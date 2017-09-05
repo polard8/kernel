@@ -1,0 +1,31 @@
+
+Design Note 1.
+
+    /microkernel stuff.
+
+Sobre o microkernel e o process manager:
+========================================
+
+    O process manager é uma parte fundamental do kernel base. Seu arquivo inicial é process.c, 
+os outros arquivos são complemento do process manager.
+    O process manager faz parte do microkernel.
+
+    @todo: deve-se criar pastas para arquitetura como \i386.
+
+    *IMPORTANTE: As rotinas nesse módulo são em parte extremamente dependente do hardware. Deve-se criar alguma abstração e encapsulamento, assim como no módulo hal.    
+
+    Obs: scheduleri.c comtém funções que complementam scheduler.c.
+    Obs: threadi.c comtém funções que complementa thread.c. 
+
+
+Sobre o gerenciamento de Heap:
+=============================
+    O arquivo pheap.c gerencia heaps para processos e o arquivo theap.c gerencia heaps para threads.
+    
+
+Sobre o gerenciamento de Stacks:
+================================
+    O arquivo tstack.c gerencia stasks para threads. 
+    @todo: Poderia existir um arquivo para gerenciar stacks para processos, (pstack.c).
+
+   * Versão 1.0, 2015, 2016.

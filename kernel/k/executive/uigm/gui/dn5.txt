@@ -1,0 +1,4 @@
+
+Criar e usa estrtura para fonte.
+criar o arquivo font.c, que será o gerenciador de fontes.
+Criar um arquivo para gerenciamento de cursor. cursor.c

@@ -1,0 +1,16 @@
+Design note 1.
+
+
+   /include stuffs.
+
+
+   O diretório /include contém headers da biblioteca padrão C e os principais
+   header do kernel, principalmente os que tem atuação global e não se
+   incluem nos módulos /executive /hal /microkernel.
+
+
+   Criado o arquivo de definições globais 'gdef.h'
+   ele deve ficar no início das definições, pois
+   servirá à todos os módulos.
+  
+   versão 1.0, 2016.

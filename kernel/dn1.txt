@@ -1,0 +1,20 @@
+Design note 1.
+
+
+
+Lista de diretórios:
+===================
+
+
+/bin      - Binário do kernel.
+/include  - Headers do kernel.
+/k        - Sources do kernel.
+
+
+
+@todo: Shared heap walker.
+um heap de memória compartilhada para alocação dinâmica..
+
+;
+; fim.
+; 

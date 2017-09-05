@@ -1,0 +1,49 @@
+
+
+  /unblocked
+
+
+   Esse é o ambiente para os dispositivos de fácil acesso.
+   Os dispositivos de fácil acesso são os dispositivos legados.
+
+   ex: 
+       ps/2 teclado, 
+       ps/2 mouse,
+       hd ide (PATA),
+       cmos (RTC)
+       Timer(PIT)
+       (PIC) 
+       porta paralela
+       vga controller
+       
+       ...  
+
+
+    Algumas configurações de dispositivos legados foram realizadas na pasta head em microkernel, não há problema nisso, porém aqui poderão ficar rotinas de acesso aos
+controladores de dispositivos legados. :)
+
+
+virtual box info:
+==================
+Porta serial: Serial#0: emulating 16550A
+Guest paging mode (VCPU #0):  32-bit (changed 6 times), A20 enabled (changed 2 times)
+gdtr=00000000c0001210:0037  idtr=00000000c0001252:07ff  eflags=00003202
+tr  ={002b base=c0001a76 limit=00002067 flags=0000008b}
+Display::handleDisplayResize: uScreenId=0 pvVRAM=000000000a900000 w=800 h=600 bpp=24 cbLine=0x960 flags=0x1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

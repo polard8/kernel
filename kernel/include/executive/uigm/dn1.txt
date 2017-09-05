@@ -1,0 +1,1 @@
+    /uigm - Gerencia recursos de interface com o usuário em modo gráfico

@@ -1,0 +1,156 @@
+/*
+ * File: heap.h
+ *
+ * Descrição:
+ *     Gerenciar o ponteiro global para o heap atual, onde será
+ * alocada memória.
+ * *IMPORTANTE: Esse arquivo é importante para gerenciar a alocação
+ * de memória para um processo em user mode.
+ * 
+ * Histórico:
+ *     Version: 1.0, 2016 - Created.
+ */
+
+//Contagem de heap.
+#define HEAP_COUNT_MAX  256
+
+//kernel heap.(Endereço virtual do heap do processo Kernel). 
+#define KERNEL_HEAP_START  0xC0100000
+#define KERNEL_HEAP_END    0xC02FFFF0    //0xC02FFFF0. 
+#define KERNEL_HEAP_SIZE   (KERNEL_HEAP_END - KERNEL_HEAP_START)
+
+/*
+ * Heap.
+ * Salvamos aqui o Global Heap Pointer atual, ele pode pertencer ao kernel,
+ * ao processo, ou ao desktop ao qual o processo pertence.
+ *     Obs: Acrescentado static.
+ */
+static unsigned long Heap;
+//static unsigned long KernelHeapPointer;  //Kernel Heap pointer.
+//static unsigned long UserHeapPointer;    //User Heap pointer.
+
+
+/*
+ * Kernel Heap support.
+ */
+
+unsigned long heapCount;            //Conta os heaps do sistema.
+unsigned long kernel_heap_start;    //Start.
+unsigned long kernel_heap_end;      //End.
+unsigned long g_heap_pointer;       //Pointer.
+unsigned long g_available_heap;     //Available.
+
+
+/*
+ * HeapPointer:
+ *     Estrutura para manipular o heap pointer
+ *     do processo atual na função malloc.
+ */
+ /*
+struct HeapPointer
+{
+	unsigned int kernel_heap_poiter;	
+    unsigned int kernel_last_valid;
+    unsigned int kernel_last_size;
+	
+	unsigned int desktop_heap_poiter;	
+    unsigned int desktop_last_valid;
+	unsigned int desktop_last_size;
+	
+	int desktop_id;
+};
+*/
+
+
+/*
+ * heap_d:
+ *     Estrutura para heap.
+ *     Cada processo tem seu heap.
+ *     Cada heap tem uma lista encadeada de blocos.  
+ */  
+typedef struct heap_d heap_descriptor_t;
+struct heap_d 
+{
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+	int Id;
+    int Used;
+    int Magic;
+    //int ObjectType; //tipo de objeto ao qual pertence o heap.(process, ...)	
+	
+	unsigned long HeapStart;             
+	unsigned long HeapEnd;
+	unsigned long HeapPointer;            
+	unsigned long AvailableHeap; 	
+	
+	
+	// Ponteiro para a lista de blocos de um heap.
+    //??? lista linkada de blocos.
+    // Obs: Foram alocados vários blocos de memória dentro
+    //	    de um heap. Portanto podemos colocar os ponteiros
+	//para as estruturas desses blocos dentro de uma lista encadeada
+	// e o ponteiro para a lista colocaremos aqui.
+	struct mmblock_d *mmblockListHead;  
+	
+	
+	//Um heap pertence à um desktop.
+	struct desktop_d *desktop;
+	
+	//Um heap pertence à um processo.
+	struct process_d *process;
+	
+	//Um heap pode pertencer à um thread.
+	struct thread_d *thread;
+	
+	//
+	// Compartilhamento de heap:
+	// ========================
+	//   + As threads de um mesmo processo podem compartilhar o mesmo heap
+	//     pois estão na mesma área de memória.
+	//   + @todo: O desafio é fazer os processes que estão no mesmo desktop
+	//            compartilharem o mesmo heap, porque eles deveriam estar
+	//            na mesma área de memória para isso. 
+	//
+	
+	//...
+
+	//Sequenciando heaps sei lá pra quê. 
+	struct heap_d *next;
+};
+heap_descriptor_t *KernelHeap;
+heap_descriptor_t *UserHeap;
+//heap_descriptor_t *CurrentHeap;
+//heap_descriptor_t *ProcessHeap;
+//heap_descriptor_t *IdleProcessHeap;
+//heap_descriptor_t *current_heap;
+//...
+
+
+//Heap list.
+//heap pool.
+//obs:. heapList[0] = The Kernel Heap !!!    
+unsigned long heapList[HEAP_COUNT_MAX];     
+
+
+//
+// Protótipos.
+//
+
+int init_heap();
+void SetKernelHeap( unsigned long HeapStart, unsigned long HeapSize);
+
+//Pega o endereço do início do header da próxima alocação.
+unsigned long get_process_heap_pointer(int pid);
+
+//
+// Alloc and Free.
+//
+unsigned long AllocateHeap(unsigned long size);
+void *AllocateHeapEx(unsigned long size);
+unsigned long FreeHeap(unsigned long size);
+
+//
+// Fim.
+//
+
