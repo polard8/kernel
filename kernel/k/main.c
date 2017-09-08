@@ -68,8 +68,7 @@ extern unsigned long kArg4;
 extern unsigned long SavedBootMode;
  
 //char *copyright = "Copyright (c) 2005-2016, Fred Nora"; 
-//char codename[] = "Londrina";
-//char codename[] = "Barbarian";
+//char codename[] = "berlin";
 
 
 /*

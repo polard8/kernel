@@ -29,7 +29,7 @@
 ;
 
 ;;
-;; codename db 'torsk'
+;; codename db 'angola'
 ;;
 
 

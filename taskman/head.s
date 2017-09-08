@@ -30,7 +30,7 @@
 
 
 ;;
-;; codename db 'oslo'
+;; codename db 'israel'
 ;;
 
 segment .head_x86

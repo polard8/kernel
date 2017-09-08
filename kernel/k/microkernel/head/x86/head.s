@@ -29,7 +29,7 @@
 ; Obs: Essa é uma ordem padrão, nunca mudar, nunca excluir arquivos, 
 ;      nunca incluir outros arquivos.
 ;
-; codename (Israel): 
+; codename (): 
 ; ==================
 ;   wCodeBootManager (MSM)
 ;   wCodeBootLoader
@@ -53,6 +53,11 @@
 ; Versão 1.0, 2016 - Revisão.
 ; ...
 ;
+
+
+;;
+;; codename='berlin'
+;;
 
 
 ;
@@ -2576,3 +2581,4 @@ _bss_start:
 ;
 ;@_FIM
 ;
+
