@@ -58,7 +58,9 @@ extern void asm_reboot();    //Reboot.
 //
  
 #define KEYBOARD_DRIVER_VERSION "1.0"
+
 #define KEY_RELEASED 0x80
+
 #define KEY_MASK 0x7F
 #define CHEIO 1
 #define VAZIO 0
@@ -181,7 +183,7 @@ unsigned long alt_status;
 unsigned long shift_status;
 unsigned long capslock_status;
 unsigned long numlock_status;
-
+//...
 
 //@todo: fazer rotina de get status algumas dessas variáveis.
 
@@ -191,6 +193,73 @@ int kbMsgStatus;
 
 //Se o teclado é do tipo abnt2.
 int abnt2;
+
+//
+// keyboardMessage
+//     estrutura interna para mensagens.
+//
+struct keyboardMessage 
+{
+	unsigned char scancode;
+	
+	//hwnd;  //@todo: na verdade todo driver usará estrutura de janela descrita na API que o driver use.
+	int message;
+	unsigned long long1;
+	unsigned long long2;
+};
+
+
+//Pega o status das teclas de modificação.
+unsigned long keyboardGetKeyState( unsigned char key )
+{
+	unsigned long State = 0;
+	
+	switch(key)
+	{   
+		case VK_LSHIFT:
+		    State = shift_status;
+		    break;
+
+	    case VK_LCONTROL:
+		    State = ctrl_status;
+		    break;
+
+	    case VK_LWIN:
+		    State = winkey_status;
+		    break;
+
+	    case VK_LMENU:
+		    State = alt_status;
+		    break;
+
+	    case VK_RWIN:
+		    State = winkey_status;
+		    break;
+
+	    case VK_RCONTROL:
+		    State = ctrl_status;
+		    break;
+			
+	    case VK_RSHIFT:
+		    State = shift_status;
+		    break;
+
+	    case VK_CAPITAL:
+		    State = capslock_status;
+		    break;
+
+	    case VK_NUMLOCK:
+		    State = numlock_status;
+		    break;
+			
+		//...
+	};
+
+	//Nothing.
+	
+Done:
+    return (unsigned long) State;		
+}
 
 
 /*
@@ -275,12 +344,16 @@ void KeKeyboard(){
 };
 
 
+
+
+
 /*
  * abnt2_keyboard_handler: 
  *     Keyboard handler for abnt2 keyboard.
  *     A interrupção de teclado vai chamar essa rotina.
- *     @todo: Poderia ser: keyboardhandlerABNT2()
+ *     @todo: Usar keyboardABNT2Handler().
  */
+//void keyboardABNT2Handler() 
 void abnt2_keyboard_handler()
 {
     /*
@@ -299,7 +372,7 @@ void abnt2_keyboard_handler()
 	//Tela para debug em RING 0.
     //unsigned char *screen = (unsigned char *) 0x000B8000;   
     unsigned char *screen = (unsigned char *) SCREEN_START;    //Virtual.   
-	
+	//...
 	
 	
     /*
@@ -313,11 +386,7 @@ void abnt2_keyboard_handler()
 	//     em user mode.
 
 
-	//
-	// @todo:
-	// Sondando scancode durante a fase de desenvolvimento do driver.
-	//
-
+    //Show the scancode if the flag is enabled. 
 	if(scStatus == 1){
 	    printf("{%d,%x}\n",scancode,scancode);
 	};
@@ -328,12 +397,14 @@ void abnt2_keyboard_handler()
      */
 
     //Se a tecla for liberada.
-    if(scancode & KEY_RELEASED)
+	//DÁ '0' se o bit de paridade fo '0'.
+    if( (scancode & KEY_RELEASED) == 0 )
 	{
 	    key = scancode;
 		key &= KEY_MASK;    //Desativando o bit de paridade caso esteja ligado.
 
-		//Configurando se é do sistema ou nao.
+		//Configurando se é do sistema ou não.
+		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
 		switch(key)
 		{
 			//Os primeiros 'case' é quando libera tecla do sistema.
@@ -446,12 +517,17 @@ void abnt2_keyboard_handler()
         //Nothing.
 		goto done;
 	}
-	else    // * Tecla pressionada ...........	
-	{
-        //Passando key.   
+	//else    // * Tecla pressionada ...........	
+	
+	
+	if( (scancode & KEY_RELEASED) != 0 )
+	{ 
 		key = scancode;
+		key &= KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
 
 		//O Último bit é zero para key press.
+		//Checando se é a tecla pressionada é o sistema ou não.
+		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
 		switch(key)
 		{
 			//@todo: tab,
@@ -548,6 +624,7 @@ void abnt2_keyboard_handler()
 
 			//A tecla pressionada não é do sistema.
 			default:
+			    //printf("keyboard debug: default: MSG_KEYDOWN\n");
 			    mensagem = MSG_KEYDOWN;
 				break;
 		};
@@ -563,8 +640,9 @@ void abnt2_keyboard_handler()
 
 		if(mensagem == MSG_KEYDOWN)
 		{
-		    ch = map_abnt2[key];
-
+			if(abnt2 == 1){
+		        ch = map_abnt2[key];
+			};
 
 		    if(shift_status == 1 || capslock_status == 1){
 			    ch = shift_abnt2[key];
@@ -608,19 +686,24 @@ done:
 	// Control + Alt + Del.
 	//
 
-	if( (ctrl_status==1) && (alt_status==1) && (ch==KEY_DELETE) )
-	{
 		//Opções:
 		//@todo: Chamar a interface do sistema para reboot.
 		//@todo: Opção chamar utilitário para gerenciador de tarefas.
 		//@todo: Abre um desktop para operações com usuário, senha, logoff, gerenciador de tarefas.
 
-		//Testado opção ...
-		systemReboot();
-
-		//outportb(0x20, 0x20);    //EOI. sim ou nao.???
-		//hal_reboot();
-		//reboot();
+		//Chamando o módulo /sm diretamente.
+		//mas não é o driver de teclado que deve chamar o reboot.
+		//o driver de teclado deve enviar o comando para o console, /sm,
+		//e o console chama a rotina de reboot do teclado.
+		//Uma mensagem de reboot pode ser enviada para o procedimento do sistema.
+		//Pois o teclado envia mensagens e não trata as mensagens.
+	
+	//Um driver não deve chamar rotinas de interface. como as rotians de serviço.	
+	if( (ctrl_status==1) && (alt_status==1) && (ch==KEY_DELETE) )
+	{
+		//A intenção é que essa mensagem chegue no procedimento do sistema.
+		//Porem o sistema tambem deve saber quem está enviando esse pedido.@todo.
+		services( SYS_REBOOT, 0, 0, 0);
 	};
 
 	//
@@ -645,9 +728,50 @@ done:
 	//apenas chamando essa rotina de serviços.
 	
 	
+	//test. TEM QUE MOSTRAR PARA TERMINAR O DRIVER DE TECLADO.
+	//printf("%c", ch);
+	
+	//Escrevendo na tela do desenvolvedor.
+	//Isso será portado para outro módulo. está aqui para teste. 
+	if( (void*) gui->DEVELOPERSCREEN == NULL)
+	{
+        printf("abnt2_keyboard_handler: gui->DEVELOPERSCREEN");	
+        refresh_screen();
+        while(1){}		
+	}else{
+		
+		//Cursor.
+		//g_cursor_x = gui->DEVELOPERSCREEN->cursor_x;
+		//g_cursor_y = gui->DEVELOPERSCREEN->cursor_y;
+		//printf("%c", ch);
+		//@todo: Não está incrementando a escrita ...
+	};
+	
 	//69 ??
-	services( 69, (unsigned long) mensagem, (unsigned long) ch, (unsigned long) ch);
+	//Enviando mensagem pra janela com o foco de entrada.
+	//#bugbug Error: O driver de teclado não deve saber qual é a janela com foco de 
+	//entrada.. ele deve enviar essa mensagem para o kernel e o kernel 
+	//decide quem é a janela com o foco de entrada e encameinha a mensagem para 
+	//a fila da janela com o o foco de entrada.
+	
+	//services( 69, (unsigned long) mensagem, (unsigned long) ch, (unsigned long) ch);
 
+	//
+	// Obs: estamos enviando a messagem para 2 procedimentos,
+	// mas o procedimento do sistema não trada digitações de teclas comuns. 
+	//
+	system_procedure( NULL, 
+	                 (int) mensagem, 
+	     			 (unsigned long) ch, 
+					 (unsigned long) ch );	
+	
+	//test
+	//@todo: #bugbug Lembrando que um driver ainda não tem acesso abertos
+	//a essa função... uma chada à essa função deve ser criada na API usada pelo driver.
+	windowSendMessage( (unsigned long) 0,
+			           (unsigned long) mensagem, //msg
+					   (unsigned long) ch,
+					   (unsigned long) ch );
 
     //
     // @todo: ENVIANDO A MENSAGEM PARA O GERENCIADOR DE MENSAGENS.

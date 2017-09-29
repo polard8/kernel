@@ -256,27 +256,22 @@ void set_file(void *file, int Index)
 };
 
 
-
-void fs_test_fat_vector()
-{
+void fs_test_fat_vector(){
     return; //Ainda não implementada.
 };
 
 
-unsigned long fs_get_fat_entry(unsigned long n)
-{	
+unsigned long fs_get_fat_entry(unsigned long n){	
     return 0; //Ainda não implementada.
 };
 											 
 
-void fs_set_fat_entry(unsigned long n, unsigned long value)
-{	
+void fs_set_fat_entry(unsigned long n, unsigned long value){	
     return;	//Ainda não implementada.
 };
 
 
-void fs_put_list_on_fat()
-{
+void fs_put_list_on_fat(){
     return; //Ainda não implementada.
 };
 
@@ -350,7 +345,11 @@ void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long stat
  * sim no final do primeiro setor, antes da tabela de partições.
  *
  * Endereço da memória onde o MBR é carregado na inicialização. 0x00020000.   
+ *
+ * @todo: Talvez essa rotina pudesse fornecer o endereço do buffer como argumento.
+ *
  */
+//void fsCheckMBR(unsigned char* buffer)  //@todo
 void fsCheckMbr()
 {
 	unsigned char *mbr = (unsigned char *) FS_MBR_ADDRESS;  
@@ -377,6 +376,7 @@ done:
  *     Vai no endereço onde está armazenado o VBR do volume atual
  *     e confere as informações sobre o volume.
  */
+//void fsCheckVBR(unsigned char* buffer)  //@todo 
 void fsCheckVbr()
 {
     unsigned char *vbr = (unsigned char *) FS_VBR_ADDRESS;
@@ -461,10 +461,9 @@ done:
 
 /*
  * set_spc:
- *     Configura spc, Sector Per Cluster.
+ *     Configura spc, 'Sector Per Cluster' em variável global.
  */
-void set_spc(int spc)
-{
+void set_spc(int spc){
     g_spc = (int) spc;
     return;
 };

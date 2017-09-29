@@ -1,5 +1,7 @@
 /*
  * File: console.h
+ * Console é o termo usado para o dispositivo que envia comandos 
+ * de gerenciamento do sistema. ... o módulo /sm esta tratando disso.
  *
  * Obs: O termo usado nesse sistema será terminal virtual. Está em (terminal.h).
  *      Um terminal é composto de teclado e monitor.

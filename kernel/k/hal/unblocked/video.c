@@ -6,12 +6,24 @@
  *     Faz parte do modulo HAL. (hardware)
  *     Crt, Vga ...
  *
- * Versão: 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2017 - Revision and small changes.
  */
 
 
 #include <kernel.h>
 
+
+//Definições internas.
+
+#define VIDEO_BIOS_FONT8X8_ADDRESS 0x000FFA6E
+//#define VIDEO_BIOS_FONT8X16_ADDRESS (0x000FFA6E+??)
+//...
+
+#define VIDEO_BIOS_FONT8X8_WIDTH   8
+#define VIDEO_BIOS_FONT8X8_HEIGHT  8
+//...
 
 //
 // Variáveis importadas.
@@ -51,7 +63,7 @@ int videoVideo();
  *     Configura o endereço inicial da memória de video em modo texto   
  *     fis=b8000  vir=0x800000 
  */
-void videoSetupCGAStartAddress( unsigned long address)
+void videoSetupCGAStartAddress(unsigned long address)
 {
     g_current_vm = (unsigned long) address;
 	//g_current_cga_address
@@ -116,21 +128,24 @@ int videoInit()
 		//Poderíamos copiar a font da ROM para a RAM.
 		
 		//Font. (BIOS font).
-		gfontAddress = (unsigned long) 0x000FFA6E;  //Code page 437.  
-	    gcharWidth = 8;
-	    gcharHeight = 8;		
+		gfontAddress = (unsigned long) VIDEO_BIOS_FONT8X8_ADDRESS;  
+	    gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
+	    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
+
+		//Font. (test).
+		//gfontAddress = (unsigned long) ??;  
+	    //gcharWidth = ??;
+	    //gcharHeight = ??;
+
+        //@todo: Onde esta a estrutura para fonte.		
 	    
-		//Cursor. ??pra que isso?
+		//Cursor. 
 		g_cursor_x = 0;
-	    g_cursor_y = 8;
-		
-        g_cursor_left = 0;  //margem esquerda dada em linhas
-        g_cursor_top = 0;   //margem superior dada em linhas
-        
-		//@todo:
-		//#bugbug Um valor baixo aqui trava a máquina.
-		g_cursor_right  = 256;  //margem direita dada em linhas
-        g_cursor_bottom = 256;   //margem inferior dada em linhas
+	    g_cursor_y = 8;	
+        g_cursor_left = 0;      // Margem esquerda dada em linhas.
+        g_cursor_top = 0;       // Margem superior dada em linhas.
+		g_cursor_right  = 256;  // Margem direita dada em linhas.
+        g_cursor_bottom = 256;  // Margem inferior dada em linhas.
 		
 		//terminal. (cmd)
 		//shell_create_terminal();
@@ -232,6 +247,12 @@ void videoSetMode(unsigned long mode)
 		//...
 	};
 	
+	
+	//
+	// @todo:
+	// Organizar isso. Os valores atuais devem ser obtidos em real mode 
+	// usando os recursos do VESA BIOS.
+	//
 	
     switch(VideoMode)
 	{

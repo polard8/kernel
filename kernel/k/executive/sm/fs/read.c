@@ -79,11 +79,14 @@ done:
 
 /*
  * read_lba:
- *     Carrega um um setor na memória dado o lba.
- *     fsReadLba(..)
+ *     Carrega um um setor na memória, dado o LBA.
+ *     fsReadLBA(..)
+ *     Obs: Talvez essa rotina tenha que ter algum retorno no caso de falhas.
  */
 void read_lba( unsigned long address, unsigned long lba)
-{ 
+{
+    //Obs: 'fatbits' é uma variável global??
+	
  	//taskswitch_lock();
 	//scheduler_lock();	          	
 	
@@ -105,6 +108,9 @@ void read_lba( unsigned long address, unsigned long lba)
 			break;
 
         default:
+		    //@todo: 
+			// Precisamos fazer alguma coisa se essa variável for 
+			// um valor inválido.
 		    return;
             break;		
 	};	
@@ -129,6 +135,7 @@ done:
  * carregados na memória e qual o endereço o tipo o tamanho etc.
  *
  */
+//unsigned long fsLoadFile( unsigned char *name, unsigned long address) 
 unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 {
     int Status;	
@@ -180,7 +187,7 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	    //Max entries ~ Número de entradas no rootdir.
 	    max = filesystem->rootdir_entries;	
 	    if(max <= 0){
-	        printf("fsLoadFile error: Root dir entries.");
+	        printf("fsLoadFile error: Root entries.");
 		    refresh_screen();
 		    while(1){}
 	    };
@@ -415,7 +422,7 @@ void fs_load_dir(unsigned long id)
 	
 	
 	if(File->address == 0){
-	    printf("fs_load_dir: null address.\n");
+	    printf("fs_load_dir: Null address.\n");
 		return;
 	};
 	

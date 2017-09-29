@@ -1,5 +1,5 @@
 /*
- * Arquivo: create.c
+ * File: microkernel\create.c
  *
  * Descrição:
  *     Rotinas de criação de processos e threads.
@@ -7,13 +7,14 @@
  *     ?? Criar, cria a estrutura. ??
  *     ?? Inicializar inicializa estrutura passada por argumento. ??
  *
- *  @todo: Separar as rotinas de criação de inicialização de threads e
- *         processos, pois assim pode haver algum tipo de reaproveitamento,
- *         apenas reinicializando a thread.
+ * @todo: 
+ *     Separar as rotinas de criação de inicialização de threads e processos, 
+ * pois assim pode haver algum tipo de reaproveitamento, apenas reinicializando 
+ * a thread.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  *     ...
  */
 
@@ -31,9 +32,9 @@ extern unsigned long get_page_dir();
 /*
  * KeCreateProcess:
  *     Interface para criação de um processo.
- *     @todo: Erro. Rotinas começadas com 'Ke_' servem
- * para chamar serviços de módulos externos.
- *
+ * @todo: 
+ *     Erro. Rotinas começadas com 'Ke_' servem para chamar serviços de 
+ * módulos externos.
  */
 void *KeCreateProcess( struct wstation_d *window_station,
                        struct desktop_d  *desktop,
@@ -60,12 +61,12 @@ done:
 };
 
 
-
 /*
  * KeCreateThread:
  *    Interface para criação de uma thread.
- *     @todo: Erro. Rotinas começadas com 'Ke_' servem
- * para chamar serviços de módulos externos.
+ * @todo: 
+ * #Erro. Rotinas começadas com 'Ke_' servem para chamar serviços de 
+ * módulos externos.
  */
 void *KeCreateThread( struct wstation_d *window_station,
                       struct desktop_d  *desktop,
@@ -93,16 +94,28 @@ done:
 
 
 
+/*
+ * dofork:
+ *     Implementa a rotinca de clonagem de processo.
+ *     Essa rotina será chamada por fork().
+ *
+ */
+//int dofork(); 
+//int dofork(){
+//	return 0;
+//};
 
 
 /*
  * fork: 
- * @todo:
- *     Semelhante ao unix, isso deve criar um processo filho fazendo
- * uma cópia dos parâmetros presentes no PCB do processo pai.
- * um tipo de clonagem. Depois obviamente a imagem do processo filho
- * será carregada em um endereço físico diferente da imagem do processo pai.
  *
+ * @todo:
+ *     Semelhante ao unix, isso deve criar um processo filho fazendo uma cópia 
+ * dos parâmetros presentes no PCB do processo pai. Um tipo de clonagem. 
+ * Depois obviamente a imagem do processo filho será carregada em um endereço 
+ * físico diferente da imagem do processo pai.
+ * Essa não precisa ser a rotina, pode ser apenas uma interface, que chama a 
+ * rotina dofork() e outras se necessário.
  */
 int fork()
 {  
@@ -112,6 +125,7 @@ int fork()
 	
 	//...
 	
+	//dofork();
 	
 done:	
 	//return (int) p->pid;
@@ -158,7 +172,6 @@ done:
  *    @todo: As funções relativas às rotinas de fork
  *           podem ir para um arquivo que será compilado junto com o kernel.
  *           ex: fork.c
- *
  */
 int KiFork()
 {
@@ -272,19 +285,22 @@ done:
 /*
  * KeCreateKernelProcess:
  *    Criando manualmente o processo do Kernel.
- *    @todo: Rever a inicial Ke, pois é usado para
- *           chamadas à módulos externos.  
- * @todo: Mudar o nome para createCreateKernelProcess()
+ *    
+ * @todo: 
+ *     Rever a inicial Ke, pois é usado para chamadas à módulos externos.  
+ *
+ * @todo: 
+ *     Mudar o nome para createCreateKernelProcess()
  */
+//void *createCreateKernelProcess() 
 void *KeCreateKernelProcess()
 {
-	char *ProcessName = "KERNEL PROCESS";
 	struct process_d *p;
-	
+	char *ProcessName = "KERNEL PROCESS";
 	
 	//KernelProcess 
 	
-	p = (void *) malloc(sizeof( struct process_d) );
+	p = (void *) malloc( sizeof(struct process_d) );
 	
 	if( (void*) p == NULL ){
 	    printf("KeCreateKernelProcess:");
@@ -304,13 +320,13 @@ void *KeCreateKernelProcess()
 		p->framepoolListHead = NULL;
 
 		//Heap and Stack. (endereços físicos = endereços virtuais).
-	    //KernelProcess->StackOffset = 0;                   //Deslocamento da pilha em relação ao início do kernel. 
-	    p->Stack       = KERNEL_STACK_START;    //Endereço do início da Stack do processo.
-	    p->StackSize   = KERNEL_STACK_SIZE;     //Tamanho da pilha.	
-	    p->Heap        = KERNEL_HEAP_START;     //Endereço do início do Heap do processo.
-	    p->HeapSize    = KERNEL_HEAP_SIZE;      //Tamanho do heap.
-	    p->Image       = KERNEL_IMAGE_BASE;     //Base da imagem do processo.
-	    //KernelProcess->ImageSize = 0;                     //Tamanho da imagem do processo.				
+	    //KernelProcess->StackOffset = 0;     // Deslocamento da pilha em relação ao início do kernel. 
+	    p->Stack       = KERNEL_STACK_START;  // Endereço do início da Stack do processo.
+	    p->StackSize   = KERNEL_STACK_SIZE;   // Tamanho da pilha.	
+	    p->Heap        = KERNEL_HEAP_START;   // Endereço do início do Heap do processo.
+	    p->HeapSize    = KERNEL_HEAP_SIZE;    // Tamanho do heap.
+	    p->Image       = KERNEL_IMAGE_BASE;   // Base da imagem do processo.
+	    //KernelProcess->ImageSize = 0;       // Tamanho da imagem do processo.				
 	    
 		//Identifications.
 		p->pid  = (int) 0;                   //PID.
@@ -373,8 +389,8 @@ done:
  */
 void *KeCreateIdle()
 {
-    void *idleStack; //Stack pointer.
-	char *ThreadName = "idlethread";    //Name.
+    void *idleStack;                    // Stack pointer.
+	char *ThreadName = "idlethread";    // Name.
 	
     //Aloca memória mara a estrutura.
 	IdleThread = (void*) malloc( sizeof(struct thread_d) );	
@@ -557,9 +573,10 @@ done:
  */
 void *KeCreateShell()
 {
-    void *shellStack;  //Stack pointer. 
-	char *ThreadName = "shellthread";    //Name.
+    void *shellStack;                    // Stack pointer. 
 	struct thread_d *t;
+	char *ThreadName = "shellthread";    // Name.
+
 
    /*
     *@todo: checar o tipo de processador antes de configurar o contexto.
@@ -720,9 +737,9 @@ done:
  */
 void *KeCreateTaskManager()
 {
-    void *taskmanStack;  //Stack pointer. 	
-	char *ThreadName = "taskmanthread";  //Nome.
+    void *taskmanStack;                    // Stack pointer. 	
 	struct thread_d *t;
+	char *ThreadName = "taskmanthread";    // Name.
 	
    /*
     * @todo: 
@@ -747,7 +764,7 @@ void *KeCreateTaskManager()
 	};
 	*/
 	if( (void*) KernelProcess == NULL ){
-	    printf("KeCreatetaskManager: Kernel Process is not created.\n");
+	    printf("KeCreatetaskManager: Kernel Process not created.\n");
 		refresh_screen();
 		while(1){}
 	};	

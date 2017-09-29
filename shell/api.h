@@ -1346,6 +1346,7 @@ ApplicationInfo_t *ApplicationInfo;
 /*
  * buffer_info_d:
  *     Informações básicas sobre um buffer.
+ *     No kernel existem várias estruturas para lidar com memória.
  */
 typedef struct buffer_info_d buffer_info_t;
 struct buffer_info_d

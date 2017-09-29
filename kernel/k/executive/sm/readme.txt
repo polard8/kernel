@@ -2,8 +2,10 @@
 
 Sobre o diretório executive/sm:
 ==============================
+   
+    /sm  * o 'console' é a interface de administração do sistema,
 
-     System Management.
+     'System Management'.
      Esse diretório comtém os recursos de gerenciamento de sistema, independente se
 estão em modo texto ou modo gráfico.
 
@@ -18,3 +20,14 @@ por utilitários do sistema em user mode que desejam configurara o sistema. Obs: 
 
 
    @todo: Criar pasta /devices.
+
+
+
+   **** Importante:
+        ===========
+
+
+   Existe uma função chamada "void *systemGetSystemMetric(int number)" ... que retornará
+  muitas medidas do sistema, usadas para criação em dimensões apropriadas e para análises diversas.
+
+a função fica em sm\system\system.c. 

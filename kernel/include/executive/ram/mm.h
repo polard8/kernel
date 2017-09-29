@@ -127,11 +127,15 @@ memória virtual, até o início da área do kernel ".
 // Directory:
 // ========== 
 //     Endereço físico de alguns diretórios.
+//     Serão colocados em cr3.
 //
-#define KERNEL_PAGEDIRECTORY  0x0009C000    //CR3={0x0009C000}. 
-//#define IDLE_PAGEDIRECTORY       0x01E00000
-//#define SHELL_PAGEDIRECTORY      0x01D00000
-//#define TASKMAN_PAGEDIRECTORY    0x01C00000
+
+//@todo: Precisamaos definir melhor esses endereços.
+//Colocá-los em um lugar segura e concatenados.
+#define KERNEL_PAGEDIRECTORY     0x0009C000     
+#define IDLE_PAGEDIRECTORY       0x01E00000
+#define SHELL_PAGEDIRECTORY      0x01D00000
+#define TASKMAN_PAGEDIRECTORY    0x01C00000
 //...
 
 
@@ -185,7 +189,7 @@ memória virtual, até o início da área do kernel ".
 //@todo: Criar um array de estruturas alocado.
 #define PAGETABLE_COUNT_MAX 1024 
 
-//quantidade máxima de pageframes.
+//Quantidade máxima de pageframes.
 //@todo: #bugbug. isso tá errado. Essa é a quantidade de pageframes
 //de apenas uma page table. Isso equiva à apenas um pagepool.
 #define PAGEFRAME_COUNT_MAX 1024 //provisório
@@ -301,12 +305,11 @@ typedef enum {
 /*
  * mmblockCount:
  *     mm block support.
- *     Conta os blocos de memória dentro de um heap. 
+ *     Conta os blocos de memória dentro de um heap.
+ *     *dentro do heap usado pelo kernel eu acho ?? 
  */
 unsigned long mmblockCount;         
  
-
-
 
 
 /*
@@ -318,15 +321,16 @@ unsigned long kernel_stack_start;
 
 /*
  * process_memory_info_d:
- * Estrutura para informações sobre a memória 
- * utilizada por um processo.
- * Obs: O gerenciamento de meória é tarefa do módulo /sm
- *      portanto isso não deve ir para o microkernel.
+ *
+ *     Estrutura para informações sobre a memória utilizada por um processo.
+ * Obs: 
+ * O gerenciamento de memória é tarefa do módulo /sm portanto isso não deve 
+ * ir para o /microkernel.
+ *
  */
 typedef struct process_memory_info_d process_memory_info_t;
 struct process_memory_info_d
 {
-
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
@@ -344,13 +348,18 @@ struct process_memory_info_d
 	//Pico de Working Set.
 	//??delta de conjunto de trabalho.
 	//...
-	
 };
-//process_memory_info_t *pmiCurrent;
+//Informações de memória do processo atual.
+process_memory_info_t *pmiCurrent;
 //...
 
-//Informações sobre a memória física.
-//system.h deve usar isso.
+
+/*
+ * physical_memory_info_d:
+ *
+ *     Informações sobre a memória física.
+ *     O arquivo system.h deve usar isso. 
+ */
 typedef struct physical_memory_info_d physical_memory_info_t;
 struct physical_memory_info_d
 {
@@ -363,6 +372,8 @@ struct physical_memory_info_d
 	unsigned long Free;      //Livre.(Existe na RAM mas não foi paginada??).
     //...	
 };
+physical_memory_info_t *pmiMemoryInfo;
+//...
 
 
 /*
@@ -384,57 +395,68 @@ struct memory_info_d
 	unsigned long TotalV;
     unsigned long AvailableV;
 };
-//memory_info_t *MemoryInfo;
-
+memory_info_t *miMemoryInfo;
+//...
 
 
 /*
+ *****************************************************************
  * mmblock_d:
  *     Estrutura para memory blocks.
  *     Temos vários blocos de memória espalhados em lugares diferentes 
  * dentro de um heap.
  *     Essa estrutura é usada pelo kernel para controlar as áreas de memória
  * alocadas dinâmicamente dentro do heap do kernel. Porém poderemos
- * usar essa mesma estrutura para alocar memória em outros heaps. como 
- * o heap de um processo ou o heap de um desktop. @todo para isso
- * essa estrutura poderia conter informações sobre qual heap estamos
- * usando.
+ * usar essa mesma estrutura para alocar memória em outros heaps. Como o heap 
+ * de um processo ou o heap de um desktop. @todo: Para isso essa estrutura 
+ * poderia conter informações sobre qual heap estamos usando. Mas me parece 
+ * que o tamanho do header deve ser fixo.
  *
  * @todo: 
- * Os blocos precisam de alguma organização. Por enquanto, o total é 
- * 256 heaps(??) de tamanhos diferentes.
+ * Os blocos precisam de alguma organização. 
+ * Por enquanto, o total é 256 heaps de tamanhos diferentes.
  *
  * Os blocos formarão uma lista encadeada que será percorrida para se 
  * encontrar um bloco vazio. (walk).
  *
+ * *Importante: A memória será organizada em bancos, que conterão memória 
+ * privada e memória compartilhada. Os blocos de memória e os heaps 
+ * precisam estar associadoas aos bancos, que conterão informações sobre 
+ * processos e usuários. @todo:
+ * Obs: Os bancos estão definidos em bank.h
+ * 
  * Obs: Um heap de processo tem vários blocos dentro.
  *
- *  *IMPORTANTE: Talvez temos algum limite para o tamanho dessa
- * estrutura em especial. Não inluir nada por enquanto.
- *
+ * *IMPORTANTE: 
+ *     Talvez tenhamos algum limite para o tamanho dessa estrutura 
+ * em especial. (Não incluir nenhuma variável por enquanto!).
+ *****************************************************************
  */ 
 typedef struct mmblock_d mmblock_descriptor_t;
 struct mmblock_d 
 {
 	//
-	// Essa estrutura é para gerenciar áreas de memória
-	// alocadas dinamicamente dentro do heap do kernel.
-	// alocadas em tempo de eecução.
+	// Essa estrutura é para gerenciar áreas de memória alocadas dinamicamente 
+	// dentro do heap do processo kernel. Alocadas em tempo de eecução.
 	//
 	
-	//@todo: Talvez nao seja possível mudar essa estrutura. ela é diferente.
+	//
+	// @todo: 
+	// Talvez não seja possível mudar essa estrutura. Éla é diferente.
+	// Portanto não definiremos inada o tipo de objeto que ela é e nem a classe.
+	
 	//object_type_t objectType;
 	//object_class_t objectClass;
 	
     //Identificadores.	
-	unsigned long Header;      //Endereço onde começa o header do heap.
+	unsigned long Header;      //Endereço onde começa o header do heap. *Importante.
 	unsigned long headerSize;  //Tamanho do header em bytes.
 	unsigned long Id;          //Id do header.
 	unsigned long Used;        //Flag 'usado' ou 'livre'.
 	unsigned long Magic;       //Magic number. Ver se não está corrompido.
 	
 	//Status.
-	unsigned long Free;        //Se o bloco esta livre ou não.
+	unsigned long Free;           //Se o bloco esta livre ou não.
 	
 	//Mensuradores. (sizes).	
 	unsigned long requestSize;    //Tamanho, em bytes, da área solicitada.
@@ -442,38 +464,33 @@ struct mmblock_d
 	unsigned long userareaSize;   //Tamanho da área reservada para o cliente. 
 	                              //(request size + unused bytes). 
 								  
-	//@todo: incluir quando possível.							  
+	//@todo: 
+	//    Incluir quando possível.
+    // Lembrando que talvez o tamanho dessa estrutura seja fixo.
+    // Talvez não mudaremos nada no tamanho dela.	
 	//struct heap_d *heap;							  
 	
-	//
     // User area. 
 	// (Onde começa a área solicitada).
-	//
-	
 	unsigned long userArea;    //Início da área alocada.
 	
-	
-	//
 	// Footer.
-	//
-	
 	unsigned long Footer;    //Endereço do início do footer.
 	
-	
-	//
 	// Process info.
     // (Pertence à qual processo?).	
-	//
-	
 	int processId;
 	struct process_d *process;
 	
-	
-	// Continua ... Talvez não pode.
+	//
+	// Continua ?? ... 
+	// Talvez não pode.
+	//
 	
 	//
-	// *IMPORTANTE: Talvez temos algum limite para o tamanho dessa
-	// estrutura em especial. Não inluir nada por enquanto.
+	// *IMPORTANTE: 
+	// Talvez temos algum limite para o tamanho dessa estrutura em especial. 
+	// Não inluir nada por enquanto.
 	//
 	
 	//Encadeando.
@@ -502,16 +519,20 @@ struct free_mmblock_d
 }
 */
 
+
+
 /*
- * Page Directory:
+ * page_directory_d:
+ *     Estrutura para o 'page directory' de um processo.
+ *
  *     Todo processo tem seu próprio diretório de páginas.
  *     Assim vários processos podem usar o mesmo endereço lógico.
  *     Ex: 0x400000
  *     @todo: Um ponteiro para essa estrutura pode estar no PCB do processo.
  *            usar os processos criados por processos para testar a configuração
  *           de page directory.
- *     Obs: Um diretório tem ponteiros para page tables. as page tables funcionam como
- *          pools de frames.
+ *     Obs: Um diretório tem ponteiros para page tables. as page tables 
+ * funcionam como pools de frames.
  */
 typedef struct page_directory_d page_directory_t;
 struct page_directory_d
@@ -542,10 +563,11 @@ struct page_directory_d
 	//significa processos ligados em um job.
     struct page_directory_d *next;  
 };
-page_directory_t *pagedirectoryCurrent;
-//page_directory_t *KernelPageDirectory;
-//page_directory_t *CurrentProcessDirectory;
-//page_directory_t *IdleProcessDirectory;
+page_directory_t *pagedirectoryKernelProcess;    // KERNEL.
+page_directory_t *pagedirectoryIdleProcess;      // IDLE.
+page_directory_t *pagedirectoryTaskmanProcess;   // TASKMAN.
+page_directory_t *pagedirectoryCurrent;          // Current.
+page_directory_t *pagedirectoryShared;           // Shared. 
 //...
 
 //
@@ -562,7 +584,7 @@ unsigned long pagedirectoryList[PAGEDIRECTORY_COUNT_MAX];
 
 
 /*
- * Page Table.
+ * page_table_d.
  *     Page table structure.
  *     Obs: Uma page table funciona como um pool de frames.
  *          Também pode ser compartilhada entre processo.(cuidado).
@@ -593,8 +615,9 @@ struct page_table_d
     //@todo: Mais informações sobre a pagetable.
 	struct page_table_d *next;
 };
+//page_table_t *pagetableCurrent;
+
 page_table_t *pagetableCurrent;
-//page_table_t *CurrentPageTable;
 //...
 
 //
@@ -669,15 +692,17 @@ unsigned long pageframesList[PAGEFRAME_COUNT_MAX];
 
 
 
-//
-// frame_pool_d:
-//Estrutura para uma partição da memória física,
-//uma partição da memória física é chamada de framepool.
-//cada framepool tem 1024 frames.
+
+/*
+ * frame_pool_d:
+ *     Estrutura para uma partição da memória física.
+ *     Uma partição da memória física é chamada de framepool.
+ *     Cada framepool tem 1024 frames.
+ *     @todo: Poderia ser framepool_d ??
+ */
 typedef struct frame_pool_d frame_pool_t;
 struct frame_pool_d
 {
-
 	object_type_t objectType;
 	object_class_t objectClass;
 	
@@ -739,8 +764,8 @@ frame_pool_t *framepoolCurrent;
 //
 
 
-
-//Onde começa a área onde alocaremos frames para os porcessos.
+//Onde começa a área onde alocaremos frames para os processos.
+//físico ??
 unsigned long g_pageable_area_start;
 
 
@@ -765,9 +790,9 @@ unsigned long g_pageable_area_start;
 
 
 
-
-//Numero máximo de indices de framepool que serão usados
-//nessa área de alocação de frames.
+//
+// Número máximo de índices de framepool que serão usados nessa área de 
+// alocação de frames.
 // *** Uma certa quantidade de framepools serão usados
 // para alocação de frames para os processos. Durante
 // a alocação sobre demanda os frames usados virão dessa área de memória.
@@ -837,14 +862,22 @@ unsigned long g_kernel_nonpaged_memory;
 // + Livre.
 //
 
+
+
+unsigned long memorysizeBaseMemory;
+unsigned long memorysizeOtherMemory;
+unsigned long memorysizeExtendedMemory;
+unsigned long memorysizeTotal;
+
 //
 // Protótipos.
 //
-
+void memoryShowMemoryInfo();
 
 //
 // Init support.
 //
+
 int init_mm(); 
 int init_stack();
 int SetUpPaging();    //Configura paginação.
@@ -858,8 +891,8 @@ void SetCR3(unsigned long address);
 
 void *CreatePageDirectory(unsigned long directory_address);
 void *CreatePageTable( unsigned long directory_address, 
-                      int offset, 
-					  unsigned long page_address );
+                       int offset, 
+					   unsigned long page_address );
 
 
 

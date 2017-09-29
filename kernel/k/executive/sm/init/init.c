@@ -290,6 +290,12 @@ WindowManager:
 	
     // Continua ...	 
 	
+	//
+	// tty support.
+	//
+	
+	ttyInit();
+	
 done:
     //debug
     printf("Done!\n");	
@@ -307,6 +313,12 @@ done:
  */
 void init_globals()
 {
+	//Atalho para a próxima mensagem de teclado..(test) debug
+	gNextKeyboardMessage = (int) 0;
+	
+	//Essa flag bloqueia e impede que uma janela obtenha o foco.
+	gFocusBlocked = (int) 0;
+	
 	//
 	// As globais relativas à usuário são independentes do ambiente gráfico.
 	//

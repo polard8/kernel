@@ -41,7 +41,7 @@
  *     Versão: 1.0, 2015 - Aprimoramento geral das rotians básicas.
  *     Versão: 1.0, 2016 - Aprimoramento geral das rotians básicas.
  *
- * Copyright (c) frednora 2013~2016.
+ * Copyright (c) frednora 2013~2017.
  */ 
  
 /******************************************
@@ -49,6 +49,11 @@
  * Abaixo, a estrutura em kernel mode.    *
  * (hybrid)                               * 
  *                                        *
+ *  ;----------------------------------;  *
+ *  ;                                  ;  *
+ *  ;             Gramado (GUI)        ;  *
+ *  ;                                  ;  *  
+ *  ;----------------------------------;  *
  *  ;----------------------------------;  *
  *  ;                                  ;  *
  *  ;             Executive            ;  *  
@@ -235,7 +240,7 @@ extern void do_executa_new_task();
 #include <hal/diskmap.h>     //Disk Map - sectors.
 #include <hal/screen.h> 
 #include <hal/video.h>       //video.
-#include <hal/memory.h>      //ram  (controlado pelo cpu nas plcas modernas).    
+#include <hal/memory.h>      //ram  (controlado pelo cpu nas placas modernas).    
 #include <hal/cpu.h>         //cpu 
 #include <hal/disk.h>        //disk.
 #include <hal/volume.h>      //volume partição.
@@ -297,18 +302,27 @@ extern void do_executa_new_task();
 	//Porque o modo texto é dependente do modo gráfico e
 	//gerenciamento do sistema é dependente das duas interfaces.
 
+//tty - Gerenciado de fluxo de caracteres.
+#include <executive/tty/tty.h>	
+
+
+//gramado - GUI. (presentation layer)
+#include <gramado/gui/usession.h>
+#include <gramado/gui/wstation.h>
+#include <gramado/gui/desktop.h>
+#include <gramado/gui/window.h>     //windows stuffs: pixel, line, rect, colors, video, windows...
+#include <gramado/gui/menu.h>
+#include <gramado/gui/grid.h> 
+#include <gramado/gui/bmp.h>
+	
 //uigm - User Interface Graphic Mode.
-#include <executive/uigm/usession.h>
-#include <executive/uigm/wstation.h>
-#include <executive/uigm/desktop.h>
-#include <executive/uigm/window.h>     //windows stuffs: pixel, line, rect, colors, video, windows...
-#include <executive/uigm/menu.h>
-#include <executive/uigm/grid.h> 
-#include <executive/uigm/bmp.h>
+//nothing for now.
+
 //uitm - User Interface Text Mode.
 #include <executive/uitm/line.h>          //Gerência de linhas.
 #include <executive/uitm/terminal.h>      //configurações de terminal(o shel usa um terminal.) 
 #include <executive/uitm/console.h>            //Console ??
+
 //sm - System Management.
 #include <executive/sm/user.h>
 #include <executive/sm/logon.h> 

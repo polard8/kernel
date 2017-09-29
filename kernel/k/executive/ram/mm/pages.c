@@ -6,37 +6,52 @@
  * suporte ao mapeamento de memória física.
  *     Faz parte do modulo /mm da classe ram.
  *
+ * *Importante:
+ *     Essa rotina pertence ao módulo de gerenciamento de memória. Não possui
+ * informações sobre processos. Qualquer informação sobre processos deve ser 
+ * conseguida através de invocação de métodos pertencentes ao módulo 
+ * /microkernel.
+ *
  * @todo: 
  *    IMPORTANTE:
- *    FAZER GERENCIAMENTO DA MEMÓRIA FÍSICA. 
- *    DIVIDIR A MEMÓRIA FÍSICA EM PARTIÇÕES DE 4MB.
- *    E DIVIDIR CADA PARTIÇÃO EM FRAMES DE 4KB, O QUE DÁ 1024 FRAMES 
- *    POR PARTIÇÃO.
- *    Obs: Podemos chamar de 'framepool' o conjunto de 1024 frames.
- *         Poderemos mapear um framepool inteiro se preciso. 
+ *    +FAZER GERENCIAMENTO DA MEMÓRIA FÍSICA. 
+ *    +DIVIDIR A MEMÓRIA FÍSICA EM PARTIÇÕES DE 4MB E 
+ *    +DIVIDIR CADA PARTIÇÃO EM FRAMES DE 4KB, O QUE DÁ 1024 FRAMES POR 
+ * PARTIÇÃO.
+ *
+ * Obs: 
+ *     Chamaremos de 'framepool' o conjunto de 1024 frames.
+ *     Poderemos mapear um framepool inteiro se preciso. 
  *
  * @todo:
- * Obs: Os processos Idle, Shell e Taskman estão usando o diretório de 
- * páginas do processo Kernel. É preciso criar um diretório para cada 
- * processo e criar uma rotina de automação na criação de diretórios
- * de páginas.
+ * *Importante:
+ * Obs: 
+ *     Os processos Idle, Shell e Taskman estão usando o diretório de páginas 
+ * do processo Kernel. É preciso criar um diretório para cada processo e 
+ * criar uma rotina de automação na criação de diretórios de páginas.
  *
  * @todo: 
- * Criar rotinas para ver o conteúdo da lista de diretórios de páginas.
- * ?? Cada diretório deve ter uma estrutura cujo ponteiro vai pra dentro da lista.
- * ?? A estrutura mostrará informações sobre o diretório de páginas.
+ *     Criar rotinas para ver o conteúdo da lista de diretórios de páginas.
+ *     ?? Cada diretório deve ter uma estrutura, cujo ponteiro vai pra dentro 
+ * da lista.
+ *     ?? A estrutura mostrará informações sobre o diretório de páginas.
  *
- * @todo: Criar rotinas que manipulem as estruturas de diretório de páginas e
- * de pagetables. 
+ * @todo: 
+ *     Criar rotinas que manipulem as estruturas de diretório de páginas e de 
+ * pagetables. 
+ *
+ * Obs: Todas as pagetables podem ficar em sequência em uma mesma região do endereço
+ * lógico do processo kernel.
  *
  * In this file:
+ * =============
  *     +CreatePageDirectory
  *     +CreatePageTable
  *     +SetCR3
  *     +SetUpPaging
  *     +
  *
- * Histórico:
+ * History:
  *     2015 - Created by Fred Nora.
  *     2016 - Revision.
  *     ...
@@ -44,22 +59,30 @@
 
 
 //
-// + kernel area    = 1024 pageframes (4MB)
-// + kernel image   = 1024 pageframes (4MB)
-// + user mode area = 1024 pageframes (4MB)
-// + vga = 1024 pageframes (4MB) (Isso transpassa o real tamanho da vga)
-// + lfb = (frontbuffer) 1024 pageframes (4MB) (Isso é muito pouco, pois
-//         uma placa de vídeo tem mais memória que isso)
-//         @todo: LFB needs to be bigger. (Ex: Four 8GB graphic cards).
-//                But the driver needs to do all the work.
-// + backbuffer = 1024 pageframes (4MB) (Isso realmente é pouco, no backbuffer
-//         deve caber uma imagem grande, que será dividade em vários monitores.)
+// Algumas áreas de memória:
+// =========================
+//
+// + kernel area    = 1024 pageframes (4MB).
+// + kernel image   = 1024 pageframes (4MB).
+// + user mode area = 1024 pageframes (4MB).
+// + vga            = 1024 pageframes (4MB).
+//     (Obs: Isso transpassa o real tamanho da vga).
+// + lfb (frontbuffer) = 1024 pageframes (4MB).
+//     (Obs: Isso é muito pouco, pois uma placa de vídeo tem mais memória
+// que isso).
+//      @todo: 
+//      LFB needs to be bigger. (Ex: Four 8GB graphic cards). But the driver 
+// needs to do all the work.
+// + backbuffer     = 1024 pageframes (4MB). 
+//     (Obs: Isso realmente é pouco, no backbuffer deve caber uma imagem 
+// grande, que será dividida em vários monitores).
 //
 
 
 /*
- O Boot Loader criou alguns diretórios nesses endereços físicos,
- parece conveniente usar esses endereços.
+ O Boot Loader criou alguns diretórios nesses endereços físicos, parece 
+ conveniente usar esses endereços.
+ @todo: Rever os endereços usados, tanto no kernel, quanto no Boot Loader.
 
 	unsigned long *page_directory         = (unsigned long *) 0x01F00000;
 	unsigned long *idle_page_directory    = (unsigned long *) 0x01E00000;
@@ -77,6 +100,11 @@
 
 //
 // Variáveis passadas pelo Boot Loader.
+//
+
+//
+// Obs: Teremos que rever os argumentos passados pelo Boot Loader ao Kernel 
+// Pois desejamos tornar o Kernel compatível com GRUB.
 //
 
 extern unsigned long SavedBootBlock;    //Parâmtros passados pelo Boot Loader.
@@ -103,31 +131,33 @@ extern void set_page_dir();
 //
 // Pagetables:
 // ==========
-//     Endereço físico de algumas pagetales.
+//     Endereços físicos de algumas pagetales.
 //
-#define KM1_PAGETABLE     0x8F000    //Pagetable para o kernel mode stuffs.
-#define KM2_PAGETABLE     0x8E000    //Pagetable para 'O Kernel'.(imagem).
-#define UM_PAGETABLE      0x8D000    //Pagetable para o aplicativos em user mode.
-#define VGA_PAGETABLE     0x8C000    //Pagetable para o vga em user mode.
-#define LFB_PAGETABLE     0x8B000    //LFB.
-#define BUFFER_PAGETABLE  0x8A000    //BackBuffer.
+
+#define KM1_PAGETABLE     0x8F000  // Pagetable para o kernel mode stuff.
+#define KM2_PAGETABLE     0x8E000  // Pagetable para 'O Kernel'. A 'imagem'.
+#define UM_PAGETABLE      0x8D000  // Pagetable para o aplicativos em user mode.
+#define VGA_PAGETABLE     0x8C000  // Pagetable para o VGA em user mode.
+#define LFB_PAGETABLE     0x8B000  // LFB.
+#define BUFFER_PAGETABLE  0x8A000  // BackBuffer.
 //...
 
 
 /*
+ ?? Para qual tipo ??
 enum PAGE_PTE_FLAGS {
  
-	I86_PTE_PRESENT			=	1,		//0000000000000000000000000000001
-	I86_PTE_WRITABLE		=	2,		//0000000000000000000000000000010
-	I86_PTE_USER			=	4,		//0000000000000000000000000000100
-	I86_PTE_WRITETHOUGH		=	8,		//0000000000000000000000000001000
-	I86_PTE_NOT_CACHEABLE		=	0x10,		//0000000000000000000000000010000
-	I86_PTE_ACCESSED		=	0x20,		//0000000000000000000000000100000
-	I86_PTE_DIRTY			=	0x40,		//0000000000000000000000001000000
-	I86_PTE_PAT			=	0x80,		//0000000000000000000000010000000
-	I86_PTE_CPU_GLOBAL		=	0x100,		//0000000000000000000000100000000
-	I86_PTE_LV4_GLOBAL		=	0x200,		//0000000000000000000001000000000
-   	I86_PTE_FRAME			=	0x7FFFF000 	//1111111111111111111000000000000
+	I86_PTE_PRESENT			=	1,		    // 0000000000000000000000000000001
+	I86_PTE_WRITABLE		=	2,		    // 0000000000000000000000000000010
+	I86_PTE_USER			=	4,		    // 0000000000000000000000000000100
+	I86_PTE_WRITETHOUGH		=	8,		    // 0000000000000000000000000001000
+	I86_PTE_NOT_CACHEABLE	=	0x10,		// 0000000000000000000000000010000
+	I86_PTE_ACCESSED		=	0x20,		// 0000000000000000000000000100000
+	I86_PTE_DIRTY			=	0x40,		// 0000000000000000000000001000000
+	I86_PTE_PAT			   =	0x80,		// 0000000000000000000000010000000
+	I86_PTE_CPU_GLOBAL		=	0x100,		// 0000000000000000000000100000000
+	I86_PTE_LV4_GLOBAL		=	0x200,		// 0000000000000000000001000000000
+   	I86_PTE_FRAME			=	0x7FFFF000 	// 1111111111111111111000000000000
 };
 */
 
@@ -197,6 +227,7 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  *
  * @todo: Mudar para pagesCreatePageDirectory(.)
  */
+//void *pagesCreatePageDirectory(unsigned long address) 
 void *CreatePageDirectory(unsigned long directory_address)
 {	
 	int i;
@@ -304,26 +335,28 @@ void SetCR3(unsigned long address)
  * SetUpPaging:
  *     Configura o diretório de páginas do processo Kernel e algumas tabelas 
  * de páginas.
+ *
  * Obs: 
  *     Na hora em que um processo é criado deve-se criar seu diretório de 
  * páginas e as tabelas de páginas usadas por ele, de acordo com o tamanho 
  * do processo.
  *
- * In this function:
- *     ...
- *
  * Diretório:
- *   page_directory = 0x0009C000. (endereço físico).
+ *     page_directory = 0x0009C000. (Endereço físico).#kernel
  *
  * Obs:
- *     Esse diretório criado será usado pelo processo Kernel e outros processos 
- * também durante essa fase de construção do sistema. Depois cada processo terá
- * seu próprio diretório de páginas. (@isso está em fase de implementação). O 
- * ideal é um diretório por processo.
- *     Toda vez que o processo Kernel iniciar a execução de um processo ele deve 
+ *     Esse diretório criado será usado pelo processo Kernel e também por 
+ * outros processos também durante essa fase de construção do sistema. 
+ * Depois cada processo terá seu próprio diretório de páginas. Isso está em 
+ * fase de implementação. O ideal é um diretório por processo.
+ *     Toda vez que o Kernel iniciar a execução de um processo ele deve 
  * carregar o endereço do diretório do processo no registrador de controle CR3.
- *     @todo: Por enquanto só um diretório foi criado.
- *     @todo Mudar para pagesSetUpPaging
+ * 
+ * @todo: 
+ *     Por enquanto só um diretório foi criado.
+ *     
+ * @tod:
+ *     o Mudar para pagesSetUpPaging.
  *
  * Histórico:
  *     2015 - Essa função foi criada por Fred Nora.
@@ -350,8 +383,8 @@ int SetUpPaging()
 
 
 	// User, VGA, VESA LFB, BUFFER ...
-	unsigned long user_address = USER_BASE; //0x00400000; 	
-	unsigned long vga_address  = VM_BASE;   //0x000B8000; 
+	unsigned long user_address = USER_BASE;                   //0x00400000; 	
+	unsigned long vga_address  = VM_BASE;                     //0x000B8000; 
     unsigned long lfb_address  = (unsigned long) SavedLFB;    //g_lbf_pa, Foi passado pelo boot manager.
 	unsigned long buff_address = (unsigned long) 0x01000000;  //16MB, #Provisório.
 	// ...
@@ -363,9 +396,12 @@ int SetUpPaging()
 	// endereço físico pelo Boot Loader. Aqui o kernel apenas reconfigura, 
 	// utilizando a mesma localizaçao. KERNEL_PAGEDIRECTORY.
 	//
-	unsigned long *page_directory = (unsigned long *) 0x0009C000;    //KERNEL_PAGEDIRECTORY. 
-
-
+	unsigned long *page_directory         = (unsigned long *) KERNEL_PAGEDIRECTORY;   //0x0009C000    
+	//unsigned long *idle_page_directory    = (unsigned long *) IDLE_PAGEDIRECTORY;     //0x01E00000    
+	//unsigned long *shell_page_directory   = (unsigned long *) SHELL_PAGEDIRECTORY;    //0x01D00000 
+	//unsigned long *taskman_page_directory = (unsigned long *) TASKMAN_PAGEDIRECTORY;  //0x01C00000   	
+    //...
+	
 	//
 	// O que temos logo abaixo são pequenas partições de memória física.
 	// cada partição tem 1024 unsigned longs. o que dá 4kb cada. 
@@ -377,6 +413,14 @@ int SetUpPaging()
 	//     Tabelas de páginas para o diretório do processo Kernel. Essas 
 	// tabelas já foram criadas nesses endereços físicos pelo Boot Loader. 
 	// Aqui o Kernel apenas reconfigura utilizando as mesmas localizações.
+	//
+	
+	//
+	// Poderíamos alocar memória para as page tables ??
+	// Sim, mas precisa ser um mecanismo que devolva o endereço físico 
+	// de onde foi alocado memória para a page table.
+	// Na verdade deve haver uma área de memória reservada para a alocação 
+	// de page tables. Todas as que serão criadas ocuparão muito espaço.
 	//
 
 	//kernel mode. (Endereços).
@@ -406,13 +450,30 @@ int SetUpPaging()
 
 
 	//
-	// Preenchendo todo o diretório com páginas não presentes. Usando um 
-	// endereço inválido de página.
+	// Preenchendo todo o diretório de páginas do kernel com páginas não 
+	// presentes. Usando um endereço nulo de página.
 	//
 
-	for(i = 0; i < 1024; i++){
+	// Inicializando quatro diretórios.
+	for(i = 0; i < 1024; i++)
+	{
+		//kernel
+		// Diretório de páginas do processo kernel.
 		page_directory[i] = (unsigned long) 0 | 2;    //010 em binário.
+		
+		//idle
+		// @todo: Diretório de páginas do processo idle.
+		//idle_page_directory[i] = (unsigned long) 0 | 2;    //010 em binário.
+		
+		//shell
+		// @todo: Diretório de páginas do processo shell.
+		//shell_page_directory[i] = (unsigned long) 0 | 2;    //010 em binário.
+
+		//taskman
+		// @todo: Diretório de páginas do processo taskman.
+		//taskman_page_directory[i] = (unsigned long) 0 | 2;    //010 em binário.
 	};
+	
 
 	//
 	// kernel mode pages (0fis = 0virt)
@@ -425,16 +486,41 @@ int SetUpPaging()
 	// início da memória RAM.
     //
     
+	
+	// Configurando uma pagetable.
 	for(i = 0; i < 1024; i++)
     {
 	    km_page_table[i] = (unsigned long) kernel_address | 3;     //011 binário.
 	    kernel_address   = (unsigned long) kernel_address + 4096;  //+ 4KB.
     };
-    //Criando a entrada número '0' do diretório de páginas do processo Kernel.
+    
+	
+	//kernel
+	//Criando a entrada número '0' do diretório de páginas do processo Kernel.
+	//que apontará para a pagetable que criamos.
     page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
     page_directory[0] = (unsigned long) page_directory[0] | 3;  //Configurando os atributos.
     
 
+	//idle
+	//Criando a entrada número '0' do diretório de páginas do processo idle.
+	//que apontará para a pagetable que criamos.
+    //idle_page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
+    //idle_page_directory[0] = (unsigned long) idle_page_directory[0] | 3;  //Configurando os atributos.
+	
+	//shell
+	//Criando a entrada número '0' do diretório de páginas do processo shell.
+	//que apontará para a pagetable que criamos.
+    //shell_page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
+    //shell_page_directory[0] = (unsigned long) shell_page_directory[0] | 3;  //Configurando os atributos.
+	
+	
+	//taskman
+	//Criando a entrada número '0' do diretório de páginas do processo taskman.
+	//que apontará para a pagetable que criamos.
+    //taskman_page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
+    //taskman_page_directory[0] = (unsigned long) taskman_page_directory[0] | 3;  //Configurando os atributos.	
+	
 	//
 	// kernel mode pages (0x00100000fis = 0xC0000000virt)
 	// kernel_base = 0x00100000 = KERNEL_BASE.
@@ -445,16 +531,37 @@ int SetUpPaging()
 	// endereço físico que carregamos a imágem do kernel. 
     //	
 
-	 
+	//Criando uma pagetable. 
     for(i = 0; i < 1024; i++)
     {
 	    km2_page_table[i] = (unsigned long) kernel_base | 3;     //011 binário.
 	    kernel_base       = (unsigned long) kernel_base + 4096;  //+4KB.
     };
-    // Criando a  entrada do diretório.
+    
+	
+	//kernel
+	// Criando a  entrada do diretório de páginas do processo kernel.
     page_directory[768] = (unsigned long) &km2_page_table[0];       //Salva no diretório o endereço físico.
     page_directory[768] = (unsigned long) page_directory[768] | 3;  //Configurando os atributos.
 
+	
+	//idle
+	// Criando a  entrada do diretóri de páginas do processo idle.
+    //idle_page_directory[768] = (unsigned long) &km2_page_table[0];       //Salva no diretório o endereço físico.
+    //idle_page_directory[768] = (unsigned long) idle_page_directory[768] | 3;  //Configurando os atributos.
+	
+	//shell
+	// Criando a  entrada do diretóri de páginas do processo shell.
+    //shell_page_directory[768] = (unsigned long) &km2_page_table[0];       //Salva no diretório o endereço físico.
+    //shell_page_directory[768] = (unsigned long) shell_page_directory[768] | 3;  //Configurando os atributos.
+	
+	
+	//taskman
+	// Criando a  entrada do diretóri de páginas do processo taskman.
+    //taskman_page_directory[768] = (unsigned long) &km2_page_table[0];       //Salva no diretório o endereço físico.
+    //taskman_page_directory[768] = (unsigned long) taskman_page_directory[768] | 3;  //Configurando os atributos.
+	
+	
 
 	//
     // Obs: Percebe-se que houve uma sobreposição. Os megas 0,1,2,3 para
@@ -462,6 +569,8 @@ int SetUpPaging()
 	// Isso significa que o Kernel Base pode acessar o primeiro mega
 	// da memória física, usando endereço virtual igual ao endereço físico.
 	//
+	
+	//    ****    USER BASE    ****
 	
 	//
 	// user mode pages - (0x00400000fis = 0x00400000virt)
@@ -472,16 +581,51 @@ int SetUpPaging()
     // Aqui estamos pegando uma partição de memória física de 4MB que começa no
 	// endereço físico 0x00400000, no quarto mega da memória física. 
     //
-
+    // É nesse endereço lógico que ficarão os processos em user mode.
+	// Cada processo terá um diretório de páginas, e nesse diretório de 
+	// páginas terá uma page table que atribuirá o endereço lógico de 0x400000
+	// à algum endereço físico alocado dinâmicamente para receber a imagem do processo.
+	// Obs: Se o processo tiver mais que 4MB de tamanho, então será preciso 
+    // de mais de uma pagetable.
+    //
+    // Obs: 
+	// HACK HACK. No momento, nessa pagetable do diretório do processo kernel, existem 
+    // três imagens carregadas nessa mesma área de memória, compilados em endereços 
+    // absolutos diferentes. (Idle, Taskman e Shell). Mas queremos que todos os 
+    // processos de usuário utilizem o mesmo endereço lógico. 0x400000.	
+	//
+	
+	//Criando uma pagetable.
 	for(i = 0; i < 1024; i++)
     {
 	    um_page_table[i] = (unsigned long) user_address | 7;     //7 decimal é igual a 111 binário.
 	    user_address     = (unsigned long) user_address + 4096;  //+4KB.
     };
-    // Criando a entrada do diretório.
+	
+
+    //kernel 	
+    // Criando a entrada do diretório de páginas do processo kernel.
     page_directory[1] = (unsigned long) &um_page_table[0];      //Salva no diretório o endereço físico.
     page_directory[1] = (unsigned long) page_directory[1] | 7;  //Configurando os atributos.
 
+    //idle 	
+    // Criando a entrada do diretório de páginas do processo idle.
+    //idle_page_directory[1] = (unsigned long) &um_page_table[0];      //Salva no diretório o endereço físico.
+    //idle_page_directory[1] = (unsigned long) idle_page_directory[1] | 7;  //Configurando os atributos.
+
+
+    //shell 	
+    // Criando a entrada do diretório de páginas do processo shell.
+    //shell_page_directory[1] = (unsigned long) &um_page_table[0];      //Salva no diretório o endereço físico.
+    //shell_page_directory[1] = (unsigned long) shell_page_directory[1] | 7;  //Configurando os atributos.
+
+
+    //taskman	
+    // Criando a entrada do diretório de páginas do processo taskman.
+    //taskman_page_directory[1] = (unsigned long) &um_page_table[0];      //Salva no diretório o endereço físico.
+    //taskman_page_directory[1] = (unsigned long) taskman_page_directory[1] | 7;  //Configurando os atributos.
+	
+	
 	//
     // Obs: Novamente aqui há uma sobreposição. O primeiro mega
 	// dessa área destinada à user mode, é o mesmo último mega da
@@ -503,16 +647,36 @@ int SetUpPaging()
     // @todo: bugbug: ESSA É CGA E NÃO A VGA.
     //Mudar o nome para cga.	
     //	
-    	
+    
+    //Criando uma pagetable.	
     for(i = 0; i < 1024; i++)
     {
 	    vga_page_table[i] = (unsigned long) vga_address | 7;     //7 decimal é igual a 111 binário.
 	    vga_address       = (unsigned long) vga_address + 4096;  //+4KB.
     };
-    // Criando a entrada do diretório.
+	
+    //kernel
+	// Criando a entrada do diretório de páginas do processo kernel.
     page_directory[2] = (unsigned long) &vga_page_table[0];     //Salva no diretório o endereço físico.
     page_directory[2] = (unsigned long) page_directory[2] | 7;  //Configurando os atributos.
 
+	
+    //idle
+	// Criando a entrada do diretório de páginas do processo idle.
+    //idle_page_directory[2] = (unsigned long) &vga_page_table[0];     //Salva no diretório o endereço físico.
+    //idle_page_directory[2] = (unsigned long) idle_page_directory[2] | 7;  //Configurando os atributos.
+
+    //shell
+	// Criando a entrada do diretório de páginas do processo shell.
+    //shell_page_directory[2] = (unsigned long) &vga_page_table[0];     //Salva no diretório o endereço físico.
+    //shell_page_directory[2] = (unsigned long) shell_page_directory[2] | 7;  //Configurando os atributos.
+
+    //taskman
+	// Criando a entrada do diretório de páginas do processo taskman.
+    //taskman_page_directory[2] = (unsigned long) &vga_page_table[0];     //Salva no diretório o endereço físico.
+    //taskman_page_directory[2] = (unsigned long) taskman_page_directory[2] | 7;  //Configurando os atributos.
+
+	
 	//
 	// Obs: 4MB começando do endereço físico 0x000B8000, são acessíveis
 	// em user mode à partir do endereço virtual 0x00800000virt.
@@ -534,15 +698,40 @@ int SetUpPaging()
     //        But the driver needs to do all the work.
     //
 	
+	g_frontbuffer_buffer_va = (unsigned long) 0xC0400000;
+	
+	//Criando uma pagetable.
     for(i = 0; i < 1024; i++)
     {
 	    lfb_page_table[i] = (unsigned long) lfb_address | 7;     //7 decimal é igual a 111 binário.
 	    lfb_address       = (unsigned long) lfb_address + 4096;  //+4KB.
     };
-    // Criando a entrada do diretório.
+    
+	
+	//kernel
+	// Criando a entrada do diretório de páginas do processo kernel.
     page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
     page_directory[769] = (unsigned long) page_directory[769] | 7;  //Configurando os atributos.	
 
+
+	//idle
+	// Criando a entrada do diretório de páginas do processo idle.
+    //idle_page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    //idle_page_directory[769] = (unsigned long) idle_page_directory[769] | 7;  //Configurando os atributos.		
+	
+
+	//shell
+	// Criando a entrada do diretório de páginas do processo shell.
+    //shell_page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    //shell_page_directory[769] = (unsigned long) shell_page_directory[769] | 7;  //Configurando os atributos.		
+
+	//taskman
+	// Criando a entrada do diretório de páginas do processo taskman.
+    //taskman_page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    //taskman_page_directory[769] = (unsigned long) taskman_page_directory[769] | 7;  //Configurando os atributos.		
+	
+	
+	
     //
 	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
 	// ***BackBuffer: 
@@ -555,16 +744,34 @@ int SetUpPaging()
 	// endereço físico 0x01000000, no decimo sexto mega da memória física. 
     //	
 
-    for(i = 0; i < 1024; i++)
+    // criando uma page table.
+	for(i = 0; i < 1024; i++)
     {
 	    buff_page_table[i] = (unsigned long) buff_address | 7;     //7 decimal é igual a 111 binário.
 	    buff_address       = (unsigned long) buff_address + 4096;  //+4KB.
     };
-    // Criando a entrada do diretório.
+	
+	//kernel
+    // Criando a entrada do diretório de páginas do processo kernel.
     page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
     page_directory[770] = (unsigned long) page_directory[770] | 7;  //Configurando os atributos.	
 
 
+	//idle
+    // Criando a entrada do diretório de páginas do processo idle.
+    //idle_page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    //idle_page_directory[770] = (unsigned long) idle_page_directory[770] | 7;  //Configurando os atributos.	
+	
+	//shell
+    // Criando a entrada do diretório de páginas do processo shell.
+    //shell_page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    //shell_page_directory[770] = (unsigned long) shell_page_directory[770] | 7;  //Configurando os atributos.	
+	
+	//taskman
+    // Criando a entrada do diretório de páginas do processo taskman.
+    //taskman_page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    //taskman_page_directory[770] = (unsigned long) taskman_page_directory[770] | 7;  //Configurando os atributos.	
+	
 	//
 	// Obs: 4MB da memória física à partir do endereço físico 0x01000000 (16MB)
     // são destinados ao back buffer. Obs: Isso é bem pouco, uma tela com alta 
@@ -623,6 +830,10 @@ int SetUpPaging()
 	printf("Page={%x} !\n", (unsigned long) &buff_page_table[0]);
 	//refresh_screen();
 	//while(1){};
+	
+	//
+	// Obs: Podemos reaproveitas pagetables em diferentes processos.
+	//
 
 	//
 	// CR3:
@@ -657,9 +868,12 @@ int SetUpPaging()
 	};
 
 	//O primeiro diretório da lista é o diretório do kernel.
-	pagedirectoryList[0] = (unsigned long) &page_directory[0];  //Único por enquanto.
-    pagedirectoryList[1] = (unsigned long) 0;
-    pagedirectoryList[2] = (unsigned long) 0;
+	pagedirectoryList[0] = (unsigned long) &page_directory[0];          //kernel.
+	//pagedirectoryList[1] = (unsigned long) &idle_page_directory[0];     //idle.
+	//pagedirectoryList[2] = (unsigned long) &shell_page_directory[0];    //shell.
+	//pagedirectoryList[3] = (unsigned long) &taskman_page_directory[0];  //taskman.	
+    pagedirectoryList[4] = (unsigned long) 0;
+    pagedirectoryList[5] = (unsigned long) 0;	
     //...
 
 
@@ -723,7 +937,7 @@ int SetUpPaging()
 		kfp->id = 0;
 		kfp->used = 1;
 		kfp->magic = 1234;
-		kfp->address = (unsigned long) (0 * MB);   //Comça em 20 MB.
+		kfp->address = (unsigned long) (0 * MB);   //?? Começa em 0 MB. ??
 		
 		//pertence ao processo kernel.
 		kfp->process = (void*) KernelProcess;
@@ -740,7 +954,7 @@ int SetUpPaging()
 
 
     //
-	// Creating user space framepool for small systems..
+	// Creating user space framepool for small systems.
 	//
 
 	struct frame_pool_d *small_fp;
@@ -752,7 +966,7 @@ int SetUpPaging()
 		small_fp->id = 1;
 		small_fp->used = 1;
 		small_fp->magic = 1234;
-		small_fp->address = (unsigned long) (4 * MB);   //Comça em 4 MB.
+		small_fp->address = (unsigned long) (4 * MB);   //Começa em 4 MB.
 
 		//pertence ao processo kernel.
 		small_fp->process = (void*) NULL; //??;
@@ -786,7 +1000,7 @@ int SetUpPaging()
 		pageable_fp->id = 5;   //quinto índice.
 		pageable_fp->used = 1;
 		pageable_fp->magic = 1234;
-		pageable_fp->address = (unsigned long) (20 * MB);   //Comça em 20 MB.
+		pageable_fp->address = (unsigned long) (20 * MB);   //Começa em 20 MB.
 
 		//pertence ao processo kernel.
 		pageable_fp->process = (void*) NULL; //??

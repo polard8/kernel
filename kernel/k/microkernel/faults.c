@@ -1,28 +1,28 @@
 /*
- * Arquivo: faults.c
+ * File: faults.c
  *
- * Faz parte do Process Manager, parte fundamental do Kernel Base.
+ *     Rotinas para atender as faults da cpu x86.
  *
- * Descrição:
- *     Rotinas para atender as faults da cpu x86.    
- *
- * @todo: Fazer rotinas para todas as faults.
- *
- *     As faults de páginas são usadas para as rotinas de memóvia virtual. 
+ *     Faz parte do Process Manager, parte fundamental do Kernel Base.
+ *     As faults de páginas são usadas para as rotinas de memóvia virtual, 
  * Swap. Então, quando ouver uma falta de página, os módulos ou drivers 
  * apropriados devem ser acionados à partir daqui.
  *
  * Obs:
  *     No caso de exceções de falta de página, por exemplo, o núcleo tem 
  * informação suficiente para tratar completamente o evento e continuar a 
- * execução do processo. Porém, em outros tipos de exceção, 
- * o núcleo não consegue preceder de maneira inteligente e tem que 
- * transferir o tratamento da exceção para um processo de tratamento 
- * de falha. Esta transferência é realizada através do mecanismo 
- * de sinais, no qual o núcleo envia ao processo, um sinal 
- * correspondente a exceção ocorrida. (Wikipedia).
+ * execução do processo. Porém, em outros tipos de exceção, o núcleo não 
+ * consegue preceder de maneira inteligente e tem que transferir o 
+ * tratamento da exceção para um processo de tratamento de falha. Esta 
+ * transferência é realizada através do mecanismo de sinais, no qual o 
+ * núcleo envia ao processo, um sinal correspondente a exceção ocorrida. 
+ * (Wikipedia).
  *
- * Versão 1.0, 2015.
+ * @todo: Fazer rotinas para todas as faults.
+ * Obs: Talvez o nome mais apropriado seria 'exceptions' enão 'faults'.
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
@@ -51,32 +51,29 @@ void faults(unsigned long number)
 	};
 	
 	printf("*FAULTS:\n");
-	//printf("=======\n");
 
 	t = (void *) threadList[current_thread];
 	if( (void*) t != NULL )
 	{
 	    //Salva o conxtexto se a tarefa já esteve rodando.
-	    if( ProcessorBlock.running_tasks >= 1 && t->step > 0 )
-	    {
-            printf("cpu_falts: Salvando contexto\n");
+	    if( ProcessorBlock.running_tasks >= 1 && t->step > 0 ){
+            printf("faults: Saving context\n");
 			save_current_context();    
-	    }
-        else
-        {	
-	        printf("cpu_falts: Nao salva contexto.\n");
+	    }else{	
+	        printf("faults: Don't save context\n");
 	    };
 	}
     else
     {	
-	    printf("cpu_falts: Nao ha contexto para salvar.\n");
+	    printf("faults: No context to save\n");
 	};
 	
-	//Info. (todo: window station, desktop ...).
-	printf("logonStatus={%d} \n",logonStatus);
-	printf("guiStatus={%d} \n",guiStatus);
-	printf("RunningTasks={%d} \n",ProcessorBlock.running_tasks);	
-    printf("t->tid={%d} t->step={%d} \n",current_thread,t->step);			
+	//Info. 
+	//(@todo: window station, desktop ...).
+	printf("logonStatus={%d}\n",logonStatus);
+	printf("guiStatus={%d}\n",guiStatus);
+	printf("RunningTasks={%d}\n",ProcessorBlock.running_tasks);	
+    printf("t->tid={%d} t->step={%d}\n",current_thread,t->step);			
 	printf("FaultNumber={%d}\n",number);                   
     printf("KeInitPhase={%d}\n",KeInitPhase);
 	
@@ -120,28 +117,25 @@ void faults(unsigned long number)
 		    break;
 	    
 	    default:			
-			printf("cpu_falts: Default number.\n");
+			printf("faults: Default number.\n");
             mostra_reg(current_thread);			
 			break;
 	};
 	
-//Done.
-done:	
+    
+	// Done.
     // Final message!	
+	// Refresh.	
+	// HALT.
+done:	
     printf("* System Halted!");    //Bullet.  
 	
-	// Refresh.
 	if(VideoBlock.useGui == 1){
 	    refresh_screen();
 	};
-	
-	// HALT.
+halt:
 	asm("hlt");   
 	while(1){};                      
-    
-	//
-    //  No return. " ... e então o veremos face à face ... ".
-    //	      
 };
 
 
@@ -156,6 +150,6 @@ void KiCpuFaults(unsigned long fault_number){
 
 
 //
-//fim.
+// fim.
 //
 

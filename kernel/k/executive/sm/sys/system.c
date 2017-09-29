@@ -1,4 +1,12 @@
 /*
+ * sm - System Management -  Esse é o console do sistema.
+ * Seu objetivo principal é receber os comandos de gerenciamento,
+ * enviados por usuários atráves de dispositivos de interface humana. 
+ *
+ * Note duas coisas importantes aqui: 
+ * o 'console' é a interface de administração do sistema, e é ele é 
+ * acessado através de um emulador de terminais utilizando-se drivers TTY.
+ *
  * File: system.c
  *
  * Obs: CADA CLASSE PODE TER UMA BIBLIOTECA EM USER MODE.
@@ -94,7 +102,7 @@ extern unsigned long SavedBPP;
 /*
  *     **** Diretórios do sistema. ****  obs:(8.3)
  *
- * Padronizados e nunca mudarão.
+ * * Obs: O esquema de diretórios ainda esta em fase de planejamento.
  */
 
 //Geral para todas as versoes do sistema operacional 
@@ -151,18 +159,11 @@ static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginaç
 //não uasr ponteiro.
 //struct memory_info_d systemMemoryInfo;
 
-/*
 
- * Uma caixa com um edit box.
- * pra receber comandos (ambiente kernel mode)
- * Esse mesmo serviço deverá ser oferecido em user mode posteriormente. 
- 
-int RunBox();
-int RunBox()
-{
-    return 0;
-};
-*/
+
+
+//Protótipo de método interno..
+void *systemNull();
 
 
 /*
@@ -179,6 +180,8 @@ int RunBox()
  * 3) systemDevicesUnblocked
  * 3) systemDevicesBlocked
  * 4) systemThings
+ *
+ * Obs: *** ESSAS CLASSES SERÃO A PRINCIPAL PORTA DE ENTRADA PARA OS UTILITÁRIOS. ***
  *
  */
 
@@ -198,7 +201,9 @@ void *systemRam( int number,
 	switch(number)
 	{
 		//Esse serviço é apenas retornar NULL.
-		case 0: return NULL; break;
+		case 0: 
+		    return systemNull(); 
+			break;
 
 		//Kernel info.
 		case 1: sys_showkernelinfo(); break;
@@ -269,12 +274,14 @@ void *systemRam( int number,
 
 		//Load file.
 		case 13:
-		    //unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address);
+		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
+			//unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address);
             return (void *) fsLoadFile( (unsigned char *) arg1, (unsigned long) arg2);		
             break;
 		
 		//Save file.
         case 14:
+		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
 		    //unsigned long fsSaveFile( unsigned char *file_name, 
             //                  unsigned long file_size, 
 		    //				  unsigned long file_address );		
@@ -507,7 +514,7 @@ void *systemRam( int number,
 		case 55: CloseActiveWindow(); break;
 		case 56: MinimizeWindow( (struct window_d *) arg1 ); break;
 		case 57: MaximizeWindow( (struct window_d *) arg1 ); break;
-		case 58: show_window_list(); break;
+		case 58: windowShowWindowList(); break;
 		case 59: show_window_with_focus(); break;
 		case 60: show_active_window(); break;
 		case 61: refresh_screen(); break;
@@ -682,8 +689,10 @@ void *systemRam( int number,
 		    break;
 			
 		//...	
+		
 		default:
-		break;
+		    return systemNull(); 
+		    break;
 		
 	};  //fim do switch.
 	
@@ -696,6 +705,7 @@ done:
 // 2) system.io.cpu
 //     serviços do microkernel referentes à cpu.
 //     process, threads, cpu ... 
+//     Especialmente transferencia RAM <--> Devices.
 //
 void *systemIoCpu( int number, 
                    unsigned long arg1,  
@@ -708,7 +718,7 @@ void *systemIoCpu( int number,
 	switch(number)
 	{
 		case 0:
-		    //return NULL;
+		    return systemNull(); 
 			break;
 
 		//Dead thread collector.
@@ -891,7 +901,8 @@ void *systemIoCpu( int number,
 	    //...
 	
 		default:
-		break;
+		    return systemNull();
+		    break;
 		
 	}; //fim do switch.
 	
@@ -903,6 +914,7 @@ done:
 //
 // 2) system.io.dma
 //    serviços do microkernel referentes à dma.
+// //     Especialmente transferencia RAM <--> Devices.
 //
 void *systemIoDma( int number, 
                    unsigned long arg1,  
@@ -913,7 +925,9 @@ void *systemIoDma( int number,
     //	
 	switch(number)
 	{
-		case 0: return NULL; break;
+		case 0: 
+		    return systemNull();
+			break;
 
 		case 1:
 		break;
@@ -922,7 +936,8 @@ void *systemIoDma( int number,
 		break;
 		
 		default:
-		break;
+		    return systemNull();
+		    break;
 		
 	}; //fim do switch.
 	
@@ -933,6 +948,8 @@ done:
  
 //
 // 3) system.devices.unbloqued
+//
+// Interação com sipositivos de fácil acesso, principalmente os legados.
 //
 void *systemDevicesUnblocked( int number,
                               unsigned long arg1,
@@ -946,7 +963,9 @@ void *systemDevicesUnblocked( int number,
 	
 	switch(number)
 	{
-		case 0: return NULL; break;
+		case 0: 
+		    return systemNull();
+			break;
 		
 		case 1:
 		   //
@@ -969,6 +988,8 @@ void *systemDevicesUnblocked( int number,
 		* arg1=msg,arg2=ch,arg3=ch,arg4=0.
 		*/
    		case 3:
+		    // Just for test. (Imprimeindo o caractere.) Em qual janela??
+			printf("%c", arg2);
 
             //
 			// Procedimento do sistema. 
@@ -985,12 +1006,12 @@ void *systemDevicesUnblocked( int number,
 							  (unsigned long) arg3 );
 			
 			//
-			// Colocar a mensagem na estrutura da janela ativa. 
+			// +Colocar a mensagem na estrutura da janela ativa. 
 			// (Para mensagens de controle de janela, interceptadas pelo processo cliente).
-			// Fica por conta das aplicações sondarem se há mensagens na fila de mensagens
+			// +Fica por conta das aplicações sondarem se há mensagens na fila de mensagens
 			// de sua janela, ou o processo poderá ser avisado sobre isso atravéz de um sinal.
-			// Os aplicativos devem deixar o sistema controlar as mensagens de digitação.
-			// O sistema imprime as digitações na área de cliente.
+			// +Os aplicativos devem deixar o sistema controlar as mensagens de digitação.
+			// +O sistema imprime as digitações na área de cliente.
 			//
 			windowSendMessage( (unsigned long) arg1,
 			                   (unsigned long) arg2,
@@ -1239,20 +1260,19 @@ void *systemDevicesUnblocked( int number,
 	
 	    //msg.msg Pega na fila de mensagens da janela com o foco de entrada.
 	    case 44:
-	    return (void*) windowGetMessage((struct window_d*) arg1 );
-        break;
+	        return (void*) windowGetMessage( (struct window_d*) arg1 );
+            break;
 	
 	    //msg.long1
-	    case 45:
-	    //@todo: windowGetLong1 
-        return NULL; //provisório.
-		break;
+	    case 45: 
+	        return (void*) windowGetLong1( (struct window_d*) arg1 );
+		    break;
 	
 	    //msg.long2
 	    case 46:
-	    //@todo: windowGetLong2
-        return NULL; //provisório.
-		break;
+	        return (void*) windowGetLong2( (struct window_d*) arg1 );
+		    break;
+
 	
 	    //
         // cmos and rtc support:
@@ -1287,7 +1307,8 @@ void *systemDevicesUnblocked( int number,
         //...	
 		
         default:
-	    break;
+	        return systemNull();
+			break;
 		
 	}; //Fim do switch.
 	
@@ -1301,6 +1322,8 @@ done:
 //
 // 3) system.devices.blocked
 //
+// Interação com dispositivos de difícil acesso, principalmente os modernos.
+//
 void *systemDevicesBlocked( int number, 
                             unsigned long arg1,  
 		                    unsigned long arg2,  
@@ -1311,7 +1334,9 @@ void *systemDevicesBlocked( int number,
 	
 	switch(number)
 	{
-		case 0: return NULL; break;
+		case 0: 
+		    return systemNull();
+			break;
 
 		//Show PCI info.
 		case 1: sys_showpciinfo(); break;
@@ -1426,7 +1451,8 @@ void *systemDevicesBlocked( int number,
 	
 		//..
 		default:
-		break;
+		    return systemNull();
+		    break;
 		
 	}; //fim do switch.
 	
@@ -1438,6 +1464,9 @@ done:
 //
 // 4) system.things
 //
+// Interação com dispositivos externos, principalmente os 
+// os que enviam dados pela internet.
+//
 void *systemThings( int number, 
                     unsigned long arg1,  
 		            unsigned long arg2,  
@@ -1447,7 +1476,9 @@ void *systemThings( int number,
     //	
 	switch(number)
 	{
-		case 0: return NULL; break;
+		case 0: 
+		    return systemNull();
+			break;
 
 		case 1:
 		break;
@@ -1456,7 +1487,8 @@ void *systemThings( int number,
 		break;
 		
 		default:
-		break;
+		    return systemNull();
+		    break;
 		
 	}; //fim do switch.
 	
@@ -1470,22 +1502,24 @@ done:
 //
 
 
-/*
-void *systemNull();
+//Método interno..
 void *systemNull(){
 	return NULL;
 };
-*/
 
 
 /*
  * systemLinkDriver:
- *     Linkando um driver ao sistema operacional
+ *     Ligando um driver ao sistema operacional.
  */
-void *systemLinkDriver(unsigned long arg1, unsigned long arg2, unsigned long arg3)
+void *systemLinkDriver( unsigned long arg1, 
+                        unsigned long arg2, 
+						unsigned long arg3 )
 {
 	MessageBox(gui->screen, 1, "systemLinkDriver:", "Linking a driver.." ); 
-	refresh_screen();
+	//
+done:
+    refresh_screen();	
     return NULL; //@@todo: Inda não implementada.	
 };
 
@@ -1494,6 +1528,7 @@ void *systemLinkDriver(unsigned long arg1, unsigned long arg2, unsigned long arg
  * systemShowDevicesInfo:
  *     Mostrar informações sobre o sistema, seguindo a ordem de
  *     velocidade dos dispositivos e barramentos.
+ *
  *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
  *     A Apresentação da sondágem pode ser feita em outra ordem,
  *     melhor que seja a ordem alfabética.
@@ -1538,7 +1573,10 @@ done:
 /*
  * systemCreateSystemMenuBar:
  *     Cria a barra de menu do sistema.
- *  @todo: essas informações devem ser repassadas para "struct system_d".
+ *
+ *  @todo: 
+ *      Essas informações devem ser repassadas para "struct system_d".
+ *
  */  
 void *systemCreateSystemMenuBar()
 {
@@ -1630,8 +1668,7 @@ int systemStartUp()
 	// Antes de tudo: CLI, Video, runtime.
 	//
 	
-	if(KeInitPhase != 0)
-	{	
+	if(KeInitPhase != 0){	
 		//@todo: As mensagens do abort podem não funcionarem nesse caso.
 		KiAbort();	
 	}
@@ -1646,30 +1683,8 @@ int systemStartUp()
 	    schedulerType = SCHEDULER_RR; 
 		
 	    
-		//@todo: O video já foi inicializado.
-		
-		// Video. *** IMPORTANTE.
-	    //Status = init_video();
-	    //if(Status != 0){
-		    //@todo: As mensagens do abort podem não funcionarem nesse caso.
-		//	KiAbort();
-	    //}else{
-	        
-			//Initial message.
-		//	set_up_cursor(0,1);
-	    //    printf("systemStartUp: Starting Kernel [%s]..\n",KERNEL_VERSION);
-		//    printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
-		//	                                                         ,(unsigned long) SavedX
-		//															 ,(unsigned long) SavedY
-		//															 ,(unsigned long) SavedBPP );		
-		    
-			//debug
-		    //refresh_screen();
-		    //while(1){}
-
-		    //Continua ...
-        //};
-		
+		//Obs: O video já foi inicializado em main.c.
+				
 		//
 		// BANNER !
 		//
@@ -1677,7 +1692,13 @@ int systemStartUp()
         //Welcome message. (Poderia ser um banner.) 
 		set_up_cursor(0,1);
         printf("systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
-	    printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
+		
+		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
+		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
+		    printf("systemStartUp: %s\n",developer_edition_string);
+		};
+		
+		printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
 		                                                         ,(unsigned long) SavedX
 																 ,(unsigned long) SavedY
 																 ,(unsigned long) SavedBPP );		
@@ -1714,7 +1735,34 @@ int systemStartUp()
 	
 	systemSetupVersion();
 	
+	//
+	// Inicializa a edição do sistema.
+	// Define um tipo de destinação para a versão do sistema operacional.
+	//
 	
+    switch(SYSTEM_EDITION)
+	{
+		case SYSTEM_DEVELOPER_EDITION:
+		    gSystemEdition = SYSTEM_DEVELOPER_EDITION; 
+		    break;
+
+		case SYSTEM_WORKSTATION_EDITION:
+		    gSystemEdition = SYSTEM_WORKSTATION_EDITION;
+		    break;
+
+		case SYSTEM_SERVER_EDITION:
+		    gSystemEdition = SYSTEM_SERVER_EDITION;
+			break;
+
+		case SYSTEM_IOT_EDITION:
+		    gSystemEdition = SYSTEM_SERVER_EDITION;
+			break;
+
+        //...
+        default:
+		    gSystemEdition = 0;
+            break; 		
+	};
 	
 //
 // Done: 
@@ -1724,8 +1772,8 @@ int systemStartUp()
 done:	
     //printf("systemStartUp: Done!\n");	
 	//refresh_screen();	
-	if(KeInitPhase != 3){
-	    Status = (int) 1;
+	if(KeInitPhase != 3){ 
+	    Status = (int) 1; 
 	};
     return (int) Status;
 };
@@ -1735,8 +1783,7 @@ done:
  * systemCheck3TierArchitecture:
  * Checa o status dos serviços oferecidos nas 3 camadas.
  */
-void systemCheck3TierArchitecture()
-{
+void systemCheck3TierArchitecture(){
     return; //@todo: Nothing for now.
 };
 
@@ -1792,13 +1839,12 @@ void systemSetupVersion()
 	
 	if((void*) System != NULL)
 	{
-		if( System->used == 1 && System->magic == 1234 )
-		{
+		if( System->used == 1 && System->magic == 1234 ){
 			System->version      = (void *) Version;
 			System->version_info = (void *) VersionInfo;
 		};
 		//Nothing
-	}
+	};
 	
 	//More ?!
 	
@@ -2108,8 +2154,7 @@ void systemReboot()
 	{
         //Pega da lista.
 		P = (void *) processList[i];
-		if(P != NULL)
-		{
+		if(P != NULL){
 		    //Termina o processo. (>> TERMINATED)
 		    printf("Killing Process PID={%d} ...\n",i);
 		    refresh_screen();
@@ -2124,56 +2169,182 @@ void systemReboot()
 	printf("Rebooting..\n");
 	
 	//Message and sleep.
-	MessageBox(gui->screen, 1, "systemReboot:","Rebooting ...");
+	MessageBox(gui->screen, 1, "systemReboot:","Rebooting..");
 	refresh_screen();
 	
 	//Nothing.
+	
 done:
-	
-	//
-	// Desabilita qualquer interrupção.
-	//
-	
-	asm("cli");		
-
-	sleep(8000*32);	
 	KiReboot();
-	//hal_reboot();
+hang: 
+    while(1){}
 };
 
 
 /*
  * systemShutdown:
  *     Interface para shutdown.
- *     hal.blocked
  */ 
 void systemShutdown()
 {
 	 
 	//@todo ...
+
+	MessageBox(gui->screen, 1, "systemShutdown:","I's safe to turnoff your computer.");
 	
 	//Nothing.
-done:	
-	MessageBox(gui->screen, 1, "systemShutdown:","I's safe to turnoff your computer.");    
-	while(1){}
+	
+done:		
+	//systemShutdownViaAPM(); //@todo: usar essa.
 	//KiShutdown(); //??
 	//hal_shutdown();
+hang:	
+	while(1){}
 };
 
 
 /*
- * Construtor
+ * systemShutdownViaAPM:
+ *     Desliga a máquina via APM.
+ *     (Deve chamar uma rotina herdada do BM).
+ */
+void systemShutdownViaAPM()
+{
+
+   //
+    // Obs: @todo:
+	//     Existe uma rotina no BM que desliga a máquina via APM usando 
+	// recursos do BIOS. A rotina começa em 32bit, assim podemos tentar herdar 
+	// o ponteiro para a função.
+    //
+	//MessageBox(gui->screen, 1, "systemShutdown:","Turning off via APM ...");	
+
+	
+    //Chamar a função de 32 bit herdado do BM.
+    //todo: usar iret.
+	
+	//Check limits.
+	// O ponteiro herdado tem que ser um valor dentro do endereço onde 
+	//roda o BM, que começa em 0x8000.
+	//if(shutdown_address > 0x8000 && shutdown_address < 0x20000 ){
+		
+	//Pilha para iret.
+    //asm("pushl %0" :: "r" ((unsigned long) 8)     : "%esp");    //cs.
+    //asm("pushl %0" :: "r" ((unsigned long) shutdown_address)    : "%esp");    //eip.
+	//asm("iret \n");    //Fly!	
+		
+	//};
+	
+hang:	
+	while(1){}
+};
+
+
+/*
+ * systemGetSystemMetric:
+ *     Retorna um valor de medida de algum elemento do sistema.
+ * usado pelas rotinas de criação e análise.
+ * O argumento seleciona a variável global que será retornada.
+ * Obs: Temos muitas variáveis globais com valores de demensões
+ * de recurso do sistema. Essa rotina é um modo organizado de 
+ * pegar os valores das variaveis globais relativas à medidas.
+ * Obs: É muito apropriado essa função ficar no arquivo \sm\sys\system.c
+ * Pois é a parte mais importante do módulo System Manegement".
+ */
+void *systemGetSystemMetric(int number)
+{
+	switch(number)
+	{
+		case SM_NULL:
+		    return NULL;
+			break;
+			
+		case SM_SCREENWIDTH:
+            //pegar uma global
+			break;
+		
+        case SM_SCREENHEIGHT:
+            //pegar uma global
+			break;
+        
+		//Essa é uma versão para o desenvolvedor??
+        case SM_DEVELOPER_EDITION:
+            if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
+				return (void*) 1; //Sim, essa é uma versão para o desenvolvedor.
+			}else{ return NULL; }; //Não, essa não é uma versão para o desenvolvedor.
+		    break;
+			
+            //Continuar ... 			
+		 	
+		default:
+		    return NULL;
+	};
+};
+
+
+/*
+ * systemGetSystemstatus:
+ *     Retorna o valor de alguma variável global relativa 
+ * apenas a status de algum elemento do sistema.
+ * Obs: É muito apropriado essa função ficar no arquivo \sm\sys\system.c
+ * Pois é a parte mais importante do módulo System Manegement".
+ *
+ */
+void *systemGetSystemStatus(int number)
+{
+	switch(number)
+	{
+		case SS_NULL:
+		    return NULL;
+			break;
+			
+		case SS_LOGGED:
+            return (void*) g_logged;
+			break;
+		
+        case SS_USING_GUI:
+            return (void*) g_useGUI;
+			break;
+        //Continuar ... 			
+		 	
+		default:
+		    return NULL;
+	};
+};
+
+
+
+/*
+ * systemSystem:
+ *     Construtor.
+ * Não tem valor de retorno, tem o mesmo nome que a classe.
+ * Uma chamada à um construtor criaria uma estrutura com seu nome e 
+ * o construtor pode inicializar alguma variável.
+ */
 void systemSystem(){
-    ;
+    gSystemStatus = 1;
 };
-*/
+
 
 
 /*
-int systemInit(){
-	;
-}
-*/
+ * systemInit:
+ *     Inicializando algumas variáveis.
+ */
+int systemInit()
+{
+	//Colocando na variável global, a opção selecionada manualmente pelo 
+	//desenvolvedor.
+    gSystemEdition = SYSTEM_EDITION;
+    //...
+	
+	// Podemos fazer algumas inicializações antes de chamarmos 
+	//a rotina de start up.
+	
+done:
+    //Retornando para o kMain. em main.c.	
+	return (int) systemStartUp();	
+};
 
 
 //

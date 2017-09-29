@@ -25,20 +25,27 @@
  */
  
  
- 
-void task0(){ 	
+void task0()
+{
+//    printf("Thread started\n"); 	
     while(1){}
 };
 
-void task1(){ 	
+void task1()
+{
+//    printf("Thread started\n"); 	 	
     while(1){}
 };
 
-void task2(){ 	
+void task2()
+{
+//    printf("Thread started\n"); 	 	
     while(1){}
 };
 
-void task3(){
+void task3()
+{
+//    printf("Thread started\n"); 		
     while(1){}
 };
 

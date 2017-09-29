@@ -61,7 +61,7 @@ void taskswitchFlushTLB(){
  * realizando operações de salvamento e restauração de contexto utilizado 
  * variáveis globais e extrutura de dados, seleciona a próxima thread através 
  * do scheduler, despacha a thread selecionada através do dispatcher e 
- * retorna para a função _irq0 em hardware.inc, que configurará os 
+ * retorna para a função _irq0 em head\x86\hardware.inc, que configurará os 
  * registradores e executará a thread através do método iret.
  * Na verdade, esta servido de interface pra uma rotina que faz tudo isso.
  * 
@@ -72,8 +72,10 @@ void KiTaskSwitch()
 	// @todo: Fazer alguma rotina antes aqui ?!
     //
 	
-done:
+TaskSwitch:	
 	task_switch();
+done:	
+	//Retornando para _irq0 em head\x86\hardware.inc.
     return;
 };
 
@@ -81,23 +83,22 @@ done:
 
 /*
  * task_switch:
- *     Gerencia a rotina de troca de thread, realizando operações
- * de salvamento e restauração de contexto, seleciona a próxima thread
- * através do scheduler, despacha a thread selecionada através do dispatcher
- * e retorna para a função _irq0 em hardware.inc, que configurará os registradores
- * e executará a thread através do método iret.
  *
+ *     Gerencia a rotina de troca de thread, realizando operações de 
+ * salvamento e restauração de contexto, seleciona a próxima thread através 
+ * do scheduler, despacha a thread selecionada através do dispatcher e retorna 
+ * para a função _irq0 em hardware.inc, que configurará os registradores e 
+ * executará a thread através do método iret.
  *
  * Obs:
- *     Apenas a ISR0, _irq0, pode chamar essa rotina.
- * 
+ *     Apenas a interface KiTaskSwitch chama essa rotina.
  */
 void task_switch()
 {
 	int New;
 	int Max;   
-    struct thread_d *Current;  //Thread atual. 	
-    struct process_d *P;       //Processo atual. 	
+    struct process_d *P;         // Processo atual. 
+    struct thread_d *Current;    // Thread atual. 	
 	//...
 	
 	Max = DISPATCHER_PRIORITY_MAX;
@@ -142,35 +143,37 @@ void task_switch()
 	};
 	//...	
 	
+	
 	/*
 	 * LOCKED:
-	 *     O mecanismo de task switch está desligado, 
-	 *     mas a tarefa é válida para user mode. 
-	 *     Retorna sem salvar o contexto.
+	 * O mecanismo de task switch está desligado, mas a tarefa é válida para 
+	 * user mode. 
+	 * Retorna sem salvar o contexto.
 	 *
 	 * @todo: 
-	 *     Checar a tarefa atual. seu iopl.(deve ser ring0)
-	 *
+	 *     Checar a tarefa atual. Seu iopl. (Deve ser ring0).
 	 */
 	if(task_switch_status == LOCKED)
 	{    		
 		//
-		// @todo: Incrementar o tempo que todas as outras estão sem rodar.
-		// usando a thread list.
+		// @todo: 
+		// Incrementar o tempo que todas as outras estão sem rodar.
+		// Usando a thread list.
+		// @todo: Checar contexto. iopl. stacks.
+		//
+		// Obs: taskswitch locked, Retorna sem salvar.
 		//
 		
-		//@todo: Checar contexto. iopl. stacks.
-		
-		//
-		//taskswitch locked,
-		//Retorna sem salvar.
-		//
-		
+		// Atualiza a contagem de tipo de seleção.
 		IncrementDispatcherCount(SELECT_CURRENT_COUNT);
 		return;  
 	};
 	
-	//UNLOCKED.
+	
+	/* 
+	 * UNLOCKED:
+	 *
+	 */
 	if(task_switch_status == UNLOCKED)
 	{   
 
@@ -184,10 +187,11 @@ void task_switch()
         // Checa o 'quantum'. (Limite que uma thread pode usar o processador).
 		if( Current->runningCount < Current->quantum )    
 		{  
-            //Continua rodando atá vencer a cota.
+            // Continua rodando até vencer a cota.		
+			// @todo: Talvez possa restaurar antes de retornar.
+			// Retorna sem restaurar, se ainda não venceu a cota.
 			
-			//@todo: talvez possa restaurar antes de retornar.
-			// retorna sem restaurar,se ainda não venceu a cota.
+			// Atualiza a contagem de tipo de seleção.
 			IncrementDispatcherCount(SELECT_CURRENT_COUNT);
 			return; 
 		}
@@ -195,24 +199,24 @@ void task_switch()
 		{
 			
 		    //
-		    //    Aqui a thread atual pode estar no estado running ou initialized.
-		    //    +Se estiver running, torna ready. (preempt).
-		    //    +Se estiver initialized, vai checar e executar mais a frente.
+		    // Aqui a thread atual pode estar no estado running ou initialized.
+		    // +Se estiver running, torna ready. (preempt).
+		    // +Se estiver initialized, vai checar e executar mais a frente.
 		    //
 		
 		    // * MOVEMENT 3 (Running --> Ready).
 		    if(Current->state == RUNNING)
 		    {   
-		        //Preempt.
-			    Current->state = READY;
+			    Current->state = READY;    //Preempt.
 		    
-			    //Início da fila onde a prioridade é menor.
+			    // Início da fila onde a prioridade é menor.
 			    if(Current->preempted = PREEMPTABLE){
-					//@todo: Nesse momento prioridade pode ser baixada para o nível de equilíbrio.
+					// @todo: Nesse momento prioridade pode ser baixada para 
+					// o nível de equilíbrio.
 			        queue_insert_head(queue, (unsigned long) Current, QUEUE_READY);	
 			    };
 			
-			    //fim da fila onde a prioridade é maior.
+			    // Fim da fila onde a prioridade é maior.
 			    if(Current->preempted = UNPREEMPTABLE){
 					//Obs: Não abaixa a prioridade.
 			        queue_insert_data(queue, (unsigned long) Current, QUEUE_READY);	
@@ -221,18 +225,19 @@ void task_switch()
 		    };
 		    
 			//
-			//@todo:
-			//A tarefa mais proxima de sua dead line e 
-			//a tarefa de maior prioridade.
-			//check_for_ ... (mais proxima da deadline)
+			// @todo:
+			// A tarefa mais próxima de sua Dead Line é a tarefa de maior 
+			// prioridade.
+			// check_for_ ... (mais próxima da deadline)
 			//
 			
 			//
 			// *IMPORTANTE:
-			// Checa se tem threads em standby 
-			// esperando pra rodar pela primeira vez.
-			// Não retorna se encontrar. 
-			// @todo: na verdade essa função deveria se chamar check for standby
+			// Checando se tem threads em standby, que estão esperando pra 
+			// rodar pela primeira vez.
+		    // Obs: Essa chamada não retorna se encontrar uma thread assim. 
+			// @todo: Na verdade essa função deveria se chamar 
+			// check_for_standby().
 			//
 			check_for_initialized(); 
             
@@ -246,7 +251,6 @@ void task_switch()
             //			
 			
 			KiRequest();
-			//request();
 			
             //
             // Não havendo thread para ser inicializada, nem request, roda uma 
@@ -259,16 +263,15 @@ void task_switch()
 	};
 	
     //
-	// * Se estamos aqui é porque houve uma falha anormal. Então
-	//   tentaremos selecionar a próxima thread. 
+	// * Se estamos aqui é porque houve uma falha anormal. Então tentaremos 
+	// selecionar a próxima thread. 
 	//
 	
+//crazyFail:	
 	goto dispatch_current;      	
 	
-	
 	//
-	// try_next:
-	//     Seleciona a Current usando a fila do dispacher.
+	// Seleciona a Current, usando a fila do dispacher.
 	//
 	
 try_next: 
@@ -277,29 +280,36 @@ try_next:
 	// No pior dos casos o condutor irá parar no fim da lista.
 	//
 	
-	//Checa se é o último da lista.
-	if( (void*) Conductor->Next == NULL )
-	{
-		//Fim da lista. 
-		//Recriar a lista. (#Agendar).
-		//@todo: Use thid interface KiScheduler();
-		//KiScheduler();
+	// Checa se é o último da lista encadeada.
+	if( (void*) Conductor->Next == NULL ){
+		// Fim da lista. 
+		// Recriar a lista. (#Agendar).
+		// @todo: Usar KiScheduler();
+		// KiScheduler();
 		scheduler();     
 		goto go_ahead;  //Com a lista atualizada, vá em frente.
 	};
 	
+	
 	//Se ainda não for o último da lista.
 	if( (void*) Conductor->Next != NULL )
 	{
-	    //O condutor avança e pega o próximo da lista.
+	    // O condutor avança e pega o próximo da lista.
 		Conductor = (void*) Conductor->Next;
 		goto go_ahead;
 	}else{ 
 	    //@todo: Se o próximo for NULL.
 		//goto go_ahead;
 	};
-	//@todo: E se não for o último da lista e próximo for NULL?
+	
+	//
+	// *Importante:
+	// E se não for o último da lista e próximo for NULL?
+	// É o que trataremos logo abaixo.
+	//
+	
 	//Nothing.
+	
 go_ahead:
     
 	//
@@ -308,45 +318,42 @@ go_ahead:
 	
 	Current = (void *) Conductor;
 	
-    //Checa a validade da estrutura.	
-	if( (void *) Current == NULL )
-	{ 
-        //
-        // Se for inválida, tentamos novamente.
-		// @todo: #bugbug Isso pode gerar um loop infinito.
-		//
+    // Checa a validade da estrutura.	
+    // Se for inválida, tentamos a próxima novamente.
+	// @todo: #bugbug Isso pode gerar um loop infinito.
+	if( (void *) Current == NULL ){ 
 		goto try_next;  
-	}
-	else
-	{
+	}else{
+		
 		//
 		// Obs: O 'else' é para o caso da estrutura ter um ponteiro válido.
 		// Agora checamos os outros parâmetros da estrutura.
 		//
 		
-		//Se for inválido. (Estrutura corrompida).
+		// Se for inválido. (Estrutura corrompida).
+		// Tentamos novamente.
+		// @todo: #bugbug Isso pode gerar um loop infinito.
 		if( Current->used != 1 || Current->magic != 1234){
-			//Tentamos novamente.
-			//@todo: #bugbug Isso pode gerar um loop infinito.
 			goto try_next;	
 		};		
+		
 		//Se não está pronta a thread.
-	    if( Current->state != READY){
-			//Tentamos novamente.
-			//@todo: #bugbug Isso pode gerar um loop infinito.			
+		//Tentamos novamente.
+		//@todo: #bugbug Isso pode gerar um loop infinito.
+	    if( Current->state != READY){	
 	        goto try_next; 
 		};
 		
-		//
-		// Selecionamos uma thread atravéz do dispatcher. Incrementando a 
-		// contagem do tipo de seleção.
-		//
+		// Selecionamos uma thread atravéz do dispatcher. 
+		// Incrementando a contagem do tipo de seleção.
 		IncrementDispatcherCount(SELECT_DISPATCHER_COUNT);
 		
-		//Obs: Current é a thread selecionada.
-		//Salvamos o TID da thread selecionada.
+		// Obs: Current é a thread selecionada.
+		// Salvamos o TID da thread selecionada.
 		current_thread = (int) Current->tid;
-		goto dispatch_current;  //Dispacha a thread selecionada.  			
+		
+		// Despacha a thread selecionada.
+		goto dispatch_current;    			
 	};	
 	
 	//
@@ -355,6 +362,7 @@ go_ahead:
     // optar pela atual e não tentaremos mais nada.
     //
  	
+//superCrazyFail:
 	goto dispatch_current; 
 	//goto try_next; //#Obs: Não tentaremos novamente.
 	
@@ -362,41 +370,37 @@ go_ahead:
 	
 //	
 // Done.
-// Nesse momente a current_thread foi selecionada e não tem volta.
+// Nesse momento a current_thread foi selecionada e não tem volta.
 //
 dispatch_current:
     
-	//
-	// Última filtragem, só por paranóia.
-	// 
+	// Última filtragem, só por paranóia. 
 	// if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
 	//     goto try_next;
 	// };
-    //
 	
-	//Checa a validade da thread selecionada.
+	// Checa a validade da thread selecionada.
+	// @todo: Resiliência. Tomar uma decisão e não desistir.
+	// A idle é sempre uma última opção.
     Current = (void *) threadList[current_thread];
-	if( (void *) Current == NULL )
-	{
-		//@todo: Resiliência. Tomar uma decisão e não desistir.
-	    //A idle é sempre uma última opção.
+	if( (void *) Current == NULL ){
 		panic("task_switch.dispatch_current error: Struct");
 	    while(1){};
-	}
-	else
-	{
+	}else{
+		
+		// @todo: Resiliência. Tomar uma decisão e não desistir.
+		// A idle é sempre uma última opção.		
 	    if( Current->used != 1 || 
 		    Current->magic != 1234 || 
 			Current->state != READY )
 	    {
-			//@todo: Resiliência. Tomar uma decisão e não desistir.
-			//A idle é sempre uma última opção.
 	        panic("task_switch.dispatch_current error: Param.");
 	        while(1){}
 	    };
         //Obs: Podemos filtrar outros parâmetros sistemicamente importante.		
 		//Nothing.
 	};
+	
 	
     //
 	// runningCount:
@@ -406,10 +410,10 @@ dispatch_current:
 	
 	Current->runningCount = 0;
 	
+	
 	//
-	// Chama o dispatcher.
-	// Coloca a thread selecionada no estado RUNNING e
-    // restaura o contexto.
+	// Chama o dispatcher. Isso coloca a thread selecionada no estado RUNNING 
+	// e restaura o contexto.
 	//
 	
 	//
@@ -420,11 +424,11 @@ dispatch_current:
 	
 	//
 	// Retornamos do dispatcher.
-	// O dispatcher restaurou o contexto para a próxima thread. Passando
-	// os valores da estrutura para variáveis que serão usadas para carregar 
-	// os registradores na hora do iretd.
-	// Agora vamos retornar para a rotina da ISR0 em assembly, 
-	// que está em hardware.inc.
+	// O dispatcher restaurou o contexto para a próxima thread. Passando os 
+	// valores da estrutura para variáveis que serão usadas para carregar os 
+	// registradores na hora do iretd.
+	// Agora vamos retornar para a rotina da _irq0 feita em assembly, que está 
+	// em head\x86\hardware.inc, mas antes, voltamos para a interface KiTaskSwitch().
 	//
 	
 	//Nothing.
@@ -433,11 +437,10 @@ dispatch_current:
 done:
     
 	//
-	// @todo: Salvar em uma variável global o cr3 do processo da thread selecionada
-    // para que a rotina em assembly, (hardware.s), configura o cr3.	
+	// @todo: 
+	// Salvar em uma variável global o cr3 do processo da thread selecionada
+    // para que a rotina em assembly, (head\x86\hardware.s), configure o cr3.	
 	//
-	
-	
 	
     P = (void*) processList[Current->ppid];
 	
@@ -480,6 +483,15 @@ done:
 		       refresh_screen();
 		       while(1){}
 			}
+			
+			//
+			// * Salvando ...
+			//
+			
+			// Bom, aqui essas duas opções de variáveis existem na estrutura,
+			// estamos trabalhando nisso.
+			// Importante é que salvamos em uma variável global, agora acessível
+			// pela rotina em assembly _irq0.
 			current_process_pagedirectory_address = (unsigned long) P->Directory;
 			//current_process_pagedirectory_address = (unsigned long) P->page_directory->Address;
 		};
@@ -494,13 +506,12 @@ done:
 	
     // 
 	// Done.
-	// Ao retornar, a rotina ISR0 em assembly, atualiza o registrador CR3 com o 
+	// Ao retornar, a rotina _irq0 em assembly atualiza o registrador CR3 com o 
 	// ponteiro para o diretório de páginas do processo ao qual a thread pertence, 
 	// alimenta os registradores e efetua iretd. #fim :)
 	//
 	return; 		
 };
-
 
 
 /*

@@ -196,8 +196,7 @@ fail:
  *    P3 - Processos em ring3, User Mode.
  *
  *
- * @todo: Esse função poderia ter um argumento para o endereço do diretório do processo.
- *        não tendo, o endereço deve ser configurado depois.
+ * @todo: Esse função deve chamar uma rotina de craição de diretório. 
  *        Quando um processo é criado deve-se criar o seu diretório
  *        e criar as pagetables que o processo vai usar de acordo
  *        com o tamanho do processo. 

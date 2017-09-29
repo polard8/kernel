@@ -175,6 +175,20 @@ void shellPrompt();
 int app_main(int argc, char *argv[]) 
 {
 	
+	//#debug
+	//deixe o kernel usar essa janela para teste.
+	//Obs: Não criaremos a janela principal desse programa 
+	//para evitarmos erros com printf.
+	MessageBox( 1, "SHELL.BIN","Initializing ...");
+    refresh_screen();
+	
+	//chamando uma system call que ative a rotina de testes de 
+	//escrita em janelas com o foco de entrada.
+    //cancelada, acionaremos via procedimento de janela do sistema F12.
+	//system_call( 222,0,0,0);
+	//while(1){}	
+	
+	
 	/*
 	 * Uma boa ordem para os passos dessa rotina nos aplicativos  
 	 * é: Step1=WindowClass, Step2=Window e Step3=Message.
@@ -194,6 +208,16 @@ int app_main(int argc, char *argv[])
 	char *s;    //String	
 
 	//...
+	
+	
+	
+	//#DEBUG
+	//printf("S");
+	//printf("Shell: testing strings \n");
+	//shellSetCursor(8,8); 
+	//printf("Shell: and cursor. \n");
+	//refresh_screen();
+	//while(1){}	
     
 	
 	//
@@ -328,9 +352,9 @@ noArgs:
 	//
 	
 	//Debug:
-	printf("\n\n Starting Shell Version ");
-	printf(SHELL_VERSION);
-	refresh_screen();	
+	//printf("\n\n Starting Shell Version ");
+	//printf(SHELL_VERSION);
+	//refresh_screen();	
 	
 	//Debug:
 	//while(1){}
@@ -438,7 +462,7 @@ noArgs:
 	// Podemos tentar criar um processo.
 	//
 
-done:	
+ 	
 
 
     //
@@ -484,8 +508,13 @@ done:
 	printf(":)");
 	*/
 	
-	printf(SHELL_PROMPT);
 	
+//entrandoNoWhile:	
+	//printf("SHELL: While...");
+	//while(1){}
+	
+	//printf(SHELL_PROMPT);
+	//refresh_screen();	
 	
 	
 	//** hang.
@@ -504,12 +533,11 @@ done:
 	
 	//isso é um teste pegar um valor por vez não é a melhor opção.
 	
-	void *msgTest;
+	int msgTest;
 	void *long1;
 	void *long2;
 	
-	while(1)
-	{
+
         //
 		// Get Message: 
 		// Systemcall get message
@@ -517,9 +545,11 @@ done:
 		// pegar a mensagem que esta dentro da estrutura. Essa estrtura fica 
 		// protegida no Kernel.
 		//
-		
-		msgTest = (void*) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 
-		                              (unsigned long) hWindow, 
+
+	while(1)
+	{		
+		msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 
+		                              (unsigned long) hWindow, //isso passa um endereço virtual que o kernel não conheçe.
 									  (unsigned long) hWindow, 
 									  (unsigned long) hWindow );
 									  
@@ -533,11 +563,8 @@ done:
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );		
 		
-        //  		
 		// Send Message to procedure.
-		//
-		
-		if((void*) msgTest != NULL)
+		if( (int) msgTest != 0)
 		{
 			//Obs: Chamado diretamente, sem interface nenhuma.
 			//     Mas não deve ser assim.
@@ -545,7 +572,13 @@ done:
 			                (int) msgTest, 
 							(unsigned long) long1, 
 							(unsigned long) long2 );
+			
+			//printf("Y-DEBUG: hwindow NULL\n"); //Deletar isso depois.
+			//printf("Y-DEBUG: msg={%d}\n",msgTest); 
+			//printf("Y-DEBUG: long1={%c}\n",long1); 
+			//printf("Y-DEBUG: long2={%c}\n",long2); 
 		};
+		
 		//Nothing.
 	};
 	
@@ -591,22 +624,28 @@ shellProcedure( struct window_d *window,
 		case MSG_KEYDOWN:
             switch(long1)
             {
+
                 //Mostrar o buffer
                 case '1':
                     printf("%s\n",&prompt[0]);
-				break; 
+				    break; 
 
 				//Mostrar o buffer	
                 case '2':
                     printf("%s\n",prompt);
-				break; 
+				    break; 
 
 				//	
-                case '3':
-				    printf("Shell procedure 3\n");
-                break; 					
+                case '#':
+				case '3':
+				    printf("Shell procedure case 3\n");
+                    break;
+					
+                case '9':
+                    MessageBox( 1, "Shell","Test 9");
+                    break; 					
                               
-               //Texto - Envia o caractere.
+                //Texto - Envia o caractere.
                 default:
 			   
                    //Imprime os caracteres normais.
@@ -614,19 +653,23 @@ shellProcedure( struct window_d *window,
 			       
 				   //O input está imprimindo...
 				   //o input coloca no buffer e imprime dependendo do caractere.
-				   input_ret = input( (unsigned long) long1);				   
+				   //input_ret = input( (unsigned long) long1);				   
 				   
-				   if(input_ret == VK_RETURN){
-				        prompt_status = 1;    //Último caractere.
-				   };
-				   goto done;
-                break;               
+				   //if(input_ret == VK_RETURN){
+				   //     prompt_status = 1;    //Último caractere.
+				   //};
+				   
+				   //debug
+				    printf("Shell procedure: keydown\n");				   
+				    goto done;
+                    break;               
             };
         break;
 		
 		case MSG_KEYUP: 
-		    printf("%c", (char) 'u'); 	
-		break;
+		    printf("%c", (char) 'u');
+            printf("%c", (char) long1);  			
+		    break;
 		
 		//case MSG_SYSKEYDOWN:
 		//    switch(long1)
@@ -636,20 +679,21 @@ shellProcedure( struct window_d *window,
 		//break;
 		
 		case MSG_SYSKEYUP: 
-		printf("%c", (char) 'U'); 	
-		break;
+		    printf("%c", (char) 'U');
+            printf("%c", (char) long1);			
+		    break;
           
 		case MSG_COMMAND:
             switch(long1)
 			{
 				case 0:
 				    MessageBox( 1, "Shell","Testing MSG_COMMAND.NULL.");
-				break;
+				    break;
 				
 				//About
 				case CMD_ABOUT:
 				    MessageBox( 1, "Shell","Testing MSG_COMMAND.CMD_ABOUT.");
-				break;
+				    break;
 				
 				//...
 				
@@ -663,8 +707,8 @@ shellProcedure( struct window_d *window,
 			//SYSTEMCALL_CALL_SYSTEMPROCEDURE
 		    //system_call(37, (unsigned long) msg, (unsigned long) long1, (unsigned long) long2);
               //system_call(37, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);			
-		//    printf("Shell procedure: default message: msg{%d} long1={%d} long2={%d} \n", (int) msg, (unsigned long) long1, (unsigned long) long2 );
-		break;	  
+		    //    printf("Shell procedure: default message: msg{%d} long1={%d} long2={%d} \n", (int) msg, (unsigned long) long1, (unsigned long) long2 );
+		    break;	  
     };
 
 
@@ -1008,7 +1052,10 @@ int shellInit()
 	//
 	
 	//Constructor.
-	shellShell();    
+	shellShell(); 
+
+
+    printf("shellInit: Testing strings on Client Area ...\n");		
 	
 	//
 	// @todo: Essa mensagem está aparecendo fora da área de trabalho do shell
@@ -1171,6 +1218,15 @@ int shellInit()
 
 	
 done:
+    //
+	// Testing welcome message.
+	//
+	
+	printf("...\n");
+	printf("Welcome to Gramado Operating System.\n");
+	printf("...\n");
+	printf("TAKE A SAD O.S. AND MAKE IT BETTER!\n");
+	printf("...\n");
 	printf("Done!");
 	
     //shellSetCursor(1,1);
@@ -1182,8 +1238,25 @@ done:
 /*
  * shellSetCursor:
  *     Configurando o cursor. (stdio.h).
+ *
+ * @todo: Aqui quando definimos os valores o cursor no shell 
+ * devemos considerar que a janela com o foco de entrada tambem tem um cursor...
+ * Temos que atualizar o cursor da janela com foco de entrada se quizermos escrever corretamente dentro dela.
+ * e isso se faz através de uma chamada ao kernel.
  */
-void shellSetCursor(unsigned long x, unsigned long y){
+void shellSetCursor(unsigned long x, unsigned long y)
+{
+	//
+	// #BUGBUG: Aconteceu uma pagefault depois de incluir essa função. 
+	// Vou testar sem ela.
+	//
+	
+    //Atualizamos as variáveis dentro da estrutura da janela com o foco de entrada.
+    //system_call( SYSTEMCALL_SETCURSOR, x, y, 0);	
+	
+
+//Atualizando as variáveis globais usadas somente aqui no shell.
+setGlobals:	
     g_cursor_x = (unsigned long) x;
     g_cursor_y = (unsigned long) y;	
 	return;

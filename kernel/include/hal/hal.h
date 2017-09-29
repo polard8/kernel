@@ -1,5 +1,5 @@
 /*
- * Arquivo: hal.h
+ * File: hal.h
  *
  * Descrição:
  *     Rotinas exportadas pelo /hal para os outros 2 módulos do kernel base.
@@ -237,6 +237,19 @@ ProcessorBlock_t ProcessorBlock;    //Obs: Não tem ponteiro.
 
 //...
  
+
+//
+// GUI support.
+// 
+ 
+void hal_backbuffer_putpixel( unsigned long ax, 
+                              unsigned long bx, 
+						      unsigned long cx, 
+						      unsigned long dx ); 
+							  
+							  
+							  
+							  
   
 /*
  * Initialization support.

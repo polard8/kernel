@@ -1,17 +1,30 @@
 
 Sobre o kernel base:
 ====================
-    O kernel base tem 2 gerenciadores, process.c e modules.c
-	O resto são módulos do tipo MB e processos do tipo PB.
+    O kernel base é o núcleo do sistema operacional, roda no ambiente
+ring0 e é construido em camadas. O executável chama-se KERNEL.BIN.	
+   
+   
 
+*******************************************************************************************
+Lista de diretórios do kernel base:
+===================================
 
-Lista de diretórios:
-===================
+    /gramado      - (4) GUI.
+    /executive    - (3) Drivers VIPs, que ficam em kernel mode.
+    /microkernel  - (2) Kernel mínimo e fundamental. (processos e threads).	
+    /hal          - (1) Hardware abstraction layer
 
-/hal          - Hardware abstraction layer
-/microkernel  - Kernel mínimo e fundamental. (tasks)
-/executive    - Drivers VIPs, que ficam em kernel mode.
-
+	
+    Os diretórios representam as camadas do kernel base. 
+	
+    A camada mais alta é a camada /gramado, que é a interface gráfica.
+    A camada mais baixa é a camada /hal que lida liretamente com o hardware. Mas
+essa camada poderá inda chamar um modulo externo em kernel mode que possivelmente será criado
+e chamará HAL.BIN, para efeito de portabilidade do kernel base, o módulo externo HAL.BIN
+se encarregará das diferenças de arquitetura deixando para o módulo interno /hal o trabalho
+de interface entre o kernel base e o módulo externo HAL.BIN.	
+*********************************************************************************************	
 
 
 Sobre o executive:
@@ -32,6 +45,35 @@ Obs:
      * No futuro serão esses 3 diretórios, so que com outros nomes.
        pois a estrutura hal,microkernel e executive pertencem a M$. 
        ex: /hardware /microkernel /system
+
+
+
+
+Design Notes 1.
+
+
+Notas de Design que descreve as principais partes do Kernel Base.
+Estamos no diretório /k e cada um dos diretórios contidos aqui representam uma
+das partes fundamentais do Kernel Base, São elas /hal, /microkernel e /executive.
+
+
+Pode-se imaginas o kernel dividido em 3 classes principais. As classes do kernel são: hal, microkernel, executive.
+
+
+    k.hal
+    k.microkernel
+    k.executive
+
+    Kernel classes (k.____).
+	
+/gramado é a camada mais externa.	
+
+
+Versão do documento: 1.0, 2016.
+   
+
+
+  
 ;
 ; fim.
 ;

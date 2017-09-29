@@ -44,24 +44,31 @@ void KeInformation()
  *
  * Obs: As informções podem ser salvas em um arquivo de saída padrão.
  */
+//void infoShowKernelInfo() 
 void KiInformation()
 {
+	
 	//
 	// Messages.
 	//
 	
+	printf("\n[System Info:]\n");
 	//OS info.
-	//printf("%s %",OS_NAME ,OS_VERSION);
-	printf("System version: %d.%d.%d.%d \n" ,SYSTEM_VERSIONMAJOR
+	printf("%s ",OS_NAME);
+	printf("Version: %d.%d.%d.%d \n\n" ,SYSTEM_VERSIONMAJOR
 	                                        ,SYSTEM_VERSIONMINOR
 										    ,SYSTEM_VERSIONBUILT
 										    ,SYSTEM_VERSIONREVISION );
 	
-	//Kernel info.
+	
+	//
+	// Kernel info.
+	//
+	
 	//Version and time running.	
-	printf("Kernel Info:\n");
-	printf("Kernel version: %s Time running: %d \n",KERNEL_VERSION
-	                                               ,kernel_tick_total );
+	printf("\n[Kernel Info:]\n");
+	printf("Kernel version: %s\n",KERNEL_VERSION );
+	printf("Ticks running: %d\n",kernel_tick_total );
 
 												   
     //ShowUserInfo(int user_id);												   
@@ -97,7 +104,7 @@ void KiInformation()
 	// foi usado pelo scheduler.
 	//
 	
-	printf("Criterios de Dispatch:\n");
+	printf("Dispatch criteria:\n");
 	printf("cIdle={%d} cInit={%d} cNext={%d} cCur={%d} cAny={%d} cIdeal={%d} cDisp={%d}\n",DispatchCountBlock->SelectIdleCount
 	    ,DispatchCountBlock->SelectInitializedCount
 	    ,DispatchCountBlock->SelectNextCount
@@ -121,9 +128,22 @@ void KiInformation()
 	printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n",kernel_stack_start ,kernel_stack_end ,StackTotal);
 
 	
+	//
+	// Video info
+	//
+	
+	printf("\n[Video Info:]\n");
+	
 	//Video mode.
-	printf("The video option is %x \n",g_video_mode);
-	printf("Frontbuffer={%x} Backbuffer={%x} \n",g_frontbuffer_buffer_address ,g_backbuffer_address);
+	//printf("The video option is %x \n",g_video_mode);
+	printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",g_frontbuffer_buffer_address ,g_frontbuffer_buffer_va ,g_backbuffer_address);
+	
+	
+	//
+	// user info
+	//
+	
+	printf("\n[User Info:]\n");
 	
 	//Group and user.
 	printf("Group={%d} User={%d} \n",current_group,current_user);
@@ -133,12 +153,28 @@ void KiInformation()
 	                                                          ,current_windowstation
 															  ,current_desktop);
 															
-	
-    //process, thrad.
-	printf("CurrentProcess={%d} CurrentThread={%d} \n",current_process ,current_thread);
-	
-	
 	ShowUserInfo(0);  //#bugbug
+	
+	
+	//
+	// Process and thread info
+	//
+	
+	printf("\n[Process Info:]\n");	
+    //process, thread.
+	printf("CurrentProcess={%d} CurrentThread={%d} \n\n",current_process ,current_thread);
+	
+	
+	
+	//
+	// Memory info.
+	//
+	
+	memoryShowMemoryInfo();
+	
+	//Específico para intel.
+	//Talves isso não deva ficar aqui.
+	//show_cpu_intel_parameters();
 	
 	//More?!
 	
@@ -148,6 +184,8 @@ done:
 	    //Não precisa disso se foi chamado pelo procesimento do sistema.
 		refresh_screen();
 	};
+	
+	//SetFocus(hWindow);	
     return;	
 };
 

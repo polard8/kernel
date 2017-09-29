@@ -1,37 +1,41 @@
 /*
- * Arquivo: rtc.c 
+ * File: rtc.c 
  *
  * Descrição:
  *     Real Time Controller ?!!
  *     Controlador RTC, Data e Hora.
+ * @todo: Criar métodos para acessar os valores salvos na estrutura Rtc.
  *     
  * Ambiente: (RING 0).
  *
- *  Versão: 1.0 - 2013, 2014, 2015.
+ * "CMOS" is a tiny bit of very low power static memory that lives on the same 
+ * chip as the Real-Time Clock. (osdev)
+ *
+ * History:
+ *     2013 - Created by Fred Nora.
+ *     2017 - Revision.
  */
 
 
 /*
- A typical OS will use the APIC or PIT for timing purposes. However, the RTC works just as well.
- RTC stands for Real Time Clock. It is the chip that keeps your computer's clock up-to-date. 
- Within the chip is also the 64 bytes of CMOS RAM.
- osdev.
+ A typical OS will use the APIC or PIT for timing purposes. However, the RTC 
+ works just as well. RTC stands for Real Time Clock. It is the chip that keeps 
+ your computer's clock up-to-date. Within the chip is also the 64 bytes of 
+ CMOS RAM. (osdev).
 */ 
- 
- 
-#include <kernel.h>
-
-
-//unsigned long rtcTicks;
-//int rtcStatus;
-//int rtcError;
-//...
-
-
 /*
     070 CMOS RAM/RTC, also NMI enable/disable (AT,PS/2, see RTC)
 	071 CMOS RAM data  (AT,PS/2)
 */
+ 
+ 
+#include <kernel.h>
+
+//Internas.
+unsigned long rtcTicks;
+int rtcStatus;
+int rtcError;
+//...
 
 
 //
@@ -130,7 +134,9 @@ unsigned long read_cmos_bcd(unsigned reg)
  * Formato: Cada unidade representa 1 segundo. 
  *
  * todo: Essa função pode ser trabalhada sem riscos ao sistema.
- *
+ * STATUS: Não funciona muito bem. @todo: rever isso
+ * Obs: Na verdade pode estar funcionando e o relógio da máquina virtual
+ * está desatualizado.
  */
 unsigned long get_time()
 {
@@ -148,7 +154,7 @@ unsigned long get_time()
  * Formato(bytes): YYMD 
  *
  * todo: Essa função pode ser trabalhada sem riscos ao sistema.
- *
+ * sTATUS: fUNCIONA BEM.
  */
 unsigned long get_date()
 {
@@ -160,20 +166,44 @@ unsigned long get_date()
 	return (unsigned long) date;
 };
 
- 
- 
-unsigned short GetTotalMemory()
+
+/* 
+//Get total memory info via CMOS. 
+    15h		Low byte of base memory size
+				100h = 256k
+				200h = 512k
+				280h = 640k
+	16h		High byte of 15h above
+	17h		Low expansion memory byte
+	18h		High expansion memory byte
+				200h = 512k
+				400h = 1024k
+				600h-3C00h = 1536-15,360k
+	19h		Extended type byte: Hard drive 1
+	1Ah		Extended type byte: Hard drive 2
+	1Bh-2Dh		reserved
+	2Eh		check-sum for addresses 10h-2Dh  (word)
+	2Fh		  see above
+	30h		Low expansion memory byte
+	31h		High expansion memory byte
+				200h = 512k
+				400h = 1024k
+				600h-3C00h = 1536-15,360k
+				
+	//Limite de uma 'word' ??			
+*/
+unsigned short rtcGetExtendedMemory()
 {
     unsigned short total;
     unsigned char lowmem;
 	unsigned char highmem;
  
-    //Low. 
-    outportb(0x70, 0x30);
+    //Low. (Low extended memory byte)
+    outportb(0x70, RTC_LOWBYTE_EXTENDEDMEMORY);
     lowmem = inportb(0x71);
     
-	//High.
-	outportb(0x70, 0x31);
+	//High. (High extended memory byte)
+	outportb(0x70, RTC_HIGHBYTE_EXTENDEDMEMORY);
     highmem = inportb(0x71);
 	
     //Total.
@@ -185,13 +215,63 @@ done:
 
 
 
+/* 
+//Get total memory info via CMOS. 
+    15h		Low byte of base memory size
+				100h = 256k
+				200h = 512k
+				280h = 640k
+	16h		High byte of 15h above
+	17h		Low expansion memory byte
+	18h		High expansion memory byte
+				200h = 512k
+				400h = 1024k
+				600h-3C00h = 1536-15,360k
+	19h		Extended type byte: Hard drive 1
+	1Ah		Extended type byte: Hard drive 2
+	1Bh-2Dh		reserved
+	2Eh		check-sum for addresses 10h-2Dh  (word)
+	2Fh		  see above
+	30h		Low expansion memory byte
+	31h		High expansion memory byte
+				200h = 512k
+				400h = 1024k
+				600h-3C00h = 1536-15,360k
+				
+	//Limite de uma 'word' ??
+*/
+unsigned short rtcGetBaseMemory()
+{
+    unsigned short total;
+    unsigned char lowmem;
+	unsigned char highmem;
+ 
+    //Low. (Low base memory byte)
+    outportb(0x70, RTC_LOWBYTE_BASEMEMORY);
+    lowmem = inportb(0x71);
+    
+	//High. (High base memory byte)
+	outportb(0x70, RTC_HIGHBYTE_BASEMEMORY);
+    highmem = inportb(0x71);
+	
+    //Total.
+    total = lowmem | highmem << 8;
+	
+done:	
+    return (unsigned short) total;
+};
+
+
 /*
  * get_cmos_info:
- *
+ *     Obs: Essa função deve ser chamada apenas uma vez na inicialização
+ * do módulo. @todo: Criar métodos que pegam esses valores salvos na 
+ * estrutura.
  */
 void *get_cmos_info()
 {
 	//
+	// #bugbug
 	// Alocando memória toda vez que chama a função.
 	// Issa alocação deveria ser feita apenas uma vez
 	// na inicialização, depois somente atualizados os valores.
@@ -202,7 +282,7 @@ void *get_cmos_info()
 	{
 	    printf("get_cmos_info fail: Struct\n");
 		refresh_screen();
-		free(Rtc);
+		//free(Rtc);
 		return NULL;
 	}
 	else
@@ -214,7 +294,7 @@ void *get_cmos_info()
 
 	    //date.
 	    Rtc->Year       = read_cmos_bcd(9);    
-	    Rtc->Year = (2000 + Rtc->Year);
+	    Rtc->Year       = (2000 + Rtc->Year);
 		Rtc->Month      = read_cmos_bcd(8);    
 	    Rtc->DayOfMonth = read_cmos_bcd(7);    
 			
@@ -239,18 +319,6 @@ show_message:
 done:
 	return (void*) Rtc;
 };
-
-
-/*
-int init_rtc();
-int init_rtc()
-{
-init_clock();
-    return 0;
-};
-*/
-
-
 
 
 /*
@@ -284,16 +352,49 @@ int init_clock()
 	//printf("CLOCK INFORMATION:\n");
 	//printf("Time=%d Date=%d\n", Time, Date);
 	
+	get_cmos_info();
+	
 Done:
     g_driver_rtc_initialized = (int) 1;	
 	printf("Done!\n");	
-	return 0;
+	return (int) 0;
 };
 
 
 /*
+int init_rtc();
+int init_rtc()
+{
+init_clock();
+    return 0;
+};
+*/
+
+
+/*
+int rtcInit();
 int rtcInit()
-{};
+{
+    rtcTicks = 0;
+    rtcStatus = 0;
+    rtcError = 0;
+
+
+	init_clock();
+	
+	//Essa rotina deve ser chamada apenas uma vez na inicialização 
+	//do módulo.
+    //get_cmos_info()
+	
+					//rtc test.
+					init_clock();
+					get_cmos_info();
+					printf("ExtendedMemory={%d} KB\n", rtcGetExtendedMemory());
+					printf("time={%d}\n", get_time());
+					printf("date={%d}\n", get_date());	
+	
+    return (int) 0;	
+};
 */
 
 //

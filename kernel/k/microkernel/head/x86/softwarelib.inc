@@ -18,6 +18,10 @@ extern _vsync
 ;-------------------------------------
 ; _my_buffer_load_bitmap_16x16:
 ;     Copia um bitmap .BMP da memória para o backbuffer.
+; @todo: Essa rotina pode ser feita em C, facilmente e 
+; dar um suporte mais completo para o formato bmp.
+; porém essa rotina de 16x16 800x600x24 pode continuar aqui.
+; pelo meno por enquanto.
 ;
 ; Argumentos:
 ;     eax = Endreço do arquivo .BMP. 
@@ -127,6 +131,7 @@ _my_buffer_load_bitmap_16x16:
 ;--------------------------------
 ; _um_buffer_putpixel:
 ;     Coloca um pixel no backbuffer.
+;     @todo: Deletar essa função.
 ;
 ; a =  cor
 ; b =  x
@@ -135,75 +140,16 @@ _my_buffer_load_bitmap_16x16:
 ;
 global _um_buffer_putpixel
 _um_buffer_putpixel:
+    jmp _gui_buffer_putpixel
+    jmp $
+	
+	
 
-	push  es
-    push  ecx   
-   
-    ;Ajuste provisório.
-	mov dword [.cor], eax    ;salva cor.
-	mov dword [.x],   ebx    ;salva x.
-	mov dword [.y],   ecx    ;salva y.		
-    mov eax, dword [.x]
-	mov ebx, dword [.y]      ;coloca y em ebx.	 	
-	mov ecx, dword [.cor]    ;coloca a cor em ecx.
-	
-	;ecx (cor)
-	mov byte [.r], cl	 ;r.
-	shr ecx, 8
-	mov byte [.g], cl    ;g.
-	shr ecx, 8
-	mov byte [.b], cl    ;b.
-	
-	;segmento ES ... poderia ser 0x10
-	push eax
-	mov ax, 0x20
-	mov ds, ax
-	mov es, ax
-	
-    pop eax
-	
-	imul ebx, 640*3       ;ebx = y * y multiplier.
-    
-	;eax*3
-	mov ecx, dword 3
-	mul ecx
-	;adiciona ebx.
-	add eax, ebx
-	
-	mov  edi, eax ;dword [ebx+eax*3]  ; edi = x*4+(y*y multiplier)
-    
-	;mov eax, ecx       ;[MenColor] ; eax = color
-    
-	 
-	;(base) buffer 1 
-	mov ecx, dword 0xC0800000 
-    ;(deslocamento)
-    add edi, ecx
-   	
-	;envia r
-	mov al, byte [.r]
-	stosb 
-	;envia g
-	mov al, byte [.g]
-	stosb 
-	;envia b
-	mov al, byte [.b]
-	stosb 
-    
-	pop ecx
-    pop es	
-    ret			
-.cor: dd 0
-.x: dd 0
-.y: dd 0
-.r db 0	
-.g db 0
-.b db 0	
-
-
-;-------------------------------------
+;===================================================================
 ; _gui_buffer_putpixel:
 ;     Coloca um pixel no backbuffer.
+;     O módulo /hal deve chamar essa rotina e não a /gui. 
+;
 ;
 ; a =  cor
 ; b =  x
@@ -367,7 +313,7 @@ _asm_refresh_screen:
 	;
     ; Origem  - BackBuffer.
     ; Destino - LFB.
-	mov esi, dword 0xC0800000    ;Endereço lógico do buffer da área de trabalho.
+	mov esi, dword 0xC0800000    ;Endereço lógico do backbuffer.
 	mov edx, dword 0xC0400000    ;Endereço logico do LFB. Configurado no bootloader.
     mov edi, edx
 	

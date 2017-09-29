@@ -1,4 +1,8 @@
 /*
+ * Gramado Executive - The main file for the Executive module in the 
+ * kernel base. 
+ * (c) Copyright 2015-2016 Fred Nora.
+ *
  * File: k\executive.c 
  * 
  * Classes:

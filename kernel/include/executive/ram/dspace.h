@@ -1,5 +1,7 @@
 /*
- * File: dspace.h Disk Space.
+ * File: ram\dspace.h 
+ * 
+ * Disk Space.
  *      
  * Obs: O lugar natural desse disco seria na classe de dispositivos, certo ?
  *      Mas ficará aqui, porque tem uma grande realção com memória ram,
@@ -7,10 +9,12 @@
  * de páginas.  
  */
 
+ 
 typedef enum {
 	dspacetypeShared,
 	dspacetypePersonal,
 }dspace_type_t;
+
 
 typedef struct dspace_d dspace_t;
 struct dspace_d

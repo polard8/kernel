@@ -1,12 +1,12 @@
 ;
 ; Gramado Idle - This is a 32bit, user mode, system application.
 ; It's the idle process to run when the system is with few activity.
-; (c) Copyright 2015-2016 Fred Nora.
+; (c) Copyright 2015-2017 Fred Nora.
 ;
-; File: head.s 
+; File: head.s  
 ;
 ; Descrição:
-;     É o entry point do programa IDLE.BIN. 
+;     É o entry point do programa IDLE.BIN na plataforma x86. 
 ;     Faz a vez do crt0.s por enquanto.
 ;
 ;
@@ -45,50 +45,10 @@ segment .head_x86
 ; Função importadas.
 ;
 
-extern _appMain           ;Roda o Idle como uma aplicação normal.
+extern _idleServices
 extern _driverInitialize  ;Envia um sinal pro kernel inicializar esse driver.
 extern _driverUninitialize
-;extern _exit
 
-
-
-;extern _slSystemRam
-;extern _slSystemIoCpu
-;extern _slSystemIoDma
-;extern _slSystemDevicesUnblocked
-;extern _slSystemDevicesBlocked
-;extern _slSystemThings
-
-
-;--------------------------------------------
-; _idle_entry_point:
-;     Entry point
-;
-global _idle_entry_point              
-_idle_entry_point:
-
-;;
-;; Normal initialization.
-;;
-
-;jmp RealStart
-
-;;
-;; System Lib Support. 
-;; Obs: Apenas os jmps.
-;; Obs: 4 argumentos devem estar na pilha.
-;;
-
-;jmp _slSystemRam
-;jmp _slSystemIoCpu
-;jmp _slSystemIoDma
-;jmp _slSystemDevicesUnblocked
-;jmp _slSystemDevicesBlocked
-;jmp _slSystemThings
-
-
-RealStart:
-	
 	;
 	; Atuando como driver:
 	; ====================
@@ -112,125 +72,84 @@ RealStart:
 	;
 
 	
-	push edx
+;;============================================
+;; _idle_entry_point:
+;;     Entry point
+;;
+;; Argumentos recebidos:
+;; ====================
+;;     + Temos quatro argumentos na pilha e
+;;     + edx comtém uma flag.
+;;     + EAX={Número do serviço solicitado.}
+;;
+global _idle_entry_point              
+_idle_entry_point:
+    nop
+.checkFlag:	
 	
-    ;Initialize driver.
-	cmp edx, dword 1234
-    je .InitializeDriver	
+	cmp edx, dword 0x00001234
+    je InitializeDriver    	     ;; Initialize driver.	
 	
-	;Uninitialize driver.
-	cmp edx, dword 4321
-	je .UninitializeDriver
 	
-    ;Default, Initialize normal application.  	
-	jmp .InitializeApplication 
+	cmp edx, dword 0x00004321
+	je UninitializeDriver        ;; Uninitialize driver.
 	
-	;
-	; ...
-	;
+	cmp edx, dword 0x12345678    ;; Magic.
+	je services
 	
-; Esse processo será inicializado como um driver.   
-.InitializeDriver:
-    ;envia ao kernel um sinal pra ele inicializar esse processo
-	;como uum driver do sistema.
+	;;
+	;;    * IDLE LOOP
+	;;
+	
+IdleLoop:
+    NOP
+    JMP IdleLoop 
+	
+	
+;;====================================================================	
+;; InitializeDriver:
+;;     Esse processo será inicializado como um driver em user mode.
+;;   
+InitializeDriver:
     call _driverInitialize	
-    jmp $ ;;Hang.
+    JMP IdleLoop 
 	
-.UninitializeDriver:
+	
+;;====================================================================	
+;; UninitializeDriver:
+;;     O processo deixa de atuar como um driver em user mode.
+;; 	
+UninitializeDriver:
     call _driverUninitialize
-	jmp $
+    JMP IdleLoop 
+	
+	
+;;======================================================================
+;; services:
+;;     Chamaremos algum dos serviços oferecidos, que obviamente só
+;; funcionarão se o driver estiver inicializado.
+;;
+services:
+    
+	;;
+	;; IN: EAX={Número do serviço solicitado.}
+	;;
 
-;
-; ...
-;
-	
-; Esse processo não está será inicializado como driver.	
-.InitializeApplication:	
-    pop edx
-
-    ;
-    ; Para transformar o processo Idle em um tipo de servidor, esse código 
-    ; precisa ser reentrante. Todos servidores receberão quatro argumentos 
-    ; na pilha que serão enviados pra uma rotina. 
-    ; Esse é um método diferente do tradicional. Isso é um teste.
-    ;
-    ; @todo:  
-    ; Obs: Os argumentos já estão na pilha, se fizermos um call para a 
-    ; rotina principal, talvez novos argumentos sejam colocados na pilha
-    ; talvez não. (Testado: Novos valores não foram incluídos na pilha e
-    ; tudo funcionou como esperado ).
-    ; Precisamos salvar os argumentos recebidos e colocá-los na pilha antes 
-    ; de chamar a rotina principal. Obs: Salvar argumentos passados nunca 
-    ; fez mal.
-    ; Obs: Não desejamos realizar esses salvamentos. Não salvaremos a pilha se 
-    ; saltarmos diretamente para rotinas de serviços de classes do sistema.
-    ;
-   
-    ;Salvando.
-    pop eax
-    mov dword [.save1], eax
-    pop eax
-    mov dword [.save2], eax   
-    pop eax
-    mov dword [.save3], eax   
-    pop eax
-    mov dword [.save4], eax   
-	
-
-    ;Debug:
-    ;Isso é um teste antigo. @todo: Deletar.
-    ;NOP
-    ;NOP
-    ;NOP
-    ;NOP
-    ;mov ax, word 0x1 
-    ;mov ax, word 0x2 
-    ;mov ax, word 0x3 
-    ;mov ax, word 0x4 
-	;mov byte [0x800000], byte "i"	
-    ;mov byte [0x800001], byte 0x0f	
-    ;mov byte [0x800002], byte "d"	
-    ;mov byte [0x800003], byte 0x0f	
-    ;mov byte [0x800004], byte "l"	
-    ;mov byte [0x800005], byte 0x0f	
-    ;mov byte [0x800006], byte "e"	
-    ;mov byte [0x800007], byte 0x0f	
-	
-	
-	;Passando os argumentos através da pilha.
-	mov eax, dword [.save4]
-	push eax
-	mov eax, dword [.save3]
-	push eax
-	mov eax, dword [.save2]
-	push eax
-	mov eax, dword [.save1]
 	push eax
 	
-	;Chamando a função principal.
-    call _appMain
+    call _idleServices 
+	mov dword [.ret_val], eax
 	
-	;Tratando o retorno.
-	cmp eax, 0
-	je .retOk
+	pop eax
 	
-    ;Nothing.
-.die:	
-    ;mov eax, dword [_error_code]
-    ;call _exit
-	jmp $
-	;...
-.retOk:
-    ;mov eax, dword [_error_code]
-    ;call _exit
-    jmp $
+	;;
+	;; aqui podemos fazer alguma coisa com o valor retornado.
+	;;
+	
+    JMP IdleLoop     	
+	
+.ret_val: dd 0
 
-;salvar pilha aqui.	
-.save1: dd 0
-.save2: dd 0
-.save3: dd 0
-.save4: dd 0	
-	
 ;
 ;End.
 ;

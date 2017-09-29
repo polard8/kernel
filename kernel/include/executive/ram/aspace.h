@@ -1,5 +1,7 @@
 /*
- * File: aspace.h 
+ * File: ram\aspace.h 
+ *
+ * Address Space.
  * 
  * Descrição:
  *     Address Space Manager.
@@ -11,6 +13,7 @@ typedef enum {
 	aspacetypeShared,
 	aspacetypePersonal,
 }aspace_type_t;
+
 
 typedef struct aspace_d aspace_t;
 struct aspace_d

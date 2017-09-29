@@ -1,6 +1,6 @@
 /*
  * File: ke.h
- *     Kernel External support.
+ *     Kernel External functions support.
  *     O objetivo é chamar rotinas que estão fora do kernel base.
  * As rotinas chamadas podem estar em servidores em user mode ou
  * em módulos em kernel mode.

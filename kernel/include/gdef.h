@@ -66,7 +66,18 @@ dessa conta.
 */
 
 
+#define FRONTBUFFER_ADDRESS 0xC0400000
+#define BACKBUFFER_ADDRESS  0xC0800000
 
+//#define FRONTBUFFER_VA 0xC0400000
+//#define BACKBUFFER_VA  0xC0800000
+
+
+//#define BIOS_FONT8X8 0x000FFA6E
+
+//using gui flags.
+#define GUI_ON   1
+#define GUI_OFF  0
 
 /*
  * Os Type:
@@ -191,11 +202,12 @@ typedef enum {
 	ObjectTypeMutex,    //57
 	ObjectTypeToken,    //58 Token de acesso à objetos. (access token)
 	ObjectTypeFont,    //59
-	ObjectTypeicon,     //60
+	ObjectTypeIcon,     //60
 	ObjectTypePipe,     //61
 	
 	ObjectTypeGroup,     //62
 	ObjectTypeUser,      //63
+	
 	ObjectTypeComputer,      //64
 	ObjectTypeCpuRegister,   //65
 	
@@ -206,10 +218,12 @@ typedef enum {
 	ObjectTypeLDT,   //69
 	ObjectTypeIDT,   //70
 	ObjectTypeTSS,   //71
+	
 	ObjectTypePort,  //72 (i/o port)
 	ObjectTypeController, //73
 	ObjectTypeKM, //74
 	ObjectTypeUM, //75
+	ObjectTypeColorScheme,  //76
 	//...
 }object_type_t;
 
@@ -261,17 +275,17 @@ typedef enum {
 }process_permition_level_t; 
 
 
-#define BACKBUFFER_ADDRESS 0xC0800000
+
 
 unsigned long g_backbuffer_address;            //0xC0800000
-unsigned long g_frontbuffer_buffer_address;    //LFB. da placa de vídeo do monitor atual. 
+unsigned long g_frontbuffer_buffer_address;    //LFB. Endereço físico do frontbuffer(memória da placa de vídeo). 
+unsigned long g_frontbuffer_buffer_va;    //endereço lógico do frontbuffer.
 
 
-//#define BIOS_FONT8X8 0x000FFA6E
 
-//using gui flags.
-#define GUI_ON   1
-#define GUI_OFF  0
+
+
+int gNextKeyboardMessage;
 
 //
 // End.

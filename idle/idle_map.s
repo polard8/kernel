@@ -56,105 +56,105 @@ Linker script and memory map
                 0x00401000                _code = .
                 0x00401000                __code = .
  *(.head_x86)
- .head_x86      0x00401000       0x81 head.o
+ .head_x86      0x00401000       0x48 head.o
                 0x00401000                idle_entry_point
  *(.text)
- *fill*         0x00401081        0x3 00
- .text          0x00401084      0x100 main.o
-                0x004010c2                idleInit
-                0x004010f4                driverInitialize
-                0x0040114c                driverUninitialize
-                0x00401084                appMain
- .text          0x00401184      0xad0 stdio.o
-                0x0040192b                putchar
-                0x004018e7                sprintf
-                0x00401af7                input
-                0x004011d1                scroll
-                0x00401aed                printf_main
-                0x00401941                outbyte
-                0x0040137b                app_print
-                0x00401c2b                stdio_system_call
-                0x0040119b                fopen
-                0x00401184                fclose
-                0x00401aba                _outbyte
-                0x004018cc                printf
-                0x0040130f                app_clear
- .text          0x00401c54     0x1000 api.o
-                0x0040291a                APIShowCurrentProcessInfo
-                0x0040216b                system11
-                0x00402210                refresh_buffer
-                0x004027fc                APISetFocus
-                0x004021ce                system14
-                0x004024f5                apiInitBackground
-                0x00402734                APICreateWindow
-                0x004024fa                MessageBox
-                0x004021ad                system13
-                0x00402bb3                apiDown
-                0x00402b89                apiFOpen
-                0x00402021                system1
-                0x004020a5                system5
-                0x00402a2a                api_refresh_screen
-                0x00402ab6                apiGetCursorY
-                0x004024a0                carrega_bitmap_16x16
-                0x00401c54                system_call
-                0x00402bff                apiUp
-                0x004021ef                system15
-                0x004028ac                APISetActiveWindow
-                0x00402b0e                apiSetClientAreaRect
-                0x00402b60                apiCreateThread
-                0x0040243c                SetNextWindowProcedure
-                0x00402a8a                apiGetCursorX
-                0x0040240c                chama_procedimento
-                0x00402523                call_kernel
-                0x00402778                APIRegisterWindow
-                0x004029a0                api_strncmp
-                0x00402042                system2
-                0x00402063                system3
-                0x00402b37                apiCreateProcess
-                0x0040283e                APIGetFocus
-                0x004020e7                system7
-                0x004020c6                system6
-                0x004027ba                APICloseWindow
-                0x0040214a                system10
-                0x0040246c                set_cursor
-                0x004029fe                refresh_screen
-                0x004026a3                call_gui
-                0x00402129                system9
-                0x0040249b                put_char
-                0x004023a7                print_string
-                0x00402ae2                apiGetClientAreaRect
-                0x004023dd                edit_box
-                0x0040296f                kill
-                0x00402a34                apiReboot
-                0x004024c9                apiShutDown
-                0x00402946                exit
-                0x00402084                system4
-                0x00402a60                apiSetCursor
-                0x0040218c                system12
-                0x004023ac                vsync
-                0x00402108                system8
-                0x004028ee                APIGetActiveWindow
-                0x00401c7c                system
-                0x00402974                dead_thread_collector
-                0x0040286a                APIKillFocus
+ .text          0x00401048       0xe0 main.o
+                0x00401093                idleInit
+                0x004010b1                idleServices
+                0x0040104d                driverInitialize
+                0x00401048                idleLoop
+                0x00401070                driverUninitialize
+ .text          0x00401128      0xad0 stdio.o
+                0x004018cf                putchar
+                0x0040188b                sprintf
+                0x00401a9b                input
+                0x00401175                scroll
+                0x00401a91                printf_main
+                0x004018e5                outbyte
+                0x0040131f                app_print
+                0x00401bcf                stdio_system_call
+                0x0040113f                fopen
+                0x00401128                fclose
+                0x00401a5e                _outbyte
+                0x00401870                printf
+                0x004012b3                app_clear
+ .text          0x00401bf8     0x1000 api.o
+                0x004028be                APIShowCurrentProcessInfo
+                0x0040210f                system11
+                0x004021b4                refresh_buffer
+                0x004027a0                APISetFocus
+                0x00402172                system14
+                0x00402499                apiInitBackground
+                0x004026d8                APICreateWindow
+                0x0040249e                MessageBox
+                0x00402151                system13
+                0x00402b57                apiDown
+                0x00402b2d                apiFOpen
+                0x00401fc5                system1
+                0x00402049                system5
+                0x004029ce                api_refresh_screen
+                0x00402a5a                apiGetCursorY
+                0x00402444                carrega_bitmap_16x16
+                0x00401bf8                system_call
+                0x00402ba3                apiUp
+                0x00402193                system15
+                0x00402850                APISetActiveWindow
+                0x00402ab2                apiSetClientAreaRect
+                0x00402b04                apiCreateThread
+                0x004023e0                SetNextWindowProcedure
+                0x00402a2e                apiGetCursorX
+                0x004023b0                chama_procedimento
+                0x004024c7                call_kernel
+                0x0040271c                APIRegisterWindow
+                0x00402944                api_strncmp
+                0x00401fe6                system2
+                0x00402007                system3
+                0x00402adb                apiCreateProcess
+                0x004027e2                APIGetFocus
+                0x0040208b                system7
+                0x0040206a                system6
+                0x0040275e                APICloseWindow
+                0x004020ee                system10
+                0x00402410                set_cursor
+                0x004029a2                refresh_screen
+                0x00402647                call_gui
+                0x004020cd                system9
+                0x0040243f                put_char
+                0x0040234b                print_string
+                0x00402a86                apiGetClientAreaRect
+                0x00402381                edit_box
+                0x00402913                kill
+                0x004029d8                apiReboot
+                0x0040246d                apiShutDown
+                0x004028ea                exit
+                0x00402028                system4
+                0x00402a04                apiSetCursor
+                0x00402130                system12
+                0x00402350                vsync
+                0x004020ac                system8
+                0x00402892                APIGetActiveWindow
+                0x00401c20                system
+                0x00402918                dead_thread_collector
+                0x0040280e                APIKillFocus
                 0x00403000                . = ALIGN (0x1000)
- *fill*         0x00402c54      0x3ac 00
+ *fill*         0x00402bf8      0x408 00
 
-.rdata          0x00403000      0x280
+.rdata          0x00403000      0x250
  .rdata         0x00403000      0x1a0 api.o
  .rdata         0x004031a0       0x20 stdio.o
- .rdata         0x004031c0       0xc0 main.o
+ .rdata         0x004031c0       0x90 main.o
 
-.data           0x00403280      0xd80
-                0x00403280                data = .
-                0x00403280                _data = .
-                0x00403280                __data = .
+.data           0x00403250      0xdb0
+                0x00403250                data = .
+                0x00403250                _data = .
+                0x00403250                __data = .
  *(.data)
- .data          0x00403280        0x0 main.o
- .data          0x00403280        0x0 stdio.o
- .data          0x00403280        0x0 api.o
+ .data          0x00403250        0x0 main.o
+ .data          0x00403250        0x0 stdio.o
+ .data          0x00403250        0x0 api.o
                 0x00404000                . = ALIGN (0x1000)
- *fill*         0x00403280      0xd80 00
+ *fill*         0x00403250      0xdb0 00
 
 .bss            0x00404000     0x1260
                 0x00404000                bss = .

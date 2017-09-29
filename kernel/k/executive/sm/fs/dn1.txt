@@ -2,7 +2,8 @@
  Sobre o diretório /fs:
  =====================
 
-     Esse módulo é o File System Manager. 
-     Todos os arquivos aqui devem ter funções
-começadas por fsXXXX()
+     Esse módulo é o 'File System Manager'.
+ 
+     Todos os arquivos aqui devem ter funções começadas por pela classe 'fs', fsXXXX().
+
      O arquivo principal é fs.c

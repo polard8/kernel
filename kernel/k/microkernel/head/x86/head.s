@@ -1,5 +1,8 @@
 ;
-; File: head.s 
+; Gramado Header - The kernel entry point for x86 processors.
+; (c) Copyright 2005-2017 Fred Nora.
+;
+; File: x86\head.s 
 ;
 ; Descrição:
 ;      Parte principal do núcleo na arquitetura x86. Essa é a parte inicial
@@ -7,7 +10,7 @@
 ;
 ; Endereço:
 ;     O Kernel é carregado no endereço físico 0x00100000, com o entry point 
-; em 0x00101000. 0 endereço lógico é 0xC0000000.
+; em 0x00101000. O endereço lógico é 0xC0000000.
 ;     Quem carregou o Kernel e fez as configurações iniciais foi o Boot Loader.
 ;
 ; Heap and Stack:
@@ -29,7 +32,7 @@
 ; Obs: Essa é uma ordem padrão, nunca mudar, nunca excluir arquivos, 
 ;      nunca incluir outros arquivos.
 ;
-; codename (): 
+; (Israel class): 
 ; ==================
 ;   wCodeBootManager (MSM)
 ;   wCodeBootLoader
@@ -56,8 +59,9 @@
 
 
 ;;
-;; codename='berlin'
+;; codename db 'berlin'
 ;;
+
 
 
 ;
@@ -71,37 +75,34 @@ segment .head_x86
 [bits 32]
 
 
-;;
+
 ;; ============================================================
 ;;
-
+;;
 ;;    ****    Bootloader standard: Multiboot Specification.    ****
-
-;;Multiboot header.
-;;The Multiboot header must be contained
-;; completely within the first 32768 bytes of the OS image, 
-;;and must be 64-bit aligned.
-
-;section .multiboot_header
-;header_start:
-;    dd 0xe85250d6                ; magic number (multiboot 2)
-;    dd 0                         ; architecture 0 (protected mode i386)
-;    dd header_end - header_start ; header length
-    ; checksum
-;    dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
-
-    ; insert optional multiboot tags here
-
-    ; required end tag
-;    dw 0    ; type
-;    dw 0    ; flags
-;    dd 8    ; size
-;header_end:
-
-
+;;
+;; Multiboot header.
+;; The Multiboot header must be contained completely within the first 32768 
+;; bytes of the OS image, and must be 64-bit aligned.
+;;
+;; section .multiboot_header
+;; header_start:
+;;    dd 0xe85250d6                ; magic number (multiboot 2)
+;;    dd 0                         ; architecture 0 (protected mode i386)
+;;    dd header_end - header_start ; header length
+;;    ; checksum
+;;    dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
+;;
+;;    ; insert optional multiboot tags here
+;;
+;;    ; required end tag
+;;    dw 0    ; type
+;;    dw 0    ; flags
+;;    dd 8    ; size
+;;header_end:
 ;;
 ;; ============================================================
-;;
+
 
 
 
@@ -113,11 +114,11 @@ segment .head_x86
 ;Buffers (gdef.h)
 extern _g_backbuffer_address
 extern _g_frontbuffer_buffer_address
-
+;...
 
 ;Stacks.
 extern _kernel_stack_start
-
+;...
  
 ;Context.
 extern _contextSS        ;User Mode.
@@ -136,9 +137,11 @@ extern _contextEDX
 extern _contextESI
 extern _contextEDI
 extern _contextEBP
+;...
 
 ;GUI.
 extern _g_useGUI
+;...
 
 ;Outros.
 extern _newtask_EIP
@@ -146,6 +149,8 @@ extern _start_new_task_status
 extern _runnable              
 extern _start_new_task_address	
 extern _dispatch_task
+;...
+
 
 ;
 ; Funções importadas.
@@ -155,12 +160,14 @@ extern _kMain
 extern _KeStartIdle         ;Start Idle (entra em User Mode).  
 extern _save_kernel_args
 ;extern _kernelServices ;Services
+;...
 
 ;Tasks in ring 0.
+;Threads em ring 0 que rodarão dentro do kernel base.
 extern _task0 
 extern _task1 
 extern _task2 
-
+;...
 
 ;
 ; Constants.
@@ -191,12 +198,18 @@ extern _task2
 
 KRN_BASE       equ 0x00100000    ;Base.
 KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
+;KRN_ENTRYPOINT equ (0x00101000+(header size))    ;Entry Point. @todo
+;...
 
 
-
-;----------------------------------------------
+;=================================================================
 ; _kernel_begin:   (wCode)
 ;    Entry point do Kernel.
+;
+;    @todo: Estamos incluindo o header do multiboot, isso irá deslocar
+; esse entry point e precisamos modificar o bootl loader para que ele
+; salte para a posição certa quando passar o comando para o kernel.
+;
 ;    Esse formato de nome é usado pelo linker.
 ;
 ; IN:  
@@ -345,22 +358,33 @@ _kernel_begin:
 	;
 
 	;call _save_kernel_args
-
+	
+	
 	;;
-	;; Start processor.
+    ;; *step
+	;; Interrupt enabling: 
+	;; Começaremos configurando suporte a interrupções.
+	;;	
+
+
+    ; Desabilita para segurança.
+	cli
+	
+	;;
+	;; Ordem das tabelas: gdt, idt, ldt, tss(tr).
 	;;
 	
 	;
+	; GDT.
+	lgdt [_GDT_register] 
+	
+	;
 	; IDT.
-	cli
 	call setup_idt          ;Aponta tudo para uma isr só. 'unhandled_int'.
 	call setup_faults       ;Configura vetores de faults e exceptions.
 	call setup_vectors      ;Configura outros vetores.
 	lidt [_IDT_register] 
 
-	;
-	; GDT.
-	lgdt [_GDT_register] 
 	
 	;
 	; LDT.
@@ -368,7 +392,7 @@ _kernel_begin:
 	lldt ax
 
 	;
-	; TR.
+	; TR. (tss)
 	;
 
 	;
@@ -391,38 +415,19 @@ _kernel_begin:
 	mov ax, word 0x2B     ;28+3. 
 	ltr ax  
 
-	;
-	; Debug.
-	; Debug: Disable break points.
-	xor	eax, eax
-	mov	dr7, eax
 	
-	;Segmentos.
-	mov ax, word 0x10   
-	mov ds, ax
-	mov es, ax
-
-
-	;Stack	(atualiza o ponteiro para a variavel global).
-	;xor	eax, eax
-	mov dword [_kernel_stack_start], 0xC03FFFF0
-	mov eax, dword [_kernel_stack_start] 
-	mov esp, eax 
-
-	;TIMER.
-	; PIT 8253 e 8254 = (1234DD)1193181.6666 / 100 = 11930. 1.19MHz
-	; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz
-	;
-	;xor	eax, eax
-	mov al, byte 0x36
-	mov dx, word 0x43
-	out dx, al
-	mov eax, dword 11931 ;11930  ;timer frequency 100 HZ
-	mov dx, word 0x40
-	out dx, al
-	mov al, ah
-	out dx, al
-
+	;;
+	;; Selecting the 'Processor Interrup Mode'.
+	;; * PIC MODE *
+	;;
+		
+	;;
+    ;; Todos os componentes APIC são ignorados e o sistema opera
+    ;; no modo single-thread usando LINT0.
+    ;;	
+		
+;.setupPICMODE:	
+	
 	;PIC.
 	cli
 	;xor eax, eax
@@ -448,6 +453,64 @@ _kernel_begin:
 	mov  al, 255
 	out  0xa1, al
 	out  0x21, al
+	
+
+    ;;
+	;; Com todas as interrupções mascaradas, é hora de configurarmos os timers.
+	;;
+	
+	;;
+	;; Configurando os timers do sistema.
+	;; Nossa opção agora é o PIT.
+	;; @todo: Para o RTC podemos fazer uma pequena inicialização agora.
+	;; pois temos um módulo mais completo em C.
+	;;
+	
+	;TIMER.
+	; PIT 8253 e 8254 = (1234DD)1193181.6666 / 100 = 11930. 1.19MHz
+	; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz
+	;
+	;xor	eax, eax
+	mov al, byte 0x36
+	mov dx, word 0x43
+	out dx, al
+	mov eax, dword 11931 ;11930  ;timer frequency 100 HZ
+	mov dx, word 0x40
+	out dx, al
+	mov al, ah
+	out dx, al
+	
+	
+	;;@todo:
+	;;Init RTC.
+
+
+	;;step 
+    ;;@todo: memory caching control.	
+	
+	;;step 
+	;processor Discovery and initialization
+	;(cpuid threads and cores, start inter-processor interrupt sipi, ap wakeu pstate,
+	;wakeup vector alignment, caching consdarations,ap idle state)	
+	;apenas o básico para o boot manager.
+	
+		
+	;;
+	;; Fazendo alguma inicialização de dispositivos de I/O suportados.
+	;;
+
+	;step
+	;i/o devices
+	;( embedded controller EC, super io SIO, legacy free systems, miscellaneous io devices)
+	
+	
+	;todo: Aqui  é um bom lugar para isso.
+	;teclado ide, lfb ...
+	
+	
+    ;;
+	;; Desmascarando intrrupções.
+	;;
 
 	;unmask the timer interrupt.
 	mov dx, word 0x21
@@ -460,8 +523,35 @@ _kernel_begin:
 	out  0xa1, al
 	out  0x21, al
 
+	
+	
+	;;
+	;; Configurando alguns registradores.
+	;;
+		
+	
 	;desbilita as interrupções. #IMPORTANTE.
-	cli
+	cli	
+	
+	;
+	; Debug.
+	; Debug: Disable break points.
+	xor	eax, eax
+	mov	dr7, eax
+	
+	;Segmentos.
+	mov ax, word 0x10   
+	mov ds, ax
+	mov es, ax
+
+
+	;Stack	(atualiza o ponteiro para a variável global).
+	;xor	eax, eax
+	mov dword [_kernel_stack_start], 0xC03FFFF0
+	mov eax, dword [_kernel_stack_start] 
+	mov esp, eax 
+		
+	
 
     ;
 	; * Muda o status do kernel.
@@ -2542,6 +2632,7 @@ _IDT_register:
 ;
 ; Includes:
 ; ========
+; Esses includes são padronizados. Não acrescentar outros.
 ;
 
     ;Funções de apoio à inicialização do Kernel 32bit.
@@ -2581,4 +2672,3 @@ _bss_start:
 ;
 ;@_FIM
 ;
-

@@ -7,8 +7,9 @@
  *     Algum gerenciamento de adaptador de network.
  *     Esse é o header do driver da placa de rede.
  *
+ * History:
+ *     2016 - Created by Fred Nora.
  *
- * Versão: 1.0, 2016.
  */
  
  /*

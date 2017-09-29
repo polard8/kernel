@@ -1,5 +1,8 @@
 /*
- *  File: k\hal.c (HELL)
+ * Gramado Hal - The main file for the Hal module in the kernel base. 
+ * (c) Copyright 2015-2016 Fred Nora.
+ *
+ *  File: k\hal.c 
  *  
  * Classes:
  *     system.unblockeddevices (K2)
@@ -163,6 +166,48 @@ void halMain(){
 	return;
 };
 */
+
+
+//@todo: criar. halGetBootInfo()
+
+
+
+
+
+
+
+
+/*
+ * hal_backbuffer_putpixel:
+ *     Coloca um pixel no backbuffer.
+ *
+ */
+ 
+//isso vem do assembly. 
+extern void gui_buffer_putpixel();
+ 
+void hal_backbuffer_putpixel( unsigned long ax, 
+                              unsigned long bx, 
+						      unsigned long cx, 
+						      unsigned long dx )
+{
+	
+	
+	
+	asm volatile(" \n " : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+		
+	/*
+	 * Chama a rotina em assembly depois de enviar os valores para os 
+	 * registradores.
+	 */
+	 
+	//Coloca um pixel no backbuffer. 
+	// ?? De onde vem essa rotina ??
+	// @todo: Devemos chamar o módulo hal.
+	gui_buffer_putpixel(); 	
+	return;
+};
+
 
 
 /*

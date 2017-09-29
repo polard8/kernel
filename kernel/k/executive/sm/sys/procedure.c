@@ -45,7 +45,7 @@
 //Realiza testes diferentes usando o procedimento do sistema.
 void procedureMakeTests();
 void procedureLinkDriverTest(); // testando linkar um driver ao sistema operacional
-
+void procedureWindowWithFocusTest();
 
 /*
  * system_procedure:
@@ -137,7 +137,9 @@ unsigned long system_procedure( struct window_d *window,
 					//if(AltStatus == 1){ break;};
 					//if(ctrl_status  == 1){ break;};
 			        //if(shift_status == 1){ break;}; 
-                    if(VideoBlock.useGui == 1){ procedureHelp(); break; };
+					if(VideoBlock.useGui == 1){ 
+					    procedureHelp();  
+					};
 					//ShowUserInfo(0);    //Mostra o usuário 0, default.
                     break;
 					
@@ -147,7 +149,9 @@ unsigned long system_procedure( struct window_d *window,
 					//if(alt_status   == 1){ break;};
 					//if(ctrl_status  == 1){ MainMenu(); break;};
 			        //if(shift_status == 1){ printf("shift_F2\n"); break;}; 				
-				    backgroundDraw(COLOR_BACKGROUND);
+				    
+					//Obs: Não usa janelas, isso não mudará o foco.
+					backgroundDraw(COLOR_BACKGROUND);
 					KiInformation();
                     //show_process_information();    //Test.
                     //ShowUserInfo(0);  //#bugbug
@@ -163,7 +167,8 @@ unsigned long system_procedure( struct window_d *window,
 					//if(ctrl_status  == 1){ printf("ctrl_F3\n"); break;};
 			        //if(shift_status == 1){ printf("shift_F3\n"); break;};
 				    //maximizar a janela ativa
-				    show_cpu_intel_parameters();					
+				    //Obs: Não usa janelas, isso não mudará o foco.
+					show_cpu_intel_parameters();					
                     break;
 					
 				//Window tests.	
@@ -172,7 +177,8 @@ unsigned long system_procedure( struct window_d *window,
 				    //if(alt_status   == 1){ printf("alt_F4\n"); break;};
 					//if(ctrl_status  == 1){ printf("ctrl_F4\n"); break;};
 			        //if(shift_status == 1){ printf("shift_F4\n"); break;};
-				    show_window_list();     //#ocupa muito espaço na tela.
+				    
+					windowShowWindowList();  //Mostra informações sobre as jnaelas.
 					//MaximizeWindow(struct window_d *window); //minimizar a janela ativa 
                     break;
 				
@@ -185,6 +191,7 @@ unsigned long system_procedure( struct window_d *window,
 			        //if(shift_status == 1){ printf("shift_F5\n"); break;};
 				    //pci_info();     //PCI information.
 				    
+					//Obs: Não usa janelas, isso não mudará o foco.
 					systemShowDevicesInfo();
 					
 					//Test teclado scancode. (FUNCIONOU BEM)
@@ -199,12 +206,12 @@ unsigned long system_procedure( struct window_d *window,
 			        //if(shift_status == 1){ printf("shift_F6\n"); break;};
 				    //init_clock(); //clock information
 					//get_cmos_info();
-					//shell_main(0,0,0,0); //bugbug.
 					//printf( (const char*) stdout->_ptr );
 				    
 					//printf("F6: Testando carregar arquivo ...\n");
 					//procedureMakeTests();
 					
+					//Obs: Não usa janelas, isso não mudará o foco.
 					windowShowWWFMessageBuffers();
 					
 					//printf("F6: Testando linkar um driver ...\n");
@@ -218,6 +225,7 @@ unsigned long system_procedure( struct window_d *window,
 			        //if(shift_status == 1){ printf("shift_F7\n"); break;};
 				    //pertence ao desktop,tipo 1, string.
 				    if(VideoBlock.useGui == 1){
+						//isso cria uma janela, mudando o foco atual.
 					    MessageBox(gui->screen, 1, "F7:","Testing Message Box");
 					};
 					break;
@@ -228,6 +236,7 @@ unsigned long system_procedure( struct window_d *window,
 					//if(ctrl_status  == 1){ printf("ctrl_F8\n"); break;};
 			        //if(shift_status == 1){ printf("shift_F8\n"); break;};
 					
+					//Obs: Não usa janelas, isso não mudará o foco.
 					backgroundDraw(COLOR_BLACK);
 					
 					//Testando repintar o background.
@@ -276,7 +285,30 @@ unsigned long system_procedure( struct window_d *window,
 					//printf("@todo Control menu.\n");
 					//@todo:control menu da area de trabalho.
 					//MainMenu();
-					printf("F12\n");
+								
+					//printf("time={%d}\n", get_time());
+					//printf("date={%d}\n", get_date());
+					
+                    //Visualizando informações de memória obtidas através do rtc.
+					//memoryShowMemoryInfo();
+					
+					//Testando limites na criação de componentes do /microkernel.
+					//Ok, funcionou bem.
+					//microkernelTestLimit();
+					
+					//Testando Limites na utilização de recursos do módulo pages.c.
+					//??
+
+					//Testando Limites na utilização de recursos do módulo memory.c.
+					//??
+					
+					//Testando Limites na utilização de recursos do módulo window.c.
+					//??
+					
+					//Testando imprimir mensagem na janela com o foco de entrada.
+					//que no caso é a janela do desenvolvedor.
+					procedureWindowWithFocusTest();
+					
 					break;
 				
                 //Mudar o foco de entrada pra próxima janela de uma lista.				
@@ -335,7 +367,25 @@ unsigned long system_procedure( struct window_d *window,
         case MSG_DESTROY:		
             //destroy 
         break;
-         */ 
+         */
+
+		// Essa categoria é para receber mensagens
+        //enviadas para o console para gerenciamento do sistema.
+        //como desligamentos, inicializações, reboot ...		
+        case MSG_CONSOLE_COMMAND:
+		    switch(long1)
+			{
+				case MSG_CONSOLE_SHUTDOWN:
+				    systemShutdown();
+				    break;
+				case MSG_CONSOLE_REBOOT:
+				    systemReboot();
+                    break;				
+			    default:
+				    break;
+			};
+			break;
+		 
         //Continua ... Create ... Close ...		
     
 	    //Nothing.
@@ -463,10 +513,12 @@ void procedureHelp()
 	    return;
 	};
 	
+	//backgroundDraw(COLOR_BACKGROUND);
+	
 	//Create.
 	hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "Help:", 
-	                                (6*(800/20)), (4*(600/20)), 320, 480, 
-							        gui->main, 0, 0, 0 );     
+	                                (800 -320 -2), (600 -240 -2), 320, 240, 
+							        gui->main, 0, COLOR_BLACK, COLOR_TEST_1 );     
 	if( (void*) hWindow == NULL){
 	    printf("procedureHelp:\n");
 		return;
@@ -475,30 +527,30 @@ void procedureHelp()
 	};
 //Coloca as mensagens na janela.
 messages: 
-	draw_text( hWindow, 8,  2*(480/20), 
+	draw_text( hWindow, 8,  2*(320/20), 
 	           COLOR_WINDOWTEXT, "F1 Help.");
-    draw_text( hWindow, 8,  3*(480/20), 
+    draw_text( hWindow, 8,  3*(320/20), 
 	           COLOR_WINDOWTEXT, "F2 Kernel info.");
-	draw_text( hWindow, 8,  4*(480/20), 
+	draw_text( hWindow, 8,  4*(320/20), 
 	           COLOR_WINDOWTEXT, "F3 CPU info.");
-	draw_text( hWindow, 8,  5*(480/20), 
+	draw_text( hWindow, 8,  5*(320/20), 
 	           COLOR_WINDOWTEXT, "F4 Window tests.");
-	draw_text( hWindow, 8,  6*(480/20), 
+	draw_text( hWindow, 8,  6*(320/20), 
 	           COLOR_WINDOWTEXT, "F5 Device info.");
-	draw_text( hWindow, 8,  7*(480/20), 
+	draw_text( hWindow, 8,  7*(320/20), 
 	           COLOR_WINDOWTEXT, "F6 Clock info.");
-	draw_text( hWindow, 8,  8*(480/20), 
+	draw_text( hWindow, 8,  8*(320/20), 
 	           COLOR_WINDOWTEXT, "F7 MessageBox.");
-	draw_text( hWindow, 8,  9*(480/20), 
+	draw_text( hWindow, 8,  9*(320/20), 
 	           COLOR_WINDOWTEXT, "F8 Cls.");
-	draw_text( hWindow, 8, 10*(480/20), 
+	draw_text( hWindow, 8, 10*(320/20), 
 	           COLOR_WINDOWTEXT, "F9 Reboot.");
-	draw_text( hWindow, 8, 11*(480/20), 
+	draw_text( hWindow, 8, 11*(320/20), 
 	           COLOR_WINDOWTEXT, "F10 Task Manager.");
-	draw_text( hWindow, 8, 12*(480/20), 
+	draw_text( hWindow, 8, 12*(320/20), 
 	           COLOR_WINDOWTEXT, "F11 Program manager.");
-    draw_text( hWindow, 8, 13*(480/20), 
-	           COLOR_WINDOWTEXT, "F12 Control menu.");
+    draw_text( hWindow, 8, 13*(320/20), 
+	           COLOR_WINDOWTEXT, "F12 Tests");
 			   
 			   
 
@@ -700,6 +752,64 @@ void *procedureInvokeUserModeProcedure()
 	
 }
 */
+
+
+void procedureWindowWithFocusTest()
+{
+	//
+	// ****  TESTANDO A JANELA DO desenvolvedor ****
+	// ****  SERÁ A ÚNICA JANELA EM PRIMEIRO PLANO POR ENQUANTO ****
+	// **** A ÚNICA COM O FOCO DE ENTRADA  ****
+	//
+					
+	//
+	// #bugbug ... essa rotina está travando ...
+	//
+					
+	//escrevendo fora da janela
+	printf("F12:Fora.\n");
+	//refresh_screen();
+					
+	if( (void*) WindowWithFocus == NULL ){
+	    printf("F12: WindowWithFocus");
+	    refresh_screen();
+		while(1){}
+	}
+
+	if( (void*) WindowWithFocus != gui->DEVELOPERSCREEN ){
+		printf("F12: WindowWithFocus != gui->DEVELOPERSCREEN");
+		refresh_screen();
+		while(1){}
+	}
+					
+	//Esperamos que a ultima janela a receber o foco tenha sido
+	//a janela do desenvolvedor...
+	//
+	WindowWithFocus->cursor_x = 0;
+	WindowWithFocus->cursor_y = 0;
+	//WindowWithFocus->left  = 0;
+	//WindowWithFocus->top = 0;
+					
+	g_cursor_x = (unsigned long) (WindowWithFocus->left);
+	g_cursor_y = (unsigned long) (WindowWithFocus->top);
+	printf("F12: [left/top]\n");
+
+	//g_cursor_x = (unsigned long) (WindowWithFocus->right);
+	//g_cursor_y = (unsigned long) (WindowWithFocus->top);
+	//printf("F12: [right/top]\n");
+
+	//g_cursor_x = (unsigned long) (WindowWithFocus->left);
+	//g_cursor_y = (unsigned long) (WindowWithFocus->bottom);
+	//printf("F12: [left/bottom]\n");
+
+	//g_cursor_x = (unsigned long) (WindowWithFocus->right);
+	//g_cursor_y = (unsigned long) (WindowWithFocus->bottom);
+	//printf("F12: [right/bottom]\n");
+	
+	//...
+	
+	return;				
+};
 
 //
 // End.

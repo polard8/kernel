@@ -10,6 +10,7 @@
  *
  *
  * @todo: Buffering and pipes.
+ *        Priorizar operações com disco.
  * 
  * Histórico: 
  *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
@@ -60,6 +61,9 @@ FILE *fopen(const char *filename, const char *mode)
 	//        e alocar memoria para a estrutura do arquivo.?? 
 	//
 	
+	//Obs: Talvez chamar essa rotina.
+	//unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
+	
 	//FILE *f;
 	
 	//f = (void) malloc 
@@ -82,7 +86,8 @@ FILE *fopen(const char *filename, const char *mode)
  *     O Que devemos fazer é reordenar as linhas
  *     nos buffers de linhas
  *     para mensagens de texto em algum terminal. 
- *
+ *     @todo: Ele não será feito dessa forma, termos uma disciplica de linhas
+ * num array de linhas que pertence à uma janela.
  */
 void scroll(void)
 {
@@ -359,7 +364,7 @@ static int printi( char **out, int i, int b, int sg, int width, int pad, int let
 	s = print_buf + PRINT_BUF_LEN-1;
 	*s = '\0';
 
-	while (u) 
+	while(u) 
 	{
 		t = u % b;
 		
@@ -369,7 +374,7 @@ static int printi( char **out, int i, int b, int sg, int width, int pad, int let
 		    u /= b;
 	};
 
-	if (neg) 
+	if(neg) 
 	{
 		if ( width && (pad & PAD_ZERO) ) 
 		{
@@ -397,9 +402,9 @@ static int print(char **out, int *varg)
 	register char *format = (char *)(*varg++);
 	char scr[2];
 
-	for (; *format != 0; ++format) 
+	for(; *format != 0; ++format) 
 	{
-		if (*format == '%') 
+		if(*format == '%') 
 		{
 			++format;
 			width = pad = 0;
@@ -490,53 +495,6 @@ int printf(const char *format, ...)
 	register int *varg = (int *)(&format);
 	return print(0, varg);
 };
-
-
-/* printf dentro da janela com o foco de entrada.
-int window_printf(const char *format, ...);
-int window_printf(const char *format, ...)
-{    
-
-	register int *varg = (int *)(&format);
-	
-    //sincronisa.  
-   // vsync();
-   
-   
-   if( (void*) WindowWithFocus == NULL){
-	   return 0;
-   }
-    
-	//Auterando a margem
-		g_cursor_left = (WindowWithFocus->left/8);
-		g_cursor_top =  (WindowWithFocus->top/8)+2;
-		g_cursor_right = g_cursor_left+(320/8);
-		g_cursor_bottom = g_cursor_top+(480/8);
-		
-		//cursor (0, mas com margem nova)
-		g_cursor_x = g_cursor_left; 
-		g_cursor_y = g_cursor_top; 	
-		
-		
-
-	
-	int r;
-
-	r = print(0, varg);
-	
-		//voltando a margem normal a margem
-		g_cursor_left = 0;
-		g_cursor_top =  0;
-		g_cursor_right = 256;
-		g_cursor_bottom = 256;
-		
-		//cursor (0, mas com margem nova)
-		g_cursor_x = g_cursor_left; 
-		g_cursor_y = g_cursor_top; 		
-	
-	return (int) r;
-};
-*/
 
 
 /*
@@ -652,6 +610,9 @@ void outbyte(int c)
     //@todo: Colocar no buffer de arquivo.
        
     static char prev = 0;
+	
+	
+//checkChar:
         
 	//nothing to do.	
     if( c <  ' '  && c != '\r' && c != '\n' && c != '\t' && c != '\b' )
@@ -723,20 +684,21 @@ void outbyte(int c)
     // armazenado em uma linha.	 
 	//
 	
-    if(g_cursor_x >= g_cursor_right)  //256 caracteres por linha no máximo
+//checkLimits:	
+
+    //Limites para o número de caracteres numa linha.
+    if( g_cursor_x >= (g_cursor_right-1) )  
     {
         g_cursor_x = g_cursor_left;
         g_cursor_y++;  
 		
-    }else{
-        
-        g_cursor_x++; //incrementa coluna
-                                 
+    }else{   
+        g_cursor_x++;    // Apenas incrementa a coluna.                       
     };
     
 	
-	//Número máximo de linhas. (8pixel por linha.)
-    if(g_cursor_y > g_cursor_bottom)  //256 caracteres por coluna no máximo
+	//Número máximo de linhas. (8 pixels por linha.)
+    if(g_cursor_y > g_cursor_bottom)  
     { 
 	    scroll();
          
@@ -778,6 +740,11 @@ void _outbyte(int c)
 	char ch = (char) c;
 	char ch_atributo = (char) g_char_attrib;
 	
+	
+	//
+	// *** #Importante: Essa rotina não sabe nada sobre janela, ela escreve na tela 
+	// como um todo: só está considerando as dimensões do 'char'.
+	//
 
     /*
      * Caso estivermos em modo gráfico.
@@ -786,14 +753,18 @@ void _outbyte(int c)
 	{
 	    //	vsync();
 		
-		// @todo: A mensagem deve ir par aum buffer de linha,
-		// antes de ser pintado ja janela apropriada.
+		// @todo: A char deve ir para um buffer de linha,
+		// antes de ser pintado na janela apropriada.
 		
 	    switch(VideoBlock.vesaMode)
 		{
 			//
 			// @todo: Testar gcharWidth, gcharHeight.
 			//
+			
+			//A rotina char built considera as dimensões da tela como um todo 
+			//para construir o 'char' no local definido, porem ela não sabe nada 
+			//sobre janelas.
 			
 		    //@todo: Listar aqui os modos VESA.
 		    case 1:

@@ -59,8 +59,8 @@ extern unsigned long hd_lba;
 
 
 //Variáveis internas
-//int hddStatus;
-//int hddError;
+int hddStatus;
+int hddError;
 //...
 
 
@@ -71,6 +71,7 @@ extern unsigned long hd_lba;
  * ebx - lba
  * ecx - null
  * edx - null
+ * Opção: void hddReadSector(....)
  */
 void my_read_hd_sector( unsigned long ax, 
                         unsigned long bx, 
@@ -95,6 +96,7 @@ void my_read_hd_sector( unsigned long ax,
  * ebx - lba
  * ecx - null
  * edx - null
+ * Opção: void hddWriteSector(....)
  */
 void my_write_hd_sector( unsigned long ax, 
                          unsigned long bx, 
@@ -131,8 +133,16 @@ done:
 
 
 /*
+int hddInit();
 int hddInit()
-{};
+{
+    hddStatus = 0;
+    hddError = 0;
+    //...
+
+	init_hdd();
+    return (int) 0;	
+};
 */
 
 //

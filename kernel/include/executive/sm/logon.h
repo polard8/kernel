@@ -1,18 +1,17 @@
 /*
- * Arquivo: logon.h
+ * File: sm\logon.h
  *
  * Descrição:
  *     Header de suporte à criação do Logon.
- *
  *  
- *     OBS:
+ * OBS:
  *     O Logon está na WindowStation0 e no Desktop0. 
- *     Pode existir um processo em user mode para gerenciamento de Logon.
+ *     Existirá um processo em user mode para gerenciamento de Logon e esse 
+ * processo poderá chamar rotinas de logon presentes nesse módulo.
  *
- * @todo: Todo esse trabalho gráfico não deve ser feito pelo kernel, futuramente
- * isso irá para um serviço em user mode.
- *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     ...
  */
  
 

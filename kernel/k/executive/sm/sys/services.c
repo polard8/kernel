@@ -171,7 +171,7 @@ void *services( unsigned long number,
     unsigned long WindowHeight = 480;  
 	
 	unsigned long WindowColor = COLOR_WINDOW;  
-
+	unsigned long WindowClientAreaColor = COLOR_WINDOW;  
 
     struct rect_d *r;	
 	
@@ -294,28 +294,33 @@ void *services( unsigned long number,
 			break;
 
 		//10 Create window.
+		// O argumento mais importante é o tipo.
         case SYS_BUFFER_CREATEWINDOW: 
 		    //if( (void *) arg3 == NULL ){ return NULL; } //rect_d
 			
             //printf("service 10 create window\n");		
-			WindowType = arg2;         //arg2 Type. 
+			WindowType = arg2;           //arg2 Type. 
 			//r = (void *) arg3;         //arg3 (Ponteiro para a estrutura rect_d)
-            WindowStatus = arg3;   //status
-			WindowName = (char *) a4;  //arg4 Window name.
+            WindowStatus = arg3;         //status
+			WindowName = (char *) a4;    //arg4 Window name.
 			WindowView = VIEW_MAXIMIZED; 
 			goto do_create_window;
             break;
 			
 			
 		//11, Coloca o conteúdo do backbuffer no LFB.
-        case SYS_REFRESHSCREEN: systemRam(3,0,0,0,0); break;			
+        case SYS_REFRESHSCREEN: 
+		    systemRam(3,0,0,0,0); 
+			break;			
 			
         //rede: 12,13,14,15			
 		//i/o:  16,17,18,19	
         //Outros: 20 até o fim.		
 
 		//34	
-        case SYS_VIDEO_SETCURSOR: systemRam(86,arg2,arg3,0,0); break;              
+        case SYS_VIDEO_SETCURSOR: 
+		    systemRam(86,arg2,arg3,0,0); 
+			break;              
 
 		//35 - Configura o procedimento da tarefa atual.
         case SYS_SETPROCEDURE:  
@@ -352,7 +357,7 @@ void *services( unsigned long number,
 		
         //47, Create Window 0.		
         case SYS_BUFFER_CREATEWINDOWx:
-			WindowType = 0; 
+			WindowType = 0;  //?? 
 			//r = (void*) arg3; 
 			WindowStatus = arg3;   //status
 			WindowView = 1; 
@@ -492,20 +497,34 @@ void *services( unsigned long number,
 		    return (void*) systemDevicesUnblocked(43,arg2,arg2,arg2,arg2);
 		    break;
 			
-		//**** 100, Pega 'msg' na fila da janela com o foco de entrada.
+		//**** 44, Pega 'msg' na fila da janela com o foco de entrada.
 		case SYS_GETKEYBOARDMESSAGE:
-		    return (void*) systemDevicesUnblocked(44,arg2,arg2,arg2,arg2);
+		    
+			//Pegando a mensagem na fila da janela com o foco de entrada.
+		    return (void*) systemDevicesUnblocked(44, 
+			                                     (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus);
 			break;
 			
-		//**** 101,  Pega 'long1' na fila da janela com o foco de entrada.	
+		//**** 45,  Pega 'long1' na fila da janela com o foco de entrada.	
 		case SYS_GETLONG1:
-		    return (void*) systemDevicesUnblocked(45,arg2,arg2,arg2,arg2);
-            break;	
+		    return (void*) systemDevicesUnblocked(45, 
+			                                     (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus);
+			break;
 			
-		//**** 102,  Pega 'long2' na fila da janela com o foco de entrada.	
+		//**** 46,  Pega 'long2' na fila da janela com o foco de entrada.	
 		case SYS_GETLONG2:
-		    return (void*) systemDevicesUnblocked(46,arg2,arg2,arg2,arg2);
-            break;	
+		    return (void*) systemDevicesUnblocked(46, 
+			                                     (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus, 
+												 (unsigned long) WindowWithFocus);
+			break;	
 
 		//103, SYS_RECEIVEMESSAGE	
         //Um processo consumidor solicita mensagem deixada em seu PCB.
@@ -615,15 +634,50 @@ void *services( unsigned long number,
 	//printf("SystemService={%d}\n",number);
     
 	goto done;	
- 
-//
-// Create window.
-//
 
 
 
 	
+//
+// Create window.
+//
+
 do_create_window:	
+	
+	//
+	// A primeira coisa a fazer é checar se solicitaram a criação
+	// de um tipo válido de janela.
+	// Obs: Ainda não conseguimos receber todos os argumentos que essa
+	// rotina exige. Uma opção é que várias chamadas sejam feitas,
+	// até que tenhamos todos os argumentos.
+	// O argumento tipo é fundamental. Pois com o tipo, podemos oferecer 
+	// alguns parâmetros padronizados, característicos do tipo em questão.
+    //
+	
+	//
+	// Uma solução elegante é a criação de uma classe de janela.
+	// steps:
+	// (*1) - Chamada avisando sobre o início de uma sequencia de chamadas
+	//      de rotinas de pintura. 
+	// *2 - Envio de argumentos que preencherão a estrutura de classe atual 
+	//      e temporária, destinada ao suporte a criação de janelas.
+	// *3 - Chamada da rotina de criação da janela com envio de alguns argumentos.
+	//      (Nesse momento a rotina de criação da janela deve considerar os 
+	//     elementos padrões característicos do tipo solicitado, deve considerar 
+	//     os argumentos enviados e a estrutura de classe antes preechida pela
+	//     chamada anterior.
+	// (*4) - Por último, uma chamada avisa sobre o fim das chamadas de rotinas de 
+	//     pintura.
+	// A IDEIA É QUE UM PROCESSO NÃO SEJA INTERROMPIDO ENQUANTO ESTÁ EFETUANDO
+	// SUAS ROTINAS DE PINTURA.
+	//
+	//
+	
+	//if(WindowType >= 0 || WindowType <= 5){
+	//	
+	//}
+	
+		
 	
 	//
 	// @todo: bugbug.
@@ -665,23 +719,32 @@ do_create_window:
 	
 */
 	
+	//Cores provisórias.
+	WindowColor = COLOR_WINDOW;
+	WindowClientAreaColor = COLOR_TEST_2;
 	
-	
-	//Criando uma janela , mas desconsiderando a estrutura rect_d passada por argumento.
+	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento.
     NewWindow = (void*) CreateWindow( WindowType, WindowStatus, WindowView, WindowName, 
 	                                  WindowX, WindowY, WindowWidth, WindowHeight,									  
-								      gui->screen, 0, 0, WindowColor);	
+								      gui->screen, 0, WindowClientAreaColor, WindowColor);
 
-	
 	if( (void*) NewWindow == NULL )
 	{ 
+        //?? Mensagem.
 	    return NULL; 
 	}else{	
         
 		//
-        // Obs: Quem solicitou a criação da janela pode estar em user mode
-        // 		porém a estrutura da janela está em kernel mode. #bugbug
+        // Obs: 
+		// Quem solicitou a criação da janela pode estar em user mode
+        // porém a estrutura da janela está em kernel mode. #bugbug
+		// Obs:
+		// Para preencher as informações da estrutura, a aplicação
+		// pode enviar diversas chamadas, Se não enviar, serão considerados
+		// os valores padrão referentes ao tipo de janela criada.
+		// Cada tipo tem suas características e mesmo que o solicitante
+		// não seja específico nos detalhes ele terá a janela do tipo que deseja.
         //		
 		
         //  

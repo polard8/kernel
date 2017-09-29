@@ -265,10 +265,14 @@ struct process_d
 	
 	//
 	//Obs: Um processo é um cliente de banco de dados.
-	//     Um processo tem contas conjuntas de pessoais.
-    //     um processo poderá compartilhas esses objetos.	
+	//     Um processo tem contas conjuntas e pessoais.
+    //     um processo poderá compartilhar esses objetos.	
     //
 
+	//
+	// BANCOS
+	//
+	
 	//Acesso ao banco de dados do kernel. (não é uma lista).
 	struct bank_d *kdb;
 	
@@ -277,6 +281,11 @@ struct process_d
 	
 	//Lista de acessos à bancos de contas pessoais.
 	struct bank_d *ldbListHead;
+	
+	
+	//
+	// CONTAS
+	//
 	
 	//Lista de contas conjuntas que o processo tem.
 	struct aspace_d *aspaceSharedListHead;
@@ -295,24 +304,24 @@ struct process_d
 	//Process Page Table. (PPT)
 	//Quais são as páginas que o processo está usando e onde elas estão.
 	//na tabela tem que ter: O número da página. onde ela está, se no disco ou se na memória
-	//qual é o número do pargeframe da página e qual o status de modificação
+	//qual é o número do pageframe da página e qual o status de modificação
 	// Bom, acho que pra isso, o processo deve trabalhar em um número limitado de pagetables
 	// pois o número do frame deve ser o índice da pte dentro da page table.
 	// Uma pagetable tem 1024 entradas, garantindo um número de 1024 frames, o que dá 4MB.
-	// Mas se um processo tiver mais que 4MB? então o diretório de páginas do processo
+	// Mas se um processo tiver mais que 4MB? Então o diretório de páginas do processo
 	// terá que ter mais de uma page table.
 	// Obs: O kernel deve manter uma lista de frames que podem ser usados.
 	//      na hora de criar uma pagetable pra um page directory de um processo
-	// é necessário pegar na lista de frames 1024 frames livre. ou quanto for necessário.
+	// é necessário pegar na lista de frames 1024 frames livres ou quanto for necessário.
 	//
 	
 	// **** IMPORTANTE ****
-	//Uma lista de framepool.(Lista de partições de memória física.)
-	//cada framepool é composto de 1024 frames.
-	// oBS: *IMPORTANTE; Qaundo um processo é criado
-	// pelo menos um framepool deve ser atribuído a ele,
-	// mesmo antes de mapear os frames desse framepool em alguma pagetable
-	//do page directory do processo.
+	// Uma lista de framepool. (Lista de partições de memória física).
+	// Cada framepool é composto de 1024 frames.
+	// Obs: *IMPORTANTE: Quando um processo é criado, pelo menos um framepool 
+	// deve ser atribuído a ele, mesmo antes de mapear os frames desse 
+	// framepool em alguma pagetable do page directory do processo.
+	//
 	struct frame_pool_d *framepoolListHead;
 	
 	
@@ -365,8 +374,8 @@ struct process_d
 	 *     O endereço do diretório é carregado no CR3.
 	 *
 	 */
-	unsigned long Directory; //endereço do diretório do processo.
-    struct page_directory_d *page_directory; //ponteiro para a estrutura do diretório do processo.
+	unsigned long Directory;                  //endereço do diretório do processo.
+    struct page_directory_d *page_directory;  //ponteiro para a estrutura do diretório do processo.
 
 	//
 	// Teste: Blocos de memoria usados pelo processo.

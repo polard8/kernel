@@ -1,4 +1,8 @@
 /*
+ * Gramado Microkernel - The main file for the Microkernel module in the 
+ * kernel base. 
+ * (c) Copyright 2015 Fred Nora.
+ *
  * File: k\microkernel.c 
  * 
  * Classes:
@@ -50,11 +54,66 @@ int localsstuff1;
 
 
 /*
-void microkernelMain();
-void microkernelMain(){
+ * microkernelTestLimit:
+ *     Rotina de testes variados de limites nos recursos
+ * do microkernel. Como a criação de trheads e processos.
+ * Obs: Essa rotina deve acionada pelo procedimento de 
+ * janela do sistema. Em user mode os programas de teste criarão 
+ * suas próprias rotinas. 
+ *
+ */
+void microkernelTestLimit()
+{
+    //Índice genérico.
+	int i;
+	struct process_d *p;
+	struct thread_d *t;
+	
+	
+	
+	printf("microkernelTestLimit: Testando limites dos componentes do microkernel...\n");  
+    refresh_screen();
+	
+   //
+   // Criando todos os processos possíveis.
+   //
+testProcess:   
+    printf("Creating processes...\n");      
+    i=128;	
+    while(i<PROCESS_COUNT_MAX)
+	{
+		p = (void*) create_process( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits");	    
+		if((void*)p == NULL ){
+			goto testThread;
+		}
+		i++;	
+	}
+      
+
+   //
+   // Criando todas as threads possíveis.
+   //	
+testThread:	  
+/* 
+    printf("Creating threads...\n");      	  
+    i=128;
+    while(i<THREAD_COUNT_MAX)
+	{
+		t = (void*) create_thread( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits");  
+		if((void*)t == NULL ){
+			goto done;
+		}	    
+		i++;	
+	}
+  
+*/  
+   //Nothing for now.
+   
+done:
+    printf("microkernelTestLimit: Done.\n");   
 	return;
 };
-*/
+
 
 
 void sys_dead_thread_collector(){

@@ -55,12 +55,20 @@ done:
  *     Testando operações com disco.
  *
  *     @todo: Essa rotina pode virar um aplicativo de teste.
+ *
+ * + Carrega o arquivo KCONFIG.TXT se estiver presente e 
+ *   sonda informações de configuração contidas nele, exibindo as
+ *   informações.
  * 
  */
 void init_test_disk()
 {
     int Index = 0;
+	//int fileSize = 0;
 	void *addr;
+	
+	//Deve existir uma estrutura de propriedades do arquivo,
+	//como tamanho ...
 
 	
 	//@todo: testando lock
@@ -123,6 +131,7 @@ void init_test_disk()
 	};
 	
 	
+//checkingMBR:	
 	fsCheckMbr();    //Check MBR.
 	
 	

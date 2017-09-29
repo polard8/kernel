@@ -1,5 +1,5 @@
 /*
- * Arquivo: pic.c
+ * File: pic.c
  *
  *    Controlador PIC.
  *    Arquivo principal do módulo interno do kernel de 32bit. 
@@ -28,17 +28,23 @@
 //
 // Variáveis internas.
 // 
-//int picStatus;
-//int picError;
+
+int picStatus;
+int picError;
 //... 
  
-int picstufffs;
  
 
  
 /* 
+int picInit();
 int picInit()
-{} 
+{
+    picStatus;
+    picError;
+
+    return (int) 0;	
+} 
 */
  
 //

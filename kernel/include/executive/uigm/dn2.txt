@@ -1,4 +1,0 @@
-criar um arquivo para gerenciamento de buffers. buffer.h
-
-
-gerenciar backbuffer, frontbuffer ...

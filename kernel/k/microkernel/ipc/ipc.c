@@ -1,5 +1,5 @@
 /*
- * Arquivo: ipc.c 
+ * File: ipc.c 
  *
  * Descrição:
  *     IPCM - Inter-Process Communication Manager.
@@ -11,12 +11,20 @@
  *     + Comunicação entre processos e threads.
  *     + Mensagens.
  *     + Área de tranferência.
- *     + Semáforos.
+ *     + Semáforos. (temos um módulo para isso).
  *       ...
  *
  * @todo: Criar estruturas.
+ * Obs: Haverá troca de mensagens entre processos e o compartilhamento de dados.
+ * Vários métodos serão usados, entre eles o uso da fila de mensagens na estrutura 
+ * da janela do processo ou do processo ou da thread e o uso de áreas compartilhadas
+ * de memórias.
+ * Devemos considerar a sincronização de acesso aos recursos. Para isso esse módulo
+ * deverá interagir com o gerente de objetos, que estrutura os acessos aos objetos
+ * concedendo permissões e contabilidade de acessos e utilizadores.
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 

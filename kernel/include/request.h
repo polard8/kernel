@@ -5,7 +5,7 @@
  *     Request manager.
  *     Header para a central de requests do kernel.
  *     Um request é uma forma de sinal, mas exclusivo para o kernel base.
- * Dese modo o kernel base pode notificado de eventos, assim como poderá
+ * Desse modo o kernel base pode notificado de eventos, assim como poderá
  * agendar ações.
  *     Um request pode ser enviado para o kernel base por ele mesmo ou 
  * por um processo. Porém ele não é atendido imediatamente, o kernel base

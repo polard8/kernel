@@ -1,4 +1,7 @@
 /*
+ * TASKMAN - Task manager application  for Gramado.
+ * (c) Copyright 2015-2017 - Fred Nora
+ *
  * File: main.c 
  *
  * Descrição:
@@ -22,6 +25,14 @@
  * @todo: + Incluir bibliotecas disponíveis.
  *        + Dar algum sinal de vida na tela.
  *
+ *
+ * *** A COR PREDOMINANTE NESSE UTILITÁRIO SERÁ CINZA ****
+ *
+ * WIN23
+ * #define COLOR_LITBUTTON  0x00E0E0E0
+ * #define COLOR_LTGRAY     0x00C0C0C0
+ * #define COLOR_GRAY       0x00808080
+ *
  * Historico:
  *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
  *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
@@ -39,6 +50,9 @@
 #include "stddef.h"
 
 
+#define MAGIC (1234)
+#define TASKMANAGER_BUFFER_SIZE 512
+
 
 //
 // Variáveis internas.
@@ -51,9 +65,7 @@ int taskmanagerError;
 // Buffer support.
 //
 
-#define TASKMANAGER_BUFFER_SIZE 512
-
-char taskmanagerBuffer[32];  //TASKMANAGER_BUFFER_SIZE
+char taskmanagerBuffer[TASKMANAGER_BUFFER_SIZE];  
 int taskmanagerBufferPos;
 //...
 
@@ -72,8 +84,6 @@ int tmProc(int junk, int message, unsigned long long1 , unsigned long long2);
 //Protótipos de funções internas.
 void tmUpdateStatus();
 
-//Inicializações.
-int tmInit();
 
 
 void tmSetCursor(unsigned long x, unsigned long y);
@@ -96,14 +106,17 @@ Obs:
 compartilhada e usaremos a lista aqui em user mode.
     
  */
-
- 
-#define MAGIC (1234)
-
-
-int tmProbeProcessList(int pid);
 int tmCreateTaskBar(); 
+ 
+int tmProbeProcessList(int pid);
+
 void tmSleep(unsigned long ms); 
+
+void progress_bar_test();
+
+//Inicializações.
+int tmInit();
+
 
 
 //
@@ -114,7 +127,6 @@ void tmSleep(unsigned long ms);
 /*
  * sleep:
  *     Apenas uma espera, um delay.
- *     Essa não é a função que coloca uma tarefa pra dormir no caso de evento.
  */
 void tmSleep(unsigned long ms) 
 {
@@ -183,265 +195,6 @@ int tmCreateTaskBar()
 	
 Done:
 	return (int) 0;
-};
-
-
-/*
- * appMain:
- *     Função principal do Task Manager.
- * 
- * @todo:
- *     +... 
- */
- 
-int appMain(int argc, char *argv[]) 
-{
-	int Flag;
-	//int Status;
-	void *P;
-    struct window_d *hWindow;	
-	
-	tmInit();  //Initializing ...
-	
-	//
-	// Esses são os processos que taskman tem que criar.
-	//
-
-	//Logon.
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGON");
-	if( (void*) P == NULL  ){
-		printf("Fail creating process LOGON.\n");
-	};
-	
-	//Object Manager. (Pertence ao Security Control).
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"OM");
-	if( (void*) P == NULL  ){
-		printf("Fail creating process OM.\n");
-	};
-
-	//System Security. (Pertence ao Security Control).
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"SS");
-    if( (void*) P == NULL ){ 
-	    printf("Fail creating process SS.\n");
-	};
-	
-    /*
-     * @todo: 
-	 *     O recurso de criar janelas está rasoavelmente funcionando. 
-	 * Mas não criar ainda. O recurso de janelas está sendo testado e aprimorado 
-	 * na aplicação terminal. Na verdade convém testar tudo no terminal.
-	 */
-	 
-	 
-	// 
-    // Create window.
-	//
-	
-	/*
-	
-	//Tentando enviar strings pra propria janela.
-	
-	//@todo: Obter o ponteiro para a janela que repressenta a área de trabalho.
-	//Ou deveria ter uma flag que indicasse, que a janela deve ter como janela mae a área
-	//de trabalho...
-	
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1,"TaskMan Window",     
-                                       2, 2, 128, 64,    
-                                       0, 0, 0 , COLOR_WINDOW );
-	
-	if( (void*) hWindow != NULL )
-	{
-        //Registrar.
-	    APIRegisterWindow(hWindow);
-	
-	    //Configurar como ativa.
-	    //APISetActiveWindow(hWindow);
-	
-	    //Setar foco.
-	    //APISetFocus(hWindow);
-		
-		//Sondando processos. criando ícones.
-	    //@todo #bugbug esta pintando na area de cliente de outro processo.
-		//tmCreateTaskBar();
-	    
-		//refresh_screen();
-        
-        //...		
-	};	
-	*/
-
-    //
-	// @todo: 
-	//     Fazer alguns testes antes do loop.
-	//
-    
-	
-	//Show info (chamadas seguras.)
-	
-	
-	//PCI info
-    //system_call( SYSTEMCALL_SHOW_PCI_INFORMATION, 0, 0, 0 );
-				   
-	//kernel info			   
-    //system_call( SYSTEMCALL_SHOW_KERNEL_INFORMATION, 0, 0, 0 );	
-	
-	
-	
-	//@todo: Testar carregar uma bmp .
-    //carrega_bitmap_16x16( unsigned long img_address, unsigned long x, unsigned long y);	
-	//system_call( SYSTEMCALL_LOAD_BITMAP_16x16, 0, 0, 0 );	
-	
-    //Message Box testing... (funcionou.)
-   // system_call( SYSTEMCALL_MESSAGE_BOX, 1, "Process", "TASKMAN.BIN");	
-	
-
-	
-	//1-Tipo de janela, (popup,normal,...).
-	//2-Estado da janela, (ativa ou não).
-	//3-(min, max ...).
-	//4-Título.
-	//5-Deslocamento em relação às margens do Desktop.
-	//6-Deslocamento em relação às margens do Desktop.
-	//7-Largura da janela.
-	//8-Altura da janela.
-	//9-Endereço da estrutura da janela mãe.
-	//10-Ambiente.( Estão no desktop, barra, cliente ...)
-	//11-? reservado.
-	//12 - COLOR.
-   
-/*
-    APICreateWindow( 1, 1, 1,"Task Manager1",     
-                      100, 100, 100, 100,    
-                      0, 0, 0 , COLOR_WINDOW );
-					  
-					  
-    APICreateWindow( 2, 1, 2,"Task Manager2",     
-                      100, 100, 100, 100,    
-                      0, 0, 0 , COLOR_WINDOW );
-					  
-					  
-					  
-    APICreateWindow( 3, 1, 0,"Task Manager3",     
-                      100, 100, 100, 100,    
-                      0, 0, 0 , COLOR_WINDOW );
-					  
-					  
-					  
-    APICreateWindow( 4, 1, 1,"Task Manager4",     
-                      100, 100, 100, 100,    
-                      0, 0, 0 , COLOR_WINDOW );
-					  
-  */
-  
-	//Chamar esse message box esta atrapalhando o logion por enquanto, mas funciona bem.
-	//system_call( SYSTEMCALL_MESSAGE_BOX, 1, "Process", "TASKMAN.BIN");	
-	
-	//refresh screen
-	//system_call( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );	
-	
-	
-	//Testing String 		
-	//system_call( SYSTEMCALL_DRAWTEXT, 0,  0, (unsigned long) "/TASKMAN.BIN Testing strings...");
-		
-		
-	//Refresh screen
-	//system_call( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0);
-	
-	
-
-	
-   	//
-	// * Hang.
-	//
-	
-    while(1)
-	{
-        //
-        // Test: 		
-        // Aproveitando para testar chamadas.		
-		// Usando o loop para cauasr um pouco de stress, com muitas chamadas.
-		//
-		
-		//system_call( SYSTEMCALL_NULL, 0, 0, 0 );
-        //system_call( SYSTEMCALL_DEAD_THREAD_COLLECTOR, 0, 0, 0 );
-		//...
-		
-		//
-		// Sinal de vida.
-		// Pintando caracteres no canto superior esquerdo da janela.
-		//
-		
-	    tmSetCursor(0,0);		
-		printf("\\");
-		tmSleep(12345);
-
-	    tmSetCursor(0,0);		
-		printf(" "); 
-		tmSleep(12345); 		
-
-	    tmSetCursor(0,0);	
-		printf("|");
-		tmSleep(12345);
-
-	    tmSetCursor(0,0);		
-		printf(" "); 
-		tmSleep(12345); 		
-
-	    tmSetCursor(0,0);	
-		printf("/");
-		tmSleep(12345);
-
-	    tmSetCursor(0,0);		
-		printf(" "); 
-		tmSleep(12345); 		
-
-	    tmSetCursor(0,0);	
-		printf("-"); 
-		tmSleep(12345);
-
-	    tmSetCursor(0,0);		
-		printf(" "); 
-		tmSleep(12345); 		
-
-	    tmSetCursor(0,0);	
-		printf("|"); 
-		tmSleep(12345);
-
-	    tmSetCursor(0,0);		
-		printf(" "); 
-		tmSleep(12345); 		
-
-	    tmSetCursor(0,0);	
-		printf("-");
-		tmSleep(12345);
-
-	    tmSetCursor(0,0);		
-		printf(" "); 
-		tmSleep(12345); 		
-
-		//
-		//taskmanagerStatus
-		//
-		
-		if(Flag == 1234){
-			goto done;
-		}
-		
-		//if(Flag == 1234){}
-		//if(Flag == 1234){}
-		//if(Flag == 1234){}
-		//...
-	};	
-	
-   
-    //
-    //Obs: O exit funcionou corretamente no teste.
-    //     Mas não usaremos exit ainda pois temos poucas threads no sistema.
-	//
-	
-done:   
-   exit(0);        //Obs: exit não usado ainda. 
-   return (int) 0; //Obs: Retorno não usado ainda.
 };
 
 
@@ -581,11 +334,109 @@ done:
  * tmSetCursor:
  *     Configurando o cursor. (stdio.h).
  */
-void tmSetCursor(unsigned long x, unsigned long y){
+void tmSetCursor(unsigned long x, unsigned long y)
+{
+	//
+	// #BUGBUG: Aconteceu uma pagefault depois de incluir essa função. 
+	// Vou testar sem ela.
+	//
+	
+    //Atualizamos as variáveis dentro da estrutura da janela com o foco de entrada.
+    //system_call( SYSTEMCALL_SETCURSOR, x, y, 0);	
+	
+
+//Atualizando as variáveis globais usadas somente aqui no shell.
+setGlobals:	
     g_cursor_x = (unsigned long) x;
     g_cursor_y = (unsigned long) y;	
 	return;
 };
+
+
+//
+// strlen:
+//     Tamanho de uma string.
+// 
+size_t tmstrlen(const char *s)
+{	
+    size_t i = 0;
+	
+	for(i = 0; s[i] != '\0'; ++i){ 
+	; 
+	};
+	return ( (size_t) i );
+};
+
+
+//
+// ================= funny progress bar ===================
+//
+
+
+//
+// DoProgress:
+//     Credits: Progress bar source code found on 
+//     codeproject.com/Tips/537904/Console-simple-progress 
+//
+void DoProgress( char label[], int step, int total )
+{
+    //progress width
+    const int pwidth = 72;
+
+    //minus label len
+    int width = pwidth - tmstrlen( label );
+    int pos = ( step * width ) / total ;
+   
+    int percent = ( step * 100 ) / total;
+
+    //set green text color, only on Windows
+    //SetConsoleTextAttribute(  GetStdHandle( STD_OUTPUT_HANDLE ), FOREGROUND_GREEN );
+    printf("%s[", label);
+
+    //fill progress bar with =
+	int i;
+    for( i = 0; i < pos; i++ ){
+		printf("%c", '=');
+    };
+	
+    //fill progress bar with spaces
+    printf("% *c", width - pos + 1);
+    printf("] %3d%%\r", percent);
+
+    //reset text color, only on Windows
+    //SetConsoleTextAttribute(  GetStdHandle( STD_OUTPUT_HANDLE ), 0x08 );
+	
+    return;	
+};
+
+
+void DoSome()
+{
+    int total = 1000;
+    int step = 0;
+
+    while(step<total){
+        
+		//do some action
+        
+		tmSleep(5000);
+        
+		step+=1;
+        
+		DoProgress("Loading: ",step,total);
+    }
+    //
+done:
+    printf("\n");
+	return;
+};
+
+
+void progress_bar_test(){
+    DoSome();
+    return;
+};
+
 
 
 /*
@@ -599,13 +450,318 @@ int tmInit()
 	//taskmanagerBuffer = '\0'
 	taskmanagerBufferPos = 0;
 	
+	//#DEBUG
+	//printf("T");
+	//printf("taskman: testing strings \n");
+	//tmSetCursor(8,8); 
+	//printf("taskman: and cursor. \n");
+	//refresh_screen();
+	//while(1){}		
 	
-	tmSetCursor(0,0);
 	//...
 	
 done:
     return (int) 0;
 };
+
+
+/*
+ * appMain:
+ *     Função principal do Task Manager.
+ * 
+ * @todo:
+ *     +... 
+ */
+int appMain(int argc, char *argv[]) 
+{
+	//int Status;	
+	int Flag;
+	void *P;
+    struct window_d *hWindow;
+
+    //
+	// Opção: Tratar os argumentos recebidos.
+	//
+	
+	
+	//#debug
+debugStuff:
+    // Uma mensagem de sinal de vida.
+	MessageBox( 1, "TASKMAN.BIN:", "Initializing ...");
+    refresh_screen();
+	//while(1){}
+	
+	
+	//
+	// Obs:
+	//  **** O message box apresenta mensagens corretamente. ****
+	// O desafio agora é enviar mensagens para a área de cliente 
+	// do utilitário TaskMan.
+	// mensagens de erro serão apresentadas via MessageBox.
+	//
+	
+    //Initializing ...	
+initializing:	
+	tmInit();  
+	
+	//
+	// Criando os processos que compoem o Security Control:
+	// ===================================================
+	//
+	// LOGON  - Logon. 
+	// LOGOFF - Logoff
+	// OM     - Object Manager. 
+	// SS     - System Security.
+	//
+
+//	
+// Obs: O object manager controlará algumas permissões iniciais
+// que habilitam os usuários a utilizarem recursos do sistema.
+// Quem controla na verdade os objetos é o kernel base, que consede
+// acesso aos objetos. Permitindo que grupos, usuários, processos e 
+// e threads denham acesso aos recursos do sistema. 
+//	
+creatingSecurityControl:	
+	
+	//Logon.
+	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGON");
+	if( (void*) P == NULL  ){
+	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process LOGON");		
+	    refresh_screen();
+		while(1){}
+	};
+
+	//Logoff.
+	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGOFF");
+	if( (void*) P == NULL  ){
+	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process LOGOFF");		
+	    refresh_screen();
+		while(1){}
+	};
+	
+	//Object Manager. 
+	//(Pertence ao Security Control).
+	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"OM");
+	if( (void*) P == NULL  ){
+	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process OM");		
+	    refresh_screen();
+		while(1){}
+	};
+
+	//System Security.
+	//(Pertence ao Security Control).
+	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"SS");
+    if( (void*) P == NULL ){ 
+	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process SS");		
+	    refresh_screen();
+		while(1){}
+	};
+	
+	//
+	// Obs:
+	// Os processos criados qui ainda são um conjunto de testes.
+	// Estamos criando os processos que compoem o security control,
+	// mas não estamos associando nenhuma imagens à eles.
+	// @todo: Podemos testar a qui a criação de algumas threads
+	// associadas à esses processos.
+	// Obs: Quando criamos um processo, uma thread inicial deve ser criada.
+	//
+	
+    /*
+     * @todo: 
+	 *     O recurso de criar janelas está razoavelmente funcionando. 
+	 * Mas não criaremos janelas ainda. Pois o recurso de janelas está 
+	 * sendo testado e aprimorado no utilitário shell. 
+	 * Na verdade convém testar tudo no shell.
+	 * Obs: No futuro, criaremos aqui a janela principal do utilitário TaskMan.
+	 *
+	 */
+	 
+	 
+	// 
+    // Create window.
+	//
+	
+	/*
+	
+	//Tentando enviar strings pra propria janela.
+	
+	//@todo: Obter o ponteiro para a janela que repressenta a área de trabalho.
+	//Ou deveria ter uma flag que indicasse, que a janela deve ter como janela mae a área
+	//de trabalho...
+	
+	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1,"TaskMan Window",     
+                                       2, 2, 128, 64,    
+                                       0, 0, 0 , COLOR_WINDOW );
+	
+	if( (void*) hWindow != NULL )
+	{
+        //Registrar.
+	    APIRegisterWindow(hWindow);
+	
+	    //Configurar como ativa.
+	    //APISetActiveWindow(hWindow);
+	
+	    //Setar foco.
+	    //APISetFocus(hWindow);
+		
+		//Sondando processos. criando ícones.
+	    //@todo #bugbug esta pintando na area de cliente de outro processo.
+		//tmCreateTaskBar();
+	    
+		//refresh_screen();
+        
+        //...		
+	};	
+	*/
+
+	
+    //
+	// @todo: 
+	//     Fazer alguns testes de chamadas ao sistema.
+	// Logo após os teste, pararemos num loop que funcionará 
+	// como pegador de mensagens na fila de mensagens da janela 
+	// do processo.
+	//
+    
+	
+	//Show info: 
+	// As chamadas ao sistema que servem para mostrar informações
+	// são consideradas seguras, perfeitas para essa fase de desenvolvimento
+	// do sistem. Apesar de ainda termos problemas com exibição das mensagens 
+	// na janela correta.
+	
+	
+	//PCI info
+    //system_call( SYSTEMCALL_SHOW_PCI_INFORMATION, 0, 0, 0 );
+				   
+	//kernel info			   
+    //system_call( SYSTEMCALL_SHOW_KERNEL_INFORMATION, 0, 0, 0 );	
+		
+	
+	//Testing String
+    // ?? do que se trata isso ??
+    // Me parece um bom teste.	
+	//system_call( SYSTEMCALL_DRAWTEXT, 0,  0, (unsigned long) "/TASKMAN.BIN Testing strings...");
+		
+		
+	//Refresh screen
+	//system_call( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0);
+	//refresh_screen();
+	
+	
+	
+   	//
+	// * Hang.
+	//
+	
+getmessageLoop:	
+	
+	// Debug:
+	MessageBox( 1, "TASKMAN:", "Get message loop");	
+	refresh_screen();
+	//while(1){}
+    
+	while(1)
+	{
+        //
+        // Test: 		
+        // Aproveitando para testar chamadas.		
+		// Usando o loop para cauasr um pouco de stress, com muitas chamadas.
+		//
+		
+		//system_call( SYSTEMCALL_NULL, 0, 0, 0 );
+        //system_call( SYSTEMCALL_DEAD_THREAD_COLLECTOR, 0, 0, 0 );
+		//...
+		
+		//
+		// Sinal de vida.
+		// Pintando caracteres no canto superior esquerdo da janela.
+		//
+		
+		//#bugbug ... isso impediu do procedimento de janela do kernel 
+		//receber mensagens do teclado. Talvez outro procesimento foi acionado.
+		//#bugbug: Cria tantas janelas assim pode nos causa problemas...
+		//pois as janelas ainda não são delatadas...
+		//MessageBox( 1, "Message", "Testing TASKMAN application.");
+		
+		
+	    //tmSetCursor(0,0);		
+		//printf("\\");
+		//tmSleep(12345);
+
+	    //tmSetCursor(0,0);		
+		//printf(" "); 
+		//tmSleep(12345); 		
+
+	    //tmSetCursor(0,0);	
+		//printf("|");
+		//tmSleep(12345);
+
+	    //tmSetCursor(0,0);		
+		//printf(" "); 
+		//tmSleep(12345); 		
+
+	    //tmSetCursor(0,0);	
+		//printf("/");
+		//tmSleep(12345);
+
+	    //tmSetCursor(0,0);		
+		//printf(" "); 
+		//tmSleep(12345); 		
+
+	    //tmSetCursor(0,0);	
+		//printf("-"); 
+		//tmSleep(12345);
+
+	    //tmSetCursor(0,0);		
+		//printf(" "); 
+		//tmSleep(12345); 		
+
+	    //tmSetCursor(0,0);	
+		//printf("|"); 
+		//tmSleep(12345);
+
+	    //tmSetCursor(0,0);		
+		//printf(" "); 
+		//tmSleep(12345); 		
+
+	    //tmSetCursor(0,0);	
+		//printf("-");
+		//tmSleep(12345);
+
+	    //tmSetCursor(0,0);		
+		//printf(" "); 
+		//tmSleep(12345); 
+
+        //progress_bar_test();	
+
+		//
+		//taskmanagerStatus
+		//
+		
+		//if(Flag == 1234){
+		//	goto done;
+		//}
+		
+		//if(Flag == 1234){}
+		//if(Flag == 1234){}
+		//if(Flag == 1234){}
+		//...
+	};	
+	
+   
+    //
+    // Obs: 
+	// O exit(0) funcionou corretamente no teste.
+    // Mas não usaremos exit(0) ainda pois temos poucas threads no sistema.
+	//
+	
+done:   
+   //exit(0);         //Obs: Não usar por enquanto. 
+   return (int) 0;    //Obs: Retornar com um valor para cr0.s ou head.s.
+};
+
 
 
 //

@@ -77,8 +77,7 @@ done:
  * prioridade para de executar para que rode uma de maior prioridade.
  * 
  */ 
-int KiFindHigherPriority()
-{ 
+int KiFindHigherPriority(){ 
     return (int) find_higher_priority(); 
 }; 
  
@@ -105,49 +104,42 @@ done:
 };
 
 
-void KiDoThreadReady(int id)
-{
+void KiDoThreadReady(int id){
     do_thread_ready(id);
 	return;
 };
 
 
-void KiDoThreadRunning(int id)
-{
+void KiDoThreadRunning(int id){
     do_thread_running(id);
 	return;
 };
 
 
-void KiDoThreadSleeping(int id)
-{
+void KiDoThreadSleeping(int id){
     do_thread_sleeping(id);
 	return;
 };
 
 
-void KiDoThreadZombie(int id)
-{
+void KiDoThreadZombie(int id){
 	do_thread_zombie(id);
     return;
 };
 
 
-void KiDoThreadDead(int id)
-{
+void KiDoThreadDead(int id){
     do_thread_dead(id);
 	return;
 };
 
 
-void KiStartTask(unsigned long id, unsigned long *task_address)
-{
+void KiStartTask(unsigned long id, unsigned long *task_address){
     return;
 };
 
 
-void KiAcordarTarefa(int id)
-{
+void KiAcordarTarefa(int id){
     wakeup_thread(id);
 	return;
 }; 
@@ -196,8 +188,7 @@ done:
  *     ??
  *    @todo: Mudar para KiSchedulerNewThread().
  */
-void KiNewTaskScheduler()
-{
+void KiNewTaskScheduler(){
     return;    //Cancelada.
 };
 
@@ -219,10 +210,8 @@ done:
 /*
  * KiSetPriority:
  *     Interface. Faz alterações na prioridade de acordo com o status.
- *
  */
-int KiSetPriority()
-{
+int KiSetPriority(){
 	return (int) set_priority();
 };
 
@@ -246,8 +235,7 @@ done:
  * KiGetCurrent:
  *     Pega o tid da thread atual.
  */
-int KiGetCurrent()
-{
+int KiGetCurrent(){
     return (int) get_current();
 };
 
@@ -256,8 +244,7 @@ int KiGetCurrent()
  * KiGetCurrentTask:
  *     @todo: Modar para KiGetCurrentProcess.
  */
-int KiGetCurrentTask()
-{ 
+int KiGetCurrentTask(){ 
     return (int) get_current_task(); 
 };
 
@@ -431,10 +418,8 @@ done:
  * get_current:
  *    Obtendo o TID da thread atual.
  *    @todo: Criar scheduleriGetCurrentTID();
- *
  */
-int get_current()
-{ 
+int get_current(){ 
 	return (int) current_thread;
 };
 
@@ -444,10 +429,8 @@ int get_current()
  * get_current_task:
  *     Pega o id da thrad atual.
  *    @todo: Criar scheduleriGetCurrentTID();
- *
  */
-int get_current_task()
-{
+int get_current_task(){
     return (int) get_current();
 };
 
@@ -947,7 +930,6 @@ int SelectNextThread(int current)
 done:	
     return (int) Next;
 };
-
 
 
 

@@ -17,6 +17,11 @@
 ; Funções importadas.
 ;
 
+;;?? Onde está definida essa variável ??
+;; Ela será usada para passar o valor salvo aqui para o 
+;;registrador cr3.
+;;extern _current_process_pagedirectory_address
+
 
 ;;;;
 ; Usadas pela _irq0.
@@ -66,34 +71,34 @@ extern _current_process_pagedirectory_address
 ;;...
 
 
-
-
-;---------------------------------------------------------
-; _irq0: 
-;     TIMER
-;     No momento, toda tarefa interrompida pelo timer esta rodando em ring3.
-;
+;;============================================================================
+;; _irq0: 
+;;     * TIMER *
+;;     Obs: No momento, toda tarefa interrompida pelo timer esta rodando 
+;; em ring3.
+;;
 global _irq0
 _irq0:
-	;
+
     cli	
+	
 	;
 	;stack
-	pop dword [_contextEIP]       ;eip (DOUBLE).
-	pop dword [_contextCS]        ;cs  (DOUBLE).
-	pop dword [_contextEFLAGS]    ;eflags (DOUBLE).
-	pop dword [_contextESP] 	  ;esp - user mode (DOUBLE).
-	pop dword [_contextSS]        ;ss  - user mode (DOUBLE).
+	pop dword [_contextEIP]         ; eip (DOUBLE).
+	pop dword [_contextCS]          ; cs  (DOUBLE).
+	pop dword [_contextEFLAGS]      ; eflags (DOUBLE).
+	pop dword [_contextESP] 	    ; esp - user mode (DOUBLE).
+	pop dword [_contextSS]          ; ss  - user mode (DOUBLE).
     ;
 	;registers 
-	mov dword [_contextEDX], edx    ;edx.		
-	mov dword [_contextECX], ecx    ;ecx.	 
-	mov dword [_contextEBX], ebx    ;ebx.	 
-	mov dword [_contextEAX], eax    ;eax.
+	mov dword [_contextEDX], edx    ; edx.		
+	mov dword [_contextECX], ecx    ; ecx.	 
+	mov dword [_contextEBX], ebx    ; ebx.	 
+	mov dword [_contextEAX], eax    ; eax.
+	mov dword [_contextEBP], ebp    ; ebp.
+	mov dword [_contextEDI], edi    ; edi.
+	mov dword [_contextESI], esi    ; esi.	
 	;
-	mov dword [_contextEBP], ebp    ;ebp.
-	mov dword [_contextEDI], edi    ;edi.
-	mov dword [_contextESI], esi    ;esi.	
 	;segments
 	xor eax, eax
     mov ax, gs
@@ -107,27 +112,23 @@ _irq0:
 	
 	
 	;
-	; @todo: Outros registradores. Ex: media, float point, debug.
+	; @todo:
+    ; Continuar salvamento de contexto dos registradores x86. 	
+	; Outros registradores. Ex: media, float point, debug.
 	;
 
-	;todo: cr3, stack ...
-	;
-	;cr3
-    ;mov eax, cr3
-    ;mov dword [_contextCR3], eax ;@todo, criar a variável.    
-    ;Não é preciso salvar o cr3 do processo, temos isso no PCB.
 	
 	;
 	; Preparando os registradores, para funcionarem em kernel mode.
+	; Obs: 
+	; Os registradores fs e gs podem ser configurados com seletor nulo '0',
+    ; ou ignorados para economizar instrução.		
 	xor eax, eax
-	mov ax, word 0x10    ;Kernel mode segment.
+	mov ax, word 0x10
 	mov ds, ax
 	mov es, ax
-	
-	; Obs: Esses registradores podem ser configurados com seletor nulo '0',
-    ;      ou ignorados para economizar instrução.	
-	mov fs, ax   
-	mov gs, ax                
+	mov fs, ax  ;*   
+	mov gs, ax  ;*              
 	
 	
 	
@@ -148,12 +149,16 @@ _irq0:
 	;
 	;	
 	
+	
+;;.TimerStuff:	
 	;chamada à modulo externo.
 	;call _KeTimer            	
 
 	;Chamada ao módulo interno.
 	call _KiTimer           ;Rotinas de timer. #NÃO envolvendo task switch.  	
-    call _KiTaskSwitch 	    ;Task switch. Troca a tarefa a ser executada.
+    
+;;.TaskSwitchStuff:	
+	call _KiTaskSwitch 	    ;Task switch. Troca a tarefa a ser executada.
 	
 	
 	;
@@ -164,10 +169,26 @@ _irq0:
 	;
 	; @todo: #bugbug: Implementar isso com cuidado.
 	;
+
+	;;
+	;; Obs: Isso é bem perigoso. O diretório para o 
+	;; processo precisa estar devidamente criado. Por isso 
+	;; Rotinas de automação na criação e rotinas de checagem são necessárias.
+    ;;
+	
+;;.PageDirectoryStuff:	
+
+    ;; HACK HACK
+    ;; Até o momento, o único diretório válido é o do kernel. Então vai 
+    ;; ele mesmo.
 	
 	;mov eax, dword [_current_process_pagedirectory_address]
-	mov eax, dword 0x9C000
+	mov eax, dword 0x9C000  
 	mov cr3, eax
+
+    ;;
+	;; Flush TLB.
+	;;
 	
     ;Flush TLB.
     jmp dummy_flush
@@ -181,36 +202,59 @@ dummy_flush:
 	nop
 	mov CR3, EAX  
 
-	;
-	; Quando chamar a rotina 'request()' ??
+	;----------------------------------------------------------------------
+	; ?? Quando chamar a rotina 'request()' ??
 	; Obs: AGORA NÃO!
-	; Nesse momento uma thread foi selecionada, o contexto está salvo
-	; em variáveis que já podem passar para os registradores e efetuar iretd.
-	; Isso acontece toda vez que o timer efetua uma interrupção, então
-	; não é esse o momento ideal para atender aos request, (Signal), pois
-	; seria muito constante e atrapalharia o desempenho da rotina de troca
-	; de contexto. Além do mais, o propósito do request,(signal), é sinalizar
+	; Nesse momento uma thread foi selecionada, o contexto está salvo em 
+	; variáveis que já podem passar para os registradores e efetuar iretd.
+	; Isso acontece toda vez que o timer efetua uma interrupção, então não é 
+	; esse o momento ideal para atender aos request, (Signal), pois seria 
+	; muito constante e atrapalharia o desempenho da rotina de troca de 
+	; contexto. Além do mais, o propósito do request, (signal), é sinalizar
 	; a necessidade de uma operação, porém efetua-la somente depois que a
 	; thread atual utilize toda a sua cota.
+	; *** Importante:
 	; O momento ideal será quando a thread que está rodando, usou toda a sua
 	; cota. Esse momento ideal acontece na rotina task_switch em taskswitch.c
+	;-----------------------------------------------------------------------
+	
+	;-----------------------------------------------------------------------
+	; *IMPORTANTE:
+	; Existe um tipo de page fault causada por recarregar os registradores 
+	; incorretamente. Por isso as rotinas de checagem de conteúdo dos 
+	; registradores antes de retornar devem ser mais severas. Ou seja, depois 
+	; de restaurar, tem que checar. Se não ouver falha, executa iretd. Mas se 
+	; ouver falha, devemos bloquear a thread, checar novamente, tentar 
+	; concertar se for algo simples e fechar a thread se o erro for grave ou 
+	; persistir. Logo apos isso devemos escalonar outra tarefa.
+	;------------------------------------------------------------------------
+	
+	;;====================================================================
+	;; ****    IMPORTANTE    ****
+	;; Obs: Muitos comentários devem ir para a documentação. Onde os 
+	;; procedimentos poderão ser explicados detalhadamente.
+	;;====================================================================
+	
+	
+	
+	;;
+	;; * Importante:
+	;; Esse é o momento em que restauramos o contexto dos registradores 
+	;; de uma thread para podermos efetura um ired e passar o comando para ela.
+	;; Obs: A thread está em user mode.
+	;; Obs: Ao final, um sinal de EOI é necessário, para sinalizarmos o fim da 
+	;; interrupção de TIMER.
+	;;
+	
+;;.RestoreThreadContext:	
+
+	;
+	; @todo:
+    ; Outros registradores precisam ser restaurados agora	
+	; Outros registradores, Ex: media, float point, debug.
 	;
 	
 	;
-	; * IMPORTANTE:
-	;   Existe um tipo de page fault causada por recarregar os 
-	;   registradores incorretamente. Acho que rotinas de checagem
-	;   de conteúdo dos registradores antes de retornar devem ser mais severas. 
-	;   Os seja, depois de restaurar, tem que checar. Se não ouver falha, executa
-	;   iretd.Mas se ouver falha, devemos bloquear a thread, checar novamente,
-	; tentar concertar se for slgo simples e fechar a thread se o erro for grave
-	; ou persistir. Loga apos escalonar outra tarefa.
-	;
-	
-	;
-	; @todo: Outros registradores, Ex: media, float point, debug.
-	;
-	
 	;segments
 	xor eax, eax
 	mov ax, word [_contextDS]
@@ -250,7 +294,8 @@ dummy_flush:
 	
 	;( Não precisa 'sti', pois as flags da pilha habilitam as interrupções ).
 	
-	sti      
+	sti
+;;.Fly:	
     iretd	
 	
 	

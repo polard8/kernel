@@ -10,9 +10,9 @@
  * um iret. A pilha foi configurada para user  mode antes de efetuar
  * o iret.
  *
- * Histórico:
- *     Versão 1.0, 2015 -  Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Small changes.
  *     //...
  */
 
@@ -54,12 +54,11 @@ done:
 
 /*
  * spawn_task: 
- *     Executa uma thread pela primeira vez.
- *     A thread deve estar no estado INITIALIZED.
+ *     Execute a  thread for the first time.
+ *     The thread needs to be in the state 'INITIALIZED'.
  *     @todo: Mudar para spawnThread(int tid).
  */
-//void spawnThread(int tid) 
- 
+//void spawnThread(int tid)  
 void spawn_task(int id)
 {
 	int Status;
@@ -91,7 +90,7 @@ void spawn_task(int id)
 	spawn_Pointer = (void *) threadList[id]; 
 	if((void*) spawn_Pointer == NULL)
 	{
-	    printf("spawn_task error: Pointer. TID={%d}",id);
+	    printf("spawn_task error: Pointer TID={%d}",id);
 		refresh_screen();
 		while(1){};
 	}
@@ -99,14 +98,14 @@ void spawn_task(int id)
     {
 	    // State ~ Checa o estado da tarefa.	 
         if(spawn_Pointer->state != STANDBY){
-            printf("spawn_task error: State. TID={%d}\n",id);
+            printf("spawn_task error: State TID={%d}\n",id);
 		    refresh_screen();
 		    while(1){}
         };
 
 	    // Saved ~ Se o contexto está salvo, é porque não é a primeira vez.
         if(spawn_Pointer->saved == 1){
-            printf("spawn_task error: Saved. TID={%d}\n",id);
+            printf("spawn_task error: Saved TID={%d}\n",id);
 		    refresh_screen();
 		    while(1){}
         };    
@@ -119,7 +118,7 @@ void spawn_task(int id)
 
 	Status = contextCheckThreadRing3Context(id);
 	if(Status != 0){
-	    printf("spawn_task error: Context. TID={%d}",id);
+	    printf("spawn_task error: Context TID={%d}",id);
 		refresh_screen();
 		while(1){}
 	};
@@ -164,7 +163,7 @@ threadSetUp:
 	if(spawn_Pointer->state != RUNNING)
 	{
 		//...
-        printf("* spawn_task error: State. TID={%d}\n",id);
+        printf("* spawn_task error: State TID={%d}\n",id);
 		refresh_screen();
 		while(1){}
 	};
@@ -175,14 +174,9 @@ threadSetUp:
 
 	IncrementDispatcherCount(SELECT_INITIALIZED_COUNT);
 
- /*
-  Gn 15: 9-17:
-  " E as aves de rapina desciam sobre os cadáveres, Abrão, porém,
-  as enxotava. ".
-
-  " Ele tomou o pão, deu graças, e o partiu e deu a seus discípulos, dizendo:
-	TOMAI, TODOS, E COMEI: ISTO É O MEU CORPO, QUE SERÁ ENTREGUE POR VÓS. ".
-  */
+	
+	
+    /* Corpo x Coisas */
 
     //Segmentos.
     asm volatile(" cli \n"
@@ -199,8 +193,10 @@ threadSetUp:
     asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->cs)     : "%esp");    //cs.
     asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip)    : "%esp");    //eip.
 	// EOI and iret.
+	//Obs: Isso suja o registrador eax.
 	asm("movb $0x20, %al \n");
 	asm("outb %al, $0x20 \n");
+	//asm(" movl $0, %eax \n");
 	asm("sti  \n"); 
 	asm("iret \n");    //Fly!
     //Nothing.

@@ -7,13 +7,10 @@
  * Ambiente: 
  *     RING 0.
  *
- * Histórico:
- *     1.0 - 2013 - Criação desse arquivo.
- *     1.0 - 2015 - Implementada sondagem de dispositivos.
- *     1.0 - 2016 - Melhorias na sondagem de dispositivos.
- *     ...
- *
- *  Versão: 1.0 - (2013 - 2016).
+ * History:
+ *     2013 - Created by Fred Nora.
+ *     2016 - Small changes.
+ *  
  */
  
 /*

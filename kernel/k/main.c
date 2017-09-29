@@ -1,7 +1,9 @@
 /*
- * File: main.c 
+ * Gramado Kernel - The main file for the kernel.
+ * (c) Copyright 2015-2016 Fred Nora.
+ *
+ * File: k\main.c 
  * 
- * This is the main file of the kernel for the Gramado operating system.
  * Description:
  *     This is the Kernel Base. It's the mains file for a 32bit Kernel. 
  *     The type is 'hybrid'.
@@ -66,9 +68,6 @@ extern unsigned long kArg4;
  
 
 extern unsigned long SavedBootMode;
- 
-//char *copyright = "Copyright (c) 2005-2016, Fred Nora"; 
-//char codename[] = "berlin";
 
 
 /*
@@ -85,6 +84,10 @@ int kMain(int argc, char* argv[])
     int Status = 0;
 
     KernelStatus = KERNEL_NULL;
+	
+	//Inicializando a flag que será usada para travar o foco
+	// de entrada na tela do desenvolvedor. gui->DEVELOPERSCREEN
+	_lockfocus = 0;
 
 	//
 	// Window procedure.
@@ -148,12 +151,16 @@ int kMain(int argc, char* argv[])
 	//while(1){}
 	
 	//
-    // System startup.
-    //	
+    // System initialization..
+    //
+    
+	//Construtor.
+    systemSystem();	
 	
-	Status = (int) systemStartUp();    //(system.c).	
+	//Inicializações.
+	Status = (int) systemInit();    //(system.c).	
     if(Status != 0){	
-		printf("kMain fail: Start Up!\n");
+		printf("kMain fail: System Init.\n");
 		KernelStatus = KERNEL_ABORTED; 
 		goto fail;		
 	};

@@ -22,13 +22,38 @@
  */ 
  
 
+//
+// #### Aqui devemos configurar manualmente a destinação do sistema. ####
+// 
+#define SYSTEM_EDITION 1               //1,2,3,4 ... #Define a edição atuala do sistema. 
+
+#define SYSTEM_DEVELOPER_EDITION    1  //Contém ferramentas do desnvolvedor.
+#define SYSTEM_WORKSTATION_EDITION  2  //Contém ferramentas de escritório.
+#define SYSTEM_SERVER_EDITION       3  //Contém ferramentas de comunicação em rede.
+#define SYSTEM_IOT_EDITION          4  //Contém ferramentas de suporte á dispositivos externos.
+//...
+
+#define developer_edition_string    "Gramado Developer Edition" 
+#define workstation_edition_string  "Gramado Workstation Edition" 
+#define server_edition_string       "Gramado Server Edition" 
+#define iot_edition_string          "Gramado IOT edition" 
+//...
+
+
+#define OS_NAME "Gramado"
+
+
+//
+//    #### Aqui devemos configurar manualmente a versão do sistema.
+//
+
 //@todo:
 //Esse é padrão de versão. 
 //Não mudar, apenas fazer as atualizações. 
 #define SYSTEM_VERSIONMAJOR 1 
 #define SYSTEM_VERSIONMINOR 0
 #define SYSTEM_VERSIONBUILT 0
-#define SYSTEM_VERSIONREVISION 1   //++
+#define SYSTEM_VERSIONREVISION 1   //++ inc.
 
 
 /*
@@ -96,6 +121,84 @@
 // @todo: Continuar criando variáveis de ambiente.
 //
 
+//...
+
+
+
+//
+//    ****    SYSTEM METRICS INDEX **** 
+//
+
+
+//*Importante.
+#define SM_NULL 0  
+#define SM_SCREENWIDTH 1
+#define SM_SCREENHEIGHT 2
+#define SM_BPP          3 //Bits Per Pixel.
+#define SM_BACKBUFFER_VA 4  //Virtual address for backbuffer.
+#define SM_BACKBUFFER_PA 5  //phisical address for backbuffer.
+#define SM_FRONTBUFFER_VA 6  //Virtual address for frontbuffer.
+#define SM_FRONTBUFFER_PA 7  //phisical address for frontbuffer.
+#define SM_KERNELSIZE 8
+#define SM_KERNELHEAPSIZE 9
+#define SM_KERNELSTACKSIZE 10
+#define SM_CHARWIDTH 11
+#define SM_CHARHEIGHT 12
+#define SM_DEVELOPER_EDITION 13
+
+//Continua ...
+//@todo.
+
+
+//
+//    ****    SYSTEM STATUS INDEX   **** 
+//
+//*Importante.
+#define SS_NULL 0  
+#define SS_LOGGED 1      //estamos logados.?
+#define SS_USING_GUI  2  // estamos no modo gráfico?
+#define SS_KERNELSTATUS 3 //
+//Continua ...
+//@todo.
+
+
+ 
+//
+// Globals.
+// 
+
+
+//Flag para habilitar as opções para o desenvolvedor.
+int gDeveloperOptions;
+
+//Sobre a destinação do sistema operacional.
+// 1 - Developer Edition.
+// 2 - Workstation Edition.
+// 3 - Server Edition.
+// 4 - IOT Edition.
+//...
+int gSystemEdition;
+
+
+int gSystemStatus; //?? Usado pelo construtor.
+
+
+//
+//  **** Shutdown support   ****
+//
+
+//Salvar aqui o endereço da rotina do BM que desliga a máquina via APM.
+//O endereço e a rotina são de 32bit.
+unsigned long shutdown_address;
+
+static char *default_user_name     = "default-[USER]";
+static char *systemDefaultUserName = "default-[USER]";
+//...
+
+
+
+//...
+
 
 /*
  * Test.
@@ -112,12 +215,7 @@ struct active_environment_d
 } 
 struct active_environment_d *CurrentEnvironment;
 */ 
- 
-//
-// Globals.
-// 
-static char *default_user_name = "default-[USER]";
-//static char *systemDefaultUserName = "default-[USER]";
+
 
 /*
  * VERSION:
@@ -284,35 +382,8 @@ struct system_d
 system_t *System;
 
 
-
-//Boot Manager.
-typedef struct bootmanager_d bootmanager_t;
-struct bootmanager_d
-{
-    //
-	// Informações básicas (nome do arquivo e endereço na memória).
-    //
-	
-	char *name;               //File name. (BM.BIN).
-	unsigned long address;    //Endereço.
-	
-	//
-	// Ponteiro para bloco de informações.
-	//
-	
-	//struct boot_block_d *BootBlock;  
-	
-	//
-	// Outras informações
-	//
-	
-	
-	//...
-};
-//bootmanager_t *BootManager;
-
-
 //Boot Loader.
+// Estrutura para guardar informações sobre o Boot Loader (BL.BIN).
 typedef struct bootloader_d bootloader_t;
 struct bootloader_d
 {
@@ -337,9 +408,36 @@ struct bootloader_d
 	
 	//...	
 };
-//bootloader_t *BootLoader; 
+bootloader_t *BootLoader; 
 
 
+
+//Boot Manager.
+// Estrutura para guardar informações sobre o Boot Manager (BM.BIN).
+typedef struct bootmanager_d bootmanager_t;
+struct bootmanager_d
+{
+    //
+	// Informações básicas (nome do arquivo e endereço na memória).
+    //
+	
+	char *name;               //File name. (BM.BIN).
+	unsigned long address;    //Endereço.
+	
+	//
+	// Ponteiro para bloco de informações.
+	//
+	
+	//struct boot_block_d *BootBlock;  
+	
+	//
+	// Outras informações
+	//
+	
+	
+	//...
+};
+bootmanager_t *BootManager;
 
 
 //
@@ -486,6 +584,12 @@ void systemReboot();
  * systemShutdown: Shut down stuffs.
  */
 void systemShutdown();
+
+
+
+
+//Chamar a função de 32 bit herdado do BM.
+void systemShutdownViaAPM(); 
  
  
 /*
@@ -495,9 +599,9 @@ void systemShutdown();
  *    Obs: Essa rotina está em service.c
  */
 void *services( unsigned long number, 
-                      unsigned long arg2, 
-			 	      unsigned long arg3, 
-					  unsigned long arg4 );
+                unsigned long arg2, 
+			 	unsigned long arg3, 
+				unsigned long arg4 );
 				
 
 /*
@@ -583,8 +687,19 @@ void SetProcedure(unsigned long proc);
 
 int init_systemserver();
 
+//Pega informações de medida de elementos do sistema.
+void *systemGetSystemMetric(int number);
 
-								
+//Pega informações de status de elementos do systema.
+void *systemGetSystemStatus(int number);
+
+
+//Construtor.
+void systemSystem();
+	
+//inicializador.	
+int systemInit();
+			
 //
 // Fim.
 //

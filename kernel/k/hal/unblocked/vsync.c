@@ -1,5 +1,5 @@
 /*
- * file: vsync.c
+ * File: vsync.c
  *
  * Descrição:
  *     Sincronisa o retraço vertical.
@@ -10,7 +10,8 @@
  *     Pertence ao hal.
  *     Não sei se pertence a x86. ???!!!
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
  
@@ -66,6 +67,7 @@ char vsync_inb(int port)
 	asm(" nop \n");
 	return (char) Value;    
 };
+
 
 //
 // End.

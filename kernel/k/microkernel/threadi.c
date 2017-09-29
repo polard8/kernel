@@ -1,5 +1,5 @@
 /*
- * Arquivo: threadi.c 
+ * File: threadi.c 
  *
  * Descrição:
  *      Thread internal.    
@@ -13,7 +13,8 @@
  *     Faz parte do Process Manager, 
  *     parte fundamental do Kernel Base. 
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
  
@@ -24,10 +25,8 @@
  * KiShowPreemptedTask
  * @todo: Substituir a palavra task por thread. KiShowPreemptedThread
  *
- *
  */
-void KiShowPreemptedTask()
-{
+void KiShowPreemptedTask(){
     return;
 };
 
@@ -50,8 +49,7 @@ void KiSetTaskStatus(unsigned long status)
  * @todo: Substituir a palavra task por thread. KiGetThreadStatus
  *
  */
-unsigned long KiGetTaskStatus()
-{ 
+unsigned long KiGetTaskStatus(){ 
     return (unsigned long) get_task_status(); 
 };
 
@@ -63,8 +61,7 @@ unsigned long KiGetTaskStatus()
  *
  *
  */
-void KiSaveContextOfNewTask(int id, unsigned long *task_address)
-{
+void KiSaveContextOfNewTask(int id, unsigned long *task_address){
     return;
 };
 
@@ -74,103 +71,91 @@ void KiSaveContextOfNewTask(int id, unsigned long *task_address)
  *  @todo: Substituir a palavra task por thread. KiReloadCurrentThread.
  *
  */
-void KiReloadCurrentTask()
-{
+void KiReloadCurrentTask(){
     return;
 };
 
 
-void KiSetQuantum(unsigned long q)
-{    
+void KiSetQuantum(unsigned long q){    
     return;
 };
 
 
-unsigned long KiGetQuantum()
-{ 
-    return (unsigned long) 0; 
-};
-
-void KiSetCurrentQuantum( unsigned long q)
-{
-    return;
-};
-
-
-unsigned long KiGetCurrentQuantum()
-{ 
+unsigned long KiGetQuantum(){ 
     return (unsigned long) 0; 
 };
 
 
-void KiSetNextQuantum( unsigned long q)
-{
+void KiSetCurrentQuantum( unsigned long q){
     return;
 };
 
 
-unsigned long KiGetNextQuantum()
-{ 
+unsigned long KiGetCurrentQuantum(){ 
     return (unsigned long) 0; 
 };
 
 
-void KiSetFocus(int pid)
-{
+void KiSetNextQuantum( unsigned long q){
+    return;
+};
+
+
+unsigned long KiGetNextQuantum(){ 
+    return (unsigned long) 0; 
+};
+
+
+void KiSetFocus(int pid){
 	return;
 };
 
 
 //Pegar o foco do que? thread?!
-int KiGetFocus()
-{ 
+int KiGetFocus(){ 
     return (int) 0; 
 };
 
 
-void KiDebugBreakpoint()
-{
+void KiDebugBreakpoint(){
     return;
 };
 
 
-void KiShowTasksParameters()
-{
+void KiShowTasksParameters(){
     return;
 };
 
 
-void KiMostraSlots()
-{
+void KiMostraSlots(){
 	//mostra_slots();
     return;
 };
 
 
-void KiMostraSlot(int id)
-{ 
+void KiMostraSlot(int id){ 
 	//mostra_slot(id);
     return;
 };
 
 
-void KiMostraReg(int id)
-{
+void KiMostraReg(int id){
 	//mostra_reg(id);
     return;
 };
 
 
 /*
- *    KiShowThreadList:
- *    Mostra os parametros de ALGUMAS das threads 
- *    existentes em threadList[i]. (as primeiras da lista).
+ * KiShowThreadList:
+ *     Mostra os parametros de ALGUMAS das threads existentes em 
+ * threadList[i]. (as primeiras da lista).
+ *
  */
-void KiShowThreadList()
-{
+void KiShowThreadList(){
     mostra_slots();
     return;	
 };
+
 
 /*
  * mostra_slots:
@@ -190,7 +175,7 @@ void mostra_slots()
 	//
 	// Testando o for para process.
 	//
-	printf(" \n\n *** Process info *** \n\n");
+	printf(" \n\n ** Process info ** \n\n");
 	
 	for( i=0; i<PROCESS_COUNT_MAX; i++)
     {
@@ -210,7 +195,7 @@ void mostra_slots()
 	//
 	// Testando o for para threads.
 	//
-	printf(" \n\n *** Thread info *** \n\n");
+	printf(" \n\n ** Thread info ** \n\n");
 	
 	for( i=0; i<THREAD_COUNT_MAX; i++)
     {
@@ -247,7 +232,7 @@ void mostra_slot(int id)
 
 	// Limits.
     if(id < 0 || id >= THREAD_COUNT_MAX){
-	    printf("mostra_slot: Id invalido!\n");
+	    printf("mostra_slot: invalid ID\n");
 		return;
 	};
 	
@@ -256,7 +241,7 @@ void mostra_slot(int id)
 	t = (void *) threadList[id];
 	
 	if( (void*) t == NULL){
-	    printf("mostra_slot: Slot vazio!\n");
+	    printf("mostra_slot: Empty slot\n");
 		return;	
 	}else{
 	
@@ -273,7 +258,7 @@ void mostra_slot(int id)
 	};
 															 
 done:
-    printf("Done!\n");
+    printf("Done\n");
     return; 
 };
 
@@ -319,12 +304,9 @@ done:
 };
 
 
-
-
 /*
  * set_thread_priority:
  *     Muda a prioridade de uma tarefa específica.
- *
  */
 void set_thread_priority(struct thread_d *t, unsigned long priority)
 {
@@ -411,13 +393,12 @@ done:
  *           a tarefa com contexto salvo.
  *
  */
-void show_preempted_task()
-{
+void show_preempted_task(){
     return;
 };
 
-void show_tasks_parameters()
-{  
+
+void show_tasks_parameters(){  
 	return; 
 };
 
@@ -431,8 +412,9 @@ void show_tasks_parameters()
  */
 void exit_thread(int tid)
 {
-    struct thread_d *Thread;
 	int i;
+    struct thread_d *Thread;
+
 	
 	//Limits. 
 	if(tid < 0 || tid >= THREAD_COUNT_MAX){
@@ -441,7 +423,7 @@ void exit_thread(int tid)
 	
 	Thread = (void*) threadList[tid];
 	
-	if( (void*) Thread == NULL)
+	if( (void*) Thread == NULL )
 	{
 		return;
 	}
@@ -521,9 +503,9 @@ done:
  */
 void dead_thread_collector()
 {
-    struct process_d *p;         //Process.
-    struct thread_d  *Thread;    //Thread.	  
 	int i;
+    struct thread_d  *Thread;    //Thread.	  
+    struct process_d *p;         //Process.
 	
 	for( i = 0; i < THREAD_COUNT_MAX; i++ )
 	{

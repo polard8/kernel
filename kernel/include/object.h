@@ -59,82 +59,93 @@
 #define OBJECT_PAGEDIRECTORY 13
 #define OBJECT_PAGETABLE 14
 #define OBJECT_PAGEFRAME 15
-#define OBJECT_SOCKET 16
-#define OBJECT_USERINFO 17
+#define OBJECT_FRAMEPOOL 16
+#define OBJECT_SOCKET 17
+#define OBJECT_USERINFO 18
 
-#define OBJECT_DESKTOP    18    //Desktop. STRUCT
-#define OBJECT_MENUITEM   19    //Menu ITEM
-#define OBJECT_MENU 20
-#define OBJECT_USESSION   21    //User Session.
-#define OBJECT_WIN_PROCEDURE  22
-#define OBJECT_RECTANGLE 23
-#define OBJECT_RGBA 24
-#define OBJECT_WINDOW     25    //Window.
-#define OBJECT_WSTATION   26    //Window Station.(DESKTOP POOL)
-#define OBJECT_CONSOLE 27
-#define OBJECT_LINE 28
-#define OBJECT_TERMINAL 29
+#define OBJECT_DESKTOP    19    //Desktop. STRUCT
+#define OBJECT_MENUITEM   20    //Menu ITEM
+#define OBJECT_MENU 21
+#define OBJECT_USESSION   22    //User Session.
+#define OBJECT_WIN_PROCEDURE  23
+#define OBJECT_RECTANGLE 24
+#define OBJECT_RGBA 25
+#define OBJECT_WINDOW     26    //Window.
+#define OBJECT_WSTATION   27    //Window Station.(DESKTOP POOL)
+#define OBJECT_CONSOLE 28
+#define OBJECT_LINE 29
+#define OBJECT_TERMINAL 30
 
 // \microkernel
-#define OBJECT_PROCESS   30
-#define OBJECT_SEMAPHORE   31
-#define OBJECT_THREAD    32
+#define OBJECT_PROCESS   31
+#define OBJECT_SEMAPHORE   32
+#define OBJECT_THREAD    33
 // \microkernel.cpu
-#define OBJECT_CPU 33
+#define OBJECT_CPU 34
 // \microkernel.dma
-#define OBJECT_DMA 34
+#define OBJECT_DMA 35
 
 // \hal
-#define OBJECT_PROCESSOR 35
-#define OBJECT_DEVICE    36 
-#define OBJECT_DISK_INFO 37
-#define OBJECT_PROCESSOR_BLOCK 38
-#define OBJECT_HOST_INFO 39
-#define OBJECT_KEYBOARD 40
-#define OBJECT_MAC_ADDRESS 41
-#define OBJECT_MEMORY      42  //HARDWARE, CARD.
-#define OBJECT_PCIDEVICE 43
-#define OBJECT_PCIDEVICEDRIVER 44
-#define OBJECT_PIC
-#define OBJECT_RTC 45
-#define OBJECT_SCREEN 46
-#define OBJECT_TIMER 47
-#define OBJECT_VIDEO 48
-#define OBJECT_VOLUME  49
+#define OBJECT_PROCESSOR 36
+
+//DEVICE
+#define OBJECT_DEVICE    37 
+#define OBJECT_DISK_INFO 38
+#define OBJECT_PROCESSOR_BLOCK 39
+#define OBJECT_HOST_INFO 40
+#define OBJECT_KEYBOARD 41
+#define OBJECT_MAC_ADDRESS 42
+#define OBJECT_MEMORY      43  //HARDWARE, CARD.
+#define OBJECT_PCIDEVICE 44
+#define OBJECT_PCIDEVICEDRIVER 45
+#define OBJECT_PIC   46
+#define OBJECT_RTC 47
+#define OBJECT_SCREEN 48
+#define OBJECT_TIMER 49
+#define OBJECT_VIDEO 50
+#define OBJECT_VOLUME  51
 
 //THINGS
 //...
 
 //OUTROS...
-#define OBJECT_CURSOR    50
-#define OBJECT_REQUEST   51 //KERNEL REQUEST.
-#define OBJECT_SIGNAL    52
-#define OBJECT_FILE      53
-#define OBJECT_METAFILE  54
-#define OBJECT_MUTEX 55
-#define OBJECT_TOKEN 56
-#define OBJECT_FONT 57
-#define OBJECT_ICON 58
-#define OBJECT_PIPE 59
+#define OBJECT_CURSOR    52
+#define OBJECT_REQUEST   53 //KERNEL REQUEST.
+#define OBJECT_SIGNAL    54
+#define OBJECT_FILE      55
+#define OBJECT_METAFILE  56
+#define OBJECT_MUTEX 57
+#define OBJECT_TOKEN 58
+#define OBJECT_FONT 59
+#define OBJECT_ICON 60
+#define OBJECT_PIPE 61
 
 
-#define OBJECT_GROUP     60 //Grupo de usuários.
-#define OBJECT_USER      61 //usuário
+#define OBJECT_GROUP     62 //Grupo de usuários.
+#define OBJECT_USER      63 //usuário
 
-#define OBJECT_COMPUTER      62  //computador (host em rede)
-#define OBJECT_CPU_REGISTER  63  //REGISTRADORES DA CPU. cr0, cr1 ...
-#define OBJECT_DISK          64 
+#define OBJECT_COMPUTER      64  //computador (host em rede)
+#define OBJECT_CPU_REGISTER  65  //REGISTRADORES DA CPU. cr0, cr1 ...
 
-#define OBJECT_DISK_PARTITION  65
-#define OBJECT_GDT      66       //LIKE GDT, IDT ...
-#define OBJECT_LDT 67
-#define OBJECT_IDT 68
-#define OBJECT_TSS 69 
+#define OBJECT_DISK          66 
+#define OBJECT_DISK_PARTITION  67
+#define OBJECT_GDT      68       //LIKE GDT, IDT ...
+#define OBJECT_LDT 69
+#define OBJECT_IDT 70
+#define OBJECT_TSS 71 
 
-#define OBJECT_PORT       70      //Porta de controlador de dispositivo
-#define OBJECT_CONTROLLER  71     //Controlador de dispositivo.
-#define OBJECTS_KM         73 //Kernel mode??
-#define OBJECTS_UM       74  //Use mode ??
+#define OBJECT_PORT       72      //Porta de controlador de dispositivo
+#define OBJECT_CONTROLLER  73     //Controlador de dispositivo.
+#define OBJECTS_KM         74 //Kernel mode??
+#define OBJECTS_UM       75  //Use mode ??
+#define OBJECTS_COLOR_SCHEME 76   //ObjectTypeColorScheme
+//...
+
+//
+// #BUGBUG:  @todo: é preciso conferir e fazer coincidir os valores em gdef.h e object.h.
+//
+
+
 
 
 /*

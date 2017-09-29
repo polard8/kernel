@@ -162,7 +162,7 @@
 #define VK_MODECHANGE  0x1F
 #define VK_ACENTO_TIL  0x28  //40 //0x7e	abnt
 #define VK_LSHIFT	   0x2A  //0xA0 
-#define VK_PRINT	   0x2A  //42 ??
+#define VK_PRINT	   0x54 //0x2A  //42 ?? print screen
 #define VK_EXECUTE	   0x2B  //43
 #define VK_SNAPSHOT    0x2C  //44
 #define VK_VIRGULA     0x33       //51 abnt
@@ -228,7 +228,7 @@
 #define VK_REMOVE    0x6F  //111
 #define VK_DIVIDE	 0x6F  //??
 #define VK_HELP	     0x73  //115 //47
-#define VK_PAUSE  0x77  //119 //19 
+#define VK_PAUSE  0x45 //0x77  //119 //19 
 #define VK_F13	0x7C
 #define VK_F14	0x7D
 #define VK_F15	0x7E
@@ -463,7 +463,7 @@ static unsigned char map_abnt2[CHARMAP_SIZE] = {
  VK_F8,        //66 F8.(abnt)
  VK_F9,        //67 F9.(abnt)
  VK_F10,       //68 F10.(abnt)
-VK_NUMLOCK,      //69 PAUSE. (num lock)
+VK_PAUSE,     //VK_NUMLOCK,      //69 PAUSE. (num lock)
 VK_SCROLL,     //70 Scroll Lock(abnt). break.
 '7',    //71 (7). home
 '8',    //72 (8). up
@@ -478,7 +478,7 @@ VK_SCROLL,     //70 Scroll Lock(abnt). break.
 '3',    //81 pgdn (q).     
 '0',    //82  Ins
 VK_DELETE_TECLADONUMERICO,    //83 Num DEL (abnt).(´)(,)
-'.',    //84 sys req (abnt).
+VK_PRINT,    //84 PRINT SCREEN E sys req (abnt).
 '.',    //85
 '\\',    //86 (\).help backslash  bar
 VK_F11,    //87 (F11)abnt.	 
@@ -490,7 +490,7 @@ VK_RWIN,    //92 Right Windows(abnt).(left WinKey) (\).
 VK_CONTROL_MENU,    //93 CONTROL MENU, Application(abnt). (]).
 VK_F18,    //94
 VK_F19,    //95
-VK_RETURN,    //96 (0). (`)Acento grave.(enter)
+'`',//VK_RETURN,    //96 (0). (`)Acento grave.(enter)
 VK_LCONTROL,    //97 (1) (a) Minúscula. control
 '/',    //98 (2) (/) KP_Divide
 VK_F23,    //99 (3) VoidSymbol  
@@ -826,6 +826,8 @@ struct keyboard_d
 // Prototypes.
 //
 
+//Pega o status das teclas de modificação.
+unsigned long keyboardGetKeyState( unsigned char key );
 
 //@todo: função para mudar o handler.
 //o kernel deve oferecer o serviço de trocar o handler

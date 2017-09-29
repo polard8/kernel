@@ -7,7 +7,7 @@
 ;
 ; Descrição:
 ;     Parte principal Task Manager, TASKMAN.BIN. 
-;     É o entry point do programa.
+;     É o entry point do programa na arquitetura x86.
 ;     Faz a vez do crt0.o por enquanto.
 ;
 ; Alguns parâmetros: (@todo: rever)
@@ -46,56 +46,34 @@ extern _appMain
 ;extern _exit
 
 
-;
+;==================================================
 ; _taskmanager_entry_point:
 ;     Entry point
 ;
+; IN: ??
+;
+;
 global _taskmanager_entry_point              
 _taskmanager_entry_point:
-
-	;
-	; tentando confirmar a entrada no app
-	;
-
-    NOP
-    NOP
-    NOP
-    NOP
-    mov ax, word 0x1 
-    mov ax, word 0x2 
-    mov ax, word 0x3 
-    mov ax, word 0x4 
-	
-  ;  mov byte [0x800000], byte "t"	
-  ;  mov byte [0x800001], byte 0x0f	
-  ;  mov byte [0x800002], byte "m"	
-  ;  mov byte [0x800003], byte 0x0f	
-  ;  mov byte [0x800004], byte "n"	
-  ;  mov byte [0x800005], byte 0x0f	
-  ;  mov byte [0x800006], byte "g"	
-  ;  mov byte [0x800007], byte 0x0f	
-  ;  mov byte [0x800008], byte "r"	
-  ;  mov byte [0x800009], byte 0x0f	
-	
-	
+    NOP	
 	call _appMain
 	
 	cmp eax, dword 0
-	je .retOk
+	je retOk
 
-    mov byte [0x800000], byte "r"	
-    mov byte [0x800001], byte 0x09		
-	jmp $
+HANG:	
+	NOP
+	JMP HANG
 
-.retOk:	
+retOk:	
 	;
 	; tornar zombie
 	;
     ;pushd eax
 	;call _exit
-	mov byte [0x800000], byte "z"	
-    mov byte [0x800001], byte 0x09	
-    jmp $
+	;mov byte [0x800000], byte "z"	
+    ;mov byte [0x800001], byte 0x09	
+	JMP HANG
 
 ;
 ; End.

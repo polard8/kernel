@@ -18,18 +18,26 @@
 #define CURSOR_MOVE     (3) 
 //...
 
+
 //
-//Obs: Temos usado variáveis globais até agora, mas o ideal
-//é usarmos a estrutura de cursor criada abaixo.
+// ** Usar essas variáveis globais.
+//    Os valores são retirados das estruturas dos objetos
+// gráficos onde o cursor esta inserido e passadas para cá.
+// Os manipuladores de cursor deve se atentar à essas globais.
+// @todo: Essas globais serão substituidas pelos valores da 
+// estrutura do cursor atual. 'CurrentCursor'.
+// Cada objeto gráfico poderá ter uma estrutura de cursor associada à ele.
+// #bugbug: estamos tendo problemas com o uso dessa estrutura. Cuidado.
+// deixe pra depois, vai usado as globais.
 //
 
 //Cursor. (disciplica de linhas).
 unsigned long g_cursor_x;
 unsigned long g_cursor_y;
-unsigned long g_cursor_left;  //margem esquerda dada em linhas
-unsigned long g_cursor_top;   //margem superior dada em linhas
-unsigned long g_cursor_right;  //margem direita dada em linhas
-unsigned long g_cursor_bottom;   //margem inferior dada em linhas
+unsigned long g_cursor_left;     // margem esquerda dada em linhas
+unsigned long g_cursor_top;      // margem superior dada em linhas
+unsigned long g_cursor_right;    // margem direita dada em linhas
+unsigned long g_cursor_bottom;   // margem inferior dada em linhas
 
 //*IMPORTANTE: Isso é ótimo, por permitira escolher uma posição dentro do terminal.
 
@@ -50,6 +58,7 @@ typedef enum {
 
 /*
  * Estrutura de suporte à cursor.
+ * Essa estrutura deve ser incluída na estrutura de janela.
  */
 typedef struct cursor_d cursor_t;
 struct cursor_d
@@ -61,6 +70,14 @@ struct cursor_d
 	//Posicionamento.
 	unsigned long x;
 	unsigned long y;
+	
+    //unsigned long left;     // margem esquerda dada em linhas
+    //unsigned long top;      // margem superior dada em linhas
+    //unsigned long right;    // margem direita dada em linhas
+    //unsigned long bottom;   // margem inferior dada em linhas
+	
+	//struct window_d *window;
+	//struct rect_d *rect;
 	
 	//Imagem usada como cursor.
 	void *imageBuffer;
@@ -74,6 +91,7 @@ struct cursor_d
 };
 cursor_t *Cursor;
 cursor_t *CurrentCursor;
+cursor_t *DeveloperWindowCursor; //test?? Cursor da janela do desenvolvedor.
 //...
 
 

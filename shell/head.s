@@ -44,56 +44,32 @@ extern _app_main
 ;extern _exit
 
 
-;
-; _idle_entry_point - Entry point
-;
+;;=====================================================
+;; _shell_entry_point: 
+;;     Entry point for the application.
+;;
+;;
 global _shell_entry_point              
 _shell_entry_point:
-
-	;
-	; tentando confirmar a entrada no app
-	;
-
-
-    NOP
-    NOP
-    NOP
-    NOP
-    mov ax, word 0x1 
-    mov ax, word 0x2 
-    mov ax, word 0x3 
-    mov ax, word 0x4 
-	
-    ;mov byte [0x800000], byte "s"	
-    ;mov byte [0x800001], byte 0x0f	
-    ;mov byte [0x800002], byte "h"	
-    ;mov byte [0x800003], byte 0x0f	
-    ;mov byte [0x800004], byte "e"	
-    ;mov byte [0x800005], byte 0x0f	
-    ;mov byte [0x800006], byte "l"	
-    ;mov byte [0x800007], byte 0x0f	
-    ;mov byte [0x800008], byte "l"	
-    ;mov byte [0x800009], byte 0x0f	
+    nop
 	
 	call _app_main
 	
 	cmp eax, dword 0
-	je ret_ok
+	je retOk
 
-    mov byte [0x800000], byte "r"	
-    mov byte [0x800001], byte 0x09		
-	jmp $
+HANG:   
+    NOP
+	JMP HANG
 
-	
-	
-ret_ok:	
+retOk:	
 	;
 	; tornar zombie
 	;
     ;call __exit
-	mov byte [0x800000], byte "z"	
-    mov byte [0x800001], byte 0x09	
-    jmp $
+	;mov byte [0x800000], byte "z"	
+    ;mov byte [0x800001], byte 0x09	
+	JMP HANG
 
 ;
 ; End.

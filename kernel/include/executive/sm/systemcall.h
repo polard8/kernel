@@ -410,12 +410,12 @@ void *sys_create_process( struct wstation_d *window_station,
 					      int ppid, 
 					      char *name );
 void *sys_create_thread( struct wstation_d *window_station,
-                      struct desktop_d  *desktop,
-                      struct window_d *window,
-                      unsigned long init_eip, 
-                      unsigned long priority, 
-					  int ppid, 
-					  char *name );
+                         struct desktop_d  *desktop,
+                         struct window_d *window,
+                         unsigned long init_eip, 
+                         unsigned long priority, 
+					     int ppid, 
+					     char *name );
 
 
 //
