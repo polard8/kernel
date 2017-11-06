@@ -216,6 +216,10 @@ int init_arquitecture_independent()
 		KiAbort(); 
 	};
 	
+	
+	//@todo:
+	//Status = init_gramado();
+	
 	//
 	// User Info:
 	// =========
@@ -269,24 +273,7 @@ WindowManager:
 	    init_window_manager();				
 	};
 	
-	//
-	//Logon.
-	//
-	
-//Logon:
-	//
-	// Logon. 
-    // Cria Background, main window, navigation bar.
-    // de acordo com predefinição.
-    //
-
-	//if(g_useGUI == 1){
-	//	printf("init_arquitecture_independent: Initializing Logon structs..\n");
-	//    create_logon();
-	//	init_logon(0,0);    //Libera.
-
-    //    //Obs: *IMPORTANTE Usa-se o procedimento de janela do Logon.		
-	//};
+ 
 	
     // Continua ...	 
 	

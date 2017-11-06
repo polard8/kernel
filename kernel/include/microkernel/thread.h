@@ -1,5 +1,5 @@
 /*
- * Arquivo: thread.h
+ * File: microkernel\thread.h
  *
  * Descrição:
  *     Header para threads.
@@ -59,8 +59,8 @@ typedef int tid_t;
   
 /*
  * thread_event_type_t:
- *     Enumerando os tipos de eventos que fazem 
- *     a tarefa entrar em modo de espera:
+ *     Enumerando os tipos de eventos que fazem a tarefa entrar em modo de 
+ * espera:
  *
  *  EVENT_NULL       - Nulo. 
  *	EVENT_PREMMPTED  - Preempção
@@ -81,14 +81,13 @@ typedef enum {
  *
  *   idle     - Threads do tipo idle.     
  *   rr       - Threads do tipo round robin.
- *   periodic - Threads do tipo periódicas. ??
+ *   periodic - Threads do tipo periódicas. 
  *   system   - Threads do tipo system.
  *   ...
  *
  * Ordem de implantação:
  * ====================
- *
- * (De acordo com a ordem de construção de um sistema).
+ *     (De acordo com a ordem de construção de um sistema).
  *
  *    TYPE_NULL     0
  *    TYPE_SYSTEM   1  // Fundamentais para o funcionamento do sistema.  
@@ -99,8 +98,8 @@ typedef enum {
  *                     // que o processador estiver ocioso. O usuário pode configurar
  *                     // o que o sistema deve fazer nesses momentos de ociosidade).
  *					   
- *    TYPE_PERIODIC 3  // Tarefas periodicas. 
- *                     // (Rodam de tempos em tempos, como o deadtask collector).
+ *    TYPE_PERIODIC 3  // Tarefas periódicas. 
+ *                     // (Rodam de tempos em tempos, como o deadthread collector).
  *
  *    TYPE_RR       4  // Threads tipo round robin. 
  *                     //(Confinadas em um processador, Não importa a prioridade, nem o deadline).
@@ -109,7 +108,12 @@ typedef enum {
  *                     // (Confinadas em um processador, Importa a prioridade o dead line, o step
  *                     //  principalmente é sistemicamente importante que se cumpra a execução em tempo.) 
  *
+ *    TYPE_UI       6  // UI user interface thread @todo:
+ * 
+ *    TYPE_IO       7  // i/o thread @todo
+ *
  *    Continua ...
+ *
  */
 typedef enum {
     TYPE_NULL,
@@ -118,6 +122,8 @@ typedef enum {
 	TYPE_PERIODIC,   // periodic threads with predefined intervals.
 	TYPE_RR,         // first-come-first-served cooperative.
     TYPE_REALTIME,
+	//TYPE_UI, //@todo
+	//TYPE_IO, //@todo
 	//...
 }thread_type_t;
 
@@ -126,33 +132,37 @@ typedef enum {
  * thread_state_t:
  *    Enumeram os estados de uma threads, (8 estados).
  *    Existem 2 grupos, 'Earth' e 'Space'.
- *    Obs: Rodam no espaço.
+ *    Obs: Rodam no 'espaço'.
  *
- * Earth: (INITIALIZED, STANDYBY, ZOMBIE, DEAD).
+ * Earth: (INITIALIZED, STANDBY, ZOMBIE, DEAD).
  * Space: (READY, RUNNING, WAITING, BLOCKED).
  *
  *  INITIALIZED,    //Earth, Criado o contexto e parâmetros.
- *  STANDBY,        //Earth, Pronta para rodar pela primeira vez. Ir para o espaço.
- *  ZOMBIE,         //Earth, Terminou a axecução. Voltou para a terra.
+ *  STANDBY,        //Earth, Pronta para rodar pela primeira vez. Ir para o 'espaço'.
+ *  ZOMBIE,         //Earth, Terminou a execução. Voltou para a 'terra'.
  *  DEAD,	        //Earth, Deleted.	
  
- *  READY,          //Space, Process is ready to run again.
- *  RUNNING,        //Space, Process is currently running.
- *  WAITING,        //Space, Process is waiting.	
- *  BLOCKED,        //Space, Process is blocked by an event.
+ *  READY,          //Space, Thread is ready to run again.
+ *  RUNNING,        //Space, Thread is currently running.
+ *  WAITING,        //Space, Thread is waiting.	
+ *  BLOCKED,        //Space, Thread is blocked by an event.
  *
- * OBS: Na pratica a troca de status está seguindo um organograma
- *      de movimentos. 
+ * Obs: 
+ *     Na prática, a troca de status está seguindo um organograma de 
+ * movimentos. 
+ *     @todo: Descrever esses movimentos na documentação. Incluir a 
+ * visualização através do gráfico.
+ *
  */
 typedef enum {
     INITIALIZED,    //0 Earth, Criado o contexto e parâmetros.
-	STANDBY,        //1 Earth, Pronta para rodar pela primeira vez. Ir para o espaço.
-	ZOMBIE,         //*2 Earth, Terminou a axecução. Voltou para a terra.
+	STANDBY,        //1 Earth, Pronta para rodar pela primeira vez. Ir para o 'espaço'.
+	ZOMBIE,         //2 Earth, Terminou a execução. Voltou para a 'terra'.
 	DEAD,	        //3 Earth, Deleted.	
-	READY,          //4 Space, Process is ready to run again.
-	RUNNING,        //5 Space, Process is currently running.
-	WAITING,        //6 Space, Process is waiting.	
-	BLOCKED,        //7 Space, Process is blocked by an event.
+	READY,          //4 Space, Thread is ready to run again.
+	RUNNING,        //5 Space, Thread is currently running.
+	WAITING,        //6 Space, Thread is waiting.	
+	BLOCKED,        //7 Space, Thread is blocked by an event.
 }thread_state_t;
 
  
@@ -352,6 +362,7 @@ struct thread_d
 	//Ticks remaining. (tempo para a tarefa chegar ao fim, tempo total-tempo percorrito)
 	unsigned long ticks_remaining; //rt, quanto tempo a tarefa tem disponível para ser concluida.
 
+	//unsigned long alarm;            //Tempo para o próximo alarme, dado em ticks.
 	
 	//??iopl??
 	unsigned long PreviousMode;	
@@ -417,6 +428,10 @@ struct thread_d
 	int msg;                    //arg2.
 	unsigned long long1;        //arg3.
 	unsigned long long2;        //arg4.
+	
+	//?? mensagens pendentes.
+	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
+	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
 	
 	/*
 	 * wait4pid: 

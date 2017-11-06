@@ -694,7 +694,7 @@ void ScanReadyQueue(struct queue_d *q)
 	int i=0;
 	
 	if((void*)q == NULL){
-	    printf("ScanReadyQueue error: Struct.\n");
+	    printf("ScanReadyQueue:\n");
 	    return;
 	};
 		
@@ -708,7 +708,7 @@ void ScanReadyQueue(struct queue_d *q)
 		    if( t->waitingCount >= t->waiting_limit )
             {
 			    t->waitingCount = 0;
-				t->priority = PRIORITY_BOOST;
+				t->priority = PRIORITY_MAX;
 				queue_insert_head(queue, (unsigned long) t, 1);
 				return;
             };			

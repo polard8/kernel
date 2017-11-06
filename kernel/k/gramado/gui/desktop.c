@@ -105,8 +105,7 @@ void *get_current_desktop()
 };
 
 
-int get_current_desktop_id()
-{
+int get_current_desktop_id(){
 	return (int) current_desktop;
 };
 

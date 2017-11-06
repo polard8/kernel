@@ -1,5 +1,5 @@
 /*
- * fILE: memory.h 
+ * File: hal\memory.h 
  * 
  * Descrição:
  *    Header para o driver do placa de memória.

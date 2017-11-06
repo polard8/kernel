@@ -23,6 +23,7 @@ g_rows              0x10              main.o
 g_cursor_y          0x10              main.o
 CursorInfo          0x10              main.o
 prompt_status       0x10              main.o
+taskmanTest1        0x10              main.o
 taskmanagerError    0x10              main.o
 g_char_attrib       0x10              main.o
 ApplicationInfo     0x10              main.o
@@ -61,7 +62,7 @@ Linker script and memory map
  .head_x86      0x004a1000       0x18 head.o
                 0x004a1000                taskmanager_entry_point
  *(.text)
- .text          0x004a1018      0x4f0 main.o
+ .text          0x004a1018      0x510 main.o
                 0x004a10c8                tmProc
                 0x004a1018                tmSleep
                 0x004a105f                tmCreateTaskBar
@@ -75,99 +76,110 @@ Linker script and memory map
                 0x004a1036                tmProbeProcessList
                 0x004a1371                tmInit
                 0x004a130d                DoSome
- .text          0x004a1508     0x1040 api.o
-                0x004a2208                APIShowCurrentProcessInfo
-                0x004a1a4f                system11
-                0x004a1af4                refresh_buffer
-                0x004a20ea                APISetFocus
-                0x004a1ab2                system14
-                0x004a1dd9                apiInitBackground
-                0x004a2022                APICreateWindow
-                0x004a1dde                MessageBox
-                0x004a1a91                system13
-                0x004a24a1                apiDown
-                0x004a2477                apiFOpen
-                0x004a2018                APIFastCreateWindow
-                0x004a1905                system1
-                0x004a1989                system5
-                0x004a2318                api_refresh_screen
-                0x004a23a4                apiGetCursorY
-                0x004a1d84                carrega_bitmap_16x16
-                0x004a1508                system_call
-                0x004a24ed                apiUp
-                0x004a1ad3                system15
-                0x004a219a                APISetActiveWindow
-                0x004a23fc                apiSetClientAreaRect
-                0x004a244e                apiCreateThread
-                0x004a1d20                SetNextWindowProcedure
-                0x004a2378                apiGetCursorX
-                0x004a1cf0                chama_procedimento
-                0x004a1e07                call_kernel
-                0x004a2066                APIRegisterWindow
-                0x004a228e                api_strncmp
-                0x004a1926                system2
-                0x004a1947                system3
-                0x004a2425                apiCreateProcess
-                0x004a212c                APIGetFocus
-                0x004a19cb                system7
-                0x004a19aa                system6
-                0x004a20a8                APICloseWindow
-                0x004a1a2e                system10
-                0x004a1d50                set_cursor
-                0x004a22ec                refresh_screen
-                0x004a1f87                call_gui
-                0x004a1a0d                system9
-                0x004a1d7f                put_char
-                0x004a1c8b                print_string
-                0x004a23d0                apiGetClientAreaRect
-                0x004a1cc1                edit_box
-                0x004a225d                kill
-                0x004a2322                apiReboot
-                0x004a1dad                apiShutDown
-                0x004a2234                exit
-                0x004a1968                system4
-                0x004a234e                apiSetCursor
-                0x004a1a70                system12
-                0x004a1c90                vsync
-                0x004a19ec                system8
-                0x004a21dc                APIGetActiveWindow
-                0x004a1530                system
-                0x004a2262                dead_thread_collector
-                0x004a2158                APIKillFocus
- .text          0x004a2548      0xad0 stdio.o
-                0x004a2cef                putchar
-                0x004a2cab                sprintf
-                0x004a2ebb                input
-                0x004a2595                scroll
-                0x004a2eb1                printf_main
-                0x004a2d05                outbyte
-                0x004a273f                app_print
-                0x004a2fef                stdio_system_call
-                0x004a255f                fopen
-                0x004a2548                fclose
-                0x004a2e7e                _outbyte
-                0x004a2c90                printf
-                0x004a26d3                app_clear
+ .text          0x004a1528     0x1270 api.o
+                0x004a2277                APIShowCurrentProcessInfo
+                0x004a1ac8                system11
+                0x004a1b6d                refresh_buffer
+                0x004a2159                APISetFocus
+                0x004a1b2b                system14
+                0x004a1e52                apiInitBackground
+                0x004a2091                APICreateWindow
+                0x004a277b                apiBeginPaint
+                0x004a1e57                MessageBox
+                0x004a22f5                APIreplace_window
+                0x004a1b0a                system13
+                0x004a2632                apiDown
+                0x004a26ca                enterCriticalSection
+                0x004a2608                apiFOpen
+                0x004a197e                system1
+                0x004a1a02                system5
+                0x004a24a9                api_refresh_screen
+                0x004a2535                apiGetCursorY
+                0x004a1dfd                carrega_bitmap_16x16
+                0x004a2723                exitCriticalSection
+                0x004a1528                system_call
+                0x004a267e                apiUp
+                0x004a1550                apiSystem
+                0x004a1b4c                system15
+                0x004a2209                APISetActiveWindow
+                0x004a258d                apiSetClientAreaRect
+                0x004a22cc                APIredraw_window
+                0x004a25df                apiCreateThread
+                0x004a1d99                SetNextWindowProcedure
+                0x004a2509                apiGetCursorX
+                0x004a1d69                chama_procedimento
+                0x004a1e80                call_kernel
+                0x004a20d5                APIRegisterWindow
+                0x004a241f                api_strncmp
+                0x004a2347                APIminimize_window
+                0x004a199f                system2
+                0x004a19c0                system3
+                0x004a25b6                apiCreateProcess
+                0x004a219b                APIGetFocus
+                0x004a1a44                system7
+                0x004a1a23                system6
+                0x004a2117                APICloseWindow
+                0x004a274f                initializeCriticalSection
+                0x004a1aa7                system10
+                0x004a1dc9                set_cursor
+                0x004a231e                APImaximize_window
+                0x004a247d                refresh_screen
+                0x004a2000                call_gui
+                0x004a1a86                system9
+                0x004a22a3                APIresize_window
+                0x004a2785                apiEndPaint
+                0x004a1df8                put_char
+                0x004a1d04                print_string
+                0x004a2561                apiGetClientAreaRect
+                0x004a1d3a                edit_box
+                0x004a23ee                kill
+                0x004a24b3                apiReboot
+                0x004a1e26                apiShutDown
+                0x004a23c5                exit
+                0x004a2370                APIget_foregroung_window
+                0x004a19e1                system4
+                0x004a24df                apiSetCursor
+                0x004a1ae9                system12
+                0x004a1d09                vsync
+                0x004a1a65                system8
+                0x004a224b                APIGetActiveWindow
+                0x004a23f3                dead_thread_collector
+                0x004a21c7                APIKillFocus
+                0x004a239c                APIset_foregroung_window
+ .text          0x004a2798      0xad0 stdio.o
+                0x004a2f3f                putchar
+                0x004a2efb                sprintf
+                0x004a310b                input
+                0x004a27e5                scroll
+                0x004a3101                printf_main
+                0x004a2f55                outbyte
+                0x004a298f                app_print
+                0x004a323f                stdio_system_call
+                0x004a27af                fopen
+                0x004a2798                fclose
+                0x004a30ce                _outbyte
+                0x004a2ee0                printf
+                0x004a2923                app_clear
                 0x004a4000                . = ALIGN (0x1000)
- *fill*         0x004a3018      0xfe8 00
+ *fill*         0x004a3268      0xd98 00
 
-.rdata          0x004a4000      0x370
+.rdata          0x004a4000      0x470
  .rdata         0x004a4000       0x20 stdio.o
- .rdata         0x004a4020      0x210 api.o
- .rdata         0x004a4230      0x140 main.o
+ .rdata         0x004a4020      0x310 api.o
+ .rdata         0x004a4330      0x140 main.o
 
-.data           0x004a4370      0xc90
-                0x004a4370                data = .
-                0x004a4370                _data = .
-                0x004a4370                __data = .
+.data           0x004a4470      0xb90
+                0x004a4470                data = .
+                0x004a4470                _data = .
+                0x004a4470                __data = .
  *(.data)
- .data          0x004a4370        0x0 main.o
- .data          0x004a4370        0x0 api.o
- .data          0x004a4370        0x0 stdio.o
+ .data          0x004a4470        0x0 main.o
+ .data          0x004a4470        0x0 api.o
+ .data          0x004a4470        0x0 stdio.o
                 0x004a5000                . = ALIGN (0x1000)
- *fill*         0x004a4370      0xc90 00
+ *fill*         0x004a4470      0xb90 00
 
-.bss            0x004a5000     0x1460
+.bss            0x004a5000     0x1470
                 0x004a5000                bss = .
                 0x004a5000                _bss = .
                 0x004a5000                __bss = .
@@ -177,7 +189,7 @@ Linker script and memory map
  .bss           0x004a5030       0x10 stdio.o
                 0x004a6000                . = ALIGN (0x1000)
  *fill*         0x004a5040      0xfc0 00
- COMMON         0x004a6000      0x460 main.o
+ COMMON         0x004a6000      0x470 main.o
                 0x004a6000                prompt
                 0x004a6100                taskmanagerBufferPos
                 0x004a6110                ClientAreaInfo
@@ -198,13 +210,14 @@ Linker script and memory map
                 0x004a63f0                g_cursor_y
                 0x004a6400                CursorInfo
                 0x004a6410                prompt_status
-                0x004a6420                taskmanagerError
-                0x004a6430                g_char_attrib
-                0x004a6440                ApplicationInfo
-                0x004a6450                g_cursor_x
-                0x004a6460                end = .
-                0x004a6460                _end = .
-                0x004a6460                __end = .
+                0x004a6420                taskmanTest1
+                0x004a6430                taskmanagerError
+                0x004a6440                g_char_attrib
+                0x004a6450                ApplicationInfo
+                0x004a6460                g_cursor_x
+                0x004a6470                end = .
+                0x004a6470                _end = .
+                0x004a6470                __end = .
 LOAD head.o
 LOAD main.o
 LOAD api.o

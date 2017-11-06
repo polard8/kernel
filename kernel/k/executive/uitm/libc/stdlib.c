@@ -88,7 +88,13 @@ done:
  * to malloc(), calloc() or realloc(). 
  * Otherwise, or if free(ptr) has already been called before, 
  * undefined behavior occurs. 
- * If ptr is NULL, no operation is performed.
+ * >> If ptr is NULL, no operation is performed.
+ *
+ * Importante:
+ *     uma estratégia seria apenas sinalizarmos na estrutura que desejamos que o 
+ * GC libere os recurso. Em seguida devemos sinalizar no mmblock que libere o bloco 
+ * para outras alocações. Obs: A área de cliente, antes ocupada pela estrutura 
+ * pode ser preenchida com zeros.
  *
  */
 void free(void *ptr)
@@ -97,10 +103,28 @@ void free(void *ptr)
     struct mmblock_d *Block;		
     struct mmblock_d *Anterior;
 	
+	
+	//>> If ptr is NULL, no operation is performed.
+	if( (void*) ptr == NULL ){
+		printf("free fail: null pointer.\n");
+		goto fail;
+	}
+	
+    //
+    // ptr:
+	//     Não temos condição de saber que tipo de dado estava alocado
+    // na área de cliente. O que nos resta é sinalizarmos na estrutura
+    // mmblock_d que ela não está mais em uso, deixando para o GC a tarefa 
+    // de desfazer a estrutura mmblock_d ou deixar a estrutura intacta e 
+    // sinalizada que está livre para uso. O alocador de memória poderá 
+    // reaproveitar essa estrutura liberada se o tamalho for o bastante para 
+    // a alocação desejada.	
+    //	
+	
 	//
 	// @todo:
-	// Se o argumento está correto, o argumento representa o início
-	// da área de cliente, ou seja, se subtrairmos o tamanho do header
+	// Se o argumento está correto, o argumento representa o início da 
+	// área de cliente, ou seja, se subtraírmos o tamanho do header
 	// encontraremos o incício do bloco de memória.
 	// Se o header for de tamanho padrão isso facilita encontrar
 	// o início da estrutura. MMBLOCK_HEADER_SIZE
@@ -109,54 +133,45 @@ void free(void *ptr)
 	//test:
 	//Calculando o início do header,dado o argumento, que é
 	//o início da área de cliente.
-	unsigned long HeaderBase;
-	HeaderBase = (unsigned long) ( (void*) ptr - MMBLOCK_HEADER_SIZE);
-	
-	Block = (void*) HeaderBase;
-	if( (void*) Block == NULL )
-	{
-		return;  //fail
-	}
-	else
-	{
-		//Confirma se é um bloco válido.
-		if( Block->Magic != 1234 ){
-			return;
-		}
 
-        //Limpa a lista.
-		if( Block->Id > 0 && Block->Id < MMBLOCK_COUNT_MAX ){
-		    mmblockList[Block->Id] = 0;	
-		}
+	unsigned long UserAreaStart = (unsigned long) ptr; 
+	
+	Block = (void*) ( UserAreaStart - MMBLOCK_HEADER_SIZE);
+	
+	//O início da estrutura de mmblock_d é um valor inválido.
+	if( (void*) Block == NULL ){
+		printf("free fail: struct pointer.\n");
+		goto fail;
+	}else{
 		
-		//Conecta o bloco anterior ao próximo.
-		if( (void*) Block->Prev != NULL )
-		{
-			Anterior = (void*) Block->Prev;
-			Anterior->Next =(void*) Block->Next;
-		}	
 		
-        //Apaga tudo.
-		//Block->Header = 0;
-		Block->headerSize = 0;
-		Block->Id  = 0;
-		Block->Used  = 0;		          
-	    Block->Magic = 0;         
-        Block->Free  = 0;
-        Block->requestSize = 0;
-        Block->unusedBytes = 0;
-		Block->userareaSize = 0;
-		Block->userArea = 0;
-		Block->Footer = 0;
-		Block->processId = 0;
-		Block->process = NULL;
-		Block->Next = NULL;
-		Block->Prev = NULL;
-		Block->Header = 0; //Volta apagar o Header.
+		if( Block->Used != 1 ){
+			printf("free fail: Used.\n");
+		    goto fail;	
+		};
+			
+		if( Block->Magic != 1234 ){
+			printf("free fail: Magic.\n");
+			goto fail;
+		};
+
+		if( Block->userArea != UserAreaStart ){
+			printf("free fail: userArea address.\n");
+			goto fail;			
+		};	
 		
-		//Nothing.	
-	}
+		if( Block->Free == 0 ){
+		    Block->Free = 1;   //Liberando o bloco para uso futuro.
+			goto done;	
+		} 
+		
+		//Se estamos aqui é porque algo deu errado.
+        goto fail;
+	};
 	//Nothing.
+fail:	
+    refresh_screen();
+	while(1){}
 done:	
 	return;
 };

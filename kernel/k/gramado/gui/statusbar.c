@@ -1,5 +1,5 @@
 /*
- * File: gui\statusbar.c
+ * File: gramado\gui\statusbar.c
  *
  * Descrição:
  *     Cria uma status bar em uma janela.
@@ -17,7 +17,7 @@
 
 /*
  * StatusBar:
- *     Desenha uma status bar, dada a janela.
+ *     Desenha uma status bar, dada a janela, encontramos o retângula da área de cliente.
  *     @todo: Acrescentar uma borda delicada, usar outra cor, próximo do 
  * branco.
  */
@@ -30,20 +30,67 @@ int StatusBar( struct window_d *window,
 	if( (void*) window == NULL ){
         return (int) 1;
     };
+	
+	//
+	// A Status bar é um elemento dentro da janela.
+	// não podemos considerar as bordas e a barra de títulos.
+	//
+	
+	if( (void*) window->rcClient == NULL ){
+		return (int) 1;
+	};
+	
+	if( window->rcClient->used != 1 || window->rcClient->magic != 1234 ){
+		return (int) 1;
+	};
 
 	// Set Up Sizes.
-	unsigned long x      = (unsigned long) window->left +1;    //Compensa a borda. 
-	unsigned long y      = (unsigned long) window->bottom -32; //Começa 32pixels antes do fim. 
-	unsigned long width  = (unsigned long) window->width -2;   //Compensa as duas bordas laterais. 
-	unsigned long height = (unsigned long) 32 -1;              //Menos a Borda de baixo. 
+	unsigned long x      = (unsigned long) window->rcClient->left;        
+	unsigned long y      = (unsigned long) window->rcClient->bottom -32; //Começa 32pixels antes do fim. 
+	unsigned long width  = (unsigned long) window->rcClient->width;      //Mesma largura da janela. 
+	unsigned long height = (unsigned long) 32;                           
 	
 	//
 	// @todo: Checar limites.
 	//
 	
     //Desenha a barra.
-draw_bar:
-    hWnd = (void*) CreateWindow( 1, 0, 0, "StatusBar", x, y, width, height, window, 0, 0, COLOR_STATUSBAR); 
+//draw_bar:
+
+	//
+	// *Importante: Checando se o esquema de cores está funcionando.
+	//
+	
+	if( (void*) CurrentColorScheme == NULL ){
+		printf("StatusBar: CurrentColorScheme");
+		refresh_screen();
+		while(1){}
+	}else{
+		
+		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		    printf("StatusBar: CurrentColorScheme validation");
+		    refresh_screen();
+		    while(1){}			
+		};
+		//Nothing.
+	};
+	
+	
+	
+	// Configurando as cores usadas na status bar.
+	
+	unsigned long StatusBarColor;
+	StatusBarColor = CurrentColorScheme->elements[csiStatusBar];  
+	
+	
+	int desktopID; 
+	desktopID = (int) get_current_desktop_id();	
+
+ 
+	hWnd = (void*) CreateWindow( 1, 0, 0, "StatusBar", 
+	                             x, y, width, height, 
+								 window, desktopID, StatusBarColor, StatusBarColor); 
+	
 	if( (void*) hWnd == NULL ){
         return (int) 1;
     };	 

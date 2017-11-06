@@ -238,6 +238,8 @@ ProcessorBlock_t ProcessorBlock;    //Obs: Não tem ponteiro.
 //...
  
 
+
+
 //
 // GUI support.
 // 
@@ -249,37 +251,8 @@ void hal_backbuffer_putpixel( unsigned long ax,
 							  
 							  
 							  
-							  
-  
-/*
- * Initialization support.
- */
- 
-int init_hal();
-//Sonda pra ver apenas qual é a empresa do processador.
-int hal_probe_processor_type();
-int hal_probe_cpu();  
-
-int init_intel();
-int init_amd();
-int hal_init_machine(); 
-void hal_set_machine_type(unsigned long type);
-unsigned long hal_get_machine_type();
-
-
-
-int jmp_address( unsigned long arg1, 
-                 unsigned long arg2, 
-				 unsigned long arg3 , 
-				 unsigned long arg4); 
-				 
-				 
-//detect	
-int hal_hardware_detect();	
-
-int hal_showpciinfo();		
-
-void hal_vsync();		 
+							
+		 
 				 
 /*
 VOID
@@ -324,10 +297,27 @@ IoWritePartitionTable(
     IN struct _DRIVE_LAYOUT_INFORMATION *PartitionBuffer
     ); 
 */				
-/*
- * Finalization support.
- */
  
+//Initialization support. 
+int init_hal();
+int init_intel();
+int init_amd();
+
+
+int jmp_address( unsigned long arg1, 
+                 unsigned long arg2, 
+				 unsigned long arg3 , 
+				 unsigned long arg4); 
+				 
+				 
+int hal_probe_processor_type();  //Sonda pra ver apenas qual é a empresa do processador.
+int hal_probe_cpu();  
+int hal_init_machine(); 
+void hal_set_machine_type(unsigned long type);
+unsigned long hal_get_machine_type();	
+int hal_hardware_detect();	
+int hal_showpciinfo();		
+void hal_vsync();
 void hal_reboot();
 void hal_shutdown();
 

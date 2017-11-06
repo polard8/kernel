@@ -31,6 +31,10 @@
 
 extern unsigned long get_page_fault_adr();
 
+//Protótipo de finção interna.
+void die();
+void do_pagefault();
+
 
 /*
  * faults:
@@ -39,7 +43,6 @@ extern unsigned long get_page_fault_adr();
 void faults(unsigned long number)
 {
     struct thread_d *t;
-	unsigned long page_fault_address;
 	
 	asm( "cli" );
 	
@@ -108,12 +111,7 @@ void faults(unsigned long number)
 		//PAGE FAULT
 		//Obs: é o contrário de page hit.
 	    case 14:
-		    printf("PAGE FAULT\n");
-			//Page Fault Linear Address (PFLA).
-			page_fault_address = (unsigned long) get_page_fault_adr();
-			printf("Address={%x}\n", (unsigned long) page_fault_address);
-			mostra_reg(current_thread);
-			mostra_slots();
+		    do_pagefault();
 		    break;
 	    
 	    default:			
@@ -121,21 +119,14 @@ void faults(unsigned long number)
             mostra_reg(current_thread);			
 			break;
 	};
+
+    //
+	// * DIE.
+	//
 	
-    
-	// Done.
-    // Final message!	
-	// Refresh.	
-	// HALT.
 done:	
-    printf("* System Halted!");    //Bullet.  
-	
-	if(VideoBlock.useGui == 1){
-	    refresh_screen();
-	};
-halt:
-	asm("hlt");   
-	while(1){};                      
+    die();
+    while(1){};	
 };
 
 
@@ -143,9 +134,60 @@ halt:
  * KiCpuFaults:
  *     Interface para chamar a rotina de faults.
  */
-void KiCpuFaults(unsigned long fault_number){
-    faults(fault_number);
+ 
+void KiCpuFaults(unsigned long number){
+    faults(number);
 	while(1){} 
+};
+
+
+// 14 PAGE FAULT
+//trata a page fault.
+//uma função completa, que trata a falta de página alocando
+//uma página para o processo.
+//aplicar alguns filtros pra saber se ainda podemos
+//recuperar o processo. caso contrário essa rotina 
+//deve fechar o processo com problema e chamar o scheduler.
+//Obs: essa função pode realizar muitas rotinas de verificação, alertas etc.
+void do_pagefault()
+{
+	unsigned long page_fault_address;
+	
+    printf("PAGE FAULT\n");
+	
+	//Page Fault Linear Address (PFLA).
+	page_fault_address = (unsigned long) get_page_fault_adr();
+	
+	printf("Address={%x}\n", (unsigned long) page_fault_address);
+	mostra_reg(current_thread);
+	mostra_slots();
+	
+	//@todo alert.
+	printf("do_pagefault: @todo: alloc page.\n");
+	
+done:	
+	return;
+}
+
+/*
+ * die:
+ *     Função sem retorno. Aqui termina tudo.
+ *      O sistema trava e não tem volta.
+ */
+void die()
+{
+    // Final message!	
+	// Refresh.	
+	// HALT.
+	
+    printf("* System Halted!");    //Bullet.  
+	
+	if(VideoBlock.useGui == 1){
+	    refresh_screen();
+	};
+halt:
+	asm("hlt");   
+	while(1){};     	
 };
 
 

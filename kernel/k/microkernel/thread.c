@@ -347,9 +347,8 @@ done:
  *     Pega o id da thread atual.
  *     Obs: current_thread já é o id.
  */
-int GetCurrentThreadId()
-{
-	return (int) current_thread;    //Id.
+int GetCurrentThreadId(){
+	return (int) current_thread;
 };
 
 

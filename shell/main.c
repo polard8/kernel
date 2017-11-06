@@ -1,5 +1,16 @@
 /*
- * File: main.c 
+ * File: main.c @todo: Criar a janela shell help.
+ *
+ * General purpose application.
+ *     SHELL.BIN é um aplicativo de próposito geral. Desenvolvido como 
+ * ferramenta do desenvolvedor para prover varios tipos de testes de recursos do sistema.
+ *
+ * Ok, isso é um program do tipo 'janela', o pequeno terminal 
+ * que roda em uma janela filha será gerenciado pelo próprio aplicativo.
+ * Isso é diferente de um programa feito para rodar em um terminal, onde o kernel 
+ * gerenciará a janela usada pelo programa. 
+ *
+ * Podemos usar esse terminal na janela filha para interpretar linguagem basic.
  *
  * Descrição:
  * Shell do sistema. (SHELL.BIN)
@@ -22,7 +33,7 @@
  *
  * Obs: O entry point está em head.s
  *      @todo: Não usar o arquivo head em assembly efeito de portabilidade.
- *
+ * Obs: O prompt e cursor estão definidos em stdio.h
  *
  * * IMPORTANTE: O FOCO DO INTERPRETADOR DE COMANDOS DO SHELL APP DEVE SER
  * A GERÊNCIA DE ARQUIVOS E DISPOSITIVOS DE ARMAZENAMENTO, EM SEGUNDO LUGAR
@@ -52,9 +63,9 @@
 
 #include "api.h"
 #include "types.h"
-#include "stddef.h"  //@todo: testando incluir isso, pode have definições duplicadas. 
-#include "stdio.h"   //#erro. o objeto foi compilado aqui. develos apenas incluilo.
-#include "stdlib.h"  //testando incluir sem compilar o objeto
+#include "stddef.h"   
+#include "stdio.h"   
+#include "stdlib.h"  
 #include "string.h"
 #include "shell.h"
 
@@ -70,9 +81,7 @@
 */
 
  
-//
-// Obs: O prompt e cursor estão definidos em stdio.h
-//
+ 
 
 
 //
@@ -104,8 +113,8 @@ int shellScreenHeight;
 // em arquivo.
 //
 
-#define SHELL_BUFFER_SIZE 512
-//#define SHELL_BUFFER_SIZE 1024 //tests
+//#define SHELL_BUFFER_SIZE 512
+#define SHELL_BUFFER_SIZE 1024 //tests
 
 char shell_buffer[SHELL_BUFFER_SIZE]; 
 unsigned long shell_buffer_pos; 
@@ -135,28 +144,36 @@ unsigned long shell_buffer_height; //Altura dada em número de caracteres.
 
 //FILE *font_file;
 
+
+//
+// Testes
+//
+int test_operators();
+
 //
 // Funções internas.
 //
 
 
-void shellShell();               //Constructor. 
-int shellInit();                 //Init.
-void shellWaitCmd();             //Wait for command.
+void shellSetCursor(unsigned long x, unsigned long y);
+void shellThread();
+void shellPrompt();
+void shellHelp();
 unsigned long shellCompare();    //Compare command.
+void shellWaitCmd();             //Wait for command.
+int shellInit();                 //Init.
+void shellShell();               //Constructor. 
 unsigned long shellProcedure( struct window_d *window, 
                               int msg, 
 							  unsigned long long1, 
 							  unsigned long long2 );
-void shellSetCursor(unsigned long x, unsigned long y);
-void shellThread();
-void shellPrompt();
-//...
  
-
+ 
+ 
 /*
- * app_main: 
+ * GramadoMain: 
  *     Função principal.
+ *     The Application Entry Point.
  *
  * @todo:
  *    +Checar argumentos.
@@ -169,18 +186,33 @@ void shellPrompt();
  *    +Testar as chamadas para pegar informções sobre o proesso.
  *    +...
  *
- * @todo: Criar argumento de entrada.
- *
+ *  
+ *  ## O SHELL É UM APLICATIVO DO TIPO JANELA DEVE TER UM MAIN DO TIPO JANELA ##
  */
-int app_main(int argc, char *argv[]) 
+void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 {
+	
+	//
+	// Obs: Esse não é um programa que roda em modo terminal,
+	// ele na verdade cria um terminal dentro de uma janela filha.
+	// isso pode servir para esse programa interpretar linguagem basic por exemplo.
+	// os programas em modo terminal não criarão janelas e rodarão nas 
+	// janelas de terminal cridas para eles pelo kernel.
+	//
 	
 	//#debug
 	//deixe o kernel usar essa janela para teste.
 	//Obs: Não criaremos a janela principal desse programa 
 	//para evitarmos erros com printf.
-	MessageBox( 1, "SHELL.BIN","Initializing ...");
+	
+	/*
+	 *Obs: Isso funcionou bem.
+	apiBeginPaint();
+	    MessageBox( 1, "SHELL.BIN","Initializing ...");
+	apiEndPaint();
+	
     refresh_screen();
+	*/
 	
 	//chamando uma system call que ative a rotina de testes de 
 	//escrita em janelas com o foco de entrada.
@@ -371,7 +403,19 @@ noArgs:
 	//
 	
 	
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1,"Shell 1.0 (Terminal Emulator)",     
+	//
+	// *Importante:
+	//      A janela do shell será uma aba dentro da janela do navegador,
+	// essa janela do navegador é gerenciada pelo kernel, mas não passa de uma moldura 
+	// com abas.
+	// >> o kernel ja sabe que o processo tem uma aba, então quando o processo 
+	//tenta criar uma janela, a sua janela será criada dentro de sua aba.
+	//
+	
+	//General purpose appplication  -  {} Developer version
+	
+	apiBeginPaint();
+	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," // SHELL.BIN ",     
                                        10, 10, 200, 200,    
                                        0, 0, 0 , COLOR_BLACK );	   
 	if((void*) hWindow == NULL){	
@@ -381,6 +425,17 @@ noArgs:
 		//exit(0);
 	};
 	
+	/*
+	 Imprimindo o ponteiro para a estrutura da janela criada 
+	 Estamos testando se o retorno está funcionando nesse caso.
+	 */
+	/* isso funcionou
+	printf("Testing handle {%x}\n",hWindow);
+	
+	printf("Testing resize window\n");
+	APIresize_window( hWindow, 640, 480);
+	*/
+	apiEndPaint();
 	
 	//
 	// Funcionou setar o foco, e a mensagem foi para a janela certa.
@@ -413,18 +468,18 @@ noArgs:
 	//     Inicializa variáveis, buffers e estruturas. Atualiza a tela.
 	//
 	
+	
+	
+	enterCriticalSection();    // * Enter Critical Section.	
 	Status = (int) shellInit(); 
-	if(Status != 0)
-	{
-		//
-	    // @todo: Teste usar Messagebox.
-		//
-		
+	if(Status != 0){
 		printf("[SHELL.BIN]: app_main: shellInit fail!");
 		refresh_screen();
 		while(1){};
 		//exit(0);
 	};
+	exitCriticalSection();     // * Exit Critical section.		
+	
 	
 	
 	//
@@ -509,6 +564,12 @@ noArgs:
 	*/
 	
 	
+//initializePrompt:
+	
+	//inicializa o prompt.	
+	//shellPrompt();	
+    //refresh_screen();	
+	
 //entrandoNoWhile:	
 	//printf("SHELL: While...");
 	//while(1){}
@@ -520,9 +581,7 @@ noArgs:
 	//** hang.
 	//printf("*Hang");
 	//refresh_screen();
-    //while(1){} 
-	
-
+    //while(1){} 	
 	
 	//
 	// **** Mensagens  ****
@@ -545,7 +604,12 @@ noArgs:
 		// pegar a mensagem que esta dentro da estrutura. Essa estrtura fica 
 		// protegida no Kernel.
 		//
-
+		
+		//
+		// #bugbug: Na verdade essa rotina está pegando a mensagem na janela 
+		// com o foco de entrada. esse argumento foi passado mas não foi usado.
+		//
+		
 	while(1)
 	{		
 		msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 
@@ -608,6 +672,7 @@ end:
 
 
 /*
+ ***********************************************
  * shellProcedure:
  *     Procedimento de janela.
  */
@@ -617,60 +682,67 @@ shellProcedure( struct window_d *window,
 				unsigned long long1, 
 				unsigned long long2 )
 {
-    unsigned long input_ret;	
+    unsigned long input_ret;
+    unsigned long compare_return;	
 	
     switch(msg)
     { 
 		case MSG_KEYDOWN:
             switch(long1)
             {
-
+				//reset prompt.
+				case '8':
+				    shellPrompt();
+				    goto done;
+					break;
+				    
+				//test return
+				case '9':
+				case VK_RETURN:
+				    input('\0'); //finaliza a string
+					shellCompare();
+					goto done;
+                    break;
                 //Mostrar o buffer
-                case '1':
-                    printf("%s\n",&prompt[0]);
-				    break; 
+                //case '1':
+                   // printf("%s\n",&prompt[0]);
+				//    break; 
 
 				//Mostrar o buffer	
-                case '2':
-                    printf("%s\n",prompt);
-				    break; 
+               // case '2':
+                //    printf("%s\n",prompt);
+				//    break; 
 
 				//	
-                case '#':
-				case '3':
-				    printf("Shell procedure case 3\n");
-                    break;
+                //case '#':
+				//case '3':
+				//    printf("Shell procedure case 3\n");
+                //    break;
 					
-                case '9':
-                    MessageBox( 1, "Shell","Test 9");
-                    break; 					
+                //case '9':
+                //    MessageBox( 1, "Shell","Test 9");
+                //    break; 					
                               
                 //Texto - Envia o caractere.
-                default:
-			   
-                   //Imprime os caracteres normais.
-				   printf("%c", (char) long1); 			   
-			       
-				   //O input está imprimindo...
-				   //o input coloca no buffer e imprime dependendo do caractere.
-				   //input_ret = input( (unsigned long) long1);				   
-				   
-				   //if(input_ret == VK_RETURN){
-				   //     prompt_status = 1;    //Último caractere.
-				   //};
-				   
-				   //debug
-				    printf("Shell procedure: keydown\n");				   
-				    goto done;
+                   //Imprime os caracteres normais na janela com o foco de entrada.
+				//enfilera os caracteres na string 'prompt[]'.
+				   //para depois ser comparada com outras strings.
+                default:  
+				    printf("%c", (char) long1); 			   
+				    input( (unsigned long) long1);				  
+					goto done;
                     break;               
             };
         break;
 		
 		case MSG_KEYUP: 
-		    printf("%c", (char) 'u');
-            printf("%c", (char) long1);  			
+		    //printf("%c", (char) 'u');
+           // printf("%c", (char) long1);  			
 		    break;
 		
+		//Não intercptaremos mensagens do sistema por enquanto.
+		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
+		//do sistema.
 		//case MSG_SYSKEYDOWN:
 		//    switch(long1)
 		//    {
@@ -679,8 +751,8 @@ shellProcedure( struct window_d *window,
 		//break;
 		
 		case MSG_SYSKEYUP: 
-		    printf("%c", (char) 'U');
-            printf("%c", (char) long1);			
+		    //printf("%c", (char) 'U');
+            //printf("%c", (char) long1);			
 		    break;
           
 		case MSG_COMMAND:
@@ -702,12 +774,27 @@ shellProcedure( struct window_d *window,
 			}
 		break; 		
 		
+		//Essa mensagem pode ser acionada clidando um botão.
+		//case MSG_CLOSE:
+		//break;
+		
+		//Essa mensagem pode ser acionada clidando um botão.
+		//case MSG_DESTROY:
+		//break;
+		
+		//Quando a aplicativo em user mode chama o kernel para 
+		//que o kernel crie uma janela, depois que o kernel criar a janela,
+		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
+        //MSG_CREATE, se o aplicativo retornar -1, então a rotina em kernel mode que 
+        //esta criando a janela, cancela a janela que está criando e retorn NULL.
+        //		
+		//case MSG_CREATE:
+		//    break;
+		
+		//Mensagem desconhecida.
 		default:
-		    //printf("shell default proc\n");
-			//SYSTEMCALL_CALL_SYSTEMPROCEDURE
-		    //system_call(37, (unsigned long) msg, (unsigned long) long1, (unsigned long) long2);
-              //system_call(37, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);			
-		    //    printf("Shell procedure: default message: msg{%d} long1={%d} long2={%d} \n", (int) msg, (unsigned long) long1, (unsigned long) long2 );
+		    //printf("shell procedure: mensagem desconhecida\n");
+		    goto done;
 		    break;	  
     };
 
@@ -734,7 +821,7 @@ done:
 
 /*
  * shellWaitCmd:
- *     Espera completar o comando com um [ENTER].
+ *     Espera completar o comando com um [ENTER]. ##suspensa
  */
 void shellWaitCmd()
 {
@@ -784,22 +871,26 @@ exit:
 
 
 /*
+ **********************************************************
  * shellCompare:
  *     Compara comandos digitados com palavras chave.
- *
- * @todo:
- *     +O minishell do Kernel deve ter poucos comandos.
+ *     Compara a palavra em 'prompt[]' com outras e chama o serviço.
  */
 unsigned long shellCompare()
 {
     unsigned long ret_value;
 	
-	//
-	// Espera o comando terminar.
-	//
 	
-	shellWaitCmd();	
+	//shellWaitCmd();  //cancelada.
+
+    //conferir se o enter foi o último caractere digitado.
+    //if( prompt_status != 1 ){
+	//	return (unsigned long) 1;  //erro.
+	//}	
 	
+    //
+    // o enter foi o caractere digitado, vamos comparar palavras.
+    //	
 	
 palavra_reservada:
 	
@@ -878,10 +969,8 @@ palavra_reservada:
 		goto exit_cmp;
     }; 
 	
-    if( strncmp( prompt, "help", 4 ) == 0 )
-	{
-		//printf(help_string);
-		//print_help();
+    if( strncmp( prompt, "help", 4 ) == 0 ){
+		shellHelp();
 		goto exit_cmp;
     };
 	
@@ -900,10 +989,9 @@ palavra_reservada:
 		goto exit_cmp;
     };
 	
-    if( strncmp( prompt, "exit", 4 ) == 0 )
-	{
+    if( strncmp( prompt, "exit", 4 ) == 0 ){
         printf("~exit\n");
-		//shell_status = 0;
+		exit(0);
 		goto exit_cmp;
     };
 	
@@ -953,18 +1041,15 @@ palavra_reservada:
         goto exit_cmp;
     };
 	
-	/*
-	//tasks
-	if( strncmp( prompt, "tasks", 5 ) == 0 )
-	{
-	    printf("~tasks - inicia o timer \n");
-		tasks();
-        goto exit_cmp;
-    };
-	*/
 	
+    if( strncmp( prompt, "version", 7 ) == 0 ){
+	    printf("%s\n",SHELL_VERSION);
+        goto exit_cmp;
+    };	
+ 
 palavra_nao_reservada:
-    return (unsigned long) 1;
+    printf("Unknown command!\n");
+	return (unsigned long) 1;
 	
 exit_cmp: 
     return (unsigned long) 0;
@@ -1038,10 +1123,15 @@ done:
 
 /*
  * shellInit:
- *     Inicializa o Shell.    
+ *     Inicializa o Shell.  
+ *     #bugbug: Essa rotina começa escrever na janela com o foco de entrada.
+ * um outro aplicativo solicitou o foco de entrada e essa rotina esta terminando 
+ * de escrever mas agora na janela do outro aplicativo.
+ * ?? o que fazer ?? sincronização?? 
  */
 int shellInit()
 {
+	int PID;
 	int ActiveWindowId = 0;
 	int WindowWithFocusId = 0;
 	void *P;
@@ -1055,7 +1145,8 @@ int shellInit()
 	shellShell(); 
 
 
-    printf("shellInit: Testing strings on Client Area ...\n");		
+	// ...Testing strings on Client Area 
+    printf("shellInit: Running tests ...\n");		
 	
 	//
 	// @todo: Essa mensagem está aparecendo fora da área de trabalho do shell
@@ -1069,20 +1160,42 @@ int shellInit()
 	//        e colocálas na tela.
 	//
 	
-      
-    printf("Starting Shell... \n");
+	//
+	// @todo: Criar na API uma rotina de inteface que use essa chamada.
+	// ex: APIGetPID().
+	//
+	
+	//PID = (int) APIGetPID();
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
+	
+	//valor de erro
+	if( PID == (-1)){
+	    printf("ERROR getting PID\n");	
+	}
+    printf("Starting Shell... PID={%d} \n", PID);
+	
 	printf("ScreenWidth={%d}  \n",shellMaxColumns);
 	printf("ScreenHeight={%d} \n",shellMaxRows);
 	
 	//
 	//Active
 	ActiveWindowId = (int) APIGetActiveWindow();
+	
+	//valor de erro
+	if( ActiveWindowId == (-1)){
+	    printf("ERROR getting Active window ID\n");	
+	}	
 	printf("ActiveWindowId={%d}\n",ActiveWindowId);
 
 
 	//
 	// Focus.
 	WindowWithFocusId = (int) APIGetFocus();
+	
+	//valor de erro
+	if( WindowWithFocusId == (-1)){
+	    printf("ERROR getting Window With Focus ID\n");	
+	}	
 	printf("WindowWithFocusId={%d}\n",WindowWithFocusId);
 	
 	//
@@ -1191,18 +1304,40 @@ int shellInit()
 	//
 	
 	int w;
+	
 	w = (int) APIGetActiveWindow();
+	//valor de erro
+	if( w == (-1)){
+	    printf("ERROR getting Active window ID\n");	
+	}
 	printf("ActiveWindow={%d}\n", w);
-	w = (int) APIGetFocus();
+	
+	w = (int) APIGetFocus();	
+	//valor de erro
+	if( WindowWithFocusId == (-1)){
+	    printf("ERROR getting Window With Focus ID\n");	
+	}		
 	printf("Focus={%d}\n", w);
 	//...
 	
 	//
 	// Testing commands.
 	//
+
+	//Lib C.
+	system("test");       //libC. (stdlib.c)
+	system("ls");
+	system("start");
+	system("xxfailxx");
+	//...
 	
-	apiSystem("test"); //api.
-	system("test");    //libC. (stdlib.c)
+	//API.
+	apiSystem("test");    //api.
+    apiSystem("ls");
+	apiSystem("start");
+	apiSystem("xxfailxx");
+	//...
+	
 	//Ok funcionando ...
 	//@todo: Testar outros comandos.
 	//...
@@ -1223,14 +1358,44 @@ done:
 	//
 	
 	printf("...\n");
-	printf("Welcome to Gramado Operating System.\n");
-	printf("...\n");
-	printf("TAKE A SAD O.S. AND MAKE IT BETTER!\n");
-	printf("...\n");
-	printf("Done!");
+	test_operators();
 	
-    //shellSetCursor(1,1);
+	printf("...\n");
+	printf("Welcome to Gramado Operating System.\n");
+	//printf("...\n");
+	//printf("TAKE A SAD O.S. AND MAKE IT BETTER!\n");
+	//printf("...\n");
+	//printf("Done!");
+	
+	//
+	// *Testando carregar um arquivo.
+	// Ok, isso funcionou.
+	//
+	
+	int fRet;
+	printf("...\n");
+	printf("Testing ... Loading file...\n");
+	
+	/*A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUAJNDO ALGUMA ÁREA DO SHELL*/
+	fRet = (int) system_call( SYSTEMCALL_READ_FILE, 
+	                          (unsigned long) init_file_name, 
+					          (unsigned long) &shell_buffer[0], 
+							  (unsigned long) &shell_buffer[0] );
+							  
+	printf("ret={%d}\n",fRet);
+	
+	printf("...\n");
+	printf(&shell_buffer[0]);	
+	
+	
+ 
+  //system_call( , , , );
+	
+	
+	shellPrompt();
+	
     refresh_screen();
+		
     return (int) 0;
 };
 
@@ -1276,19 +1441,29 @@ void shellThread(){
 
 /*
  * @todo: Criar rotina de saída do shell.
-int shellExit(int code);
-int shellExit(int code){
-	return code;
+void shellExit(int code);
+void shellExit(int code){
+	exit(code);
 }
 */
 
+//help message
+void shellHelp(){
+    printf(help_banner);	
+	return;
+}
 
 /*
  * shellPrompt:
  *     Inicializa o prompt.
  */
 void shellPrompt()
-{
+{	
+	int i;
+	for(i=0; i<PROMPT_MAX_DEFAULT;i++){
+		prompt[i] = (char) '\0';
+	}
+	
     prompt[0] = (char) '\0';
 	prompt_pos = 0;
     prompt_status = 0;
@@ -1298,6 +1473,41 @@ void shellPrompt()
 	printf(SHELL_PROMPT);
 	return;
 };
+
+//
+// C function to demonstrate the working of arithmetic operators
+//#include <stdio.h>
+int test_operators()
+{
+    int a = 9,b = 4, c;
+    
+	printf("Testing operators ...\n");
+	
+    c = a+b;
+    printf("a+b = %d \n",c);
+
+    c = a-b;
+    printf("a-b = %d \n",c);
+    
+    c = a*b;
+    printf("a*b = %d \n",c);
+    
+    c=a/b;
+    printf("a/b = %d \n",c);
+    
+    c=a%b;
+    printf("Remainder when a divided by b = %d \n",c);
+    
+    return 0;
+}
+/*
+void die(char * str);
+void die(char * str)
+{
+	fprintf(stderr,"%s\n",str);
+	exit(1);
+}
+*/
 
 
 //

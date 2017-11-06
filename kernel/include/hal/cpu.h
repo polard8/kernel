@@ -362,7 +362,7 @@ void init_cpu();
 int cpu_get_parameters();
 void get_cpu_intel_parameters();
 void get_cpu_amd_parameters();
-int KeTestCPU();
+int KeTestCPU();   //@todo: Isso deve isr para include/ke.h.
 void show_cpu_intel_parameters();
 
 //

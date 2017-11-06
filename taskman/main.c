@@ -1,6 +1,6 @@
 /*
  * TASKMAN - Task manager application  for Gramado.
- * (c) Copyright 2015-2017 - Fred Nora
+ * (c) Copyright 2015-2017 - Fred Nora.
  *
  * File: main.c 
  *
@@ -48,6 +48,8 @@
 #include "api.h"
 #include "stdio.h"
 #include "stddef.h"
+
+#include "taskman.h"
 
 
 #define MAGIC (1234)
@@ -415,17 +417,15 @@ void DoSome()
     int total = 1000;
     int step = 0;
 
-    while(step<total){
-        
-		//do some action
-        
-		tmSleep(5000);
+    while( step < total )
+	{   
+		tmSleep(5000);    // Do some action.
         
 		step+=1;
         
 		DoProgress("Loading: ",step,total);
-    }
-    //
+    };
+    // Nothing.
 done:
     printf("\n");
 	return;
@@ -487,8 +487,14 @@ int appMain(int argc, char *argv[])
 	//#debug
 debugStuff:
     // Uma mensagem de sinal de vida.
-	MessageBox( 1, "TASKMAN.BIN:", "Initializing ...");
-    refresh_screen();
+	apiBeginPaint();
+	    //(type, string1, string2)
+	    MessageBox( 1, "TASKMAN.BIN:", "Initializing ...");
+    apiEndPaint();
+	
+	refresh_screen();
+	
+	//Debug breakpoint.
 	//while(1){}
 	
 	
@@ -658,7 +664,12 @@ creatingSecurityControl:
 getmessageLoop:	
 	
 	// Debug:
-	MessageBox( 1, "TASKMAN:", "Get message loop");	
+	
+	apiBeginPaint();
+	    //(type, string1, string2)
+	    MessageBox( 1, "TASKMAN:", "Get message loop");	
+	apiEndPaint();
+	
 	refresh_screen();
 	//while(1){}
     

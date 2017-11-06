@@ -72,7 +72,6 @@ void KeProcessExit();
 void KeKillProcess(int pid);
 int KeFork();	
 int KeExecProcess(int pid, unsigned long *process_address);
-void *KeCreateKernelProcess();
 
 					
 //Thread support.					
@@ -91,12 +90,14 @@ void KeSetNextQuantum(unsigned long q);
 unsigned long KeGetNextQuantum();
 int KeSetPriority();
 int KeIncreasePriority(int pid);
-void *KeCreateIdle();
-void *KeCreateShell();
-void *KeCreateTaskManager();	
+
+
+
 void KeStartIdle(); 
 void KeStartShell();
 void KeStartTaskManager();
+
+
 void KeSpawnTask(int id);   //spawn thread.
 int KeSelectNextThread(int current);									
 									

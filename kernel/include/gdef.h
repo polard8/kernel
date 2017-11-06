@@ -1,33 +1,29 @@
 /*
- * File: gdef.h
-*
-* Descrição:
-*     Definições globais. 
-*     Será utilizado por todos os módulos. Deve ficar no início.
-*     Quando uma definição deve ser acessada por todos os módulos
-*     do kernel base ela deve ficar aqui.
-*
-* @todo: FAZER O MÁXIMO DE COISAS SISTEMICAMENTE NÃO-IMPORTANTES PRIMEIRO.
+  File: gdef.h
+
+ Descrição:
+     Definições globais. 
+     Será utilizado por todos os módulos. Deve ficar no início.
+     Quando uma definição deve ser acessada por todos os módulos
+     do kernel base ela deve ficar aqui.
+
+ @todo: FAZER O MÁXIMO DE COISAS SISTEMICAMENTE NÃO-IMPORTANTES PRIMEIRO.
          que não comprometam o sistema. como gui.
-*/
 
-/*
- * Sobre a GUI:
- * ============
- *     Um grid flutuante de janelas quadradas, 4 janelas.
- *     O message box pode ser um retângulo abaixo do grid.
- *     Uma janela de terminal virtual igual à um celular. 
- * Desse modo, enquanto essas 6 janelas não são flutuantes, dá pra
- * ir usando elas desenha das no backbuffer mesmo.
- *
- *
- * divisão da tela:   
- * quatro quadrantes de 10.
- * divide por vinte e multiplica pela quantidade desejada.
- *         (multiplicador*(total/20)) 
- */
+ Sobre a GUI:
+ ============
+     Um grid flutuante de janelas quadradas, 4 janelas.
+     O message box pode ser um retângulo abaixo do grid.
+     Uma janela de terminal virtual igual à um celular. 
+ Desse modo, enquanto essas 6 janelas não são flutuantes, dá pra
+ ir usando elas desenha das no backbuffer mesmo.
 
-/*
+
+ divisão da tela:   
+ quatro quadrantes de 10.
+ divide por vinte e multiplica pela quantidade desejada.
+         (multiplicador*(total/20)) 
+
  Sobre o banco de dados:
  =======================
  
@@ -66,6 +62,48 @@ dessa conta.
 */
 
 
+
+/*
+    ******************************************************** 
+  
+    Enumeração guia para o projeto de organização do código.
+	
+	Uma página de código deve ter a seguinte ordem:
+	
+	ux4 - Cima.
+	ux3
+	ux2
+	ux1 - Baixo.
+	
+	Obs: 
+	>>Fica em cima as rotinas mais primitivas, que dificilmente um usuário 
+	  com profundo conhecimento dos detalhes seria capaz de usar.
+	  São decisões sistemicamente importantes.
+	>>Fica em baixo as rotinas mais complexas e completas, que servem de 
+	  interface entre a camada superior e os recursos disponíveis nas camadas 
+	  inferiores. Importante: Os nomes nessa camada devem ser o mais simples 
+	  possíveis para facilitar o entendimento.
+	  São decisões sistemicamente não importantes.
+	**********************************************************  
+ */
+
+typedef enum {
+	UXNULL,      //0
+	UX1,         //1 HAL         ~thinking       
+	UX2,         //2 MICROKERNEL ~logic
+	UX3,         //3 EXECUTIVE   ~creativity
+    UX4,	     //4 GRAMADO     ~activity
+}ux_type_t;
+
+
+
+
+
+//
+// * UX4 ******************************************************
+//
+
+
 #define FRONTBUFFER_ADDRESS 0xC0400000
 #define BACKBUFFER_ADDRESS  0xC0800000
 
@@ -73,7 +111,7 @@ dessa conta.
 //#define BACKBUFFER_VA  0xC0800000
 
 
-//#define BIOS_FONT8X8 0x000FFA6E
+
 
 //using gui flags.
 #define GUI_ON   1
@@ -224,6 +262,8 @@ typedef enum {
 	ObjectTypeKM, //74
 	ObjectTypeUM, //75
 	ObjectTypeColorScheme,  //76
+	ObjectTypeButton,       //77
+	ObjectTypeGrid,       //78
 	//...
 }object_type_t;
 
@@ -277,6 +317,7 @@ typedef enum {
 
 
 
+
 unsigned long g_backbuffer_address;            //0xC0800000
 unsigned long g_frontbuffer_buffer_address;    //LFB. Endereço físico do frontbuffer(memória da placa de vídeo). 
 unsigned long g_frontbuffer_buffer_va;    //endereço lógico do frontbuffer.
@@ -286,6 +327,13 @@ unsigned long g_frontbuffer_buffer_va;    //endereço lógico do frontbuffer.
 
 
 int gNextKeyboardMessage;
+
+
+//
+// * UX1 ******************************************************
+//
+
+//#define BIOS_FONT8X8 0x000FFA6E
 
 //
 // End.

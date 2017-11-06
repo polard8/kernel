@@ -126,9 +126,6 @@ frequencia. Ex: Os Version 1.0.1234.4321.
 #define MICROKERNEL 3
 
 
-#define KERNEL_MAX_PRIORITY 10
-
-
 /*
  diretorios
 /boot
@@ -306,6 +303,10 @@ extern void do_executa_new_task();
 #include <executive/tty/tty.h>	
 
 
+//
+// @todo: Testar se é possível colocar esses includes abaixo dos includes do executive.
+//
+
 //gramado - GUI. (presentation layer)
 #include <gramado/gui/usession.h>
 #include <gramado/gui/wstation.h>
@@ -314,7 +315,15 @@ extern void do_executa_new_task();
 #include <gramado/gui/menu.h>
 #include <gramado/gui/grid.h> 
 #include <gramado/gui/bmp.h>
-	
+// gramado/user
+#include <gramado/user/user.h>
+//gramado/logon
+#include <gramado/logon/logon.h>
+//gramado/logoff
+#include <gramado/logoff/logoff.h>	
+//principal
+#include <gramado/gramado.h>   //principal.
+
 //uigm - User Interface Graphic Mode.
 //nothing for now.
 
@@ -323,10 +332,7 @@ extern void do_executa_new_task();
 #include <executive/uitm/terminal.h>      //configurações de terminal(o shel usa um terminal.) 
 #include <executive/uitm/console.h>            //Console ??
 
-//sm - System Management.
-#include <executive/sm/user.h>
-#include <executive/sm/logon.h> 
-#include <executive/sm/logoff.h>  
+//sm - System Management.  
 #include <executive/sm/install.h>  
 #include <executive/sm/init.h>
 #include <executive/sm/networkports.h>  //(network) Network Ports  (sw)
@@ -338,10 +344,11 @@ extern void do_executa_new_task();
 #include <executive/sm/network.h>       //(network) Gerenciamento de rede. 
 #include <executive/sm/fs.h>            //fs.
 #include <executive/sm/io.h>            //io
-#include <executive/sm/system.h>        //subsystema que recebe as chamadas de usuario.
 #include <executive/sm/systemcall.h>    //as chamadas ao sistema.
 #include <executive/sm/modules.h>       //gerenciamento de modulos.  
 #include <executive/sm/debug.h>
+#include <executive/sm/sys.h>           //*intefaces de gerenciamento do sistema.
+#include <executive/sm/system.h>        //*intefaces de gerenciamento do sistema.
 
 //ram
 #include <executive/ram/heap.h>          //Heap pointer support.
@@ -351,7 +358,7 @@ extern void do_executa_new_task();
 #include <executive/ram/mm.h>            //mm memory manager support.
 
 //Esse fica em /executive..
-#include <executive/executive.h>     // ***
+#include <executive/executive.h>     // principal.
 //--
 
 

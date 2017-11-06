@@ -601,6 +601,10 @@ _kernel_begin:
 	; Se não terminou de forma normal, halt system.
 	;
 	
+	;;
+	;; @todo: Argumentos.
+	;;
+	
 	call _kMain
 
 	cmp eax, 0

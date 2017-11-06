@@ -1,5 +1,5 @@
 /*
- * File: procedure.c
+ * File: executive\sm\sys\procedure.c
  *
  * O PROCEDIMENTO NUNCA DEVE SER TROCADO, SEMPRE SERÁ O PROCEDIMENTO DO SISTEMA
  * QUANDO HOUVER UMA MENSAGEM ENVIADA PARA OUTRO PROCEDIMENTO, A MENSAGEM DEVE SER
@@ -46,6 +46,7 @@
 void procedureMakeTests();
 void procedureLinkDriverTest(); // testando linkar um driver ao sistema operacional
 void procedureWindowWithFocusTest();
+void procedureGrid();
 
 /*
  * system_procedure:
@@ -67,56 +68,32 @@ unsigned long system_procedure( struct window_d *window,
 	
 	int AltStatus;
 	int CtrlStatus;
+	int ShiftStatus;
 	//...
 	
 
 	//Get status.
 	AltStatus = (int) get_alt_status(); 
 	CtrlStatus = (int) get_ctrl_status();	
+	//ShiftStatus = (int) get_shift_status();
 	//...
 	
+	//janela de teste.
+	struct window_d *xxxx;
+	
+	
+	void *buff;
 	
     switch(msg)
     { 
-        /*	
+        /*
+         ## Não tratar digitações normais ## 		
         case MSG_KEYDOWN:
-            switch(long1)
-            {
-				//@todo: incluir o [enter].
-				
-                //@todo: fazendo o driver de teclado.
-	            //putchar( (int) long1 );
-				
-				//@todo: O escape poderia reiniciar algumas variáveis
-				//       zerar algum buffer ... etc.
-				case VK_ESCAPE:
-                    SetProcedure( (unsigned long) &system_procedure);				
-					//...
-					break;
-				   
-				   
-				//
-                // Quando qualquer tecla que não é do sistema é pressionada
-				// colocamos em um buffer para depois comparar com um comando.
-				// Obs: input(.) em stdio.c.
-                //
-				
-                default:
-					//my_buffer_char_blt( 0, 0, COLOR_TEXT, long1); //funciona.
-				    //putchar( (int) long1);
-					
-					//Salva num buffer pra comparar depois.
-					//@todo: Salvando em prompt[], porém o buffer da linha
-					// na disciplina de linha deve apontar para esse buffer.
-					input( (unsigned long) long1 );   
-					goto done;
-					//refresh_screen();
-					//return (unsigned long) 0;   //retorna pois a tela atualizando 2 vezes
-					break; 
-            };
-        break;
+            //#cancelado.
+		break;
 		*/
           
+		/* ## Teclas do sistema interceptadas pelo kernel ## */  
         case MSG_SYSKEYDOWN:                 
             switch(long1)	       
             {   
@@ -129,14 +106,15 @@ unsigned long system_procedure( struct window_d *window,
 				//      no driver de teclado. Para saber o valor delas
 				//      tem que chamar uma função do driver. keyboard.c
 				//
+				
+				//Obs: 
+				// *Importante: Tem que chamar método pra pegar variável dentro de driver.
 				 
 				//Help. 
 				case VK_F1:
-					//AltStatus = (int) get_alt_status(); 
-					//CtrlStatus = (int) get_ctrl_status();
-					//if(AltStatus == 1){ break;};
-					//if(ctrl_status  == 1){ break;};
-			        //if(shift_status == 1){ break;}; 
+					//if(AltStatus == 1){ window_with_focus = 1; break;};
+					//if(CtrlStatus == 1){ active_window = 1; break;};
+			        //if(ShiftStatus == 1){ break;}; 
 					if(VideoBlock.useGui == 1){ 
 					    procedureHelp();  
 					};
@@ -145,10 +123,9 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//Kernel info.	
                 case VK_F2:
-				    //AltStatus = (int) get_alt_status(); 
-					//if(alt_status   == 1){ break;};
-					//if(ctrl_status  == 1){ MainMenu(); break;};
-			        //if(shift_status == 1){ printf("shift_F2\n"); break;}; 				
+					//if(AltStatus == 1){ window_with_focus = 2; break;};
+					//if(CtrlStatus == 1){ active_window = 2; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F2\n"); break;}; 				
 				    
 					//Obs: Não usa janelas, isso não mudará o foco.
 					backgroundDraw(COLOR_BACKGROUND);
@@ -162,10 +139,9 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //CPU info. 				
                 case VK_F3: 
-                    //AltStatus = (int) get_alt_status();  				
-					//if(alt_status   == 1){ printf("alt_F3\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F3\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F3\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 3; break;};
+					//if(CtrlStatus == 1){ active_window = 3; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F3\n"); break;};
 				    //maximizar a janela ativa
 				    //Obs: Não usa janelas, isso não mudará o foco.
 					show_cpu_intel_parameters();					
@@ -173,12 +149,13 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//Window tests.	
                 case VK_F4:
-				    //AltStatus = (int) get_alt_status(); 
-				    //if(alt_status   == 1){ printf("alt_F4\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F4\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F4\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 4; break;};
+					//if(CtrlStatus == 1){ active_window = 4; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F4\n"); break;};
 				    
-					windowShowWindowList();  //Mostra informações sobre as jnaelas.
+					//Mostra informações sobre as jnaelas.
+					//gramado/gui/window.c
+					windowShowWindowList();  
 					//MaximizeWindow(struct window_d *window); //minimizar a janela ativa 
                     break;
 				
@@ -186,9 +163,9 @@ unsigned long system_procedure( struct window_d *window,
 				//Mostra informções sobre todos os dispositivos.
 				//Igual ao gerenciador de dispositivos.
 				case VK_F5:
-					//if(alt_status   == 1){ printf("alt_F5\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F5\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F5\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 5; break;};
+					//if(CtrlStatus == 1){ active_window = 5; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
 				    //pci_info();     //PCI information.
 				    
 					//Obs: Não usa janelas, isso não mudará o foco.
@@ -201,9 +178,10 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Clock info./minishell				
 				case VK_F6:
-					//if(alt_status  == 1){ procedureMakeTests(); break;};
-					//if(ctrl_status == 1){ procedureLinkDriverTest(); break;};
-			        //if(shift_status == 1){ printf("shift_F6\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 6; break;};
+					//if(CtrlStatus == 1){ active_window = 6; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
+					
 				    //init_clock(); //clock information
 					//get_cmos_info();
 					//printf( (const char*) stdout->_ptr );
@@ -220,9 +198,9 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Testing Message Box.				
 				case VK_F7:
-					//if(alt_status   == 1){ printf("alt_F7\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F7\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F7\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 7; break;};
+					//if(CtrlStatus == 1){ active_window = 7; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F7\n"); break;};
 				    //pertence ao desktop,tipo 1, string.
 				    if(VideoBlock.useGui == 1){
 						//isso cria uma janela, mudando o foco atual.
@@ -232,9 +210,9 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//Cls.	
 				case VK_F8:
-					//if(alt_status   == 1){ printf("alt_F8\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F8\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F8\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 8; break;};
+					//if(CtrlStatus == 1){ active_window = 8; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F8\n"); break;};
 					
 					//Obs: Não usa janelas, isso não mudará o foco.
 					backgroundDraw(COLOR_BLACK);
@@ -246,41 +224,73 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Reboot.  				
 				case VK_F9:
-					//if(alt_status   == 1){ printf("alt_F9\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F9\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F9\n"); break;};
-                    systemReboot();
+					//if(AltStatus == 1){ window_with_focus = 9; break;};
+					//if(CtrlStatus == 1){ active_window = 9; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F9\n"); break;};
+                    backgroundDraw(COLOR_BACKGROUND);
+					systemReboot();
 					break;				
 
 				//Task Manager.	
 				case VK_F10:
-					//if(alt_status   == 1){ printf("alt_F10\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F10\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F10\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 10; break;};
+					//if(CtrlStatus == 1){ active_window = 10; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F10\n"); break;};
 				    
 					//KiShowThreadList(); //threadi.c
-					mostra_slots();  //threadi.c
+					//mostra_slots();  //threadi.c
 					
 					//@todo: abrir o gerenciador de tarefas.
 					//show_process_information();
 					//show_thread_information();					
-				    break;
+				    
+					//aumentando gradativamente a janela de pouco em pouco.
+					xxxx = (void*) windowList[6];
+					xxxx->width  -= 20;
+					xxxx->height -= 20;
+					resize_window(xxxx, xxxx->width, xxxx->height);
+					redraw_window(xxxx);					
+					
+					break;
 					
 				//Program manager.
                 //@todo: usar F11 para FULL SCREEN.				
 				case VK_F11:
-					//if(alt_status   == 1){ printf("alt_F11\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F11\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F11\n"); break;};
+					//if(AltStatus == 1){ window_with_focus = 11; break;};
+					//if(CtrlStatus == 1){ active_window = 11; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F11\n"); break;};
 					//printf("@todo Program manager.\n");
-					printf("F11\n");
+					//printf("F11\n");
+					
+					//aumentando gradativamente a janela de pouco em pouco.
+					xxxx = (void*) windowList[6];
+					xxxx->width  += 20;
+					xxxx->height += 20;
+					resize_window(xxxx, xxxx->width, xxxx->height);
+					redraw_window(xxxx);
+					
 					break;
 					
 				//Control menu.	
 				case VK_F12:
-					//if(alt_status   == 1){ printf("alt_F12\n"); break;};
-					//if(ctrl_status  == 1){ printf("ctrl_F12\n"); break;};
-			        //if(shift_status == 1){ printf("shift_F12\n"); break;};	
+					//if(AltStatus == 1){ window_with_focus = 12; break;};
+					//if(CtrlStatus == 1){ active_window = 12; break;};
+				    //procedureGrid();
+					
+					//Testando repintar todas as janelas seguindo a ordem list.
+					redraw_screen();
+					
+					//Teste de GC. 
+					//Funcionando bem.
+					//printf("F12: alocando ...\n");
+					//buff = (void*) malloc(4*1024);
+					//printf("F12: liberando ...\n");
+					//free(buff);
+					//printf("F12: testando GC ...\n");
+					//gc();
+					//printf("F12: OK\n");
+					
+ 	
 					//SystemMenu();
 					//printf("@todo Control menu.\n");
 					//@todo:control menu da area de trabalho.
@@ -307,13 +317,39 @@ unsigned long system_procedure( struct window_d *window,
 					
 					//Testando imprimir mensagem na janela com o foco de entrada.
 					//que no caso é a janela do desenvolvedor.
-					procedureWindowWithFocusTest();
+					//procedureWindowWithFocusTest();
+					
+					//drawScreenGrid();
+					
+					
+					//repintar uma janela qualquer.
+					
+					
+					//xxxx = (void*) windowList[4];
+					//MaximizeWindow(xxxx);
+					//redraw_window(xxxx);
+
+					//xxxx = (void*) windowList[5];
+					//replace_window(xxxx, 100, 100);
+					//redraw_window(xxxx);
+
+					//xxxx = (void*) windowList[6];
+					//resize_window(xxxx, 100, 100);
+					//redraw_window(xxxx);
 					
 					break;
 				
                 //Mudar o foco de entrada pra próxima janela de uma lista.				
                 case VK_TAB:
-				    windowSwitchFocus();
+				    //if(AltStatus   == 1)
+					//{ 
+					    //window_with_focus++;
+                        //if(	window_with_focus > 9 ){
+						//	window_with_focus = 1;
+						//}					
+						//break;
+					//};
+					//windowSwitchFocus();
 				    break;
 					
                 // Nothing for now!  				
@@ -324,45 +360,21 @@ unsigned long system_procedure( struct window_d *window,
 		    };              
         break;
 		
+		/* ## Teclas do sistema interceptadas pelo kernel ## */  
 		/*
 		case MSG_SYSKEYUP: 
             switch(long1)  
             {
-				//Obs: Em ordem, da esquer pra direita.
-				
-				//@todo: Me parece que esse botão não funciona.
-                case VK_LSHIFT:
-				    //windowSwitchFocus();
-					//SetFocus(gui->desktop);
-					//SystemMenu();
-					//StatusBar(gui->screen, "Status bar", "string 2");
-					//DialogBox(gui->screen,1,"DialogBox","String2"); 
-					//MessageBox(gui->screen, 1, "F7:","Testing Message Box");
-				    break;    	
-					
-                case VK_LCONTROL:
-				    SetFocus(window);
-				    ControlMenu();    //teste.
-				    break; 	
-					
-				case VK_RWIN: 	
-				case VK_LWIN:    break; 
-                case VK_LMENU:	 break;
-					
-                //case KEY_ALTGR:				    
-				//    break;
-				
-                //case KEY_WINKEY2:				    
-				//    break;
-
-                //case KEY_CONTROLMENU: //@todo criar constante.				    
-				//    break;
-
-                //case KEY_CONTROL2:
-				//    break; 					
+				//0x5B.
+                //Left WinKey system keyup. 
+                //#super.
+				case VK_LGRAMADO:
+                    procedureGrid();  //Grid de botões usado pelo kernel.				
+				break; 		
             };          
         break;
-        */
+		*/
+		
         /*		
         case MSG_DESTROY:		
             //destroy 
@@ -502,7 +514,6 @@ void SendMessage( struct window_d *window,
 /*
  * procedureHelp:
  *     Mensagem de ajuda ao usuário.
- *
  */
 void procedureHelp()
 { 
@@ -513,43 +524,52 @@ void procedureHelp()
 	    return;
 	};
 	
+	unsigned long left   = gui->main->left;
+	unsigned long top    = gui->main->top;
+	unsigned long width  = gui->main->width;
+	unsigned long height = gui->main->height;
+	
+	g_cursor_x = (left/8);
+	g_cursor_y = (top/8); 
+	
 	//backgroundDraw(COLOR_BACKGROUND);
 	
 	//Create.
-	hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "Help:", 
-	                                (800 -320 -2), (600 -240 -2), 320, 240, 
-							        gui->main, 0, COLOR_BLACK, COLOR_TEST_1 );     
+	hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "//KERNEL Help", 
+	                                left, top, width, height, 
+							        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR );     
 	if( (void*) hWindow == NULL){
 	    printf("procedureHelp:\n");
 		return;
     }else{
 		RegisterWindow(hWindow);
 	};
+	
 //Coloca as mensagens na janela.
 messages: 
-	draw_text( hWindow, 8,  2*(320/20), 
+	draw_text( hWindow, 8,  2*(height/20), 
 	           COLOR_WINDOWTEXT, "F1 Help.");
-    draw_text( hWindow, 8,  3*(320/20), 
+    draw_text( hWindow, 8,  3*(height/20), 
 	           COLOR_WINDOWTEXT, "F2 Kernel info.");
-	draw_text( hWindow, 8,  4*(320/20), 
+	draw_text( hWindow, 8,  4*(height/20), 
 	           COLOR_WINDOWTEXT, "F3 CPU info.");
-	draw_text( hWindow, 8,  5*(320/20), 
+	draw_text( hWindow, 8,  5*(height/20), 
 	           COLOR_WINDOWTEXT, "F4 Window tests.");
-	draw_text( hWindow, 8,  6*(320/20), 
+	draw_text( hWindow, 8,  6*(height/20), 
 	           COLOR_WINDOWTEXT, "F5 Device info.");
-	draw_text( hWindow, 8,  7*(320/20), 
+	draw_text( hWindow, 8,  7*(height/20), 
 	           COLOR_WINDOWTEXT, "F6 Clock info.");
-	draw_text( hWindow, 8,  8*(320/20), 
+	draw_text( hWindow, 8,  8*(height/20), 
 	           COLOR_WINDOWTEXT, "F7 MessageBox.");
-	draw_text( hWindow, 8,  9*(320/20), 
+	draw_text( hWindow, 8,  9*(height/20), 
 	           COLOR_WINDOWTEXT, "F8 Cls.");
-	draw_text( hWindow, 8, 10*(320/20), 
+	draw_text( hWindow, 8, 10*(height/20), 
 	           COLOR_WINDOWTEXT, "F9 Reboot.");
-	draw_text( hWindow, 8, 11*(320/20), 
+	draw_text( hWindow, 8, 11*(height/20), 
 	           COLOR_WINDOWTEXT, "F10 Task Manager.");
-	draw_text( hWindow, 8, 12*(320/20), 
+	draw_text( hWindow, 8, 12*(height/20), 
 	           COLOR_WINDOWTEXT, "F11 Program manager.");
-    draw_text( hWindow, 8, 13*(320/20), 
+    draw_text( hWindow, 8, 13*(height/20), 
 	           COLOR_WINDOWTEXT, "F12 Tests");
 			   
 			   
@@ -559,7 +579,7 @@ messages:
     // Testing Status Bar
     //
     
-	StatusBar(hWindow,"Esc=EXIT","Enter=?");
+	StatusBar( hWindow, "Esc=EXIT", "Enter=?" );
 	
 	
 	//
@@ -810,6 +830,22 @@ void procedureWindowWithFocusTest()
 	
 	return;				
 };
+
+
+/* @todo; Criar um grid parecido com o outro, mas que será gerenciado pelo
+ procedimento de janelas do sistema.
+*/ 
+void procedureGrid()
+{
+	int Status;
+	
+	Status = grid(GRID_VERTICAL);
+	if(Status == 1){
+		printf("procedureGrid: FAIL\n");
+	}
+	return;
+};
+
 
 //
 // End.

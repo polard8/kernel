@@ -568,9 +568,18 @@ done:
 };
 
 
+
+/*
+ * printchar:
+ *     Coloca o caractere na string ou imprime.
+ * Essa função chama uma rotina que deverá tratar o caractere e em seguida 
+ * enviá-lo para a tela.
+ * Essa rotina é chamada pelas funções: /print/printi/prints.
+ */
 static void printchar(char **str, int c)
 {
 	//extern int putchar(int c);
+	
 	if(str) 
     {
 		**str = c;
@@ -583,6 +592,9 @@ static void printchar(char **str, int c)
 /*
  * putchar:
  *     Put a char on the screen. (libC).
+ *     Essa rotina chama uma rotina de tratamento de caractes, somente
+ * depois é que o caractere será enviado para a tela.
+ *     Essa rotina é chamada pelas funções: /printchar/input/.
  */
 int putchar(int ch)
 {    
@@ -602,8 +614,12 @@ int getchar(void)
 
 
 /*
+ *******************************************************************
  * outbyte:
- *     Trata o caractere a ser imprimido.
+ *     Trata o caractere a ser imprimido e chama a rotina /_outbyte/
+ * para efetivamente colocar o caractere na tela.
+ *
+ * Essa rotina é chamada pelas funções: /putchar/scroll/.
  */
 void outbyte(int c)
 {     
@@ -720,12 +736,16 @@ done:
 
 
 /*
+ **********************************************************************
  * _outbyte:
- *     Essa rotina envia o caractere para a tela.
- *     @todo: Um switch percebe o modo de vídeo e como esse
- *            caractere deve ser construído.
- *            Criar uma estrutura para parâmetros de vídeo.
- * 
+ *     Essa rotina efetivamente envia o caractere para a tela, não 
+ * fazendo nenhum tipo de tratamento de caractere.
+ *     Essa rotina é chamada pema rotina /outbyte/.
+ *
+ * Obs: 
+ *     Um switch percebe o modo de vídeo e como esse caractere deve ser 
+ * construído.
+ * @todo: ?? Criar uma estrutura para parâmetros de vídeo. ??
  */
 void _outbyte(int c)
 {

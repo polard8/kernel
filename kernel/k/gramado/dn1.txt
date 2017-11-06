@@ -1,0 +1,4 @@
+
+  Seleção de esquemas de cores:
+
+  um a rotina poderia selecionar um dos possíveis esquemas de cores instalados. Apenas selecionar entre as opções de esquemas já configurados e prontos para usar.

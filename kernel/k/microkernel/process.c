@@ -732,33 +732,27 @@ int KeExecProcess(int pid, unsigned long *process_address)
  *     Interface para chamr uma rotina para despachar uma thread.
  *     Server em user mode.
  */
-void KeDispatchProcess()
-{
+void KeDispatchProcess(){
     return;
 }
 
-void KeDoProcessReady(int pid)
-{
+void KeDoProcessReady(int pid){
     return;
 };
 
-void KeDoProcessRunning(int pid)
-{
+void KeDoProcessRunning(int pid){
     return;
 };
 
-void KeDoProcessSleeping(int pid)
-{
+void KeDoProcessSleeping(int pid){
     return;
 };
 
-void KeDoProcessZombie(int pid)
-{
+void KeDoProcessZombie(int pid){
     return;
 };
 
-void KeDoProcessDead(int pid)
-{
+void KeDoProcessDead(int pid){
     return;
 };
 
@@ -768,8 +762,7 @@ void KeDoProcessDead(int pid)
  *     Interface para chamar uma rotina de execução de um processo,
  * dado seu id e seu endereço.
  */
-void KeStartProcess(unsigned long pid, unsigned long *task_address)
-{
+void KeStartProcess(unsigned long pid, unsigned long *task_address){
     return;
 };
 

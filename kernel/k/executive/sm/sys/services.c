@@ -1,45 +1,26 @@
 /*
- * File: services.c 
+ * File: sm\sys\services.c 
  *
- * >>>> Quando essa rotina receber uma solicitação de serviço
- * ela envia para a CLASSE correspondente à categoria do serviço solicitado.
+ *       GERENCIA OS SERVIÇOS OFERECIDOS PEAS INTERFACES /sys.h E /system.h.   
  *
- * Descrição:
- *     Arquivo principal do módulo sys do executive.
- *     Serviços oferecidos pelo kernel via systemcall.
- *     O Kernel faz ponte entre Clientes em user mode e servidores que estão 
- * em user mode. O cliente em user mode solicita serviços oferecidos por 
- * servidores que estão em user mode e o kernel faz a ponte entre o cliente
- * e o servidor.
- *     O kernel estabelece essa conexão cliente/servidor atravéz de mensagens 
- * via interrupção, a interrupção é a 200. A interrupção 200 executa a rotina 
- * services(...) para atender as chamadas dos processos cliente. Para atender 
- * essas chamadas o kernel usa rotinas internas ou chama os servidores que 
- * podem estar tanto em kernel modo quanto em user mode.
+ * Obs: Todas as rotinas chmadas por esse módulo devem vir apenas das interfaces
+ * /sys.h e /system.h.
+ *
  *
  * In this file:
- *   + Services
- *   + Dispatch to procedure
- *   + Change procedure
+ *   + services: (public)
+ *   + servicesChangeProcedure: (private)
  *
- * @todo:
- *     Todos os serviços oferecidos estão nos 
- *     arquivos principais dos módulos hal microkernel e executive
- *     e começam com 'sys_'.
- *
- *
- * @todo: LOGO APÓS IDENTIFICAR O NÚMERO DO SERVIÇO SOLICITADO,
- *        CHAMAREMOS AS ROTINAS DE SERVIÇO COM BASE EM CLASSES
- *        DE SERVIÇOS. (Isso é oferecido em system.c). 
- *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
+ *     2017 - Revision.
  *     //...
  */
 
 
 #include <kernel.h>
+
 
 //
 // Constantes internas.
@@ -164,10 +145,10 @@ void *services( unsigned long number,
 	//Obs: Emulando telas de celulares.
 	// 320x480.
 	// Terminal abaixo dos diálogos.
-	unsigned long WindowX = (6*(800/20));  //100;   >          
+	unsigned long WindowX = (2*(800/20));  //100;   >          
 	unsigned long WindowWidth  = 320;               
 	
-    unsigned long WindowY = (4*(600/20)); //100;   V                
+    unsigned long WindowY = (2*(600/20)); //100;   V                
     unsigned long WindowHeight = 480;  
 	
 	unsigned long WindowColor = COLOR_WINDOW;  
@@ -175,13 +156,41 @@ void *services( unsigned long number,
 
     struct rect_d *r;	
 	
+	
+	
+	//
+	// *Importante: Checando se o esquema de cores está funcionando.
+	//
+	
+	if( (void*) CurrentColorScheme == NULL ){
+		printf("StatusBar: CurrentColorScheme");
+		refresh_screen();
+		while(1){}
+	}else{
+		
+		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		    printf("StatusBar: CurrentColorScheme validation");
+		    refresh_screen();
+		    while(1){}			
+		};
+		//Nothing.
+	};	
+	
+	//Configurando as cores.
+	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
+	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow]; 	
+	
+	
+	int desktopID; 
+	desktopID = (int) get_current_desktop_id();		
+	
 	//
 	// Se a área de trabalho for válida, usaremos
 	// suas dimensões, caso não seja, temos um problem.
 	//
 	
 	if(gui->main == NULL){
-		printf("systemServices: main");
+		printf("services: main");
 		refresh_screen();
 		while(1){}
 	};		
@@ -207,15 +216,21 @@ void *services( unsigned long number,
 	switch(number)
 	{
 	    //0 - Null, O processo pode ser malicioso.
-	    case SYS_NULL: systemRam(0,0,0,0,0); break; 	   
+	    case SYS_NULL: 
+	        systemRam(0,0,0,0,0); 
+	        break; 	   
 		
 		//Disco: 1,2,3,4
 		
 		//1 (i/o) Essa rotina pode ser usada por um driver em user mode.
-		case SYS_READ_LBA: systemDevicesUnblocked(36,arg2,arg3,0,0); break;
+		case SYS_READ_LBA: 
+		    systemDevicesUnblocked(36,arg2,arg3,0,0); 
+		    break;
 			
 		//2 (i/o) Essa rotina pode ser usada por um driver em user mode.
-		case SYS_WRITE_LBA: systemDevicesUnblocked(35,arg2,arg3,0,0); break;
+		case SYS_WRITE_LBA: 
+		    systemDevicesUnblocked(35,arg2,arg3,0,0); 
+		    break;
 
 		//3 fopen (i/o)
 		case SYS_READ_FILE:
@@ -262,16 +277,32 @@ void *services( unsigned long number,
 		// (left+x, top+y,color,char)
 		//devemos usar o left e o top da janela com foco d3e entrada.
         //
-		case SYS_BUFFER_DRAWCHAR: 			
-			focusWnd = (void*) WindowWithFocus; //windowList[window_with_focus];
+		// Obs: A biblioteca c99 em user mode usa essa chamada para pintar um caractere
+		// quando implementa a função printf(.). Porém esse caractere é pintado
+		// na janela com o foco de entrada. A intenção é que o carctere seja pintado 
+		// na própria janela do aplicativo.
+		// Outro caso é a digitação de caractere. Quando um caractere é
+		// digitado desejamos que ele seja pintado na janela com o foco de entrada.
+		//
+		// ?? Quando um carctere é pintado em uma janela que não está com o foco 
+		//    de entrada ?? ex: shells, logs ...
+		//
+		case SYS_BUFFER_DRAWCHAR:
+            
+			//
+			// Aqui está pintando o caractere na janela com o foco de entrada.
+			//
+           		
+			focusWnd = (void*) windowList[window_with_focus];
 			if( (void*) focusWnd == NULL ){
 			    break;	
 			};
 			
-			my_buffer_char_blt( (unsigned long) (arg2 + focusWnd->left), 
-			                    (unsigned long) (arg3 + focusWnd->top), 
-								COLOR_BLACK, 
-								(unsigned long) arg4);
+			my_buffer_char_blt( (unsigned long) (arg2 + focusWnd->left), //x.
+			                    (unsigned long) (arg3 + focusWnd->top),  //y.
+								COLOR_BLACK,                             //color. 
+								(unsigned long) arg4);                   //char.
+								
 			break;
 
 		//8
@@ -349,9 +380,11 @@ void *services( unsigned long number,
 
 
         //45 Message Box. 
+		//Ok Funcionou assim.
         case SYS_MESSAGEBOX:
-            //Ok Funcionou assim.		
-            MessageBox(gui->screen, 1, (char *) a3, (char *) a4 );        
+            //(parent window, type, string1, string2)
+            //arg2=5; *test: Colocando aqui o argumento funciona. recebendo da chamada, não funciona.			
+            MessageBox(gui->screen, (int) arg2, (char *) arg3, (char *) arg4 );        
             return NULL;
 			break;
 		
@@ -364,11 +397,59 @@ void *services( unsigned long number,
             WindowName = (char*) a4;
 			goto do_create_window;
             break;
+			
+		//50~59 Window suppot, manipulação de janelas	
 
+		//50 resize window
+		case SYS_BUFFER_RESIZEWINDOW:		
+		    //(handle,x,y)
+		    return (void*) resize_window( (struct window_d*) arg2, arg3, arg4);
+		break;
+		
+		//51 redraw window.
+		case SYS_BUFFER_REDRAWWINDOW:
+		    //(handle)
+		    return (void*) redraw_window((struct window_d*) arg2);
+		break;
+		
+		//52  replace window.
+		case SYS_BUFFER_REPLACEWINDOW:
+		    //(handle,x,y)
+		    return (void*) replace_window( (struct window_d*) arg2, arg3, arg4);
+		break;
+		
+		//53 maximize window 
+		case SYS_BUFFER_MAXIMIZEWINDOW:
+		    //(handle)
+		    MaximizeWindow((struct window_d*) arg2);
+		break;
+		
+		//54 minimize window
+		case SYS_BUFFER_MINIMIZEWINDOW:
+		    //(handle)
+		    MinimizeWindow( (struct window_d *) arg2);
+		break;
+		
+		//55 Get foreground window.
+		case SYS_BUFFER_GETFOREGROUNDWINDOW:
+		    return (void*) windowGetForegroundWindow();
+		break;
+		
+		//56 set foreground window.
+		case SYS_BUFFER_SETFOREGROUNDWINDOW:
+		    return (void*) windowSetForegroundWindow((struct window_d*) arg2);
+		break;
+		
+		
 		//57.	
-		case SYS_REGISTERWINDOW: systemRam(41,(unsigned long) hWnd,0,0,0); break;
+		case SYS_REGISTERWINDOW: 
+		    systemRam(41,(unsigned long) hWnd,0,0,0); 
+			break;
+			
 		//58.	
-		case SYS_CLOSEWINDOW: systemRam(53,(unsigned long) hWnd,0,0,0); break;
+		case SYS_CLOSEWINDOW: 
+		    systemRam(53,(unsigned long) hWnd,0,0,0); 
+			break;
 			
         //60
 		case SYS_SETACTIVEWINDOW:			
@@ -381,11 +462,19 @@ void *services( unsigned long number,
 			break;
 
         //62
-		case SYS_SETFOCUS: systemRam(71,(unsigned long) hWnd,0,0,0); break;
+		case SYS_SETFOCUS: 
+		    systemRam(71,(unsigned long) hWnd,0,0,0); 
+			break;
+			
         //63
-		case SYS_GETFOCUS: return (void*) systemRam(72,0,0,0,0); break;
+		case SYS_GETFOCUS: 
+		    return (void*) systemRam(72,0,0,0,0); 
+			break;
+			
         //64
-		case SYS_KILLFOCUS: systemRam(73,(unsigned long) hWnd,0,0,0); break;
+		case SYS_KILLFOCUS: 
+		    systemRam(73,(unsigned long) hWnd,0,0,0); 
+			break;
 
 		//65-reservado pra input de usuário.	
 		//case 65:
@@ -429,7 +518,9 @@ void *services( unsigned long number,
 			break;
 		
         //71 		
-		case SYS_FORK: return (void*) systemIoCpu(4,0,0,0,0); break;	
+		case SYS_FORK: 
+		    return (void*) systemIoCpu(4,0,0,0,0); 
+			break;	
 
 		//72 - Create thread.	
         case SYS_CREATETHREAD:			
@@ -486,7 +577,9 @@ void *services( unsigned long number,
 		    break;
 		
 		//90 Coletor de threads Zombie. (a tarefa idle pode chamar isso.)		
-		case SYS_DEADTHREADCOLLECTOR: systemIoCpu(1,0,0,0,0); break;
+		case SYS_DEADTHREADCOLLECTOR: 
+		    systemIoCpu(1,0,0,0,0); 
+			break;
 			
 	    //
         // 99,100,101,102 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
@@ -542,7 +635,9 @@ void *services( unsigned long number,
 
 			
 		//110 Reboot. (Teclado é legado, é desbloqueado)
-	    case SYS_REBOOT: systemDevicesUnblocked(2,0,0,0,0); break;
+	    case SYS_REBOOT: 
+		    systemDevicesUnblocked(2,0,0,0,0); 
+			break;
 			
 		//...
 		
@@ -553,7 +648,9 @@ void *services( unsigned long number,
 	    //@todo: Essa rotina precisa ser aprimorada. Mas a chamada deve ser 
 		// essa mesma.
 		//
-		case SYS_DRIVERINITIALIZED: return (void*) systemLinkDriver(arg2,arg3,arg4); break;
+		case SYS_DRIVERINITIALIZED: 
+		    return (void*) systemLinkDriver(arg2,arg3,arg4); 
+			break;
 			
 		//130
 		case SYS_DRAWTEXT:
@@ -562,6 +659,20 @@ void *services( unsigned long number,
 			argString = (unsigned char*) arg4;
 		    draw_text( gui->screen, arg2,  arg3, COLOR_TEXT, argString);
 			break;
+			
+		//131
+		// Pintar o caractere especificamente na janela com o foco de entrada.          
+		case SYS_BUFFER_DRAWCHAR_WWF: 
+			focusWnd = (void*) windowList[window_with_focus];
+			if( (void*) focusWnd == NULL ){
+			    break;	
+			};
+			
+			my_buffer_char_blt( (unsigned long) (arg2 + focusWnd->left), //x.
+			                    (unsigned long) (arg3 + focusWnd->top),  //y.
+								COLOR_BLACK,                             //color. 
+								(unsigned long) arg4);                   //char.
+    		break;		
 		
 		
 		case SYS_GETCURSORX:
@@ -585,14 +696,31 @@ void *services( unsigned long number,
 			setClientAreaRect( arg2, arg3, arg4, 0);
             break;
 
-
-			
-			
+		//199 - Garbage Collector.	
+		case SYS_GC:
+		    gc();
+		    break;
+		
 		//200 - Envia um sinal para um processo.	
 		case SYS_SENDSIGNAL:
 		    //argumentos (process handle, signal number).
 		    signalSend((void*) a2, (int) arg3);
 		    break;
+			
+		//226 get
+        case SYS_GET_KERNELSEMAPHORE:
+            return (void*) __ipc_kernel_spinlock;
+            break;
+        
+        //227 close critical section	
+		case SYS_CLOSE_KERNELSEMAPHORE:
+		    __ipc_kernel_spinlock = 0;
+			return;
+			
+		//228 open critical section
+		case SYS_OPEN_KERNELSEMAPHORE:
+		    __ipc_kernel_spinlock = 1;
+			return;
 		
 		//Info. (250 ~ 255).
 		
@@ -614,9 +742,14 @@ void *services( unsigned long number,
 			
 			
 		//254 - Show PCI info.	
-		case SYS_SHOWPCIINFO: systemDevicesBlocked(1,0,0,0,0); break;  
+		case SYS_SHOWPCIINFO: 
+		    systemDevicesBlocked(1,0,0,0,0); 
+			break;
+			
 		//255 - Mostra informações sobre o kernel.	
-		case SYS_SHOWKERNELINFO: systemRam(1,0,0,0,0); break;
+		case SYS_SHOWKERNELINFO: 
+		    systemRam(1,0,0,0,0); 
+			break;
 			
 		//
 		// @todo:
@@ -645,34 +778,44 @@ void *services( unsigned long number,
 do_create_window:	
 	
 	//
-	// A primeira coisa a fazer é checar se solicitaram a criação
-	// de um tipo válido de janela.
-	// Obs: Ainda não conseguimos receber todos os argumentos que essa
-	// rotina exige. Uma opção é que várias chamadas sejam feitas,
-	// até que tenhamos todos os argumentos.
-	// O argumento tipo é fundamental. Pois com o tipo, podemos oferecer 
+	// A primeira coisa a fazer é checar se solicitaram a criação de um tipo 
+    // válido de janela.
+    //
+	// Obs: Ainda não conseguimos receber todos os argumentos que essa rotina 
+    // exige. Uma opção é que várias chamadas sejam feitas, até que tenhamos 
+    // todos os argumentos.
+    //
+	// O argumento 'tipo' é fundamental. Pois com o tipo, podemos oferecer 
 	// alguns parâmetros padronizados, característicos do tipo em questão.
     //
 	
 	//
 	// Uma solução elegante é a criação de uma classe de janela.
+    //
 	// steps:
-	// (*1) - Chamada avisando sobre o início de uma sequencia de chamadas
-	//      de rotinas de pintura. 
-	// *2 - Envio de argumentos que preencherão a estrutura de classe atual 
-	//      e temporária, destinada ao suporte a criação de janelas.
-	// *3 - Chamada da rotina de criação da janela com envio de alguns argumentos.
-	//      (Nesse momento a rotina de criação da janela deve considerar os 
-	//     elementos padrões característicos do tipo solicitado, deve considerar 
-	//     os argumentos enviados e a estrutura de classe antes preechida pela
-	//     chamada anterior.
+    // =====
+    //
+	// (*1) - Chamada avisando sobre o início de uma sequência de chamadas de 
+    //        rotinas de pintura. Efetuando algum travamento.
+    //  
+	//  *2  - Envio de argumentos que preencherão a estrutura de classe atual 
+	//        e temporária, destinada ao suporte a criação de janelas.
+    //
+	//  *3  - Chamada da rotina de criação da janela com envio de alguns 
+    //        argumentos. (Nesse momento a rotina de criação da janela deve 
+    //        considerar os elementos padrões característicos do tipo 
+    //        solicitado, deve considerar os argumentos enviados e a estrutura 
+    //        de classe antes preechida pela chamada anterior.
+    //
 	// (*4) - Por último, uma chamada avisa sobre o fim das chamadas de rotinas de 
-	//     pintura.
+	//        pintura. Efetuando algum destravamento.
+    //
 	// A IDEIA É QUE UM PROCESSO NÃO SEJA INTERROMPIDO ENQUANTO ESTÁ EFETUANDO
-	// SUAS ROTINAS DE PINTURA.
-	//
+	// SUAS ROTINAS DE PINTURA E QUE ÁREAS DE MEMÓRIA COMPARTILHADA TENHA O
+    // O USO COORDENADO NA HORA DAS ROTINAS DE PINTURA.
 	//
 	
+	//?? @TODO
 	//if(WindowType >= 0 || WindowType <= 5){
 	//	
 	//}
@@ -681,54 +824,72 @@ do_create_window:
 	
 	//
 	// @todo: bugbug.
-	// Obs: A parent window é 'gui->screen', talvez poderia ser 'gui->desktop'.
-	//      Talvez essa estrutura nem esteja inicializada ainda no ambiente de logon.
-	//      O usuário só pode criar janelas na área de trabalho do desktop atual.
+	// Obs: A parent window é 'gui->screen'. Talvez essa estrutura nem esteja 
+    // inicializada ainda no ambiente de logon.
+	// Obs: O usuário só pode criar janelas na área de trabalho do desktop atual.
+    // @todo: A área de trabalho do desktop atual pode ser representada por
+    // uma estrutura de retângulo na estrutura do desktop e/ou uma estrutura de
+    // retângula na estrututra gui->.
     //      ...
     //
 	
 	//
-	// @todo: A chamada deve receber, por argumento, um ponteiro para um pacote
-	//        de informações sobre a janela, contendo sua classe e outros elementos. 
+	// @todo: 
+    // Opção: A chamada deve receber, por argumento, um ponteiro para um pacote
+	//        de informações sobre a janela, contendo sua classe e outros elementos.
+	//        Esse array ou estrutura contendo informações sobre a janela 
+	// a ser construída pode ser preenchido aos poucos, atravéz de diversas chamadas.
+	// Por fim, será uma estrutura de dados com bastante informações e só poderá 
+	// ser usada depois que uma flag sinalizar que temos informações suficientes.  
+	//
+
+
+	//
+	// *Importante: Checando se o esquema de cores está funcionando.
 	//
 	
-	//@todo: deletar
-	//r = NULL;
-	
-	/*
-	if( (void*) r == NULL  )
-	{
-	    NewWindow = (void*) CreateWindow( WindowType, 1, WindowView, WindowName, 
-	                                  WindowX, WindowY, WindowWidth, WindowHeight,									  
-								      gui->screen, 0, 0, WindowColor);		
+	if( (void*) CurrentColorScheme == NULL ){
+		printf("services: CurrentColorScheme");
+		refresh_screen();
+		while(1){}
+	}else{
+		
+		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		    printf("services: CurrentColorScheme validation");
+		    refresh_screen();
+		    while(1){}			
+		};
+		//Nothing.
 	};
+	
+	//
+	// Nesse momento estamos atribuindo a cor padrão de janelas 
+	// para as janelas que criadas pelos aplicativos através de system calls.
+	// Não há problema nisso por enquanto.
+	//
+	
+	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
+	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
 
-	if( (void*) r != NULL  )
-	{
-		
-	    //largura
-	    if( r->cx == 0 ){ r->cx = WindowWidth; }
-	
-	    //altura.
-	    if( r->cy == 0 ){ r->cy =  WindowHeight; }
-		
-	    NewWindow = (void*) CreateWindow( WindowType, 1, WindowView, WindowName, 
-	                                  r->x, r->y, r->cx, r->cy,									  
-								      gui->screen, 0, 0, WindowColor);		
-	};
-	
-*/
-	
-	//Cores provisórias.
-	WindowColor = COLOR_WINDOW;
-	WindowClientAreaColor = COLOR_TEST_2;
+
+    //
+    // Importante:
+	// Nesse momento é fundamental saber qual é a parent window da janela que vamos criar 
+	// pois a parent window terá as margens que nos guiam.
+	// Essa parent window pode ser uma aba de navegador por exemplo.
+	// >> O aplicativo deve enviar o ponteiro da janela mãe.
+    //	
 	
 	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
-	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento.
+	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
+	//com um endereço da área de memória do app.
     NewWindow = (void*) CreateWindow( WindowType, WindowStatus, WindowView, WindowName, 
 	                                  WindowX, WindowY, WindowWidth, WindowHeight,									  
-								      gui->screen, 0, WindowClientAreaColor, WindowColor);
+								      gui->screen, desktopID, WindowClientAreaColor, WindowColor);
 
+	
+	struct thread_d *t;
+	
 	if( (void*) NewWindow == NULL )
 	{ 
         //?? Mensagem.
@@ -754,6 +915,15 @@ do_create_window:
 		
 		//@todo: Não registrar, quem criou que registre a janela.
 		//RegisterWindow(NewWindow);
+		
+		//
+		// Se a tarefa atual está pintando, vamos melhorar a sua prioridade.
+		//
+		
+		t = (void*) threadList[current_thread];
+		
+		set_thread_priority( t, PRIORITY_HIGH4);
+		
 	    return (void*) NewWindow; 
 	};
 

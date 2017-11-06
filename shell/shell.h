@@ -11,7 +11,9 @@
  * diretório deve ter várias pastas, uma para cada um dos comandos principais, 
  * como shutdown. Cda pasta é um programa que o Shell vai chamar.
  *
- * Versão 1.0, 2016.
+ * History:
+ *     2016 - Created by Fred Nora.
+ *     2017 - procedure and command stuff.
  */
  
 //
@@ -45,9 +47,17 @@ unsigned long foregroung_color;  //texto.
 static const char usage[] =
     "Usage: shell [arguments...]\n"
     "       shell -help             Display this help message and exit.\n"
-    "       shell -version          Output version information and exit.";
+    "       shell -version          Output version information and exit.\n";
 	//...
  
+static const char help_banner[] =
+    "commands: makeboot, format, debug, dir, newfile, newdir,\n"
+    "mbr, root, start, help, cls, reboot, exit, hd, save,\n"
+    "install, boot, service, slots, version \n";
+	//... 
+	
+	
+static const char init_file_name[] = "INIT    TXT";	
  
 //
 // Structures.
@@ -75,10 +85,6 @@ struct shell_metrics_d
 };
 shell_metrics_t *ShellMetrics;
 //...
-
-
-//int app_main(int argc, char *argv[]); 
-
  
 //
 // End.

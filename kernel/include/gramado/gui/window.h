@@ -1,5 +1,5 @@
 /*
- * File: uigm\window.h 
+ * File: gramado\gui\window.h 
  *
  * Descrição:
  *    Funções e parâmetros para o kernel controlar a interface gráfica 
@@ -11,6 +11,10 @@
  *     Versão: 1.0, 2016 - Revisão.
  */
 
+ 
+//Definindo as dimensões padrão. 
+//#define DEFAULT_SCREEN_WIDTH  800
+//#define DEFAULT_SCREEN_HEIGHT 600
  
 // Número máximo de janelas.
 #define WINDOW_COUNT_MAX 256
@@ -43,6 +47,11 @@
 #define MSG_ACTIVATE      11
 #define MSG_SHOWWINDOW    12 
 #define MSG_SETCURSOR     13
+#define MSG_HIDE          14
+#define MSG_MAXIMIZE      15
+#define MSG_RESTORE       16
+#define MSG_SHOWDEFAULT   17
+
 //keyboard (20-29)
 #define MSG_KEYDOWN       20
 #define MSG_KEYUP         21
@@ -80,13 +89,40 @@
 #define WT_EDITBOX       2 // igual simples, mais uma bordinha preta.
 #define WT_OVERLAPPED    3 //sobreposta(completa)(barra de titulo + borda +client area)
 #define WT_POPUP         4 //um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
-#define WT_BUTTON_DOWN   5 //rever
-#define WT_BUTTON_UP     6 //rever
+//#define WT_BUTTON_DOWN   5 // cancelado
+//#define WT_BUTTON_UP     6 // cancelado
+
+
+
+// window style
+#define WINDOW_STYLE_FLOATING 1000 
+#define WINDOW_STYLE_DOCKING  2000  //(atracada em algum canto.)
+//...
+
+
+// window status
+#define WINDOW_STATUS_ACTIVE       1
+#define WINDOW_STATUS_INACTIVE     0
+//...
+
+//window relationship status. (seu status em relação as outras janelas.)
+//Obs: tem uma estreita ligação com o status da thread que está trabalahndo com ela 
+//e com a prioridade dessa thread e do processo que a possui.
+// *** RELAÇÃO IMPLICA PRIORIDADE ***
+#define WINDOW_REALATIONSHIPSTATUS_FOREGROUND     1000
+#define WINDOW_REALATIONSHIPSTATUS_BACKGROUND     2000
+#define WINDOW_REALATIONSHIPSTATUS_OWNED          3000  //Possuida por outra janela.
+#define WINDOW_REALATIONSHIPSTATUS_ZAXIS_TOP      4000
+#define WINDOW_REALATIONSHIPSTATUS_ZAXIS_BOTTOM   6000
+//...
+
+
+
 
 //apresentação.
 #define VIEW_NULL      0
-#define VIEW_FULL      1000
-#define VIEW_MAXIMIZED 1001
+#define VIEW_FULL      1000  // * Full screen.
+#define VIEW_MAXIMIZED 1001  
 #define VIEW_MINIMIZED 1002
 #define VIEW_NORMAL    1003  //Normal (restaurada)
 //...
@@ -257,25 +293,26 @@ typedef enum {
 
 
 //enumerando os elementos gráficos
+//color scheme index.
 typedef enum {
 	
-	csiNull,        //0
-	csiDesktop,     //1 área de trabalho.
+	csiNull,                    //0
+	csiDesktop,                 //1 área de trabalho.
 
 	//window
-	csiWindow,        //2
-	csiWindowBackground,  //3
-	csiActiveWindowBorder,	 //4
-	csiInactiveWindowBorder, //5
+	csiWindow,                  //2
+	csiWindowBackground,        //3
+	csiActiveWindowBorder,	    //4
+	csiInactiveWindowBorder,    //5
 	                    
 	//bar
-	csiActiveWindowTitleBar,  //6	
-	csiInactiveWindowTitleBar,	 //7
-	csiMenuBar,   //8
-	csiScrollBar,  //9
-	csiStatusBar,	//10
+	csiActiveWindowTitleBar,    //6	
+	csiInactiveWindowTitleBar,  //7
+	csiMenuBar,                 //8
+	csiScrollBar,               //9
+	csiStatusBar,	            //10
 	
-	csiMessageBox,  //11
+	csiMessageBox,              //11
 	//...
 	
 	//@todo: Window 'shadow' (black??)
@@ -309,6 +346,20 @@ color_scheme_t HumilityColorScheme;
 color_scheme_t PrideColorScheme;
 //... 
  
+ 
+ 
+//cinza para pintar janela
+//a janela tem camadas que vai do mais escuro para o mais claro.
+#define xCOLOR_BLACK 0x00000000  //preto
+#define xCOLOR_GRAY1 0x20202000  //cinza mais escuro
+#define xCOLOR_GRAY2 0x40404000  //cinza
+#define xCOLOR_GRAY3 0x60606000  //cinza
+#define xCOLOR_GRAY4 0x80808000  //cinza
+#define xCOLOR_GRAY5 0xa0a0a000  //cinza
+#define xCOLOR_GRAY6 0xc0c0c000  //cinza
+#define xCOLOR_GRAY7 0xe0e0e000  //cinza mais clarinho
+#define xCOLOR_WHITE 0xffffff00  //branco 
+
 
 //WIN23
 //TRÊS TIPOS DE CINZA.
@@ -701,6 +752,21 @@ color_scheme_t PrideColorScheme;
 #define CLOCK_BASE  (KERNEL_COL_MAX-40)
 
 
+//=========================================
+//    ****    KERNEL WINDOW    ****
+//Definições padronizadas para janelas do kernel usadas para 
+//fornecer informações sobre o sistema.
+// (Retângulo grande no topo da tela.)
+#define KERNEL_WINDOW_DEFAULT_LEFT 0
+#define KERNEL_WINDOW_DEFAULT_TOP  0
+#define KERNEL_WINDOW_DEFAULT_WIDTH  800
+#define KERNEL_WINDOW_DEFAULT_HEIGHT (600/4) 
+#define KERNEL_WINDOW_DEFAULT_CLIENTCOLOR  xCOLOR_GRAY2
+#define KERNEL_WINDOW_DEFAULT_BGCOLOR      xCOLOR_GRAY1
+//...
+
+
+
 //
 // ******** ESSA VARIÁVEL BLOQUEIA O FOCO NA JANELA DO DESENVOLVEDOR   *****
 //
@@ -788,6 +854,38 @@ unsigned long  EDITBOX_BG_COLOR;
 unsigned long  EDITBOX_TEXT_COLOR;
 
 
+//estrutura para botões.
+typedef struct button_d button_t;
+struct button_d
+{
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+    int used;
+    int magic;
+
+    int selected;	
+    unsigned long border1; //color
+    unsigned long border2; //color	
+	
+    struct window_d *window; //A qual janela o botão pertence.
+    unsigned char *string; //label
+    unsigned long type; //tipo de botão.
+    unsigned long x;    //deslocamento em relação à margem da janela
+    unsigned long y;  //deslocamento em relação à margem da janela
+    unsigned long width; 
+    unsigned long height; 
+    unsigned long color;
+	
+	//More ??
+				  
+    struct button_d *Next;  //proximo botão dentro da mesma janela.??
+};
+//Botões na janela principal.				  
+button_t *mainButton1;  
+button_t *mainButton2;  
+button_t *mainButton3;  
+//...
 
 /*
  * taskbar_d: 
@@ -915,11 +1013,12 @@ struct rect_d
     unsigned long cx;
     unsigned long cy;
 
+	
     unsigned long width;
     unsigned long height;
+
 	unsigned long left;
-	unsigned long top;
-	
+	unsigned long top;	
 	unsigned long right;
 	unsigned long bottom;
 	
@@ -987,7 +1086,19 @@ struct window_d
 	//struct window_class_d *windowClass;
 	
 	unsigned long type;                    //tipo ... (editbox, normal, ...)  style???
+	
+	/*
+     Número da aba do navegador que a janela está.
+     Se for 0, então a janela está no desktop.
+    */
+	int tab;
     
+	//window style:
+	//WINDOW_STYLE_FLOATING (flutuante) 
+	//WINDOW_STYLE_DOCKING   (atracada em algum canto)
+	int style;   
+	
+	
 	//procedure support. (poderia ser um argumento ou elemento da classe.)
 	unsigned long procedure;               //procedimento da janela
     struct window_procedure_d *wProcedure; //procedure struct
@@ -1003,25 +1114,38 @@ struct window_d
 	// Características dessa janela..
 	//
 
-	int active;    //Se é a janela ativa ou não.
-	int focus;     //Se tem o foco de entrada ou não.
+	//*full screen mode = modo tela cheia. 
+	//( utiliza a resolução atual do dispositivo )
+	// deve ser a janela em primeiro plano. acima de todas as outras.
+	//mas podemos configurar para que uma jenela esteja em full screen 
+	//enquanto outra janela é a janela ativa e ainda outra tenha o foco de entrada.
+	//uma janela em modo full screen pode conter barras de rolagem.
+	//*embedded mode = dentro de uma janela ou de um navegador. 
+
+    //int active;    //FAST FLAG. Essa será a flag de ativa ou não. (decidido isso)
+    //int focus;     //Se tem o foco de entrada ou não.
     int view;      //Estado: (Full,Maximized,Minimized...)	
-	unsigned long status;  //?? @todo: Deletar..
+    //unsigned long status;                //ATIVA OU NÃO.
+    unsigned long relationship_status;   //seu estatus de relacionamento com outras janelas.
+	
+	//ordem na pilha de janelas do eixo z.
+	//A janela mais ao topo é a janela foreground.
+	int z_axis_order; 
 
 	//dimensões e margens.
     unsigned long x;           //deslocamento x
     unsigned long y;           //deslocamento y 
-	unsigned long width;       //largura
+    unsigned long width;       //largura
     unsigned long height;      //altura    
-	unsigned long left;        //margem esquerda 
+    unsigned long left;        //margem esquerda 
     unsigned long top;         //margem superior
     unsigned long right;       //margem direita  
     unsigned long bottom;      //margem inferior       
     
     unsigned long color_bg;    //cor  
     unsigned long clientrect_color_bg;    //cor do retãngulo da área do cliente.
-    //...definir mais cores.	
-	
+    //...definir mais cores.
+
 
 	//?? Se mudar para Rect pode deletar alguns elementos acima
 	//como x, y, width ...
@@ -1044,6 +1168,9 @@ struct window_d
 	int clientAreaUsed;
 	int statusbarUsed;
 	int scrollbarUsed;
+	int minimizebuttonUsed;
+	int maxmizebuttonUsed;
+	int closebuttonUsed;
 	//Continua.
 	
 	//Msg support.
@@ -1108,7 +1235,7 @@ struct window_d
 	//
 	
 	struct window_d *parent;	  //Parent window.	
-    unsigned long parentid;           //(Número da janela mãe).
+    unsigned long parentid;       //(Número da janela mãe).
 	
 	//
 	// Child support.
@@ -1122,10 +1249,10 @@ struct window_d
 	// Client window support.
 	//
     
-	//Client window.( A área de cliente pode ter uma moldura na forma de janela.)
+	//Client window.
+    //é a janela propriamente dita, excluindo a moldura e a barra de rolagem.
 	struct window_d *client_window;   	
-	//O retângulo de input e output para cliente.
-	struct rect_d *rcClient;     // Client, usar '.'	
+	struct rect_d *rcClient;     	
 	
 	
 	//
@@ -1156,10 +1283,13 @@ struct window_d
 	struct menu_d *defaultMenu;     //menu da janela (*importante)
 	//...
 	
-    // Texto para o caso da janela ser um item de menu.	
+    // Flag par indicar se a janela é um item de menu.	
 	//ou um botão.
-	int isMenu;
-	int isButton;
+	int isMenu;   //deletar??
+	int isButton; //deletar??
+	//int isIcon; //deletar??
+	//...
+	
 	int selected;     //seleção  de item de menu.
     const char *text; //@todo usar unsigned char.
 
@@ -1192,8 +1322,8 @@ struct window_d
 	//unsigned long bgcolor;		// Background color.
 	//unsigned long fgcolor;		// Foreground color. 
 	
-	
-
+	struct button_d *current_button;  //Botão atual.      
+    struct button_d *buttonList;      //Lista encadeada de botões em uma janela.
 	
 	//
 	// Mouse cursor support ???
@@ -1229,6 +1359,7 @@ window_t *window_Conductor2;
 window_t *window_Conductor;
 window_t *window_rootConductor;
 
+
  /*
  * Lista de janelas.
  * @todo: Na verdade poderia ser alocação dinâmica
@@ -1236,7 +1367,97 @@ window_t *window_rootConductor;
  */ 
 unsigned long windowList[WINDOW_COUNT_MAX];
 
+//
+// Browser support. (SHELL.BIN)
+//
 
+#define TABWINDOW_COUNT_MAX 12  //F1 à F12.
+
+/* Essa é a aba onde os lementos devem ser criados ...
+quando um aplicativo chamar serviços do kernel para criar elementos na aba.*/
+int current_tab;
+
+window_t *BROWSERWINDOW;    //Ponteiro para a janela do navegador.
+window_t *TABWINDOW;        //ponteiro para a janela da tab atual..
+
+//janela full screen que será usada pelo navegador...
+//essa janela deve ter as dimensões da tela...
+//Obs: já existe uma janela com essas características ... que é a janela 
+//gui->screen ... lenbrando que não queremos que a janela gui->screen tenha 
+//os valores de sua estrutura alterados ... pois refletem as características do dispositivo.
+//Importante: Estragar essa estrutura pode causar muitos problemas.
+window_t *FULLSCREEN_TABWINDOW;   
+
+/*
+ estrutura para tabs do navegador do kernel.
+
+ */
+typedef struct browser_tab_d browser_tab_t;
+struct browser_tab_d
+{
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+    int used;
+    int magic;
+	
+	int id;   //Identificação da aba.
+	
+	char *name;
+	
+	/* 
+	  *Importante:
+	       Tipo de aba. Temos três tipos basicamente:
+		   + 1 = Aba de console. para aplicativos de console.
+		   + 2 = Aba de janela. para aplicativos de janela.
+		   + 3 = Aba de navegador. para páginas da internet.
+		   
+	 */
+	int type;
+	
+	/* talvez teremos 2 modos, maximizado e full screen*/
+	int view; 
+	
+	/*
+	 Qual é a janela que constitui a aba. 
+	 Isso nos dá muitas informações sobre a aba.
+	 Toda a sua métrica ...
+	 */
+	struct window_d* window;
+	
+	/*
+      Importante:	
+	      Dedicated buffer:
+		  ??
+	 */
+	/*void *buffer;*/
+
+    	
+
+    struct browser_tab_d *next;    	
+};
+//browser_tab_t *CurrentTab;
+//browser_tab_t *BrowserTab;
+//...
+
+unsigned long browsertabList[TABWINDOW_COUNT_MAX]; //lista de ponteiros para estruturas de tabs.
+/*
+ * zorderList[] support.
+ *     Sobreposição de janelas.    
+ *     ?? Precisamos reorganizar a lista ??
+ *     ?? seria melhor uma lista encadeada ??
+ *     ??e quando fecharem uma janela no meio da lista ??
+ *
+ *  >> Quando criamos uma janela ela é incluída no primeiro lugar vago da lista.
+ *  >> quando deletamos uma janela, apenas excluimos ela da lista, não precisamos reorganizar.
+ *  >> uma janelas minimizada é excluida dessa lista, é zerada z_axis_order na sua estrutura.
+ *  >> repintaremos começando do zero.
+ */
+
+ #define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
+unsigned long zorderList[ZORDER_COUNT_MAX];
+
+int zorderCounter;         //contador de janelas incluidas nessa lista.
 
 
 
@@ -1657,14 +1878,13 @@ int menubarX();
 
 
 
-
 //Color.
 void set_up_color(unsigned long color);
 void set_up_text_color(unsigned char forecolor, unsigned char backcolor);
 							
 
 //Button.
-void draw_button( struct window_d *window,
+void *draw_button( struct window_d *window,
                   unsigned char *string, 
                   unsigned long type, 
                   unsigned long x, 
@@ -1677,13 +1897,43 @@ void MessageBox( struct window_d *parent_window, int type,char *title, char *str
 void DialogBox(struct window_d *parent_window, int type, char *title, char *string);
 
 
-//
 // Focus support.
-//
-
 void SetFocus( struct window_d *window );
-int GetFocus();                               //Pega o id da janela com o foco de entrada.
+void *GetFocus();                             
 void KillFocus( struct window_d *window );
+
+//foreground window support
+void *windowGetForegroundWindow();
+int windowSetForegroundWindow(struct window_d *window);
+
+//parent.
+void *GetParentWindow(struct window_d * hwnd);
+
+//desktop
+void *GetWindowDesktop(struct window_d * hwnd);
+
+
+// pegando ponteiros para estrutura de janela na estrutura 'gui->'.
+void *guiGetScreenWindow();
+void *guiGetDeveloperScreenWindow();
+void *guiGetBackgroundWindow();
+void *guiGetLogoWindow();
+void *guiGetDesktopWindow();
+void *guiGetTaskbarWindow();
+void *guiGetMainWindow();
+void *guiGetStatusbarWindow();
+void *guiGetGridWindow();
+void *guiGetMenuWindow();
+void *guiGetInfoboxWindow();
+void *guiGetTooltipWindow();
+void *guiGetMessageboxWindow();
+void *guiGetDialogboxWindow();
+void *guiGetDebugWindow();
+void *guiGetMbhWindowWindow();
+void *guiGetTopbarWindow();
+void *guiGetNavigationbarWindow();
+void *guiGetShellWindowWindow();
+void *guiGetShellClientWindowWindow();
 
 
 //
@@ -1770,10 +2020,12 @@ void set_current_window(struct window_d *window);
 void *get_current_window();
 int resize_window(struct window_d *window, unsigned long cx, unsigned long cy);		  
 int replace_window(struct window_d *window, unsigned long x, unsigned long y);			  
-int redraw_window(struct window_d *window);
+int redraw_window(struct window_d *window);   //redraw window. 
+int redraw_screen();                          //redraw all windows.
 int is_window_full(struct window_d *window);
 int is_window_maximized(struct window_d *window);
 int is_window_minimized(struct window_d *window);
+
 int get_active_window();
 void set_active_window(struct window_d *window);
 void change_active_window(int Id);
@@ -1811,6 +2063,8 @@ void windowShowWWFMessageBuffers(); //mostra o buffer de mensagens da janela com
 //color support.
 void windowSetUpColorScheme();
 
+/*Inicialização do sistema de suporte ao navegador shell*/
+int windowInitializeBrowserSupport();
 
 /*
  * CreateWindow:

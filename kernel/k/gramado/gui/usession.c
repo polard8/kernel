@@ -1,5 +1,5 @@
 /*
- * File: usession.c
+ * File: gramado\gui\usession.c
  *
  * Descrição:
  *     User Session.
@@ -8,8 +8,8 @@
  *     Secões usuário.
  *
  * *importante:
- *     Quando um usuário loga, ele cria uma seção, que conterá uma 
- * window station, que conterá um desktop, que conterá janelas.
+ *     Quando um usuário loga, ele cria uma 'seção', que conterá uma 
+ * 'window station', que conterá um 'desktop', que conterá 'janelas'.
  *
  * Versão 1.0, 2015, 2016.
  */
@@ -83,7 +83,7 @@ void *CreateUserSession(int userID)
 	};
 	//Nothing.
 fail:
-    printf("CreateUserSession error: Cant create!\n");
+    printf("CreateUserSession error: Can't create!\n");
     refresh_screen();
 	while(1){};
 	return NULL;	

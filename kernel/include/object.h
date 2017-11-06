@@ -139,6 +139,9 @@
 #define OBJECTS_KM         74 //Kernel mode??
 #define OBJECTS_UM       75  //Use mode ??
 #define OBJECTS_COLOR_SCHEME 76   //ObjectTypeColorScheme
+#define OBJECTS_BUTTON 77
+#define OBJECTS_GRID 78
+
 //...
 
 //

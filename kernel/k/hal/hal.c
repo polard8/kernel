@@ -47,6 +47,7 @@
 #include <kernel.h>
 //#include "hidata.h"  //Hal Internal Data.
 
+//unsigned char  HalName[] = "HAL LAYER";
 
 //
 // Variáveis importadas.

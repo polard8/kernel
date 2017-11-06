@@ -161,11 +161,6 @@ static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginaç
 
 
 
-
-//Protótipo de método interno..
-void *systemNull();
-
-
 /*
  * Classes:
  *     O que segue são as funções principais do Kernel. São seis rotinas 
@@ -972,7 +967,9 @@ void *systemDevicesUnblocked( int number,
 		break;
 
 		//Reboot via teclado.
-		case 2: sys_reboot(); break;
+		case 2: 
+		    sys_reboot(); 
+			break;
 
        /*
         * Recebendo mensagem de digitação vinda do driver de teclado ou
@@ -1260,16 +1257,22 @@ void *systemDevicesUnblocked( int number,
 	
 	    //msg.msg Pega na fila de mensagens da janela com o foco de entrada.
 	    case 44:
+		    //O aplicativo passou um handle via argumento.
+			// ?? mas esse handle é válido ??
 	        return (void*) windowGetMessage( (struct window_d*) arg1 );
             break;
 	
 	    //msg.long1
 	    case 45: 
+		    //O aplicativo passou um handle via argumento.
+			// ?? mas esse handle é válido ??
 	        return (void*) windowGetLong1( (struct window_d*) arg1 );
 		    break;
 	
 	    //msg.long2
 	    case 46:
+		    //O aplicativo passou um handle via argumento.
+			// ?? mas esse handle é válido ??
 	        return (void*) windowGetLong2( (struct window_d*) arg1 );
 		    break;
 
@@ -1339,13 +1342,19 @@ void *systemDevicesBlocked( int number,
 			break;
 
 		//Show PCI info.
-		case 1: sys_showpciinfo(); break;
+		case 1: 
+		    sys_showpciinfo(); 
+			break;
 	
 	    //Shut down.
-		case 2: systemShutdown(); break;
+		case 2: 
+		    systemShutdown(); 
+			break;
 			
 		//mostra informações de dispositivos.	
-		case 3:	systemShowDevicesInfo(); break;
+		case 3:	
+		    systemShowDevicesInfo(); 
+			break;
 			
 		//...
 
@@ -1535,6 +1544,10 @@ done:
  */
 void systemShowDevicesInfo()
 {
+	//
+	//
+	//
+	
     //Título.
 	printf("==== DEVICES: ==== \n\n");
     //...	
@@ -2071,110 +2084,209 @@ void systemReboot()
 	asm("cli");  // Me parece que desabilitar é uma opção.
 	
 	
-	//
-	//@todo: Criar a interface. realizando configurações de sistema
-	// antes de chamar o hal.
-	// É apropriado deixar aqui as rotinas de desligamento do sistema
-	// ficando para hal a parte de hardware.
-	// +salvar arquivos de configuração.
-	// +salvar discos virtuais.
-	// ...
-	//
-    
-	//...
 	
-   //
-   // Coloca uma tela preta pra começar.
-   //
 	
-    //Cls and Message.
-	backgroundDraw(COLOR_BACKGROUND);
-	//StatusBar( gui->screen, "StatusBar: ", "Rebooting...");	
-    refresh_screen();
+	struct window_d *hWnd;
+	struct window_d *hWindow;	
+	
 
-	
-	//@todo:
-	//block current task.
-	//close tasks
-	//...
 
-    //
-    //@todo: 
-	// +criar uma variavel global que especifique o tipo de reboot.
-    // +criar um switch para efetuar os tipos de reboot.
-	// +criar rota de fuga para reboot abortado.
-	// +Identificar o uso da gui antes de apagar a tela.
-	//  modo grafico ou modo texto.
-	//
-
-	//
-	// Video.
-	//
-	
-	sleep(8000);
-    set_up_cursor(0,0);	
-    set_up_text_color(0x0f, 0x09);
-    printf("\n REBOOT: \n");	
-	printf("The computer will restart in seconds.\n");
-	
-	//
-	// Scheduler stuffs.
-	//
-	
-	sleep(8000);
-	printf("Locking Scheduler and taskswitch.\n");
-	scheduler_lock();
-	taskswitch_lock();
-	
-    
-	
-	
-	//
-	// File System stuffs. @todo
-	//
-	
-	
-	
-	//
-	// Fechando processos que não foram fechados pelo shutdown em user mode.
-	// Obs: Todos os processos nesse momento ja deveriam estar terminados
-	// através de rotinas em user mode. Então checamos se falta algum e 
-	// caso haja, terminamos o processo.
-	// Obs: A rotina de fechar processo deve fechar as threads na ordem da lista encadeada.
-	//
-
-	sleep(8000);
-	printf("Killing Processes..\n");
-
-	
-	//Começa do 1 para não fechar o kernel.
-	i = 1;
-	
-	while( i < PROCESS_COUNT_MAX)
-	{
-        //Pega da lista.
-		P = (void *) processList[i];
-		if(P != NULL){
-		    //Termina o processo. (>> TERMINATED)
-		    printf("Killing Process PID={%d} ...\n",i);
-		    refresh_screen();
-		    exit_process(i, 0);
-		};
-		i++;
+	//Se não estivermos em modo gráfico, não há o que mostrar.	
+    if(VideoBlock.useGui != 1){
+	    return;	
 	};
+	
+	
+	//Parent window.
+	if( (void*) gui->main == NULL){
+	    return;
+	};
+	
+	unsigned long left   = gui->main->left;
+	unsigned long top    = gui->main->top;
+	unsigned long width  = gui->main->width;
+	unsigned long height = gui->main->height;	
+	
+		
+	//@todo: Chamar método.	
+	//Cursor.
+	g_cursor_x = (left/8);
+	g_cursor_y = (top/8); 
+	//set_up_cursor(0,10);
+
+
+
+//
+	// @todo: Usar esquema de cores padrão.
+	//
+	
+	if(VideoBlock.useGui == 1)
+	{
+		//Parent window.
+	    if( (void*) gui->main == NULL){
+	        return;
+	    };
+			
+	    //Create.
+	    hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "//KERNEL Reboot", 
+	                                    left, top, width, height, 
+			     				        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
+
+	    if( (void*) hWindow == NULL){
+	        printf("show_window_list:\n");
+		    return;
+        }else{
+		    RegisterWindow(hWindow);
+			set_active_window(hWindow);
+			SetFocus(hWindow);
+	    };										
+		
+		
+		// Auterando as margens.
+		// Essas margens são usadas pela função printf.
+		// Obs: As medidas são feitas em números de caracteres.
+		// Obs: @todo: Devemos usar aqui o retângulo da área de cliente,
+		// e não as margens da janela.
+		// A estrutura de janela deve nos oferecer os valores para a métrica do 
+		// retângulo da área de cliente.
+		// Obs: @todo:Acho que essa não é a forma correta de configurar isso. Uma 
+		//rotina deveria perceber as dimensões da janela de do caractere e determinar
+		//as margens.
+		
+		g_cursor_left   = (hWindow->left/8);
+		g_cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+		g_cursor_right  = g_cursor_left + (width/8);
+		g_cursor_bottom = g_cursor_top  + (height/8);
+		
+		//cursor (0, mas com margem nova).
+		g_cursor_x = g_cursor_left; 
+		g_cursor_y = g_cursor_top; 
+		
+        
+	    //
+	    //@todo: Criar a interface. realizando configurações de sistema
+	    // antes de chamar o hal.
+	    // É apropriado deixar aqui as rotinas de desligamento do sistema
+	    // ficando para hal a parte de hardware.
+	    // +salvar arquivos de configuração.
+	    // +salvar discos virtuais.
+	    // ...
+	    //
+    
+     	//...
+	
+        //
+        // Coloca uma tela preta pra começar.
+        //
+	
+        //Cls and Message.
+	    //backgroundDraw(COLOR_BACKGROUND);
+	    //StatusBar( gui->screen, "StatusBar: ", "Rebooting...");	
+        //refresh_screen();
 
 	
-	// Final message.
-	sleep(8000);
-	printf("Rebooting..\n");
+	    //@todo:
+	    //block current task.
+	    //close tasks
+	    //...
+
+        //
+        //@todo: 
+	    // +criar uma variavel global que especifique o tipo de reboot.
+        // +criar um switch para efetuar os tipos de reboot.
+	    // +criar rota de fuga para reboot abortado.
+	    // +Identificar o uso da gui antes de apagar a tela.
+	    //  modo grafico ou modo texto.
+	    //
+
 	
-	//Message and sleep.
-	MessageBox(gui->screen, 1, "systemReboot:","Rebooting..");
-	refresh_screen();
+	    //
+	    // Video.
+	    //
+	
+        set_up_cursor(0,4);	            //O cursor deveria ficar na área do cliente.	
+        set_up_text_color(0x0f, 0x09);  //isso é para modo texto. eu acho??
+	    
+		//init message.
+		sleep(8000);
+        printf("\n REBOOT:\n");	
+	    printf("The computer will restart in seconds.\n");
+	
+	    //
+	    // Scheduler stuffs.
+	    //
+	
+	    sleep(8000);
+	    printf("Locking Scheduler and taskswitch.\n");
+	    scheduler_lock();
+	    taskswitch_lock();
+	
+	
+	    //
+	    // File System stuffs. @todo
+	    //
+	
+	    //
+	    // Fechando processos que não foram fechados pelo shutdown em user mode.
+	    // Obs: Todos os processos nesse momento ja deveriam estar terminados
+	    // através de rotinas em user mode. Então checamos se falta algum e 
+	    // caso haja, terminamos o processo.
+	    // Obs: A rotina de fechar processo deve fechar as threads na ordem da lista encadeada.
+	    //
+
+	    sleep(8000);
+	    printf("Killing Processes..\n");
+
+	
+	    //Começa do 1 para não fechar o kernel.
+	    i = 1;
+	
+	    while( i < PROCESS_COUNT_MAX)
+	    {
+            //Pega da lista.
+		    P = (void *) processList[i];
+		    if(P != NULL){
+		        //Termina o processo. (>> TERMINATED)
+		        printf("Killing Process PID={%d} ...\n",i);
+		        //refresh_screen();
+		        exit_process(i, 0);
+		    };
+		    i++;
+	    };
+
+	    // Final message.
+	    sleep(8000);
+	    printf("Rebooting..\n");
+			
+        SetFocus(hWindow);
+	
+		
+		//voltando a margem normal a margem
+		//?? isso não é necessário??
+		g_cursor_left   = (left/8);    //0;
+		g_cursor_top    = (top/8);        //0;
+		g_cursor_right  = (width/8);   
+		g_cursor_bottom = (height/8);  
+		
+		//cursor (0, mas com margem nova)
+		g_cursor_x = g_cursor_left; 
+		g_cursor_y = g_cursor_top;
+        //set_up_cursor(g_cursor_left,g_cursor_top); 		
+
+
+		StatusBar(hWindow,"Esc=EXIT","Enter=?");		
+		//Nothing.
+	};	   
+
+ 
 	
 	//Nothing.
 	
 done:
+    refresh_screen();
+	sleep(8*8000);
+	MessageBox(gui->screen, 1, "systemReboot:","Rebooting..");
+    refresh_screen();
 	KiReboot();
 hang: 
     while(1){}
@@ -2313,20 +2425,6 @@ void *systemGetSystemStatus(int number)
 };
 
 
-
-/*
- * systemSystem:
- *     Construtor.
- * Não tem valor de retorno, tem o mesmo nome que a classe.
- * Uma chamada à um construtor criaria uma estrutura com seu nome e 
- * o construtor pode inicializar alguma variável.
- */
-void systemSystem(){
-    gSystemStatus = 1;
-};
-
-
-
 /*
  * systemInit:
  *     Inicializando algumas variáveis.
@@ -2344,6 +2442,18 @@ int systemInit()
 done:
     //Retornando para o kMain. em main.c.	
 	return (int) systemStartUp();	
+};
+
+
+/*
+ * systemSystem:
+ *     Construtor.
+ * Não tem valor de retorno, tem o mesmo nome que a classe.
+ * Uma chamada à um construtor criaria uma estrutura com seu nome e 
+ * o construtor pode inicializar alguma variável.
+ */
+void systemSystem(){
+    gSystemStatus = 1;
 };
 
 

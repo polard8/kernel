@@ -1,9 +1,9 @@
 /*
- * File: userenv.c 
+ * File: gramado\user\userenv.c 
  *
  * Descrição:
  * User Environment Manager, (UEM).
- * Cria o ambiente do usuário, Área de trabalho, onde o usuário interaje 
+ * Cria o ambiente do usuário, Área de trabalho, onde o usuário interage 
  * com a máquina logo após o logon. 
  *
  * MB - Módulos incluídos no Kernel Base.

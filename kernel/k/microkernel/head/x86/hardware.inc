@@ -71,16 +71,22 @@ extern _current_process_pagedirectory_address
 ;;...
 
 
-;;============================================================================
+;;=========================================================================
 ;; _irq0: 
+;;
 ;;     * TIMER *
-;;     Obs: No momento, toda tarefa interrompida pelo timer esta rodando 
-;; em ring3.
+;;
+;; IRQ 0. Handler da interrupção do timer.
+;;
+;; Obs: 
+;;     No momento, toda tarefa interrompida pelo timer esta rodando em ring3.
 ;;
 global _irq0
 _irq0:
 
     cli	
+	
+	;; ?? Exite algum código de erro antes do EIP ??
 	
 	;
 	;stack
@@ -89,15 +95,20 @@ _irq0:
 	pop dword [_contextEFLAGS]      ; eflags (DOUBLE).
 	pop dword [_contextESP] 	    ; esp - user mode (DOUBLE).
 	pop dword [_contextSS]          ; ss  - user mode (DOUBLE).
-    ;
+    
+	;
 	;registers 
 	mov dword [_contextEDX], edx    ; edx.		
 	mov dword [_contextECX], ecx    ; ecx.	 
 	mov dword [_contextEBX], ebx    ; ebx.	 
 	mov dword [_contextEAX], eax    ; eax.
+	
+	;
+	;registers 
 	mov dword [_contextEBP], ebp    ; ebp.
 	mov dword [_contextEDI], edi    ; edi.
 	mov dword [_contextESI], esi    ; esi.	
+	
 	;
 	;segments
 	xor eax, eax
@@ -117,12 +128,15 @@ _irq0:
 	; Outros registradores. Ex: media, float point, debug.
 	;
 
-	
+
 	;
 	; Preparando os registradores, para funcionarem em kernel mode.
+	;
 	; Obs: 
 	; Os registradores fs e gs podem ser configurados com seletor nulo '0',
-    ; ou ignorados para economizar instrução.		
+    ; ou ignorados para economizar instrução.
+
+;;.setupKernelModeRegisters:		
 	xor eax, eax
 	mov ax, word 0x10
 	mov ds, ax
@@ -151,39 +165,46 @@ _irq0:
 	
 	
 ;;.TimerStuff:	
+
 	;chamada à modulo externo.
+	;Talvez podemos colocar as rotinas do timer fora do kernel base.
+	;Então essa chamada será uma opção.
 	;call _KeTimer            	
 
 	;Chamada ao módulo interno.
-	call _KiTimer           ;Rotinas de timer. #NÃO envolvendo task switch.  	
+	;Para essa chamada as rotinas do timer estão dentro do kernel base.
+	;Rotinas de timer. #NÃO envolvendo task switch.
+	call _KiTimer             	
     
 ;;.TaskSwitchStuff:	
-	call _KiTaskSwitch 	    ;Task switch. Troca a tarefa a ser executada.
-	
-	
-	;
-	; O page diretory do processo atual foi salvo em uma variável.
-	; e agora o registrador cr3 será configurado.
-	;
-	
-	;
-	; @todo: #bugbug: Implementar isso com cuidado.
-	;
+    ;Task switch. Troca a tarefa a ser executada.
+	call _KiTaskSwitch 	    
 
+
+;;.PageDirectoryStuff:		
+	
 	;;
-	;; Obs: Isso é bem perigoso. O diretório para o 
-	;; processo precisa estar devidamente criado. Por isso 
-	;; Rotinas de automação na criação e rotinas de checagem são necessárias.
+	;; O page diretory do processo atual foi salvo em uma variável.
+	;; e agora o registrador CR3 será configurado.
+	;; @todo: #bugbug: Implementar isso com cuidado.
+	;; Obs: 
+	;; Isso é bem perigoso. 
+	;; O diretório para o processo precisa estar devidamente criado. Por isso 
+	;; rotinas de automação na criação e rotinas de checagem são necessárias.
     ;;
-	
-;;.PageDirectoryStuff:	
-
     ;; HACK HACK
-    ;; Até o momento, o único diretório válido é o do kernel. Então vai 
-    ;; ele mesmo.
+    ;; Até o momento, o único diretório válido é o do kernel. Então vai ele 
+	;; mesmo.
+	;;
 	
-	;mov eax, dword [_current_process_pagedirectory_address]
-	mov eax, dword 0x9C000  
+	;;Endereço do diretório de páginas do processo kernel.
+	mov eax, dword 0x0009C000  	
+	
+	;;@todo:
+	;;Endereço do diretório de páginas do processo atual.
+	;mov eax, dword [_current_process_pagedirectory_address]  
+	
+	;; CR3.
 	mov cr3, eax
 
     ;;
@@ -293,9 +314,13 @@ dummy_flush:
 	mov eax, dword [_contextEAX]    ;eax. (Acumulador).	
 	
 	;( Não precisa 'sti', pois as flags da pilha habilitam as interrupções ).
-	
 	sti
-;;.Fly:	
+	
+;;.Fly:
+    ;;
+	;; "Hi, my name is 'iretd', I work so hard for your happiness."
+    ;; "So that's why my page has to be always in the TLB."
+    ;; 	
     iretd	
 	
 	

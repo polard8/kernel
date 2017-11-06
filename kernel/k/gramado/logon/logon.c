@@ -270,8 +270,8 @@ draw_logon_stuffs:
 	// a janela do desenvolvedor.
 	//
 	
-CREATING_DEVELOPER_SCREEN:
-	logon_create_developer_screen();
+//CREATING_DEVELOPER_SCREEN:
+	//logon_create_developer_screen();
 	
 	
 	//Done.
@@ -692,8 +692,10 @@ void logon_create_grid()
 
 /*
  * logon_create_developer_screen:
- *     Cria a tela do desenvolvedor, a única tela em primeiro plane e com foco de
- * entrada durante a fse de desenvolvimento da interface gráfica.
+ *     Cria a tela do desenvolvedor, a única tela em primeiro plano e com foco de
+ * entrada durante a fase de desenvolvimento da interface gráfica.
+ *     É conveniente que essa tela seja de uma cor diferente, para os aplicativos 
+ * testarem cores diferentes de fonte.
  *     Atribuindo as dimensões.
  *     ...
  */
@@ -717,10 +719,15 @@ void logon_create_developer_screen()
 	
     struct window_d *hWindow; 	
 	
+	//
+	//
+	//
+	//
+	
 	// Screen - Não tem parent window.
 	hWindow = (void*) CreateWindow( 3, 0, VIEW_NORMAL, "{} DEVELOPER SCREEN", 
 	                                Left, Top, Width, Height, 
-							        NULL, 0, 0, COLOR_ORANGE );  // **** ORANGE RULES ****  
+							        NULL, 0, COLOR_ORANGE, COLOR_BLUE );  
 	if( (void*) hWindow == NULL ){
 	    printf("logon_create_developer_screen:");
 		refresh_screen();

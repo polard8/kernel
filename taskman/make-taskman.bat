@@ -1,5 +1,5 @@
 :SetUp
-@echo off
+    @echo off
 
 :Mounting	
 echo -{ ...
@@ -8,11 +8,11 @@ echo -{ head
 
 :Compiling	
 echo -{ ...
-echo -{ Compiling app2 Task Manager.
+echo -{ Compiling TASKMAN.BIN.
 	gcc -c main.c -o main.o  
 	
 :Objects	
-set my_objects=head.o ^
+set myObjects=head.o ^
 main.o ^
 api.o ^
 stdio.o 
@@ -20,12 +20,12 @@ stdio.o
 
 :Linking
 echo -{ ...
-echo -{ ligando objetos ... 
-    ld -T link.ld -o TASKMAN.BIN %my_objects% -Map app_map.s
+echo -{ Linking objects ... 
+    ld -T link.ld -o TASKMAN.BIN %myObjects% -Map app_map.s
    
     rem
     rem :Cleaning   
-    rem Não pode deletar os objetos.
+    rem      Não pode deletar os objetos.
     rem
    
 :Moving   

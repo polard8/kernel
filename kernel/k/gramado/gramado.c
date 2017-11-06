@@ -1,5 +1,7 @@
 /*
- * File: gui.c
+ * File: gramado.c
+ *
+ *       Arquivo principal da camada gramado. (Antigo gui.c)
  *
  * Esse módulo principalmente cria a estrutura 'gui->', que é espinha
  * dorsal de todos os elementos gráficos da interface gráfica. Nessa
@@ -43,6 +45,7 @@
 
 #include <kernel.h>
 
+//unsigned char  GramadoName[] = "GRAMADO LAYER";
 
 //internas
 void gui_create_screen();
@@ -884,6 +887,207 @@ done:
 
 
 
+//screen
+//métrica do dispositivo.
+void *guiGetScreenWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->screen;
+};
+
+//developer screen
+void *guiGetDeveloperScreenWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->DEVELOPERSCREEN;
+};
+
+
+//background
+void *guiGetBackgroundWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->background;
+};
+
+
+//logo
+void *guiGetLogoWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->logo;
+};
+
+
+//desktop window
+void *guiGetDesktopWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->desktop;
+};
+
+
+//task bar, top window, mac style
+void *guiGetTaskbarWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->taskbar;
+};
+
+
+
+//main window
+void *guiGetMainWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->main;
+};
+
+//status bar window (do kernel base)
+void *guiGetStatusbarWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->statusbar;
+};
+
+
+//grid window (do kernel base)
+void *guiGetGridWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->grid;
+};
+
+
+//janela do 'control menu' atual.
+void *guiGetMenuWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->menu;
+};
+
+
+//infobox (o sistema envia mensagens de informação)
+void *guiGetInfoboxWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->infobox;
+};
+
+//tooltip  Janelinha que aparece quando repousa o mouse sobre elemento gráfico.
+void *guiGetTooltipWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->tooltip;
+};
+
+
+//message box do kernel base. (especial)
+void *guiGetMessageboxWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->messagebox;
+};
+
+
+//dialogbox do kernel base. (especial)
+void *guiGetDialogboxWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->dialogbox;
+};
+
+
+//janela de debug usada pelo kernel base.
+void *guiGetDebugWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->debug;
+};
+
+
+//menubar usada pelo kernel base.
+void *guiGetMbhWindowWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->mbhWindow;
+};
+
+
+//top bar de verdade, estilo mac ou mobile.
+void *guiGetTopbarWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->topbar;
+};
+
+
+//navigation bar, estilo mobile.
+//gerenciada pelo kernel base.
+void *guiGetNavigationbarWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->navigationbar;
+};
+
+
+//janela do shell do kernel base.
+//naõ é um processo.
+void *guiGetShellWindowWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->shellWindow;
+};
+
+
+//uma janela filha do shell do kernel base.
+void *guiGetShellClientWindowWindow()
+{
+	if( (void*) gui == NULL){
+		return NULL;
+	}
+	return (void*) gui->shellClientWindow;
+};
+
+
 /*
  * init_gui:
  *     Inicializa a GUI.
@@ -922,6 +1126,11 @@ done:
 int guiInit()
 {};
 */
+
+
+void gramado(){
+    return; 	
+}
 
 //
 // End.

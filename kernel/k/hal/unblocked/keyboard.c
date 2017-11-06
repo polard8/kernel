@@ -177,13 +177,26 @@ uint8_t kybrd_ctrl_read_status () {
 unsigned long key_status;
 unsigned long escape_status;
 unsigned long tab_status;
-unsigned long winkey_status;
+unsigned long winkey_status;  // >> Winkey shotcuts. #super
 unsigned long ctrl_status;
 unsigned long alt_status;
 unsigned long shift_status;
 unsigned long capslock_status;
 unsigned long numlock_status;
 //...
+
+//
+// ** kernel Winkey shotcuts **
+//
+
+/*
+ WINKEY+
+ ...
+ */
+
+
+
+
 
 //@todo: fazer rotina de get status algumas dessas variáveis.
 
@@ -210,7 +223,7 @@ struct keyboardMessage
 
 
 //Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState( unsigned char key )
+unsigned long keyboardGetKeyState(unsigned char key)
 {
 	unsigned long State = 0;
 	
@@ -344,8 +357,18 @@ void KeKeyboard(){
 };
 
 
-
-
+/*
+void keyboard();
+void keyboard()
+{
+	//@todo: Create global.
+	if(gKeyboardType == 1){
+		abnt2_keyboard_handler();
+	}
+	//...
+	return;
+}
+*/
 
 /*
  * abnt2_keyboard_handler: 
@@ -614,7 +637,7 @@ void abnt2_keyboard_handler()
 				if(numlock_status == 0)
 				{
 				    numlock_status = 1;
-					keyboard_set_leds(LED_NUMLOCK);
+					keyboard_set_leds(LED_NUMLOCK);  //@retorno.
 					break;
 				};
 				if(numlock_status == 1){ numlock_status = 0; break; };
@@ -698,14 +721,50 @@ done:
 		//Uma mensagem de reboot pode ser enviada para o procedimento do sistema.
 		//Pois o teclado envia mensagens e não trata as mensagens.
 	
-	//Um driver não deve chamar rotinas de interface. como as rotians de serviço.	
-	if( (ctrl_status==1) && (alt_status==1) && (ch==KEY_DELETE) )
-	{
+	    //Um driver não deve chamar rotinas de interface. como as rotians de serviço.	
 		//A intenção é que essa mensagem chegue no procedimento do sistema.
 		//Porem o sistema tambem deve saber quem está enviando esse pedido.@todo.
+		//@todo: podemos O reboot pode ser feito através de um utilitário em user mode.
+	if( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
+	{
+		//Uma opção aqui, é enviar para o aplicativo uma mensagem de reboot.
+		//como o aplicativo não trata esse tipo de mensagem ele apenas reecaminha 
+		//para o procedimentod e janelas do sistema.
 		services( SYS_REBOOT, 0, 0, 0);
 	};
 
+	
+	//
+	// ?? Dúvida: E se o aplicativo em user mode não tem janela,
+	// para onde vai as mensagens de digitações que são recebidas 
+	// pelas rotinas de input dos aplicativos ?? Onde as rotinas 
+	// de input dos aplcativos de console pegam suas mensagens??
+	// ?? Ou seja: ?? Qual é a janela que recebe mensagens quando 
+	// o aplicativo que está rodando é um aplicativo de console??
+	// >>> A solução seria enviar a mensagem para a janela de terminal
+	// criada pelo kernel para o aplicativo de console... Desse modo 
+	// até um aplicativo de console terá uma janela de associada a ele.
+	// podendo enviar mensagens para ela, e receber mensagens através da
+	// fila de mensagens da janela.
+	// Obs: Quando um aplicativo de console recebe tempo de processamento,
+	// sua janela pode ou não estar com o foco de entrada, pois aplicativos 
+	// podem rodar em segundo plano, até mesmo minimizados.
+	// ?? Pergunta: ?? como fazer então para enviar mensagens para janelas de 
+	// aplicativos que estão rodando em segundo plano, sem o foco de entrada??
+	// >> As mensagens que vem com o destinatário explicitado são mais fáceis de 
+    // serem enviadas. Para isso podemos utilizar canais de mensagens que 
+	// indiquem quem são as janelas do emissor e do receptor. 
+	// No caso de mensagens enviadas entre processos, os processos serão 
+	// os emossores e receptores da mensagem, nesse caso então a mensagem 
+	// será enviada à janela principal do processo emissor. Para isso 
+	// na estrutura de processo deve ter um ponteiro para a janela principal,
+	// que será responsávem por receber as emnsagens no caso de uma comunicação entre 
+	// processos... Até mesmo para os casos mais simples onde o kernel envia mensagens 
+	// para  ajanela de um processo, poderíamos abrir um canal de comunicação, 
+	// onde o processo kernel seria o emissor da mensagem.
+	//
+	//
+	
 	//
     // Obs: NÃO É ATRIBUIÇÃO DO DRIVER DE TECLADO SABER INFORMAÇÕES
     // SOBRE AS JANELAS, ENTÃO UM DRIVER DE TECLADO DEVE ENVIAR A
@@ -733,6 +792,8 @@ done:
 	
 	//Escrevendo na tela do desenvolvedor.
 	//Isso será portado para outro módulo. está aqui para teste. 
+	
+	/*
 	if( (void*) gui->DEVELOPERSCREEN == NULL)
 	{
         printf("abnt2_keyboard_handler: gui->DEVELOPERSCREEN");	
@@ -746,6 +807,7 @@ done:
 		//printf("%c", ch);
 		//@todo: Não está incrementando a escrita ...
 	};
+	*/
 	
 	//69 ??
 	//Enviando mensagem pra janela com o foco de entrada.
@@ -759,20 +821,58 @@ done:
 	//
 	// Obs: estamos enviando a messagem para 2 procedimentos,
 	// mas o procedimento do sistema não trada digitações de teclas comuns. 
+	// Obs: O que estamos fazendo aqui é chamarmos o procedimento de janela do sistema
+	//e em seguida colocarmos a mensagem na fila da janela com o foco de entrada.
+	// Obs: Uma opção seria não chamarmos o procedimento de janela do sistema agora e
+	// e sim apenas colocarmos a mensagem na fila da janela com o foco de entrada.
+	// Daí então, quando o aplicativo em user mode receber a mensagem, ele trata a 
+	// a mensagem ou reencaminha para o procedimento de janela do sistema através de uma 
+	// system call.
+	// *Importante; Uma chamada ao procedimento de janela do sistema nesse momento,
+	// so atrasa o recebimento da mensagem por parte do aplicativo em user mode.
+    // bom seria que o aplicativo rebece a mensagem antes de chamar o procedimento de 
+    // de janela para tratar as mensagens de sistema. Isso privilegia as teclas de digitação
+	// em detrimento das teclas de acionamento de controles.
+	//
 	//
 	system_procedure( NULL, 
 	                 (int) mensagem, 
 	     			 (unsigned long) ch, 
 					 (unsigned long) ch );	
 	
+	
 	//test
 	//@todo: #bugbug Lembrando que um driver ainda não tem acesso abertos
 	//a essa função... uma chada à essa função deve ser criada na API usada pelo driver.
-	windowSendMessage( (unsigned long) 0,
-			           (unsigned long) mensagem, //msg
-					   (unsigned long) ch,
-					   (unsigned long) ch );
+	//windowSendMessage( (unsigned long) 0,
+	//		           (unsigned long) mensagem, //msg
+	//				   (unsigned long) ch,
+	//				   (unsigned long) ch );
+	
 
+	//*Importante: se nenhuma janela tem o foco de entrada, não há porque 
+	//enviar uma mensagem para a janela com o foco de entrada.
+	
+	
+	/*
+	 * Importante: Nesse caso podemos abrir um canal de comunicação,
+	 * onde o kernel é o emissor da mensagem.
+	 */
+	
+	struct window_d *w;
+	
+	w = (void*) windowList[window_with_focus];
+	
+	//Somente destituimos o foco se a janela for válida.
+    //Isso envia uma mensagem para a janela com o foco de entrada.
+	//se nenhuma janela tem o foco de entrada então apenas retorna.			
+	if( (void*) w != NULL )
+	{	    
+		if( w->used == 1 && w->magic == 1234 ){
+	        windowSendMessage( 0, mensagem, ch, ch);
+		};			    	
+	};		
+	
     //
     // @todo: ENVIANDO A MENSAGEM PARA O GERENCIADOR DE MENSAGENS.
     //	
@@ -1119,6 +1219,12 @@ int get_ctrl_status(){
     return (int) ctrl_status;
 };
 
+ 
+
+int get_shift_status(){
+    return (int) shift_status;	
+}
+ 
 
 /*
  * KiKeyboard:

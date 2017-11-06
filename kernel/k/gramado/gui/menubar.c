@@ -1,5 +1,5 @@
 /*
- * File: menubar.c
+ * File: gramado\gui\menubar.c
  *
  * Descrição:
  *     Rotinas de criação e gerenciamento de menubar.
@@ -37,7 +37,7 @@
 
 
 /*
- * create_menu_bar:
+ * create_menubar:
  *     Cria a menu bar.
  *     Aquela barra simples abaixo da barra de título da janela.
  *     Argumento: Janela mãe.
@@ -156,7 +156,7 @@ int create_menubar_item(struct menu_d *menu, unsigned char *string, int status)
 	// Count.	
 	menu->itemCount++;
 	
-	if( menu->itemCount > 16){
+	if( menu->itemCount > 16 ){
 		printf("create_menu_item error: Limits.");
 		refresh_screen();
 		return 1;
@@ -288,6 +288,7 @@ int select_menubar_item(int n)
     return (int) 0;
 };
 
+
 //@todo: errado: o certo seria mb_unselectmenu()
 int unselect_menubar_item(int n)
 {
@@ -334,14 +335,11 @@ done:
 };
 
 
-
-
 int get_menubar_selected_item()
 {
+	//@todo: Checar se a estrutura é válida.
     return (int) gui->mb->selectedItem;
 };
-
-
 
 
 /*
@@ -415,7 +413,6 @@ unsigned long MenuBarProcedure( struct window_d *window,
 	
 	switch(msg)
 	{	
-	
         case MSG_KEYDOWN:
             switch(long1)
             {
@@ -431,9 +428,18 @@ unsigned long MenuBarProcedure( struct window_d *window,
 		case MSG_SYSKEYDOWN:                 
             switch(long1)	       
             {   
-				case VK_F1: n--; break;  //left (circula)
-                case VK_F2: n++; break;  //right  (circula)										
-				default:  break;
+			    //left (circula)
+				case VK_F1: 
+				    n--; 
+				    break;  
+					
+				//right  (circula)	
+                case VK_F2: 
+				    n++; 
+				    break;
+					
+				default:  
+				    break;
 		    };              
         break;
 		
@@ -470,6 +476,7 @@ done:
 
 	return (unsigned long) 0;
 };
+
 
 /*
 int menubarInit()

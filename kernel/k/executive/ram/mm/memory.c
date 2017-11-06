@@ -55,6 +55,24 @@
  *
  * @todo: Criar: heapGetPointer, heapSePointer.
  *
+ *
+ * @todo: IMPORTANTE: Devemos ter um heap do kernebase, grande
+ * o bastante para alocarmos os recursos gráficos grenciados
+ * pelo módulo /gramado.
+ *
+ * @todo:
+ * IMPORTANTE: Um alocador de memória física precisa ser criado,
+ * que considere o tamanho da memória física disponível.
+ * Esse alocador deve ser usado para alocarmos uma região bem grande
+ * da memória física onde ficarão os frames de memória física. Os 
+ * frames livres serão encontrados nessa região e o alocador de 
+ * páginas, utilizará esses frames livres para associá-los às
+ * páginas alocadas aos processos.
+ *
+ * @todo: Variáveis globais devem controlar o início e o fim da área
+ * destinada aos frames de memória física. semelhando ao que foi 
+ * feito com o heap do kernel base. Faremos isso no início do arquivo mm.h.
+ *
  * Histórico:
  *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
  *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
@@ -161,6 +179,9 @@ unsigned long heap_set_new_handler( unsigned long address )
  * get_process_heap_pointer:
  *     Pega o heap pointer do heap de um processo.
  *     Pega o endereço do início do header da próxima alocação.
+ * Obs: Isso será usado para alocar memória dentro do heap do processo.
+ * Cada processo terá seu heap, cada heap tem ponteiros.
+ *
  */
 unsigned long get_process_heap_pointer(int pid)
 {
@@ -256,6 +277,10 @@ void SetKernelHeap( unsigned long HeapStart, unsigned long HeapSize)
 	// Lista de heaps.
 	//
 	
+	//@todo: Um 'for' pode inicializar essa lista com '0' nesse momento.
+	//for(...)
+	
+	
 	//Configuração inicial da lista de heaps. Só temos 'um' ainda.
 	heapList[0] = (unsigned long) KernelHeap;  //Configura o heap do kernel.
 	heapList[1] = (unsigned long) 0;
@@ -271,9 +296,10 @@ done:
 
 
 /*
-//@todo: Criar essa rotina.
-//Aloca memória dentro de um heap determinado.
-//Esse rotina deve ser oferecida como serviço. e chamada via system call.
+ * HeapAlloc:
+ * @todo: Criar essa rotina.
+ * Aloca memória dentro de um heap determinado.
+ * Esse rotina deve ser oferecida como serviço e chamada via system call.
 void* HeapAlloc(struct heap_d * heap, unsigned long size);
 void* HeapAlloc(struct heap_d * heap, unsigned long size)
 {
@@ -281,10 +307,12 @@ void* HeapAlloc(struct heap_d * heap, unsigned long size)
 }
 */
 
+
 /*
+ * GetProcessHeap:
  @todo:
- Retorna um ponteiro para o heap de um processo.
- oferecer como serviço do sistema.
+ Retorna um ponteiro para a estrutura do heap de um processo.
+ Obs: Oferecer como serviço do sistema.
 void *GetProcessHeap(struct process_d *process);
 void *GetProcessHeap(struct process_d *process)
 {
@@ -293,12 +321,15 @@ void *GetProcessHeap(struct process_d *process)
 */
 
 /*
+ * GetHeap:
  @todo:
  Retorna um ponteiro para o heap do processo atual.
- oferecer como serviço do sistema.
+ Obs: Oferecer como serviço do sistema.
 void *GetHeap();
 void *GetHeap()
 {
+	//@todo: Pegar o identificador do processo atual.
+	//pegar na estrutura do processo o ponteiro para seu heap.
 	return NULL;
 }
 */
@@ -306,6 +337,7 @@ void *GetHeap()
 
 
 /*
+ ****************************************************************
  * AllocateHeap:
  *     Aloca memória no heap do kernel.
  *
@@ -313,12 +345,13 @@ void *GetHeap()
  *     Aloca BLOCOS de memória dentro do heap do processo Kernel.
  *
  * Obs: 
- *     A estrutura usada aqui é salva onde ??
+ *     ?? A estrutura usada aqui é salva onde, ou não é salva ??
  *
  * @todo: 
  *     Ao fim dessa rotina, os valores da estrutura devem ser armazenas no 
  * header, lá onde foi alocado espaço para o header, assim tem-se informações 
- * sobre o header alocado.
+ * sobre o header alocado. ??
+ *
  *  A estrutura header do heap, é uma estrutura e deve ficar antes da área 
  * desejada. Partes={header,client,footer}.
  *
@@ -332,10 +365,20 @@ void *GetHeap()
 unsigned long AllocateHeap(unsigned long size)
 {
 	struct mmblock_d *Current;	
-	//struct mmblock_d *Prev;		
+	//struct mmblock_d *Prev;	
+
+
+    //
+    // @todo: Aplicar filtro.
+    // Aqui podemos checar se o quantidade de heap disponível 
+	// está coerente com o tamanho do heap. Se essa quantidade 
+	// for muito grande, maior que o heap total, então temos um 
+	// problema.
+    //	
 	
 	//
-	// Se não há heap disponível, não há muito o que fazer.
+	// Se não há espaço disponível no heap, não há muito o que fazer.
+	// Uma opção seria tentar almentar o heap, se isso for possível.
 	//
 	
 	// Available heap.
@@ -365,8 +408,9 @@ unsigned long AllocateHeap(unsigned long size)
     // Size limits. (Min, max).
     //
  	
-	//Se o tamanho desejado é igual a zero.
-	//@todo: aqui podemos converter o size para uo tamanho mínimo.
+	//Se o tamanho desejado for igual a zero.
+	//@todo: Aqui podemos converter o size para uo tamanho mínimo.
+	// não há problema nisso.
     if(size == 0){
 		//size = 1;
 	    printf("AllocateHeap error: size={0}\n");
@@ -410,7 +454,7 @@ try_again:
 	
 	//
 	// A variável 'Header', no header do bloco, é o início da estrutura que o 
-	// define. 'b->Header'. Ou seja o endereço da vairál marca o início da 
+	// define. 'b->Header'. Ou seja o endereço da varirál marca o início da 
 	// estrutura.
 	//
 
@@ -419,12 +463,21 @@ try_again:
 	// (Não vamos querer um heap pointer fora dos limites do heap do kernel)
 	// Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
 	// devemos usar o último válido que provavelmente está nos limites.
+	// ?? #bugbug: Mas se o último válido está sendo usado por uma alocação 
+	// anterior. ?? temos flags que indiquem isso ??
+	//
+	// IMPORTANTE: O HEAP POINTER TAMBÉM É O INÍCIO DE UMA ESTRUTURA. 
+	// NESSA ESTRUTURA PODEMOS SABER SE O HEAP ESTA EM USO OU NÃO.
+	// ISSO SE APLICA À TENTATIVA DE REUTILIZAR O ÚLTIMO HEAP POINTER VÁLIDO.
 	//
 	
 	//Se estiver fora dos limites.
 	if( g_heap_pointer < KERNEL_HEAP_START || 
 	    g_heap_pointer >= KERNEL_HEAP_END )
 	{
+		//#bugbug: ?? Como saberemos, se o último válido,
+		// não está em uso por uma alocação anterior. ??
+		
 	    //Checa os limites o último last heap pointer válido.
 	    if( last_valid < KERNEL_HEAP_START || 
 		    last_valid >= KERNEL_HEAP_END )
@@ -433,6 +486,11 @@ try_again:
 		    refresh_screen();
 		    while(1){}		
 	    };
+		
+		//
+		// @todo: Checar a disponibilidade desse último válido.
+		// Ele é válido, mas não sabemos se está disponível.
+		
 		//Havendo um last heap pointer válido.
 		//?? isso não faz sentido.
 		g_heap_pointer = (unsigned long) last_valid + last_size;
@@ -448,15 +506,10 @@ try_again:
 	last_valid = (unsigned long) g_heap_pointer;
 	
 	//
-	// Criando um bloco.
-	//
-	
-	//
+	// Criando um bloco, que é uma estrutura mmblock_d.
 	// Estrutura mmblock_d interna.
 	// Configurando a estrutura para o bloco atual.
 	//
-	
-    //	
 	// Obs: A estutura deverá ficar lá no espaço reservado para o header. 
 	// (antes da area alocada).
 	// Current = (void*) g_heap_pointer;
@@ -474,7 +527,7 @@ try_again:
         Current->Id = mmblockCount;                        //Id do mmblock. (Índice na lista)
 	    Current->Used = 1;                //Flag, 'sendo Usado' ou 'livre'.
 	    Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
-        Current->Free = 0;                //not free.
+        Current->Free = 0;                //0=not free 1=FREE (*SUPER IMPORTANTE)
 	    //Continua...		
 	
 	    //
@@ -603,7 +656,7 @@ try_again:
 	 * *IMPORTANTE
 	 *
 	 * @todo:
-	 * Colocar o conteúdo da estrutura no lugar alocado para o header.
+	 * Colocar o conteúdo da estrutura no lugar destinado para o header.
 	 * O header conterá informações sobre o heap.
 	 *
 	 */
@@ -664,11 +717,20 @@ void *AllocateHeapEx(unsigned long size){
 
 /*
  * show_memory_structs:
+ *     *IMPORTANTE.
  *     Mostra as informações das estruturas de memória. 
  * @todo: 
  *     Mostrar a memória usada pelos processos.
  *     Mostrar o quanto de memória o processo usa.
- *
+ *     *Importante: Esse tipo de rotina mereçe muita atenção
+ * principalmente na fase inicial de construção do sistema.
+ * Apresentar as informações em uma janela bem grande e 
+ * chamar através do procedimento de janela do sistema é 
+ * uma opção bem interessante.
+ * Por enquanto apenas escrevemos provavelmente na janela como 
+ * foco de entrada e o procedimento de janela do sistema efetua
+ * um refresh screen
+ * 
  */
 void show_memory_structs()
 {
@@ -699,6 +761,15 @@ void show_memory_structs()
 		//Nothing.
     };
 	
+	
+	//
+	// Aqui podemos aprentar informações sobre o heap.
+	// como tamanho, espaço disponível, ponteiro, à que processo ele 
+	// pertence.
+	// mas estamos lidando a estrtutura de mmblock_d, que é especial e meio 
+	// engessada.
+	//
+	
 	//More?!
 	
 //
@@ -710,13 +781,19 @@ done:
 };
 
 
-
-
 /*
  * init_heap:
  *     Iniciar a gerência de Heap do kernel. 
- *     @todo: Usar heapInit() ou heapHeap().
+ *     @todo: Usar heapInit() ou heapHeap(). memoryInitializeHeapManager().
+ *
+ * Essa rotina controi a mão o heap usado pelo processo kernel.
+ *     +Ela é chamada apenas uma vez.
+ *     +Ela deve ser chamada entes de quelquer outra operação 
+ * envolvendo o heap do processo kernel.
+ * 
+ * @todo: Rotinas de automação da criação de heaps para processos.
  */
+//int memoryInitializeHeapManager() 
 int init_heap()
 {
 	//Internas.
@@ -833,14 +910,15 @@ fail:
 
 void memoryShowMemoryInfo()
 {
-	printf("Show memory info:\n");
-	printf("=================\n");
-	printf("BaseMemory      = {%d} KB\n", memorysizeBaseMemory);
-	printf("OtherMemory     = {%d} KB\n", memorysizeOtherMemory);
-	printf("ExtendedMemory  = {%d} KB\n", memorysizeExtendedMemory);
-	printf("TotalMemory     = {%d} KB\n", memorysizeTotal);	
+	printf("Memory info:\n");
+	printf("============\n");
+	printf("BaseMemory     = (%d KB)\n", memorysizeBaseMemory);
+	printf("OtherMemory    = (%d KB)\n", memorysizeOtherMemory);
+	printf("ExtendedMemory = (%d KB)\n", memorysizeExtendedMemory);
+	printf("TotalMemory    = (%d KB)\n", memorysizeTotal);	
 	return;
 }
+
 
 /*
  * init_mm:
@@ -863,6 +941,10 @@ int init_mm()
 	// Clear BSS.
 	// Criar mmClearBSS()
 	//
+	//
+	
+	//
+	// Chamando uma rotina que cria e inicializa o heap do kernel manualmente.
 	//
 	
 	//Heap.
@@ -905,6 +987,230 @@ int init_mm()
 done:	
     return (int) Status;	
 }; 
+
+//
+// Segue rotinas de GC.
+//
+
+//limpa a camada /gramado
+int gcGRAMADO(){
+	return (int) 0;
+}
+
+/*
+ gcEXECUTIVE:
+    //limpa a camada /executive.
+    Esse é o Garbage Collector, o trabalho dele é checar nas listas 
+ de ponteiros de estrutura se encontra, estruturas sinalizadas para serem 
+  liberadas. Quando encontra uma estrutura sinalizada, libera os recurso da 
+estrutura.
+  Obs: As estruturas poderão ser deletadas ou não.
+  Obs: A área do cliente na estrutura mmblock deverá se preenchida com zero
+       quando a estrutura estiver sinalizada.
+       O garbage collector é um serviço do kernel, e poderá ser 
+	   chamado por interrupção. Pois utilitários de gerência de memória 
+	   usarão recursos de gerência de memória oferecidos pelo kernel.
+  Obs: a função gc() poderá ser chamada de tempod em tempos do mesmo modo 
+       que o dead thread collector.
+	   
+  Obs: 
+        Importante:
+		O GC deve efetuar apenas uma operação de liberação, mesmo que 
+        haja muita coisa pra fazer, pois não queremos que ele use 
+		muito tempo de processamento prejudicando os outros processos.
+		Pois bem, ele efetua apenas uma operação de limpeza e sai sem erro.
+		se não encontrar nada pra fazer, também sai sem erro.
+		
+		@todo: Cria os 'for's para as outras listas.
+		 @todo: Criar as rotinas de limpeza para as outras listas.
+		 
+	//@todo 
+	
+	//+Checar as etruturas de mmblock e liberar 
+	// as estruturas marcadas como Free=1.
+	//para isso deve haver um array mmblockList[].
+	
+	//+Checar as estruturas de janela e liberar as 
+	//estiverem marcadas como used=216 e magic=4321.
+
+	*Importante:
+	Essa rotina deve limpar alocações de memória e não estruturas de 
+	objetos de outros tipos.
+	+O módulo de gerência de recursos gráficos que limpe suas listas.
+	+O módulo de gerência de processos que limpe suas listas.
+    +O módulo de gerência de threads que limpe suas listas.
+	
+	
+	
+ */
+int gcEXECUTIVE()
+{
+	int i;
+	struct mmblock_d *b;  //memory block.
+	struct heap_d *h;     //heap.
+	//...
+	
+	//Obs: 
+	// Importante: Cada lista contêm um tipo de estrutura.
+	// Importante: Limparemos somente as listas que pertencem ao módulo /ram
+	
+	//mmblockList[]
+	for( i=0; i<MMBLOCK_COUNT_MAX; i++)
+	{
+	    b = (void*) mmblockList[i];
+		
+		//ponteiro válido.
+	    if( (void*) b != NULL )
+		{
+			//sinalizado para o GC.
+			if( b->Used == 216 && b->Magic == 4321 ){
+				goto clear_mmblock;
+			}
+		}
+	};
+	
+	
+	//heapList[]
+	for( i=0; i<HEAP_COUNT_MAX; i++)
+	{
+	    h = (void*) heapList[i];
+		
+		//ponteiro válido.
+	    if( (void*) h != NULL )
+		{
+			//sinalizado para o GC.
+			if( h->Used == 216 && h->Magic == 4321 ){
+				goto clear_heap;
+			}
+		}
+	};
+	
+	//
+	// @todo: Cria os 'for's para as outras listas.
+	//
+
+	
+    goto done;
+	
+	//
+	// Segue operações de limpeza em estruturas de tipos diferentes.
+	// Devemos limpar e sairmos em seguida.
+	//
+	
+	//Nothing
+	
+clear_mmblock:	
+    if( (void*) b != NULL )
+    {
+		//Checar se a área alocada está dentro dos limites.
+	    if( (b->userArea + b->userareaSize) != b->Footer ){
+			printf("gc fail: User Area Size");
+			goto fail;
+		}else{
+	        //preenche com zeros.
+			bzero( (char*) b->userArea , (int) b->userareaSize);
+		};
+        //Nothing.		
+	};
+	goto done;
+	//Nothing.
+	
+clear_heap:
+    if( (void*) h != NULL )
+	{
+		// ?? O que fazer aqui ??
+		
+		//Limparemos mas não deletaremos.
+		//h->Used  = 1;
+		//h->Magic = 1234;
+		
+		//lista encadeada de blocos que formavam o heap.
+		//podemos apenas sinalizar todos os mmblocks dessa lista e depois o GC acaba com eles.
+		//para isso precisamos de um 'for'.
+		//h->mmblockListHead = NULL;
+        		
+		
+	};
+	goto done;
+	//Nothing.
+
+	//
+	// @todo: Criar as rotinas de limpeza para as outras listas.
+	//
+
+fail:
+    refresh_screen();
+	//while(1){}
+	return (int) 1;
+done:	
+	return (int) 0;	
+};
+
+//limpa a camada /microkernel
+int gcMICROKERNEL(){
+	return (int) 0;
+}
+
+//limpa a camada /hal
+int gcHAL(){
+	return (int) 0;
+}
+
+/*
+ ***********************************************************
+    gc:
+	    Garbage Collector.
+		Call all Garbage Collections rotines.
+		Clear all layers.
+		/GRAMADO
+		/EXECUTIVE
+		/MICROKERNEL
+		/HAL
+ */
+int gc()
+{
+    int Status;
+	
+//clearGramadoLayer:
+    Status = (int) gcGRAMADO();
+    if(Status == 1){
+		printf("gc: clearGramadoLayer:\n");
+		goto fail;
+	}
+	
+//clearExecutiveLayer:
+    Status = (int) gcEXECUTIVE();
+    if(Status == 1){
+		printf("gc: clearExecutiveLayer:\n");
+		goto fail;
+	}
+	
+//clearMicrokernelLayer:
+    Status = (int) gcMICROKERNEL();
+    if(Status == 1){
+		printf("gc: clearMicrokernelLayer:\n");
+		goto fail;
+	}
+	
+//clearHalLayer:
+    Status = (int) gcHAL();
+    if(Status == 1){
+		printf("gc: clearHalLayer:\n");
+		goto fail;
+	}
+	
+	goto done;
+	
+fail:
+    printf("gc: FAIL.\n");	
+	refresh_screen();
+	//while(1){}
+	return (int) 1;
+	
+done:
+    return (int) 0;	
+};
+
 
 
 /*

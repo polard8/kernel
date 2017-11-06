@@ -132,11 +132,12 @@ void DrawNormalWindow( struct window_d *w,
 	//titulo + borda
 
 	// Sem foco de entrada.
-	if(w->focus == 0){
+	if(w->id != window_with_focus){
 	    w->color_bg = COLOR_GRAY;
-	};	
+	};
+	
 	// Com foco de entrada.
-	if(w->focus == 1){
+	if(w->id == window_with_focus){
 	    w->color_bg = COLOR_BLACK;
 	};
 		

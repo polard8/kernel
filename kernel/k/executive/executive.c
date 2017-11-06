@@ -48,6 +48,9 @@
 #include <kernel.h>
 //#include "eidata.h"  //Executive Internal Data.
 
+//unsigned char  EcecutiveName[] = "EXECUTIVE LAYER";
+
+
 /*
 void executiveMain();
 void executiveMain(){

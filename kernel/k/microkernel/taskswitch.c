@@ -1,5 +1,5 @@
 /*
- * File: taskswitch.c
+ * File: microkernel\taskswitch.c
  *
  * Descrição:
  *     Faz parte do Process Manager, parte fundamental do Kernel Base.
@@ -78,7 +78,6 @@ done:
 	//Retornando para _irq0 em head\x86\hardware.inc.
     return;
 };
-
 
 
 /*
@@ -206,7 +205,8 @@ void task_switch()
 		
 		    // * MOVEMENT 3 (Running --> Ready).
 		    if(Current->state == RUNNING)
-		    {   
+		    {
+                // MOVEMENT 3 (running >> ready)  				
 			    Current->state = READY;    //Preempt.
 		    
 			    // Início da fila onde a prioridade é menor.
@@ -552,7 +552,8 @@ void taskswitchRR()
 		goto dispatch_current;
 	}
 	else
-	{	
+	{
+        //?? @todo: Talvez aqui seja o movimento 3, running >> ready. Conferir.  		
 		Current->state = READY;
 		
 		//
@@ -568,7 +569,7 @@ void taskswitchRR()
 		    i++;
 			
 			//Contando++
-			if( i < Max)
+			if(i < Max)
 			{
 		        Current = (void *) threadList[i];
 		        if( (void *) Current != NULL )
@@ -598,7 +599,7 @@ void taskswitchRR()
 				};
 			};
 
-		}while( i < Max);
+		}while(i < Max);
 			
         panic("taskswitchRR error: *HANG");
         while(1){}   			
@@ -640,8 +641,7 @@ void set_task_status(unsigned long status)
  *
  * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
  */
-unsigned long get_task_status()
-{
+unsigned long get_task_status(){
     return (unsigned long) task_switch_status;
 };
 
@@ -651,8 +651,7 @@ unsigned long get_task_status()
  *     Trava o mecanismo de taskswitch.
  *     @todo: Mudar para taskswitchLock().
  */ 
-void taskswitch_lock()
-{
+void taskswitch_lock(){
     task_switch_status = (unsigned long) LOCKED;
 	return;
 };
@@ -663,8 +662,7 @@ void taskswitch_lock()
  *     Destrava o mecanismo de taskswitch.
  *     @todo: Mudar para taskswitchUnlock().
  */ 
-void taskswitch_unlock()
-{
+void taskswitch_unlock(){
     task_switch_status = (unsigned long) UNLOCKED;
 	return;
 };

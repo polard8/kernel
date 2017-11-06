@@ -21,8 +21,11 @@
  * Talvez uma estrutura de botão seja necessário, para armazenas coisas como 
  * deslocamento dentro da janela e endereço da imagem carregada como etiqueta.
  *
+ * Retorna o ponteiro pra estrutura do botão.
+ *
+ *
  */
-void draw_button( struct window_d *window,
+void *draw_button( struct window_d *window,
                   unsigned char *string,
                   unsigned long type, 
                   unsigned long x, 
@@ -31,21 +34,52 @@ void draw_button( struct window_d *window,
                   unsigned long height, 
                   unsigned long color)
 {
-    int i;
+    int i; //??
 	int Selected;
-	unsigned long board1;
-    unsigned long board2;
+	unsigned long border1;
+    unsigned long border2;
+	struct button_d *b;
 	
 	//validade da janela onde o botão está.
 	if((void*) window == NULL){
 	    return;
 	};
 	
+
+	//Alocando memória para a estrutura do botão.
+	b = (void*) malloc( sizeof(struct button_d) );
+    if( (void*) b == NULL ){
+		return NULL;
+	}else{
+		b->objectType = ObjectTypeButton;
+		b->objectClass = ObjectClassGuiObjects;
+	    b->used = 1;	
+	    b->magic = 1234;
+		b->string = string;  //Label.
+        b->type = type;
+        b->x = x;
+        b->y = y;
+        b->width = width;
+        b->height = height;
+        b->window = (void*) window;
+        b->color = color; 	
+        b->Next = NULL;		 
+		//...
+	};
+	
+	//Devemos colocar o ponteiro na lista encadeada de botões 
+	//dentro da estrutura da janela.
+	//if( (void*) window->buttonList == NULL ){
+	//	window->buttonList = (void*)b;
+	//}
+	
+	//Todo: Usar esquema padrão de cores.
+	
     //Quem chamou precisa saber ao menos o tipo de botão que quer.	
     if(type == 0){
 		//printf("draw_button: The button needs a type.\n");
 		//refresh_screen();
-        return;
+        return NULL;
     };    
 	
     switch(type)
@@ -53,61 +87,72 @@ void draw_button( struct window_d *window,
         //Não pressionado.
         case BN_DOWN:
 		    Selected = 0;
-		    board1 = COLOR_BUTTONHIGHLIGHT;
-			board2 = COLOR_BUTTONSHADOW;
+			b->selected = 0;
+		    border1 = COLOR_BUTTONHIGHLIGHT;
+			border2 = COLOR_BUTTONSHADOW;
+			b->border1 = COLOR_BUTTONHIGHLIGHT;
+			b->border2 = COLOR_BUTTONSHADOW;
             goto do_draw_button;			
 			break;
                                     
         //Precionado.
         case BN_UP:
 		    Selected = 0;
-		    board1 = COLOR_BUTTONSHADOW;
-			board2 = COLOR_BUTTONHIGHLIGHT;
-            goto do_draw_button;			
+		    b->selected = 0;
+			border1 = COLOR_BUTTONSHADOW;
+			border2 = COLOR_BUTTONHIGHLIGHT;
+            b->border1 = COLOR_BUTTONSHADOW;
+			b->border2 = COLOR_BUTTONHIGHLIGHT;
+			goto do_draw_button;			
             break;
                        
          //Selecionado. (highlight)
         case BN_SELECTED:
 		    Selected = 1;
-		    board1 = COLOR_BUTTONHIGHLIGHT;
-			board2 = COLOR_BUTTONSHADOW;
-            goto do_draw_button;			
+			b->selected = 1;
+		    border1 = COLOR_BUTTONHIGHLIGHT;
+			border2 = COLOR_BUTTONSHADOW;
+            b->border1 = COLOR_BUTTONHIGHLIGHT;
+			b->border2 = COLOR_BUTTONSHADOW;
+			goto do_draw_button;			
             break;
         
 		default:  
-		    return; 
+		    return NULL; 
             break;    
     };  
 
 //
 // Do draw the button.
 //
+		
 	
 do_draw_button:
 
     //
 	// Usaremos retângulos para desenharmos o botão.
 	//
-    
+   
+	
 	//bg
 	drawDataRectangle( window->left +x, window->top +y, width, height, color);
     
 	//board1, borda de cima e esquerda.
-	drawDataRectangle( window->left +x, window->top +y, width, 1, board1);
-	drawDataRectangle( window->left +x, window->top +y, 1, height, board1);
+	drawDataRectangle( window->left +x, window->top +y, width, 1, border1);
+	drawDataRectangle( window->left +x, window->top +y, 1, height, border1);
 
 	//board2, borda direita e baixo.
 	drawDataRectangle( window->left +x +width -1, 
 	                   window->top +y, 
 					   1, 
 					   height, 
-					   board2);
+					   border2);
 					   
 	drawDataRectangle( window->left +x, 
 	                   window->top  +y +height -1, 
 					   width, 
 					   1,
-					   board2);
+					   border2);
 
 //
 // Do draw label.
@@ -133,7 +178,8 @@ do_draw_label:
 	
 // Done! 
 done:
-    return;          
+    //Retornando o ponteiro para a estrutura do botão.
+    return (void*) b;          
 };
 
 

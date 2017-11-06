@@ -5,6 +5,7 @@
  * File: k\main.c 
  * 
  * Description:
+ *     project browser: 'SHELL.BIN IS MY MASTER.'
  *     This is the Kernel Base. It's the mains file for a 32bit Kernel. 
  *     The type is 'hybrid'.
  *     The entry point is in 'head.s'.
@@ -40,8 +41,6 @@
  *     Version: 1.0, 2016 - Revision.
  *     //... 
  */ 
- 
-
 #include <kernel.h>
 
 
@@ -87,8 +86,25 @@ int kMain(int argc, char* argv[])
 	
 	//Inicializando a flag que será usada para travar o foco
 	// de entrada na tela do desenvolvedor. gui->DEVELOPERSCREEN
-	_lockfocus = 0;
+	//@todo: Não usar isso.
+	//_lockfocus = 0; 
+	
+	//Inicializando o semáforo binário do kernel de uso geral.
+	//Aplicações usarão isso para entrarem em suas sessões críticas.
+	//@todo: Criar um método para isso.
+    __ipc_kernel_spinlock = 1;
+	
+	
 
+	// initializing zorder list
+	int zIndex;
+	for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
+		zorderList[zIndex] = (unsigned long) 0;
+	}
+	
+	//initializing zorder counter.
+	zorderCounter = 0;
+	
 	//
 	// Window procedure.
 	//
@@ -99,6 +115,8 @@ int kMain(int argc, char* argv[])
 	//
 	// Video.
 	//
+	
+//setupVideo:	
 	
 	//@todo: Device screen sizes.
 	
@@ -113,6 +131,10 @@ int kMain(int argc, char* argv[])
         //...		
 	};
 
+	//Construtor. 
+	//Configura algumas variáveis internas do gerenciador de vídeo.
+	videoVideo();
+	
 	videoInit();  //Setup video first of all.	   
 	
 
@@ -154,6 +176,8 @@ int kMain(int argc, char* argv[])
     // System initialization..
     //
     
+//initializeSystem:
+	
 	//Construtor.
     systemSystem();	
 	
@@ -170,9 +194,10 @@ int kMain(int argc, char* argv[])
 	// The processes are: Kernel, Idle, Shell, Taskman.
 	//
 	
+//createProcesses:	
+	
 	// Creating Kenrel process. PID=0.	
-	// @todo: Change the name to KiCreateKernelProcess.
-	KernelProcess = (void*) KeCreateKernelProcess();	
+	KernelProcess = (void*) KiCreateKernelProcess();	
 	if( (void*) KernelProcess == NULL ){
 	    printf("kMain error: Create KernelProcess!");
 		refresh_screen();
@@ -222,9 +247,11 @@ int kMain(int argc, char* argv[])
 	// The Shell thread belongs to Shell process.
 	// The Taskman thread belongs to Taskman process.
 	//
+
+//createThreads:
 	
 	//Create Idle Thread. tid=0. ppid=0.
-	IdleThread = (void*) KeCreateIdle();	
+	IdleThread = (void*) KiCreateIdle();	
 	if( (void*) IdleThread == NULL )
 	{
 	    printf("kMain error: Create Idle Thread!");
@@ -242,7 +269,7 @@ int kMain(int argc, char* argv[])
     };
 	
 	// Create shell Thread. tid=1. 
-	ShellThread = (void*) KeCreateShell();	
+	ShellThread = (void*) KiCreateShell();	
 	if( (void*) ShellThread == NULL ){
 	    printf("kMain error: Create Shell Thread!");
 		refresh_screen();
@@ -254,7 +281,7 @@ int kMain(int argc, char* argv[])
     };
 	
 	//Create taskman Thread. tid=2. 
-	TaskManThread = (void*) KeCreateTaskManager();
+	TaskManThread = (void*) KiCreateTaskManager();
 	if( (void*) TaskManThread == NULL ){
 	    printf("kMain error: Create TaskMan Thread!");
 		refresh_screen();
@@ -270,13 +297,7 @@ int kMain(int argc, char* argv[])
 	// Debug.
 	//
 	
-done:
-	
-	//Debug.
-	//if(VideoBlock.useGui != 1){	
-	//    kclear(0);
-    //    kprintf("kMain: Done" ,10 ,9 );
-    //};
+doDebug:
 	
 	//Kernel base Debugger.
 	Status = (int) debug();	
@@ -289,12 +310,40 @@ done:
 	    KernelStatus = KERNEL_INITIALIZED;
 	};	
 	
+	
+
 	//
 	// TESTS:
 	// We can make some testes here.
 	//
+//doTests:	
+   //...
+    
+	//
+	// Done.
+	//
+	
+done:
 
-    //...	
+	//if(VideoBlock.useGui != 1){	
+	//    kclear(0);
+    //    kprintf("kMain: Done" ,10 ,9 );
+    //};
+	
+	
+	
+	//
+	// *Importante:
+	//  Iniciando o suporte ao browser.
+	//  O Browser é uma janela criada e gerenciada pelo kernel ...
+	//  em suas abas rodarão os aplicativos e páginas da web.
+	//
+	
+	/* suspendido
+	printf("main: initializing browser support.\n");
+	windowInitializeBrowserSupport();
+	printf("main: done.\n");
+	*/
 	
 	//
 	// RETURNING !

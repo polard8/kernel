@@ -226,8 +226,8 @@ void CreateSystemTasks()
 	struct thread_d *Thread;
 	
     printf("CreateSystemTasks: Creating System threads..\n");
-	KeCreateShell();
-	KeCreateTaskManager();
+	KiCreateShell();
+	KiCreateTaskManager();
 	//...
 	
 	//
@@ -283,17 +283,10 @@ done:
 
 
 /*
- * KeCreateKernelProcess:
+ * KiCreateKernelProcess:
  *    Criando manualmente o processo do Kernel.
- *    
- * @todo: 
- *     Rever a inicial Ke, pois é usado para chamadas à módulos externos.  
- *
- * @todo: 
- *     Mudar o nome para createCreateKernelProcess()
  */
-//void *createCreateKernelProcess() 
-void *KeCreateKernelProcess()
+void *KiCreateKernelProcess()
 {
 	struct process_d *p;
 	char *ProcessName = "KERNEL PROCESS";
@@ -303,7 +296,7 @@ void *KeCreateKernelProcess()
 	p = (void *) malloc( sizeof(struct process_d) );
 	
 	if( (void*) p == NULL ){
-	    printf("KeCreateKernelProcess:");
+	    printf("KiCreateKernelProcess:");
 		refresh_screen();
 		while(1){}
 	}else{
@@ -328,6 +321,8 @@ void *KeCreateKernelProcess()
 	    p->Image       = KERNEL_IMAGE_BASE;   // Base da imagem do processo.
 	    //KernelProcess->ImageSize = 0;       // Tamanho da imagem do processo.				
 	    
+		//@todo: objectType, objectClass, appMode
+		
 		//Identifications.
 		p->pid  = (int) 0;                   //PID.
 	    p->ppid = (int) p->pid;  //PPID, Criado por ele mesmo.	 
@@ -378,7 +373,7 @@ done:
 
 
 /*
- * KeCreateIdle:
+ * KiCreateIdle:
  *     Criando Idle thread manualmente.
  * *IMPORTANTE: Na verdade esse processos e threads devem ser criados 
  * com uma funçao que passe os parametros via argumento, tipo 
@@ -387,7 +382,7 @@ done:
  * Obs: Criar idle thread com prioridade alta. TID=0 Idle (RING 3).
  * @todo: Mudar o nome para createCreateIdleThread()
  */
-void *KeCreateIdle()
+void *KiCreateIdle()
 {
     void *idleStack;                    // Stack pointer.
 	char *ThreadName = "idlethread";    // Name.
@@ -395,7 +390,7 @@ void *KeCreateIdle()
     //Aloca memória mara a estrutura.
 	IdleThread = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) IdleThread == NULL ){
-	    printf("KeCreateIdle:\n");
+	    printf("KiCreateIdle:\n");
 		refresh_screen();
 		while(1){}
 	}
@@ -403,7 +398,7 @@ void *KeCreateIdle()
 	{ 
 	    //Ver se a estrutura do processo é válida.
 		if( (void*) KernelProcess == NULL ){
-	        printf("KeCreateIdle: Kernel Process was not created.\n");
+	        printf("KiCreateIdle: Kernel Process was not created.\n");
 		    refresh_screen();
 		    while(1){}
 	    }else{
@@ -433,7 +428,7 @@ void *KeCreateIdle()
 	//#BugBug.
 	idleStack = (void*) malloc(4*1024);
 	if( (void*) idleStack == NULL ){
-	    printf("KeCreateIdle fail: Stack.\n");
+	    printf("KiCreateIdle fail: Stack.\n");
 		refresh_screen();
 		while(1){}
 	};
@@ -445,8 +440,7 @@ void *KeCreateIdle()
 	//     Mas por enquanto serão feitas à mão essas primeiras threads. 
 	//
 	
-	//Object. @todo: Isso parece ser legal.
-	//IdleThread->ObjectType = OBJECT_THREAD;
+	//@todo: objectType, objectClass, appMode
 	
     //Identificadores.
 	IdleThread->tid = 0;
@@ -560,18 +554,18 @@ void *KeCreateIdle()
 // Done.	
 done:
     queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_INITIALIZED);
-    SelectForExecution(IdleThread);    // * MOVEMENT 1 ( Initialized ---> Standby).
+    SelectForExecution(IdleThread);    // * MOVEMENT 1 ( Initialized ---> Standby ).
    	return (void*) IdleThread;
 };
 
 
 
 /*
- * KeCreateShell:
+ * KiCreateShell:
  *     Criando Thread Shell manualmente.
  * @todo: Mudar o nome para createCreateShellThread()
  */
-void *KeCreateShell()
+void *KiCreateShell()
 {
     void *shellStack;                    // Stack pointer. 
 	struct thread_d *t;
@@ -594,13 +588,13 @@ void *KeCreateShell()
 	p = (void*) malloc( sizeof(struct process_d) );	
 	if( (void*) p == NULL)
 	{
-	    printf("KeCreateShell: Process fail.\n");
+	    printf("KiCreateShell: Process fail.\n");
 		refresh_screen();
 		while(1){}
 	};
 	*/
 	if( (void*) KernelProcess == NULL ){
-	    printf("KeCreateShell: Kernel Process is not created.\n");
+	    printf("KiCreateShell: Kernel Process is not created.\n");
 		refresh_screen();
 		while(1){}
 	};	
@@ -608,7 +602,7 @@ void *KeCreateShell()
 	//Thread.
 	t = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) t == NULL ){
-	    printf("KeCreateShell fail: Thread.\n");
+	    printf("KiCreateShell fail: Thread.\n");
 		refresh_screen();
 		while(1){}
 	}
@@ -621,10 +615,12 @@ void *KeCreateShell()
 	//Stack.
 	shellStack = (void*) malloc(4*1024);
 	if( (void*) shellStack == NULL ){
-	    printf("KeCreateShell: Stack fail.\n");
+	    printf("KiCreateShell: Stack fail.\n");
 		refresh_screen();
 		while(1){}
 	};
+	
+	//@todo: objectType, objectClass, appMode
 
     //Identificadores.       	
 	t->tid = 1;     
@@ -724,18 +720,18 @@ void *KeCreateShell()
 // Done.
 done:
     queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
-    SelectForExecution(t);    // * MOVEMENT 1 ( Initialized --> Standby).
+    SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
     return (void*) t;
 };
 
 
 
 /*
- * KeCreateTaskManager:
+ * KiCreateTaskManager:
  *     Criando thread task manager manualmente.
  * @todo: Mudar o nome para createCreateTaskmanThread()
  */
-void *KeCreateTaskManager()
+void *KiCreateTaskManager()
 {
     void *taskmanStack;                    // Stack pointer. 	
 	struct thread_d *t;
@@ -758,13 +754,13 @@ void *KeCreateTaskManager()
 	p = (void*) malloc( sizeof(struct process_d) );	
 	if( (void*) p == NULL)
 	{
-	    printf("KeCreateTaskManager: Process fail.\n");
+	    printf("KiCreateTaskManager: Process fail.\n");
 		refresh_screen();
 		while(1){}
 	};
 	*/
 	if( (void*) KernelProcess == NULL ){
-	    printf("KeCreatetaskManager: Kernel Process not created.\n");
+	    printf("KiCreatetaskManager: Kernel Process not created.\n");
 		refresh_screen();
 		while(1){}
 	};	
@@ -772,7 +768,7 @@ void *KeCreateTaskManager()
     //Thread.
 	t = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) t == NULL ){
-	    printf("KeCreateTaskManager: Thread fail.\n");
+	    printf("KiCreateTaskManager: Thread fail.\n");
 		refresh_screen();
 		while(1){}
 	}
@@ -785,7 +781,7 @@ void *KeCreateTaskManager()
 	//Stack.
 	taskmanStack = (void*) malloc(4*1024);
 	if( (void*) taskmanStack == NULL ){
-	    printf("KeCreateTaskManager: Stack fail.\n");
+	    printf("KiCreateTaskManager: Stack fail.\n");
 		refresh_screen();
 		while(1){}
 	};
@@ -869,7 +865,7 @@ void *KeCreateTaskManager()
 	//t->CurrentProcessor = 0;   //Qual processador.
 	//t->NextProcessor = 0;      //Próximo processador. 
 	
-	//Coloca na lista de estruras.
+	//Coloca na lista de estruturas.
 	threadList[2] = (unsigned long) t;
 	
 	t->Next = NULL;
@@ -883,7 +879,7 @@ void *KeCreateTaskManager()
 // Done.
 done:
     queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
-    SelectForExecution(t);    // * MOVEMENT 1 ( Initialized --> Standby).
+    SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
     return (void*) t;
 };
 

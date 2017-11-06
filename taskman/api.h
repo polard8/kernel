@@ -1,23 +1,30 @@
 /*
+ * API - This is the header for 32bit applications.
+ * Copyright (c) 2017 Fred Nora.
+ *
  * File: api.h 
  *   
  * Description:
  *    Header da API do sistema.
  *    API - ( Application Programming Interface ).
- *    The functions here, calls the services of Krernel via interrupts. 
- *    So and application in User Mode can call the Kernel resources and 
+ *    The functions here, call the services of the Kernel via interrupts. 
+ *    So and application in User Mode can uses the Kernel resources and 
  * the resources of the modules.
+ *
+ * Sobre as interrupções:
+ *     +As primeiras são interrupções de hardware.
  *     +As interrupções de serviços do KERNEL vão de 48 à 199.
- *     +A interrupções principal é a 200.
+ *     +A interrupções principal é a *200.
  *     +As interrupções de chamadas especiais vão de 201 até 215. 
  *     +As interrupções de serviços da GUI vão de 216 à 219.
+ *     +As outras estão indefinidas 220 até 255.
  *
- *   Patterns:
- *       + My Own.
- *       + Single UNIX Specification (SUS).
- *       + Portable Operating System Interface (POSIX).
- *       + C99. 
- *       + ...  
+ * Patterns:
+ *     + My Own.
+ *     + Single UNIX Specification (SUS).
+ *     + Portable Operating System Interface (POSIX).
+ *     + C99. 
+ *     + ...  
  *
  * Sequência:
  *     +Os números das interrupções suportadas.
@@ -25,26 +32,21 @@
  *
  *     *IMPORTANTE, as definições de chamadas não podem ser minúsculas.
  *
- * Histórico: 
- *     Version 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
- *     Version 1.0, 2014 - Implimentação de novas chamadas. 
- *     Version 1.0, 2015 - Implimentação de novas chamadas.
- *     Version 1.0, 2016 - Implementação de novas chamadas.
+ * Obs: No futuro pode haver alguma reorganização desses números. 
+ *      a mesma ordem deverá se obedecida no kernel base. 
  *
- * Copyright (c) Frederico Martins Nora (frednora).
+ * Histórico: 
+ *     2013 - Esse arquivo foi criado por Fred Nora.
+ *     2014 - Implimentação de novas chamadas. 
+ *     2015 - Implimentação de novas chamadas.
+ *     2016 - Implementação de novas chamadas.
+ *     2017 - Revisão.
  */
 
  
 //
 // @todo: Fazer suporte a objetos. estruturas.
 //
- 
- 
-/*
- * List of services using the interrpt 200.
- * The services go from 0 to 255.
- *
- */ 
  
 // 
 //Interrupções. 
@@ -54,14 +56,17 @@
 /*
  * KERNEL:
  *     Serviços relativos ao gerenciamento do kernel.
- *     Manipula status e estatísticas do kernel. Também faz
- * configurações em tempo real, tais como: selecionar tipo de scheduler,
- * gerenciar quantidade de recursos etc ...
- * De 48 até 199.
+ *     Manipula status e estatísticas do kernel. Também faz configurações 
+ * em tempo real, tais como: Selecionar tipo de scheduler, gerenciar 
+ * quantidade de recursos etc ...
+ *     Isso são interrupções.
+ *     De 48 até 199.
  */
 //Kernel.
 #define	KERNEL      48
+#define	KERNEL48    48
 #define	KERNEL49    49
+
 #define	KERNEL50    50
 #define	KERNEL51    51
 #define	KERNEL52    52
@@ -70,9 +75,163 @@
 #define	KERNEL55    55
 #define	KERNEL56    56
 #define	KERNEL57    57
-//...
-#define	KERNEL199    199
+#define	KERNEL58    58
+#define	KERNEL59    59
 
+#define	KERNEL60    60
+#define	KERNEL61    61
+#define	KERNEL62    62
+#define	KERNEL63    63
+#define	KERNEL64    64
+#define	KERNEL65    65
+#define	KERNEL66    66
+#define	KERNEL67    67
+#define	KERNEL68    68
+#define	KERNEL69    69
+
+#define	KERNEL70    70
+#define	KERNEL71    71
+#define	KERNEL72    72
+#define	KERNEL73    73
+#define	KERNEL74    74
+#define	KERNEL75    75
+#define	KERNEL76    76
+#define	KERNEL77    77
+#define	KERNEL78    78
+#define	KERNEL79    79
+
+#define	KERNEL80    80
+#define	KERNEL81    81
+#define	KERNEL82    82
+#define	KERNEL83    83
+#define	KERNEL84    84
+#define	KERNEL85    85
+#define	KERNEL86    86
+#define	KERNEL87    87
+#define	KERNEL88    88
+#define	KERNEL89    89
+
+#define	KERNEL90    90
+#define	KERNEL91    91
+#define	KERNEL92    92
+#define	KERNEL93    93
+#define	KERNEL94    94
+#define	KERNEL95    95
+#define	KERNEL96    96
+#define	KERNEL97    97
+#define	KERNEL98    98
+#define	KERNEL99    99
+
+#define	KERNEL100   100
+#define	KERNEL101   101
+#define	KERNEL102   102
+#define	KERNEL103   103
+#define	KERNEL104   104
+#define	KERNEL105   105
+#define	KERNEL106   106
+#define	KERNEL107   107
+#define	KERNEL108   108
+#define	KERNEL109   109
+
+#define	KERNEL110    110
+#define	KERNEL111    111
+#define	KERNEL112    112
+#define	KERNEL113    113
+#define	KERNEL114    114
+#define	KERNEL115    115
+#define	KERNEL116    116
+#define	KERNEL117    117
+#define	KERNEL118    118
+#define	KERNEL119    119
+
+#define	KERNEL120    120
+#define	KERNEL121    121
+#define	KERNEL122    122
+#define	KERNEL123    123
+#define	KERNEL124    124
+#define	KERNEL125    125
+#define	KERNEL126    126
+#define	KERNEL127    127
+#define	KERNEL128    128
+#define	KERNEL129    129
+
+#define	KERNEL130    130
+#define	KERNEL131    131
+#define	KERNEL132    132
+#define	KERNEL133    133
+#define	KERNEL134    134
+#define	KERNEL135    135
+#define	KERNEL136    136
+#define	KERNEL137    137
+#define	KERNEL138    138
+#define	KERNEL139    139
+
+#define	KERNEL140    140
+#define	KERNEL141    141
+#define	KERNEL142    142
+#define	KERNEL143    143
+#define	KERNEL144    144
+#define	KERNEL145    145
+#define	KERNEL146    146
+#define	KERNEL147    147
+#define	KERNEL148    148
+#define	KERNEL149    149
+
+#define	KERNEL150    150
+#define	KERNEL151    151
+#define	KERNEL152    152
+#define	KERNEL153    153
+#define	KERNEL154    154
+#define	KERNEL155    155
+#define	KERNEL156    156
+#define	KERNEL157    157
+#define	KERNEL158    158
+#define	KERNEL159    159
+
+#define	KERNEL160    160
+#define	KERNEL161    161
+#define	KERNEL162    162
+#define	KERNEL163    163
+#define	KERNEL164    164
+#define	KERNEL165    165
+#define	KERNEL166    166
+#define	KERNEL167    167
+#define	KERNEL168    168
+#define	KERNEL169    169
+
+#define	KERNEL170    170
+#define	KERNEL171    171
+#define	KERNEL172    172
+#define	KERNEL173    173
+#define	KERNEL174    174
+#define	KERNEL175    175
+#define	KERNEL176    176
+#define	KERNEL177    177
+#define	KERNEL178    178
+#define	KERNEL179    179
+
+#define	KERNEL180    180
+#define	KERNEL181    181
+#define	KERNEL182    182
+#define	KERNEL183    183
+#define	KERNEL184    184
+#define	KERNEL185    185
+#define	KERNEL186    186
+#define	KERNEL187    187
+#define	KERNEL188    188
+#define	KERNEL189    189
+
+
+#define	KERNEL190    190
+#define	KERNEL191    191
+#define	KERNEL192    192
+#define	KERNEL193    193
+#define	KERNEL194    194
+#define	KERNEL195    195
+#define	KERNEL196    196
+#define	KERNEL197    197
+#define	KERNEL198    198
+#define	KERNEL199    199
 
 
 /*
@@ -133,10 +292,13 @@
 
 
 //
-// Obs: As interrupções à partir de 220 ainda não foram definidas.
+// Obs: As outras estão indefinidas. De 220 até 255.
 //
 
 
+//
+// * Agora segue a lista de serviços usados pela interupção principal. 200.
+//
 
 /*
  * interrupção 200:
@@ -150,8 +312,9 @@
  * Obs: A ordem dos 19 primeiros implica prioridade e velocidade.
  *      Os serviços estão organizados por categoria.
  *
- * Lembrete: Lembre-se que a ordem que está aqui deve necessariamente
- * ser amesma ordem encontradas no kernel base. Portanto, alterações
+ * Lembrete: 
+ * *Importante: Lembre-se que a ordem que está aqui deve necessariamente
+ * ser a mesma ordem encontrada no kernel base. Portanto, alterações
  * aqui apresentam um grande custo, pois acarretam mudanças no kernel base.
  * 
  * Histórico da lista:
@@ -161,156 +324,200 @@
  */
 //NULL.
 #define	SYSTEMCALL_NULL  0
+
 //Disk.
 #define	SYSTEMCALL_READ_LBA    1
 #define	SYSTEMCALL_WRITE_LBA   2
 #define	SYSTEMCALL_READ_FILE   3
 #define	SYSTEMCALL_WRITE_FILE  4
+
 //Gráfico.
-#define	SYSTEMCALL_VSYNC  5
-#define	SYSTEMCALL_BUFFER_PUTPIXEL  6
-#define	SYSTEMCALL_BUFFER_DRAWCHAR  7
-#define	SYSTEMCALL_BUFFER_DRAWLINE  8
-#define	SYSTEMCALL_BUFFER_DRAWRECT  9
+#define	SYSTEMCALL_VSYNC                5
+#define	SYSTEMCALL_BUFFER_PUTPIXEL      6
+#define	SYSTEMCALL_BUFFER_DRAWCHAR      7
+#define	SYSTEMCALL_BUFFER_DRAWLINE      8
+#define	SYSTEMCALL_BUFFER_DRAWRECT      9
 #define	SYSTEMCALL_BUFFER_CREATEWINDOW  10
-#define	SYSTEMCALL_REFRESHSCREEN  11
+#define	SYSTEMCALL_REFRESHSCREEN        11
+
 //Rede.
 #define	SYSTEMCALL_REDE_RES1  12
 #define	SYSTEMCALL_REDE_RES2  13
 #define	SYSTEMCALL_REDE_RES3  14
 #define	SYSTEMCALL_REDE_RES4  15
+
 //i/o.
 #define	SYSTEMCALL_IO_RES1  16
 #define	SYSTEMCALL_IO_RES2  17
 #define	SYSTEMCALL_IO_RES3  18
 #define	SYSTEMCALL_IO_RES4  19
+
 //Outros. 
+
 //Buffer.
 #define	SYSTEMCALL_REFRESH_BUFFER1  20
 #define	SYSTEMCALL_REFRESH_BUFFER2  21
 #define	SYSTEMCALL_REFRESH_BUFFER3  22
+
 //Screen.
 #define	SYSTEMCALL_REFRESH_SCREEN2  23
+
 //Refresh Bars.
 #define	SYSTEMCALL_REFRESH_TITLEBAR   24
 #define	SYSTEMCALL_REFRESH_MENUBAR    25
 #define	SYSTEMCALL_REFRESH_TOOLBAR    26
 #define	SYSTEMCALL_REFRESH_STATUSBAR  27
 #define	SYSTEMCALL_REFRESH_TASKBAR    28
-//Buffer.
+
+//Buffer: Print string.
 #define	SYSTEMCALL_BUFFER_PRINTSTRING  29
-//Put pixel on buffer.
+
+//Buffer: Put pixel on buffer.
 #define	SYSTEMCALL_BUFFER1_PUTPIXEL  30
 #define	SYSTEMCALL_BUFFER2_PUTPIXEL  31
 #define SYSTEMCALL_BUFFER3_PUTPIXEL  32
+
 //Edit box.
 #define	SYSTEMCALL_EDITBOX    33
+
 //Cursor.
 #define	SYSTEMCALL_SETCURSOR  34
+
 //Message and procedures.
-#define	SYSTEMCALL_SETPROCEDURE  35
-#define	SYSTEMCALL_KSENDMESSAGE  36          //O teclado envia essa mensagem para o procedimento ativo.
+#define	SYSTEMCALL_SETPROCEDURE          35
+#define	SYSTEMCALL_KSENDMESSAGE          36  //O teclado envia essa mensagem para o procedimento ativo.
 #define	SYSTEMCALL_CALL_SYSTEMPROCEDURE  37  //chama o procedimento padrao do sistema.
+
 //Read sector.
 #define	SYSTEMCALL_READSECTOR  38
+
 //Show buffer.
 #define	SYSTEMCALL_SHOWBUFFER  39
-//Shut down conputer.
+
+//Shut down computer.
 #define	SYSTEMCALL_SHUTDOWN  40    //Desliga o computador.
 #define	SYSTEMCALL_41        41
-//Load bitmap image, size=16x16.
-#define	SYSTEMCALL_LOAD_BITMAP_16x16  42
+
+//Bitmap img: 
+#define	SYSTEMCALL_LOAD_BITMAP_16x16  42  //Load bitmap image, size=16x16.
 #define	SYSTEMCALL_43                 43
+
 // ?? Next app.
 #define	SYSTEMCALL_G_NEXT_APP         44
+
 //Message box.
 #define	SYSTEMCALL_MESSAGE_BOX        45
+
 //Client area.
 #define	SYSTEMCALL_SET_CLIENT_AREA    46
+
 //Create Window support.
 #define	SYSTEMCALL_CREATEWINDOW0  47
 #define	SYSTEMCALL_CREATEWINDOW1  48
 #define	SYSTEMCALL_CREATEWINDOW2  49
-#define SYSTEMCALL_CREATEWINDOW3  50
-#define	SYSTEMCALL_CREATEWINDOW4  51
-#define	SYSTEMCALL_CREATEWINDOW5  52
-#define	SYSTEMCALL_CREATEWINDOW6  53
-#define	SYSTEMCALL_CREATEWINDOW7  54
-#define	SYSTEMCALL_CREATEWINDOW8  55
-#define	SYSTEMCALL_CREATEWINDOW9  56
+
+//
+//(50~59) Window suppot, manipulação de janelas.
+//
+
+#define	SYSTEMCALL_RESIZEWINDOW    50 //resize. 
+#define	SYSTEMCALL_REDRAWWINDOW    51 //redraw.
+#define	SYSTEMCALL_REPLACEWINDOW   52 //replace.
+#define	SYSTEMCALL_MAXIMIZEWINDOW    53 //MAXIMIZE
+#define	SYSTEMCALL_MINIMIZEWINDOW    54 //MINMIZE
+#define	SYSTEMCALL_GETFOREGROUNDWINDOW    55   //GET FOREGROUND
+#define	SYSTEMCALL_SETFOREGROUNDWINDOW    56   // SET FOREGROUND
 //Register window.
-#define	SYSTEMCALL_REGISTERWINDOW  57
+#define	SYSTEMCALL_REGISTERWINDOW  57  
 //Close window.
 #define	SYSTEMCALL_CLOSEWINDOW     58
 //Destroy window. (Destrói a estrutura e a classe).
 #define	SYSTEMCALL_DESTROYWINDOW   59
-//Active window.
+
+
+
+//Active window support.
 #define	SYSTEMCALL_SETACTIVEWINDOW  60
 #define	SYSTEMCALL_GETACTIVEWINDOW  61
-//Focus.
+
+//Focus support.
 #define	SYSTEMCALL_SETFOCUS   62
 #define	SYSTEMCALL_GETFOCUS   63
 #define	SYSTEMCALL_KILLFOCUS  64
-//Outros. @todo: Reservar próximos para seleção de janela. 
+
+//Outros. 
+//@todo: Reservar próximos para seleção de janela. 
 #define	SYSTEMCALL_65  65
 #define	SYSTEMCALL_66  66
 #define	SYSTEMCALL_67  67
 #define	SYSTEMCALL_68  68
 #define	SYSTEMCALL_69  69
+
 //Exit process support.
-#define	SYSTEMCALL_EXIT  70
-#define	SYSTEMCALL_71    71  //@todo: Reservar para saída de processo.
+#define	SYSTEMCALL_EXIT             70
+
+//fork support.
+#define	SYSTEMCALL_FORK             71  
+
 //Create thread.
-#define	SYSTEMCALL_CREATETHREAD  72
+#define	SYSTEMCALL_CREATETHREAD     72
+
 //Create process.
-#define	SYSTEMCALL_CREATEPROCESS 73
-//Outros. @todo: Reservar próximos para manipulação de threads e processos. 
-#define	SYSTEMCALL_74    74
-#define	SYSTEMCALL_75    75
-#define	SYSTEMCALL_76    76
-#define	SYSTEMCALL_77    77
-#define	SYSTEMCALL_78    78
-#define	SYSTEMCALL_79    79
+#define	SYSTEMCALL_CREATEPROCESS    73
+
+//Outros. 
+//@todo: Reservar próximos para manipulação de threads e processos. 
+#define	SYSTEMCALL_CLOSEALLPROCESS  74
+#define	SYSTEMCALL_75               75 //poderia ser close current process.??
+#define	SYSTEMCALL_GETNEXTPROCESS   76
+#define	SYSTEMCALL_SETNEXTPROCESS   77
+#define	SYSTEMCALL_GETNEXTTHREAD    78
+#define	SYSTEMCALL_SETNEXTTHREAD    79
+
 //@todo: Resevar próximos para manipulação de processos.
 #define	SYSTEMCALL_CURRENTPROCESSINFO  80  //Informações sobre o processo atual.
-#define	SYSTEMCALL_81  81
-#define	SYSTEMCALL_82  82
-#define	SYSTEMCALL_83  83
-#define	SYSTEMCALL_84  84
-#define	SYSTEMCALL_85  85
-#define	SYSTEMCALL_86  86
-
+#define	SYSTEMCALL_GETPPID  81
+#define	SYSTEMCALL_SETPPID  82
+#define	SYSTEMCALL_WAIT4    83 //wait for process termination
+#define	SYSTEMCALL_84       84
+#define	SYSTEMCALL_GETPID   85
+#define	SYSTEMCALL_SETPID   86
 #define	SYSTEMCALL_SEMAPHORE_DOWN  87
-#define	SYSTEMCALL_88  88  //Em uso. não mudar.
-#define	SYSTEMCALL_SEMAPHORE_UP  89
+#define	SYSTEMCALL_88              88  //Em uso. não mudar.
+#define	SYSTEMCALL_SEMAPHORE_UP    89
 
+//reserva próximos para manipulação de threads.
 //Dead thread collector.
 #define	SYSTEMCALL_DEAD_THREAD_COLLECTOR  90
-#define	SYSTEMCALL_91  91
+#define	SYSTEMCALL_ALERTTHREAD  91
 #define	SYSTEMCALL_92  92
 #define	SYSTEMCALL_93  93
 #define	SYSTEMCALL_94  94
 #define	SYSTEMCALL_95  95
 #define	SYSTEMCALL_96  96
 #define	SYSTEMCALL_97  97
-#define	SYSTEMCALL_98  98
-#define	SYSTEMCALL_99  99
+#define	SYSTEMCALL_RESUMETHREAD  98
+
 //Procedure arguments. (window,msg,long1,long2)
+#define	SYSTEMCALL_GET_HWINDOW           99
 #define	SYSTEMCALL_GET_KEYBOARD_MESSAGE  100
 #define	SYSTEMCALL_GET_LONG1             101 
 #define	SYSTEMCALL_GET_LONG2             102
-//Mensagens, channels, sockets.
-#define	SYSTEMCALL_RECEIVEMESSAGE 103  //Pega uma mensagem no PCB de um processo.
-#define	SYSTEMCALL_SENDMESSAGE 104     //Envia uma mensagem para o PCB de um processo.
-//Reservar próximos para manipulação de mensagens (ipc).
-#define	SYSTEMCALL_105 105
-#define	SYSTEMCALL_106 106
-#define	SYSTEMCALL_107 107
-#define	SYSTEMCALL_108 108
-#define	SYSTEMCALL_109 109
+
+//(103~109) Rotinas de mensagens. Channels, Sockets.
+#define	SYSTEMCALL_RECEIVEMESSAGE     103  //Pega uma mensagem no PCB de um processo.
+#define	SYSTEMCALL_SENDMESSAGE        104  //Envia uma mensagem para o PCB de um processo.
+#define	SYSTEMCALL_REGISTERPROCEDURE  105
+#define	SYSTEMCALL_CREATECHANNEL      106
+#define	SYSTEMCALL_DESTROYCHANNEL     107
+#define	SYSTEMCALL_OPENCHANNEL        108
+#define	SYSTEMCALL_CLOSECHANNEL       109
+
 //Reboot.
 #define	SYSTEMCALL_REBOOT  110
-//Outros. @todo: Reservar para gerenciamento de energia.
+
+//Outros. 
+//@todo: Reservar para gerenciamento de energia. 111- 119
 #define	SYSTEMCALL_111  111
 #define	SYSTEMCALL_112  112
 #define	SYSTEMCALL_113  113
@@ -320,53 +527,65 @@
 #define	SYSTEMCALL_117  117
 #define	SYSTEMCALL_118  118
 #define	SYSTEMCALL_119  119
-//Outros.
-#define	SYSTEMCALL_120 120
-#define	SYSTEMCALL_121 121
-#define	SYSTEMCALL_122 122
-#define	SYSTEMCALL_123 123
-#define	SYSTEMCALL_124 124
-#define	SYSTEMCALL_125 125
+
+//??
+//120-125 gerenciamento de barras
+#define	SYSTEMCALL_CREATEMENUBAR    120
+#define	SYSTEMCALL_CREATETASKBAR    121
+#define	SYSTEMCALL_CREATESTATUSBAR  122
+#define	SYSTEMCALL_123              123
+#define	SYSTEMCALL_124              124
+#define	SYSTEMCALL_125              125
+
+//126~129 (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
 #define	SYSTEMCALL_126 126
 #define	SYSTEMCALL_127 127
 #define	SYSTEMCALL_128 128
-#define	SYSTEMCALL_129 129
-//Text support.
+//129: Inicializando um driver. Um driver enviou uma systemcall 
+//confirmando a inicialização de um driver.
+#define	SYSTEMCALL_DRIVERINITIALIZED 129
+
+//130-139 Manipulação de texto.
 #define	SYSTEMCALL_DRAWTEXT  130
-//@todo: Resevar próximos para manipulação de texto.
-#define	SYSTEMCALL_131  131
-#define	SYSTEMCALL_132  132
-#define	SYSTEMCALL_133  133
-#define	SYSTEMCALL_134  134
-#define	SYSTEMCALL_135  135
-#define	SYSTEMCALL_136  136
-#define	SYSTEMCALL_137  137
-#define	SYSTEMCALL_138  138
-#define	SYSTEMCALL_139  139
-//Outros.
+#define	SYSTEMCALL_131       131
+#define	SYSTEMCALL_132       132
+#define	SYSTEMCALL_133       133
+#define	SYSTEMCALL_134       134
+#define	SYSTEMCALL_135       135
+#define	SYSTEMCALL_136       136
+#define	SYSTEMCALL_137       137
+#define	SYSTEMCALL_138       138
+#define	SYSTEMCALL_139       139
+
+//Outros. (texto)
 #define	SYSTEMCALL_140 140
 #define	SYSTEMCALL_141 141
 #define	SYSTEMCALL_142 142
 #define	SYSTEMCALL_143 143
+
+//144-149 Recursos da area do Cliente.
 #define	SYSTEMCALL_GETCLIENTAREARECT 144    // Get client Area rect.
 #define	SYSTEMCALL_SETCLIENTAREARECT 145    // Set Client Area rect.
-//@todo: Reservar próximos para gerenciamento de recurso do Cliente.
 #define	SYSTEMCALL_146 146
 #define	SYSTEMCALL_147 147
 #define	SYSTEMCALL_148 148
 #define	SYSTEMCALL_149 149
-//Outros.
-#define	SYSTEMCALL_150 150
-#define	SYSTEMCALL_151 151
-#define	SYSTEMCALL_152 152
-#define	SYSTEMCALL_153 153
-#define	SYSTEMCALL_154 154
-#define	SYSTEMCALL_155 155
-#define	SYSTEMCALL_156 156
+
+
+//150-159 user and group support.
+#define	SYSTEMCALL_CREATEUSER         150
+#define	SYSTEMCALL_SETCURRENTUSERID   151
+#define	SYSTEMCALL_GETCURRENTUSERID   152
+#define	SYSTEMCALL_SETCURRENTGROUPID  153
+#define	SYSTEMCALL_GETCURRENTGROUPID  154
+#define	SYSTEMCALL_UPDATEUSERINFO     155
+#define	SYSTEMCALL_SHOWUSERINFO       156
 #define	SYSTEMCALL_157 157
 #define	SYSTEMCALL_158 158
 #define	SYSTEMCALL_159 159
-//Outros.
+
+
+//160-169 network support
 #define	SYSTEMCALL_160 160
 #define	SYSTEMCALL_161 161
 #define	SYSTEMCALL_162 162
@@ -377,7 +596,8 @@
 #define	SYSTEMCALL_167 167
 #define	SYSTEMCALL_168 168
 #define	SYSTEMCALL_169 169
-//Outros
+
+//170-179 network support
 #define	SYSTEMCALL_170 170
 #define	SYSTEMCALL_171 171
 #define	SYSTEMCALL_172 172
@@ -388,20 +608,22 @@
 #define	SYSTEMCALL_177 177
 #define	SYSTEMCALL_178 178
 #define	SYSTEMCALL_179 179
-//Outros
-#define	SYSTEMCALL_180 180
-#define	SYSTEMCALL_181 181
-#define	SYSTEMCALL_182 182
-#define	SYSTEMCALL_183 183
-#define	SYSTEMCALL_184 184
-#define	SYSTEMCALL_185 185
-#define	SYSTEMCALL_186 186
-#define	SYSTEMCALL_187 187
-#define	SYSTEMCALL_188 188
-#define	SYSTEMCALL_189 189
-//Outros
-#define	SYSTEMCALL_190 190
-#define	SYSTEMCALL_191 191
+
+//180-189 Memory support.
+#define	SYSTEMCALL_CREATEPAGEDIRECTORY 180
+#define	SYSTEMCALL_CREATEPAGETABLE 181
+#define	SYSTEMCALL_SHOWMEMORYSTRUCTS 182
+#define	SYSTEMCALL_SETCR3 183
+#define	SYSTEMCALL_GETPROCESSHEAPPOINTER 184
+#define	SYSTEMCALL_SETKERNELHEAP 185
+#define	SYSTEMCALL_ALLOCATEKERNELHEAP 186
+#define	SYSTEMCALL_FREEKERNELHEAP 187
+#define	SYSTEMCALL_GETPROCESSDIRECTORY 188
+#define	SYSTEMCALL_SETPROCESSDIRECTORY 189
+
+//190-199 memory support.
+#define	SYSTEMCALL_SYS_GETPAGEDIRVALUE 190
+#define	SYSTEMCALL_ALLOCATEVIRTUALMEMORY 191
 #define	SYSTEMCALL_192 192
 #define	SYSTEMCALL_193 193
 #define	SYSTEMCALL_194 194
@@ -409,75 +631,86 @@
 #define	SYSTEMCALL_196 196
 #define	SYSTEMCALL_197 197
 #define	SYSTEMCALL_198 198
-#define	SYSTEMCALL_199 199
-//Outros.
-#define	SYSTEMCALL_200 200  //reservar.
-#define	SYSTEMCALL_201 201
-#define	SYSTEMCALL_202 202
-#define	SYSTEMCALL_203 203
-#define	SYSTEMCALL_204 204
-#define	SYSTEMCALL_205 205
-#define	SYSTEMCALL_206 206
-#define	SYSTEMCALL_207 207
-#define	SYSTEMCALL_208 208
-#define	SYSTEMCALL_209 209
-//Outros
-#define	SYSTEMCALL_210 210
-#define	SYSTEMCALL_211 211
-#define	SYSTEMCALL_212 212
-#define	SYSTEMCALL_213 213
-#define	SYSTEMCALL_214 214
-#define	SYSTEMCALL_215 215
-#define	SYSTEMCALL_216 216  //Reservar. (renascer)
-#define	SYSTEMCALL_217 217
-#define	SYSTEMCALL_218 218
-#define	SYSTEMCALL_219 219
+#define	SYSTEMCALL_199 199   //@todo: GC
+
+//Outros. (sinais, alertas, mesagens)
+#define	SYSTEMCALL_SENDSIGNAL         200  //??reservar.
+#define	SYSTEMCALL_WAIT4OBJECT        201
+#define	SYSTEMCALL_WAIT4EVENT         202
+#define	SYSTEMCALL_WAIT4DEVICE        203
+#define	SYSTEMCALL_WAIT4SIGNAL        204
+#define	SYSTEMCALL_GENERICWAIT        205
+#define	SYSTEMCALL_TIMERGETTICKCOUNT  206
+#define	SYSTEMCALL_TIMERGETTIMEOUT    207
+#define	SYSTEMCALL_TIMERSETTIMEOUT    208
+#define	SYSTEMCALL_CALLIOSERVICES     209
+
+//tty;console;terminal - terminal emulator support.
+#define	SYSTEMCALL_CREATETERMINAL          210
+#define	SYSTEMCALL_GETCURRENTTERMINAL      211
+#define	SYSTEMCALL_SETCURRENTTERMINAL      212
+#define	SYSTEMCALL_GETTERMINALINPUTBUFFER  213
+#define	SYSTEMCALL_SETTERMINALINPUTBUFFER  214
+#define	SYSTEMCALL_GETTERMINALWINDOW       215
+#define	SYSTEMCALL_SETTERMINALWINDOW       216
+#define	SYSTEMCALL_GETTERMINALRECT         217
+#define	SYSTEMCALL_SETTERMINALRECT         218
+#define	SYSTEMCALL_DESTROYTERMINAL         219
+
 //Reboot.
 #define	SYSTEMCALL_REBOOT2  220
-#define	SYSTEMCALL_221  221
-#define	SYSTEMCALL_222  222
+
+//program support.
+#define	SYSTEMCALL_EXECUTEPROGRAM  221  //execute program.
+#define	SYSTEMCALL_222             222  
 #define	SYSTEMCALL_223  223
 #define	SYSTEMCALL_224  224
 #define	SYSTEMCALL_225  225
-#define	SYSTEMCALL_226  226
-#define	SYSTEMCALL_227  227
-#define	SYSTEMCALL_228  228
-#define	SYSTEMCALL_229  229
-//Outros.
-#define	SYSTEMCALL_230 230
-#define	SYSTEMCALL_231 231
-#define	SYSTEMCALL_232 232
-#define	SYSTEMCALL_233 233
-#define	SYSTEMCALL_234 234
-#define	SYSTEMCALL_235 235
-#define	SYSTEMCALL_236 236
-#define	SYSTEMCALL_237 237
-#define	SYSTEMCALL_238 238
-#define	SYSTEMCALL_239 239
-//Cursor support.
+
+//Critical section. (kernel semaphore)
+//Um semáforo do kernel para uso geral.
+#define	SYSTEMCALL_GET_KERNELSEMAPHORE    226
+#define	SYSTEMCALL_CLOSE_KERNELSEMAPHORE  227
+#define	SYSTEMCALL_OPEN_KERNELSEMAPHORE   228
+
+//debug stuff
+#define	SYSTEMCALL_KERNELDEBUG  229
+
+//230-239 (Boot support)
+//logon logoff support.
+#define	SYSTEMCALL_STARTLOGON     230
+#define	SYSTEMCALL_STARTLOGOFF    231
+#define	SYSTEMCALL_232            232
+#define	SYSTEMCALL_233            233
+#define	SYSTEMCALL_234            234
+#define	SYSTEMCALL_235            235
+#define	SYSTEMCALL_236            236
+#define	SYSTEMCALL_237            237
+#define	SYSTEMCALL_238            238
+#define	SYSTEMCALL_SETBOOTOPTIONS 239
+
+
+//240-249 Reservar próximos para gerenciamento de cursor e ponteiros.
 #define	SYSTEMCALL_GETCURSORX  240
 #define	SYSTEMCALL_GETCURSORY  241
-//@todo: Reservar próximos para gerenciamento de cursor e ponteiros.
-#define	SYSTEMCALL_242  242
-#define	SYSTEMCALL_243  243
-#define	SYSTEMCALL_244  244
-#define	SYSTEMCALL_245  245
-#define	SYSTEMCALL_246  246
-#define	SYSTEMCALL_247  247
-#define	SYSTEMCALL_248  248
-#define	SYSTEMCALL_249  249
-//Info support, get info. (250 ~ 255).
+#define	SYSTEMCALL_242         242
+#define	SYSTEMCALL_243         243
+#define	SYSTEMCALL_244         244
+#define	SYSTEMCALL_245         245
+#define	SYSTEMCALL_246         246
+#define	SYSTEMCALL_247         247
+#define	SYSTEMCALL_248         248
+#define	SYSTEMCALL_249         249
+
+
+//(250 ~ 255) Info support, get info.
 //Ou últimos oferecem informações sobre o sistema.
-#define	SYSTEMCALL_250  250 
-#define	SYSTEMCALL_251  251
-#define	SYSTEMCALL_252  252
-#define	SYSTEMCALL_253  253
+#define	SYSTEMCALL_250                      250 
+#define	SYSTEMCALL_251                      251
+#define	SYSTEMCALL_252                      252
+#define	SYSTEMCALL_253                      253
 #define	SYSTEMCALL_SHOW_PCI_INFORMATION     254
 #define	SYSTEMCALL_SHOW_KERNEL_INFORMATION  255
-
-
-
-
 
 
 //
@@ -486,17 +719,44 @@
 
 /*
  * Constantes para níveis de prioridade.
- * @todo: Definir melhor isso.
+ * Se um processo quiser alterar a prioridade de outro processo.
+ * Qualquer processo pode obter sua prioridade e analizar através 
+ * dessas definições.
  */
-#define PRIORITY_LOW       1
-#define PRIORITY_NORMAL    5
-#define PRIORITY_BOOST     7 
-#define PRIORITY_HIGH      8
-#define PRIORITY_REALTIME  9     
-//#define PRIORITY_MAX       KERNEL_MAX_PRIORITY    
-//PRIORITY_REALTIME  
+ 
+//Definições principais. 
+#define PRIORITY_LOW4      1  //4
+#define PRIORITY_LOW3      2  //3
+#define PRIORITY_LOW2      3  //2
+#define PRIORITY_LOW1      4  //1 
+#define PRIORITY_NORMAL    5  //*0 (Normal).
+#define PRIORITY_HIGH1     6  //1
+#define PRIORITY_HIGH2     7  //2
+#define PRIORITY_HIGH3     8  //3
+#define PRIORITY_HIGH4     9  //4
+//Definições secundárias.
+#define PRIORITY_LOW        PRIORITY_LOW1
+#define PRIORITY_SUPERLOW   PRIORITY_LOW4
+#define PRIORITY_MIN        PRIORITY_SUPERLOW
+#define PRIORITY_HIGH       PRIORITY_HIGH1 
+#define PRIORITY_SUPERHIGH  PRIORITY_HIGH4
+#define PRIORITY_MAX        PRIORITY_SUPERHIGH    
+//Definição especial.
+#define PRIORITY_REALTIME  10    
 
 
+
+
+
+
+//
+// Colors: Gray support.
+//
+
+//WIN23
+#define COLOR_LITBUTTON  0x00E0E0E0
+#define COLOR_LTGRAY     0x00C0C0C0
+#define COLOR_GRAY       0x00808080
 
 
 //
@@ -587,7 +847,7 @@
 #define COLOR_GOLDENROD 0xDAA520FF
 #define COLOR_GRADIENTACTIVECAPTION 0xB9D1EAFF
 #define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2FF
-#define COLOR_GRAY 0x008080FF
+//#define COLOR_GRAY 0x008080FF
 #define COLOR_GRAYTEXT 0x008080FF
 #define COLOR_GREEN 0x008000FF
 #define COLOR_GREENYELLOW 0xADFF2FFF
@@ -890,7 +1150,7 @@
 
 
 //
-// Keyboard LEDs
+// Keyboard LEDs support.
 //
 
 #define LED_SCROLLLOCK  1
@@ -1096,14 +1356,19 @@
 //#define VK_
 //#define VK_
 
+
 //****
+
 
 /*
  * Messages.
+ *     Lista de mensagens suportadas pelo sistema.
+ *     ...
  */
+ 
 //window (0-19) 
-#define MSG_NULL          0  
-#define MSG_CREATE        1
+#define MSG_NULL          0  //@todo: Criar pequeno comentário descritivo.  
+#define MSG_CREATE        1  //...
 #define MSG_DESTROY       2
 #define MSG_MOVE          3 
 #define MSG_SIZE          4
@@ -1135,7 +1400,10 @@
 #define MSG_INSERT        46
 #define MSG_RUN_PROCESS   47
 #define MSG_RUN_THREAD    48
-
+// Continua ...
+// Muitas outras mensagens podem ser criadas,
+// A variável é do tipo int.
+//...
 
  
 /*
@@ -1148,25 +1416,26 @@
 #define WT_POPUP         4 //um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
 #define WT_BUTTON_DOWN   5 //rever
 #define WT_BUTTON_UP     6 //rever
+//...
 
 //apresentação.
 #define VIEW_NULL      0
 #define VIEW_FULL      1000
 #define VIEW_MAXIMIZED 1001
 #define VIEW_MINIMIZED 1002
+//...
 
-
-//botoes
+//botões
 #define BN_CLICKED  200
 #define BN_DOWN     1
 #define BN_UP       2
 #define BN_SELECTED 3
+//...
 
 
 //
 // Application support.
 //
-
 
 
 /*
@@ -1259,7 +1528,7 @@ rect_t *rect;
 /*
  * window_d:
  *     Window Structure.
- *     @todo: Deve ficar igual a do kernel.
+ *     @todo: *Deve ficar igual a do kernel.
  *     Obs: Não sei se essa estrutura pode ser pública.
  *
  * Histórico:
@@ -1442,12 +1711,11 @@ struct window_d
 };
 window_t *CurrentWindow;
 //window_t *Window;
+// As principais janelas usadas pelos utilitários
+// dos subsistemas em user mode podem ser definidas aqui.
 //...
 
 
-
-
- 
 /*
  * semaphore_d:
  *     Estrutura para criação de um semáforo.        
@@ -1482,7 +1750,7 @@ struct semaphore_d
 	//...	
 };
 semaphore_descriptor_t *current_semaphore; 
-
+//...
 
 
 //
@@ -1491,27 +1759,28 @@ semaphore_descriptor_t *current_semaphore;
 
  
 /*
- * system: 
+ * apiSystem: 
+ *     Interpreta um comando e envia uma systemcall para o Kernel.
  *
- * Interpreta um comando e envia uma systemcall para o Kernel.
- * Obs: Há comandos prédefinidos, porém um comando pode ser o nome
+ * Obs: Há comandos predefinidos, porém um comando pode ser o nome
  * abreviado de um programa ou uma variável de ambiante representando
  * um diretório.
  *
  * Argumento:
  *     String de comando.
+ *
  * Retorno:
- * ?? 
+ *     ?? 
  */
-int system(const char *command);
+int apiSystem(const char *command);
 
 
 /*
  * system_call: 
- * 
- * Interrupção de sistema, número 200, chama vários serviços do Kernel com a 
- * mesma interrupção.
- * Essa é a chamada mais simples.
+ *     Interrupção de sistema, número 200, pode chamar vários serviços do 
+ * Kernel com a mesma interrupção. O número do serviço é passado via 
+ * argumento.
+ *     Essa é a chamada mais simples.
  *
  * Argumentos:
  *    eax = arg1, o Número do serviço.
@@ -1523,6 +1792,11 @@ void *system_call( unsigned long ax,
                    unsigned long bx, 
 				   unsigned long cx, 
 				   unsigned long dx );
+				   
+//
+// As chamadas system1 à system15 poderão ser revistas
+// atribuindo a elas uma destinação mais importante.
+//
 
 //Print pixel.
 int system1( unsigned long ax, 
@@ -1627,7 +1901,7 @@ int edit_box( unsigned long x,
 
 //int 200 - serviço 17.
 int SetNextWindowProcedure(unsigned long next_procedure);
-int chama_procedimento(unsigned long proximo_procedure); 
+int chama_procedimento(unsigned long proximo_procedure);  //@todo: traduzir para inglês.
  
  
 //Carrega bitmap 16x16.
@@ -1689,39 +1963,7 @@ int call_gui( unsigned long int_number,
 // Window support.
 //
 
-/*
- * APIFastCreateWindow: 
- *     Cria uma janela com base em uma struct.
- *     Retorna o endereço da estrutura da janela criada. 
- *     Para que possa ser registrada na lista windowList[].
- *
- * Cria a janela dependendo do tipo:                              
- * =================================
- * 1 - POP-UP.
- * 2 - EDIT-BOX.
- * 3 - NORMAL ( bg + client area ).
- * 4 - NORMAL_EDIT ( bg + editbox).
- * 5 - MENUBAR.
- * 6 - TOOLBAR.
- * 7 - STATUSBAR.
- * 8 - TASKBAR.
- * 9 - ? 
- * CONTINUA ...
- */
-void *APIFastCreateWindow( unsigned long type,        //1-Tipo de janela, (popup,normal,...).
-                           unsigned long status,      //2-Estado da janela, (ativa ou não).
-                           unsigned long view,        //3-(min, max ...).
-                           char *windowname,          //4-Título.                          
-                           unsigned long x,           //5-Deslocamento em relação às margens do Desktop.                           
-                           unsigned long y,           //6-Deslocamento em relação às margens do Desktop.
-                           unsigned long width,       //7-Largura da janela.
-                           unsigned long height,      //8-Altura da janela.
-                           struct window_d *pWindow,  //9-Endereço da estrutura da janela mãe.
-                           unsigned long onde,        //10-Ambiente.( Estão no desktop, barra, cliente ...)
-                           unsigned long arg11,       //11-? reservado.
-                           unsigned long color );     //12-Color (bg) (para janela simples).
-
-						   
+					   
 /*
  * APICreateWindow: 
  *     Cria uma janela com base em uma struct.
@@ -1780,6 +2022,15 @@ int APIGetActiveWindow();
 void *apiGetClientAreaRect();
 void apiSetClientAreaRect(struct rect_d *r);
 
+
+/*window support.*/
+void APIresize_window(struct window_d *window, unsigned long x, unsigned long y);
+void APIredraw_window(struct window_d *window);
+void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y);
+void APImaximize_window(struct window_d *window);
+void APIminimize_window(struct window_d *window);
+void *APIget_foregroung_window();
+void APIset_foregroung_window(struct window_d *window);
 	
 //
 // Char support.
@@ -1890,6 +2141,24 @@ void apiDown(struct semaphore_d *s);
 
 //Operação up em um semáforo indicado no argumento.
 void apiUp(struct semaphore_d *s);
+
+
+
+//Critical section support.
+void enterCriticalSection();         //P (Proberen) testar.
+void exitCriticalSection();          //V (Verhogen)incrementar.
+void initializeCriticalSection();    //Inicializa em 1
+
+//Paint support.
+void apiBeginPaint();
+void apiEndPaint();
+
+
+
+/*
+int getpid();
+*/
+
 
 
 //

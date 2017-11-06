@@ -1,5 +1,5 @@
 /*
- *  Arquivo: memmap.h 
+ *  File: hal\memmap.h 
  *
  * Descrição: 
  *     Memory map support.
@@ -114,6 +114,14 @@
 //        e não a tela inteira.
 // 
 
+/*
+unsigned long memmapBaseMemoryStart;
+unsigned long memmapBaseMemoryEnd;
+unsigned long memmapOtherMemoryStart;
+unsigned long memmapOtherMemoryEnd;
+unsigned long memmapExtendedMemoryStart;
+unsigned long memmapExtendedMemoryEnd;
+*/
 
 //
 //fim.

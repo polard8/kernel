@@ -69,7 +69,7 @@ struct queue_d
     int standbyHead; 
     int standbyTail;
     int standbyMax;
-    unsigned long standbyList[KERNEL_MAX_PRIORITY+1];    
+    unsigned long standbyList[PRIORITY_MAX+1];    
 
 
 	//Movimento 2, standby --> running.
@@ -78,7 +78,7 @@ struct queue_d
     int runningHead; 
     int runningTail;
     int runningMax;
-    unsigned long runningList[KERNEL_MAX_PRIORITY+1];    
+    unsigned long runningList[PRIORITY_MAX+1];    
 	
 	//Movimento 3, running --> ready.
 	//Movimento 6, waiting --> ready.
@@ -86,7 +86,7 @@ struct queue_d
     int readyHead; 
     int readyTail;
     int readyMax;
-    unsigned long readyList[KERNEL_MAX_PRIORITY+1];     
+    unsigned long readyList[PRIORITY_MAX+1];     
 	 
 	 
 	//Movimento 5, ready --> waiting.
@@ -94,34 +94,34 @@ struct queue_d
     int waitingHead;
     int waitingTail;
     int waitingMax;
-    unsigned long waitingList[KERNEL_MAX_PRIORITY+1];
+    unsigned long waitingList[PRIORITY_MAX+1];
 	  
 	  
 	//Movimento 7, running --> blocked.	
     int blockedHead;
     int blockedTail;
     int blockedMax;
-    unsigned long blockedList[KERNEL_MAX_PRIORITY+1];
+    unsigned long blockedList[PRIORITY_MAX+1];
 	  
 	//Movimento 9, running --> zombie.	
     int zombieHead;
     int zombieTail;
     int zombieMax;
-    unsigned long zombieList[KERNEL_MAX_PRIORITY+1];
+    unsigned long zombieList[PRIORITY_MAX+1];
 	  
 	  
 	//Movimento 10, zombie --> dead.
     int deadHead;
     int deadTail;
     int deadMax;
-    unsigned long deadList[KERNEL_MAX_PRIORITY+1];    
+    unsigned long deadList[PRIORITY_MAX+1];    
 
 	//Movimento 11, zombie --> initalized.
     //Movimento 0,       x --> initalized. (created)	
     int initializedHead;
     int initializedTail;
     int initializedMax;
-    unsigned long initializedList[KERNEL_MAX_PRIORITY+1];
+    unsigned long initializedList[PRIORITY_MAX+1];
 	
 	
 	/*
@@ -136,13 +136,13 @@ struct queue_d
     int syscoopHead; 
     int syscoopTail;
     int syscoopMax;
-    unsigned long syscoopList[KERNEL_MAX_PRIORITY+1];   
+    unsigned long syscoopList[PRIORITY_MAX+1];   
 
 	//Concorrência, sistema.
     int sysconcHead; 
     int sysconcTail;
     int sysconcMax;
-    unsigned long sysconcList[KERNEL_MAX_PRIORITY+1];
+    unsigned long sysconcList[PRIORITY_MAX+1];
 
 	/*
      * RACE: Filas do loop do usuário. Cooperação e Concorrência.
@@ -153,13 +153,13 @@ struct queue_d
     int usercoopHead; 
     int usercoopTail;
     int usercoopMax;
-    unsigned long usercoopList[KERNEL_MAX_PRIORITY+1];  	
+    unsigned long usercoopList[PRIORITY_MAX+1];  	
 
 	//Concorrência, usuário.
     int userconcHead; 
     int userconcTail;
     int userconcMax;
-    unsigned long userconcList[KERNEL_MAX_PRIORITY+1];   
+    unsigned long userconcList[PRIORITY_MAX+1];   
 
 	
     /*
@@ -170,14 +170,14 @@ struct queue_d
     int realtimeHead; 
     int realtimeTail;
     int realtimeMax;
-    unsigned long realtimeList[KERNEL_MAX_PRIORITY+1];  //real time rr. 
+    unsigned long realtimeList[PRIORITY_MAX+1];  //real time rr. 
 	
 	
     //default queue
     int defaultHead;
     int defaultTail;
     int defaultMax;
-    unsigned long defaultList[KERNEL_MAX_PRIORITY+1]; 
+    unsigned long defaultList[PRIORITY_MAX+1]; 
 	
 	//
 	// 3 níveis de prioridade para threads no estado READY.

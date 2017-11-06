@@ -11,6 +11,10 @@
  
 #include <kernel.h>
 
+//test.
+//#define tolower(c)  ((int)((c) & ~0x20))
+//#define toupper(c)  ((int)((c) | 0x20))
+
 
 /*
  * strcmp:
@@ -144,11 +148,11 @@ char *strcat(char *to, const char *from)
 /*
  *  bcopy:
  *
- *
  */
 void bcopy(char *from, char *to, int len)
 {
-	while(len--) {
+	while(len--) 
+	{
 		*to++ = *from++;
 	};
     return;
@@ -158,11 +162,11 @@ void bcopy(char *from, char *to, int len)
 /*
  *  bzero:
  *      Preenche com zeros.
- *
- */
+ */ 
 void  bzero(char *cp, int len)
 {
-	while (len--) {
+	while(len--)
+	{
 		*(cp + len) = 0;
 	};
     return;
@@ -177,7 +181,7 @@ size_t strlen(const char *s)
 {	
     size_t i = 0;
 	
-	for (i = 0; s[i] != '\0'; ++i) {
+	for(i = 0; s[i] != '\0'; ++i){
 	;
 	};
 	
@@ -185,6 +189,15 @@ done:
 	return ( (size_t) i );
 };
 
+/*
+    Outra opção:
+int strlen(const char * s)
+{
+	int n = 0;
+	while (*s++) n++;
+	return(n);
+}
+*/
 
 /*
 int kstrlen(const char *s);

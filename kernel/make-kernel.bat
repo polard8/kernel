@@ -19,7 +19,6 @@ rem primeiramente nas partes desbloqueadas deixando as partes bloqueadas
 rem para depois.
 rem
 
-
 :Start_Job0
 rem Main.
 echo -{ ...
@@ -30,7 +29,7 @@ echo -{ Main and I/O.
 :Hal_Job1	
 rem hal	
 echo -{ ...
-echo -{ /hal (part 1)	
+echo -{  ux4  /hal 	
     rem hal .. arquivo principal do hal
 	gcc -c k/hal/hal.c     -I./include -o hal.o	
 	gcc -c k/hal/device/device.c  -I./include -o device.o
@@ -67,7 +66,7 @@ echo -{ /hal (part 1)
 :Microkernel_Job2	
 rem kernel mínimo. (tasks)
 echo -{ ...
-echo -{ /microkernel (part 2)
+echo -{  ux3  /microkernel 
     
 	rem começamos com os principais módulos do microkernel.
 	rem (head e microkernel)  
@@ -113,7 +112,7 @@ echo -{ /microkernel (part 2)
 rem drivers VIP em kernel mode.	
 rem o executive é formado por três grupos: /sm,/uitm e /uigm.
 echo -{ ...
-echo -{ /executive (part 3)
+echo -{  ux2  /executive
 	rem /executive
 	gcc -c k/executive/executive.c  -I./include -o executive.o	
 	
@@ -198,6 +197,8 @@ echo -{ /executive (part 3)
     gcc -c k/executive/sm/disk/volume.c -I./include -o volume.o	
 	
 
+echo -{ ...
+echo -{  ux1  /gramado \o/
 
 	rem    ****    COMPILANDO A INTERFACE GRÁFICA    ****
 	rem k\gramado\gui
@@ -242,8 +243,7 @@ echo -{ /executive (part 3)
     gcc -c k/gramado/gui/wstation.c    -I./include -o wstation.o    
     rem user section
     gcc -c k/gramado/gui/usession.c    -I./include -o usession.o        
-	rem gui
-    gcc -c k/gramado/gui/gui.c         -I./include -o gui.o    	
+
     
 	rem gramado logon e logoff
 	
@@ -255,6 +255,9 @@ echo -{ /executive (part 3)
 	rem gramado/user
 	gcc -c k/gramado/user/userenv.c -I./include -o userenv.o 	
 	
+
+	rem *gui (GRAMADO)
+    gcc -c k/gramado/gramado.c         -I./include -o gramado.o    	
 	
 	rem
 	rem Compilando o módulo **** SYSTEM MANAGER ****
@@ -367,7 +370,7 @@ window.o ^
 desktop.o ^
 wstation.o ^
 usession.o ^
-gui.o ^
+gramado.o ^
 object.o ^
 userenv.o ^
 procedure.o ^

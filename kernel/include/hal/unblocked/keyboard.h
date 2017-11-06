@@ -193,9 +193,23 @@
 #define VK_DELETE_TECLADONUMERICO 0x53  //83  
 #define VK_F11	  0x57  //87 
 #define VK_F12	  0x58  //88    
-#define VK_LWIN	  0x5B
-#define VK_WINKEY 0x5B  //91    
-#define VK_RWIN	  0x5C
+
+
+// Left Winkey
+#define VK_LWIN	      0x5B
+#define VK_WINKEY     0x5B  //91   
+#define VK_LGRAMADO	  0x5B
+#define VK_LSUPER	  0x5B
+//#define VK_LMETA	  0x5B
+//...
+ 
+// Right Winkey 
+#define VK_RWIN	     0x5C
+#define VK_RGRAMADO	 0x5C
+#define VK_RSUPER    0x5C
+//#define VK_RMETA     0x5C
+//...
+
 #define VK_APPS	  0x5D
 #define VK_CONTROL_MENU 0x5D  //93
 #define VK_ACENTO_CIRCUNFLEXO 0x5E  //abnt	
@@ -844,9 +858,13 @@ void keyboardDisable();
 
 //Set flags.
 void keyboard_set_leds(char flag); 
- 
+
+
+//get status 
 int get_alt_status();
 int get_ctrl_status();
+int get_shift_status();
+//...
 
 void abnt2_keyboard_handler();
 void KeKeyboard();    //User Mode driver.

@@ -18,6 +18,7 @@
  *     @todo: Começar a análise pela estrutura 'platform' e todo
  * o que está dentro dela.
  *
+ * This is a spiritual quote.
  *
  * Versão: 1.0, 2015, 2016.
  */

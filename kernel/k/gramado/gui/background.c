@@ -21,6 +21,7 @@
  * backgroundDraw:
  *     Pinta um background em modo gráfico.
  *     Limpa a tela em modo texto. 
+ *   pinta a tela toda.
  */
 void backgroundDraw(unsigned long color)
 {

@@ -3,12 +3,23 @@
 /gramado
 
      Gramado é uma interface gráfica, ela deve ficar dentro do
-kernel base, para efeito de desempenho, mas mas fora dos outros componentes
+kernel base, para efeito de desempenho, mas fora dos outros componentes
 do kernel base, para efeito de portabilidade. Desse modo poderemos
 portar a interface gráfica 'gramado' para outros kernel base com menos dificuldade.
+     Muitas funções serão redefinidas e terão o nome traduzido para um nome
+agradável para a camada gramado. Essas funções serão canonizadas, permanecendo as
+mesmas mesmo que a camada gramado seja usda em outro kernel.
+    Ex: gramado_printf = kprintf
 
 
-
+Diretórios em /k/gramado:
+========================	
+	\gui     - Recursos gráficos padrão. 
+	\logoff  - A parte do kernelbase referente a gerência de logoff.
+	\logon   - A parte do kernelbase referente a gerência de logon.
+	\user    - A parte do kernelbase referente a gerencia de contas e usuários.
+	
+	
 gramado\gui
 
     Recursos de suporte a interface gráfica de usuário.

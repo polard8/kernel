@@ -358,6 +358,13 @@ void SetCR3(unsigned long address)
  * @tod:
  *     o Mudar para pagesSetUpPaging.
  *
+ * @TODO: AS COISAS ESTÃO MEIO BAGUNÇADAS AQUI. A INTENÇÃO É QUE 
+ * A PARTE BAIXA DA MEMÓRIA VIRTURAL DO PROCESSO PERTENÇA AO PROCESSO 
+ * E A PARTE ALTA DA MEMÓRIA VIRTUAL DO PROCESSO PERTENÇA AO KERNEL.
+ * QUANTO A MEMÓRIA FÍSICA, DESEJAMOS QUE APENAS O KERNEL ACESSE A 
+ * PARTE BAIXA DA MEMÓRIA FÍSICA, OS PROGRAMAS EM USER MODE MANIPULARÃO
+ * APENAS A MEMÓRIA QUE LHES FOR CONCEDIDA.
+ *
  * Histórico:
  *     2015 - Essa função foi criada por Fred Nora.
  *     2016 - Revisão.
@@ -475,7 +482,7 @@ int SetUpPaging()
 	};
 	
 
-	//
+	//===========================================================
 	// kernel mode pages (0fis = 0virt)
 	// kernel_address = 0.
 	// Mapear os primeiros 4MB da memória. (kernel mode). Preenchendo a tabela 
@@ -484,10 +491,21 @@ int SetUpPaging()
 	//
     // Aqui estamos pegando uma partição de memória física de 4MB que começa no 
 	// início da memória RAM.
-    //
+    // Obs: Essa page table dá acesso aos primeiros 4MB da memória física,
+	// Isso inclu a área do kernel base que começa no primeiro MB. Manipular
+	// esse espaço pode corromper o kernel base.
+	//
+	// A intenção aqui é que o kernel base possa manipular as áreas baixas da 
+	// memória física com facilidade. Porém, para os outros processos, os endereços 
+	// lógicos mais baixos não devem corresponder aos endereços físicos mais baixos,
+	// por segurança, apenas o kernel base deve ter acesso à essa área.
+	// Para alguns processos especiais, algum tipo de permissão poderá ser concedida.
+	//
     
 	
 	// Configurando uma pagetable.
+	// a pagetable para os primeiros 4MB de memória física. 
+	// kernel mode pages (0fis = 0virt)
 	for(i = 0; i < 1024; i++)
     {
 	    km_page_table[i] = (unsigned long) kernel_address | 3;     //011 binário.
@@ -521,17 +539,23 @@ int SetUpPaging()
     //taskman_page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
     //taskman_page_directory[0] = (unsigned long) taskman_page_directory[0] | 3;  //Configurando os atributos.	
 	
-	//
+	
+	
+	//===============================================
 	// kernel mode pages (0x00100000fis = 0xC0000000virt)
 	// kernel_base = 0x00100000 = KERNEL_BASE.
 	// Mapear 4MB começando do primeiro mega. (kernel mode).
 	// Preenchendo a tabela km2_page_table.
 	//
     // Aqui estamos pegando uma partição de memória física de 4MB que começa no
-	// endereço físico que carregamos a imágem do kernel. 
+	// endereço físico que carregamos a imagem do kernel.
+    // são 4MB de memória física, começando do primeiro MB, onde o KERNEL.BIN 
+    // foi carregado.	
     //	
 
-	//Criando uma pagetable. 
+	//Criando uma pagetable.
+    //4MB de memória física, começando em 1MB.
+    // kernel mode pages (0x00100000fis = 0xC0000000virt)	
     for(i = 0; i < 1024; i++)
     {
 	    km2_page_table[i] = (unsigned long) kernel_base | 3;     //011 binário.
@@ -572,7 +596,7 @@ int SetUpPaging()
 	
 	//    ****    USER BASE    ****
 	
-	//
+	//===================================================================
 	// user mode pages - (0x00400000fis = 0x00400000virt)
 	// user_address = 0x00400000 = USER_BASE.
 	// Mapear 4MB da memória começando em 0x00400000fis. (user mode).
@@ -596,6 +620,9 @@ int SetUpPaging()
 	//
 	
 	//Criando uma pagetable.
+	//4MB de memória física, começando do querto mega.
+	// user mode pages - (0x00400000fis = 0x00400000virt)
+	//será usado pelo processo em user mode. Note as flags.(7).
 	for(i = 0; i < 1024; i++)
     {
 	    um_page_table[i] = (unsigned long) user_address | 7;     //7 decimal é igual a 111 binário.
@@ -635,7 +662,7 @@ int SetUpPaging()
     //	
 	  
 	  
-    //
+    //==============================================================
 	// user mode VGA pages - ( 0x000B8000fis = 0x00800000virt)
 	// vga_address  = VM_BASE;   //0x000B8000;
 	// Mapear 4MB da memória começando em 0x000B8000fis. (user mode).
@@ -648,7 +675,11 @@ int SetUpPaging()
     //Mudar o nome para cga.	
     //	
     
-    //Criando uma pagetable.	
+    //Criando uma pagetable.
+    //4MB de memória física, começando 0x000B8000fis.
+    // user mode VGA pages - ( 0x000B8000fis = 0x00800000virt)
+    // Podemos permitir que alguns processos em user mode acessem
+    // essa área diretamente.	
     for(i = 0; i < 1024; i++)
     {
 	    vga_page_table[i] = (unsigned long) vga_address | 7;     //7 decimal é igual a 111 binário.
@@ -683,7 +714,7 @@ int SetUpPaging()
 	//
 	
 	
-    //
+    //==================================================================
 	// user mode LFB pages - (0x????????fis = 0xC0400000virt).
 	// lfb_address  = SavedLFB = g_lbf_pa, Foi passado pelo boot manager.
 	// Mapear 4MB da memória física começando no valor do endereço físico 
@@ -701,6 +732,9 @@ int SetUpPaging()
 	g_frontbuffer_buffer_va = (unsigned long) 0xC0400000;
 	
 	//Criando uma pagetable.
+	//Os quatro primeiros MB da memória de vídeo.
+	//user mode LFB pages - (0x????????fis = 0xC0400000virt).
+	//provavelmente o endereço físico é 0xE0000000
     for(i = 0; i < 1024; i++)
     {
 	    lfb_page_table[i] = (unsigned long) lfb_address | 7;     //7 decimal é igual a 111 binário.
@@ -732,7 +766,7 @@ int SetUpPaging()
 	
 	
 	
-    //
+    //===============================================================
 	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
 	// ***BackBuffer: 
 	//     É o buffer onde se pinta o que aparecerá na tela. O conteúdo 
@@ -745,6 +779,9 @@ int SetUpPaging()
     //	
 
     // criando uma page table.
+	//4MB de meória física, começando em 16MB, que serão usados 
+	//para backbuffer. Obs essa área deve ter o mesmo tamanho do frontbuffer.
+	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
 	for(i = 0; i < 1024; i++)
     {
 	    buff_page_table[i] = (unsigned long) buff_address | 7;     //7 decimal é igual a 111 binário.
@@ -780,38 +817,80 @@ int SetUpPaging()
 
 
 	//
-	// @todo:  O que precisa ser feito no momento:
-	//         + Os processos em user mode precisam alocação
-	// dinâmica de memória, para isso será usado o heap do processo
-	// ou o heap do desktop ao qual o processo pertence.
-	// *IMPORTANTE: Os buffers de janela serão alocados no heap
-	// do processo em user mode que gerencia a criação de janelas,
-	// portanto esse processo tem que ter bastante heap disponível.
+	// @todo:  
+	// (sobre heaps para processos em user mode).
+	// O que precisa ser feito no momento:
+	// + Os processos em user mode precisam alocação dinâmica de memória, 
+	// para isso será usado o heap do processo ou o heap do desktop ao qual o 
+	// processo pertence.
+	//
+	//@todo:
+	// *IMPORTANTE: 
+	// (sobre heaps para gerenciamento de recursos gráficos).
+	// + Os buffers de janela serão alocados no heap do processo em user mode 
+	// que gerencia a criação de janelas, portanto esse processo tem que ter 
+	// bastante heap disponível. Talvez quem faça esse papel seja o próprio 
+	// kernel base, aí quem precisa de bastante heap é o kernel base.
+	// Talvez seja um módulo em kernel mode que gerencie as janelas.
+	// Por enquanto é a camada superior do kernel base. Mas interfaces poderão
+	// chamar essa camada no kernel base e oferecerem serviços de gerenciamento
+	// de recursos gráficos, utilizando apenas as primitivas oferecidas pelo 
+	// kernel base. Essas bibliotecas que oferecem recursos gráficos podem 
+	// ser processos em kernel mode ou em user mode. Elas oferecerão recursos 
+	// bem elaborados e completos, chamando o kernel base apenas para 
+	// as rotinas primitivas. Isso facilita a criação de recursos gráficos,
+	// porém prejudica o desempenho, por isso o kernel base também oferece 
+	// seu conjunto de recursos gráficos mais elaborados, além das primitivas,
+	// é claro.
 	//
 
 
 	//
-	// @todo: Continua: Mais páginas podem ser criadas.
+	// @todo: 
+	// Continuar: Mais páginas podem ser criadas manualmente agora.
+	// Porem a intenção é utilizar rotinas de automação da criação 
+	// de paginas, pagetable e diretórios.
 	//
 
 
 	//
-	// @todo: Até agora tem uma sobreposição danada no mapeamento
-	// um mesmo endereço físico de memória é mapeado para vários
-	// endereços virtuais. Ete aí não há problema nisso. Na prática
+	// @todo: 
+	// Até agora tem uma sobreposição danada no mapeamento um mesmo 
+	// endereço físico de memória é mapeado para vários endereços virtuais. 
+	// Isso não é proibido, é assim que se comaprtilha memória. Na prática
 	// podemos acessar a mesma região de memória de várias maneira diferentes.
+	// Mas devemos tomar cuidado, principalmente para não corrompermos o 
+	// kernel base.
+	// O acesso a memória compartilhada será gerenciado pelos mecanismos
+	// padrão de comunicação e compartilhamento. Semáforos e mutexes ...
 	//
 
 
 	//
-	// @todo: *IMPORTANTE.
+	// @todo: 
+	// *IMPORTANTE.
 	// O que queremos é utilizar uma lista de frames livres na hora
 	// configurarmos o mapeamento. Queremos pegar um frame livre e
 	// associarmos ele com uma PTE, (entrada na tabela de páginas).
 	// O que está faltando é o gerenciamento de memória física.
-	// O gerenciamento de memória física é feito dividindo
-	// a memória física em partições, pedaços grandes de memória.
+	// O gerenciamento de memória física é feito dividindo a memória física 
+	// em partições, pedaços grandes de memória. Tem um módulo que trata
+	// de bancos, aspaces no kernel base.
 	//
+	
+	
+	//
+	// @todo:
+	// *SUPER IMPORTANTE.
+	// para gerenciarmos a meória física, precisamos saber o tamanho 
+	// da memória física disponpivel. tem um módulo no kernel base 
+	// que trata disso.
+	// * Depois de alocarmos uma região grande da memória física,
+	// destinada para frames, então criaremos a lista de frames livres.
+	// que significará uma quantidade de frames livres dentro da área 
+	// destinadas à frames. Não significa área toda a área livre
+	// na memória física, mas apenas os frames livres dentro da região 
+	// destinada aos frames.
 	//
 
 	//
@@ -872,8 +951,8 @@ int SetUpPaging()
 	//pagedirectoryList[1] = (unsigned long) &idle_page_directory[0];     //idle.
 	//pagedirectoryList[2] = (unsigned long) &shell_page_directory[0];    //shell.
 	//pagedirectoryList[3] = (unsigned long) &taskman_page_directory[0];  //taskman.	
-    pagedirectoryList[4] = (unsigned long) 0;
-    pagedirectoryList[5] = (unsigned long) 0;	
+    //pagedirectoryList[4] = (unsigned long) 0;
+    //pagedirectoryList[5] = (unsigned long) 0;	
     //...
 
 
@@ -892,7 +971,7 @@ int SetUpPaging()
 	pagetableList[3] = (unsigned long) &vga_page_table[0];
 	pagetableList[4] = (unsigned long) &lfb_page_table[0];
 	pagetableList[5] = (unsigned long) &buff_page_table[0];
-	pagetableList[6] = (unsigned long) 0;
+	//pagetableList[6] = (unsigned long) 0;
     //...
 
 
@@ -925,7 +1004,7 @@ int SetUpPaging()
 
 
 	//
-	// Creating kernel space framepool.
+	// Creating kernel space framepool. 
 	//
 
 	struct frame_pool_d *kfp;
@@ -1052,6 +1131,9 @@ int SetUpPaging()
 
 	// **** Estamos atuando em uma memória de 32MB por enquanto.
 
+	
+	
+	
 	//
 	// More?!
 	//

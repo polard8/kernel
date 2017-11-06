@@ -46,6 +46,9 @@
 #include <kernel.h>
 //#include "mkidata.h"  //MicroKernel Internal Data.
 
+//unsigned char  MicrokernelName[] = "MICROKERNEL LAYER";
+
+
 
 #define LOCALSTUFF1 0
 int localsstuff1;
@@ -213,11 +216,34 @@ void sys_reboot(void)
 };
 */
 
-int sys_getpid(void){
-	return (int) CurrentProcess->pid;
+int sys_getpid()
+{
+	//erro
+	if( (void*) CurrentProcess == NULL ){
+		return (int) -1;
+	};
+	
+	//erro
+	if( CurrentProcess->used != 1 || CurrentProcess->magic != 1234 ){
+		return (int) -1;
+	};
+	
+    return (int) CurrentProcess->pid;
 };
 
-int sys_getppid(void){
+
+int sys_getppid()
+{
+	//erro
+	if( (void*) CurrentProcess == NULL ){
+		return (int) -1;
+	};
+	
+	//erro
+	if( CurrentProcess->used != 1 || CurrentProcess->magic != 1234 ){
+		return (int) -1;
+	};
+
 	return (int) CurrentProcess->ppid;
 };
 

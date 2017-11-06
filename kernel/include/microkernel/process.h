@@ -98,15 +98,28 @@ typedef int ppid_t;
  
 /*
  * Constantes para níveis de prioridade.
- * @todo: Definir melhor isso.
  */
-#define PRIORITY_LOW       1
-#define PRIORITY_NORMAL    5
-#define PRIORITY_BOOST     7 
-#define PRIORITY_HIGH      8
-#define PRIORITY_REALTIME  9     
-#define PRIORITY_MAX       KERNEL_MAX_PRIORITY    
-//PRIORITY_REALTIME  
+ 
+//Definições principais. 
+#define PRIORITY_LOW4      1  //4
+#define PRIORITY_LOW3      2  //3
+#define PRIORITY_LOW2      3  //2
+#define PRIORITY_LOW1      4  //1 
+#define PRIORITY_NORMAL    5  //*0 (Normal).
+#define PRIORITY_HIGH1     6  //1
+#define PRIORITY_HIGH2     7  //2
+#define PRIORITY_HIGH3     8  //3
+#define PRIORITY_HIGH4     9  //4
+//Definições secundárias.
+#define PRIORITY_LOW        PRIORITY_LOW1
+#define PRIORITY_SUPERLOW   PRIORITY_LOW4
+#define PRIORITY_MIN        PRIORITY_SUPERLOW
+#define PRIORITY_HIGH       PRIORITY_HIGH1 
+#define PRIORITY_SUPERHIGH  PRIORITY_HIGH4
+#define PRIORITY_MAX        PRIORITY_SUPERHIGH    
+//Definição especial.
+#define PRIORITY_REALTIME  10    
+
 
 
 /*
@@ -150,7 +163,7 @@ typedef int ppid_t;
  
 
 /*
- * process_state_t:
+ * process_state_t
  *     Status de um processo.
  *     @todo: Pode-se usar mais status.
  *            como estado de transição.
@@ -170,6 +183,22 @@ typedef enum {
 }process_state_t;
 
 
+/* 
+ appmode_t
+ 
+ Importante:
+ 
+ APPMODE_TERMINAL = O kernel cria uma estrutura de terminal 
+ com uma janela associada a essa estrutura, essa janela será a 
+ janela de terminal para o aplicativo.
+ APPMODE_WINDOW = O kernel não cria estrutura de terminal para 
+ esse processo e o processo criará janelas.
+ */
+typedef enum {
+    APPMODE_NULL,      // Isso se aplica ao processo kernel e ao processo idle por exemplo.	
+    APPMODE_TERMINAL,  // O kernel cria uma janela de terminal para o aplicativo.
+	APPMODE_WINDOW,    // o kernel não cria janela de terminal para o aplicativo
+}appmode_t;
 
 /*
  * Estruturas para processos.
@@ -258,6 +287,15 @@ struct process_d
 	//Se o processo é ou não um processo de terminal.
 	//que aparece no terminal.
 	int terminal;
+	
+    //Importante:
+	//isso substituirá a flag 'terminal'
+    //APPMODE_TERMINAL = O kernel cria uma estrutura de terminal 
+    //com uma janela associada a essa estrutura, essa janela será a 
+    //janela de terminal para o aplicativo.
+    //APPMODE_WINDOW = O kernel não cria estrutura de terminal para 
+    //esse processo e o processo criará janelas.
+	appmode_t appMode;
 	
 	//
 	//    ****  Banco de dados ****
@@ -518,10 +556,13 @@ struct process_d
 	/* 
 	 * Temporização da tarefa. 
 	 */
+	
 	unsigned long step;               //Quantas vezes a tarefa usou o processador. 
 	unsigned long quantum;            //thread quantum
 	unsigned long timeout;            //Tempo em modo de espera. 
 	unsigned long ticks_remaining;    //rt, quanto tempo a tarefa tem disponível para ser concluida.
+	
+	//unsigned long alarm;            //Tempo para o próximo alarme, dado em ticks.
 	
 	//unsigned long ThreadQuantum;    //As threads do processo iniciam com esse quantum.
 	
@@ -671,6 +712,10 @@ struct process_d
 	// List of terminated childs
 	struct process_d *zombieChildListHead;           
 	
+    //?? mensagens pendentes.	
+	//struct thread_d *sendersList; //Lista encadeada de processos querendo enviar mensagem
+	//struct thread_d *nextSender;  //próximo processo a enviar mensagem.
+	
     //
     //Next.
     //	
@@ -773,6 +818,11 @@ struct process_info_d
 
 
 
+/* 
+ * Linux style.
+#define invalidate() \
+ asm("movl %%eax,%%cr3"::"a" (0))
+*/
 
 //
 // Protótipos de função.

@@ -82,14 +82,8 @@ void rtc_irq()
 {
 	unsigned i;
 
-    /* 
-	 * Increment char in upper left corner of screen on 
-	 * every timer tick. 
-	 */
 	g_ticks++;
-	
-
-	
+		
 	//_BLINK; ??
 	
     /* save contents of I/O port 0x70 */
@@ -107,7 +101,6 @@ void rtc_irq()
 done:
 	return;
 };
-
 
 
 /* Lê da CMOS um determinado registro. */

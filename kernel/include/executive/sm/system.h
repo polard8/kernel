@@ -1,5 +1,5 @@
 /*
- * File: system.h
+ * File: sm\system.h (System Management)
  *
  * Descrição:
  *     Header para rotinas de gerenciamento do sistema dentro do módulo 
@@ -462,136 +462,7 @@ bootmanager_t *BootManager;
 //
 
 
-/*
- * Classes:
- *     O que segue são as funções principais do Kernel. São seis rotinas 
- * chamadoras de serviços.
- * 
- * @todo: Esse esquema de rotians de serviços organizadas em classe precisa 
- * ser replicado para outros sistemas, mesmo em user mode.
- *
- * 1) systemRam
- * 2) systemIoCpu
- * 2) systemIoDma
- * 3) systemDevicesUnblocked
- * 3) systemDevicesBlocked
- * 4) systemThings
- *
- */
 
-void *systemRam( int number, 
-                 unsigned long arg1,  
-		         unsigned long arg2,  
-		         unsigned long arg3,  
-		         unsigned long arg4 );
-void *systemIoCpu( int number, 
-                   unsigned long arg1,  
-		           unsigned long arg2,  
-		           unsigned long arg3,  
-		           unsigned long arg4 );
-void *systemIoDma( int number, 
-                  unsigned long arg1,  
-		          unsigned long arg2,  
-		          unsigned long arg3,  
-		          unsigned long arg4 );
-void *systemDevicesUnblocked( int number, 
-                              unsigned long arg1,  
-		                      unsigned long arg2,  
-		                      unsigned long arg3,  
-		                      unsigned long arg4 );
-void *systemDevicesBlocked( int number, 
-                            unsigned long arg1,  
-		                    unsigned long arg2,  
-		                    unsigned long arg3,  
-		                    unsigned long arg4 ); 
-void *systemThings( int number, 
-                    unsigned long arg1,  
-		            unsigned long arg2,  
-		            unsigned long arg3,  
-		            unsigned long arg4 );
-					
-	
-/*
- * systemLinkDriver:
- *     Linkando um driver ao sistema operacional
- */
-
-void *systemLinkDriver(unsigned long arg1, unsigned long arg2, unsigned long arg3);
-
-	
-/*
- * systemShowDevicesInfo:
- *     Mostrar informações sobre o sistema, seguindo a ordem de
- *     velocidade dos dispositivos e barramentos.
- *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
- *     Apresentar em ordem alfabética.
- */
-void systemShowDevicesInfo();
-
-//Cria a barra de menu do sistema. 
-void *systemCreateSystemMenuBar();
-
-/*
- * systemStartUp:
- *     Inicialização do sistema.
- *
- */
-int systemStartUp();
-
-/*
- * systemCheck3TierArchitecture:
- *     Checa as serviços oferecids nas 3 camadas.
- */
-void systemCheck3TierArchitecture();
-
-//version
-void systemSetupVersion();
-
-
-/*
- * system_dispatch_to_procedure:
- *     Despacha uma mensagem para o procedimento de janela do sistema.
- *     Obs: Esse procedimento fica no kernel base em procedure.c
- */
-int system_dispatch_to_procedure( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2);
-								
-/*
- * SystemMenu: System Menu para manipular a janela ativa.
- * Interface que chama o control menu da janlea ativa.
- */
-int SystemMenu();
-
-
-/*
- * SystemMenuProcedure:
- *     O procedimento do Control Menu principal.
- *     Menu do sistema, manipula a janela ativa.
- */																
-unsigned long SystemMenuProcedure( struct window_d *window, 
-                                   int msg, 
-								   unsigned long long1, 
-								   unsigned long long2);
-
-/*
- * systemReboot: Reboot stuffs.
- */
-void systemReboot();							   
-
-/*
- * systemShutdown: Shut down stuffs.
- */
-void systemShutdown();
-
-
-
-
-//Chamar a função de 32 bit herdado do BM.
-void systemShutdownViaAPM(); 
- 
- 
 /*
  * services:
  *    Atende as chamadas das interrupções do sistema.
@@ -651,9 +522,6 @@ void SendMessage( struct window_d *window,
 				  unsigned long long2 );
 
 
-
-
-
 /*
  * procedureHelp:
  *     Help messages.
@@ -661,17 +529,11 @@ void SendMessage( struct window_d *window,
  */
 void procedureHelp();
 
-
-
 /*
  * systemAbort:
  *     Abort system.
  */
 void systemAbort();
-
-
-
-
 
 /*
  * SetProcedure:
@@ -679,26 +541,128 @@ void systemAbort();
  */
 void SetProcedure(unsigned long proc);
 
-
-
 //
 // System Server support.
 //
-
 int init_systemserver();
 
+
+
+
+/*
+ * Classes:
+ *     O que segue são as funções principais do Kernel. São seis rotinas 
+ * chamadoras de serviços.
+ * 
+ * @todo: Esse esquema de rotians de serviços organizadas em classe precisa 
+ * ser replicado para outros sistemas, mesmo em user mode.
+ *
+ * 1) systemRam
+ * 2) systemIoCpu
+ * 2) systemIoDma
+ * 3) systemDevicesUnblocked
+ * 3) systemDevicesBlocked
+ * 4) systemThings
+ *
+ */
+
+void *systemRam( int number, 
+                 unsigned long arg1,  
+		         unsigned long arg2,  
+		         unsigned long arg3,  
+		         unsigned long arg4 );
+void *systemIoCpu( int number, 
+                   unsigned long arg1,  
+		           unsigned long arg2,  
+		           unsigned long arg3,  
+		           unsigned long arg4 );
+void *systemIoDma( int number, 
+                  unsigned long arg1,  
+		          unsigned long arg2,  
+		          unsigned long arg3,  
+		          unsigned long arg4 );
+void *systemDevicesUnblocked( int number, 
+                              unsigned long arg1,  
+		                      unsigned long arg2,  
+		                      unsigned long arg3,  
+		                      unsigned long arg4 );
+void *systemDevicesBlocked( int number, 
+                            unsigned long arg1,  
+		                    unsigned long arg2,  
+		                    unsigned long arg3,  
+		                    unsigned long arg4 ); 
+void *systemThings( int number, 
+                    unsigned long arg1,  
+		            unsigned long arg2,  
+		            unsigned long arg3,  
+		            unsigned long arg4 );
+					
+void *systemNull();  //Metodo nulo.
+	
+/*
+ * systemLinkDriver:
+ *     Linkando um driver ao sistema operacional
+ */
+void *systemLinkDriver(unsigned long arg1, unsigned long arg2, unsigned long arg3);
+
+/*
+ * systemShowDevicesInfo:
+ *     Mostrar informações sobre o sistema, seguindo a ordem de
+ *     velocidade dos dispositivos e barramentos.
+ *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
+ *     Apresentar em ordem alfabética.
+ */
+void systemShowDevicesInfo();
+ 
+void *systemCreateSystemMenuBar();  //Cria a barra de menu do sistema.
+
+/*
+ * systemStartUp:
+ *     Inicialização do sistema.
+ */
+int systemStartUp();
+
+/*
+ * systemCheck3TierArchitecture:
+ *     ?? Checa as serviços oferecids nas 3 camadas.
+ */
+void systemCheck3TierArchitecture();
+void systemSetupVersion();  //version
+
+/*
+ * system_dispatch_to_procedure:
+ *     Despacha uma mensagem para o procedimento de janela do sistema.
+ *     Obs: Esse procedimento fica no kernel base em procedure.c
+ */
+int system_dispatch_to_procedure( struct window_d *window, 
+                                int msg, 
+								unsigned long long1, 
+								unsigned long long2);
+/*
+ * SystemMenu: System Menu para manipular a janela ativa.
+ * Interface que chama o control menu da janlea ativa.
+ */
+int SystemMenu();
+/*
+ * SystemMenuProcedure:
+ *     O procedimento do Control Menu principal.
+ *     Menu do sistema, manipula a janela ativa.
+ */																
+unsigned long SystemMenuProcedure( struct window_d *window, 
+                                   int msg, 
+								   unsigned long long1, 
+								   unsigned long long2);
+void systemReboot();	    //systemReboot: Reboot stuff.						   
+void systemShutdown();      //systemShutdown: Shut down stuff.
+//Chamar a função de 32 bit herdado do BM.
+void systemShutdownViaAPM(); 
 //Pega informações de medida de elementos do sistema.
 void *systemGetSystemMetric(int number);
-
 //Pega informações de status de elementos do systema.
 void *systemGetSystemStatus(int number);
+int systemInit();     //Inicializador.
+void systemSystem();  //Construtor.
 
-
-//Construtor.
-void systemSystem();
-	
-//inicializador.	
-int systemInit();
 			
 //
 // Fim.

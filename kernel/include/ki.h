@@ -29,6 +29,17 @@ void KiSpawnTask(int id);
 void KiCalloutTest();
 void KiCallfarTest();
 
+void *KiCreateKernelProcess();
+void *KiCreateIdle();
+void *KiCreateShell();
+void *KiCreateTaskManager();	
+
+
+
+//@todo: Conferir se esse protótipo já está em outro lugar,
+//o lugar dele é aqui.
+void KiCpuFaults(unsigned long number);
+
 // Finalizations support.
 void KiShutDown(); 
 void KiReboot();

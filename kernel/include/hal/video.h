@@ -164,13 +164,6 @@ video_t VideoBlock;
  * Prototypes.
  */
  
-//video.c 
-int videoInit(); 
-void videoSetMode(unsigned long mode);
-unsigned long videoGetMode();
-void videoSetupCGAStartAddress(unsigned long address);
-
-
 /*
  * Sincroniza o retraço vertical. para directdraw usando lfb.
  * @todo: 
@@ -178,7 +171,16 @@ void videoSetupCGAStartAddress(unsigned long address);
  * ficando aqui apenas uma interface.
  *Obs: Isso é coisa de hardware. vídeo. (HAL)
  */
-void vsync(); 
+void vsync();  
+ 
+ 
+//video.c 
+void videoSetupCGAStartAddress(unsigned long address);
+unsigned long videoGetMode();
+void videoSetMode(unsigned long mode);
+int videoInit(); 
+int videoVideo();  //Método construtor.
+
 
 //
 // End.

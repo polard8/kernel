@@ -107,19 +107,22 @@
 #define	SYS_BUFFER_CREATEWINDOWx    47
 #define	SYS_BUFFER_CREATEWINDOW1    48
 #define	SYS_BUFFER_CREATEWINDOW2    49
-#define	SYS_BUFFER_CREATEWINDOW3    50
-#define	SYS_BUFFER_CREATEWINDOW4    51
-#define	SYS_BUFFER_CREATEWINDOW5    52
-#define	SYS_BUFFER_CREATEWINDOW6    53
-#define	SYS_BUFFER_CREATEWINDOW7    54
-#define	SYS_BUFFER_CREATEWINDOW8    55
-#define	SYS_BUFFER_CREATEWINDOW9    56
+
+//(50~59) Window suppot, manipulação de janelas.
+#define	SYS_BUFFER_RESIZEWINDOW    50 //resize. 
+#define	SYS_BUFFER_REDRAWWINDOW    51 //redraw.
+#define	SYS_BUFFER_REPLACEWINDOW   52 //replace.
+#define	SYS_BUFFER_MAXIMIZEWINDOW    53 //MAXIMIZE
+#define	SYS_BUFFER_MINIMIZEWINDOW    54 //MINMIZE
+#define	SYS_BUFFER_GETFOREGROUNDWINDOW    55   //GET FOREGROUND
+#define	SYS_BUFFER_SETFOREGROUNDWINDOW    56   // SET FOREGROUND
 //Register window.
 #define	SYS_REGISTERWINDOW          57
 //Close window.
 #define	SYS_CLOSEWINDOW             58
 //Destroy window. (Destrói a estrutura e a classe).
 #define	SYS_DESTROYWINDOW           59
+
 //Active window.
 #define	SYS_SETACTIVEWINDOW 60
 #define	SYS_GETACTIVEWINDOW 61
@@ -226,7 +229,7 @@
 #define	SYS_DRIVERINITIALIZED 129   
 //130-139 manipulação de texto.
 #define	SYS_DRAWTEXT 130
-#define	SYS_131 131
+#define	SYS_BUFFER_DRAWCHAR_WWF 131
 #define	SYS_132 132
 #define	SYS_133 133
 #define	SYS_134 134
@@ -303,7 +306,7 @@
 #define	SYS_196 196
 #define	SYS_197 197
 #define	SYS_198 198
-#define	SYS_199 199
+#define	SYS_GC 199
 //variados
 #define	SYS_SENDSIGNAL 200  //Envia um sinal para um processo.
 #define	SYS_WAIT4OBJECT 201  //espera por um objeto
@@ -333,9 +336,13 @@
 #define	SYS_223 223
 #define	SYS_224 224
 #define	SYS_225 225
-#define	SYS_226 226
-#define	SYS_227 227
-#define	SYS_228 228
+
+//Critical section support.
+#define	SYS_GET_KERNELSEMAPHORE    226  //Get.     
+#define	SYS_CLOSE_KERNELSEMAPHORE  227  //Close (0).
+#define	SYS_OPEN_KERNELSEMAPHORE   228  //Open  (1).
+
+
 #define	SYS_KERNELDEBUG 229    //some kernel checks.
 //logon logoff support.
 #define	SYS_STARTLOGON  230
@@ -384,45 +391,6 @@ struct systemcall_d
 }
 systemcall_t *CurrentSystemCall;
 */
-
-//
-// EXECUTIVE ----------------------
-//
-
-
-//
-// MICROKERNEL ----------------------
-//
-void sys_vsync();
-void sys_dead_thread_collector();
-void sys_showkernelinfo();
-int sys_showpciinfo();
-int sys_fork();
-int sys_getpid(void);     //Get process Identification.
-int sys_getppid(void);    //Get parent process Identification.
-void sys_exit_process(int pid, int code);
-void sys_exit_thread(int tid);
-void *sys_create_process( struct wstation_d *window_station,
-                          struct desktop_d  *desktop,
-                          struct window_d *window,
-                          unsigned long init_eip, 
-                          unsigned long priority, 
-					      int ppid, 
-					      char *name );
-void *sys_create_thread( struct wstation_d *window_station,
-                         struct desktop_d  *desktop,
-                         struct window_d *window,
-                         unsigned long init_eip, 
-                         unsigned long priority, 
-					     int ppid, 
-					     char *name );
-
-
-//
-// HAL -----------
-//
-void sys_shutdown();
-void sys_reboot();
 
 
 

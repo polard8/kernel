@@ -207,7 +207,7 @@ do_dispatch:
 	};
 	
 	//A thread passa para o estado RUNNING.
-	// * MOVEMENT 4 ( Ready --> Running).	
+	// * MOVEMENT 4 (Ready --> Running).	
 	if(dispatch_Pointer->state == READY)
 	{
 	    dispatch_Pointer->state = RUNNING;	
@@ -694,7 +694,7 @@ void dispatch_task()
 	    return;
 	}else{
 	    t->saved = 0;         //Náo está mais salvo o contexto.
-	    t->state = RUNNING;
+	    t->state = RUNNING;   //Movimento 2 ou 4. ??
 	};
 	
 //

@@ -28,11 +28,13 @@
 
 /*
     Sobre 'pages' e 'page frames':
-	=========================
-
-pages: São blocos de disco.
-pageframes: São blocos na memória física equivalentes aos blocos do disco.
-	
+	============================
+	pages: 
+	    São blocos de memória virtual. 
+		?? São blocos de disco equivalentes aos blocos de memória física.??
+		
+    pageframes: 
+	    São blocos na memória física equivalentes aos blocos do disco.
  */ 
  
  
@@ -41,26 +43,28 @@ pageframes: São blocos na memória física equivalentes aos blocos do disco.
     (process page directory).	
 	
 	" Cada processo tem seu diretório e uma configuração de 4GB de memória 
-virtual. Essa é memória virtual para processos criados, uma padronização que
-será respeitada na hora de criar o diretório de páginas de um processo ".
-		
+virtual. Essa é a memória virtual para processos criados, uma padronização que
+será respeitada na hora de criar o diretório de páginas de um processo ".	
 	" Note que o início da memória virtual está disponível para drivers ou 
-bibliotecas de link dinâmico ".
-	   
+bibliotecas de link dinâmico ".   
 	" Todo processo começará em 0x00400000vir e terá o entry point em 
-0x00401000virt ".
+0x00401000virt ". "Bibliotecas de ligação dinâmica, começarão em 0x0vir
+e não sei se essas bibliotecas tem entry point"
 		
 	//...
 	
-	@todo: 
-	
-	" O ideal é que um processo tenha disponível pra si toda a área baixa de 
-memória virtual, até o início da área do kernel ".
+ @todo: 	
+     " O ideal é que um processo tenha disponível pra si toda a área baixa de 
+memória virtual, até o início da área do kernel".
+     "A divisão da memória virtual do processo entre a parte que pertence ao 
+processo e a parte que pertence ao kernel tem seguido o seguinte padrão:
+(1) meio à meio, onde o processo fica com os 2GB mais baixos e o kernel fica 
+com os 2GB superiores, ou (2) O processo fica com os 3GB mais baixos e o
+kernel fica com o 1GB superior."	 
 
 
-
-    Mapeamento padrão de memória virtual para todos os processos:
-    ============================================================	
+    Mapeamento padrão de memória virtual para todos os processos do sistema:
+    =======================================================================	
 
 
 		     +------------------------------------+
@@ -69,15 +73,15 @@ memória virtual, até o início da área do kernel ".
 		     +------------------------------------+
 		     +------------------------------------+ 
 		     +------------------------------------+
-	         |         User Mode access           | @todo: Mudar de lugar.  
-		     |                                    |        Seder espaço para lfb.  
-		     |                                    |
+	         |           Kernel land              | @todo:   
+		     |                                    | Mudar de lugar.         
+		     |                                    | Seder espaço para LFB, que precisa ser grande.
     C0800000 |           Back Buffer              |  			 
 		     +------------------------------------+	
-	         |        User Mode access            |	 Memória da placa de vídeo.
-		     |             (4MB)                  |  @todo Ampliar (PRECISA SER MAIOR)
-			 |             ...                    |  obs: Tamanho do monitor.
-	C0400000 |             LFB                    |
+	         |           Kernel land              |	 Memória da placa de vídeo.
+		     |             (4MB)                  |  @todo: 
+			 |             ...                    |  Ampliar (TER O TAMANHO DA MEMÓRIA DA PLACA DE VÍDEO) 
+	C0400000 |             LFB                    |  Obs: Tamanho da soma das áreas dos monitores, no mínimo.
 		     +------------------------------------+
 			 +====================================+
              |           Kernel land              |
@@ -121,6 +125,38 @@ memória virtual, até o início da área do kernel ".
  * As configurações de memória foram feitas pelo Boot Loader.
  * (aqui os endereços lógico e físicos são iguais.)
  */
+ 
+ 
+/**
+ **  **  SUPER IMPORTANTE  **
+ **
+ ** ESSAS VARIÁVEIS GLOBAIS MARCARÃO O INÍCIO E O FIM 
+ ** DA ÁREA DE MEMÓRIA FÍSICA DESTINADA AOS FRAMES DE MEMÓRIA 
+ ** FÍSICA QUE SERÃO USADOS PELO GERENCIADOR DE PÁGINAS.
+ **
+ **/
+ 
+// Frames Super Block.
+// Variáveis globais parecem ser uma opção melhor que estrutura
+// para esse caso. 
+// Obs: temos listas de framas em algum lugar. criaremos listas aqui
+//para o FSB, que será o nome do gerenciado, para melhorar o controle dessa área.
+unsigned long mmFramesSuperBlockStart;      //Endereço onde começa o FSB.
+unsigned long mmFramesSuperBlockEnd;        //Endereço onde termina o FSB.
+unsigned long mmFramesSuperBlockSize;       //Tamanho do FSB dado em bytes.
+unsigned long mmFramesSuperBlockTotal;      //Total de frames.
+unsigned long mmFramesSuperBlockTotalFree;  //Total de frames livres. 
+unsigned long mmFramesSuperBlockTotalUsed;  //Total de frames e uso. 
+//Continua...
+
+#define FSB_FRAMES_MAX  (1*1024) //?? @todo: Determinar melhor isso
+#define FSB_FREEFRAMES_MAX  (1*1024) //?? @todo: Determinar melhor isso
+
+
+//Lista de ponteiros para as estruturas de todos os frames do FSB.
+unsigned long fsbFrames[FSB_FRAMES_MAX]; 
+//Lista de ponteiros para as estruturas de todos os frames 'LIVRES' do FSB.
+unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];  
  
  
 // 
@@ -432,6 +468,7 @@ memory_info_t *miMemoryInfo;
  * em especial. (Não incluir nenhuma variável por enquanto!).
  *****************************************************************
  */ 
+//typedef struct mmblock_d mmblock_t;  //@todo: usar esse. 
 typedef struct mmblock_d mmblock_descriptor_t;
 struct mmblock_d 
 {
@@ -901,6 +938,17 @@ void *CreatePageTable( unsigned long directory_address,
 //
 
 void show_memory_structs();
+
+
+// garbage collection
+int gc();
+int gcGRAMADO();
+int gcEXECUTIVE();
+int gcMICROKERNEL();
+int gcHAL();
+
+
+
 
 //
 // End.

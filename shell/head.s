@@ -40,7 +40,7 @@ segment .head_x86
 
  
 
-extern _app_main
+extern _GramadoMain
 ;extern _exit
 
 
@@ -53,7 +53,23 @@ global _shell_entry_point
 _shell_entry_point:
     nop
 	
-	call _app_main
+	;; enviando argumentos
+	;;push 0
+	;;push 0
+	;;push 0
+	;;push 0
+	
+	call _GramadoMain
+	
+	;; atualizando a pilha
+	;;pop 0
+	;;pop 0
+	;;pop 0
+	;;pop 0
+	
+	;;
+	;; Obs: o retorno de main é to tipo (void*)
+	;;
 	
 	cmp eax, dword 0
 	je retOk

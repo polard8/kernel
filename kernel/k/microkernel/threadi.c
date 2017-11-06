@@ -312,16 +312,28 @@ void set_thread_priority(struct thread_d *t, unsigned long priority)
 {
     unsigned long ThreadPriority;
 	
-	if( (void*) t == NULL){
+	if( (void*) t == NULL ){
 	    return;
 	};
 	
-	ThreadPriority = t->priority;
+    if( t->used != 1 || t->magic != 1234 ){
+		return;
+	}	
 	
-	if(priority != ThreadPriority)
+	ThreadPriority = t->priority;
+
+	// se aprioridade solicitada for igual da prioridade atual.	
+	if( priority == ThreadPriority ){
+		return;
+	};
+	
+	// se aprioridade solicitada for diferente da prioridade atual.
+	if( priority != ThreadPriority )
 	{
+		//Muda a prioridade.
         t->priority = priority;
 		
+		/*
 		switch(t->state) 
 		{
 		    case READY:
@@ -330,18 +342,20 @@ void set_thread_priority(struct thread_d *t, unsigned long priority)
 
 		    case RUNNING:
 			    //@todo
-				if( (void*) t->Next == NULL )
-				{
-					if(priority < ThreadPriority){
+				//if( (void*) t->Next == NULL )
+				//{
+				//	if(priority < ThreadPriority){
 					    //@todo: encontra e prepara uma outra tarefa.
-					};
-				};
+				//	};
+				//};
 		        break; 
 			    //Nada para os outros estados.
 		    default:
 			    //Nothing for now.
 			    break;
 		};
+		*/
+		
     };
 //Done.
 done:
@@ -529,8 +543,8 @@ void dead_thread_collector()
 	};
 	
 	//@todo:
-	// * MOVEMENT 10 ( zombie --> Dead)
-	// * MOVEMENT 11 ( zombie --> Initialized) .. reinicializar.
+	// * MOVEMENT 10 (zombie --> Dead)
+	// * MOVEMENT 11 (zombie --> Initialized) .. reinicializar.
 	
 done: 
     //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.	
