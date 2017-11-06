@@ -10,7 +10,7 @@
    MBR /BM.BIN /BL.BIN /KERNEL.BIN /IDLE.BIN /SHELL.BIN /TASKMAN.BIN /INIT.TXT.
    The kernel base has 4 layers:
    /gramado /executive /microkernel /hal.
- - This is the first release of the code.
+ - This was the first release of the code.
    
  2005~2017 / Version 1.0
  =======================
