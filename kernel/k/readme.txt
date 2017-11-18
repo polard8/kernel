@@ -41,11 +41,6 @@ Obs:
     A outra parte do controle do hardware fica em user mode. 
     (servers, drivers)
 
-     *@todo:
-     * No futuro serão esses 3 diretórios, so que com outros nomes.
-       pois a estrutura hal,microkernel e executive pertencem a M$. 
-       ex: /hardware /microkernel /system
-
 
 
 
@@ -54,7 +49,7 @@ Design Notes 1.
 
 Notas de Design que descreve as principais partes do Kernel Base.
 Estamos no diretório /k e cada um dos diretórios contidos aqui representam uma
-das partes fundamentais do Kernel Base, São elas /hal, /microkernel e /executive.
+das partes fundamentais do Kernel Base, São elas /hal, /microkernel, /executive e /gramado.
 
 
 Pode-se imaginas o kernel dividido em 3 classes principais. As classes do kernel são: hal, microkernel, executive.
@@ -63,6 +58,7 @@ Pode-se imaginas o kernel dividido em 3 classes principais. As classes do kernel
     k.hal
     k.microkernel
     k.executive
+    k.gramado
 
     Kernel classes (k.____).
 	
