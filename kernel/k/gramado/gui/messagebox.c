@@ -197,14 +197,6 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 			                             x, y, cx, cy, 
 										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
 	        break;
-
-		//Light. Sem botão e sem moldura.	
-	    case 5:
-		    Button = 0;
-	        hWnd = (void*) CreateWindow( 1, 0, 0, "Message", 
-			                             x, y, cx, cy, 
-										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
-	        break;			
 			
 		//Tipo negligenciado. Usamos o formato padrão.	
 		default:

@@ -29,7 +29,7 @@ echo -{ Main and I/O.
 :Hal_Job1	
 rem hal	
 echo -{ ...
-echo -{  ux4  /hal 	
+echo -{ ux4 /hal	
     rem hal .. arquivo principal do hal
 	gcc -c k/hal/hal.c     -I./include -o hal.o	
 	gcc -c k/hal/device/device.c  -I./include -o device.o
@@ -66,7 +66,7 @@ echo -{  ux4  /hal
 :Microkernel_Job2	
 rem kernel mínimo. (tasks)
 echo -{ ...
-echo -{  ux3  /microkernel 
+echo -{ ux3 /microkernel
     
 	rem começamos com os principais módulos do microkernel.
 	rem (head e microkernel)  
@@ -112,7 +112,7 @@ echo -{  ux3  /microkernel
 rem drivers VIP em kernel mode.	
 rem o executive é formado por três grupos: /sm,/uitm e /uigm.
 echo -{ ...
-echo -{  ux2  /executive
+echo -{ ux2 /executive
 	rem /executive
 	gcc -c k/executive/executive.c  -I./include -o executive.o	
 	
@@ -197,8 +197,9 @@ echo -{  ux2  /executive
     gcc -c k/executive/sm/disk/volume.c -I./include -o volume.o	
 	
 
+	
 echo -{ ...
-echo -{  ux1  /gramado \o/
+echo -{ ux1 /gramado \o/	
 
 	rem    ****    COMPILANDO A INTERFACE GRÁFICA    ****
 	rem k\gramado\gui

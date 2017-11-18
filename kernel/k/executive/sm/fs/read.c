@@ -139,18 +139,24 @@ done:
 unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 {
     int Status;	
+	
 	int i;
-	unsigned long S;  //Primeiro setor do cluster.
-	int Spc;
-	unsigned short cluster;    //Cluster inicial
+    unsigned short next;
+
+    unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+    unsigned long max = 64;    //Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
-    unsigned long max = 64;    //Número máximo de entradas.
 	char NameX[13];	
+
     unsigned short *fat  = (unsigned short *) FAT16_FAT_ADDRESS;
-    unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+	unsigned short cluster;    //Cluster inicial
+
+    //??	
+	unsigned long S;  //Primeiro setor do cluster.
+	int Spc;
+
     //...
-	
 	
 	//
 	// Lock ??.
@@ -162,6 +168,8 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	//
 	// Root dir.
 	//
+
+//loadRoot:
 	
 	//Carrega o diretório raiz na memória.
 	printf("fsLoadFile: Loading root..\n"); 
@@ -223,6 +231,9 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	 
 	i = 0; 
 	
+	// Procura o arquivo no diretório raiz.
+//search_file:
+	
 	//Compara.
 	while(i < max)
 	{
@@ -259,12 +270,10 @@ found:
     //refresh_screen();
 	//while(1){}
 	
-    //Carrega fat na memória.
-	printf("loading FAT..\n");	
-	fs_load_fatEx();
-	
     //Pega o cluster inicial. (word)
-	cluster = root[ z+13 ];    //(0x1A/2) = 13.
+	cluster = root[ z+13 ];    //(0x1A/2) = 13.	
+	
+	
 	
 	/*
 	 * Checar se cluster está fora dos limites.
@@ -278,8 +287,14 @@ found:
 	if( cluster <= 0 || cluster > (0xfff0) ){
 	    printf("fsLoadFile error: Cluster limits {%x}!\n",cluster);
 		goto fail;
-	};
+	};	
 	
+	
+//loadFAT:
+	
+    //Carrega fat na memória.
+	printf("loading FAT..\n");	
+	fs_load_fatEx();
 	
     /*
      * Carregar o arquivo, cluster por cluster.
@@ -297,6 +312,15 @@ found:
     //     @todo: Esse loop é provisório, while pode ser problema.
 	//
 	
+	
+	//
+	// Carregar o arquivo.
+	//
+	
+//Loop.	
+proxima_entrada:
+	
+	/*
 	while(1)
 	{	
 	    //Calcula.
@@ -314,7 +338,31 @@ found:
 	    if(cluster == 0xFFFF || cluster == 0xFFF8){ goto done; };
 		//Nothing.
     };
+	*/
 	
+	read_lba( file_address, FAT16_DATAAREA_LBA + cluster -2 ); 
+	
+	//Incrementa o buffer. +512;
+	file_address = (unsigned long) file_address + 512; //SECTOR_SIZE;  	
+	
+	
+	
+	//Pega o próximo cluster na FAT.
+	next = (unsigned short) fat[cluster];		
+	
+	
+	//Configura o cluster atual.
+	cluster = (unsigned short) next;	
+	
+	//Ver se o cluster carregado era o último cluster do arquivo.
+	if(cluster == 0xFFFF || cluster == 0xFFF8){ goto done; };
+
+	//
+	// Loop: 
+	// Vai para próxima entrada na FAT.
+	//
+	
+	goto proxima_entrada;	
 	//Nothing.
 	
 //Falha ao carregar o arquivo.
@@ -334,6 +382,7 @@ done:
 	//taskswitch_unlock();
     return (unsigned long) 0;
 };
+
 
 
 /*

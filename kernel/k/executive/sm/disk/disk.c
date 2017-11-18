@@ -2,6 +2,7 @@
  * File: disk.c 
  * 
  * Descrição:
+ *     Gerenciador de discos. 
  *     Arquivo principal do Disk Manager.
  *     MB - Módulos incluídos no Kernel Base.
  *
@@ -63,6 +64,9 @@ done:
  */
 void init_test_disk()
 {
+	/*@todo: Teste desse tipo pode ser feito em user mode.*/
+	
+ 	/*
     int Index = 0;
 	//int fileSize = 0;
 	void *addr;
@@ -143,6 +147,7 @@ void init_test_disk()
 
 done:
 	printf("Done.\n");
+	*/
     return;
 };
 

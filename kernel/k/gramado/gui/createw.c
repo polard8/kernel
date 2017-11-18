@@ -886,7 +886,20 @@ drawBegin:
 						21, 21, 
 						COLOR_BUTTONFACE);				
 	    };					 
-					
+			
+		//#bugbug O kernel não pode ficar tanto tempo assim carregando uma imagem.
+		//essa coisa de pitar o ícone nesse momento até que deu certo, mas 
+		//demora muito carregálo na memória, ele ja deveria estar lá
+		// e nesse momento somente seria transferido par ao backbuffer.
+		/*
+		//icon.	
+        //load bmp file.
+		void *bmp_buffer = (void*)malloc(32*1024);
+        fsLoadFile("BMP1    BMP", (unsigned long) bmp_buffer); 		
+		//display bmp.	
+		load_bitmap_16x16( (unsigned long) bmp_buffer, window->left, window->top, 0);	
+		*/
+		
 		//...			 
 	};	
 	

@@ -241,7 +241,10 @@ or the ACPI ones to solve the mess. Good luck.
 //
 // 1111,1111, | 1111,1 | 111.
 //
-
+//
+// type 0:  [31-11]                          [function 10-8][7-2][1][0]
+// type 1:  [31-24] [bus 23-16][device 15-11][function 10-8][7-2][1][0]
+//
 
 /*
  * #Testing macros.
@@ -691,7 +694,7 @@ unsigned char pciGetClassCode(unsigned char bus, unsigned char slot){
 
 /*
  * pciGetBAR:
- *     Get BAR address.
+ *     Get BAR.
  *
  * Offsets:
  * #define PCI_OFFSET_BASEADDRESS0   0x10
@@ -707,12 +710,12 @@ unsigned char pciGetClassCode(unsigned char bus, unsigned char slot){
  * apenas uma unsigned short ou ainda retorne um unsigned long com uma 
  * parte suja.
  *
- * Obs: O argumento number é o número do BAR.
+ * Obs: O argumento 'number' é o número do BAR.
  *
  * Primeiro devemos salvar o valor encontrado na BAR, o valor da BAR
- * servirá para identificarmos um endereço de memória ou numero de
- * porta de i/o. os bits do bar dirão se o endereço de memória é
- * de 32 bou 64 bit.
+ * servirá para identificarmos um endereço de memória ou número de
+ * porta de i/o. Os bits do bar dirão se o endereço de memória é
+ * de 32bit ou 64 bit.
  *
  * Depois para sabermos a quantidade de memória que um dispositivo irá precisar
  * devemos colocar tudo 1 na BAR, pegar o valor da bar e efetuar um NOT (~) each

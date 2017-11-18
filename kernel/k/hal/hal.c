@@ -194,7 +194,7 @@ void hal_backbuffer_putpixel( unsigned long ax,
 {
 	
 	
-	
+	 //cor,x,y,0
 	asm volatile(" \n " : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 		
 	/*

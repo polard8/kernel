@@ -24,6 +24,7 @@
  * de software.
  *
  * Obs: signal.h é um arquivo cabeçalho da biblioteca padrão da linguagem de programação C??
+ * Obs:  PODEM SER IMPLMENTADOS POUCOS SINAIS, SEPARADOS EM CATEGORIAS.
  *
  * Histórico:
  *      Versão: 1.0, 2016 - Created.
@@ -31,12 +32,13 @@
  */
 
  /*
-The C standard defines only 6 signals. They are all defined in signal.h header (csignal header in C++):[1]
+The C standard defines only 6 signals. 
+They are all defined in signal.h header (csignal header in C++):[1]
 
 SIGABRT - "abort", abnormal termination.
-SIGFPE - floating point exception.
-SIGILL - "illegal", invalid instruction.
-SIGINT - "interrupt", interactive attention request sent to the program.
+SIGFPE  - floating point exception.
+SIGILL  - "illegal", invalid instruction.
+SIGINT  - "interrupt", interactive attention request sent to the program.
 SIGSEGV - "segmentation violation, invalid memory access.
 SIGTERM - "terminate", termination request sent to the program. 
  
@@ -234,6 +236,57 @@ Um tipo de retorno de um sinal que indica um erro ocorreu
 
 
 
+//=====================================================
+// Possíveis categorias de sinais para esse sistema:
+// Process/Thread
+// Nesse caso essas 3 estruturas teriam a o elemento 'signal;'
+//
+//	unsigned long signal;
+//	unsigned long signalMask;
+//
+// que receberiam sinais de todos os tipos.
+// Nesse caso não estamos falando de enfileiramento de sinais.
+// Obs: Os sinais do sistema gramado começariam em 1000 ... 1001 1002 ... 
+// Os outros sinais seriam os sinais padrão da linguagem C, posix e outros.
+//======================================================
+
+//
+//sinais para o sistema gramado.
+//
+
+//Sinais para a categoria Process.
+// GSIGP0 1000
+// GSIGP1 1001
+// GSIGP2 1002
+// GSIGP3 1003
+// GSIGP4 1004
+//...
+
+//Sinais para a categoria Thread.
+// GSIGT0 2000
+// GSIGT1 2001
+// GSIGT2 2002
+// GSIGT3 2003
+// GSIGT4 2004
+//...
+
+
+//Criando primeiro sinal para teste.
+#define SIGNULL 0;
+
+
+/*
+#define SIGHUP  1       // hangup 
+#define SIGINT  2       // interrupt 
+#define SIGQUIT 3       // quit 
+#define SIGILL  4       // illegal instruction (not reset when caught) 
+#define SIGTRAP 5       // trace trap (not reset when caught) 
+#define SIGABRT 6       // abort() 
+#define SIGPOLL 7       // pollable event ([XSR] generated, not supported) 
+#define SIGFPE  8       // floating point exception 
+#define SIGKILL 9       // kill (cannot be caught or ignored) 
+//(...)
+*/
 
 
 //

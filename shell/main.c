@@ -114,7 +114,7 @@ int shellScreenHeight;
 //
 
 //#define SHELL_BUFFER_SIZE 512
-#define SHELL_BUFFER_SIZE 1024 //tests
+#define SHELL_BUFFER_SIZE 1024 //(1024*32) //tests
 
 char shell_buffer[SHELL_BUFFER_SIZE]; 
 unsigned long shell_buffer_pos; 
@@ -188,6 +188,8 @@ unsigned long shellProcedure( struct window_d *window,
  *
  *  
  *  ## O SHELL É UM APLICATIVO DO TIPO JANELA DEVE TER UM MAIN DO TIPO JANELA ##
+ *
+ * Obs: Esses argumentos podem ser um padrão.
  */
 void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 {
@@ -230,8 +232,9 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 	//       Provavelmente deve coincidir com a estrutura presente
     //nas rotinas de gerenciamento de janela que estão em kernel mode.	
 	//struct window_class_d *wc; 
-	struct window_d *hWindow;
-    
+	struct window_d *hWindow;   //janela do aplicativo.
+
+	
 	//struct message_d *m;
 
 	
@@ -377,7 +380,6 @@ noArgs:
 	//
 	
 	
-
 	
 	//
     // Create Window.
@@ -1132,6 +1134,7 @@ done:
 int shellInit()
 {
 	int PID;
+	int PPID;
 	int ActiveWindowId = 0;
 	int WindowWithFocusId = 0;
 	void *P;
@@ -1166,16 +1169,26 @@ int shellInit()
 	//
 	
 	//PID = (int) APIGetPID();
-    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
 	
-	//valor de erro
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
 	if( PID == (-1)){
 	    printf("ERROR getting PID\n");	
 	}
-    printf("Starting Shell... PID={%d} \n", PID);
+  
+    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0);
+	if( PPID == (-1)){
+	    printf("ERROR getting PPID\n");	
+	}
+  
 	
-	printf("ScreenWidth={%d}  \n",shellMaxColumns);
-	printf("ScreenHeight={%d} \n",shellMaxRows);
+	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n",PID ,PPID);
+	
+	
+	
+	
+	
+	printf("shellMaxColumns={%d} \n",shellMaxColumns);
+	printf("shellMaxRows={%d} \n",shellMaxRows);
 	
 	//
 	//Active
@@ -1243,6 +1256,12 @@ int shellInit()
 	apiCreateThread((unsigned long)&shellThread, 1,"TestShellThread4");
 	//...
 	
+	//
+	//@todo: 
+	// Devemos implementar uma rotina de inicialização dessas threads 
+	// criadas através de chamadas ao sistema.
+	//
+	
 	//printf("Initializing a thread...\n");
 	//...
 	
@@ -1257,8 +1276,16 @@ int shellInit()
 	//stdlib.h
 	printf("Testing stdlib:\n");
 	
-	//Testando inicializar a rt do stdio para usar alocação dinâmica.
-	libcInitRT(); //(@todo: isso pode ir para shellInit)
+	//
+	// *Importante:
+	//     Isso inicializa o gerenciamento de memória oferecido pela 
+	// biblioteca C99 em user mode. Coisas como inicializar o 'heap'
+	// oferecido pela biblioteca.
+	// Agora poderemos alocar memória dentro do heap oferecido pela biblioteca.
+	//
+	
+//initRT:	
+	//libcInitRT(); 
 	
 	//Obs: Sempre inicia com o mesmo número.
 	int rand_value;
@@ -1303,21 +1330,21 @@ int shellInit()
 	// Window test.
 	//
 	
-	int w;
+	int wID;
 	
-	w = (int) APIGetActiveWindow();
+	wID = (int) APIGetActiveWindow();
 	//valor de erro
-	if( w == (-1)){
+	if( wID == (-1) ){
 	    printf("ERROR getting Active window ID\n");	
 	}
-	printf("ActiveWindow={%d}\n", w);
+	printf("ActiveWindow={%d}\n", wID);
 	
-	w = (int) APIGetFocus();	
+	wID = (int) APIGetFocus();	
 	//valor de erro
-	if( WindowWithFocusId == (-1)){
+	if( wID == (-1) ){
 	    printf("ERROR getting Window With Focus ID\n");	
 	}		
-	printf("Focus={%d}\n", w);
+	printf("Focus={%d}\n", wID);
 	//...
 	
 	//
@@ -1357,8 +1384,10 @@ done:
 	// Testing welcome message.
 	//
 	
+	/*
 	printf("...\n");
 	test_operators();
+	*/
 	
 	printf("...\n");
 	printf("Welcome to Gramado Operating System.\n");
@@ -1374,9 +1403,9 @@ done:
 	
 	int fRet;
 	printf("...\n");
-	printf("Testing ... Loading file...\n");
+	printf("Testing buffer ... Loading file...\n");
 	
-	/*A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUAJNDO ALGUMA ÁREA DO SHELL*/
+	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
 	fRet = (int) system_call( SYSTEMCALL_READ_FILE, 
 	                          (unsigned long) init_file_name, 
 					          (unsigned long) &shell_buffer[0], 
@@ -1384,13 +1413,146 @@ done:
 							  
 	printf("ret={%d}\n",fRet);
 	
-	printf("...\n");
+	printf("...\n\n");
 	printf(&shell_buffer[0]);	
 	
+	//
+	// testando malloc.
+	//
 	
+	//Obs: 32Kb é alem do limite.
+	void *b = (void*) malloc(1024*30);
+	
+	//unsigned char b[32*1024];
+	
+    //load bmp test
+    //carregou, e pintou ...pinteou meio errado, mas o problema não é a rotina de pintura.
+
  
-  //system_call( , , , );
 	
+	system_call( SYSTEMCALL_READ_FILE, 
+	                          (unsigned long) bmp1_file_name, 
+					          (unsigned long) b, 
+							  (unsigned long) b);	
+	
+    
+	
+    //system_call( SYSTEMCALL_LOAD_BITMAP_16x16, (unsigned long) &shell_buffer[0], 10, 10);
+	
+	
+	int i,j, base, offset;
+	unsigned long x, y;
+	unsigned long color;
+	
+	base = 0x36;  //início da área de dados do bmp
+	
+	x=10;
+	y=10+16;
+	
+	//base do bmp carregado na memória
+	unsigned char *bmp = (unsigned char *) b;
+	unsigned char *c   = (unsigned char *) &color;
+	
+	//@todo: encontrando o magic
+	
+	//if( bmp[0] != 0x42 )
+	//{
+	//	printf("~Sig fail\n");
+	//    printf("magic0 %c\n", bmp[0]);	
+	//    printf("magic1 %c\n", bmp[1]);			
+	//	printf("buffer %x\n",bmp); //Ok
+    //    printf("buffer %x\n",b);   //Ok
+		//printf("width %d \n", bmp[0x12]);
+		//printf("height %d \n", bmp[0x16]);
+	//}
+	
+	//
+	//Mostrando características do bmp.
+	
+	//printf("magic0 %c\n", bmp[0]);	
+	//printf("magic1 %c\n", bmp[1]);
+	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
+	//printf("buffer %x \n",bmp);
+	//printf("data area address %x \n",&bmp[base]);
+	
+	for (i=0; i<16; i++)
+	{
+		for (j=0; j<16; j++)
+		{	
+			
+			//construindo o char.
+			
+			offset = base;
+			c[1] = bmp[offset];
+			
+			offset = base+1;
+			c[2] = bmp[offset];
+			
+			offset = base+2;
+			c[3] = bmp[offset];
+			
+			c[0] = 0;
+			
+			base = base + 3;
+			
+			//number,cor,x,y
+			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, (unsigned long) x, (unsigned long) y);
+			
+			x++; //próximo pixel.
+		}
+		
+		//vamos para a linha anterior.
+		y = y-1;
+		x=10;    //reiniciamos o x.
+	}
+
+ 
+	
+	
+	//
+	// @todo:
+	// Gerenciamento do heap do processo. ??
+	//
+	
+	
+	//
+	// @todo:
+	// Chamar rotinas da biblioteca que ofereçam informações sobre 
+	// o heap oferecido pela biblioteca.
+	// Obs: A rt foi inicializada logo acima.
+    //	
+	
+	
+//heapTest:
+/*	
+	printf("\n...\n");
+	printf("Testing C99 RT ...\n");
+	
+	unsigned long hStart, hEnd, hPointer, hAvail;
+	
+	hStart   = (unsigned long) rtGetHeapStart();
+	hEnd     = (unsigned long) rtGetHeapEnd();
+	hPointer = (unsigned long) rtGetHeapPointer();
+	hAvail   = (unsigned long) rtGetAvailableHeap();
+	
+	printf("heapStart{%x} heapEnd{%x} heapPointer{%x} heapAvailable={%x}\n",hStart, hEnd, hPointer, hAvail);
+	
+	// resultados do teste:
+	// os valores parecem satisfatórios pois estão realmente dentro da área 
+	// de memória do aplicativo.
+	// @todo: Confirmar no memorymap gerado pelo compilador se essa área de memória 
+	// é apropriada. #bugbug
+	// observando o mmmap pelo jeito o compilador colocou o buffer do heap 
+	// no bss do arquivo e do tamanho certo.
+	// tudo indica que é saudável aumentar o tamanho do buffer usado pelo heap.
+	//
+	
+	*/
+	
+	/*
+	printf("\nO melhor grupo do Facebook: \n");
+	printf(">> https://www.facebook.com/groups/1078308252227836 \n");
+    */
 	
 	shellPrompt();
 	
@@ -1439,13 +1601,6 @@ void shellThread(){
 };
 
 
-/*
- * @todo: Criar rotina de saída do shell.
-void shellExit(int code);
-void shellExit(int code){
-	exit(code);
-}
-*/
 
 //help message
 void shellHelp(){
@@ -1474,6 +1629,7 @@ void shellPrompt()
 	return;
 };
 
+
 //
 // C function to demonstrate the working of arithmetic operators
 //#include <stdio.h>
@@ -1500,6 +1656,17 @@ int test_operators()
     
     return 0;
 }
+
+
+/*
+ * @todo: Criar rotina de saída do shell.
+void shellExit(int code);
+void shellExit(int code){
+	exit(code);
+}
+*/
+
+
 /*
 void die(char * str);
 void die(char * str)

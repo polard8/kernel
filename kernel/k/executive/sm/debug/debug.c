@@ -35,7 +35,9 @@
 //
 // Estruturas para fases de inicialização.
 // De uso interno no debug.
-// Just for fun.
+// Just for fun. (user's mental model)
+// ux4, ux3, ux2, ux1
+// hal/microkernel/executive/gramado
 
 typedef enum {
    MYTHIC,  	
@@ -75,7 +77,7 @@ int debug_test_threads()
 */
 
 
-
+/*
 //Construtor.
 void InitMind()
 {
@@ -87,8 +89,9 @@ void InitMind()
 	Mind.Realist = 0;
 	Mind.Naturalist = 0;	
 };
+*/
 
-
+/*
 void SetMind(int Type)
 {
 	//if((void*) Mind == NULL)
@@ -106,7 +109,7 @@ void SetMind(int Type)
     		break;
 	};
 };
-
+*/
 
 /*
  * debug_check_inicialization:
@@ -117,14 +120,32 @@ void SetMind(int Type)
 int debug_check_inicialization()
 {
     int Status = 0;
-		
-	//Check phase.
+	
+    //	
+	// Check phase.
+	//
+	
 	if(KeInitPhase != 3){
 	   Status = 1;
 	   printf("debug_check_inicialization: Initialization fail! fase={%d} \n",KeInitPhase);
 	   goto fail;
 	};
-	SetMind(NATURALIST);
+	
+    //
+    // check personas
+    //	
+
+	// gramado.
+	/*  @todo: Inda não implementado
+	if(Initialization.gramado != 1){
+	   Status = 1;
+	   printf("debug_check_inicialization: gramado fail!\n");
+	   goto fail;
+	};
+	*/
+	
+	
+	//SetMind(NATURALIST);
 	
 	// Executive.
 	if(Initialization.executive != 1){
@@ -132,7 +153,7 @@ int debug_check_inicialization()
 	   printf("debug_check_inicialization: Executive fail!\n");
 	   goto fail;
 	};
-	SetMind(REALIST);
+	//SetMind(REALIST);
 	
 	
 	// Microkernel.
@@ -141,7 +162,7 @@ int debug_check_inicialization()
 	   printf("debug_check_inicialization: Microkernel fail!\n");
 	   goto fail;
 	};
-	SetMind(ROMANTIC);
+	//SetMind(ROMANTIC);
 	
 	// Hal.
     if(Initialization.hal != 1){
@@ -149,7 +170,7 @@ int debug_check_inicialization()
 	   printf("debug_check_inicialization: Hal fail!\n");
 	   goto fail;
 	};
-	SetMind(MYTHIC);
+	//SetMind(MYTHIC);
 	
 	
 	//More?!
@@ -241,7 +262,7 @@ int debug()
 	//printf("debug: Starting..\n");
 	
 	//Contrutor.
-	InitMind();
+	//InitMind();
 	
 	//
 	// Checa inicialização. Fases, variáveis e estruturas.

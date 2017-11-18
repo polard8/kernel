@@ -71,23 +71,64 @@
 
 
 /*
- * Variáveis de ambiente. (em ordem).
- * Obs: @todo: Variáveis de ambiente serão salvas
- * em banco de dados. Em arquivos de configuração.            
- */ 
+ * Disks
+ *    Discos físicos   
+ */
+#define SYSTEM_DISK0  "/disk0" 
+#define SYSTEM_DISK1  "/disk1"
+#define SYSTEM_DISK2  "/disk2"
+#define SYSTEM_DISK3  "/disk3"
+#define SYSTEM_DISK SYSTEM_DISK0  
+//...
+
+/*
+ * Volumes
+ *    Cada partição é um volume.
+ *    Um volume pode ocupar mais de um disco. 
+ */
+#define SYSTEM_VOLUME0  "/volume0" 
+#define SYSTEM_VOLUME1  "/volume1"
+#define SYSTEM_VOLUME2  "/volume2"
+#define SYSTEM_VOLUME3  "/volume3"
+#define SYSTEM_VOLUME SYSTEM_VOLUME0  
+//...
 
 
-//Diretories. 
-#define SYSTEM_ROOT        "/root"                  //Diretório raiz.
-#define SYSTEM_ROOTDIR     "/root"                  //Diretório raiz.
-#define SYSTEM_BOOTDIR     "/root/boot"             //Arquivos de inicialização.
-#define SYSTEM_USERSDIR    "/root/users"            //Diretório de usuários.
-#define SYSTEM_TMPDIR      "/root/tmp"              //Temporary files.
-#define SYSTEM_TRASHDIR    "/root/trash"            //Trash dir.
-#define SYSTEM_DEVICESDIR  "/root/devices"          //Devices,(as entradas representam dispositivos).
-#define SYSTEM_SYSTEMDIR   "/root/os/system"           //Arquivos do sistema.
-#define SYSTEM_DRIVERSDIR  "/root/os/system/drivers"   //Drivers de dispositivos.
-//... 
+#define SYSTEM_ROOT      "/"
+#define SYSTEM_ROOTDIR     SYSTEM_ROOT      
+
+ 
+/*
+ * /disk0
+ *     Esse será sempre o disco principal.
+ *     Lista de diretórios dentro do disco principal.
+ */
+ 
+//principais.  
+#define SYSTEM_GBUILD    "/gbuild"   //Build
+#define SYSTEM_GDOCS     "/gdocs"    //Docs
+#define SYSTEM_GRAMADO   "/gramado"  //System (aqui ficarão os binários dos programas, em pastas)
+#define SYSTEM_GSDK      "/gsdk"     //SDK 
+#define SYSTEM_GSRC      "/gsrc"     //Source 
+
+//secundários
+#define SYSTEM_GUSERS    "/users"    // (os perfis de usuário ficarão aqui.)
+#define SYSTEM_GCMD      "/cmd"      //COMANDO USADOS PELO SHELL CHAMARÃO OS PROGRAMAS QUE ESTÃO AQUI.
+#define SYSTEM_GTMP      "/tmp"      //ARQUIVOS TEMPORÁRIOS
+#define SYSTEM_GDOWNLOAD "/download"  //DOWNLOADS
+//...
+
+//files (path para alguns arquivos principais)
+#define SYSTEM_BM       "/BM.BIN"
+#define SYSTEM_BL       "/BL.BIN"
+#define SYSTEM_KERNEL   "/KERNEL.BIN"
+#define SYSTEM_IDLE     "/IDLE.BIN"
+#define SYSTEM_TASKMAN  "/TASKMAN.BIN"
+#define SYSTEM_SHELL    "/SHELL.BIN"
+#define SYSTEM_INIT     "/INIT.TXT"   // CONFIGURAÇÕES DE INICIALIZAÇÃO.
+#define SYSTEM_SWAP     "/SWAP.BIN"   // (ARQUIVO DE PAGINAÇÃO)
+//...
+
  
 //Computer.
 #define SYSTEM_COMPUTER    "COMPUTER=$"

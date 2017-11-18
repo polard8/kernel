@@ -101,7 +101,7 @@ void free(void *ptr)
 {	
     int Index;
     struct mmblock_d *Block;		
-    struct mmblock_d *Anterior;
+    /*struct mmblock_d *Anterior;*/
 	
 	
 	//>> If ptr is NULL, no operation is performed.

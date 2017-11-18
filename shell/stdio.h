@@ -126,6 +126,15 @@ int printf_main(void);    //@todo: Isso é para testes.
 unsigned long input(unsigned long ch);
 
 
+//rt support
+//pegando informações sobre o heap usado pela biblioteca C99 em user mode.
+unsigned long rtGetHeapStart();
+unsigned long rtGetHeapEnd();
+unsigned long rtGetHeapPointer();
+unsigned long rtGetAvailableHeap();
+//...
+
+
 //
 // End.
 //

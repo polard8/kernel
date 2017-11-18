@@ -7,10 +7,10 @@
 
 
 typedef enum {
-    banktypeLDB,    // LDB - Local Data Base. (private)
-    banktypeGDB,    // GDB - Global Data Base. (shareable)
+    banktypeLDB,    // LDB - Local Data Base.   (private)
+    banktypeGDB,    // GDB - Global Data Base.  (shareable)
     banktypeKDB,    // KDB - Kernel Data Base.  (kernel only)
-	banktypeFDB,    // FDB - Free Data Base.     (free memory)
+	banktypeFDB,    // FDB - Free Data Base.    (free memory)
 }bank_type_t;
 
 

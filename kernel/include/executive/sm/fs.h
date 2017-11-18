@@ -619,7 +619,7 @@ int dirCount;
  * A lista armazena endereços das estruturas dos volumes.
  *
  */ 
-unsigned long volumeList[256];  //@todo: Diminuir o tamanho do buffer.
+//unsigned long volumeList[256];  //@todo: Diminuir o tamanho do buffer.
  
  
 //Id da partição atual.(volume atual) 

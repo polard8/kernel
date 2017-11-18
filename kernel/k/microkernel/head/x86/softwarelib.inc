@@ -20,9 +20,9 @@ extern _vsync
 ;     Copia um bitmap .BMP da memória para o backbuffer.
 ; @todo: Essa rotina pode ser feita em C, facilmente e 
 ; dar um suporte mais completo para o formato bmp.
-; porém essa rotina de 16x16 800x600x24 pode continuar aqui.
+; porém essa rotina de 16x16x24 800x600x24 pode continuar aqui.
 ; pelo meno por enquanto.
-;
+;  @todo; O nome poderia ser softwarelibDisplayBMP16x16.
 ; Argumentos:
 ;     eax = Endreço do arquivo .BMP. 
 ;     ebx = x. (x no backbuffer).
@@ -32,12 +32,16 @@ extern _vsync
 global _my_buffer_load_bitmap_16x16     
 _my_buffer_load_bitmap_16x16:
     
+	;
+	; lembrando que os argumentos indicam a posição esquerda cima da imagem.
+	;
+	
 	;pushad
 	
 	;Salva argumentos.
 	mov dword [.endereco], eax
-	mov dword [.x]       , ebx
-	mov dword [.y]       , ecx
+	mov dword [.x]       , ebx ;esquerda 10
+	mov dword [.y]       , ecx ;cima     10
 	xor edx, edx
 
     ;
@@ -45,52 +49,78 @@ _my_buffer_load_bitmap_16x16:
 	;
 	
 	;Preparando o inicio da area de dados.
-	;Adiciona o offset da área de dados do arquivo .BMP à base.
+	;O endereço recebido em eax é a base do arquivo bmp.
+	;Adiciona o offset encontramos o início da área de dados.
     add eax, dword 036h  	
-	mov esi, eax         
+	mov esi, eax                 ;;Início da área de dados.
 
 	;
 	;Prepara o destino, (EDI).
 	;
 	
 	;calcula x.
+	xor eax, eax
 	mov eax, ebx        ;pega x.
 	mov ebx, dword 3    ;3 bytes por pixel.
-	mul ebx
+	mul ebx             ;x*3 
 	mov ebx, eax        ;eax contém o deslocamento de x.
 	
+	;;agora ebx, contem o deslocamento de x.(left)
+	
 	;calcula y e adiciona x.
+	xor eax, eax
 	mov eax, ecx            ;pega y.
-	mov edx, dword 640*3    ;(pixel por linha * bytes por pixel) = bytes por linha.
+	mov edx, dword 800*3    ;(pixel por linha * bytes por pixel) = bytes por linha.
 	mul edx                 ;(número de linhas * bytes por linha).   
-    add eax, ebx            ;adiciona x.	
+    ;o resultado fucou em eax.
+	add eax, ebx            ;adiciona x.	
     
 	
-    ;'eax' - contém o deslocamento em relação ao início do buffer.
-	
+    ;'eax' - 
+	; Contém o deslocamento em relação ao início do back buffer.
+	; Isso que dizer, 'eax' é a posição na string de 'chars' que representa
+	; as cordenadas x e y da imágem. Ou seja left e top.  _ 
+	;                                                    |  
+	;
 	 
     mov edx, dword 0xC0800000  ;backbuffer.
 	add eax, edx               ;adiciona o buffer.
     mov edi, eax               ;posição (esquerda/cima) da imagem na tela.
 	
-	;sabendo a altura da imagem ...
+	;sabendo a altura da imagem, podemos achar a posição do último pixel 
+	; da imagem no backbuffer.
 	mov eax, edi
-	add eax, dword 640*3*16    ;(bytes por linha * altura).
+	add eax, dword 800*3*16    ;(bytes por linha * altura).
+		
+	;?? isso não daria o último char do último pixel no destino ??
+	;Se for isso, significa que pintaremos primeiro o último pixel.
 	
-	;eax contém a posição (baixo/esquerda) da imagem, '|____'.
+	;'eax' contém a posição (baixo/esquerda) da imagem, '|____' no backbuffer.
+	;#bugbug, mas o que foi passado por argumento foi a posição equerda/cima.
 	mov edi, eax
+	
+	;
+	; edi contém a posição do último pixel da imagem no backbuffer
+	;
+	
 	
 	;
 	;A sincronização vertical.
 	;
 	;call _vsync
 	
+	
+	;começaremos pegando na origem que é o primeiro char 
+	; da área de dados do arquivo bmp.
+	
+	;mas o destino é o ultimo char da imágem no backbuffer.
+	
 	;quantidade de linhas
     mov ecx, dword 16
 ;Loop:	
 .pinta_bmp:	
 	;pega uma linha
-    movq  mm0, [esi]        ;2 primeiros pixels.      
+    movq  mm0, [esi]        ;8 chars, cada pixel tem 3 chars.      
 	movq  mm1, [esi+8]    
 	movq  mm2, [esi+16]
 	movq  mm3, [esi+24]
@@ -109,13 +139,18 @@ _my_buffer_load_bitmap_16x16:
 	;movq  [edi+56], mm7
     
 	;próxima linha da bmp.
+	;avançando dentro da área de dados.
 	mov eax, esi 
-	add eax, dword 48    ;64 ; adiciona 64 bytes.
+	add eax, dword 48 ;(6*8) ;48/3 = 16
 	mov esi, eax
 	
-	;linha anterior do buffer
+	;
+	; Pintando no back buffer a próxima linha superior da imagem.
+	;
+	
+	;linha anterior do back buffer.
 	mov eax, edi 
-	sub eax, dword 640*3    ;Adiciona a quantidade de bytes por linha.
+	sub eax, dword 800*3    ;subtrai a quantidade de bytes por linha.
 	mov edi, eax
 	
 	loop .pinta_bmp

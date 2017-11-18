@@ -4,7 +4,7 @@
  * Descrição:
  *     Rotinas de criação e gerenciamento de menubar.
  *     Faz parte do módulo Window Manager do tipo MB.
- *
+ *     Obs: Menu bars são basicamente uma árvore de menus.
  * Sobre menubar:
  *     Menu bar é a barra que fica logo abaixo da 
  *     barra de título de uma janela em sistemas como windows/linux.

@@ -17,7 +17,8 @@
  * I/O system: Inclui I/O manager
  *
  *  @todo: Cria funções para gerenciar ioBuffers.
- *
+ * The actual Streams modules lives in kernel space on Unix, and are 
+ * installed (pushed) and removed (popped) by the ioctl system call.
  * Versão 1.0, 2016.
  */
  

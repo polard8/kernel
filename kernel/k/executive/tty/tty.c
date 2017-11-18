@@ -17,6 +17,8 @@ void *createTTYLine()
 {
 	struct ttyline_d *l;
 	
+	
+	//Alocando memória para uma estrutura de linha.
 	l = (void*) malloc( sizeof(struct ttyline_d) );
 
     if( (void*) l == NULL ){
@@ -29,8 +31,8 @@ void *createTTYLine()
 	//Inicializar as variáveis dentro da estrutura.
 	
 	int i;
-	for(i = 0; i< DEVELOPER_TTYCHARS_MAX; i++){
-	    l->c[i] = 0;	
+	for(i = 0; i< TTYCHARS_COUNT_MAX; i++){
+	    l->c[i] = 0;  //zerando o buffer de caracteres.	
 	}
 	
 	l->used = 1;
@@ -40,13 +42,22 @@ void *createTTYLine()
 	
 	
 	ttyLineCounter++;
-	if(ttyLineCounter >= DEVELOPER_TTYLINES_MAX){
+	if(ttyLineCounter >= TTYLINES_COUNT_MAX){
 		printf("createTTYLine: Line limits\n");
 		refresh_screen();
 		//free(l);
 		return NULL;
 	}else{
-	    developer_ttylines[ttyLineCounter] = (void*) l;	
+	    //developer_ttylines[ttyLineCounter] = (void*) l;	
+		
+		
+		//
+		// Precisamos de uma estrutura de texto ...
+		// mas essa rotina é somente para tratamento de linhas.
+		//
+		
+		// ?? A qual estrutura de texto essa linha pertence.
+		
 	}
 	
 	//...
@@ -64,8 +75,8 @@ done:
 int ttyInit()
 {
 	int i;
-	for(i = 0; i< DEVELOPER_TTYLINES_MAX; i++){
-	    developer_ttylines[i] = NULL;	
+	for(i = 0; i< TTYLINES_COUNT_MAX; i++){
+	    //developer_ttylines[i] = NULL;	
 	}
 	
 	ttyLineCounter = 0;

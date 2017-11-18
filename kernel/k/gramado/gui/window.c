@@ -1,5 +1,5 @@
 /*
- * File: gramado\gui\window.c 
+ * File: gui\window.c 
  *
  * Descrição:
  *     Arquivo principal do Window Manager.
@@ -69,8 +69,7 @@ int windowInitializeBrowserSupport()
 {
 	int i;
 	
-	//KSOC - Kernel Standard Output Container
-	printf("Initializing KSOC support\n");
+	printf("Initializing browser support\n");
 	
 	
 	for(i=0; i< TABWINDOW_COUNT_MAX; i++){
@@ -234,7 +233,6 @@ int windowInitializeBrowserSupport()
 	return (int) 0;
 }
 
-
 /*
 int windowShowWindow(struct window_s *window, int msg);
 int windowShowWindow(struct window_s *window, int msg)
@@ -316,32 +314,23 @@ void windowSetForegroundWindow(struct window_d *window)
 */
 
 
-/*
- * GetParentWindow:
- *     Retorna o ponteiro para a estrutura da janela mãe.
- */
+//get parent window
 void *GetParentWindow(struct window_d * hwnd)
 {
 	if( (void*) hwnd == NULL ){
 		return NULL;
 	}
 	return (void*) hwnd->parent;
-};
+}
 
-
-/*
- * GetWindowDesktop:
- *     Retorna o ponteiro para a estrutura do desktop do qual a janela 
- * pertence.
- */
+//get the desktop of a window.
 void *GetWindowDesktop(struct window_d * hwnd)
 {
 	if( (void*) hwnd == NULL ){
 		return NULL;
 	}
 	return (void*) hwnd->desktop;
-};
-
+}
 
 /*
  * ===============================================================
@@ -448,9 +437,8 @@ done:
 /*
  * windowShowWWFMessageBuffers:
  *     Mostra o buffer de mensagens da janela com foco de entrada.
- *     #Rotinas de teste. 
- *     @todo: Enviar para a pasta /test.
- *     Feedback: Esse rotina funcionou e se mostrou bem útil.
+ *     #Rotinas de teste. @todo: Enviar para a pasta /test.
+ *     Esse rotina funcionou e se mostrou bem útil.
  */
 void windowShowWWFMessageBuffers()
 {
@@ -458,10 +446,7 @@ void windowShowWWFMessageBuffers()
     wFocus = (void *) windowList[window_with_focus];
 
 	int i;
-	
 	//Obs: Tipo.
-	//@todo: Limits.
-	
 	for( i=0; i<32; i++){
 	    printf("%d ", wFocus->msgList[i]);
     };

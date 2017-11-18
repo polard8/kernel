@@ -133,13 +133,13 @@ kernel fica com o 1GB superior."
  ** ESSAS VARIÁVEIS GLOBAIS MARCARÃO O INÍCIO E O FIM 
  ** DA ÁREA DE MEMÓRIA FÍSICA DESTINADA AOS FRAMES DE MEMÓRIA 
  ** FÍSICA QUE SERÃO USADOS PELO GERENCIADOR DE PÁGINAS.
- **
+ ** pertencerão ao banco FDB. Free Data Base.
  **/
  
 // Frames Super Block.
 // Variáveis globais parecem ser uma opção melhor que estrutura
 // para esse caso. 
-// Obs: temos listas de framas em algum lugar. criaremos listas aqui
+// Obs: temos listas de frames em algum lugar. criaremos listas aqui
 //para o FSB, que será o nome do gerenciado, para melhorar o controle dessa área.
 unsigned long mmFramesSuperBlockStart;      //Endereço onde começa o FSB.
 unsigned long mmFramesSuperBlockEnd;        //Endereço onde termina o FSB.

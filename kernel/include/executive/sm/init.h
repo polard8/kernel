@@ -25,6 +25,7 @@ struct initialization_d
 	int hal;
 	int microkernel;
 	int executive;
+	//int gramado;  //@todo: Esse ainda não foi implementado.
 	
 	//...
 }; 

@@ -2,8 +2,8 @@
  * Arquivo: disk.h 
  *
  * Descrição:
+ *     Gerenciador de discos. 
  *     Header para rotinas de operação com discos.
- *     Header para o Volume Manager.
  *
  * Obs: 
  *     Part of hal.
@@ -14,7 +14,7 @@
  
  
  
-#define DISK_COUNT_MAX 16
+#define DISK_COUNT_MAX 8
 #define DISK_BYTES_PER_SECTOR 512 
 //#define DISK_BYTES_PER_SECTOR 4096 
  
@@ -64,33 +64,11 @@ struct diskinfo_d
 	
 	
 	//
-	// Hidden Sectors. (Quantos setores reservados antes da fat, ou do vbr da primeira partição.).
+	// @todo #bugbug Aqui não deve ficar informações sobre volumes.
+	// talvez um ponteiro para o volume principal e só isso.
 	//
 	
-    unsigned long HiddenSectors;	
 	
-    //
-    // FAT.
-    //
-	
-	unsigned long FatType;              //FAT12, FAT16, FAT32, FATX16 or FATX32.	
-    unsigned long FatSectorStart;       //Starting sector of 1st FAT table.
-    unsigned long ActiveFatSectorStart; //Starting sector of active FAT table.
-    unsigned long NumberOfFats;         //Number of FAT tables.
-    unsigned long SectorsPerFat;        //Sectors per FAT table.
-
-	
-    //
-	// ROOT.
-	//
-    unsigned long RootDirSectorStart;   //Starting sector of the root directory (non-fat32).
-    unsigned long RootDirSectors;       //Number of sectors of the root directory (non-fat32).
-    unsigned long RootDirStartCluster;  //Starting cluster number of the root directory (fat32 only).
-
-	//
-	// DATA AREA.
-	//
-	unsigned long DataSectorStart;      //Starting sector of the data area.
 	
 	//
 	// Volume list.  x->Volumes[i].xxx
@@ -106,6 +84,12 @@ diskinfo_t *CurrentDiskInfo;
 diskinfo_t *SystemDiskInfo;
 //...
 
+
+//
+// Lita de discos
+//
+
+unsigned long diskList[DISK_COUNT_MAX];
 
 int disk_init();
 void init_test_disk();  //*teste de operação com disco. 

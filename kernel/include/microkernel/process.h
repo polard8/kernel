@@ -522,11 +522,7 @@ struct process_d
 	// @todo: Criar uma fila de mensagens.
 	//
 	
- 
-	
-	//Signal
-	unsigned long signal;
-	unsigned long signalMask;
+
 	
 	//@todo: mailBox, sockets ... (IPC).
 	
@@ -727,6 +723,13 @@ struct process_d
     //struct process_d *NextInitialized;    //Próximo pronto pra rodar.		
 	//struct process_d *Parent;
 	//struct process_d *Prev;
+	
+	
+	
+	//Signal
+	unsigned long signal;
+	unsigned long signalMask;
+	
 	struct process_d *Next;
 };
 

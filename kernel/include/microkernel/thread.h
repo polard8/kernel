@@ -386,11 +386,6 @@ struct thread_d
     // (SYSTEM, PERIODIC, RR, IDLE).	
 	//
 	thread_type_t type;	
-	
-
-	//Signal
-	unsigned long signal;
-	unsigned long signalMask;
 		
 		
 	//
@@ -439,9 +434,15 @@ struct thread_d
 	 */
 	unsigned long wait4pid;    //@todo: pode ser 'int'.
 	
+		
     //Motivo da thread fechar.
 	int exit_code; 	
-		
+	
+
+	//Signal
+	unsigned long signal;
+	unsigned long signalMask;
+	
 	//Next: 
     //Um ponteiro para a próxima thread da lista linkada. 
 	struct thread_d *Next;

@@ -6,6 +6,8 @@
  *     Estação de janelas. 
  *     (Contém desktops).
  *
+ *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
+ *
  * Tipos de window station: 
  *     (interactive, non_interactive).
  *

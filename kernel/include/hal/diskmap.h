@@ -18,6 +18,7 @@
  */
  
  
+//?? @todo: Rever
 #define System4NoraSize 32    //32 KB. 
 #define Stage1StartSector 1 
 #define Stage2StartSector 2

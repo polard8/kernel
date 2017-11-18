@@ -4,7 +4,7 @@
  * Descrição: 
  *     Gerência de caixas de diálogo.
  *     Faz parte do módulo Window Manager do tipo MB.
- *
+ *     Obs: Dialogbox é basicamente um 'form'.
  * History:
  *     2015 - Created by fred Nora.
  */

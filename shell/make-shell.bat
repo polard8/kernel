@@ -8,11 +8,14 @@ echo -{ Creating head.o ...
 	nasm  head.s  -felf -o head.o
     rem essa deveria ser crt0.s ? (C RunTime)
 	
-echo -{ Creating main.o ...	
+echo -{ Creating main.o ...
+    rem crt0.o não deve ser compilado aqui ... isso é só um teste.
+    gcc  -c  crt0.c -o crt0.o 	
 	gcc  -c  main.c  -o main.o  
 	
 :SetingObjects		
 set myObjects=head.o ^
+crt0.o ^
 main.o ^
 api.o ^
 stdio.o ^

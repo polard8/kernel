@@ -41,7 +41,7 @@ unsigned long foregroung_color;  //texto.
  
  
 //
-// Usage banner.
+// banners.
 //
  
 static const char usage[] =
@@ -57,7 +57,16 @@ static const char help_banner[] =
 	//... 
 	
 	
+//
+// files.
+//	
+	
 static const char init_file_name[] = "INIT    TXT";	
+static const char  bmp1_file_name[] = "BMP1    BMP";
+static const char  bmp2_file_name[] = "BMP2    BMP";
+static const char  bmp3_file_name[] = "BMP3    BMP";
+static const char  bmp4_file_name[] = "BMP4    BMP";	
+//... 
  
 //
 // Structures.
@@ -85,6 +94,9 @@ struct shell_metrics_d
 };
 shell_metrics_t *ShellMetrics;
 //...
+ 
+ 
+//void *GramadoMain( int argc, char *argv[], unsigned long address, int view );
  
 //
 // End.

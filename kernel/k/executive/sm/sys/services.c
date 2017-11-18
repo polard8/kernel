@@ -159,6 +159,23 @@ void *services( unsigned long number,
 	
 	
 	//
+	// *Test:
+	//  Se o número do serviço for igual ou superior a 1000,
+	// chamaremos a rotina servicesEx(.) ... que encontrará esses 
+	// serviços no processo IDLE, em user mode.
+	//
+	
+	/*
+	if(number >= 1000){
+		servicesEx( (unsigned long) number,
+                    (unsigned long) arg2,
+                    (unsigned long) arg3,
+					(unsigned long) arg4 );
+	};
+	*/
+	
+	
+	//
 	// *Importante: Checando se o esquema de cores está funcionando.
 	//
 	
@@ -264,6 +281,7 @@ void *services( unsigned long number,
         //Coloca um pixel no backbuffer.
         //Isso pode ser usado por um driver. 		
         case SYS_BUFFER_PUTPIXEL:
+		    //cor,x,y,0
             my_buffer_put_pixel( (unsigned long) a2, 
 			                     (unsigned long) a3, 
 								 (unsigned long) a4, 
@@ -380,11 +398,9 @@ void *services( unsigned long number,
 
 
         //45 Message Box. 
-		//Ok Funcionou assim.
         case SYS_MESSAGEBOX:
-            //(parent window, type, string1, string2)
-            //arg2=5; *test: Colocando aqui o argumento funciona. recebendo da chamada, não funciona.			
-            MessageBox(gui->screen, (int) arg2, (char *) arg3, (char *) arg4 );        
+            //Ok Funcionou assim.		
+            MessageBox(gui->screen, 1, (char *) a3, (char *) a4 );        
             return NULL;
 			break;
 		
@@ -468,7 +484,8 @@ void *services( unsigned long number,
 			
         //63
 		case SYS_GETFOCUS: 
-		    return (void*) systemRam(72,0,0,0,0); 
+		    return (void*) window_with_focus;
+		    //return (void*) systemRam(72,0,0,0,0); //#bugbug retornando valor errado. ??
 			break;
 			
         //64
@@ -528,9 +545,15 @@ void *services( unsigned long number,
 			return (void*) create_thread( NULL, NULL, NULL, arg2, arg3, 0, (char *) a4);
 			break; 
 
-		//73 - Create process.	
+		//73 - Create process.
+        //@todo; Ok, nesse momento, precisamos saber qual é o processo pai do processo 
+        //que iremos criar. Esse deve ser o processo atual ...  		
         case SYS_CREATEPROCESS:
 		    //systemIoCpu( 2, 0, 0, 0, 0);
+			// PPID = 0. Nesse momento todo processo criado será filho do processo número 0.
+			// mas não é verdade. @tpdp: Precisamos que o aplicativo em user mode 
+			// nos passe o número do processo pai, ou o proprio kernel identifica qual é o 
+			//processo atual e determina que ele será o processo pai.
             return (void *) create_process( NULL, NULL, NULL, arg2, arg3, 0, (char *) a4); 		
             break;
 			

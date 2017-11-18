@@ -39,8 +39,8 @@ segment .head_x86
 [bits 32]
 
  
-
-extern _GramadoMain
+extern _crt0
+;extern _GramadoMain
 ;extern _exit
 
 
@@ -59,7 +59,8 @@ _shell_entry_point:
 	;;push 0
 	;;push 0
 	
-	call _GramadoMain
+	call _crt0
+	;;call _GramadoMain
 	
 	;; atualizando a pilha
 	;;pop 0

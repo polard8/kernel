@@ -2,6 +2,7 @@
  * File: volume.c 
  *
  * Descrição:
+ *     Gerenciador de volumes.
  *     Arquivo principal do Volume Manager.
  *     MB - Módulos incluídos no Kernel Base.
  *

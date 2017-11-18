@@ -216,8 +216,12 @@ void sys_reboot(void)
 };
 */
 
+
+//pega o id do processo atual.
 int sys_getpid()
 {
+	return (int) current_process;
+/*	
 	//erro
 	if( (void*) CurrentProcess == NULL ){
 		return (int) -1;
@@ -229,11 +233,38 @@ int sys_getpid()
 	};
 	
     return (int) CurrentProcess->pid;
+*/
 };
 
 
+//pega o id do processo pai do processo atual.
 int sys_getppid()
 {
+    int pid;
+	int ppid;
+	struct process_d *p;
+	
+	pid = current_process;
+	
+	if( pid >= 0 && pid < PROCESS_COUNT_MAX )
+	{
+        //ponteiro da estrutura.
+		p = (void*) processList[pid]; 		
+		
+		if( (void*) p == NULL ){
+			return (int) -1;
+		}
+		
+		if ( p->used != 1 || p->magic != 1234 ){
+		    return (int) -1;	
+		}
+		
+		//retorna o id do processo pai.
+		return (int) p->ppid;
+	};
+	
+
+	/*
 	//erro
 	if( (void*) CurrentProcess == NULL ){
 		return (int) -1;
@@ -245,6 +276,10 @@ int sys_getppid()
 	};
 
 	return (int) CurrentProcess->ppid;
+	*/
+	
+	//fail.
+    return (int) -1;	
 };
 
 

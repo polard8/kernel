@@ -5,6 +5,8 @@
  *    Funções e parâmetros para o kernel controlar a interface gráfica 
  * e as operações com vídeo.
  *
+ *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
+ *
  * Histórico:
  *     Versão: 1.0, 2014 - Esse arquivo foi criado por Fred Nora.
  *     Versão: 1.0, 2015 - Revisão. 

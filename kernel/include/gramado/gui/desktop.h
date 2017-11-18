@@ -7,6 +7,7 @@
  *     Um desktop contém janelas, menus e outras coisas.
  *     ...
  *
+ *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
  * Versão 1.0, 2015.
  */
  

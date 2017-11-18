@@ -1,7 +1,8 @@
 /*
- * Arquivo: volume.h
+ * File: volume.h
  *
  * Descrição:
+ *     Gerenciador de volumes.
  *     Header para o Volume Manager.
  *     Gerência de volumes.
  *
@@ -39,6 +40,12 @@ struct volumeinfo_d
 	int flag;
 	int error;
 	
+	//
+	// File System Type
+	//
+	
+	int file_system_type;
+	
 	
 	//
 	// VBR info. 
@@ -65,12 +72,51 @@ struct volumeinfo_d
 	//
 	unsigned long szROOT;
 	
+	
+	
+//
+	// Hidden Sectors. (Quantos setores reservados antes da fat, ou do vbr da primeira partição.).
+	//
+	
+    //unsigned long HiddenSectors;	
+	
+    //
+    // FAT.
+    //
+	
+	//unsigned long FatType;              //FAT12, FAT16, FAT32, FATX16 or FATX32.	
+    //unsigned long FatSectorStart;       //Starting sector of 1st FAT table.
+    //unsigned long ActiveFatSectorStart; //Starting sector of active FAT table.
+    //unsigned long NumberOfFats;         //Number of FAT tables.
+    //unsigned long SectorsPerFat;        //Sectors per FAT table.
+
+	
+    //
+	// ROOT.
+	//
+    //unsigned long RootDirSectorStart;   //Starting sector of the root directory (non-fat32).
+    //unsigned long RootDirSectors;       //Number of sectors of the root directory (non-fat32).
+   // unsigned long RootDirStartCluster;  //Starting cluster number of the root directory (fat32 only).
+
+	//
+	// DATA AREA.
+	//
+	//unsigned long DataSectorStart;      //Starting sector of the data area.
+	
 };
 volumeinfo_t *volumeinfo;
 volumeinfo_t *CurrentVolume;
 volumeinfo_t *SystemVolume;
 //...
 
+
+//
+// Lista de volumes.
+//
+
+
+
+unsigned long volumeList[VOLUME_COUNT_MAX];
 
 //@todo: Fazer uma lista de volumes.??!!
 

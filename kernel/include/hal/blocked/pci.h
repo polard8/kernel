@@ -234,7 +234,7 @@ Class Description
 
 #define PCI_OFFSET_REVISIONID     0x08    //char RID
 #define PCI_OFFSET_PROGIF         0x09    //char  PI Programming Inteface
-#define PCI_OFFSET_SUBCLASS       0x0A    //char Class Code CC //*importante
+#define PCI_OFFSET_SUBCLASS       0x0A    //char Class Code CC /* Device class */ //*importante
 #define PCI_OFFSET_CLASSCODE      0x0B    //char.
 
 #define PCI_OFFSET_CACHELINESIZE  0x0C    //char CLS
@@ -242,12 +242,36 @@ Class Description
 #define PCI_OFFSET_HEADERTYPE     0x0E    //char HTYPE
 #define PCI_OFFSET_BIST           0x0F    //char
 
+/*
+ * Base addresses specify locations in memory or I/O space.
+ * Decoded size can be determined by writing a value of
+ * 0xffffffff to the register, and reading it back.  Only
+ * 1 bits are decoded.
+ */
+
 #define PCI_OFFSET_BASEADDRESS0   0x10  //unsigned long
-#define PCI_OFFSET_BASEADDRESS1   0x14  //unsigned long
-#define PCI_OFFSET_BASEADDRESS2   0x18  //unsigned long
+#define PCI_OFFSET_BASEADDRESS1   0x14  //unsigned long [htype 0,1 only]
+#define PCI_OFFSET_BASEADDRESS2   0x18  //unsigned long [htype 0 only]
 #define PCI_OFFSET_BASEADDRESS3   0x1C  //unsigned long
 #define PCI_OFFSET_BASEADDRESS4   0x20  //unsigned long
 #define PCI_OFFSET_BASEADDRESS5   0x24  //unsigned long
+
+/*
+#define  PCI_BASE_ADDRESS_SPACE	0x01	// 0 = memory, 1 = I/O 
+#define  PCI_BASE_ADDRESS_SPACE_IO 0x01
+#define  PCI_BASE_ADDRESS_SPACE_MEMORY 0x00
+#define  PCI_BASE_ADDRESS_MEM_TYPE_MASK 0x06
+#define  PCI_BASE_ADDRESS_MEM_TYPE_32	0x00	// 32 bit address 
+#define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	// Below 1M [obsolete]
+#define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	// 64 bit address 
+#define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	// prefetchable? 
+#define  PCI_BASE_ADDRESS_MEM_MASK	(~(pciaddr_t)0x0f)
+#define  PCI_BASE_ADDRESS_IO_MASK	(~(pciaddr_t)0x03)
+// bit 1 is reserved if address_space = 1 
+
+*/
+
+
 
 #define PCI_OFFSET_CISP           0x28  //unsigned long (Cardbus CIS Pointer)
 

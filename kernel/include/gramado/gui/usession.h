@@ -4,7 +4,7 @@
  * Descrição:
  *     Header do gerenciador de user sections.
  *     
- *     DESKTOP -> WINDOW STATION -> USER SECTION.
+ *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
  *
  *
  * Obs: Uma estrutura de user session pode armazenas ponteiros para

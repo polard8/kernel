@@ -242,9 +242,9 @@ get_next:
         //Ticks ...
         //DeadLine ... 
 
-	    Thread->step = 0;            //Quantas vezes ela usou o processador no total.
- 	    Thread->Quota = 9;           //Cota de utilização do processador antes de deixa-lo.
-        Thread->quantum = 9;  //QUANTUM_BASE
+	    Thread->step = 0;               //Quantas vezes ela usou o processador no total.
+ 	    Thread->Quota = 9;              //Cota de utilização do processador antes de deixa-lo.
+        Thread->quantum = 9;            //QUANTUM_BASE
         Thread->quantum_limit = (9*2);  //O boost não deve ultrapassar o limite. QUANTUM_LIMIT		 
 
 		
