@@ -152,15 +152,16 @@ _irq0:
 	
 	
 	;
+	; ??
 	; As rotinas em executarão serviços oferecidos pelo kernel
 	; ou pelos seus modulos ou drivers.
 	; Durante a execução dessas rotinas, as interrupções podem
-	; por um instante serem habilitadas novamente, se isso aacontecer
-	; não queremos que a interrupção de timer irq1 chame essas rotinas
+	; por um instante serem habilitadas novamente, se isso acontecer
+	; não queremos que a interrupção de timer irq0 chame essas rotinas
 	; em c novamente. Então desabilitaremos a rechamada dessas funções
-	; enquanto elas estivere em execução e habilitaremos novamnete ao sairmos delas.
-	;
-	;
+	; enquanto elas estivere em execução e habilitaremos novamente ao 
+	; sairmos delas.
+	; ??
 	;	
 	
 	
