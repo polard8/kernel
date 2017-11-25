@@ -163,6 +163,7 @@ unsigned long system_procedure( struct window_d *window,
 				//Mostra informções sobre todos os dispositivos.
 				//Igual ao gerenciador de dispositivos.
 				case VK_F5:
+					
 					//if(AltStatus == 1){ window_with_focus = 5; break;};
 					//if(CtrlStatus == 1){ active_window = 5; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
@@ -171,6 +172,20 @@ unsigned long system_procedure( struct window_d *window,
 					//Obs: Não usa janelas, isso não mudará o foco.
 					systemShowDevicesInfo();
 					
+					/*
+					//testando chamar o bootloader na forma de módulo.
+					asm (" pushl %eax ");
+					asm (" pushl %ebx ");
+					
+					asm (" movl $0x12345678,  %eax "); //flag.
+					
+					asm (" movl $0x00021000,  %ebx "); //endereço do entrypoint do boot loader.
+					asm (" call *%ebx "); 
+					
+					asm (" popl %ebx ");
+					asm (" popl %eax ");
+					*/
+					
 					//Test teclado scancode. (FUNCIONOU BEM)
 					//Quando aciona esse status, o kernel mostra o scancode.
 					//scStatus = 1;
@@ -178,6 +193,12 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Clock info./minishell				
 				case VK_F6:
+					init_mouse();  //isso está em keyboard.c
+					
+					//#bugbug TEST.
+					//Loop para testes ... isso é problema 
+					//while(1){ kernelPS2MouseDriverReadData(); };
+					
 					//if(AltStatus == 1){ window_with_focus = 6; break;};
 					//if(CtrlStatus == 1){ active_window = 6; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
@@ -190,7 +211,7 @@ unsigned long system_procedure( struct window_d *window,
 					//procedureMakeTests();
 					
 					//Obs: Não usa janelas, isso não mudará o foco.
-					windowShowWWFMessageBuffers();
+					//windowShowWWFMessageBuffers();
 					
 					//printf("F6: Testando linkar um driver ...\n");
 					//procedureLinkDriverTest();
@@ -341,7 +362,9 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Mudar o foco de entrada pra próxima janela de uma lista.				
                 case VK_TAB:
-				    //if(AltStatus   == 1)
+				    //windowSwitchFocus();
+					
+					//if(AltStatus   == 1)
 					//{ 
 					    //window_with_focus++;
                         //if(	window_with_focus > 9 ){
@@ -349,7 +372,7 @@ unsigned long system_procedure( struct window_d *window,
 						//}					
 						//break;
 					//};
-					//windowSwitchFocus();
+					
 				    break;
 					
                 // Nothing for now!  				

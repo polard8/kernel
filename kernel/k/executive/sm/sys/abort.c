@@ -62,7 +62,7 @@ void KiAbort()
 
 /*
  * abort:
- *     Módulo interno do tipo MB. Faz parte do Kenrel Base.
+ *     Módulo interno do tipo MB. Faz parte do Kernel Base.
  *     Aborta o kernel e mostra o erro.
  *     Aborta o kernel devido a falhas do kernel.
  *
@@ -136,13 +136,17 @@ void abort()
 	    refresh_screen();
 	};
 	
-	asm("cli");
-	asm("hlt");                        //Halt system.
+
     
 	/*
      *  No return.
      */	     	
-	while(1){};                        //Wait forever.  
+	while(1){         //Wait forever.
+		
+	asm("cli");
+	asm("hlt");                        //Halt system.
+	
+	};                          
 };
 
 //

@@ -93,17 +93,41 @@ void my_buffer_char_blt( unsigned long x,
 	 *     + Criar e usar uma estrutura para fonte.
 	 *     + Usar o ponteiro para a fonte atual que foi carregada.
 	 *     + Criar um switch para o tamanho da fonte.
+	 *     isso deveria estar na inicialização do módulo char.
 	 *     ...
 	 */
 	 
     if( gfontAddress == 0 || 
-	    gcharWidth == 0 || 
-		gcharHeight == 0 )
+	      gcharWidth == 0 || 
+		 gcharHeight == 0 )
 	{
-	    gfontAddress = (unsigned long) 0x000FFA6E;    //ROM bios.
+		//@todo: Criar definições globais para esses valores, ou estruturas.
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		gcharWidth = 8;
 		gcharHeight = 8;
 	};
+	
+	/*
+	//@todo: Criar essas variáveis e definições.
+	switch(gFontSize)
+	{
+		case FONT8X8:
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		gcharWidth = 8;
+		gcharHeight = 8;
+		break;
+		
+		case FONT8X16:
+	    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		gcharWidth = 8;
+		gcharHeight = 16;
+		break;
+		 
+		//...
+	}
+	*/
+	
+	
 
  	//
 	// O caractere sendo trabalhado.
@@ -111,7 +135,6 @@ void my_buffer_char_blt( unsigned long x,
     //
 	
 	work_char = (void *) gfontAddress + (c * gcharHeight);
-    //work_char = (void *) 0x000FFA6E + (c * 8);
 
 	//
 	// Draw.
@@ -147,7 +170,37 @@ done:
 
 /*
 int charInit()
-{}
+{
+	
+    if( gfontAddress == 0 || 
+	      gcharWidth == 0 || 
+		 gcharHeight == 0 )
+	{
+		//@todo: Criar definições globais para esses valores, ou estruturas.
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		gcharWidth = 8;
+		gcharHeight = 8;
+	};
+	
+	//@todo: Criar essas variáveis e definições.
+	switch(gFontSize)
+	{
+		case FONT8X8:
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		gcharWidth = 8;
+		gcharHeight = 8;
+		break;
+		
+		case FONT8X16:
+	    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		gcharWidth = 8;
+		gcharHeight = 16;
+		break;
+		 
+		//...
+	}
+
+}
 */
 
 //

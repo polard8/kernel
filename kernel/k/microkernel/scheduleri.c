@@ -720,7 +720,7 @@ void kill_task(int id)
 	    
 		//Zerar as variáveis da estrutura.
 	    t->tid = 0;
-	    t->ppid = 0;    
+	    t->ownerPID = 0;    
 	    t->used = 0;
 	    t->magic = 0;
 	    t->state = DEAD;
@@ -808,22 +808,19 @@ void taskexit()
 	    // Parent. //Parent process
 	    //
 
-    	Parent = t->ppid;    //Parent process.
+    	Parent = t->ownerPID;    //Parent process.
  	
-	    if( Parent < 0)
-		{
+	    if(Parent < 0){
 		    return;
-		}
-		else
-		{
-		    //process
+		}else{
+			
+			
+		    //Process.
 	        p = (void *) processList[Parent];	
-	        if( (void *) p == NULL )
-			{
+	        if( (void *) p == NULL ){
 			    return;
-			}
-			else
-			{
+			}else{
+				
 			  /*
 			    //se a parent estava esperando a filha fechar.
 	            if( p->wait4pid == 0) 

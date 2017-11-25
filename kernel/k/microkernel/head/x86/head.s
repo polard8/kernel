@@ -59,7 +59,7 @@
 
 
 ;;
-;; codename db 'berlin'
+;; codename db 'fortaleza'
 ;;
 
 
@@ -117,7 +117,11 @@ extern _g_frontbuffer_buffer_address
 ;...
 
 ;Stacks.
-extern _kernel_stack_start
+;#bugbug: O endereço configurado na hora da inicialização poderá corromper o 
+;processo em user mode, o melhor é deixar configurar na inicialização com o mesmo
+;endereço indicado na tss.
+extern _kernel_stack_start      ;;usado na inicialização @bugbug
+extern _kernel_stack_start_pa   ;;indicado na TSS
 ;...
  
 ;Context.
@@ -157,7 +161,8 @@ extern _dispatch_task
 ;
 
 extern _kMain  
-extern _KeStartIdle         ;Start Idle (entra em User Mode).  
+;extern _KeStartIdle         ;Start Idle (entra em User Mode). 
+extern _startStartIdle 
 extern _save_kernel_args
 ;extern _kernelServices ;Services
 ;...
@@ -416,6 +421,16 @@ _kernel_begin:
 	ltr ax  
 
 	
+    ;
+    ; Me parece que nesse momento precisamos de um jmp far, semelhante ao que usamos
+    ; na comutação do modo real para o modo protegido.
+    ;
+    ;	
+	
+	jmp 8:dummyJmpAfterLTR
+    nop	
+dummyJmpAfterLTR:
+	
 	;;
 	;; Selecting the 'Processor Interrup Mode'.
 	;; * PIC MODE *
@@ -547,7 +562,8 @@ _kernel_begin:
 
 	;Stack	(atualiza o ponteiro para a variável global).
 	;xor	eax, eax
-	mov dword [_kernel_stack_start], 0xC03FFFF0
+	mov dword [_kernel_stack_start_pa], 0x003FFFF0 ;0x00200000 ;(o mesmo endereço indicado na TSS) 
+	mov dword [_kernel_stack_start], 0x003FFFF0    ;0xC03FFFF0
 	mov eax, dword [_kernel_stack_start] 
 	mov esp, eax 
 		
@@ -637,8 +653,11 @@ flushTLB:
 	nop
 	mov CR3, EAX  	
 	
-	jmp _KeStartIdle
-	;;jmp _StartIdle   @todo criar esse extern.	
+	jmp _startStartIdle
+	;jmp _KeStartIdle  @todo deletar
+	;;jmp _StartIdle   @todo deletar	
+	
+	;debug
 	;jmp $
 
 

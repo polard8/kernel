@@ -301,10 +301,11 @@ extern void do_executa_new_task();
 
 //tty - Gerenciado de fluxo de caracteres.
 #include <executive/tty/tty.h>	
-
+#include <executive/ram/mmglobal.h>	
 
 //
-// @todo: Testar se é possível colocar esses includes abaixo dos includes do executive.
+// @todo: ( *** IMPORTANTE ***) 
+// Testar se é possível colocar esses includes abaixo dos includes do executive.
 //
 
 //gramado - GUI. (presentation layer)

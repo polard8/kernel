@@ -201,7 +201,7 @@ int videoInit()
 		//
 		
 		//Background.
-		backgroundDraw(COLOR_BLUE);
+		backgroundDraw(COLOR_KERNEL_BACKGROUND);  //COLOR_BLUE
 		
 	    //@todo: Isso deve fazer parte do construtor.
 		

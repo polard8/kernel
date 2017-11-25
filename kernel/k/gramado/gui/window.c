@@ -233,6 +233,7 @@ int windowInitializeBrowserSupport()
 	return (int) 0;
 }
 
+
 /*
 int windowShowWindow(struct window_s *window, int msg);
 int windowShowWindow(struct window_s *window, int msg)
@@ -340,13 +341,18 @@ void *GetWindowDesktop(struct window_d * hwnd)
  * do usuário que fez o logon.
  * Os dois esquemas padrão chamam-se: 'humility' e 'pride'.
  * + O esquema 'humility' são cores com tema cinza, lembrando interfaces antigas.
- * + O esquema 'pride' são cores modernas e até mesmo exageradas.
+ * + O esquema 'pride' são cores modernas 
+ *   ( Aquele verde e preto e cinza, das primeiras versões, com imagens publicadas. )
  *
  */
-void windowSetUpColorScheme()
+void windowSetUpColorScheme(int type)
 {	
     struct color_scheme_d *humility;
     struct color_scheme_d *pride;	
+	
+	//
+	// * HUMILITY
+	//
 	
     //Criando o esquema de cores humility. (cinza)
     humility = (void*) malloc( sizeof(struct color_scheme_d) );
@@ -384,6 +390,9 @@ void windowSetUpColorScheme()
 		HumilityColorScheme = (void*) humility;
 	};	
 	
+	//
+	// * PRIDE 
+	//
 	
     //Criando o esquema de cores PRIDE. (colorido)
     pride = (void*) malloc( sizeof(struct color_scheme_d) );
@@ -405,16 +414,16 @@ void windowSetUpColorScheme()
 		
 		//@todo:
 		pride->elements[csiNull] = 0;
-        pride->elements[csiDesktop] = COLOR_DESKTOP;		
+        pride->elements[csiDesktop] = COLOR_BACKGROUND; //0x00808000 verde escuro.
 		pride->elements[csiWindow] = COLOR_WINDOW;
-        pride->elements[csiWindowBackground] = COLOR_WINDOW;		
-		pride->elements[csiActiveWindowBorder] = COLOR_BORDER;
-        pride->elements[csiInactiveWindowBorder] = COLOR_GRAY;		
-		pride->elements[csiActiveWindowTitleBar] = COLOR_TITLEBAR;
-        pride->elements[csiInactiveWindowTitleBar] = COLOR_GRAY;		
+        pride->elements[csiWindowBackground] = COLOR_WINDOW;	//COLOR_WINDOW	
+		pride->elements[csiActiveWindowBorder] =  0x80FFFF00;
+        pride->elements[csiInactiveWindowBorder] = 0x80FFFF00;    //  (LIGHT GREEN) 
+		pride->elements[csiActiveWindowTitleBar] = 0x80FFFF00;    //  (LIGHT GREEN)
+        pride->elements[csiInactiveWindowTitleBar] =  0x80FFFF00;		
 		pride->elements[csiMenuBar] = COLOR_GRAY;
         pride->elements[csiScrollBar] = COLOR_GRAY;		
-		pride->elements[csiStatusBar] = COLOR_STATUSBAR;
+		pride->elements[csiStatusBar] = 0x40404000;  //COLOR_STATUSBAR;  //#404040 cinza #FFFFFF branco
         pride->elements[csiMessageBox] = COLOR_GRAY;		
 		//...
 		
@@ -427,7 +436,32 @@ void windowSetUpColorScheme()
 	// Configurando qual será o esquema padrão.
 	//
 	
-	CurrentColorScheme = (void*) humility; 
+	//
+	// @todo; Criar uma função que selecione qual dois esquemas serão usados
+	//        apenas selecionando o ponteiro da estrutura.  
+	//
+	
+	
+    switch(type)
+	{
+		case ColorSchemeNull:
+		    CurrentColorScheme = (void*) humility;
+		    break;
+		
+		case ColorSchemeHumility:
+		    CurrentColorScheme = (void*) humility;
+		    break;
+		
+		case ColorSchemePride:
+	        CurrentColorScheme = (void*) pride; 
+		    break;
+		
+		default:
+		    CurrentColorScheme = (void*) humility;
+			break;
+	}	
+	
+
 	
 done:	
 	return;
@@ -1964,6 +1998,7 @@ void windowSwitchActiveWindow()
 {}
 */
 
+
 /*
  * windowSwitchFocus:
  *     Muda a janela que está com foco de entrada.
@@ -1977,16 +2012,16 @@ void windowSwitchActiveWindow()
 void windowSwitchFocus()
 {
 	int Max;
-	int Current;
+	int CurrentID;
+	int NextID;
 
     struct window_d *window;
-	struct window_d *next;
-	struct window_d *Saved;    //Caso tudo ter errado, use essa.	
+	struct window_d *next;	
 	//...
 	
 	//Max e Current.
 	Max     = (int) windows_count;
-	Current = (int) window_with_focus;	
+	CurrentID = (int) window_with_focus;	//salva
 	
 	//
 	// @todo: 
@@ -1999,35 +2034,41 @@ void windowSwitchFocus()
 	    return;    
 	}else{
 		
-	    //Se não há uma próxima, não tem como mudar.
-	    if( (void*) window->next == NULL ){
-		    return;
-		};		
-		
 	    KillFocus(window);  //Kill.
 		
-	    next = (void*) window->next;  //Get next.
+		//Se a próxima janela é válida.
+		if( (void*) window->next != NULL )
+		{
+		    next = (void*) window->next;  //Get next.
+		   	    
+		    NextID = (int) next->id;     //Current id.
+		   
+		    //Se estiver dentro dos limites usaremos a próxima.
+		    if(NextID > 0 && NextID < Max){
+		        window_with_focus = (int) NextID;
+	        }else{
+			    window_with_focus = (int) CurrentID;	
+			}			
 
-		//Focus.	    
-		Current = (int) next->id;     //Current id.
-	    
-		//Se estiver fora dos limites, use o antigo.
-		if(Current < 0 || Current >= Max){
-		    Current = (int) window->id;
-	    };	
-
-		//@todo: Usar o método.
-		window_with_focus = (int) Current;
-		window = (void*) windowList[Current];
-        SetFocus(window);		
+		    window = (void*) windowList[window_with_focus];			
+            SetFocus(window);
+			goto done;			
+		}else{
+		    window_with_focus = (int) CurrentID;	
+		    window = (void*) windowList[window_with_focus];			
+            SetFocus(window);
+            goto done;  			
+		};
+		//Fail.
 	};
 	//Nothing.
 done:
-
+    redraw_window(window);
+	
     //Debug message:  
 	//@todo: Criar mecanismo melhor pra mostrar a janela com o foco.
-    printf("Focus={%d}\n", (int) window_with_focus);
-	refresh_screen();
+    //printf("Focus={%d}\n", (int) window_with_focus);
+	//refresh_screen();
 	
 	return;
 };
@@ -2274,7 +2315,59 @@ int init_windows()
 
 	
 	//inicializando os esquemas de cores.
-	windowSetUpColorScheme();	
+	//@todo: Isso poderia ter um argumento, selecionado entre o 
+	//tipo 1 e 2, humility e pride.
+	//ColorSchemeHumility ou ColorSchemePride
+	windowSetUpColorScheme(ColorSchemePride);	
+	
+	//input buffer support ??
+	//output buffer support ??
+	
+	
+	//inicializar as estruturas de backbuffer e frontbuffer.
+	
+//
+// Backbuffer support. (espelho da memória de video)
+//
+	
+	BackBufferInfo = (void*) malloc( sizeof(struct backbufferinfo_d) );
+    if((void*) BackBufferInfo == NULL){
+	    //fail	
+	}else{
+	    BackBufferInfo->used = 1;
+        BackBufferInfo->magic = 1234;
+        //BackBufferInfo->start = ?
+        //BackBufferInfo->end = ?
+        //BackBufferInfo->size = ?
+        //...		
+	};		
+	
+
+//
+// Frontbuffer support. (memória de vídeo)
+//
+	
+	FrontBufferInfo = (void*) malloc( sizeof(struct frontbufferinfo_d) );
+    if((void*) FrontBufferInfo == NULL){	
+	    //fail	
+	}else{
+		
+		//Algumas informações foram enviadas pelo boot loader.
+	    FrontBufferInfo->used = 1;
+        FrontBufferInfo->magic = 1234;
+        //FrontBufferInfo->start = ?
+        //FrontBufferInfo->end = ?
+        //FrontBufferInfo->size = ?	
+
+        //FrontBufferInfo->width = ?	
+        //FrontBufferInfo->height = ?	
+        //FrontBufferInfo->bpp = ?			
+		
+        //... 
+
+        //?? console ??		
+	};		
+
 	
 	//
 	// Continua ...

@@ -49,7 +49,7 @@
 #define	SYS_BUFFER_DRAWCHAR    7
 #define	SYS_BUFFER_DRAWLINE    8
 #define	SYS_BUFFER_DRAWRECT    9
-#define	SYS_BUFFER_CREATEWINDOW    10
+#define	SYS_BUFFER_CREATEWINDOW    10  // ** função principal **
 #define	SYS_REFRESHSCREEN          11
 //rede
 #define	SYS_REDE_R1    12
@@ -103,10 +103,16 @@
 #define	SYS_MESSAGEBOX      45
 //Client area.
 #define	SYS_SETCLIENTAREA   46
-//Create Window support.
-#define	SYS_BUFFER_CREATEWINDOWx    47
-#define	SYS_BUFFER_CREATEWINDOW1    48
-#define	SYS_BUFFER_CREATEWINDOW2    49
+
+//
+// Create Window support. 
+// *Importante:
+//  Essas funções serão usadas para suporte à criação de janelas 
+//  A função principal será a número 10.
+//
+#define	SYS_BUFFER_CREATEWINDOWx    47  // envia argumentos de controle de janela.
+#define	SYS_BUFFER_CREATEWINDOW1    48  // envia argumentos de posicionamento de janela.
+#define	SYS_BUFFER_CREATEWINDOW2    49  // envia argumentos de dimensões de janela.
 
 //(50~59) Window suppot, manipulação de janelas.
 #define	SYS_BUFFER_RESIZEWINDOW    50 //resize. 

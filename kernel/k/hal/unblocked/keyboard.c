@@ -195,8 +195,13 @@ unsigned long numlock_status;
  */
 
 
-
-
+ //mouse support
+unsigned char *mousemsg;
+unsigned char buffer_mouse[3];
+unsigned char mouse_status;
+unsigned char delta_x;
+unsigned char delta_y;
+int count_mouse;
 
 //@todo: fazer rotina de get status algumas dessas variáveis.
 
@@ -1330,6 +1335,9 @@ void init_keyboard()
 	numlock_status = 0;
 	//...
 
+	
+	//kbdc_wait(1);
+	//outportb(0x64,0xAE);   // Activar a primeira porta PS/2
 
 	//Leds.
 	//LED_SCROLLLOCK 
@@ -1364,6 +1372,506 @@ int keyboardInit(){
 };
 */
 
+
+//
+// ********************** mouse ************************
+//
+
+// ??? estraanho
+//??? usado pelo mouse
+#define outanyb(p) __asm__ __volatile__(\
+		"outb %%al,%0"::"dN"((p)) :"eax"\
+		)  /* Valeu Fred */
+		
+
+/*
+ * init_mouse:
+ *     Inicializando o mouse no controlador 8042.
+ */		
+int init_mouse()
+{
+    unsigned char response = 0;
+    unsigned char deviceId = 0;
+    int i;
+    
+	int bruto = 1;
+	
+	mousemsg = ( unsigned char *) malloc(32);
+	
+    mouse_status = 0;
+    delta_x = 0;
+    delta_y = 0;
+    count_mouse = 0;
+	
+	
+	//configurar ps2 antes de tudo.
+    //P8042_install(); //@todo: deletar .. isso foi chamado em hal.c
+	
+	
+    // Talk to the keyboard controller a little bit to initialize the mouse
+   
+   /*
+    Wait for ACK from Mouse:
+    It is required to wait until the mouse sends back the 0xFA acknowledgement byte 
+    after each command or data byte before sending the next byte 
+    (Note: reset commands might not be ACK'ed -- wait for the 0xAA after a reset). 
+    A few commands require an additional data byte, and both bytes will generate an ACK.	
+   */	
+	
+	//printf("Initializing mouse ...\n");
+    MessageBox(gui->screen, 1, "init_mouse:","initializing!");
+
+	
+	if(bruto == 1)
+	{
+        //modo bruto
+	    mouse_write(0xFF);
+	    mouse_write(0xF6); 
+	    mouse_write(0xF4); 
+        while(1)	
+	    {
+	        response = (unsigned char) mouse_read();	
+	        if(response != 0xFA){
+			    //goto InterruptStuff;
+                goto done;				
+		    }
+            //Nothing.		
+	    };
+        //nothing.		
+	};
+	
+	
+	
+/*	
+//Disable Packet Streaming	The mouse stops sending automatic packets.
+Disabledatareporting:
+	printf("Disable data reporting ...\n");
+	refresh_screen();
+    mouse_write(0xF5);
+    while(1)	
+	{
+	    response = (unsigned char) mouse_read();	
+	    if (response != 0xFA){
+			goto reset;
+		}
+        //Nothing.		
+	};	
+	
+*/
+	
+/*	
+//Reset	The mouse probably sends ACK (0xFA) plus several more bytes, then resets itself, and always sends 0xAA.	
+reset:
+	printf("reseting ...\n");
+    refresh_screen();
+    mouse_write(0xFF);
+	while(1)	
+	{
+	    response = (unsigned char) mouse_read();	
+	    if (response != 0xAA){
+			goto SetDefaults;
+		}
+        //Nothing.		
+	};
+*/
+ 
+/* 
+//Set Defaults	Disables streaming, sets the packet rate to 100 per second, and resolution to 4 pixels per mm. 
+SetDefaults:
+	printf("set defaults ...\n"); 
+    refresh_screen();
+	mouse_write(0xF6); 
+	while(1)	
+	{
+	    response = (unsigned char) mouse_read();	
+	    if (response != 0xFA){
+			goto EnablePacketStreaming;
+		}
+        //Nothing.		
+	};
+*/
+
+/* 
+//Enable Packet Streaming	The mouse starts sending automatic packets when the mouse moves or is clicked. 
+EnablePacketStreaming:
+	printf("enable streaming...\n");
+    refresh_screen();
+	mouse_write(0xF4); 
+    while(1)	
+	{
+	    response = (unsigned char) mouse_read();	
+	    if (response != 0xFA){
+			goto InterruptStuff;
+		}
+        //Nothing.		
+	};
+*/ 
+
+/**
+//?? 
+// Disable the mouse line
+//Disablethemouseline:
+//    outPort64(0xA7);
+  
+
+//??  
+// Enable the mouse line
+//    outPort64(0xA8);
+ **/    
+
+ 
+/**
+// Get the device ID.  0x00 for normal PS/2 mouse
+deviceId = inPort60();
+**/
+ 
+/**
+// Set scaling to 2:1
+mouse_write(0xE7);
+**/
+
+    //
+	//  ?? Interrupt ??
+	//
+	
+/*	
+//you need to enable the aux port to generate IRQ12. 
+//You need to send the command byte 0x20 ("Get Compaq Status Byte") to the PS2 controller on port 0x64.
+// This command does not generate a 0xFA ACK byte.
+//The very next byte returned should be the Status byte.
+//After you get the Status byte, 
+// you need to set bit number 1 (value=2, Enable IRQ12), and 
+//clear bit number 5 (value=0x20, Disable Mouse Clock).
+// Then send command byte 0x60 ("Set Compaq Status") to port 0x64,
+//followed by the modified Status byte to port 0x60.
+//This might generate a 0xFA ACK byte from the keyboard.
+//
+InterruptStuff:
+	printf(" enable the aux port to generate IRQ12 (Compaq stuff) ...\n");
+    refresh_screen();
+    // Tell the controller to issue mouse interrupts
+    outPort64(0x20);
+    response = inPort60();
+    response |= 0x02;     //Enable IRQ12
+	//response |= 0x22;  //teste.?? Disable Mouse Clock
+    outPort64(0x60); 
+    outPort60(response);
+    while(1)	
+	{
+	    response = (unsigned char) mouse_read();	
+	    if (response != 0xFA){
+			goto done;
+		}
+        //Nothing.		
+	};
+*/
+
+
+done:
+
+    // Reabilitando as duas portas.
+	
+	kbdc_wait(1);
+	outportb(0x64,0xAE);   // Activar a primeira porta PS/2
+
+	kbdc_wait(1);
+	outportb(0x64,0xA8);  // activar a segunda porta PS/2
+	
+  //initialized = 1;
+  //return (kernelDriverRegister(mouseDriver, &defaultMouseDriver));
+    MessageBox(gui->screen, 1, "init_mouse:","Mouse initialized!");    	
+	return (int) 0;
+};
+
+/*
+ * mouse_write:
+ *     Envia um byte para a porta 0x60.
+ *     (Nelson Cole) 
+ */
+void mouse_write(unsigned char write)
+{
+	kbdc_wait(1);
+	outportb(0x64,0xD4);
+	kbdc_wait(1);
+	outportb(0x60,write);
+};
+
+
+/*
+ * mouse_read:
+ *     Pega um byte na porta 0x60.
+ *     (Nelson Cole) 
+ */
+unsigned char mouse_read()
+{
+	kbdc_wait(0);
+	return inportb(0x60);
+
+};
+
+
+/*
+ * kbdc_wait:
+ *     Espera por flag de autorização para ler ou escrever.
+ *     (Nelson Cole) 
+ */
+void kbdc_wait(unsigned char type)
+{
+	if(type==0)
+	{
+        while(!inportb(0x64)&1)outanyb(0x80);
+    }
+    else 
+	{
+        while(inportb(0x64)&2)outanyb(0x80);
+	};
+};
+
+
+/*
+ * mouseHandler:
+ *     handler de teclado. A _irq0 chama essa rotina.
+ *     *Importante: Se estamos aqui é porque os dados disponíveis
+ * no controlador 8042 pertencem ao mouse.
+ */
+void mouseHandler()
+{
+    
+	buffer_mouse[count_mouse++] = mouse_read();
+	
+	if( count_mouse >= 3 )
+	{
+        mouse_status = buffer_mouse[0];
+        
+		delta_x = buffer_mouse[1];
+	    delta_y = buffer_mouse[2];
+		
+        //printf("ocorreram 3 irq12 !\n");
+        //kernelPS2MouseDriverReadData(); //bugbug
+		printf("mouseStatus={%d} deltaX={%d} deltaY={%d} \n",mouse_status,delta_x,delta_y);
+		refresh_screen();
+		
+	    //printf("#"); //teste
+	    //MessageBox(gui->screen, 1, "mouseHandler:","Testing Mouse interrupt");
+	    //kernelPS2MouseDriverReadData();
+		
+		count_mouse=0;
+    };
+	//return;
+};
+
+
+
+static unsigned char inPort60(void)
+{
+  // Input a value from the keyboard controller's data port, after checking
+  // to make sure that there's some data there for us
+
+  unsigned char data = 0;
+
+  while (!(data & 0x01))
+    kernelProcessorInPort8(0x64, data);
+
+  kernelProcessorInPort8(0x60, data);
+  return (data);
+}
+
+
+static void outPort60(unsigned char value)
+{
+  // Output a value to the keyboard controller's data port, after checking
+  // to make sure it's ready for the data
+
+  unsigned char data;
+  
+  // Wait for the controller to be ready
+  data = 0x02;
+  while (data & 0x02)
+    kernelProcessorInPort8(0x64, data);
+  
+  data = value;
+  kernelProcessorOutPort8(0x60, data);
+  return;
+}
+
+
+static void outPort64(unsigned char value)
+{
+  // Output a value to the keyboard controller's command port, after checking
+  // to make sure it's ready for the command
+
+  unsigned char data;
+  
+  // Wait for the controller to be ready
+  data = 0x02;
+  while (data & 0x02)
+    kernelProcessorInPort8(0x64, data);
+
+  data = value;
+  kernelProcessorOutPort8(0x64, data);
+  return;
+};
+
+
+/*
+ * getMouseData:
+ *     Essa função é usada pela rotina kernelPS2MouseDriverReadData.
+ */
+static unsigned char getMouseData(void)
+{
+  // Input a value from the keyboard controller's data port, after checking
+  // to make sure that there's some mouse data there for us
+
+  unsigned char data = 0;
+
+  while ((data & 0x21) != 0x21)
+    kernelProcessorInPort8(0x64, data);
+
+  kernelProcessorInPort8(0x60, data);
+  return (data);
+}
+
+
+
+/*
+ * kernelPS2MouseDriverReadData:  
+ *     Pega os bytes e salva em um array.
+ *     Exibe um caractere na tela, dado as cordenadas.
+ *     @todo: Rever as entradas no array.
+ *         
+ */
+void kernelPS2MouseDriverReadData(void)
+{
+    // This gets called whenever there is a mouse interrupt
+
+    
+
+    static volatile int button1, button2, button3;
+    unsigned char byte1 = 0, byte2 = 0, byte3 = 0;
+    int xChange, yChange;
+	
+	mousemsg[9] = 0; //zera o sestatdo do mouse 
+
+    // Disable keyboard output here, because our data reads are not atomic
+    outPort64(0xAD);
+
+    // The first byte contains button information and sign information
+    // for the next two bytes
+    //byte1 = getMouseData();
+    byte1 = mouse_status;
+	
+    // The change in X position
+    //byte2 = getMouseData();
+    byte2 = delta_x;
+	
+    // The change in Y position
+    //byte3 = getMouseData();
+    byte3 = delta_y;
+	
+    // Re-enable keyboard output
+    outPort64(0xAE);
+
+    if ((byte1 & 0x01) != button1)
+    {
+        // kernelMouseButtonChange(1, button1 = (byte1 & 0x01));
+        mousemsg[2] = 1;
+        mousemsg[9] = MSG_MOUSEKEYDOWN; // clicado ou nao
+        return;
+    }else if((byte1 & 0x04) != button2)
+          {
+              //  kernelMouseButtonChange(2, button2 = (byte1 & 0x04));
+              mousemsg[2]= 2;
+              mousemsg[9] = MSG_MOUSEKEYDOWN; // clicado ou nao                                      
+              return;
+          }else if((byte1 & 0x02) != button3)
+                {
+                    //  kernelMouseButtonChange(3, button3 = (byte1 & 0x02));
+                    mousemsg[2]= 3;
+                    mousemsg[9] = MSG_MOUSEKEYDOWN; // clicado ou nao                                      
+                    return;
+                }
+				else
+				{
+                    
+					// Sign them
+                    if(byte1 & 0x10){
+	                    xChange = (int) ((256 - byte2) * -1);
+                    }else{ xChange = (int) byte2; 
+					};
+
+                    if (byte1 & 0x20){
+                        yChange = (int) (256 - byte3);
+                    }else{
+                	    yChange = (int) (byte3 * -1);
+                    };
+
+                    //  char_blt(xChange * 8,yChange * 8,55,'A'); 
+                    //  kernelMouseMove(xChange, yChange);
+                    //  mousemove(xChange, yChange);
+                    
+					my_buffer_char_blt( xChange, yChange, COLOR_PINK, 'T');
+					
+					mousemsg[0]= xChange;
+                    mousemsg[1]= yChange;
+                };
+  return;
+}
+
+
+/* 
+ * P8042_install:
+ *     Configurando o controlador PS/2, 
+ *     e activar a segunda porta PS/2 (mouse).
+ *     (Nelson Cole)
+ */
+void P8042_install()
+{
+	
+	unsigned char status;
+
+
+/* Desativar dispositivos PS/2 , isto envita que os dispositivos PS/2 envie dados no momento da configuração.
+ */
+
+  	kbdc_wait(1);
+	outportb(0x64,0xAD);  // Desativar a primeira porta PS/2
+	kbdc_wait(1);
+	outportb(0x64,0xA7);  /* Desativar a segunda porta PS/2, hahaha por default ela já vem desativada, só para constar */
+
+	kbdc_wait(1);    
+	outportb(0x64,0x20);     // defina a leitura do byte actual de configuração do controlador PS/2
+
+	kbdc_wait(0);
+	status=inportb(0x60)|2;  /* Activar o segundo despositivo PS/2, modificando o status de configuração do controlador PS/2. 
+				Lembrando que o bit 1 é o responsável por habilitar, desabilitar o segundo despositivo PS/2  ( o rato). Só 					para constar se vedes aqui fizemos duas coisas lemos ao mesmo tempo modificamos o byte 
+				de configuração do controlador PS/2 
+			     */
+
+	
+	kbdc_wait(1);
+	outportb(0x64,0x60);  // defina, a escrita  de byte de configuração do controlador PS/2
+
+	
+	kbdc_wait(1);
+	outportb(0x60,status);  // devolvemos o byte de configuração modificado
+
+	// Agora temos dois dispositivos sereais teclado e mouse (PS/2).
+	
+
+
+	kbdc_wait(1);
+	outportb(0x64,0xAE);   // Activar a primeira porta PS/2
+
+	kbdc_wait(1);
+	outportb(0x64,0xA8);  // activar a segunda porta PS/2
+
+     kbdc_wait(1); //espera 
+
+/* NOTA. Esta configuração discata do teste do controlador PS/2 e de seus dispositivos. Depois façamos a configuração decente e minuciosa do P8042.
+ 
+*/
+
+}
 
 //
 // End.

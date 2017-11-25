@@ -13,6 +13,12 @@
  *           uma estrutura válida.
  *
  * Faz parte do módulo Window Manager do tipo MB.
+ *
+ * #bugbug: Esse módulo está suspenso. Mas as rotinas aqui poderão ser chamadas 
+ * por CreateWindow ou qualquer outra rotina de criação de elementos gráficos.
+ * aqui deve ser primitivas que fazem trabalho bruto, como é o caso de 
+ * putpixel, draw line ...
+ *          
  */
 
 

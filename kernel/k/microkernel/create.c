@@ -444,7 +444,7 @@ void *KiCreateIdle()
 	
     //Identificadores.
 	IdleThread->tid = 0;
-	IdleThread->ppid = (int) KernelProcess->pid;  
+	IdleThread->ownerPID = (int) KernelProcess->pid;  
 	IdleThread->used = 1;
 	IdleThread->magic = 1234;
 	IdleThread->name_address = (unsigned long) ThreadName;   //Funciona.
@@ -624,7 +624,7 @@ void *KiCreateShell()
 
     //Identificadores.       	
 	t->tid = 1;     
-	t->ppid = (int) KernelProcess->pid;         
+	t->ownerPID = (int) KernelProcess->pid;         
 	t->used = 1;
 	t->magic = 1234;
 	t->name_address = (unsigned long) ThreadName;    //Funciona.
@@ -788,7 +788,7 @@ void *KiCreateTaskManager()
   	
     //Identificadores      
 	t->tid = 2;     
-	t->ppid = (int) KernelProcess->pid;         
+	t->ownerPID = (int) KernelProcess->pid;         
 	t->used = 1;
 	t->magic = 1234;	
 	t->name_address = (unsigned long) ThreadName;   //Funciona.

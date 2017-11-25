@@ -14,6 +14,16 @@
  */
 
  
+//Endereços das fonts presentes no CMOS BIOS. 
+#define BIOSFONT8X8 0x000FFA6E    //8x8
+//#define BIOSFONT8X8 0x000FFA6E
+//#define BIOSFONT8X8 0x000FFA6E
+//#define BIOSFONT8X8 0x000FFA6E
+//...
+ 
+ 
+ 
+ 
 //Definindo as dimensões padrão. 
 //#define DEFAULT_SCREEN_WIDTH  800
 //#define DEFAULT_SCREEN_HEIGHT 600
@@ -382,7 +392,7 @@ color_scheme_t PrideColorScheme;
 
 
 //windows2k system colors
-#define COLOR_TEST_0  0x8080FF00  // COLOR_BACKGROUND(verde claro)
+#define COLOR_TEST_0  0x8080FF00  // COLOR_BACKGROUND(verde claro) ??
 #define COLOR_TEST_1  0x80FFFF00  // COLOR_APPWORKSPACE, MDIWINDOW 
 #define COLOR_TEST_2  0x80FF8000  // COLOR_WINDOW, CLIENT
 #define COLOR_TEST_3  0x80FF0000  // COLOR_WINDOWTEXT, CLIENTTEXT 
@@ -461,7 +471,7 @@ color_scheme_t PrideColorScheme;
 #define COLOR_APPWORKSPACE        COLOR_SILVER 
 // A cor padrão para o Bg é azul quase escuro,
 // o azul escuro é usado em seleção de item.
-#define COLOR_BACKGROUND          0x00808000 
+#define COLOR_BACKGROUND          0x00808000  
 #define COLOR_BORDER              COLOR_SILVER 
 #define COLOR_BUTTONFACE          0xF0F0F000
 #define COLOR_BUTTONHIGHLIGHT     0xFFFFFF00
@@ -664,6 +674,9 @@ color_scheme_t PrideColorScheme;
 //#define COLOR_DARKBLUE   0x00008B00 
 //#define COLOR_BLACK      0x00000000 
  
+ 
+ 
+#define COLOR_KERNEL_BACKGROUND COLOR_BLUE     
  
 /*
  * Padrão para janela de Aplicativo.  
@@ -1463,6 +1476,61 @@ int zorderCounter;         //contador de janelas incluidas nessa lista.
 
 
 
+//
+// Backbuffer support. (espelho da memória de video)
+//
+
+typedef struct backbufferinfo_d backbufferinfo_t;
+struct backbufferinfo_d
+{
+	//@todo: object support
+	
+	int used;
+	int magic;
+	
+    unsigned long start;
+    unsigned long end;
+    unsigned long size;
+    //...
+
+    //@todo:
+	// ?? O que nos podemos ter aqui ??	
+	// terminal., window, line disciplice, cursor ...
+	//input buffer? z-order ??
+};
+backbufferinfo_t *BackBufferInfo;
+
+
+
+
+//
+// Frontbuffer support. (memória de vídeo)
+//
+
+typedef struct frontbufferinfo_d frontbufferinfo_t;
+struct frontbufferinfo_d
+{
+	//@todo: object support
+	
+	int used;
+	int magic;
+	
+    unsigned long start;
+    unsigned long end;
+    unsigned long size;
+	
+	unsigned long width;
+    unsigned long height;
+	unsigned long bpp;
+	//
+	
+    //@todo:
+	// ?? O que nos podemos ter aqui ??	
+	// terminal., window, line disciplice, cursor ...	
+};
+frontbufferinfo_t *FrontBufferInfo;
+
+
 /*
  * gui:
  *     Nível 0 - gui.
@@ -1804,6 +1872,11 @@ struct gui_d
 	//Informações sobre a tela.
 	struct screen_d *ScreenInfo;
 	
+	
+	struct backbufferinfo_d  *backbufferInfo;  // Backbuffer support. (espelho da memória de video)
+	
+	struct frontbufferinfo_d *frontbufferInfo; // Frontbuffer support. (memória de vídeo)
+	
     //Lista de informações sobre usuários.
     //@todo: Isso não precisa ficar aqui.	
 	struct user_info_d *User; 	
@@ -2063,7 +2136,7 @@ void windowShowWWFMessageBuffers(); //mostra o buffer de mensagens da janela com
 
 
 //color support.
-void windowSetUpColorScheme();
+void windowSetUpColorScheme(int type);
 
 /*Inicialização do sistema de suporte ao navegador shell*/
 int windowInitializeBrowserSupport();

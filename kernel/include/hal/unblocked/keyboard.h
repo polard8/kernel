@@ -889,5 +889,21 @@ unsigned long input(unsigned long ch);
 void reboot();
 
 //
+// ********************** mouse ************************
+//
+
+int init_mouse();
+void mouse_write(unsigned char write);
+unsigned char mouse_read();
+void kbdc_wait(unsigned char type);
+void mouseHandler(); 
+static unsigned char inPort60(void);
+static void outPort60(unsigned char value);
+static void outPort64(unsigned char value);
+static unsigned char getMouseData(void);
+void kernelPS2MouseDriverReadData(void);
+void P8042_install();
+
+//
 // End.
 //

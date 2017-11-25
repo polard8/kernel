@@ -236,7 +236,6 @@ typedef enum {
 typedef struct process_d process_descriptor_t;
 struct process_d 
 {
- 
 	object_type_t objectType;
 	object_class_t objectClass;
 	

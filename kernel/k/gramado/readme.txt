@@ -2,6 +2,9 @@
 
 /gramado
 
+     gerenciamento de recursos gráficos, logon, logoff,e gerenciamento de usuário. (segurança e proteção).
+
+
      Gramado é uma interface gráfica, ela deve ficar dentro do
 kernel base, para efeito de desempenho, mas fora dos outros componentes
 do kernel base, para efeito de portabilidade. Desse modo poderemos

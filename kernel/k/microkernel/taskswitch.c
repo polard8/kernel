@@ -74,6 +74,10 @@ void KiTaskSwitch()
 	
 TaskSwitch:	
 	task_switch();
+	
+	
+	
+	
 done:	
 	//Retornando para _irq0 em head\x86\hardware.inc.
     return;
@@ -440,9 +444,32 @@ done:
 	// @todo: 
 	// Salvar em uma variável global o cr3 do processo da thread selecionada
     // para que a rotina em assembly, (head\x86\hardware.s), configure o cr3.	
+	// Para isso precisamos descobrir qual é o processo atual.
+	// Current é o próximo thread a rodar.
+	//
+	// Current->ppid é o ID do processo ao qual o thread pertence ???
+	// #bugbug: @todo: O que precisamos é nos certificar que esse 
+	// ID é válido.
+	//
+	// @todo: Criar na estrutura de thread a variável 'int owner_process_id;'
+	//        Isso resolve o problema.
+	
+	//
+	// #bugbug @todo: filtrar se o id é válido.
 	//
 	
-    P = (void*) processList[Current->ppid];
+	//Overflow. Checar se não é maior que o número máximo de indices 
+	//que a lista suporta.
+	if( Current->ownerPID < 0 || Current->ownerPID >= PROCESS_COUNT_MAX )
+	{
+		//fail;
+		printf("taskswitch: ownerPID fail \n", Current->ownerPID );
+		refresh_screen();
+		while(1){}		
+	}
+	
+	
+    P = (void*) processList[Current->ownerPID];
 	
 	//estrutura inválida
 	if( (void*) P == NULL ){
@@ -494,10 +521,22 @@ done:
 			// pela rotina em assembly _irq0.
 			current_process_pagedirectory_address = (unsigned long) P->Directory;
 			//current_process_pagedirectory_address = (unsigned long) P->page_directory->Address;
+		    goto doneRET;
 		};
+		
+		//fail
+		printf("taskswitch: estrutura corrompida");
+		refresh_screen();
+		while(1){}
 	};
 	
 	
+	//fail
+	printf("taskswitch: debug");
+	refresh_screen();
+	while(1){}
+		
+doneRET:
 	
 	//Debug:
 	//Provisório
@@ -510,6 +549,12 @@ done:
 	// ponteiro para o diretório de páginas do processo ao qual a thread pertence, 
 	// alimenta os registradores e efetua iretd. #fim :)
 	//
+	
+	//
+	// Nesse momento retornaremos para a interface que chamou essa função.
+	// Depois a interface retorna para o driver de timer. _irq0.
+	//
+	
 	return; 		
 };
 

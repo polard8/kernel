@@ -26,8 +26,7 @@ void fs_apaga_fat()
 };
 
 
-void fs_delete_entry(unsigned long id, unsigned long eid)
-{
+void fs_delete_entry(unsigned long id, unsigned long eid){
     return;
 };
 

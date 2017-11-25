@@ -554,7 +554,17 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	// Preparando os parametros da pintura de acordo com o tipo.
 	//	
 
-	
+	//
+	// De acordo com o tipo de janela, preparamos a configuração
+	// e a própria rotina create window está pintando.
+	// Porém nesse momento o 'case' pode chamar rotinas de pintura em 
+	// draw.c e retornar. 
+	// CreateWindow é para criar a moldura principal ...
+	// para so outros tipos de janelas podemos usar draw.c
+	// pois quando chamarmos draw.c a estrutura de janela ja deve estar 
+	// inicializada.
+	// Rotinas grandes como pintar um barra de rolagem podem ficar em draw.c
+	//
 	
 	
 	//
@@ -619,6 +629,10 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	    //if(titulo){} TitleBar = 1;    //titulo + borda	
 		break;
 
+		//editbox,
+		//barra de rolagem
+		//botões de radio .. 
+		//...
 
         //Continua ...
 		
@@ -663,9 +677,12 @@ drawBegin:
 	
 	//if(DedicatedBuffer == 1){};
 	
+	
+	// se o view for igual NULL talvez signifique 
 	if( window->view == VIEW_NULL ){
-		//@todo: temos um problema, dvemos retornar??
-	    //return NULL;
+		//window->show = 0;
+		//window->redraw = 0;
+		//return (void*) window;
 	};
 	
     //
@@ -775,7 +792,7 @@ drawBegin:
 		                   window->top  +1, 
 						   window->width  +1 +1,   // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
 						   window->height +1 +24 +1,   // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-						   xCOLOR_GRAY1 );         //Cinza escuro.        
+						   xCOLOR_GRAY1 );         //Cinza escuro.  CurrentColorScheme->elements[??] @TODO: criar elemento sombra no esquema.       
 	};	
 	
     
@@ -792,7 +809,7 @@ drawBegin:
 		//};
 		
 		//Validando o argumento para todos os tipos de janelas.
-		window->color_bg = xCOLOR_GRAY2;  //CINZA UM POUQUINHO MAIS CLARO.
+		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; //xCOLOR_GRAY2;  //CINZA UM POUQUINHO MAIS CLARO.
 		
 		//@todo: Se tiver barra de rolagem a largura do backgrond deve ser maior.
 		//if()

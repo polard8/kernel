@@ -23,7 +23,7 @@ rem
 rem Main.
 echo -{ ...
 echo -{ Compiling KERNEL.BIN ...
-echo -{ Main and I/O.
+echo -{ Main.
 	gcc -c k/main.c  -I./include -o main.o 
 	
 :Hal_Job1	

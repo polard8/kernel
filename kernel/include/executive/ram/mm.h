@@ -76,12 +76,12 @@ kernel fica com o 1GB superior."
 	         |           Kernel land              | @todo:   
 		     |                                    | Mudar de lugar.         
 		     |                                    | Seder espaço para LFB, que precisa ser grande.
-    C0800000 |           Back Buffer              |  			 
+    C0800000 |           BackBuffer               |  			 
 		     +------------------------------------+	
 	         |           Kernel land              |	 Memória da placa de vídeo.
 		     |             (4MB)                  |  @todo: 
 			 |             ...                    |  Ampliar (TER O TAMANHO DA MEMÓRIA DA PLACA DE VÍDEO) 
-	C0400000 |             LFB                    |  Obs: Tamanho da soma das áreas dos monitores, no mínimo.
+	C0400000 |          FrontBuffer(LFB)          |  Obs: Tamanho da soma das áreas dos monitores, no mínimo.
 		     +------------------------------------+
 			 +====================================+
              |           Kernel land              |
@@ -93,16 +93,20 @@ kernel fica com o 1GB superior."
 	         |  Kernel Base = 0xC0000000          |	     Início da imágem do processo kernel. 
 	C0000000 |         Kernel Mode access         |	 	   
 	         +------------------------------------+
-             |           User Land                |	 
+             |           User Land                |
+		     +------------------------------------+
+		     +------------------------------------+ 
+		     +------------------------------------+
+		     +------------------------------------+ 			 
 	         |                                    |
-             |  Stack = 0x40300000 ~ 0x403FFFF0   | @todo  Início da pilha em user mode do proesso.
-	         |  Heap  = 0x40100000 ~ 0x402FFFF0   | @todo: Início do heap em user mode do processo.
+             |  Stack = 0x00403000 ~ 0x0043FFF0   | @todo  Início da pilha em user mode do proesso.
+	         |  Heap  = 0x00401000 ~ 0x0042FFF0   | @todo: Início do heap em user mode do processo.
              |                                    | ### Por enquando cada processo tem sua própria
              |                                    |     pilha e heap no fim da imagem do processo.   			 
-             | 40000000 = Process Base.           | ??
+             |                                    | 
 			 |                                    |
-			 | 00041000 = Process entry point     | Entrypoint da imagem.
-			 | 00040000 = Process image base      | Onde se carrega uma imagem de processo.
+			 | 00401000 = Process entry point     | Entrypoint da imagem.
+			 | 00400000 = Process image base      | Onde se carrega uma imagem de processo.
              |                                    |  			 
              | 00000000 = Dinamic Library Base    |
 			 | 00000000 = Dinamic Library image   |
@@ -113,13 +117,43 @@ kernel fica com o 1GB superior."
 			 
 
     ***
+	
+	
+
+   mm - kernel process
+
+
+
+*********************************   
+ Memória linear para o processo kernel:
+
+ Kernel Base        = 0xC0000000
+ Kernel Entry point = 0xC0001000
+ Heap               = 0xC0100000 ~ 0xC02FFFF0  
+ Stack              = 0xC0300000 ~ 0xC03FFFF0
+
+
+*********************************
+ Memória física para o processo kernel: 
+
+ Kernel Base        = 0x00100000
+ Kernel Entry point = 0x00101000 
+ Heap               = 0x00200000 ~ 0x003FFFF0    
+ Stack              = 0x00400000 ~ 0x004FFFF0
+
+
+ //#bugbug
+ A configuração acima é a desejada, mas na prática o endereço 
+ da pilha indicado na TSS é 0x200000
+ 
+ 
 			 
 	@todo: 
 	    O layout da memória virtual está em fase de desenvolvimento.	   
 	    Criar um layout dos endereços físicos principais usados pelo sistema.
 */ 
  
- 
+
 
 /* 
  * As configurações de memória foram feitas pelo Boot Loader.
@@ -190,9 +224,10 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //kernel stack. (Endereço virtual da pilha do processo Kernel).
 //Obs: O Heap e a Stack estão dentro dos limites de 4MB de
 //tamanho da imagem do kernel base.
-#define KERNEL_STACK_START  0xC03FFFF0    //Início da pilha. No fim dos 4MB.      
-#define KERNEL_STACK_END    0xC0300000    //Fim da pilha.  
-#define KERNEL_STACK_SIZE (KERNEL_STACK_START-KERNEL_STACK_END)
+#define KERNEL_STACK_SIZE   0x8000                                      //32kb
+#define KERNEL_STACK_START  0xC02FFFF0                                  //(1 mega + 3 megas)Início da pilha. No fim dos 4MB.      
+#define KERNEL_STACK_END    (KERNEL_STACK_START - KERNEL_STACK_SIZE)    //Fim da pilha.  
+
 
 
 
@@ -351,9 +386,9 @@ unsigned long mmblockCount;
 /*
  * Kernel Stack suppport.
  */ 
-unsigned long kernel_stack_end;
-unsigned long kernel_stack_start;
-
+unsigned long kernel_stack_end;        //va
+unsigned long kernel_stack_start;      //va
+unsigned long kernel_stack_start_pa;   //pa (endereço indicado na TSS).
 
 /*
  * process_memory_info_d:

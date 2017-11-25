@@ -30,7 +30,8 @@ extern void turn_task_switch_on();
  *          Mudar para startIdleThread().
  *
  */
-void KeStartIdle()
+//void KeStartIdle()
+void startStartIdle() 
 {
 	int i;
 	struct thread_d *Thread;

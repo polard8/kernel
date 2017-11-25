@@ -403,6 +403,7 @@ int SetUpPaging()
 	// endereço físico pelo Boot Loader. Aqui o kernel apenas reconfigura, 
 	// utilizando a mesma localizaçao. KERNEL_PAGEDIRECTORY.
 	//
+	
 	unsigned long *page_directory         = (unsigned long *) KERNEL_PAGEDIRECTORY;   //0x0009C000    
 	//unsigned long *idle_page_directory    = (unsigned long *) IDLE_PAGEDIRECTORY;     //0x01E00000    
 	//unsigned long *shell_page_directory   = (unsigned long *) SHELL_PAGEDIRECTORY;    //0x01D00000 
@@ -462,6 +463,7 @@ int SetUpPaging()
 	//
 
 	// Inicializando quatro diretórios.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
 	for(i = 0; i < 1024; i++)
 	{
 		//kernel
@@ -516,6 +518,7 @@ int SetUpPaging()
 	//kernel
 	//Criando a entrada número '0' do diretório de páginas do processo Kernel.
 	//que apontará para a pagetable que criamos.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
     page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
     page_directory[0] = (unsigned long) page_directory[0] | 3;  //Configurando os atributos.
     
@@ -565,6 +568,7 @@ int SetUpPaging()
 	
 	//kernel
 	// Criando a  entrada do diretório de páginas do processo kernel.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
     page_directory[768] = (unsigned long) &km2_page_table[0];       //Salva no diretório o endereço físico.
     page_directory[768] = (unsigned long) page_directory[768] | 3;  //Configurando os atributos.
 
@@ -632,6 +636,7 @@ int SetUpPaging()
 
     //kernel 	
     // Criando a entrada do diretório de páginas do processo kernel.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
     page_directory[1] = (unsigned long) &um_page_table[0];      //Salva no diretório o endereço físico.
     page_directory[1] = (unsigned long) page_directory[1] | 7;  //Configurando os atributos.
 
@@ -688,6 +693,7 @@ int SetUpPaging()
 	
     //kernel
 	// Criando a entrada do diretório de páginas do processo kernel.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
     page_directory[2] = (unsigned long) &vga_page_table[0];     //Salva no diretório o endereço físico.
     page_directory[2] = (unsigned long) page_directory[2] | 7;  //Configurando os atributos.
 
@@ -744,6 +750,7 @@ int SetUpPaging()
 	
 	//kernel
 	// Criando a entrada do diretório de páginas do processo kernel.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
     page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
     page_directory[769] = (unsigned long) page_directory[769] | 7;  //Configurando os atributos.	
 
@@ -790,6 +797,7 @@ int SetUpPaging()
 	
 	//kernel
     // Criando a entrada do diretório de páginas do processo kernel.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
     page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
     page_directory[770] = (unsigned long) page_directory[770] | 7;  //Configurando os atributos.	
 

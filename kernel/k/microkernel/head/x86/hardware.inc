@@ -17,11 +17,6 @@
 ; Funções importadas.
 ;
 
-;;?? Onde está definida essa variável ??
-;; Ela será usada para passar o valor salvo aqui para o 
-;;registrador cr3.
-;;extern _current_process_pagedirectory_address
-
 
 ;;;;
 ; Usadas pela _irq0.
@@ -42,6 +37,10 @@ extern _KiKeyboard
 ;Usada pela _irq8
 extern _KiRtcIrq
 ;extern _rtc_irq
+
+
+extern _mouseHandler
+
 
 ;
 ; _KiPciHandler (PCI)
@@ -65,8 +64,8 @@ extern _KiPciHandler4
 ;;...
 
 
-
-
+;; @todo:
+;;?? Em que arquivo está essa função ??
 extern _current_process_pagedirectory_address
 ;;...
 
@@ -152,16 +151,15 @@ _irq0:
 	
 	
 	;
-	; ??
 	; As rotinas em executarão serviços oferecidos pelo kernel
 	; ou pelos seus modulos ou drivers.
 	; Durante a execução dessas rotinas, as interrupções podem
-	; por um instante serem habilitadas novamente, se isso acontecer
+	; por um instante serem habilitadas novamente, se isso aacontecer
 	; não queremos que a interrupção de timer irq0 chame essas rotinas
 	; em c novamente. Então desabilitaremos a rechamada dessas funções
-	; enquanto elas estivere em execução e habilitaremos novamente ao 
-	; sairmos delas.
-	; ??
+	; enquanto elas estivere em execução e habilitaremos novamnete ao sairmos delas.
+	;
+	;
 	;	
 	
 	
@@ -201,7 +199,7 @@ _irq0:
 	;;Endereço do diretório de páginas do processo kernel.
 	mov eax, dword 0x0009C000  	
 	
-	;;@todo:
+	;;@todo: #bugbug
 	;;Endereço do diretório de páginas do processo atual.
 	;mov eax, dword [_current_process_pagedirectory_address]  
 	
@@ -562,6 +560,15 @@ global _irq8
 _irq8:
     cli
 	
+	
+	;preparando os registradores, para funcionarem em kernel mode.
+	;xor eax, eax
+	;mov ax, word 0x10    ;Kernel mode segment.	
+	;mov ds, ax
+	;mov es, ax
+	;mov fs, ax  ;Usar seletor 0.
+	;mov gs, ax  ;Usar seletor 0.	
+	
 	pushad
 	call _KiRtcIrq
 	popad
@@ -617,7 +624,22 @@ _irq11:
 global _irq12
 _irq12:
     cli
-	;call _mouseHandler
+	
+	;#bugbug depois que inclui essa inicialização 
+	;ocorreu uma falha nos segmentos alertada pelo taskswitch.
+	;ocurreu uma falha nos segmentos.
+	;preparando os registradores, para funcionarem em kernel mode.
+	;xor eax, eax
+	;mov ax, word 0x10    ;Kernel mode segment.	
+	;mov ds, ax
+	;mov es, ax
+	;mov fs, ax  ;Usar seletor 0.
+	;mov gs, ax  ;Usar seletor 0.	
+	
+	pushad
+	call _mouseHandler
+	popad
+	
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  

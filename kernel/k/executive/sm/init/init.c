@@ -186,6 +186,7 @@ int init_arquitecture_independent()
 	// Hal:
 	// Obs: Nesse momento deve haver alguma sondagem de dispositivos,
 	//      salvando os parâmetros encontrados.
+	//#bugbug @todo: Se é hal ... acho que leva em consideração a arquitetura.
 	printf("Initializing Hal..\n");	
 	Status = init_hal();	
 	if(Status != 0){
@@ -197,6 +198,7 @@ int init_arquitecture_independent()
 	// Obs: O Microkernel lida com informações dependentes da arquitetura,
 	// porém inicializa a gerencia de processos e threads e de comunicação
 	//entre processos.
+	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
 	printf("Initializing Microkernel..\n");	
 	Status = init_microkernel();
 	if(Status != 0){
@@ -419,7 +421,8 @@ int init()
 	printf("init: Initializing file system manager..\n");
     fsInit();
 	
-    //System folders.	
+    //System folders.
+    // ??@todo: /ux4 .../ux1	
 	printf("init: Initializing system folders..\n");
 	create_system_folders(); 
     

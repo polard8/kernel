@@ -10,7 +10,7 @@
  *     MB - Módulos incluídos no Kernel Base.
  *     No momento aparece a janela do Shell, que é um processo em user mode.
  *     Esse shell que aparece no momento do logon servirá para
- *     configurações. Semelhante ao que acontece no window server.
+ *     configurações. 
  *     No ambiente de logon o comando será passado para o procedimento do
  *     Shell.
  *
@@ -163,7 +163,8 @@ void create_logon()
 					   
 draw_logon_stuffs:	
 	   
-	printf("create_logon: Draw..\n");   
+	//Debug.
+	//printf("create_logon: Draw..\n");   
 
 	//Screen, Background and Logo. 
 	if(gui->screenStatus == 1){ 
@@ -226,7 +227,9 @@ draw_logon_stuffs:
         if(g_guiMinimal != 1)
 		{		
 	        //
-			// Obs: As mensagens aqui são paar auxiliar o desenvolvedor no processo de inicialização.
+			// Obs: 
+			// As mensagens aqui são para auxiliar o desenvolvedor no 
+			// processo de inicialização.
 			//
 			
 			//@todo: Informar o desktop atual.
@@ -234,8 +237,9 @@ draw_logon_stuffs:
 			//draw_text(gui->main, 0, 0, COLOR_WHITE, "Logon:");
 			//draw_text(gui->main, 0, 8, COLOR_WHITE, "=============");
 			//draw_text(gui->main, 8*12, 8*5, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
-			draw_text(gui->main, 400 +8, 8*1, COLOR_WHITE, "Welcome");			
-			draw_text(gui->main, 400 +8, 8*2, COLOR_WHITE, "(c) Copyright 2005-2017, Fred Nora");
+			draw_text(gui->main, 400 +8, 8*1, COLOR_WHITE, "Gramado 1.0");			
+			draw_text(gui->main, 400 +8, 8*2, 
+			          COLOR_WHITE, "(c) Copyright 2005-2017, Fred Nora");
 			draw_text(gui->main, 400 +8, 8*3, COLOR_WHITE, "(under construction)");
 			//draw_text(gui->main, 8*10, 8*12, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
 			//draw_text(gui->main, 8*10, 8*13, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
@@ -784,7 +788,7 @@ done:
 	//e ela será usada apenas uma vez. 
 	// essa variável será uma flag na rotina SetFocus(.).
 	//e ficará definida no começo do arquivo window.h.
-	_lockfocus = 1;
+	//_lockfocus = 1;
 	
 
 	//ERRO NA CRIAÇÃO DA ESTRUTURA.
@@ -927,6 +931,7 @@ done:
 	//g_logged = (int) 0;
 	return (int) 0;
 };
+
 
 /*
 int logonInit()

@@ -92,8 +92,11 @@ int KeSetPriority();
 int KeIncreasePriority(int pid);
 
 
-
-void KeStartIdle(); 
+//
+// passando o comando para os processos.
+//
+//void KeStartIdle(); 
+void startStartIdle(); 
 void KeStartShell();
 void KeStartTaskManager();
 

@@ -885,6 +885,7 @@ fail:
 int init_stack()
 {
     //Globals.
+	//#bugbug
 	kernel_stack_end   = (unsigned long) KERNEL_STACK_END; 
 	kernel_stack_start = (unsigned long) KERNEL_STACK_START; 
 	

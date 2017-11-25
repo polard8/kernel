@@ -36,6 +36,20 @@ bl_video_mode: db 0
 bl_lfb:        db 0  
 	
 
+;
+; @todo:
+; Nota sobre a pilha em ring0 configurada na tss:
+; O valor atual é 0x00200000. Mas não é o que queremos,
+; o que queremos é o equivalente físico à 0xC03FFFF0.
+; Que seria (0x00100000 + 3FFFF0).
+; O problema é que temos um aplicativo começando no 
+; endereço físico 0x400000. Com isso a pilha sujaria
+; o aplicativo.
+; É necessário que o gerenciamento de memória física
+; aloque memória física para os aplicativos em algum
+; pool de memória física padronizado.
+;
+;
 	
 ;
 ; TSS. 
@@ -47,7 +61,7 @@ dd 0
 dd 0	
 tss0:
 	dd 0x401000             ;back link
-	dd 0x00200000           ;esp0    (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
+	dd 0x003FFFF0   ;;0x00200000           ;esp0    (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
 	dd 0x10                 ;ss0
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
@@ -82,7 +96,7 @@ dd 0
 dd 0
 tss1:		          
 	dd _task0               ;back link  (todo: esse backlink esta errado,precisa ser logico)
-	dd 0x00200000           ;esp0   (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
+	dd 0x003FFFF0   ;0x00200000           ;esp0   (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
 	dd 0x10                 ;ss0
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
@@ -360,7 +374,7 @@ setup_faults:
 	ret	
 	
 
-;-------------------------------------------------
+;======================================================
 ; setup_vectors:
 ;    Configura alguns vetores da idt.
 ;	
@@ -412,6 +426,13 @@ setup_vectors:
 	mov eax, dword  _irq8
 	mov ebx, dword 40
 	call _setup_idt_vector
+	
+	
+	;
+	; int 44 - Mouse.
+	mov eax, dword  _irq12
+	mov ebx, dword 44
+	call _setup_idt_vector	
 	
 	pop ebx
 	pop eax

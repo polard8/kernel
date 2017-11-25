@@ -69,6 +69,8 @@ extern unsigned long kArg4;
 extern unsigned long SavedBootMode;
 
 
+
+
 /*
  * kMain: 
  *     The entry point for a C part of the Kernel.
@@ -166,7 +168,7 @@ int kMain(int argc, char* argv[])
 	
 	//Debug message.
 	printf("kMain: Starting up system..\n");
-	refresh_screen();
+	refresh_screen(); //@TODO: Talvez isso não precise.
 	//while(1){}	
 
 	//Debug
@@ -259,7 +261,7 @@ int kMain(int argc, char* argv[])
 		while(1){}
 	}else{
 	    
-        IdleThread->ppid = (int) IdleProcess->pid;  //PPID.    
+        IdleThread->ownerPID = (int) IdleProcess->pid;  //ID do processo ao qual o thread pertence.    
 		
 		//Thread.
 	    processor->CurrentThread = (void*) IdleThread;
@@ -276,7 +278,7 @@ int kMain(int argc, char* argv[])
 		while(1){}
 	}else{
 		
-	    ShellThread->ppid = (int) ShellProcess->pid;  //PPID.
+	    ShellThread->ownerPID = (int) ShellProcess->pid;  //ID do processo ao qual o thread pertence. 
 		//...		
     };
 	
@@ -288,7 +290,7 @@ int kMain(int argc, char* argv[])
 		while(1){}
 	}else{
 		
-	    TaskManThread->ppid = (int) TaskManProcess->pid; //PPID.		
+	    TaskManThread->ownerPID = (int) TaskManProcess->pid; //ID do processo ao qual o thread pertence. 		
 		//...		
     };	
 	
@@ -322,7 +324,7 @@ doDebug:
 	//
 	// Done.
 	//
-	
+
 done:
 
 	//if(VideoBlock.useGui != 1){	
@@ -344,6 +346,20 @@ done:
 	windowInitializeBrowserSupport();
 	printf("main: done.\n");
 	*/
+	
+	
+	//
+	// Tentando inicializar o controlador de mouse.
+	//
+	// Já foi criada a irq12
+	// ja foi configurado vetor da IDT.
+	// já foi criado um handle para a irq12.
+	// agora inicializaremos o controlador 8042
+	// testando inicializar o mouse no procedimento de janela do sistema em F6.
+	
+	//init_mouse();  //isso está em keyboard.c
+	
+	
 	
 	//
 	// RETURNING !
@@ -367,6 +383,9 @@ fail:
 	refresh_screen();  
 	return (int) EXIT_FAILURE;   
 };
+
+
+
  
 //
 // End.

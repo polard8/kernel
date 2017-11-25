@@ -206,8 +206,8 @@ void mostra_slots()
 		        t->used == 1 && 
 				t->magic == 1234 )
 	    {
-		  printf("TID={%d} Step={%d} PPID={%d} pHandle={%x} State={%d} Handle={%x} Name={%s}\n\n",t->tid 
-		      ,t->step ,t->ppid, t->process ,t->state ,(void*) t ,t->name_address);
+		  printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d} Handle={%x} Name={%s}\n\n",t->tid 
+		      ,t->step ,t->ownerPID, t->process ,t->state ,(void*) t ,t->name_address);
 	    };
     };
     
@@ -247,14 +247,14 @@ void mostra_slot(int id)
 	
 	    // Show one slot.
 	    printf("\n");
-	    printf("TID  PPID pHandle  Prio  State   tName   \n");
-	    printf("===  ==== ======== ====  =====   ======= \n");
-        printf("%d   %d   %x       %d    %d      %s      \n" ,t->tid 
-	                                                         ,t->ppid
-                                                             ,t->process															
-														     ,t->priority 
-														     ,t->state
-														     ,t->name_address);
+	    printf("TID  ownerPID pHandle  Prio  State   tName   \n");
+	    printf("===  ======== ======== ====  =====   ======= \n");
+        printf("%d   %d       %x       %d    %d      %s      \n" ,t->tid 
+	                                                             ,t->ownerPID
+                                                                 ,t->process															
+														         ,t->priority 
+														         ,t->state
+														         ,t->name_address);
 	};
 															 
 done:

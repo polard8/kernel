@@ -37,6 +37,22 @@
 //int servicesError;
 //...
 
+// Create Window support.
+int cwFlag;                //flag (alerta que os argumentos estão disponíveis)
+unsigned long cwArg1;      //WindowType
+unsigned long cwArg2;      //WindowStatus
+unsigned long cwArg3;      //WindowView
+char *cwArg4;              //WindowName
+unsigned long cwArg5;      //WindowX
+unsigned long cwArg6;      //WindowY
+unsigned long cwArg7;      //WindowWidth
+unsigned long cwArg8;      //WindowHeight
+struct window_d * cwArg9;  //gui->screen Parent window
+int  cwArg10;               // desktopID 
+unsigned long cwArg11;     // WindowClientAreaColor
+unsigned long cwArg12;     // WindowColor
+
+
 
 //
 // Protótipos de funções internas.
@@ -73,6 +89,9 @@ void servicesChangeProcedure();
  * 
  *    @todo: O Nome da função, para pertencer à essa pasta, deveria ser:
  *           servicesSystemServices(....).
+ *
+ *@todo: *importante: Essa rotina deve identificar quem está chamando, PID TID.
+ *
  */
 void *services( unsigned long number, 
                 unsigned long arg2, 
@@ -127,6 +146,11 @@ void *services( unsigned long number,
 	//void* kLONG1;
 	//void* kLONG2;
 	//...
+	
+	//Para identificarmos qual processo e qual thread está chamando.
+	struct process_d *p;
+	struct thread_d *t;
+	
 	
 	//
 	// Setup.
@@ -344,15 +368,11 @@ void *services( unsigned long number,
 
 		//10 Create window.
 		// O argumento mais importante é o tipo.
+		//Função principal na criação de janelas via systemcall
         case SYS_BUFFER_CREATEWINDOW: 
-		    //if( (void *) arg3 == NULL ){ return NULL; } //rect_d
-			
-            //printf("service 10 create window\n");		
-			WindowType = arg2;           //arg2 Type. 
-			//r = (void *) arg3;         //arg3 (Ponteiro para a estrutura rect_d)
-            WindowStatus = arg3;         //status
-			WindowName = (char *) a4;    //arg4 Window name.
-			WindowView = VIEW_MAXIMIZED; 
+			cwArg1 = arg2;               //arg2 Type. 
+            cwArg3 = arg3;               //view
+			cwArg4 = (char *) a4;        //arg4 Window name.
 			goto do_create_window;
             break;
 			
@@ -404,15 +424,32 @@ void *services( unsigned long number,
             return NULL;
 			break;
 		
-        //47, Create Window 0.		
-        case SYS_BUFFER_CREATEWINDOWx:
-			WindowType = 0;  //?? 
-			//r = (void*) arg3; 
-			WindowStatus = arg3;   //status
-			WindowView = 1; 
-            WindowName = (char*) a4;
-			goto do_create_window;
-            break;
+        //47, Create Window support.		
+        //envia argumentos de controle.
+		case SYS_BUFFER_CREATEWINDOWx:
+		    cwFlag = 1234;      //Aciona a flag.
+            cwArg2  = arg2;     //WindowStatus 
+			//@todo: Temos disponíveis ainda os argumentos 3 e 4.
+			return NULL;
+			break;
+		
+		//48, Create Window support.
+		//envia argumentos de posicionamento.
+		case SYS_BUFFER_CREATEWINDOW1:
+		    cwArg5  = arg2;  //x
+			cwArg6  = arg3;  //y
+			cwArg9  = gui->screen;  //arg4;  //Parent window(simulando)    
+			return NULL;
+			break;
+		
+		//49, Create Window support.
+		//envia argumentos de dimensões.
+		case SYS_BUFFER_CREATEWINDOW2:
+		    cwArg7 = arg2; //width
+			cwArg8 = arg3; //height
+			//cwArg10 = arg4;  //desktop ID 
+			return NULL;
+			break;	
 			
 		//50~59 Window suppot, manipulação de janelas	
 
@@ -564,21 +601,27 @@ void *services( unsigned long number,
 		    break;
 			
 		//81
+		//#bugbug Isso está retornando o ID do processo atual.
+		//O que queremos é o ID do processo que está chamando
 		case SYS_GETPPID: 
 		    return (void*) sys_getppid();
 			break;
 		
 		//82
+		//
 		case SYS_SETPPID: 
 		    //
 			break;
 			
 		//85
+		//#bugbug Isso está retornando o ID do processo pai do processo atual.
+		//O que queremos é o ID do processo pai do processo que está chamando.
 		case SYS_GETPID: 
 		    return (void*) sys_getpid();
 			break;
 		
 		//86
+		//
 		case SYS_SETPID: 
 		    //
 			break;
@@ -795,6 +838,27 @@ void *services( unsigned long number,
 
 	
 //
+// * Aviso: #Importante.
+//
+// Juntando os argumentos para a função CreateWindow(.).
+// Nesse caso, antes de chamarmos a função CreateWindow, vamos juntar
+// todos os argumentos que ela precisa. Mas o que acontece é que
+// estamos na rotina de serviços que o kernel oferece via API.
+// Qual será a estratégia para conseguirmos os argumentos.
+// >> Quando um aplicativo em user mode chamar CreateWindow, 
+// a rotina da API deve fazer duas system calls, aprimeira passando 
+// os argumentos e a segunda criando a janela.
+// Quando enviar os argumentos aciona-se ativa-se uma flag,
+// quando criar a janela, desativa a flag,
+//*importante: Lembrando que para um aplicativo criar uma janela
+// ele deve entrar em sua sessão crítica. Talvez um lock possa ser criado 
+// exclusivamente para a função CreateWindow, então o programado não precisa 
+// acionar o lock, apenas chamar a função.
+// 
+//	
+	
+	
+//
 // Create window.
 //
 
@@ -865,6 +929,8 @@ do_create_window:
 	// Por fim, será uma estrutura de dados com bastante informações e só poderá 
 	// ser usada depois que uma flag sinalizar que temos informações suficientes.  
 	//
+	
+	
 
 
 	//
@@ -894,6 +960,60 @@ do_create_window:
 	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
 	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
 
+	
+	
+	//
+	// *Teste:
+	//     Simulando a passagem de argumentos e ativação da flag.
+	//
+
+	/*
+	cwFlag = 1234;
+
+    cwArg1 = 3;
+	cwArg2 = 0;
+	cwArg3 = 0;
+	cwArg4 = "#Janela de teste";
+	
+	cwArg5 = 10;
+	cwArg6 = 10;
+	cwArg7 = 400;
+	cwArg8 = 400;
+	
+	cwArg9  = gui->screen;
+	cwArg10 = desktopID;
+	cwArg11 = COLOR_RED;
+	cwArg12 = COLOR_BROWN;
+	*/
+	
+	//
+	// * Primeira coisa a fazer é ver se os argumentos estão disponíveis.
+	//   Vamos conferir a flag que indica que argumentos foram enviados 
+	//   previamente.
+	//
+	
+	//se a flag tiver acionada, os argumentos usarão os valores 
+	//que foram previamente passados
+	if ( cwFlag == 1234 )
+	{ 
+	    //Simulando 2 argumentos faltantes.
+		cwArg11 = WindowColor;   //isso deve obedecer o color scheme
+	    cwArg12 = WindowClientAreaColor; //isso deve obedecer o color scheme
+		
+        WindowType    = cwArg1; 
+		WindowStatus  = cwArg2; 
+		WindowView    = cwArg3; 
+		WindowName    = (char*) cwArg4; 
+	    WindowX       = cwArg5; 
+		WindowY       = cwArg6; 
+		WindowWidth   = cwArg7; 
+        WindowHeight  = cwArg8;									  
+		//gui->screen  = cwArg9; 
+		//desktopID = cwArg10; 
+		WindowClientAreaColor = cwArg11; 
+		WindowColor = cwArg12; 
+	}	
+	
 
     //
     // Importante:
@@ -911,7 +1031,8 @@ do_create_window:
 								      gui->screen, desktopID, WindowClientAreaColor, WindowColor);
 
 	
-	struct thread_d *t;
+	
+	
 	
 	if( (void*) NewWindow == NULL )
 	{ 
@@ -919,6 +1040,10 @@ do_create_window:
 	    return NULL; 
 	}else{	
         
+		
+		//se a janela foi criada com sucesso, podemos desativar a flag.
+		cwFlag = 0;                  //*importante, nesse momento precisamos desativar a flag.
+		
 		//
         // Obs: 
 		// Quem solicitou a criação da janela pode estar em user mode

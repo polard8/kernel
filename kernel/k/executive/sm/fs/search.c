@@ -155,8 +155,7 @@ done:
  * de arquivos menos a primeira. 0 é erro.
  *
  */
-unsigned long fs_search_empty_entry(unsigned long id)
-{
+unsigned long fs_search_empty_entry(unsigned long id){
     return (unsigned long) 0; 	
 };
 
@@ -165,8 +164,7 @@ unsigned long fs_search_empty_entry(unsigned long id)
  * fs_find_empty_entry:
  *     Encontrar uma entrada vazia na fat.
  */
-unsigned long fs_find_empty_entry()
-{
+unsigned long fs_find_empty_entry(){
 	return (unsigned long) 0;
 };
 

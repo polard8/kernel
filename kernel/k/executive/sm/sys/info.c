@@ -207,8 +207,15 @@ void KiInformation()
         printf("\n[Kernel Heap and Stack info:]\n");
 	    printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",kernel_heap_start ,kernel_heap_end ,HeapTotal);	
         printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
-	    printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n",kernel_stack_start ,kernel_stack_end ,StackTotal);
-
+	    
+		//@todo:
+		//mostrar o tamanho da pilha..
+		//#bugbug: A informações sobre a stack estão incorretas, pois essas variáveis mostram 
+		// o endereço da stack na hora da inicialização. Quando o processador retorna de ring3 para ring0
+		//ele usa o endereço de pilha indicado na TSS.
+		//Pois bem, é mais digno mostrar aqui o endereço da pilha, indicado no TSS.
+		printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n",kernel_stack_start ,kernel_stack_end ,StackTotal);
+        printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
 	
 	    //
 	    // Video info

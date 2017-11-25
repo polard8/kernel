@@ -720,9 +720,19 @@ int init_hal()
 	init_clock();
 	get_cmos_info();
 		
+		
+	//
+    //@todo 8042 ... teclado e mouse.
+    //
+    P8042_install();	
+		
     //keyboard.
 	printf("init_hal: kd..\n");
 	init_keyboard();
+	
+	//mouse
+	//printf("init_hal: mouse..\n");
+	//init_mouse();  //isso está em keyboard.c
 	
 	//printf("init_hal: init machine (bug)\n");	
 	//hal_init_machine();	

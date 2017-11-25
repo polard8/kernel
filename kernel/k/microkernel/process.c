@@ -1,5 +1,5 @@
 /*
- * Arquivo: process.c 
+ * File: process.c 
  *
  * Descrição:
  *     Gerenciamento de processos.
@@ -86,7 +86,7 @@ extern unsigned long get_page_dir();
 int caller_process_id;
 
 
-int processNewPID;
+int processNewPID;   //??
 
 
 //
@@ -110,12 +110,16 @@ done:
 */
 
 
-//Testando se o processo é válido
-//se for válido retorna 1234.(serviço 88.)
+
+/*
+ * processTesting:
+ *     Testando se o processo é válido. Se for válido retorna 1234.
+ * system call (serviço 88.)
+ * 
+ */
 int processTesting(int pid)
 {
 	struct process_d *P;
-	
 	
 	P = (void*) processList[pid];
 	
@@ -138,7 +142,7 @@ fail:
  *     Envia um sinal para um processo.
  *     Se o sinal e o processo forem válidos, um sinal é colocado
  * no PCB do processo.
- *
+ *     @todo: Rotinas envolvendo sinais devem ir para outro arquivo.
  */
 int processSendSignal(struct process_d *p, unsigned long signal)
 {
@@ -214,15 +218,10 @@ process_descriptor_t *create_process( struct wstation_d *window_station,
 	struct process_d *Process;
     struct process_d *Empty;    //Para a entrada vazia no array de processos.  	
 
-	//
-	// @todo: #bugbug: Há um erro na numeração dos processos criados,
-	// está contando de 2 em 2.
-	//
+    //@todo:
+    //Melhorar esse esquema de numeração e contagem de processos criados.
 	
-	
-    if( processNewPID < USER_BASE_PID || 
-	    processNewPID >= PROCESS_COUNT_MAX )
-	{
+    if( processNewPID < USER_BASE_PID || processNewPID >= PROCESS_COUNT_MAX ){
 		processNewPID = (int) USER_BASE_PID;	
 	};
 	
@@ -237,8 +236,6 @@ process_descriptor_t *create_process( struct wstation_d *window_station,
 	};
 
 
-	
-	
 //Loop.	
 get_next:	
 	
@@ -257,15 +254,15 @@ get_next:
 	
 	//Get empty.
 	Empty = (void*) processList[i];
-    if( (void*) Empty != NULL )  //Se o slot estiver ocupado.
-	{
+	
+	//Se o slot estiver ocupado.
+    if( (void*) Empty != NULL ){
 		goto get_next;
-	}
-	else
-	{
+	}else{
+		
 		//Object.
-		//Process->objectType = ObjectTypeProcess;
-		//Process->objectClass = ObjectClassKernelObjects;
+		Process->objectType = ObjectTypeProcess;
+		Process->objectClass = ObjectClassKernelObjects;
 		
 		//c
 		processNewPID = (int) i;
@@ -278,7 +275,7 @@ get_next:
         Process->gid = (int) GetCurrentGroupId();  //GID. 
 
 		//f,flag, State of process
-		Process->state = INITIALIZED;    //PROCESS_IN_MEMORY 	
+		Process->state = INITIALIZED;    	
 		
 		//e - Error.
 		//Process->error = 0;
@@ -374,11 +371,11 @@ get_next:
 		//
 		
 		//Heap and Stack. (endereços virtuais).
-	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do kernel.
-	    Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
-	    Process->StackSize   = UPROCESS_DEFAULT_STACK_SIZE;   //Tamanho da pilha.	
 	    Process->Heap        = UPROCESS_DEFAULT_HEAP_BASE;    //Endereço do início do Heap do processo.
 	    Process->HeapSize    = UPROCESS_DEFAULT_HEAP_SIZE;    //Tamanho do heap.
+	    Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
+	    Process->StackSize   = UPROCESS_DEFAULT_STACK_SIZE;   //Tamanho da pilha.	
+	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo.
 	    
 		//Process->HeapPointer
 		//Process->HeapLastValid
@@ -412,6 +409,8 @@ get_next:
 	    
 		//Msg support.
 		//Argumentos do procedimento de janela.
+		//@todo: Isso pode ser um ponteiro de estrutura,
+		//a fila de mensgens pode ser uma fila de ponteiros.
 		Process->window = NULL;    //arg1. 
 	    Process->msg = 0;          //arg2.
 	    Process->long1 = 0;        //arg3.
@@ -499,26 +498,25 @@ get_next:
 		
 		//Process->wait4pid
 		
-		Process->exit_code = 0;
 		
 		Process->zombieChildListHead = NULL;
 		
-
+		Process->exit_code = 0;
 		
 		//More?!
 		//Obs: É bom lembrar que outros elementos podem ser 
 		//configurados posteriormente.
 		
-		//Coloca na lista o processo criado.
-		processList[i] = (unsigned long) Process;
-
 		//Next.
 		//Process->next_task;  //@todo deletar isso.
 		//Process->next_process
 		//Process->NextInitialized
 		//Process->Parent
 		//Process->Prev
-		Process->Next = NULL;  
+		Process->Next = NULL; 
+
+		//Coloca o processo criado na lista de processos.
+		processList[i] = (unsigned long) Process;		
 		//Nothing.
 	};	
 

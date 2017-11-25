@@ -520,12 +520,34 @@ struct dir_d
 	 */
 	struct dir_entry_d *current;
 };
-struct dir_d *rootDir;    // hd0:/root
-struct dir_d *bootDir;    // hd0:/boot 
-struct dir_d *systemDir;  // hd0:/system
-struct dir_d *userDir;    // hd0:/user
-//dir_t *MyDir;
-//...    
+
+//Diretório raiz.
+struct dir_d *rootDir;      // "/"
+
+//Principais.
+struct dir_d *gbuildDir;    // "/gbuild"
+struct dir_d *gdocsDir;     // "/gdocs"
+struct dir_d *gramadoDir;   // "/gramado"
+struct dir_d *gsdkDir;      // "/gsdk"
+struct dir_d *gsrcDir;      // "/gsrc"
+
+//Secundários.
+struct dir_d *usersDir;     // "/users"
+struct dir_d *cmdDir;       // "/cmd"
+struct dir_d *tmpDir;       // "/tmp"
+struct dir_d *downloadDir;  // "/download"
+//...
+
+//Diretório atual.
+struct dir_d *currentDir;       // "/?"
+
+
+//
+// @todo: Obs: Eu nem sei se essa listagem de diretórios deveria existir.
+//             Talvez essa possa ser uma forma de estabelecer um padrão.
+//             Pois ficará difícil mudar isso. Talvez essa rigidez 
+//             ajude consolidar quais serão os diretórios e arquivos principail. 
+//
  
  
 /*

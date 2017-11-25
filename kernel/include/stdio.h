@@ -288,8 +288,13 @@
   First the string str is printed followed by a colon and then a space.
 */ 
  
- 
+// 
+//printf support 
+//
 
+//#define kprintf printf    //kernel support
+//#define dprintf printf    //debug support
+//...
  
 
 #define REVERSE_ATTRIB 0x70

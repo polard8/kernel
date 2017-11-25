@@ -176,7 +176,6 @@ typedef enum {
 typedef struct thread_d thread_descriptor_t;
 struct thread_d 
 {	
-
 	object_type_t objectType;
 	object_class_t objectClass;
 	
@@ -187,8 +186,10 @@ struct thread_d
 	//
 	
 	int tid;                //c, thread ID.   
-	//int pid;              // Á qual process a thread pertence. 
-	int ppid;               //b, Qual é o parent process do processo ao qual a thread pertence.
+	
+	int ownerPID;           //ID do processo ao qual o thread pertencer. 
+	//int ownerPPID;        //Acho que isso não é necessário !! 
+	
 	unsigned long used;     //a, @todo: Poderia ser int.
     unsigned long magic;    //g, @todo: Poderia ser int.
 	

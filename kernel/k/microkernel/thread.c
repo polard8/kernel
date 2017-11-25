@@ -111,13 +111,12 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
 	//
 	ProcessID = (int) pid;
 	
-	if( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX){
+	if( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX ){
 		ProcessID = current_process;
 	};
 
 	Process = (void*) processList[ProcessID]; 		
-	if( (void*) Process == NULL )
-	{
+	if( (void*) Process == NULL ){
 		printf("create_thread: Process struct\n");
 		refresh_screen();
 		while(1){}
@@ -147,11 +146,11 @@ get_next:
 	//Get empty.
 	Empty = (void*) threadList[i];
     
+	//Se o slot estiver ocupado.
 	if( (void*) Empty != NULL ){
         goto get_next;
-    }
-	else
-	{	
+    }else{
+		
 		//Object.
 		Thread->objectType = ObjectTypeThread;
 		Thread->objectClass = ObjectClassKernelObjects;
@@ -163,7 +162,7 @@ get_next:
 		    //fail	
 		//};		
 		
-		Thread->ppid = (int) pid;
+		Thread->ownerPID = (int) pid;  //ID do processo ao qual o thread pertence.
 
 	    Thread->used = 1;
 	    Thread->magic = 1234;				
@@ -308,21 +307,17 @@ get_next:
 
         Thread->exit_code = 0;
 	    
-		//Próxima thread da lista.
-		Thread->Next = NULL;
-		
-		
+
 		//@todo: Incrementar a contagem de threads no processo.
 		//Process->threadCount++;
+		
+		//Próxima thread da lista.
+		Thread->Next = NULL;
 		
 		//Coloca na lista.
 		threadList[i] = (unsigned long) Thread;	
 	};
 
-	
-	
-	
-	
 	//
 	// Running tasks.
 	//
@@ -330,8 +325,7 @@ get_next:
 	//ProcessorBlock.running_tasks = 2;
     //@todo: isso deve ir pra outro lugar.
 	//talvez dentro de SelectForExecution.
-	
-	
+		
 //
 // Done.
 //

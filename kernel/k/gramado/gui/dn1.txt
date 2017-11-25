@@ -7,7 +7,10 @@
     gui pode ser o nome da classe que contem todos os recursos
 gráficos. ou pode ser awt.
 
-    Diversas primitivas gráficas são oferecidas no kernel base em função do ganho de desempenho. Pode haver funções mas elaboradas em user mode que se utilizem dessas primitivas. Aliás, em user mode terá um gerente de recursos gráficos, que chamará as primitivas contidas aqui nesse módulo em kernel mode.
+    Diversas primitivas gráficas são oferecidas no kernel base em função do ganho de desempenho. 
+	Pode haver funções mas elaboradas em user mode que se utilizem dessas primitivas. 
+	Aliás, em user mode terá um gerente de recursos gráficos, que chamará as primitivas 
+	contidas aqui nesse módulo em kernel mode.
     Os processos em user mode utilizarão os recursos oferecidos pelo gerente
 de recursos gráficos presente em user mode. Já a chamada direta aos recursos gráficos
 oferecidos pelo kernel base serão de uso privilegiado, somente alguns processo e
