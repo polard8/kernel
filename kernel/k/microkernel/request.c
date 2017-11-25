@@ -216,7 +216,7 @@ void request()
 		//9 - checa se ha threads para serem inicializadas e 
 		//inicializa pelo método spawn.	
 		case KR_CHECK_INITIALIZED:
-            check_for_initialized();		
+            check_for_standby();		
 		    break;
 			
 		//@todo: Tratar mais tipos.	

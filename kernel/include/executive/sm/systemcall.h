@@ -187,7 +187,7 @@
 #define	SYS_ALERTTHREAD 91
 #define	SYS_92 92
 #define	SYS_93 93
-#define	SYS_94 94
+#define	SYS_STARTTHREAD  94 //REAL (coloca a thread em standby para executar pela primeira vez.)
 #define	SYS_95 95
 #define	SYS_96 96
 #define	SYS_97 97

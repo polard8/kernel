@@ -931,13 +931,13 @@ done:
 
 
 /*
- * check_for_initialized:
+ * check_for_standby:
  *     Procura na lista de threads no estado StandyBy.
  *     Se tiver uma thread nessa lista, ela se torna a current.
  *     Para rodar pela primeira vez, atravéz de Spawn.
  *     @todo: na verdade essa função deveria se chamar check for standby
  */
-void check_for_initialized()
+void check_for_standby()
 {
 	int i = 0;
     int newId;
@@ -969,7 +969,7 @@ done:
     return;
 //Do Spawn.
 do_spawn:
-    KiSpawnTask(current_thread);
+    KiSpawnTask(current_thread);  //spawn.c
 	//spawn_task(current_thread);
     panic("check_for_initialized:");
 	while(1){};	

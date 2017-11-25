@@ -91,7 +91,7 @@ void do_thread_sleeping(int id);
 void do_thread_zombie(int id);
 void do_thread_dead(int id);
 
-void check_for_initialized();
+void check_for_standby();
 int check_quantum();
 
 

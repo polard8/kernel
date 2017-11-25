@@ -173,7 +173,6 @@ threadSetUp:
 	//refresh_screen();
 
 	IncrementDispatcherCount(SELECT_INITIALIZED_COUNT);
-
 	
 	
     /* Corpo x Coisas */

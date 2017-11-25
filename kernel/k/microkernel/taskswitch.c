@@ -243,7 +243,7 @@ void task_switch()
 			// @todo: Na verdade essa função deveria se chamar 
 			// check_for_standby().
 			//
-			check_for_initialized(); 
+			check_for_standby(); //scheduleri.c
             
             //
             // Request:

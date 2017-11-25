@@ -505,7 +505,7 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
                                     struct desktop_d  *desktop,
                                     struct window_d *window,
                                     unsigned long init_eip, 
-                                    unsigned long priority, 
+                                    unsigned long init_stack, 
 									int pid, 
 									char *name);
 void *GetCurrentThread();

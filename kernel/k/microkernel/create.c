@@ -21,10 +21,8 @@
  
 #include <kernel.h>
 
-//
-// Funções importadas.
-//
 
+// Funções importadas.
 extern unsigned long get_page_dir();
 
 
@@ -50,14 +48,12 @@ void *KeCreateProcess( struct wstation_d *window_station,
 	
 	//@todo: Filtros para ponteiros NULL.
 	
-    //
+   
+   
 	// Create process.
-	//
-    create_process( window_station, desktop, window, init_eip, priority, ppid, name);
-	//@todo: Return da função create.
 	
-done:
-    return NULL;
+createProcess:
+    return (void*) create_process( window_station, desktop, window, init_eip, priority, ppid, name);
 };
 
 
@@ -82,14 +78,11 @@ void *KeCreateThread( struct wstation_d *window_station,
 	
 	//@todo filtros, para ponteiros NULL.
 	
-    //
-	// Create thread.
-	//
-    create_thread( window_station, desktop, window, init_eip, priority, ppid, name);               
-    //@todo: return da função create.
-	
-done:
-    return NULL;
+  
+ // Create thread.
+ 
+createThread:
+    return (void*) create_thread( window_station, desktop, window, init_eip, priority, ppid, name);   
 };
 
 
@@ -252,7 +245,8 @@ void CreateSystemTasks()
 
 	
 	//Create Thread, test 1.
-	Thread = (void*) create_thread( NULL, NULL, NULL, (unsigned long) 0x00401000, PRIORITY_LOW, 0, "TESTTHREAD1");	
+	//#bugbug stack
+	Thread = (void*) create_thread( NULL, NULL, NULL, (unsigned long) 0x00401000, 0x004FFFF0, 0, "TESTTHREAD1");	
 	if((void*) Thread == NULL){
 		printf("CreateSystemTasks fail: Create thread.\n");
 		refresh_screen();
@@ -261,7 +255,8 @@ void CreateSystemTasks()
 	
 
 	//Create Thread, test 2.
-	Thread = (void*) create_thread( NULL, NULL, NULL, (unsigned long) 0x00401000, PRIORITY_LOW, 0, "TESTTHREAD2");	
+	//#bugbug stack
+	Thread = (void*) create_thread( NULL, NULL, NULL, (unsigned long) 0x00401000, 0x004FFFF0, 0, "TESTTHREAD2");	
 	if((void*) Thread == NULL){
 		printf("CreateSystemTasks fail: Create thread 2.\n");
 		refresh_screen();
@@ -553,6 +548,10 @@ void *KiCreateIdle()
 	
 // Done.	
 done:
+    //#bugbug
+	//Não há a necessidade de colocar na fila de inicializadas
+	//se logo em seguida estamos selecionando para execução 
+	//colocando no estado standby.
     queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_INITIALIZED);
     SelectForExecution(IdleThread);    // * MOVEMENT 1 ( Initialized ---> Standby ).
    	return (void*) IdleThread;
@@ -766,19 +765,20 @@ void *KiCreateTaskManager()
 	};	
 
     //Thread.
+	//Alocando memória para a estrutura da thread.
 	t = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) t == NULL ){
 	    printf("KiCreateTaskManager: Thread fail.\n");
 		refresh_screen();
 		while(1){}
-	}
-	else
-	{  
+	}else{  
 	    //Indica à qual proesso a thread pertence.
 	    t->process = (void*) KernelProcess;
 	};
 	
 	//Stack.
+	//#bugbug
+	//estamos alocando uma stack dentro do heap do kernel.
 	taskmanStack = (void*) malloc(4*1024);
 	if( (void*) taskmanStack == NULL ){
 	    printf("KiCreateTaskManager: Stack fail.\n");
@@ -786,6 +786,8 @@ void *KiCreateTaskManager()
 		while(1){}
 	};
   	
+	//@todo: object
+	
     //Identificadores      
 	t->tid = 2;     
 	t->ownerPID = (int) KernelProcess->pid;         

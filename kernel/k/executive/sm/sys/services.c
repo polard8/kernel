@@ -647,6 +647,26 @@ void *services( unsigned long number,
 		    systemIoCpu(1,0,0,0,0); 
 			break;
 			
+		//94	
+		//REAL (coloca a thread em standby para executar pela primeira vez.)
+		case SYS_STARTTHREAD:
+
+		    //#debug
+		    //select
+   		    printf("services:94 select\n");
+			refresh_screen();
+		    t = (struct thread_d*) arg2;
+            SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
+		    
+			//#debug
+			//spawn
+			printf("services:94 spawn\n");
+			refresh_screen();
+			current_thread = t->tid;
+			KiSpawnTask(current_thread); 
+			
+			break;		
+			
 	    //
         // 99,100,101,102 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
         //		

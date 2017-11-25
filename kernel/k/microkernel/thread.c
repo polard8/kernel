@@ -53,7 +53,7 @@ done:
 
 /*
  * create_thread:
- *     Cria uma thread. 
+ *     Cria um thread para rodar em user mode. 
  *
  * @todo: O processo ao qual o thread vai ser atribuído deve ser 
  * passado via argumento, se o argumento for nulo, então usa-se o 
@@ -78,7 +78,7 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
                                     struct desktop_d  *desktop,
                                     struct window_d *window,
                                     unsigned long init_eip, 
-                                    unsigned long priority, 
+                                    unsigned long init_stack, 
 									int pid, 
 									char *name)
 {	
@@ -129,6 +129,9 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
 	    printf("create_thread:");
 		refresh_screen();
 		while(1){}
+	}else{  
+	    //Indica à qual proesso a thread pertence.
+	    //Thread->process = (void*) Process;
 	};
 	
 	//Nothing.
@@ -163,46 +166,89 @@ get_next:
 		//};		
 		
 		Thread->ownerPID = (int) pid;  //ID do processo ao qual o thread pertence.
-
 	    Thread->used = 1;
-	    Thread->magic = 1234;				
+	    Thread->magic = 1234;
+		Thread->name_address = (unsigned long) name;  //Name.   
+		//@todo: Usar Thread->name. 
+		//Thread->cmd @todo.
 
-        //f, Caracteristicas.
+        //Thread->process = (void*) Process;
+
+		//Procedimento de janela.
+	    Thread->procedure = (unsigned long) &system_procedure;
+		//Msg support. //Argumentos.
+		Thread->window = NULL;        //arg1.
+	    Thread->msg = 0;              //arg2.
+	    Thread->long1 = 0;            //arg3.
+	    Thread->long2 = 0;            //arg4.		
+
+        //Caracteristicas.
+	    Thread->type = TYPE_SYSTEM; //TYPE_IDLE;    //?? //Type...@todo: Rever. 
 	    Thread->state = INITIALIZED;  
 		//Apenas Initialized, pois a função SelectForExecution
 		//seleciona uma thread para a execução colocando ela no
 		//state Standby.	
 		
-        //Name. 		
-		//@todo: Usar Thread->name. 
-		Thread->name_address = (unsigned long) name;   
-		//Thread->cmd @todo.
+		//A prioridade básica da thread é igual a prioridade básica do processo.
+		Thread->base_priority = (unsigned long) KernelProcess->base_priority; //Process->base_priority;
+		Thread->priority = (unsigned long) Thread->base_priority; // priority; //A prioridade dinâmica da thread foi passada por argumento.			
 		
-		//cpu.
-		//Thread->cpuID = 0;
-		//Thread->confined = 0;
-		//Thread->CurrentProcessor = 0;
-		//Thread->NextProcessor = 0;
-		
-		//Page Directory. (#CR3).
-		//Estamos usando o page directory do processo.
-		//page directory do processo ao qual a thread pertence.
-		Thread->Directory = (unsigned long ) Process->Directory; 
-
-
 		//IOPL.
 		//Se ela vai rodar em kernel mode ou user mode.
 		//@todo: herdar o mesmo do processo.
-		Thread->iopl = RING3;  //Process->iopl;  
+		Thread->iopl = RING3;  //Process->iopl;  		
+		Thread->saved = 0;                //Saved flag.	
+		Thread->preempted = PREEMPTABLE;  //Se pode ou não sofrer preempção.
 		
+		//Heap and Stack.
+	    //Thread->Heap;
+	    //Thread->HeapSize;
+	    //Thread->Stack;
+	    //Thread->StackSize;
+
+        //Temporizadores.  		
+	    Thread->step = 0;               //Quantas vezes ela usou o processador no total.
+ 	    Thread->Quota = 9;              //Cota de utilização do processador antes de deixa-lo.
+        Thread->quantum =  QUANTUM_BASE;            //QUANTUM_BASE
+        Thread->quantum_limit = QUANTUM_LIMIT; //(9*2);  //O boost não deve ultrapassar o limite. QUANTUM_LIMIT			
+		
+		
+		
+        Thread->standbyCount = 0;
+	    Thread->runningCount = 0;    //Tempo rodando antes de parar.
+	    Thread->readyCount = 0;      //Tempo de espera para retomar a execução.
+	    Thread->ready_limit = READY_LIMIT;
+	    Thread->waitingCount  = 0;
+	    Thread->waiting_limit = WAITING_LIMIT;
+	    Thread->blockedCount = 0;    //Tempo bloqueada.		
+	    Thread->blocked_limit = BLOCKED_LIMIT;
+		
+	    Thread->ticks_remaining = 1000;    //Not used now.	
+
+
+	    //signal
+	    //Sinais para threads.
+	    Thread->signal = 0;
+        Thread->signalMask = 0;	
+
+
         //
 		// @todo: Essa parte é dependente da arquitetura i386.
 		//        poderá ir pra outro arquivo.
 		//
 		
+		//
+		// #BUGBUG 
+		// **** NÃO TEMOS UMA PILHA ****
+		// Precisamos de uma pilha para user mode.
+		// Colocaremos uma pilha simulada para teste ..
+		// isso funcionará em apenas uma thread...
+		// na proxima vai dat problema.
+		//
+		
 		//Context.
 	    Thread->ss = 0x23;    //RING 3.
-	    //Thread->esp = (unsigned long) init_eip + x; @todo: 
+	    Thread->esp = (unsigned long) init_stack;//@todo: 
 	    Thread->eflags = 0x3200;
 	    Thread->cs = 0x1B;                                
 	    Thread->eip = (unsigned long) init_eip;  
@@ -217,46 +263,44 @@ get_next:
 	    Thread->edx = 0;
 	    Thread->esi = 0;
 	    Thread->edi = 0;
-	    Thread->ebp = 0;			
+	    Thread->ebp = 0;	
 		
-		//A prioridade básica da thread é igual a prioridade básica do processo.
-		Thread->base_priority = (unsigned long) Process->base_priority;
 		
-		//A prioridade dinâmica da thread foi passada por argumento.
-		Thread->priority = (unsigned long) priority;		
+		//cpu.
+		//Thread->cpuID = 0;
+		//Thread->confined = 0;
+		//Thread->CurrentProcessor = 0;
+		//Thread->NextProcessor = 0;
 		
-		Thread->preempted = PREEMPTABLE;  //Se pode ou não sofrer preempção. 
-	    Thread->saved = 0;                //Saved falg.	
+		//Page Directory. (#CR3).
+		//Estamos usando o page directory do processo.
+		//page directory do processo ao qual a thread pertence.
+		Thread->Directory = (unsigned long ) Process->Directory; 
+
+
+
+		
+		
+		
+
+		
+	
+		
+		 
+	    
 
 		//@todo: Por enquanto as threads são criadas usando o diretório de páginas do kernel.
 		
-		//Heap and Stack.
-	    //Thread->Heap;
-	    //Thread->HeapSize;
-	    //Thread->Stack;
-	    //Thread->StackSize;
+
 
         //ServiceTable ..
 
         //Ticks ...
         //DeadLine ... 
 
-	    Thread->step = 0;               //Quantas vezes ela usou o processador no total.
- 	    Thread->Quota = 9;              //Cota de utilização do processador antes de deixa-lo.
-        Thread->quantum = 9;            //QUANTUM_BASE
-        Thread->quantum_limit = (9*2);  //O boost não deve ultrapassar o limite. QUANTUM_LIMIT		 
+	 
 
-		
-        Thread->standbyCount = 0;
-	    Thread->runningCount = 0;    //Tempo rodando antes de parar.
-	    Thread->readyCount = 0;      //Tempo de espera para retomar a execução.
-	    Thread->ready_limit = READY_LIMIT;
-	    Thread->waitingCount  = 0;
-	    Thread->waiting_limit = WAITING_LIMIT;
-	    Thread->blockedCount = 0;    //Tempo bloqueada.		
-	    Thread->blocked_limit = BLOCKED_LIMIT;
-		
-	    Thread->ticks_remaining = 1000;    //Not used now.		
+	
 		
 		//Thread->PreviousMode  //ring???
 		
@@ -264,11 +308,9 @@ get_next:
 		
 		//Thread->event
 		
-		//Type...@todo: Rever.
-	    Thread->type = TYPE_IDLE;    //??   	
+  	
 	
-	    //Thread->signal
-        //Thread->signalMask		
+	
 	
 	
 	    //
@@ -284,15 +326,9 @@ get_next:
 		//Thread->window_station
 		//Thread->desktop
          
-		//Procedimento de janela.
-	    Thread->procedure = (unsigned long) &system_procedure;
 
-		//Msg support.
-		//Argumentos.
-		Thread->window = NULL;        //arg1.
-	    Thread->msg = 0;              //arg2.
-	    Thread->long1 = 0;            //arg3.
-	    Thread->long2 = 0;            //arg4.	
+
+	
 
 		
 		//Thread->control_menu_procedure
@@ -331,6 +367,11 @@ get_next:
 //
 	
 done:
+    
+	//
+	// Warning !!! (NÃO COLOCAR PARA EXECUÇÃO, OUTRA FUNÇÃO DEVE COLOCAR PARA EXECUÇÃO)
+	//
+	
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
     return (void*) Thread;
 };
@@ -406,8 +447,14 @@ fail:
 
 /*
  * SelectForExecution:
- *     Um thread entra em standby, sinalizando que
- * está pronto para entrar em execução.
+ *     Um thread entra em standby, sinalizando que está pronto para entrar 
+ * em execução.
+ *     Nesse caso, durante a rotina de taskswitch, checar-se-a se existe 
+ * um thread em estado standby, caso haja, a thread é colocada pra executar 
+ * pelo método spawn. Esse método de spawn já foi testado, segundo a contagem,
+ * duas thread começaram a rodas através desse método de spawn. provavelmente 
+ * as threads 'shell' e 'taskman', pois a thread 'idle' é chamada com um 
+ * spawn exclusivo para ela, o que é desnecessário e poderá ser revisto. @todo
  *     
  *  *** MOVIMENTO 1, (Initialized --> Standby).
  */
@@ -418,17 +465,24 @@ void SelectForExecution(struct thread_d *Thread)
 	};  
 
 	//
-	//@todo: if initialized ---> Standby.
+	// @todo: if initialized ---> Standby.
+	// @todo: if zombie ---> Standby.
+	//
+	// Talvez aqui seja necessário checar o estado da thread.
+	// Quem pode entrar no estado standby??
+	// >> Uma thread no estado initialized pode entrar no estado standby 
+	// >> Uma thread no estado zombie pode entrar no estado standby.
+	// >> @todo: se uma thread estiver em qualquer um dos outros estados ela 
+	// não pode entrar em stadby.
 	//
 	
-	Thread->state = (int) STANDBY;
-	
-	//*MOVIMENTO 1, (Initialized --> Standby).
-	queue_insert_data(queue, (unsigned long) Thread, QUEUE_STANDBY);
-	
-done:	
+setState:
+    //*MOVIMENTO 1, (Initialized --> Standby).
+    Thread->state = (int) STANDBY;
+	queue_insert_data(queue, (unsigned long) Thread, QUEUE_STANDBY);	
 	return;
 };
+
 
 //Get State. (Zero é tipo NULL?).
 int GetThreadState(struct thread_d *Thread)
