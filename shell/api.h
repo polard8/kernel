@@ -3,6 +3,9 @@
  * Copyright (c) 2017 Fred Nora.
  *
  * File: api.h 
+ *
+ * @todo: Esse arquivo poderia se chamar gramado.h.
+ *        Ou gramado.h incluir esse arquivo.
  *   
  * Description:
  *    Header da API do sistema.
@@ -412,9 +415,9 @@
 #define	SYSTEMCALL_SET_CLIENT_AREA    46
 
 //Create Window support.
-#define	SYSTEMCALL_CREATEWINDOW0  47
-#define	SYSTEMCALL_CREATEWINDOW1  48
-#define	SYSTEMCALL_CREATEWINDOW2  49
+#define	SYSTEMCALL_CREATEWINDOW0  47 // envia argumentos de controle. 
+#define	SYSTEMCALL_CREATEWINDOW1  48 // envia argumentos de posicionamento.
+#define	SYSTEMCALL_CREATEWINDOW2  49 // envia argumentos de dimensões.
 
 //
 //(50~59) Window suppot, manipulação de janelas.
@@ -492,7 +495,7 @@
 #define	SYSTEMCALL_ALERTTHREAD  91
 #define	SYSTEMCALL_92  92
 #define	SYSTEMCALL_93  93
-#define	SYSTEMCALL_94  94
+#define	SYSTEMCALL_STARTTHREAD  94 //REAL (coloca a thread em standby para executar pela primeira vez.)
 #define	SYSTEMCALL_95  95
 #define	SYSTEMCALL_96  96
 #define	SYSTEMCALL_97  97
@@ -631,7 +634,7 @@
 #define	SYSTEMCALL_196 196
 #define	SYSTEMCALL_197 197
 #define	SYSTEMCALL_198 198
-#define	SYSTEMCALL_199 199  //??GC
+#define	SYSTEMCALL_199 199   //@todo: GC
 
 //Outros. (sinais, alertas, mesagens)
 #define	SYSTEMCALL_SENDSIGNAL         200  //??reservar.
@@ -2127,7 +2130,7 @@ void kill(int exit_code);
 
 //Create thread.
 void *apiCreateThread(unsigned long thread_eip, unsigned long thread_priority, char *name);
-
+void apiStartThread(void *Thread); //coloca no estado standby para executar pela primeira vez
 
 //
 // File support.

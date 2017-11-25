@@ -90,88 +90,89 @@ Linker script and memory map
  *(.text)
  .text          0x00451018       0x40 crt0.o
                 0x00451018                crt0
- .text          0x00451058      0xfc0 main.o
-                0x00451edf                shellPrompt
+ .text          0x00451058      0xf30 main.o
+                0x00451e57                shellPrompt
                 0x004512ec                shellProcedure
                 0x004517ed                shellShell
-                0x00451f3c                test_operators
-                0x00451eb2                shellThread
+                0x00451eb4                test_operators
+                0x00451e2a                shellThread
                 0x004518ae                shellInit
                 0x004513e7                shellWaitCmd
                 0x00451058                GramadoMain
                 0x004513ff                shellCompare
-                0x00451e9d                shellSetCursor
-                0x00451ecb                shellHelp
- .text          0x00452018     0x1270 api.o
-                0x00452d67                APIShowCurrentProcessInfo
-                0x004525b8                system11
-                0x0045265d                refresh_buffer
-                0x00452c49                APISetFocus
-                0x0045261b                system14
-                0x00452942                apiInitBackground
-                0x00452b81                APICreateWindow
-                0x0045326b                apiBeginPaint
-                0x00452947                MessageBox
-                0x00452de5                APIreplace_window
-                0x004525fa                system13
-                0x00453122                apiDown
-                0x004531ba                enterCriticalSection
-                0x004530f8                apiFOpen
-                0x0045246e                system1
-                0x004524f2                system5
-                0x00452f99                api_refresh_screen
-                0x00453025                apiGetCursorY
-                0x004528ed                carrega_bitmap_16x16
-                0x00453213                exitCriticalSection
-                0x00452018                system_call
-                0x0045316e                apiUp
-                0x00452040                apiSystem
-                0x0045263c                system15
-                0x00452cf9                APISetActiveWindow
-                0x0045307d                apiSetClientAreaRect
-                0x00452dbc                APIredraw_window
-                0x004530cf                apiCreateThread
-                0x00452889                SetNextWindowProcedure
-                0x00452ff9                apiGetCursorX
-                0x00452859                chama_procedimento
-                0x00452970                call_kernel
-                0x00452bc5                APIRegisterWindow
-                0x00452f0f                api_strncmp
-                0x00452e37                APIminimize_window
-                0x0045248f                system2
-                0x004524b0                system3
-                0x004530a6                apiCreateProcess
-                0x00452c8b                APIGetFocus
-                0x00452534                system7
-                0x00452513                system6
-                0x00452c07                APICloseWindow
-                0x0045323f                initializeCriticalSection
-                0x00452597                system10
-                0x004528b9                set_cursor
-                0x00452e0e                APImaximize_window
-                0x00452f6d                refresh_screen
-                0x00452af0                call_gui
-                0x00452576                system9
-                0x00452d93                APIresize_window
-                0x00453275                apiEndPaint
-                0x004528e8                put_char
-                0x004527f4                print_string
-                0x00453051                apiGetClientAreaRect
-                0x0045282a                edit_box
-                0x00452ede                kill
-                0x00452fa3                apiReboot
-                0x00452916                apiShutDown
-                0x00452eb5                exit
-                0x00452e60                APIget_foregroung_window
-                0x004524d1                system4
-                0x00452fcf                apiSetCursor
-                0x004525d9                system12
-                0x004527f9                vsync
-                0x00452555                system8
-                0x00452d3b                APIGetActiveWindow
-                0x00452ee3                dead_thread_collector
-                0x00452cb7                APIKillFocus
-                0x00452e8c                APIset_foregroung_window
+                0x00451e15                shellSetCursor
+                0x00451e43                shellHelp
+ .text          0x00451f88     0x1300 api.o
+                0x00452d3b                APIShowCurrentProcessInfo
+                0x00452528                system11
+                0x004525cd                refresh_buffer
+                0x00452c1d                APISetFocus
+                0x0045258b                system14
+                0x004528b2                apiInitBackground
+                0x00452af1                APICreateWindow
+                0x00453268                apiBeginPaint
+                0x004528b7                MessageBox
+                0x00452db9                APIreplace_window
+                0x0045256a                system13
+                0x0045311f                apiDown
+                0x004531b7                enterCriticalSection
+                0x004530f5                apiFOpen
+                0x004523de                system1
+                0x00452462                system5
+                0x00452f6d                api_refresh_screen
+                0x00452ff9                apiGetCursorY
+                0x0045285d                carrega_bitmap_16x16
+                0x00453210                exitCriticalSection
+                0x00451f88                system_call
+                0x0045316b                apiUp
+                0x00451fb0                apiSystem
+                0x004525ac                system15
+                0x00452ccd                APISetActiveWindow
+                0x00453051                apiSetClientAreaRect
+                0x00452d90                APIredraw_window
+                0x004530a3                apiCreateThread
+                0x004527f9                SetNextWindowProcedure
+                0x00452fcd                apiGetCursorX
+                0x004527c9                chama_procedimento
+                0x004528e0                call_kernel
+                0x00452b99                APIRegisterWindow
+                0x00452ee3                api_strncmp
+                0x00452e0b                APIminimize_window
+                0x004523ff                system2
+                0x00452420                system3
+                0x0045307a                apiCreateProcess
+                0x00452c5f                APIGetFocus
+                0x004524a4                system7
+                0x00452483                system6
+                0x00452bdb                APICloseWindow
+                0x0045323c                initializeCriticalSection
+                0x00452507                system10
+                0x00452829                set_cursor
+                0x00452de2                APImaximize_window
+                0x00452f41                refresh_screen
+                0x00452a60                call_gui
+                0x004524e6                system9
+                0x00452d67                APIresize_window
+                0x00453272                apiEndPaint
+                0x00452858                put_char
+                0x00452764                print_string
+                0x00453025                apiGetClientAreaRect
+                0x0045279a                edit_box
+                0x00452eb2                kill
+                0x00452f77                apiReboot
+                0x00452886                apiShutDown
+                0x00452e89                exit
+                0x00452e34                APIget_foregroung_window
+                0x00452441                system4
+                0x00452fa3                apiSetCursor
+                0x00452549                system12
+                0x00452769                vsync
+                0x004524c5                system8
+                0x00452d0f                APIGetActiveWindow
+                0x00452eb7                dead_thread_collector
+                0x004530cc                apiStartThread
+                0x00452c8b                APIKillFocus
+                0x00452e60                APIset_foregroung_window
  .text          0x00453288      0xa90 stdio.o
                 0x00453a2f                putchar
                 0x004539eb                sprintf
@@ -217,25 +218,25 @@ Linker script and memory map
                 0x00455000                . = ALIGN (0x1000)
  *fill*         0x004548e8      0x718 00
 
-.rdata          0x00455000      0xf20
+.rdata          0x00455000      0xec0
  .rdata         0x00455000      0x420 stdlib.o
  .rdata         0x00455420       0x30 stdio.o
  .rdata         0x00455450      0x310 api.o
- .rdata         0x00455760      0x7c0 main.o
+ .rdata         0x00455760      0x760 main.o
 
-.data           0x00455f20       0xe0
-                0x00455f20                data = .
-                0x00455f20                _data = .
-                0x00455f20                __data = .
+.data           0x00455ec0      0x140
+                0x00455ec0                data = .
+                0x00455ec0                _data = .
+                0x00455ec0                __data = .
  *(.data)
- .data          0x00455f20        0x0 crt0.o
- .data          0x00455f20        0x0 main.o
- .data          0x00455f20        0x0 api.o
- .data          0x00455f20        0x0 stdio.o
- .data          0x00455f20       0x10 stdlib.o
- .data          0x00455f30        0x0 string.o
+ .data          0x00455ec0        0x0 crt0.o
+ .data          0x00455ec0        0x0 main.o
+ .data          0x00455ec0        0x0 api.o
+ .data          0x00455ec0        0x0 stdio.o
+ .data          0x00455ec0       0x10 stdlib.o
+ .data          0x00455ed0        0x0 string.o
                 0x00456000                . = ALIGN (0x1000)
- *fill*         0x00455f30       0xd0 00
+ *fill*         0x00455ed0      0x130 00
 
 .bss            0x00456000     0x9ff0
                 0x00456000                bss = .

@@ -417,9 +417,9 @@ noArgs:
 	//General purpose appplication  -  {} Developer version
 	
 	apiBeginPaint();
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," // SHELL.BIN ",     
-                                       10, 10, 200, 200,    
-                                       0, 0, 0 , COLOR_BLACK );	   
+	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",     
+                                       20, 20, 640, 480,    
+                                       0, 0, COLOR_BLACK , COLOR_WINDOW );	   
 	if((void*) hWindow == NULL){	
 		printf("Shell: Window fail");
 		refresh_screen();
@@ -1250,11 +1250,53 @@ int shellInit()
     //      ao processo que chamou a rotina de criação.	
 	//
 	printf("Creating threads...\n");
-	apiCreateThread((unsigned long)&shellThread, 1,"TestShellThread1");
-	apiCreateThread((unsigned long)&shellThread, 1,"TestShellThread2");
-	apiCreateThread((unsigned long)&shellThread, 1,"TestShellThread3");
-	apiCreateThread((unsigned long)&shellThread, 1,"TestShellThread4");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread3");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread4");
 	//...
+	
+	//
+	// Tentando executar um thread.
+	//
+	
+	/*
+	 *******************************
+     //OBS: ISSO FUNCIONOU. ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O TAMANHO DO 
+     //     HEAP USADO PELO PROCESSO PARA ALOCAÇÃO DINÂMICA, ELE NÃO TA DANDO CONTA 
+     //     DE TODA A DEMANDA POR MEMÓRIA.		  
+	
+	//>>dessa vez pegaremos o retorno, que deve ser o ponteiro para a estrutura da thread.
+	//>>chamaremos a systemcall que executa essa thread que temos o ponteiro da estrutura.
+    void* ThreadTest1;	
+	
+	//#bugbug, não temos mais epapo no heap do preocesso para alocar memória 
+	//pois gastamos o heap com a imagem bmp.
+	//
+	unsigned long *threadstack1;
+	threadstack1 = (unsigned long *) malloc(30*1024);
+	threadstack1 = ( threadstack1 + (30*1024) - 4 ); //Ajuste para o início da pilha.
+	ThreadTest1 = (void*) apiCreateThread((unsigned long)&shellThread, (unsigned long) threadstack1,"ThreadTest1");
+	
+	
+	printf("shell: Tentando executar um thread ...\n");
+	refresh_screen();
+	
+	if( (void*) ThreadTest1 == NULL ){
+	    printf("shell: Tentando executar um thread FAIL NULL ...\n");	
+	    refresh_screen();
+		while(1){}
+	}
+	//Lá no kernel isso deve selecionar a thread para execussão colocando ela no estado standby
+	apiStartThread(ThreadTest1);
+	printf("shell: Tentando executar um thread [ok] hang...\n");
+	refresh_screen();
+	
+	while(1){}
+	**************************
+	*/
+	
+	
 	
 	//
 	//@todo: 
@@ -1266,10 +1308,10 @@ int shellInit()
 	//...
 	
 	//Testando bibliotecas.
-	printf("Testing libraries:\n");	
+	//printf("Testing libraries:\n");	
 	
 	//stdio.h
-	printf("Testing stdio:\n");
+	//printf("Testing stdio:\n");
 	//app_clear(0);  //Não fez nada.
     //...
 
@@ -1594,10 +1636,14 @@ setGlobals:
  * shellThread:
  *     Um thread dentro para testes.
  */
-void shellThread(){
-	printf("Shell: This is a thread for test!");
-	refresh_screen();
-	while(1){}
+void shellThread()
+{
+    printf("shellThread: This is a thread for test!\n");
+    refresh_screen();
+	
+    while(1){	
+	    //printf("$");
+    }	
 };
 
 
