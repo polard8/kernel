@@ -32,7 +32,7 @@
 extern unsigned long get_page_fault_adr();
 
 //Protótipo de finção interna.
-void die();
+
 void do_pagefault();
 
 
@@ -168,6 +168,7 @@ void do_pagefault()
 done:	
 	return;
 }
+
 
 /*
  * die:

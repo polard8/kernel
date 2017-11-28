@@ -301,6 +301,8 @@ typedef enum {
 #define GUICOLOR_SCROLLBAR  9 
 #define GUICOLOR_STATUSBAR  10
 #define GUICOLOR_MESSAGEBOX  11
+#define GUICOLOR_SYSTEMFONT_COLOR  12
+#define GUICOLOR_TERMINALFONT_COLOR  13
 //...
 
 
@@ -325,6 +327,8 @@ typedef enum {
 	csiStatusBar,	            //10
 	
 	csiMessageBox,              //11
+	csiSystemFontColor,         //12 BLACK
+	csiTerminalFontColor,       //13 WHITE
 	//...
 	
 	//@todo: Window 'shadow' (black??)

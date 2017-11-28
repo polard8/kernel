@@ -159,6 +159,246 @@ kernel fica com o 1GB superior."
  * As configurações de memória foram feitas pelo Boot Loader.
  * (aqui os endereços lógico e físicos são iguais.)
  */
+
+
+//Quantidade de diretórios que podem ser criados.
+//obs: cada processo cria seu próprio diretório. 
+//@todo: Criar um array de estruturas alocado.
+#define PAGEDIRECTORY_COUNT_MAX 1024  
+
+//Quantidade de page tables criadas...
+//cada diretório pode ter um monte de tabelas.
+//@todo: Criar um array de estruturas alocado.
+#define PAGETABLE_COUNT_MAX 1024 
+
+
+
+//
+// zones support
+//
+
+//memória total em duas partes.
+// 
+
+
+//Zones.
+// ** ESSA ESTRUTURA É A RAIZ DE TODA GERÊNCIA DE MEMÓRIA **
+typedef struct mm_zones_d mm_zones_t;
+struct mm_zones_d
+{
+    struct system_zone_d *system_zone;  //Essa zona é para o sistema.
+    struct window_zone_d *window_zone;  //Essa zona toda é uma user session.
+};
+mm_zones_t *zones;
+
+
+//system zone. <= 256 MB
+typedef struct system_zone_d system_zone_t;
+struct system_zone_d
+{
+    //os sete bancos do sistema.
+    struct bank_d *bank1; //     0          ~ 0x01FFFFFF It's not Music.
+    struct bank_d *bank2; //#E   0x02000000 ~ 0x03FFFFFF
+    struct bank_d *bank3; //#F   0x04000000 ~ 0x05FFFFFF
+    struct bank_d *bank4; //#G   0x06000000 ~ 0x07FFFFFF 
+    struct bank_d *bank5; //#A   0x08000000 ~ 0x09FFFFFF 
+    struct bank_d *bank6; //#B   0x0A000000 ~ 0x0BFFFFFF
+    struct bank_d *bank7; //#C   0x0C000000 ~ 0x0DFFFFFF   
+    struct bank_d *bank8; //#D   0x0E000000 ~ 0x0FFFFFFF  \o/ kernel Heap and Stack
+};
+system_zone_t *systemzone;
+
+
+//window zone. > 256MB
+typedef struct window_zone_d window_zone_t;
+struct window_zone_d
+{
+    struct usession_d *usersession;  // 0x10000000 ~ end .Única user session.
+};
+window_zone_t *windowzone;
+
+
+
+
+// variáveis blobais de endereços usados no gerenciamento de zonas de memória.
+
+#define SYSTEMZONE_START 0
+#define SYSTEMZONE_END   0x0FFFFFFF 
+#define WINDOWZONE_START 0x10000000
+//#define WINDOWZONE_END ??
+
+unsigned long systemzoneStart;
+unsigned long systemzoneEnd;
+unsigned long systemzoneSize;
+unsigned long windowzoneStart;
+unsigned long windowzoneEnd;    //?? Devemos levar em consideração o calculo do tamanho da memória
+unsigned long windowzoneSize;
+//
+// tables support
+//
+
+//PDE - Page Directory Entry
+typedef struct page_directory_entry_d page_directory_entry_t;
+struct page_directory_entry_d
+{
+    unsigned long Present              :1;
+    unsigned long ReadWrite            :1;
+    unsigned long UserSupervisor       :1;
+    unsigned long WriteThrough         :1;
+    unsigned long CacheDisabled        :1;
+    unsigned long Accessed             :1;
+    unsigned long Reserved             :1;
+    unsigned long PageSize             :1;
+    unsigned long GlobalPage           :1;
+    unsigned long Available1           :1;
+    unsigned long Available2           :1;
+    unsigned long Available3           :1;
+    unsigned long PageTableBaseAddress :20;
+};
+
+//PTE - Page Table Entry
+typedef struct page_table_entry_d page_table_entry_t;
+struct page_table_entry_d
+{
+    unsigned long Present         :1;
+    unsigned long ReadWrite       :1;
+    unsigned long UserSupervisor  :1;
+    unsigned long WriteThrough    :1;
+    unsigned long CacheDisabled   :1;
+    unsigned long Accessed        :1;
+    unsigned long Reserved        :1;
+    unsigned long PAT             :1;  // Page Table Attribute Index.
+    unsigned long GlobalPage      :1;
+    unsigned long Available1      :1;
+    unsigned long Available2      :1;
+    unsigned long Available3      :1;
+    unsigned long PageBaseAddress :20;
+};
+
+
+
+
+
+
+
+
+
+
+/*
+ * page_directory_d:
+ *     Estrutura para o 'page directory' de um processo.
+ *
+ *     Todo processo tem seu próprio diretório de páginas.
+ *     Assim vários processos podem usar o mesmo endereço lógico.
+ *     Ex: 0x400000
+ *     @todo: Um ponteiro para essa estrutura pode estar no PCB do processo.
+ *            usar os processos criados por processos para testar a configuração
+ *           de page directory.
+ *     Obs: Um diretório tem ponteiros para page tables. as page tables 
+ * funcionam como pools de frames.
+ */
+typedef struct page_directory_d page_directory_t;
+struct page_directory_d
+{
+	
+	object_type_t objectType;
+	object_class_t objectClass;
+	
+	//identificadores.
+	int id;
+	int used;
+	int magic;
+	
+	//Qual processo é o dono do diretório de páginas.
+	//talvez seja possivel reaproveitar o diretório.
+	struct process_d *process;
+	
+	//Endereço onde ficará o diretório de páginas.
+	//Obs: Para configurar um diretório de páginas talvez
+	//tenha que colocar um endereço físico em CR3. Lembre-se
+	//que o malloc do kernel base aloca memória no heap do 
+	//processo kernel que fica no último giga da memória virtual.
+	unsigned long Address;
+	
+	//@todo: Mais informações sobre o diretório de páginas.
+	
+	//Próximo diretório, significa próximo processo.
+	//significa processos ligados em um job.
+    struct page_directory_d *next;  
+};
+page_directory_t *pagedirectoryKernelProcess;    // KERNEL.
+page_directory_t *pagedirectoryIdleProcess;      // IDLE.
+page_directory_t *pagedirectoryTaskmanProcess;   // TASKMAN.
+page_directory_t *pagedirectoryCurrent;          // Current.
+page_directory_t *pagedirectoryShared;           // Shared. 
+//...
+
+//
+// Lista de diretórios. (Pois cada processo tem um diretório).
+//
+
+//Lista de estruturas para diretórios de páginas.
+unsigned long pagedirectoryList[PAGEDIRECTORY_COUNT_MAX]; 
+
+//Linked list pode ser uma opção.
+//Deve estar em sintonia com o scheduler de threads.
+//page_directory_t *pagedirectoryLinkedListHead;
+
+
+
+/*
+ * page_table_d.
+ *     Page table structure.
+ *     Obs: Uma page table funciona como um pool de frames.
+ *          Também pode ser compartilhada entre processo.(cuidado).
+ */
+typedef struct page_table_d page_table_t;
+struct page_table_d
+{
+	object_type_t objectType;
+	object_class_t objectClass;
+	
+	int id;
+	int used;
+	int magic;
+	
+	//A qual diretório de páginas a page table perrtence.
+	//se bem que talvez possamos usar a mesma pagetable
+	//em mais de um diretório. será??
+	struct page_directory_d *directory;
+	
+	//Cada pagetable pertence à um processo.
+	struct process_d *process;
+	
+	//Travando uma pagetable inteira,
+	//nenhuma de suas páginas poderão se descarregadas
+	//para o disco de swap.
+	int locked;
+	
+    //@todo: Mais informações sobre a pagetable.
+	struct page_table_d *next;
+};
+//page_table_t *pagetableCurrent;
+
+page_table_t *pagetableCurrent;
+//...
+
+//
+// Lista de pagetables.
+//
+
+unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
+
+//Linked List talvez seja uma opção.
+//page_table_t *pagetableLinkedListHead;
+
+
+
+
+
+
+
+
  
  
 /**
@@ -168,10 +408,19 @@ kernel fica com o 1GB superior."
  ** DA ÁREA DE MEMÓRIA FÍSICA DESTINADA AOS FRAMES DE MEMÓRIA 
  ** FÍSICA QUE SERÃO USADOS PELO GERENCIADOR DE PÁGINAS.
  ** pertencerão ao banco FDB. Free Data Base.
+ ** 0x10000000 é um bom lugar pra começar os frames 
+ ** na verdade os blocos 4MB, pois cada bloco de 4MB pode ser mapeado 
+ ** usando apenas uma pagetable.
+ ** 
+ ** mmFramesSuperBlockStart = 0x10000000
+ ** mmFramesSuperBlockEnd   = 0x1FFFFFFF
+ ** 
+ **
+ **
  **/
  
 // Frames Super Block.
-// Variáveis globais parecem ser uma opção melhor que estrutura
+// Variáveis globais parecem ser uma opção melhor de estrutura
 // para esse caso. 
 // Obs: temos listas de frames em algum lugar. criaremos listas aqui
 //para o FSB, que será o nome do gerenciado, para melhorar o controle dessa área.
@@ -183,9 +432,11 @@ unsigned long mmFramesSuperBlockTotalFree;  //Total de frames livres.
 unsigned long mmFramesSuperBlockTotalUsed;  //Total de frames e uso. 
 //Continua...
 
-#define FSB_FRAMES_MAX  (1*1024) //?? @todo: Determinar melhor isso
+// ((0x1FFFFFFF - 0x10000000) / 512)  = QUANTIDADE DE FRAMES NESSA ÁREA.
+#define FSB_FRAMES_MAX      (1*1024) //?? @todo: Determinar melhor isso
 #define FSB_FREEFRAMES_MAX  (1*1024) //?? @todo: Determinar melhor isso
 
+//## BUGBUG isso tornaria esse array bem grande.
 
 //Lista de ponteiros para as estruturas de todos os frames do FSB.
 unsigned long fsbFrames[FSB_FRAMES_MAX]; 
@@ -250,15 +501,6 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
  
 
 
-//Quantidade de diretórios que podem ser criados.
-//obs: cada processo cria seu próprio diretório. 
-//@todo: Criar um array de estruturas alocado.
-#define PAGEDIRECTORY_COUNT_MAX 1024  
-
-//Quantidade de page tables criadas...
-//cada diretório pode ter um monte de tabelas.
-//@todo: Criar um array de estruturas alocado.
-#define PAGETABLE_COUNT_MAX 1024 
 
 //Quantidade máxima de pageframes.
 //@todo: #bugbug. isso tá errado. Essa é a quantidade de pageframes
@@ -593,116 +835,6 @@ struct free_mmblock_d
 
 
 
-/*
- * page_directory_d:
- *     Estrutura para o 'page directory' de um processo.
- *
- *     Todo processo tem seu próprio diretório de páginas.
- *     Assim vários processos podem usar o mesmo endereço lógico.
- *     Ex: 0x400000
- *     @todo: Um ponteiro para essa estrutura pode estar no PCB do processo.
- *            usar os processos criados por processos para testar a configuração
- *           de page directory.
- *     Obs: Um diretório tem ponteiros para page tables. as page tables 
- * funcionam como pools de frames.
- */
-typedef struct page_directory_d page_directory_t;
-struct page_directory_d
-{
-	
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	//identificadores.
-	int id;
-	int used;
-	int magic;
-	
-	//Qual processo é o dono do diretório de páginas.
-	//talvez seja possivel reaproveitar o diretório.
-	struct process_d *process;
-	
-	//Endereço onde ficará o diretório de páginas.
-	//Obs: Para configurar um diretório de páginas talvez
-	//tenha que colocar um endereço físico em CR3. Lembre-se
-	//que o malloc do kernel base aloca memória no heap do 
-	//processo kernel que fica no último giga da memória virtual.
-	unsigned long Address;
-	
-	//@todo: Mais informações sobre o diretório de páginas.
-	
-	//Próximo diretório, significa próximo processo.
-	//significa processos ligados em um job.
-    struct page_directory_d *next;  
-};
-page_directory_t *pagedirectoryKernelProcess;    // KERNEL.
-page_directory_t *pagedirectoryIdleProcess;      // IDLE.
-page_directory_t *pagedirectoryTaskmanProcess;   // TASKMAN.
-page_directory_t *pagedirectoryCurrent;          // Current.
-page_directory_t *pagedirectoryShared;           // Shared. 
-//...
-
-//
-// Lista de diretórios. (Pois cada processo tem um diretório).
-//
-
-//Lista de estruturas para diretórios de páginas.
-unsigned long pagedirectoryList[PAGEDIRECTORY_COUNT_MAX]; 
-
-//Linked list pode ser uma opção.
-//Deve estar em sintonia com o scheduler de threads.
-//page_directory_t *pagedirectoryLinkedListHead;
-
-
-
-/*
- * page_table_d.
- *     Page table structure.
- *     Obs: Uma page table funciona como um pool de frames.
- *          Também pode ser compartilhada entre processo.(cuidado).
- */
-typedef struct page_table_d page_table_t;
-struct page_table_d
-{
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	int id;
-	int used;
-	int magic;
-	
-	//A qual diretório de páginas a page table perrtence.
-	//se bem que talvez possamos usar a mesma pagetable
-	//em mais de um diretório. será??
-	struct page_directory_d *directory;
-	
-	//Cada pagetable pertence à um processo.
-	struct process_d *process;
-	
-	//Travando uma pagetable inteira,
-	//nenhuma de suas páginas poderão se descarregadas
-	//para o disco de swap.
-	int locked;
-	
-    //@todo: Mais informações sobre a pagetable.
-	struct page_table_d *next;
-};
-//page_table_t *pagetableCurrent;
-
-page_table_t *pagetableCurrent;
-//...
-
-//
-// Lista de pagetables.
-//
-
-unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
-
-//Linked List talvez seja uma opção.
-//page_table_t *pagetableLinkedListHead;
-
-
-
 //
 // ********  GERENCIAMENTO DE MEMÓRIA FÍSICA **************
 //
@@ -975,7 +1107,10 @@ void *CreatePageTable( unsigned long directory_address,
 void show_memory_structs();
 
 
-// garbage collection
+//
+// garbage collection support
+//
+
 int gc();
 int gcGRAMADO();
 int gcEXECUTIVE();

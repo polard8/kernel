@@ -675,6 +675,14 @@ headHalt:
 	jmp headHalt
 	
 	
+;;
+;; Essa rotina pode ser exportada para finalizações seguras.
+;;	
+global __die
+__die:
+    hlt
+    jmp __die	
+	
 	;
 	; ***
 	;

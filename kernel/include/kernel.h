@@ -912,7 +912,7 @@ void sleep(unsigned long ms);
 void faults(unsigned long number); 
 void abort(); 
 void shutdown();   
- 
+void die();      //* erro fatal 
 
 /*
  * ke - Kernel External.

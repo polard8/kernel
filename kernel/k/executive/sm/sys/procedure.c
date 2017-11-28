@@ -423,9 +423,20 @@ unsigned long system_procedure( struct window_d *window,
 		 
         //Continua ... Create ... Close ...		
     
+	
+	    //
+		// Aqui provavelmente estamos com teclas de digita~çao.
+		// então não precisamos efetuar o refresh_screen() deixando isso 
+		// para o procedimento de janela do aplicativo
+		//
+		
 	    //Nothing.
-	    default:    break;
+	    default:    
+		    return (unsigned long) 0;
+			break;
 	};
+	
+	
     //Done.
 done:
 	if(VideoBlock.useGui == 1){

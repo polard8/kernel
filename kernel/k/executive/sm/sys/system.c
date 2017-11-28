@@ -2133,7 +2133,7 @@ void systemReboot()
 			     				        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
 
 	    if( (void*) hWindow == NULL){
-	        printf("show_window_list:\n");
+	        printf("systemReboot:\n");
 		    return;
         }else{
 		    RegisterWindow(hWindow);
@@ -2235,13 +2235,13 @@ void systemReboot()
 	    //
 
 	    sleep(8000);
-	    printf("Killing Processes..\n");
+	    printf("Terminating processes..\n");
 
 	
 	    //Começa do 1 para não fechar o kernel.
 	    i = 1;
 	
-	    while( i < PROCESS_COUNT_MAX)
+	    while(i < PROCESS_COUNT_MAX)
 	    {
             //Pega da lista.
 		    P = (void *) processList[i];

@@ -515,7 +515,7 @@ void gui_create_mainwindow()
 	//A janela principal perence ao desktop
 	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Area de Trabalho", 
 	                                (Width/2), Top, (Width/2), Height,           //meia tela como teste
-							        gui->screen, 0, 0, COLOR_PINK ); 
+							        gui->screen, 0, 0, COLOR_PINK );         //COR TESTE
 	if( (void*) hWindow == NULL){
 	    printf("gui_create_mainwindow:");
 	    refresh_screen();
@@ -940,7 +940,6 @@ done:
 };
 
 
-
 //screen
 //métrica do dispositivo.
 void *guiGetScreenWindow()
@@ -950,6 +949,7 @@ void *guiGetScreenWindow()
 	}
 	return (void*) gui->screen;
 };
+
 
 //developer screen
 void *guiGetDeveloperScreenWindow()

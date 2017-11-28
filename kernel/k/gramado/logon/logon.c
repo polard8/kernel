@@ -169,10 +169,12 @@ draw_logon_stuffs:
 	//Screen, Background and Logo. 
 	if(gui->screenStatus == 1){ 
 	    logon_create_screen(); 
-	};	
+	};
+	
 	if(gui->backgroundStatus == 1){	
 	    logon_create_background(); 
 	};	
+	
 	if(gui->logoStatus == 1){ 
 	    logon_create_logo(); 
 	};	
@@ -188,6 +190,8 @@ draw_logon_stuffs:
 	    logon_create_messagebox(); 
 	};
 
+
+	
 	//Main window, Navigation bar and grid.    
 	if(gui->mainStatus == 1){ 
 	    logon_create_mainwindow(); 
@@ -266,8 +270,10 @@ draw_logon_stuffs:
     //StatusBar( gui->screen, "StatusBar: ", "Press F1 to Log on as default user!");
 
 
-
-	
+	//Debug:
+	//printf("#debug LOGON");				   
+	//refresh_screen();
+	//while(1){}	
 	
 	//
 	// Depois de criado todos os elementos gráficos, vamos criar em definitivo
@@ -344,8 +350,8 @@ int grid             // Grid da janela principal.
 	gui->refresh = refresh; 
 	gui->screenStatus = screen;
 	gui->backgroundStatus = background; 
-	gui->logoStatus = logo;
-	gui->mainStatus = main; 	
+	gui->mainStatus = main; 
+	gui->logoStatus = logo;	
 	gui->taskbarStatus = taskbar;
 	gui->menuStatus = menu;
 	gui->infoboxStatus = infobox;
@@ -369,19 +375,15 @@ done:
  */
 void logon_create_screen()
 {
-    //
-	// @todo: Os parâmetros passados com as dimensões foram
-	//        passados pelo boot loader e estão disponíveis.
-	//
+	struct window_d *hWindow; 
 	
 	unsigned long Left = 0;
 	unsigned long Top = 0;
-	unsigned long Width = 800;    //@todo: usar variável global com esse valor.
-	unsigned long Height = 600;   //@todo: usar variável global com esse valor.
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();
 	
-    struct window_d *hWindow; 	
-	
-	// Screen - Não tem parent window.
+	// Screen
+	// Obs: Não tem 'parent window' !!!
 	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Screen", 
 	                                Left, Top, Width, Height, 
 							        NULL, 0, 0, COLOR_BLACK );  
@@ -418,7 +420,12 @@ done:
  */
 void logon_create_background()
 { 
-    struct window_d *hWindow; 
+    struct window_d *hWindow;
+
+	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
+	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();	
 
 	//Debug:
 	//printf("logon_create_background createwindow\n");				   
@@ -426,7 +433,7 @@ void logon_create_background()
 
 	//O background pertence ao desktop0.
 	hWindow = (void*) CreateWindow( 1, 0, 0, "Background", 
-	                                0, 0, 800, 600, 
+	                                Left, Top, Width, Height, 
 							        gui->screen, 0, 0, COLOR_BACKGROUND );
 													
 	if( (void*) hWindow == NULL){
@@ -456,43 +463,24 @@ done:
 
 
 /*
- * logon_create_logo:
- *     Cria a janela para o logo da area de trabalho.
- *     o logo da area de trabalho é a magem da area de trabalho.
- *
- *     Obs: Sem logo por enquanto.
- */
-void logon_create_logo()
-{ 
-    return; //Cancelada! 
-};
-
-
-/*
- * logon_create_taskbar:
- *     Obs: Não há tarefas durante o ambiente de logon.
- *          Não precisa de barra de tarefas.
- */
-void logon_create_taskbar()
-{ 
-    return; //Cancelada!.
-};
-
-
-/*
  * logon_create_mainwindow:
  *      A área de trabalho.
  *      *Importante: É a área disponível na tela para o aplicativo. 
  */
 void logon_create_mainwindow()
-{    	
-	//Dimensões:
-	unsigned long Left = 0;
-	unsigned long Top = 0;
-	unsigned long Width = 800;    //@todo: usar variável global com esse valor.
-	unsigned long Height = 600;   //@todo: usar variável global com esse valor.	
-
+{  
     struct window_d *hWindow; 
+	 
+	//Dimensões:
+	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
+	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();
+
+ 
+	if( (void*) gui == NULL ){
+        return;
+    }; 
 	
 	//
 	// A janela principal pertence ao desktop.
@@ -507,8 +495,8 @@ void logon_create_mainwindow()
 	//
 	
 	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Area de Trabalho", 
-	                                Left, Top, Width, (Height-32), 
-							        gui->screen, 0, 0, COLOR_WINDOW ); 
+	                                (Width/2), Top, (Width/2), Height,           //meia tela como teste
+							         gui->screen, 0, 0, COLOR_BROWN );           //COR TESTE
 	if( (void*) hWindow == NULL){
 	    printf("logon_create_mainwindow:");
 	    refresh_screen();
@@ -564,14 +552,35 @@ done:
 
 
 /*
+ * logon_create_logo:
+ *     Cria a janela para o logo da area de trabalho.
+ *     o logo da area de trabalho é a magem da area de trabalho.
+ *
+ *     Obs: Sem logo por enquanto.
+ */
+void logon_create_logo(){ 
+    return; //Cancelada! 
+};
+
+
+/*
+ * logon_create_taskbar:
+ *     Obs: Não há tarefas durante o ambiente de logon.
+ *          Não precisa de barra de tarefas.
+ */
+void logon_create_taskbar(){ 
+    return; //Cancelada!.
+};
+
+
+/*
  * logon_create_controlmenu:
  *     Inicializar a estrutura do System menu, 
  *     para ser usado durante o ambiente de logon.
  *     
  *
  */
-void logon_create_controlmenu()
-{ 
+void logon_create_controlmenu(){ 
     return; 
 };
 
@@ -583,8 +592,7 @@ void logon_create_controlmenu()
  * como novos dispositivos encontrados.
  *     Inicalizar uma estrutura light de infobox.
  */
-void logon_create_infobox()
-{
+void logon_create_infobox(){
    //@todo: trocar isso por message window, aquela janela amarela de mensagens.
     return; //Nothing for now.
 };
@@ -595,8 +603,7 @@ void logon_create_infobox()
  *     @todo: Inicializa o message box a ser usado no ambiente de logon.
  *            Light message box. 
  */
-void logon_create_messagebox()
-{ 
+void logon_create_messagebox(){ 
     return; 
 };
 
@@ -606,8 +613,7 @@ void logon_create_messagebox()
  *     Pequeno debug de estruturas e parâmetros e logon.
  * 
  */
-void logon_create_debug()
-{ 
+void logon_create_debug(){ 
     return; //Nothing for now.
 };
 
@@ -626,11 +632,20 @@ void logon_create_debug()
  */
 void logon_create_navigationbar()
 {
-    struct window_d *hWindow;  
+    struct window_d *hWindow; 
+
+	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
+	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();
+
+	if( (void*) gui == NULL ){
+        return;
+    };		
 	
 	//A navigation bar pertence a janela principal.
 	hWindow = (void*) CreateWindow( 1, 0, 0, "NavigationBar", 
-	                                0, 0, 800, 24, 
+	                                 Left, Height-(8*5), Width, (8*5), 
 									gui->screen, 0, 0, COLOR_BLACK); 
 	if( (void*) hWindow == NULL)
 	{
@@ -688,8 +703,7 @@ done:
  * logon_create_grid:
  *     O Kernel não cria grid em logon.
  */
-void logon_create_grid()
-{ 
+void logon_create_grid(){ 
 	return; //Cancelada!
 };
 
@@ -705,7 +719,9 @@ void logon_create_grid()
  */
 void logon_create_developer_screen()
 {
-    //
+    struct window_d *hWindow; 
+	
+	//
 	// @todo: Os parâmetros passados com as dimensões foram
 	//        passados pelo boot loader e estão disponíveis.
 	//
@@ -716,12 +732,13 @@ void logon_create_developer_screen()
 	//Então ela deve ser estreita e do lado esquerdo... 
 	//Deve ter uma cor distinta... naõ pode preto, azul, nem verde, nem rosa...
 	//Será laranjada.
-	unsigned long Left   = 2;
-	unsigned long Top    = 2;
-	unsigned long Width  = 320;    //@todo: usar variável global com esse valor.
-	unsigned long Height = 480;    //@todo: usar variável global com esse valor.
+	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
+	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();
 	
-    struct window_d *hWindow; 	
+    
+    Width = (Width/2);	
 	
 	//
 	//
@@ -801,6 +818,7 @@ done:
 	
     return; 
 };
+
 
 /*
  * LogonProcedure:

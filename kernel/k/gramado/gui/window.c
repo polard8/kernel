@@ -372,18 +372,20 @@ void windowSetUpColorScheme(int type)
 		
 		humility->name = "Humility";
 		
-		humility->elements[csiNull] = 0;
-        humility->elements[csiDesktop] = COLOR_BACKGROUND;		
-		humility->elements[csiWindow]  = COLOR_WINDOW;
-        humility->elements[csiWindowBackground] = xCOLOR_GRAY1;		
-		humility->elements[csiActiveWindowBorder] = xCOLOR_GRAY2;
-        humility->elements[csiInactiveWindowBorder] = xCOLOR_GRAY3;		
-		humility->elements[csiActiveWindowTitleBar] = xCOLOR_GRAY2;
-        humility->elements[csiInactiveWindowTitleBar] = xCOLOR_GRAY3;		
-		humility->elements[csiMenuBar] = COLOR_MENUBAR;
-        humility->elements[csiScrollBar] = xCOLOR_GRAY3;		
-		humility->elements[csiStatusBar] = COLOR_STATUSBAR;
-        humility->elements[csiMessageBox] = xCOLOR_GRAY2;		
+		humility->elements[csiNull] = 0;                               //0
+        humility->elements[csiDesktop] = COLOR_BACKGROUND;             //1		
+		humility->elements[csiWindow]  = COLOR_WINDOW;                 //2
+        humility->elements[csiWindowBackground] = xCOLOR_GRAY1;	       //3	
+		humility->elements[csiActiveWindowBorder] = xCOLOR_GRAY2;      //4
+        humility->elements[csiInactiveWindowBorder] = xCOLOR_GRAY3;    //5		
+		humility->elements[csiActiveWindowTitleBar] = xCOLOR_GRAY2;    //6
+        humility->elements[csiInactiveWindowTitleBar] = xCOLOR_GRAY3;  //7	 	
+		humility->elements[csiMenuBar] = COLOR_MENUBAR;                //8
+        humility->elements[csiScrollBar] = xCOLOR_GRAY3;		       //9  
+		humility->elements[csiStatusBar] = COLOR_STATUSBAR;            //10
+        humility->elements[csiMessageBox] = xCOLOR_GRAY2;		       //11
+		humility->elements[csiSystemFontColor] =   COLOR_BLACK;		   //12
+		humility->elements[csiTerminalFontColor] = COLOR_WHITE;	       //13
 		//...
 		
 		//Sanvando na estrutura padrão para o esquema humility.
@@ -416,7 +418,7 @@ void windowSetUpColorScheme(int type)
 		pride->elements[csiNull] = 0;
         pride->elements[csiDesktop] = COLOR_BACKGROUND; //0x00808000 verde escuro.
 		pride->elements[csiWindow] = COLOR_WINDOW;
-        pride->elements[csiWindowBackground] = COLOR_WINDOW;	//COLOR_WINDOW	
+        pride->elements[csiWindowBackground] = xCOLOR_GRAY1;
 		pride->elements[csiActiveWindowBorder] =  0x80FFFF00;
         pride->elements[csiInactiveWindowBorder] = 0x80FFFF00;    //  (LIGHT GREEN) 
 		pride->elements[csiActiveWindowTitleBar] = 0x80FFFF00;    //  (LIGHT GREEN)
@@ -424,7 +426,9 @@ void windowSetUpColorScheme(int type)
 		pride->elements[csiMenuBar] = COLOR_GRAY;
         pride->elements[csiScrollBar] = COLOR_GRAY;		
 		pride->elements[csiStatusBar] = 0x40404000;  //COLOR_STATUSBAR;  //#404040 cinza #FFFFFF branco
-        pride->elements[csiMessageBox] = COLOR_GRAY;		
+        pride->elements[csiMessageBox] = COLOR_GRAY;
+		pride->elements[csiSystemFontColor] =   COLOR_BLACK;		   //12
+		pride->elements[csiTerminalFontColor] = COLOR_WHITE;	       //13		
 		//...
 		
 		//Sanvando na estrutura padrão para o esquema pride.

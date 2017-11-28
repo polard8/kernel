@@ -417,7 +417,8 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//saveLeft = window->left;
 		//saveTop  = window->top;
 		
-		window->color_bg = (unsigned long) color; 
+		window->color_bg            = (unsigned long) color; 
+		window->clientrect_color_bg = (unsigned long) clientcolor;
 		
 		//O retângulo da janela.
 		//window->rcWindow = NULL;
@@ -578,56 +579,55 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//0) Null.
 		case WT_NULL:
 		    return NULL;  //Ainda não implementada.
-		break;
+		    break;
 		
 		//    **** WINDOW ****
 		// A window is an undecorated Frame.
 		//1) Simple rect, (Sem barra de títulos).
+		//Obs: para o tipo 1 é fundamental considerar a cor passada por argumento.
 		case WT_SIMPLE:
 	        Background = 1;    //bg.
 	        window->backgroundUsed = 1;
-		break;
+		    break;
 
 		//
 		//2) Edit box, (Simples + borda preta).
 		case WT_EDITBOX:
-	    Shadow = 1;        //sombra.
-	    Background = 1;    //bg.
-		window->shadowUsed = 1;
-		window->backgroundUsed = 1;	
-		break;
+	        Shadow = 1;        //sombra.
+	        Background = 1;    //bg.
+		    //ClientArea = 1;
+		    window->shadowUsed = 1;
+		    window->backgroundUsed = 1;	
+		    break;
 
 		//   **** FRAME ****
 		//3) Overlapped, (completa, para aplicativos).
 		case WT_OVERLAPPED:
-	    Shadow = 1;        //Sombra.
-	    Background = 1;    //bg.
-	    TitleBar = 1;      //Título + Borda.
-		MinimizeButton = 1;  //Botão para minimizar
-		CloseButton = 1;     //Botão para fechar. 
-		//MenuBar       = 1;  //Barra de menu. 
-	    ButtonSysMenu = 1;    //System menu button. ??
-		ClientArea = 1;
-		
-		window->shadowUsed = 1;
-		window->backgroundUsed = 1;
-		window->titlebarUsed = 1;
-		window->clientAreaUsed = 1;
-		
-		//@todo:
-		//Se for do tipo overlapped pode ser ou não a janela ativa.
-		//set_active_window(window);
-		break;
+	        Shadow = 1;        //Sombra.
+	        Background = 1;    //bg.
+	        TitleBar = 1;      //Título + Borda.
+		    ClientArea = 1;
+			MinimizeButton = 1;  //Botão para minimizar
+		    CloseButton = 1;     //Botão para fechar. 
+		    //MenuBar       = 1;  //Barra de menu. 
+	        ButtonSysMenu = 1;    //System menu button. ??
+		    window->shadowUsed = 1;
+		    window->backgroundUsed = 1;
+		    window->titlebarUsed = 1;
+		    window->clientAreaUsed = 1;
+		    //@todo:
+		    //Se for do tipo overlapped pode ser ou não a janela ativa.
+		    //set_active_window(window);
+		    break;
 
 		//4) Popup (um tipo de overlapped mais simples).
 		case WT_POPUP:
-	    Shadow = 1;        //sombra.
-	    Background = 1;    //bg.
-		window->shadowUsed = 1;
-		window->backgroundUsed = 1;		
-		
-	    //if(titulo){} TitleBar = 1;    //titulo + borda	
-		break;
+	        Shadow = 1;        //sombra.
+	        Background = 1;    //bg.
+		    window->shadowUsed = 1;
+		    window->backgroundUsed = 1;		
+		    //if(titulo){} TitleBar = 1;    //titulo + borda	
+		    break;
 
 		//editbox,
 		//barra de rolagem
@@ -803,13 +803,22 @@ drawBegin:
 	
 	//Background.
 	if(Background == 1)
-	{
-	    //if( (unsigned long) type == WT_SIMPLE){
-		//    window->color_bg = color;
-		//};
-		
-		//Validando o argumento para todos os tipos de janelas.
+	{		
+		//Primeiro configurando a cor padrão para todos os tipos de janelas.
+		//Depois definimos para tipos específicos.
 		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; //xCOLOR_GRAY2;  //CINZA UM POUQUINHO MAIS CLARO.
+
+        //
+		//#bugbug: Estamos usando a cor padrão do tema para background,
+		// mas para o tipo 1 é fundamental que se use no background a cor 
+		// passada por argumento.
+		//
+	    
+		//Cor do background para o tipo 1.
+		if( (unsigned long) type == WT_SIMPLE){ window->color_bg = color; }
+		if( (unsigned long) type == WT_POPUP){ window->color_bg = color; }
+		//if( (unsigned long) type == WT_SIMPLE){ window->color_bg = color; }
+		
 		
 		//@todo: Se tiver barra de rolagem a largura do backgrond deve ser maior.
 		//if()
@@ -825,17 +834,15 @@ drawBegin:
     //Título + borda.	
 	if(TitleBar == 1)
 	{ 
-		//Focus.
-		//Cores diferenste se tiver foco e se não tiver.
-		if(window->id == window_with_focus)
-		{
+		window->color_bg = color;  //*Cor enviada por argumento.
+		
+		//@todo: Precisamos definir a questão o foco.
+		// ?? Quando uma jamela é criada, ela é criada com o foco ou não??
+		//Se a janela estiver com o foco de entrada.
+		//if(window->id == window_with_focus){
 			//esquema de cor. No caso de inativa.
-		    window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
-		}else{
-			//*Cor enviada por argumento.
-		    window->color_bg = color;
-			//window->color_bg = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
-		};
+		//    window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
+		//}
 		
 		//@todo: String color.
 		
@@ -935,7 +942,9 @@ drawBegin:
 		if( (void*) clientRect == NULL )
 		{
 			//free(clientRect);
-		    window->rcClient = NULL;	
+		    window->rcClient = NULL;
+            //O que acontece nesse caso?? ficamos sem área de cliente ??
+			
 		}else{
 			
 			//@todo: Criar função rectSetup(....)
@@ -961,7 +970,7 @@ drawBegin:
 			window->rcClient->used = 1;
 			window->rcClient->magic = 1234;
 			
-			window->rcClient->window = (void*) window; //pertence à que janela.
+			window->rcClient->window = (void*) window; //o retângulo pertence à essa janela.
 			
 			
 			//Esse é o posicionamento e as dimensões da janela propriamente dita.
@@ -987,11 +996,7 @@ drawBegin:
 		    //
 			// * ESSA COR FOI PASSADA VIA ARGUMENTO.
 			//
-			window->rcClient->color_bg = clientcolor;
-			
-			//@todo: isso deveria ir para a estrutura de retãngulo usada pela área de cliente.
-			//Obs: não precisamos mais disso. deletar.
-	        window->clientrect_color_bg = clientcolor;
+			window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
 			
 			//window->rcClient->color_bg;  //esse é o certo
             drawDataRectangle( (unsigned long) window->rcClient->left, 

@@ -340,10 +340,12 @@ void *services( unsigned long number,
 			    break;	
 			};
 			
-			my_buffer_char_blt( (unsigned long) (arg2 + focusWnd->left), //x.
-			                    (unsigned long) (arg3 + focusWnd->top),  //y.
-								COLOR_BLACK,                             //color. 
-								(unsigned long) arg4);                   //char.
+			//Supondo que os aplicativos escreverão mais em terminal por enquanto 
+			//a cor padrão de fonte será a cor de terminal.
+			my_buffer_char_blt( (unsigned long) (arg2 + focusWnd->left),             //x.
+			                    (unsigned long) (arg3 + focusWnd->top),              //y.
+								CurrentColorScheme->elements[csiTerminalFontColor],  //color. 
+								(unsigned long) arg4);                               //char.
 								
 			break;
 
@@ -371,7 +373,7 @@ void *services( unsigned long number,
 		//Função principal na criação de janelas via systemcall
         case SYS_BUFFER_CREATEWINDOW: 
 			cwArg1 = arg2;               //arg2 Type. 
-            cwArg3 = arg3;               //view
+            cwArg3 = arg3;               //arg3 view
 			cwArg4 = (char *) a4;        //arg4 Window name.
 			goto do_create_window;
             break;
@@ -427,9 +429,10 @@ void *services( unsigned long number,
         //47, Create Window support.		
         //envia argumentos de controle.
 		case SYS_BUFFER_CREATEWINDOWx:
-		    cwFlag = 1234;      //Aciona a flag.
-            cwArg2  = arg2;     //WindowStatus 
-			//@todo: Temos disponíveis ainda os argumentos 3 e 4.
+		    cwFlag  = 1234;  //Aciona a flag.
+            cwArg2  = arg2;  //WindowStatus 
+			cwArg11 = arg3;  //cor da area de cliente.
+			cwArg12 = arg4;  //cor da janela.
 			return NULL;
 			break;
 		
@@ -438,7 +441,7 @@ void *services( unsigned long number,
 		case SYS_BUFFER_CREATEWINDOW1:
 		    cwArg5  = arg2;  //x
 			cwArg6  = arg3;  //y
-			cwArg9  = gui->screen;  //arg4;  //Parent window(simulando)    
+			cwArg9  = gui->screen;  //@todo: O argumento arg4 está enviando parent window.    
 			return NULL;
 			break;
 		
@@ -653,15 +656,15 @@ void *services( unsigned long number,
 
 		    //#debug
 		    //select
-   		    printf("services:94 select\n");
-			refresh_screen();
+   		    //printf("services:94 select\n");
+			//refresh_screen();
 		    t = (struct thread_d*) arg2;
             SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
 		    
 			//#debug
 			//spawn
-			printf("services:94 spawn\n");
-			refresh_screen();
+			//printf("services:94 spawn\n");
+			//refresh_screen();
 			current_thread = t->tid;
 			KiSpawnTask(current_thread); 
 			
@@ -852,6 +855,12 @@ void *services( unsigned long number,
 	//Debug.
 	//printf("SystemService={%d}\n",number);
     
+	
+	//
+	// * importante:
+	//   Depois de esgotados os 'cases', saltamos para a saída da função.
+	//
+	
 	goto done;	
 
 
@@ -866,14 +875,9 @@ void *services( unsigned long number,
 // estamos na rotina de serviços que o kernel oferece via API.
 // Qual será a estratégia para conseguirmos os argumentos.
 // >> Quando um aplicativo em user mode chamar CreateWindow, 
-// a rotina da API deve fazer duas system calls, aprimeira passando 
-// os argumentos e a segunda criando a janela.
-// Quando enviar os argumentos aciona-se ativa-se uma flag,
-// quando criar a janela, desativa a flag,
-//*importante: Lembrando que para um aplicativo criar uma janela
-// ele deve entrar em sua sessão crítica. Talvez um lock possa ser criado 
-// exclusivamente para a função CreateWindow, então o programado não precisa 
-// acionar o lock, apenas chamar a função.
+// a rotina da API deve fazer 4 system calls, as 3 primeiras passando 
+// os argumentos e a última criando a janela.
+// >> do_create_window: é acionada depois de passados todos os argumentos. 
 // 
 //	
 	
@@ -884,43 +888,7 @@ void *services( unsigned long number,
 
 do_create_window:	
 	
-	//
-	// A primeira coisa a fazer é checar se solicitaram a criação de um tipo 
-    // válido de janela.
-    //
-	// Obs: Ainda não conseguimos receber todos os argumentos que essa rotina 
-    // exige. Uma opção é que várias chamadas sejam feitas, até que tenhamos 
-    // todos os argumentos.
-    //
-	// O argumento 'tipo' é fundamental. Pois com o tipo, podemos oferecer 
-	// alguns parâmetros padronizados, característicos do tipo em questão.
-    //
-	
-	//
-	// Uma solução elegante é a criação de uma classe de janela.
-    //
-	// steps:
-    // =====
-    //
-	// (*1) - Chamada avisando sobre o início de uma sequência de chamadas de 
-    //        rotinas de pintura. Efetuando algum travamento.
-    //  
-	//  *2  - Envio de argumentos que preencherão a estrutura de classe atual 
-	//        e temporária, destinada ao suporte a criação de janelas.
-    //
-	//  *3  - Chamada da rotina de criação da janela com envio de alguns 
-    //        argumentos. (Nesse momento a rotina de criação da janela deve 
-    //        considerar os elementos padrões característicos do tipo 
-    //        solicitado, deve considerar os argumentos enviados e a estrutura 
-    //        de classe antes preechida pela chamada anterior.
-    //
-	// (*4) - Por último, uma chamada avisa sobre o fim das chamadas de rotinas de 
-	//        pintura. Efetuando algum destravamento.
-    //
-	// A IDEIA É QUE UM PROCESSO NÃO SEJA INTERROMPIDO ENQUANTO ESTÁ EFETUANDO
-	// SUAS ROTINAS DE PINTURA E QUE ÁREAS DE MEMÓRIA COMPARTILHADA TENHA O
-    // O USO COORDENADO NA HORA DAS ROTINAS DE PINTURA.
-	//
+
 	
 	//?? @TODO
 	//if(WindowType >= 0 || WindowType <= 5){
@@ -939,17 +907,7 @@ do_create_window:
     // retângula na estrututra gui->.
     //      ...
     //
-	
-	//
-	// @todo: 
-    // Opção: A chamada deve receber, por argumento, um ponteiro para um pacote
-	//        de informações sobre a janela, contendo sua classe e outros elementos.
-	//        Esse array ou estrutura contendo informações sobre a janela 
-	// a ser construída pode ser preenchido aos poucos, atravéz de diversas chamadas.
-	// Por fim, será uma estrutura de dados com bastante informações e só poderá 
-	// ser usada depois que uma flag sinalizar que temos informações suficientes.  
-	//
-	
+ 
 	
 
 
@@ -977,35 +935,16 @@ do_create_window:
 	// Não há problema nisso por enquanto.
 	//
 	
+	//
+	// *Podemos aceitar as opções de cores passadas por argumento.
+	//  principalmente a cor da área de cliente.
+	//
+	
+	//*Importante
+	//definimos as cores psdrão caso a flag esteja desligada.
 	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
 	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
 
-	
-	
-	//
-	// *Teste:
-	//     Simulando a passagem de argumentos e ativação da flag.
-	//
-
-	/*
-	cwFlag = 1234;
-
-    cwArg1 = 3;
-	cwArg2 = 0;
-	cwArg3 = 0;
-	cwArg4 = "#Janela de teste";
-	
-	cwArg5 = 10;
-	cwArg6 = 10;
-	cwArg7 = 400;
-	cwArg8 = 400;
-	
-	cwArg9  = gui->screen;
-	cwArg10 = desktopID;
-	cwArg11 = COLOR_RED;
-	cwArg12 = COLOR_BROWN;
-	*/
-	
 	//
 	// * Primeira coisa a fazer é ver se os argumentos estão disponíveis.
 	//   Vamos conferir a flag que indica que argumentos foram enviados 
@@ -1014,12 +953,7 @@ do_create_window:
 	
 	//se a flag tiver acionada, os argumentos usarão os valores 
 	//que foram previamente passados
-	if ( cwFlag == 1234 )
-	{ 
-	    //Simulando 2 argumentos faltantes.
-		cwArg11 = WindowColor;   //isso deve obedecer o color scheme
-	    cwArg12 = WindowClientAreaColor; //isso deve obedecer o color scheme
-		
+	if(cwFlag == 1234){		
         WindowType    = cwArg1; 
 		WindowStatus  = cwArg2; 
 		WindowView    = cwArg3; 
@@ -1030,9 +964,9 @@ do_create_window:
         WindowHeight  = cwArg8;									  
 		//gui->screen  = cwArg9; 
 		//desktopID = cwArg10; 
-		WindowClientAreaColor = cwArg11; 
-		WindowColor = cwArg12; 
-	}	
+		WindowClientAreaColor = (unsigned long) cwArg11;  //Obs: A cor da área de cliente será escolhida pelo app.   
+		WindowColor = (unsigned long) cwArg12;            //a cor da janela escolhida pelo app. 
+	};	
 	
 
     //
@@ -1048,7 +982,7 @@ do_create_window:
 	//com um endereço da área de memória do app.
     NewWindow = (void*) CreateWindow( WindowType, WindowStatus, WindowView, WindowName, 
 	                                  WindowX, WindowY, WindowWidth, WindowHeight,									  
-								      gui->screen, desktopID, WindowClientAreaColor, WindowColor);
+								      gui->screen, desktopID, (unsigned long) WindowClientAreaColor, (unsigned long) WindowColor);
 
 	
 	

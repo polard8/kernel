@@ -1159,7 +1159,7 @@ void exit_process(int pid, int code)
 	};
 	
 	//Debug:
-	printf("exit_process: Terminando o processo %d.\n",pid);
+	printf("exit_process: Terminating process %d.\n",pid);
 	refresh_screen();
 	
 	
@@ -1188,7 +1188,7 @@ void exit_process(int pid, int code)
 		
 
 	//Debug:
-	printf("exit_process: Terminando lista de threads\n");
+	printf("exit_process: Terminating threads..\n");
 	refresh_screen();
 		
 

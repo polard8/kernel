@@ -93,6 +93,10 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 	struct window_d *hWnd;    //Window.
 	struct window_d *pWnd;    //Parent.
 	struct window_d *bWnd;    //Button.
+	
+	unsigned long WindowClientAreaColor;
+	unsigned long WindowColor;
+	
 
 	
 	//No GUI.
@@ -134,11 +138,9 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 	
 	// Configurando as cores usadas no message box.
 	
-	unsigned long WindowColor;
-	unsigned long WindowClientAreaColor;
-	
-	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
 	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  	
+	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
+	
 	
 	
 	int desktopID; 

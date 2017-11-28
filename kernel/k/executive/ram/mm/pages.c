@@ -123,6 +123,7 @@ extern void set_page_dir();
 //...
 
 
+
 //
 // Obs: Deixar aqui os endereços das páginas.
 //
@@ -142,6 +143,9 @@ extern void set_page_dir();
 #define BUFFER_PAGETABLE  0x8A000  // BackBuffer.
 //...
 
+
+//Usar alguma rotina de hal_ pra isso;
+//extern unsigned long _get_page_dir();
 
 /*
  ?? Para qual tipo ??
@@ -213,10 +217,6 @@ static inline void __native_flush_tlb_single(unsigned long addr)
 */
 
 
-//Usar alguma rotina de hal_ pra isso;
-//extern unsigned long _get_page_dir();
-
-
 /*
  * CreatePageDirectory:
  *     Cria um page directory para um processo.
@@ -225,34 +225,40 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  *     + Precisa ser um endereço físico.
  *     +...
  *
- * @todo: Mudar para pagesCreatePageDirectory(.)
+ *
+ * Obs:
+ *   **  Aviso importante!  **
+ *     O endereço passado via argumento pode ser alocado ninamicamente antes 
+ * ou então essa rotina pode corromper alguma área importante.
+ * Ante de chamar essa rotina devemos alocar memória do tamanho de um diretório,
+ * que é de 1024 entradas de 4bytes. (1024*4).
+ *
  */
-//void *pagesCreatePageDirectory(unsigned long address) 
 void *CreatePageDirectory(unsigned long directory_address)
 {	
 	int i;
-	unsigned long *page_directory = (unsigned long *) directory_address;    //Diretório.
-
-
-   /*
-    * @todo: 
-	*     Na verdade os diretórios de página e as page tables devem ser 
-	* criados em sequência num local pre-definido ou deve-se alocar memória 
-	* para criá-lo. 
-	*/	
+	unsigned long *newPD = (unsigned long *) directory_address;    //Diretório.
 	
 	//Limits.
 	if(directory_address == 0){
 		return NULL;
 	};
 
+	//Criamos um diretório vazio com páginas não presentes.
+	for(i = 0; i < 1024; i++){
+		newPD[i] = (unsigned long) 0 | 2;    //010 em binário.
+	};
 
 	//
 	//@todo:
 	//    Save on a list of directories.
 	//    Registra na lista de diretórios.
+	//    Antes precisamos saber em qual índice devemos salvar o endereço 
+	// do diretório de páginas que criamos.
 	//
-	//pagedirectoryList[PAGEDIRECTORY_COUNT_MAX]; 
+	//
+	
+	//pagedirectoryList[??] = (unsigned long) &newPD[0]; 
 	
 	
 	//...
@@ -272,19 +278,25 @@ done:
  *     + O diretório precisa ser um diretório válido.
  *
  * Argumentos:
- *     directory_address - 
- *     offset -
- *     page_address -
+ *     directory_address - O endereço do diretório onde colocaremos o endereço 
+ * do início da página que criaremos.
+ *     offset - O deslocamento dentro do diretório para sabermos o lugar para 
+ * salvarmos o endereço da tabela de páginas que estamos criando.
+ * @todo: Na hora de salvarmos esse endereço também temos que incluir as flags.
+ *     page_address - O endereço da página que estamos criando.
+ * Obs: Precisamos alocar memória para a página qque estamos criando, isso 
+ * antes de chamarmos essa rotina.
  *
- * @todo: Mudar para pagesCreatePageTable(...)
+ * Obs: Criamos uma tabela de páginas, com páginas em user mode.
+ *
  */
 void *CreatePageTable( unsigned long directory_address, 
                       int offset, 
 					  unsigned long page_address )
 {
 	int i;
-	unsigned long *page_directory = (unsigned long *) directory_address;    //Diretório.
-	unsigned long *page_table = (unsigned long *) page_address;
+	unsigned long *PD = (unsigned long *) directory_address;    //Diretório.
+	unsigned long *newPT = (unsigned long *) page_address;             //Tabela de páginas.
 	
 	//Limits.
 	if(directory_address == 0){
@@ -293,12 +305,28 @@ void *CreatePageTable( unsigned long directory_address,
 
 	//Limits.
 	if(offset < 0){
-		return;
+		return NULL;
 	};
 
+	//Limits.
+	if(page_address == 0){
+		return NULL;
+	};
+	
 
-	page_directory[offset] = (unsigned long) page_address;
+	//Criando uma pagetable.
+	//4MB de memória física.
+	// user mode pages
+	//será usado pelo processo em user mode. Note as flags.(7).
+	for(i = 0; i < 1024; i++)
+    {
+	    newPT[i] = (unsigned long) page_address | 7;             //7 decimal é igual a 111 binário.
+	    page_address     = (unsigned long) page_address + 4096;  //+4KB.
+    };
 
+	//Aqui devemos incluir as flags também.
+	PD[offset] = (unsigned long) &newPT[0];
+    PD[offset] = (unsigned long) PD[offset] | 7;      //Configurando os atributos.
 
 	//
 	// @todo: 

@@ -908,15 +908,31 @@ fail:
 };
 
 
-
+/*
+ * memoryShowMemoryInfo:
+ *     Show memory info.
+ */
 void memoryShowMemoryInfo()
 {
 	printf("Memory info:\n");
 	printf("============\n");
+	
+	//sizes
 	printf("BaseMemory     = (%d KB)\n", memorysizeBaseMemory);
 	printf("OtherMemory    = (%d KB)\n", memorysizeOtherMemory);
 	printf("ExtendedMemory = (%d KB)\n", memorysizeExtendedMemory);
-	printf("TotalMemory    = (%d KB)\n", memorysizeTotal);	
+	printf("TotalMemory    = (%d KB)\n", memorysizeTotal);
+	
+	//system zone
+	printf("systemzoneStart  = 0x%x\n", systemzoneStart);
+	printf("systemzoneEnd    = 0x%x\n", systemzoneEnd);
+	printf("systemzoneSize   = 0x%x\n", systemzoneSize);
+
+	//window zone.
+	printf("windowzoneStart  = 0x%x\n", windowzoneStart);
+	printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
+	printf("windowzoneSize   = 0x%x\n", windowzoneSize);
+	
 	return;
 }
 
@@ -943,6 +959,10 @@ int init_mm()
 	// Criar mmClearBSS()
 	//
 	//
+	
+
+	
+	
 	
 	//
 	// Chamando uma rotina que cria e inicializa o heap do kernel manualmente.
@@ -980,6 +1000,101 @@ int init_mm()
 	memorysizeOtherMemory    = (unsigned long) (1024 - memorysizeBaseMemory);
 	memorysizeExtendedMemory = (unsigned long) rtcGetExtendedMemory();  //KB
     memorysizeTotal          = (unsigned long) (memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory);
+	
+	
+	//
+	// Agora que temos o tamanho da memória podemos definir as zonas 
+	// de memória de acordo com o tamanho da memória.
+	// inicializando as estruturas principais de gerenciamento de memória.
+	//
+	
+	
+    //Se a memória total for igual ou maior que 256MB.	
+	//Estamos medindo em KB.
+	//Isso seria o normal.
+	if( memorysizeTotal >= (256*1024) )
+	{
+        //system zone
+	    systemzoneStart = 0;
+        systemzoneEnd   = 0x0FFFFFFF;
+        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	
+	    //window zone
+	    windowzoneStart = 0x10000000;
+        windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
+        windowzoneSize  = (windowzoneEnd - windowzoneEnd);
+	}
+    
+
+    //Se a memória total for igual ou maior que 128MB.	
+	//Estamos medindo em KB.
+	//Isso seria o normal.
+	if( memorysizeTotal >= (128*1024) )
+	{
+        //system zone
+	    systemzoneStart = 0;
+        systemzoneEnd   = 0x07FFFFFF;
+        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	
+	    //window zone
+	    //windowzoneStart = 0x10000000;
+        //windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
+        //windowzoneSize  = (windowzoneEnd - windowzoneEnd);
+	}
+	
+    //Se a memória total for igual ou maior que 64MB.	
+	//Estamos medindo em KB.
+	//Isso seria o normal.
+	if( memorysizeTotal >= (64*1024) )
+	{
+        //system zone
+	    systemzoneStart = 0;
+        systemzoneEnd   = 0x03FFFFFF;
+        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	
+	    //window zone
+	    //windowzoneStart = 0x10000000;
+        //windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
+        //windowzoneSize  = (windowzoneEnd - windowzoneEnd);
+	}
+	
+
+    //Se a memória total for igual ou maior que 32MB.	
+	//Estamos medindo em KB.
+	//Isso é o requisito mínimo de memória..
+	if( memorysizeTotal >= (32*1024) )
+	{
+        //system zone
+	    systemzoneStart = 0;
+        systemzoneEnd   = 0x01FFFFFF;
+        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	
+	    //window zone
+	    //windowzoneStart = 0x10000000;
+        //windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
+        //windowzoneSize  = (windowzoneEnd - windowzoneEnd);
+	};
+
+	//32MB Isso é o requisito mínimo de memória..
+	if( memorysizeTotal < (32*1024) ){
+		printf("init_mm: Error Memory Size!\n");
+	    printf("init_mm: TotalMemory={ %d KB}\n");
+        refresh_screen();
+		die();
+	};
+	
+	//
+	//Aviso!
+	// Essas estruturas precisam ser inicializadas antes de inicializarmos 
+	// a estrutura de user session. Depois, quando configurarmos a estrutura 
+	// de user session devemos salvar o ponteiro aqui na estrutura 'windowzone'.
+	//
+	
+	//Criando estruturas principais para o gerenciamento de memória.
+	//@todo: Conferir validade
+	zones       = (void*) malloc( sizeof(struct mm_zones_d ) );
+	systemzone  = (void*) malloc( sizeof(struct system_zone_d ) );
+	windowzone	= (void*) malloc( sizeof(struct window_zone_d ) );
 	
 	//
 	// Continua...
