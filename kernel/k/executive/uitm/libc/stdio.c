@@ -56,21 +56,42 @@ done:
  */
 FILE *fopen(const char *filename, const char *mode)
 {
+	unsigned char buffer[1024];
+	
+	unsigned char *a = (unsigned char *) filename;
+	unsigned long m = (unsigned long) mode;
+	
+	//@todo: Podemos usar malloc para o buffer!
+	
 	//
-	// @todo: precisamos de um retorno e de um buffer.
-	//        e alocar memoria para a estrutura do arquivo.?? 
+	// @todo: Criar filtros para os argumentos. Retornar NULL
+	// se os argumentos forem inválidos.
 	//
 	
 	//Obs: Talvez chamar essa rotina.
-	//unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
+	//unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address);
 	
-	//FILE *f;
 	
-	//f = (void) malloc 
-		
-	//carregar_arquivo( (unsigned char *) filename, (unsigned long) address);
-	 
-	printf("fopen: @todo:\n");
+	//Criando as estruturas.
+	//struct _iobuf *stream;
+	FILE *stream;
+
+	
+	stream = (FILE *) &buffer[0];
+	  
+	//f._base = ??;  //colocamos aqui o endereço onde o arquivo foi carregado
+	//f._ptr = stdin->_base;
+	stream->_cnt = PROMPT_MAX_DEFAULT;
+	stream->_file = 0;
+	stream->_tmpfname = (char*) filename;	
+	
+	
+	//if( (void*) a == NULL ){
+	//    printf("Error: Invalid name.");
+	//    return NULL;	
+	//};
+	
+	//return (FILE *) stream; 	
     return NULL;	
 };
 
@@ -512,8 +533,9 @@ gui_mode:
 	    backgroundDraw(COLOR_BLACK);
 		printf("KERNEL PANIC:\n\n");
 		print(0, varg);
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	};
 
 text_mode:
@@ -521,7 +543,8 @@ text_mode:
 	{
 	    kclear(0);
 	    print(0, varg);
-	    while(1){}        //No return.
+	    die();
+		//while(1){}        //No return.
 	};
 	
 //Done.
@@ -995,6 +1018,52 @@ input_more:
 input_done:	
     return VK_RETURN;	
 };
+
+
+//inicializa as estruturas do fluxo padrão.
+void stdioInitialize()
+{
+	//buffers para as estruturas.
+	unsigned char buffer0[512];
+	unsigned char buffer1[512];
+	unsigned char buffer2[512];
+	
+	
+	stdin  = (FILE *) &buffer0[0];	
+	stdout = (FILE *) &buffer1[0];	
+	stderr = (FILE *) &buffer2[0];	
+	
+	  
+	stdin->_base = &prompt[0];
+	stdin->_ptr = stdin->_base;
+	stdin->_cnt = PROMPT_MAX_DEFAULT;
+	stdin->_file = 0;
+	stdin->_tmpfname = "stdin";
+	//...
+	
+	stdout->_base = &prompt_out[0];
+	stdout->_ptr = stdout->_base;
+	stdout->_cnt = PROMPT_MAX_DEFAULT;
+	stdout->_file = 1;
+	stdout->_tmpfname = "stdout";
+	//...
+	
+	stderr->_base = &prompt_err[0];
+	stderr->_ptr = stderr->_base;
+	stderr->_cnt = PROMPT_MAX_DEFAULT;
+	stderr->_file = 2;
+	stderr->_tmpfname = "stderr";	
+	//...
+	
+	int i;
+	for(i=0; i<PROMPT_MAX_DEFAULT;i++)
+	{
+		prompt[i] = (char) '\0';
+		prompt_out[i] = (char) '\0';
+		prompt_err[i] = (char) '\0';
+	};	
+	
+}
 
 
 //

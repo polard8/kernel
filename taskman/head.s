@@ -30,7 +30,7 @@
 
 
 ;;
-;; codename db 'israel'
+;; codename db 'new york'
 ;;
 
 segment .head_x86
@@ -42,7 +42,8 @@ segment .head_x86
 ; Funções importadas.
 ;
 
-extern _appMain
+extern _crt0
+;extern _appMain
 ;extern _exit
 
 
@@ -56,7 +57,7 @@ extern _appMain
 global _taskmanager_entry_point              
 _taskmanager_entry_point:
     NOP	
-	call _appMain
+	call _crt0
 	
 	cmp eax, dword 0
 	je retOk

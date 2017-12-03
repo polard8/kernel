@@ -466,6 +466,7 @@ done:
 
 
 /*
+ **************************************************************
  * appMain:
  *     Função principal do Task Manager.
  * 
@@ -490,9 +491,10 @@ debugStuff:
 	apiBeginPaint();
 	    //(type, string1, string2)
 	    MessageBox( 1, "TASKMAN.BIN:", "Initializing ...");
-    apiEndPaint();
+        refresh_screen();
+	apiEndPaint();
 	
-	refresh_screen();
+	
 	
 	//Debug breakpoint.
 	//while(1){}

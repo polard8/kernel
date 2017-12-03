@@ -192,28 +192,23 @@ struct mm_zones_d
 mm_zones_t *zones;
 
 
-//system zone. <= 256 MB
+//system zone. 
 typedef struct system_zone_d system_zone_t;
 struct system_zone_d
 {
-    //os sete bancos do sistema.
-    struct bank_d *bank1; //     0          ~ 0x01FFFFFF It's not Music.
-    struct bank_d *bank2; //#E   0x02000000 ~ 0x03FFFFFF
-    struct bank_d *bank3; //#F   0x04000000 ~ 0x05FFFFFF
-    struct bank_d *bank4; //#G   0x06000000 ~ 0x07FFFFFF 
-    struct bank_d *bank5; //#A   0x08000000 ~ 0x09FFFFFF 
-    struct bank_d *bank6; //#B   0x0A000000 ~ 0x0BFFFFFF
-    struct bank_d *bank7; //#C   0x0C000000 ~ 0x0DFFFFFF   
-    struct bank_d *bank8; //#D   0x0E000000 ~ 0x0FFFFFFF  \o/ kernel Heap and Stack
+    unsigned long systemzone_start;  //0x00000000. são os 32MB iniciais  
 };
 system_zone_t *systemzone;
 
 
-//window zone. > 256MB
+//window zone.  
 typedef struct window_zone_d window_zone_t;
 struct window_zone_d
 {
-    struct usession_d *usersession;  // 0x10000000 ~ end .Única user session.
+	unsigned long windowzone_start;
+	//Endereço onde começa a user session.
+	unsigned long usersession_start;	//ficará dentro de uma área paginada.
+    struct usession_d *usersession;    
 };
 window_zone_t *windowzone;
 
@@ -962,6 +957,10 @@ frame_pool_t *framepoolPageableSpace;
 frame_pool_t *framepoolCurrent;
 //...
 
+//frame_pool_t *framepoolKernelPagedPool;
+//frame_pool_t *framepoolKernelNonPagedPool;
+//frame_pool_t *framepoolUserPagedPool;
+//frame_pool_t *framepoolUserNonPagedPool;
 
 //
 //   **** PAGEABLE AREA ****
@@ -970,7 +969,15 @@ frame_pool_t *framepoolCurrent;
 
 //Onde começa a área onde alocaremos frames para os processos.
 //físico ??
-unsigned long g_pageable_area_start;
+//Esse início será o mesmo tanto para sistemas com 32mb quanto para sistemas maiores.
+
+//definindo o início do paged pool para sustemas pequenos. Com 32MB.
+#define SMALLSYSTEM_PAGEDPOLL_START  0x01800000   //MÍNIMO 32MB
+#define MEDIUMSYSTEM_PAGEDPOLL_START 0x10000000   //MÍNIMO 64MB
+#define LARGESYSTEM_PAGEDPOLL_START  0x20000000   //MÍNIMO 128MB
+
+unsigned long gPagedPollStart;
+unsigned long gPagedPollEnd;
 
 
 //Obs: ISSO É UM TESTE.

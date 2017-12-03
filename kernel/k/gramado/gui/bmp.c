@@ -31,6 +31,75 @@
 extern void my_buffer_load_bitmap_16x16();
 
 
+
+
+
+//mostra na tela uma imagem bmp carregada na memória.
+void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, int height )
+{
+	int i, j, base, offset;
+	
+	unsigned long left, top, bottom;
+	
+	unsigned long color;
+	
+	base = 0x36;  //início da área de dados do bmp
+	
+	//limits
+	
+	//@todo: Refazer isso
+	if( x > 800 ){ return; }
+	if( y > 600 ){ return; }
+	if( width > 800 ){ return; }
+	if( height > 600 ){ return; }
+	
+	left = x;    //
+	top  = y; 
+	bottom = top + height;
+	
+	//base do bmp carregado na memória
+	unsigned char *bmp = (unsigned char *) address;
+	unsigned char *c   = (unsigned char *) &color;
+	
+	
+	for(i=0; i<height; i++)
+	{
+		for(j=0; j<width; j++)
+		{	
+			//construindo o char.
+			
+			offset = base;
+			c[1] = bmp[offset];
+			
+			offset = base+1;
+			c[2] = bmp[offset];
+			
+			offset = base+2;
+			c[3] = bmp[offset];
+			
+			c[0] = 0;
+			
+			base = base + 3;
+		
+			my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
+			
+			left++; //próximo pixel.
+		}
+		
+		//vamos para a linha anterior.
+		bottom = bottom-1;
+		left = x;    //reiniciamos o x.
+	};	
+	
+	return;
+};
+
+
+
+
+
+
+
 /* bugbug alloc
 void bmpTest();
 void bmpTest()
@@ -110,6 +179,7 @@ void load_bitmap_16x16( unsigned long ax,
     my_buffer_load_bitmap_16x16();
     return;				  
 };
+
 
 
 /*

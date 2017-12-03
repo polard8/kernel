@@ -991,6 +991,12 @@ int init_mm()
 	//Primeiro Bloco.
     //current_mmblock = (void *) NULL;
 	
+	
+	//
+	// MEMORY SIZES
+	//
+	
+	
 	//
 	// Get memory sizes via RTC.
 	//
@@ -1000,6 +1006,12 @@ int init_mm()
 	memorysizeOtherMemory    = (unsigned long) (1024 - memorysizeBaseMemory);
 	memorysizeExtendedMemory = (unsigned long) rtcGetExtendedMemory();  //KB
     memorysizeTotal          = (unsigned long) (memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory);
+	
+	
+	
+	//
+	// MEMORY ZONES
+	//
 	
 	
 	//

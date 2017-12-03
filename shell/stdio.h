@@ -41,16 +41,30 @@
 #define KEY_RETURN   13    //@todo: Pertence ao teclado.
 
 
+//#define EOF	(-1)
+
+//#ifndef EOF
+//#define	EOF	(-1)
+//#endif
+
 //
 // Prompt support.
 //
 
+//#define	BUFSIZ	512
+//#define	BUFSIZ	1024
+//#define BUFSIZ 32768
 //Buffer. @todo: Pertence ao Shell??
-#define PROMPT_MAX_DEFAULT 256 
-char prompt[PROMPT_MAX_DEFAULT];    
-unsigned long prompt_pos;
-unsigned long prompt_max;
-unsigned long prompt_status;
+#define PROMPT_MAX_DEFAULT 256  //Pode ser maior ??
+
+char prompt[PROMPT_MAX_DEFAULT];      //stdin
+char prompt_out[PROMPT_MAX_DEFAULT];  //stdout 
+char prompt_err[PROMPT_MAX_DEFAULT];  //stderr 
+   
+int prompt_pos;
+int prompt_max;
+int prompt_status;
+//char prompt_text[] = "$> ";
 
 
 //
@@ -81,12 +95,12 @@ int g_using_gui; //modo gráfico?
 typedef struct _iobuf FILE; 
 struct _iobuf 
 {
-	char *_ptr;    //Current position of file pointer (absolute address).
-	int   _cnt;
-	char *_base;   //Pointer to the base of the file.
-	int   _flag;   //Flags (see FileFlags).
-	int   _file;
-	int   _charbuf;
+	char *_ptr;      //Current position of file pointer (absolute address).
+	int   _cnt;      // number of available characters in buffer 
+	char *_base;     //Pointer to the base of the file. the buffer
+	int   _flag;     //Flags (see FileFlags). the state of the stream
+	int   _file;      //UNIX System file descriptor
+	int   _charbuf;   
 	int   _bufsiz;
 	char *_tmpfname;
 };
@@ -94,6 +108,25 @@ struct _iobuf
 FILE *stdin;
 FILE *stdout;
 FILE *stderr;
+
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
+
+
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
+#endif
+
+#define FOPEN_MAX	(20)
+#define NUMBER_OF_FILES (20)
+
+//unsigned long __iob[NUMBER_OF_FILES]
+
+//#define stdin	    (&_iob[STDIN_FILENO])
+//#define stdout	(&_iob[STDOUT_FILENO])
+//#define stderr	(&_iob[STDERR_FILENO])
+
 
 
 /*
@@ -126,14 +159,9 @@ int printf_main(void);    //@todo: Isso é para testes.
 unsigned long input(unsigned long ch);
 
 
-//rt support
-//pegando informações sobre o heap usado pela biblioteca C99 em user mode.
-unsigned long rtGetHeapStart();
-unsigned long rtGetHeapEnd();
-unsigned long rtGetHeapPointer();
-unsigned long rtGetAvailableHeap();
-//...
 
+
+void stdioInitialize();
 
 //
 // End.

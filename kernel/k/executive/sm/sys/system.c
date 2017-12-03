@@ -1211,7 +1211,7 @@ void *systemDevicesUnblocked( int number,
         case 36:
 		taskswitch_lock();
 	    scheduler_lock();	
-        //void read_lba( unsigned long address, unsigned long lba);     //ide.
+        //address, lba
         read_lba( (unsigned long) arg1, (unsigned long) arg2);     //ide.
 		scheduler_unlock();
 	    taskswitch_unlock();			
@@ -1681,12 +1681,12 @@ int systemStartUp()
 	// Antes de tudo: CLI, Video, runtime.
 	//
 	
-	if(KeInitPhase != 0){	
+	if(KeInitPhase != 0)
+	{	
 		//@todo: As mensagens do abort podem não funcionarem nesse caso.
 		KiAbort();	
-	}
-	else
-	{	
+	}else{
+		
 	    //Disable interrupts, lock taskswitch and scheduler.	    
 		asm("cli");	
 	    taskswitch_lock();
@@ -1704,20 +1704,32 @@ int systemStartUp()
 		
         //Welcome message. (Poderia ser um banner.) 
 		set_up_cursor(0,1);
-        printf("systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
 		
+#ifdef KERNEL_VERBOSE		
+        printf("systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
+#endif		
+		
+#ifdef KERNEL_VERBOSE		
 		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
 		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
 		    printf("systemStartUp: %s\n",developer_edition_string);
 		};
-		
+#endif
+
+#ifdef KERNEL_VERBOSE
 		printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
 		                                                         ,(unsigned long) SavedX
 																 ,(unsigned long) SavedY
-																 ,(unsigned long) SavedBPP );		
+																 ,(unsigned long) SavedBPP );
+#endif
 
-	    // Runtime.
-	    printf("systemStartUp: Initializing Runtime..\n");	 
+        //
+        // RUNTIME !
+        //		
+
+#ifdef KERNEL_VERBOSE		
+	    printf("systemStartUp: Initializing Runtime..\n");
+#endif			
 	    Status = (int) KiInitRuntime();
 	    if(Status != 0){
 	        printf("systemStartUp error: Runtime.\n");
@@ -1725,11 +1737,14 @@ int systemStartUp()
 	    };		
         
         //
-        // INIT ! (inicializa as 4 fases.)
+        // INIT ! 
         //  		
 		
+#ifdef KERNEL_VERBOSE
+		//(inicializa as 4 fases.)
 	    // Básico. ( Variáveis globais e estruturas ... ).
-	    printf("systemStartUp: Initializing Basics..\n");		
+	    printf("systemStartUp: Initializing Basics..\n");
+#endif		
         Status = (int) init(); 
 	    if(Status != 0){
 	        printf("systemStartUp error: Init.\n");
@@ -2245,10 +2260,13 @@ void systemReboot()
 	    {
             //Pega da lista.
 		    P = (void *) processList[i];
-		    if(P != NULL){
+		    if(P != NULL)
+			{
+#ifdef KERNEL_VERBOSE				
 		        //Termina o processo. (>> TERMINATED)
 		        printf("Killing Process PID={%d} ...\n",i);
 		        //refresh_screen();
+#endif
 		        exit_process(i, 0);
 		    };
 		    i++;
@@ -2456,6 +2474,33 @@ void systemSystem(){
     gSystemStatus = 1;
 };
 
+
+
+/*
+ * die:
+ *     Função sem retorno. Aqui termina tudo.
+ *      O sistema trava e não tem volta.
+ */
+void die()
+{
+    // Final message!	
+	// Refresh.	
+	// HALT.
+	
+    printf("* System Halted!");    //Bullet.  
+	
+	if(VideoBlock.useGui == 1){
+	    refresh_screen();
+	};
+halt:
+	asm("hlt");   
+	while(1){
+		
+	asm("cli");
+	asm("hlt");                        //Halt system.
+	
+	};     	
+};
 
 //
 // End.

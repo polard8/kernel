@@ -5,14 +5,13 @@
 //usado para inicializar a rt na libc99
 
 #include "types.h"
-#include "stdio.h"   
+#include "stdio.h"  
 #include "stddef.h"   
 #include "stdlib.h"  
 
 
 
-extern void *GramadoMain( int, char*, unsigned long , int );
-//extern int libcInitRT();
+extern int appMain(int argc, char *argv[]); 
 
 
 //
@@ -31,7 +30,7 @@ void crt0()
 	//inicializando o suporte ao fluxo padrão.
     stdioInitialize();	
 	
-	mainret = (int) GramadoMain(0,0,0,0);
+	mainret = (int) appMain( 0, 0); 
 	
 	//
 	// Chama kill ou exit de acordo com o problema ocorrido em main.

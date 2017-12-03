@@ -308,6 +308,45 @@
 #define EOF (-1)    //Ok.
 
 
+
+
+
+//#define SEEK_SET   0
+//#define SEEK_CUR   1
+//#define SEEK_END   2
+
+
+//enum FileFlags {_F_READ = 0x0001, _F_WRIT = 0x0002, _F_RDWR = 0x0003, _F_ERR = 0x0010, _F_EOF = 0x0020, _F_BIN = 0x0040};
+
+
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
+
+//The macro yields the maximum size array of characters that 
+//you must provide to hold a filename.
+//#define FILENAME_MAX (8+3)
+
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
+#endif
+
+//The macro yields the maximum number of files that the target 
+//environment permits to be simultaneously open (including stderr, stdin, and stdout).
+#define FOPEN_MAX	(20)
+#define NUMBER_OF_FILES (20)
+
+
+/*
+ * Prompt:
+ *    O prompt do shell. 
+ *    Se os caracteres do prompt do shell
+ * serão pintados no terminal, então precisamos de mais espaço.
+ * o terminal pode ser a janela que é a tela toda (gui->screen) ou
+ * outra janela qualquer.
+ *
+ */
+ 
 //BUFFER
 //_IOFBF, _IOLBF and _IONBF
 //_IONBF: The macro yields the value of the mode argument to 
@@ -317,23 +356,19 @@
 #define  _IOLBF  256     //Uma linha.       
 #define  _IONBF  0       
 #define  BUFSIZ  512 
+#define PROMPT_SIZE 256 
+#define PROMPT_MAX_DEFAULT 256
+ 
+char prompt[PROMPT_SIZE];      //buffer para stdin
+char prompt_out[PROMPT_SIZE];  //buffer para stdout
+char prompt_err[PROMPT_SIZE];  //buffer para strerr
 
+unsigned long prompt_pos; 
+unsigned long prompt_status;
 
-//The macro yields the maximum size array of characters that 
-//you must provide to hold a filename.
-#define FILENAME_MAX (8+3)
-
-//The macro yields the maximum number of files that the target 
-//environment permits to be simultaneously open (including stderr, stdin, and stdout).
-#define FOPEN_MAX 8
-
-
-//#define SEEK_SET   0
-//#define SEEK_CUR   1
-//#define SEEK_END   2
-
-
-//enum FileFlags {_F_READ = 0x0001, _F_WRIT = 0x0002, _F_RDWR = 0x0003, _F_ERR = 0x0010, _F_EOF = 0x0020, _F_BIN = 0x0040};
+//@todo: Testando strings.
+static char prompt_cursor[] = "$";
+static char prompt_string[] = "Prompt:";
 
 /*
  * FILE:
@@ -374,9 +409,9 @@ FILE *file_Current;
  +----------------+---------+-----------------------------------+
  |       0        |  stdin  |   associado a leitura do teclado  |
  +----------------+---------+-----------------------------------+
- |       1        | stdout  |  associado a saida normal na tela |
+ |       1        | stdout  |  associado a saída normal na tela |
  +----------------+---------+-----------------------------------+
- |       2        | stderr  | associado a saída de erro na tela |
+ |       2        | stderr  | associado a saída de erro         |
  +----------------+---------+-----------------------------------+
 */
 
@@ -386,10 +421,16 @@ FILE *stdout;
 FILE *stderr;
 
 //Fluxo padrão para o kernel:
-FILE *kstdin;
-FILE *kstdout;
-FILE *kstderr;
+//FILE *kstdin;
+//FILE *kstdout;
+//FILE *kstderr;
 
+
+FILE *_io_table[NUMBER_OF_FILES];
+
+#define stdin  (_io_table[0])	
+#define stdout 	(_io_table[1])
+#define stderr 	(_io_table[2])
 
 //Lista de arquivos abertos
 //unsigned long openfileList[128];
@@ -452,6 +493,9 @@ int kclear(int color);
 int kclearClientArea(int color); 
 int kprintf(char *message, unsigned int line, int color);
 
+
+//inicializa os buffers do fluxo padrão em stdio.c
+void stdioInitialize();
 //
 // Fim.
 //

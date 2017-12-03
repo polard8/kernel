@@ -97,14 +97,16 @@ int windowInitializeBrowserSupport()
 
     if( (void*) w == NULL ){
 	    printf("windowInitializeBrowserSupport:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 		
 		if( w->used != 1 || w->magic != 1234 ){
 	        printf("windowInitializeBrowserSupport: fail");
-		    refresh_screen();
-	        while(1){};			
+		    die();
+			//refresh_screen();
+	        //while(1){};			
 		}
 		
 		RegisterWindow(w);
@@ -129,8 +131,9 @@ int windowInitializeBrowserSupport()
 		bt = (void*) malloc( sizeof(struct browser_tab_d) );
 	    if((void*) bt == NULL){
 	        printf("erro tab struct");
-		    refresh_screen();
-	        while(1){};
+		    die();
+			//refresh_screen();
+	        //while(1){};
 	    }		
 		
 		bt->used = 1;
@@ -153,8 +156,9 @@ int windowInitializeBrowserSupport()
 		
 	    if((void*) w == NULL){
 	        printf(".");
-		    refresh_screen();
-	        while(1){};
+		    die();
+			//refresh_screen();
+	        //while(1){};
 	    }else{   
 		    RegisterWindow(w);
 		    //...
@@ -180,14 +184,16 @@ int windowInitializeBrowserSupport()
     
 	if((void*) bt == NULL){
 	    printf("~erro tab struct");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}	   
    
     if( bt->used != 1 || bt->magic != 1234 ){
 	    printf("windowInitializeBrowserSupport: bt fail");
-		refresh_screen();
-	    while(1){};			
+		die();
+		//refresh_screen();
+	    //while(1){};			
 	}
 
 
@@ -200,14 +206,16 @@ int windowInitializeBrowserSupport()
 
     if( (void*) w == NULL ){
 	    printf("windowInitializeBrowserSupport:~fail");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 		
 	    if( w->used != 1 || w->magic != 1234 ){
 	        printf("windowInitializeBrowserSupport: ~fail");
-	        refresh_screen();
-	        while(1){};			
+	        die();
+			//refresh_screen();
+	        //while(1){};			
 	    }
 		
 		//Aqui temos uma janela válida. Essa janela é uma aba.
@@ -358,8 +366,9 @@ void windowSetUpColorScheme(int type)
     humility = (void*) malloc( sizeof(struct color_scheme_d) );
     if( (void*) humility == NULL ){
 		printf("windowSetUpColorScheme: humility");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
 		//Object.
@@ -400,8 +409,9 @@ void windowSetUpColorScheme(int type)
     pride = (void*) malloc( sizeof(struct color_scheme_d) );
     if( (void*) pride == NULL ){
 		printf("windowSetUpColorScheme: pride");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
 		//Object.
@@ -963,8 +973,9 @@ int RegisterWindow(struct window_d *window)
 	
 	if(windows_count >= WINDOW_COUNT_MAX){
 	    printf("RegisterWindow: Limits.");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	};
     
 	// Create empty.	
@@ -1221,14 +1232,16 @@ int redraw_window(struct window_d *window)
 	
 	if( (void*) CurrentColorScheme == NULL ){
 		printf("redraw_window: CurrentColorScheme");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
 		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
 		    printf("redraw_window: CurrentColorScheme validation");
-		    refresh_screen();
-		    while(1){}			
+		    die();
+			//refresh_screen();
+		    //while(1){}			
 		};
 		//Nothing.
 	};	
@@ -1388,16 +1401,18 @@ redrawBegin:
 		if( (void*) window->rcClient == NULL )
 		{
 			printf("redraw_window: a estrututura de client falhou");
-			refresh_screen();
-            while(1){}			
+			die();
+			//refresh_screen();
+            //while(1){}			
 		     
 		}else{
 			
 			//conferir validade.
 			if( window->rcClient->used != 1 || window->rcClient->magic != 1234 ){
 			    printf("redraw_window: validade falhou");
-			    refresh_screen();
-                while(1){}							
+			    die();
+				//refresh_screen();
+                //while(1){}							
 			}
 		    
             //dimensões e posicionamento da área de cliente.
@@ -1467,7 +1482,7 @@ done:
  */
 int redraw_screen()
 {
-	int zIndex;
+	int z;
     int RedrawStatus;	
 	struct window_d *zWindow;
 	
@@ -1476,9 +1491,9 @@ int redraw_screen()
 	// Repintaremos todas as janelas com ponteiros válidos.
 	//
 	
-	for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ )
+	for( z = 0; z < ZORDER_COUNT_MAX; z++ )
 	{
-	    zWindow = (void*) zorderList[zIndex];
+	    zWindow = (void*) zorderList[z];
 	
 		//Pegando um ponteiro de janela válido na zorderList.
 		if( (void*) zWindow != NULL )
@@ -1486,8 +1501,8 @@ int redraw_screen()
 			if( zWindow->used == 1 && zWindow->magic == 1234 )
             {
 				//compara os índices.
-				if( zWindow->z_axis_order != zIndex ){
-					printf("redraw_screen: zIndex error\n");
+				if( zWindow->zIndex != z ){
+					printf("redraw_screen: z index error\n");
 					goto fail;
 				};
 				
@@ -1534,7 +1549,8 @@ done:
     return (int) 0;	
 fail:
     printf("redraw_screen: FAIL.\n");
-    while(1){}
+    die();
+	//while(1){}
 };
 
 
@@ -1685,12 +1701,12 @@ void CloseWindow(struct window_d *window)
 	// devemos retirar a janela da zorder list 
 	//
 	
-	int zIndex = (int) window->z_axis_order;
+	int z = (int) window->zIndex;
 	
-	if( zIndex >= 0 && zIndex < ZORDER_COUNT_MAX )
+	if( z >= 0 && z < ZORDER_COUNT_MAX )
 	{
 		//retira da lista
-	    zorderList[zIndex] = (unsigned long) 0;	
+	    zorderList[z] = (unsigned long) 0;	
 	    
 		//atualiza o contador.
         zorderCounter--;
@@ -2201,8 +2217,9 @@ int init_window_manager()
 	WindowProcedure = (void*) malloc( sizeof( struct window_procedure_d ) );
 	if( (void*) WindowProcedure == NULL ){
 	    printf("init_window_manager fail: Structure.");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	};  
 
 	//
@@ -2255,8 +2272,9 @@ int init_windows()
 	rectClientArea = (void*) malloc( sizeof(struct rect_d) );
     if((void*) rectClientArea == NULL){	
 	    printf("init_windows:");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 	    setClientAreaRect( 0, 0, 0, 0);	
 	};
@@ -2382,9 +2400,56 @@ done:
 	return (int) 0;
 };
 
+/*
+int getZorder( struct window_d *window )
+{
+	int z;
+    
+	//procura a janela na lista.
+	for(z=0; z< ??; z++)
+	{
+		if( window == h ){
+			goto done;
+		}
+		
+	}
+    
+done:	
+	return (int) z;
+};
+*/
+
+/*
+struct window_d *getTopWindow( struct window_d *window)
+{
+	//refletindo ??
+    //se um argumento for passado teremos que examinar a ordem das janelas filhas.	
+	//sendo assim cada estrutura de janela precisa de uma lista de janelas filhas 
+	// e a zorder delas ... se nenhuma janela for passada como argumento 
+	// teremos que olhar as janelas filhas da janela principal que é a gui->main ...
+	//a janelça gui->main pode ser a janela mae de todas as outras ...
+	// sendo a janela gui->main a janela principal do processo kernel.
+	//o processo explorador de arquivos poderá ser o processo que 
+	//seja a mãe de todos os aplicativos de usuário ... então a 
+	//z order na estrutura da janela desse aplicativo indica a ordem 
+	//das janelas principais dos seus processos filhos ...
+	//??
+} 
+*/
 
 
- 
+void closeActiveWindow()
+{
+    int WID;
+	struct window_d *w;
+	
+	WID = get_active_window();
+	
+	w = (void*) windowList[WID];
+	
+	CloseWindow(w);
+};
+
 
 //
 // End.

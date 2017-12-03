@@ -1149,7 +1149,8 @@ struct window_d
 	
 	//ordem na pilha de janelas do eixo z.
 	//A janela mais ao topo é a janela foreground.
-	int z_axis_order; 
+	int zIndex;    //@todo: deletar. se usarmos a estrutura de zorder não precisaremos desse índice.
+    struct zorder_d *zorder;	
 
 	//dimensões e margens.
     unsigned long x;           //deslocamento x
@@ -1460,6 +1461,81 @@ struct browser_tab_d
 //...
 
 unsigned long browsertabList[TABWINDOW_COUNT_MAX]; //lista de ponteiros para estruturas de tabs.
+
+
+//
+// z order support
+//
+
+#define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
+
+
+
+//esses tipo indicam algum posicionamento dentro da xorder.
+typedef enum {
+	zordertypeNull,     //ignorado
+    zordertypeTop,      //acima de todas
+    zordertypeBottom,   //abaixo de rodas.
+    //...	
+}zorder_type_t;
+
+
+
+//essas são as camadas onde os objetos gráficos ficam ...
+//estão associadas com formulários e containers.
+typedef enum {
+	zorderlayerNull,     //ignorado
+    zorderlayerBack,     //back layer. é a área onde os métodos invocarão a construção de objetos gráficos.
+    zorderlayerMiddle,   //middle layer. é onde os objetos gráficos e as etiquetas de controle são colocadas.
+	zorderlayerFront,    //front layer. são colocados os controles não gráficos como: 
+	                     //CommandButton, CheckBox e ListBox 
+    //...	
+}zorder_layer_t;
+
+
+int zorderCounter;         //contador de janelas incluidas nessa lista.   
+int zorderTopWindow;
+//...
+
+//
+//Estrutura para controlar um índice de janela 
+//ponteiros de instãncias dessa estrutura ficarão na lista zorderList[].
+// Obs: uma estrutura de janela pode ter um poteiro para essa 
+// estrutura que controlará todas as propriedades de zorder relaticas a aquela janela.
+//
+typedef struct zorder_d zorder_t;
+struct zorder_d
+{
+	// tipo ... top ou bottom.
+	//encontraremos com facilidade se ela é top ou bottom.
+	
+	//zorder_type_t zorderType; 
+	//zorder_layer_t zorderLayer;
+	
+	int zIndex;
+    
+	//?? ...
+	
+    struct window_d *window;
+	
+	//toda janela está na lista de zorder de outra janela.
+	struct window_d *parent; //janela mãe... 
+	
+	
+	struct zorder_d *next;
+};
+
+
+/* 
+struct zorderInfo
+{
+    struct window *top_window;	
+} 
+*/
+
+
+
+
 /*
  * zorderList[] support.
  *     Sobreposição de janelas.    
@@ -1471,12 +1547,10 @@ unsigned long browsertabList[TABWINDOW_COUNT_MAX]; //lista de ponteiros para est
  *  >> quando deletamos uma janela, apenas excluimos ela da lista, não precisamos reorganizar.
  *  >> uma janelas minimizada é excluida dessa lista, é zerada z_axis_order na sua estrutura.
  *  >> repintaremos começando do zero.
- */
-
- #define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
+ */ 
 unsigned long zorderList[ZORDER_COUNT_MAX];
 
-int zorderCounter;         //contador de janelas incluidas nessa lista.
+
 
 
 
@@ -2054,6 +2128,19 @@ void my_buffer_char_blt( unsigned long x,
 //
 // Pixel, line rect support.
 //						 
+
+//pega um pixel no backbuffer
+unsigned long get_pixel( unsigned long x,  unsigned long y );
+
+//envia um pixel do backbuffer para o frontbuffer
+void refresh_pixel( unsigned long x,  unsigned long y, unsigned long color );
+
+//envia um retângulo do backbuffer para o frontbuffer
+void refresh_rectangle( unsigned long x, 
+                        unsigned long y, 
+						unsigned long width, 
+						unsigned long height );
+
 	
 //Pinta um pixel em um buffer de janela.
 void pixelPutPixelWindowBuffer( void* buffer, 
@@ -2116,6 +2203,9 @@ void MaximizeWindow(struct window_d *window);
 void windowShowWindowList();
 void show_window_with_focus();
 void show_active_window();
+
+
+void closeActiveWindow();
 
 //bloqueando e desbloqueando o foco.
 void windowBlockfocus();

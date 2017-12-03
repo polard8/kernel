@@ -115,24 +115,34 @@ void create_logon()
 		// Initialize Session, WindowStation, Desktop, Windows and Menus.
 		  
 		//user section.
+#ifdef KERNEL_VERBOSE		
 		printf("create_logon: User Session..\n");
+#endif		
 		init_user_session();
 		
 		//initialize window station default.	
-	    printf("create_logon: Station..\n");   
-	    init_window_station();  	
+#ifdef KERNEL_VERBOSE			    
+		printf("create_logon: Station..\n");   
+#endif	    
+		init_window_station();  	
 	
 	    //initialize desktop default.
-	    printf("create_logon: Desktop..\n");   
-	    init_desktop(); 	    
+#ifdef KERNEL_VERBOSE			    
+		printf("create_logon: Desktop..\n");   
+#endif	    
+		init_desktop(); 	    
 	
 	    //Inicia estrutura.	
-	    printf("create_logon: Windows..\n");   
-	    init_windows(); 
+#ifdef KERNEL_VERBOSE			    
+		printf("create_logon: Windows..\n");   
+#endif	    
+		init_windows(); 
 
 		//menus.
+#ifdef KERNEL_VERBOSE				
 		printf("create_logon: Menu..\n");
-	    init_menus();        
+#endif	    
+		init_menus();        
 	    
 		//init_menus( ... 	
 	    //...
@@ -189,8 +199,6 @@ draw_logon_stuffs:
     if(gui->messageboxStatus == 1){ 
 	    logon_create_messagebox(); 
 	};
-
-
 	
 	//Main window, Navigation bar and grid.    
 	if(gui->mainStatus == 1){ 
@@ -389,8 +397,9 @@ void logon_create_screen()
 							        NULL, 0, 0, COLOR_BLACK );  
 	if( (void*) hWindow == NULL ){
 	    printf("logon_create_screen:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
@@ -438,8 +447,9 @@ void logon_create_background()
 													
 	if( (void*) hWindow == NULL){
 	    printf("logon_create_background:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
@@ -499,8 +509,9 @@ void logon_create_mainwindow()
 							         gui->screen, 0, 0, COLOR_BROWN );           //COR TESTE
 	if( (void*) hWindow == NULL){
 	    printf("logon_create_mainwindow:");
-	    refresh_screen();
-		while(1){};
+	    die();
+		//refresh_screen();
+		//while(1){};
 	}else{   
 	    		
 	    RegisterWindow(hWindow);
@@ -650,8 +661,9 @@ void logon_create_navigationbar()
 	if( (void*) hWindow == NULL)
 	{
 	    printf("logon_create_navigationbar:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 	    		
         //navigation bar como foreground window inicialmente.		
@@ -751,8 +763,9 @@ void logon_create_developer_screen()
 							        NULL, 0, COLOR_ORANGE, COLOR_BLUE );  
 	if( (void*) hWindow == NULL ){
 	    printf("logon_create_developer_screen:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
@@ -809,11 +822,11 @@ done:
 	
 
 	//ERRO NA CRIAÇÃO DA ESTRUTURA.
-	if( (void*) gui->DEVELOPERSCREEN == NULL)
-	{
+	if( (void*) gui->DEVELOPERSCREEN == NULL ){
 		printf("logon_create_developer_screen: gui->DEVELOPERSCREEN");
-		refresh_screen();
-		while(1){};
+		die();
+		//refresh_screen();
+		//while(1){};
 	};
 	
     return; 

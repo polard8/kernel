@@ -272,14 +272,16 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	
 	if( (void*) CurrentColorScheme == NULL ){
 		printf("CreateWindow: CurrentColorScheme");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
 		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
 		    printf("CreateWindow: CurrentColorScheme validation");
-		    refresh_screen();
-		    while(1){}			
+		    die();
+			//refresh_screen();
+		    //while(1){}			
 		};
 		//Nothing.
 	};
@@ -368,7 +370,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		    //window->active = WINDOW_STATUS_ACTIVE;
 			//window->status = (unsigned long) WINDOW_STATUS_ACTIVE;
 			window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
-            window->z_axis_order = 0; // ?? inicializando apenas. @todo:getNextZAxisOrder()
+            window->zIndex = 0; // ?? inicializando apenas. @todo:getNextZAxisOrder()
 			//...			
 		};
 		
@@ -377,7 +379,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		    //window->active = WINDOW_STATUS_INACTIVE;
 			//window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
 			window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
-            window->z_axis_order = 0; //inicializando apenas. @todo:getNextZAxisOrder()
+            window->zIndex = 0; //inicializando apenas. @todo:getNextZAxisOrder()
 			//...			
 		};	
 		
@@ -1107,22 +1109,22 @@ drawBegin:
 	// zorder stuff.
 	//
 	
-	int zIndex; 
+	int z; 
 	struct window_d *zWindow;
 	
-	for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ )
+	for( z = 0; z < ZORDER_COUNT_MAX; z++ )
 	{
-	    zWindow = (void*) zorderList[zIndex];
+	    zWindow = (void*) zorderList[z];
         
 		//Obtendo um espaço vazio.
 		//Se for NULL, então não tinha um ponteiro no slot.
 		if( (void*) zWindow == NULL )
 		{
 			//Coloca o ponteiro da janela criada no slot vazio.
-			zorderList[zIndex] = (unsigned long) window;
+			zorderList[z] = (unsigned long) window;
 
             //Salva o índice da ordem na estrutura da janela criada. 			
-            window->z_axis_order = (int) zIndex;
+            window->zIndex = (int) z;
 			
 			zorderCounter++;
 			if(zorderCounter >= ZORDER_COUNT_MAX){
@@ -1138,8 +1140,9 @@ drawBegin:
 //Se o for acabou sem termos conseguido um lugar vazio.	
 fail:
     printf("CreateWindow: zorderList\n");
-    refresh_screen();
-    while(1){}	
+    die();
+	//refresh_screen();
+    //while(1){}	
 	
 // done.		
 done:

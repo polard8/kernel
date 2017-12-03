@@ -37,8 +37,11 @@ echo -{ ux4 /hal
 	rem (unblocked) legados (K2).
 	gcc -c k/hal/unblocked/video.c   -I./include -o video.o  
 	gcc -c k/hal/unblocked/screen.c  -I./include -o screen.o 	
-	gcc -c k/hal/unblocked/keyboard.c  -I./include -o keyboard.o
-    gcc -c k/hal/unblocked/hdd.c    -I./include -o hdd.o	
+	
+	gcc -c k/hal/unblocked/keyboard.c  -I./include -o keyboard.o  
+	gcc -c k/hal/unblocked/ldisc.c  -I./include -o ldisc.o    	
+    
+	gcc -c k/hal/unblocked/hdd.c    -I./include -o hdd.o	
 	gcc -c k/hal/unblocked/pic.c   -I./include -o pic.o 
     gcc -c k/hal/unblocked/timer.c     -I./include -o timer.o	
 	gcc -c k/hal/unblocked/rtc.c    -I./include -o rtc.o
@@ -308,6 +311,7 @@ pic.o ^
 timer.o ^
 rtc.o ^
 keyboard.o ^
+ldisc.o ^
 hdd.o ^
 nic.o ^
 pci.o ^

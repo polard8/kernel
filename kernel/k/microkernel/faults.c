@@ -170,32 +170,6 @@ done:
 }
 
 
-/*
- * die:
- *     Função sem retorno. Aqui termina tudo.
- *      O sistema trava e não tem volta.
- */
-void die()
-{
-    // Final message!	
-	// Refresh.	
-	// HALT.
-	
-    printf("* System Halted!");    //Bullet.  
-	
-	if(VideoBlock.useGui == 1){
-	    refresh_screen();
-	};
-halt:
-	asm("hlt");   
-	while(1){
-		
-	asm("cli");
-	asm("hlt");                        //Halt system.
-	
-	};     	
-};
-
 
 //
 // fim.

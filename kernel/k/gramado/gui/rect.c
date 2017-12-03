@@ -152,6 +152,28 @@ int rectInit()
 {}  
 */
 
+					
+//copiar apenas um retângulo do backbuffer para o frintbuffer.						
+void refresh_rectangle( unsigned long x, 
+                        unsigned long y, 
+						unsigned long width, 
+						unsigned long height )
+{
+    vsync();
+    
+    //calcular quantos bytes tem no retângulo	
+    int i;
+	unsigned long color;
+	
+    for(i=0; i< (width*height*3); i++)
+	{
+		color = (unsigned long) get_pixel( x, y );
+	    refresh_pixel(  x,  y, color );
+	}	
+};
+
+
+
 
 //
 // End.

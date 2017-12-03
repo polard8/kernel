@@ -356,8 +356,8 @@ _asm_refresh_screen:
 	; Uma tela de 800x600:
 	; 800 pixel de 3 bytes por linha é igual a 2400 bytes por linha.   
 	; 2400 byte por linhas é igual a 600 dwords por linha.
-    mov ecx, dword (800*600)    ;(640*480)    ;(600*600); 800x600.   
-    rep movsd
+    mov ecx, dword (800*600)      
+    rep movsd                ;; Estamos movendo 4bytes
 	
 	pop edx
 	pop ecx

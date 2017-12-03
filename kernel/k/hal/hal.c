@@ -724,7 +724,7 @@ int init_hal()
 	//
     //@todo 8042 ... teclado e mouse.
     //
-    P8042_install();	
+    //P8042_install();	
 		
     //keyboard.
 	printf("init_hal: kd..\n");

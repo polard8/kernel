@@ -97,7 +97,8 @@ int kMain(int argc, char* argv[])
     __ipc_kernel_spinlock = 1;
 	
 	
-
+    //@todo: Encontrar o lugar apropriado para a  inicialização de zorder 
+	//provavelmente na inicialização da gui.
 	// initializing zorder list
 	int zIndex;
 	for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
@@ -146,9 +147,11 @@ int kMain(int argc, char* argv[])
 	
 	//If we are using graphic mode.
 	if(VideoBlock.useGui == GUI_ON){
+#ifdef KERNEL_VERBOSE	
 		//kbackground(COLOR_BLUE);
 	    printf("kMain: Using GUI!\n");	
-        //drawDataRectangle( 20, 20, 20, 20, COLOR_RED);       	
+        //drawDataRectangle( 20, 20, 20, 20, COLOR_RED);
+#endif       	
 	};
 	
 	//If we are using text mode.
@@ -167,12 +170,11 @@ int kMain(int argc, char* argv[])
 	};
 	
 	//Debug message.
+#ifdef KERNEL_VERBOSE
 	printf("kMain: Starting up system..\n");
 	refresh_screen(); //@TODO: Talvez isso não precise.
 	//while(1){}	
-
-	//Debug
-	//while(1){}
+#endif
 	
 	//
     // System initialization..
@@ -219,8 +221,9 @@ int kMain(int argc, char* argv[])
 	                                      PRIORITY_HIGH, (int) KernelProcess->pid, "IDLEPROCESS");	
 	if((void*) IdleProcess == NULL){
 		printf("kMain error: Create Idle process.\n");
-		refresh_screen();
-		while(1){};
+		die();
+		//refresh_screen();
+		//while(1){};
 	};
     //processor->IdleProcess = (void*) IdleProcess;	
 	
@@ -229,8 +232,9 @@ int kMain(int argc, char* argv[])
 	                                       PRIORITY_HIGH, (int) KernelProcess->pid, "SHELLPROCESS");	
 	if((void*) ShellProcess == NULL){
 		printf("kMain error: Create shell process.\n");
-		refresh_screen();
-		while(1){};
+		die();
+		//refresh_screen();
+		//while(1){};
 	};	
 
 	//Creating Taskman process.
@@ -238,8 +242,9 @@ int kMain(int argc, char* argv[])
 	                                         PRIORITY_LOW, 0, "TASKMANPROCESS");	
 	if((void*) TaskManProcess == NULL){
 		printf("kMain error: Create taskman process.\n");
-		refresh_screen();
-		while(1){};
+		die();
+		//refresh_screen();
+		//while(1){};
 	};		
 	
 	//
@@ -257,8 +262,9 @@ int kMain(int argc, char* argv[])
 	if( (void*) IdleThread == NULL )
 	{
 	    printf("kMain error: Create Idle Thread!");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 	    
         IdleThread->ownerPID = (int) IdleProcess->pid;  //ID do processo ao qual o thread pertence.    
@@ -274,8 +280,9 @@ int kMain(int argc, char* argv[])
 	ShellThread = (void*) KiCreateShell();	
 	if( (void*) ShellThread == NULL ){
 	    printf("kMain error: Create Shell Thread!");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
 	    ShellThread->ownerPID = (int) ShellProcess->pid;  //ID do processo ao qual o thread pertence. 
@@ -286,8 +293,9 @@ int kMain(int argc, char* argv[])
 	TaskManThread = (void*) KiCreateTaskManager();
 	if( (void*) TaskManThread == NULL ){
 	    printf("kMain error: Create TaskMan Thread!");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
 	    TaskManThread->ownerPID = (int) TaskManProcess->pid; //ID do processo ao qual o thread pertence. 		
@@ -324,6 +332,7 @@ doDebug:
 	//
 	// Done.
 	//
+void *b;
 
 done:
 
@@ -360,6 +369,30 @@ done:
 	//init_mouse();  //isso está em keyboard.c
 	
 	
+	//
+	// testing BMP support
+	//
+	
+	//32KB
+	
+	b = (void*) malloc(512*1024);
+	
+	unsigned long fileret;
+	
+	
+	taskswitch_lock();
+	scheduler_lock();
+	fileret = fsLoadFile( "FREDNORABMP", (unsigned long) b);
+	if(fileret != 0)
+	{
+		//escrevendo string na janela
+	    draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FREDNORA BMP FAIL");  	
+	}
+	bmpDisplayBMP( b, 30, 450, 128, 128 );
+	scheduler_unlock();
+	taskswitch_unlock();
+	
+	
 	
 	//
 	// RETURNING !
@@ -369,12 +402,16 @@ done:
 	// Return to assembly file, (head.s).
 	//
 	
-	if(KernelStatus == KERNEL_INITIALIZED){
-        //@todo: if verbose??
+	if(KernelStatus == KERNEL_INITIALIZED)
+	{
+
+#ifdef KERNEL_VERBOSE
 		//printf("KeMain: EXIT_SUCCESS\n");
 		refresh_screen();
-		return (int) EXIT_SUCCESS;	
+#endif	
+	    return (int) EXIT_SUCCESS;	
 	};
+	
 	// Fail!
 fail:
     //if(KernelStatus != KERNEL_INITIALIZED){...};	
@@ -383,8 +420,6 @@ fail:
 	refresh_screen();  
 	return (int) EXIT_FAILURE;   
 };
-
-
 
  
 //

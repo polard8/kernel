@@ -208,6 +208,25 @@
 // Globals.
 // 
 
+typedef enum {
+    systemsizeNull,
+    systemsize1,     //#  1 O sistema tem pelo menos 32 MB
+    systemsize2,     //#E 2 O sistema tem pelo menos 64 MB
+    systemsize3,     //#F 3 O sistema tem pelo menos 96 MB
+    systemsize4,     //#G 4 O sistema tem pelo menos 128 MB 
+    systemsize5,     //#A 5 O sistema tem pelo menos 160 MB 
+    systemsize6,     //#B 6 O sistema tem pelo menos 192 MB 	
+    systemsize7,     //#C 7 O sistema tem pelo menos 224 MB
+    systemsize8,     //#D 8 O sistema tem pelo menos 256 MB
+    systemsizeFull,  //     O sistema tem pelo menos 288 MB	
+}system_size_t;
+
+
+//Aqui salvaremos o número que identifica o tipo de sistema dado o tamanho.
+// Se o sistema tiver 288 MB ou mais então ele será do tipo Full
+// e conterá 8 bancos de memória de 32Mb mais uma user session de tamnaho variado.
+int systemSize;
+
 
 //Flag para habilitar as opções para o desenvolvedor.
 int gDeveloperOptions;

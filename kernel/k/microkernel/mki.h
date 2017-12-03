@@ -1,5 +1,3 @@
-
-
 /*
  * mki.h (MicroKernel Internal)
  *
@@ -9,9 +7,7 @@
  *
  * Created 2016.
  *
- */
- 
- 
+ */ 
  
 int mkiTesting;
 

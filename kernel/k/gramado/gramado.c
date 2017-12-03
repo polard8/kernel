@@ -94,8 +94,9 @@ void create_gui()
 	gui = (void*) malloc( sizeof(struct gui_d) );
     if((void*) gui == NULL){	
 	    printf("create_gui:");
-		refresh_screen();
-		while(1){};
+		die();
+		//refresh_screen();
+		//while(1){};
 	}else{
 		
         //
@@ -122,26 +123,38 @@ void create_gui()
 		// windows and menus.
 		//
 		
+#ifdef KERNEL_VERBOSE		
 		printf("create_gui: User Session..\n");
+#endif
 		init_user_session();
-				
+		
+#ifdef KERNEL_VERBOSE				
 		printf("create_gui: Window Station..\n");
+#endif
 		init_window_station();
-	    
+	 
+#ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Desk..\n");
+#endif
 	    init_desktop();	
-	    
+	 
+#ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Wind..\n");
-	    init_windows();	
-	    
+#endif	    
+		init_windows();	
+	 
+#ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Menu..\n");
-	    init_menus();
+#endif	    
+		init_menus();
 		
 		//
 		// System MenuBar: (Barra no topo da tela). 
 		//
-		
+	
+#ifdef KERNEL_VERBOSE			
 		printf("create_gui: System Menu bar..\n");
+#endif		
 		systemCreateSystemMenuBar();
 		
 		//
@@ -180,8 +193,9 @@ void create_gui()
 	
 	if( (void*) gui == NULL ){
 		printf("create_gui: gui struct");
-		refresh_screen();
-		while(1){};
+		die();
+		//refresh_screen();
+		//while(1){};
 	};
 	
 	//
@@ -393,8 +407,9 @@ void gui_create_screen()
 						           0, 0, 0, COLOR_BLACK );     
 	if( (void*) hWindow == NULL ){
 	    printf("gui_create_screen:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 
 		RegisterWindow(hWindow);
@@ -455,8 +470,9 @@ void gui_create_background()
 	if( (void*) hWindow == NULL )
 	{
 	    printf("gui_create_background:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
@@ -518,8 +534,9 @@ void gui_create_mainwindow()
 							        gui->screen, 0, 0, COLOR_PINK );         //COR TESTE
 	if( (void*) hWindow == NULL){
 	    printf("gui_create_mainwindow:");
-	    refresh_screen();
-		while(1){};
+	    die();
+		//refresh_screen();
+		//while(1){};
 	}else{   
 	    		
 	    RegisterWindow(hWindow);
@@ -601,11 +618,12 @@ void gui_create_logo()
 	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Logo", 
 	                                (Width/3), (Height/3), (Width/3), (Height/3), 
 							        gui->screen, 0, 0, COLOR_WINDOW );
-	if( (void*) hWindow == NULL)
+	if( (void*) hWindow == NULL )
 	{
 	    printf("gui_create_logo:");
-	    refresh_screen();
-		while(1){};
+	    die();
+		//refresh_screen();
+		//while(1){};
 	}else{
 	    		
 		RegisterWindow(hWindow);
@@ -668,8 +686,9 @@ draw_bar:
 	if( (void*) hWindow == NULL)
 	{
 	    printf("gui_create_taskbar:");
-		refresh_screen();
-	    while(1){};
+		die();
+		//refresh_screen();
+	    //while(1){};
 	}else{
 	    		
 	    RegisterWindow(hWindow);
@@ -737,8 +756,10 @@ void gui_create_controlmenu()
     cmWindow = (void *) create_menu(gui->screen,2,0,0,0);
 	if( (void *) cmWindow == NULL ){
 	    printf("gui_create_controlmenu:");
-		refresh_screen();
-		while(1){}	
+		return;
+		//die();
+		//refresh_screen();
+		//while(1){}	
 	}else{
 	    
 		//configura a janela do menu do sistema.
@@ -827,9 +848,6 @@ done:
 };
 
 	
-
-	
-
 /*
  * gui_create_navigationbar:
  *     Barra de navegação. 
@@ -1162,6 +1180,7 @@ int init_gui()
 	//	 
 		
 done:
+    //?? erro fatal ??
     if( (void*) gui == NULL )
 	{
 		printf("init_gui:\n"); 
@@ -1184,6 +1203,10 @@ int guiInit()
 
 void gramado(){
     return; 	
+}
+
+int init_gramado(){
+	return 0;
 }
 
 //

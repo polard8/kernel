@@ -34,7 +34,7 @@ int init_runtime()
 {
     //	
 	// Init Memory Manager:	
-	// Heap, Stack, Pages, mmblocks ...
+	// Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
 	//
 	init_mm();
 	
@@ -51,7 +51,8 @@ int init_runtime()
 	//
 	
 	
-	//@todo: Gerenciamento de memória é primordial.
+	//Cria o diretório de páginas do processo kernel, page tables e 
+	//area para pageframes de memória paginada.
 	SetUpPaging();		
 	
     // Continua ...

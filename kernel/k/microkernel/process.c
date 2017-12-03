@@ -527,8 +527,6 @@ done:
     return (void*) Process;
 };
 
-
-
  
 /*
  * CloseAllProcesses:
@@ -1157,11 +1155,12 @@ void exit_process(int pid, int code)
 	if(pid == 0){
 		return;
 	};
-	
+
+#ifdef KERNEL_VERBOSE	
 	//Debug:
 	printf("exit_process: Terminating process %d.\n",pid);
 	refresh_screen();
-	
+#endif	
 	
 	//
 	// Pega o ponteiro para a estrutura.
@@ -1186,11 +1185,11 @@ void exit_process(int pid, int code)
 		//...
 	};
 		
-
+#ifdef KERNEL_VERBOSE
 	//Debug:
 	printf("exit_process: Terminating threads..\n");
 	refresh_screen();
-		
+#endif		
 
 	//pega o primeiro da lista
 	//Se o head da list naõ foi inicializado corretamente dá page fault.
@@ -1219,10 +1218,11 @@ void exit_process(int pid, int code)
         if(Thread == NULL){
 		    goto done;	
 		}else{
-        
+    
+#ifdef KERNEL_VERBOSE    
 		    //fecha a thread.
 		    printf("exit_process: KILL thread %d.\n",Thread->tid);
-			
+#endif			
 			
 			kill_thread(Thread->tid);  					
 		    
@@ -1305,7 +1305,16 @@ int processmanagerInit(){
 };
 */
 
-
+//pega o endereço do heap do processo.
+unsigned long GetProcessHeapStart(struct process_d *process)
+{
+    //Estrutura inválida.
+	if((void*) process == NULL){
+        return (unsigned long) 0;        
+	};
+	
+	return (unsigned long) process->Heap;
+};
 //
 // Fim.
 //

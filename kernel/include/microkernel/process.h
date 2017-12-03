@@ -846,6 +846,8 @@ void SetProcessDirectory(struct process_d *process, unsigned long Address);
 // Process support.
 //
 
+unsigned long GetProcessHeapStart(struct process_d *process);
+
 int processTesting(int pid);
 
 void init_processes();

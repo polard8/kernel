@@ -5,7 +5,30 @@
  *     Gerente de banco de dados em memória e em disco.
  */
 
+  
+ 
+//Número máximo de bancos no sistema. 
+#define BANKS_COUNT_MAX 8
+ 
+ 
+ 
+//contando a quantidade de bancos no sistema. 
+//A quantidade de bancos depende do tamanho do sistema.
+//A quantidade mínima de bancos é 1.
+//Se tivermos apenas um banco, a user session deverá ficar dentro desse banco.
+//se tivermos 2 bancos a user session ficará no último banco.
+//Se tivermos até oito banco de memória a user session ficará no último banco.
+int banksCount;
 
+
+//*Importante: A user session ficará no último banco.
+//caso o sistema tenha apenas um banco, então a user session ficará no fim do banco.
+int lastBank;
+
+        
+
+ 
+ 
 typedef enum {
     banktypeLDB,    // LDB - Local Data Base.   (private)
     banktypeGDB,    // GDB - Global Data Base.  (shareable)

@@ -403,28 +403,118 @@ int SetUpPaging()
 {
     unsigned int i;
 	int Index;
+	
+	
+	//==============================================================
+	//                  ****    SMALL SYSTEMS    ****
+	//==============================================================
+	
+	unsigned long SMALL_kernel_address       = 0;
+	unsigned long SMALL_kernel_base          = KERNEL_BASE;
+	unsigned long SMALL_user_address         = USER_BASE;
+	unsigned long SMALL_vga_address          = VM_BASE;
+	unsigned long SMALL_frontbuffer_address  = (unsigned long) SavedLFB;
+	unsigned long SMALL_backbuffer_address   = (unsigned long) 0x01000000;
+	unsigned long SMALL_pagedpool_address    = (unsigned long) 0x01400000; //SMALLSYSTEM_PAGEDPOLL_START
+	
+	
+	
+	//==============================================================
+	//                  ****    MEDIUM SYSTEMS    ****
+	//==============================================================	
+	
+	unsigned long MEDIUM_kernel_address       = 0;
+	unsigned long MEDIUM_kernel_base          = KERNEL_BASE;
+	unsigned long MEDIUM_user_address         = USER_BASE;
+	unsigned long MEDIUM_vga_address          = VM_BASE;
+	unsigned long MEDIUM_frontbuffer_address  = (unsigned long) SavedLFB;
+	unsigned long MEDIUM_backbuffer_address   = (unsigned long) 0x01000000;
+	unsigned long MEDIUM_pagedpool_address    = (unsigned long) 0x10000000; //MEDIUMSYSTEM_PAGEDPOLL_START	
 
-    //
-	// (phase 1) Endereços da memória físicas acessíveis em Kernel Mode.
-    //	
-
+	
+	//==============================================================
+	//                  ****    LARGE SYSTEMS    ****
+	//==============================================================	
+	
+	unsigned long LARGE_kernel_address       = 0;
+	unsigned long LARGE_kernel_base          = KERNEL_BASE;
+	unsigned long LARGE_user_address         = USER_BASE;
+	unsigned long LARGE_vga_address          = VM_BASE;
+	unsigned long LARGE_frontbuffer_address  = (unsigned long) SavedLFB;
+	unsigned long LARGE_backbuffer_address   = (unsigned long) 0x01000000;
+	unsigned long LARGE_pagedpool_address    = (unsigned long) 0x20000000; //LARGESYSTEM_PAGEDPOLL_START	
+	
+	// ** bank 1 ** //
+	//O primeiro banco representa o mínimo de memória RAM que o sistema operacional 
+	//suporta, 32MB. Dentro deve conter tudo. Até cache e frames para memória paginada.
+	// Endereços da memória físicas acessíveis em Kernel Mode.
 	// Kernel process.
-	unsigned long kernel_address = 0;        //para os 4 primeiros mega da memoria fisica     
-	unsigned long kernel_base = KERNEL_BASE; //0x00100000 //para o kernnel que começa no primeiro mega
-
-    //
-	// (phase 2) Endereços da memória físicas acessíveis em User Mode.
-    //
-
-
+	        //para os 4 primeiros mega da memoria fisica     
+	 //0x00100000 //para o kernnel que começa no primeiro mega
+	// Endereços da memória físicas acessíveis em User Mode.
 	// User, VGA, VESA LFB, BUFFER ...
-	unsigned long user_address = USER_BASE;                   //0x00400000; 	
-	unsigned long vga_address  = VM_BASE;                     //0x000B8000; 
-    unsigned long lfb_address  = (unsigned long) SavedLFB;    //g_lbf_pa, Foi passado pelo boot manager.
-	unsigned long buff_address = (unsigned long) 0x01000000;  //16MB, #Provisório.
+	                   //0x00400000; 	
+	                     //0x000B8000; 
+        //g_lbf_pa, Foi passado pelo boot manager.
+	  //16MB, 
 	// ...
 
+	  // Cache para um sistema com 32MB de memória.
+	
+    //
+	// *Importante.
+    // Esse endereço servirá para sistema de 32Mb e para sistemas com mais que 32Mb de RAM.
+    //	
+	// Inicio da área dos pageframes para memória paginada.
+	//Para um sistema de 32MB essa área deve acabar em 0x01FFFFFF
+     		
+	
+	
+	
+	
+	
+	
+	//=====================================================
+	// A memória física é dividida em duas partes principais: 
+	// + System Zone. (oito bancos de 32MB começando em 0)
+	// + Window Zone. (Uma user session começando em 0x10000000)
+	//
+	//=====================================================	
 
+
+	//
+	// O número máximo de bancos no sistema será 8.
+	// Se o sistema for pequeno, teremos menos bancos.
+	// Se o sistema for grande o bastante, teremos 8 bancos e uma user session.
+	// Mas o sistema sempre será composto de bancos e uma user session.
+	// A quantidade de bancos será contada em variáveis globais.
+	//
+	
+	
+	//=========================================================================
+	
+	//
+	// **** Endereços iniciais áreas de memória 'não paginada'.
+	//
+	
+
+	
+	
+
+
+	//
+	// *FIM
+	//
+	
+	
+	//
+	// *importante:
+    // ?? e se o sistema tiver 
+	//	
+	
+	
+	//=========================================================================
+	
 	//
 	// DIRECTORY:
 	//     Diretório do processo Kernel. Esse diretório já foi criado nesse 
@@ -459,9 +549,28 @@ int SetUpPaging()
 	// de page tables. Todas as que serão criadas ocuparão muito espaço.
 	//
 
-	//kernel mode. (Endereços).
+	//
+	// SYSTEM MEMORY * NONPAGED POOLS 
+	//
+	
+	//*Importante:
+	// @todo: Não mudar o endereço onde essas tabelas foram construidas.
+	// Esses endereços estão bem organizados, essa será o início da memória 
+	// não paginada do processo kernel.
+	// Todas as páginas mapeadas aqui nunca serão enviadas para a memória secundária 
+	// ou seja nunca mudarão de endereço físico.
+	//
+	// 0x0008F000 Tabela para mapear a parte mais baixa da memória física. Começa em 0.
+	// 0x0008E000 Tabela para mapear a memória usada pela imagem do kernel. Começa em 0x100000.
+	// 0x0008D000 Tabela para mapear uma área em user mode onde rodam códigos. Começa em 0x400000.
+	// 0x0008C000 Tabela para mapear a vga. Começa em 0xb8000.
+	// 0x0008B000 Tabela para mapear o frontbuffer, O começo é passado pelo Boot.
+	// 0x0008A000 Tabela para mapear o backbuffer, o começo é em 0x01000000.
+	//
+	
+	//kernel mode. (Endereços). 
 	unsigned long *km_page_table   = (unsigned long *) 0x0008F000;  //KM1_PAGETABLE.
-
+ 
 	//kernel mode. (O kernel).
     unsigned long *km2_page_table  = (unsigned long *) 0x0008E000;  //KM2_PAGETABLE.
 
@@ -472,14 +581,21 @@ int SetUpPaging()
 	unsigned long *vga_page_table  = (unsigned long *) 0x0008C000;  //VGA_PAGETABLE.
 
 	//user mode. (LFB).
-	unsigned long *lfb_page_table  = (unsigned long *) 0x0008B000;  //LFB_PAGETABLE.
+	unsigned long *frontbuffer_page_table  = (unsigned long *) 0x0008B000;  //LFB_PAGETABLE.
 
-	//user mode. (buffer).
-    unsigned long *buff_page_table = (unsigned long *) 0x0008A000;  //BUFFER_PAGETABLE.
+	//user mode. (buffer). backbuffer ??
+    unsigned long *backbuff_page_table = (unsigned long *) 0x0008A000;  //BUFFER_PAGETABLE.
 
 	//...
 
+	//
+	// SYSTEM MEMORY * PAGED POOLS 
+	//
 
+	//@criaremos por enquanto apenas uma pagetable com memória paginada.
+    //unsigned long *paged_page_table = (unsigned long *) ??;  //BUFFER_PAGETABLE.	
+	
+	
     //
 	// Message. (verbose).
 	printf("SetUpPaging: Initializing Pages..\n");
@@ -514,7 +630,7 @@ int SetUpPaging()
 
 	//===========================================================
 	// kernel mode pages (0fis = 0virt)
-	// kernel_address = 0.
+	// SMALL_kernel_address = 0.
 	// Mapear os primeiros 4MB da memória. (kernel mode). Preenchendo a tabela 
 	// km_page_table. A entrada 0 do diretório refere-se aos primeiros 4 megas 
 	// de endereço virtual.
@@ -538,8 +654,14 @@ int SetUpPaging()
 	// kernel mode pages (0fis = 0virt)
 	for(i = 0; i < 1024; i++)
     {
-	    km_page_table[i] = (unsigned long) kernel_address | 3;     //011 binário.
-	    kernel_address   = (unsigned long) kernel_address + 4096;  //+ 4KB.
+	    //if SMALL
+		km_page_table[i] = (unsigned long) SMALL_kernel_address | 3;     //011 binário.
+	    SMALL_kernel_address   = (unsigned long) SMALL_kernel_address + 4096;  //+ 4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE
+		
     };
     
 	
@@ -574,7 +696,7 @@ int SetUpPaging()
 	
 	//===============================================
 	// kernel mode pages (0x00100000fis = 0xC0000000virt)
-	// kernel_base = 0x00100000 = KERNEL_BASE.
+	// SMALL_kernel_base = 0x00100000 = KERNEL_BASE.
 	// Mapear 4MB começando do primeiro mega. (kernel mode).
 	// Preenchendo a tabela km2_page_table.
 	//
@@ -589,8 +711,13 @@ int SetUpPaging()
     // kernel mode pages (0x00100000fis = 0xC0000000virt)	
     for(i = 0; i < 1024; i++)
     {
-	    km2_page_table[i] = (unsigned long) kernel_base | 3;     //011 binário.
-	    kernel_base       = (unsigned long) kernel_base + 4096;  //+4KB.
+		//IF SMALL
+	    km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     //011 binário.
+	    SMALL_kernel_base       = (unsigned long) SMALL_kernel_base + 4096;  //+4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE		
     };
     
 	
@@ -630,7 +757,7 @@ int SetUpPaging()
 	
 	//===================================================================
 	// user mode pages - (0x00400000fis = 0x00400000virt)
-	// user_address = 0x00400000 = USER_BASE.
+	// SMALL_user_address = 0x00400000 = USER_BASE.
 	// Mapear 4MB da memória começando em 0x00400000fis. (user mode).
 	//
 	//
@@ -657,8 +784,14 @@ int SetUpPaging()
 	//será usado pelo processo em user mode. Note as flags.(7).
 	for(i = 0; i < 1024; i++)
     {
-	    um_page_table[i] = (unsigned long) user_address | 7;     //7 decimal é igual a 111 binário.
-	    user_address     = (unsigned long) user_address + 4096;  //+4KB.
+	    //IF SMALL
+		um_page_table[i] = (unsigned long) SMALL_user_address | 7;     //7 decimal é igual a 111 binário.
+	    SMALL_user_address     = (unsigned long) SMALL_user_address + 4096;  //+4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE		
+
     };
 	
 
@@ -697,7 +830,7 @@ int SetUpPaging()
 	  
     //==============================================================
 	// user mode VGA pages - ( 0x000B8000fis = 0x00800000virt)
-	// vga_address  = VM_BASE;   //0x000B8000;
+	// SMALL_vga_address  = VM_BASE;   //0x000B8000;
 	// Mapear 4MB da memória começando em 0x000B8000fis. (user mode).
 	// @todo: Aqui na verdade não precisa configurar 4 megas, 
 	//        apenas o tamanho da memória de vídeo presente em 0xb8000.
@@ -715,8 +848,13 @@ int SetUpPaging()
     // essa área diretamente.	
     for(i = 0; i < 1024; i++)
     {
-	    vga_page_table[i] = (unsigned long) vga_address | 7;     //7 decimal é igual a 111 binário.
-	    vga_address       = (unsigned long) vga_address + 4096;  //+4KB.
+		//ID SMALL
+	    vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     //7 decimal é igual a 111 binário.
+	    SMALL_vga_address       = (unsigned long) SMALL_vga_address + 4096;  //+4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE		
     };
 	
     //kernel
@@ -750,7 +888,7 @@ int SetUpPaging()
 	
     //==================================================================
 	// user mode LFB pages - (0x????????fis = 0xC0400000virt).
-	// lfb_address  = SavedLFB = g_lbf_pa, Foi passado pelo boot manager.
+	// SMALL_frontbuffer_address  = SavedLFB = g_lbf_pa, Foi passado pelo boot manager.
 	// Mapear 4MB da memória física começando no valor do endereço físico 
 	// do LFB que foi passado pelo Boot Manager.
 	// O endereço de memória lógica utilizada é 4MB à partir de 0xC0400000.
@@ -771,32 +909,38 @@ int SetUpPaging()
 	//provavelmente o endereço físico é 0xE0000000
     for(i = 0; i < 1024; i++)
     {
-	    lfb_page_table[i] = (unsigned long) lfb_address | 7;     //7 decimal é igual a 111 binário.
-	    lfb_address       = (unsigned long) lfb_address + 4096;  //+4KB.
+	    //IF SMALL
+		frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7;     //7 decimal é igual a 111 binário.
+	    SMALL_frontbuffer_address       = (unsigned long) SMALL_frontbuffer_address + 4096;  //+4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE
+		
     };
     
 	
 	//kernel
 	// Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       //Salva no diretório o endereço físico.
     page_directory[769] = (unsigned long) page_directory[769] | 7;  //Configurando os atributos.	
 
 
 	//idle
 	// Criando a entrada do diretório de páginas do processo idle.
-    //idle_page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    //idle_page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       //Salva no diretório o endereço físico.
     //idle_page_directory[769] = (unsigned long) idle_page_directory[769] | 7;  //Configurando os atributos.		
 	
 
 	//shell
 	// Criando a entrada do diretório de páginas do processo shell.
-    //shell_page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    //shell_page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       //Salva no diretório o endereço físico.
     //shell_page_directory[769] = (unsigned long) shell_page_directory[769] | 7;  //Configurando os atributos.		
 
 	//taskman
 	// Criando a entrada do diretório de páginas do processo taskman.
-    //taskman_page_directory[769] = (unsigned long) &lfb_page_table[0];       //Salva no diretório o endereço físico.
+    //taskman_page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       //Salva no diretório o endereço físico.
     //taskman_page_directory[769] = (unsigned long) taskman_page_directory[769] | 7;  //Configurando os atributos.		
 	
 	
@@ -806,7 +950,7 @@ int SetUpPaging()
 	// ***BackBuffer: 
 	//     É o buffer onde se pinta o que aparecerá na tela. O conteúdo 
 	// desse buffer é copiado no LFB da memória de vídeo, (refresh_screen).
-    // buff_address = 0x01000000 = 16MB, #Provisório.	
+    // SMALL_backbuffer_address = 0x01000000 = 16MB, #Provisório.	
 	// O endereço de memória lógica utilizada é 4MB à partir de 0xC0800000.
 	//
     // Aqui estamos pegando uma partição de memória física de 4MB que começa no
@@ -819,30 +963,35 @@ int SetUpPaging()
 	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
 	for(i = 0; i < 1024; i++)
     {
-	    buff_page_table[i] = (unsigned long) buff_address | 7;     //7 decimal é igual a 111 binário.
-	    buff_address       = (unsigned long) buff_address + 4096;  //+4KB.
+		//IF SMALL
+	    backbuff_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     //7 decimal é igual a 111 binário.
+	    SMALL_backbuffer_address       = (unsigned long) SMALL_backbuffer_address + 4096;  //+4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE		
     };
 	
 	//kernel
     // Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    page_directory[770] = (unsigned long) &backbuff_page_table[0];      //Salva no diretório o endereço físico.
     page_directory[770] = (unsigned long) page_directory[770] | 7;  //Configurando os atributos.	
 
 
 	//idle
     // Criando a entrada do diretório de páginas do processo idle.
-    //idle_page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    //idle_page_directory[770] = (unsigned long) &backbuff_page_table[0];      //Salva no diretório o endereço físico.
     //idle_page_directory[770] = (unsigned long) idle_page_directory[770] | 7;  //Configurando os atributos.	
 	
 	//shell
     // Criando a entrada do diretório de páginas do processo shell.
-    //shell_page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    //shell_page_directory[770] = (unsigned long) &backbuff_page_table[0];      //Salva no diretório o endereço físico.
     //shell_page_directory[770] = (unsigned long) shell_page_directory[770] | 7;  //Configurando os atributos.	
 	
 	//taskman
     // Criando a entrada do diretório de páginas do processo taskman.
-    //taskman_page_directory[770] = (unsigned long) &buff_page_table[0];      //Salva no diretório o endereço físico.
+    //taskman_page_directory[770] = (unsigned long) &backbuff_page_table[0];      //Salva no diretório o endereço físico.
     //taskman_page_directory[770] = (unsigned long) taskman_page_directory[770] | 7;  //Configurando os atributos.	
 	
 	//
@@ -935,17 +1084,18 @@ int SetUpPaging()
 	//     #verbose.
 	//
 
+#ifdef KERNEL_VERBOSE	
 	printf("Debug:\n");
 	printf("Configurando CR3={%x} !\n", (unsigned long) &page_directory[0]);
 	printf("Page={%x} !\n", (unsigned long) &km_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &km2_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &um_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &vga_page_table[0]);
-	printf("Page={%x} !\n", (unsigned long) &lfb_page_table[0]);
-	printf("Page={%x} !\n", (unsigned long) &buff_page_table[0]);
+	printf("Page={%x} !\n", (unsigned long) &frontbuffer_page_table[0]);
+	printf("Page={%x} !\n", (unsigned long) &backbuff_page_table[0]);
 	//refresh_screen();
 	//while(1){};
-	
+#endif	
 	//
 	// Obs: Podemos reaproveitas pagetables em diferentes processos.
 	//
@@ -1005,8 +1155,8 @@ int SetUpPaging()
 	pagetableList[1] = (unsigned long) &km2_page_table[0];
 	pagetableList[2] = (unsigned long) &um_page_table[0];
 	pagetableList[3] = (unsigned long) &vga_page_table[0];
-	pagetableList[4] = (unsigned long) &lfb_page_table[0];
-	pagetableList[5] = (unsigned long) &buff_page_table[0];
+	pagetableList[4] = (unsigned long) &frontbuffer_page_table[0];
+	pagetableList[5] = (unsigned long) &backbuff_page_table[0];
 	//pagetableList[6] = (unsigned long) 0;
     //...
 
@@ -1176,7 +1326,9 @@ int SetUpPaging()
 
 // Done.
 done:
+#ifdef KERNEL_VERBOSE
 	printf("Done!\n");
+#endif	
     return (int) 0;
 };
 

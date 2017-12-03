@@ -72,6 +72,10 @@
  ******************************************/
  
  
+// flag para mostrar ou não as mensagens de debug.
+//#define KERNEL_VERBOSE 1 
+ 
+ 
 /*
  * Definições globais.
  *     (Isso deve ficar no topo). 
@@ -253,7 +257,8 @@ extern void do_executa_new_task();
 #include <hal/unblocked/apic.h>        //APIC - Advanced Programmable Interrupt Controller.
 #include <hal/unblocked/rtc.h>         //clock    ( South bridge).
 #include <hal/unblocked/floppy.h>      //floppy   ( South bridge).
-#include <hal/unblocked/keyboard.h>    //irq1     ( South bridge).
+#include <hal/unblocked/keyboard.h>    //irq1     ( South bridge). //keyboard
+#include <hal/unblocked/ldisc.h>    //irq1     ( South bridge).   //ldisc
 #include <hal/unblocked/ide.h>         //irq14/15 ( South bridge).
 //...
 //Blocked.
@@ -399,6 +404,10 @@ extern void do_executa_new_task();
  * Globals.
  */
  
+ 
+//keyboard suppport 
+//Se o teclado é do tipo abnt2.
+int abnt2;
  
 //
 // Product type.
@@ -910,9 +919,14 @@ void sleep(unsigned long ms);
 //
  
 void faults(unsigned long number); 
-void abort(); 
-void shutdown();   
-void die();      //* erro fatal 
+
+void shutdown();
+
+//
+// error support
+//  
+void abort();    //abort.c *erros de níveis diferentes. 
+void die();      //system.c * erro fatal. 
 
 /*
  * ke - Kernel External.

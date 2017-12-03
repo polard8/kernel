@@ -71,13 +71,12 @@
 
 
 /*
-    Fluxo padrão:
+    Fluxo padrão: definido em <stdio.h>
 	
     FILE *stdin; 
     FILE *stdout; 
     FILE *stderr; 
-    
-	#include <stdio.h>
+ 
 */
 
  
@@ -94,40 +93,115 @@
 //#define CMD_ABOUT 1003
 //...
 
+
+//
+// Variáveis para test de funções de console
+//
+
+
+
+
 //
 // Variáveis internas.
 //
 
 int shellStatus;
 int shellError;
-int shellMaxColumns;
-int shellMaxRows;
-int shellScreenWidth;
-int shellScreenHeight;
-//...
 
 
 //
-// Buffer:
-// Esse buffer pode ser usado para algum log ou pra testar função que escreve
-// em arquivo.
+// BUFFER SUPPORT
 //
+
+//Buffer size.
+int shellBufferMaxColumns;  //80
+int shellBufferMaxRows;     //25*4 (4 vistas) 
 
 //#define SHELL_BUFFER_SIZE 512
-#define SHELL_BUFFER_SIZE 1024 //(1024*32) //tests
+//#define SHELL_BUFFER_SIZE 1024 
+#define SHELL_BUFFER_SIZE (80*25)      //2000
+//#define SHELL_BUFFER_SIZE (80*25*4)
 
-char shell_buffer[SHELL_BUFFER_SIZE]; 
+#define DEFAULT_BUFFER_MAX_COLUMNS 80
+#define DEFAULT_BUFFER_MAX_ROWS    25
+
+char shell_buffer[SHELL_BUFFER_SIZE]; //buffer de output
 unsigned long shell_buffer_pos; 
-unsigned long shell_buffer_width;  //Largura dada em número de caracteres.
-unsigned long shell_buffer_height; //Altura dada em número de caracteres.
+unsigned long shell_buffer_x; 
+unsigned long shell_buffer_y; 
+//unsigned long shell_buffer_width;  //Largura dada em número de caracteres.
+//unsigned long shell_buffer_height; //Altura dada em número de caracteres.
 //...
+
+
+
+
+//
+// SCREEN SUPPORT
+//
+
+//Obs: aumentar essas constantes aumenta o tamanho da janela.
+#define DEFAULT_MAX_COLUMNS 80
+#define DEFAULT_MAX_ROWS    50 //25
+
+//Screen size.
+int shellMaxColumns;       //80   
+int shellMaxRows;          //25
+int shellScreenWidth;      //800 
+int shellScreenHeight;     //600
+
+//...
+
+
+//
+// WINDOW SUPPORT
+//
+
+int shellWindowWidth;      //80*8
+int shellWindowHeight;     //25*8
 
 //
 // Window position.
 //
 
-//unsigned long shell_window_x;
-//unsigned long shell_window_y;
+#define DEFAULT_WINDOW_X 0
+#define DEFAULT_WINDOW_Y 0
+
+unsigned long shell_window_x;
+unsigned long shell_window_y;
+
+
+
+//linux 
+//#define SCREEN_START 0xb8000
+//#define SCREEN_END   0xc0000
+#define LINES 25
+#define COLUMNS 80
+#define NPAR 16
+
+//linux 
+static unsigned long origin = (unsigned long) &shell_buffer[0];                     //SCREEN_START;
+static unsigned long scr_end = (unsigned long) (&shell_buffer[0] + (LINES * COLUMNS));  //SCREEN_START+LINES*COLUMNS*2;
+static unsigned long pos; //posição dentro do buffer
+static unsigned long x,y;
+static unsigned long top = 0, bottom = LINES;
+static unsigned long lines = LINES,columns = COLUMNS;
+static unsigned long state=0;
+static unsigned long npar,par[NPAR];
+static unsigned long ques=0;
+static unsigned char attr=0x07;
+
+
+static unsigned long saved_x=0;
+static unsigned long saved_y=0;
+
+static void save_cur(void);
+static void restore_cur(void);
+static void lf(void);
+static void ri(void);
+static void cr(void);
+static void del(void);
+
 
 
 //
@@ -153,8 +227,25 @@ int test_operators();
 //
 // Funções internas.
 //
+void shellTestMBR();
+void shellTestDisplayBMP();
+void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
 
+void shellInsertNullTerminator();
+void shellInsertCR();
+void shellInsertLF();
+void shellInsertNextChar(char c);
+void shellInsertCharXY(unsigned long x, unsigned long y, char c);
+void shellInsertCharPos(unsigned long offset, char c);
+//protótipos de funções internas.
+void shellClearBuffer();
+void shellTestLoadFile();
 
+void shellTestThreads();
+void shellClearscreen();
+void shellScroll();
+//...
+void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
 void shellSetCursor(unsigned long x, unsigned long y);
 void shellThread();
 void shellPrompt();
@@ -244,6 +335,15 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 
 	//...
 	
+	
+	
+	//
+	// Isso configura alguns padrões do aplicativo.
+	// Os argumentos tratados abaixo podem modificar esses padrões
+	// Ex: Um argumento de entrada pode solicitar a troca de cor de fonte.
+	//
+	
+	shellShell(); 	
 	
 	
 	//#DEBUG
@@ -341,6 +441,7 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 	
 noArgs:	
 	
+
 	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
@@ -418,8 +519,8 @@ noArgs:
 	
 	apiBeginPaint();
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",     
-                                       20, 20, 640, 480,    
-                                       0, 0, COLOR_BLACK , COLOR_WINDOW );	   
+                                       shell_window_x, shell_window_y, shellWindowWidth, shellWindowHeight,    
+                                       0, 0, COLOR_BLACK, 0x83FCFF00 );	   
 	if((void*) hWindow == NULL){	
 		printf("Shell: Window fail");
 		refresh_screen();
@@ -648,18 +749,6 @@ noArgs:
 		//Nothing.
 	};
 	
-
-	//
-	// @todo: Rotinas de comparação e execução do comando.
-	//
-
-	
-    while(1)
-	{
-        //shellInit(); 
-		// shellCompare();
-	};
-	
 	
 	//
 	// Exit process.
@@ -701,7 +790,7 @@ shellProcedure( struct window_d *window,
 				//test return
 				case '9':
 				case VK_RETURN:
-				    input('\0'); //finaliza a string
+				    input('\0'); //finaliza a string.
 					shellCompare();
 					goto done;
                     break;
@@ -729,7 +818,8 @@ shellProcedure( struct window_d *window,
                    //Imprime os caracteres normais na janela com o foco de entrada.
 				//enfilera os caracteres na string 'prompt[]'.
 				   //para depois ser comparada com outras strings.
-                default:  
+                default:
+                    shellInsertNextChar((char) long1); //coloca no buffer do shell				
 				    printf("%c", (char) long1); 			   
 				    input( (unsigned long) long1);				  
 					goto done;
@@ -815,7 +905,7 @@ done:
 	//if(VideoBlock.useGui == 1)
 	//{
 	    //Debug.
-		refresh_screen();
+		refresh_screen(); //Obs: #bugbug perceba que o procedimento de janela do sistema também tem um refresh screen.
 	//};	
     return (unsigned long) 0;	
 };
@@ -895,41 +985,74 @@ unsigned long shellCompare()
     //	
 	
 palavra_reservada:
+
+    //
+	// ordem alfabética.
+	//
 	
-	//cria arquivos e diretorios principais..
-	if( strncmp( prompt, "makeboot", 8 ) == 0 )
+	
+	//boot - ?? boot info ??
+	if( strncmp( prompt, "boot", 4 ) == 0 )
 	{
-	    printf("~makeboot\n");
-		
-		//ret_value = fs_makeboot();
-		//if(ret_value != 0){
-		//    printf("shell: makeboot fail!");
-		//};
+	    printf("~boot\n");
+		//boot();
         goto exit_cmp;
     };
+
 	
-	
-	if( strncmp( prompt, "format", 6 ) == 0 )
+
+    //cls
+	if( strncmp( prompt, "cls", 3 ) == 0 )
 	{
-	    printf("~format\n");
-		//fs_format(); 
+        shellClearscreen();
+        shellSetCursor(0,0);
+	    shellPrompt();
         goto exit_cmp;
-    };	
+	};
 	
-	if( strncmp( prompt, "debug", 5 ) == 0 )
-	{
-	    printf("~debug\n");
-		//debug();
-        goto exit_cmp;
-    };
-		
- 
+	//dir
 	if( strncmp( prompt, "dir", 3 ) == 0 )
 	{
 	    printf("~dir\n");
 		//fs_show_dir(0); 
         goto exit_cmp;
     };
+	
+	//exit
+    if( strncmp( prompt, "exit", 4 ) == 0 ){
+        printf("~exit\n");
+		exit(0);
+		goto exit_cmp;
+    };
+
+	//hd ??
+    if( strncmp( prompt, "hd", 2 ) == 0 )
+	{
+	    printf("~hd\n");
+        goto exit_cmp;
+    };
+	
+	//help
+    if( strncmp( prompt, "help", 4 ) == 0 ){
+		shellHelp();
+		goto exit_cmp;
+    };	
+	
+	//install	
+	//muda um arquivo da area de transferencia para 
+	//o sistema de arquivos...
+	if( strncmp( prompt, "install", 7 ) == 0 )
+	{
+	    printf("~install\n");
+		//fs_install();
+        goto exit_cmp;
+    };
+	
+    //ls
+	if( strncmp( prompt, "ls", 2 ) == 0 )
+	{
+        goto exit_cmp;
+	};	
 
 
 	// newfile
@@ -947,42 +1070,17 @@ palavra_reservada:
 		//fs_create_dir( "novo    dir", 0);
         goto exit_cmp;
     };
-	
-    //testa mbr
+
+    //mbr
     if( strncmp( prompt, "mbr", 3 ) == 0 )
 	{
 	    printf("~mbr\n");
-		//testa_mbr();
-		goto exit_cmp;
-    }; 
-	
-    //testa /root
-    if( strncmp( prompt, "root", 4 ) == 0 )
-	{
-	    printf("~/root\n");
-		//testa_root();
+		shellTestMBR();
+		printf("done\n");
 		goto exit_cmp;
     }; 
 
-	
-    if( strncmp( prompt, "start", 5 ) == 0 )
-	{
-	    printf("~start\n");
-		goto exit_cmp;
-    }; 
-	
-    if( strncmp( prompt, "help", 4 ) == 0 ){
-		shellHelp();
-		goto exit_cmp;
-    };
-	
-    if( strncmp( prompt, "cls", 3 ) == 0 )
-	{
-	    //black
-	    //kclear(0);
-        goto exit_cmp;
-	};
- 	  	
+    //reboot 	  	
     if( strncmp( prompt, "reboot", 6 ) == 0 )
 	{
 	    printf("~reboot\n");
@@ -991,39 +1089,18 @@ palavra_reservada:
 		goto exit_cmp;
     };
 	
-    if( strncmp( prompt, "exit", 4 ) == 0 ){
-        printf("~exit\n");
-		exit(0);
-		goto exit_cmp;
-    };
-	
-    if( strncmp( prompt, "hd", 2 ) == 0 )
+    //root
+    if( strncmp( prompt, "root", 4 ) == 0 )
 	{
-	    printf("~hd\n");
-        goto exit_cmp;
-    };
-	
+	    printf("~/root\n");
+		//testa_root();
+		goto exit_cmp;
+    }; 
+
+    //save
 	if( strncmp( prompt, "save", 4 ) == 0 )
 	{
 	    printf("~save root\n");
-        goto exit_cmp;
-    };
-	
-	//muda um arquivo da area de transferencia para 
-	//o sistema de arquivos...
-	if( strncmp( prompt, "install", 7 ) == 0 )
-	{
-	    printf("~install\n");
-		//fs_install();
-        goto exit_cmp;
-    };
-	
-	
-	//boot - inicia o sistema carregado
-	if( strncmp( prompt, "boot", 4 ) == 0 )
-	{
-	    printf("~boot\n");
-		//boot();
         goto exit_cmp;
     };
 
@@ -1043,14 +1120,64 @@ palavra_reservada:
         goto exit_cmp;
     };
 	
+	//start
+    if( strncmp( prompt, "start", 5 ) == 0 )
+	{
+	    printf("~start\n");
+		goto exit_cmp;
+    }; 
 	
+	
+    //t1 - Test file
+	if( strncmp( prompt, "t1", 2 ) == 0 ){
+		
+		//carrega e exibe um arquivo.
+		shellTestLoadFile();
+		
+		//escreve no buffer de saida e mostra o buffer de saida.
+		shell_buffer[0] = (char) 'F';
+        shell_buffer[1] = (char) 'N';	
+        shell_buffer[2] = (char) '\0';			
+		printf( (const char *) stdout->_base );
+		
+		printf("%s \n",stdout->_base);
+		printf("%s \n",stdout->_tmpfname);
+		printf("%d \n",stdout->_cnt);
+		printf("%d \n",stdout->_bufsiz);
+		printf("done \n");
+		
+        goto exit_cmp;
+    };
+	
+	//t2 - test bmp
+	if( strncmp( prompt, "t2", 2 ) == 0 ){
+		shellTestDisplayBMP();
+        goto exit_cmp;
+    };	
+	
+	//t3 - test thread
+	if( strncmp( prompt, "t3", 2 ) == 0 ){
+	    shellTestThreads();
+        goto exit_cmp;
+    };
+		
+		
+	//version
     if( strncmp( prompt, "version", 7 ) == 0 ){
 	    printf("%s\n",SHELL_VERSION);
         goto exit_cmp;
     };	
  
+ 
+//
+// Se apertamos o enter e não encontramos um comando válido
+// então damops um aviso de comando inválido e reiniciamos o prompt 
+// na próxima linha.
+//
+ 
 palavra_nao_reservada:
-    printf("Unknown command!\n");
+    printf(" Unknown command!\n");
+	shellPrompt();
 	return (unsigned long) 1;
 	
 exit_cmp: 
@@ -1078,31 +1205,54 @@ void shellShell()
 	
     shellStatus = 0;
     shellError = 0;
-    shellMaxColumns = (320/8);  //30;    //80
-    shellMaxRows    = (480/8);  //20;    //25
-    shellScreenWidth = shellMaxColumns;
-    shellScreenHeight = shellMaxRows;
+	
+	//window position
+	//shell_window_x = DEFAULT_WINDOW_X;
+	//shell_window_y = DEFAULT_WINDOW_Y;
+	shell_window_x = 10;
+	shell_window_y = 10;
+
+	
+	//screen sizes
+	shellScreenWidth = 800;
+    shellScreenHeight = 600;
+	
+	//window height
+	shellWindowWidth = (DEFAULT_MAX_COLUMNS*8);
+    shellWindowHeight = (DEFAULT_MAX_ROWS*8);
+	
+    shellMaxColumns = DEFAULT_MAX_COLUMNS; //80;
+    shellMaxRows    = DEFAULT_MAX_ROWS; //25;
+
     //...	
 
 	//
-	// Em stdio.h.
+	// Setup buffers.
 	//
 	
-    //Prompt.
-    prompt[0] = (char) '\0';
-	prompt_pos = 0;
-    prompt_max = 250;  //??	PROMPT_MAX_DEFAULT
-    prompt_status = 0;	
+    // reiniciando as variáveis na estrutura do output
+	stdout->_base = &shell_buffer[0];
+	stdout->_ptr = stdout->_base;
+	stdout->_cnt = PROMPT_MAX_DEFAULT;
+	stdout->_file = 1;
+	stdout->_tmpfname = "shell_stdout";
+	//...	
+	//
+	// Obs:
+	// shell_buffer[] = Aqui é o buffer de output. 
+	// prompt[] - Aqui ficam as digitações. 
+	//
+	shellClearBuffer();
+	shellPrompt();
 	
 	
-	//
-	// Shell buffer.
-	//
+	
+	//shellBufferMaxColumns = DEFAULT_BUFFER_MAX_COLUMNS;
+	//shellBufferMaxRows    = DEFAULT_BUFFER_MAX_ROWS;
+	
+	//buffersize = (shellBufferMaxColumns * shellBufferMaxRows);
+	
 
-	for( i=0; i<SHELL_BUFFER_SIZE; i++){
-		shell_buffer[i] = 0;
-	}
-	shell_buffer[0] = (char) '\0';
 	
 	//
 	// @todo: E o fluxo padrão. Quem configurou os arquivos ???
@@ -1110,8 +1260,8 @@ void shellShell()
 	//
 	
 	//Número máximo de colunas e linhas.
-	g_columns = shellMaxColumns; //30;
-	g_rows = shellMaxRows;       //20;
+	g_columns = shellMaxColumns; //80;
+	g_rows = shellMaxRows;       //25;
     //...
 	
 	
@@ -1138,14 +1288,14 @@ int shellInit()
 	int ActiveWindowId = 0;
 	int WindowWithFocusId = 0;
 	void *P;
-	void *T;
+
 	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo texto.
 	//
 	
 	//Constructor.
-	shellShell(); 
+	//shellShell(); 
 
 
 	// ...Testing strings on Client Area 
@@ -1180,12 +1330,7 @@ int shellInit()
 	    printf("ERROR getting PPID\n");	
 	}
   
-	
 	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n",PID ,PPID);
-	
-	
-	
-	
 	
 	printf("shellMaxColumns={%d} \n",shellMaxColumns);
 	printf("shellMaxRows={%d} \n",shellMaxRows);
@@ -1243,58 +1388,6 @@ int shellInit()
 	
 	printf("Created!\n");
 	//...
-	
-	//
-	// Obs: As threads criadas aqui etão sendo atribuídas ao processo PID=0.
-	//      @todo: No kernel, quando criar uma thread ela deve ser atribuída
-    //      ao processo que chamou a rotina de criação.	
-	//
-	printf("Creating threads...\n");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread3");
-	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread4");
-	//...
-	
-	//
-	// Tentando executar um thread.
-	//
-	
-	/*
-	 *******************************
-     //OBS: ISSO FUNCIONOU. ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O TAMANHO DO 
-     //     HEAP USADO PELO PROCESSO PARA ALOCAÇÃO DINÂMICA, ELE NÃO TA DANDO CONTA 
-     //     DE TODA A DEMANDA POR MEMÓRIA.		  
-	
-	//>>dessa vez pegaremos o retorno, que deve ser o ponteiro para a estrutura da thread.
-	//>>chamaremos a systemcall que executa essa thread que temos o ponteiro da estrutura.
-    void* ThreadTest1;	
-	
-	//#bugbug, não temos mais epapo no heap do preocesso para alocar memória 
-	//pois gastamos o heap com a imagem bmp.
-	//
-	unsigned long *threadstack1;
-	threadstack1 = (unsigned long *) malloc(30*1024);
-	threadstack1 = ( threadstack1 + (30*1024) - 4 ); //Ajuste para o início da pilha.
-	ThreadTest1 = (void*) apiCreateThread((unsigned long)&shellThread, (unsigned long) threadstack1,"ThreadTest1");
-	
-	
-	printf("shell: Tentando executar um thread ...\n");
-	refresh_screen();
-	
-	if( (void*) ThreadTest1 == NULL ){
-	    printf("shell: Tentando executar um thread FAIL NULL ...\n");	
-	    refresh_screen();
-		while(1){}
-	}
-	//Lá no kernel isso deve selecionar a thread para execussão colocando ela no estado standby
-	apiStartThread(ThreadTest1);
-	printf("shell: Tentando executar um thread [ok] hang...\n");
-	refresh_screen();
-	
-	while(1){}
-	**************************
-	*/
 	
 	
 	
@@ -1436,120 +1529,10 @@ done:
 	//printf("...\n");
 	//printf("TAKE A SAD O.S. AND MAKE IT BETTER!\n");
 	//printf("...\n");
-	//printf("Done!");
+	printf("Done!");
 	
-	//
-	// *Testando carregar um arquivo.
-	// Ok, isso funcionou.
-	//
-	
-	int fRet;
-	printf("...\n");
-	printf("Testing buffer ... Loading file...\n");
-	
-	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
-	fRet = (int) system_call( SYSTEMCALL_READ_FILE, 
-	                          (unsigned long) init_file_name, 
-					          (unsigned long) &shell_buffer[0], 
-							  (unsigned long) &shell_buffer[0] );
-							  
-	printf("ret={%d}\n",fRet);
-	
-	printf("...\n\n");
-	printf(&shell_buffer[0]);	
-	
-	//
-	// testando malloc.
-	//
-	
-	//Obs: 32Kb é alem do limite.
-	void *b = (void*) malloc(1024*30);
-	
-	//unsigned char b[32*1024];
-	
-    //load bmp test
-    //carregou, e pintou ...pinteou meio errado, mas o problema não é a rotina de pintura.
 
- 
-	
-	system_call( SYSTEMCALL_READ_FILE, 
-	                          (unsigned long) bmp1_file_name, 
-					          (unsigned long) b, 
-							  (unsigned long) b);	
-	
-    
-	
-    //system_call( SYSTEMCALL_LOAD_BITMAP_16x16, (unsigned long) &shell_buffer[0], 10, 10);
-	
-	
-	int i,j, base, offset;
-	unsigned long x, y;
-	unsigned long color;
-	
-	base = 0x36;  //início da área de dados do bmp
-	
-	x=10;
-	y=10+16;
-	
-	//base do bmp carregado na memória
-	unsigned char *bmp = (unsigned char *) b;
-	unsigned char *c   = (unsigned char *) &color;
-	
-	//@todo: encontrando o magic
-	
-	//if( bmp[0] != 0x42 )
-	//{
-	//	printf("~Sig fail\n");
-	//    printf("magic0 %c\n", bmp[0]);	
-	//    printf("magic1 %c\n", bmp[1]);			
-	//	printf("buffer %x\n",bmp); //Ok
-    //    printf("buffer %x\n",b);   //Ok
-		//printf("width %d \n", bmp[0x12]);
-		//printf("height %d \n", bmp[0x16]);
-	//}
-	
-	//
-	//Mostrando características do bmp.
-	
-	//printf("magic0 %c\n", bmp[0]);	
-	//printf("magic1 %c\n", bmp[1]);
-	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
-	//printf("buffer %x \n",bmp);
-	//printf("data area address %x \n",&bmp[base]);
-	
-	for (i=0; i<16; i++)
-	{
-		for (j=0; j<16; j++)
-		{	
-			
-			//construindo o char.
-			
-			offset = base;
-			c[1] = bmp[offset];
-			
-			offset = base+1;
-			c[2] = bmp[offset];
-			
-			offset = base+2;
-			c[3] = bmp[offset];
-			
-			c[0] = 0;
-			
-			base = base + 3;
-			
-			//number,cor,x,y
-			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, (unsigned long) x, (unsigned long) y);
-			
-			x++; //próximo pixel.
-		}
-		
-		//vamos para a linha anterior.
-		y = y-1;
-		x=10;    //reiniciamos o x.
-	}
 
- 
-	
 	
 	//
 	// @todo:
@@ -1647,33 +1630,11 @@ void shellThread()
 };
 
 
-
 //help message
 void shellHelp(){
     printf(help_banner);	
 	return;
 }
-
-/*
- * shellPrompt:
- *     Inicializa o prompt.
- */
-void shellPrompt()
-{	
-	int i;
-	for(i=0; i<PROMPT_MAX_DEFAULT;i++){
-		prompt[i] = (char) '\0';
-	}
-	
-    prompt[0] = (char) '\0';
-	prompt_pos = 0;
-    prompt_status = 0;
-
-    printf("\n");	
-	//printf("\n %s", ++ user name  ++);
-	printf(SHELL_PROMPT);
-	return;
-};
 
 
 //
@@ -1701,8 +1662,183 @@ int test_operators()
     printf("Remainder when a divided by b = %d \n",c);
     
     return 0;
-}
+};
 
+
+/*
+ * shellPrompt:
+ *     Inicializa o prompt.
+ *     Na inicialização de stdio, prompt foi definido como stdin->_base.
+ */
+void shellPrompt()
+{	
+	int i;
+	for(i=0; i<PROMPT_MAX_DEFAULT;i++){
+		prompt[i] = (char) '\0';
+	};
+	
+    prompt[0] = (char) '\0';
+	prompt_pos = 0;
+    prompt_status = 0;
+	prompt_max = 250;  //??	PROMPT_MAX_DEFAULT
+
+    printf("\n");	
+	//printf("\n %s", ++ user name  ++);
+	printf(SHELL_PROMPT);
+	return;
+};
+
+
+//limpa o buffer do shell
+void shellClearBuffer()
+{
+	int i;
+	
+	// Shell buffer.
+	for( i=0; i<SHELL_BUFFER_SIZE; i++){
+		shell_buffer[i] = 0;
+	}
+	shell_buffer[0] = (char) '\0';
+    shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+};
+
+
+//Carrega um arquivo de texto no buffer e mostra na tela.
+void shellTestLoadFile()
+{
+	shellClearBuffer();
+	shellClearscreen();
+    shellSetCursor(0,0);
+	shellPrompt();
+	//@todo: reposicionar o cursor.
+	
+	//
+	// *Testando carregar um arquivo.
+	// Ok, isso funcionou.
+	//
+	
+	int fRet;
+	printf("...\n");
+	printf("Testing buffer ... Loading file...\n");
+	
+	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
+	fRet = (int) system_call( SYSTEMCALL_READ_FILE, 
+	                          (unsigned long) init_file_name, 
+					          (unsigned long) &shell_buffer[0], 
+							  (unsigned long) &shell_buffer[0] );
+							  
+	printf("ret={%d}\n",fRet);
+	
+	printf("...\n\n");
+	printf(&shell_buffer[0]);		
+};
+
+
+//Cria um thread e executa.
+void shellTestThreads()
+{
+    void *T;	
+	//
+	// Obs: As threads criadas aqui etão sendo atribuídas ao processo PID=0.
+	//      @todo: No kernel, quando criar uma thread ela deve ser atribuída
+    //      ao processo que chamou a rotina de criação.	
+	//
+	printf("Creating threads...\n");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread3");
+	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread4");
+	//...
+	
+	//
+	// Tentando executar um thread.
+	//
+	
+	
+	// *******************************
+     //OBS: ISSO FUNCIONOU. ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O TAMANHO DO 
+     //     HEAP USADO PELO PROCESSO PARA ALOCAÇÃO DINÂMICA, ELE NÃO TA DANDO CONTA 
+     //     DE TODA A DEMANDA POR MEMÓRIA.		  
+	
+	//>>dessa vez pegaremos o retorno, que deve ser o ponteiro para a estrutura da thread.
+	//>>chamaremos a systemcall que executa essa thread que temos o ponteiro da estrutura.
+    void* ThreadTest1;	
+	
+	//#bugbug, não temos mais epapo no heap do preocesso para alocar memória 
+	//pois gastamos o heap com a imagem bmp.
+	//
+	unsigned long *threadstack1;
+	threadstack1 = (unsigned long *) malloc(30*1024);
+	threadstack1 = ( threadstack1 + (30*1024) - 4 ); //Ajuste para o início da pilha.
+	ThreadTest1 = (void*) apiCreateThread((unsigned long)&shellThread, (unsigned long) threadstack1,"ThreadTest1");
+	
+	
+	printf("shell: Tentando executar um thread ...\n");
+	refresh_screen();
+	
+	if( (void*) ThreadTest1 == NULL ){
+	    printf("shell: Tentando executar um thread FAIL NULL ...\n");	
+	    refresh_screen();
+		while(1){}
+	}
+	//Lá no kernel isso deve selecionar a thread para execussão colocando ela no estado standby
+	apiStartThread(ThreadTest1);
+	printf("shell: Tentando executar um thread [ok] hang...\n");
+	refresh_screen();
+	
+	//while(1){}
+	// **************************
+	return;	
+};
+
+
+//limpar a tela do shell.
+void shellClearscreen()
+{
+	int i;
+	
+	shellSetCursor(0,0);
+	
+	// Shell buffer. (80*25) ??
+	for( i=0; i<SHELL_BUFFER_SIZE; i++){
+		printf("%c", '\0'); //pinta um espaço.
+	}
+	shellSetCursor(0,0);
+};
+
+//copia o conteúdo do buffer para a tela. (dentro da janela)
+void shellRefreshScreen()
+{
+	int i;
+
+	//cursor apontando par ao início da janela.
+	shellSetCursor(0,0);
+	
+	// Shell buffer.
+	for( i=0; i<SHELL_BUFFER_SIZE; i++){
+		printf("%c", stdout->_ptr[i]);
+	};
+	
+    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+};
+
+
+
+void shellScroll()
+{
+	int i;
+    int end = (SHELL_BUFFER_SIZE+80);
+	
+	//cursor apontando par ao início da janela.
+	shellSetCursor(0,0);
+	
+	// Shell buffer.
+	for( i=80; i<end; i++){
+		printf("%c", stdout->_ptr[i]);
+	};
+	
+    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.		
+};
 
 /*
  * @todo: Criar rotina de saída do shell.
@@ -1721,6 +1857,264 @@ void die(char * str)
 	exit(1);
 }
 */
+
+
+static void save_cur(void)
+{
+	saved_x = shell_buffer_x;
+	saved_y = shell_buffer_y;
+}
+
+
+static void restore_cur(void)
+{
+	x=saved_x;
+	y=saved_y;
+	//pos = origin + ( (y * columns + x) << 1 );
+	shell_buffer_pos = origin + (shell_buffer_y * columns + shell_buffer_x);
+}
+
+
+static void lf(void)
+{
+	if (shell_buffer_y+1 < bottom) {
+		shell_buffer_y++;
+		shell_buffer_pos += columns;  //pos += columns<<1;
+		return;
+	}
+	//scrup();
+}
+
+
+static void ri(void)
+{
+	if (shell_buffer_y>top) {
+		shell_buffer_y--;
+		shell_buffer_pos -= columns; //shell_buffer_pos -= columns<<1;
+		return;
+	}
+	//scrdown();
+}
+
+
+static void cr(void)
+{
+	shell_buffer_pos -= shell_buffer_x; //pos -= x<<1;
+	shell_buffer_x=0;
+}
+
+
+static void del(void)
+{
+	if (shell_buffer_x) {
+		shell_buffer_pos -= 2;
+		shell_buffer_x--;
+		//*(unsigned short *) shell_buffer_pos = 0x0720;
+		//@todo: printchar
+	}
+}
+
+
+//insere um caractere entro do buffer
+void shellInsertCharXY(unsigned long x, unsigned long y, char c)
+{
+	unsigned long offset = (unsigned long) ((y*80) + x); 
+	
+	if(x>=80){
+		return;
+	}
+	
+	if(y>=25){
+		return;
+	}
+
+	shell_buffer[offset] = (char) c;
+}
+
+//insere um caractere entro do buffer
+void shellInsertCharPos(unsigned long offset, char c)
+{
+	unsigned long offsetMax = (unsigned long)(80*25); 
+		
+	if(offset >= offsetMax){
+		return;
+	}
+	
+	shell_buffer[offset] = (char) c;
+};
+
+
+//coloca um char na próxima posição do buffer
+void shellInsertNextChar(char c)
+{
+	shell_buffer[shell_buffer_pos] = (char) c;	
+}
+
+
+void shellInsertCR()
+{
+   shell_buffer[shell_buffer_pos] = (char) '\r';	
+}
+
+
+void shellInsertLF()
+{
+    shell_buffer[shell_buffer_pos] = (char) '\n';	
+}
+
+
+void shellInsertNullTerminator()
+{
+    shell_buffer[shell_buffer_pos] = (char) '\0';	
+}
+
+
+//mostra na tela uma imágem carregada na memória.
+void bmpDisplayBMP( void * address, unsigned long x, unsigned long y, int width, int height )
+{
+	int i, j, base, offset;
+	
+	unsigned long left, top, bottom;
+	
+	unsigned long color;
+	
+	base = 0x36;  //início da área de dados do bmp
+	
+	//limits
+	
+	//@todo: Refazer isso
+	if( x > 800 ){ return; }
+	if( y > 600 ){ return; }
+	if( width > 800 ){ return; }
+	if( height > 600 ){ return; }
+	
+	if(address == 0){return;}
+	
+	left = x;    //
+	top  = y; 
+	bottom = top + height;
+	
+	//base do bmp carregado na memória
+	unsigned char *bmp = (unsigned char *) address;
+	unsigned char *c   = (unsigned char *) &color;
+	
+	
+	for(i=0; i<height; i++)
+	{
+		for(j=0; j<width; j++)
+		{	
+			//construindo o char.
+			
+			offset = base;
+			c[1] = bmp[offset];
+			
+			offset = base+1;
+			c[2] = bmp[offset];
+			
+			offset = base+2;
+			c[3] = bmp[offset];
+			
+			c[0] = 0;
+			
+			base = base + 3;
+		
+			
+			
+			//number,cor,x,y
+			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, (unsigned long) left, (unsigned long) bottom);
+			//my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
+			
+			left++; //próximo pixel.
+		}
+		
+		//vamos para a linha anterior.
+		bottom = bottom-1;
+		left = x;    //reiniciamos o x.
+	};	
+	
+	return;
+};
+
+
+//carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+void shellTestDisplayBMP()
+{	
+	//
+	// #bugbug @todo: Aumenta o tamanho do heap do processo.
+	// Esse heap é gerenciando nas bibliotecas ou na API.
+	//Obs: 32Kb é alem do limite.
+	//
+	
+	void *b = (void*) malloc(1024*30); 	// testando malloc.
+    if( (void*) b == NULL ){
+		printf("shellTestDisplayBMP: allocation fail\n");
+		//while(1){}
+	}
+	
+	//Carregando o arquivo.
+loadFile:
+    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+	// na verdade tem que fazer essas rotinas na API.
+	system_call( SYSTEMCALL_READ_FILE, 
+	             (unsigned long) bmp1_file_name, 
+				 (unsigned long) b, 
+				 (unsigned long) b);	
+	
+	
+
+	//16x16
+	bmpDisplayBMP( b, 10, 450, 16, 16 );
+	 
+	 
+    //
+	//Mostrando informações sobre o arquivo.
+	//
+	
+	//base do bmp carregado na memória
+	//unsigned char *bmp = (unsigned char *) b;
+	
+	
+	//@todo: encontrando o magic
+	
+	//if( bmp[0] != 0x42 )
+	//{
+	//	printf("~Sig fail\n");
+	//    printf("magic0 %c\n", bmp[0]);	
+	//    printf("magic1 %c\n", bmp[1]);			
+	//	printf("buffer %x\n",bmp); //Ok
+    //    printf("buffer %x\n",b);   //Ok
+		//printf("width %d \n", bmp[0x12]);
+		//printf("height %d \n", bmp[0x16]);
+	//}
+	
+	//
+	//Mostrando características do bmp.
+	
+	//printf("magic0 %c\n", bmp[0]);	
+	//printf("magic1 %c\n", bmp[1]);
+	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
+	//printf("buffer %x \n",bmp);
+	//printf("data area address %x \n",&bmp[base]);
+		
+};
+
+
+void shellTestMBR()
+{
+	unsigned char buffer[512];
+	
+	
+	enterCriticalSection(); 
+	
+	//read sector
+	system_call( SYSTEMCALL_READ_LBA, 
+	             (unsigned long) &buffer[0],  //address 
+				 (unsigned long) 0,           //lba
+				 (unsigned long) 0);
+				 
+    shellRefreshScreen();	
+	exitCriticalSection();   
+}
 
 
 //

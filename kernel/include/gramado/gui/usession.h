@@ -23,7 +23,14 @@
  */
 
  
+ 
+//#bugbug: teremos somente uma user session. 
 #define USER_SESSION_COUNT_MAX 16
+ 
+ 
+//user session start
+//No caso de termos apenas uma user session, esse será o endereço dela.
+unsigned long usersession_start; 
  
  
 /*

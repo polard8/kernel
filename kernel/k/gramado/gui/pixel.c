@@ -196,6 +196,54 @@ void my_buffer_put_pixel( unsigned long ax,
 	return;
 };
 
+
+
+
+//copia um pixel do backbuffer para o frontbuffer
+void refresh_pixel( unsigned long x,  unsigned long y, unsigned long color )
+{
+    unsigned char *frontbuffer = (unsigned char *) 0xC0800000;
+	
+	//#bugbug conferir se a passagem de valores está certa .
+	unsigned char *rgba = (unsigned char *) color;
+
+	unsigned long pos = (unsigned long) ( 3 * x * y );
+	
+	frontbuffer[pos] = rgba[0];
+	frontbuffer[pos+3] = rgba[1];
+	frontbuffer[pos+3+3] = rgba[2];
+	frontbuffer[pos+3+3+3] = rgba[3];
+
+}
+
+
+//pega um pixel no backbuffer
+unsigned long get_pixel( unsigned long x,  unsigned long y )
+{
+    unsigned char *backbuffer = (unsigned char *) 0xC0400000;
+	
+	unsigned long color;
+	unsigned char *rgba = (unsigned char *) &color;
+	
+	unsigned long pos = (unsigned long) ( 3 * x * y );
+	
+	rgba[0] = backbuffer[pos];
+	rgba[1] = backbuffer[pos+3];
+	rgba[2] = backbuffer[pos+3+3];
+	rgba[3] = backbuffer[pos+3+3+3];
+
+    return (unsigned long) color;	
+}
+
+
 //
 // End.
 //
+
+
+
+
+
+
+
+

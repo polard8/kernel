@@ -1,6 +1,8 @@
 /*
  * File: executive\sm\sys\procedure.c
  *
+ *                   
+ *
  * O PROCEDIMENTO NUNCA DEVE SER TROCADO, SEMPRE SERÁ O PROCEDIMENTO DO SISTEMA
  * QUANDO HOUVER UMA MENSAGEM ENVIADA PARA OUTRO PROCEDIMENTO, A MENSAGEM DEVE SER
  * COLOCADA NA ESTRUTURA DA JANELA ATIVA E AVISAR A THREAD E O PROCESSO SOBRE A MENSAGEM.
@@ -110,8 +112,11 @@ unsigned long system_procedure( struct window_d *window,
 				//Obs: 
 				// *Importante: Tem que chamar método pra pegar variável dentro de driver.
 				 
+				
 				//Help. 
 				case VK_F1:
+
+					
 					//if(AltStatus == 1){ window_with_focus = 1; break;};
 					//if(CtrlStatus == 1){ active_window = 1; break;};
 			        //if(ShiftStatus == 1){ break;}; 
@@ -121,8 +126,10 @@ unsigned long system_procedure( struct window_d *window,
 					//ShowUserInfo(0);    //Mostra o usuário 0, default.
                     break;
 					
+				
 				//Kernel info.	
                 case VK_F2:
+					
 					//if(AltStatus == 1){ window_with_focus = 2; break;};
 					//if(CtrlStatus == 1){ active_window = 2; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F2\n"); break;}; 				
@@ -137,6 +144,7 @@ unsigned long system_procedure( struct window_d *window,
                     //... @todo: Testar mais coisa aqui.					
                     break;
 				
+	
                 //CPU info. 				
                 case VK_F3: 
 					//if(AltStatus == 1){ window_with_focus = 3; break;};
@@ -149,7 +157,11 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//Window tests.	
                 case VK_F4:
-					//if(AltStatus == 1){ window_with_focus = 4; break;};
+					if(AltStatus == 1){ 
+					    closeActiveWindow(); 
+						AltStatus = 0;
+						break;
+					};
 					//if(CtrlStatus == 1){ active_window = 4; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F4\n"); break;};
 				    
@@ -193,7 +205,8 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Clock info./minishell				
 				case VK_F6:
-					init_mouse();  //isso está em keyboard.c
+					
+					//init_mouse();  //isso está em keyboard.c
 					
 					//#bugbug TEST.
 					//Loop para testes ... isso é problema 

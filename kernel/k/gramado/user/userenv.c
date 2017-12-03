@@ -161,8 +161,9 @@ void *CreateUser(char *name, int type)
 	New = (void*) malloc( sizeof(struct user_info_d) ); 
 	if( (void*) New == NULL ){
 	    printf("CreateUser:");
-	    refresh_screen();
-	    while(1){}
+	    die();
+		//refresh_screen();
+	    //while(1){}
 	}else{
 	    
 		New->name = (char *) name;      //Name.
@@ -316,8 +317,9 @@ void init_user_info()
 	DefaultUser = (void*) CreateUser(default_user_name, USER_TYPE_INTERACTIVE);
 	if( (void*) DefaultUser == NULL){
 	    printf("init_user_info:");
-	    refresh_screen();
-	    while(1){}
+	    die();
+		//refresh_screen();
+	    //while(1){}
 	}else{
 		
 		//Coloca no início da lista.

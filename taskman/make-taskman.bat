@@ -9,13 +9,20 @@ echo -{ head
 :Compiling	
 echo -{ ...
 echo -{ Compiling TASKMAN.BIN.
+    gcc -c crt0.c -o crt0.o  
 	gcc -c main.c -o main.o  
 	
 :Objects	
 set myObjects=head.o ^
+crt0.o ^
 main.o ^
 api.o ^
-stdio.o 
+stdio.o ^
+stdlib.o ^
+string.o 
+
+
+
 
 
 :Linking

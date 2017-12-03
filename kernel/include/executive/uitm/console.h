@@ -153,9 +153,9 @@ struct console_d
 	// Arquivos (drivers, metafiles, stdout)
 	//
 	
-	FILE *stdin;	
-	FILE *stdout;
-	FILE *stderr;
+	FILE *_stdin;	
+	FILE *_stdout;
+	FILE *_stderr;
 	//...
 	
 	//Continua...

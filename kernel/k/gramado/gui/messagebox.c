@@ -62,34 +62,9 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 				 char *title,                     //Title for the window frame.
 				 char *string )                   //Message string.
 {	
-	//
-	// Set up.
-	//
-	
-	struct button_d *b1;  //ponteiro para a estrutura de botão.
-	struct button_d *b2;  //ponteiro para a estrutura de botão.
-	
-	//Elementos.
-	int Button = 0;
-	int Icon = 0;
-	//continua...
-	
-	//unsigned long x  = (unsigned long) (1*(800/3));	
-	//unsigned long y  = (unsigned long) (1*(600/3));
-    //unsigned long cx = (unsigned long) (1*(800/3));
-    //unsigned long cy = (unsigned long) (1*(600/3));	
+	struct button_d *b1; 
+	struct button_d *b2;
 
-    //retângulo abaixo do grid.
-	
-	//x
-	unsigned long x  = (unsigned long) (800 -400); //deslocamento x
-    unsigned long cx = (unsigned long) 320;        //largura   
-	
-	//y
-	unsigned long y  = (unsigned long) (600 -400); //deslocamento y
-    unsigned long cy = (unsigned long) 240; //altura	
-
-	
 	struct window_d *hWnd;    //Window.
 	struct window_d *pWnd;    //Parent.
 	struct window_d *bWnd;    //Button.
@@ -97,6 +72,19 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 	unsigned long WindowClientAreaColor;
 	unsigned long WindowColor;
 	
+	int desktopID; 
+
+	int Button = 0;
+	int Icon = 0;
+	//...
+
+	
+	//x and y
+	//@todo: Pegar a métrica do dispositivo.
+	unsigned long x  = (unsigned long) (800 -400);  //deslocamento x
+    unsigned long cx = (unsigned long) 320;         //largura   
+	unsigned long y  = (unsigned long) (600 -400);  //deslocamento y
+    unsigned long cy = (unsigned long) 240;         //altura	
 
 	
 	//No GUI.
@@ -136,38 +124,21 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 		//Nothing.
 	};
 	
-	// Configurando as cores usadas no message box.
-	
+	// Configurando as cores.
 	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  	
 	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
 	
-	
-	
-	int desktopID; 
+	//Desktop support.
 	desktopID = (int) get_current_desktop_id();
 	
-	
-	//
-	// Quando criamos um message box, criamos uma janela.
-	// do tipo que tem botão. ??
-	//
-	
+	// Criando a janela.
 	
 //creatingFrame:
-	
-	// Creating a Window Frame for the Message Box. 
-	// Obs: Não queremos muitos tipos, isso é desnecessário.
-	
-	//
-	// @todo: Usar o esquema de cores padrão.
-	//
-	
+
+    //@todo: Criar definições de tipos de message boxs.
+	//@todo: Criar um tipo light.
 	switch(type)
-	{
-		//
-		// 765432(D=1) ??
-		//
-				
+	{	
 	    // Com botão, considera o título.
 	    case 1:
 		    Button = 1;
@@ -209,16 +180,12 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 		    break;
 	};
 	
-	//
-    // Register.
-	//
-	
+	// registrando a janela.
 	if((void*) hWnd == NULL){
 	    printf("MessageBox:");
 		refresh_screen();
 	    while(1){};
 	}else{   
-		
 		RegisterWindow(hWnd);
         set_active_window(hWnd);
 		SetFocus(hWnd);  	 
@@ -238,7 +205,7 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 	//size_t S;
 	//S = (size_t) strlen( (const char*) string);
 	
-d_string:
+drawString:
 	draw_text( hWnd, 1*(cx/16), (cy-16), COLOR_WINDOWTEXT, string);
 
 	//
@@ -249,7 +216,7 @@ d_string:
 	//
 	//
 	//
-d_button:	
+drawButton:	
     if(Button == 1)
 	{
 		//@todo: Criar uma janela do tipo botão para setar o foco.
@@ -293,17 +260,21 @@ d_button:
 			RegisterWindow(bWnd); 
 	    };	
 */		
-	
-	
-	//
-	// Continua ...
-	//
-	
+		
+	//Configurando qual vai ser a janela atual.
 	CurrentWindow = (void*) hWnd;
+	//current_window ?? id ??
+	
+	//Habilitando o procedimento de janela do message box.
 	SetProcedure( (unsigned long) &MessageBoxProcedure );	
 	
+	
+	//
+	// ?? Continua ...
+	//	
+	
 done:
-    //SetFocus(hWnd);		
+    //SetFocus(hWnd);	//??	
     refresh_screen();		   
     return;
 };
