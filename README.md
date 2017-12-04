@@ -8,9 +8,9 @@ I need to load the kernel and some other files.
 Maybe you can help me with this thing.
 
 
-/init    = init application
-/kernel  = kernel
-/shell   = shell application 
-/taskman = taskman application
+<br>/init    = init application
+<br>/kernel  = kernel
+<br>/shell   = shell application 
+<br>/taskman = taskman application
 
 @frednora
