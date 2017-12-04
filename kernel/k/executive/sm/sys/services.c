@@ -265,12 +265,14 @@ void *services( unsigned long number,
 		
 		//1 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_READ_LBA: 
-		    systemDevicesUnblocked(36,arg2,arg3,0,0); 
+		    //@todo: chamar hal
+			systemDevicesUnblocked(36,arg2,arg3,0,0); 
 		    break;
 			
 		//2 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_WRITE_LBA: 
-		    systemDevicesUnblocked(35,arg2,arg3,0,0); 
+		    //@todo: chamar hal
+			systemDevicesUnblocked(35,arg2,arg3,0,0); 
 		    break;
 
 		//3 fopen (i/o)
@@ -329,24 +331,18 @@ void *services( unsigned long number,
 		// ?? Quando um carctere é pintado em uma janela que não está com o foco 
 		//    de entrada ?? ex: shells, logs ...
 		//
+		//Supondo que os aplicativos escreverão mais em terminal por enquanto 
+		//a cor padrão de fonte será a cor de terminal.
+		//	
+		// Aqui está pintando o caractere na janela com o foco de entrada.
 		case SYS_BUFFER_DRAWCHAR:
-            
-			//
-			// Aqui está pintando o caractere na janela com o foco de entrada.
-			//
-           		
 			focusWnd = (void*) windowList[window_with_focus];
-			if( (void*) focusWnd == NULL ){
-			    break;	
-			};
+			if( (void*) focusWnd == NULL ){ break; };
 			
-			//Supondo que os aplicativos escreverão mais em terminal por enquanto 
-			//a cor padrão de fonte será a cor de terminal.
-			my_buffer_char_blt( (unsigned long) (arg2 + focusWnd->left),             //x.
-			                    (unsigned long) (arg3 + focusWnd->top),              //y.
+			my_buffer_char_blt( (unsigned long) (focusWnd->left + arg2),             //x.
+			                    (unsigned long) (focusWnd->top + arg3),              //y.
 								CurrentColorScheme->elements[csiTerminalFontColor],  //color. 
 								(unsigned long) arg4);                               //char.
-								
 			break;
 
 		//8
@@ -420,8 +416,7 @@ void *services( unsigned long number,
 
 
         //45 Message Box. 
-        case SYS_MESSAGEBOX:
-            //Ok Funcionou assim.		
+        case SYS_MESSAGEBOX:		
             MessageBox(gui->screen, 1, (char *) a3, (char *) a4 );        
             return NULL;
 			break;
@@ -439,9 +434,9 @@ void *services( unsigned long number,
 		//48, Create Window support.
 		//envia argumentos de posicionamento.
 		case SYS_BUFFER_CREATEWINDOW1:
-		    cwArg5  = arg2;  //x
-			cwArg6  = arg3;  //y
-			cwArg9  = gui->screen;  //@todo: O argumento arg4 está enviando parent window.    
+		    cwArg5 = arg2;  //x
+			cwArg6 = arg3;  //y
+			cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window.    
 			return NULL;
 			break;
 		
@@ -460,41 +455,41 @@ void *services( unsigned long number,
 		case SYS_BUFFER_RESIZEWINDOW:		
 		    //(handle,x,y)
 		    return (void*) resize_window( (struct window_d*) arg2, arg3, arg4);
-		break;
+		    break;
 		
 		//51 redraw window.
 		case SYS_BUFFER_REDRAWWINDOW:
 		    //(handle)
 		    return (void*) redraw_window((struct window_d*) arg2);
-		break;
+		    break;
 		
 		//52  replace window.
 		case SYS_BUFFER_REPLACEWINDOW:
 		    //(handle,x,y)
 		    return (void*) replace_window( (struct window_d*) arg2, arg3, arg4);
-		break;
+		    break;
 		
 		//53 maximize window 
 		case SYS_BUFFER_MAXIMIZEWINDOW:
 		    //(handle)
 		    MaximizeWindow((struct window_d*) arg2);
-		break;
+		    break;
 		
 		//54 minimize window
 		case SYS_BUFFER_MINIMIZEWINDOW:
 		    //(handle)
 		    MinimizeWindow( (struct window_d *) arg2);
-		break;
+		    break;
 		
 		//55 Get foreground window.
 		case SYS_BUFFER_GETFOREGROUNDWINDOW:
 		    return (void*) windowGetForegroundWindow();
-		break;
+		    break;
 		
 		//56 set foreground window.
 		case SYS_BUFFER_SETFOREGROUNDWINDOW:
 		    return (void*) windowSetForegroundWindow((struct window_d*) arg2);
-		break;
+		    break;
 		
 		
 		//57.	
@@ -524,12 +519,14 @@ void *services( unsigned long number,
 			
         //63
 		case SYS_GETFOCUS: 
-		    return (void*) window_with_focus;
+		    return (void*) window_with_focus;  //id
+			//return (void*) GetFocus();       //handle
 		    //return (void*) systemRam(72,0,0,0,0); //#bugbug retornando valor errado. ??
 			break;
 			
         //64
-		case SYS_KILLFOCUS: 
+		case SYS_KILLFOCUS:
+            //KillFocus(window);		
 		    systemRam(73,(unsigned long) hWnd,0,0,0); 
 			break;
 
@@ -848,7 +845,6 @@ void *services( unsigned long number,
 		
 		default:	
 			printf("Default SystemService={%d}\n",number);
-			//return NULL;
 			break;
 	};
 	

@@ -1643,169 +1643,6 @@ done:
 	return (void*) hwBar;
 }; 
  
- 
-/*
- * systemStartUp:
- *     Rotina de inicialização do sistema.
- *
- * Fase 1:
- *     Inicia elementos independentes da arquitetura.
- *	   + Inicia vídeo, cursor, monitor. 
- *       Somente o necessário para ver mensagens.
- * Fase 2:
- *     Inicia elementos dependentes da arquiterura.
- *	   + inicia elementos de I/O e elementos conservadores de dados.
- *	   + inicia runtime.
- *     + inicia hal, microkernel, executive.
- *     + Inicia as tarefas. (@todo: threads ou processos ?).
- * Fase 3:
- *     classe system.device.unblocked.
- *	   @todo: Inicializar dispositivos LPC/super io.
- *            Keyboard, mouse, TPM, parallel port, serial port, FDC. 
- * Fase 4:
- *     classe system.device.unblocked.
- *     @todo: Dispositivos PCI, ACPI ...
- *
- *     Continua ...
- *
- * 2015 - Created.
- * 2016 - Revisão.
- */
-int systemStartUp()
-{
-    int Status = 0;
-
-	KeInitPhase = 0;  //Set Kernel phase.    
-
-    //
-	// Antes de tudo: CLI, Video, runtime.
-	//
-	
-	if(KeInitPhase != 0)
-	{	
-		//@todo: As mensagens do abort podem não funcionarem nesse caso.
-		KiAbort();	
-	}else{
-		
-	    //Disable interrupts, lock taskswitch and scheduler.	    
-		asm("cli");	
-	    taskswitch_lock();
-	    scheduler_lock();
-		
-		//Set scheduler type. (Round Robin).
-	    schedulerType = SCHEDULER_RR; 
-		
-	    
-		//Obs: O video já foi inicializado em main.c.
-				
-		//
-		// BANNER !
-		//
-		
-        //Welcome message. (Poderia ser um banner.) 
-		set_up_cursor(0,1);
-		
-#ifdef KERNEL_VERBOSE		
-        printf("systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
-#endif		
-		
-#ifdef KERNEL_VERBOSE		
-		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
-		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
-		    printf("systemStartUp: %s\n",developer_edition_string);
-		};
-#endif
-
-#ifdef KERNEL_VERBOSE
-		printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
-		                                                         ,(unsigned long) SavedX
-																 ,(unsigned long) SavedY
-																 ,(unsigned long) SavedBPP );
-#endif
-
-        //
-        // RUNTIME !
-        //		
-
-#ifdef KERNEL_VERBOSE		
-	    printf("systemStartUp: Initializing Runtime..\n");
-#endif			
-	    Status = (int) KiInitRuntime();
-	    if(Status != 0){
-	        printf("systemStartUp error: Runtime.\n");
-		    KiAbort();
-	    };		
-        
-        //
-        // INIT ! 
-        //  		
-		
-#ifdef KERNEL_VERBOSE
-		//(inicializa as 4 fases.)
-	    // Básico. ( Variáveis globais e estruturas ... ).
-	    printf("systemStartUp: Initializing Basics..\n");
-#endif		
-        Status = (int) init(); 
-	    if(Status != 0){
-	        printf("systemStartUp error: Init.\n");
-		    KiAbort();
-	    };	
-        //...	 
-	};
-	
-	 
-	
-	//
-	// System Version:
-	//     Configurando a versão do sistema.
-	//     
-	//
-	
-	systemSetupVersion();
-	
-	//
-	// Inicializa a edição do sistema.
-	// Define um tipo de destinação para a versão do sistema operacional.
-	//
-	
-    switch(SYSTEM_EDITION)
-	{
-		case SYSTEM_DEVELOPER_EDITION:
-		    gSystemEdition = SYSTEM_DEVELOPER_EDITION; 
-		    break;
-
-		case SYSTEM_WORKSTATION_EDITION:
-		    gSystemEdition = SYSTEM_WORKSTATION_EDITION;
-		    break;
-
-		case SYSTEM_SERVER_EDITION:
-		    gSystemEdition = SYSTEM_SERVER_EDITION;
-			break;
-
-		case SYSTEM_IOT_EDITION:
-		    gSystemEdition = SYSTEM_SERVER_EDITION;
-			break;
-
-        //...
-        default:
-		    gSystemEdition = 0;
-            break; 		
-	};
-	
-//
-// Done: 
-//     Completas as 3 fases de inicialização do sistema.
-//     @todo: Na verdade serão mais fases..
-//           as fases estão em init().
-done:	
-    //printf("systemStartUp: Done!\n");	
-	//refresh_screen();	
-	if(KeInitPhase != 3){ 
-	    Status = (int) 1; 
-	};
-    return (int) Status;
-};
-
 
 /*
  * systemCheck3TierArchitecture:
@@ -2440,6 +2277,168 @@ void *systemGetSystemStatus(int number)
 		default:
 		    return NULL;
 	};
+};
+
+/*
+ * systemStartUp:
+ *     Rotina de inicialização do sistema.
+ *
+ * Fase 1:
+ *     Inicia elementos independentes da arquitetura.
+ *	   + Inicia vídeo, cursor, monitor. 
+ *       Somente o necessário para ver mensagens.
+ * Fase 2:
+ *     Inicia elementos dependentes da arquiterura.
+ *	   + inicia elementos de I/O e elementos conservadores de dados.
+ *	   + inicia runtime.
+ *     + inicia hal, microkernel, executive.
+ *     + Inicia as tarefas. (@todo: threads ou processos ?).
+ * Fase 3:
+ *     classe system.device.unblocked.
+ *	   @todo: Inicializar dispositivos LPC/super io.
+ *            Keyboard, mouse, TPM, parallel port, serial port, FDC. 
+ * Fase 4:
+ *     classe system.device.unblocked.
+ *     @todo: Dispositivos PCI, ACPI ...
+ *
+ *     Continua ...
+ *
+ * 2015 - Created.
+ * 2016 - Revisão.
+ */
+int systemStartUp()
+{
+    int Status = 0;
+
+	KeInitPhase = 0;  //Set Kernel phase.    
+
+    //
+	// Antes de tudo: CLI, Video, runtime.
+	//
+	
+	if(KeInitPhase != 0)
+	{	
+		//@todo: As mensagens do abort podem não funcionarem nesse caso.
+		KiAbort();	
+	}else{
+		
+	    //Disable interrupts, lock taskswitch and scheduler.	    
+		asm("cli");	
+	    taskswitch_lock();
+	    scheduler_lock();
+		
+		//Set scheduler type. (Round Robin).
+	    schedulerType = SCHEDULER_RR; 
+		
+	    
+		//Obs: O video já foi inicializado em main.c.
+				
+		//
+		// BANNER !
+		//
+		
+        //Welcome message. (Poderia ser um banner.) 
+		set_up_cursor(0,1);
+		
+#ifdef KERNEL_VERBOSE		
+        printf("systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
+#endif		
+		
+#ifdef KERNEL_VERBOSE		
+		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
+		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
+		    printf("systemStartUp: %s\n",developer_edition_string);
+		};
+#endif
+
+#ifdef KERNEL_VERBOSE
+		printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
+		                                                         ,(unsigned long) SavedX
+																 ,(unsigned long) SavedY
+																 ,(unsigned long) SavedBPP );
+#endif
+
+        //
+        // RUNTIME !
+        //		
+
+#ifdef KERNEL_VERBOSE		
+	    printf("systemStartUp: Initializing Runtime..\n");
+#endif			
+	    Status = (int) KiInitRuntime();
+	    if(Status != 0){
+	        printf("systemStartUp error: Runtime.\n");
+		    KiAbort();
+	    };		
+        
+        //
+        // INIT ! 
+        //  		
+		
+#ifdef KERNEL_VERBOSE
+		//(inicializa as 4 fases.)
+	    // Básico. ( Variáveis globais e estruturas ... ).
+	    printf("systemStartUp: Initializing Basics..\n");
+#endif		
+        Status = (int) init(); 
+	    if(Status != 0){
+	        printf("systemStartUp error: Init.\n");
+		    KiAbort();
+	    };	
+        //...	 
+	};
+	
+	 
+	
+	//
+	// System Version:
+	//     Configurando a versão do sistema.
+	//     
+	//
+	
+	systemSetupVersion();
+	
+	//
+	// Inicializa a edição do sistema.
+	// Define um tipo de destinação para a versão do sistema operacional.
+	//
+	
+    switch(SYSTEM_EDITION)
+	{
+		case SYSTEM_DEVELOPER_EDITION:
+		    gSystemEdition = SYSTEM_DEVELOPER_EDITION; 
+		    break;
+
+		case SYSTEM_WORKSTATION_EDITION:
+		    gSystemEdition = SYSTEM_WORKSTATION_EDITION;
+		    break;
+
+		case SYSTEM_SERVER_EDITION:
+		    gSystemEdition = SYSTEM_SERVER_EDITION;
+			break;
+
+		case SYSTEM_IOT_EDITION:
+		    gSystemEdition = SYSTEM_SERVER_EDITION;
+			break;
+
+        //...
+        default:
+		    gSystemEdition = 0;
+            break; 		
+	};
+	
+//
+// Done: 
+//     Completas as 3 fases de inicialização do sistema.
+//     @todo: Na verdade serão mais fases..
+//           as fases estão em init().
+done:	
+    //printf("systemStartUp: Done!\n");	
+	//refresh_screen();	
+	if(KeInitPhase != 3){ 
+	    Status = (int) 1; 
+	};
+    return (int) Status;
 };
 
 

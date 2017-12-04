@@ -197,7 +197,7 @@ LOAD head.o
 LOAD main.o
 LOAD stdio.o
 LOAD api.o
-OUTPUT(IDLE.BIN pe-i386)
+OUTPUT(INIT.BIN pe-i386)
 
 .comment        0x00000000       0x20
  .comment       0x00000000       0x1f head.o

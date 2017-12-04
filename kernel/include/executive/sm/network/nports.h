@@ -1,5 +1,5 @@
 /*
- *  Arquivo: networkports.h
+ * File: networkports.h
  *
  *  Descrição:
  *      Network ports manager.

@@ -58,7 +58,7 @@ echo -{ ux4 /hal
 	gcc -c k/hal/blocked/pci.c   -I./include -o pci.o
 	gcc -c k/hal/blocked/usb.c   -I./include -o usb.o
 	gcc -c k/hal/blocked/apic.c  -I./include -o apic.o 
-	gcc -c k/hal/blocked/nic.c   -I./include -o nic.o
+
 	rem @todo Criar gcc -c k/hal/blocked/acpi.c -I./include -o acpi.o
 	rem @todo Criar gcc -c k/hal/blocked/apm.c -I./include -o apm.o	
 	
@@ -140,8 +140,9 @@ echo -{ ux2 /executive
 	
 	rem sm
 	rem /executive/network
+	gcc -c k/executive/sm/network/nic.c     -I./include -o nic.o
 	gcc -c k/executive/sm/network/network.c -I./include -o network.o
-	
+	gcc -c k/executive/sm/network/socket.c  -I./include -o socket.o
 	rem System Management.
 	
 	rem /executive/sm/sys
@@ -313,7 +314,6 @@ rtc.o ^
 keyboard.o ^
 ldisc.o ^
 hdd.o ^
-nic.o ^
 pci.o ^
 usb.o ^
 device.o ^
@@ -337,7 +337,9 @@ scheduleri.o ^
 dispatch.o ^
 semaphore.o ^
 modules.o ^
+nic.o ^
 network.o ^
+socket.o ^
 server.o ^
 channel.o ^
 ipc.o ^

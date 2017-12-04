@@ -7,4 +7,10 @@ I'm working to support GRUB boot loader.
 I need to load the kernel and some other files. 
 Maybe you can help me with this thing.
 
+
+/init    = init application
+/kernel  = kernel
+/shell   = shell application 
+/taskman = taskman application
+
 @frednora

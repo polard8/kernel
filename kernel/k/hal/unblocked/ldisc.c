@@ -837,10 +837,24 @@ done:
 	// em detrimento das teclas de acionamento de controles.
 	//
 	//
-	system_procedure( NULL, 
-	                 (int) mensagem, 
-	     			 (unsigned long) ch, 
-					 (unsigned long) ch );	
+	
+	//
+	// ?? PORQUE O HANDLE DE JANELA É NULO AQUI ??
+	//
+	// DEVEMOS CHAMAR O PROCEDIMENTO DO SISTEMA PARA ATUAR EM ALGUMA JANELA.
+	//
+	
+	
+	//teste:
+	// o procedimento de janela do sistema afetara a janela com o foco de entrada.
+	
+    //#bugbug : ?? o ldisc deveria ter essa informação toda sobre janelas ??
+	struct window_d *wwf;
+	wwf = (void *) windowList[window_with_focus];
+	
+	if( (void*) wwf != NULL ){
+	    system_procedure( wwf, (int) mensagem, (unsigned long) ch, (unsigned long) ch );
+    }					 
 	
 	
 	//test

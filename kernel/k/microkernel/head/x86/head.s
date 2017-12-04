@@ -623,8 +623,12 @@ dummyJmpAfterLTR:
 	
 	call _kMain
 
-	cmp eax, 0
-	jne headHalt
+_hang: 
+    hlt 
+	jmp _hang	
+	
+	;cmp eax, 0
+	;jne headHalt
 	
 	;
 	; @todo: e o processo IDLE.BIN?
@@ -637,23 +641,23 @@ dummyJmpAfterLTR:
 	
 	;Directory.
 	;xor eax, eax             	
-	mov eax, dword 0x9C000          
+	;mov eax, dword 0x9C000          
 	;mov eax, dword 0x01F00000
-	mov cr3, eax  
+	;mov cr3, eax  
 
     ;Flush TLB.
-    jmp flushTLB
-flushTLB:	
+    ;jmp flushTLB
+;flushTLB:	
 	;TLB.
-	mov EAX, CR3  
-    nop
-	nop
-	nop
-	nop
-	nop
-	mov CR3, EAX  	
+	;mov EAX, CR3  
+    ;nop
+	;nop
+	;nop
+	;nop
+	;nop
+	;mov CR3, EAX  	
 	
-	jmp _startStartIdle
+	;jmp _startStartIdle
 	;jmp _KeStartIdle  @todo deletar
 	;;jmp _StartIdle   @todo deletar	
 	

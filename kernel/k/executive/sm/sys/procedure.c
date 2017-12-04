@@ -59,6 +59,12 @@ void procedureGrid();
  * do sistema. Pois o procedimento do menu deve passar boa parte das mensagens
  * para serem tratadas pelo procedimento do sistema. 
  *
+ * ?? QUAL JANELA É AFETADA POR ESSE PROCEDIMENTO ??
+ *    É IMPORTANTE OBSERVAR O HANDLE DE JANELA PASSADO VIA ARGUMENTO.
+ *
+ * OBS: ESSE PROCEDIMENTO É INVOCADO POR 'ldisc.c' NA ROTINA LINEDISCIPLINE(..)
+ *      POR ENQUANTO ESTÁ PASSANDO UM HANDLE DE JANELA NULO. 
+ *
  */
 unsigned long system_procedure( struct window_d *window, 
                                 int msg, 
@@ -79,6 +85,12 @@ unsigned long system_procedure( struct window_d *window,
 	CtrlStatus = (int) get_ctrl_status();	
 	//ShiftStatus = (int) get_shift_status();
 	//...
+	
+	// ??
+	// E SE O HANDLE DE JANELA FOR NULL ??
+	// ENTÃO O PROCEDIMENTO DE JANELA NÃO PODERÁ ATUAR SOBRE JANELA NENHUMA.
+	// OBS:
+	//
 	
 	//janela de teste.
 	struct window_d *xxxx;
@@ -278,7 +290,7 @@ unsigned long system_procedure( struct window_d *window,
 					//show_process_information();
 					//show_thread_information();					
 				    
-					//aumentando gradativamente a janela de pouco em pouco.
+					//aumentando gradativamente uma janela de pouco em pouco.
 					xxxx = (void*) windowList[6];
 					xxxx->width  -= 20;
 					xxxx->height -= 20;
@@ -375,6 +387,12 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Mudar o foco de entrada pra próxima janela de uma lista.				
                 case VK_TAB:
+				
+				    //circula até errar.
+				    window_with_focus++;
+					if( (void*) windowList[window_with_focus] == NULL ){
+						window_with_focus = 1;
+					}
 				    //windowSwitchFocus();
 					
 					//if(AltStatus   == 1)

@@ -1,5 +1,7 @@
 /*
  * File: client.h
+ 
+ //(network) Client process support.   network support
  *
  * Description:
  *     Header do gerenciador de atividades do processo cliente.

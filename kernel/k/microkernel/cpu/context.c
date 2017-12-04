@@ -30,6 +30,15 @@
 #include <kernel.h>
 
 
+extern void set_page_dir();
+
+
+static inline void ckSetCr3( unsigned long value)
+{
+    __asm__ ( "mov %0, %%cr3" : : "r"(value) );
+}
+
+
 //
 // Variáveis internas. 
 //
@@ -246,6 +255,21 @@ void restore_current_context()
         contextedi[0] = (unsigned long) t->edi; 
 	    contextebp[0] = (unsigned long) t->ebp;  
         // Continua...
+		
+		
+	    //@todo: salvar o endereço do diretório de páginas da thread no CR3.		
+		
+		//asm (" movl %eax, %cr3" : "a" ((unsigned long) t->Directory) );
+		
+		//set_page_dir();
+		 
+		 
+		 
+		ckSetCr3( (unsigned long) t->Directory);
+
+	    //flush TLB
+	    asm("movl %cr3, %eax");
+        asm("movl %eax, %cr3");		
 	};
 
 	
@@ -253,6 +277,8 @@ void restore_current_context()
 	//flag ??...
 	//
 	
+	
+
 	
 //Done.
 done:
@@ -413,6 +439,17 @@ int contextContext()
 int contextInit()
 {};
 */
+
+/*
+static inline uint32_t ckGetCr3()
+{
+    uint32_t ret;
+    __asm__ ( "mov %%cr3, %0 " : "=r"(ret) );
+    return ret;
+}
+*/
+
+
 
 
 //

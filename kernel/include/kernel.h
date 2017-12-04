@@ -262,7 +262,7 @@ extern void do_executa_new_task();
 #include <hal/unblocked/ide.h>         //irq14/15 ( South bridge).
 //...
 //Blocked.
-#include <hal/blocked/nic.h>         //nic - network interface controller, adaptador de rede.
+
 #include <hal/blocked/sata.h>        //(PCI BUS).
 #include <hal/blocked/usb.h>         //usb.      
 #include <hal/blocked/pci.h>         //pci.  
@@ -341,13 +341,14 @@ extern void do_executa_new_task();
 //sm - System Management.  
 #include <executive/sm/install.h>  
 #include <executive/sm/init.h>
-#include <executive/sm/networkports.h>  //(network) Network Ports  (sw)
-#include <executive/sm/sockets.h>       //(network) Sockets info. (sw)
-#include <executive/sm/ip.h>            //(network) IP info.      (sw)
-#include <executive/sm/channel.h>       //(network) Channel       (sw)
-#include <executive/sm/client.h>        //(network) Client process support. 
-#include <executive/sm/server.h>        //(network) Server process support.
-#include <executive/sm/network.h>       //(network) Gerenciamento de rede. 
+#include <executive/sm/network/nic.h>         //nic - network interface controller, adaptador de rede.
+#include <executive/sm/network/nports.h>  //(network) Network Ports  (sw)
+#include <executive/sm/network/socket.h>       //(network) Sockets info. (sw)
+#include <executive/sm/network/ip.h>            //(network) IP info.      (sw)
+#include <executive/sm/network/channel.h>       //(network) Channel       (sw)
+#include <executive/sm/network/client.h>        //(network) Client process support. 
+#include <executive/sm/network/server.h>        //(network) Server process support.
+#include <executive/sm/network/network.h>       //(network) Gerenciamento de rede. 
 #include <executive/sm/fs.h>            //fs.
 #include <executive/sm/io.h>            //io
 #include <executive/sm/systemcall.h>    //as chamadas ao sistema.
@@ -883,9 +884,8 @@ void Removing_from_the_beginning(struct linkedlist_d *list);
 void Removing_from_the_middle(struct linkedlist_d *list);
 void Removing_from_the_end(struct linkedlist_d *list);
 
-
-//outros. 
-void CreateSystemTasks(); 
+ 
+ 
 
  
  

@@ -1,6 +1,7 @@
 /*
- * Arquivo: server.h 
+ * File: server.h 
  *
+ * //(network) Server process support. network support
  * Descrição:
  *     Header do módulo server do sistema.
  *

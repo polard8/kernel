@@ -1,5 +1,5 @@
 /*
- * Arquivo: sockets.h
+ * File: sockets.h
  *
  * Descrição:
  *     Header para gerenciamento de sockets.
@@ -14,23 +14,32 @@
 /*
  * struct sockets_d:
  *     ex: 192.168.1.1:80
+ *         127.0.0.1:80  
  */
-typedef struct sockets_d sockets_t;
-struct sockets_d
+typedef struct socket_d socket_t;
+struct socket_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
 	
 	unsigned long ip_address;
-    short port;	
+    unsigned short port;	
 	
 	//struct ip_address_d *ip_address;    //@todo: deletar.
 };
-sockets_t *CurrentSocket;
+socket_t *CurrentSocket;
+socket_t *LocalHostHTTPSocket;
+//...
+
+
+#define SOCKET_COUNT_MAX 32
+//@todo: refazer esse limite proviório
+unsigned long socketList[SOCKET_COUNT_MAX];
 
 
 
-//unsigned long socketList[16];
+
+struct socket_d *create_socket( unsigned long ip, unsigned short port );
 
 
 //

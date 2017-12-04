@@ -1071,6 +1071,87 @@ RGBA_t *RGBA;
 /*
  * Windows structures.
  */ 
+ 
+ 
+ 
+	//
+	// Window Class support.
+	//
+	
+ 
+//enumerando classe de janela 
+typedef enum {
+    WindowClassNull,
+	WindowClassClient,  //1 cliente
+	WindowClassKernel,  //2 kernel
+	WindowClassServer,  //3 servidor
+}wc_t;
+
+
+//classes de janelas controladas pelos aplicativos.
+typedef enum {
+    WindowClassApplicationWindow,	
+	//...
+}client_window_classes_t;
+
+//classes de janelas controladas exclusivamente pelo kernel.
+typedef enum {
+	WindowClassKernelWindow,    //janelas criadas pelo kernel ... coma a "tela azul da morte"
+    WindowClassTerminal,  //janela de terminal usada pelos aplicativos que não criam janela e gerenciada pelo kernel	
+    WindowClassButton,
+	WindowClassComboBox,
+	WindowClassEditBox,
+	WindowClassListBox,
+	WindowClassScrollBar,
+	WindowClassMessageOnly, //essa janela não é visível, serve apenas para troca de mensagens ...
+	WindowClassMenu,
+	WindowClassDesktopWindow,
+	WindowClassDialogBox,
+	WindowClassMessageBox,
+	WindowClassTaskSwitchWindow,
+	WindowClassIcons,
+	WindowClassControl,   //??
+    WindowClassDialog,
+    WindowClassInfo,
+    //...	
+}kernel_window_classes_t;
+
+//classes de janelas controladas pelos servidores.
+typedef enum {
+    WindowClassServerWindow,
+    //...	
+}server_window_classes_t;
+
+
+
+//estrutura para window class
+typedef struct window_class_d window_class_t; 
+struct window_class_d
+{
+	
+	//Que tipo de window class.
+	// do sistema, dos processos ...
+    //tipo de classe.	
+	wc_t windowClass; 
+	
+	//
+	// 
+	//
+
+	//1
+    client_window_classes_t	clientClass;
+	
+	//2
+	kernel_window_classes_t	kernelClass;
+	
+	//3
+	server_window_classes_t	serverClass;
+	
+	//Endereço do procedimento de janela.
+	//(eip da thread primcipal do app)
+	unsigned long procedure;
+    //...
+};
 
  
 /*
@@ -1101,8 +1182,7 @@ struct window_d
 	// Window Class support.
 	//
 	
-	//@todo: Criar essa estrutura.
-	//struct window_class_d *windowClass;
+	struct window_class_d *window_class;
 	
 	unsigned long type;                    //tipo ... (editbox, normal, ...)  style???
 	

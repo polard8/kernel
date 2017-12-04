@@ -56,11 +56,19 @@
 
 int networkTesting;
 
-/*
-int networkInit();
+ 
+
 int networkInit()
-{}
-*/
+{
+	//criando socket para local host porta 80
+	
+	LocalHostHTTPSocket = (struct socket_d *) create_socket( 0x0100007F, 80 );  /* Localhost (127.0.0.1):80 */
+	CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
+	//...
+	
+	return 0;
+}
+ 
 
 
 //

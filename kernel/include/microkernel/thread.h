@@ -236,14 +236,11 @@ struct thread_d
 	
 	/*
 	 * Page directory information:
-	 *     Todo processo deve ter seu próprio diretório.
-	 *     As threads usam o diretório do processo ao qual pertencem.
-	 *     O valor será carregado no CR3.
-	 *     @todo: Thread não tem diretório de página, mas
-	 *            pode ser o diretório do processo ao qual a thread pertence.
-	 *
+     *
+	 *   ** COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA
+	 *      AJUDA NA HORA DO TASKSWITCH **
 	 */
-	unsigned long Directory; //Thread não tem diretório, diretório do processo dela.
+	unsigned long Directory; 
 
 
 	
@@ -451,6 +448,7 @@ struct thread_d
 thread_descriptor_t *IdleThread;       // Idle Thread. TID=0
 thread_descriptor_t *ShellThread;      // Shell Thread. TID=1
 thread_descriptor_t *TaskManThread;    // TaskMan Thread. TID=2
+
 thread_descriptor_t *Thread;           // Current.
 //outros.
 //thread_descriptor_t *CurrentThread;  

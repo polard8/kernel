@@ -204,78 +204,8 @@ int KiCreateTask( int task_id,
 	return (int) KiCreateProcess(0, task_eip);
 };
 
-/*
- * CreateSystemTasks:
- *     Cria e inicializa as estruturas dos processos do sistema.
- *     Idle, Shell, Taskmanager.
- *     Não criar Idle aqui.
- *     @todo: Poderia mudar o nome para createCreateSystemProcesses().
- * Obs:
- *    Funcionou bem a criação de processos e treads.
- */
-void CreateSystemTasks()
-{
-	struct process_d *Process;
-	struct thread_d *Thread;
-	
-    printf("CreateSystemTasks: Creating System threads..\n");
-	KiCreateShell();
-	KiCreateTaskManager();
-	//...
-	
-	//
-	// @todo: Testando a criação de processos.
-	//
-		
-	//Create Process, test 1.
-	Process = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, PRIORITY_LOW, 0, "TESTPROCESS");	
-	if((void*) Process == NULL){
-		printf("CreateSystemTasks fail: Create process.\n");
-		refresh_screen();
-		while(1){};
-	};
-	
-	
-	//
-	// @todo: Testando criar threads inicializadas mas não prontas pra execução.
-	//
-	//OBS: As threads serão criadas depois de ja serem sido criadas as threads do sistema.
-	//idle thread eip (unsigned long) 0x00401000.
-	
-
-	
-	//Create Thread, test 1.
-	//#bugbug stack
-	Thread = (void*) create_thread( NULL, NULL, NULL, (unsigned long) 0x00401000, 0x004FFFF0, 0, "TESTTHREAD1");	
-	if((void*) Thread == NULL){
-		printf("CreateSystemTasks fail: Create thread.\n");
-		refresh_screen();
-		while(1){};
-	};
-	
-
-	//Create Thread, test 2.
-	//#bugbug stack
-	Thread = (void*) create_thread( NULL, NULL, NULL, (unsigned long) 0x00401000, 0x004FFFF0, 0, "TESTTHREAD2");	
-	if((void*) Thread == NULL){
-		printf("CreateSystemTasks fail: Create thread 2.\n");
-		refresh_screen();
-		while(1){};
-	};
-	
-	
-	//@todo: Stress test.
-	//debug_test_threads();
-	
-	
-	//...
-	
-	
-done:
-    printf("Done.\n");
-    return;
-};
-
+ 
+ 
 
 /*
  * KiCreateKernelProcess:
@@ -419,7 +349,7 @@ void *KiCreateIdle()
 	//IdleThread->Stack = ?;
 	//IdleThread->StackSize = ?;	
 	
-	//Stack.
+	//Stack. @todo: A stack deve ser a que está na TSS
 	//#BugBug.
 	idleStack = (void*) malloc(4*1024);
 	if( (void*) idleStack == NULL ){
@@ -445,6 +375,10 @@ void *KiCreateIdle()
 	IdleThread->name_address = (unsigned long) ThreadName;   //Funciona.
 
 	IdleThread->process = (void*) KernelProcess;
+	
+	
+	IdleThread->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
+	
 	//
 	// Procedimento de janela.
 	//  
@@ -534,10 +468,7 @@ void *KiCreateIdle()
 	IdleThread->Next = NULL;
 	//IdleThread->Next = (void*) IdleThread;    //Opção.
 	
-    //
 	// Running tasks. (Quantas threads estão rodando).
-	//
-	
     ProcessorBlock.running_tasks = (int) 1;
 	
 	//@todo: setar a idle como current.
@@ -629,6 +560,8 @@ void *KiCreateShell()
 	t->name_address = (unsigned long) ThreadName;    //Funciona.
 	
 	t->process = (void*) KernelProcess;
+	
+	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 	
 	//Procedimento de janela.
 	t->procedure = (unsigned long) &system_procedure;
@@ -796,6 +729,8 @@ void *KiCreateTaskManager()
 	t->name_address = (unsigned long) ThreadName;   //Funciona.
 	
 	t->process = (void*) KernelProcess;
+	
+	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 
 	//Procedimento de janela.
     t->procedure = (unsigned long) &system_procedure;	

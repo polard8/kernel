@@ -7,11 +7,16 @@
  *     Algum gerenciamento de adaptador de network.
  *     Esse é o header do driver da placa de rede.
  *
+  * 8086/100e network controller encontrado na oracle virtual box.
  * History:
  *     2016 - Created by Fred Nora.
  *
  */
  
+ 
+// >> The register at offset 0x00 is the "IOADDR" window. 
+// >> The register at offset 0x04 is the "IODATA" window. 
+
  /*
    wikipedia - NIC
    A network interface controller 

@@ -4,7 +4,7 @@
 
 :Monting
 echo -{ ...
-echo -{ Creating application IDLE.BIN ...
+echo -{ Creating application INIT.BIN ...
 echo -{ head
     rem head.s
 	nasm head.s -felf -o head.o
@@ -12,7 +12,7 @@ echo -{ head
 	
 :Compiling	
 echo -{ ...
-echo -{ app1 (idle task)
+echo -{ app1 (init task)
 	gcc  -c  main.c  -o main.o  
  
  
@@ -26,13 +26,13 @@ api.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T link.ld -o IDLE.BIN %myObjects%  -Map  idle_map.s
+   ld -T link.ld -o INIT.BIN %myObjects%  -Map  init_map.s
    
    rem Não deletar os objetos.
  
  
 :Moving   
-   move IDLE.BIN bin\IDLE.BIN
+   move INIT.BIN bin\INIT.BIN
 
    
 :End   

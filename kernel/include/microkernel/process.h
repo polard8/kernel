@@ -734,7 +734,7 @@ struct process_d
 
 //Os quatro principais processos.
 process_descriptor_t *KernelProcess;     //PID=0.   Ok.
-process_descriptor_t *IdleProcess;       //PID=100. ?
+process_descriptor_t *InitProcess;       //PID=100. ?
 process_descriptor_t *ShellProcess;      //PID=101. ?
 process_descriptor_t *TaskManProcess;    //PID=103. ?
 

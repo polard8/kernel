@@ -197,14 +197,14 @@ _irq0:
 	;;
 	
 	;;Endereço do diretório de páginas do processo kernel.
-	mov eax, dword 0x0009C000  	
+	;;mov eax, dword 0x0009C000  	
 	
 	;;@todo: #bugbug
 	;;Endereço do diretório de páginas do processo atual.
 	;mov eax, dword [_current_process_pagedirectory_address]  
 	
 	;; CR3.
-	mov cr3, eax
+	;;mov cr3, eax
 
     ;;
 	;; Flush TLB.

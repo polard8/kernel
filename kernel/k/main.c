@@ -177,7 +177,10 @@ int kMain(int argc, char* argv[])
 #endif
 	
 	//
-    // System initialization..
+	//============================================================
+    // System initialization.. system.c
+	// Inicializaremos todas funcionalidades do sistema 
+	// Mas processos e threads não serão criados.
     //
     
 //initializeSystem:
@@ -194,9 +197,11 @@ int kMain(int argc, char* argv[])
 	};
 	
 	//
+	//============================================================
+	// processes and threads initialization.
 	// Creating processes and threads.
 	// The processes are: Kernel, Idle, Shell, Taskman.
-	//
+	// obs: As imagens ja estão carregadas na memória.
 	
 //createProcesses:	
 	
@@ -217,15 +222,16 @@ int kMain(int argc, char* argv[])
     };
 
     //Creating Idle process.
-	IdleProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
+	InitProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
 	                                      PRIORITY_HIGH, (int) KernelProcess->pid, "IDLEPROCESS");	
-	if((void*) IdleProcess == NULL){
+	if((void*) InitProcess == NULL){
 		printf("kMain error: Create Idle process.\n");
 		die();
 		//refresh_screen();
 		//while(1){};
 	};
     //processor->IdleProcess = (void*) IdleProcess;	
+	
 	
     //Creating Shell process.
 	ShellProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
@@ -237,15 +243,18 @@ int kMain(int argc, char* argv[])
 		//while(1){};
 	};	
 
-	//Creating Taskman process.
+	
+	//Creating Taskman process. 
 	TaskManProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
-	                                         PRIORITY_LOW, 0, "TASKMANPROCESS");	
+	                                         PRIORITY_LOW, KernelProcess->pid, "TASKMANPROCESS");	
 	if((void*) TaskManProcess == NULL){
 		printf("kMain error: Create taskman process.\n");
 		die();
 		//refresh_screen();
 		//while(1){};
 	};		
+	
+	
 	
 	//
 	// Creating threads. 
@@ -267,7 +276,7 @@ int kMain(int argc, char* argv[])
 		//while(1){}
 	}else{
 	    
-        IdleThread->ownerPID = (int) IdleProcess->pid;  //ID do processo ao qual o thread pertence.    
+        IdleThread->ownerPID = (int) InitProcess->pid;  //ID do processo ao qual o thread pertence.    
 		
 		//Thread.
 	    processor->CurrentThread = (void*) IdleThread;
@@ -275,6 +284,8 @@ int kMain(int argc, char* argv[])
         processor->IdleThread    = (void*) IdleThread;		
 		//...		
     };
+	
+	
 	
 	// Create shell Thread. tid=1. 
 	ShellThread = (void*) KiCreateShell();	
@@ -289,6 +300,7 @@ int kMain(int argc, char* argv[])
 		//...		
     };
 	
+	
 	//Create taskman Thread. tid=2. 
 	TaskManThread = (void*) KiCreateTaskManager();
 	if( (void*) TaskManThread == NULL ){
@@ -302,6 +314,7 @@ int kMain(int argc, char* argv[])
 		//...		
     };	
 	
+
  
     //
 	// Debug.
@@ -368,6 +381,10 @@ done:
 	
 	//init_mouse();  //isso está em keyboard.c
 	
+	//janela de test
+    CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
+	              (30-5), (450-5), (128+10), (128+10), 
+				  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 
 	
 	//
 	// testing BMP support
@@ -409,7 +426,14 @@ done:
 		//printf("KeMain: EXIT_SUCCESS\n");
 		refresh_screen();
 #endif	
-	    return (int) EXIT_SUCCESS;	
+
+        //
+		// **  START IDLE THREAD  **
+		//
+		
+		startStartIdle() ;
+		
+	    //return (int) EXIT_SUCCESS;	
 	};
 	
 	// Fail!
@@ -420,6 +444,134 @@ fail:
 	refresh_screen();  
 	return (int) EXIT_FAILURE;   
 };
+
+
+
+
+extern void turn_task_switch_on();
+
+
+static inline void mainSetCr3( unsigned long value)
+{
+    __asm__ ( "mov %0, %%cr3" : : "r"(value) );
+}
+
+/*
+ * startStartIdle:
+ *     Inicia a thead idle.
+ *
+ *     @todo: 
+ *         + Iniciar o processo da idle.
+ *         + Detectar se o aplicativo está carregado na memória 
+ *	         antes de passar o comando pra ele via iret.
+ *          Mudar para startIdleThread().
+ *
+ */
+void startStartIdle() 
+{
+	int i;
+	//struct thread_d *Thread;
+	
+	//Thread = (void *) threadList[0];
+ 
+	
+	if((void*) IdleThread == NULL)
+	{
+		//printf("KeStartIdle error: Struct!\n");
+	    MessageBox(gui->screen,1,"ERRO","KeStartIdle: struct");
+        KeAbort();
+	}else{
+	    
+		//Checar se o programa já foi inicializado antes. 
+		//Ele não pode estar.
+	    if(IdleThread->saved != 0){
+	        printf("KeStartIdle error: Context!\n");
+            KeAbort(); 			
+	    };
+	    
+		//Checar se o slot na estrutura de tarefas é válido.
+	    if(IdleThread->used != 1 || IdleThread->magic != 1234){
+	        printf("KeStartIdle: IdleThread %d corrompida.\n", IdleThread->tid);
+            KeAbort(); 		
+	    };
+		
+        set_current(IdleThread->tid);      //Seta a thread atual.	
+		//...
+	};
+	
+	// State ~ Checa o estado da tarefa.	 
+    if(IdleThread->state != STANDBY){
+        printf("KeStartIdle error: State. Id={%d}\n",IdleThread->tid);
+	    refresh_screen();
+	    while(1){};
+    };
+	
+    // * MOVEMENT 2 ( Standby --> Running)	
+    if(IdleThread->state == STANDBY){
+		IdleThread->state = RUNNING;    
+		queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_RUNNING);
+	};		
+//Done!
+done:	
+	//Debug:
+	//Alertando.
+    //printf("* Starting idle TID=%d \n", Thread->tid); 
+	//refresh_screen(); //@todo: isso é necessãrio ??
+
+
+	for( i=0; i<=DISPATCHER_PRIORITY_MAX; i++){
+	    dispatcherReadyList[i] = (unsigned long) IdleThread;
+	};
+	
+    IncrementDispatcherCount(SELECT_IDLE_COUNT);
+	
+	
+	
+		 
+	mainSetCr3( (unsigned long) IdleThread->Directory);
+
+	//flush TLB
+	asm("movl %cr3, %eax");
+    asm("movl %eax, %cr3");			
+	
+	
+	/*
+	 * turn_task_switch_on:
+	 * + Cria um vetor para o timer, IRQ0.
+	 * + Habilita o funcionamento do mecanismo de taskswitch.
+	 */	 
+	turn_task_switch_on(); 
+	
+	
+	//
+	// @todo: Testando timer novamente.
+	//        *IMPORTANTE Me parece que tem que configurar o PIT por último.
+	//
+	
+	timerInit8253(); 
+	    		
+    asm volatile(" cli \n"   
+                 " mov $0x23, %ax  \n" 
+                 " mov %ax, %ds  \n"
+                 " mov %ax, %es  \n"
+                 " mov %ax, %fs  \n"
+                 " mov %ax, %gs  \n"
+                 " pushl $0x23            \n"    //ss.
+                 " movl $0x0044FFF0, %eax \n"
+                 " pushl %eax             \n"    //esp.
+                 " pushl $0x3200          \n"    //eflags.
+                 " pushl $0x1B            \n"    //cs.
+                 " pushl $0x00401000      \n"    //eip. 
+                 " iret \n" );
+				//Nothing.
+// Fail ~ retorno inesperado.
+fail:
+    panic("KeStartIdle error: Return!"); 	
+	while(1){};  //no return.	   
+};
+
+
+
 
  
 //
