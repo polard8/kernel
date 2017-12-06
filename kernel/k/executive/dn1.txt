@@ -1,3 +1,6 @@
-pasta principal
+pasta principal DA CAMADA EXECUTIVE
 
-  /ram
+
+/fs - File system (principal, controla tudo)
+/dd - device drivers
+/sci - system call interface

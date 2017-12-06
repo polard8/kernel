@@ -227,6 +227,7 @@ int test_operators();
 //
 // Funções internas.
 //
+void shellCreateTopBar();
 void shellTestMBR();
 void shellTestDisplayBMP();
 void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
@@ -323,7 +324,9 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 	//       Provavelmente deve coincidir com a estrutura presente
     //nas rotinas de gerenciamento de janela que estão em kernel mode.	
 	//struct window_class_d *wc; 
-	struct window_d *hWindow;   //janela do aplicativo.
+	
+	
+	struct window_d *hWindow;        //janela do aplicativo.
 
 	
 	//struct message_d *m;
@@ -494,9 +497,18 @@ noArgs:
 	//Debug:
 	//while(1){}
 	
+	
+
+		
+	
+	
+	
 	//
 	// Step 2. Creating a window frame.
 	//
+	
+	
+		
 	
 	//
     // Não é necessário passar todos os argumentos de uma vez só.
@@ -583,6 +595,17 @@ noArgs:
 	};
 	exitCriticalSection();     // * Exit Critical section.		
 	
+	
+	
+	//
+	// ** criando a top bar.
+	//
+	
+	//#bug bug
+	enterCriticalSection();    // * Enter Critical Section.
+	shellCreateTopBar();
+	exitCriticalSection();     // * Exit Critical section.		
+    	
 	
 	
 	//
@@ -728,13 +751,24 @@ noArgs:
 		long2 = (void*) system_call( SYSTEMCALL_GET_LONG2, 
 		                             (unsigned long) hWindow, 
 									 (unsigned long) hWindow, 
-									 (unsigned long) hWindow );		
+									 (unsigned long) hWindow );
+
+        //
+        // + PEGAMOS A MENSAGEM NA FILA DA JANELA COM O FOCO DE ENTRADA.
+        //   ?? COMO DECIDIREMOS QUAL JANELA SERÁ AFETADA PELO PROCEDIMENTO 
+        //	    QUE CHAMAREMOS AGORA ??
+        //		
 		
 		// Send Message to procedure.
 		if( (int) msgTest != 0)
 		{
-			//Obs: Chamado diretamente, sem interface nenhuma.
-			//     Mas não deve ser assim.
+            //
+            // *IMPORTANTE:
+			//  SE TEMOS UM HANDLE DE JANELA, SIGNIFICA QUE O PROCEDIMENTO PODE 
+			//  AFETAR MAIS DE UMA JANELA. PORTANTO JANELAS FILHAS OU ATE MESMO JANELAS 
+			//  CRIADAS PELO SISTEMA PODERÃO SER AFETADAS POR ESSE PROCEDIMENTO??
+			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
+            //			
 		    shellProcedure( NULL, 
 			                (int) msgTest, 
 							(unsigned long) long1, 
@@ -766,6 +800,7 @@ end:
  ***********************************************
  * shellProcedure:
  *     Procedimento de janela.
+ *     LOCAL
  */
 unsigned long 
 shellProcedure( struct window_d *window, 
@@ -781,6 +816,11 @@ shellProcedure( struct window_d *window,
 		case MSG_KEYDOWN:
             switch(long1)
             {
+				//Null key
+				case 0:
+				    printf(" null ");
+				    break;
+				
 				//reset prompt.
 				case '8':
 				    shellPrompt();
@@ -818,10 +858,10 @@ shellProcedure( struct window_d *window,
                    //Imprime os caracteres normais na janela com o foco de entrada.
 				//enfilera os caracteres na string 'prompt[]'.
 				   //para depois ser comparada com outras strings.
-                default:
-                    shellInsertNextChar((char) long1); //coloca no buffer do shell				
-				    printf("%c", (char) long1); 			   
-				    input( (unsigned long) long1);				  
+                default:			   
+				    input( (unsigned long) long1);      //Coloca no stdin
+                    shellInsertNextChar((char) long1);  //Coloca no stdout
+					printf("%c", (char) long1); 					
 					goto done;
                     break;               
             };
@@ -868,6 +908,10 @@ shellProcedure( struct window_d *window,
 		
 		//Essa mensagem pode ser acionada clidando um botão.
 		//case MSG_CLOSE:
+		    //??
+		    //isso deve fechar qualquer janela que esteja usando esse procedimento.
+			//pode ser uma janela filha ou ainda uma janela de dialogo criada pelo sistema.
+			//??
 		//break;
 		
 		//Essa mensagem pode ser acionada clidando um botão.
@@ -986,6 +1030,33 @@ unsigned long shellCompare()
 	
 palavra_reservada:
 
+    //L1 RAM /objetcs   (diretório raiz para os arquivos que são diretórios de objetos)
+	//os objetos serão listador em um arquivo que nunca será salvo no disco.
+	if( strncmp( prompt, "/objects", 6 ) == 0 ){
+	    printf("Open object manager root dir ...\n");
+        goto exit_cmp;
+    };
+
+	//L2 disk  /diretório raiz do sistema de arquivos
+	if( strncmp( prompt, "/", 5 ) == 0 ){
+	    printf("Open file system root dir ...\n");
+        goto exit_cmp;
+    };
+
+	//L3 LAN  // acesso a arquivos da lan
+	//os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
+	if( strncmp( prompt, "/lan", 6 ) == 0 ){
+	    printf("Open lan root dir ...\n");
+        goto exit_cmp;
+    };
+ 
+	//L4 WAN   //acesso a arquivos da wan
+	//os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
+	if( strncmp( prompt, "/wan", 6 ) == 0 ){
+	    printf("Open wan root dir ...\n");
+        goto exit_cmp;
+    };
+	
     //
 	// ordem alfabética.
 	//
@@ -1164,7 +1235,7 @@ palavra_reservada:
 		
 	//version
     if( strncmp( prompt, "version", 7 ) == 0 ){
-	    printf("%s\n",SHELL_VERSION);
+	    printf("\n Gramado version %s \n",SHELL_VERSION);
         goto exit_cmp;
     };	
  
@@ -1210,7 +1281,7 @@ void shellShell()
 	//shell_window_x = DEFAULT_WINDOW_X;
 	//shell_window_y = DEFAULT_WINDOW_Y;
 	shell_window_x = 10;
-	shell_window_y = 10;
+	shell_window_y = 100;
 
 	
 	//screen sizes
@@ -1531,8 +1602,6 @@ done:
 	//printf("...\n");
 	printf("Done!");
 	
-
-
 	
 	//
 	// @todo:
@@ -2116,6 +2185,94 @@ void shellTestMBR()
 	exitCriticalSection();   
 }
 
+
+
+//CRIANDO A TOP BAR
+void shellCreateTopBar()
+{
+    struct window_d *topbarWindow;   //task bar.
+	struct window_d *i1Window; //icone 1
+	struct window_d *i2Window; //icone 2
+	
+	//
+	// topbar window
+	//
+	
+	topbarWindow = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar ",     
+                                       0, 0, 800, (600/8),    
+                                       0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	   
+	if((void*) topbarWindow == NULL){	
+		printf("shellCreateTopBar: topbar Window fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+	    //Registrar.
+    APIRegisterWindow(topbarWindow);
+	
+	//
+	// icon 1 window
+	//
+	
+	unsigned long iconMaxWidth  = (600/8);
+	unsigned long iconMaxHeight = (600/8);
+
+	i1Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
+                                       2, 2, (iconMaxWidth-4), (iconMaxHeight-4),    
+                                       0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
+	if((void*) i1Window == NULL){	
+		printf("shellCreateTopBar: icon1 Window fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+    //Registrar.
+    APIRegisterWindow(i1Window);
+	
+	//
+	// icon 2 window
+	//
+
+	i2Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
+                                       (2+(iconMaxWidth-4)+2), 2, (iconMaxWidth-4), (iconMaxHeight-4),    
+                                       0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
+	if((void*) i2Window == NULL){	
+		printf("shellCreateTopBar: icon2 Window fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+	//Registrar.
+    APIRegisterWindow(i2Window);
+	
+	//
+	// BMP . LABELS
+	//
+	
+/*	
+	
+	void *b = (void*) malloc(1024*30); 	// testando malloc.
+    if( (void*) b == NULL ){
+		printf("shellTestDisplayBMP: allocation fail\n");
+		//while(1){}
+	}
+	
+	//Carregando o arquivo.
+loadFile:
+    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+	// na verdade tem que fazer essas rotinas na API.
+	system_call( SYSTEMCALL_READ_FILE, 
+	             (unsigned long) bmp1_file_name, 
+				 (unsigned long) b, 
+				 (unsigned long) b);	
+	
+	
+
+	//16x16
+	bmpDisplayBMP( b, 2, 2, 16, 16 );	
+	bmpDisplayBMP( b, 2+16+2, 2, 16, 16 );		
+	*/	
+};
 
 //
 // End.

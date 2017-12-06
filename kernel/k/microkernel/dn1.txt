@@ -6,6 +6,9 @@ Design Note 1.
 Sobre o microkernel e o process manager:
 ========================================
 
+    /pc process control (ipc,scheduler,mm)
+
+
     O process manager é uma parte fundamental do kernel base. Seu arquivo inicial é process.c, 
 os outros arquivos são complemento do process manager.
     O process manager faz parte do microkernel.

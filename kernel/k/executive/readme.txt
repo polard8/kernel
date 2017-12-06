@@ -10,7 +10,7 @@ Executive: (Internal Servers)
     /tty  - (fluxo de caractere: teclado-->processo, processo-->monitor).
     /uitm - (gerenciamento do modo texto)
     /uigm - (gerenciamento do modo gráfico)
-     
+    /sci  - systemcall interface. 
  
    Ambiente= ring0
 

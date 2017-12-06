@@ -345,7 +345,7 @@ doDebug:
 	//
 	// Done.
 	//
-void *b;
+//void *b;
 
 done:
 
@@ -381,6 +381,7 @@ done:
 	
 	//init_mouse();  //isso está em keyboard.c
 	
+/*	
 	//janela de test
     CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
 	              (30-5), (450-5), (128+10), (128+10), 
@@ -408,7 +409,7 @@ done:
 	bmpDisplayBMP( b, 30, 450, 128, 128 );
 	scheduler_unlock();
 	taskswitch_unlock();
-	
+*/	
 	
 	
 	//

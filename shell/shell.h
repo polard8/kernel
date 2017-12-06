@@ -52,12 +52,7 @@ static const char usage[] =
  
 static const char help_banner[] =
     "\n Commands: \n \n"
-	"boot, cls, dir, exit\n"
-    "hd, help, install, ls\n"
-    "newfile, newdir, mbr, reboot\n"
-	"root, save, service, slots\n"
-	"start, t1, t2, t3\n"
-	"version\n";
+	"help, version, reboot, exit\n";
 	
 	//... 
 	

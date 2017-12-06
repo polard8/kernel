@@ -32,38 +32,7 @@ echo -{ ...
 echo -{ ux4 /hal	
     rem hal .. arquivo principal do hal
 	gcc -c k/hal/hal.c     -I./include -o hal.o	
-	gcc -c k/hal/device/device.c  -I./include -o device.o
 	
-	rem (unblocked) legados (K2).
-	gcc -c k/hal/unblocked/video.c   -I./include -o video.o  
-	gcc -c k/hal/unblocked/screen.c  -I./include -o screen.o 	
-	
-	gcc -c k/hal/unblocked/keyboard.c  -I./include -o keyboard.o  
-	gcc -c k/hal/unblocked/ldisc.c  -I./include -o ldisc.o    	
-    
-	gcc -c k/hal/unblocked/hdd.c    -I./include -o hdd.o	
-	gcc -c k/hal/unblocked/pic.c   -I./include -o pic.o 
-    gcc -c k/hal/unblocked/timer.c     -I./include -o timer.o	
-	gcc -c k/hal/unblocked/rtc.c    -I./include -o rtc.o
-	gcc -c k/hal/unblocked/vsync.c  -I./include -o vsync.o 
-	gcc -c k/hal/unblocked/arch/x86/systemcall.c  -I./include -o systemcall.o		
-	gcc -c k/hal/unblocked/arch/x86/cpux86.c  -I./include -o cpux86.o 
-    gcc -c k/hal/unblocked/arch/x86/x86.c     -I./include -o x86.o	
-	gcc -c k/hal/unblocked/arch/x86/ports.c   -I./include -o ports.o 	
-	gcc -c k/hal/unblocked/arch/amd/cpuamd.c  -I./include -o cpuamd.o 	    
-
-
-	
-	rem (blocked) (K1).
-	gcc -c k/hal/blocked/pci.c   -I./include -o pci.o
-	gcc -c k/hal/blocked/usb.c   -I./include -o usb.o
-	gcc -c k/hal/blocked/apic.c  -I./include -o apic.o 
-
-	rem @todo Criar gcc -c k/hal/blocked/acpi.c -I./include -o acpi.o
-	rem @todo Criar gcc -c k/hal/blocked/apm.c -I./include -o apm.o	
-	
-    rem (thing) (K0).	
-	rem @todo: Criar gcc -c k/hal/things/things.c  -I./include -o things.o
 	
 	
 :Microkernel_Job2	
@@ -82,31 +51,50 @@ echo -{ ux3 /microkernel
 	gcc -c  k/microkernel/cpu/context.c     -I./include  -o context.o
 	gcc -c  k/microkernel/cpu/start.c       -I./include  -o start.o
 
-	rem microkernel/ipc (callouts)
-	gcc -c  k/microkernel/ipc/spawn.c       -I./include  -o spawn.o
-	gcc -c  k/microkernel/ipc/callout.c       -I./include  -o callout.o
-	gcc -c  k/microkernel/ipc/callfar.c       -I./include  -o callfar.o
-    gcc -c  k/microkernel/ipc/ipc.c         -I./include  -o ipc.o	
-    gcc -c  k/microkernel/ipc/semaphore.c   -I./include  -o semaphore.o
-	rem ...
 	
 	rem dma (K3)
 	rem @todo gcc -c  k/microkernel/dma/dma.c  -I./include  -o dma.o
 	
-	rem módulos secundários do microkernel.
-    gcc -c  k/microkernel/process.c     -I./include  -o process.o
-    gcc -c  k/microkernel/pheap.c       -I./include  -o pheap.o	
-    gcc -c  k/microkernel/thread.c      -I./include  -o thread.o		
-    gcc -c  k/microkernel/threadi.c     -I./include  -o threadi.o
-    gcc -c  k/microkernel/theap.c       -I./include  -o theap.o
-    gcc -c  k/microkernel/tstack.c      -I./include  -o tstack.o	
-    gcc -c  k/microkernel/tasks.c       -I./include  -o tasks.o
-    gcc -c  k/microkernel/taskswitch.c  -I./include  -o taskswitch.o
-    gcc -c  k/microkernel/dispatch.c    -I./include  -o dispatch.o		
-    gcc -c  k/microkernel/scheduler.c   -I./include  -o scheduler.o
-    gcc -c  k/microkernel/scheduleri.c  -I./include  -o scheduleri.o    	
-	gcc -c  k/microkernel/queue.c       -I./include  -o queue.o
-	gcc -c  k/microkernel/create.c      -I./include  -o create.o
+	rem
+	rem /pc process control (ipc,scheduler,mm)
+	rem
+	
+	gcc -c  k/microkernel/pc/taskswitch.c  -I./include  -o taskswitch.o	
+    gcc -c  k/microkernel/pc/dispatch.c    -I./include  -o dispatch.o	
+	gcc -c  k/microkernel/pc/queue.c       -I./include  -o queue.o
+	gcc -c  k/microkernel/pc/process.c     -I./include  -o process.o
+    gcc -c  k/microkernel/pc/pheap.c       -I./include  -o pheap.o	
+    gcc -c  k/microkernel/pc/thread.c      -I./include  -o thread.o		
+    gcc -c  k/microkernel/pc/threadi.c     -I./include  -o threadi.o
+    gcc -c  k/microkernel/pc/theap.c       -I./include  -o theap.o
+    gcc -c  k/microkernel/pc/tstack.c      -I./include  -o tstack.o	
+    gcc -c  k/microkernel/pc/tasks.c       -I./include  -o tasks.o	
+	gcc -c  k/microkernel/pc/create.c      -I./include  -o create.o
+	
+	rem microkernel/pc/ipc (callouts)
+	gcc -c  k/microkernel/pc/ipc/spawn.c       -I./include  -o spawn.o
+	gcc -c  k/microkernel/pc/ipc/callout.c       -I./include  -o callout.o
+	gcc -c  k/microkernel/pc/ipc/callfar.c       -I./include  -o callfar.o
+    gcc -c  k/microkernel/pc/ipc/ipc.c         -I./include  -o ipc.o	
+    gcc -c  k/microkernel/pc/ipc/semaphore.c   -I./include  -o semaphore.o
+	rem ...
+	
+	rem microkernel/pc/scheduler
+    gcc -c  k/microkernel/pc/scheduler/scheduler.c   -I./include  -o scheduler.o
+    gcc -c  k/microkernel/pc/scheduler/scheduleri.c  -I./include  -o scheduleri.o    	
+
+	
+	
+	rem k/microkernel/pc/ram
+	
+	rem (RAM) (K5) módulo principal do executive
+	rem /microkernel/pc/mm (memory manager)
+    gcc -c k/microkernel/pc/mm/memory.c  -I./include -o memory.o    
+	rem /microkernel/pc/mm (memory manager)
+    gcc -c k/microkernel/pc/mm/pages.c   -I./include -o pages.o 	
+	
+	
+	rem pertencem ao microkernel mas não são controles de processos.
 	gcc -c  k/microkernel/request.c     -I./include  -o request.o	
 	gcc -c  k/microkernel/faults.c      -I./include  -o faults.o		
 	
@@ -119,86 +107,119 @@ echo -{ ux2 /executive
 	rem /executive
 	gcc -c k/executive/executive.c  -I./include -o executive.o	
 	
+	rem services (atende as systemcalls) 
+    gcc -c k/executive/sci/services.c  -I./include -o services.o		
 	
-	rem (RAM) (K5) módulo principal do executive
-	rem /executive/ram/mm (memory manager)
-    gcc -c k/executive/ram/mm/memory.c  -I./include -o memory.o    
-	rem /executive/mm (memory manager)
-    gcc -c k/executive/ram/mm/pages.c   -I./include -o pages.o 	
+    rem executive/dd
+	
 	
 	rem O que segue são os módulos secundários do executive (sm,uitm,uigm).
 	
 	rem sm
 	rem /executive/init
-    gcc -c k/executive/sm/init/init.c  -I./include -o init.o
+    gcc -c k/executive/dd/sm/init/init.c  -I./include -o init.o
 	
 	rem sm
 	
 	rem sm
 	rem /executive/sm/ob
-	gcc -c k/executive/sm/ob/object.c  -I./include -o object.o		
+	gcc -c k/executive/dd/sm/ob/object.c  -I./include -o object.o		
 	
 	rem sm
 	rem /executive/network
-	gcc -c k/executive/sm/network/nic.c     -I./include -o nic.o
-	gcc -c k/executive/sm/network/network.c -I./include -o network.o
-	gcc -c k/executive/sm/network/socket.c  -I./include -o socket.o
+	gcc -c k/executive/dd/sm/network/nic.c     -I./include -o nic.o
+	gcc -c k/executive/dd/sm/network/network.c -I./include -o network.o
+	gcc -c k/executive/dd/sm/network/socket.c  -I./include -o socket.o
 	rem System Management.
 	
 	rem /executive/sm/sys
     rem system
-    gcc -c k/executive/sm/sys/modules.c  -I./include -o modules.o
-	rem services (atende as systemcalls) 
-    gcc -c k/executive/sm/sys/services.c  -I./include -o services.o	
+    gcc -c k/executive/dd/sm/sys/modules.c  -I./include -o modules.o
     rem procedure
-    gcc -c k/executive/sm/sys/procedure.c  -I./include -o procedure.o	
+    gcc -c k/executive/dd/sm/sys/procedure.c  -I./include -o procedure.o	
     rem abort
-    gcc -c k/executive/sm/sys/abort.c  -I./include -o abort.o		
+    gcc -c k/executive/dd/sm/sys/abort.c  -I./include -o abort.o		
     rem info
-    gcc -c k/executive/sm/sys/info.c  -I./include -o info.o	
+    gcc -c k/executive/dd/sm/sys/info.c  -I./include -o info.o	
     rem server
-    gcc -c k/executive/sm/sys/server.c  -I./include -o server.o
+    gcc -c k/executive/dd/sm/sys/server.c  -I./include -o server.o
     rem channel
-    gcc -c k/executive/sm/sys/channel.c  -I./include -o channel.o	
+    gcc -c k/executive/dd/sm/sys/channel.c  -I./include -o channel.o	
 	rem signal
-    gcc -c k/executive/sm/sys/signal.c  -I./include -o signal.o	
+    gcc -c k/executive/dd/sm/sys/signal.c  -I./include -o signal.o	
     rem system
-    gcc -c k/executive/sm/sys/system.c  -I./include -o system.o
+    gcc -c k/executive/dd/sm/sys/system.c  -I./include -o system.o
 	rem io
-	gcc -c k/executive/sm/sys/io.c -I./include -o io.o	
+	gcc -c k/executive/dd/sm/sys/io.c -I./include -o io.o	
 	
     rem sm
 	rem /executive/rt (runtime)
-	gcc -c k/executive/sm/rt/runtime.c -I./include -o runtime.o
+	gcc -c k/executive/dd/sm/rt/runtime.c -I./include -o runtime.o
 	
 	rem tty
-    gcc -c k/executive/tty/tty.c   -I./include -o tty.o		
+    gcc -c k/executive/dd/tty/tty.c   -I./include -o tty.o		
 	
 	rem uitm
 	rem /executive/uitm/libk
-    gcc -c k/executive/uitm/libk/misc.c   -I./include -o misc.o	
+    gcc -c k/executive/dd/uitm/libk/misc.c   -I./include -o misc.o	
 	
 	rem uitm
 	rem /executive/uitm/libc
-	gcc -c k/executive/uitm/libc/stdlib.c -I./include -o stdlib.o
-	gcc -c k/executive/uitm/libc/stdio.c  -I./include -o stdio.o
-    gcc -c k/executive/uitm/libc/string.c -I./include -o string.o
+	gcc -c k/executive/dd/uitm/libc/stdlib.c -I./include -o stdlib.o
+	gcc -c k/executive/dd/uitm/libc/stdio.c  -I./include -o stdio.o
+    gcc -c k/executive/dd/uitm/libc/string.c -I./include -o string.o
 	
 	rem uigm Nothing for now.	
-	
-	rem sm
-	rem /executive/sm/fs
-    gcc -c k/executive/sm/fs/fs.c      -I./include -o fs.o						
-    gcc -c k/executive/sm/fs/read.c    -I./include -o read.o			
-    gcc -c k/executive/sm/fs/write.c   -I./include -o write.o			
-    gcc -c k/executive/sm/fs/cf.c      -I./include -o cf.o			
-    gcc -c k/executive/sm/fs/search.c  -I./include -o search.o			
-    gcc -c k/executive/sm/fs/format.c  -I./include -o format.o			
-	
+		
 	rem sm
 	rem /executive/sm/disk
-    gcc -c k/executive/sm/disk/disk.c   -I./include -o disk.o						
-    gcc -c k/executive/sm/disk/volume.c -I./include -o volume.o	
+    gcc -c k/executive/dd/sm/disk/disk.c   -I./include -o disk.o						
+    gcc -c k/executive/dd/sm/disk/volume.c -I./include -o volume.o	
+	
+  	rem sm
+    gcc -c k/executive/dd/sm/install/install.c -I./include -o install.o    
+	
+	rem sm
+	rem /executive/debug
+	gcc -c k/executive/dd/sm/debug/debug.c -I./include -o debug.o	
+	
+	
+	gcc -c k/executive/dd/device/device.c  -I./include -o device.o
+	
+	rem (unblocked) legados (K2).
+	gcc -c k/executive/dd/unblocked/video.c   -I./include -o video.o  
+	gcc -c k/executive/dd/unblocked/screen.c  -I./include -o screen.o 	
+	gcc -c k/executive/dd/unblocked/keyboard.c  -I./include -o keyboard.o  
+	gcc -c k/executive/dd/unblocked/ldisc.c  -I./include -o ldisc.o    	
+	gcc -c k/executive/dd/unblocked/hdd.c    -I./include -o hdd.o	
+	gcc -c k/executive/dd/unblocked/pic.c   -I./include -o pic.o 
+    gcc -c k/executive/dd/unblocked/timer.c     -I./include -o timer.o	
+	gcc -c k/executive/dd/unblocked/rtc.c    -I./include -o rtc.o
+	gcc -c k/executive/dd/unblocked/vsync.c  -I./include -o vsync.o 
+	gcc -c k/executive/dd/unblocked/arch/x86/systemcall.c  -I./include -o systemcall.o		
+	gcc -c k/executive/dd/unblocked/arch/x86/cpux86.c  -I./include -o cpux86.o 
+    gcc -c k/executive/dd/unblocked/arch/x86/x86.c     -I./include -o x86.o	
+	gcc -c k/executive/dd/unblocked/arch/x86/ports.c   -I./include -o ports.o 	
+	gcc -c k/executive/dd/unblocked/arch/amd/cpuamd.c  -I./include -o cpuamd.o 	    
+
+
+	
+	rem (blocked) (K1).
+	gcc -c k/executive/dd/blocked/pci.c   -I./include -o pci.o
+	gcc -c k/executive/dd/blocked/usb.c   -I./include -o usb.o
+	gcc -c k/executive/dd/blocked/apic.c  -I./include -o apic.o 
+
+	
+	
+	rem FILE System
+	
+	rem /executive/fs
+    gcc -c k/executive/fs/fs.c      -I./include -o fs.o						
+    gcc -c k/executive/fs/read.c    -I./include -o read.o			
+    gcc -c k/executive/fs/write.c   -I./include -o write.o			
+    gcc -c k/executive/fs/cf.c      -I./include -o cf.o			
+    gcc -c k/executive/fs/search.c  -I./include -o search.o			
+    gcc -c k/executive/fs/format.c  -I./include -o format.o			
 	
 
 	
@@ -269,12 +290,6 @@ echo -{ ux1 /gramado \o/
 	rem
 	
 
-  	rem sm
-    gcc -c k/executive/sm/install/install.c -I./include -o install.o    
-	
-	rem sm
-	rem /executive/debug
-	gcc -c k/executive/sm/debug/debug.c -I./include -o debug.o	
 	
     REM 
     REM Ordem: Hardware, Kernel, GUI (embrulo).

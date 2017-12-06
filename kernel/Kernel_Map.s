@@ -811,898 +811,898 @@ Linker script and memory map
                 0xc0006a30                fault_N9
                 0xc00069dc                fault_N5
  *fill*         0xc00071fb        0x1 00
- .text          0xc00071fc      0x690 main.o
+ .text          0xc00071fc      0x590 main.o
                 0xc00071fc                kMain
-                0xc00076fe                startStartIdle
- .text          0xc000788c       0x60 io.o
-                0xc000788c                ioServices
-                0xc00078cd                ioInit
- .text          0xc00078ec      0x4c0 hal.o
-                0xc0007b23                hal_set_machine_type
-                0xc0007b30                hal_get_machine_type
-                0xc0007b8b                hal_probe_cpu
-                0xc0007cdb                KiShutDown
-                0xc000790a                sys_vsync
-                0xc0007ce8                hal_reboot
-                0xc0007987                hal_probe_processor_type
-                0xc0007c4b                getGdt
-                0xc000797a                hal_showpciinfo
-                0xc000793e                hal_hardware_detect
-                0xc0007a6d                init_cpu
-                0xc0007ca9                KiReboot
-                0xc0007c79                shutdown
-                0xc0007931                sys_shutdown
-                0xc0007b3a                hal_init_machine
-                0xc00078ec                hal_backbuffer_putpixel
-                0xc0007917                sys_showpciinfo
-                0xc0007924                sys_reboot
-                0xc0007c6c                hal_shutdown
-                0xc0007c5f                hal_vsync
-                0xc0007d19                init_hal
-                0xc0007c55                getIdt
- .text          0xc0007dac      0x2f0 microkernel.o
-                0xc0007f0a                sys_getpid
-                0xc0007dac                microkernelTestLimit
-                0xc0007e3f                sys_dead_thread_collector
-                0xc0007e79                sys_create_process
-                0xc0007f89                init_microkernel
-                0xc0007e4c                sys_exit_process
-                0xc0007f84                KeReboot
-                0xc0007efd                sys_fork
-                0xc0007e66                sys_exit_thread
-                0xc0007ebb                sys_create_thread
-                0xc0007f14                sys_getppid
- .text          0xc000809c       0x50 executive.o
-                0xc00080a9                init_executive
-                0xc000809c                sys_showkernelinfo
- .text          0xc00080ec      0x250 video.o
-                0xc00080f9                videoGetMode
-                0xc0008103                videoSetMode
-                0xc00081d5                videoInit
-                0xc00080ec                videoSetupCGAStartAddress
-                0xc0008310                videoVideo
- .text          0xc000833c      0x100 screen.o
-                0xc000833c                screenGetWidth
-                0xc0008346                screenGetHeight
-                0xc0008350                screenSetSize
-                0xc0008393                screenInit
-                0xc0008372                screenRefresh
-                0xc0008365                refresh_screen
- .text          0xc000843c       0x30 runtime.o
-                0xc000845d                KiInitRuntime
-                0xc000843c                init_runtime
- .text          0xc000846c       0xe0 ports.o
-                0xc00084c9                inport8
-                0xc000851c                outport32
-                0xc000848b                inb
-                0xc000853a                outportl
-                0xc0008528                inportl
-                0xc00084bd                outportb
-                0xc00084dc                outport8
-                0xc00084fd                outport16
-                0xc000846c                kinportb
-                0xc000847f                koutportb
-                0xc00084e8                inport16
-                0xc00084aa                inportb
-                0xc000850a                inport32
-                0xc000849e                outb
- .text          0xc000854c       0xd0 x86.o
-                0xc00085f1                pushFlags
-                0xc00085e5                pushRegs
-                0xc00085dc                Pop
-                0xc000856f                farReturn
-                0xc0008575                getFlags
-                0xc00085f7                popFlags
-                0xc0008562                stopCpu
-                0xc0008607                setStackPointer
-                0xc00085eb                popRegs
-                0xc00085ae                kernelProcessorOutPort16
-                0xc0008589                kernelProcessorInPort8
-                0xc00085d3                Push
-                0xc0008595                kernelProcessorOutPort8
-                0xc000857f                setFlags
-                0xc00085fd                getStackPointer
-                0xc0008557                disable
-                0xc00085bb                kernelProcessorInPort32
-                0xc0008569                intReturn
-                0xc00085a1                kernelProcessorInPort16
-                0xc00085c7                kernelProcessorOutPort32
-                0xc000854c                enable
- .text          0xc000861c      0xd30 stdio.o
-                0xc0008ef8                putchar
-                0xc0008e76                sprintf
-                0xc0008dfd                panic
-                0xc0009122                input
-                0xc0008687                scroll
-                0xc0009118                printf_main
-                0xc0008f0e                outbyte
-                0xc0008e90                fprintf
-                0xc0008633                fopen
-                0xc00087c2                kclear
-                0xc000889b                kprintf
-                0xc0009207                stdioInitialize
-                0xc000861c                fclose
-                0xc000903f                _outbyte
-                0xc0008840                kclearClientArea
-                0xc0008de2                printf
- .text          0xc000934c      0x110 stdlib.o
-                0xc00093aa                free
-                0xc000934c                rand
-                0xc0009369                malloc
- .text          0xc000945c      0x240 string.o
-                0xc00095fd                strcat
-                0xc000945c                strcmp
-                0xc0009654                bzero
-                0xc0009590                memcpy
-                0xc000962d                bcopy
-                0xc00095cd                strcpy
-                0xc0009515                str_cmp
-                0xc00094b7                strncmp
-                0xc000966f                strlen
- .text          0xc000969c       0xe0 tty.o
-                0xc000973a                ttyInit
-                0xc000969c                createTTYLine
- .text          0xc000977c      0x460 init.o
-                0xc0009781                boot
-                0xc0009a3f                init
-                0xc000982e                init_arquitecture_independent
-                0xc000977c                save_kernel_args
-                0xc0009906                init_globals
-                0xc0009795                init_arquitecture_dependent
- .text          0xc0009bdc      0xaa0 logon.o
-                0xc0009ea2                ExitLogon
-                0xc000a5bd                init_logon
-                0xc000a27a                logon_create_infobox
-                0xc0009edd                SetLogonParameters
-                0xc000a275                logon_create_controlmenu
-                0xc000a05a                logon_create_background
-                0xc000a3ff                logon_create_developer_screen
-                0xc000a55f                LogonProcedure
-                0xc000a27f                logon_create_messagebox
-                0xc000a270                logon_create_taskbar
-                0xc000a143                logon_create_mainwindow
-                0xc000a284                logon_create_debug
-                0xc0009f80                logon_create_screen
-                0xc000a3fa                logon_create_grid
-                0xc000a289                logon_create_navigationbar
-                0xc000a26b                logon_create_logo
-                0xc0009bdc                create_logon
- .text          0xc000a67c       0xe0 logoff.o
-                0xc000a67c                StartLogoff
-                0xc000a695                init_logoff
- .text          0xc000a75c      0x500 cpux86.o
-                0xc000aaf6                KeTestCPU
-                0xc000a75c                get_cpu_intel_parameters
-                0xc000aae9                cpu_get_parameters
-                0xc000ab08                show_cpu_intel_parameters
-                0xc000ac46                init_intel
- .text          0xc000ac5c       0x20 cpuamd.o
-                0xc000ac5c                get_cpu_amd_parameters
-                0xc000ac61                init_amd
- .text          0xc000ac7c      0x9e0 memory.o
-                0xc000af51                FreeHeap
-                0xc000b4b3                gcEXECUTIVE
-                0xc000b296                init_mm
-                0xc000b000                init_heap
-                0xc000ac7c                get_process_heap_pointer
-                0xc000b4a9                gcGRAMADO
-                0xc000af6e                show_memory_structs
-                0xc000b5a5                gcMICROKERNEL
-                0xc000b5af                gcHAL
-                0xc000af5b                AllocateHeapEx
-                0xc000b5b9                gc
-                0xc000acee                SetKernelHeap
-                0xc000ad7f                AllocateHeap
-                0xc000b1a4                memoryShowMemoryInfo
-                0xc000b135                init_stack
- .text          0xc000b65c      0x690 pages.o
-                0xc000b76e                SetCR3
-                0xc000b65c                CreatePageDirectory
-                0xc000b786                SetUpPaging
-                0xc000b6ad                CreatePageTable
- .text          0xc000bcec        0x0 apic.o
- .text          0xc000bcec        0x0 pic.o
- .text          0xc000bcec      0x1f0 timer.o
-                0xc000be37                set_timeout
-                0xc000be19                sleep
-                0xc000bdf8                get_next_quantum
-                0xc000bdeb                set_next_quantum
-                0xc000bdca                get_quantum
-                0xc000bdbd                set_quantum
-                0xc000be4e                timerTimer
-                0xc000be02                now
-                0xc000be0f                get_tick_count
-                0xc000bd68                timerInit8253
-                0xc000be76                timerInit
-                0xc000bde1                get_current_quantum
-                0xc000bcf9                KiTimer
-                0xc000be44                get_timeout
-                0xc000bdd4                set_current_quantum
-                0xc000bcec                KeTimer
-                0xc000bd06                timer
- .text          0xc000bedc      0x3e0 rtc.o
-                0xc000c28c                init_clock
-                0xc000c0b4                rtcGetBaseMemory
-                0xc000c118                get_cmos_info
-                0xc000bf41                read_cmos_bcd
-                0xc000bedc                KiRtcIrq
-                0xc000c050                rtcGetExtendedMemory
-                0xc000bfb1                get_time
-                0xc000bee9                rtc_irq
-                0xc000c003                get_date
- .text          0xc000c2bc       0x50 keyboard.o
-                0xc000c2bc                abnt2_keyboard_handler
-                0xc000c2df                KiKeyboard
- .text          0xc000c30c      0xe60 ldisc.o
-                0xc000c413                keyboardDisable
-                0xc000c30c                keyboardGetKeyState
-                0xc000c4cb                LINE_DISCIPLINE
-                0xc000ca1a                KbGetLongParam1
-                0xc000ccdc                kbdc_wait
-                0xc000c9db                KbGetMessage
-                0xc000ced9                kernelPS2MouseDriverReadData
-                0xc000d04c                P8042_install
-                0xc000caab                init_keyboard
-                0xc000ca97                get_ctrl_status
-                0xc000caa1                get_shift_status
-                0xc000ccb9                mouse_read
-                0xc000cb57                init_mouse
-                0xc000ca4d                KbGetLongParam2
-                0xc000cd20                mouseHandler
-                0xc000c9a8                KdGetWindowPointer
-                0xc000ca8d                get_alt_status
-                0xc000c449                keyboard_set_leds
-                0xc000ca80                reboot
-                0xc000c3dd                keyboardEnable
-                0xc000cc6b                mouse_write
- .text          0xc000d16c       0x50 hdd.o
-                0xc000d16c                my_read_hd_sector
-                0xc000d189                my_write_hd_sector
-                0xc000d1a6                init_hdd
- .text          0xc000d1bc      0x810 pci.o
-                0xc000d4aa                pciGetBAR
-                0xc000d1d0                KiPciHandler3
-                0xc000d3be                pciCheckVendor
-                0xc000d1c6                KiPciHandler2
-                0xc000d287                pciConfigReadWord
-                0xc000d677                pciInfo
-                0xc000d46f                pciGetClassCode
-                0xc000d9b1                pciInit
-                0xc000d1da                KiPciHandler4
-                0xc000d1e4                pciConfigReadByte
-                0xc000d434                pciGetSubClass
-                0xc000d601                pciGetInterruptLine
-                0xc000d3f9                pciCheckDevice
-                0xc000d93d                init_pci
-                0xc000d32d                pciConfigReadDWord
-                0xc000d63c                pciGetInterruptPin
-                0xc000d730                pci_setup_devices
-                0xc000d1bc                KiPciHandler1
- .text          0xc000d9cc       0x10 usb.o
-                0xc000d9cc                usbInit
- .text          0xc000d9dc       0x10 device.o
-                0xc000d9dc                init_device_manager
- .text          0xc000d9ec      0x1c0 spawn.o
-                0xc000da1a                spawn_task
-                0xc000d9ec                KiSpawnTask
- .text          0xc000dbac       0x10 callout.o
-                0xc000dbac                KiCalloutTest
- .text          0xc000dbbc       0x10 callfar.o
-                0xc000dbbc                KiCallfarTest
- .text          0xc000dbcc      0x7e0 process.o
-                0xc000e1ac                SetProcessDirectory
-                0xc000df0b                KeSelectNextThread
-                0xc000df9d                KeSetPriority
-                0xc000e1c0                GetProcessDirectory
-                0xc000e015                show_process_information
-                0xc000dc63                create_process
-                0xc000df6b                KeDoProcessReady
-                0xc000df70                KeDoProcessRunning
-                0xc000de7d                CloseAllProcesses
-                0xc000e006                KeMostraSlot
-                0xc000e25c                dead_task_collector
-                0xc000df66                KeDispatchProcess
-                0xc000e010                KeShowPreemptedTask
-                0xc000df7f                KeDoProcessDead
-                0xc000e351                set_caller_process_id
-                0xc000df31                KeInitTasks
-                0xc000dfd9                KeSetNextQuantum
-                0xc000df75                KeDoProcessSleeping
-                0xc000dfcf                KeGetCurrentQuantum
-                0xc000e1fa                init_tasks
-                0xc000df93                KeKillProcess
-                0xc000df7a                KeDoProcessZombie
-                0xc000df5c                KeExecProcess
-                0xc000df98                KeNewProcessScheduler
-                0xc000e261                exit_process
-                0xc000dfca                KeSetCurrentQuantum
-                0xc000dfb6                KeReloadCurrentTask
-                0xc000e00b                KeMostraReg
-                0xc000df89                KeWakeupProcess
-                0xc000e347                get_caller_process_id
-                0xc000df1e                KeCheckTaskContext
-                0xc000dedb                KeSaveCurrentContext
-                0xc000dffc                KeShowTasksParameters
-                0xc000e001                KeMostraSlots
-                0xc000e1e3                GetPageDirValue
-                0xc000e35e                init_process_manager
-                0xc000dfe8                KeSetFocus
-                0xc000dfb1                KeSaveContextOfNewTask
-                0xc000e1f0                init_task
-                0xc000dbcc                processTesting
-                0xc000dfa7                KeIncreasePriority
-                0xc000dfde                KeGetNextQuantum
-                0xc000dff7                KeDebugBreakpoint
-                0xc000dc18                processSendSignal
-                0xc000e207                init_processes
-                0xc000dee0                KeRestoreCurrentContext
-                0xc000dfc0                KeGetQuantum
-                0xc000df3e                KeCreateTask
-                0xc000df84                KeStartProcess
-                0xc000df8e                KeProcessExit
-                0xc000e37c                GetProcessHeapStart
-                0xc000dfed                KeGetFocus
-                0xc000def8                KeSpawnTask
-                0xc000df48                KeInitTask
-                0xc000dee5                KeCpuFaults
-                0xc000df52                KeFork
-                0xc000dfbb                KeSetQuantum
- .text          0xc000e3ac        0x0 pheap.o
- .text          0xc000e3ac      0x5a0 thread.o
-                0xc000e801                GetThreadState
-                0xc000e8bc                init_threads
-                0xc000e3ac                create_thread
-                0xc000e769                FindReadyThread
-                0xc000e824                GetThreadType
-                0xc000e84a                show_thread_information
-                0xc000e71a                GetCurrentThread
-                0xc000e7cb                SelectForExecution
-                0xc000e710                GetCurrentThreadId
- .text          0xc000e94c      0x540 threadi.o
-                0xc000e964                KiGetTaskStatus
-                0xc000ed6a                show_tasks_parameters
-                0xc000e9ad                KiGetFocus
-                0xc000ed42                GetThreadDirectory
-                0xc000e9bc                KiShowTasksParameters
-                0xc000e98a                KiSetCurrentQuantum
-                0xc000e976                KiReloadCurrentTask
-                0xc000ed6f                exit_thread
-                0xc000e9c1                KiMostraSlots
-                0xc000e9dd                mostra_slots
-                0xc000e9d0                KiShowThreadList
-                0xc000e951                KiSetTaskStatus
-                0xc000ebd6                mostra_reg
-                0xc000edc4                kill_thread
-                0xc000e94c                KiShowPreemptedTask
-                0xc000e980                KiGetQuantum
-                0xc000e9a8                KiSetFocus
-                0xc000ecdd                set_thread_priority
-                0xc000e999                KiSetNextQuantum
-                0xc000e97b                KiSetQuantum
-                0xc000e9b7                KiDebugBreakpoint
-                0xc000e9cb                KiMostraReg
-                0xc000ed65                show_preempted_task
-                0xc000ed2c                SetThreadDirectory
-                0xc000eb0d                mostra_slot
-                0xc000e971                KiSaveContextOfNewTask
-                0xc000e99e                KiGetNextQuantum
-                0xc000e98f                KiGetCurrentQuantum
-                0xc000e9c6                KiMostraSlot
-                0xc000ee15                dead_thread_collector
- .text          0xc000ee8c       0x30 theap.o
-                0xc000ee8c                GetThreadHeapStart
- .text          0xc000eebc       0x30 tstack.o
-                0xc000eebc                GetThreadStackStart
- .text          0xc000eeec      0xbf0 create.o
-                0xc000f115                KiCreateIdle
-                0xc000ef84                KiCreateProcess
-                0xc000f7c2                KiCreateTaskManager
-                0xc000ef29                KeCreateThread
-                0xc000ef8e                KiCreateTask
-                0xc000efa9                KiCreateKernelProcess
-                0xc000ef66                fork
-                0xc000ef7a                KiFork
-                0xc000eeec                KeCreateProcess
-                0xc000ef70                create_task
-                0xc000f4aa                KiCreateShell
- .text          0xc000fadc      0x190 start.o
-                0xc000fc5a                KiInitTasks
-                0xc000fb3c                executa_tarefa
-                0xc000fb04                start_task
-                0xc000fadc                KeStartShell
-                0xc000fb28                switch_to_user_mode
-                0xc000fc28                KiExecutaTarefa
-                0xc000fb23                reload_current_task
-                0xc000faf0                KeStartTaskManager
-                0xc000fc32                KiInitTask
-                0xc000fc1b                KiSwitchToUserMode
- .text          0xc000fc6c      0x450 context.o
-                0xc00100a4                KiRestoreCurrentContext
-                0xc00100b1                save_context_of_new_task
-                0xc000ff81                contextCheckThreadRing0Context
-                0xc000fc6c                save_current_context
-                0xc000ff8b                contextCheckThreadRing3Context
-                0xc0010084                KiCheckTaskContext
-                0xc0010097                KiSaveCurrentContext
-                0xc000fdd0                restore_current_context
- .text          0xc00100bc       0x20 tasks.o
-                0xc00100cb                task3
-                0xc00100bc                task0
-                0xc00100c1                task1
-                0xc00100c6                task2
- .text          0xc00100dc      0x4e0 taskswitch.o
-                0xc00100e9                task_switch
-                0xc001057a                set_task_status
-                0xc0010451                taskswitchRR
-                0xc0010591                taskswitch_lock
-                0xc0010587                get_task_status
-                0xc00100dc                KiTaskSwitch
-                0xc00105a0                taskswitch_unlock
- .text          0xc00105bc      0xe90 queue.o
-                0xc0010a33                queue_insert_data
-                0xc00105bc                init_queue
-                0xc0010e5c                queue_insert_head
-                0xc00112b9                feed_ready_queue
-                0xc0010fed                queue_get_data
-                0xc001120a                ScanReadyQueue
-                0xc001117c                show_queue_information
- .text          0xc001144c      0x150 scheduler.o
-                0xc001144c                KeScheduler
-                0xc001148c                scheduler
-                0xc001157e                scheduler_get_status
-                0xc001156f                scheduler_unlock
-                0xc0011560                scheduler_lock
-                0xc0011588                new_task_scheduler
-                0xc0011547                scheduler_start
-                0xc001158d                init_scheduler
- .text          0xc001159c      0x760 scheduleri.o
-                0xc001190c                do_thread_running
-                0xc001166e                KiKillTask
-                0xc0011c0d                check_for_standby
-                0xc00119b0                do_thread_dead
-                0xc001159c                KiIncreasePriority
-                0xc0011649                KiStartTask
-                0xc0011686                KiDispatchTask
-                0xc00118d8                do_thread_ready
-                0xc0011681                KiNewTaskScheduler
-                0xc0011636                KiDoThreadDead
-                0xc0011623                KiDoThreadZombie
-                0xc00115ca                KiSelectNextThread
-                0xc0011974                do_thread_zombie
-                0xc00115fd                KiDoThreadRunning
-                0xc001168b                KiSetPriority
-                0xc0011858                get_current
-                0xc00116c5                find_higher_priority
-                0xc0011ad1                taskexit
-                0xc0011b42                SelectNextThread
-                0xc00115a6                KiScheduler
-                0xc001164e                KiAcordarTarefa
-                0xc0011895                set_priority
-                0xc00117c6                preempt
-                0xc0011661                KiTaskExit
-                0xc0011610                KiDoThreadSleeping
-                0xc0011862                get_current_task
-                0xc00116ab                KiGetCurrent
-                0xc001186c                set_current
-                0xc00115ea                KiDoThreadReady
-                0xc0011940                do_thread_sleeping
-                0xc0011c84                check_quantum
-                0xc00116b8                KiGetCurrentTask
-                0xc00115bd                KiFindHigherPriority
-                0xc0011698                KiSetCurrent
-                0xc0011a4c                kill_task
-                0xc00119e4                wakeup_thread
- .text          0xc0011cfc      0x860 dispatch.o
-                0xc0012360                dispatch_task
-                0xc0011fca                sysconcDispatcher
-                0xc0012197                dispatch_Default
-                0xc001211c                rrDispatcher
-                0xc0012108                idleDispatcher
-                0xc0012064                userconcDispatcher
-                0xc00120fe                systemDispatcher
-                0xc0012439                init_dispatcher
-                0xc00124db                IncrementDispatcherCount
-                0xc0011cfc                dispatcher
-                0xc0011e96                syscoopDispatcher
-                0xc0012126                realtimeDispatcher
-                0xc0011f30                usercoopDispatcher
-                0xc0011e27                readyDispatcher
-                0xc0012112                periodicDispatcher
-                0xc00123a5                dispatch_thread
- .text          0xc001255c      0x110 semaphore.o
-                0xc0012586                Down
-                0xc001263a                semaphore_up
-                0xc001255c                init_semaphore
-                0xc0012661                close_semaphore
-                0xc0012657                delete_semaphore
-                0xc001265c                open_semaphore
-                0xc001264d                create_semaphore
-                0xc0012627                semaphore_down
-                0xc00125e0                Up
- .text          0xc001266c       0x10 modules.o
-                0xc001266c                modulesModules
- .text          0xc001267c       0x10 nic.o
-                0xc001267c                init_network
- .text          0xc001268c       0x30 network.o
-                0xc001268c                networkInit
- .text          0xc00126bc       0x50 socket.o
-                0xc00126bc                create_socket
- .text          0xc001270c       0x10 server.o
-                0xc001270c                init_systemserver
- .text          0xc001271c       0xd0 channel.o
-                0xc0012791                OpenChannel
-                0xc00127bc                CloseChannel
-                0xc001271c                CreateChannel
-                0xc0012770                DestroyChannel
- .text          0xc00127ec       0x70 ipc.o
-                0xc0012849                init_ipc
-                0xc00127f6                ipcProcedureEx
-                0xc00127ec                ipcProcedure
-                0xc0012800                ipc_dispatch_message
- .text          0xc001285c      0x440 read.o
-                0xc0012b3f                fs_load_rootdirEx
-                0xc0012b90                fs_load_fatEx
-                0xc00128f4                fsLoadFile
-                0xc00128be                read_lba
-                0xc0012bf3                fs_load_dir
-                0xc0012af0                KiLoadRootDir
-                0xc0012882                fatLoadCluster
-                0xc0012bdf                fs_load_rootdir
-                0xc001285c                fatClustToSect
- .text          0xc0012c9c       0x90 write.o
-                0xc0012c9c                fatWriteCluster
-                0xc0012d18                fs_save_rootdir
-                0xc0012d22                fs_save_entry_on_root
-                0xc0012d27                fs_save_structure
-                0xc0012d0e                fsSaveFile
-                0xc0012d1d                fs_save_dir
-                0xc0012cd8                write_lba
- .text          0xc0012d2c      0x150 cf.o
-                0xc0012e4c                fs_create_entry
-                0xc0012d2c                fs_create_dir
-                0xc0012d46                fs_create_file
-                0xc0012e5b                create_system_folders
-                0xc0012e51                fs_create_name
-                0xc0012e56                salva_nome
- .text          0xc0012e7c      0x230 search.o
-                0xc0012f15                fsSearchFile
-                0xc0013095                fsSearchFileName
-                0xc0013017                fs_find_not_empty_entry
-                0xc001300d                fs_find_empty_entry
-                0xc0013003                fs_search_empty_entry
-                0xc0013021                fs_find_n_empty_entries
-                0xc0012e7c                KiSearchFile
- .text          0xc00130ac       0x90 format.o
-                0xc00130b9                fs_delete_entry
-                0xc00130ac                fs_apaga_fat
-                0xc00130ed                fsClearFat
-                0xc00130be                limpa_root
- .text          0xc001313c       0xa0 disk.o
-                0xc001313c                disk_init
-                0xc00131ca                init_test_disk
- .text          0xc00131dc       0x70 volume.o
-                0xc00131dc                volume_init
- .text          0xc001324c      0x530 fs.o
-                0xc00133ba                fs_get_fat_entry
-                0xc00133c4                fs_set_fat_entry
-                0xc0013452                fsCheckVbr
-                0xc00133fb                fs_show_entry
-                0xc00133d3                fs_set_entry
-                0xc00133b5                fs_test_fat_vector
-                0xc00135ae                set_spc
-                0xc0013714                fsInit
-                0xc001336c                get_file
-                0xc00133f1                fs_check_fat
-                0xc00132e3                KeLoadFile
-                0xc001340a                fs_set_entry_status
-                0xc00135dc                fs_init_fat
-                0xc0013643                fs_init_structures
-                0xc0013495                fs_check_disk
-                0xc00134bf                MountShortFileName
-                0xc00133d8                fs_get_entry
-                0xc001324c                fsListFiles
-                0xc00133e2                fs_show_dir
-                0xc0013400                fs_get_entry_status
-                0xc00133e7                fs_check_cluster
-                0xc00133c9                fs_put_list_on_fat
-                0xc0013393                set_file
-                0xc00135cf                set_filesystem_type
-                0xc00133dd                fs_show_dir_entry
-                0xc00133ce                fs_set_structures
-                0xc00135c5                get_filesystem_type
-                0xc001340f                fsCheckMbr
-                0xc00135bb                get_spc
- .text          0xc001377c      0x140 misc.o
-                0xc00137be                newNode
-                0xc00138a7                get_cursor_y
-                0xc0013888                set_up_cursor
-                0xc00137f7                Removing_from_the_beginning
-                0xc0013820                Removing_from_the_middle
-                0xc0013850                set_up_color
-                0xc001389d                get_cursor_x
-                0xc001385d                set_up_text_color
-                0xc001377c                newLinkedlist
-                0xc0013825                Removing_from_the_end
- .text          0xc00138bc      0x170 request.o
-                0xc00138bc                KiRequest
-                0xc00138f7                request
- .text          0xc0013a2c      0x560 info.o
-                0xc0013a31                KiInformation
-                0xc0013a2c                KeInformation
- .text          0xc0013f8c       0x60 signal.o
-                0xc0013f8c                signalSend
-                0xc0013fd7                signalInit
- .text          0xc0013fec     0x18e0 system.o
-                0xc0014fba                systemCreateSystemMenuBar
-                0xc00151b2                SystemMenu
-                0xc0015877                systemInit
-                0xc0015774                systemGetSystemStatus
-                0xc0014a80                systemIoDma
-                0xc00150b1                systemCheck3TierArchitecture
-                0xc001589d                die
-                0xc0014f1a                systemLinkDriver
-                0xc001571a                systemGetSystemMetric
-                0xc0015184                system_dispatch_to_procedure
-                0xc001588e                systemSystem
-                0xc0015715                systemShutdownViaAPM
-                0xc00153d9                systemReboot
-                0xc001533c                SystemMenuProcedure
-                0xc001479c                systemIoCpu
-                0xc0014ed0                systemThings
-                0xc0014da9                systemDevicesBlocked
-                0xc00157c5                systemStartUp
-                0xc0014f10                systemNull
-                0xc0014ac0                systemDevicesUnblocked
-                0xc0013fec                systemRam
-                0xc00156e5                systemShutdown
-                0xc00150b6                systemSetupVersion
-                0xc0014f54                systemShowDevicesInfo
- .text          0xc00158cc      0x100 background.o
-                0xc001593f                backgroundSetColor
-                0xc00159ae                backgroundInit
-                0xc00158cc                backgroundDraw
-                0xc001596a                backgroundRedraw
-                0xc0015995                backgroundBackground
- .text          0xc00159cc      0x380 grid.o
-                0xc0015cfd                grid
-                0xc0015c7f                CreateGrid
-                0xc00159cc                InitializeGrid
- .text          0xc0015d4c      0x1f0 statusbar.o
-                0xc0015d4c                StatusBar
- .text          0xc0015f3c      0x950 menubar.o
-                0xc00164c8                redraw_menubar_item
-                0xc0016673                get_menubar_selected_item
-                0xc00167c2                MenuBarProcedure
-                0xc0016111                create_menubar_item
-                0xc0016686                menubarX
-                0xc0016482                unselect_menubar_item
-                0xc0015f3c                create_menubar
-                0xc001643c                select_menubar_item
- .text          0xc001688c      0x930 menu.o
-                0xc0016b16                create_menu_item
-                0xc0016eef                ControlMenu
-                0xc0016e00                initmenuArray
-                0xc0017162                init_menus
-                0xc0016d4f                set_current_menu
-                0xc0016efc                MainMenu
-                0xc0017009                MainMenuProcedure
-                0xc001688c                create_menu
-                0xc0016d67                get_current_menu
-                0xc0016d93                RegisterMenu
- .text          0xc00171bc      0x4a0 messagebox.o
-                0xc00171bc                MessageBox
-                0xc00175c3                MessageBoxProcedure
- .text          0xc001765c      0x3b0 dialogbox.o
-                0xc0017995                DialogBoxProcedure
-                0xc001765c                DialogBox
- .text          0xc0017a0c      0x320 button.o
-                0xc0017a0c                draw_button
- .text          0xc0017d2c       0xe0 char.o
-                0xc0017d2c                my_buffer_char_blt
- .text          0xc0017e0c      0x180 pixel.o
-                0xc0017ea9                refresh_pixel
-                0xc0017e0c                pixelPutPixelWindowBuffer
-                0xc0017f1a                get_pixel
-                0xc0017e81                my_buffer_put_pixel
-                0xc0017e11                pixelPutPixelDedicatedWindowBuffer
- .text          0xc0017f8c       0x40 line.o
-                0xc0017f8c                my_buffer_horizontal_line
- .text          0xc0017fcc      0x170 rect.o
-                0xc001808a                getClientAreaRect
-                0xc00180d3                refresh_rectangle
-                0xc0017fcc                drawDataRectangle
-                0xc0018094                setClientAreaRect
- .text          0xc001813c       0x90 dtext.o
-                0xc001813c                draw_text
-                0xc0018178                draw_string
- .text          0xc00181cc      0x460 draw.o
-                0xc00181d1                DrawPopUpWindow
-                0xc00181cc                do_draw
-                0xc00185ed                DrawAppWindow
-                0xc001826c                DrawEditBoxWindow
-                0xc00184b5                DrawMenuBarWindow
-                0xc001847f                DrawNormalEditWindow
-                0xc00185e3                DrawTaskBarWindow
-                0xc00185e8                DrawControlMenuWindow
-                0xc00185ba                DrawStatusBarWindow
-                0xc0018307                DrawNormalWindow
-                0xc00184d0                DrawToolBarWindow
- .text          0xc001862c       0x60 vsync.o
-                0xc001866a                vsync_inb
-                0xc001862c                vsync
- .text          0xc001868c      0x170 bmp.o
-                0xc00187da                load_bitmap_16x16
-                0xc00187b2                carrega_bitmap_16x16
-                0xc001868c                bmpDisplayBMP
- .text          0xc00187fc      0x9b0 createw.o
-                0xc00187fc                CreateWindow
- .text          0xc00191ac     0x1a10 window.o
-                0xc0019801                windowSendMessage
-                0xc0019dd5                redraw_window
-                0xc001a557                set_active_window
-                0xc001a364                resize_window
-                0xc00199ad                windowGetLong2
-                0xc001a8f0                MinimizeWindow
-                0xc001a92b                MaximizeWindow
-                0xc0019563                GetWindowDesktop
-                0xc00191ac                windowInitializeBrowserSupport
-                0xc001a54d                get_active_window
-                0xc001a436                is_window_minimized
-                0xc001a46c                CloseWindow
-                0xc001a760                windowGetForegroundWindow
-                0xc0019ab6                windowUnlock
-                0xc0019ad0                set_current_window
-                0xc001a667                SetFocus
-                0xc001aa1f                init_windows
-                0xc001a5d5                CloseActiveWindow
-                0xc00197b9                windowShowWWFMessageBuffers
-                0xc0019af0                get_current_window
-                0xc001ab8e                closeActiveWindow
-                0xc0019afa                RegisterWindow
-                0xc00198b9                windowGetMessage
-                0xc001a868                KillFocus
-                0xc001a658                windowUnblockFocus
-                0xc001a53a                DestroyWindow
-                0xc001a7a1                windowSwitchFocus
-                0xc001953d                GetParentWindow
-                0xc001a649                windowBlockfocus
-                0xc001a74f                GetFocus
-                0xc001a272                redraw_screen
-                0xc0019933                windowGetLong1
-                0xc001a9c3                init_window_manager
-                0xc001a3ca                is_window_full
-                0xc0019a9c                windowLock
-                0xc001a5b8                show_window_with_focus
-                0xc001a771                windowSetForegroundWindow
-                0xc001a59b                show_active_window
-                0xc001a397                replace_window
-                0xc0019a27                windowCreateDedicatedBuffer
-                0xc0019589                windowSetUpColorScheme
-                0xc001a400                is_window_maximized
-                0xc0019b85                windowShowWindowList
-                0xc001a596                change_active_window
- .text          0xc001abbc      0x3e0 desktop.o
-                0xc001ac6f                init_desktop_list
-                0xc001ad89                set_current_traywindow
-                0xc001ada5                set_current_tooltipwindow
-                0xc001ac16                set_current_desktop
-                0xc001ae78                init_desktop
-                0xc001ad6d                set_current_messagewindow
-                0xc001ae40                set_current_menuHScroll
-                0xc001ac99                CreateDesktop
-                0xc001ad51                set_current_foreground
-                0xc001adc1                change_foreground
-                0xc001ae24                set_current_dialogsysMenu
-                0xc001ac2e                get_current_desktop
-                0xc001abbc                RegisterDesktop
-                0xc001ae08                set_current_sysMenu
-                0xc001ac65                get_current_desktop_id
-                0xc001ad35                set_current_menuwindow
-                0xc001ae5c                set_current_menuVScroll
- .text          0xc001af9c      0x1d0 wstation.o
-                0xc001af9c                get_current_windowstation
-                0xc001b100                init_window_station
-                0xc001b0d6                init_windowstation_list
-                0xc001b07c                RegisterWindowStation
-                0xc001afe0                CreateWindowStation
-                0xc001afc8                set_current_windowstation
- .text          0xc001b16c      0x230 usession.o
-                0xc001b307                init_user_session
-                0xc001b16c                get_current_user_session
-                0xc001b2d0                open_user_session
-                0xc001b269                close_user_session
-                0xc001b1a3                CreateUserSession
- .text          0xc001b39c     0x1060 gramado.o
-                0xc001c292                guiGetDebugWindow
-                0xc001c33e                guiGetShellWindowWindow
-                0xc001be28                gui_create_navigationbar
-                0xc001c211                guiGetTooltipWindow
-                0xc001c1bb                guiGetMenuWindow
-                0xc001b8e7                gui_create_mainwindow
-                0xc001bdea                gui_create_messagebox
-                0xc001c394                init_gui
-                0xc001c23c                guiGetMessageboxWindow
-                0xc001c168                guiGetStatusbarWindow
-                0xc001c0f0                guiGetDesktopWindow
-                0xc001bdcb                gui_create_infobox
-                0xc001c1e6                guiGetInfoboxWindow
-                0xc001c2bd                guiGetMbhWindowWindow
-                0xc001c0a0                guiGetBackgroundWindow
-                0xc001bcc2                gui_create_controlmenu
-                0xc001c078                guiGetDeveloperScreenWindow
-                0xc001c369                guiGetShellClientWindowWindow
-                0xc001c3ef                init_gramado
-                0xc001c140                guiGetMainWindow
-                0xc001c031                gui_create_grid
-                0xc001b669                SetGuiParameters
-                0xc001bb30                gui_create_taskbar
-                0xc001c118                guiGetTaskbarWindow
-                0xc001c3ea                gramado
-                0xc001c2e8                guiGetTopbarWindow
-                0xc001b39c                create_gui
-                0xc001be09                gui_create_debug
-                0xc001c313                guiGetNavigationbarWindow
-                0xc001c267                guiGetDialogboxWindow
-                0xc001c050                guiGetScreenWindow
-                0xc001b70c                gui_create_screen
-                0xc001c190                guiGetGridWindow
-                0xc001c0c8                guiGetLogoWindow
-                0xc001ba0f                gui_create_logo
-                0xc001b7f2                gui_create_background
- .text          0xc001c3fc       0x60 object.o
-                0xc001c3fc                init_object_manager
- .text          0xc001c45c      0x300 userenv.o
-                0xc001c60a                SetCurrentGroupId
-                0xc001c636                GetCurrentGroupId
-                0xc001c73f                init_user_environment_manager
-                0xc001c5d4                SetCurrentUserId
-                0xc001c45c                startUserEnvironment
-                0xc001c51d                CreateUser
-                0xc001c68c                init_user_info
-                0xc001c600                GetCurrentUserId
-                0xc001c50e                config_user
-                0xc001c4af                ShowUserInfo
-                0xc001c640                UpdateUserInfo
- .text          0xc001c75c      0x850 procedure.o
-                0xc001ce1f                procedureMakeTests
-                0xc001c9b0                SendMessage
-                0xc001c99b                SetProcedure
-                0xc001c75c                system_procedure
-                0xc001ca06                procedureHelp
-                0xc001cf81                procedureGrid
-                0xc001c983                registra_procedimento
-                0xc001ceea                procedureWindowWithFocusTest
-                0xc001cde4                procedureLinkDriverTest
- .text          0xc001cfac       0x80 systemcall.o
-                0xc001cfac                systemcall
-                0xc001d008                jmp_address
- .text          0xc001d02c       0x20 install.o
-                0xc001d036                install_bootmanager_stage1
-                0xc001d03b                install_bootmanager_stage2
-                0xc001d02c                install_os
-                0xc001d040                install_bootmanager_metafile
-                0xc001d031                install_boot_manager
- .text          0xc001d04c      0x180 debug.o
-                0xc001d04c                debug_check_inicialization
-                0xc001d158                debug
-                0xc001d0f7                debug_check_drivers
-                0xc001d12b                debug_compute_checksum
-                0xc001d109                debug_breakpoint
- .text          0xc001d1cc      0x140 abort.o
-                0xc001d1f2                KiAbort
-                0xc001d1fd                abort
-                0xc001d1e5                systemAbort
-                0xc001d1cc                KeAbort
- .text          0xc001d30c      0x220 faults.o
-                0xc001d4bf                KiCpuFaults
-                0xc001d4d2                do_pagefault
-                0xc001d30c                faults
- .text          0xc001d52c      0xbe0 services.o
-                0xc001d52c                services
-                0xc001e100                servicesChangeProcedure
-                0xc001e10c                _code_end = .
+                0xc00075f9                startStartIdle
+ .text          0xc000778c       0x60 io.o
+                0xc000778c                ioServices
+                0xc00077cd                ioInit
+ .text          0xc00077ec      0x4c0 hal.o
+                0xc0007a23                hal_set_machine_type
+                0xc0007a30                hal_get_machine_type
+                0xc0007a8b                hal_probe_cpu
+                0xc0007bdb                KiShutDown
+                0xc000780a                sys_vsync
+                0xc0007be8                hal_reboot
+                0xc0007887                hal_probe_processor_type
+                0xc0007b4b                getGdt
+                0xc000787a                hal_showpciinfo
+                0xc000783e                hal_hardware_detect
+                0xc000796d                init_cpu
+                0xc0007ba9                KiReboot
+                0xc0007b79                shutdown
+                0xc0007831                sys_shutdown
+                0xc0007a3a                hal_init_machine
+                0xc00077ec                hal_backbuffer_putpixel
+                0xc0007817                sys_showpciinfo
+                0xc0007824                sys_reboot
+                0xc0007b6c                hal_shutdown
+                0xc0007b5f                hal_vsync
+                0xc0007c19                init_hal
+                0xc0007b55                getIdt
+ .text          0xc0007cac      0x2f0 microkernel.o
+                0xc0007e0a                sys_getpid
+                0xc0007cac                microkernelTestLimit
+                0xc0007d3f                sys_dead_thread_collector
+                0xc0007d79                sys_create_process
+                0xc0007e89                init_microkernel
+                0xc0007d4c                sys_exit_process
+                0xc0007e84                KeReboot
+                0xc0007dfd                sys_fork
+                0xc0007d66                sys_exit_thread
+                0xc0007dbb                sys_create_thread
+                0xc0007e14                sys_getppid
+ .text          0xc0007f9c       0x50 executive.o
+                0xc0007fa9                init_executive
+                0xc0007f9c                sys_showkernelinfo
+ .text          0xc0007fec      0x250 video.o
+                0xc0007ff9                videoGetMode
+                0xc0008003                videoSetMode
+                0xc00080d5                videoInit
+                0xc0007fec                videoSetupCGAStartAddress
+                0xc0008210                videoVideo
+ .text          0xc000823c      0x100 screen.o
+                0xc000823c                screenGetWidth
+                0xc0008246                screenGetHeight
+                0xc0008250                screenSetSize
+                0xc0008293                screenInit
+                0xc0008272                screenRefresh
+                0xc0008265                refresh_screen
+ .text          0xc000833c       0x30 runtime.o
+                0xc000835d                KiInitRuntime
+                0xc000833c                init_runtime
+ .text          0xc000836c       0xe0 ports.o
+                0xc00083c9                inport8
+                0xc000841c                outport32
+                0xc000838b                inb
+                0xc000843a                outportl
+                0xc0008428                inportl
+                0xc00083bd                outportb
+                0xc00083dc                outport8
+                0xc00083fd                outport16
+                0xc000836c                kinportb
+                0xc000837f                koutportb
+                0xc00083e8                inport16
+                0xc00083aa                inportb
+                0xc000840a                inport32
+                0xc000839e                outb
+ .text          0xc000844c       0xd0 x86.o
+                0xc00084f1                pushFlags
+                0xc00084e5                pushRegs
+                0xc00084dc                Pop
+                0xc000846f                farReturn
+                0xc0008475                getFlags
+                0xc00084f7                popFlags
+                0xc0008462                stopCpu
+                0xc0008507                setStackPointer
+                0xc00084eb                popRegs
+                0xc00084ae                kernelProcessorOutPort16
+                0xc0008489                kernelProcessorInPort8
+                0xc00084d3                Push
+                0xc0008495                kernelProcessorOutPort8
+                0xc000847f                setFlags
+                0xc00084fd                getStackPointer
+                0xc0008457                disable
+                0xc00084bb                kernelProcessorInPort32
+                0xc0008469                intReturn
+                0xc00084a1                kernelProcessorInPort16
+                0xc00084c7                kernelProcessorOutPort32
+                0xc000844c                enable
+ .text          0xc000851c      0xd30 stdio.o
+                0xc0008df8                putchar
+                0xc0008d76                sprintf
+                0xc0008cfd                panic
+                0xc0009022                input
+                0xc0008587                scroll
+                0xc0009018                printf_main
+                0xc0008e0e                outbyte
+                0xc0008d90                fprintf
+                0xc0008533                fopen
+                0xc00086c2                kclear
+                0xc000879b                kprintf
+                0xc0009107                stdioInitialize
+                0xc000851c                fclose
+                0xc0008f3f                _outbyte
+                0xc0008740                kclearClientArea
+                0xc0008ce2                printf
+ .text          0xc000924c      0x110 stdlib.o
+                0xc00092aa                free
+                0xc000924c                rand
+                0xc0009269                malloc
+ .text          0xc000935c      0x240 string.o
+                0xc00094fd                strcat
+                0xc000935c                strcmp
+                0xc0009554                bzero
+                0xc0009490                memcpy
+                0xc000952d                bcopy
+                0xc00094cd                strcpy
+                0xc0009415                str_cmp
+                0xc00093b7                strncmp
+                0xc000956f                strlen
+ .text          0xc000959c       0xe0 tty.o
+                0xc000963a                ttyInit
+                0xc000959c                createTTYLine
+ .text          0xc000967c      0x460 init.o
+                0xc0009681                boot
+                0xc000993f                init
+                0xc000972e                init_arquitecture_independent
+                0xc000967c                save_kernel_args
+                0xc0009806                init_globals
+                0xc0009695                init_arquitecture_dependent
+ .text          0xc0009adc      0xaa0 logon.o
+                0xc0009da2                ExitLogon
+                0xc000a4bd                init_logon
+                0xc000a17a                logon_create_infobox
+                0xc0009ddd                SetLogonParameters
+                0xc000a175                logon_create_controlmenu
+                0xc0009f5a                logon_create_background
+                0xc000a2ff                logon_create_developer_screen
+                0xc000a45f                LogonProcedure
+                0xc000a17f                logon_create_messagebox
+                0xc000a170                logon_create_taskbar
+                0xc000a043                logon_create_mainwindow
+                0xc000a184                logon_create_debug
+                0xc0009e80                logon_create_screen
+                0xc000a2fa                logon_create_grid
+                0xc000a189                logon_create_navigationbar
+                0xc000a16b                logon_create_logo
+                0xc0009adc                create_logon
+ .text          0xc000a57c       0xe0 logoff.o
+                0xc000a57c                StartLogoff
+                0xc000a595                init_logoff
+ .text          0xc000a65c      0x500 cpux86.o
+                0xc000a9f6                KeTestCPU
+                0xc000a65c                get_cpu_intel_parameters
+                0xc000a9e9                cpu_get_parameters
+                0xc000aa08                show_cpu_intel_parameters
+                0xc000ab46                init_intel
+ .text          0xc000ab5c       0x20 cpuamd.o
+                0xc000ab5c                get_cpu_amd_parameters
+                0xc000ab61                init_amd
+ .text          0xc000ab7c      0x9e0 memory.o
+                0xc000ae51                FreeHeap
+                0xc000b3b3                gcEXECUTIVE
+                0xc000b196                init_mm
+                0xc000af00                init_heap
+                0xc000ab7c                get_process_heap_pointer
+                0xc000b3a9                gcGRAMADO
+                0xc000ae6e                show_memory_structs
+                0xc000b4a5                gcMICROKERNEL
+                0xc000b4af                gcHAL
+                0xc000ae5b                AllocateHeapEx
+                0xc000b4b9                gc
+                0xc000abee                SetKernelHeap
+                0xc000ac7f                AllocateHeap
+                0xc000b0a4                memoryShowMemoryInfo
+                0xc000b035                init_stack
+ .text          0xc000b55c      0x690 pages.o
+                0xc000b66e                SetCR3
+                0xc000b55c                CreatePageDirectory
+                0xc000b686                SetUpPaging
+                0xc000b5ad                CreatePageTable
+ .text          0xc000bbec        0x0 apic.o
+ .text          0xc000bbec        0x0 pic.o
+ .text          0xc000bbec      0x1f0 timer.o
+                0xc000bd37                set_timeout
+                0xc000bd19                sleep
+                0xc000bcf8                get_next_quantum
+                0xc000bceb                set_next_quantum
+                0xc000bcca                get_quantum
+                0xc000bcbd                set_quantum
+                0xc000bd4e                timerTimer
+                0xc000bd02                now
+                0xc000bd0f                get_tick_count
+                0xc000bc68                timerInit8253
+                0xc000bd76                timerInit
+                0xc000bce1                get_current_quantum
+                0xc000bbf9                KiTimer
+                0xc000bd44                get_timeout
+                0xc000bcd4                set_current_quantum
+                0xc000bbec                KeTimer
+                0xc000bc06                timer
+ .text          0xc000bddc      0x3e0 rtc.o
+                0xc000c18c                init_clock
+                0xc000bfb4                rtcGetBaseMemory
+                0xc000c018                get_cmos_info
+                0xc000be41                read_cmos_bcd
+                0xc000bddc                KiRtcIrq
+                0xc000bf50                rtcGetExtendedMemory
+                0xc000beb1                get_time
+                0xc000bde9                rtc_irq
+                0xc000bf03                get_date
+ .text          0xc000c1bc       0x50 keyboard.o
+                0xc000c1bc                abnt2_keyboard_handler
+                0xc000c1df                KiKeyboard
+ .text          0xc000c20c      0xe60 ldisc.o
+                0xc000c313                keyboardDisable
+                0xc000c20c                keyboardGetKeyState
+                0xc000c3cb                LINE_DISCIPLINE
+                0xc000c91a                KbGetLongParam1
+                0xc000cbdc                kbdc_wait
+                0xc000c8db                KbGetMessage
+                0xc000cdd9                kernelPS2MouseDriverReadData
+                0xc000cf4c                P8042_install
+                0xc000c9ab                init_keyboard
+                0xc000c997                get_ctrl_status
+                0xc000c9a1                get_shift_status
+                0xc000cbb9                mouse_read
+                0xc000ca57                init_mouse
+                0xc000c94d                KbGetLongParam2
+                0xc000cc20                mouseHandler
+                0xc000c8a8                KdGetWindowPointer
+                0xc000c98d                get_alt_status
+                0xc000c349                keyboard_set_leds
+                0xc000c980                reboot
+                0xc000c2dd                keyboardEnable
+                0xc000cb6b                mouse_write
+ .text          0xc000d06c       0x50 hdd.o
+                0xc000d06c                my_read_hd_sector
+                0xc000d089                my_write_hd_sector
+                0xc000d0a6                init_hdd
+ .text          0xc000d0bc      0x810 pci.o
+                0xc000d3aa                pciGetBAR
+                0xc000d0d0                KiPciHandler3
+                0xc000d2be                pciCheckVendor
+                0xc000d0c6                KiPciHandler2
+                0xc000d187                pciConfigReadWord
+                0xc000d577                pciInfo
+                0xc000d36f                pciGetClassCode
+                0xc000d8b1                pciInit
+                0xc000d0da                KiPciHandler4
+                0xc000d0e4                pciConfigReadByte
+                0xc000d334                pciGetSubClass
+                0xc000d501                pciGetInterruptLine
+                0xc000d2f9                pciCheckDevice
+                0xc000d83d                init_pci
+                0xc000d22d                pciConfigReadDWord
+                0xc000d53c                pciGetInterruptPin
+                0xc000d630                pci_setup_devices
+                0xc000d0bc                KiPciHandler1
+ .text          0xc000d8cc       0x10 usb.o
+                0xc000d8cc                usbInit
+ .text          0xc000d8dc       0x10 device.o
+                0xc000d8dc                init_device_manager
+ .text          0xc000d8ec      0x1c0 spawn.o
+                0xc000d91a                spawn_task
+                0xc000d8ec                KiSpawnTask
+ .text          0xc000daac       0x10 callout.o
+                0xc000daac                KiCalloutTest
+ .text          0xc000dabc       0x10 callfar.o
+                0xc000dabc                KiCallfarTest
+ .text          0xc000dacc      0x7e0 process.o
+                0xc000e0ac                SetProcessDirectory
+                0xc000de0b                KeSelectNextThread
+                0xc000de9d                KeSetPriority
+                0xc000e0c0                GetProcessDirectory
+                0xc000df15                show_process_information
+                0xc000db63                create_process
+                0xc000de6b                KeDoProcessReady
+                0xc000de70                KeDoProcessRunning
+                0xc000dd7d                CloseAllProcesses
+                0xc000df06                KeMostraSlot
+                0xc000e15c                dead_task_collector
+                0xc000de66                KeDispatchProcess
+                0xc000df10                KeShowPreemptedTask
+                0xc000de7f                KeDoProcessDead
+                0xc000e251                set_caller_process_id
+                0xc000de31                KeInitTasks
+                0xc000ded9                KeSetNextQuantum
+                0xc000de75                KeDoProcessSleeping
+                0xc000decf                KeGetCurrentQuantum
+                0xc000e0fa                init_tasks
+                0xc000de93                KeKillProcess
+                0xc000de7a                KeDoProcessZombie
+                0xc000de5c                KeExecProcess
+                0xc000de98                KeNewProcessScheduler
+                0xc000e161                exit_process
+                0xc000deca                KeSetCurrentQuantum
+                0xc000deb6                KeReloadCurrentTask
+                0xc000df0b                KeMostraReg
+                0xc000de89                KeWakeupProcess
+                0xc000e247                get_caller_process_id
+                0xc000de1e                KeCheckTaskContext
+                0xc000dddb                KeSaveCurrentContext
+                0xc000defc                KeShowTasksParameters
+                0xc000df01                KeMostraSlots
+                0xc000e0e3                GetPageDirValue
+                0xc000e25e                init_process_manager
+                0xc000dee8                KeSetFocus
+                0xc000deb1                KeSaveContextOfNewTask
+                0xc000e0f0                init_task
+                0xc000dacc                processTesting
+                0xc000dea7                KeIncreasePriority
+                0xc000dede                KeGetNextQuantum
+                0xc000def7                KeDebugBreakpoint
+                0xc000db18                processSendSignal
+                0xc000e107                init_processes
+                0xc000dde0                KeRestoreCurrentContext
+                0xc000dec0                KeGetQuantum
+                0xc000de3e                KeCreateTask
+                0xc000de84                KeStartProcess
+                0xc000de8e                KeProcessExit
+                0xc000e27c                GetProcessHeapStart
+                0xc000deed                KeGetFocus
+                0xc000ddf8                KeSpawnTask
+                0xc000de48                KeInitTask
+                0xc000dde5                KeCpuFaults
+                0xc000de52                KeFork
+                0xc000debb                KeSetQuantum
+ .text          0xc000e2ac        0x0 pheap.o
+ .text          0xc000e2ac      0x5a0 thread.o
+                0xc000e701                GetThreadState
+                0xc000e7bc                init_threads
+                0xc000e2ac                create_thread
+                0xc000e669                FindReadyThread
+                0xc000e724                GetThreadType
+                0xc000e74a                show_thread_information
+                0xc000e61a                GetCurrentThread
+                0xc000e6cb                SelectForExecution
+                0xc000e610                GetCurrentThreadId
+ .text          0xc000e84c      0x540 threadi.o
+                0xc000e864                KiGetTaskStatus
+                0xc000ec6a                show_tasks_parameters
+                0xc000e8ad                KiGetFocus
+                0xc000ec42                GetThreadDirectory
+                0xc000e8bc                KiShowTasksParameters
+                0xc000e88a                KiSetCurrentQuantum
+                0xc000e876                KiReloadCurrentTask
+                0xc000ec6f                exit_thread
+                0xc000e8c1                KiMostraSlots
+                0xc000e8dd                mostra_slots
+                0xc000e8d0                KiShowThreadList
+                0xc000e851                KiSetTaskStatus
+                0xc000ead6                mostra_reg
+                0xc000ecc4                kill_thread
+                0xc000e84c                KiShowPreemptedTask
+                0xc000e880                KiGetQuantum
+                0xc000e8a8                KiSetFocus
+                0xc000ebdd                set_thread_priority
+                0xc000e899                KiSetNextQuantum
+                0xc000e87b                KiSetQuantum
+                0xc000e8b7                KiDebugBreakpoint
+                0xc000e8cb                KiMostraReg
+                0xc000ec65                show_preempted_task
+                0xc000ec2c                SetThreadDirectory
+                0xc000ea0d                mostra_slot
+                0xc000e871                KiSaveContextOfNewTask
+                0xc000e89e                KiGetNextQuantum
+                0xc000e88f                KiGetCurrentQuantum
+                0xc000e8c6                KiMostraSlot
+                0xc000ed15                dead_thread_collector
+ .text          0xc000ed8c       0x30 theap.o
+                0xc000ed8c                GetThreadHeapStart
+ .text          0xc000edbc       0x30 tstack.o
+                0xc000edbc                GetThreadStackStart
+ .text          0xc000edec      0xbf0 create.o
+                0xc000f015                KiCreateIdle
+                0xc000ee84                KiCreateProcess
+                0xc000f6c2                KiCreateTaskManager
+                0xc000ee29                KeCreateThread
+                0xc000ee8e                KiCreateTask
+                0xc000eea9                KiCreateKernelProcess
+                0xc000ee66                fork
+                0xc000ee7a                KiFork
+                0xc000edec                KeCreateProcess
+                0xc000ee70                create_task
+                0xc000f3aa                KiCreateShell
+ .text          0xc000f9dc      0x190 start.o
+                0xc000fb5a                KiInitTasks
+                0xc000fa3c                executa_tarefa
+                0xc000fa04                start_task
+                0xc000f9dc                KeStartShell
+                0xc000fa28                switch_to_user_mode
+                0xc000fb28                KiExecutaTarefa
+                0xc000fa23                reload_current_task
+                0xc000f9f0                KeStartTaskManager
+                0xc000fb32                KiInitTask
+                0xc000fb1b                KiSwitchToUserMode
+ .text          0xc000fb6c      0x450 context.o
+                0xc000ffa4                KiRestoreCurrentContext
+                0xc000ffb1                save_context_of_new_task
+                0xc000fe81                contextCheckThreadRing0Context
+                0xc000fb6c                save_current_context
+                0xc000fe8b                contextCheckThreadRing3Context
+                0xc000ff84                KiCheckTaskContext
+                0xc000ff97                KiSaveCurrentContext
+                0xc000fcd0                restore_current_context
+ .text          0xc000ffbc       0x20 tasks.o
+                0xc000ffcb                task3
+                0xc000ffbc                task0
+                0xc000ffc1                task1
+                0xc000ffc6                task2
+ .text          0xc000ffdc      0x4e0 taskswitch.o
+                0xc000ffe9                task_switch
+                0xc001047a                set_task_status
+                0xc0010351                taskswitchRR
+                0xc0010491                taskswitch_lock
+                0xc0010487                get_task_status
+                0xc000ffdc                KiTaskSwitch
+                0xc00104a0                taskswitch_unlock
+ .text          0xc00104bc      0xe90 queue.o
+                0xc0010933                queue_insert_data
+                0xc00104bc                init_queue
+                0xc0010d5c                queue_insert_head
+                0xc00111b9                feed_ready_queue
+                0xc0010eed                queue_get_data
+                0xc001110a                ScanReadyQueue
+                0xc001107c                show_queue_information
+ .text          0xc001134c      0x150 scheduler.o
+                0xc001134c                KeScheduler
+                0xc001138c                scheduler
+                0xc001147e                scheduler_get_status
+                0xc001146f                scheduler_unlock
+                0xc0011460                scheduler_lock
+                0xc0011488                new_task_scheduler
+                0xc0011447                scheduler_start
+                0xc001148d                init_scheduler
+ .text          0xc001149c      0x760 scheduleri.o
+                0xc001180c                do_thread_running
+                0xc001156e                KiKillTask
+                0xc0011b0d                check_for_standby
+                0xc00118b0                do_thread_dead
+                0xc001149c                KiIncreasePriority
+                0xc0011549                KiStartTask
+                0xc0011586                KiDispatchTask
+                0xc00117d8                do_thread_ready
+                0xc0011581                KiNewTaskScheduler
+                0xc0011536                KiDoThreadDead
+                0xc0011523                KiDoThreadZombie
+                0xc00114ca                KiSelectNextThread
+                0xc0011874                do_thread_zombie
+                0xc00114fd                KiDoThreadRunning
+                0xc001158b                KiSetPriority
+                0xc0011758                get_current
+                0xc00115c5                find_higher_priority
+                0xc00119d1                taskexit
+                0xc0011a42                SelectNextThread
+                0xc00114a6                KiScheduler
+                0xc001154e                KiAcordarTarefa
+                0xc0011795                set_priority
+                0xc00116c6                preempt
+                0xc0011561                KiTaskExit
+                0xc0011510                KiDoThreadSleeping
+                0xc0011762                get_current_task
+                0xc00115ab                KiGetCurrent
+                0xc001176c                set_current
+                0xc00114ea                KiDoThreadReady
+                0xc0011840                do_thread_sleeping
+                0xc0011b84                check_quantum
+                0xc00115b8                KiGetCurrentTask
+                0xc00114bd                KiFindHigherPriority
+                0xc0011598                KiSetCurrent
+                0xc001194c                kill_task
+                0xc00118e4                wakeup_thread
+ .text          0xc0011bfc      0x860 dispatch.o
+                0xc0012260                dispatch_task
+                0xc0011eca                sysconcDispatcher
+                0xc0012097                dispatch_Default
+                0xc001201c                rrDispatcher
+                0xc0012008                idleDispatcher
+                0xc0011f64                userconcDispatcher
+                0xc0011ffe                systemDispatcher
+                0xc0012339                init_dispatcher
+                0xc00123db                IncrementDispatcherCount
+                0xc0011bfc                dispatcher
+                0xc0011d96                syscoopDispatcher
+                0xc0012026                realtimeDispatcher
+                0xc0011e30                usercoopDispatcher
+                0xc0011d27                readyDispatcher
+                0xc0012012                periodicDispatcher
+                0xc00122a5                dispatch_thread
+ .text          0xc001245c      0x110 semaphore.o
+                0xc0012486                Down
+                0xc001253a                semaphore_up
+                0xc001245c                init_semaphore
+                0xc0012561                close_semaphore
+                0xc0012557                delete_semaphore
+                0xc001255c                open_semaphore
+                0xc001254d                create_semaphore
+                0xc0012527                semaphore_down
+                0xc00124e0                Up
+ .text          0xc001256c       0x10 modules.o
+                0xc001256c                modulesModules
+ .text          0xc001257c       0x10 nic.o
+                0xc001257c                init_network
+ .text          0xc001258c       0x30 network.o
+                0xc001258c                networkInit
+ .text          0xc00125bc       0x50 socket.o
+                0xc00125bc                create_socket
+ .text          0xc001260c       0x10 server.o
+                0xc001260c                init_systemserver
+ .text          0xc001261c       0xd0 channel.o
+                0xc0012691                OpenChannel
+                0xc00126bc                CloseChannel
+                0xc001261c                CreateChannel
+                0xc0012670                DestroyChannel
+ .text          0xc00126ec       0x70 ipc.o
+                0xc0012749                init_ipc
+                0xc00126f6                ipcProcedureEx
+                0xc00126ec                ipcProcedure
+                0xc0012700                ipc_dispatch_message
+ .text          0xc001275c      0x440 read.o
+                0xc0012a3f                fs_load_rootdirEx
+                0xc0012a90                fs_load_fatEx
+                0xc00127f4                fsLoadFile
+                0xc00127be                read_lba
+                0xc0012af3                fs_load_dir
+                0xc00129f0                KiLoadRootDir
+                0xc0012782                fatLoadCluster
+                0xc0012adf                fs_load_rootdir
+                0xc001275c                fatClustToSect
+ .text          0xc0012b9c       0x90 write.o
+                0xc0012b9c                fatWriteCluster
+                0xc0012c18                fs_save_rootdir
+                0xc0012c22                fs_save_entry_on_root
+                0xc0012c27                fs_save_structure
+                0xc0012c0e                fsSaveFile
+                0xc0012c1d                fs_save_dir
+                0xc0012bd8                write_lba
+ .text          0xc0012c2c      0x150 cf.o
+                0xc0012d4c                fs_create_entry
+                0xc0012c2c                fs_create_dir
+                0xc0012c46                fs_create_file
+                0xc0012d5b                create_system_folders
+                0xc0012d51                fs_create_name
+                0xc0012d56                salva_nome
+ .text          0xc0012d7c      0x230 search.o
+                0xc0012e15                fsSearchFile
+                0xc0012f95                fsSearchFileName
+                0xc0012f17                fs_find_not_empty_entry
+                0xc0012f0d                fs_find_empty_entry
+                0xc0012f03                fs_search_empty_entry
+                0xc0012f21                fs_find_n_empty_entries
+                0xc0012d7c                KiSearchFile
+ .text          0xc0012fac       0x90 format.o
+                0xc0012fb9                fs_delete_entry
+                0xc0012fac                fs_apaga_fat
+                0xc0012fed                fsClearFat
+                0xc0012fbe                limpa_root
+ .text          0xc001303c       0xa0 disk.o
+                0xc001303c                disk_init
+                0xc00130ca                init_test_disk
+ .text          0xc00130dc       0x70 volume.o
+                0xc00130dc                volume_init
+ .text          0xc001314c      0x530 fs.o
+                0xc00132ba                fs_get_fat_entry
+                0xc00132c4                fs_set_fat_entry
+                0xc0013352                fsCheckVbr
+                0xc00132fb                fs_show_entry
+                0xc00132d3                fs_set_entry
+                0xc00132b5                fs_test_fat_vector
+                0xc00134ae                set_spc
+                0xc0013614                fsInit
+                0xc001326c                get_file
+                0xc00132f1                fs_check_fat
+                0xc00131e3                KeLoadFile
+                0xc001330a                fs_set_entry_status
+                0xc00134dc                fs_init_fat
+                0xc0013543                fs_init_structures
+                0xc0013395                fs_check_disk
+                0xc00133bf                MountShortFileName
+                0xc00132d8                fs_get_entry
+                0xc001314c                fsListFiles
+                0xc00132e2                fs_show_dir
+                0xc0013300                fs_get_entry_status
+                0xc00132e7                fs_check_cluster
+                0xc00132c9                fs_put_list_on_fat
+                0xc0013293                set_file
+                0xc00134cf                set_filesystem_type
+                0xc00132dd                fs_show_dir_entry
+                0xc00132ce                fs_set_structures
+                0xc00134c5                get_filesystem_type
+                0xc001330f                fsCheckMbr
+                0xc00134bb                get_spc
+ .text          0xc001367c      0x140 misc.o
+                0xc00136be                newNode
+                0xc00137a7                get_cursor_y
+                0xc0013788                set_up_cursor
+                0xc00136f7                Removing_from_the_beginning
+                0xc0013720                Removing_from_the_middle
+                0xc0013750                set_up_color
+                0xc001379d                get_cursor_x
+                0xc001375d                set_up_text_color
+                0xc001367c                newLinkedlist
+                0xc0013725                Removing_from_the_end
+ .text          0xc00137bc      0x170 request.o
+                0xc00137bc                KiRequest
+                0xc00137f7                request
+ .text          0xc001392c      0x560 info.o
+                0xc0013931                KiInformation
+                0xc001392c                KeInformation
+ .text          0xc0013e8c       0x60 signal.o
+                0xc0013e8c                signalSend
+                0xc0013ed7                signalInit
+ .text          0xc0013eec     0x18e0 system.o
+                0xc0014eba                systemCreateSystemMenuBar
+                0xc00150b2                SystemMenu
+                0xc0015777                systemInit
+                0xc0015674                systemGetSystemStatus
+                0xc0014980                systemIoDma
+                0xc0014fb1                systemCheck3TierArchitecture
+                0xc001579d                die
+                0xc0014e1a                systemLinkDriver
+                0xc001561a                systemGetSystemMetric
+                0xc0015084                system_dispatch_to_procedure
+                0xc001578e                systemSystem
+                0xc0015615                systemShutdownViaAPM
+                0xc00152d9                systemReboot
+                0xc001523c                SystemMenuProcedure
+                0xc001469c                systemIoCpu
+                0xc0014dd0                systemThings
+                0xc0014ca9                systemDevicesBlocked
+                0xc00156c5                systemStartUp
+                0xc0014e10                systemNull
+                0xc00149c0                systemDevicesUnblocked
+                0xc0013eec                systemRam
+                0xc00155e5                systemShutdown
+                0xc0014fb6                systemSetupVersion
+                0xc0014e54                systemShowDevicesInfo
+ .text          0xc00157cc      0x100 background.o
+                0xc001583f                backgroundSetColor
+                0xc00158ae                backgroundInit
+                0xc00157cc                backgroundDraw
+                0xc001586a                backgroundRedraw
+                0xc0015895                backgroundBackground
+ .text          0xc00158cc      0x380 grid.o
+                0xc0015bfd                grid
+                0xc0015b7f                CreateGrid
+                0xc00158cc                InitializeGrid
+ .text          0xc0015c4c      0x1f0 statusbar.o
+                0xc0015c4c                StatusBar
+ .text          0xc0015e3c      0x950 menubar.o
+                0xc00163c8                redraw_menubar_item
+                0xc0016573                get_menubar_selected_item
+                0xc00166c2                MenuBarProcedure
+                0xc0016011                create_menubar_item
+                0xc0016586                menubarX
+                0xc0016382                unselect_menubar_item
+                0xc0015e3c                create_menubar
+                0xc001633c                select_menubar_item
+ .text          0xc001678c      0x930 menu.o
+                0xc0016a16                create_menu_item
+                0xc0016def                ControlMenu
+                0xc0016d00                initmenuArray
+                0xc0017062                init_menus
+                0xc0016c4f                set_current_menu
+                0xc0016dfc                MainMenu
+                0xc0016f09                MainMenuProcedure
+                0xc001678c                create_menu
+                0xc0016c67                get_current_menu
+                0xc0016c93                RegisterMenu
+ .text          0xc00170bc      0x4a0 messagebox.o
+                0xc00170bc                MessageBox
+                0xc00174c3                MessageBoxProcedure
+ .text          0xc001755c      0x3b0 dialogbox.o
+                0xc0017895                DialogBoxProcedure
+                0xc001755c                DialogBox
+ .text          0xc001790c      0x320 button.o
+                0xc001790c                draw_button
+ .text          0xc0017c2c       0xe0 char.o
+                0xc0017c2c                my_buffer_char_blt
+ .text          0xc0017d0c      0x180 pixel.o
+                0xc0017da9                refresh_pixel
+                0xc0017d0c                pixelPutPixelWindowBuffer
+                0xc0017e1a                get_pixel
+                0xc0017d81                my_buffer_put_pixel
+                0xc0017d11                pixelPutPixelDedicatedWindowBuffer
+ .text          0xc0017e8c       0x40 line.o
+                0xc0017e8c                my_buffer_horizontal_line
+ .text          0xc0017ecc      0x170 rect.o
+                0xc0017f8a                getClientAreaRect
+                0xc0017fd3                refresh_rectangle
+                0xc0017ecc                drawDataRectangle
+                0xc0017f94                setClientAreaRect
+ .text          0xc001803c       0x90 dtext.o
+                0xc001803c                draw_text
+                0xc0018078                draw_string
+ .text          0xc00180cc      0x460 draw.o
+                0xc00180d1                DrawPopUpWindow
+                0xc00180cc                do_draw
+                0xc00184ed                DrawAppWindow
+                0xc001816c                DrawEditBoxWindow
+                0xc00183b5                DrawMenuBarWindow
+                0xc001837f                DrawNormalEditWindow
+                0xc00184e3                DrawTaskBarWindow
+                0xc00184e8                DrawControlMenuWindow
+                0xc00184ba                DrawStatusBarWindow
+                0xc0018207                DrawNormalWindow
+                0xc00183d0                DrawToolBarWindow
+ .text          0xc001852c       0x60 vsync.o
+                0xc001856a                vsync_inb
+                0xc001852c                vsync
+ .text          0xc001858c      0x170 bmp.o
+                0xc00186da                load_bitmap_16x16
+                0xc00186b2                carrega_bitmap_16x16
+                0xc001858c                bmpDisplayBMP
+ .text          0xc00186fc      0x9b0 createw.o
+                0xc00186fc                CreateWindow
+ .text          0xc00190ac     0x1a10 window.o
+                0xc0019701                windowSendMessage
+                0xc0019cd5                redraw_window
+                0xc001a457                set_active_window
+                0xc001a264                resize_window
+                0xc00198ad                windowGetLong2
+                0xc001a7f0                MinimizeWindow
+                0xc001a82b                MaximizeWindow
+                0xc0019463                GetWindowDesktop
+                0xc00190ac                windowInitializeBrowserSupport
+                0xc001a44d                get_active_window
+                0xc001a336                is_window_minimized
+                0xc001a36c                CloseWindow
+                0xc001a660                windowGetForegroundWindow
+                0xc00199b6                windowUnlock
+                0xc00199d0                set_current_window
+                0xc001a567                SetFocus
+                0xc001a91f                init_windows
+                0xc001a4d5                CloseActiveWindow
+                0xc00196b9                windowShowWWFMessageBuffers
+                0xc00199f0                get_current_window
+                0xc001aa8e                closeActiveWindow
+                0xc00199fa                RegisterWindow
+                0xc00197b9                windowGetMessage
+                0xc001a768                KillFocus
+                0xc001a558                windowUnblockFocus
+                0xc001a43a                DestroyWindow
+                0xc001a6a1                windowSwitchFocus
+                0xc001943d                GetParentWindow
+                0xc001a549                windowBlockfocus
+                0xc001a64f                GetFocus
+                0xc001a172                redraw_screen
+                0xc0019833                windowGetLong1
+                0xc001a8c3                init_window_manager
+                0xc001a2ca                is_window_full
+                0xc001999c                windowLock
+                0xc001a4b8                show_window_with_focus
+                0xc001a671                windowSetForegroundWindow
+                0xc001a49b                show_active_window
+                0xc001a297                replace_window
+                0xc0019927                windowCreateDedicatedBuffer
+                0xc0019489                windowSetUpColorScheme
+                0xc001a300                is_window_maximized
+                0xc0019a85                windowShowWindowList
+                0xc001a496                change_active_window
+ .text          0xc001aabc      0x3e0 desktop.o
+                0xc001ab6f                init_desktop_list
+                0xc001ac89                set_current_traywindow
+                0xc001aca5                set_current_tooltipwindow
+                0xc001ab16                set_current_desktop
+                0xc001ad78                init_desktop
+                0xc001ac6d                set_current_messagewindow
+                0xc001ad40                set_current_menuHScroll
+                0xc001ab99                CreateDesktop
+                0xc001ac51                set_current_foreground
+                0xc001acc1                change_foreground
+                0xc001ad24                set_current_dialogsysMenu
+                0xc001ab2e                get_current_desktop
+                0xc001aabc                RegisterDesktop
+                0xc001ad08                set_current_sysMenu
+                0xc001ab65                get_current_desktop_id
+                0xc001ac35                set_current_menuwindow
+                0xc001ad5c                set_current_menuVScroll
+ .text          0xc001ae9c      0x1d0 wstation.o
+                0xc001ae9c                get_current_windowstation
+                0xc001b000                init_window_station
+                0xc001afd6                init_windowstation_list
+                0xc001af7c                RegisterWindowStation
+                0xc001aee0                CreateWindowStation
+                0xc001aec8                set_current_windowstation
+ .text          0xc001b06c      0x230 usession.o
+                0xc001b207                init_user_session
+                0xc001b06c                get_current_user_session
+                0xc001b1d0                open_user_session
+                0xc001b169                close_user_session
+                0xc001b0a3                CreateUserSession
+ .text          0xc001b29c     0x1060 gramado.o
+                0xc001c192                guiGetDebugWindow
+                0xc001c23e                guiGetShellWindowWindow
+                0xc001bd28                gui_create_navigationbar
+                0xc001c111                guiGetTooltipWindow
+                0xc001c0bb                guiGetMenuWindow
+                0xc001b7e7                gui_create_mainwindow
+                0xc001bcea                gui_create_messagebox
+                0xc001c294                init_gui
+                0xc001c13c                guiGetMessageboxWindow
+                0xc001c068                guiGetStatusbarWindow
+                0xc001bff0                guiGetDesktopWindow
+                0xc001bccb                gui_create_infobox
+                0xc001c0e6                guiGetInfoboxWindow
+                0xc001c1bd                guiGetMbhWindowWindow
+                0xc001bfa0                guiGetBackgroundWindow
+                0xc001bbc2                gui_create_controlmenu
+                0xc001bf78                guiGetDeveloperScreenWindow
+                0xc001c269                guiGetShellClientWindowWindow
+                0xc001c2ef                init_gramado
+                0xc001c040                guiGetMainWindow
+                0xc001bf31                gui_create_grid
+                0xc001b569                SetGuiParameters
+                0xc001ba30                gui_create_taskbar
+                0xc001c018                guiGetTaskbarWindow
+                0xc001c2ea                gramado
+                0xc001c1e8                guiGetTopbarWindow
+                0xc001b29c                create_gui
+                0xc001bd09                gui_create_debug
+                0xc001c213                guiGetNavigationbarWindow
+                0xc001c167                guiGetDialogboxWindow
+                0xc001bf50                guiGetScreenWindow
+                0xc001b60c                gui_create_screen
+                0xc001c090                guiGetGridWindow
+                0xc001bfc8                guiGetLogoWindow
+                0xc001b90f                gui_create_logo
+                0xc001b6f2                gui_create_background
+ .text          0xc001c2fc       0x60 object.o
+                0xc001c2fc                init_object_manager
+ .text          0xc001c35c      0x300 userenv.o
+                0xc001c50a                SetCurrentGroupId
+                0xc001c536                GetCurrentGroupId
+                0xc001c63f                init_user_environment_manager
+                0xc001c4d4                SetCurrentUserId
+                0xc001c35c                startUserEnvironment
+                0xc001c41d                CreateUser
+                0xc001c58c                init_user_info
+                0xc001c500                GetCurrentUserId
+                0xc001c40e                config_user
+                0xc001c3af                ShowUserInfo
+                0xc001c540                UpdateUserInfo
+ .text          0xc001c65c      0x850 procedure.o
+                0xc001cd1f                procedureMakeTests
+                0xc001c8b0                SendMessage
+                0xc001c89b                SetProcedure
+                0xc001c65c                system_procedure
+                0xc001c906                procedureHelp
+                0xc001ce81                procedureGrid
+                0xc001c883                registra_procedimento
+                0xc001cdea                procedureWindowWithFocusTest
+                0xc001cce4                procedureLinkDriverTest
+ .text          0xc001ceac       0x80 systemcall.o
+                0xc001ceac                systemcall
+                0xc001cf08                jmp_address
+ .text          0xc001cf2c       0x20 install.o
+                0xc001cf36                install_bootmanager_stage1
+                0xc001cf3b                install_bootmanager_stage2
+                0xc001cf2c                install_os
+                0xc001cf40                install_bootmanager_metafile
+                0xc001cf31                install_boot_manager
+ .text          0xc001cf4c      0x180 debug.o
+                0xc001cf4c                debug_check_inicialization
+                0xc001d058                debug
+                0xc001cff7                debug_check_drivers
+                0xc001d02b                debug_compute_checksum
+                0xc001d009                debug_breakpoint
+ .text          0xc001d0cc      0x140 abort.o
+                0xc001d0f2                KiAbort
+                0xc001d0fd                abort
+                0xc001d0e5                systemAbort
+                0xc001d0cc                KeAbort
+ .text          0xc001d20c      0x220 faults.o
+                0xc001d3bf                KiCpuFaults
+                0xc001d3d2                do_pagefault
+                0xc001d20c                faults
+ .text          0xc001d42c      0xbe0 services.o
+                0xc001d42c                services
+                0xc001e000                servicesChangeProcedure
+                0xc001e00c                _code_end = .
                 0xc001f000                . = ALIGN (0x1000)
- *fill*         0xc001e10c      0xef4 00
+ *fill*         0xc001e00c      0xff4 00
 
 .data           0xc001f000    0x10000
                 0xc001f000                _data_begin = .
@@ -1812,108 +1812,108 @@ Linker script and memory map
  .data          0xc0029aa4      0x1c0 faults.o
  .data          0xc0029c64      0x1c0 services.o
  *(.rdata)
- .rdata         0xc0029e24      0x280 main.o
- .rdata         0xc002a0a4       0x10 io.o
- .rdata         0xc002a0b4      0x150 hal.o
- .rdata         0xc002a204      0x100 microkernel.o
- .rdata         0xc002a304       0x30 executive.o
- .rdata         0xc002a334       0x30 video.o
- .rdata         0xc002a364       0x30 screen.o
- .rdata         0xc002a394       0x10 runtime.o
- .rdata         0xc002a3a4       0x10 ports.o
- .rdata         0xc002a3b4       0x10 x86.o
- .rdata         0xc002a3c4       0x50 stdio.o
- .rdata         0xc002a414       0x90 stdlib.o
- .rdata         0xc002a4a4       0x10 string.o
- .rdata         0xc002a4b4       0x40 tty.o
- .rdata         0xc002a4f4      0x220 init.o
- .rdata         0xc002a714      0x170 logon.o
- .rdata         0xc002a884       0x30 logoff.o
- .rdata         0xc002a8b4      0x250 cpux86.o
- .rdata         0xc002ab04       0x10 cpuamd.o
- .rdata         0xc002ab14      0x460 memory.o
- .rdata         0xc002af74       0x40 pages.o
- .rdata         0xc002afb4       0x10 apic.o
- .rdata         0xc002afc4       0x10 pic.o
- .rdata         0xc002afd4       0x30 timer.o
- .rdata         0xc002b004       0x80 rtc.o
- .rdata         0xc002b084       0x30 keyboard.o
- .rdata         0xc002b0b4       0x80 ldisc.o
- .rdata         0xc002b134       0x10 hdd.o
- .rdata         0xc002b144      0x2e0 pci.o
- .rdata         0xc002b424       0x10 device.o
- .rdata         0xc002b434      0x100 spawn.o
- .rdata         0xc002b534       0x10 callout.o
- .rdata         0xc002b544      0x190 process.o
- .rdata         0xc002b6d4       0x10 pheap.o
- .rdata         0xc002b6e4       0x90 thread.o
- .rdata         0xc002b774      0x200 threadi.o
- .rdata         0xc002b974       0x10 theap.o
- .rdata         0xc002b984       0x10 tstack.o
- .rdata         0xc002b994      0x1a0 create.o
- .rdata         0xc002bb34       0xe0 start.o
- .rdata         0xc002bc14      0x130 context.o
- .rdata         0xc002bd44       0x10 tasks.o
- .rdata         0xc002bd54      0x1b0 taskswitch.o
- .rdata         0xc002bf04      0x190 queue.o
- .rdata         0xc002c094       0x10 scheduler.o
- .rdata         0xc002c0a4       0x30 scheduleri.o
- .rdata         0xc002c0d4      0x180 dispatch.o
- .rdata         0xc002c254       0x10 semaphore.o
- .rdata         0xc002c264       0x10 modules.o
- .rdata         0xc002c274       0x10 nic.o
- .rdata         0xc002c284       0x10 network.o
- .rdata         0xc002c294       0x10 socket.o
- .rdata         0xc002c2a4       0x10 server.o
- .rdata         0xc002c2b4       0x10 channel.o
- .rdata         0xc002c2c4       0x10 ipc.o
- .rdata         0xc002c2d4      0x140 read.o
- .rdata         0xc002c414       0x10 write.o
- .rdata         0xc002c424      0x140 cf.o
- .rdata         0xc002c564       0x80 search.o
- .rdata         0xc002c5e4       0x10 format.o
- .rdata         0xc002c5f4       0x40 disk.o
- .rdata         0xc002c634       0x40 volume.o
- .rdata         0xc002c674      0x1b0 fs.o
- .rdata         0xc002c824       0x10 misc.o
- .rdata         0xc002c834       0xa0 request.o
- .rdata         0xc002c8d4      0x3c0 info.o
- .rdata         0xc002cc94       0x10 signal.o
- .rdata         0xc002cca4      0x760 system.o
- .rdata         0xc002d404       0x10 background.o
- .rdata         0xc002d414       0x50 grid.o
- .rdata         0xc002d464       0x70 statusbar.o
- .rdata         0xc002d4d4      0x150 menubar.o
- .rdata         0xc002d624      0x200 menu.o
- .rdata         0xc002d824       0xb0 messagebox.o
- .rdata         0xc002d8d4       0x70 dialogbox.o
- .rdata         0xc002d944       0x10 button.o
- .rdata         0xc002d954       0x10 char.o
- .rdata         0xc002d964       0x40 pixel.o
- .rdata         0xc002d9a4       0x10 line.o
- .rdata         0xc002d9b4       0x10 rect.o
- .rdata         0xc002d9c4       0x10 dtext.o
- .rdata         0xc002d9d4       0x10 draw.o
- .rdata         0xc002d9e4       0x10 vsync.o
- .rdata         0xc002d9f4       0x10 bmp.o
- .rdata         0xc002da04       0xc0 createw.o
- .rdata         0xc002dac4      0x470 window.o
- .rdata         0xc002df34       0x40 desktop.o
- .rdata         0xc002df74       0x50 wstation.o
- .rdata         0xc002dfc4       0x90 usession.o
- .rdata         0xc002e054      0x190 gramado.o
- .rdata         0xc002e1e4       0x30 object.o
- .rdata         0xc002e214       0xb0 userenv.o
- .rdata         0xc002e2c4      0x300 procedure.o
- .rdata         0xc002e5c4       0x10 systemcall.o
- .rdata         0xc002e5d4       0x10 install.o
- .rdata         0xc002e5e4      0x130 debug.o
- .rdata         0xc002e714       0xa0 abort.o
- .rdata         0xc002e7b4      0x1a0 faults.o
- .rdata         0xc002e954      0x4d0 services.o
-                0xc002ee24                _data_end = .
+ .rdata         0xc0029e24      0x250 main.o
+ .rdata         0xc002a074       0x10 io.o
+ .rdata         0xc002a084      0x150 hal.o
+ .rdata         0xc002a1d4      0x100 microkernel.o
+ .rdata         0xc002a2d4       0x30 executive.o
+ .rdata         0xc002a304       0x30 video.o
+ .rdata         0xc002a334       0x30 screen.o
+ .rdata         0xc002a364       0x10 runtime.o
+ .rdata         0xc002a374       0x10 ports.o
+ .rdata         0xc002a384       0x10 x86.o
+ .rdata         0xc002a394       0x50 stdio.o
+ .rdata         0xc002a3e4       0x90 stdlib.o
+ .rdata         0xc002a474       0x10 string.o
+ .rdata         0xc002a484       0x40 tty.o
+ .rdata         0xc002a4c4      0x220 init.o
+ .rdata         0xc002a6e4      0x170 logon.o
+ .rdata         0xc002a854       0x30 logoff.o
+ .rdata         0xc002a884      0x250 cpux86.o
+ .rdata         0xc002aad4       0x10 cpuamd.o
+ .rdata         0xc002aae4      0x460 memory.o
+ .rdata         0xc002af44       0x40 pages.o
+ .rdata         0xc002af84       0x10 apic.o
+ .rdata         0xc002af94       0x10 pic.o
+ .rdata         0xc002afa4       0x30 timer.o
+ .rdata         0xc002afd4       0x80 rtc.o
+ .rdata         0xc002b054       0x30 keyboard.o
+ .rdata         0xc002b084       0x80 ldisc.o
+ .rdata         0xc002b104       0x10 hdd.o
+ .rdata         0xc002b114      0x2e0 pci.o
+ .rdata         0xc002b3f4       0x10 device.o
+ .rdata         0xc002b404      0x100 spawn.o
+ .rdata         0xc002b504       0x10 callout.o
+ .rdata         0xc002b514      0x190 process.o
+ .rdata         0xc002b6a4       0x10 pheap.o
+ .rdata         0xc002b6b4       0x90 thread.o
+ .rdata         0xc002b744      0x200 threadi.o
+ .rdata         0xc002b944       0x10 theap.o
+ .rdata         0xc002b954       0x10 tstack.o
+ .rdata         0xc002b964      0x1a0 create.o
+ .rdata         0xc002bb04       0xe0 start.o
+ .rdata         0xc002bbe4      0x130 context.o
+ .rdata         0xc002bd14       0x10 tasks.o
+ .rdata         0xc002bd24      0x1b0 taskswitch.o
+ .rdata         0xc002bed4      0x190 queue.o
+ .rdata         0xc002c064       0x10 scheduler.o
+ .rdata         0xc002c074       0x30 scheduleri.o
+ .rdata         0xc002c0a4      0x180 dispatch.o
+ .rdata         0xc002c224       0x10 semaphore.o
+ .rdata         0xc002c234       0x10 modules.o
+ .rdata         0xc002c244       0x10 nic.o
+ .rdata         0xc002c254       0x10 network.o
+ .rdata         0xc002c264       0x10 socket.o
+ .rdata         0xc002c274       0x10 server.o
+ .rdata         0xc002c284       0x10 channel.o
+ .rdata         0xc002c294       0x10 ipc.o
+ .rdata         0xc002c2a4      0x140 read.o
+ .rdata         0xc002c3e4       0x10 write.o
+ .rdata         0xc002c3f4      0x140 cf.o
+ .rdata         0xc002c534       0x80 search.o
+ .rdata         0xc002c5b4       0x10 format.o
+ .rdata         0xc002c5c4       0x40 disk.o
+ .rdata         0xc002c604       0x40 volume.o
+ .rdata         0xc002c644      0x1b0 fs.o
+ .rdata         0xc002c7f4       0x10 misc.o
+ .rdata         0xc002c804       0xa0 request.o
+ .rdata         0xc002c8a4      0x3c0 info.o
+ .rdata         0xc002cc64       0x10 signal.o
+ .rdata         0xc002cc74      0x760 system.o
+ .rdata         0xc002d3d4       0x10 background.o
+ .rdata         0xc002d3e4       0x50 grid.o
+ .rdata         0xc002d434       0x70 statusbar.o
+ .rdata         0xc002d4a4      0x150 menubar.o
+ .rdata         0xc002d5f4      0x200 menu.o
+ .rdata         0xc002d7f4       0xb0 messagebox.o
+ .rdata         0xc002d8a4       0x70 dialogbox.o
+ .rdata         0xc002d914       0x10 button.o
+ .rdata         0xc002d924       0x10 char.o
+ .rdata         0xc002d934       0x40 pixel.o
+ .rdata         0xc002d974       0x10 line.o
+ .rdata         0xc002d984       0x10 rect.o
+ .rdata         0xc002d994       0x10 dtext.o
+ .rdata         0xc002d9a4       0x10 draw.o
+ .rdata         0xc002d9b4       0x10 vsync.o
+ .rdata         0xc002d9c4       0x10 bmp.o
+ .rdata         0xc002d9d4       0xc0 createw.o
+ .rdata         0xc002da94      0x470 window.o
+ .rdata         0xc002df04       0x40 desktop.o
+ .rdata         0xc002df44       0x50 wstation.o
+ .rdata         0xc002df94       0x90 usession.o
+ .rdata         0xc002e024      0x190 gramado.o
+ .rdata         0xc002e1b4       0x30 object.o
+ .rdata         0xc002e1e4       0xb0 userenv.o
+ .rdata         0xc002e294      0x300 procedure.o
+ .rdata         0xc002e594       0x10 systemcall.o
+ .rdata         0xc002e5a4       0x10 install.o
+ .rdata         0xc002e5b4      0x130 debug.o
+ .rdata         0xc002e6e4       0xa0 abort.o
+ .rdata         0xc002e784      0x1a0 faults.o
+ .rdata         0xc002e924      0x4d0 services.o
+                0xc002edf4                _data_end = .
                 0xc002f000                . = ALIGN (0x1000)
- *fill*         0xc002ee24      0x1dc 00
+ *fill*         0xc002edf4      0x20c 00
 
 .bss            0xc002f000    0x18000
                 0xc002f000                _bss_begin = .
