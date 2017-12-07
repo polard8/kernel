@@ -1,7 +1,11 @@
 /*
- * File: sm\sys\services.c 
+ * File: executive\sci\services.c 
  *
- *       GERENCIA OS SERVIÇOS OFERECIDOS PEAS INTERFACES /sys.h E /system.h.   
+ *       (SCI) = SYSTEM CALL INTERFACE
+ *
+ * Esse é o arquivo principal da sci.
+ *
+ *       GERENCIA OS SERVIÇOS OFERECIDOS PELAS INTERFACES /sys.h E /system.h.   
  *
  * Obs: Todas as rotinas chmadas por esse módulo devem vir apenas das interfaces
  * /sys.h e /system.h.

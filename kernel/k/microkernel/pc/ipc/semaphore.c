@@ -1,5 +1,5 @@
 /*
- * File: microkernel\ipc\semaphore.c  
+ * File: microkernel\pc\ipc\semaphore.c  
  *
  * Descrrição:  
  *     Gerenciamento de semáforos.

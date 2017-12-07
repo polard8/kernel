@@ -375,6 +375,16 @@ struct process_d
 	unsigned long workingset_size;
 	unsigned long workingset_peak_size;	
 	
+
+	//Qualquer pagefault deve ser registrada na estrutura do processo corrente.
+	unsigned long pagefaultCount;
+	//...
+	
+	
+    //double Cycles;                   //ticks running .. 
+    //unsigned long ContextSwitches;   //quantas vezes no total o dispacher atuou sobre ele.
+    //unsigned long ContextSwitchesDelta;  //Quantas trocas de context sofreu durante um determinado tempo de análise.
+	//esse deve ser o mesmo tempo de análise usado para calcular o working set.
 	
 	
 	//

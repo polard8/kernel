@@ -148,7 +148,7 @@ unsigned long executa_tarefa(int id, unsigned long *task_address)
 	// Running tasks ~ Incrementa o número de tarefas que estão rodando.
 	//
 	
-    ProcessorBlock.running_tasks++;   
+    ProcessorBlock.running_threads++;   
 	
 	IncrementDispatcherCount(SELECT_ANY_COUNT);
 

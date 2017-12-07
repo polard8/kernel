@@ -1,5 +1,5 @@
 
-HAL
+HAL    hardware control
 ===
 
     Essa é a camada de abstração do hardware.

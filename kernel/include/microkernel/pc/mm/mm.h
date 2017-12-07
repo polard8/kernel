@@ -4,6 +4,11 @@
  * Descrição:
  *     Header para o Memory Manager. Gerenciamento de memória.
  *
+ * Ordem de importância do gerenciamento de memória:
+ *     > Endereços dos page directories.
+ *     > Endereços das pagetables. 
+ *     > 
+ *
  * Obs:
  *     Em executive, temos áreas de memórias reservadas para o sistema. 
  * Privilégios de executivo.
@@ -152,6 +157,41 @@ kernel fica com o 1GB superior."
 	    O layout da memória virtual está em fase de desenvolvimento.	   
 	    Criar um layout dos endereços físicos principais usados pelo sistema.
 */ 
+ 
+ 
+ 
+ //
+ // **  ENDEREÇOS DOS PRINCIPAIS PAGE DIRECTORIES **
+ //
+ 
+ 
+// 
+// Directory:
+// ========== 
+//     Endereço físico de alguns diretórios.
+//     Esses diretórios são dos utilitários principais.
+//     Não tem problema se esses diretórios ficarem isolados.
+//     Serão colocados em cr3.
+//
+
+//@todo: Precisamaos definir melhor esses endereços.
+//Colocá-los em um lugar segura e concatenados.
+
+#define KERNEL_PAGEDIRECTORY  (0x0009C000)                        
+#define IDLE_PAGEDIRECTORY    (0x0009C000 + 4096)                
+#define SHELL_PAGEDIRECTORY   (0x0009C000 + 4096 + 4096)         
+#define TASKMAN_PAGEDIRECTORY (0x0009C000 + 4096 + 4096 + 4096)  
+//...
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
 
 
@@ -439,22 +479,6 @@ unsigned long fsbFrames[FSB_FRAMES_MAX];
 unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];  
  
  
-// 
-// Directory:
-// ========== 
-//     Endereço físico de alguns diretórios.
-//     Serão colocados em cr3.
-//
-
-//@todo: Precisamaos definir melhor esses endereços.
-//Colocá-los em um lugar segura e concatenados.
-#define KERNEL_PAGEDIRECTORY     0x0009C000     
-#define IDLE_PAGEDIRECTORY       0x01E00000
-#define SHELL_PAGEDIRECTORY      0x01D00000
-#define TASKMAN_PAGEDIRECTORY    0x01C00000
-//...
-
-
 
 
  

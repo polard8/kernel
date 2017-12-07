@@ -1,5 +1,5 @@
 /*
- * File: executive\sm\sys\procedure.c
+ * File: executive\dd\sm\sys\procedure.c
  *
  *                   
  *
@@ -127,13 +127,29 @@ unsigned long system_procedure( struct window_d *window,
 				
 				//Help. 
 				case VK_F1:
-
+				     					
+					//teste
+					//devemos enviar para o shell a mensagem command .. avisando que o botão foi clicado ..
+					// que estamos selecionado a opção de mostrar o menu de aplicativos.
+					/*
+			        if(AltStatus == 1)
+					{ 
+					    xxxx = (void*) windowList[window_with_focus];
+						if( (void*) xxxx != NULL ){
+						    //@todo xxxx->
+					        xxxx->msg = MSG_COMMAND; 
+					        xxxx->long1 = BN_CLICKED; 
+					        //xxxx->long2 =  
+						}
+						break;
+					};*/
 					
 					//if(AltStatus == 1){ window_with_focus = 1; break;};
 					//if(CtrlStatus == 1){ active_window = 1; break;};
 			        //if(ShiftStatus == 1){ break;}; 
 					if(VideoBlock.useGui == 1){ 
-					    procedureHelp();  
+					    procedureHelp();
+                        break;						
 					};
 					//ShowUserInfo(0);    //Mostra o usuário 0, default.
                     break;
@@ -141,7 +157,12 @@ unsigned long system_procedure( struct window_d *window,
 				
 				//Kernel info.	
                 case VK_F2:
-					
+				
+					//teste
+					//devemos enviar para o shell a mensagem command .. avisando que o botão foi clicado ..
+					// que estamos selecionado a opção de mostrar o interpretador de comandos.
+
+				
 					//if(AltStatus == 1){ window_with_focus = 2; break;};
 					//if(CtrlStatus == 1){ active_window = 2; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F2\n"); break;}; 				

@@ -560,7 +560,7 @@ int init_threads()
 { 
 	//Globais.	 
 	current_thread = 0;                        //Atual. 
-	ProcessorBlock.running_tasks = (int) 0;    //Número de tarefas rodando.	
+	ProcessorBlock.running_threads = (int) 0;    //Número de tarefas rodando.	
 	old = 0;                                   //?
     forkid = 0;                                //
     task_count = (unsigned long) 0;            //Zera o contador de tarefas criadas.

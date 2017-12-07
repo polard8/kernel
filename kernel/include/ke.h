@@ -48,7 +48,6 @@ int KeLoadFile( struct channel_d *channel, unsigned char *file_name, unsigned lo
 void KeNewProcessScheduler();
 void KeSaveCurrentContext();
 void KeRestoreCurrentContext();	
-int KeScheduler(); 
 
 //dispatch support.
 void KeDispatchProcess();

@@ -437,12 +437,10 @@ void exit_thread(int tid)
 	
 	Thread = (void*) threadList[tid];
 	
-	if( (void*) Thread == NULL )
-	{
+	if( (void*) Thread == NULL ){
 		return;
-	}
-	else
-	{	
+	}else{
+		
         //Se estiver corrompida.
         if(Thread->magic != THREAD_MAGIC){
 			return;
@@ -488,9 +486,8 @@ void kill_thread(int tid)
 	
 	if( (void*) Thread == NULL){
 		return;
-	}
-	else
-	{
+	}else{
+		
 	    //@todo pegar o id do pai e enviar um sinal e acorda-lo
         //se ele estiver esperando por filho.		
         Thread->used = 0;

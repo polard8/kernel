@@ -5,12 +5,10 @@ Executive: (Internal Servers)
 
    O diretório /executive é dividido em partes:
    
-    /ram  - (Gerenciamento de memória primária).
-    /sm   - (gerenciamento do sistema:logon,logoff,user ...).
-    /tty  - (fluxo de caractere: teclado-->processo, processo-->monitor).
-    /uitm - (gerenciamento do modo texto)
-    /uigm - (gerenciamento do modo gráfico)
-    /sci  - systemcall interface. 
+   /dd    device drivers
+   /fs    file system
+   /sci   sytem call interface
+
  
    Ambiente= ring0
 

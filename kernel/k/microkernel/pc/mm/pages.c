@@ -520,9 +520,10 @@ int SetUpPaging()
 	//     Diretório do processo Kernel. Esse diretório já foi criado nesse 
 	// endereço físico pelo Boot Loader. Aqui o kernel apenas reconfigura, 
 	// utilizando a mesma localizaçao. KERNEL_PAGEDIRECTORY.
+	// ??
 	//
 	
-	unsigned long *page_directory         = (unsigned long *) KERNEL_PAGEDIRECTORY;   //0x0009C000    
+	unsigned long *page_directory         = (unsigned long *) KERNEL_PAGEDIRECTORY;     //0x0009C000    
 	//unsigned long *idle_page_directory    = (unsigned long *) IDLE_PAGEDIRECTORY;     //0x01E00000    
 	//unsigned long *shell_page_directory   = (unsigned long *) SHELL_PAGEDIRECTORY;    //0x01D00000 
 	//unsigned long *taskman_page_directory = (unsigned long *) TASKMAN_PAGEDIRECTORY;  //0x01C00000   	

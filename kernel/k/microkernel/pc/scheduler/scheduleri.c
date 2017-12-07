@@ -45,25 +45,29 @@ int KiIncreasePriority(int pid)
  * @todo: 
  *     Essa rotina deve ter retorno do tipo 'int'.
  */
-void KiScheduler()
+int KiScheduler()
 {
-    int Id = 0;
-	//?? quem esta chamando
-    //??outros filtros.
-	
-    //abre.
-	Id = (int) scheduler();
-	//fecha.
-	
-	//if( id < 0){
-	//	current_thread = 0;
-	//};
-	
-//
-// Done.
-//	
-done:	
-	return;
+    //
+	// ?? Quem está chamando ? Filtros ?
+    // 
+    // @todo: Talvez haja mais casos onde não se deva trocar a tarefa.
+    //
+
+	//Scheduler Status. (LOCKED, UNLOCKED).
+	if(g_scheduler_status == LOCKED){
+        return (int) 0;
+    };
+
+	// Retornaremos se a única thread rodando for a idle.
+	if(ProcessorBlock.running_threads == 1)
+	{
+        if(current_thread == 0){
+	        return (int) 0;
+		};
+	};
+    //Chama o Scheduler.
+done:
+	return (int) scheduler();
 }; 
 
 
@@ -268,8 +272,10 @@ int find_higher_priority()
     struct thread_d *t;  	
 	
 	//Only Idle? return.
-	if(ProcessorBlock.running_tasks == 1)
+	if(ProcessorBlock.running_threads == 1)
 	{
+		//#bugbug, Nã devemos determinar o valor da thread idle dessa forma.
+		//tempos um ponteiro para a estrutura da thread idle.
 	    if(current_thread == 0){
 		    return (int) 0;
 		};
@@ -739,9 +745,9 @@ void kill_task(int id)
 	
 	//@todo: Check struct.
 	
-	if(ProcessorBlock.running_tasks > 1)
+	if(ProcessorBlock.running_threads > 1)
 	{
-        ProcessorBlock.running_tasks--;	 
+        ProcessorBlock.running_threads--;	 
 	    //...
 	};	 
  	

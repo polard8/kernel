@@ -237,7 +237,7 @@ extern void do_executa_new_task();
  */
 //++ 
 // Global first.
-#include <hal/memmap.h>      //Memory Map - address. 
+#include <microkernel/pc/mm/memmap.h>      //Memory Map - address. 
 #include <hal/diskmap.h>     //Disk Map - sectors.
 #include <hal/screen.h> 
 #include <hal/video.h>       //video.
@@ -250,22 +250,22 @@ extern void do_executa_new_task();
 #include <hal/host.h>         //host info.   
 //...
 //Unblocked.
-#include <hal/unblocked/ports.h>       //Portas para dispositivos
-#include <hal/unblocked/ps2.h>       //ps/2 
-#include <hal/unblocked/timer.h>       //PIT. irq0.
-#include <hal/unblocked/pic.h>         //PIC.
-#include <hal/unblocked/apic.h>        //APIC - Advanced Programmable Interrupt Controller.
-#include <hal/unblocked/rtc.h>         //clock    ( South bridge).
-#include <hal/unblocked/floppy.h>      //floppy   ( South bridge).
-#include <hal/unblocked/keyboard.h>    //irq1     ( South bridge). //keyboard
-#include <hal/unblocked/ldisc.h>    //irq1     ( South bridge).   //ldisc
-#include <hal/unblocked/ide.h>         //irq14/15 ( South bridge).
+#include <executive/dd/unblocked/ports.h>       //Portas para dispositivos
+#include <executive/dd/unblocked/ps2.h>       //ps/2 
+#include <executive/dd/unblocked/timer.h>       //PIT. irq0.
+#include <executive/dd/unblocked/pic.h>         //PIC.
+#include <executive/dd/unblocked/apic.h>        //APIC - Advanced Programmable Interrupt Controller.
+#include <executive/dd/unblocked/rtc.h>         //clock    ( South bridge).
+#include <executive/dd/unblocked/floppy.h>      //floppy   ( South bridge).
+#include <executive/dd/unblocked/keyboard.h>    //irq1     ( South bridge). //keyboard
+#include <executive/dd/unblocked/ldisc.h>    //irq1     ( South bridge).   //ldisc
+#include <executive/dd/unblocked/ide.h>         //irq14/15 ( South bridge).
 //...
 //Blocked.
 
-#include <hal/blocked/sata.h>        //(PCI BUS).
-#include <hal/blocked/usb.h>         //usb.      
-#include <hal/blocked/pci.h>         //pci.  
+#include <executive/dd/blocked/sata.h>        //(PCI BUS).
+#include <executive/dd/blocked/usb.h>         //usb.      
+#include <executive/dd/blocked/pci.h>         //pci.  
 //#include                   //pcie (controlado pelo cpu nas plcas modernas). 
 //...
 //Last stuffs. (precisam dos anteriores.)     
@@ -279,18 +279,19 @@ extern void do_executa_new_task();
  * MICROKERNEL
  */
  //++
-#include <microkernel/cpu/context.h>          
-#include <microkernel/taskswitch.h>          
-#include <microkernel/tasks.h>          
-#include <microkernel/process.h> 
-#include <microkernel/thread.h>
-#include <microkernel/scheduler.h>
-#include <microkernel/ipc/ipc.h> 
-#include <microkernel/ipc/semaphore.h> 
-#include <microkernel/queue.h>
-#include <microkernel/realtime.h>
-#include <microkernel/dispatch.h>
-#include <microkernel/event.h>
+#include <microkernel/cpu/context.h> 
+         
+#include <microkernel/pc/taskswitch.h>          
+#include <microkernel/pc/tasks.h>  
+#include <microkernel/pc/process.h> 
+#include <microkernel/pc/thread.h>
+#include <microkernel/pc/scheduler/scheduler.h>
+#include <microkernel/pc/ipc/ipc.h> 
+#include <microkernel/pc/ipc/semaphore.h> 
+#include <microkernel/pc/queue.h>
+#include <microkernel/pc/realtime.h>
+#include <microkernel/pc/dispatch.h>
+#include <microkernel/pc/event.h>
 #include <microkernel/microkernel.h>
 //--
 
@@ -305,8 +306,8 @@ extern void do_executa_new_task();
 	//gerenciamento do sistema é dependente das duas interfaces.
 
 //tty - Gerenciado de fluxo de caracteres.
-#include <executive/tty/tty.h>	
-#include <executive/ram/mmglobal.h>	
+#include <executive/dd/tty/tty.h>	
+
 
 //
 // @todo: ( *** IMPORTANTE ***) 
@@ -334,35 +335,40 @@ extern void do_executa_new_task();
 //nothing for now.
 
 //uitm - User Interface Text Mode.
-#include <executive/uitm/line.h>          //Gerência de linhas.
-#include <executive/uitm/terminal.h>      //configurações de terminal(o shel usa um terminal.) 
-#include <executive/uitm/console.h>            //Console ??
+#include <executive/dd/uitm/line.h>          //Gerência de linhas.
+#include <executive/dd/uitm/terminal.h>      //configurações de terminal(o shel usa um terminal.) 
+#include <executive/dd/uitm/console.h>            //Console ??
 
 //sm - System Management.  
-#include <executive/sm/install.h>  
-#include <executive/sm/init.h>
-#include <executive/sm/network/nic.h>         //nic - network interface controller, adaptador de rede.
-#include <executive/sm/network/nports.h>  //(network) Network Ports  (sw)
-#include <executive/sm/network/socket.h>       //(network) Sockets info. (sw)
-#include <executive/sm/network/ip.h>            //(network) IP info.      (sw)
-#include <executive/sm/network/channel.h>       //(network) Channel       (sw)
-#include <executive/sm/network/client.h>        //(network) Client process support. 
-#include <executive/sm/network/server.h>        //(network) Server process support.
-#include <executive/sm/network/network.h>       //(network) Gerenciamento de rede. 
-#include <executive/sm/fs.h>            //fs.
-#include <executive/sm/io.h>            //io
-#include <executive/sm/systemcall.h>    //as chamadas ao sistema.
-#include <executive/sm/modules.h>       //gerenciamento de modulos.  
-#include <executive/sm/debug.h>
-#include <executive/sm/sys.h>           //*intefaces de gerenciamento do sistema.
-#include <executive/sm/system.h>        //*intefaces de gerenciamento do sistema.
+#include <executive/dd/sm/install.h>  
+#include <executive/dd/sm/init.h>
+#include <executive/dd/sm/network/nic.h>         //nic - network interface controller, adaptador de rede.
+#include <executive/dd/sm/network/nports.h>  //(network) Network Ports  (sw)
+#include <executive/dd/sm/network/socket.h>       //(network) Sockets info. (sw)
+#include <executive/dd/sm/network/ip.h>            //(network) IP info.      (sw)
+#include <executive/dd/sm/network/channel.h>       //(network) Channel       (sw)
+#include <executive/dd/sm/network/client.h>        //(network) Client process support. 
+#include <executive/dd/sm/network/server.h>        //(network) Server process support.
+#include <executive/dd/sm/network/network.h>       //(network) Gerenciamento de rede. 
+
+#include <executive/fs/fs.h>            //fs.
+
+#include <executive/dd/sm/io.h>            //io
+
+#include <executive/sci/systemcall.h>    //as chamadas ao sistema.
+
+#include <executive/dd/sm/modules.h>       //gerenciamento de modulos.  
+#include <executive/dd/sm/debug.h>
+#include <executive/dd/sm/sys.h>           //*intefaces de gerenciamento do sistema.
+#include <executive/dd/sm/system.h>        //*intefaces de gerenciamento do sistema.
 
 //ram
-#include <executive/ram/heap.h>          //Heap pointer support.
-#include <executive/ram/aspace.h>        //Address Space (conta de banco de dados)
-#include <executive/ram/dspace.h>        //Disk Space (conta de banco de dados) 
-#include <executive/ram/bank.h>          //bancos de dados. 
-#include <executive/ram/mm.h>            //mm memory manager support.
+#include <microkernel/pc/mm/mmglobal.h>	
+#include <microkernel/pc/mm/heap.h>          //Heap pointer support.
+#include <microkernel/pc/mm/aspace.h>        //Address Space (conta de banco de dados)
+#include <microkernel/pc/mm/dspace.h>        //Disk Space (conta de banco de dados) 
+#include <microkernel/pc/mm/bank.h>          //bancos de dados. 
+#include <microkernel/pc/mm/mm.h>            //mm memory manager support.
 
 //Esse fica em /executive..
 #include <executive/executive.h>     // principal.

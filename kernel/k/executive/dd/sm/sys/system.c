@@ -1932,14 +1932,13 @@ void systemReboot()
 {
 	int i;
 	struct process_d *P;
+	struct thread_d *T;
+		
+	struct window_d *hWnd;
+	struct window_d *hWindow;	
 	
 	asm("cli");  // Me parece que desabilitar é uma opção.
 	
-	
-	
-	
-	struct window_d *hWnd;
-	struct window_d *hWindow;	
 	
 
 
@@ -2013,7 +2012,6 @@ void systemReboot()
 		//cursor (0, mas com margem nova).
 		g_cursor_x = g_cursor_left; 
 		g_cursor_y = g_cursor_top; 
-		
         
 	    //
 	    //@todo: Criar a interface. realizando configurações de sistema
@@ -2088,8 +2086,39 @@ void systemReboot()
 
 	    sleep(8000);
 	    printf("Terminating processes..\n");
-
+		
+		
+		//
+		// +Enviamos sinal para todas as threads bloquearem.
+		// +desalocamos todos os recursos usados por elas.
+		// +mandamos sinal para todas as thears fecharem.
+		//
+		
+//blockingAllThreads:		
+		//antes de terminarmos todos processos vamos boquear todas as threads.
+	    //Começa do 1 para não fechar o kernel.
+	    i = 1;
 	
+	    while(i < THREAD_COUNT_MAX)
+	    {
+            //Pega da lista.
+		    T = (void *) threadList[i];
+		    if(T != NULL)
+			{
+#ifdef KERNEL_VERBOSE				
+		        //bloqueia a thread. 
+		        printf("blocking thread TID={%d} ...\n",i);
+		        //refresh_screen();
+#endif
+                if( T->used == 1 ){
+                    T->state = BLOCKED; //?? ZOMBIE ??   
+		            //block_thread(i, 0);
+				}
+		    };
+		    i++;
+	    };
+
+//exitingAllProcesses:	
 	    //Começa do 1 para não fechar o kernel.
 	    i = 1;
 	
@@ -2104,7 +2133,9 @@ void systemReboot()
 		        printf("Killing Process PID={%d} ...\n",i);
 		        //refresh_screen();
 #endif
-		        exit_process(i, 0);
+                if( P->used == 1 ){
+		            exit_process(i, 0);
+				}
 		    };
 		    i++;
 	    };

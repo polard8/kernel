@@ -39,6 +39,12 @@ void do_pagefault();
 /*
  * faults:
  *     Tratamento de faults.
+ *     #Obs: O tratamento de faults é uma questão de hardware,
+ *           Quando ocorrer uma pagefault a rotina apropriada deve 
+ *           ser chamada no módulo /executive/pc para operar sobre o 
+ *           processo com problemas. @todo: Nesse caso, é preciso 
+ *           identificar qual era o processo atual.
+ *
  */
 void faults(unsigned long number)
 {
@@ -59,7 +65,7 @@ void faults(unsigned long number)
 	if( (void*) t != NULL )
 	{
 	    //Salva o conxtexto se a tarefa já esteve rodando.
-	    if( ProcessorBlock.running_tasks >= 1 && t->step > 0 ){
+	    if( ProcessorBlock.running_threads >= 1 && t->step > 0 ){
             printf("faults: Saving context\n");
 			save_current_context();    
 	    }else{	
@@ -75,7 +81,7 @@ void faults(unsigned long number)
 	//(@todo: window station, desktop ...).
 	printf("logonStatus={%d}\n",logonStatus);
 	printf("guiStatus={%d}\n",guiStatus);
-	printf("RunningTasks={%d}\n",ProcessorBlock.running_tasks);	
+	printf("RunningThreads={%d}\n",ProcessorBlock.running_threads);	
     printf("t->tid={%d} t->step={%d}\n",current_thread,t->step);			
 	printf("FaultNumber={%d}\n",number);                   
     printf("KeInitPhase={%d}\n",KeInitPhase);

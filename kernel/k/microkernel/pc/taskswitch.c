@@ -72,10 +72,47 @@ void KiTaskSwitch()
 	// @todo: Fazer alguma rotina antes aqui ?!
     //
 	
+	//
+	// Obs: A qui poderemos criar rotinas que não lidem com a troca de 
+	// threads propriamente, mas com atualizações de variáveis e gerenciamento 
+	// de contagem.
+	// >> Na entrada da rotina podemos atualizar a contagem da tarefa que acabou de rodar.
+	// >> A rotina task_switch fica responsável apenas troca de contexto, não fazendo 
+	// atualização de variáveis de contagem.
+	// >> ?? Na saída ??
+	//
+	
+	// ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
+	
+	
+	//Limits.
+	if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+	    printf("KiTaskSwitch error: current_thread TID={%d}",current_thread);										   
+        die();
+	}
+	
+
+	//Limits.
+	if(current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+	    printf("KiTaskSwitch error: current_thread TID={%d}",current_process);										   
+        die();
+	}
+
+	
+	
+	//...
+	
+	
 TaskSwitch:	
 	task_switch();
 	
-	
+
+    //
+    // obs: Nessa hora ja temos um thread atual e um processo atual selecionados.
+    // podemos checar as variáveis para conferir se não está fora dos limites.
+    // Se estiverem fora dos limites, podemos usar algum etodo para selecioanrmos 
+    // outro processo ou outra thread com limites válidos.
+    //	
 	
 	
 done:	
@@ -100,51 +137,95 @@ void task_switch()
 {
 	int New;
 	int Max;   
-    struct process_d *P;         // Processo atual. 
+    
+	
+	//@todo: Melhorar o nome dessas variáveis.
+	struct process_d *P;         // Processo atual. 
     struct thread_d *Current;    // Thread atual. 	
 	//...
+	
+	
+	//
+	// Obs: Devemos atualizar a variável global que indica quel é a thread atual 
+	//      e a variável global que indica qual é o processo atual.
+	//      >> Essas variáveis sofre alterações durante essa rotina. Pois 
+	// quando essa rotina começa, as veriáveis representam o contexto antigo, e 
+	// quando essa rotina termina as variáveis devem representar o próximo contexto.
+	//      >> Portanto a única atualização que interessa é no termino dessa rotina.
+	//         ?? Essa atualização pode ser feita na interface KiTaskSwitch ??
+	//
+	//
+	
 	
 	Max = DISPATCHER_PRIORITY_MAX;
 	
 	//
-	// Valida 'Struct' e 'ID' da thread atual.	
+	// Thread atual e processo atual.
 	//
+	
+	// Valida 'Struct' da thread atual.	
+    Current = (void *) threadList[current_thread]; 
+	if( (void*) Current == NULL ){
+	    printf("task_switch error: Struct={%x}",(void*) Current);										   
+        die();
+	};
 
-	//Limits.
-	if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ) 
+	//Processo atual.
+    P = (void*) Current->process;
+	
+
+	//No cado da estrutura do processo so qual o thread pertence ser inválida.
+	//Obs: Não queremos que a thread pertença a um processo inválido.
+	if( (void*) P == NULL )
 	{
-	        printf("task_switch error: Id, current_thread={%d}",current_thread);										   
-		    refresh_screen();
-		    while(1){}
-	}
-	else
-	{
-	    Current = (void *) threadList[current_thread]; 
-	    if( (void*) Current == NULL ){
-	        printf("task_switch error: Struct={%x}",(void*) Current);										   
-		    refresh_screen();
-		    while(1){}
-	    };
-		//Nothing.
+	    printf("task_switch error: P Struct={%x}", (void*) P);										   
+        die();		
 	};
 	
-	//Contagem.
-	//step: Quantas vezes ela já rodou no total.
-	//runningCount: Quanto tempo ela está rodando antes de parar.
+	//Ok o processo ao qual o thread pertence é um processo válido.
+	if( (void*) P != NULL )
+	{
+		/* #testar #bugbug ... antes de liberarmos esse filtro precisamos 
+		                       atualizar corretamente o current process
+							   no fim da rotina de task switch. Talvez até mesmo em spawn 
+							   e init idle thread.
+                               							   
+		//Conferindo se o valor salvo na estrutura do processo é o mesmo 
+		//que foi salvo na variável global que indica qual é o processo atual.
+		if( P->pid != current_process ){
+	        printf("task_switch error: P->pid != current_process ");										   
+            die();					
+		}
+		*/
+		
+		
+		if(P->used == 1 && P->magic == 1234)
+		{
+			//Obs: Se o if mais acima for verdadeiro essa atualização não é nessessária. 
+		    current_process = (int) P->pid;
+		};
+		
+		//Obs: Podemos fazer outros testes referentes ao processo que o thread pertence.
+		//...
+		
+	};
+	//...	
+	
+	//
+	// Contagem.
+	//            step: Quantas vezes ela já rodou no total.
+	//    runningCount: Quanto tempo ela está rodando antes de parar.
+	//
 	Current->step++;          
 	Current->runningCount++;
+	
+	//
+	// @todo: Agora a estrutura de processo tem uma variável double Cycles.
+	//        A contagem de ticks será registrada na estrutura do processo também.      
+	//
 
     //Outras configurações iniciais.
 	
-	//Processo atual.
-    P = (void*) Current->process;
-	if( (void*) P != NULL )
-	{
-		if(P->used == 1 && P->magic == 1234){
-		    current_process = (int) P->pid;
-		};
-	};
-	//...	
 	
 	
 	/*
@@ -155,26 +236,37 @@ void task_switch()
 	 *
 	 * @todo: 
 	 *     Checar a tarefa atual. Seu iopl. (Deve ser ring0).
-	 */
+	 *     *importante: Não colocamos isso na interface KiTaskSwitch porque 
+	 *                  é bom fazermos todas as checagens antes de acionarmos 
+	 *                  essa condicional.
+	 */	 
 	if(task_switch_status == LOCKED)
 	{    		
-		//
-		// @todo: 
-		// Incrementar o tempo que todas as outras estão sem rodar.
-		// Usando a thread list.
-		// @todo: Checar contexto. iopl. stacks.
-		//
-		// Obs: taskswitch locked, Retorna sem salvar.
-		//
+	    //
+	    // @todo: 
+	    // Incrementar o tempo que todas as outras estão sem rodar.
+	    // Usando a thread list.
+	    // @todo: Checar contexto. iopl. stacks.    
+	    //
 		
 		// Atualiza a contagem de tipo de seleção.
 		IncrementDispatcherCount(SELECT_CURRENT_COUNT);
+		
+		// Obs: taskswitch locked, Retorna sem salvar.
 		return;  
 	};
 	
 	
 	/* 
 	 * UNLOCKED:
+	 * O mecanismo de taskswitch esta destravado, podemos usa-lo.
+	 *
+	 * > Salvamos o contexto.
+	 * > Retornameo se não venceu a cota.
+	 * > Se venceu a cota é preempção por vencimento de cota.
+	 * > Checamos se existe uma thread no estado standby, querendo rodar pela primeira vez.
+	 *   Se ouver essa rotina é desviada para um spawn e não prossegue.
+	 * > Checamos se existem 'requests': Pedidos pendentes.
 	 *
 	 */
 	if(task_switch_status == UNLOCKED)
@@ -188,24 +280,26 @@ void task_switch()
 	    Current->saved = 1;	
 				
         // Checa o 'quantum'. (Limite que uma thread pode usar o processador).
-		if( Current->runningCount < Current->quantum )    
-		{  
-            // Continua rodando até vencer a cota.		
-			// @todo: Talvez possa restaurar antes de retornar.
-			// Retorna sem restaurar, se ainda não venceu a cota.
+        // Continua rodando até vencer a cota.		
+		// @todo: Talvez possa restaurar antes de retornar.
+		// Retorna sem restaurar, se ainda não venceu a cota.
+		if( Current->runningCount < Current->quantum ){
 			
 			// Atualiza a contagem de tipo de seleção.
 			IncrementDispatcherCount(SELECT_CURRENT_COUNT);
 			return; 
-		}
-		else    //Vencido o quantum.
-		{
+		
+		}else{
 			
 		    //
+			// ## PREEMPT ##
+			//
 		    // Aqui a thread atual pode estar no estado running ou initialized.
 		    // +Se estiver running, torna ready. (preempt).
 		    // +Se estiver initialized, vai checar e executar mais a frente.
-		    //
+		    // #bugbug ?? E se tiver em outro estado ?? O que fazemos ??
+			//
+			//
 		
 		    // * MOVEMENT 3 (Running --> Ready).
 		    if(Current->state == RUNNING)
@@ -268,7 +362,7 @@ void task_switch()
 	
     //
 	// * Se estamos aqui é porque houve uma falha anormal. Então tentaremos 
-	// selecionar a próxima thread. 
+	//   selecionar a próxima thread. 
 	//
 	
 //crazyFail:	
@@ -286,11 +380,8 @@ try_next:
 	
 	// Checa se é o último da lista encadeada.
 	if( (void*) Conductor->Next == NULL ){
-		// Fim da lista. 
-		// Recriar a lista. (#Agendar).
-		// @todo: Usar KiScheduler();
-		// KiScheduler();
-		scheduler();     
+		// Fim da lista.  Recriar a lista. (#Agendar).
+		KiScheduler();     
 		goto go_ahead;  //Com a lista atualizada, vá em frente.
 	};
 	
@@ -566,7 +657,7 @@ doneRET:
 void taskswitchRR()
 {
 	int i;
-	int Max = (int) ProcessorBlock.running_tasks;
+	int Max = (int) ProcessorBlock.running_threads;
 	struct thread_d *Current; //Thread atual.
 	
 	//Filtro.

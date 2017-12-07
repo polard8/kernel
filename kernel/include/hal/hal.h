@@ -222,9 +222,10 @@ struct ProcessorBlock_d
 	//
 	// Threads.
 	//
-	int running_tasks;    // (@todo: Mudar para running_threads.)
-	//int running_threads;  //Número de threads rodando nesse processador.
-    struct thread_d *CurrentThread;    
+	//int running_tasks;    // (@todo: Mudar para running_threads.)
+	int running_threads;  //Número de threads rodando nesse processador.
+    
+	struct thread_d *CurrentThread;    
     struct thread_d *NextThread;
     struct thread_d *IdleThread;	
 	//...	

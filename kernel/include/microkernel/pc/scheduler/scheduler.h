@@ -46,7 +46,8 @@ void init_scheduler();
  
 
 //Interfaces. 
-void KiScheduler();
+int KiScheduler();
+
 int KiFindHigherPriority(); 
 int KiSelectNextThread(int current);
 void KiDispatchTask();	

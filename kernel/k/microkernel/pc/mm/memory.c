@@ -2,7 +2,7 @@
  * File: memory.c
  *
  * Descrição:
- *     Arquivo principal do módulo /mm do executive, Memory Manager. 
+ *     Arquivo principal do módulo /mm do /pc, Memory Manager. 
  *     MB - Módulos incluídos no Kernel Base.
  *
  * Atribuições:

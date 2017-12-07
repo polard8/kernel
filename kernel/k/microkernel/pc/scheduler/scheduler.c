@@ -45,55 +45,6 @@
 //unsigned long schedulerQueue[4];
 
 
-/*
- * KeScheduler:
- *    Interface para chamar a rotina de scheduler.
- *    Troca as tarefas que estão em user mode, usando o método cooperativo.
- * Round Robing. 
- *    As tarefas tem a mesma prioridade.
- *    + Quando encontrada uma tarefa de maior prioridade, escolhe ela
- * imediatamente.
- *    + Quando encontrar uma tarefa de menor prioridade, apenas eleva
- * a prioridade dela em até dois valores acima da prioridade base,
- * pegando a próxima tarefa.
- *    + Quando uma tarefa está rodando à dois valores acima da sua
- * prioridade básica, volta a prioridade para a sua prioridade básica
- * e executa.
- *
- * @todo: 
- *     'Ke_' é a iniciação errada para o nome da função. Isso é destinado
- *      para chamadas à módulos externos, ou servers.
- *     O certo seria nem usar uma interface para essa rotina, para ganhar
- * desempenho, mas se for usar deve-se usar a intermafe com iniciação
- * 'Ki_' para o nome. KiScheduler();
- *
- */
-int KeScheduler()
-{
-    //
-	// ?? Quem está chamando ? Filtros ?
-    // 
-    // @todo: Talvez haja mais casos onde não se deva trocar a tarefa.
-    //
-
-	//Scheduler Status. (LOCKED, UNLOCKED).
-	if(g_scheduler_status == LOCKED){
-        return (int) 0;
-    };
-
-	//Only Idle? Return.
-	//@todo: Essa estrutura é válida?!
-	if(ProcessorBlock.running_tasks == 1)
-	{
-        if(current_thread == 0){
-	        return (int) 0;
-		};
-	};
-    //Chama o Scheduler.
-done:
-	return (int) scheduler();
-}; 
-
 
 /*
  * scheduler:

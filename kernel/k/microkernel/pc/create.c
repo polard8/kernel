@@ -469,7 +469,7 @@ void *KiCreateIdle()
 	//IdleThread->Next = (void*) IdleThread;    //Opção.
 	
 	// Running tasks. (Quantas threads estão rodando).
-    ProcessorBlock.running_tasks = (int) 1;
+    ProcessorBlock.running_threads = (int) 1;
 	
 	//@todo: setar a idle como current.
 	
@@ -646,7 +646,7 @@ void *KiCreateShell()
 	// Running tasks.
 	//
 	
-	ProcessorBlock.running_tasks = 2;
+	ProcessorBlock.running_threads = 2;
 
 	
 // Done.
@@ -811,7 +811,7 @@ void *KiCreateTaskManager()
 	// Running tasks.
 	//
 	
-	ProcessorBlock.running_tasks = 3;
+	ProcessorBlock.running_threads = 3;
 	
 // Done.
 done:
