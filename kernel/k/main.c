@@ -342,12 +342,7 @@ doDebug:
 //doTests:	
    //...
     
-	//
-	// Done.
-	//
-//void *b;
 
-done:
 
 	//if(VideoBlock.useGui != 1){	
 	//    kclear(0);
@@ -381,25 +376,29 @@ done:
 	
 	//init_mouse();  //isso está em keyboard.c
 	
-/*	
+	
+	//
+	// Done.
+	//
+
+   //void *b;
+   
+done:
+
+   /*	
+    //===================================
+	
 	//janela de test
     CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
 	              (30-5), (450-5), (128+10), (128+10), 
 				  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 
-	
-	//
-	// testing BMP support
-	//
-	
-	//32KB
-	
+	// testing BMP support 32KB
 	b = (void*) malloc(512*1024);
 	
 	unsigned long fileret;
-	
-	
-	taskswitch_lock();
-	scheduler_lock();
+		
+	//taskswitch_lock();
+	//scheduler_lock();
 	fileret = fsLoadFile( "FREDNORABMP", (unsigned long) b);
 	if(fileret != 0)
 	{
@@ -407,10 +406,11 @@ done:
 	    draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FREDNORA BMP FAIL");  	
 	}
 	bmpDisplayBMP( b, 30, 450, 128, 128 );
-	scheduler_unlock();
-	taskswitch_unlock();
-*/	
-	
+	//scheduler_unlock();
+	//taskswitch_unlock();
+
+    //===================================	
+	*/
 	
 	//
 	// RETURNING !

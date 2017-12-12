@@ -139,8 +139,8 @@ extern void set_page_dir();
 #define KM2_PAGETABLE     0x8E000  // Pagetable para 'O Kernel'. A 'imagem'.
 #define UM_PAGETABLE      0x8D000  // Pagetable para o aplicativos em user mode.
 #define VGA_PAGETABLE     0x8C000  // Pagetable para o VGA em user mode.
-#define LFB_PAGETABLE     0x8B000  // LFB.
-#define BUFFER_PAGETABLE  0x8A000  // BackBuffer.
+#define LFB_PAGETABLE     0x8B000  // LFB.        FRONTBUFFER_PAGETABLE
+#define BUFFER_PAGETABLE  0x8A000  // BackBuffer. BACKBUFFER_PAGETABLE
 //...
 
 
@@ -278,14 +278,17 @@ done:
  *     + O diretório precisa ser um diretório válido.
  *
  * Argumentos:
+ *
  *     directory_address - O endereço do diretório onde colocaremos o endereço 
  * do início da página que criaremos.
+ *
  *     offset - O deslocamento dentro do diretório para sabermos o lugar para 
  * salvarmos o endereço da tabela de páginas que estamos criando.
  * @todo: Na hora de salvarmos esse endereço também temos que incluir as flags.
+ *
  *     page_address - O endereço da página que estamos criando.
- * Obs: Precisamos alocar memória para a página qque estamos criando, isso 
- * antes de chamarmos essa rotina.
+ * Obs: Precisamos alocar memória para a pagetable que estamos criando, isso 
+ * antes de chamarmos essa rotina. Obs: Uma pagetable tem 4096 bytes de tamanho.
  *
  * Obs: Criamos uma tabela de páginas, com páginas em user mode.
  *

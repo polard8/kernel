@@ -1,5 +1,5 @@
 /*
- * File: executive/ram/mm.h  
+ * File: pc\mm\mm.h  
  *
  * Descrição:
  *     Header para o Memory Manager. Gerenciamento de memória.
@@ -311,14 +311,6 @@ struct page_table_entry_d
 };
 
 
-
-
-
-
-
-
-
-
 /*
  * page_directory_d:
  *     Estrutura para o 'page directory' de um processo.
@@ -354,6 +346,9 @@ struct page_directory_d
 	//que o malloc do kernel base aloca memória no heap do 
 	//processo kernel que fica no último giga da memória virtual.
 	unsigned long Address;
+	
+	
+	// ?? struct page_directory_entry_d[1024] ??
 	
 	//@todo: Mais informações sobre o diretório de páginas.
 	
@@ -409,6 +404,8 @@ struct page_table_d
 	//nenhuma de suas páginas poderão se descarregadas
 	//para o disco de swap.
 	int locked;
+	
+	// ?? struct page_table_entry_d[1024] ??
 	
     //@todo: Mais informações sobre a pagetable.
 	struct page_table_d *next;

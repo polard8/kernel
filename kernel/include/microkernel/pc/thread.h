@@ -332,9 +332,7 @@ struct thread_d
 	//Steps.
 	unsigned long step;            //Quantas vezes a tarefa usou o processador. 		
 	
-	//Quota @todo: NAO USAR ESSA VARIÁVEL, USAR QUANTUM.
-	unsigned long Quota; //@todo (Esse deve ser o quantum, atribuido pelo scheduler.)
-	//Quantum. (slice time, igual cota) 
+	//Quantum. (time-slice, igual cota) 
 	unsigned long quantum;         //tempo que a thread tem.
 	unsigned long quantum_limit;   //limite quando dado boost. tempo limite rodando. 		
 	

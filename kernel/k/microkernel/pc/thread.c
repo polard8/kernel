@@ -207,8 +207,7 @@ get_next:
 	    //Thread->StackSize;
 
         //Temporizadores.  		
-	    Thread->step = 0;               //Quantas vezes ela usou o processador no total.
- 	    Thread->Quota = 9;              //Cota de utilização do processador antes de deixa-lo.
+	    Thread->step = 0;                           //Quantas vezes ela usou o processador no total.
         Thread->quantum =  QUANTUM_BASE;            //QUANTUM_BASE
         Thread->quantum_limit = QUANTUM_LIMIT; //(9*2);  //O boost não deve ultrapassar o limite. QUANTUM_LIMIT			
 		

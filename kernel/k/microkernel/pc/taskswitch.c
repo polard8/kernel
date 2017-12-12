@@ -683,12 +683,11 @@ void taskswitchRR()
 
 
 	//se o runningCount ainda é menor que a cota, dispacha.
-	if(Current->runningCount < 9)    //Current->Quota.
-	{ 
+	//Obs: Cuidado !! A média é (PRIORITY_NORMAL*2)
+	if(Current->runningCount < Current->quantum){ 
 		goto dispatch_current;
-	}
-	else
-	{
+	}else{
+		
         //?? @todo: Talvez aqui seja o movimento 3, running >> ready. Conferir.  		
 		Current->state = READY;
 		

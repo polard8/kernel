@@ -126,14 +126,14 @@ typedef int ppid_t;
  * Constantes para níveis de quantum.
  * Tempo de processamento atribuido pelo scheduler à cada processo.
  */
-#define QUANTUM_BASE  10
-#define QUANTUM_LIMIT 19
+#define QUANTUM_BASE   (PRIORITY_NORMAL*2)
+#define QUANTUM_LIMIT  (PRIORITY_REALTIME*2)
 
 
 //Limite de tempo esperando.
-#define READY_LIMIT 19
-#define WAITING_LIMIT 19
-#define BLOCKED_LIMIT 19
+#define READY_LIMIT   (PRIORITY_REALTIME*2)
+#define WAITING_LIMIT (PRIORITY_REALTIME*2)
+#define BLOCKED_LIMIT (PRIORITY_REALTIME*2)
  
 //Lista de status na criação de um processo.     
 #define ERRO_SLOT_OCUPADO  0xfffff    //Slot ocupado.      

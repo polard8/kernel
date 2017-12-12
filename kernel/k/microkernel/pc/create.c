@@ -404,8 +404,7 @@ void *KiCreateIdle()
 	IdleThread->preempted = UNPREEMPTABLE;    // Não pode sofrer preempção.
 	
 	//Temporizadores.
-	IdleThread->step = 0;
-	IdleThread->Quota = 9;           
+	IdleThread->step = 0;          
 	IdleThread->quantum       = QUANTUM_BASE;
 	IdleThread->quantum_limit = QUANTUM_LIMIT;
 
@@ -587,8 +586,10 @@ void *KiCreateShell()
 	
 	//Temporizadores.
 	t->step = 0;
-	t->Quota = 9;	
-	t->quantum       = QUANTUM_BASE;
+	
+	//O shel é o thread mais interativo de todos.
+	//Deixaremos o quantum dele no limite.
+	t->quantum       = QUANTUM_LIMIT;  //QUANTUM_BASE;
 	t->quantum_limit = QUANTUM_LIMIT;
 	
 	
@@ -756,7 +757,6 @@ void *KiCreateTaskManager()
 
 	//Temporizadores.
 	t->step = 0;
-	t->Quota = 9;
 	t->quantum       = QUANTUM_BASE;
 	t->quantum_limit = QUANTUM_LIMIT;	
 

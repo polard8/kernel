@@ -30,7 +30,8 @@ echo -{ Main.
 rem hal	
 echo -{ ...
 echo -{ ux4 /hal	
-    rem hal .. arquivo principal do hal
+    rem -save-temps
+	rem hal .. arquivo principal do hal
 	gcc -c k/hal/hal.c     -I./include -o hal.o	
 	
 	
@@ -288,10 +289,7 @@ echo -{ ux1 /gramado \o/
 	rem
 	rem Compilando o módulo **** SYSTEM MANAGER ****
 	rem
-	
-
-	
-    REM 
+	 
     REM Ordem: Hardware, Kernel, GUI (embrulo).
 	REM Ordem: Fica em último as rotinas usadas com menor frequência.
 	REM        Colocar por último, abort, faults...shutdown, reboot.
