@@ -1247,6 +1247,9 @@ int get_shift_status(){
 /*
  * init_keyboard:
  *     Inicializa o driver de teclado.
+ *
+ *  @todo: enviar para o driver de teclado o que for de lá.
+ *         criar a variável keyboard_type ;;; ABNT2 
  */
  
 // void keyboardInit()
@@ -1317,6 +1320,11 @@ void init_keyboard()
 	//      enabling keyboard interface.
 	kbdc_wait(1);
 	outportb(0x64,0xAE);   // Activar a primeira porta PS/2
+	
+	//reset
+	kbdc_wait(1);
+	outportb(0x60,0xFF);
+
 
 	//Leds.
 	//LED_SCROLLLOCK 
@@ -1407,6 +1415,13 @@ int init_mouse()
 	    mouse_write(0xFF);
 	    mouse_write(0xF6); 
 	    mouse_write(0xF4); 
+		while(!0xFA)mouse_read();
+
+		//#bugbug Esse while aí em cima é complicado...
+		//rever. mas funciona.
+		//a impressão é que ele não faz nada .. nem pega o status.
+		
+		/*
         while(1)	
 	    {
 	        response = (unsigned char) mouse_read();	
@@ -1416,7 +1431,8 @@ int init_mouse()
 		    }
             //Nothing.		
 	    };
-        //nothing.		
+        //nothing.
+        */		
 	};
 	
 	
@@ -1585,7 +1601,6 @@ unsigned char mouse_read()
 {
 	kbdc_wait(0);
 	return inportb(0x60);
-
 };
 
 
@@ -1596,26 +1611,27 @@ unsigned char mouse_read()
  */
 void kbdc_wait(unsigned char type)
 {
-	if(type==0)
-	{
+	if(type==0){
         while(!inportb(0x64)&1)outanyb(0x80);
-    }
-    else 
-	{
+    }else{
         while(inportb(0x64)&2)outanyb(0x80);
 	};
 };
 
 
 /*
+ * **************************************************
  * mouseHandler:
- *     handler de teclado. A _irq0 chama essa rotina.
- *     *Importante: Se estamos aqui é porque os dados disponíveis
- * no controlador 8042 pertencem ao mouse.
+ *     Handler de mouse. 
+ *
+ * *Importante: 
+ *     Se estamos aqui é porque os dados disponíveis no controlador 8042 
+ * pertencem ao mouse.
+ * @todo: Essa rotina não pertence ao line discipline.
+ * 
  */
 void mouseHandler()
-{
-    
+{ 
 	buffer_mouse[count_mouse++] = mouse_read();
 	
 	if( count_mouse >= 3 )
@@ -1732,7 +1748,7 @@ void kernelPS2MouseDriverReadData(void)
 	mousemsg[9] = 0; //zera o sestatdo do mouse 
 
     // Disable keyboard output here, because our data reads are not atomic
-    outPort64(0xAD);
+    //outPort64(0xAD);
 
     // The first byte contains button information and sign information
     // for the next two bytes
@@ -1748,7 +1764,7 @@ void kernelPS2MouseDriverReadData(void)
     byte3 = delta_y;
 	
     // Re-enable keyboard output
-    outPort64(0xAE);
+    //outPort64(0xAE);
 
     if ((byte1 & 0x01) != button1)
     {
@@ -1793,7 +1809,8 @@ void kernelPS2MouseDriverReadData(void)
 					mousemsg[0]= xChange;
                     mousemsg[1]= yChange;
                 };
-  return;
+							
+    return;
 }
 
 
@@ -1850,6 +1867,15 @@ void P8042_install()
  
 */
 
+}
+
+
+
+void ps2()
+{
+    P8042_install();
+    init_keyboard();
+	init_mouse();	
 }
 
 //

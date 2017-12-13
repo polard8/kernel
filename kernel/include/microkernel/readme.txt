@@ -1,7 +1,7 @@
 
 
-Sobre o diretório:
-    microkernel.
-    Recursos para gerenciamento de processos e threads. o básico.
+Sobre o diretório /microkernel:
 
-    @todo: NÃO CRIAR PASTAS NESSE DIRETÓRIO.
+    deve conter o básico que um microkernel teria.
+
+    /pc (process control)

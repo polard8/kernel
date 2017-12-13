@@ -905,7 +905,7 @@ static void outPort64(unsigned char value);
 static unsigned char getMouseData(void);
 void kernelPS2MouseDriverReadData(void);
 void P8042_install();
-
+void ps2();
 
 //
 //*************************** line discipline ***********************

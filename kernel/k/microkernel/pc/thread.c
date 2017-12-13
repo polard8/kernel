@@ -528,7 +528,7 @@ void show_thread_information()
 		//...
 	};
 
-    mostra_slots();    //Mostra Slots.
+    mostra_slots();    //Mostra Slots. ?/??onde fica isso??
 	
 	/*
 	 * @todo: 

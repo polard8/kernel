@@ -114,6 +114,7 @@ done:
 /*
  * processTesting:
  *     Testando se o processo é válido. Se for válido retorna 1234.
+ *     @todo: repensar os valores de retorno. 
  * system call (serviço 88.)
  * 
  */
@@ -158,14 +159,13 @@ int processSendSignal(struct process_d *p, unsigned long signal)
 	};
 	
 	//struct fail
-	if( (void*) p == NULL ){
-		return 1;
-	}		
+	//if( (void*) p == NULL ){
+	//	return 1;
+	//}		
 	
+ok:	
 	//Ok
-	if( (void*) p != NULL )
-	{
-		
+	if( (void*) p != NULL ){	
 		p->signal = (unsigned long) signal;
 		return 0; //(int) signalSend(p,signal);
 	}
@@ -373,9 +373,10 @@ get_next:
 		//Heap and Stack. (endereços virtuais).
 	    Process->Heap        = UPROCESS_DEFAULT_HEAP_BASE;    //Endereço do início do Heap do processo.
 	    Process->HeapSize    = UPROCESS_DEFAULT_HEAP_SIZE;    //Tamanho do heap.
-	    Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
+	    
+		Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
 	    Process->StackSize   = UPROCESS_DEFAULT_STACK_SIZE;   //Tamanho da pilha.	
-	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo.
+	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo. ??
 	    
 		//Process->HeapPointer
 		//Process->HeapLastValid

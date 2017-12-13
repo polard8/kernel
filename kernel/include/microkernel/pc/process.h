@@ -75,7 +75,7 @@ typedef int ppid_t;
 #define UPROCESS_DEFAULT_HEAP_SIZE  0x2000     
 
 //Stack.
-//Deslocamento default do início da pilha em relação ao início do kernel.
+//Deslocamento default do início da pilha em relação ao início do kernel. #bugbug
 #define UPROCESS_DEFAULT_STACK_OFFSET 0x2000   
 //Base default da pilha do processo.
 #define UPROCESS_DEFAULT_STACK_BASE ( UPROCESS_PROCESS_LIMIT - UPROCESS_DEFAULT_STACK_OFFSET )  
@@ -125,6 +125,10 @@ typedef int ppid_t;
 /*
  * Constantes para níveis de quantum.
  * Tempo de processamento atribuido pelo scheduler à cada processo.
+ * dado em quantidades de ticks ...
+ * para saber quanto tempo tem que multiplicar por 10ms ... que é 
+ * o tempo de cada interrupção ... e somar o tempo perdido com taskswitch ...
+ *  100ms + 5ms(que o timer fica esperando o kernel habilitar as interrupções).
  */
 #define QUANTUM_BASE   (PRIORITY_NORMAL*2)
 #define QUANTUM_LIMIT  (PRIORITY_REALTIME*2)
@@ -664,9 +668,7 @@ struct process_d
 	 *    Tipo de evento que fazem a tarefa entrar em modo de espera. 
 	 */	
     //event_type_t event;
-	
-
-	
+		
 	
 	/*
 	 * Windows. (Janelas)
@@ -684,9 +686,17 @@ struct process_d
 	// ORDEM: O que segue é referenciado com pouca frequência.
 	//
 	
+	//lista de arquivos ??
+	//fluxo padrão. stdio, stdout, stderr
+	//unsigned long iob[8];
+    
+	//ponteiros para as streams do fluxo padrão.
+	unsigned long standard_streams[3];
 	
-	//fluxo padrão. etdio, stdout, stderr
-	//unsigned long iob[3];
+	struct _iobuf *root;	// 4 root directory
+	struct _iobuf *pwd;	    // 5 (print working directory) 
+	//...
+		
 	
 	// @todo:
 	// Outros:

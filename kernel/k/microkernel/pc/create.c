@@ -452,8 +452,14 @@ void *KiCreateIdle()
 	IdleThread->esi = 0;
 	IdleThread->edi = 0;
 	IdleThread->ebp = 0;
+	//...
 	
+	//#bugbug
+	//Obs: As estruturas precisam já estar decidamente inicializadas.
+	IdleThread->root = (struct _iobuf *) file_root;
+	IdleThread->pwd  = (struct _iobuf *) file_pwd;
 
+	
 	//CPU configuration.
 	//IdleThread->cpuID = 0;              //Qual processador.
 	//IdleThread->confined = 1;           //Flag, confinado ou não.
@@ -538,7 +544,7 @@ void *KiCreateShell()
 	else
 	{  
 	    //Indica à qual proesso a thread pertence.
-	    t->process = (void*) KernelProcess;
+	    t->process = (void*) TaskManProcess; //KernelProcess;
 	};
 
 	//Stack.
@@ -558,7 +564,7 @@ void *KiCreateShell()
 	t->magic = 1234;
 	t->name_address = (unsigned long) ThreadName;    //Funciona.
 	
-	t->process = (void*) KernelProcess;
+	t->process = (void*) ShellProcess; //KernelProcess;
 	
 	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 	
@@ -628,6 +634,12 @@ void *KiCreateShell()
 	t->esi = 0;
 	t->edi = 0;
 	t->ebp = 0;	
+	//...
+	
+	//#bugbug
+	//Obs: As estruturas precisam já estar decidamente inicializadas.
+	IdleThread->root = (struct _iobuf *) file_root;
+	IdleThread->pwd  = (struct _iobuf *) file_pwd;	
 	
 	//CPU stuffs.
 	//t->cpuID = 0;              //Qual processador.
@@ -795,6 +807,12 @@ void *KiCreateTaskManager()
 	t->esi = 0;
 	t->edi = 0;
 	t->ebp = 0;	
+	//...
+	
+	//#bugbug
+	//Obs: As estruturas precisam já estar decidamente inicializadas.
+	IdleThread->root = (struct _iobuf *) file_root;
+	IdleThread->pwd  = (struct _iobuf *) file_pwd;	
 
 	//CPU stuffs.
 	//t->cpuID = 0;              //Qual processador.

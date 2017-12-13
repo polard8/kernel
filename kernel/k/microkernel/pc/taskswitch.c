@@ -174,10 +174,9 @@ void task_switch()
     P = (void*) Current->process;
 	
 
-	//No cado da estrutura do processo so qual o thread pertence ser inválida.
+	//No caso da estrutura do processo so qual o thread pertence ser inválida.
 	//Obs: Não queremos que a thread pertença a um processo inválido.
-	if( (void*) P == NULL )
-	{
+	if( (void*) P == NULL ){
 	    printf("task_switch error: P Struct={%x}", (void*) P);										   
         die();		
 	};
@@ -428,14 +427,14 @@ go_ahead:
 		// Se for inválido. (Estrutura corrompida).
 		// Tentamos novamente.
 		// @todo: #bugbug Isso pode gerar um loop infinito.
-		if( Current->used != 1 || Current->magic != 1234){
+		if( Current->used != 1 || Current->magic != 1234 ){
 			goto try_next;	
 		};		
 		
 		//Se não está pronta a thread.
 		//Tentamos novamente.
 		//@todo: #bugbug Isso pode gerar um loop infinito.
-	    if( Current->state != READY){	
+	    if( Current->state != READY ){	
 	        goto try_next; 
 		};
 		
@@ -616,14 +615,14 @@ done:
 		};
 		
 		//fail
-		printf("taskswitch: estrutura corrompida");
+		printf("task_switch: estrutura corrompida");
 		refresh_screen();
 		while(1){}
 	};
 	
 	
 	//fail
-	printf("taskswitch: debug");
+	printf("task_switch: debug");
 	refresh_screen();
 	while(1){}
 		

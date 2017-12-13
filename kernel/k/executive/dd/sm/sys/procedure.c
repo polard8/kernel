@@ -243,7 +243,10 @@ unsigned long system_procedure( struct window_d *window,
 					
 					//#bugbug TEST.
 					//Loop para testes ... isso é problema 
-					//while(1){ kernelPS2MouseDriverReadData(); };
+
+					//não precisou disso.
+				    //kernelPS2MouseDriverReadData();
+
 					
 					//if(AltStatus == 1){ window_with_focus = 6; break;};
 					//if(CtrlStatus == 1){ active_window = 6; break;};
@@ -344,8 +347,14 @@ unsigned long system_procedure( struct window_d *window,
 					//if(CtrlStatus == 1){ active_window = 12; break;};
 				    //procedureGrid();
 					
+					//testando informaçõe sobre os processos.
+					show_process_information();
+					
+					//testando informações sobre as threads.
+					show_thread_information();
+					
 					//Testando repintar todas as janelas seguindo a ordem list.
-					redraw_screen();
+					//redraw_screen();
 					
 					//Teste de GC. 
 					//Funcionando bem.

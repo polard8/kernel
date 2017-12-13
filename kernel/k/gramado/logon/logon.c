@@ -2,6 +2,8 @@
  * File: logon.c
  *
  * Descrição:
+ *     @todo: Esse módulo deve prepara o ambiente para rodar o processo logon.bin.
+ *
  *     Arquivo principal do módulo logon do executive.
  *     *IMPORTANTE: Esse é o ambiente de logon.
  *                  É onde o programa de logon vai rodar.
@@ -253,6 +255,7 @@ draw_logon_stuffs:
 			draw_text(gui->main, 400 +8, 8*2, 
 			          COLOR_WHITE, "(c) Copyright 2005-2017, Fred Nora");
 			draw_text(gui->main, 400 +8, 8*3, COLOR_WHITE, "(under construction)");
+			draw_text(gui->main, 400 +8, 8*4, COLOR_WHITE, "(This is the enviroment to run logon.bin)");
 			//draw_text(gui->main, 8*10, 8*12, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
 			//draw_text(gui->main, 8*10, 8*13, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
 			//draw_text(gui->main, 8*10, 8*14, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");

@@ -373,7 +373,7 @@ static char prompt_string[] = "Prompt:";
 /*
  * FILE:
  *     Estrutura padrão para arquivos.
- *      
+ *     >>> i/o buffer 
  */
 typedef struct _iobuf FILE; 
 struct _iobuf 
@@ -390,13 +390,18 @@ struct _iobuf
 	int   _bufsiz;
 	char *_tmpfname;
 };
+
+//principais
 FILE *file_BootManager;
 FILE *file_BootLoader;
 FILE *file_Kernel;
 FILE *file_Idle;
 FILE *file_Shell;
 FILE *file_TaskMan;
-//...
+
+//
+FILE *file_root;
+FILE *file_pwd;
 FILE *file_Current;
 //...
 

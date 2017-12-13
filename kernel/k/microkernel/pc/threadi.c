@@ -417,6 +417,31 @@ void show_tasks_parameters(){
 };
 
 
+void release(struct thread_d *t)
+{
+	int i;
+	
+	struct thread_d *Thread;
+
+	if( (void*) t == NULL )
+	    return;
+	
+	for( i=1; i<THREAD_COUNT_MAX; i++ )
+	{	
+        Thread = (void*) threadList[i];
+		if( Thread == t )
+		{
+			threadList[i] = (unsigned long) 0;
+			
+			//free_page((long)p);
+			//schedule();
+			
+			return;
+		}
+	};
+	panic("trying to release non-existent task");
+}
+
 /*
  * exit_thread:
  *     Exit a thread.

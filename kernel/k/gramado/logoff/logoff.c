@@ -1,6 +1,8 @@
 /*
  * File: logoff.c
  *
+ * isso prepara um ambiente para rodar o processo logoff
+ *
  * Descrição:
  *     Módulo do kernel responsável por rotinas de logoff.
  *     Esse módulo faz parte do kernel base.

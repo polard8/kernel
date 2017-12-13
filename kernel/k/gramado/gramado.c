@@ -3,6 +3,9 @@
  *
  *       Arquivo principal da camada gramado. (Antigo gui.c)
  *
+ * isso deve preparar o ambiente para rodar os aplicativos para o 
+ * ambiente de usuário. A área de trabalho.
+ *
  * Esse módulo principalmente cria a estrutura 'gui->', que é espinha
  * dorsal de todos os elementos gráficos da interface gráfica. Nessa
  * estrutura conterá ponteiros para as principais janelas usadas pelo 
@@ -278,7 +281,7 @@ void create_gui()
 		    draw_text(gui->main, 0, 8, COLOR_WHITE, "================");
 			draw_text(gui->main, 8*14, 8*4, 
 			          COLOR_WHITE, "Welcome to User Environmet, press F1=HELP.");
-			//draw_text(gui->main, 8*10, 8*11, COLOR_WHITE, "F1=HELP");
+			draw_text(gui->main, 8*14, 8*5, COLOR_WHITE, "This is the user environment");
 			//draw_text(gui->main, 8*10, 8*12, COLOR_WHITE, "F1=HELP");
 			//...
 			

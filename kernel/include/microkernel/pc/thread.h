@@ -388,6 +388,18 @@ struct thread_d
 	// ORDEM: O que segue é referenciado com pouca frequencia.
 	//
 	
+	//lista de arquivos ??
+	//fluxo padrão. stdio, stdout, stderr
+	//unsigned long iob[8];
+    
+	//ponteiros para as streams do fluxo padrão.
+	unsigned long standard_streams[3];
+	
+	struct _iobuf *root;	// 4 root directory
+	struct _iobuf *pwd;	    // 5 (print working directory) 
+	//...
+		
+	
 	
 	//@todo: Uma thread pode estar esperando varias outras por motivos diferenes.
 	//struct wait_d WaitBlock;
@@ -545,9 +557,10 @@ int GetCurrentThreadId();
 // Finalizações...
 //
 
-void dead_thread_collector();
+void release(struct thread_d *t);
 void exit_thread(int tid);       //Torna zunbi uma thread.
 void kill_thread(int tid);       //Destrói uma thread.
+void dead_thread_collector();
 
 //
 //fim.

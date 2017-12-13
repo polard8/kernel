@@ -376,6 +376,7 @@ doDebug:
 	
 	//init_mouse();  //isso está em keyboard.c
 	
+    ps2();	
 	
 	//
 	// Done.
@@ -387,7 +388,8 @@ done:
 
    /*	
     //===================================
-	
+	// @todo: Carregar a estrelinha e usar como ponteiro de mouse.
+	//
 	//janela de test
     CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
 	              (30-5), (450-5), (128+10), (128+10), 
