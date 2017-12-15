@@ -406,6 +406,7 @@ unsigned long quit_message;
 
 /*
  * NORMAL ABNT2.
+ * ?? const char* ??
  */
 static unsigned char map_abnt2[CHARMAP_SIZE] = {
  0,      //Scancode 0.

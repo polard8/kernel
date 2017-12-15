@@ -184,15 +184,6 @@ kernel fica com o 1GB superior."
 //...
 
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
 
 
 /* 
@@ -988,14 +979,6 @@ frame_pool_t *framepoolCurrent;
 //
 
 
-//Onde começa a área onde alocaremos frames para os processos.
-//físico ??
-//Esse início será o mesmo tanto para sistemas com 32mb quanto para sistemas maiores.
-
-//definindo o início do paged pool para sustemas pequenos. Com 32MB.
-#define SMALLSYSTEM_PAGEDPOLL_START  0x01800000   //MÍNIMO 32MB
-#define MEDIUMSYSTEM_PAGEDPOLL_START 0x10000000   //MÍNIMO 64MB
-#define LARGESYSTEM_PAGEDPOLL_START  0x20000000   //MÍNIMO 128MB
 
 unsigned long gPagedPollStart;
 unsigned long gPagedPollEnd;

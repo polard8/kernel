@@ -112,9 +112,9 @@ segment .head_x86
 
 
 ;Buffers (gdef.h)
-extern _g_backbuffer_address
-extern _g_frontbuffer_buffer_address
+extern _g_frontbuffer_pa
 ;...
+
 
 ;Stacks.
 ;#bugbug: O endereço configurado na hora da inicialização poderá corromper o 
@@ -123,6 +123,8 @@ extern _g_frontbuffer_buffer_address
 extern _kernel_stack_start      ;;usado na inicialização @bugbug
 extern _kernel_stack_start_pa   ;;indicado na TSS
 ;...
+ 
+ 
  
 ;Context.
 extern _contextSS        ;User Mode.
@@ -330,11 +332,12 @@ _kernel_begin:
 
     mov dword [_SavedBootBlock], edx
 
+	;salvando o endereço físico do frontbuffer.
 	;FrontBuffer Address, (LFB)
 	xor eax, eax
 	mov eax, dword [edx +0]       ;lfb.
 	mov dword [_SavedLFB], eax
-	mov dword [_g_frontbuffer_buffer_address], eax
+	mov dword [_g_frontbuffer_pa], eax
 
 	xor eax, eax
     mov ax, word [edx +4]         ;X.

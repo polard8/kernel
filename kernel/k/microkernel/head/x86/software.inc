@@ -133,8 +133,8 @@ _int200:
 	
 	popad	
 	
-    mov al, 0x20
-    out 0x20, al
+    ;mov al, 0x20
+    ;out 0x20, al
 	
 	mov eax, dword [.int200Ret] 
 	sti

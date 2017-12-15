@@ -225,7 +225,7 @@ void KiInformation()
 	
 	    //Video mode.
 	    //printf("The video option is %x \n",g_video_mode);
-	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",g_frontbuffer_buffer_address ,g_frontbuffer_buffer_va ,g_backbuffer_address);
+	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",g_frontbuffer_pa ,g_frontbuffer_va ,g_backbuffer_va);
 	
 	    //
 	    // user info

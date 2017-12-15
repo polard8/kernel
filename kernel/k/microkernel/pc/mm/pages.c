@@ -412,69 +412,54 @@ int SetUpPaging()
 	//                  ****    SMALL SYSTEMS    ****
 	//==============================================================
 	
-	unsigned long SMALL_kernel_address       = 0;
-	unsigned long SMALL_kernel_base          = KERNEL_BASE;
-	unsigned long SMALL_user_address         = USER_BASE;
-	unsigned long SMALL_vga_address          = VM_BASE;
-	unsigned long SMALL_frontbuffer_address  = (unsigned long) SavedLFB;
-	unsigned long SMALL_backbuffer_address   = (unsigned long) 0x01000000;
-	unsigned long SMALL_pagedpool_address    = (unsigned long) 0x01400000; //SMALLSYSTEM_PAGEDPOLL_START
-	
+	unsigned long SMALL_kernel_address       = SMALLSYSTEM_KERNELADDRESS;
+	unsigned long SMALL_kernel_base          = SMALLSYSTEM_KERNELBASE;
+	unsigned long SMALL_user_address         = SMALLSYSTEM_USERBASE;
+	unsigned long SMALL_vga_address          = SMALLSYSTEM_VGA;
+	unsigned long SMALL_frontbuffer_address  = (unsigned long) SavedLFB;                     //frontbuffer
+	unsigned long SMALL_backbuffer_address   = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
+	unsigned long SMALL_pagedpool_address    = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  
+	//...
 	
 	
 	//==============================================================
 	//                  ****    MEDIUM SYSTEMS    ****
 	//==============================================================	
 	
-	unsigned long MEDIUM_kernel_address       = 0;
-	unsigned long MEDIUM_kernel_base          = KERNEL_BASE;
-	unsigned long MEDIUM_user_address         = USER_BASE;
-	unsigned long MEDIUM_vga_address          = VM_BASE;
+	unsigned long MEDIUM_kernel_address       = MEDIUMSYSTEM_KERNELADDRESS;
+	unsigned long MEDIUM_kernel_base          = MEDIUMSYSTEM_KERNELBASE;
+	unsigned long MEDIUM_user_address         = MEDIUMSYSTEM_USERBASE;
+	unsigned long MEDIUM_vga_address          = MEDIUMSYSTEM_VGA ;
 	unsigned long MEDIUM_frontbuffer_address  = (unsigned long) SavedLFB;
-	unsigned long MEDIUM_backbuffer_address   = (unsigned long) 0x01000000;
-	unsigned long MEDIUM_pagedpool_address    = (unsigned long) 0x10000000; //MEDIUMSYSTEM_PAGEDPOLL_START	
+	unsigned long MEDIUM_backbuffer_address   = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
+	unsigned long MEDIUM_pagedpool_address    = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
 
 	
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
 	//==============================================================	
 	
-	unsigned long LARGE_kernel_address       = 0;
-	unsigned long LARGE_kernel_base          = KERNEL_BASE;
-	unsigned long LARGE_user_address         = USER_BASE;
-	unsigned long LARGE_vga_address          = VM_BASE;
+	unsigned long LARGE_kernel_address       = LARGESYSTEM_KERNELADDRESS;
+	unsigned long LARGE_kernel_base          = LARGESYSTEM_KERNELBASE;
+	unsigned long LARGE_user_address         = LARGESYSTEM_USERBASE;
+	unsigned long LARGE_vga_address          = LARGESYSTEM_VGA;
 	unsigned long LARGE_frontbuffer_address  = (unsigned long) SavedLFB;
-	unsigned long LARGE_backbuffer_address   = (unsigned long) 0x01000000;
-	unsigned long LARGE_pagedpool_address    = (unsigned long) 0x20000000; //LARGESYSTEM_PAGEDPOLL_START	
+	unsigned long LARGE_backbuffer_address   = (unsigned long) LARGESYSTEM_BACKBUFFER;
+	unsigned long LARGE_pagedpool_address    = (unsigned long) LARGESYSTEM_PAGEDPOLL_START; 	
 	
 	// ** bank 1 ** //
-	//O primeiro banco representa o mínimo de memória RAM que o sistema operacional 
-	//suporta, 32MB. Dentro deve conter tudo. Até cache e frames para memória paginada.
+	// O primeiro banco representa o mínimo de memória RAM que o sistema 
+	// operacional suporta, 32MB. 
+	// Dentro deve conter tudo. Até cache e frames para memória paginada.
 	// Endereços da memória físicas acessíveis em Kernel Mode.
 	// Kernel process.
-	        //para os 4 primeiros mega da memoria fisica     
-	 //0x00100000 //para o kernnel que começa no primeiro mega
-	// Endereços da memória físicas acessíveis em User Mode.
-	// User, VGA, VESA LFB, BUFFER ...
-	                   //0x00400000; 	
-	                     //0x000B8000; 
-        //g_lbf_pa, Foi passado pelo boot manager.
-	  //16MB, 
-	// ...
-
-	  // Cache para um sistema com 32MB de memória.
-	
-    //
+	// >> Os 4 primeiros mega da memória fisica.     
+	// >> A imagem do kernel que começa no primeiro mega.
+	// >> Endereços da memória físicas acessíveis em User Mode.
+	// >> VGA, VESA LFB, BACKBUFFER e PAGEDPOOL
 	// *Importante.
     // Esse endereço servirá para sistema de 32Mb e para sistemas com mais que 32Mb de RAM.
-    //	
-	// Inicio da área dos pageframes para memória paginada.
-	//Para um sistema de 32MB essa área deve acabar em 0x01FFFFFF
-     		
-	
-	
-	
-	
+	// Para um sistema de 32MB a área de pagedpool deve acabar em 0x01FFFFFF.
 	
 	
 	//=====================================================
@@ -526,10 +511,10 @@ int SetUpPaging()
 	// ??
 	//
 	
-	unsigned long *page_directory         = (unsigned long *) KERNEL_PAGEDIRECTORY;     //0x0009C000    
-	//unsigned long *idle_page_directory    = (unsigned long *) IDLE_PAGEDIRECTORY;     //0x01E00000    
-	//unsigned long *shell_page_directory   = (unsigned long *) SHELL_PAGEDIRECTORY;    //0x01D00000 
-	//unsigned long *taskman_page_directory = (unsigned long *) TASKMAN_PAGEDIRECTORY;  //0x01C00000   	
+	unsigned long *page_directory         = (unsigned long *) KERNEL_PAGEDIRECTORY;     // 0x0009C000    
+	//unsigned long *idle_page_directory    = (unsigned long *) IDLE_PAGEDIRECTORY;     //(0x0009C000 + 4096)      
+	//unsigned long *shell_page_directory   = (unsigned long *) SHELL_PAGEDIRECTORY;    //(0x0009C000 + 4096 + 4096)
+	//unsigned long *taskman_page_directory = (unsigned long *) TASKMAN_PAGEDIRECTORY;  //(0x0009C000 + 4096 + 4096 + 4096)	
     //...
 	
 	//
@@ -569,27 +554,29 @@ int SetUpPaging()
 	// 0x0008D000 Tabela para mapear uma área em user mode onde rodam códigos. Começa em 0x400000.
 	// 0x0008C000 Tabela para mapear a vga. Começa em 0xb8000.
 	// 0x0008B000 Tabela para mapear o frontbuffer, O começo é passado pelo Boot.
-	// 0x0008A000 Tabela para mapear o backbuffer, o começo é em 0x01000000.
-	//
+	// 0x0008A000 Tabela para mapear o backbuffer, o começo é em (0x01000000 - 0x400000) no small system.
+	// 0x00089000 Tabela de páginas para o pagedpool.
 	
 	//kernel mode. (Endereços). 
-	unsigned long *km_page_table   = (unsigned long *) 0x0008F000;  //KM1_PAGETABLE.
+	unsigned long *km_page_table   = (unsigned long *) PAGETABLE_KERNELAREA; //0x0008F000;  
  
 	//kernel mode. (O kernel).
-    unsigned long *km2_page_table  = (unsigned long *) 0x0008E000;  //KM2_PAGETABLE.
+    unsigned long *km2_page_table  = (unsigned long *) PAGETABLE_KERNELBASE; //0x0008E000;   
 
 	//user mode.
-	unsigned long *um_page_table   = (unsigned long *) 0x0008D000;  //UM_PAGETABLE.
+	unsigned long *um_page_table   = (unsigned long *) PAGETABLE_USERBASE; //0x0008D000;   
 
 	//user mode. (vga).
-	unsigned long *vga_page_table  = (unsigned long *) 0x0008C000;  //VGA_PAGETABLE.
+	unsigned long *vga_page_table  = (unsigned long *) PAGETABLE_VGA; //0x0008C000;   
 
 	//user mode. (LFB).
-	unsigned long *frontbuffer_page_table  = (unsigned long *) 0x0008B000;  //LFB_PAGETABLE.
+	unsigned long *frontbuffer_page_table  = (unsigned long *) PAGETABLE_FRONTBUFFER; //0x0008B000;   
 
 	//user mode. (buffer). backbuffer ??
-    unsigned long *backbuff_page_table = (unsigned long *) 0x0008A000;  //BUFFER_PAGETABLE.
-
+    unsigned long *backbuff_page_table = (unsigned long *) PAGETABLE_BACKBUFFER; //0x0008A000; 
+	
+    //pagetable para o pagedpool
+	unsigned long *pagedpool_page_table = (unsigned long *) PAGETABLE_PAGEDPOOL; //0x00089000;  
 	//...
 
 	//
@@ -604,6 +591,10 @@ int SetUpPaging()
 	// Message. (verbose).
 	printf("SetUpPaging: Initializing Pages..\n");
 
+	
+	//
+	//  **  DIRECTORIES **
+	//
 
 	//
 	// Preenchendo todo o diretório de páginas do kernel com páginas não 
@@ -631,6 +622,10 @@ int SetUpPaging()
 		//taskman_page_directory[i] = (unsigned long) 0 | 2;    //010 em binário.
 	};
 	
+	
+	//
+	//  ** PAGE TABLE, KERNEL AREA **
+	//
 
 	//===========================================================
 	// kernel mode pages (0fis = 0virt)
@@ -697,6 +692,9 @@ int SetUpPaging()
     //taskman_page_directory[0] = (unsigned long) taskman_page_directory[0] | 3;  //Configurando os atributos.	
 	
 	
+	//
+	//  ** PAGE TABLE, KERNEL BASE **
+	//
 	
 	//===============================================
 	// kernel mode pages (0x00100000fis = 0xC0000000virt)
@@ -757,7 +755,10 @@ int SetUpPaging()
 	// da memória física, usando endereço virtual igual ao endereço físico.
 	//
 	
-	//    ****    USER BASE    ****
+	
+	//
+	//    ** PAGETABLE, USER BASE **
+	//
 	
 	//===================================================================
 	// user mode pages - (0x00400000fis = 0x00400000virt)
@@ -832,6 +833,10 @@ int SetUpPaging()
     //	
 	  
 	  
+	//
+    // ** PAGE TABLE, VGA **
+    //	
+	  
     //==============================================================
 	// user mode VGA pages - ( 0x000B8000fis = 0x00800000virt)
 	// SMALL_vga_address  = VM_BASE;   //0x000B8000;
@@ -889,6 +894,11 @@ int SetUpPaging()
 	// em user mode à partir do endereço virtual 0x00800000virt.
 	//
 	
+	//
+	// ** PAGETABLE, FRONT BUFFER  **
+	//
+	
+	
 	
     //==================================================================
 	// user mode LFB pages - (0x????????fis = 0xC0400000virt).
@@ -905,7 +915,7 @@ int SetUpPaging()
     //        But the driver needs to do all the work.
     //
 	
-	g_frontbuffer_buffer_va = (unsigned long) 0xC0400000;
+	g_frontbuffer_va = (unsigned long) 0xC0400000;         //@todo: usar esse
 	
 	//Criando uma pagetable.
 	//Os quatro primeiros MB da memória de vídeo.
@@ -948,6 +958,11 @@ int SetUpPaging()
     //taskman_page_directory[769] = (unsigned long) taskman_page_directory[769] | 7;  //Configurando os atributos.		
 	
 	
+	//
+	// ** PAGETABLE, BACKBUFFER **
+	//
+	
+	g_backbuffer_va = (unsigned long) 0xC0800000; 
 	
     //===============================================================
 	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
@@ -1003,7 +1018,44 @@ int SetUpPaging()
     // são destinados ao back buffer. Obs: Isso é bem pouco, uma tela com alta 
 	// resolução usa mais que isso.	
 	//
+	
+	
+	
+	//
+	// ** PAGETABLE, PAGEDPOOL **
+	//	
+	for(i = 0; i < 1024; i++)
+    {
+		//IF SMALL
+	    pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;     //7 decimal é igual a 111 binário.
+	    SMALL_pagedpool_address       = (unsigned long) SMALL_pagedpool_address + 4096;  //+4KB.
+		
+		//if MEDIUM
+		
+		//if LARGE		
+    };
+	//kernel
+    // Criando a entrada do diretório de páginas do processo kernel.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
+    page_directory[771] = (unsigned long) &pagedpool_page_table[0];      //Salva no diretório o endereço físico.
+    page_directory[771] = (unsigned long) page_directory[771] | 7;  //Configurando os atributos.	
 
+
+	//idle
+    // Criando a entrada do diretório de páginas do processo idle.
+    //idle_page_directory[771] = (unsigned long) &pagedpool_page_table[0];      //Salva no diretório o endereço físico.
+    //idle_page_directory[771] = (unsigned long) idle_page_directory[771] | 7;  //Configurando os atributos.	
+	
+	//shell
+    // Criando a entrada do diretório de páginas do processo shell.
+    //shell_page_directory[771] = (unsigned long) &pagedpool_page_table[0];      //Salva no diretório o endereço físico.
+    //shell_page_directory[771] = (unsigned long) shell_page_directory[771] | 7;  //Configurando os atributos.	
+	
+	//taskman
+    // Criando a entrada do diretório de páginas do processo taskman.
+    //taskman_page_directory[771] = (unsigned long) &pagedpool_page_table[0];      //Salva no diretório o endereço físico.
+    //taskman_page_directory[771] = (unsigned long) taskman_page_directory[771] | 7;  //Configurando os atributos.		
+	
 
 	//
 	// @todo:  
@@ -1097,6 +1149,8 @@ int SetUpPaging()
 	printf("Page={%x} !\n", (unsigned long) &vga_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &frontbuffer_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &backbuff_page_table[0]);
+	printf("Page={%x} !\n", (unsigned long) &pagedpool_page_table[0]);
+	
 	//refresh_screen();
 	//while(1){};
 #endif	

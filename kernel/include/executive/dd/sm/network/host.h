@@ -81,10 +81,12 @@ struct sockaddr_in {
 };	  
 */
 
+
+#define HOST_DEFAULTNAME  "admin" 
+
 typedef struct host_info_d host_info_t;
 struct host_info_d
 {
-	
 	object_type_t objectType;
 	object_class_t objectClass;
 	

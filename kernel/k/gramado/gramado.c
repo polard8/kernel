@@ -1156,12 +1156,48 @@ void *guiGetShellWindowWindow()
 //uma janela filha do shell do kernel base.
 void *guiGetShellClientWindowWindow()
 {
-	if( (void*) gui == NULL){
+	if( (void*) gui == NULL ){
 		return NULL;
 	}
 	return (void*) gui->shellClientWindow;
 };
 
+
+// reposiciona e muda o tamanho da gui->main window.
+// configura a área de trabalho.
+void guiSetUpMainWindow( unsigned long x, 
+                         unsigned long y, 
+						 unsigned long width, 
+						 unsigned long height )
+{
+	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
+	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();		
+		
+	//check limits
+
+	if( x > Width || y > Height ){
+		return;
+	}
+	
+	if( width > Width || height > Height ){
+		return;
+	}
+
+	if( (void*) gui == NULL ){
+		return;
+	}	
+	
+	if( (void*) gui->main == NULL ){
+		return;
+	}else{
+		
+	    replace_window(gui->main, x, y);
+	    resize_window( gui->main, width, height);		
+	};	
+	//Nothing.
+};
 
 /*
  * init_gui:

@@ -68,9 +68,8 @@ dessa conta.
 
 #define FRONTBUFFER_ADDRESS 0xC0400000
 #define BACKBUFFER_ADDRESS  0xC0800000
-
-//#define FRONTBUFFER_VA 0xC0400000
-//#define BACKBUFFER_VA  0xC0800000
+#define FRONTBUFFER_VA      0xC0400000
+#define BACKBUFFER_VA       0xC0800000
 
 
 //#define BIOS_FONT8X8 0x000FFA6E
@@ -278,12 +277,17 @@ typedef enum {
 
 
 
+//
+// buffer support
+//
 
+//frontbuffer lfb
+unsigned long g_frontbuffer_va;         
+unsigned long g_frontbuffer_pa;         
 
-unsigned long g_backbuffer_address;            //0xC0800000
-unsigned long g_frontbuffer_buffer_address;    //LFB. Endereço físico do frontbuffer(memória da placa de vídeo). 
-unsigned long g_frontbuffer_buffer_va;    //endereço lógico do frontbuffer.
-
+//backbuffer
+unsigned long g_backbuffer_va;
+unsigned long g_backbuffer_pa;
 
 
 

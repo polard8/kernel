@@ -12,7 +12,10 @@
  *     Versão: 1.0, 2015 - Revisão. 
  *     Versão: 1.0, 2016 - Revisão.
  */
-
+ 
+//desktop window. (Área de trabalho) 
+//#define MAINWINDOW_DEFAULTX  ?
+//#define MAINWINDOW_DEFAULTY  ?
  
 //Endereços das fonts presentes no CMOS BIOS. 
 #define BIOSFONT8X8 0x000FFA6E    //8x8
@@ -2314,6 +2317,13 @@ void windowSetUpColorScheme(int type);
 
 /*Inicialização do sistema de suporte ao navegador shell*/
 int windowInitializeBrowserSupport();
+
+
+
+void guiSetUpMainWindow( unsigned long x, 
+                         unsigned long y, 
+						 unsigned long width, 
+						 unsigned long height );
 
 /*
  * CreateWindow:

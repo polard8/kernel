@@ -481,12 +481,12 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		
 		//O backbuffer é a janela do desktop ao qual a janela pertence.
 		//window->BackBuffer = (void*) windowGetBackbufferAddress(); //@todo: Criar função.
-		window->BackBuffer = (void*) g_backbuffer_address;
+		//window->BackBuffer = (void*) g_backbuffer_address;
+		window->BackBuffer = (void*) g_backbuffer_va;
 		
 		//o frontbuffer é o endereço da memória de vídeo para o monitor
 		//que se deseja mostrar a janela. (LFB, cr3)
-		//window->FrontBuffer = (void*) windowGetFrontbufferAddress(); //@todo: Criar função.
-		window->FrontBuffer = (void*) g_frontbuffer_buffer_address;
+		window->FrontBuffer = (void*) g_frontbuffer_pa;
 		
 	    //@todo:
 	    //Se não for uma Child, deve-se resetar todas as informações relativas

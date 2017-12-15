@@ -247,7 +247,7 @@ extern void do_executa_new_task();
 #include <hal/volume.h>      //volume partição.
 #include <hal/serial.h>        
 #include <hal/mac.h>         //mac address info. (hw)
-#include <hal/host.h>         //host info.   
+#include <executive/dd/sm/network/host.h>         //host info.   
 //...
 //Unblocked.
 #include <executive/dd/unblocked/ports.h>       //Portas para dispositivos

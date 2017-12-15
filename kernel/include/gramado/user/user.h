@@ -27,10 +27,11 @@
   
  
 //Strings.
+#define USER_SYSTEM            "system" 
+#define USER_DEFAULT           "default" 
+#define USER_ADMIN             "admin" 
+#define USER_ALL               "all" 
 #define _4NORA_USER_DIRECTORY  "/root/user" 
-#define USER_SYSTEM            "system-[USER]" 
-#define USER_DEFAULT           "default-[USER]" 
-#define USER_ALL               "all-[USER]" 
 //...
 
  

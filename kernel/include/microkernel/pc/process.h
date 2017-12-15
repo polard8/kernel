@@ -121,6 +121,9 @@ typedef int ppid_t;
 #define PRIORITY_REALTIME  10    
 
 
+#define TIMESLICE_MULTIPLIER 2
+//#define TIMESLICE_MULTIPLIER 1
+//...
 
 /*
  * Constantes para níveis de quantum.
@@ -130,14 +133,14 @@ typedef int ppid_t;
  * o tempo de cada interrupção ... e somar o tempo perdido com taskswitch ...
  *  100ms + 5ms(que o timer fica esperando o kernel habilitar as interrupções).
  */
-#define QUANTUM_BASE   (PRIORITY_NORMAL*2)
-#define QUANTUM_LIMIT  (PRIORITY_REALTIME*2)
+#define QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
+#define QUANTUM_LIMIT  (PRIORITY_REALTIME*TIMESLICE_MULTIPLIER)
 
 
 //Limite de tempo esperando.
-#define READY_LIMIT   (PRIORITY_REALTIME*2)
-#define WAITING_LIMIT (PRIORITY_REALTIME*2)
-#define BLOCKED_LIMIT (PRIORITY_REALTIME*2)
+#define READY_LIMIT   (PRIORITY_REALTIME*TIMESLICE_MULTIPLIER)
+#define WAITING_LIMIT (PRIORITY_REALTIME*TIMESLICE_MULTIPLIER)
+#define BLOCKED_LIMIT (PRIORITY_REALTIME*TIMESLICE_MULTIPLIER)
  
 //Lista de status na criação de um processo.     
 #define ERRO_SLOT_OCUPADO  0xfffff    //Slot ocupado.      
@@ -211,7 +214,9 @@ typedef enum {
   
 /*
  * process_d: 
- *    Process Control Block, PCB.
+ *
+ *    PCB - Process Control Block.
+ *
  *    Estruturas para processos.
  *    Estrutura onde se guarda informações sobre os processos.
  *    Cada estrutura terá informações necessárias para

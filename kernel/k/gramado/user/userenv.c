@@ -98,9 +98,6 @@ done:
 /*
  * ShowUserInfo:
  *     Mostra informações sobre o usuário atual.
- *
- * #bugbug: Aqui aparece alguma pagefault, provavelmente alguma 
- *          estrutura não foi inicializada(alocada) corretamente.
  */
 void ShowUserInfo(int user_id)
 {
@@ -112,7 +109,7 @@ void ShowUserInfo(int user_id)
 	
 	User = (void *) userList[user_id];
 	if( (void*) User == NULL ){
-	    printf("Invalid user ID!");
+	    printf("ShowUserInfo: Error\n");
         return;		
 	}else{
 	    
@@ -162,8 +159,6 @@ void *CreateUser(char *name, int type)
 	if( (void*) New == NULL ){
 	    printf("CreateUser:");
 	    die();
-		//refresh_screen();
-	    //while(1){}
 	}else{
 	    
 		New->name = (char *) name;      //Name.
@@ -264,7 +259,7 @@ void UpdateUserInfo( struct user_info_d *user,
 					 int window_station_id,
 					 int desktop_id )
 {  
-	if( (void*) user == NULL){
+	if( (void*) user == NULL ){
         return;
 	}else{	
 	    
@@ -301,11 +296,6 @@ void init_user_info()
 	int Id = 0;
     int Index = 0;	
 	
-	//Name. (static)
-	//char *defaultName = "default-[USER]";     //@todo: Usar uma constante em system.h. 
-	//char defaultName[] = "default-[USER]"; //@todo: Usar esse.
-	
-
 	//Initialize list.
 	while(Index < USER_COUNT_MAX){
 	    userList[Index] = (unsigned long) 0;
@@ -315,11 +305,9 @@ void init_user_info()
 	//Configurando a estrutura global.
 	// Create default user. (default,interactive)
 	DefaultUser = (void*) CreateUser(default_user_name, USER_TYPE_INTERACTIVE);
-	if( (void*) DefaultUser == NULL){
+	if( (void*) DefaultUser == NULL ){
 	    printf("init_user_info:");
 	    die();
-		//refresh_screen();
-	    //while(1){}
 	}else{
 		
 		//Coloca no início da lista.
@@ -345,7 +333,7 @@ void init_user_info()
     // Continua...??!!
 
 done:
-    printf("init_user_info: Done.\n"); 
+    printf("Done\n"); 
     return;
 };
 

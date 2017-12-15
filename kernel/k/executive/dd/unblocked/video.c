@@ -186,9 +186,13 @@ int videoInit()
 	    g_useGUI = 1;
 		VideoBlock.useGui = 1;
 	    
-		//@todo: Configura Backbuffer e LFB.
-		g_backbuffer_address = (unsigned long) BACKBUFFER_ADDRESS;
-		g_frontbuffer_buffer_address = (unsigned long) SavedLFB;
+		
+		//endereço físico do frontbuffer.
+		g_frontbuffer_pa = (unsigned long) SavedLFB;              
+
+		//endereço virtual do backbuffer.
+		g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
+		
 		
 		//Device screen sizes. (herdadas do boot loader.)
 		g_device_screen_width = (unsigned long) SavedX;

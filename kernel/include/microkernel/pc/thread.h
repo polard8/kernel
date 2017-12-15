@@ -168,7 +168,9 @@ typedef enum {
  
 /*
  * thread_d: 
- *    Thread Control Block, TCB.
+ *
+ *    TCB - Thread Control Block.
+ *
  *    A estrutura onde guarda informações sobre a thread.
  *    @todo: Começar com informações sobre disco e arquivos.
  *    Obs: Deve ficar por último o que for referenciado com menos frequência.

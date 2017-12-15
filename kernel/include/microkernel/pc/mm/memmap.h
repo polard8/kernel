@@ -108,6 +108,86 @@
 //Endereço virtual padrão para o BackBuffer. (buffer1)
 #define DEFAULT_BACKBUFFER_VIRTUALADDRESS 0xC0800000
 
+
+//MEDIDAS.
+//0x01000000 (16Mb)	
+//0x02000000 (32Mb)
+//0x04000000 (64Mb)	
+//0x08000000 (128Mb)
+//...	
+
+//Onde começa a área onde alocaremos frames para os processos.
+//físico ??
+//Esse início será o mesmo tanto para sistemas com 32mb quanto para sistemas maiores.
+
+//definindo o início do paged pool para sustemas pequenos. Com 32MB.
+
+//
+// SMALL SYSTEM (MÍNIMO 32MB)
+//
+
+#define SMALLSYSTEM_KERNELADDRESS    0
+#define SMALLSYSTEM_KERNELBASE       KERNEL_BASE
+#define SMALLSYSTEM_USERBASE         USER_BASE
+#define SMALLSYSTEM_VGA              VM_BASE
+//#define SMALLSYSTEM_FRONTBUFFER      ?? 
+#define SMALLSYSTEM_BACKBUFFER       (0x01000000 - 0x400000)   
+#define SMALLSYSTEM_PAGEDPOLL_START  0x01000000   //Começa em 16MB.
+//...
+
+//
+// MEDIUM SYSTEM  (MÍNIMO 64MB) 
+//
+
+#define MEDIUMSYSTEM_KERNELADDRESS    0
+#define MEDIUMSYSTEM_KERNELBASE       KERNEL_BASE
+#define MEDIUMSYSTEM_USERBASE         USER_BASE
+#define MEDIUMSYSTEM_VGA              VM_BASE
+//#define MEDIUMSYSTEM_FRONTBUFFER      ?? 
+#define MEDIUMSYSTEM_BACKBUFFER       0x01000000   
+#define MEDIUMSYSTEM_PAGEDPOLL_START  0x02000000   //Começa em 32MB.
+//...
+
+//
+// LARGE SYSTEM (MÍNIMO 128MB)
+//
+
+#define LARGESYSTEM_KERNELADDRESS    0
+#define LARGESYSTEM_KERNELBASE       KERNEL_BASE
+#define LARGESYSTEM_USERBASE         USER_BASE
+#define LARGESYSTEM_VGA              VM_BASE
+//#define LARGESYSTEM_FRONTBUFFER      ?? 
+#define LARGESYSTEM_BACKBUFFER       0x01000000   
+#define LARGESYSTEM_PAGEDPOLL_START  0x04000000   //Começa em 64MB.
+//...
+
+
+//
+// Endereços físicos de algumas pagetables.
+//
+
+//
+// 0x0008F000 Tabela para mapear a parte mais baixa da memória física. Começa em 0.
+// 0x0008E000 Tabela para mapear a memória usada pela imagem do kernel. Começa em 0x100000.
+// 0x0008D000 Tabela para mapear uma área em user mode onde rodam códigos. Começa em 0x400000.
+// 0x0008C000 Tabela para mapear a vga. Começa em 0xb8000.
+// 0x0008B000 Tabela para mapear o frontbuffer, O começo é passado pelo Boot.
+// 0x0008A000 Tabela para mapear o backbuffer, o começo é em (0x01000000 - 0x400000) no small system.
+// // 0x00089000 Tabela de páginas para o pagedpool.
+// //...
+//?? Obs: Não sei o quanto podemos ir escolhendo endereços nessa região sem sobrepor o boot loader.
+//
+
+
+#define PAGETABLE_KERNELAREA   0x0008F000
+#define PAGETABLE_KERNELBASE   0x0008E000
+#define PAGETABLE_USERBASE     0x0008D000
+#define PAGETABLE_VGA          0x0008C000
+#define PAGETABLE_FRONTBUFFER  0x0008B000
+#define PAGETABLE_BACKBUFFER   0x0008A000
+#define PAGETABLE_PAGEDPOOL    0x00089000  //?? isso é um teste ... Cuidado. #bugbug
+//?? Obs: Não sei o quanto podemos ir escolhendo endereços nessa região sem sobrepor o boot loader.
+
 //
 // @todo: Com as informações de backbuffer e lfb pode-se
 //        fazer rotinas de pintura rápida de partes da tela, 
