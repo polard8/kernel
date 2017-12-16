@@ -238,19 +238,11 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Clock info./minishell				
 				case VK_F6:
-					
-					//init_mouse();  //isso está em keyboard.c
-					
-					//#bugbug TEST.
-					//Loop para testes ... isso é problema 
-
-					//não precisou disso.
-				    //kernelPS2MouseDriverReadData();
-
-					
 					//if(AltStatus == 1){ window_with_focus = 6; break;};
 					//if(CtrlStatus == 1){ active_window = 6; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
+					
+				    testingFrameAlloc();
 					
 				    //init_clock(); //clock information
 					//get_cmos_info();

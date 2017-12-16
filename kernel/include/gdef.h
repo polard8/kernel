@@ -281,6 +281,8 @@ typedef enum {
 // buffer support
 //
 
+// ??@todo: Talvez essas globais deva ir para o microkernel/pc
+
 //frontbuffer lfb
 unsigned long g_frontbuffer_va;         
 unsigned long g_frontbuffer_pa;         
@@ -289,8 +291,8 @@ unsigned long g_frontbuffer_pa;
 unsigned long g_backbuffer_va;
 unsigned long g_backbuffer_pa;
 
-
-
+//pagedpool virtual address
+unsigned long g_pagedpool_va;
 
 int gNextKeyboardMessage;
 

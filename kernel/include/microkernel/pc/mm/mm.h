@@ -860,8 +860,8 @@ struct free_mmblock_d
  *     Guarda informações sobre um 'page frame' na memória física.
  *     @todo: Incluir todas as informações necessárias.
  */
-typedef struct page_frames_d page_frames_t;
-struct page_frames_d
+typedef struct page_frame_d page_frame_t;
+struct page_frame_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
@@ -870,6 +870,9 @@ struct page_frames_d
 	int used;
 	int magic;
 	int locked;             //Não pode ser descarregado para o disco.
+	
+	int free;    //se é um frame de memória física livre para uso.
+	
 	//...
 	
     unsigned long address;  //Endereço físico da page frame.	
@@ -892,16 +895,22 @@ struct page_frames_d
 	
 	
 	//navegação
-    struct page_frames_d *next;	
+    struct page_frame_d *next;	
 };
-page_frames_t *pageframeCurrent;
+page_frame_t *pageframeCurrent;
 //...
 
 //Lista de page frames.
-unsigned long pageframesList[PAGEFRAME_COUNT_MAX];
+unsigned long pageframeList[PAGEFRAME_COUNT_MAX];
 //page_frames_t *pageframeListHead;
 
+//
+// *importante
+//
 
+//pool de memória paginável usado par alocação.
+//aqui ficam os ponteiros para estrutura do tipo pageframe
+unsigned long pageframeAllocList[PAGEFRAME_COUNT_MAX];
 
 
 /*
@@ -1079,6 +1088,18 @@ unsigned long g_kernel_nonpaged_memory;
 
 
 
+//tipo de sistema baseado no tamanho da memória.
+typedef enum {
+	stNull,
+    stSmallSystem,
+    stMediumSystem,
+    stLargeSystem,
+}mm_system_type_t;
+
+
+//salva o tipo de sistema baseado no tamanho da memória.
+int g_mm_system_type;
+
 unsigned long memorysizeBaseMemory;
 unsigned long memorysizeOtherMemory;
 unsigned long memorysizeExtendedMemory;
@@ -1110,6 +1131,16 @@ void *CreatePageTable( unsigned long directory_address,
 					   unsigned long page_address );
 
 
+					   
+					   
+					   
+//
+// page frame support.
+//
+	
+void initializaFramesAlloc();	
+void *allocPages( int size );
+void testingFrameAlloc();   //@todo: Rotina de teste. deletar.
 
 //
 // Debug support.

@@ -898,6 +898,7 @@ int SetUpPaging()
 	// ** PAGETABLE, FRONT BUFFER  **
 	//
 	
+	g_frontbuffer_va = (unsigned long) 0xC0400000;         //@todo: usar esse
 	
 	
     //==================================================================
@@ -915,7 +916,7 @@ int SetUpPaging()
     //        But the driver needs to do all the work.
     //
 	
-	g_frontbuffer_va = (unsigned long) 0xC0400000;         //@todo: usar esse
+	
 	
 	//Criando uma pagetable.
 	//Os quatro primeiros MB da memória de vídeo.
@@ -1024,6 +1025,9 @@ int SetUpPaging()
 	//
 	// ** PAGETABLE, PAGEDPOOL **
 	//	
+	
+	g_pagedpool_va = (unsigned long) 0xC0C00000;
+	
 	for(i = 0; i < 1024; i++)
     {
 		//IF SMALL
@@ -1223,13 +1227,13 @@ int SetUpPaging()
 	// Inicializando a lista de pageframes.
 	//
 	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++){
-	    pageframesList[Index] = (unsigned long) 0;
+	    pageframeList[Index] = (unsigned long) 0;
 	};
 
 
 	//Configurando manualmente a lista de pageframes.
-	pageframesList[0] = (unsigned long) 0;
-	pageframesList[1] = (unsigned long) 0;
+	pageframeList[0] = (unsigned long) 0;
+	pageframeList[1] = (unsigned long) 0;
 	//...
 
 
@@ -1390,6 +1394,178 @@ done:
     return (int) 0;
 };
 
+
+
+void initializaFramesAlloc()
+{
+	int Index;
+	struct page_frame_d *pf;
+	
+	//
+	// Inicializando a lista de pageframes.
+	//
+	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++){
+	    pageframeAllocList[Index] = (unsigned long) 0;
+	};
+	
+	
+	//
+	// Criando o primeiro para testes.
+	//
+	
+	pf = (void*) malloc( sizeof( struct page_frame_d ) );
+	if( pf == NULL ){
+		printf("initializaFramesAlloc:\n");
+		goto done;
+	};
+	pf->id = 0;
+	pf->used = 1;
+	pf->magic = 1234;
+	pf->free = 0;  //not free
+	 
+	//...	
+	
+	pageframeAllocList[0] = ( unsigned long ) pf; 
+	
+done:
+    return;	
+};
+
+
+
+
+//@param número de páginas contíguas.
+//Obs: Pode ser que os pageframes não sejam contíguos mas as páginas serão.
+//estamos usando uma page table toda já mapeada. 4MB.
+//@TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
+void *allocPages( int size )
+{
+	int Index;
+	struct page_frame_d *Conductor;
+	struct page_frame_d *pf;
+	
+	unsigned long Address = (unsigned long) (g_pagedpool_va);
+	int Count = 0;
+
+	
+    if( size > PAGEFRAME_COUNT_MAX ){
+		printf("allocPages: size\n");
+		goto fail;
+	}
+
+
+    for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
+	{
+	    Conductor = (void*) pageframeAllocList[Index];		
+		if( Conductor == NULL )
+		{
+			Conductor = (void*) malloc( sizeof( struct page_frame_d ) );
+			if( Conductor == NULL ){
+				printf("allocPages: 1\n");
+				goto fail;
+			};
+			
+			printf("$");
+			Conductor->id = Index;
+			Conductor->used = 1;
+			Conductor->magic = 1234;
+			Conductor->free = 0;  //not free
+			Conductor->address = (unsigned long) Address;//endereço físico do inicio do frame.
+			//...
+			
+			pageframeAllocList[Index] = ( unsigned long ) Conductor; 
+			
+			//inicializa o contador.
+			Count = 1;
+			goto goAhead;
+		}
+		Address = (unsigned long) (Address+4096);
+	};	
+
+	//
+	// Se estamos aqui é porque temos um Conductor.
+	//
+	
+goAhead:
+		
+	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
+	{
+	    pf = (void*) pageframeAllocList[Index];
+		
+		//Slot livre
+		if( pf == NULL )
+		{
+			pf = (void*) malloc( sizeof( struct page_frame_d ) );
+			if( pf == NULL ){
+				printf("allocPages: 2\n");
+				goto fail;
+			};
+			
+			printf("#");
+			pf->id = Index;
+			pf->used = 1;
+			pf->magic = 1234;
+			pf->free = 0;  //not free
+			//...
+			
+			pageframeAllocList[Index] = ( unsigned long ) pf; 
+			
+			Conductor->next = (void*) pf;
+			Conductor = (void*) Conductor->next;
+			Count++;
+			if( Count >= size ){
+			    goto done;	
+			}
+		};
+		
+		Address = (unsigned long) (Address+4096);
+		//Continua ...
+	};
+	
+fail:	
+    return NULL;	
+done:
+	//retorna o endereço virtual inicial da área alocada.
+    return (void*) Conductor;
+};
+
+
+ //@todo: Rotina de teste. deletar.
+void testingFrameAlloc()
+{
+	int Index;
+    struct page_frame_d *pf;
+	struct page_frame_d *Ret;
+	
+	
+	printf("testingFrameAlloc:\n");
+	
+	initializaFramesAlloc();
+	
+    Ret = (void*) allocPages(8);
+	if( (void*) Ret == NULL ){
+	    printf("Ret fail\n");
+        goto done;		
+	}
+	
+	printf("\n");
+	
+    for(Index = 0; Index < 9; Index++)   	
+	{  
+        pf = (void*) pageframeAllocList[Index]; 
+		
+		if( (void*) pf == NULL ){
+		    printf("null\n");	 
+		}
+	    if( (void*) pf != NULL ){
+		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
+		}
+	}
+	
+done:
+    printf("done\n");
+    return;	
+};
 
 //
 // End.

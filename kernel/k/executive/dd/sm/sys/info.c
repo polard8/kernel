@@ -269,18 +269,18 @@ void KiInformation()
 		// Disks and directories
 		//
 		
-		printf("\n[Disks and directories:]\n");
+		//printf("\n[Disks and directories:]\n");
 		
 		//disk
-		printf("%s (system disk)\n",SYSTEM_DISK);
-		printf("%s (system volume)\n",SYSTEM_VOLUME);
+		//printf("%s (system disk)\n",SYSTEM_DISK);
+		//printf("%s (system volume)\n",SYSTEM_VOLUME);
 		
 		//directories
-		printf("%s\n",SYSTEM_GBUILD);
-		printf("%s\n",SYSTEM_GDOCS);
-		printf("%s\n",SYSTEM_GRAMADO);
-		printf("%s\n",SYSTEM_GSDK);
-		printf("%s\n",SYSTEM_GSRC);
+		//printf("%s\n",SYSTEM_GBUILD);
+		//printf("%s\n",SYSTEM_GDOCS);
+		//printf("%s\n",SYSTEM_GRAMADO);
+		//printf("%s\n",SYSTEM_GSDK);
+		//printf("%s\n",SYSTEM_GSRC);
 	    
 		//
 		// Test.

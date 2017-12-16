@@ -924,15 +924,41 @@ void memoryShowMemoryInfo()
 	printf("TotalMemory    = (%d KB)\n", memorysizeTotal);
 	
 	//system zone
-	printf("systemzoneStart  = 0x%x\n", systemzoneStart);
-	printf("systemzoneEnd    = 0x%x\n", systemzoneEnd);
-	printf("systemzoneSize   = 0x%x\n", systemzoneSize);
+	//printf("systemzoneStart  = 0x%x\n", systemzoneStart);
+	//printf("systemzoneEnd    = 0x%x\n", systemzoneEnd);
+	//printf("systemzoneSize   = 0x%x\n", systemzoneSize);
 
 	//window zone.
-	printf("windowzoneStart  = 0x%x\n", windowzoneStart);
-	printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
-	printf("windowzoneSize   = 0x%x\n", windowzoneSize);
+	//printf("windowzoneStart  = 0x%x\n", windowzoneStart);
+	//printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
+	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
+	//
+	// System type
+	//
+	
+	switch(g_mm_system_type)
+	{
+		case stSmallSystem:
+		    printf("stSmallSystem={%d KB}\n",memorysizeTotal);
+		    break;
+			
+		case stMediumSystem:
+		    printf("stMediumSystem={%d KB}\n",memorysizeTotal);
+			break;
+			
+		case stLargeSystem:
+		    printf("stLargeSystem={%d KB}\n",memorysizeTotal);
+			break;
+			
+		case stNull:
+		default:
+		    printf("stNull={%d KB}\n",memorysizeTotal);
+			break;
+	};
+	
+	
+done:	
 	return;
 }
 
@@ -1008,6 +1034,32 @@ int init_mm()
     memorysizeTotal          = (unsigned long) (memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory);
 	
 	
+	//
+	// Determinar o tipo de sistema de memória.
+	// small, medium, large
+	//
+	
+	
+	//0MB
+	if ( memorysizeTotal >= (0) ){
+		g_mm_system_type = stNull;
+	}	
+	
+	//32MB
+	if ( memorysizeTotal >= (32*1024) ){
+		g_mm_system_type = stSmallSystem;
+	}
+	
+	
+	//64MB
+	if ( memorysizeTotal >= (64*1024) ){
+		g_mm_system_type = stMediumSystem;
+	}	
+	
+	//128MB
+	if ( memorysizeTotal >= (128*1024) ){
+		g_mm_system_type = stLargeSystem;
+	}		
 	
 	//
 	// MEMORY ZONES
@@ -1024,76 +1076,76 @@ int init_mm()
     //Se a memória total for igual ou maior que 256MB.	
 	//Estamos medindo em KB.
 	//Isso seria o normal.
-	if( memorysizeTotal >= (256*1024) )
-	{
+	//if( memorysizeTotal >= (256*1024) )
+	//{
         //system zone
-	    systemzoneStart = 0;
-        systemzoneEnd   = 0x0FFFFFFF;
-        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	//    systemzoneStart = 0;
+    //    systemzoneEnd   = 0x0FFFFFFF;
+    //    systemzoneSize  = (systemzoneEnd - systemzoneStart);
 	
 	    //window zone
-	    windowzoneStart = 0x10000000;
-        windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
-        windowzoneSize  = (windowzoneEnd - windowzoneEnd);
-	}
+	//    windowzoneStart = 0x10000000;
+    //    windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
+    //    windowzoneSize  = (windowzoneEnd - windowzoneEnd);
+	//}
     
 
     //Se a memória total for igual ou maior que 128MB.	
 	//Estamos medindo em KB.
 	//Isso seria o normal.
-	if( memorysizeTotal >= (128*1024) )
-	{
+	//if( memorysizeTotal >= (128*1024) )
+	//{
         //system zone
-	    systemzoneStart = 0;
-        systemzoneEnd   = 0x07FFFFFF;
-        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	 //   systemzoneStart = 0;
+     //   systemzoneEnd   = 0x07FFFFFF;
+    //    systemzoneSize  = (systemzoneEnd - systemzoneStart);
 	
 	    //window zone
 	    //windowzoneStart = 0x10000000;
         //windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
         //windowzoneSize  = (windowzoneEnd - windowzoneEnd);
-	}
+	//}
 	
     //Se a memória total for igual ou maior que 64MB.	
 	//Estamos medindo em KB.
 	//Isso seria o normal.
-	if( memorysizeTotal >= (64*1024) )
-	{
+	//if( memorysizeTotal >= (64*1024) )
+	//{
         //system zone
-	    systemzoneStart = 0;
-        systemzoneEnd   = 0x03FFFFFF;
-        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	//    systemzoneStart = 0;
+    //    systemzoneEnd   = 0x03FFFFFF;
+     //   systemzoneSize  = (systemzoneEnd - systemzoneStart);
 	
 	    //window zone
 	    //windowzoneStart = 0x10000000;
         //windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
         //windowzoneSize  = (windowzoneEnd - windowzoneEnd);
-	}
+	//}
 	
 
     //Se a memória total for igual ou maior que 32MB.	
 	//Estamos medindo em KB.
 	//Isso é o requisito mínimo de memória..
-	if( memorysizeTotal >= (32*1024) )
-	{
+	//if( memorysizeTotal >= (32*1024) )
+	//{
         //system zone
-	    systemzoneStart = 0;
-        systemzoneEnd   = 0x01FFFFFF;
-        systemzoneSize  = (systemzoneEnd - systemzoneStart);
+	//    systemzoneStart = 0;
+    //    systemzoneEnd   = 0x01FFFFFF;
+    //    systemzoneSize  = (systemzoneEnd - systemzoneStart);
 	
 	    //window zone
 	    //windowzoneStart = 0x10000000;
         //windowzoneEnd   = systemzoneSize;    //?? Devemos levar em consideração o calculo do tamanho da memória
         //windowzoneSize  = (windowzoneEnd - windowzoneEnd);
-	};
+	//};
 
 	//32MB Isso é o requisito mínimo de memória..
-	if( memorysizeTotal < (32*1024) ){
-		printf("init_mm: Error Memory Size!\n");
-	    printf("init_mm: TotalMemory={ %d KB}\n");
-        refresh_screen();
-		die();
-	};
+	//if( memorysizeTotal < (32*1024) ){
+	//	printf("init_mm: Error Memory Size!\n");
+	//    printf("init_mm: TotalMemory={ %d KB}\n");
+     //   refresh_screen();
+	//	die();
+	//};
 	
 	//
 	//Aviso!
@@ -1104,9 +1156,9 @@ int init_mm()
 	
 	//Criando estruturas principais para o gerenciamento de memória.
 	//@todo: Conferir validade
-	zones       = (void*) malloc( sizeof(struct mm_zones_d ) );
-	systemzone  = (void*) malloc( sizeof(struct system_zone_d ) );
-	windowzone	= (void*) malloc( sizeof(struct window_zone_d ) );
+	//zones       = (void*) malloc( sizeof(struct mm_zones_d ) );
+	//systemzone  = (void*) malloc( sizeof(struct system_zone_d ) );
+	//windowzone	= (void*) malloc( sizeof(struct window_zone_d ) );
 	
 	//
 	// Continua...
