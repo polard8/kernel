@@ -1433,7 +1433,7 @@ done:
 
 
 
-
+//=======================================================================
 //@param número de páginas contíguas.
 //Obs: Pode ser que os pageframes não sejam contíguos mas as páginas serão.
 //estamos usando uma page table toda já mapeada. 4MB.
@@ -1441,15 +1441,27 @@ done:
 void *allocPageFrames(int size)
 {
 	int Index;
+	
+	//página inicial da lista
+	struct page_frame_d *Ret;   
+	
 	struct page_frame_d *Conductor;
 	struct page_frame_d *pf;
 	
-	unsigned long Address = (unsigned long) (g_pagedpool_va);
+	//Esse é o endereço virtual do início do pool de pageframes.
+	unsigned long base = (unsigned long) g_pagedpool_va;
+	
 	int Count = 0;
 	
 	//
 	// Checando limites.
 	//
+	
+	
+//tentando novamente em outra região com blocos livres 
+//em quantidade suficiente.	
+tryNext:
+    printf("tryNext:\n");	
 
 	//problemas com o size.
 	if(size <= 0){
@@ -1480,7 +1492,13 @@ void *allocPageFrames(int size)
 		printf("allocPageFrames: 1\n");
 		goto fail;
 	}else{
-	    Count = 1;	
+	    Count = 1;
+		
+		//Salvando.
+		//o ponteiro para a primeira páginas da lista.
+		//com base no ponteiro da estrutura do pageframe podemos 
+		//e no id podemos saber o endereço de memória virtual desse pageframe
+        Ret = (void*) Conductor;		
 	}
 	
 	//
@@ -1488,10 +1506,30 @@ void *allocPageFrames(int size)
 	//
 	
 goAhead:
+
+   //*importante:
+   //antes precisamos procurar uma região com slots livres e consecutivos.
+   //na quantidade suficiente.
+   //Se não encontrarmos , precisaremos de um novo condutor ...
+   //que é o primeiro da sequência de slots consecutivos.   
 	
-	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
+	if( Conductor->id >= PAGEFRAME_COUNT_MAX ){
+		printf("allocPageFrames: Conductor->id >= PAGEFRAME_COUNT_MAX\n");
+		goto fail;
+	}
+	
+	//começamos a contar do frame logo após o condutor.
+	for(Index = (Conductor->id+1); Index < PAGEFRAME_COUNT_MAX; Index++)
 	{
 	    pf = (void*) pageframeAllocList[Index];
+		
+		//Se encontramos um slot não NULL é porque a 
+		//não temos slots conscutivos o suficiente.
+		if( pf != NULL ){
+			//#bugbug: isso pode dar um loop infinito ??
+			goto tryNext;
+		}
+			
 		
 		//Slot livre
 		if( pf == NULL )
@@ -1516,20 +1554,20 @@ goAhead:
 			Count++;
 			if( Count >= size ){
 			    goto done;	
-			}
+			}	
 		};
 		
-		Address = (unsigned long) (Address+4096);
+		//base = (unsigned long) ( base + (New->id * 4096) );
 		//Continua ...
 	};
 	
 fail:	
     return NULL;	
 done:
-    //??@todo: Não é isso o que queremos. Queremos o primeiro da lista 
-	//talvez tenhamos que alocar de trás pra frente.
-	//estamos retornando o ponteiro para a estrutura do último frame alocado.
-    return (void*) Conductor;
+    
+	//*Importante:
+	//retornaremos o endereço virtual inicial do primeiro pageframe da lista.
+	return (void*) ( base + (Ret->id * 4096) );
 };
 
 
@@ -1622,17 +1660,24 @@ void testingFrameAlloc()
 	struct page_frame_d *Ret;
 	
 	
-	printf("testingFrameAlloc:\n");
+	printf("testingFrameAlloc: #100\n");
 	
-    Ret = (void*) allocPageFrames(8);
+	
+	//
+	// =============================================
+	//
+	
+ 					  
+	
+    Ret = (void*) allocPageFrames(100); //400 ??
 	if( (void*) Ret == NULL ){
 	    printf("Ret fail\n");
         goto done;		
 	}
 	
 	printf("\n");
-	
-    for(Index = 0; Index < 9; Index++)   	
+	printf("BaseOfList={%x} Showing #32 \n",Ret);
+    for(Index = 0; Index < 32; Index++)   	
 	{  
         pf = (void*) pageframeAllocList[Index]; 
 		
@@ -1643,6 +1688,34 @@ void testingFrameAlloc()
 		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
 		}
 	}
+	
+	
+    //===================================
+	// @todo: Carregar a estrelinha e usar como ponteiro de mouse.
+	//
+	//janela de test
+    CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
+	              (10-5), (10-5), (309+10), (325+10), 
+				  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
+	
+	
+	unsigned long fileret;
+		
+	//taskswitch_lock();
+	//scheduler_lock();
+	fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
+	if(fileret != 0)
+	{
+		//escrevendo string na janela
+	    draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");  	
+	}
+	bmpDisplayBMP( Ret, 10, 10, 309, 325 );
+	//scheduler_unlock();
+	//taskswitch_unlock();
+
+    //===================================	
+	 
+	
 	
 done:
     printf("done\n");
