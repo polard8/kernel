@@ -1014,25 +1014,63 @@ unsigned long input(unsigned long ch)
 	
 input_more:	
 	return 0;
-
 input_done:	
     return VK_RETURN;	
 };
 
 
+
+/*
+ * stdioInitialize:
+ *     Inicializando stdio pertencente ao kernel base.
+ *
+ */
 //inicializa as estruturas do fluxo padrão.
+// ?? Quem chamou essa inicialização ?? em que hora ??
 void stdioInitialize()
 {
 	//buffers para as estruturas.
-	unsigned char buffer0[512];
-	unsigned char buffer1[512];
-	unsigned char buffer2[512];
+	//unsigned char buffer0[512];
+	//unsigned char buffer1[512];
+	//unsigned char buffer2[512];
 	
+	//buffers para as estruturas.
+	unsigned char *buffer0;
+	unsigned char *buffer1;
+	unsigned char *buffer2;
+	
+	//
+	// Alocando uma página para cada buffer.
+	// 4KB size.
+	//
+	
+	//4KB
+	buffer0 = (unsigned char *) newPage();
+	if( (unsigned char *) buffer0 == NULL ){
+		printf("stdioInitialize: buffer0");
+		refresh_screen();
+		while(1){}
+	}
+	
+	//4KB
+	buffer1 = (unsigned char *) newPage();
+	if( (unsigned char *) buffer1 == NULL ){
+		printf("stdioInitialize: buffer1");
+		refresh_screen();
+		while(1){}
+	}
+	
+	//4KB
+	buffer2 = (unsigned char *) newPage();
+	if( (unsigned char *) buffer2 == NULL ){
+		printf("stdioInitialize: buffer2");
+		refresh_screen();
+		while(1){}
+	}
 	
 	stdin  = (FILE *) &buffer0[0];	
 	stdout = (FILE *) &buffer1[0];	
 	stderr = (FILE *) &buffer2[0];	
-	
 	  
 	stdin->_base = &prompt[0];
 	stdin->_ptr = stdin->_base;

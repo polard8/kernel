@@ -374,7 +374,11 @@ doDebug:
 	// agora inicializaremos o controlador 8042
 	// testando inicializar o mouse no procedimento de janela do sistema em F6.
 	
-	//init_mouse();  //isso está em keyboard.c
+	
+	//
+	// * Isso funcionou. Inicializando mouse e teclado juntos.
+	//   @todo: Deixar isso aqui.
+	//
 	
     ps2();	
 	
@@ -425,8 +429,6 @@ done:
 	
 	// isso substitui o malloc.
 	b = (void*) newPage();
-	//#bugbug checar a validade do buffer
-	
 	if( (void *) b == NULL ){
 		printf("main: newPage: buffer:");
 		refresh_screen();

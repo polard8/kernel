@@ -1041,8 +1041,11 @@ int init_mm()
 	
 	
 	//0MB
-	if ( memorysizeTotal >= (0) ){
+	if ( memorysizeTotal >= (0) )
+	{
 		g_mm_system_type = stNull;
+	    //#bugbug
+        //@todo: nesse caso devemos parar e avisão não ser possível prosseguir.		
 	}	
 	
 	//32MB
@@ -1075,14 +1078,20 @@ done:
     return (int) Status;	
 }; 
 
+
+
+
 //
 // Segue rotinas de GC.
+// =====================================================
 //
 
 //limpa a camada /gramado
 int gcGRAMADO(){
+	//Ainda não implementado.
 	return (int) 0;
 }
+
 
 /*
  gcEXECUTIVE:
@@ -1233,15 +1242,18 @@ done:
 	return (int) 0;	
 };
 
+
 //limpa a camada /microkernel
 int gcMICROKERNEL(){
 	return (int) 0;
 }
 
+
 //limpa a camada /hal
 int gcHAL(){
 	return (int) 0;
 }
+
 
 /*
  ***********************************************************

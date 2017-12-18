@@ -1558,6 +1558,8 @@ void *newPageFrame()
 			New->used = 1;
 			New->magic = 1234;
 			New->free = 0;  //not free
+			New->next = NULL;
+			
 			
 			//#bugbug ... isso tá errado.
 			//New->address = (unsigned long) Address;//endereço físico do inicio do frame.
