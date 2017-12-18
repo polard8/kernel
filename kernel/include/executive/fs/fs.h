@@ -763,6 +763,7 @@ void fatWriteCluster(unsigned long sector, unsigned long address, unsigned long 
 void MountShortFileName(char *buffer, struct dir_entry_d *entry);
 void fs_check_disk();
 
+void fsCreateVFS();
 //
 // End.
 //

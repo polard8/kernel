@@ -382,7 +382,7 @@ doDebug:
 	// Done.
 	//
 
-   //void *b;
+  // void *b;
    
 done:
 
@@ -396,6 +396,7 @@ done:
 				  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 
 	// testing BMP support 32KB
 	b = (void*) malloc(512*1024);
+	//#bugbug checar a validade do buffer
 	
 	unsigned long fileret;
 		
@@ -412,6 +413,44 @@ done:
 	//taskswitch_unlock();
 
     //===================================	
+	*/
+	
+	/*
+	  * esse teste funcionou.
+	//
+	// testando a alocação de páginas.
+	//
+	
+	printf("main: testing page allocator\n");
+	
+	// isso substitui o malloc.
+	b = (void*) newPage();
+	//#bugbug checar a validade do buffer
+	
+	if( (void *) b == NULL ){
+		printf("main: newPage: buffer:");
+		refresh_screen();
+		while(1){}
+	}
+	
+	unsigned long fileret;
+	fileret = fsLoadFile( "INIT    TXT", (unsigned long) b);
+	if(fileret != 0)
+	{
+		//escrevendo string na janela
+	    draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "INIT.TXT FAIL");  	
+	}else{
+		
+		printf("%s",b);
+		refresh_screen();
+		while(1){}
+	}	
+	
+	//#debug
+	printf("main: debug done");
+	refresh_screen();
+	while(1){}
+	
 	*/
 	
 	//

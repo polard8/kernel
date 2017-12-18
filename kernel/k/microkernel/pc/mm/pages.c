@@ -1395,7 +1395,7 @@ done:
 };
 
 
-
+//inicializa o framepool.
 void initializaFramesAlloc()
 {
 	int Index;
@@ -1438,7 +1438,7 @@ done:
 //Obs: Pode ser que os pageframes não sejam contíguos mas as páginas serão.
 //estamos usando uma page table toda já mapeada. 4MB.
 //@TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
-void *allocPages( int size )
+void *allocPageFrames(int size)
 {
 	int Index;
 	struct page_frame_d *Conductor;
@@ -1446,48 +1446,49 @@ void *allocPages( int size )
 	
 	unsigned long Address = (unsigned long) (g_pagedpool_va);
 	int Count = 0;
-
 	
+	//
+	// Checando limites.
+	//
+
+	//problemas com o size.
+	if(size <= 0){
+		//if debug
+		printf("allocPageFrames: size 0\n");
+		return NULL;
+	};
+			
+    //Se é pra alocar apenas uma página.
+	if(size == 1){
+		return (void*) newPageFrame();
+	}	
+	
+	//se o size for maior que o limite.
     if( size > PAGEFRAME_COUNT_MAX ){
-		printf("allocPages: size\n");
+		//if debug
+		printf("allocPageFrames: size limits\n");
 		goto fail;
 	}
 
+	//
+	// Criando um condutor para a lista encadeada.
+	//
 
-    for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
-	{
-	    Conductor = (void*) pageframeAllocList[Index];		
-		if( Conductor == NULL )
-		{
-			Conductor = (void*) malloc( sizeof( struct page_frame_d ) );
-			if( Conductor == NULL ){
-				printf("allocPages: 1\n");
-				goto fail;
-			};
-			
-			printf("$");
-			Conductor->id = Index;
-			Conductor->used = 1;
-			Conductor->magic = 1234;
-			Conductor->free = 0;  //not free
-			Conductor->address = (unsigned long) Address;//endereço físico do inicio do frame.
-			//...
-			
-			pageframeAllocList[Index] = ( unsigned long ) Conductor; 
-			
-			//inicializa o contador.
-			Count = 1;
-			goto goAhead;
-		}
-		Address = (unsigned long) (Address+4096);
-	};	
-
+	Conductor = (void*) newPageFrame();
+	if( Conductor == NULL ){
+	    //fail	
+		printf("allocPageFrames: 1\n");
+		goto fail;
+	}else{
+	    Count = 1;	
+	}
+	
 	//
 	// Se estamos aqui é porque temos um Conductor.
 	//
 	
 goAhead:
-		
+	
 	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
 	{
 	    pf = (void*) pageframeAllocList[Index];
@@ -1497,7 +1498,7 @@ goAhead:
 		{
 			pf = (void*) malloc( sizeof( struct page_frame_d ) );
 			if( pf == NULL ){
-				printf("allocPages: 2\n");
+				printf("allocPageFrames: 2\n");
 				goto fail;
 			};
 			
@@ -1525,14 +1526,95 @@ goAhead:
 fail:	
     return NULL;	
 done:
-	//retorna o endereço virtual inicial da área alocada.
+    //??@todo: Não é isso o que queremos. Queremos o primeiro da lista 
+	//talvez tenhamos que alocar de trás pra frente.
+	//estamos retornando o ponteiro para a estrutura do último frame alocado.
     return (void*) Conductor;
 };
 
 
+
+//aloca apenas uma página e retorna o handle.
+void *newPageFrame()
+{
+	int Index;
+	struct page_frame_d *New;	
+	unsigned long Address = (unsigned long) (g_pagedpool_va);
+
+	//procura slot vazio.
+    for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
+	{
+	    New = (void*) pageframeAllocList[Index];		
+		if( New == NULL )
+		{
+			New = (void*) malloc( sizeof( struct page_frame_d ) );
+			if( New == NULL ){
+				printf("newPage:\n");
+				goto fail;
+			};
+			
+			printf("$");
+			New->id = Index;
+			New->used = 1;
+			New->magic = 1234;
+			New->free = 0;  //not free
+			
+			//#bugbug ... isso tá errado.
+			//New->address = (unsigned long) Address;//endereço físico do inicio do frame.
+			//...
+			
+			pageframeAllocList[Index] = ( unsigned long ) New; 
+		    return (void*) New;
+		};
+	};	
+
+fail:
+    return NULL;    
+};
+
+//aloca uma página e retorna seu endereço virtual inicial
+//com base no id do pageframe e no endereço virtual inicial do pool de pageframes.
+void *newPage()
+{
+    struct page_frame_d *New;
+	
+	
+	//Esse é o endereço virtual do início do pool de pageframes.
+	unsigned long base = (unsigned long) g_pagedpool_va;
+
+	//pega o id do pageframe e multiplica pelo tamanho da página e adiciona a case	
+	
+    New	= (void*) newPageFrame();
+	if( New == NULL ){
+	    //fail	
+		printf("allocPageFrames: 1\n");
+		return NULL;
+		//goto fail;
+	}else{
+	    
+		//check
+        if( New->used == 1 && New->magic == 1234 )
+		{
+			//pega o id 
+			//checa o limite de slots.
+			if( New->id > 0 && New->id < PAGEFRAME_COUNT_MAX )
+            {
+				base = (unsigned long) ( base + (New->id * 4096) );
+				return (void *) base;
+			}				
+		}		
+	}
+fail:
+    return NULL;	
+};
+
  //@todo: Rotina de teste. deletar.
 void testingFrameAlloc()
 {
+	//printf("testingFrameAlloc:\n suspended!");
+	//return;
+
+	
 	int Index;
     struct page_frame_d *pf;
 	struct page_frame_d *Ret;
@@ -1540,9 +1622,7 @@ void testingFrameAlloc()
 	
 	printf("testingFrameAlloc:\n");
 	
-	initializaFramesAlloc();
-	
-    Ret = (void*) allocPages(8);
+    Ret = (void*) allocPageFrames(8);
 	if( (void*) Ret == NULL ){
 	    printf("Ret fail\n");
         goto done;		

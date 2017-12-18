@@ -373,6 +373,10 @@ _asm_refresh_screen:
 write_char:
     ;;Nothing for now.
 	ret	
+	
+	
+	
+	
 
 ;
 ; End.

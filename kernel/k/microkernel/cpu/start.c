@@ -159,8 +159,9 @@ unsigned long executa_tarefa(int id, unsigned long *task_address)
 	//pilha
 	unsigned long eflags = 0x3200;
 	unsigned short cs = 0x1B;            
-	unsigned long eip = (unsigned long ) task_address;
+	unsigned long eip = (unsigned long ) task_address;			 
 			
+	// ?? #bugbug ?? rever ?? é esse mesmo o seletor que queremos para ring3 ???		
 	//segmento de dados.
 	asm(" movw $0x0010, %ax ");	   
 	asm(" movw %ax, %ds ");
@@ -172,10 +173,30 @@ unsigned long executa_tarefa(int id, unsigned long *task_address)
     asm(" pushw %0" :: "r" (cs)    : "%esp");             
     asm(" pushl %0" :: "r" (eip)   : "%esp");  
 	
-    outb(0x20,0x20); 
+    //#bugbug ... isso realmente não é necessário ... @todo: deletar.
+	outb(0x20,0x20); 
+	
 	asm("sti");
     asm("iret");
 	//Nothing.	
+	
+	/*
+	 *@todo: Observar os seletores usado... o de cima não deveria ser igua ???
+  asm volatile(" cli \n"   
+                 " mov $0x23, %ax  \n" 
+                 " mov %ax, %ds  \n"
+                 " mov %ax, %es  \n"
+                 " mov %ax, %fs  \n"
+                 " mov %ax, %gs  \n"
+                 " pushl $0x23            \n"    //ss.
+                 " movl $0x0044FFF0, %eax \n"
+                 " pushl %eax             \n"    //esp.
+                 " pushl $0x3200          \n"    //eflags.
+                 " pushl $0x1B            \n"    //cs.
+                 " pushl $0x00401000      \n"    //eip. 
+                 " iret \n" );
+*/		
+	
 fail:
     panic("executa_tarefa error: Return!");
     while(1){};    

@@ -1138,8 +1138,11 @@ void *CreatePageTable( unsigned long directory_address,
 // page frame support.
 //
 	
-void initializaFramesAlloc();	
-void *allocPages( int size );
+	
+void initializaFramesAlloc();
+void *newPageFrame();  //aloca apenas uma página.	
+void *allocPageFrames(int size);
+void *newPage();   //aloca uma página e retorna seu endereço virtual inicial
 void testingFrameAlloc();   //@todo: Rotina de teste. deletar.
 
 //

@@ -43,6 +43,40 @@
 #include <kernel.h>
 
 
+/*
+  @todo
+//  
+// ** CRIANDO O DIRETÓRIO RAIZ DO VFS BASEADO EM STREAMS **
+//
+
+//criando o diretório '/vfs'
+
+**/
+void fsCreateVFS()
+{
+    FILE *vfs;
+    char * vfs_root;
+  
+    //inicializa a estrutura ...
+    vfs = ( void* ) malloc( sizeof(struct _iobuf) );
+	if( (void*) vfs == NULL  ){
+		//die();
+	}	
+	
+	//aloca memória para o diretório raiz do vfs.
+    vfs_root = (char *) malloc(512*16);
+	
+	if( (char *) vfs_root == (char *) 0 ){
+		//die();
+	}else{	
+		vfs->_base = (char *) vfs_root;
+        //...
+	};
+};
+
+
+
+
 //Variáveis internas.
 //int fsStatus;
 //int fsError;

@@ -242,6 +242,7 @@ unsigned long system_procedure( struct window_d *window,
 					//if(CtrlStatus == 1){ active_window = 6; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
 					
+					
 				    testingFrameAlloc();
 					
 				    //init_clock(); //clock information

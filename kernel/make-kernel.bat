@@ -44,7 +44,7 @@ echo -{ ux3 /microkernel
 	rem começamos com os principais módulos do microkernel.
 	rem (head e microkernel)  
 	rem head.s
-	nasm  -I./k/microkernel/head/x86/  k/microkernel/head/x86/head.s  -felf -o head.o
+	nasm  -I./k/microkernel/head/x86/  k/microkernel/head/x86/head.s  -f elf -o head.o
     rem c. 
     gcc -c  k/microkernel/microkernel.c -I./include  -o microkernel.o
 	
