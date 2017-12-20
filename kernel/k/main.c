@@ -380,6 +380,7 @@ doDebug:
 	//   @todo: Deixar isso aqui.
 	//
 	
+	//isso está em ldisc.c
     ps2();	
 	
 	//

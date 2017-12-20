@@ -1139,7 +1139,12 @@ void *CreatePageTable( unsigned long directory_address,
 //
 // page frame support.
 //
-	
+
+
+
+int pfEmpty(struct page_frame_d *pf);
+void freePageframe(struct page_frame_d *pf);
+void notfreePageframe(struct page_frame_d *pf);	
 int firstSlotForAList(int size);	
 void initializeFramesAlloc();
 void *newPageFrame();  //aloca apenas uma página.	

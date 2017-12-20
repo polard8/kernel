@@ -1,5 +1,40 @@
+/*
+ * File: executive\dd\unblocked\keyboard.c
+ *
+ * Driver de teclado presente dentro do Kernel Base.
+ * Esse será o driver de teclado para o modelo abnt2.
+ *
+ * Ambiente: 
+ *     Kernel mode.
+ *
+ * Teclados usados:
+ *
+ * @todo: Fazer rotinas para identificar fabricante e modelo.
+ * @todo:
+ *     Gerenciamento de caracteres, linhas e listas de linhas. Como acontece
+ * no Unix, os caracteres recebidos aqui devem prosseguir até seu destino
+ * final. O que envolve, algum tipo de disciplina de linhas, lista encadeadas 
+ * de linha, emulador de terminal, fila do dispositivo gráfico, fila do
+ * processo.
+ * Obs: As listas de linhas ficam em lista encadeada, que provavelmente
+ * pertence ao processo que está manipulando linhas.
+ * Obs: A disciplica de linhas dentro do kernel serve também para movimentar
+ * linhas de caracteres entre kernel mode e user mode, alimentar buffers de
+ * dispositivos ou pegar linhas de caracteres nos buffers de dispositivos
+ * como NIC, (placa de rede).
+ *
+ * >>>>>>> Não é responsabilidade do driver de teclado
+ * encontrar o destino certo da mensagem, ele só precisa entregar ela pro
+ * serviço de sistema responsável.
+ *     
+ *
+ * Histórico: 
+ *     2005~2013 - Created by Fred nora.
+ *     2017      - Rotines was moved to ldisc.
+ *     ...
+ */
 
-//esse será o driver de teclado.
+ 
 #include <kernel.h>
 
 
@@ -68,11 +103,14 @@ void KiKeyboard()
 	};
 
     if(abnt2 != 1){
-	    panic("O teclado nao eh abnt2.");
+	    panic("The keyboard is not a abnt2 model.\n");
 	};
 
 done:
     return;
 };
 
+//
+//fim.
+//
 

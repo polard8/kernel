@@ -1427,7 +1427,7 @@ void initializeFramesAlloc()
 	pf->used = 1;
 	pf->magic = 1234;
 	pf->free = 0;  //not free
-	 
+	pf->next = NULL; 
 	//...	
 	
 	pageframeAllocList[0] = ( unsigned long ) pf; 
@@ -1545,6 +1545,37 @@ done:
 };
 
 
+//checar se a estrutura é nula
+int pfEmpty(struct page_frame_d *pf)
+{
+    return pf == NULL ? 1 : 0;
+}
+
+//selecionar o pageframe como livre.
+void freePageframe(struct page_frame_d *pf)
+{
+	if(pf == NULL){
+		return;  //fail	
+	}
+	    
+	//check
+    if( pf->used == 1 && pf->magic == 1234 ){
+	    pf->free = 1;
+	}		
+};
+
+//selecionar o pageframe como não livre.
+void notfreePageframe(struct page_frame_d *pf)
+{
+	if(pf == NULL){
+		return;  //fail	
+	}
+	    
+	//check
+    if( pf->used == 1 && pf->magic == 1234 ){
+	    pf->free = 0;
+	}		
+};
 
 //aloca apenas uma página e retorna o handle.
 void *newPageFrame()
@@ -1678,7 +1709,8 @@ void testingFrameAlloc()
 	
  					  
 	
-    Ret = (void*) allocPageFrames(500); //400 ??
+    //Ret = (void*) allocPageFrames(500);  // Funcionou com 500.
+	Ret = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
 	if( (void*) Ret == NULL ){
 	    printf("Ret fail\n");
         goto done;		
@@ -1715,14 +1747,16 @@ void testingFrameAlloc()
 	//fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
 	//fileret = fsLoadFile( "FERRIS  BMP", (unsigned long) Ret);
 	//fileret = fsLoadFile( "GOONIES BMP", (unsigned long) Ret);
-	fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
+	fileret = fsLoadFile( "BMP1    BMP", (unsigned long) Ret);  //LEVE PARA TESTES
 	if(fileret != 0)
 	{
 		//escrevendo string na janela
 	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
-        draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");		
+        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
+		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
 	}
 	bmpDisplayBMP( Ret, 0, 0, 0, 0 );
 	//scheduler_unlock();
