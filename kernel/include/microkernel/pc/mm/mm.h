@@ -536,8 +536,10 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //List.(1024 framepools de 4MB dá 4GB).
 #define FRAMEPOOL_COUNT_MAX 1024
 
+//#bugbug
+//@todo: Aumentar ...
 //Contagem de mmblock. 
-#define MMBLOCK_COUNT_MAX  256 
+#define MMBLOCK_COUNT_MAX  (2*4096)//4096 //512  //(1024)   256 
  
  
 #define PAGE_SIZE 0x1000    //4096.
@@ -875,23 +877,23 @@ struct page_frame_d
 	
 	//...
 	
-    unsigned long address;  //Endereço físico da page frame.	
+    //unsigned long address;  //Endereço físico da page frame.	
 	
 	//...
 	
 	//@todo
 	//'owner' A quem pertence a page frame.???user, group, process.
-	struct process_d *process;
+	//struct process_d *process;
 	//...
 	
 	//à qual pagetable pertence esse page frame.
-	struct page_table_d *pagetable;
+	//struct page_table_d *pagetable;
 	
 	//aspace associado à esse pageframe.
-	struct aspace_d *aspace;
+	//struct aspace_d *aspace;
 	
 	//area de disco associada à esse pageframe.
-	struct dspace_d *dspace;
+	//struct dspace_d *dspace;
 	
 	
 	//navegação
@@ -1138,8 +1140,8 @@ void *CreatePageTable( unsigned long directory_address,
 // page frame support.
 //
 	
-	
-void initializaFramesAlloc();
+int firstSlotForAList(int size);	
+void initializeFramesAlloc();
 void *newPageFrame();  //aloca apenas uma página.	
 void *allocPageFrames(int size);
 void *newPage();   //aloca uma página e retorna seu endereço virtual inicial

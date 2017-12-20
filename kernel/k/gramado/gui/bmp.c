@@ -35,6 +35,10 @@ extern void my_buffer_load_bitmap_16x16();
 
 
 //mostra na tela uma imagem bmp carregada na memória.
+//address = endereço base
+//x       = posicionamento 
+//y       = posicionamento
+// deletar w h
 void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, int height )
 {
 	int i, j, base, offset;
@@ -42,29 +46,73 @@ void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, 
 	unsigned long left, top, bottom;
 	
 	unsigned long color;
+	unsigned long Width;
+	unsigned long Height;
 	
-	base = 0x36;  //início da área de dados do bmp
+	
 	
 	//limits
 	
 	//@todo: Refazer isso
 	if( x > 800 ){ return; }
 	if( y > 600 ){ return; }
-	if( width > 800 ){ return; }
-	if( height > 600 ){ return; }
+	//if( width > 800 ){ return; }
+	//if( height > 600 ){ return; }
 	
-	left = x;    //
-	top  = y; 
-	bottom = top + height;
+	
+	//
+	// struct.
+	//
+	
+	//struct bmp_header_d *b;
+	struct bmp_infoheader_d *bi = (struct bmp_infoheader_d *) address;
+	
+	//bi = (void*) malloc( sizeof(struct bmp_infoheader_d) );
+	//.. check
 	
 	//base do bmp carregado na memória
 	unsigned char *bmp = (unsigned char *) address;
-	unsigned char *c   = (unsigned char *) &color;
+	unsigned char *c   = (unsigned char *) &color;	
+	//unsigned char *w   = (unsigned char *) &Width;
+	//unsigned char *h   = (unsigned char *) &Height;
 	
 	
-	for(i=0; i<height; i++)
+
+
+    // extract image height and width from header
+    Width  = *( unsigned long* )&bmp[18];
+    Height = *( unsigned long* )&bmp[22];	
+	
+	
+	bi->bmpWidth    = (unsigned long) Width;
+	bi->bmpHeight   = (unsigned long) Height;
+	//bi->bmpBitCount = (unsigned long)
+	
+	//unico suportado ainda.
+	if(bi->bmpBitCount != 24 ){
+		//fail
+	}
+	
+	
+	
+	
+	//
+	// Draw !
+	//
+	
+	left = x;    //
+	top  = y; 
+	//bottom = top + height;
+	bottom = (top + bi->bmpHeight );
+
+	
+	base = 0x36;  //início da área de dados do bmp
+	
+	for(i=0; i < bi->bmpHeight; i++)	
 	{
-		for(j=0; j<width; j++)
+		//#bugbug: 
+		//Precisa ser o valor encontrado na estrutura +1.
+		for(j=0; j < bi->bmpWidth; j++)	
 		{	
 			//construindo o char.
 			
@@ -90,6 +138,11 @@ void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, 
 		bottom = bottom-1;
 		left = x;    //reiniciamos o x.
 	};	
+	
+	
+	//Debug
+	
+	printf("w={%d} h={%d}\n",bi->bmpWidth ,bi->bmpHeight);
 	
 	return;
 };

@@ -1060,6 +1060,11 @@ int SetUpPaging()
     //taskman_page_directory[771] = (unsigned long) &pagedpool_page_table[0];      //Salva no diretório o endereço físico.
     //taskman_page_directory[771] = (unsigned long) taskman_page_directory[771] | 7;  //Configurando os atributos.		
 	
+	
+	
+	
+    	
+	
 
 	//
 	// @todo:  
@@ -1396,7 +1401,7 @@ done:
 
 
 //inicializa o framepool.
-void initializaFramesAlloc()
+void initializeFramesAlloc()
 {
 	int Index;
 	struct page_frame_d *pf;
@@ -1415,7 +1420,7 @@ void initializaFramesAlloc()
 	
 	pf = (void*) malloc( sizeof( struct page_frame_d ) );
 	if( pf == NULL ){
-		printf("initializaFramesAlloc:\n");
+		printf("initializeFramesAlloc:\n");
 		goto done;
 	};
 	pf->id = 0;
@@ -1457,11 +1462,7 @@ void *allocPageFrames(int size)
 	// Checando limites.
 	//
 	
-	
-//tentando novamente em outra região com blocos livres 
-//em quantidade suficiente.	
-tryNext:
-    printf("tryNext:\n");	
+    printf("allocPageFrames: Initializing ...\n");	
 
 	//problemas com o size.
 	if(size <= 0){
@@ -1481,66 +1482,37 @@ tryNext:
 		printf("allocPageFrames: size limits\n");
 		goto fail;
 	}
-
-	//
-	// Criando um condutor para a lista encadeada.
-	//
-
-	Conductor = (void*) newPageFrame();
-	if( Conductor == NULL ){
-	    //fail	
-		printf("allocPageFrames: 1\n");
-		goto fail;
-	}else{
-	    Count = 1;
-		
-		//Salvando.
-		//o ponteiro para a primeira páginas da lista.
-		//com base no ponteiro da estrutura do pageframe podemos 
-		//e no id podemos saber o endereço de memória virtual desse pageframe
-        Ret = (void*) Conductor;		
-	}
+	
 	
 	//
-	// Se estamos aqui é porque temos um Conductor.
+	// Isso encontra slots o suficiente para alocarmos tudo o que queremos.
 	//
-	
-goAhead:
-
-   //*importante:
-   //antes precisamos procurar uma região com slots livres e consecutivos.
-   //na quantidade suficiente.
-   //Se não encontrarmos , precisaremos de um novo condutor ...
-   //que é o primeiro da sequência de slots consecutivos.   
-	
-	if( Conductor->id >= PAGEFRAME_COUNT_MAX ){
-		printf("allocPageFrames: Conductor->id >= PAGEFRAME_COUNT_MAX\n");
+	int Base;
+	Base = firstSlotForAList(size);
+	if( Base == -1 ){
+		printf("Base = -1 \n");
 		goto fail;
 	}
 	
+    printf("allocPageFrames: for ...\n");		
+ 
 	//começamos a contar do frame logo após o condutor.
-	for(Index = (Conductor->id+1); Index < PAGEFRAME_COUNT_MAX; Index++)
+	for(Index = Base; Index < (Base+size+1); Index++)
 	{
 	    pf = (void*) pageframeAllocList[Index];
-		
-		//Se encontramos um slot não NULL é porque a 
-		//não temos slots conscutivos o suficiente.
-		if( pf != NULL ){
-			//#bugbug: isso pode dar um loop infinito ??
-			goto tryNext;
-		}
-			
-		
+				
 		//Slot livre
 		if( pf == NULL )
 		{
+			//#bugbug
+			//Isso pode esgotar o heap do kernel
 			pf = (void*) malloc( sizeof( struct page_frame_d ) );
 			if( pf == NULL ){
 				printf("allocPageFrames: 2\n");
 				goto fail;
 			};
 			
-			printf("#");
+			//printf("#");
 			pf->id = Index;
 			pf->used = 1;
 			pf->magic = 1234;
@@ -1551,19 +1523,21 @@ goAhead:
 			
 			Conductor->next = (void*) pf;
 			Conductor = (void*) Conductor->next;
+			
 			Count++;
-			if( Count >= size ){
+			if( Count >= size )
+			{
+				Ret = (void*) pageframeAllocList[Base];
 			    goto done;	
 			}	
 		};
-		
-		//base = (unsigned long) ( base + (New->id * 4096) );
-		//Continua ...
 	};
 	
-fail:	
+fail:
+    printf("allocPageFrames: fail ...\n");		
     return NULL;	
 done:
+    printf("allocPageFrames: done ...\n");	
     
 	//*Importante:
 	//retornaremos o endereço virtual inicial do primeiro pageframe da lista.
@@ -1648,6 +1622,39 @@ fail:
     return NULL;	
 };
 
+
+//retorna o primeiro indice de uma sequencia de slots livres.
+int firstSlotForAList(int size)
+{
+	int Index;
+	int Base = 0;
+	int Count = 0;
+    void *slot;
+	
+tryAgain:
+	
+	for( Index=Base; Index < 1024; Index++ )
+	{
+	    slot = (void*) pageframeAllocList[Index];
+		if( (void*) slot != NULL )
+		{
+			Base = Base+Count;
+			Base++;
+			Count = 0;
+			goto tryAgain;			
+		};
+		
+		Count++;       
+		if(Count >= size){
+			return (int) Base;
+		}
+	};
+     	
+fail:		
+    return (int) -1;		
+};
+
+
  //@todo: Rotina de teste. deletar.
 void testingFrameAlloc()
 {
@@ -1660,6 +1667,8 @@ void testingFrameAlloc()
 	struct page_frame_d *Ret;
 	
 	
+	//#bugbug .;;;: mais que 100 dá erro ...
+	//@todo: melhorar o código de alocação de páginas.
 	printf("testingFrameAlloc: #100\n");
 	
 	
@@ -1669,7 +1678,7 @@ void testingFrameAlloc()
 	
  					  
 	
-    Ret = (void*) allocPageFrames(100); //400 ??
+    Ret = (void*) allocPageFrames(500); //400 ??
 	if( (void*) Ret == NULL ){
 	    printf("Ret fail\n");
         goto done;		
@@ -1694,22 +1703,28 @@ void testingFrameAlloc()
 	// @todo: Carregar a estrelinha e usar como ponteiro de mouse.
 	//
 	//janela de test
-    CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
-	              (10-5), (10-5), (309+10), (325+10), 
-				  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
+    //CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
+	//              (10-5), (10-5), (376+10), (156+10), 
+	//			  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
 	
 	
 	unsigned long fileret;
 		
 	//taskswitch_lock();
 	//scheduler_lock();
-	fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "FERRIS  BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "GOONIES BMP", (unsigned long) Ret);
+	fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
 	if(fileret != 0)
 	{
 		//escrevendo string na janela
-	    draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");  	
+	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
+        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
+		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
+        draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");		
 	}
-	bmpDisplayBMP( Ret, 10, 10, 309, 325 );
+	bmpDisplayBMP( Ret, 0, 0, 0, 0 );
 	//scheduler_unlock();
 	//taskswitch_unlock();
 
@@ -1721,6 +1736,8 @@ done:
     printf("done\n");
     return;	
 };
+
+
 
 //
 // End.

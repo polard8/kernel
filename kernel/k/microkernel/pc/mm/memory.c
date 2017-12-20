@@ -443,6 +443,8 @@ try_again:
 
     mmblockCount++;  
     
+	//#bugbug
+	//mesmo tendo espaço suficiente no heap, esta,os chegando nesse limite de indices.
 	//Obs: Temos um limite para a quantidade de índices na lista de blocos.
 	if( mmblockCount >= MMBLOCK_COUNT_MAX ){
         printf("AllocateHeap Error: mmblockCount limits!");
@@ -1068,7 +1070,7 @@ int init_mm()
 
 	
 	//inicializando o framepool (paged pool)
-	initializaFramesAlloc();
+	initializeFramesAlloc();
 	
 	//
 	// Continua...
