@@ -668,7 +668,7 @@ void outbyte(int c)
        
     
     //Início da próxima linha.    
-    if( c == '\n' && prev != '\r' ) 
+    if( c == '\n' && prev == '\r' ) 
     {
         g_cursor_y++;
         g_cursor_x = g_cursor_left;  //0
@@ -677,7 +677,7 @@ void outbyte(int c)
     };
         
     //Próxima linha.
-	if( c == '\n' && prev == '\r' ) 
+	if( c == '\n' && prev != '\r' ) 
     {
         g_cursor_y++;
         prev = c;
@@ -812,6 +812,7 @@ void _outbyte(int c)
 		    //@todo: Listar aqui os modos VESA.
 		    case 1:
 			      my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
+				  
 			      //my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
 				  //my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
 			    break;
@@ -946,6 +947,7 @@ done:
 
 /*
  * input:
+ *     ****** >>>> devemos nos certificar que input(.) não imprima nada.
  *     Coloca os caracteres digitados em um buffer, (string). Para depois 
  * comparar a string com outra string, que é um comando.
  * 
@@ -956,7 +958,7 @@ done:
  */
 unsigned long input(unsigned long ch)
 {   
-	char c = (char) ch;  //Converte 'unsigned long' em 'char'.
+	char c = (char) ch;  //Converte 'unsigned long' em 'char'.	
 	
     //Limite.
 	if(prompt_pos >= PROMPT_SIZE){ 
@@ -986,9 +988,7 @@ unsigned long input(unsigned long ch)
 			    prompt[prompt_pos] = (char )'\r';
                 prompt_pos++;
 				prompt[prompt_pos] = (char )'\n';
-				prompt_pos++;
-				printf("\r");
-				printf("\n"); 				
+				prompt_pos++;				
 			};			
 		    break;
 
@@ -1004,17 +1004,6 @@ unsigned long input(unsigned long ch)
 			//Apaga o anterior (no buffer).
 			prompt_pos--;
 			prompt[prompt_pos] = (char ) '\0';
-			
-			//Apaga o atual no Backbuffer.
-			printf("%c",' ');
-			
-			//Apaga o anterior no Backbuffer.
-			g_cursor_x--;
-			g_cursor_x--;
-			//printf("%c",' ');
-			
-			//Volta o cursor.
-			//g_cursor_x--;
 			break;
 			
 		//...	
@@ -1022,10 +1011,7 @@ unsigned long input(unsigned long ch)
         //Para qualquer caractere que não sejam os especiais tratados acima.		
 		default:
 		    prompt[prompt_pos] = c;
-		    prompt_pos++;          //incrementa fila.
-			putchar(c);
-			//printf("%c",' ');
-			//g_cursor_x--;
+		    prompt_pos++;          //incrementa fila
 			break;
 	};
 	

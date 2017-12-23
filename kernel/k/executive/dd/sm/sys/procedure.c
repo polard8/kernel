@@ -90,7 +90,7 @@ unsigned long system_procedure( struct window_d *window,
 	//...
 	
 	//usado no refresh_rectangle
-	unsigned long saveX, saveY;
+	//unsigned long saveX, saveY;
 	
 
 	//Get status.
@@ -128,6 +128,8 @@ unsigned long system_procedure( struct window_d *window,
 				
 				case VK_RETURN:
 				   //input esta em stdio.c
+				    printf("\r");
+					printf("\n");
 					input( (unsigned long) long1);  
 					goto done;
 					break;				
@@ -135,18 +137,27 @@ unsigned long system_procedure( struct window_d *window,
                 default:
 			        if( (void*) w != NULL )
 			        {
-			            //saveX = g_cursor_x;
-			            //saveY = g_cursor_y;
-			            //printf("%c", (char) long1);
-		                
-						input( (unsigned long) long1);      //Coloca no stdin
-						//refresh ... toda a janela com foco de entrada.
-				        refresh_rectangle( w->x, w->y, w->width, w->height );
+						//
+						// *importante:
+						// Podemos imprimir nesse momento, pois a impressão está correta e 
+						// deixarmos o input sem imprimir. o que parece ser normal, input
+						// apenas por dentro do buffer.
+						//
 						
-						//#bugbug: a rotina de input tambem está imprimindo ..
-						//ai imprime dobrado ..
-						// a rotina de inmput não pode imprimir. @todo: retirar do input a impresssão.
-						//input( (unsigned long) long1);      //Coloca no stdin
+						//printf deve imprimir no caso de tab ou espaço...
+						//input só vai mexer com o buffer
+	
+	                    //isso funciona porque printf incrementa o cursor antes de imprimir o char 
+						//no backbuffer. Tem caso que ele manipula o cursor e não imprime nada.
+						printf("%c", (char) long1);
+		                refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+						
+			            //
+						// input:
+						// Devemos nos certificar que input não imprima nada.
+						//
+						input( (unsigned long) long1);      //Coloca no stdin
+					
 						goto done;
 			        };
                     break; 
