@@ -443,28 +443,37 @@ struct process_d
 	//Muitas informações sobre a memória usada pro um processo.
 	//struct process_memory_info_d *processMemoryInfo;
 	
+	
+	//Image support.
+	
+	unsigned long Image;          //Base da imagem do processo.
+	unsigned long ImageSize;      //Tamanho da imagem do processo.
+
 	/*
 	 * Heap. 
 	 */
-	//struct heap_d *processHeap; //@todo: Usar essa estrutura.
 
-	unsigned long Heap;           //Endereço do início do Heap do processo.
-	unsigned long HeapSize;       //Tamanho do heap.
-	unsigned long HeapPointer;    //Ponteiro do heap do processo para o próxima alocação.
-	unsigned long HeapLastValid;  //Último ponteiro válido.
-	unsigned long HeapLastSize;   //Último tamanho alocado..	
+	unsigned long Heap;            //Endereço do início do Heap do processo.
+	unsigned long HeapEnd;
+	unsigned long HeapSize;        //Tamanho do heap.
+	
+	//?? Isso serve para manipulação do heap do processo.
+	unsigned long HeapPointer;     //Ponteiro do heap do processo para o próxima alocação.
+	unsigned long HeapLastValid;   //Último ponteiro válido.
+	unsigned long HeapLastSize;    //Último tamanho alocado..	
+	//struct heap_d *processHeap;  //@todo: Usar essa estrutura.
+
 	
 	/*
-	 *  Stack and ImageAddres. 
+	 *  Stack 
 	 */	
-	//struct stack_d *processStack;  //@todo: Criar essa estrutura.
 	
-	unsigned long StackOffset;    //Deslocamento da pilha em relação ao início do kernel.
 	unsigned long Stack;          //Endereço do início da Stack do processo.
+	unsigned long StackEnd;
 	unsigned long StackSize;      //Tamanho da pilha.	
-	unsigned long Image;          //Base da imagem do processo.
-	unsigned long ImageSize;      //Tamanho da imagem do processo.
-	
+	unsigned long StackOffset;    //Deslocamento da pilha em relação ao início do kernel.	
+	//struct stack_d *processStack;  //@todo: Criar essa estrutura.
+
 	
 	//IOPL of the task. (ring).
 	unsigned long iopl;      

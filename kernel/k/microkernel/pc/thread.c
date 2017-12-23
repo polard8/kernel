@@ -543,6 +543,7 @@ void show_thread_information()
 //Done.	
 done:	
     printf("Done.\n");
+	refresh_screen();
 	return;
 };
 

@@ -690,292 +690,36 @@ done:
 		//A intenção é que essa mensagem chegue no procedimento do sistema.
 		//Porem o sistema tambem deve saber quem está enviando esse pedido.@todo.
 		//@todo: podemos O reboot pode ser feito através de um utilitário em user mode.
-	if( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
-	{
+			
+	
 		//Uma opção aqui, é enviar para o aplicativo uma mensagem de reboot.
 		//como o aplicativo não trata esse tipo de mensagem ele apenas reecaminha 
 		//para o procedimentod e janelas do sistema.
+	
+	if( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) ){
 		services( SYS_REBOOT, 0, 0, 0);
 	};
 
-	
-	//
-	// ?? Dúvida: E se o aplicativo em user mode não tem janela,
-	// para onde vai as mensagens de digitações que são recebidas 
-	// pelas rotinas de input dos aplicativos ?? Onde as rotinas 
-	// de input dos aplcativos de console pegam suas mensagens??
-	// ?? Ou seja: ?? Qual é a janela que recebe mensagens quando 
-	// o aplicativo que está rodando é um aplicativo de console??
-	// >>> A solução seria enviar a mensagem para a janela de terminal
-	// criada pelo kernel para o aplicativo de console... Desse modo 
-	// até um aplicativo de console terá uma janela de associada a ele.
-	// podendo enviar mensagens para ela, e receber mensagens através da
-	// fila de mensagens da janela.
-	// Obs: Quando um aplicativo de console recebe tempo de processamento,
-	// sua janela pode ou não estar com o foco de entrada, pois aplicativos 
-	// podem rodar em segundo plano, até mesmo minimizados.
-	// ?? Pergunta: ?? como fazer então para enviar mensagens para janelas de 
-	// aplicativos que estão rodando em segundo plano, sem o foco de entrada??
-	// >> As mensagens que vem com o destinatário explicitado são mais fáceis de 
-    // serem enviadas. Para isso podemos utilizar canais de mensagens que 
-	// indiquem quem são as janelas do emissor e do receptor. 
-	// No caso de mensagens enviadas entre processos, os processos serão 
-	// os emossores e receptores da mensagem, nesse caso então a mensagem 
-	// será enviada à janela principal do processo emissor. Para isso 
-	// na estrutura de processo deve ter um ponteiro para a janela principal,
-	// que será responsávem por receber as emnsagens no caso de uma comunicação entre 
-	// processos... Até mesmo para os casos mais simples onde o kernel envia mensagens 
-	// para  ajanela de um processo, poderíamos abrir um canal de comunicação, 
-	// onde o processo kernel seria o emissor da mensagem.
-	//
-	//
-	
-	//
-    // Obs: NÃO É ATRIBUIÇÃO DO DRIVER DE TECLADO SABER INFORMAÇÕES
-    // SOBRE AS JANELAS, ENTÃO UM DRIVER DE TECLADO DEVE ENVIAR A
-    // MENSAGEM PARA UM GERENCIADOR DE MENSAGENS QUE COLOCARÁ A MENSAGEM
-    // EM SEU DEVIDO LUGAR. (Fila de mensagens da janela com o foco de entrada.)
-    // o GERENTE DE JANELAS (window.c) ENCONTRA A JANELA COM O FOCO DE ENTRADA.
-	// >>>> Um driver de teclado deve enviar a mensagem para um serviço do sistema
-	// que decidirá o que fazer com ela. Não é responsabilidade do driver de teclado
-	// encontrar o destino certo da mensagem, ele só precisa entregar ela pro
-	//serviço de sistema responsável.
-	//
 
-	// 
-    //>>>>isso é o que um driver deve fazer.. apenas solicitar o serviço.
-	//
-	
-	//driver de teclado >> serviço do kernel >> classe do serviço.
-	
-	//Obs: um teclado virtual pode simular essas mensagens
-	//apenas chamando essa rotina de serviços.
-	
-	
-	//test. TEM QUE MOSTRAR PARA TERMINAR O DRIVER DE TECLADO.
-	//printf("%c", ch);
-	
-	//Escrevendo na tela do desenvolvedor.
-	//Isso será portado para outro módulo. está aqui para teste. 
-	
-	/*
-	if( (void*) gui->DEVELOPERSCREEN == NULL)
-	{
-        printf("abnt2_keyboard_handler: gui->DEVELOPERSCREEN");	
-        refresh_screen();
-        while(1){}		
-	}else{
-		
-		//Cursor.
-		//g_cursor_x = gui->DEVELOPERSCREEN->cursor_x;
-		//g_cursor_y = gui->DEVELOPERSCREEN->cursor_y;
-		//printf("%c", ch);
-		//@todo: Não está incrementando a escrita ...
-	};
-	*/
-	
-	//69 ??
-	//Enviando mensagem pra janela com o foco de entrada.
-	//#bugbug Error: O driver de teclado não deve saber qual é a janela com foco de 
-	//entrada.. ele deve enviar essa mensagem para o kernel e o kernel 
-	//decide quem é a janela com o foco de entrada e encameinha a mensagem para 
-	//a fila da janela com o o foco de entrada.
-	
-	//services( 69, (unsigned long) mensagem, (unsigned long) ch, (unsigned long) ch);
-
-	//
-	// Obs: estamos enviando a messagem para 2 procedimentos,
-	// mas o procedimento do sistema não trada digitações de teclas comuns. 
-	// Obs: O que estamos fazendo aqui é chamarmos o procedimento de janela do sistema
-	//e em seguida colocarmos a mensagem na fila da janela com o foco de entrada.
-	// Obs: Uma opção seria não chamarmos o procedimento de janela do sistema agora e
-	// e sim apenas colocarmos a mensagem na fila da janela com o foco de entrada.
-	// Daí então, quando o aplicativo em user mode receber a mensagem, ele trata a 
-	// a mensagem ou reencaminha para o procedimento de janela do sistema através de uma 
-	// system call.
-	// *Importante; Uma chamada ao procedimento de janela do sistema nesse momento,
-	// so atrasa o recebimento da mensagem por parte do aplicativo em user mode.
-    // bom seria que o aplicativo rebece a mensagem antes de chamar o procedimento de 
-    // de janela para tratar as mensagens de sistema. Isso privilegia as teclas de digitação
-	// em detrimento das teclas de acionamento de controles.
-	//
-	//
-	
-	//
-	// ?? PORQUE O HANDLE DE JANELA É NULO AQUI ??
-	//
-	// DEVEMOS CHAMAR O PROCEDIMENTO DO SISTEMA PARA ATUAR EM ALGUMA JANELA.
-	//
-	
-	
-	//teste:
-	// o procedimento de janela do sistema afetara a janela com o foco de entrada.
-	
-    //#bugbug : ?? o ldisc deveria ter essa informação toda sobre janelas ??
-	struct window_d *wwf;
-	wwf = (void *) windowList[window_with_focus];
-	
-	if( (void*) wwf != NULL ){
-	    system_procedure( wwf, (int) mensagem, (unsigned long) ch, (unsigned long) ch );
-    }					 
-	
-	
-	//test
-	//@todo: #bugbug Lembrando que um driver ainda não tem acesso abertos
-	//a essa função... uma chada à essa função deve ser criada na API usada pelo driver.
-	//windowSendMessage( (unsigned long) 0,
-	//		           (unsigned long) mensagem, //msg
-	//				   (unsigned long) ch,
-	//				   (unsigned long) ch );
-	
-
-	//*Importante: se nenhuma janela tem o foco de entrada, não há porque 
-	//enviar uma mensagem para a janela com o foco de entrada.
-	
-	
-	/*
-	 * Importante: Nesse caso podemos abrir um canal de comunicação,
-	 * onde o kernel é o emissor da mensagem.
-	 */
-	
 	struct window_d *w;
+	w = (void *) windowList[window_with_focus];
 	
-	w = (void*) windowList[window_with_focus];
-	
-	//Somente destituimos o foco se a janela for válida.
-    //Isso envia uma mensagem para a janela com o foco de entrada.
-	//se nenhuma janela tem o foco de entrada então apenas retorna.			
 	if( (void*) w != NULL )
-	{	    
+	{
+		//
+		// * Imprime os caracteres na janela com o focod e entrada.
+		//
+		
+	    system_procedure( w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );
+		
+		//
+		// Envia as mensagens para os aplicativos intercepta-las
+		//
+		
 		if( w->used == 1 && w->magic == 1234 ){
 	        windowSendMessage( 0, mensagem, ch, ch);
-		};			    	
-	};		
-	
-    //
-    // @todo: ENVIANDO A MENSAGEM PARA O GERENCIADOR DE MENSAGENS.
-    //	
-
-	/*
-	 * Quem é o cliente?
-	 * ================
-	 *     O cliente é o processo que é o dono da janela com o
-	 * foco de entrada.
-	 *     Identificando a janela com o foco de entrada, sabemos
-	 * quem é o processo cliente.
-	 *  Obs: A janela com o foco de entrada nem sempre é a janela ativa,
-	 * pode ser também uma janela filha da janela ativa.
-	 * Mas até mesmo a janela filha de uma janela ativa está vinculada
-	 * ao processo cliente.
-	 */
-
-    /*
-	 * Sobre a fila de mensagem da janela com o foco de entrada:
-     * ========================================================
-     *  *IMPORTANTE: 
-	 *      O que importa é qual janela está com o foco de entrada.
-	 *      Quando sabemos qual janela está com o foco de entrada, então
-	 * sabemos qual é a janela que é a área de cliente, sabemos e provavelmente
-	 * a sua janela mãe é a janela ativa, se ela mesma não for a janela ativa.
-	 *      Uma mensagem pode ser enviada para a janela com o foco de entrada,
-	 * e a mensagem afetará apenas a janela com o foco de entrada.
-	 *      Se a janela que receber a mensagem for a janela ativa, ela não
-	 * terá janela mãe, nessa caso uma mensagem para fechar uma janela ativa
-	 * implica em fechar o processo ao qual ela está vinculada.
-	 *      Não importa qual processo foi interrompida pela interrupção de 
-	 * teclado. A mensagem deve ir para a fila de mensagens da janela com o foco
-	 * de entrada.
-	 */
-
-
-	/*
-	 * Sobre a escolha do procedimento de janela:
-	 * =========================================
-     * Procedimento de janela.
-	 *     Se o próximo procedimento for o procedimento do sistema
-	 *     dispacha para ele.
-	 *     Chama o próximo procedimento, passando os argumentos pra ele.
-	 *     *IMPORTANTE: É importante saber qual é a janela ativa
-	 *     pra enviar a mensagem para o procedimento de janela certo
-	 *     e enviar todos os 4 parametros.
-     */
-
-
-
-
-    //
-	// @todo:
-	// Obs: Aqui estamos enviando diretamente para um procedimento de janela,
- 	//     mas o certo é colocar na fila da janela com o foco de entrada.    
-	//
-
-	//Se for o procedimento padrão. 
-	//if( g_next_proc == (unsigned long) &system_procedure )
-	//{
-	//	//@todo: Aqui janela tem que ser NULL.
-	//	system_procedure( NULL, (int) mensagem, (unsigned long) ch, 0);
-	//    //goto eoi;
-	//};
-
-	//Se NÃO for o procedimento padrão. 
-	//if( g_next_proc != (unsigned long) &system_procedure )
-	//{
-
-		//
-		// @todo: 
-		// Na verdade, aqui tem que mandar a mensage para a janela com o foco 
-		// de entrada, mesmo que seja uma janela filha.
-		// 
-
-	//	wFocus = (void *) WindowWithFocus;
-	//	CurrentWindow = (void *) WindowWithFocus;
-
-		//
-		// A janela atual, seria a janela ativa ?
-		//
-
-		//
-		// Estamos apenas enviando para a janela com foco de entrada.
-		//
-
-    //    if( (void*) wFocus == NULL ){			
-    //        system_dispatch_to_procedure( NULL, (int) mensagem, (unsigned long) ch, 0);
-	//	}else{
-
-			//Valida a estrutura da janela com o foco de entrada.
-	//		if( wFocus->used == 1 && wFocus->magic == 1234 )
-	//		{		
-				//Estamos enviando a mensagem para a estrutura da janela 
-				//com o foco de entrada.
-	//			wFocus->msg_window = (void*) wFocus;
-	//			wFocus->msg = (int)	mensagem;
-	//			wFocus->long1 = (unsigned long) ch;
-	//			wFocus->long2 = (unsigned long)0;  //Ainda não implementada.
-
-				//...
-
-				//@todo: Precisamos identificar que é a janela mãe
-				//e qual é processo ao qual essa janela está vinvulada.
-
-	//		} 	
-
-	//		system_dispatch_to_procedure( wFocus, (int) mensagem, (unsigned long) ch, 0);
-	//	}
-
-		//Nothing.
-
-		//goto eoi;
-	//};
-
-
-	/*
-	 * IPC stuffs
-	 * enviando para uma area de memoria compartilhada.
-	 * ipc_dispatch_message( WindowProcedure->window,
-			                 WindowProcedure->msg,
-							 WindowProcedure->long1,
-							 WindowProcedure->long2 );
-	 */
+		};			
+	};
 
 eoi:
     outportb(0x20, 0x20);    //EOI.

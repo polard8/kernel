@@ -1579,6 +1579,7 @@ void systemShowDevicesInfo()
 	
 done:
     printf("done.\n");
+	refresh_screen();
     return;
 }; 
  

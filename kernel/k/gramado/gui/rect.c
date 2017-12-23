@@ -46,6 +46,39 @@ void rectDrawRectangleWindowBuffer(struct window_d *window,
 }
 */
 
+
+/* 
+void rectDrawRectangle( struct window_d *window, struct rect_d *rect);
+void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
+{
+	struct window_d *hwndDesktop;
+	
+    hwndDesktop = guiGetMainWindow();
+	
+	// Criaremos o retângulo na janela principal caso o ponteiro 
+	//passado seja inválido.
+	
+    if( (void*) window == NULL ){
+        window = hwndDesktop;
+    };
+
+    unsigned long x; 
+    unsigned long y; 
+	unsigned long width; 
+	unsigned long height; 
+	unsigned long color;
+
+    x      = window->left + rect->x;	
+	y      = window->top + rect->y;
+	width  = rect->width;
+	height = rect->height;
+	color = rect->color_bg;
+	
+    drawDataRectangle( x, y, width, height, color );
+	
+}						
+*/
+
  
 /*
  * drawDataRectangle:
@@ -54,6 +87,8 @@ void rectDrawRectangleWindowBuffer(struct window_d *window,
  *     @todo: Criar rotina para pintar um retângulo em um buffer dedicado.
  *            Toda janela tem um buffer dedicado. O BackBuffer é o buffer
  * dedicado da janela principal. 'gui->main'
+ *
+ *
  */
 void drawDataRectangle( unsigned long x, 
                         unsigned long y, 
@@ -147,31 +182,97 @@ void setClientAreaRect( unsigned long x,
 };
 
 
-/*
-int rectInit()
-{}  
-*/
-
 					
-//copiar apenas um retângulo do backbuffer para o frintbuffer.						
+
+
+
+//
+//===============================================================
+// refresh rect - Fred. P.
+//
+
+
+
+
+
+//extern void* frmbuffptr;
+//extern void* backbuffptr;
+//extern unsigned int screen_width, screen_height;
+
+
+
+
+//
+// @todo:
+// Nessa macro podemos usar variáveis globais e inicializar
+// essas variável. E considerarmos valores como g_bpp, g_screen_width. 
+//
+
+#define BUFFER_PIXEL_OFFSET(x,y) \
+( (3*800*(y)) + (3*(x)) )
+
+//#define RGB_PIXEL_OFFSET(x,y) \
+//( (3*800*(y)) + (3*(x)) )
+
+// @todo:
+// Fazer assim ...
+
+//
+// #define RGB_PIXEL_OFFSET(x,y) \
+// ( (3*screenGetWidth()*(y)) + (3*(x)) )
+//
+// #define RGB_PIXEL_OFFSET(x,y) \
+// ( ( screenGetBPP() * screenGetWidth()*(y)) + ( screenGetBPP() *(x)) )
+
+// #define RGB_PIXEL_OFFSET(x,y) \
+// ( ( g_bpp * g_screen_width *(y)) + ( g_bpp *(x)) )
+
+//================================================
+
+
+/*
+ * refresh_rectangle:
+ *     Copiar um retângulo do backbuffer para o frontbuffer.   
+ * 
+ * Histórico:
+ *     2017 - Criado por Frederico Lamberti Pissarra.
+ *     2017 - Revisão. 
+ */					
 void refresh_rectangle( unsigned long x, 
                         unsigned long y, 
 						unsigned long width, 
 						unsigned long height )
-{
-    vsync();
-    
-    //calcular quantos bytes tem no retângulo	
-    int i;
-	unsigned long color;
+{    
+	void *p = (void*) FRONTBUFFER_ADDRESS;		
+	void *q = (void*) BACKBUFFER_ADDRESS;
+
+	unsigned int line_size, lines;
+	unsigned int offset;
+	unsigned long Width  = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();	
+
+	line_size = (unsigned int) width; 
+	lines     = (unsigned int) height;
+	offset    = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	p = (void*) (p + offset);    
+	q = (void*) (q + offset);    
+	 
+    vsync();	
 	
-    for(i=0; i< (width*height*3); i++)
-	{
-		color = (unsigned long) get_pixel( x, y );
-	    refresh_pixel(  x,  y, color );
-	}	
+	unsigned int i;
+	for( i = 0; i < lines; i++ ){
+		memcpy( p, q, (line_size*3) );
+		q += (Width*3);
+		p += (Width*3);
+	};	
 };
 
+
+
+/*
+int rectInit()
+{}  
+*/
 
 
 

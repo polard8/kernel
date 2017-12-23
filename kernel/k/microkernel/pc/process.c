@@ -357,6 +357,10 @@ get_next:
 		//        Os endereços virtuais dessas areas dos processos são sempre os mesmos.
 		//        mas os endereços físicos dessas areas variam de processo pra processo.
 		//
+
+		//Imagem do processo.
+		Process->Image       = UPROCESS_IMAGE_BASE;           //Base da imagem do processo.
+	    //Process->ImageSize = 0;                             //Tamanho da imagem do processo.	    
 		
 		
 		//
@@ -370,31 +374,35 @@ get_next:
 		// o mesmo endereço de heap e stack.
 		//
 		
-		//Heap and Stack. (endereços virtuais).
+		//Heap and Stack. 
+		// ** (endereços virtuais). **
+		
 	    Process->Heap        = UPROCESS_DEFAULT_HEAP_BASE;    //Endereço do início do Heap do processo.
-	    Process->HeapSize    = UPROCESS_DEFAULT_HEAP_SIZE;    //Tamanho do heap.
-	    
-		Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
-	    Process->StackSize   = UPROCESS_DEFAULT_STACK_SIZE;   //Tamanho da pilha.	
-	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo. ??
-	    
+	    Process->HeapEnd = 0;
+		Process->HeapSize    = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    //Tamanho do heap, dado em KB.
+
 		//Process->HeapPointer
 		//Process->HeapLastValid
 		//Process->HeapLastSize
-		
-		//Imagem do processo.
-		Process->Image       = UPROCESS_IMAGE_BASE;           //Base da imagem do processo.
-	    //Process->ImageSize = 0;                             //Tamanho da imagem do processo.	    
+	    
+		Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
+	    Process->StackEnd = 0;
+		Process->StackSize   = (UPROCESS_DEFAULT_STACK_SIZE/1024);   //Tamanho da pilha,dada em KB.	
+	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo. ??
+	    
 
 		//
 		// iopl: 
 		// @todo: Isso deveria ser passado por argumento ou ser configurado depois.
 		// Cada processo tem um iopl diferente. Deve-se passar isso via argumento.
-		// ou reconfigurar depois. O erro aquié atribuir a todo processo criado
+		// ou reconfigurar depois. O erro aqui é atribuir a todo processo criado
         // o mesmo iopl.  		
 		//
-		Process->iopl = RING0;    //Kernel mode. 
-
+		
+		Process->iopl = RING3;
+		//Process->iopl = RING0;    //Kernel mode. 
+        
+		
 	    //PPL - (Process Permition Level).(gdef.h)
         //Determina as camadas de software que um processo terá acesso irrestrito.
 	    //Process->ppl = pplK0;
@@ -937,7 +945,7 @@ void show_process_information()
 	
 	//Struct.
 	Current = (void*) processList[current_process];
-	if( (void*) Current == NULL){
+	if( (void*) Current == NULL ){
 	    printf("show_process_information:\n");
         return; 		
 	}else{
@@ -955,9 +963,9 @@ void show_process_information()
 		//Directory Address. *IMPORTANTE.
 		printf("CurrentProcessDirectoryAddress={%x} \n",Current->Directory);		
 		
-		//Stack and Heap.
-		printf("Stack={%x} StackSize={%x} \n",Current->Stack ,Current->StackSize);
-		printf("Heap={%x}  HeapSize={%x}  \n",Current->Heap  ,Current->HeapSize );
+		//Heap and stack.
+		printf("Heap={%x}  HeapSize={%d KB}  \n",Current->Heap  , Current->HeapSize );
+		printf("Stack={%x} StackSize={%d KB} \n",Current->Stack , Current->StackSize );
 		
 		//...
 	};
@@ -988,6 +996,7 @@ void show_process_information()
 	
 done:	
     printf("Done.\n");
+	refresh_screen();
 	return;
 };
 

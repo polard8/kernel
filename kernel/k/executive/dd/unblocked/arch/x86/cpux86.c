@@ -408,6 +408,8 @@ void show_cpu_intel_parameters()
 //	
 
 done:
+    //como não usa janelas devemos dar refresh na tela todo por enquanto.
+	refresh_screen();
 	return;
 };
 

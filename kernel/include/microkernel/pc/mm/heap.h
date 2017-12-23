@@ -14,7 +14,7 @@
  
 //@todo: diminuir
 //Contagem de heap.
-#define HEAP_COUNT_MAX  256  //32  16  (8)
+#define HEAP_COUNT_MAX  8 //256  //32  16  (8)
 
 //kernel heap.(Endereço virtual do heap do processo Kernel).
 //O heap deve começa depois do kernel e antes da pilha..

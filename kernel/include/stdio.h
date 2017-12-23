@@ -288,6 +288,15 @@
   First the string str is printed followed by a colon and then a space.
 */ 
  
+ 
+//
+// input() support
+// 
+
+#define INPUT_MODE_LINE                0
+#define INPUT_MODE_MULTIPLE_LINES      1
+int g_inputmode;
+ 
 // 
 //printf support 
 //

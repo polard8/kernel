@@ -13,6 +13,20 @@
  *     Versão: 1.0, 2016 - Revisão.
  */
  
+ 
+//used
+#define WINDOW_NOTUSED   0
+#define WINDOW_USED      1
+#define WINDOW_GC        216   //Sinalizada para o GC.
+//...
+
+//magic
+#define WINDOW_NOTMAGIC  0
+#define WINDOW_MAGIC     1234 
+#define WINDOW_CLOSED    4321
+//... 
+ 
+ 
 //desktop window. (Área de trabalho) 
 //#define MAINWINDOW_DEFAULTX  ?
 //#define MAINWINDOW_DEFAULTY  ?
@@ -32,6 +46,7 @@
 //#define DEFAULT_SCREEN_HEIGHT 600
  
 // Número máximo de janelas.
+//@todo: Aumentar esse tamanho.
 #define WINDOW_COUNT_MAX 256
 #define MAX_WINDOWS WINDOW_COUNT_MAX 
 
@@ -101,9 +116,9 @@
  */
 #define WT_NULL          0 
 #define WT_SIMPLE        1
-#define WT_EDITBOX       2 // igual simples, mais uma bordinha preta.
-#define WT_OVERLAPPED    3 //sobreposta(completa)(barra de titulo + borda +client area)
-#define WT_POPUP         4 //um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
+#define WT_EDITBOX       2  // igual simples, mais uma bordinha preta.
+#define WT_OVERLAPPED    3  // sobreposta(completa)(barra de titulo + borda +client area)
+#define WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
 //#define WT_BUTTON_DOWN   5 // cancelado
 //#define WT_BUTTON_UP     6 // cancelado
 
@@ -1206,8 +1221,11 @@ struct window_d
     struct window_procedure_d *wProcedure; //procedure struct
 	//unsigned long Icon;
 	//unsigned long Cursor;    //@todo: Criar cursorx e cursory.
-	//unsigned long CursorX;
-	//unsigned long CursorY;
+	
+	unsigned long CursorX;
+	unsigned long CursorY;
+	unsigned long CursorColor;
+	
 	//unsigned long Background;
 	//int instance; //???	
 	
@@ -2216,13 +2234,17 @@ void my_buffer_char_blt( unsigned long x,
 unsigned long get_pixel( unsigned long x,  unsigned long y );
 
 //envia um pixel do backbuffer para o frontbuffer
-void refresh_pixel( unsigned long x,  unsigned long y, unsigned long color );
+void refresh_pixel( unsigned long x,  unsigned long y );
 
+void refresh_horizontal_line( unsigned long x1,
+                              unsigned long y, 
+			  				  unsigned long x2 );
+							  
 //envia um retângulo do backbuffer para o frontbuffer
 void refresh_rectangle( unsigned long x, 
                         unsigned long y, 
 						unsigned long width, 
-						unsigned long height );
+						unsigned long height );					
 
 	
 //Pinta um pixel em um buffer de janela.
@@ -2277,7 +2299,7 @@ int is_window_minimized(struct window_d *window);
 
 int get_active_window();
 void set_active_window(struct window_d *window);
-void change_active_window(int Id);
+void change_active_window(int id);
 void CloseWindow(struct window_d *window);
 void DestroyWindow(struct window_d *window);
 void CloseActiveWindow();

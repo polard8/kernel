@@ -607,6 +607,7 @@ int SetUpPaging()
 	{
 		//kernel
 		// Diretório de páginas do processo kernel.
+		//0 no bit 2 indica qual level ??
 		page_directory[i] = (unsigned long) 0 | 2;    //010 em binário.
 		
 		//idle
@@ -1700,8 +1701,8 @@ void testingFrameAlloc()
 	
 	//#bugbug .;;;: mais que 100 dá erro ...
 	//@todo: melhorar o código de alocação de páginas.
-	printf("testingFrameAlloc: #100\n");
-	
+	//printf("testingFrameAlloc: #100\n");
+	printf("testingFrameAlloc:\n");
 	
 	//
 	// =============================================
@@ -1758,16 +1759,39 @@ void testingFrameAlloc()
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
 		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
 	}
-	bmpDisplayBMP( Ret, 0, 0, 0, 0 );
+	
+	
+	bmpDisplayBMP( Ret, 20, 20, 0, 0 );
 	//scheduler_unlock();
 	//taskswitch_unlock();
 
-    //===================================	
-	 
+    //===================================							
+    
 	
+	//
+	// *importante:
+	//  O REFRESH RECT SÓ FUNCIONA DAS DIMENSÕES NÃO O POSICIONAMENTO.
+	//
+	
+	//Isso funcionou ...
+	refresh_rectangle( 20, 20, 16, 16 );
+	
+	//struct myrect *rc;
+	
+	//rc = (void *) malloc( sizeof( struct myrect ) );
+	//if(
+	
+	//rc->left   = 40 ;
+	//rc->right  = 80;
+	//rc->top    = 40 ;
+	//rc->bottom = 80;
+	
+	//move_back_to_front(rc);
+	while(1){}
 	
 done:
     printf("done\n");
+	refresh_screen();
     return;	
 };
 

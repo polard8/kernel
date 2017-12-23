@@ -322,8 +322,9 @@ void KiInformation()
 	
 //Done
 done:
-	if(VideoBlock.useGui == 1){
-	    //Não precisa disso se foi chamado pelo procesimento do sistema.
+	if(VideoBlock.useGui == 1)
+	{
+        //talvez possamo da refresh apenas da janela onde as strings aparecem...
 		refresh_screen();
 	};
 	

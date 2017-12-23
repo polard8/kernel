@@ -71,13 +71,26 @@ unsigned long system_procedure( struct window_d *window,
 								unsigned long long1, 
 								unsigned long long2) 
 { 
-    //debug!
+    
+	//
+	// @todo: *importante:
+	//        Não rpecisa dar refresh_screen para todos os casos.
+	//        Cada caso é diferente ... 
+	//        ?? Quem deve chamar esse refresh dos elentos gráficos ??
+	//        O aplicativo ?? acionando a flag através de ShowWindow por exemplo??
+	//
+	
+	
+	//debug!
 	//printf("system_procedure: msg={%d} long1={%d}\n", msg, long1);  
 	
 	int AltStatus;
 	int CtrlStatus;
 	int ShiftStatus;
 	//...
+	
+	//usado no refresh_rectangle
+	unsigned long saveX, saveY;
 	
 
 	//Get status.
@@ -95,17 +108,50 @@ unsigned long system_procedure( struct window_d *window,
 	//janela de teste.
 	struct window_d *xxxx;
 	
+	struct window_d *w;
+	w = (void *) windowList[window_with_focus];
 	
 	void *buff;
 	
     switch(msg)
     { 
-        /*
-         ## Não tratar digitações normais ## 		
-        case MSG_KEYDOWN:
-            //#cancelado.
-		break;
-		*/
+		//teclas de digitação.
+		case MSG_KEYDOWN:
+            switch(long1)
+            {
+                case VK_ESCAPE:
+				    AltStatus = 0;
+					CtrlStatus = 0;
+					ShiftStatus = 0;
+                    goto done;				
+				    break;
+				
+				case VK_RETURN:
+				   //input esta em stdio.c
+					input( (unsigned long) long1);  
+					goto done;
+					break;				
+				   
+                default:
+			        if( (void*) w != NULL )
+			        {
+			            //saveX = g_cursor_x;
+			            //saveY = g_cursor_y;
+			            //printf("%c", (char) long1);
+		                
+						input( (unsigned long) long1);      //Coloca no stdin
+						//refresh ... toda a janela com foco de entrada.
+				        refresh_rectangle( w->x, w->y, w->width, w->height );
+						
+						//#bugbug: a rotina de input tambem está imprimindo ..
+						//ai imprime dobrado ..
+						// a rotina de inmput não pode imprimir. @todo: retirar do input a impresssão.
+						//input( (unsigned long) long1);      //Coloca no stdin
+						goto done;
+			        };
+                    break; 
+            };		
+			break;
           
 		/* ## Teclas do sistema interceptadas pelo kernel ## */  
         case MSG_SYSKEYDOWN:                 
@@ -126,83 +172,50 @@ unsigned long system_procedure( struct window_d *window,
 				 
 				
 				//Help. 
-				case VK_F1:
-				     					
-					//teste
-					//devemos enviar para o shell a mensagem command .. avisando que o botão foi clicado ..
-					// que estamos selecionado a opção de mostrar o menu de aplicativos.
-					/*
-			        if(AltStatus == 1)
-					{ 
-					    xxxx = (void*) windowList[window_with_focus];
-						if( (void*) xxxx != NULL ){
-						    //@todo xxxx->
-					        xxxx->msg = MSG_COMMAND; 
-					        xxxx->long1 = BN_CLICKED; 
-					        //xxxx->long2 =  
-						}
-						break;
-					};*/
-					
-					//if(AltStatus == 1){ window_with_focus = 1; break;};
-					//if(CtrlStatus == 1){ active_window = 1; break;};
-			        //if(ShiftStatus == 1){ break;}; 
-					if(VideoBlock.useGui == 1){ 
-					    procedureHelp();
-                        break;						
-					};
-					//ShowUserInfo(0);    //Mostra o usuário 0, default.
+				case VK_F1:	
+					//procedureHelp();
+				    AltStatus = 0;
+					CtrlStatus = 0;
+					ShiftStatus = 0;
+                    backgroundDraw(COLOR_BLACK);
+					printf("%s",stdin->_base);  //mostrar a entrada padrão.
+					refresh_screen();
                     break;
 					
 				
 				//Kernel info.	
                 case VK_F2:
-				
-					//teste
-					//devemos enviar para o shell a mensagem command .. avisando que o botão foi clicado ..
-					// que estamos selecionado a opção de mostrar o interpretador de comandos.
-
-				
-					//if(AltStatus == 1){ window_with_focus = 2; break;};
-					//if(CtrlStatus == 1){ active_window = 2; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F2\n"); break;}; 				
-				    
-					//Obs: Não usa janelas, isso não mudará o foco.
-					backgroundDraw(COLOR_BACKGROUND);
-					KiInformation();
-                    //show_process_information();    //Test.
-                    //ShowUserInfo(0);  //#bugbug
-                    //ShowUserInfo(1); 	 //#bugbug
-                    //fs_check_disk();					
-                    //... @todo: Testar mais coisa aqui.					
-                    break;
+					//KiInformation();
+				    AltStatus = 0;
+					CtrlStatus = 0;
+					ShiftStatus = 0;
+                    backgroundDraw(COLOR_BLACK);
+					printf("%s",stdout->_base);  //mostrar a entrada padrão.
+					refresh_screen();					
+					break;
 				
 	
                 //CPU info. 				
                 case VK_F3: 
-					//if(AltStatus == 1){ window_with_focus = 3; break;};
-					//if(CtrlStatus == 1){ active_window = 3; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F3\n"); break;};
-				    //maximizar a janela ativa
-				    //Obs: Não usa janelas, isso não mudará o foco.
-					show_cpu_intel_parameters();					
-                    break;
+					//show_cpu_intel_parameters();
+				    AltStatus = 0;
+					CtrlStatus = 0;
+					ShiftStatus = 0;
+                    backgroundDraw(COLOR_BLACK);
+					printf("%s",stderr->_base);  //mostrar a entrada padrão.
+					refresh_screen();
+					break;
 					
 				//Window tests.	
                 case VK_F4:
 					if(AltStatus == 1){ 
 					    closeActiveWindow(); 
 						AltStatus = 0;
+						goto done;
 						break;
 					};
-					//if(CtrlStatus == 1){ active_window = 4; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F4\n"); break;};
-				    
-					//Mostra informações sobre as jnaelas.
-					//gramado/gui/window.c
 					windowShowWindowList();  
-					//MaximizeWindow(struct window_d *window); //minimizar a janela ativa 
-                    break;
+					break;
 				
 				//Device Info.
 				//Mostra informções sobre todos os dispositivos.
@@ -234,6 +247,7 @@ unsigned long system_procedure( struct window_d *window,
 					//Test teclado scancode. (FUNCIONOU BEM)
 					//Quando aciona esse status, o kernel mostra o scancode.
 					//scStatus = 1;
+					
 					break;
 				
                 //Clock info./minishell				
@@ -257,40 +271,31 @@ unsigned long system_procedure( struct window_d *window,
 					
 					//printf("F6: Testando linkar um driver ...\n");
 					//procedureLinkDriverTest();
+					
+					//Testando repintar o background.
+					//resize_window(gui->background, gui->background->width, gui->background->height);
+					//redraw_window(gui->background);	
+                    //MaximizeWindow(struct window_d *window); //minimizar a janela ativa 					
 					break;
 				
                 //Testing Message Box.				
 				case VK_F7:
-					//if(AltStatus == 1){ window_with_focus = 7; break;};
-					//if(CtrlStatus == 1){ active_window = 7; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F7\n"); break;};
-				    //pertence ao desktop,tipo 1, string.
-				    if(VideoBlock.useGui == 1){
-						//isso cria uma janela, mudando o foco atual.
-					    MessageBox(gui->screen, 1, "F7:","Testing Message Box");
-					};
+					MessageBox(gui->screen, 1, "F7:","Testing Message Box");
+					goto done;
 					break;
 					
 				//Cls.	
 				case VK_F8:
-					//if(AltStatus == 1){ window_with_focus = 8; break;};
-					//if(CtrlStatus == 1){ active_window = 8; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F8\n"); break;};
-					
-					//Obs: Não usa janelas, isso não mudará o foco.
-					backgroundDraw(COLOR_BLACK);
-					
-					//Testando repintar o background.
-					//resize_window(gui->background, gui->background->width, gui->background->height);
-					//redraw_window(gui->background);
+				    AltStatus = 0;
+					CtrlStatus = 0;
+					ShiftStatus = 0;
+                    backgroundDraw(COLOR_BLACK);
+					refresh_screen();
+					goto done;	
 					break;
 				
                 //Reboot.  				
 				case VK_F9:
-					//if(AltStatus == 1){ window_with_focus = 9; break;};
-					//if(CtrlStatus == 1){ active_window = 9; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F9\n"); break;};
-                    backgroundDraw(COLOR_BACKGROUND);
 					systemReboot();
 					break;				
 
@@ -313,7 +318,7 @@ unsigned long system_procedure( struct window_d *window,
 					xxxx->height -= 20;
 					resize_window(xxxx, xxxx->width, xxxx->height);
 					redraw_window(xxxx);					
-					
+					refresh_screen();
 					break;
 					
 				//Program manager.
@@ -331,7 +336,7 @@ unsigned long system_procedure( struct window_d *window,
 					xxxx->height += 20;
 					resize_window(xxxx, xxxx->width, xxxx->height);
 					redraw_window(xxxx);
-					
+					refresh_screen();
 					break;
 					
 				//Control menu.	
@@ -405,7 +410,6 @@ unsigned long system_procedure( struct window_d *window,
 					//xxxx = (void*) windowList[6];
 					//resize_window(xxxx, 100, 100);
 					//redraw_window(xxxx);
-					
 					break;
 				
                 //Mudar o foco de entrada pra próxima janela de uma lista.				
@@ -452,6 +456,8 @@ unsigned long system_procedure( struct window_d *window,
         break;
 		*/
 		
+
+		
         /*		
         case MSG_DESTROY:		
             //destroy 
@@ -486,16 +492,16 @@ unsigned long system_procedure( struct window_d *window,
 		
 	    //Nothing.
 	    default:    
-		    return (unsigned long) 0;
+		    //return (unsigned long) 0;
 			break;
 	};
 	
 	
     //Done.
 done:
-	if(VideoBlock.useGui == 1){
-	    refresh_screen();
-	};
+	//if(VideoBlock.useGui == 1){
+	//    refresh_screen();
+	//};
     return (unsigned long) 0;	
 };  
 
@@ -676,8 +682,11 @@ messages:
 		
 //Done.
 done:
-	if(VideoBlock.useGui == 1){
-	    //refresh_screen();
+	if(VideoBlock.useGui == 1)
+	{    
+		//@todo: 
+		//Devemos dar o refresh somente da janela.
+		refresh_screen();
 	};
     SetFocus(hWindow);
     return;

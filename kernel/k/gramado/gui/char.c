@@ -44,7 +44,7 @@ void my_buffer_char_blt( unsigned long x,
                          unsigned long y, 
 						 unsigned long color, 
 						 unsigned long c)
-{
+{	
 	int x2;
     int y2;
     unsigned char bit_mask = 0x80;	
@@ -162,7 +162,9 @@ void my_buffer_char_blt( unsigned long x,
 	//
 	// Algo mais ?
 	//
- 
+	
+	
+
 done:
     return;  	         	   
 };

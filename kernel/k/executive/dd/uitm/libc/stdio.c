@@ -811,12 +811,14 @@ void _outbyte(int c)
 			
 		    //@todo: Listar aqui os modos VESA.
 		    case 1:
-			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
+			      my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
+			      //my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
 				  //my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
 			    break;
 		    default:
 			    //modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
-			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
+			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
+				//my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
 			    //my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
 				break;
 		};
@@ -969,10 +971,25 @@ unsigned long input(unsigned long ch)
 	switch(c)
 	{
 	    //Enter.	
+		//+se for modo comando devemos finalizar com zero.
+		//+se for modo texto, devemos apenas incluir os caracteres \r \n.		
 		//case 0x1C:
 		case VK_RETURN:
-		    prompt[prompt_pos] = (char )'\0';
-            goto input_done;			
+            //modo linha 
+			if(g_inputmode == INPUT_MODE_LINE ){
+			    prompt[prompt_pos] = (char )'\0'; //end of line.
+			    //@todo: ?? ldiscCompare();
+				goto input_done;
+			};
+            //modo multiplas linhas 
+		    if(g_inputmode == INPUT_MODE_MULTIPLE_LINES ){
+			    prompt[prompt_pos] = (char )'\r';
+                prompt_pos++;
+				prompt[prompt_pos] = (char )'\n';
+				prompt_pos++;
+				printf("\r");
+				printf("\n"); 				
+			};			
 		    break;
 
 	    //Backspace.
@@ -1092,6 +1109,9 @@ void stdioInitialize()
 	stderr->_file = 2;
 	stderr->_tmpfname = "stderr";	
 	//...
+	
+	//multiplas linhas.
+	g_inputmode = INPUT_MODE_MULTIPLE_LINES;
 	
 	int i;
 	for(i=0; i<PROMPT_MAX_DEFAULT;i++)

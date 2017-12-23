@@ -237,20 +237,25 @@ void *KiCreateKernelProcess()
 		//que será usada para mapeamento das páginas usadas pelo processo.
 		p->framepoolListHead = NULL;
 
-		//Heap and Stack. (endereços físicos = endereços virtuais).
-	    //KernelProcess->StackOffset = 0;     // Deslocamento da pilha em relação ao início do kernel. 
-	    p->Stack       = KERNEL_STACK_START;  // Endereço do início da Stack do processo.
-	    p->StackSize   = KERNEL_STACK_SIZE;   // Tamanho da pilha.	
-	    p->Heap        = KERNEL_HEAP_START;   // Endereço do início do Heap do processo.
-	    p->HeapSize    = KERNEL_HEAP_SIZE;    // Tamanho do heap.
+		//Image info.
 	    p->Image       = KERNEL_IMAGE_BASE;   // Base da imagem do processo.
-	    //KernelProcess->ImageSize = 0;       // Tamanho da imagem do processo.				
+	    p->ImageSize = 0;       //@todo: Tamanho da imagem do processo.				
+		
+		//Heap and Stack. (endereços físicos = endereços virtuais).
+	    p->Heap        = KERNEL_HEAP_START;   // Endereço do início do Heap do processo.
+		p->HeapEnd     = KERNEL_HEAP_END;
+	    p->HeapSize    = (KERNEL_HEAP_SIZE/1024);    // Tamanho do heap, dado em KB.
+	    p->Stack       = KERNEL_STACK_START;  // Endereço do início da Stack do processo.
+	    p->StackEnd    = KERNEL_STACK_END;
+		p->StackSize   = (KERNEL_STACK_SIZE/1024);   // Tamanho da pilha, dado em KB.	
+	    p->StackOffset = 0;     // Deslocamento da pilha em relação ao início do kernel. 
+
 	    
 		//@todo: objectType, objectClass, appMode
 		
 		//Identifications.
 		p->pid  = (int) 0;                   //PID.
-	    p->ppid = (int) p->pid;  //PPID, Criado por ele mesmo.	 
+	    p->ppid = (int) p->pid;              //PPID, Criado por ele mesmo.	 
 		p->uid  = (int) GetCurrentUserId();  //UID.
 		p->gid  = (int) 0;                   //GID.
 		

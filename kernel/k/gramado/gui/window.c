@@ -243,8 +243,9 @@ int windowInitializeBrowserSupport()
 
 
 /*
-int windowShowWindow(struct window_s *window, int msg);
-int windowShowWindow(struct window_s *window, int msg)
+ * @todo: Talvez aque devamos apenas atualizar a flag de view da janela.
+int windowShowWindow(struct window_d *window, int msg);
+int windowShowWindow(struct window_d *window, int msg)
 {
 	int Status;
 	
@@ -476,7 +477,6 @@ void windowSetUpColorScheme(int type)
 	}	
 	
 
-	
 done:	
 	return;
 };
@@ -931,7 +931,8 @@ void set_current_window(struct window_d *window)
 
 
 /*
- * get_current_window: Get current window pointer.
+ * get_current_window: 
+ *     Get current window pointer.
  */
 void *get_current_window(){
 	return (void *) CurrentWindow;
@@ -942,10 +943,7 @@ void *get_current_window(){
 int get_current_window_id();
 int get_current_window_id()
 {
-	if( (void*) CurrentWindow == NULL ){
-		return (int) -1;
-	}
-    return (int) CurrentWindow->id;	
+    return (int) current_window;	
 };
 */
 
@@ -1140,7 +1138,8 @@ void windowShowWindowList()
     // Continua ...
 	
 done:
-    //refresh_screen();
+    //@todo; Aqui podemos dar refresh apenas na janela
+	refresh_screen();
     //SetFocus(hWindow);
     return;
 };
@@ -1679,6 +1678,10 @@ void CloseWindow(struct window_d *window)
 	if( (void*) window == NULL ){ 
 	    return; 
 	};
+	
+	//
+	// ?? E as threads e processos associados à essa janela ??
+	//
 
 	// Focus.
 	KillFocus(window);
@@ -1717,10 +1720,9 @@ void CloseWindow(struct window_d *window)
 	};
 	
 	
-	
     //Sinaliza para o GC.
-	window->used = 216;
-	window->magic = 4321;
+	window->used = WINDOW_GC;       //216;
+	window->magic = WINDOW_CLOSED;  //4321;
 	
 // Done
 done:
@@ -1788,17 +1790,15 @@ done:
 
 /*
  * change_active_window:
- *     @todo: Trocar a janela ativa usando uma linked list.
+ *     @todo: Trocar a janela ativa
  */
-void change_active_window(int Id)
+void change_active_window(int id)
 {
 	// @todo: Limits. Max.
-    if(Id < 0){
+    if(id < 0){
 	    return;
 	};
-	
-done:
-    return;
+	active_window = (int) id;
 };
 
 
@@ -1809,7 +1809,6 @@ done:
  */
 void show_active_window(){
 	printf("ActiveWindowId={%d}\n", (int) active_window);
-    return;
 };
 
 /*
@@ -1817,8 +1816,7 @@ void show_active_window(){
  *     Mostra o id da janela com o foco de entrada..
  */
 void show_window_with_focus(){
-	printf("WindowWithFocusId={%d}\n", (int) window_with_focus);
-    return;
+	printf("wwfId={%d}\n", (int) window_with_focus);
 };
 
 /*
@@ -1869,12 +1867,10 @@ done:
 
 void windowBlockfocus(){
 	gFocusBlocked = (int) 1;
-	return;
 };
 
 void windowUnblockFocus(){
 	gFocusBlocked = (int) 0;
-	return;
 };
 
 
@@ -2285,7 +2281,7 @@ int init_windows()
 	//
 		
 	// 8x8 
-	g8x8fontAddress  = (unsigned long) 0x000FFA6E;    //ROM. @todo usar definição de constante.
+	g8x8fontAddress  = (unsigned long) BIOSFONT8X8; //0x000FFA6E;    //ROM.
 	//g8x16fontAddress = (unsigned long) 0x000FFA6E;  //@todo.
 	//...
 	
@@ -2436,6 +2432,8 @@ struct window_d *getTopWindow( struct window_d *window)
 	//??
 } 
 */
+
+
 
 
 void closeActiveWindow()

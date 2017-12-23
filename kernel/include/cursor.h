@@ -34,6 +34,7 @@
 //Cursor. (disciplica de linhas).
 unsigned long g_cursor_x;
 unsigned long g_cursor_y;
+unsigned long g_cursor_color;
 unsigned long g_cursor_left;     // margem esquerda dada em linhas
 unsigned long g_cursor_top;      // margem superior dada em linhas
 unsigned long g_cursor_right;    // margem direita dada em linhas

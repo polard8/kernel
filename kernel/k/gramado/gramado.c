@@ -1024,6 +1024,7 @@ void *guiGetTaskbarWindow()
 
 
 //main window
+//GetDesktopWindow
 void *guiGetMainWindow()
 {
 	if( (void*) gui == NULL){

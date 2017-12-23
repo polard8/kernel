@@ -197,43 +197,55 @@ void my_buffer_put_pixel( unsigned long ax,
 };
 
 
-
-
-//copia um pixel do backbuffer para o frontbuffer
-void refresh_pixel( unsigned long x,  unsigned long y, unsigned long color )
-{
-    unsigned char *frontbuffer = (unsigned char *) 0xC0800000;
-	
-	//#bugbug conferir se a passagem de valores está certa .
-	unsigned char *rgba = (unsigned char *) color;
-
-	unsigned long pos = (unsigned long) ( 3 * x * y );
-	
-	frontbuffer[pos] = rgba[0];
-	frontbuffer[pos+3] = rgba[1];
-	frontbuffer[pos+3+3] = rgba[2];
-	frontbuffer[pos+3+3+3] = rgba[3];
-
-}
-
-
 //pega um pixel no backbuffer
 unsigned long get_pixel( unsigned long x,  unsigned long y )
 {
-    unsigned char *backbuffer = (unsigned char *) 0xC0400000;
+	//SALVA A COR
+	unsigned long COLOR;
 	
-	unsigned long color;
-	unsigned char *rgba = (unsigned char *) &color;
+	unsigned char *rgba = (unsigned char *) &COLOR;
 	
-	unsigned long pos = (unsigned long) ( 3 * x * y );
+    unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;	
+	unsigned long pos = (unsigned long) (y*3*800)+(x*3);
 	
-	rgba[0] = backbuffer[pos];
-	rgba[1] = backbuffer[pos+3];
-	rgba[2] = backbuffer[pos+3+3];
-	rgba[3] = backbuffer[pos+3+3+3];
+	COLOR  = *( unsigned long* )&backbuffer[pos];
+	
+	//talvez isso seja invertido
+	//rgba[3] = backbuffer[pos];
+	//rgba[2] = backbuffer[pos+3];
+	//rgba[1] = backbuffer[pos+3+3];
+	//rgba[0] = backbuffer[pos+3+3+3];
 
-    return (unsigned long) color;	
+    return (unsigned long) COLOR;	
 }
+
+
+//copia um pixel do backbuffer para o frontbuffer
+void refresh_pixel( unsigned long x,  unsigned long y )
+{	
+	//SALVA A COR
+	unsigned long COLOR;
+	
+	unsigned char *rgba = (unsigned char *) &COLOR;
+	
+    unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_ADDRESS;	
+	//unsigned long pos = (unsigned long) ( 3 * x * y );
+
+	unsigned long pos = (unsigned long) (y*3*800)+(x*3);
+	
+	//pego o pixel no backbuffer
+	COLOR = get_pixel( x, y );
+	
+	*( unsigned long* )&frontbuffer[pos] = COLOR;
+	//*( unsigned long* )&frontbuffer[pos] = get_pixel( x, y );
+
+	
+	//talvez isso seja invertido
+	//frontbuffer[pos]   = rgba[0];
+	//frontbuffer[pos+1] = rgba[1];
+	//frontbuffer[pos+2] = rgba[2];
+	//frontbuffer[pos+3] = rgba[3];
+};
 
 
 //

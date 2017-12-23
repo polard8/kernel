@@ -346,7 +346,9 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//window->wProcedure = NULL;  //Estrutura.
 		
 		//icon, cursor, cursor x, cursor y, bg etc...
-		
+		window->CursorX = 0;
+		window->CursorY = 0;
+		window->CursorColor = COLOR_PINK;
 		//Características.
 		
 		//Modo de exibição:
