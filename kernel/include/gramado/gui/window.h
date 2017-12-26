@@ -843,11 +843,13 @@ int g_guiMinimal; //Light or Full gui.
  */
 int windows_count;  
 
-/*
- * A janela com o foco de entrada.
- *
- */     
+
+//editbox.
+//A janela com o foco de entrada.
 int window_with_focus;   
+
+//janela do terminal.
+int terminal_window;
 
 //Id da janela ativa.
 int active_window;
@@ -1204,6 +1206,16 @@ struct window_d
 	
 	unsigned long type;                    //tipo ... (editbox, normal, ...)  style???
 	
+	//flag
+	//se é um terminal ou não.
+	int terminal;
+	
+	//@todo: isso deve pertencer a uma janela.
+	//se uma janela tiver o foco de entrada e for um terminal 
+	//a disciplica de linhas poderá usar essas carcterística do terminal.
+	struct terminal_d *wTerminal; //dd\uitm\terminal.h
+	struct console_d *console;   //dd\uitm\console.h	
+	
 	/*
      Número da aba do navegador que a janela está.
      Se for 0, então a janela está no desktop.
@@ -1479,6 +1491,8 @@ window_t *WindowWithFocus;  //Janela com o foco de entrada.
 window_t *window_Conductor2;
 window_t *window_Conductor;
 window_t *window_rootConductor;
+
+
 
 
  /*

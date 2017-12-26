@@ -383,6 +383,10 @@ doDebug:
 	//isso está em ldisc.c
     ps2();	
 	
+	//@todo: isso deve ser uma opção de system call. 
+	//systemSetTerminal( gui->main );
+	//systemSetTerminal( gui->terminal );  //@todo: Criar esse elemento da struct gui.
+	
 	//
 	// Done.
 	//

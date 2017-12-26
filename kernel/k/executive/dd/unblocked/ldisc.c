@@ -700,25 +700,35 @@ done:
 		services( SYS_REBOOT, 0, 0, 0);
 	};
 
-
+	
+	//
+	// Nesse momento temos duas opções:
+	// Devemos saber se a janela com o foco de entrada é um terminal ou não ...
+	// se ela for um terminal chamaremos o porcedimento de janelas de terminal 
+	// se ela não for um terminal chamaremos o procedimento de janela de edit box. 
+	// que é o procedimento de janela do sistema.
+	// *IMPORTANTE: ENQUANTO O PROCEDIMENTO DE JANELA DO SISTEMA TIVER ATIVO,
+	// MUITOS COMANDOS NÃO VÃO FUNCIONAR ATE QUE SAIAMOS DO MODO TERMINAL.
+	//
+	//
+	
+	
+    //Pegaremos aqui a janela com o foco de entrada e passaremos 
+	//para o procedimento, que não deve pegar novamente.
 	struct window_d *w;
 	w = (void *) windowList[window_with_focus];
 	
 	if( (void*) w != NULL )
 	{
-		//
-		// * Imprime os caracteres na janela com o focod e entrada.
-		//
-		
-	    system_procedure( w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );
-		
-		//
 		// Envia as mensagens para os aplicativos intercepta-las
-		//
-		
+		//so mandamos mensagem para um aplicativo no estavo válido.
 		if( w->used == 1 && w->magic == 1234 ){
 	        windowSendMessage( 0, mensagem, ch, ch);
 		};			
+		
+		//Chama o procedimento de janelas do sistema.
+		//O procedimento de janela do terminal está em cascata.
+		system_procedure( w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );					
 	};
 
 eoi:

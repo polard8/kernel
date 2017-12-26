@@ -707,8 +707,11 @@ void *services( unsigned long number,
 												 (unsigned long) WindowWithFocus, 
 												 (unsigned long) WindowWithFocus, 
 												 (unsigned long) WindowWithFocus);
-			break;	
+			break;
 
+
+ 
+		    
 		//103, SYS_RECEIVEMESSAGE	
         //Um processo consumidor solicita mensagem deixada em seu PCB.
 		case SYS_RECEIVEMESSAGE:
@@ -795,6 +798,11 @@ void *services( unsigned long number,
 		case SYS_SENDSIGNAL:
 		    //argumentos (process handle, signal number).
 		    signalSend((void*) a2, (int) arg3);
+		    break;
+		
+        //configura qual vai ser a janela do terminal. 		
+		case SYS_SETTERMINALWINDOW:	
+		    systemSetTerminal( (struct window_d*) arg2);	
 		    break;
 			
 		//226 get

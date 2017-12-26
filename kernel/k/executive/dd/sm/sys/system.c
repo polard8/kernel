@@ -2533,6 +2533,16 @@ halt:
 	};     	
 };
 
+
+//escolhe uma janela para ser o terminla...
+//@todo podemos ter uma dessas em terminal.c
+void systemSetTerminal( struct window_d *window )
+{
+    if( (void*) window != NULL ){
+		window->terminal = 1;
+	}	
+}
+
 //
 // End.
 //

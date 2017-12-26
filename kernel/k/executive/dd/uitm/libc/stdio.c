@@ -109,6 +109,7 @@ FILE *fopen(const char *filename, const char *mode)
  *     para mensagens de texto em algum terminal. 
  *     @todo: Ele não será feito dessa forma, termos uma disciplica de linhas
  * num array de linhas que pertence à uma janela.
+ * @todo: Fazer o scroll somente no stream stdin e depois mostrar ele pronto.
  */
 void scroll(void)
 {
@@ -680,9 +681,14 @@ void outbyte(int c)
 	if( c == '\n' && prev != '\r' ) 
     {
         g_cursor_y++;
+		
+		//Iremos para o início da linha até mesmo nesse caso.
+		//Assumindo um comportamento de terminal.
+		g_cursor_x = g_cursor_left;  
         prev = c;
         return; 
     };
+	
 
     //tab
 	//@todo: Criar a variável 'g_tab_size'.

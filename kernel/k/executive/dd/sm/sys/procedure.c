@@ -31,8 +31,6 @@
  
 #include <kernel.h>
 
-
-
 //
 // Variáveis internas.
 //
@@ -50,9 +48,123 @@ void procedureLinkDriverTest(); // testando linkar um driver ao sistema operacio
 void procedureWindowWithFocusTest();
 void procedureGrid();
 
+
+ 
+
+
+
+
+/*
+ *O procedimento de janela do (terminal.)
+ */
+unsigned long terminal_procedure( struct window_d *window, 
+                                  int msg, 
+								  unsigned long long1, 
+								  unsigned long long2 ) 
+{
+    // esse procedimento de janela é exclusivo para a janela do terminal que pode 
+    //ser uma janela indicada por um aplciativo.
+	
+
+	// Window With Focus !
+	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
+	//e passada via argumento.
+	if( (void*) window == NULL )
+	{
+		//debug
+	    printf("terminal_procedure: wwf fail!");
+        refresh_screen();
+		while(1){}		
+	}else{
+	
+	    //
+	    // Configurando o cursor para ficar de acordo com a janela com o foco de entrda.
+	    //
+		
+		//
+		// @todo:
+		// Aqui deveríamos apenas pegar o ponteiro para a estrutura 
+		// de cursor que pertence a janela com o foco de entrada.
+		//
+	
+	    //pegando as dimensões da janela com o foco de entrada.
+
+		left   = window->left;
+	    top    = window->top;
+	    width  = window->width;
+	    height = window->height;		
+	
+		g_cursor_left   = (window->left/8);
+		g_cursor_top    = (window->top/8) + 4;   //Queremos o início da área de clente.
+		g_cursor_right  = g_cursor_left + (width/8);
+		g_cursor_bottom = g_cursor_top  + (height/8);
+		
+		if( g_cursor_right == 0 ){
+			g_cursor_right = 1;
+		}
+		
+        if( g_cursor_bottom == 0 ){
+			g_cursor_bottom = 1;
+		}		
+		
+		//cursor (0, mas com margem nova).
+		//#bugbug ... isso reiniciaria o cursor a cada tecla pressionada.
+		//g_cursor_x = g_cursor_left; 
+		//g_cursor_y = g_cursor_top;  		
+           
+	
+	    //...
+	};
+
+	// Se a janela não for um terminal, retornaremos imediatamente.	
+	if( window->terminal != 1 ){
+		return (unsigned long) 0;
+	};
+	
+	
+	switch(msg)
+	{
+        case MSG_KEYDOWN:                 
+            switch(long1)	       
+            {  
+				
+				case VK_RETURN:
+					//input esta em stdio.c
+				    //input() para terminal deve ser diferente de input para editbox.
+					printf("\r");
+					printf("\n");
+					input( (unsigned long) long1);  
+					goto done;
+					break;
+					
+			    //Apenas o 12 para teste.
+                case VK_F12:
+	                printf("terminal_procedure: $ \n");
+					refresh_screen();
+                    break;
+
+				//Teclas de digitação para o terminal.	
+                default:
+				    printf("%c", (char) long1);
+		            refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+					// Devemos nos certificar que input não imprima nada.
+					input( (unsigned long) long1);      //Coloca no stdin
+                    break;						
+			};
+		break;
+		
+		default:
+		    break;
+	};
+
+done:
+    return 0;	
+};
+
+
 /*
  * system_procedure:
- *     Procedimento do sistema.
+ *     Procedimento de janela da janela com o foco de entrada ... (edit box.)
  *     Procedimento de janela default.
  *     
  * OBS: Existe uma relação grande entre control menus e o procedimento do
@@ -70,8 +182,7 @@ unsigned long system_procedure( struct window_d *window,
                                 int msg, 
 								unsigned long long1, 
 								unsigned long long2) 
-{ 
-    
+{ 	
 	//
 	// @todo: *importante:
 	//        Não rpecisa dar refresh_screen para todos os casos.
@@ -83,6 +194,8 @@ unsigned long system_procedure( struct window_d *window,
 	
 	//debug!
 	//printf("system_procedure: msg={%d} long1={%d}\n", msg, long1);  
+	
+	void *buff;
 	
 	int AltStatus;
 	int CtrlStatus;
@@ -99,21 +212,92 @@ unsigned long system_procedure( struct window_d *window,
 	//ShiftStatus = (int) get_shift_status();
 	//...
 	
-	// ??
-	// E SE O HANDLE DE JANELA FOR NULL ??
-	// ENTÃO O PROCEDIMENTO DE JANELA NÃO PODERÁ ATUAR SOBRE JANELA NENHUMA.
-	// OBS:
+
 	//
+	// Lidando com a janela com o foco de entrada.
+	//
+
+
+	unsigned long left; 
+	unsigned long top;   
+	unsigned long width; 
+	unsigned long height; 		
+
 	
 	//janela de teste.
 	struct window_d *xxxx;
 	
-	struct window_d *w;
-	w = (void *) windowList[window_with_focus];
+	//struct window_d *w;
 	
-	void *buff;
+
+	//
+	// Checamos se a janela com o focod e entrada é válida.
+	//
 	
-    switch(msg)
+	//#bugbug isso está errado ... devemos pegar a janela passada por argumento 
+	//poi o line discipline selecionou a janela com o foco de entrada.
+	
+	//w = (void *) windowList[window_with_focus];
+	
+	// Window With Focus !
+	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
+	//e passada via argumento.
+	if( (void*) window == NULL )
+	{
+		//debug
+	    printf("system_procedure: wwf fail!");
+        refresh_screen();
+		while(1){}		
+	}else{
+	
+	    //
+	    // Configurando o cursor para ficar de acordo com a janela com o foco de entrda.
+	    //
+		
+		//
+		// @todo:
+		// Aqui deveríamos apenas pegar o ponteiro para a estrutura 
+		// de cursor que pertence a janela com o foco de entrada.
+		//
+	
+	    //pegando as dimensões da janela com o foco de entrada.
+
+		left   = window->left;
+	    top    = window->top;
+	    width  = window->width;
+	    height = window->height;		
+	
+		g_cursor_left   = (window->left/8);
+		g_cursor_top    = (window->top/8) + 4;   //Queremos o início da área de clente.
+		g_cursor_right  = g_cursor_left + (width/8);
+		g_cursor_bottom = g_cursor_top  + (height/8);
+		
+		if( g_cursor_right == 0 ){
+			g_cursor_right = 1;
+		}
+		
+        if( g_cursor_bottom == 0 ){
+			g_cursor_bottom = 1;
+		}		
+		
+		//cursor (0, mas com margem nova).
+		//#bugbug ... isso reiniciaria o cursor a cada tecla pressionada.
+		//g_cursor_x = g_cursor_left; 
+		//g_cursor_y = g_cursor_top;  		
+           
+	
+	    //...
+	};
+
+    //
+    //*importante:
+	// Desejamos que as teclas de controle sejam tratadas por esse 
+	// procedimento mesmo que a janela seja do tipo terminal ...
+	// pois as teclas de comtrole permite trocarmos a jenala com 
+	// o foco de entrada sem fecharmos o terminal.
+    //	
+    
+	switch(msg)
     { 
 		//teclas de digitação.
 		case MSG_KEYDOWN:
@@ -127,6 +311,7 @@ unsigned long system_procedure( struct window_d *window,
 				    break;
 				
 				case VK_RETURN:
+		
 				   //input esta em stdio.c
 				    printf("\r");
 					printf("\n");
@@ -134,32 +319,41 @@ unsigned long system_procedure( struct window_d *window,
 					goto done;
 					break;				
 				   
+				//teclas de digitação para o editbox.   
                 default:
-			        if( (void*) w != NULL )
-			        {
-						//
-						// *importante:
-						// Podemos imprimir nesse momento, pois a impressão está correta e 
-						// deixarmos o input sem imprimir. o que parece ser normal, input
-						// apenas por dentro do buffer.
-						//
+					//Se for do tipo termional as teclas de digitação se 
+					//serão tratadas pelo procedimento de janelas do terminal.
+					//para isso é só ir para o fim desse procedimento.
+					if( window->terminal == 1 ){
+					    goto do_terminal;	
+					}
 						
-						//printf deve imprimir no caso de tab ou espaço...
-						//input só vai mexer com o buffer
+					//
+					// *importante:
+					// Podemos imprimir nesse momento, pois a impressão está correta e 
+					// deixarmos o input sem imprimir. o que parece ser normal, input
+					// apenas por dentro do buffer.
+					//
+						
+					//printf deve imprimir no caso de tab ou espaço...
+					//input só vai mexer com o buffer
 	
-	                    //isso funciona porque printf incrementa o cursor antes de imprimir o char 
-						//no backbuffer. Tem caso que ele manipula o cursor e não imprime nada.
-						printf("%c", (char) long1);
-		                refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+	                //isso funciona porque printf incrementa o cursor antes de imprimir o char 
+					//no backbuffer. Tem caso que ele manipula o cursor e não imprime nada.
 						
-			            //
-						// input:
-						// Devemos nos certificar que input não imprima nada.
-						//
-						input( (unsigned long) long1);      //Coloca no stdin
-					
-						goto done;
-			        };
+					//printf deveria imprimir na janela com o foco de entrada.
+					//obs: printf o cursor do sistema. Para imprimir na janela temos 
+					//que auterar o cursor do sistema para ficar com as dimensões da 
+					//janela com o foco de entrada. shell.bin agradece.
+					printf("%c", (char) long1);
+		            refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+						
+			        //
+					// input:
+					// Devemos nos certificar que input não imprima nada.
+					//
+					input( (unsigned long) long1);      //Coloca no stdin
+					goto done;
                     break; 
             };		
 			break;
@@ -351,16 +545,16 @@ unsigned long system_procedure( struct window_d *window,
 					break;
 					
 				//Control menu.	
-				case VK_F12:
+				//case VK_F12:
 					//if(AltStatus == 1){ window_with_focus = 12; break;};
 					//if(CtrlStatus == 1){ active_window = 12; break;};
 				    //procedureGrid();
 					
 					//testando informaçõe sobre os processos.
-					show_process_information();
+					//show_process_information();
 					
 					//testando informações sobre as threads.
-					show_thread_information();
+					//show_thread_information();
 					
 					//Testando repintar todas as janelas seguindo a ordem list.
 					//redraw_screen();
@@ -421,7 +615,7 @@ unsigned long system_procedure( struct window_d *window,
 					//xxxx = (void*) windowList[6];
 					//resize_window(xxxx, 100, 100);
 					//redraw_window(xxxx);
-					break;
+				//	break;
 				
                 //Mudar o foco de entrada pra próxima janela de uma lista.				
                 case VK_TAB:
@@ -508,12 +702,20 @@ unsigned long system_procedure( struct window_d *window,
 	};
 	
 	
-    //Done.
-done:
+    
+do_terminal:
 	//if(VideoBlock.useGui == 1){
 	//    refresh_screen();
 	//};
-    return (unsigned long) 0;	
+    //return (unsigned long) 0;	
+	
+	//
+	// Chama o procedimento da janela terminal.
+	// Se ajanela não for uma janela do tipo terminal isso irá retornar imediatamente.
+	//
+	return (unsigned long) terminal_procedure( window, (int) msg, (unsigned long) long1, (unsigned long) long2 );
+done:
+    return (unsigned long) 0;
 };  
 
 

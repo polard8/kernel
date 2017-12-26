@@ -1,5 +1,5 @@
 /*
- * File: console.h
+ * File: console.h  (at the console --usually just the monitor) 
  * Console é o termo usado para o dispositivo que envia comandos 
  * de gerenciamento do sistema. ... o módulo /sm esta tratando disso.
  *

@@ -349,6 +349,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		window->CursorX = 0;
 		window->CursorY = 0;
 		window->CursorColor = COLOR_PINK;
+		//@todo: As outras características do cursor.
 		//Características.
 		
 		//Modo de exibição:

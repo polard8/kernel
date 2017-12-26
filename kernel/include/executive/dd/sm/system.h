@@ -19,8 +19,19 @@
  *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
  *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
  *     //...
- */ 
+ */
+
  
+ 
+
+#define SYSTEMMODE_EDITBOX  0
+#define SYSTEMMODE_TERMINAL 1
+int g_system_mode;  //terminal ou edibox. 
+ 
+ 
+//@todo: isso deve ser uma opção de system call. 
+void systemSetTerminal( struct window_d *window );
+
 
 //
 // #### Aqui devemos configurar manualmente a destinação do sistema. ####
@@ -202,7 +213,11 @@
 //Continua ...
 //@todo.
 
-
+//procedure tupe mode
+//@TODO: CRIAR UM ENUM
+#define PROCEDURE_TYPE_MODE_TERMINAL  1    //digitando em um terminal/
+#define PROCEDURE_TYPE_MODE_EDITBOX   2    //digitando em um editbox.
+//...
  
 //
 // Globals.
@@ -535,6 +550,17 @@ void *services( unsigned long number,
 				unsigned long arg4 );
 				
 
+				
+
+/*
+ procedimento de janleas do terminal.
+*/				
+unsigned long terminal_procedure( struct window_d *window, 
+                                int msg, 
+								unsigned long long1, 
+								unsigned long long2); 
+
+								
 /*
  * system_procedure:
  *     O procedimento default do sistema.
@@ -703,6 +729,11 @@ int system_dispatch_to_procedure( struct window_d *window,
  * Interface que chama o control menu da janlea ativa.
  */
 int SystemMenu();
+
+ 
+
+ 
+
 /*
  * SystemMenuProcedure:
  *     O procedimento do Control Menu principal.

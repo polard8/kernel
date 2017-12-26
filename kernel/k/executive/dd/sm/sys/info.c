@@ -76,7 +76,8 @@ void KiInformation()
 	unsigned long width  = gui->main->width;
 	unsigned long height = gui->main->height;		
 	
-	
+    //no caso de falha a mensagem aparecerá aqui.
+	//o cursor será configurado mais a frente.
 	g_cursor_x = (left/8);
 	g_cursor_y = (top/8); 	
 	

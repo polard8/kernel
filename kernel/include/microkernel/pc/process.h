@@ -727,6 +727,8 @@ struct process_d
 	//total de bytes gravados no disco pelo processo.
 	//generic bytes i/o. contagem de bytes para operações genéricas de i/o, excluindo disco.
 	
+
+	
 	/*
 	 * wait4pid: 
      * O processo pode estar esperando um processo filho fechar. 
