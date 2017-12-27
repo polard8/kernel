@@ -1684,47 +1684,47 @@ Linker script and memory map
                 0xc001ccaa                config_user
                 0xc001cc4b                ShowUserInfo
                 0xc001cddc                UpdateUserInfo
- .text          0xc001cef8      0xb70 procedure.o
-                0xc001d8d1                procedureMakeTests
-                0xc001d454                SendMessage
-                0xc001d43f                SetProcedure
-                0xc001cfd7                system_procedure
-                0xc001d4aa                procedureHelp
-                0xc001da33                procedureGrid
-                0xc001d427                registra_procedimento
-                0xc001d99c                procedureWindowWithFocusTest
+ .text          0xc001cef8      0xbf0 procedure.o
+                0xc001d955                procedureMakeTests
+                0xc001d4d8                SendMessage
+                0xc001d4c3                SetProcedure
+                0xc001d069                system_procedure
+                0xc001d52e                procedureHelp
+                0xc001dab7                procedureGrid
+                0xc001d4ab                registra_procedimento
+                0xc001da20                procedureWindowWithFocusTest
                 0xc001cef8                terminal_procedure
-                0xc001d896                procedureLinkDriverTest
- .text          0xc001da68       0x80 systemcall.o
-                0xc001da68                systemcall
-                0xc001dac4                jmp_address
- .text          0xc001dae8       0x20 install.o
-                0xc001daf2                install_bootmanager_stage1
-                0xc001daf7                install_bootmanager_stage2
-                0xc001dae8                install_os
-                0xc001dafc                install_bootmanager_metafile
-                0xc001daed                install_boot_manager
- .text          0xc001db08      0x180 debug.o
-                0xc001db08                debug_check_inicialization
-                0xc001dc14                debug
-                0xc001dbb3                debug_check_drivers
-                0xc001dbe7                debug_compute_checksum
-                0xc001dbc5                debug_breakpoint
- .text          0xc001dc88      0x140 abort.o
-                0xc001dcae                KiAbort
-                0xc001dcb9                abort
-                0xc001dca1                systemAbort
-                0xc001dc88                KeAbort
- .text          0xc001ddc8      0x220 faults.o
-                0xc001df7b                KiCpuFaults
-                0xc001df8e                do_pagefault
-                0xc001ddc8                faults
- .text          0xc001dfe8      0xbf0 services.o
-                0xc001dfe8                services
-                0xc001ebcc                servicesChangeProcedure
-                0xc001ebd8                _code_end = .
+                0xc001d91a                procedureLinkDriverTest
+ .text          0xc001dae8       0x80 systemcall.o
+                0xc001dae8                systemcall
+                0xc001db44                jmp_address
+ .text          0xc001db68       0x20 install.o
+                0xc001db72                install_bootmanager_stage1
+                0xc001db77                install_bootmanager_stage2
+                0xc001db68                install_os
+                0xc001db7c                install_bootmanager_metafile
+                0xc001db6d                install_boot_manager
+ .text          0xc001db88      0x180 debug.o
+                0xc001db88                debug_check_inicialization
+                0xc001dc94                debug
+                0xc001dc33                debug_check_drivers
+                0xc001dc67                debug_compute_checksum
+                0xc001dc45                debug_breakpoint
+ .text          0xc001dd08      0x140 abort.o
+                0xc001dd2e                KiAbort
+                0xc001dd39                abort
+                0xc001dd21                systemAbort
+                0xc001dd08                KeAbort
+ .text          0xc001de48      0x220 faults.o
+                0xc001dffb                KiCpuFaults
+                0xc001e00e                do_pagefault
+                0xc001de48                faults
+ .text          0xc001e068      0xbf0 services.o
+                0xc001e068                services
+                0xc001ec4c                servicesChangeProcedure
+                0xc001ec58                _code_end = .
                 0xc001f000                . = ALIGN (0x1000)
- *fill*         0xc001ebd8      0x428 00
+ *fill*         0xc001ec58      0x3a8 00
 
 .data           0xc001f000    0x10000
                 0xc001f000                _data_begin = .
@@ -1926,16 +1926,16 @@ Linker script and memory map
  .rdata         0xc002e1b4      0x1b0 gramado.o
  .rdata         0xc002e364       0x30 object.o
  .rdata         0xc002e394       0xa0 userenv.o
- .rdata         0xc002e434      0x330 procedure.o
- .rdata         0xc002e764       0x10 systemcall.o
- .rdata         0xc002e774       0x10 install.o
- .rdata         0xc002e784      0x130 debug.o
- .rdata         0xc002e8b4       0xa0 abort.o
- .rdata         0xc002e954      0x1a0 faults.o
- .rdata         0xc002eaf4      0x4d0 services.o
-                0xc002efc4                _data_end = .
+ .rdata         0xc002e434      0x350 procedure.o
+ .rdata         0xc002e784       0x10 systemcall.o
+ .rdata         0xc002e794       0x10 install.o
+ .rdata         0xc002e7a4      0x130 debug.o
+ .rdata         0xc002e8d4       0xa0 abort.o
+ .rdata         0xc002e974      0x1a0 faults.o
+ .rdata         0xc002eb14      0x4d0 services.o
+                0xc002efe4                _data_end = .
                 0xc002f000                . = ALIGN (0x1000)
- *fill*         0xc002efc4       0x3c 00
+ *fill*         0xc002efe4       0x1c 00
 
 .bss            0xc002f000    0x20000
                 0xc002f000                _bss_begin = .

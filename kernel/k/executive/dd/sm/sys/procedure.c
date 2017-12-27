@@ -65,6 +65,15 @@ unsigned long terminal_procedure( struct window_d *window,
     // esse procedimento de janela é exclusivo para a janela do terminal que pode 
     //ser uma janela indicada por um aplciativo.
 	
+	//
+	// Lidando com a janela com o foco de entrada.
+	//
+
+
+	unsigned long left; 
+	unsigned long top;   
+	unsigned long width; 
+	unsigned long height; 	
 
 	// Window With Focus !
 	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
