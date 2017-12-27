@@ -14,3 +14,5 @@ Maybe you can help me with this thing.
 <br>/taskman = taskman application
 
 @frednora
+
+<img src="https://github.com/frednora/gramado/blob/master/kernel/gui.png">
