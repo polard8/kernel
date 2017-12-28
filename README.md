@@ -15,4 +15,4 @@ Maybe you can help me with this thing.
 
 @frednora
 
-<img src="https://github.com/frednora/gramado/blob/master/kernel/gui.png">
+<img src="https://github.com/frednora/gramado/blob/master/screenshots/gui.png">
