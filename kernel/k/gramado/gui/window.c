@@ -1884,6 +1884,9 @@ void windowUnblockFocus(){
  */
 void SetFocus(struct window_d *window)
 {
+	
+	int i;
+	
 	//Impossível mudar o focus.
 	//Isso manterá o foco na janela do desenvolvedor
 	//durante a fase de criação da interface gráfica.
@@ -1948,7 +1951,32 @@ void SetFocus(struct window_d *window)
 			    window_with_focus = (int) window->id;
                 goto done;				
 			};
-		  				
+			
+			//
+			// Se a janela for um editbox, ela precisa ter seu input resetado..
+			// para que o procedimento de janela do kernel possa usá-lo.
+			// por enquanto, faremos isso para todos os tipos de janelas.
+			//
+			
+			//Resetando o input do procedimento de janela.
+			
+	        g_cursor_left   = (window->left/8);
+	        g_cursor_top    = (window->top/8);   
+	        g_cursor_right  = g_cursor_left + (window->right/8);
+	        g_cursor_bottom = g_cursor_top + (window->height/8);
+	
+            g_cursor_x = g_cursor_left; 
+	        g_cursor_y = g_cursor_top;  		
+	
+	        for(i=0; i<PROMPT_MAX_DEFAULT;i++)
+	        {
+		        prompt[i] = (char) '\0';
+		        prompt_out[i] = (char) '\0';
+		        prompt_err[i] = (char) '\0';
+	        };
+            prompt_pos = 0;				
+		    
+			//... 				
 		};
 		
 	};

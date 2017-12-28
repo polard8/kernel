@@ -965,16 +965,36 @@ done:
 unsigned long input(unsigned long ch)
 {   
 	char c = (char) ch;  //Converte 'unsigned long' em 'char'.	
+
+
+    if(g_inputmode == INPUT_MODE_LINE )	
+    {
+        //Limite.
+	    if(prompt_pos >= PROMPT_SIZE)
+	    {
+	        printf("input: INPUT_MODE_LINE full buffer!\n");	
+	        refresh_screen();
+			return (unsigned long) 0; 
+	    };
+    };
 	
-    //Limite.
-	if(prompt_pos >= PROMPT_SIZE){ 
-	    printf("Buffer cheio!\n");	
-	    return (unsigned long) 0; 
+	if(g_inputmode == INPUT_MODE_MULTIPLE_LINES )
+	{
+		//tem que ter o tamanho de um arquivo.
+		if(prompt_pos >= PROMPT_SIZE)
+		{
+	        printf("input: INPUT_MODE_MULTIPLE_LINES full buffer!\n");	
+	        refresh_screen();
+			return (unsigned long) 0; 			
+		}
 	};
- 
+	
+	
 	//
 	// Trata o caractere digitado. 
 	//
+	
+	int i;
 	
 	switch(c)
 	{
@@ -984,9 +1004,18 @@ unsigned long input(unsigned long ch)
 		//case 0x1C:
 		case VK_RETURN:
             //modo linha 
-			if(g_inputmode == INPUT_MODE_LINE ){
+			if(g_inputmode == INPUT_MODE_LINE )
+			{
 			    prompt[prompt_pos] = (char )'\0'; //end of line.
 			    //@todo: ?? ldiscCompare();
+				//o compare está no aplicativo.
+	            for(i=0; i<PROMPT_MAX_DEFAULT;i++)
+	            {
+		            prompt[i] = (char) '\0';
+		            prompt_out[i] = (char) '\0';
+		            prompt_err[i] = (char) '\0';
+	            };
+                prompt_pos = 0;				
 				goto input_done;
 			};
             //modo multiplas linhas 
@@ -1105,13 +1134,33 @@ void stdioInitialize()
 	//multiplas linhas.
 	g_inputmode = INPUT_MODE_MULTIPLE_LINES;
 	
+	
+	//
+	//
+	//
+	
+	//
+	// Inicializa o cursor com margens bem abertas.
+	//
+		
+	g_cursor_left   = (0);
+	g_cursor_top    = (0);   
+	g_cursor_right  = (800/8);
+	g_cursor_bottom = (600/8);
+	
+    g_cursor_x = g_cursor_left; 
+	g_cursor_y = g_cursor_top;  		
+	
+	
 	int i;
 	for(i=0; i<PROMPT_MAX_DEFAULT;i++)
 	{
 		prompt[i] = (char) '\0';
 		prompt_out[i] = (char) '\0';
 		prompt_err[i] = (char) '\0';
-	};	
+	};
+
+    prompt_pos = 0;	
 	
 }
 

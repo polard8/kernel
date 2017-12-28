@@ -108,11 +108,20 @@ unsigned long terminal_procedure( struct window_d *window,
 		g_cursor_right  = g_cursor_left + (width/8);
 		g_cursor_bottom = g_cursor_top  + (height/8);
 		
-		if( g_cursor_right == 0 ){
+		if( g_cursor_right == 0 )
+		{
+			printf("terminal_procedure: cursor right null");
+			refresh_screen();
+			while(1){}
 			g_cursor_right = 1;
 		}
 		
-        if( g_cursor_bottom == 0 ){
+        if( g_cursor_bottom == 0 )
+		{
+			printf("terminal_procedure: cursor bottom null");
+			refresh_screen();
+			while(1){}
+			
 			g_cursor_bottom = 1;
 		}		
 		
@@ -291,18 +300,30 @@ unsigned long system_procedure( struct window_d *window,
 	    width  = window->width;
 	    height = window->height;		
 	
+	    //
+		// simular valores aqui para teste ... como 80 25
+		//
+		
 		g_cursor_left   = (window->left/8);
 		g_cursor_top    = (window->top/8) + 4;   //Queremos o início da área de clente.
+		
 		g_cursor_right  = g_cursor_left + (width/8);
 		g_cursor_bottom = g_cursor_top  + (height/8);
+
+		//100
+		//a linha deve ser grande.
+		//A linha pode ser maior que a janela.
+		//g_cursor_right  = (800/8);
+		//g_cursor_bottom = (600/8);
+
 		
-		if( g_cursor_right == 0 ){
-			g_cursor_right = 1;
-		}
+		//if( g_cursor_right == 0 ){
+		//	g_cursor_right = 1;
+		//}
 		
-        if( g_cursor_bottom == 0 ){
-			g_cursor_bottom = 1;
-		}		
+        //if( g_cursor_bottom == 0 ){
+		//	g_cursor_bottom = 1;
+		//}		
 		
 		//cursor (0, mas com margem nova).
 		//#bugbug ... isso reiniciaria o cursor a cada tecla pressionada.
@@ -518,7 +539,10 @@ unsigned long system_procedure( struct window_d *window,
 				    AltStatus = 0;
 					CtrlStatus = 0;
 					ShiftStatus = 0;
-                    backgroundDraw(COLOR_BLACK);
+                    //backgroundDraw(COLOR_BLACK);
+					videoInit();
+					//setar o foco ajuda a restaurar o input stdin para o procedimento de janela.
+					SetFocus( gui->main );
 					refresh_screen();
 					goto done;	
 					break;

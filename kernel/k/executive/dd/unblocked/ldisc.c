@@ -1379,12 +1379,12 @@ void mouseHandler()
 		// Envia as mensagens para os aplicativos intercepta-las
 		//so mandamos mensagem para um aplicativo no estavo válido.
 		if( w->used == 1 && w->magic == 1234 ){
-	        windowSendMessage( 0, 0, 0, 0);
+	        //windowSendMessage( 0, 0, 0, 0);
 		};			
 		
 		//Chama o procedimento de janelas do sistema.
 		//O procedimento de janela do terminal está em cascata.
-		system_procedure( w, (int) 0, (unsigned long) 0, (unsigned long) 0 );					
+		//system_procedure( w, (int) 0, (unsigned long) 0, (unsigned long) 0 );					
 	};		
 			
 	

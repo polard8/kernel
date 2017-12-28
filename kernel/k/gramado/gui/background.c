@@ -56,6 +56,10 @@ done:
 	//Cursor.
 	g_cursor_x = 0;
 	g_cursor_y = 0; 
+	
+	g_cursor_right  = (800/8);
+	g_cursor_bottom = (600/8);
+		
     return;
 };
 
