@@ -38,8 +38,8 @@ extern _KiKeyboard
 extern _KiRtcIrq
 ;extern _rtc_irq
 
-
-extern _mouseHandler
+;;usada pela irq12.
+extern _mouse_handler
 
 
 ;
@@ -637,7 +637,7 @@ _irq12:
 	;mov gs, ax  ;Usar seletor 0.	
 	
 	pushad
-	call _mouseHandler
+	call _mouse_handler
 	popad
 	
 	mov al, 0x20

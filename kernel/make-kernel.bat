@@ -190,7 +190,8 @@ echo -{ ux2 /executive
 	rem (unblocked) legados (K2).
 	gcc -c k/executive/dd/unblocked/video.c   -I./include -o video.o  
 	gcc -c k/executive/dd/unblocked/screen.c  -I./include -o screen.o 	
-	gcc -c k/executive/dd/unblocked/keyboard.c  -I./include -o keyboard.o  
+	gcc -c k/executive/dd/unblocked/keyboard.c  -I./include -o keyboard.o
+    gcc -c k/executive/dd/unblocked/mouse.c  -I./include -o mouse.o  	
 	gcc -c k/executive/dd/unblocked/ldisc.c  -I./include -o ldisc.o    	
 	gcc -c k/executive/dd/unblocked/hdd.c    -I./include -o hdd.o	
 	gcc -c k/executive/dd/unblocked/pic.c   -I./include -o pic.o 
@@ -325,6 +326,7 @@ pic.o ^
 timer.o ^
 rtc.o ^
 keyboard.o ^
+mouse.o ^
 ldisc.o ^
 hdd.o ^
 pci.o ^

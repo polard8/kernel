@@ -42,6 +42,7 @@
  * *******************************************************
  * abnt2_keyboard_handler: 
  *     Keyboard handler for abnt2 keyboard.
+ *     fica dentro do driver de teclado.
  *
  *     A interrupção de teclado vai chamar essa rotina.
  *     @todo: Usar keyboardABNT2Handler().
@@ -65,6 +66,7 @@ void abnt2_keyboard_handler()
     	
 	//
 	// * Importante:
+	//   Estamos no driver de teclado.
 	//   Aqui chamamos uma rotina que deve ficar no kernel base.
     //   Se estamos no driver de teclado em kernel mode precisamos	
 	//   de um método para chamar o kernel base. Talvez system call.
