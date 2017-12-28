@@ -14,6 +14,51 @@
 
 #include <kernel.h>
 
+/*
+char*  cursor[] =
+{
+    "1..........",
+    "11.........",
+    "121........",
+    "1221.......",
+    "12221......",
+    "122221.....",
+    "1222221....",
+    "12222221...",
+    "122222221..",
+    "1222222221.",
+    "12222211111",
+    "1221221....",
+    "121.1221...",
+    "11..1221...",
+    "1....1221..",
+    ".....1221..",
+    "......11..."
+};
+
+*/
+
+/*
+static char cursor[16][16] = {
+		"**************..",
+		"*OOOOOOOOOOO*...",
+		"*OOOOOOOOOO*....",
+		"*OOOOOOOOO*.....",
+		"*OOOOOOOO*......",
+		"*OOOOOOO*.......",
+		"*OOOOOOO*.......",
+		"*OOOOOOOO*......",
+		"*OOOO**OOO*.....",
+		"*OOO*..*OOO*....",
+		"*OO*....*OOO*...",
+		"*O*......*OOO*..",
+		"**........*OOO*.",
+		"*..........*OOO*",
+		"............*OO*",
+		".............***"
+	};
+
+*/
 
 //
 // Imported functions.
@@ -165,8 +210,8 @@ unsigned long numlock_status;
 unsigned char *mousemsg;
 unsigned char buffer_mouse[3];
 unsigned char mouse_status;
-unsigned char delta_x;
-unsigned char delta_y;
+char delta_x;
+char delta_y;
 int count_mouse;
 
 //@todo: fazer rotina de get status algumas dessas variáveis.
@@ -712,6 +757,12 @@ done:
 	//
 	//
 	
+		//
+		// *importante:
+		// Passamos a mensagem de teclado para o procedimento de janela do sistema.
+		// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
+		//
+	
 	
     //Pegaremos aqui a janela com o foco de entrada e passaremos 
 	//para o procedimento, que não deve pegar novamente.
@@ -1215,17 +1266,93 @@ void mouseHandler()
 	// a quantidade de informações necessária.
 	//
 	
+	int xChange, yChange;
+	unsigned long x,y;
+	
+	char mouse_char[] = "T";
+	
 	if(count_mouse >= 3)
 	{
-        mouse_status = buffer_mouse[0];
-        
-		delta_x = buffer_mouse[1];
-	    delta_y = buffer_mouse[2];
+        mouse_status = buffer_mouse[0];       
+		delta_x      = buffer_mouse[1];
+	    delta_y      = buffer_mouse[2];
 		
         //printf("ocorreram 3 irq12 !\n");
         //kernelPS2MouseDriverReadData(); //bugbug
-		printf("mouseStatus={%d} deltaX={%d} deltaY={%d} \n",mouse_status,delta_x,delta_y);
+		//printf("mouseStatus={%d} deltaX={%d} deltaY={%d} \n",mouse_status,delta_x,delta_y);
+		              
+					  
+		/*  
+					  
+		//x
+                    if( (mouse_status & 0x10) )
+					{
+	                    //baixo e esquerda
+						printf("1: esquerda %d \n",delta_x);
+					//    xChange = (unsigned long) ((256 - delta_x) * -1);
+                    }else{ 
+					    //cima direita 
+					    printf("2: direita %d \n",delta_x);
+					//    xChange = (unsigned long) delta_x; 
+					};
+					//--=======
+
+					//xChange = 40;
+					
+					//++=======
+                    //y
+					if( (mouse_status & 0x20))
+					{
+						// baixo e esquerda
+						printf("3: baixo %d \n",delta_y);
+                       // yChange = (int) (yChange + delta_y);
+                    }else{
+						//cima e direita
+                        printf("4: cima %d\n",delta_y); 						
+                       // yChange = (int) ( yChange + delta_y );						
+					};
+					
+					*/
+					
+					/*
+	    if( (mouse_status & 0x10) != 0) 
+		{
+			delta_x |= 0xffffff00;
+		};
+		
+		if( (mouse_status & 0x20) != 0) 
+		{
+			delta_y |= 0xffffff00;
+		};
+		
+		delta_y = - delta_y; 
+		
+		*/
+		
+		/*
+        if ((mouse_status & 0x10) != 0)
+            delta_x |= -1 << 8;
+    
+	    if((mouse_status & 0x20) != 0)
+            delta_y |= -1 << 8;
+    
+	        delta_y = -delta_y;		
+		*/
+		
+		printf("dX={%d} dY={%d} \n",delta_x,delta_y);
 		refresh_screen();
+		
+		if(xChange < 0){ xChange = 0;}
+		if(xChange > 800){ xChange = 800-8;}
+		if(yChange < 0){ yChange = 0;}
+		if(yChange > 600){ yChange = 600-8;}
+		
+		x = (unsigned long) xChange;
+		y = (unsigned long) yChange;
+		
+		//printf("%c", (char) 'T' );
+		//my_buffer_char_blt( x*8, y*8, COLOR_PINK, 'T');
+		//refresh_rectangle( (unsigned long) x*8, (unsigned long) y*8, 8, 8 );		
 		
 	    //printf("#"); //teste
 	    //MessageBox(gui->screen, 1, "mouseHandler:","Testing Mouse interrupt");
@@ -1234,6 +1361,33 @@ void mouseHandler()
 		//Zerando a contagem de interrupções de mouse.
 		count_mouse=0;
     };
+	
+	
+	//
+	// *importante:
+	// Passamos a mensagem de mouse para o procedimento de janela do sistema.
+	// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
+	//
+		
+    //Pegaremos aqui a janela com o foco de entrada e passaremos 
+	//para o procedimento, que não deve pegar novamente.
+	struct window_d *w;
+	w = (void *) windowList[window_with_focus];
+	
+	if( (void*) w != NULL )
+	{
+		// Envia as mensagens para os aplicativos intercepta-las
+		//so mandamos mensagem para um aplicativo no estavo válido.
+		if( w->used == 1 && w->magic == 1234 ){
+	        windowSendMessage( 0, 0, 0, 0);
+		};			
+		
+		//Chama o procedimento de janelas do sistema.
+		//O procedimento de janela do terminal está em cascata.
+		system_procedure( w, (int) 0, (unsigned long) 0, (unsigned long) 0 );					
+	};		
+			
+	
 	//return;
 };
 

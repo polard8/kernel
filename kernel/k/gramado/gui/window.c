@@ -2234,12 +2234,15 @@ int init_window_manager()
 	//
 	
 done:
+#ifdef KERNEL_VERBOSE
     printf("done!\n");
+#endif
     return (int) 0;
 };
 
 
 /*
+ *******************************************************
  * init_windows:
  *     Inicializa a lista de janelas.
  *     Inicializa globais relativas à janelas.
@@ -2396,58 +2399,108 @@ done:
 	return (int) 0;
 };
 
-/*
-int getZorder( struct window_d *window )
-{
-	int z;
-    
-	//procura a janela na lista.
-	for(z=0; z< ??; z++)
-	{
-		if( window == h ){
-			goto done;
-		}
-		
-	}
-    
-done:	
-	return (int) z;
-};
-*/
 
-/*
-struct window_d *getTopWindow( struct window_d *window)
+//pegando a z-order de uma janela.
+int get_zorder( struct window_d *window )
+{
+    if( (void*) window != NULL ){
+		return (int) window->zIndex;
+	}		
+fail:
+	return (int) -1;
+};
+
+
+//pegando a o id da janela que está no topo da lista de uma janela.
+struct window_d *getTopWindow(struct window_d *window)
 {
 	//refletindo ??
     //se um argumento for passado teremos que examinar a ordem das janelas filhas.	
 	//sendo assim cada estrutura de janela precisa de uma lista de janelas filhas 
-	// e a zorder delas ... se nenhuma janela for passada como argumento 
+	// e a zorder delas ... 
+	//
+	//se nenhuma janela for passada como argumento 
 	// teremos que olhar as janelas filhas da janela principal que é a gui->main ...
-	//a janelça gui->main pode ser a janela mae de todas as outras ...
+	//a janela gui->main pode ser a janela mae de todas as outras ...
 	// sendo a janela gui->main a janela principal do processo kernel.
 	//o processo explorador de arquivos poderá ser o processo que 
 	//seja a mãe de todos os aplicativos de usuário ... então a 
 	//z order na estrutura da janela desse aplicativo indica a ordem 
 	//das janelas principais dos seus processos filhos ...
 	//??
-} 
-*/
+	// Uma estrutura de janela pode ter uma variável top_window indicando o id 
+	// da janela que está no topo da z-order da janela.
+	//
+	
+	
+	if( (void*) window == NULL )
+	{
+		return ( struct window_d * ) windowList[top_window];
+	};
+	
+	return NULL;
+}; 
 
 
+int get_top_window(){
+	return (int) top_window;
+};
 
+//configurando a top window.
+void set_top_window( int id )
+{
+	top_window = (int) id;
+	return;
+};
 
+//fecha a janela ativa.
 void closeActiveWindow()
 {
-    int WID;
+    int ID;
 	struct window_d *w;
 	
-	WID = get_active_window();
+	ID = get_active_window();
 	
-	w = (void*) windowList[WID];
+	w = (void*) windowList[ID];
 	
 	CloseWindow(w);
 };
 
+
+//encontrando um slot livre na z-order global de 
+//overlapped windows.
+int z_order_get_free_slot()
+{
+	int response;
+	int z; 
+	struct window_d *zWindow;
+
+	for( z = 0; z < ZORDER_COUNT_MAX; z++ )
+	{
+	    zWindow = (void*) zorderList[z];
+        
+		//Obtendo um espaço vazio.
+		//Se for NULL, então não tinha um ponteiro no slot.
+		if( (void*) zWindow == NULL )
+		{
+			response = (int) z; 
+			
+			zorderCounter++;
+			if(zorderCounter >= ZORDER_COUNT_MAX){
+				printf("CreateWindow: zorderCounter\n");
+				goto fail;
+			}
+            
+			goto done; 				
+		};		
+		//Nothing
+	};
+	
+fail:
+    return (int) -1;
+done:
+    return (int) response;	
+};
 
 //
 // End.

@@ -367,7 +367,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//
 		
 		//active 
-		if( status == WINDOW_STATUS_ACTIVE){ 
+		if( status == WINDOW_STATUS_ACTIVE ){ 
 		    active_window = (int) window->id;  
             //set_active_window(window); 		
 		    //window->active = WINDOW_STATUS_ACTIVE;
@@ -378,7 +378,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		};
 		
 		//inactive
-		if( status == WINDOW_STATUS_INACTIVE){ 
+		if( status == WINDOW_STATUS_INACTIVE ){ 
 		    //window->active = WINDOW_STATUS_INACTIVE;
 			//window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
 			window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
@@ -809,26 +809,21 @@ drawBegin:
 	//Background.
 	if(Background == 1)
 	{		
-		//Primeiro configurando a cor padrão para todos os tipos de janelas.
-		//Depois definimos para tipos específicos.
+        //Configurando a cor padrão de background.
 		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; //xCOLOR_GRAY2;  //CINZA UM POUQUINHO MAIS CLARO.
-
-        //
-		//#bugbug: Estamos usando a cor padrão do tema para background,
-		// mas para o tipo 1 é fundamental que se use no background a cor 
-		// passada por argumento.
-		//
 	    
+		//Configurando par tipos específicos.
 		//Cor do background para o tipo 1.
-		if( (unsigned long) type == WT_SIMPLE){ window->color_bg = color; }
-		if( (unsigned long) type == WT_POPUP){ window->color_bg = color; }
+		//Para o tipo 1 tem que usar a cor passada pelo argumento.
+		if( (unsigned long) type == WT_SIMPLE ){ window->color_bg = color; };
+		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
 		//if( (unsigned long) type == WT_SIMPLE){ window->color_bg = color; }
-		
+		//...
 		
 		//@todo: Se tiver barra de rolagem a largura do backgrond deve ser maior.
 		//if()
 		
-		//@todo: Passar a estrutura de janela.
+		//Pintar o retângulo.
 		drawDataRectangle( window->left, 
 		                   window->top, 
 						   window->width,  // @todo: Adicionar a largura da bordas bordas verticais.
@@ -839,7 +834,8 @@ drawBegin:
     //Título + borda.	
 	if(TitleBar == 1)
 	{ 
-		window->color_bg = color;  //*Cor enviada por argumento.
+        //*Cor enviada por argumento.
+		window->color_bg = color;  
 		
 		//@todo: Precisamos definir a questão o foco.
 		// ?? Quando uma jamela é criada, ela é criada com o foco ou não??
@@ -874,8 +870,8 @@ drawBegin:
 		                       window->top, 
 				    		   window->width  +1 +1,  // largura do retângulo que marca que a janela está ativa.
 						       4,                     // altura do retângulo que marca que a janela está ativa.
-						       COLOR_SALMON );			
-		}
+						       COLOR_SALMON );		  //@todo: Incluir essa cor no esquema padrão.	
+		};
 						   
 		//@todo: Se estivermos em full screen, não teremos string.				   
 		draw_string( window->left +8 +16 +8, 
@@ -903,7 +899,7 @@ drawBegin:
 	        draw_button( window, "V", 1, 
 			             (window->width -42 -1), 4, 
 						 21, 21, 
-						 COLOR_BUTTONFACE);	
+						 COLOR_BUTTONFACE); //@todo: criar elemento no esquema de cores.	
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
@@ -913,7 +909,7 @@ drawBegin:
 	        draw_button( window, "X", 1, 
 			            (window->width -21), 4, 
 						21, 21, 
-						COLOR_BUTTONFACE);				
+						COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.			
 	    };					 
 			
 		//#bugbug O kernel não pode ficar tanto tempo assim carregando uma imagem.
@@ -1109,43 +1105,28 @@ drawBegin:
 	
 	
 	//
-	// zorder stuff.
+	// zorder support.
 	//
 	
-	int z; 
-	struct window_d *zWindow;
+	//
+	// Deve ter uma função que faça isso,
+	// daí chamamos só a função.
 	
-	for( z = 0; z < ZORDER_COUNT_MAX; z++ )
-	{
-	    zWindow = (void*) zorderList[z];
-        
-		//Obtendo um espaço vazio.
-		//Se for NULL, então não tinha um ponteiro no slot.
-		if( (void*) zWindow == NULL )
-		{
-			//Coloca o ponteiro da janela criada no slot vazio.
-			zorderList[z] = (unsigned long) window;
-
-            //Salva o índice da ordem na estrutura da janela criada. 			
-            window->zIndex = (int) z;
-			
-			zorderCounter++;
-			if(zorderCounter >= ZORDER_COUNT_MAX){
-				printf("CreateWindow: zorderCounter\n");
-				goto fail;
-			}
-            
-			goto done; 				
-		};		
-		//Nothing
+	//
+	// Opções:
+	// + z-order dos elementos gráficos dentro da janela mãe.
+	// + z-order global da overlapped windows.
+	//
+	
+    //z-order global de overlapped windows.
+    int z;
+	z = (int) z_order_get_free_slot();	
+    if( z >= 0 && z < ZORDER_COUNT_MAX ){
+	    zorderList[z] = (unsigned long) window;
 	};
 	
-//Se o for acabou sem termos conseguido um lugar vazio.	
-fail:
-    printf("CreateWindow: zorderList\n");
-    die();
-	//refresh_screen();
-    //while(1){}	
+	//@todo: z-order de elementos gráficos dentro da janela mãe.
+ 
 	
 // done.		
 done:

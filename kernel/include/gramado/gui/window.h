@@ -854,6 +854,8 @@ int terminal_window;
 //Id da janela ativa.
 int active_window;
 
+//Janela de id 0 na z-order
+int top_window;
 
 // LFB - address for kernel graphic mode
 unsigned long g_kernel_lfb; 
@@ -1262,8 +1264,12 @@ struct window_d
 	
 	//ordem na pilha de janelas do eixo z.
 	//A janela mais ao topo é a janela foreground.
-	int zIndex;    //@todo: deletar. se usarmos a estrutura de zorder não precisaremos desse índice.
-    struct zorder_d *zorder;	
+	
+	int zIndex;    
+
+	//z-order global.
+	//Sua ordem em relação a janela gui->main.    
+	struct zorder_d *zorder;
 
 	//dimensões e margens.
     unsigned long x;           //deslocamento x
@@ -2323,6 +2329,16 @@ void windowShowWindowList();
 void show_window_with_focus();
 void show_active_window();
 
+//
+// z-order support.
+//
+
+int z_order_get_free_slot();
+int get_zorder( struct window_d *window );
+struct window_d *getTopWindow(struct window_d *window);
+int get_top_window();
+//configurando a top window.
+void set_top_window( int id );
 
 void closeActiveWindow();
 

@@ -162,6 +162,21 @@ unsigned long terminal_procedure( struct window_d *window,
 			};
 		break;
 		
+        //case MSG_CONSOLE:
+		case MSG_CONSOLE_COMMAND:
+		    switch(long1)
+			{
+				case MSG_CONSOLE_SHUTDOWN:
+				    systemShutdown();
+				    break;
+				case MSG_CONSOLE_REBOOT:
+				    systemReboot();
+                    break;				
+			    default:
+				    break;
+			};
+			break;		
+		
 		default:
 		    break;
 	};
@@ -333,9 +348,9 @@ unsigned long system_procedure( struct window_d *window,
 					//Se for do tipo termional as teclas de digitação se 
 					//serão tratadas pelo procedimento de janelas do terminal.
 					//para isso é só ir para o fim desse procedimento.
-					if( window->terminal == 1 ){
-					    goto do_terminal;	
-					}
+					//if( window->terminal == 1 ){
+					//    goto do_terminal;	
+					//}
 						
 					//
 					// *importante:
@@ -669,35 +684,30 @@ unsigned long system_procedure( struct window_d *window,
             };          
         break;
 		*/
-		
-
-		
-        /*		
-        case MSG_DESTROY:		
-            //destroy 
-        break;
-         */
 
 		// Essa categoria é para receber mensagens
         //enviadas para o console para gerenciamento do sistema.
         //como desligamentos, inicializações, reboot ...		
-        case MSG_CONSOLE_COMMAND:
-		    switch(long1)
-			{
-				case MSG_CONSOLE_SHUTDOWN:
-				    systemShutdown();
-				    break;
-				case MSG_CONSOLE_REBOOT:
-				    systemReboot();
-                    break;				
-			    default:
-				    break;
-			};
+        //case MSG_CONSOLE:
+		case MSG_CONSOLE_COMMAND:
+            goto do_terminal;		
 			break;
 		 
         //Continua ... Create ... Close ...		
-    
-	
+        //case MSG_CREATE:
+		//    break;
+		//case MSG_DESTROY:
+	    //    break;
+		//case MSG_CLOSE:
+	    //    break;
+		//case MSG_SETFOCUS:
+	    //    break;
+		//case MSG_KILLFOCUS:
+	    //    break;
+		//case MSG_PAINT:
+	    //    break;
+
+			
 	    //
 		// Aqui provavelmente estamos com teclas de digita~çao.
 		// então não precisamos efetuar o refresh_screen() deixando isso 
@@ -722,8 +732,18 @@ do_terminal:
 	// Chama o procedimento da janela terminal.
 	// Se ajanela não for uma janela do tipo terminal isso irá retornar imediatamente.
 	//
-	return (unsigned long) terminal_procedure( window, (int) msg, (unsigned long) long1, (unsigned long) long2 );
+	//return (unsigned long) terminal_procedure( window, (int) msg, (unsigned long) long1, (unsigned long) long2 );
 done:
+
+   //
+   // *importante:
+   // Aqui devemos chamar o procedimento de janela da janela com o foco de entrada.
+   // Pois bem, já mandamos a mensagem para fila de mensagens da janela com o foco
+   // de entrada, então quando o aplicativo receber tempo de processamento ele irá  
+   // processar a mensagem.
+   //
+   
+
     return (unsigned long) 0;
 };  
 

@@ -275,8 +275,12 @@ drawButton:
 	
 done:
     //SetFocus(hWnd);	//??	
-    refresh_screen();		   
-    return;
+    //refresh_screen();
+
+    //refresh apenas do message box ... teste.	
+    refresh_rectangle( x, y, cx, cy );
+	
+	return;
 };
 
 
