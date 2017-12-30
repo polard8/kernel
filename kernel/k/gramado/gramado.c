@@ -510,7 +510,6 @@ done:
  * @todo: Criar o buffer dedicado para a janela principal.
  *
  *     Obs: Essa janela é especial e usará o Backbuffer como buffer dedicado.
- * @todo: Cria buffer dedicado.
  */
 void gui_create_mainwindow()
 {
@@ -532,14 +531,12 @@ void gui_create_mainwindow()
 	//dispositivo.
 	//É onde ficam as janelas dos aplicativos.
 	//A janela principal perence ao desktop
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Area de Trabalho", 
-	                                (Width/2), Top, (Width/2), Height,           //meia tela como teste
-							        gui->screen, 0, 0, COLOR_PINK );         //COR TESTE
+	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "desktop window", 
+	                                Left, Top, Width, Height,           
+							        gui->screen, 0, 0, COLOR_WINDOW );   
 	if( (void*) hWindow == NULL){
 	    printf("gui_create_mainwindow:");
 	    die();
-		//refresh_screen();
-		//while(1){};
 	}else{   
 	    		
 	    RegisterWindow(hWindow);
@@ -625,8 +622,6 @@ void gui_create_logo()
 	{
 	    printf("gui_create_logo:");
 	    die();
-		//refresh_screen();
-		//while(1){};
 	}else{
 	    		
 		RegisterWindow(hWindow);
@@ -690,8 +685,6 @@ draw_bar:
 	{
 	    printf("gui_create_taskbar:");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 	    		
 	    RegisterWindow(hWindow);
@@ -760,9 +753,6 @@ void gui_create_controlmenu()
 	if( (void *) cmWindow == NULL ){
 	    printf("gui_create_controlmenu:");
 		return;
-		//die();
-		//refresh_screen();
-		//while(1){}	
 	}else{
 	    
 		//configura a janela do menu do sistema.
@@ -1177,13 +1167,12 @@ void guiSetUpMainWindow( unsigned long x,
 	unsigned long Height = (unsigned long) screenGetHeight();		
 		
 	//check limits
-
-	if( x > Width || y > Height ){
-		return;
+	if( x > Width || y > Height ){ 
+	    return; 
 	}
 	
-	if( width > Width || height > Height ){
-		return;
+	if( width > Width || height > Height ){ 
+	    return; 
 	}
 
 	if( (void*) gui == NULL ){

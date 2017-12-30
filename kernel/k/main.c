@@ -165,7 +165,7 @@ int kMain(int argc, char* argv[])
 	
 	    //Debug.
 	    kclear(0);
-	    kprintf("kMain: Debug" ,9 ,9 );
+	    kprint("kMain: Debug" ,9 ,9 );
 	    printf("kMain: Text Mode!\n");	    	
 	};
 	

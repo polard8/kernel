@@ -205,14 +205,31 @@ unsigned long numlock_status;
  ...
  */
 
+//
+// Mouse support
+//
 
- //mouse support
-unsigned char *mousemsg;
-unsigned char buffer_mouse[3];
-unsigned char mouse_status;
+//buffer
+char buffer_mouse[3];
+int count_mouse;
+
+//bytes do controlador.
+char mouse_status;
 char delta_x;
 char delta_y;
-int count_mouse;
+
+//coordenadas.
+int mouse_pos_x;
+int mouse_pos_y;
+
+
+unsigned char *mousemsg;
+
+
+
+
+
+
 
 //@todo: fazer rotina de get status algumas dessas variáveis.
 
@@ -430,7 +447,7 @@ void LINE_DISCIPLINE(unsigned char SC)
      */
 
     //Se a tecla for liberada.
-	//DÁ '0' se o bit de paridade fo '0'.
+	//Dá '0' se o bit de paridade for '0'.
     if( (scancode & KEY_RELEASED) == 0 )
 	{
 	    key = scancode;
@@ -1150,6 +1167,7 @@ int init_mouse()
 	// Checar se não é NULL.
 	
 	//Inicializando ...
+	//??onde foram definidas??
     mouse_status = 0;
     delta_x = 0;
     delta_y = 0;
@@ -1258,7 +1276,8 @@ void kbdc_wait(unsigned char type)
  * 
  */
 void mouseHandler()
-{	
+{
+    //buffer: definido como char.	
 	buffer_mouse[count_mouse++] = mouse_read();
 	
 	//
@@ -1266,13 +1285,20 @@ void mouseHandler()
 	// a quantidade de informações necessária.
 	//
 	
-	int xChange, yChange;
-	unsigned long x,y;
+	//int xChange, yChange;
+	//unsigned long x,y;
 	
+	
+	//cursor provisório.
 	char mouse_char[] = "T";
+	
+	//
+	// Contagem de interruções.
+	//
 	
 	if(count_mouse >= 3)
 	{
+		//bytes: definidos como 'char'
         mouse_status = buffer_mouse[0];       
 		delta_x      = buffer_mouse[1];
 	    delta_y      = buffer_mouse[2];
@@ -1282,37 +1308,41 @@ void mouseHandler()
 		//printf("mouseStatus={%d} deltaX={%d} deltaY={%d} \n",mouse_status,delta_x,delta_y);
 		              
 					  
-		/*  
+		  
 					  
 		//x
-                    if( (mouse_status & 0x10) )
-					{
-	                    //baixo e esquerda
-						printf("1: esquerda %d \n",delta_x);
-					//    xChange = (unsigned long) ((256 - delta_x) * -1);
-                    }else{ 
-					    //cima direita 
-					    printf("2: direita %d \n",delta_x);
-					//    xChange = (unsigned long) delta_x; 
-					};
-					//--=======
+        if( (mouse_status & 0x10) )
+		{
+			mouse_pos_x -= delta_x;
+	        //baixo e esquerda
+			//printf("1: esquerda %d \n",delta_x);
+			//    xChange = (unsigned long) ((256 - delta_x) * -1);
+        }else{ 
+		    mouse_pos_x += delta_x;
+		    //cima direita 
+		    //printf("2: direita %d \n",delta_x);
+			//    xChange = (unsigned long) delta_x; 
+		};
+		//--=======
 
-					//xChange = 40;
+
 					
-					//++=======
-                    //y
-					if( (mouse_status & 0x20))
-					{
-						// baixo e esquerda
-						printf("3: baixo %d \n",delta_y);
-                       // yChange = (int) (yChange + delta_y);
-                    }else{
-						//cima e direita
-                        printf("4: cima %d\n",delta_y); 						
-                       // yChange = (int) ( yChange + delta_y );						
-					};
+		//++=======
+        //y
+		if( (mouse_status & 0x20))
+		{
+			mouse_pos_y -= delta_y;
+			// baixo e esquerda
+			//printf("3: baixo %d \n",delta_y);
+            // yChange = (int) (yChange + delta_y);
+        }else{
+			mouse_pos_y += delta_y;
+			//cima e direita
+            //printf("4: cima %d\n",delta_y); 						
+            // yChange = (int) ( yChange + delta_y );						
+		};
 					
-					*/
+				 
 					
 					/*
 	    if( (mouse_status & 0x10) != 0) 
@@ -1339,16 +1369,24 @@ void mouseHandler()
 	        delta_y = -delta_y;		
 		*/
 		
-		printf("dX={%d} dY={%d} \n",delta_x,delta_y);
+		//calculando...
+		//mouse_pos_x += delta_x;
+		//mouse_pos_y += delta_y;
+		
+		
+		//#debug
+		//mostrando os resultados obtidos.
+		printf("X={%d} Y={%d} \n",mouse_pos_x,mouse_pos_y);
+		//printf("dX={%d} dY={%d} \n",delta_x,delta_y);
 		refresh_screen();
 		
-		if(xChange < 0){ xChange = 0;}
-		if(xChange > 800){ xChange = 800-8;}
-		if(yChange < 0){ yChange = 0;}
-		if(yChange > 600){ yChange = 600-8;}
+		//if(xChange < 0){ xChange = 0;}
+		//if(xChange > 800){ xChange = 800-8;}
+		//if(yChange < 0){ yChange = 0;}
+		//if(yChange > 600){ yChange = 600-8;}
 		
-		x = (unsigned long) xChange;
-		y = (unsigned long) yChange;
+		//x = (unsigned long) xChange;
+		//y = (unsigned long) yChange;
 		
 		//printf("%c", (char) 'T' );
 		//my_buffer_char_blt( x*8, y*8, COLOR_PINK, 'T');

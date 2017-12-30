@@ -454,6 +454,7 @@ FILE *_io_table[NUMBER_OF_FILES];
  * Protótipos do padão C.
  */
 
+#define kprintf printf
  
 int fclose(FILE *stream);    //@todo:  
 FILE *fopen( const char *filename, const char *mode );    //@todo: 
@@ -504,8 +505,8 @@ void _outbyte(int c);
  */
 void scroll( void );
 int kclear(int color);
-int kclearClientArea(int color); 
-int kprintf(char *message, unsigned int line, int color);
+int kclearClientArea(int color);
+int kprint(char *message, unsigned int line, int color);
 
 
 //inicializa os buffers do fluxo padrão em stdio.c

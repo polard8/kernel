@@ -54,7 +54,31 @@ static const char help_banner[] =
     "\n Commands: \n \n"
 	"help, version, reboot, exit\n";
 	
+	
+static const char tree_banner[] =
+    "\n"
+    "\n"
+    "\n"	
+"     \\o/    \n"
+"      d      \n"
+"     ccc     \n"
+"    bbbbb    \n"
+"   aaaaaaa   \n"
+"  ggggggggg  \n" 
+" fffffffffff \n"
+"eeeeeeeeeeeee\n" 
+"     ||      \n"  
+"     ||      \n"
+"     ||      \n"
+"    ~~~~     \n"
+	"\n";
+	
 	//... 
+	
+	
+        
+
+
 	
 	
 //

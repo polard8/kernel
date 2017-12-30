@@ -87,6 +87,27 @@ unsigned long g_rows;
 
 int g_using_gui; //modo gráfico?
 
+
+
+
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
+
+
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
+#endif
+
+#define FOPEN_MAX	(20)
+#define NUMBER_OF_FILES (20)
+
+//unsigned long __iob[NUMBER_OF_FILES]
+
+
+
+
+
 /*
  * FILE:
  *     Estrutura padrão para arquivos.    
@@ -109,25 +130,11 @@ FILE *stdin;
 FILE *stdout;
 FILE *stderr;
 
-#define	STDIN_FILENO	0
-#define	STDOUT_FILENO	1
-#define	STDERR_FILENO	2
+FILE *_io_table[NUMBER_OF_FILES];
 
-
-#ifndef FILENAME_MAX
-#define	FILENAME_MAX	(260)
-#endif
-
-#define FOPEN_MAX	(20)
-#define NUMBER_OF_FILES (20)
-
-//unsigned long __iob[NUMBER_OF_FILES]
-
-//#define stdin	    (&_iob[STDIN_FILENO])
-//#define stdout	(&_iob[STDOUT_FILENO])
-//#define stderr	(&_iob[STDERR_FILENO])
-
-
+#define stdin  (_io_table[0])	
+#define stdout 	(_io_table[1])
+#define stderr 	(_io_table[2])
 
 /*
  * Protótipos do padrão C.

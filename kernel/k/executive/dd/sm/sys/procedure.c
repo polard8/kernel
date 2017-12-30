@@ -31,6 +31,12 @@
  
 #include <kernel.h>
 
+
+extern int alt_status;
+extern int ctrl_status;
+extern int shift_status;
+//...
+
 //
 // Variáveis internas.
 //
@@ -349,9 +355,9 @@ unsigned long system_procedure( struct window_d *window,
             switch(long1)
             {
                 case VK_ESCAPE:
-				    AltStatus = 0;
-					CtrlStatus = 0;
-					ShiftStatus = 0;
+				    alt_status = 0;
+					ctrl_status = 0;
+					shift_status = 0;
                     goto done;				
 				    break;
 				
@@ -424,9 +430,9 @@ unsigned long system_procedure( struct window_d *window,
 				//Help. 
 				case VK_F1:	
 					//procedureHelp();
-				    AltStatus = 0;
-					CtrlStatus = 0;
-					ShiftStatus = 0;
+				    alt_status = 0;
+					ctrl_status = 0;
+					shift_status = 0;
                     backgroundDraw(COLOR_BLACK);
 					printf("%s",stdin->_base);  //mostrar a entrada padrão.
 					refresh_screen();
@@ -436,9 +442,9 @@ unsigned long system_procedure( struct window_d *window,
 				//Kernel info.	
                 case VK_F2:
 					//KiInformation();
-				    AltStatus = 0;
-					CtrlStatus = 0;
-					ShiftStatus = 0;
+				    alt_status = 0;
+					ctrl_status = 0;
+					shift_status = 0;
                     backgroundDraw(COLOR_BLACK);
 					printf("%s",stdout->_base);  //mostrar a entrada padrão.
 					refresh_screen();					
@@ -448,9 +454,9 @@ unsigned long system_procedure( struct window_d *window,
                 //CPU info. 				
                 case VK_F3: 
 					//show_cpu_intel_parameters();
-				    AltStatus = 0;
-					CtrlStatus = 0;
-					ShiftStatus = 0;
+				    alt_status = 0;
+					ctrl_status = 0;
+					shift_status = 0;
                     backgroundDraw(COLOR_BLACK);
 					printf("%s",stderr->_base);  //mostrar a entrada padrão.
 					refresh_screen();
@@ -460,7 +466,7 @@ unsigned long system_procedure( struct window_d *window,
                 case VK_F4:
 					if(AltStatus == 1){ 
 					    closeActiveWindow(); 
-						AltStatus = 0;
+						alt_status = 0;
 						goto done;
 						break;
 					};
@@ -534,15 +540,18 @@ unsigned long system_procedure( struct window_d *window,
 					goto done;
 					break;
 					
-				//Cls.	
+				//Cls. 
+				//(reiniciar as configurações originais)	
 				case VK_F8:
-				    AltStatus = 0;
-					CtrlStatus = 0;
-					ShiftStatus = 0;
+				    alt_status = 0;
+					ctrl_status = 0;
+					shift_status = 0;
                     //backgroundDraw(COLOR_BLACK);
 					videoInit();
 					//setar o foco ajuda a restaurar o input stdin para o procedimento de janela.
 					SetFocus( gui->main );
+					//kprintf está funcionando.
+					//kprintf("F8: Testing kprintf ...\n");
 					refresh_screen();
 					goto done;	
 					break;
@@ -687,9 +696,24 @@ unsigned long system_procedure( struct window_d *window,
 				    break;
 					
                 // Nothing for now!  				
-                case VK_LMENU:    break;
-                case VK_LCONTROL: break;
-                case VK_LSHIFT:   break;
+                case VK_LMENU:
+                    if( alt_status == 0 ){ 
+					    alt_status = 1; 
+					}else{ alt_status = 0; };				
+				    break;
+					
+                case VK_LCONTROL: 
+				    if( ctrl_status == 0 ){ 
+					    ctrl_status = 1; 
+					}else{ ctrl_status = 0; };
+					break;
+                
+				case VK_LSHIFT:   
+				    if( shift_status == 0 ){ 
+					    shift_status = 1; 
+					}else{ shift_status = 0; };
+				    break;
+					
                 //default: break;				
 		    };              
         break;

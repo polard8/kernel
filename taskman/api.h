@@ -3,6 +3,9 @@
  * Copyright (c) 2017 Fred Nora.
  *
  * File: api.h 
+ *
+ * @todo: Esse arquivo poderia se chamar gramado.h.
+ *        Ou gramado.h incluir esse arquivo.
  *   
  * Description:
  *    Header da API do sistema.
@@ -245,7 +248,7 @@
  * vários recursos básicos e fundamentais, portanto não se espera 
  * desempenho nessa chamada, mas sim uma grande quantidade de serviços
  * básicos. Já as interrupções que vão de 201 até 215 oferecem recursos 
- * específicos com o proósito de ganhar desempenho em serviços considerados 
+ * específicos com o propósito de ganhar desempenho em serviços considerados 
  * importantes para o desempenho geral do sistema.
  *
  */
@@ -412,9 +415,9 @@
 #define	SYSTEMCALL_SET_CLIENT_AREA    46
 
 //Create Window support.
-#define	SYSTEMCALL_CREATEWINDOW0  47
-#define	SYSTEMCALL_CREATEWINDOW1  48
-#define	SYSTEMCALL_CREATEWINDOW2  49
+#define	SYSTEMCALL_CREATEWINDOW0  47 // envia argumentos de controle. 
+#define	SYSTEMCALL_CREATEWINDOW1  48 // envia argumentos de posicionamento.
+#define	SYSTEMCALL_CREATEWINDOW2  49 // envia argumentos de dimensões.
 
 //
 //(50~59) Window suppot, manipulação de janelas.
@@ -447,7 +450,7 @@
 
 //Outros. 
 //@todo: Reservar próximos para seleção de janela. 
-#define	SYSTEMCALL_65  65
+#define	SYSTEMCALL_SYS_PUTCHAR  65
 #define	SYSTEMCALL_66  66
 #define	SYSTEMCALL_67  67
 #define	SYSTEMCALL_68  68
@@ -492,7 +495,7 @@
 #define	SYSTEMCALL_ALERTTHREAD  91
 #define	SYSTEMCALL_92  92
 #define	SYSTEMCALL_93  93
-#define	SYSTEMCALL_94  94
+#define	SYSTEMCALL_STARTTHREAD  94 //REAL (coloca a thread em standby para executar pela primeira vez.)
 #define	SYSTEMCALL_95  95
 #define	SYSTEMCALL_96  96
 #define	SYSTEMCALL_97  97
@@ -746,220 +749,326 @@
 
 
 
+ 
+ 
+//cinza para pintar janela
+//a janela tem camadas que vai do mais escuro para o mais claro.
+#define xCOLOR_BLACK 0x00000000  //preto
+#define xCOLOR_GRAY1 0x20202000  //cinza mais escuro
+#define xCOLOR_GRAY2 0x40404000  //cinza
+#define xCOLOR_GRAY3 0x60606000  //cinza
+#define xCOLOR_GRAY4 0x80808000  //cinza
+#define xCOLOR_GRAY5 0xa0a0a000  //cinza
+#define xCOLOR_GRAY6 0xc0c0c000  //cinza
+#define xCOLOR_GRAY7 0xe0e0e000  //cinza mais clarinho
+#define xCOLOR_WHITE 0xffffff00  //branco 
 
-
-
-//
-// Colors: Gray support.
-//
 
 //WIN23
-#define COLOR_LITBUTTON  0x00E0E0E0
-#define COLOR_LTGRAY     0x00C0C0C0
-#define COLOR_GRAY       0x00808080
+//TRÊS TIPOS DE CINZA.
+#define COLOR_LITBUTTON  0xE0E0E000
+#define COLOR_LTGRAY     0xC0C0C000
+#define COLOR_GRAY       0x80808000
+
+//CORES BÁSICAS.
+#define rgbBlack   0x00000000
+#define rgbBlue    0x0000FF00
+#define rgbCyan    0x00FFFF00
+#define rgbGreen   0x00FF0000
+#define rgbMagenta 0xFF00FF00
+#define rgbRed     0xFF000000
+#define rgbYellow  0xFFFF0000
+#define rgbWhite   0xFFFFFF00
 
 
-//
-// Button support.
-//
 
-//Cores para botões.
-#define COLOR_BUTTONFACE         0x00F0F0FF
-#define COLOR_BUTTONHIGHLIGHT    0x00FFFFFF
-#define COLOR_BUTTONSHADOW       0x00A0A0FF
-//...
+//windows2k system colors
+#define COLOR_TEST_0  0x8080FF00  // COLOR_BACKGROUND(verde claro) ??
+#define COLOR_TEST_1  0x80FFFF00  // COLOR_APPWORKSPACE, MDIWINDOW 
+#define COLOR_TEST_2  0x80FF8000  // COLOR_WINDOW, CLIENT
+#define COLOR_TEST_3  0x80FF0000  // COLOR_WINDOWTEXT, CLIENTTEXT 
+#define COLOR_TEST_4  0xFFFF8000  // COLOR_MENU, MENUBAR
+#define COLOR_TEST_5  0xFF800000  // COLOR_MENUTEXT (laranjado+-)
+#define COLOR_TEST_6  0xC080FF00  // COLOR_ACTIVECAPTION, MYCAPTION
+#define COLOR_TEST_7  0xFF80FF00  // COLOR_INACTIVECAPTION, CAPTION2
+#define COLOR_TEST_8  0x0000FF00  // COLOR_CAPTIONTEXT, CAPTIONTEXT(azul)highlight
+#define COLOR_TEST_9  0x00FFFF00  // COLOR_ACTIVEBORDER, BORDER
+#define COLOR_TEST_10 0x00FF8000  // COLOR_INACTIVEBORDER, BORDER2
+#define COLOR_TEST_11 0x40FF0000  // COLOR_WINDOWFRAME
+#define COLOR_TEST_12 0xFFFF0000  // COLOR_SCROLLBAR (amarelo)
+#define COLOR_TEST_13 0xC0800000  // COLOR_BTNFACE
+#define COLOR_TEST_14 0xC0808000  // COLOR_BTNSHADOW (vinho)
+#define COLOR_TEST_15 0xFF00FF00  // COLOR_BTNTEXT (rosa)
+#define COLOR_TEST_16 0x40408000  // COLOR_HIGHLIGHT ~ COLOR_GRAYTEXT (azul escuro)
+#define COLOR_TEST_17 0x4080FF00  // COLOR_HIGHLIGHT
+#define COLOR_TEST_18 0x00FF0000  // COLOR_HIGHLIGHTTEXT (verde)
+#define COLOR_TEST_19 0x80800000  // COLOR_INACTIVECAPTIONTEXT
+#define COLOR_TEST_20 0x80400000  // COLOR_BTNHIGHLIGHT
+#define COLOR_TEST_21 0xFF808000 
+#define COLOR_TEST_22 0x40008000 
+#define COLOR_TEST_23 0x8000FF00
+#define COLOR_TEST_24 0x00008000  //COLOR_HIGHLIGHT ~ hot track (azul)
+#define COLOR_TEST_25 0x0080FF00 
+#define COLOR_TEST_26 0x00800000 
+#define COLOR_TEST_27 0x40800000 
+#define COLOR_TEST_28 0xFF000000  //red
+#define COLOR_TEST_29 0xA0000000 
+#define COLOR_TEST_30 0x80008000 
+#define COLOR_TEST_31 0xFF008000
+#define COLOR_TEST_32 0x00004000
+#define COLOR_TEST_33 0x00408000 
+#define COLOR_TEST_34 0x00400000 
+#define COLOR_TEST_35 0x40400000 
+#define COLOR_TEST_36 0x80000000 
+#define COLOR_TEST_37 0x40000000 
+#define COLOR_TEST_38 0x40004000
+#define COLOR_TEST_39 0x80004000
+#define COLOR_TEST_40 0x00000000 //COLOR_BTNSHADOW ~ preto text
+#define COLOR_TEST_41 0x00808000  //vrde escuro
+#define COLOR_TEST_42 0x40808000  //vrde escuro
+#define COLOR_TEST_43 0x80808000  //COLOR_APPWORKSPACE (cinza)
+#define COLOR_TEST_44 0x80804000 
+#define COLOR_TEST_45 0xC0C0C000  //silver
+#define COLOR_TEST_46 0x40004000
+ 
+ 
+//outros teste
+#define COLOR_TEST_47 0x3366FF00  //azul claro
+    
 
+/*
+ * Cores usadas nessa sistema.
+ */
 
-//
-// Text colors.
-//
+#define COLOR_BLACK               0x00000000
+#define COLOR_WHITE               0xFFFFFF00 
+#define COLOR_RED                 0xFF000000 
+#define COLOR_GREEN               0x00FF0000
+#define COLOR_BLUE                0x0000FF00
+#define COLOR_DARKRED             0x8B000000
+#define COLOR_DARKGREEN           0x00640000
+#define COLOR_DARKBLUE            0x00008B00
+//#define COLOR_GRAY                0x80808000
+#define COLOR_GREY                0xAFAFAF00
+#define COLOR_LIGHTGRAY           0xD3D3D300
+#define COLOR_LIGHTGREEN          0x90EE9000
+#define COLOR_LIGHTBLUE           0xADD8E600
+#define COLOR_SILVER              0xC0C0C000
 
-//Cores para textos.
-#define COLOR_TEXT 0x00000000
-//#define COLOR_TEXT2 0x00000000
+//window colors
+#define COLOR_ACTIVEBORDER        0xB4B4B400
+#define COLOR_ACTIVECAPTION       0x99B4D100
+#define COLOR_ACTIVECAPTIONTEXT   0x00000000
+#define COLOR_APPWORKSPACE        COLOR_SILVER 
+// A cor padrão para o Bg é azul quase escuro,
+// o azul escuro é usado em seleção de item.
+#define COLOR_BACKGROUND          0x00808000  
+#define COLOR_BORDER              COLOR_SILVER 
+#define COLOR_BUTTONFACE          0xF0F0F000
+#define COLOR_BUTTONHIGHLIGHT     0xFFFFFF00
+#define COLOR_BUTTONSHADOW        0xA0A0A000  //COLOR_BLACK
+#define COLOR_BUTTONTEXT          COLOR_WINDOWTEXT
+#define COLOR_CONTROL             0xF0F0F000
+#define COLOR_CONTROLDARK         0xA0A0A000
+#define COLOR_CONTROLDARKDARK     0x69696900
+#define COLOR_CONTROLLIGHT        0xE3E3E300
+#define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF00
+#define COLOR_CONTROLTEXT         0x00000000
+#define COLOR_DESKTOP             0x00000000
+#define COLOR_FOCUS_TOPBAR        0x7FFF0000
+#define COLOR_GRAYTEXT            0x80808000
+#define COLOR_HIGHLIGHT           0x3399FF00
+#define COLOR_HIGHLIGHTTEXT       0xFFFFFF00
+#define COLOR_INACTIVEBORDER      0xF4F7FC00
+#define COLOR_INACTIVECAPTION     0xBFCDDB00
+#define COLOR_INACTIVECAPTIONTEXT 0x434E5400
+#define COLOR_INFO                0xFFFFE100
+#define COLOR_INFOTEXT            0x00000000
 
+#define COLOR_MENU                  COLOR_GRAY
+#define COLOR_MENUTEXT              COLOR_BLACK
+#define COLOR_MENUITEM              COLOR_WHITE
+#define COLOR_MENUITEMTEXT          COLOR_BLACK
+#define COLOR_MENUITEM_SELECTED     COLOR_BLUE
+#define COLOR_MENUITEMTEXT_SELECTED COLOR_WHITE
+#define COLOR_MENUBAR               COLOR_GRAY
+#define COLOR_MENUHIGHLIGHT         0x3399FF00
 
-//
-// The colors here are using alpha.
-//
+#define COLOR_NAVIGATIONBAR       COLOR_BLACK
+#define COLOR_NAVIGATIONBAR_TEXT  COLOR_WHITE
+#define COLOR_STATUSBAR           COLOR_WINDOW
+#define COLOR_TASKBAR             COLOR_WINDOW
+#define COLOR_TASKBAR_TEXT        COLOR_TEXT
+#define COLOR_TEXT                0x00000000
+#define COLOR_TITLEBAR            COLOR_BLUE
+#define COLOR_TITLEBAR_TEXT       COLOR_WHITE
+#define COLOR_TOPBAR              0x83F52C00
+#define COLOR_TOPBAR_TEXT         0x397D0200
+#define COLOR_WINDOW              0xFFFFFF00
+#define COLOR_WINDOWFRAME         COLOR_GRAY
+//(debug: Pink para contraste com quaquer cor de janela)
+#define COLOR_WINDOWTEXT          COLOR_PINK //COLOR_BLACK 
+#define COLOR_WORKSPACE           0x0000FF00 //area de trabalho
 
-#define COLOR_GREY 0xAFAFAFAA
-#define COLOR_ACTIVEBORDER 0xB4B4B4FF
-#define COLOR_ACTIVECAPTION 0x99B4D1FF
-#define COLOR_ACTIVECAPTIONTEXT 0x000000FF
-#define COLOR_ALICEBLUE 0xF0F8FFFF
-#define COLOR_ANTIQUEWHITE 0xFAEBD7FF
-#define COLOR_APPWORKSPACE 0xABABABFF
-#define COLOR_AQUA 0x00FFFFFF
-#define COLOR_AQUAMARINE 0x7FFFD4FF
-#define COLOR_AZURE 0xF0FFFFFF
-#define COLOR_BEIGE 0xF5F5DCFF
-#define COLOR_BISQUE 0xFFE4C4FF
-#define COLOR_BLACK 0x000000FF
-#define COLOR_BLANCHEDALMOND 0xFFEBCDFF
-#define COLOR_BLUE 0x0000FFFF
-#define COLOR_BLUEVIOLET 0x8A2BE2FF
-#define COLOR_BROWN 0xA52A2AFF
-#define COLOR_BURLYWOOD 0xDEB887FF
-#define COLOR_CADETBLUE 0x5F9EA0FF
-#define COLOR_CHARTREUSE 0x7FFF00FF
-#define COLOR_CHOCOLATE 0xD2691EFF
-#define COLOR_CONTROL 0xF0F0F0FF
-#define COLOR_CONTROLDARK 0xA0A0A0FF
-#define COLOR_CONTROLDARKDARK 0x696969FF
-#define COLOR_CONTROLLIGHT 0xE3E3E3FF
-#define COLOR_CONTROLLIGHTLIGHT 0xFFFFFFFF
-#define COLOR_CONTROLTEXT 0x000000FF
-#define COLOR_CORAL 0xFF7F50FF
-#define COLOR_CORNFLOWERBLUE 0x6495EDFF
-#define COLOR_CORNSILK 0xFFF8DCFF
-#define COLOR_CRIMSON 0xDC143CFF
-#define COLOR_CYAN 0x00FFFFFF
-#define COLOR_DARKBLUE 0x00008BFF
-#define COLOR_DARKCYAN 0x008B8BFF
-#define COLOR_DARKGOLDENROD 0xB8860BFF
-#define COLOR_DARKGRAY 0xA9A9A9FF
-#define COLOR_DARKGREEN 0x006400FF
-#define COLOR_DARKKHAKI 0xBDB76BFF
-#define COLOR_DARKMAGENTA 0x8B008BFF
-#define COLOR_DARKOLIVEGREEN 0x556B2FFF
-#define COLOR_DARKORANGE 0xFF8C00FF
-#define COLOR_DARKORCHID 0x9932CCFF
-#define COLOR_DARKRED 0x8B0000FF
-#define COLOR_DARKSALMON 0xE9967AFF
-#define COLOR_DARKSEAGREEN 0x8FBC8BFF
-#define COLOR_DARKSLATEBLUE 0x483D8BFF
-#define COLOR_DARKSLATEGRAY 0x2F4F4FFF
-#define COLOR_DARKTURQUOISE 0x00CED1FF
-#define COLOR_DARKVIOLET 0x9400D3FF
-#define COLOR_DEEPPINK 0xFF1493FF
-#define COLOR_DEEPSKYBLUE 0x00BFFFFF
-#define COLOR_DESKTOP 0x000000FF
-#define COLOR_DIMGRAY 0x696969FF
-#define COLOR_DODGERBLUE 0x1E90FFFF
-#define COLOR_FIREBRICK 0xB22222FF
-#define COLOR_FLORALWHITE 0xFFFAF0FF
-#define COLOR_FORESTGREEN 0x228B22FF
-#define COLOR_FUCHSIA 0xFF00FFFF
-#define COLOR_GAINSBORO 0xDCDCDCFF
-#define COLOR_GHOSTWHITE 0xF8F8FFFF
-#define COLOR_GOLD 0xFFD700FF
-#define COLOR_GOLDENROD 0xDAA520FF
-#define COLOR_GRADIENTACTIVECAPTION 0xB9D1EAFF
+//Tipos de azul
+#define COLOR_BLUE1 0x067AB500
+#define COLOR_BLUE2CYAN   0x1BA1E200
+#define COLOR_BLUE3COBALT 0x0050EF00
+#define COLOR_BLUE4INDIGO 0x6A00FF00
+
+/*
+ *  Lista de cores de 32 bit usando Alpha.
+ */
+
+#define COLOR_ALICEBLUE           0xF0F8FFFF
+#define COLOR_ANTIQUEWHITE        0xFAEBD7FF
+#define COLOR_AQUA                0x00FFFFFF
+#define COLOR_AQUAMARINE          0x7FFFD4FF
+#define COLOR_AZURE               0xF0FFFFFF
+#define COLOR_BEIGE               0xF5F5DCFF
+#define COLOR_BISQUE              0xFFE4C4FF
+#define COLOR_BLANCHEDALMOND      0xFFEBCDFF
+#define COLOR_BLUEVIOLET          0x8A2BE2FF
+#define COLOR_BROWN               0xA52A2AFF
+#define COLOR_BURLYWOOD           0xDEB887FF
+#define COLOR_CADETBLUE           0x5F9EA0FF
+#define COLOR_CHARTREUSE          0x7FFF00FF
+#define COLOR_CHOCOLATE           0xD2691EFF
+#define COLOR_CORAL               0xFF7F50FF
+#define COLOR_CORNFLOWERBLUE      0x6495EDFF
+#define COLOR_CORNSILK            0xFFF8DCFF
+#define COLOR_CRIMSON             0xDC143CFF
+#define COLOR_CYAN                0x00FFFFFF
+#define COLOR_DARKCYAN            0x008B8BFF
+#define COLOR_DARKGOLDENROD       0xB8860BFF
+#define COLOR_DARKGRAY            0xA9A9A9FF
+#define COLOR_DARKKHAKI           0xBDB76BFF
+#define COLOR_DARKMAGENTA         0x8B008BFF
+#define COLOR_DARKOLIVEGREEN      0x556B2FFF
+#define COLOR_DARKORANGE          0xFF8C00FF
+#define COLOR_DARKORCHID          0x9932CCFF
+#define COLOR_DARKSALMON          0xE9967AFF
+#define COLOR_DARKSEAGREEN        0x8FBC8BFF
+#define COLOR_DARKSLATEBLUE       0x483D8BFF
+#define COLOR_DARKSLATEGRAY       0x2F4F4FFF
+#define COLOR_DARKTURQUOISE       0x00CED1FF
+#define COLOR_DARKVIOLET          0x9400D3FF
+#define COLOR_DEEPPINK            0xFF1493FF
+#define COLOR_DEEPSKYBLUE         0x00BFFFFF
+#define COLOR_DIMGRAY             0x696969FF
+#define COLOR_DODGERBLUE          0x1E90FFFF
+#define COLOR_FIREBRICK           0xB22222FF
+#define COLOR_FLORALWHITE         0xFFFAF0FF
+#define COLOR_FORESTGREEN         0x228B22FF
+#define COLOR_FUCHSIA             0xFF00FFFF
+#define COLOR_GAINSBORO           0xDCDCDCFF
+#define COLOR_GHOSTWHITE          0xF8F8FFFF
+#define COLOR_GOLD                0xFFD700FF
+#define COLOR_GOLDENROD           0xDAA520FF
+#define COLOR_GRADIENTACTIVECAPTION   0xB9D1EAFF
 #define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2FF
-//#define COLOR_GRAY 0x008080FF
-#define COLOR_GRAYTEXT 0x008080FF
-#define COLOR_GREEN 0x008000FF
-#define COLOR_GREENYELLOW 0xADFF2FFF
-#define COLOR_HIGHLIGHT 0x3399FFFF
-#define COLOR_HIGHLIGHTTEXT 0xFFFFFFFF
-#define COLOR_HONEYDEW 0xF0FFF0FF
-#define COLOR_HOTPINK 0xFF69B4FF
-#define COLOR_HOTTRACK 0x0066CCFF
-#define COLOR_INACTIVEBORDER 0xF4F7FCFF
-#define COLOR_INACTIVECAPTION 0xBFCDDBFF
-#define COLOR_INACTIVECAPTIONTEXT 0x434E54FF
-#define COLOR_INDIANRED 0xCD5C5CFF
-#define COLOR_INDIGO 0x4B0082FF
-#define COLOR_INFO 0xFFFFE1FF
-#define COLOR_INFOTEXT 0x000000FF
-#define COLOR_IVORY 0xFFFFF0FF
-#define COLOR_KHAKI 0xF0E68CFF
-#define COLOR_LAVENDER 0xE6E6FAFF
-#define COLOR_LAVENDERBLUSH 0xFFF0F5FF
-#define COLOR_LAWNGREEN 0x7CFC00FF
-#define COLOR_LEMONCHIFFON 0xFFFACDFF
-#define COLOR_LIGHTBLUE 0xADD8E6FF
-#define COLOR_LIGHTCORAL 0xF08080FF
-#define COLOR_LIGHTCYAN 0xE0FFFFFF
+#define COLOR_GREENYELLOW         0xADFF2FFF
+#define COLOR_HONEYDEW            0xF0FFF0FF
+#define COLOR_HOTPINK             0xFF69B4FF
+#define COLOR_HOTTRACK            0x0066CCFF
+#define COLOR_INDIANRED           0xCD5C5CFF
+#define COLOR_INDIGO              0x4B0082FF
+#define COLOR_IVORY               0xFFFFF0FF
+#define COLOR_KHAKI               0xF0E68CFF
+#define COLOR_LAVENDER            0xE6E6FAFF
+#define COLOR_LAVENDERBLUSH       0xFFF0F5FF
+#define COLOR_LAWNGREEN           0x7CFC00FF
+#define COLOR_LEMONCHIFFON        0xFFFACDFF
+#define COLOR_LIGHTCORAL          0xF08080FF
+#define COLOR_LIGHTCYAN           0xE0FFFFFF
 #define COLOR_LIGHTGOLDENRODYELLOW 0xFAFAD2FF
-#define COLOR_LIGHTGRAY 0xD3D3D3FF
-#define COLOR_LIGHTGREEN 0x90EE90FF
-#define COLOR_LIGHTPINK 0xFFB6C1FF
-#define COLOR_LIGHTSALMON 0xFFA07AFF
-#define COLOR_LIGHTSEAGREEN 0x20B2AAFF
-#define COLOR_LIGHTSKYBLUE 0x87CEFAFF
-#define COLOR_LIGHTSLATEGRAY 0x778899FF
-#define COLOR_LIGHTSTEELBLUE 0xB0C4DEFF
-#define COLOR_LIGHTYELLOW 0xFFFFE0FF
-#define COLOR_LIME 0x00FF00FF
-#define COLOR_LIMEGREEN 0x32CD32FF
-#define COLOR_LINEN 0xFAF0E6FF
-#define COLOR_MAGENTA 0xFF00FFFF
-#define COLOR_MAROON 0x800000FF
-#define COLOR_MEDIUMAQUAMARINE 0x66CDAAFF
-#define COLOR_MEDIUMBLUE 0x0000CDFF
-#define COLOR_MEDIUMORCHID 0xBA55D3FF
-#define COLOR_MEDIUMPURPLE 0x9370DBFF
-#define COLOR_MEDIUMSEAGREEN 0x3CB371FF
-#define COLOR_MEDIUMSLATEBLUE 0x7B68EEFF
-#define COLOR_MEDIUMSPRINGGREEN 0x00FA9AFF
-#define COLOR_MEDIUMTURQUOISE 0x48D1CCFF
-#define COLOR_MEDIUMVIOLETRED 0xC71585FF
-#define COLOR_MENU 0xF0F0F0FF
-#define COLOR_MENUBAR 0xF0F0F0FF
-#define COLOR_MENUHIGHLIGHT 0x3399FFFF
-#define COLOR_MENUTEXT 0x000000FF
-#define COLOR_MIDNIGHTBLUE 0x191970FF
-#define COLOR_MINTCREAM 0xF5FFFAFF
-#define COLOR_MISTYROSE 0xFFE4E1FF
-#define COLOR_MOCCASIN 0xFFE4B5FF
-#define COLOR_NAVAJOWHITE 0xFFDEADFF
-#define COLOR_NAVY 0x000080FF
-#define COLOR_OLDLACE 0xFDF5E6FF
-#define COLOR_OLIVE 0x808000FF
-#define COLOR_OLIVEDRAB 0x6B8E23FF
-#define COLOR_ORANGE 0xFFA500FF
-#define COLOR_ORANGERED 0xFF4500FF
-#define COLOR_ORCHID 0xDA70D6FF
-#define COLOR_PALEGOLDENROD 0xEEE8AAFF
-#define COLOR_PALEGREEN 0x98FB98FF
-#define COLOR_PALETURQUOISE 0xAFEEEEFF
-#define COLOR_PALEVIOLETRED 0xDB7093FF
-#define COLOR_PAPAYAWHIP 0xFFEFD5FF
-#define COLOR_PEACHPUFF 0xFFDAB9FF
-#define COLOR_PERU 0xCD853FFF
-#define COLOR_PINK 0xFFC0CBFF
-#define COLOR_PLUM 0xDDA0DDFF
-#define COLOR_POWDERBLUE 0xB0E0E6FF
-#define COLOR_PURPLE 0x800080FF
-#define COLOR_RED 0xFF0000FF
-#define COLOR_ROSYBROWN 0xBC8F8FFF
-#define COLOR_ROYALBLUE 0x4169E1FF
-#define COLOR_SADDLEBROWN 0x8B4513FF
-#define COLOR_SALMON 0xFA8072FF
-#define COLOR_SANDYBROWN 0xF4A460FF
-#define COLOR_SCROLLBAR 0xC8C8C8FF
-#define COLOR_SEAGREEN 0x2E8B57FF
-#define COLOR_SEASHELL 0xFFF5EEFF
-#define COLOR_SIENNA 0xA0522DFF
-#define COLOR_SILVER 0xC0C0C0FF
-#define COLOR_SKYBLUE 0x87CEEBFF
-#define COLOR_SLATEBLUE 0x6A5ACDFF
-#define COLOR_SLATEGRAY 0x708090FF
-#define COLOR_SNOW 0xFFFAFAFF
-#define COLOR_SPRINGGREEN 0x00FF7FFF
-#define COLOR_STEELBLUE 0x4682B4FF
-#define COLOR_TAN 0xD2B48CFF
-#define COLOR_TEAL 0x008080FF
-#define COLOR_THISTLE 0xD8BFD8FF
-#define COLOR_TOMATO 0xFF6347FF
-#define COLOR_TRANSPARENT 0xFFFFFF00
-#define COLOR_TURQUOISE 0x40E0D0FF
-#define COLOR_VIOLET 0xEE82EEFF
-#define COLOR_WHEAT 0xF5DEB3FF
-#define COLOR_WHITE 0xFFFFFFFF
-#define COLOR_WHITESMOKE 0xF5F5F5FF
-#define COLOR_WINDOW 0xFFFFFFFF
-#define COLOR_WINDOWFRAME 0x646464FF
-#define COLOR_WINDOWTEXT 0x000000FF
-#define COLOR_YELLOW 0xFFFF00FF
-#define COLOR_YELLOWGREEN 0x9ACD32FF
-#define STEALTH_ORANGE 0xFF880000
-#define STEALTH_OLIVE 0x66660000
-#define STEALTH_GREEN 0x33DD1100
-#define STEALTH_PINK 0xFF22EE00
-#define STEALTH_BLUE 0x0077BB00
+#define COLOR_LIGHTPINK           0xFFB6C1FF
+#define COLOR_LIGHTSALMON         0xFFA07AFF
+#define COLOR_LIGHTSEAGREEN       0x20B2AAFF
+#define COLOR_LIGHTSKYBLUE        0x87CEFAFF
+#define COLOR_LIGHTSLATEGRAY      0x778899FF
+#define COLOR_LIGHTSTEELBLUE      0xB0C4DEFF
+#define COLOR_LIGHTYELLOW         0xFFFFE0FF
+#define COLOR_LIME                0x00FF00FF
+#define COLOR_LIMEGREEN           0x32CD32FF
+#define COLOR_LINEN               0xFAF0E6FF
+#define COLOR_MAGENTA             0xFF00FFFF
+#define COLOR_MAROON              0x800000FF
+#define COLOR_MEDIUMAQUAMARINE    0x66CDAAFF
+#define COLOR_MEDIUMBLUE          0x0000CDFF
+#define COLOR_MEDIUMORCHID        0xBA55D3FF
+#define COLOR_MEDIUMPURPLE        0x9370DBFF
+#define COLOR_MEDIUMSEAGREEN      0x3CB371FF
+#define COLOR_MEDIUMSLATEBLUE     0x7B68EEFF
+#define COLOR_MEDIUMSPRINGGREEN   0x00FA9AFF
+#define COLOR_MEDIUMTURQUOISE     0x48D1CCFF
+#define COLOR_MEDIUMVIOLETRED     0xC71585FF
+#define COLOR_MIDNIGHTBLUE        0x191970FF
+#define COLOR_MINTCREAM           0xF5FFFAFF
+#define COLOR_MISTYROSE           0xFFE4E1FF
+#define COLOR_MOCCASIN            0xFFE4B5FF
+#define COLOR_NAVAJOWHITE         0xFFDEADFF
+#define COLOR_NAVY                0x000080FF
+#define COLOR_OLDLACE             0xFDF5E6FF
+#define COLOR_OLIVE               0x808000FF
+#define COLOR_OLIVEDRAB           0x6B8E23FF
+#define COLOR_ORANGE              0xFFA500FF
+#define COLOR_ORANGERED           0xFF4500FF
+#define COLOR_ORCHID              0xDA70D6FF
+#define COLOR_PALEGOLDENROD       0xEEE8AAFF
+#define COLOR_PALEGREEN           0x98FB98FF
+#define COLOR_PALETURQUOISE       0xAFEEEEFF
+#define COLOR_PALEVIOLETRED       0xDB7093FF
+#define COLOR_PAPAYAWHIP          0xFFEFD5FF
+#define COLOR_PEACHPUFF           0xFFDAB9FF
+#define COLOR_PERU                0xCD853FFF
+#define COLOR_PINK                0xFFC0CBFF
+#define COLOR_PLUM                0xDDA0DDFF
+#define COLOR_POWDERBLUE          0xB0E0E6FF
+#define COLOR_PURPLE              0x800080FF
+#define COLOR_ROSYBROWN           0xBC8F8FFF
+#define COLOR_ROYALBLUE           0x4169E1FF
+#define COLOR_SADDLEBROWN         0x8B4513FF
+#define COLOR_SALMON              0xFA8072FF
+#define COLOR_SANDYBROWN          0xF4A460FF
+#define COLOR_SCROLLBAR           0xC8C8C8FF
+#define COLOR_SEAGREEN            0x2E8B57FF
+#define COLOR_SEASHELL            0xFFF5EEFF
+#define COLOR_SIENNA              0xA0522DFF
+#define COLOR_SKYBLUE             0x87CEEBFF
+#define COLOR_SLATEBLUE           0x6A5ACDFF
+#define COLOR_SLATEGRAY           0x708090FF
+#define COLOR_SNOW                0xFFFAFAFF
+#define COLOR_SPRINGGREEN         0x00FF7FFF
+#define COLOR_STEELBLUE           0x4682B4FF
+#define COLOR_TAN                 0xD2B48CFF
+#define COLOR_TEAL                0x008080FF
+#define COLOR_THISTLE             0xD8BFD8FF
+#define COLOR_TOMATO              0xFF6347FF
+#define COLOR_TRANSPARENT         0xFFFFFF00
+#define COLOR_TURQUOISE           0x40E0D0FF
+#define COLOR_VIOLET              0xEE82EEFF
+#define COLOR_WHEAT               0xF5DEB3FF
+#define COLOR_WHITESMOKE          0xF5F5F5FF
+#define COLOR_YELLOW              0xFFFF00FF
+#define COLOR_YELLOWGREEN         0x9ACD32FF
+#define STEALTH_ORANGE            0xFF880000
+#define STEALTH_OLIVE             0x66660000
+#define STEALTH_GREEN             0x33DD1100
+#define STEALTH_PINK              0xFF22EE00
+#define STEALTH_BLUE              0x0077BB00
+ 
+ 
+/*
+ * (w) Colors, futuristic GUI. (Dark blu and Black)
+ */ 
+//#define COLOR_DARKBLUE   0x00008B00 
+//#define COLOR_BLACK      0x00000000 
+ 
+ 
+ 
+#define COLOR_KERNEL_BACKGROUND COLOR_BLUE     
+
 
 
 //
@@ -1993,7 +2102,7 @@ void *APICreateWindow( unsigned long type,        //1-Tipo de janela, (popup,nor
                        unsigned long height,      //8-Altura da janela.
                        struct window_d *pWindow,  //9-Endereço da estrutura da janela mãe.
                        unsigned long onde,        //10-Ambiente.( Estão no desktop, barra, cliente ...)
-                       unsigned long arg11,       //11-? reservado.
+                       unsigned long clientcolor, //11- Cor da área de cliente.
                        unsigned long color );     //12-Color (bg) (para janela simples).
 
 					   
@@ -2127,7 +2236,7 @@ void kill(int exit_code);
 
 //Create thread.
 void *apiCreateThread(unsigned long thread_eip, unsigned long thread_priority, char *name);
-
+void apiStartThread(void *Thread); //coloca no estado standby para executar pela primeira vez
 
 //
 // File support.
@@ -2153,7 +2262,7 @@ void initializeCriticalSection();    //Inicializa em 1
 void apiBeginPaint();
 void apiEndPaint();
 
-
+void apiPutChar( int c );
 
 /*
 int getpid();

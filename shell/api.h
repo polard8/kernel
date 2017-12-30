@@ -248,7 +248,7 @@
  * vários recursos básicos e fundamentais, portanto não se espera 
  * desempenho nessa chamada, mas sim uma grande quantidade de serviços
  * básicos. Já as interrupções que vão de 201 até 215 oferecem recursos 
- * específicos com o proósito de ganhar desempenho em serviços considerados 
+ * específicos com o propósito de ganhar desempenho em serviços considerados 
  * importantes para o desempenho geral do sistema.
  *
  */
@@ -450,7 +450,7 @@
 
 //Outros. 
 //@todo: Reservar próximos para seleção de janela. 
-#define	SYSTEMCALL_65  65
+#define	SYSTEMCALL_SYS_PUTCHAR  65
 #define	SYSTEMCALL_66  66
 #define	SYSTEMCALL_67  67
 #define	SYSTEMCALL_68  68
@@ -783,7 +783,7 @@
 
 
 //windows2k system colors
-#define COLOR_TEST_0  0x8080FF00  // COLOR_BACKGROUND(VIOLETA CLARO) ??
+#define COLOR_TEST_0  0x8080FF00  // COLOR_BACKGROUND(verde claro) ??
 #define COLOR_TEST_1  0x80FFFF00  // COLOR_APPWORKSPACE, MDIWINDOW 
 #define COLOR_TEST_2  0x80FF8000  // COLOR_WINDOW, CLIENT
 #define COLOR_TEST_3  0x80FF0000  // COLOR_WINDOWTEXT, CLIENTTEXT 
@@ -2262,7 +2262,7 @@ void initializeCriticalSection();    //Inicializa em 1
 void apiBeginPaint();
 void apiEndPaint();
 
-
+void apiPutChar( int c );
 
 /*
 int getpid();

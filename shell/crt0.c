@@ -10,18 +10,15 @@
 #include "stdlib.h"  
 
 
-
 extern void *GramadoMain( int, char*, unsigned long , int );
-//extern int libcInitRT();
 
 
 //
 //
 //
-
 void crt0()
 {
-    int mainret;	
+    int app_response;	
 
 //initRT:	
 
@@ -31,7 +28,7 @@ void crt0()
 	//inicializando o suporte ao fluxo padrão.
     stdioInitialize();	
 	
-	mainret = (int) GramadoMain(0,0,0,0);
+	app_response = (int) GramadoMain(0,0,0,0);
 	
 	//
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
@@ -40,5 +37,5 @@ void crt0()
 	//
 	
 	while(1){}
-}
+};
 

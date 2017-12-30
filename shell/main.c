@@ -79,9 +79,23 @@
  
 */
 
- 
- 
+//
+// font support.
+//
 
+//FILE *font_file;
+
+ 
+//Diretórios para o shell comparar os comandos com os nomes dos arquivos lá. 
+struct _iobuf *pwd; 
+struct _iobuf *root;
+//...
+
+//Janelas usadas pelo aplicativo.
+struct window_d *topbarWindow;  //task bar.
+struct window_d *i1Window;      //icone 1.
+struct window_d *i2Window;      //icone 2.
+//...
 
 //
 // Definindo mensagens..@todo: Mover para a API.
@@ -92,12 +106,6 @@
 //#define CMD_ABOUT 1002
 //#define CMD_ABOUT 1003
 //...
-
-
-//
-// Variáveis para test de funções de console
-//
-
 
 
 
@@ -195,63 +203,42 @@ static unsigned char attr=0x07;
 static unsigned long saved_x=0;
 static unsigned long saved_y=0;
 
+
+
+//
+// Protótipos para funções internas.
+//
+
 static void save_cur(void);
 static void restore_cur(void);
 static void lf(void);
 static void ri(void);
 static void cr(void);
 static void del(void);
-
-
-
-//
-// Window size.
-//
-
-//unsigned long shell_window_width;
-//unsigned long shell_window_height;
-
-
-//
-// font support.
-//
-
-//FILE *font_file;
-
-
-//
-// Testes
-//
+void move_to( unsigned long x, unsigned long y);
 int test_operators();
-
-//
-// Funções internas.
-//
 void shellCreateTopBar();
 void shellTestMBR();
 void shellTestDisplayBMP();
 void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
-
 void shellInsertNullTerminator();
 void shellInsertCR();
 void shellInsertLF();
 void shellInsertNextChar(char c);
 void shellInsertCharXY(unsigned long x, unsigned long y, char c);
 void shellInsertCharPos(unsigned long offset, char c);
-//protótipos de funções internas.
 void shellClearBuffer();
 void shellTestLoadFile();
-
 void shellTestThreads();
 void shellClearscreen();
 void shellScroll();
-//...
 void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
 void shellSetCursor(unsigned long x, unsigned long y);
 void shellThread();
 void shellPrompt();
 void shellHelp();
-unsigned long shellCompare();    //Compare command.
+void shellTree();
+unsigned long shellCompare(struct window_d *window);    //Compare command.
 void shellWaitCmd();             //Wait for command.
 int shellInit();                 //Init.
 void shellShell();               //Constructor. 
@@ -259,10 +246,13 @@ unsigned long shellProcedure( struct window_d *window,
                               int msg, 
 							  unsigned long long1, 
 							  unsigned long long2 );
+							  
+
  
  
  
 /*
+ *****************************************************************
  * GramadoMain: 
  *     Função principal.
  *     The Application Entry Point.
@@ -529,9 +519,17 @@ noArgs:
 	
 	//General purpose appplication  -  {} Developer version
 	
+	//@todo:
+	//Criar essas funções na API.
+	//unsigned long ScreenWidth = (unsigned long) APIGetScreenWidth();
+	//unsigned long ScreenHeight = (unsigned long) APIGetScreenheight();
+	
+	
 	apiBeginPaint();
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",     
-                                       shell_window_x, shell_window_y, shellWindowWidth, shellWindowHeight,    
+	
+	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
+	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
+	                                   shell_window_x, shell_window_y, shellWindowWidth, shellWindowHeight,    
                                        0, 0, COLOR_BLACK, 0x83FCFF00 );	   
 	if((void*) hWindow == NULL){	
 		printf("Shell: Window fail");
@@ -566,6 +564,11 @@ noArgs:
 	//*IMPORTANTE: É FUNDAMENTAL SETAR O FOCO, POIS O KERNEL DEPENDE DELE
 	//PARA RETORNAR A MENSAGEM DA JANELA COM O FOCO DE ENTRADA.
     APISetFocus(hWindow);
+	
+	//definindo a janela como sendo uma janela de terminal.
+	//isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
+	//para essa janela e não apenas ao procedimento de janela do sistema.
+	system_call( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, (unsigned long) hWindow, (unsigned long) hWindow);
 		
 	
 	//
@@ -831,7 +834,7 @@ shellProcedure( struct window_d *window,
 				case '9':
 				case VK_RETURN:
 				    input('\0'); //finaliza a string.
-					shellCompare();
+					shellCompare(window);
 					goto done;
                     break;
                 //Mostrar o buffer
@@ -861,7 +864,7 @@ shellProcedure( struct window_d *window,
                 default:			   
 				    input( (unsigned long) long1);      //Coloca no stdin
                     shellInsertNextChar((char) long1);  //Coloca no stdout
-					printf("%c", (char) long1); 					
+					//printf("%c", (char) long1); 					
 					goto done;
                     break;               
             };
@@ -887,6 +890,13 @@ shellProcedure( struct window_d *window,
             //printf("%c", (char) long1);			
 		    break;
           
+		//
+        //  *** Aqui o procedimento de janelas do kernel vai enviar uma mensagem notificando 
+		//      que os botões de controle F1 ou F2 foram apertados ... 
+		//      F1 significa que temos que abri o menu de aplicativos e F2 significa que temos 
+		//     que abrir a janela do interpretador de comando ...
+        //		
+		  
 		case MSG_COMMAND:
             switch(long1)
 			{
@@ -899,6 +909,17 @@ shellProcedure( struct window_d *window,
 				    MessageBox( 1, "Shell","Testing MSG_COMMAND.CMD_ABOUT.");
 				    break;
 				
+				//clicaram no botão
+				case BN_CLICKED:
+				    if(window == i1Window){
+					     //@todo: abre o menu de aplicativos
+					}
+				    if(window == i2Window){
+					   //@todo: abre o interpretador de comandos.
+					}
+					//#debug
+					printf("  ** BN_CLICKED  **  \n");
+				break;
 				//...
 				
 				//default:
@@ -949,7 +970,7 @@ done:
 	//if(VideoBlock.useGui == 1)
 	//{
 	    //Debug.
-		refresh_screen(); //Obs: #bugbug perceba que o procedimento de janela do sistema também tem um refresh screen.
+		//refresh_screen(); //Obs: #bugbug perceba que o procedimento de janela do sistema também tem um refresh screen.
 	//};	
     return (unsigned long) 0;	
 };
@@ -1011,24 +1032,79 @@ exit:
  * shellCompare:
  *     Compara comandos digitados com palavras chave.
  *     Compara a palavra em 'prompt[]' com outras e chama o serviço.
+ * o enter foi o caractere digitado, vamos comparar palavras.
  */
-unsigned long shellCompare()
+unsigned long shellCompare(struct window_d *window)
 {
     unsigned long ret_value;
 	
+	//
+	// ?? E se tivermos várias palavras na linha de comando ??
+	//
 	
-	//shellWaitCmd();  //cancelada.
-
-    //conferir se o enter foi o último caractere digitado.
-    //if( prompt_status != 1 ){
-	//	return (unsigned long) 1;  //erro.
-	//}	
+	//
+	// Antes de tudo precisamos separar os argumentos na linha de comandos 
+	// colocando cada argumento em um elemento do vetor, na medida em que 
+	// vamos contando o número de argumentos encontrados na linha de comando.
+	//
 	
-    //
-    // o enter foi o caractere digitado, vamos comparar palavras.
-    //	
+	/*
+	char c;
+	int i=0;
+	size_t string_size;
+	int compare_argc;
+	char compare_argv[];
 	
-palavra_reservada:
+	//calcula o tamanho da linha.
+	string_size = (size_t) strlen( (const char *) prompt );
+	
+	while(string_size--)
+	{
+		//avançando de caractere em caractere ...
+		c = (char) prompt[i];
+		
+		//se for espaco vazio 
+		if( c == ' ')
+		{
+            i++; 
+            continue; 			
+		};
+		
+		compare_argc++;
+		
+		
+		//??
+	};
+	
+	
+        s = *++argv;
+        if (*s == '-' || *s == '/') 
+		{
+            while(*++s) 
+			{
+                switch(*s) 
+				{
+                    case 'h':	
+	
+	//Se não existe argumentos.
+	//if(compare_argc < 1){
+	//	return 0;
+	//};
+	
+    if (!strcmp( compare_argv[1], "-help" )){
+        printf( "%s\n", usage );
+        refresh_screen();
+		exit(0);
+    }	
+	
+	//Contagem do número de argumentos
+	while( compare_argc-- )
+	{
+		
+	};
+	*/
+	
+do_compare:
 
     //L1 RAM /objetcs   (diretório raiz para os arquivos que são diretórios de objetos)
 	//os objetos serão listador em um arquivo que nunca será salvo no disco.
@@ -1194,7 +1270,14 @@ palavra_reservada:
 	//start
     if( strncmp( prompt, "start", 5 ) == 0 )
 	{
-	    printf("~start\n");
+		//Isso deve setar o foco na janela do shell.
+		//ao mesmo tempo que reinicia o input para digitação 
+		//e ajusta as margens do cursor. :)
+		//qualquer editbox precisa desse tipo de ajuste.
+	    
+		APISetFocus(window);
+		shellPrompt();
+		printf("~start\n");
 		goto exit_cmp;
     }; 
 	
@@ -1232,6 +1315,11 @@ palavra_reservada:
         goto exit_cmp;
     };
 		
+	//tree
+    if( strncmp( prompt, "tree", 4 ) == 0 ){
+		shellTree();
+		goto exit_cmp;
+    };			
 		
 	//version
     if( strncmp( prompt, "version", 7 ) == 0 ){
@@ -1249,9 +1337,14 @@ palavra_reservada:
 palavra_nao_reservada:
     printf(" Unknown command!\n");
 	shellPrompt();
+	//Mostrando as strings da rotina de comparação.
+	refresh_screen(); 	
 	return (unsigned long) 1;
 	
-exit_cmp: 
+exit_cmp:
+	//Mostrando as strings da rotina de comparação.
+	shellPrompt();
+	refresh_screen(); 
     return (unsigned long) 0;
 };
 
@@ -1705,6 +1798,11 @@ void shellHelp(){
 	return;
 }
 
+//drawing a tree
+void shellTree(){
+    printf(tree_banner);	
+	return;
+}
 
 //
 // C function to demonstrate the working of arithmetic operators
@@ -2086,8 +2184,6 @@ void bmpDisplayBMP( void * address, unsigned long x, unsigned long y, int width,
 			c[0] = 0;
 			
 			base = base + 3;
-		
-			
 			
 			//number,cor,x,y
 			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, (unsigned long) left, (unsigned long) bottom);
@@ -2172,7 +2268,6 @@ void shellTestMBR()
 {
 	unsigned char buffer[512];
 	
-	
 	enterCriticalSection(); 
 	
 	//read sector
@@ -2190,10 +2285,6 @@ void shellTestMBR()
 //CRIANDO A TOP BAR
 void shellCreateTopBar()
 {
-    struct window_d *topbarWindow;   //task bar.
-	struct window_d *i1Window; //icone 1
-	struct window_d *i2Window; //icone 2
-	
 	//
 	// topbar window
 	//
@@ -2249,9 +2340,10 @@ void shellCreateTopBar()
 	// BMP . LABELS
 	//
 	
-/*	
-	
-	void *b = (void*) malloc(1024*30); 	// testando malloc.
+    /*
+	 ** isso funcionou.
+	void *b;
+	b = (void*) malloc(1024*30); 	// testando malloc.
     if( (void*) b == NULL ){
 		printf("shellTestDisplayBMP: allocation fail\n");
 		//while(1){}
@@ -2273,6 +2365,25 @@ loadFile:
 	bmpDisplayBMP( b, 2+16+2, 2, 16, 16 );		
 	*/	
 };
+
+
+
+void move_to( unsigned long x, unsigned long y )
+{
+	if( x > DEFAULT_BUFFER_MAX_COLUMNS ){
+		return;
+	}
+
+	if( y > DEFAULT_BUFFER_MAX_ROWS ){
+		return;
+	}
+	
+	shell_buffer_x = x;
+	shell_buffer_y = y;
+	return;
+};
+
+
 
 //
 // End.

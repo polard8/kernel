@@ -53,46 +53,66 @@ done:
 /*
  * fopen:
  *     Open a file.
+ *     #bugbug: Por enquanto o limite do tamanho do arquvo é 4KB.
  */
 FILE *fopen(const char *filename, const char *mode)
-{
-	unsigned char buffer[1024];
+{	
+    unsigned long fileret;
+	struct _iobuf *stream;
 	
-	unsigned char *a = (unsigned char *) filename;
-	unsigned long m = (unsigned long) mode;
+	//Buffer usado cara colocar a estrutura.
+    unsigned char struct_buffer[1024];
 	
-	//@todo: Podemos usar malloc para o buffer!
+	//Buffer para armazenar o arquivo que vamos abrir.
+	unsigned char *file_buffer;		
 	
-	//
-	// @todo: Criar filtros para os argumentos. Retornar NULL
-	// se os argumentos forem inválidos.
-	//
-	
-	//Obs: Talvez chamar essa rotina.
-	//unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address);
-	
-	
-	//Criando as estruturas.
-	//struct _iobuf *stream;
-	FILE *stream;
+	//buffer da estrutura.
+	stream  = (FILE *) &struct_buffer[0];		
 
+
+	/*
+	 *usado para alocar mais páginas.
+	Ret = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
+	if( (void*) Ret == NULL ){
+	    printf("Ret fail\n");
+        goto done;		
+	}
+    */	
 	
-	stream = (FILE *) &buffer[0];
+	//alocando apenas uma página.
+	//4KB
+	//Buffer do arquivo.
+	//@todo: Deve ser maior. Do tamanho do arquivo.
+	//Podemos usar outra rotina de alocação de página.
+	file_buffer = (unsigned char *) newPage();
+	if( (unsigned char *) file_buffer == NULL ){
+		printf("fopen: file_buffer");
+		refresh_screen();
+		while(1){}
+	}	
+	
 	  
-	//f._base = ??;  //colocamos aqui o endereço onde o arquivo foi carregado
-	//f._ptr = stdin->_base;
+	stream->_base = &file_buffer[0];
+	stream->_ptr = stdin->_base;
 	stream->_cnt = PROMPT_MAX_DEFAULT;
 	stream->_file = 0;
 	stream->_tmpfname = (char*) filename;	
 	
 	
-	//if( (void*) a == NULL ){
-	//    printf("Error: Invalid name.");
-	//    return NULL;	
-	//};
-	
-	//return (FILE *) stream; 	
-    return NULL;	
+	//
+	// Loading file.
+	//
+loadingFile:
+	fileret = fsLoadFile( (unsigned char *) stream->_tmpfname, (unsigned long) stream->_base);
+	if(fileret != 0)
+	{
+		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "fopen: fsLoadFile");
+	    stream = NULL;
+		return NULL;
+	};
+	//...
+done:
+	return (FILE *) stream; 	
 };
 
 
@@ -149,10 +169,18 @@ void scroll(void)
 		
 		//move 74 linhas começando da segunda.
 		
+		//
+		//  ** full screen **
+		//
+		
+		//if(fullscree ...
+		
 		//destino, origem(segunda linha), quantidade de bytes.
         //memcpy( (void*) BACKBUFFER_BASE, (const void*) BACKBUFFER_BASE + (g_cursor_right*8*3), (size_t) (g_cursor_right*8*3*8*(g_cursor_left-1)));        
-        memcpy( (void*) BACKBUFFER_BASE, (const void*) BACKBUFFER_BASE + (100*8*3), (size_t) (100*8*3*8*(g_cursor_left-1)));        		
-
+        memcpy( (void*) BACKBUFFER_BASE,                         //inicio do backbuffer
+		        (const void*) BACKBUFFER_BASE + ((800*3)*8),     //início da primeira linha
+				(size_t) ((800*3) * (600-8))  );                 //quantidade de bytes.   		 		
+				
 		//
         //Limpa a última linha.
         //
@@ -281,7 +309,7 @@ done:
  * kprintf:
  *     Rotina simples de escrita em kernel mode.
  */
-int kprintf( char *message, unsigned int line, int color )
+int kprint( char *message, unsigned int line, int color )
 { 
     char *vm = (char *) g_current_vm;    //fis=0xb8000, vir=0x800000; 
     unsigned int i; 
@@ -1067,6 +1095,12 @@ input_done:
 // ?? Quem chamou essa inicialização ?? em que hora ??
 void stdioInitialize()
 {
+	//
+	// #bugbug:
+	//  4Kb alocados para cada estrutura. Isso é muito.
+	//  Podemos alocar 4KB para o buffer. 'prompt'
+	//
+	
 	//buffers para as estruturas.
 	//unsigned char buffer0[512];
 	//unsigned char buffer1[512];
