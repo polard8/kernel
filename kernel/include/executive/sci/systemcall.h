@@ -147,7 +147,7 @@
 //O driver do dispositivo envirá a mensagem pra cá para ser
 //enviada para o destino certo.
 //65~67-Resevado para input de usuário.
-#define	SYS_65 65
+#define	SYS_PUTCHAR 65
 #define	SYS_66 66  
 #define	SYS_67 67
 //68-Um evento de mouse ocorreu e o driver de mouse enviou a mensagem pra cá.

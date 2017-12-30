@@ -534,10 +534,11 @@ void *services( unsigned long number,
 		    systemRam(73,(unsigned long) hWnd,0,0,0); 
 			break;
 
-		//65-reservado pra input de usuário.	
-		//case 65:
-        //    systemDevicesUnblocked( (int)1, (unsigned long) arg1, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4);  		
-		//	break;
+		//65	
+		//putchar usando o cursor gerenciado pelo kernel.
+		case SYS_PUTCHAR:
+		    putchar( (int) arg2 );
+		    break;
 
 		//66 - reservado pra input de usuário.
 		//case 66:

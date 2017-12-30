@@ -2244,7 +2244,10 @@ void my_buffer_char_blt( unsigned long x,
 						 unsigned long color, 
 						 unsigned long c);
 						 
-						 
+void set_char_width( int width );	
+void set_char_height( int height );					 
+int get_char_width();
+int get_char_height();						 
 						 
 //
 // Pixel, line rect support.

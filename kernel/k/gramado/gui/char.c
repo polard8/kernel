@@ -205,6 +205,26 @@ int charInit()
 }
 */
 
+
+void set_char_width( int width ){
+	gcharWidth = (int) width;
+	return;
+}
+
+void set_char_height( int height ){
+	gcharHeight = (int) height;
+	return;
+}
+
+int get_char_width(){
+	return (int) gcharWidth;
+}
+
+
+int get_char_height(){
+	return (int) gcharHeight;
+}
+
 //
 //fim
 //
