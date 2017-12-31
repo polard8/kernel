@@ -821,7 +821,9 @@ shellProcedure( struct window_d *window,
             {
 				//Null key
 				case 0:
-				    printf(" null ");
+				    return 0;
+					//#BUGBUG esse null aqui dava problemas na digitação.
+					//printf(" null ");
 				    break;
 				
 				//reset prompt.
@@ -1164,6 +1166,12 @@ do_compare:
 		//fs_show_dir(0); 
         goto exit_cmp;
     };
+	
+	//echo
+    if( strncmp( prompt, "echo", 4 ) == 0 ){
+		printf("~echo\n");
+		goto exit_cmp;
+    };	
 	
 	//exit
     if( strncmp( prompt, "exit", 4 ) == 0 ){

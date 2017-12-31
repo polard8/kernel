@@ -301,20 +301,20 @@ unsigned long system_procedure( struct window_d *window,
 	
 	    //pegando as dimensões da janela com o foco de entrada.
 
-		left   = window->left;
-	    top    = window->top;
-	    width  = window->width;
-	    height = window->height;		
+		//left   = window->left;
+	    //top    = window->top;
+	    //width  = window->width;
+	    //height = window->height;		
 	
 	    //
 		// simular valores aqui para teste ... como 80 25
 		//
 		
-		g_cursor_left   = (window->left/8);
-		g_cursor_top    = (window->top/8) + 4;   //Queremos o início da área de clente.
+		//g_cursor_left   = (window->left/8);
+		//g_cursor_top    = (window->top/8) + 4;   //Queremos o início da área de clente.
 		
-		g_cursor_right  = g_cursor_left + (width/8);
-		g_cursor_bottom = g_cursor_top  + (height/8);
+		//g_cursor_right  = g_cursor_left + (width/8);
+		//g_cursor_bottom = g_cursor_top  + (height/8);
 
 		//100
 		//a linha deve ser grande.
