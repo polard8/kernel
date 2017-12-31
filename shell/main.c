@@ -1035,7 +1035,15 @@ exit:
  *     Compara comandos digitados com palavras chave.
  *     Compara a palavra em 'prompt[]' com outras e chama o serviço.
  * o enter foi o caractere digitado, vamos comparar palavras.
+ *
+ * Credits:
+ * + Stephen Brennan - https://brennan.io/2015/01/16/write-a-shell-in-c/
+ * + Frederico Lamberti Pissarra 
+ *
  */
+ 
+#define LSH_TOK_DELIM " \t\r\n\a" 
+ 
 unsigned long shellCompare(struct window_d *window)
 {
     unsigned long ret_value;
@@ -1043,69 +1051,70 @@ unsigned long shellCompare(struct window_d *window)
 	//
 	// ?? E se tivermos várias palavras na linha de comando ??
 	//
+		
+    // Returns first token 
+    //char *token = strtok(prompt, " -");
 	
-	//
-	// Antes de tudo precisamos separar os argumentos na linha de comandos 
-	// colocando cada argumento em um elemento do vetor, na medida em que 
-	// vamos contando o número de argumentos encontrados na linha de comando.
-	//
 	
-	/*
-	char c;
-	int i=0;
-	size_t string_size;
-	int compare_argc;
-	char compare_argv[];
+    printf("shellCompare: Testing ...\n");
+    refresh_screen();	
+   
+    char *tokenList[80];
+    int i = 0;
+   
+    tokenList[0] = strtok( prompt, LSH_TOK_DELIM);    // first call returns pointer
+                                         // to first part of user_input
+	                                     // separated by delim  
+	char *token;
 	
-	//calcula o tamanho da linha.
-	string_size = (size_t) strlen( (const char *) prompt );
+	token = (char *) tokenList[0];
 	
-	while(string_size--)
+	i=0;                                  
+    while( token != NULL )
 	{
-		//avançando de caractere em caractere ...
-		c = (char) prompt[i];
-		
-		//se for espaco vazio 
-		if( c == ' ')
-		{
-            i++; 
-            continue; 			
-		};
-		
-		compare_argc++;
-		
-		
-		//??
-	};
-	
-	
-        s = *++argv;
-        if (*s == '-' || *s == '/') 
-		{
-            while(*++s) 
-			{
-                switch(*s) 
-				{
-                    case 'h':	
-	
-	//Se não existe argumentos.
-	//if(compare_argc < 1){
-	//	return 0;
-	//};
-	
-    if (!strcmp( compare_argv[1], "-help" )){
-        printf( "%s\n", usage );
+
+        //coloca na lista
+        tokenList[i] = token;
+
+		//#debug
+		//Mostra
+        printf("shellCompare: %s \n",tokenList[i]);
         refresh_screen();
-		exit(0);
-    }	
-	
-	//Contagem do número de argumentos
-	while( compare_argc-- )
-	{
+
+		//incrementa o índice da lista
+        i++;
 		
-	};
-	*/
+		token = strtok(NULL, LSH_TOK_DELIM);
+    }; 
+
+	//Temos que finalizar a lista ??!!
+    tokenList[i] = NULL;
+
+    printf("shellCompare: %s \n",tokenList[i]);
+    refresh_screen();	
+
+    printf("shellCompare: Test done!\n");
+    refresh_screen();		
+   
+    //printf("shellCompare: Testing ...\n");
+    //refresh_screen();
+   
+    // Keep printing tokens while one of the
+    // delimiters present in str[].
+    //while(token != NULL)
+    //{
+    //    printf("%s\n", token);
+	//	refresh_screen();
+	//	token = strtok(NULL, " -");
+    //}
 	
+		
+		//do_command(argc, argv);
+		goto do_command;	
+	
+	
+do_command:	
+    //nothing.	
 do_compare:
 
     //L1 RAM /objetcs   (diretório raiz para os arquivos que são diretórios de objetos)
@@ -2390,10 +2399,4 @@ void move_to( unsigned long x, unsigned long y )
 	shell_buffer_y = y;
 	return;
 };
-
-
-
-//
-// End.
-//
 

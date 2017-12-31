@@ -1,5 +1,5 @@
 /*
- * Arquivo: stdio.h
+ * File: stdio.h
  *
  * Descrição:
  *     Rotinas padrão de I/O.
