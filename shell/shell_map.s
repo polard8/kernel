@@ -14,7 +14,7 @@ _io_table           0x50              crt0.o
 shellError          0x10              main.o
 shell_buffer_y      0x10              main.o
 stderr              0x10              crt0.o
-shell_buffer        0x7d0             main.o
+shell_buffer        0x7e0             main.o
 shellWindowHeight   0x10              main.o
 prompt_pos          0x10              crt0.o
 current_mmblock     0x10              stdlib.o
@@ -276,7 +276,7 @@ Linker script and memory map
                 0x00458000                . = ALIGN (0x1000)
  *fill*         0x004571e0      0xe20 00
 
-.bss            0x00458000     0xa6c0
+.bss            0x00458000     0xa6d0
                 0x00458000                bss = .
                 0x00458000                _bss = .
                 0x00458000                __bss = .
@@ -306,7 +306,7 @@ Linker script and memory map
                 0x004613e0                prompt_status
                 0x004613f0                g_char_attrib
                 0x00461400                g_cursor_x
- COMMON         0x00461410      0x9c0 main.o
+ COMMON         0x00461410      0x9d0 main.o
                 0x00461410                ShellMetrics
                 0x00461420                shellStatus
                 0x00461430                shellWindowWidth
@@ -316,50 +316,50 @@ Linker script and memory map
                 0x00461470                shellError
                 0x00461480                shell_buffer_y
                 0x00461490                shell_buffer
-                0x00461c60                shellWindowHeight
-                0x00461c70                root
-                0x00461c80                shell_window_x
-                0x00461c90                i2Window
-                0x00461ca0                rect
-                0x00461cb0                backgroung_color
-                0x00461cc0                shellMaxRows
-                0x00461cd0                foregroung_color
-                0x00461ce0                shell_buffer_pos
-                0x00461cf0                pwd
-                0x00461d00                CurrentWindow
-                0x00461d10                current_semaphore
-                0x00461d20                ShellHook
-                0x00461d30                shellScreenWidth
-                0x00461d40                shellScreenHeight
-                0x00461d50                shell_buffer_x
-                0x00461d60                shell_window_y
-                0x00461d70                shellBufferMaxRows
-                0x00461d80                CursorInfo
-                0x00461d90                shellMaxColumns
-                0x00461da0                i1Window
-                0x00461db0                topbarWindow
-                0x00461dc0                ApplicationInfo
- COMMON         0x00461dd0      0x8f0 stdlib.o
-                0x00461dd0                current_mmblock
-                0x00461de0                mm_prev_pointer
-                0x00461df0                heap_end
-                0x00461e00                g_available_heap
-                0x00461e10                heap_start
-                0x00461e20                heapCount
-                0x00461e30                HEAP_START
-                0x00461e40                g_heap_pointer
-                0x00461e50                heapList
-                0x00462250                HEAP_SIZE
-                0x00462260                last_size
-                0x00462270                last_valid
-                0x00462280                mmblockList
-                0x00462680                libcHeap
-                0x00462690                Heap
-                0x004626a0                mmblockCount
-                0x004626b0                HEAP_END
-                0x004626c0                end = .
-                0x004626c0                _end = .
-                0x004626c0                __end = .
+                0x00461c70                shellWindowHeight
+                0x00461c80                root
+                0x00461c90                shell_window_x
+                0x00461ca0                i2Window
+                0x00461cb0                rect
+                0x00461cc0                backgroung_color
+                0x00461cd0                shellMaxRows
+                0x00461ce0                foregroung_color
+                0x00461cf0                shell_buffer_pos
+                0x00461d00                pwd
+                0x00461d10                CurrentWindow
+                0x00461d20                current_semaphore
+                0x00461d30                ShellHook
+                0x00461d40                shellScreenWidth
+                0x00461d50                shellScreenHeight
+                0x00461d60                shell_buffer_x
+                0x00461d70                shell_window_y
+                0x00461d80                shellBufferMaxRows
+                0x00461d90                CursorInfo
+                0x00461da0                shellMaxColumns
+                0x00461db0                i1Window
+                0x00461dc0                topbarWindow
+                0x00461dd0                ApplicationInfo
+ COMMON         0x00461de0      0x8f0 stdlib.o
+                0x00461de0                current_mmblock
+                0x00461df0                mm_prev_pointer
+                0x00461e00                heap_end
+                0x00461e10                g_available_heap
+                0x00461e20                heap_start
+                0x00461e30                heapCount
+                0x00461e40                HEAP_START
+                0x00461e50                g_heap_pointer
+                0x00461e60                heapList
+                0x00462260                HEAP_SIZE
+                0x00462270                last_size
+                0x00462280                last_valid
+                0x00462290                mmblockList
+                0x00462690                libcHeap
+                0x004626a0                Heap
+                0x004626b0                mmblockCount
+                0x004626c0                HEAP_END
+                0x004626d0                end = .
+                0x004626d0                _end = .
+                0x004626d0                __end = .
 LOAD head.o
 LOAD crt0.o
 LOAD main.o

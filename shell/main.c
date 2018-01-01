@@ -68,45 +68,7 @@
 #include "stdlib.h"  
 #include "string.h"
 #include "shell.h"
-
-
-/*
-    Fluxo padrão: definido em <stdio.h>
-	
-    FILE *stdin; 
-    FILE *stdout; 
-    FILE *stderr; 
- 
-*/
-
-//
-// font support.
-//
-
-//FILE *font_file;
-
- 
-//Diretórios para o shell comparar os comandos com os nomes dos arquivos lá. 
-struct _iobuf *pwd; 
-struct _iobuf *root;
-//...
-
-//Janelas usadas pelo aplicativo.
-struct window_d *topbarWindow;  //task bar.
-struct window_d *i1Window;      //icone 1.
-struct window_d *i2Window;      //icone 2.
-//...
-
-//
-// Definindo mensagens..@todo: Mover para a API.
-//
-
-#define CMD_ABOUT 1000
-//#define CMD_ABOUT 1001
-//#define CMD_ABOUT 1002
-//#define CMD_ABOUT 1003
-//...
-
+#include "globals.h"
 
 
 //
@@ -118,130 +80,10 @@ int shellError;
 
 
 //
-// BUFFER SUPPORT
-//
-
-//Buffer size.
-int shellBufferMaxColumns;  //80
-int shellBufferMaxRows;     //25*4 (4 vistas) 
-
-//#define SHELL_BUFFER_SIZE 512
-//#define SHELL_BUFFER_SIZE 1024 
-#define SHELL_BUFFER_SIZE (80*25)      //2000
-//#define SHELL_BUFFER_SIZE (80*25*4)
-
-#define DEFAULT_BUFFER_MAX_COLUMNS 80
-#define DEFAULT_BUFFER_MAX_ROWS    25
-
-char shell_buffer[SHELL_BUFFER_SIZE]; //buffer de output
-unsigned long shell_buffer_pos; 
-unsigned long shell_buffer_x; 
-unsigned long shell_buffer_y; 
-//unsigned long shell_buffer_width;  //Largura dada em número de caracteres.
-//unsigned long shell_buffer_height; //Altura dada em número de caracteres.
-//...
-
-
-
-
-//
-// SCREEN SUPPORT
-//
-
-//Obs: aumentar essas constantes aumenta o tamanho da janela.
-#define DEFAULT_MAX_COLUMNS 80
-#define DEFAULT_MAX_ROWS    50 //25
-
-//Screen size.
-int shellMaxColumns;       //80   
-int shellMaxRows;          //25
-int shellScreenWidth;      //800 
-int shellScreenHeight;     //600
-
-//...
-
-
-//
-// WINDOW SUPPORT
-//
-
-int shellWindowWidth;      //80*8
-int shellWindowHeight;     //25*8
-
-//
-// Window position.
-//
-
-#define DEFAULT_WINDOW_X 0
-#define DEFAULT_WINDOW_Y 0
-
-unsigned long shell_window_x;
-unsigned long shell_window_y;
-
-
-
-//linux 
-//#define SCREEN_START 0xb8000
-//#define SCREEN_END   0xc0000
-#define LINES 25
-#define COLUMNS 80
-#define NPAR 16
-
-//linux 
-static unsigned long origin = (unsigned long) &shell_buffer[0];                     //SCREEN_START;
-static unsigned long scr_end = (unsigned long) (&shell_buffer[0] + (LINES * COLUMNS));  //SCREEN_START+LINES*COLUMNS*2;
-static unsigned long pos; //posição dentro do buffer
-static unsigned long x,y;
-static unsigned long top = 0, bottom = LINES;
-static unsigned long lines = LINES,columns = COLUMNS;
-static unsigned long state=0;
-static unsigned long npar,par[NPAR];
-static unsigned long ques=0;
-static unsigned char attr=0x07;
-
-
-static unsigned long saved_x=0;
-static unsigned long saved_y=0;
-
-
-
-//
 // Protótipos para funções internas.
 //
 
-static void save_cur(void);
-static void restore_cur(void);
-static void lf(void);
-static void ri(void);
-static void cr(void);
-static void del(void);
-void move_to( unsigned long x, unsigned long y);
-int test_operators();
-void shellCreateTopBar();
-void shellTestMBR();
-void shellTestDisplayBMP();
-void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
-void shellInsertNullTerminator();
-void shellInsertCR();
-void shellInsertLF();
-void shellInsertNextChar(char c);
-void shellInsertCharXY(unsigned long x, unsigned long y, char c);
-void shellInsertCharPos(unsigned long offset, char c);
-void shellClearBuffer();
-void shellTestLoadFile();
-void shellTestThreads();
-void shellClearscreen();
-void shellScroll();
-void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
-void shellSetCursor(unsigned long x, unsigned long y);
-void shellThread();
-void shellPrompt();
-void shellHelp();
-void shellTree();
-unsigned long shellCompare(struct window_d *window);    //Compare command.
-void shellWaitCmd();             //Wait for command.
-int shellInit();                 //Init.
-void shellShell();               //Constructor. 
+
 unsigned long shellProcedure( struct window_d *window, 
                               int msg, 
 							  unsigned long long1, 
@@ -1873,7 +1715,10 @@ void shellPrompt()
 };
 
 
-//limpa o buffer do shell
+/*
+ * shellClearBuffer:
+ *     Limpa o buffer do shell.
+ */
 void shellClearBuffer()
 {
 	int i;
@@ -1887,7 +1732,10 @@ void shellClearBuffer()
 };
 
 
-//Carrega um arquivo de texto no buffer e mostra na tela.
+/*
+ * shellTestLoadFile:
+ *     Carrega um arquivo de texto no buffer e mostra na tela.
+ */
 void shellTestLoadFile()
 {
 	shellClearBuffer();
@@ -1918,7 +1766,10 @@ void shellTestLoadFile()
 };
 
 
-//Cria um thread e executa.
+/*
+ * shellTestThreads:
+ *     Cria um thread e executa.
+ */
 void shellTestThreads()
 {
     void *T;	
@@ -1976,7 +1827,10 @@ void shellTestThreads()
 };
 
 
-//limpar a tela do shell.
+/*
+ * shellClearscreen:
+ *     Limpar a tela do shell.
+ */
 void shellClearscreen()
 {
 	int i;
@@ -1990,7 +1844,12 @@ void shellClearscreen()
 	shellSetCursor(0,0);
 };
 
-//copia o conteúdo do buffer para a tela. (dentro da janela)
+
+/*
+ * shellRefreshScreen:
+ *     Copia o conteúdo do buffer para a tela. (dentro da janela).
+ *
+ */
 void shellRefreshScreen()
 {
 	int i;
@@ -2007,7 +1866,10 @@ void shellRefreshScreen()
 };
 
 
-
+/*
+ * shellScroll:
+ *     @todo:
+ */
 void shellScroll()
 {
 	int i;
@@ -2024,30 +1886,13 @@ void shellScroll()
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.		
 };
 
-/*
- * @todo: Criar rotina de saída do shell.
-void shellExit(int code);
-void shellExit(int code){
-	exit(code);
-}
-*/
-
-
-/*
-void die(char * str);
-void die(char * str)
-{
-	fprintf(stderr,"%s\n",str);
-	exit(1);
-}
-*/
 
 
 static void save_cur(void)
 {
 	saved_x = shell_buffer_x;
 	saved_y = shell_buffer_y;
-}
+};
 
 
 static void restore_cur(void)
@@ -2056,7 +1901,7 @@ static void restore_cur(void)
 	y=saved_y;
 	//pos = origin + ( (y * columns + x) << 1 );
 	shell_buffer_pos = origin + (shell_buffer_y * columns + shell_buffer_x);
-}
+};
 
 
 static void lf(void)
@@ -2067,7 +1912,7 @@ static void lf(void)
 		return;
 	}
 	//scrup();
-}
+};
 
 
 static void ri(void)
@@ -2078,14 +1923,14 @@ static void ri(void)
 		return;
 	}
 	//scrdown();
-}
+};
 
 
 static void cr(void)
 {
 	shell_buffer_pos -= shell_buffer_x; //pos -= x<<1;
 	shell_buffer_x=0;
-}
+};
 
 
 static void del(void)
@@ -2096,7 +1941,7 @@ static void del(void)
 		//*(unsigned short *) shell_buffer_pos = 0x0720;
 		//@todo: printchar
 	}
-}
+};
 
 
 //insere um caractere entro do buffer
@@ -2113,7 +1958,8 @@ void shellInsertCharXY(unsigned long x, unsigned long y, char c)
 	}
 
 	shell_buffer[offset] = (char) c;
-}
+};
+
 
 //insere um caractere entro do buffer
 void shellInsertCharPos(unsigned long offset, char c)
@@ -2132,34 +1978,40 @@ void shellInsertCharPos(unsigned long offset, char c)
 void shellInsertNextChar(char c)
 {
 	shell_buffer[shell_buffer_pos] = (char) c;	
-}
+};
 
 
 void shellInsertCR()
 {
    shell_buffer[shell_buffer_pos] = (char) '\r';	
-}
+};
 
 
 void shellInsertLF()
 {
     shell_buffer[shell_buffer_pos] = (char) '\n';	
-}
+};
 
 
 void shellInsertNullTerminator()
 {
     shell_buffer[shell_buffer_pos] = (char) '\0';	
-}
+};
 
 
-//mostra na tela uma imágem carregada na memória.
-void bmpDisplayBMP( void * address, unsigned long x, unsigned long y, int width, int height )
+/*
+ * bmpDisplayBMP:
+ *     Mostra na tela uma imagem .bmp carregada na memória.
+ */
+void bmpDisplayBMP( void *address, 
+                    unsigned long x, 
+					unsigned long y, 
+					int width, 
+					int height )
 {
-	int i, j, base, offset;
 	
+	int i, j, base, offset;	
 	unsigned long left, top, bottom;
-	
 	unsigned long color;
 	
 	base = 0x36;  //início da área de dados do bmp
@@ -2202,8 +2054,13 @@ void bmpDisplayBMP( void * address, unsigned long x, unsigned long y, int width,
 			
 			base = base + 3;
 			
+			//put pixel.
 			//number,cor,x,y
-			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, (unsigned long) left, (unsigned long) bottom);
+			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, 
+			             (unsigned long) color, 
+						 (unsigned long) left, 
+						 (unsigned long) bottom );
+						 
 			//my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
 			
 			left++; //próximo pixel.
@@ -2218,7 +2075,11 @@ void bmpDisplayBMP( void * address, unsigned long x, unsigned long y, int width,
 };
 
 
-//carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+/*
+ * shellTestDisplayBMP:
+ *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+ *
+ */
 void shellTestDisplayBMP()
 {	
 	//
@@ -2281,6 +2142,12 @@ loadFile:
 };
 
 
+/*
+ * shellTestMBR:
+ *     Testar a leitura de um setor do disco.
+ *     Testaremos o setor do mbr.
+ *
+ */
 void shellTestMBR()
 {
 	unsigned char buffer[512];
@@ -2298,14 +2165,19 @@ void shellTestMBR()
 }
 
 
-
-//CRIANDO A TOP BAR
+/*
+ * shellCreateTopBar:
+ *
+ *     CRIANDO A TOP BAR.
+ *     Obs: Essa é uma janela filha.
+ *     @todo: ?? e o procedimento de janela ?? e as mensagens ??
+ *     Obs: É uma janela simples e limpa, feita para dispositivos IOT 
+ * com resolução 800x600.
+ *
+ */
 void shellCreateTopBar()
 {
-	//
-	// topbar window
-	//
-	
+	// Topbar window.
 	topbarWindow = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar ",     
                                        0, 0, 800, (600/8),    
                                        0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	   
@@ -2384,7 +2256,10 @@ loadFile:
 };
 
 
-
+/*
+ * move_to:
+ *    Posicionamento dentro do buffer.
+ */
 void move_to( unsigned long x, unsigned long y )
 {
 	if( x > DEFAULT_BUFFER_MAX_COLUMNS ){
@@ -2399,4 +2274,26 @@ void move_to( unsigned long x, unsigned long y )
 	shell_buffer_y = y;
 	return;
 };
+
+
+
+/*
+ * @todo: Criar rotina de saída do shell.
+void shellExit(int code);
+void shellExit(int code){
+	exit(code);
+}
+*/
+
+
+/*
+void die(char * str);
+void die(char * str)
+{
+	fprintf(stderr,"%s\n",str);
+	exit(1);
+}
+*/
+
+
 

@@ -16,8 +16,59 @@
  *     2017 - procedure and command stuff.
  */
  
+
 //
-// Definições.
+// SCREEN SUPPORT
+//
+
+#define DEFAULT_WINDOW_X 0
+#define DEFAULT_WINDOW_Y 0
+
+//Obs: aumentar essas constantes aumenta o tamanho da janela.
+#define DEFAULT_MAX_COLUMNS 80
+#define DEFAULT_MAX_ROWS    50 //25 
+  
+
+//linux 
+//#define SCREEN_START 0xb8000
+//#define SCREEN_END   0xc0000
+#define LINES 25
+#define COLUMNS 80
+#define NPAR 16
+   
+
+//
+// BUFFER SUPPORT
+//
+
+#define DEFAULT_BUFFER_MAX_COLUMNS 80
+#define DEFAULT_BUFFER_MAX_ROWS    25
+
+
+//#define SHELL_BUFFER_SIZE 512
+//#define SHELL_BUFFER_SIZE 1024 
+//#define SHELL_BUFFER_SIZE (80*25)      
+//#define SHELL_BUFFER_SIZE (80*25*4)
+#define SHELL_BUFFER_SIZE ((DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS)+1) 
+
+
+ 
+//
+// Messages support.
+//
+
+
+#define CMD_ABOUT 1000
+//#define CMD_ABOUT 1001
+//#define CMD_ABOUT 1002
+//#define CMD_ABOUT 1003
+//...
+
+
+
+
+//
+// Strings
 //
  
 #define SHELL_VERSION  "1.0"
@@ -27,17 +78,8 @@
 //... 
  
  
-//
-// Macros.
-// 
- 
-//#define DeclareStructHandle(name) struct nameJABUTICABA__ { int unused; }; typedef struct nameJABUTICABA__ *name 
-//#define DeclareHandle(name) typedef void* name 
- 
 
-//cores do texto. 
-unsigned long backgroung_color;  //pano de fundo.
-unsigned long foregroung_color;  //texto.
+
  
  
 //
@@ -76,11 +118,6 @@ static const char tree_banner[] =
 	//... 
 	
 	
-        
-
-
-	
-	
 //
 // files.
 //	
@@ -91,7 +128,41 @@ static const char  bmp2_file_name[] = "BMP2    BMP";
 static const char  bmp3_file_name[] = "BMP3    BMP";
 static const char  bmp4_file_name[] = "BMP4    BMP";	
 //... 
+ 	
+        
+
  
+
+/*
+    Fluxo padrão: definido em <stdio.h>
+	
+    FILE *stdin; 
+    FILE *stdout; 
+    FILE *stderr; 
+ 
+*/
+
+//
+// font support.
+//
+
+//FILE *font_file;
+
+ 
+//Diretórios para o shell comparar os comandos com os nomes dos arquivos lá. 
+struct _iobuf *pwd; 
+struct _iobuf *root;
+//...
+
+//Janelas usadas pelo aplicativo.
+struct window_d *topbarWindow;  //task bar.
+struct window_d *i1Window;      //icone 1.
+struct window_d *i2Window;      //icone 2.
+//...
+
+
+	
+
 //
 // Structures.
 // 
@@ -120,7 +191,87 @@ shell_metrics_t *ShellMetrics;
 //...
  
  
+ 
+//
+// Macros.
+// 
+ 
+//#define DeclareStructHandle(name) struct nameJABUTICABA__ { int unused; }; typedef struct nameJABUTICABA__ *name 
+//#define DeclareHandle(name) typedef void* name 
+  
+ 
 //void *GramadoMain( int argc, char *argv[], unsigned long address, int view );
+ 
+ 
+
+//Screen support
+void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
+void shellClearscreen();
+void shellScroll();
+//...
+
+
+// top bar.
+// child window.
+void shellCreateTopBar();
+
+
+//buffer support.
+void shellClearBuffer();
+
+
+//Typing support
+void shellInsertCR();
+void shellInsertLF();
+void shellInsertNullTerminator();
+void shellInsertNextChar(char c);
+void shellInsertCharXY(unsigned long x, unsigned long y, char c);
+void shellInsertCharPos(unsigned long offset, char c);
+static void lf(void);
+static void ri(void);
+static void cr(void);
+static void del(void);
+void move_to( unsigned long x, unsigned long y);
+//...
+
+
+
+//Cursor support.
+void shellSetCursor(unsigned long x, unsigned long y);
+static void save_cur(void);
+static void restore_cur(void);
+
+
+// Reset prompt.
+void shellPrompt();
+
+
+//cmd
+//Funções chamadas pelos comandos.
+void shellHelp();
+void shellTree();
+void shellThread();
+void shellTestLoadFile();
+void shellTestThreads();
+void shellTestMBR();
+void shellTestDisplayBMP();
+void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
+int test_operators();
+//...
+
+// Wait for commands.
+//Isso não é usado, temos um while.
+void shellWaitCmd();             
+ 
+ // Compare comands.
+unsigned long shellCompare(struct window_d *window);    //Compare command. 
+ 
+// Initialization. 
+int shellInit();                 //Init.
+void shellShell();               //Constructor. 
+ 
+// Finalizing ... 
+// ??exit, die... 
  
 //
 // End.
