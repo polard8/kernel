@@ -43,5 +43,4 @@
 <br>@frednora
 
 <br>
->>>>>>> origin/master
-<img src="https://github.com/frednora/gramado/blob/master/screenshots/gui.png">
+<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gui.png">
