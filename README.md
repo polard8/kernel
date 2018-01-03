@@ -17,6 +17,7 @@
 <br>
 <br><b>// Resolution:</b>
 <br>The kernel starts in Graphics Mode, resolution 800x600x24.
+<<<<<<< HEAD
 
 <br>
 <br><b>// Folders:</b>
@@ -29,4 +30,18 @@
 <br>@frednora
 
 <br>
+=======
+
+<br>
+<br><b>// Folders:</b>
+<br>/init    = init application
+<br>/kernel  = kernel
+<br>/shell   = shell application 
+<br>/taskman = taskman application
+
+<br>
+<br>@frednora
+
+<br>
+>>>>>>> origin/master
 <img src="https://github.com/frednora/gramado/blob/master/screenshots/gui.png">
