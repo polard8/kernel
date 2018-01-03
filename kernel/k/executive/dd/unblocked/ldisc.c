@@ -14,7 +14,12 @@
 
 #include <kernel.h>
 
+
+//?? usado pelo mouse
+#define outanyb(p) __asm__ __volatile__( "outb %%al,%0" : : "dN"((p)) : "eax" )
+
 /*
+ aqui não é o lugar disso.
 char*  cursor[] =
 {
     "1..........",
@@ -39,6 +44,7 @@ char*  cursor[] =
 */
 
 /*
+ aqui não é o lugar disso.
 static char cursor[16][16] = {
 		"**************..",
 		"*OOOOOOOOOOO*...",
@@ -67,15 +73,9 @@ static char cursor[16][16] = {
 //
 // Definições para uso interno do módulo.
 //
- 
-#define KEYBOARD_DRIVER_VERSION "1.0"
 
-#define KEY_RELEASED 0x80
 
-#define KEY_MASK 0x7F
-#define CHEIO 1
-#define VAZIO 0
-#define OBF   0x01    //Output buffer flag.
+
 
 
 //
@@ -113,6 +113,7 @@ static char cursor[16][16] = {
 //0xFF	Reset keyboard to power on state and start self test
 
 
+//issso pertence à inicialização do teclado. deve ficar no driver de teclado.
 /* Keyboard Commands */
 #define KBD_CMD_SET_LEDS	    0xED	// Set keyboard leds.
 #define KBD_CMD_ECHO     	    0xEE
@@ -185,6 +186,7 @@ uint8_t kybrd_ctrl_read_status () {
 
 //Status
 //@todo: Status pode ser (int).
+//variáveis usadas pelo line discipline para controlar o estado das teclas de controle.
 unsigned long key_status;
 unsigned long escape_status;
 unsigned long tab_status;
@@ -209,9 +211,7 @@ unsigned long numlock_status;
 // Mouse support
 //
 
-//buffer
-char buffer_mouse[3];
-int count_mouse;
+
 
 //bytes do controlador.
 char mouse_status;
@@ -401,6 +401,9 @@ void keyboard()
  ***********************************************
  *        LINE DISCIPLINE
  * funciona como um filtro.
+ * Obs: Esse é a rotina principal desse arquivo, todo o resto 
+ * deverá encontrar um lugar melhor.
+ *
  */
 void LINE_DISCIPLINE(unsigned char SC)
 {
@@ -448,10 +451,10 @@ void LINE_DISCIPLINE(unsigned char SC)
 
     //Se a tecla for liberada.
 	//Dá '0' se o bit de paridade for '0'.
-    if( (scancode & KEY_RELEASED) == 0 )
+    if( (scancode & LDISC_KEY_RELEASED) == 0 )
 	{
 	    key = scancode;
-		key &= KEY_MASK;    //Desativando o bit de paridade caso esteja ligado.
+		key &= LDISC_KEY_MASK;    //Desativando o bit de paridade caso esteja ligado.
 
 		//Configurando se é do sistema ou não.
 		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
@@ -570,10 +573,10 @@ void LINE_DISCIPLINE(unsigned char SC)
 	//else    // * Tecla pressionada ...........	
 	
 	
-	if( (scancode & KEY_RELEASED) != 0 )
+	if( (scancode & LDISC_KEY_RELEASED) != 0 )
 	{ 
 		key = scancode;
-		key &= KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
+		key &= LDISC_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
 
 		//O Último bit é zero para key press.
 		//Checando se é a tecla pressionada é o sistema ou não.
@@ -909,6 +912,7 @@ done:
 
 /*
  * reboot: 
+ *     @todo: essa rotina poderá ter seu próprio arquivo.
  *     Reboot system via keyboard port.
  *     ?? #bugbug Por que o reboot está aqui ??
  *
@@ -1021,14 +1025,13 @@ int get_shift_status(){
 
 /*
  * init_keyboard:
+ *     ??
  *     Inicializa o driver de teclado.
  *
  *  @todo: enviar para o driver de teclado o que for de lá.
  *         criar a variável keyboard_type ;;; ABNT2 
  */
- 
 // void keyboardInit()
- 
 void init_keyboard()
 {
     //int Type = 0;
@@ -1145,9 +1148,7 @@ int keyboardInit(){
 // @todo: mouse.c 
 //
 
-//?? estranho
-//?? usado pelo mouse
-#define outanyb(p) __asm__ __volatile__( "outb %%al,%0" : : "dN"((p)) : "eax" )
+
 
 /*
  * init_mouse:
@@ -1168,10 +1169,10 @@ int init_mouse()
 	
 	//Inicializando ...
 	//??onde foram definidas??
-    mouse_status = 0;
-    delta_x = 0;
-    delta_y = 0;
-    count_mouse = 0;
+    //mouse_status = 0;
+    //delta_x = 0;
+    //delta_y = 0;
+    //count_mouse = 0;
     //...
 	
 	//Mostraremos essa mensagem somente no ambiente de debug.
@@ -1190,12 +1191,41 @@ tryModoBruto:
 	
 	//Modo bruto.
 	//Obs: Esse modo está funcionando.
+	/*
 	if(bruto == 1){
 	    mouse_write(0xFF);
 	    mouse_write(0xF6); 
 	    mouse_write(0xF4); 
-		while(!0xFA)mouse_read();
+		//while(!0xFA)mouse_read();
+		while (mouse_read() != 0xfa);   // ACK
 	};
+	*/
+	
+ // Reseta mouse (reset ? lento!)...
+  // Espero pelo byte 0xaa que encerra a sequ?ncia
+  // de reset!
+  kbdc_wait(1);
+  mouse_write(0xff);
+  while (mouse_read() != 0xaa);
+
+  // Restaura defaults do PS/2 mouse.
+  kbdc_wait(1);
+  mouse_write(0xf6);
+  while (mouse_read() != 0xfa);
+
+
+// TODO: Pode ser interessante diminuir a sensibilidade do mouse
+  // aqui!!!
+
+  // Habilita o mouse streaming
+  // Interessante notar que, no modo streaming,
+  // 1 byte recebido do PS/2 mouse gerar  uma IRQ...
+  // Talvez valha a pena DESABILITAR o modo streaming
+  // para colher os 3 dados de uma s¢ vez na IRQ!
+  kbdc_wait(1);
+  mouse_write(0xf4);
+  while (mouse_read() != 0xfa);         // ACK
+  
 	
 	//
 	// Aqui podemos tentar outros modos mais completos.
@@ -1275,126 +1305,130 @@ void kbdc_wait(unsigned char type)
  * @todo: Essa rotina não pertence ao line discipline.
  * 
  */
+#define MOUSE_X_SIGN	0x10
+#define MOUSE_Y_SIGN	0x20
+ 
 void mouseHandler()
 {
+	
+//buffer
+static int count_mouse=0;
+static char buffer_mouse[3];
+
+
+//coordenadas..
+//isso pode ser global.
+int posX = 0;
+int posY = 0;
+
+
+//local.
+static int data = 0;
+static int x = 0;
+static int y = 0;
+static int scroll = 0;	
+static int first_time=1; // Usado para ignorar a primeira IRQ12.	
+
+	
+//cursor provisório.
+static char mouse_char[] = "T";
+
+
+
+  // FIX: Por algum motivo nós "perdemos" os dois primeiros valores...
+  //      descarto o terceiro aqui para que obtenhamos os 3 "na ordem"...
+  //if (first_time)
+  //{
+  //  first_time = 0;
+  //  mouse_read(); //inportb(0x60);
+  //  goto exit_isr;
+  //}
+
+
     //buffer: definido como char.	
-	buffer_mouse[count_mouse++] = mouse_read();
-	
-	//
-	// Contamos o número de interrupções. Quando chega a 3, então já temos 
-	// a quantidade de informações necessária.
-	//
-	
-	//int xChange, yChange;
-	//unsigned long x,y;
-	
-	
-	//cursor provisório.
-	char mouse_char[] = "T";
-	
-	//
+	buffer_mouse[count_mouse++] = mouse_read();		
 	// Contagem de interruções.
-	//
-	
 	if(count_mouse >= 3)
 	{
-		//bytes: definidos como 'char'
-        mouse_status = buffer_mouse[0];       
-		delta_x      = buffer_mouse[1];
-	    delta_y      = buffer_mouse[2];
 		
-        //printf("ocorreram 3 irq12 !\n");
-        //kernelPS2MouseDriverReadData(); //bugbug
-		//printf("mouseStatus={%d} deltaX={%d} deltaY={%d} \n",mouse_status,delta_x,delta_y);
-		              
-					  
-		  
-					  
-		//x
-        if( (mouse_status & 0x10) )
+		
+		
+		//
+		//@todo: Tentando encontrar os valores corretos das coordenadas.
+		//
+		
+		//bytes: definidos como 'char'
+        data   = buffer_mouse[0];
+		x      = buffer_mouse[1];       
+		y      = buffer_mouse[2];
+		//scroll = buffer_mouse[3];
+		
+	
+		//posX += buffer_mouse[1]/2;       
+		//posY -= buffer_mouse[2]/2;
+	
+		
+		//++=======
+        if(data & 0x10)
 		{
-			mouse_pos_x -= delta_x;
-	        //baixo e esquerda
-			//printf("1: esquerda %d \n",delta_x);
-			//    xChange = (unsigned long) ((256 - delta_x) * -1);
+	         posX = (int) posX - (256 - x) ;
         }else{ 
-		    mouse_pos_x += delta_x;
-		    //cima direita 
-		    //printf("2: direita %d \n",delta_x);
-			//    xChange = (unsigned long) delta_x; 
+			posX = (int) posX + x; 
 		};
 		//--=======
 
-
-					
 		//++=======
-        //y
-		if( (mouse_status & 0x20))
+        if(data & 0x20)
 		{
-			mouse_pos_y -= delta_y;
-			// baixo e esquerda
-			//printf("3: baixo %d \n",delta_y);
-            // yChange = (int) (yChange + delta_y);
-        }else{
-			mouse_pos_y += delta_y;
-			//cima e direita
-            //printf("4: cima %d\n",delta_y); 						
-            // yChange = (int) ( yChange + delta_y );						
+           posY = (int) posY + (256 - y) ;
+        }else{ 
+
+		    posY = (int) posY - y; 
 		};
-					
-				 
-					
-					/*
-	    if( (mouse_status & 0x10) != 0) 
-		{
-			delta_x |= 0xffffff00;
-		};
+		//--=======		
+	    
 		
-		if( (mouse_status & 0x20) != 0) 
-		{
-			delta_y |= 0xffffff00;
-		};
-		
-		delta_y = - delta_y; 
-		
-		*/
-		
-		/*
-        if ((mouse_status & 0x10) != 0)
-            delta_x |= -1 << 8;
-    
-	    if((mouse_status & 0x20) != 0)
-            delta_y |= -1 << 8;
-    
-	        delta_y = -delta_y;		
-		*/
-		
-		//calculando...
-		//mouse_pos_x += delta_x;
-		//mouse_pos_y += delta_y;
-		
+//update_mouse:
+
+//.do_x:
+        //if( data & MOUSE_X_SIGN )
+        //{
+		//    x = !x;
+		//	x++;
+		//	posX -= x;
+		//}else{
+		//    posX += x;	
+		//}			
+	
+
+//.do_y:
+        //if( data & MOUSE_Y_SIGN )
+        //{
+		//    posY -= y;
+			
+		//}else{
+		//    y = !y;
+		//	y++;
+		//	posY -= y;
+		//}		
+	
 		
 		//#debug
 		//mostrando os resultados obtidos.
-		printf("X={%d} Y={%d} \n",mouse_pos_x,mouse_pos_y);
-		//printf("dX={%d} dY={%d} \n",delta_x,delta_y);
-		refresh_screen();
+		//printf("X={%d} Y={%d} \n",posX,posY);
+		//refresh_screen();
 		
-		//if(xChange < 0){ xChange = 0;}
-		//if(xChange > 800){ xChange = 800-8;}
-		//if(yChange < 0){ yChange = 0;}
-		//if(yChange > 600){ yChange = 600-8;}
+        if(	posX < 0 ){ posX = 0; }	
+		if(	posY < 0 ){ posY = 0; }
+		if(	posX > 800-8 ){ posX = 800-8; }
+		if(	posY > 600-8 ){ posY = 600-8; }
 		
-		//x = (unsigned long) xChange;
-		//y = (unsigned long) yChange;
+		g_cursor_x = (unsigned long)posX;
+		g_cursor_y = (unsigned long)posY;
 		
-		//printf("%c", (char) 'T' );
-		//my_buffer_char_blt( x*8, y*8, COLOR_PINK, 'T');
-		//refresh_rectangle( (unsigned long) x*8, (unsigned long) y*8, 8, 8 );		
+		printf("%c", (char) 'T');
+		refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 		
-	    //printf("#"); //teste
-	    //MessageBox(gui->screen, 1, "mouseHandler:","Testing Mouse interrupt");
-	    //kernelPS2MouseDriverReadData();
 		
 		//Zerando a contagem de interrupções de mouse.
 		count_mouse=0;
@@ -1424,9 +1458,12 @@ void mouseHandler()
 		//O procedimento de janela do terminal está em cascata.
 		//system_procedure( w, (int) 0, (unsigned long) 0, (unsigned long) 0 );					
 	};		
-			
 	
-	//return;
+
+exit_isr:	
+    // EOI.		
+    outportb(0xa0, 0x20); 
+    outportb(0x20, 0x20);
 };
 
 
@@ -1602,6 +1639,7 @@ done:
 
 
 /* 
+ * ***************************************************************
  * P8042_install:
  *     Configurando o controlador PS/2, 
  *     e activar a segunda porta PS/2 (mouse).
@@ -1658,11 +1696,11 @@ goAhead:
 	
 enablePorts:
 	
-	// Activar a primeira porta PS/2.
+	// Ativar a primeira porta PS/2.
 	kbdc_wait(1);
 	outportb(0x64,0xAE);   
 
-	// Activar a segunda porta PS/2.
+	// Ativar a segunda porta PS/2.
 	kbdc_wait(1);
 	outportb(0x64,0xA8);  
 
@@ -1683,6 +1721,7 @@ done:
 
 /*
  * ps2:
+ *     Essa rotina de inicialização do controladro poderá ter seu próprio módulo.
  *     Inicializa o controlador ps2.
  *     Inicializa a porta do teclado no controlador.
  *     Inicializa a porta do mouse no controlador.
@@ -1692,9 +1731,9 @@ done:
  */
 void ps2()
 {
-    P8042_install();
-    init_keyboard();
-	init_mouse();	
+    P8042_install();  //deverá ir para ps2.c @todo: criar arquivo.
+    init_keyboard();  //?? quem inicializará a porta do teclado ?? o driver ??
+	init_mouse();	  //?? quem inicializará a porta do mouse ?? o driver ??
 };
 
 //

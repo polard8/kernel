@@ -197,8 +197,6 @@ void create_gui()
 	if( (void*) gui == NULL ){
 		printf("create_gui: gui struct");
 		die();
-		//refresh_screen();
-		//while(1){};
 	};
 	
 	//
@@ -411,12 +409,14 @@ void gui_create_screen()
 	if( (void*) hWindow == NULL ){
 	    printf("gui_create_screen:");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 
 		RegisterWindow(hWindow);
 		set_active_window(hWindow); 
+		
+		//Isso impede que rotinas mudem as caracteríscicas 
+		// da janela principal sem antes destravar ou sem 
+		//ter autorização para isso.
 		windowLock(hWindow); 
 		
 		//Estrutura gui.
@@ -474,13 +474,11 @@ void gui_create_background()
 	{
 	    printf("gui_create_background:");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
 		set_active_window(hWindow); 
-	    windowLock(hWindow); 
+		windowLock(hWindow);  
 		
         //Estrutura gui.
 		if( (void*) gui != NULL ){

@@ -1,7 +1,9 @@
 /*
- * File: keyboard.h 
+ * File: ldisc.h 
  *
  * Descrição:
+ *     >> header para o módulo ldisc do kernel base.
+ *
  *     Header do driver de teclado presente dentro do kernel. 
  *     Manter aqui parâmetros gerais, que possam ser úteis pra qualquer 
  * driver de teclado.
@@ -77,6 +79,14 @@
  *     //...
  */ 
  
+ 
+#define LDISC_KEY_RELEASED  0x80
+#define LDISC_KEY_MASK  0x7F
+#define LDISC_FULL      1
+#define LDISC_EMPTY     0
+#define LDISC_OBF       0x01    //Output buffer flag.
+ 
+ 
 //variável de ambiente. 
 #define KEYBOARD_DRIVER_PATHNAME "/root/drivers/keyboard.bin" 
 //... 
@@ -99,6 +109,7 @@
 
 
 //ASCII
+//A disciplina de linhas precisa disso.
 #define KEY_RETURN   13     //sc 28
 #define KEY_TAB	     15
 #define KEY_SHIFT	 42     //16
@@ -382,6 +393,17 @@ unsigned long ambiente;
 unsigned long destroy_window;
 unsigned long quit_message;
 
+
+
+//
+// Sobre charmaps:
+// ?? quem deve possuir o char map ??
+// Obviamente o kernel base precis de algum controle sobre isso.
+// sujerindo alterações conforme a conveniência do usuário.
+// Se a intenção é que o driver de teclado passe para a line discipline 
+// somente o scancode, então não há a necessidade de o driver de teclado 
+// ter um char map, ele apenas passa o scancode.
+//
 
 /*
  * ABNT2 keyboard layout.
@@ -813,6 +835,8 @@ STP|L,
 
 //
 // structure for hardware keyboard info.
+//  As informações sobre o hardware de teclado devem ser mantidas 
+// pelo kernel base, mas não é aqui o lugagr dessa estrutura.
 //
 
 typedef struct keyboard_d keyboard_t;
@@ -842,7 +866,7 @@ struct keyboard_d
 //
 
 //Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState( unsigned char key );
+unsigned long keyboardGetKeyState(unsigned char key);
 
 //@todo: função para mudar o handler.
 //o kernel deve oferecer o serviço de trocar o handler
@@ -905,6 +929,13 @@ static void outPort60(unsigned char value);
 static void outPort64(unsigned char value);
 static unsigned char getMouseData(void);
 void kernelPS2MouseDriverReadData(void);
+
+
+
+//
+// *****************  ps/2 ***********************
+//
+
 void P8042_install();
 void ps2();
 
@@ -913,6 +944,10 @@ void ps2();
 //
 
 //LINE DISCIPLINE ...@TODO: ISSO DEVE FICAR DENTRO DO KERNEL BASE.
+//Esse será o ponto de entrada do line discipline no kernel base,
+//o kernelbase receberá uma mensagem do driver de teclado enviando o scancode
+//esse scacode passará por essa rotina, então o kernel base deve chamar essa rotina
+//apos ter recebido o scacode do driver de teclado.
 void LINE_DISCIPLINE(unsigned char SC);
 
 

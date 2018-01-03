@@ -738,7 +738,7 @@ unsigned long system_procedure( struct window_d *window,
         //como desligamentos, inicializações, reboot ...		
         //case MSG_CONSOLE:
 		case MSG_CONSOLE_COMMAND:
-            goto do_terminal;		
+            //goto do_terminal;		
 			break;
 		 
         //Continua ... Create ... Close ...		
@@ -747,7 +747,11 @@ unsigned long system_procedure( struct window_d *window,
 		//case MSG_DESTROY:
 	    //    break;
 		//case MSG_CLOSE:
-	    //    break;
+		    //#debug.
+		    //Vamos tentar invalidar as janelas de diálogo.
+			//Certamente não queremos fechar a janela gui->main.
+	        //CloseWindow(window);
+			//break;
 		//case MSG_SETFOCUS:
 	    //    break;
 		//case MSG_KILLFOCUS:

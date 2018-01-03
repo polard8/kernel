@@ -1,4 +1,6 @@
+//mouse.c 
 
+//isso aqui está no kernel base, mas deverá ser um driver.
 
 
 #include <kernel.h>
@@ -18,6 +20,8 @@ void mouse_handler()
 	//
 	
 callMouseHandler:
+
+    //Obs: Essa função ainda está em ldisc.c
     mouseHandler();	
 	return;
 };

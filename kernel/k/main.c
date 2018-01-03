@@ -1,6 +1,6 @@
 /*
- * Gramado Kernel - The main file for the kernel.
- * (c) Copyright 2015-2016 Fred Nora.
+ * Gramado Operating System - The main file for the kernel.
+ * (c) Copyright 2015~2018 - Fred Nora.
  *
  * File: k\main.c 
  * 
@@ -37,17 +37,13 @@
  *      + Nothing!
  *
  * Revision History:
- *     Version: 1.0, 2015 - Created by Fred Nora.
- *     Version: 1.0, 2016 - Revision.
+ *     2015      - Created by Fred Nora.
+ *     2016~2018 - Revision.
  *     //... 
  */ 
 #include <kernel.h>
 
-
-// 
 // Variables from Boot Loader.
-//
-
 extern unsigned long SavedBootBlock;    //Boot Loader Block.
 extern unsigned long SavedLFB;          //LFB address.  
 extern unsigned long SavedX;            //Screen width. 
@@ -55,10 +51,7 @@ extern unsigned long SavedY;            //Screen height.
 extern unsigned long SavedBPP;          //Bits per pixel.
 //...
 
-//
 // Args.
-//
-
 extern unsigned long kArg1;
 extern unsigned long kArg2;
 extern unsigned long kArg3;
@@ -68,61 +61,53 @@ extern unsigned long kArg4;
 
 extern unsigned long SavedBootMode;
 
-
+extern void turn_task_switch_on();
 
 
 /*
+ ***********************************************************
  * kMain: 
  *     The entry point for a C part of the Kernel.
  *
- * Function history: 
+ * Function history:
  *     2015 - Created.
  *     Nov 2016 - Revision.
- *     ... 
+ *     ...
  */
 int kMain(int argc, char* argv[])
-{	
+{
     int Status = 0;
 
     KernelStatus = KERNEL_NULL;
-	
-	//Inicializando a flag que será usada para travar o foco
-	// de entrada na tela do desenvolvedor. gui->DEVELOPERSCREEN
-	//@todo: Não usar isso.
-	//_lockfocus = 0; 
-	
-	//Inicializando o semáforo binário do kernel de uso geral.
-	//Aplicações usarão isso para entrarem em suas sessões críticas.
-	//@todo: Criar um método para isso.
+
+    //Initializing the global spinlock.
     __ipc_kernel_spinlock = 1;
-	
-	
-    //@todo: Encontrar o lugar apropriado para a  inicialização de zorder 
-	//provavelmente na inicialização da gui.
-	// initializing zorder list
-	int zIndex;
-	for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
-		zorderList[zIndex] = (unsigned long) 0;
-	}
-	
-	//initializing zorder counter.
-	zorderCounter = 0;
-	
-	//
-	// Window procedure.
-	//
-	
-	SetProcedure( (unsigned long) &system_procedure);
-	
-	
-	//
-	// Video.
-	//
-	
-//setupVideo:	
-	
-	//@todo: Device screen sizes.
-	
+
+    // #test.
+    // initializing zorder list
+    int zIndex;
+    for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
+        zorderList[zIndex] = (unsigned long) 0;
+    }
+
+    //initializing zorder counter.
+    zorderCounter = 0;
+
+    // set system window procedure.
+    SetProcedure( (unsigned long) &system_procedure);
+
+
+    //
+    // Video.
+	// First of all.
+	// ps: Boot loader is mappint the LFB.
+    //
+
+//setupVideo:
+
+    // @todo: 
+	// Device screen sizes.
+
     //Set graphic mode or text mode using a flag.
 	if(SavedBootMode == 1){
         g_useGUI = GUI_ON; 
@@ -134,11 +119,8 @@ int kMain(int argc, char* argv[])
         //...		
 	};
 
-	//Construtor. 
-	//Configura algumas variáveis internas do gerenciador de vídeo.
-	videoVideo();
-	
-	videoInit();  //Setup video first of all.	   
+	videoVideo();	
+	videoInit();  	   
 	
 
 	//
@@ -148,9 +130,7 @@ int kMain(int argc, char* argv[])
 	//If we are using graphic mode.
 	if(VideoBlock.useGui == GUI_ON){
 #ifdef KERNEL_VERBOSE	
-		//kbackground(COLOR_BLUE);
 	    printf("kMain: Using GUI!\n");	
-        //drawDataRectangle( 20, 20, 20, 20, COLOR_RED);
 #endif       	
 	};
 	
@@ -162,34 +142,23 @@ int kMain(int argc, char* argv[])
 	    //Set cga video memory: 0x800000vir = 0xb8000fis.
 	    videoSetupCGAStartAddress(SCREEN_CGA_START); 
 	    
-	
 	    //Debug.
+#ifdef KERNEL_VERBOSE		
 	    kclear(0);
 	    kprint("kMain: Debug" ,9 ,9 );
-	    printf("kMain: Text Mode!\n");	    	
+	    printf("kMain: Text Mode!\n");
+#endif		
 	};
 	
-	//Debug message.
 #ifdef KERNEL_VERBOSE
-	printf("kMain: Starting up system..\n");
-	refresh_screen(); //@TODO: Talvez isso não precise.
-	//while(1){}	
+	printf("kMain: Starting kernel...\n");
+	refresh_screen(); 
 #endif
-	
-	//
-	//============================================================
-    // System initialization.. system.c
-	// Inicializaremos todas funcionalidades do sistema 
-	// Mas processos e threads não serão criados.
-    //
-    
+		
 //initializeSystem:
-	
-	//Construtor.
+
     systemSystem();	
-	
-	//Inicializações.
-	Status = (int) systemInit();    //(system.c).	
+	Status = (int) systemInit();    	
     if(Status != 0){	
 		printf("kMain fail: System Init.\n");
 		KernelStatus = KERNEL_ABORTED; 
@@ -197,11 +166,12 @@ int kMain(int argc, char* argv[])
 	};
 	
 	//
-	//============================================================
+	//=================================================
 	// processes and threads initialization.
 	// Creating processes and threads.
 	// The processes are: Kernel, Idle, Shell, Taskman.
-	// obs: As imagens ja estão carregadas na memória.
+	// ps: The images are loaded in the memory.
+	//
 	
 //createProcesses:	
 	
@@ -209,8 +179,7 @@ int kMain(int argc, char* argv[])
 	KernelProcess = (void*) KiCreateKernelProcess();	
 	if( (void*) KernelProcess == NULL ){
 	    printf("kMain error: Create KernelProcess!");
-		refresh_screen();
-		while(1){}
+        die();
 	}else{
 		//ppid.
 		KernelProcess->ppid = (int) KernelProcess->pid;
@@ -227,8 +196,6 @@ int kMain(int argc, char* argv[])
 	if((void*) InitProcess == NULL){
 		printf("kMain error: Create Idle process.\n");
 		die();
-		//refresh_screen();
-		//while(1){};
 	};
     //processor->IdleProcess = (void*) IdleProcess;	
 	
@@ -239,8 +206,6 @@ int kMain(int argc, char* argv[])
 	if((void*) ShellProcess == NULL){
 		printf("kMain error: Create shell process.\n");
 		die();
-		//refresh_screen();
-		//while(1){};
 	};	
 
 	
@@ -250,12 +215,9 @@ int kMain(int argc, char* argv[])
 	if((void*) TaskManProcess == NULL){
 		printf("kMain error: Create taskman process.\n");
 		die();
-		//refresh_screen();
-		//while(1){};
 	};		
 	
-	
-	
+		
 	//
 	// Creating threads. 
 	// The threads are: Idle, Shell, Taskman.
@@ -268,15 +230,12 @@ int kMain(int argc, char* argv[])
 	
 	//Create Idle Thread. tid=0. ppid=0.
 	IdleThread = (void*) KiCreateIdle();	
-	if( (void*) IdleThread == NULL )
-	{
+	if( (void*) IdleThread == NULL ){
 	    printf("kMain error: Create Idle Thread!");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 	    
-        IdleThread->ownerPID = (int) InitProcess->pid;  //ID do processo ao qual o thread pertence.    
+        IdleThread->ownerPID = (int) InitProcess->pid;    
 		
 		//Thread.
 	    processor->CurrentThread = (void*) IdleThread;
@@ -286,17 +245,14 @@ int kMain(int argc, char* argv[])
     };
 	
 	
-	
 	// Create shell Thread. tid=1. 
 	ShellThread = (void*) KiCreateShell();	
 	if( (void*) ShellThread == NULL ){
 	    printf("kMain error: Create Shell Thread!");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 		
-	    ShellThread->ownerPID = (int) ShellProcess->pid;  //ID do processo ao qual o thread pertence. 
+	    ShellThread->ownerPID = (int) ShellProcess->pid;  
 		//...		
     };
 	
@@ -306,26 +262,16 @@ int kMain(int argc, char* argv[])
 	if( (void*) TaskManThread == NULL ){
 	    printf("kMain error: Create TaskMan Thread!");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 		
-	    TaskManThread->ownerPID = (int) TaskManProcess->pid; //ID do processo ao qual o thread pertence. 		
+	    TaskManThread->ownerPID = (int) TaskManProcess->pid;  		
 		//...		
     };	
 	
-
- 
-    //
-	// Debug.
-	//
-	
+//Kernel base Debugger.
 doDebug:
-	
-	//Kernel base Debugger.
 	Status = (int) debug();	
 	if(Status != 0){    
-		//printf("kMain fail: Debug!\n");
 		MessageBox(gui->screen,1,"kMain ERROR","Debug Status Fail!");
 		KernelStatus = KERNEL_ABORTED;	
 		goto fail;
@@ -339,61 +285,21 @@ doDebug:
 	// TESTS:
 	// We can make some testes here.
 	//
+	
 //doTests:	
    //...
-    
-
-
-	//if(VideoBlock.useGui != 1){	
-	//    kclear(0);
-    //    kprintf("kMain: Done" ,10 ,9 );
-    //};
 	
-	
-	
-	//
-	// *Importante:
-	//  Iniciando o suporte ao browser.
-	//  O Browser é uma janela criada e gerenciada pelo kernel ...
-	//  em suas abas rodarão os aplicativos e páginas da web.
-	//
-	
-	/* suspendido
-	printf("main: initializing browser support.\n");
-	windowInitializeBrowserSupport();
-	printf("main: done.\n");
-	*/
-	
-	
-	//
-	// Tentando inicializar o controlador de mouse.
-	//
-	// Já foi criada a irq12
-	// ja foi configurado vetor da IDT.
-	// já foi criado um handle para a irq12.
-	// agora inicializaremos o controlador 8042
-	// testando inicializar o mouse no procedimento de janela do sistema em F6.
-	
-	
-	//
-	// * Isso funcionou. Inicializando mouse e teclado juntos.
-	//   @todo: Deixar isso aqui.
-	//
-	
-	//isso está em ldisc.c
+	// initializing ps/2 controller.
     ps2();	
 	
-	//@todo: isso deve ser uma opção de system call. 
-	//systemSetTerminal( gui->main );
-	//systemSetTerminal( gui->terminal );  //@todo: Criar esse elemento da struct gui.
 	
 	//
-	// Done.
+	// Loading file tests.
 	//
+	
 
-  // void *b;
-   
-done:
+   // void *b;
+
 
    /*	
     //===================================
@@ -464,46 +370,30 @@ done:
 	// RETURNING !
 	//
 	
-	//
-	// Return to assembly file, (head.s).
-	//
-	
-	if(KernelStatus == KERNEL_INITIALIZED)
-	{
+done:
+
+    // Return to assembly file, (head.s).
+    if(KernelStatus == KERNEL_INITIALIZED){
 
 #ifdef KERNEL_VERBOSE
-		//printf("KeMain: EXIT_SUCCESS\n");
-		refresh_screen();
-#endif	
+    refresh_screen();
+#endif
 
-        //
-		// **  START IDLE THREAD  **
-		//
-		
-		startStartIdle() ;
-		
-	    //return (int) EXIT_SUCCESS;	
-	};
-	
-	// Fail!
+        //This function do not return.
+        startStartIdle() ;
+    };
+
 fail:
-    //if(KernelStatus != KERNEL_INITIALIZED){...};	
-	//printf("KeMain: EXIT_FAILURE\n");
-	MessageBox(gui->screen,1,"kMain ERROR","Kernel main EXIT_FAILURE!");
-	refresh_screen();  
-	return (int) EXIT_FAILURE;   
+    MessageBox(gui->screen,1,"kMain ERROR","Kernel main EXIT_FAILURE!");
+    refresh_screen();
+    return (int) EXIT_FAILURE;
 };
 
 
-
-
-extern void turn_task_switch_on();
-
-
-static inline void mainSetCr3( unsigned long value)
-{
+static inline void mainSetCr3( unsigned long value){
     __asm__ ( "mov %0, %%cr3" : : "r"(value) );
 }
+
 
 /*
  * startStartIdle:
@@ -519,29 +409,25 @@ static inline void mainSetCr3( unsigned long value)
 void startStartIdle() 
 {
 	int i;
-	//struct thread_d *Thread;
-	
-	//Thread = (void *) threadList[0];
  
-	
 	if((void*) IdleThread == NULL)
 	{
 		//printf("KeStartIdle error: Struct!\n");
-	    MessageBox(gui->screen,1,"ERRO","KeStartIdle: struct");
-        KeAbort();
+	    MessageBox(gui->screen,1,"ERRO","startStartIdle: struct");
+        die();
 	}else{
 	    
 		//Checar se o programa já foi inicializado antes. 
 		//Ele não pode estar.
 	    if(IdleThread->saved != 0){
-	        printf("KeStartIdle error: Context!\n");
-            KeAbort(); 			
+	        printf("startStartIdle error: Context!\n");
+            die(); 			
 	    };
 	    
 		//Checar se o slot na estrutura de tarefas é válido.
 	    if(IdleThread->used != 1 || IdleThread->magic != 1234){
-	        printf("KeStartIdle: IdleThread %d corrompida.\n", IdleThread->tid);
-            KeAbort(); 		
+	        printf("startStartIdle: IdleThread %d corrompida.\n", IdleThread->tid);
+            die(); 		
 	    };
 		
         set_current(IdleThread->tid);      //Seta a thread atual.	
@@ -550,9 +436,8 @@ void startStartIdle()
 	
 	// State ~ Checa o estado da tarefa.	 
     if(IdleThread->state != STANDBY){
-        printf("KeStartIdle error: State. Id={%d}\n",IdleThread->tid);
-	    refresh_screen();
-	    while(1){};
+        printf("startStartIdle error: State. Id={%d}\n",IdleThread->tid);
+	    die(); 
     };
 	
     // * MOVEMENT 2 ( Standby --> Running)	
@@ -573,34 +458,32 @@ done:
 	};
 	
     IncrementDispatcherCount(SELECT_IDLE_COUNT);
-	
-	
-	
-		 
-	mainSetCr3( (unsigned long) IdleThread->Directory);
 
-	//flush TLB
-	asm("movl %cr3, %eax");
-    asm("movl %eax, %cr3");			
-	
-	
+
+    //Set cr2 and flush TLB.
+    mainSetCr3( (unsigned long) IdleThread->Directory);
+    asm("movl %cr3, %eax");
+    asm("movl %eax, %cr3");
+
+
 	/*
 	 * turn_task_switch_on:
 	 * + Cria um vetor para o timer, IRQ0.
 	 * + Habilita o funcionamento do mecanismo de taskswitch.
-	 */	 
-	turn_task_switch_on(); 
-	
-	
+    */
+    turn_task_switch_on();
+
+
 	//
 	// @todo: Testando timer novamente.
 	//        *IMPORTANTE Me parece que tem que configurar o PIT por último.
 	//
-	
-	timerInit8253(); 
-	    		
-    asm volatile(" cli \n"   
-                 " mov $0x23, %ax  \n" 
+
+
+    timerInit8253();
+
+    asm volatile(" cli \n"
+                 " mov $0x23, %ax  \n"
                  " mov %ax, %ds  \n"
                  " mov %ax, %es  \n"
                  " mov %ax, %fs  \n"
@@ -610,20 +493,15 @@ done:
                  " pushl %eax             \n"    //esp.
                  " pushl $0x3200          \n"    //eflags.
                  " pushl $0x1B            \n"    //cs.
-                 " pushl $0x00401000      \n"    //eip. 
+                 " pushl $0x00401000      \n"    //eip.
                  " iret \n" );
-				//Nothing.
-// Fail ~ retorno inesperado.
-fail:
-    panic("KeStartIdle error: Return!"); 	
-	while(1){};  //no return.	   
+
+    panic("startStartIdle: *");
 };
 
 
-
-
- 
 //
 // End.
 //
+
 

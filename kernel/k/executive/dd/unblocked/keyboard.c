@@ -38,6 +38,16 @@
 #include <kernel.h>
 
 
+
+//
+// Obs: um driver de teclado precisa ter acesso as portas, 
+// As opções são:
+// + se o driver estiver em ser mode ele precisa de uma systemcall 
+// para acessar as portas para configurar o controlador ps/2.
+// +se o driver estiver em kernel mode, tudo o que ele precisa é de uma 
+// biblioteca estática que acesse as portas por ele.
+//
+
 /*
  * *******************************************************
  * abnt2_keyboard_handler: 

@@ -697,7 +697,8 @@ drawBegin:
 	//
 	// Minimized ? 
 	// Se tiver minimizada, não precisa mostrar a janela, porém
-	// é necessário pintar a janela no buffer dedicado.
+	// é necessário pintar a janela no buffer dedicado, se essa técnica 
+	// estiver disponível.
 	//
 	View = 0;
 	View = (int) is_window_minimized(window);
@@ -722,13 +723,29 @@ drawBegin:
 	// o tamanho da área do cliente, caso ela seja uma janela filha.
 	// Essa área de cliente poderá ser a área de trabalho, caso a
 	// janela mãe seja a janela principal.
+	// Obs: se estiver mazimizada devemos usar as dimensão e coordenadas 
+	// da janela gui->main.
 	// 
 	
-	//View = 0;
-	//View = (int) is_window_maximized(window);
-    //if(View == 1){
-	//	//...
-	//}	
+	View = 0;
+	View = (int) is_window_maximized(window);
+    if(View == 1)
+	{
+		//Dimensões.	
+        window->width  = gui->main->width;
+        window->height = gui->main->height;  
+		
+		//Margens.
+		window->left   = gui->main->x;    
+        window->top    = gui->main->y;
+        window->right  = (unsigned long) window->left + window->width;
+        window->bottom = (unsigned long) window->top  + window->height;       
+
+		//Deslocamentos em relação às margens.
+		// Os deslocamentos servem para inserir elementos na janela, como barras, botões e textos.
+		window->x = 0;
+        window->y = 0;		
+	};	
 
     //
     //  * FULL SCREEN

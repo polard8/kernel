@@ -1679,6 +1679,13 @@ void CloseWindow(struct window_d *window)
 	    return; 
 	};
 	
+	//Obs:
+	// Não fechamos a janela principal.
+	//Se for a janela principal.
+	//if( (void*) window == (void*) gui->main ){
+	//	return;
+	//}
+	
 	//
 	// ?? E as threads e processos associados à essa janela ??
 	//
@@ -1695,8 +1702,7 @@ void CloseWindow(struct window_d *window)
             set_current_window(window->parent); 
 	        set_active_window(window->parent);
             SetFocus(window->parent);
-        };
-        //?? Pra quem vai o foco nesse caso ??  		
+        }; 		
     };
 	
 	
