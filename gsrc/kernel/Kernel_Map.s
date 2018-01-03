@@ -963,21 +963,21 @@ Linker script and memory map
                 0xc0009a61                init_arquitecture_dependent
  .text          0xc0009ea8      0xad0 logon.o
                 0xc000a19e                ExitLogon
-                0xc000a8b9                init_logon
-                0xc000a576                logon_create_infobox
+                0xc000a8b5                init_logon
+                0xc000a572                logon_create_infobox
                 0xc000a1d9                SetLogonParameters
-                0xc000a571                logon_create_controlmenu
+                0xc000a56d                logon_create_controlmenu
                 0xc000a356                logon_create_background
-                0xc000a6fb                logon_create_developer_screen
-                0xc000a85b                LogonProcedure
-                0xc000a57b                logon_create_messagebox
-                0xc000a56c                logon_create_taskbar
+                0xc000a6f7                logon_create_developer_screen
+                0xc000a857                LogonProcedure
+                0xc000a577                logon_create_messagebox
+                0xc000a568                logon_create_taskbar
                 0xc000a43f                logon_create_mainwindow
-                0xc000a580                logon_create_debug
+                0xc000a57c                logon_create_debug
                 0xc000a27c                logon_create_screen
-                0xc000a6f6                logon_create_grid
-                0xc000a585                logon_create_navigationbar
-                0xc000a567                logon_create_logo
+                0xc000a6f2                logon_create_grid
+                0xc000a581                logon_create_navigationbar
+                0xc000a563                logon_create_logo
                 0xc0009ea8                create_logon
  .text          0xc000a978       0xe0 logoff.o
                 0xc000a978                StartLogoff

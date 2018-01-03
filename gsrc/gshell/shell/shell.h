@@ -71,6 +71,9 @@
 // Strings
 //
  
+//@todo: 
+//a versão do sistema operacional deve-se obter através de uma chamada ao sistema. 
+#define OS_VERSION  "0.1"  
 #define SHELL_VERSION  "1.0"
 #define SHELL_PROMPT   ">"
 //#define SHELL_PROMPT   "$"

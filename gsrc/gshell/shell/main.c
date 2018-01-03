@@ -370,7 +370,7 @@ noArgs:
 	apiBeginPaint();
 	
 	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
+	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, VIEW_MAXIMIZED," {} SHELL.BIN ",
 	                                   shell_window_x, shell_window_y, shellWindowWidth, shellWindowHeight,    
                                        0, 0, COLOR_BLACK, 0x83FCFF00 );	   
 	if((void*) hWindow == NULL){	
@@ -447,9 +447,9 @@ noArgs:
 	//
 	
 	//#bug bug
-	enterCriticalSection();    // * Enter Critical Section.
-	shellCreateTopBar();
-	exitCriticalSection();     // * Exit Critical section.		
+	//enterCriticalSection();    // * Enter Critical Section.
+	//shellCreateTopBar();
+	//exitCriticalSection();     // * Exit Critical section.		
     	
 	
 	
@@ -1081,6 +1081,7 @@ do_compare:
     if( strncmp( prompt, "mbr", 3 ) == 0 )
 	{
 	    printf("~mbr\n");
+		//#bugbug pagefault
 		shellTestMBR();
 		printf("done\n");
 		goto exit_cmp;
@@ -1173,6 +1174,15 @@ do_compare:
 	    shellTestThreads();
         goto exit_cmp;
     };
+	
+	//topbar
+    if( strncmp( prompt, "topbar", 6 ) == 0 ){
+	    enterCriticalSection();    
+	    shellCreateTopBar();
+	    exitCriticalSection();    
+		goto exit_cmp;
+    };			
+	
 		
 	//tree
     if( strncmp( prompt, "tree", 4 ) == 0 ){
@@ -1182,7 +1192,7 @@ do_compare:
 		
 	//version
     if( strncmp( prompt, "version", 7 ) == 0 ){
-	    printf("\n Gramado version %s \n",SHELL_VERSION);
+	    printf("\n Gramado version %s \n",OS_VERSION);
         goto exit_cmp;
     };	
  
@@ -1266,7 +1276,7 @@ void shellShell()
 	// prompt[] - Aqui ficam as digitações. 
 	//
 	shellClearBuffer();
-	shellPrompt();
+
 	
 	
 	
@@ -1291,7 +1301,11 @@ void shellShell()
 	//...
 	
 done:	
-	shellSetCursor(0,4); //cursor.
+    //Nossa referência é amoldura e não a área de cliente.
+	//@todo:usar a área de cliente como referência
+	//shellSetCursor(0,0);
+    shellSetCursor(0,4);	
+	shellPrompt();
     return;	
 };
 
@@ -1601,9 +1615,7 @@ done:
     */
 	
 	shellPrompt();
-	
     refresh_screen();
-		
     return (int) 0;
 };
 
@@ -1618,16 +1630,10 @@ done:
  * e isso se faz através de uma chamada ao kernel.
  */
 void shellSetCursor(unsigned long x, unsigned long y)
-{
-	//
-	// #BUGBUG: Aconteceu uma pagefault depois de incluir essa função. 
-	// Vou testar sem ela.
-	//
+{	
+    //setando o cursor usado pelo kernel base.	
+    apiSetCursor(x,y);
 	
-    //Atualizamos as variáveis dentro da estrutura da janela com o foco de entrada.
-    //system_call( SYSTEMCALL_SETCURSOR, x, y, 0);	
-	
-
 //Atualizando as variáveis globais usadas somente aqui no shell.
 setGlobals:	
     g_cursor_x = (unsigned long) x;
@@ -1839,7 +1845,7 @@ void shellClearscreen()
 	
 	// Shell buffer. (80*25) ??
 	for( i=0; i<SHELL_BUFFER_SIZE; i++){
-		printf("%c", '\0'); //pinta um espaço.
+		printf("%c", ' '); //pinta um espaço.
 	}
 	shellSetCursor(0,0);
 };

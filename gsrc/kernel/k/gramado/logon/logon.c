@@ -1,5 +1,5 @@
 /*
- * File: logon.c
+ * File: gramado\logon\logon.c
  *
  * Descrição:
  *     @todo: Esse módulo deve prepara o ambiente para rodar o processo logon.bin.
@@ -507,14 +507,12 @@ void logon_create_mainwindow()
 	// um tamanho inicial para ela ja foi reservado.
 	//
 	
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Area de Trabalho", 
-	                                (Width/2), Top, (Width/2), Height,           //meia tela como teste
+	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Desktop window", 
+	                                (Width), Top, (Width), Height,           //meia tela como teste
 							         gui->screen, 0, 0, COLOR_BROWN );           //COR TESTE
 	if( (void*) hWindow == NULL){
 	    printf("logon_create_mainwindow:");
 	    die();
-		//refresh_screen();
-		//while(1){};
 	}else{   
 	    		
 	    RegisterWindow(hWindow);
