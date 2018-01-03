@@ -1,0 +1,11 @@
+DISK={0}
+VOLUME={0}
+SYSTEM={Operating System Name}
+*
+**
+***
+****    This is a file.    ****
+****
+***
+**
+*
