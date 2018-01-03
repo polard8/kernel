@@ -17,7 +17,6 @@
 <br>
 <br><b>// Resolution:</b>
 <br>The kernel starts in Graphics Mode, resolution 800x600x24.
-<<<<<<< HEAD
 
 <br>
 <br><b>// Folders:</b>
@@ -25,19 +24,6 @@
 <br>/gdocs   = Docs.
 <br>/gsdk    = SDK.
 <br>/gsrc    = source code.
-
-<br>
-<br>@frednora
-
-<br>
-=======
-
-<br>
-<br><b>// Folders:</b>
-<br>/init    = init application
-<br>/kernel  = kernel
-<br>/shell   = shell application 
-<br>/taskman = taskman application
 
 <br>
 <br>@frednora
