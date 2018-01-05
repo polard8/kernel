@@ -131,8 +131,7 @@ void faults(unsigned long number)
 	//
 	
 done:	
-    die();
-    while(1){};	
+    die();	
 };
 
 
@@ -140,10 +139,9 @@ done:
  * KiCpuFaults:
  *     Interface para chamar a rotina de faults.
  */
- 
 void KiCpuFaults(unsigned long number){
     faults(number);
-	while(1){} 
+	die();
 };
 
 

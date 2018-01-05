@@ -462,8 +462,6 @@ void LINE_DISCIPLINE(unsigned char SC)
 		{
 			//Os primeiros 'case' é quando libera tecla do sistema.
 			//O case 'default' é pra quando libera tecla que não é do sistema.
-
-			//@todo: Tab, capslock.
 			
 			//left Shift liberado.
 			case VK_LSHIFT:
@@ -684,26 +682,21 @@ void LINE_DISCIPLINE(unsigned char SC)
 
 		if(mensagem == MSG_SYSKEYDOWN)
 		{
-			if(abnt2 == 1){
-		        ch = map_abnt2[key];
-			};
+			if(abnt2 == 1){ ch = map_abnt2[key]; };
 
             //@todo acionar status. 
 		};
 
 		if(mensagem == MSG_KEYDOWN)
 		{
-			if(abnt2 == 1){
-		        ch = map_abnt2[key];
-			};
-
+			if(abnt2 == 1){ ch = map_abnt2[key]; };
+			
 		    if(shift_status == 1 || capslock_status == 1){
 			    ch = shift_abnt2[key];
 			};
 
-		    if(ctrl_status == 1){
-			    ch = ctl_abnt2[key];
-			};
+		    if(ctrl_status == 1){ ch = ctl_abnt2[key]; };
+			
             //Nothing.
 		};
 		//Nothing.
@@ -803,7 +796,7 @@ done:
 	};
 
 eoi:
-    outportb(0x20, 0x20);    //EOI.
+    outportb(0x20,0x20);    //EOI.
     return;
 };
 

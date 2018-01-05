@@ -391,6 +391,7 @@ void *services( unsigned long number,
 		//34	
         case SYS_VIDEO_SETCURSOR: 
 		    systemRam(86,arg2,arg3,0,0); 
+			//set_up_cursor( (unsigned long) arg2, (unsigned long) arg2);
 			break;              
 
 		//35 - Configura o procedimento da tarefa atual.

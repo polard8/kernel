@@ -175,7 +175,12 @@ extern void do_executa_new_task();
 #include <executive/dd/unblocked/rtc.h>          //clock    ( South bridge).
 #include <executive/dd/unblocked/floppy.h>       //floppy   ( South bridge).
 #include <executive/dd/unblocked/keyboard.h>     //irq1     ( South bridge).   //keyboard
+
+#include <executive/dd/unblocked/ascii.h>     //ascii table 
+#include <executive/dd/unblocked/vk.h>         //virtual keys
+#include <executive/dd/unblocked/abnt2.h> 
 #include <executive/dd/unblocked/ldisc.h>        //ldisc
+
 #include <executive/dd/unblocked/ide.h>          //irq14/15 ( South bridge).
 //...
 

@@ -35,14 +35,12 @@ char vsync_inb(int port);
 void vsync()
 {
     /* wait until any previous retrace has ended */
-    do
-	{
+    do{
 	//nothing
     }while( vsync_inb(VSYNC_INPORT) & 8 );
 
     /* wait until a new retrace has just begun */
-    do 
-	{
+    do{
 	//nothing
     }while( !(vsync_inb(VSYNC_INPORT) & 8) );
 	
@@ -52,7 +50,8 @@ done:
 
 
 /*
- * gui_inb: Pega um byte na porta.
+ * vsync_inb: 
+ *     Pega um byte na porta.
  */
 char vsync_inb(int port)
 {
@@ -60,7 +59,6 @@ char vsync_inb(int port)
 	
     Value = (char) inportb(port); 
 	
-	// Wait.
 	asm(" nop \n");
 	asm(" nop \n");
 	asm(" nop \n");

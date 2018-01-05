@@ -570,7 +570,8 @@ void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg
             //nesse momento podemos mostrar o nome da janela com o foco de entrada.
 			//printf("windowSendMessage: focus={%s}\n",wFocus->name);
               			
-            
+            //#bugbug
+			//A fila não funciona, estamos usando apenas um offset para testes.
 			wFocus->sendOffset = 0; 
 			
 			//Trata o deslocamento atual para as filas.
@@ -580,7 +581,7 @@ void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg
 			//};
 	        
 			//Envia cada mensagem pra sua fila apropriada.
-			wFocus->hwndList[wFocus->sendOffset]  = (unsigned long) 0; //arg1;
+			wFocus->hwndList[wFocus->sendOffset]  = (unsigned long) 0;     //window;
 			wFocus->msgList[wFocus->sendOffset]   = (unsigned long) arg2;  //msg.
 			wFocus->long1List[wFocus->sendOffset] = (unsigned long) arg3;  //long1
 			wFocus->long2List[wFocus->sendOffset] = (unsigned long) arg4;  //long2
@@ -1232,15 +1233,11 @@ int redraw_window(struct window_d *window)
 	if( (void*) CurrentColorScheme == NULL ){
 		printf("redraw_window: CurrentColorScheme");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 		
 		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
 		    printf("redraw_window: CurrentColorScheme validation");
-		    die();
-			//refresh_screen();
-		    //while(1){}			
+		    die();			
 		};
 		//Nothing.
 	};	
@@ -1328,7 +1325,8 @@ redrawBegin:
 						   window->color_bg );
 						   
 		//ressaltando a barra de títulos da janala com o foco de entrada.
-        //quem deve ser pintada diferente é a janela com o foco de entrada e não a janela ativa.						   
+        //quem deve ser pintada diferente é a janela com o foco de entrada e não a janela ativa.
+        //Obs: Isso vale para janelas com bordas. 		
         if(window->id == window_with_focus)
 		{
             drawDataRectangle( window->left, 

@@ -1590,7 +1590,7 @@ done:
  *
  *  @todo: 
  *      Essas informações devem ser repassadas para "struct system_d".
- *
+ *      #bugbug: A parent window deve ser gui->main e não gui->screen.
  */  
 void *systemCreateSystemMenuBar()
 {
@@ -1622,21 +1622,18 @@ void *systemCreateSystemMenuBar()
 	hwItemSystem = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "SystemMenuBar", 
 	                               0, 60, (800/4), (600-60), 
 							       gui->screen, 0, 0, COLOR_GRAY ); 
-	if( (void*) hwItemSystem == NULL )
-	{
-		printf("systemCreateSystemMenuBar error: Struct.\n");
-		refresh_screen();
-	    while(1){};
-		//return NULL;	    
-	}
-	else
-	{
+	if( (void*) hwItemSystem == NULL ){
+		printf("systemCreateSystemMenuBar: hwItemSystem");
+		die();
+	}else{
+		
 		hwItemSystem = (void *) hwItemSystem;
 		hwItemApplications = (void *) hwItemSystem;
 		hwItemWindow = (void *) hwItemSystem;
 	    RegisterWindow(hwItemSystem);
 		RegisterWindow(hwItemApplications);
 		RegisterWindow(hwItemWindow);
+		//...
 	};	
 	
 	
@@ -1656,19 +1653,15 @@ void systemCheck3TierArchitecture(){
 
 /*
  * systemSetupVersion:
- *     Configurando os dados sobre versão.     
+ *     Setup version info.     
  */
 void systemSetupVersion()
 {
-	//
-	// Estrutura Version.
-	//
-	
+	//Version.
     Version = (void*) malloc( sizeof(struct version_d) );
     if((void*) Version == NULL){	
-	    printf("systemSetupVersion:");
-		refresh_screen();
-		while(1){};
+	    printf("systemSetupVersion: Version");
+        die();  
 	}else{	
         Version->Major = SYSTEM_VERSIONMAJOR;
 		Version->Minor = SYSTEM_VERSIONMINOR;
@@ -1676,19 +1669,13 @@ void systemSetupVersion()
 		Version->Revision = SYSTEM_VERSIONREVISION;
 	};
 	
-	//
-	// Estrutura VersionInfo.
-	//
-	
+	//VersionInfo.
     VersionInfo = (void*) malloc( sizeof(struct version_info_d) );
-    if((void*) VersionInfo == NULL)
-	{	
-	    printf("systemSetupVersion:");
-		refresh_screen();
-		while(1){};
-	}
-	else
-	{
+    if((void*) VersionInfo == NULL){	
+	    printf("systemSetupVersion: VersionInfo");
+		die();
+	}else{
+		
 		if( (void*) Version != NULL  )
 		{
             //VersionInfo->version = (void *) Version;
@@ -1937,38 +1924,36 @@ void systemReboot()
 		
 	struct window_d *hWnd;
 	struct window_d *hWindow;	
-	
-	asm("cli");  // Me parece que desabilitar é uma opção.
-	
-	
 
-
-	//Se não estivermos em modo gráfico, não há o que mostrar.	
+	unsigned long left;
+	unsigned long top;
+	unsigned long width;
+	unsigned long height;	
+	
+	asm("cli");
+	
+	//No graphics.	
     if(VideoBlock.useGui != 1){
-	    return;	
+		hal_reboot();
 	};
-	
-	
+		
 	//Parent window.
 	if( (void*) gui->main == NULL){
-	    return;
+	    hal_reboot();
+	}else{
+	    
+		left   = gui->main->left;
+	    top    = gui->main->top;
+	    width  = gui->main->width;
+	    height = gui->main->height;	
+		
+	    set_up_cursor( (left/8) , (top/8) );
+	    //g_cursor_x = (left/8);
+	    //g_cursor_y = (top/8); 
+		
 	};
 	
-	unsigned long left   = gui->main->left;
-	unsigned long top    = gui->main->top;
-	unsigned long width  = gui->main->width;
-	unsigned long height = gui->main->height;	
-	
-		
-	//@todo: Chamar método.	
-	//Cursor.
-	g_cursor_x = (left/8);
-	g_cursor_y = (top/8); 
-	//set_up_cursor(0,10);
-
-
-
-//
+    //
 	// @todo: Usar esquema de cores padrão.
 	//
 	
@@ -1976,7 +1961,7 @@ void systemReboot()
 	{
 		//Parent window.
 	    if( (void*) gui->main == NULL){
-	        return;
+	        hal_reboot();
 	    };
 			
 	    //Create.
@@ -1985,8 +1970,7 @@ void systemReboot()
 			     				        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
 
 	    if( (void*) hWindow == NULL){
-	        printf("systemReboot:\n");
-		    return;
+	        hal_reboot();
         }else{
 		    RegisterWindow(hWindow);
 			set_active_window(hWindow);
@@ -2176,7 +2160,7 @@ done:
     refresh_screen();
 	KiReboot();
 hang: 
-    while(1){}
+    die();
 };
 
 
@@ -2198,7 +2182,7 @@ done:
 	//KiShutdown(); //??
 	//hal_shutdown();
 hang:	
-	while(1){}
+	die();
 };
 
 
@@ -2235,7 +2219,7 @@ void systemShutdownViaAPM()
 	//};
 	
 hang:	
-	while(1){}
+	die();
 };
 
 
@@ -2508,6 +2492,7 @@ void systemSystem(){
 
 
 /*
+ * ********************************************
  * die:
  *     Função sem retorno. Aqui termina tudo.
  *      O sistema trava e não tem volta.

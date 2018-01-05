@@ -38,7 +38,11 @@
  */
 //#define RR_TIMESLICE            (100 * HZ / 1000)
 
+//a flag indica se o cursor está habilitado ou não.
+int timer_cursor_used;
 
+//status do cursor.
+int timer_cursor_status;
 
 unsigned long time_out;
 
@@ -65,7 +69,7 @@ struct timer_d
 	unsigned long error; //e
 	
 	//Navegação.
-	struct timer_d * next;
+	struct timer_d *next;
 };
 //timer_t *Timer;
 

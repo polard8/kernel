@@ -137,7 +137,9 @@ int screenInit()
 	// More?!
 	
 done:
+#ifdef KERNEL_VERBOSE
     printf("done\n");
+#endif
 	return (int) 0;
 };
 
@@ -150,6 +152,6 @@ int screenScreen()
 
 
 //
-// Fim.
+// End.
 //
 

@@ -2,7 +2,7 @@
  * Gramado Hal - The main file for the Hal module in the kernel base. 
  * (c) Copyright 2015-2016 Fred Nora.
  *
- *  File: k\hal.c 
+ *  File: k\hal\hal.c 
  *  
  * Classes:
  *     system.unblockeddevices (K2)
@@ -55,6 +55,8 @@
 
 extern unsigned long gdt;
 extern unsigned long idt;
+
+extern void gui_buffer_putpixel();
 
 //
 //@todo: criar rotina hal_get_page_dir();
@@ -183,10 +185,6 @@ void halMain(){
  *     Coloca um pixel no backbuffer.
  *
  */
- 
-//isso vem do assembly. 
-extern void gui_buffer_putpixel();
- 
 void hal_backbuffer_putpixel( unsigned long ax, 
                               unsigned long bx, 
 						      unsigned long cx, 
@@ -378,8 +376,9 @@ void init_cpu()
 	processor = (void*) malloc( sizeof(struct tagProcessor) );
 	if((void*) processor == NULL){
 	    printf("init_cpu:");
-	    refresh_screen();
-		while(1){};
+	    die();
+		//refresh_screen();
+		//while(1){};
 		//return;
 	}else{
 	    
@@ -402,15 +401,19 @@ void init_cpu()
 	Status = (int) hal_probe_cpu(); //sonda.
 	if(Status != 0){
 	    printf("init_hal fail: Probe cpu.");
-        refresh_screen();
-        while(1){};
+        die();
+		//refresh_screen();
+        //while(1){};
         //return;   		
 	};
 	
     //More?!	
 	
 done:
-    printf("Done.\n");
+
+#ifdef KERNEL_VERBOSE
+    printf("Done\n");
+#endif	
     return;
 };
 
@@ -422,8 +425,7 @@ void hal_set_machine_type(unsigned long type)
 };
 
 
-unsigned long hal_get_machine_type()
-{
+unsigned long hal_get_machine_type(){
     return (unsigned long) g_machine_type;
 };
 
@@ -434,24 +436,16 @@ unsigned long hal_get_machine_type()
  *      @todo: Trocar o nome para hal_init_current_machine. 
  */
 int hal_init_machine()
-{
-    
-	//
+{	
 	// Limits for machine type.
-	//
-	
 	if( g_machine_type < 0 || g_machine_type > 4)
 	{
-	    printf("hal_init_machine:\n");
-		//@todo: Aqui não deveria parar?
+	    //#bugbug: Devemos parar aqui.
+		printf("hal_init_machine:\n");
         return (int) 0;    
 	};
 	
-	
-	//
 	// Type.
-	//
-	
 	switch(g_machine_type)    
 	{
 		//Unknow.
@@ -502,7 +496,9 @@ int hal_probe_cpu()
 {
 	unsigned long eax, ebx, ecx, edx;
 	
+#ifdef KERNEL_VERBOSE
     printf("hal_probe_cpu:\n");	
+#endif
 	
 	//
 	// Check structure.
@@ -565,7 +561,7 @@ void hal_vsync(){
  */
 void hal_shutdown(){
     shutdown();
-    while(1){}	
+    die();
 };
 
 
@@ -615,7 +611,7 @@ void shutdown()
 	//
 	
 fail:	
-    while(1){};	
+    die();
 };
 
 
@@ -644,7 +640,7 @@ do_reboot:
     StatusBar( gui->screen, "StatusBar:", "Rebooting...");	
 	refresh_screen();
 	hal_reboot();
-    while(1){}	 
+    die();	 
 };
 
 
@@ -658,7 +654,7 @@ do_reboot:
 void KiShutDown()
 {
     hal_shutdown();
-	while(1){}
+    die();
 };
 
 
@@ -670,8 +666,7 @@ void KiShutDown()
 void hal_reboot()
 {
     asm_reboot(); 
-	MessageBox(NULL, 3,"FAIL","hal_reboot fail !");
-	while(1){};
+	die();
 };
 
 
@@ -690,10 +685,14 @@ int init_hal()
 {	
     int Status = 0;
 	
+#ifdef KERNEL_VERBOSE	
 	printf("HAL:\n");
+#endif	
 	
 	// CPU - Cria e inicializa a estrutura de cpu.
+#ifdef KERNEL_VERBOSE	
 	printf("init_hal: cpu..\n");
+#endif	
 	init_cpu();
 
 	
@@ -702,7 +701,9 @@ int init_hal()
 	//
 	
 	// PCI - Cria e inicializa estrutura de pci.
+#ifdef KERNEL_VERBOSE	
 	printf("init_hal: pci..(BUG) \n");
+#endif	
 	init_pci();    //bugbug (a rotina esta incompleta.)	
 
 	//@todo: Isso é um teste de inicialização de pci.
@@ -712,11 +713,15 @@ int init_hal()
 	
 	
 	// TIMER - Cria e inicializa estrutura do timer.
+#ifdef KERNEL_VERBOSE	
 	printf("init_hal: Timer..\n");
-    timerInit();	
+#endif    
+	timerInit();	
 
 	// RTC - Cria e inicializa estrutura de rtc.
+#ifdef KERNEL_VERBOSE	
 	printf("init_hal: rtc..\n");
+#endif	
 	init_clock();
 	get_cmos_info();
 		
@@ -727,7 +732,9 @@ int init_hal()
     //P8042_install();	
 		
     //keyboard.
+#ifdef KERNEL_VERBOSE	
 	printf("init_hal: kd..\n");
+#endif	
 	init_keyboard();
 	
 	//mouse
@@ -765,7 +772,11 @@ int init_hal()
 
 Done:
     Initialization.hal = 1;	
-	printf("Done!\n");	
+	
+#ifdef KERNEL_VERBOSE
+	printf("Done!\n");
+#endif
+	
 	return (int) Status;
 };
 

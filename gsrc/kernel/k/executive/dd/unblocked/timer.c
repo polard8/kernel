@@ -138,6 +138,8 @@ done:
 };
 
 
+
+
 /*
  * timer: 
  *     Handler chamado pelo ISR do timer (IRQ 0).
@@ -158,13 +160,21 @@ void timer()
 	//	time_out--;
 	//};
 	
+
+	
 	//
 	// @todo: Tentando clacular os segundos.
 	//
+
+    //sempre apaga o cursor.
+	//printf("%c", (char) 219 );   	
+	//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+	//g_cursor_x--;			
+
 	
 	// De tempos em tempos.
-	//if( timerTicks % 18 == 0 ) //Rápido demais.
-	if( timerTicks % 100 == 0 )	//Lento demais.
+	//if( timerTicks % 18 == 0 )  
+	if( timerTicks % 9 == 0 )	 
     {   
         //Incrementa a contagem de tempo de funcionamento do kernel.	
 		kernel_tick++;   
@@ -173,6 +183,15 @@ void timer()
 		if( kernel_tick > 0xffff0000 ){
 			kernel_request = KR_TIMER_LIMIT;
 		};
+		
+		//cursor ativado
+		//if( timer_cursor_used == 1 )
+		//{	
+		    //acende a cada múltiplo de 9
+		//    printf("%c", (char) '_');   	
+		//	refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+		//	g_cursor_x--;			
+        //};
 		
 		
 		//printf("One second ...\n");

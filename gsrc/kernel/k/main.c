@@ -286,6 +286,13 @@ doDebug:
 	// We can make some testes here.
 	//
 	
+	
+	//Inicializando as variáveis do cursor piscante do terminal.
+	//isso é um teste.
+	timer_cursor_used = 0;   //desabilitado.
+	timer_cursor_status = 0;
+	
+	
 //doTests:	
    //...
 	

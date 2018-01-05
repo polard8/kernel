@@ -368,7 +368,26 @@ unsigned long system_procedure( struct window_d *window,
 					printf("\n");
 					input( (unsigned long) long1);  
 					goto done;
-					break;				
+					break;
+
+                //o tab deve fazer parte das teclas de difitação. ??
+                case VK_TAB:
+					//if(AltStatus == 1){
+                    //    //@todo: Chama uma rotina que muda a janela com o foco de entrada.						
+					//	break;
+					//};
+					
+					printf("\t");
+					input( (unsigned long) long1);  
+					goto done;
+				    break;
+                
+				case VK_BACK:
+				    g_cursor_x--;
+					printf(" ");
+					input( (unsigned long) long1);  
+					goto done;
+                    break;
 				   
 				//teclas de digitação para o editbox.   
                 default:
@@ -512,8 +531,12 @@ unsigned long system_procedure( struct window_d *window,
 					//if(CtrlStatus == 1){ active_window = 6; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
 					
+					//habilitando o cursor.
+					timer_cursor_used = 1;
+					timer_cursor_status = 0;
 					
-				    testingFrameAlloc();
+					
+				    //testingFrameAlloc();
 					
 				    //init_clock(); //clock information
 					//get_cmos_info();
@@ -673,27 +696,6 @@ unsigned long system_procedure( struct window_d *window,
 					//resize_window(xxxx, 100, 100);
 					//redraw_window(xxxx);
 				//	break;
-				
-                //Mudar o foco de entrada pra próxima janela de uma lista.				
-                case VK_TAB:
-				
-				    //circula até errar.
-				    window_with_focus++;
-					if( (void*) windowList[window_with_focus] == NULL ){
-						window_with_focus = 1;
-					}
-				    //windowSwitchFocus();
-					
-					//if(AltStatus   == 1)
-					//{ 
-					    //window_with_focus++;
-                        //if(	window_with_focus > 9 ){
-						//	window_with_focus = 1;
-						//}					
-						//break;
-					//};
-					
-				    break;
 					
                 // Nothing for now!  				
                 case VK_LMENU:
