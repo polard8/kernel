@@ -30,3 +30,5 @@
 
 <br>
 <img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gui.png">
+<br>
+<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado2.png">
