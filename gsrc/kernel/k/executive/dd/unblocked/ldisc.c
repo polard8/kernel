@@ -33,6 +33,13 @@ extern char mouse_packet_y;
 //extern char mouse_packet_scroll;
  
 extern void update_mouse();
+
+//usado pelo mouse.
+int mouse_buttom_1; 
+int mouse_buttom_2;
+int mouse_buttom_3;
+
+
 //--
 //=========================================================
 
@@ -1335,6 +1342,7 @@ void kbdc_wait(unsigned char type)
  * Obs: Temos externs no início desse arquivo.
  * 
  */
+ 
 void mouseHandler()
 {
 	
@@ -1347,6 +1355,7 @@ static char buffer_mouse[3];
 //O tratador em assembly tem as variáveis globais do posicionamento.
 int posX = 0;
 int posY = 0;	
+
 	
 //Char para o cursor provisório.
 static char mouse_char[] = "T";
@@ -1365,6 +1374,8 @@ static char mouse_char[] = "T";
 	if(count_mouse >= 3)
 	{
 		// Salvando os bytes obtidos.
+		//Isso garante os dados que serão usados pelo assembly.
+		//mas não queremos que eles sejam modificados antes de chegarem lá.
         mouse_packet_data   = buffer_mouse[0];
 		mouse_packet_x      = buffer_mouse[1];       
 		mouse_packet_y      = buffer_mouse[2];
@@ -1383,10 +1394,55 @@ static char mouse_char[] = "T";
 		// apresentando descontinuidade no traço.
 		//mouse_packet_x = (mouse_packet_x/2);
 		//mouse_packet_y = (mouse_packet_y/2); 
+
+
+
+		//
+        // Obs:
+        // salvando o estado dos botões.
+        // Isso não deve causar problemas.		
+
+		//
+		// ?? Será que essas operações corrompem os dados ??
 		
+		if( ( mouse_packet_data & 0x01 ) == 0 )
+		{
+			//liberada.
+			mouse_buttom_1 = 0;
+		}else if( ( mouse_packet_data & 0x01 ) != 0 )
+		      {
+				  //pressionada.
+				  mouse_buttom_1 = 1;
+			  }
+			  
+
+	    if( ( mouse_packet_data & 0x02 ) == 0 )
+		{
+		    //liberada.
+		    mouse_buttom_2 = 0;
+		}else if( ( mouse_packet_data & 0x02 ) != 0 )
+		      {
+				 //pressionada.
+				 mouse_buttom_2 = 1;
+			  }
+			  
+	    if( ( mouse_packet_data & 0x04 ) == 0 )
+		{
+		    //liberada.
+		    mouse_buttom_3 = 0;
+		}else if( ( mouse_packet_data & 0x04 ) != 0 )
+		      {
+		          //pressionada.
+		          mouse_buttom_3 = 1;
+		      }			  
+			  
+
+			  
 		//
 		// Chamando assembly para calcular as coodenadas.
+		// Salvando os valores em variáveis globais.
 		//
+		
 		
 		update_mouse();	
 		
@@ -1419,7 +1475,8 @@ static char mouse_char[] = "T";
 		//
 		
 		//Imprimindo o caractere que está servindo de ponteiro provisório.
-		printf("%c", (char) 'T');
+
+        printf("%c", (char) '0'); 
 		
 		//Efetuando o refresh do retângulo referente ao caractere.
 		//@todo: Isso poderá ser maior.
@@ -1455,7 +1512,7 @@ static char mouse_char[] = "T";
 	};		
 	
 
-exit_isr:	
+exit_irq:	
     // EOI.		
     outportb(0xa0, 0x20); 
     outportb(0x20, 0x20);

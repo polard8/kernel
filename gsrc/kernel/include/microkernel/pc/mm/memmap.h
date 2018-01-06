@@ -19,72 +19,72 @@
 
 /*
     Memory map. (Kernel directory)
-
- " Cada processo tem seu diretório e uma configuração de 4GB de
+	
+ " Cada processo tem seu diretório e uma configuração de 4GB de 
    memória virtual. Essa é memória virtual do processo Kernel. "
 
- " Note que no início da memória virtual temos 4MB em kernel mode,
+ " Note que no início da memória virtual temos 4MB em kernel mode, 
    isso é usado pelo Kernel para acessar os endereços mais baixos,
-   inclusive a memória de video VGA, mas a memória de vídeo VGA
-   foi novamente mapeada em no endereço virtual 0x800000. "
+   inclusive a memória de video VGA, mas a memória de vídeo VGA 
+   foi novamente mapeada em no endereço virtual 0x800000. "  
 
   Mapeamento padrão de memória virtual para todos os processos:
-    ============================================================
+    ============================================================	
 
 
-             +------------------------------------+
-    FFFFFFFF |             FIM                    |
-             +------------------------------------+
-             +------------------------------------+
-             +------------------------------------+
-             +------------------------------------+
-             |         User Mode access           | @todo: Mudar de lugar.
-             |                                    |        Seder espaço para lfb.
-             |                                    |
-    C0800000 |           Back Buffer              |
-             +------------------------------------+
-             |        User Mode access            |  Memória da placa de vídeo.
-             |             (4MB)                  |  @todo Ampliar (PRECISA SER MAIOR)
-             |             ...                    |  obs: Tamanho do monitor.
-    C0400000 |             LFB                    |
-             +------------------------------------+
-             +====================================+
+		     +------------------------------------+
+	FFFFFFFF |             FIM                    |
+		     +------------------------------------+
+		     +------------------------------------+
+		     +------------------------------------+ 
+		     +------------------------------------+
+	         |         User Mode access           | @todo: Mudar de lugar.  
+		     |                                    |        Seder espaço para lfb.  
+		     |                                    |
+    C0800000 |           Back Buffer              |  			 
+		     +------------------------------------+	
+	         |        User Mode access            |	 Memória da placa de vídeo.
+		     |             (4MB)                  |  @todo Ampliar (PRECISA SER MAIOR)
+			 |             ...                    |  obs: Tamanho do monitor.
+	C0400000 |             LFB                    |
+		     +------------------------------------+
+			 +====================================+
              |           Kernel land              |
-             |                                    |
-             |  Stack = 0xC0300000 ~ 0xC03FFFF0   | Pilha do Kernel.
-             |  Heap  = 0xC0100000 ~ 0xC02FFFF0   | Obs: O Heap do kernel precisa ser maior.
-             |                                    |
-             |  Kernel Entry point = 0xC0001000   |      Entry point do kernel.
-             |  Kernel Base = 0xC0000000          |      Início da imágem do processo kernel.
-    C0000000 |         Kernel Mode access         |
-             +------------------------------------+
-             |           User Land                |
-             |                                    |
+	         |                                    | 
+             |  Stack = 0xC0300000 ~ 0xC03FFFF0   | Pilha do Kernel. 
+	         |  Heap  = 0xC0100000 ~ 0xC02FFFF0   |	Obs: O Heap do kernel precisa ser maior.
+             |                                    | 			 
+			 |  Kernel Entry point = 0xC0001000   |      Entry point do kernel.
+	         |  Kernel Base = 0xC0000000          |	     Início da imágem do processo kernel. 
+	C0000000 |         Kernel Mode access         |	 	   
+	         +------------------------------------+
+             |           User Land                |	 
+	         |                                    |
              |  Stack = 0x40300000 ~ 0x403FFFF0   | @todo  Início da pilha em user mode do proesso.
-             |  Heap  = 0x40100000 ~ 0x402FFFF0   | @todo: Início do heap em user mode do processo.
+	         |  Heap  = 0x40100000 ~ 0x402FFFF0   | @todo: Início do heap em user mode do processo.
              |                                    | ### Por enquando cada processo tem sua própria
-             |                                    |     pilha e heap no fim da imagem do processo.
+             |                                    |     pilha e heap no fim da imagem do processo.   			 
              | 40000000 = Process Base.           | ??
-             |                                    |
-             | 00041000 = Process entry point     | Entrypoint da imagem.
-             | 00040000 = Process image base      | Onde se carrega uma imagem de processo.
-             |                                    |
+			 |                                    |
+			 | 00041000 = Process entry point     | Entrypoint da imagem.
+			 | 00040000 = Process image base      | Onde se carrega uma imagem de processo.
+             |                                    |  			 
              | 00000000 = Dinamic Library Base    |
-             | 00000000 = Dinamic Library image   |
-             |                                    |
-             |              ...                   | @todo: ampliar heap.
-    00000000 |       User Mode access             | 
-             +====================================+ 
+			 | 00000000 = Dinamic Library image   |
+			 |                                    |
+             |              ...                   | @todo: ampliar heap.   			 
+	00000000 |       User Mode access             |	 
+			 +====================================+			 
+			    
+  
 
+    ***	 
 
-
+			 
     ***
-
-
-    ***
-
-    Obs: O layout da memória virtual está em fase de desenvolvimento.	   
-
+	
+	Obs: O layout da memória virtual está em fase de desenvolvimento.	   
+	
 */ 
  
 
