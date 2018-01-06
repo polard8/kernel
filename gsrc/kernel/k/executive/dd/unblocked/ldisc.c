@@ -15,6 +15,29 @@
 #include <kernel.h>
 
 
+//=======================================================
+//++ Usadas pelo mouse.
+// hardwarelib.inc
+//
+#define MOUSE_X_SIGN	0x10
+#define MOUSE_Y_SIGN	0x20
+
+//Coordenadas do cursor.
+extern int mouse_x;
+extern int mouse_y;
+
+//Bytes do controlador.
+extern char mouse_packet_data;
+extern char mouse_packet_x;
+extern char mouse_packet_y;
+//extern char mouse_packet_scroll;
+ 
+extern void update_mouse();
+//--
+//=========================================================
+
+
+
 //?? usado pelo mouse
 #define outanyb(p) __asm__ __volatile__( "outb %%al,%0" : : "dN"((p)) : "eax" )
 
@@ -1159,14 +1182,27 @@ int init_mouse()
 	mousemsg = ( unsigned char *) malloc(32);
 	//@todo:
 	// Checar se não é NULL.
+
+		
+	//Inicializando as variáveis usadas na rotina em Assemly
+    //em hardwarelib.inc
+    
+	mouse_x = 0;
+	mouse_y = 0;
 	
-	//Inicializando ...
-	//??onde foram definidas??
-    //mouse_status = 0;
-    //delta_x = 0;
-    //delta_y = 0;
-    //count_mouse = 0;
-    //...
+	//#bugbug: Essa inicialização está travando o mouse.
+	//fazer com cuidado.
+	
+	//Coordenadas do cursor.
+    //mouse_x = (800/2);
+    //mouse_y = (600/2);
+
+    //Bytes do controlador.
+   // mouse_packet_data = 0;
+   // mouse_packet_x = 0;
+    //mouse_packet_y = 0;
+    //mouse_packet_scroll = 0;
+	
 	
 	//Mostraremos essa mensagem somente no ambiente de debug.
 	
@@ -1288,7 +1324,7 @@ void kbdc_wait(unsigned char type)
 
 
 /*
- * **************************************************
+ ***************************************************
  * mouseHandler:
  *     Handler de mouse. 
  *
@@ -1296,11 +1332,9 @@ void kbdc_wait(unsigned char type)
  *     Se estamos aqui é porque os dados disponíveis no controlador 8042 
  * pertencem ao mouse.
  * @todo: Essa rotina não pertence ao line discipline.
+ * Obs: Temos externs no início desse arquivo.
  * 
  */
-#define MOUSE_X_SIGN	0x10
-#define MOUSE_Y_SIGN	0x20
- 
 void mouseHandler()
 {
 	
@@ -1308,120 +1342,88 @@ void mouseHandler()
 static int count_mouse=0;
 static char buffer_mouse[3];
 
-
-//coordenadas..
-//isso pode ser global.
+//Coordenadas do mouse.
+//Obs: Isso pode ser blobal.
+//O tratador em assembly tem as variáveis globais do posicionamento.
 int posX = 0;
-int posY = 0;
-
-
-//local.
-static int data = 0;
-static int x = 0;
-static int y = 0;
-static int scroll = 0;	
-static int first_time=1; // Usado para ignorar a primeira IRQ12.	
-
+int posY = 0;	
 	
-//cursor provisório.
+//Char para o cursor provisório.
 static char mouse_char[] = "T";
 
+    //
+	// Lendo um char no controlador.
+	//
 
-
-  // FIX: Por algum motivo nós "perdemos" os dois primeiros valores...
-  //      descarto o terceiro aqui para que obtenhamos os 3 "na ordem"...
-  //if (first_time)
-  //{
-  //  first_time = 0;
-  //  mouse_read(); //inportb(0x60);
-  //  goto exit_isr;
-  //}
-
-
-    //buffer: definido como char.	
 	buffer_mouse[count_mouse++] = mouse_read();		
-	// Contagem de interruções.
+	
+	//
+	// Contagem de interruções:
+	// Precisamos esperar 3 interrupções.
+	//
+	
 	if(count_mouse >= 3)
 	{
-		
+		// Salvando os bytes obtidos.
+        mouse_packet_data   = buffer_mouse[0];
+		mouse_packet_x      = buffer_mouse[1];       
+		mouse_packet_y      = buffer_mouse[2];
+		//mouse_packet_scroll = buffer_mouse[3]; //Suspenso.
 		
 		
 		//
-		//@todo: Tentando encontrar os valores corretos das coordenadas.
+		//@todo:
+		// Nessa hora podemos dividir os deltas.
+		// Essa variável divisora pode ser usada para configuração.
+		// @todo: Subistituir esse '2' por uma variável global.
 		//
 		
-		//bytes: definidos como 'char'
-        data   = buffer_mouse[0];
-		x      = buffer_mouse[1];       
-		y      = buffer_mouse[2];
-		//scroll = buffer_mouse[3];
+		//#bugbug:
+		// Isso não apresentou um bom resultado.
+		// apresentando descontinuidade no traço.
+		//mouse_packet_x = (mouse_packet_x/2);
+		//mouse_packet_y = (mouse_packet_y/2); 
 		
-	
-		//posX += buffer_mouse[1]/2;       
-		//posY -= buffer_mouse[2]/2;
-	
+		//
+		// Chamando assembly para calcular as coodenadas.
+		//
 		
-		//++=======
-        if(data & 0x10)
-		{
-	         posX = (int) posX - (256 - x) ;
-        }else{ 
-			posX = (int) posX + x; 
-		};
-		//--=======
-
-		//++=======
-        if(data & 0x20)
-		{
-           posY = (int) posY + (256 - y) ;
-        }else{ 
-
-		    posY = (int) posY - y; 
-		};
-		//--=======		
-	    
+		update_mouse();	
 		
-//update_mouse:
-
-//.do_x:
-        //if( data & MOUSE_X_SIGN )
-        //{
-		//    x = !x;
-		//	x++;
-		//	posX -= x;
-		//}else{
-		//    posX += x;	
-		//}			
-	
-
-//.do_y:
-        //if( data & MOUSE_Y_SIGN )
-        //{
-		//    posY -= y;
-			
-		//}else{
-		//    y = !y;
-		//	y++;
-		//	posY -= y;
-		//}		
-	
+        // 
+		// Pegando os valores encontrados calculados pela rotina acima.
+        //
 		
-		//#debug
-		//mostrando os resultados obtidos.
+		//Obs:
+		//mouse_x e mouse_y são variáveis globais.
+		posX = mouse_x;
+	    posY = mouse_y;
+		
+		//#debug:
+		//#importante:
+		//Mostrando os resultados obtidos.
 		//printf("X={%d} Y={%d} \n",posX,posY);
 		//refresh_screen();
 		
-        if(	posX < 0 ){ posX = 0; }	
+        if( posX < 0 ){ posX = 0; }	
 		if(	posY < 0 ){ posY = 0; }
 		if(	posX > 800-8 ){ posX = 800-8; }
 		if(	posY > 600-8 ){ posY = 600-8; }
 		
-		g_cursor_x = (unsigned long)posX;
-		g_cursor_y = (unsigned long)posY;
+		//Atualizando o mesmo cursor usado pelo teclado.
+		g_cursor_x = (unsigned long) posX;
+		g_cursor_y = (unsigned long) posY;
 		
+		//
+		// Draw !
+		//
+		
+		//Imprimindo o caractere que está servindo de ponteiro provisório.
 		printf("%c", (char) 'T');
-		refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 		
+		//Efetuando o refresh do retângulo referente ao caractere.
+		//@todo: Isso poderá ser maior.
+		refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 		
 		//Zerando a contagem de interrupções de mouse.
 		count_mouse=0;

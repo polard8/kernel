@@ -98,7 +98,7 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'j',
  'k',
  'l',    //38 
- ' ',    //39 00e7 ccedilla
+ 135,    //39 00e7 ccedilla
  '~',    //40 dead_tilde	dead_circumflex
  '\'',    //41 (") (espaço) (') dead_acute dead_diaeresis 
  VK_LSHIFT,    //42 Shift.  
@@ -209,7 +209,7 @@ static unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {
 '#',   //4
 '$',   //5
 '%',   //6
-0xA8,  //7 (00a8 @) (trema)
+168,   //7 (00a8 @) (trema)
 '&',   //8
 '*',   //9
 '(',   //10
@@ -241,7 +241,7 @@ CTL,
 'J',
 'K',
 'L',  //38
-' ',  //39 (00c7)
+128,  //39 (00c7) Ç
 '^',  //40
 '"',  //41 abnt2=(")
 SHF,

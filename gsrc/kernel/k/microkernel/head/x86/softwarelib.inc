@@ -375,10 +375,7 @@ write_char:
 	ret	
 	
 	
-	
-	
-
 ;
 ; End.
-;	
-	
+;
+

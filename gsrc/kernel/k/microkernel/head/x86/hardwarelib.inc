@@ -623,6 +623,126 @@ BCD2bin:
 ;	ret
 
 
+
+	
+;;
+;; ============================ Mouse support ============================
+;;	
+
+; Format Of Mouse Packet Data.
+MOUSE_LEFT_BTN	  EQU 0x01
+MOUSE_RIGHT_BTN	  EQU 0x02
+MOUSE_MIDDLE_BTN  EQU 0x04
+MOUSE_X_SIGN	  EQU 0x10
+MOUSE_Y_SIGN	  EQU 0x20
+MOUSE_X_OVERFLOW  EQU 0x40
+MOUSE_Y_OVERFLOW  EQU 0x80
+
+;Posicionamento do cursor.
+;X.
+global _mouse_x
+_mouse_x:
+    dd 0
+;Y.
+global _mouse_y
+_mouse_y:
+    dd 0
+
+;Bytes do controlador.
+;Status.
+global _mouse_packet_data 
+_mouse_packet_data:
+    db 0
+;Delta x.
+global _mouse_packet_x
+_mouse_packet_x:
+    db 0
+;Delta y.
+global _mouse_packet_y
+_mouse_packet_y:
+    db 0
+;Scroll.
+global _mouse_packet_scroll
+_mouse_packet_scroll:
+    db 0
+
+
+;;=====================================================
+;; _update_mouse:
+;;     Updates the mouse position.
+;;
+;; Credits:
+;;     Omar Mohammad. Maadi, Cairo, Egypt.
+;;
+global _update_mouse
+_update_mouse:
+    nop
+
+;;======== X ==========	
+
+    ;
+	; Testando o sinal de x.
+	;
+
+; Do the x pos first.
+.do_x:
+	
+	;;pega o delta x
+	movzx eax, byte [_mouse_packet_x]
+	;testa o sinal para x
+	test byte [_mouse_packet_data], MOUSE_X_SIGN
+	jnz .x_neg
+
+;caso x seja positivo.	
+.x_pos:
+	add [_mouse_x], eax
+	jmp .do_y
+
+;;caso x seja negativo.	
+.x_neg:
+	not al
+	inc al
+	sub [_mouse_x], eax
+	jns .do_y
+
+	xor eax, eax
+	mov [_mouse_x], eax
+
+	
+;;======== Y ==========	
+
+    ;
+	; Testando o sinal de x.
+	;
+
+; Do the same for y position.	
+.do_y:
+
+	;Pega o delta y.
+	movzx eax, byte [_mouse_packet_y]
+	;Testa o sinal para y.
+	test byte[_mouse_packet_data], MOUSE_Y_SIGN
+	jnz .y_neg
+
+;Caso y seja positivo.	
+.y_pos:
+	sub [_mouse_y], eax
+	jns .quit
+
+	xor eax, eax
+	mov [_mouse_y], eax
+	jmp .quit
+
+;Caso y seja negativo. 	
+.y_neg:
+	not al
+	inc al
+	add [_mouse_y], eax
+	
+;Done.
+.quit:
+	ret
+	
 	
 ;
 ; End.
