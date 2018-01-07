@@ -50,7 +50,7 @@ void save_kernel_args()
  *            Identificar volumes.
  */
 void boot(){    
-	panic("boot:");	
+	panic("sm-init-boot:");	
 };	
 
 
@@ -77,10 +77,8 @@ int init_arquitecture_dependent()
     //
 	
 	if(KeInitPhase != 1){
-		printf("init_arquitecture_dependent:");
-        die();
-		//refresh_screen();
-        //while(1){};		
+		printf("sm-init-init_arquitecture_dependent: KeInitPhase\n");
+        die();		
 	};
 
 
@@ -102,10 +100,8 @@ int init_arquitecture_dependent()
 	
 	// Check structure.
 	if( (void*) processor == NULL ){
-	    printf("init_arquitecture_dependent fail: Structure.");
+	    printf("sm-init-init_arquitecture_dependent: processor\n");
 		die();
-		//refresh_screen();
-		//while(1){}
     };
 	
 	//
@@ -123,7 +119,6 @@ int init_arquitecture_dependent()
 	//Inicializa de acordo com o tipo de processador..
 	//
 	
-	
 	switch(Type)
 	{
 	    //Intel. (pega os parâmetros do processador intel e coloca na estrutura).
@@ -140,11 +135,8 @@ int init_arquitecture_dependent()
 			
 		//@todo: Aqui é um erro fatal.	
 		default:
-		    printf("init_arquitecture_dependent fail: Processor type.");
+		    printf("sm-init-init_arquitecture_dependent: default Type\n");
 			die();
-			//refresh_screen();
-			//while(1){};
-		    //KeAbort();
             break;		
 	};
 	
@@ -181,10 +173,8 @@ int init_arquitecture_independent()
     int Status;
 		
     if(KeInitPhase != 0){
-		printf("init_arquitecture_independent error: Phase..\n");
+		printf("sm-init-init_arquitecture_independent: KeInitPhase\n");
         die();
-		//refresh_screen();
-        //while(1){};		
 	}; 
 
 	
@@ -197,8 +187,8 @@ int init_arquitecture_independent()
 #endif	
 	Status = init_hal();	
 	if(Status != 0){
-	    printf("init_arquitecture_independent error: Hal.\n");
-		KiAbort(); 
+	    printf("sm-init-init_arquitecture_independent: init_hal\n");
+		die();
 	};
 
 	// Microkernel:
@@ -211,8 +201,8 @@ int init_arquitecture_independent()
 #endif	
 	Status = init_microkernel();
 	if(Status != 0){
-	    printf("init_arquitecture_independent error: Microkernel.\n");
-		KiAbort(); 
+	    printf("sm-init-init_arquitecture_independent: init_microkernel\n");
+		die();
 	};
 	
     // Executive:
@@ -225,8 +215,8 @@ int init_arquitecture_independent()
 #endif	
 	Status = init_executive();
 	if(Status != 0){
-	    printf("init_arquitecture_independent error: Executive.\n");
-		KiAbort(); 
+	    printf("sm-init-init_arquitecture_independent: init_executive\n");
+		die(); 
 	};
 	
 	// Gramado:
@@ -235,8 +225,8 @@ int init_arquitecture_independent()
 #endif
 	Status = init_gramado();
 	if(Status != 0){
-	    printf("init_arquitecture_independent error: Gramado.\n");
-		KiAbort(); 
+	    printf("sm-init-init_arquitecture_independent: init_gramado\n");
+		die(); 
 	};
 	
 	//
@@ -253,7 +243,7 @@ int init_arquitecture_independent()
 	//
 UserInfo:
 #ifdef KERNEL_VERBOSE	  
-    printf("init_arquitecture_independent: User..\n");
+    printf("sm-init-init_arquitecture_independent: init_user_info\n");
 #endif
     init_user_info();       //initialize user info structure.	
     
@@ -266,19 +256,19 @@ UserInfo:
 	
 UserSession:
 #ifdef KERNEL_VERBOSE	
-    printf("init_arquitecture_independent: User Session..\n");   
+    printf("sm-init-init_arquitecture_independent: init_user_session\n");   
 #endif    
 	init_user_session();    //initialize user session.	 
 	
 WindowStation:
 #ifdef KERNEL_VERBOSE
-    printf("init_arquitecture_independent: Window Stations..\n");   
+    printf("sm-init-init_arquitecture_independent: init_window_station\n");   
 #endif    
 	init_window_station();
 
 Desktop:
 #ifdef KERNEL_VERBOSE 
-    printf("init_arquitecture_independent: Desktops..\n");   
+    printf("sm-init-init_arquitecture_independent: init_desktop\n");   
 #endif    
 	init_desktop(); 
  
@@ -297,7 +287,7 @@ WindowManager:
         
 		// Window manager.
 #ifdef KERNEL_VERBOSE	    
-		printf("init_arquitecture_independent: Initializing window manager..\n");
+		printf("sm-init-init_arquitecture_independent: init_window_manager\n");
 #endif	    
 		init_window_manager();				
 	};
@@ -330,6 +320,11 @@ done:
  */
 void init_globals()
 {
+
+#ifdef KERNEL_VERBOSE	
+    printf("sm-init-init_globals:\n");	
+#endif
+
 	//Atalho para a próxima mensagem de teclado..(test) debug
 	gNextKeyboardMessage = (int) 0;
 	
@@ -426,53 +421,51 @@ int init()
 {
     int Status = 0;
 	
-	if(KeInitPhase != 0)
-	{
-		printf("init: KeInitPhase != 0 \n");
-        die();
-		//refresh_screen();
-        //while(1){};		
+	//Check kernel phase.
+	if(KeInitPhase != 0){
+		printf("sm-init-init: KeInitPhase\n");
+        die();		
 	}; 
  
     //Globals.
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing globals..\n");     
+	printf("sm-init-init: init_globals\n");     
 #endif    
 	init_globals();
 	
     //Object manager.	
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing Object Manager..\n");
+	printf("sm-init-init: init_object_manager\n");
 #endif	
 	init_object_manager();
 	
 	//i/o Manager.
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing i/o manager..\n");	
+	printf("sm-init-init: ioInit\n");	
 #endif	
 	ioInit();
 	
 	//Disk manager, volume manager and fs manager.
 	
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing disk manager..\n");
+	printf("sm-init-init: disk_init\n");
 #endif    
 	disk_init();
 	
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing volume manager..\n");
+	printf("sm-init-init: volume_init\n");
 #endif    
 	volume_init();
 	
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing file system manager..\n");
+	printf("sm-init-init: fsInit\n");
 #endif    
 	fsInit();
 	
     //System folders.
     // ??@todo: /ux4 .../ux1	
 #ifdef KERNEL_VERBOSE	
-	printf("init: Initializing system folders..\n");
+	printf("sm-init-init: create_system_folders\n");
 #endif	
 	create_system_folders(); 
     
@@ -484,24 +477,20 @@ int init()
 	// Initialize Platform structure.
 	//
 #ifdef KERNEL_VERBOSE
-	printf("init: Initializing Platform Struct..");	
+	printf("sm-init-init: Platform\n");	
 #endif
 
 	Platform = (void*) malloc( sizeof(struct platform_d) );
 	if( (void*) Platform ==  NULL ){
-		printf("init error: Platform Struct!\n");	
+		printf("sm-init-init: Platform\n");	
 	    die();
-		//refresh_screen();
-		//while(1){};
 	}else{
 		
 		//Hardware
 	    Hardware = (void*) malloc( sizeof(struct hardware_d) );
 	    if( (void*) Hardware ==  NULL ){
-		    printf("init error: Hardware Struct!\n");	
+		    printf("sm-init-init: Hardware\n");	
 	        die();
-			//refresh_screen();
-		    //while(1){};
 		}else{
 		    Platform->Hardware = (void*) Hardware;
             //printf(".");			
@@ -510,10 +499,8 @@ int init()
 		//Firmware
 	    Firmware = (void*) malloc( sizeof(struct firmware_d) );
 	    if( (void*) Firmware ==  NULL ){
-		    printf("init error: Firmware Struct!\n");	
+		    printf("sm-init-init: Firmware\n");	
 	        die();
-			//refresh_screen();
-		    //while(1){};
 		}else{
 		    Platform->Firmware = (void*) Firmware;
             //printf(".");  			
@@ -528,10 +515,8 @@ int init()
 		
 		System = (void*) malloc( sizeof(struct system_d) );
 	    if( (void*) System ==  NULL ){
-		    printf("init error: System Struct!\n");	
+		    printf("sm-init-init: System\n");	
 	        die();
-			//refresh_screen();
-		    //while(1){};
 		}else{
 			
 			System->used = 1;    //Sinaliza que a estrutura esta em uso.
@@ -577,7 +562,7 @@ Logon:
 	if(g_useGUI == 1)
 	{
 #ifdef KERNEL_VERBOSE		
-		printf("init: Initializing Logon structs..\n");
+		printf("sm-init-init: Logon\n");
 #endif	    
 		create_logon();
 		init_logon(0,0);    //Libera. (Aceita argumentos).

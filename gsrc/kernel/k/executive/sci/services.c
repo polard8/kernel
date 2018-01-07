@@ -825,8 +825,10 @@ void *services( unsigned long number,
 		//Info. (250 ~ 255).
 		
 		//250
-		//case 250:
-		//    break;
+		//Get system metrics
+		case SYS_GETSYSTEMMETRICS:
+		    return (void*) systemGetSystemMetrics( (int) arg2 );
+		    break;
 		
 		//251
 		//case 251:

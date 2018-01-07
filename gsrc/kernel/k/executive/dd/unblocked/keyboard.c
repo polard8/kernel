@@ -115,7 +115,7 @@ void KiKeyboard()
 	};
 
     if(abnt2 != 1){
-	    panic("The keyboard is not a abnt2 model.\n");
+	    panic("unblocked-KiKeyboard: not abnt2.\n");
 	};
 
 done:

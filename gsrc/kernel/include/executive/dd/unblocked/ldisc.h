@@ -277,6 +277,9 @@ void reboot();
 // ********************** mouse ************************
 //
 
+
+void *mouseBMPBuffer; //buffer para o bmp
+
 int init_mouse();
 void mouse_write(unsigned char write);
 unsigned char mouse_read();
@@ -287,7 +290,7 @@ static void outPort60(unsigned char value);
 static void outPort64(unsigned char value);
 static unsigned char getMouseData(void);
 void kernelPS2MouseDriverReadData(void);
-
+int load_mouse_bmp();
 
 
 //

@@ -1696,8 +1696,8 @@ void testingFrameAlloc()
 	
 	int Index;
     struct page_frame_d *pf;
-	struct page_frame_d *Ret;
-	
+	struct page_frame_d *Ret; //#bugbug @todo: aqui deveria ser void*.
+	//void *Ret;
 	
 	//#bugbug .;;;: mais que 100 dá erro ...
 	//@todo: melhorar o código de alocação de páginas.

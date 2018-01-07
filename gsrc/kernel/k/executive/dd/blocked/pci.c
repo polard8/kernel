@@ -1049,11 +1049,9 @@ int init_pci()
 	//
    
 	Status = (int) pci_setup_devices(); 
-	if(Status != 0)
-	{
-	    printf("init_pci:");
-        refresh_screen();
-        while(1){}		
+	if(Status != 0){
+	    printf("blocked-init_pci:\n");
+        die();		
 	};
     
     //...

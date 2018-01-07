@@ -373,7 +373,7 @@
 #define	SYS_248 248
 #define	SYS_249 249
 //Info support.
-#define	SYS_250 250 
+#define	SYS_GETSYSTEMMETRICS 250 
 #define	SYS_251 251
 #define	SYS_252 252
 #define	SYS_253 253

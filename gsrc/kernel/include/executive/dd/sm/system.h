@@ -731,7 +731,8 @@ int system_dispatch_to_procedure( struct window_d *window,
 int SystemMenu();
 
  
-
+//isso será um serviço disponível para a api, 
+unsigned long systemGetSystemMetrics( int index );
  
 
 /*

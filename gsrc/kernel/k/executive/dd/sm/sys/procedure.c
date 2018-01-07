@@ -68,135 +68,8 @@ unsigned long terminal_procedure( struct window_d *window,
 								  unsigned long long1, 
 								  unsigned long long2 ) 
 {
-    // esse procedimento de janela é exclusivo para a janela do terminal que pode 
-    //ser uma janela indicada por um aplciativo.
-	
-	//
-	// Lidando com a janela com o foco de entrada.
-	//
-
-
-	unsigned long left; 
-	unsigned long top;   
-	unsigned long width; 
-	unsigned long height; 	
-
-	// Window With Focus !
-	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
-	//e passada via argumento.
-	if( (void*) window == NULL )
-	{
-		//debug
-	    printf("terminal_procedure: wwf fail!");
-        refresh_screen();
-		while(1){}		
-	}else{
-	
-	    //
-	    // Configurando o cursor para ficar de acordo com a janela com o foco de entrda.
-	    //
-		
-		//
-		// @todo:
-		// Aqui deveríamos apenas pegar o ponteiro para a estrutura 
-		// de cursor que pertence a janela com o foco de entrada.
-		//
-	
-	    //pegando as dimensões da janela com o foco de entrada.
-
-		left   = window->left;
-	    top    = window->top;
-	    width  = window->width;
-	    height = window->height;		
-	
-		g_cursor_left   = (window->left/8);
-		g_cursor_top    = (window->top/8) + 4;   //Queremos o início da área de clente.
-		g_cursor_right  = g_cursor_left + (width/8);
-		g_cursor_bottom = g_cursor_top  + (height/8);
-		
-		if( g_cursor_right == 0 )
-		{
-			printf("terminal_procedure: cursor right null");
-			refresh_screen();
-			while(1){}
-			g_cursor_right = 1;
-		}
-		
-        if( g_cursor_bottom == 0 )
-		{
-			printf("terminal_procedure: cursor bottom null");
-			refresh_screen();
-			while(1){}
-			
-			g_cursor_bottom = 1;
-		}		
-		
-		//cursor (0, mas com margem nova).
-		//#bugbug ... isso reiniciaria o cursor a cada tecla pressionada.
-		//g_cursor_x = g_cursor_left; 
-		//g_cursor_y = g_cursor_top;  		
-           
-	
-	    //...
-	};
-
-	// Se a janela não for um terminal, retornaremos imediatamente.	
-	if( window->terminal != 1 ){
-		return (unsigned long) 0;
-	};
-	
-	
-	switch(msg)
-	{
-        case MSG_KEYDOWN:                 
-            switch(long1)	       
-            {  
-				
-				case VK_RETURN:
-					//input esta em stdio.c
-				    //input() para terminal deve ser diferente de input para editbox.
-					printf("\r");
-					printf("\n");
-					input( (unsigned long) long1);  
-					goto done;
-					break;
-					
-			    //Apenas o 12 para teste.
-                case VK_F12:
-	                printf("terminal_procedure: $ \n");
-					refresh_screen();
-                    break;
-
-				//Teclas de digitação para o terminal.	
-                default:
-				    printf("%c", (char) long1);
-		            refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
-					// Devemos nos certificar que input não imprima nada.
-					input( (unsigned long) long1);      //Coloca no stdin
-                    break;						
-			};
-		break;
-		
-        //case MSG_CONSOLE:
-		case MSG_CONSOLE_COMMAND:
-		    switch(long1)
-			{
-				case MSG_CONSOLE_SHUTDOWN:
-				    systemShutdown();
-				    break;
-				case MSG_CONSOLE_REBOOT:
-				    systemReboot();
-                    break;				
-			    default:
-				    break;
-			};
-			break;		
-		
-		default:
-		    break;
-	};
-
-done:
+    //#suspenso esse diálogo.
+	//repensando ele.
     return 0;	
 };
 
@@ -281,12 +154,9 @@ unsigned long system_procedure( struct window_d *window,
 	// Window With Focus !
 	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
 	//e passada via argumento.
-	if( (void*) window == NULL )
-	{
-		//debug
-	    printf("system_procedure: wwf fail!");
-        refresh_screen();
-		while(1){}		
+	if( (void*) window == NULL ){
+	    printf("sm-sys-system_procedure: window");
+        die();		
 	}else{
 	
 	    //
@@ -1081,7 +951,7 @@ void procedureMakeTests()
 	taskswitch_lock();
 	scheduler_lock();	
 	
-	printf("procedureMakeTests:\n");
+	printf("sm-sys-procedureMakeTests:\n");
 	
 	//Fluxo padrão. (file structure)
 	stdout = (void*) malloc( sizeof(FILE) );
@@ -1125,7 +995,7 @@ done:
 	//
     fsListFiles(0);
 
-	printf("procedureMakeTests: done.\n");
+	printf("sm-sys-procedureMakeTests: done\n");
     //Reabilita task switch.
 	scheduler_unlock();
 	taskswitch_unlock();
@@ -1234,7 +1104,7 @@ void procedureGrid()
 	
 	Status = grid(GRID_VERTICAL);
 	if(Status == 1){
-		printf("procedureGrid: FAIL\n");
+		printf("sm-sys-procedureGrid: grid\n");
 	}
 	return;
 };

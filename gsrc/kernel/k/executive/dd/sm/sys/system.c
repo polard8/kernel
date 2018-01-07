@@ -3,6 +3,8 @@
  * Seu objetivo principal é receber os comandos de gerenciamento,
  * enviados por usuários atráves de dispositivos de interface humana. 
  *
+ * ********** #importante: Essas classes são 'system dialogs' ************
+ *
  * Note duas coisas importantes aqui: 
  * o 'console' é a interface de administração do sistema, e é ele é 
  * acessado através de um emulador de terminais utilizando-se drivers TTY.
@@ -1548,6 +1550,10 @@ void systemShowDevicesInfo()
 	//
 	//
 	
+#ifdef KERNEL_VERBOSE	
+	printf("sm-sys-systemShowDevicesInfo:\n");
+#endif	
+	
     //Título.
 	printf("==== DEVICES: ==== \n\n");
     //...	
@@ -2219,6 +2225,7 @@ void systemShutdownViaAPM()
 	//};
 	
 hang:	
+    printf("sm-sys-systemShutdownViaAPM:\n");
 	die();
 };
 
@@ -2357,18 +2364,18 @@ int systemStartUp()
 		set_up_cursor(0,1);
 		
 #ifdef KERNEL_VERBOSE		
-        printf("systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
+        printf("sm-sys-systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
 #endif		
 		
 #ifdef KERNEL_VERBOSE		
 		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
 		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
-		    printf("systemStartUp: %s\n",developer_edition_string);
+		    printf("sm-sys-systemStartUp: %s\n",developer_edition_string);
 		};
 #endif
 
 #ifdef KERNEL_VERBOSE
-		printf("systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
+		printf("sm-sys-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
 		                                                         ,(unsigned long) SavedX
 																 ,(unsigned long) SavedY
 																 ,(unsigned long) SavedBPP );
@@ -2379,12 +2386,12 @@ int systemStartUp()
         //		
 
 #ifdef KERNEL_VERBOSE		
-	    printf("systemStartUp: Initializing Runtime..\n");
+	    printf("sm-sys-systemStartUp: Initializing Runtime..\n");
 #endif			
 	    Status = (int) KiInitRuntime();
 	    if(Status != 0){
-	        printf("systemStartUp error: Runtime.\n");
-		    KiAbort();
+	        printf("sm-sys-systemStartUp error: Runtime.\n");
+		    die();
 	    };		
         
         //
@@ -2394,12 +2401,12 @@ int systemStartUp()
 #ifdef KERNEL_VERBOSE
 		//(inicializa as 4 fases.)
 	    // Básico. ( Variáveis globais e estruturas ... ).
-	    printf("systemStartUp: Initializing Basics..\n");
+	    printf("sm-sys-systemStartUp: Initializing Basics..\n");
 #endif		
         Status = (int) init(); 
 	    if(Status != 0){
-	        printf("systemStartUp error: Init.\n");
-		    KiAbort();
+	        printf("sm-sys-systemStartUp error: init\n");
+	        die();
 	    };	
         //...	 
 	};
@@ -2527,6 +2534,58 @@ void systemSetTerminal( struct window_d *window )
 		window->terminal = 1;
 	}	
 }
+
+//retorna informações sobre o sistema.
+//@todo: Criam um enum para essa função, aqui mesmo nesse arquivo.
+unsigned long systemGetSystemMetrics( int index )
+{
+	//@todo:
+	//Função ainda não implementada.
+	
+	
+	switch(index)
+	{
+		case 0:
+		    return (unsigned long) 0;
+            break;		
+		
+		//screen width.
+		case 1:
+		    break;
+			
+		//screen height.	
+		case 2:
+            break;		
+			
+		//cursor width.	
+		case 3:
+            break;		
+
+		//cursor hight.	
+		case 4:
+            break;		
+			
+			
+		//mouse pointer width.	
+		case 5:
+            break;		
+         
+		//mouse pointer height. 
+		case 6:
+            break;		
+
+
+		//...
+		
+		default:
+		    goto done;
+		    break;
+	}
+	
+	
+done:	
+	return (unsigned long) 0;
+};
 
 //
 // End.

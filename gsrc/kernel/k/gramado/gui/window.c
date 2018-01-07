@@ -352,7 +352,9 @@ void *GetWindowDesktop(struct window_d * hwnd)
  * + O esquema 'humility' são cores com tema cinza, lembrando interfaces antigas.
  * + O esquema 'pride' são cores modernas 
  *   ( Aquele verde e preto e cinza, das primeiras versões, com imagens publicadas. )
- *
+ * @todo: é preciso criar rotinas que selecionem entre os modo criados e habilitados.
+ * é preciso criar rotinas que permitam que aplicativos em user mode criem esquemas de 
+ * de cores e habilite eles.
  */
 void windowSetUpColorScheme(int type)
 {	
@@ -2371,7 +2373,8 @@ int init_windows()
 	//@todo: Isso poderia ter um argumento, selecionado entre o 
 	//tipo 1 e 2, humility e pride.
 	//ColorSchemeHumility ou ColorSchemePride
-	windowSetUpColorScheme(ColorSchemePride);	
+	windowSetUpColorScheme(ColorSchemeHumility);
+	//windowSetUpColorScheme(ColorSchemePride);	
 	
 	//input buffer support ??
 	//output buffer support ??

@@ -1277,7 +1277,24 @@ done:
 
 	// Ativar a segunda porta PS/2.
 	kbdc_wait(1);
-	outportb(0x64,0xA8);  
+	outportb(0x64,0xA8); 
+
+
+	//
+	// Carregando o bmp do disco para a memória
+	// e apresentando pela primeira vez.
+	//
+	
+	int mouse_ret;
+    mouse_ret = load_mouse_bmp();	
+	if(mouse_ret != 0)
+	{
+		printf("init_mouse: erro ao carregar o bmp do mouse");
+		refresh_screen();
+		while(1){}
+	}
+	
+	
 	
 #ifdef KERNEL_VERBOSE		
     MessageBox(gui->screen, 1, "init_mouse:","Mouse initialized!");   
@@ -1477,6 +1494,8 @@ static char mouse_char[] = "T";
 		//Imprimindo o caractere que está servindo de ponteiro provisório.
 
         printf("%c", (char) '0'); 
+		
+		//bmpDisplayBMP( mouseBMPBuffer, g_cursor_x*8, g_cursor_y*8, 0, 0 );
 		
 		//Efetuando o refresh do retângulo referente ao caractere.
 		//@todo: Isso poderá ser maior.
@@ -1768,6 +1787,129 @@ done:
     // NOTA. 
 	// Esta configuração discarta do teste do controlador PS/2 e de seus dispositivos. 
 	// Depois façamos a configuração decente e minuciosa do P8042.
+};
+
+
+
+/*
+ carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
+ usar isso na inicialização do mouse.
+ */
+
+int load_mouse_bmp()
+{
+	//printf("testingFrameAlloc:\n suspended!");
+	//return;
+
+	
+	int Index;
+    struct page_frame_d *pf;
+	//struct page_frame_d *Ret; //#bugbug @todo: aqui deveria ser void*.
+	
+	//virou global
+	//void *mouseBMPBuffer;
+	
+	//#bugbug .;;;: mais que 100 dá erro ...
+	//@todo: melhorar o código de alocação de páginas.
+	//printf("testingFrameAlloc: #100\n");
+	
+#ifdef KERNEL_VERBOSE
+	printf("load_mouse_bmp:\n");
+#endif	
+	
+	//
+	// =============================================
+	//
+	
+ 					  
+	
+    //Ret = (void*) allocPageFrames(500);  // Funcionou com 500.
+	mouseBMPBuffer = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
+	if( (void*) mouseBMPBuffer == NULL ){
+	    printf("unblocked-ldisc-load_mouse_bmp: mouseBMPBuffer\n");
+        goto done;		
+	}
+	
+	//printf("\n");
+	//printf("BaseOfList={%x} Showing #32 \n",mouseBMPBuffer);
+    //for(Index = 0; Index < 32; Index++)   	
+	//{  
+    //    pf = (void*) pageframeAllocList[Index]; 
+	//	
+	//	if( (void*) pf == NULL ){
+	//	    printf("null\n");	 
+	//	}
+	//   if( (void*) pf != NULL ){
+	//	    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
+	//	}
+	//}
+	
+	
+    //===================================
+	// @todo: Carregar a estrelinha e usar como ponteiro de mouse.
+	//
+	//janela de test
+    //CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
+	//              (10-5), (10-5), (376+10), (156+10), 
+	//			  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
+	
+	
+	unsigned long fileret;
+		
+	//taskswitch_lock();
+	//scheduler_lock();
+	//fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "FERRIS  BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "GOONIES BMP", (unsigned long) Ret);
+	//fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
+	fileret = fsLoadFile( "MOUSE   BMP", (unsigned long) mouseBMPBuffer);  //LEVE PARA TESTES
+	if(fileret != 0)
+	{
+		//escrevendo string na janela
+	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
+        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
+		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
+        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
+		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
+		return 1;	
+	}
+	
+	
+	bmpDisplayBMP( mouseBMPBuffer, 20, 20, 0, 0 );
+	//scheduler_unlock();
+	//taskswitch_unlock();
+
+    //===================================							
+    
+	
+	//
+	// *importante:
+	//  O REFRESH RECT SÓ FUNCIONA DAS DIMENSÕES NÃO O POSICIONAMENTO.
+	//
+	
+	//Isso funcionou ...
+	refresh_rectangle( 20, 20, 16, 16 );
+	
+	//struct myrect *rc;
+	
+	//rc = (void *) malloc( sizeof( struct myrect ) );
+	//if(
+	
+	//rc->left   = 40 ;
+	//rc->right  = 80;
+	//rc->top    = 40 ;
+	//rc->bottom = 80;
+	
+	//move_back_to_front(rc);
+	//while(1){}
+	
+done:
+
+#ifdef KERNEL_VERBOSE
+    printf("done\n");
+#endif	
+	//refresh_screen();
+    return 0;	
 };
 
 
