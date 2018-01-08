@@ -17,7 +17,7 @@ a plataforma Windows:
 ************************************************
  Principais:
  ===========
- 
+         
          /gbuild    - Scripts e documentação para compilação.
 	 /gdocs     - Documentação.
 	 /gramado   - Destino de binários e arquivos de configuração.
