@@ -150,7 +150,9 @@ struct heap_d
 	//...
 
 	//Sequenciando heaps sei lá pra quê. 
-	struct heap_d *next;
+	//#bugbug: Não queremos sequenciar os heaps.
+	//cada processo tem seu heap.
+	//struct heap_d *next;
 };
 heap_descriptor_t *KernelHeap;
 heap_descriptor_t *UserHeap;
