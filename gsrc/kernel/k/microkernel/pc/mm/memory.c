@@ -364,134 +364,133 @@ void *GetHeap()
  */
 unsigned long AllocateHeap(unsigned long size)
 {
-	struct mmblock_d *Current;	
-	//struct mmblock_d *Prev;	
+    struct mmblock_d *Current;
+    //struct mmblock_d *Prev;
 
 
     //
     // @todo: Aplicar filtro.
-    // Aqui podemos checar se o quantidade de heap disponível 
-	// está coerente com o tamanho do heap. Se essa quantidade 
-	// for muito grande, maior que o heap total, então temos um 
-	// problema.
-    //	
-	
-	//
-	// Se não há espaço disponível no heap, não há muito o que fazer.
-	// Uma opção seria tentar almentar o heap, se isso for possível.
-	//
-	
-	// Available heap.
-	if(g_available_heap == 0)
-	{
-	    //
-		// @todo: Tentar crescer o heap para atender o size requisitado.
-		//
-		
-		//try_grow_heap() ...
-		
-		//
-		// @todo: Aqui poderia parar o sistema e mostrar essa mensagem.
-		//
-		
-	    printf("AllocateHeap fail: g_available_heap={0}\n");
+    // Aqui podemos checar se o quantidade de heap disponível
+    // está coerente com o tamanho do heap. Se essa quantidade
+    // for muito grande, maior que o heap total, então temos um
+    // problema.
+    //
+
+    //
+    // Se não há espaço disponível no heap, não há muito o que fazer.
+    // Uma opção seria tentar almentar o heap, se isso for possível.
+    //
+
+    // Available heap.
+    if(g_available_heap == 0)
+    {
+        //
+        // @todo: Tentar crescer o heap para atender o size requisitado.
+        //
+
+        //try_grow_heap() ...
+
+        //
+        // @todo: Aqui poderia parar o sistema e mostrar essa mensagem.
+        //
+
+        printf("AllocateHeap fail: g_available_heap={0}\n");
         refresh_screen();
-        //while(1){} 
-		
+        //while(1){}
+
         return (unsigned long) 0;
-		//while(1){};
-	};
-	
-	
-	
-	//
+        //while(1){};
+    };
+
+
+    //
     // Size limits. (Min, max).
     //
- 	
-	//Se o tamanho desejado for igual a zero.
-	//@todo: Aqui podemos converter o size para uo tamanho mínimo.
-	// não há problema nisso.
+
+    //Se o tamanho desejado for igual a zero.
+    //@todo: Aqui podemos converter o size para uo tamanho mínimo.
+    // não há problema nisso.
     if(size == 0){
-		//size = 1;
-	    printf("AllocateHeap error: size={0}\n");
-		refresh_screen();
-		return (unsigned long) g_heap_pointer;
-	};
-	
-	//Se o tamanho desejado é maior ou igual ao espaço disponível.
-	if(size >= g_available_heap)
-	{
-	    //
-		// @todo: Tentar crescer o heap para atender o size requisitado.
-		//
+        //size = 1;
+        printf("AllocateHeap error: size={0}\n");
+        refresh_screen();
+        return (unsigned long) g_heap_pointer;
+    };
 
-		//try_grow_heap() ...
+    //Se o tamanho desejado é maior ou igual ao espaço disponível.
+    if(size >= g_available_heap)
+    {
+        //
+        // @todo: Tentar crescer o heap para atender o size requisitado.
+        //
 
-		printf("AllocateHeap error: size >= g_available_heap\n");
-		refresh_screen();
-		return (unsigned long) 0;
-	};
+        //try_grow_heap() ...
+
+        printf("AllocateHeap error: size >= g_available_heap\n");
+        refresh_screen();
+        return (unsigned long) 0;
+    };
     
-	//Salvando o tamanho desejado.
-	last_size = (unsigned long) size;
-	
-	//
-	// Contador de blocos.
-	//
-	
-try_again:	
+    //Salvando o tamanho desejado.
+    last_size = (unsigned long) size;
+    
+    //
+    // Contador de blocos.
+    //
+
+try_again:
 
     mmblockCount++;  
     
-	//#bugbug
-	//mesmo tendo espaço suficiente no heap, esta,os chegando nesse limite de indices.
-	//Obs: Temos um limite para a quantidade de índices na lista de blocos.
-	if( mmblockCount >= MMBLOCK_COUNT_MAX ){
+    //#bugbug
+    //mesmo tendo espaço suficiente no heap, esta,os chegando nesse limite de indices.
+    //Obs: Temos um limite para a quantidade de índices na lista de blocos.
+    if( mmblockCount >= MMBLOCK_COUNT_MAX ){
         printf("AllocateHeap Error: mmblockCount limits!");
-		refresh_screen();
-		while(1){};
+        refresh_screen();
+        while(1){};
     };
-	
-    //Identificadores.	
-	
-	//
-	// A variável 'Header', no header do bloco, é o início da estrutura que o 
-	// define. 'b->Header'. Ou seja o endereço da varirál marca o início da 
-	// estrutura.
-	//
 
-	//
-	// Pointer Limits:
-	// (Não vamos querer um heap pointer fora dos limites do heap do kernel)
-	// Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
-	// devemos usar o último válido que provavelmente está nos limites.
-	// ?? #bugbug: Mas se o último válido está sendo usado por uma alocação 
-	// anterior. ?? temos flags que indiquem isso ??
-	//
-	// IMPORTANTE: O HEAP POINTER TAMBÉM É O INÍCIO DE UMA ESTRUTURA. 
-	// NESSA ESTRUTURA PODEMOS SABER SE O HEAP ESTA EM USO OU NÃO.
-	// ISSO SE APLICA À TENTATIVA DE REUTILIZAR O ÚLTIMO HEAP POINTER VÁLIDO.
-	//
-	
-	//Se estiver fora dos limites.
-	if( g_heap_pointer < KERNEL_HEAP_START || 
-	    g_heap_pointer >= KERNEL_HEAP_END )
-	{
-		//#bugbug: ?? Como saberemos, se o último válido,
-		// não está em uso por uma alocação anterior. ??
-		
-	    //Checa os limites o último last heap pointer válido.
-	    if( last_valid < KERNEL_HEAP_START || 
-		    last_valid >= KERNEL_HEAP_END )
-		{
+    //Identificadores.
+
+    //
+    // A variável 'Header', no header do bloco, é o início da estrutura que o
+    // define. 'b->Header'. Ou seja o endereço da varirál marca o início da
+    // estrutura.
+    //
+
+    //
+    // Pointer Limits:
+    // (Não vamos querer um heap pointer fora dos limites do heap do kernel)
+    // Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
+    // devemos usar o último válido que provavelmente está nos limites.
+    // ?? #bugbug: Mas se o último válido está sendo usado por uma alocação 
+    // anterior. ?? temos flags que indiquem isso ??
+    //
+    // IMPORTANTE: O HEAP POINTER TAMBÉM É O INÍCIO DE UMA ESTRUTURA. 
+    // NESSA ESTRUTURA PODEMOS SABER SE O HEAP ESTA EM USO OU NÃO.
+    // ISSO SE APLICA À TENTATIVA DE REUTILIZAR O ÚLTIMO HEAP POINTER VÁLIDO.
+    //
+
+    //Se estiver fora dos limites.
+    if( g_heap_pointer < KERNEL_HEAP_START || 
+        g_heap_pointer >= KERNEL_HEAP_END )
+    {
+        //#bugbug: ?? Como saberemos, se o último válido,
+        // não está em uso por uma alocação anterior. ??
+
+        //Checa os limites o último last heap pointer válido.
+        if( last_valid < KERNEL_HEAP_START || 
+           last_valid >= KERNEL_HEAP_END )
+        {
             printf("AllocateHeap Error: last valid heap pointer limits");
-		    refresh_screen();
-		    while(1){}		
-	    };
-		
-		//
-		// @todo: Checar a disponibilidade desse último válido.
-		// Ele é válido, mas não sabemos se está disponível.
+            refresh_screen();
+            while(1){}
+        };
+
+        //
+        // @todo: Checar a disponibilidade desse último válido.
+        // Ele é válido, mas não sabemos se está disponível.
 		
 		//Havendo um last heap pointer válido.
 		//?? isso não faz sentido.
@@ -501,194 +500,192 @@ try_again:
 	
 
     //
-	// Agora temos um 'g_heap_pointer' válido, salvaremos ele.
-	// 'last_valid' NÃO é global. Fica nesse arquivo.
-	//
-	
-	last_valid = (unsigned long) g_heap_pointer;
-	
-	//
-	// Criando um bloco, que é uma estrutura mmblock_d.
-	// Estrutura mmblock_d interna.
-	// Configurando a estrutura para o bloco atual.
-	//
-	// Obs: A estutura deverá ficar lá no espaço reservado para o header. 
-	// (antes da area alocada).
-	// Current = (void*) g_heap_pointer;
-    //		
-	
-	//O endereço do ponteiro da estrutura será o pointer do heap.
-	Current = (void*) g_heap_pointer;    
-	
-	if( (void*) Current != NULL )
-	{
-		//Obs: Perceba que 'Current' e 'Current->Header' devem ser iguais. 
-		
-	    Current->Header = (unsigned long) g_heap_pointer;  //Endereço onde começa o header.
-	    Current->headerSize = MMBLOCK_HEADER_SIZE;         //Tamanho do header. (*TAMANHO DA STRUCT).  
+    // Agora temos um 'g_heap_pointer' válido, salvaremos ele.
+    // 'last_valid' NÃO é global. Fica nesse arquivo.
+    //
+    
+    last_valid = (unsigned long) g_heap_pointer;
+    
+    //
+    // Criando um bloco, que é uma estrutura mmblock_d.
+    // Estrutura mmblock_d interna.
+    // Configurando a estrutura para o bloco atual.
+    //
+    // Obs: A estutura deverá ficar lá no espaço reservado para o header.
+    // (antes da area alocada).
+    // Current = (void*) g_heap_pointer;
+    //
+
+    //O endereço do ponteiro da estrutura será o pointer do heap.
+    Current = (void*) g_heap_pointer;    
+
+    if( (void*) Current != NULL )
+    {
+        //Obs: Perceba que 'Current' e 'Current->Header' devem ser iguais. 
+
+        Current->Header = (unsigned long) g_heap_pointer;  //Endereço onde começa o header.
+        Current->headerSize = MMBLOCK_HEADER_SIZE;         //Tamanho do header. (*TAMANHO DA STRUCT).
         Current->Id = mmblockCount;                        //Id do mmblock. (Índice na lista)
-	    Current->Used = 1;                //Flag, 'sendo Usado' ou 'livre'.
-	    Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
+        Current->Used = 1;                //Flag, 'sendo Usado' ou 'livre'.
+        Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
         Current->Free = 0;                //0=not free 1=FREE (*SUPER IMPORTANTE)
-	    //Continua...		
-	
-	    //
-	    // Mensuradores. (tamanhos) (@todo:)
-	    //
-	
-	    //
-	    // @todo:
-	    // Tamanho da área reservada para o cliente.
-	    // userareaSize = (request size + unused bytes)
-	    // Zera unused bytes, já que não foi calculado.
-	    //	
+        //Continua...
 
         //
-	    // User Area base:
-	    // *Onde começa a área solicitada. 
-		// *Fácil. Isso fica logo depois do header.
-	    //
-		
-		//Obseve que 'Current->headerSize' é igual a 'MMBLOCK_HEADER_SIZE'
-		// E que 'Current->headerSize' é o início da estrutura.
-	
-	    Current->userArea = (unsigned long) Current->Header + Current->headerSize;    
+        // Mensuradores. (tamanhos) (@todo:)
+        //
 
-	    //
-	    // Footer:
+        //
+        // @todo:
+        // Tamanho da área reservada para o cliente.
+        // userareaSize = (request size + unused bytes)
+        // Zera unused bytes, já que não foi calculado.
+        //
+
+        //
+        // User Area base:
+        // *Onde começa a área solicitada. 
+        // *Fácil. Isso fica logo depois do header.
+        //
+
+        //Obseve que 'Current->headerSize' é igual a 'MMBLOCK_HEADER_SIZE'
+        // E que 'Current->headerSize' é o início da estrutura.
+
+        Current->userArea = (unsigned long) Current->Header + Current->headerSize;
+
+        //
+        // Footer:
         // O footer começa no 'endereço do início da área de cliente' + 'o tamanho dela'.
-	    // O footer é o fim dessa alocação e início da próxima.
-	    //
-	
-	    // #bugbug: Penso que aqui deveríamos considerar 'userareaSize' como 
-		// tamanho da área de cliente, esse tamanho equivale ao tamanho solicitado,
-		// mais o tanto de bytes não usados.
-		// Obs: Por enquanto o tamanho da área de cliente tem apenas o tamanho
-		// do espaço solicitado.
-	    Current->Footer = (unsigned long) Current->userArea + size;
-	
-	    //
-	    // Heap pointer. 
-	    //     Atualiza o endereço onde vai ser a próxima alocação.
-	    //
-	
-	    //if ( Current->Footer < KERNEL_HEAP_START){
-	    //    Current->Used = 0;                //Flag, 'sendo Usado' ou 'livre'.
-	    //    Current->Magic = 0;            //Magic number. Ver se não está corrompido.	    
-	    //	goto try_again;	
-	    //}
-	
-        
-		//
-		// Obs: O limite da contagem de blocos foi checado acima.
-		//
-		
-	    //
-	    // Coloca o ponteiro na lista de blocos.
-	    //
-	
-	    mmblockList[mmblockCount] = (unsigned long) Current;
-	
-	    //
-		// Salva o ponteiro do bloco usado como 'prévio'.
-	    // Obs: 'mm_prev_pointer' não é global, fica nesse arquivo.
-	    //
-		
-		mm_prev_pointer  = (unsigned long) g_heap_pointer; 
-	
-	    //
-		// *****************************************************
-		//                **** SUPER IMPORTANTE ****
-		// *****************************************************
-		//
-	    // Atualiza o ponteiro. Deve ser onde termina o último bloco 
-		// configurado.
-	    // Isso significa que o próximo ponteiro onde começaremos a próxima 
-		// estrutura fica exatamente onde começa o footer dessa estrutura.
-		// Obs: O footer está aqui somente para isso. Para ajudar
-		// a localizamarmos o início da próxima estrutura.
-		//
-		
-		g_heap_pointer = (unsigned long) Current->Footer;	
+        // O footer é o fim dessa alocação e início da próxima.
+        //
 
-	
-	    //
-	    // Available heap:
-	    // Calcula o valor de heap disponível para as próximas alocações.
-	    // O heap disponível será o que tínhamos disponível menos o que 
-		// gastamos agora.
-		// O que gastamos agora foi o tamanho do header mais o tamanho da área 
-		// de cliente.
-		//
-	
-	    g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);		
-	
-	    //
-	    // Retorna o ponteiro para o início da área alocada.
-		// Obs: Esse é o valor que será usado pela função malloc.
-		//
-		// *Imporatate:
-		//     O que acontece se um aplicativo utilizar além da área alocada ??
-		// O aplicativo invadirá a área do footer, onde está a estrutura do 
-		// próximo bloco. Inutilizando as informações sobre aquele bloco.
-		// *Aviso: Cuidado com isso. @todo: Como corrigir.?? o que fzer??
-		//
-		
-		return (unsigned long) Current->userArea;
-		//Nothing.
-		
-	}else{
-		
-	    //Se o ponteiro da estrutura de mmblock for inválido.
-		
-		printf("AllocateHeap fail: struct.\n");
-		//@todo: Deveria retornar.
-		//goto fail;
-		return (unsigned long) 0;
-	};
-	
+        // #bugbug: Penso que aqui deveríamos considerar 'userareaSize' como 
+        // tamanho da área de cliente, esse tamanho equivale ao tamanho solicitado,
+        // mais o tanto de bytes não usados.
+        // Obs: Por enquanto o tamanho da área de cliente tem apenas o tamanho
+        // do espaço solicitado.
+        Current->Footer = (unsigned long) Current->userArea + size;
 
-	//
-	// @todo: 
-	// Checar novamente aqui o heap disponível. Se esgotou, tentar crescer.
-	//
-	
+        //
+        // Heap pointer. 
+        //     Atualiza o endereço onde vai ser a próxima alocação.
+        //
+
+        //if ( Current->Footer < KERNEL_HEAP_START){
+        //    Current->Used = 0;                //Flag, 'sendo Usado' ou 'livre'.
+        //    Current->Magic = 0;            //Magic number. Ver se não está corrompido.
+        //	goto try_again;
+        //}
+
+
+        //
+        // Obs: O limite da contagem de blocos foi checado acima.
+        //
+
+        //
+        // Coloca o ponteiro na lista de blocos.
+        //
+
+         mmblockList[mmblockCount] = (unsigned long) Current;
+
+        //
+        // Salva o ponteiro do bloco usado como 'prévio'.
+        // Obs: 'mm_prev_pointer' não é global, fica nesse arquivo.
+        //
+
+        mm_prev_pointer  = (unsigned long) g_heap_pointer; 
+
+        //
+        // *****************************************************
+        //                **** SUPER IMPORTANTE ****
+        // *****************************************************
+        //
+        // Atualiza o ponteiro. Deve ser onde termina o último bloco 
+        // configurado.
+        // Isso significa que o próximo ponteiro onde começaremos a próxima 
+        // estrutura fica exatamente onde começa o footer dessa estrutura.
+        // Obs: O footer está aqui somente para isso. Para ajudar
+        // a localizamarmos o início da próxima estrutura.
+        //
+
+        g_heap_pointer = (unsigned long) Current->Footer;
+
+
+        //
+        // Available heap:
+        // Calcula o valor de heap disponível para as próximas alocações.
+        // O heap disponível será o que tínhamos disponível menos o que 
+        // gastamos agora.
+        // O que gastamos agora foi o tamanho do header mais o tamanho da área
+        // de cliente.
+        //
+
+        g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);
+
+        //
+        // Retorna o ponteiro para o início da área alocada.
+        // Obs: Esse é o valor que será usado pela função malloc.
+        //
+        // *Imporatate:
+        //     O que acontece se um aplicativo utilizar além da área alocada ??
+        // O aplicativo invadirá a área do footer, onde está a estrutura do 
+        // próximo bloco. Inutilizando as informações sobre aquele bloco.
+        // *Aviso: Cuidado com isso. @todo: Como corrigir.?? o que fzer??
+        //
+
+        return (unsigned long) Current->userArea;
+        //Nothing.
+
+    }else{
+
+        //Se o ponteiro da estrutura de mmblock for inválido.
+
+        printf("AllocateHeap fail: struct.\n");
+        //@todo: Deveria retornar.
+        //goto fail;
+        return (unsigned long) 0;
+    };
+
+
+    //
+    // @todo: 
+    // Checar novamente aqui o heap disponível. Se esgotou, tentar crescer.
+    //
+
 
     /*
-	 * *IMPORTANTE
-	 *
-	 * @todo:
-	 * Colocar o conteúdo da estrutura no lugar destinado para o header.
-	 * O header conterá informações sobre o heap.
-	 *
-	 */
-	
-	
-	
-	/* errado #bugbug.
-	Prev = (void*) mm_prev_pointer;
-	
-	if( (void*) Prev != NULL)
-	{
-	    if( Prev->Used == 1 && 
-		    Prev->Magic == 1234 && 
-			Prev->Free == 0)
-		{
-		    Current->Prev = (void*) Prev;
-            Prev->Next = (void*) Current;			
-		};		
-	};
-	*/
-	
-	
+     * *IMPORTANTE
+     *
+     * @todo:
+     * Colocar o conteúdo da estrutura no lugar destinado para o header.
+     * O header conterá informações sobre o heap.
+     *
+     */
+
+
+    /* errado #bugbug.
+    Prev = (void*) mm_prev_pointer;
+
+    if( (void*) Prev != NULL)
+    {
+        if( Prev->Used == 1 && 
+            Prev->Magic == 1234 && 
+            Prev->Free == 0)
+        {
+            Current->Prev = (void*) Prev;
+            Prev->Next = (void*) Current;
+        };
+    };
+    */
+
+
 //
 // Fail.
-//	
+//
 fail:
     //Se falhamos, retorna 0. Que equivalerá à NULL.
-    return (unsigned long) 0;	
+    return (unsigned long) 0;
 };
-
 
 
 /*

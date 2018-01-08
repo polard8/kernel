@@ -413,8 +413,6 @@ void windowSetUpColorScheme(int type)
     if( (void*) pride == NULL ){
 		printf("windowSetUpColorScheme: pride");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 		
 		//Object.
