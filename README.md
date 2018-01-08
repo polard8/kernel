@@ -29,6 +29,9 @@
 <br>@frednora
 
 <br>
+<br>Clone the repo: git clone https://github.com/frednora/gramado.git
+
+<br>
 <img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gui.png">
 <br>
 <img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado2.png">
