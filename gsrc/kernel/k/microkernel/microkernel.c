@@ -85,7 +85,7 @@ testProcess:
     i=128;	
     while(i<PROCESS_COUNT_MAX)
 	{
-		p = (void*) create_process( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits");	    
+		p = (void*) create_process( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	    
 		if((void*)p == NULL ){
 			goto testThread;
 		}
@@ -149,7 +149,9 @@ void *sys_create_process( struct wstation_d *window_station,
                           unsigned long init_eip, 
                           unsigned long priority, 
 					      int ppid, 
-					      char *name )
+					      char *name,
+						  unsigned long iopl, 
+						  unsigned long directory_address )
 {
     //
 	// @todo: Create some interface routine.
@@ -160,7 +162,7 @@ void *sys_create_process( struct wstation_d *window_station,
     //
 	// Create process.
 	//
-    create_process( window_station, desktop, window, init_eip, priority, ppid, name);
+    create_process( window_station, desktop, window, init_eip, priority, ppid, name, iopl, (unsigned long) directory_address);
 	//@todo: Return da função create.
 	
 done:

@@ -23,7 +23,9 @@ void *sys_create_process( struct wstation_d *window_station,
                           unsigned long init_eip, 
                           unsigned long priority, 
 					      int ppid, 
-					      char *name );
+					      char *name, 
+						  unsigned long iopl,
+                          unsigned long directory_address  );
 						  
 //
 // THREADS

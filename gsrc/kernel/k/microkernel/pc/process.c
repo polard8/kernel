@@ -205,6 +205,9 @@ fail:
  *        e criar as pagetables que o processo vai usar de acordo
  *        com o tamanho do processo. 
  * @todo: processCreateProcess(...)
+ *
+ * Aumetar o número de argumentos para dar o suporte necessário para criar um processo 
+ * do jeito que for necessário
  */
 process_descriptor_t *create_process( struct wstation_d *window_station,
                                       struct desktop_d  *desktop,
@@ -212,7 +215,9 @@ process_descriptor_t *create_process( struct wstation_d *window_station,
                                       unsigned long init_eip, 
                                       unsigned long priority, 
 									  int ppid, 
-									  char *name)
+									  char *name, 
+									  unsigned long iopl,
+									  unsigned long directory_address )
 {
 	int i;
 	struct process_d *Process;
@@ -338,7 +343,7 @@ get_next:
 		//
 
 		//@todo: 		
-		Process->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY; //@todo: Usar um pra cada processo.
+		Process->Directory = (unsigned long ) directory_address; //KERNEL_PAGEDIRECTORY; //@todo: Usar um pra cada processo.
         //@todo: Alocar um endereço físico antes, depois chamar a função que cria o pagedirectory.
 		//Process->Directory = (unsigned long ) CreatePageDirectory(unsigned long directory_address)
 		//Process->page_directory->Address = (unsigned long) KERNEL_PAGEDIRECTORY;
@@ -359,8 +364,8 @@ get_next:
 		//
 
 		//Imagem do processo.
-		Process->Image       = UPROCESS_IMAGE_BASE;           //Base da imagem do processo.
-	    //Process->ImageSize = 0;                             //Tamanho da imagem do processo.	    
+		Process->Image = UPROCESS_IMAGE_BASE;           //Base da imagem do processo.
+		//Process->ImageSize = 0;                             //Tamanho da imagem do processo.	    
 		
 		
 		//
@@ -391,16 +396,8 @@ get_next:
 	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo. ??
 	    
 
-		//
-		// iopl: 
-		// @todo: Isso deveria ser passado por argumento ou ser configurado depois.
-		// Cada processo tem um iopl diferente. Deve-se passar isso via argumento.
-		// ou reconfigurar depois. O erro aqui é atribuir a todo processo criado
-        // o mesmo iopl.  		
-		//
-		
-		Process->iopl = RING3;
-		//Process->iopl = RING0;    //Kernel mode. 
+		//ring.
+		Process->iopl = iopl; 
         
 		
 	    //PPL - (Process Permition Level).(gdef.h)
@@ -476,7 +473,7 @@ get_next:
         //Process->esp
         //Process->eflags
         //Process->cs
-        //Process->eip	
+        //Process->eip = init_eip;  //isso deve ser o entry point da thread principal.	
         //Process->ds
         //Process->es
         //Process->fs

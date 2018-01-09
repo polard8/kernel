@@ -740,160 +740,172 @@ void *systemIoCpu( int number,
         //...			
 		
         //Process support:
-
         case 5:
-		//process_descriptor_t *create_process( struct wstation_d *window_station,
-        //                               struct desktop_d  *desktop,
-        //                               struct window_d *window,
-        //                               unsigned long init_eip, 
-        //                               unsigned long priority, 
-	    //								int ppid, 
-	    //								char *name);
-
-        return (void*) create_process( (struct wstation_d *) 0,
-                                       (struct desktop_d  *) 0,
-                                       (struct window_d *) 0,
-                                       (unsigned long) arg1, 
-                                       (unsigned long) arg2, 
-	    							   (int) arg3, 
-	    							   (char *) arg4);
-		break;
+            return (void*) create_process( (struct wstation_d *) 0,
+                                           (struct desktop_d  *) 0,
+                                           (struct window_d *) 0,
+                                           (unsigned long) arg1, 
+                                           (unsigned long) arg2, 
+	    							       (int) arg3, 
+	    							       (char *) arg4,
+										   (unsigned long) RING3,
+                                           (unsigned long ) KERNEL_PAGEDIRECTORY );
+		    break;
 
 	
 
 	    case 6:
-	    //int processSendSignal(struct process_d *p, unsigned long signal);		
-	    return (void*) processSendSignal( (struct process_d *) arg1, (unsigned long) arg2 );		
-	    break;
+	        return (void*) processSendSignal( (struct process_d *) arg1, (unsigned long) arg2 );		
+	        break;
 	
 	    case 7:
-	    //unsigned long GetProcessDirectory(struct process_d *process);
-	    return (void*) GetProcessDirectory( (struct process_d *) arg1);
-	    break;
+	        return (void*) GetProcessDirectory( (struct process_d *) arg1);
+	        break;
 	
 	    case 8:
-	    //void SetProcessDirectory(struct process_d *process, unsigned long Address);		
-	    SetProcessDirectory( (struct process_d *) arg1, (unsigned long) arg2 );		
-	    break;
+	        SetProcessDirectory( (struct process_d *) arg1, (unsigned long) arg2 );		
+	        break;
 	
 	    //Close all processes.
-	    case 9: CloseAllProcesses(); break;
+	    case 9: 
+		    CloseAllProcesses(); 
+			break;
 	
 	    //?? Dead process collector. ??
-        case 10: dead_task_collector(); break;
+        case 10: 
+		    dead_task_collector(); 
+			break;
 	
         //Exit process.	
-	    case 11: exit_process( (int) arg1, (int) arg2); break;
+	    case 11: 
+		    exit_process( (int) arg1, (int) arg2); 
+			break;
 	
 	    //Set caller PID.
-	    case 12: set_caller_process_id( (int) arg1 ); break;
+	    case 12: 
+		    set_caller_process_id( (int) arg1 ); 
+			break;
 	
 	    case 13:
-	    //int get_caller_process_id();	
-	    return (void*) get_caller_process_id();		
-	    break;
+	        return (void*) get_caller_process_id();		
+	        break;
 	
         //Semaphore support.
-	    case 14: Down( (struct semaphore_d *) arg1); break;
-	    case 15: Up( (struct semaphore_d *) arg1); break;
+	    case 14: 
+		    Down( (struct semaphore_d *) arg1); 
+			break;
+			
+	    case 15: 
+		    Up( (struct semaphore_d *) arg1); 
+			break;
 		
 	    case 16:
-	    //int init_semaphore(struct semaphore_d *s, unsigned int count); 
-	    return (void*) init_semaphore( (struct semaphore_d *) arg1, (unsigned int) arg2); 
-	    break;
+	        return (void*) init_semaphore( (struct semaphore_d *) arg1, (unsigned int) arg2); 
+	        break;
 		
 	    //Semaphore support.	
-	    case 17: semaphore_down( (struct semaphore_d *) arg1); break;
-	    case 18: semaphore_up( (struct semaphore_d *) arg1); break;
+	    case 17: 
+		    semaphore_down( (struct semaphore_d *) arg1); 
+			break;
+			
+	    case 18: 
+		    semaphore_up( (struct semaphore_d *) arg1); 
+			break;
 		
 	    case 19:
-	    //void *create_semaphore(); 
-	    return (void *) create_semaphore(); 
-	    break;
+	        return (void *) create_semaphore(); 
+	        break;
 		
 	    //Semaphore support.			
-	    case 20: delete_semaphore( (struct semaphore_d *) arg1); break;
-	    case 21: open_semaphore( (struct semaphore_d *) arg1); break;
-	    case 22: close_semaphore( (struct semaphore_d *) arg1); break;
+	    case 20: 
+		    delete_semaphore( (struct semaphore_d *) arg1); 
+			break;
+			
+	    case 21: 
+		    open_semaphore( (struct semaphore_d *) arg1); 
+			break;
+			
+	    case 22: 
+		    close_semaphore( (struct semaphore_d *) arg1); 
+			break;
 		
         //Thread support.
-        case 23: dead_thread_collector(); break;
-	    case 24: exit_thread( (int) arg1); break;  //Torna zunbi uma thread.
-	    case 25: kill_thread( (int) arg2); break;  //Destrói uma thread.
+        case 23: 
+		    dead_thread_collector(); 
+			break;
+			
+		//Torna zumbi uma thread.	
+	    case 24: 
+		    exit_thread( (int) arg1); 
+			break;
+			
+		//Destrói uma thread.	
+	    case 25: 
+		    kill_thread( (int) arg2); 
+			break;  
 	
 	    case 26:
-	    //int GetCurrentThreadId();
-	    return (void*) GetCurrentThreadId();
-	    break;
+	        return (void*) GetCurrentThreadId();
+	        break;
 	
 	    //Select a thread for execution.
-	    case 27: SelectForExecution( (struct thread_d *) arg1); break;
+	    case 27: 
+		    SelectForExecution( (struct thread_d *) arg1); 
+			break;
 	
 	    case 28:
-	    //unsigned long GetThreadStackStart(struct thread_d *thread);
-	    return (void *) GetThreadStackStart( (struct thread_d *) arg1);
-	    break;
+	        return (void *) GetThreadStackStart( (struct thread_d *) arg1);
+	        break;
 	
 	    case 29:
-	    //unsigned long GetThreadHeapStart(struct thread_d *thread);
-	    return (void *) GetThreadHeapStart( (struct thread_d *) arg1);
-	    break;
+	        return (void *) GetThreadHeapStart( (struct thread_d *) arg1);
+	        break;
 	
 	    case 30:
-	    //unsigned long GetThreadDirectory(struct thread_d *thread);
-	    return (void *) GetThreadDirectory( (struct thread_d *) arg1);
-	    break;
+	        return (void *) GetThreadDirectory( (struct thread_d *) arg1);
+	        break;
 	
 	    //?? Quem tem directory é o processo.
 	    case 31:
-	    //void SetThreadDirectory(struct thread_d *thread, unsigned long Address);
-	    SetThreadDirectory( (struct thread_d *) arg1, (unsigned long) arg2);
-	    break;
+	        SetThreadDirectory( (struct thread_d *) arg1, (unsigned long) arg2);
+	        break;
 		
-	    case 32:
-	    //thread_descriptor_t *create_thread( struct wstation_d *window_station,
-        //                                    struct desktop_d  *desktop,
-        //                                    struct window_d *window,
-        //                                    unsigned long init_eip, 
-        //                                    unsigned long priority, 
-        //									int pid, 
-        //									char *name);
-	    
-		return (void*) create_thread( (struct wstation_d *) 0,
+	    case 32:	    
+		    return (void*) create_thread( (struct wstation_d *) 0,
                                       (struct desktop_d  *) 0,
                                       (struct window_d *) 0,
                                       (unsigned long) arg1, 
                                       (unsigned long) arg2, 
  									  (int) arg3, 
 									  (char *) arg4);
-        break;
+            break;
 
 
         case 33:
-        //void *GetCurrentThread();
-        return (void *) GetCurrentThread();
-	    break;
+            return (void *) GetCurrentThread();
+	        break;
 	
 	    case 34:
-	    //void *FindReadyThread();
-	    return (void *) FindReadyThread();
-	    break;
+	        return (void *) FindReadyThread();
+	        break;
 	
 	    case 35:
-	    //int GetThreadState(struct thread_d *Thread);
-	    return (void *) GetThreadState( (struct thread_d *) arg1);
-	    break;
+	        return (void *) GetThreadState( (struct thread_d *) arg1);
+	        break;
 	
 	    case 36:
-	    //int GetThreadType(struct thread_d *Thread);
-	    return (void *) GetThreadType( (struct thread_d *) arg1);
-	    break;
+	        return (void *) GetThreadType( (struct thread_d *) arg1);
+	        break;
 	
 	    //Dispatch a thread.
-	    case 37: dispatch_thread( (struct thread_d *) arg1); break;
+	    case 37: 
+		    dispatch_thread( (struct thread_d *) arg1); 
+			break;
 	
 	    //Set thread priority.
-	    case 38: set_thread_priority( (struct thread_d *) arg1, (unsigned long) arg2); break; 
+	    case 38: 
+		    set_thread_priority( (struct thread_d *) arg1, (unsigned long) arg2); 
+			break; 
 	
 	    //...
 	

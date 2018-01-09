@@ -1,5 +1,5 @@
 /*
- * File: microkernel\create.c
+ * File: microkernel\pc\create.c
  *
  * Descrição:
  *     Rotinas de criação de processos e threads.
@@ -40,7 +40,9 @@ void *KeCreateProcess( struct wstation_d *window_station,
                        unsigned long init_eip, 
                        unsigned long priority, 
 					   int ppid, 
-					   char *name )
+					   char *name,
+					   unsigned long iopl,
+                       unsigned long directory_address  )
 {
     //
 	// @todo: Create some interface routine.
@@ -53,7 +55,7 @@ void *KeCreateProcess( struct wstation_d *window_station,
 	// Create process.
 	
 createProcess:
-    return (void*) create_process( window_station, desktop, window, init_eip, priority, ppid, name);
+    return (void*) create_process( window_station, desktop, window, init_eip, priority, ppid, name, iopl, (unsigned long) directory_address );
 };
 
 
@@ -109,6 +111,7 @@ createThread:
  * físico diferente da imagem do processo pai.
  * Essa não precisa ser a rotina, pode ser apenas uma interface, que chama a 
  * rotina dofork() e outras se necessário.
+ *
  */
 int fork()
 {  
@@ -210,9 +213,15 @@ int KiCreateTask( int task_id,
 /*
  * KiCreateKernelProcess:
  *    Criando manualmente o processo do Kernel.
+ *    #suspensa: Agora o processo kernel é criado com a mesma rotina 
+ * que é usda para criar os outros processos.
  */
 void *KiCreateKernelProcess()
 {
+	/*
+	 * #SUSPENSA !!
+     *	 
+	
 	struct process_d *p;
 	char *ProcessName = "KERNEL PROCESS";
 	
@@ -299,6 +308,9 @@ void *KiCreateKernelProcess()
 //Done.
 done:
     return (void*) KernelProcess;
+	
+	*/
+    return NULL;
 };
 
 
