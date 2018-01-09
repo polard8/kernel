@@ -55,7 +55,14 @@ void *KeCreateProcess( struct wstation_d *window_station,
 	// Create process.
 	
 createProcess:
-    return (void*) create_process( window_station, desktop, window, init_eip, priority, ppid, name, iopl, (unsigned long) directory_address );
+    return (void*) create_process( window_station, 
+	                               desktop, window, 
+								   init_eip, 
+								   priority, 
+								   ppid, 
+								   name, 
+								   iopl, 
+								   (unsigned long) directory_address );
 };
 
 
@@ -84,7 +91,13 @@ void *KeCreateThread( struct wstation_d *window_station,
  // Create thread.
  
 createThread:
-    return (void*) create_thread( window_station, desktop, window, init_eip, priority, ppid, name);   
+    return (void*) create_thread( window_station, 
+	                              desktop, 
+								  window, 
+								  init_eip, 
+								  priority, 
+								  ppid, 
+								  name );   
 };
 
 
@@ -332,17 +345,15 @@ void *KiCreateIdle()
     //Aloca memória mara a estrutura.
 	IdleThread = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) IdleThread == NULL ){
-	    printf("KiCreateIdle:\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateIdle: IdleThread\n");
+		die();
 	}
 	else
 	{ 
 	    //Ver se a estrutura do processo é válida.
 		if( (void*) KernelProcess == NULL ){
-	        printf("KiCreateIdle: Kernel Process was not created.\n");
-		    refresh_screen();
-		    while(1){}
+	        printf("pc-create-KiCreateIdle: KernelProcess\n");
+		    die();
 	    }else{
 			//Indica à qual processo a thread pertence.
 	        IdleThread->process = (void*) KernelProcess;
@@ -368,11 +379,11 @@ void *KiCreateIdle()
 	
 	//Stack. @todo: A stack deve ser a que está na TSS
 	//#BugBug.
+	// Estamos alocando mas não etamos usando.
 	idleStack = (void*) malloc(4*1024);
 	if( (void*) idleStack == NULL ){
-	    printf("KiCreateIdle fail: Stack.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateIdle: idleStack\n");
+		die();
 	};
 	
 	//
@@ -546,17 +557,15 @@ void *KiCreateShell()
 	};
 	*/
 	if( (void*) KernelProcess == NULL ){
-	    printf("KiCreateShell: Kernel Process is not created.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateShell: KernelProcess\n");
+		die();
 	};	
 	
 	//Thread.
 	t = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) t == NULL ){
-	    printf("KiCreateShell fail: Thread.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateShell: t \n");
+		die();
 	}
 	else
 	{  
@@ -567,9 +576,8 @@ void *KiCreateShell()
 	//Stack.
 	shellStack = (void*) malloc(4*1024);
 	if( (void*) shellStack == NULL ){
-	    printf("KiCreateShell: Stack fail.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateShell: shellStack\n");
+		die();
 	};
 	
 	//@todo: objectType, objectClass, appMode
@@ -722,18 +730,16 @@ void *KiCreateTaskManager()
 	};
 	*/
 	if( (void*) KernelProcess == NULL ){
-	    printf("KiCreatetaskManager: Kernel Process not created.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreatetaskManager: KernelProcess\n");
+		die();
 	};	
 
     //Thread.
 	//Alocando memória para a estrutura da thread.
 	t = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) t == NULL ){
-	    printf("KiCreateTaskManager: Thread fail.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateTaskManager: t \n");
+		die();
 	}else{  
 	    //Indica à qual proesso a thread pertence.
 	    t->process = (void*) KernelProcess;
@@ -744,9 +750,8 @@ void *KiCreateTaskManager()
 	//estamos alocando uma stack dentro do heap do kernel.
 	taskmanStack = (void*) malloc(4*1024);
 	if( (void*) taskmanStack == NULL ){
-	    printf("KiCreateTaskManager: Stack fail.\n");
-		refresh_screen();
-		while(1){}
+	    printf("pc-create-KiCreateTaskManager: taskmanStack\n");
+		die();
 	};
   	
 	//@todo: object

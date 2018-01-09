@@ -203,29 +203,36 @@ void *systemRam( int number,
 			break;
 
 		//Kernel info.
-		case 1: sys_showkernelinfo(); break;
+		case 1: 
+		    sys_showkernelinfo(); 
+			break;
 
 		//Despacha uma mensagem para o procedimento atual.
 		case 2:
 		    g_nova_mensagem = 1; //existe uma nova mensagem.
-            system_dispatch_to_procedure( (struct window_d *) arg1, (int) arg2, (unsigned long) arg3, (unsigned long) arg4);
-		break;
+            system_dispatch_to_procedure( (struct window_d *) arg1, 
+			                              (int) arg2, 
+										  (unsigned long) arg3, 
+										  (unsigned long) arg4 );
+		    break;
 		
 		//refresh screen (executive: ram| uigm/gui)
-		case 3: refresh_screen(); break;
+		case 3: 
+		    refresh_screen(); 
+			break;
 			
 		//set up cr3. /ram/mm	
-		case 4: SetCR3((unsigned long) arg1); break;
+		case 4: 
+		    SetCR3((unsigned long) arg1); 
+			break;
 			
 		//create page directory.	
 		case 5:
-		    //void *CreatePageDirectory(unsigned long directory_address);
 		    return (void *) CreatePageDirectory((unsigned long) arg1);
             break; 
 
 		//create page table.	
         case 6:
-            //void *CreatePageTable( unsigned long directory_address, int offset, unsigned long page_address );
 			return (void *) CreatePageTable( (unsigned long) arg1, (int) arg2, (unsigned long) arg3 );
             break;
 
@@ -236,76 +243,70 @@ void *systemRam( int number,
 
 		//Pega o heap pointer de um processo.	
         case 8:
-		    //unsigned long get_process_heap_pointer(int pid);
 			return (void *) get_process_heap_pointer((int) arg1);
             break;		
 
 		//create channel.	
         case 9:
-            //void *CreateChannel(struct d_process *OwnerProcess,
-		    //		    struct d_thread *ClientThread,
-		    //		    struct d_thread *ServerThread);
-            return (void *)CreateChannel( (struct process_d *) arg1, (struct thread_d *) arg2, (struct thread_d *) arg3);
+            return (void *)CreateChannel( (struct process_d *) arg1, 
+			                              (struct thread_d *) arg2, 
+										  (struct thread_d *) arg3 );
             break;
 			
 		//Destroy channel.	
         case 10:			
-            //int DestroyChannel( struct channel_d *channel );
 		    return (void *) DestroyChannel( (struct channel_d *) arg1 );
             break; 
 
 		//Open channel.
 		case 11:
-            //int OpenChannel(struct channel_d *channel, 
-            //struct d_process *OwnerProcess,
-			//struct d_thread *ClientThread,
-			//struct d_thread *ServerThread);
-            return (void *) OpenChannel( (struct channel_d *) arg1, (struct process_d *) arg2, (struct thread_d *) arg3, (struct thread_d *) arg4);
+            return (void *) OpenChannel( (struct channel_d *) arg1, 
+			                             (struct process_d *) arg2, 
+										 (struct thread_d *) arg3, 
+										 (struct thread_d *) arg4 );
 		    break;
 		
 		//Close channel.
 		case 12:
-            //int CloseChannel(struct channel_d *channel);
 			return (void *) CloseChannel( (struct channel_d *) arg1);
 		    break;
 
 		//Load file.
 		case 13:
 		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
-			//unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address);
             return (void *) fsLoadFile( (unsigned char *) arg1, (unsigned long) arg2);		
             break;
 		
 		//Save file.
         case 14:
 		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
-		    //unsigned long fsSaveFile( unsigned char *file_name, 
-            //                  unsigned long file_size, 
-		    //				  unsigned long file_address );		
-		    return (void *) fsSaveFile( (unsigned char *) arg1, (unsigned long) arg2, (unsigned long) arg3 );				    
+		    return (void *) fsSaveFile( (unsigned char *) arg1, 
+			                            (unsigned long) arg2, 
+										(unsigned long) arg3 );				    
 			break;
 		
 		//Create user.
 		case 15:
-            //void *CreateUser(char *name, int type);
 			return (void *) CreateUser( (char *) arg1, (int) arg2);
 			break;
 			
 		//Set current user id.	
-		case 16: SetCurrentUserId( (int) arg1); break;
+		case 16: 
+		    SetCurrentUserId( (int) arg1); 
+			break;
 	   
         //Get current user id.
 		case 17:
-		    //int GetCurrentUserId();
 			return (void*) GetCurrentUserId();
 			break;
 			
 		//Set current group id.	
-		case 18: SetCurrentGroupId( (int) arg1); break;
+		case 18: 
+		    SetCurrentGroupId( (int) arg1); 
+			break;
 		
 		//Get current group id.
 		case 19:
-		    //int GetCurrentGroupId();
 		    return (void*) GetCurrentGroupId();
 		    break;
 			
@@ -319,70 +320,60 @@ void *systemRam( int number,
 		case 21:
             return (void*) RegisterDesktop( (struct desktop_d *) arg1);  			
             break;
-        case 22: set_current_desktop( (struct desktop_d *) arg1); break;
+			
+        case 22: 
+		    set_current_desktop( (struct desktop_d *) arg1); 
+			break;
 		
 		case 23:
-		    //void *get_current_desktop();
 		    return (void *) get_current_desktop();
             break;
 
         case 24:		
-		    //int get_current_desktop_id();
 		    return (void*) get_current_desktop_id();
             break;
 
         case 25:		
-		    //void *CreateDesktop(struct wstation_d *ws);
 		    return (void *) CreateDesktop( (struct wstation_d *) arg1 );
             break;
 		
 		case 26:
-		    //void set_current_menuwindow(struct desktop_d *desktop, struct window_d *window); 
  		    set_current_menuwindow( (struct desktop_d *) arg1, (struct window_d *) arg2); 
             break;
 		
 		case 27:
-		    //void set_current_foreground(struct desktop_d *desktop, struct window_d *window); 
 		    set_current_foreground( (struct desktop_d *) arg1, (struct window_d *) arg2); 
 		    break;
 		
 		case 28:
-		    //void set_current_messagewindow(struct desktop_d *desktop, struct window_d *window); 
 		    set_current_messagewindow( (struct desktop_d *) arg1, (struct window_d *) arg2); 
 		    break;
 		
         case 29:
-		    //void set_current_traywindow(struct desktop_d *desktop, struct window_d *window); 
 		    set_current_traywindow( (struct desktop_d *) arg1, (struct window_d *) arg2); 
 		    break;
 
 		case 30:	
-		    //void set_current_tooltipwindow(struct desktop_d *desktop, struct window_d *window); 
 		    set_current_tooltipwindow( (struct desktop_d *) arg1, (struct window_d *) arg2);
             break;		
 
 		case 31:
-		    //void change_foreground(struct desktop_d *desktop);
             change_foreground( (struct desktop_d *) arg1);
             break;
 
 		case 32:
-		    //void set_current_sysMenu(struct desktop_d *desktop, struct menu_d *menu);
 		    set_current_sysMenu( (struct desktop_d *) arg1, (struct menu_d *) arg2);
 		    break;
 		
 		case 33:
-		    //void set_current_dialogsysMenu(struct desktop_d *desktop, struct menu_d *menu);
 		    set_current_dialogsysMenu( (struct desktop_d *) arg1, (struct menu_d *) arg2);
             break; 
 		 
 		case 34:
-		    //void set_current_menuHScroll(struct desktop_d *desktop, struct menu_d *menu);
 		    set_current_menuHScroll( (struct desktop_d *) arg1, (struct menu_d *) arg2);
 		    break;
 		
 		case 35:
-		    //void set_current_menuVScroll(struct desktop_d *desktop, struct menu_d *menu);
 		    set_current_menuVScroll( (struct desktop_d *) arg1, (struct menu_d *) arg2);
             break;
 
@@ -390,16 +381,12 @@ void *systemRam( int number,
 		
         case 36:
 		    // create_menu_item: Menus são verticais.
-            //int create_menu_item(struct menu_d *menu, unsigned char *string, int status);
-            return (void*) create_menu_item( (struct menu_d *) arg1, (unsigned char *) arg2, (int) arg3);
+            return (void*) create_menu_item( (struct menu_d *) arg1, 
+			                                 (unsigned char *) arg2, 
+											 (int) arg3 );
             break;        
 		
 		case 37:
-            //void *create_menu( struct window_d *pwindow,    //Parent window. 
-            //                   unsigned long iCount,        //Contagem de ítems. 
-            //				   unsigned long sCount,        //Contagem de espaçadores.
-            //				   int type,                    //Horizontal ou vertical.
-            //				   int style );                 //Estilo.
             return (void *) create_menu( (struct window_d *) arg1,  //Parent window. 
                                          (unsigned long) arg2,      //Contagem de ítems. 
         				                 (unsigned long) arg3,      //Contagem de espaçadores.
@@ -410,12 +397,10 @@ void *systemRam( int number,
         //User session suport:
 
         case 38:
-		    //void *CreateUserSession(int userID); 
 		    return (void *) CreateUserSession( (int) arg1); 
 		    break;
 
 		case 39:
-            //void *get_current_user_session();
             return (void *) get_current_user_session();
 			break;
 
@@ -425,20 +410,6 @@ void *systemRam( int number,
 		//40
 		//CreateWindow: Cria uma janela com base em um tipo.
 		case 40:
-           //void *CreateWindow( unsigned long type,  //1 - tipo de janela (popup ..normal ...)
-           //unsigned long status,           //2  - estado da janela (ativa ou nao)
-           //unsigned long view,             //3  - (min, max ...)
-           //char* windowname,               //4  - titulo                                
-           //unsigned long x,                //5  - deslocamento em relação às margens do desktop(sua instancia)        
-           //unsigned long y,                //6  - idem
-           //unsigned long width,            //7  - largura da janela  
-           //unsigned long height,           //8  - altura
-           //struct window_d *pWindow,       //9  - id da janela mae, se for zero, essa é a janela mae.
-           //unsigned long onde,             //10 - (qual desktop)
-           //unsigned long arg11,            //11 - ? reservado
-           //unsigned long color             //12 - cor do bg (para janelas simples, tipo 1)
-           //);
-
             return (void *) CreateWindow( (unsigned long) arg1,  //1 - tipo de janela (popup ..normal ...)
                                           (unsigned long) arg2,  //2  - estado da janela (ativa ou nao)
                                           (unsigned long) 0,     //3  - (min, max ...)
@@ -455,69 +426,103 @@ void *systemRam( int number,
 			break;
 
 		case 41:	
-            //int RegisterWindow(struct window_d *window);
             return (void*) RegisterWindow( (struct window_d *) arg1);
 			break;
 			
-		case 42: set_current_window( (struct window_d *) arg1); break;
+		case 42: 
+		    set_current_window( (struct window_d *) arg1); 
+			break;
 			
 		case 43:	
-            //void *get_current_window();
             return (void *) get_current_window();
 			break;
 			
-		case 44:	
-            //int resize_window(struct window_d *window, unsigned long cx, unsigned long cy);		  
+		case 44:			  
             return (void *) resize_window( (struct window_d *) arg1, (unsigned long) arg2, (unsigned long) arg3 );		  
             break;
 			
 		case 45:	
-			//int replace_window(struct window_d *window, unsigned long x, unsigned long y);
 			return (void *) replace_window( (struct window_d *) arg1, (unsigned long) arg2, (unsigned long) arg3 );
 			break;
 
 		//...
 		
 		case 46:	
-            //int redraw_window(struct window_d *window);
             return (void*) redraw_window( (struct window_d *) arg1);
 			break;
 
 		case 47:
-		    //int is_window_full(struct window_d *window);
 		    return (void*) is_window_full( (struct window_d *) arg1);
 			break;
 
 		case 48:
-		    //int is_window_maximized(struct window_d *window);
 		    return (void*) is_window_maximized( (struct window_d *) arg1);
             break;
 			
 		case 49:
-		    //int is_window_minimized(struct window_d *window);
 		    return (void*) is_window_minimized( (struct window_d *) arg1);
 			break;
 			
 		case 50:
-		    //int get_active_window();
 		    return (void*) get_active_window();
             break;
 			
 		//Window support.	
-		case 51: set_active_window( (struct window_d *) arg1); break;
-		case 52: change_active_window( (int) arg1); break;
-		case 53: CloseWindow( (struct window_d *) arg1 ); break;
-		case 54: DestroyWindow( (struct window_d *) arg1); break;
-		case 55: CloseActiveWindow(); break;
-		case 56: MinimizeWindow( (struct window_d *) arg1 ); break;
-		case 57: MaximizeWindow( (struct window_d *) arg1 ); break;
-		case 58: windowShowWindowList(); break;
-		case 59: show_window_with_focus(); break;
-		case 60: show_active_window(); break;
-		case 61: refresh_screen(); break;
-		case 62: windowSwitchFocus(); break;
-		case 63: windowLock( (struct window_d *) arg1); break;
-		case 64: windowUnlock( (struct window_d *) arg1); break;			
+		case 51: 
+		    set_active_window( (struct window_d *) arg1); 
+			break;
+			
+		case 52: 
+		    change_active_window( (int) arg1); 
+			break;
+			
+		case 53: 
+		    CloseWindow( (struct window_d *) arg1 ); 
+			break;
+			
+		case 54: 
+		    DestroyWindow( (struct window_d *) arg1); 
+			break;
+			
+		case 55: 
+		    CloseActiveWindow(); 
+			break;
+			
+		case 56: 
+		    MinimizeWindow( (struct window_d *) arg1 ); 
+			break;
+			
+		case 57: 
+		    MaximizeWindow( (struct window_d *) arg1 ); 
+			break;
+			
+		case 58: 
+		    windowShowWindowList(); 
+			break;
+			
+		case 59: 
+		    show_window_with_focus(); 
+			break;
+			
+		case 60: 
+		    show_active_window(); 
+			break;
+			
+		case 61: 
+		    refresh_screen(); 
+			break;
+			
+		case 62: 
+		    windowSwitchFocus(); 
+			break;
+			
+		case 63: 
+		    windowLock( (struct window_d *) arg1); 
+			break;
+			
+		case 64: 
+		    windowUnlock( (struct window_d *) arg1); 
+			break;			
 		
 		case 65:
 		    return (void*) windowCreateDedicatedBuffer( (struct window_d *) arg1);
@@ -525,11 +530,6 @@ void *systemRam( int number,
 
         
 		case 66:
-			//void pixelPutPixelDedicatedWindowBuffer( struct window_d *window, 
-            //                                         unsigned long x, 
-            //										 unsigned long y, 
-            //										 unsigned long color );
-
 			pixelPutPixelDedicatedWindowBuffer( (struct window_d *) arg1, 
                                                 (unsigned long) arg2, 
             								    (unsigned long) arg3, 
@@ -537,11 +537,6 @@ void *systemRam( int number,
 			break;
          
 		case 67: 
-           //void pixelPutPixelWindowBuffer( void* buffer, 
-           //                          unsigned long x, 
-           //						  unsigned long y, 
-           //						  unsigned long color );
-
            pixelPutPixelWindowBuffer( (void*) arg1, 
                                       (unsigned long) arg2, 
            						      (unsigned long) arg3, 
@@ -549,12 +544,6 @@ void *systemRam( int number,
 		   break;
 
         case 68:
-            //void draw_text( struct window_d *window,
-            //                unsigned long x,  
-            //                unsigned long y,  
-            //				unsigned long color, 
-            //				unsigned char *string );
-
             draw_text( (struct window_d *) arg1,
                        (unsigned long) arg2,  
                        (unsigned long) arg3,  
@@ -566,15 +555,18 @@ void *systemRam( int number,
 		//...
 		
 		//Background.
-		case 69: backgroundDraw( (unsigned long) arg1); break;
+		case 69: 
+		    backgroundDraw( (unsigned long) arg1); 
+			break;
 		   
         case 70:
-            //void *getClientAreaRect();
             return (void *) getClientAreaRect();
 		    break;
 			
 		//Set focus on a window.	
-        case 71: SetFocus( (struct window_d *) arg1 ); break;
+        case 71: 
+		    SetFocus( (struct window_d *) arg1 ); 
+			break;
 			
 		//Pega o id da janela com o foco de entrada.
         case 72: 
@@ -582,28 +574,25 @@ void *systemRam( int number,
 			break;
 			
 		//Kill window focus.	
-        case 73: KillFocus( (struct window_d *) arg1 ); break;
+        case 73: 
+		    KillFocus( (struct window_d *) arg1 ); 
+			break;
 			
         case 74:
-            //void MessageBox( struct window_d *parent_window, int type,char *title, char *string);
-            MessageBox( (struct window_d *) arg1, (int) arg2, (char *) arg3, (char *) arg4);
+            MessageBox( (struct window_d *) arg1, 
+			            (int) arg2, 
+						(char *) arg3, 
+						(char *) arg4 );
 			break;
 			
         case 75:  
-            //void DialogBox(struct window_d *parent_window, int type, char *title, char *string);
-            DialogBox( (struct window_d *) arg1, (int) arg2, (char *) arg3, (char *) arg4);
+            DialogBox( (struct window_d *) arg1, 
+			           (int) arg2, 
+					   (char *) arg3, 
+					   (char *) arg4 );
 			break;
 			
         case 76:
-            //void draw_button( struct window_d *window,
-            //                  unsigned char *string, 
-            //                  unsigned long type, 
-            //                  unsigned long x, 
-            //                  unsigned long y, 
-            //                  unsigned long width, 
-            //                  unsigned long height, 
-            //                  unsigned long color);
-
             draw_button( (struct window_d *) arg1,
                          (unsigned char *) arg2, 
                          (unsigned long) arg3, 
@@ -615,18 +604,19 @@ void *systemRam( int number,
 		    break;
 			
         case 77:
-            //int StatusBar(struct window_d *window, unsigned char *string1, unsigned char *string2);
-            return (void*) StatusBar( (struct window_d *) arg1, (unsigned char *) arg2, (unsigned char *) arg3);
+            return (void*) StatusBar( (struct window_d *) arg1, 
+			                          (unsigned char *) arg2, 
+									  (unsigned char *) arg3 );
             break;
 			
         case 78: 
-            //void *create_menubar(struct window_d *pwindow); 
             return (void *) create_menubar( (struct window_d *) arg1); 
             break;
 			
         case 79:  
-            //int create_menubar_item(struct menu_d *menu, unsigned char *string, int status);
-            return (void*) create_menubar_item( (struct menu_d *) arg1, (unsigned char *) arg2, (int) arg3);
+            return (void*) create_menubar_item( (struct menu_d *) arg1, 
+			                                    (unsigned char *) arg2, 
+												(int) arg3 );
 		    break;
 		
         case 80:
@@ -634,7 +624,7 @@ void *systemRam( int number,
             //return (void*) draw_menubar_item( (struct window_d *) arg1, (unsigned char *) arg2);
             break;
 			
-     //Window station support: (desktop pools.)
+        //Window station support: (desktop pools.)
 
 	    case 81:
             //int RegisterWindowStation(struct wstation_d *ws);
@@ -642,17 +632,14 @@ void *systemRam( int number,
             break;
 			
         case 82:
-            //void set_current_windowstation(struct wstation_d *ws);
             set_current_windowstation( (struct wstation_d *) arg1);
             break;
 			
         case 83:
-            //void *get_current_windowstation();
             return (void *) get_current_windowstation();
 		    break;
 			
         case 84:
-            //void *CreateWindowStation(struct usession_d *s);
             return (void *) CreateWindowStation( (struct usession_d *) arg1);
 		    break;
 
@@ -666,7 +653,6 @@ void *systemRam( int number,
         //cursor support:
     
 	    case 86:
-	        //void set_up_cursor(unsigned long x, unsigned long y);
 	        set_up_cursor( (unsigned long) arg1, (unsigned long) arg2);
 		    break;
 			
@@ -681,7 +667,6 @@ void *systemRam( int number,
         // ss signal support:
     
 	    case 89:
-	        //int signalSend(struct process_d *process ,int signal);
 	        return (void*) signalSend( (struct process_d *) arg1, (int) arg2);	
 		    break;
 			
@@ -1126,35 +1111,37 @@ void *systemDevicesUnblocked( int number,
 	    //int farReturn();
         //break;
 	
-	    case 13: return (void *) getFlags( (int) arg1); break;
+	    case 13: 
+		    return (void *) getFlags( (int) arg1); 
+			break;
 	
 	    //case 14:
 	    //int setFlags(int variable);
         //break;
 	
 	    case 15:
-	    return (void*) kernelProcessorInPort8( (int) arg1, (int) arg2);
-        break;
+	        return (void*) kernelProcessorInPort8( (int) arg1, (int) arg2);
+            break;
 	
 	    case 16:
-	    return (void*) kernelProcessorOutPort8( (int) arg1, (int) arg2);
-        break;
+	        return (void*) kernelProcessorOutPort8( (int) arg1, (int) arg2);
+            break;
 	
 	    case 17:
-	    return (void*) kernelProcessorInPort16( (int) arg1, (int) arg2);
-        break;
+	        return (void*) kernelProcessorInPort16( (int) arg1, (int) arg2);
+            break;
 	
 	    case 18:
-	    return (void*) kernelProcessorOutPort16( (int) arg1, (int) arg2);
-        break;
+	        return (void*) kernelProcessorOutPort16( (int) arg1, (int) arg2);
+            break;
 	
 	    case 19:
-	    return (void*) kernelProcessorInPort32( (int) arg1, (int) arg2); 
-        break;
+	        return (void*) kernelProcessorInPort32( (int) arg1, (int) arg2); 
+            break;
 	
 	    case 20:
-	    return (void*) kernelProcessorOutPort32( (int) arg1, (int) arg2);
-        break;
+	        return (void*) kernelProcessorOutPort32( (int) arg1, (int) arg2);
+            break;
 	
 	    //case 21:
 	    //int Push(int value);
@@ -1194,7 +1181,9 @@ void *systemDevicesUnblocked( int number,
 	    //void init_cpu();
         //break;
 	
-	    case 30: return (void*) cpu_get_parameters(); break;
+	    case 30: 
+		    return (void*) cpu_get_parameters(); 
+			break;
 		
 	    //case 31:	
 	    //void get_cpu_intel_parameters();
@@ -1204,8 +1193,13 @@ void *systemDevicesUnblocked( int number,
 	    //void get_cpu_amd_parameters();
         //break;
 	
-	    case 33: return (void*) KeTestCPU(); break;
-	    case 34: show_cpu_intel_parameters(); break;
+	    case 33: 
+		    return (void*) KeTestCPU(); 
+			break;
+			
+	    case 34: 
+		    show_cpu_intel_parameters(); 
+			break;
 
         // 
         // ide support: (hdd)
@@ -1213,51 +1207,60 @@ void *systemDevicesUnblocked( int number,
 	
 	    //Write.
 	    case 35:
-		taskswitch_lock();
-	    scheduler_lock();	
-	    //void write_lba( unsigned long address, unsigned long lba);    //ide.
-	    write_lba( (unsigned long) arg1, (unsigned long) arg2 );    //ide.
-		scheduler_unlock();
-	    taskswitch_unlock();			
-        break;
+		    taskswitch_lock();
+	        scheduler_lock();	
+	        write_lba( (unsigned long) arg1, (unsigned long) arg2 );    //ide.
+		    scheduler_unlock();
+	        taskswitch_unlock();			
+            break;
 	
 	    //Read.
         case 36:
-		taskswitch_lock();
-	    scheduler_lock();	
-        //address, lba
-        read_lba( (unsigned long) arg1, (unsigned long) arg2);     //ide.
-		scheduler_unlock();
-	    taskswitch_unlock();			
-        break;
+		    taskswitch_lock();
+	        scheduler_lock();	
+            //address, lba
+            read_lba( (unsigned long) arg1, (unsigned long) arg2);     //ide.
+		    scheduler_unlock();
+	        taskswitch_unlock();			
+            break;
 	
 	    //Read.
         case 37:
-        my_read_hd_sector( (unsigned long) arg1, 
-                           (unsigned long) arg2, 
-						   (unsigned long) arg3, 
-						   (unsigned long) arg4 );    
-        break;
+            my_read_hd_sector( (unsigned long) arg1, 
+                               (unsigned long) arg2, 
+				    		   (unsigned long) arg3, 
+					    	   (unsigned long) arg4 );    
+            break;
 
         //Write.
 	    case 38:
-        my_write_hd_sector( (unsigned long) arg1, 
-                            (unsigned long) arg2, 
-						    (unsigned long) arg3, 
-						    (unsigned long) arg4 );    
-        break;
+            my_write_hd_sector( (unsigned long) arg1, 
+                                (unsigned long) arg2, 
+				    		    (unsigned long) arg3, 
+					    	    (unsigned long) arg4 );    
+            break;
 
 
 	    //	
-        //keyboard support:
+        // keyboard support:
         //
 	
-	    case 39: keyboard_set_leds( (char) arg1); break; //Set LEDs.
-	    case 40: return (void*) get_alt_status(); break; //alt status.	
-	    case 41: return (void*) get_ctrl_status(); break; //ctrl status.
+	    case 39: 
+		    keyboard_set_leds( (char) arg1); 
+			break; //Set LEDs.
+			
+	    case 40: 
+		    return (void*) get_alt_status(); 
+			break; //alt status.
+			
+	    case 41: 
+		    return (void*) get_ctrl_status(); 
+			break; //ctrl status.
 	
 	    //Input. (put in command buffer)
-	    case 42: return (void*) input( (unsigned long) arg1); break;
+	    case 42: 
+		    return (void*) input( (unsigned long) arg1); 
+			break;
 		
 	    //
         // 43,44,45,46 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
@@ -1265,9 +1268,9 @@ void *systemDevicesUnblocked( int number,
 	
 	    //msg.window
 	    case 43:
-	    //@todo: windowGetWindowPointer
-        return NULL; //provisório.
-		break;
+	        //@todo: windowGetWindowPointer
+            return NULL; //provisório.
+		    break;
 	
 	    //msg.msg Pega na fila de mensagens da janela com o foco de entrada.
 	    case 44:
@@ -1295,30 +1298,50 @@ void *systemDevicesUnblocked( int number,
         // cmos and rtc support:
         //
 	
-	    case 47: return (void*) read_cmos_bcd( (unsigned) arg1); break;
-	    case 48: return (void*) get_time(); break; //time
-	    case 49: return (void*) get_date(); break; //adte.
+	    case 47: 
+		    return (void*) read_cmos_bcd( (unsigned) arg1); 
+			break;
+			
+	    case 48: 
+		    return (void*) get_time(); 
+			break; //time
+			
+	    case 49: 
+		    return (void*) get_date(); 
+			break; //adte.
 	
 	    //Get total memory. 
 	    case 50:
-	    //return (void*) GetTotalMemory();
-        break;
+	        //return (void*) GetTotalMemory();
+            break;
 		
-	    case 51: return (void*) get_cmos_info(); break;
+	    case 51: 
+		    return (void*) get_cmos_info(); 
+			break;
 
 	    //
         //screen support:
         //
 	
-	    case 52: return (void*) screenGetWidth(); break; //screen width.
-	    case 53: return (void*) screenGetHeight(); break; //screen height.
-	    case 54: screenRefresh(); break; //Refresh screen. (Backbuffer >> LFB.)
+	    case 52: 
+		    return (void*) screenGetWidth(); 
+			break; //screen width.
+			
+	    case 53: 
+		    return (void*) screenGetHeight(); 
+			break; //screen height.
+			
+	    case 54: 
+		    screenRefresh(); 
+			break; //Refresh screen. (Backbuffer >> LFB.)
 	
 	    //
         // Video support:
         //
 	
-	    case 55: return (void*) videoGetMode(); break; 	//Get video mode.
+	    case 55: 
+		    return (void*) videoGetMode(); 
+			break; 	//Get video mode.
 
 
         //...	
@@ -1462,15 +1485,22 @@ void *systemDevicesBlocked( int number,
 			break;
 			
 		//Out port.	
-	    case 19: outport32( (int) arg1, (int) arg2); break;
-	    case 20: outportb( (int) arg1, (int) arg2); break;
+	    case 19: 
+		    outport32( (int) arg1, (int) arg2); 
+			break;
+			
+	    case 20: 
+		    outportb( (int) arg1, (int) arg2); 
+			break;
 			
 	    case 21:
 	        //inline unsigned long inportl(unsigned long port);
 	        return (void*) inportl( (unsigned long) arg1 );
             break;
 			
-	    case 22: outportl( (unsigned long) arg1, (unsigned long) arg2); break;
+	    case 22: 
+		    outportl( (unsigned long) arg1, (unsigned long) arg2); 
+			break;
 	
 		//..
 		default:
@@ -1495,8 +1525,7 @@ void *systemThings( int number,
 		            unsigned long arg2,  
 		            unsigned long arg3,  
 		            unsigned long arg4 )
-{
-    //	
+{	
 	switch(number)
 	{
 		case 0: 
@@ -1504,16 +1533,16 @@ void *systemThings( int number,
 			break;
 
 		case 1:
-		break;
+		    break;
 
 		case 2:
-		break;
+		    break;
 		
 		default:
 		    return systemNull();
 		    break;
 		
-	}; //fim do switch.
+	};
 	
 done:
     return NULL;			   
@@ -1539,7 +1568,7 @@ void *systemLinkDriver( unsigned long arg1,
                         unsigned long arg2, 
 						unsigned long arg3 )
 {
-	MessageBox(gui->screen, 1, "systemLinkDriver:", "Linking a driver.." ); 
+	MessageBox(gui->screen, 1, "sm-sys-system-systemLinkDriver:", "Linking a driver.." ); 
 	//
 done:
     refresh_screen();	
@@ -1563,32 +1592,32 @@ void systemShowDevicesInfo()
 	//
 	
 #ifdef KERNEL_VERBOSE	
-	printf("sm-sys-systemShowDevicesInfo:\n");
+	printf("sm-sys-system-systemShowDevicesInfo:\n");
 #endif	
 	
     //Título.
-	printf("==== DEVICES: ==== \n\n");
+	printf(" == DEVICES: == \n\n");
     //...	
 	
 	//CPU Devices.
-	printf("*** CPU Info *** \n\n");
+	printf(" ** CPU Info ** \n\n");
 	show_cpu_intel_parameters();
 	//...
 	
 	//Memory Devices.
-	printf("*** Memory Info *** \n\n");
+	printf(" ** Memory Info ** \n\n");
 	//...
 	
 	//PCIE Devices (Graphic cards)
-	printf("*** Graphic Card Info *** \n\n");
+	printf(" ** Graphic Card Info ** \n\n");
 	//...
 	
 	//PCI Devices.
-	printf("*** PCI Devices *** \n\n");
+	printf(" ** PCI Devices ** \n\n");
 	pciInfo();
 	
 	//Legacy ...
-	printf("*** Legacy Devices Info *** \n\n");
+	printf(" ** Legacy Devices Info ** \n\n");
 	//...
 	
 	//
@@ -1641,7 +1670,7 @@ void *systemCreateSystemMenuBar()
 	                               0, 60, (800/4), (600-60), 
 							       gui->screen, 0, 0, COLOR_GRAY ); 
 	if( (void*) hwItemSystem == NULL ){
-		printf("systemCreateSystemMenuBar: hwItemSystem");
+		printf("sm-sys-system-systemCreateSystemMenuBar: hwItemSystem");
 		die();
 	}else{
 		
@@ -1678,7 +1707,7 @@ void systemSetupVersion()
 	//Version.
     Version = (void*) malloc( sizeof(struct version_d) );
     if((void*) Version == NULL){	
-	    printf("systemSetupVersion: Version");
+	    printf("sm-sys-system-systemSetupVersion: Version");
         die();  
 	}else{	
         Version->Major = SYSTEM_VERSIONMAJOR;
@@ -1690,7 +1719,7 @@ void systemSetupVersion()
 	//VersionInfo.
     VersionInfo = (void*) malloc( sizeof(struct version_info_d) );
     if((void*) VersionInfo == NULL){	
-	    printf("systemSetupVersion: VersionInfo");
+	    printf("sm-sys-system-systemSetupVersion: VersionInfo");
 		die();
 	}else{
 		
@@ -1826,9 +1855,8 @@ int SystemMenu()
 	
 	//Se houve falha na criação da janela.
 	if( (void *) hWindow == NULL ){
-	    printf("SystemMenu error: Window Struct.\n");
-		refresh_screen();
-		while(1){}	
+	    printf("sm-sys-system-SystemMenu: hWindow\n");
+		die();
 	};
 	
 	//Se houve falha na criação do menu.
@@ -2174,7 +2202,7 @@ void systemReboot()
 done:
     refresh_screen();
 	sleep(8*8000);
-	MessageBox(gui->screen, 1, "systemReboot:","Rebooting..");
+	MessageBox(gui->screen, 1, "sm-sys-system-systemReboot:","Rebooting..");
     refresh_screen();
 	KiReboot();
 hang: 
@@ -2191,7 +2219,7 @@ void systemShutdown()
 	 
 	//@todo ...
 
-	MessageBox(gui->screen, 1, "systemShutdown:","I's safe to turnoff your computer.");
+	MessageBox(gui->screen, 1, "sm-sys-system-systemShutdown:","I's safe to turnoff your computer.");
 	
 	//Nothing.
 	
@@ -2237,7 +2265,7 @@ void systemShutdownViaAPM()
 	//};
 	
 hang:	
-    printf("sm-sys-systemShutdownViaAPM:\n");
+    printf("sm-sys-system-systemShutdownViaAPM:\n");
 	die();
 };
 
@@ -2376,21 +2404,21 @@ int systemStartUp()
 		set_up_cursor(0,1);
 		
 #ifdef KERNEL_VERBOSE		
-        printf("sm-sys-systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
+        printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
 #endif		
 		
 #ifdef KERNEL_VERBOSE		
 		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
 		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
-		    printf("sm-sys-systemStartUp: %s\n",developer_edition_string);
+		    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
 		};
 #endif
 
 #ifdef KERNEL_VERBOSE
-		printf("sm-sys-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
-		                                                         ,(unsigned long) SavedX
-																 ,(unsigned long) SavedY
-																 ,(unsigned long) SavedBPP );
+		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
+		                                                                       ,(unsigned long) SavedX
+											       					           ,(unsigned long) SavedY
+																               ,(unsigned long) SavedBPP );
 #endif
 
         //
@@ -2398,11 +2426,11 @@ int systemStartUp()
         //		
 
 #ifdef KERNEL_VERBOSE		
-	    printf("sm-sys-systemStartUp: Initializing Runtime..\n");
+	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
 #endif			
 	    Status = (int) KiInitRuntime();
 	    if(Status != 0){
-	        printf("sm-sys-systemStartUp error: Runtime.\n");
+	        printf("sm-sys-system-systemStartUp error: Runtime.\n");
 		    die();
 	    };		
         
@@ -2413,11 +2441,11 @@ int systemStartUp()
 #ifdef KERNEL_VERBOSE
 		//(inicializa as 4 fases.)
 	    // Básico. ( Variáveis globais e estruturas ... ).
-	    printf("sm-sys-systemStartUp: Initializing Basics..\n");
+	    printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
 #endif		
         Status = (int) init(); 
 	    if(Status != 0){
-	        printf("sm-sys-systemStartUp error: init\n");
+	        printf("sm-sys-system-systemStartUp error: init\n");
 	        die();
 	    };	
         //...	 
@@ -2522,18 +2550,17 @@ void die()
 	// Refresh.	
 	// HALT.
 	
-    printf("* System Halted!");    //Bullet.  
+    printf("sm-sys-system-die: * System Halted!\n");    //*Bullet.  
 	
 	if(VideoBlock.useGui == 1){
 	    refresh_screen();
 	};
 halt:
 	asm("hlt");   
-	while(1){
-		
-	asm("cli");
-	asm("hlt");                        //Halt system.
-	
+	while(1)
+	{
+		asm("cli");
+	    asm("hlt");                        //Halt system.
 	};     	
 };
 

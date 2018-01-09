@@ -33,11 +33,14 @@
 //...
 
 //
+// # This is a spiritual quote.
 // Estruturas para fases de inicialização.
 // De uso interno no debug.
 // Just for fun. (user's mental model)
 // ux4, ux3, ux2, ux1
 // hal/microkernel/executive/gramado
+// thinking, logic, creativity, action
+//
 
 typedef enum {
    MYTHIC,  	
@@ -55,8 +58,6 @@ struct Mind_d
 	unsigned long Naturalist;	
 };
 Mind_t Mind;
-
-
 
 
 //Internas.
@@ -121,13 +122,10 @@ int debug_check_inicialization()
 {
     int Status = 0;
 	
-    //	
 	// Check phase.
-	//
-	
 	if(KeInitPhase != 3){
 	   Status = 1;
-	   printf("debug_check_inicialization: Initialization fail! fase={%d} \n",KeInitPhase);
+	   printf("sm-debug-debug_check_inicialization: KeInitPhase phase={%d}\n",KeInitPhase);
 	   goto fail;
 	};
 	
@@ -150,7 +148,7 @@ int debug_check_inicialization()
 	// Executive.
 	if(Initialization.executive != 1){
 	   Status = 1;
-	   printf("debug_check_inicialization: Executive fail!\n");
+	   printf("sm-debug-debug_check_inicialization: executive\n");
 	   goto fail;
 	};
 	//SetMind(REALIST);
@@ -159,7 +157,7 @@ int debug_check_inicialization()
 	// Microkernel.
     if(Initialization.microkernel != 1){
 	   Status = 1;
-	   printf("debug_check_inicialization: Microkernel fail!\n");
+	   printf("sm-debug-debug_check_inicialization: microkernel\n");
 	   goto fail;
 	};
 	//SetMind(ROMANTIC);
@@ -167,7 +165,7 @@ int debug_check_inicialization()
 	// Hal.
     if(Initialization.hal != 1){
 	   Status = 1;
-	   printf("debug_check_inicialization: Hal fail!\n");
+	   printf("sm-debug-debug_check_inicialization: hal\n");
 	   goto fail;
 	};
 	//SetMind(MYTHIC);
@@ -179,10 +177,7 @@ int debug_check_inicialization()
 done:
     return (int) Status;
 fail:
-	if(VideoBlock.useGui == 1){
-	    refresh_screen();
-	};
-	while(1){}; 
+	die(); 
 };
 
 
@@ -221,19 +216,14 @@ done:
 };
 
 
-
 /*
  * debug_breakpoint:
  *     Para a execução do sistema.
  *     @todo: isso pode ir para o arquivo debug.c.
  */
-void debug_breakpoint()
-{
-    printf("debug_breakpoint:");
-    if(VideoBlock.useGui == 1){
-	    refresh_screen();   
-    }; 
-	while(1){};
+void debug_breakpoint(){
+    printf("sm-debug-debug_breakpoint:\n");
+	die();
 };
 
 
@@ -270,16 +260,14 @@ int debug()
 	
 	Status = (int) debug_check_inicialization();
 	if(Status == 1){
-	   printf("debug fail: Initialization.\n");
-	   refresh_screen();
-	   while(1){}
+	   printf("sm-debug-debug: debug_check_inicialization\n");
+	   die();
 	};
 	
-    // Estrutura 'processor'.	
+    // 'processor' struct.	
 	if( (void*) processor == NULL ){
-	    printf("debug fail: Struct.\n");
-		refresh_screen();
-		while(1){}
+	    printf("sm-debug-debug: processor\n");
+		die();
 	};
 
 	//Check drivers status. 
@@ -312,11 +300,11 @@ int debug()
 	// Checar a estrutura da PID 0.
 	// 
 	 
-	if( (void*) threadList[0] == NULL ){
-	    printf("debug fail: TID 0!\n");
-		refresh_screen();
-		while(1){}
-	};
+	//if( (void*) threadList[0] == NULL ){
+	//    printf("debug fail: TID 0!\n");
+	//	refresh_screen();
+	//	while(1){}
+	//};
 	
 	
 

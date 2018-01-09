@@ -117,18 +117,16 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
 
 	Process = (void*) processList[ProcessID]; 		
 	if( (void*) Process == NULL ){
-		printf("create_thread: Process struct\n");
-		refresh_screen();
-		while(1){}
+		printf("pc-thread-create_thread: Process\n");
+		die();
 	};
 	
 	//Alocando memória para a estrutura da thread.
 	//Obs: Estamos alocando memória dentro do heap do kernel.
 	Thread = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) Thread == NULL ){
-	    printf("create_thread:");
-		refresh_screen();
-		while(1){}
+	    printf("pc-thread-create_thread: Thread\n");
+		die();
 	}else{  
 	    //Indica à qual proesso a thread pertence.
 	    //Thread->process = (void*) Process;
@@ -276,18 +274,6 @@ get_next:
 		//page directory do processo ao qual a thread pertence.
 		Thread->Directory = (unsigned long ) Process->Directory; 
 
-
-
-		
-		
-		
-
-		
-	
-		
-		 
-	    
-
 		//@todo: Por enquanto as threads são criadas usando o diretório de páginas do kernel.
 		
 
@@ -297,9 +283,6 @@ get_next:
         //Ticks ...
         //DeadLine ... 
 
-	 
-
-	
 		
 		//Thread->PreviousMode  //ring???
 		
@@ -307,10 +290,6 @@ get_next:
 		
 		//Thread->event
 		
-  	
-	
-	
-	
 	
 	    //
 	    // ORDEM: O que segue é referenciado com pouca frequencia.
@@ -325,10 +304,6 @@ get_next:
 		//Thread->window_station
 		//Thread->desktop
          
-
-
-	
-
 		
 		//Thread->control_menu_procedure
 		
@@ -520,7 +495,7 @@ void show_thread_information()
 	
 	Current = (void*) threadList[current_thread];
 	if( (void*) Current == NULL){
-	    printf("show_thread_information:\n");	
+	    printf("pc-thread-show_thread_information:\n");	
 	    return;
 	}else{
 	    

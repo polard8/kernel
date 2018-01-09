@@ -160,7 +160,7 @@ int kMain(int argc, char* argv[])
     systemSystem();	
 	Status = (int) systemInit();    	
     if(Status != 0){	
-		printf("kMain fail: System Init.\n");
+		printf("main-kMain: systemInit\n");
 		KernelStatus = KERNEL_ABORTED; 
 		goto fail;		
 	};
@@ -184,7 +184,7 @@ int kMain(int argc, char* argv[])
 	KernelProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0xC0001000, 
 	                                      PRIORITY_HIGH, (int) 0, "KERNEL-PROCESS", RING0, (unsigned long ) KERNEL_PAGEDIRECTORY );	
 	if((void*) KernelProcess == NULL){
-		printf("kMain: KernelProcess\n");
+		printf("main-kMain: KernelProcess\n");
 		die();
 	}else{
     
@@ -200,7 +200,7 @@ int kMain(int argc, char* argv[])
 	InitProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
 	                                      PRIORITY_HIGH, (int) KernelProcess->pid, "IDLEPROCESS", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY );	
 	if((void*) InitProcess == NULL){
-		printf("kMain: InitProcess\n");
+		printf("main-kMain: InitProcess\n");
 		die();
 	}else{
         //processor->IdleProcess = (void*) IdleProcess;	
@@ -210,7 +210,7 @@ int kMain(int argc, char* argv[])
 	ShellProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
 	                                       PRIORITY_HIGH, (int) KernelProcess->pid, "SHELLPROCESS", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	
 	if((void*) ShellProcess == NULL){
-		printf("kMain: ShellProcess\n");
+		printf("main-kMain: ShellProcess\n");
 		die();
 	}else{
 		//...
@@ -221,11 +221,16 @@ int kMain(int argc, char* argv[])
 	TaskManProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
 	                                         PRIORITY_LOW, KernelProcess->pid, "TASKMANPROCESS", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	
 	if((void*) TaskManProcess == NULL){
-		printf("kMain: ShellProcess\n");
+		printf("main-kMain: TaskManProcess\n");
 		die();
 	}else{
 		//...
-	}	
+	}
+
+
+    //
+    // *** NÃO HÁ PROBLEMA EM CRIAR MANUALMENTE AS PRIMEIRAS THREADS DO SISTEMA ***
+    //	
 	
 		
 	//
@@ -238,10 +243,11 @@ int kMain(int argc, char* argv[])
 
 //createThreads:
 	
+	//====================================================
 	//Create Idle Thread. tid=0. ppid=0.
 	IdleThread = (void*) KiCreateIdle();	
 	if( (void*) IdleThread == NULL ){
-	    printf("kMain error: Create Idle Thread!");
+	    printf("main-kMain: IdleThread\n");
 		die();
 	}else{
 	    
@@ -252,13 +258,14 @@ int kMain(int argc, char* argv[])
         processor->NextThread    = (void*) IdleThread;
         processor->IdleThread    = (void*) IdleThread;		
 		//...		
-    };
+    };	
 	
 	
+	//=============================================
 	// Create shell Thread. tid=1. 
 	ShellThread = (void*) KiCreateShell();	
 	if( (void*) ShellThread == NULL ){
-	    printf("kMain error: Create Shell Thread!");
+	    printf("main-kMain: ShellThread\n");
 		die();
 	}else{
 		
@@ -266,11 +273,11 @@ int kMain(int argc, char* argv[])
 		//...		
     };
 	
-	
+	//===================================
 	//Create taskman Thread. tid=2. 
 	TaskManThread = (void*) KiCreateTaskManager();
 	if( (void*) TaskManThread == NULL ){
-	    printf("kMain error: Create TaskMan Thread!");
+	    printf("main-kMain: TaskManThread\n");
 		die();
 	}else{
 		
@@ -278,11 +285,16 @@ int kMain(int argc, char* argv[])
 		//...		
     };	
 	
+	
+	
+	
+	
+	
 //Kernel base Debugger.
 doDebug:
 	Status = (int) debug();	
 	if(Status != 0){    
-		MessageBox(gui->screen,1,"kMain ERROR","Debug Status Fail!");
+		MessageBox(gui->screen,1,"main-kMain","debug");
 		KernelStatus = KERNEL_ABORTED;	
 		goto fail;
 	}else{
@@ -401,7 +413,7 @@ done:
     };
 
 fail:
-    MessageBox(gui->screen,1,"kMain ERROR","Kernel main EXIT_FAILURE!");
+    MessageBox(gui->screen,1,"main-kMain","EXIT_FAILURE");
     refresh_screen();
     return (int) EXIT_FAILURE;
 };
@@ -430,20 +442,20 @@ void startStartIdle()
 	if((void*) IdleThread == NULL)
 	{
 		//printf("KeStartIdle error: Struct!\n");
-	    MessageBox(gui->screen,1,"ERRO","startStartIdle: struct");
+	    MessageBox(gui->screen,1,"main-startStartIdle","IdleThread");
         die();
 	}else{
 	    
 		//Checar se o programa já foi inicializado antes. 
 		//Ele não pode estar.
 	    if(IdleThread->saved != 0){
-	        printf("startStartIdle error: Context!\n");
+	        printf("main-startStartIdle: saved\n");
             die(); 			
 	    };
 	    
 		//Checar se o slot na estrutura de tarefas é válido.
 	    if(IdleThread->used != 1 || IdleThread->magic != 1234){
-	        printf("startStartIdle: IdleThread %d corrompida.\n", IdleThread->tid);
+	        printf("main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
             die(); 		
 	    };
 		
@@ -453,7 +465,7 @@ void startStartIdle()
 	
 	// State ~ Checa o estado da tarefa.	 
     if(IdleThread->state != STANDBY){
-        printf("startStartIdle error: State. Id={%d}\n",IdleThread->tid);
+        printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
 	    die(); 
     };
 	
@@ -496,6 +508,12 @@ done:
 	//        *IMPORTANTE Me parece que tem que configurar o PIT por último.
 	//
 
+	
+	//
+	//#importante;
+	// Os valores aqui devem vir da estrutura da thread idle e não 
+	// serem determinados.
+	//
 
     timerInit8253();
 
@@ -513,7 +531,7 @@ done:
                  " pushl $0x00401000      \n"    //eip.
                  " iret \n" );
 
-    panic("startStartIdle: *");
+    panic("main-startStartIdle: panic *");
 };
 
 
