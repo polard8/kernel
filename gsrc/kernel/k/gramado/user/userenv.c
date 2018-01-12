@@ -4,7 +4,7 @@
  * Descrição:
  * User Environment Manager, (UEM).
  * Cria o ambiente do usuário, Área de trabalho, onde o usuário interage 
- * com a máquina logo após o logon. 
+ * com a máquina (logo após o logon). 
  *
  * MB - Módulos incluídos no Kernel Base.
  *    
@@ -52,45 +52,29 @@
 void config_user();
 
 
-
 /*
+ *********************************************************************
  * startUserEnvironment:
  *     Cria um ambiente com janelas para usuário do tipo interativo.
- *     @todo: Todo esse trabalho gráfico não deve ser feito pelo kernel.
- *            Futuramente isso irá para um serviço de inicialização.
- *            Mudar o nome para userenvironmentStart(int argc, char* argv[]).
+ *     Obs: Isso não é realmente o ambiente que o usuário vai usar, mas sim 
+ * as janelas principais onde o aplicativo 'file manager' (explorer e taskbar) 
+ * vão criar juas janelas.
+ * 
+ * Mudar o nome para userenvironmentStart(int argc, char* argv[]).
  */
 int startUserEnvironment(int argc, char* argv[])
 {
-	int Status = 0;
-	int UserId;
-		
-    //
-	// GUI ~ Ítens básicos.
-	//
-   
-    //Cria. (background e navigation bar).
+    int Status = 0;
+
+    //Cria as principais janelas que servirão de base para 
+    //a interface gráfica.
     create_gui();
-	
-	//Inicializa.
-	init_gui(); 
-	
-	
-	//More?!
-	
-	if(gui->screen != NULL){
-	    StatusBar( gui->screen, "GUI", "User Environment");	
-    };
+
+    //Inicializa.
+    init_gui(); 
 
 done:
-	//
-	// Barra no topo, estilo Mac/Linux.
-	// Aqui vamos usar o procedimento da menubar.
-	//
-	
-	//menubarX();
-
-    SetProcedure( (unsigned long) &system_procedure);	 
+    SetProcedure( (unsigned long) &system_procedure);
     return (int) Status;
 };
 
@@ -154,16 +138,15 @@ void *CreateUser(char *name, int type)
 	int Index = 0;	
    	struct user_info_d *New;
 
-	// New User struct.
 	New = (void*) malloc( sizeof(struct user_info_d) ); 
 	if( (void*) New == NULL ){
-	    printf("CreateUser:");
+	    printf("user-userenv-CreateUser:");
 	    die();
 	}else{
 	    
-		New->name = (char *) name;      //Name.
+		New->name = (char *) name;      
 	    New->name_address = (unsigned long) name;
-	    New->userType = type;    //Type.
+	    New->userType = type;    
 	
 	    New->sessionId       = current_usersession;      //Session. 
 	    New->windowstationId = current_windowstation;    //Window Station. (Desktop pool). 
@@ -209,7 +192,7 @@ void SetCurrentUserId(int user_id)
 {
 	//Limits.
 	if(user_id < 0 || user_id > USER_COUNT_MAX){
-		printf("SetCurrentUserId:\n");
+		printf("user-userenv-SetCurrentUserId:\n");
 		return;
 	};
     current_user = (int) user_id;

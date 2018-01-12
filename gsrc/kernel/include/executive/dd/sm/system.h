@@ -602,7 +602,7 @@ unsigned long registra_procedimento( unsigned long arg1,
  * SendMessage:
  *     Envia mensagem para um procedimento de janela.
  */									 
-void SendMessage( struct window_d *window, 
+unsigned long SendMessage( struct window_d *window, 
                   int msg, 
 				  unsigned long long1, 
 				  unsigned long long2 );

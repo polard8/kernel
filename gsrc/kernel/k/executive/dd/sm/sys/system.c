@@ -2581,6 +2581,7 @@ unsigned long systemGetSystemMetrics( int index )
 	//@todo:
 	//Função ainda não implementada.
 	
+	//print("#debug: systemGetSystemMetrics: i={%d} \n",index)
 	
 	switch(index)
 	{
@@ -2590,29 +2591,44 @@ unsigned long systemGetSystemMetrics( int index )
 		
 		//screen width.
 		case 1:
+		    return (unsigned long) screenGetWidth();
 		    break;
 			
 		//screen height.	
 		case 2:
+		    return (unsigned long) screenGetHeight();
             break;		
 			
 		//cursor width.	
 		case 3:
+		    return (unsigned long) g_cursor_width;
             break;		
 
 		//cursor hight.	
 		case 4:
+		    return (unsigned long) g_cursor_height;
             break;		
 			
 			
 		//mouse pointer width.	
 		case 5:
+		    return (unsigned long) g_mousepointer_width;
             break;		
          
 		//mouse pointer height. 
 		case 6:
+		    return (unsigned long) g_mousepointer_height;
+            break;
+
+		//char width.	
+        case 7:
+		    return (unsigned long) get_char_width();
             break;		
 
+		//char height.	
+        case 8:
+		    return (unsigned long) get_char_height();
+            break;		
 
 		//...
 		

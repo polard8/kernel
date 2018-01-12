@@ -370,7 +370,7 @@ noArgs:
 	apiBeginPaint();
 	
 	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, VIEW_MAXIMIZED," {} SHELL.BIN ",
+	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
 	                                   shell_window_x, shell_window_y, shellWindowWidth, shellWindowHeight,    
                                        0, 0, COLOR_BLACK, 0x83FCFF00 );	   
 	if((void*) hWindow == NULL){	
@@ -390,6 +390,20 @@ noArgs:
 	printf("Testing resize window\n");
 	APIresize_window( hWindow, 640, 480);
 	*/
+	
+	
+
+	
+	//
+	// ** criando a top bar.
+	//
+	
+	//#bug bug
+	//enterCriticalSection();    // * Enter Critical Section.
+	shellCreateTopBar();
+	//exitCriticalSection();     // * Exit Critical section.	
+	
+	
 	apiEndPaint();
 	
 	//
@@ -431,7 +445,7 @@ noArgs:
 	
 	
 	enterCriticalSection();    // * Enter Critical Section.	
-	Status = (int) shellInit(); 
+	Status = (int) shellInit(hWindow); 
 	if(Status != 0){
 		printf("[SHELL.BIN]: app_main: shellInit fail!");
 		refresh_screen();
@@ -442,14 +456,7 @@ noArgs:
 	
 	
 	
-	//
-	// ** criando a top bar.
-	//
 	
-	//#bug bug
-	//enterCriticalSection();    // * Enter Critical Section.
-	//shellCreateTopBar();
-	//exitCriticalSection();     // * Exit Critical section.		
     	
 	
 	
@@ -816,7 +823,9 @@ done:
 	    //Debug.
 		//refresh_screen(); //Obs: #bugbug perceba que o procedimento de janela do sistema também tem um refresh screen.
 	//};	
-    return (unsigned long) 0;	
+	
+	return (unsigned long) apiDefDialog(window,msg,long1,long2);
+    //return (unsigned long) 0;	
 };
 
 
@@ -1061,6 +1070,13 @@ do_compare:
 	};	
 
 
+    //metrics
+	if( strncmp( prompt, "metrics", 7 ) == 0 ){
+		shellShowMetrics();
+        goto exit_cmp;
+	};	
+
+	
 	// newfile
 	if( strncmp( prompt, "newfile", 7 ) == 0 )
 	{
@@ -1242,17 +1258,20 @@ void shellShell()
 	//window position
 	//shell_window_x = DEFAULT_WINDOW_X;
 	//shell_window_y = DEFAULT_WINDOW_Y;
-	shell_window_x = 10;
-	shell_window_y = 100;
+	shell_window_x = (800/2);
+	shell_window_y = (600/8);
 
 	
 	//screen sizes
-	shellScreenWidth = 800;
-    shellScreenHeight = 600;
+	shellScreenWidth  = (800/2);
+    shellScreenHeight = (600 - (600/8) );//600;
 	
 	//window height
-	shellWindowWidth = (DEFAULT_MAX_COLUMNS*8);
-    shellWindowHeight = (DEFAULT_MAX_ROWS*8);
+	//shellWindowWidth = (DEFAULT_MAX_COLUMNS*8);
+    //shellWindowHeight = (DEFAULT_MAX_ROWS*8);
+	
+	shellWindowWidth = (800/2);
+	shellWindowHeight = (600 - (600/8) );
 	
     shellMaxColumns = DEFAULT_MAX_COLUMNS; //80;
     shellMaxRows    = DEFAULT_MAX_ROWS; //25;
@@ -1318,7 +1337,7 @@ done:
  * de escrever mas agora na janela do outro aplicativo.
  * ?? o que fazer ?? sincronização?? 
  */
-int shellInit()
+int shellInit( struct window_d *window )
 {
 	int PID;
 	int PPID;
@@ -1327,14 +1346,10 @@ int shellInit()
 	void *P;
 
 	
-	//
-	// @todo: Usar essa rotina para fazer testes de modo texto.
-	//
-	
-	//Constructor.
-	//shellShell(); 
-
-
+	APISetFocus( window );
+	shellSetCursor(0,4);
+	shellPrompt();
+    
 	// ...Testing strings on Client Area 
     printf("shellInit: Running tests ...\n");		
 	
@@ -1775,6 +1790,7 @@ void shellTestLoadFile()
 /*
  * shellTestThreads:
  *     Cria um thread e executa.
+ *     #bugbug ...já funcionou uma vez.
  */
 void shellTestThreads()
 {
@@ -2005,148 +2021,6 @@ void shellInsertNullTerminator()
 };
 
 
-/*
- * bmpDisplayBMP:
- *     Mostra na tela uma imagem .bmp carregada na memória.
- */
-void bmpDisplayBMP( void *address, 
-                    unsigned long x, 
-					unsigned long y, 
-					int width, 
-					int height )
-{
-	
-	int i, j, base, offset;	
-	unsigned long left, top, bottom;
-	unsigned long color;
-	
-	base = 0x36;  //início da área de dados do bmp
-	
-	//limits
-	
-	//@todo: Refazer isso
-	if( x > 800 ){ return; }
-	if( y > 600 ){ return; }
-	if( width > 800 ){ return; }
-	if( height > 600 ){ return; }
-	
-	if(address == 0){return;}
-	
-	left = x;    //
-	top  = y; 
-	bottom = top + height;
-	
-	//base do bmp carregado na memória
-	unsigned char *bmp = (unsigned char *) address;
-	unsigned char *c   = (unsigned char *) &color;
-	
-	
-	for(i=0; i<height; i++)
-	{
-		for(j=0; j<width; j++)
-		{	
-			//construindo o char.
-			
-			offset = base;
-			c[1] = bmp[offset];
-			
-			offset = base+1;
-			c[2] = bmp[offset];
-			
-			offset = base+2;
-			c[3] = bmp[offset];
-			
-			c[0] = 0;
-			
-			base = base + 3;
-			
-			//put pixel.
-			//number,cor,x,y
-			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, 
-			             (unsigned long) color, 
-						 (unsigned long) left, 
-						 (unsigned long) bottom );
-						 
-			//my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
-			
-			left++; //próximo pixel.
-		}
-		
-		//vamos para a linha anterior.
-		bottom = bottom-1;
-		left = x;    //reiniciamos o x.
-	};	
-	
-	return;
-};
-
-
-/*
- * shellTestDisplayBMP:
- *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
- *
- */
-void shellTestDisplayBMP()
-{	
-	//
-	// #bugbug @todo: Aumenta o tamanho do heap do processo.
-	// Esse heap é gerenciando nas bibliotecas ou na API.
-	//Obs: 32Kb é alem do limite.
-	//
-	
-	void *b = (void*) malloc(1024*30); 	// testando malloc.
-    if( (void*) b == NULL ){
-		printf("shellTestDisplayBMP: allocation fail\n");
-		//while(1){}
-	}
-	
-	//Carregando o arquivo.
-loadFile:
-    //@todo: Usar alguma rotina da API específica para carregar arquivo.
-	// na verdade tem que fazer essas rotinas na API.
-	system_call( SYSTEMCALL_READ_FILE, 
-	             (unsigned long) bmp1_file_name, 
-				 (unsigned long) b, 
-				 (unsigned long) b);	
-	
-	
-
-	//16x16
-	bmpDisplayBMP( b, 10, 450, 16, 16 );
-	 
-	 
-    //
-	//Mostrando informações sobre o arquivo.
-	//
-	
-	//base do bmp carregado na memória
-	//unsigned char *bmp = (unsigned char *) b;
-	
-	
-	//@todo: encontrando o magic
-	
-	//if( bmp[0] != 0x42 )
-	//{
-	//	printf("~Sig fail\n");
-	//    printf("magic0 %c\n", bmp[0]);	
-	//    printf("magic1 %c\n", bmp[1]);			
-	//	printf("buffer %x\n",bmp); //Ok
-    //    printf("buffer %x\n",b);   //Ok
-		//printf("width %d \n", bmp[0x12]);
-		//printf("height %d \n", bmp[0x16]);
-	//}
-	
-	//
-	//Mostrando características do bmp.
-	
-	//printf("magic0 %c\n", bmp[0]);	
-	//printf("magic1 %c\n", bmp[1]);
-	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
-	//printf("buffer %x \n",bmp);
-	//printf("data area address %x \n",&bmp[base]);
-		
-};
-
 
 /*
  * shellTestMBR:
@@ -2171,95 +2045,6 @@ void shellTestMBR()
 }
 
 
-/*
- * shellCreateTopBar:
- *
- *     CRIANDO A TOP BAR.
- *     Obs: Essa é uma janela filha.
- *     @todo: ?? e o procedimento de janela ?? e as mensagens ??
- *     Obs: É uma janela simples e limpa, feita para dispositivos IOT 
- * com resolução 800x600.
- *
- */
-void shellCreateTopBar()
-{
-	// Topbar window.
-	topbarWindow = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar ",     
-                                       0, 0, 800, (600/8),    
-                                       0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	   
-	if((void*) topbarWindow == NULL){	
-		printf("shellCreateTopBar: topbar Window fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-	    //Registrar.
-    APIRegisterWindow(topbarWindow);
-	
-	//
-	// icon 1 window
-	//
-	
-	unsigned long iconMaxWidth  = (600/8);
-	unsigned long iconMaxHeight = (600/8);
-
-	i1Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
-                                       2, 2, (iconMaxWidth-4), (iconMaxHeight-4),    
-                                       0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
-	if((void*) i1Window == NULL){	
-		printf("shellCreateTopBar: icon1 Window fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-    //Registrar.
-    APIRegisterWindow(i1Window);
-	
-	//
-	// icon 2 window
-	//
-
-	i2Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
-                                       (2+(iconMaxWidth-4)+2), 2, (iconMaxWidth-4), (iconMaxHeight-4),    
-                                       0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
-	if((void*) i2Window == NULL){	
-		printf("shellCreateTopBar: icon2 Window fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-	//Registrar.
-    APIRegisterWindow(i2Window);
-	
-	//
-	// BMP . LABELS
-	//
-	
-    /*
-	 ** isso funcionou.
-	void *b;
-	b = (void*) malloc(1024*30); 	// testando malloc.
-    if( (void*) b == NULL ){
-		printf("shellTestDisplayBMP: allocation fail\n");
-		//while(1){}
-	}
-	
-	//Carregando o arquivo.
-loadFile:
-    //@todo: Usar alguma rotina da API específica para carregar arquivo.
-	// na verdade tem que fazer essas rotinas na API.
-	system_call( SYSTEMCALL_READ_FILE, 
-	             (unsigned long) bmp1_file_name, 
-				 (unsigned long) b, 
-				 (unsigned long) b);	
-	
-	
-
-	//16x16
-	bmpDisplayBMP( b, 2, 2, 16, 16 );	
-	bmpDisplayBMP( b, 2+16+2, 2, 16, 16 );		
-	*/	
-};
 
 
 /*
@@ -2281,6 +2066,42 @@ void move_to( unsigned long x, unsigned long y )
 	return;
 };
 
+
+
+void shellShowMetrics()
+{
+	unsigned long screen_width;
+	unsigned long screen_height;
+	unsigned long cursor_width;
+	unsigned long cursor_height;
+	unsigned long mouse_pointer_width;
+	unsigned long mouse_pointer_height;
+	unsigned long char_width;
+	unsigned long char_height;
+	
+	//...
+
+	screen_width = apiGetSystemMetrics(1);
+	screen_height = apiGetSystemMetrics(2);
+	cursor_width = apiGetSystemMetrics(3);
+	cursor_height = apiGetSystemMetrics(4);
+	mouse_pointer_width = apiGetSystemMetrics(5);
+	mouse_pointer_height = apiGetSystemMetrics(6);
+	char_width = apiGetSystemMetrics(7);
+	char_height = apiGetSystemMetrics(8);
+	//...
+	
+	
+	printf("shellShowMetrics:\n");
+	printf("screenWidth={%d} screenHeight={%d}\n",screen_width,screen_height);
+	printf("cursorWidth={%d} cursorHeight={%d}\n",cursor_width,cursor_height);
+	printf("mousepointerWidth={%d} mousepointerHeight={%d}\n",mouse_pointer_width,mouse_pointer_height);
+	printf("charWidth={%d} charHeight={%d}\n",char_width,char_height);	
+	//...
+	
+printf("done\n");	
+	return;
+}
 
 
 /*

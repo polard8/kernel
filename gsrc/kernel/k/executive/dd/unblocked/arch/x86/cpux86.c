@@ -24,6 +24,20 @@
 
 
 
+#define CPUX86_CR0_CD  (1 << 30)
+#define CPUX86_CR0_NW  (1 << 29)
+#define CPUX86_CR0_PG  (1 << 31)
+#define CPUX86_CR4_MPE (1 << 11)
+#define CPUX86_CR4_PCE (1 << 8)
+#define CPUX86_CR4_PGE (1 << 7)
+#define CPUX86_CR4_PAE (1 << 5)
+#define CPUX86_CR4_PSE (1 << 4)
+
+
+//função interna
+//habilita cache.
+void cpux86_enable_caches();
+
 /*
  * get_cpu_intel_parameters:
  *     Pega os parâmetros da cpu x86 através da instrução cpuid.
@@ -414,6 +428,20 @@ done:
 };
 
 
+
+//habilita cache.
+//credits: barrelfish
+void cpux86_enable_caches()
+{
+    uint32_t cr0;
+
+    __asm volatile("mov %%cr0, %[cr0]" : [cr0] "=r" (cr0));
+    cr0 &= ~CPUX86_CR0_CD;
+    cr0 &= ~CPUX86_CR0_NW;
+    __asm volatile("mov %[cr0], %%cr0" :: [cr0] "r" (cr0));
+}  
+
+
 /*
  * init_intel:
  *     Inicializa processador Intel.
@@ -421,6 +449,9 @@ done:
  */
 int init_intel()
 {
+	
+	cpux86_enable_caches();
+	
 	// Get info.
 	get_cpu_intel_parameters();
 	return (int) 0;

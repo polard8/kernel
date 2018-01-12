@@ -171,21 +171,35 @@ void create_gui()
 	// Configura quais janelas devem ser pintadas.
 	//
 	
-    if(g_guiMinimal == 1){		
-        SetGuiParameters(0,1,1,0,0,1,0,0,0,0,0,0); 	
+    if(g_guiMinimal == 1)
+	{		
+
+        SetGuiParameters( 0,    //Refresh.         
+                          1,    //*Screen.          
+                          1,    //*Background.       
+                          0,    //Logo.            
+                          1,    //*Taskbar. #test.        
+                          1,    //*Main.(Desktop window, Área de trabalho) com base na taskbar.             
+                          0,    //Menu.           
+                          0,    //Info Box.         
+                          0,    //Message Box.       
+                          0,    //Debug.           
+                          0,    //Navigation Bar.    
+                          0 );  //Grid. #test.	
+						  
 	}else{
 		
         SetGuiParameters( 0,    //Refresh.         
                           1,    //*Screen.          
                           1,    //*Background.       
                           0,    //Logo.            
-                          0,    //Taskbar. #test.        
-                          1,    //*Main.(Desktop window, Área de trabalho)             
+                          1,    //*Taskbar. #test.        
+                          1,    //*Main.(Desktop window, Área de trabalho) com base na taskbar.             
                           0,    //Menu.           
                           0,    //Info Box.         
                           0,    //Message Box.       
                           0,    //Debug.           
-                          1,    //Navigation Bar.    
+                          0,    //Navigation Bar.    
                           0 );  //Grid. #test.	
 						   
 	};
@@ -199,18 +213,25 @@ void create_gui()
 		die();
 	};
 	
-	//
-	// Pinta as janelas da GUI que foram selecionadas. 
-	// 1) Screen, Background, Logo.
-	// 2) Main window, Navigation window
-	// 3) Taskbar, Menu ...
-	//
+	
+	//Grupo1:
+	//Base windows:
+	//screen,background,taskbar
+	
+	//grupo2
+	//main (com base na screen e na taskbar.)
+	
+	//grupo3
+	//outros.
+
 	
 //creatingWindows:
 	
+    	
 	//Grupo1:
-	//Screen, Background, Main and Logo.
-    
+	//Base windows:
+	//screen,background,taskbar
+	
 	if(gui->screenStatus == 1){ 
 	    gui_create_screen(); 
 	};
@@ -218,21 +239,27 @@ void create_gui()
 	if(gui->backgroundStatus == 1){	
 	    gui_create_background(); 
 	};
+
+	if(gui->taskbarStatus == 1){	
+	    gui_create_taskbar(); 
+	};
+
+	//grupo2
+	//main (com base na screen e na taskbar.)
+	
 	
     if(gui->mainStatus == 1){ 
 	    gui_create_mainwindow(); 
 	};
+
+	//grupo3
+	//outros.
+
 	
 	if(gui->logoStatus == 1){ 
 	    gui_create_logo(); 
 	};	
-
-	//Grupo2:
-	//Taskbar, Message box, Control menu and Navigation bar.
 	
-	if(gui->taskbarStatus == 1){	
-	    gui_create_taskbar(); 
-	};
 	
     if(gui->messageboxStatus == 1){ 
 	    gui_create_messagebox(); 
@@ -498,6 +525,60 @@ done:
 };
 
 
+
+/*
+ * gui_create_taskbar:
+ *      Cria a taskbar da área de trabalho. gui->taskbar.
+ *      Cria somente a janela que será uada pelo file manager.
+ * e que servirá de referência para a janela gui->main
+ *
+ */
+void gui_create_taskbar()
+{ 
+	struct window_d *hWindow; 
+
+	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
+	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();	
+	
+	if( (void*) gui == NULL ){
+        return;
+    };
+    	
+draw_bar:	
+
+    Height = (Height/8);
+
+	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "taskbar", 
+	                                Left, Top, Width, Height, 
+							        gui->screen, 0, 0, COLOR_WINDOW );
+									
+	if( (void*) hWindow == NULL)
+	{
+	    printf("gramado-gramado-gui_create_taskbar:\n");
+		die();
+	}
+	else
+	{
+	    RegisterWindow(hWindow);
+	    windowLock(hWindow); 
+	    
+		if( (void*) gui != NULL ){
+            gui->taskbarStatus = (int) 1;
+			gui->taskbar = (void*) hWindow;
+	    };
+		
+		//...
+	};
+	
+	//...
+	
+done:	
+	return; 
+};
+
+
 /*
  * gui_create_mainwindow:
  *      A área de trabalho.
@@ -518,9 +599,26 @@ void gui_create_mainwindow()
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
 	
-	if( (void*) gui == NULL ){
-        return;
-    };	
+	//estrutura gui.
+	if( (void*) gui == NULL )
+	{
+        printf("gui_create_mainwindow: gui\n");
+        die();
+	};
+
+	//janela taskbar.
+	if( (void*) gui->taskbar == NULL )
+	{
+        printf("gui_create_mainwindow: taskbar\n");
+        die();
+	};
+	
+	//
+	// Usando a janela taskbar como referência para criar a janela main.
+	//
+	
+	//Top = gui->taskbar->bottom;
+	
 	
 	//Window:
 	//Color? (?? Nem precisa pintar, mas precisa criar ??)
@@ -529,11 +627,11 @@ void gui_create_mainwindow()
 	//dispositivo.
 	//É onde ficam as janelas dos aplicativos.
 	//A janela principal perence ao desktop
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "desktop window", 
+	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "gramado desktop window", 
 	                                Left, Top, Width, Height,           
 							        gui->screen, 0, 0, COLOR_WINDOW );   
 	if( (void*) hWindow == NULL){
-	    printf("gui_create_mainwindow:");
+	    printf("gramado-gui_create_mainwindow:\n");
 	    die();
 	}else{   
 	    		
@@ -599,6 +697,10 @@ done:
  */
 void gui_create_logo()
 { 
+
+/*
+ * #suspensa
+ 
     struct window_d *hWindow; 
 	
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
@@ -640,86 +742,11 @@ void gui_create_logo()
 
 done:
 	SetFocus(hWindow);	
+	
+ */
     return; 
 };
 
-
-/*
- * gui_create_taskbar:
- *      Cria a taskbar da área de trabalho.
- *
- *      @todo: na verdade a taskbar na area de
- * trabalho deve ser a taskbar do aplicativo em user mode
- * responsável pelo gerenciamento de programas. Programm Manager.
- * o que inclui o menu iniciar. 
- * Quando a taskbar estiver na vertical, não poderá sobrepor
- * a GMB (Global Manu Bar). sendo ela seu limite superior.
- * 
- * @todo: Cria buffer dedicado.
- */
-void gui_create_taskbar()
-{ 
-	struct window_d *hWindow; 
-
-	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();	
-
-    //
-	// @todo: Criar o ambiente para a barra de tarefas (task bar).
-	//
-	
-	if( (void*) gui == NULL ){
-        return;
-    };		
-	
-draw_bar:	
-	//A navigation bar perence a janela principal.
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "TaskBar", 
-	                                Left, Top, Width, 32, 
-							        gui->screen, 0, 0, COLOR_BLUE );	
-	if( (void*) hWindow == NULL)
-	{
-	    printf("gui_create_taskbar:");
-		die();
-	}else{
-	    		
-	    RegisterWindow(hWindow);
-		set_active_window(hWindow); 
-	    windowLock(hWindow); 
-	    
-		if( (void*) gui != NULL ){
-            gui->taskbarStatus = (int) 1;
-			gui->taskbar = (void*) hWindow;
-	    };
-		
-		//Desktop.
-		//a janela pertence ao desktop 0
-	    //hWindow->desktop = (void*) desktop0;
-		
-	};
-	
-	//
-	// Buttons.
-	//
-	
-draw_buttons:
-
-	//Window Menu ( system menu ) fecha janelas e programas.
-    draw_button( (void*) gui->taskbarStatus, "Menu", 1, 0*(800/8), 8, 100, 24, COLOR_WINDOW);	
-				 		 
-	//File Menu (gerencia a criação de arquivos.)
-    draw_button( (void*) gui->taskbarStatus, "File", 1, 1*(800/8), 8, 100, 24, COLOR_WINDOW);	
-	
-	//
-    // Continua ...
-    //	
-    
-done:	
-	SetFocus(hWindow);
-	return; 
-};
 
 
 /*
@@ -731,6 +758,10 @@ done:
  */
 void gui_create_controlmenu()
 { 
+
+/*
+ * #suspensa
+ 
     struct window_d *cmWindow;
 	
 	if( (void*) gui == NULL ){
@@ -771,6 +802,8 @@ void gui_create_controlmenu()
 done:
     SetFocus(cmWindow);
     refresh_screen();
+	
+*/
     return; 
 };
 
@@ -853,6 +886,10 @@ done:
  */
 void gui_create_navigationbar()
 {
+	
+/*
+ * #suspensa
+ 
 	struct window_d *hWindow;  
 	
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
@@ -907,20 +944,21 @@ draw_buttons:
     //draw_text( gui->navigationbar, 1*(480/8), 8, COLOR_WINDOWTEXT, ".Desktop"); 	
 	
 	
-/*
-    * Text.   
-    if( (void*) gui->navigationbar != NULL )
-	{
-        //draw_text( gui->navigationbar, 1*(800/8), 8, COLOR_WINDOWTEXT, "/WindowStation0/Desktop0 GUI");
-        //draw_text( gui->navigationbar, 5*(800/8), 8, COLOR_WINDOWTEXT, "F1=HELP");
-	};
-*/	
+
+//    * Text.   
+//    if( (void*) gui->navigationbar != NULL )
+//	{
+//        //draw_text( gui->navigationbar, 1*(800/8), 8, COLOR_WINDOWTEXT, "/WindowStation0/Desktop0 GUI");
+//        //draw_text( gui->navigationbar, 5*(800/8), 8, COLOR_WINDOWTEXT, "F1=HELP");
+//	};	
 
 
     // Continua ...
     
 done:	
-    SetFocus(hWindow);     
+    SetFocus(hWindow); 
+
+*/    
 	return; 
 };
 

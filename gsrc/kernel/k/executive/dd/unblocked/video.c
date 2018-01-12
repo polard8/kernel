@@ -226,8 +226,13 @@ int videoInit()
 		//Cursor. 
 		g_cursor_x = 0;
 	    g_cursor_y = 8;	
+		
+		g_cursor_width = 8;
+		g_cursor_height = 8;
+		
 		g_cursor_color = COLOR_PINK;
-        g_cursor_left = 0;      // Margem esquerda dada em linhas.
+        
+		g_cursor_left = 0;      // Margem esquerda dada em linhas.
         g_cursor_top = 0;       // Margem superior dada em linhas.
 		g_cursor_right  = 256;  // Margem direita dada em linhas.
         g_cursor_bottom = 256;  // Margem inferior dada em linhas.

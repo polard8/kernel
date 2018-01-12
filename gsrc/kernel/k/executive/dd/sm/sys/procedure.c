@@ -224,10 +224,14 @@ unsigned long system_procedure( struct window_d *window,
 		case MSG_KEYDOWN:
             switch(long1)
             {
+				//usando o scape para fechar a janela com o foco de entrada.
                 case VK_ESCAPE:
 				    alt_status = 0;
 					ctrl_status = 0;
 					shift_status = 0;
+					//Mensagem para fechar a janela passada via argumento.
+					SendMessage(window,MSG_DEVELOPER,1,0);
+					//CloseWindow(window);
                     goto done;				
 				    break;
 				
@@ -322,10 +326,14 @@ unsigned long system_procedure( struct window_d *window,
 				    alt_status = 0;
 					ctrl_status = 0;
 					shift_status = 0;
-                    backgroundDraw(COLOR_BLACK);
-					printf("%s",stdin->_base);  //mostrar a entrada padrão.
-					refresh_screen();
-                    break;
+                    //backgroundDraw(COLOR_BLACK);
+					//printf("%s",stdin->_base);  //mostrar a entrada padrão.
+					//refresh_screen();
+                    
+					//tentando indica qual janela está com o foco de entrada.
+					draw_text(window,0,0,COLOR_PINK,"*");
+					refresh_rectangle( window->left, window->top, 8, 8 );
+					break;
 					
 				
 				//Kernel info.	
@@ -334,9 +342,10 @@ unsigned long system_procedure( struct window_d *window,
 				    alt_status = 0;
 					ctrl_status = 0;
 					shift_status = 0;
-                    backgroundDraw(COLOR_BLACK);
-					printf("%s",stdout->_base);  //mostrar a entrada padrão.
-					refresh_screen();					
+                   // backgroundDraw(COLOR_BLACK);
+					//printf("%s",stdout->_base);  //mostrar a entrada padrão.
+					//refresh_screen();
+                    
 					break;
 				
 	
@@ -346,9 +355,9 @@ unsigned long system_procedure( struct window_d *window,
 				    alt_status = 0;
 					ctrl_status = 0;
 					shift_status = 0;
-                    backgroundDraw(COLOR_BLACK);
-					printf("%s",stderr->_base);  //mostrar a entrada padrão.
-					refresh_screen();
+                   // backgroundDraw(COLOR_BLACK);
+					//printf("%s",stderr->_base);  //mostrar a entrada padrão.
+					//refresh_screen();
 					break;
 					
 				//Window tests.	
@@ -609,9 +618,9 @@ unsigned long system_procedure( struct window_d *window,
         //enviadas para o console para gerenciamento do sistema.
         //como desligamentos, inicializações, reboot ...		
         //case MSG_CONSOLE:
-		case MSG_CONSOLE_COMMAND:
+		//case MSG_CONSOLE_COMMAND:
             //goto do_terminal;		
-			break;
+		//	break;
 		 
         //Continua ... Create ... Close ...		
         //case MSG_CREATE:
@@ -630,10 +639,26 @@ unsigned long system_procedure( struct window_d *window,
 	    //    break;
 		//case MSG_PAINT:
 	    //    break;
+		
+		//Dialogo especial:
+		//Serve para funções provisórias usadas pelo desenvolvedor 
+		//do sistema operacional.
+		case MSG_DEVELOPER:
+		    switch(long1)
+			{
+				//fechar message box em kernel mode.
+				case 1:
+				    CloseWindow(window);
+				break;
+				
+				default:
+				break;
+			}
+			break;
 
 			
 	    //
-		// Aqui provavelmente estamos com teclas de digita~çao.
+		// Aqui provavelmente estamos com teclas de digitação.
 		// então não precisamos efetuar o refresh_screen() deixando isso 
 		// para o procedimento de janela do aplicativo
 		//
@@ -738,36 +763,12 @@ void SetProcedure(unsigned long proc)
  *            atravéz de uma estrutura que contenha esses quatro 
  *            argumentos na forma de parâmetros. 
  */
-void SendMessage( struct window_d *window, 
+unsigned long SendMessage( struct window_d *window, 
                   int msg, 
 				  unsigned long long1, 
 				  unsigned long long2 )
 {
-    unsigned long Old;
-
-    if( (void *) window == NULL){
-	    return;
-	};
-	
-	//Salva o procedimento antigo.
-	Old = (unsigned long) g_next_proc;
-	
-	//Usa o procedimento da janela.
-	g_next_proc = (unsigned long) window->procedure;
-	
-	//@todo Check limits.
-	if( (unsigned long) g_next_proc == 0 ){
-		g_next_proc = (unsigned long) Old;
-		return; 
-	}else{
-	    //Send.
-        system_dispatch_to_procedure(window, msg, long1, long2);
-		return;
-	};
-	
-	//Se tudo deu errado, não envia nada e volta a usar o antigo.
-	g_next_proc = (unsigned long) Old;
-	return;
+	return (unsigned long) system_procedure(window,msg,long1,long2);
 };
 
 

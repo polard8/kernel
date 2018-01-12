@@ -214,9 +214,7 @@ void shellScroll();
 //...
 
 
-// top bar.
-// child window.
-void shellCreateTopBar();
+
 
 
 //buffer support.
@@ -257,9 +255,10 @@ void shellThread();
 void shellTestLoadFile();
 void shellTestThreads();
 void shellTestMBR();
-void shellTestDisplayBMP();
-void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
+
+
 int test_operators();
+void shellShowMetrics();
 //...
 
 // Wait for commands.
@@ -270,12 +269,24 @@ void shellWaitCmd();
 unsigned long shellCompare(struct window_d *window);    //Compare command. 
  
 // Initialization. 
-int shellInit();                 //Init.
+int shellInit( struct window_d *window );                //Init.
 void shellShell();               //Constructor. 
  
 // Finalizing ... 
 // ??exit, die... 
  
+ 
+//
+// shelui.c
+//
+
+// top bar.
+void shellCreateTopBar(); 
+void shellTestDisplayBMP();
+void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
+
+
+
 //
 // End.
 //

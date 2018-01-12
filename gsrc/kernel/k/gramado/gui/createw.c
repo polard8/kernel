@@ -279,13 +279,10 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		
 		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
 		    printf("CreateWindow: CurrentColorScheme validation");
-		    die();
-			//refresh_screen();
-		    //while(1){}			
+		    die();			
 		};
 		//Nothing.
 	};
-	
 	
 	
 	
@@ -881,7 +878,8 @@ drawBegin:
 						   
 		//ressaltando a barra de títulos da janala com o foco de entrada.
         //quem deve ser pintada diferente é a janela com o foco de entrada e não a janela ativa.		
-        if(window->id == window_with_focus)
+        //if(window->id == window_with_focus)
+		if(window->id == active_window)
 		{
             drawDataRectangle( window->left, 
 		                       window->top, 

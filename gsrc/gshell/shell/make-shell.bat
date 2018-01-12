@@ -11,12 +11,14 @@ echo -{ Creating head.o ...
 echo -{ Creating main.o ...
     rem crt0.o não deve ser compilado aqui ... isso é só um teste.
     gcc  -c  crt0.c -o crt0.o 	
-	gcc  -c  main.c  -o main.o  
+	gcc  -c  main.c  -o main.o 
+    gcc  -c  shellui.c  -o shellui.o	
 	
 :SetingObjects		
 set myObjects=head.o ^
 crt0.o ^
 main.o ^
+shellui.o ^
 api.o ^
 stdio.o ^
 stdlib.o ^

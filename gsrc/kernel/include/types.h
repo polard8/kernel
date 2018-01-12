@@ -9,9 +9,8 @@
 
 #define NULL ((void *)0)
  
-#define TRUE 1
 #define FALSE 0
-
+#define TRUE 1
 
 
 //
@@ -41,7 +40,7 @@ typedef void *HMENU;               //Menu.
 //typedef void *RPC_HANDLE;            //Remote Procedure Call Handle.
 //typedef void *LPC_HANDLE;            //Local Procedure Call Handle.
 //...
-//typedef HANDLE KERNELHANDLE;
+
 
 
 

@@ -107,6 +107,7 @@
 #define MSG_CONSOLE_COMMAND 49
 #define MSG_CONSOLE_SHUTDOWN 50
 #define MSG_CONSOLE_REBOOT   51
+#define MSG_DEVELOPER 52
 //...
 
  
@@ -201,9 +202,11 @@
 /*
  * char 
  */
+#define DEFAULT_CHAR_WIDTH   8
+#define DEFAULT_CHAR_HEIGHT  8
+
 #define CHAR_WIDTH   8
 #define CHAR_HEIGHT  8
-
 
 #define	BAR_STEPS   46
 #define LINE KERNEL_COL_MAX 
@@ -1183,21 +1186,174 @@ struct window_class_d
  */
 typedef struct window_d window_t;
 struct window_d
-{	
-    //
+{
+	
+//  
+// Deve estar em conformidade com a estrutura em user mode.	
+//==================================================		
+
     // Identificadores.
-    //
-    
 	object_type_t objectType;
 	object_class_t objectClass;		
 	
-    unsigned long id;              //Window Id. 
-	char *name;                    //Window name.
-	
+    unsigned long id;    //Window Id. 
+	char *name;          //Window name.
+	unsigned long type;  //tipo ... (editbox, normal, ...)  style???
 	
 	//Segurança.
 	int used;
-	int magic;
+	int magic;	
+	
+	// Características dessa janela..
+	
+	//Estado: (Full,Maximized,Minimized...)
+	int view;      	
+	
+	//dimensões e margens.
+    
+	unsigned long x;           //deslocamento x
+    unsigned long y;           //deslocamento y 
+    unsigned long width;       //largura
+    unsigned long height;      //altura   
+	
+    unsigned long left;        //margem esquerda 
+    unsigned long top;         //margem superior
+    unsigned long right;       //margem direita  
+    unsigned long bottom;      //margem inferior  
+
+    unsigned long color_bg;    //cor  	
+ 	
+// 
+//==================================================
+
+	//Msg support.
+	//Argumentos para o procedimento de janela.
+	struct window_d *msg_window;  //arg1.
+	int msg;                      //arg2.
+	unsigned long long1;          //arg3.
+	unsigned long long2;          //arg4.		
+	
+	int msgAlert;  //um alerta de que exite uma mensagem para essa janela.
+	
+	int sendOffset;
+	int receiveOffset;
+	
+	//Filas para uma janela receber mensagens.
+	//São os quatro argumentos de um procedimento de janela padrão.
+	
+	unsigned long hwndList[32];
+	unsigned long msgList[32];
+	unsigned long long1List[32];
+	unsigned long long2List[32];
+	
+	//procedure support. (poderia ser um argumento ou elemento da classe.)
+	unsigned long procedure;               //procedimento da janela
+    struct window_procedure_d *wProcedure; //procedure struct	
+	
+    int active;    //FAST FLAG. Essa será a flag de ativa ou não. (decidindo isso)
+    int focus;     //Se tem o foco de entrada ou não.
+
+// 
+//==================================================
+
+	// Parent support
+	unsigned long parentid;       //(Número da janela mãe).
+	struct window_d *parent;	  //Parent window.	
+	
+	// Child support.
+	struct window_d *childListHead;  //Lista encadeada de janelas filhas.
+    int childCount;                  //Tamanho da lista.
+    
+	
+// 
+//==================================================
+
+	// Client window support.
+    
+    //é a janela propriamente dita, excluindo a moldura e a barra de rolagem.
+	struct window_d *client_window;   	
+	struct rect_d *rcClient;     
+    unsigned long clientrect_color_bg;    //cor do retãngulo da área do cliente.
+		
+// 
+//==================================================
+		
+	unsigned long CursorX;
+	unsigned long CursorY;
+	unsigned long CursorColor;	
+
+// 
+//==================================================	
+
+
+	// Bars support.
+	// Cada tipo de janela tem seus itens específicos.
+	// Esses são os status dos ítens. Se eles estão presentes ou não.
+	
+	int backgroundUsed;
+	int shadowUsed;
+	int titlebarUsed;
+    int menubarUsed; 
+	int toolbarUsed;
+	int clientAreaUsed;
+	int statusbarUsed;
+	int scrollbarUsed;
+	int minimizebuttonUsed;
+	int maxmizebuttonUsed;
+	int closebuttonUsed;
+	
+
+// 
+//==================================================	
+
+	
+	// Buffer.
+	// DedicatedBuffer
+	// DedicatedBuffer --> LFB.
+	// Endereço de memória onde a janela foi pintada.
+	// Obs: Toda janela deve ter seu próprio buffer de pintura para poder 
+	// passar a janela direto de seu próprio buffer para o LFB, sem passar 
+	// pelo Backbuffer.
+	void *DedicatedBuffer;        //Qual buffer dedicado a janela usa.
+	void *BackBuffer;    //Qual backbuffer a janela usa.
+	void *FrontBuffer;   //Qual frontbuffer a janela usa. (LFB).	
+
+
+// 
+//==================================================
+
+	// Desktop support.
+	// A que desktop a janela pertence??
+	
+    int desktop_id;
+	struct desktop_d *desktop; 
+
+// 
+//==================================================
+
+	// Navegation.
+	struct window_d *prev;     
+	struct window_d *next;     //Next window.
+
+	// Trava. Se travada, não pode mudar nada.
+	// Enables or disables mouse and keyboard input to the specified window 
+	// or control.
+	int locked; 	
+	
+// Gramado v 0.1 usa essa estrutura somente até aqui.
+//==================================================
+
+	
+	//Posição do cursor para texto dentro da janela.
+	//Obs: Deve ser multiplo da altura e largura do caractere.
+	//Obs: Para cada janela o cursor pode estar em uma posição diferente.
+	//@todo: Deletar isso e começar usar a estrutura.
+	unsigned long cursor_x;
+	unsigned long cursor_y;
+
+	
+	//unsigned long Icon;
+	//unsigned long Cursor;    //@todo: Criar cursorx e cursory.	
 	
 	
 	//
@@ -1206,7 +1362,7 @@ struct window_d
 	
 	struct window_class_d *window_class;
 	
-	unsigned long type;                    //tipo ... (editbox, normal, ...)  style???
+//unsigned long scancodeList[32];	
 	
 	//flag
 	//se é um terminal ou não.
@@ -1230,15 +1386,8 @@ struct window_d
 	int style;   
 	
 	
-	//procedure support. (poderia ser um argumento ou elemento da classe.)
-	unsigned long procedure;               //procedimento da janela
-    struct window_procedure_d *wProcedure; //procedure struct
-	//unsigned long Icon;
-	//unsigned long Cursor;    //@todo: Criar cursorx e cursory.
-	
-	unsigned long CursorX;
-	unsigned long CursorY;
-	unsigned long CursorColor;
+//struct msg_d *msg;
+
 	
 	//unsigned long Background;
 	//int instance; //???	
@@ -1256,9 +1405,8 @@ struct window_d
 	//uma janela em modo full screen pode conter barras de rolagem.
 	//*embedded mode = dentro de uma janela ou de um navegador. 
 
-    //int active;    //FAST FLAG. Essa será a flag de ativa ou não. (decidido isso)
-    //int focus;     //Se tem o foco de entrada ou não.
-    int view;      //Estado: (Full,Maximized,Minimized...)	
+
+    
     //unsigned long status;                //ATIVA OU NÃO.
     unsigned long relationship_status;   //seu estatus de relacionamento com outras janelas.
 	
@@ -1271,18 +1419,10 @@ struct window_d
 	//Sua ordem em relação a janela gui->main.    
 	struct zorder_d *zorder;
 
-	//dimensões e margens.
-    unsigned long x;           //deslocamento x
-    unsigned long y;           //deslocamento y 
-    unsigned long width;       //largura
-    unsigned long height;      //altura    
-    unsigned long left;        //margem esquerda 
-    unsigned long top;         //margem superior
-    unsigned long right;       //margem direita  
-    unsigned long bottom;      //margem inferior       
-    
-    unsigned long color_bg;    //cor  
-    unsigned long clientrect_color_bg;    //cor do retãngulo da área do cliente.
+     
+    //void *buffer;        //Qual buffer dedicado a janela usa.
+
+
     //...definir mais cores.
 
 
@@ -1295,46 +1435,10 @@ struct window_d
 	//uada por esses recursos.
 	struct rect_d *rectList;
 
-	// Bars support.
-	// Cada tipo de janela tem seus itens específicos.
-	// Esses são os status dos ítens. Se eles estão presentes ou não.
+
+
 	
-	int backgroundUsed;
-	int shadowUsed;
-	int titlebarUsed;
-    int menubarUsed; 
-	int toolbarUsed;
-	int clientAreaUsed;
-	int statusbarUsed;
-	int scrollbarUsed;
-	int minimizebuttonUsed;
-	int maxmizebuttonUsed;
-	int closebuttonUsed;
-	//Continua.
-	
-	//Msg support.
-	//Argumentos para o procedimento de janela.
-	struct window_d *msg_window;    //arg1.
-	int msg;                    //arg2.
-	unsigned long long1;        //arg3.
-	unsigned long long2;        //arg4.	
-	
-	int msgAlert;  //um alerta de que exite uma mensagem para essa janela.
-	
-	//struct msg_d *msg;
-	
-	int sendOffset;
-	int receiveOffset;
-	
-	//Filas para uma janela receber mensagens.
-	//São os quatro argumentos de um procedimento de janela padrão.
-	
-	unsigned long hwndList[32];
-	unsigned long msgList[32];
-	unsigned long long1List[32];
-	unsigned long long2List[32];
-	
-	//unsigned long scancodeList[32];
+
 	
 	
 	//
@@ -1354,54 +1458,8 @@ struct window_d
 	int LineArrayPointerY;      //em qual coluna o ponteiro está.
 	//...
 	
-	
-	// Buffer.
-	// DedicatedBuffer
-	// DedicatedBuffer --> LFB.
-	// Endereço de memória onde a janela foi pintada.
-	// Obs: Toda janela deve ter seu próprio buffer de pintura para poder 
-	// passar a janela direto de seu próprio buffer para o LFB, sem passar 
-	// pelo Backbuffer.
-	//void *buffer;        //Qual buffer dedicado a janela usa.
-	void *DedicatedBuffer;        //Qual buffer dedicado a janela usa.
-	void *BackBuffer;    //Qual backbuffer a janela usa.
-	void *FrontBuffer;   //Qual frontbuffer a janela usa. (LFB).
-    //... 	
 
-	
-	//
-	// Parent support
-	//
-	
-	struct window_d *parent;	  //Parent window.	
-    unsigned long parentid;       //(Número da janela mãe).
-	
-	//
-	// Child support.
-	//
-	
-	//Lista encadeada de janelas filhas.
-	struct window_d *childListHead;
-    int childCount;    //Tamanho da lista.
-	
-	//
-	// Client window support.
-	//
-    
-	//Client window.
-    //é a janela propriamente dita, excluindo a moldura e a barra de rolagem.
-	struct window_d *client_window;   	
-	struct rect_d *rcClient;     	
-	
-	
-	//
-	// Desktop support.
-	// A que desktop a janela pertence??
-	//
-	
-
-	struct desktop_d *desktop;
-	int desktop_id;  
+ 
 
 
     //
@@ -1449,15 +1507,10 @@ struct window_d
 	// Text Cursor support.
 	//
 
+	//fica para uma versão estendida da estrutura.
 	//Estrutura de cursor para a janela.
     struct cursor_d	*cursor;
 	
-	//Posição do cursor para texto dentro da janela.
-	//Obs: Deve ser multiplo da altura e largura do caractere.
-	//Obs: Para cada janela o cursor pode estar em uma posição diferente.
-	//@todo: Deletar isso e começar usar a estrutura.
-	unsigned long cursor_x;
-	unsigned long cursor_y;
 	//unsigned long bgcolor;		// Background color.
 	//unsigned long fgcolor;		// Foreground color. 
 	
@@ -1472,17 +1525,12 @@ struct window_d
 	// Abaixo ficam os elementos referenciados com menor frequência.
 	//
 	
-	// Trava. Se travada, não pode mudar nada.
-	// Enables or disables mouse and keyboard input to the specified window 
-	// or control.
-	int locked;    
+   
 	
 	//linked list. ( a linked list da janela)
 	struct linkedlist_d *linkedlist;	
 	
-	// Navegation.
-	struct window_d *prev;     
-	struct window_d *next;     //Next window.	
+
 };
 window_t *CurrentWindow;    //Janela atual
 window_t *ActiveWindow;     //Janela atual.
@@ -1531,7 +1579,7 @@ window_t *FULLSCREEN_TABWINDOW;
 
 /*
  estrutura para tabs do navegador do kernel.
-
+ *@todo; Talvez deletar essa estrutura
  */
 typedef struct browser_tab_d browser_tab_t;
 struct browser_tab_d

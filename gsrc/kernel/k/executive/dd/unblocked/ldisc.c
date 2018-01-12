@@ -253,12 +253,7 @@ int mouse_pos_x;
 int mouse_pos_y;
 
 
-unsigned char *mousemsg;
-
-
-
-
-
+//unsigned char *mousemsg;
 
 
 //@todo: fazer rotina de get status algumas dessas variáveis.
@@ -1186,9 +1181,7 @@ int init_mouse()
 	
 	//
 	// Estamos espaço para o buffer de mensagens de mouse.
-	mousemsg = ( unsigned char *) malloc(32);
-	//@todo:
-	// Checar se não é NULL.
+	// mousemsg = ( unsigned char *) malloc(32);
 
 		
 	//Inicializando as variáveis usadas na rotina em Assemly
@@ -1199,6 +1192,10 @@ int init_mouse()
 	
 	//#bugbug: Essa inicialização está travando o mouse.
 	//fazer com cuidado.
+	
+	//#bugbug. Cuidado com essa inicializaçao.
+	g_mousepointer_width = 16;
+	g_mousepointer_height = 16;
 	
 	//Coordenadas do cursor.
     //mouse_x = (800/2);
@@ -1624,6 +1621,10 @@ done:
  */
 void kernelPS2MouseDriverReadData(void)
 {
+
+/*
+ * #suspensa !	
+	
     // Botões do mouse.
 	static volatile int button1, button2, button3;
     
@@ -1703,6 +1704,8 @@ takeSomeAction:
                 };
 				
 	//Nothing.	
+	
+*/
 	
 done:							
     return;

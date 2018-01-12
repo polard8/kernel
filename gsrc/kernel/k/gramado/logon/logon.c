@@ -507,11 +507,11 @@ void logon_create_mainwindow()
 	// um tamanho inicial para ela ja foi reservado.
 	//
 	
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Desktop window", 
-	                                (Width), Top, (Width), Height,           //meia tela como teste
-							         gui->screen, 0, 0, COLOR_BROWN );           //COR TESTE
+	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "logon desktop window", 
+	                                Left, Top, Width, Height,           
+							        gui->screen, 0, 0, COLOR_WINDOW  );      
 	if( (void*) hWindow == NULL){
-	    printf("logon_create_mainwindow:");
+	    printf("logon-logon-logon_create_mainwindow:\n");
 	    die();
 	}else{   
 	    		
@@ -644,6 +644,10 @@ void logon_create_debug(){
  */
 void logon_create_navigationbar()
 {
+	
+/*
+ * #suspensa
+ 
     struct window_d *hWindow; 
 
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
@@ -683,20 +687,18 @@ void logon_create_navigationbar()
 draw_buttons:	
     draw_button( gui->navigationbar, "MENU", 1, 2, 2, 48, 20, COLOR_BLACK);	
 	
- /*   
-	//Start
-    draw_button( gui->navigationbar, "F1=START", 1,  
-	             6*(480/8), 8, 100, 24, 
-				 COLOR_WINDOW);	
-    
-				 
-    //Reboot
-    draw_button( gui->navigationbar, "F2=REBOOT", 1,  
-	             8*(480/8), 8, 100, 24, 
-				 COLOR_WINDOW);	
-	
-	*/
-		
+   
+//	//Start
+//    draw_button( gui->navigationbar, "F1=START", 1,  
+//	             6*(480/8), 8, 100, 24, 
+//				 COLOR_WINDOW);	
+//    
+//				 
+//    //Reboot
+//    draw_button( gui->navigationbar, "F2=REBOOT", 1,  
+//	             8*(480/8), 8, 100, 24, 
+//				 COLOR_WINDOW);	
+			
 	
     //
     // Text.
@@ -707,7 +709,9 @@ draw_texts:
 	//draw_text( gui->navigationbar, 2*(480/8), 8, COLOR_WHITE, CurrentUser->name_address ); 
 	
 done:
-    SetFocus(hWindow);		
+    SetFocus(hWindow);	
+
+*/	
 	return; 
 };
 
@@ -732,6 +736,10 @@ void logon_create_grid(){
  */
 void logon_create_developer_screen()
 {
+	
+/*
+ * #suspensa
+ 
     struct window_d *hWindow; 
 	
 	//
@@ -830,6 +838,7 @@ done:
 		//while(1){};
 	};
 	
+*/
     return; 
 };
 

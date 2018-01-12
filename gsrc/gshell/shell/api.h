@@ -708,7 +708,7 @@
 
 //(250 ~ 255) Info support, get info.
 //Ou últimos oferecem informações sobre o sistema.
-#define	SYSTEMCALL_250                      250 
+#define	SYSTEMCALL_GETSYSTEMMETRICS         250 
 #define	SYSTEMCALL_251                      251
 #define	SYSTEMCALL_252                      252
 #define	SYSTEMCALL_253                      253
@@ -1542,6 +1542,140 @@
 //...
 
 
+
+//
+// object support
+//
+
+
+typedef enum {
+	
+	// **** EXECUTIVE  ****
+	
+	//ram
+	//Nothing for now.	
+    ObjectTypeNull,               //0 Null.
+	ObjectTypeASpace,             //1 Address Space. (memory address)
+	ObjectTypeDSpace,             //2 Disk Space.
+	ObjectTypeBank,               //3 Bank. (banco de dados).
+	//sm
+	ObjectTypeChannel,            //4 executive sm.
+	ObjectTypeDirectory,          //5 diretório de arquivos. executive sm.
+	ObjectTypeHeap,               //6 heap executive sm
+	ObjectTypeIoBuffer,           //7 i/o buffer executive sm
+	ObjectTypeIpAddress,          //8 ip address executivesm.
+	ObjectTypeProcessMemoryInfo,  //9 process memory info, executive sm.
+	ObjectTypePhysicalMemoryInfo, //10 physical memory info, executive sm.
+	ObjectTypeMemoryInfo,         //11 memory info, executive sm.
+	ObjectTypeMemoryBlock,        //12 ????? @todo: Ver se esse pode ser Criado sem prejudicar a alocação dinâmica. executive sm mm.	
+	ObjectTypePageDirectory,      //13 page directory. executive sm, mm.	
+	ObjectTypePageTable,          //14 pagepool , page table, executive ,sm,mm.	
+	ObjectTypePageFrame,          //15 page frame ,executive ,sm,mm.
+	ObjectTypeFramePool,          //16
+	ObjectTypeSocket,             //17 sockets, executive, sm.
+    ObjectTypeUserInfo,           //18 userinfo, executive, sm.
+	//uigm 
+	ObjectTypeDesktop,     //19 desktop, executive,uigm.	
+	ObjectTypeMenuItem,        //20 menuitem, executive uigm.
+	ObjectTypeMenu,        //21 menu, executive uigm.	
+	ObjectTypeUserSession, //22 User session, executive, uigm.	
+	ObjectTypeWindowProcedure,  //23 window procedure, executive, uigm.	
+	ObjectTypeRectangle,        //24 rectangle, executive, uigm. 	
+	ObjectTypeRGBA,             //25 rgba, executive, uigm. 
+	ObjectTypeWindow,           //26 window, executive ,uigm.
+	ObjectTypeWindowStation,  //27 desktop pool. window station, executive, uigm.
+	//uitm.
+	ObjectTypeConsole,        //28 console, executive, uitm.
+    ObjectTypeLine,           //29 console line, executive, uitm.
+	ObjectTypeTerminal,       //30 Terminal, executive, uitm.
+	
+    // **** MICROKERNEL  ****
+	
+	//microkernel
+	ObjectTypeProcess,  //31 Process, microkernel.
+	ObjectTypeSemaphore,  //32 semaphore, microkernel.	
+	ObjectTypeThread,     //33 thread, microkernel.
+	
+	//io 
+	//@todo: isso deverá ser criado aqui.
+	ObjectTypeCpu,  //34
+	ObjectTypeDma,  //35
+	
+	// **** HAL  ****
+	
+	ObjectTypeProcessor,  //36 processor, hal (talvez isso devesse ir para io de microkernel.)
+	
+	//device(unblocked e blocked).
+	ObjectTypeDevice,      //37 device, hal
+	ObjectTypeDiskInfo,    //38 disk info, hal.
+	ObjectTypeProcessorBlock, //39 processor block hal...(pode ir para io,microkernel)
+    ObjectTypeHostInfo,  //40 HostInfo, hal. 
+	ObjectTypeKeyboard,   //41 keyboard, hal.
+	ObjectTypeMacAddress,  //42 MAC Address, hal.
+	ObjectTypeMemory,      //43 memory card info, hal.
+	ObjectTypePciDevice,   //44 PCI device info, hal.
+	ObjectTypePciDeviceDriver,   //45 PCI device driver info, hal.
+	ObjectTypePIC, //46 pic controller, hal.
+	ObjectTypeRTC, //47 rtc controller, hal.
+	ObjectTypeScreen, //48 Screen, hal.
+	ObjectTypeTimer,    //49 ?? timer ,hal.	
+	ObjectTypeVideo,    //50 video ,hal.
+	ObjectTypeVolume,    //51 disk volume ,hal.
+	
+	//things
+	//@todo:
+	
+	// **** OUTROS  ****
+	ObjectTypeCursor,    //52 /include.
+	ObjectTypeRequest,   //53 request de kernel /include.
+	ObjectTypeSignal,    //54
+	ObjectTypeFile,      //55 file, /include. stdio.
+	ObjectTypeMetafile, //56 
+	ObjectTypeMutex,    //57
+	ObjectTypeToken,    //58 Token de acesso à objetos. (access token)
+	ObjectTypeFont,    //59
+	ObjectTypeIcon,     //60
+	ObjectTypePipe,     //61
+	
+	ObjectTypeGroup,     //62
+	ObjectTypeUser,      //63
+	
+	ObjectTypeComputer,      //64
+	ObjectTypeCpuRegister,   //65
+	
+	
+	ObjectTypeDisk,   //66
+	ObjectTypeDiskPartition,   //67 //info struct
+	ObjectTypeGDT,   //68
+	ObjectTypeLDT,   //69
+	ObjectTypeIDT,   //70
+	ObjectTypeTSS,   //71
+	
+	ObjectTypePort,  //72 (i/o port)
+	ObjectTypeController, //73
+	ObjectTypeKM, //74
+	ObjectTypeUM, //75
+	ObjectTypeColorScheme,  //76
+	ObjectTypeButton,       //77
+	ObjectTypeGrid,       //78
+	//...
+}object_type_t;
+
+//
+// Enumerando classes de objetos. (categorias)
+//
+typedef enum {
+	ObjectClassKernelObjects,  // Kernel Objects.
+	ObjectClassUserObjects,    // User Objects.
+	ObjectClassGuiObjects,     // Graphical User Interface Objects.
+	ObjectClassCliObjects,     // Command Line Interface Objects.
+    //...	
+}object_class_t;
+
+
+
+
+
 //
 // Application support.
 //
@@ -1648,20 +1782,170 @@ rect_t *rect;
 typedef struct window_d window_t;
 struct window_d
 {	
-    //
+
+ 
+// Deve estar em conformidade com a estrutura em user mode.	
+//==================================================	
+
     // Identificadores.
-    //
-    
-	//@todo: Crir isso no começo de todas as estruturas.
-	//object_type_t object_type = ObjectTypeWindow;
+	object_type_t objectType;
+	object_class_t objectClass;		
 	
-    unsigned long id;              //Window Id. 
-	char *name;                    //Window name.
+    unsigned long id;    //Window Id. 
+	char *name;          //Window name.
+	unsigned long type;  //tipo ... (editbox, normal, ...)  style???	
 	
 	//Segurança.
-	//int used;
-	//int magic;
+	int used;
+	int magic;
 	
+	// Características dessa janela..
+	int view;                  //Estado: (Full,Maximized,Minimized...)	
+	 
+    unsigned long x;           //deslocamento x
+    unsigned long y;           //deslocamento y 
+    unsigned long width;       //largura
+    unsigned long height;      //altura
+	
+    unsigned long left;        //margem esquerda 
+    unsigned long top;         //margem superior
+    unsigned long right;       //margem direita  
+    unsigned long bottom;      //margem inferior 
+
+    unsigned long color_bg;    //cor 	
+	
+ 
+//==================================================
+
+	//Msg support.
+	//Argumentos para o procedimento de janela.
+	struct window_d *msg_window;  //arg1.
+	int msg;                      //arg2.
+	unsigned long long1;          //arg3.
+	unsigned long long2;          //arg4.
+	
+	int msgAlert;  //um alerta de que exite uma mensagem para essa janela.
+	
+	int sendOffset;
+	int receiveOffset;
+	
+	//Filas para uma janela receber mensagens.
+	//São os quatro argumentos de um procedimento de janela padrão.
+	
+	unsigned long hwndList[32];
+	unsigned long msgList[32];
+	unsigned long long1List[32];
+	unsigned long long2List[32];
+	
+    unsigned long procedure;               //procedimento da janela
+    struct window_procedure_d *wProcedure; //procedure struct	
+	
+	int active;                   //Se é a janela ativa ou não.
+	int focus;                    //Se tem o foco de entrada ou não.
+
+ 
+//==================================================
+
+	// Parent support
+    unsigned long parentid;           //(Número da janela mãe).
+	struct window_d *parent;	  //Parent window.	
+	
+	// Child support.
+	struct window_d *childListHead;   //Lista encadeada de janelas filhas.
+    int childCount;                   //Tamanho da lista.	
+
+ 
+//==================================================
+
+	// Client window support.
+
+	//Client window.( A área de cliente pode ter uma moldura na forma de janela.)
+	struct window_d *client_window;   	
+	//O retângulo de input e output para cliente.
+	struct rect_d *rcClient;     // Client, usar '.'	
+	unsigned long clientrect_color_bg;    //cor do retãngulo da área do cliente.
+
+ 
+//==================================================
+	
+	unsigned long CursorX;
+	unsigned long CursorY;
+	unsigned long CursorColor;	
+	
+ 
+//==================================================
+
+	// Bars support.
+	// Cada tipo de janela tem seus itens específicos.
+	// Esses são os status dos ítens. Se eles estão presentes ou não.
+	
+	int backgroundUsed;
+	int shadowUsed;
+	int titlebarUsed;
+    int menubarUsed; 
+	int toolbarUsed;
+	int clientAreaUsed;
+	int statusbarUsed;
+	int scrollbarUsed;
+	int minimizebuttonUsed;
+	int maxmizebuttonUsed;
+	int closebuttonUsed;
+
+ 
+//==================================================	
+
+	
+	// Buffer.
+	// DedicatedBuffer
+	// DedicatedBuffer --> LFB.
+	// Endereço de memória onde a janela foi pintada.
+	// Obs: Toda janela deve ter seu próprio buffer de pintura para poder 
+	// passar a janela direto de seu próprio buffer para o LFB, sem passar 
+	// pelo Backbuffer.
+	void *DedicatedBuffer;        //Qual buffer dedicado a janela usa.
+	void *BackBuffer;    //Qual backbuffer a janela usa.
+	void *FrontBuffer;   //Qual frontbuffer a janela usa. (LFB). 	
+
+ 
+//==================================================
+
+	// Desktop support.
+	int desktop_id;    
+	struct desktop_d *desktop;
+
+ 
+//==================================================
+
+	// Navegation.
+	struct window_d *prev;     
+	struct window_d *next;     //Next window.
+	
+	// Trava.
+	//Enables or disables mouse and keyboard input to the specified window 
+	//or control.
+    //Se travada, não pode mudar nada.	
+	int locked;   
+
+// Gramado v 0.1 usa essa estrutura somente até aqui.
+//==================================================
+
+
+	unsigned long status;      //?? @todo: Deletar..
+	
+    
+	//Posição do cursor para texto dentro da janela.
+	//Obs: Deve ser multiplo da altura e largura do caractere.
+	//Obs: Para cada janela o cursor pode estar em uma posição diferente.
+	//@todo: Deletar isso e começar usar a estrutura.
+	unsigned long cursor_x;
+	unsigned long cursor_y;
+
+	//unsigned long Icon;
+	//unsigned long Cursor;    //@todo: Criar cursorx e cursory.		
+	
+	//struct msg_d *msg;
+	
+	//void *buffer;        //Qual buffer dedicado a janela usa.
 	
 	//
 	// Window Class support.
@@ -1670,102 +1954,22 @@ struct window_d
 	//@todo: Criar essa estrutura.
 	//struct window_class_d *windowClass;
 	
-	unsigned long type;                    //tipo ... (editbox, normal, ...)  style???
-    unsigned long procedure;               //procedimento da janela
-    struct window_procedure_d *wProcedure; //procedure struct
+
+
 	//unsigned long Icon;
-	//unsigned long Cursor;    //@todo: Criar cursorx e cursory.
-	//unsigned long CursorX;
-	//unsigned long CursorY;
 	//unsigned long Background;
 	//int instance; //???	
 	
-	
-    //
-	// Características dessa janela..
-	//
-
-	int active;    //Se é a janela ativa ou não.
-	int focus;     //Se tem o foco de entrada ou não.
-    int view;      //Estado: (Full,Maximized,Minimized...)	
-	unsigned long status;  //?? @todo: Deletar..
-
-    unsigned long x;           //deslocamento x
-    unsigned long y;           //deslocamento y 
-    unsigned long left;        //margem esquerda 
-    unsigned long top;         //margem superior
-    unsigned long right;       //margem direita  
-    unsigned long bottom;      //margem inferior       
-    unsigned long width;       //largura
-    unsigned long height;      //altura
-    unsigned long color_bg;    //cor    
+	//unsigned long scancodeList[32];	
+ 
 
 	//?? Se mudar para Rect pode deletar alguns elementos acima
 	//como x, y, width ...
 	struct rect_d *rcWindow;
 
-	// Bars support.
-	// Cada tipo de janela tem seus itens específicos.
-	// Esses são os status dos ítens. Se eles estão presentes ou não.
-	
-	int titlebarUsed;
-    int menubarUsed; 
-	int toolbarUsed;
-	int statusbarUsed;
-	int scrollbarUsed;
-	//Continua.
-	
-	
-	//
-	// Buffers support.
-	//
-
-	// Buffer.
-	// DedicatedBuffer
-	// DedicatedBuffer --> LFB.
-	// Endereço de memória onde a janela foi pintada.
-	// Obs: Toda janela deve ter seu próprio buffer de pintura para poder 
-	// passar a janela direto de seu próprio buffer para o LFB, sem passar 
-	// pelo Backbuffer.
-	void *buffer;        //Qual buffer dedicado a janela usa.
-	void *BackBuffer;    //Qual backbuffer a janela usa.
-	void *FrontBuffer;   //Qual frontbuffer a janela usa. (LFB).
-    //... 	
 
 	
-	//
-	// Parent support
-	//
-    unsigned long parentid;           //(Número da janela mãe).
-	struct window_d *parent;	  //Parent window.	
-	
-	//
-	// Child support.
-	//
-	
-	//Lista encadeada de janelas filhas.
-	struct window_d *childListHead;
-    int childCount;    //Tamanho da lista.
-	
-	//
-	// Client window support.
-	//
-    
-	//Client window.( A área de cliente pode ter uma moldura na forma de janela.)
-	struct window_d *client_window;   	
-	//O retângulo de input e output para cliente.
-	struct rect_d *rcClient;     // Client, usar '.'
-		
-	
-	
-	//
-	// Desktop support.
-	//
-	
-	int desktop_id;    //desnecessário.	
-	struct desktop_d *desktop;
-   
-	
+ 
 	//
 	// Menus support.
 	//
@@ -1800,23 +2004,14 @@ struct window_d
 	// frequência.
 	//
 	
-	//
-	// Trava.
-	//
-	
-	//Enables or disables mouse and keyboard input to the specified window 
-	//or control.
-    //Se travada, não pode mudar nada.	
-	int locked;    
+ 
 
 	
 	//linked list. ( a linked list da janela)
 	struct linkedlist_d *linkedlist;
 
 	
-	// Navegation.
-	struct window_d *prev;     
-	struct window_d *next;     //Next window.	
+	
 };
 window_t *CurrentWindow;
 //window_t *Window;
@@ -2269,6 +2464,20 @@ int getpid();
 */
 
 
+/*
+ ***********************************************
+ * apiDefDialog:
+ *     Procedimento de janela adiado. 
+ *     Usado pelos aplicativos ao fim dos seus procedimentos de janela.
+ */
+unsigned long 
+apiDefDialog( struct window_d *window, 
+              int msg, 
+			  unsigned long long1, 
+			  unsigned long long2 );
+			  
+			  
+unsigned long apiGetSystemMetrics( int index );
 
 //
 //...

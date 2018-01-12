@@ -108,14 +108,24 @@ _int100:
 ; ecx = ;arg3 (arg3)
 ; edx = ;arg4 (arg4)
 ; ...  
-;
+; _systemcall_entry
+; _systemcall_services
+; 
+; @todo: Pelo jeito é natural entrar com muito mais argumentos.
+;        passados pelos registradores ebp, esi, edi.
 ;++
 extern _services
 global _int200
 _int200:  
 	cli 
 	pushad 
-
+	
+	;@todo:
+	;New arguments.
+	;push dword ebp    ;arg7.
+	;push dword edi    ;arg6.
+    ;push dword esi    ;arg5.
+	
     ;Argumentos.	
     push dword edx    ;arg4.
     push dword ecx    ;arg3. 
@@ -131,11 +141,13 @@ _int200:
     pop ecx
     pop edx 
 	
+	;@todo:
+	;New arguments.	
+	;pop esi 
+	;pop edi 
+	;pop ebp
+	
 	popad	
-	
-    ;mov al, 0x20
-    ;out 0x20, al
-	
 	mov eax, dword [.int200Ret] 
 	sti
 	iretd

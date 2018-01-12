@@ -1,5 +1,5 @@
 /*
- * File: char.c
+ * File: gramado\gui\char.c
  *
  * Descrição:
  *     Constrói caractere em modo gráfico.
@@ -98,13 +98,12 @@ void my_buffer_char_blt( unsigned long x,
 	 */
 	 
     if( gfontAddress == 0 || 
-	      gcharWidth == 0 || 
-		 gcharHeight == 0 )
+	      gcharWidth <= 0 || 
+		 gcharHeight <= 0 )
 	{
-		//@todo: Criar definições globais para esses valores, ou estruturas.
 	    gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		gcharWidth = 8;
-		gcharHeight = 8;
+		gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
 	};
 	
 	/*

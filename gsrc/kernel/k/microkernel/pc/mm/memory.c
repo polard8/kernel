@@ -80,6 +80,14 @@
  */
 
  
+/*
+ @todo:
+ +Criar o arquivo heap.c 
+ +Criar a função CreateHeap: Se o argumento 'endereço' for nulo, alocamos memória.
+ ...
+*/ 
+ 
+ 
 #include <kernel.h>
  
  

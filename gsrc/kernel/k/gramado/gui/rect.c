@@ -95,7 +95,8 @@ void drawDataRectangle( unsigned long x,
 						unsigned long width, 
 						unsigned long height, 
 						unsigned long color )
-{  
+{
+	
 	struct rect_d *rect;
 	
 	//A estrutura base é usada para efetuar essa rotina aqui,

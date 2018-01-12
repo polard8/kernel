@@ -1327,7 +1327,8 @@ redrawBegin:
 		//ressaltando a barra de títulos da janala com o foco de entrada.
         //quem deve ser pintada diferente é a janela com o foco de entrada e não a janela ativa.
         //Obs: Isso vale para janelas com bordas. 		
-        if(window->id == window_with_focus)
+        //if(window->id == window_with_focus)
+		if(window->id == active_window)
 		{
             drawDataRectangle( window->left, 
 		                       window->top, 

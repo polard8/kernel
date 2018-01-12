@@ -327,7 +327,7 @@ extern void do_executa_new_task();
 //system signals. (SS)
 #include <ss.h>
 
-
+#include <brtypes.h>
 //
 // Globals.
 //
