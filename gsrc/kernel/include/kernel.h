@@ -328,6 +328,10 @@ extern void do_executa_new_task();
 #include <ss.h>
 
 #include <brtypes.h>
+
+
+#include <events.h>
+
 //
 // Globals.
 //

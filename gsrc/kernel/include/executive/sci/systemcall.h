@@ -56,7 +56,7 @@
 #define	SYS_REDE_R2    13
 #define	SYS_REDE_R3    14
 #define SYS_REDE_R4    15
-//i/o
+//i/o de disco
 #define	SYS_IO_R1    16
 #define	SYS_IO_R2    17
 #define	SYS_IO_R3    18
@@ -245,10 +245,14 @@
 #define	SYS_138 138
 #define	SYS_139 139
 
-#define	SYS_140 140
-#define	SYS_141 141
-#define	SYS_142 142
-#define	SYS_143 143
+//keyboard responder
+#define	SYS_SET_CURRENT_KEYBOARD_RESPONDER 140
+#define	SYS_GET_CURRENT_KEYBOARD_RESPONDER 141
+
+//mouse responder
+#define	SYS_SET_CURRENT_MOUSE_RESPONDER 142
+#define	SYS_GET_CURRENT_MOUSE_RESPONDER 143
+
 //144-149 Recursos da area do Cliente.
 #define	SYS_GETCLIENTAREARECT 144
 #define	SYS_SETCLIENTAREARECT 145

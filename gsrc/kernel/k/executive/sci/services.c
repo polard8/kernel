@@ -766,16 +766,28 @@ void *services( unsigned long number,
 			                    (unsigned long) (arg3 + focusWnd->top),  //y.
 								COLOR_BLACK,                             //color. 
 								(unsigned long) arg4);                   //char.
-    		break;		
-		
-		
-		case SYS_GETCURSORX:
-		    return (void*) get_cursor_x();
-		    break;
+    		break;
 
-		case SYS_GETCURSORY:
-		    return (void*) get_cursor_y();
+        //140
+        case SYS_SET_CURRENT_KEYBOARD_RESPONDER:
+            set_current_keyboard_responder(arg2);		
 		    break;
+			
+		//141	
+		case SYS_GET_CURRENT_KEYBOARD_RESPONDER:
+		    return (void*) get_current_keyboard_responder();
+		    break;
+			
+		//142	
+        case SYS_SET_CURRENT_MOUSE_RESPONDER:			
+		    set_current_mouse_responder(arg2);
+			break;
+			
+		//143	
+		case SYS_GET_CURRENT_MOUSE_RESPONDER:
+		    return (void*) get_current_mouse_responder();
+			break;
+
 			
 		//144	
 		//Pega o ponteiro da client area.	
@@ -820,7 +832,17 @@ void *services( unsigned long number,
 		case SYS_OPEN_KERNELSEMAPHORE:
 		    __ipc_kernel_spinlock = 1;
 			return;
-		
+
+		//240
+		case SYS_GETCURSORX:
+		    return (void*) get_cursor_x();
+		    break;
+
+		//241
+		case SYS_GETCURSORY:
+		    return (void*) get_cursor_y();
+		    break;
+			
 		//Info. (250 ~ 255).
 		
 		//250

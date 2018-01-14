@@ -560,11 +560,13 @@
 #define	SYSTEMCALL_138       138
 #define	SYSTEMCALL_139       139
 
-//Outros. (texto)
-#define	SYSTEMCALL_140 140
-#define	SYSTEMCALL_141 141
-#define	SYSTEMCALL_142 142
-#define	SYSTEMCALL_143 143
+//keyboard responder
+#define	SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER 140
+#define	SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER 141
+
+//mouse responder
+#define	SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER 142
+#define	SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER 143
 
 //144-149 Recursos da area do Cliente.
 #define	SYSTEMCALL_GETCLIENTAREARECT 144    // Get client Area rect.
@@ -2478,6 +2480,14 @@ apiDefDialog( struct window_d *window,
 			  
 			  
 unsigned long apiGetSystemMetrics( int index );
+
+
+void api_set_current_keyboard_responder( int i );
+int api_get_current_keyboard_responder();
+void api_set_current_mouse_responder( int i );
+int api_get_current_mouse_responder();
+
+
 
 //
 //...

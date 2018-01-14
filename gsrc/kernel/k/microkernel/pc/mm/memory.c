@@ -1,5 +1,5 @@
 /*
- * File: memory.c
+ * File: pc\mm\memory.c
  *
  * Descrição:
  *     Arquivo principal do módulo /mm do /pc, Memory Manager. 
@@ -454,9 +454,8 @@ try_again:
     //mesmo tendo espaço suficiente no heap, esta,os chegando nesse limite de indices.
     //Obs: Temos um limite para a quantidade de índices na lista de blocos.
     if( mmblockCount >= MMBLOCK_COUNT_MAX ){
-        printf("AllocateHeap Error: mmblockCount limits!");
-        refresh_screen();
-        while(1){};
+        printf("pc-mm-memory-AllocateHeap: MMBLOCK_COUNT_MAX");
+        die();
     };
 
     //Identificadores.
@@ -491,9 +490,8 @@ try_again:
         if( last_valid < KERNEL_HEAP_START || 
            last_valid >= KERNEL_HEAP_END )
         {
-            printf("AllocateHeap Error: last valid heap pointer limits");
-            refresh_screen();
-            while(1){}
+            printf("pc-mm-memory-AllocateHeap: last_valid");
+            die();
         };
 
         //

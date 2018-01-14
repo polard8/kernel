@@ -1,5 +1,5 @@
 /*
- * File: pages.c
+ * File: pc\mm\pages.c
  *
  * Descrição:
  *     Faz a configuração da paginação de memória e oferece rotinas de
@@ -1463,7 +1463,9 @@ void *allocPageFrames(int size)
 	// Checando limites.
 	//
 	
+#ifdef KERNEL_VERBOSE
     printf("allocPageFrames: Initializing ...\n");	
+#endif
 
 	//problemas com o size.
 	if(size <= 0){
@@ -1547,10 +1549,10 @@ done:
 
 
 //checar se a estrutura é nula
-int pfEmpty(struct page_frame_d *pf)
-{
+int pfEmpty(struct page_frame_d *pf){
     return pf == NULL ? 1 : 0;
-}
+};
+
 
 //selecionar o pageframe como livre.
 void freePageframe(struct page_frame_d *pf)
@@ -1565,6 +1567,7 @@ void freePageframe(struct page_frame_d *pf)
 	}		
 };
 
+
 //selecionar o pageframe como não livre.
 void notfreePageframe(struct page_frame_d *pf)
 {
@@ -1577,6 +1580,7 @@ void notfreePageframe(struct page_frame_d *pf)
 	    pf->free = 0;
 	}		
 };
+
 
 //aloca apenas uma página e retorna o handle.
 void *newPageFrame()
@@ -1618,6 +1622,7 @@ fail:
     return NULL;    
 };
 
+
 //aloca uma página e retorna seu endereço virtual inicial
 //com base no id do pageframe e no endereço virtual inicial do pool de pageframes.
 void *newPage()
@@ -1633,7 +1638,7 @@ void *newPage()
     New	= (void*) newPageFrame();
 	if( New == NULL ){
 	    //fail	
-		printf("allocPageFrames: 1\n");
+		printf("newPage: New\n");
 		return NULL;
 		//goto fail;
 	}else{
