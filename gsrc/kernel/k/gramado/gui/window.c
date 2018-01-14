@@ -525,7 +525,10 @@ void windowShowWWFMessageBuffers()
  * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com foco de entrada.
  * Ex: void windowSendMessageWWW(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4)
  */	
-void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4)
+void windowSendMessage( unsigned long arg1, 
+                        unsigned long arg2, 
+						unsigned long arg3, 
+						unsigned long arg4 )
 {    
 	struct window_d *wFocus;
 	
@@ -572,16 +575,17 @@ void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg
               			
             //#bugbug
 			//A fila não funciona, estamos usando apenas um offset para testes.
-			wFocus->sendOffset = 0; 
+			//wFocus->sendOffset = 0; 
 			
 			//Trata o deslocamento atual para as filas.
-			//wFocus->sendOffset++;
-			//if(wFocus->sendOffset >= 32){ 
-			//    wFocus->sendOffset = 0; 
-			//};
+			wFocus->sendOffset++;
+			if(wFocus->sendOffset >= 32)
+			{ 
+			    wFocus->sendOffset = 0; 
+			};
 	        
 			//Envia cada mensagem pra sua fila apropriada.
-			wFocus->hwndList[wFocus->sendOffset]  = (unsigned long) 0;     //window;
+			wFocus->hwndList[wFocus->sendOffset]  = (unsigned long) arg1;   //0;     //window;
 			wFocus->msgList[wFocus->sendOffset]   = (unsigned long) arg2;  //msg.
 			wFocus->long1List[wFocus->sendOffset] = (unsigned long) arg3;  //long1
 			wFocus->long2List[wFocus->sendOffset] = (unsigned long) arg4;  //long2
@@ -598,6 +602,103 @@ void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg
 	};
 	
 	return;
+};
+
+
+/*
+ * windowGetMessage:
+ *     Pega uma mensagem na estrutura da janela com o foco de entrada.
+ *
+ * Obs: 
+ *     Esse mecanismo deve ser reproduzido para os parametros hwnd, long1 e long2.
+ *     As funções precisam ser criadas ainda. semelhantes a essa.
+ *     Mas o que nos importa agora é somente o parâmetro 'msg'.
+ * @todo: Quem chamou essa rotina, deseja pegar a mensagem de qualquer janela 
+ *ou somente a da janela com o foco de entreada.???
+ * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com foco de entrada.
+ * Ex: void *windowGetMessageWWF()
+ */
+void *windowGetHandleWindow(struct window_d *window)
+{
+	void *kHANDLE;
+	
+	struct window_d *wFocus;
+	
+	
+	//
+	// teste
+	//
+	//isso não ficará assim, é só para testar se um app em user mode 
+	//consegue pegar alguma mensagem atravez dessa rotina.
+	
+	//int tmp;
+	//if( gNextKeyboardMessage != 0)
+	//{
+	//	tmp = gNextKeyboardMessage;
+    //    gNextKeyboardMessage = (int) 0;  		
+	//	return (void *) tmp; 
+	//};
+	
+	//Pega o ponteiro da janela com o foco de entrada.
+	wFocus = (void *) windowList[window_with_focus];
+	
+	//Desejamos usar a janela com o foco de entrada.
+	//if(  (void*) window != (void*) wFocus  )
+	//{
+	//	printf("windowGetMessage: window != wFocus \n");
+	//	refresh_screen();		
+	//	window = (void*) wFocus;
+	//};
+	
+	//
+	// #importante:
+	// Isso identifica exatamente de qual janela queremos a mensagem.
+	//
+	
+	//Testando a validade.
+	if((void*) window == NULL)
+	{ 
+		printf("windowGetMessage: window fail \n");
+		refresh_screen();		
+	    return NULL; 
+	}else{	
+
+			//isso exibiria muitas mensagens por causa do while.
+			//printf("windowGetMessage: focus={%s}\n",wFocus->name);	
+		
+		//
+		// @todo: Quando pegar a mensagem no buffer, tem que colocar 
+		// zero no lugar, pra não pegar novamente.
+		//
+		
+		//window->receiveOffset = 0;
+				
+		// Não mudaremos o offset do receive ante de tentarmos pegar.
+		//Circula.
+		
+		//#importante: 
+		// Só faremos isso na primeira das 4 chamadas. 
+		window->receiveOffset++;
+		if(window->receiveOffset >= 32)
+		{
+		    window->receiveOffset = 0;
+		};
+				
+		//Pega mensagem.
+		kHANDLE = (void*) window->hwndList[window->receiveOffset]; 
+				
+		//Apaga a mensagem que foi consumida.
+		window->hwndList[window->receiveOffset] = 0; 
+		
+        //Incrementamos o offset para a próxima vez.
+		//window->receiveOffset++;  		
+		
+		//Retorna.
+		return (void*) kHANDLE; 
+	};
+	//Nothing.
+fail:	
+	return NULL;
 };
 
 
@@ -663,12 +764,16 @@ void *windowGetMessage(struct window_d *window)
 		// zero no lugar, pra não pegar novamente.
 		//
 		
-		window->receiveOffset = 0;
+		//window->receiveOffset = 0;
 				
 		// Não mudaremos o offset do receive ante de tentarmos pegar.
 		//Circula.
-		//if(window->receiveOffset >= 32){
-		//	window->receiveOffset = 0;
+		
+		//#importante: 
+		// Só faremos isso na primeira das 4 chamadas. 
+		//if(window->receiveOffset >= 32)
+		//{
+		//    window->receiveOffset = 0;
 		//};
 				
 		//Pega mensagem.
@@ -738,7 +843,7 @@ void *windowGetLong1(struct window_d *window)
 		// zero no lugar, pra não pegar novamente.
 		//
 		
-		window->receiveOffset = 0;
+		//window->receiveOffset = 0;
 				
 		// Não mudaremos o offset do receive ante de tentarmos pegar.
 		//Circula.
@@ -814,7 +919,7 @@ void *windowGetLong2(struct window_d *window)
 		// zero no lugar, pra não pegar novamente.
 		//
 		
-		window->receiveOffset = 0;
+		//window->receiveOffset = 0;
 				
 		// Não mudaremos o offset do receive ante de tentarmos pegar.
 		//Circula.

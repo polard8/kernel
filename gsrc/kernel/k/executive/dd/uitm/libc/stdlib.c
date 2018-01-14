@@ -170,8 +170,7 @@ void free(void *ptr)
 	};
 	//Nothing.
 fail:	
-    refresh_screen();
-	while(1){}
+    die();
 done:	
 	return;
 };

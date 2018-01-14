@@ -2405,9 +2405,16 @@ void windowLock(struct window_d *window);
 void windowUnlock(struct window_d *window);
 int windowCreateDedicatedBuffer(struct window_d *window);
 
+//
 //envia mensagem para a fila da janela com foco de entrada.
+//
 void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4);
-//pega uma mensagem na estrutura da janela com o foco de entrada.
+
+
+//
+// pega uma mensagem na estrutura da janela com o foco de entrada.
+//
+void *windowGetHandleWindow(struct window_d *window); 
 void *windowGetMessage(struct window_d *window);
 void *windowGetLong1(struct window_d *window);
 void *windowGetLong2(struct window_d *window);

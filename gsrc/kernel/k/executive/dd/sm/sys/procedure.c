@@ -230,9 +230,10 @@ unsigned long system_procedure( struct window_d *window,
 					ctrl_status = 0;
 					shift_status = 0;
 					//Mensagem para fechar a janela passada via argumento.
-					SendMessage(window,MSG_DEVELOPER,1,0);
+					//SendMessage(window,MSG_DEVELOPER,1,0);
 					//CloseWindow(window);
-                    goto done;				
+                    KillFocus(window);
+					goto done;				
 				    break;
 				
 				case VK_RETURN:
@@ -342,10 +343,9 @@ unsigned long system_procedure( struct window_d *window,
 				    alt_status = 0;
 					ctrl_status = 0;
 					shift_status = 0;
-                   // backgroundDraw(COLOR_BLACK);
+                    // backgroundDraw(COLOR_BLACK);
 					//printf("%s",stdout->_base);  //mostrar a entrada padrão.
 					//refresh_screen();
-                    
 					break;
 				
 	

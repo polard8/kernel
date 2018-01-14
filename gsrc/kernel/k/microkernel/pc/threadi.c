@@ -168,8 +168,8 @@ void KiShowThreadList(){
 void mostra_slots()
 {
     int i; 	
-	struct process_d *p;    //Process.
-    struct thread_d  *t;    //Threads.
+	struct process_d *p;    
+    struct thread_d  *t;   
 
 
 	//
@@ -232,7 +232,7 @@ void mostra_slot(int id)
 
 	// Limits.
     if(id < 0 || id >= THREAD_COUNT_MAX){
-	    printf("mostra_slot: invalid ID\n");
+	    printf("pc-threadi-mostra_slot: id\n");
 		return;
 	};
 	
@@ -241,7 +241,7 @@ void mostra_slot(int id)
 	t = (void *) threadList[id];
 	
 	if( (void*) t == NULL){
-	    printf("mostra_slot: Empty slot\n");
+	    printf("pc-threadi-mostra_slot: t\n");
 		return;	
 	}else{
 	
@@ -439,7 +439,7 @@ void release(struct thread_d *t)
 			return;
 		}
 	};
-	panic("trying to release non-existent task");
+	panic("pc-threadi-release:");
 }
 
 /*
@@ -540,8 +540,8 @@ done:
 void dead_thread_collector()
 {
 	int i;
-    struct thread_d  *Thread;    //Thread.	  
-    struct process_d *p;         //Process.
+    struct thread_d  *Thread;   	  
+    struct process_d *p;         
 	
 	for( i = 0; i < THREAD_COUNT_MAX; i++ )
 	{
@@ -576,6 +576,6 @@ done:
 
 
 //
-//fim.
+// End.
 //
 

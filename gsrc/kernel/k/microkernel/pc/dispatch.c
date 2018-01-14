@@ -1,5 +1,5 @@
 /*
- * File: dispatch.c
+ * File: pc\dispatch.c
  *
  * Descrição:
  *     Faz parte do Process Manager, parte fundamental do Kernel Base.
@@ -721,18 +721,16 @@ void dispatch_thread(struct thread_d *thread)
 	
 	if( (void*) thread == NULL)
 	{
-        printf("dispatch_thread error: Struct CurrentThread={%d}",current_thread); 
-        refresh_screen();
-		while(1){}	
+        printf("pc-dispatch-dispatch_thread: thread tid={%d}",current_thread); 
+        die();
 	}
 	else
 	{
 	    // Context.	
 	    Status = contextCheckThreadRing3Context(thread->tid);
 	    if(Status == 1){
-	        printf("dispatch_task error: Context!\n");
-		    refresh_screen();
-		    while(1){}
+	        printf("pc-dispatch-dispatch_task: contextCheckThreadRing3Context\n");
+		    die();
 	    };
 	    //...
 	};
@@ -761,8 +759,8 @@ void dispatch_thread(struct thread_d *thread)
 	};
 	
 fail:
-	refresh_screen();
-	while(1){}
+    printf("pc-dispatch-dispatch_thread: fail");
+    die();
 };
 
 
@@ -859,27 +857,17 @@ done:
  */
 void IncrementDispatcherCount(int type)
 {	
-	//
-	// Testando a estrutura.
-	//
-	
+	// Testing struct.
 	if( (void*) DispatchCountBlock == NULL ){
 		return;
 	};
 	
-	//
-	// Limite de tipo.
-	//
-	
+	// type limits.
 	if(type < 0 || type > 10){
 	    return;	
 	};
 	
-	
-	//
-	// Ativando o tipo selecionado.
-	//
-	
+	// Activating the selected type.
 	switch(type)
 	{
 		case SELECT_IDLE_COUNT:
@@ -921,7 +909,6 @@ void IncrementDispatcherCount(int type)
 	//     Obs: @todo: O laço acima pode são selecionar nada.
 	//
 	
-//done.
 done:
 	return;
 };
@@ -933,6 +920,7 @@ int dispatchDispatch()
 {};
 */
 
+
 /*
 int dispatchInit()
 {};
@@ -940,6 +928,6 @@ int dispatchInit()
 
 
 //
-// Fim.
+// End.
 //
 

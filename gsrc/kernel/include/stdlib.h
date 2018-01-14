@@ -82,6 +82,10 @@ struct ldiv_d
 };
 */
 
+
+#define kmalloc malloc
+#define kfree free
+
 /*
  * malloc:
  *    Allocates the requested memory and returns a pointer to it.

@@ -570,6 +570,7 @@ noArgs:
 	
 	//isso é um teste pegar um valor por vez não é a melhor opção.
 	
+	struct window_d *hwTest;
 	int msgTest;
 	void *long1;
 	void *long2;
@@ -589,9 +590,15 @@ noArgs:
 		//
 		
 	while(1)
-	{		
+	{	
+
+ 		hwTest = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
+		                              (unsigned long) hWindow,  
+									  (unsigned long) hWindow, 
+									  (unsigned long) hWindow );        
+
 		msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 
-		                              (unsigned long) hWindow, //isso passa um endereço virtual que o kernel não conheçe.
+		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
 									  (unsigned long) hWindow );
 									  
@@ -621,7 +628,7 @@ noArgs:
 			//  CRIADAS PELO SISTEMA PODERÃO SER AFETADAS POR ESSE PROCEDIMENTO??
 			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
             //			
-		    shellProcedure( NULL, 
+		    shellProcedure(  (struct window_d *) hwTest, 
 			                (int) msgTest, 
 							(unsigned long) long1, 
 							(unsigned long) long2 );

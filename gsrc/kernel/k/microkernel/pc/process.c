@@ -1,5 +1,5 @@
 /*
- * File: process.c 
+ * File: pc\process.c 
  *
  * Descrição:
  *     Gerenciamento de processos.
@@ -124,14 +124,18 @@ int processTesting(int pid)
 	
 	P = (void*) processList[pid];
 	
-	if( (void*) P == NULL ){
+	if( (void*) P == NULL )
+	{
 		return (int) 0;
-	}else{		
+	}
+	else
+	{		
 		
-		if( P->used ==  1 && P->magic == 1234){
+		if( P->used == 1 && P->magic == 1234){
 	        return (int) 1234;			
 		}
-	}
+	};
+	
 fail:
 	return (int) 0;
 }
@@ -234,9 +238,8 @@ process_descriptor_t *create_process( struct wstation_d *window_station,
 	
 	Process = (void *) malloc(sizeof(struct process_d));
 	if( (void*) Process == NULL ){
-	    printf("create_process:");
-		refresh_screen();
-		while(1){}
+	    printf("pc-process-create_process: Process");
+		die();
 		//@todo: aqui retorna NULL.
 	};
 
@@ -250,7 +253,7 @@ get_next:
 	
 	if(i >= PROCESS_COUNT_MAX)
 	{
-		printf("create_process: End of list");
+		printf("pc-process-create_process: End of list");
         refresh_screen();
 		return NULL;
 		//while(1){}
@@ -619,7 +622,7 @@ void KeCpuFaults(unsigned long fault_number)
  * KeSpawnTask:
  *     Interface para rotina que executa pela primeira vez
  * uma tarefa em user mode.
- *
+ * @todo: deletar.
  */
 void KeSpawnTask(int id)
 {
@@ -1175,12 +1178,9 @@ void exit_process(int pid, int code)
 	
 	Process = (void*) processList[pid];
 	
-	if( (void*) Process == NULL)
-	{
+	if( (void*) Process == NULL ){
 		return;
-	}
-	else
-	{	
+	}else{	
 
 		//Se estiver corrompida.
         if(Process->used != 1 || Process->magic != PROCESS_MAGIC){
@@ -1322,6 +1322,8 @@ unsigned long GetProcessHeapStart(struct process_d *process)
 	
 	return (unsigned long) process->Heap;
 };
+
+
 //
-// Fim.
+// End.
 //

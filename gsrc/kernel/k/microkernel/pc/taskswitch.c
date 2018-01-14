@@ -1,5 +1,5 @@
 /*
- * File: microkernel\taskswitch.c
+ * File: microkernel\pc\taskswitch.c
  *
  * Descrição:
  *     Faz parte do Process Manager, parte fundamental do Kernel Base.
@@ -27,7 +27,7 @@
 //
   
 int lock_taskswitch;  
-//int taskswitchLock;  //@todo Criar
+//int __taskswitch_lock;
 //...
 
 
@@ -37,7 +37,6 @@ int lock_taskswitch;
 //
 
 void taskswitchRR();
-//void task_switch_rr();  //@Mudar para taskswitchRR().
 //...
 
 
@@ -53,6 +52,7 @@ void taskswitchFlushTLB(){
 	return;
 }
 */
+
 
 /*
  * KiTaskSwitch:
@@ -489,7 +489,7 @@ dispatch_current:
 			Current->state != READY )
 	    {
 	        panic("task_switch.dispatch_current error: Param.");
-	        while(1){}
+	        die();
 	    };
         //Obs: Podemos filtrar outros parâmetros sistemicamente importante.		
 		//Nothing.
@@ -803,5 +803,5 @@ void taskswitch_unlock(){
 
 
 //
-// Fim.
+// End.
 //

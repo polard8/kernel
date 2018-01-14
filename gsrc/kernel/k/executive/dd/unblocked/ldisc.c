@@ -800,6 +800,13 @@ done:
 		// Passamos a mensagem de teclado para o procedimento de janela do sistema.
 		// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
 		//
+		
+		//
+		// *importante:
+		// Quem é o 'first responder' para evento de teclado.
+		// A janela com o foco de entrada é o first responder para 
+		// eventos de teclado, mas não para todo tipo de envento.		
+		//
 	
 	
     //Pegaremos aqui a janela com o foco de entrada e passaremos 
@@ -811,13 +818,17 @@ done:
 	{
 		// Envia as mensagens para os aplicativos intercepta-las
 		//so mandamos mensagem para um aplicativo no estavo válido.
-		if( w->used == 1 && w->magic == 1234 ){
+		if( w->used == 1 && w->magic == 1234 )
+		{
+			//#bugbug (hwnd estava null, mandando para qual janela. ??
 	        windowSendMessage( 0, mensagem, ch, ch);
+			//windowSendMessage( (struct window_d *) w, mensagem, ch, ch);
 		};			
 		
 		//Chama o procedimento de janelas do sistema.
 		//O procedimento de janela do terminal está em cascata.
-		system_procedure( w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );					
+		//system_procedure( (struct window_d *) w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );
+        system_procedure(  w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );  		
 	};
 
 eoi:
@@ -1932,6 +1943,29 @@ void ps2()
     init_keyboard();  //?? quem inicializará a porta do teclado ?? o driver ??
 	init_mouse();	  //?? quem inicializará a porta do mouse ?? o driver ??
 };
+
+
+
+
+void set_current_keyboard_responder( int i ){
+	current_keyboard_responder = i;
+};
+
+int get_current_keyboard_responder(){
+	return (int) current_keyboard_responder;
+};
+
+
+void set_current_mouse_responder( int i ){
+    current_mouse_responder = i;	
+};
+
+int get_current_mouse_responder()
+{
+    return (int) current_mouse_responder;	
+};
+
+
 
 //
 // End.
