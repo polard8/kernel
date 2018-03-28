@@ -84,7 +84,7 @@ int kMain(int argc, char* argv[])
     __ipc_kernel_spinlock = 1;
 
     // #test.
-    // initializing zorder list
+    // initializing zorder list.
     int zIndex;
     for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
         zorderList[zIndex] = (unsigned long) 0;
@@ -100,7 +100,7 @@ int kMain(int argc, char* argv[])
     //
     // Video.
 	// First of all.
-	// ps: Boot loader is mappint the LFB.
+	// ps: Boot loader is mapping the LFB.
     //
 
 //setupVideo:
@@ -108,7 +108,7 @@ int kMain(int argc, char* argv[])
     // @todo: 
 	// Device screen sizes.
 
-    //Set graphic mode or text mode using a flag.
+    //Set graphics mode or text mode using a flag.
 	if(SavedBootMode == 1){
         g_useGUI = GUI_ON; 
 	    VideoBlock.useGui = GUI_ON;
@@ -127,7 +127,7 @@ int kMain(int argc, char* argv[])
 	// Init screen
 	//
 	
-	//If we are using graphic mode.
+	//If we are using graphics mode.
 	if(VideoBlock.useGui == GUI_ON){
 #ifdef KERNEL_VERBOSE	
 	    printf("kMain: Using GUI!\n");	
