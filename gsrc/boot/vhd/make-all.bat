@@ -30,7 +30,7 @@ echo -{ Creating a formated VHD.
 
     rem Obs: O disco é criado já com a primeira partição formatada.
 	
-    SET ROOT=c:\gsrc\boot\vhd\v8.5
+    SET ROOT=c:\gramado\gsrc\boot\vhd\v8.5
 	cd %ROOT%
 	
 	nasm -I./stage1/ ^
@@ -73,6 +73,7 @@ echo -{ ...
 	REM TESTANDO BMPS.
 	
 	copy BMP1.BMP      F:\
+	copy MOUSE.BMP      F:\
 	REM copy FREDNORA.BMP      F:\
 	REM copy DENNIS.BMP      F:\
 	REM copy SPOON.BMP      F:\
