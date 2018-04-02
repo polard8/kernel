@@ -4,6 +4,11 @@
 <br>(c) Coppyright 2018 - Fred Nora.
 
 <br>
+<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gui.png">
+<br>
+<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado2.png">
+
+<br>
 <br><b>// Compilation process:</b>
 <br>I'm using a .bat file on Windows platform.
 <br>Check the file make-kernel.bat.
@@ -31,7 +36,4 @@
 <br>
 <br>Clone the repo: <b> git clone https://github.com/frednora/gramado.git </b>
 
-<br>
-<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gui.png">
-<br>
-<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado2.png">
+
