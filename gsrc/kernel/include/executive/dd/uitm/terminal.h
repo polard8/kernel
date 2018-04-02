@@ -49,6 +49,8 @@ The system creates a new terminal when it starts a terminal process,
 #define TERMINAL_COL_MAX     74    //Número máximo de colunas.
 
 
+//#define TERMINAL_COUNT_MAX 8
+
 //
 // Número do terminal atual.
 //
@@ -60,6 +62,34 @@ int terminalLineMax;    //Número máximo de linhas suportadas.
 int terminalOffsetMax;  //Número máximo de caracteres por linha.
 
 
+
+/*
+
+[ Reflexão sobre o retângulo onde aparecem os caracteres no terminal virtual: ]
+
+Um terminal virtual terá uma janela de instância e o retângulo que 
+compreende a área de cliente dessa janela. Esse retângulo deve ser o lugar 
+onde os caracteres serão pintados. 
+
+Mas podemos desvincular esse retângulo da janela de instância e usarmos 
+apenas o retângulo que compreende a área de cliente da janela.
+
+Pois bem, no modo full screen do terminal virtual podemos simplesmente 
+desabilitar a janela de instância e usarmos apenas um retângulo do tamanho da tela inteira.
+
+Isso libera a estrutura de janela. Para isso a estrutura de terminal deve 
+conter um ponteiro para janela e um ponteiro para retângulo.
+
+Para efeito de teste, podemos escrever no retângulo do terminal, sem
+criarmos uma janela completa, daquelas que tem barra de títulos e tudo mais.  
+
+Uma função deve ser oferecida para configurar esse retângulo do terminal virtual 
+atual.
+
+Ou seja, o lugar natural de imprimir caracteres de terminal é nesse retângulo 
+configurável.
+
+*/
 
 //Struct para terminal.
 typedef struct terminal_d terminal_t;
@@ -78,7 +108,14 @@ struct terminal_d
 	int	ColMax;
 	int FullScreen;    //flag.
 	
-    struct window_d *window;    //*IMPORTANTE: Essa será a janela para uma instância de terminal.
+	// *IMPORTANTE: 
+	// Essa será a janela para uma instância de terminal.
+    struct window_d *window;    
+	
+	// *IMPORTANTE: 
+	// Os caracteres serão pintados nesse retângulo.
+	// @todo: Uma função deve oferecer a oportunidade de configurar esse
+	// até o limite da área de cliente da janela de instãncia do terminal.
 	struct rect_d *rect;
 	
 
@@ -121,7 +158,7 @@ terminal_t *terminalShell;
 //(Control+F6)
 //(Control+F7)
 //(Control+F8) 
-unsigned long terminalList[8];
+unsigned long terminalList[8]; //TERMINAL_COUNT_MAX
 
 
 

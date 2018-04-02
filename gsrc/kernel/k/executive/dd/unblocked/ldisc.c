@@ -1,5 +1,5 @@
 /*
- * File: executive\dd\unblocked\ldisc.c
+ * File: unblocked\ldisc.c
  *
  * Descrição:
  *    Esse será o gerenciador de Line Discipline.
@@ -9,7 +9,7 @@
  * para a fila de mensagem da janela apropriada. Principalmente a janela 
  * com o foco de entrada. 
  *
-*/
+ */
 
 
 #include <kernel.h>
@@ -48,6 +48,7 @@ int mouse_buttom_3;
 //?? usado pelo mouse
 #define outanyb(p) __asm__ __volatile__( "outb %%al,%0" : : "dN"((p)) : "eax" )
 
+
 /*
  aqui não é o lugar disso.
 char*  cursor[] =
@@ -72,6 +73,7 @@ char*  cursor[] =
 };
 
 */
+
 
 /*
  aqui não é o lugar disso.
@@ -321,6 +323,8 @@ unsigned long keyboardGetKeyState(unsigned char key)
 	    case VK_NUMLOCK:
 		    State = numlock_status;
 		    break;
+			
+		//VK_SCROLLOCK	
 			
 		//...
 	};
@@ -781,6 +785,8 @@ done:
 	
 	if( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) ){
 		services( SYS_REBOOT, 0, 0, 0);
+		//system_procedure ...
+		// @todo: Chamar o aplicativo REBOOT.BIN.
 	};
 
 	
@@ -809,30 +815,72 @@ done:
 		//
 	
 	
-    //Pegaremos aqui a janela com o foco de entrada e passaremos 
-	//para o procedimento, que não deve pegar novamente.
-	struct window_d *w;
+    //
+	// #importante
+	// Ok. A ideia agora é enviar a mensagem para a fia de mensagens do sistema.
+	//
+	
+
+	//checando a validade da janela com o foco de entrada.
+	struct window_d *w;    //janela com o foco de entrada.(first responder ??)
 	w = (void *) windowList[window_with_focus];
 	
-	if( (void*) w != NULL )
+	if( (void*) w == NULL )
 	{
+		printf("LINE_DISCIPLINE: w");
+		die();
+	}else{
 		// Envia as mensagens para os aplicativos intercepta-las
 		//so mandamos mensagem para um aplicativo no estavo válido.
-		if( w->used == 1 && w->magic == 1234 )
+		if( w->used != 1 || w->magic != 1234 )
 		{
-			//#bugbug (hwnd estava null, mandando para qual janela. ??
-	        windowSendMessage( 0, mensagem, ch, ch);
-			//windowSendMessage( (struct window_d *) w, mensagem, ch, ch);
-		};			
-		
-		//Chama o procedimento de janelas do sistema.
-		//O procedimento de janela do terminal está em cascata.
-		//system_procedure( (struct window_d *) w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );
-        system_procedure(  w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );  		
-	};
+			printf("LINE_DISCIPLINE: w magic");
+			die();
+		}
+	}
 
-eoi:
-    outportb(0x20,0x20);    //EOI.
+	//colocando a mensagem na fila de mensagens do sistema.
+	struct message_d* m;	
+	
+	//Circulando.
+	system_message_write++;
+	if( system_message_write < 0 || 
+	    system_message_write >= SYSTEM_MESSAGE_QUEUE_MAX )
+	{
+		system_message_write = 0;
+	}
+			
+	//Colocando na fila.		
+	system_message_queue[system_message_write] = (unsigned long) m;
+	
+	//#importante (teste)
+	//testando outra fila ...
+	//colocando o ponteiro da estrutura na fila.
+	xenqueue( (void *) m, ld_keyboard_queue);
+	
+	if( m->used == 1 && m->magic == 1234 )
+	{
+		//?? object ??
+		
+		m->empty = 0;
+		
+		
+		m->window = (struct window_d *) w;
+		m->msg    = (int) mensagem;
+		m->long1  = (unsigned long) ch;
+		m->long2  = (unsigned long) ch;
+		
+		//...
+	};
+	
+	
+	//Chamando o procedimento de janelas do sistema.
+	//Talvez isso seja apenas por enquanto...
+	//isso talvez deva ser chamado depois do procedimento de janelas 
+	//do aplicativo.
+	system_procedure(  w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );  
+	
+	
     return;
 };
 
@@ -1940,6 +1988,8 @@ done:
 void ps2()
 {
     P8042_install();  //deverá ir para ps2.c @todo: criar arquivo.
+	
+	//@todo: isso deveria se chamar init_ps2_mouse ...
     init_keyboard();  //?? quem inicializará a porta do teclado ?? o driver ??
 	init_mouse();	  //?? quem inicializará a porta do mouse ?? o driver ??
 };
@@ -1960,10 +2010,127 @@ void set_current_mouse_responder( int i ){
     current_mouse_responder = i;	
 };
 
-int get_current_mouse_responder()
-{
+int get_current_mouse_responder(){
     return (int) current_mouse_responder;	
 };
+
+
+//inicializando a fila de mensagens do sistema
+//com ponteiros para estruturas de mensagens ...
+//es estruturas serão reutilizáveis.
+void initialize_system_message_queue()
+{
+	struct message_d *m;
+	
+	int i;
+	for( i=0; i<SYSTEM_MESSAGE_QUEUE_MAX; ++i )
+	{
+		
+		m = (void*) malloc( sizeof(struct message_d) );
+		if( (void*) m == NULL )
+		{
+			printf("unblocked-ldisc-initialize_system_message_queue:");
+			die();
+		}else{
+			
+			m->objectType = ObjectTypeMessage;
+			m->objectClass = ObjectClassKernelObjects;
+		    m->used = 1;
+			m->magic = 1234;
+			m->empty = 1;
+            system_message_queue[i] = (unsigned long) m;		
+		}; 
+	};
+	
+	system_message_write = 0;
+	system_message_read = 0;
+	
+	//
+	// ==================================================
+	// #importante:   (teste)
+	// initializaes keyboard queue
+	//
+	
+	xinit_queue(ld_keyboard_queue);
+	
+    return;	
+};
+
+//==========================================
+// marlls1989 - marcos - queue 
+
+void xinit_queue(ld_queue_t *queue) {
+	//pthread_mutex_init(&(queue->lock), NULL);
+	//pthread_cond_init(&(queue->wait), NULL);
+
+	queue->data = malloc(QUEUE_INITIAL_SIZE*sizeof(void*));
+	queue->size = QUEUE_INITIAL_SIZE;
+	queue->reads = queue->writes = 0;
+}
+
+void xdestroy_queue(ld_queue_t *queue) {
+	//pthread_mutex_destroy(&(queue->lock));
+	//pthread_cond_destroy(&(queue->wait));
+
+	free(queue->data);
+}
+
+//size should always be a power of 2
+static void xresize_queue(ld_queue_t *queue, size_t new_size) {
+	void **new_data;
+	size_t i, k;
+
+	new_data = malloc(new_size*sizeof(void*));
+
+	for(i = 0, k = queue->writes - queue->reads ; i  < k ; i++)
+		new_data[i] = queue->data[(queue->reads+i) & (queue->size-1)];
+
+	free(queue->data);
+
+	queue->data = new_data;
+	queue->size = new_size;
+	queue->writes = k;
+	queue->reads = 0;
+}
+
+void xenqueue(void *element, ld_queue_t *queue) {
+	size_t s;
+	//pthread_mutex_lock(&(queue->lock));
+
+	if(!(s = queue->writes - queue->reads))
+		queue->reads = queue->writes = 0;
+
+	if(s >= queue->size)
+		xresize_queue(queue, queue->size << 1);
+
+	queue->data[(queue->writes++) & (queue->size-1)] = element;
+
+	//pthread_cond_broadcast(&(queue->wait));
+	//pthread_mutex_unlock(&(queue->lock));
+}
+
+
+void *xdequeue(ld_queue_t *queue) {
+	void * ret;
+	//pthread_mutex_lock(&(queue->lock));
+
+	//while(queue->writes == queue->reads) {
+	//	queue->reads = queue->writes = 0;
+	//	pthread_cond_wait(&(queue->wait), &(queue->lock));
+	//}
+	
+	//incluído por fred.
+	//if(queue->writes == queue->reads){
+	//	queue->reads = queue->writes = 0;
+	//	return NULL;
+	//}
+
+	ret = queue->data[(queue->reads++) & (queue->size-1)];
+
+	//pthread_mutex_unlock(&(queue->lock));
+
+	return ret;
+}
 
 
 

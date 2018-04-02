@@ -229,6 +229,7 @@ KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
 ;       edx = LoaderBlock pointer.
 ;
 
+;; <head>
 global _kernel_begin              
 _kernel_begin:
 
@@ -239,14 +240,14 @@ _kernel_begin:
 	; OBS: O endereço virtual da memoria de vídeo vga é 0x800000
 	;      o mapeamento foi feito pelo Boot Loader.
 	;
-	mov byte [0x800000], byte "K"
-    mov byte [0x800001], byte 9	
-    mov byte [0x800002], byte "R"
-    mov byte [0x800003], byte 9	
-    mov byte [0x800004], byte "N"
-    mov byte [0x800005], byte 9	
-    mov byte [0x800006], byte "L"
-    mov byte [0x800007], byte 9	
+	;mov byte [0x800000], byte "K"
+    ;mov byte [0x800001], byte 9	
+    ;mov byte [0x800002], byte "R"
+    ;mov byte [0x800003], byte 9	
+    ;mov byte [0x800004], byte "N"
+    ;mov byte [0x800005], byte 9	
+    ;mov byte [0x800006], byte "L"
+    ;mov byte [0x800007], byte 9	
 
 	
 	
@@ -581,37 +582,37 @@ dummyJmpAfterLTR:
 	
 	mov dword [_KernelStatus], dword 1
 	
-	;
-	; Chama função em C para inicar as tarefas.
-	;
-
-    ;
-    ; @todo:
-    ;     A inicial "_Ke" deve ser substituida.
-	;     pois será usada pra chamar módulos externos. 
-    ;
 	
-
     ;Debug:
-	; Essa mensagem aparece. (trabalhar em c)
-    mov byte [0x800008], byte "M"    ;flag.	
-    mov byte [0x800009], byte 9
+	; Essa mensagem aparece em modot texto.
+    ;mov byte [0x800008], byte "M"    ;flag.	
+    ;mov byte [0x800009], byte 9
 
 	;Debug
-	mov eax, 0xc0c0c0
-	mov ebx, 500
-	mov ecx, 500
+	mov eax, 0xA0A0A0
+	mov ebx, 440
+	mov ecx, 440
 	call _gui_buffer_putpixel
 
-	mov eax, 0xc0c0c0
-	mov ebx, 502
-	mov ecx, 500
+	;Debug
+	mov eax, 0xB0B0B0
+	mov ebx, 494
+	mov ecx, 440
 	call _gui_buffer_putpixel
 
-	mov eax, 0xc0c0c0
-	mov ebx, 504
-	mov ecx, 500
+	;Debug
+	mov eax, 0xC0C0C0
+	mov ebx, 523
+	mov ecx, 440
 	call _gui_buffer_putpixel
+
+	;Debug
+	mov eax, 0xD0D0D0
+	mov ebx, 587
+	mov ecx, 440
+	call _gui_buffer_putpixel
+	
+	;Debug
 	call _asm_refresh_screen    ;refresh
 	;jmp $
 	
@@ -627,7 +628,8 @@ dummyJmpAfterLTR:
 	call _kMain
 
 _hang: 
-    hlt 
+    hlt
+    ;cli	
 	jmp _hang	
 	
 	;cmp eax, 0

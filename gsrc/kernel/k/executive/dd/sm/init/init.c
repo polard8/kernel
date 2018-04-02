@@ -469,9 +469,11 @@ int init()
 #endif	
 	create_system_folders(); 
     
-	//Shell. (O Shell do kernel base).
-	//printf("init: Initializing kernel shell variables ...\n");	
-	//init_shell();
+
+#ifdef KERNEL_VERBOSE	
+	printf("sm-init-init: initialize_system_message_queue\n");
+#endif	
+	initialize_system_message_queue(); 
 	
     //
 	// Initialize Platform structure.

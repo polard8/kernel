@@ -1,6 +1,6 @@
 /*
- *   File: tty.h 
- *	 Header para o gerenciado de fluxo de caractere.
+ * File: tty.h 
+ * Header para o gerenciado de fluxo de caractere.
  */
 
  
@@ -11,12 +11,14 @@
 //#define DEVELOPER_TTYLINES_MAX 25    //25 
 //... 
 
+
 //Contador de linhas usados na hora da criação de linhas.
 int ttyLineCounter;
 
 //Cursor.
 int ttyCurrentX;
 int ttyCurrentY;
+
 
 typedef struct ttyline_d ttyline_t;
 struct ttyline_d

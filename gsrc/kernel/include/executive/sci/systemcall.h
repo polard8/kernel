@@ -243,7 +243,7 @@
 #define	SYS_136 136
 #define	SYS_137 137
 #define	SYS_138 138
-#define	SYS_139 139
+#define	SYS_GETSCANCODE 139  
 
 //keyboard responder
 #define	SYS_SET_CURRENT_KEYBOARD_RESPONDER 140

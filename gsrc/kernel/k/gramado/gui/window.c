@@ -618,84 +618,43 @@ void windowSendMessage( unsigned long arg1,
  * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com foco de entrada.
  * Ex: void *windowGetMessageWWF()
  */
+
+ //salvando a estrutura para o app pegar elemento por eemento.	
+struct message_d *xxxxsavemessage; 
+ 
 void *windowGetHandleWindow(struct window_d *window)
 {
-	void *kHANDLE;
-	
-	struct window_d *wFocus;
-	
-	
-	//
-	// teste
-	//
-	//isso não ficará assim, é só para testar se um app em user mode 
-	//consegue pegar alguma mensagem atravez dessa rotina.
-	
-	//int tmp;
-	//if( gNextKeyboardMessage != 0)
-	//{
-	//	tmp = gNextKeyboardMessage;
-    //    gNextKeyboardMessage = (int) 0;  		
-	//	return (void *) tmp; 
-	//};
-	
-	//Pega o ponteiro da janela com o foco de entrada.
-	wFocus = (void *) windowList[window_with_focus];
-	
-	//Desejamos usar a janela com o foco de entrada.
-	//if(  (void*) window != (void*) wFocus  )
-	//{
-	//	printf("windowGetMessage: window != wFocus \n");
-	//	refresh_screen();		
-	//	window = (void*) wFocus;
-	//};
-	
-	//
-	// #importante:
-	// Isso identifica exatamente de qual janela queremos a mensagem.
-	//
-	
-	//Testando a validade.
-	if((void*) window == NULL)
-	{ 
-		printf("windowGetMessage: window fail \n");
-		refresh_screen();		
-	    return NULL; 
-	}else{	
 
-			//isso exibiria muitas mensagens por causa do while.
-			//printf("windowGetMessage: focus={%s}\n",wFocus->name);	
+    //salvando a estrutura para o app pegar elemento por eemento.	
+	xxxxsavemessage = (struct message_d *) xdequeue(ld_keyboard_queue);
+	
+	return (void*) xxxxsavemessage->window;
+
+/*	
+	system_message_read++;
+	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
+    {
+		system_message_read = 0;
+	}		
+	
+	//Vamos ver se a primeira mensagem no pertence.	
+	m = (struct message_d *) system_message_queue[system_message_read];
+
+	if( m->used == 1 && m->magic == 1234 )
+	{
+		//?? object ??
 		
-		//
-		// @todo: Quando pegar a mensagem no buffer, tem que colocar 
-		// zero no lugar, pra não pegar novamente.
-		//
+		if( m->empty == 1 ){
+			goto fail;
+		}
 		
-		//window->receiveOffset = 0;
-				
-		// Não mudaremos o offset do receive ante de tentarmos pegar.
-		//Circula.
-		
-		//#importante: 
-		// Só faremos isso na primeira das 4 chamadas. 
-		window->receiveOffset++;
-		if(window->receiveOffset >= 32)
+		if( window == m->window )
 		{
-		    window->receiveOffset = 0;
+		    return (void*) m->window;
 		};
-				
-		//Pega mensagem.
-		kHANDLE = (void*) window->hwndList[window->receiveOffset]; 
-				
-		//Apaga a mensagem que foi consumida.
-		window->hwndList[window->receiveOffset] = 0; 
-		
-        //Incrementamos o offset para a próxima vez.
-		//window->receiveOffset++;  		
-		
-		//Retorna.
-		return (void*) kHANDLE; 
 	};
+
+*/	
 	//Nothing.
 fail:	
 	return NULL;
@@ -717,152 +676,75 @@ fail:
  */
 void *windowGetMessage(struct window_d *window)
 {
-	void *kMSG;
 	
-	struct window_d *wFocus;
+	return (void*) xxxxsavemessage->msg;
 	
+	/*
 	
-	//
-	// teste
-	//
-	//isso não ficará assim, é só para testar se um app em user mode 
-	//consegue pegar alguma mensagem atravez dessa rotina.
-	
-	//int tmp;
-	//if( gNextKeyboardMessage != 0)
-	//{
-	//	tmp = gNextKeyboardMessage;
-    //    gNextKeyboardMessage = (int) 0;  		
-	//	return (void *) tmp; 
-	//};
-	
-	//Pega o ponteiro da janela com o foco de entrada.
-	wFocus = (void *) windowList[window_with_focus];
-	
-	//Desejamos usar a janela com o foco de entrada.
-	//if(  (void*) window != (void*) wFocus  )
-	//{
-	//	printf("windowGetMessage: window != wFocus \n");
-	//	refresh_screen();		
-	//	window = (void*) wFocus;
-	//};
+	struct message_d *m;
 	
 	
-	//Testando a validade.
-	if((void*) window == NULL)
-	{ 
-		printf("windowGetMessage: window fail \n");
-		refresh_screen();		
-	    return NULL; 
-	}else{	
+	system_message_read++;
+	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
+    {
+		system_message_read = 0;
+	}	
+	
+	//Vamos ver se a primeira mensagem no pertence.	
+	m = (struct message_d *) system_message_queue[system_message_read];
 
-			//isso exibiria muitas mensagens por causa do while.
-			//printf("windowGetMessage: focus={%s}\n",wFocus->name);	
+	if( m->used == 1 && m->magic == 1234 )
+	{
+		//?? object ??
 		
-		//
-		// @todo: Quando pegar a mensagem no buffer, tem que colocar 
-		// zero no lugar, pra não pegar novamente.
-		//
-		
-		//window->receiveOffset = 0;
-				
-		// Não mudaremos o offset do receive ante de tentarmos pegar.
-		//Circula.
-		
-		//#importante: 
-		// Só faremos isso na primeira das 4 chamadas. 
-		//if(window->receiveOffset >= 32)
-		//{
-		//    window->receiveOffset = 0;
-		//};
-				
-		//Pega mensagem.
-		kMSG = (void*) window->msgList[window->receiveOffset]; 
-				
-		//Apaga a mensagem que foi consumida.
-		window->msgList[window->receiveOffset] = 0; 
-		
-        //Incrementamos o offset para a próxima vez.
-		//window->receiveOffset++;  		
-		
-		//Retorna.
-		return (void*) kMSG; 
+		if( m->empty == 1 ){
+			goto fail;
+		}
+			
+		if( window == m->window )
+        {			
+		    return (void*) m->msg;
+		};
 	};
+	*/
+		
 	//Nothing.
 fail:	
 	return NULL;
 };
 
 
+
 void *windowGetLong1(struct window_d *window)
 {
-	void *kLONG1;
+	return (void*) xxxxsavemessage->long1;
+	/*
+	struct message_d *m;
 	
-	struct window_d *wFocus;
+	system_message_read++;
+	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
+    {
+		system_message_read = 0;
+	}	
 	
-	
-	//
-	// teste
-	//
-	//isso não ficará assim, é só para testar se um app em user mode 
-	//consegue pegar alguma mensagem atravez dessa rotina.
-	
-	//int tmp;
-	//if( gNextKeyboardMessage != 0)
-	//{
-	//	tmp = gNextKeyboardMessage;
-    //    gNextKeyboardMessage = (int) 0;  		
-	//	return (void *) tmp; 
-	//};
-	
-	//Pega o ponteiro da janela com o foco de entrada.
-	wFocus = (void *) windowList[window_with_focus];
-	
-	//Desejamos usar a janela com o foco de entrada.
-	//if(  (void*) window != (void*) wFocus  )
-	//{
-	//	printf("windowGetLong1: window != wFocus \n");
-	//	refresh_screen();		
-	//	window = (void*) wFocus;
-	//};
-	
-	
-	//Testando a validade.
-	if((void*) window == NULL)
-	{ 
-		printf("windowGetLong1: window fail \n");
-		refresh_screen();		
-	    return NULL; 
-	}else{	
+	//Vamos ver se a primeira mensagem no pertence.	
+	m = (struct message_d *) system_message_queue[system_message_read];
 
-			//isso exibiria muitas mensagens por causa do while.
-			//printf("windowGetMessage: focus={%s}\n",wFocus->name);	
+	if( m->used == 1 && m->magic == 1234 )
+	{
+		//?? object ??
 		
-		//
-		// @todo: Quando pegar a mensagem no buffer, tem que colocar 
-		// zero no lugar, pra não pegar novamente.
-		//
+		if( m->empty == 1 ){
+			goto fail;
+		}
 		
-		//window->receiveOffset = 0;
-				
-		// Não mudaremos o offset do receive ante de tentarmos pegar.
-		//Circula.
-		//if(window->receiveOffset >= 32){
-		//	window->receiveOffset = 0;
-		//};
-				
-		//Pega mensagem.
-		kLONG1 = (void*) window->long1List[window->receiveOffset]; 
-				
-		//Apaga a mensagem que foi consumida.
-		window->long1List[window->receiveOffset] = 0; 
-		
-        //Incrementamos o offset para a próxima vez.
-		//window->receiveOffset++;  		
-		
-		//Retorna.
-		return (void*) kLONG1; 
+		if( window == m->window )
+		{
+			return (void*) m->long1;
+		};
 	};
+	*/
+		
 	//Nothing.
 fail:	
 	return NULL;
@@ -872,73 +754,37 @@ fail:
 
 void *windowGetLong2(struct window_d *window)
 {
-	void *kLONG2;
+	return (void*) xxxxsavemessage->long2;
 	
-	struct window_d *wFocus;
+	/*
+	struct message_d *m;
 	
+	system_message_read++;
+	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
+    {
+		system_message_read = 0;
+	}	
 	
-	//
-	// teste
-	//
-	//isso não ficará assim, é só para testar se um app em user mode 
-	//consegue pegar alguma mensagem atravez dessa rotina.
-	
-	//int tmp;
-	//if( gNextKeyboardMessage != 0)
-	//{
-	//	tmp = gNextKeyboardMessage;
-    //    gNextKeyboardMessage = (int) 0;  		
-	//	return (void *) tmp; 
-	//};
-	
-	//Pega o ponteiro da janela com o foco de entrada.
-	wFocus = (void *) windowList[window_with_focus];
-	
-	//Desejamos usar a janela com o foco de entrada.
-	//if(  (void*) window != (void*) wFocus  )
-	//{
-	//	printf("windowGetLong2: window != wFocus \n");
-	//	refresh_screen();		
-	//	window = (void*) wFocus;
-	//};
-	
-	
-	//Testando a validade.
-	if((void*) window == NULL)
-	{ 
-		printf("windowGetLong2: window fail \n");
-		refresh_screen();		
-	    return NULL; 
-	}else{	
+	//Vamos ver se a primeira mensagem no pertence.	
+	m = (struct message_d *) system_message_queue[system_message_read];
 
-			//isso exibiria muitas mensagens por causa do while.
-			//printf("windowGetMessage: focus={%s}\n",wFocus->name);	
+	if( m->used == 1 && m->magic == 1234 )
+	{
+		//?? object ??
 		
-		//
-		// @todo: Quando pegar a mensagem no buffer, tem que colocar 
-		// zero no lugar, pra não pegar novamente.
-		//
+		if( m->empty == 1 ){
+			goto fail;
+		}
 		
-		//window->receiveOffset = 0;
-				
-		// Não mudaremos o offset do receive ante de tentarmos pegar.
-		//Circula.
-		//if(window->receiveOffset >= 32){
-		//	window->receiveOffset = 0;
-		//};
-				
-		//Pega mensagem.
-		kLONG2 = (void*) window->long2List[window->receiveOffset]; 
-				
-		//Apaga a mensagem que foi consumida.
-		window->long2List[window->receiveOffset] = 0; 
-		
-        //Incrementamos o offset para a próxima vez.
-		//window->receiveOffset++;  		
-		
-		//Retorna.
-		return (void*) kLONG2; 
+		if( window == m->window )
+		{	
+			//no quarto elemento sinalizamos que o slot está vazio.
+			m->empty = 1;
+		    return (void*) m->long2;
+		};
 	};
+	*/
+		
 	//Nothing.
 fail:	
 	return NULL;

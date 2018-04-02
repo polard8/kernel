@@ -76,7 +76,8 @@ void servicesChangeProcedure();
  *     São vários serviços.
  *
  *
- * obs: >>> TODOS OS SERVIÇOS DESSA ROTINA DEVEM CHAMAR ROTINAS DE CLASSES 'system.x.x'
+ * Obs: 
+ * TODOS OS SERVIÇOS DESSA ROTINA PODEM CHAMAR ROTINAS DE CLASSES 'system.x.x'.
  *
  * @todo: 
  *    Pode haver algum tipo de autorização para essa rotina.
@@ -103,7 +104,7 @@ void *services( unsigned long number,
 				unsigned long arg4 )
 {
 	//
-	// Decalrações.
+	// Declarações.
 	//
 	
     //Args. (strings)
@@ -767,6 +768,12 @@ void *services( unsigned long number,
 								COLOR_BLACK,                             //color. 
 								(unsigned long) arg4);                   //char.
     		break;
+			
+			
+		//139
+        case SYS_GETSCANCODE:
+		    return (void*) get_scancode();
+            break;		
 
         //140
         case SYS_SET_CURRENT_KEYBOARD_RESPONDER:

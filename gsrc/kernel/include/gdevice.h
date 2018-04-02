@@ -14,6 +14,15 @@
  
  
  
+//O driver de sistema é do tipo persistente. Não poderá ser descarregado,
+//permanecerá na memória o tempo todo. Poderá ser desativado. Pode estar em qualquer ring.
+//O driver modular poderá ser descarregado. 
+typedef enum {
+	DriverTypeSystem,     //Persistente.
+	DriverTypeModular,    //Modular.
+	//...
+}driver_type_t; 
+ 
 //Classes mais comuns de dispositivos.
 //Outras poderão ser incluídas futuramente. 
 typedef enum {
@@ -22,6 +31,8 @@ typedef enum {
 	HostDeviceTypeIOT,       //Iot.
 	//...
 }host_device_type_t; 
+
+
  
 typedef struct host_device_info_d host_device_info_t; 
 struct host_device_info_d
@@ -39,6 +50,24 @@ struct host_device_info_d
 };
 host_device_info_t *HostDeviceInfo; 
 //
+
+/*
+ * #bugbug essa estrutura ja deve ter sido definida em outro lugar , por isso 
+ * esta dando problemas.
+ * @todo: tirar o x.
+ *
+typedef struct xdevice_driver_d xdevice_driver_t;
+struct xdevice_driver_d
+{
+	driver_type_t driver_type;  //do sistema ou modular.
+	
+	struct host_device_info_d *device_info;
+	
+	int status;  //habilidado ou desabilitado.
+	
+	//...
+};
+*/
  
 // 
 // Globais de fácil acesso.

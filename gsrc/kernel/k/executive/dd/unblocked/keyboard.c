@@ -1,5 +1,5 @@
 /*
- * File: executive\dd\unblocked\keyboard.c
+ * File: unblocked\keyboard.c
  *
  * Driver de teclado presente dentro do Kernel Base.
  * Esse será o driver de teclado para o modelo abnt2.
@@ -48,6 +48,13 @@
 // biblioteca estática que acesse as portas por ele.
 //
 
+
+
+char _keyboard_queue[32];
+
+int _write_offset;
+int _read_offset;
+
 /*
  * *******************************************************
  * abnt2_keyboard_handler: 
@@ -66,14 +73,9 @@
  */
 void abnt2_keyboard_handler()
 {
-    unsigned char scancode;
-	
-	//
-	// Pega o scancode. 
-	//
-
-	scancode = inportb(0x60);	
-    	
+    unsigned char scancode = inportb(0x60);	
+			
+		
 	//
 	// * Importante:
 	//   Estamos no driver de teclado.
@@ -83,9 +85,37 @@ void abnt2_keyboard_handler()
 	//
 	
 callLineDiscipline:	
+
+//@todo:precisa inicializar esse buffer e as variáveis.
+
+  //  _write_offset++;
+//	if( _write_offset >= 32 ){
+//		_write_offset = 0;
+//	}
+	//_keyboard_queue[_write_offset] = scancode; 
+	
+	
 	LINE_DISCIPLINE(scancode);
+eoi:
+    outportb(0x20,0x20);    //EOI.
 	return;
 };
+
+
+unsigned long get_scancode()
+{	
+	unsigned long c;
+	
+	_read_offset++;
+	if( _read_offset >= 32 ){
+		_read_offset = 0;
+	}
+	
+	c = 0;
+	c = (unsigned long) _keyboard_queue[_read_offset];
+	
+	return (unsigned long) c; 
+}
 
 
 /*

@@ -118,18 +118,21 @@ done:
 
 /*
  * scroll:
+ * *Importante: Um (retângulo) num terminal deve ser o lugar onde o buffer de linhas 
+ * deve ser pintado. Obs: Esse retãngulo pode ser configurado através de uma função.
  *     Scroll the screen in text mode.
  *     Scroll the screen in graphical mode.
  *     @todo Poderiam ser duas funções: ex: gui_scroll(). 
- *     @todo: Não realizar scroll da interface gráfica.
  *    
- *     *IMPORTANTE
- *     O Que devemos fazer é reordenar as linhas
- *     nos buffers de linhas
- *     para mensagens de texto em algum terminal. 
- *     @todo: Ele não será feito dessa forma, termos uma disciplica de linhas
+ * * IMPORTANTE
+ *   O que devemos fazer é reordenar as linhas nos buffers de linhas
+ *     para mensagens de texto em algum terminal.
+ * 
+ * @todo: Ele não será feito dessa forma, termos uma disciplica de linhas
  * num array de linhas que pertence à uma janela.
+ *
  * @todo: Fazer o scroll somente no stream stdin e depois mostrar ele pronto.
+ *
  */
 void scroll(void)
 {

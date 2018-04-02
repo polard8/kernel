@@ -169,6 +169,6 @@ console_t *CurrentConsole;
 
 
 //
-//fim.
+// End.
 //
 

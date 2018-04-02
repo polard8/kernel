@@ -80,12 +80,35 @@
  */ 
  
  
-
+//keyboard support
 #define LDISC_KEY_RELEASED  0x80
 #define LDISC_KEY_MASK  0x7F
 #define LDISC_FULL      1
 #define LDISC_EMPTY     0
 #define LDISC_OBF       0x01    //Output buffer flag.
+ 
+//msg - dialog 
+#define LDISC_NULL 0
+#define LDISC_GET_ALT_STATUS 1
+#define LDISC_GET_CTRL_STATUS 2
+#define LDISC_GET_SHIFT_STATUS 3
+#define LDISC_GET_WINKEY_STATUS 4
+#define LDISC_GET_CAPITAL_STATUS 5
+#define LDISC_GET_NUMLOCK_STATUS 6
+#define LDISC_CHANGE_MESSAGE1 7     //use long1 como mensagem
+#define LDISC_CHANGE_MESSAGE2 8     //use long2 como mensagem
+
+//pega a próxima mensagem da fila fifo. circular.
+#define LDISC_GET_NEXT_MESSAGE 9    
+
+//pega o próximo scancode da fila fifo. circular.
+#define LDISC_GET_NEXT_SCANCODE 10  
+
+//Um endereço em usermode espera pelos 4 argumentos da mensagem.	
+#define LDISC_RECEIVE_MESSAGE   11  
+#define LDISC_LOAD_ARGS   12
+//...
+ 
  
  
 //variável de ambiente. 
@@ -156,8 +179,8 @@ unsigned long keyboard_handler_address;
 //@todo: Variável que identifique o driver. seu nome e pathname.
 
 //int KeyboardObjectNumber;
-//char *keybaord_driver_name;
-//char *keybaord_driver_pathname;
+//char *keyboard_driver_name;
+//char *keyboard_driver_pathname;
 
 
 /*
@@ -312,6 +335,36 @@ void ps2();
 //esse scacode passará por essa rotina, então o kernel base deve chamar essa rotina
 //apos ter recebido o scacode do driver de teclado.
 void LINE_DISCIPLINE(unsigned char SC);
+
+
+//
+// marcos - queue  - teste
+//
+
+//==========================================
+// marlls1989 - marcos - queue 
+
+
+typedef struct ld_queue_t {
+	//pthread_mutex_t lock;
+	//pthread_cond_t wait;
+	volatile size_t reads, writes;
+	size_t size;
+	void **data;
+} ld_queue_t;
+
+ld_queue_t *ld_keyboard_queue;  //fila para o teclado.
+
+
+
+void xenqueue(void *element, ld_queue_t *queue);
+void *xdequeue(ld_queue_t *queue);
+void xinit_queue(ld_queue_t *queue);
+void xdestroy_queue(ld_queue_t *queue);
+static void xresize_queue(ld_queue_t *queue, size_t new_size);
+
+//size should always be a power of 2
+#define QUEUE_INITIAL_SIZE 32 //16
 
 
 //

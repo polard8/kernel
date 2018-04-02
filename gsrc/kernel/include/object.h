@@ -141,6 +141,7 @@
 #define OBJECTS_COLOR_SCHEME 76   //ObjectTypeColorScheme
 #define OBJECTS_BUTTON 77
 #define OBJECTS_GRID 78
+#define OBJECTS_MESSAGE 79
 
 //...
 

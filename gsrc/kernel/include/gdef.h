@@ -115,6 +115,7 @@ typedef enum {
 // deichando os vindouros como subsequentes à esses.
 //
 
+//talvez isso devesse ir para object.h
 typedef enum {
 	
 	// **** EXECUTIVE  ****
@@ -225,12 +226,15 @@ typedef enum {
 	ObjectTypeColorScheme,  //76
 	ObjectTypeButton,       //77
 	ObjectTypeGrid,       //78
+	ObjectTypeMessage,    //79
 	//...
 }object_type_t;
 
 //
 // Enumerando classes de objetos. (categorias)
 //
+
+//talvez isso devesse ir para object.h
 typedef enum {
 	ObjectClassKernelObjects,  // Kernel Objects.
 	ObjectClassUserObjects,    // User Objects.

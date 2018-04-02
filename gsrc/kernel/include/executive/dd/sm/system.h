@@ -552,10 +552,24 @@ void *services( unsigned long number,
 
 				
 
+				
+/*
+ * ldisc_dialog:
+ *     Procedimento de dialogo usado para a manipulação de 
+ * eventos de teclado.
+ *     esse procedimento deve ser chamado quando o sistema 
+ * ou algum processo deseja interagir com o driver de teclado 
+ *  ?? planejando a funcionalidade desse diálogo ??
+ */
+unsigned long ldisc_dialog( struct window_d *window, 
+                            int msg, 
+							unsigned long long1, 
+							unsigned long long2 ); 
+							
 /*
  procedimento de janleas do terminal.
 */				
-unsigned long terminal_procedure( struct window_d *window, 
+unsigned long terminal_dialog( struct window_d *window, 
                                 int msg, 
 								unsigned long long1, 
 								unsigned long long2); 
