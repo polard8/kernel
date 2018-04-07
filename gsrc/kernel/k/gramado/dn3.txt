@@ -1,0 +1,7 @@
+
+/gramado lida com input e output e console...
+
+
+/guser
+/ggdi
+/gconsole

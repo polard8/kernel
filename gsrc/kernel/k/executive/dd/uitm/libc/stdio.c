@@ -745,31 +745,38 @@ void outbyte(int c)
         prev = c;
         return;         
     };
+	
+	
+	//
+	// limits
+	//
         
      
     //
     // Filtra as dimensões da janela onde está pintando.
     // @todo: Esses limites precisam de variável global.
 	//        mas estamos usando printf pra tudo.
-	//        cada elemeto terá que impor seu próprio limite.
-	//        O processo shell impoe seu limite.
-	//        a janela impoe seu limite etc...
+	//        cada elemento terá que impor seu próprio limite.
+	//        O processo shell impõe seu limite.
+	//        a janela impõe seu limite etc...
 	//        Esse aqui é o limite máximo de uma linha.
-    // poderia ser o limite imposto pela disciplina de linha
-    // do kernel. para o máximo de input. Pois o input é
+    // Poderia ser o limite imposto pela disciplina de linha
+    // do kernel para o máximo de input. Pois o input é
     // armazenado em uma linha.	 
 	//
 	
 //checkLimits:	
 
     //Limites para o número de caracteres numa linha.
-    if( g_cursor_x >= (g_cursor_right-1) )  
-    {
+    if( g_cursor_x >= (g_cursor_right-1) )
+	{
         g_cursor_x = g_cursor_left;
         g_cursor_y++;  
 		
     }else{   
-        g_cursor_x++;    // Apenas incrementa a coluna.                       
+	
+	    // Apenas incrementa a coluna. 
+        g_cursor_x++;                          
     };
     
 	
@@ -813,22 +820,27 @@ void _outbyte(int c)
 	unsigned long x;
 	unsigned long y;
 	
+    //O caractere.
+	char ch = (char) c;
+	char ch_atributo = (char) g_char_attrib;
+
+
+	//suporte ao modo texto.
 	//Base atual da memória de vídeo 0x000B8000;
     //@todo: usar VideoBlock.currentVM.
 	char *vm = (char *) g_current_vm;    
-
-	char ch = (char) c;
-	char ch_atributo = (char) g_char_attrib;
 	
 	
 	//
-	// *** #Importante: Essa rotina não sabe nada sobre janela, ela escreve na tela 
-	// como um todo: só está considerando as dimensões do 'char'.
+	// #Importante: 
+	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
+	// um todo. Só está considerando as dimensões do 'char'.
 	//
 
-    /*
-     * Caso estivermos em modo gráfico.
-     */
+    //
+    // Caso estivermos em modo gráfico.
+    //
+	 
 	if(VideoBlock.useGui == 1)
 	{
 	    //	vsync();
@@ -848,15 +860,19 @@ void _outbyte(int c)
 			
 		    //@todo: Listar aqui os modos VESA.
 		    case 1:
-			      my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
-				  
-			      //my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
-				  //my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
+			    // #bugbug.
+			    // @todo: Aqui temos a intenção de usar variáveis globais.
+				// Mas está dando problema.
+				my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
+				//my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
 			    break;
+				
 		    default:
+			    // #bugbug.
+			    // @todo: Aqui temos a intenção de usar variáveis globais.
+				// Mas está dando problema.
 			    //modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
 			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
-				//my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WINDOWTEXT, c);
 			    //my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
 				break;
 		};
@@ -865,9 +881,10 @@ void _outbyte(int c)
 	};
  
 
-	/*
-	 * Caso estivermos em text mode.
-	 */
+	//
+	// Caso estivermos em text mode.
+	//
+	 
     if(VideoBlock.useGui == 0)
 	{
 	    //calcula o valor do deslocamento para text mode 80x25.

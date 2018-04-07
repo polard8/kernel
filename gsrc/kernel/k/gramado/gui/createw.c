@@ -455,15 +455,15 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//serão acionadas mais tarde, na hora da pintuda, de acordo com
 		//o tipo de janela à ser pintada.
 		
+		//Current message.
 		//Msg support.
 		window->msg_window = (void *) window;
 		window->msg = 0;
 		window->long1 = 0;
 		window->long2 = 0;
 		
-		//Offsets
-		window->sendOffset = 0;
-		window->receiveOffset = 0;
+		//Se tem ou não uma nova mensagem.
+		window->newmessageFlag = 0;
 		
 		//Filas de mensagens.
 		//São dessas filas que os programas em user mode
@@ -472,6 +472,10 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		window->msgList[0] = 0;
 		window->long1List[0] = 0;
 		window->long2List[0] = 0;
+		
+		//Offsets
+		window->sendOffset = 0;
+		window->receiveOffset = 0;
 		
 		//Buffers support.
 		

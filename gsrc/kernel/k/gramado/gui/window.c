@@ -49,6 +49,125 @@ extern unsigned long kArg4;	   //??.
 
 
 /*
+  test - queue support *******************************
+ */
+ 
+ 
+ /*
+ 
+#define MAX_ITEMS    4*4
+typedef struct circularQueue_s
+{
+    int     first;
+    int     last;
+    int     validItems;
+    
+	//int     data[MAX_ITEMS];
+	unsigned long data[MAX_ITEMS];
+	
+} circularQueue_t;
+
+
+    unsigned long readValue;
+    circularQueue_t   myQueue;
+
+void initializeQueue(circularQueue_t *theQueue);
+ 
+int isEmpty(circularQueue_t *theQueue);
+ 
+int putItem(circularQueue_t *theQueue, unsigned long theItemValue);
+ 
+int getItem(circularQueue_t *theQueue, unsigned long *theItemValue);
+ 
+//void printQueue(circularQueue_t *theQueue);
+
+*/
+
+/*
+void initializeQueue(circularQueue_t *theQueue)
+{
+    int i;
+    theQueue->validItems  =  0;
+    theQueue->first       =  0;
+    theQueue->last        =  0;
+    for(i=0; i<MAX_ITEMS; i++)
+    {
+        theQueue->data[i] = (unsigned long) 0;
+    }        
+    return;
+}
+*/
+
+/*
+int isEmpty(circularQueue_t *theQueue)
+{
+    if(theQueue->validItems==0)
+        return(1);
+    else
+        return(0);
+}
+*/
+
+/*
+int putItem(circularQueue_t *theQueue, unsigned long theItemValue)
+{
+    if(theQueue->validItems>=MAX_ITEMS)
+    {
+        printf("The queue is full\n");
+        printf("You cannot add items\n");
+        return(-1);
+    }
+    else
+    {
+        theQueue->validItems++;
+        theQueue->data[theQueue->last] = (unsigned long) theItemValue;
+        theQueue->last = (theQueue->last+1)%MAX_ITEMS;
+    }
+}
+*/
+
+/*
+int getItem(circularQueue_t *theQueue, unsigned long *theItemValue)
+{
+    if(isEmpty(theQueue))
+    {
+        printf("isempty\n");
+        return(-1);
+    }
+    else
+    {
+        *theItemValue =  theQueue->data[theQueue->first];
+        theQueue->first = (theQueue->first+1)%MAX_ITEMS;
+        theQueue->validItems--;
+        return(0);
+    }
+}
+*/
+
+/*
+void printQueue(circularQueue_t *theQueue)
+{
+    int aux, aux1;
+    aux  = theQueue->first;
+    aux1 = theQueue->validItems;
+    while(aux1>0)
+    {
+        printf("Element #%d = %d\n", aux, theQueue->data[aux]);
+        aux=(aux+1)%MAX_ITEMS;
+        aux1--;
+    }
+    return;
+}
+ 
+*/
+
+/*
+ **************************************
+*/ 
+
+
+
+/*
  * windowInitializeBrowserSupport:
  *      (KSOC - Kernel Standard Output Container)
  *       gerenciador de ambientes de janelas ... como no caso de window station/desktop/window...
@@ -570,6 +689,27 @@ void windowSendMessage( unsigned long arg1,
 		//Valida a estrutura da janela com o foco de entrada.
 		if( wFocus->used == 1 && wFocus->magic == 1234 )
 		{
+			
+			//testando fila do sistema para teclado.
+			
+			//putItem(&myQueue, arg1);
+			//putItem(&myQueue, arg2);
+			//putItem(&myQueue, arg3);
+			//putItem(&myQueue, arg4);
+			
+			// se a mensagem atual foi consumida, não colocaremos na fila.
+			//Isso significa que não temos uma mensagem atual, então
+			//essa mensagem se torna a atual e não colocamos nada na fila.
+			if( wFocus->newmessageFlag == 0 )
+			{
+				wFocus->msg_window = (struct window_d *) arg1;
+				wFocus->msg   = (int) arg2;      
+				wFocus->long1 = (unsigned long) arg3;
+				wFocus->long2 = (unsigned long) arg4;
+				wFocus->newmessageFlag = 1;
+				goto done;
+			};
+			
             //nesse momento podemos mostrar o nome da janela com o foco de entrada.
 			//printf("windowSendMessage: focus={%s}\n",wFocus->name);
               			
@@ -601,13 +741,19 @@ void windowSendMessage( unsigned long arg1,
           		
 	};
 	
+	
+done:	
 	return;
 };
 
 
 /*
- * windowGetMessage:
+ **********************************************************************
+ * windowGetHandleWindow:
  *     Pega uma mensagem na estrutura da janela com o foco de entrada.
+ *     #importante: Não devemos nos preocupar em saber qual foi o dispositivo 
+ *                  gerador do evento, apenas pegar a mensagem na fila da    
+ *                  janela com o foco de entrada.
  *
  * Obs: 
  *     Esse mecanismo deve ser reproduzido para os parametros hwnd, long1 e long2.
@@ -619,42 +765,77 @@ void windowSendMessage( unsigned long arg1,
  * Ex: void *windowGetMessageWWF()
  */
 
- //salvando a estrutura para o app pegar elemento por eemento.	
+// Salvando a estrutura para o app pegar elemento por eemento.	(#teste)
 struct message_d *xxxxsavemessage; 
  
 void *windowGetHandleWindow(struct window_d *window)
 {
-
-    //salvando a estrutura para o app pegar elemento por eemento.	
-	xxxxsavemessage = (struct message_d *) xdequeue(ld_keyboard_queue);
 	
-	return (void*) xxxxsavemessage->window;
+	//test 
+	//getItem(&myQueue, &readValue);
+	//return (void*) readValue;
+	
+	/*
 
-/*	
+    //Teste. 
+    //Salvando a estrutura para o app pegar elemento por elemento.	
+	//xxxxsavemessage = (struct message_d *) xdequeue(ld_keyboard_queue);
+	
+	//return (void*) xxxxsavemessage->window;
+
 	system_message_read++;
 	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
     {
 		system_message_read = 0;
 	}		
 	
-	//Vamos ver se a primeira mensagem no pertence.	
-	m = (struct message_d *) system_message_queue[system_message_read];
-
-	if( m->used == 1 && m->magic == 1234 )
-	{
-		//?? object ??
+	//Vamos ver se a primeira mensagem nos pertence.	
+	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
+    
+	if( (void*) xxxxsavemessage == NULL ){
+		goto fail;
+	}
+	
+	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
+	    goto fail;
+	};
+			
+	if( xxxxsavemessage->empty == 1 ){
+		goto fail;
+	}
 		
-		if( m->empty == 1 ){
-			goto fail;
+	//if( window == m->window ){
+	//	return (void*) m->window;
+	//};
+		
+	
+done:
+    return (void*) xxxxsavemessage->window;	
+
+	*/
+	
+
+	
+	//pegando na estrutura de janela a mensagem da vez.
+	struct window_d *save;  //arg1.
+	
+	
+	if((void*) window == NULL ){
+		goto fail;
+	}else{
+		
+		//se ainda não tem nova mensagem
+		if( window->newmessageFlag == 0 ){
+		    goto fail;	
 		}
 		
-		if( window == m->window )
-		{
-		    return (void*) m->window;
-		};
+		save = (void*) window->msg_window;			
+		window->msg_window = 0;		
+		
+		return (void*) save;
 	};
-
-*/	
+	
+	
 	//Nothing.
 fail:	
 	return NULL;
@@ -676,37 +857,59 @@ fail:
  */
 void *windowGetMessage(struct window_d *window)
 {
+
+	//test 
+	//getItem(&myQueue, &readValue);
+	//return (void*) readValue;
 	
-	return (void*) xxxxsavemessage->msg;
+/*
 	
-	/*
-	
-	struct message_d *m;
-	
+	//return (void*) xxxxsavemessage->msg;
 	
 	system_message_read++;
 	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
     {
 		system_message_read = 0;
-	}	
+	}		
 	
-	//Vamos ver se a primeira mensagem no pertence.	
-	m = (struct message_d *) system_message_queue[system_message_read];
-
-	if( m->used == 1 && m->magic == 1234 )
-	{
-		//?? object ??
-		
-		if( m->empty == 1 ){
-			goto fail;
-		}
-			
-		if( window == m->window )
-        {			
-		    return (void*) m->msg;
-		};
+	//Vamos ver se a primeira mensagem nos pertence.	
+	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
+    
+	if( (void*) xxxxsavemessage == NULL ){
+		goto fail;
+	}
+	
+	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
+	    goto fail;
 	};
-	*/
+			
+	if( xxxxsavemessage->empty == 1 ){
+		goto fail;
+	}
+	
+done:
+    return (void*) xxxxsavemessage->msg;
+
+*/
+
+	//pegando na estrutura de janela a mensagem da vez.
+	int save;
+	
+	if((void*) window == NULL ){
+		goto fail;
+	}else{
+		
+		//se ainda não tem nova mensagem
+		if( window->newmessageFlag == 0 ){
+		    goto fail;	
+		}
+
+				
+		save = (int) window->msg;
+		window->msg = 0;
+		
+		return (void*) save;
+	};	
 		
 	//Nothing.
 fail:	
@@ -717,33 +920,57 @@ fail:
 
 void *windowGetLong1(struct window_d *window)
 {
-	return (void*) xxxxsavemessage->long1;
+	
+	//test 
+	//getItem(&myQueue, &readValue);
+	//return (void*) readValue;	
+	
 	/*
-	struct message_d *m;
+	//return (void*) xxxxsavemessage->long1;
 	
 	system_message_read++;
 	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
     {
 		system_message_read = 0;
-	}	
+	}		
 	
-	//Vamos ver se a primeira mensagem no pertence.	
-	m = (struct message_d *) system_message_queue[system_message_read];
-
-	if( m->used == 1 && m->magic == 1234 )
-	{
-		//?? object ??
-		
-		if( m->empty == 1 ){
-			goto fail;
-		}
-		
-		if( window == m->window )
-		{
-			return (void*) m->long1;
-		};
+	//Vamos ver se a primeira mensagem nos pertence.	
+	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
+    
+	if( (void*) xxxxsavemessage == NULL ){
+		goto fail;
+	}
+	
+	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
+	    goto fail;
 	};
+			
+	if( xxxxsavemessage->empty == 1 ){
+		goto fail;
+	}
+	
+done:
+    return (void*) xxxxsavemessage->long1;
+	
 	*/
+	
+	//pegando na estrutura de janela a mensagem da vez.
+	unsigned long save;
+	
+	if((void*) window == NULL ){
+		goto fail;
+	}else{
+		
+		//se ainda não tem nova mensagem
+		if( window->newmessageFlag == 0 ){
+		    goto fail;	
+		}
+
+				
+		save = (unsigned long) window->long1;
+        window->long1 = 0;		
+		return (void*) save;
+	};	
 		
 	//Nothing.
 fail:	
@@ -754,36 +981,64 @@ fail:
 
 void *windowGetLong2(struct window_d *window)
 {
-	return (void*) xxxxsavemessage->long2;
+	
+	//test 
+	//getItem(&myQueue, &readValue);
+	//return (void*) readValue;
 	
 	/*
-	struct message_d *m;
+	//return (void*) xxxxsavemessage->long2;
 	
 	system_message_read++;
 	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
     {
 		system_message_read = 0;
-	}	
+	}		
 	
-	//Vamos ver se a primeira mensagem no pertence.	
-	m = (struct message_d *) system_message_queue[system_message_read];
-
-	if( m->used == 1 && m->magic == 1234 )
-	{
-		//?? object ??
-		
-		if( m->empty == 1 ){
-			goto fail;
-		}
-		
-		if( window == m->window )
-		{	
-			//no quarto elemento sinalizamos que o slot está vazio.
-			m->empty = 1;
-		    return (void*) m->long2;
-		};
+	//Vamos ver se a primeira mensagem nos pertence.	
+	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
+    
+	if( (void*) xxxxsavemessage == NULL ){
+		goto fail;
+	}
+	
+	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
+	    goto fail;
 	};
+			
+	if( xxxxsavemessage->empty == 1 ){
+		goto fail;
+	}
+	
+	//Liberar.
+	xxxxsavemessage->empty = 1;
+	
+done:
+    
+    return (void*) xxxxsavemessage->long2;
 	*/
+	
+	//pegando na estrutura de janela a mensagem da vez.
+    unsigned long save;
+	
+	if((void*) window == NULL ){
+		goto fail;
+	}else{
+		
+		//se ainda não tem nova mensagem
+		if( window->newmessageFlag == 0 ){
+		    goto fail;	
+		}
+
+				
+		save = (unsigned long) window->long2;
+        window->long2 = 0;		
+		
+		//Nesse momento autorizamos o kernel a colocar nova mensagem aqui.
+		window->newmessageFlag =  0;
+		return (void*) save;
+
+	};
 		
 	//Nothing.
 fail:	
@@ -2374,6 +2629,17 @@ int init_windows()
         //?? console ??		
 	};		
 
+	
+	/*
+	  test - testando queue para teclado.
+	 ************************************
+	 */
+	 
+	//inicializando a fila do sistema usada pelo teclado. 
+	//initializeQueue(&myQueue); 
+	 
+	 
+	 
 	
 	//
 	// Continua ...

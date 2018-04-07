@@ -380,7 +380,8 @@ unsigned long system_procedure( struct window_d *window,
 				   
 				//teclas de digitação para o editbox.   
                 default:
-					//Se for do tipo termional as teclas de digitação se 
+					
+					//Se for do tipo terminal as teclas de digitação se 
 					//serão tratadas pelo procedimento de janelas do terminal.
 					//para isso é só ir para o fim desse procedimento.
 					//if( window->terminal == 1 ){
@@ -390,22 +391,28 @@ unsigned long system_procedure( struct window_d *window,
 					//
 					// *importante:
 					// Podemos imprimir nesse momento, pois a impressão está correta e 
-					// deixarmos o input sem imprimir. o que parece ser normal, input
+					// deixarmos o input sem imprimir. O que parece ser normal, input
 					// apenas por dentro do buffer.
 					//
 						
 					//printf deve imprimir no caso de tab ou espaço...
 					//input só vai mexer com o buffer
 	
-	                //isso funciona porque printf incrementa o cursor antes de imprimir o char 
-					//no backbuffer. Tem caso que ele manipula o cursor e não imprime nada.
+	                // Isso funciona, porque printf incrementa o cursor antes 
+					// de imprimir o char no backbuffer. Tem caso que ele 
+					// manipula o cursor e não imprime nada.
 						
-					//printf deveria imprimir na janela com o foco de entrada.
-					//obs: printf o cursor do sistema. Para imprimir na janela temos 
-					//que auterar o cursor do sistema para ficar com as dimensões da 
-					//janela com o foco de entrada. shell.bin agradece.
-					//printf("%c", (char) long1);
-		            //refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+					// printf deveria imprimir na janela com o foco de entrada.
+					// obs: printf usa o cursor do sistema. Para imprimir na janela temos 
+					// que auterar o cursor do sistema para ficar com as dimensões da 
+					// janela com o foco de entrada. shell.bin agradece.
+					
+					//#bugbug: Problemas com o cursor. Está saltando a cada 
+					//caractere digitado. Mas o refresh funciona bem.
+					
+					//teste
+					printf("%c", (char) long1);
+		            refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 						
 			        //
 					// input:
@@ -437,26 +444,26 @@ unsigned long system_procedure( struct window_d *window,
 				
 				//Help. 
 				case VK_F1:	
-					//procedureHelp();
-				    alt_status = 0;
-					ctrl_status = 0;
-					shift_status = 0;
+					procedureHelp();
+				    //alt_status = 0;
+					//ctrl_status = 0;
+					//shift_status = 0;
                     //backgroundDraw(COLOR_BLACK);
 					//printf("%s",stdin->_base);  //mostrar a entrada padrão.
 					//refresh_screen();
                     
 					//tentando indica qual janela está com o foco de entrada.
-					draw_text(window,0,0,COLOR_PINK,"*");
-					refresh_rectangle( window->left, window->top, 8, 8 );
+					//draw_text(window,0,0,COLOR_PINK,"*");
+					//refresh_rectangle( window->left, window->top, 8, 8 );
 					break;
 					
 				
 				//Kernel info.	
                 case VK_F2:
-					//KiInformation();
-				    alt_status = 0;
-					ctrl_status = 0;
-					shift_status = 0;
+					KiInformation();
+				    //alt_status = 0;
+					//ctrl_status = 0;
+					//shift_status = 0;
                     // backgroundDraw(COLOR_BLACK);
 					//printf("%s",stdout->_base);  //mostrar a entrada padrão.
 					//refresh_screen();
@@ -465,11 +472,11 @@ unsigned long system_procedure( struct window_d *window,
 	
                 //CPU info. 				
                 case VK_F3: 
-					//show_cpu_intel_parameters();
-				    alt_status = 0;
-					ctrl_status = 0;
-					shift_status = 0;
-                   // backgroundDraw(COLOR_BLACK);
+					show_cpu_intel_parameters();
+				    //alt_status = 0;
+					//ctrl_status = 0;
+					//shift_status = 0;
+                    // backgroundDraw(COLOR_BLACK);
 					//printf("%s",stderr->_base);  //mostrar a entrada padrão.
 					//refresh_screen();
 					break;
@@ -525,8 +532,8 @@ unsigned long system_procedure( struct window_d *window,
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
 					
 					//habilitando o cursor.
-					timer_cursor_used = 1;
-					timer_cursor_status = 0;
+					//timer_cursor_used = 1;
+					//timer_cursor_status = 0;
 					
 					
 				    //testingFrameAlloc();
@@ -587,16 +594,16 @@ unsigned long system_procedure( struct window_d *window,
 					//mostra_slots();  //threadi.c
 					
 					//@todo: abrir o gerenciador de tarefas.
-					//show_process_information();
-					//show_thread_information();					
+					show_process_information();
+					show_thread_information();					
 				    
 					//aumentando gradativamente uma janela de pouco em pouco.
-					xxxx = (void*) windowList[6];
-					xxxx->width  -= 20;
-					xxxx->height -= 20;
-					resize_window(xxxx, xxxx->width, xxxx->height);
-					redraw_window(xxxx);					
-					refresh_screen();
+					//xxxx = (void*) windowList[6];
+					//xxxx->width  -= 20;
+					//xxxx->height -= 20;
+					//resize_window(xxxx, xxxx->width, xxxx->height);
+					//redraw_window(xxxx);					
+					//refresh_screen();
 					break;
 					
 				//Program manager.
@@ -609,12 +616,12 @@ unsigned long system_procedure( struct window_d *window,
 					//printf("F11\n");
 					
 					//aumentando gradativamente a janela de pouco em pouco.
-					xxxx = (void*) windowList[6];
-					xxxx->width  += 20;
-					xxxx->height += 20;
-					resize_window(xxxx, xxxx->width, xxxx->height);
-					redraw_window(xxxx);
-					refresh_screen();
+					//xxxx = (void*) windowList[6];
+					//xxxx->width  += 20;
+					//xxxx->height += 20;
+					//resize_window(xxxx, xxxx->width, xxxx->height);
+					//redraw_window(xxxx);
+					//refresh_screen();
 					break;
 					
 				//Control menu.	

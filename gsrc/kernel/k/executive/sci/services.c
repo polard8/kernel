@@ -30,6 +30,11 @@
 // Constantes internas.
 //
 
+//#BUGBUG
+// Esse máximo de serviços para a interrupção 200 não existirá mais.
+// um número grande de serviços poderá ser atendido por essa interupção,
+// esses 255 serviços são os serviços que serão atendidos em kernel mode
+// aqui no kernel base.
 #define SERVICE_NUMBER_MAX 255
 
 
@@ -97,6 +102,12 @@ void servicesChangeProcedure();
  *
  *@todo: *importante: Essa rotina deve identificar quem está chamando, PID TID.
  *
+ *
+ * *IMPORTANTE:
+ *  DEPENDEND DO NÚMERO DO SERVIÇO ELE PODERÁ SER TRATADO EM OUTRO ARQUIVO
+ *  E NÃO NO KERNEL BASE.
+ *
+ * 
  */
 void *services( unsigned long number, 
                 unsigned long arg2, 
@@ -675,13 +686,21 @@ void *services( unsigned long number,
 			
 	    //
         // 99,100,101,102 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
-        //		
+        //
+
+        //
+        // *importante: 
+		//  #bugbug SYS_GETKEYBOARDMESSAGE (44) está pegando a mensagem de teclado,
+		//          mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
+		//          qual foi o dispositivo gerador do evento. ??!!
+        //  		
 			
 		//**** 99,  Pega 'hwnd' na fila da janela com o foco de entrada.
 		case SYS_GETHWINDOW:
 		    return (void*) systemDevicesUnblocked(43,arg2,arg2,arg2,arg2);
 		    break;
 			
+		//#bugbug
 		//**** 44, Pega 'msg' na fila da janela com o foco de entrada.
 		case SYS_GETKEYBOARDMESSAGE:
 		    

@@ -1264,7 +1264,13 @@ void *systemDevicesUnblocked( int number,
 		
 	    //
         // 43,44,45,46 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
-        //	
+        //
+
+        //
+        // #importante:
+        // pegando as informações na fila da janela com foco de entrada.
+        //#bugbug: Devemos pegar a mensagem(msg) sem nos preocupar em qual é o 
+        // dispositivo gerador do evento.		
 	
 	    //msg.window
 	    case 43:

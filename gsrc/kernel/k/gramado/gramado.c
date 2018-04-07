@@ -3,6 +3,10 @@
  *
  *       Arquivo principal da camada gramado. (Antigo gui.c)
  *
+ * #Importante:
+ *  Aqui poderão ficar variáveis globais relativas à inteface gráfica.
+ * Essas variáveis globais serão acessíveis através de métodos. 
+ *
  * isso deve preparar o ambiente para rodar os aplicativos para o 
  * ambiente de usuário. A área de trabalho.
  *

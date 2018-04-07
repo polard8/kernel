@@ -55,7 +55,7 @@
 void fsCreateVFS()
 {
     FILE *vfs;
-    char * vfs_root;
+    char *vfs_root;
   
     //inicializa a estrutura ...
     vfs = ( void* ) malloc( sizeof(struct _iobuf) );
@@ -66,9 +66,13 @@ void fsCreateVFS()
 	//aloca memória para o diretório raiz do vfs.
     vfs_root = (char *) malloc(512*16);
 	
-	if( (char *) vfs_root == (char *) 0 ){
+	if( (char *) vfs_root == (char *) 0 )
+	{
 		//die();
-	}else{	
+	}else{
+		
+		//O início da área de memória reservado para o diretório 
+		//será salvo na estrutura de stream.
 		vfs->_base = (char *) vfs_root;
         //...
 	};

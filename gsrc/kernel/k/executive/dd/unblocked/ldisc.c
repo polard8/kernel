@@ -39,7 +39,6 @@ int mouse_buttom_1;
 int mouse_buttom_2;
 int mouse_buttom_3;
 
-
 //--
 //=========================================================
 
@@ -268,16 +267,20 @@ int kbMsgStatus;
 
 //
 // keyboardMessage
-//     estrutura interna para mensagens.
+//     Estrutura interna para mensagens.
 //
 struct keyboardMessage 
 {
-	unsigned char scancode;
-	
-	//hwnd;  //@todo: na verdade todo driver usará estrutura de janela descrita na API que o driver use.
-	int message;
-	unsigned long long1;
-	unsigned long long2;
+    unsigned char scancode;
+
+    //??
+    //@todo: Na verdade todo driver usará estrutura de janela descrita na API 
+    //que o driver use.
+
+    //? hwnd;  
+    int message;
+    unsigned long long1;
+    unsigned long long2;
 };
 
 
@@ -288,9 +291,9 @@ unsigned long keyboardGetKeyState(unsigned char key)
 	
 	switch(key)
 	{   
-		case VK_LSHIFT:
-		    State = shift_status;
-		    break;
+		case VK_LSHIFT: 
+		    State = shift_status; 
+			break;
 
 	    case VK_LCONTROL:
 		    State = ctrl_status;
@@ -333,7 +336,7 @@ unsigned long keyboardGetKeyState(unsigned char key)
 	
 Done:
     return (unsigned long) State;		
-}
+};
 
 
 /*
@@ -343,9 +346,11 @@ Done:
 void keyboardEnable()
 {
 	//Wait for bit 1 of status reg to be zero.
-    while( (inportb(0x64) & 2) != 0 ){
+    while( (inportb(0x64) & 2) != 0 )
+	{
 		//Nothing.
 	};
+	
 	//Send code for setting Enable command.
     outportb(0x60,0xF4);
     //sleep(100);
@@ -362,9 +367,11 @@ done:
 void keyboardDisable()
 {
 	//Wait for bit 1 of status reg to be zero.
-    while( (inportb(0x64) & 2) != 0 ){
+    while( (inportb(0x64) & 2) != 0 )
+	{
 		//Nothing.
 	};
+	
 	//Send code for setting disable command.
     outportb(0x60,0xF5);
     //sleep(100);
@@ -379,9 +386,7 @@ done:
  *     Set keyboard flags.
  *     ED = Set led.
  */
-
 // void keyboardSetLEDs(cahr flag)
-
 void keyboard_set_leds(char flag)
 {
 	//@todo: filtro.
@@ -408,7 +413,6 @@ done:
 
 
  
-
 /*
 void keyboard();
 void keyboard()
@@ -423,44 +427,43 @@ void keyboard()
 */
 
 
-
-
-
 /*
  ***********************************************
- *        LINE DISCIPLINE
- * funciona como um filtro.
- * Obs: Esse é a rotina principal desse arquivo, todo o resto 
- * deverá encontrar um lugar melhor.
+ * LINE DISCIPLINE
+ * Funciona como um filtro.
+ * Obs: Essa é a rotina principal desse arquivo, todo o resto 
+ * poderá encontrar um lugar melhor.
  *
  */
 void LINE_DISCIPLINE(unsigned char SC)
 {
-    /*
-	 * Step 0 - Declarações de variáveis.
-	 */
+    //
+    // Step 0 - Declarações de variáveis.
+    //
 
-	//Variáveis para tecla digitada.
+    //Variáveis para tecla digitada.
     unsigned char scancode;
-	unsigned char key;         //Tecla (uma parte do scancode).  
+    unsigned char key;         //Tecla (uma parte do scancode).  
     unsigned long mensagem;    //arg2.	
     unsigned long ch;          //arg3 - (O caractere convertido para ascii).
     unsigned long status;      //arg4.  
-	 
-	struct window_d *wFocus;
 
-	//Tela para debug em RING 0.
-    //unsigned char *screen = (unsigned char *) 0x000B8000;   
+    // Text mode support.
+	// Tela para debug em RING 0.
+    // unsigned char *screen = (unsigned char *) 0x000B8000;   
     unsigned char *screen = (unsigned char *) SCREEN_START;    //Virtual.   
-	//...
+    //...
 	
-	
-    /*
-     * Step1 - Pegar o scancode.
-     */
+	//Window.
+    struct window_d *wFocus;	
 
-	//scancode = inportb(0x60);    //@todo: usar constante. (retorno).
-    
+
+    //
+    // Step1 - Pegar o scancode.
+    //
+
+    //O driver pegou o scancode e passou para a disciplina de linha 
+    //através de parâmetro.	
 	scancode = SC;
 	
 
@@ -468,15 +471,16 @@ void LINE_DISCIPLINE(unsigned char SC)
 	//     em user mode.
 
 
-    //Show the scancode if the flag is enabled. 
+	//Debug stuff.
+    //Show the scancode if the flag is enabled.	
 	if(scStatus == 1){
 	    printf("{%d,%x}\n",scancode,scancode);
 	};
 	
 	
-    /*
-     *  Step 2 - Tratar as mensagens.
-     */
+    //
+    // Step 2 - Tratar as mensagens.
+    //
 
     //Se a tecla for liberada.
 	//Dá '0' se o bit de paridade for '0'.
@@ -733,6 +737,12 @@ void LINE_DISCIPLINE(unsigned char SC)
 	};//fim do else
 
     //Nothing.
+	
+	
+	//
+	// ++ Para finalizar, vamos enviar a mensagem para fila certa ++
+	//
+		
 
 //Done.
 done:
@@ -817,69 +827,91 @@ done:
 	
     //
 	// #importante
-	// Ok. A ideia agora é enviar a mensagem para a fia de mensagens do sistema.
+	// Ok. A ideia agora é enviar a mensagem para a fila de mensagens do sistema.
 	//
 	
+	// Envia as mensagens para os aplicativos intercepta-las
+	//so mandamos mensagem para um aplicativo no estavo válido.	
 
-	//checando a validade da janela com o foco de entrada.
+	
+	//Apenas checando a validade da janela com o foco de entrada.
+	
 	struct window_d *w;    //janela com o foco de entrada.(first responder ??)
 	w = (void *) windowList[window_with_focus];
 	
-	if( (void*) w == NULL )
-	{
+	if( (void*) w == NULL ){
 		printf("LINE_DISCIPLINE: w");
 		die();
 	}else{
-		// Envia as mensagens para os aplicativos intercepta-las
-		//so mandamos mensagem para um aplicativo no estavo válido.
-		if( w->used != 1 || w->magic != 1234 )
-		{
+		
+		if( w->used != 1 || w->magic != 1234 ){
 			printf("LINE_DISCIPLINE: w magic");
 			die();
 		}
-	}
+	};
+	
+	//
+	// @todo: (( IMPORTANTE ))
+	//
+	// TRABALHANDO PARA COLOCAR A MENSAGEM NA FILA.
+	// A intenção é que a mensagem fique na fila de mensagens da 
+	// janela com o foco de entrada, para que depois o aplicativo 
+	// possa desenfileirar as mensagens.
+	// Obs: A fila deve ser circular.
+	//
 
-	//colocando a mensagem na fila de mensagens do sistema.
+	//Colocando a mensagem na fila de mensagens do sistema.
+	
 	struct message_d* m;	
 	
-	//Circulando.
-	system_message_write++;
+	//Preenchendo a estrutura de mensagem. 
+		
+	//?? object ??	
+	m->used = 1;
+	m->magic = 1234;
+	m->empty = 0;
+	m->window = (struct window_d *) w;
+	m->msg    = (int) mensagem;
+	m->long1  = (unsigned long) ch;
+	m->long2  = (unsigned long) ch;
+	//...
+	
+	//
+	// Tentando enviar para fila ...
+	//
+	
+	//Circulando o offset para write.
+	system_message_write++; //index ++
 	if( system_message_write < 0 || 
 	    system_message_write >= SYSTEM_MESSAGE_QUEUE_MAX )
 	{
 		system_message_write = 0;
 	}
 			
-	//Colocando na fila.		
+	// Colocando na fila.
+    // Colocando o ponteiro da estrutura de mensagem na fila do sistema.	
 	system_message_queue[system_message_write] = (unsigned long) m;
 	
 	//#importante (teste)
-	//testando outra fila ...
-	//colocando o ponteiro da estrutura na fila.
-	xenqueue( (void *) m, ld_keyboard_queue);
-	
-	if( m->used == 1 && m->magic == 1234 )
-	{
-		//?? object ??
+	//Testando outra fila ...
+	//Colocando o ponteiro da estrutura na fila.
+	//xenqueue( (void *) m, ld_keyboard_queue);
 		
-		m->empty = 0;
-		
-		
-		m->window = (struct window_d *) w;
-		m->msg    = (int) mensagem;
-		m->long1  = (unsigned long) ch;
-		m->long2  = (unsigned long) ch;
-		
-		//...
-	};
-	
-	
 	//Chamando o procedimento de janelas do sistema.
 	//Talvez isso seja apenas por enquanto...
-	//isso talvez deva ser chamado depois do procedimento de janelas 
-	//do aplicativo.
-	system_procedure(  w, (int) mensagem, (unsigned long) ch, (unsigned long) ch );  
+	//O motivo disso é para no caso de erro do mecanismo de fila
+	//tenhamos ainda algum evento de teclado sendo tratado pelo 
+	//procedimento do sistema.
+	//O procedimento de janelas do sistema vai tratar poucas teclas.
+	//Obs: #importante. Isso talvez deva ser chamado depois do 
+	//procedimento de janelas do aplicativo. Ou seja, chamado em user mode.
 	
+	// sm\sys\procedure.c
+	
+	system_procedure(  w, 
+	      (int) mensagem, 
+		  (unsigned long) ch, 
+		  (unsigned long) ch );  
 	
     return;
 };
@@ -2093,7 +2125,10 @@ static void xresize_queue(ld_queue_t *queue, size_t new_size) {
 	queue->reads = 0;
 }
 
-void xenqueue(void *element, ld_queue_t *queue) {
+
+// xenqueue - por na fila.
+void xenqueue(void *element, ld_queue_t *queue)
+{
 	size_t s;
 	//pthread_mutex_lock(&(queue->lock));
 
@@ -2107,11 +2142,13 @@ void xenqueue(void *element, ld_queue_t *queue) {
 
 	//pthread_cond_broadcast(&(queue->wait));
 	//pthread_mutex_unlock(&(queue->lock));
-}
+};
 
 
-void *xdequeue(ld_queue_t *queue) {
-	void * ret;
+// xdequeue - Retirar da fila.
+void *xdequeue(ld_queue_t *queue)
+{
+	void *ret;
 	//pthread_mutex_lock(&(queue->lock));
 
 	//while(queue->writes == queue->reads) {
@@ -2129,8 +2166,8 @@ void *xdequeue(ld_queue_t *queue) {
 
 	//pthread_mutex_unlock(&(queue->lock));
 
-	return ret;
-}
+	return (void*) ret;
+};
 
 
 

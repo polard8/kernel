@@ -73,6 +73,7 @@ int _read_offset;
  */
 void abnt2_keyboard_handler()
 {
+	//unsigned char scancode = (unsigned char) inportb(0x60);	
     unsigned char scancode = inportb(0x60);	
 			
 		
@@ -96,6 +97,7 @@ callLineDiscipline:
 	
 	
 	LINE_DISCIPLINE(scancode);
+	
 eoi:
     outportb(0x20,0x20);    //EOI.
 	return;
@@ -152,7 +154,8 @@ done:
     return;
 };
 
+
 //
-//fim.
+// End.
 //
 

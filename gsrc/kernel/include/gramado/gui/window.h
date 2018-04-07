@@ -1226,12 +1226,6 @@ struct window_d
 // 
 //==================================================
 
-	//Msg support.
-	//Argumentos para o procedimento de janela.
-	struct window_d *msg_window;  //arg1.
-	int msg;                      //arg2.
-	unsigned long long1;          //arg3.
-	unsigned long long2;          //arg4.		
 	
 	int msgAlert;  //um alerta de que exite uma mensagem para essa janela.
 	
@@ -1241,10 +1235,33 @@ struct window_d
 	//Filas para uma janela receber mensagens.
 	//São os quatro argumentos de um procedimento de janela padrão.
 	
+
+
+	//
+	// CURRENT MESSAGE !!!
+	// 
+	
+	struct window_d *msg_window;  //arg1.
+	int msg;                      //arg2.
+	unsigned long long1;          //arg3.
+	unsigned long long2;          //arg4.		
+
+    //O aplicativo depois de pegar os 4 elementos, autoriza o 
+    //kernel a colocar uma nova mensagem.
+    //'0' indica que não temos uma mensagem válida.
+    //'1' indica que temos uma nova mensagem.	
+	int newmessageFlag;	
+	
+	//
+	// MESSAGE QUEUE !!!
+	//
+	
 	unsigned long hwndList[32];
 	unsigned long msgList[32];
 	unsigned long long1List[32];
 	unsigned long long2List[32];
+	
+	
 	
 	//procedure support. (poderia ser um argumento ou elemento da classe.)
 	unsigned long procedure;               //procedimento da janela
