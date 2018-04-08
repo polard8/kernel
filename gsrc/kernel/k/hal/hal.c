@@ -177,48 +177,48 @@ void halMain(){
 
 
 
-
-
-
 /*
  * hal_backbuffer_putpixel:
  *     Coloca um pixel no backbuffer.
- *
  */
 void hal_backbuffer_putpixel( unsigned long ax, 
                               unsigned long bx, 
 						      unsigned long cx, 
 						      unsigned long dx )
-{
+{	
+	// Chama a rotina em assembly depois de enviar os valores para os 
+	// registradores.
+	// IN: cor, x, y, 0
 	
-	
-	 //cor,x,y,0
 	asm volatile(" \n " : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-		
-	/*
-	 * Chama a rotina em assembly depois de enviar os valores para os 
-	 * registradores.
-	 */
-	 
+
+
+    //? Questionamentos: 	
 	//Coloca um pixel no backbuffer. 
 	// ?? De onde vem essa rotina ??
 	// @todo: Devemos chamar o módulo hal.
+	
 	gui_buffer_putpixel(); 	
 	return;
 };
 
 
-
 /*
  * sys_vsync:
- * 
+ *     Sincroniza o retraço vertical do monitor.
+ *     ? Isso ainda está em uso ?
  */
-void sys_vsync(){
+void sys_vsync()
+{
     hal_vsync();	
     return;
 };
 
 
+/*
+ * sys_showpciinfo:
+ *     Mostra informações encontradas na interface PCI.
+ */
 int sys_showpciinfo(){
     return (int) hal_showpciinfo();
 };
@@ -227,20 +227,23 @@ int sys_showpciinfo(){
 /*
  * sys_reboot:
  *     Reboot, Serviço do sistema.
+ *     Chamando uma rotina interna de reboot do sistema.
  */
-void sys_reboot(){
+void sys_reboot()
+{
     KiReboot();
-    while(1){}	
+    die();
 };
 
 
 /*
  * sys_shutdown:
- * ShutDown. Serviço do sistema.
+ *     Chama uma rotina interna para desligar a máquina.
  */
-void sys_shutdown(){
+void sys_shutdown()
+{
     KiShutDown();
-    while(1){}
+    die();
 };
 
 
@@ -310,6 +313,10 @@ done:
 };
 
 
+//#bugbug: tem algo errado aqui nos nomes das funções.
+//hal_showpciinfo deveria ser a rotina que pci.c chama 
+//para obter acesso as informações em baixo nível.
+//@todo: rever os nomes das funções.
 int hal_showpciinfo(){
 	return (int) pciInfo();
 };
@@ -375,11 +382,8 @@ void init_cpu()
 	
 	processor = (void*) malloc( sizeof(struct tagProcessor) );
 	if((void*) processor == NULL){
-	    printf("init_cpu:");
+	    printf("init_cpu: processor");
 	    die();
-		//refresh_screen();
-		//while(1){};
-		//return;
 	}else{
 	    
 		//@todo: set processor id: escolhe o processador atual. ??
@@ -400,11 +404,8 @@ void init_cpu()
 	//Checa qual cpu é e inicializa mais variaveis.
 	Status = (int) hal_probe_cpu(); //sonda.
 	if(Status != 0){
-	    printf("init_hal fail: Probe cpu.");
-        die();
-		//refresh_screen();
-        //while(1){};
-        //return;   		
+	    printf("init_cpu: hal_probe_cpu");
+        die();  		
 	};
 	
     //More?!	
@@ -500,13 +501,10 @@ int hal_probe_cpu()
     printf("hal_probe_cpu:\n");	
 #endif
 	
-	//
-	// Check structure.
-	//
-	
+	// Check structure.	
 	if((void*) processor == NULL )
 	{
-	    printf("hal_probe_cpu fail: Struct.\n");
+	    printf("hal_probe_cpu: struct\n");
 		//@todo: Aqui não deveria parar.
 		return (int) 1;    //Fail.
 	};
@@ -680,7 +678,9 @@ void hal_reboot()
  *
  *     obs: Segue a ordem de importância.
  *          Cpu, Pci (bustype), Timer, Cmos/Rtc, Keyboard ...
+ *
  */
+//int halInit() 
 int init_hal()
 {	
     int Status = 0;
@@ -779,14 +779,6 @@ Done:
 	
 	return (int) Status;
 };
-
-
-/*
-int halInit()
-{
-	
-};
-*/
 
 
 //

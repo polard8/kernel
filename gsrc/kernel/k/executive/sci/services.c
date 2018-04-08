@@ -353,12 +353,19 @@ void *services( unsigned long number,
 		// Aqui está pintando o caractere na janela com o foco de entrada.
 		case SYS_BUFFER_DRAWCHAR:
 			focusWnd = (void*) windowList[window_with_focus];
-			if( (void*) focusWnd == NULL ){ break; };
+			if( (void*) focusWnd == NULL ){ 
+			    break; 
+			};
 			
 			my_buffer_char_blt( (unsigned long) (focusWnd->left + arg2),             //x.
 			                    (unsigned long) (focusWnd->top + arg3),              //y.
 								CurrentColorScheme->elements[csiTerminalFontColor],  //color. 
-								(unsigned long) arg4);                               //char.
+								(unsigned long) arg4); 								 //char.
+								
+			//printf("%c", (char) long1);
+		    //refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+			//refresh_rectangle( focusWnd->left + (arg2*8), focusWnd->top + (arg3*8), 8, 8 );
+			//refresh_rectangle( (focusWnd->left + arg2), (focusWnd->top + arg3), 8, 8 );
 			break;
 
 		//8
@@ -549,8 +556,11 @@ void *services( unsigned long number,
 
 		//65	
 		//putchar usando o cursor gerenciado pelo kernel.
+		//a biblioteca em user mode, altera o cursor do kernel e 
+		//usa essa rotina para imprimir.
 		case SYS_PUTCHAR:
 		    putchar( (int) arg2 );
+			refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 		    break;
 
 		//66 - reservado pra input de usuário.

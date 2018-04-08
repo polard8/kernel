@@ -55,6 +55,7 @@ char _keyboard_queue[32];
 int _write_offset;
 int _read_offset;
 
+
 /*
  * *******************************************************
  * abnt2_keyboard_handler: 
@@ -72,31 +73,24 @@ int _read_offset;
  * Essa é a parte do driver de dispositivo de caractere.
  */
 void abnt2_keyboard_handler()
-{
-	//unsigned char scancode = (unsigned char) inportb(0x60);	
+{  
     unsigned char scancode = inportb(0x60);	
-			
-		
-	//
-	// * Importante:
-	//   Estamos no driver de teclado.
-	//   Aqui chamamos uma rotina que deve ficar no kernel base.
-    //   Se estamos no driver de teclado em kernel mode precisamos	
-	//   de um método para chamar o kernel base. Talvez system call.
-	//
 	
-callLineDiscipline:	
-
-//@todo:precisa inicializar esse buffer e as variáveis.
-
-  //  _write_offset++;
-//	if( _write_offset >= 32 ){
-//		_write_offset = 0;
-//	}
-	//_keyboard_queue[_write_offset] = scancode; 
+	//#obs: Esse buffer está em user.h 
 	
+	keybuffer[keybuffer_tail++] = (char) scancode;
 	
-	LINE_DISCIPLINE(scancode);
+	if( keybuffer_tail >= 128 ){
+		keybuffer_tail = 0;
+	}
+	
+//callLineDiscipline:	
+	
+	// #DEBUG !!!
+	// Isso fica aqui para testes apenas,
+	// pois quem chama isso é o consumidor.
+	
+	//LINE_DISCIPLINE(scancode);
 	
 eoi:
     outportb(0x20,0x20);    //EOI.

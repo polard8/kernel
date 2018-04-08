@@ -411,8 +411,11 @@ unsigned long system_procedure( struct window_d *window,
 					//caractere digitado. Mas o refresh funciona bem.
 					
 					//teste
-					printf("%c", (char) long1);
-		            refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+					//#IMPORTANTE: ISSO FOI CANCELADO PORQUE A LIB EM USER MODE 
+					//AGORA IMPRIME OS CARACTERES E FAZ O REFRESH DO CHAR.
+					
+					//printf("%c", (char) long1);
+		            //refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 						
 			        //
 					// input:

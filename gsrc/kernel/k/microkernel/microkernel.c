@@ -138,6 +138,7 @@ void sys_exit_thread(int tid){
     return;
 };
 
+
 /*
  * sys_create_process:
  *     Serviço do sistema.
@@ -159,10 +160,11 @@ void *sys_create_process( struct wstation_d *window_station,
 	
 	//@todo: Filtros para ponteiros NULL.
 	
-    //
 	// Create process.
-	//
-    create_process( window_station, desktop, window, init_eip, priority, ppid, name, iopl, (unsigned long) directory_address);
+    create_process( window_station, desktop, window, init_eip, 
+	                priority, ppid, name, iopl, 
+					(unsigned long) directory_address);
+	
 	//@todo: Return da função create.
 	
 done:
@@ -170,20 +172,18 @@ done:
 };
 
 
-
 /*
  * sys_create_thread:
  *    Serviço do sistema.
  *    Interface para criação de uma thread.
- *
  */
 void *sys_create_thread( struct wstation_d *window_station,
-                      struct desktop_d  *desktop,
-                      struct window_d *window,
-                      unsigned long init_eip, 
-                      unsigned long priority, 
-					  int ppid, 
-					  char *name )
+                         struct desktop_d  *desktop,
+                         struct window_d *window,
+                         unsigned long init_eip, 
+                         unsigned long priority, 
+					     int ppid, 
+					     char *name )
 {
     //
 	// @todo: Create some interface routine.
@@ -191,10 +191,11 @@ void *sys_create_thread( struct wstation_d *window_station,
 	
 	//@todo filtros, para ponteiros NULL.
 	
-    //
+	
 	// Create thread.
-	//
-    create_thread( window_station, desktop, window, init_eip, priority, ppid, name);               
+    create_thread( window_station, desktop, window, init_eip, 
+	               priority, ppid, name); 
+				   
     //@todo: return da função create.
 	
 done:
@@ -210,6 +211,7 @@ int sys_fork(){
 	return (int) fork();
 };
 
+
 /*
 void sys_reboot(void)
 {
@@ -219,83 +221,58 @@ void sys_reboot(void)
 */
 
 
-//pega o id do processo atual.
-int sys_getpid()
-{
+//Pega o id do processo atual.
+int sys_getpid(){
 	return (int) current_process;
-/*	
-	//erro
-	if( (void*) CurrentProcess == NULL ){
-		return (int) -1;
-	};
-	
-	//erro
-	if( CurrentProcess->used != 1 || CurrentProcess->magic != 1234 ){
-		return (int) -1;
-	};
-	
-    return (int) CurrentProcess->pid;
-*/
 };
 
 
-//pega o id do processo pai do processo atual.
+//Pega o ID do processo pai do processo atual.
 int sys_getppid()
 {
     int pid;
 	int ppid;
 	struct process_d *p;
 	
-	pid = current_process;
+	pid = (int) current_process;
 	
 	if( pid >= 0 && pid < PROCESS_COUNT_MAX )
 	{
-        //ponteiro da estrutura.
+        //Ponteiro da estrutura.
 		p = (void*) processList[pid]; 		
 		
+		//erro.
 		if( (void*) p == NULL ){
 			return (int) -1;
 		}
 		
+		//erro.
 		if ( p->used != 1 || p->magic != 1234 ){
 		    return (int) -1;	
 		}
 		
-		//retorna o id do processo pai.
+		//Retorna o id do processo pai.
 		return (int) p->ppid;
 	};
 	
-
-	/*
-	//erro
-	if( (void*) CurrentProcess == NULL ){
-		return (int) -1;
-	};
-	
-	//erro
-	if( CurrentProcess->used != 1 || CurrentProcess->magic != 1234 ){
-		return (int) -1;
-	};
-
-	return (int) CurrentProcess->ppid;
-	*/
-	
-	//fail.
+//fail.
+fail:
     return (int) -1;	
 };
 
 
 /*
+ **********************************************************************
  * KeReboot:
- *     Chama uma interface para rotina de reboot. 
- *
- *     @todo: KeReboot deve chamar um módulo externo de rotinas de reboot.
- *      Mas por enquanto está chamando um módulo interno.
- *            As rotinas que chamam módulos externos
- *            deverão ficar em algum lugar definido.  
+ *     Uma interface para chamar um servidor em user mode que realize a 
+ * rotina de reboot. 
  */
 void KeReboot()
 {
+	//
+	// @todo
+	//
+	
     return;
 };
 
@@ -315,6 +292,7 @@ void KeReboot()
  * @todo: Mudar para microkernelInit().
  *
  */
+//int microkernelInit() 
 int init_microkernel()
 {
     int Status = 0;
@@ -344,8 +322,8 @@ int init_microkernel()
 	//Inicializar as filas que alimentarão a lista do dispatcher.	
 	queue = malloc( sizeof( struct queue_d ) );
 	if( (void*) queue == NULL ){
-	    panic("init_microkernel error: Queue.\n");
-	    while(1){}
+	    panic("init_microkernel: queue\n");
+	    die();
 	}else{
 		
 		//Inicializa todas as filas do microkernel.
@@ -364,8 +342,8 @@ int init_microkernel()
 	
 	DispatchCountBlock = malloc( sizeof( struct dispatch_count_d ) );
 	if( (void*) DispatchCountBlock == NULL ){
-	    panic("init_microkernel error: DispatchCountBlock.\n");
-	    while(1){}
+	    panic("init_microkernel: DispatchCountBlock\n");
+	    die();
 	}else{
 		
 		DispatchCountBlock->SelectIdleCount = 0;
@@ -377,20 +355,20 @@ int init_microkernel()
 		DispatchCountBlock->SelectDispatcherQueueCount = 0;
 		//...
 	};
-	
-	//More?!
-	
+
+    //More?!
+
 // Done.
 Done:
-	Initialization.microkernel = 1;
-	printf("Done!\n");
-	return (int) Status;
+    Initialization.microkernel = 1;
+
+#ifdef KERNEL_VERBOSE
+    printf("Done!\n");
+#endif
+
+    return (int) Status;
 };
 
-/*
-int microkernelInit()
-{};
-*/
 
 //
 // End.

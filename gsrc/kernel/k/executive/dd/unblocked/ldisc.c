@@ -862,18 +862,18 @@ done:
 
 	//Colocando a mensagem na fila de mensagens do sistema.
 	
-	struct message_d* m;	
+	//struct message_d* m;	
 	
 	//Preenchendo a estrutura de mensagem. 
 		
 	//?? object ??	
-	m->used = 1;
-	m->magic = 1234;
-	m->empty = 0;
-	m->window = (struct window_d *) w;
-	m->msg    = (int) mensagem;
-	m->long1  = (unsigned long) ch;
-	m->long2  = (unsigned long) ch;
+	//m->used = 1;
+	//m->magic = 1234;
+	//m->empty = 0;
+	//m->window = (struct window_d *) w;
+	//m->msg    = (int) mensagem;
+	//m->long1  = (unsigned long) ch;
+	//m->long2  = (unsigned long) ch;
 	//...
 	
 	//
@@ -881,16 +881,16 @@ done:
 	//
 	
 	//Circulando o offset para write.
-	system_message_write++; //index ++
-	if( system_message_write < 0 || 
-	    system_message_write >= SYSTEM_MESSAGE_QUEUE_MAX )
-	{
-		system_message_write = 0;
-	}
+	//system_message_write++; //index ++
+	//if( system_message_write < 0 || 
+	//    system_message_write >= SYSTEM_MESSAGE_QUEUE_MAX )
+	//{
+	//	system_message_write = 0;
+	//}
 			
 	// Colocando na fila.
     // Colocando o ponteiro da estrutura de mensagem na fila do sistema.	
-	system_message_queue[system_message_write] = (unsigned long) m;
+	//system_message_queue[system_message_write] = (unsigned long) m;
 	
 	//#importante (teste)
 	//Testando outra fila ...
@@ -908,10 +908,17 @@ done:
 	
 	// sm\sys\procedure.c
 	
+	
+	//o procedimento tratará as mensagens de sistema, colocará o cham no 
+	//stdin e imprimirá o char na tela.
 	system_procedure(  w, 
 	      (int) mensagem, 
 		  (unsigned long) ch, 
-		  (unsigned long) ch );  
+		  (unsigned long) ch ); 
+
+		  
+    //colocará a mensagem na estrutura de janle para que o aplicativo pegue.
+    windowSendMessage( (unsigned long) w, (unsigned long) mensagem, (unsigned long) ch, (unsigned long) ch );		  
 	
     return;
 };

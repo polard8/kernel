@@ -22,8 +22,6 @@
  * +
  * +
  *
- *
- *
  * Histórico:
  *     Versão: 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
  *     Versão: 1.0, 2014 - Aprimoramento geral das rotinas básicas. 
@@ -690,47 +688,14 @@ void windowSendMessage( unsigned long arg1,
 		if( wFocus->used == 1 && wFocus->magic == 1234 )
 		{
 			
-			//testando fila do sistema para teclado.
+			//ok funcionou
+			wFocus->msg_window = (struct window_d *) arg1;
+			wFocus->msg   = (int) arg2;      
+			wFocus->long1 = (unsigned long) arg3;
+			wFocus->long2 = (unsigned long) arg4;
+			wFocus->newmessageFlag = 1;
 			
-			//putItem(&myQueue, arg1);
-			//putItem(&myQueue, arg2);
-			//putItem(&myQueue, arg3);
-			//putItem(&myQueue, arg4);
-			
-			// se a mensagem atual foi consumida, não colocaremos na fila.
-			//Isso significa que não temos uma mensagem atual, então
-			//essa mensagem se torna a atual e não colocamos nada na fila.
-			if( wFocus->newmessageFlag == 0 )
-			{
-				wFocus->msg_window = (struct window_d *) arg1;
-				wFocus->msg   = (int) arg2;      
-				wFocus->long1 = (unsigned long) arg3;
-				wFocus->long2 = (unsigned long) arg4;
-				wFocus->newmessageFlag = 1;
-				goto done;
-			};
-			
-            //nesse momento podemos mostrar o nome da janela com o foco de entrada.
-			//printf("windowSendMessage: focus={%s}\n",wFocus->name);
-              			
-            //#bugbug
-			//A fila não funciona, estamos usando apenas um offset para testes.
-			//wFocus->sendOffset = 0; 
-			
-			//Trata o deslocamento atual para as filas.
-			wFocus->sendOffset++;
-			if(wFocus->sendOffset >= 32)
-			{ 
-			    wFocus->sendOffset = 0; 
-			};
-	        
-			//Envia cada mensagem pra sua fila apropriada.
-			wFocus->hwndList[wFocus->sendOffset]  = (unsigned long) arg1;   //0;     //window;
-			wFocus->msgList[wFocus->sendOffset]   = (unsigned long) arg2;  //msg.
-			wFocus->long1List[wFocus->sendOffset] = (unsigned long) arg3;  //long1
-			wFocus->long2List[wFocus->sendOffset] = (unsigned long) arg4;  //long2
-			
-			
+			//#bugbug acho que isso não é usado.
 			//isso é um teste.
 			//Para facilitar vamos colocar a mensagem num lugar mais acessivel.
 			gNextKeyboardMessage = (int) 0;
@@ -770,71 +735,25 @@ struct message_d *xxxxsavemessage;
  
 void *windowGetHandleWindow(struct window_d *window)
 {
+	//#importante.
+	//Essa rotina ainda não é chamada pelo consumidor,
+	//apenas as outras 3.
 	
-	//test 
-	//getItem(&myQueue, &readValue);
-	//return (void*) readValue;
+//fast_return:
+	return NULL;
 	
-	/*
-
-    //Teste. 
-    //Salvando a estrutura para o app pegar elemento por elemento.	
-	//xxxxsavemessage = (struct message_d *) xdequeue(ld_keyboard_queue);
+	//fast way 
+	//@todo: melhorar isso
+	struct window_d *wFocus;
 	
-	//return (void*) xxxxsavemessage->window;
-
-	system_message_read++;
-	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
-    {
-		system_message_read = 0;
-	}		
+	wFocus = (void *) windowList[window_with_focus];
 	
-	//Vamos ver se a primeira mensagem nos pertence.	
-	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
-    
-	if( (void*) xxxxsavemessage == NULL ){
-		goto fail;
-	}
+	//@todo: habilitar esse if.
+	//if( wFocus->newmessageFlag == 0 ){
+	//	return NULL;
+	//}
 	
-	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
-	    goto fail;
-	};
-			
-	if( xxxxsavemessage->empty == 1 ){
-		goto fail;
-	}
-		
-	//if( window == m->window ){
-	//	return (void*) m->window;
-	//};
-		
-	
-done:
-    return (void*) xxxxsavemessage->window;	
-
-	*/
-	
-
-	
-	//pegando na estrutura de janela a mensagem da vez.
-	struct window_d *save;  //arg1.
-	
-	
-	if((void*) window == NULL ){
-		goto fail;
-	}else{
-		
-		//se ainda não tem nova mensagem
-		if( window->newmessageFlag == 0 ){
-		    goto fail;	
-		}
-		
-		save = (void*) window->msg_window;			
-		window->msg_window = 0;		
-		
-		return (void*) save;
-	};
-	
+	return (void*) wFocus->msg_window;
 	
 	//Nothing.
 fail:	
@@ -857,60 +776,40 @@ fail:
  */
 void *windowGetMessage(struct window_d *window)
 {
-
-	//test 
-	//getItem(&myQueue, &readValue);
-	//return (void*) readValue;
+	unsigned char SC;
 	
-/*
+	SC = (unsigned char) keybuffer[keybuffer_head];
 	
-	//return (void*) xxxxsavemessage->msg;
+	//Limpa.
+	keybuffer[keybuffer_head] = 0;
 	
-	system_message_read++;
-	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
-    {
-		system_message_read = 0;
-	}		
+	keybuffer_head++;
 	
-	//Vamos ver se a primeira mensagem nos pertence.	
-	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
-    
-	if( (void*) xxxxsavemessage == NULL ){
-		goto fail;
+	if( keybuffer_head >= 128 ){
+	    keybuffer_head = 0;	
+	}
+		
+	//#bugbug
+	//alguma coisa está imprimindo o char duas vezes ...
+	//Talvez o próprio aplicativo esteja imprimeiro também.
+	//
+	
+	//Obs: isso vai imprimir o char na tela.
+   	LINE_DISCIPLINE(SC);	
+	
+	//fast way 
+	//@todo: melhorar isso
+	struct window_d *wFocus;
+	
+	wFocus = (void *) windowList[window_with_focus];
+	
+	if( wFocus->newmessageFlag == 0 ){
+		return NULL;
 	}
 	
-	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
-	    goto fail;
-	};
-			
-	if( xxxxsavemessage->empty == 1 ){
-		goto fail;
-	}
+	return (void*) wFocus->msg;	
 	
-done:
-    return (void*) xxxxsavemessage->msg;
-
-*/
-
-	//pegando na estrutura de janela a mensagem da vez.
-	int save;
 	
-	if((void*) window == NULL ){
-		goto fail;
-	}else{
-		
-		//se ainda não tem nova mensagem
-		if( window->newmessageFlag == 0 ){
-		    goto fail;	
-		}
-
-				
-		save = (int) window->msg;
-		window->msg = 0;
-		
-		return (void*) save;
-	};	
-		
 	//Nothing.
 fail:	
 	return NULL;
@@ -920,58 +819,17 @@ fail:
 
 void *windowGetLong1(struct window_d *window)
 {
+	//fast way 
+	//@todo: melhorar isso
+	struct window_d *wFocus;
 	
-	//test 
-	//getItem(&myQueue, &readValue);
-	//return (void*) readValue;	
+	wFocus = (void *) windowList[window_with_focus];
 	
-	/*
-	//return (void*) xxxxsavemessage->long1;
-	
-	system_message_read++;
-	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
-    {
-		system_message_read = 0;
-	}		
-	
-	//Vamos ver se a primeira mensagem nos pertence.	
-	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
-    
-	if( (void*) xxxxsavemessage == NULL ){
-		goto fail;
+	if( wFocus->newmessageFlag == 0 ){
+		return NULL;
 	}
+	return (void*) wFocus->long1;
 	
-	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
-	    goto fail;
-	};
-			
-	if( xxxxsavemessage->empty == 1 ){
-		goto fail;
-	}
-	
-done:
-    return (void*) xxxxsavemessage->long1;
-	
-	*/
-	
-	//pegando na estrutura de janela a mensagem da vez.
-	unsigned long save;
-	
-	if((void*) window == NULL ){
-		goto fail;
-	}else{
-		
-		//se ainda não tem nova mensagem
-		if( window->newmessageFlag == 0 ){
-		    goto fail;	
-		}
-
-				
-		save = (unsigned long) window->long1;
-        window->long1 = 0;		
-		return (void*) save;
-	};	
-		
 	//Nothing.
 fail:	
 	return NULL;
@@ -981,65 +839,25 @@ fail:
 
 void *windowGetLong2(struct window_d *window)
 {
+	//@todo: Liberar long2.
+	return NULL;
 	
-	//test 
-	//getItem(&myQueue, &readValue);
-	//return (void*) readValue;
+	//fast way 
+	//@todo: melhorar isso
+	struct window_d *wFocus;
 	
-	/*
-	//return (void*) xxxxsavemessage->long2;
+	wFocus = (void *) windowList[window_with_focus];
 	
-	system_message_read++;
-	if( system_message_read < 0 || system_message_read >= SYSTEM_MESSAGE_QUEUE_MAX )
-    {
-		system_message_read = 0;
-	}		
-	
-	//Vamos ver se a primeira mensagem nos pertence.	
-	xxxxsavemessage = (struct message_d *) system_message_queue[system_message_read];
-    
-	if( (void*) xxxxsavemessage == NULL ){
-		goto fail;
+	if( wFocus->newmessageFlag == 0 ){
+		return NULL;
 	}
 	
-	if( xxxxsavemessage->used != 1 || xxxxsavemessage->magic != 1234 ){
-	    goto fail;
-	};
-			
-	if( xxxxsavemessage->empty == 1 ){
-		goto fail;
-	}
+	//sinaliza que a mensagem foi lida, e que não temos nova mensagem.
+	wFocus->newmessageFlag = 0;
 	
-	//Liberar.
-	xxxxsavemessage->empty = 1;
+	return (void*) wFocus->long2;
 	
-done:
-    
-    return (void*) xxxxsavemessage->long2;
-	*/
-	
-	//pegando na estrutura de janela a mensagem da vez.
-    unsigned long save;
-	
-	if((void*) window == NULL ){
-		goto fail;
-	}else{
-		
-		//se ainda não tem nova mensagem
-		if( window->newmessageFlag == 0 ){
-		    goto fail;	
-		}
 
-				
-		save = (unsigned long) window->long2;
-        window->long2 = 0;		
-		
-		//Nesse momento autorizamos o kernel a colocar nova mensagem aqui.
-		window->newmessageFlag =  0;
-		return (void*) save;
-
-	};
-		
 	//Nothing.
 fail:	
 	return NULL;
@@ -2639,7 +2457,19 @@ int init_windows()
 	//initializeQueue(&myQueue); 
 	 
 	 
-	 
+	keyboard_message_head = 0;
+    keyboard_message_tail = 0;	
+	
+    //inicializando fila de teclado.
+	int k;
+	for( k=0; k<128; k++){
+		keybuffer[k] = 0; 
+	}
+	
+	keybuffer_tail = 0;
+	keybuffer_head = 0;
+
+	
 	
 	//
 	// Continua ...

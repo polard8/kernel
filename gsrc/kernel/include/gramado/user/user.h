@@ -50,6 +50,40 @@ typedef enum {
 int userconfig_Status;
  
  
+ 
+int keybuffer_index; 
+
+int keybuffer_head;
+int keybuffer_tail;
+char keybuffer[128];
+ 
+int keyboard_message_head;
+int keyboard_message_tail;
+ 
+//estrutura para enviar mensagens de teclado do kernel para 
+//um aplicativo em user mode. 
+typedef struct keyboard_message_d keyboard_message_t; 
+struct keyboard_message_d
+{
+	//manipuladores.
+	int used;
+	int magic;
+
+	//identificadores.
+	struct process_d *receiver_process;
+	struct process_d *receiver_thread;
+	struct window_d *receiver_window;	
+	
+	//dados.
+	struct window_d *window;
+	int msg;
+	unsigned long long1;
+	unsigned long long2;
+}; 
+ 
+keyboard_message_t keyboard_queue[8]; 
+ 
+ 
 //
 // @todo: Revendo: para cada grupo pode ter 2 tipos, major e minor.
 // 
