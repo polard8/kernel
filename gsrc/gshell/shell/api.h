@@ -552,13 +552,13 @@
 #define	SYSTEMCALL_DRAWTEXT  130
 #define	SYSTEMCALL_131       131
 #define	SYSTEMCALL_132       132
-#define	SYSTEMCALL_133       133
-#define	SYSTEMCALL_134       134
+#define	SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT 133
+#define	SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT 134
 #define	SYSTEMCALL_135       135
 #define	SYSTEMCALL_136       136
 #define	SYSTEMCALL_137       137
-#define	SYSTEMCALL_138       138
-#define	SYSTEMCALL_139       139
+#define	SYSTEMCALL_138       138    //api_receive_message
+#define	SYSTEMCALL_139       139   //get scancode.@todo
 
 //keyboard responder
 #define	SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER 140
@@ -2058,6 +2058,21 @@ struct semaphore_d
 semaphore_descriptor_t *current_semaphore; 
 //...
 
+/*
+typedef struct api_receive_message_d api_receive_message_t;
+struct api_receive_message_d
+{
+	int full;
+	struct window_d *window;
+	int msg;
+	unsigned long long1;
+	unsigned long long2;
+}
+*/
+
+
+
+
 
 //
 // Principais chamadas ao sistema.
@@ -2487,6 +2502,8 @@ int api_get_current_keyboard_responder();
 void api_set_current_mouse_responder( int i );
 int api_get_current_mouse_responder();
 
+void api_set_window_with_text_input( struct window_d *window );
+int api_get_window_with_text_input();
 
 
 //

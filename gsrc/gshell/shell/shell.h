@@ -73,37 +73,29 @@
  
 //@todo: 
 //a versão do sistema operacional deve-se obter através de uma chamada ao sistema. 
-#define OS_VERSION  "0.1"  
-#define SHELL_VERSION  "1.0"
+#define OS_VERSION     "0.1"  
+#define SHELL_VERSION  "0.1"
 #define SHELL_PROMPT   ">"
-//#define SHELL_PROMPT   "$"
-//#define SHELL_PROMPT   "shell: " 
+#define SHELL_PROMPT2  "$"
+//#define SHELL_PROMPT3  "shell: " 
 //... 
  
  
-
-
- 
- 
 //
-// banners.
+// Banners.
 //
  
-static const char usage[] =
-    "Usage: shell [arguments...]\n"
-    "       shell -help             Display this help message and exit.\n"
-    "       shell -version          Output version information and exit.\n";
-	//...
  
+// help 
 static const char help_banner[] =
     "\n Commands: \n \n"
 	"help, version, reboot, exit\n";
 	
-	
+// tree
 static const char tree_banner[] =
-    "\n"
-    "\n"
-    "\n"	
+"\n"
+"\n"
+"\n"	
 "     \\o/    \n"
 "      d      \n"
 "     ccc     \n"
@@ -116,24 +108,34 @@ static const char tree_banner[] =
 "     ||      \n"
 "     ||      \n"
 "    ~~~~     \n"
-	"\n";
-	
-	//... 
+"\n";	
+//... 
+
+// usage	
+static const char usage[] =
+    "Usage: shell [arguments...]\n"
+    "       shell -help             Display this help message and exit.\n"
+    "       shell -version          Output version information and exit.\n";
+	//...
 	
 	
 //
-// files.
+// Files (strings).
 //	
 	
+static const char bmp1_file_name[] = "BMP1    BMP";
+static const char bmp2_file_name[] = "BMP2    BMP";
+static const char bmp3_file_name[] = "BMP3    BMP";
+static const char bmp4_file_name[] = "BMP4    BMP";	
 static const char init_file_name[] = "INIT    TXT";	
-static const char  bmp1_file_name[] = "BMP1    BMP";
-static const char  bmp2_file_name[] = "BMP2    BMP";
-static const char  bmp3_file_name[] = "BMP3    BMP";
-static const char  bmp4_file_name[] = "BMP4    BMP";	
 //... 
  	
-        
-
+//static const char file_bmp1[] = "BMP1.BMP";
+//static const char file_bmp2[] = "BMP2.BMP";
+//static const char file_bmp3[] = "BMP3.BMP";
+//static const char file_bmp4[] = "BMP4.BMP";	
+//static const char file_init[] = "INIT.TXT";	
+//... 
  
 
 /*
@@ -171,6 +173,7 @@ struct window_d *i2Window;      //icone 2.
 // 
  
 
+//??
 typedef struct shell_hook_d shell_hook_t; 
 struct shell_hook_d
 {
@@ -181,6 +184,7 @@ struct shell_hook_d
 shell_hook_t *ShellHook; 
 
 
+//metrics
 typedef struct shell_metrics_d shell_metrics_t;
 struct shell_metrics_d
 {
@@ -206,22 +210,26 @@ shell_metrics_t *ShellMetrics;
 //void *GramadoMain( int argc, char *argv[], unsigned long address, int view );
  
  
+//
+// Screen support.
+//
 
-//Screen support
-void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
 void shellClearscreen();
+void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
 void shellScroll();
 //...
 
 
+//
+// Buffer support.
+//
 
-
-
-//buffer support.
 void shellClearBuffer();
 
+//
+// Typing support.
+//
 
-//Typing support
 void shellInsertCR();
 void shellInsertLF();
 void shellInsertNullTerminator();
@@ -236,14 +244,19 @@ void move_to( unsigned long x, unsigned long y);
 //...
 
 
+//
+// Cursor support.
+//
 
-//Cursor support.
 void shellSetCursor(unsigned long x, unsigned long y);
 static void save_cur(void);
 static void restore_cur(void);
 
 
+//
 // Reset prompt.
+//
+
 void shellPrompt();
 
 
@@ -280,13 +293,15 @@ void shellShell();               //Constructor.
 // shelui.c
 //
 
-// top bar.
 void shellCreateTopBar(); 
 void shellTestDisplayBMP();
-void bmpDisplayBMP( void* address, unsigned long x, unsigned long y, int width, int height );
-
-
-
+void bmpDisplayBMP( void* address, 
+                    unsigned long x, 
+					unsigned long y, 
+					int width, 
+					int height );
+					
+					
 //
 // End.
 //

@@ -46,17 +46,16 @@ static unsigned long origin = (unsigned long) &shell_buffer[0];
 static unsigned long scr_end = (unsigned long) (&shell_buffer[0] + (LINES * COLUMNS));  
 
 static unsigned long pos;    //posição dentro do buffer
-static unsigned long x,y;
+static unsigned long x, y;
 static unsigned long top = 0, bottom = LINES;
 static unsigned long lines = LINES,columns = COLUMNS;
-static unsigned long state=0;
+static unsigned long state = 0;
 static unsigned long npar, par[NPAR];
 static unsigned long ques = 0;
 static unsigned char attr = 0x07;
 static unsigned long saved_x = 0;
 static unsigned long saved_y = 0;
 //...
-
 
 
 //

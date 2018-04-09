@@ -1,16 +1,17 @@
+/*
+ * File shellui.c 
+ *
+ * Shell User Interface.
+ *     Suporte às rotinas gráficas do aplicativo shell.
+ *
+ * @frednora
+ */
 
 
-//shellui.c 
-
-//shell user interface
-
-
-
-
- 
 //
 // Includes.
 // 
+
 
 #include "api.h"
 #include "types.h"

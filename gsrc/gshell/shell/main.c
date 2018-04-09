@@ -371,7 +371,8 @@ noArgs:
 	
 	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
-	                                   shell_window_x, shell_window_y, shellWindowWidth, shellWindowHeight,    
+	                                   shell_window_x, shell_window_y, 
+									   shellWindowWidth, shellWindowHeight,    
                                        0, 0, COLOR_BLACK, 0x83FCFF00 );	   
 	if((void*) hWindow == NULL){	
 		printf("Shell: Window fail");
@@ -421,10 +422,18 @@ noArgs:
 	//PARA RETORNAR A MENSAGEM DA JANELA COM O FOCO DE ENTRADA.
     APISetFocus(hWindow);
 	
+	//#bugbug
+	//janela usada para input de textos ...
+	//o input de texto pode vir de várias fontes.
+	//api_set_window_with_text_input(hWindow);
+	
 	//definindo a janela como sendo uma janela de terminal.
 	//isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
 	//para essa janela e não apenas ao procedimento de janela do sistema.
-	system_call( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, (unsigned long) hWindow, (unsigned long) hWindow);
+	system_call( SYSTEMCALL_SETTERMINALWINDOW, 
+	             (unsigned long) hWindow, 
+				 (unsigned long) hWindow, 
+				 (unsigned long) hWindow );
 		
 	
 	//
@@ -471,7 +480,11 @@ noArgs:
 	//g_cursor_x = 0;
 	//g_cursor_y = 32;
 	
-	//system_call( SYSTEMCALL_DRAWTEXT, shell_cursor_x,  shell_cursor_y, (unsigned long) "Starting SHELL.BIN ... \n");		
+	//system_call( SYSTEMCALL_DRAWTEXT, 
+	//             shell_cursor_x,  
+	//			   shell_cursor_y, 
+	//			   (unsigned long) "Starting SHELL.BIN ... \n" );
+	
 	//system_call( SYSTEMCALL_DRAWTEXT, x,  y, (unsigned long) "$>_");		
 	    
 	//Printf Funcionando. (stdio.c)
@@ -590,13 +603,24 @@ noArgs:
 		//
 		
 	while(1)
-	{	
+	{
 
+
+		//  #bugbug SYSTEMCALL_GET_KEYBOARD_MESSAGE está pegando a mensagem de teclado,
+		//          mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
+		//          qual foi o dispositivo gerador do evento. ??!!
+		
+
+       apiBeginPaint();
+	   
+		
  		hwTest = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
 		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
-									  (unsigned long) hWindow );        
-
+									  (unsigned long) hWindow );
+									  
+        //#bugbug ( Aqui devemos pegar a mensagem sem se preocupar em
+		//identificar o dispositivo gerador do evento.
 		msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 
 		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
@@ -611,6 +635,9 @@ noArgs:
 		                             (unsigned long) hWindow, 
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );
+									 
+		apiEndPaint();
+									 
 
         //
         // + PEGAMOS A MENSAGEM NA FILA DA JANELA COM O FOCO DE ENTRADA.
@@ -619,7 +646,7 @@ noArgs:
         //		
 		
 		// Send Message to procedure.
-		if( (int) msgTest != 0)
+		if( (int) msgTest != 0 )
 		{
             //
             // *IMPORTANTE:
@@ -628,7 +655,7 @@ noArgs:
 			//  CRIADAS PELO SISTEMA PODERÃO SER AFETADAS POR ESSE PROCEDIMENTO??
 			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
             //			
-		    shellProcedure(  (struct window_d *) hwTest, 
+		    shellProcedure( (struct window_d *) hwTest, 
 			                (int) msgTest, 
 							(unsigned long) long1, 
 							(unsigned long) long2 );
@@ -722,7 +749,13 @@ shellProcedure( struct window_d *window,
                 default:			   
 				    input( (unsigned long) long1);      //Coloca no stdin
                     shellInsertNextChar((char) long1);  //Coloca no stdout
-					//printf("%c", (char) long1); 					
+					
+					//#BUGBUG 
+					//Não está havendo o refresh do char, ele é pintado no 
+					//backbuffer mas não aparece é efetuado o refresh do char.
+					//obs: isso é o certo para alguns casos, para outros o char 
+					//tem que aparecer.
+					printf("%c", (char) long1); 		//#importante: IMPRIMINDO.			
 					goto done;
                     break;               
             };
@@ -749,10 +782,10 @@ shellProcedure( struct window_d *window,
 		    break;
           
 		//
-        //  *** Aqui o procedimento de janelas do kernel vai enviar uma mensagem notificando 
-		//      que os botões de controle F1 ou F2 foram apertados ... 
-		//      F1 significa que temos que abri o menu de aplicativos e F2 significa que temos 
-		//     que abrir a janela do interpretador de comando ...
+        //  *** Aqui o procedimento de janelas do kernel vai enviar uma mensagem 
+		// notificando que os botões de controle F1 ou F2 foram apertados ... 
+		//      F1 significa que temos que abri o menu de aplicativos e 
+		// F2 significa que temos que abrir a janela do interpretador de comando ...
         //		
 		  
 		case MSG_COMMAND:
@@ -828,7 +861,9 @@ done:
 	//if(VideoBlock.useGui == 1)
 	//{
 	    //Debug.
-		//refresh_screen(); //Obs: #bugbug perceba que o procedimento de janela do sistema também tem um refresh screen.
+		//refresh_screen(); 
+		//Obs: #bugbug perceba que o procedimento de janela do 
+		//sistema também tem um refresh screen.
 	//};	
 	
 	return (unsigned long) apiDefDialog(window,msg,long1,long2);
@@ -919,10 +954,15 @@ unsigned long shellCompare(struct window_d *window)
    
     char *tokenList[80];
     int i = 0;
-   
-    tokenList[0] = strtok( prompt, LSH_TOK_DELIM);    // first call returns pointer
-                                         // to first part of user_input
-	                                     // separated by delim  
+	
+	
+	// ?? what ?
+    // first call returns pointer
+	// to first part of user_input
+	// separated by delim
+	
+    tokenList[0] = strtok( prompt, LSH_TOK_DELIM);
+	
 	char *token;
 	
 	token = (char *) tokenList[0];
@@ -930,25 +970,24 @@ unsigned long shellCompare(struct window_d *window)
 	i=0;                                  
     while( token != NULL )
 	{
-
-        //coloca na lista
+        // Coloca na lista.
         tokenList[i] = token;
 
 		//#debug
 		//Mostra
-        printf("shellCompare: %s \n",tokenList[i]);
+        printf("shellCompare: %s \n", tokenList[i] );
         refresh_screen();
 
-		//incrementa o índice da lista
+		// Incrementa o índice da lista
         i++;
 		
-		token = strtok(NULL, LSH_TOK_DELIM);
+		token = strtok( NULL, LSH_TOK_DELIM );
     }; 
 
-	//Temos que finalizar a lista ??!!
+	//Finalizando a lista.
     tokenList[i] = NULL;
 
-    printf("shellCompare: %s \n",tokenList[i]);
+    printf("shellCompare: %s \n", tokenList[i] );
     refresh_screen();	
 
     printf("shellCompare: Test done!\n");
@@ -975,39 +1014,57 @@ do_command:
     //nothing.	
 do_compare:
 
-    //L1 RAM /objetcs   (diretório raiz para os arquivos que são diretórios de objetos)
-	//os objetos serão listador em um arquivo que nunca será salvo no disco.
-	if( strncmp( prompt, "/objects", 6 ) == 0 ){
-	    printf("Open object manager root dir ...\n");
+    //
+	// #Importante:
+	// Devemos pegar os argumentos salvos na lista.
+	// O primeiro argumento é o nome do aplicativo que deve ser executado
+	// e os outros argumentos são argumentos que devem ser passados para 
+	// o aplicativo a ser executado.
+	//
+	
+	//
+	// Talvez aqui devamos usar tokenList[0] e não prompt.
+	//
+
+    // L1 RAM /objetcs   
+	// (diretório raiz para os arquivos que são diretórios de objetos)
+	// os objetos serão listador em um arquivo que nunca será salvo no disco.
+	if( strncmp( prompt, "/objects", 6 ) == 0 )
+	{
+	    printf("info: Open object manager root dir ...\n");
         goto exit_cmp;
     };
 
-	//L2 disk  /diretório raiz do sistema de arquivos
-	if( strncmp( prompt, "/", 5 ) == 0 ){
-	    printf("Open file system root dir ...\n");
+	// L2 disk  /diretório raiz do sistema de arquivos.
+	if( strncmp( prompt, "/", 5 ) == 0 )
+	{
+	    printf("info: Open file system root dir ...\n");
         goto exit_cmp;
     };
 
-	//L3 LAN  // acesso a arquivos da lan
+	// L3 LAN  // acesso a arquivos da lan
 	//os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
-	if( strncmp( prompt, "/lan", 6 ) == 0 ){
-	    printf("Open lan root dir ...\n");
+	if( strncmp( prompt, "/lan", 6 ) == 0 )
+	{
+	    printf("info: Open lan root dir ...\n");
         goto exit_cmp;
     };
  
-	//L4 WAN   //acesso a arquivos da wan
-	//os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
-	if( strncmp( prompt, "/wan", 6 ) == 0 ){
-	    printf("Open wan root dir ...\n");
+	// L4 WAN   //acesso a arquivos da wan
+	// os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
+	if( strncmp( prompt, "/wan", 6 ) == 0 )
+	{
+	    printf("info: Open wan root dir ...\n");
         goto exit_cmp;
     };
 	
     //
-	// ordem alfabética.
+	// Ordem alfabética.
 	//
 	
 	
-	//boot - ?? boot info ??
+	// boot
+	// ?? Boot info talvez.
 	if( strncmp( prompt, "boot", 4 ) == 0 )
 	{
 	    printf("~boot\n");
@@ -1016,17 +1073,20 @@ do_compare:
     };
 
 	
-
-    //cls
+    // cls
+	// Clear the screen.
 	if( strncmp( prompt, "cls", 3 ) == 0 )
 	{
+		//@todo
         shellClearscreen();
         shellSetCursor(0,0);
 	    shellPrompt();
         goto exit_cmp;
 	};
 	
-	//dir
+	
+	// dir
+	// Lista os arquivos no estilo DOS.
 	if( strncmp( prompt, "dir", 3 ) == 0 )
 	{
 	    printf("~dir\n");
@@ -1034,35 +1094,46 @@ do_compare:
         goto exit_cmp;
     };
 	
-	//echo
-    if( strncmp( prompt, "echo", 4 ) == 0 ){
+	
+	// echo
+	// Echo de terminal.
+    if( strncmp( prompt, "echo", 4 ) == 0 )
+	{
+		//@todo.
 		printf("~echo\n");
 		goto exit_cmp;
     };	
 	
-	//exit
-    if( strncmp( prompt, "exit", 4 ) == 0 ){
+	
+	// exit
+	// Exit the application.
+    if( strncmp( prompt, "exit", 4 ) == 0 )
+	{
         printf("~exit\n");
+		refresh_screen();
 		exit(0);
 		goto exit_cmp;
     };
 
-	//hd ??
+	// hd ??
     if( strncmp( prompt, "hd", 2 ) == 0 )
 	{
 	    printf("~hd\n");
         goto exit_cmp;
     };
 	
-	//help
-    if( strncmp( prompt, "help", 4 ) == 0 ){
+	
+	// help
+	// Mostra ajuda.
+    if( strncmp( prompt, "help", 4 ) == 0 )
+	{
 		shellHelp();
 		goto exit_cmp;
     };	
 	
-	//install	
-	//muda um arquivo da area de transferencia para 
-	//o sistema de arquivos...
+	
+	// install	
+    // ??
 	if( strncmp( prompt, "install", 7 ) == 0 )
 	{
 	    printf("~install\n");
@@ -1070,15 +1141,21 @@ do_compare:
         goto exit_cmp;
     };
 	
-    //ls
+	
+    // ls
+	// lista arquivos no estilo unix.
 	if( strncmp( prompt, "ls", 2 ) == 0 )
 	{
+		//@todo: Isso deve ser um aplicativo.
+		printf("~ls\n");
         goto exit_cmp;
 	};	
 
 
-    //metrics
-	if( strncmp( prompt, "metrics", 7 ) == 0 ){
+    // metrics
+	// Mostra algumas informações de métrica do sistema.
+	if( strncmp( prompt, "metrics", 7 ) == 0 )
+	{
 		shellShowMetrics();
         goto exit_cmp;
 	};	
@@ -1092,6 +1169,7 @@ do_compare:
         goto exit_cmp;
     };
 	
+	
 	// newdir
 	if( strncmp( prompt, "newdir", 7 ) == 0 )
 	{
@@ -1100,26 +1178,32 @@ do_compare:
         goto exit_cmp;
     };
 
-    //mbr
+    
+	// mbr
+	// ?? Talvez mostrar informações sobre o mbr ou realizar testes.
     if( strncmp( prompt, "mbr", 3 ) == 0 )
 	{
 	    printf("~mbr\n");
+		
 		//#bugbug pagefault
+		
 		shellTestMBR();
 		printf("done\n");
 		goto exit_cmp;
     }; 
 
-    //reboot 	  	
+	
+    // reboot
+    // @todo: Isso deverá ser um aplicativo.	
     if( strncmp( prompt, "reboot", 6 ) == 0 )
 	{
 	    printf("~reboot\n");
-		//reboot();
-        //KiReboot();
 		goto exit_cmp;
     };
 	
-    //root
+	
+    // root
+	// ??
     if( strncmp( prompt, "root", 4 ) == 0 )
 	{
 	    printf("~/root\n");
@@ -1127,14 +1211,16 @@ do_compare:
 		goto exit_cmp;
     }; 
 
-    //save
+	
+    // save
 	if( strncmp( prompt, "save", 4 ) == 0 )
 	{
 	    printf("~save root\n");
         goto exit_cmp;
     };
 
-	//service
+	
+	// service
 	if( strncmp( prompt, "service", 7 ) == 0 )
 	{
 	    printf("~service - testa servicos do kernel:\n");
@@ -1142,7 +1228,7 @@ do_compare:
         goto exit_cmp;
     };
 
-	//slots
+	// slots
 	if( strncmp( prompt, "slots", 5 ) == 0 )
 	{
 	    printf("~slots - mostra slots \n");
@@ -1150,28 +1236,31 @@ do_compare:
         goto exit_cmp;
     };
 	
-	//start
+	
+	// start
     if( strncmp( prompt, "start", 5 ) == 0 )
 	{
-		//Isso deve setar o foco na janela do shell.
-		//ao mesmo tempo que reinicia o input para digitação 
-		//e ajusta as margens do cursor. :)
-		//qualquer editbox precisa desse tipo de ajuste.
+		// Isso deve setar o foco na janela do shell.
+		// ao mesmo tempo que reinicia o input para digitação 
+		// e ajusta as margens do cursor. :)
+		// Qualquer editbox precisa desse tipo de ajuste.
 	    
 		APISetFocus(window);
 		shellPrompt();
 		printf("~start\n");
+		
 		goto exit_cmp;
     }; 
 	
 	
-    //t1 - Test file
-	if( strncmp( prompt, "t1", 2 ) == 0 ){
-		
-		//carrega e exibe um arquivo.
+    // t1 - Test file
+	if( strncmp( prompt, "t1", 2 ) == 0 )
+	{	
+		// Carrega e exibe um arquivo.
 		shellTestLoadFile();
 		
-		//escreve no buffer de saida e mostra o buffer de saida.
+		// teste.
+		// Escreve no buffer de saída e mostra o buffer de saida.
 		shell_buffer[0] = (char) 'F';
         shell_buffer[1] = (char) 'N';	
         shell_buffer[2] = (char) '\0';			
@@ -1186,45 +1275,57 @@ do_compare:
         goto exit_cmp;
     };
 	
-	//t2 - test bmp
-	if( strncmp( prompt, "t2", 2 ) == 0 ){
+	
+	// t2 - Test bmp
+	if( strncmp( prompt, "t2", 2 ) == 0 )
+	{
 		shellTestDisplayBMP();
         goto exit_cmp;
     };	
 	
-	//t3 - test thread
-	if( strncmp( prompt, "t3", 2 ) == 0 ){
+	
+	// t3 - Test thread
+	if( strncmp( prompt, "t3", 2 ) == 0 )
+	{
 	    shellTestThreads();
         goto exit_cmp;
     };
 	
-	//topbar
-    if( strncmp( prompt, "topbar", 6 ) == 0 ){
+	
+	// topbar
+	// Cria uma top bar.
+    if( strncmp( prompt, "topbar", 6 ) == 0 )
+	{
 	    enterCriticalSection();    
 	    shellCreateTopBar();
 	    exitCriticalSection();    
+		
 		goto exit_cmp;
     };			
 	
-		
-	//tree
-    if( strncmp( prompt, "tree", 4 ) == 0 ){
+	
+	// tree
+	// Desenha uma pequena árvore.
+    if( strncmp( prompt, "tree", 4 ) == 0 )
+	{
 		shellTree();
 		goto exit_cmp;
     };			
-		
-	//version
-    if( strncmp( prompt, "version", 7 ) == 0 ){
-	    printf("\n Gramado version %s \n",OS_VERSION);
+	
+	
+	// version
+    if( strncmp( prompt, "version", 7 ) == 0 )
+	{
+	    printf("\n Gramado version %s \n", OS_VERSION );
         goto exit_cmp;
     };	
  
  
-//
-// Se apertamos o enter e não encontramos um comando válido
-// então damops um aviso de comando inválido e reiniciamos o prompt 
-// na próxima linha.
-//
+    //
+    // Se apertamos o enter e não encontramos um comando válido
+    // então damos um aviso de comando inválido e reiniciamos o prompt 
+    // na próxima linha.
+    //
  
 palavra_nao_reservada:
     printf(" Unknown command!\n");
@@ -1234,8 +1335,8 @@ palavra_nao_reservada:
 	return (unsigned long) 1;
 	
 exit_cmp:
-	//Mostrando as strings da rotina de comparação.
 	shellPrompt();
+	//Mostrando as strings da rotina de comparação.	
 	refresh_screen(); 
     return (unsigned long) 0;
 };
@@ -1271,7 +1372,7 @@ void shellShell()
 	
 	//screen sizes
 	shellScreenWidth  = (800/2);
-    shellScreenHeight = (600 - (600/8) );//600;
+    shellScreenHeight = (600 - (600/8) );   // 600;
 	
 	//window height
 	//shellWindowWidth = (DEFAULT_MAX_COLUMNS*8);
@@ -1280,8 +1381,8 @@ void shellShell()
 	shellWindowWidth = (800/2);
 	shellWindowHeight = (600 - (600/8) );
 	
-    shellMaxColumns = DEFAULT_MAX_COLUMNS; //80;
-    shellMaxRows    = DEFAULT_MAX_ROWS; //25;
+    shellMaxColumns = DEFAULT_MAX_COLUMNS;  // 80;
+    shellMaxRows    = DEFAULT_MAX_ROWS;     // 25;
 
     //...	
 
@@ -1304,8 +1405,6 @@ void shellShell()
 	shellClearBuffer();
 
 	
-	
-	
 	//shellBufferMaxColumns = DEFAULT_BUFFER_MAX_COLUMNS;
 	//shellBufferMaxRows    = DEFAULT_BUFFER_MAX_ROWS;
 	
@@ -1318,16 +1417,16 @@ void shellShell()
 	//        o kernel configuroru???
 	//
 	
-	//Número máximo de colunas e linhas.
-	g_columns = shellMaxColumns; //80;
-	g_rows = shellMaxRows;       //25;
+	// Número máximo de colunas e linhas.
+	g_columns = shellMaxColumns;  // 80;
+	g_rows = shellMaxRows;        // 25;
     //...
 	
 	
 	//...
 	
 done:	
-    //Nossa referência é amoldura e não a área de cliente.
+    //Nossa referência é a moldura e não a área de cliente.
 	//@todo:usar a área de cliente como referência
 	//shellSetCursor(0,0);
     shellSetCursor(0,4);	
@@ -1336,13 +1435,17 @@ done:
 };
 
 
+
 /*
+ ********************************************************************
  * shellInit:
  *     Inicializa o Shell.  
- *     #bugbug: Essa rotina começa escrever na janela com o foco de entrada.
- * um outro aplicativo solicitou o foco de entrada e essa rotina esta terminando 
+ *
+ *     #bugbug: 
+ *     Essa rotina começa escrever na janela com o foco de entrada. Mas um 
+ * outro aplicativo solicitou o foco de entrada e essa rotina esta terminando 
  * de escrever mas agora na janela do outro aplicativo.
- * ?? o que fazer ?? sincronização?? 
+ *
  */
 int shellInit( struct window_d *window )
 {
@@ -1357,19 +1460,27 @@ int shellInit( struct window_d *window )
 	shellSetCursor(0,4);
 	shellPrompt();
     
-	// ...Testing strings on Client Area 
+	// ... Testing strings on Client Area. 
     printf("shellInit: Running tests ...\n");		
 	
 	//
-	// @todo: Essa mensagem está aparecendo fora da área de trabalho do shell
-	//        pois ainda não temos um ponteiro para a memória que representa essa área.
-	//        Talvez as mensagens devessem ir para um buffer de linha antes de irem 
-	//        para a memória de vídeo.
+	// @todo: 
+	// Essa mensagem está aparecendo fora da área de trabalho do shell
+	// pois ainda não temos um ponteiro para a memória que representa essa área.
+	// Talvez as mensagens devessem ir para um buffer de linha antes de irem 
+	// para a memória de vídeo.
+	// #Impotante:
+	// Devemos utilizar as configurações de terminal virtual, respeitar a estrutura 
+	// de terminal, que indicará qual é a janela de terminal onde os caracteres 
+	// devem ser escritos. Na verdade é um ponteiro para um retãngulo e não para 
+	// uma janela. Obs: Esse retângulo do terminal deve esr configurável e uma rotina 
+	// deve dar suporte a essa configuração.
 	//
 	
 	//
-	// @todo: O que tevemos fazer aqui é pegar informações sobre o processo Shell
-	//        e colocálas na tela.
+	// @todo: 
+	// O que tevemos fazer aqui é pegar informações sobre o processo Shell
+	// e coloca-las na tela.
 	//
 	
 	//
@@ -1389,10 +1500,11 @@ int shellInit( struct window_d *window )
 	    printf("ERROR getting PPID\n");	
 	}
   
-	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n",PID ,PPID);
+	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n", PID, PPID );
 	
-	printf("shellMaxColumns={%d} \n",shellMaxColumns);
-	printf("shellMaxRows={%d} \n",shellMaxRows);
+	
+	printf("shellMaxColumns={%d} \n", shellMaxColumns );
+	printf("shellMaxRows={%d} \n", shellMaxRows );
 	
 	//
 	//Active
@@ -1402,7 +1514,7 @@ int shellInit( struct window_d *window )
 	if( ActiveWindowId == (-1)){
 	    printf("ERROR getting Active window ID\n");	
 	}	
-	printf("ActiveWindowId={%d}\n",ActiveWindowId);
+	printf("ActiveWindowId={%d}\n", ActiveWindowId );
 
 
 	//
@@ -1413,7 +1525,7 @@ int shellInit( struct window_d *window )
 	if( WindowWithFocusId == (-1)){
 	    printf("ERROR getting Window With Focus ID\n");	
 	}	
-	printf("WindowWithFocusId={%d}\n",WindowWithFocusId);
+	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );
 	
 	//
 	// @todo: Criar processos processos:
@@ -1487,11 +1599,9 @@ int shellInit( struct window_d *window )
 	printf("RandValue1={%d}\n", rand_value);
 	rand_value = (int) rand();
 	printf("RandValue2={%d}\n", rand_value);
-    rand_value = (int) rand();
-	printf("RandValue3={%d}\n", rand_value);
+    //rand_value = (int) rand();
+	//printf("RandValue3={%d}\n", rand_value);
 	//...
-
-	
 	
 
 	//stddef.h
@@ -1526,19 +1636,21 @@ int shellInit( struct window_d *window )
 	
 	int wID;
 	
+	// Active window.
 	wID = (int) APIGetActiveWindow();
 	//valor de erro
 	if( wID == (-1) ){
 	    printf("ERROR getting Active window ID\n");	
 	}
-	printf("ActiveWindow={%d}\n", wID);
+	printf("ActiveWindow={%d}\n", wID );
 	
+	// Window with focus.
 	wID = (int) APIGetFocus();	
 	//valor de erro
 	if( wID == (-1) ){
 	    printf("ERROR getting Window With Focus ID\n");	
 	}		
-	printf("Focus={%d}\n", wID);
+	printf("Focus={%d}\n", wID );
 	//...
 	
 	//
@@ -1546,14 +1658,15 @@ int shellInit( struct window_d *window )
 	//
 
 	//Lib C.
-	system("test");       //libC. (stdlib.c)
+	//libC. (stdlib.c)
+	system("test");       
 	system("ls");
 	system("start");
 	system("xxfailxx");
 	//...
 	
 	//API.
-	apiSystem("test");    //api.
+	apiSystem("test");    
     apiSystem("ls");
 	apiSystem("start");
 	apiSystem("xxfailxx");
@@ -1585,9 +1698,6 @@ done:
 	
 	printf("...\n");
 	printf("Welcome to Gramado Operating System.\n");
-	//printf("...\n");
-	//printf("TAKE A SAD O.S. AND MAKE IT BETTER!\n");
-	//printf("...\n");
 	printf("Done!");
 	
 	
@@ -1605,8 +1715,8 @@ done:
     //	
 	
 	
-//heapTest:
-/*	
+    //heapTest:
+    /*	
 	printf("\n...\n");
 	printf("Testing C99 RT ...\n");
 	
@@ -1617,7 +1727,8 @@ done:
 	hPointer = (unsigned long) rtGetHeapPointer();
 	hAvail   = (unsigned long) rtGetAvailableHeap();
 	
-	printf("heapStart{%x} heapEnd{%x} heapPointer{%x} heapAvailable={%x}\n",hStart, hEnd, hPointer, hAvail);
+	printf("heapStart{%x} heapEnd{%x} heapPointer{%x} heapAvailable={%x}\n", 
+	     hStart, hEnd, hPointer, hAvail);
 	
 	// resultados do teste:
 	// os valores parecem satisfatórios pois estão realmente dentro da área 
@@ -1628,16 +1739,11 @@ done:
 	// no bss do arquivo e do tamanho certo.
 	// tudo indica que é saudável aumentar o tamanho do buffer usado pelo heap.
 	//
-	
 	*/
-	
-	/*
-	printf("\nO melhor grupo do Facebook: \n");
-	printf(">> https://www.facebook.com/groups/1078308252227836 \n");
-    */
 	
 	shellPrompt();
     refresh_screen();
+	
     return (int) 0;
 };
 
@@ -1648,7 +1754,8 @@ done:
  *
  * @todo: Aqui quando definimos os valores o cursor no shell 
  * devemos considerar que a janela com o foco de entrada tambem tem um cursor...
- * Temos que atualizar o cursor da janela com foco de entrada se quizermos escrever corretamente dentro dela.
+ * Temos que atualizar o cursor da janela com foco de entrada se quizermos 
+ * escrever corretamente dentro dela.
  * e isso se faz através de uma chamada ao kernel.
  */
 void shellSetCursor(unsigned long x, unsigned long y)
@@ -1683,13 +1790,13 @@ void shellThread()
 void shellHelp(){
     printf(help_banner);	
 	return;
-}
+};
 
 //drawing a tree
 void shellTree(){
     printf(tree_banner);	
 	return;
-}
+};
 
 //
 // C function to demonstrate the working of arithmetic operators
@@ -1834,8 +1941,10 @@ void shellTestThreads()
 	unsigned long *threadstack1;
 	threadstack1 = (unsigned long *) malloc(30*1024);
 	threadstack1 = ( threadstack1 + (30*1024) - 4 ); //Ajuste para o início da pilha.
-	ThreadTest1 = (void*) apiCreateThread((unsigned long)&shellThread, (unsigned long) threadstack1,"ThreadTest1");
-	
+	ThreadTest1  = (void*) apiCreateThread( (unsigned long)&shellThread, 
+	                                        (unsigned long) threadstack1, 
+										    "ThreadTest1" );
+										   
 	
 	printf("shell: Tentando executar um thread ...\n");
 	refresh_screen();
@@ -2049,8 +2158,7 @@ void shellTestMBR()
 				 
     shellRefreshScreen();	
 	exitCriticalSection();   
-}
-
+};
 
 
 
@@ -2074,7 +2182,7 @@ void move_to( unsigned long x, unsigned long y )
 };
 
 
-
+//metrics
 void shellShowMetrics()
 {
 	unsigned long screen_width;
@@ -2084,31 +2192,33 @@ void shellShowMetrics()
 	unsigned long mouse_pointer_width;
 	unsigned long mouse_pointer_height;
 	unsigned long char_width;
-	unsigned long char_height;
-	
+	unsigned long char_height;	
 	//...
 
-	screen_width = apiGetSystemMetrics(1);
-	screen_height = apiGetSystemMetrics(2);
-	cursor_width = apiGetSystemMetrics(3);
-	cursor_height = apiGetSystemMetrics(4);
-	mouse_pointer_width = apiGetSystemMetrics(5);
+	screen_width         = apiGetSystemMetrics(1);
+	screen_height        = apiGetSystemMetrics(2);
+	cursor_width         = apiGetSystemMetrics(3);
+	cursor_height        = apiGetSystemMetrics(4);
+	mouse_pointer_width  = apiGetSystemMetrics(5);
 	mouse_pointer_height = apiGetSystemMetrics(6);
-	char_width = apiGetSystemMetrics(7);
-	char_height = apiGetSystemMetrics(8);
+	char_width           = apiGetSystemMetrics(7);
+	char_height          = apiGetSystemMetrics(8);
 	//...
 	
 	
 	printf("shellShowMetrics:\n");
 	printf("screenWidth={%d} screenHeight={%d}\n",screen_width,screen_height);
 	printf("cursorWidth={%d} cursorHeight={%d}\n",cursor_width,cursor_height);
-	printf("mousepointerWidth={%d} mousepointerHeight={%d}\n",mouse_pointer_width,mouse_pointer_height);
+	printf("mousepointerWidth={%d} mousepointerHeight={%d}\n", 
+	        mouse_pointer_width,mouse_pointer_height);
 	printf("charWidth={%d} charHeight={%d}\n",char_width,char_height);	
 	//...
 	
-printf("done\n");	
+	
+done:	
+    printf("Done\n");	
 	return;
-}
+};
 
 
 /*
