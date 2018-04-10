@@ -1,5 +1,5 @@
 /*
- * File: timer.c 
+ * File: unblocked\timer.c 
  *  
  * Descrição:
  *     Arquivo principal do driver do PIT. 
@@ -373,7 +373,7 @@ int timerTimer()
     kernel_tick = 0;
     kernel_tick_total = 0;	
 	
-	return 0;
+	return (int) 0;
 };
 
 

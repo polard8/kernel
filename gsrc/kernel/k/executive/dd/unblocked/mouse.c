@@ -1,6 +1,12 @@
-//mouse.c 
-
-//isso aqui está no kernel base, mas deverá ser um driver.
+/*
+ * File: unblocked\mouse.c
+ *
+ * Isso aqui está no kernel base, mas deverá ser um driver.
+ * 
+ * History:
+ * 2017 - Created by fred Nora. 
+ *
+ */
 
 
 #include <kernel.h>
@@ -8,6 +14,7 @@
 
 
 /*
+ ********************************************
  * mouse_handler:
  *     Mouse handler do driver de mouse.
  */

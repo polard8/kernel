@@ -78,6 +78,7 @@ done:
 
 
 /*
+ *****************************************************************
  * read_lba:
  *     Carrega um um setor na memória, dado o LBA.
  *     fsReadLBA(..)
@@ -124,6 +125,7 @@ done:
 
 
 /*
+ ************************************************************************
  * fsLoadFile:
  *    Carrega um arquivo na memória dado o nome e o endereço.
  *    Apenas FAT16.
@@ -133,10 +135,11 @@ done:
  *  caso eles não estejam carregados e não tenham seus endereços salvos.
  *   Obs:   Pode existir uma estrutura pra dizer se o root dir e fat estão 
  * carregados na memória e qual o endereço o tipo o tamanho etc.
- *
+ * + O argumento nome poderia ser const char* para compatibilidade com a libC.
  */
-//unsigned long fsLoadFile( unsigned char *name, unsigned long address) 
-unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
+//unsigned long fsLoadFile( const char *name, unsigned long address ) 
+unsigned long fsLoadFile( unsigned char *file_name, 
+                          unsigned long file_address )
 {
     int Status;	
 	
@@ -178,26 +181,27 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	//Checa se é válida a estrutura do sistema de arquivos.
 	if( (void*) filesystem == NULL )
 	{
-	    printf("fsLoadFile error: Struct.");
-		refresh_screen();
-		while(1){}
-	}
-	else
-	{
+	    printf("fs-read-fsLoadFile: filesystem");
+		//goto fail;
+		die(); //@todo: Na verdade aqui deveria apenas falhar a função.
+	}else{
+		
 	    //Setores por cluster.
 	    Spc = filesystem->spc;
-	    if(Spc <= 0){
-	        printf("fsLoadFile error: Spc.");
-		    refresh_screen();
-		    while(1){}
+	    if(Spc <= 0)
+		{
+	        printf("fs-read-fsLoadFile error: Spc.");
+		    //goto fail;
+			die();  //@todo: Na verdade aqui deveria apenas falhar a função.
 	    };
 	
 	    //Max entries ~ Número de entradas no rootdir.
 	    max = filesystem->rootdir_entries;	
-	    if(max <= 0){
-	        printf("fsLoadFile error: Root entries.");
-		    refresh_screen();
-		    while(1){}
+	    if(max <= 0)
+		{
+	        printf("fs-read-fsLoadFile error: max");
+			//goto fail;
+		    die();  //@todo: Na verdade aqui deveria apenas falhar a função.
 	    };
 		
 	    //More?! 
@@ -232,6 +236,7 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	i = 0; 
 	
 	// Procura o arquivo no diretório raiz.
+	
 //search_file:
 	
 	//Compara.
@@ -239,15 +244,18 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	{
 		if(root[z] != 0)
         {
-			//Copia o nome e termina incluindo o char 0.
-			memcpy( NameX, &root[z], 11);
+			// Copia o nome e termina incluindo o char 0.
+			memcpy( NameX, &root[z], 11 );
 			NameX[11] = 0;
 			
             // Compara 11 caracteres do nome desejado, 
 			// com o nome encontrado na entrada atual.
-			Status = strncmp(file_name, NameX, 11);
-            if(Status == 0){ goto found; };
-			//Nothing.
+			Status = strncmp( file_name, NameX, 11 );
+            if(Status == 0){ 
+			    goto found; 
+			};
+			
+			// Nothing.
         }; 
 		
 		//(32/2) próxima entrada! (16 words) 512 vezes!
@@ -260,32 +268,33 @@ unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address)
 	// Sai do while. O arquivo não foi encontrado.
 	//
 	
+    // O arquivo não foi encontrado.	
 notFound:
     printf("fsLoadFile: %s not found!\n",file_name);     
     goto fail;
+	
+    // O arquivo foi encontrado.	
 found:
-   // printf("arquivo encontrado\n");
-   	
-	//debug
-    //refresh_screen();
-	//while(1){}
+
+    // #debug
+    // printf("arquivo encontrado\n");
+    // refresh_screen();
+	// while(1){}
 	
     //Pega o cluster inicial. (word)
 	cluster = root[ z+13 ];    //(0x1A/2) = 13.	
 	
 	
+	// Cluster Limits.
+	// Checar se 'cluster' está fora dos limites.
+	// +São 256 entradas de FAT por setor. 
+	// +São 64 setores por FAT. 
+	// Isso varia de acordo com o tamanho do disco.
+	// O número máximo do cluster nesse caso é (256*64).
 	
-	/*
-	 * Checar se cluster está fora dos limites.
-	 * São 256 entradas de FAT por setor. 
-	 * São 64 setores por FAT. 
-	 * Isso varia de acordo com o tamanho do disco.
-	 * O número máximo do cluster nesse caso é (256*64).
-	 */
-	 
-	//Cluster Limits. 
-	if( cluster <= 0 || cluster > (0xfff0) ){
-	    printf("fsLoadFile error: Cluster limits {%x}!\n",cluster);
+	if( cluster <= 0 || cluster > 0xfff0 )
+	{
+	    printf("fs-read-fsLoadFile error: Cluster limits {%x}!\n", cluster );
 		goto fail;
 	};	
 	
@@ -293,14 +302,12 @@ found:
 //loadFAT:
 	
     //Carrega fat na memória.
+	
 	printf("loading FAT..\n");	
 	fs_load_fatEx();
 	
-    /*
-     * Carregar o arquivo, cluster por cluster.
-     * @todo: 
-	 *     Por enquanto, um cluster é igual à um setor, 512 bytes.
-     */
+    // Carregar o arquivo, cluster por cluster.
+    // @todo: Por enquanto, um cluster é igual à um setor, 512 bytes.
  
     //Debug:
     printf("Loading clusters..\n");
@@ -318,7 +325,8 @@ found:
 	//
 	
 //Loop.	
-proxima_entrada:
+//proxima_entrada:
+next_entry:
 	
 	/*
 	while(1)
@@ -343,8 +351,8 @@ proxima_entrada:
 	read_lba( file_address, FAT16_DATAAREA_LBA + cluster -2 ); 
 	
 	//Incrementa o buffer. +512;
-	file_address = (unsigned long) file_address + 512; //SECTOR_SIZE;  	
-	
+	//SECTOR_SIZE;
+	file_address = (unsigned long) file_address + 512;    	
 	
 	
 	//Pega o próximo cluster na FAT.
@@ -355,31 +363,29 @@ proxima_entrada:
 	cluster = (unsigned short) next;	
 	
 	//Ver se o cluster carregado era o último cluster do arquivo.
-	if(cluster == 0xFFFF || cluster == 0xFFF8){ goto done; };
+	if( cluster == 0xFFFF || cluster == 0xFFF8 ){ 
+	    goto done; 
+	};
 
 	//
 	// Loop: 
 	// Vai para próxima entrada na FAT.
 	//
 	
-	goto proxima_entrada;	
+	//goto proxima_entrada;
+	goto next_entry;
+	
 	//Nothing.
 	
 //Falha ao carregar o arquivo.
 fail:
-	//scheduler_unlock();
-	//taskswitch_unlock();
-    printf("fsLoadFile fail: file={%s}!\n",file_name);	
+    printf("fs-read-fsLoadFile fail: file={%s}!\n", file_name );	
     refresh_screen();
-	//taskswitch_unlock();
 	return (unsigned long) 1;
 //Done. 	
 done:
     //printf("fsLoadFile: done\n");
 	refresh_screen(); 
-	//scheduler_unlock();
-	//taskswitch_unlock();
-	//taskswitch_unlock();
     return (unsigned long) 0;
 };
 
@@ -396,8 +402,9 @@ void KiLoadRootDir(unsigned long address)
 	unsigned long szRoot = 32;    //32 setores.
 	
 	//Carregar root dir na memória.
-	for( i=0; i < szRoot; i++){
-	    read_lba( address + b, FAT16_ROOTDIR_LBA + i);    
+	for( i=0; i < szRoot; i++ )
+	{
+	    read_lba( address + b, FAT16_ROOTDIR_LBA + i );    
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -416,8 +423,9 @@ void fs_load_rootdirEx()
 	unsigned long szRoot = 32;
 	
 	//Carregar root dir na memória.
-	for( i=0; i < szRoot; i++){
-	    read_lba( FAT16_ROOTDIR_ADDRESS + b, FAT16_ROOTDIR_LBA + i);    
+	for( i=0; i < szRoot; i++ )
+	{
+	    read_lba( FAT16_ROOTDIR_ADDRESS + b, FAT16_ROOTDIR_LBA + i );    
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -436,8 +444,9 @@ void fs_load_fatEx()
 	unsigned long szFat = 64;    //64 Setores de tamanho.(@todo: variável global)
 	
 	//Carregar root dir na memória.
-	for( i=0; i < szFat; i++){
-	    read_lba( FAT16_FAT_ADDRESS + b, FAT16_FAT_LBA + i); 
+	for( i=0; i < szFat; i++ )
+	{
+	    read_lba( FAT16_FAT_ADDRESS + b, FAT16_FAT_LBA + i ); 
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -500,6 +509,7 @@ void fs_load_dir(unsigned long id)
 done:	
 	return;
 };
+
 
 //
 // End.

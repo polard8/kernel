@@ -44,6 +44,8 @@
 
 
 /*
+ * fsCreateVFS:
+ *
   @todo
 //  
 // ** CRIANDO O DIRETÓRIO RAIZ DO VFS BASEADO EM STREAMS **
@@ -272,7 +274,7 @@ void *get_file(int Index)
  * dado seu id.
  * 
  */
-void set_file(void *file, int Index)
+void set_file( void *file, int Index )
 {
 	//Limits.	
 	if(Index < 0){
@@ -385,16 +387,27 @@ void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long stat
  * Endereço da memória onde o MBR é carregado na inicialização. 0x00020000.   
  *
  * @todo: Talvez essa rotina pudesse fornecer o endereço do buffer como argumento.
- *
+ * @todo: O mbr do sisco do sistema precisa de uma estruura que 
+ * coordene o acesso a ele.
  */
 //void fsCheckMBR(unsigned char* buffer)  //@todo
 void fsCheckMbr()
 {
-	unsigned char *mbr = (unsigned char *) FS_MBR_ADDRESS;  
+	unsigned char *mbr = (unsigned char *) FS_MBR_ADDRESS; 
+
+
+    //
+	// @todo:
+	// Checar uma estrutura do mbr do disco do sistema,
+	// para validar o acesso à ele.
+	//
+	
 	
 	// Check signature.
-	if( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA ){
-	    printf("fsCheckMbr: Signature Fail!\n"); 
+	if( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+	{
+	    printf("fsCheckMbr: Signature Fail!\n");
+        goto fail;		
 	};
 	
 	//
@@ -403,8 +416,12 @@ void fsCheckMbr()
 	
 done:
     printf("fsCheckMbr: Done.\n");
-	//refresh_screen();
+	refresh_screen();
 	return;
+	
+fail:
+    refresh_screen();
+    return;
 };
 
 

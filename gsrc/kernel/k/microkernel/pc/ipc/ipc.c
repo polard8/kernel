@@ -1,5 +1,5 @@
 /*
- * File: ipc.c 
+ * File: pc\ipc.c 
  *
  * Descrição:
  *     IPCM - Inter-Process Communication Manager.
@@ -107,7 +107,8 @@ int ipc_dispatch_message( unsigned long a,
 	// @todo: BugBug rever esse endereço.
 	//
 
-  // PA_1b8000 = VA_900000 (comunication area)
+	//#bugbug: Rever esse endereço.
+    // PA_1b8000 = VA_900000 (comunication area)
 	unsigned long *int_args  = (unsigned long *) 0x001B8000; 
 
     //sinaliza que existe uma mensages esperando processamento.	

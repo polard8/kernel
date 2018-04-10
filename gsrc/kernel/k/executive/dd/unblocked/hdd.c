@@ -1,5 +1,5 @@
 /*
- * File: hal\unblocked\hdd.c 
+ * File: unblocked\hdd.c 
  * 
  * Descrição:
  *     Interface de acesso a discos do tipo HDD.

@@ -29,7 +29,7 @@
  *    +...
  *
  */ 
-int KiSearchFile( unsigned char *file_name, unsigned long address)
+int KiSearchFile( unsigned char *file_name, unsigned long address )
 {
 	int Status;
     unsigned long i = 0;        //Deslocamento do dir. 
@@ -51,8 +51,10 @@ int KiSearchFile( unsigned char *file_name, unsigned long address)
     {     
         if(dir[j] != 0)
 		{
-		    Status = strncmp(file_name, &dir[j], 11);
-			if(Status == 0){ goto done; }; 
+		    Status = strncmp( file_name, &dir[j], 11 );
+			if(Status == 0){ 
+			    goto done; 
+			}; 
         };   
 		
 		//Próxima entrada. Repete 512 vezes.
@@ -63,10 +65,10 @@ int KiSearchFile( unsigned char *file_name, unsigned long address)
 	//More?!
 	
 fail:
-    printf("KiSearchFile: Not found!\n");       	
-    return (int) 1; 
+    printf("fs-search-KiSearchFile: File not found!\n");       	
+    //printf("File not found!\n");
+	return (int) 1; 
 done:
-    //printf("Found.\n");
     return (int) 0;
 };
 
@@ -83,7 +85,8 @@ done:
  *    +Tamanho do disco
  *    +Tipo de sistema de arquivos. (nao por enquanto)
  *    +...
- */ 
+ */
+//int fsSearchFile( const char *name ) 
 int fsSearchFile(unsigned char *file_name)
 {
 	int Status;	
@@ -94,7 +97,7 @@ int fsSearchFile(unsigned char *file_name)
 	//...
 	
 	//Testa a estrutura.
-	if( (void*) rootDir == NULL){
+	if( (void*) rootDir == NULL ){
 		return (int) 1;
 	};
 	
@@ -108,13 +111,13 @@ int fsSearchFile(unsigned char *file_name)
 		
 	//Checa se o root dir está na memória.	
     if(rootDir->inMemory != 1){
-	    printf("Root dir is NOT in memory.\n");
+	    printf("fs-search-fsSearchFile: Root dir is NOT in memory.\n");
 	    return (int) 1;
 	};
 
 	//Checar se o endereço é válido.
     if(rootDir->address == 0){
-	    printf("Root dir address fail.\n");
+	    printf("fs-search-fsSearchFile: Root dir address fail.\n");
 	    return (int) 1;
 	};
     
@@ -129,7 +132,9 @@ int fsSearchFile(unsigned char *file_name)
         if( root[z] != 0 )
 		{
 			Status = strncmp(file_name, &root[z], 11);
-            if(Status == 0){ goto done; }; 
+            if(Status == 0){ 
+			    goto done; 
+			}; 
         };   
         
 		//Próxima entrada. Repete 512 vezes.
@@ -140,10 +145,10 @@ int fsSearchFile(unsigned char *file_name)
 	//More?!
 	
 fail:
-    printf("fsSearchFile: File not found!\n");       	
-    return (int) 1;    
+    printf("fs-search-fsSearchFile: File not found!\n");       	
+    //printf("File not found!\n");
+	return (int) 1;    
 done:
-    //printf("fsSearchFile: Found.\n");
     return (int) 0;
 };
 
@@ -193,17 +198,18 @@ unsigned long fs_find_n_empty_entries(unsigned long n)
 	unsigned long empty;
 	
 	// Limits.
-	if(n < 0 || n > 1024){
+	if( n < 0 || n > 1024 ){
 	    goto fail;
 	};
 	
 	// Loop ~ Procurar uma quantidade de entradas vazias.
-	for(i = 0; i < n; i++)
+	for( i=0; i < n; i++ )
 	{	
 		empty = fs_find_empty_entry();
 		
-		//Preenche a lista de entradas vazias.	
-		if ( empty != 0 && empty < 1024 ){
+		// Preenche a lista de entradas vazias.	
+		if( empty != 0 && empty < 1024 )
+		{
 		    file_cluster_list[l] = empty;
             l++;
 		}else{
@@ -227,8 +233,10 @@ fail:
  *     Procurar um nome de arquivo em uma pasta.
  *     No caso é o diretório raiz.
  */
-unsigned long fsSearchFileName(unsigned char *name){
-    return (unsigned long ) fsSearchFile(name);
+//int fsSearchFileName( const char *name ) 
+unsigned long fsSearchFileName(unsigned char *name)
+{
+    return (unsigned long) fsSearchFile(name);
 };
 
 

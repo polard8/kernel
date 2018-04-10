@@ -11,8 +11,7 @@ Objetivo do módulo /mm:
     
     + Gerenciar o diretório de tabelas de páginas usados pelo kernel.
     + Gerenciar o Heap do Kernel.
-    + Gerenciar a Stack do Kernel.
-    
+    + Gerenciar a Stack do Kernel.  
     + Gerenciar os diretórios de tabelas de páginas usados pelos processos.
     + Gerenciar o Heap dos Processos.
     + Gerenciar a Stack dos Processos. 

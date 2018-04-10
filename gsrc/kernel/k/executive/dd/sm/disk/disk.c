@@ -1,5 +1,5 @@
 /*
- * File: disk.c 
+ * File: sm\disk\disk.c 
  * 
  * Descrição:
  *     Gerenciador de discos. 
@@ -11,8 +11,32 @@
  *    Versão 1.0, 2015, 2016.
  */
 
+ 
+//
+// Obs: o foco está na lista de discos. diskList
+//
 
 #include <kernel.h>
+
+
+
+void *disk_get_disk_handle( int number )
+{
+	//check limts
+	if( number < 0 || number >= DISK_COUNT_MAX ){
+		return NULL;
+	}
+	
+	return (void *) diskList[number];
+};
+
+
+
+
+void *disk_get_current_disk_info()
+{
+	return (void *) CurrentDiskInfo; 
+};
 
 
 /*
@@ -21,16 +45,23 @@
  *     Que é um módulo do tipo MB.
  *
  */
+//int diskInit() 
 int disk_init()
 {
     printf("disk_init: Initializing..\n");
+	
+	//
+	// Inicializando uma estrutura global de informações sobre o 
+	// disco do sistema.
+	// ?? Em que arquivo está essa estrutura.
+	//
 
 	// Create structure.
     diskinfo = (void*) malloc( sizeof(struct diskinfo_d) );
-	if( (void*) diskinfo == NULL ){
-	    printf("disk_init:");
-		refresh_screen();
-		while(1){}
+	if( (void*) diskinfo == NULL )
+	{
+	    printf("sm-disk-disk_init:");
+		die();
 	}else{
 		
 	    diskinfo->diskId = 0;
@@ -161,13 +192,6 @@ int init_disk_manager()
 };
 
 
-*/
-
-
-/*
-int diskInit(){
-	;
-};
 */
 
 

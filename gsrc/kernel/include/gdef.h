@@ -93,7 +93,8 @@ dessa conta.
 typedef enum {
 	OsTypeClient,
 	OsTypeServer,
-	OsTypeHeadlessServer,  //Headless Server. ??	
+	OsTypeHeadlessServer,  //Headless Server. ??
+    //...	
 }os_type_t;
 
 //

@@ -150,13 +150,13 @@ extern void do_executa_new_task();
 // HAL (4)
 //
 
-#include <hal/diskmap.h>                         //Disk Map - sectors.
+#include <executive/dd/sm/disk/diskmap.h>        //Disk Map - sectors.
 #include <hal/screen.h> 
 #include <hal/video.h>                           //video.
 #include <hal/memory.h>                          //ram (hardware).
 #include <hal/cpu.h>                             //cpu
-#include <hal/disk.h>                            //disk.
-#include <hal/volume.h>                          //volume.
+#include <executive/dd/sm/disk/disk.h>           //disk.
+#include <executive/dd/sm/disk/volume.h>         //volume.
 #include <hal/serial.h>        
 #include <hal/mac.h>                             //mac address info. (hw)
 //...

@@ -21,19 +21,32 @@
  *     Salva um cluster no disco.
  *
  * Argumentos:
- *   setor ~ Primeiro setor do cluster.
+ *   setor   ~ Primeiro setor do cluster.
  *   address ~ Endereço do primeiro setor do cluster.
- *   spc  ~ Número de setores por cluster.
+ *   spc     ~ Número de setores por cluster.
  */
-void fatWriteCluster(unsigned long sector, unsigned long address, unsigned long spc)
+
+//int fatWriteCluster( unsigned long sector, 
+//                     unsigned long address, 
+//	  				   int spc )
+					  
+void fatWriteCluster( unsigned long sector, 
+                      unsigned long address, 
+					  unsigned long spc )
 {
 	unsigned long i;
 
 	//Começa do primeiro setor do cluster.
-	for(i = 0; i < spc; i++){
+	for( i=0; i < spc; i++ )
+	{
         write_lba( address, sector + i );
 		address = address +512; 
 	};
+	
+	//...
+	
+done:
+    //return (int) 0;	
 	return;
 };
 
@@ -43,32 +56,40 @@ void fatWriteCluster(unsigned long sector, unsigned long address, unsigned long 
  *     Grava um setor no disco dado o lba.
  *     fsWriteLba
  */
-void write_lba( unsigned long address, unsigned long lba)
+//int write_lba( unsigned long address, unsigned long lba ) 
+void write_lba( unsigned long address, unsigned long lba )
 {    
     //@todo: Check limits.
+	
+	// ?? onde está fatbits ??
 	
     switch(fatbits)
     {
 	    case 32:
-	        //Nothing.	    
-            return;
+			printf("fs-write-write_lba: fat32 not supported. \n");
+			goto fail;
 			break;		
 			
 	    case 16:
-            my_write_hd_sector( address, lba, 0, 0); 
-            return;
+            my_write_hd_sector( address, lba, 0, 0 );
+            goto done;			
 			break;		
 			
 	    case 12:
-	        //Nothing.	    
-            return;
+			printf("fs-write-write_lba: fat12 not supported. \n");
+			goto fail;	    
 			break;
 
         default:
-		    return;
+			printf("fs-write-write_lba: Unknow fat fs. \n");
+			goto fail;		    
             break;		
-	};	
+	};
+
+    // Nothing.	
 	
+fail:
+    refresh_screen();	
 done:
     return;
 };

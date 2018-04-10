@@ -1,5 +1,5 @@
 /*
- * File: pci.c
+ * File: blocked\pci.c
  * 
  * Descrição:
  *     Driver de PCI presente no kernel Base.
@@ -660,8 +660,10 @@ done:
  * pciCheckVendor:
  *     Check vendor, offset 0.
  */ 
-unsigned short pciCheckVendor(unsigned char bus, unsigned char slot){
-	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_VENDORID);  //Vendor.
+unsigned short pciCheckVendor(unsigned char bus, unsigned char slot)
+{
+	// Vendor.
+	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_VENDORID );  
 }; 
 
  
@@ -669,8 +671,10 @@ unsigned short pciCheckVendor(unsigned char bus, unsigned char slot){
  * pciCheckDevice:
  *     Check device, offset 2.    
  */ 
-unsigned short pciCheckDevice(unsigned char bus, unsigned char slot){        
-	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_DEVICEID);  //Device. 
+unsigned short pciCheckDevice(unsigned char bus, unsigned char slot)
+{        
+    // Device.
+	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_DEVICEID );   
 };
 
 
@@ -678,8 +682,9 @@ unsigned short pciCheckDevice(unsigned char bus, unsigned char slot){
  * pciGetSubClass:
  *     Get subclass code. Offset 0x0A.
  */
-unsigned char pciGetSubClass(unsigned char bus, unsigned char slot){
-	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_SUBCLASS);
+unsigned char pciGetSubClass(unsigned char bus, unsigned char slot)
+{
+	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_SUBCLASS );
 };
 
 
@@ -687,12 +692,14 @@ unsigned char pciGetSubClass(unsigned char bus, unsigned char slot){
  * pciGetClassCode:
  *     Get class code, offset 0x0B.  
  */
-unsigned char pciGetClassCode(unsigned char bus, unsigned char slot){	
-	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_CLASSCODE);
+unsigned char pciGetClassCode(unsigned char bus, unsigned char slot)
+{	
+	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_CLASSCODE );
 };
 
 
 /*
+ *****************************************************************
  * pciGetBAR:
  *     Get BAR.
  *
@@ -712,10 +719,10 @@ unsigned char pciGetClassCode(unsigned char bus, unsigned char slot){
  *
  * Obs: O argumento 'number' é o número do BAR.
  *
- * Primeiro devemos salvar o valor encontrado na BAR, o valor da BAR
+ * Primeiro devemos salvar o valor encontrado na BAR, o valor do BAR
  * servirá para identificarmos um endereço de memória ou número de
  * porta de i/o. Os bits do bar dirão se o endereço de memória é
- * de 32bit ou 64 bit.
+ * de 32bit ou 64bit.
  *
  * Depois para sabermos a quantidade de memória que um dispositivo irá precisar
  * devemos colocar tudo 1 na BAR, pegar o valor da bar e efetuar um NOT (~) each
@@ -725,45 +732,65 @@ unsigned char pciGetClassCode(unsigned char bus, unsigned char slot){
  *
  * Obs: Nessa rotina apenas pegamos o valor da bar.
  */
-unsigned long pciGetBAR(unsigned char bus, unsigned char slot, int number)
+unsigned long pciGetBAR( unsigned char bus, 
+                         unsigned char slot, 
+						 int number )
 {
 	unsigned long BAR;
 	
 	//@todo: Filtros para argumentos.
 	
-	if(number <0 || number > 5){
+	if( number <0 || number > 5 ){
 		return 0;
 	};
 	
     switch(number)
 	{
 		case 0:
-			BAR = (unsigned long) pciConfigReadDWord( bus, slot, 0, PCI_OFFSET_BASEADDRESS0);
+			BAR = (unsigned long) pciConfigReadDWord( bus, 
+			                                          slot, 
+													  0, 
+													  PCI_OFFSET_BASEADDRESS0 );
 			goto done;
 		    break;
 	
 		case 1:
-			BAR = (unsigned long) pciConfigReadDWord( bus, slot, 0, PCI_OFFSET_BASEADDRESS1);
+			BAR = (unsigned long) pciConfigReadDWord( bus, 
+			                                          slot, 
+													  0, 
+													  PCI_OFFSET_BASEADDRESS1 );
 			goto done;
 		    break;
 
 		case 2:
-			BAR = (unsigned long) pciConfigReadDWord( bus, slot, 0, PCI_OFFSET_BASEADDRESS2);
+			BAR = (unsigned long) pciConfigReadDWord( bus, 
+			                                          slot, 
+													  0, 
+													  PCI_OFFSET_BASEADDRESS2 );
 			goto done;
 		    break;
 
 		case 3:
-			BAR = (unsigned long) pciConfigReadDWord( bus, slot, 0, PCI_OFFSET_BASEADDRESS3);
+			BAR = (unsigned long) pciConfigReadDWord( bus, 
+			                                          slot, 
+													  0, 
+													  PCI_OFFSET_BASEADDRESS3 );
 			goto done;
 		    break;
 
 		case 4:
-			BAR = (unsigned long) pciConfigReadDWord( bus, slot, 0, PCI_OFFSET_BASEADDRESS4);
+			BAR = (unsigned long) pciConfigReadDWord( bus, 
+			                                          slot, 
+													  0, 
+													  PCI_OFFSET_BASEADDRESS4 );
 			goto done;
 		    break;
 
 		case 5:
-			BAR = (unsigned long) pciConfigReadDWord( bus, slot, 0, PCI_OFFSET_BASEADDRESS5);
+			BAR = (unsigned long) pciConfigReadDWord( bus, 
+			                                          slot, 
+													  0, 
+													  PCI_OFFSET_BASEADDRESS5 );
 			goto done;
 		    break;
 			
@@ -787,8 +814,13 @@ done:
  *     Get Interrupt Line, offset 0x3C.
  *     (Read an write register).
  */
-unsigned char pciGetInterruptLine(unsigned char bus, unsigned char slot){
-	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_INTERRUPTLINE);
+unsigned char pciGetInterruptLine( unsigned char bus, 
+                                   unsigned char slot )
+{
+	return (unsigned char) pciConfigReadByte( bus, 
+	                                          slot, 
+											  0, 
+											  PCI_OFFSET_INTERRUPTLINE );
 };
 
 
@@ -796,8 +828,13 @@ unsigned char pciGetInterruptLine(unsigned char bus, unsigned char slot){
  * pciGetInterruptPin:
  *     Get interrupt pin offser 3d (Read only).
  */
-unsigned char pciGetInterruptPin(unsigned char bus, unsigned char slot){
-	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_INTERRUPTPIN);
+unsigned char pciGetInterruptPin( unsigned char bus, 
+                                  unsigned char slot )
+{
+	return (unsigned char) pciConfigReadByte( bus, 
+	                                          slot, 
+											  0, 
+											  PCI_OFFSET_INTERRUPTPIN );
 };
 
 
@@ -839,9 +876,13 @@ int pciInfo()
 			//@todo: Mostrar mais informações.
 			if(D->deviceMagic == 1234)
 			{
-				printf("Vendor={%x} Device={%x} Class={%s} SubClass={%x} iLine={%d} iPin={%d} \n",
-				D->Vendor, D->Device, pci_class_strings[D->classCode], D->subclass, D->irq_line, D->irq_pin);
-                //D->Vendor, D->Device, pci_class_strings[D->classCode], D->subclass, D->irq_line, D->irq_pin);				
+				printf("\n Vendor={%x} Device={%x} Class={%s} SubClass={%x} iLine={%d} iPin={%d} \n",
+				       D->Vendor, 
+					   D->Device, 
+					   pci_class_strings[ D->classCode ], 
+					   D->subclass, 
+					   D->irq_line, 
+					   D->irq_pin );			
 			
 			    //pci_class_strings[D->classCode]
 			    //Mass Storage
@@ -982,11 +1023,11 @@ int pci_setup_devices()
 					if( (void*) Dr == NULL ){
 						D->driver = NULL;
 					}else{ 
-					    D->driver = (void*) Dr;
-                        Dr->id = (int) listIndex;
-                        Dr->used  = (int) 1;
-                        Dr->magic = (int) 1234;
-						Dr->pci_device = (void*) D; 
+					    D->driver      = (void *) Dr;
+                        Dr->id         = (int) listIndex;
+                        Dr->used       = (int) 1;
+                        Dr->magic      = (int) 1234;
+						Dr->pci_device = (void *) D; 
 						//... 						
 					};  
 					
@@ -996,7 +1037,9 @@ int pci_setup_devices()
 					//Colocar a estrutura na lista.		
 					
 					//@todo: Limits
-					if(listIndex < 0 || listIndex >= Max){ goto done; };
+					if( listIndex < 0 || listIndex >= Max ){ 
+					    goto done; 
+					};
 					
 					pcideviceList[listIndex] = (unsigned long) D;
 					listIndex++;
@@ -1038,7 +1081,7 @@ int init_pci()
    
     //@todo: Criar um construtor que faça isso.
 	//Exemplo: pciPci().
-    for(Index=0; Index<Max; Index++){
+    for( Index=0; Index<Max; Index++ ){
 		pcideviceList[Index] = (unsigned long) 0;
 	};
    
@@ -1050,7 +1093,7 @@ int init_pci()
    
 	Status = (int) pci_setup_devices(); 
 	if(Status != 0){
-	    printf("blocked-init_pci:\n");
+	    printf("blocked-pci-init_pci:\n");
         die();		
 	};
     
@@ -1064,15 +1107,6 @@ done:
 
 
 /*
- * pciInit:
- *     Inicialização do módulo.
- */
-int pciInit(){
-	return (int) init_pci();
-};
-
-
-/*
  * pciPci:
  *     Constructor.
 int pciPci(){
@@ -1081,6 +1115,14 @@ int pciPci(){
  */
 
 
+/*
+ * pciInit:
+ *     Inicialização do módulo.
+ */
+int pciInit(){
+	return (int) init_pci();
+}; 
+ 
 //
 // End.
 //

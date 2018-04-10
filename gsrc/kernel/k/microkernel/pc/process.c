@@ -277,10 +277,10 @@ get_next:
 		//processNewPID++;
 		
 		//b,a,g, Identificadores.
-		Process->pid = (int) i;                    //PID.
-        Process->ppid = (int) ppid;                //PPID.    @todo:
-		Process->uid = (int) GetCurrentUserId();   //UID. 
-        Process->gid = (int) GetCurrentGroupId();  //GID. 
+		Process->pid  = (int) i;                    //PID.
+        Process->ppid = (int) ppid;                 //PPID.    @todo:
+		Process->uid  = (int) GetCurrentUserId();   //UID. 
+        Process->gid  = (int) GetCurrentGroupId();  //GID. 
 
 		//f,flag, State of process
 		Process->state = INITIALIZED;    	

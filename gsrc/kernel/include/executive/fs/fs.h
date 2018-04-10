@@ -1,5 +1,5 @@
 /*
- * File: fs.h 
+ * File: executive\fs\fs.h 
  *
  * Obs: Dentro do kernel base somente teremos primitivas
  *      Operações complexas devem ir para servidores utilitários.
@@ -14,20 +14,38 @@
  */
 
 
+ //
+ // Path support
+ //
 
-/*
-#define MAXPATH                 256     // Maximum filename length (including trailing zero)
-#define MFSNAMELEN              16      // Length of fs type name
-
-#define PS1                     '/'     // Primary path separator
-#define PS2                     '\\'    // Alternate path separator
-*/ 
+ 
+#define FS_MAX_NAME_LENGHT (8+3)   // Max name lenght.   8.3
+#define PS1                '/'     // Primary path separator.
+#define PS2                '\\'    // Alternate path separator.
+//...
  
 //
 // Types. (@todo: Criar definições de tipos).
 // 
-#define FS_TYPE_FAT16 1 
-#define FS_TYPE_EXT2  2
+
+#define FS_TYPE_VFS   1000  // Designativo genérico.  
+#define FS_TYPE_GVFS  1001  // Gramado VFS.   
+//...
+
+#define FS_TYPE_FAT   2000  // Designativo genérico.
+#define FS_TYPE_FAT12 2001 
+#define FS_TYPE_FAT16 2002 
+#define FS_TYPE_FAT32 2003 
+//...
+
+#define FS_TYPE_MINIXFS  3000  //Minix FS
+#define FS_TYPE_EXT      3001
+#define FS_TYPE_EXT2     3002
+#define FS_TYPE_EXT3     3003
+#define FS_TYPE_EXT4     3004
+//... 
+ 
+//... 
  
  
 /*

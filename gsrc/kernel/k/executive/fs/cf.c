@@ -18,9 +18,9 @@
  * fs_create_dir:
  *     Cria um diretório.
  */
-unsigned long fs_create_dir( char *name , unsigned long id)
+unsigned long fs_create_dir( char *name, unsigned long id )
 {
-	return fs_create_file( name, id); 
+	return fs_create_file( name, id ); 
 };
 
 
@@ -28,7 +28,7 @@ unsigned long fs_create_dir( char *name , unsigned long id)
  * fs_create_file:
  *     Cria um arquivo.
  */
-unsigned long fs_create_file( char *name , unsigned long id)
+unsigned long fs_create_file( char *name, unsigned long id )
 {
     unsigned long fat_entry;
     unsigned long dir_entry;

@@ -14,17 +14,27 @@
  
  
  
-//O driver de sistema é do tipo persistente. Não poderá ser descarregado,
-//permanecerá na memória o tempo todo. Poderá ser desativado. Pode estar em qualquer ring.
-//O driver modular poderá ser descarregado. 
+/*
+ * driver_type_t: 
+ *     Tipos de drivers. 
+ *     + O driver de sistema é do tipo persistente. Não poderá ser descarregado,
+ * permanecerá na memória o tempo todo. Poderá ser desativado. Pode estar 
+ * em qualquer ring.
+ *     + O driver modular poderá ser descarregado. 
+ */ 
 typedef enum {
 	DriverTypeSystem,     //Persistente.
 	DriverTypeModular,    //Modular.
 	//...
 }driver_type_t; 
  
-//Classes mais comuns de dispositivos.
-//Outras poderão ser incluídas futuramente. 
+ 
+/*
+ * host_device_type_t:
+ *     Classes de dispositivos segundo o host que pertencem.
+ *     Classes mais comuns de dispositivos.
+ *     Outras poderão ser incluídas futuramente. 
+ */ 
 typedef enum {
 	HostDeviceTypePC,        //PC.
 	HostDeviceTypeMobile,    //Mobile.

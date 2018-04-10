@@ -1,5 +1,5 @@
 /*
- * File: signal.c
+ * File: sm\sys\signal.c
  *
  * Descrição:
  *     Signal Manager.
@@ -109,8 +109,13 @@ enum signal_t {
 
 int Signal;
 
-//Envia um sinal para um processo.
-int signalSend(struct process_d *process ,int signal)
+
+
+/*
+ * signalSend:
+ *     Envia um sinal para um processo.
+ */
+int signalSend( struct process_d *process, int signal )
 {
 	//SIGNAL_COUNT_MAX
 	
@@ -139,15 +144,22 @@ int signalSend(struct process_d *process ,int signal)
 	//...
 	
 fail:
-	return 1;	
-}
+	return (int) 1;	
+};
 
 
+/*
+ * signalInit:
+ *     Inicialização do módulo de gerenciamento de sinais.
+ *
+ */
 int signalInit()
 {
     Signal = 0;	
 	
-	return 0;
+	
+done:	
+	return (int) 0;
 };
 
 

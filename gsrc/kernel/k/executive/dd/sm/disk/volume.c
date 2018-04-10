@@ -1,5 +1,5 @@
 /*
- * File: volume.c 
+ * File: sm\disk\volume.c 
  *
  * Descrição:
  *     Gerenciador de volumes.
@@ -15,20 +15,48 @@
 #include <kernel.h>
 
 
+
+void *volume_get_volume_handle( int number )
+{
+	//check limts
+	if( number < 0 || number >= VOLUME_COUNT_MAX ){
+		return NULL;
+	}
+	
+	return (void *) volumeList[number];
+};
+
+
+
+
+void *volume_get_current_volume_info()
+{
+	return (void *) CurrentVolumeInfo; 
+};
+
+
+
 /*
  * volume_init:
  *     Inicializa o volume manager.
  */
+//int volumeInit()
 int volume_init()
 {
-    printf("volume_init: Initializing..\n");	
+    printf("volume_init: Initializing..\n");
+
+	//
+	// Inicializando uma estrutura global de informações sobre o 
+	// volume do sistema.
+	// ?? Em que arquivo está essa estrutura.
+	//	
 
 	// Structure.
     volumeinfo = (void*) malloc( sizeof(struct volumeinfo_d) );
-	if( (void*) volumeinfo == NULL ){
-	    printf("volume_init:");
-		refresh_screen();
-		while(1){}
+	if( (void*) volumeinfo == NULL )
+	{
+	    printf("sm-disk-volume_init:");
+		die();
 	}else{
 		
 	    //
@@ -58,13 +86,6 @@ int init_volume_manager()
 {
 	volume_init();
     return (int) 0;
-};
-*/
-
-
-/*
-int volumeInit(){
-	;
 };
 */
 

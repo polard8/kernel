@@ -1,5 +1,5 @@
 /*
- * File: rtc.c 
+ * File: unblocked\rtc.c 
  *
  * Descrição:
  *     Real Time Controller ?!!
@@ -74,6 +74,7 @@ done:
  
  
 /*
+ *******************************************
  * rtc_irq: 
  *     irq8 interrupt handler.
  *     System CMOS, Realtime clock. 
@@ -83,18 +84,19 @@ void rtc_irq()
 	unsigned i;
 
 	g_ticks++;
-		
+	
 	//_BLINK; ??
 	
-    /* save contents of I/O port 0x70 */
+    // Save contents of I/O port 0x70.
 	i = inportb(0x70);
     
-	/* acknowledge IRQ 8 at the RTC by reading register C */
+	// acknowledge IRQ 8 at the RTC by reading register C.
 	outportb(0x70, 0x0C);
-	(void)inportb(0x71);
+	(void)inportb(0x71); //??
 	outportb(0x70, i);
     
-	/* acknowledge IRQ 8 at the PICs */
+	// @todo: Checar esse EOI.
+	// acknowledge IRQ 8 at the PICs
 	//outportb(0xA0, 0x20);
 	//outportb(0x20, 0x20);
 	
@@ -103,15 +105,18 @@ done:
 };
 
 
-/* Lê da CMOS um determinado registro. */
-unsigned long read_cmos_bcd(unsigned reg)
+/* 
+ * read_cmos_bcd:
+ *     Lê da CMOS um determinado registro. 
+ */
+unsigned long read_cmos_bcd( unsigned reg )
 {
 	unsigned long high_digit, low_digit;
 
-	outportb(0x70, (inportb(0x70) & 0x80) | (reg & 0x7F));
+	outportb( 0x70, ( inportb(0x70) & 0x80) | (reg & 0x7F) );
 	high_digit = low_digit = inportb(0x71);
 
-	/* Converte BCD para binário. */
+	// Converte BCD para binário. 
 	high_digit >>= 4;
 
 	high_digit &= 0x0F;
@@ -123,6 +128,7 @@ unsigned long read_cmos_bcd(unsigned reg)
 
 
 /* 
+ * get_time:
  * Pega o horário armazenado na CMOS.
  * Formato: Cada unidade representa 1 segundo. 
  *
@@ -142,7 +148,8 @@ unsigned long get_time()
 };
 
 
-/* 
+/*
+ * get_date: 
  * Pega a data armazenada na CMOS. 
  * Formato(bytes): YYMD 
  *
@@ -161,30 +168,32 @@ unsigned long get_date()
 
 
 /* 
-//Get total memory info via CMOS. 
-    15h		Low byte of base memory size
-				100h = 256k
-				200h = 512k
-				280h = 640k
-	16h		High byte of 15h above
-	17h		Low expansion memory byte
-	18h		High expansion memory byte
-				200h = 512k
-				400h = 1024k
-				600h-3C00h = 1536-15,360k
-	19h		Extended type byte: Hard drive 1
-	1Ah		Extended type byte: Hard drive 2
-	1Bh-2Dh		reserved
-	2Eh		check-sum for addresses 10h-2Dh  (word)
-	2Fh		  see above
-	30h		Low expansion memory byte
-	31h		High expansion memory byte
-				200h = 512k
-				400h = 1024k
-				600h-3C00h = 1536-15,360k
-				
-	//Limite de uma 'word' ??			
-*/
+ * rtcGetExtendedMemory:
+ *     Get total memory info via CMOS. 
+ *
+ *  15h		Low byte of base memory size
+ *				100h = 256k
+ *				200h = 512k
+ *				280h = 640k
+ *	16h		High byte of 15h above
+ *	17h		Low expansion memory byte
+ *	18h		High expansion memory byte
+ *				200h = 512k
+ *				400h = 1024k
+ *				600h-3C00h = 1536-15,360k
+ *	19h		Extended type byte: Hard drive 1
+ *	1Ah		Extended type byte: Hard drive 2
+ *	1Bh-2Dh		reserved
+ *	2Eh		check-sum for addresses 10h-2Dh  (word)
+ *	2Fh		  see above
+ *	30h		Low expansion memory byte
+ *	31h		High expansion memory byte
+ *				200h = 512k
+ *				400h = 1024k
+ *				600h-3C00h = 1536-15,360k
+ *				
+ *	Limite de uma 'word' ??			
+ */
 unsigned short rtcGetExtendedMemory()
 {
     unsigned short total;
@@ -209,30 +218,32 @@ done:
 
 
 /* 
-//Get total memory info via CMOS. 
-    15h		Low byte of base memory size
-				100h = 256k
-				200h = 512k
-				280h = 640k
-	16h		High byte of 15h above
-	17h		Low expansion memory byte
-	18h		High expansion memory byte
-				200h = 512k
-				400h = 1024k
-				600h-3C00h = 1536-15,360k
-	19h		Extended type byte: Hard drive 1
-	1Ah		Extended type byte: Hard drive 2
-	1Bh-2Dh		reserved
-	2Eh		check-sum for addresses 10h-2Dh  (word)
-	2Fh		  see above
-	30h		Low expansion memory byte
-	31h		High expansion memory byte
-				200h = 512k
-				400h = 1024k
-				600h-3C00h = 1536-15,360k
-				
-	//Limite de uma 'word' ??
-*/
+ * rtcGetBaseMemory:
+ *     Get base memory info via CMOS. 
+ *
+ *  15h		Low byte of base memory size
+ *				100h = 256k
+ *				200h = 512k
+ *				280h = 640k
+ *	16h		High byte of 15h above
+ *	17h		Low expansion memory byte
+ *	18h		High expansion memory byte
+ *				200h = 512k
+ *				400h = 1024k
+ *				600h-3C00h = 1536-15,360k
+ *	19h		Extended type byte: Hard drive 1
+ *	1Ah		Extended type byte: Hard drive 2
+ *	1Bh-2Dh		reserved
+ *	2Eh		check-sum for addresses 10h-2Dh  (word)
+ *	2Fh		  see above
+ *	30h		Low expansion memory byte
+ *	31h		High expansion memory byte
+ *				200h = 512k
+ *				400h = 1024k
+ *				600h-3C00h = 1536-15,360k
+ *				
+ *	Limite de uma 'word' ??			
+ */
 unsigned short rtcGetBaseMemory()
 {
     unsigned short total;

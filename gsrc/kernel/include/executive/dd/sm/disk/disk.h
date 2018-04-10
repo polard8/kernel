@@ -1,5 +1,5 @@
 /*
- * Arquivo: disk.h 
+ * File: include\executive\dd\sm\disk\disk.h 
  *
  * Descrição:
  *     Gerenciador de discos. 
@@ -79,8 +79,9 @@ struct diskinfo_d
 	//Navigation.
     struct diskinfo_d *next;	
 };
+diskinfo_t *CurrentDiskInfo; 
+diskinfo_t *CurrentDisk;
 diskinfo_t *diskinfo;
-diskinfo_t *CurrentDiskInfo;
 diskinfo_t *SystemDiskInfo;
 //...
 
@@ -90,6 +91,12 @@ diskinfo_t *SystemDiskInfo;
 //
 
 unsigned long diskList[DISK_COUNT_MAX];
+
+
+
+void *disk_get_disk_handle( int number );
+void *disk_get_current_disk_info();
+
 
 int disk_init();
 void init_test_disk();  //*teste de operação com disco. 

@@ -1,5 +1,5 @@
 /*
- * File: volume.h
+ * File: include\executive\dd\sm\disk\volume.h
  *
  * Descrição:
  *     Gerenciador de volumes.
@@ -104,8 +104,9 @@ struct volumeinfo_d
 	//unsigned long DataSectorStart;      //Starting sector of the data area.
 	
 };
-volumeinfo_t *volumeinfo;
+volumeinfo_t *CurrentVolumeInfo;
 volumeinfo_t *CurrentVolume;
+volumeinfo_t *volumeinfo;
 volumeinfo_t *SystemVolume;
 //...
 
@@ -119,6 +120,11 @@ volumeinfo_t *SystemVolume;
 unsigned long volumeList[VOLUME_COUNT_MAX];
 
 //@todo: Fazer uma lista de volumes.??!!
+
+
+void *volume_get_volume_handle( int number );
+void *volume_get_current_volume_info();
+
 
 int volume_init();
 

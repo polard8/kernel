@@ -325,6 +325,7 @@ struct tagProcessor
 processor_descriptor_t *processor; 
  
 
+//@todo: liberar essa lista. 
 //unsigned long processorList[32]; 
  
 

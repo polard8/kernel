@@ -70,8 +70,8 @@ extern void turn_task_switch_on();
  *     The entry point for a C part of the Kernel.
  *
  * Function history:
- *     2015 - Created.
- *     Nov 2016 - Revision.
+ *     2015 - Created by Fred Nora.
+ *     2016~2018 - Revision.
  *     ...
  */
 int kMain(int argc, char* argv[])

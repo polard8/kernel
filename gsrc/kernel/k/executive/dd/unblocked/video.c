@@ -1,5 +1,5 @@
 /*
- * File: video.c
+ * File: unblocked\video.c
  *
  * Descrição: 
  *     Rotinas paga gerenciar os controladores de video.
@@ -304,6 +304,7 @@ done:
  *     Método construtor.
  *     Funçao interna. 
  *     Confgura algumas variáveis.
+ *     @todo: isso poderia ter retorno void.
  */
 int videoVideo()
 {

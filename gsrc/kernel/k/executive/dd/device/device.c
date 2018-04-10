@@ -1,8 +1,9 @@
 /*
- * Arquivo: device.c 
+ * File: device\device.c 
  *
- * Descrição: Arquivo principal do device manager. (igual do windows.)
- *            Device manager do kernel. 
+ * Descrição: 
+ *     Arquivo principal do device manager. (igual do windows.)
+ *     Device manager do kernel. 
  *
  * In shutdown process all devices need to be turnedoff.
  *
@@ -34,6 +35,10 @@ void init_device_manager()
 int devicemanagerInit()
 {}
 */
+
+//int deveiceInit(){
+//	
+//}
 
 //
 //fim

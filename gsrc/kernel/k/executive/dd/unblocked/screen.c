@@ -1,5 +1,5 @@
 /*
- * File: screen.c
+ * File: unblocked\screen.c
  *
  * Descrição: 
  *     Parametros de tela e monitor de video. 
