@@ -532,7 +532,7 @@ P0:
 .os_type:             db  4               ;6;1;0x04 ;4 = FAT16 < 32MB ;0x0E FAT16, (32MB to 2GB), (LBA Support).
 .hcs_final:           db  0, 0, 0
 .lba_inicial:         dd  0x3F            ; Setor inicial da partição. (63, vbr)
-.tamanho_da_particao: dd  (31*1024*1024)  ; quantidade de setores na partição.
+.tamanho_da_particao: dd  (31*1024*1024)  ; 31 MB.
 ;partitions 1, 2 and 3.
 P1: dd 0,0,0,0
 P2: dd 0,0,0,0
