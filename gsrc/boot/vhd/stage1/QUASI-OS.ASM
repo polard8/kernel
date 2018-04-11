@@ -166,15 +166,15 @@ LOAD_ROOT:
 
 	; Compute location(LBA) of root directory and store in "ax".
     xor ax, ax
-	mov  al, BYTE [TotalFATs]                ; 2. Number of FATs.
-    mul  WORD [SectorsPerFAT]                ; 246. Sectors used by FATs.
-    add  ax, WORD [ReservedSectors]          ; +3. Adiciona os setores reservados. 
-	add  ax, WORD [HiddenSectors]            ; +0. Adiciona os setores escondidos.
+	mov  al, BYTE [TotalFATs]        ; 2. Number of FATs.
+    mul  WORD [SectorsPerFAT]        ; 246. Sectors used by FATs.
+    add  ax, WORD [ReservedSectors]  ; +62. Adiciona os setores reservados. 
+	add  ax, WORD [HiddenSectors]    ; +5. Adiciona os setores escondidos.
     
-	mov word [ROOTDIRSTART], ax              ; *** Nesse momento ax contem o setor inicial do root dir ***
+	mov word [ROOTDIRSTART], ax      ; *** Nesse momento ax contem o setor inicial do root dir ***
 	add  ax, cx
 	 
-	mov  WORD [datasector], ax               ; 
+	mov  WORD [datasector], ax       ; 
     ;mov  WORD [datasector], 591             ;; SIMULANDO.
 
 	;;Obs: A variável 'datasector' precisa ser inicializada aqui, pois é usada mais à frente na rotina de conversão.
