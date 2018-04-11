@@ -16,6 +16,15 @@
  *     2017 - procedure and command stuff.
  */
  
+//
+// File suppport.
+//
+ 
+//#define FILENAME_LENGTH (8+3) 
+//...
+
+
+
 
 //
 // SCREEN SUPPORT
@@ -214,7 +223,7 @@ shell_metrics_t *ShellMetrics;
 // Screen support.
 //
 
-void shellClearscreen();
+void shellClearScreen();
 void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
 void shellScroll();
 //...
@@ -271,7 +280,10 @@ void shellTestMBR();
 
 
 int test_operators();
+
+void shellShowInfo();
 void shellShowMetrics();
+void shellShowSystemInfo();
 //...
 
 // Wait for commands.

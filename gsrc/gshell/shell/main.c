@@ -710,13 +710,13 @@ shellProcedure( struct window_d *window,
 				    break;
 				
 				//reset prompt.
-				case '8':
-				    shellPrompt();
-				    goto done;
-					break;
+				//case '8':
+				//    shellPrompt();
+				//    goto done;
+				//	break;
 				    
 				//test return
-				case '9':
+				//case '9':
 				case VK_RETURN:
 				    input('\0'); //finaliza a string.
 					shellCompare(window);
@@ -948,7 +948,7 @@ unsigned long shellCompare(struct window_d *window)
     // Returns first token 
     //char *token = strtok(prompt, " -");
 	
-	
+	//#debug
     printf("shellCompare: Testing ...\n");
     refresh_screen();	
    
@@ -987,9 +987,11 @@ unsigned long shellCompare(struct window_d *window)
 	//Finalizando a lista.
     tokenList[i] = NULL;
 
+	//#debug
     printf("shellCompare: %s \n", tokenList[i] );
     refresh_screen();	
 
+	//#debug
     printf("shellCompare: Test done!\n");
     refresh_screen();		
    
@@ -1078,7 +1080,7 @@ do_compare:
 	if( strncmp( prompt, "cls", 3 ) == 0 )
 	{
 		//@todo
-        shellClearscreen();
+        shellClearScreen();
         shellSetCursor(0,0);
 	    shellPrompt();
         goto exit_cmp;
@@ -1227,6 +1229,16 @@ do_compare:
 		//test_services();
         goto exit_cmp;
     };
+	
+    // shellinfo
+	// informações sobre o aplicativo.
+	if( strncmp( prompt, "shellinfo", 9 ) == 0 )
+	{
+		
+	    printf("~@todo: shell info.\n");
+		shellShowInfo();
+        goto exit_cmp;
+    };	
 
 	// slots
 	if( strncmp( prompt, "slots", 5 ) == 0 )
@@ -1250,7 +1262,16 @@ do_compare:
 		printf("~start\n");
 		
 		goto exit_cmp;
-    }; 
+    };
+
+    // systeminfo
+	// informações sobre o sistema.
+	if( strncmp( prompt, "systeminfo", 10 ) == 0 )
+	{
+	    printf("~@todo: system info.\n");
+		shellShowSystemInfo();
+        goto exit_cmp;
+    };	
 	
 	
     // t1 - Test file
@@ -1874,7 +1895,7 @@ void shellClearBuffer()
 void shellTestLoadFile()
 {
 	shellClearBuffer();
-	shellClearscreen();
+	shellClearScreen();
     shellSetCursor(0,0);
 	shellPrompt();
 	//@todo: reposicionar o cursor.
@@ -1966,10 +1987,10 @@ void shellTestThreads()
 
 
 /*
- * shellClearscreen:
+ * shellClearScreen:
  *     Limpar a tela do shell.
  */
-void shellClearscreen()
+void shellClearScreen()
 {
 	int i;
 	
@@ -2182,6 +2203,29 @@ void move_to( unsigned long x, unsigned long y )
 };
 
 
+//show shell info
+void shellShowInfo()
+{
+	int PID, PPID;
+	
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
+	if( PID == (-1)){
+	    printf("ERROR getting PID\n");	
+	}
+  
+    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0);
+	if( PPID == (-1)){
+	    printf("ERROR getting PPID\n");	
+	}
+  
+	printf("Process info: PID={%d} PPID={%d} \n", PID, PPID );
+	
+	
+	printf("shellMaxColumns={%d} \n", shellMaxColumns );
+	printf("shellMaxRows={%d} \n", shellMaxRows );	
+	
+};
+
 //metrics
 void shellShowMetrics()
 {
@@ -2218,6 +2262,35 @@ void shellShowMetrics()
 done:	
     printf("Done\n");	
 	return;
+};
+
+//show system info
+void shellShowSystemInfo()
+{
+	int ActiveWindowId;
+	int WindowWithFocusId;
+	
+	//
+	//Active
+	ActiveWindowId = (int) APIGetActiveWindow();
+	
+	//valor de erro
+	if( ActiveWindowId == (-1)){
+	    printf("ERROR getting Active window ID\n");	
+	}	
+	printf("ActiveWindowId={%d}\n", ActiveWindowId );
+
+
+	//
+	// Focus.
+	WindowWithFocusId = (int) APIGetFocus();
+	
+	//valor de erro
+	if( WindowWithFocusId == (-1)){
+	    printf("ERROR getting Window With Focus ID\n");	
+	}	
+	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
+	
 };
 
 
