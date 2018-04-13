@@ -209,17 +209,19 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 	// Filtra o primeiro argumento no formato 'palavra'.
 	//
 	
-    if (!strcmp( argv[1], "-help" )){
-        printf( "%s\n", usage );
-        refresh_screen();
-		exit(0);
-    }
+    //if (!strcmp( argv[1], "-help" ))
+	//{
+    //    printf( "%s\n", usage );
+    //    refresh_screen();
+	//	exit(0);
+    //}
     
-	if (!strcmp( argv[1], "-version" )){
+	//if (!strcmp( argv[1], "-version" ))
+	//{
         //printf( "%s\n", shellGetVersion() );
-        refresh_screen();
-		exit(0);
-    }	
+    //    refresh_screen();
+	//	exit(0);
+    //}	
 	
 	//
 	// Outras opções de argumentos.
@@ -367,6 +369,20 @@ noArgs:
 	//unsigned long ScreenHeight = (unsigned long) APIGetScreenheight();
 	
 	
+	//
+	// Configurando o retângulo que deve ser usado pelo terminal.
+	//
+	
+	//#bugbug 
+	// esses valores são usados para construir a janela princpal.
+	// o que desejamos são os valores do retângulo da área de cliente 
+	// da janela principal.
+	
+	terminal_rect.left = shell_window_x;
+	terminal_rect.top  = shell_window_y;
+	terminal_rect.width = shellWindowWidth;
+	terminal_rect.height = shellWindowHeight;
+	
 	apiBeginPaint();
 	
 	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
@@ -380,6 +396,8 @@ noArgs:
 		while(1){}
 		//exit(0);
 	};
+	
+
 	
 	/*
 	 Imprimindo o ponteiro para a estrutura da janela criada 
@@ -427,6 +445,7 @@ noArgs:
 	//o input de texto pode vir de várias fontes.
 	//api_set_window_with_text_input(hWindow);
 	
+	// ** terminal **
 	//definindo a janela como sendo uma janela de terminal.
 	//isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
 	//para essa janela e não apenas ao procedimento de janela do sistema.
@@ -434,6 +453,11 @@ noArgs:
 	             (unsigned long) hWindow, 
 				 (unsigned long) hWindow, 
 				 (unsigned long) hWindow );
+				 
+				 
+				 
+	//salva ponteiro da janela principal. 
+	shell_info.main_window = ( struct window_d* ) hWindow;			 
 		
 	
 	//
@@ -588,6 +612,7 @@ noArgs:
 	void *long1;
 	void *long2;
 	
+	//struct shell_message_d *msg;
 
         //
 		// Get Message: 
@@ -613,7 +638,7 @@ noArgs:
 
        apiBeginPaint();
 	   
-		
+		//msg->window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
  		hwTest = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
 		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
@@ -621,17 +646,22 @@ noArgs:
 									  
         //#bugbug ( Aqui devemos pegar a mensagem sem se preocupar em
 		//identificar o dispositivo gerador do evento.
-		msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 
+		//msg->msg = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE,
+        msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 		
 		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
 									  (unsigned long) hWindow );
 									  
-		long1 = (void*) system_call( SYSTEMCALL_GET_LONG1, 
+		 
+		//msg->long1 = (unsigned long) system_call( SYSTEMCALL_GET_LONG1,
+        long1 = (void*) system_call( SYSTEMCALL_GET_LONG1,		
 		                             (unsigned long) hWindow, 
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );
 									 
-		long2 = (void*) system_call( SYSTEMCALL_GET_LONG2, 
+		 
+		//msg->long2 = (unsigned long) system_call( SYSTEMCALL_GET_LONG2,
+        long2 = (void*) system_call( SYSTEMCALL_GET_LONG2,		
 		                             (unsigned long) hWindow, 
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );
@@ -646,7 +676,9 @@ noArgs:
         //		
 		
 		// Send Message to procedure.
-		if( (int) msgTest != 0 )
+		
+		//if( (int) msg->msg != 0 )
+        if( (int) msgTest != 0 )			
 		{
             //
             // *IMPORTANTE:
@@ -659,7 +691,9 @@ noArgs:
 			                (int) msgTest, 
 							(unsigned long) long1, 
 							(unsigned long) long2 );
-			
+
+		    //shellProcedure( msg->window, msg->msg, msg->long1, msg->long2 ); 
+							
 			//printf("Y-DEBUG: hwindow NULL\n"); //Deletar isso depois.
 			//printf("Y-DEBUG: msg={%d}\n",msgTest); 
 			//printf("Y-DEBUG: long1={%c}\n",long1); 
@@ -954,6 +988,7 @@ unsigned long shellCompare(struct window_d *window)
    
     char *tokenList[80];
     int i = 0;
+	int token_count;
 	
 	
 	// ?? what ?
@@ -962,6 +997,10 @@ unsigned long shellCompare(struct window_d *window)
 	// separated by delim
 	
     tokenList[0] = strtok( prompt, LSH_TOK_DELIM);
+	
+	
+	//para o argumento atual
+	//@todo: isso precisa ser limpado sempre.
 	
 	char *token;
 	
@@ -982,6 +1021,9 @@ unsigned long shellCompare(struct window_d *window)
         i++;
 		
 		token = strtok( NULL, LSH_TOK_DELIM );
+		
+		//salvando a contagem.
+		token_count = i;
     }; 
 
 	//Finalizando a lista.
@@ -989,11 +1031,15 @@ unsigned long shellCompare(struct window_d *window)
 
 	//#debug
     printf("shellCompare: %s \n", tokenList[i] );
-    refresh_screen();	
+    //refresh_screen();	
 
 	//#debug
     printf("shellCompare: Test done!\n");
-    refresh_screen();		
+    refresh_screen();	
+
+
+	// Zerando o índice do tokenList
+    i=0;	
    
     //printf("shellCompare: Testing ...\n");
     //refresh_screen();
@@ -1027,7 +1073,9 @@ do_compare:
 	//
 	// Talvez aqui devamos usar tokenList[0] e não prompt.
 	//
+	
 
+		
     // L1 RAM /objetcs   
 	// (diretório raiz para os arquivos que são diretórios de objetos)
 	// os objetos serão listador em um arquivo que nunca será salvo no disco.
@@ -1064,6 +1112,68 @@ do_compare:
 	// Ordem alfabética.
 	//
 	
+
+	
+	//@todo
+	//token
+	//testando tokenList
+	if( strncmp( prompt, "token", 5 ) == 0 )
+    {
+		printf("\nTesting tokenList ...\n");
+		printf("\nTotal={%d}\n",token_count);
+		printf("\n Comand = %s \n",tokenList[i]);
+		refresh_screen();
+		
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL ){
+			goto exit_cmp;
+		}else{
+		    printf("\n argument_number={%d} argument={%s}\n", i, tokenList[i]);	
+            
+			if( strncmp( (char*) tokenList[i], "-a", 2 ) == 0 )
+			{
+			    printf("[OK] argumento %s selecionado.\n", tokenList[i]);
+		    }
+			//...
+		};
+		
+		
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL ){
+			goto exit_cmp;
+		}else{
+		    printf("\n argument_number={%d} argument={%s}\n", i, tokenList[i]);	
+            
+			if( strncmp( (char*) tokenList[i], "-b", 2 ) == 0 )
+			{
+			    printf("[OK] argumento %s selecionado.\n", tokenList[i]);
+		    }
+			//...
+		};		
+		
+		
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL ){
+			goto exit_cmp;
+		}else{
+		    printf("\n argument_number={%d} argument={%s}\n", i, tokenList[i]);	
+            
+			if( strncmp( (char*) tokenList[i], "-c", 2 ) == 0 )
+			{
+			    printf("[OK] argumento %s selecionado.\n", tokenList[i]);
+		    }
+			//...
+		};		
+		printf("\n");
+		goto exit_cmp;
+	};
+    	
 	
 	// boot
 	// ?? Boot info talvez.
@@ -1101,8 +1211,8 @@ do_compare:
 	// Echo de terminal.
     if( strncmp( prompt, "echo", 4 ) == 0 )
 	{
-		//@todo.
-		printf("~echo\n");
+		//printf("%s\n",prompt[4]);
+		printf("%s\n",prompt);
 		goto exit_cmp;
     };	
 	
@@ -1339,7 +1449,52 @@ do_compare:
 	{
 	    printf("\n Gramado version %s \n", OS_VERSION );
         goto exit_cmp;
-    };	
+    };
+
+	// window
+    if( strncmp( prompt, "window", 6 ) == 0 )
+	{
+		//
+		// #bugbug.
+		// Testando a estrutura de janela.
+		// A janela foi criada pelo kernel e copiamos o ponteiro 
+		// da estrutura para um ponteiro em user mode.
+		// Podemos ter erros de memória com essas operações.
+		
+	    printf("\n testing main window ... \n");
+		
+		// esse printf funcionou.
+		printf("mainWindow={%x}", shell_info.main_window );
+		
+		//#bugbug 
+		//temos um problema aqui.
+		// provavelmente o erro é por acessar um endereço que está 
+		// em kernel mode.
+		//if( shell_info.main_window->left > 0 && shell_info.main_window->top > 0  )
+		//{
+		//    shellSetCursor( (shell_info.main_window->left/8), (shell_info.main_window->top/8) );
+		//}
+		
+        printf("rect: l={%d} t={%d} w={%d} h={%d}\n", terminal_rect.left,
+		                                              terminal_rect.top,
+													  terminal_rect.width,
+													  terminal_rect.height );
+
+													  
+		if( terminal_rect.left > 0 && terminal_rect.top > 0 )
+		{											  
+            shellSetCursor( (terminal_rect.left/8), (terminal_rect.top/8) );													  
+		};
+		
+        goto exit_cmp;
+    };
+
+
+	//comentário
+	// a linha é um comentário, podemos ignorar.
+    if( strncmp( prompt, "//", 2 ) == 0 ){
+		goto exit_cmp;
+	};	
  
  
     //
@@ -1364,6 +1519,7 @@ exit_cmp:
 
 
 /*
+ ******************************************
  * shellShell:
  *     Constructor.
  */
@@ -1450,7 +1606,12 @@ done:
     //Nossa referência é a moldura e não a área de cliente.
 	//@todo:usar a área de cliente como referência
 	//shellSetCursor(0,0);
-    shellSetCursor(0,4);	
+    shellSetCursor(0,4);
+    
+	//@todo
+	//tentando posicionar o cursor dentro da janela
+	//shellSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));	
+	
 	shellPrompt();
     return;	
 };
@@ -1479,6 +1640,9 @@ int shellInit( struct window_d *window )
 	
 	APISetFocus( window );
 	shellSetCursor(0,4);
+	
+	//shellSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));
+	
 	shellPrompt();
     
 	// ... Testing strings on Client Area. 

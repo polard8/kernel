@@ -132,6 +132,7 @@ FILE *stderr;
 
 FILE *_io_table[NUMBER_OF_FILES];
 
+//@todo: deletar isso se possível.
 #define stdin  (_io_table[0])	
 #define stdout 	(_io_table[1])
 #define stderr 	(_io_table[2])

@@ -11,6 +11,9 @@
  * diretório deve ter várias pastas, uma para cada um dos comandos principais, 
  * como shutdown. Cda pasta é um programa que o Shell vai chamar.
  *
+ * O kernel que gerencia a estrutura de processo deve criar o fluxo padrão ?
+ * 
+ *
  * History:
  *     2016 - Created by Fred Nora.
  *     2017 - procedure and command stuff.
@@ -84,11 +87,16 @@
 //a versão do sistema operacional deve-se obter através de uma chamada ao sistema. 
 #define OS_VERSION     "0.1"  
 #define SHELL_VERSION  "0.1"
+
+//prompt
 #define SHELL_PROMPT   ">"
 #define SHELL_PROMPT2  "$"
-//#define SHELL_PROMPT3  "shell: " 
+#define SHELL_PROMPT3  "%"
+//#define SHELL_PROMPT4  "shell: " 
 //... 
  
+//usado para salvar um comando atual  
+//char tmp_command[32];      
  
 //
 // Banners.
@@ -200,13 +208,145 @@ struct shell_metrics_d
     int fontWidth;
     int fontHeight;
 	int lineMax;
-	int colMax;
+	int colMax; //rowMax
 	//... 
 };
 shell_metrics_t *ShellMetrics;
 //...
  
  
+/*
+ #bugbug isso dá problema. falta de página.
+ 
+typedef struct shell_message_d shell_message_t;  
+struct shell_message_d
+{
+	struct window_d *window;
+	int msg;
+	unsigned long long1;
+	unsigned long long2;
+};
+*/
+
+
+
+
+
+
+//
+// Comunicação Cliente/Servidor:
+// Número da mensagem enviada pelo terminal virtual.
+// São apenas mensagens usadas pelo terminal virtual 
+// em modo texto, relativas a input e output de textos.
+// 
+//
+
+
+typedef enum terminal_api_message_number_d {
+	
+	terminalNull,       //0
+	terminalOpenTerminal,  // inicia a estrutura de terminal
+    terminalCloseTerminal, // fecha a estrutura de terminal.
+	terminalGetWindow,  //
+    terminalGetMessage, //
+    terminalGetLong1,   //
+    terminalGetLong2, 	//
+    terminalScreenWidth,
+    terminalScreenHeight,
+    terminalCursorWidth,
+    terminalCursorHeight,
+    terminalCharWidth,
+    terminalCharHeight	
+	
+}terminal_api_message_number_t;
+
+
+//
+// @todo:
+// Cada atitude do terminal merece uma estrutura.
+// faremos as estruturas daqui para baixo.
+//
+ 
+ 
+//screen info 
+typedef struct terminal_screen_info_d terminal_screen_info_t; 
+struct terminal_screen_info_d
+{
+	unsigned long width;
+	unsigned long height;
+}; 
+ 
+
+ 
+//#importante. 
+//rect info
+//retângulo da área de cliente onde aparecerão os caracteres.
+typedef struct terminal_rect_info_d terminal_rect_info_t; 
+struct terminal_rect_info_d
+{
+	unsigned long top;
+	unsigned long left;
+	unsigned long width;
+	unsigned long height;
+	//...
+};
+struct terminal_rect_info_d terminal_rect; 
+
+
+//cursor info
+typedef struct terminal_cursor_info_d terminal_cursor_info_t; 
+struct terminal_cursor_info_d
+{
+	unsigned long width;
+	unsigned long height;
+	//...
+}; 
+
+
+//char info
+typedef struct terminal_char_info_d terminal_char_info_t; 
+struct terminal_char_info_d
+{
+	unsigned long width;
+	unsigned long height;
+}; 
+
+//...
+
+#define SHELL_STREAM_STATUS_INPUT  1 //input
+#define SHELL_STREAM_STATUS_OUTPUT 2 //output
+#define SHELL_STREAM_STATUS_ERROR  3 //error
+
+
+//
+// Estrutura principal.
+// Informações sobre o shell.
+//
+
+typedef struct shell_info_d shell_info_t;
+struct shell_info_d
+{
+	struct window_d *main_window;
+	//stream support.
+    int stream_status;  //inpout ou output.
+	
+	//#BUGBUG duplicando estrutura. ??
+	//struct _iobuf *stdin;
+	//struct _iobuf *stdout;
+	//struct _iobuf *stderr;
+	
+	//O retângulo da área de cliente.
+	struct rect_d *rect;   
+	//struct terminal_rect_info_d *r;
+	
+	struct shell_hook_d *hook;
+	struct shell_metrics_d *metrics;
+	//...
+	
+}; 
+//sem ponteiro.
+struct shell_info_d shell_info;
+
  
 //
 // Macros.
