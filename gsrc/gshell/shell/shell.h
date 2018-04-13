@@ -53,16 +53,19 @@
 // BUFFER SUPPORT
 //
 
+//
+// Screen Buffer: 
+// Igual a tela do vga, com caracteres e atributos.
+// @todo: O buffer deve ser maior, com várias vistas para rolagem.
+// mas apenas uma parte do buffer será mostrada na tela por vez.
+//
+
 #define DEFAULT_BUFFER_MAX_COLUMNS 80
 #define DEFAULT_BUFFER_MAX_ROWS    25
+#define SCREEN_BUFFER_SIZE ( ((DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS)*2)+1)
 
 
-//#define SHELL_BUFFER_SIZE 512
-//#define SHELL_BUFFER_SIZE 1024 
-//#define SHELL_BUFFER_SIZE (80*25)      
-//#define SHELL_BUFFER_SIZE (80*25*4)
-#define SHELL_BUFFER_SIZE ((DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS)+1) 
-
+ 
 
  
 //

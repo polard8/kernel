@@ -12,16 +12,23 @@
 // Buffer support.
 // 
 
-char shell_buffer[SHELL_BUFFER_SIZE]; //buffer de output
-unsigned long shell_buffer_pos; 
-unsigned long shell_buffer_x; 
-unsigned long shell_buffer_y; 
+
+//
+//  ** SCREEN BUFFER ***
+//
+
+//Uma tela igual a vga, com caracteres e atributos.
+
+char screen_buffer[SCREEN_BUFFER_SIZE]; 
+unsigned long screen_buffer_pos; 
+unsigned long screen_buffer_x; 
+unsigned long screen_buffer_y; 
 //unsigned long shell_buffer_width;  //Largura dada em número de caracteres.
 //unsigned long shell_buffer_height; //Altura dada em número de caracteres.
 //...
 //Buffer size.
-int shellBufferMaxColumns;  //80
-int shellBufferMaxRows;     //25*4 (4 vistas) 
+int shellScreenBufferMaxColumns;  //80
+int shellScreenBufferMaxRows;     //25
 
 
 //
@@ -41,9 +48,9 @@ int shellScreenHeight;     //600
 //Screen start and screen end.
 
 //SCREEN_START;
-static unsigned long origin = (unsigned long) &shell_buffer[0];                         
+static unsigned long origin = (unsigned long) &screen_buffer[0];                         
 //SCREEN_START+LINES*COLUMNS*2;
-static unsigned long scr_end = (unsigned long) (&shell_buffer[0] + (LINES * COLUMNS));  
+static unsigned long scr_end = (unsigned long) (&screen_buffer[0] + (LINES * COLUMNS));  
 
 static unsigned long pos;    //posição dentro do buffer
 static unsigned long x, y;

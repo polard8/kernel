@@ -71,6 +71,10 @@
 #include "globals.h"
 
 
+
+
+//#define DEFAULT_WINDOW_TITLE "Shell"
+
 //
 // Variáveis internas.
 //
@@ -196,7 +200,8 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 	
 	// Se não há argumentos.
 	if(argc < 1){
-        sprintf( shell_buffer,"Starting Shell with no arguments...\n");	 //Test.	
+		//#bugbug sprintf ( ?? o que deve ficar no argumentop ?? ) 
+        //sprintf( stderr->_base,"Starting Shell with no arguments...\n");	 //Test.	
 	    goto noArgs; 
 	};
 	
@@ -1392,9 +1397,15 @@ do_compare:
 		
 		// teste.
 		// Escreve no buffer de saída e mostra o buffer de saida.
-		shell_buffer[0] = (char) 'F';
-        shell_buffer[1] = (char) 'N';	
-        shell_buffer[2] = (char) '\0';			
+		screen_buffer[0] = (char) 'F';
+		screen_buffer[1] = 7;
+		
+        screen_buffer[2] = (char) 'N';	
+        screen_buffer[3] = 7;
+		
+		screen_buffer[4] = (char) '\0';			
+		screen_buffer[5] = 7;
+		
 		printf( (const char *) stdout->_base );
 		
 		printf("%s \n",stdout->_base);
@@ -1568,7 +1579,7 @@ void shellShell()
 	//
 	
     // reiniciando as variáveis na estrutura do output
-	stdout->_base = &shell_buffer[0];
+	stdout->_base = &screen_buffer[0];
 	stdout->_ptr = stdout->_base;
 	stdout->_cnt = PROMPT_MAX_DEFAULT;
 	stdout->_file = 1;
@@ -1628,6 +1639,8 @@ done:
  * outro aplicativo solicitou o foco de entrada e essa rotina esta terminando 
  * de escrever mas agora na janela do outro aplicativo.
  *
+ * @todo: Inicializar globais e estruturas.
+ *
  */
 int shellInit( struct window_d *window )
 {
@@ -1636,17 +1649,63 @@ int shellInit( struct window_d *window )
 	int ActiveWindowId = 0;
 	int WindowWithFocusId = 0;
 	void *P;
-
 	
-	APISetFocus( window );
+	//stream status
+	shell_info.stream_status = 0;
+		
+	//cursor
 	shellSetCursor(0,4);
 	
-	//shellSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));
-	
+	//pointer
 	shellPrompt();
     
-	// ... Testing strings on Client Area. 
-    printf("shellInit: Running tests ...\n");		
+	// message.
+    printf("shellInit: Running tests ...\n");	
+
+
+	//
+	// Window support.
+	//
+
+	//window
+	if( (void*) window == NULL ){
+	    printf("shellInit: window fail.\n");    
+	}else{
+		APISetFocus( window );
+	};
+	
+	
+	//Active window
+	ActiveWindowId = (int) APIGetActiveWindow();
+	
+	//valor de erro
+	if( ActiveWindowId == (-1)){
+	    printf("shellInit: ERROR getting Active window ID\n");	
+	}	
+	printf("ActiveWindowId={%d}\n", ActiveWindowId );
+
+
+	//
+	// Focus.
+	WindowWithFocusId = (int) APIGetFocus();
+	
+	//valor de erro
+	if( WindowWithFocusId == (-1)){
+	    printf("shellInit: ERROR getting Window With Focus ID\n");	
+	}	
+	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
+	
+	
+	
+	//columns and rows
+	printf("shellMaxColumns={%d} \n", shellMaxColumns );
+	printf("shellMaxRows={%d} \n", shellMaxRows );	
+		
+	
+	
+	//
+	// Process support.
+	//
 	
 	//
 	// @todo: 
@@ -1688,29 +1747,7 @@ int shellInit( struct window_d *window )
 	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n", PID, PPID );
 	
 	
-	printf("shellMaxColumns={%d} \n", shellMaxColumns );
-	printf("shellMaxRows={%d} \n", shellMaxRows );
-	
-	//
-	//Active
-	ActiveWindowId = (int) APIGetActiveWindow();
-	
-	//valor de erro
-	if( ActiveWindowId == (-1)){
-	    printf("ERROR getting Active window ID\n");	
-	}	
-	printf("ActiveWindowId={%d}\n", ActiveWindowId );
 
-
-	//
-	// Focus.
-	WindowWithFocusId = (int) APIGetFocus();
-	
-	//valor de erro
-	if( WindowWithFocusId == (-1)){
-	    printf("ERROR getting Window With Focus ID\n");	
-	}	
-	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );
 	
 	//
 	// @todo: Criar processos processos:
@@ -1782,8 +1819,8 @@ int shellInit( struct window_d *window )
 	int rand_value;
 	rand_value = (int) rand();
 	printf("RandValue1={%d}\n", rand_value);
-	rand_value = (int) rand();
-	printf("RandValue2={%d}\n", rand_value);
+	//rand_value = (int) rand();
+	//printf("RandValue2={%d}\n", rand_value);
     //rand_value = (int) rand();
 	//printf("RandValue3={%d}\n", rand_value);
 	//...
@@ -1815,28 +1852,7 @@ int shellInit( struct window_d *window )
 	// Get thread info.
 	//
 	
-	//
-	// Window test.
-	//
-	
-	int wID;
-	
-	// Active window.
-	wID = (int) APIGetActiveWindow();
-	//valor de erro
-	if( wID == (-1) ){
-	    printf("ERROR getting Active window ID\n");	
-	}
-	printf("ActiveWindow={%d}\n", wID );
-	
-	// Window with focus.
-	wID = (int) APIGetFocus();	
-	//valor de erro
-	if( wID == (-1) ){
-	    printf("ERROR getting Window With Focus ID\n");	
-	}		
-	printf("Focus={%d}\n", wID );
-	//...
+
 	
 	//
 	// Testing commands.
@@ -2037,18 +2053,22 @@ void shellPrompt()
 
 /*
  * shellClearBuffer:
- *     Limpa o buffer do shell.
+ *     Limpa o buffer da tela.
  */
 void shellClearBuffer()
 {
 	int i;
 	
 	// Shell buffer.
-	for( i=0; i<SHELL_BUFFER_SIZE; i++){
-		shell_buffer[i] = 0;
+	for( i=0; i<SCREEN_BUFFER_SIZE; i++)
+	{
+		screen_buffer[i] = 0;
 	}
-	shell_buffer[0] = (char) '\0';
-    shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+	
+	screen_buffer[0] = (char) '\0';
+	screen_buffer[1] = 7;
+	
+    screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
 
 
@@ -2076,13 +2096,13 @@ void shellTestLoadFile()
 	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
 	fRet = (int) system_call( SYSTEMCALL_READ_FILE, 
 	                          (unsigned long) init_file_name, 
-					          (unsigned long) &shell_buffer[0], 
-							  (unsigned long) &shell_buffer[0] );
+					          (unsigned long) &screen_buffer[0], 
+							  (unsigned long) &screen_buffer[0] );
 							  
 	printf("ret={%d}\n",fRet);
 	
 	printf("...\n\n");
-	printf(&shell_buffer[0]);		
+	printf(&screen_buffer[0]);		
 };
 
 
@@ -2161,7 +2181,7 @@ void shellClearScreen()
 	shellSetCursor(0,0);
 	
 	// Shell buffer. (80*25) ??
-	for( i=0; i<SHELL_BUFFER_SIZE; i++){
+	for( i=0; i<SCREEN_BUFFER_SIZE; i++){
 		printf("%c", ' '); //pinta um espaço.
 	}
 	shellSetCursor(0,0);
@@ -2181,7 +2201,7 @@ void shellRefreshScreen()
 	shellSetCursor(0,0);
 	
 	// Shell buffer.
-	for( i=0; i<SHELL_BUFFER_SIZE; i++){
+	for( i=0; i<SCREEN_BUFFER_SIZE; i++){
 		printf("%c", stdout->_ptr[i]);
 	};
 	
@@ -2196,7 +2216,7 @@ void shellRefreshScreen()
 void shellScroll()
 {
 	int i;
-    int end = (SHELL_BUFFER_SIZE+80);
+    int end = (SCREEN_BUFFER_SIZE+80);
 	
 	//cursor apontando par ao início da janela.
 	shellSetCursor(0,0);
@@ -2206,15 +2226,15 @@ void shellScroll()
 		printf("%c", stdout->_ptr[i]);
 	};
 	
-    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.		
+    //screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.		
 };
 
 
 
 static void save_cur(void)
 {
-	saved_x = shell_buffer_x;
-	saved_y = shell_buffer_y;
+	saved_x = screen_buffer_x;
+	saved_y = screen_buffer_y;
 };
 
 
@@ -2223,15 +2243,15 @@ static void restore_cur(void)
 	x=saved_x;
 	y=saved_y;
 	//pos = origin + ( (y * columns + x) << 1 );
-	shell_buffer_pos = origin + (shell_buffer_y * columns + shell_buffer_x);
+	screen_buffer_pos = origin + (screen_buffer_y * columns + screen_buffer_x);
 };
 
 
 static void lf(void)
 {
-	if (shell_buffer_y+1 < bottom) {
-		shell_buffer_y++;
-		shell_buffer_pos += columns;  //pos += columns<<1;
+	if (screen_buffer_y+1 < bottom) {
+		screen_buffer_y++;
+		screen_buffer_pos += columns;  //pos += columns<<1;
 		return;
 	}
 	//scrup();
@@ -2240,9 +2260,9 @@ static void lf(void)
 
 static void ri(void)
 {
-	if (shell_buffer_y>top) {
-		shell_buffer_y--;
-		shell_buffer_pos -= columns; //shell_buffer_pos -= columns<<1;
+	if (screen_buffer_y>top) {
+		screen_buffer_y--;
+		screen_buffer_pos -= columns; //screen_buffer_pos -= columns<<1;
 		return;
 	}
 	//scrdown();
@@ -2251,16 +2271,16 @@ static void ri(void)
 
 static void cr(void)
 {
-	shell_buffer_pos -= shell_buffer_x; //pos -= x<<1;
-	shell_buffer_x=0;
+	screen_buffer_pos -= screen_buffer_x; //pos -= x<<1;
+	screen_buffer_x=0;
 };
 
 
 static void del(void)
 {
-	if (shell_buffer_x) {
-		shell_buffer_pos -= 2;
-		shell_buffer_x--;
+	if (screen_buffer_x) {
+		screen_buffer_pos -= 2;
+		screen_buffer_x--;
 		//*(unsigned short *) shell_buffer_pos = 0x0720;
 		//@todo: printchar
 	}
@@ -2280,11 +2300,12 @@ void shellInsertCharXY(unsigned long x, unsigned long y, char c)
 		return;
 	}
 
-	shell_buffer[offset] = (char) c;
+	screen_buffer[offset] = (char) c;
 };
 
 
-//insere um caractere entro do buffer
+//insere um caractere no buffer de output 
+//#bugbug, talvez o buffer seja stdout. 
 void shellInsertCharPos(unsigned long offset, char c)
 {
 	unsigned long offsetMax = (unsigned long)(80*25); 
@@ -2293,32 +2314,49 @@ void shellInsertCharPos(unsigned long offset, char c)
 		return;
 	}
 	
-	shell_buffer[offset] = (char) c;
+	screen_buffer[offset] = (char) c;
 };
 
+
+/*
+//inserindo uma string em uma posição do buffer de saída.
+void shellInsertStringPos( unsigned long offset, char *string );
+void shellInsertStringPos( unsigned long offset, char *string )
+{
+    //@todo
+};
+*/
+
+/*
+ preenche todo o buffer de saída com char ou atributo
+void shellFillOutputBuffer( char element, int element_type )
+{
+	
+}
+*/
 
 //coloca um char na próxima posição do buffer
 void shellInsertNextChar(char c)
 {
-	shell_buffer[shell_buffer_pos] = (char) c;	
+	screen_buffer[screen_buffer_pos] = (char) c;	
 };
 
 
 void shellInsertCR()
 {
-   shell_buffer[shell_buffer_pos] = (char) '\r';	
+   screen_buffer[screen_buffer_pos] = (char) '\r';	
 };
 
 
 void shellInsertLF()
 {
-    shell_buffer[shell_buffer_pos] = (char) '\n';	
+    screen_buffer[screen_buffer_pos] = (char) '\n';	
 };
 
 
 void shellInsertNullTerminator()
 {
-    shell_buffer[shell_buffer_pos] = (char) '\0';	
+    screen_buffer[screen_buffer_pos] = (char) '\0';	
 };
 
 
@@ -2361,8 +2399,8 @@ void move_to( unsigned long x, unsigned long y )
 		return;
 	}
 	
-	shell_buffer_x = x;
-	shell_buffer_y = y;
+	screen_buffer_x = x;
+	screen_buffer_y = y;
 	return;
 };
 
@@ -2457,6 +2495,19 @@ void shellShowSystemInfo()
 	
 };
 
+
+
+/*
+ * shell_write_to_screen:
+ *     refresh de um retângulo ??    
+ */
+/* 
+void shell_write_to_screen( struct shell_screen_d *screen, 
+                            struct shell_rect_d *region )
+{
+    //@todo	
+};
+*/
 
 /*
  * @todo: Criar rotina de saída do shell.
