@@ -356,10 +356,39 @@ struct shell_info_d shell_info;
 typedef struct alias_d alias_t;
 struct alias_d 
 {
+	int used;
+	int magic;
+	
+	int name_lenght;
     char *name;
+	
+	int command_lenght;
     char *command;
 }; 
  
+
+typedef struct COMMAND_D COMMAND_T;
+struct COMMAND_D
+{
+	int used;
+	int magic;
+	
+	int command_lenght;
+	char *command;
+	
+	struct alias_d *alias; 
+};
+COMMAND_T *CurrentCommand;  
+//...
+
+typedef struct COMMANDHISTORY_D COMMANDHISTORY_T;
+struct COMMANDHISTORY_D
+{
+    int NumberOfCommands;
+	int MaximumNumberOfCommands;
+	
+};
+COMMANDHISTORY_T *CommandHistory;  
 
  
 //

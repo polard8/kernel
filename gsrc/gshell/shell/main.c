@@ -810,6 +810,7 @@ shellProcedure( struct window_d *window,
 		//Não intercptaremos mensagens do sistema por enquanto.
 		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
 		//do sistema.
+		// call defproc
 		//case MSG_SYSKEYDOWN:
 		//    switch(long1)
 		//    {
@@ -817,10 +818,11 @@ shellProcedure( struct window_d *window,
 		//	};
 		//break;
 		
-		case MSG_SYSKEYUP: 
+		// call defproc
+		//case MSG_SYSKEYUP: 
 		    //printf("%c", (char) 'U');
             //printf("%c", (char) long1);			
-		    break;
+		//    break;
           
 		//
         //  *** Aqui o procedimento de janelas do kernel vai enviar uma mensagem 
@@ -860,16 +862,18 @@ shellProcedure( struct window_d *window,
 		break; 		
 		
 		//Essa mensagem pode ser acionada clidando um botão.
-		//case MSG_CLOSE:
+		case MSG_CLOSE:
 		    //??
 		    //isso deve fechar qualquer janela que esteja usando esse procedimento.
 			//pode ser uma janela filha ou ainda uma janela de dialogo criada pelo sistema.
 			//??
-		//break;
+		    printf("SHELL.BIN: MSG_CLOSE\n");
+			break;
 		
 		//Essa mensagem pode ser acionada clidando um botão.
-		//case MSG_DESTROY:
-		//break;
+		case MSG_DESTROY:
+		    printf("SHELL.BIN: MSG_DESTROY\n");
+		    break;
 		
 		//Quando a aplicativo em user mode chama o kernel para 
 		//que o kernel crie uma janela, depois que o kernel criar a janela,
@@ -877,9 +881,47 @@ shellProcedure( struct window_d *window,
         //MSG_CREATE, se o aplicativo retornar -1, então a rotina em kernel mode que 
         //esta criando a janela, cancela a janela que está criando e retorn NULL.
         //		
-		//case MSG_CREATE:
+		case MSG_CREATE:
+		    printf("SHELL.BIN: MSG_CREATE\n");
+		    break;
+		
+		case MSG_SETFOCUS:
+		    APISetFocus(window);
+			break;
+			
+		case MSG_KILLFOCUS:
+            break;
+
+		//isso pinta os elementos da área de cliente.	
+        case MSG_PAINT:
+            break;
+
+		//@todo: isso ainda não existe na biblioteca. criar.	
+        //case MSG_CLS:
+            //limparemos o retãngulo da área de cliente,
+			//mesmo que estejamos em full screen. 
+		//	break;		
+		
+		//mudaremos o curso usando long1 e long2.
+		//case MSG_SETCURSOR:
 		//    break;
 		
+		//case MSG_HSCROLL:
+		//    break;
+		//case MSG_VSCROLL:
+		//    break;
+		
+		
+		//case MSG_FULLSCREEN:
+		//    break;
+		
+		
+		//case COMMAND_SET_WINDOW_SIZE:
+		//    break;
+		
+		//case COMMAND_HIDE_WINDOW:
+        //    break; 	
+	
 		//Mensagem desconhecida.
 		default:
 		    //printf("shell procedure: mensagem desconhecida\n");
@@ -1083,7 +1125,9 @@ do_compare:
 	// Talvez aqui devamos usar tokenList[0] e não prompt.
 	//
 	
-
+    //@todo Criar sof links no vfs.
+	//o vfs ficará no kernel base.
+	//@todo: Criar chamadas ao vfs.
 		
     // L1 RAM /objetcs   
 	// (diretório raiz para os arquivos que são diretórios de objetos)
@@ -1116,6 +1160,13 @@ do_compare:
 	    printf("info: Open wan root dir ...\n");
         goto exit_cmp;
     };
+	
+	
+	//comentário
+	// a linha é um comentário, podemos ignorar.
+    if( strncmp( prompt, "//", 2 ) == 0 ){
+		goto exit_cmp;
+	};		
 	
     //
 	// Ordem alfabética.
@@ -1188,6 +1239,8 @@ do_compare:
     // Início dos comandos.
     //
 
+	// Imprime a tabela ascii usando a fonte atual.
+    // 128 chars.	
     if( strncmp( prompt, "ascii", 5 ) == 0 )
     {
 		shellASCII();
@@ -1196,6 +1249,7 @@ do_compare:
 	
 	// boot
 	// ?? Boot info talvez.
+	// ?? Talvez informações de boot ou configuração.
 	if( strncmp( prompt, "boot", 4 ) == 0 )
 	{
 	    printf("~boot\n");
@@ -1230,8 +1284,8 @@ do_compare:
 	// Echo de terminal.
     if( strncmp( prompt, "echo", 4 ) == 0 )
 	{
-		//printf("%s\n",prompt[4]);
-		printf("%s\n",prompt);
+		printf("%s\n",prompt[4]);
+		//printf("%s\n",prompt);
 		goto exit_cmp;
     };	
 	
@@ -1241,12 +1295,14 @@ do_compare:
     if( strncmp( prompt, "exit", 4 ) == 0 )
 	{
         printf("~exit\n");
+		printf("Exiting shell process ...\n");
 		refresh_screen();
 		exit(0);
 		goto exit_cmp;
     };
 
 	// hd ??
+	// hd info maybe.
     if( strncmp( prompt, "hd", 2 ) == 0 )
 	{
 	    printf("~hd\n");
@@ -1264,7 +1320,7 @@ do_compare:
 	
 	
 	// install	
-    // ??
+    // ?? 
 	if( strncmp( prompt, "install", 7 ) == 0 )
 	{
 	    printf("~install\n");
@@ -1516,11 +1572,7 @@ do_compare:
     };
 
 
-	//comentário
-	// a linha é um comentário, podemos ignorar.
-    if( strncmp( prompt, "//", 2 ) == 0 ){
-		goto exit_cmp;
-	};	
+
  
  
     //
@@ -1530,7 +1582,9 @@ do_compare:
     //
  
 palavra_nao_reservada:
-    printf(" Unknown command!\n");
+    //shellParseFileName(); @todo
+	printf(" Unknown command!\n");
+	printf("%s\n", prompt);
 	shellPrompt();
 	//Mostrando as strings da rotina de comparação.
 	refresh_screen(); 	
@@ -2552,6 +2606,19 @@ void shellASCII()
 		}
     };	
 };
+
+
+//??
+//void shellSetScreenColors( ... ){}
+
+//??
+//void *shellGetTerminalWindow(){}
+
+//void shellSetTerminalRectangle(....){}
+
+//void *shellOpenTerminal(.){}
+
+
 
 
 /*
