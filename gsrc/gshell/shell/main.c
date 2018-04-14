@@ -71,7 +71,9 @@
 #include "globals.h"
 
 
-
+//Sendo assim, o shell poderia abrir no ambiente de logon.
+char *username;
+char *password; 
 
 //#define DEFAULT_WINDOW_TITLE "Shell"
 
@@ -975,6 +977,8 @@ exit:
  */
  
 #define LSH_TOK_DELIM " \t\r\n\a" 
+
+#define SPACE " "
  
 unsigned long shellCompare(struct window_d *window)
 {
@@ -1178,7 +1182,17 @@ do_compare:
 		printf("\n");
 		goto exit_cmp;
 	};
-    	
+    
+
+    //
+    // Início dos comandos.
+    //
+
+    if( strncmp( prompt, "ascii", 5 ) == 0 )
+    {
+		shellASCII();
+		goto exit_cmp;
+	}		
 	
 	// boot
 	// ?? Boot info talvez.
@@ -1373,7 +1387,7 @@ do_compare:
 		// Qualquer editbox precisa desse tipo de ajuste.
 	    
 		APISetFocus(window);
-		shellPrompt();
+		//shellPrompt();
 		printf("~start\n");
 		
 		goto exit_cmp;
@@ -1492,10 +1506,11 @@ do_compare:
 													  terminal_rect.height );
 
 													  
-		if( terminal_rect.left > 0 && terminal_rect.top > 0 )
-		{											  
-            shellSetCursor( (terminal_rect.left/8), (terminal_rect.top/8) );													  
-		};
+		//Obs: isso funcionou. setando o cursor.
+		//if( terminal_rect.left > 0 && terminal_rect.top > 0 )
+		//{											  
+        //    shellSetCursor( (terminal_rect.left/8), (terminal_rect.top/8) );													  
+		//};
 		
         goto exit_cmp;
     };
@@ -2028,6 +2043,7 @@ int test_operators()
 
 
 /*
+ ********************************************************************
  * shellPrompt:
  *     Inicializa o prompt.
  *     Na inicialização de stdio, prompt foi definido como stdin->_base.
@@ -2176,21 +2192,37 @@ void shellTestThreads()
  */
 void shellClearScreen()
 {
-	int i;
+	int lin, col;    
+
 	
+	//cursor.
 	shellSetCursor(0,0);
 	
-	// Shell buffer. (80*25) ??
-	for( i=0; i<SCREEN_BUFFER_SIZE; i++){
-		printf("%c", ' '); //pinta um espaço.
-	}
+	//
+	// Tamanho da tela. 80x25
+	//
+	
+	//linhas.
+	for( lin=0; lin < 25; lin++)
+	{
+		col = 0;
+		shellSetCursor(col,lin);
+		
+		//colunas.
+		for( col=0; col < 80; col++)
+		{
+		    //@todo:
+			printf("%c",' ');
+	    }
+	};
+	
 	shellSetCursor(0,0);
 };
 
 
 /*
  * shellRefreshScreen:
- *     Copia o conteúdo do buffer para a tela. (dentro da janela).
+ *     Copia o conteúdo do buffer de output para a tela. (dentro da janela).
  *
  */
 void shellRefreshScreen()
@@ -2198,10 +2230,14 @@ void shellRefreshScreen()
 	int i;
 
 	//cursor apontando par ao início da janela.
+	//usado pelo printf.
 	shellSetCursor(0,0);
 	
-	// Shell buffer.
-	for( i=0; i<SCREEN_BUFFER_SIZE; i++){
+	//o certo é copiar o buffer todo e a rotina printf faz o scroll
+	
+	//for( i=0; i < SCREEN_BUFFER_SIZE; i++)
+	for( i=0; i < (80*25); i++)
+	{
 		printf("%c", stdout->_ptr[i]);
 	};
 	
@@ -2216,14 +2252,15 @@ void shellRefreshScreen()
 void shellScroll()
 {
 	int i;
-    int end = (SCREEN_BUFFER_SIZE+80);
 	
 	//cursor apontando par ao início da janela.
 	shellSetCursor(0,0);
 	
-	// Shell buffer.
-	for( i=80; i<end; i++){
-		printf("%c", stdout->_ptr[i]);
+	// tamanho da tela.
+	for( i = 0; i < ( 80*25 ); i++ )
+	{
+        //começa da segunda linha e copia a tela toda.
+		printf("%c", stdout->_ptr[i+80]);
 	};
 	
     //screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.		
@@ -2495,6 +2532,26 @@ void shellShowSystemInfo()
 	
 };
 
+
+/*
+ * shellASCII:
+ *     Mostrar os caracteres da tabela ascii padrão.
+ *     O padrão tem 128 chars.
+ *     Obs: Na fonte ROM BIOS temos esse padrão.
+ */
+void shellASCII()
+{
+    unsigned char count;
+	unsigned char standard_ascii_max = 128;
+	
+    for( count=0; count<standard_ascii_max; count++ )
+    {
+		printf(" %d - %c",count,count);
+        if( count % 4 == 0 ){
+            printf("\n");
+		}
+    };	
+};
 
 
 /*

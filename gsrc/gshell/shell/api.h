@@ -2358,7 +2358,6 @@ void APIset_foregroung_window(struct window_d *window);
 //	
 	
 //put char.
-//@todo: Mudar argumento para *ch.
 void put_char( unsigned long x,  
                unsigned long y,  
 			   unsigned long color, 
@@ -2428,7 +2427,7 @@ void apiSetCursor( unsigned long x, unsigned long y);
 //
 
 //Create process.
-void *apiCreateProcess(unsigned long process_eip, unsigned long process_priority, char *name);
+void *apiCreateProcess( unsigned long process_eip, unsigned long process_priority, char *name);
 
 //Mostra informações sobre o processo atual.	
 void APIShowCurrentProcessInfo();

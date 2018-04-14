@@ -350,6 +350,17 @@ struct shell_info_d
 //sem ponteiro.
 struct shell_info_d shell_info;
 
+
+
+// alias support
+typedef struct alias_d alias_t;
+struct alias_d 
+{
+    char *name;
+    char *command;
+}; 
+ 
+
  
 //
 // Macros.
@@ -443,6 +454,9 @@ void shellShell();               //Constructor.
 // Finalizing ... 
 // ??exit, die... 
  
+ 
+//show ascii table
+void shellASCII(); 
  
 //
 // shelui.c
