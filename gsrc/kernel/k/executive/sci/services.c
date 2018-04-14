@@ -361,11 +361,6 @@ void *services( unsigned long number,
 			                    (unsigned long) (focusWnd->top + arg3),              //y.
 								CurrentColorScheme->elements[csiTerminalFontColor],  //color. 
 								(unsigned long) arg4); 								 //char.
-								
-			//printf("%c", (char) long1);
-		    //refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
-			//refresh_rectangle( focusWnd->left + (arg2*8), focusWnd->top + (arg3*8), 8, 8 );
-			//refresh_rectangle( (focusWnd->left + arg2), (focusWnd->top + arg3), 8, 8 );
 			break;
 
 		//8
@@ -558,10 +553,18 @@ void *services( unsigned long number,
 		//putchar usando o cursor gerenciado pelo kernel.
 		//a biblioteca em user mode, altera o cursor do kernel e 
 		//usa essa rotina para imprimir.
+		//obs: #importante: Como printf é uma função 
+		//usada pelo terminal virtual, deve-se considerar as cores 
+		//usadas no terminal virtual.
+		//@todo: implementar a configuração de cores no terminal virtual 
+		//usado pelo aplicativo.
+		//obs: estamos improvisando as cores por enquanto.
 		case SYS_PUTCHAR:
-		    putchar( (int) arg2 );
+		    stdio_terminalmode_flag = 1;  // seleciona não transparente.
+			putchar( (int) arg2 );
 			refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
-		    break;
+		    stdio_terminalmode_flag = 0;  // seleciona transparente.
+			break;
 
 		//66 - reservado pra input de usuário.
 		//case 66:

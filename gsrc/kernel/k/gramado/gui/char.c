@@ -37,7 +37,7 @@
 
 /*
  * my_buffer_char_blt:
- *     Constrói um caractere 8x8 no buffer.
+ *     Constrói um caractere transparente 8x8 no buffer.
  */
 //void charBuiltCharBackBuffer( unsigned long x, unsigned long y, unsigned long color, unsigned long c)
 void my_buffer_char_blt( unsigned long x, 
@@ -126,6 +126,10 @@ void my_buffer_char_blt( unsigned long x,
 	}
 	*/
 	
+	//tentando pintar um espaço em branco.
+    //Nas rotinas da biblioteca gráfica, quando encontram
+	//um espaço(32), nem manda para cá, apenas incrementam o cursor.
+	
 	
 
  	//
@@ -168,6 +172,22 @@ done:
     return;  	         	   
 };
 
+
+/*
+void my_buffer_char_blt_space( unsigned long x, 
+                               unsigned long y, 
+						       unsigned long color );
+							   
+//deve criar um retângulo do tamanho de um char.
+//será usado para apagar a tela.
+void my_buffer_char_blt_space( unsigned long x, 
+                               unsigned long y, 
+						       unsigned long color )
+{
+	//@todo:
+	//call draw_rect( ... )
+};							   
+*/						      
 
 /*
 int charInit()
@@ -223,6 +243,173 @@ int get_char_width(){
 int get_char_height(){
 	return (int) gcharHeight;
 }
+
+
+
+
+						   
+void drawchar_transparent( unsigned long x, 
+                           unsigned long y, 
+						   unsigned long color, 
+						   unsigned long c)
+{
+    my_buffer_char_blt( x, y, color, c );	
+};
+	
+
+
+
+
+
+				
+/*
+ * draw_char:
+ *     Constrói um caractere 8x8 no buffer.
+ */
+void draw_char( unsigned long x, 
+                unsigned long y,  
+				unsigned long c,
+				unsigned long fgcolor,
+				unsigned long bgcolor)
+{	
+	int x2;
+    int y2;
+    unsigned char bit_mask = 0x80;	
+    char *work_char;  
+    struct window_d *hWindow;			
+	  
+    //
+	// Window Terminal.
+	//
+	
+	/*
+	if( VideoBlock.useGui == 1 )
+	{
+        //se existe um terminal.
+		if( (void *) terminal != NULL )
+        {
+		    if( (void*) terminal->window != NULL )
+			{
+			    hWindow = (void*) terminal->window;
+			
+			    x = hWindow->left + x;
+			    y = hWindow->top + y;
+			};
+			
+		};		
+    };	
+	*/
+	  
+	  
+    /*
+	 * @todo: 
+	 *     +Criar variáveis internas para tamanho de fonte.
+	 *     +Pegar as informações em uma estrutura.
+	 *     ...
+	 */
+	 
+    //int CharWidth;
+	//int CharHeight;  
+	  
+	  
+    /*
+	 * Get the font pointer.
+	 *
+	 * @todo:
+     *     usar variavel g8x8fontAddress.	 
+	 *     + Criar e usar uma estrutura para fonte.
+	 *     + Usar o ponteiro para a fonte atual que foi carregada.
+	 *     + Criar um switch para o tamanho da fonte.
+	 *     isso deveria estar na inicialização do módulo char.
+	 *     ...
+	 */
+	 
+    if( gfontAddress == 0 || 
+	      gcharWidth <= 0 || 
+		 gcharHeight <= 0 )
+	{
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
+	};
+	
+	/*
+	//@todo: Criar essas variáveis e definições.
+	switch(gFontSize)
+	{
+		case FONT8X8:
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		gcharWidth = 8;
+		gcharHeight = 8;
+		break;
+		
+		case FONT8X16:
+	    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		gcharWidth = 8;
+		gcharHeight = 16;
+		break;
+		 
+		//...
+	}
+	*/
+	
+	//tentando pintar um espaço em branco.
+    //Nas rotinas da biblioteca gráfica, quando encontram
+	//um espaço(32), nem manda para cá, apenas incrementam o cursor.
+	
+	
+
+ 	//
+	// O caractere sendo trabalhado.
+	// Offset da tabela de chars de altura 8 na ROM.	
+    //
+	
+	work_char = (void *) gfontAddress + (c * gcharHeight);
+
+	//
+	// Draw.
+	//
+	
+    for( y2 = 0; y2 < gcharHeight; y2++ )
+    {
+        bit_mask = 0x80;
+
+        for( x2 = 0; x2 < gcharWidth; x2++ )
+        {
+			//
+			// @todo: o nome dessa rotina de putpixel será mudado.
+			//
+			
+			//putpixel( glyph[cy] & mask[cx] ? fgcolor: bgcolor, x+cx, y+cy-12 );
+			
+			//Put pixel.
+			my_buffer_put_pixel( *work_char & bit_mask ? fgcolor: bgcolor, 
+			                     x + x2, 
+								 y, 
+								 0 );
+            bit_mask = (bit_mask >> 1); 								 
+			
+            //if( (*work_char & bit_mask) )
+            //    my_buffer_put_pixel(color, x + x2, y, 0);  //Put pixel.
+            //    bit_mask = (bit_mask >> 1);                //Rotate bitmask.
+        };
+		
+		y++;            //Próxima linha da 8 linhas do caractere.
+		work_char++;   
+	};
+	
+	//
+	// Algo mais ?
+	//
+	
+	
+
+done:
+    return;  	         	   
+};
+
+
+
 
 //
 //fim

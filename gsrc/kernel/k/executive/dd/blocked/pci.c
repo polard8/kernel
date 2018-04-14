@@ -324,6 +324,9 @@ static const char* pci_class_strings[] = {
 // fica grande e não funciona. Alguma coisa de área de dados.
 //
 
+
+
+//1 mass storage
 //Obs: parece que outra forma de lista é mais apropriado.
 static const char* mass_storage_subclass_strings[] = {
     "SCSI Bus Controller",          //0x00
@@ -339,6 +342,138 @@ static const char* mass_storage_subclass_strings[] = {
 	//0x09 (Universal Flash Storage (UFS) controller)
 	//0x80 Other Mass Storage Controller
 };
+
+
+/*
+//2 network
+static const char* networkcard_subclass_strings[] = {
+    "Ethernet controller",  //0
+    "Token ring",  //1
+    "FDDI controller",  //2
+    "ATM controller",  //3
+	0
+};
+*/
+
+
+/*
+//3 display controllers
+static const char* displaycontrollers_subclass_strings[] = {
+    "",  //0
+    "XGA controller",  //1
+    "",  //2
+    "",  //3
+	0
+};
+*/
+
+
+/*
+//4 multimedia
+static const char* multimedia_subclass_strings[] = {
+    "Video device",  //0
+    "Audio device",  //1
+    "",  //2
+    "",  //3
+	0
+};
+*/
+
+
+/*
+//5 memory controllers
+static const char* memorycontrollers_subclass_strings[] = {
+    "RAM controller",  //0
+    "Flash memory controller",  //1
+    "",  //2
+    "",  //3
+	0
+};
+*/
+
+
+//6 bridge
+static const char* bridge_subclass_strings[] = {
+    "Host/PCI bridge",           //0
+    "PCI/ISA bridge",            //1
+    "PCI/EISA bridge",           //2
+    "PCI/Micro Channel bridge",  //3
+    "PCI/PCI bridge",            //4
+    "PCI/PCMCIA bridge",         //5
+    "PCI/NuBus bridge",          //6
+    "PCI/CardBus bridge",        //7
+    0 
+};
+
+
+/*
+//7 Simple Communications Controllers
+static const char* scc_subclass_strings[] = {
+    "",  //0
+    "",  //1
+    "",  //2
+    "",  //3
+	0
+};
+*/
+
+
+/*
+// 8 Base System Peripherals
+static const char* bsp_subclass_strings[] = {
+    "",  //0
+    "",  //1
+    "",  //2
+    "",  //3
+	0
+};
+*/
+
+
+/*
+// 9 Input Devices
+static const char* inputdevices_subclass_strings[] = {
+    "Keyboard controller",  //0
+    "Digitizer (pen)",  //1
+    "Mouse controller",  //2
+    "",  //3
+	0
+};
+*/
+
+
+/*
+// A Docking Stations
+static const char* dockingstations_subclass_strings[] = {
+    "Generic docking station",  //0
+    "",  //1
+	0
+};
+*/
+
+
+/*
+// B Processors
+static const char* processors_subclass_strings[] = {
+    "386",      //0
+    "486",      //1
+    "Pentium",  //2
+    "",         //3
+	0
+};
+*/
+
+
+/*
+// C Serial Bus Controllers
+static const char* sbc_subclass_strings[] = {
+    "Firewire (IEEE 1394)",               //0
+    "ACCESS bus",                         //1
+    "SSA (Serial Storage Architecture)",  //2
+    "USB (Universal Serial Bus)",         //3
+	0
+};
+*/
 
 
 //
@@ -662,6 +797,7 @@ done:
  */ 
 unsigned short pciCheckVendor(unsigned char bus, unsigned char slot)
 {
+	//@todo: Nesse momento não há nenhume busca por fuction.
 	// Vendor.
 	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_VENDORID );  
 }; 
@@ -672,7 +808,8 @@ unsigned short pciCheckVendor(unsigned char bus, unsigned char slot)
  *     Check device, offset 2.    
  */ 
 unsigned short pciCheckDevice(unsigned char bus, unsigned char slot)
-{        
+{   
+    //@todo: Nesse momento não há nenhume busca por fuction.     
     // Device.
 	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_DEVICEID );   
 };
@@ -684,6 +821,7 @@ unsigned short pciCheckDevice(unsigned char bus, unsigned char slot)
  */
 unsigned char pciGetSubClass(unsigned char bus, unsigned char slot)
 {
+	//@todo: Nesse momento não há nenhume busca por fuction.
 	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_SUBCLASS );
 };
 
@@ -693,7 +831,8 @@ unsigned char pciGetSubClass(unsigned char bus, unsigned char slot)
  *     Get class code, offset 0x0B.  
  */
 unsigned char pciGetClassCode(unsigned char bus, unsigned char slot)
-{	
+{
+    //@todo: Nesse momento não há nenhume busca por fuction.	
 	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_CLASSCODE );
 };
 
@@ -844,6 +983,7 @@ unsigned char pciGetInterruptPin( unsigned char bus,
 
 
 /*
+ ****************************************************************************
  * pciInfo:
  *     Mostra as informações salvas nas estruturas da lista de dispositivos. 
  *
@@ -882,14 +1022,8 @@ int pciInfo()
 					   pci_class_strings[ D->classCode ], 
 					   D->subclass, 
 					   D->irq_line, 
-					   D->irq_pin );			
+					   D->irq_pin );
 			
-			    //pci_class_strings[D->classCode]
-			    //Mass Storage
-			    //if(D->classCode == 0x01)
-				//{
-				//	printf("\nDiskInfo={%s}\n",mass_storage_subclass_strings[D->subclass]);
-				//};
 			
 			};
 		};
@@ -932,6 +1066,7 @@ int pciShowDeviceInfo(int number)
 
 
 /*
+ ***********************************************************************
  * pci_setup_devices:
  *     Encontrar os dispositivos PCI e salvar as informações sobre eles
  * em suas respectivas estruturas.
@@ -998,7 +1133,7 @@ int pci_setup_devices()
 					D->deviceId    = (int) listIndex;
 				    D->deviceUsed  = (int) 1;
 					D->deviceMagic = (int) 1234;
-					D->name = "Noname";
+					D->name = "No name";
 					
 					//Localização.
 					D->bus = (unsigned char) i;
@@ -1010,12 +1145,12 @@ int pci_setup_devices()
 					D->objectClass = ObjectClassKernelObjects;
 					
 					//Pci Header.
-			        D->Vendor = (unsigned short) Vendor;
-				    D->Device = (unsigned short) pciCheckDevice(i,j);
+			        D->Vendor    = (unsigned short) Vendor;
+				    D->Device    = (unsigned short) pciCheckDevice(i,j);
 					D->classCode = (unsigned char) pciGetClassCode(i,j);
-					D->subclass = (unsigned char) pciGetSubClass(i,j); //*importante.
-					D->irq_line = (unsigned char) pciGetInterruptLine(i,j);
-					D->irq_pin  = (unsigned char) pciGetInterruptPin(i,j);
+					D->subclass  = (unsigned char) pciGetSubClass(i,j); //*importante.
+					D->irq_line  = (unsigned char) pciGetInterruptLine(i,j);
+					D->irq_pin   = (unsigned char) pciGetInterruptPin(i,j);
 					
 					//Driver.
 					//Inicialização básica.

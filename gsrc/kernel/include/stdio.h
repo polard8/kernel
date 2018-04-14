@@ -367,6 +367,7 @@ int g_inputmode;
 #define  BUFSIZ  512 
 #define PROMPT_SIZE 256 
 #define PROMPT_MAX_DEFAULT 256
+
  
 char prompt[PROMPT_SIZE];      //buffer para stdin
 char prompt_out[PROMPT_SIZE];  //buffer para stdout
@@ -378,6 +379,11 @@ unsigned long prompt_status;
 //@todo: Testando strings.
 static char prompt_cursor[] = "$";
 static char prompt_string[] = "Prompt:";
+
+
+//flag usada por _outbyte para decidir
+//se desenha um char transparente ou não.
+int stdio_terminalmode_flag;
 
 /*
  * FILE:

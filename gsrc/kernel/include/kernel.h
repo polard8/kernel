@@ -259,10 +259,11 @@ extern void do_executa_new_task();
 //uigm - User Interface Graphic Mode.
 //nothing for now.
 
-//uitm - User Interface Text Mode.
-#include <executive/dd/uitm/line.h>              //lines support.
-#include <executive/dd/uitm/terminal.h>          //terminal support. 
-#include <executive/dd/uitm/console.h>           //Console. Monitor support.
+//gramado/terminal 
+//suporte a terminal.
+#include <gramado/terminal/line.h>              //lines support.
+#include <gramado/terminal/terminal.h>          //terminal support. 
+#include <gramado/terminal/console.h>           //Console. Monitor support.
 
 //sm - System Management.  
 #include <executive/dd/sm/install.h>  

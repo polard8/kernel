@@ -13,6 +13,13 @@
  *     Versão: 1.0, 2016 - Revisão.
  */
  
+//
+// Window handle status
+// Se uma janela está aberta ou não. 
+//
+#define HANDLE_STATUS_CLOSE 0
+#define HANDLE_STATUS_OPEN 1
+ 
  
 //used
 #define WINDOW_NOTUSED   0
@@ -1542,7 +1549,13 @@ struct window_d
 	// Abaixo ficam os elementos referenciados com menor frequência.
 	//
 	
-   
+    //
+	// Status do puxador da janela.
+	// Se está aberta ou não.
+	// HANDLE_STATUS_OPEN ou HANDLE_STATUS_CLOSE
+	//
+	
+	int handle_status;
 	
 	//linked list. ( a linked list da janela)
 	struct linkedlist_d *linkedlist;	
@@ -2312,7 +2325,20 @@ void my_buffer_char_blt( unsigned long x,
 void set_char_width( int width );	
 void set_char_height( int height );					 
 int get_char_width();
-int get_char_height();						 
+int get_char_height();	
+
+//desenha um caractere transparente.
+void drawchar_transparent( unsigned long x, 
+                           unsigned long y, 
+						   unsigned long color, 
+						   unsigned long c);
+
+//desenha um caractere.
+void draw_char( unsigned long x, 
+                unsigned long y,  
+				unsigned long c,
+				unsigned long fgcolor,
+				unsigned long bgcolor);						   
 						 
 //
 // Pixel, line rect support.

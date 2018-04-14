@@ -1129,19 +1129,15 @@ Done:
  *
  */ 
 void dead_task_collector()
-{
-	
-	//
-	// @todo
-	//
-	
-done: 	
-	return;
+{	
+	return;  // @todo
 };
 
 
 /*
+ **********************************************************************
  * exit_process:
+ *
  *     Exit process..
  *     Torna o estado PROCESS_TERMINATED, mas não destrói a estrutura do 
  * processo. Outra rotina destruirá as informações.
@@ -1295,6 +1291,8 @@ int init_process_manager()
 	
 	//...
 	
+	
+done:	
 	return (int) 0;
 };
 

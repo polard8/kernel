@@ -62,4 +62,10 @@ typedef int size_t;
 /*
  * offset_of - "deslocamento dentro de uma estrutura"
  */
-#define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
+
+//linux like. 
+#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+ 
+//#define offsetof(st, m) ((size_t)&(((st *)0)->m))
+//#define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
+

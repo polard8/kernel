@@ -4,6 +4,14 @@
 
      gerenciamento de recursos gráficos, logon, logoff,e gerenciamento de usuário. (segurança e proteção).
 
+     *importante:
+     todas as coisas criadas em /gramado poderão de alguma forma ser aproveitadas 
+em servidores em user mode. essa é a ideia. cada módulo aqui dentro pderá ser um 
+servidor em user mode, mas isso não impede a implementação desses recursos aqui
+memo no kernel base.
+
+     os termos diferenciadores poderiam ser gk_ e gu_, para gramado kernel e gramado user.
+
 
      Gramado é uma interface gráfica, ela deve ficar dentro do
 kernel base, para efeito de desempenho, mas fora dos outros componentes

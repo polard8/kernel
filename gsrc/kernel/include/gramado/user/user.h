@@ -34,6 +34,23 @@
 #define _4NORA_USER_DIRECTORY  "/root/user" 
 //...
 
+
+//
+// DESKTOP
+// Estrutura principal de suporte ao desktop atual (principal)
+//
+//
+
+//typedef struct DESKTOP_D DESKTOPINFO; 
+//typedef struct DESKTOP_D DESKTOP_T; 
+typedef struct DESKTOP_D DESKTOP; 
+struct DESKTOP_D
+{
+	// @todo
+	// estrutura principal. Contém muitos elementos gráficos.
+    struct gui_d *gui;
+};
+
  
 //User types.  
 typedef enum {

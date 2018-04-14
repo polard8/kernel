@@ -1583,6 +1583,7 @@ done:
 
 
 /*
+ * ************************************************************
  * systemShowDevicesInfo:
  *     Mostrar informações sobre o sistema, seguindo a ordem de
  *     velocidade dos dispositivos e barramentos.

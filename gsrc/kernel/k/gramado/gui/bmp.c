@@ -1,5 +1,5 @@
 /*
- * File: bmp.c
+ * File: gui\bmp.c
  *
  * Descrição:
  *     Rotinas para bmp.
@@ -80,6 +80,7 @@ void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, 
 
 
     // extract image height and width from header
+	// @todo: Criar defines para esses deslocamentos.
     Width  = *( unsigned long* )&bmp[18];
     Height = *( unsigned long* )&bmp[22];	
 	
@@ -88,12 +89,10 @@ void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, 
 	bi->bmpHeight   = (unsigned long) Height;
 	//bi->bmpBitCount = (unsigned long)
 	
-	//unico suportado ainda.
+	//único suportado ainda.
 	if(bi->bmpBitCount != 24 ){
 		//fail
 	}
-	
-	
 	
 	
 	//
@@ -129,9 +128,13 @@ void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, 
 			
 			base = base + 3;
 		
-			my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
+			my_buffer_put_pixel( (unsigned long) color, 
+			                     (unsigned long) left, 
+								 (unsigned long) bottom, 
+								 0 );
 			
-			left++; //próximo pixel.
+			// Próximo pixel.
+			left++; 
 		}
 		
 		//vamos para a linha anterior.
@@ -140,16 +143,12 @@ void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, 
 	};	
 	
 	
+	
+done:	
 	//Debug
-	
-	printf("w={%d} h={%d}\n",bi->bmpWidth ,bi->bmpHeight);
-	
+	printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
 	return;
 };
-
-
-
-
 
 
 

@@ -311,6 +311,7 @@ done:
 /*
  * kprintf:
  *     Rotina simples de escrita em kernel mode.
+ *     @todo: isso deve ir para outro lugar. uitm/libk 
  */
 int kprint( char *message, unsigned int line, int color )
 { 
@@ -554,6 +555,9 @@ int printf(const char *format, ...)
  * panic:
  *     Kernel panic function.
  *     @todo: Esse função deve retornar void.
+ *     Essa função faz parte da libC ??
+ *     Essa rotina deveria ir para outro lugar.
+ *     provavelmente em /sm
  */
 int panic(const char *format, ...)
 {           
@@ -563,11 +567,9 @@ gui_mode:
     if(VideoBlock.useGui == 1)
 	{
 	    backgroundDraw(COLOR_BLACK);
-		printf("KERNEL PANIC:\n\n");
+		printf("uitm-libc-stdio-panic: KERNEL PANIC\n\n");
 		print(0, varg);
 		die();
-		//refresh_screen();
-		//while(1){}
 	};
 
 text_mode:
@@ -576,7 +578,6 @@ text_mode:
 	    kclear(0);
 	    print(0, varg);
 	    die();
-		//while(1){}        //No return.
 	};
 	
 //Done.
@@ -625,6 +626,7 @@ done:
 
 
 /*
+ *************************************************************
  * printchar:
  *     Coloca o caractere na string ou imprime.
  * Essa função chama uma rotina que deverá tratar o caractere e em seguida 
@@ -645,6 +647,7 @@ static void printchar(char **str, int c)
 
 
 /*
+ ********************************************************************
  * putchar:
  *     Put a char on the screen. (libC).
  *     Essa rotina chama uma rotina de tratamento de caractes, somente
@@ -675,21 +678,21 @@ int getchar(void)
  * para efetivamente colocar o caractere na tela.
  *
  * Essa rotina é chamada pelas funções: /putchar/scroll/.
+ * @todo: Colocar no buffer de arquivo.
  */
 void outbyte(int c)
-{     
-    //@todo: Colocar no buffer de arquivo.
-       
-    static char prev = 0;
+{
+	static char prev = 0;
 	
 	
 //checkChar:
         
-	//nothing to do.	
-    if( c <  ' '  && c != '\r' && c != '\n' && c != '\t' && c != '\b' )
-    {
-        return;
-    };
+	//liberando esse limite.
+	//permitindo os caracteres menores que 32.
+	//if( c <  ' '  && c != '\r' && c != '\n' && c != '\t' && c != '\b' )
+	//{
+    //    return;
+    //};
                 
     //Volta ao inicio da linha.        
     if( c == '\r' ){
@@ -729,14 +732,18 @@ void outbyte(int c)
         prev = c;
         return;         
     };
-        
+       
+    //#@todo#bugbug 
+    //retirei esse retorno para o espaço, com isso 
+    // o ascii 32 foi pintado, mas como todos os 
+    //bits estão desligados, não pintou nada.	
     //space 
-    if( c == ' ' )  
-    {
-        g_cursor_x++; 
-        prev = c;
-        return;         
-    };
+    //if( c == ' ' )  
+    //{
+    //    g_cursor_x++; 
+    //    prev = c;
+    //    return;         
+    //};
         
     //delete 
     if( c == 8 )  
@@ -843,6 +850,25 @@ void _outbyte(int c)
 	 
 	if(VideoBlock.useGui == 1)
 	{
+		if ( stdio_terminalmode_flag == 1 )
+		{
+			// NÃO TRANPARENTE
+            //se estamos no modo terminal então usaremos as cores 
+            //configuradas na estrutura do terminal atual.			
+			//draw_char( x, y, c, fgcolor, bgcolor );	
+			draw_char( 8*g_cursor_x, 8*g_cursor_y, c, COLOR_WHITE, COLOR_BLACK );	
+			
+		}else{
+			
+			// TRANSPARENTE
+		   //se não estamos no modo terminal então usaremos
+		   //char transparente.			
+			//drawchar_transparent( x, y, color, c);
+			drawchar_transparent( 8*g_cursor_x, 8*g_cursor_y, COLOR_PINK, c);
+			
+		};
+		
+		/*
 	    //	vsync();
 		
 		// @todo: A char deve ir para um buffer de linha,
@@ -876,6 +902,8 @@ void _outbyte(int c)
 			    //my_buffer_char_blt( gcharWidth*g_cursor_x, gcharHeight*g_cursor_y, COLOR_WINDOWTEXT, c);
 				break;
 		};
+		
+		*/
 
      	goto done;	
 	};

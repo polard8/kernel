@@ -12,6 +12,25 @@
 //... 
 
 
+/*
+//??
+//Credits: Linux like.
+#define TTY_BUFFER_SIZE 1024
+typedef struct tty_queue_d tty_queue_t;
+struct tty_queue_d 
+{
+	unsigned long data;
+	unsigned long head;
+	unsigned long tail;
+	struct process_t *process_list;
+	struct thread_t *thread_list;
+	struct window_d *window_list;
+	char buffer[TTY_BUF_SIZE];
+};
+*/
+
+
+
 //Contador de linhas usados na hora da criação de linhas.
 int ttyLineCounter;
 
