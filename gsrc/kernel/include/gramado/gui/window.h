@@ -859,13 +859,26 @@ int windows_count;
 int window_with_focus;   
 
 //janela do terminal.
+//Configurando a variável global que diz qual é 
+//o ID da janela que tem o terminal virtual ativo.
 int terminal_window;
+
+//Current editbox window id.
+int editbox_window;
+
+//current combobox window id;
+int combobox_window;
+
 
 //Id da janela ativa.
 int active_window;
 
 //Janela de id 0 na z-order
 int top_window;
+
+//
+// ...
+//
 
 // LFB - address for kernel graphic mode
 unsigned long g_kernel_lfb; 

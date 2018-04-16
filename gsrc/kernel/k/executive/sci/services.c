@@ -884,19 +884,19 @@ void *services( unsigned long number,
 			
 		//215
 		case SYS_GETTERMINALWINDOW:
-		    return NULL;
+		    //retorna o ID.
+		    return (void *) systemGetTerminalWindow(); 
 		    break;
 			
 		//216
         //configura qual vai ser a janela do terminal. 		
 		case SYS_SETTERMINALWINDOW:	
-		   //#bugbug: Pagefault.
 		   systemSetTerminalWindow( (struct window_d*) arg2 );	
 		   break;
 		   
 		//217
 		case SYS_GETTERMINALRECT:
-		    return NULL;
+            return NULL; 
 			break;
 			
 		//218

@@ -29,6 +29,8 @@
 int g_system_mode;  //terminal ou edibox. 
  
  
+int systemGetTerminalWindow(); 
+ 
 //configuramos a janela do terminal virtual corrente.. 
 //@todo: isso deve ser uma opção de system call. 
 void systemSetTerminalWindow( struct window_d *window );

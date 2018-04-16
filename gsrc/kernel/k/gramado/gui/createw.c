@@ -1,5 +1,5 @@
 /*
- * File: createw.c
+ * File: gui\createw.c
  *
  * Descrição: 
  *     Gerencia os métodos de criação de molduras de janelas e de janelas simples.
@@ -270,14 +270,14 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	// *Importante: Checando se o esquema de cores está funcionando.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL ){
+	if( (void*) CurrentColorScheme == NULL )
+	{
 		printf("CreateWindow: CurrentColorScheme");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 )
+		{
 		    printf("CreateWindow: CurrentColorScheme validation");
 		    die();			
 		};
@@ -302,9 +302,10 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		// Por enquanto no backbuffer.
         //
 		
-		printf("CreateWindow:\n");
+		// Erro.
+		printf("CreateWindow: window struct \n");
 		refresh_screen();	
-		return NULL; //erro.
+		return NULL; 
 		
     }else{
         
@@ -319,8 +320,9 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		window->objectType = ObjectTypeWindow;
 		window->objectClass = ObjectClassGuiObjects;
 
-		//Id. A janela recebe um id somente na hora de registrar.
-		//window->id = ??.
+		// #importante
+		// Id. A janela recebe um id somente na hora de registrar.
+		// window->id = ??.
 
 	    //Name.
 		window->name = windowname;
@@ -468,13 +470,13 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//Filas de mensagens.
 		//São dessas filas que os programas em user mode
 		//são pegar as mensagens, solicitando através de system call.
-		window->hwndList[0] = 0;
-		window->msgList[0] = 0;
+		window->hwndList[0]  = 0;
+		window->msgList[0]   = 0;
 		window->long1List[0] = 0;
 		window->long2List[0] = 0;
 		
 		//Offsets
-		window->sendOffset = 0;
+		window->sendOffset    = 0;
 		window->receiveOffset = 0;
 		
 		//Buffers support.
@@ -506,6 +508,16 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//Client window support.
 		window->client_window = NULL;  //window.
 		window->rcClient = NULL;       //rect.
+		
+		// Terminal support.
+		// Suporte não tradicional à terminais.
+		window->terminal_used  = (int) 0;
+		window->terminal_magic = (int) 0;
+		window->terminal_tab   = (int) 0;
+		window->teminal_left   = (unsigned long) 0;
+		window->teminal_top    = (unsigned long) 0;
+		window->teminal_width  = (unsigned long) 0;
+		window->teminal_height = (unsigned long) 0;
 		
 		//Desktop support.
 		//window->desktop = (void*) Desktop; //configurado anteriormente.

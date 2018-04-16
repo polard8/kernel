@@ -337,7 +337,16 @@ unsigned long system_procedure( struct window_d *window,
 		//teclas de digitação.
 		case MSG_KEYDOWN:
             switch(long1)
-            {
+            {	
+				// [ ENTER ]
+				case VK_RETURN:
+				    printf("\r");
+					printf("\n");
+					//input esta em stdio.c
+					input( (unsigned long) long1);  
+					goto done;
+					break;
+					
 				//usando o scape para fechar a janela com o foco de entrada.
                 case VK_ESCAPE:
 				    alt_status = 0;
@@ -349,15 +358,31 @@ unsigned long system_procedure( struct window_d *window,
                     KillFocus(window);
 					goto done;				
 				    break;
+					
+				//Obs: Não deve ser preocupação do desenvolvedor de aplicação 
+				//incrementar o cursor quando pressiona a seta.
+				//por isso vou tratálas aqui.
 				
-				case VK_RETURN:
-		
-				   //input esta em stdio.c
-				    printf("\r");
-					printf("\n");
-					input( (unsigned long) long1);  
-					goto done;
-					break;
+				//# bugbug problemas no 'i'.
+				
+				//case VK_RIGHT:	
+				//    g_cursor_x++;
+				//	break;
+				
+				//case VK_LEFT:
+				//    g_cursor_x--;
+				//    break;
+					
+				//case VK_DOWN:
+				//    g_cursor_y++;
+				//    break;
+					
+				//case VK_UP:
+				//    g_cursor_y--;
+				//	break;
+				
+				
+
 
                 //o tab deve fazer parte das teclas de difitação. ??
                 case VK_TAB:
@@ -377,10 +402,14 @@ unsigned long system_procedure( struct window_d *window,
 					input( (unsigned long) long1);  
 					goto done;
                     break;
-				   
-				//teclas de digitação para o editbox.   
-                default:
 					
+				case VK_PAUSE:
+                    if(CtrlStatus == 1){
+					    KiInformation();	
+					}
+					goto done;
+					break;				
+				   					
 					//Se for do tipo terminal as teclas de digitação se 
 					//serão tratadas pelo procedimento de janelas do terminal.
 					//para isso é só ir para o fim desse procedimento.
@@ -421,6 +450,9 @@ unsigned long system_procedure( struct window_d *window,
 					// input:
 					// Devemos nos certificar que input não imprima nada.
 					//
+								//teclas de digitação para o editbox.   
+                
+				default:	
 					input( (unsigned long) long1);      //Coloca no stdin
 					goto done;
                     break; 
@@ -611,7 +643,7 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//Program manager.
                 //@todo: usar F11 para FULL SCREEN.				
-				case VK_F11:
+				case VK_F11:				
 					//if(AltStatus == 1){ window_with_focus = 11; break;};
 					//if(CtrlStatus == 1){ active_window = 11; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F11\n"); break;};

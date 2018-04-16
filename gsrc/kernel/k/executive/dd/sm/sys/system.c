@@ -2572,7 +2572,10 @@ halt:
 };
 
 
- 
+//o ID da janela que tem o terminal virtual ativo.
+int systemGetTerminalWindow(){
+    return (int) terminal_window;	
+}; 
 
 
 //configurar as variáveis de terminal presentes dentro da 
@@ -2607,6 +2610,10 @@ check_window:
 		if( window->used != 1 || window->magic != 1234 ){
 			goto fail;
 		}
+		
+		//Configurando a variável global que diz qual é 
+		//o ID da janela que tem o terminal virtual ativo.
+		terminal_window = (int) window->id;
 		
 		//configura o status do terminal dentro da janela
 		window->terminal_used = 1;
@@ -2731,59 +2738,7 @@ void systemSetTerminalRectangle( unsigned long left,
 								 unsigned long width,
 								 unsigned long height )
 {
-	
-/*	
-	
-	//#bugbug 
-	//@todo: testar essa chamada, parece que esta dando page fault.
-	
-
-    // limits ?
-	
-	//#bugbug
-    //test
-    if( left > 800 || top > 600 )
-	{
-		left = 0;
-		top = 0;
-	};
-
-	//#bugbug
-    //test
-    if( width > 800 || height > 600 )
-	{
-		width = 50;
-		height = 50;
-	};
-	
-	
-	
-setup_terminal:
-
-
-    
-    if( (void *) CurrentTerminal == NULL )
-	{
-		//@todo: create a new terminal.
-	    goto fail;
-	
-	}else{
-	
-		if( CurrentTerminal->used != 1 || CurrentTerminal->magic != 1234 ){
-			goto fail;
-		}
-		
-        // Salvando na estrutura de terminal a janela que estamos usando.
-        CurrentTerminal->left = left;
-		CurrentTerminal->top = top;
-		CurrentTerminal->width = width;
-		CurrentTerminal->height = height;
-		
-		goto done;
-	};	
-	
-	
-*/
+	//terminal_window
 	
 done:
     //...
