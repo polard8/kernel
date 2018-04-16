@@ -29,9 +29,16 @@
 int g_system_mode;  //terminal ou edibox. 
  
  
+//configuramos a janela do terminal virtual corrente.. 
 //@todo: isso deve ser uma opção de system call. 
-void systemSetTerminal( struct window_d *window );
+void systemSetTerminalWindow( struct window_d *window );
 
+
+//configuramos o retângulo do terminal virtual corrente.. 
+void systemSetTerminalRectangle( unsigned long left,
+                                 unsigned long top,
+								 unsigned long width,
+								 unsigned long height );
 
 //
 // #### Aqui devemos configurar manualmente a destinação do sistema. ####

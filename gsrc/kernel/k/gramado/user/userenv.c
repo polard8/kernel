@@ -132,6 +132,11 @@ done:
 /*
  * CreateUser:
  *     Cria um usuário do computador.
+ *     #importante: Quando criar um usuário tem que 
+ * montar uma pasta para ele em /root/user/(name)
+ * Se utilizar um usuário válido é só pegar os arquivos de 
+ * configuração dentro da pasta.
+ * 
  */
 void *CreateUser(char *name, int type)
 {
@@ -144,6 +149,11 @@ void *CreateUser(char *name, int type)
 	    die();
 	}else{
 	    
+		New->used = 1;
+		New->magic = 1234;
+		
+		//New->path = ?
+		
 		New->name = (char *) name;      
 	    New->name_address = (unsigned long) name;
 	    New->userType = type;    
@@ -244,7 +254,17 @@ void UpdateUserInfo( struct user_info_d *user,
 {  
 	if( (void*) user == NULL ){
         return;
-	}else{	
+	}else{
+		
+		//Estamos tentando atualizar uma estrutura válida.
+
+        if( user->used != 1 ){
+			//fail;
+		}  	
+
+        if( user->magic != 1234 ){
+			//fail;
+		}  	
 	    
 		user->userId = (int) id;                      //Id.     
 		user->name = (char *) name;                   //Name.
@@ -273,6 +293,16 @@ done:
  *     Utiliza as informações do usuário ativo. 
  *     O usuário ativo pode ser trocado.
  *     pode ser criar e deletar usuários.
+ *
+ * #importante: As informações de usuário ficam 
+ * em /root/user/(name)
+ * 
+ * Obs: Nessa hora o VFS ja deve estar montado
+ * então pegaremos informações sobre qual é o usuário atual.
+ * /root/user/password.txt
+ * /root/user/username.txt
+ * /root/user/config.txt
+ * ...
  */
 void init_user_info()
 {	 

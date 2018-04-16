@@ -1,5 +1,5 @@
 /*
- * File: stdio.c 
+ * File: uitm\stdio.c 
  *
  * Descrição:
  *     +Rotinas de input/output padrão.
@@ -820,6 +820,9 @@ done:
  *     Um switch percebe o modo de vídeo e como esse caractere deve ser 
  * construído.
  * @todo: ?? Criar uma estrutura para parâmetros de vídeo. ??
+ * 
+ * #importante: Essa rotina de pintura deveria ser exclusiva para 
+ * dentro do terminal. 
  */
 void _outbyte(int c)
 {
@@ -843,6 +846,12 @@ void _outbyte(int c)
 	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
 	// um todo. Só está considerando as dimensões do 'char'.
 	//
+	
+	//
+	//
+	//
+	//
+	//
 
     //
     // Caso estivermos em modo gráfico.
@@ -850,6 +859,11 @@ void _outbyte(int c)
 	 
 	if(VideoBlock.useGui == 1)
 	{
+
+        //#importante: Essa rotina de pintura deveria ser exclusiva para 
+        //dentro do terminal.
+        //então essa flag não faz sentido.		
+ 
 		if ( stdio_terminalmode_flag == 1 )
 		{
 			// NÃO TRANPARENTE

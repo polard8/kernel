@@ -43,6 +43,12 @@ A terminal can have many processes attached to it.
 
 The system creates a new terminal when it starts a terminal process,
 */
+
+
+//test 
+//#bugbug
+#define DEFAULT_TERMINAL_LEFT 0
+#define DEFAULT_TERMINAL_TOP  0
  
 //Constantes.
 #define TERMINAL_LIN_MAX    100    //Número máximo de linhas. 
@@ -98,9 +104,10 @@ struct terminal_d
 	object_type_t objectType;
 	object_class_t objectClass;
 
-    int Id;    //Slot number.(NÚMERO DO TERMINAL)
-    int Used;
-    int Magic;
+    int id;    //Slot number.(NÚMERO DO TERMINAL)
+    
+	int used;
+    int magic;
 	
 	//@todo: Instance.
 	
@@ -116,9 +123,15 @@ struct terminal_d
 	// Os caracteres serão pintados nesse retângulo.
 	// @todo: Uma função deve oferecer a oportunidade de configurar esse
 	// até o limite da área de cliente da janela de instãncia do terminal.
-	struct rect_d *rect;
-	
 
+	//informações básicas sobre o retângulo
+    unsigned long left; 
+	unsigned long top;
+	unsigned long width;
+	unsigned long height;
+	
+	//informações extras sobre o retângulo.
+	struct rect_d *rect;
 	
 	//
 	// Buffers.
@@ -143,9 +156,7 @@ struct terminal_d
 	//struct process_d *Owner;
 	//int UserId;                
 };
-terminal_t *terminal;
-terminal_t *terminalCurrent;
-terminal_t *terminalShell;
+terminal_t *CurrentTerminal;
 //...
 
 

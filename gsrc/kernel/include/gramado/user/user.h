@@ -185,10 +185,17 @@ struct user_info_d
 	object_type_t objectType;
 	object_class_t objectClass;
 	
+	
+	int used;
+	int magic;
+	
 	//File.
 	FILE userinfo;  //User info file.
+	//FILE *userinfo; //?? NÃO SERIA ASSIM ??
+    
+	char *path;  // '/root/user/(name)'
 	
-    //Name.
+	//Name.
 	char *name;
     unsigned long name_address; 	 
 	

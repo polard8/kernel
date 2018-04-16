@@ -1,8 +1,8 @@
 /*
- * File: misc.c
+ * File: libk\misc.c
  *
  * Descrição:
- *    Rotinas variadas em Kernel Mode.
+ *    Rotinas variadas em kernel mode.
  *
  * Versão 1.0, 2015.
  */
@@ -108,6 +108,7 @@ done:
 /*
  * set_up_system_color: 
  *     Configura cor padrão para o sistema.
+ *     @todo: Isso pode ir para outro lugar.   
  */
 void set_up_color(unsigned long color){   
 	g_system_color = (unsigned long) color;	
@@ -119,6 +120,7 @@ void set_up_color(unsigned long color){
  *     Atribui o primeiro plano e o fundo que nós usaremos. 
  *     Top 4 bytes are the background,  bottom 4 bytes
  *     are the foreground color.
+ *     @todo: Isso pode ir para outro lugar.
  */
 void set_up_text_color(unsigned char forecolor, unsigned char backcolor)
 {
@@ -130,6 +132,7 @@ void set_up_text_color(unsigned char forecolor, unsigned char backcolor)
 /*
  * set_up_cursor:
  *     Configura cursor.
+ *     @todo: Isso pode ir para outro lugar.
  */
 void set_up_cursor(unsigned long x, unsigned long y){   
 	g_cursor_x = (unsigned long) x;
@@ -140,6 +143,7 @@ void set_up_cursor(unsigned long x, unsigned long y){
 /*
  * get_cursor_x:
  *     Pega o valor de x.
+ *     @todo: Isso pode ir para outro lugar.
  */
 unsigned long get_cursor_x(){   	
 	return (unsigned long) g_cursor_x;
@@ -148,6 +152,7 @@ unsigned long get_cursor_x(){
 /*
  * get_cursor_y:
  *     Pega o valor de y.
+ *     @todo: Isso pode ir para outro lugar.
  */
 unsigned long get_cursor_y(){         
     return (unsigned long) g_cursor_y; 	

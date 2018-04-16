@@ -22,6 +22,26 @@
 #include <kernel.h>
 
 
+//Onde ficam os códigos e arquivos de configuração usados na inicialização.
+//A ideia é que se a inicialização precisar de algum arquivo, deve procurá-lo
+//nos diretórios previamente combinados.
+//melhor que sejam poucos e que sempre sejam os mesmos.
+
+#define INIT_ROOT_PATH  "/root"
+#define INIT_BIN_PATH   "/root/bin"
+//...
+
+
+//externs
+//@todo:
+//isso deverá ser definido em /gramado.
+//extern char *GramadoSystemRoot;
+//extern char *GramadoMajorVersion;
+//extern char *GramadoMinorVersion;
+//extern char *GramadoVersionString;
+//...
+
+
 //Variáveis internas.
 //int initStatus;
 //...

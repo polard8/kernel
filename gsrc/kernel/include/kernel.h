@@ -243,6 +243,8 @@ extern void do_executa_new_task();
 #include <gramado/gui/menu.h>
 #include <gramado/gui/grid.h>
 #include <gramado/gui/bmp.h>
+#include <gramado/gui/fonts.h>
+
 // gramado/user
 #include <gramado/user/user.h>
 //gramado/logon
@@ -277,6 +279,7 @@ extern void do_executa_new_task();
 #include <executive/dd/sm/network/server.h>      //(network) Server process support.
 #include <executive/dd/sm/network/network.h>     //(network) Gerenciamento de rede. 
 #include <executive/fs/fs.h>                     //fs.
+#include <executive/fs/vfs.h>                     //vfs.
 #include <executive/dd/sm/io.h>                  //io.
 #include <executive/sci/systemcall.h>            //system calls.
 #include <executive/dd/sm/modules.h>             //module manager.

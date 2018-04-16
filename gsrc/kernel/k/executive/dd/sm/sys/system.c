@@ -2572,14 +2572,228 @@ halt:
 };
 
 
-//escolhe uma janela para ser o terminla...
-//@todo podemos ter uma dessas em terminal.c
-void systemSetTerminal( struct window_d *window )
+ 
+
+
+//configurar as variáveis de terminal presentes dentro da 
+//janela.
+//pois cada janela pode ter um terminal. 
+void systemSetTerminalWindow( struct window_d *window )
 {
-    if( (void*) window != NULL ){
-		window->terminal = 1;
-	}	
-}
+
+		// Obs: ?? Como faremos para pintar dentro da janela do terminal.
+        // Obs: a rotina de configuração do terminal deverá ajustar 		
+		// as margens usadas pela rotina de impressão de caracteres.
+        //		
+
+		
+	//
+	// obs:
+    // essa modificação de margens obriga o aplicativo a 
+	// configurar o terminal somente na hora que for usa-lo,
+	// para não correr o risco de imprimir no lugar errado.
+    //	
+		
+check_window:	
+
+	if( (void*) window == NULL )
+	{
+		goto fail;
+	
+	}
+	else
+	{
+		
+		if( window->used != 1 || window->magic != 1234 ){
+			goto fail;
+		}
+		
+		//configura o status do terminal dentro da janela
+		window->terminal_used = 1;
+		//validade e reusabilidade das variáveis de terminal 
+		//dentro da estrutura de janela.
+		window->terminal_magic = 1234; 
+		
+		//tab
+		//número da tab.
+		//indica qual tab o terminal está usando.
+		//@todo:
+		// Criar uma forma de contar as tabs de terminal 
+		// dentro do gerenciador de terminais.
+		window->terminal_tab = 0; 
+		
+		
+	    //rect
+	    window->teminal_left = 0;
+	    window->teminal_top = 0;
+	    window->teminal_width = 0;
+	    window->teminal_height = 0;		
+		//..
+		
+		
+		//
+		// test:
+		// tentando ajustar as margens para as rotinas de impressão.
+		// para que as rotinas de impressão imprimam dentro das 
+		// dimensões do terminal. 
+		// obs: @todo: Essas margens deverão ser reconfiguradas 
+		// quando o terminal é fechado.
+		//
+		
+		// #bugbug:
+        // #importante		
+		// Esse ajuste pode significar problemas.
+        
+		//x
+		if( window->x > 0 )
+		{
+            g_cursor_x = (window->x/8 );     
+		}		
+		
+		//y
+		if( window->y > 0 )
+		{
+            g_cursor_y = (window->y/8 );     
+        }		
+
+        //dimensões do cursor.
+		g_cursor_width = 8;  //??
+        g_cursor_height = 8; //??
+        
+		//cor do cursor
+		g_cursor_color = COLOR_PINK;
+
+		
+		//left
+		if( window->left > 0 )
+		{
+			// margem esquerda dada em linhas
+            window->teminal_left = (window->left/8 );     
+            g_cursor_left = window->teminal_left; 
+		}
+		
+		//top
+		if( window->top > 0 )
+		{
+			// margem superior dada em linhas
+		    window->teminal_top = (window->top/8 ); 
+			g_cursor_top = window->teminal_top;
+        }
+		
+	
+	    if( (window->left + window->width) > 0 )
+		{
+			// margem direita dada em linhas
+			window->teminal_width = (window->left + window->width)/8;
+		    g_cursor_right = window->teminal_width;     
+        }
+		
+		if( (window->top + window->height) > 0 )
+		{
+			// margem inferior dada em linhas
+			window->teminal_height = (window->top + window->height)/8;
+		    g_cursor_bottom = window->teminal_height;   
+		}
+		
+		//limits
+		//@todo: corrigir.
+		// ajustes temporários ...
+		if( g_cursor_left > 800 ){
+			g_cursor_left = 795;
+		};
+
+		if( g_cursor_top > 600 ){
+			g_cursor_top = 595;
+		};
+		
+		if( g_cursor_right > 800 ){
+			g_cursor_right = 795;
+		};
+
+		if( g_cursor_bottom > 600 ){
+			g_cursor_bottom = 595;
+		};
+		
+	};
+		
+done:
+    //...
+fail:	
+    return;
+};
+
+
+
+//@todo: precisamos de argumentos.
+//configuramos o retângulo do terminal virtual corrente.. 
+void systemSetTerminalRectangle( unsigned long left,
+                                 unsigned long top,
+								 unsigned long width,
+								 unsigned long height )
+{
+	
+/*	
+	
+	//#bugbug 
+	//@todo: testar essa chamada, parece que esta dando page fault.
+	
+
+    // limits ?
+	
+	//#bugbug
+    //test
+    if( left > 800 || top > 600 )
+	{
+		left = 0;
+		top = 0;
+	};
+
+	//#bugbug
+    //test
+    if( width > 800 || height > 600 )
+	{
+		width = 50;
+		height = 50;
+	};
+	
+	
+	
+setup_terminal:
+
+
+    
+    if( (void *) CurrentTerminal == NULL )
+	{
+		//@todo: create a new terminal.
+	    goto fail;
+	
+	}else{
+	
+		if( CurrentTerminal->used != 1 || CurrentTerminal->magic != 1234 ){
+			goto fail;
+		}
+		
+        // Salvando na estrutura de terminal a janela que estamos usando.
+        CurrentTerminal->left = left;
+		CurrentTerminal->top = top;
+		CurrentTerminal->width = width;
+		CurrentTerminal->height = height;
+		
+		goto done;
+	};	
+	
+	
+*/
+	
+done:
+    //...
+fail:	
+    return;
+};
+
+
+
+
 
 //retorna informações sobre o sistema.
 //@todo: Criam um enum para essa função, aqui mesmo nesse arquivo.

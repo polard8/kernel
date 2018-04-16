@@ -559,6 +559,13 @@ void *services( unsigned long number,
 		//@todo: implementar a configuração de cores no terminal virtual 
 		//usado pelo aplicativo.
 		//obs: estamos improvisando as cores por enquanto.
+		//
+		// Obs: ?? Como faremos para pintar dentro da janela do terminal.
+        // Obs: a rotina de configuração do terminal deverá ajustar 		
+		// as margens usadas pela rotina de impressão de caracteres.
+        // então nesse momento devemos considerar que as margens ja estão 
+        // ajustadas.		
+        //		
 		case SYS_PUTCHAR:
 		    stdio_terminalmode_flag = 1;  // seleciona não transparente.
 			putchar( (int) arg2 );
@@ -851,11 +858,67 @@ void *services( unsigned long number,
 		    //argumentos (process handle, signal number).
 		    signalSend((void*) a2, (int) arg3);
 		    break;
-		
+			
+		//...	
+			
+		//210
+		case SYS_CREATETERMINAL: 
+            break;
+		//211
+        case SYS_GETCURRENTTERMINAL:
+            return NULL;
+			break;
+			
+	    //212
+        case SYS_SETCURRENTTERMINAL:
+            break;
+			
+		//213
+        case SYS_GETTERMINALINPUTBUFFER:	
+            return NULL;
+			break;
+			
+		//214
+        case SYS_SETTERMINALINPUTBUFFER:		
+		    break;
+			
+		//215
+		case SYS_GETTERMINALWINDOW:
+		    return NULL;
+		    break;
+			
+		//216
         //configura qual vai ser a janela do terminal. 		
 		case SYS_SETTERMINALWINDOW:	
-		    systemSetTerminal( (struct window_d*) arg2);	
+		   //#bugbug: Pagefault.
+		   systemSetTerminalWindow( (struct window_d*) arg2 );	
+		   break;
+		   
+		//217
+		case SYS_GETTERMINALRECT:
+		    return NULL;
+			break;
+			
+		//218
+        //configura na estrutura do terminal corrente,
+        //qual vai ser o retãngulo a ser usado. 		
+		case SYS_SETTERMINALRECT:
+		
+		   //#bugbug: Pagefault.
+		   
+		    // Estamos usando default por falta de argumento.
+            //systemSetTerminalRectangle( DEFAULT_TERMINAL_LEFT, 
+			//                            DEFAULT_TERMINAL_TOP, 
+			//							arg3, 
+			//							arg4 );		
 		    break;
+			
+		//219
+        case SYS_DESTROYTERMINAL:
+            break; 		
+			
+		//Obs: @todo: poderia ser uma chamada para configurar o posicionamento 
+        //e outra para configurar as dimensões.		
 			
 		//226 get
         case SYS_GET_KERNELSEMAPHORE:

@@ -1190,6 +1190,20 @@ struct window_class_d
  * window_d:
  *     Window - nível 1. 
  *     Estrutura para janelas.
+ *
+ * terminal:
+ *     Toda estrutura de janela poderá ter apenas 
+ * um terminal.
+ *     Colocar um terminal dentro da estrutura de janela 
+ * não impede o sistema de ter as estruturas tradicionais 
+ * de terminal, porém pode trazer algumas vantagens na hora 
+ * da manipulação do retângulo que compreende tanto a tela
+ * do terminal quanto a área de cliente da janela.
+ *    Porém um terminal pode ser full screen e não 
+ * pertencer a uma janela. Para isso ele considera apenas 
+ * as dimensões da tela. Nesse caso o terminal seria 
+ * gerenciado por uma estrutura tradicional de terminal.
+ *
  */
 typedef struct window_d window_t;
 struct window_d
@@ -1388,9 +1402,48 @@ struct window_d
 	
 //unsigned long scancodeList[32];	
 	
-	//flag
-	//se é um terminal ou não.
-	int terminal;
+	//
+	// TERMINAL SUPPORT
+	//
+	
+	// Obs: 
+	// Essas variáveis só serão inicializadas se o 
+	// aplicativo decidir que conterá um terminal em sua 
+	// janela.
+	// Um aplicativo só poderá ter um terminal dentro de cada janela.
+	// Ou seja, se um aplicativo quiser ter mais de um terminal virtual, 
+	// vai precisar de uma janela para cada terminal dentro do aplicativo.
+    // isso permite facilmente que um mesmo aplicativo rode vários
+    // programas, um em cada aba.
+    // Ao invés de criar um frame para cada aplicativo que rode em terminal,
+    // é só criar uma nova aba no gerenciador de terminais virtuais ...
+    // esse gerenciador de terminais virtuais poderia ser o shell.bin	
+	//
+	
+	//flags
+	
+	//configura o status do terminal dentro da janela
+	int terminal_used;     //Se é um terminal ou não.
+	
+	//validade e reusabilidade das variáveis de terminal 
+	//dentro da estrutura de janela.	
+	int terminal_magic;
+	
+	//tab
+	//número da tab.
+	//indica qual tab o terminal está usando.
+	//@todo:
+	// Criar uma forma de contar as tabs de terminal 
+	// dentro do gerenciador de terminais.
+	int terminal_tab; // em qual tab do gerenciador de terminais está o terminal.
+	
+	//rect
+	unsigned long teminal_left;
+	unsigned long teminal_top;
+	unsigned long teminal_width;
+	unsigned long teminal_height;
+	
+	//...
 	
 	//@todo: isso deve pertencer a uma janela.
 	//se uma janela tiver o foco de entrada e for um terminal 

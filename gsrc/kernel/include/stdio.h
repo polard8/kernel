@@ -381,9 +381,29 @@ static char prompt_cursor[] = "$";
 static char prompt_string[] = "Prompt:";
 
 
-//flag usada por _outbyte para decidir
-//se desenha um char transparente ou não.
+//
+// Print char flags. (_outbyte)
+// usada para rotinas de pintura da libC.
+// ou seja, dentro do terminal. 
+//
+
+//
+//#importante: 
+//
+//  +++ Não se escreve fora do terminal com printf. +++
+//
+// Como não se escreve fora no terminal com printf.
+// essa flag só faz sentido dentro de stdio.c
+//
+// Para rotinas de pintura fora do terminal poderemos 
+// usar os dois tipos de draw char.
+//
+// flag usada por _outbyte para decidir
+// se desenha um char transparente ou não.
 int stdio_terminalmode_flag;
+
+
+//
 
 /*
  * FILE:

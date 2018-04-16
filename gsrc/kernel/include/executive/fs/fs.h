@@ -241,6 +241,27 @@ struct IMAGE_SECTION_HEADER { // size 40 bytes
 */
  
  
+ 
+//links para arquivos ou diretórios dentro do mesmo sistema de arquivos. 
+typedef struct hardlink_d hardlink_t; 
+struct hardlink_d
+{
+	int used;
+	int magic;
+	//..
+	
+};
+ 
+//links para arquivos e diretórios em volumes espalhados por vários discos. 
+typedef struct softlink_d softlink_t; 
+struct softlink_d
+{
+	int used;
+	int magic;
+	//..
+};
+ 
+ 
 /*
  * mbr_d:
  *     Structure for MBR parameters.
@@ -497,11 +518,24 @@ struct dir_entry_d
 /*
  * dir_d:
  *     Estrutura para diretório de arquivo.
- *
+ *     #importante: Entrada de diretório baseada em strams. 
  */
 typedef struct dir_d dir_t;
 struct dir_d
 {
+	//
+	// @todo: Criar e organizar os elementos dessa estrutura.
+	//
+	
+	//
+	int used;
+	
+	//
+	int magic;
+	
+	// Parte principal da estrutura
+	FILE *stream;
+	
 	//
     // @todo: Incluir informações extras sobre o diretório,
 	//        como se está ou não carregado na memória, endereço,
@@ -511,6 +545,12 @@ struct dir_d
 	//struct user_info_d *OwnerUser;	
 	//struct process_d *OwnerProcess;
 	
+	
+	// numero de bytes em uma entrada.
+	int entry_size_in_bytes;
+	
+	//numero total de bytes no diretório.
+	int totalentries_size_in_bytes;
 	
     /*
      * Númetro máximo de arquivos em um diretório.

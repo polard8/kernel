@@ -3,7 +3,6 @@
  *
  * Descrição: 
  *     Rotinas paga gerenciar os controladores de video.
- *     Faz parte do modulo HAL. (hardware)
  *     Crt, Vga ...
  *
  * History:
@@ -17,6 +16,7 @@
 
 //Definições internas.
 
+//@todo: Criar um arquivo para gerenciar fontes.
 #define VIDEO_BIOS_FONT8X8_ADDRESS 0x000FFA6E
 //#define VIDEO_BIOS_FONT8X16_ADDRESS (0x000FFA6E+??)
 //...
