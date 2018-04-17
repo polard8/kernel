@@ -1,5 +1,8 @@
-
-//abnt2.h
+/*
+ * File: abnt2.h 
+ *     Header de suporte ao teclado abnt2.
+ *
+ */
 
 
 //Usado no mapa de caracteres. 
@@ -14,6 +17,7 @@
 
 
 //ASCII
+
 //A disciplina de linhas precisa disso.
 #define KEY_RETURN   13     //sc 28
 #define KEY_TAB	     15
@@ -26,6 +30,7 @@
 #define KEY_SPACE	 57     //32
 #define KEY_WINKEY	 91   
 #define KEY_DELETE   127    //sc 83
+
 #define KEY_F1  0x80
 #define KEY_F2  (KEY_F1 + 1)
 #define KEY_F3  (KEY_F2 + 1)
@@ -38,25 +43,30 @@
 #define KEY_F10 (KEY_F9 + 1)
 #define KEY_F11 (KEY_F10 + 1)
 #define KEY_F12 (KEY_F11 + 1)
+
 //Mouse
 #define KEY_MOUSEBUTTON1   5000
 #define KEY_MOUSEBUTTON2   5000
 #define KEY_MOUSEBUTTON3   5000
 
 
+// Char map size.
 #define ABNT2_CHARMAP_SIZE  136 
 
 
 //
-// Endereços de charmaps usados.
+// Endereços dos charmaps usados:
 // Obs: Incluídos na estrutura.
+//
 //unsigned long normal_charmap_address;
 //unsigned long shift_charmap_address;
 //unsigned long control_charmap_address;
+//
+
 
 /*
  * NORMAL ABNT2.
- * ?? const char* ??
+ *     ?? const char* ??
  */
 static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  0,      //Scancode 0.
@@ -97,22 +107,22 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'h',
  'j',
  'k',
- 'l',    //38 
- 135,    //39 00e7 ccedilla
- '~',    //40 dead_tilde	dead_circumflex
- '\'',    //41 (") (espaço) (') dead_acute dead_diaeresis 
- VK_LSHIFT,    //42 Shift.  
- ']',    //43 bracketright braceright asciitilde Control_bracketright 
- 'z',    //44 
+ 'l',        //38 
+ 135,        //39 00e7 ccedilla
+ '~',        //40 dead_tilde	dead_circumflex
+ '\'',       //41 (") (espaço) (') dead_acute dead_diaeresis 
+ VK_LSHIFT,  //42 Shift.  
+ ']',        //43 bracketright braceright asciitilde Control_bracketright 
+ 'z',        //44 
  'x',
  'c',
  'v',
  'b',
  'n',
- 'm',  //50 
- ',',  //51 comma  less
- '.',  //52 period greater 
- ';',  //53  numlockdesligado=(;) numlockligado=(/)abnt2.
+ 'm',          //50 
+ ',',          //51 comma  less
+ '.',          //52 period greater 
+ ';',          //53  numlockdesligado=(;) numlockligado=(/)abnt2.
  VK_RSHIFT,    //54 Right Shift.
  '*',          //55 abnt2(NUM *) (NUM lock??).(printscreen(abnt2))
  VK_ALTGR,     //56 abnt2=(Alt). VK_ALTGR (@todo)

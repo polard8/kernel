@@ -227,6 +227,7 @@ unsigned long alt_status;
 unsigned long shift_status;
 unsigned long capslock_status;
 unsigned long numlock_status;
+unsigned long scrolllock_status;
 //...
 
 //
@@ -327,7 +328,9 @@ unsigned long keyboardGetKeyState(unsigned char key)
 		    State = numlock_status;
 		    break;
 			
-		//VK_SCROLLOCK	
+		case VK_SCROLL:
+            State = scrolllock_status;
+            break;			
 			
 		//...
 	};
@@ -406,6 +409,12 @@ void keyboard_set_leds(char flag)
     //Send flag. 
 	outportb(0x60,flag);
 	sleep(100);
+	
+	//@todo mudar o status.
+    //switch(flag)
+    //{
+		
+	//}	
 
 done:
 	return;
@@ -520,17 +529,18 @@ void LINE_DISCIPLINE(unsigned char SC)
             case VK_LMENU:
 				alt_status = 0;
 				mensagem = MSG_SYSKEYUP;
-			    break;
-
-			//@todo: alt gr.
-
+			    break;				
+			
 			//right winkey liberada.
 			case VK_RWIN:
 			    winkey_status = 0;
                 mensagem = MSG_SYSKEYUP;
 				break;
 
-			//@todo: control menu.
+			//control menu.
+			case VK_CONTROL_MENU:
+			    mensagem = MSG_SYSKEYUP;
+			    break;
 
             //right control liberada.
 			case VK_RCONTROL:
@@ -614,17 +624,24 @@ void LINE_DISCIPLINE(unsigned char SC)
 		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
 		switch(key)
 		{
+			//back space será tratado como tecla normal
+			
 			//@todo: tab,
-
+            //?? tab será tratado como tecla normal por enquanto.
+			
+			//caps lock keydown
 			case VK_CAPITAL:
 			    //muda o status do capslock não importa o anterior.
-				if(capslock_status == 0)
-				{ 
-				    capslock_status = 1;
-					keyboard_set_leds(LED_CAPSLOCK);
+				if(capslock_status == 0){ 
+				    capslock_status = 1; 
+					mensagem = MSG_SYSKEYDOWN; 
 					break; 
 				};
-				if(capslock_status == 1){ capslock_status = 0; break; };
+				if(capslock_status == 1){ 
+				    capslock_status = 0; 
+					mensagem = MSG_SYSKEYDOWN; 
+					break; 
+				};
 				break; 
 
 			//Left shift pressionada.
@@ -695,13 +712,31 @@ void LINE_DISCIPLINE(unsigned char SC)
 			//Num Lock.	
 		    case VK_NUMLOCK:
 			    //muda o status do numlock não importa o anterior.
-				if(numlock_status == 0)
-				{
-				    numlock_status = 1;
-					keyboard_set_leds(LED_NUMLOCK);  //@retorno.
+				if(numlock_status == 0){
+		            numlock_status = 1;
+					mensagem = MSG_SYSKEYDOWN;
 					break;
 				};
-				if(numlock_status == 1){ numlock_status = 0; break; };
+				if(numlock_status == 1){ 
+				    numlock_status = 0;
+                    mensagem = MSG_SYSKEYDOWN; 					
+					break; 
+				};
+			    break;
+				
+			//Scroll Lock.	
+		    case VK_SCROLL:
+			    //muda o status do numlock não importa o anterior.
+				if(scrolllock_status == 0){
+		            scrolllock_status = 1;
+					mensagem = MSG_SYSKEYDOWN;
+					break;
+				};
+				if(scrolllock_status == 1){ 
+				    scrolllock_status = 0;
+                    mensagem = MSG_SYSKEYDOWN; 					
+					break; 
+				};
 			    break;
 
             //...
@@ -1207,6 +1242,7 @@ void init_keyboard()
     alt_status = 0;
     shift_status = 0;
 	capslock_status = 0;
+	scrolllock_status = 0;
 	numlock_status = 0;
 	//...
 

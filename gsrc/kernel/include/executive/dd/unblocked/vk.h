@@ -47,11 +47,13 @@
 #define VK_PONTO       0x34  //52 abnt
 #define VK_PONTOVIRGULA  0x35  //53 abnt
 #define VK_RSHIFT	   0x36  //54  //0xA1
+
 #define VK_ALT         0x38  //56   
 #define VK_LMENU	   0x38  //56   //Não mudar.
 #define VK_MENU        0x38  //56 
 #define VK_RMENU	   0x38  //56   //@todo:Mudar esse
 #define VK_ALTGR       0x38  //56 abnt //100 //56
+
 #define VK_SPACE       0x39  //57  //Space.
 #define VK_CAPITAL	   0x3A  //58  //20  
 #define VK_F1	0x3B  //59   // No DOS é 0x170.  
@@ -101,17 +103,24 @@
 #define VK_NUMPAD5	 0x65
 #define VK_FIND      0x66  //102
 #define VK_NUMPAD6	 0x66
+
 #define VK_UP	     0x67  //103 //72 
 #define VK_NUMPAD7	 0x67  //??
+
 #define VK_PRIOR     0x68  //104 //33 (prior).
 #define VK_NUMPAD8	 0x68  //??
+
 #define VK_LEFT	     0x69  //105 //75 
 #define VK_NUMPAD9   0x69  //??
+
 #define VK_RIGHT     0x6A  //106 //77	
+
 #define VK_MULTIPLY  0x6A  //??
 #define VK_SELECT	 0x6B  //107 //41
 #define VK_ADD       0x6B  //??
+
 #define VK_DOWN	     0x6C  //108 //80
+
 #define VK_SEPARATOR 0x6C  //??
 #define VK_NEXT	     0x6D  //109 //34
 #define VK_SUBTRACT  0x6D  //??

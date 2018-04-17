@@ -38,6 +38,9 @@
 extern int alt_status;
 extern int ctrl_status;
 extern int shift_status;
+extern int capslock_status;
+extern int numlock_status;
+extern int scrolllock_status;
 //...
 
 //
@@ -659,7 +662,7 @@ unsigned long system_procedure( struct window_d *window,
 					//refresh_screen();
 					break;
 					
-				//Control menu.	
+					
 				//case VK_F12:
 					//if(AltStatus == 1){ window_with_focus = 12; break;};
 					//if(CtrlStatus == 1){ active_window = 12; break;};
@@ -731,44 +734,89 @@ unsigned long system_procedure( struct window_d *window,
 					//resize_window(xxxx, 100, 100);
 					//redraw_window(xxxx);
 				//	break;
+				
+				//caps lock keydown
+				case VK_CAPITAL:
+			        //Apenas percebe o status e efetua uma ação, 
+					//mas não altera o status.
+				    if(capslock_status == 1){ 
+				        keyboard_set_leds(LED_CAPSLOCK);
+					    break; 
+				    };
+				    break;
 					
                 // Nothing for now!  				
                 case VK_LMENU:
-                    if( alt_status == 0 ){ 
-					    alt_status = 1; 
-					}else{ alt_status = 0; };				
+                    if( alt_status == 1 ){ 
+					    //todo 
+					};				
 				    break;
 					
+				// Nothing for now!	
                 case VK_LCONTROL: 
-				    if( ctrl_status == 0 ){ 
-					    ctrl_status = 1; 
-					}else{ ctrl_status = 0; };
+				    if( ctrl_status == 1 ){ 
+					    //todo
+					};
 					break;
                 
+				// Nothing for now!
 				case VK_LSHIFT:   
-				    if( shift_status == 0 ){ 
-					    shift_status = 1; 
-					}else{ shift_status = 0; };
+				    if( shift_status == 1 ){ 
+					    //todo.    
+					}
 				    break;
 					
-                //default: break;				
+			    //Num Lock.	
+		        case VK_NUMLOCK:
+				    if(numlock_status == 1){
+					    keyboard_set_leds(LED_NUMLOCK);  
+					    break;
+				    };
+			        break;
+					
+			    //Scroll Lock.	
+		        case VK_SCROLL:
+				    if(scrolllock_status == 1){
+		                keyboard_set_leds(LED_SCROLLLOCK);
+					    break;
+				    };
+			        break;
+					
+                default: 
+				    break;				
 		    };              
         break;
 		
 		/* ## Teclas do sistema interceptadas pelo kernel ## */  
-		/*
+		
 		case MSG_SYSKEYUP: 
             switch(long1)  
             {
 				//0x5B.
                 //Left WinKey system keyup. 
                 //#super.
-				case VK_LGRAMADO:
-                    procedureGrid();  //Grid de botões usado pelo kernel.				
-				break; 		
+				//case VK_LGRAMADO:
+                //    procedureGrid();  //Grid de botões usado pelo kernel.				
+				//break;
+
+                case VK_LWIN:
+                case VK_RWIN:
+				    //control menu.
+					MessageBox(gui->screen, 1, "Win Key:","MSG_SYSKEYUP VK_LWIN or VK_RWIN");
+                    break;
+					
+				//test.
+				//control menu. (application)
+                case VK_CONTROL_MENU:
+				    //control menu.
+					MessageBox(gui->screen, 1, "Control menu:","MSG_SYSKEYUP.VK_CONTROL_MENU");
+                    break;
+					
+                default:
+                    break;				
             };          
         break;
-		*/
+		
 
 		// Essa categoria é para receber mensagens
         //enviadas para o console para gerenciamento do sistema.
