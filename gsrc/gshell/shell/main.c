@@ -86,6 +86,22 @@ int shellError;
 
 
 //
+// Input flags.
+//
+
+
+int ShellFlag = 0;
+
+#define SHELLFLAG_NULL 0
+#define SHELLFLAG_COMMANDLINE 1
+#define SHELLFLAG_SCRIPT 2
+#define SHELLFLAG_HELP 3
+#define SHELLFLAG_VERSION 4
+#define SHELLFLAG_USAGE 5
+//...
+
+
+//
 // Protótipos para funções internas.
 //
 
@@ -121,7 +137,10 @@ unsigned long shellProcedure( struct window_d *window,
  *
  * Obs: Esses argumentos podem ser um padrão.
  */
-void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
+
+//opção. 
+//void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
+int GramadoMain( int argc, char *argv[], unsigned long long1, unsigned long long2 ) 
 {
 	
 	//
@@ -171,11 +190,23 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 
 	
 	int Status = 0;
-	int ShellFlag = 0;
 	char *s;    //String	
 
 	//...
 	
+	//@todo:
+	//Podemos começar pegando o id do processo atual e 
+	//melhorando a prioridade.
+	
+	
+	// get current dir
+	//pegamos o diretório atual.
+	
+	//get user dir
+	//pegamos o diretório do usuário /root/user/(name)
+	
+	//set current dir
+	//setamos para que o diretório do usuário seja o diretório atual.
 	
 	
 	//
@@ -244,41 +275,63 @@ void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
 			{
                 switch(*s) 
 				{
+					//Null
+					case 0:
+					    ShellFlag = SHELLFLAG_NULL; 
+						break;
+						
+					
+					// -c 
+                    // Modo command line.					
+					case 'c':
+					    ShellFlag = SHELLFLAG_COMMANDLINE;
+					    break;
+	
+					// -s 
+					// Modo script.
+					case 's':
+					    ShellFlag = SHELLFLAG_SCRIPT;
+						break;
+
+					// -h 
+                    // help					
                     case 'h':
+					    ShellFlag = SHELLFLAG_HELP;
                         //if (!strcmp( argv[argc], "help" )){ ... };
 						//if (!strcmp( argv[argc], "HELP" )){ ... };
 						//...
-						ShellFlag = 0;
                         break;
 
+					// -v 
+                    // version					
                     case 'v':
+					    ShellFlag = SHELLFLAG_VERSION;
 					    //if (!strcmp( argv[argc], "version" )){ ... };
 						//if (!strcmp( argv[argc], "VERSION" )){ ... };
 						//...
-                        ShellFlag = 0;
                         break;
 
-                    case 'r':
+                    // -u 
+					// usage
+					case 'u':
+					    ShellFlag = SHELLFLAG_USAGE;
 					    //if (!strcmp( argv[argc], "XXX" )){ ... };
-					    ShellFlag = 0;
                         break;
 
-                    case 'f':
-					    //if (!strcmp( argv[argc], "XXX" )){ ... };
-						ShellFlag = 0;
-                        break;
+                    //...
 
                     default:    
-					    //usage();
+						ShellFlag = SHELLFLAG_USAGE;
+						//usage();
 						break;
                 };
             };
-        }
-        else 
-		{
-			goto noArgs; 
-            //usage();
-        }
+        
+		}else{
+			ShellFlag = SHELLFLAG_NULL;
+			//usage();
+			goto noArgs;   
+        };
     };
 	
 	//Nothing.
@@ -392,6 +445,7 @@ noArgs:
 	
 	apiBeginPaint();
 	
+	// #bugbug o tipo editbox está falhando....
 	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
 	                                   shell_window_x, shell_window_y, 
@@ -417,7 +471,8 @@ noArgs:
 	APIresize_window( hWindow, 640, 480);
 	*/
 	
-	
+	//#bugbug 
+	//Não é possível configurar a estrutura de janela diretamente.
 
 	
 	//
@@ -452,7 +507,10 @@ noArgs:
 	//o input de texto pode vir de várias fontes.
 	//api_set_window_with_text_input(hWindow);
 	
-	// ** terminal **
+	//
+	// ++ terminal ++
+	//
+	
 	//definindo a janela como sendo uma janela de terminal.
 	//isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
 	//para essa janela e não apenas ao procedimento de janela do sistema.
@@ -614,10 +672,10 @@ noArgs:
 	
 	//isso é um teste pegar um valor por vez não é a melhor opção.
 	
-	struct window_d *hwTest;
-	int msgTest;
-	void *long1;
-	void *long2;
+	struct window_d *msg_Window;
+	int msg_Message;
+	void *msg_Long1;
+	void *msg_Long2;
 	
 	//struct shell_message_d *msg;
 
@@ -646,7 +704,7 @@ noArgs:
        apiBeginPaint();
 	   
 		//msg->window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
- 		hwTest = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
+ 		msg_Window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
 		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
 									  (unsigned long) hWindow );
@@ -654,21 +712,21 @@ noArgs:
         //#bugbug ( Aqui devemos pegar a mensagem sem se preocupar em
 		//identificar o dispositivo gerador do evento.
 		//msg->msg = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE,
-        msgTest = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 		
+        msg_Message = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 		
 		                              (unsigned long) hWindow,  
 									  (unsigned long) hWindow, 
 									  (unsigned long) hWindow );
 									  
 		 
 		//msg->long1 = (unsigned long) system_call( SYSTEMCALL_GET_LONG1,
-        long1 = (void*) system_call( SYSTEMCALL_GET_LONG1,		
+        msg_Long1 = (void*) system_call( SYSTEMCALL_GET_LONG1,		
 		                             (unsigned long) hWindow, 
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );
 									 
 		 
 		//msg->long2 = (unsigned long) system_call( SYSTEMCALL_GET_LONG2,
-        long2 = (void*) system_call( SYSTEMCALL_GET_LONG2,		
+        msg_Long2 = (void*) system_call( SYSTEMCALL_GET_LONG2,		
 		                             (unsigned long) hWindow, 
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );
@@ -685,7 +743,7 @@ noArgs:
 		// Send Message to procedure.
 		
 		//if( (int) msg->msg != 0 )
-        if( (int) msgTest != 0 )			
+        if( (int) msg_Message != 0 )			
 		{
             //
             // *IMPORTANTE:
@@ -694,10 +752,10 @@ noArgs:
 			//  CRIADAS PELO SISTEMA PODERÃO SER AFETADAS POR ESSE PROCEDIMENTO??
 			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
             //			
-		    shellProcedure( (struct window_d *) hwTest, 
-			                (int) msgTest, 
-							(unsigned long) long1, 
-							(unsigned long) long2 );
+		    shellProcedure( (struct window_d *) msg_Window, 
+			                (int) msg_Message, 
+							(unsigned long) msg_Long1, 
+							(unsigned long) msg_Long2 );
 
 		    //shellProcedure( msg->window, msg->msg, msg->long1, msg->long2 ); 
 							
@@ -716,6 +774,8 @@ noArgs:
 	//
 	
 end:
+    printf("shell loop fail!");
+    refresh_screen();	
     while(1){}    //Hang.
     //MessageBox(...);	
 	exit(0);  
@@ -738,108 +798,86 @@ shellProcedure( struct window_d *window,
     unsigned long input_ret;
     unsigned long compare_return;	
 	
+	
+	//if( msg == COMMAND_INITIALIZE_SHELL ){
+		//...
+	//}
+	
     switch(msg)
-    { 
+    {
+		//Faz algumas inicializações de posicionamento e dimensões.
+        //case MSG_INITDIALOG:
+        //    break;
+
+		//Torna a janela visível.
+        //case MSG_SHOWWINDOW:
+		//    break; 
+		 
 		case MSG_KEYDOWN:
             switch(long1)
             {
-				//Null key
+				// Null key.
 				case 0:
-				    return 0;
-					//#BUGBUG esse null aqui dava problemas na digitação.
-					//printf(" null ");
+				    return (unsigned long) 0;
 				    break;
 				
-				//reset prompt.
-				//case '8':
-				//    shellPrompt();
-				//    goto done;
-				//	break;
-				    
-				//test return
-				//case '9':
+				// Enter.
+				// Finaliza a string e compara.
 				case VK_RETURN:
-				    input('\0'); //finaliza a string.
+				    input('\0'); 
 					shellCompare(window);
 					goto done;
-                    break;
-                //Mostrar o buffer
-                //case '1':
-                   // printf("%s\n",&prompt[0]);
-				//    break; 
-
-				//Mostrar o buffer	
-               // case '2':
-                //    printf("%s\n",prompt);
-				//    break; 
-
-				//	
-                //case '#':
-				//case '3':
-				//    printf("Shell procedure case 3\n");
-                //    break;
-					
-                //case '9':
-                //    MessageBox( 1, "Shell","Test 9");
-                //    break; 					
+                    break; 					
                               
-                //Texto - Envia o caractere.
-                   //Imprime os caracteres normais na janela com o foco de entrada.
-				//enfilera os caracteres na string 'prompt[]'.
-				   //para depois ser comparada com outras strings.
+                // Mensagens de digitação.
+				// Texto. Envia o caractere.
+                // Imprime os caracteres normais na janela com o foco de 
+				// entrada.
+				// Enfilera os caracteres na string 'prompt[]' para depois 
+				// ser comparada com outras strings.
                 default:			   
-				    input( (unsigned long) long1);      //Coloca no stdin
-                    shellInsertNextChar((char) long1);  //Coloca no stdout
+				    
+					// Coloca no stdin.
+					input( (unsigned long) long1);      
+                    
+					// Coloca no stdout.
+					shellInsertNextChar((char) long1);  
 					
-					//#BUGBUG 
-					//Não está havendo o refresh do char, ele é pintado no 
-					//backbuffer mas não aparece é efetuado o refresh do char.
-					//obs: isso é o certo para alguns casos, para outros o char 
-					//tem que aparecer.
-					printf("%c", (char) long1); 		//#importante: IMPRIMINDO.			
+					// #importante: IMPRIMINDO.
+					// Funcionando bem.
+					printf("%c", (char) long1); 					
 					goto done;
                     break;               
             };
         break;
 		
 		case MSG_KEYUP: 
-		    //printf("%c", (char) 'u');
-           // printf("%c", (char) long1);  			
+		    // printf("%c", (char) 'u');
+            // printf("%c", (char) long1);  			
 		    break;
 		
-		//Não intercptaremos mensagens do sistema por enquanto.
+		//Não interceptaremos mensagens do sistema por enquanto.
 		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
 		//do sistema.
-		// call defproc
-		//case MSG_SYSKEYDOWN:
-		//    switch(long1)
-		//    {
-		//		case VK_ESCAPE: printf("shell procedure Esc\n");
-		//	};
-		//break;
 		
-		// call defproc
-		//case MSG_SYSKEYUP: 
-		    //printf("%c", (char) 'U');
-            //printf("%c", (char) long1);			
+		//case MSG_SYSKEYDOWN:
+		//case MSG_SYSKEYUP: 		  
 		//    break;
-          
-		//
-        //  *** Aqui o procedimento de janelas do kernel vai enviar uma mensagem 
-		// notificando que os botões de controle F1 ou F2 foram apertados ... 
-		//      F1 significa que temos que abri o menu de aplicativos e 
-		// F2 significa que temos que abrir a janela do interpretador de comando ...
-        //		
-		  
+		
+
+        // Commands.		
 		case MSG_COMMAND:
             switch(long1)
 			{
+				// Null.
 				case 0:
 				    MessageBox( 1, "Shell","Testing MSG_COMMAND.NULL.");
 				    break;
 				
-				//About
+				// About.
+				// Abre uma janela e oferece informações sobre o aplicativo.
 				case CMD_ABOUT:
+				    // Test.
 				    MessageBox( 1, "Shell","Testing MSG_COMMAND.CMD_ABOUT.");
 				    break;
 				
@@ -868,6 +906,9 @@ shellProcedure( struct window_d *window,
 			//pode ser uma janela filha ou ainda uma janela de dialogo criada pelo sistema.
 			//??
 		    printf("SHELL.BIN: MSG_CLOSE\n");
+			
+			//@todo: Criar essa função na api.
+			//apiExitProcess(0);
 			break;
 		
 		//Essa mensagem pode ser acionada clidando um botão.
@@ -1015,7 +1056,7 @@ exit:
  * Credits:
  * + Stephen Brennan - https://brennan.io/2015/01/16/write-a-shell-in-c/
  * + Frederico Lamberti Pissarra 
- *
+ * + Frederico Martins Nora (frednora)
  */
  
 #define LSH_TOK_DELIM " \t\r\n\a" 
@@ -1238,6 +1279,16 @@ do_compare:
     //
     // Início dos comandos.
     //
+	
+	//about 
+	//isso é um teste.
+	//mostra informações sobre o aplicativo usando 
+	//um message box ou uma janela.
+	if( strncmp( prompt, "about", 5 ) == 0 )
+	{
+		shellSendMessage( NULL, MSG_COMMAND, CMD_ABOUT, 0);
+	    goto exit_cmp;
+	}
 
 	// Imprime a tabela ascii usando a fonte atual.
     // 128 chars.	
@@ -1256,6 +1307,13 @@ do_compare:
 		//boot();
         goto exit_cmp;
     };
+	
+	//close
+	if( strncmp( prompt, "close", 5 ) == 0 )
+	{
+		shellSendMessage( NULL, MSG_CLOSE, 0, 0);
+	    goto exit_cmp;
+	}	
 
 	
     // cls
@@ -1287,7 +1345,18 @@ do_compare:
 		printf("%s\n",prompt[4]);
 		//printf("%s\n",prompt);
 		goto exit_cmp;
-    };	
+    };
+
+	// editbox
+	// Cria uma edibox.
+    if( strncmp( prompt, "editbox", 7 ) == 0 )
+	{
+	    enterCriticalSection();    
+	    shellCreateEditBox();
+	    exitCriticalSection();    
+		
+		goto exit_cmp;
+    };		
 	
 	
 	// exit
@@ -1535,39 +1604,7 @@ do_compare:
 	// window
     if( strncmp( prompt, "window", 6 ) == 0 )
 	{
-		//
-		// #bugbug.
-		// Testando a estrutura de janela.
-		// A janela foi criada pelo kernel e copiamos o ponteiro 
-		// da estrutura para um ponteiro em user mode.
-		// Podemos ter erros de memória com essas operações.
-		
-	    printf("\n testing main window ... \n");
-		
-		// esse printf funcionou.
-		printf("mainWindow={%x}", shell_info.main_window );
-		
-		//#bugbug 
-		//temos um problema aqui.
-		// provavelmente o erro é por acessar um endereço que está 
-		// em kernel mode.
-		//if( shell_info.main_window->left > 0 && shell_info.main_window->top > 0  )
-		//{
-		//    shellSetCursor( (shell_info.main_window->left/8), (shell_info.main_window->top/8) );
-		//}
-		
-        printf("rect: l={%d} t={%d} w={%d} h={%d}\n", terminal_rect.left,
-		                                              terminal_rect.top,
-													  terminal_rect.width,
-													  terminal_rect.height );
-
-													  
-		//Obs: isso funcionou. setando o cursor.
-		//if( terminal_rect.left > 0 && terminal_rect.top > 0 )
-		//{											  
-        //    shellSetCursor( (terminal_rect.left/8), (terminal_rect.top/8) );													  
-		//};
-		
+		shellShowWindowInfo();
         goto exit_cmp;
     };
 
@@ -1583,6 +1620,39 @@ do_compare:
  
 palavra_nao_reservada:
     //shellParseFileName(); @todo
+	
+	// Se a apavra não é reservada, então talvez seja o nome de um app.
+	// Procuraremos esse app no diretório corrente.
+	//@todo: criar o ponteiro app_name
+	//while( *app_name == ' ' )
+    //    app_name++;
+
+    //@todo: Criar função, argumentos e retorno.
+    //app_return = shellExecute( app_name );
+	
+	//switch( app_return )
+	//{
+		//retorno null.
+	//	case 0:
+	//	    break;
+			
+		//@todo Criar os tipos de erro possíveis.	
+	//	case xxx:
+    //        break;
+
+        //...
+		
+	//	default:
+	//	    app_return = 0;
+    //        break;		
+	//};
+	
+	
+	// set cursor ?
+	
+	// set current directory
+	
+	
 	printf(" Unknown command!\n");
 	printf("%s\n", prompt);
 	shellPrompt();
@@ -1620,23 +1690,28 @@ void shellShell()
     shellStatus = 0;
     shellError = 0;
 	
+	//
+	// Deve ser pequena, clara e centralizada.
+	// Para ficar mais rápido.
+	//
+	
 	//window position
 	//shell_window_x = DEFAULT_WINDOW_X;
 	//shell_window_y = DEFAULT_WINDOW_Y;
-	shell_window_x = (800/2);
-	shell_window_y = (600/8);
+	shell_window_x = (800/8);
+	shell_window_y = (600/4); //depois da barra
 
 	
 	//screen sizes
-	shellScreenWidth  = (800/2);
-    shellScreenHeight = (600 - (600/8) );   // 600;
+	shellScreenWidth  = (800/8)*6;
+    shellScreenHeight = (600/4)*2;   
 	
 	//window height
 	//shellWindowWidth = (DEFAULT_MAX_COLUMNS*8);
     //shellWindowHeight = (DEFAULT_MAX_ROWS*8);
 	
-	shellWindowWidth = (800/2);
-	shellWindowHeight = (600 - (600/8) );
+	shellWindowWidth = (800/8)*6;
+	shellWindowHeight = (600/4)*2;   
 	
     shellMaxColumns = DEFAULT_MAX_COLUMNS;  // 80;
     shellMaxRows    = DEFAULT_MAX_ROWS;     // 25;
@@ -2047,6 +2122,8 @@ setGlobals:
  */
 void shellThread()
 {
+	// ?? Message Box ??
+	
     printf("shellThread: This is a thread for test!\n");
     refresh_screen();
 	
@@ -2130,9 +2207,8 @@ void shellClearBuffer()
 	int i;
 	
 	// Shell buffer.
-	for( i=0; i<SCREEN_BUFFER_SIZE; i++)
-	{
-		screen_buffer[i] = 0;
+	for( i=0; i<SCREEN_BUFFER_SIZE; i++){
+		screen_buffer[i] = (char) '\0';
 	}
 	
 	screen_buffer[0] = (char) '\0';
@@ -2248,6 +2324,8 @@ void shellClearScreen()
 {
 	int lin, col;    
 
+	// @todo:
+	//system( "cls" ); // calls the cls command.
 	
 	//cursor.
 	shellSetCursor(0,0);
@@ -2331,8 +2409,8 @@ static void save_cur(void)
 
 static void restore_cur(void)
 {
-	x=saved_x;
-	y=saved_y;
+	x = saved_x;
+	y = saved_y;
 	//pos = origin + ( (y * columns + x) << 1 );
 	screen_buffer_pos = origin + (screen_buffer_y * columns + screen_buffer_x);
 };
@@ -2369,7 +2447,8 @@ static void cr(void)
 
 static void del(void)
 {
-	if (screen_buffer_x) {
+	if (screen_buffer_x)
+	{
 		screen_buffer_pos -= 2;
 		screen_buffer_x--;
 		//*(unsigned short *) shell_buffer_pos = 0x0720;
@@ -2391,7 +2470,8 @@ void shellInsertCharXY(unsigned long x, unsigned long y, char c)
 		return;
 	}
 
-	screen_buffer[offset] = (char) c;
+	screen_buffer[offset*2] = (char) c;
+	screen_buffer[ (offset*2)+1 ] = 7;
 };
 
 
@@ -2405,7 +2485,8 @@ void shellInsertCharPos(unsigned long offset, char c)
 		return;
 	}
 	
-	screen_buffer[offset] = (char) c;
+	screen_buffer[offset*2] = (char) c;
+	screen_buffer[ (offset*2)+1 ] = 7;
 };
 
 
@@ -2429,25 +2510,29 @@ void shellFillOutputBuffer( char element, int element_type )
 //coloca um char na próxima posição do buffer
 void shellInsertNextChar(char c)
 {
-	screen_buffer[screen_buffer_pos] = (char) c;	
+	screen_buffer[ screen_buffer_pos*2 ] = (char) c;
+	screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;
 };
 
 
 void shellInsertCR()
 {
-   screen_buffer[screen_buffer_pos] = (char) '\r';	
+   screen_buffer[screen_buffer_pos*2 ] = (char) '\r';
+   screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;   
 };
 
 
 void shellInsertLF()
 {
-    screen_buffer[screen_buffer_pos] = (char) '\n';	
+    screen_buffer[ screen_buffer_pos*2 ] = (char) '\n';
+    screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;	
 };
 
 
 void shellInsertNullTerminator()
 {
-    screen_buffer[screen_buffer_pos] = (char) '\0';	
+    screen_buffer[ screen_buffer_pos*2 ] = (char) '\0';
+    screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;	
 };
 
 
@@ -2464,13 +2549,17 @@ void shellTestMBR()
 	
 	enterCriticalSection(); 
 	
+	//message 
+	printf("shellTestMBR: Initializing MBR test ...\n");
+	
 	//read sector
 	system_call( SYSTEMCALL_READ_LBA, 
 	             (unsigned long) &buffer[0],  //address 
 				 (unsigned long) 0,           //lba
 				 (unsigned long) 0);
 				 
-    shellRefreshScreen();	
+    shellRefreshScreen();
+	
 	exitCriticalSection();   
 };
 
@@ -2500,6 +2589,10 @@ void move_to( unsigned long x, unsigned long y )
 void shellShowInfo()
 {
 	int PID, PPID;
+	
+	
+    printf("shellShowInfo: Showing some infos ...\n");
+	
 	
     PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
 	if( PID == (-1)){
@@ -2563,6 +2656,9 @@ void shellShowSystemInfo()
 	int ActiveWindowId;
 	int WindowWithFocusId;
 	
+	
+	printf("shellShowSystemInfo:\n");
+	
 	//
 	//Active
 	ActiveWindowId = (int) APIGetActiveWindow();
@@ -2586,6 +2682,54 @@ void shellShowSystemInfo()
 	
 };
 
+//mostrar informações sobre janelas.
+void shellShowWindowInfo()
+{
+	
+	//
+	// #bugbug.
+	// Testando a estrutura de janela.
+	// A janela foi criada pelo kernel e copiamos o ponteiro 
+	// da estrutura para um ponteiro em user mode.
+	// Podemos ter erros de memória com essas operações.
+		
+	printf("\n shell_info: \n");
+		
+	// esse printf funcionou.
+	printf("mainWindow={%x}", shell_info.main_window );
+		
+	//#bugbug 
+	//temos um problema aqui.
+	// provavelmente o erro é por acessar um endereço que está 
+	// em kernel mode.
+	//if( shell_info.main_window->left > 0 && shell_info.main_window->top > 0  )
+	//{
+	//    shellSetCursor( (shell_info.main_window->left/8), (shell_info.main_window->top/8) );
+	//}
+		
+		
+	printf("\n terminal_rect: \n");	
+    printf("l={%d} t={%d} w={%d} h={%d}\n", terminal_rect.left,
+		                                    terminal_rect.top,
+									  	    terminal_rect.width,
+											terminal_rect.height );
+
+													  
+	//Obs: isso funcionou. setando o cursor.
+	//if( terminal_rect.left > 0 && terminal_rect.top > 0 )
+	//{											  
+    //    shellSetCursor( (terminal_rect.left/8), (terminal_rect.top/8) );													  
+	//};
+		
+    int wID;		
+	wID = (int) system_call( SYSTEMCALL_GETTERMINALWINDOW, 0, 0, 0); 
+	
+	printf("\n current terminal: \n");
+	printf("Windows ID for current terminal = {%d} \n", wID);
+	
+	//...
+};
+
 
 /*
  * shellASCII:
@@ -2597,6 +2741,9 @@ void shellASCII()
 {
     unsigned char count;
 	unsigned char standard_ascii_max = 128;
+	
+	
+	printf("shellASCII:\n");
 	
     for( count=0; count<standard_ascii_max; count++ )
     {
@@ -2620,6 +2767,15 @@ void shellASCII()
 
 
 
+				  
+unsigned long 
+shellSendMessage( struct window_d *window, 
+                  int msg, 
+				  unsigned long long1, 
+				  unsigned long long2 )
+{
+	return (unsigned long) shellProcedure( window, msg, long1, long2 );
+};
 
 /*
  * shell_write_to_screen:

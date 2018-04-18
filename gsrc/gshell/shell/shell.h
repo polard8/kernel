@@ -180,6 +180,9 @@ struct _iobuf *root;
 //...
 
 //Janelas usadas pelo aplicativo.
+
+struct window_d *topbar_editboxWindow;  //edit box.
+struct window_d *editboxWindow;  //edit box.
 struct window_d *topbarWindow;  //task bar.
 struct window_d *i1Window;      //icone 1.
 struct window_d *i2Window;      //icone 2.
@@ -464,9 +467,15 @@ void shellTestMBR();
 
 int test_operators();
 
+void shellShowWindowInfo();
 void shellShowInfo();
 void shellShowMetrics();
 void shellShowSystemInfo();
+unsigned long 
+shellSendMessage( struct window_d *window, 
+                  int msg, 
+				  unsigned long long1, 
+				  unsigned long long2 );
 //...
 
 // Wait for commands.
@@ -491,6 +500,7 @@ void shellASCII();
 // shelui.c
 //
 
+void shellCreateEditBox();
 void shellCreateTopBar(); 
 void shellTestDisplayBMP();
 void bmpDisplayBMP( void* address, 

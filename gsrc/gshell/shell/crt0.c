@@ -10,7 +10,7 @@
 #include "stdlib.h"  
 
 
-extern void *GramadoMain( int, char*, unsigned long , int );
+extern void *GramadoMain( int, char*, unsigned long , unsigned long );
 
 
 //
@@ -35,6 +35,10 @@ void crt0()
 	// o erro pode vir no retorno ou implementa-se uma forma de pegar a execessão 
 	// ocorrida durante a execussão de main.
 	//
+	
+	//if( app_response ...
+	
+	//exit( app_response );
 	
 	while(1){}
 };

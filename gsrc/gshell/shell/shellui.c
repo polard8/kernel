@@ -23,6 +23,33 @@
 #include "globals.h"
 
 
+
+//isso é um test.
+//o tipo dois funciona.
+//estou trabalhando nas bordas.
+void shellCreateEditBox()
+{
+    
+	editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-editbox1",     
+                                       40, 40, 100, 20,    
+                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
+									   
+									   
+	if((void*) editboxWindow == NULL){	
+		printf("shellCreateEditBox: fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+	    //Registrar.
+    APIRegisterWindow(editboxWindow);
+
+
+    
+									   
+};
+
+
 /*
  * shellCreateTopBar:
  *
@@ -82,6 +109,33 @@ void shellCreateTopBar()
 	};
 	//Registrar.
     APIRegisterWindow(i2Window);
+	
+	
+    //
+    // edit box na topbar
+    //
+	
+	//o tipo 2 funciona.
+	topbar_editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-topbar-editbox1",     
+                                       (iconMaxWidth*2) +20, 
+									   20, 
+									   800 - ( (iconMaxWidth*2) +40 ) -20, 
+									   20,    
+                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
+									   
+									   
+	if((void*) topbar_editboxWindow == NULL){	
+		printf("shellCreateTopBar: fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+	    //Registrar.
+    APIRegisterWindow(topbar_editboxWindow);
+
+	
+	
+	
 	
 	//
 	// BMP . LABELS

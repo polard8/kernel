@@ -41,35 +41,11 @@
 #define KEY_RETURN   13    //@todo: Pertence ao teclado.
 
 
-//#define EOF	(-1)
-
-//#ifndef EOF
-//#define	EOF	(-1)
-//#endif
-
-//
-// Prompt support.
-//
-
-//#define	BUFSIZ	512
-//#define	BUFSIZ	1024
-//#define BUFSIZ 32768
-//Buffer. @todo: Pertence ao Shell??
-#define PROMPT_MAX_DEFAULT 256  //Pode ser maior ??
-
-char prompt[PROMPT_MAX_DEFAULT];      //stdin
-char prompt_out[PROMPT_MAX_DEFAULT];  //stdout 
-char prompt_err[PROMPT_MAX_DEFAULT];  //stderr 
-   
-int prompt_pos;
-int prompt_max;
-int prompt_status;
-//char prompt_text[] = "$> ";
-
 
 //
 // Obs: O tipo da variável aqui é provisório. (UL).
 //
+
 //cursor
 unsigned long g_cursor_x;
 unsigned long g_cursor_y;
@@ -88,6 +64,51 @@ unsigned long g_rows;
 int g_using_gui; //modo gráfico?
 
 
+//#define EOF	(-1)
+
+//#ifndef EOF
+//#define	EOF	(-1)
+//#endif
+
+//===========================================
+
+//
+// Prompt support.
+//
+
+// Obs: Esses buffers são usados pela libe como arquivo.
+// #importante: 
+// Qual o tamanho máximo que eu posso usar nesse buffer.
+// Qual é o padrão de tamanho usado para o fluxo padrão.
+//
+
+
+#define PROMPT_MAX_DEFAULT 256  
+//#define BUFSIZ 512
+//#define BUFSIZ 1024
+//#define BUFSIZ 32768
+//Pode ser maior ??
+
+// Normalmente quem cria o fluxo padrão é a rotina 
+// que cria o processo.
+
+// Fluxo padrão.
+char prompt[PROMPT_MAX_DEFAULT];      //stdin
+char prompt_out[PROMPT_MAX_DEFAULT];  //stdout 
+char prompt_err[PROMPT_MAX_DEFAULT];  //stderr 
+   
+int prompt_pos;
+int prompt_max;
+int prompt_status;
+
+//char prompt_text[] = "$> ";
+
+//...
+
+//===========================================
+
+
+
 
 
 #define	STDIN_FILENO	0
@@ -103,8 +124,6 @@ int g_using_gui; //modo gráfico?
 #define NUMBER_OF_FILES (20)
 
 //unsigned long __iob[NUMBER_OF_FILES]
-
-
 
 
 
@@ -132,7 +151,6 @@ FILE *stderr;
 
 FILE *_io_table[NUMBER_OF_FILES];
 
-//@todo: deletar isso se possível.
 #define stdin  (_io_table[0])	
 #define stdout 	(_io_table[1])
 #define stderr 	(_io_table[2])
