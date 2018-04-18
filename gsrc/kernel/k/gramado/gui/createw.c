@@ -190,7 +190,9 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	int ButtonDown = 0; //??
 	int ButtonUp = 0;   //??
 	int ButtonSysMenu = 0;  //system menu na barra de títulos.	
-
+    int Border = 0;         //New !!! usado no edit box.
+	
+	
 	//Desktop support.
     int ParentWindowDesktopId;    //Id do desktop da parent window.
 	int WindowDesktopId;          //Id do desktop da janela a ser criada.
@@ -608,14 +610,15 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	        window->backgroundUsed = 1;
 		    break;
 
-		//
+		// 
 		//2) Edit box, (Simples + borda preta).
+        //editbox não tem sombra, tem bordas. 
 		case WT_EDITBOX:
-	        Shadow = 1;        //sombra.
 	        Background = 1;    //bg.
-		    //ClientArea = 1;
-		    window->shadowUsed = 1;
-		    window->backgroundUsed = 1;	
+		    window->backgroundUsed = 1;
+            //bordas.
+            Border = 1;
+ 			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
 		    break;
 
 		//   **** FRAME ****
@@ -814,6 +817,9 @@ drawBegin:
 	//
 	//
 	
+	//#bugbug
+	//a sombra no editbox tá bangunçando tudo.
+	//#suspenso. suspenso por um tempo.
     //Sombra.	
 	if(Shadow == 1)
 	{
@@ -822,12 +828,16 @@ drawBegin:
 		//@todo: Se tiver barra de rolagem a largura da sombra deve ser maior.
 		//if()
 		
-		//@todo: Passar a estrutura de janela.
-        drawDataRectangle( window->left +1, 
+		
+		if( (unsigned long) type == WT_OVERLAPPED )
+		{
+		    //@todo: Passar a estrutura de janela.
+            drawDataRectangle( window->left +1, 
 		                   window->top  +1, 
-						   window->width  +1 +1,   // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
-						   window->height +1 +24 +1,   // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-						   xCOLOR_GRAY1 );         //Cinza escuro.  CurrentColorScheme->elements[??] @TODO: criar elemento sombra no esquema.       
+						   window->width  +1 +1,      // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
+						   window->height +1 +24 +1,  // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
+						   xCOLOR_GRAY1 );            //Cinza escuro.  CurrentColorScheme->elements[??] @TODO: criar elemento sombra no esquema.  
+        };						   
 	};	
 	
     
@@ -847,7 +857,7 @@ drawBegin:
 		//Para o tipo 1 tem que usar a cor passada pelo argumento.
 		if( (unsigned long) type == WT_SIMPLE ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
-		//if( (unsigned long) type == WT_SIMPLE){ window->color_bg = color; }
+		if( (unsigned long) type == WT_EDITBOX){ window->color_bg = color; }
 		//...
 		
 		//@todo: Se tiver barra de rolagem a largura do backgrond deve ser maior.
@@ -859,6 +869,39 @@ drawBegin:
 						   window->width,  // @todo: Adicionar a largura da bordas bordas verticais.
 						   window->height, // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
 						   window->color_bg );   	
+	};
+	
+	//BORDA PARA EDITBOX
+	if( Border == 1 )
+	{
+		
+	    //board1, borda de cima e esquerda.
+	    
+		drawDataRectangle( window->left, 
+		                   window->top, 
+						   window->width, 
+						   1, 
+						   COLOR_BLUE);
+						   
+	    drawDataRectangle( window->left, 
+		                   window->top, 
+						   1, 
+						   window->height, 
+						   COLOR_BLUE);
+
+	    //board2, borda direita e baixo.
+	    drawDataRectangle( window->left +window->width -1, 
+	                       window->top, 
+					       1, 
+					       window->height, 
+					       COLOR_BLUE);
+					   
+	    drawDataRectangle( window->left, 
+	                       window->top +window->height -1, 
+					       window->width, 
+					       1,
+					       COLOR_BLUE);
+		
 	};
 	
     //Título + borda.	
