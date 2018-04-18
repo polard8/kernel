@@ -35,13 +35,16 @@
 #include <kernel.h>
 
 
-extern int alt_status;
-extern int ctrl_status;
-extern int shift_status;
-extern int capslock_status;
-extern int numlock_status;
-extern int scrolllock_status;
-//...
+extern unsigned long key_status;
+extern unsigned long escape_status;
+extern unsigned long tab_status;
+extern unsigned long winkey_status;  // >> Winkey shotcuts. #super
+extern unsigned long ctrl_status;
+extern unsigned long alt_status;
+extern unsigned long shift_status;
+extern unsigned long capslock_status;
+extern unsigned long numlock_status;
+extern unsigned long scrolllock_status;
 
 //
 // Variáveis internas.
@@ -604,9 +607,9 @@ unsigned long system_procedure( struct window_d *window,
 				//Cls. 
 				//(reiniciar as configurações originais)	
 				case VK_F8:
-				    alt_status = 0;
-					ctrl_status = 0;
-					shift_status = 0;
+                    ldisc_init_modifier_keys();
+					ldisc_init_lock_keys();
+	                //...
                     //backgroundDraw(COLOR_BLACK);
 					videoInit();
 					//setar o foco ajuda a restaurar o input stdin para o procedimento de janela.
@@ -989,18 +992,19 @@ void procedureHelp()
 	    return;
 	};
 	
-	unsigned long left   = gui->main->left;
-	unsigned long top    = gui->main->top;
-	unsigned long width  = gui->main->width;
-	unsigned long height = gui->main->height;
+	unsigned long left   = 20;  // gui->main->left;
+	unsigned long top    = 20;  // gui->main->top;
+	unsigned long width  = 240; // gui->main->width;
+	unsigned long height = 200; // gui->main->height;
 	
 	g_cursor_x = (left/8);
 	g_cursor_y = (top/8); 
 	
 	//backgroundDraw(COLOR_BACKGROUND);
 	
+	//VIEW_MAXIMIZED
 	//Create.
-	hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "//KERNEL Help", 
+	hWindow = (void*) CreateWindow( 3, 0, VIEW_NORMAL, "{} procedureHelp:", 
 	                                left, top, width, height, 
 							        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR );     
 	if( (void*) hWindow == NULL){

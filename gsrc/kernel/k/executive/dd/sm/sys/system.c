@@ -2350,6 +2350,7 @@ void *systemGetSystemStatus(int number)
 };
 
 /*
+ *******************************************************************
  * systemStartUp:
  *     Rotina de inicialização do sistema.
  *
@@ -2513,6 +2514,7 @@ done:
 
 
 /*
+ *******************************************
  * systemInit:
  *     Inicializando algumas variáveis.
  */

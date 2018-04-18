@@ -491,7 +491,7 @@ void LINE_DISCIPLINE(unsigned char SC)
     // Step 2 - Tratar as mensagens.
     //
 
-    //Se a tecla for liberada.
+    //Se a tecla for (liberada).
 	//Dá '0' se o bit de paridade for '0'.
     if( (scancode & LDISC_KEY_RELEASED) == 0 )
 	{
@@ -507,14 +507,12 @@ void LINE_DISCIPLINE(unsigned char SC)
 			
 			//left Shift liberado.
 			case VK_LSHIFT:
-			//case KEY_SHIFT:
 				shift_status = 0;
 				mensagem = MSG_SYSKEYUP;
 			    break;
 
 			//Left Control liberado.			
 			case VK_LCONTROL:
-			//case KEY_CTRL:
 				ctrl_status = 0;
 				mensagem = MSG_SYSKEYUP;
 				break;
@@ -539,6 +537,7 @@ void LINE_DISCIPLINE(unsigned char SC)
 
 			//control menu.
 			case VK_CONTROL_MENU:
+			    //controlmenu_status = 0; //@todo
 			    mensagem = MSG_SYSKEYUP;
 			    break;
 
@@ -586,34 +585,30 @@ void LINE_DISCIPLINE(unsigned char SC)
 		{
 			//Normal.
 			ch = map_abnt2[key];
-
-			//@todo: aqui deve acionar o shift?
-            //Talvez um switch.
 		};
 
 		//Analiza: Se for tecla normal, pega o mapa de caracteres apropriado.
 		if(mensagem == MSG_KEYUP)
 		{
-		    //Normal.
+		    //checar os mudificadores para maiúscula.
+		    //if(shift_status == 1 || capslock_status == 1)
+			//{	
+			//    ch = shift_abnt2[key];	
+			//	goto done;
+			//};
+			
+			//minúscula
+			//Nenhuma tecla de modificação ligada.
 			ch = map_abnt2[key];
-
-			//Shift.
-		    if(shift_status == 1){
-			    ch = shift_abnt2[key];
-			};
-
-			//Control.
-		    if(ctrl_status == 1){
-			    ch = ctl_abnt2[key];
-			};
+			goto done;
+			
             //Nothing.
 		};
         //Nothing.
 		goto done;
-	}
-	//else    // * Tecla pressionada ...........	
+	};
 	
-	
+	// * Tecla (pressionada) ...........	
 	if( (scancode & LDISC_KEY_RELEASED) != 0 )
 	{ 
 		key = scancode;
@@ -750,20 +745,27 @@ void LINE_DISCIPLINE(unsigned char SC)
 
 		if(mensagem == MSG_SYSKEYDOWN)
 		{
-			if(abnt2 == 1){ ch = map_abnt2[key]; };
-
-            //@todo acionar status. 
+			//uma tecla do sistema foi pressionada.
+            //poderiamos ter opções dependendo do status das modificadoras.
+			ch = map_abnt2[key];
+            goto done;
 		};
 
 		if(mensagem == MSG_KEYDOWN)
 		{
-			if(abnt2 == 1){ ch = map_abnt2[key]; };
+			//uma tecla normal foi pressionada.
+			//mensagem de diitação.
 			
-		    if(shift_status == 1 || capslock_status == 1){
-			    ch = shift_abnt2[key];
-			};
+			//Se os shift o capslock estiverem acionado ela vira maiúscula.
+		    //if(shift_status == 1 || capslock_status == 1)
+			//{
+			//    ch = shift_abnt2[key];
+			//    goto done;
+			//};
 
-		    if(ctrl_status == 1){ ch = ctl_abnt2[key]; };
+			//minúsculas.
+		    ch = map_abnt2[key];
+			goto done;
 			
             //Nothing.
 		};
@@ -2211,6 +2213,52 @@ void *xdequeue(ld_queue_t *queue)
 
 	return (void*) ret;
 };
+
+
+
+// Inicializa o status das teclas de modificação.
+// são usadas em comjunto com outras teclas para criar atalhos.
+// modificam temporariamente a função de outra tecla.
+void ldisc_init_modifier_keys()
+{
+	// Modifier keys.
+	
+	// Shift.
+	shift_status = 0;
+	
+	// Control.
+	ctrl_status = 0;
+	
+	// Win key.
+	winkey_status = 0;
+    
+	// Alternate.
+    alt_status = 0;
+
+	// Alternate Graphic.
+    //altgr_status = 0; //@todo
+    
+	// Function.
+	//fn_status = 0;  //@todo
+	
+	//...
+};
+
+
+// modificam permanentemente a função de outra tecla.
+//ativa as teclas extendidas.
+void ldisc_init_lock_keys()
+{
+    // Capital Lock.	
+	capslock_status = 0;
+	
+	// Scrolling Lock.
+	scrolllock_status = 0;
+	
+	// Number Lock.
+	numlock_status = 0;	
+};
+
 
 
 

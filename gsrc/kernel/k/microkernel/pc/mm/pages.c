@@ -237,7 +237,7 @@ static inline void __native_flush_tlb_single(unsigned long addr)
 void *CreatePageDirectory(unsigned long directory_address)
 {	
 	int i;
-	unsigned long *newPD = (unsigned long *) directory_address;    //Diretório.
+	unsigned long *newPD = (unsigned long *) directory_address;  //Diretório.
 	
 	//Limits.
 	if(directory_address == 0){
@@ -245,7 +245,8 @@ void *CreatePageDirectory(unsigned long directory_address)
 	};
 
 	//Criamos um diretório vazio com páginas não presentes.
-	for(i = 0; i < 1024; i++){
+	for( i=0; i < 1024; i++ )
+	{
 		newPD[i] = (unsigned long) 0 | 2;    //010 em binário.
 	};
 
@@ -298,8 +299,8 @@ void *CreatePageTable( unsigned long directory_address,
 					  unsigned long page_address )
 {
 	int i;
-	unsigned long *PD = (unsigned long *) directory_address;    //Diretório.
-	unsigned long *newPT = (unsigned long *) page_address;             //Tabela de páginas.
+	unsigned long *PD = (unsigned long *) directory_address;  //Diretório.
+	unsigned long *newPT = (unsigned long *) page_address;    //Tabela de páginas.
 	
 	//Limits.
 	if(directory_address == 0){
@@ -321,9 +322,10 @@ void *CreatePageTable( unsigned long directory_address,
 	//4MB de memória física.
 	// user mode pages
 	//será usado pelo processo em user mode. Note as flags.(7).
-	for(i = 0; i < 1024; i++)
+	for( i=0; i < 1024; i++ )
     {
-	    newPT[i] = (unsigned long) page_address | 7;             //7 decimal é igual a 111 binário.
+		//7 decimal é igual a 111 binário.
+	    newPT[i] = (unsigned long) page_address | 7;             
 	    page_address     = (unsigned long) page_address + 4096;  //+4KB.
     };
 
@@ -589,8 +591,9 @@ int SetUpPaging()
 	
     //
 	// Message. (verbose).
+#ifdef KERNEL_VERBOSE	
 	printf("SetUpPaging: Initializing Pages..\n");
-
+#endif
 	
 	//
 	//  **  DIRECTORIES **
@@ -603,7 +606,7 @@ int SetUpPaging()
 
 	// Inicializando quatro diretórios.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-	for(i = 0; i < 1024; i++)
+	for( i=0; i < 1024; i++ )
 	{
 		//kernel
 		// Diretório de páginas do processo kernel.
@@ -652,7 +655,7 @@ int SetUpPaging()
 	// Configurando uma pagetable.
 	// a pagetable para os primeiros 4MB de memória física. 
 	// kernel mode pages (0fis = 0virt)
-	for(i = 0; i < 1024; i++)
+	for( i=0; i < 1024; i++ )
     {
 	    //if SMALL
 		km_page_table[i] = (unsigned long) SMALL_kernel_address | 3;     //011 binário.
@@ -669,8 +672,10 @@ int SetUpPaging()
 	//Criando a entrada número '0' do diretório de páginas do processo Kernel.
 	//que apontará para a pagetable que criamos.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[0] = (unsigned long) &km_page_table[0];      //Salva no diretório o endereço físico da tabela.
-    page_directory[0] = (unsigned long) page_directory[0] | 3;  //Configurando os atributos.
+	//Salva no diretório o endereço físico da tabela.
+	//Configurando os atributos.
+    page_directory[0] = (unsigned long) &km_page_table[0];      
+    page_directory[0] = (unsigned long) page_directory[0] | 3;  
     
 
 	//idle
@@ -712,7 +717,7 @@ int SetUpPaging()
 	//Criando uma pagetable.
     //4MB de memória física, começando em 1MB.
     // kernel mode pages (0x00100000fis = 0xC0000000virt)	
-    for(i = 0; i < 1024; i++)
+    for( i=0; i < 1024; i++ )
     {
 		//IF SMALL
 	    km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     //011 binário.
@@ -727,8 +732,10 @@ int SetUpPaging()
 	//kernel
 	// Criando a  entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[768] = (unsigned long) &km2_page_table[0];       //Salva no diretório o endereço físico.
-    page_directory[768] = (unsigned long) page_directory[768] | 3;  //Configurando os atributos.
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
+    page_directory[768] = (unsigned long) &km2_page_table[0];       
+    page_directory[768] = (unsigned long) page_directory[768] | 3;  
 
 	
 	//idle
@@ -788,10 +795,11 @@ int SetUpPaging()
 	//4MB de memória física, começando do querto mega.
 	// user mode pages - (0x00400000fis = 0x00400000virt)
 	//será usado pelo processo em user mode. Note as flags.(7).
-	for(i = 0; i < 1024; i++)
+	for( i=0; i < 1024; i++ )
     {
 	    //IF SMALL
-		um_page_table[i] = (unsigned long) SMALL_user_address | 7;     //7 decimal é igual a 111 binário.
+		//7 decimal é igual a 111 binário.
+		um_page_table[i] = (unsigned long) SMALL_user_address | 7;     
 	    SMALL_user_address     = (unsigned long) SMALL_user_address + 4096;  //+4KB.
 		
 		//if MEDIUM
@@ -804,8 +812,10 @@ int SetUpPaging()
     //kernel 	
     // Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[1] = (unsigned long) &um_page_table[0];      //Salva no diretório o endereço físico.
-    page_directory[1] = (unsigned long) page_directory[1] | 7;  //Configurando os atributos.
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
+    page_directory[1] = (unsigned long) &um_page_table[0];      
+    page_directory[1] = (unsigned long) page_directory[1] | 7;  
 
     //idle 	
     // Criando a entrada do diretório de páginas do processo idle.
@@ -856,10 +866,11 @@ int SetUpPaging()
     // user mode VGA pages - ( 0x000B8000fis = 0x00800000virt)
     // Podemos permitir que alguns processos em user mode acessem
     // essa área diretamente.	
-    for(i = 0; i < 1024; i++)
+    for( i=0; i < 1024; i++ )
     {
 		//ID SMALL
-	    vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     //7 decimal é igual a 111 binário.
+		//7 decimal é igual a 111 binário.
+	    vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     
 	    SMALL_vga_address       = (unsigned long) SMALL_vga_address + 4096;  //+4KB.
 		
 		//if MEDIUM
@@ -870,8 +881,10 @@ int SetUpPaging()
     //kernel
 	// Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[2] = (unsigned long) &vga_page_table[0];     //Salva no diretório o endereço físico.
-    page_directory[2] = (unsigned long) page_directory[2] | 7;  //Configurando os atributos.
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
+    page_directory[2] = (unsigned long) &vga_page_table[0];     
+    page_directory[2] = (unsigned long) page_directory[2] | 7;  
 
 	
     //idle
@@ -923,11 +936,12 @@ int SetUpPaging()
 	//Os quatro primeiros MB da memória de vídeo.
 	//user mode LFB pages - (0x????????fis = 0xC0400000virt).
 	//provavelmente o endereço físico é 0xE0000000
-    for(i = 0; i < 1024; i++)
+    for( i=0; i < 1024; i++ )
     {
 	    //IF SMALL
-		frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7;     //7 decimal é igual a 111 binário.
-	    SMALL_frontbuffer_address       = (unsigned long) SMALL_frontbuffer_address + 4096;  //+4KB.
+		//7 decimal é igual a 111 binário.
+		frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7;     
+	    SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096;  //+4KB.
 		
 		//if MEDIUM
 		
@@ -939,8 +953,10 @@ int SetUpPaging()
 	//kernel
 	// Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       //Salva no diretório o endereço físico.
-    page_directory[769] = (unsigned long) page_directory[769] | 7;  //Configurando os atributos.	
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
+    page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       
+    page_directory[769] = (unsigned long) page_directory[769] | 7;  	
 
 
 	//idle
@@ -982,11 +998,12 @@ int SetUpPaging()
 	//4MB de meória física, começando em 16MB, que serão usados 
 	//para backbuffer. Obs essa área deve ter o mesmo tamanho do frontbuffer.
 	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
-	for(i = 0; i < 1024; i++)
+	for( i=0; i < 1024; i++ )
     {
 		//IF SMALL
-	    backbuff_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     //7 decimal é igual a 111 binário.
-	    SMALL_backbuffer_address       = (unsigned long) SMALL_backbuffer_address + 4096;  //+4KB.
+		//7 decimal é igual a 111 binário.
+	    backbuff_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     
+	    SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096;  //+4KB.
 		
 		//if MEDIUM
 		
@@ -996,8 +1013,10 @@ int SetUpPaging()
 	//kernel
     // Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[770] = (unsigned long) &backbuff_page_table[0];      //Salva no diretório o endereço físico.
-    page_directory[770] = (unsigned long) page_directory[770] | 7;  //Configurando os atributos.	
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
+    page_directory[770] = (unsigned long) &backbuff_page_table[0];      
+    page_directory[770] = (unsigned long) page_directory[770] | 7;  	
 
 
 	//idle
@@ -1029,11 +1048,12 @@ int SetUpPaging()
 	
 	g_pagedpool_va = (unsigned long) 0xC0C00000;
 	
-	for(i = 0; i < 1024; i++)
+	for( i=0; i < 1024; i++ )
     {
 		//IF SMALL
-	    pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;     //7 decimal é igual a 111 binário.
-	    SMALL_pagedpool_address       = (unsigned long) SMALL_pagedpool_address + 4096;  //+4KB.
+		//7 decimal é igual a 111 binário.
+	    pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;     
+	    SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096;  //+4KB.
 		
 		//if MEDIUM
 		
@@ -1042,8 +1062,10 @@ int SetUpPaging()
 	//kernel
     // Criando a entrada do diretório de páginas do processo kernel.
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-    page_directory[771] = (unsigned long) &pagedpool_page_table[0];      //Salva no diretório o endereço físico.
-    page_directory[771] = (unsigned long) page_directory[771] | 7;  //Configurando os atributos.	
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
+    page_directory[771] = (unsigned long) &pagedpool_page_table[0];      
+    page_directory[771] = (unsigned long) page_directory[771] | 7;  	
 
 
 	//idle
@@ -1160,7 +1182,6 @@ int SetUpPaging()
 	printf("Page={%x} !\n", (unsigned long) &frontbuffer_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &backbuff_page_table[0]);
 	printf("Page={%x} !\n", (unsigned long) &pagedpool_page_table[0]);
-	
 	//refresh_screen();
 	//while(1){};
 #endif	
@@ -1194,9 +1215,12 @@ int SetUpPaging()
 	// diretórios e das tabelas de páginas.
 	//
 
-
-	//Inicializar a lista de diretórios de páginas.
-	for(Index = 0; Index < PAGEDIRECTORY_COUNT_MAX; Index++){
+    //
+	// Inicializar a lista de diretórios de páginas.
+	// 
+	
+	for( Index=0; Index < PAGEDIRECTORY_COUNT_MAX; Index++ )
+	{
 	    pagedirectoryList[Index] = (unsigned long) 0;
 	};
 
@@ -1213,7 +1237,9 @@ int SetUpPaging()
 	//
 	// Inicializando a lista de pagetables..
 	//
-	for(Index = 0; Index < PAGETABLE_COUNT_MAX; Index++){
+	
+	for( Index=0; Index < PAGETABLE_COUNT_MAX; Index++ )
+	{
 	    pagetableList[Index] = (unsigned long) 0;
 	};
 
@@ -1232,7 +1258,9 @@ int SetUpPaging()
 	//
 	// Inicializando a lista de pageframes.
 	//
-	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++){
+	
+	for( Index=0; Index < PAGEFRAME_COUNT_MAX; Index++ )
+	{
 	    pageframeList[Index] = (unsigned long) 0;
 	};
 
@@ -1246,7 +1274,9 @@ int SetUpPaging()
 	//
 	// Inicializando a lista de framepools. (partições)
 	//
-	for(Index = 0; Index < FRAMEPOOL_COUNT_MAX; Index++){
+	
+	for( Index=0; Index < FRAMEPOOL_COUNT_MAX; Index++ )
+	{
 	    framepoolList[Index] = (unsigned long) 0;
 	};
 
@@ -1401,7 +1431,10 @@ done:
 };
 
 
-//inicializa o framepool.
+/*
+ * initializeFramesAlloc:
+ *     Inicializa o framepool.
+ */
 void initializeFramesAlloc()
 {
 	int Index;
@@ -1410,7 +1443,8 @@ void initializeFramesAlloc()
 	//
 	// Inicializando a lista de pageframes.
 	//
-	for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++){
+	for( Index=0; Index < PAGEFRAME_COUNT_MAX; Index++ )
+	{
 	    pageframeAllocList[Index] = (unsigned long) 0;
 	};
 	
@@ -1439,12 +1473,16 @@ done:
 
 
 
-//=======================================================================
-//@param número de páginas contíguas.
-//Obs: Pode ser que os pageframes não sejam contíguos mas as páginas serão.
-//estamos usando uma page table toda já mapeada. 4MB.
-//@TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
-void *allocPageFrames(int size)
+/*
+ * allocPageFrames:
+ *
+ * @param número de páginas contíguas.
+ * Obs: Pode ser que os pageframes não sejam contíguos mas as páginas serão.
+ * estamos usando uma page table toda já mapeada. 4MB.
+ * @TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
+ *
+ */
+void *allocPageFrames( int size )
 {
 	int Index;
 	
@@ -1582,7 +1620,10 @@ void notfreePageframe(struct page_frame_d *pf)
 };
 
 
-//aloca apenas uma página e retorna o handle.
+/*
+ * newPageFrame:
+ * Aloca apenas uma página e retorna o handle.
+ */
 void *newPageFrame()
 {
 	int Index;
@@ -1597,7 +1638,7 @@ void *newPageFrame()
 		{
 			New = (void*) malloc( sizeof( struct page_frame_d ) );
 			if( New == NULL ){
-				printf("newPage:\n");
+				printf("pc-mm-newPageFrame:\n");
 				goto fail;
 			};
 			
@@ -1623,8 +1664,13 @@ fail:
 };
 
 
-//aloca uma página e retorna seu endereço virtual inicial
-//com base no id do pageframe e no endereço virtual inicial do pool de pageframes.
+/*
+ * newPage:
+ * Aloca uma página e retorna seu endereço virtual inicial
+ * com base no id do pageframe e no endereço virtual inicial do pool 
+ * de pageframes.
+ *
+ */
 void *newPage()
 {
     struct page_frame_d *New;
@@ -1638,9 +1684,8 @@ void *newPage()
     New	= (void*) newPageFrame();
 	if( New == NULL ){
 	    //fail	
-		printf("newPage: New\n");
-		return NULL;
-		//goto fail;
+		printf("pc-mm-newPage: New\n");
+		goto fail;
 	}else{
 	    
 		//check
@@ -1653,15 +1698,18 @@ void *newPage()
 				base = (unsigned long) ( base + (New->id * 4096) );
 				return (void *) base;
 			}				
-		}		
-	}
+		};		
+	};
 fail:
     return NULL;	
 };
 
 
-//retorna o primeiro indice de uma sequencia de slots livres.
-int firstSlotForAList(int size)
+/*
+ * firstSlotForAList:
+ *     Retorna o primeiro índice de uma sequência de slots livres.
+ */
+int firstSlotForAList( int size )
 {
 	int Index;
 	int Base = 0;
@@ -1694,11 +1742,7 @@ fail:
 
  //@todo: Rotina de teste. deletar.
 void testingFrameAlloc()
-{
-	//printf("testingFrameAlloc:\n suspended!");
-	//return;
-
-	
+{	
 	int Index;
     struct page_frame_d *pf;
 	struct page_frame_d *Ret; //#bugbug @todo: aqui deveria ser void*.
@@ -1717,24 +1761,30 @@ void testingFrameAlloc()
 	
     //Ret = (void*) allocPageFrames(500);  // Funcionou com 500.
 	Ret = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
-	if( (void*) Ret == NULL ){
+	if( (void*) Ret == NULL )
+	{
 	    printf("Ret fail\n");
-        goto done;		
+        goto fail;		
 	}
 	
 	printf("\n");
 	printf("BaseOfList={%x} Showing #32 \n",Ret);
-    for(Index = 0; Index < 32; Index++)   	
+    
+	for( Index=0; Index < 32; Index++ )   	
 	{  
         pf = (void*) pageframeAllocList[Index]; 
 		
 		if( (void*) pf == NULL ){
 		    printf("null\n");	 
 		}
-	    if( (void*) pf != NULL ){
-		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
+	    
+		if( (void*) pf != NULL )
+		{
+		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", pf->id,
+			    pf->used, pf->magic, pf->free, pf, pf->next ); 	
 		}
-	}
+		//Nothing.
+	};
 	
 	
     //===================================
@@ -1763,7 +1813,7 @@ void testingFrameAlloc()
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
 		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
-	}
+	};
 	
 	
 	bmpDisplayBMP( Ret, 20, 20, 0, 0 );
@@ -1792,14 +1842,17 @@ void testingFrameAlloc()
 	//rc->bottom = 80;
 	
 	//move_back_to_front(rc);
+	
+	printf("pc-mm-testingFrameAlloc: debug hang\n");
+	refresh_screen();
 	while(1){}
 	
 done:
-    printf("done\n");
+  // Nothing for now.	
+fail:
 	refresh_screen();
     return;	
 };
-
 
 
 //

@@ -367,6 +367,9 @@ static void xresize_queue(ld_queue_t *queue, size_t new_size);
 #define QUEUE_INITIAL_SIZE 32 //16
 
 
+void ldisc_init_modifier_keys();
+void ldisc_init_lock_keys();
+
 //
 // End.
 //

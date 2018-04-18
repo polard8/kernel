@@ -185,7 +185,7 @@ unsigned long heap_set_new_handler( unsigned long address )
 
 /*
  * get_process_heap_pointer:
- *     Pega o heap pointer do heap de um processo.
+ *     Pega o 'heap pointer' do heap de um processo.
  *     Pega o endereço do início do header da próxima alocação.
  * Obs: Isso será usado para alocar memória dentro do heap do processo.
  * Cada processo terá seu heap, cada heap tem ponteiros.
@@ -197,14 +197,18 @@ unsigned long get_process_heap_pointer(int pid)
 	struct process_d *P;
 	
 	//@todo: Limite máximo.
-	if(pid < 0){
-		return (unsigned long) 0;
+	if(pid < 0)
+	{
+		printf("get_process_heap_pointer: pid fail\n");
+		goto fail;
 	};
 	
 	P = (void*) processList[pid];
 	
-	if((void*) P == NULL ){
-	    return (unsigned long) 0;	
+	if((void*) P == NULL )
+	{
+		printf("get_process_heap_pointer: struct fail\n");
+		goto fail;
 	};
 	
 	//Obs podemos checr 'used' e 'magic'.
@@ -219,13 +223,17 @@ unsigned long get_process_heap_pointer(int pid)
 	heapLimit = (unsigned long) (P->Heap + P->HeapSize);
 	
 	//Se for menor que o início ou maior que o limite.
-	if( P->HeapPointer < P->Heap || P->HeapPointer >= heapLimit ){
-		return (unsigned long) 0;
+	if( P->HeapPointer < P->Heap || P->HeapPointer >= heapLimit )
+	{
+		printf("get_process_heap_pointer: heap limits fail\n");
+		goto fail;
 	};
 	
 done:
     //Retorna o heap pointer do processo. 
 	return (unsigned long) P->HeapPointer;
+fail:
+    return (unsigned long) 0;    
 };
 
 
@@ -366,11 +374,14 @@ void *GetHeap()
  * @todo: 
  *     Essa rotina poderia se chamar memoryKernelProcessHeapAlloc(unsigned long size).
  *
+ * IN: size in bytes
+ * OUT: address if success. 0 if fail.
+ *
  * 2015 - Created.
  * sep 2016 - Revision.
  * ...
  */
-unsigned long AllocateHeap(unsigned long size)
+unsigned long AllocateHeap( unsigned long size )
 {
     struct mmblock_d *Current;
     //struct mmblock_d *Prev;
@@ -403,11 +414,7 @@ unsigned long AllocateHeap(unsigned long size)
         //
 
         printf("AllocateHeap fail: g_available_heap={0}\n");
-        refresh_screen();
-        //while(1){}
-
-        return (unsigned long) 0;
-        //while(1){};
+        goto fail;
     };
 
 
@@ -435,8 +442,7 @@ unsigned long AllocateHeap(unsigned long size)
         //try_grow_heap() ...
 
         printf("AllocateHeap error: size >= g_available_heap\n");
-        refresh_screen();
-        return (unsigned long) 0;
+        goto fail;
     };
     
     //Salvando o tamanho desejado.
@@ -645,11 +651,8 @@ try_again:
     }else{
 
         //Se o ponteiro da estrutura de mmblock for inválido.
-
         printf("AllocateHeap fail: struct.\n");
-        //@todo: Deveria retornar.
-        //goto fail;
-        return (unsigned long) 0;
+        goto fail;
     };
 
 
@@ -688,7 +691,9 @@ try_again:
 //
 // Fail.
 //
+
 fail:
+    refresh_screen();
     //Se falhamos, retorna 0. Que equivalerá à NULL.
     return (unsigned long) 0;
 };
@@ -712,11 +717,9 @@ unsigned long FreeHeap(unsigned long size){
 /*
  * AllocateHeapEx:
  *     Aloca heap.
- *     @todo: Função imcompleta.
- *     Poderia chamar a função AllocateHeap.
  */
 void *AllocateHeapEx(unsigned long size){
-	return (void *) AllocateHeap(size);  //suspensa.
+	return (void *) AllocateHeap(size);  
 };
 
 
@@ -787,6 +790,7 @@ done:
 
 
 /*
+ ***********************************************************************
  * init_heap:
  *     Iniciar a gerência de Heap do kernel. 
  *     @todo: Usar heapInit() ou heapHeap(). memoryInitializeHeapManager().
@@ -867,6 +871,7 @@ done:
 // Fail. Falha ao iniciar o heap do kernel.
 fail:
     printf("init_heap: Fail!\n");
+	//refresh_screen();
 	
 	/*
 	printf("* Debug: %x %x %x %x \n", kernel_heap_start, 
@@ -969,6 +974,7 @@ done:
 
 
 /*
+ ******************************************
  * init_mm:
  *   Inicializa o memory manager.
  *    @todo: Usar mmInit().
@@ -1092,10 +1098,11 @@ done:
 //
 
 //limpa a camada /gramado
-int gcGRAMADO(){
+int gcGRAMADO()
+{
 	//Ainda não implementado.
 	return (int) 0;
-}
+};
 
 
 /*
@@ -1241,7 +1248,6 @@ clear_heap:
 
 fail:
     refresh_screen();
-	//while(1){}
 	return (int) 1;
 done:	
 	return (int) 0;	
@@ -1249,15 +1255,17 @@ done:
 
 
 //limpa a camada /microkernel
-int gcMICROKERNEL(){
+int gcMICROKERNEL()
+{
 	return (int) 0;
-}
+};
 
 
 //limpa a camada /hal
-int gcHAL(){
+int gcHAL()
+{
 	return (int) 0;
-}
+};
 
 
 /*
@@ -1308,7 +1316,6 @@ int gc()
 fail:
     printf("gc: FAIL.\n");	
 	refresh_screen();
-	//while(1){}
 	return (int) 1;
 	
 done:

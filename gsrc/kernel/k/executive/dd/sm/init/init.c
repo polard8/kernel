@@ -425,6 +425,14 @@ void init_globals()
     //inicializa as estruturas do fluxo padrão.	
 	stdioInitialize();
 	
+	
+	//
+	// Keyboard support.
+	//
+	
+	//ldisc_init_modifier_keys();
+	//ldisc_init_lock_keys();	
+	
 	//Continua ...
 
 // Done.
@@ -434,6 +442,7 @@ done:
 
 
 /*
+ ******************************************
  * init:
  * Base initializations. (Four phases).
  */ 

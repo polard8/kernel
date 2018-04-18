@@ -1233,7 +1233,8 @@ void guiSetUpMainWindow( unsigned long x,
  * init_gui:
  *     Inicializa a GUI.
  *     É preciso criar a GUI antes de inicializar.
- *     @todo: Mudar para guiInit(). 
+ *     @todo: Mudar para guiInit().
+ * Obs: Nada alem de recursos gráficos. 
  */
 int init_gui()
 {

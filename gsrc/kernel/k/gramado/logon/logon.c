@@ -3,6 +3,7 @@
  *
  * Descrição:
  *     @todo: Esse módulo deve prepara o ambiente para rodar o processo logon.bin.
+ *     Esse logon pode ser usado par um eventual boot loader ou system installer.
  *
  *     Arquivo principal do módulo logon do executive.
  *     *IMPORTANTE: Esse é o ambiente de logon.
@@ -961,7 +962,12 @@ int init_logon(int argc, char *argv[])
 	// com a flag.
 	//
 	
+	//
+	// Keyboard support.
+	//
 	
+	ldisc_init_modifier_keys();
+	ldisc_init_lock_keys();
 	
 	//...
 	

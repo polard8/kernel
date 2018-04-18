@@ -2,7 +2,7 @@
     Design Note 1.
 
 
-    Design Note sobre o módulo /gui que pertence ao executive do kernel base.
+    Design Note sobre o módulo /gui que pertence ao /gramado do kernel base.
 
     gui pode ser o nome da classe que contem todos os recursos
 gráficos. ou pode ser awt.

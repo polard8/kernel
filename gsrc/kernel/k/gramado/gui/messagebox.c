@@ -55,12 +55,18 @@ void messageboxOut(struct window_d *parent_window, int type, char *title, char *
 /*
  * MessageBox:
  *     Cria uma Window Frame e apresenta uma mensagem nela.
- *     
+ * 
+ * IN: 
+ * Window frame handle.
+ * Message Box type. 
+ * Title for the window frame.
+ * Message string.
+ *
  */
-void MessageBox( struct window_d *parent_window,  //Window frame handle.      
-                 int type,                        //Message Box type.
-				 char *title,                     //Title for the window frame.
-				 char *string )                   //Message string.
+void MessageBox( struct window_d *parent_window,        
+                 int type,                        
+				 char *title,                     
+				 char *string )                   
 {	
 	struct button_d *b1; 
 	struct button_d *b2;
@@ -80,11 +86,12 @@ void MessageBox( struct window_d *parent_window,  //Window frame handle.
 
 	
 	//x and y
+	// @todo centralizado: metade | um terço.
 	//@todo: Pegar a métrica do dispositivo.
-	unsigned long x  = (unsigned long) (800 -400);  //deslocamento x
-    unsigned long cx = (unsigned long) 320;         //largura   
-	unsigned long y  = (unsigned long) (600 -400);  //deslocamento y
-    unsigned long cy = (unsigned long) 240;         //altura	
+	unsigned long x  = (unsigned long) 20;  //deslocamento x
+    unsigned long cx = (unsigned long) 400;         //largura   
+	unsigned long y  = (unsigned long) 20;  //deslocamento y
+    unsigned long cy = (unsigned long) 100;         //altura	
 
 	
 	//No GUI.
