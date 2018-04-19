@@ -53,14 +53,17 @@ void *draw_button( struct window_d *window,
 	}else{
 		b->objectType = ObjectTypeButton;
 		b->objectClass = ObjectClassGuiObjects;
+		
 	    b->used = 1;	
 	    b->magic = 1234;
+		
 		b->string = string;  //Label.
         b->type = type;
         b->x = x;
         b->y = y;
         b->width = width;
         b->height = height;
+		
         b->window = (void*) window;
         b->color = color; 	
         b->Next = NULL;		 
@@ -165,10 +168,17 @@ do_draw_label:
 	//if(useImage == 1{ ... goto done;}
 	
 	//button label								   
-    if(Selected == 1){
-	    draw_string( window->left + x +8, window->top + y +8, COLOR_WHITE, string);	
+    if(Selected == 1)
+	{
+	    draw_string( window->left +x +8, 
+		             window->top  +y +8, 
+					 COLOR_WHITE, 
+					 string);	
     }else{
-	    draw_string( window->left + x +8, window->top + y +8, COLOR_WINDOWTEXT, string);	
+	    draw_string( window->left +x +8, 
+		             window->top  +y +8, 
+					 COLOR_WINDOWTEXT, 
+					 string);	
 	};
 	
 	

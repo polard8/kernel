@@ -650,7 +650,29 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		    //if(titulo){} TitleBar = 1;    //titulo + borda	
 		    break;
 
-		//editbox,
+		// 
+		//5) Check box, (Simples + borda preta).
+        //   Caixa de seleção. Caixa de verificação. Quadradinho.
+		case WT_CHECKBOX:
+	        Background = 1;    //bg.
+		    window->backgroundUsed = 1;
+            //bordas.
+            Border = 1;
+ 			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
+		    break;
+			
+		// 
+		//6) scroll bar.
+        //   // Cria uma scroll bar. Para ser usada como janela filha.
+		case WT_SCROLLBAR:
+	        Background = 1;    //bg.
+		    window->backgroundUsed = 1;
+            //bordas.
+            //Border = 1;
+ 			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
+		    break;
+			
+			
 		//barra de rolagem
 		//botões de radio .. 
 		//...
@@ -817,9 +839,7 @@ drawBegin:
 	//
 	//
 	
-	//#bugbug
-	//a sombra no editbox tá bangunçando tudo.
-	//#suspenso. suspenso por um tempo.
+	
     //Sombra.	
 	if(Shadow == 1)
 	{
@@ -832,11 +852,14 @@ drawBegin:
 		if( (unsigned long) type == WT_OVERLAPPED )
 		{
 		    //@todo: Passar a estrutura de janela.
-            drawDataRectangle( window->left +1, 
+            // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
+			// @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
+			//Cinza escuro.  CurrentColorScheme->elements[??] @TODO: criar elemento sombra no esquema. 
+			drawDataRectangle( window->left +1, 
 		                   window->top  +1, 
-						   window->width  +1 +1,      // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
-						   window->height +1 +24 +1,  // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-						   xCOLOR_GRAY1 );            //Cinza escuro.  CurrentColorScheme->elements[??] @TODO: criar elemento sombra no esquema.  
+						   window->width  +1 +1,      
+						   window->height +1 +24 +1,  
+						   xCOLOR_GRAY1 );             
         };						   
 	};	
 	
@@ -858,17 +881,16 @@ drawBegin:
 		if( (unsigned long) type == WT_SIMPLE ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_EDITBOX){ window->color_bg = color; }
+		if( (unsigned long) type == WT_CHECKBOX){ window->color_bg = color; }
+		if( (unsigned long) type == WT_SCROLLBAR){ window->color_bg = color; }
 		//...
-		
-		//@todo: Se tiver barra de rolagem a largura do backgrond deve ser maior.
-		//if()
 		
 		//Pintar o retângulo.
 		drawDataRectangle( window->left, 
 		                   window->top, 
 						   window->width,  // @todo: Adicionar a largura da bordas bordas verticais.
 						   window->height, // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-						   window->color_bg );   	
+						   window->color_bg ); 						   
 	};
 	
 	//BORDA PARA EDITBOX
@@ -1084,6 +1106,10 @@ drawBegin:
 		};
 		//Nothing.
 	};
+	
+	
+	//@todo: janela com scroll bar padrão.
+	//if( ScrollBar == 1 ){}
 
 	//MenuBar (teste)
     /*   
@@ -1096,6 +1122,33 @@ drawBegin:
 	};
 	*/
 	
+	// SCROLL BAR
+	//se create window foi usada para criar uma janela filha do tipo scroll bar. 		
+	//completaremos 
+	if( (unsigned long) type == WT_SCROLLBAR )
+	{ 
+	    //botão 1 da barra horizontal.
+		draw_button( window, "^", 1, 
+			         1, 1,  //deslocamento 
+					(window->width -2), 16, 
+					COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.
+			
+	
+	    //limits
+	    if( window->height == 0 || window->height > 800 ){ 
+		    window->height = 2; 
+		}
+		draw_button( window, "=", 1, 
+			         1, (window->height/2), //#bugbug cuidado
+					(window->width -2), 16, 
+					COLOR_BUTTONFACE);				
+					
+	    //botão 2 da barra horizontal.
+		draw_button( window, "v", 1, 
+			         1, (window->height -17), 
+					(window->width -2), 16, 
+					COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.			
+	};				   
 
 	
 	//

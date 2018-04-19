@@ -181,6 +181,8 @@ struct _iobuf *root;
 
 //Janelas usadas pelo aplicativo.
 
+struct window_d *topbar_scrollbarWindow;
+struct window_d *topbar_checkboxWindow;
 struct window_d *topbar_editboxWindow;  //edit box.
 struct window_d *editboxWindow;  //edit box.
 struct window_d *topbarWindow;  //task bar.

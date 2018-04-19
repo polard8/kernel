@@ -132,9 +132,61 @@ void shellCreateTopBar()
 	};
 	    //Registrar.
     APIRegisterWindow(topbar_editboxWindow);
+	
+	
+	
+	
+	
+    //
+    // check box na topbar
+    //
+	
+
+	topbar_checkboxWindow = (void*) APICreateWindow( 5, 1, 1,"{}shell-topbar-checkbox1",     
+                                       20, 
+									   20, 
+									   20, 
+									   20,    
+                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
+									   
+									   
+	if((void*) topbar_checkboxWindow == NULL){	
+		printf("shellCreateTopBar: fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+	    //Registrar.
+    APIRegisterWindow(topbar_checkboxWindow);
 
 	
 	
+	
+	
+    //
+    // scroll bar na topbar
+    //
+	
+
+	topbar_scrollbarWindow = (void*) APICreateWindow( 6, 1, 1,"{}shell-topbar-scrollbar",     
+                                       (800-41), 
+									   0, 
+									   40, 
+									   200,    
+                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
+									   
+									   
+	if((void*) topbar_scrollbarWindow == NULL){	
+		printf("shellCreateTopBar: fail");
+		refresh_screen();
+		while(1){}
+		//exit(0);
+	};
+	    //Registrar.
+    APIRegisterWindow(topbar_scrollbarWindow);
+
+	
+		
 	
 	
 	//

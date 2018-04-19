@@ -127,8 +127,9 @@
 #define WT_EDITBOX       2  // igual simples, mais uma bordinha preta.
 #define WT_OVERLAPPED    3  // sobreposta(completa)(barra de titulo + borda +client area)
 #define WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
-//#define WT_BUTTON_DOWN   5 // cancelado
-//#define WT_BUTTON_UP     6 // cancelado
+#define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
+#define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
+//... 
 
 
 

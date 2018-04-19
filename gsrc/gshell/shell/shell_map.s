@@ -38,11 +38,15 @@ prompt_max          0x10              crt0.o
 pwd                 0x10              main.o
 CurrentWindow       0x10              main.o
 g_heap_pointer      0x10              stdlib.o
+topbar_scrollbarWindow
+                    0x10              main.o
 heapList            0x400             stdlib.o
 prompt_err          0x100             crt0.o
 current_semaphore   0x10              main.o
 g_columns           0x10              crt0.o
 ShellHook           0x10              main.o
+topbar_checkboxWindow
+                    0x10              main.o
 shellScreenBufferMaxRows
                     0x10              main.o
 shellScreenWidth    0x10              main.o
@@ -147,164 +151,164 @@ Linker script and memory map
                 0x00452551                shellTree
                 0x0045253d                shellHelp
                 0x00452b04                shellTestMBR
- .text          0x00452ee8      0x4c0 shellui.o
-                0x004531f4                shellTestDisplayBMP
+ .text          0x00452ee8      0x5e0 shellui.o
+                0x00453318                shellTestDisplayBMP
                 0x00452ee8                shellCreateEditBox
-                0x0045326a                bmpDisplayBMP
+                0x0045338e                bmpDisplayBMP
                 0x00452f82                shellCreateTopBar
- .text          0x004533a8     0x1470 api.o
-                0x0045415b                APIShowCurrentProcessInfo
-                0x00453948                system11
-                0x004539ed                refresh_buffer
-                0x0045403d                APISetFocus
-                0x004539ab                system14
-                0x00453cd2                apiInitBackground
-                0x00453f11                APICreateWindow
-                0x00454688                apiBeginPaint
-                0x00453cd7                MessageBox
-                0x004541d9                APIreplace_window
-                0x004546cf                apiGetSystemMetrics
-                0x0045398a                system13
-                0x0045453f                apiDown
-                0x004545d7                enterCriticalSection
-                0x00454515                apiFOpen
-                0x004537fe                system1
-                0x00453882                system5
-                0x0045438d                api_refresh_screen
-                0x00454419                apiGetCursorY
-                0x00453c7d                carrega_bitmap_16x16
-                0x00454630                exitCriticalSection
-                0x004533a8                system_call
-                0x0045458b                apiUp
-                0x004533d0                apiSystem
-                0x004547e8                api_get_window_with_text_input
-                0x004539cc                system15
-                0x004540ed                APISetActiveWindow
-                0x00454471                apiSetClientAreaRect
-                0x004541b0                APIredraw_window
-                0x004544c3                apiCreateThread
-                0x00453c19                SetNextWindowProcedure
-                0x004543ed                apiGetCursorX
-                0x00453be9                chama_procedimento
-                0x00453d00                call_kernel
-                0x00453fb9                APIRegisterWindow
-                0x00454303                api_strncmp
-                0x0045422b                APIminimize_window
-                0x0045381f                system2
-                0x00453840                system3
-                0x00454721                api_get_current_keyboard_responder
-                0x0045449a                apiCreateProcess
-                0x0045407f                APIGetFocus
-                0x004538c4                system7
-                0x004538a3                system6
-                0x004546c5                apiDefDialog
-                0x00453ffb                APICloseWindow
-                0x0045465c                initializeCriticalSection
-                0x00453927                system10
-                0x00453c49                set_cursor
-                0x00454202                APImaximize_window
-                0x00454361                refresh_screen
-                0x00453e80                call_gui
-                0x00453906                system9
-                0x004546f8                api_set_current_keyboard_responder
-                0x00454187                APIresize_window
-                0x00454692                apiEndPaint
-                0x00453c78                put_char
-                0x00453b84                print_string
-                0x00454445                apiGetClientAreaRect
-                0x00453bba                edit_box
-                0x004542d2                kill
-                0x00454397                apiReboot
-                0x00453ca6                apiShutDown
-                0x0045474d                api_set_current_mouse_responder
-                0x004542a9                exit
-                0x00454254                APIget_foregroung_window
-                0x00453861                system4
-                0x004543c3                apiSetCursor
-                0x00453969                system12
-                0x00453b89                vsync
-                0x004538e5                system8
-                0x004547a2                api_set_window_with_text_input
-                0x0045412f                APIGetActiveWindow
-                0x00454776                api_get_current_mouse_responder
-                0x004542d7                dead_thread_collector
-                0x004544ec                apiStartThread
-                0x004540ab                APIKillFocus
-                0x00454280                APIset_foregroung_window
-                0x0045469c                apiPutChar
- .text          0x00454818      0xbf0 stdio.o
-                0x00454fd7                putchar
-                0x00454f93                sprintf
-                0x004551c3                input
-                0x0045487d                scroll
-                0x004551b9                printf_main
-                0x00455003                outbyte
-                0x00454a27                app_print
-                0x004552ba                stdio_system_call
-                0x0045482f                fopen
-                0x004552e2                stdioInitialize
-                0x00454818                fclose
-                0x00455186                _outbyte
-                0x00454f78                printf
-                0x004549bb                app_clear
- .text          0x00455408      0x960 stdlib.o
-                0x004556c3                FreeHeap
-                0x00455408                rtGetHeapStart
-                0x0045590a                free
-                0x004558ac                rand
-                0x00455823                stdlibInitMM
-                0x004556cd                heapInit
-                0x0045541c                rtGetHeapPointer
-                0x00455426                rtGetAvailableHeap
-                0x00455883                libcInitRT
-                0x00455430                heapSetLibcHeap
-                0x004558c9                malloc
-                0x004556b0                AllocateHeapEx
-                0x004554d7                AllocateHeap
-                0x00455d01                stdlib_strncmp
-                0x00455412                rtGetHeapEnd
-                0x0045590f                system
- .text          0x00455d68      0x4a0 string.o
-                0x00455fcf                strcspn
-                0x00455f32                strcat
-                0x00455d68                strcmp
-                0x00455f89                bzero
-                0x0045610f                strtok_r
-                0x00455ec5                memcpy
-                0x00455e9c                memoryZeroMemory
-                0x00455f62                bcopy
-                0x00455f02                strcpy
-                0x0045606f                strspn
-                0x004561e4                strtok
-                0x00455e21                str_cmp
-                0x00455dc3                strncmp
-                0x00455fa4                strlen
+ .text          0x004534c8     0x1470 api.o
+                0x0045427b                APIShowCurrentProcessInfo
+                0x00453a68                system11
+                0x00453b0d                refresh_buffer
+                0x0045415d                APISetFocus
+                0x00453acb                system14
+                0x00453df2                apiInitBackground
+                0x00454031                APICreateWindow
+                0x004547a8                apiBeginPaint
+                0x00453df7                MessageBox
+                0x004542f9                APIreplace_window
+                0x004547ef                apiGetSystemMetrics
+                0x00453aaa                system13
+                0x0045465f                apiDown
+                0x004546f7                enterCriticalSection
+                0x00454635                apiFOpen
+                0x0045391e                system1
+                0x004539a2                system5
+                0x004544ad                api_refresh_screen
+                0x00454539                apiGetCursorY
+                0x00453d9d                carrega_bitmap_16x16
+                0x00454750                exitCriticalSection
+                0x004534c8                system_call
+                0x004546ab                apiUp
+                0x004534f0                apiSystem
+                0x00454908                api_get_window_with_text_input
+                0x00453aec                system15
+                0x0045420d                APISetActiveWindow
+                0x00454591                apiSetClientAreaRect
+                0x004542d0                APIredraw_window
+                0x004545e3                apiCreateThread
+                0x00453d39                SetNextWindowProcedure
+                0x0045450d                apiGetCursorX
+                0x00453d09                chama_procedimento
+                0x00453e20                call_kernel
+                0x004540d9                APIRegisterWindow
+                0x00454423                api_strncmp
+                0x0045434b                APIminimize_window
+                0x0045393f                system2
+                0x00453960                system3
+                0x00454841                api_get_current_keyboard_responder
+                0x004545ba                apiCreateProcess
+                0x0045419f                APIGetFocus
+                0x004539e4                system7
+                0x004539c3                system6
+                0x004547e5                apiDefDialog
+                0x0045411b                APICloseWindow
+                0x0045477c                initializeCriticalSection
+                0x00453a47                system10
+                0x00453d69                set_cursor
+                0x00454322                APImaximize_window
+                0x00454481                refresh_screen
+                0x00453fa0                call_gui
+                0x00453a26                system9
+                0x00454818                api_set_current_keyboard_responder
+                0x004542a7                APIresize_window
+                0x004547b2                apiEndPaint
+                0x00453d98                put_char
+                0x00453ca4                print_string
+                0x00454565                apiGetClientAreaRect
+                0x00453cda                edit_box
+                0x004543f2                kill
+                0x004544b7                apiReboot
+                0x00453dc6                apiShutDown
+                0x0045486d                api_set_current_mouse_responder
+                0x004543c9                exit
+                0x00454374                APIget_foregroung_window
+                0x00453981                system4
+                0x004544e3                apiSetCursor
+                0x00453a89                system12
+                0x00453ca9                vsync
+                0x00453a05                system8
+                0x004548c2                api_set_window_with_text_input
+                0x0045424f                APIGetActiveWindow
+                0x00454896                api_get_current_mouse_responder
+                0x004543f7                dead_thread_collector
+                0x0045460c                apiStartThread
+                0x004541cb                APIKillFocus
+                0x004543a0                APIset_foregroung_window
+                0x004547bc                apiPutChar
+ .text          0x00454938      0xbf0 stdio.o
+                0x004550f7                putchar
+                0x004550b3                sprintf
+                0x004552e3                input
+                0x0045499d                scroll
+                0x004552d9                printf_main
+                0x00455123                outbyte
+                0x00454b47                app_print
+                0x004553da                stdio_system_call
+                0x0045494f                fopen
+                0x00455402                stdioInitialize
+                0x00454938                fclose
+                0x004552a6                _outbyte
+                0x00455098                printf
+                0x00454adb                app_clear
+ .text          0x00455528      0x960 stdlib.o
+                0x004557e3                FreeHeap
+                0x00455528                rtGetHeapStart
+                0x00455a2a                free
+                0x004559cc                rand
+                0x00455943                stdlibInitMM
+                0x004557ed                heapInit
+                0x0045553c                rtGetHeapPointer
+                0x00455546                rtGetAvailableHeap
+                0x004559a3                libcInitRT
+                0x00455550                heapSetLibcHeap
+                0x004559e9                malloc
+                0x004557d0                AllocateHeapEx
+                0x004555f7                AllocateHeap
+                0x00455e21                stdlib_strncmp
+                0x00455532                rtGetHeapEnd
+                0x00455a2f                system
+ .text          0x00455e88      0x4a0 string.o
+                0x004560ef                strcspn
+                0x00456052                strcat
+                0x00455e88                strcmp
+                0x004560a9                bzero
+                0x0045622f                strtok_r
+                0x00455fe5                memcpy
+                0x00455fbc                memoryZeroMemory
+                0x00456082                bcopy
+                0x00456022                strcpy
+                0x0045618f                strspn
+                0x00456304                strtok
+                0x00455f41                str_cmp
+                0x00455ee3                strncmp
+                0x004560c4                strlen
                 0x00457000                . = ALIGN (0x1000)
- *fill*         0x00456208      0xdf8 00
+ *fill*         0x00456328      0xcd8 00
 
-.rdata          0x00457000     0x17f0
+.rdata          0x00457000     0x1810
  .rdata         0x00457000      0x430 stdlib.o
  .rdata         0x00457430       0x30 stdio.o
  .rdata         0x00457460      0x310 api.o
- .rdata         0x00457770      0x320 shellui.o
- .rdata         0x00457a90      0xd60 main.o
+ .rdata         0x00457770      0x340 shellui.o
+ .rdata         0x00457ab0      0xd60 main.o
 
-.data           0x004587f0      0x810
-                0x004587f0                data = .
-                0x004587f0                _data = .
-                0x004587f0                __data = .
+.data           0x00458810      0x7f0
+                0x00458810                data = .
+                0x00458810                _data = .
+                0x00458810                __data = .
  *(.data)
- .data          0x004587f0        0x0 crt0.o
- .data          0x004587f0       0x20 main.o
- .data          0x00458810       0x20 shellui.o
- .data          0x00458830        0x0 api.o
- .data          0x00458830        0x0 stdio.o
- .data          0x00458830       0x10 stdlib.o
- .data          0x00458840        0x0 string.o
+ .data          0x00458810        0x0 crt0.o
+ .data          0x00458810       0x20 main.o
+ .data          0x00458830       0x20 shellui.o
+ .data          0x00458850        0x0 api.o
+ .data          0x00458850        0x0 stdio.o
+ .data          0x00458850       0x10 stdlib.o
+ .data          0x00458860        0x0 string.o
                 0x00459000                . = ALIGN (0x1000)
- *fill*         0x00458840      0x7c0 00
+ *fill*         0x00458860      0x7a0 00
 
-.bss            0x00459000     0xaf30
+.bss            0x00459000     0xaf50
                 0x00459000                bss = .
                 0x00459000                _bss = .
                 0x00459000                __bss = .
@@ -336,7 +340,7 @@ Linker script and memory map
                 0x004623e0                prompt_status
                 0x004623f0                g_char_attrib
                 0x00462400                g_cursor_x
- COMMON         0x00462410     0x1230 main.o
+ COMMON         0x00462410     0x1250 main.o
                 0x00462410                ShellMetrics
                 0x00462420                shellStatus
                 0x00462430                CommandHistory
@@ -357,47 +361,49 @@ Linker script and memory map
                 0x00462530                foregroung_color
                 0x00462540                pwd
                 0x00462550                CurrentWindow
-                0x00462560                current_semaphore
-                0x00462570                ShellHook
-                0x00462580                shellScreenBufferMaxRows
-                0x00462590                shellScreenWidth
-                0x004625a0                screen_buffer_pos
-                0x004625b0                shellScreenHeight
-                0x004625c0                editboxWindow
-                0x004625d0                username
-                0x004625e0                screen_buffer_x
-                0x004625f0                screen_buffer
-                0x004635a0                shell_window_y
-                0x004635b0                terminal_rect
-                0x004635c0                password
-                0x004635d0                CursorInfo
-                0x004635e0                shellMaxColumns
-                0x004635f0                i1Window
-                0x00463600                screen_buffer_y
-                0x00463610                topbar_editboxWindow
-                0x00463620                topbarWindow
-                0x00463630                ApplicationInfo
- COMMON         0x00463640      0x8f0 stdlib.o
-                0x00463640                current_mmblock
-                0x00463650                mm_prev_pointer
-                0x00463660                heap_end
-                0x00463670                g_available_heap
-                0x00463680                heap_start
-                0x00463690                heapCount
-                0x004636a0                HEAP_START
-                0x004636b0                g_heap_pointer
-                0x004636c0                heapList
-                0x00463ac0                HEAP_SIZE
-                0x00463ad0                last_size
-                0x00463ae0                last_valid
-                0x00463af0                mmblockList
-                0x00463ef0                libcHeap
-                0x00463f00                Heap
-                0x00463f10                mmblockCount
-                0x00463f20                HEAP_END
-                0x00463f30                end = .
-                0x00463f30                _end = .
-                0x00463f30                __end = .
+                0x00462560                topbar_scrollbarWindow
+                0x00462570                current_semaphore
+                0x00462580                ShellHook
+                0x00462590                topbar_checkboxWindow
+                0x004625a0                shellScreenBufferMaxRows
+                0x004625b0                shellScreenWidth
+                0x004625c0                screen_buffer_pos
+                0x004625d0                shellScreenHeight
+                0x004625e0                editboxWindow
+                0x004625f0                username
+                0x00462600                screen_buffer_x
+                0x00462610                screen_buffer
+                0x004635c0                shell_window_y
+                0x004635d0                terminal_rect
+                0x004635e0                password
+                0x004635f0                CursorInfo
+                0x00463600                shellMaxColumns
+                0x00463610                i1Window
+                0x00463620                screen_buffer_y
+                0x00463630                topbar_editboxWindow
+                0x00463640                topbarWindow
+                0x00463650                ApplicationInfo
+ COMMON         0x00463660      0x8f0 stdlib.o
+                0x00463660                current_mmblock
+                0x00463670                mm_prev_pointer
+                0x00463680                heap_end
+                0x00463690                g_available_heap
+                0x004636a0                heap_start
+                0x004636b0                heapCount
+                0x004636c0                HEAP_START
+                0x004636d0                g_heap_pointer
+                0x004636e0                heapList
+                0x00463ae0                HEAP_SIZE
+                0x00463af0                last_size
+                0x00463b00                last_valid
+                0x00463b10                mmblockList
+                0x00463f10                libcHeap
+                0x00463f20                Heap
+                0x00463f30                mmblockCount
+                0x00463f40                HEAP_END
+                0x00463f50                end = .
+                0x00463f50                _end = .
+                0x00463f50                __end = .
 LOAD head.o
 LOAD crt0.o
 LOAD main.o
