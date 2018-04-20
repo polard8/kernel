@@ -118,6 +118,13 @@ int kMain(int argc, char* argv[])
         VideoBlock.useGui = GUI_OFF;
         //...
     };
+	
+	
+	//verbose mode do kernel.
+	//permite que a tela do kernel funcione igual a um 
+	//terminal, imprimindo os printfs um abaixo do outro.
+	//sempre reiniciando x.	
+	stdio_verbosemode_flag = 1;
 
     videoVideo();
     videoInit();

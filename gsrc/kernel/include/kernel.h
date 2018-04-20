@@ -276,7 +276,7 @@ extern void do_executa_new_task();
 #include <executive/dd/sm/network/ip.h>          //(network) IP info.      (sw)
 #include <executive/dd/sm/network/channel.h>     //(network) Channel       (sw)
 #include <executive/dd/sm/network/client.h>      //(network) Client process support. 
-#include <executive/dd/sm/network/server.h>      //(network) Server process support.
+#include <executive/dd/sm/network/ns.h>          //(network) Network Server.
 #include <executive/dd/sm/network/network.h>     //(network) Gerenciamento de rede. 
 #include <executive/fs/fs.h>                     //fs.
 #include <executive/fs/vfs.h>                     //vfs.

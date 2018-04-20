@@ -328,6 +328,7 @@ done:
 
 
 /*
+ *******************************************************************
  * KiCreateIdle:
  *     Criando Idle thread manualmente.
  * *IMPORTANTE: Na verdade esse processos e threads devem ser criados 
@@ -466,7 +467,7 @@ void *KiCreateIdle()
 	//@todo: Isso deve ser uma estrutura de contexto.
 	IdleThread->ss  = 0x23;                          //RING 3.
 	IdleThread->esp = (unsigned long) 0x0044FFF0;    //idleStack; (*** RING 3)
-	IdleThread->eflags = 0x3200;
+	IdleThread->eflags = 0x3200;  //0x3202, pois o bit 1 é reservado e está sempre ligado.
 	IdleThread->cs = 0x1B;                                
 	IdleThread->eip = (unsigned long) 0x00401000;     	                                               
 	IdleThread->ds = 0x23; 

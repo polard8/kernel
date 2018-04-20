@@ -403,7 +403,12 @@ static char prompt_string[] = "Prompt:";
 int stdio_terminalmode_flag;
 
 
-//
+//verbose mode do kernel.
+//permite que a tela do kernel funcione igual a um 
+//terminal, imprimindo os printfs um abaixo do outro.
+//sempre reiniciando x.
+int stdio_verbosemode_flag;
+
 
 /*
  * FILE:

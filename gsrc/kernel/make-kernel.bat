@@ -142,8 +142,8 @@ echo -{ ux2 /executive
     gcc -c k/executive/dd/sm/sys/abort.c  -I./include -o abort.o		
     rem info
     gcc -c k/executive/dd/sm/sys/info.c  -I./include -o info.o	
-    rem server
-    gcc -c k/executive/dd/sm/sys/server.c  -I./include -o server.o
+    rem server manager
+    gcc -c k/executive/dd/sm/sys/sm.c  -I./include -o sm.o
     rem channel
     gcc -c k/executive/dd/sm/sys/channel.c  -I./include -o channel.o	
 	rem signal
@@ -355,7 +355,7 @@ modules.o ^
 nic.o ^
 network.o ^
 socket.o ^
-server.o ^
+sm.o ^
 channel.o ^
 ipc.o ^
 read.o ^

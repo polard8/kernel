@@ -15,6 +15,40 @@
 
 
 //
+//===============================================================
+// refresh rect - Fred. P.
+//
+// @todo:
+// Nessa macro podemos usar variáveis globais e inicializar
+// essas variável. E considerarmos valores como g_bpp, g_screen_width. 
+//
+
+
+//#define RGB_PIXEL_OFFSET(x,y) \
+//( (3*800*(y)) + (3*(x)) )
+
+//
+// #define RGB_PIXEL_OFFSET(x,y) \
+// ( (3*screenGetWidth()*(y)) + (3*(x)) )
+//
+// #define RGB_PIXEL_OFFSET(x,y) \
+// ( ( screenGetBPP() * screenGetWidth()*(y)) + ( screenGetBPP() *(x)) )
+
+// #define RGB_PIXEL_OFFSET(x,y) \
+// ( ( g_bpp * g_screen_width *(y)) + ( g_bpp *(x)) )
+
+//================================================
+
+
+
+//Usada no refresh rectangle.
+#define BUFFER_PIXEL_OFFSET(x,y) \
+( (3*800*(y)) + (3*(x)) )
+
+
+
+
+//
 // @todo: Criar uma estrutura para o elemento gráfico. entre os elementos da estrutura
 // pode ter os buffer para o char. backbuffer, frontbuffer, dedicatedbuffer.
 //
@@ -134,11 +168,17 @@ void drawDataRectangle( unsigned long x,
     */	
   	
     //Pinta as linhas no Backbuffer.  
-	while(height--){
-	    my_buffer_horizontal_line( rect->left, y, rect->right, rect->color_bg);
+	while( height-- )
+	{
+	    my_buffer_horizontal_line( rect->left, 
+		                           y, 
+								   rect->right, 
+								   rect->color_bg );
 		y++;
     };    
   
+    //Nothing.
+	
 done: 
     return;
 };
@@ -183,61 +223,17 @@ void setClientAreaRect( unsigned long x,
 };
 
 
-					
-
-
-
-//
-//===============================================================
-// refresh rect - Fred. P.
-//
-
-
-
-
-
-//extern void* frmbuffptr;
-//extern void* backbuffptr;
-//extern unsigned int screen_width, screen_height;
-
-
-
-
-//
-// @todo:
-// Nessa macro podemos usar variáveis globais e inicializar
-// essas variável. E considerarmos valores como g_bpp, g_screen_width. 
-//
-
-#define BUFFER_PIXEL_OFFSET(x,y) \
-( (3*800*(y)) + (3*(x)) )
-
-//#define RGB_PIXEL_OFFSET(x,y) \
-//( (3*800*(y)) + (3*(x)) )
-
-// @todo:
-// Fazer assim ...
-
-//
-// #define RGB_PIXEL_OFFSET(x,y) \
-// ( (3*screenGetWidth()*(y)) + (3*(x)) )
-//
-// #define RGB_PIXEL_OFFSET(x,y) \
-// ( ( screenGetBPP() * screenGetWidth()*(y)) + ( screenGetBPP() *(x)) )
-
-// #define RGB_PIXEL_OFFSET(x,y) \
-// ( ( g_bpp * g_screen_width *(y)) + ( g_bpp *(x)) )
-
-//================================================
 
 
 /*
+ ***********************************************************
  * refresh_rectangle:
  *     Copiar um retângulo do backbuffer para o frontbuffer.   
  * 
  * Histórico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
- *     2017 - Revisão. 
+ *     2018 - Fred Nora.
+ * 
  */					
 void refresh_rectangle( unsigned long x, 
                         unsigned long y, 
@@ -261,7 +257,8 @@ void refresh_rectangle( unsigned long x,
     vsync();	
 	
 	unsigned int i;
-	for( i = 0; i < lines; i++ ){
+	for( i=0; i < lines; i++ )
+	{
 		memcpy( p, q, (line_size*3) );
 		q += (Width*3);
 		p += (Width*3);

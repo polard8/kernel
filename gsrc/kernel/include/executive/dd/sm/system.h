@@ -22,6 +22,19 @@
  */
 
  
+//======================================== 
+//Esses são os principais arquivos usandos na 
+//inicialização do sistema. 
+//Obs: No fat16 eles se apresentam em maiúsculas.
+//#define INITTXT_PATH  "/root/init.txt"
+//#define BM_PATH       "/root/bm.bin"
+//#define BL_PATH       "/root/bl.bin"
+//#define KERNEL_PATH   "/root/kernel.bin"
+//#define INIT_PATH     "/root/init.bin"
+//#define SHELL_PATH    "/root/shell.bin"
+//#define TASKMAN_PATH  "/root/taskman.bin" 
+//...
+//========================================
  
 
 #define SYSTEMMODE_EDITBOX  0

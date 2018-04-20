@@ -1,6 +1,13 @@
 /*
- * File: server.c  
- * 
+ * File: k\sm.c  
+ *     Server Manager 
+ *     Gerenciamento de servidores feito pelo kernel base.
+ *     #importante: Um aplicativo gerenciador de servidores 
+ * deverá invocar esse módulo para pegar informações sobre 
+ * os servidores do sistema. Pois o kernel base vai gerenciar
+ * as estruturas com informações sobre eles, deixando os dados 
+ * protegidos em na memória em kernel mode.
+ *
  * Descrição:
  *      Gerenciamento de servidores.
  *      Gerencia os processos servidores que estão em user mode.

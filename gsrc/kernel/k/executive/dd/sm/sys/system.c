@@ -565,6 +565,7 @@ void *systemRam( int number,
 			
 		//Set focus on a window.	
         case 71: 
+		    //window.c
 		    SetFocus( (struct window_d *) arg1 ); 
 			break;
 			
@@ -653,14 +654,17 @@ void *systemRam( int number,
         //cursor support:
     
 	    case 86:
+		    //uitm\libk\misk.c
 	        set_up_cursor( (unsigned long) arg1, (unsigned long) arg2);
 		    break;
 			
 	    case 87:
-	        return (void*) get_cursor_x();
+	        //uitm\libk\misk.c
+			return (void*) get_cursor_x();
 		    break;
 			
 	    case 88:
+		    //uitm\libk\misk.c
 			return (void*) get_cursor_y();
             break;			
 	

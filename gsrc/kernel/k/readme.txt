@@ -2,7 +2,13 @@
 Sobre o kernel base:
 ====================
     O kernel base é o núcleo do sistema operacional, roda no ambiente
-ring0 e é construido em camadas. O executável chama-se KERNEL.BIN.	
+ring0 e é construido em camadas. O executável chama-se KERNEL.BIN.
+
+
+k\sm.c:
+    responsável por gerenciar os servidores que compoem o sistema.
+    Obs: esses servidores podem ser persistentes e ficarem dentro
+do kernel base o tempo todo ou podem ser caregados pelo sistema de arquivos.
    
    
 

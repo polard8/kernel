@@ -118,6 +118,8 @@ done:
 
 /*
  * scroll:
+ *     Isso pode ser útil em full screen e na inicialização do kernel.
+ *
  * *Importante: Um (retângulo) num terminal deve ser o lugar onde o buffer de linhas 
  * deve ser pintado. Obs: Esse retãngulo pode ser configurado através de uma função.
  *     Scroll the screen in text mode.
@@ -138,6 +140,21 @@ void scroll(void)
 {
     unsigned short i;
     unsigned short j;
+
+
+	//indice para o backbuffer.
+	int Start, End;
+	int Source, Dest;
+	
+	//
+	// ponteiros usados no modo grafico.
+	//
+
+	unsigned char *backbuffer = (unsigned char *) BACKBUFFER_BASE;
+	
+	//
+	// ponteiros usados no modo texto.
+	//
 	
 	//Início da tela.
 	unsigned short *p1 = (unsigned short *) SCREEN_START;
@@ -145,12 +162,21 @@ void scroll(void)
 	//Início da segunda linha.
     unsigned short *p2 = (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
 
+	//salvar cursor.
+	unsigned long OldX, OldY;
+	
+	
 	//
 	// Se estamos em Modo gráfico (GUI).
     //
+
+//graphics_mode:
 	
 	if(VideoBlock.useGui == 1)
 	{
+		
+		
+		
 		//Modificar o backbuffer. BACKBUFFER_BASE
         
 		//mover o backbuffer começando da segunda linha.
@@ -161,57 +187,57 @@ void scroll(void)
 		//por enquanto fica assim.
 		
 		
-		//apaga a linha.
-		for(i = 0; i < 70; i++){
-		    //outbyte(" ");    	
+		Start = 0;
+		Source = Start+(3*800);  //Começa da segunda linha.
+		Dest = 0;                //destino o início do backbuffer.
+		
+		End = (3*800)*600;       //termina ao fim de 600 linhas.
+		
+		//Contagem do total a ser transferido.
+		for(  Start=0; Start < End; Start++ )
+		{
+			//copy. 
+            backbuffer[Start] = backbuffer[Source];
+            Source++;    			
 		};
 		
-		//cada linha tem 800 pixel, cada char tem 8 pixel de largura,
-		//a altura do char são pixel.
-		//cada pixel tem 3 bytes.
-		
-		//move 74 linhas começando da segunda.
-		
-		//
-		//  ** full screen **
-		//
-		
-		//if(fullscree ...
-		
-		//destino, origem(segunda linha), quantidade de bytes.
-        //memcpy( (void*) BACKBUFFER_BASE, (const void*) BACKBUFFER_BASE + (g_cursor_right*8*3), (size_t) (g_cursor_right*8*3*8*(g_cursor_left-1)));        
-        memcpy( (void*) BACKBUFFER_BASE,                         //inicio do backbuffer
-		        (const void*) BACKBUFFER_BASE + ((800*3)*8),     //início da primeira linha
-				(size_t) ((800*3) * (600-8))  );                 //quantidade de bytes.   		 		
-				
 		//
         //Limpa a última linha.
         //
 		
-		g_cursor_x = g_cursor_left;
-		g_cursor_y = g_cursor_bottom;
+		//salva cursor
+		OldX = g_cursor_x;
+		OldY = g_cursor_y;
 		
-		for(i = g_cursor_left; i < g_cursor_right; i++){
-		    printf("%c",' ');    	
+		//cursor na ultima linha.
+		g_cursor_x = 0;
+		g_cursor_y = (g_cursor_bottom-1);
+		
+		for( i=0; i < g_cursor_right; i++){
+		    _outbyte(' ');    	
 		};
-		//Nothing.
-		
+	
+	//Nothing.
 		
 		//
 		// Reposiciona o cursor na última linha.
 		//
 		
-        g_cursor_x = g_cursor_left;
-		g_cursor_y = g_cursor_bottom;
+        g_cursor_x = OldX;
+		g_cursor_y = OldY;
 		
 		
-		
+		refresh_screen();
 		goto done;
-	};	
+	};
+
+	
 	
 	//
 	// Se estavermos em modo texto.
     //
+	
+//text_mode:
 	
 	if(VideoBlock.useGui == 0)	
 	{
@@ -684,43 +710,72 @@ void outbyte(int c)
 {
 	static char prev = 0;
 	
+	//
+	// Obs:
+	// Podemos setar a posição do curso usando método,
+	// simulando uma vaiável protegida.
+	//
 	
 //checkChar:
         
-	//liberando esse limite.
-	//permitindo os caracteres menores que 32.
-	//if( c <  ' '  && c != '\r' && c != '\n' && c != '\t' && c != '\b' )
-	//{
-    //    return;
-    //};
-                
-    //Volta ao inicio da linha.        
-    if( c == '\r' ){
-        g_cursor_x = g_cursor_left;  //0
-        prev = c;
-        return;    
-    };        
-       
+      
+    //switch ?? 
+
+    //
+    // m$. É normal \n retornar sem imprimir nada.
+    //	
     
     //Início da próxima linha.    
     if( c == '\n' && prev == '\r' ) 
     {
-        g_cursor_y++;
-        g_cursor_x = g_cursor_left;  //0
-        prev = c;
+		if( g_cursor_y >= (g_cursor_bottom-1) ) {
+	        scroll();
+            g_cursor_y = (g_cursor_bottom-1);
+            
+			prev = c; 
+			
+		} else {
+		    g_cursor_y++;
+            g_cursor_x = g_cursor_left; //Por causa do prev.			
+		    prev = c;
+		}	
         return;
     };
+	
         
     //Próxima linha.
 	if( c == '\n' && prev != '\r' ) 
     {
-        g_cursor_y++;
-		
-		//Iremos para o início da linha até mesmo nesse caso.
-		//Assumindo um comportamento de terminal.
-		g_cursor_x = g_cursor_left;  
-        prev = c;
-        return; 
+		if( g_cursor_y >= (g_cursor_bottom-1) ) {
+	        scroll();
+            g_cursor_y = (g_cursor_bottom-1);
+           
+		    prev = c;
+			
+		} else {
+		    
+			g_cursor_y++;
+            
+			//Retornaremos mesmo assim ao início da linha 
+			//se estivermos imprimindo no terminal.
+			if ( stdio_terminalmode_flag == 1 ){
+			    g_cursor_x = g_cursor_left;	
+			} 
+			
+			//verbose mode do kernel.
+			//permite que a tela do kernel funcione igual a um 
+			//terminal, imprimindo os printfs um abaixo do outro.
+			//sempre reiniciando x.
+			if ( stdio_verbosemode_flag == 1 ){
+			    g_cursor_x = g_cursor_left;	
+			} 
+			
+			//Obs: No caso estarmos imprimindo em um editor 
+			//então não devemos voltar ao início da linha.
+			
+			prev = c;
+		}	
+        return;		
     };
 	
 
@@ -728,10 +783,38 @@ void outbyte(int c)
 	//@todo: Criar a variável 'g_tab_size'.
     if( c == '\t' )  
     {
-        g_cursor_x += (4); 
+		g_cursor_x += (4); 
         prev = c;
-        return;         
+        return; 
+		
+		//Não adianta só avançar, tem que apagar o caminho até lá.
+		
+		//int tOffset;
+		//tOffset = 8 - ( g_cursor_left % 8 );
+		//while(tOffset--){
+		//	_outbyte(' ');
+		//}
+		//Olha que coisa idiota, e se tOffset for 0.
+		//set_up_cursor( g_cursor_x +tOffset, g_cursor_y );
+		//return;        
     };
+	
+	
+	//liberando esse limite.
+	//permitindo os caracteres menores que 32.
+	//if( c <  ' '  && c != '\r' && c != '\n' && c != '\t' && c != '\b' )
+	//{
+    //    return;
+    //};
+                
+    //Volta ao inicio da linha.
+    //	
+    if( c == '\r' )
+	{
+        g_cursor_x = g_cursor_left;  
+        prev = c;
+        return;    
+    };  	
        
     //#@todo#bugbug 
     //retirei esse retorno para o espaço, com isso 
@@ -774,6 +857,9 @@ void outbyte(int c)
 	
 //checkLimits:	
 
+// caracteres normais.
+//default:
+
     //Limites para o número de caracteres numa linha.
     if( g_cursor_x >= (g_cursor_right-1) )
 	{
@@ -788,15 +874,16 @@ void outbyte(int c)
     
 	
 	//Número máximo de linhas. (8 pixels por linha.)
-    if(g_cursor_y > g_cursor_bottom)  
+    if( g_cursor_y >= g_cursor_bottom )  
     { 
 	    scroll();
-         
-	    // DEBUG( tx, "SCROLL!");
-         
-        // MessageBox("scroll");
         g_cursor_y = g_cursor_bottom;
     };
+	
+	
+	//
+	// Nesse momento imprimiremos os caracteres.
+	//
 
     // Imprime os caracteres normais.
 	_outbyte(c);
@@ -943,6 +1030,62 @@ void _outbyte(int c)
 done:    
     return;     
 };
+
+
+/*
+ essa função é legal ... habilitar quando der.
+ 
+void stdio_ClearToEndOfLine();
+//limpa com caracteres em branco até antes da posição do cursor.
+void stdio_ClearToEndOfLine()
+{
+    unsigned u;
+    unsigned long OldX, OldY;
+    
+    OldX = g_cursor_x;
+	OldY = g_cursor_y;
+	
+	//de onde o cursor está até o fim da linha.
+	for( u = g_cursor_x; u < g_cursor_right; u++ )
+	{
+       _outbyte(' ');
+    }
+	
+    g_cursor_x = OldX;
+	g_cursor_y = OldY;
+
+}
+*/
+
+
+/*
+ essa função é legal ... habilitar quando der.
+ 
+void stdio_ClearToStartOfLine();
+//limpa com caracteres em branco até antes da posição do cursor.
+void stdio_ClearToStartOfLine()
+{
+    unsigned u;
+    unsigned long OldX, OldY;
+    
+    OldX = g_cursor_x;
+	OldY = g_cursor_y;
+	
+	//Início da linha.
+    g_cursor_x = 0;
+	g_cursor_y = OldY;	
+	
+	//de onde o cursor está até o fim da linha.
+	for( u = g_cursor_x; u < g_cursor_right; u++ )
+	{
+       _outbyte(' ');
+    }
+	
+    g_cursor_x = OldX;
+	g_cursor_y = OldY;
+
+}
+*/
 
 
 /*

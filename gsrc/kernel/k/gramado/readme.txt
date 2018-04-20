@@ -1,6 +1,25 @@
 
 
 /gramado
+  *  kernel base display server. Persistent.
+
+
+   Composer:    
+
+   gramado.c 
+
+
+   O objetivo desse módulo é juntar os componentes para formar
+o próximo output e efetuar o refresh da tela, ou de parte dela apenas.
+
+o módulo /gui fica responsável por criar os elementos.
+gramado.c fica responsável pela inicialização e per manipilar
+pedidos dos clietes. Pois apesar de estar no kernel base ele deve
+se comportar como um servidor gráfico.
+gramado.c ficará responsável por inicializar o servidor gráfico,
+seja ele o servidor persistente dentro do ekrnel base ou outros
+carregados.
+
 
      gerenciamento de recursos gráficos, logon, logoff,e gerenciamento de usuário. (segurança e proteção).
 

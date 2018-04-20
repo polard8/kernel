@@ -1,5 +1,5 @@
 /*
- * File: menu.c 
+ * File: gui\menu.c 
  *
  * Descrição:
  *     Criação e gerenciamento de menus.
@@ -29,6 +29,7 @@ int menuIsMenu(struct menu_d *menu)
 
 
 /*
+ ******************************************************************
  * create_menu:
  *     Cria um menu e retorna o ponteiro pra janela do menu.
  */
@@ -49,8 +50,10 @@ void *create_menu( struct window_d *pwindow,    //Parent window.
 	unsigned long height;
 	
 	// Structure.
-    if( (void*) pwindow == NULL ){
-	    printf("create_menu:");
+    if( (void*) pwindow == NULL )
+	{
+	    //@todo: Devemos retornar e mostrar mensagem de erro.
+		printf("create_menu:");
 		refresh_screen();
 	    while(1){};
        // return NULL;
@@ -116,17 +119,18 @@ void *create_menu( struct window_d *pwindow,    //Parent window.
 	
 do_create:
 
-    hWindow = (void*) CreateWindow(1,0,0,"Menu",
-	                               x,y,width,height,
-						           pwindow,0,0,COLOR_BLACK);
-	if( (void*) hWindow == NULL){
+    hWindow = (void*) CreateWindow( 1, 0, 0, "Menu",
+	                                x, y, width, height,
+						           pwindow, 0, 0, COLOR_BLACK );
+	if( (void*) hWindow == NULL )
+	{
 		
-		printf("create_menu error: Struct.\n");
+		printf("create_menu: hWindow\n");
 		refresh_screen();
 	    while(1){};
 		//return NULL;  
 	}else{
-		RegisterWindow(hWindow);
+		RegisterWindow( hWindow );
 	};
 	
 		
@@ -135,8 +139,9 @@ do_create:
 	//
 	
 	menuDefault = (void*) malloc( sizeof(struct menu_d) );  
-	if( (void*) menuDefault == NULL ){
-	    printf("create_menu error: Menu struct.\n");
+	if( (void*) menuDefault == NULL )
+	{
+	    printf("create_menu: menuDefault\n");
 		refresh_screen();
 		while(1){};
 		
@@ -180,7 +185,8 @@ do_create:
 	
 	
 	//Limits.
-	if(iCount >= MENUITEM_COUNT_MAX){
+	if(iCount >= MENUITEM_COUNT_MAX)
+	{
 	    iCount = (MENUITEM_COUNT_MAX-1);
 		printf("create_menu error: Itens limits!\n");		
 	};
@@ -203,10 +209,10 @@ do_create:
     // Linked list. (linked list no menu)	
     //
 		
-    LinkedList = (void*) malloc( sizeof(struct linkedlist_d));
-    if( (void*) LinkedList == NULL)
+    LinkedList = (void*) malloc( sizeof(struct linkedlist_d) );
+    if( (void*) LinkedList == NULL )
 	{
-	    printf("create_menu error: LinkedList\n");
+	    printf("create_menu: LinkedList\n");
 		refresh_screen();
 		while(1){}        
 	}
@@ -232,24 +238,24 @@ done:
  *     Create a menu item. 
  *     Obs: Os menus são verticais.
  */
-int create_menu_item(struct menu_d *menu, unsigned char *string, int status)
+int create_menu_item( struct menu_d *menu, 
+                      unsigned char *string, 
+					  int status )
 {
     int Selected = 0;
 	unsigned long Color = COLOR_WINDOW;
 	struct window_d *hWindow;
 	
-	//
 	// Menu structure.
-	//
-   
-    if( (void*) menu == NULL){
+    if( (void*) menu == NULL ){
         return (int) 1;
-    };
+    }
 	
 	menu->itemCount++;	 
 	
 	//Limits.
-	if( menu->itemCount >= MENUITEM_COUNT_MAX){
+	if( menu->itemCount >= MENUITEM_COUNT_MAX )
+	{
 		printf("create_menu_item:\n");
 		refresh_screen();
 		while(1){};
@@ -293,7 +299,8 @@ int create_menu_item(struct menu_d *menu, unsigned char *string, int status)
 	
 	
 	//menu window.
-	if( (void*) menu->menuWindow == NULL){
+	if( (void*) menu->menuWindow == NULL )
+	{
 	    printf("menu window fail.\n");
 		return (int) 1;
 	}
@@ -463,7 +470,7 @@ done:
  *     Cria um array de itens para um menu.
  *
  */
-void initmenuArray(struct menu_d *a, int initialSize)
+void initmenuArray( struct menu_d *a, int initialSize )
 {
 	int i;
 		
@@ -488,18 +495,16 @@ void initmenuArray(struct menu_d *a, int initialSize)
 	//
 	
     a->Items = (void*) malloc( sizeof(struct menuitem_d) * initialSize);	
-	if( (void*) a->Items == NULL ){
+	if( (void*) a->Items == NULL )
+	{
 	   return;
-	};
+	}
 	
-    //
-	// Inicializa todos os ítens do menu,
-	// Lembrando que oítem '0' é o ítem que 
-	// aciona o control menu para a janela.
-	//
-	//
+
+	// Inicializa todos os ítens do menu. Lembrando que o ítem '0' é o ítem 
+	// que aciona o control menu para a janela.
 	
-    for( i=0; i < initialSize; i++)
+    for( i=0; i < initialSize; i++ )
     {
         a->Items[i].Used = 1;
 		a->Items[i].Magic = 1234;
@@ -582,7 +587,9 @@ void freeArray(Array *a)
  *     quando se clica com o botão direito do mouse.
  *      menuControlMenu();
  */
-int ControlMenu(){
+int ControlMenu()
+{
+	//@todo: Rever isso aqui.
     return (int) MainMenu();	
 };
 
@@ -599,25 +606,13 @@ int MainMenu()
 	struct window_d *cmWindow;
 	struct window_d *pWindow;
 	
-	//
 	// Pega o id da janela com foco de entrada.
-	//
-	
 	Focus = (int) GetFocus();
-	
-	//
-	// Pega o ponteira da estrutura da janela com o foco de entrada.
-	//
-	
 	pWindow = (void *) windowList[Focus];
 	
 	
-	//
-	// Se a estrutura não for uma estrutura válida,
-	// utilizaremos a janela 'gui->screen' por enquanto
-    // somente para fins de teste. 	
-	//
-	
+	// Se a estrutura não for uma estrutura válida, utilizaremos a janela 
+	// 'gui->screen' por enquanto. Somente para fins de teste. 	
     if( (void*) pWindow == NULL )
 	{
 		pWindow = (void *) gui->screen;
@@ -660,8 +655,9 @@ int MainMenu()
     //        de entrada, ou próxima ao ponteiro do mouse quando	
 	//        clicado o botão direito.
 	
-    cmWindow = (void *) create_menu( pWindow,4,0,0,0);
-	if( (void *) cmWindow == NULL ){
+    cmWindow = (void *) create_menu( pWindow, 4, 0, 0, 0 );
+	if( (void *) cmWindow == NULL )
+	{
 	    printf("MainMenu error: struct.\n");
 		refresh_screen();
 		while(1){}	
@@ -674,16 +670,16 @@ int MainMenu()
 	// Cria um menuitem, dado um menu da janela.
 	//
 	
-	create_menu_item( cmWindow->defaultMenu, "Maximizar" ,0);
-    create_menu_item( cmWindow->defaultMenu, "Minimizar" ,0);
-	create_menu_item( cmWindow->defaultMenu, "Fechar   " ,1);
-	//create_menu_item( cmWindow->defaultMenu, "cmitem3" , 0);
+	create_menu_item( cmWindow->defaultMenu, "Maximizar" , 0 );
+    create_menu_item( cmWindow->defaultMenu, "Minimizar" , 0 );
+	create_menu_item( cmWindow->defaultMenu, "Fechar   " , 1 );
+	//create_menu_item( cmWindow->defaultMenu, "cmitem3" , 0 );
 	
 	
 	//draw_text( gui->screen, 2*(640/3), 2*(480/3) , COLOR_WINDOWTEXT, "MAIN MENU"); 
 	//StatusBar(gui->screen, "Status Bar", "MAIN MENU");
 	
-	SetProcedure((unsigned long) &MainMenuProcedure);	
+	SetProcedure( (unsigned long) &MainMenuProcedure );	
 
 done: 
     SetFocus(cmWindow);
@@ -692,14 +688,16 @@ done:
 
 
 /*
+ **********************************************
  * MainMenuProcedure:
- *     control menu.
- *    //test
+ *     Procedimento de janela do 'main menu'.
+ *     #test
  */																
-unsigned long MainMenuProcedure( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2) 
+unsigned long 
+MainMenuProcedure( struct window_d *window, 
+                   int msg, 
+  				   unsigned long long1, 
+				   unsigned long long2 ) 
 {
     switch(msg)
 	{	
@@ -767,25 +765,24 @@ unsigned long MainMenuProcedure( struct window_d *window,
 	
 // Done.
 done:
-	//Refresh screen. 
-	if(VideoBlock.useGui == 1){
-	    refresh_screen();
-	};
+    refresh_screen();
 	return (unsigned long) 0;
 };
 
 
 /*
+ **************************************
  * init_menus:
  *     Inicializa a lista de menus.
  */
 int init_menus()
 {
-	int i = 0;
+	int i=0;
 	
 	printf("init_menus:\n");  	
 
-	while(i < MENU_COUNT_MAX){
+	while( i < MENU_COUNT_MAX )
+	{
 	    menuList[i] = (unsigned long) 0;
         ++i;
 	};

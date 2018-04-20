@@ -3,6 +3,10 @@
  *
  *       Arquivo principal da camada gramado. (Antigo gui.c)
  *
+ *  Gramado Display Server - GDS.
+ *
+ *  kernel base display server. Persistent.
+ *
  * #Importante:
  *  Aqui poderão ficar variáveis globais relativas à inteface gráfica.
  * Essas variáveis globais serão acessíveis através de métodos. 
@@ -52,7 +56,17 @@
 
 #include <kernel.h>
 
+
+// Obs: Um módulo no kernel base vai gerenciar os 
+// servidores usados pelo sistema, desde os que estão no kernel base
+// até os carregados. 
+// classe server, elemento display.
+// unsigned char  server_display[] = "Gramado Display Server";
+
+
 //unsigned char  GramadoName[] = "GRAMADO LAYER";
+
+
 
 //internas
 void gui_create_screen();

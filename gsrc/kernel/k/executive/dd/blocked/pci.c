@@ -1107,7 +1107,11 @@ int pci_setup_devices()
     struct pci_device_d *D;   //Device. 
 	struct pci_driver_d *Dr;  //Driver.
 	
-	printf("PCI INFO:\n\n");
+	
+#ifdef KERNEL_VERBOSE
+    printf("Detecting PCI Devices ...\n");
+#endif
+	
 	
 	i=0;    //Bus.
 	j=0;    //Devices. (Slots).
@@ -1189,9 +1193,13 @@ int pci_setup_devices()
 	
 // Done.
 done:
-	printf("Done!\n");
+
+#ifdef KERNEL_VERBOSE
+    printf("Detecting PCI Devices completes ...\n");
+#endif
+
     return (int) 0; 
-}
+};
 
 
 /*

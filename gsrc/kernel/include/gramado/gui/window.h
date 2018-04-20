@@ -1395,6 +1395,8 @@ struct window_d
 // Gramado v 0.1 usa essa estrutura somente até aqui.
 //==================================================
 
+    //
+	//@todo: rever esse cursor, pois ja existe na versão 0.1 acima.
 	
 	//Posição do cursor para texto dentro da janela.
 	//Obs: Deve ser multiplo da altura e largura do caractere.

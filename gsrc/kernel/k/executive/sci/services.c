@@ -565,8 +565,18 @@ void *services( unsigned long number,
 		// as margens usadas pela rotina de impressão de caracteres.
         // então nesse momento devemos considerar que as margens ja estão 
         // ajustadas.		
-        //		
+        //	
+
+        // #importante:
+		// putchar pertence a libc e todo o sistema tem obedecido 
+		// a sua maneira de imprimir chars ... não podemos mudar 
+		// putchar assim tão facilmente.
+		// refresh_rectangle obedece os deslocamentos usados 
+		// por putchar.
+ 		
 		case SYS_PUTCHAR:
+		    // Coloca um char usando o 'terminal mode' de stdio.
+			// selecionado em _outbyte.
 		    stdio_terminalmode_flag = 1;  // seleciona não transparente.
 			putchar( (int) arg2 );
 			refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );

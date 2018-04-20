@@ -739,6 +739,8 @@ void *windowGetHandleWindow(struct window_d *window)
 	//Essa rotina ainda não é chamada pelo consumidor,
 	//apenas as outras 3.
 	
+	//@todo: Precisa fazer essa função.
+	
 //fast_return:
 	return NULL;
 	
@@ -1934,6 +1936,7 @@ void SetFocus(struct window_d *window)
 		return;
 	}else{
 		
+		//validade e estado da estrutura.
 		if( window->used == 1 && window->magic == 1234 )
 		{
 			//Se a janela é a janela ativa.
@@ -1987,17 +1990,36 @@ void SetFocus(struct window_d *window)
 			// por enquanto, faremos isso para todos os tipos de janelas.
 			//
 			
+			//
+			// Reiniciando as margens para input em janela.
+			//
+			
 			//Resetando o input do procedimento de janela.
 			
-	        g_cursor_left   = (window->left/8);
+			//
+			// #importante:
+			// Salvar a configuração de cursor específica para essa janela.
+			// Pois cada janela vai querer o cursor em um lugar.
+			//
+			
+			
+			// Configurando o cursor global gerenciado pelo kernel base.
+			g_cursor_left   = (window->left/8);
 	        g_cursor_top    = (window->top/8);   
 	        g_cursor_right  = g_cursor_left + (window->right/8);
 	        g_cursor_bottom = g_cursor_top + (window->height/8);
 	
             g_cursor_x = g_cursor_left; 
-	        g_cursor_y = g_cursor_top;  		
+	        g_cursor_y = g_cursor_top;  
+
 	
-	        for(i=0; i<PROMPT_MAX_DEFAULT;i++)
+	        //configurando o cursor específico da janela com o foco de entrada.
+			window->CursorX = g_cursor_x;
+			window->CursorY = g_cursor_y;
+            window->CursorColor = COLOR_PINK;
+			
+	
+	        for( i=0; i<PROMPT_MAX_DEFAULT; i++ )
 	        {
 		        prompt[i] = (char) '\0';
 		        prompt_out[i] = (char) '\0';
