@@ -27,6 +27,14 @@
 //
 
 
+typedef enum {
+	VFSStatusNull,
+	VFSStatusInitialized,
+	VFSStatusLocked,
+    //...	
+}vfs_status_t;
+
+
 //
 // O sistema de arquivos virtual sendo tratado como se fosse 
 // apenas um diretório comum, mas que não está em nenhum disco.
@@ -65,6 +73,10 @@ struct vfs_token_d
 typedef struct vfs_info_d vfs_info_t;
 struct vfs_info_d
 {
+	//@todo:
+	//object support.
+	
+	
 	//vaildando a estrutura.
 	int used;
 	int magic;
@@ -72,7 +84,7 @@ struct vfs_info_d
 	//Qual o status do vfs.
 	//não queremos que alguma parte do sistema 
 	//começe usá-lo antes de estar devidamente montado.
-	int Status;
+	vfs_status_t status;
 	
 	//Nome amigável do sistema de arquivos virtual.
     char *name;
@@ -121,10 +133,16 @@ struct vfs_info_d
 	
 	//...
 	
+	
+	//unsigned long filesList[?];
+	
 		
     // diretório raiz.    
     struct dir_d *vfs;  	
 };
 
+//Assim mesmo sem ponteiro.
+struct vfs_info_d VFS_INFO;
 
 
+void vfsInit();

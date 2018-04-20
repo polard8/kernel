@@ -117,11 +117,13 @@ done:
 
 
 /*
+ ************************************************************************
  * scroll:
  *     Isso pode ser útil em full screen e na inicialização do kernel.
  *
- * *Importante: Um (retângulo) num terminal deve ser o lugar onde o buffer de linhas 
- * deve ser pintado. Obs: Esse retãngulo pode ser configurado através de uma função.
+ * *Importante: Um (retângulo) num terminal deve ser o lugar onde o buffer 
+ * de linhas deve ser pintado. Obs: Esse retãngulo pode ser configurado através 
+ * de uma função.
  *     Scroll the screen in text mode.
  *     Scroll the screen in graphical mode.
  *     @todo Poderiam ser duas funções: ex: gui_scroll(). 
@@ -188,8 +190,8 @@ void scroll(void)
 		
 		
 		Start = 0;
-		Source = Start+(3*800);  //Começa da segunda linha.
-		Dest = 0;                //destino o início do backbuffer.
+		Source = Start+(3*800*8);  //Começa da segunda linha.
+		Dest = 0;                  //destino o início do backbuffer.
 		
 		End = (3*800)*600;       //termina ao fim de 600 linhas.
 		
@@ -210,10 +212,11 @@ void scroll(void)
 		OldY = g_cursor_y;
 		
 		//cursor na ultima linha.
-		g_cursor_x = 0;
+		//g_cursor_x = 0;
+		g_cursor_x = g_cursor_left;
 		g_cursor_y = (g_cursor_bottom-1);
 		
-		for( i=0; i < g_cursor_right; i++){
+		for( i = g_cursor_x; i < g_cursor_right; i++ ){
 		    _outbyte(' ');    	
 		};
 	
@@ -223,9 +226,12 @@ void scroll(void)
 		// Reposiciona o cursor na última linha.
 		//
 		
-        g_cursor_x = OldX;
-		g_cursor_y = OldY;
+        //g_cursor_x = OldX;
+		//g_cursor_y = OldY;
 		
+        //g_cursor_x = 0;
+		g_cursor_x = g_cursor_left;
+		g_cursor_y = OldY;
 		
 		refresh_screen();
 		goto done;

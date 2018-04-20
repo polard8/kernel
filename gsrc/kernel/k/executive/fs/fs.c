@@ -660,7 +660,7 @@ done:
  */
 int fsInit()
 {
-    printf("fsInit: Initializing..\n");
+    printf("fsInit: Initializing FS support..\n");
     
 	//
 	// Type - Configura o tipo de sistema de arquivos usado. 
@@ -690,6 +690,14 @@ int fsInit()
 	
 	printf("fsInit: FAT..\n");
 	fs_init_fat();
+	
+	
+	
+	//
+	// VFS
+	//
+	
+	vfsInit();
 	
 	
 	//

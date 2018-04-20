@@ -221,7 +221,8 @@ echo -{ ux2 /executive
     gcc -c k/executive/fs/write.c   -I./include -o write.o			
     gcc -c k/executive/fs/cf.c      -I./include -o cf.o			
     gcc -c k/executive/fs/search.c  -I./include -o search.o			
-    gcc -c k/executive/fs/format.c  -I./include -o format.o			
+    gcc -c k/executive/fs/format.c  -I./include -o format.o	
+    gcc -c k/executive/fs/vfs.c     -I./include -o vfs.o		
 	
 
 	
@@ -366,6 +367,7 @@ format.o ^
 disk.o ^
 volume.o ^
 fs.o ^
+vfs.o ^
 misc.o ^
 request.o ^
 info.o ^
