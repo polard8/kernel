@@ -26,7 +26,8 @@
 
 //isso é um test.
 //o tipo dois funciona.
-//estou trabalhando nas bordas.
+// testando colocar o ponteiro no edit box. setar foco.
+//
 void shellCreateEditBox()
 {
     
@@ -45,8 +46,7 @@ void shellCreateEditBox()
     APIRegisterWindow(editboxWindow);
 
 
-    
-									   
+	shellSetCursor( 8, 8 );								   
 };
 
 

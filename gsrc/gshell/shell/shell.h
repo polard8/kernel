@@ -422,6 +422,9 @@ void shellScroll();
 //
 
 void shellClearBuffer();
+void shellShowScreenBuffer();
+//...
+
 
 //
 // Typing support.

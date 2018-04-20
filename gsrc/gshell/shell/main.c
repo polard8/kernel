@@ -498,8 +498,14 @@ noArgs:
     APISetActiveWindow(hWindow);
 	
     //Setar foco.
-	//*IMPORTANTE: É FUNDAMENTAL SETAR O FOCO, POIS O KERNEL DEPENDE DELE
-	//PARA RETORNAR A MENSAGEM DA JANELA COM O FOCO DE ENTRADA.
+	// *IMPORTANTE: 
+	// É FUNDAMENTAL SETAR O FOCO, POIS O KERNEL DEPENDE DELE
+	// PARA RETORNAR A MENSAGEM DA JANELA COM O FOCO DE ENTRADA.
+	// Nesse momento o kernel configura as margens para o cursor 
+	// dentro da janela.
+	// @todo: O kernel deve reiniciar as variáveis de cursor 
+	// dentro da janela também, pois cada janela tem uma configuração 
+	// diferente de cursor.
     APISetFocus(hWindow);
 	
 	//#bugbug
@@ -1308,6 +1314,13 @@ do_compare:
         goto exit_cmp;
     };
 	
+	// clear-screen-buffer
+	if( strncmp( prompt, "clear-screen-buffer", 19 ) == 0 )
+	{
+		shellClearBuffer();
+		goto exit_cmp;
+	}	
+	
 	//close
 	if( strncmp( prompt, "close", 5 ) == 0 )
 	{
@@ -1323,7 +1336,7 @@ do_compare:
 		//@todo
         shellClearScreen();
         shellSetCursor(0,0);
-	    shellPrompt();
+	    //shellPrompt();
         goto exit_cmp;
 	};
 	
@@ -1474,6 +1487,14 @@ do_compare:
 	    printf("~save root\n");
         goto exit_cmp;
     };
+	
+	
+	// show-screen-buffer
+	if( strncmp( prompt, "show-screen-buffer", 18 ) == 0 )
+	{
+		shellShowScreenBuffer();
+		goto exit_cmp;
+	}
 
 	
 	// service
@@ -1758,16 +1779,17 @@ void shellShell()
 	//...
 	
 done:	
-    //Nossa referência é a moldura e não a área de cliente.
+    //#bugbug
+	//Nossa referência é a moldura e não a área de cliente.
 	//@todo:usar a área de cliente como referência
 	//shellSetCursor(0,0);
-    shellSetCursor(0,4);
+    //shellSetCursor(0,4);
     
 	//@todo
 	//tentando posicionar o cursor dentro da janela
 	//shellSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));	
 	
-	shellPrompt();
+	//shellPrompt();
     return;	
 };
 
@@ -1794,9 +1816,16 @@ int shellInit( struct window_d *window )
 	int WindowWithFocusId = 0;
 	void *P;
 	
+	//
+	// #bugbug:
+    //     Esse ponteiro de estrutura está em kernel mode. 
+	//     Não podemos usá-lo.
+	//
+	
 	//stream status
 	shell_info.stream_status = 0;
-		
+	
+    //bugbug	
 	//cursor
 	shellSetCursor(0,4);
 	
@@ -2214,6 +2243,29 @@ void shellClearBuffer()
 	screen_buffer[0] = (char) '\0';
 	screen_buffer[1] = 7;
 	
+    screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+};
+
+
+
+//Isso é só um teste.
+void shellShowScreenBuffer()
+{
+	int i;
+	int j = 0;
+	
+    shellClearScreen();
+    shellSetCursor(0,0);	
+	
+	// Shell buffer.
+	for( i=0; i<SCREEN_BUFFER_SIZE; i++)
+	{
+		
+	    printf( "%c", screen_buffer[j] );
+		j++; //ignora o atributo.
+		j++;
+	};	
+
     screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
 
