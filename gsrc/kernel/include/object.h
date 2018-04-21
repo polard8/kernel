@@ -263,7 +263,7 @@ object_descriptor_t *object;  //object
 //        Porém é certo que manipularemos muitos objetos.  
 //
 
-//@todo: Usar array dinâmico.
+
 object_descriptor_t objects_km[256+1];  //objetos em kernel mode.
 object_descriptor_t objects_um[256+1];  //objetos em user mode. 
 object_descriptor_t objects_gui[256+1]; //objetos gráficos. 

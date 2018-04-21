@@ -29,35 +29,24 @@
 //
 
 
-
-#define EXT2_NAME_LEN 255
-#define VFS_NAME_LEN 255
-
-
-/*
- *********************************************************************
- * The new version of the directory entry.  Since EXT2 structures are
- * stored in intel byte order, and the name_len field could never be
- * bigger than 255 chars, it's safe to reclaim the extra byte for the
- * file_type field.
- */
-typedef struct ext2_dir_entry_d ext2_dir_entry_t;
-struct ext2_dir_entry_d 
-{
-	unsigned int   inode;     /* Inode number */
-	unsigned short rec_len;   /* Directory entry length */
-	unsigned char  name_len;  /* Name length */
-	unsigned char  file_type;
-	char           name[EXT2_NAME_LEN];    /* File name, up to EXT2_NAME_LEN */
-};
-
-#define ext2_dir_entry_d vfs_dir_entry_d
-#define ext2_dir_entry_t vfs_dir_entry_t
+// a entrada '/objects' vai apontar para a lista de ponteiros 
+// para estruturas de objetos gerenciados pelo obect manager,
+// podendo até mesmo abrir o object manager.
+// essa entrada ligará a lista de objetos ao vfs.
+// essa deve ser a primeira entrada e será montada logo na 
+// inicialização do vfs.
+// inclusive o vfs pode chamar a rotina de inicializaçao do object manager.
+// incluive a sequência de montagem do vfs promoverá um pouco mais 
+// de ordem na inicialização.
+// mas o vfs não precisa montar a lista de objetos no object manager.
+// somente ligar a lista de objetops ao vfs, sinalizando como não 
+// inicializada.  
+//
 
 
-#define VFS_MAX_ENTRIES 512
 
-unsigned long directory_entry_list[VFS_MAX_ENTRIES];
+
+
 
 
 /*
@@ -111,14 +100,77 @@ struct ext2_inode_d
 	unsigned int   extra[3];
 };
 
-#define ext2_inode_d vfs_inode_d 
-#define ext2_inode_t vfs_inode_t
 
 
 
 #define VFS_MAX_INODES 512
 
 unsigned long inode_list[VFS_MAX_INODES];
+
+
+
+#define EXT2_NAME_LEN 255
+#define VFS_NAME_LEN 255
+
+
+/*
+ *********************************************************************
+ * The new version of the directory entry.  Since EXT2 structures are
+ * stored in intel byte order, and the name_len field could never be
+ * bigger than 255 chars, it's safe to reclaim the extra byte for the
+ * file_type field.
+ */
+typedef struct ext2_dir_entry_d ext2_dir_entry_t;
+struct ext2_dir_entry_d 
+{
+	unsigned int   inode;     /* Inode number */
+	unsigned short rec_len;   /* Directory entry length */
+	unsigned char  name_len;  /* Name length */
+	unsigned char  file_type;
+	char           name[EXT2_NAME_LEN];    /* File name, up to EXT2_NAME_LEN */
+};
+
+
+
+#define VFS_MAX_ENTRIES 512
+
+unsigned long directory_entry_list[VFS_MAX_ENTRIES];
+
+/*****************************************************************/
+#define VFS_HANDLE_MAX 512
+
+
+//manipulador das entradas de diretório do vfs.
+typedef struct vfs_handle_d vfs_handle_t;
+struct vfs_handle_d
+{
+	//id do handle.
+    int id;
+
+    int used;
+    int magic;  //
+
+	int status;
+	
+
+	// Nome do handle e não o nome do arquivo.
+    // Isso servirá para efeito de exibução.
+	//poderá ter quanquer tamanho.
+    char *name;
+	
+	//Posso colocar aqui os identificadores 
+	//de minha preferência.
+	
+	//Continua ...
+	//...
+	
+	struct ext2_dir_entry_d *directory_entry; 	
+};
+
+unsigned long vfs_handle_list[VFS_HANDLE_MAX];
+
+
+
 
 //
 // SOBRE OS TIPOS DE ARQUIVOS:
@@ -249,3 +301,6 @@ struct dir_d *vfs;
 
 
 void vfsInit();
+void vfs_show_handle_list();
+
+

@@ -649,7 +649,8 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//Program manager.
                 //@todo: usar F11 para FULL SCREEN.				
-				case VK_F11:				
+				case VK_F11:
+				    vfs_show_handle_list();
 					//if(AltStatus == 1){ window_with_focus = 11; break;};
 					//if(CtrlStatus == 1){ active_window = 11; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F11\n"); break;};
