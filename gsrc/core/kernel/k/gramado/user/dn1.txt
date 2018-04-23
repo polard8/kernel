@@ -1,0 +1,9 @@
+núcleo dos recusos de interação disponíveis ao usuário.
+controle central dos recursos disponíveis ao usuário ...
+
+diversos recursos serão centralizados aqui.
+
+user session, window station, desktop 
+window, keyboard, cursor,
+
+etc ...

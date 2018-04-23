@@ -1,0 +1,10 @@
+
+ /blocked
+
+
+    Como essa pasta se refere aos dispositivos de difícil acesso, esse é o ambiente
+ideal para os novos dispositivos, e para os dispositivos mais velozes.
+    PCI oferece um nível alto de dificuldade de acesso.
+    ACPI oferece o nível mais alto de dificuldade, tendo que programar em linguagem esquisita.
+	
+	

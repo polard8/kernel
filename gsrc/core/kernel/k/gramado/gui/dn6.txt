@@ -1,0 +1,5 @@
+awt - Abstract Window Toolkit
+
+
+    awt pode ser uma classe para conter todos os recursos gráficos.
+    semelhante a classe gui.

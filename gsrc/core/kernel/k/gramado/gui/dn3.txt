@@ -1,0 +1,38 @@
+
+
+ Sobre full screen:
+ =================
+
+
+    F11 aciona e desaciona o full screen.
+    Em full screen é mostrado na tela toda apenas a área de
+cliente da janela ativa.
+     Parece ser uma boa opção nessa fase de desenvolvimento.
+     
+
+   Mostrar janelas sem molduras também parace ser uma opção, mesmo que não seja em full screen.
+
+
+ Opção por janelas pequenas:
+ ==========================
+
+
+    A opção por janelas pequenas pode ajudar muito o desenvolvimento.
+
+    janelas pequenas que emulam dispositivos mobile parecem ser a melhor opção nessa fase de desenvolvimento.
+
+
+   JANELAS PEQUENAS PRECISAM DE MENOS BUFFER E SÃO MAIS RÁPIDAS.
+   
+
+    ESSAS JANELAS PODEM APARECER CENTRALIZADAS PRINCIPALMENTE
+    PORÉM MAIORES VERTICALMENTE DO QUE HORIZONTALMENTE, EMULANDO
+A TIMELINE DAS REDES SOCIAIS E FORMATO DAS TELAS DOS CELULARES.
+
+ Me parece que o google usa muito janelas pequenas. Pequenas e centralizadas e com poucos elementos gráficos. Fazem isso por causo do trafico que é muito grande por lá, mas fazem isso também no android.
+
+
+ :)
+
+
+

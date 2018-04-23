@@ -1,0 +1,27 @@
+ ** User kernel-mode code. **
+
+/gramado: (w32)
++gconsole
++ggdi
++guser
+
+
+ja temos as pastas /user e /gui
+
+/user poderá conter:
+poderá conter diretórios. /kernel,/kbd,...
+
+input.c para lidar com eventos de mouser e teclado. pegando e enviando mensagens para procedimentos de janela.
+
+
+o importante é que em /user deve ficar os mecanismos de interação do usuário com o sistema.
+
+outra opção seria:
+
+/gramado/user:
+
++gconsole
++ggdi
++guser
+
+

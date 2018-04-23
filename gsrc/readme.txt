@@ -1,3 +1,8 @@
+\boot
+\cali
+\core
+\la
+
 
  Gramado:
  =======

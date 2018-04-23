@@ -1,0 +1,5 @@
+pastas principais:
+
+/cpu
+/head
+/pc - process control

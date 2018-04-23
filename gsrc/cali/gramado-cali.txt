@@ -1,0 +1,38 @@
+﻿   Code names.
+    
+	\cali   
+    
+	Gramado Cali
+
+        Gramado Cali Package
+
+	
+\cs  - California shell
+\cfe - California File Explorer
+\cwe - California Web Explorer
+
+
+    Pacote básico de gerenciamento de arquivos.
+	
+	Deve haver uma similaridade entre eles tanto na aparência quanto na funcionalidade.
+	Uma interação entre eles deve ser primordial.
+	
+=====================================================
+	
+   Isso será um comando.
+   
+   cali.bin - Processo gerenciador de todo o conteúdo do pacote.
+   
+   cs.bin  - California Shell
+   cfe.bin - California File Explorer 
+   cwe.bin - California Web Explorer
+
+  ==========================================
+  
+  
+Esse pacote poderá ter seu próprio disco virtual, e gerenciamento de
+memória, promovendo portabilidade.
+
+É esperado que esse pacote consuma uma quantidade grande de recursos.
+
+Esse pacote será o primeiro conjunto de aplicativos criado pelo sistema.

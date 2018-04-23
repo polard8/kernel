@@ -1,0 +1,10 @@
+@todo: 
+
+Criar uma rotina no kernel que crie uma estrutura de terminal e 
+uma janela de terminal para os aplicativos que rodem em modo terminal. 
+
+Pois bem, teremos então modos para os aplicativos rodarem serão: 
+
+Modo Terminal ou Modo Janela. 
+
+no modo terminal o kernel deve criar a janela que o aplicativo irá usar e no modo janela o kernel não deve criar uma janela de terminal para o aplicativo.

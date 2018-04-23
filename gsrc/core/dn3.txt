@@ -1,0 +1,16 @@
+ 
+ Design Note 3.
+
+ Sobre gerenciadores de subsistemas:
+ ==================================
+
+    Em user mode pode haver gerenciadores de subsistemas.
+    Como haverão vários subsistemas em user mode, é necessário que gerenciadores em user mode gerenciem os subsistemas em user mode.
+    Dois gerenciadores se mostram fundamentais:
+    O gerenciador de RunTim, osRT, e o gerenciador de aplicações para desktop em 32bit os32.
+
+   @todo: 
+   Essa parte precisa ser planeja ainda, mas o escencial é que deve haver alguma gerência dos subsistemas em user mode.
+
+   Versão 1.0, 2016.
+

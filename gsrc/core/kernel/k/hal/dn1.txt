@@ -1,0 +1,20 @@
+
+
+  As classes do módulo hal são as seguintes.
+
+
+  k.hal.blocked
+  k.hal.device
+  k.hal.drivers
+  k.hal.things
+  k.hal.unblocked
+
+
+  podendo ser criadas outras:
+ 
+   k.hal.legacy (legacy pc)
+   k.hal.acpi
+   k.hal.apic
+   k.hal.common
+   k.hal.arch
+   //...

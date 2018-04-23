@@ -1,0 +1,72 @@
+Design Note 2.
+=============
+
+    Software Layers.
+    As camadas de software do sistema.
+    O objetivo aqui é organizar as camadas de software que estão em user mode.
+
+
+Como as bibliotecas em user mode são organizadas:
+=================================================
+    A primeira opção aparentemente viável é seguir uma organização semelhante à 
+do Android. E semelhante ao windows.
+
+
+
+Ilustração:
+==========
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ --------------
+| Applications |
+ -----------------------
+| Application Framework |
+ -----------------------
+|   Libraries   |
+ ---------------
+|     Kernel    |
+ ---------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+Applications:
+============
+    As aplicações em user mode.
+
+---------------------
+Application Framework:
+======================
+    @todo:
+    API, Window Manager, activity manager, ...
+    Environment subsystem(posix manager), security manager, login, system manager.
+    Web support+browser,
+    runtime para: comunicação e dados; gráficos e mídia, dispositivos.
+    subsystem servers, process and thread managers, object managers,
+    device managers, file manager, communication manager,
+
+
+---------------------------
+Libraries:
+=========
+    @todo:
+    libC, libc++, runtimelib, graphiclib, media, database,
+    Web,
+
+
+-------------------
+Kernel:
+======
+    partes do kernel base:
+    Executive, Microkernel, Hal.
+
+    Versão 1.0, 2016.
+
+
+
+
+
+
+
+
+
+
+

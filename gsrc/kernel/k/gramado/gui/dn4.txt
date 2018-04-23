@@ -1,8 +1,0 @@
-
- Sobre o buffer dedicado:
-     Cada janela terá um buffer dedicado, onde ela será pintada.
-     O conteúdo desse buffer dedicado será copiado para o frontbuffer, sem passar para o backbuffer, pois no backbuffer fica o pano de fundo, que é um elemento do desktop.
-     Para criar um buffer dedicado pra toda janela criada é necessário alocar memória, precisamos observar a diminuição do heap disponível.
-
-
-     @todo: Podemos criar uma estrutura para buffer dedicado.

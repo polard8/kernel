@@ -1,0 +1,3 @@
+
+suporte à interação do usuário com recursos de dispositivos ...
+interfaces padronizadas para interação com dispositivos.

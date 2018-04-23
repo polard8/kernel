@@ -1,0 +1,11 @@
+ Design Note 1.
+ 
+ Sobre o diretório /usermode:
+ ==========================
+    Esse diretório contém os processos que rodam em user mode.
+
+    Os programas Idle, Shell e Taskman estão em user mode e fazem parte do conjunto principal de programas do sistema. (israel). Cada programa do conjunto tem dupla funcionalidade, funcionando como aplicação em user mode e servidor em user mode.
+    As demais aplicações serão carregados sempre no mesmo endereço virtual, 0x00400000 e não fazem parte do conjunto principal de programas.
+
+    Versãp 1.0, 2016.
+
