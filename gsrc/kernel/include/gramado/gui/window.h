@@ -377,6 +377,12 @@ struct color_scheme_d
 	int used;
 	int magic;
 	
+	//marcador de estilo de design para 
+	//o padrão de cores.
+	//cada estilo pode invocar por si um padrão de cores.
+	//ou o padrão de cores por si pode representar um estilo.
+	int style;
+	
 	char *name;  	
 	
 	//cada índice desse array representará um elemento gráfico,
@@ -928,6 +934,9 @@ struct button_d
 	
     int used;
     int magic;
+	
+	//estilo de design.
+	int style;
 
     int selected;	
     unsigned long border1; //color
@@ -960,13 +969,21 @@ button_t *mainButton3;
  * em baixo e contêm ícones dos programas abertos.
  * Porém essa barra na verdade é uma janela e pode ser redimensionada 
  * ou movida.
- * O kernel terá umagom registro disso para salvar as dimensões da
+ * O kernel terá registro disso para salvar as dimensões da
  * área de trabalho, que é o tamanho da tela menos o tamanho da barra.
  */
 typedef struct taskbar_d taskbar_t;
 struct taskbar_d
 {
-	//object stuff??
+
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+    int used;
+    int magic;
+	
+	//estilo de design.
+	int style;
 	
     unsigned long Left;	
     unsigned long Top;
@@ -991,7 +1008,14 @@ taskbar_t TaskBar;    //*Importante: Sem Ponteiro.
 typedef struct menubar_d menubar_t;
 struct menubar_d
 {
-	//object stuff??
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+    int used;
+    int magic;
+	
+	//estilo de design.
+	int style;
 	
     unsigned long Left;	
     unsigned long Top;
@@ -1068,7 +1092,11 @@ struct rect_d
 
     int used;	
 	int magic;
+	
 	int flag;
+	
+	//estilo de design
+	int style;
 	
 	//int validated;
 	//int focus;
@@ -1472,7 +1500,13 @@ struct window_d
      Se for 0, então a janela está no desktop.
     */
 	int tab;
-    
+	
+	
+	
+    //
+	// style: isso poderia ser estilo de design ...
+	//
+	
 	//window style:
 	//WINDOW_STYLE_FLOATING (flutuante) 
 	//WINDOW_STYLE_DOCKING   (atracada em algum canto)

@@ -811,9 +811,12 @@ unsigned long system_procedure( struct window_d *window,
 					
 				//test.
 				//control menu. (application)
+				//#importante:
+				// ESSA MENSAGEM DEVE SER INTERCEPTADA PELO APLICATIVO.
+				// ex: o shell.bin está intereptando bem essa mensagem.
                 case VK_CONTROL_MENU:
 				    //control menu.
-					MessageBox(gui->screen, 1, "Control menu:","MSG_SYSKEYUP.VK_CONTROL_MENU");
+					//MessageBox(gui->screen, 1, "Control menu:","MSG_SYSKEYUP.VK_CONTROL_MENU");
                     break;
 					
                 default:
@@ -1203,7 +1206,8 @@ done:
     //
 	// Testando listar os arquivos.
 	//
-    fsListFiles(0);
+    
+	//fsFAT16ListFiles(,,);
 
 	printf("sm-sys-procedureMakeTests: done\n");
     //Reabilita task switch.

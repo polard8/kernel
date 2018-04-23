@@ -244,6 +244,7 @@ extern void do_executa_new_task();
 #include <gramado/gui/grid.h>
 #include <gramado/gui/bmp.h>
 #include <gramado/gui/fonts.h>
+#include <gramado/gui/guiconf.h>  //*principal.
 
 // gramado/user
 #include <gramado/user/user.h>

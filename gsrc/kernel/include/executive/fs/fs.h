@@ -723,13 +723,15 @@ int fatbits;
  * Initialization support.
  */
 int fsInit();
-void fsListFiles(unsigned short *dir);
+void fsFAT16ListFiles( const char *dir_name, 
+                       unsigned short *dir_address, 
+					   int number_of_entries );
 
 //MBR support.
-void fsCheckMbr();
+void fsCheckMbrFile( unsigned char *buffer );
 
 //VBR support.
-void fsCheckVbr();
+void fsCheckVbrFile( unsigned char *buffer );
 
 
 void fs_init_structures();

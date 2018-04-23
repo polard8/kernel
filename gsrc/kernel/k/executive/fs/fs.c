@@ -43,8 +43,19 @@
 #include <kernel.h>
 
 
+
+
+//Variáveis internas.
+//int fsStatus;
+//int fsError;
+//...
+
+
 /*
  * fsCreateVFS:
+ * 
+ * #bugbug : Isso está errado:
+ * agora temos rotinas de vfs em vfs.c
  *
   @todo
 //  
@@ -56,6 +67,7 @@
 **/
 void fsCreateVFS()
 {
+/*	
     FILE *vfs;
     char *vfs_root;
   
@@ -78,15 +90,11 @@ void fsCreateVFS()
 		vfs->_base = (char *) vfs_root;
         //...
 	};
+*/
 };
 
 
 
-
-//Variáveis internas.
-//int fsStatus;
-//int fsError;
-//...
 
 
 /*
@@ -161,44 +169,55 @@ done:
 /*
  * fsListFiles:
  *     Mostra os nomes dos arquivos de um diretório.
+ *     Sistema de arquivos fat16.
+ *
+ * IN:
+ *     dir = Ponteiro para um endereço de memória onde foi carregado 
+ * o diretório.
+ *
  */
-void fsListFiles(unsigned short *dir)
+void fsFAT16ListFiles( const char *dir_name, 
+                       unsigned short *dir_address, 
+					   int number_of_entries )
 {
-    int i;
-	int max = 64;  //Número máximo de entradas.
-    unsigned long z = 0;       //Deslocamento do rootdir 
-    unsigned long n = 0;       //Deslocamento no nome.	
+	//@todo: O número de entradas é maior no diretório raiz.(512 ?)
 	
-	unsigned short *D = (unsigned short *) dir;
-    unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+    int i = 0;
+	int max = number_of_entries;         // Número máximo de entradas.
+    
+	unsigned long j = 0;  // Deslocamento
 	
-	//
-	// dir? Por enquanto o dir raiz.
-	//
+	unsigned short *DirBaseAddress = (unsigned short *) dir_address;
 	
-	printf("fsListFiles: Mostra os nomes dos arquivos em um diretorio.\n");
 	
-	//Carrega o diretório raiz na memória.
-	printf("Loading root..\n"); 
-	fs_load_rootdirEx();
+	if( number_of_entries <= 0 ){
+		return;
+	}
 	
-    i = 0; 
+	printf("fsListFiles: Listing names in %s ...\n", dir_name);
 	
-	//Mostra.
+    
+	// Mostra.
+	i=0; 
 	while(i < max)
 	{
-		//Diferente de vazio.
-		if(root[z] != 0){
-			printf("Name={%s}\n",&root[z]);
-        }; 
+		// Diferente de vazio.
+		if( DirBaseAddress[j] != 0 )
+		{
+			//O problema é a terminação da string '\0'
+			printf( "%s\n", &DirBaseAddress[j] );
+        } 
 		
 		//(32/2) próxima entrada! (16 words) 512 vezes!
-        z += 16;    
+        j += 16;    
         ++i;        
-    }; 	
+    }; 
+	
 	//...
-	printf("fsListFiles: done\n");
-	return; 	
+	
+	//printf("fsListFiles: done\n");
+	printf("Done\n");	
+	return; 
 };
 
 
@@ -208,6 +227,8 @@ void fsListFiles(unsigned short *dir)
  *     Carraga um arquivo na memória.
  *     @todo: Ke_ não é o certo, pois ke é chamadas 
  *            à rotinas externas. 
+ *
+ *  #bugbug a estrutura de canal será usada para troca de mensagens S|----|S
  */
 int KeLoadFile( struct channel_d *channel, 
                 unsigned char *file_name, 
@@ -261,6 +282,7 @@ done:
 void *get_file(int Index)
 {
 	//Limits.	
+	//@todo: max.
 	if(Index < 0){
 	    return NULL;
 	};
@@ -378,7 +400,10 @@ void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long stat
 
 
 /*
+ **************************************************************************
  * fsCheckMbr:
+ *     Checamos um mbr carregado em algum endereço de memória.
+ *
  *     Checa o registro do disco. (MBR). (disco do sistema).
  *
  *     Obs: O MBR desse sistema não tem o bpb no inicio do primeiro setor e 
@@ -386,15 +411,16 @@ void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long stat
  *
  * Endereço da memória onde o MBR é carregado na inicialização. 0x00020000.   
  *
- * @todo: Talvez essa rotina pudesse fornecer o endereço do buffer como argumento.
+ * @todo: Talvez essa rotina pudesse fornecer o endereço do buffer como 
+ * argumento.
  * @todo: O mbr do sisco do sistema precisa de uma estruura que 
  * coordene o acesso a ele.
  */
 //void fsCheckMBR(unsigned char* buffer)  //@todo
-void fsCheckMbr()
+void fsCheckMbrFile( unsigned char *buffer )
 {
-	unsigned char *mbr = (unsigned char *) FS_MBR_ADDRESS; 
-
+	//Onde carregar.
+	unsigned char *mbr = (unsigned char *) buffer; 
 
     //
 	// @todo:
@@ -431,27 +457,38 @@ fail:
  *     Vai no endereço onde está armazenado o VBR do volume atual
  *     e confere as informações sobre o volume.
  */
-//void fsCheckVBR(unsigned char* buffer)  //@todo 
-void fsCheckVbr()
+void fsCheckVbrFile( unsigned char *buffer )
 {
-    unsigned char *vbr = (unsigned char *) FS_VBR_ADDRESS;
+	//Onde carregar.
+	unsigned char *mbr = (unsigned char *) buffer; 
+
+    //
+	// @todo:
+	// Checar uma estrutura do mbr do disco do sistema,
+	// para validar o acesso à ele.
+	//
 	
-	//Check signature.	
-	if( vbr[0x1FE] != 0x55 || vbr[0x1FF] != 0xAA ){
-	    printf("fsCheckVbr: Signature fail!\n");
+	
+	// Check signature.
+	if( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+	{
+	    printf("fsCheckMbr: Signature Fail!\n");
+        goto fail;		
 	};
 	
-	
 	//
-	// @todo: Implementar outras rotinas de análise do vbr do volume.
+	// Continua ...
 	//
 	
 done:
-    printf("fsCheckVbr: Done.\n");
-	//refresh_screen();
+    printf("fsCheckMbr: Done.\n");
+	refresh_screen();
 	return;
+	
+fail:
+    refresh_screen();
+    return;
 };
-
 
 
 
@@ -465,8 +502,8 @@ done:
 void fs_check_disk()
 {
     printf("fs_check_disk: Initializing..\n");	
-	fsCheckMbr();
-	fsCheckVbr();
+	//fsCheckMbrFile();
+	//fsCheckVbrFile();
     //...
 	
 // Done.
@@ -602,16 +639,14 @@ void fs_init_structures()
     filesystem = (void*) malloc( sizeof(struct filesystem_d));
 	if( (void*) filesystem == NULL){
 	    printf("fs_init_structures:");
-		refresh_screen();
-		while(1){}
+        die();
 	};
 	
 	//Type.
 	Type = (int) get_filesystem_type();    //variável.	
 	if( Type == 0 ){
 	    printf("fs_init_structures error: Type.");
-		refresh_screen();
-		while(1){}
+        die();
 	};	
 	
 	filesystem->type = (int) Type;
@@ -655,13 +690,18 @@ done:
 
 
 /*
+ *************************************************************
  * fsInit:
  *     Inicializa o file system manager.
+ *
  */
 int fsInit()
 {
+	
+#ifdef KERNEL_VERBOSE
     printf("fsInit: Initializing FS support..\n");
-    
+#endif 
+ 
 	//
 	// Type - Configura o tipo de sistema de arquivos usado. 
 	// No caso, (fat16).
@@ -685,10 +725,16 @@ int fsInit()
 
 	// Structures and fat.
     
+#ifdef KERNEL_VERBOSE	
 	printf("fsInit: Structures..\n");
-	fs_init_structures();
+#endif
 	
+	fs_init_structures();
+
+#ifdef KERNEL_VERBOSE	
 	printf("fsInit: FAT..\n");
+#endif
+	
 	fs_init_fat();
 	
 	
@@ -696,6 +742,10 @@ int fsInit()
 	//
 	// VFS
 	//
+	
+#ifdef KERNEL_VERBOSE	
+	printf("fsInit: VFS..\n");
+#endif
 	
 	vfsInit();
 	
@@ -705,9 +755,14 @@ int fsInit()
 	//
 	
 done:
+
+#ifdef KERNEL_VERBOSE
     printf("Done!\n");
+#endif 
+
     return (int) 0;    	
-}
+};
+
 
 //
 // End.

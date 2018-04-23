@@ -867,8 +867,19 @@ shellProcedure( struct window_d *window,
 		//do sistema.
 		
 		//case MSG_SYSKEYDOWN:
-		//case MSG_SYSKEYUP: 		  
 		//    break;
+		
+		//Obs:
+		//essas teclas são tratadas pelo procedimento do sistema.
+		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
+		//como o context menu [Application Key]
+		case MSG_SYSKEYUP:
+            switch(long1){
+				case VK_CONTROL_MENU:
+				    MessageBox( 1, "Shell test","MSG_SYSKEYUP [Application Key]");
+					break;
+			}		
+		    break;
 		
 
         // Commands.		
@@ -877,14 +888,14 @@ shellProcedure( struct window_d *window,
 			{
 				// Null.
 				case 0:
-				    MessageBox( 1, "Shell","Testing MSG_COMMAND.NULL.");
+				    MessageBox( 1, "Shell test","Testing MSG_COMMAND.NULL.");
 				    break;
 				
 				// About.
 				// Abre uma janela e oferece informações sobre o aplicativo.
 				case CMD_ABOUT:
 				    // Test.
-				    MessageBox( 1, "Shell","Testing MSG_COMMAND.CMD_ABOUT.");
+				    MessageBox( 1, "Shell test","Testing MSG_COMMAND.CMD_ABOUT.");
 				    break;
 				
 				//clicaram no botão
@@ -1693,6 +1704,7 @@ exit_cmp:
  ******************************************
  * shellShell:
  *     Constructor.
+ *     Não emite mensagens.
  */
 void shellShell()
 {
@@ -1825,28 +1837,57 @@ int shellInit( struct window_d *window )
 	//stream status
 	shell_info.stream_status = 0;
 	
+	
+	//
+	// Antes dessa função ser chamada, o foco foi setado 
+	// na janela do aplicativo.
+	// Test: Não mechemos no cursor nesse momento, deicharemos 
+	// a função SetFocus configurar o curso.
+	// Não mostraremos o prompt, somente depois dos testes de inicialização.
+	//
+	//
+	
     //bugbug	
 	//cursor
-	shellSetCursor(0,4);
+	//shellSetCursor(0,4);
 	
 	//pointer
-	shellPrompt();
+	//shellPrompt();
     
 	// message.
-    printf("shellInit: Running tests ...\n");	
+    //printf("shellInit: Running tests ...\n");	
 
 
 	//
 	// Window support.
 	//
 
-	//window
+	// Testando a validade do ponteiro da janela.
+	// #importante: A estrutura está em kernel mode 
+	// e não podemos acessa-la.
+	
 	if( (void*) window == NULL ){
 	    printf("shellInit: window fail.\n");    
 	}else{
+		
+		// Nesse momento temos um ponteiro válido,
+		// mas infelismente não podemos testar outros elementos 
+		// da estrutura.
+		
 		APISetFocus( window );
+		
+		//
+		// mensagens !!
+		//
+		
+		printf("shellInit: Starting shell.bin ... \n");
+		printf("shellInit: Running tests ...\n");	
 	};
 	
+	
+	//
+	// Obtendo informações sobre a janela ativa.
+	//
 	
 	//Active window
 	ActiveWindowId = (int) APIGetActiveWindow();
@@ -1856,6 +1897,11 @@ int shellInit( struct window_d *window )
 	    printf("shellInit: ERROR getting Active window ID\n");	
 	}	
 	printf("ActiveWindowId={%d}\n", ActiveWindowId );
+
+	
+	//
+	// Obtendo informações sobre a janela com o foco de entrada.
+	//
 
 
 	//
@@ -1868,6 +1914,10 @@ int shellInit( struct window_d *window )
 	}	
 	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
 	
+	
+	//
+	// Obetendo informações sobre linhas e colunas do shell.
+	//
 	
 	
 	//columns and rows
@@ -2499,13 +2549,10 @@ static void cr(void)
 
 static void del(void)
 {
-	if (screen_buffer_x)
-	{
-		screen_buffer_pos -= 2;
-		screen_buffer_x--;
-		//*(unsigned short *) shell_buffer_pos = 0x0720;
-		//@todo: printchar
-	}
+	int i = (int) (screen_buffer_pos * 2);
+	
+	screen_buffer[i] = (char) '\0';
+	screen_buffer[i +1] = 7;
 };
 
 

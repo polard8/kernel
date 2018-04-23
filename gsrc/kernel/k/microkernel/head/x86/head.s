@@ -237,7 +237,7 @@ _kernel_begin:
     ;Debug.
     ;*IMPORTANTE para text mode.
 	;
-	; OBS: O endereço virtual da memoria de vídeo vga é 0x800000
+	; OBS: O endereço virtual da memória de vídeo vga é 0x800000
 	;      o mapeamento foi feito pelo Boot Loader.
 	;
 	;mov byte [0x800000], byte "K"
@@ -311,6 +311,7 @@ _kernel_begin:
     ;GUI ou text
 	cmp al, byte 'G'
 	jne .no_gui
+	
 .useGUI:
 	mov dword [_g_useGUI], dword 1
 	mov dword [_SavedBootMode], dword 1
@@ -351,6 +352,15 @@ _kernel_begin:
 	xor eax, eax
     mov al, byte [edx +12]        ;BPP.	
     mov dword [_SavedBPP], eax
+	
+	;;
+	;; #importante:
+	;; Outras informações poderiam ser passadas 
+	;; através do boot block.
+	;; Informações captadas durante as rotinas de boot.
+	;;
+	
+	
 .no_gui:
     mov dword [_g_useGUI], dword 0
 

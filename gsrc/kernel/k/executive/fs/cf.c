@@ -197,7 +197,7 @@ void create_system_folders()
 	
 */	
 done:
-    printf("done");	
+    //printf("done");	
 	return;
 };
 

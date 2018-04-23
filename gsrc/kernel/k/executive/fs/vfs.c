@@ -1,18 +1,19 @@
-
-
-//vfs.c
-
-// Virtual File System
-
-
-// sistema de arquivos virtual gerenciado pelo kernel base.
+/*
+ * File: fs\vfs.c
+ *     Virtual File System
+ *     Sistema de arquivos virtual gerenciado pelo kernel base.
+ */
 
 
 #include <kernel.h>
 
-//int dummy_vfs;
 
 
+/*
+ * vfsInit:
+ *     Initializing VFS.
+ *
+ */
 void vfsInit()
 {
 	int i;
@@ -21,7 +22,9 @@ void vfsInit()
 	// Inicializando a estrutura do VFS.
 	//
 
+#ifdef KERNEL_VERBOSE	
 	printf("Initilizing VFS ... \n");
+#endif	
 	
 	//Nosso objetivo é que tenha apenas uma estrutura 
 	//para o VFS.
@@ -41,10 +44,9 @@ void vfsInit()
 	//...
 	
 	
-	
-	
-	
+#ifdef KERNEL_VERBOSE	
 	printf("Initilizing VFS lists ...\n");	
+#endif	
 	
 	//
 	// Inicializando a lista de handles usada pelo vfs.
@@ -410,14 +412,23 @@ void vfsInit()
 		
 	
 
+	//
+	// #importante
+	// É possivel fazer mais inicializações.
+	//
 	
-	
+#ifdef KERNEL_VERBOSE
 	printf("VFS Initialized!\n");
+#endif	
+	
 	return;
 };
 
 
-//mostrar os elementos da lista de handle.
+/*
+ * vfs_show_handle_list:
+ *     Mostrar os elementos da lista de handles do VFS. 
+ */
 void vfs_show_handle_list()
 {
 	int i;

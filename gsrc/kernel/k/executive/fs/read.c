@@ -84,6 +84,7 @@ done:
  *     fsReadLBA(..)
  *     Obs: Talvez essa rotina tenha que ter algum retorno no caso de falhas.
  */
+//void read_fat_lba( unsigned long address, unsigned long lba) 
 void read_lba( unsigned long address, unsigned long lba)
 {
     //Obs: 'fatbits' é uma variável global??
@@ -182,29 +183,25 @@ unsigned long fsLoadFile( unsigned char *file_name,
 	if( (void*) filesystem == NULL )
 	{
 	    printf("fs-read-fsLoadFile: filesystem");
-		//goto fail;
-		die(); //@todo: Na verdade aqui deveria apenas falhar a função.
+		goto fail;
 	}else{
 		
 	    //Setores por cluster.
 	    Spc = filesystem->spc;
-	    if(Spc <= 0)
-		{
-	        printf("fs-read-fsLoadFile error: Spc.");
-		    //goto fail;
-			die();  //@todo: Na verdade aqui deveria apenas falhar a função.
+	    if(Spc <= 0){
+	        printf("fs-read-fsLoadFile: Spc");
+		    goto fail;
 	    };
 	
 	    //Max entries ~ Número de entradas no rootdir.
 	    max = filesystem->rootdir_entries;	
-	    if(max <= 0)
-		{
-	        printf("fs-read-fsLoadFile error: max");
-			//goto fail;
-		    die();  //@todo: Na verdade aqui deveria apenas falhar a função.
+	    if(max <= 0){
+	        printf("fs-read-fsLoadFile: max");
+			goto fail;
 	    };
 		
-	    //More?! 
+	    // More?! 
+		// ...
 	};
 	
 	
@@ -270,7 +267,7 @@ unsigned long fsLoadFile( unsigned char *file_name,
 	
     // O arquivo não foi encontrado.	
 notFound:
-    printf("fsLoadFile: %s not found!\n",file_name);     
+    printf( "fs-read-fsLoadFile: %s not found!\n", file_name );     
     goto fail;
 	
     // O arquivo foi encontrado.	
@@ -292,9 +289,8 @@ found:
 	// Isso varia de acordo com o tamanho do disco.
 	// O número máximo do cluster nesse caso é (256*64).
 	
-	if( cluster <= 0 || cluster > 0xfff0 )
-	{
-	    printf("fs-read-fsLoadFile error: Cluster limits {%x}!\n", cluster );
+	if( cluster <= 0 || cluster > 0xfff0 ){
+	    printf("fs-read-fsLoadFile: error, Cluster limits {%x}\n", cluster );
 		goto fail;
 	};	
 	
@@ -415,6 +411,9 @@ done:
 /*
  * fs_load_rootdirEx:
  *    Carrega o diretório raiz na memória.
+ *    Sistema de arquivos fat16.
+ *    ? qual disco ?
+ *    ? qual volume ? 
  */
 void fs_load_rootdirEx()
 {
@@ -436,6 +435,9 @@ done:
 /*
  * fs_load_fatEx:
  *    Carrega a fat na memória.
+ *    Sistema de arquivos fat16.
+ *    ? qual disco ?
+ *    ? qual volume ? 
  */
 void fs_load_fatEx()
 {
@@ -461,10 +463,11 @@ void fs_load_rootdir()
 }; 
 
 
-//
-// carrega um dado diretorio da lista de arquivos. dado o indice.
-//
-void fs_load_dir(unsigned long id)
+/*
+ * fs_load_dir:
+ *     Carrega um dado diretorio da lista de arquivos, dado o índice.
+ */
+void fs_load_dir( unsigned long id )
 {    	
 	unsigned long i;
 	unsigned long n = 0;

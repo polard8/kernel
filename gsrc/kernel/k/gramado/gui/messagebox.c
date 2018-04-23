@@ -53,9 +53,15 @@ void messageboxOut(struct window_d *parent_window, int type, char *title, char *
 
 								   
 /*
+ ***************************************************************
  * MessageBox:
  *     Cria uma Window Frame e apresenta uma mensagem nela.
  * 
+ * #Importante:
+ *     Temos que considerar o propósito do message box e 
+ * o design do message box.
+ * Opções: tradicional, com elementos 3d ou mais flat e clean.
+ *
  * IN: 
  * Window frame handle.
  * Message Box type. 

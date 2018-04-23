@@ -44,8 +44,8 @@ void fs_delete_entry(unsigned long id, unsigned long eid){
  */
 void limpa_root()
 {
-    int i;	
-	unsigned char *root = (unsigned char *) FAT16_ROOTDIR_ADDRESS;
+    //int i;	
+	//unsigned char *root = (unsigned char *) FAT16_ROOTDIR_ADDRESS;
 
     
 	/*
@@ -61,17 +61,17 @@ void limpa_root()
 	 *     O tamanho do rootdir deveria estar definido em uma
 	 * variável global. Por enquanto o tamanho é constante.
 	 */
-	i = 0;
+	//i = 0;
      
 	 
 	
 	/*
 	 * Limpando o rootdir. (32 setores.) 512 entradas de 32bytes. 
      */
-	while(i < (32*512)){
-        root[i] = (unsigned char) 0;    
-        ++i;
-    };
+	//while(i < (32*512)){
+    //    root[i] = (unsigned char) 0;    
+    //    ++i;
+    //};
      
     /*
 	 * Salva o root dir. (size?)    
@@ -88,8 +88,8 @@ void limpa_root()
  */
 void fsClearFat()
 {
-	int i;
-    unsigned char *fat_base = (unsigned char *) FAT16_FAT_ADDRESS;
+	//int i;
+    //unsigned char *fat_base = (unsigned char *) FAT16_FAT_ADDRESS;
 	
 	/*
      * @todo: 
@@ -104,15 +104,15 @@ void fsClearFat()
 	 *     O tamanho da fat deveria estar definido em uma
 	 * variável global. 
 	 */	
-    i = (int) (512*4);
+    //i = (int) (512*4);
 	
-	while(i > 0){
-        fat_base[i] = 0;    
-        i--;
-    }; 
+	//while(i > 0){
+    //    fat_base[i] = 0;    
+    //    i--;
+    //}; 
 
     //Salva  FAT ! 
-	write_lba(FAT16_FAT_ADDRESS, FAT16_FAT_LBA);
+	//write_lba(FAT16_FAT_ADDRESS, FAT16_FAT_LBA);
 
 	
     //@todo: Usar while.      

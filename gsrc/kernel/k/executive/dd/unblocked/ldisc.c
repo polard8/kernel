@@ -1488,6 +1488,7 @@ void kbdc_wait(unsigned char type)
  * *Importante: 
  *     Se estamos aqui é porque os dados disponíveis no controlador 8042 
  * pertencem ao mouse.
+ *
  * @todo: Essa rotina não pertence ao line discipline.
  * Obs: Temos externs no início desse arquivo.
  * 
@@ -1495,20 +1496,24 @@ void kbdc_wait(unsigned char type)
  
 void mouseHandler()
 {
+	// ?? #bugbug.
+	// ?? Porque isso é local. ??
+	// ?? Não tem um contador global para isso ??
+	// E o fato de serem 'static' ???
+	// Obs: A função entra com esse mouse count zerado.
+    static int count_mouse=0;
 	
-//buffer
-static int count_mouse=0;
-static char buffer_mouse[3];
-
-//Coordenadas do mouse.
-//Obs: Isso pode ser blobal.
-//O tratador em assembly tem as variáveis globais do posicionamento.
-int posX = 0;
-int posY = 0;	
-
+	// Buffer.
+    static char buffer_mouse[3];
 	
-//Char para o cursor provisório.
-static char mouse_char[] = "T";
+    // Coordenadas do mouse.
+    // Obs: Isso pode ser global.
+    // O tratador em assembly tem as variáveis globais do posicionamento.
+    int posX=0;
+    int posY=0;	
+
+    //Char para o cursor provisório.
+    static char mouse_char[] = "T";
 
     //
 	// Lendo um char no controlador.
@@ -1518,18 +1523,19 @@ static char mouse_char[] = "T";
 	
 	//
 	// Contagem de interruções:
-	// Precisamos esperar 3 interrupções.
+	// Obs: Precisamos esperar 3 interrupções.
 	//
 	
-	if(count_mouse >= 3)
+	if( count_mouse >= 3 )
 	{
 		// Salvando os bytes obtidos.
-		//Isso garante os dados que serão usados pelo assembly.
-		//mas não queremos que eles sejam modificados antes de chegarem lá.
-        mouse_packet_data   = buffer_mouse[0];
-		mouse_packet_x      = buffer_mouse[1];       
-		mouse_packet_y      = buffer_mouse[2];
-		//mouse_packet_scroll = buffer_mouse[3]; //Suspenso.
+		// Isso garante os dados que serão usados pelo assembly, mas não 
+		// queremos que eles sejam modificados antes de chegarem lá.
+		
+        mouse_packet_data = buffer_mouse[0];
+		mouse_packet_x = buffer_mouse[1];       
+		mouse_packet_y = buffer_mouse[2];
+		//mouse_packet_scroll = buffer_mouse[3];  // Suspenso.
 		
 		
 		//
@@ -1551,9 +1557,8 @@ static char mouse_char[] = "T";
         // Obs:
         // salvando o estado dos botões.
         // Isso não deve causar problemas.		
-
-		//
 		// ?? Será que essas operações corrompem os dados ??
+		// 
 		
 		if( ( mouse_packet_data & 0x01 ) == 0 )
 		{
@@ -1593,30 +1598,32 @@ static char mouse_char[] = "T";
 		// Salvando os valores em variáveis globais.
 		//
 		
-		
 		update_mouse();	
 		
         // 
 		// Pegando os valores encontrados calculados pela rotina acima.
-        //
+        // Obs: mouse_x e mouse_y são variáveis globais.
+		//
 		
-		//Obs:
-		//mouse_x e mouse_y são variáveis globais.
 		posX = mouse_x;
 	    posY = mouse_y;
 		
-		//#debug:
-		//#importante:
-		//Mostrando os resultados obtidos.
-		//printf("X={%d} Y={%d} \n",posX,posY);
-		//refresh_screen();
+		// #debug:
+		// #importante:
+		// Mostrando os resultados obtidos.
+		// printf("X={%d} Y={%d} \n",posX,posY);
+		// refresh_screen();
 		
+		// Limits.
         if( posX < 0 ){ posX = 0; }	
 		if(	posY < 0 ){ posY = 0; }
 		if(	posX > 800-8 ){ posX = 800-8; }
 		if(	posY > 600-8 ){ posY = 600-8; }
 		
-		//Atualizando o mesmo cursor usado pelo teclado.
+		//
+		// Atualizando o mesmo cursor usado pelo teclado.
+		//
+		
 		g_cursor_x = (unsigned long) posX;
 		g_cursor_y = (unsigned long) posY;
 		
@@ -1625,36 +1632,58 @@ static char mouse_char[] = "T";
 		//
 		
 		//Imprimindo o caractere que está servindo de ponteiro provisório.
-
         printf("%c", (char) '0'); 
+		refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );		
 		
+		// @todo:
+		// ?? Porque não estamos testando o bmp como ponteiro ??
+		// Talvez porque o bmp é 16x16.
 		//bmpDisplayBMP( mouseBMPBuffer, g_cursor_x*8, g_cursor_y*8, 0, 0 );
+		//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 16, 16 );
 		
-		//Efetuando o refresh do retângulo referente ao caractere.
-		//@todo: Isso poderá ser maior.
-		refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
+		//
+		// ?? #bugbug: Porque essa variável é local, dentro da função.
+		// Zerando a contagem de interrupções de mouse.
+		//
 		
-		//Zerando a contagem de interrupções de mouse.
 		count_mouse=0;
     };
 	
 	
 	//
 	// *importante:
-	// Passamos a mensagem de mouse para o procedimento de janela do sistema.
-	// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
+    // Esse é o memento em que enviamos a mensagem !!
+    //	
+	
+    //
+	// *importante:
+	// Devemos enviar a mensagem de mouse para quem. ??
+	// First responder ?? (wwf)
 	//
-		
-    //Pegaremos aqui a janela com o foco de entrada e passaremos 
-	//para o procedimento, que não deve pegar novamente.
+	
+	// O aplicativo poderá interceptar mensgens como mouse hover.
+	// mousehover é flutuando por cima do objeto.
+	
+	//
+	// FIRST RESPONDER
+	// 
+	
 	struct window_d *w;
 	w = (void *) windowList[window_with_focus];
 	
 	if( (void*) w != NULL )
 	{
-		// Envia as mensagens para os aplicativos intercepta-las
-		//so mandamos mensagem para um aplicativo no estavo válido.
-		if( w->used == 1 && w->magic == 1234 ){
+		// Envia as mensagens para os aplicativos intercepta-las.
+		if( w->used == 1 && w->magic == 1234 )
+		{
+			// ?? O que sabemos sobre o evento de mouse até aqui ??
+			// sabemos que ele se movimentou e temos as coordenadas dele.
+			
+			// se o mouse alcançar as coordenadas da janela com o foco de 
+			// entrada podemos enviar uma mensagem para ela. assim ela 
+			// pode criar uma janelinha que alerta sobre o mouse hover.
+			// essa mesagem pode ser de mouse hover.
+			
 	        //windowSendMessage( 0, 0, 0, 0);
 		};			
 		
@@ -1663,7 +1692,24 @@ static char mouse_char[] = "T";
 		//system_procedure( w, (int) 0, (unsigned long) 0, (unsigned long) 0 );					
 	};		
 	
-
+	
+	//
+	// #importante 
+	// Por outro lado o mouse deve confrontar seu posicionamento com 
+	// todas as janelas, para saber se as coordenadas atuais estão passando 
+	// por alguma das janelas. Se estiver, então enviaremos mensagens para essa 
+	// janela que o mouse passou por cima. Ela deve ser sinalizada como hover,
+	// 
+	// #importante:
+	// Se houver um click, o elemento com mousehover será afetado, e enviaremos,
+	// mesagens para ele, se apertarem enter ou application key, quem 
+	// recebe a mensagem é o first responder, ou seja. a janela com o focod e entrada.
+	//
+    // Se clicarmos com o botão da direita, quem recebe a mensagem é 
+    // a janela que o mouse está passando por cima.	
+	//
+	
+	
 exit_irq:	
     // EOI.		
     outportb(0xa0, 0x20); 

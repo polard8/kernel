@@ -5,6 +5,11 @@
  *     Rotinas de criação e gerenciamento de botões. 
  *     Faz parte do módulo Window Manager do tipo MB.
  *
+ * Refletindo:
+ *    Talvez seja certo criar opções de rotinas de criação de botões.
+ * Por exemplo: draw_3d_button e draw_flat_button 
+ * seria muito confuso uma rotina só que acione o tipo via argumento.
+ *
  * Versão 1.0, 2015.
  */
 

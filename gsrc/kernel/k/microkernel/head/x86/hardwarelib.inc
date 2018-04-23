@@ -116,6 +116,55 @@ _test_write:
     ret
 
 	
+	
+	
+	
+;;================================================
+;; 
+
+
+;; chanel 0, master, read sector
+global _ide_channel0_master_readsector
+_ide_channel0_master_readsector:
+    ret
+
+;; channel 0, master write sector	
+global _ide_channel0_master_writesector
+_ide_channel0_master_writesector:
+    ret
+	
+;; channel 0, slave, read sector	
+global _ide_channel0_slave_readsector
+_ide_channel0_slave_readsector:
+    ret
+		
+;; channel 0, slave, write sector	
+global _ide_channel0_slave_writesector
+_ide_channel0_slave_writesector:
+    ret
+
+;; chanel 1, master, read sector
+global _ide_channel1_master_readsector
+_ide_channel1_master_readsector:
+    ret
+	
+;; channel 1, master write sector		
+global _ide_channel1_master_writesector
+_ide_channel1_master_writesector:
+    ret
+
+;; channel 1, slave, read sector		
+global _ide_channel1_slave_readsector
+_ide_channel1_slave_readsector:
+    ret
+		
+;; channel 1, slave, write sector		
+global _ide_channel1_slave_writesector
+_ide_channel1_slave_writesector:
+    ret
+	
+
+	
 ;--------------------------------	
 ; _os_read_sector:
 ;
@@ -429,8 +478,10 @@ IDE_RESET_DISK:
 	mov al, dl           ;al = dl.
 	shl al, 4            ;move drive selector into bit 4.
 	or al, 0A0h          ;make bits 7 and 5 a 1.
+	
 	mov dx, 01F6h        ;dx = drive/head regsiter port address.
 	out dx, al           ;write to drive/head register.
+	
 	mov al, 10h          ;Command 1xh: Recalibrate.
 	inc dx                         ;dx is now 01F7h, port address of command register.
 	mov byte [lastcommand], 10h    ;Tell our ISR what we are doing.

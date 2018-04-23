@@ -1917,6 +1917,7 @@ void SetFocus(struct window_d *window)
 {
 	
 	int i;
+	int WindowID;
 	
 	//Impossível mudar o focus.
 	//Isso manterá o foco na janela do desenvolvedor
@@ -1939,50 +1940,87 @@ void SetFocus(struct window_d *window)
 		//validade e estado da estrutura.
 		if( window->used == 1 && window->magic == 1234 )
 		{
-			//Se a janela é a janela ativa.
+			//Salvando id localmente.
+			WindowID = (int) window->id; 
+			
+			//Se a janela já tem o foco não precisa fazer nada.
+			if( window->id == window_with_focus ){
+				goto setup_wwf;
+			}
+			
+		    //Se a janela é a janela ativa.
+			//Então atribuimos o foco e configuramos o procedimento de janela.
 			if( window->id == active_window )
 			{
+	            //set wwf id.
+			    window_with_focus = (int) window->id;
+
+			    //set wwf pointer.
+			    WindowWithFocus = (void *) window;
+				
 		        //Procedure.
 		        //?? Não sei se é o ideal.
 		        SetProcedure((unsigned long) window->procedure);
-		    
-			    //set wwf pointer.
-			    WindowWithFocus = (void *) window;
-
-	            //set wwf id.
-			    window_with_focus = (int) window->id;
-				goto done;
-				
+				goto setup_wwf;
 			};
 			
-			//Se ela não é a janela ativa, tentamos ativar sua janela mãe.			
+			// Se ela não é a janela ativa, tentamos ativar sua janela mãe.
+            // As janelas filhas nunca são janelas ativas. Se uma janela filha 
+			// tem o foco de entrada, então sua janela mãe é a ativa. 			
 			if( window->id != active_window )
 			{
 				
-			    //Se a janela mãe tem um ponteiro inválido. Ativamos a janela filha. 
+			    // Se a janela mãe tem um ponteiro inválido. Então ela não tem uma 
+				// janela mãe, então ativamos a janela filha.
+                // ?? #bugbug talvez não seja essa ideia certa.			
 		        if( (void*) window->parent == NULL ){
 			        set_active_window(window);				
-		        }
+		        }else{
 
-		        //Ativar a janela mãe se ela tem um ponteiro válido.
-		        if( (void*) window->parent != NULL )
-		        {
+					// Testando a validade da janela mãe
+				    // Ativar a janela mãe se ela tem um ponteiro válido
+					// Pois janela filha nunca é a janela ativa, mesmo tendo o foco.
 			        if( window->parent->used == 1 && window->parent->magic == 1234 ){
 			            set_active_window(window->parent);	
-			        };
-		        };
-				
-		        //Procedure.
-		        //?? Não sei se é o ideal.
-		        SetProcedure((unsigned long) window->procedure);
+			        };				
+				};
+
+                //Obs: Nesse momento a janela ativa está configurada.
+				// a janela ativa é a própria janela ou a sua janela mãe.
+                
+                // Já podemos setar o foco de entrada e configurarmos o 
+				// procedimento de janela.				
+
+	            //set wwf id.
+			    window_with_focus = (int) window->id;				
 		    
 			    //set wwf pointer.
 			    WindowWithFocus = (void *) window;
 
-	            //set wwf id.
-			    window_with_focus = (int) window->id;
-                goto done;				
+		        //Procedure.
+		        //?? Não sei se é o ideal.
+		        SetProcedure((unsigned long) window->procedure);
+
+                goto setup_wwf;				
 			};
+			
+			
+//
+// Nesse momento a janela já deve estar com o cofo de entrada,
+// se não estiver é porque falhamos.
+//		
+
+    //if( WindowID != window_with_focus )
+    //{
+	       //window_with_focus = main->id;;      
+    //};	
+			
+
+//
+// Configurando a janela com o foco de entrada.
+//
+			
+setup_wwf:			
 			
 			//
 			// Se a janela for um editbox, ela precisa ter seu input resetado..

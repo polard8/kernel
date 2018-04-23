@@ -14,6 +14,7 @@
 
 
 /*
+ **********************************************************************
  * KiSearchFile:
  *    Procura por um arquivo, dado o endereço do diretório.
  *    Com o diretório raiz já carregado na memória.
@@ -29,7 +30,8 @@
  *    +...
  *
  */ 
-int KiSearchFile( unsigned char *file_name, unsigned long address )
+int KiSearchFile( unsigned char *file_name, 
+                  unsigned long address )
 {
 	int Status;
     unsigned long i = 0;        //Deslocamento do dir. 
@@ -63,10 +65,10 @@ int KiSearchFile( unsigned char *file_name, unsigned long address )
     };
 	
 	//More?!
+	//fsSearchFile(unsigned char *file_name)
 	
 fail:
     printf("fs-search-KiSearchFile: File not found!\n");       	
-    //printf("File not found!\n");
 	return (int) 1; 
 done:
     return (int) 0;
@@ -75,6 +77,7 @@ done:
 
 
 /*
+ **********************************************************************
  * fsSearchFile:
  *    Procura por um arquivo no diretório raiz de uma partição.
  *    Com o diretório raiz já carregado na memória.
@@ -146,7 +149,6 @@ int fsSearchFile(unsigned char *file_name)
 	
 fail:
     printf("fs-search-fsSearchFile: File not found!\n");       	
-    //printf("File not found!\n");
 	return (int) 1;    
 done:
     return (int) 0;
