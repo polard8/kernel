@@ -1373,7 +1373,7 @@
 #define VK_WINKEY 0x5B  //91    
 #define VK_RWIN	  0x5C
 #define VK_APPS	  0x5D
-#define VK_CONTROL_MENU 0x5D  //93
+#define VK_CONTROL_MENU 0x5D  //93 BUGBUG ISSO É CONTEXT MENU
 #define VK_ACENTO_CIRCUNFLEXO 0x5E  //abnt	
 #define VK_SLEEP     0x5F
 #define VK_NUMPAD0	 0x60

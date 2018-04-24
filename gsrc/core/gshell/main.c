@@ -1,5 +1,5 @@
 /*
- * File: main.c @todo: Criar a janela shell help.
+ * File: main.c @todo: Criar a janela shell help F1.
  *
  * General purpose application.
  *     SHELL.BIN é um aplicativo de próposito geral. Desenvolvido como 
@@ -866,8 +866,24 @@ shellProcedure( struct window_d *window,
 		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
 		//do sistema.
 		
-		//case MSG_SYSKEYDOWN:
-		//    break;
+		case MSG_SYSKEYDOWN:
+		    switch(long1){
+		        
+				//help
+				case VK_F1:
+				    MessageBox( 1, "Gramado Core - Shell","F1: HELP");
+					break;
+				
+                //full screen
+                //colocar em full screen somente a área de cliente. 				
+		        case VK_F11:
+				    MessageBox( 1, "Gramado Core - Shell","F11: FULL SCREEN");
+					break;
+					
+				//...
+
+			};
+			break;
 		
 		//Obs:
 		//essas teclas são tratadas pelo procedimento do sistema.
@@ -875,8 +891,11 @@ shellProcedure( struct window_d *window,
 		//como o context menu [Application Key]
 		case MSG_SYSKEYUP:
             switch(long1){
-				case VK_CONTROL_MENU:
-				    MessageBox( 1, "Shell test","MSG_SYSKEYUP [Application Key]");
+				
+				//O MENU APPLICATION É O CONTEXT MENU.
+				//
+				case VK_APPS:
+				    MessageBox( 1, "Gramado Core Shell:","Context Menu");
 					break;
 			}		
 		    break;
@@ -914,7 +933,7 @@ shellProcedure( struct window_d *window,
 				//default:
 				//break;
 			}
-		break; 		
+		    break; 		
 		
 		//Essa mensagem pode ser acionada clidando um botão.
 		case MSG_CLOSE:
@@ -978,8 +997,172 @@ shellProcedure( struct window_d *window,
 		//    break;
 		
 		//case COMMAND_HIDE_WINDOW:
-        //    break; 	
+        //    break; 
+
+		
+		//#importante
+		// os caracteres de controle encontrados na tabela ascii.
+		//@todo: Essa mensagem precis ser criada, tanto no kernel 
+		//quanto na API.
+		//case MSG_ASCII_CONTROL_KEYS:
+		//   switch(long1)
+		//	{
 	
+		        //^A STX
+                //case 1:
+		        //    printf("^A");
+                //    break;  		
+	
+		        //^B SOT
+                //case 2:
+		        //    printf("^B");
+                //   break;  		
+			
+		        //^C ETX
+                //case 3:
+		        //    printf("^C");
+		        //	shellPrompt();
+                //    break;
+
+		        //^D EOT
+                //case 4:
+		        //   printf("^D");
+                //   break;
+
+		        //^E ENQ
+                //case 5:
+		        //    printf("^E");
+                //    break;  								
+			
+		        //^F ACK
+                //case 6:
+		        //    printf("^F");
+                //    break;  					
+
+
+		        //^G BEL
+                //case 7:
+		        //   printf("^G");
+                //    break;  					
+			
+			
+		        //^H BS
+                //case 8:
+                //    break;  								
+			
+		        //^I HT horizontal tab
+                //case 9:
+                //    break;  	
+
+		        //^J LF
+                //case 10:
+                //    break;  			
+			
+						
+		        //^K VT vertical tab
+                //case 11:
+                //    break;  	
+
+		        //^L FF form feed
+                //case 12:
+                //    break;  	
+			
+			
+		        //^M CR
+                //case 13:
+                //    break;  	
+			
+
+		        //^N SO
+                //case 14:
+                //    break;  				
+		
+
+		        //^O SI
+                //case 15:
+                //    break;
+
+
+		        //^P DLE DATA LINK ESCAPE
+                //case 16:
+                //    break;  			
+		
+		
+		        //^Q DC1 DEVICE CONTROL 1
+                //case 17:
+                //    break;  	
+  			
+			
+		        //^R DC2 DEVICE CONTROL 2
+                //case 18:
+                //    break;
+
+		        //^S DC3 DEVICE CONTROL 3
+                //case 19:
+                //    break;  			
+
+		        //^T DC3 DEVICE CONTROL 4
+                //case 20:
+                //    break;  			
+		
+		
+		        //^U NAK NEGATIVE ACKNOLEDGE
+                //case 21:
+                //    break;  			
+
+		        //^V SYN SYNCHRONOUS IDLE
+                //case 22:
+                //    break;  			
+		
+		        //^W ETB END OF TRANSMISSION BLOCK
+                //case 23:
+                //    break;  			
+		
+		        //^X CAN CANCEL
+                //case 24:
+                //    break;  			
+
+		
+		        //^Y EM END OF MEDIUM
+                //case 25:
+                //    break;  			
+		
+		        //^Z SUB SUBSTITUTE
+                //case 26:
+                //    break;  			
+		
+		
+		        //^[ ESC ESCAPE
+                //case 27:
+                //    break;  			
+		
+		        //^\ FS FILE SEPARATOR
+                //case 28:
+                //    break;  			
+		
+		        //^] GS GROUP SEPARATOR
+                //case 29:
+                //    break;  			
+		
+		        //^ RS RECORD SEPARATOR
+                //case 30:
+                //    break;  			
+		
+		
+		        //_ US UNIT SEPARATOR
+                //case 31:
+                //    break;  			
+		
+		
+		        //DELETE
+                //case 127:
+                //    break; 
+
+        //    };		
+		//    break;
+			
+		
+		
 		//Mensagem desconhecida.
 		default:
 		    //printf("shell procedure: mensagem desconhecida\n");
