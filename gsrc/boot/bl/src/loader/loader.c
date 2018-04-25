@@ -25,8 +25,12 @@
 //
 // PE file header support.
 //
-#define IMAGE_FILE_MACHINE_I386 0x014C
+#define IMAGE_FILE_MACHINE_I386     0x014C  // x86
+#define IMAGE_FILE_MACHINE_IA64     0x0200  // Intel Itanium
+#define IMAGE_FILE_MACHINE_AMD64    0x8664  // x64
 //Continua...
+
+
 
 /*
 //
@@ -42,6 +46,7 @@ void DoProgress( char label[], int step, int total );
 void updateProgressBar();
 //...
 */
+
 
 /*
  * load_kernel:
@@ -139,6 +144,7 @@ fail:
  
 
 /*
+ *************************************************************
  * load_files:
  *     Carrega os arquivos IDLE.BIN, SHELL.BIN e TASKMAN.BIN.
  *
@@ -147,12 +153,12 @@ fail:
  *     + ...
  *
  * @todo:
- *     Deve existir uma lista de arquivos. Essa função carregará os 
- *     arquivos da lista.
- *     Mudar para BlLoadFiles();. ou loaderLoadFiles()
+ *     Deve existir uma lista de arquivos. 
+ *     Essa função carregará os arquivos da lista.
+ *
+ *     Mudar para loaderLoadFiles()
  */ 
 //int loaderLoadFiles()
- 
 int load_files()
 {
     int Status;   
@@ -205,6 +211,12 @@ int load_files()
 		goto fail;
 	};
 	
+	
+	//
+	// @todo: Limpar a tela.
+	//
+	
+	//==================
 	//0, IDLE.BIN. 
 #ifdef BL_VERBOSE
 	printf("load_files: Loading %s..\n",init_name);
@@ -218,7 +230,7 @@ int load_files()
     // Update progress bar
 	//updateProgressBar();
 	
-		
+    //==================		
 	//1, SHELL.BIN.
 #ifdef BL_VERBOSE
 	printf("load_files: Loading %s..\n",shell_name);
@@ -232,7 +244,7 @@ int load_files()
     // Update progress bar
 	//updateProgressBar();
 
-
+    //================== 
 	//2, TASKMAN.BIN.
 #ifdef BL_VERBOSE
 	printf("load_files: Loading %s..\n",taskmanager_name);
@@ -295,8 +307,6 @@ done:
 fail:
 	printf("load_files: Fail.\n");    
 	die();
-	//refresh_screen();
-	//while(1){};
 };
 
 

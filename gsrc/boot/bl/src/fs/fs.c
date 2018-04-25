@@ -437,13 +437,14 @@ int mostra(){
 
 
 /*
+ *****************************************************************
  * fsLoadFile:
  *     Carrega um arquivo na memória. (#fat16)
  *     O Boot Loader utiliza essa rotina para carregar os arquivos 
  * do sistema.
  *
  * @todo:
- *     +A lib C chama essa função atravez de open(...).
+ *     +A libC chama essa função atravez de open(...).
  *     +Mudar o tipo de retorno para 'int'.
  *     +...
  */
@@ -475,11 +476,21 @@ unsigned long fsLoadFile( unsigned char *name, unsigned long address )
 	//if( (void*) f == NULL ){
 		//fail.
 	//};
+	
+	//#bugbug
+	//Essa refresh screen leva muito tempo.
 
+	//Debug
+	printf("fsLoadFile: Loading %s\n", (const char*) name );
+	refresh_screen();
+	
 //loadRoot:
 
+    //#test: 
+	// Suspendendo o carregamento do root.
+	// Ele será previamente carregado em main().
 	// Carrega o diretório raiz na memória.
-	fs_load_rootdirEx();
+	//fs_load_rootdirEx();
 	
 	//#debug 
 	//printf("carregar_arquivo: Searching File=[%s]\n",file_name);		
@@ -496,7 +507,7 @@ search_file:
 			name_x[11] = 0;
 			
             //Compara 11 caracteres.
-			Status = (int) strncmp(name, name_x, 11);
+			Status = (int) strncmp( name, name_x, 11 );
             if(Status == 0){
 				cluster = (unsigned short) root[z +13];
                 goto arquivo_encontrado;
@@ -544,8 +555,12 @@ arquivo_encontrado:
 	//#debug. 
 	//printf("carregar_arquivo: Loading FAT ...\n");
 
+	
+    //#test: 
+	// Suspendendo o carregamento do root.
+	// Ele será previamente carregado em main().	
     // Carrega a FAT na memória. 		
-	fs_load_fatEx();
+	//fs_load_fatEx();
 	
 	//#debug. 
     //printf("carregar_arquivo: Loading file ...\n"); 
@@ -602,7 +617,10 @@ while(1)
 	cluster = (unsigned short) next;
 	
 	//Ver se o cluster carregado era o último cluster do arquivo.
-	if(cluster == 0xFFFF || cluster == 0xFFF8){ goto done; };
+	if(cluster == 0xFFFF || cluster == 0xFFF8)
+	{ 
+	    goto done; 
+	};
 	
 	//#debug.
 	//printf("%d ", cluster);

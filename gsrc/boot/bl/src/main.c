@@ -28,16 +28,16 @@
  * com 'Ble', que significa algo como Boot Loader Extention.
  *
  * In this file:
- *     + BlMain        - Entrada da parte em C do bootloader. 
+ *     + BlMain        - Entrada da parte em C do boot loader. 
  *     + BlLoadKernel  - Carrega o kernel.
  *     + BlLoadFiles   - Carrega os módulos do Kernel, aplicativos e 
                          metafiles de inicilização.
  *     + BlSetupPaging - Configura a paginação.
  *     ...
  *
- * Histórico:
- *    Versão: 1.0, 2015 - Criado por Fred Nora.
- *    Versão: 1.0, 2016 - Revisão.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  *    ... 
  */
  
@@ -54,9 +54,11 @@ void BlLoadFiles();
 void BlSetupPaging();
 
 
-//static char *codename = "Pablo";
+//static char *codename = "Gramado Boot";
+
 
 /*
+ ******************************************************************
  * BlMain:
  *     Entrada da parte em C do Boot Loader. 
  *
@@ -94,9 +96,7 @@ void BlMain()
     if(g_initialized != 1){
 		printf("BlMain:");
 		die();
-		//refresh_screen();
-		//while(1){};
-	};
+	}
 
 
 	//Debug...
@@ -121,8 +121,31 @@ void BlMain()
     printf("BlMain: LOADING FILES ...\n");
     refresh_screen();
 #endif
+
+    //
+	// #importante:
+	// Carregando o diretório raiz e a fat na memória.
+	// Evitando repetição de carregamento.
+	//
 	
+	// Ok isso deu certo.
+	fs_load_rootdirEx();
+	fs_load_fatEx();
+
+
+	
+	//printf("Loading kernel base ...\n");
     BlLoadKernel();
+	
+	//
+	// @Todo: (Pensando na possibilidade)
+	// Aqui podemos ter acondição de carregarmos apenas o krnel base.
+	// Essa opção deverá ser habilitada através de um arquivo de configuração.
+	// Ou no header do kernel base poderá ter a indicação de quais módulos 
+	// deve-se carregar.
+	//
+	
+	//printf("Loading files ...\n");
 	BlLoadFiles();
 
     //
@@ -140,6 +163,7 @@ void BlMain()
     //
 #ifdef BL_VERBOSE	
 	printf("BlMain: Initializing pages..\n");
+	//refresh_screen();
 #endif	
 	BlSetupPaging();
     
@@ -169,6 +193,7 @@ done:
 
 
 /*
+ ***************************************************************
  * BlLoadKernel: 
  *     Carrega o Kernel.
  *     Kernel carregado em 0x00100000, entry point em 0x00101000.
@@ -190,6 +215,7 @@ void BlLoadKernel()
  
  
 /*
+ ****************************************************
  * BlLoadFiles:
  *     Carrega outros arquivos.
  * In this function:
@@ -200,19 +226,19 @@ void BlLoadFiles()
 { 
 	int Status;
 	
+	// Está em loader.c
 	Status = (int) load_files();
 	if(Status != 0){
 	    //Erro fatal.
 		printf("BlLoadFiles:\n");
-	    die();
-		//refresh_screen();		
-	    //while(1){};	
+	    die();	
 	};
 	return;
 };
 
 
 /*
+ ********************************************************************
  * BlSetupPaging:
  *     Configura as páginas.
  *
@@ -282,19 +308,25 @@ void BlKernelModuleMain()
 
 
 
-
+/*
+ **************************************************
+ * die:
+ *     A intenção dessa rotina deixar o processador no 
+ * estado hlt durante um erro fatal. Para que ele não fique 
+ * funcionando a 100% num loop infinito.
+ */
 void die()
 {
     // Final message !
     printf("* System Halted!\n");    // Bullet, Message.
 	refresh_screen();
-	
-
-    
-	while(1){
-	asm("cli"); 	
-	asm("hlt");                      // Halt system.		
-	};                      // Wait forever.  
+	   
+	// Wait forever.   
+	while(1)
+	{
+	    asm("cli"); 	
+	    asm("hlt");    // Halt system.		
+	};                        
     
 	//
     //  No return.

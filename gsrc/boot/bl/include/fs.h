@@ -42,6 +42,16 @@
 
 
 
+//
+// #importante:
+// Status de carregamento.
+// Se o diretório raiz já está carregado na memória.
+// Se a FAT já está carregada na memória.
+//
+
+int g_fat16_root_status;
+int g_fat16_fat_status;
+
 // 
 // Tipo de sistema de arquivos. (Ex: FAT16, EXT2 ...). 
 //
