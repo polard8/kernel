@@ -50,7 +50,7 @@ DriveNumber           db 0x80
 Flags                 db 0x00
 Signature             db 0x29
 BUFFER_VOLUME_ID      dd 0x980E63F5
-VolumeLabel           db "GRAMADO VHD"
+VolumeLabel           db "GRAMADO MBR"
 SystemID              db "FAT16   "
 
 
@@ -532,7 +532,8 @@ P0:
 .os_type:             db  4               ;6;1;0x04 ;4 = FAT16 < 32MB ;0x0E FAT16, (32MB to 2GB), (LBA Support).
 .hcs_final:           db  0, 0, 0
 .lba_inicial:         dd  0x3F            ; Setor inicial da partição. (63, vbr)
-.tamanho_da_particao: dd  (31*1024*1024)  ; 31 MB.
+.tamanho_da_particao: dd  63488 ;(31*1024*1024)  ; 31 MB. #bugbug (Total Sectors . The total number of sectors in the volume.)
+;;.tamanho_da_particao: dd  ((31*1024*1024)/512)
 ;partitions 1, 2 and 3.
 P1: dd 0,0,0,0
 P2: dd 0,0,0,0
