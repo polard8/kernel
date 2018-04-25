@@ -131,7 +131,9 @@ void BlMain()
 	// Ok isso deu certo.
 	fs_load_rootdirEx();
 	fs_load_fatEx();
-
+	
+    g_fat16_root_status = 1;
+    g_fat16_fat_status = 1;	
 
 	
 	//printf("Loading kernel base ...\n");

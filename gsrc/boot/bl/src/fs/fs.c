@@ -492,6 +492,14 @@ unsigned long fsLoadFile( unsigned char *name, unsigned long address )
 	// Carrega o diretório raiz na memória.
 	//fs_load_rootdirEx();
 	
+	
+	if( g_fat16_root_status != 1 )
+	{
+        printf("fsLoadFile: Root Status \n");     
+        return 1;	
+	}
+	
+	
 	//#debug 
 	//printf("carregar_arquivo: Searching File=[%s]\n",file_name);		
 
@@ -561,6 +569,14 @@ arquivo_encontrado:
 	// Ele será previamente carregado em main().	
     // Carrega a FAT na memória. 		
 	//fs_load_fatEx();
+	
+	
+	if( g_fat16_fat_status != 1 )
+	{
+        printf("fsLoadFile: FAT Status \n");     
+        return 1;	
+	}
+
 	
 	//#debug. 
     //printf("carregar_arquivo: Loading file ...\n"); 
