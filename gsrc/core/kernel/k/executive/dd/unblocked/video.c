@@ -211,11 +211,17 @@ int videoInit()
 		
 		//Poderíamos copiar a font da ROM para a RAM.
 		
+		//
+		// Font support
+		//
+		
 		//Font. (BIOS font).
 		gfontAddress = (unsigned long) VIDEO_BIOS_FONT8X8_ADDRESS;  
 	    gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
 	    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
 
+		gfontSize = FONT8X8;
+		
 		//Font. (test).
 		//gfontAddress = (unsigned long) ??;  
 	    //gcharWidth = ??;
@@ -232,6 +238,7 @@ int videoInit()
 		
 		g_cursor_color = COLOR_PINK;
         
+		//@todo; Criar defines para default.
 		g_cursor_left = 0;      // Margem esquerda dada em linhas.
         g_cursor_top = 0;       // Margem superior dada em linhas.
 		g_cursor_right  = 256;  // Margem direita dada em linhas.

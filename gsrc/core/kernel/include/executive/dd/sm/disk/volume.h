@@ -15,6 +15,41 @@
 
 
 /*
+ *****************************************************
+ * volume_type_t:
+ *     Enumerando os tipos de volume.
+ *
+ */
+typedef enum {
+	
+	VOLUME_TYPE_NULL,            // Null. 
+	
+	// Partição em disco físico.
+	VOLUME_TYPE_DISK_PARTITION,  
+
+	// Partição em disco físico.
+	VOLUME_TYPE_VIRTUAL_DISK_PARTITION,  
+
+    // Arquivo.
+	// Um pequeno arquivo qualquer. Não tem MBR.
+	// Esse foi carregado de algum disco.
+	VOLUME_TYPE_FILE,           
+	
+	// Buffer.
+	// Um pequeno buffer qualquer. Não tem MBR.
+	// Obs: Esse não foi carregado de disco nenhum.
+	// O volume 0, será desse tipo. (conductor://)
+	VOLUME_TYPE_BUFFER
+	
+	//...
+	
+}volume_type_t;
+
+
+
+
+/*
+ ******************************************************
  * volumeinfo_d
  *
  * Volume info struct.
@@ -25,17 +60,17 @@ struct volumeinfo_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
-	
-	//callback , d
-	
+		
     //
 	// Volume info.
 	//
 	
-	int volumeId;  //c
-	int volumeUsed; //b
-	int volumeMagic; //a
-	char *volumeName;    //g, Label.
+	int id;  
+	
+	int used; 
+	int magic; 
+	
+	char *name; 
 	
 	int flag;
 	int error;
@@ -104,6 +139,8 @@ struct volumeinfo_d
 	//unsigned long DataSectorStart;      //Starting sector of the data area.
 	
 };
+volumeinfo_t *volumeinfo_conductor;
+
 volumeinfo_t *CurrentVolumeInfo;
 volumeinfo_t *CurrentVolume;
 volumeinfo_t *volumeinfo;
@@ -111,15 +148,39 @@ volumeinfo_t *SystemVolume;
 //...
 
 
+
+/*
+ * volume_d:
+ *     Estrutura para acesso rápido a volumes.
+ *     Deve ser simples e com poucos elementos.
+ */
+typedef struct volume_d volume_t; 
+struct volume_d
+{ 
+	object_type_t objectType;
+	object_class_t objectClass;
+	
+	volume_type_t volumeType;
+	
+	int id;
+	
+	int used;
+	int magic;
+	
+	char *name; 
+
+    struct volumeinfo_d *volume_info;	
+};
+volume_t *volume_conductor;  //O volume 0.
+//...
+
+
 //
 // Lista de volumes.
 //
 
-
-
 unsigned long volumeList[VOLUME_COUNT_MAX];
 
-//@todo: Fazer uma lista de volumes.??!!
 
 
 void *volume_get_volume_handle( int number );

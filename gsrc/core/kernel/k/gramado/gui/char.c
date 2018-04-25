@@ -7,7 +7,10 @@
  *     Faz parte do módulo Window Manager do tipo MB.
  * Obs: A fonte usada é a fonte 8x8 que está na ROM BIOS. em 0x000FFA6E.
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2018 - Revision.
+ *
  */
 
  
@@ -21,21 +24,9 @@
 //
 
 
-//
-// charDirectCharBuilt: 
-//     Desenha um caractere diretamente no frontbuffer.
-//     Obs: Requer sincronização vertical.
-//     Obs: A sincronização é feita antes de desenha o caractere e não
-// a cada pixel enviado.
-//
-//void charDirectCharBuilt( void* FrontBuffer, unsigned long x, unsigned long y, unsigned long color, unsigned long c);
-//void charDirectCharBuilt( void* FrontBuffer, unsigned long x, unsigned long y, unsigned long color, unsigned long c)
-//{
-//    return; //Ainda não implementada.	
-//}
-
 
 /*
+ ********************************************************
  * my_buffer_char_blt:
  *     Constrói um caractere transparente 8x8 no buffer.
  */
@@ -44,6 +35,40 @@ void my_buffer_char_blt( unsigned long x,
                          unsigned long y, 
 						 unsigned long color, 
 						 unsigned long c)
+{
+    drawchar_transparent( x, y, color, c );								
+};
+
+
+void set_char_width( int width ){
+	gcharWidth = (int) width;
+	return;
+}
+
+void set_char_height( int height ){
+	gcharHeight = (int) height;
+	return;
+}
+
+int get_char_width(){
+	return (int) gcharWidth;
+}
+
+
+int get_char_height(){
+	return (int) gcharHeight;
+}
+
+
+/*
+ ******************************************************
+ * drawchar_transparent:
+ *     Desenha um caractere sem alterar o pano de fundo.
+ */						   
+void drawchar_transparent( unsigned long x, 
+                           unsigned long y, 
+						   unsigned long color, 
+						   unsigned long c)
 {	
 	int x2;
     int y2;
@@ -106,30 +131,43 @@ void my_buffer_char_blt( unsigned long x,
 		gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
 	};
 	
-	/*
+
 	//@todo: Criar essas variáveis e definições.
-	switch(gFontSize)
+	switch(gfontSize)
 	{
 		case FONT8X8:
-	    gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
-		gcharWidth = 8;
-		gcharHeight = 8;
-		break;
+	        gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		    gcharWidth = 8;
+		    gcharHeight = 8;
+		    break;
 		
-		case FONT8X16:
-	    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
-		gcharWidth = 8;
-		gcharHeight = 16;
-		break;
+		//case FONT8X16:
+	    //    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		//    gcharWidth = 8;
+		//    gcharHeight = 16;
+		//    break;
 		 
 		//...
-	}
-	*/
-	
-	//tentando pintar um espaço em branco.
-    //Nas rotinas da biblioteca gráfica, quando encontram
-	//um espaço(32), nem manda para cá, apenas incrementam o cursor.
-	
+		
+		//
+		// #importante:
+		// #BUGBUG
+		// Se não temos um tamanho selecionado então teremos 
+		// que usar o tamanho padrão.
+		//
+		default:
+		    printf("gui-char-drawchar_transparent: Font size fail.");
+			printf("gui-char-drawchar_transparent: Using default ...");
+	        
+			// Fonte padrão.
+			gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
+            
+            //gfontStatus = 0;  //fail 			
+		    
+			break;
+	};
 	
 
  	//
@@ -172,99 +210,12 @@ done:
     return;  	         	   
 };
 
-
-/*
-void my_buffer_char_blt_space( unsigned long x, 
-                               unsigned long y, 
-						       unsigned long color );
-							   
-//deve criar um retângulo do tamanho de um char.
-//será usado para apagar a tela.
-void my_buffer_char_blt_space( unsigned long x, 
-                               unsigned long y, 
-						       unsigned long color )
-{
-	//@todo:
-	//call draw_rect( ... )
-};							   
-*/						      
-
-/*
-int charInit()
-{
-	
-    if( gfontAddress == 0 || 
-	      gcharWidth == 0 || 
-		 gcharHeight == 0 )
-	{
-		//@todo: Criar definições globais para esses valores, ou estruturas.
-	    gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		gcharWidth = 8;
-		gcharHeight = 8;
-	};
-	
-	//@todo: Criar essas variáveis e definições.
-	switch(gFontSize)
-	{
-		case FONT8X8:
-	    gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
-		gcharWidth = 8;
-		gcharHeight = 8;
-		break;
-		
-		case FONT8X16:
-	    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
-		gcharWidth = 8;
-		gcharHeight = 16;
-		break;
-		 
-		//...
-	}
-
-}
-*/
-
-
-void set_char_width( int width ){
-	gcharWidth = (int) width;
-	return;
-}
-
-void set_char_height( int height ){
-	gcharHeight = (int) height;
-	return;
-}
-
-int get_char_width(){
-	return (int) gcharWidth;
-}
-
-
-int get_char_height(){
-	return (int) gcharHeight;
-}
-
-
-
-
-						   
-void drawchar_transparent( unsigned long x, 
-                           unsigned long y, 
-						   unsigned long color, 
-						   unsigned long c)
-{
-    my_buffer_char_blt( x, y, color, c );	
-};
-	
-
-
-
-
-
 				
 /*
+ *****************************************************
  * draw_char:
  *     Constrói um caractere 8x8 no buffer.
+ *     Desenha um caractere e pinta o pano de fundo.
  */
 void draw_char( unsigned long x, 
                 unsigned long y,  
@@ -333,25 +284,43 @@ void draw_char( unsigned long x,
 		gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
 	};
 	
-	/*
-	//@todo: Criar essas variáveis e definições.
-	switch(gFontSize)
+    //@todo: Criar essas variáveis e definições.
+	switch(gfontSize)
 	{
 		case FONT8X8:
-	    gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
-		gcharWidth = 8;
-		gcharHeight = 8;
-		break;
+	        gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		    gcharWidth = 8;
+		    gcharHeight = 8;
+		    break;
 		
-		case FONT8X16:
-	    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
-		gcharWidth = 8;
-		gcharHeight = 16;
-		break;
+		//case FONT8X16:
+	    //    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		//    gcharWidth = 8;
+		//    gcharHeight = 16;
+		//    break;
 		 
 		//...
-	}
-	*/
+		
+		//
+		// #importante:
+		// #BUGBUG
+		// Se não temos um tamanho selecionado então teremos 
+		// que usar o tamanho padrão.
+		//
+		default:
+		    printf("gui-char-drawchar_transparent: Font size fail.");
+			printf("gui-char-drawchar_transparent: Using default ...");
+	        
+			// Fonte padrão.
+			gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
+            
+            //gfontStatus = 0;  //fail 			
+		    
+			break;
+	};
+	
 	
 	//tentando pintar um espaço em branco.
     //Nas rotinas da biblioteca gráfica, quando encontram
@@ -410,8 +379,62 @@ done:
 
 
 
+/*
+int charInit()
+{
+	
+    if( gfontAddress == 0 || 
+	      gcharWidth == 0 || 
+		 gcharHeight == 0 )
+	{
+		//@todo: Criar definições globais para esses valores, ou estruturas.
+	    gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		gcharWidth = 8;
+		gcharHeight = 8;
+	};
+	
+	//@todo: Criar essas variáveis e definições.
+	switch(gfontSize)
+	{
+		case FONT8X8:
+	        gfontAddress = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+		    gcharWidth = 8;
+		    gcharHeight = 8;
+		    break;
+		
+		//case FONT8X16:
+	    //    gfontAddress = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+		//    gcharWidth = 8;
+		//    gcharHeight = 16;
+		//    break;
+		 
+		//...
+		
+		//
+		// #importante:
+		// #BUGBUG
+		// Se não temos um tamanho selecionado então teremos 
+		// que usar o tamanho padrão.
+		//
+		default:
+		    printf("gui-char-drawchar_transparent: Font size fail.");
+			printf("gui-char-drawchar_transparent: Using default ...");
+	        
+			// Fonte padrão.
+			gfontAddress = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
+            
+            //gfontStatus = 0;  //fail 			
+		    
+			break;
+	};
+
+}
+*/
+
 
 //
-//fim
+// End.
 //
 

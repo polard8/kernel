@@ -485,7 +485,11 @@ unsigned long system_procedure( struct window_d *window,
 				
 				//Help. 
 				case VK_F1:	
-					procedureHelp();
+					
+					// #importante 
+					// Mostraremos a ajuda do aplicativo.
+					
+					//procedureHelp();
 				    //alt_status = 0;
 					//ctrl_status = 0;
 					//shift_status = 0;

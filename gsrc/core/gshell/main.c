@@ -1,5 +1,5 @@
 /*
- * File: main.c @todo: Criar a janela shell help F1.
+ * File: main.c 
  *
  * General purpose application.
  *     SHELL.BIN é um aplicativo de próposito geral. Desenvolvido como 
@@ -140,7 +140,10 @@ unsigned long shellProcedure( struct window_d *window,
 
 //opção. 
 //void *GramadoMain( int argc, char *argv[], unsigned long address, int view )
-int GramadoMain( int argc, char *argv[], unsigned long long1, unsigned long long2 ) 
+int GramadoMain( int argc, 
+                 char *argv[], 
+				 unsigned long long1, 
+				 unsigned long long2 )
 {
 	
 	//
@@ -1521,6 +1524,15 @@ do_compare:
 		shellSendMessage( NULL, MSG_CLOSE, 0, 0);
 	    goto exit_cmp;
 	}	
+	
+	
+	
+	//cd
+	// change dir
+	if( strncmp( prompt, "cd", 2 ) == 0 )
+	{
+	    goto exit_cmp;
+	}		
 
 	
     // cls
@@ -1533,6 +1545,27 @@ do_compare:
 	    //shellPrompt();
         goto exit_cmp;
 	};
+	
+	
+	// copy
+	if( strncmp( prompt, "copy", 4 ) == 0 )
+	{
+	    goto exit_cmp;
+	}
+	
+	
+	// date
+	if( strncmp( prompt, "date", 4 ) == 0 )
+	{
+        goto exit_cmp;
+    };	
+
+
+	// del
+	if( strncmp( prompt, "del", 3 ) == 0 )
+	{
+	    goto exit_cmp;
+	}		
 	
 	
 	// dir
@@ -1587,8 +1620,10 @@ do_compare:
 	
 	
 	// help
+	// ?
 	// Mostra ajuda.
-    if( strncmp( prompt, "help", 4 ) == 0 )
+    if( strncmp( prompt, "help", 4 ) == 0 || 
+	    strncmp( prompt, "?", 1 ) == 0 )
 	{
 		shellHelp();
 		goto exit_cmp;
@@ -1612,7 +1647,14 @@ do_compare:
 		//@todo: Isso deve ser um aplicativo.
 		printf("~ls\n");
         goto exit_cmp;
-	};	
+	};
+
+
+	// mov
+	if( strncmp( prompt, "mov", 3 ) == 0 )
+	{
+	    goto exit_cmp;
+	}		
 
 
     // metrics
@@ -1623,24 +1665,13 @@ do_compare:
         goto exit_cmp;
 	};	
 
-	
-	// newfile
-	if( strncmp( prompt, "newfile", 7 ) == 0 )
+	// new
+	if( strncmp( prompt, "new", 3 ) == 0 )
 	{
-	    printf("~newfile - create empty file.\n");
-		//fs_create_file( "novo    txt", 0);
-        goto exit_cmp;
-    };
+	    printf("~new - New file or directory\n");		
+	    goto exit_cmp;
+	}		
 	
-	
-	// newdir
-	if( strncmp( prompt, "newdir", 7 ) == 0 )
-	{
-	    printf("~newdir - create empty folder.\n");
-		//fs_create_dir( "novo    dir", 0);
-        goto exit_cmp;
-    };
-
     
 	// mbr
 	// ?? Talvez mostrar informações sobre o mbr ou realizar testes.
@@ -1664,6 +1695,12 @@ do_compare:
 		goto exit_cmp;
     };
 	
+	// rename
+	if( strncmp( prompt, "rename", 6 ) == 0 )
+	{
+        goto exit_cmp;
+    };	
+	
 	
     // root
 	// ??
@@ -1683,14 +1720,6 @@ do_compare:
     };
 	
 	
-	// show-screen-buffer
-	if( strncmp( prompt, "show-screen-buffer", 18 ) == 0 )
-	{
-		shellShowScreenBuffer();
-		goto exit_cmp;
-	}
-
-	
 	// service
 	if( strncmp( prompt, "service", 7 ) == 0 )
 	{
@@ -1699,6 +1728,17 @@ do_compare:
         goto exit_cmp;
     };
 	
+	
+	// show-screen-buffer
+	if( strncmp( prompt, "show-screen-buffer", 18 ) == 0 )
+	{
+		shellShowScreenBuffer();
+		goto exit_cmp;
+	}
+
+	
+
+	
     // shellinfo
 	// informações sobre o aplicativo.
 	if( strncmp( prompt, "shellinfo", 9 ) == 0 )
@@ -1706,6 +1746,14 @@ do_compare:
 		
 	    printf("~@todo: shell info.\n");
 		shellShowInfo();
+        goto exit_cmp;
+    };	
+	
+	
+    // shutdown
+	if( strncmp( prompt, "shutdown", 8 ) == 0 )
+	{
+	    printf("~shutdown \n");
         goto exit_cmp;
     };	
 
@@ -1786,6 +1834,12 @@ do_compare:
 	    shellTestThreads();
         goto exit_cmp;
     };
+	
+	// time
+	if( strncmp( prompt, "time", 4 ) == 0 )
+	{
+        goto exit_cmp;
+    };	
 	
 	
 	// topbar
@@ -3058,6 +3112,17 @@ shellSendMessage( struct window_d *window,
 {
 	return (unsigned long) shellProcedure( window, msg, long1, long2 );
 };
+
+
+//copia bytes	
+void shell_memcpy_bytes( unsigned char *Dest, 
+                         unsigned char *Source,
+                         unsigned long Length )
+{
+    while(Length--)
+        *Dest++ = *Source++;
+}
+
 
 /*
  * shell_write_to_screen:

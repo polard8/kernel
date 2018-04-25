@@ -1,5 +1,5 @@
 /*
- * File: gramado\gui\statusbar.c
+ * File: gui\statusbar.c
  *
  * Descrição:
  *     Cria uma status bar em uma janela.
@@ -29,7 +29,7 @@ int StatusBar( struct window_d *window,
 		
 	if( (void*) window == NULL ){
         return (int) 1;
-    };
+    }
 	
 	//
 	// A Status bar é um elemento dentro da janela.

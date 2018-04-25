@@ -1252,6 +1252,7 @@ void guiSetUpMainWindow( unsigned long x,
  */
 int init_gui()
 {
+	// ??
 	// Habilita taskswitch e scheduler.
 	set_task_status(UNLOCKED);
     scheduler_unlock();	 	
@@ -1261,8 +1262,8 @@ int init_gui()
 	//
 	// A partir de agora o scheduler pode procurar por threads 
 	// no estado 'Initialized' e executar.
-	//	 
-		
+	//	
+
 done:
     //?? erro fatal ??
     if( (void*) gui == NULL )

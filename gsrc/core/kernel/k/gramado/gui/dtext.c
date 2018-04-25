@@ -1,5 +1,5 @@
 /*
- * File: dtext.c
+ * File: gui\dtext.c
  *
  * Descrição:
  *     Escreve um texto dentro de uma janela.
@@ -43,12 +43,13 @@ void draw_string( unsigned long x,
 {
     int Index;
       
-    for(Index = 0; string[Index] != 0; Index++)
+    for( Index=0; string[Index] != 0; Index++ )
 	{
 		//@todo: 
 		//   Conflito de tipo no argumento 4.
 		//   gcharWidth.
-		my_buffer_char_blt( x, y, color, string[Index]);
+		//my_buffer_char_blt( x, y, color, string[Index]);
+		drawchar_transparent( x, y, color, string[Index]);
         x += 8;
     };
     return;    

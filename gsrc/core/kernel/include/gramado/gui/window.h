@@ -909,6 +909,8 @@ unsigned long g9x16fontAddress;  //9x16,80×25,VGA
 int gcharWidth;
 int gcharHeight;
 
+int gfontSize;
+
 //color  
 unsigned long g_system_color;
 unsigned long g_char_attrib;

@@ -46,9 +46,9 @@ void *draw_button( struct window_d *window,
 	struct button_d *b;
 	
 	//validade da janela onde o botão está.
-	if((void*) window == NULL){
+	if( (void*) window == NULL ){
 	    return;
-	};
+	}
 	
 
 	//Alocando memória para a estrutura do botão.
@@ -56,6 +56,8 @@ void *draw_button( struct window_d *window,
     if( (void*) b == NULL ){
 		return NULL;
 	}else{
+		
+		// Object.
 		b->objectType = ObjectTypeButton;
 		b->objectClass = ObjectClassGuiObjects;
 		
@@ -141,6 +143,8 @@ do_draw_button:
 	// Usaremos retângulos para desenharmos o botão.
 	//
    
+    // Temos a intenção de uar estilos diferentes, como flat design,
+	// por exemplo.
 	
 	//bg
 	drawDataRectangle( window->left +x, window->top +y, width, height, color);

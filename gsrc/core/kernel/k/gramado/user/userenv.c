@@ -309,6 +309,19 @@ done:
  * init_user_info:
  *     Configurar informações sobre o usuário default.
  *
+ *     #bugbug: Na verdade o que queremos é que seja feita a 
+ * inicialização do ambiente de usuário com as configurações 
+ * do usuário atual e não o default.
+ *
+ * #importante:
+ *      Esse é o momento certo para inicializar todas as preferências 
+ * salvas no perfil do usuário.
+ *  
+ * Configurar o ambiente do usuário significa:
+ *     Selecionar suas preferências de fonte e cores.
+ *     Selecionar suas preferências de estilos de elementos gráficos.
+ *     etc ...
+ *
  * Obs: 
  *     Deve ser possível configurar usuários independente se 
  *     a interface gráfica está habilitada ou não.

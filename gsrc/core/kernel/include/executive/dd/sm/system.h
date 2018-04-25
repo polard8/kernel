@@ -145,7 +145,7 @@ void systemSetTerminalRectangle( unsigned long left,
 #define SYSTEM_GSRC      "/gsrc"     //Source 
 
 //secundários
-#define SYSTEM_GUSERS    "/users"    // (os perfis de usuário ficarão aqui.)
+#define SYSTEM_GUSERS    "/user"    // (os perfis de usuário ficarão aqui.)
 #define SYSTEM_GCMD      "/cmd"      //COMANDO USADOS PELO SHELL CHAMARÃO OS PROGRAMAS QUE ESTÃO AQUI.
 #define SYSTEM_GTMP      "/tmp"      //ARQUIVOS TEMPORÁRIOS
 #define SYSTEM_GDOWNLOAD "/download"  //DOWNLOADS

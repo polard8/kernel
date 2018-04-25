@@ -48,7 +48,10 @@ void *disk_get_current_disk_info()
 //int diskInit() 
 int disk_init()
 {
+	
+#ifdef KERNEL_VERBOSE	
     printf("disk_init: Initializing..\n");
+#endif	
 	
 	//
 	// Inicializando uma estrutura global de informações sobre o 
@@ -56,21 +59,50 @@ int disk_init()
 	// ?? Em que arquivo está essa estrutura.
 	//
 
-	// Create structure.
-    diskinfo = (void*) malloc( sizeof(struct diskinfo_d) );
-	if( (void*) diskinfo == NULL )
+	// disk info
+    diskinfo_conductor = (void*) malloc( sizeof(struct diskinfo_d) );
+	if( (void*) diskinfo_conductor == NULL )
 	{
 	    printf("sm-disk-disk_init:");
 		die();
 	}else{
 		
-	    diskinfo->diskId = 0;
-	    diskinfo->diskUsed = 0;
-	    diskinfo->diskMagic = 0;
-	    diskinfo->BytesPerSector = DISK_BYTES_PER_SECTOR;
-	    diskinfo->SectorsPerCluster = 0;
+	    diskinfo_conductor->id = 0;
+	    
+		diskinfo_conductor->used = 1;
+	    diskinfo_conductor->magic = 1234;
+	    
+		diskinfo_conductor->name = "DISK INFO";
+		
+		//diskinfo_conductor->BytesPerSector = DISK_BYTES_PER_SECTOR;
+	    //diskinfo_conductor->SectorsPerCluster = 0;
         //...		
 	};
+	
+	
+	// disk.
+    disk_conductor = (void*) malloc( sizeof(struct disk_d) );
+	if( (void*) disk_conductor == NULL )
+	{
+	    printf("sm-disk-disk_init:");
+		die();
+	}else{
+		
+		//@todo:
+		//disk_conductor->objectType = ?;
+		//disk_conductor->objectClass = ?;
+		
+		disk_conductor->diskType = DISK_TYPE_NULL;
+		
+	    disk_conductor->id = 0;
+	    
+		disk_conductor->used = 1;
+	    disk_conductor->magic = 1234;
+	    
+		disk_conductor->name = "DISK 0";
+		
+		disk_conductor->disk_info = (struct diskinfo_d *) diskinfo_conductor;
+	};	
 		
     //
 	//@todo: Nothing more ?!!

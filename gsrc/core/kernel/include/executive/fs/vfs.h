@@ -7,15 +7,15 @@
 // 
 
 
-#define VHS_DIR_ROOT  '/root'  
-#define VHS_DIR_BOOT  '/root/boot' // boot files
-#define VHS_DIR_BIN   '/root/bin'  // binary programs.
-#define VHS_DIR_DEV   '/root/dev'  // i/o devices.
-#define VHS_DIR_ETC   '/root/etc'  // misc
-#define VHS_DIR_LIB   '/root/lib'  // libraries
-#define VHS_DIR_OBJECTS   '/root/objects'  // gerenciador de objetos.
-#define VHS_DIR_TMP   '/root/tmp'  // tmp
-#define VHS_DIR_USER  '/root/user' // users
+#define VHS_DIR_ROOT         '/root'  
+#define VHS_DIR_BOOT         '/root/boot' // boot files
+#define VHS_DIR_BIN          '/root/bin'  // binary programs.
+#define VHS_DIR_DEV          '/root/dev'  // i/o devices.
+#define VHS_DIR_ETC          '/root/etc'  // misc
+#define VHS_DIR_LIB          '/root/lib'  // libraries
+#define VHS_DIR_OBJECTS      '/root/objects'  // gerenciador de objetos.
+#define VHS_DIR_TMP          '/root/tmp'  // tmp
+#define VHS_DIR_USER         '/root/user' // users
 #define VHS_DIR_DEFAULTUSER  '/root/user/default' // default user
 //...  
 

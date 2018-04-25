@@ -80,12 +80,18 @@
 //...
 
 
-
+#define TAB_SIZE 8
 
 //
 // Strings
 //
- 
+
+#define SHELL_PATHNAME_SEPARATOR "\\"
+#define SHELL_PATHNAME_TERMINATOR "\0"
+
+#define SHELL_STRING_TERMINATOR "\0" 
+
+
 //@todo: 
 //a versão do sistema operacional deve-se obter através de uma chamada ao sistema. 
 #define OS_VERSION     "0.1"  
@@ -97,6 +103,19 @@
 #define SHELL_PROMPT3  "%"
 //#define SHELL_PROMPT4  "shell: " 
 //... 
+
+
+
+
+#define CalculateRowScanLine(WindowY,CharHeight) \
+    ( WindowY * CharHeight )
+
+
+#define CalculateColumnScanLine(WindowX,CharWidth) \
+    ( WindowX * CharWidth )
+	
+	
+	
  
 //usado para salvar um comando atual  
 //char tmp_command[32];      
@@ -109,11 +128,28 @@
 // help 
 static const char help_banner[] =
     "\n Commands: \n \n"
-	"help, version, reboot, exit\n";
+	" ?         - This help\n"
+	" cd        - Change current directory\n"
+	" cls       - Clear screen\n"
+	" copy      - Copy file or directory\n"
+	" date      - Date\n"
+	" del       - Delete file or directory\n"
+	" dir       - List\n"
+	" echo      - This ---\n"
+	" exit      - Exit shell\n"
+	" help      - This help\n"
+    " mov       - Move file or diretory\n"
+    " new       - New file or directory\n"
+    " reboot    - Reboot system\n"
+    " rename    - Rename file or directory\n"
+	" shutdown  - Shutdown your computer locally or remotely\n"
+	" time      - Time\n"
+	" version   - Shell version\n"
+	"\n";
+
 	
 // tree
 static const char tree_banner[] =
-"\n"
 "\n"
 "\n"	
 "     \\o/    \n"
@@ -252,13 +288,13 @@ struct shell_message_d
 
 typedef enum terminal_api_message_number_d {
 	
-	terminalNull,       //0
-	terminalOpenTerminal,  // inicia a estrutura de terminal
-    terminalCloseTerminal, // fecha a estrutura de terminal.
-	terminalGetWindow,  //
-    terminalGetMessage, //
-    terminalGetLong1,   //
-    terminalGetLong2, 	//
+	terminalNull,          // 0
+	terminalOpenTerminal,  // Inicia a estrutura de terminal virtual.
+    terminalCloseTerminal, // Fecha a estrutura de terminal.
+	terminalGetWindow,     //
+    terminalGetMessage,    //
+    terminalGetLong1,      //
+    terminalGetLong2, 	   //
     terminalScreenWidth,
     terminalScreenHeight,
     terminalCursorWidth,
@@ -500,6 +536,13 @@ void shellShell();               //Constructor.
  
 //show ascii table
 void shellASCII(); 
+
+
+// copia bytes	
+void shell_memcpy_bytes( unsigned char *Dest, 
+                         unsigned char *Source,
+                         unsigned long Length );
+
  
 //
 // shelui.c

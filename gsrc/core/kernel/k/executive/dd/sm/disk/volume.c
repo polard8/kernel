@@ -22,11 +22,8 @@ void *volume_get_volume_handle( int number )
 	if( number < 0 || number >= VOLUME_COUNT_MAX ){
 		return NULL;
 	}
-	
 	return (void *) volumeList[number];
 };
-
-
 
 
 void *volume_get_current_volume_info()
@@ -37,39 +34,75 @@ void *volume_get_current_volume_info()
 
 
 /*
+ ***************************************************
  * volume_init:
  *     Inicializa o volume manager.
  */
 //int volumeInit()
 int volume_init()
 {
+	
+#ifdef KERNEL_VERBOSE
     printf("volume_init: Initializing..\n");
+#endif
 
+    //
+	// Inicializando a estrutura do volume 0,
+	// que será o VFS.
+	// Esse volume será do tipo buffer, então não será 
+	// carregado de nenhum disco.
 	//
-	// Inicializando uma estrutura global de informações sobre o 
-	// volume do sistema.
-	// ?? Em que arquivo está essa estrutura.
-	//	
 
-	// Structure.
-    volumeinfo = (void*) malloc( sizeof(struct volumeinfo_d) );
-	if( (void*) volumeinfo == NULL )
+	
+	// Volume info
+	volumeinfo_conductor = (void*) malloc( sizeof(struct volumeinfo_d) );
+	
+	if( (void*) volumeinfo_conductor == NULL )
 	{
 	    printf("sm-disk-volume_init:");
 		die();
 	}else{
 		
-	    //
-	    // Bom, como aqui já temos uma estrutura válida,
-	    // então podemos completá-la com parâmetros padrões.
-	    //
-	
-	    volumeinfo->volumeId = 0;
-	    volumeinfo->volumeUsed = 0;
-	    volumeinfo->volumeMagic = 0;
-	    //volumeinfo->volumeName = NULL;    //Pointer.		
+
+	    volumeinfo_conductor->id = 0;
+	    
+		volumeinfo_conductor->used = 1;
+	    volumeinfo_conductor->magic = 1234;
+	    
+		volumeinfo_conductor->name = "VOLUME INFO";    		
 		//...
 	};
+	
+	
+	// Volume.
+	volume_conductor = (void*) malloc( sizeof(struct volume_d) );
+	
+	if( (void*) volume_conductor == NULL )
+	{
+	    printf("sm-disk-volume_init:");
+		die();
+	}else{
+		
+		//@todo:
+		//volume_conductor->objectType = ?;
+        //volume_conductor->objectClass = ?;
+		
+		
+		// Será usado pelo VFS.
+		volume_conductor->volumeType = VOLUME_TYPE_BUFFER;
+		
+	    volume_conductor->id = 0;
+	    
+		volume_conductor->used = 1;
+	    volume_conductor->magic = 1234;
+	    
+		volume_conductor->name = "VOLUME 0";  
+
+        volume_conductor->volume_info = (struct volumeinfo_d *) volumeinfo_conductor;   		
+	};
+	
+	
+	
 	
 	//
 	// @todo: More ??!
