@@ -240,7 +240,8 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	// Se a parent window enviada por argumento for inválida, então usaremos
 	// a janela gui->screen. ?? Talvez o certo fosse retornar com erro.
 	//@todo: devemos checar used e magic da janela mãe.
-	if( (void*) pWindow == NULL ){
+	if( (void*) pWindow == NULL )
+    {
 		Parent = (void*) gui->screen;	
 	}else{
 		Parent = (void*) pWindow;
@@ -354,9 +355,9 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//Características.
 		
 		//Modo de exibição:
+		window->view = (int) view;
 		
 		//Se não estivermos no modo gráfico, não há o que pintar.
-		window->view = (int) view;
 		if(g_useGUI == 0){ window->view = (int) VIEW_MINIMIZED; };
 
         //Se não foi oferecido um modo de exibição, então temos um problema.
@@ -507,12 +508,18 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//Child window linked list.
 		window->childListHead = NULL;
 		
-		//Client window support.
-		window->client_window = NULL;  //window.
-		window->rcClient = NULL;       //rect.
+		// (#importante)
+		// Client window support.
+		// Obs: A área de cliente será um retângulo e não uma janela.
+		// Mas nda impede da estrutra gerenciar uma janela que fique 
+		// em cima da área de cliente.
+		window->client_window = NULL;  //window. 
+		window->rcClient = NULL;       //rect. (#importante)
 		
+		// #importante
 		// Terminal support.
 		// Suporte não tradicional à terminais.
+		// manipulando variáveis ao invés de uma estrutura.
 		window->terminal_used  = (int) 0;
 		window->terminal_magic = (int) 0;
 		window->terminal_tab   = (int) 0;
@@ -587,6 +594,12 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	// Rotinas grandes como pintar um barra de rolagem podem ficar em draw.c
 	//
 	
+	//
+	// #importante
+	// Deveria ter uma variável global indicando o tipo de 
+	// design atual, se é 3D ou flat.
+	//
+	
 	
 	//
 	// Configurando os elementos de acordo com o tipo.
@@ -622,16 +635,19 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		    break;
 
 		//   **** FRAME ****
-		//3) Overlapped, (completa, para aplicativos).
+		// 3) Overlapped, (completa, para aplicativos).
+		// Obs: Nessa caso, como se trata de uma janela de aplicativo,
+		// poderíamos configurar a área de cliente.
+		// 
 		case WT_OVERLAPPED:
-	        Shadow = 1;        //Sombra.
-	        Background = 1;    //bg.
-	        TitleBar = 1;      //Título + Borda.
+	        Shadow = 1;           // Sombra.
+	        Background = 1;       // bg.
+	        TitleBar = 1;         // Título + Borda.
 		    ClientArea = 1;
-			MinimizeButton = 1;  //Botão para minimizar
-		    CloseButton = 1;     //Botão para fechar. 
-		    //MenuBar       = 1;  //Barra de menu. 
-	        ButtonSysMenu = 1;    //System menu button. ??
+			MinimizeButton = 1;   // Botão para minimizar
+		    CloseButton = 1;      // Botão para fechar. 
+		    //MenuBar       = 1;  // Barra de menu. 
+	        ButtonSysMenu = 1;    // System menu button. ??
 		    window->shadowUsed = 1;
 		    window->backgroundUsed = 1;
 		    window->titlebarUsed = 1;
@@ -677,7 +693,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//botões de radio .. 
 		//...
 
-        //Continua ...
+        // Continua ...
 		
         default:
             return NULL;  //Ainda não implementada.		
@@ -1024,10 +1040,25 @@ drawBegin:
 		//...			 
 	};	
 	
-	
-    // Client Area. 
-    //@todo: RESPEITAR A IMPORTÂNCIA DESSE ELEMENTO.	
-	if(ClientArea == 1)
+	// #importante
+    //     Client Area. 
+    //
+    // @todo: 
+    //     RESPEITAR A IMPORTÂNCIA DESSE ELEMENTO.	
+    //     PERMITIR QUE MAIS TIPOS DE JANELA TENHAM CLIENT AREA.
+    // Nesse caso deveremos considerar o tipo de janela na hora de  
+    // criarmos a client area, pois tem janela que tem barra de títulos 
+    // e tem janela que não tem, tem janela que bordas e tem janela que 
+    // não tem.
+    //
+    //     Estamos criando uma estrutura para o retângulo
+    // da área de cliente.
+    //
+	// #teste:            
+	//     Não sei se essa parte está funcionado direito,
+	// pintarei de cor extravagante para testar.
+	//
+    if( ClientArea == 1 )
 	{
 		//
 		// Obs: A Client Area é apenas um retângulo.
@@ -1041,6 +1072,9 @@ drawBegin:
 			//free(clientRect);
 		    window->rcClient = NULL;
             //O que acontece nesse caso?? ficamos sem área de cliente ??
+			
+			// #bugbug
+			// Nenhum alerta será emitido aqui por enquanto.
 			
 		}else{
 			
@@ -1061,48 +1095,74 @@ drawBegin:
 			//Salva o ponteiro.
 			window->rcClient = (void*) clientRect;
 			
+			// Object stuff.
 			window->rcClient->objectType = ObjectTypeRectangle;
 			window->rcClient->objectClass = ObjectClassGuiObjects;
 			
+			// Validation.
 			window->rcClient->used = 1;
 			window->rcClient->magic = 1234;
 			
-			window->rcClient->window = (void*) window; //o retângulo pertence à essa janela.
+			// janela.
+			// O retângulo pertence à essa janela.
+			window->rcClient->window = (void*) window; 
 			
+			// #importante
+			// ( Posicionamento e dimencionamento. )
+            // + Ajustando o posicionamento da área de cliente com base
+            // no posicionamento e dimensões da janela.
+			// + Nesse espaço serão incluídos elementos adicionais,
+			// desenhados e repintados pelo próprio aplicativo.
+			// + Essa é a única parte que deve aparecer quando o aplicativo
+			// entrar em modo full screen.
+			//
 			
-			//Esse é o posicionamento e as dimensões da janela propriamente dita.
-			//Nesse espaço serão incluídos elementos adicionais.
-			//Essa é a parte que deve parecer em full screen.
-			window->rcClient->x  = (unsigned long)(window->left +1);     //+ borda
-            window->rcClient->y  = (unsigned long)(window->top  +1 +24); //+borda +barra de títulos.     
-            window->rcClient->cx = (unsigned long)(window->width);    
-            window->rcClient->cy = (unsigned long)(window->height);	
+			//
+			// Isso está meio atrapalhado, então vamos configura apenas o básico
+			// por enquanto. left top width height right bottom.
+			//
+			
             
-            window->rcClient->width  = (unsigned long) window->rcClient->cx;
-            window->rcClient->height = (unsigned long) window->rcClient->cy;
-			
-            window->rcClient->left   = (unsigned long) window->rcClient->x;
-            window->rcClient->top    = (unsigned long) window->rcClient->y;
+            //left top
+            window->rcClient->left   = (unsigned long) (window->left +1);
+            window->rcClient->top    = (unsigned long) (window->top  +1 +24);
+            
+            // width e height.
+            // width = window widdth - as bordas verticais.
+            // height = windows height - as bordas horizontais - a barra de títulos.
+            window->rcClient->width  = (unsigned long) (window->width -1 -1);
+            window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
+            
+            //right bottom.
   			window->rcClient->right  = (unsigned long) (window->rcClient->left + window->rcClient->width);
 			window->rcClient->bottom = (unsigned long) (window->rcClient->top + window->rcClient->height);
-		
-		    //zerando o deslocamento.
+			
+            // #bugbug Isso pode dar problemas.		
+		    // Deslocamento dentro da área de cliente.
+            // Zerando o deslocamento.
 		    window->rcClient->x = 0;
 			window->rcClient->y = 0;
 			
 		    //
 			// * ESSA COR FOI PASSADA VIA ARGUMENTO.
 			//
-			window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
 			
-			//window->rcClient->color_bg;  //esse é o certo
+            //window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
+			
+			// #TESTE: VERMELHÃO.
+			window->rcClient->color_bg = (unsigned long) COLOR_RED;
+			
+			//
+			// Draw!
+			//
+			
             drawDataRectangle( (unsigned long) window->rcClient->left, 
 		                       (unsigned long) window->rcClient->top, 
 						       (unsigned long) window->rcClient->width, 
 						       (unsigned long) window->rcClient->height, 
 							   (unsigned long) window->rcClient->color_bg );
-						      
-		
+							   
+            // Done.
 		};
 		//Nothing.
 	};

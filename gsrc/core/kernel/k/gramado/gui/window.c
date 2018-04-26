@@ -1908,12 +1908,20 @@ void windowUnblockFocus(){
 /*
  *****************************************************
  * SetFocus:
- *     Atribui o foco à uma janela e possível.
- *     //Por enquanto estamos implementando a possibilidade
- * de travar a obtenção de foco, somente para teste... porem 
- * isso pode ser útil depois.
+ *     + Seta o foco em uma janela.
+ *     + Configura o cursor.
+ *     + Reinicia um buffer.
+ *           
+ * @todo:
+ *     Tentando configurar o cursor dentro da área de cliente.
+ *     Se a janela for o frame de aplicativo, então o cursor 
+ *     fica dentro dos limites da área de cliente, mesmo que esteja 
+ * em full screen.
+ *     Se a janela for um editbox, faz mais sentido ainda que 
+ * o corsor fique dentro dos limites da área de cliente.
+ *  
  */
-void SetFocus(struct window_d *window)
+void SetFocus( struct window_d *window )
 {
 	
 	int i;
@@ -2040,12 +2048,36 @@ setup_wwf:
 			// Pois cada janela vai querer o cursor em um lugar.
 			//
 			
+			//
+			// #importante 
+			// Tentando colocar o cursor dentro dos limites da área de cliente
+			// no momento em que setamos o foco.
+			//
 			
+			// Usaremos a área de cliente caso ela exista,
+			// pois tem janela que simplesmente não tem, o ponteiro é nulo.
+			if( (void*) window->rcClient != NULL )
+			{
+			    if( window->rcClient->used == 1 && 
+				    window->rcClient->magic == 1234 )
+			    {
+			        g_cursor_left   = (window->rcClient->left/8);
+	                g_cursor_top    = (window->rcClient->top/8) +1; //?? Ajuste temporário.   
+	                g_cursor_right  = g_cursor_left + (window->rcClient->right/8);
+	                g_cursor_bottom = g_cursor_top + (window->rcClient->height/8);					
+			    }
+				 
+				// Nothing. 
+				
+			}else{
+				
 			// Configurando o cursor global gerenciado pelo kernel base.
-			g_cursor_left   = (window->left/8);
-	        g_cursor_top    = (window->top/8);   
-	        g_cursor_right  = g_cursor_left + (window->right/8);
-	        g_cursor_bottom = g_cursor_top + (window->height/8);
+			    g_cursor_left   = (window->left/8);
+	            g_cursor_top    = (window->top/8);   
+	            g_cursor_right  = g_cursor_left + (window->right/8);
+	            g_cursor_bottom = g_cursor_top + (window->height/8);			
+			};
+			
 	
             g_cursor_x = g_cursor_left; 
 	        g_cursor_y = g_cursor_top;  
