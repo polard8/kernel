@@ -4,7 +4,7 @@ Common symbol       size              file
 
 ShellMetrics        0x10              main.o
 shellStatus         0x10              main.o
-prompt              0x100             crt0.o
+prompt              0x400             crt0.o
 CommandHistory      0x10              main.o
 shellWindowWidth    0x10              main.o
 ClientAreaInfo      0x10              main.o
@@ -43,7 +43,7 @@ g_heap_pointer      0x10              stdlib.o
 topbar_scrollbarWindow
                     0x10              main.o
 heapList            0x400             stdlib.o
-prompt_err          0x100             crt0.o
+prompt_err          0x400             crt0.o
 current_semaphore   0x10              main.o
 g_columns           0x10              crt0.o
 ShellHook           0x10              main.o
@@ -59,7 +59,7 @@ shellScreenHeight   0x10              main.o
 last_size           0x10              stdlib.o
 last_valid          0x10              stdlib.o
 g_rows              0x10              crt0.o
-prompt_out          0x100             crt0.o
+prompt_out          0x400             crt0.o
 editboxWindow       0x10              main.o
 username            0x10              main.o
 mmblockList         0x400             stdlib.o
@@ -312,7 +312,7 @@ Linker script and memory map
                 0x00459000                . = ALIGN (0x1000)
  *fill*         0x00458cc0      0x340 00
 
-.bss            0x00459000     0xcf70
+.bss            0x00459000     0xd870
                 0x00459000                bss = .
                 0x00459000                _bss = .
                 0x00459000                __bss = .
@@ -327,89 +327,89 @@ Linker script and memory map
  .bss           0x004611f0       0x10 string.o
                 0x00462000                . = ALIGN (0x1000)
  *fill*         0x00461200      0xe00 00
- COMMON         0x00462000      0x410 crt0.o
+ COMMON         0x00462000      0xd10 crt0.o
                 0x00462000                prompt
-                0x00462100                _io_table
-                0x00462150                stderr
-                0x00462160                prompt_pos
-                0x00462170                g_using_gui
-                0x00462180                stdin
-                0x00462190                prompt_max
-                0x004621a0                prompt_err
-                0x004622a0                g_columns
-                0x004622b0                stdout
-                0x004622c0                g_rows
-                0x004622d0                prompt_out
-                0x004623d0                g_cursor_y
-                0x004623e0                prompt_status
-                0x004623f0                g_char_attrib
-                0x00462400                g_cursor_x
- COMMON         0x00462410     0x3270 main.o
-                0x00462410                ShellMetrics
-                0x00462420                shellStatus
-                0x00462430                CommandHistory
-                0x00462440                shellWindowWidth
-                0x00462450                ClientAreaInfo
-                0x00462460                BufferInfo
-                0x00462470                shellError
-                0x00462480                shellWindowHeight
-                0x00462490                lineList
-                0x00464490                root
-                0x004644a0                CurrentCommand
-                0x004644b0                shell_info
-                0x004644d0                shellScreenBufferMaxColumns
-                0x004644e0                shell_window_x
-                0x004644f0                i2Window
-                0x00464500                rect
-                0x00464510                backgroung_color
-                0x00464520                shellMaxRows
-                0x00464530                screenbufferList
-                0x00464550                foregroung_color
-                0x00464560                pwd
-                0x00464570                CurrentWindow
-                0x00464580                topbar_scrollbarWindow
-                0x00464590                current_semaphore
-                0x004645a0                ShellHook
-                0x004645b0                topbar_checkboxWindow
-                0x004645c0                shellScreenBufferMaxRows
-                0x004645d0                shellScreenWidth
-                0x004645e0                screen_buffer_pos
-                0x004645f0                shellScreenHeight
-                0x00464600                editboxWindow
-                0x00464610                username
-                0x00464620                screen_buffer_x
-                0x00464630                screen_buffer
-                0x004655e0                shell_window_y
-                0x004655f0                terminal_rect
-                0x00465600                password
-                0x00465610                CursorInfo
-                0x00465620                shellMaxColumns
-                0x00465630                i1Window
-                0x00465640                screen_buffer_y
-                0x00465650                topbar_editboxWindow
-                0x00465660                topbarWindow
-                0x00465670                ApplicationInfo
- COMMON         0x00465680      0x8f0 stdlib.o
-                0x00465680                current_mmblock
-                0x00465690                mm_prev_pointer
-                0x004656a0                heap_end
-                0x004656b0                g_available_heap
-                0x004656c0                heap_start
-                0x004656d0                heapCount
-                0x004656e0                HEAP_START
-                0x004656f0                g_heap_pointer
-                0x00465700                heapList
-                0x00465b00                HEAP_SIZE
-                0x00465b10                last_size
-                0x00465b20                last_valid
-                0x00465b30                mmblockList
-                0x00465f30                libcHeap
-                0x00465f40                Heap
-                0x00465f50                mmblockCount
-                0x00465f60                HEAP_END
-                0x00465f70                end = .
-                0x00465f70                _end = .
-                0x00465f70                __end = .
+                0x00462400                _io_table
+                0x00462450                stderr
+                0x00462460                prompt_pos
+                0x00462470                g_using_gui
+                0x00462480                stdin
+                0x00462490                prompt_max
+                0x004624a0                prompt_err
+                0x004628a0                g_columns
+                0x004628b0                stdout
+                0x004628c0                g_rows
+                0x004628d0                prompt_out
+                0x00462cd0                g_cursor_y
+                0x00462ce0                prompt_status
+                0x00462cf0                g_char_attrib
+                0x00462d00                g_cursor_x
+ COMMON         0x00462d10     0x3270 main.o
+                0x00462d10                ShellMetrics
+                0x00462d20                shellStatus
+                0x00462d30                CommandHistory
+                0x00462d40                shellWindowWidth
+                0x00462d50                ClientAreaInfo
+                0x00462d60                BufferInfo
+                0x00462d70                shellError
+                0x00462d80                shellWindowHeight
+                0x00462d90                lineList
+                0x00464d90                root
+                0x00464da0                CurrentCommand
+                0x00464db0                shell_info
+                0x00464dd0                shellScreenBufferMaxColumns
+                0x00464de0                shell_window_x
+                0x00464df0                i2Window
+                0x00464e00                rect
+                0x00464e10                backgroung_color
+                0x00464e20                shellMaxRows
+                0x00464e30                screenbufferList
+                0x00464e50                foregroung_color
+                0x00464e60                pwd
+                0x00464e70                CurrentWindow
+                0x00464e80                topbar_scrollbarWindow
+                0x00464e90                current_semaphore
+                0x00464ea0                ShellHook
+                0x00464eb0                topbar_checkboxWindow
+                0x00464ec0                shellScreenBufferMaxRows
+                0x00464ed0                shellScreenWidth
+                0x00464ee0                screen_buffer_pos
+                0x00464ef0                shellScreenHeight
+                0x00464f00                editboxWindow
+                0x00464f10                username
+                0x00464f20                screen_buffer_x
+                0x00464f30                screen_buffer
+                0x00465ee0                shell_window_y
+                0x00465ef0                terminal_rect
+                0x00465f00                password
+                0x00465f10                CursorInfo
+                0x00465f20                shellMaxColumns
+                0x00465f30                i1Window
+                0x00465f40                screen_buffer_y
+                0x00465f50                topbar_editboxWindow
+                0x00465f60                topbarWindow
+                0x00465f70                ApplicationInfo
+ COMMON         0x00465f80      0x8f0 stdlib.o
+                0x00465f80                current_mmblock
+                0x00465f90                mm_prev_pointer
+                0x00465fa0                heap_end
+                0x00465fb0                g_available_heap
+                0x00465fc0                heap_start
+                0x00465fd0                heapCount
+                0x00465fe0                HEAP_START
+                0x00465ff0                g_heap_pointer
+                0x00466000                heapList
+                0x00466400                HEAP_SIZE
+                0x00466410                last_size
+                0x00466420                last_valid
+                0x00466430                mmblockList
+                0x00466830                libcHeap
+                0x00466840                Heap
+                0x00466850                mmblockCount
+                0x00466860                HEAP_END
+                0x00466870                end = .
+                0x00466870                _end = .
+                0x00466870                __end = .
 LOAD head.o
 LOAD crt0.o
 LOAD main.o
