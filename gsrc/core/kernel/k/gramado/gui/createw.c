@@ -143,19 +143,17 @@ void *createwNewWindow()
  *
  * Cria a janela dependendo do tipo:                              
  * =================================
- * 1 - POP-UP.
- * 2 - EDIT-BOX.
- * 3 - NORMAL ( bg + client area ).
- * 4 - NORMAL_EDIT ( bg + editbox).
- * 5 - MENUBAR.
- * 6 - TOOLBAR.
- * 7 - STATUSBAR.
- * 8 - TASKBAR.
- * 9 - ? 
+ * WT_NULL          0 
+ * WT_SIMPLE        1
+ * WT_EDITBOX       2  // igual simples, mais uma bordinha preta.
+ * WT_OVERLAPPED    3  // sobreposta(completa)(barra de titulo + borda +client area)
+ * WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
+ * WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
+ * WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
  * CONTINUA ...
  */
 void *CreateWindow( unsigned long type, //1  - Tipo de janela (popup,normal,...)
-unsigned long status,     //2  - Estado da janela (ativa ou nao)
+unsigned long status,     //2  - Estado da janela. (poderia ter vários bits ??)
 unsigned long view,       //3  - (min, max ...)
 char *windowname,         //4  - Título.                          
 unsigned long x,          //5  - Deslocamento em relação às margens do Desktop.                           
@@ -168,6 +166,11 @@ unsigned long clientcolor,  //11 - Client Area Color.
 unsigned long color         //12 - color (bg) (para janela simples)
 )
 {
+	
+	// @todo: O argumento style está faltando.
+	//        cada tipo de tanela poderá ter vários estilos.
+	// Obs: Podemos ir usando apenas um estilo padrão por enquanto.
+	
 	int View;	//(min, max ...).
 
 	//Bars.
@@ -627,11 +630,10 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//2) Edit box, (Simples + borda preta).
         //editbox não tem sombra, tem bordas. 
 		case WT_EDITBOX:
-	        Background = 1;    //bg.
-		    window->backgroundUsed = 1;
-            //bordas.
+            Background = 1;    //bg.
+	        window->backgroundUsed = 1;
             Border = 1;
- 			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
+		    //window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??	
 		    break;
 
 		//   **** FRAME ****
@@ -909,36 +911,55 @@ drawBegin:
 						   window->color_bg ); 						   
 	};
 	
-	//BORDA PARA EDITBOX
+	
+	//#improvisando uma largura de borda.
+	//@todo: isso deve ir para outro lugar.
+	unsigned long border_size = 0;
+	unsigned long border_color = COLOR_BORDER;
+	
+	// BORDA COLOR_INACTIVEBORDER 
+	// Borda para as janelas.
+	// Obs: As bordas dependem do tipo de janela e do estilo de janela.
 	if( Border == 1 )
 	{
+		// A largura da borda pode sinalizar o status (ativo ou inativo) 
+		// de uma caixa de edição.
+		if( status == 0 ){ 
+		    border_size = 1;
+            border_color = COLOR_INACTIVEBORDER; 			
+		}
+		if( status == 1 ){ 
+		    border_size = 2; 
+		    border_color = COLOR_BLUE;
+		}
+		//if( status == 2 ){ border_size = 3; } //just for fun
 		
 	    //board1, borda de cima e esquerda.
 	    
 		drawDataRectangle( window->left, 
 		                   window->top, 
 						   window->width, 
-						   1, 
-						   COLOR_BLUE);
+						   border_size, 
+						   border_color );
 						   
 	    drawDataRectangle( window->left, 
 		                   window->top, 
-						   1, 
+						   border_size, 
 						   window->height, 
-						   COLOR_BLUE);
+						   border_color );
 
 	    //board2, borda direita e baixo.
 	    drawDataRectangle( window->left +window->width -1, 
 	                       window->top, 
-					       1, 
+					       border_size, 
 					       window->height, 
-					       COLOR_BLUE);
+					       border_color );
 					   
 	    drawDataRectangle( window->left, 
 	                       window->top +window->height -1, 
 					       window->width, 
-					       1,
-					       COLOR_BLUE);
+					       border_size,
+					       border_color );
 		
 	};
 	
@@ -1050,13 +1071,8 @@ drawBegin:
     // criarmos a client area, pois tem janela que tem barra de títulos 
     // e tem janela que não tem, tem janela que bordas e tem janela que 
     // não tem.
-    //
-    //     Estamos criando uma estrutura para o retângulo
-    // da área de cliente.
-    //
-	// #teste:            
-	//     Não sei se essa parte está funcionado direito,
-	// pintarei de cor extravagante para testar.
+	//
+    // #Testando para diferentes tipos de janela.
 	//
     if( ClientArea == 1 )
 	{
@@ -1122,20 +1138,45 @@ drawBegin:
 			// por enquanto. left top width height right bottom.
 			//
 			
+			//
+			// ## OVERLAPPED WINDOW ##
+			//
+			
+            if( window->type == WT_OVERLAPPED )
+            {
+			    //left top
+                window->rcClient->left   = (unsigned long) (window->left +1);
+                window->rcClient->top    = (unsigned long) (window->top  +1 +24);
             
-            //left top
-            window->rcClient->left   = (unsigned long) (window->left +1);
-            window->rcClient->top    = (unsigned long) (window->top  +1 +24);
+                // width e height.
+                // width = window widdth - as bordas verticais.
+                // height = windows height - as bordas horizontais - a barra de títulos.
+                window->rcClient->width  = (unsigned long) (window->width -1 -1);
+                window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
+                
+			};
+			
+            //
+			// ## EDITBOX ##
+			//
+
+			if( window->type == WT_EDITBOX || window->type == WT_EDITBOX_MULTIPLE_LINES )
+			{	
+                //left top
+                window->rcClient->left   = (unsigned long) (window->left +1);
+                window->rcClient->top    = (unsigned long) (window->top  +1 +24);
             
-            // width e height.
-            // width = window widdth - as bordas verticais.
-            // height = windows height - as bordas horizontais - a barra de títulos.
-            window->rcClient->width  = (unsigned long) (window->width -1 -1);
-            window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
-            
-            //right bottom.
+                // width e height.
+                // width = window widdth - as bordas verticais.
+                // height = windows height - as bordas horizontais - a barra de títulos.
+                window->rcClient->width  = (unsigned long) (window->width -1 -1);
+                window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
+			};
+			
+			//right bottom.
   			window->rcClient->right  = (unsigned long) (window->rcClient->left + window->rcClient->width);
 			window->rcClient->bottom = (unsigned long) (window->rcClient->top + window->rcClient->height);
+			
 			
             // #bugbug Isso pode dar problemas.		
 		    // Deslocamento dentro da área de cliente.
@@ -1147,14 +1188,15 @@ drawBegin:
 			// * ESSA COR FOI PASSADA VIA ARGUMENTO.
 			//
 			
-            //window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
+            window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
 			
 			// #TESTE: VERMELHÃO.
-			window->rcClient->color_bg = (unsigned long) COLOR_RED;
+			//window->rcClient->color_bg = (unsigned long) COLOR_RED;
 			
 			//
 			// Draw!
 			//
+			
 			
             drawDataRectangle( (unsigned long) window->rcClient->left, 
 		                       (unsigned long) window->rcClient->top, 
@@ -1195,7 +1237,8 @@ drawBegin:
 			
 	
 	    //limits
-	    if( window->height == 0 || window->height > 800 ){ 
+	    if( window->height == 0 || window->height > 800 )
+		{ 
 		    window->height = 2; 
 		}
 		draw_button( window, "=", 1, 

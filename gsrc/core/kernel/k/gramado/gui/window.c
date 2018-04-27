@@ -1919,7 +1919,11 @@ void windowUnblockFocus(){
  * em full screen.
  *     Se a janela for um editbox, faz mais sentido ainda que 
  * o corsor fique dentro dos limites da área de cliente.
- *  
+ *
+ * #importante:
+ *  Isso depende do tipo de janela. Se for um editbox tem que colocar o 
+ * cursor no início da área de edição.
+ * ...
  */
 void SetFocus( struct window_d *window )
 {
@@ -1973,6 +1977,7 @@ void SetFocus( struct window_d *window )
 			};
 			
 			// Se ela não é a janela ativa, tentamos ativar sua janela mãe.
+			// Isso se a janela mão já não for a janela ativa.
             // As janelas filhas nunca são janelas ativas. Se uma janela filha 
 			// tem o foco de entrada, então sua janela mãe é a ativa. 			
 			if( window->id != active_window )
@@ -1996,6 +2001,7 @@ void SetFocus( struct window_d *window )
                 //Obs: Nesse momento a janela ativa está configurada.
 				// a janela ativa é a própria janela ou a sua janela mãe.
                 
+				
                 // Já podemos setar o foco de entrada e configurarmos o 
 				// procedimento de janela.				
 
@@ -2028,7 +2034,10 @@ void SetFocus( struct window_d *window )
 // Configurando a janela com o foco de entrada.
 //
 			
-setup_wwf:			
+setup_wwf:		
+
+			//
+			// Temos que posicionar o cursor caso a janela seja um editbox.	
 			
 			//
 			// Se a janela for um editbox, ela precisa ter seu input resetado..
@@ -2088,6 +2097,11 @@ setup_wwf:
 			window->CursorY = g_cursor_y;
             window->CursorColor = COLOR_PINK;
 			
+			
+			//
+			// Buffer do controle editbox.
+			// Esse buffer pode ser o arquivo usado pelo editbox.
+			//
 	
 	        for( i=0; i<PROMPT_MAX_DEFAULT; i++ )
 	        {

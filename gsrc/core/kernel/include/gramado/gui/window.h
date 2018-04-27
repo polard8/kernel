@@ -129,6 +129,7 @@
 #define WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
 #define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
 #define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
+#define WT_EDITBOX_MULTIPLE_LINES 7
 //... 
 
 
@@ -1507,7 +1508,8 @@ struct window_d
 	
     //
 	// style: isso poderia ser estilo de design ...
-	//
+	//        Qualquer janela pode ter vários estilos de design 
+    //        ex: um editbox poderá ser de vários estilos.	
 	
 	//window style:
 	//WINDOW_STYLE_FLOATING (flutuante) 

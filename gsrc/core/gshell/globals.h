@@ -158,13 +158,13 @@ static unsigned long saved_y = 0;
 // WINDOW SUPPORT
 //
 
-int shellWindowWidth;      //80*8
-int shellWindowHeight;     //25*8
+
 
 //...
 unsigned long shell_window_x;
 unsigned long shell_window_y;
-
+int shellWindowWidth;      //80*8
+int shellWindowHeight;     //25*8
 
 //
 // Colors

@@ -32,7 +32,7 @@ void shellCreateEditBox()
 {
     
 	editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-editbox1",     
-                                       40, 40, 100, 20,    
+                                       80, 80, 200, 22,    
                                        0, 0, COLOR_WINDOW, COLOR_WINDOW );
 									   
 									   
@@ -62,6 +62,12 @@ void shellCreateEditBox()
  */
 void shellCreateTopBar()
 {
+	//
+	// Precisamos registrar no kernel
+	// que essa janela corresponde a área de taskbar 
+	// e que a área de trabalho agora é menor.
+	//
+	
 	// Topbar window.
 	topbarWindow = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar ",     
                                        0, 0, 800, (600/8),    
@@ -119,8 +125,8 @@ void shellCreateTopBar()
 	topbar_editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-topbar-editbox1",     
                                        (iconMaxWidth*2) +20, 
 									   20, 
-									   800 - ( (iconMaxWidth*2) +40 ) -20, 
-									   20,    
+									   (800/3) , 
+									   22,    
                                        0, 0, COLOR_WINDOW, COLOR_WINDOW );
 									   
 									   
@@ -143,8 +149,8 @@ void shellCreateTopBar()
 	
 
 	topbar_checkboxWindow = (void*) APICreateWindow( 5, 1, 1,"{}shell-topbar-checkbox1",     
-                                       20, 
-									   20, 
+                                       80, 
+									   80, 
 									   20, 
 									   20,    
                                        0, 0, COLOR_WINDOW, COLOR_WINDOW );
@@ -172,7 +178,7 @@ void shellCreateTopBar()
                                        (800-41), 
 									   0, 
 									   40, 
-									   200,    
+									   (600/8),    
                                        0, 0, COLOR_WINDOW, COLOR_WINDOW );
 									   
 									   

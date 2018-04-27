@@ -448,8 +448,11 @@ noArgs:
 	
 	apiBeginPaint();
 	
-	// #bugbug o tipo editbox está falhando....
-	//hWindow = (void*) APICreateWindow( WT_EDITBOX, 1, 1," {} SHELL.BIN ",
+
+    //
+	// Criando a janela WT_OVERLAPPED.
+	//
+	
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
 	                                   shell_window_x, shell_window_y, 
 									   shellWindowWidth, shellWindowHeight,    
@@ -1278,8 +1281,8 @@ unsigned long shellCompare(struct window_d *window)
     //char *token = strtok(prompt, " -");
 	
 	//#debug
-    printf("shellCompare: Testing ...\n");
-    refresh_screen();	
+    //printf("shellCompare: Testing ...\n");
+    //refresh_screen();	
    
     char *tokenList[80];
     int i = 0;
@@ -1309,8 +1312,8 @@ unsigned long shellCompare(struct window_d *window)
 
 		//#debug
 		//Mostra
-        printf("shellCompare: %s \n", tokenList[i] );
-        refresh_screen();
+        //printf("shellCompare: %s \n", tokenList[i] );
+        //refresh_screen();
 
 		// Incrementa o índice da lista
         i++;
@@ -1325,12 +1328,12 @@ unsigned long shellCompare(struct window_d *window)
     tokenList[i] = NULL;
 
 	//#debug
-    printf("shellCompare: %s \n", tokenList[i] );
+    //printf("shellCompare: %s \n", tokenList[i] );
     //refresh_screen();	
 
 	//#debug
-    printf("shellCompare: Test done!\n");
-    refresh_screen();	
+    //printf("shellCompare: Test done!\n");
+    //refresh_screen();	
 
 
 	// Zerando o índice do tokenList
@@ -1625,7 +1628,36 @@ do_compare:
     if( strncmp( prompt, "help", 4 ) == 0 || 
 	    strncmp( prompt, "?", 1 ) == 0 )
 	{
-		shellHelp();
+
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL )
+		{
+			shellHelp();
+			goto exit_cmp;
+		}else{
+		    //printf("\n argument_number={%d} argument={%s}\n", i, tokenList[i]);	
+            
+			if( strncmp( (char*) tokenList[i], "-all", 4 ) == 0 )
+			{   
+				printf("Show all help topics.\n");
+				shellHelp();
+				goto exit_cmp;
+			}
+			
+			if( strncmp( (char*) tokenList[i], "-min", 4 ) == 0 )
+			{   
+				printf("cls, help, exit ...\n");
+				refresh_screen();
+				//shellHelp();
+				goto exit_cmp;
+			}
+			
+			//...
+		};
+		
+		//shellHelp();
 		goto exit_cmp;
     };	
 	
@@ -1767,6 +1799,8 @@ do_compare:
 	
 	
 	// start
+	// Inicia uma nova janela(instancia ??) para executar 
+	// um programa ou comando desejado.
     if( strncmp( prompt, "start", 5 ) == 0 )
 	{
 		// Isso deve setar o foco na janela do shell.
@@ -2433,6 +2467,7 @@ setGlobals:
 
 
 /*
+ *******************************************
  * shellThread:
  *     Um thread dentro para testes.
  */
@@ -2947,6 +2982,7 @@ void shellShowInfo()
 	printf("shellMaxRows={%d} \n", shellMaxRows );	
 	
 };
+
 
 //metrics
 void shellShowMetrics()
