@@ -620,8 +620,10 @@ void windowShowWWFMessageBuffers()
 
 
 /*
+ *****************************************************************************
  * windowSendMessage:
- *    Uma mensagem deve ser enviada para a estrutura da janela com o foco de entrada.
+ *    Uma mensagem deve ser enviada para a estrutura da janela com o 
+ * foco de entrada.
  *    A classe system.devices.unblocked. pois essa rotina é um método dela.
  *
  * Sobre a fila de mensagem da janela com o foco de entrada:
@@ -639,8 +641,10 @@ void windowShowWWFMessageBuffers()
  *      (Não importa qual processo foi interrompido pela interrupção de 
  * teclado. A mensagem deve ir para a fila de mensagens da janela com o foco
  * de entrada.)
- * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com foco de entrada.
- * Ex: void windowSendMessageWWW(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4)
+ * @todo: Criar uma rotina semelhante, mas exclusivamente para a janela com
+ * foco de entrada.
+ * Ex: void windowSendMessageWWW(unsigned long arg1, unsigned long arg2, 
+ * unsigned long arg3, unsigned long arg4)
  */	
 void windowSendMessage( unsigned long arg1, 
                         unsigned long arg2, 

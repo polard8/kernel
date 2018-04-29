@@ -1,7 +1,8 @@
 /*
- * File: sm\logoff.h
+ * File: gramado\logoff\logoff.h
  *
  * Descrição:
+ *     Kernel Mode Logoff Support Routines.
  *     Header de suporte ao logoff.
  *
  * OBS:

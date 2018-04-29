@@ -7,7 +7,9 @@
  *     Gerência de volumes.
  *
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2018 - Some new structures.
  */
 
  
@@ -186,6 +188,7 @@ unsigned long volumeList[VOLUME_COUNT_MAX];
 void *volume_get_volume_handle( int number );
 void *volume_get_current_volume_info();
 
+int volumeShowVolumeInfo( int descriptor );
 
 int volume_init();
 

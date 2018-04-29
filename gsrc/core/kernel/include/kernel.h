@@ -218,6 +218,7 @@ extern void do_executa_new_task();
 #include <microkernel/pc/realtime.h>
 #include <microkernel/pc/dispatch.h>
 #include <microkernel/pc/event.h>
+#include <microkernel/pc/pc.h>
 #include <microkernel/microkernel.h>
 //--
 
@@ -287,6 +288,7 @@ extern void do_executa_new_task();
 #include <executive/dd/sm/debug.h>
 #include <executive/dd/sm/sys.h>                 //system calls 2.
 #include <executive/dd/sm/system.h>              //system manager.
+#include <executive/dd/dd.h>
 
 //
 // MICROKERNEL (3)

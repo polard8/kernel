@@ -572,6 +572,7 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Clock info./minishell				
 				case VK_F6:
+				    ata_initialize();
 					//if(AltStatus == 1){ window_with_focus = 6; break;};
 					//if(CtrlStatus == 1){ active_window = 6; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
@@ -639,8 +640,9 @@ unsigned long system_procedure( struct window_d *window,
 					//mostra_slots();  //threadi.c
 					
 					//@todo: abrir o gerenciador de tarefas.
-					show_process_information();
-					show_thread_information();					
+					volumeShowVolumeInfo(0);
+					//show_process_information();
+					//show_thread_information();					
 				    
 					//aumentando gradativamente uma janela de pouco em pouco.
 					//xxxx = (void*) windowList[6];

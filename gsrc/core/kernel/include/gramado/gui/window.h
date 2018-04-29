@@ -1307,6 +1307,7 @@ struct window_d
 	// CURRENT MESSAGE !!!
 	// 
 	
+	/* shared by producer and consumer */
 	struct window_d *msg_window;  //arg1.
 	int msg;                      //arg2.
 	unsigned long long1;          //arg3.
@@ -1322,6 +1323,7 @@ struct window_d
 	// MESSAGE QUEUE !!!
 	//
 	
+	/* shared by producer and consumer */
 	unsigned long hwndList[32];
 	unsigned long msgList[32];
 	unsigned long long1List[32];
@@ -1426,6 +1428,13 @@ struct window_d
 // Gramado v 0.1 usa essa estrutura somente até aqui.
 //==================================================
 
+    // Buffer para mensagens pequenas.
+    // Será usado pelo produtor e pelo consumidor.
+    // char read_buf[WINDOW_MSG_BUFFER_SIZE];
+    //
+	//
+	
+	
     //
 	//@todo: rever esse cursor, pois ja existe na versão 0.1 acima.
 	

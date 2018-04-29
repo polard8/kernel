@@ -2,6 +2,7 @@
  * File: gramado\logon\logon.c
  *
  * Descrição:
+ *     Kernel Mode Logon Support Routines.
  *     @todo: Esse módulo deve prepara o ambiente para rodar o processo logon.bin.
  *     Esse logon pode ser usado par um eventual boot loader ou system installer.
  *

@@ -1,5 +1,7 @@
 /*
- * File: logoff.c
+ * File: gramado\logoff\logoff.c
+ *
+ *  Kernel Mode Logoff Support Routines.
  *
  * isso prepara um ambiente para rodar o processo logoff
  *

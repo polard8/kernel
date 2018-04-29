@@ -40,6 +40,31 @@
 #define SYSTEMMODE_EDITBOX  0
 #define SYSTEMMODE_TERMINAL 1
 int g_system_mode;  //terminal ou edibox. 
+
+
+
+//
+// Identificação do processo que está efetuando logon e 
+// identificação do processo que está efetuando logoff.
+// Precisamos registrar o processo que efetuou logon.
+// ?? Porque eu ainda não sei.
+// Uma rotina de registro de processo de logon 
+// será oferecida para processos em user mode,
+// é necessario enviar uma flag de segurança,
+// pode ser um magic number ...
+// então esse proecesso terá direito de efetuar o logon 
+// se tiver privilégios válidos em sua estrutura.
+// logo em seguida registraremos qual foi o processo 
+// que efetuou logon. Outro processo não poderá 
+// efetuar logon durante aquela sessão.
+// Caso semelhante é o logoff. O processo deverá 
+// enviar uma flag de segurança e ter atributos válidos 
+// para efetuar o logoff.
+//
+//
+
+int gLogonPID;
+int gLogoffPID;
  
  
 int systemGetTerminalWindow(); 

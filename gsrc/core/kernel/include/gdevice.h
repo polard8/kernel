@@ -1,12 +1,17 @@
 /*
  *  File: gdevice.h
  *
- * Definição: 
- * Informações globais sobre o dispositivo onde o sistema operacional foi instalado.
- * Informações sobre o host device.
- * Não é a qui o lugar para se detalhar todos os dispositivos instalados na máquina.
+ * Definição:
+ * Informações globais sobre a gerênciacia de dispositivos.
+ * 
+ * + Informações globais sobre o dispositivo onde o sistema operacional 
+ * foi instalado.
+ *
+ * + Informações sobre o host device.
+ *
+ * + Não é a qui o lugar para se detalhar todos os dispositivos instalados na máquina.
  * Aqui é lugar de classificar a plataforma alvo para o sistema operacional. Para
- * que as aplicações possam se adaptar às características do dispositivo que suporta
+ * que as aplicações possam se adaptar às características do dispositivo que suportam
  * o sistema operacional.
  *
  * Versão 1.0, 2016 - Created.   

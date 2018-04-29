@@ -33,6 +33,44 @@ void *volume_get_current_volume_info()
 
 
 
+int volumeShowVolumeInfo( int descriptor )
+{
+    if( descriptor < 0 || descriptor > VOLUME_COUNT_MAX ){
+		goto fail;
+	}	
+	
+	struct volume_d *v;
+	
+	v = (struct volume_d *) volumeList[0];
+	
+	if( (void *) v == NULL )
+	{
+		
+	}else{
+		
+		if( v->used != 1 || v->magic == 1234 ){
+			goto fail;
+		}
+		
+		printf("volumeType={&d}\n",v->volumeType);
+		printf("name={%s}",v->name);
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		
+	};
+	
+	
+done:
+	return (int) 0;
+fail:
+    return (int) 1;
+};
+
 /*
  ***************************************************
  * volume_init:
@@ -98,7 +136,9 @@ int volume_init()
 	    
 		volume_conductor->name = "VOLUME 0";  
 
-        volume_conductor->volume_info = (struct volumeinfo_d *) volumeinfo_conductor;   		
+        volume_conductor->volume_info = (struct volumeinfo_d *) volumeinfo_conductor; 
+
+        volumeList[0] = (unsigned long) volume_conductor; 		
 	};
 	
 	

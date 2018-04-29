@@ -1,7 +1,8 @@
 /*
- * File: sm\logon.h
+ * File: gramado\logon\logon.h
  *
  * Descrição:
+ *     Kernel Mode Logon Support Routines.
  *     Header de suporte à criação do Logon.
  *  
  * OBS:
