@@ -360,14 +360,13 @@ _u8 ata_status_read()
 
 }
 
-_void ata_cmd_write(_i32 cmd_val)
+void ata_cmd_write(_i32 cmd_val)
 {
            
     	// no_busy      	
 	ata_wait_not_busy();
 	outb(ata.cmd_block_base_address + ATA_REG_CMD,cmd_val);
 	ata_wait(400);  // Esperamos 400ns
-
 }
 
 
@@ -407,10 +406,11 @@ _u8 ata_assert_dever(_i8 nport)
 
 
 /*
+ *********************************************
  * ide_identify_device:
  * 
  */
-int ide_identify_device(uint8_t nport)
+int ide_identify_device( uint8_t nport )
 {
     _u8 status;
     _u8 lba1,lba2;
@@ -418,17 +418,23 @@ int ide_identify_device(uint8_t nport)
     ata_assert_dever(nport);
 
     // Ponto flutuante
-    if(ata_status_read() == 0xff)//Sem unidade conectada ao barramento
+	//Sem unidade conectada ao barramento
+    if(ata_status_read() == 0xff){
         return -1;
+	}
+	
+	//
+	//
+	//
 
-    outb(ata.cmd_block_base_address + ATA_REG_SECCOUNT,0);	// Sector Count 7:0
-	outb(ata.cmd_block_base_address + ATA_REG_LBA0,0);        // LBA 7-0   
-	outb(ata.cmd_block_base_address + ATA_REG_LBA1,0);        // LBA 15-8
-	outb(ata.cmd_block_base_address + ATA_REG_LBA2,0);        // LBA 23-16
+    outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+	outb( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0   
+	outb( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
+	outb( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
 
     
     // Select device,
-    outb(ata.cmd_block_base_address + ATA_REG_DEVSEL,0xE0| ata.dev_num << 4);
+    outb( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0| ata.dev_num << 4 );
     ata_wait(400);
 
     // cmd
@@ -441,13 +447,16 @@ int ide_identify_device(uint8_t nport)
     ata_wait(400);
 
 
-    if(ata_status_read() == 0) //Sem unidade no canal 
+	//Sem unidade no canal
+    if(ata_status_read() == 0){  
         return -1;
+	}
 
-   lba1 = inb(ata.cmd_block_base_address + ATA_REG_LBA1);
-   lba2 = inb(ata.cmd_block_base_address + ATA_REG_LBA2);
+   lba1 = inb( ata.cmd_block_base_address + ATA_REG_LBA1 );
+   lba2 = inb( ata.cmd_block_base_address + ATA_REG_LBA2 );
 
-   if(lba1 == 0x14 && lba2 == 0xEB){
+   if(lba1 == 0x14 && lba2 == 0xEB)
+   {
         //kputs("Unidade PATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
@@ -620,11 +629,16 @@ int ata_initialize()
 	// Messages
 	//
 	
-#ifdef KERNEL_VERBOSE
+//#ifdef KERNEL_VERBOSE
     kprintf("sm-disk-disk-ata_initalize:\n");
     kprintf("Initializing IDE/AHCI support ...\n");
 	//refresh_screen();
-#endif 
+//#endif
+
+    //
+    // Sondando a interface PCI para encontrarmos um dispositivo
+    // que seja de armazenamento de dados.
+    //	
 	
     data = (_u32) pci_scan_device(PCI_CLASSE_MASS);
     if( data == -1 )
@@ -642,7 +656,7 @@ int ata_initialize()
     fun = ( data &7 );
 
 	//
-	// Configuration space.
+	// Vamos saber mais sobre o dispositivo enconrtado. 
 	//
 	
     data = (_u32) ata_pci_configuration_space( bus, dev, fun );
@@ -675,30 +689,43 @@ int ata_initialize()
     ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
 
 	
+	//
+	// De acordo com o tipo.
+	//
+	
+	
+	//
+	// Se for IDE.
+	//
+	
 	// Type
     if( ata.chip_control_type == ATA_IDE_CONTROLLER )
 	{
 
-    //Soft Reset, defina IRQ
-    outb( ATA_BAR1, 0xff );
-    outb( ATA_BAR3, 0xff );
-    outb( ATA_BAR1, 0x00 );
-    outb( ATA_BAR3, 0x00 );
+        //Soft Reset, defina IRQ
+        outb( ATA_BAR1, 0xff );
+        outb( ATA_BAR3, 0xff );
+        outb( ATA_BAR1, 0x00 );
+        outb( ATA_BAR3, 0x00 );
 
-    ata_record_dev = 0xff;
-    ata_record_channel = 0xff;
+        ata_record_dev = 0xff;
+        ata_record_channel = 0xff;
 
 #ifdef KERNEL_VERBOSE	
-	printf("Initializing IDE Mass Storage device ...\n");
-	refresh_screen();
+	    printf("Initializing IDE Mass Storage device ...\n");
+	    refresh_screen();
 #endif    
 	
-	//
-	// As estruturas de disco serão colocadas em uma lista encadeada.
-	//
+	    //
+	    // As estruturas de disco serão colocadas em uma lista encadeada.
+	    //
 	
-	ide_mass_storage_initialize();
-
+	    ide_mass_storage_initialize();
+		
+		
+		//
+		// Agora se for AHCI.
+		//
 
     }else if( ata.chip_control_type == ATA_AHCI_CONTROLLER )
 	      {
@@ -735,10 +762,10 @@ int ata_initialize()
 	
  done:
 
-#ifdef KERNEL_VERBOSE 
+//#ifdef KERNEL_VERBOSE 
     printf("done!\n");
     refresh_screen();
-#endif 
+//#endif 
 	
     return (int) 0;	
 };
@@ -1048,6 +1075,11 @@ void ide_mass_storage_initialize()
 {
 	int port;
 	
+
+    //
+    // Vamos trabalhar na lista de dispositivos.
+    //	
+	
 	// Iniciando a lista.
 	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
 	
@@ -1063,6 +1095,10 @@ void ide_mass_storage_initialize()
 	ata_identify_dev_buf = ( _u16 * ) kmalloc(4096);
 
 
+	//
+	// Sondando dispositivos e imprimindo na tela.
+	//
+	
     // As primeiras quatro portas do controlador IDE.    
 	for( port=0; port < 4; port++ )
 	{
@@ -2217,16 +2253,16 @@ void show_ide_info()
 	//if( ata != NULL )
 	//{
 		printf("ata:\n");
- 	    printf("type={%d}", (int) ata.chip_control_type);
-	    printf("channel={%d}", (int) ata.channel);
-	    printf("devType={%d}", (int) ata.dev_type);
-	    printf("devNum={%d}", (int) ata.dev_num);
-	    printf("accessType={%d}", (int) ata.access_type);
-	    printf("cmdReadMode={%d}", (int) ata.cmd_read_modo);
-	    printf("cmdBlockBaseAddress={%d}", (int) ata.cmd_block_base_address);
-	    printf("controlBlockBaseAddress={%d}", (int) ata.ctrl_block_base_address);
-		printf("busMasterBaseAddress={%d}", (int) ata.bus_master_base_address);
-		printf("ahciBaseAddress={%d}", (int) ata.ahci_base_address);
+ 	    printf("type={%d}\n", (int) ata.chip_control_type);
+	    printf("channel={%d}\n", (int) ata.channel);
+	    printf("devType={%d}\n", (int) ata.dev_type);
+	    printf("devNum={%d}\n", (int) ata.dev_num);
+	    printf("accessType={%d}\n", (int) ata.access_type);
+	    printf("cmdReadMode={%d}\n", (int) ata.cmd_read_modo);
+	    printf("cmdBlockBaseAddress={%d}\n", (int) ata.cmd_block_base_address);
+	    printf("controlBlockBaseAddress={%d}\n", (int) ata.ctrl_block_base_address);
+		printf("busMasterBaseAddress={%d}\n", (int) ata.bus_master_base_address);
+		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
 	//};
 	
 	

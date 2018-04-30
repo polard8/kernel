@@ -144,16 +144,19 @@ void systemSetTerminalRectangle( unsigned long left,
  *    Cada partição é um volume.
  *    Um volume pode ocupar mais de um disco. 
  */
-#define SYSTEM_VOLUME0  "/volume0" 
-#define SYSTEM_VOLUME1  "/volume1"
-#define SYSTEM_VOLUME2  "/volume2"
-#define SYSTEM_VOLUME3  "/volume3"
-#define SYSTEM_VOLUME SYSTEM_VOLUME0  
+#define SYSTEM_VOLUME0  "/volume0"   //vfs
+#define SYSTEM_VOLUME1  "/volume1"   //partição de boot
+#define SYSTEM_VOLUME2  "/volume2"   //partição do sistema.
+#define SYSTEM_VOLUME3  "/volume3"   //??indefinido.
+
+#define VHS_VOLUME    SYSTEM_VOLUME0
+#define BOOT_VOLUME   SYSTEM_VOLUME1
+#define SYSTEM_VOLUME SYSTEM_VOLUME2  
 //...
 
 
-#define SYSTEM_ROOT      "/"
-#define SYSTEM_ROOTDIR     SYSTEM_ROOT      
+#define SYSTEM_ROOT      "root:/"
+#define SYSTEM_ROOTDIR   SYSTEM_ROOT      
 
  
 /*
@@ -162,18 +165,24 @@ void systemSetTerminalRectangle( unsigned long left,
  *     Lista de diretórios dentro do disco principal.
  */
  
+//
+// Obs: Isso são opções ainda não definidas.
+// 
+ 
 //principais.  
+#define SYSTEM_GUSERS    "/user"    // (os perfis de usuário ficarão aqui.)
+#define SYSTEM_GCMD      "/cmd"      //COMANDO USADOS PELO SHELL CHAMARÃO OS PROGRAMAS QUE ESTÃO AQUI.
+#define SYSTEM_GTMP      "/tmp"      //ARQUIVOS TEMPORÁRIOS
+#define SYSTEM_GDOWNLOAD "/download"  //DOWNLOADS
+
+//secundários.
 #define SYSTEM_GBUILD    "/gbuild"   //Build
 #define SYSTEM_GDOCS     "/gdocs"    //Docs
 #define SYSTEM_GRAMADO   "/gramado"  //System (aqui ficarão os binários dos programas, em pastas)
 #define SYSTEM_GSDK      "/gsdk"     //SDK 
 #define SYSTEM_GSRC      "/gsrc"     //Source 
 
-//secundários
-#define SYSTEM_GUSERS    "/user"    // (os perfis de usuário ficarão aqui.)
-#define SYSTEM_GCMD      "/cmd"      //COMANDO USADOS PELO SHELL CHAMARÃO OS PROGRAMAS QUE ESTÃO AQUI.
-#define SYSTEM_GTMP      "/tmp"      //ARQUIVOS TEMPORÁRIOS
-#define SYSTEM_GDOWNLOAD "/download"  //DOWNLOADS
+
 //...
 
 //files (path para alguns arquivos principais)

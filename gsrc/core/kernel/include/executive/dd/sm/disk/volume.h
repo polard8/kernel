@@ -141,12 +141,9 @@ struct volumeinfo_d
 	//unsigned long DataSectorStart;      //Starting sector of the data area.
 	
 };
-volumeinfo_t *volumeinfo_conductor;
-
-volumeinfo_t *CurrentVolumeInfo;
-volumeinfo_t *CurrentVolume;
-volumeinfo_t *volumeinfo;
-volumeinfo_t *SystemVolume;
+volumeinfo_t *volumeinfo_vfs;
+volumeinfo_t *volumeinfo_bootpartition;
+volumeinfo_t *volumeinfo_systempartition;
 //...
 
 
@@ -169,12 +166,24 @@ struct volume_d
 	int used;
 	int magic;
 	
-	char *name; 
+	//label
+	char *name;
+	
+	//pathname
+	char *cmd;
 
     struct volumeinfo_d *volume_info;	
+	
+	struct disk_d *disk;
+	
+	struct volume_d *next;
 };
-volume_t *volume_conductor;  //O volume 0.
-//...
+//@todo: Isso está bom, não mexer.
+volume_t *volume_vfs;             // volume 0
+volume_t *volume_bootpartition;   // volume 1
+volume_t *volume_systempartition; // volume 2
+
+// Observação o volume atual será uma variável global.  
 
 
 //

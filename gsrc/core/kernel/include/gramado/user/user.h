@@ -31,7 +31,7 @@
 #define USER_DEFAULT           "default" 
 #define USER_ADMIN             "admin" 
 #define USER_ALL               "all" 
-#define _4NORA_USER_DIRECTORY  "/root/user" 
+#define _4NORA_USER_DIRECTORY  "root:/volume2/user" //??deletar
 //...
 
 
