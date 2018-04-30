@@ -573,6 +573,8 @@ unsigned long system_procedure( struct window_d *window,
                 //Clock info./minishell				
 				case VK_F6:
 				    ata_initialize();
+					//show_ide_info(); //(#teste)
+					
 					//if(AltStatus == 1){ window_with_focus = 6; break;};
 					//if(CtrlStatus == 1){ active_window = 6; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
