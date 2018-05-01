@@ -2210,7 +2210,7 @@ int system15( unsigned long ax,
  */
 
  
-//int 200 - serviço 14.
+// int 200 - serviço 14.
 int edit_box( unsigned long x,  
               unsigned long y, 
 			  unsigned long height, 

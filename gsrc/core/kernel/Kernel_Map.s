@@ -1886,12 +1886,12 @@ Linker script and memory map
                 0xc002156f                KiCpuFaults
                 0xc0021587                do_pagefault
                 0xc00213bc                faults
- .text          0xc00215dc      0xce0 services.o
+ .text          0xc00215dc      0xd10 services.o
                 0xc00215dc                services
-                0xc00222ab                servicesChangeProcedure
-                0xc00222bc                _code_end = .
+                0xc00222db                servicesChangeProcedure
+                0xc00222ec                _code_end = .
                 0xc0023000                . = ALIGN (0x1000)
- *fill*         0xc00222bc      0xd44 00
+ *fill*         0xc00222ec      0xd14 00
 
 .data           0xc0023000    0x13000
                 0xc0023000                _data_begin = .
@@ -2105,10 +2105,10 @@ Linker script and memory map
  .rdata         0xc00353c4      0x150 debug.o
  .rdata         0xc0035514       0xa0 abort.o
  .rdata         0xc00355b4      0x1a0 faults.o
- .rdata         0xc0035754      0x4d0 services.o
-                0xc0035c24                _data_end = .
+ .rdata         0xc0035754      0x4f0 services.o
+                0xc0035c44                _data_end = .
                 0xc0036000                . = ALIGN (0x1000)
- *fill*         0xc0035c24      0x3dc 00
+ *fill*         0xc0035c44      0x3bc 00
 
 .bss            0xc0036000    0x22000
                 0xc0036000                _bss_begin = .

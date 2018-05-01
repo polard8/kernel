@@ -1,5 +1,5 @@
 /*
- * File: executive\sm\systemcall.h
+ * File: executive\sci\systemcall.h
  *
  * Descrição:
  *     SCI - System Call Interface header.
@@ -282,10 +282,10 @@
 #define	SYS_167 167
 #define	SYS_168 168
 #define	SYS_169 169
-//network support
-#define	SYS_170 170
-#define	SYS_171 171
-#define	SYS_172 172
+//fs - gerenciamento de arquivos e fs.
+#define	SYS_PWD 170                 // Print Working Directory.
+#define	SYS_GETCURRENTVOLUMEID 171  // Get current volume id.
+#define	SYS_SETCURRENTVOLUMEID 172  // configura o id do volume atual.
 #define	SYS_173 173
 #define	SYS_174 174
 #define	SYS_175 175

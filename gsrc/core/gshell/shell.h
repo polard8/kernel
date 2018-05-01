@@ -106,6 +106,44 @@
 
 
 
+//
+// Volume support
+//
+
+#define SHELL_UNKNOWNVOLUME_STRING "unknown-volume/"
+#define SHELL_ROOTVOLUME_STRING "root:/"
+#define SHELL_VOLUME0_STRING "volume0/"
+#define SHELL_VOLUME1_STRING "volume1/"
+#define SHELL_VOLUME2_STRING "volume2/"
+//...
+
+
+//
+// pwd support
+//
+
+#define SHELL_ROOTWORKINGDIRECTORY_ID    0
+#define SHELL_VFSWORKINGDIRECTORY_ID     0
+#define SHELL_BOOTWORKINGDIRECTORY_ID    1
+#define SHELL_SYSTEMWORKINGDIRECTORY_ID  2
+#define SHELL_UNKNOWNWORKINGDIRECTORY_ID (-1)
+
+#define SHELL_ROOTWORKINGDIRECTORY_STRING    "root:"
+#define SHELL_VFSWORKINGDIRECTORY_STRING     "root:"
+#define SHELL_BOOTWORKINGDIRECTORY_STRING    "volume1"
+#define SHELL_SYSTEMWORKINGDIRECTORY_STRING  "volume2"
+#define SHELL_UNKNOWNWORKINGDIRECTORY_STRING "unknown-directory"
+//...
+
+int g_current_disk_id;
+int g_current_volume_id;
+int g_current_workingdirectory_id;  //??
+
+
+#define WORKINGDIRECTORY_STRING_MAX 32
+// a stringo do diretório de trabalho.
+char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
+
 
 #define CalculateRowScanLine(WindowY,CharHeight) \
     ( WindowY * CharHeight )
@@ -140,6 +178,7 @@ static const char help_banner[] =
 	" help      - This help\n"
     " mov       - Move file or diretory\n"
     " new       - New file or directory\n"
+	" pwd       - Print working directory\n"
     " reboot    - Reboot system\n"
     " rename    - Rename file or directory\n"
 	" shutdown  - Shutdown your computer locally or remotely\n"
@@ -543,6 +582,10 @@ void shell_memcpy_bytes( unsigned char *Dest,
                          unsigned char *Source,
                          unsigned long Length );
 
+ 
+ 
+void shellUpdateCurrentDirectoryID( int id ); 
+void shellUpdateWorkingDiretoryString( int id ); 
  
 //
 // shelui.c

@@ -857,6 +857,24 @@ void *services( unsigned long number,
 		    //@todo: O ponteiro para estrutura de retângulo é passado via argumento.
 			setClientAreaRect( arg2, arg3, arg4, 0);
             break;
+			
+		//170	
+		case SYS_PWD:
+            printf("service 170: pwd @todo: \n");
+			refresh_screen();
+			break;	
+		
+		//171 - retorna o id do volume atual.
+		case SYS_GETCURRENTVOLUMEID:
+		    return (void*) current_volume;
+            break;	
+
+		//172 - configura o id do volume atual.
+		case SYS_SETCURRENTVOLUMEID:
+		    //#bugbug: Estamos modificando, sem aplicar nenhum filtro.
+		    current_volume = (int) arg2;
+            break;				
+			
 
 		//199 - Garbage Collector.	
 		case SYS_GC:

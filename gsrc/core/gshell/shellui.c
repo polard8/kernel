@@ -23,6 +23,433 @@
 #include "globals.h"
 
 
+extern int ShellFlag;
+
+#define SHELLFLAG_NULL 0
+#define SHELLFLAG_COMMANDLINE 1
+#define SHELLFLAG_SCRIPT 2
+#define SHELLFLAG_HELP 3
+#define SHELLFLAG_VERSION 4
+#define SHELLFLAG_USAGE 5
+#define SHELLFLAG_TOPBAR 6
+//...
+
+/*
+ ***********************************************
+ * shellTopbarProcedure:
+ *     Procedimento de janela.
+ *     LOCAL
+ */
+unsigned long 
+shellTopbarProcedure( struct window_d *window, 
+                      int msg, 
+				      unsigned long long1, 
+				      unsigned long long2 )
+{
+    unsigned long input_ret;
+    unsigned long compare_return;	
+	
+	
+	//if( msg == COMMAND_INITIALIZE_SHELL ){
+		//...
+	//}
+	
+    switch(msg)
+    {
+		//Faz algumas inicializações de posicionamento e dimensões.
+        //case MSG_INITDIALOG:
+        //    break;
+
+		//Torna a janela visível.
+        //case MSG_SHOWWINDOW:
+		//    break; 
+		 
+		case MSG_KEYDOWN:
+            switch(long1)
+            {
+				// Null key.
+				case 0:
+				    return (unsigned long) 0;
+				    break;
+				
+				// Enter.
+				// Finaliza a string e compara.
+				//case VK_RETURN:
+				//    input('\0'); 
+				//	shellCompare(window);
+				//	goto done;
+                //    break; 					
+                              
+                // Mensagens de digitação.
+				// Texto. Envia o caractere.
+                // Imprime os caracteres normais na janela com o foco de 
+				// entrada.
+				// Enfilera os caracteres na string 'prompt[]' para depois 
+				// ser comparada com outras strings.
+                default:			   
+				    
+					// Coloca no stdin.
+					//input( (unsigned long) long1);      
+                    
+					// Coloca no stdout.
+					//shellInsertNextChar((char) long1);  
+					//
+					// #importante: IMPRIMINDO.
+					// Funcionando bem.
+					//printf("%c", (char) long1); 					
+					//goto done;
+                    break;               
+            };
+        break;
+		
+		case MSG_KEYUP: 
+		    // printf("%c", (char) 'u');
+            // printf("%c", (char) long1);  			
+		    break;
+		
+		//Não interceptaremos mensagens do sistema por enquanto.
+		//As mensagens do sistema são interceptadas primeiro pelo procedimento 
+		//do sistema.
+		
+		case MSG_SYSKEYDOWN:
+		    switch(long1)
+			{
+				
+		        // queremos atuar sobre os botões da topbar.
+				
+				//help
+				case VK_F1:
+				    //APISetFocus(i1Window);
+					//APIredraw_window(i1Window);
+					MessageBox( 1, "Gramado Core - Shell Topbar","F1: HELP");
+					break;
+				
+                //full screen
+                //colocar em full screen somente a área de cliente. 				
+		        case VK_F2:
+				    //APISetFocus(i2Window);
+					//APIredraw_window(i2Window);				
+				    MessageBox( 1, "Gramado Core - Shell Topbar","F2: ");
+					//ShellFlag = SHELLFLAG_COMMANDLINE;
+					break;
+					
+				case VK_F3:
+				    ShellFlag = SHELLFLAG_COMMANDLINE;
+				    break;
+					
+				//...
+
+			};
+			break;
+		
+		//Obs:
+		//essas teclas são tratadas pelo procedimento do sistema.
+		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
+		//como o context menu [Application Key]
+		case MSG_SYSKEYUP:
+            switch(long1){
+				
+				//O MENU APPLICATION É O CONTEXT MENU.
+				//
+				case VK_APPS:
+				    MessageBox( 1, "Gramado Core Shell Topbar:","Context Menu");
+					break;
+			}		
+		    break;
+		
+
+        // Commands.		
+		case MSG_COMMAND:
+            switch(long1)
+			{
+				// Null.
+				//case 0:
+				//    MessageBox( 1, "Shell test Topbar","Testing MSG_COMMAND.NULL.");
+				//    break;
+				
+				// About.
+				// Abre uma janela e oferece informações sobre o aplicativo.
+				case CMD_ABOUT:
+				    // Test.
+				    MessageBox( 1, "Shell test Topbar","Testing MSG_COMMAND.CMD_ABOUT.");
+				    break;
+				
+				//clicaram no botão
+				case BN_CLICKED:
+				    if(window == i1Window){
+					     //@todo: abre o menu de aplicativos
+					}
+				    if(window == i2Window){
+					   //@todo: abre o interpretador de comandos.
+					}
+					//#debug
+					printf("  Topbar ** BN_CLICKED  **  \n");
+				break;
+				//...
+				
+				//default:
+				//break;
+			}
+		    break; 		
+		
+		//Essa mensagem pode ser acionada clidando um botão.
+		case MSG_CLOSE:
+		    //??
+		    //isso deve fechar qualquer janela que esteja usando esse procedimento.
+			//pode ser uma janela filha ou ainda uma janela de dialogo criada pelo sistema.
+			//??
+		    printf("SHELL.BIN: Topbar MSG_CLOSE\n");
+			
+			//@todo: Criar essa função na api.
+			//apiExitProcess(0);
+			break;
+		
+		//Essa mensagem pode ser acionada clidando um botão.
+		case MSG_DESTROY:
+		    printf("SHELL.BIN: Topbar MSG_DESTROY\n");
+		    break;
+		
+		//Quando a aplicativo em user mode chama o kernel para 
+		//que o kernel crie uma janela, depois que o kernel criar a janela,
+		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
+        //MSG_CREATE, se o aplicativo retornar -1, então a rotina em kernel mode que 
+        //esta criando a janela, cancela a janela que está criando e retorn NULL.
+        //		
+		case MSG_CREATE:
+		    printf("SHELL.BIN:Topbar  MSG_CREATE\n");
+		    break;
+		
+		case MSG_SETFOCUS:
+		    APISetFocus(window);
+			break;
+			
+		case MSG_KILLFOCUS:
+            break;
+
+		//isso pinta os elementos da área de cliente.	
+        case MSG_PAINT:
+            break;
+
+		//@todo: isso ainda não existe na biblioteca. criar.	
+        //case MSG_CLS:
+            //limparemos o retãngulo da área de cliente,
+			//mesmo que estejamos em full screen. 
+		//	break;		
+		
+		//mudaremos o curso usando long1 e long2.
+		//case MSG_SETCURSOR:
+		//    break;
+		
+		//case MSG_HSCROLL:
+		//    break;
+		//case MSG_VSCROLL:
+		//    break;
+		
+		
+		//case MSG_FULLSCREEN:
+		//    break;
+		
+		
+		//case COMMAND_SET_WINDOW_SIZE:
+		//    break;
+		
+		//case COMMAND_HIDE_WINDOW:
+        //    break; 
+
+		
+		//#importante
+		// os caracteres de controle encontrados na tabela ascii.
+		//@todo: Essa mensagem precis ser criada, tanto no kernel 
+		//quanto na API.
+		//case MSG_ASCII_CONTROL_KEYS:
+		//   switch(long1)
+		//	{
+	
+		        //^A STX
+                //case 1:
+		        //    printf("^A");
+                //    break;  		
+	
+		        //^B SOT
+                //case 2:
+		        //    printf("^B");
+                //   break;  		
+			
+		        //^C ETX
+                //case 3:
+		        //    printf("^C");
+		        //	shellPrompt();
+                //    break;
+
+		        //^D EOT
+                //case 4:
+		        //   printf("^D");
+                //   break;
+
+		        //^E ENQ
+                //case 5:
+		        //    printf("^E");
+                //    break;  								
+			
+		        //^F ACK
+                //case 6:
+		        //    printf("^F");
+                //    break;  					
+
+
+		        //^G BEL
+                //case 7:
+		        //   printf("^G");
+                //    break;  					
+			
+			
+		        //^H BS
+                //case 8:
+                //    break;  								
+			
+		        //^I HT horizontal tab
+                //case 9:
+                //    break;  	
+
+		        //^J LF
+                //case 10:
+                //    break;  			
+			
+						
+		        //^K VT vertical tab
+                //case 11:
+                //    break;  	
+
+		        //^L FF form feed
+                //case 12:
+                //    break;  	
+			
+			
+		        //^M CR
+                //case 13:
+                //    break;  	
+			
+
+		        //^N SO
+                //case 14:
+                //    break;  				
+		
+
+		        //^O SI
+                //case 15:
+                //    break;
+
+
+		        //^P DLE DATA LINK ESCAPE
+                //case 16:
+                //    break;  			
+		
+		
+		        //^Q DC1 DEVICE CONTROL 1
+                //case 17:
+                //    break;  	
+  			
+			
+		        //^R DC2 DEVICE CONTROL 2
+                //case 18:
+                //    break;
+
+		        //^S DC3 DEVICE CONTROL 3
+                //case 19:
+                //    break;  			
+
+		        //^T DC3 DEVICE CONTROL 4
+                //case 20:
+                //    break;  			
+		
+		
+		        //^U NAK NEGATIVE ACKNOLEDGE
+                //case 21:
+                //    break;  			
+
+		        //^V SYN SYNCHRONOUS IDLE
+                //case 22:
+                //    break;  			
+		
+		        //^W ETB END OF TRANSMISSION BLOCK
+                //case 23:
+                //    break;  			
+		
+		        //^X CAN CANCEL
+                //case 24:
+                //    break;  			
+
+		
+		        //^Y EM END OF MEDIUM
+                //case 25:
+                //    break;  			
+		
+		        //^Z SUB SUBSTITUTE
+                //case 26:
+                //    break;  			
+		
+		
+		        //^[ ESC ESCAPE
+                //case 27:
+                //    break;  			
+		
+		        //^\ FS FILE SEPARATOR
+                //case 28:
+                //    break;  			
+		
+		        //^] GS GROUP SEPARATOR
+                //case 29:
+                //    break;  			
+		
+		        //^ RS RECORD SEPARATOR
+                //case 30:
+                //    break;  			
+		
+		
+		        //_ US UNIT SEPARATOR
+                //case 31:
+                //    break;  			
+		
+		
+		        //DELETE
+                //case 127:
+                //    break; 
+
+        //    };		
+		//    break;
+			
+		
+		
+		//Mensagem desconhecida.
+		default:
+		    //printf("shell procedure: mensagem desconhecida\n");
+		    goto done;
+		    break;	  
+    };
+
+
+    //
+    // Nothing for now !
+    //
+
+
+//printf("Shell procedure\n");
+
+	
+	
+done:
+    //@todo: variavel que indica que estamos em modo gráfico.
+	//if(VideoBlock.useGui == 1)
+	//{
+	    //Debug.
+		//refresh_screen(); 
+		//Obs: #bugbug perceba que o procedimento de janela do 
+		//sistema também tem um refresh screen.
+	//};	
+	
+	//return (unsigned long) apiDefDialog(window,msg,long1,long2);
+    return (unsigned long) 0;	
+};
 
 //isso é um test.
 //o tipo dois funciona.
@@ -121,6 +548,7 @@ void shellCreateTopBar()
     // edit box na topbar
     //
 	
+/*	
 	//o tipo 2 funciona.
 	topbar_editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-topbar-editbox1",     
                                        (iconMaxWidth*2) +20, 
@@ -138,7 +566,7 @@ void shellCreateTopBar()
 	};
 	    //Registrar.
     APIRegisterWindow(topbar_editboxWindow);
-	
+*/	
 	
 	
 	
@@ -148,6 +576,7 @@ void shellCreateTopBar()
     //
 	
 
+/*	
 	topbar_checkboxWindow = (void*) APICreateWindow( 5, 1, 1,"{}shell-topbar-checkbox1",     
                                        80, 
 									   80, 
@@ -164,7 +593,7 @@ void shellCreateTopBar()
 	};
 	    //Registrar.
     APIRegisterWindow(topbar_checkboxWindow);
-
+*/
 	
 	
 	
@@ -173,7 +602,7 @@ void shellCreateTopBar()
     // scroll bar na topbar
     //
 	
-
+/*
 	topbar_scrollbarWindow = (void*) APICreateWindow( 6, 1, 1,"{}shell-topbar-scrollbar",     
                                        (800-41), 
 									   0, 
@@ -190,7 +619,7 @@ void shellCreateTopBar()
 	};
 	    //Registrar.
     APIRegisterWindow(topbar_scrollbarWindow);
-
+*/
 	
 		
 	
@@ -223,6 +652,10 @@ loadFile:
 	bmpDisplayBMP( b, 2, 2, 16, 16 );	
 	bmpDisplayBMP( b, 2+16+2, 2, 16, 16 );		
 	*/	
+	
+	
+	
+	ShellFlag = SHELLFLAG_TOPBAR;
 };
 
 

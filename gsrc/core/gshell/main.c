@@ -98,6 +98,7 @@ int ShellFlag = 0;
 #define SHELLFLAG_HELP 3
 #define SHELLFLAG_VERSION 4
 #define SHELLFLAG_USAGE 5
+#define SHELLFLAG_TOPBAR 6
 //...
 
 
@@ -110,6 +111,12 @@ unsigned long shellProcedure( struct window_d *window,
                               int msg, 
 							  unsigned long long1, 
 							  unsigned long long2 );
+							  
+							  
+unsigned long shellTopbarProcedure( struct window_d *window, 
+                                    int msg, 
+							        unsigned long long1, 
+							        unsigned long long2 );
 							  
 
  
@@ -487,7 +494,7 @@ noArgs:
 	
 	//#bug bug
 	//enterCriticalSection();    // * Enter Critical Section.
-	shellCreateTopBar();
+	//shellCreateTopBar();
 	//exitCriticalSection();     // * Exit Critical section.	
 	
 	
@@ -764,11 +771,23 @@ noArgs:
 			//  CRIADAS PELO SISTEMA PODERÃO SER AFETADAS POR ESSE PROCEDIMENTO??
 			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
             //			
-		    shellProcedure( (struct window_d *) msg_Window, 
+		    
+			if( ShellFlag == SHELLFLAG_TOPBAR )
+			{
+			
+			    shellTopbarProcedure( (struct window_d *) msg_Window, 
+			                (int) msg_Message, 
+							(unsigned long) msg_Long1, 
+							(unsigned long) msg_Long2 );			
+			}else{
+				
+			    shellProcedure( (struct window_d *) msg_Window, 
 			                (int) msg_Message, 
 							(unsigned long) msg_Long1, 
 							(unsigned long) msg_Long2 );
 
+			};
+			
 		    //shellProcedure( msg->window, msg->msg, msg->long1, msg->long2 ); 
 							
 			//printf("Y-DEBUG: hwindow NULL\n"); //Deletar isso depois.
@@ -1717,6 +1736,14 @@ do_compare:
 		printf("done\n");
 		goto exit_cmp;
     }; 
+	
+	// pwd - print working directory
+	if( strncmp( prompt, "pwd", 3 ) == 0 )
+	{
+	    printf("~pwd - print working directory\n");
+        system_call(170,0,0,0);		
+	    goto exit_cmp;
+	};		
 
 	
     // reboot
@@ -2059,9 +2086,18 @@ void shellShell()
     //...
 	
 	
+	for( i=0; i<WORKINGDIRECTORY_STRING_MAX; i++ ){
+		current_workingdiretory_string[i] = (char) '\0';
+	};
+	
+    sprintf(current_workingdiretory_string,SHELL_UNKNOWNWORKINGDIRECTORY_STRING);    
+	
 	//...
 	
-done:	
+done:
+
+    ShellFlag = SHELLFLAG_COMMANDLINE;
+	
     //#bugbug
 	//Nossa referência é a moldura e não a área de cliente.
 	//@todo:usar a área de cliente como referência
@@ -2098,6 +2134,7 @@ int shellInit( struct window_d *window )
 	int ActiveWindowId = 0;
 	int WindowWithFocusId = 0;
 	void *P;
+	int CurrentVolumeID = 0;
 	
 	//
 	// #bugbug:
@@ -2379,7 +2416,18 @@ int shellInit( struct window_d *window )
 	// @todo: Clear client area.
 	//        System call redraw client area.
 	
+	
+	//test: get current volume id.
+	CurrentVolumeID = (int) system_call(171,0,0,0);		
 
+	printf("The current volume id is %d\n",CurrentVolumeID);
+	
+	// setup ID.
+	shellUpdateCurrentDirectoryID(SHELL_ROOTWORKINGDIRECTORY_ID);
+	
+	// updating the current working directory string.
+	shellUpdateWorkingDiretoryString(SHELL_ROOTWORKINGDIRECTORY_ID);
+	
 	
 done:
     //
@@ -2544,7 +2592,8 @@ void shellPrompt()
 
     printf("\n");	
 	//printf("\n %s", ++ user name  ++);
-	printf(SHELL_PROMPT);
+	//printf(SHELL_PROMPT);
+	printf("%s/%s",current_workingdiretory_string ,SHELL_PROMPT );
 	return;
 };
 
@@ -3189,6 +3238,46 @@ void die(char * str)
 	exit(1);
 }
 */
+
+void shellUpdateWorkingDiretoryString( int id )
+{
+    switch(id)
+    {
+		// ROOT
+		case 0:
+	        sprintf( current_workingdiretory_string, 
+	                 SHELL_ROOTWORKINGDIRECTORY_STRING ); 		
+		    break;
+
+		// BOOT	
+		case 1:
+	        sprintf( current_workingdiretory_string, 
+	                 SHELL_BOOTWORKINGDIRECTORY_STRING ); 		
+		    break;
+
+		// SYSTEM	
+		case 2:
+	        sprintf( current_workingdiretory_string, 
+	                 SHELL_SYSTEMWORKINGDIRECTORY_STRING ); 		
+		    break;
+
+		// UNKNOWN	
+		default:
+	        sprintf( current_workingdiretory_string, 
+	                 SHELL_UNKNOWNWORKINGDIRECTORY_STRING ); 		
+		    break;
+	};
+	
+    return;
+};
+
+
+// atualiza a variável global para id de diretório atual de trabalho.
+void shellUpdateCurrentDirectoryID( int id )
+{
+	g_current_workingdirectory_id = (id);
+};
+
 
 
 
