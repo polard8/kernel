@@ -1285,8 +1285,8 @@ exit:
  */
  
 #define LSH_TOK_DELIM " \t\r\n\a" 
-
 #define SPACE " "
+#define TOKENLIST_MAX_DEFAULT 80
  
 unsigned long shellCompare(struct window_d *window)
 {
@@ -1303,7 +1303,7 @@ unsigned long shellCompare(struct window_d *window)
     //printf("shellCompare: Testing ...\n");
     //refresh_screen();	
    
-    char *tokenList[80];
+    char *tokenList[TOKENLIST_MAX_DEFAULT];
     int i = 0;
 	int token_count;
 	
@@ -1631,6 +1631,15 @@ do_compare:
 		exit(0);
 		goto exit_cmp;
     };
+	
+    //getpid
+	if( strncmp( prompt, "getpid", 6 ) == 0 )
+	{
+	    shellShowCurrentPID();
+        goto exit_cmp;
+    };
+	
+	
 
 	// hd ??
 	// hd info maybe.
@@ -1751,6 +1760,7 @@ do_compare:
     if( strncmp( prompt, "reboot", 6 ) == 0 )
 	{
 	    printf("~reboot\n");
+		system("reboot");
 		goto exit_cmp;
     };
 	
@@ -1896,6 +1906,13 @@ do_compare:
         goto exit_cmp;
     };
 	
+	// tasklist - Lista informações sobre os processos.
+	if( strncmp( prompt, "tasklist", 8 ) == 0 )
+	{
+		shellTaskList();
+        goto exit_cmp;
+    };	
+	
 	// time
 	if( strncmp( prompt, "time", 4 ) == 0 )
 	{
@@ -1991,6 +2008,16 @@ palavra_nao_reservada:
 	return (unsigned long) 1;
 	
 exit_cmp:
+
+	// Limpando a lista de argumentos.
+	// Um array de ponteiros.
+	
+	for( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){
+		tokenList[i] = NULL;
+	};
+	
+	// Limpando o buffer de entrada
+	
 	shellPrompt();
 	//Mostrando as strings da rotina de comparação.	
 	refresh_screen(); 
@@ -2090,7 +2117,8 @@ void shellShell()
 		current_workingdiretory_string[i] = (char) '\0';
 	};
 	
-    sprintf(current_workingdiretory_string,SHELL_UNKNOWNWORKINGDIRECTORY_STRING);    
+    sprintf( current_workingdiretory_string, 
+	         SHELL_UNKNOWNWORKINGDIRECTORY_STRING );    
 	
 	//...
 	
@@ -2581,18 +2609,18 @@ int test_operators()
 void shellPrompt()
 {	
 	int i;
-	for(i=0; i<PROMPT_MAX_DEFAULT;i++){
+	
+	//Linpando o buffer de entrada.
+	for( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
 		prompt[i] = (char) '\0';
 	};
 	
     prompt[0] = (char) '\0';
 	prompt_pos = 0;
     prompt_status = 0;
-	prompt_max = 250;  //??	PROMPT_MAX_DEFAULT
+	prompt_max = PROMPT_MAX_DEFAULT;  
 
     printf("\n");	
-	//printf("\n %s", ++ user name  ++);
-	//printf(SHELL_PROMPT);
 	printf("%s/%s",current_workingdiretory_string ,SHELL_PROMPT );
 	return;
 };
@@ -2978,9 +3006,25 @@ void shellTestMBR()
 				 (unsigned long) 0,           //lba
 				 (unsigned long) 0);
 				 
-    shellRefreshScreen();
 	
 	exitCriticalSection();   
+	
+	//
+	// exibe o conteúdo carregado.
+	//
+	
+	//?? address #bugbug
+	printf("%s",&buffer[0]);
+	
+	//
+	// @todo: Sondar cada elemento do MBR para 
+	// confirmar a presença.
+	//
+	
+done:
+	printf("done");
+	refresh_screen(); //??
+	return;
 };
 
 
@@ -3279,5 +3323,65 @@ void shellUpdateCurrentDirectoryID( int id )
 };
 
 
+//lista informações sobre os processos.
+void shellTaskList()
+{
+	// opções:
+	// +podemos pedir para o kernel listar as informações.
+	// +podemos solicitar as informações uma a uma.
+	// Obs: A segunda opção é a mais trabalhosa, mas 
+	// da oportunidade para testarmos as chamadas ao kernel e 
+	// explorarmos as possibilidades que cada informação traz 
+	// individualmente.
+	//
+	
+	
+	// testando posicionamento de strings
+	
+	unsigned long X, Y;
+	int PID;
+
+	//Pega o PID do processo atual.
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
+	
+    //X = apiGetCursorX();
+	Y = apiGetCursorY();
+	
+	Y++;
+	X=0;
+	shellSetCursor(X,Y);	
+    printf("PID ");
+	X=8;
+	shellSetCursor(X,Y);
+	printf("XXXXXXXX");
+	
+	Y++;
+	X=0;
+	shellSetCursor(X,Y);
+    printf("====");
+	X=8;
+	shellSetCursor(X,Y);
+	printf("========");
+
+	Y++;
+	X=0;
+	shellSetCursor(X,Y);	
+    printf("%d",PID);
+	X=8;
+	shellSetCursor(X,Y);
+	printf("...");
+	
+    //...	
+	
+	
+    return;	
+};
+
+
+void shellShowCurrentPID()
+{
+	printf("Current PID %d\n", 
+	    (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0) );
+}
 
 

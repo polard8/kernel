@@ -586,6 +586,11 @@ void shell_memcpy_bytes( unsigned char *Dest,
  
 void shellUpdateCurrentDirectoryID( int id ); 
 void shellUpdateWorkingDiretoryString( int id ); 
+
+//lista informações sobre os processos.
+void shellTaskList();
+
+void shellShowCurrentPID();
  
 //
 // shelui.c
