@@ -386,6 +386,7 @@ int current_process;
 int current_thread;
 int current_disk;
 int current_volume;
+int current_directory;
 //...
 
 

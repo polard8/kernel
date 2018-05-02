@@ -210,6 +210,13 @@ int volume_init()
 	
 	
 	//
+	//  selecionando o primeiro volume,
+	// que deve ser o volume do vfs
+	//
+	current_volume = 0;
+	
+	
+	//
 	// @todo: More ??!
 	//
 

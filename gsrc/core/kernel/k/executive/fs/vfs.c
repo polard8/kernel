@@ -48,14 +48,16 @@ void vfsInit()
 	printf("Initilizing VFS lists ...\n");	
 #endif	
 	
+
+	
 	//
-	// Inicializando a lista de handles usada pelo vfs.
+	// Inicializando a lista de inodes usada pelo vfs.
 	//
 	
-	for( i=0; i<VFS_HANDLE_MAX; i++){
-		vfs_handle_list[i] = (unsigned long) 0;
+	for( i=0; i<VFS_MAX_INODES; i++){
+		inode_list[i] = (unsigned long) 0;
 	}
-
+	
 	
 	//
 	// Inicializando a lista de entradas de diretório usada pelo vfs.
@@ -65,14 +67,12 @@ void vfsInit()
 		directory_entry_list[i] = (unsigned long) 0;
 	}
 	
-	
-	
 	//
-	// Inicializando a lista de inodes usada pelo vfs.
+	// Inicializando a lista de handles usada pelo vfs.
 	//
 	
-	for( i=0; i<VFS_MAX_INODES; i++){
-		inode_list[i] = (unsigned long) 0;
+	for( i=0; i<VFS_HANDLE_MAX; i++){
+		vfs_handle_list[i] = (unsigned long) 0;
 	}
 	
 	
@@ -85,6 +85,10 @@ void vfsInit()
 	// /objectskm /objectsum /objectsgui
 	//
 	
+	
+	//
+	// (0)
+	//
 
 	// inode 0.
 	struct ext2_inode_d *i0;
@@ -162,7 +166,9 @@ void vfsInit()
 	};
 	
 	
-	
+	//
+	// (1)
+	//
 	
 
 	// inode 1.
@@ -241,7 +247,9 @@ void vfsInit()
 	};
 		
 	
-	
+	//
+	// (1)
+	//	
 	
 	// inode 2.
 	struct ext2_inode_d *i2;
@@ -320,14 +328,7 @@ void vfsInit()
 		
 		
 	
-	// Colocando as três listas de objetos na lista de handles do vfs.
-	vfs_handle_list[0] = (unsigned long) &objects_km[0];
-	vfs_handle_list[1] = (unsigned long) &objects_um[0];
-	vfs_handle_list[2] = (unsigned long) &objects_gui[0];
-	
-	
-	
-	
+
 	//
 	// Disco do sistema.
 	//
@@ -411,7 +412,37 @@ void vfsInit()
 	};
 		
 	
+	//
+	// #importante: Colocando nas listas.
+	//
+	
+	//lista de inodes
+	inode_list[0] = (unsigned long) i0;	
+	inode_list[1] = (unsigned long) i1;
+	inode_list[2] = (unsigned long) i2;
+	inode_list[3] = (unsigned long) system_disk_inode;
+	
+	//lista de entradas
+	directory_entry_list[0] = (unsigned long) e0;
+	directory_entry_list[1] = (unsigned long) e1;
+	directory_entry_list[2] = (unsigned long) e2;
+	directory_entry_list[3] = (unsigned long) system_disk_directory_entry;
+	
+	// Colocando as três listas de objetos na lista de handles do vfs.
+	vfs_handle_list[0] = (unsigned long) h0;
+	vfs_handle_list[1] = (unsigned long) h1;
+	vfs_handle_list[2] = (unsigned long) h2;
+	vfs_handle_list[3] = (unsigned long) system_disk_vfs_handle;
 
+	
+	
+	//
+	//  selecionando o primeiro diretório,
+	// que deve ser o volume do vfs
+	//
+	
+	current_directory = 0;
+	
 	//
 	// #importante
 	// É possivel fazer mais inicializações.
@@ -442,8 +473,10 @@ void vfs_show_handle_list()
 		
 		if( (void*) h != NULL )
         {
-			if( h->used ==  1 && h->magic == 1234 ){
-		        printf("%d = { %s }\n", h->id, h->name );		
+			if( h->used ==  1 && h->magic == 1234 )
+			{
+				//#bugbug Cuidado.
+		        //printf("%d = { %s }\n", h->id, h->name );		
 			}
 		}			
 	};
@@ -453,4 +486,139 @@ void vfs_show_handle_list()
 };
 
 
+/*
+ * Monstrndo informações sobre VFS.
+ */
+void vfsShowVFSInfo()
+{
+	int i;
+	
+	//#bugbug
+	//@todo: Checar a validade da estrutura antes
 
+    //
+	// Informações sobre a estrutura do sistema de arquivos.
+	//
+	
+	printf("\nfs-vfsShowVFSInfo:\n\n");	
+	
+	printf("VFS INFO:\n");
+	
+	printf("used={%d} magic={%d} ", VFS_INFO.used, VFS_INFO.magic);	
+	printf("Status={%d} ",          VFS_INFO.status);
+	printf("name={%s} ",            VFS_INFO.name);
+	printf("description={%s} ",     VFS_INFO.description);
+	printf("helpString={%s} ",      VFS_INFO.help_string);
+	//printf("name={%x}\n",           VFS_INFO.vfs); 
+
+
+	struct vfs_handle_d      *Handle;	
+	struct ext2_dir_entry_d  *Entry;
+	struct ext2_inode_d      *INode;
+	
+    //
+	// Lista de handles 
+	// manipuladores de arquivos presentes no diretório raiz do vfs.
+	//
+	
+	printf("VFS handles:\n");
+	
+	for( i=0; i<VFS_HANDLE_MAX; i++)
+	{
+		Handle = (struct vfs_handle_d *) vfs_handle_list[i]; 
+		
+		if( Handle != NULL )
+		{
+			printf("%d %d %d %d ", Handle->id, Handle->used, Handle->magic, Handle->status );
+		    printf("dirEntry={%x}\n",Handle->directory_entry );
+		}
+	}		
+	
+	//
+    // Lista de entradas de diretório 
+    //	
+
+	printf("VFS ext2 entries:\n");
+	
+	for( i=0; i<VFS_MAX_ENTRIES; i++)
+	{
+        Entry = (struct ext2_dir_entry_d *) directory_entry_list[i];
+		if( Entry != NULL )
+		{
+			//#bugbug Cuidado com o nome. #PF
+			printf("inode={%d} dlen={%d} nlen={%d} fileType={%d} name={%s}\n", 
+			    Entry->inode, 
+				Entry->rec_len, 
+				Entry->name_len, 
+				Entry->file_type, 
+				Entry->name );
+		}
+
+	}
+	
+	//
+	// Lista de inodes.
+	//
+
+	printf("VFS ext2 inodes:\n");
+	
+	for( i=0; i<VFS_MAX_INODES; i++)
+	{
+		INode = (struct ext2_inode_d *) inode_list[i];
+		if( INode != NULL )
+		{
+			printf("%d %d %d %d ", INode->i_mode, 
+			                        INode->i_uid, 
+									INode->i_size, 
+									INode->i_atime );
+									
+		    printf("%d %d %d %d ", INode->i_ctime, 
+			                        INode->i_mtime, 
+									INode->i_dtime, 
+									INode->i_gid );
+									
+			printf("%d %d %d %d ", INode->i_links_count, 
+			                        INode->i_blocks, 
+									INode->i_flags, 
+									INode->osd1 );
+									
+			printf("gen={%d} facl={%x} dacl={%x} fadd={%x}\n", INode->i_generation, 
+			                                                   INode->i_file_acl, 
+															   INode->i_dir_acl, 
+															   INode->i_faddr );
+		}
+
+	};	
+	
+done:	
+    printf("done\n");	
+	refresh_screen();
+	return;
+};
+
+
+
+
+//lista os nomes dos arquivos no diretório raiz do vfs.
+void vfsListFiles()
+{
+    int i;
+	struct ext2_dir_entry_d *Entry;
+	
+	printf("\n");
+	
+	for( i=0; i<VFS_MAX_ENTRIES; i++ )
+	{
+        Entry = (struct ext2_dir_entry_d *) directory_entry_list[i];
+		if( Entry != NULL )
+		{
+			printf("inode={%d} fileType={%d} name={%s}\n", 
+			    Entry->inode, 
+				Entry->file_type, 
+				(const char*) Entry->name );
+		}
+	}
+	
+	refresh_screen();
+	return;
+};

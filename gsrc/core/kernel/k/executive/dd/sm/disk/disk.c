@@ -114,6 +114,14 @@ int disk_init()
 		
 		disk_conductor->disk_info = (struct diskinfo_d *) diskinfo_conductor;
 	};	
+	
+	
+	//
+	//  selecionando o primeiro disco,
+	// que deve ser o volume do vfs
+	//
+	current_disk = 0;
+
 		
     //
 	//@todo: Nothing more ?!!

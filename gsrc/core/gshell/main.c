@@ -1594,8 +1594,18 @@ do_compare:
 	// Lista os arquivos no estilo DOS.
 	if( strncmp( prompt, "dir", 3 ) == 0 )
 	{
-	    printf("~dir\n");
-		//fs_show_dir(0); 
+		//
+		// @todo: get set disk id e directory id.
+		//
+
+        printf("~dir \n");		
+        
+		//#test 
+		//173 Lista arquivos de um diretório, dado o número do disco,
+        //o número do volume e o número do diretório,	
+        system_call(173,0,0,0);		
+		
+		printf("~done\n");
         goto exit_cmp;
     };
 	

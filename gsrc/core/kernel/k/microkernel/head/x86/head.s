@@ -75,36 +75,7 @@ segment .head_x86
 [bits 32]
 
 
-
-;; ============================================================
-;;
-;;
-;;    ****    Bootloader standard: Multiboot Specification.    ****
-;;
-;; Multiboot header.
-;; The Multiboot header must be contained completely within the first 32768 
-;; bytes of the OS image, and must be 64-bit aligned.
-;;
-;; section .multiboot_header
-;; header_start:
-;;    dd 0xe85250d6                ; magic number (multiboot 2)
-;;    dd 0                         ; architecture 0 (protected mode i386)
-;;    dd header_end - header_start ; header length
-;;    ; checksum
-;;    dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
-;;
-;;    ; insert optional multiboot tags here
-;;
-;;    ; required end tag
-;;    dw 0    ; type
-;;    dw 0    ; flags
-;;    dd 8    ; size
-;;header_end:
-;;
-;; ============================================================
-
-
-
+ 
 
 ;
 ; Variáveis importadas.
@@ -209,6 +180,7 @@ KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
 ;...
 
 
+
 ;=================================================================
 ; _kernel_begin:   (wCode)
 ;    Entry point do Kernel.
@@ -229,9 +201,106 @@ KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
 ;       edx = LoaderBlock pointer.
 ;
 
+
+
 ;; <head>
 global _kernel_begin              
 _kernel_begin:
+    jmp mboot_end
+
+	;;
+	;; @todo: 
+	;; Seguir a 'multiboot specification'.
+	;; O objetivo é que o Gramado Boot também 
+	;; utilize as informações que existem aqui no header. 
+	;; Porém o entry point agora será depois do header.
+	;; Eu acho. 
+	;;
+	;; Obs:
+	;; O gramado Boot precisa carregar vários arquivos antes 
+	;; de carregar o kernel, e faz a configuração inicial 
+	;; de memória e de modo de vídeo.
+    ;;
+    ;; #importante:
+    ;; Se o kernel for carregado pelo multiboot ele 
+    ;; inicializará sem os argumentos enviados pelo 
+    ;; pelo Gramado Boot, então o kernel terá que fazer 
+    ;; uma inicialização diferente, provavelmente em modo texto.
+    ;; Talvez o kernel não funcione completamente se inicializado
+    ;; com o multiboot. isso não é problema, pois estamos 
+    ;; apenas implementando as primeiras tentativas de usarmos 
+    ;; o multiboot.	
+	;;
+	
+    ;The only problem with loading the PE format is that GRUB 
+	;doesn't know how to parse it and you will have to provide 
+	;it quite a bit of information on how to load it and where to jump too. 
+    ;You can make grub load any file format by using the aout kludge. 
+	;This uses additional fields at the end of the Multiboot header, like this: 
+	
+;	
+;	+-------------------+
+;0	| magic: 0x1BADB002 |	(required)
+;4	| flags		        |	(required)
+;8	| checksum	        |	(required)
+;	+-------------------+
+;8	| header_addr	    |	(present if flags[16] is set)
+;12	| load_addr	        |	(present if flags[16] is set)
+;16	| load_end_addr	    |	(present if flags[16] is set)
+;20	| bss_end_addr	    |	(present if flags[16] is set)
+;24	| entry_addr	    |	(present if flags[16] is set)
+;	+-------------------+
+;
+
+;header_addr -- Contains the address corresponding to the beginning of 
+;the multiboot_header - the physical memory location at which the 
+;magic value is supposed to be loaded. This field serves to 
+;"synchronize" the mapping between OS image offsets and physical memory addresses.
+
+;load_addr -- Contains the physical address of the beginning of 
+;the text segment. The offset in the OS image file at which to 
+;start loading is defined by the offset at which the header was found, 
+;minus (header_addr - load_addr). load_addr must be less than or equal to header_addr.
+
+;load_end_addr -- Contains the physical address of the end of the data segment. 
+;(load_end_addr - load_addr) specifies how much data to load. 
+;This implies that the text and data segments must be consecutive in the OS image; 
+;this is true for existing a.out executable formats.
+
+;bss_end_addr -- Contains the physical address of the end of the bss segment. 
+;The boot loader initializes this area to zero, and reserves the memory it 
+;occupies to avoid placing boot modules and other data relevant to the OS in that area.
+
+;entry -- The physical address to which the boot loader should jump in order 
+;to start running the OS.
+
+	;; Multiboot support.
+    MULTIBOOT_PAGE_ALIGN   equ 1<<0
+    MULTIBOOT_MEMORY_INFO  equ 1<<1
+    MULTIBOOT_AOUT_KLUDGE  equ 1<<16
+
+    MULTIBOOT_HEADER_MAGIC equ 0x1BADB002
+    MULTIBOOT_HEADER_FLAGS equ MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO | MULTIBOOT_AOUT_KLUDGE
+    CHECKSUM               equ -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
+
+    extern _code_begin
+	extern _data_end
+	extern _bss_end
+	
+	; The Multiboot header
+align 4
+mboot_start:
+    dd MULTIBOOT_HEADER_MAGIC
+    dd MULTIBOOT_HEADER_FLAGS
+    dd CHECKSUM
+    ; fields used if MULTIBOOT_AOUT_KLUDGE is set in MULTIBOOT_HEADER_FLAGS
+    dd mboot_start    ; these are PHYSICAL addresses
+    dd _code_begin    ; start of kernel .text (code) section
+    dd _data_end      ; end of kernel .data section
+    dd _bss_end       ; end of kernel BSS
+    dd _kernel_begin  ; kernel entry point (initial EIP)
+ mboot_end:
+
 
 
     ;Debug.
@@ -277,11 +346,6 @@ _kernel_begin:
 	;call _gui_buffer_putpixel
 	;call _asm_refresh_screen    ;refresh
 	;jmp $
-	
-	
-	;;
-	;; @todo: Seguir a 'multiboot specification'.
-	;;
 
     	
 	;;
@@ -299,6 +363,20 @@ _kernel_begin:
 	;
 	; **** EAX = MAGIC  **** 0x36d76289
 	;
+	
+	;;se estivermos no modo gráfico.
+	cmp al, byte 'G'
+    je .useGUI
+
+
+	mov byte [0xb8000], byte "t"	
+    mov byte [0xb8001], byte 9	
+    mov byte [0xb8002], byte "m"	
+    mov byte [0xb8003], byte 9	
+
+.nogui_hang:	
+    hlt
+	jmp .nogui_hang
 	
 	;imperativo
 	;mov al, byte 'T'

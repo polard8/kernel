@@ -570,11 +570,16 @@ unsigned long system_procedure( struct window_d *window,
 					
 					break;
 				
-                //Clock info./minishell				
+                //testes				
 				case VK_F6:
+				
+				     //vfsListFiles();
 				    
-					ata_initialize();
-					show_ide_info(); //(#teste)
+					//vfsShowVFSInfo();
+					
+					//#test testando inicialização do IDE, #funcionou.
+					//ata_initialize();
+					//show_ide_info(); //(#teste)
 					
 					//if(AltStatus == 1){ window_with_focus = 6; break;};
 					//if(CtrlStatus == 1){ active_window = 6; break;};

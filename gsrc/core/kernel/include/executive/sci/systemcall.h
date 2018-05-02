@@ -282,11 +282,13 @@
 #define	SYS_167 167
 #define	SYS_168 168
 #define	SYS_169 169
+//#importante
 //fs - gerenciamento de arquivos e fs.
+//@todo: get set disk id e directory id.
 #define	SYS_PWD 170                 // Print Working Directory.
 #define	SYS_GETCURRENTVOLUMEID 171  // Get current volume id.
 #define	SYS_SETCURRENTVOLUMEID 172  // configura o id do volume atual.
-#define	SYS_173 173
+#define	SYS_LISTFILES          173  // Listar os arquivos do diretório atual.
 #define	SYS_174 174
 #define	SYS_175 175
 #define	SYS_176 176

@@ -7,17 +7,14 @@
 // 
 
 
-#define VHS_DIR_ROOT         '/root'  
-#define VHS_DIR_BOOT         '/root/boot' // boot files
-#define VHS_DIR_BIN          '/root/bin'  // binary programs.
-#define VHS_DIR_DEV          '/root/dev'  // i/o devices.
-#define VHS_DIR_ETC          '/root/etc'  // misc
-#define VHS_DIR_LIB          '/root/lib'  // libraries
-#define VHS_DIR_OBJECTS      '/root/objects'  // gerenciador de objetos.
-#define VHS_DIR_TMP          '/root/tmp'  // tmp
-#define VHS_DIR_USER         '/root/user' // users
-#define VHS_DIR_DEFAULTUSER  '/root/user/default' // default user
-//...  
+#define VHS_DIR_ROOT         'root:' 
+#define VHS_DIR_ETC          'root:/etc'  // misc
+#define VHS_DIR_OBJECTS      'root:/objects'  // gerenciador de objetos.
+#define VHS_DIR_TMP          'root:/tmp'      // tmp 
+//...
+
+
+
 
 // Ex: 
 //
@@ -140,7 +137,9 @@ unsigned long directory_entry_list[VFS_MAX_ENTRIES];
 #define VFS_HANDLE_MAX 512
 
 
-//manipulador das entradas de diretório do vfs.
+// manipulador das entradas de diretório do vfs.
+// Essa estrutura existe para termos informações extras 
+// além das poucas oferecidadas por uma entrada de ext2 padrão.
 typedef struct vfs_handle_d vfs_handle_t;
 struct vfs_handle_d
 {
@@ -285,9 +284,12 @@ struct vfs_info_d
     // diretório raiz.    
     struct dir_d *vfs;  	
 };
+// Essa é estrutura de informações sobre o VFS.
+// Assim mesmo sem ponteiro.
+struct vfs_info_d VFS_INFO; 
 
-//Assim mesmo sem ponteiro.
-struct vfs_info_d VFS_INFO;
+
+
 
 //
 // O sistema de arquivos virtual sendo tratado como se fosse 
@@ -302,5 +304,7 @@ struct dir_d *vfs;
 
 void vfsInit();
 void vfs_show_handle_list();
+void vfsShowVFSInfo();
+void vfsListFiles();
 
 

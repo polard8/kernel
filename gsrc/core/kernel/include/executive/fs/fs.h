@@ -18,6 +18,33 @@
  // Path support
  //
 
+// Diretório raiz dos volumes principais.
+#define FS_DIR_VFS    'root:/volume0'  // raiz do vfs
+#define FS_DIR_BOOT   'root:/volume1'  // raiz do volume de boot
+#define FS_DIR_SYSTEM 'root:/volume2'  // raiz do volume do sistema
+//...
+
+// Arquivos no volume de boot.
+// Obs: O volume de boot só terá o diretório raiz.
+#define FS_DIR_BM      'root:/volume1/BM.BIN'       // boot manager
+#define FS_DIR_BL      'root:/volume1/BL.BIN'       // boot loader
+#define FS_DIR_KERNEL  'root:/volume1/KERNEL.BIN'   // kernel
+#define FS_DIR_INIT    'root:/volume1/INIT.BIN'     // init
+#define FS_DIR_SHELL   'root:/volume1/SHELL.BIN'    // shell
+#define FS_DIR_TASKMAN 'root:/volume1/TASKMAN.BIN'  // task manager
+#define FS_DIR_INITTXT 'root:/volume1/INIT.TXT'     // init txt
+//...  
+
+
+// Diretórios no volume do sistema. 
+#define FS_DIR_BIN          'root:/volume2/bin'          // binary programs.
+#define FS_DIR_DEV          'root:/volume2/dev'          // i/o devices.
+#define FS_DIR_LIB          'root:/volume2/lib'          // libraries
+#define FS_DIR_USER         'root:/volume2/user'         // users
+#define FS_DIR_DEFAULTUSER  'root:/volume2/user/default' // default user
+
+
+
  
 #define FS_MAX_NAME_LENGHT (8+3)   // Max name lenght.   8.3
 #define PS1                '/'     // Primary path separator.
@@ -824,6 +851,11 @@ void MountShortFileName(char *buffer, struct dir_entry_d *entry);
 void fs_check_disk();
 
 void fsCreateVFS();
+
+void fsListFiles( int disk_id, 
+                  int volume_id, 
+				  int directory_id );
+				  
 //
 // End.
 //

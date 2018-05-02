@@ -51,6 +51,54 @@
 //...
 
 
+				  
+void fsListFiles( int disk_id, 
+                  int volume_id, 
+				  int directory_id )
+{
+	printf("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
+	    disk_id, volume_id, directory_id);
+
+    //
+	// @todo: Checar mais limites.
+	//
+	
+	if( disk_id == -1 || 
+	    volume_id == -1 || 
+		directory_id == -1 )
+	{
+		goto fail;	
+	}
+	
+	
+	//
+	// Show!
+	//
+	
+	
+	//
+	// Se o diretório selecionado é o diretório raiz 
+	// do VFS.
+	//
+	
+	if( current_disk == 0 && 
+	    current_volume == 0 &&
+		current_directory == 0 )
+	{
+	    vfsListFiles();
+        goto done;		
+	};
+	
+	// @todo: Suportar outros diretórios.
+	// ...
+	
+fail:
+    printf("fail\n");
+done:	
+	refresh_screen();
+};
+
+
 /*
  * fsCreateVFS:
  * 
@@ -749,6 +797,18 @@ int fsInit()
 	
 	vfsInit();
 	
+	
+	
+	//selecionando disco, volume e diretório.
+	//estamos resetando tudo e selecionando o diretório raiz 
+	//do vfs ... mas na verdade o diretório selecionado 
+	//deveria ser o diretório onde ficam a maioria dos aplicativos.
+	//para que o usuário possa chamar o maior número de apps usando 
+	//apenas comandos simples.
+    //#bugbug: isso deveria se passado pelo boot ??	
+	current_disk = 0;
+	current_volume = 0;
+	current_directory = 0;
 	
 	//
 	// @todo: Continua ...

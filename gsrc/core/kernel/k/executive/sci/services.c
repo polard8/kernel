@@ -873,7 +873,15 @@ void *services( unsigned long number,
 		case SYS_SETCURRENTVOLUMEID:
 		    //#bugbug: Estamos modificando, sem aplicar nenhum filtro.
 		    current_volume = (int) arg2;
-            break;				
+            break;	
+
+		//173 Lista arquivos de um diretório, dado o número do disco,
+        //o número do volume e o número do diretório,		
+        case SYS_LISTFILES:
+            fsListFiles( arg2,   //disk id 
+			             arg3,   //volume id
+						 arg4);  //directory id
+			break;		
 			
 
 		//199 - Garbage Collector.	
