@@ -268,9 +268,9 @@
 #define	SYS_GETCURRENTGROUPID  154
 #define	SYS_UPDATEUSERINFO     155
 #define	SYS_SHOWUSERINFO       156
-#define	SYS_157 157
-#define	SYS_158 158
-#define	SYS_159 159
+#define	SYS_GETCURRENTUSERSESSION   157 //user session
+#define	SYS_GETCURRENTWINDOWSTATION 158 //window station
+#define	SYS_GETCURRENTDESKTOP       159 //desktop
 //network support
 #define	SYS_160 160
 #define	SYS_161 161

@@ -1292,6 +1292,9 @@ unsigned long shellCompare(struct window_d *window)
 {
     unsigned long ret_value;
 	
+	// O input pode ser copiado aqui, então manipularemos essa variável.
+	//char *FileName;
+	
 	//
 	// ?? E se tivermos várias palavras na linha de comando ??
 	//
@@ -1645,12 +1648,63 @@ do_compare:
     //getpid
 	if( strncmp( prompt, "getpid", 6 ) == 0 )
 	{
-	    shellShowCurrentPID();
+	    shellShowPID();
+        goto exit_cmp;
+    };
+	
+    //getppid
+	if( strncmp( prompt, "getppid", 7 ) == 0 )
+	{
+	    shellShowPPID();
         goto exit_cmp;
     };
 	
 	
+    //getuid get user id
+	if( strncmp( prompt, "getuid", 6 ) == 0 )
+	{
+	    shellShowUID();
+        goto exit_cmp;
+    };
+	
+	
+    //getgid - get group id
+	if( strncmp( prompt, "getgid", 6 ) == 0 )
+	{
+	    shellShowGID();
+        goto exit_cmp;
+    };
+	
+    //get-usersession
+	if( strncmp( prompt, "get-usersession", 15 ) == 0 )
+	{
+	    shellShowUserSessionID();
+        goto exit_cmp;
+    };
+	
+	
+    //get-windowstation
+	if( strncmp( prompt, "get-windowstation", 17 ) == 0 )
+	{
+	    shellShowWindowStationID();
+        goto exit_cmp;
+    };
+	
+    //get-desktop
+	if( strncmp( prompt, "get-desktop", 11 ) == 0 )
+	{
+	    shellShowDesktopID();
+        goto exit_cmp;
+    };
+	
+    //get-heappointer
+	if( strncmp( prompt, "get-heappointer", 15 ) == 0 )
+	{
+	    shellShowProcessHeapPointer();
+        goto exit_cmp;
+    };
 
+	
 	// hd ??
 	// hd info maybe.
     if( strncmp( prompt, "hd", 2 ) == 0 )
@@ -2063,27 +2117,26 @@ void shellShell()
 	// Para ficar mais rápido.
 	//
 	
-	//window position
-	//shell_window_x = DEFAULT_WINDOW_X;
-	//shell_window_y = DEFAULT_WINDOW_Y;
-	shell_window_x = (800/8);
-	shell_window_y = (600/4); //depois da barra
-
+	//
+	// Usar o get system metrics para pegar o tamanho da tela.
+	//
 	
+	// Tamanho da tela.	
 	//screen sizes
-	shellScreenWidth  = (800/8)*6;
-    shellScreenHeight = (600/4)*2;   
+	shellScreenWidth  = apiGetSystemMetrics(1);
+    shellScreenHeight = apiGetSystemMetrics(2); 	
 	
-	//window height
-	//shellWindowWidth = (DEFAULT_MAX_COLUMNS*8);
-    //shellWindowHeight = (DEFAULT_MAX_ROWS*8);
+	//Tamanho da janela do shell	
+	shellWindowWidth = 640;
+	shellWindowHeight = 480; 
 	
-	shellWindowWidth = (800/8)*6;
-	shellWindowHeight = (600/4)*2;   
+	//window position
+	shell_window_x = (unsigned long) ( (shellScreenWidth - shellWindowWidth)/2 );
+	shell_window_y = (unsigned long) ( (shellScreenHeight - shellWindowHeight)/2 );   
 	
-    shellMaxColumns = DEFAULT_MAX_COLUMNS;  // 80;
-    shellMaxRows    = DEFAULT_MAX_ROWS;     // 25;
-
+    shellMaxColumns = DEFAULT_MAX_COLUMNS;  // 80; shellWindowWidth/8
+    shellMaxRows    = DEFAULT_MAX_ROWS;     // 25; shellWindowHeight/8
+ 
     //...	
 
 	//
@@ -3388,10 +3441,58 @@ void shellTaskList()
 };
 
 
-void shellShowCurrentPID()
+void shellShowPID()
 {
 	printf("Current PID %d\n", 
 	    (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0) );
 }
 
 
+void shellShowPPID()
+{
+	printf("Current PID %d\n", 
+	    (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0) );
+}
+
+
+void shellShowUID()
+{
+	printf("Current UID %d\n", 
+	    (int) system_call( SYSTEMCALL_GETCURRENTUSERID, 0, 0, 0) );
+}
+
+
+void shellShowGID()
+{
+	printf("Current GID %d\n", 
+	    (int) system_call( SYSTEMCALL_GETCURRENTGROUPID, 0, 0, 0) );
+}
+
+
+void shellShowUserSessionID()
+{
+	printf("Current user session %d\n", 
+	    (int) system_call( SYSTEMCALL_GETCURRENTUSERSESSION, 0, 0, 0) );
+}
+
+
+void shellShowWindowStationID()
+{
+	printf("Current window station %d\n", 
+	    (int) system_call( SYSTEMCALL_GETCURRENTWINDOWSTATION, 0, 0, 0) );
+}
+
+
+void shellShowDesktopID()
+{
+	printf("Current desktop %d\n", 
+	    (int) system_call( SYSTEMCALL_GETCURRENTDESKTOP, 0, 0, 0) );
+}
+
+void shellShowProcessHeapPointer()
+{
+	int id = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0); 
+	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, id, 0, 0);
+	
+	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
+};

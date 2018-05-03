@@ -2,6 +2,10 @@
  * File: request.h 
  *
  * Descrição:
+ *     ( Deferred Kernel Service )
+ *     A execução de alguns serviços podem ser adiadas por um tempo
+ * e depois atendidas por essa rotina.
+ *
  *     Request manager.
  *     Header para a central de requests do kernel.
  *     Um request é uma forma de sinal, mas exclusivo para o kernel base.

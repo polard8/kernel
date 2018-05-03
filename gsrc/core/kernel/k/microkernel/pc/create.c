@@ -331,6 +331,7 @@ done:
  *******************************************************************
  * KiCreateIdle:
  *     Criando Idle thread manualmente.
+ *
  * *IMPORTANTE: Na verdade esse processos e threads devem ser criados 
  * com uma funçao que passe os parametros via argumento, tipo 
  * create_process create_thread. Exceto a idle que pode ser feita manualmente. 
@@ -345,12 +346,12 @@ void *KiCreateIdle()
 	
     //Aloca memória mara a estrutura.
 	IdleThread = (void*) malloc( sizeof(struct thread_d) );	
-	if( (void*) IdleThread == NULL ){
+	if( (void*) IdleThread == NULL )
+	{
 	    printf("pc-create-KiCreateIdle: IdleThread\n");
 		die();
-	}
-	else
-	{ 
+	}else{
+		
 	    //Ver se a estrutura do processo é válida.
 		if( (void*) KernelProcess == NULL ){
 	        printf("pc-create-KiCreateIdle: KernelProcess\n");
@@ -364,13 +365,14 @@ void *KiCreateIdle()
 	};
 
 	//
-	// @todo: bugbug; A stack da idle não deve ficar no heap do kernel.
-	//                Pois a idle está em user mode e 
-	//                deve ter sua stack em user mode
-	//                para ter permissão de acesso.
-	//                Mas ficará aqui por enquanto.
-	//                Obs: Mais abaixo a pilha foi configurada 
-	//                     manualmente no lugar certo.
+	// @todo: 
+	// #bugbug: #importante
+	// A stack da idle não deve ficar no heap do kernel.
+	// Pois a idle está em user mode e deve ter sua stack 
+	// em user mode para ter permissão de acesso.
+	// Mas ficará aqui por enquanto.
+	// Obs: Mais abaixo a pilha foi configurada manualmente 
+	// no lugar certo.
 	//
 	
 	//IdleThread->Heap = ?;

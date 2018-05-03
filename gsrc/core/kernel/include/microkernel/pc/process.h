@@ -242,7 +242,7 @@ typedef enum {
  *          O kernel precisa alocar memória para Heap e Stack dos processos.
  *          //...
  */
-typedef struct process_d process_descriptor_t;
+typedef struct process_d process_t;
 struct process_d 
 {
 	object_type_t objectType;
@@ -769,21 +769,21 @@ struct process_d
 };
 
 //Os quatro principais processos.
-process_descriptor_t *KernelProcess;     //PID=0.   Ok.
-process_descriptor_t *InitProcess;       //PID=100. ?
-process_descriptor_t *ShellProcess;      //PID=101. ?
-process_descriptor_t *TaskManProcess;    //PID=103. ?
+struct process_d *KernelProcess;     //PID=0.   Ok.
+struct process_d *InitProcess;       //PID=100. ?
+struct process_d *ShellProcess;      //PID=101. ?
+struct process_d *TaskManProcess;    //PID=103. ?
 
 //Outros.
-process_descriptor_t *Process;           //Current.
-process_descriptor_t *idle_proc;           //Iddle. //@todo: deletar
-process_descriptor_t *cur_process;         //Current.
+struct process_d *Process;           //Current.
+struct process_d *idle_proc;           //Iddle. //@todo: deletar
+struct process_d *cur_process;         //Current.
 
 //Lista encadeada de processos.
-process_descriptor_t *process_Conductor2;
-process_descriptor_t *process_Conductor;
-process_descriptor_t *process_rootConductor;
-process_descriptor_t *CurrentProcess;    //Current.
+struct process_d *process_Conductor2;
+struct process_d *process_Conductor;
+struct process_d *process_rootConductor;
+struct process_d *CurrentProcess;    //Current.
 
 //Genérico.
 //process_descriptor_t *PCB;
@@ -825,8 +825,8 @@ typedef struct proc_list_d proc_list_t;
 struct proc_list_d
 {
 	unsigned long len;
-	process_descriptor_t *head;
-	process_descriptor_t *tail;
+	struct process_d *head;
+	struct process_d *tail;
 	
 }; 
 proc_list_t *system_procs;      //Processos do sistema.
@@ -882,7 +882,12 @@ void SetProcessDirectory(struct process_d *process, unsigned long Address);
 // Process support.
 //
 
-unsigned long GetProcessHeapStart(struct process_d *process);
+unsigned long 
+GetProcessHeapStart( int pid );
+
+unsigned long 
+GetProcessPageDirectoryAddress( int pid );
+
 
 int processTesting(int pid);
 
@@ -890,15 +895,15 @@ void init_processes();
 void show_process_information();
 
 
-process_descriptor_t *create_process( struct wstation_d *window_station,
-                                    struct desktop_d  *desktop,
-                                    struct window_d *window,
-                                    unsigned long init_eip, 
-                                    unsigned long priority, 
-									int ppid, 
-									char *name,
-									unsigned long iopl,
-                                    unsigned long directory_address );
+struct process_d *create_process( struct wstation_d *window_station,
+                                  struct desktop_d  *desktop,
+                                  struct window_d *window,
+                                  unsigned long init_eip, 
+                                  unsigned long priority, 
+								  int ppid, 
+								  char *name,
+								  unsigned long iopl,
+                                  unsigned long directory_address );
 									
 //Finalizações.
 void CloseAllProcesses();									

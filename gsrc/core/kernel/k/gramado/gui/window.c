@@ -163,7 +163,38 @@ void printQueue(circularQueue_t *theQueue)
  **************************************
 */ 
 
+//retorna o id de uma janela.
+int windowGetWindowID( struct window_d *window)
+{
+	if( (void*) window != NULL )
+	{
+		if( window->used == 1 && window->magic == 1234 ){
+		    return (int) window->id; 	
+		}
+	};
+	
+fail:
+	return (int) -1;
+};
 
+
+// Pegar o id da janela main.
+// Para os aplicativos lidarem com a área de trabalho. 
+int windowGetMainWindowDescriptor()
+{	
+	if( (void*) gui == NULL ){
+		goto fail;
+	}else{
+		
+		if( (void*) gui->main == NULL ){
+		    goto fail;
+		}
+		return (int) gui->main->id;
+	};
+	
+fail:	
+	return (int) -1;
+};
 
 /*
  * windowInitializeBrowserSupport:

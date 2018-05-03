@@ -858,6 +858,31 @@ void *services( unsigned long number,
 			setClientAreaRect( arg2, arg3, arg4, 0);
             break;
 			
+		//152 - get user id	
+		case SYS_GETCURRENTUSERID:
+		    return (void*) current_user;
+			break;			
+		
+		//154 - get group id	
+		case SYS_GETCURRENTGROUPID:
+		    return (void*) current_group;
+			break;
+			
+		//157 - get user session id	
+		case SYS_GETCURRENTUSERSESSION:
+		    return (void*) current_usersession;
+			break;
+			
+        //158 - get window station id		
+		case SYS_GETCURRENTWINDOWSTATION:	
+		    return (void*) current_windowstation; 
+			break;	
+			
+		//159 - get desktop id
+        case SYS_GETCURRENTDESKTOP:		
+		    return (void*) current_desktop; 
+			break;
+			
 		//170	
 		case SYS_PWD:
             printf("service 170: pwd @todo: \n");
@@ -881,6 +906,12 @@ void *services( unsigned long number,
             fsListFiles( arg2,   //disk id 
 			             arg3,   //volume id
 						 arg4);  //directory id
+			break;
+
+		//184
+		//pega o endereço do heap do processo dado seu id.	
+        case SYS_GETPROCESSHEAPPOINTER:
+            return (void*) GetProcessHeapStart( (int) arg2 );
 			break;		
 			
 

@@ -175,7 +175,7 @@ typedef enum {
  *    @todo: Começar com informações sobre disco e arquivos.
  *    Obs: Deve ficar por último o que for referenciado com menos frequência.
  */
-typedef struct thread_d thread_descriptor_t;
+typedef struct thread_d thread_t;
 struct thread_d 
 {	
 	object_type_t objectType;
@@ -457,22 +457,22 @@ struct thread_d
     //Um ponteiro para a próxima thread da lista linkada. 
 	struct thread_d *Next;
 };
-thread_descriptor_t *IdleThread;       // Idle Thread. TID=0
-thread_descriptor_t *ShellThread;      // Shell Thread. TID=1
-thread_descriptor_t *TaskManThread;    // TaskMan Thread. TID=2
+struct thread_d *IdleThread;       // Idle Thread. TID=0
+struct thread_d *ShellThread;      // Shell Thread. TID=1
+struct thread_d *TaskManThread;    // TaskMan Thread. TID=2
 
-thread_descriptor_t *Thread;           // Current.
+struct thread_d *Thread;           // Current.
 //outros.
-//thread_descriptor_t *CurrentThread;  
-thread_descriptor_t *idle_thread;    // Iddle.
-thread_descriptor_t *cur_thread;     // Current.
-thread_descriptor_t *blocked_list_head;
-thread_descriptor_t *waiting_list_head;
-thread_descriptor_t *ready_list_head;
+//struct thread_d *CurrentThread;  
+struct thread_d *idle_thread;    // Iddle.
+struct thread_d *cur_thread;     // Current.
+struct thread_d *blocked_list_head;
+struct thread_d *waiting_list_head;
+struct thread_d *ready_list_head;
 //Lista linkada de threads.
-thread_descriptor_t *Conductor2;
-thread_descriptor_t *Conductor;
-thread_descriptor_t *rootConductor;
+struct thread_d *Conductor2;
+struct thread_d *Conductor;
+struct thread_d *rootConductor;
 
 
 int conductorIndex;
@@ -511,7 +511,7 @@ struct thread_list_d
  * create_thread:
  *
  */ 
-thread_descriptor_t *create_thread( struct wstation_d *window_station,
+struct thread_d *create_thread( struct wstation_d *window_station,
                                     struct desktop_d  *desktop,
                                     struct window_d *window,
                                     unsigned long init_eip, 

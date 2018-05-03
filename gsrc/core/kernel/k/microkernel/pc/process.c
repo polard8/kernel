@@ -25,7 +25,7 @@
  * @todo: 
  * Essas interfaces devem ser padronizadas, obedecendo roteiros de abertura, 
  * fechamento, salvamento e restauração de pilha ou argumento.
- * +Criar a função get_current_pid.
+ * +Criar a função get_current_pid. (obs: Isso já existe)
  *
  * In this file:
  * ============
@@ -35,7 +35,8 @@
  *     +show_process_information
  *     +muitas outras rotinas...
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Create by Fred Nora.
  */
  
  
@@ -84,8 +85,6 @@ extern unsigned long get_page_dir();
 //...
 
 int caller_process_id;
-
-
 int processNewPID;   //??
 
 
@@ -182,15 +181,16 @@ fail:
 
 
 /*
+ ***********************************************************************
  * create_process:
  *     Cria process para ring 3.
  *     Preenche o PCB (Process Control Block).
  *
  * @todo: 
- *     Rotina ainda não implementada.
  *     Um processo na verdade inclui tudo sobre a tarefa,
  *     Desde o nome do arquivo até o carregamento, registro e execução.
  *
+ * Obs:
  *     Um job é um conjunto de processos.
  *     Tudo depende do tipo (funcionalidade): 
  *     SYSTEM, PERIODIC, ROUND_ROBIN, IDLE.
@@ -204,16 +204,20 @@ fail:
  *    P3 - Processos em ring3, User Mode.
  *
  *
- * @todo: Esse função deve chamar uma rotina de craição de diretório. 
- *        Quando um processo é criado deve-se criar o seu diretório
- *        e criar as pagetables que o processo vai usar de acordo
- *        com o tamanho do processo. 
+ * @todo: 
+ * Esse função deve chamar uma rotina de criação de diretório. 
+ * Quando um processo é criado deve-se criar o seu diretório e criar 
+ * as pagetables que o processo vai usar de acordo com o tamanho do 
+ * processo. 
+ *
  * @todo: processCreateProcess(...)
  *
- * Aumetar o número de argumentos para dar o suporte necessário para criar um processo 
- * do jeito que for necessário
+ * @todo: 
+ * Aumetar o número de argumentos para dar o suporte necessário para 
+ * criar um processo do jeito que for necessário
+ *
  */
-process_descriptor_t *create_process( struct wstation_d *window_station,
+struct process_d *create_process( struct wstation_d *window_station,
                                       struct desktop_d  *desktop,
                                       struct window_d *window,
                                       unsigned long init_eip, 
@@ -225,46 +229,64 @@ process_descriptor_t *create_process( struct wstation_d *window_station,
 {
 	int i;
 	struct process_d *Process;
-    struct process_d *Empty;    //Para a entrada vazia no array de processos.  	
-
-    //@todo:
-    //Melhorar esse esquema de numeração e contagem de processos criados.
 	
-    if( processNewPID < USER_BASE_PID || processNewPID >= PROCESS_COUNT_MAX ){
+	// Para a entrada vazia no array de processos.
+    struct process_d *Empty;      	
+
+    // @todo:
+    // Melhorar esse esquema de numeração e 
+	// contagem de processos criados.
+	
+    if( processNewPID < USER_BASE_PID || 
+	    processNewPID >= PROCESS_COUNT_MAX )
+	{
 		processNewPID = (int) USER_BASE_PID;	
 	};
 	
 	i = (int) processNewPID;
 	
-	Process = (void *) malloc(sizeof(struct process_d));
-	if( (void*) Process == NULL ){
+	Process = (void *) malloc( sizeof(struct process_d) );
+	if( (void*) Process == NULL )
+	{
 	    printf("pc-process-create_process: Process");
 		die();
-		//@todo: aqui retorna NULL.
+		
+		//@todo: Aqui pode retornar NULL.
 	};
 
 
 //Loop.	
 get_next:	
 	
-	//BugBug: Isso pode virar um loop infinito.
+	//
+	// #BugBug: 
+	// Isso pode virar um loop infinito.
+	//
 	
 	i++;
 	
-	if(i >= PROCESS_COUNT_MAX)
+	if( i >= PROCESS_COUNT_MAX )
 	{
+		// #bugbug: Isso dexa o sistema devagar caso não apareça 
+		// a mensagem.
+		
 		printf("pc-process-create_process: End of list");
         refresh_screen();
 		return NULL;
 		//while(1){}
-		i = USER_BASE_PID;
+		
+		//i = USER_BASE_PID;
 	};
 	
-	//Get empty.
+	//
+	// Get empty.
+	//
+	
 	Empty = (void*) processList[i];
 	
 	//Se o slot estiver ocupado.
-    if( (void*) Empty != NULL ){
+    if( (void*) Empty != NULL )
+	{
 		goto get_next;
 	}else{
 		
@@ -312,11 +334,11 @@ get_next:
 		//Process->dspaceSharedListHead =
 		//Process->dspacePersonalListHead =
 		
-		//Inicializando a lista de framepools do processo.
-		//@todo: Todo processo deve sr criado com pelo menos um 
-		//frame pool, o que é equivalente a 4MB.(uma partição)
-		//Obs: Um framepool indica onde é a área de memória fisica
-		//que será usada para mapeamento das páginas usadas pelo processo.
+		// Inicializando a lista de framepools do processo.
+		// @todo: Todo processo deve ser criado com pelo menos um 
+		// frame pool, o que é equivalente a 4MB. (uma partição)
+		// Obs: Um framepool indica onde é a área de memória fisica
+		// que será usada para mapeamento das páginas usadas pelo processo.
 		Process->framepoolListHead = NULL;
 		
 		//Lista de arquivos.
@@ -335,19 +357,23 @@ get_next:
 
 		//
 		// Page Directory: 
-		//     Alocar um endereço físico para o diretório de páginas do processo a ser
-		// criado, depois chamar a função que cria o diretório.
+		//     Alocar um endereço físico para o diretório de páginas do 
+		// processo a ser criado, depois chamar a função que cria o diretório.
 		//
 		// @todo:
-		// *IMPORTANTE: Por enquanto os processos são criadas usando o diretório de páginas 
-		// do processo Kernel. Mas temos que criar um diretório novo pra cada processo criado.
-		// O diretório de todos os processos de usuário serão iguais. Terão uma área de usário
-		// particular e uma área compartilhada em kernel mode.
+		// *IMPORTANTE: Por enquanto os processos são criadas usando o 
+		// diretório de páginas do processo Kernel. Mas temos que criar 
+		// um diretório novo pra cada processo criado.
+		// O diretório de todos os processos de usuário serão iguais. 
+		// Terão uma área de usário particular e uma área compartilhada 
+		// em kernel mode.
 		//
-
-		//@todo: 		
-		Process->Directory = (unsigned long ) directory_address; //KERNEL_PAGEDIRECTORY; //@todo: Usar um pra cada processo.
-        //@todo: Alocar um endereço físico antes, depois chamar a função que cria o pagedirectory.
+		//@todo: Alocar um endereço físico antes, depois chamar a função que 
+		// cria o pagedirectory.
+		//@todo: 
+        //opção: KERNEL_PAGEDIRECTORY; //@todo: Usar um pra cada processo.		
+		
+		Process->Directory = (unsigned long ) directory_address; 
 		//Process->Directory = (unsigned long ) CreatePageDirectory(unsigned long directory_address)
 		//Process->page_directory->Address = (unsigned long) KERNEL_PAGEDIRECTORY;
 		
@@ -366,37 +392,51 @@ get_next:
 		//        mas os endereços físicos dessas areas variam de processo pra processo.
 		//
 
-		//Imagem do processo.
-		Process->Image = UPROCESS_IMAGE_BASE;           //Base da imagem do processo.
-		//Process->ImageSize = 0;                             //Tamanho da imagem do processo.	    
+		// Imagem do processo.
+		// ?? Provavelmente esse endereço é virtual.
+		// Queremos que esse endereço seja padronizado e que todos 
+		// os processos usem o mesmo endereço.
+		Process->Image = UPROCESS_IMAGE_BASE;  // Base da imagem do processo.
+		//Process->ImageSize = 0;              // Tamanho da imagem do processo.	    
 		
 		
 		//
 		// Heap e Stack:
 		//
 		// @todo: #BugBug 
-		// O Heap e o Stack devem estar dentro da área de memória do processo.
+		// O Heap e a Stack devem estar dentro da área de memória do processo.
 		// Uma pagetable do diretório é para o heap e outra para a stack.
-        // Cada pagetable no diretório do processo é pra uma coisa.		
-		// # O erro aqui é que todo processo criado com essa rotina tem  
-		// o mesmo endereço de heap e stack.
-		//
+        // Cada pagetable no diretório do processo é pra uma coisa.
+        //
+		// Obs: O endereço virtual do heap e da stack dos processos serão 
+		// os mesmos para todos os processos, assim como o endereço virtual 
+		// de carregamento da imagem.
+ 		//
 		
-		//Heap and Stack. 
-		// ** (endereços virtuais). **
+		// Heap and Stack. 
+		// #importante: (Endereços virtuais).
+		// Por isso pode ser o mesmo para todos os processos.
 		
-	    Process->Heap        = UPROCESS_DEFAULT_HEAP_BASE;    //Endereço do início do Heap do processo.
-	    Process->HeapEnd = 0;
-		Process->HeapSize    = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    //Tamanho do heap, dado em KB.
+		// Endereço do início do Heap do processo.
+		// #bubug: Endereço do fim do heap.
+		// Tamanho do heap, dado em KB.
+	    Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;    
+	    Process->HeapEnd = 0; // @todo: (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE);
+		Process->HeapSize = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    
 
 		//Process->HeapPointer
 		//Process->HeapLastValid
 		//Process->HeapLastSize
 	    
-		Process->Stack       = UPROCESS_DEFAULT_STACK_BASE;   //Endereço do início da Stack do processo.
-	    Process->StackEnd = 0;
-		Process->StackSize   = (UPROCESS_DEFAULT_STACK_SIZE/1024);   //Tamanho da pilha,dada em KB.	
-	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; //Deslocamento da pilha em relação ao início do processo. ??
+		// Endereço do início da Stack do processo.
+		// Endereço do fim da stack do processo.
+		// Tamanho da pilha, dada em KB.
+		// #importante: Deslocamento do endereço do início da pilha em relação 
+		// ao início do processo. 
+		Process->Stack = UPROCESS_DEFAULT_STACK_BASE;   
+	    Process->StackEnd = 0; // @todo: (UPROCESS_DEFAULT_STACK_BASE+UPROCESS_DEFAULT_STACK_SIZE);
+		Process->StackSize = (UPROCESS_DEFAULT_STACK_SIZE/1024);   	
+	    Process->StackOffset = UPROCESS_DEFAULT_STACK_OFFSET; 
 	    
 
 		//ring.
@@ -529,7 +569,12 @@ get_next:
 		//Nothing.
 	};	
 
-    //...	
+	
+	//
+	// ?? O que falta mais aqui. ??
+	//
+	
+    // ...	
 	
 //Done.
 done:
@@ -1310,17 +1355,76 @@ int processmanagerInit(){
 };
 */
 
-//pega o endereço do heap do processo.
-unsigned long GetProcessHeapStart(struct process_d *process)
+/*
+ * GetProcessHeapStart:
+ *     Pega o endereço do heap do processo.
+ *
+ */
+//
+unsigned long 
+GetProcessHeapStart( int pid )
 {
-    //Estrutura inválida.
-	if((void*) process == NULL){
-        return (unsigned long) 0;        
+	struct process_d *process;
+	
+	//Limits.
+	if( pid < 0 || pid >= PROCESS_COUNT_MAX ){
+		//erro
+		goto fail; 
 	};
 	
-	return (unsigned long) process->Heap;
+	
+	process = (struct process_d *) processList[pid];
+    
+	//Estrutura inválida.
+	if( (void*) process == NULL )
+	{
+		goto fail;
+		 
+	}else{
+		
+		if( process->used != 1 || process->magic != 1234 ){
+			goto fail;
+		}
+		
+		//Ok.
+		return (unsigned long) process->Heap;
+	};
+fail:	
+    return (int) -1;
 };
 
+
+unsigned long 
+GetProcessPageDirectoryAddress( int pid )
+{
+	struct process_d *process;
+	
+	//Limits.
+	if( pid < 0 || pid >= PROCESS_COUNT_MAX ){
+		//erro
+		goto fail; 
+	};
+	
+	
+	process = (struct process_d *) processList[pid];
+    
+	//Estrutura inválida.
+	if( (void*) process == NULL )
+	{
+		goto fail;
+		 
+	}else{
+		
+		if( process->used != 1 || process->magic != 1234 ){
+			goto fail;
+		}
+		
+		//Ok.
+		return (unsigned long) process->Directory;
+	};
+fail:	
+    return (int) -1;
+};
 
 //
 // End.

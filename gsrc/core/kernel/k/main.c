@@ -182,15 +182,28 @@ int kMain(int argc, char* argv[])
 
 //createProcesses:
 
-    //Creating Kenrel process. PID=0.
-    //Cuidado para não corromper as informações que o processo precisa.
-    //#bugbug: A estrutura do processo kernel não é inicializada corretamente
-    //pois alguns valores são determinados e não pertencem ao processo kernel.
-    //Obs: Por enquanto está bom, pois estamos criando o processo do mesmo 
-    //jeito que ciramos os outros processos.
-    KernelProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0xC0001000, 
-                                            PRIORITY_HIGH, (int) 0, "KERNEL-PROCESS", RING0, (unsigned long ) KERNEL_PAGEDIRECTORY );	
-    if((void*) KernelProcess == NULL){
+    // Creating Kernel process. PID=0.
+	// #importante: Obs: Nesse caso o kernel base também tem um processo,
+	// mas ele não é escalonado como os outros processos. O kernel base 
+	// possui uma estrutura de processo somente para efeito de organização 
+	// e compartilhamento de recursos.
+    // Cuidado para não corromper as informações que o processo precisa.
+    // #bugbug: A estrutura do processo kernel não é inicializada corretamente
+    // pois alguns valores são determinados e não pertencem ao processo kernel.
+    // Obs: Por enquanto está bom, pois estamos criando aumaticamente o processo 
+	// do mesmo jeito que criamos os outros processos.
+	//
+    KernelProcess = (void*) create_process( NULL, // Window station.
+	                                        NULL, // Desktop.
+											NULL, // Window.
+											(unsigned long) 0xC0001000,  // Entry point. 
+                                            PRIORITY_HIGH,               // Priority.
+											(int) 0,                     // ppid.
+											"KERNEL-PROCESS",            // Name.
+											RING0,                       // iopl. 
+											(unsigned long ) KERNEL_PAGEDIRECTORY ); // Page directory.	
+    if( (void*) KernelProcess == NULL )
+	{
         printf("main-kMain: KernelProcess\n");
         die();
     }else{
@@ -204,9 +217,17 @@ int kMain(int argc, char* argv[])
 
 
     //Creating Idle process.
-    InitProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
-                                          PRIORITY_HIGH, (int) KernelProcess->pid, "IDLEPROCESS", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY );	
-    if((void*) InitProcess == NULL){
+    InitProcess = (void*) create_process( NULL, 
+	                                      NULL, 
+										  NULL, 
+										  (unsigned long) 0x00401000, 
+                                          PRIORITY_HIGH, 
+										  (int) KernelProcess->pid, 
+										  "IDLEPROCESS", 
+										  RING3, 
+										  (unsigned long ) KERNEL_PAGEDIRECTORY );	
+    if((void*) InitProcess == NULL)
+	{
         printf("main-kMain: InitProcess\n");
         die();
     }else{
@@ -214,8 +235,15 @@ int kMain(int argc, char* argv[])
     };
 
     //Creating Shell process.
-    ShellProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
-                                           PRIORITY_HIGH, (int) KernelProcess->pid, "SHELLPROCESS", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	
+    ShellProcess = (void*) create_process( NULL, 
+	                                       NULL, 
+										   NULL, 
+										   (unsigned long) 0x00401000, 
+                                           PRIORITY_HIGH, 
+										   (int) KernelProcess->pid, 
+										   "SHELLPROCESS", 
+										   RING3, 
+										   (unsigned long ) KERNEL_PAGEDIRECTORY );	
     if((void*) ShellProcess == NULL){
         printf("main-kMain: ShellProcess\n");
         die();
@@ -225,8 +253,15 @@ int kMain(int argc, char* argv[])
 
 
     //Creating Taskman process. 
-    TaskManProcess = (void*) create_process( NULL, NULL, NULL, (unsigned long) 0x00401000, 
-                                             PRIORITY_LOW, KernelProcess->pid, "TASKMANPROCESS", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	
+    TaskManProcess = (void*) create_process( NULL, 
+	                                         NULL, 
+											 NULL, 
+											 (unsigned long) 0x00401000, 
+                                             PRIORITY_LOW, 
+											 KernelProcess->pid, 
+											 "TASKMANPROCESS", 
+											 RING3, 
+											 (unsigned long ) KERNEL_PAGEDIRECTORY);	
     if((void*) TaskManProcess == NULL){
         printf("main-kMain: TaskManProcess\n");
         die();
@@ -236,7 +271,8 @@ int kMain(int argc, char* argv[])
 
 
     //
-    // *** NÃO HÁ PROBLEMA EM CRIAR MANUALMENTE AS PRIMEIRAS THREADS DO SISTEMA ***
+    // *** NÃO HÁ PROBLEMA EM CRIAR MANUALMENTE AS 
+	//     PRIMEIRAS THREADS DO SISTEMA ***
     //
 
 
@@ -253,7 +289,8 @@ int kMain(int argc, char* argv[])
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
     IdleThread = (void*) KiCreateIdle();
-    if( (void*) IdleThread == NULL ){
+    if( (void*) IdleThread == NULL )
+	{
         printf("main-kMain: IdleThread\n");
         die();
     }else{
@@ -271,7 +308,8 @@ int kMain(int argc, char* argv[])
     //=============================================
     // Create shell Thread. tid=1. 
     ShellThread = (void*) KiCreateShell();
-    if( (void*) ShellThread == NULL ){
+    if( (void*) ShellThread == NULL )
+	{
         printf("main-kMain: ShellThread\n");
         die();
     }else{
@@ -283,7 +321,8 @@ int kMain(int argc, char* argv[])
     //===================================
     //Create taskman Thread. tid=2.
     TaskManThread = (void*) KiCreateTaskManager();
-    if( (void*) TaskManThread == NULL ){
+    if( (void*) TaskManThread == NULL )
+	{
         printf("main-kMain: TaskManThread\n");
         die();
     }else{

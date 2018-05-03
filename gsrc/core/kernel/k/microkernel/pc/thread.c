@@ -1,21 +1,25 @@
 /*
- * File: thread.c
+ * File: pc\thread.c
  *
  * Descrição:
- *     TM - Thread Manager.
+ *     TM - Thread Manager (Parte fundamental do Kernel Base).
  *     Rotinas com threads. 
  *     Criar, deletar ...
  *
  * Obs: As threads podem acessar o espaço virtual do processo ao qual 
- * pertencem. mas não podem acessar memória de outro processo.
+ * pertencem, mas não podem acessar memória de outro processo.
+ *      Existe a memória compartilhada entre processos. Nesse caso
+ * uma thread vai acessar uma memória sua que também pertence a outro 
+ * processo. 
  *
+ * #bugbug
  * Obs: Nesse arquivo há uma mistura de inicialização independente de
  * de arquitetura e inicialização da arquitetura i386. Essas inicializações
  * precisam estar em arquivos e diretórios diferentes.
  * 
- * Historico:
- *     Versão: 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão: 1.0, 2016 - Revisão.
+ * History:
+ *     2015 - Create by Fred Nora.
+ *     2016 - Revision.
  */
 
 
@@ -23,7 +27,9 @@
 
 
 /*
- * Uma forma de proteger a estrutura de thread é deixa-la aqui restringindo o acesso à ela.
+ * Obs:
+ * Uma forma de proteger a estrutura de thread é deixa-la aqui 
+ * restringindo o acesso à ela.
  *
  */
 
@@ -52,29 +58,30 @@ done:
 */
 
 /*
+ ***********************************************************************
  * create_thread:
  *     Cria um thread para rodar em user mode. 
  *
- * @todo: O processo ao qual o thread vai ser atribuído deve ser 
- * passado via argumento, se o argumento for nulo, então usa-se o 
+ * @todo: O processo ao qual o thread vai ser atribuído deve ser passado 
+ * via argumento, se o argumento for nulo, então usa-se o 
  * processo atual como dono do thread.
- *
- * Obs:
- *     Retorno do tipo ponteiro de estrutura.
- *     Retorna o endereço da estrutura da tarefa.
- *     Retorna NULL se der errado.
  *
  * Obs: Essa rotina deve fazer a inicialização da parte independente
  * da arquitetura e chamar as rotinas referentes à inicializaçções
  * dependentes da arquitetura, que ficarão em outro diretório.
  *
- * @todo: Esses argumentos presisam ser revistos. Escolher um conjunto 
- * melhor de argumentos.
+ * IN:
+ *     @todo: Esses argumentos presisam ser melhorados.
+ *
+ * OUT:
+ *     Retorno do tipo ponteiro de estrutura.
+ *     Retorna o endereço da estrutura da thread.
+ *     Retorna NULL se der errado.
  *
  * 2015, Created - Fred Nora.
  * 2016, Revisão - FN.
  */								 
-thread_descriptor_t *create_thread( struct wstation_d *window_station,
+struct thread_d *create_thread( struct wstation_d *window_station,
                                     struct desktop_d  *desktop,
                                     struct window_d *window,
                                     unsigned long init_eip, 
@@ -94,10 +101,18 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
 	//
 	// Limits da thread atual.
 	//
-	// @todo: Não sei pra que isso. A thread atual não importa.
-	//        deletar isso. 
+	// #bugbug: 
+	// Não sei pra que isso. 
+	// Pois a thread atual não importa.
+	// @todo: deletar isso. 
 	//
-	if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+	
+	
+	//#bugbug
+	//@deletar
+	if( current_thread < 0 || 
+	    current_thread >= THREAD_COUNT_MAX )
+	{
 		return NULL;
 	};
 	
@@ -109,14 +124,25 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
 	//
 	// Filtrar o processo ao qual a thread pertencerá.
 	//
+	
 	ProcessID = (int) pid;
 	
-	if( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX ){
+	if( ProcessID < 0 || 
+	    ProcessID >= PROCESS_COUNT_MAX )
+	{
+		// #bugbug:
+		// Não sabemos a condição do processo atual para 
+		// permitirmos que ele seja o dono da thread.
 		ProcessID = current_process;
 	};
+	
+	//
+	// Já temos um PID para o processo que é dono da thread.
+	//
 
 	Process = (void*) processList[ProcessID]; 		
-	if( (void*) Process == NULL ){
+	if( (void*) Process == NULL )
+	{
 		printf("pc-thread-create_thread: Process\n");
 		die();
 	};
@@ -124,7 +150,8 @@ thread_descriptor_t *create_thread( struct wstation_d *window_station,
 	//Alocando memória para a estrutura da thread.
 	//Obs: Estamos alocando memória dentro do heap do kernel.
 	Thread = (void*) malloc( sizeof(struct thread_d) );	
-	if( (void*) Thread == NULL ){
+	if( (void*) Thread == NULL )
+	{
 	    printf("pc-thread-create_thread: Thread\n");
 		die();
 	}else{  
@@ -140,15 +167,20 @@ get_next:
 	//BugBug: Isso pode virar um loop infinito!
 	
 	i++;
-	if(i >= THREAD_COUNT_MAX){
-		i = USER_BASE_TID;    //Recomeça o loop na base para id de usuários.
+	if( i >= THREAD_COUNT_MAX )
+	{
+		// Recomeça o loop na base para id de usuários.
+		i = USER_BASE_TID;    
 	};
 	
 	//Get empty.
 	Empty = (void*) threadList[i];
     
 	//Se o slot estiver ocupado.
-	if( (void*) Empty != NULL ){
+	if( (void*) Empty != NULL )
+	{
+		// Voltamos.
+		// #bugbug: Isso pode não parar nunca.
         goto get_next;
     }else{
 		
@@ -163,8 +195,10 @@ get_next:
 		    //fail	
 		//};		
 		
-		Thread->ownerPID = (int) pid;  //ID do processo ao qual o thread pertence.
-	    Thread->used = 1;
+		//ID do processo ao qual o thread pertence.
+		Thread->ownerPID = (int) pid; //#bugbug: Deve ser (ProcessID).  
+	    
+		Thread->used = 1;
 	    Thread->magic = 1234;
 		Thread->name_address = (unsigned long) name;  //Name.   
 		//@todo: Usar Thread->name. 
@@ -172,31 +206,35 @@ get_next:
 
         //Thread->process = (void*) Process;
 
-		//Procedimento de janela.
+		// Procedimento de janela.
 	    Thread->procedure = (unsigned long) &system_procedure;
-		//Msg support. //Argumentos.
+		
+		// Msg support. //Argumentos.
 		Thread->window = NULL;        //arg1.
 	    Thread->msg = 0;              //arg2.
 	    Thread->long1 = 0;            //arg3.
 	    Thread->long2 = 0;            //arg4.		
 
-        //Caracteristicas.
-	    Thread->type = TYPE_SYSTEM; //TYPE_IDLE;    //?? //Type...@todo: Rever. 
+        // Caracteristicas.
+		// TYPE_IDLE;    //?? //Type...@todo: Rever. 
+	    Thread->type = TYPE_SYSTEM; 
 	    Thread->state = INITIALIZED;  
 		//Apenas Initialized, pois a função SelectForExecution
 		//seleciona uma thread para a execução colocando ela no
 		//state Standby.	
 		
-		//A prioridade básica da thread é igual a prioridade básica do processo.
-		Thread->base_priority = (unsigned long) KernelProcess->base_priority; //Process->base_priority;
-		Thread->priority = (unsigned long) Thread->base_priority; // priority; //A prioridade dinâmica da thread foi passada por argumento.			
+		// A prioridade básica da thread é igual a prioridade básica do processo.
+		// Process->base_priority;
+		// priority; A prioridade dinâmica da thread foi passada por argumento.
+		Thread->base_priority = (unsigned long) KernelProcess->base_priority; 
+		Thread->priority = (unsigned long) Thread->base_priority; 			
 		
 		//IOPL.
 		//Se ela vai rodar em kernel mode ou user mode.
 		//@todo: herdar o mesmo do processo.
-		Thread->iopl = RING3;  //Process->iopl;  		
-		Thread->saved = 0;                //Saved flag.	
-		Thread->preempted = PREEMPTABLE;  //Se pode ou não sofrer preempção.
+		Thread->iopl = RING3;             // Process->iopl;  		
+		Thread->saved = 0;                // Saved flag.	
+		Thread->preempted = PREEMPTABLE;  // Se pode ou não sofrer preempção.
 		
 		//Heap and Stack.
 	    //Thread->Heap;
@@ -204,52 +242,78 @@ get_next:
 	    //Thread->Stack;
 	    //Thread->StackSize;
 
-        //Temporizadores.  		
-	    Thread->step = 0;                           //Quantas vezes ela usou o processador no total.
-        Thread->quantum =  QUANTUM_BASE;            //QUANTUM_BASE
-        Thread->quantum_limit = QUANTUM_LIMIT; //(9*2);  //O boost não deve ultrapassar o limite. QUANTUM_LIMIT			
+        // Temporizadores. 
+        // step - Quantas vezes ela usou o processador no total.  		
+	    // quantum_limit - (9*2);  O boost não deve ultrapassar o limite. 
+		Thread->step = 0;                           
+        Thread->quantum = QUANTUM_BASE;    
+        Thread->quantum_limit = QUANTUM_LIMIT; 			
 		
 		
-		
+		// runningCount - Tempo rodando antes de parar.
+		// readyCount - Tempo de espera para retomar a execução.
+		// blockedCount - Tempo bloqueada.
         Thread->standbyCount = 0;
-	    Thread->runningCount = 0;    //Tempo rodando antes de parar.
-	    Thread->readyCount = 0;      //Tempo de espera para retomar a execução.
+	    Thread->runningCount = 0;    
+	    Thread->readyCount = 0;      
 	    Thread->ready_limit = READY_LIMIT;
-	    Thread->waitingCount  = 0;
+	    Thread->waitingCount = 0;
 	    Thread->waiting_limit = WAITING_LIMIT;
-	    Thread->blockedCount = 0;    //Tempo bloqueada.		
+	    Thread->blockedCount = 0;    		
 	    Thread->blocked_limit = BLOCKED_LIMIT;
 		
-	    Thread->ticks_remaining = 1000;    //Not used now.	
+	    // Not used now. But it works fine.
+		Thread->ticks_remaining = 1000;    	
 
 
-	    //signal
-	    //Sinais para threads.
+	    // Signal
+	    // Sinais para threads.
 	    Thread->signal = 0;
         Thread->signalMask = 0;	
 
 
         //
-		// @todo: Essa parte é dependente da arquitetura i386.
-		//        poderá ir pra outro arquivo.
+		// @todo: 
+		// Essa parte é dependente da arquitetura i386.
+		// Poderá ir pra outro arquivo.
+		//
+		
+        //
+		// init_stack:
+		// O endereço de início da pilha é passado via argumento.
+		// Então quem chama precisa alocar memória para a pilha.
+		// @todo: Podemos checar a validade dessa pilha ou é problema 
+		// na certa.
 		//
 		
 		//
-		// #BUGBUG 
-		// **** NÃO TEMOS UMA PILHA ****
-		// Precisamos de uma pilha para user mode.
-		// Colocaremos uma pilha simulada para teste ..
-		// isso funcionará em apenas uma thread...
-		// na proxima vai dat problema.
+		// init_eip:
+		// O endereço início da sessão de código da thread é 
+		// passado via argumento. Então quem chama essa rotina 
+		// deve providendiar um endereço válido.
+		// Obs: init_eip Aceita endereços inválidos pois a thread 
+		// fecha nesses casos por PG fault. Mas o sistema pode travar 
+		// se for a única thread e um único processo. 
+		//
+		
+		//if( init_stack == 0 ){ ... }
+		//if( init_eip == 0 ){ ... }
+		
+		
+	    //
+		// Contexto x86 usado pela thread.
 		//
 		
 		//Context.
+		// ss (0x20 | 3)
+		// cs (0x18 | 3)
 	    Thread->ss = 0x23;    //RING 3.
-	    Thread->esp = (unsigned long) init_stack;//@todo: 
+	    Thread->esp = (unsigned long) init_stack; 
 	    Thread->eflags = 0x3200;
 	    Thread->cs = 0x1B;                                
-	    Thread->eip = (unsigned long) init_eip;  
-        ////OBS: eip Aceita endereços inválidos, a thread fecha nesses casos por PG fault.		
+	    Thread->eip = (unsigned long) init_eip; 
+		
+		// (0x20 | 3)
 	    Thread->ds = 0x23; 
 	    Thread->es = 0x23; 
 	    Thread->fs = 0x23; 
@@ -269,17 +333,20 @@ get_next:
 		//Thread->CurrentProcessor = 0;
 		//Thread->NextProcessor = 0;
 		
-		//Page Directory. (#CR3).
-		//Estamos usando o page directory do processo.
-		//page directory do processo ao qual a thread pertence.
-		Thread->Directory = (unsigned long ) Process->Directory; 
-
-		//@todo: Por enquanto as threads são criadas usando o diretório de páginas do kernel.
+		//
+		// @todo: 
+        // O processo dono da thread precisa ter um diretório 
+		// de páginas válido.
+		//
 		
+		// #bugbug
+		// Page Directory. (#CR3).
+		// Estamos usando o page directory do processo.
+		// Page directory do processo ao qual a thread pertence.
+		Thread->Directory = (unsigned long ) Process->Directory; 
 
 
         //ServiceTable ..
-
         //Ticks ...
         //DeadLine ... 
 
@@ -292,7 +359,8 @@ get_next:
 		
 	
 	    //
-	    // ORDEM: O que segue é referenciado com pouca frequencia.
+	    // ORDEM: 
+		// O que segue é referenciado com pouca frequência.
 	    //
 
 	    Thread->waitingCount = 0;    //Tempo esperando algo.
@@ -343,7 +411,9 @@ get_next:
 done:
     
 	//
-	// Warning !!! (NÃO COLOCAR PARA EXECUÇÃO, OUTRA FUNÇÃO DEVE COLOCAR PARA EXECUÇÃO)
+	// Warning !!! 
+	// ( NÃO COLOCAR PARA EXECUÇÃO, 
+	//   OUTRA FUNÇÃO DEVE COLOCAR PARA EXECUÇÃO )
 	//
 	
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)

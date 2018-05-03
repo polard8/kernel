@@ -375,8 +375,8 @@ typedef enum {
 int g_platform_type;
 
 
-int current_group;
 int current_user;
+int current_group;
 int current_usersession;
 int current_windowstation;
 int current_desktop;

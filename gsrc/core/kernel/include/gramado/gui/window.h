@@ -888,6 +888,8 @@ int top_window;
 // ...
 //
 
+
+
 // LFB - address for kernel graphic mode
 unsigned long g_kernel_lfb; 
 
@@ -2556,6 +2558,8 @@ void closeActiveWindow();
 void windowBlockfocus();
 void windowUnblockFocus();
 
+int windowGetMainWindowDescriptor();
+int windowGetWindowID( struct window_d *window);
 
 //@todo: Criar windowRefreshScreen();
 

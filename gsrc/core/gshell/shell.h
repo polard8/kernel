@@ -590,7 +590,20 @@ void shellUpdateWorkingDiretoryString( int id );
 //lista informações sobre os processos.
 void shellTaskList();
 
-void shellShowCurrentPID();
+void shellShowPID();
+void shellShowPPID();
+
+
+
+void shellShowUID();
+void shellShowGID();
+
+
+void shellShowUserSessionID();
+void shellShowWindowStationID();
+void shellShowDesktopID();
+
+void shellShowProcessHeapPointer();
  
 //
 // shelui.c
