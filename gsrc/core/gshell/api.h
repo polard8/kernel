@@ -710,12 +710,12 @@
 
 //(250 ~ 255) Info support, get info.
 //Ou últimos oferecem informações sobre o sistema.
-#define	SYSTEMCALL_GETSYSTEMMETRICS         250 
-#define	SYSTEMCALL_251                      251
-#define	SYSTEMCALL_252                      252
-#define	SYSTEMCALL_253                      253
-#define	SYSTEMCALL_SHOW_PCI_INFORMATION     254
-#define	SYSTEMCALL_SHOW_KERNEL_INFORMATION  255
+#define	SYSTEMCALL_GETSYSTEMMETRICS  250 
+#define	SYSTEMCALL_251               251
+#define	SYSTEMCALL_252               252
+#define	SYSTEMCALL_MEMORYINFO        253
+#define	SYSTEMCALL_SHOWPCIINFO       254
+#define	SYSTEMCALL_SHOWKERNELINFO    255
 
 
 //

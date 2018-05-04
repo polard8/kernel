@@ -5,7 +5,9 @@
  *     Rotinas de execução de thread e processos.
  *     Faz parte do Process Manager, uma parte fundamental do Kernel Base.
  *
- * Versão 1.0, 2015, 2016. 
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision. 
  */
 
 
@@ -25,9 +27,10 @@ extern void turn_task_switch_on();
  * KeStartShell:
  *     Executa o programa SHELL.BIN.
  */
-void KeStartShell(){
+void KeStartShell()
+{
     panic("KeStartShell:");    //Cancelada! 	
-	while(1){}; 
+    die();
 };
 
 
@@ -35,22 +38,25 @@ void KeStartShell(){
  * KeStartTaskManager:
  *     Executa o programa TASKMAN.BIN.
  */
-void KeStartTaskManager(){
+void KeStartTaskManager()
+{
     panic("KeStartTaskManager:");    //Cancelada! 	
-	while(1){};
+	die();
 };
 
 
 /*
+ ****************************************************************
  * start_task: 
- *     Habilita uma tarefa para ser executada pela primeira vez, alertando 
- * sobre a presença dela.
+ *     Habilita uma tarefa para ser executada pela primeira vez, 
+ * alertando sobre a presença dela.
  *
  * @todo: 
  *     Poderia ser um kernel request?!
  *
  */
-void start_task(unsigned long id, unsigned long *task_address)
+void start_task( unsigned long id, 
+                 unsigned long *task_address )
 {     	
 	
 	//@todo: filtrar argumentos.
@@ -82,7 +88,8 @@ done:
 /*
  * reload_current_task:
  */
-void reload_current_task(){
+void reload_current_task()
+{
     return;    //Cancelada!
 };
 
@@ -90,13 +97,15 @@ void reload_current_task(){
 /*
  * switch_to_user_mode:     
  */
-void switch_to_user_mode(){ 
+void switch_to_user_mode()
+{ 
     panic("switch_to_user_mode:");    //Cancelada!	
-	while(1){};
+    die();
 }; 
 
 
 /*
+ ***************************************************
  * executa_tarefa:
  *     Executa uma nova thread.
  *     @todo: Mudar o nome. startExecuteThread(...)
@@ -104,7 +113,8 @@ void switch_to_user_mode(){
  */
 //unsigned long startExecuteThread(int tid, unsigned long *thread_address)
 
-unsigned long executa_tarefa(int id, unsigned long *task_address)
+unsigned long executa_tarefa( int id, 
+                              unsigned long *task_address )
 {
     struct thread_d *t;
 	
@@ -112,11 +122,14 @@ unsigned long executa_tarefa(int id, unsigned long *task_address)
 	// OBS: A thread a ser executada, precisa ser a current.   
     //
 	
-	if(current_thread != id)
+	if( current_thread != id )
 	{
-        printf("executa_tarefa: current_thread = %d | new task = %d ",current_thread, id);
-        refresh_screen();
-		while(1){};
+        printf("executa_tarefa: current_thread = %d | new task = %d ",
+		    current_thread, id );
+			
+        die();
+		//refresh_screen();
+		//while(1){};
 		//return 1;
 	};	
 
@@ -126,19 +139,22 @@ unsigned long executa_tarefa(int id, unsigned long *task_address)
     //
 	
 	t = (void *) threadList[id];	
-	if( (void *) t == NULL)
+	if( (void *) t == NULL )
 	{
-	    panic("executa_tarefa error: Structure!\n");
-	    while(1){};
+	    panic("start-executa_tarefa: t\n");
+	    die();
 	}
     else
     {
         // Status.	
-	    if(t->state != READY){
-	        panic("executa_tarefa error: State!\n",id);
-            while(1){}; 	    
+	    if( t->state != READY ){
+	        panic("start-executa_tarefa: state",id);
+            die();
+			//while(1){}; 	    
 	    }else{
+			
 	        t->state = RUNNING;
+			
 	    };
 	
 	    //...
@@ -198,8 +214,9 @@ unsigned long executa_tarefa(int id, unsigned long *task_address)
 */		
 	
 fail:
-    panic("executa_tarefa error: Return!");
-    while(1){};    
+    panic("start-executa_tarefa: fail");
+    die();
+	//while(1){};    
 };
 
 

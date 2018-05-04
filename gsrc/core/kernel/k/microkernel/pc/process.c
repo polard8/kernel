@@ -696,11 +696,15 @@ int KeSelectNextThread(int current)
  * KeCheckTaskContext:
  *     Interface para chamar uma rotina de análise de contexto.
  */
-int KeCheckTaskContext( int task_id)
+int KeCheckTaskContext( int task_id )
 {
+	//#bugbug Aqui estamos chamando uma rotina detro do 
+	//kernel base, não é essa a ideia.
+	// e se alguma rotina dentro do kernel estava chamando essa 
+	// função é bom substituir a chamada por KiCheckTaskContext
     //@todo: preparação antes de chamar.filtros.
 	return (int) KiCheckTaskContext(task_id);
-}
+};
 
 
 
@@ -774,7 +778,6 @@ int KeExecProcess(int pid, unsigned long *process_address)
 {
     return 0;
 };
-
 
 
 /*
@@ -857,7 +860,6 @@ void KeNewProcessScheduler()
 }
 
 
-
 int KeSetPriority()
 {
     return 0;
@@ -868,10 +870,6 @@ int KeIncreasePriority(int pid)
 {
     return 0;
 };
-
-
- 
-
 
 void KeSaveContextOfNewTask(int id, unsigned long *task_address)
 {
@@ -963,6 +961,7 @@ void KeShowPreemptedTask()
 
 
 /*
+ ********************************************************
  * show_process_information:
  *    Mostra informações sobre o processo atual.
  *    Current Process Info.
@@ -975,7 +974,8 @@ void show_process_information()
     
 	
 	//
-	// Janela: @deve-se criar a janela e fazer os resultados aparecerem dentro dela.
+	// Janela: @deve-se criar a janela e fazer os resultados 
+	// aparecerem dentro dela.
 	//
 	
 	//struct window_d *hWindow;    //janela. 	
@@ -984,15 +984,19 @@ void show_process_information()
 	printf("\n Current Process Info:\n\n");
 	
 	//Limits.
-	if( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+	if( current_process < 0 || 
+	    current_process >= PROCESS_COUNT_MAX )
+	{
 		return;
 	};
 	
 	//Struct.
 	Current = (void*) processList[current_process];
-	if( (void*) Current == NULL ){
+	if( (void*) Current == NULL )
+	{
 	    printf("show_process_information:\n");
         return; 		
+	
 	}else{
 		//Index.
 		printf("PID={%d} PPID={%d} UID={%d} GID={%d} \n",Current->pid
@@ -1009,8 +1013,11 @@ void show_process_information()
 		printf("CurrentProcessDirectoryAddress={%x} \n",Current->Directory);		
 		
 		//Heap and stack.
-		printf("Heap={%x}  HeapSize={%d KB}  \n",Current->Heap  , Current->HeapSize );
-		printf("Stack={%x} StackSize={%d KB} \n",Current->Stack , Current->StackSize );
+		printf("Heap={%x}  HeapSize={%d KB}  \n", Current->Heap, 
+		                                          Current->HeapSize );
+												  
+		printf("Stack={%x} StackSize={%d KB} \n", Current->Stack, 
+		                                          Current->StackSize );
 		
 		//...
 	};
@@ -1018,23 +1025,30 @@ void show_process_information()
 	
 	
 	//
-	// Testando o for para process.
+	// Testando.
 	//
-	printf(" *** Process info *** \n\n");
 	
-	for( i=0; i<PROCESS_COUNT_MAX; i++)
+	printf("Process info:\n\n");
+	
+	for( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
 	    Current = (void *) processList[i];
 	    
-		//Mostra as tarefas válidas, mesmo que estejam com problemas.
+		//
+		// Mostra as tarefas válidas, 
+		// mesmo que estejam com problemas.
+		//
+		
 		if( (void*) Current != NULL && 
 		        Current->used == 1 && 
 				Current->magic == 1234 )
 	    {
 			//@todo: Mostrar quem é o processo pai.
-		    printf("PID={%d} Name={%s} Directory={%x} \n",Current->pid ,Current->name_address, Current->Directory);
-			//printf("PID={%d} PPID={%d} Name={%s}\n",Current->pid ,Current->ppid, Current->name_address);
-	    };
+		    printf("PID={%d} Name={%s} Directory={%x} \n", Current->pid, 
+			    Current->name_address, Current->Directory );
+
+	    }
+		//Nothing.
     };	
 
 	//...
@@ -1047,15 +1061,18 @@ done:
 
 
 /*
+ **************************************************************
  * SetProcessDirectory:
  *     Configura o endereço do diretório de páginas do processo.
  *     @todo: Isso pode ser um serviço oferecido pelo kernel,
  * para um gerenciador de processos em user mode usar.
  * @todo: processSetDirectory(...)
  */
-void SetProcessDirectory(struct process_d *process, unsigned long Address)
+void SetProcessDirectory( struct process_d *process, 
+                          unsigned long Address )
 {
-    if((void*) process != NULL){
+    if( (void*) process != NULL )
+	{
         process->Directory = (unsigned long) Address;        
 	};
 	return;
@@ -1063,15 +1080,18 @@ void SetProcessDirectory(struct process_d *process, unsigned long Address)
 
 
 /*
+ ************************************************************
  * GetProcessDirectory:
  *     Pega o endereço do diretório de páginas do processo.
  *     @todo: Isso pode ser um serviço oferecido pelo kernel,
  * para um gerenciador de processos em user mode usar.
  * @todo: processGetDirectory(...)
  */
-unsigned long GetProcessDirectory(struct process_d *process)
+unsigned long GetProcessDirectory( struct process_d *process )
 {
-    if((void*) process != NULL){
+    if( (void*) process != NULL )
+	{
+		//@todo: checar used e magic.
         return (unsigned long) process->Directory;
 	};
 	return (unsigned long) 0;
@@ -1079,17 +1099,20 @@ unsigned long GetProcessDirectory(struct process_d *process)
 
 
 /*
+ *********************************************************
  * GetPageDirValue:
  *     Pega o endereço do diretório de páginas do processo.
  *     processGetPageDirValue()
  */
-unsigned long GetPageDirValue(){
+unsigned long GetPageDirValue()
+{
     return (unsigned long ) get_page_dir();
 };
 
 
 
 /*
+ ***************************************************************
  * init_task:
  *     Inicia um processo.
  *     @todo: Mudar o nome para init_process().
@@ -1108,6 +1131,7 @@ int init_task(int id)
 
 
 /*
+ *************************************************************
  * init_tasks: 
  *     Inicia as variáveis.
  *
@@ -1124,6 +1148,7 @@ void init_tasks()
 
 
 /*
+ ***********************************************************
  * init_processes:
  *    Inicaliza o process manager.
  */
@@ -1162,6 +1187,7 @@ Done:
 
 
 /*  
+ ***********************************************************
  * dead_task_collector:
  *     Coletor de processos mortos.    
  * 
@@ -1183,13 +1209,19 @@ void dead_task_collector()
  **********************************************************************
  * exit_process:
  *
- *     Exit process..
- *     Torna o estado PROCESS_TERMINATED, mas não destrói a estrutura do 
- * processo. Outra rotina destruirá as informações.
- *     @todo: Liberar a memória e os recursos usado pelo processo.
- *     @todo: Fechar as threads seguindo a lista encadeada.
+ *     Exit process.
+ *     Coloca o processo no estado PROCESS_TERMINATED, mas não destrói a 
+ * estrutura do processo. Outra rotina destruirá as informações.
+ *
+ * @todo: 
+ * Liberar a memória e os recursos usado pelo processo. Ou ainda apenas 
+ * sinalizar a flag magic para que o GC a reutilize.
+ *
+ * @todo: 
+ * Fechar as threads seguindo a lista encadeada.
+ *
  */
-void exit_process(int pid, int code)
+void exit_process( int pid, int code )
 {
 	int i;
     struct process_d *Process;
@@ -1198,14 +1230,18 @@ void exit_process(int pid, int code)
 	//...
 	
 	//Limits. 
-	if(pid < 0 || pid >= PROCESS_COUNT_MAX){
+	if( pid < 0 || pid >= PROCESS_COUNT_MAX )
+	{
 	    return;	
 	};    
 	
-	//Não fechar o processo 0.
-	if(pid == 0){
+	// Não fechar o processo 0. ele é o kernel.
+	if( pid == 0 )
+	{
 		return;
 	};
+	
+	// Mais limites ??
 
 #ifdef KERNEL_VERBOSE	
 	//Debug:
@@ -1214,17 +1250,22 @@ void exit_process(int pid, int code)
 #endif	
 	
 	//
-	// Pega o ponteiro para a estrutura.
+	// Pega o ponteiro para a estrutura, muda o código de saída 
+	// e o status.
 	//
 	
 	Process = (void*) processList[pid];
 	
-	if( (void*) Process == NULL ){
+	if( (void*) Process == NULL )
+	{
 		return;
+	
 	}else{	
 
-		//Se estiver corrompida.
-        if(Process->used != 1 || Process->magic != PROCESS_MAGIC){
+		// Se estiver corrompida.
+        if( Process->used != 1 || 
+		    Process->magic != PROCESS_MAGIC )
+		{
 			return;
 		};
 		
@@ -1239,44 +1280,63 @@ void exit_process(int pid, int code)
 	refresh_screen();
 #endif		
 
-	//pega o primeiro da lista
-	//Se o head da list naõ foi inicializado corretamente dá page fault.
+	// Agora temos que terminar as threads que estão na lista 
+	// de threads do processo.
+	// Pegaremos a primeira da lista.
+	// Se o head da list não foi inicializado corretamente 
+	// dá page fault.
+	
 	Thread = (void*) Process->threadListHead;
 		
-	//se não há nada na head.	
-    if(Thread == NULL){
+	// Se não há nada na head.	
+	if( Thread == NULL )
+	{
+		// @todo: Talvez haja mais o que fazer.
 	    goto done;	
-	};		
+	}else{
 		
+		//used, magic ??
+	};	
+		
+	//
+	// Se a primeira thread da lista é válida, então tentaremos
+	// fechar toda a lista.
+	//
 	
-    
-	//fecha todos da lista.
 	while(1)
 	{
-        //salva o ponteiro para o próximo.
-		//qual deve fechar depois.
+		// ?? Qual deve fechar depois. ??
 		
-		printf("a\n");
+		printf(".\n");
 		refresh_screen();
 		
+		// Salva o ponteiro para o próximo thread.
 		Next = (void*) Thread->Next;
 		
-		//fim da lista?
-		//'Thread' fecha agora.
-        if(Thread == NULL){
+		// Confere se chegamos ao fim da lista.
+		// 'Thread' fecha agora.
+		
+        if( Thread == NULL )
+		{
 		    goto done;	
+		
 		}else{
     
 #ifdef KERNEL_VERBOSE    
 		    //fecha a thread.
-		    printf("exit_process: KILL thread %d.\n",Thread->tid);
+		    printf("exit_process: Killing thread %d.\n",Thread->tid);
 #endif			
 			
-			kill_thread(Thread->tid);  					
+			//
+			// Kill !
+			//
+			
+			kill_thread( Thread->tid );  					
 		    
-			//prepara qual deve fechar agora.
-		    //havíamos salvo e agora é vez dela.
-		    //Obs: estamos reusando o ponteiro.
+			// Prepara qual deve fechar agora.
+		    // Havíamos salvo e agora é vez dela.
+		    // Obs: Estamos reusando o ponteiro.
+			
 			Thread = (void*) Next;
 		 };
         //Nothing.
@@ -1312,18 +1372,25 @@ done:
 };
 
 
-int get_caller_process_id(){
+
+// ??
+int get_caller_process_id()
+{
 	return (int) caller_process_id;
 };
 
 
-void set_caller_process_id(int pid){
+
+// ??
+void set_caller_process_id(int pid)
+{
 	caller_process_id = (int) pid;
 	return;
 };
 
 
 /*
+ *************************************************
  * init_process_manager:
  *     Initialize process manager.
  *     processInitializeProcessManager();
@@ -1349,18 +1416,19 @@ int processmanagerProcessmanager(){
 };
 */
 
+
 /*
 int processmanagerInit(){
 	;
 };
 */
 
+
 /*
  * GetProcessHeapStart:
  *     Pega o endereço do heap do processo.
  *
  */
-//
 unsigned long 
 GetProcessHeapStart( int pid )
 {
@@ -1394,6 +1462,11 @@ fail:
 };
 
 
+
+/*
+ * GetProcessPageDirectoryAddress:
+ *
+ */
 unsigned long 
 GetProcessPageDirectoryAddress( int pid )
 {
@@ -1425,6 +1498,7 @@ GetProcessPageDirectoryAddress( int pid )
 fail:	
     return (int) -1;
 };
+
 
 //
 // End.

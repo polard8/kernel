@@ -896,7 +896,11 @@ shellProcedure( struct window_d *window,
 		        
 				//help
 				case VK_F1:
-				    MessageBox( 1, "Gramado Core - Shell","F1: HELP");
+				    //MessageBox( 1, "Gramado Core - Shell","F1: HELP");
+					//shell_gramado_core_init_execve( "TESTTESTBIN", 0, 0 );
+					
+					//testando formato amigável de string
+					shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
 					break;
 				
                 //full screen
@@ -1696,13 +1700,6 @@ do_compare:
 	    shellShowDesktopID();
         goto exit_cmp;
     };
-	
-    //get-heappointer
-	if( strncmp( prompt, "get-heappointer", 15 ) == 0 )
-	{
-	    shellShowProcessHeapPointer();
-        goto exit_cmp;
-    };
 
 	
 	// hd ??
@@ -1764,6 +1761,14 @@ do_compare:
     };
 	
 	
+    // kernel-info
+	if( strncmp( prompt, "kernel-info", 11 ) == 0 )
+	{
+	    shellShowKernelInfo();
+        goto exit_cmp;
+    };	
+	
+	
     // ls
 	// lista arquivos no estilo unix.
 	if( strncmp( prompt, "ls", 2 ) == 0 )
@@ -1772,7 +1777,29 @@ do_compare:
 		printf("~ls\n");
         goto exit_cmp;
 	};
+	
+	
+    // mm-info
+	if( strncmp( prompt, "mm-info", 7 ) == 0 )
+	{
+	    shellShowMemoryInfo();
+        goto exit_cmp;
+    };	
+	
+	
+    // mm-kernelheap
+	if( strncmp( prompt, "mm-kernelheap", 13 ) == 0 )
+	{
+	    shellShowKernelHeapPointer();
+        goto exit_cmp;
+    };
 
+    // mm-processheap
+	if( strncmp( prompt, "mm-processheap", 14 ) == 0 )
+	{
+	    shellShowProcessHeapPointer();
+        goto exit_cmp;
+    };
 
 	// mov
 	if( strncmp( prompt, "mov", 3 ) == 0 )
@@ -1809,6 +1836,13 @@ do_compare:
 		printf("done\n");
 		goto exit_cmp;
     }; 
+	
+    // pci-info
+	if( strncmp( prompt, "pci-info", 8 ) == 0 )
+	{
+	    shellShowPCIInfo();
+        goto exit_cmp;
+    };	
 	
 	// pwd - print working directory
 	if( strncmp( prompt, "pwd", 3 ) == 0 )
@@ -2030,6 +2064,25 @@ do_compare:
     //
  
 palavra_nao_reservada:
+
+    //
+	// ## TEST ##
+	//
+
+    //
+	// Se estamos aqui é porque o comando não corresponde a
+	// nenhuma das palavras reservadas acima, então executaremos
+	// presumindo ser um nome de aplicativo no formato 'test.bin'
+	// Obs: Isso é um teste, o comando digitado ainda 
+	// precisa de mais análises como as barras '/'
+	//
+	//
+
+    //Presumindo ser um nome de aplicativo no formato 'test.bin'.
+	//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
+    shell_gramado_core_init_execve( (const char*) prompt, 0, 0 );
+	goto exit_cmp;
+	
     //shellParseFileName(); @todo
 	
 	// Se a apavra não é reservada, então talvez seja o nome de um app.
@@ -3496,3 +3549,108 @@ void shellShowProcessHeapPointer()
 	
 	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
 };
+
+
+void shellShowKernelHeapPointer()
+{
+	int id = 0;  //Id do processo kernel. 
+	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, id, 0, 0);
+	
+	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
+};
+
+
+//mostrar informações gerais sobre a memória.
+void shellShowMemoryInfo()
+{
+	system_call( SYSTEMCALL_MEMORYINFO, 0, 0, 0);
+};
+
+//mostrar informações gerais sobre a memória.
+void shellShowPCIInfo()
+{
+    system_call( SYSTEMCALL_SHOWPCIINFO, 0, 0, 0);	
+};
+
+//mostrar informações gerais sobre a memória.
+void shellShowKernelInfo()
+{
+	system_call( SYSTEMCALL_SHOWKERNELINFO, 0, 0, 0);
+};
+
+
+
+//rotina interna de support.
+//isso deve ir para bibliotecas depois.
+//não tem protótipo ainda.
+//void shell_fntos(const char *name)
+void shell_fntos(char *name)
+{
+    int  i, ns = 0;
+    char ext[4];
+    //const char ext[4];
+	
+    //transforma em maiúscula
+	while(*name && *name != '.')
+	{
+        if(*name >= 'a' && *name <= 'z')
+            *name -= 0x20;
+
+        name++;
+        ns++;
+    }
+
+    // aqui name[0] é o ponto.
+	// então constroi a extensão.
+	for(i=0; i < 3 && name[i+1]; i++)
+	{
+        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+            name[i+1] -= 0x20;
+
+        ext[i] = name[i+1];
+    }
+
+    while(ns < 8){
+        *name++ = ' ';
+        ns++;
+    }
+
+    for(i=0; i < 3; i++)
+        *name++ = ext[i];
+
+    *name = '\0';
+};
+
+
+/*
+ *******************************************************
+ * shell_gramado_core_init_execve:
+ *     gramado core specials execve SUPPORT
+ *
+ */									 
+void shell_gramado_core_init_execve( const char *filename, 
+                                     const char *argv[], 
+                                     const char *envp[] )
+{	
+	
+	//Ok funcionou.
+	shell_fntos( (char *) filename);
+	
+	//const char* isso não foi testado.
+	//shell_fntos(filename);
+
+
+	//isso deve chamar gramado_core_init_execve() na api.
+	
+	//
+	// 
+	//
+	//
+	system_call( 167, 
+	            (unsigned long) filename,
+				(unsigned long) argv,
+				(unsigned long) envp );
+	
+    /* No return */
+};
+

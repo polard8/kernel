@@ -63,8 +63,8 @@ void KiInformation()
 	struct window_d *hWindow;
 	
 	
-	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
-	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);	
+	//unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
+	//unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);	
 	
 	//Parent window.
 	if( (void*) gui->main == NULL){
@@ -205,9 +205,9 @@ void KiInformation()
 	    //
 	
 	
-        printf("\n[Kernel Heap and Stack info:]\n");
-	    printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",kernel_heap_start ,kernel_heap_end ,HeapTotal);	
-        printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
+        //printf("\n[Kernel Heap and Stack info:]\n");
+	    //printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",kernel_heap_start ,kernel_heap_end ,HeapTotal);	
+        //printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
 	    
 		//@todo:
 		//mostrar o tamanho da pilha..
@@ -215,18 +215,18 @@ void KiInformation()
 		// o endereço da stack na hora da inicialização. Quando o processador retorna de ring3 para ring0
 		//ele usa o endereço de pilha indicado na TSS.
 		//Pois bem, é mais digno mostrar aqui o endereço da pilha, indicado no TSS.
-		printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n",kernel_stack_start ,kernel_stack_end ,StackTotal);
-        printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
+		//printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n",kernel_stack_start ,kernel_stack_end ,StackTotal);
+        //printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
 	
 	    //
 	    // Video info
 	    //
 	
-	    printf("\n[Video Info:]\n");
+	    //printf("\n[Video Info:]\n");
 	
 	    //Video mode.
 	    //printf("The video option is %x \n",g_video_mode);
-	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",g_frontbuffer_pa ,g_frontbuffer_va ,g_backbuffer_va);
+	    //printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",g_frontbuffer_pa ,g_frontbuffer_va ,g_backbuffer_va);
 	
 	    //
 	    // user info
@@ -257,8 +257,9 @@ void KiInformation()
 	
 	    //
 	    // Memory info.
-	    //
-	
+	    // Obs: memoryShowMemoryInfo mostrará informações 
+		// que hoje estão aqui nessa rotina.
+	    //  
 	    memoryShowMemoryInfo();
 	
 	    //Específico para intel.

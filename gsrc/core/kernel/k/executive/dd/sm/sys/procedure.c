@@ -485,33 +485,14 @@ unsigned long system_procedure( struct window_d *window,
 				
 				//Help. 
 				case VK_F1:	
-					
 					// #importante 
 					// Mostraremos a ajuda do aplicativo.
-					
-					//procedureHelp();
-				    //alt_status = 0;
-					//ctrl_status = 0;
-					//shift_status = 0;
-                    //backgroundDraw(COLOR_BLACK);
-					//printf("%s",stdin->_base);  //mostrar a entrada padrão.
-					//refresh_screen();
-                    
-					//tentando indica qual janela está com o foco de entrada.
-					//draw_text(window,0,0,COLOR_PINK,"*");
-					//refresh_rectangle( window->left, window->top, 8, 8 );
 					break;
 					
 				
 				//Kernel info.	
                 case VK_F2:
 					KiInformation();
-				    //alt_status = 0;
-					//ctrl_status = 0;
-					//shift_status = 0;
-                    // backgroundDraw(COLOR_BLACK);
-					//printf("%s",stdout->_base);  //mostrar a entrada padrão.
-					//refresh_screen();
 					break;
 				
 	
@@ -572,9 +553,9 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-				
-				     //vfsListFiles();
-				    
+				    memoryShowMemoryInfo();
+					
+				    //vfsListFiles();
 					//vfsShowVFSInfo();
 					
 					//#test testando inicialização do IDE, #funcionou.

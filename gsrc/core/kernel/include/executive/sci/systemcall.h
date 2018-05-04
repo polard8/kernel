@@ -160,11 +160,11 @@
 #define	SYS_69 69    
 //process and thread support.
 #define	SYS_EXIT    70    //Uma thread terminou.(terminate a current process)
-#define	SYS_FORK    71    //fork.(create a child process)
+#define	SYS_FORK    71    //fork.
 #define	SYS_CREATETHREAD    72    //Create Thread.
 #define	SYS_CREATEPROCESS   73    //Create process. 
 #define	SYS_CLOSEALLPROCESS 74    //FECHA TODOS PROCESSO.
-#define	SYS_75 75
+#define	SYS_EXECVE  75            //execve 
 #define	SYS_GETNEXTPROCESS 76  //get next process
 #define	SYS_SETNEXTPROCESS 77
 #define	SYS_GETNEXTTHREAD 78   //get next thread.
@@ -279,9 +279,11 @@
 #define	SYS_164 164
 #define	SYS_165 165
 #define	SYS_166 166
-#define	SYS_167 167
-#define	SYS_168 168
-#define	SYS_169 169
+
+/*gramado core specials execve*/
+#define	SYS_GRAMADOCORE_INIT_EXECVE    167
+#define	SYS_GRAMADOCORE_SHELL_EXECVE   168
+#define	SYS_GRAMADOCORE_TASKMAN_EXECVE 169
 //#importante
 //fs - gerenciamento de arquivos e fs.
 //@todo: get set disk id e directory id.
@@ -382,7 +384,7 @@
 #define	SYS_GETSYSTEMMETRICS 250 
 #define	SYS_251 251
 #define	SYS_252 252
-#define	SYS_253 253
+#define	SYS_MEMORYINFO        253
 #define	SYS_SHOWPCIINFO       254
 #define	SYS_SHOWKERNELINFO    255
 

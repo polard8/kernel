@@ -68,39 +68,27 @@ typedef unsigned int   UINT;      //32bit
 typedef unsigned long  ULONG;     //32bit
 
 
+
+typedef	unsigned long  vm_offset_t;
+typedef	unsigned long  vm_size_t;
+
 /*
- *  Ints 
+ * Basic integral types.
+ * (BSD style)
+ *
  */ 
+ 
 typedef char  int8_t;
-typedef short int16_t;
-typedef int   int32_t;
-
-
-/*
- *  Unsigned Ints
- */ 
 typedef unsigned char  uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int   uint32_t;
+typedef short  int16_t;
+typedef unsigned short  uint16_t;
+typedef int  int32_t;
+typedef unsigned int  uint32_t;
+//typedef	long long		  int64_t;
+//typedef	unsigned long long	u_int64_t;
 
-
-/*
-//Linux types.
-
-typedef signed char s8;
-typedef unsigned char u8;
-
-typedef signed short s16;
-typedef unsigned short u16;
-
-typedef signed int s32;
-typedef unsigned int u32;
-
-typedef signed long long s64;
-typedef unsigned long long u64;
-*/
 
 //
-// Fim.
+// End
 //
 

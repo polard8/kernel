@@ -780,7 +780,8 @@ void *services( unsigned long number,
 			
 		//110 Reboot. (Teclado é legado, é desbloqueado)
 	    case SYS_REBOOT: 
-		    systemDevicesUnblocked(2,0,0,0,0); 
+		    //systemDevicesUnblocked(2,0,0,0,0); 
+			systemReboot();
 			break;
 			
 		//...
@@ -866,6 +867,11 @@ void *services( unsigned long number,
 		//154 - get group id	
 		case SYS_GETCURRENTGROUPID:
 		    return (void*) current_group;
+			break;
+			
+		//167	
+		case 167:
+		    executive_gramado_core_init_execve( arg2, arg3, arg4 );
 			break;
 			
 		//157 - get user session id	
@@ -1029,18 +1035,24 @@ void *services( unsigned long number,
 		//    break;
 		
 		//253
-		//case 253:
-		//    break;
+		case SYS_MEMORYINFO:
+		    memoryShowMemoryInfo();
+			refresh_screen();
+			break;
 			
 			
 		//254 - Show PCI info.	
 		case SYS_SHOWPCIINFO: 
-		    systemDevicesBlocked(1,0,0,0,0); 
+		    //systemDevicesBlocked(1,0,0,0,0); 
+			systemShowDevicesInfo();
+			refresh_screen();
 			break;
 			
 		//255 - Mostra informações sobre o kernel.	
 		case SYS_SHOWKERNELINFO: 
-		    systemRam(1,0,0,0,0); 
+		    //systemRam(1,0,0,0,0); 
+			KiInformation();
+			refresh_screen();
 			break;
 			
 		//

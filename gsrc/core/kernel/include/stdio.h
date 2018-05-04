@@ -314,6 +314,16 @@ int g_inputmode;
 #define PRINT_BUF_LEN 12
 
 
+
+/*
+ (BSD style)
+#define	_IOFBF	0		// setvbuf should set fully buffered 
+#define	_IOLBF	1		// setvbuf should set line buffered 
+#define	_IONBF	2		// setvbuf should set unbuffered 
+
+#define	BUFSIZ	1024	// size of buffer used by setbuf
+#define	EOF	(-1)
+*/
 #define EOF (-1)    //Ok.
 
 

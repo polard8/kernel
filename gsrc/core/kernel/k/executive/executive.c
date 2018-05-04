@@ -52,6 +52,101 @@
 
 
 /*
+ *****************************************************************
+ * executive_gramado_core_init_execve:
+ *     Executa um programa no processo INIT 
+ * dentro do ambiente Gramado Core. 
+ * #obs: Isso funcionou.
+ */
+void executive_gramado_core_init_execve( const char *filename, 
+                                         const char *argv[], 
+                                         const char *envp[] )
+{
+	
+	struct thread_d *Thread;
+    
+	//
+	// Testando carregar um programa para 
+	// rodar no processo INIT, usando a thread 
+	// primária do processo !
+	//
+	
+	printf("\nexecutive_gramado_core_init_execve: testing ...\n");
+	printf("fileneme={%s}\n",filename);
+	printf("arg={%x}\n",argv[0]);
+	printf("env={%x}\n",envp[0]);
+	
+	//
+	// Pegar o ponteiro da thread primária do processo 
+	// INIT.
+	//
+	
+	Thread = (struct thread_d *) threadList[0];
+	if( (void*) Thread == NULL ){
+		goto fail;
+	}else{
+		
+		if( Thread->used != 1 || Thread->magic != 1234 ){
+			goto fail;
+		}
+		
+		// Significa que o contexto nunca foi salvo ...
+		// isso é importante, pois o spawn não funciona em thread 
+		// com o contexto salvo.
+		Thread->saved = 0; 
+		
+	    //Context.
+	    //@todo: Isso deve ser uma estrutura de contexto.
+	    Thread->ss  = 0x23;                          //RING 3.
+	    Thread->esp = (unsigned long) 0x0044FFF0;    //idleStack; (*** RING 3)
+	    Thread->eflags = 0x3200;  //0x3202, pois o bit 1 é reservado e está sempre ligado.
+	    Thread->cs = 0x1B;                                
+	    Thread->eip = (unsigned long) 0x00401000;   //entry point  	                                               
+	    Thread->ds = 0x23; 
+	    Thread->es = 0x23; 
+	    Thread->fs = 0x23; 
+	    Thread->gs = 0x23; 
+	    Thread->eax = 0;
+	    Thread->ebx = 0;
+	    Thread->ecx = 0;
+	    Thread->edx = 0;
+	    Thread->esi = 0;
+	    Thread->edi = 0;
+	    Thread->ebp = 0;
+		
+		
+		Thread->Next = NULL;
+		
+		//
+		// Load file.
+		//
+ 		
+		
+		//
+		// #bugbug
+		// #importante Precisamos do ponteiro válido para filename.
+		// Não podemos auterá-lo e depois usá-lo.
+		//
+		
+	    // "FILE    BIN"
+        fsLoadFile((unsigned char *) filename, (unsigned long) 0x00400000 );
+
+        queue_insert_data(queue, (unsigned long) Thread, QUEUE_INITIALIZED);
+        SelectForExecution(Thread);    // * MOVEMENT 1 ( Initialized ---> Standby ).		
+	};
+	
+	
+	
+fail:
+    printf("fail ");
+done:
+    printf("done\n");	
+	refresh_screen();
+	return;	
+};
+
+
+/*
 void executiveMain();
 void executiveMain(){
 	return;

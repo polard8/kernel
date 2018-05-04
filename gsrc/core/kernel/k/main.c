@@ -64,6 +64,12 @@ extern unsigned long SavedBootMode;
 extern void turn_task_switch_on();
 
 
+char copyright[] =
+"Copyright (c) 2005-2018\n\tFred Nora.  All rights reserved.\n\n";
+
+/* BSD quote: Components of the first process. */
+
+
 /*
  *************************************************
  * kMain: 
