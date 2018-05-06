@@ -1128,10 +1128,11 @@ void stdio_ClearToStartOfLine()
  * -3:   -3 right justif.
  *
  */
+/*	 
 int printf_main(void)
 {
 
-/*	
+
 	
 	int mi;
 	int i = 5;
@@ -1183,30 +1184,32 @@ int printf_main(void)
 	
     sprintf(buf, "-3: %4d right justif.\n", -3); 
     printf("%s", buf);
-*/
+
 
 done:
 	return (int) 0;
 };
+*/
 
 
 /*
+ ******************************************************************
  * input:
- *     ****** >>>> devemos nos certificar que input(.) não imprima nada.
- *     Coloca os caracteres digitados em um buffer, (string). Para depois 
- * comparar a string com outra string, que é um comando.
+ *     Coloca os caracteres digitados em um buffer, (string). 
+ * Para depois comparar a string com outra string, que é um comando.
  * 
- * Histórico:
- *     Versão 1.0, 2015 - Essa rotina foi criada por Fred Nora.
- *     Versão 1.0, 2016 - Revisão.
+ *     Devemos nos certificar que input(.) não imprima nada.
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
  *     ...
  */
 unsigned long input(unsigned long ch)
 {   
-	char c = (char) ch;  //Converte 'unsigned long' em 'char'.	
+	// Converte 'unsigned long' em 'char'.
+	char c = (char) ch;  	
 
-
-    if(g_inputmode == INPUT_MODE_LINE )	
+    if( g_inputmode == INPUT_MODE_LINE )	
     {
         //Limite.
 	    if(prompt_pos >= PROMPT_SIZE)
@@ -1298,29 +1301,29 @@ input_done:
 
 
 /*
+ ***********************************************************
  * stdioInitialize:
  *     Inicializando stdio pertencente ao kernel base.
- *
+ *     Inicializa as estruturas do fluxo padrão.
+ *     Quem chamou essa inicialização ?? Em que hora ??
  */
-//inicializa as estruturas do fluxo padrão.
-// ?? Quem chamou essa inicialização ?? em que hora ??
 void stdioInitialize()
 {
-	//
-	// #bugbug:
-	//  4Kb alocados para cada estrutura. Isso é muito.
-	//  Podemos alocar 4KB para o buffer. 'prompt'
-	//
-	
-	//buffers para as estruturas.
-	//unsigned char buffer0[512];
-	//unsigned char buffer1[512];
-	//unsigned char buffer2[512];
-	
-	//buffers para as estruturas.
+	int i;
+
+	// Buffers para as estruturas.
 	unsigned char *buffer0;
 	unsigned char *buffer1;
 	unsigned char *buffer2;
+	
+	//
+	// #bugbug:
+	//  4KB alocados para cada estrutura. Isso é muito.
+	//  Mas ao mesmo tempo estamos economizando o heap 
+	//  usado pelo malloc.
+	//  Podemos alocar 4KB para o buffer. 'prompt'
+	//
+	
 	
 	//
 	// Alocando uma página para cada buffer.
@@ -1328,61 +1331,80 @@ void stdioInitialize()
 	//
 	
 	//4KB
-	buffer0 = (unsigned char *) newPage();
-	if( (unsigned char *) buffer0 == NULL ){
+	buffer0 = (unsigned char *) newPage(); //?? kernel mode ??
+	if( (unsigned char *) buffer0 == NULL )
+	{
 		printf("stdioInitialize: buffer0");
-		refresh_screen();
-		while(1){}
+        die();
 	}
 	
 	//4KB
 	buffer1 = (unsigned char *) newPage();
-	if( (unsigned char *) buffer1 == NULL ){
+	if( (unsigned char *) buffer1 == NULL )
+	{
 		printf("stdioInitialize: buffer1");
-		refresh_screen();
-		while(1){}
+        die();
 	}
 	
 	//4KB
 	buffer2 = (unsigned char *) newPage();
-	if( (unsigned char *) buffer2 == NULL ){
+	if( (unsigned char *) buffer2 == NULL )
+	{
 		printf("stdioInitialize: buffer2");
-		refresh_screen();
-		while(1){}
+        die();
 	}
+	
+	//
+	// Alocando memória para o fluxo padrão do 
+	// processo kernel.
+	//
 	
 	stdin  = (FILE *) &buffer0[0];	
 	stdout = (FILE *) &buffer1[0];	
 	stderr = (FILE *) &buffer2[0];	
 	  
+	  
+	//
+    // Configurando a estrutura de stdin.
+    //	
+	  
 	stdin->_base = &prompt[0];
 	stdin->_ptr = stdin->_base;
 	stdin->_cnt = PROMPT_MAX_DEFAULT;
 	stdin->_file = 0;
-	stdin->_tmpfname = "stdin";
+	stdin->_tmpfname = "kernel-stdin";
 	//...
+
+	//
+    // Configurando a estrutura de stdout.
+    //	
 	
 	stdout->_base = &prompt_out[0];
 	stdout->_ptr = stdout->_base;
 	stdout->_cnt = PROMPT_MAX_DEFAULT;
 	stdout->_file = 1;
-	stdout->_tmpfname = "stdout";
+	stdout->_tmpfname = "kernel-stdout";
 	//...
+	
+	//
+    // Configurando a estrutura de stderr.
+    //	
 	
 	stderr->_base = &prompt_err[0];
 	stderr->_ptr = stderr->_base;
 	stderr->_cnt = PROMPT_MAX_DEFAULT;
 	stderr->_file = 2;
-	stderr->_tmpfname = "stderr";	
+	stderr->_tmpfname = "kernel-stderr";	
 	//...
 	
-	//multiplas linhas.
+	
+	//
+	// Flag para o tipo de input.
+	// # Multiplas linhas.
+	//
+	
 	g_inputmode = INPUT_MODE_MULTIPLE_LINES;
 	
-	
-	//
-	//
-	//
 	
 	//
 	// Inicializa o cursor com margens bem abertas.
@@ -1397,17 +1419,34 @@ void stdioInitialize()
 	g_cursor_y = g_cursor_top;  		
 	
 	
-	int i;
-	for(i=0; i<PROMPT_MAX_DEFAULT;i++)
+	//
+	// #importante:
+	// Preenche os arquivos do fluxo padrão do kernel base
+	// com 'zeros'.
+	//
+
+	for( i=0; i<PROMPT_MAX_DEFAULT; i++ )
 	{
 		prompt[i] = (char) '\0';
 		prompt_out[i] = (char) '\0';
 		prompt_err[i] = (char) '\0';
 	};
 
+	// Inicializa o deslocamento dentro do arquivo de entrada.
+	// #bugbug @todo: Poderíamos ter posicionamento dentro 
+	// dos 3 arquivos. Mas isso reflete apenas o posicionamento 
+	// dentro de stdin por enquanto.
+	
     prompt_pos = 0;	
 	
-}
+	
+	//
+	// Done !
+	//
+	
+done:
+    return;	
+};
 
 
 //

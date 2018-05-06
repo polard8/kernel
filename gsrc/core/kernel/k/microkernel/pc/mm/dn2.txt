@@ -1,10 +1,10 @@
-alocar memória em buffer fisico.
-alocar memoria em buffer de memória compartilhada.
 
-precisamos de um endereço físico para criarmos pagedirectory e pagetables.
+  @todo:
+  ?? alocar memória em buffer físico.
+  ?? alocar memória em buffer de memória compartilhada.
 
-
-Gerenciamento d o LFB.
+  +Precisamos de um endereço físico para criarmos pagedirectory e pagetables.
+  +@todo: Gerenciamento do LFB. Ele pode er uma estrutura.
 
 O Frontbuffer será formado pelo conjunto dos LFBs de todas as placas de vídeo somados
 e consecutivos. Ex: Para 4 placas de 1GB cada, teremos um frontbuffer de 4GB. 

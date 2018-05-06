@@ -932,7 +932,7 @@ int SetUpPaging()
 	
 	
 	
-	//Criando uma pagetable.
+	//Criando uma pagetable. (user mode)
 	//Os quatro primeiros MB da memória de vídeo.
 	//user mode LFB pages - (0x????????fis = 0xC0400000virt).
 	//provavelmente o endereço físico é 0xE0000000
@@ -1048,6 +1048,7 @@ int SetUpPaging()
 	
 	g_pagedpool_va = (unsigned long) 0xC0C00000;
 	
+	//(user mode)
 	for( i=0; i < 1024; i++ )
     {
 		//IF SMALL
@@ -1621,8 +1622,11 @@ void notfreePageframe(struct page_frame_d *pf)
 
 
 /*
+ ******************************************************
  * newPageFrame:
- * Aloca apenas uma página e retorna o handle.
+ *    Aloca apenas uma página e retorna o ponteiro.
+ *    ? kernel mode ? user mode ?
+ *    obs: isso funciona bem.
  */
 void *newPageFrame()
 {
@@ -1665,24 +1669,29 @@ fail:
 
 
 /*
+ *********************************************************************
  * newPage:
- * Aloca uma página e retorna seu endereço virtual inicial
+ *     Aloca uma página e retorna seu endereço virtual inicial
  * com base no id do pageframe e no endereço virtual inicial do pool 
  * de pageframes.
- *
+ *     ? kernel Mode ? ou user mode ?
+ *     Obs: Isso funciona bem.
  */
 void *newPage()
 {
-    struct page_frame_d *New;
+	// Esse é o endereço virtual do início do pool de pageframes.
+	unsigned long base = (unsigned long) g_pagedpool_va;	
+    
+	struct page_frame_d *New;
 	
-	
-	//Esse é o endereço virtual do início do pool de pageframes.
-	unsigned long base = (unsigned long) g_pagedpool_va;
-
-	//pega o id do pageframe e multiplica pelo tamanho da página e adiciona a case	
+    //
+	// Pega o id do pageframe e multiplica pelo tamanho da página e 
+	// adiciona a base.	
+	//
 	
     New	= (void*) newPageFrame();
-	if( New == NULL ){
+	if( New == NULL )
+	{
 	    //fail	
 		printf("pc-mm-newPage: New\n");
 		goto fail;
@@ -1700,6 +1709,11 @@ void *newPage()
 			}				
 		};		
 	};
+	
+ //
+ // Fail !
+ //
+	
 fail:
     return NULL;	
 };
@@ -1740,7 +1754,10 @@ fail:
 };
 
 
- //@todo: Rotina de teste. deletar.
+
+//#importante:
+//teste de memória é sempre importante.
+//@todo: Rotina de teste.  
 void testingFrameAlloc()
 {	
 	int Index;

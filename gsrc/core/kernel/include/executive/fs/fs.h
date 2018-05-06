@@ -554,6 +554,8 @@ struct dir_d
 	// @todo: Criar e organizar os elementos dessa estrutura.
 	//
 	
+	int id;
+	
 	//
 	int used;
 	
@@ -605,9 +607,14 @@ struct dir_d
 	 */
 	struct dir_entry_d *current;
 };
+struct dir_d *volume0RootDir;  //VFS.
+struct dir_d *volume1RootDir;  //boot volume.
+struct dir_d *volume2RootDir;  //system volume.
+//...
+
 
 //Diretório raiz.
-struct dir_d *rootDir;      // "/"
+struct dir_d *rootDir;      // 
 
 //Principais.
 struct dir_d *gbuildDir;    // "/gbuild"
@@ -624,7 +631,7 @@ struct dir_d *downloadDir;  // "/download"
 //...
 
 //Diretório atual.
-struct dir_d *currentDir;       // "/?"
+struct dir_d *currentDir;       // 
 
 
 //
@@ -636,11 +643,16 @@ struct dir_d *currentDir;       // "/?"
  
  
 /*
- * Lista de endreços de estruturas de arquivos ou diretorios.
+ * Lista de endreços de estruturas de arquivos.
  *
  */
 unsigned long fileList[32]; 
 
+/*
+ * Lista de endreços de estruturas de diretórios.
+ *
+ */
+unsigned long dirList[32]; 
 
 /*
  * filesystem_d:

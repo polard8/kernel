@@ -2,6 +2,7 @@
  * File: main.c 
  *
  * General purpose application.
+ *
  *     SHELL.BIN é um aplicativo de próposito geral. Desenvolvido como 
  * ferramenta do desenvolvedor para prover varios tipos de testes de recursos do sistema.
  *
@@ -40,9 +41,9 @@
  * A GERENCIA DOS RECURSOS DO SISTEMA, POIS ISSO É ATRIBUIÇÃO DO APP TASKMAN.
  *
  *
- * Histórico:
- *     Versão 1.0, 2016 -  Esse arquivo foi criado por Fred Nora.
- *     //...
+ * History:
+ *     2016 - Created by Fred Nora.
+ *     2018 - More commands.
  */
 
 /*
@@ -107,20 +108,21 @@ int ShellFlag = 0;
 //
 
 
-unsigned long shellProcedure( struct window_d *window, 
-                              int msg, 
-							  unsigned long long1, 
-							  unsigned long long2 );
-							  
-							  
-unsigned long shellTopbarProcedure( struct window_d *window, 
-                                    int msg, 
-							        unsigned long long1, 
-							        unsigned long long2 );
+// Procedimento de janela principal do aplicativo.
+unsigned long 
+shellProcedure( struct window_d *window, 
+                int msg, 
+ 			    unsigned long long1, 
+				unsigned long long2 );
 							  
 
- 
- 
+// Procedimento de janela da topbar.							  
+unsigned long 
+shellTopbarProcedure( struct window_d *window, 
+                      int msg, 
+			          unsigned long long1, 
+					  unsigned long long2 );
+					  
  
 /*
  *****************************************************************
@@ -140,7 +142,8 @@ unsigned long shellTopbarProcedure( struct window_d *window,
  *    +...
  *
  *  
- *  ## O SHELL É UM APLICATIVO DO TIPO JANELA DEVE TER UM MAIN DO TIPO JANELA ##
+ *  ## O SHELL É UM APLICATIVO DO TIPO JANELA, 
+ *     DEVE TER UM MAIN DO TIPO JANELA ##
  *
  * Obs: Esses argumentos podem ser um padrão.
  */
@@ -156,7 +159,8 @@ int GramadoMain( int argc,
 	//
 	// Obs: Esse não é um programa que roda em modo terminal,
 	// ele na verdade cria um terminal dentro de uma janela filha.
-	// isso pode servir para esse programa interpretar linguagem basic por exemplo.
+	// isso pode servir para esse programa interpretar linguagem 
+	// basic por exemplo.
 	// os programas em modo terminal não criarão janelas e rodarão nas 
 	// janelas de terminal cridas para eles pelo kernel.
 	//
@@ -193,8 +197,8 @@ int GramadoMain( int argc,
 	//struct window_class_d *wc; 
 	
 	
-	struct window_d *hWindow;        //janela do aplicativo.
-
+	// A janela principal do aplicativo.
+	struct window_d *hWindow;        
 	
 	//struct message_d *m;
 
@@ -464,14 +468,13 @@ noArgs:
 	                                   shell_window_x, shell_window_y, 
 									   shellWindowWidth, shellWindowHeight,    
                                        0, 0, COLOR_BLACK, 0x83FCFF00 );	   
-	if((void*) hWindow == NULL){	
+	if((void*) hWindow == NULL)
+	{	
 		printf("Shell: Window fail");
 		refresh_screen();
 		while(1){}
 		//exit(0);
 	};
-	
-
 	
 	/*
 	 Imprimindo o ponteiro para a estrutura da janela criada 
@@ -521,6 +524,16 @@ noArgs:
 	// diferente de cursor.
     APISetFocus(hWindow);
 	
+	
+
+	//
+	// ?? Show Window !!
+	// Precisamos mostrar a janela e não repintar 
+	// a tela toda.
+	//
+	
+	refresh_screen();
+	
 	//#bugbug
 	//janela usada para input de textos ...
 	//o input de texto pode vir de várias fontes.
@@ -563,7 +576,8 @@ noArgs:
 	
 	enterCriticalSection();    // * Enter Critical Section.	
 	Status = (int) shellInit(hWindow); 
-	if(Status != 0){
+	if(Status != 0)
+	{
 		printf("[SHELL.BIN]: app_main: shellInit fail!");
 		refresh_screen();
 		while(1){};
@@ -892,16 +906,18 @@ shellProcedure( struct window_d *window,
 		//do sistema.
 		
 		case MSG_SYSKEYDOWN:
-		    switch(long1){
+		    switch(long1)
+			{
 		        
 				//help
 				case VK_F1:
-				    //MessageBox( 1, "Gramado Core - Shell","F1: HELP");
-					//shell_gramado_core_init_execve( "TESTTESTBIN", 0, 0 );
+				    MessageBox( 1, "Gramado Core - Shell","F1: HELP");
 					
-					//testando formato amigável de string
-					shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
+					//testando formato amigável de string - ok
+					//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
 					break;
+					
+				//...
 				
                 //full screen
                 //colocar em full screen somente a área de cliente. 				
@@ -919,7 +935,8 @@ shellProcedure( struct window_d *window,
 		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
 		//como o context menu [Application Key]
 		case MSG_SYSKEYUP:
-            switch(long1){
+            switch(long1)
+			{
 				
 				//O MENU APPLICATION É O CONTEXT MENU.
 				//
@@ -2062,6 +2079,9 @@ do_compare:
     // então damos um aviso de comando inválido e reiniciamos o prompt 
     // na próxima linha.
     //
+	
+	//fail.
+	int Execve_Ret = 1;
  
 palavra_nao_reservada:
 
@@ -2077,11 +2097,61 @@ palavra_nao_reservada:
 	// precisa de mais análises como as barras '/'
 	//
 	//
-
+	
+    //
+    // ## Se o comando começa com barra.
+    //	
+	
+	//if( prompt[0] == '/' )
+	//{
+		
+	//}
+	
+	
+	//
+	// ## Executando um programa no formato ">test.bin"
+	//
+	
+    //teste: com argumentos.
+    //Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 
+	//                                                    tokenList[i+1], 
+	//													tokenList[i+2] );
+	
     //Presumindo ser um nome de aplicativo no formato 'test.bin'.
 	//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
-    shell_gramado_core_init_execve( (const char*) prompt, 0, 0 );
-	goto exit_cmp;
+    Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 0, 0 );
+	
+	// Ok, funcionou e o arquivo foi carregado,
+	// mas demora para receber tempo de processamento.
+	if( Execve_Ret == 0 )
+	{
+		//
+		// ## WAIT ??
+		//
+		
+		// Aqui temos uma decisão a tomar.
+		// Se o aplicativo executou corretamente e esta em primeiro 
+		// plano então devemos entrar em wait.
+		// Se o aplicativo funcionou corretamente mas está em segundo 
+		// plano então decemos continuar. 
+		// Por enquanto estamos continuando e rodando concomitantemente.
+		//
+		
+	    goto exit_cmp;	
+	}else{
+		// falhou. Significa que o serviço naõ conseguir encontrar 
+		// o arquivo ou falhou o carregamento.
+		printf("shell: execve fail\n");
+	}
+	
+	//
+	// Se o arquivo não foi encontrado não há mais o que fazer.
+	//
+	
+	
+	//@todo: Se retornar 0 vamos para exit_cmp.
+	// caso contrário mostramos a mensagem de comando desconhecido.
+
 	
     //shellParseFileName(); @todo
 	
@@ -2116,9 +2186,14 @@ palavra_nao_reservada:
 	
 	// set current directory
 	
+fail:	
+	for( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){
+		tokenList[i] = NULL;
+	};
 	
 	printf(" Unknown command!\n");
 	printf("%s\n", prompt);
+	
 	shellPrompt();
 	//Mostrando as strings da rotina de comparação.
 	refresh_screen(); 	
@@ -3583,6 +3658,7 @@ void shellShowKernelInfo()
 //rotina interna de support.
 //isso deve ir para bibliotecas depois.
 //não tem protótipo ainda.
+// Credits: Luiz Felipe
 //void shell_fntos(const char *name)
 void shell_fntos(char *name)
 {
@@ -3626,13 +3702,42 @@ void shell_fntos(char *name)
  *******************************************************
  * shell_gramado_core_init_execve:
  *     gramado core specials execve SUPPORT
+ *     ## executa arquivos do tipo ">test.bin"
  *
+ *     #importante; E caso o arquivo não tenha extensão?
+ *     # Devemos presumir que ele seja .bin ?? 
+ *       Ou não tenha ponto nem extensão. ?? Certamente o 
+ * carregamento irá falhar.
+ *     #@todo: caso seja .bin mas começe com "/"
+ *     Devemos suprimir a barra. 
+ *     
  */									 
-void shell_gramado_core_init_execve( const char *filename, 
-                                     const char *argv[], 
-                                     const char *envp[] )
-{	
+int shell_gramado_core_init_execve( const char *filename, 
+                                    const char *argv[], 
+                                    const char *envp[] )
+{
+
+	// suprimindo dot-slash
+	// The dot is the current directory and the 
+	// slash is a path delimiter.
+	//if( filename[0] == '.' && filename[1] == '/' )
+	//{ 
+	//    filename++;
+    //    filename++; 
+    //    goto translate;	
+	//};
 	
+	
+	//suprimindo a barra.
+	if( *filename == '/' || 
+	    *filename == '\\' )
+	{ 
+	    filename++; 
+	};
+	
+	
+	
+translate:	
 	//Ok funcionou.
 	shell_fntos( (char *) filename);
 	
@@ -3642,15 +3747,18 @@ void shell_gramado_core_init_execve( const char *filename,
 
 	//isso deve chamar gramado_core_init_execve() na api.
 	
+
+								
+								
 	//
-	// 
-	//
-	//
-	system_call( 167, 
-	            (unsigned long) filename,
-				(unsigned long) argv,
-				(unsigned long) envp );
-	
-    /* No return */
+    // Retornaremos. Quem chamou essa rotina que tome a decisão 
+	// se entra em wait ou não.
+    //	
+    
+done:	
+	return (int) system_call( 167, 
+	                          (unsigned long) filename,
+				              (unsigned long) argv,
+				              (unsigned long) envp );
 };
 

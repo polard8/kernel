@@ -1,5 +1,5 @@
 /*
- * File: ram\bank.h 
+ * File: mm\bank.h 
  *
  * Descrição:
  *     Gerente de banco de dados em memória e em disco.
@@ -25,8 +25,7 @@ int banksCount;
 //caso o sistema tenha apenas um banco, então a user session ficará no fim do banco.
 int lastBank;
 
-        
-
+       
  
  
 typedef enum {

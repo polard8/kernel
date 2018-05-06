@@ -1,7 +1,10 @@
 /*
- * File: ram\dspace.h 
+ * File: mm\dspace.h 
  * 
- * Disk Space.
+ * Disk Space. 
+ *    Gerenciamento de espaço em disco. Isso está no módulo de memória 
+ * para servir de interface entre o gerente de memória e o gerente de disco 
+ * no suporte a memória virtual. Principalmente swap.
  *      
  * Obs: O lugar natural desse disco seria na classe de dispositivos, certo ?
  *      Mas ficará aqui, porque tem uma grande realção com memória ram,

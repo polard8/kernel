@@ -532,7 +532,8 @@ static void printchar(char **str, int c);
 static int prints(char **out, const char *string, int width, int pad);
 static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase);
 static int print(char **out, int *varg);
-int printf_main(void);    //#Teste.
+
+//int printf_main(void);    //#suspensa
 
 
 //Suporte às rotinas do padrão C.

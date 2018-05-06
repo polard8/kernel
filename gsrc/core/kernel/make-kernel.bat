@@ -245,7 +245,7 @@ echo -{ ux1 /gramado \o/
     rem draw
     gcc -c k/gramado/gui/dtext.c  -I./include -o dtext.o
     rem draw
-    gcc -c k/gramado/gui/draw.c   -I./include -o draw.o	
+    gcc -c k/gramado/gui/font.c   -I./include -o font.o	
     rem createw
     gcc -c k/gramado/gui/createw.c    -I./include -o createw.o    
     rem grid
@@ -388,7 +388,7 @@ pixel.o ^
 line.o ^
 rect.o ^
 dtext.o ^
-draw.o ^
+font.o ^
 vsync.o ^
 bmp.o ^
 createw.o ^

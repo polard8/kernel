@@ -91,12 +91,13 @@ kernel fica com o 1GB superior."
 			 +====================================+
              |           Kernel land              |
 	         |                                    | 
-             |  Stack = 0xC0300000 ~ 0xC03FFFF0   | Pilha do Kernel. 
-	         |  Heap  = 0xC0100000 ~ 0xC02FFFF0   |	Obs: O Heap do kernel precisa ser maior.
+             |  Stack = 0xC02F7FF0 ~ 0xC02FFFF0   | Total 32KB. 
+	         |  Heap  = 0xC0100000 ~ 0xC02F7FF0   |	Total 2015 KB.
              |                                    | 			 
-			 |  Kernel Entry point = 0xC0001000   |      Entry point do kernel.
-	         |  Kernel Base = 0xC0000000          |	     Início da imágem do processo kernel. 
-	C0000000 |         Kernel Mode access         |	 	   
+			 |  Kernel Entry point = 0xC0001000   | Entry point do kernel.
+	         |  Kernel Base = 0xC0000000          |	Início da imagem do 
+             |                                    |	processo kernel. 		 
+	C0000000 |        ( Kernel Mode access )      |	 	   
 	         +------------------------------------+
              |           User Land                |
 		     +------------------------------------+
@@ -104,8 +105,8 @@ kernel fica com o 1GB superior."
 		     +------------------------------------+
 		     +------------------------------------+ 			 
 	         |                                    |
-             |  Stack = 0x00403000 ~ 0x0043FFF0   | @todo  Início da pilha em user mode do proesso.
-	         |  Heap  = 0x00401000 ~ 0x0042FFF0   | @todo: Início do heap em user mode do processo.
+             |                                    | @todo  Início da pilha em user mode do proesso.
+	         |                                    | @todo: Início do heap em user mode do processo.
              |                                    | ### Por enquando cada processo tem sua própria
              |                                    |     pilha e heap no fim da imagem do processo.   			 
              |                                    | 
@@ -134,8 +135,8 @@ kernel fica com o 1GB superior."
 
  Kernel Base        = 0xC0000000
  Kernel Entry point = 0xC0001000
- Heap               = 0xC0100000 ~ 0xC02FFFF0  
- Stack              = 0xC0300000 ~ 0xC03FFFF0
+ Stack = 0xC02F7FF0 ~ 0xC02FFFF0   | Total 32KB. 
+ Heap  = 0xC0100000 ~ 0xC02F7FF0   | Total 2015 KB.
 
 
 *********************************
@@ -143,16 +144,9 @@ kernel fica com o 1GB superior."
 
  Kernel Base        = 0x00100000
  Kernel Entry point = 0x00101000 
- Heap               = 0x00200000 ~ 0x003FFFF0    
- Stack              = 0x00400000 ~ 0x004FFFF0
-
-
- //#bugbug
- A configuração acima é a desejada, mas na prática o endereço 
- da pilha indicado na TSS é 0x200000
- 
- 
-			 
+ Heap               =      
+ Stack              =  
+ 		 
 	@todo: 
 	    O layout da memória virtual está em fase de desenvolvimento.	   
 	    Criar um layout dos endereços físicos principais usados pelo sistema.
@@ -174,9 +168,13 @@ kernel fica com o 1GB superior."
 //     Serão colocados em cr3.
 //
 
-//@todo: Precisamaos definir melhor esses endereços.
-//Colocá-los em um lugar segura e concatenados.
 
+//aqui seria um lugar segura para os diretórios desses processos 
+//do ambiente Gramado Core.
+//para os outros ambientes podemos concatenar os diretórios em 
+//outro lugar de fácil acesso.
+//Obs: #bugbug No momento estamos usando apenas o diretório do 
+//porcesso kernel para tosos os aplicativos do ambiente Gramado Core.
 #define KERNEL_PAGEDIRECTORY  (0x0009C000)                        
 #define IDLE_PAGEDIRECTORY    (0x0009C000 + 4096)                
 #define SHELL_PAGEDIRECTORY   (0x0009C000 + 4096 + 4096)         
@@ -417,36 +415,34 @@ unsigned long pagetableList[PAGETABLE_COUNT_MAX];
 
 
 
-
-
-
-
-
- 
  
 /**
  **  **  SUPER IMPORTANTE  **
  **
+ ** Super block.
  ** ESSAS VARIÁVEIS GLOBAIS MARCARÃO O INÍCIO E O FIM 
  ** DA ÁREA DE MEMÓRIA FÍSICA DESTINADA AOS FRAMES DE MEMÓRIA 
  ** FÍSICA QUE SERÃO USADOS PELO GERENCIADOR DE PÁGINAS.
- ** pertencerão ao banco FDB. Free Data Base.
- ** 0x10000000 é um bom lugar pra começar os frames 
+ **
+ ** Pertencerão ao banco FDB. (Free Data Base).
+ ** 0x10000000 é um bom lugar pra começar os frames ,
  ** na verdade os blocos 4MB, pois cada bloco de 4MB pode ser mapeado 
  ** usando apenas uma pagetable.
  ** 
  ** mmFramesSuperBlockStart = 0x10000000
  ** mmFramesSuperBlockEnd   = 0x1FFFFFFF
  ** 
- **
+ ** Esses são endereços físicos.
+ ** Obs: Ficarão nesse lugar caso se tenha memória disponível para isso.
  **
  **/
  
 // Frames Super Block.
 // Variáveis globais parecem ser uma opção melhor de estrutura
 // para esse caso. 
-// Obs: temos listas de frames em algum lugar. criaremos listas aqui
-//para o FSB, que será o nome do gerenciado, para melhorar o controle dessa área.
+// Obs: Temos listas de frames em algum lugar. 
+// Criaremos listas aqui para o FSB, que será o nome do gerenciado, 
+// para melhorar o controle dessa área.
 unsigned long mmFramesSuperBlockStart;      //Endereço onde começa o FSB.
 unsigned long mmFramesSuperBlockEnd;        //Endereço onde termina o FSB.
 unsigned long mmFramesSuperBlockSize;       //Tamanho do FSB dado em bytes.
@@ -461,41 +457,53 @@ unsigned long mmFramesSuperBlockTotalUsed;  //Total de frames e uso.
 
 //## BUGBUG isso tornaria esse array bem grande.
 
+
+//
+// Lista com todos.
+//
+
+
 //Lista de ponteiros para as estruturas de todos os frames do FSB.
 unsigned long fsbFrames[FSB_FRAMES_MAX]; 
+
+//
+// Lista de livres.
+//
+
 //Lista de ponteiros para as estruturas de todos os frames 'LIVRES' do FSB.
 unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];  
  
  
-
-
  
 //
 // memory:
 //
 
 //
-// Stack.
+// ## KERNEL STACK ##
 //
 
 //@todo: Crir estrutura de pilha.
 //kernel stack. (Endereço virtual da pilha do processo Kernel).
 //Obs: O Heap e a Stack estão dentro dos limites de 4MB de
 //tamanho da imagem do kernel base.
-#define KERNEL_STACK_SIZE   0x8000                                      //32kb
-#define KERNEL_STACK_START  0xC02FFFF0                                  //(1 mega + 3 megas)Início da pilha. No fim dos 4MB.      
-#define KERNEL_STACK_END    (KERNEL_STACK_START - KERNEL_STACK_SIZE)    //Fim da pilha.  
-
+//32kb
+#define KERNEL_STACK_SIZE   0x8000                                      
+#define KERNEL_STACK_START  0xC02FFFF0                                        
+#define KERNEL_STACK_END    (KERNEL_STACK_START - KERNEL_STACK_SIZE)  
 
 
 
 //Default stack que será usado em outra configuração de pilha.
-//#define DEFAULT_STACK_SIZE           (1 * 1024 * 1024)
-//#define DEFAULT_INITIAL_STACK_COMMIT (8 * 1024)
+//#define DEFAULT_STACK_SIZE           KERNEL_STACK_SIZE
+//#define DEFAULT_INITIAL_STACK_COMMIT ?
 
+//
+// ## KERNEL IMAGE ADDRESS ##
+//
 
-//image.
-#define KERNEL_IMAGE_BASE  0xC0000000    //Base da imagem do kernel.
+//Base da imagem do kernel.
+#define KERNEL_IMAGE_BASE  0xC0000000    
  
  
  
@@ -504,30 +512,43 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 // MM BLOCK.
 // 
 
+//Isso é usdo pelo heap.
 #define MMBLOCK_HEADER_SIZE 64 
  
 
 
+// Quantidade máxima de pageframes.
+// @todo: 
+// #bugbug. 
+// Isso tá errado. 
+// Essa é a quantidade de pageframes de apenas uma page table. 
+// Isso equiva à apenas um pagepool. enão não poderá ser usado
+// em outro lugar enão no contexto de um pagepool.
+//
+#define PAGEFRAME_COUNT_MAX 1024    //??
 
-//Quantidade máxima de pageframes.
-//@todo: #bugbug. isso tá errado. Essa é a quantidade de pageframes
-//de apenas uma page table. Isso equiva à apenas um pagepool.
-#define PAGEFRAME_COUNT_MAX 1024 //provisório
 
-
-//Quantidade máxima de framepools.
-//Um framepool é uma partição da memória física.
-//cada framepool é composto de 1024 pageframes.
-//@todo: #bugbug: A quantidade de framepools deve ser
-//equivalente à quantidade de memória física disponível.
-//Por isso devemos criar áreas de memória física alocáveis.
-// o que facilita a manutenção de listas de framepools.
-// Em outras palavra, temos que concatenar partições de memória física
-//pra facilitar. Chamaremos essa área onde estão as partições de
-//área paginável.
-//@todo: Criar um ponteiro que indique o ínício da área páginável,
-//assim como acontece com o início de um heap.
-// À principio todo processo poderia ter acesso à apenas uma partição
+// Quantidade máxima de framepools.
+// Um framepool é uma partição da memória física.
+// Cada framepool é composto de 1024 pageframes.
+//
+// @todo: 
+// #bugbug: 
+// A quantidade de framepools deve ser equivalente à quantidade 
+// de memória física disponível.
+// Por isso devemos criar áreas de memória física alocáveis. O que 
+// facilita a manutenção de listas de framepools.
+//
+// Em outras palavra. Temos que concatenar partições de memória física
+// pra facilitar. Então chamaremos essa área onde estão as partições de
+// área paginável. Pois existem áres de memória que não são pafináveis,
+// elas simplesmente foram mapeadas para que alguma parte do sistema use.
+//
+// @todo: 
+// Criar um ponteiro que indique o ínício da área páginável, assim como 
+// acontece com o início de um heap.
+//
+// À principio todo processo poderia ter acesso à apenas uma partição.
 // Um framepool é garantido para um processo quando esse processo é criado
 // mesmo antes de haver algum mapeamento. Na verdade um processo terá uma lista
 // de framepools.
@@ -539,7 +560,7 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //#bugbug
 //@todo: Aumentar ...
 //Contagem de mmblock. 
-#define MMBLOCK_COUNT_MAX  (2*4096)//4096 //512  //(1024)   256 
+#define MMBLOCK_COUNT_MAX  (2*4096)
  
  
 #define PAGE_SIZE 0x1000    //4096.
@@ -551,6 +572,10 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 #define KB  (1024)
 #define MB	(1024 * 1024)
 #define GB	(1024 * 1024 * 1024)
+
+//
+// ## MEMORY PARTITION ##
+//
 
 //Um framepool tem 4MB de tamanho.
 #define MEMORY_PARTITION_SIZE (4 * MB)
@@ -583,15 +608,16 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //
 
 //
-// Page directory entries.
+// ## PAGE DIRECTORY ENTRIES ##
 //
 
-#define KERNEL_PAGE_DIRECTORY_ENTRY 0
-#define KERNEL_IMAGE_PAGE_DIRECTORY_ENTRY 768
-#define USERMODE_PAGE_DIRECTORY_ENTRY 1
-#define VGA_PAGE_DIRECTORY_ENTRY 2
-#define LFB_PAGE_DIRECTORY_ENTRY 769           //Frontbuffer.
-#define BACKBUFFER_PAGE_DIRECTORY_ENTRY 770    //Backbuffer.
+#define KERNEL_PAGE_DIRECTORY_ENTRY        0    // 4 primeiros megas em kernel mode.
+#define USERMODE_PAGE_DIRECTORY_ENTRY      1    // 4 megas em user mode.
+#define VGA_PAGE_DIRECTORY_ENTRY           2    // VGA
+
+#define KERNEL_IMAGE_PAGE_DIRECTORY_ENTRY  768  // A imagem do kernel.
+#define LFB_PAGE_DIRECTORY_ENTRY           769  // Frontbuffer.
+#define BACKBUFFER_PAGE_DIRECTORY_ENTRY    770  // Backbuffer.
 //...
 
 

@@ -58,13 +58,20 @@
  * dentro do ambiente Gramado Core. 
  * #obs: Isso funcionou.
  */
-void executive_gramado_core_init_execve( const char *filename, 
-                                         const char *argv[], 
-                                         const char *envp[] )
+int executive_gramado_core_init_execve( const char *filename, 
+                                        const char *argv[], 
+                                        const char *envp[] )
 {
-	
 	struct thread_d *Thread;
     
+	//fail.
+	int Status = 1;
+	
+	//fail.
+	//if( (const char *) filename == NULL ){
+	//	return 1;
+	//}
+	
 	//
 	// Testando carregar um programa para 
 	// rodar no processo INIT, usando a thread 
@@ -82,7 +89,8 @@ void executive_gramado_core_init_execve( const char *filename,
 	//
 	
 	Thread = (struct thread_d *) threadList[0];
-	if( (void*) Thread == NULL ){
+	if( (void*) Thread == NULL )
+	{
 		goto fail;
 	}else{
 		
@@ -128,21 +136,38 @@ void executive_gramado_core_init_execve( const char *filename,
 		// Não podemos auterá-lo e depois usá-lo.
 		//
 		
+		//fs/read.c
 	    // "FILE    BIN"
-        fsLoadFile((unsigned char *) filename, (unsigned long) 0x00400000 );
+        Status = (int) fsLoadFile( (unsigned char *) filename, 
+		                           (unsigned long) 0x00400000 );
 
-        queue_insert_data(queue, (unsigned long) Thread, QUEUE_INITIALIZED);
-        SelectForExecution(Thread);    // * MOVEMENT 1 ( Initialized ---> Standby ).		
+        //fail
+		if( Status == 1 )
+		{
+			// @todo:
+			// Configurar estrutura.
+			goto fail;
+		};
+		
+		// Se deu certo.
+		if( Status == 0 )
+		{
+		    queue_insert_data(queue, (unsigned long) Thread, QUEUE_INITIALIZED);
+            SelectForExecution(Thread);    // * MOVEMENT 1 ( Initialized ---> Standby ).
+            goto done; 
+        };	
+         
+        //fail		 
 	};
 	
-	
+	//fail
 	
 fail:
     printf("fail ");
 done:
     printf("done\n");	
 	refresh_screen();
-	return;	
+	return (int) Status;	
 };
 
 

@@ -616,9 +616,9 @@ void shellShowKernelInfo();
  * gramado core specials execve SUPPORT.
  */
  
-void shell_gramado_core_init_execve( const char *filename, 
-                                     const char *argv[], 
-                                     const char *envp[] );
+int shell_gramado_core_init_execve( const char *filename, 
+                                    const char *argv[], 
+                                    const char *envp[] );
 
 //
 // shelui.c

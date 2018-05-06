@@ -2616,94 +2616,9 @@ unsigned long clientcolor,            //11 - Client Area Color.
 unsigned long color             //12 - cor do bg (para janelas simples, tipo 1)
 );
 
-
-/*
- * do_draw:
- *     Pinta vários tipos de janelas.
- */
-void do_draw(struct window_d *window, int type);
-
-
+ 
+ 			
 //
-// Rotinas de pintura:
-// Funções  de suporte à CreateWindow.
+// End.
 //
 
-//1
-void DrawPopUpWindow( struct window_d *w,
-                        unsigned long x,  
-                      unsigned long y,  
-					  unsigned long width,  
-					  unsigned long height,  
-					  unsigned long color);
-//2
-void DrawEditBoxWindow( struct window_d *w,
-                        unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height, 
-						unsigned long color);
-//3
-void DrawNormalWindow( struct window_d *w,
-                       char* titulo, 
-                       unsigned long x, 
-					   unsigned long y, 
-					   unsigned long width, 
-					   unsigned long height, 
-					   unsigned long color);
-//4
-void DrawNormalEditWindow( struct window_d *w,
-                           unsigned long x, 
-                           unsigned long y, 
-						   unsigned long width, 
-						   unsigned long height, 
-						   unsigned long color);
-//5
-void DrawMenuBarWindow( struct window_d *w,
-                        unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height, 
-						unsigned long color);
-//6
-void DrawToolBarWindow( struct window_d *w,
-                        unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height, 
-						unsigned long color);
-//7
-void DrawStatusBarWindow( struct window_d *w,
-                          unsigned char *string1, 
-                          unsigned char *string2, 
-						  unsigned long x, 
-						  unsigned long y, 
-						  unsigned long width, 
-						  unsigned long height, 
-						  unsigned long color);
-//8
-void DrawTaskBarWindow( struct window_d *w,
-                        unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height, 
-						unsigned long color);
-//9
-void DrawControlMenuWindow(struct window_d *w,
-                            unsigned long x, 
-                            unsigned long y, 
-							unsigned long width, 
-							unsigned long height, 
-							unsigned long color);
-//10
-void DrawAppWindow( struct window_d *w,
-                    char* titulo, 
-                    unsigned long x, 
-					unsigned long y, 
-					unsigned long width, 
-					unsigned long height, 
-					unsigned long color);
-					
-//
-//fim.
-//

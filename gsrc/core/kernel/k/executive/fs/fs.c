@@ -770,6 +770,24 @@ int fsInit()
     //
 	
 	set_spc(1);
+	
+   
+    //
+    // ## initialize currents ##
+    //	
+	
+	
+	//selecionando disco, volume e diretório.
+	//estamos resetando tudo e selecionando o diretório raiz 
+	//do vfs ... mas na verdade o diretório selecionado 
+	//deveria ser o diretório onde ficam a maioria dos aplicativos.
+	//para que o usuário possa chamar o maior número de apps usando 
+	//apenas comandos simples.
+    //#bugbug: isso deveria se passado pelo boot ??	
+	current_disk = 0;
+	current_volume = 0;
+	current_directory = 0;
+	
 
 	// Structures and fat.
     
@@ -798,17 +816,47 @@ int fsInit()
 	vfsInit();
 	
 	
+
 	
-	//selecionando disco, volume e diretório.
-	//estamos resetando tudo e selecionando o diretório raiz 
-	//do vfs ... mas na verdade o diretório selecionado 
-	//deveria ser o diretório onde ficam a maioria dos aplicativos.
-	//para que o usuário possa chamar o maior número de apps usando 
-	//apenas comandos simples.
-    //#bugbug: isso deveria se passado pelo boot ??	
-	current_disk = 0;
-	current_volume = 0;
-	current_directory = 0;
+	
+	//
+	// ## PWD ##
+	//
+	
+	// Inicializando o diretório de trabalho.
+	
+	struct dir_d *d;
+	
+	d = (void*) kmalloc( sizeof( struct dir_d ) );
+	if( (void*) d == NULL )
+	{
+		//fail
+		printf("fsInit: d");
+		die();
+	}else{
+		
+		//@todo: object
+		
+		d->id = 0;   //??
+		d->used = 1;
+		d->magic = 1234;
+		
+		d->stream = NULL; //@todo
+		
+		
+		
+		//d->entry_size_in_bytes
+		//d->totalentries_size_in_bytes
+		//d->fileMax
+		//d->fileTotal
+		//d->address
+		//d->inMemory
+		
+		d->current = NULL;
+		
+		current_directory = 0;
+		volume0RootDir = (struct dir_d *) d;
+	};
 	
 	//
 	// @todo: Continua ...

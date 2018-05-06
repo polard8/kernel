@@ -869,9 +869,13 @@ void *services( unsigned long number,
 		    return (void*) current_group;
 			break;
 			
-		//167	
+		// 167
+        // SYS_GRAMADOCORE_INIT_EXECVE
+        // executa um novo programa dentro do processo INIT 
+		// do ambiente Gramado Core.		
 		case 167:
-		    executive_gramado_core_init_execve( arg2, arg3, arg4 );
+		    //executive.c
+		    return (void*) executive_gramado_core_init_execve( (const char *) arg2, 0, 0 );
 			break;
 			
 		//157 - get user session id	
@@ -891,7 +895,8 @@ void *services( unsigned long number,
 			
 		//170	
 		case SYS_PWD:
-            printf("service 170: pwd @todo: \n");
+            printf("service 170:.pwd  disk={%d} volume={%d} directory={%d}\n",
+			current_disk, current_volume, current_directory );
 			refresh_screen();
 			break;	
 		
