@@ -29,19 +29,22 @@ QEMU does not properly handle the software reset operation (CTRL.RST) in builds 
  
 //NIC 82540EM Intel PRO/1000 MT
 
-/*
-typedef struct nic_controller_d nic_controller_t; 
-struct nic_controller_d
+typedef struct nic_info_d nic_info_t; 
+struct nic_info_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
 	
-	struct pci_device_d *pci;
-	struct device_d     *device;	
-} 
-nic_controller_t *NicControllerHook;
+	// rede.
+	//struct network_info_d *network;
+	
+	//struct pci_device_d *pci;
+	//struct device_d     *device;
+
+    //struct nic_info_d *next;	
+};
+//nic_info_t *NicControllerHook;
 //...
-*/
  
 int init_network();
 

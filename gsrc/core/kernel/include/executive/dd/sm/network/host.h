@@ -89,16 +89,21 @@ struct host_info_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
+
 	
-    //id.
-	unsigned long host_id;
+	// id da estrutura para lista interna.
+    int id;
+    
+    int used;
+    int magic;
 	
-	unsigned long name_address;
-	
-    //char *name;
-	//char *alias;
-	
-	//int length; The length of the addresses in bytes, which is 4 for IP (version 4) addresses.
+	int hostIdentifier;  // Número identificador dentro da rede interna.
+	char *hostName;      // Nome.
+    char *hostVersion;   // string mostrando a versão. ex: (1.1.1234)
+	unsigned short hostVersionMajor;
+	unsigned short hostVersionMinor; 
+	unsigned short hostVersionRevision;
+    int hostArchitecture; //identificador de tipo de arquitetura. ex: (x86)
 	
 	//...
 };
