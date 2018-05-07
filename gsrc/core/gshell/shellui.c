@@ -134,6 +134,7 @@ shellTopbarProcedure( struct window_d *window,
 					break;
 					
 				case VK_F3:
+				    printf("F3: Saindo da top bar e voltando ao shell...\n");
 				    ShellFlag = SHELLFLAG_COMMANDLINE;
 				    break;
 					

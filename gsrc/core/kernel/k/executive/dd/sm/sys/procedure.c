@@ -353,6 +353,7 @@ unsigned long system_procedure( struct window_d *window,
 					goto done;
 					break;
 					
+				//??isso deveria ser do sistema ??
 				//usando o scape para fechar a janela com o foco de entrada.
                 case VK_ESCAPE:
 				    alt_status = 0;

@@ -551,6 +551,8 @@ int kclearClientArea(int color);
 int kprint(char *message, unsigned int line, int color);
 
 
+//int getchar();
+
 //inicializa os buffers do fluxo padrão em stdio.c
 void stdioInitialize();
 //

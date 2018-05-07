@@ -100,6 +100,8 @@ int ShellFlag = 0;
 #define SHELLFLAG_VERSION 4
 #define SHELLFLAG_USAGE 5
 #define SHELLFLAG_TOPBAR 6
+#define SHELLFLAG_FEEDTERMINAL 7
+
 //...
 
 
@@ -114,6 +116,13 @@ shellProcedure( struct window_d *window,
                 int msg, 
  			    unsigned long long1, 
 				unsigned long long2 );
+				
+				
+//diálogo para alimentar o terminal usado pelos aplicativos.				
+int feedterminalDialog( struct window_d *window, 
+                      int msg, 
+				      unsigned long long1, 
+				      unsigned long long2 );
 							  
 
 // Procedimento de janela da topbar.							  
@@ -786,28 +795,41 @@ noArgs:
 			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
             //			
 		    
-			if( ShellFlag == SHELLFLAG_TOPBAR )
-			{
 			
-			    shellTopbarProcedure( (struct window_d *) msg_Window, 
-			                (int) msg_Message, 
-							(unsigned long) msg_Long1, 
-							(unsigned long) msg_Long2 );			
-			}else{
-				
-			    shellProcedure( (struct window_d *) msg_Window, 
-			                (int) msg_Message, 
-							(unsigned long) msg_Long1, 
-							(unsigned long) msg_Long2 );
-
+			//
+			// ## call procedure ##
+			//
+			
+			switch(ShellFlag)
+			{
+				// Para alimentar o terminal.
+				case SHELLFLAG_FEEDTERMINAL:
+			        feedterminalDialog( (struct window_d *) msg_Window, 
+			                            (int) msg_Message, 
+							            (unsigned long) msg_Long1, 
+							            (unsigned long) msg_Long2 );
+				    break;
+					
+				// Para utilizar a topbar.	
+				case SHELLFLAG_TOPBAR:
+			        shellTopbarProcedure( (struct window_d *) msg_Window, 
+			                              (int) msg_Message, 
+							              (unsigned long) msg_Long1, 
+							              (unsigned long) msg_Long2 );
+				    break;
+					
+				// Para os demais casos use o procedimento 
+				// do shell.
+				default:
+			        shellProcedure( (struct window_d *) msg_Window, 
+			                        (int) msg_Message, 
+							        (unsigned long) msg_Long1, 
+							        (unsigned long) msg_Long2 );				
+				    break;
 			};
 			
-		    //shellProcedure( msg->window, msg->msg, msg->long1, msg->long2 ); 
-							
-			//printf("Y-DEBUG: hwindow NULL\n"); //Deletar isso depois.
-			//printf("Y-DEBUG: msg={%d}\n",msgTest); 
-			//printf("Y-DEBUG: long1={%c}\n",long1); 
-			//printf("Y-DEBUG: long2={%c}\n",long2); 
+			//Nothing.
+
 		};
 		
 		//Nothing.
@@ -3716,6 +3738,8 @@ int shell_gramado_core_init_execve( const char *filename,
                                     const char *argv[], 
                                     const char *envp[] )
 {
+	//erro.
+	int Status = 1;
 
 	// suprimindo dot-slash
 	// The dot is the current directory and the 
@@ -3738,6 +3762,8 @@ int shell_gramado_core_init_execve( const char *filename,
 	
 	
 translate:	
+	
+	//Isso faz uma conversão de 'test.bin' em 'TEST    BIN'.
 	//Ok funcionou.
 	shell_fntos( (char *) filename);
 	
@@ -3745,20 +3771,168 @@ translate:
 	//shell_fntos(filename);
 
 
-	//isso deve chamar gramado_core_init_execve() na api.
-	
+	// #importante:
+	// Isso deve chamar gramado_core_init_execve() na api.
+								
+								
 
-								
-								
-	//
-    // Retornaremos. Quem chamou essa rotina que tome a decisão 
-	// se entra em wait ou não.
+
+   	
+ //isso chamará uma rotina especial de execve, somente 
+//usada no ambiente gramado core. 
+execve:
+
+//
+// #importante
+// Nesse momento o shell pode atuar com outro procedimento de janela 
+// que ficaria responsável por conduzir essas mensgens ató o processo 
+// filho, que ate mesmo ser um aplicativo que não use  recursos gráficos.
+// Esse processo filho a janela do shell como output e o shell como input.
+// Ex: um aplicativo chamado pelo shell pode chamar a função getch() para 
+// obter input ... como o shell tem a janela com o foco de entrada, então 
+// o shell precisa enviar a mensagem para esse aplicativo. Como ?
+// Uma opção seria fazer uma chamada ao kernel enviando essa mensagem 
+// para o lugar padrão onde os aplicativos pegam mensagens do tipo caractere.
+// Ou seja, getch() solicita um caractere ao kernel, e quem enviou esse caractere 
+// ao kernel foi o shell no qual o aplicativo está rodando.
+// Se esse aplicativo pertence a um terminal específico, então o caractere 
+// pode ser enviado para a estrutura desse terminal específico. Pode uasr 
+// descritores de terminal.
+// teminalFeed(teminal_id,ch) poderia enviar o caratere para um terminal específico,
+// de onde o aplicativo pegará o caractere.
+//	
+
+    //
+    // O retorno significa que o aplicativo foi colocado
+	// para rodar e em breve receberá tempo de processamento.
+	// '0' significa que funcionou e '1' que falhou.
     //	
-    
-done:	
-	return (int) system_call( 167, 
+	
+	Status = (int) system_call( 167, 
 	                          (unsigned long) filename,
 				              (unsigned long) argv,
 				              (unsigned long) envp );
+							  
+							  
+    if( Status == 0 )
+	{
+		//Não houve erro. O aplicativo irá executar.
+		
+		//
+		// Nesse momento devemos usar um novo procedimento de janela.
+		// Que vai enviar as mensagens de caractere para um terminal 
+		// específico, para que aplicativos que user aquele terminal 
+		// possam pegar essas mensgens de caractere.
+		//
+		
+		 
+		ShellFlag = SHELLFLAG_FEEDTERMINAL;		
+		goto done;
+	}else{
+		
+		// Se estamos aqui é porque ouve erro 
+		// ainda não sabemos o tipo de erro. 
+		// Status indica o tipo de erro.
+		// Se falhou significa que o aplicativo não vai executar,
+		// então não mais o que fazer.
+		ShellFlag = SHELLFLAG_COMMANDLINE;
+		goto fail;
+	};
+	
+	
+	//fail.
+	
+	//
+    // Retornaremos. 
+	// Quem chamou essa rotina que tome a decisão 
+	// se entra em wait ou não.
+    //
+
+	
+fail:
+    //status = 1.
+    printf("shell_gramado_core_init_execve: fail retornando ao interpretador\n");
+done:
+    return (int) Status;						  
 };
+
+
+
+
+
+
+
+/*
+ * feedterminalDialog:
+ *     Para alimentar um terminal com caracteres.
+ */					  
+int feedterminalDialog( struct window_d *window, 
+                      int msg, 
+				      unsigned long long1, 
+				      unsigned long long2 )
+{
+	
+	switch(msg)
+	{
+	
+	
+	    //para alimentar o terminal
+		case MSG_KEYDOWN:
+			//para todas as teclas.
+			//feed terminal system call.
+			system_call( 135,  // número do serviço 
+			             0,    // número do terminal
+						 long1,    // o caractere
+						 long1 );  // o caractere
+
+			break;
+			
+		//para sair do diálogo.	
+		case MSG_SYSKEYDOWN:
+		    switch(long1)
+			{
+
+                //
+                // ?? #importante:
+				// ?? Quando parar de alimentar o terminal ??
+                // ## [CONTROL + C]  ou [ESC]  ## 
+				// >>> F12 POR ENQUANTO PARA TESTES.
+				//
+				
+				//help
+				case VK_F1:
+				    //APISetFocus(i1Window);
+					//APIredraw_window(i1Window);
+					MessageBox( 1, "feedterminalDialog","F1: HELP");
+					break;
+				
+                //full screen
+                //colocar em full screen somente a área de cliente. 				
+		        case VK_F2:
+				    //APISetFocus(i2Window);
+					//APIredraw_window(i2Window);				
+				    MessageBox( 1, "feedterminalDialog","F2: ");
+					//ShellFlag = SHELLFLAG_COMMANDLINE;
+					break;
+					
+				case VK_F3:
+				    printf("F3: Saindo do aplicativo e voltando ao shell...\n");
+				    ShellFlag = SHELLFLAG_COMMANDLINE;
+				    break;
+					
+					
+			};
+		    break;
+			
+		default:  
+		    break;
+	
+    };
+	
+done:
+    return (int) 0;
+}
+
+
+
 

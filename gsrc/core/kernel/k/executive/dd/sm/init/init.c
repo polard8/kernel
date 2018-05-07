@@ -314,13 +314,22 @@ WindowManager:
 	
  
 	
-    // Continua ...	 
+
 	
 	//
 	// tty support.
 	//
 	
 	ttyInit();
+
+	//
+	// terminal support.
+	//
+	
+	//init_system_terminal();
+
+
+    // Continua ...	 
 	
 done:
 #ifdef KERNEL_VERBOSE

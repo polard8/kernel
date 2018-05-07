@@ -239,7 +239,8 @@
 #define	SYS_132 132
 #define	SYS_133 133
 #define	SYS_134 134
-#define	SYS_135 135
+ //coloca caracteres na estrutura de terminal, para aplciativos pegarem
+#define	SYS_FEEDTERMINAL 135
 #define	SYS_136 136
 #define	SYS_137 137
 #define	SYS_138 138

@@ -820,6 +820,24 @@ void *services( unsigned long number,
     		break;
 			
 			
+		// 135
+		// Coloca caracteres na estrutura de terminal, para aplciativos pegarem
+        case SYS_FEEDTERMINAL:
+            //@todo:
+			// Colocar o caractere enviado no argumento para 
+			//a estrutura de terminal do terminal indicado no argumento.
+			//terminalFeed( (int) arg2, (int) arg3 );
+			
+			//arg2 = número do terminal
+			//arg3 = ch 
+			//arg4 - ch 
+			
+			//terminal.h
+			//teminalfeedCH = (char) arg3;
+			//teminalfeedCHStatus = (int) 1;
+		    break;		
+			
+			
 		//139
         case SYS_GETSCANCODE:
 		    return (void*) get_scancode();

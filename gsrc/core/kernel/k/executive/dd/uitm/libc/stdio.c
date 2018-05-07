@@ -693,12 +693,30 @@ int putchar(int ch)
 };
 
 
+
+
 /*
+ * getchar:
+ *    @todo isso deve er oferecido como serviço pelo kernel.
+ *
  * The getchar function is equivalent to getc with stdin as the value of the stream argument.
-int getchar(void);
-int getchar(void)
+ */
+/* 
+int getchar()
 {
-	return 0;
+	//terminal.h
+	
+	
+	//erro
+	if( teminalfeedCHStatus != 1 )
+	{
+		return (int) -1;
+	}
+	
+	
+done:
+    teminalfeedCHStatus = 0;
+	return (int) teminalfeedCH;
 }
 */
 

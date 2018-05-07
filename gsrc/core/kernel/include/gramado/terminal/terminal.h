@@ -55,7 +55,7 @@ The system creates a new terminal when it starts a terminal process,
 #define TERMINAL_COL_MAX     74    //Número máximo de colunas.
 
 
-//#define TERMINAL_COUNT_MAX 8
+#define TERMINAL_COUNT_MAX 8
 
 //
 // Número do terminal atual.
@@ -67,6 +67,9 @@ int terminalOffset;     //Deslocamento dentro da linha; (left right).
 int terminalLineMax;    //Número máximo de linhas suportadas.
 int terminalOffsetMax;  //Número máximo de caracteres por linha.
 
+
+//char teminalfeedCH;
+//int teminalfeedCHStatus;
 
 
 /*
@@ -150,6 +153,10 @@ struct terminal_d
 	//struct buffer_d *TerminalScreenBuffer;	
 	
 	
+	//caractere que os aplicativos pegarão via getch()
+	char inputCH;
+	int inputCHStatus; //status da mensagem de char ;;; empty ??
+	
     //char prompt[128];
     //unsigned long prompt_pos;
 	
@@ -169,7 +176,7 @@ terminal_t *CurrentTerminal;
 //(Control+F6)
 //(Control+F7)
 //(Control+F8) 
-unsigned long terminalList[8]; //TERMINAL_COUNT_MAX
+unsigned long terminalList[TERMINAL_COUNT_MAX]; //TERMINAL_COUNT_MAX
 
 
 
@@ -181,6 +188,11 @@ unsigned long terminalList[8]; //TERMINAL_COUNT_MAX
 struct window_d *terminalActiveWindow;
 struct window_d *terminalWindowWithFocus;
 //...
+
+//envia um caractere para a estrutura de terminal 
+//de onde um aplicativo poderá pegar.
+int terminalFeed(int terminal_id, int ch );
+//int init_system_terminal();
 
 //
 //fim.

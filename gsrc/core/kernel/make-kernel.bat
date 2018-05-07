@@ -275,6 +275,9 @@ echo -{ ux1 /gramado \o/
     rem user section
     gcc -c k/gramado/gui/usession.c    -I./include -o usession.o        
 
+	
+	rem terminal
+	rem gcc -c k/gramado/terminal/terminal.c -I./include -o terminal.o 
     
 	rem gramado logon e logoff
 	

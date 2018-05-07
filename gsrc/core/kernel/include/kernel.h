@@ -388,6 +388,7 @@ int current_disk;
 int current_volume;
 int current_directory;   //dirList[.]
 int current_file;        //fileList[.]
+int current_terminal;
 //...
 
 
