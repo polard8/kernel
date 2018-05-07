@@ -334,7 +334,7 @@ void *get_file(int Index)
 	if(Index < 0){
 	    return NULL;
 	};
-    return (void *) fileList[Index];
+    return (void *) Streams[Index];
 };
 
 
@@ -361,7 +361,7 @@ void set_file( void *file, int Index )
 	};	
 	
 	// Include pointer in the list.
-	fileList[Index] = (unsigned long) file;
+	Streams[Index] = (unsigned long) file;
 	return;
 };
 
@@ -704,16 +704,16 @@ void fs_init_structures()
 	    case FS_TYPE_FAT16:
 	        
 			//Rootdir.
-			filesystem->rootdir_address = FAT16_ROOTDIR_ADDRESS;
-	        filesystem->rootdir_lba = FAT16_ROOTDIR_LBA;
+			filesystem->rootdir_address = VOLUME1_ROOTDIR_ADDRESS;
+	        filesystem->rootdir_lba = VOLUME1_ROOTDIR_LBA;
 	        
 			//Fat.
-			filesystem->fat_address = FAT16_FAT_ADDRESS;
-	        filesystem->fat_lba = FAT16_FAT_LBA;
+			filesystem->fat_address = VOLUME1_FAT_ADDRESS;
+	        filesystem->fat_lba = VOLUME1_FAT_LBA;
 	        
 			//Dataarea.
 			//filesystem->dataarea_address = ??;
-	        filesystem->dataarea_lba = FAT16_DATAAREA_LBA;
+	        filesystem->dataarea_lba = VOLUME1_DATAAREA_LBA;
 	        
 			//sectors per cluster.
 			filesystem->spc = (int) get_spc(); //variavel
@@ -816,8 +816,35 @@ int fsInit()
 	vfsInit();
 	
 	
-
+    //  ## volume 1 root dir  ##
 	
+	FILE *volume1_rootdir;
+	
+	volume1_rootdir = (FILE *) malloc( sizeof(FILE) );
+	
+	volume1_rootdir->_base = (char*) VOLUME1_ROOTDIR_ADDRESS;
+	volume1_rootdir->_ptr = stdin->_base;
+	volume1_rootdir->_cnt = (32 * 512) ;
+	volume1_rootdir->_file = 0; //?
+	volume1_rootdir->_tmpfname = "volume1-stream";
+	
+	Streams[4] = (unsigned long) volume1_rootdir;
+	
+	
+	
+    //  ## volume 2 root dir  ##
+	
+	FILE *volume2_rootdir;
+	
+	volume2_rootdir = (FILE *) malloc( sizeof(FILE) );
+	
+	volume2_rootdir->_base = (char*) VOLUME2_ROOTDIR_ADDRESS;
+	volume2_rootdir->_ptr = stdin->_base;
+	volume2_rootdir->_cnt = (32 * 512) ;
+	volume2_rootdir->_file = 0; //?
+	volume2_rootdir->_tmpfname = "volume2-stream";
+	
+	Streams[2] = (unsigned long) volume2_rootdir;
 	
 	//
 	// ## PWD ##
@@ -825,6 +852,7 @@ int fsInit()
 	
 	// Inicializando o diretório de trabalho.
 	
+	/*
 	struct dir_d *d;
 	
 	d = (void*) kmalloc( sizeof( struct dir_d ) );
@@ -857,6 +885,8 @@ int fsInit()
 		current_directory = 0;
 		volume0RootDir = (struct dir_d *) d;
 	};
+	
+	*/
 	
 	//
 	// @todo: Continua ...

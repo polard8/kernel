@@ -133,7 +133,7 @@ int fsSearchFile(unsigned char *file_name)
 	//...
 	
 	char NameX[13];	
-	char *dir = (char *) FS_ROOTDIR_ADDRESS; //rootDir->address;	
+	char *dir = (char *) VOLUME1_ROOTDIR_ADDRESS; //rootDir->address;	
 	
 	 
 	if(  file_name[0] == '/' || 

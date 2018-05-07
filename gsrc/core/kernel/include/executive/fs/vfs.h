@@ -6,6 +6,20 @@
 // serão usadas as estruturas de 'directory entry' e 'inode' do ext2. 
 // 
 
+//
+//  ## VFS SUPPORT  ##
+//
+
+//
+// O VFS só tem o diretótio raiz, nada mais.
+// Seu endereço será alocado dinamicamente.
+// Suas entradas serão construidas seguindo o padrão fat,
+// Suas entradas apontaram para objetos, principalmetne streams.
+//
+
+#define VFS_ROOTDIR_NUMBER_OF_ENTRIES 128
+#define VFS_ROOTDIR_ENTRY_SIZE 32 
+
 
 #define VHS_DIR_ROOT         'root:' 
 #define VHS_DIR_ETC          'root:/etc'  // misc
@@ -240,6 +254,8 @@ struct vfs_info_d
 	//e exple fundamentos da navegação nos diretórios.
 	char *help_string;
 	
+	unsigned long rootdir_address;
+	
 	//um arquivo de informações sobre o vfs.
 	//FILE *vfs_info_file;
 
@@ -282,7 +298,7 @@ struct vfs_info_d
 	
 		
     // diretório raiz.    
-    struct dir_d *vfs;  	
+    //struct dir_d *vfs;  	
 };
 // Essa é estrutura de informações sobre o VFS.
 // Assim mesmo sem ponteiro.

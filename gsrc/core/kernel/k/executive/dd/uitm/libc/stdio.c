@@ -1357,12 +1357,26 @@ void stdioInitialize()
 	//
 	// Alocando memória para o fluxo padrão do 
 	// processo kernel.
+	// Estamos apenas alocando memória para a estrutura.
 	//
 	
 	stdin  = (FILE *) &buffer0[0];	
 	stdout = (FILE *) &buffer1[0];	
 	stderr = (FILE *) &buffer2[0];	
 	  
+	  
+	//
+    // #importante
+    // Salvando os ponteiros na lista de arquivos.	
+	//
+	Streams[0] = (unsigned long) stdin;
+	Streams[1] = (unsigned long) stdout;
+	Streams[2] = (unsigned long) stderr;
+	
+	//Streams[3] volume0 root dir (vfs) 
+	//Streams[4] volume1 root dir (boot volume)
+    //Streams[5] volume2 root dir  (system volume)	 
+	//...  
 	  
 	//
     // Configurando a estrutura de stdin.

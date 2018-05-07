@@ -147,13 +147,13 @@ unsigned long fsLoadFile( unsigned char *file_name,
 	int i;
     unsigned short next;
 
-    unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+    unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
     unsigned long max = 64;    //Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 	char NameX[13];	
 
-    unsigned short *fat  = (unsigned short *) FAT16_FAT_ADDRESS;
+    unsigned short *fat  = (unsigned short *) VOLUME1_FAT_ADDRESS;
 	unsigned short cluster;    //Cluster inicial
 
     //??	
@@ -329,7 +329,7 @@ next_entry:
 	{	
 	    //Calcula.
 		//Primeiro setor do cluster. 
-		S = fatClustToSect(cluster, Spc, FAT16_DATAAREA_LBA); 
+		S = fatClustToSect(cluster, Spc, VOLUME1_DATAAREA_LBA); 
 		
 		//Carrega 'x' setores começando de S.
 		fatLoadCluster( S, file_address, Spc);
@@ -344,7 +344,7 @@ next_entry:
     };
 	*/
 	
-	read_lba( file_address, FAT16_DATAAREA_LBA + cluster -2 ); 
+	read_lba( file_address, VOLUME1_DATAAREA_LBA + cluster -2 ); 
 	
 	//Incrementa o buffer. +512;
 	//SECTOR_SIZE;
@@ -400,7 +400,7 @@ void KiLoadRootDir(unsigned long address)
 	//Carregar root dir na memória.
 	for( i=0; i < szRoot; i++ )
 	{
-	    read_lba( address + b, FAT16_ROOTDIR_LBA + i );    
+	    read_lba( address + b, VOLUME1_ROOTDIR_LBA + i );    
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -409,6 +409,7 @@ done:
 
 
 /*
+ ********************************************************
  * fs_load_rootdirEx:
  *    Carrega o diretório raiz na memória.
  *    Sistema de arquivos fat16.
@@ -424,7 +425,7 @@ void fs_load_rootdirEx()
 	//Carregar root dir na memória.
 	for( i=0; i < szRoot; i++ )
 	{
-	    read_lba( FAT16_ROOTDIR_ADDRESS + b, FAT16_ROOTDIR_LBA + i );    
+	    read_lba( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i );    
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -448,7 +449,7 @@ void fs_load_fatEx()
 	//Carregar root dir na memória.
 	for( i=0; i < szFat; i++ )
 	{
-	    read_lba( FAT16_FAT_ADDRESS + b, FAT16_FAT_LBA + i ); 
+	    read_lba( VOLUME1_FAT_ADDRESS + b, VOLUME1_FAT_LBA + i ); 
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -475,7 +476,7 @@ void fs_load_dir( unsigned long id )
 	
     struct dir_d *File;
 
-	File = (void*) fileList[id];	
+	File = (void*) Streams[id];	
 	if( (void*) File == NULL ){
 	    printf("fs_load_dir fail: Struct.\n");
 	    return;
@@ -491,7 +492,7 @@ void fs_load_dir( unsigned long id )
 	
 	//na inicialização so temos a lba inicial do diretorio raiz
 	if(id == 0){
-	    lba = FS_ROOTDIR_LBA;
+	    lba = VOLUME1_ROOTDIR_LBA;
 	}else{
 	    //lba = filesystem->dir[id].lba_inicial;
 	};

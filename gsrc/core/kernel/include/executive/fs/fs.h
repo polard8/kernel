@@ -12,11 +12,72 @@
  *
  * Versão 1.0 ~ 2014, 2015.
  */
+ 
+ 
+//
+// #BUGBUG
+// #importante:
+// lembrando que o kernel começa em 0x00100000
+// @todo: Podemos encontrar um novo lugar para isso tudo.
+// 
+ 
+//
+//  ## MBR SUPPORT  ##
+//
 
 
- //
- // Path support
- //
+#define MBR_LBA          0           // mbr
+#define MBR_ADDRESS      0x00020000  //isso suja o bm? ou bl?
+
+
+
+
+
+//
+//  ## VBR SUPPORT  ##
+//
+       
+#define VOLUME1_VBR_LBA       63
+#define VOLUME2_VBR_LBA       32000
+#define VOLUME1_VBR_ADDRESS   0x001A0000
+#define VOLUME2_VBR_ADDRESS   0x001A0000
+
+//
+//  ## FAT1 SUPPORT  ##
+//
+
+#define VOLUME1_FAT_LBA       67 
+#define VOLUME2_FAT_LBA       33000  
+#define VOLUME1_FAT_ADDRESS   0x001B0000
+#define VOLUME2_FAT_ADDRESS   0x001B0000
+
+
+//
+//  ## FAT2 SUPPORT  ##
+//
+
+// Não usada !!
+
+//
+//  ## ROOT DIR SUPPORT  ##
+//
+
+
+#define VOLUME1_ROOTDIR_LBA     559
+#define VOLUME2_ROOTDIR_LBA     34000
+#define VOLUME1_ROOTDIR_ADDRESS 0x001C0000
+#define VOLUME2_ROOTDIR_ADDRESS 0x001C0000
+ 
+//
+//  ##  DATA AREA SUPPORT  ##
+//
+
+#define VOLUME1_DATAAREA_LBA   591 
+#define VOLUME2_DATAAREA_LBA   35000
+
+//
+// ============ Path support ======================
+//
 
 // Diretório raiz dos volumes principais.
 #define FS_DIR_VFS    'root:/volume0'  // raiz do vfs
@@ -74,66 +135,12 @@
  
 //... 
  
- 
-/*
- * @todo: 
- *     Deixar espaço bastante par um kernel grande, 
- *     começando em 0x00100000
- */
- 
-#define FS_VBR_ADDRESS        0x001A0000 
-#define FS_FAT_ADDRESS        0x001B0000 
-#define FS_ROOTDIR_ADDRESS    0x001C0000 
-
-
-//fat16
-#define FAT16_VBR_ADDRESS     FS_VBR_ADDRESS
-#define FAT16_FAT_ADDRESS     FS_FAT_ADDRESS
-#define FAT16_ROOTDIR_ADDRESS FS_ROOTDIR_ADDRESS
-
-//fat32
-#define FAT32_VBR_ADDRESS     FS_VBR_ADDRESS
-#define FAT32_FAT_ADDRESS     FS_FAT_ADDRESS
-#define FAT32_ROOTDIR_ADDRESS FS_ROOTDIR_ADDRESS
 
 
 
-/*
- * Referências para localização de VBR, FAT, ROOT, DATAAREA ...
- *
- * partição 0 - (8MB)
- *
- * vbr  - ?  ;134  (depende do tanto de setores reservados.)
- * fat1 - 136
- * fat2 - 200
- * root - 264
- * data - 296
- *
- */
-#define FS_VBR_LBA       63   //134
-#define FS_FAT_LBA       67   //136 
-#define FS_ROOTDIR_LBA   559  //264
-#define FS_DATAAREA_LBA  591  //296 
 
-//mbr 
-#define MBR_LBA  0
-#define MBR_ADDRESS      0x00020000
-#define FS_MBR_LBA       MBR_LBA
-#define FS_MBR_ADDRESS   0x00020000
 
-//Partição 0.
-#define FAT16_VBR_LBA       FS_VBR_LBA 
-#define FAT16_FAT_LBA       FS_FAT_LBA 
-#define FAT16_ROOTDIR_LBA   FS_ROOTDIR_LBA
-#define FAT16_DATAAREA_LBA  FS_DATAAREA_LBA 
- 
-//FAT32
-#define FAT32_VBR_LBA       FS_VBR_LBA 
-#define FAT32_FAT_LBA       FS_FAT_LBA 
-#define FAT32_ROOTDIR_LBA   FS_ROOTDIR_LBA
-#define FAT32_DATAAREA_LBA  FS_DATAAREA_LBA 
- 
- 
+
  
 #define FAT16_ROOT_ENTRIES  512  //512 entradas no rootdir. 
 #define FAT16_ENTRY_SIZE    32   //tamanho em bytes da entrada no root dir. 
@@ -643,16 +650,15 @@ struct dir_d *currentDir;       //
  
  
 /*
+ * #importante 
  * Lista de endreços de estruturas de arquivos.
- *
+ * obs: Podemos guardar aqui ponteiros para stream.
+ * começando com o fluxo padrão.
+ * então poderia se chamar Streams[.]
  */
-unsigned long fileList[32]; 
+unsigned long Streams[32]; 
 
-/*
- * Lista de endreços de estruturas de diretórios.
- *
- */
-unsigned long dirList[32]; 
+ 
 
 /*
  * filesystem_d:
