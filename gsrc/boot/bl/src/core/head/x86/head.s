@@ -23,15 +23,10 @@
 ; ATENÇÃO:
 ; Logo abaixo, no fim desse arquivo, estão GDT, IDT e includes.
 ;
-; Histórico:
-;     Version 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
-;     Version 1.0, 2016 - Revisão.
+; History:
+;     2015 - Created by Fred Nora.
+;     2016 - Revision.
 ;
-
-
-;;
-;; codename db 'são paulo'
-;;
 
 
 ;
@@ -177,20 +172,30 @@ _bootloader_entry_point:
 	;mov gs, ax 
 	
 	
-	;Stack.
+	;;
+	;; ## STACK ##
+	;;
+	
+	
+	;; Maravilhosa pilha intrna no fim do arquivo.
 	mov ss, ax
-	mov eax,  _bootloader_stack_start 
+	mov eax, _bootloader_stack_start 
 	mov esp, eax 
 	
+	;;
+	;; #teste
+	;; Vamos deixar o kernel inicializar o PIT.
+	;;
+	
 	;PIT.
-	mov al, byte 0x36
-	mov dx, word 0x43
-	out dx, al	
-	mov eax, dword 11930    ;Timer frequency 100 HZ. 
-	mov dx, word 0x40
-	out dx, al
-	mov al, ah
-	out dx, al
+	;mov al, byte 0x36
+	;mov dx, word 0x43
+	;out dx, al	
+	;mov eax, dword 11930    ;Timer frequency 100 HZ. 
+	;mov dx, word 0x40
+	;out dx, al
+	;mov al, ah
+	;out dx, al
 
 	;PIC.
 	cli
@@ -270,9 +275,8 @@ _bootloader_entry_point:
 	
 setupCR3:	
 	; @todo: Usar variável global.
-	;xor eax, eax             	
-	;mov eax, dword 0x9C000          
-	mov eax, dword 0x01F00000
+	;Obs:  Para sistemas pequenos.             	
+	mov eax, dword (0x01000000 - 0x900000)           
 	mov cr3, eax                  	
   
     ;Flush TLB.
@@ -384,7 +388,8 @@ StartKernelEntry:
 	; Go ! (Passa o comando para o Kernel.)
 	;
 	
-	jmp CODE_SEL:0xC0001000    ;Endereço lógico. 
+	;Endereço lógico.
+	jmp CODE_SEL:0xC0001000    ; Sem o header do multiboot.     
 	jmp $
 	
 headStartBLShell:
@@ -2353,24 +2358,35 @@ _data_start:
     db 0xAA    ;Data magic.
 
 
-;
-; BSS: inicio do bss segment
-;
 
+;;
+;; ## BSS  ##
+;;
 
 segment .bss
 global _bss_start
 _bss_start:
+    ;times (512*2) db 0 #bugbug isso não pode.
 
-
+	
+	
+;;
+;; ## HEAP  ##
+;;
+	
+	
 ;heap
 ;inicio do heap do bootloader, ainda parte de bss.
 segment .bss_heap
 global _bootloader_heap_start
 _bootloader_heap_start:
-    ;resb 512
+    times (512*2) db 0
 global _bootloader_heap_end 
 _bootloader_heap_end:
+
+;;
+;; ## STACK  ##
+;;
 
 
 ;stack
@@ -2378,7 +2394,7 @@ _bootloader_heap_end:
 segment .bss_stack
 global _bootloader_stack_end
 _bootloader_stack_end:
-    ;resb 512
+    times (512*2) db 0
 global _bootloader_stack_start
 _bootloader_stack_start:
 

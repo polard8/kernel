@@ -837,6 +837,10 @@ void *services( unsigned long number,
 			//teminalfeedCHStatus = (int) 1;
 		    break;		
 			
+		//137
+        case SYS_GETCH:
+		    return (void*) window_getch();
+            break;		
 			
 		//139
         case SYS_GETSCANCODE:

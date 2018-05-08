@@ -45,8 +45,12 @@
 ; de 32 bits.
 ;
 start:	
+    
+	;; #bugbug Esse valor pode estar errado durante 
+	;; a inicialização em modo texto.
 	mov byte [BOOT.modo], al			    
-    xor eax, eax	
+    
+	xor eax, eax	
     xor ebx, ebx	
     xor ecx, ecx	
     xor edx, edx    ;Voice,8.	
@@ -61,6 +65,9 @@ startSetupMode:
 
 	;Pega o modo de inicialisação do Boot Manager. 
 	xor eax, eax
+
+	;; #bugbug Esse valor pode estar errado durante 
+	;; a inicialização em modo texto.
 	mov al, byte [BOOT.modo]  
 	
 	;
@@ -79,6 +86,15 @@ startSetupMode:
 	
 	cmp al, byte 2  
 	je startGUI	
+	
+	
+	;;
+	;; ## Correção de problemas ##
+	;;
+	
+	
+	;; Se 'al' estiver zerado entraremos em modo texto.
+	;; O modo texto será o padrão.
 	
 .default:	
 	jmp startCLI 
@@ -121,21 +137,33 @@ startCLI:
 	sti 
 	
     ;;
-    ;;    ****    SHELL LOOP    ****
+    ;;  ##  SHELL LOOP  ##
     ;;    
 
+	;; #importante
+	;; O shell está em msm/shell
+	
+	
+;; Esse é loop do shell do boot manager.	
 startShellLoop:	
-	call shellPrintShellVersion    ;;shell.inc
+    
+	;;shell.inc
+	call shellPrintShellVersion    
+	
 .shellInit:	
-	call shellInit                 ;;shell.inc
+    
+	;;shell.inc
+	call shellInit                
     
 	; Sairemos do loop.
-    ; 0 - Nenhuma alteração foi feita, não precisa salvar o metafile.
+    ; 0 - Nenhuma alteração foi feita, 
+	; não precisa salvar o metafile.
 	cmp eax, 0
 	je .exit0
 
 	; Sairemos do loop.
-    ; 1 - Alguma alteração foi feita, precisa salvar o metafile.
+    ; 1 - Alguma alteração foi feita, 
+	; precisa salvar o metafile.
 	cmp eax, 1
 	je .exit1
 	
@@ -143,18 +171,17 @@ startShellLoop:
 	JMP $
 
 ;	
-;Saímos do loop do shell.
+;Saimos do loop do shell.
 ;Nenhuma alteração foi feita, não precisa salvar o metafile.
 ;Apenas reiniciamos o sistema.
 .exit0:
 	mov esi, start_msg_rebooting
 	call os_output	
     jmp keyboardReboot
-    ;jmp reboot
 	jmp $
 
 ;	
-;Saímos do loop do shell.
+;Saimos do loop do shell.
 ;Alguma alteração foi feita, precisamos salvar o metafile.
 ;Reiniciamos o sistema para validar as alterações feitas no metafile. 
 .exit1:
@@ -186,34 +213,25 @@ start_msg_rebooting        db 'start: Rebooting..',13,10,0
 ;
 ;
 startGUI:
-
-	;;debug
-	;mov esi, startMsgTest1   ;;crazy message
-	;call lib32PrintString
-    ;call _asm_refresh_screen
-	;jmp $	
-
-    ;;#bugbgu: No qemu essa rotina apresenta algum problema, está reiniciando a máquina.
-    ;;call setup_machine
 	
 	;;
 	;; *Importante:
-	;; Fazendo configurações aqui mesmo ao invés de chamarmos 'setup_machine'
-	;; ou ainda não fazendo essas configurações, pois ja estamos em modo protegido
-	;;com as interrupções desabilitadas e em modo gráfico ..
-	;;podemos deixar que o boot loader faça suas inicializações. 
-	;;
+	;; Fazendo configurações aqui mesmo ao invés de chamarmos 
+	;; 'setup_machine' ou ainda não fazendo essas configurações, 
+	;; pois já estamos em modo protegido com as interrupções 
+	;; desabilitadas e em modo gráfico ..
+	;; Podemos deixar que o boot loader faça suas inicializações. 
+	;; Obs: Isso está funcionando bem.
+	;; Mas o timer foi configurado várias vezes.
+	;;	
 	
-	
-	;;=============================================================================
+	;;===============
 	;;setup machine
 	
+	
+	;GDT and IDT. 
 	cli
-
-    ;GDT and IDT. 	
-    
 	lgdt [lgdt_opcode] 
-    
 	lidt [lidt_opcode]	
 	
 	
@@ -258,17 +276,22 @@ startGUI:
 	;; Nossa opção agora é o PIT.
 	;; @todo: Para o RTC podemos fazer uma pequena inicialização agora.
 	;; pois um módulo mais completo está no kernel base.
+	;; #importante: #bugbug
+	;; Talvez seja um erro configurarmos o PIT agora,
+	;; Pois todas essas interrupções podem 
+	;; prejudicar o carregamento no boot loader.
+	;; Obs: Testando sem essa configuração.
 	;;
 	
 	;TIMER.
-	mov al, byte 0x36
-	mov dx, word 0x43
-	out dx, al
-	mov eax, dword 11930    ;Timer frequency 100 HZ.
-	mov dx, word 0x40
-	out dx, al
-	mov al, ah
-	out dx, al
+	;mov al, byte 0x36
+	;mov dx, word 0x43
+	;out dx, al
+	;mov eax, dword 11930    ;Timer frequency 100 HZ.
+	;mov dx, word 0x40
+	;out dx, al
+	;mov al, ah
+	;out dx, al
 	
 		
 	

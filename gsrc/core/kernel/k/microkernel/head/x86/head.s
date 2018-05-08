@@ -651,14 +651,19 @@ dummyJmpAfterLTR:
 	mov ds, ax
 	mov es, ax
 
+	;;
+	;; ## STACK ##
+	;;
 
 	;Stack	(atualiza o ponteiro para a variável global).
-	;xor	eax, eax
-	mov dword [_kernel_stack_start_pa], 0x003FFFF0 ;0x00200000 ;(o mesmo endereço indicado na TSS) 
-	mov dword [_kernel_stack_start], 0x003FFFF0    ;0xC03FFFF0
-	mov eax, dword [_kernel_stack_start] 
+	
+	;(o mesmo endereço indicado na TSS ??)
+	mov eax, 0x003FFFF0 
 	mov esp, eax 
-		
+    
+    ;salva.	
+	mov dword [_kernel_stack_start_pa], 0x003FFFF0   
+	mov dword [_kernel_stack_start],    0x003FFFF0 
 	
 
     ;
@@ -677,31 +682,41 @@ dummyJmpAfterLTR:
     ;mov byte [0x800009], byte 9
 
 	;Debug
+	;#A
 	mov eax, 0xA0A0A0
 	mov ebx, 440
 	mov ecx, 440
 	call _gui_buffer_putpixel
 
 	;Debug
+	;#B
 	mov eax, 0xB0B0B0
 	mov ebx, 494
 	mov ecx, 440
 	call _gui_buffer_putpixel
 
 	;Debug
+	;#C
 	mov eax, 0xC0C0C0
 	mov ebx, 523
 	mov ecx, 440
 	call _gui_buffer_putpixel
 
 	;Debug
+	;#D
 	mov eax, 0xD0D0D0
 	mov ebx, 587
 	mov ecx, 440
 	call _gui_buffer_putpixel
 	
+	;;
+	;; ## Refresh screen ##
+	;;
+	
 	;Debug
-	call _asm_refresh_screen    ;refresh
+	call _asm_refresh_screen    
+	
+	;debug
 	;jmp $
 	
     ;
@@ -715,69 +730,23 @@ dummyJmpAfterLTR:
 	
 	call _kMain
 
-_hang: 
-    hlt
-    ;cli	
-	jmp _hang	
-	
-	;cmp eax, 0
-	;jne headHalt
-	
-	;
-	; @todo: e o processo IDLE.BIN?
-	;        Quando ele foi iniciado. 
-	;
-	
-	;
-	; Ok. Start Idle thread.
-	;
-	
-	;Directory.
-	;xor eax, eax             	
-	;mov eax, dword 0x9C000          
-	;mov eax, dword 0x01F00000
-	;mov cr3, eax  
-
-    ;Flush TLB.
-    ;jmp flushTLB
-;flushTLB:	
-	;TLB.
-	;mov EAX, CR3  
-    ;nop
-	;nop
-	;nop
-	;nop
-	;nop
-	;mov CR3, EAX  	
-	
-	;jmp _startStartIdle
-	;jmp _KeStartIdle  @todo deletar
-	;;jmp _StartIdle   @todo deletar	
-	
-	;debug
-	;jmp $
-
-
-    ;
-    ; OBS:
- 	;    _KeMain em C não retorna pra esse ponto.
-	;
-	;    O código em C executa a primeira tarefa 
-	; efetuando um iret para o aplicativo em que está em user mode.	
-    ;
-
-headHalt:	
-    hlt
-    ;jmp $
-	jmp headHalt
-	
-	
 ;;
-;; Essa rotina pode ser exportada para finalizações seguras.
+;; HANG
 ;;	
+	
+_hang: 
+    ;pause
+    hlt	
+	jmp _hang	
+		
+;;
+;; _DIE
+;;
+		
 global __die
 __die:
-    hlt
+    ;pause
+	hlt
     jmp __die	
 	
 	;

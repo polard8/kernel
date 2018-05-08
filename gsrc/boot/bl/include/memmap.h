@@ -7,9 +7,9 @@
  *
  * ATENÇÃO: 
  *     Kernel base = 0x00100000.
- *     vbr  = 0x001A0000;
- *     fat  = 0x001B0000;
- *     root = 0x001C0000;
+ *     vbr  =  
+ *     fat  =  ;
+ *     root =  ;
  *
  *     Cuidado na escolha dos endereços para fat, root.
  *     @todo Deixar espaço o bastante para um kernel grande. 
@@ -49,8 +49,8 @@
 			 +====================================+
              |           Kernel land              |
 	         |                                    | 
-             |  Stack = 0xC0300000 ~ 0xC03FFFF0   | Pilha do Kernel. 
-	         |  Heap  = 0xC0100000 ~ 0xC02FFFF0   |	Obs: O Heap do kernel precisa ser maior.
+             |  Stack =    | Pilha do Kernel. 
+	         |  Heap  =     |	Obs: O Heap do kernel precisa ser maior.
              |                                    | 			 
 			 |  Kernel Entry point = 0xC0001000   |      Entry point do kernel.
 	         |  Kernel Base = 0xC0000000          |	     Início da imágem do processo kernel. 
@@ -58,11 +58,11 @@
 	         +------------------------------------+
              |           User Land                |	 
 	         |                                    |
-             |  Stack = 0x40300000 ~ 0x403FFFF0   | @todo  Início da pilha em user mode do proesso.
-	         |  Heap  = 0x40100000 ~ 0x402FFFF0   | @todo: Início do heap em user mode do processo.
+             |      | @todo  Início da pilha em user mode do proesso.
+	         |      | @todo: Início do heap em user mode do processo.
              |                                    | ### Por enquando cada processo tem sua própria
              |                                    |     pilha e heap no fim da imagem do processo.   			 
-             | 40000000 = Process Base.           | ??
+             |  .           | ??
 			 |                                    |
 			 | 00041000 = Process entry point     | Entrypoint da imagem.
 			 | 00040000 = Process image base      | Onde se carrega uma imagem de processo.
@@ -86,27 +86,30 @@
 //
 //
 
-#define MBR_ADDRESS     0x001A0000
-#define FS_MBR_ADDRESS  0x001A0000
- 
-#define FS_VBR_ADDRESS      0x001A0000 
-#define FS_FAT_ADDRESS      0x001B0000 
-#define FS_ROOTDIR_ADDRESS  0x001C0000 
+
+#define MBR_ADDRESS     0x7C00              
+#define FS_MBR_ADDRESS  0x7C00              
+#define FS_VBR_ADDRESS  (0x7C00 + 0x200)    
+
+#define FS_FAT_ADDRESS      (0x1000000 - 0x400000)  
+#define FS_ROOTDIR_ADDRESS  (0x1000000 - 0x100000)  
 
 
 //
-// Fat support. fat32, fat16, fat12.
+// Fat support.  fat16, fat12.
 //
 
 #define FAT12_VBR_ADDRESS     FS_VBR_ADDRESS
 #define FAT12_FAT_ADDRESS     FS_FAT_ADDRESS
 #define FAT12_ROOTDIR_ADDRESS FS_ROOTDIR_ADDRESS
+
 #define FAT16_VBR_ADDRESS     FS_VBR_ADDRESS
 #define FAT16_FAT_ADDRESS     FS_FAT_ADDRESS
 #define FAT16_ROOTDIR_ADDRESS FS_ROOTDIR_ADDRESS
-#define FAT32_VBR_ADDRESS     FS_VBR_ADDRESS
-#define FAT32_FAT_ADDRESS     FS_FAT_ADDRESS
-#define FAT32_ROOTDIR_ADDRESS FS_ROOTDIR_ADDRESS
+
+//#define FAT32_VBR_ADDRESS     FS_VBR_ADDRESS
+//#define FAT32_FAT_ADDRESS     FS_FAT_ADDRESS
+//#define FAT32_ROOTDIR_ADDRESS FS_ROOTDIR_ADDRESS
 
 
 /*

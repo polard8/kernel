@@ -119,11 +119,11 @@ mShell:
 	; Obs: 
 	; @todo: Talvez os argumentos devam ser preparados antes.
 	;
-	
-	
- 
 	 
 	; Inicializão do modo protegido.
+	; Switching to Protected Mode.
+	; msm/pm.inc
+	
 	jmp pmInit
 	jmp $  
 	
@@ -181,42 +181,56 @@ mGui:
 	
 	
 	;;
-	;; Temos que entrar no modo protegido já estando no modo grafico.
+	;; Ajustando registradores.
 	;;
+		
+    cli
 	
-   cli
 	;Data.
-	mov  ax, 0; 0x0800 ;DATA_SEGMENT    ;0.        
+	mov  ax, 0; 
     mov  ds, ax
     mov  es, ax
 	;mov  fs, ax    ;Unused       
 	;mov  gs, ax    ;Unused    
+	
 	;Stack.
 	XOR AX, AX
     mov ss, ax
     mov sp, 0x6000 ;STACK_POINTER
+	
 	;General purpose.
 	xor ax, ax
 	xor bx, bx
 	xor cx, cx
 	xor dx, dx
 	
-	;
-	; Obs: 
-	;@todo: Talvez os argumentos devam ser preparados antes
-	;
+	
+	;;
+	;; #importante
+	;; Temos que entrar no modo protegido já estando 
+	;; no modo grafico.
+	;;
+
+	;;
+	;; GDTR
+	;;
 	
 	lgdt [stage2_gdtr]
-	;lgdt [0x8000 + stage2_gdtr]  ;;está em 16bit        
-    ;lgdt [lgdt_opcode]  ;;está em 32bit (teste)
 
+	
+	;;
+	;; CR0 - PE
+	;;
+	
 	;Muda PE.
 	mov eax, cr0
     or al, 1
     mov cr0, eax
 
 
-
+    ;;
+	;; Flush pipeline
+	;;
 
 ;@todo: Mudar nome para pmFlushPipeline 
 	
@@ -224,7 +238,11 @@ mGui:
 ;flush_pipeline:
 s2modesFlushPipeline:
     jmp stage2_CODE_SEL:s2modespm32 
-    ;jmp 8:pm32
+	
+	;;
+	;; 32bit 
+	;;
+	
 	[BITS 32]
 s2modespm32:	
 
@@ -234,6 +252,7 @@ s2modespm32:
 	mov es, ax
 	;mov fs, stage2_NULL_SEL    ;0.
 	;mov gs, stage2_NULL_SEL    ;0.
+	
 	mov ss, ax
 	mov esp, dword 0x0009FFFC
 	
@@ -248,26 +267,37 @@ s2modespm32:
 	;; para esse ambiente estão funcionando.
 	;;
 	
+	;;
+	;; @todo: Poderíamos limpar a tela entes de 
+	;; apresentarmos essa mensagem.
+	;;
+	
 	;;testando mensagem.
     mov eax, 0x00ffff00 ;color
 	mov esi, s2modes_initmessageinGM
 	call lib32PrintString
     call _asm_refresh_screen	
 
+	;debug
 	;jmp $
 	
-    ;opção é saltar para uma área de inicialização em 32bit modo gráfico.
-    jmp startGUI
-
-	;jmp 8:IMAGE_ADDRESS_ENTRY_POINT
-	;JMP $	
-	; Inicializão do modo protegido.
-	;jmp pmInit
+	
+	;;
+	;; GO!
+	;;
+	
+    ; Opção é saltar para uma área de inicialização em 
+	; 32bit modo gráfico.
+    
+	;msm/start.inc
+	jmp startGUI
 	jmp $
+	
+	
 s2modes_initmessageinGM db "s2modes: Initializing PM in GM.",13,10,0
 
 ;;
-;;=========
+;;#####################################################################
 ;;
 
 ;;não queremos estragar as rotinas de 16bit.	

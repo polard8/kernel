@@ -3,28 +3,93 @@
 ;
 ; Descrição:
 ;     Esse é o arquivo principal de BM.BIN.
+;     Foi carregado pelo MBR.  
 ;     O objetivo é carregar BL.BIN na memória e passar o comando para ele.
+; 
+;     *** Importante: @todo: Um novo nome deve ser criado.
+;     Arquivo principal do System4Nora. (Começa com o BM).
 ;
-; Atribuições: 
-; ===========
-;+
-;+ É carregado em 0x7C00 pelo bios.
-;+ Copia o stage 1 para 0x0E00 e executa.
-;+ Carrega o stage 2 em 0x1000 e executa.
-;+ Carrega Boot Loader do System4Nora em 0x00020000.
-;+ Executa Boot Loader do System4Nora em (entry point 0x00021000).
-;+
+; *Importante:
+; O arquivo main.asm faz uma sequencia de inclusões de módulos
+; que compõem o Boot manager, começando pelos módulos de 16bit
+; e depois os módulos de 32bit. O arquivo header32.inc deve ficar no 
+; início das inclusões dos módulos de 32bit, para que os módulos
+; de 32bit possam utiliza-lo adequadamente.
 ;
-; Partes:
-;1 - Boot         - Stage 1, Stage 2 e pm.inc.
-;2 - Boot Manager - Núcleo do Boot Manager. 
+;Sobre o sistema System4Nora:
+;========================================
 ;
-; Funcionamento:
-;+ O stage 1(MBR) é carregado em 0x7C00 pelo BIOS.
-;+ O stage 1 carrega à si próprio para 0x0E00. 
-;+ O stage 1 carrega o resto do Boot Manager (stage2,os) para 0x00001000.
-;+ O stage 2 inicializa o hardware.(setup).
-;+ O Boot Manager carrega o Boot Loader e passa o comando para ele. 
+;    O sistema é chamado SYSTEM.VHD.
+;    É um VHD de 32 MB feito em assembly. (NASM).
+;    Comtém 4 programas compilados juntos.
+;    São eles:
+;    
+;       1, Boot Manager (16 e 32 bit).
+;       2, Boot Loader (32 bit). (@todo)
+;       3, Kernel (32 bit).      (@todo)
+;       4, Browser (32 bits).    (@todo)
+;       
+;    Obs: 
+;    ====
+;        *IMPORTANTE: Os 4 programas do System4Nora
+;                     podem usar as bibliotecas de 32bit
+;                     que pertencem ao Boot Manager.
+;
+;       *O System4Nora permite a inicialização no Modo Texto e
+;        e no Modo Gráfico. A seleção do modo é feita no arquivo stage2.inc.
+;        mas a seleção do modo de inicilização poderá ser feita pelo
+;        usuário administrador e pelo desenvolvedor.
+;
+;  1) Sobre o Boot Manager do System4Nora:
+;       Faz a inicialização em 16 bits.
+;
+;  2) Sobre o Boot Loader do System4Nora:
+;       É um Boot Loader interno que carrega o kernel interno
+;
+;  3) Sobre o Kernel do System4Nora:
+;         O Kernel é mínimo, monotarefa.
+;         Tecnologia semelhante ao DPMI.
+;         Os recursos do System4Nora podem
+;         ser acessados através de um Shell interno.
+;         usado pelo desenvolvedor para gerenciamento de
+;         inicialização.         
+;       
+;  4) Sobre o Browser do System4Nora:
+;        O Browser é a interface gráfica. É a área de trabalho onde
+;        aparecerão as páginas em html, os atalhos para as aplicações
+;        ou os gerenciadores do sistema.
+;        Essa inteface gráfica assim como o shell interno será
+;        usada para gerenciamento de inicialização.
+;
+;Sobre o subsistema:
+;===================
+;    O subsistema é chamado SYSTEM.BIN.
+;    É um programa em user mode feito em C.
+;    Serão usados os códigos do Boot Loader em C e
+;    do Kernel em C, já feitos.
+;    A atribuição do subsistema é ser uma interface
+;    entre as aplicações em user mode e o kernel em assembly.
+;     
+; Sobre as aplicações:
+; ===================
+;     As aplicações são programas feitos em C 32bit.
+;     Rodam em user mode.
+;
+; @todo: Filtrar as informaçoes abaixo nesse comentário.
+;
+; Sobre o Boot Manager contido no System4Nora:
+; ============================================
+;     O Boot Manager é a primeira parte do System4Nora, ele começa com um MBR 
+; em 16bit e stage 2 em 16bit depois muda pra 32bit.
+; 
+;     Arquivo principal do Boot Manager.
+;     M0 - Módulos em ring0.
+;
+;     Boot Manager 16bit via BIOS.
+;     Para HD IDE.
+;     Tamanho = 32KB.
+;
+ 
 ;
 ; Video modes:
 ; ============
@@ -48,7 +113,8 @@
 ;
 ; Autor: Frederico Martins Nora - (frednora)
 ;
-; Versão 1.0, Copyright (c) 2005 ~ 2016. 
+; History:
+;     (2005-2016) - Created by Fred Nora. 
 ;---------------------------------------------------
 
 ;;
@@ -158,7 +224,7 @@ bootmanagerSTART:
     ;Create stack.
     mov ax, 0x0000
     mov ss, ax
-    mov sp, 0x6000  ;;?? Por que aqui ??
+    mov sp, 0x6000   
     sti
 	
 	
@@ -177,17 +243,17 @@ bootmanagerSTART:
 	;int 0x16 
 	;int 0x19	
 
-;;getDiskInfo:	
-	
+;;getDiskInfo:
+
     ;;
 	;; Pegando informações sobre o disco.
 	;;
 	
 	;;========================================
-	
- ;
-	; Get drive parameters: 
-	; =====================
+
+    ;
+    ; Get drive parameters: 
+    ; =====================
     ; Return: CF set on error.
     ; AH = status (07h).
     ; CF clear if successful.
@@ -199,11 +265,11 @@ bootmanagerSTART:
     ;      high two bits of maximum cylinder number (bits 7-6).
     ; DH = maximum head number.
     ; DL = number of drives.
-	;
-	xor ax, ax
-	mov ah, byte 08h
+    ;
+    xor ax, ax
+    mov ah, byte 08h
     int 0x13 
-	
+
 	;
 	;Heads.
 	;Número de heads.
@@ -245,7 +311,7 @@ bootmanagerSTART:
     ;	
 	xor eax, eax 
 	mov al, cl
-	and al, byte 00111111b                   ;03Fh			
+	and al, byte 00111111b                   ;03Fh
 	mov byte [SectorsPerTrack], al    ;BPB (word).
 	;Sectors per track.
 	mov ah, 0                                   ;;enviamos apenas 'al' 
@@ -257,20 +323,21 @@ bootmanagerSTART:
 	; O valor de CylinderNumbers foi gravado em variável mas precisará ser 
 	; passado a diante para uso posterior.
 	;
-	xor eax, eax
-	mov al, cl   					;Two high bits of cylinder number in bits 6&7.
-	and al, 11000000b				;Mask it.
-	shl ax, 2						;Move them to bits 8&9.
-	mov al, ch						;Rest of the cylinder bits.(low 8 bits)
-	inc eax							;Number is 0-based.
-	;Número de cilindros do disco.
-	mov word [save_cylinder_numbers], ax	
-	mov word [META$FILE.CYLINDERS], ax
-	
-	;;;========================================
+    xor eax, eax
+    mov al, cl   					;Two high bits of cylinder number in bits 6&7.
+    and al, 11000000b				;Mask it.
+    shl ax, 2						;Move them to bits 8&9.
+    mov al, ch						;Rest of the cylinder bits.(low 8 bits)
+    inc eax							;Number is 0-based.
+    ;Número de cilindros do disco.
+    mov word [save_cylinder_numbers], ax
+    mov word [META$FILE.CYLINDERS], ax
 
+
+	;;
+	;;========================================
+    ;;
    
-
 
 	;;
 	;; Carregar root.
@@ -299,7 +366,7 @@ bootmanagerLOAD_ROOT:
 	mov word [ROOTDIRSTART], ax              ; *** Nesse momento ax contem o setor inicial do root dir ***
 	add  ax, cx
     mov WORD [bootmanagerdatasector], ax               ; base of root directory
-    ;Read root directory into memory (8000:1000) ?
+    ;Read root directory into memory (0:1000) ?
     ;mov WORD [bootmanagerdatasector], 591  ;;SIMULADO Início da área de dados.
 	
 	
@@ -361,7 +428,7 @@ bootmanagerLOAD_FAT:
      
 	 
     ; Read FAT into memory (es:bx).?? Onde ??
-	; ?? 0:0x1000 ?? Por que ??
+	; ?? 0:0x1000 
 	; ?? Qual é o segmento e o offset da FAT ??
 	mov ax, 0 
     mov es, ax
@@ -465,36 +532,28 @@ bootmanagerDONE:
 	;; maior, mas talvez isso torne o trabalho o MBR mais difícil.
 	;;======================================================================
 
-;	
-; Go!	
-; Agora saltamos para a trap que existe no início do META$FILE. 
+
+;
+; Go!
+; Agora saltamos para a trap que existe no início do META$FILE.
 ; 
-.goToFisrtTrap:	 
+.goToFisrtTrap:
 
-	push WORD 0      
-    push WORD stage2Trap1  ;Trap 1.
+    push WORD 0
+    push WORD stage2Trap1  ;Trap 1. (isso está nesse arquivo mesmo)
     retf
-	;JMP $  ;Fail.
-	
-	;;Opção.
-	;;Obs: Isso funcionou.
-	;push WORD 0                 
-    ;push WORD stage2Trap8  ;Trap 8.
-    ;retf	
-	;JMP $  ;Fail.
-	
-	;;Opção.
-	;JMP stage2_main
-    ;PUSH CODE_SEGMENT 
-	;PUSH stage2Trap2    ;; *fat16 (Padrão) Quando carregado pe stage 1.      
-    ;RETF
 
-	
+    ;JMP $  ;Fail.
+
+
+;;===============================
 ;Fail. 
+; @todo: Agora temos espaço no BM. Isso pode ser melhorado, colocando 
+; uma mensagem.
 bootmanagerFAILURE:
-	int 0x18
-	jmp $
-	
+    int 0x18
+    jmp $
+
 	;mov ax, 0x8000 ;0x07C0
     ;mov ds, ax
     ;mov es, ax
@@ -506,10 +565,10 @@ bootmanagerFAILURE:
     ;int  0x19         ; warm boot computer
 
 
-;*************************************************************************
+;*****************************************************************
 ; bootmanagerDisplayMessage:
 ;     Display ASCIIZ string at "ds:si" via BIOS.
-;*************************************************************************
+;*****************************************************************
 bootmanagerDisplayMessage:
     lodsb                                   ; load next character
     or al, al                               ; test for NUL character
@@ -522,13 +581,14 @@ bootmanagerDisplayMessage:
 .bootmanagerDONE:
     ret
 	
-;**************************************************************************
+	
+;************************************************************************
 ; bootmanagerReadSectors:
 ;     Reads "cx" sectors from disk starting at "ax" into memory location 
 ; "es:bx".
 ;     Carrega na memória, em es:bx, 'cx' setores do disco, começando pela 
 ; LBA 'ax'. 
-;**************************************************************************
+;************************************************************************
 bootmanagerReadSectors:
 	mov WORD [bootmanagerDAPBuffer], bx
 	mov WORD [bootmanagerDAPBuffer+2], es
@@ -563,40 +623,40 @@ bootmanagerReadSectors:
     pop bx
     pop ax
     add bx, WORD [bootmanagerBytesPerSector]           ; queue next buffer
-	cmp	bx, 0x0000  ;;??	
-	jne	 .bootmanagerNextSector
-	push ax
-	mov ax, es
-	add	ax, 0x1000
+    cmp bx, 0x0000  ;;??
+    jne .bootmanagerNextSector
+    push ax
+    mov ax, es
+    add ax, 0x1000
     mov es, ax
-	pop ax
+    pop ax
 .bootmanagerNextSector:
     inc ax                               ; queue next sector
-	mov WORD [bootmanagerDAPBuffer], bx    
+    mov WORD [bootmanagerDAPBuffer], bx    
     mov WORD [bootmanagerDAPStart], ax
     loop .bootmanagerMAIN                ; read next sector
     ret
  
  
-;*************************************************************************
+;*****************************************************
 ; bootmanagerClusterLBA:
 ; convert FAT cluster into LBA addressing scheme
 ; LBA = (cluster - 2) * sectors per cluster
-;*************************************************************************
+;*****************************************************
 bootmanagerClusterLBA:
     sub ax, 0x0002     ; zero base cluster number.
     xor cx, cx
     mov cl, BYTE  1    ;[bootmanagerSectorsPerCluster] ; convert byte to word.
     mul cx
-    add ax, WORD 591   ;[bootmanagerdatasector] ; base data sector.
-	ret
+    add ax, WORD 591   ;[bootmanagerdatasector] ; base data sector.(#bugbug Valor determinado.)
+    ret
 
 
 ;;
 ;; Dados de supporte.
 ;;
-	
-;DAP.	
+
+;DAP.
 bootmanagerDAPSizeOfPacket  db 10h
 bootmanagerDAPReserved		db 00h
 bootmanagerDAPTransfer		dw 0001h
@@ -645,23 +705,21 @@ bootmanagermsgCRLF      db 0x0D, 0x0A, 0x00
 ;=================
 ; Obs: Aqui é oomeço do Stage2 do Boot Manager.
 ;
-	
-	
-	
-	
-	
+
+
+
 [bits 16]
 	;Stage 2.
 	;Esse é o segundo setor.
     ;*Daqui pra frente temos código de inicialização.	
 	;; ** SEGUNDO SETOR ** ;;
-	
+
 	;;
 	;;=====================================================
 	;;
 	
 	;;%include "stage2.inc"       ;Inicialisa a arquitetura presente.(setup).
-	
+
 ;
 ; Gramado Boot Manager - This is the stage 2 for the boot manager.
 ; It's a 16bit/32bit program to make some basic system initialization and 
@@ -751,9 +809,6 @@ bootmanagermsgCRLF      db 0x0D, 0x0A, 0x00
 
 
 
-[BITS 16] 
-
-
 ;
 ; Algumas constantes usadas pelo stage 2.
 ; Obs: Por conveniência, o desenvolvedor pode manipular essas constantes.
@@ -774,26 +829,27 @@ bootmanagermsgCRLF      db 0x0D, 0x0A, 0x00
 ; de rotinas de sondagem. 
 ;
 
+
 ;stage 2.
 CODE_SEGMENT   equ 0
-DATA_SEGMENT   equ 0  
+DATA_SEGMENT   equ 0
 STACK_SEGMENT  equ 0
-STACK_POINTER  equ 0x6000 
+STACK_POINTER  equ 0x6000
 
 ;vbr.
 VBR_SEGMENT    equ 8000H
 VBR_OFFSET     equ 7C00H
-VBR_LBA        equ 63    
+VBR_LBA        equ 63
 
 ;fat.
 FAT_SEGMENT    equ 6000H
 FAT_OFFSET     equ 0
-FAT_LBA        equ 67    
+FAT_LBA        equ 67
 
 ;root.
 ROOT_SEGMENT   equ 4000H
 ROOT_OFFSET    equ 0
-ROOT_LBA       equ 559    
+ROOT_LBA       equ 559
 
 
 ;;========================
@@ -806,8 +862,8 @@ ROOT_LBA       equ 559
 ;Boot Loader.
 BL_SEGMENT     equ 2000H
 BL_OFFSET      equ 0
-BL_LBA         equ 0    
- 
+BL_LBA         equ 0
+
 
 ;--------------------------------------- 
 ;Algum suporte para cores no modo texto. 
@@ -917,7 +973,7 @@ stage2InitializeMetafile:
 	;mov word [META$FILE.MAGIC_NUMBER], bx     ;magic number.
 .diskParametersMetafile:       	; * Salva os parâmetros de disco no META$FILE.
 	
-	;;#bugbug. não salvaremos no metafile porque ja fizemos isso no início do bm.
+	;;#bugbug. não salvaremos no metafile porque já fizemos isso no início do bm.
 	
 	;mov word [META$FILE.S1_BPB_POINTER], si   ;Ponteiro para o BPB do stage 1, do MBR.		
 	;Disk Number, heads, spt, cylinders.
@@ -996,7 +1052,7 @@ stage2Initializations:
 	
 	
 HERE:	
-	mov ax, 0 ;0x0800
+	mov ax, 0 
 	mov ds, ax
 	mov es, ax 
 	
@@ -1012,19 +1068,7 @@ HERE:
 	;jmp $
 	
 	
-;;
-;; ****  TESTANDO SE O BL.BIN ESTÁ NA MEMÓRIA ****
-;;	
-;; Se não estiver, tentaremos mais uma vez carrega-lo usando recursos do BIOS.
-;; Porém não vamos carregar o ROOT nem a FAT novamente, vamos supor que pelo menos
-;; isso o MBR fez direito.
-;;
-	
-;;
-;; ROOT DIR ADDRESS = 0:0xA000 (CHECAR SE É POSSIVEL.)
-;; FAT ADDRESS = 0x5000:0x0200 (CHECAR SE É POSSIVEL.)
-;; 
-;;	
+ 
 	
 ;; Checar se a assinatura PE está na memória, se estiver, pularemos e
 ;;a etapa de carregamento do arquivo.	
@@ -1093,11 +1137,14 @@ HERE:
     ;pop ds	
 	
 	;;
-	;; O arquivo me parece estar corrompido, foi carregado com setores desordenados... coisa que não acontece com a rotina de 32bit.
+	;; O arquivo me parece estar corrompido, foi carregado 
+	;;com setores desordenados... coisa que não acontece com a rotina de 32bit.
 	;;
 	
-	;DEBUG:   **** USAR BASTANTE ESSE DEBUG PARA TER CERTEZA QUE TEMOS TODO O ARQUIVO ONDE QUEREMOS.
-	;;REPETIR ESSE DEBUG EM OUTRAS PARTES DO BM ... EM MUITAS PARTES SE PRECISO ... FAZER ALGO SEMELHANTE EM 32BIT
+	;DEBUG:   **** USAR BASTANTE ESSE DEBUG PARA TER CERTEZA QUE TEMOS 
+	;TODO O ARQUIVO ONDE QUEREMOS.
+	;;REPETIR ESSE DEBUG EM OUTRAS PARTES DO BM ... 
+	;EM MUITAS PARTES SE PRECISO ... FAZER ALGO SEMELHANTE EM 32BIT
 	;jmp $
 	
 	
@@ -1111,16 +1158,20 @@ HERE:
     ;Setup registers.
 .setupRegisters:	
     cli
+	
 	;Data.
-	mov  ax, 0; 0x0800 ;DATA_SEGMENT    ;0.        
+	mov  ax, 0       
     mov  ds, ax
     mov  es, ax
 	;mov  fs, ax    ;Unused       
-	;mov  gs, ax    ;Unused    
+	;mov  gs, ax    ;Unused 
+
 	;Stack.
+	;STACK_POINTER (Colocamos no mesmo lugar de antes.)
 	XOR AX, AX
     mov ss, ax
-    mov sp, 0x6000 ;STACK_POINTER
+    mov sp, 0x6000 
+	
 	;General purpose.
 	xor ax, ax
 	xor bx, bx
@@ -1157,26 +1208,10 @@ HERE:
 	;call DisplayMessage
     ;call DetectionMain
 	
-	;
-	; @todo:
-	;     Tentando carregar o boot loader (BL.BIN)
-	; usando uma rotina em modo real.
-	; AX = ?? "BL      BIN"
-	;
-	;; Status: Essa rotina esta funcionando parcialmente.
-	;; @todo: Fazer debug dessa rotina e corrigir as partes 
-    ;; que não são eficazes.
 	;;
 .readingFile:
 	
-
-	;;
-	;; Carregaremos o BL usando os recursos do BIOS antes de entrarmos no shell do bm, que está em 32bit.
-	;; @bugbug Nessa versão essa função está incompleta.
-	
-	;mov ax, word s2header_boot_loader_name
-	;call s2fat16ReadFile    ;;s2fat16.inc
-	
+    ;## Nothing ...	
 	
 	
     ;
@@ -1199,10 +1234,10 @@ HERE:
 	call DisplayMessage
 	
 	;JMP $
-
 	;;
 	
-.preSelection:	
+.preSelection:
+	
 	mov al, byte BOOTMODE_SHELL
 	;mov al, byte BOOTMODE_GUI
 	call set_boot_mode	
@@ -1223,14 +1258,25 @@ HERE:
 	;mov ax, 0x115
 	;call set_video_mode
 
+	;;
+	;; ## GO!
+	;;
 	
 	; Ativar o modo escolhido.
-	JMP s2modesActivateMode    ;(lib16\s2modes.inc) 
+	; (lib16\s2modes.inc)
+	
+	JMP s2modesActivateMode     
 	JMP $
 	
 	
 stage2_msg_pe_sig   db "BM:stage2Initializations: *PE SIG",0
 stage2_msg_pe_sigOK db "BM:stage2Initializations: SIG OK",13,10,0	
+	
+	
+;;
+;; ####################################################################
+;;	
+	
 	
 ;;============================================
 ;; stage2Shutdown:
@@ -1241,7 +1287,8 @@ stage2_msg_pe_sigOK db "BM:stage2Initializations: SIG OK",13,10,0
 ;;                 chamar uma rotina de retorno para o modo real.
 ;;
 stage2Shutdown:	
-    ;Connect to APM API
+    
+	;Connect to APM API
     MOV     AX, 5301h
     XOR     BX,BX
     INT     15h

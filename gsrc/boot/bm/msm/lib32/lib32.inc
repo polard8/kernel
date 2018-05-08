@@ -18,6 +18,7 @@
 ;     ... 
 ;
 
+LIB32_BACKBUFFER EQU (0x1000000 - 0x800000)
 
 ;
 ; Variáveis internas.
@@ -304,7 +305,7 @@ lib32SetupIDT:
 ;; Continua...	
 	
 	
-;--------------------------------------------
+;####################################################
 ; _gui_buffer_putpixel:
 ;     Coloca um pixel no Back Buffer.
 ;
@@ -359,8 +360,7 @@ _gui_buffer_putpixel:
     
 	 
 	;(base) buffer 1 
-	;mov ecx, dword 0xC0800000 ;;[ModeInfo_PhysBasePtr] 0x01000000 ; buffer [5000h]
-    mov ecx, dword 0x01000000  ;endereço fisico do backbuffer ;[ModeInfo_PhysBasePtr]
+    mov ecx, dword LIB32_BACKBUFFER ;0x01000000  ;endereço fisico do backbuffer ;[ModeInfo_PhysBasePtr]
 	add edi, ecx     ;(deslocamento)
    	
 	;a
@@ -387,7 +387,7 @@ _gui_buffer_putpixel:
 .a db 0
 
 
-;------------------------------------------------
+;#################################################
 ; _gui_direct_putpixel:
 ;     Coloca um pixel direto no LFB.
 ;
@@ -440,8 +440,7 @@ _gui_direct_putpixel:
     
 	;mov eax, ecx       ;[MenColor] ; eax = color
     
-	;(base) buffer 1 
-	;mov ecx, dword 0xC0800000 ;;[ModeInfo_PhysBasePtr] 0x01000000 ; buffer [5000h]  
+	;(base) buffer 1   
     mov ecx, dword [ModeInfo_PhysBasePtr]
 	add edi, ecx     ;(deslocamento)
    	
@@ -674,7 +673,7 @@ _background:
 	mov   ebx, dword 600   ; numero de linhas	    
 .bg_newline:     	
 	;contador de pixel por linha.
-    mov   ecx, dword 800*4 ; 3 bytes por pixel. (800 pixel por linha)	
+    mov   ecx, dword 800*3 ; 3 bytes por pixel. (800 pixel por linha)	
 .bg_newpixel:     
 	mov al, byte [.a]
 	stosb 
@@ -799,8 +798,8 @@ _asm_refresh_screen:
 	;
     ; Origem  - Buffer.
     ; Destino - LFB.
-	mov esi, dword 0x01000000
-	mov edx, dword  [ModeInfo_PhysBasePtr]
+	mov esi, dword LIB32_BACKBUFFER ;0x01000000
+	mov edx, dword [ModeInfo_PhysBasePtr]
     mov edi, edx
 	
 	;

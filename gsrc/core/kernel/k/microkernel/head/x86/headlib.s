@@ -61,7 +61,7 @@ dd 0
 dd 0	
 tss0:
 	dd 0x401000             ;back link
-	dd 0x003FFFF0   ;;0x00200000           ;esp0    (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
+	dd 0x003FFFF0           ;esp0    (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
 	dd 0x10                 ;ss0
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
@@ -96,7 +96,7 @@ dd 0
 dd 0
 tss1:		          
 	dd _task0               ;back link  (todo: esse backlink esta errado,precisa ser logico)
-	dd 0x003FFFF0   ;0x00200000           ;esp0   (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
+	dd 0x003FFFF0           ;esp0   (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
 	dd 0x10                 ;ss0
 	dd 0                    ;esp1
 	dd 0                    ;ss1	

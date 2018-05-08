@@ -16,7 +16,7 @@ echo -{ Warning: ...
 echo -{ ... 	
 echo -{ Creating BM.BIN 
 	
-    SET ROOT=c:\gsrc\boot\bm\v2.2
+    SET ROOT=c:\gramado\branch\gsrc\boot\bm\v2.2
 	cd %ROOT%
 	
 	nasm -I./stage1/ ^

@@ -13,6 +13,9 @@
  *     Versão: 1.0, 2016 - Revisão.
  */
  
+//test: suporte a getch();
+int window_getch(); 
+ 
 //
 // Window handle status
 // Se uma janela está aberta ou não. 
@@ -1786,7 +1789,7 @@ unsigned long browsertabList[TABWINDOW_COUNT_MAX]; //lista de ponteiros para est
 
 #define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
 
-
+int zorder;
 
 //esses tipo indicam algum posicionamento dentro da xorder.
 typedef enum {

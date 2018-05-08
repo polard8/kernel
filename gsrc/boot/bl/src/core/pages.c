@@ -124,13 +124,13 @@ int SetUpPaging()
 	//
 	
 	
-	unsigned long *page_directory         = (unsigned long *) 0x01F00000;  	
-	unsigned long *idle_page_directory    = (unsigned long *) 0x01E00000;
-	unsigned long *shell_page_directory   = (unsigned long *) 0x01D00000;
-	unsigned long *taskman_page_directory = (unsigned long *) 0x01C00000;
-	unsigned long *x_page_directory       = (unsigned long *) 0x01B00000;
-	unsigned long *xx_page_directory      = (unsigned long *) 0x01A00000;
-	unsigned long *xxx_page_directory     = (unsigned long *) 0x01900000;	
+	unsigned long *page_directory         = (unsigned long *) (0x01000000 - 0x900000);   	
+	unsigned long *idle_page_directory    = (unsigned long *) (0x01000000 - 0x901000); 
+	unsigned long *shell_page_directory   = (unsigned long *) (0x01000000 - 0x902000); 
+	unsigned long *taskman_page_directory = (unsigned long *) (0x01000000 - 0x903000); 
+	unsigned long *x_page_directory       = (unsigned long *) (0x01000000 - 0x904000); 
+	unsigned long *xx_page_directory      = (unsigned long *) (0x01000000 - 0x905000); 
+	unsigned long *xxx_page_directory     = (unsigned long *) (0x01000000 - 0x906000); 	
 	//Continua descendo.
 	
 	

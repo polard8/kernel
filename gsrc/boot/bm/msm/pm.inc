@@ -51,13 +51,6 @@ pmInit:
 	xor bx, bx
 	mov bl, al    ;Salva em bl.
 	
-	;Carrega o gdtr do stage 2.
-    ;cli	
-	
-	
-	;;
-	;;  #### BUGBUG  ####
-	;;
 	
 	pusha
     call Window.StatusBar
@@ -65,54 +58,100 @@ pmInit:
     call PoeString
     popa	
 	
+	;debug
 	;jmp $
 
-   cli
+    ; Configurando segmentos.
+	
+	cli
+	
 	;Data.
-	mov  ax, 0; 0x0800 ;DATA_SEGMENT    ;0.        
+	mov  ax, 0        
     mov  ds, ax
     mov  es, ax
 	;mov  fs, ax    ;Unused       
 	;mov  gs, ax    ;Unused    
+	
 	;Stack.
+	;STACK_POINTER
+	;Reconfigurando no mesmo lugar de antes.
+	
 	XOR AX, AX
     mov ss, ax
-    mov sp, 0x6000 ;STACK_POINTER
+    mov sp, 0x6000 
+	
 	;General purpose.
 	xor ax, ax
-	xor bx, bx
+	xor bx, bx ;; #bugbug Isso suja o boot mode salvo em bl.
 	xor cx, cx
 	xor dx, dx
 	 
+	;;
+	;; GDTR
+	;;
+	
+	;Carrega o gdtr do stage 2.	
 	lgdt [stage2_gdtr]
 
+	;;
+	;; CR0 - PE
+	;;
+	
 	;Muda PE.
 	mov eax, cr0
     or al, 1
     mov cr0, eax
 	
+	;;
+	;; Flush pipeline.
+	;;
+	
 	;CS.
 pmFlushPipeline:
     jmp stage2_CODE_SEL:pm32 
+	
+	;;
+	;; ## 32 BIT START ##
+	;;
+	
 	[BITS 32]
 pm32:
 
-
+    ;debug em modo texto.
     ;mov byte [0B8000h], byte 'P'
     ;jmp $
 
+	
+	;;
+	;; ## Inicalizando modo de boot ##
+	;;
+	
 	; Salva o boot mode em um endereço de 32 bits.
+	; #bugbug: O bl foi zerado um pouco antes.
+	; Provavelmente podemos deletar isso.
+	; É preciso conferir se não usamos essa variável 
+	; logo a frente.
+	
+	; Aqui estamos selecionando o modo '0'.
 	mov byte [BOOT.modo], bl
 
+	;;
+	;; Reconfigurando registradores.
+	;;
 
 	;
 	; @todo: 
-	;    Talvez dê para passar outras coisas através dos registradores b,c,d.
+	;    Talvez dê para passar outras coisas através dos 
+	; registradores b,c,d.
 	; Obs: 
-	;     A pilha está bem perto do diretório do kenrel. ??.
+	;     A pilha está bem perto do diretório do kernel. ??.
 	;     Stack = 0x0009FFFC
 	;     Directory = 9C000.  
 	;
+	
+	;;
+	;; Segmentos
+	;;
 	
 	;Segmentos de dados e pilha.
     mov ax, stage2_DATA_SEL        
@@ -120,8 +159,17 @@ pm32:
 	mov es, ax
 	;mov fs, stage2_NULL_SEL    ;0.
 	;mov gs, stage2_NULL_SEL    ;0.
+	
+	;;
+	;; Pilha
+	;;
+	
 	mov ss, ax
 	mov esp, dword 0x0009FFFC
+	
+	;;
+	;; Uso geral.
+	;;
 	
 	;Zera os registradores.		
     mov edx, dword 0    ;#Voice,8?!
@@ -167,7 +215,8 @@ pm32:
 	; start:
 	; Inicia o modo escolhido que foi salvo em 'BOOT.modo'.
 	; IN: AL = Boot mode.
-	;	
+	; #bugbug podemos ter um proble nessa variável BOOT BOOT.modo.
+    ;	
 	mov al, byte [BOOT.modo]	
 	JMP start
 	JMP $

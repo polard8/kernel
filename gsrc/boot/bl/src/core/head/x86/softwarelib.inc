@@ -13,6 +13,8 @@
 
 extern _vsync
 
+
+SOFTWARELIB_BACKBUFFER EQU (0x1000000 - 0x800000)
 	
 	
 ;---------------------------------------------
@@ -60,7 +62,7 @@ _my_buffer_load_bitmap_16x16:
     ;'eax', Contém o deslocamento em relação ao inicio do buffer.
 	
 	;mov edx, dword [5000h] ;lfb
-    mov edx, dword 0x01000000    ;buffer
+    mov edx, dword SOFTWARELIB_BACKBUFFER ;0x01000000    ;buffer
 	add eax, edx                 ;adiciona o buffer
     mov edi, eax                 ;posição (esquerda/cima) da imagem na tela.
 	
@@ -237,7 +239,7 @@ _gui_buffer_putpixel:
     
 	;@todo: Mudar o buffer para um endereço lógico conhecido. 
 	;(base) buffer 1 
-	mov ecx, dword 0x01000000    ;buffer ;[ModeInfo_PhysBasePtr]
+	mov ecx, dword SOFTWARELIB_BACKBUFFER ;0x01000000    ;buffer ;[ModeInfo_PhysBasePtr]
     add edi, ecx     ;(deslocamento).
    	
 	;envia r
@@ -282,7 +284,7 @@ _refresh_screen:
 	push edx
 	
     ;Origem, buffer.
-    mov esi, dword 0x01000000 
+    mov esi, dword SOFTWARELIB_BACKBUFFER ;0x01000000 
 	;Destino, LFB, (no início o bootloader lida com endereços fisicos).
 	mov edx, DWORD [_g_lbf_pa]    ;[bl_lfb] 
     mov edi, edx

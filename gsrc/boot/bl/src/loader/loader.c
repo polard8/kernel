@@ -118,6 +118,33 @@ int load_kernel()
 	//WORD Machine.
 	//WORD NumberOfSections.
 	
+	
+	//
+	// #importante:
+	// Checando se o kernel base contém o header 
+	// do multiboot.
+	// Obs: Para o Gramado Boot isso significa apenas
+	// mais um ítem de segurança, pois o Gramado Boot
+	// fará a inicialização do mesmo modo de sempre e enviará 
+	// os mesmos argumentos de sempre.
+	// Porém se um multiboot carregar o kernel, certamente 
+	// não passará os mesmos argumentos que o Gramado Boot,
+	// então o kernel inicializará de forma diferente,
+	// provavelmente apenas em modo texto.
+	//
+	
+	// Multiboot magic signature.
+    // O header está em 0xC0001000.	
+	// 0x1BADB002
+	// tem um jmp antes do header.
+	if( kernel[0x1008] != 0x02 ||
+        kernel[0x1009] != 0xB0 ||
+        kernel[0x100A] != 0xAD ||  		
+	    kernel[0x100B] != 0x1B )
+	{	    
+        //
+	};	
+	
 	//Continua ...
 	
 //Kernel carregado.	

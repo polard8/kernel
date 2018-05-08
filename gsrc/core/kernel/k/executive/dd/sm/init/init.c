@@ -27,8 +27,8 @@
 //nos diretórios previamente combinados.
 //melhor que sejam poucos e que sempre sejam os mesmos.
 
-#define INIT_ROOT_PATH  "/root"
-#define INIT_BIN_PATH   "/root/bin"
+#define INIT_ROOT_PATH  "root:"
+#define INIT_BIN_PATH   "root:/volume2/bin"
 //...
 
 

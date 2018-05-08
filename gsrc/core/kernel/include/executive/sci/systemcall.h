@@ -242,7 +242,7 @@
  //coloca caracteres na estrutura de terminal, para aplciativos pegarem
 #define	SYS_FEEDTERMINAL 135
 #define	SYS_136 136
-#define	SYS_137 137
+#define	SYS_GETCH 137  //SUPORTE a getch()
 #define	SYS_138 138
 #define	SYS_GETSCANCODE 139  
 

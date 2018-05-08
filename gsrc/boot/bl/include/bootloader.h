@@ -53,7 +53,7 @@ extern void refresh_screen();
  
  
 // Boot Loader version.
-#define BL_VERSION "1.0"
+#define BL_VERSION "0.1"
 
 
 
@@ -180,9 +180,7 @@ extern void refresh_screen();
 // aplicações será 0x400000 e das bibliotecas compartilhadas será 0x0.
 //
 
-//Endereços físicos.
-#define SERVER_ADDRESS       0x00400000    //Genérico.
-#define APP_ADDRESS          0x00400000    //Genérico.
+
 
 
 
@@ -190,6 +188,10 @@ extern void refresh_screen();
 #define SHELL_ADDRESS        0x00450000    //Físico. 
 #define TASKMANAGER_ADDRESS  0x004A0000    //Físico.
 //... 
+
+//Endereços físicos.
+//#define SERVER_ADDRESS       0x00400000    //Genérico.
+//#define APP_ADDRESS          0x00400000    //Genérico.
  
  
 /*
@@ -257,7 +259,8 @@ extern void refresh_screen();
 /*
  *  Colors:
  *      Constants for support colors. 
- * @todo: O Boot Loader deve usar poucas cores, como: Branco, Preto, Cinza, Vermelho.
+ *      @todo: O Boot Loader deve usar poucas cores, 
+ *      como: Branco, Preto, Cinza, Vermelho.
  */
 
 //White.
@@ -305,29 +308,29 @@ extern void refresh_screen();
 #define COLOR_MENU 0xF0F0F0FF
 #define COLOR_DESKTOP 0x000000FF
 #define COLOR_APPWORKSPACE 0xABABABFF
-#define COLOR_BUTTONFACE 0xF0F0F0FF
-#define COLOR_BUTTONHIGHLIGHT 0xFFFFFFFF
-#define COLOR_BUTTONSHADOW 0xA0A0A0FF
-#define COLOR_CONTROL 0xF0F0F0FF
-#define COLOR_CONTROLDARK 0xA0A0A0FF
-#define COLOR_CONTROLDARKDARK 0x696969FF
-#define COLOR_CONTROLLIGHT 0xE3E3E3FF
-#define COLOR_CONTROLLIGHTLIGHT 0xFFFFFFFF
-#define COLOR_CONTROLTEXT 0x000000FF
-#define COLOR_GRADIENTACTIVECAPTION 0xB9D1EAFF
-#define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2FF
+//#define COLOR_BUTTONFACE 0xF0F0F0FF
+//#define COLOR_BUTTONHIGHLIGHT 0xFFFFFFFF
+//#define COLOR_BUTTONSHADOW 0xA0A0A0FF
+//#define COLOR_CONTROL 0xF0F0F0FF
+//#define COLOR_CONTROLDARK 0xA0A0A0FF
+//#define COLOR_CONTROLDARKDARK 0x696969FF
+//#define COLOR_CONTROLLIGHT 0xE3E3E3FF
+//#define COLOR_CONTROLLIGHTLIGHT 0xFFFFFFFF
+//#define COLOR_CONTROLTEXT 0x000000FF
+//#define COLOR_GRADIENTACTIVECAPTION 0xB9D1EAFF
+//#define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2FF
 #define COLOR_HIGHLIGHT 0x3399FFFF
 #define COLOR_HIGHLIGHTTEXT 0xFFFFFFFF
-#define COLOR_INACTIVEBORDER 0xF4F7FCFF
-#define COLOR_INACTIVECAPTION 0xBFCDDBFF
-#define COLOR_INACTIVECAPTIONTEXT 0x434E54FF
+//#define COLOR_INACTIVEBORDER 0xF4F7FCFF
+//#define COLOR_INACTIVECAPTION 0xBFCDDBFF
+//#define COLOR_INACTIVECAPTIONTEXT 0x434E54FF
 #define COLOR_INFO 0xFFFFE1FF
 #define COLOR_INFOTEXT 0x000000FF
 #define COLOR_MENUBAR 0xF0F0F0FF
 #define COLOR_MENUHIGHLIGHT 0x3399FFFF
 #define COLOR_MENUTEXT 0x000000FF
-#define COLOR_SCROLLBAR 0xC8C8C8FF
-#define COLOR_TOMATO 0xFF6347FF 
+//#define COLOR_SCROLLBAR 0xC8C8C8FF
+//#define COLOR_TOMATO 0xFF6347FF 
 #define COLOR_WINDOWFRAME 0x646464FF
 #define COLOR_WINDOWTEXT 0x000000FF
 //...

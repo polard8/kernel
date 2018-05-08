@@ -831,7 +831,7 @@ void *windowGetMessage(struct window_d *window)
 	//Talvez o próprio aplicativo esteja imprimeiro também.
 	//
 	
-	//Obs: isso vai imprimir o char na tela.
+	//Obs: isso alimenta a estrutura da janela com o foco de entrada.
    	LINE_DISCIPLINE(SC);	
 	
 	//fast way 
@@ -901,6 +901,59 @@ fail:
 };
 
 
+//suporte a getch().
+//será um serviço
+int window_getch()
+{
+	unsigned char SC;
+	
+	SC = (unsigned char) keybuffer[keybuffer_head];
+	
+	//Limpa.
+	keybuffer[keybuffer_head] = 0;
+	
+	keybuffer_head++;
+	
+	if( keybuffer_head >= 128 ){
+	    keybuffer_head = 0;	
+	}
+		
+	//#bugbug
+	//alguma coisa está imprimindo o char duas vezes ...
+	//Talvez o próprio aplicativo esteja imprimeiro também.
+	//
+	
+	//Obs: isso alimenta a estrutura da janela com o foco de entrada.
+   	LINE_DISCIPLINE(SC);	
+	
+	//fast way 
+	//@todo: melhorar isso
+	struct window_d *wFocus;
+	
+	wFocus = (void *) windowList[window_with_focus];
+	
+	
+	int save;
+	if( (void*) wFocus != NULL )
+	{
+		if( wFocus->msg == MSG_KEYDOWN )
+		{
+			save = (int) wFocus->long1;
+			
+			wFocus->msg_window = 0;
+			wFocus->msg = 0;
+			wFocus->long1 = 0;
+			wFocus->long2 = 0;
+			
+	        //sinaliza que a mensagem foi lida, e que não temos nova mensagem.
+	        wFocus->newmessageFlag = 0;
+	
+			return (int) save;
+		}
+	}
+	
+	return (int) -1; //erro	
+}
 
 /*
  * windowCreateDedicatedBuffer: 
@@ -1983,6 +2036,11 @@ void SetFocus( struct window_d *window )
 		//SetFocus(gui->screen);    
 		return;
 	}else{
+		
+		//validade e estado da estrutura.
+		if( window->used != 1 || window->magic != 1234 ){
+			return;
+		}
 		
 		//validade e estado da estrutura.
 		if( window->used == 1 && window->magic == 1234 )

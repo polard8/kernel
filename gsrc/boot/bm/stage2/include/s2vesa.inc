@@ -114,8 +114,8 @@ MODEINFO:
 ;
 	
 ;
-; 0x4112 is 640x480x24bit	(*inicialização)   (3 bytes por pixel) (0xrrggbbrrggbb)
-; 0x4115 is 800x600x24bit	(*gui)             (3 bytes por pixel) (0xrrggbbrrggbb)
+; 0x4112 is 640x480x24bit	(*inicialização)   (3 bytes por pixel) 
+; 0x4115 is 800x600x24bit	(*gui)             (3 bytes por pixel) 
 ; 0x4118 is 1024x768x24bit   	
 ; 0x411B is 1280x1024x24bit	
 ; 0x4129 is 640x480x32bit

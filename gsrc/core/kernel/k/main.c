@@ -368,6 +368,7 @@ doDebug:
    //...
 
     // Initializing ps/2 controller.
+	//unblocked/ldisc.c
     ps2();
 
 

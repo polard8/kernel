@@ -595,22 +595,25 @@ unsigned long system_procedure( struct window_d *window,
 				
                 //Testing Message Box.				
 				case VK_F7:
-					MessageBox(gui->screen, 1, "F7:","Testing Message Box");
+				    zorder++;
+				    if( zorder >= ZORDER_COUNT_MAX ){
+						zorder = 0;
+					}
+					printf("zorder={%d}\n",zorder);
+					SetFocus( (struct window_d*) zorderList[zorder] );
+					refresh_screen();
+					//MessageBox(gui->screen, 1, "F7:","Testing Message Box");
 					goto done;
 					break;
 					
-				//Cls. 
-				//(reiniciar as configurações originais)	
+				// Cls. 
+				// (reiniciar as configurações originais)
+                // Seta o foco na janela principal.				
 				case VK_F8:
                     ldisc_init_modifier_keys();
 					ldisc_init_lock_keys();
-	                //...
-                    //backgroundDraw(COLOR_BLACK);
 					videoInit();
-					//setar o foco ajuda a restaurar o input stdin para o procedimento de janela.
 					SetFocus( gui->main );
-					//kprintf está funcionando.
-					//kprintf("F8: Testing kprintf ...\n");
 					refresh_screen();
 					goto done;	
 					break;

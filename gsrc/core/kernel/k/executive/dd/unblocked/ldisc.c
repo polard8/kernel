@@ -1305,8 +1305,10 @@ int keyboardInit(){
 
 
 /*
+ ********************************************************
  * init_mouse:
  *     Inicializando o mouse no controlador 8042.
+ *     Carregando o bmp para o curso do mouse.
  */		
 int init_mouse()
 {
@@ -1314,6 +1316,7 @@ int init_mouse()
     unsigned char deviceId = 0;
     int i; 
 	int bruto = 1;  //Método.
+	int mouse_ret;
 	
 	//
 	// Estamos espaço para o buffer de mensagens de mouse.
@@ -1414,17 +1417,19 @@ done:
 
 
 	//
+	// ## BMP ##
+	//
+	
+	//
 	// Carregando o bmp do disco para a memória
 	// e apresentando pela primeira vez.
 	//
 	
-	int mouse_ret;
-    mouse_ret = load_mouse_bmp();	
+    mouse_ret = (int) load_mouse_bmp();	
 	if(mouse_ret != 0)
 	{
-		printf("init_mouse: erro ao carregar o bmp do mouse");
-		refresh_screen();
-		while(1){}
+		printf("ldisc-init_mouse: load_mouse_bmp");
+		die();
 	}
 	
 	
@@ -1977,10 +1982,10 @@ done:
 
 
 /*
- carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
- usar isso na inicialização do mouse.
+ * load_mouse_bmp:
+ *     Carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
+ *     Usar isso na inicialização do mouse.
  */
-
 int load_mouse_bmp()
 {
 	//printf("testingFrameAlloc:\n suspended!");
