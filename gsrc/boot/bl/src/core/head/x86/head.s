@@ -734,6 +734,7 @@ idt:
 ;IRQs.
 ;
 
+;; 0 timer
 ;32 interrupt 20h, _irq0, TIMER, IRQ0.
 	dw 0         
 	dw sys_code
@@ -741,6 +742,7 @@ idt:
 	db sys_interrupt
 	dw 0
 
+;; 1	
 ;33 interrupt 21h, Keyboard, IRQ1.
 	dw 0               
 	dw sys_code
@@ -832,6 +834,7 @@ idt:
 	db sys_interrupt
 	dw 0
 
+;; ide	
 ;46 interrupt 2Eh, Reserved, IRQ 14.
 	dw 0		   
 	dw sys_code
@@ -839,6 +842,7 @@ idt:
 	db sys_interrupt
 	dw 0
 
+; ide	
 ;47 interrupt 2Fh, Reserved, IRQ15.
 	dw 0		   
 	dw sys_code

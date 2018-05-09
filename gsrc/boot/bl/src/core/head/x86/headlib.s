@@ -438,10 +438,18 @@ setup_vectors:
 	;
 	; timer - iniciamos um timer provisório, depois o Kemain() inicia o definitivo.
 	;
-	;mov eax,  dword _irq0         ;será inicializado em c. 
 	mov eax,  dword _timer_test    ;provisório.
 	mov ebx, dword 32
 	call _setup_idt_vector	
+	
+	
+	mov eax,  dword _irq14     
+	mov ebx, dword 46
+	call _setup_idt_vector	
+
+	mov eax,  dword _irq15     
+	mov ebx, dword 47
+	call _setup_idt_vector		
 	
 	pop ebx
 	pop eax

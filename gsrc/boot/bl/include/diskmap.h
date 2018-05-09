@@ -34,10 +34,10 @@
 //     @todo: 
 //
 //
-#define FS_VBR_LBA       63     //134
-#define FS_FAT_LBA       67     //136 
-#define FS_ROOTDIR_LBA   559    //264
-#define FS_DATAAREA_LBA  591    //296 
+#define FS_VBR_LBA       63     
+#define FS_FAT_LBA       67      
+#define FS_ROOTDIR_LBA   559    
+#define FS_DATAAREA_LBA  591     
 
 //FAT32
 #define FAT32_VBR_LBA       FS_VBR_LBA 

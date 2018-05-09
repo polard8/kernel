@@ -80,6 +80,8 @@ void BlMain()
 	init(); 
 	
 	
+	libcInitRT();
+	
 	//
 	//@todo: Limpar a tela.
 	//
@@ -87,7 +89,10 @@ void BlMain()
 	//Welcome Message.
 #ifdef BL_VERBOSE		
 	printf("BL.BIN: Starting Boot Loader..\n");	
-#endif    
+#endif  
+
+    printf("BL.BIN: initializin ata ..\n");
+    ata_initialize();   
 	
 	//Debug:
 	//kprintf( "BlMain: Boot Loader 32 bits em C (TEXT Mode) #test. #hang", 9, 9 );
