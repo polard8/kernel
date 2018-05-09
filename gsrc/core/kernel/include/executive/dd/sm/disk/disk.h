@@ -172,6 +172,10 @@ void init_test_disk();  //*teste de operação com disco.
 //
 
 
+int ATAFlag;
+#define FORCEPIO 1234
+
+
 /*
  * Khole Operating System
  * ata/ata.h
@@ -207,11 +211,25 @@ typedef void _void;
 
 
 // Atenção:
-// Esse endereço está ana memória baixa.
-#define DMA_PHYS_ADDR0 (0x40000)
-#define DMA_PHYS_ADDR1 (DMA_PHYS_ADDR0 + 0x10000)
-#define DMA_PHYS_ADDR2 (DMA_PHYS_ADDR1 + 0x10000)
-#define DMA_PHYS_ADDR3 (DMA_PHYS_ADDR2 + 0x10000)
+// Esse endereço está na memória baixa.
+//#define DMA_PHYS_ADDR0 (0x40000)
+//#define DMA_PHYS_ADDR1 (DMA_PHYS_ADDR0 + 0x10000)
+//#define DMA_PHYS_ADDR2 (DMA_PHYS_ADDR1 + 0x10000)
+//#define DMA_PHYS_ADDR3 (DMA_PHYS_ADDR2 + 0x10000)
+
+
+//
+// ## bug bug precisamos encontrar endereços válidos.
+//
+
+//#bugbug: precisa encontrar endereços válidos.
+//user mode 1:1
+#define DMA_PHYS_ADDR0 0xa0000
+#define DMA_PHYS_ADDR1 0xb0000
+#define DMA_PHYS_ADDR2 0xb0000
+#define DMA_PHYS_ADDR3 0xb0000 
+
+
 
 #define PCI_CLASSE_MASS 1
 
@@ -469,7 +487,7 @@ _u8 ata_record_channel;
 // ATA initialization.
 //
 
-int ata_initialize();
+int ata_initialize( int ataflag );
 
 
 //

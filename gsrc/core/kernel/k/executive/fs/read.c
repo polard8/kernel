@@ -267,7 +267,8 @@ unsigned long fsLoadFile( unsigned char *file_name,
 	
     // O arquivo não foi encontrado.	
 notFound:
-    printf( "fs-read-fsLoadFile: %s not found!\n", file_name );     
+    printf( "fs-read-fsLoadFile: %s not found!\n", file_name );  
+    //printf("root: %s ",root);	
     goto fail;
 	
     // O arquivo foi encontrado.	
@@ -425,7 +426,9 @@ void fs_load_rootdirEx()
 	//Carregar root dir na memória.
 	for( i=0; i < szRoot; i++ )
 	{
-	    read_lba( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i );    
+	    //read_lba( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i );
+        my_read_hd_sector(VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i, 0, 0 );
+		
 		b = b+512;    //Incrementa buffer.
 	};
 done:	
@@ -444,12 +447,15 @@ void fs_load_fatEx()
 {
 	unsigned long i;
 	unsigned long b = 0;
-	unsigned long szFat = 64;    //64 Setores de tamanho.(@todo: variável global)
+	//unsigned long szFat = 64;    //64 Setores de tamanho.(@todo: variável global)
+	unsigned long szFat = 128;
+	
 	
 	//Carregar root dir na memória.
 	for( i=0; i < szFat; i++ )
 	{
-	    read_lba( VOLUME1_FAT_ADDRESS + b, VOLUME1_FAT_LBA + i ); 
+	    //read_lba( VOLUME1_FAT_ADDRESS + b, VOLUME1_FAT_LBA + i ); 
+		my_read_hd_sector( VOLUME1_FAT_ADDRESS + b, VOLUME1_FAT_LBA + i, 0 , 0 );
 		b = b+512;    //Incrementa buffer.
 	};
 done:	

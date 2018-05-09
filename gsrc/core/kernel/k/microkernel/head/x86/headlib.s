@@ -434,6 +434,16 @@ setup_vectors:
 	mov ebx, dword 44
 	call _setup_idt_vector	
 	
+	;ide
+	mov eax,  dword _irq14     
+	mov ebx, dword 46
+	call _setup_idt_vector	
+
+	;ide
+	mov eax,  dword _irq15     
+	mov ebx, dword 47
+	call _setup_idt_vector	
+	
 	pop ebx
 	pop eax
 	ret

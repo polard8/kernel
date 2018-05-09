@@ -235,7 +235,7 @@ _gui_buffer_putpixel:
 	;mov eax, ecx       ;[MenColor] ; eax = color
     
 	;(base) buffer 1 
-	mov ecx, dword 0xC0800000 ;;[ModeInfo_PhysBasePtr] 0x01000000 ; buffer [5000h]  
+	mov ecx, dword 0xC0800000   
     add edi, ecx     ;(deslocamento)
    	
 	;a

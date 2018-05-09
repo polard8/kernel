@@ -1425,13 +1425,14 @@ done:
 	// e apresentando pela primeira vez.
 	//
 	
+	/*
     mouse_ret = (int) load_mouse_bmp();	
 	if(mouse_ret != 0)
 	{
 		printf("ldisc-init_mouse: load_mouse_bmp");
 		die();
 	}
-	
+	*/
 	
 	
 #ifdef KERNEL_VERBOSE		

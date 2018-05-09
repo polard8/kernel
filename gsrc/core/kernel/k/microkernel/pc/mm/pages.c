@@ -983,21 +983,21 @@ int SetUpPaging()
 	g_backbuffer_va = (unsigned long) 0xC0800000; 
 	
     //===============================================================
-	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
+	// user mode BUFFER1 pages - (0x01000000 - 0x800000 fis) = 0xC0800000virt).
 	// ***BackBuffer: 
 	//     É o buffer onde se pinta o que aparecerá na tela. O conteúdo 
 	// desse buffer é copiado no LFB da memória de vídeo, (refresh_screen).
-    // SMALL_backbuffer_address = 0x01000000 = 16MB, #Provisório.	
+    // SMALL_backbuffer_address = , #Provisório.	
 	// O endereço de memória lógica utilizada é 4MB à partir de 0xC0800000.
 	//
     // Aqui estamos pegando uma partição de memória física de 4MB que começa no
-	// endereço físico 0x01000000, no decimo sexto mega da memória física. 
+	// endereço físico , no decimo sexto mega da memória física. 
     //	
 
     // criando uma page table.
 	//4MB de meória física, começando em 16MB, que serão usados 
 	//para backbuffer. Obs essa área deve ter o mesmo tamanho do frontbuffer.
-	// user mode BUFFER1 pages - (0x01000000fis = 0xC0800000virt).
+	// user mode BUFFER1 pages - ((0x01000000 - 0x800000 fis) = 0xC0800000virt).
 	for( i=0; i < 1024; i++ )
     {
 		//IF SMALL

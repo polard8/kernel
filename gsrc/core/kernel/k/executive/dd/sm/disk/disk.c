@@ -623,7 +623,8 @@ static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Addres
  *     Inicializa o IDE e mostra informações sobre o disco.
  *
  */
-int ata_initialize()
+//int ata_initialize()
+int ata_initialize( int ataflag )
 {
 	//int Status = 0;
 	
@@ -632,6 +633,13 @@ int ata_initialize()
 	_u8 bus;
 	_u8 dev;
 	_u8 fun;
+	
+	
+	//
+	// Configurando flags do driver.
+	//
+	
+	ATAFlag = (int) ataflag;
 	
 	//
 	// Messages
@@ -1134,6 +1142,12 @@ int ide_dev_init(char port)
     new_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
     
 	//@todo: Checar a validade da estrutura.
+	if( (void*) new_dev ==  NULL ){
+		
+		printf("ide_dev_init: struct");
+		refresh_screen();
+		while(1){}
+	} 
 	
 	
 	data = (int) ide_identify_device(port);
@@ -1148,10 +1162,18 @@ int ide_dev_init(char port)
 	{
         // Unidades ATA.
 
-        new_dev->dev_type            = (ata_identify_dev_buf[0] &0x8000)?       0xffff: ATA_DEVICE_TYPE;
-        new_dev->dev_access          = (ata_identify_dev_buf[83]&0x0400)?    ATA_LBA48: ATA_LBA28;
-        new_dev->dev_modo_transfere  = (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+        new_dev->dev_type   = (ata_identify_dev_buf[0] &0x8000)? 0xffff: ATA_DEVICE_TYPE;
+        new_dev->dev_access = (ata_identify_dev_buf[83]&0x0400)? ATA_LBA48: ATA_LBA28;
         
+		if(ATAFlag == FORCEPIO)
+		{
+			//com esse só funciona em pio
+		    new_dev->dev_modo_transfere = 0;	
+		}else{
+		    //com esse pode funcionar em dma
+		    new_dev->dev_modo_transfere = (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+        };
+		
 		new_dev->dev_total_num_sector   = ata_identify_dev_buf[60];
         new_dev->dev_total_num_sector  += ata_identify_dev_buf[61];
 		
@@ -1174,8 +1196,17 @@ int ide_dev_init(char port)
               
 			  new_dev->dev_access = ATA_LBA28;
               
-			  new_dev->dev_modo_transfere = (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
-              
+			  if(ATAFlag == FORCEPIO)
+			  {
+                  //com esse só funciona em pio 				  
+			      new_dev->dev_modo_transfere = 0; 
+			  }else{
+			      //com esse pode funcionar em dma
+			      new_dev->dev_modo_transfere = (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+              };
+              			  
+			    
+			  
 			  new_dev->dev_total_num_sector  = 0;
               new_dev->dev_total_num_sector += 0;
               

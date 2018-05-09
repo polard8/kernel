@@ -134,6 +134,9 @@ int kMain(int argc, char* argv[])
 
     videoVideo();
     videoInit();
+	
+	
+
 
 
     //
@@ -367,9 +370,23 @@ doDebug:
 //doTests:
    //...
 
+ 
+	
     // Initializing ps/2 controller.
 	//unblocked/ldisc.c
     ps2();
+	
+	
+	//
+	// IN:
+	//    FORCEPIO = Força o driver a funcionar no modo pio.
+	//    0 = Dá ao driver a chance de funcionar em modo DMA.
+	//    Como o DMA anda não funciona, podemos ir usando ele 
+	// no modo PIO.
+	//
+	ata_initialize(FORCEPIO);
+
+
 
 
     //
