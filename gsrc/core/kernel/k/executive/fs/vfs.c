@@ -49,7 +49,8 @@ void vfsInit()
 	    die();
 	}
 	
-	FILE *vfs;
+	//foi definido em stdio.h
+	//FILE *vfs;
 	
 	vfs = (FILE *) malloc( sizeof(FILE) );
 	

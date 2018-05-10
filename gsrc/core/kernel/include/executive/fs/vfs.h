@@ -238,6 +238,8 @@ struct vfs_info_d
 	int used;
 	int magic;
 	
+	//int file_descriptor; //3
+	
 	//Qual o status do vfs.
 	//não queremos que alguma parte do sistema 
 	//começe usá-lo antes de estar devidamente montado.
@@ -305,16 +307,7 @@ struct vfs_info_d
 struct vfs_info_d VFS_INFO; 
 
 
-
-
-//
-// O sistema de arquivos virtual sendo tratado como se fosse 
-// apenas um diretório comum, mas que não está em nenhum disco.
-// e as entradas terão estruturas que lidam com streams.
-//
-
-// O diretório raiz será montado nesse endereço.
-struct dir_d *vfs;  
+ 
 
 
 

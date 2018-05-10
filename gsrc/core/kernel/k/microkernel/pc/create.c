@@ -251,9 +251,9 @@ void *KiCreateIdle()
 	//...
 	
 	//#bugbug
-	//Obs: As estruturas precisam já estar decidamente inicializadas.
-	IdleThread->root = (struct _iobuf *) file_root;
-	IdleThread->pwd  = (struct _iobuf *) file_pwd;
+	//Obs: As estruturas precisam já estar devidamente inicializadas.
+	//IdleThread->root = (struct _iobuf *) file_root;
+	//IdleThread->pwd  = (struct _iobuf *) file_pwd;
 
 	
 	//CPU configuration.
@@ -431,8 +431,8 @@ void *KiCreateShell()
 	
 	//#bugbug
 	//Obs: As estruturas precisam já estar decidamente inicializadas.
-	IdleThread->root = (struct _iobuf *) file_root;
-	IdleThread->pwd  = (struct _iobuf *) file_pwd;	
+	//IdleThread->root = (struct _iobuf *) file_root;
+	//IdleThread->pwd  = (struct _iobuf *) file_pwd;	
 	
 	//CPU stuffs.
 	//t->cpuID = 0;              //Qual processador.
@@ -601,8 +601,8 @@ void *KiCreateTaskManager()
 	
 	//#bugbug
 	//Obs: As estruturas precisam já estar decidamente inicializadas.
-	IdleThread->root = (struct _iobuf *) file_root;
-	IdleThread->pwd  = (struct _iobuf *) file_pwd;	
+	//IdleThread->root = (struct _iobuf *) file_root;
+	//IdleThread->pwd  = (struct _iobuf *) file_pwd;	
 
 	//CPU stuffs.
 	//t->cpuID = 0;              //Qual processador.

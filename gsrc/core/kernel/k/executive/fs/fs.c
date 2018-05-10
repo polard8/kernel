@@ -818,7 +818,8 @@ int fsInit()
 	
     //  ## volume 1 root dir  ##
 	
-	FILE *volume1_rootdir;
+	//foi definido em stdio.h
+	//FILE *volume1_rootdir;
 	
 	volume1_rootdir = (FILE *) malloc( sizeof(FILE) );
 	
@@ -834,7 +835,8 @@ int fsInit()
 	
     //  ## volume 2 root dir  ##
 	
-	FILE *volume2_rootdir;
+	//foi definido em stdio.h
+	//FILE *volume2_rootdir;
 	
 	volume2_rootdir = (FILE *) malloc( sizeof(FILE) );
 	
@@ -844,7 +846,7 @@ int fsInit()
 	volume2_rootdir->_file = 0; //?
 	volume2_rootdir->_tmpfname = "volume2-stream";
 	
-	Streams[2] = (unsigned long) volume2_rootdir;
+	Streams[5] = (unsigned long) volume2_rootdir;
 	
 	//
 	// ## PWD ##

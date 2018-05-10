@@ -607,6 +607,9 @@ struct dir_d
 	 */
 	struct dir_entry_d *current;
 };
+
+//@todo: seguir a lista usada em stdio.h presentes em Streams[]
+
 struct dir_d *volume0RootDir;  //VFS.
 struct dir_d *volume1RootDir;  //boot volume.
 struct dir_d *volume2RootDir;  //system volume.
@@ -642,14 +645,7 @@ struct dir_d *currentDir;       //
 //
  
  
-/*
- * #importante 
- * Lista de endreços de estruturas de arquivos.
- * obs: Podemos guardar aqui ponteiros para stream.
- * começando com o fluxo padrão.
- * então poderia se chamar Streams[.]
- */
-unsigned long Streams[32]; 
+
 
  
 

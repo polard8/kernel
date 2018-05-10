@@ -289,6 +289,10 @@
 */ 
  
  
+//#ifdef  _POSIX_
+//...
+//#endif
+ 
 //
 // input() support
 // 
@@ -352,8 +356,8 @@ int g_inputmode;
 
 //The macro yields the maximum number of files that the target 
 //environment permits to be simultaneously open (including stderr, stdin, and stdout).
-#define FOPEN_MAX	(20)
-#define NUMBER_OF_FILES (20)
+#define FOPEN_MAX	    (32)
+#define NUMBER_OF_FILES (32)
 
 
 /*
@@ -373,8 +377,11 @@ int g_inputmode;
 
 #define  _IOFBF  4096    //Full buffer (uma página)
 #define  _IOLBF  256     //Uma linha.       
-#define  _IONBF  0       
+#define  _IONBF  0   
+
+    
 #define  BUFSIZ  512 
+
 #define PROMPT_SIZE 256 
 #define PROMPT_MAX_DEFAULT 256
 
@@ -431,7 +438,7 @@ struct _iobuf
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
-	char *_ptr;    //Current position of file pointer (absolute address).
+	char *_ptr;      //Current position of file pointer (absolute address).
 	int   _cnt;
 	char *_base;    //Pointer to the base of the file.
 	int   _flag;    //Flags (see FileFlags).
@@ -440,22 +447,6 @@ struct _iobuf
 	int   _bufsiz;
 	char *_tmpfname;
 };
-
-//principais
-FILE *file_BootManager;
-FILE *file_BootLoader;
-FILE *file_Kernel;
-FILE *file_Idle;
-FILE *file_Shell;
-FILE *file_TaskMan;
-
-//
-FILE *file_root;
-FILE *file_pwd;
-FILE *file_Current;
-//...
-
-
 /*
     Fluxo padrão. Também conhecidos como descritores padrão.
 
@@ -470,22 +461,76 @@ FILE *file_Current;
  +----------------+---------+-----------------------------------+
 */
 
-//Fluxo padrão:
-FILE *stdin;
-FILE *stdout;
-FILE *stderr;
+//
+//  ## ARQUIVOS DO PROCESSO KERNEL  ##
+//
 
-//Fluxo padrão para o kernel:
-//FILE *kstdin;
-//FILE *kstdout;
-//FILE *kstderr;
+// Gramado Boot
+FILE *stdin;            //0
+FILE *stdout;           //1
+FILE *stderr;           //2
+FILE *vfs;              //3 - Diretório raiz do vfs. 
+FILE *volume1_rootdir;  //4 - Diretório raiz do volume de boot.
+FILE *volume2_rootdir;  //5 - Diretório raiz do volume do sistema. 
+FILE *file_InitTXT;     //6 - Arquivo de configuração de inicialização. INIT.TXT.
+FILE *file_users;       //7 - Pasta para perfis de usuários.
+FILE *file_BootManager; //8 - Boot Manager. BM.BIN.
+FILE *file_BootLoader;  //9 - Boot Loader. BL.BIN.
+
+// Gramado Core
+FILE *file_Kernel;      //10 - Kernel base. KERNEL.BIN
+FILE *file_Init;        //11 - Init subsystem. INIT.BIN
+FILE *file_Shell;       //12 - Shell subsystem. SHELL.BIN
+FILE *file_TaskMan;     //13 - Task manager subsystem. TAKSMAN.BIN
+
+// Gramado Cali
+FILE *file_CS;          //14 California Shell. CS.BIN
+FILE *file_CFE;         //15 California File explorer. CFE.BIN
+FILE *file_CWE;         //16 California Web Explorer. CWE.BIN
+
+// Gramado LA
+FILE *file_LA;          //17 - Los Angeles Package Manager. LA.BIN  
+
+// System directories
+FILE *file_dd;          //18 - device drivers folder
+FILE *file_bin;         //19 - applications folder
+FILE *file_tmp;         //20 - tmp files folder
+FILE *file_download;    //21 - download files folder
+FILE *file_libs;        //22 - system libs folder
+
+// User directories
+FILE *file_pwd;         //23 - Diretório de trabalho. Diretório usado no comando 'pwd'. 
+
+//...
+
+//Array de estruturas.
+//FILE *_io_table[NUMBER_OF_FILES];
+
+// Nã usaremos o array de estrutura.
+//#define stdin     (_io_table[0])	
+//#define stdout 	(_io_table[1])
+//#define stderr 	(_io_table[2])
+//#define stdin     (&_io_table[0])	
+//#define stdout 	(&_io_table[1])
+//#define stderr 	(&_io_table[2])
 
 
-FILE *_io_table[NUMBER_OF_FILES];
+/*
+ * #importante 
+ * Lista de endereços de estruturas de streams.
+ */
+//Array de ponteiros de estrutura. 
+unsigned long Streams[NUMBER_OF_FILES]; 
 
-#define stdin  (_io_table[0])	
-#define stdout 	(_io_table[1])
-#define stderr 	(_io_table[2])
+
+/*
+ * Diretórios onde a pesquisa deve ser feita.
+ * Isso é configurável.
+ * 
+ */
+//unsigned long Search[9]; 
+
+
 
 //Lista de arquivos abertos
 //unsigned long openfileList[128];

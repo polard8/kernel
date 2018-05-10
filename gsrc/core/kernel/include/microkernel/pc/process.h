@@ -267,6 +267,7 @@ struct process_d
 	//g, Número do grupo do dono do processo.
 	int gid;
 	
+	unsigned long Streams[NUMBER_OF_FILES];
 	
 	//State.
 	process_state_t state; //f, flag,
