@@ -649,7 +649,11 @@ unsigned long system_procedure( struct window_d *window,
 				//Program manager.
                 //@todo: usar F11 para FULL SCREEN.				
 				case VK_F11:
-				    vfs_show_handle_list();
+				
+				    //saltando para o boot loader
+				    //asm(" movl $5, %eax   ");
+					//asm(" jmp  $0x8, $0x21000  ");
+					vfs_show_handle_list();
 					//if(AltStatus == 1){ window_with_focus = 11; break;};
 					//if(CtrlStatus == 1){ active_window = 11; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F11\n"); break;};

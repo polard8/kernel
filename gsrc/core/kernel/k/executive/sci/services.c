@@ -896,7 +896,8 @@ void *services( unsigned long number,
         // executa um novo programa dentro do processo INIT 
 		// do ambiente Gramado Core.		
 		case 167:
-		    //executive.c
+		    // Testar
+			//executive.c
 		    return (void*) executive_gramado_core_init_execve( (const char *) arg2, 0, 0 );
 			break;
 			
