@@ -23,6 +23,7 @@
 #include <kernel.h>
 
 
+
 /*
  * disk_get_disk_handle:
  *     Obtem o ponteiro da estrutura dado o descritor.
@@ -317,19 +318,7 @@ _u8 ata_wait_drq()
 
 
 
-_void ata_irq_handler1(_void)
-{
 
-    ata_irq_invoked = 1;
-   
-}
-
-_void ata_irq_handler2(_void)
-{
-
-    ata_irq_invoked = 1;
-    
-}
 
 
 _u8 ata_wait_irq()
@@ -521,56 +510,6 @@ done:
 };
 
 
-// TODO
-// Nelson aqui, devemos destinguir se a Interface é IDE ou AHCI
-// Por em quanto temos suporte a IDE
-int read_sector(void *buf,uint64_t addr,uint16_t count,char dev)
-{
-
-    int i;
-    if(nport_ajuste(dev) != 0)
-    return -1;
-
-    if(current_dev->dev_type == ATA_DEVICE_TYPE){
-	for(i=0;i < count;i++){
-        if((ide_read_sector(dev,1,addr + i ,buf + (current_dev->dev_byte_per_sector*i))) !=0)
-        return -1;
-
-	}
-
-    }
-    else if(current_dev->dev_type == ATAPI_DEVICE_TYPE){
-	for(i=0;i < count;i++){
-        if((atapi_read_sector(dev,count,addr + i,buf+ (current_dev->dev_byte_per_sector*i)))!=0)
-        return -1;
-    	}
-	
-    }
-    return 0;
-
-}
-
-int write_sector(void *buf,uint64_t addr,uint16_t count,char dev)
-{
-    int i;
-    if(nport_ajuste(dev) != 0)
-    return 1;
-
-    if(current_dev->dev_type == ATA_DEVICE_TYPE){
-    for(i=0;i < count;i++){
-        if((ide_write_sector(dev,1,addr + i ,buf + (current_dev->dev_byte_per_sector*i))) !=0)
-        return -1;
-    }    
-
-    }
-    else if(current_dev->dev_type == ATAPI_DEVICE_TYPE){
-        kprintf("Acesso negado, apenas leitura devd%\n",dev);
-        return -1;
-    }
-
-    return 0;
-
-}
 
 
 
@@ -646,246 +585,6 @@ done:
 };
 
 
-/*
- *************************************************************
- * ata_pci_configuration_space:
- *     Espaço de configuraçao PCI Mass Storage
- */
-int ata_pci_configuration_space( char bus, char dev, char fun )
-{
-    uint32_t data;
-
-#ifdef KERNEL_VERBOSE	
-	kprintf("ata_pci_configuration_space:\n");
-    kprintf("Initializing PCI Mass Storage support ...\n");
-#endif
-
-    // Indentification Device
-    data = (uint32_t) read_pci_config_addr( bus, dev, fun, 0 );
-	
-	//
-	// Salvando configurações.
-	//
-    
-    ata_pci.vendor_id = data &0xffff;
-    ata_pci.device_id = data >> 16 &0xffff;
-	
-#ifdef KERNEL_VERBOSE	
-	kprintf("\nDisk info:\n");
-    kprintf("[ Vendor ID: %X,Device ID: %X ]\n", ata_pci.vendor_id, 
-	    ata_pci.device_id );
-#endif	
-	
-    // Classe code, programming interface, revision id
-    data  = (uint32_t) read_pci_config_addr( bus, dev, fun, 8 );
-    
-	
-	//
-	// Salvando configurações.
-	//
-	
-	// Classe e sub-classe.
-    ata_pci.classe = data >> 24 &0xff;
-    ata_pci.subclasse = data >> 16 &0xff;
-    
-	// prog if.
-	ata_pci.prog_if = data >> 8 &0xff;
-   
-    // Revision.
-    ata_pci.revision_id = data &0xff;
-
-	
-    if( ata_pci.classe == 1 && 
-	    ata_pci.subclasse == 1 )
-	{
-        ata.chip_control_type = ATA_IDE_CONTROLLER; 
-                   
-        // IDE
-	
-        // Compatibilidade e nativo, primary.
-        data  = read_pci_config_addr( bus, dev, fun, 8 );
-        if( data &0x200 )
-		{ 
-	        write_pci_config_addr( bus, dev, fun, 8, data | 0x100 ); 
-		};        
-
-        // Compatibilidade e nativo, secundary.
-        data = read_pci_config_addr( bus, dev, fun, 8 );
-        if( data &0x800 )
-		{ 
-	        write_pci_config_addr( bus, dev, fun, 8, data | 0x400 ); 
-		};        
-
-        data = read_pci_config_addr( bus, dev, fun, 8 );
-        if( data &0x8000 )
-		{    
-            // Bus Master Enable
-            data  = read_pci_config_addr(bus,dev,fun,4);
-            write_pci_config_addr(bus,dev,fun,4,data | 0x4);
-        }; 
-
-	    // Habilitar interrupcao (INTx#)
-        data = read_pci_config_addr( bus, dev, fun, 4 );
-        write_pci_config_addr( bus, dev, fun, 4, data & ~0x400);
-
-       	// IDE Decode Enable
-       	data = read_pci_config_addr( bus, dev, fun, 0x40 );
-       	write_pci_config_addr( bus, dev, fun, 0x40, data | 0x80008000 );
-
-        // Synchronous DMA Control Register
-	    // Enable UDMA
-	    data = read_pci_config_addr( bus, dev, fun, 0x48 );
-	    write_pci_config_addr( bus, dev, fun, 0x48, data | 0xf);
-
-#ifdef KERNEL_VERBOSE 		
-        kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-            ata_sub_class_code_register_strings[ata.chip_control_type],
-	        ata_pci.prog_if,
-			ata_pci.revision_id );
-#endif
-            
-    }else if( ata_pci.classe == 1 && ata_pci.subclasse == 4 )
-	      {
-              //RAID
-              ata.chip_control_type = ATA_RAID_CONTROLLER;
-			  
-#ifdef KERNEL_VERBOSE              
-			  kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-                  ata_sub_class_code_register_strings[ata.chip_control_type], 
-				  ata_pci.prog_if,
-				  ata_pci.revision_id );
-#endif
-    
-			  // Em avaliacao
-              return PCI_MSG_AVALIABLE;
-			  
-          }else if( ata_pci.classe == 1 && 
-	                ata_pci.subclasse == 6)
-		        {
-              
-			        ata.chip_control_type = ATA_AHCI_CONTROLLER;
-       
-	                //
-                    // ACHI.
-                    //
-		
-                    // Compatibilidade e nativo, primary.
-                    data = read_pci_config_addr( bus, dev, fun, 8 );
-                    if( data &0x200 ){ 
-		                write_pci_config_addr( bus, dev, fun, 8, data | 0x100 ); 
-		            }        
-
-                    // Compatibilidade e nativo, secundary.
-                    data = read_pci_config_addr( bus, dev, fun, 8 );
-                    if( data &0x800 ){ 
-	                    write_pci_config_addr( bus, dev, fun, 8, data | 0x400 ); 
-		            }        
-
-		            // ??
-                    data = read_pci_config_addr(bus,dev,fun,8);
-                    if( data &0x8000 ) 
-		            {    
-                        // Bus Master Enable.
-                        data = read_pci_config_addr( bus, dev, fun, 4 );
-                        write_pci_config_addr( bus, dev, fun, 4, data | 0x4 );
-                    } 
-
-                    // IDE Decode Enable
-                    data = read_pci_config_addr( bus, dev, fun, 0x40 );
-                    write_pci_config_addr( bus, dev, fun, 0x40, data | 0x80008000 );
-
-                    // Habilitar interrupcao (INTx#)
-                    data = read_pci_config_addr( bus, dev, fun, 4 );
-                    write_pci_config_addr( bus, dev, fun, 4, data & ~0x400);
-
-#ifdef KERNEL_VERBOSE
-                    kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-                        ata_sub_class_code_register_strings[ata.chip_control_type], 
-		                ata_pci.prog_if,
-			            ata_pci.revision_id );
-#endif			
-
-                    //Ok.
-                }else{
-					
-					 //
-                     // PANIC! 
-                     //
-					 
-					 kprintf("sm-disk-disk-ata_pci_configuration_space: PANIC DRIVER BLOCK!");
-		             die();
-                 };
-
-
-
-    // PCI cacheline, Latancy, Headr type, end BIST
-    data = read_pci_config_addr( bus, dev, fun, 0xC );
-
-	//
-	// Salvando configurações.
-	//    
-	
-	// ??
-	ata_pci.primary_master_latency_timer = data >>8 &0xff;
-    
-	ata_pci.header_type = data >>16 &0xff;
-	
-    ata_pci.BIST = data >>24 &0xff;
-    
-	// BARs
-    ata_pci.bar0 = read_pci_config_addr( bus, dev, fun, 0x10 );
-    ata_pci.bar1 = read_pci_config_addr( bus, dev, fun, 0x14 );
-    ata_pci.bar2 = read_pci_config_addr( bus, dev, fun, 0x18 );
-    ata_pci.bar3 = read_pci_config_addr( bus, dev, fun, 0x1C );
-    ata_pci.bar4 = read_pci_config_addr( bus, dev, fun, 0x20 );
-    ata_pci.bar5 = read_pci_config_addr( bus, dev, fun, 0x24 );
-	
-    //--------------
-    
-    // Interrupt
-    data = read_pci_config_addr( bus, dev, fun, 0x3C );
-    
-    //
-    // Salvando configurações.
-    //		
-	
-	ata_pci.interrupt_line = data &0xff;
-    ata_pci.interrupt_pin  = data >> 8 &0xff;
-
-
-    // PCI command and status
-    data = read_pci_config_addr( bus, dev, fun, 4 );
-    
-    //
-    // Salvando configurações.
-    //	
-	
-	ata_pci.command = data &0xffff; 
-    ata_pci.status  = data >>16 &0xffff;
-	
-	
-#ifdef KERNEL_VERBOSE	
-    kprintf("[ Command %x Status %x ]\n", ata_pci.command, 
-	    ata_pci.status );
-		
-    kprintf("[ Interrupt Line %x Interrupt Pin %x ]\n", ata_pci.interrupt_pin, 
-	    ata_pci.interrupt_line );
-#endif		
-	
-    data = read_pci_config_addr(bus,dev,fun,0x48);
-	
-#ifdef KERNEL_VERBOSE		
-    kprintf("[ Synchronous DMA Control Register %X ]\n", data );
-#endif
-	
-done:
-
-#ifdef KERNEL_VERBOSE	
-    refresh_screen();
-#endif 
- 	
-    return (PCI_MSG_SUCCESSFUL);
-};
 
 
 /* *
@@ -1252,187 +951,7 @@ static inline void atapi_pio_read( void *buffer, uint32_t bytes )
 };
 
 
-/*
- ****************************************************************
- * atapi_read_sector:
- *
- */
-int atapi_read_sector( char nport, 
-                       uint16_t count, 
-                       uint64_t addr, 
-                       void *buffer )
-{
-    uint32_t sector_size = current_dev->dev_byte_per_sector;
-    uint8_t  modo_atapi  = 0;
-	
-	//
-	// package.
-	//
-	
-    char atapi_packet [] = { 
-	    ATAPI_CMD_READ, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0, 
-		0 
-	};
-
-    
-	// #bugbug
-	// ?? Não sei qual é o problema aqui.
-	// FIXME
-    ata_assert_dever(nport); 
-	
-    if( current_dev->dev_modo_transfere == ATA_DMA_MODO )
-	{
-        switch( nport )
-		{
-            case 0: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR0;
-                break;
-				
-            case 1: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR1;
-                break;
-				
-            case 2: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR2;
-                break;
-				
-            case 3: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR3;
-                break;
-				
-            // ?? default
-        };
-	};
-    
-    
-    // Configurar o pacote SCSI, 
-    // 12 bytes de tamanho.
-    // Use LBA28.
-    atapi_packet[0x02] = ( addr >> 24 ) & 0xff;
-    atapi_packet[0x03] = ( addr >> 16 ) & 0xff;
-    atapi_packet[0x04] = ( addr >> 8  ) & 0xff;
-    atapi_packet[0x05] = ( addr) & 0xff;
-    atapi_packet[0x09] = (count);
-    
-    // Seleccionar a unidade.
-    outb( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0x40 | ata.dev_num << 4 );
-	
-    // Verifique se é a mesma unidade para não esperar.
-    if( ata_record_dev != ata.dev_num && 
-	    ata_record_channel != ata.channel )
-	{
-        ata_wait(400);    // 400 ns.
-        ata_record_dev      = ata.dev_num;
-        ata_record_channel  = ata.channel;
-    };
-
-    // Selecionar modo ATAPI
-    // 0 = Modo PIO.
-    // 1 = DMA or UDMA
-	
-    if( current_dev->dev_modo_transfere == ATA_DMA_MODO )
-	{
-        modo_atapi = 1;
-        sector_size = 0;
-    };
-	
-	// Modo PIO or DMA.
-    outb( ata.cmd_block_base_address + ATA_REG_FEATURES,modo_atapi ); 
-
-    // Defina o tamanho do buffer em LBA0 e LBA1.
-    // O tamanho do bytes por sector.
-     outb( ata.cmd_block_base_address + ATA_REG_LBA0, sector_size &0xff);  // LBA 7-0   
-	 outb( ata.cmd_block_base_address + ATA_REG_LBA1, sector_size >> 8);   // LBA 15-8
-
-    // Enviar comando PACKET.
-    ata_cmd_write(ATA_CMD_PACKET);
-    
-	if( modo_atapi == 0 ) 
-	{ 
-        // #bugbug
-        // FIXME IRQs
-        ata_wait_irq();  
-	
-	}else{ 
-	
-        if( ata_wait_not_busy() != 0 )
-		{ 
-	        // Message.
-		    return (int) -1; 
-		};
-		
-    };
-
-	
-    if( ata_wait_drq() != 0 ){ 
-	    return (int) -1; 
-	}
-    
-	// Enviar os dados do pacote.
-	
-    __asm__ __volatile__("cld; rep; outsw" ::"c" (6) , "d" (\
-    (ata.cmd_block_base_address +ATA_REG_DATA)),"S"(atapi_packet));
  
-    
-	//
-	// @todo:
-    // ?? Nelson é mesmo correcto DRQ aqui ??
-	//
-	
-    if( ata_wait_drq() != 0 )
-	{
-		//Message
-		return (int) -1;
-    }		
-
-    if( current_dev->dev_modo_transfere == ATA_DMA_MODO )
-	{
-        ide_dma_data( buffer, 
-		              current_dev->dev_byte_per_sector*count, 
-					  0x0, 
-					  nport );    
-
-        ide_dma_start();
-
-        ata_wait_irq();
-
-        while( ide_dma_read_status() &1 )
-		{
-            if( ide_dma_read_status() &2 )
-			{
-				// ?? Message.
-                ide_dma_stop();
-				
-                return (int) -1;
-            };
-        };			
-
-        ide_dma_stop();
-        
-		__asm__ __volatile__("cld; rep; movsd;"::"D"(buffer),\
-                "S"(dma_addr),"c"((current_dev->dev_byte_per_sector*count)/4));
-     
-
-        return (int) 0;
-    };
-    
-    atapi_pio_read(buffer,sector_size);
-    ata_wait_irq();
-    
-	// Verifica erros
-done:
-    return (int) 0;
-};
 
 
 
@@ -1522,301 +1041,7 @@ static inline _void ata_set_device_and_sector( _u32 count, _u64 addr,\
 };
 
 
-/*
- ***********************************************************
- * ide_read_sector:
- *     READ SECTOR
- *
- */
-_i32 ide_read_sector( _i8 nport, 
-                      _u16 count, 
-					  _u64 addr, 
-					  _void *buffer )
-{ 
-    
-    // Select device, lba, count
-    ata_set_device_and_sector( count, addr, current_dev->dev_access, nport );
-
-    if( current_dev->dev_modo_transfere == ATA_DMA_MODO )
-    {
-	    switch( nport )
-		{
-            case 0: 
-			    dma_addr = (_u8*) DMA_PHYS_ADDR0;
-                break;
-				
-            case 1: 
-			    dma_addr = (_u8*) DMA_PHYS_ADDR1;
-                break;
-				
-            case 2: 
-			    dma_addr = (_u8*) DMA_PHYS_ADDR2;
-                break;
-				
-            case 3: 
-			    dma_addr = (_u8*) DMA_PHYS_ADDR3;
-                break;
-				
-            // ?? default
-        };
-	};
-
-    // ??
-	
-    if( current_dev->dev_access == ATA_LBA28 && 
-	    current_dev->dev_modo_transfere == ATA_PIO_MODO )
-	{
-        ata_cmd_write( ATA_CMD_READ_SECTORS );
-		
-        // #bugbug 
-		// @todo:
-		// //FIXME IRQs
-		// ata_wait_irq(); 
-        
-		ata_wait_not_busy();
-		
-        if( ata_wait_drq() != 0 )
-		{
-            // ?? Message			
-		    return -1;
-		}
-        
-		ata_pio_read( buffer, current_dev->dev_byte_per_sector );
-        ata_wait_not_busy();
-        
-		if( ata_wait_no_drq() != 0 )
-		{
-
-            // ?? Message
-            return -1;
-        }
-
-    }else if( current_dev->dev_access == ATA_LBA48 && 
-	          current_dev->dev_modo_transfere == ATA_PIO_MODO)
-		  {
-
-            ata_cmd_write(ATA_CMD_READ_SECTORS_EXT);
-            
-			// #bugbug 
-			// @todo
-			// FIXME IRQs
-			// ata_wait_irq(); 
-            
-			ata_wait_not_busy();
-            
-			if( ata_wait_drq() != 0 )
-			{ 
-		        return -1; 
-			};
-			
-            ata_pio_read(buffer,current_dev->dev_byte_per_sector);
-            ata_wait_not_busy();
-            
-			if( ata_wait_no_drq() != 0 )
-			{
-                // ?? Message
-                return -1;
-            }
-            
-          }else if( current_dev->dev_access == ATA_LBA28 && 
-		            current_dev->dev_modo_transfere == ATA_DMA_MODO )
-		        {
-
-                    ide_dma_data( dma_addr, 
-			                      current_dev->dev_byte_per_sector*count, 
-							      0x0, 
-							      nport );
-							 
-                    ata_cmd_write(ATA_CMD_READ_DMA);
-                    ide_dma_start();
-                    ata_wait_irq();
-            
-                    while( ide_dma_read_status() &1 )
-			        {
-                        if(ide_dma_read_status() &2)
-			            {
-                            ide_dma_stop();
-                            // ?? Message 					
-                            return -1;
-                        }
-			        };
-                    ide_dma_stop();
-            
-
-                __asm__ __volatile__("cld; rep; movsd;"::"D"(buffer),\
-                    "S"(dma_addr),"c"((current_dev->dev_byte_per_sector*count)/4));
-            
-                }else if( current_dev->dev_access == ATA_LBA48 && 
-		                  current_dev->dev_modo_transfere == ATA_DMA_MODO )
-		              {
-                          ide_dma_data( dma_addr,
-				                        current_dev->dev_byte_per_sector*count, 
-							            0x0,
-							            nport );    
-                
-				          ata_cmd_write( ATA_CMD_READ_DMA_EXT );
-                          ide_dma_start();
-                          ata_wait_irq();
-            
-                          while(ide_dma_read_status() &1 )
-			              {
-                              if( ide_dma_read_status() &2 )
-				              {
-                                  ide_dma_stop();
-                                  // Message 
-                                  return -1;
-                              }
-			              };
-
-                          ide_dma_stop();
-          
-                          __asm__ __volatile__("cld; rep; movsd;"::"D"(buffer),\
-                                  "S"(dma_addr),"c"((current_dev->dev_byte_per_sector*count)/4));
-         
-                     };
-
-done:        
-    return 0;
-};
-
-
-/*
- ***********************************************************
- * ide_write_sector:
- *     WRITE SECTOR
- *
- */
-_i32 ide_write_sector( _i8 nport, 
-                       _u16 count, 
-					   _u64 addr, 
-					   _void *buffer )
-{    
-    //select device, lba, count
-    ata_set_device_and_sector( count,addr,current_dev->dev_access, nport );
-
-    if( current_dev->dev_modo_transfere == ATA_DMA_MODO )
-	{
-        switch(nport)
-		{
-            case 0: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR0;
-                break;
-              
-			case 1: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR1;
-                break;
-                
-			case 2: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR2;
-                break;
-                
-		    case 3: 
-			    dma_addr = (_u8*)DMA_PHYS_ADDR3;
-                break;
-                
-			// ?? default
-        };
-    };
-
-        
-    if( current_dev->dev_access == ATA_LBA28 && 
-	    current_dev->dev_modo_transfere == ATA_PIO_MODO )
-	{
-        ata_cmd_write(ATA_CMD_WRITE_SECTORS);
-        //ata_wait_irq(); //FIXME IRQs
-        ata_wait_not_busy();
-        if(ata_wait_drq() != 0)return -1;
-        ata_pio_write(buffer,current_dev->dev_byte_per_sector);
-
-        //Flush Cache
-        ata_cmd_write(ATA_CMD_FLUSH_CACHE);
-        ata_wait_not_busy();
-        if(ata_wait_no_drq() != 0)
-		{
-            return -1;
-        }
-    }else if( current_dev->dev_access == ATA_LBA48 && 
-	          current_dev->dev_modo_transfere == ATA_PIO_MODO )
-	      {
-
-                  ata_cmd_write(ATA_CMD_WRITE_SECTORS_EXT);
-                  //ata_wait_irq(); //FIXME IRQs
-                  ata_wait_not_busy();
-                  if( ata_wait_drq() != 0 )return -1;
-                  ata_pio_write(buffer,current_dev->dev_byte_per_sector);
-
-                  //Flush Cache
-                  ata_cmd_write(ATA_CMD_FLUSH_CACHE_EXT);
-                  ata_wait_not_busy();
-                   if( ata_wait_no_drq() != 0 )
-				   {
-                       //Message ??                
-                       return -1;
-                   }
-
-          }else if( current_dev->dev_access == ATA_LBA28 && 
-			            current_dev->dev_modo_transfere == ATA_DMA_MODO )
-			    {
-            
-                        __asm__ __volatile__("cld; rep; movsd;"::"S"(buffer),\
-                        "D"(dma_addr),"c"((current_dev->dev_byte_per_sector*count)/4));
-
-
-                        ide_dma_data(dma_addr,current_dev->dev_byte_per_sector*count,0x1,nport);    
-                        ata_cmd_write(ATA_CMD_WRITE_DMA);
-
-                        ide_dma_start();
-
-                        ata_wait_irq();
-						
-                        while( ide_dma_read_status() &1 )
-                        {
-		                    if( ide_dma_read_status() &2 )
-				            {
-                
-				                ide_dma_stop();
-                                //Message 
-                                return -1;
-                            }
-			            }			
-                        ide_dma_stop();
-                        //Flush Cache
-                        ata_cmd_write(ATA_CMD_FLUSH_CACHE); 
-
-                }else if( current_dev->dev_access == ATA_LBA48 && 
-					          current_dev->dev_modo_transfere == ATA_DMA_MODO )
-					  {
-
-                              __asm__ __volatile__("cld; rep; movsd;"::"S"(buffer),\
-                              "D"(dma_addr),"c"((current_dev->dev_byte_per_sector*count)/4));            
-
-                              ide_dma_data(dma_addr,current_dev->dev_byte_per_sector*count,0x1,nport);    
-                              ata_cmd_write(ATA_CMD_WRITE_DMA_EXT);
-
-                              ide_dma_start();
-
-                               ata_wait_irq();
-							   
-                               while( ide_dma_read_status() &1 )
-			                   {
-                                   if( ide_dma_read_status() &2 )
-				                   {
-                                       ide_dma_stop(); 
-                                       return -1;
-                                   }
-			                   }
-                               
-							   ide_dma_stop();
-                               //Flush Cache
-                               ata_cmd_write(ATA_CMD_FLUSH_CACHE_EXT);  
-			
-                       };
-
-
-done:
-    return 0;
-};
-
+ 
 
 
 /**
@@ -2001,7 +1226,7 @@ const char *pci_classes[] = {
  * read_pci_config_addr:
  *     READ
  */
-uint32_t read_pci_config_addr( int bus, 
+uint32_t diskReadPCIConfigAddr( int bus, 
                                int dev,
 							   int fun, 
 							   int offset )
@@ -2017,7 +1242,7 @@ done:
  * write_pci_config_addr:
  *     WRITE
  */
-void write_pci_config_addr( int bus, 
+void diskWritePCIConfigAddr( int bus, 
                             int dev,
 							int fun, 
 							int offset, 
@@ -2030,6 +1255,248 @@ void write_pci_config_addr( int bus,
 
 
 
+/*
+ *************************************************************
+ * diskATAPCIConfigurationSpace:
+ *     Espaço de configuraçao PCI Mass Storage
+ */
+int diskATAPCIConfigurationSpace( char bus, char dev, char fun )
+{
+    uint32_t data;
+
+#ifdef KERNEL_VERBOSE	
+	kprintf("diskATAPCIConfigurationSpace:\n");
+    kprintf("Initializing PCI Mass Storage support ...\n");
+#endif
+
+    // Indentification Device
+    data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
+	
+	//
+	// Salvando configurações.
+	//
+    
+    ata_pci.vendor_id = data &0xffff;
+    ata_pci.device_id = data >> 16 &0xffff;
+	
+#ifdef KERNEL_VERBOSE	
+	kprintf("\nDisk info:\n");
+    kprintf("[ Vendor ID: %X,Device ID: %X ]\n", ata_pci.vendor_id, 
+	    ata_pci.device_id );
+#endif	
+	
+    // Classe code, programming interface, revision id
+    data  = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 8 );
+    
+	
+	//
+	// Salvando configurações.
+	//
+	
+	// Classe e sub-classe.
+    ata_pci.classe = data >> 24 &0xff;
+    ata_pci.subclasse = data >> 16 &0xff;
+    
+	// prog if.
+	ata_pci.prog_if = data >> 8 &0xff;
+   
+    // Revision.
+    ata_pci.revision_id = data &0xff;
+
+	
+    if( ata_pci.classe == 1 && 
+	    ata_pci.subclasse == 1 )
+	{
+        ata.chip_control_type = ATA_IDE_CONTROLLER; 
+                   
+        // IDE
+	
+        // Compatibilidade e nativo, primary.
+        data  = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        if( data &0x200 )
+		{ 
+	        diskWritePCIConfigAddr( bus, dev, fun, 8, data | 0x100 ); 
+		};        
+
+        // Compatibilidade e nativo, secundary.
+        data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        if( data &0x800 )
+		{ 
+	        diskWritePCIConfigAddr( bus, dev, fun, 8, data | 0x400 ); 
+		};        
+
+        data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        if( data &0x8000 )
+		{    
+            // Bus Master Enable
+            data = diskReadPCIConfigAddr(bus,dev,fun,4);
+            diskWritePCIConfigAddr(bus,dev,fun,4,data | 0x4);
+        }; 
+
+	    // Habilitar interrupcao (INTx#)
+        data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+        diskWritePCIConfigAddr( bus, dev, fun, 4, data & ~0x400);
+
+       	// IDE Decode Enable
+       	data = diskReadPCIConfigAddr( bus, dev, fun, 0x40 );
+       	diskWritePCIConfigAddr( bus, dev, fun, 0x40, data | 0x80008000 );
+
+        // Synchronous DMA Control Register
+	    // Enable UDMA
+	    data = diskReadPCIConfigAddr( bus, dev, fun, 0x48 );
+	    diskWritePCIConfigAddr( bus, dev, fun, 0x48, data | 0xf);
+
+#ifdef KERNEL_VERBOSE 		
+        kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+            ata_sub_class_code_register_strings[ata.chip_control_type],
+	        ata_pci.prog_if,
+			ata_pci.revision_id );
+#endif
+            
+    }else if( ata_pci.classe == 1 && ata_pci.subclasse == 4 )
+	      {
+              //RAID
+              ata.chip_control_type = ATA_RAID_CONTROLLER;
+			  
+#ifdef KERNEL_VERBOSE              
+			  kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+                  ata_sub_class_code_register_strings[ata.chip_control_type], 
+				  ata_pci.prog_if,
+				  ata_pci.revision_id );
+#endif
+    
+			  // Em avaliacao
+              return PCI_MSG_AVALIABLE;
+			  
+          }else if( ata_pci.classe == 1 && 
+	                ata_pci.subclasse == 6)
+		        {
+              
+			        ata.chip_control_type = ATA_AHCI_CONTROLLER;
+       
+	                //
+                    // ACHI.
+                    //
+		
+                    // Compatibilidade e nativo, primary.
+                    data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+                    if( data &0x200 ){ 
+		                diskWritePCIConfigAddr( bus, dev, fun, 8, data | 0x100 ); 
+		            }        
+
+                    // Compatibilidade e nativo, secundary.
+                    data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+                    if( data &0x800 ){ 
+	                    diskWritePCIConfigAddr( bus, dev, fun, 8, data | 0x400 ); 
+		            }        
+
+		            // ??
+                    data = diskReadPCIConfigAddr(bus,dev,fun,8);
+                    if( data &0x8000 ) 
+		            {    
+                        // Bus Master Enable.
+                        data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+                        diskWritePCIConfigAddr( bus, dev, fun, 4, data | 0x4 );
+                    } 
+
+                    // IDE Decode Enable
+                    data = diskReadPCIConfigAddr( bus, dev, fun, 0x40 );
+                    diskWritePCIConfigAddr( bus, dev, fun, 0x40, data | 0x80008000 );
+
+                    // Habilitar interrupcao (INTx#)
+                    data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+                    diskWritePCIConfigAddr( bus, dev, fun, 4, data & ~0x400);
+
+#ifdef KERNEL_VERBOSE
+                    kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+                        ata_sub_class_code_register_strings[ata.chip_control_type], 
+		                ata_pci.prog_if,
+			            ata_pci.revision_id );
+#endif			
+
+                    //Ok.
+                }else{
+					
+					 //
+                     // PANIC! 
+                     //
+					 
+					 kprintf("sm-disk-disk-diskATAPCIConfigurationSpace: PANIC DRIVER BLOCK!");
+		             die();
+                 };
+
+
+
+    // PCI cacheline, Latancy, Headr type, end BIST
+    data = diskReadPCIConfigAddr( bus, dev, fun, 0xC );
+
+	//
+	// Salvando configurações.
+	//    
+	
+	// ??
+	ata_pci.primary_master_latency_timer = data >>8 &0xff;
+    
+	ata_pci.header_type = data >>16 &0xff;
+	
+    ata_pci.BIST = data >>24 &0xff;
+    
+	// BARs
+    ata_pci.bar0 = diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
+    ata_pci.bar1 = diskReadPCIConfigAddr( bus, dev, fun, 0x14 );
+    ata_pci.bar2 = diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
+    ata_pci.bar3 = diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
+    ata_pci.bar4 = diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
+    ata_pci.bar5 = diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
+	
+    //--------------
+    
+    // Interrupt
+    data = diskReadPCIConfigAddr( bus, dev, fun, 0x3C );
+    
+    //
+    // Salvando configurações.
+    //		
+	
+	ata_pci.interrupt_line = data &0xff;
+    ata_pci.interrupt_pin  = data >> 8 &0xff;
+
+
+    // PCI command and status
+    data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+    
+    //
+    // Salvando configurações.
+    //	
+	
+	ata_pci.command = data &0xffff; 
+    ata_pci.status  = data >>16 &0xffff;
+	
+	
+#ifdef KERNEL_VERBOSE	
+    kprintf("[ Command %x Status %x ]\n", ata_pci.command, 
+	    ata_pci.status );
+		
+    kprintf("[ Interrupt Line %x Interrupt Pin %x ]\n", ata_pci.interrupt_pin, 
+	    ata_pci.interrupt_line );
+#endif		
+	
+    data = diskReadPCIConfigAddr(bus,dev,fun,0x48);
+	
+#ifdef KERNEL_VERBOSE		
+    kprintf("[ Synchronous DMA Control Register %X ]\n", data );
+#endif
+	
+done:
+
+#ifdef KERNEL_VERBOSE	
+    refresh_screen();
+#endif 
+ 	
+    return (PCI_MSG_SUCCESSFUL);
+};
+
+
 
 /*
  ********************************************************************
@@ -2040,7 +1507,7 @@ void write_pci_config_addr( int bus,
  * de acordo a classe.
  *
  */
-uint32_t pci_scan_device(int classe)
+uint32_t diskPCIScanDevice( int class )
 {
     int bus, dev, fun;
     
@@ -2048,7 +1515,7 @@ uint32_t pci_scan_device(int classe)
 
 	
 #ifdef KERNEL_VERBOSE		
-	printf("sm-disk-disk-pci_scan_device:\n");
+	printf("sm-disk-disk-diskPCIScanDevice:\n");
     refresh_screen();
 #endif
     
@@ -2065,14 +1532,14 @@ uint32_t pci_scan_device(int classe)
                 outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
                 data = inportl(PCI_PORT_DATA);
                 
-				if( ( data >> 24 &0xff ) == classe )
+				if( ( data >> 24 &0xff ) == class )
 				{
 					
 					
                     // Message.
 #ifdef KERNEL_VERBOSE							
 					kprintf( "[ Detected PCI device: %s ]\n", 
-					         pci_classes[classe] );
+					         pci_classes[class] );
 #endif
 							 
 					//
@@ -2097,6 +1564,279 @@ fail:
 	
     return (uint32_t) (-1);
 };
+
+
+/*
+ ****************************************************************
+ * diskATAInitialize:
+ *     Inicializa o IDE e mostra informações sobre o disco.
+ *
+ */
+int diskATAInitialize( int ataflag )
+{
+	int Status = 1;  //error
+	
+	_u32 data;
+	
+	_u8 bus;
+	_u8 dev;
+	_u8 fun;
+	
+	
+	//
+	// Configurando flags do driver.
+	//
+	
+	ATAFlag = (int) ataflag;
+	
+	//
+	// Messages
+	//
+	
+//#ifdef KERNEL_VERBOSE
+    kprintf("sm-disk-disk-diskATAInitialize:\n");
+    kprintf("Initializing IDE/AHCI support ...\n");
+	//refresh_screen();
+//#endif
+
+    //
+    // Sondando a interface PCI para encontrarmos um dispositivo
+    // que seja de armazenamento de dados.
+    //	
+	
+    data = (_u32) diskPCIScanDevice(PCI_CLASSE_MASS);
+    
+	// Error.	
+	if( data == -1 )
+	{
+		kprintf("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", (_u32) data );
+		
+	    // Abortar.
+		Status = (int) (PCI_MSG_ERROR);
+		goto fail;
+	};
+    
+    bus = ( data >> 8 &0xff );
+    dev = ( data >> 3 &31 );
+    fun = ( data &7 );
+
+	//
+	// Vamos saber mais sobre o dispositivo enconrtado. 
+	//
+	
+    data = (_u32) diskATAPCIConfigurationSpace( bus, dev, fun );
+
+	// Error.	
+    if( data == PCI_MSG_ERROR )
+	{
+        kprintf("sm-disk-disk-diskATAInitialize: Error Driver [%X]\n",data);
+		Status = (int) 1;
+		goto fail;  
+	
+	}else if( data == PCI_MSG_AVALIABLE )
+	      {
+              kprintf("sm-disk-disk-diskATAInitialize: RAID Controller Not supported.\n");
+		      Status = (int) 1;
+		      goto fail;  
+          };
+		  
+	//
+    // Salvando informações.
+    //	
+
+    // Initialize base address
+    // AHCI/IDE Compativel com portas IO IDE legado
+    ATA_BAR0 = ( ata_pci.bar0 & ~7   ) + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
+    ATA_BAR1 = ( ata_pci.bar1 & ~3   ) + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
+    ATA_BAR2 = ( ata_pci.bar2 & ~7   ) + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
+    ATA_BAR3 = ( ata_pci.bar3 & ~3   ) + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
+    ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
+    ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
+
+	
+	//
+	// De acordo com o tipo.
+	//
+	
+	
+	//
+	// Se for IDE.
+	//
+	
+	// Type
+    if( ata.chip_control_type == ATA_IDE_CONTROLLER )
+	{
+
+        //Soft Reset, defina IRQ
+        outb( ATA_BAR1, 0xff );
+        outb( ATA_BAR3, 0xff );
+        outb( ATA_BAR1, 0x00 );
+        outb( ATA_BAR3, 0x00 );
+
+        ata_record_dev = 0xff;
+        ata_record_channel = 0xff;
+
+#ifdef KERNEL_VERBOSE	
+	    printf("Initializing IDE Mass Storage device ...\n");
+	    refresh_screen();
+#endif    
+	
+	    //
+	    // As estruturas de disco serão colocadas em uma lista encadeada.
+	    //
+	
+	    //ide_mass_storage_initialize();
+		
+	int port;
+	
+
+    //
+    // Vamos trabalhar na lista de dispositivos.
+    //	
+	
+	// Iniciando a lista.
+	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+	
+	current_dev = ( struct st_dev * ) ready_queue_dev;
+    current_dev->dev_id      = dev_next_pid++;
+    current_dev->dev_type    = -1;
+    current_dev->dev_num     = -1;
+    current_dev->dev_channel = -1;
+    current_dev->dev_nport   = -1;
+    current_dev->next        = NULL;
+
+    // ??
+	ata_identify_dev_buf = ( _u16 * ) kmalloc(4096);
+
+
+	//
+	// Sondando dispositivos e imprimindo na tela.
+	//
+	
+    // As primeiras quatro portas do controlador IDE.    
+	for( port=0; port < 4; port++ )
+	{
+		// ??
+        ide_dev_init(port);
+	};		
+		
+		
+		
+		//
+		// Agora se for AHCI.
+		//
+
+    }else if( ata.chip_control_type == ATA_AHCI_CONTROLLER )
+	      {
+			  
+		      //
+              // Nothing for now !!!
+              //			  
+
+              // Aqui, vamos mapear o BAR5
+              // Estou colocando na marca 28MB
+    
+//#ifdef KERNEL_VERBOSE	
+              // printf("ata_initialize: mem_map para ahci\n");
+              // refresh_screen();
+//#endif
+	
+	          //mem_map( (uint32_t*)0x01C00000, (uint32_t*) ATA_BAR5, 0x13, 2);
+
+              //kputs("[ AHCI Mass Storage initialize ]\n");
+              //ahci_mass_storage_init();
+
+          }else{
+			  
+			   //
+			   // Panic !!
+			   //
+               
+			   kprintf(" # Panic! # \n");
+			   kprintf("sm-disk-disk-diskATAInitialize:\n");
+		       kprintf("IDE and AHCI not found!\n");
+			   die();
+          };
+	
+//
+// Ok
+//
+
+    Status = 0;
+    goto done;
+	
+// fail
+fail:
+    kprintf("sm-disk-disk-diskATAInitialize: fail\n");    	
+done:
+
+//#ifdef KERNEL_VERBOSE 
+    kprintf("done!\n");
+    refresh_screen();
+//#endif 
+	
+    return (int) Status;	
+};
+
+
+
+/*
+ *******************************************
+ * diskATADialog:
+ *     Rotina de diálogo com o driver ATA.
+ */
+int diskATADialog( int msg, 
+                   unsigned long long1, 
+				   unsigned long long2 )
+{
+    int Status = 1; //erro
+	
+	
+    switch(msg)
+    {
+		//ATAMSG_INITIALIZE
+		//Initialize driver.
+		case 1:
+		    diskATAInitialize( (int) long1 );
+		    Status = 0;
+			goto done;
+			break;
+			
+		//ATAMSG_REGISTER
+        //registra o driver. 		
+		//case 2:
+		//    break;
+			
+		default:
+		    goto fail;
+			break;
+	};
+
+//
+// Done:
+//	
+fail:
+    printf("diskATADialog: fail\n");
+done:
+    return (int) Status;	
+};
+
+
+/*
+ */
+void diskATAIRQHandler1()
+{
+    ata_irq_invoked = 1;  
+};
+
+
+/*
+ */
+void diskATAIRQHandler2()
+{
+    ata_irq_invoked = 1;   
+};
+
 
 
 /*
@@ -2151,220 +1891,6 @@ done:
     refresh_screen();
     return;	
 };
-
-
-/*
- ****************************************************************
- * diskATAInitialize:
- *     Inicializa o IDE e mostra informações sobre o disco.
- *
- */
-int diskATAInitialize( int ataflag )
-{
-	//int Status = 0;
-	
-	_u32 data;
-	
-	_u8 bus;
-	_u8 dev;
-	_u8 fun;
-	
-	
-	//
-	// Configurando flags do driver.
-	//
-	
-	ATAFlag = (int) ataflag;
-	
-	//
-	// Messages
-	//
-	
-//#ifdef KERNEL_VERBOSE
-    kprintf("sm-disk-disk-ata_initalize:\n");
-    kprintf("Initializing IDE/AHCI support ...\n");
-	//refresh_screen();
-//#endif
-
-    //
-    // Sondando a interface PCI para encontrarmos um dispositivo
-    // que seja de armazenamento de dados.
-    //	
-	
-    data = (_u32) pci_scan_device(PCI_CLASSE_MASS);
-    if( data == -1 )
-	{
-		// Error.
-		kprintf("sm-disk-disk-ata_initalize: pci_scan_device fail. ret={%d} \n", (_u32) data );
-		refresh_screen();
-		
-	    // Abortar.
-		return (int) (PCI_MSG_ERROR); 	
-	};
-    
-    bus = ( data >> 8 &0xff );
-    dev = ( data >> 3 &31 );
-    fun = ( data &7 );
-
-	//
-	// Vamos saber mais sobre o dispositivo enconrtado. 
-	//
-	
-    data = (_u32) ata_pci_configuration_space( bus, dev, fun );
-
-    if( data == PCI_MSG_ERROR )
-	{
-		// Error.
-        kprintf("sm-disk-disk-ata_initalize: Error Driver [%X]\n",data);
-        refresh_screen();
-		return (int) 1;    
-	
-	}else if( data == PCI_MSG_AVALIABLE )
-	      {
-              kprintf("sm-disk-disk-ata_initalize: RAID Controller Not supported.\n");
-		      refresh_screen();
-              return (int) 1;       
-          };
-		  
-	//
-    // Salvando informações.
-    //	
-
-    // Initialize base address
-    // AHCI/IDE Compativel com portas IO IDE legado
-    ATA_BAR0 = ( ata_pci.bar0 & ~7   ) + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
-    ATA_BAR1 = ( ata_pci.bar1 & ~3   ) + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
-    ATA_BAR2 = ( ata_pci.bar2 & ~7   ) + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
-    ATA_BAR3 = ( ata_pci.bar3 & ~3   ) + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
-    ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
-    ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
-
-	
-	//
-	// De acordo com o tipo.
-	//
-	
-	
-	//
-	// Se for IDE.
-	//
-	
-	// Type
-    if( ata.chip_control_type == ATA_IDE_CONTROLLER )
-	{
-
-        //Soft Reset, defina IRQ
-        outb( ATA_BAR1, 0xff );
-        outb( ATA_BAR3, 0xff );
-        outb( ATA_BAR1, 0x00 );
-        outb( ATA_BAR3, 0x00 );
-
-        ata_record_dev = 0xff;
-        ata_record_channel = 0xff;
-
-#ifdef KERNEL_VERBOSE	
-	    printf("Initializing IDE Mass Storage device ...\n");
-	    refresh_screen();
-#endif    
-	
-	    //
-	    // As estruturas de disco serão colocadas em uma lista encadeada.
-	    //
-	
-	    ide_mass_storage_initialize();
-		
-		
-		//
-		// Agora se for AHCI.
-		//
-
-    }else if( ata.chip_control_type == ATA_AHCI_CONTROLLER )
-	      {
-			  
-		      //
-              // Nothing for now !!!
-              //			  
-
-              // Aqui, vamos mapear o BAR5
-              // Estou colocando na marca 28MB
-    
-//#ifdef KERNEL_VERBOSE	
-              // printf("ata_initialize: mem_map para ahci\n");
-              // refresh_screen();
-//#endif
-	
-	          //mem_map( (uint32_t*)0x01C00000, (uint32_t*) ATA_BAR5, 0x13, 2);
-
-              //kputs("[ AHCI Mass Storage initialize ]\n");
-              //ahci_mass_storage_init();
-
-          }else{
-			  
-			   //
-			   // Panic !!
-			   //
-               
-			   kprintf("sm-disk-disk-ata_initalize: Panic!\n");
-               kprintf("IDE controller not found!\n");
-		       kprintf("AHCI controller not found!\n");
-			   die();
-          };
-	
-	
- done:
-
-//#ifdef KERNEL_VERBOSE 
-    printf("done!\n");
-    refresh_screen();
-//#endif 
-	
-    return (int) 0;	
-};
-
-
-
-/*
- *******************************************
- * diskATADialog:
- *     Rotina de diálogo com o driver ATA.
- */
-int diskATADialog( int msg, 
-                   unsigned long long1, 
-				   unsigned long long2 )
-{
-    int Status = 1; //erro
-	
-	
-    switch(msg)
-    {
-		//ATAMSG_INITIALIZE
-		//Initialize driver.
-		case 1:
-		    diskATAInitialize( (int) long1 );
-		    Status = 0;
-			goto done;
-			break;
-			
-		//ATAMSG_REGISTER
-        //registra o driver. 		
-		//case 2:
-		//    break;
-			
-		default:
-		    goto fail;
-			break;
-	};
-
-//
-// Done:
-//	
-fail:
-    printf("diskATADialog: fail\n");
-done:
-    return (int) Status;	
-};
-
-
 
 
 //

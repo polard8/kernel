@@ -308,8 +308,10 @@ void BlAbort()
  */
 void BlKernelModuleMain()
 {
-    printf("BlKernelModuleMain: Boot Loader !");
+    printf("BlKernelModuleMain: Boot Loader \\o/ !");
     refresh_screen();
+	
+	while(1){}
 	return;	
 }
 

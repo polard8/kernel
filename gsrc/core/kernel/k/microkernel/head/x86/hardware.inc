@@ -663,7 +663,7 @@ _irq13:
 ;     IRQ 14 – primary ATA channel 
 ;     (ATA interface usually serves hard disk drives and CD drives) 
 ;
-extern _ata_irq_handler1
+extern _diskATAIRQHandler1
 global _irq14
 _irq14:
 
@@ -671,7 +671,7 @@ _irq14:
 	cli 
 	
 	PUSH AX
-	call _ata_irq_handler1
+	call _diskATAIRQHandler1
 	MOV AL,020h
 	OUT 0A0h,AL
 	OUT 020h,AL
@@ -686,7 +686,7 @@ _irq14:
 ;     Tratador de interrupções para unidade slave.
 ;     IRQ 15 – secondary ATA channel
 ;
-extern _ata_irq_handler2
+extern _diskATAIRQHandler2
 global _irq15
 _irq15:
    
@@ -694,7 +694,7 @@ _irq15:
 	cli
 	
 	PUSH AX
-	call _ata_irq_handler2
+	call _diskATAIRQHandler2
 	MOV AL,020h
 	OUT 0A0h,AL
 	OUT 020h,AL

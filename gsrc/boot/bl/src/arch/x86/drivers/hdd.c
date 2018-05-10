@@ -48,7 +48,8 @@ void my_read_hd_sector( unsigned long ax,
 						unsigned long cx, 
 						unsigned long dx )
 {
-
+	
+/*
    //endereço.
    _void *buf = (_void *) ax;
 
@@ -56,7 +57,6 @@ void my_read_hd_sector( unsigned long ax,
   // read sector do nelson...
   //
    
-   //read_sector(void *buf,uint64_t addr,uint16_t count,char dev)  
    
     read_sector( (void *) buf,
 	             (uint64_t) bx,
@@ -65,11 +65,12 @@ void my_read_hd_sector( unsigned long ax,
 				  
 				  
 	 return;			  
-   
+  
+*/  
     //
 	// read sector do fred...
 	//
-/*
+
 	
     hd_buffer = (unsigned long) ax;    //arg1 (buffer).
     hd_lba    = (unsigned long) bx;    //arg2 (lba).		
@@ -77,7 +78,6 @@ void my_read_hd_sector( unsigned long ax,
 	//Ler setor do hd. Usando rotina em assembly.
 	os_read_sector();	
     return;
-*/
 };
 
 

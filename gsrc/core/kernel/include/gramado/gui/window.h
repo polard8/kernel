@@ -15,6 +15,18 @@
  
 //test: suporte a getch();
 int window_getch(); 
+
+//
+// #importante:
+// Tipos de mensagem de comunicação nos diálogos 
+// e procesimento de janelas:
+// 
+// SIGNAL_       Sinal. Não contém argumentos.
+// MSG_          Message. Contém os argumentos padrão.
+// STREAMMSG_    Streams. O argumento é um ponteiro para uma stream.
+// BUFFER_MSG_   Buffer. O argumento é um ponteiro para um buffer.
+// CAT_MSG_      Concatenate. Os argumentos long1 e long devem ser concatenados.
+//
  
 //
 // Window handle status
@@ -68,12 +80,23 @@ int window_getch();
 //#define PATH_MAX         128
 
 
+
+
+
 /*
  * Messages.
  */
  
-//window (0-19) 
-#define MSG_NULL          0  
+
+#define MSG_NULL          0 
+#define SIGNAL_NULL       0 
+#define STREAM_MSG_NULL   0 
+#define BUFFER_MSG_NULL   0 
+#define CAT_MSG_NULL      0 
+
+
+ 
+//window (1-19)  
 #define MSG_CREATE        1
 #define MSG_DESTROY       2
 #define MSG_MOVE          3 

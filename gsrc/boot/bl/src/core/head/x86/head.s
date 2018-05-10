@@ -84,7 +84,8 @@ _bootloader_entry_point:
 	;; módulo do kernel em kernel mode.
 	;;
 	
-	cmp eax, dword 0x12345678
+	;cmp eax, dword 0x12345678
+	cmp eax, dword 5
     je _BlKernelModuleMain	
 
     ;Debug.

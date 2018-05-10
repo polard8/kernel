@@ -486,24 +486,7 @@ _u8 ata_record_channel;
  
 
 
-//
-// PCI support.
-//
 
-uint32_t pci_scan_device(int classe);
-
-// PCI READ.
-uint32_t read_pci_config_addr( int bus, 
-                               int dev,
-							   int fun, 
-							   int offset );
-
-// PCI WRITE.							   
-void write_pci_config_addr( int bus, 
-                            int dev,
-							int fun, 
-							int offset, 
-							int data );
 
 /**************************** Libs ***************************************/
 
@@ -515,7 +498,7 @@ int ide_dev_init(char port);
 
 // ata_main.c
 void set_ata_addr(int channel);
-int ata_pci_configuration_space(char bus,char dev,char fun);
+
 
 // ata.c
 int ide_identify_device(uint8_t nport);
@@ -538,15 +521,8 @@ void ata_pio_write(_void *buffer,_i32 bytes);
 
 // ide.c
 
-int ide_read_sector( char nport, 
-                     uint16_t count, 
-					 uint64_t addr, 
-					 void *buffer );
-					 
-int ide_write_sector( char nport, 
-                      uint16_t count, 
-					  uint64_t addr, 
-					  void *buffer );
+ 
+ 
 
 
 //ide_dma.c
@@ -559,20 +535,38 @@ void ide_dma_stop();
 int ide_dma_read_status();
 
 
-//atapi.c
-int atapi_read_sector( char nport, 
-                       uint16_t count, 
-					   uint64_t addr, 
-					   void *buffer );
+ 
 
 
 //ahci.c
 void ahci_mass_storage_init();
 
 
-//
-void show_ide_info();
 
+
+
+//
+// PCI support.
+//
+
+
+
+// PCI READ.
+uint32_t diskReadPCIConfigAddr( int bus, 
+                               int dev,
+							   int fun, 
+							   int offset );
+
+// PCI WRITE.							   
+void diskWritePCIConfigAddr( int bus, 
+                            int dev,
+							int fun, 
+							int offset, 
+							int data );
+
+uint32_t diskPCIScanDevice( int class );
+
+int diskATAPCIConfigurationSpace( char bus, char dev, char fun );
 
 /*
  ****************************************************************
@@ -590,6 +584,10 @@ int diskATAInitialize( int ataflag );
 int diskATADialog( int msg, 
                    unsigned long long1, 
 				   unsigned long long2 );
+				   
+				   
+//
+void show_ide_info();
 
 #endif
 
