@@ -52,16 +52,6 @@ void KeRestoreCurrentContext();
 //dispatch support.
 void KeDispatchProcess();
 
-//Process support.
-void *KeCreateProcess( struct wstation_d *window_station,
-                                    struct desktop_d  *desktop,
-                                    struct window_d *window,
-                                    unsigned long init_eip, 
-                                    unsigned long priority, 
-									int ppid, 
-									char *name,
-									unsigned long iopl,
-                                    unsigned long directory_address	);
 void KeDoProcessReady(int pid);
 void KeDoProcessRunning(int pid);
 void KeDoProcessSleeping(int pid);
@@ -74,15 +64,6 @@ void KeKillProcess(int pid);
 int KeFork();	
 int KeExecProcess(int pid, unsigned long *process_address);
 
-					
-//Thread support.					
-void *KeCreateThread( struct wstation_d *window_station,
-                                    struct desktop_d  *desktop,
-                                    struct window_d *window,
-                                    unsigned long init_eip, 
-                                    unsigned long priority, 
-									int ppid, 
-									char *name);
 void KeSetQuantum(unsigned long q);
 unsigned long KeGetQuantum();
 void KeSetCurrentQuantum(unsigned long q);

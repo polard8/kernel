@@ -613,180 +613,7 @@ static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Addres
 
 
 
-//
-//   ## ATA INITIALIZE ##
-//
-
-/*
- ****************************************************************
- * ata_initialize:
- *     Inicializa o IDE e mostra informações sobre o disco.
- *
- */
-//int ata_initialize()
-int ata_initialize( int ataflag )
-{
-	//int Status = 0;
-	
-	_u32 data;
-	
-	_u8 bus;
-	_u8 dev;
-	_u8 fun;
-	
-	
-	//
-	// Configurando flags do driver.
-	//
-	
-	ATAFlag = (int) ataflag;
-	
-	//
-	// Messages
-	//
-	
-//#ifdef KERNEL_VERBOSE
-    kprintf("sm-disk-disk-ata_initalize:\n");
-    kprintf("Initializing IDE/AHCI support ...\n");
-	//refresh_screen();
-//#endif
-
-    //
-    // Sondando a interface PCI para encontrarmos um dispositivo
-    // que seja de armazenamento de dados.
-    //	
-	
-    data = (_u32) pci_scan_device(PCI_CLASSE_MASS);
-    if( data == -1 )
-	{
-		// Error.
-		kprintf("sm-disk-disk-ata_initalize: pci_scan_device fail. ret={%d} \n", (_u32) data );
-		refresh_screen();
-		
-	    // Abortar.
-		return (int) (PCI_MSG_ERROR); 	
-	};
-    
-    bus = ( data >> 8 &0xff );
-    dev = ( data >> 3 &31 );
-    fun = ( data &7 );
-
-	//
-	// Vamos saber mais sobre o dispositivo enconrtado. 
-	//
-	
-    data = (_u32) ata_pci_configuration_space( bus, dev, fun );
-
-    if( data == PCI_MSG_ERROR )
-	{
-		// Error.
-        kprintf("sm-disk-disk-ata_initalize: Error Driver [%X]\n",data);
-        refresh_screen();
-		return (int) 1;    
-	
-	}else if( data == PCI_MSG_AVALIABLE )
-	      {
-              kprintf("sm-disk-disk-ata_initalize: RAID Controller Not supported.\n");
-		      refresh_screen();
-              return (int) 1;       
-          };
-		  
-	//
-    // Salvando informações.
-    //	
-
-    // Initialize base address
-    // AHCI/IDE Compativel com portas IO IDE legado
-    ATA_BAR0 = ( ata_pci.bar0 & ~7   ) + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
-    ATA_BAR1 = ( ata_pci.bar1 & ~3   ) + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
-    ATA_BAR2 = ( ata_pci.bar2 & ~7   ) + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
-    ATA_BAR3 = ( ata_pci.bar3 & ~3   ) + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
-    ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
-    ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
-
-	
-	//
-	// De acordo com o tipo.
-	//
-	
-	
-	//
-	// Se for IDE.
-	//
-	
-	// Type
-    if( ata.chip_control_type == ATA_IDE_CONTROLLER )
-	{
-
-        //Soft Reset, defina IRQ
-        outb( ATA_BAR1, 0xff );
-        outb( ATA_BAR3, 0xff );
-        outb( ATA_BAR1, 0x00 );
-        outb( ATA_BAR3, 0x00 );
-
-        ata_record_dev = 0xff;
-        ata_record_channel = 0xff;
-
-#ifdef KERNEL_VERBOSE	
-	    printf("Initializing IDE Mass Storage device ...\n");
-	    refresh_screen();
-#endif    
-	
-	    //
-	    // As estruturas de disco serão colocadas em uma lista encadeada.
-	    //
-	
-	    ide_mass_storage_initialize();
-		
-		
-		//
-		// Agora se for AHCI.
-		//
-
-    }else if( ata.chip_control_type == ATA_AHCI_CONTROLLER )
-	      {
-			  
-		      //
-              // Nothing for now !!!
-              //			  
-
-              // Aqui, vamos mapear o BAR5
-              // Estou colocando na marca 28MB
-    
-//#ifdef KERNEL_VERBOSE	
-              // printf("ata_initialize: mem_map para ahci\n");
-              // refresh_screen();
-//#endif
-	
-	          //mem_map( (uint32_t*)0x01C00000, (uint32_t*) ATA_BAR5, 0x13, 2);
-
-              //kputs("[ AHCI Mass Storage initialize ]\n");
-              //ahci_mass_storage_init();
-
-          }else{
-			  
-			   //
-			   // Panic !!
-			   //
-               
-			   kprintf("sm-disk-disk-ata_initalize: Panic!\n");
-               kprintf("IDE controller not found!\n");
-		       kprintf("AHCI controller not found!\n");
-			   die();
-          };
-	
-	
- done:
-
-//#ifdef KERNEL_VERBOSE 
-    printf("done!\n");
-    refresh_screen();
-//#endif 
-	
-    return (int) 0;	
-};
-
-
+ 
 
 void set_ata_addr(int channel)
 {
@@ -2324,6 +2151,221 @@ done:
     refresh_screen();
     return;	
 };
+
+
+/*
+ ****************************************************************
+ * diskATAInitialize:
+ *     Inicializa o IDE e mostra informações sobre o disco.
+ *
+ */
+int diskATAInitialize( int ataflag )
+{
+	//int Status = 0;
+	
+	_u32 data;
+	
+	_u8 bus;
+	_u8 dev;
+	_u8 fun;
+	
+	
+	//
+	// Configurando flags do driver.
+	//
+	
+	ATAFlag = (int) ataflag;
+	
+	//
+	// Messages
+	//
+	
+//#ifdef KERNEL_VERBOSE
+    kprintf("sm-disk-disk-ata_initalize:\n");
+    kprintf("Initializing IDE/AHCI support ...\n");
+	//refresh_screen();
+//#endif
+
+    //
+    // Sondando a interface PCI para encontrarmos um dispositivo
+    // que seja de armazenamento de dados.
+    //	
+	
+    data = (_u32) pci_scan_device(PCI_CLASSE_MASS);
+    if( data == -1 )
+	{
+		// Error.
+		kprintf("sm-disk-disk-ata_initalize: pci_scan_device fail. ret={%d} \n", (_u32) data );
+		refresh_screen();
+		
+	    // Abortar.
+		return (int) (PCI_MSG_ERROR); 	
+	};
+    
+    bus = ( data >> 8 &0xff );
+    dev = ( data >> 3 &31 );
+    fun = ( data &7 );
+
+	//
+	// Vamos saber mais sobre o dispositivo enconrtado. 
+	//
+	
+    data = (_u32) ata_pci_configuration_space( bus, dev, fun );
+
+    if( data == PCI_MSG_ERROR )
+	{
+		// Error.
+        kprintf("sm-disk-disk-ata_initalize: Error Driver [%X]\n",data);
+        refresh_screen();
+		return (int) 1;    
+	
+	}else if( data == PCI_MSG_AVALIABLE )
+	      {
+              kprintf("sm-disk-disk-ata_initalize: RAID Controller Not supported.\n");
+		      refresh_screen();
+              return (int) 1;       
+          };
+		  
+	//
+    // Salvando informações.
+    //	
+
+    // Initialize base address
+    // AHCI/IDE Compativel com portas IO IDE legado
+    ATA_BAR0 = ( ata_pci.bar0 & ~7   ) + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
+    ATA_BAR1 = ( ata_pci.bar1 & ~3   ) + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
+    ATA_BAR2 = ( ata_pci.bar2 & ~7   ) + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
+    ATA_BAR3 = ( ata_pci.bar3 & ~3   ) + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
+    ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
+    ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
+
+	
+	//
+	// De acordo com o tipo.
+	//
+	
+	
+	//
+	// Se for IDE.
+	//
+	
+	// Type
+    if( ata.chip_control_type == ATA_IDE_CONTROLLER )
+	{
+
+        //Soft Reset, defina IRQ
+        outb( ATA_BAR1, 0xff );
+        outb( ATA_BAR3, 0xff );
+        outb( ATA_BAR1, 0x00 );
+        outb( ATA_BAR3, 0x00 );
+
+        ata_record_dev = 0xff;
+        ata_record_channel = 0xff;
+
+#ifdef KERNEL_VERBOSE	
+	    printf("Initializing IDE Mass Storage device ...\n");
+	    refresh_screen();
+#endif    
+	
+	    //
+	    // As estruturas de disco serão colocadas em uma lista encadeada.
+	    //
+	
+	    ide_mass_storage_initialize();
+		
+		
+		//
+		// Agora se for AHCI.
+		//
+
+    }else if( ata.chip_control_type == ATA_AHCI_CONTROLLER )
+	      {
+			  
+		      //
+              // Nothing for now !!!
+              //			  
+
+              // Aqui, vamos mapear o BAR5
+              // Estou colocando na marca 28MB
+    
+//#ifdef KERNEL_VERBOSE	
+              // printf("ata_initialize: mem_map para ahci\n");
+              // refresh_screen();
+//#endif
+	
+	          //mem_map( (uint32_t*)0x01C00000, (uint32_t*) ATA_BAR5, 0x13, 2);
+
+              //kputs("[ AHCI Mass Storage initialize ]\n");
+              //ahci_mass_storage_init();
+
+          }else{
+			  
+			   //
+			   // Panic !!
+			   //
+               
+			   kprintf("sm-disk-disk-ata_initalize: Panic!\n");
+               kprintf("IDE controller not found!\n");
+		       kprintf("AHCI controller not found!\n");
+			   die();
+          };
+	
+	
+ done:
+
+//#ifdef KERNEL_VERBOSE 
+    printf("done!\n");
+    refresh_screen();
+//#endif 
+	
+    return (int) 0;	
+};
+
+
+
+/*
+ *******************************************
+ * diskATADialog:
+ *     Rotina de diálogo com o driver ATA.
+ */
+int diskATADialog( int msg, 
+                   unsigned long long1, 
+				   unsigned long long2 )
+{
+    int Status = 1; //erro
+	
+	
+    switch(msg)
+    {
+		//ATAMSG_INITIALIZE
+		//Initialize driver.
+		case 1:
+		    diskATAInitialize( (int) long1 );
+		    Status = 0;
+			goto done;
+			break;
+			
+		//ATAMSG_REGISTER
+        //registra o driver. 		
+		//case 2:
+		//    break;
+			
+		default:
+		    goto fail;
+			break;
+	};
+
+//
+// Done:
+//	
+fail:
+    printf("diskATADialog: fail\n");
+done:
+    return (int) Status;	
+};
+
+
+
 
 //
 // End.

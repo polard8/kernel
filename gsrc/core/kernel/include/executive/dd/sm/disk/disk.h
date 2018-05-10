@@ -483,11 +483,7 @@ _u8 ata_record_dev;
 _u8 ata_record_channel;
 
 
-//
-// ATA initialization.
-//
-
-int ata_initialize( int ataflag );
+ 
 
 
 //
@@ -576,6 +572,24 @@ void ahci_mass_storage_init();
 
 //
 void show_ide_info();
+
+
+/*
+ ****************************************************************
+ * diskATAInitialize:
+ *     Inicializa o IDE e mostra informações sobre o disco.
+ *
+ */
+int diskATAInitialize( int ataflag );
+
+/*
+ *******************************************
+ * diskATADialog:
+ *     Rotina de diálogo com o driver ATA.
+ */
+int diskATADialog( int msg, 
+                   unsigned long long1, 
+				   unsigned long long2 );
 
 #endif
 

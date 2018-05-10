@@ -87,10 +87,8 @@ void start_task(unsigned long id, unsigned long *task_address);
 // Usadas durante a criação de threads e processos.
 //
 int fork();
-int create_task( int task_id, 
-                 unsigned long *task_eip, 
-				 unsigned long *task_stack, 
-				 unsigned long prior );
+
+ 
 				 
 
 //
@@ -111,7 +109,8 @@ void KiCpuFaults(unsigned long fault_number);
 void KiSpawnTask(int id);
 int KiCheckTaskContext(int thread_id);
 void KiInitTasks();	
-int KiCreateProcess(unsigned long type, unsigned long *task_eip);
+
+
 int KiInitTask(int id);	
 int KiFork();	
 unsigned long KiExecutaTarefa(int id, unsigned long *task_address);
@@ -146,14 +145,8 @@ void KiMostraSlots();
 void KiMostraSlot(int id);
 void KiMostraReg(int id);
 void KiShowPreemptedTask();	
-int KiCreateTask( int task_id, 
-                 unsigned long *task_eip, 
-				 unsigned long *task_stack, 
-				 unsigned long prior );			 
-	
-	
-	
-	
+
+ 
 
 //quantum
 void set_quantum( unsigned long q);

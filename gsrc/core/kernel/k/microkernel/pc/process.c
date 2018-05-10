@@ -218,14 +218,14 @@ fail:
  *
  */
 struct process_d *create_process( struct wstation_d *window_station,
-                                      struct desktop_d  *desktop,
-                                      struct window_d *window,
-                                      unsigned long init_eip, 
-                                      unsigned long priority, 
-									  int ppid, 
-									  char *name, 
-									  unsigned long iopl,
-									  unsigned long directory_address )
+                                  struct desktop_d *desktop,
+                                  struct window_d *window,
+                                  unsigned long init_eip, 
+                                  unsigned long priority, 
+								  int ppid, 
+								  char *name, 
+								  unsigned long iopl,
+								  unsigned long directory_address )
 {
 	int i;
 	struct process_d *Process;

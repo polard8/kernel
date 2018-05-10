@@ -29,7 +29,6 @@ void KiSpawnTask(int id);
 void KiCalloutTest();
 void KiCallfarTest();
 
-void *KiCreateKernelProcess();
 void *KiCreateIdle();
 void *KiCreateShell();
 void *KiCreateTaskManager();	

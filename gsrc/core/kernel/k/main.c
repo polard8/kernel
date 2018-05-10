@@ -384,10 +384,9 @@ doDebug:
 	//    Como o DMA anda não funciona, podemos ir usando ele 
 	// no modo PIO.
 	//
-	ata_initialize(FORCEPIO);
 
-
-
+    //ATAMSG_INITIALIZE = 1
+    diskATADialog( 1, FORCEPIO, FORCEPIO );
 
     //
     // Loading file tests.
