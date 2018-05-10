@@ -3,43 +3,11 @@
  * (c) Copyright 2015-2016 Fred Nora.
  *
  *  File: k\hal\hal.c 
- *  
- * Classes:
- *     system.unblockeddevices (K2)
- *     system.blockeddevices   (K1)
- *     system.things           (K0)
+ *  Hardware Abstraction Layer
  *
- * HAL:
- *     O HAL lida especialmente com dispositivos externos.
- * Seu trabalho é permitir que as camadas superiores não se preocupem
- * com detalhes específicos dos dispositivos e encarem todos de forma genérica.
- *     O ambiente do hal é ideal para realizar proteção de variáveis estruturas e 
- * funções
- *     É aceitável a inclusão de código em assembly nessa camada do sistema. 
- *
- *
- *  Descrição:
- *      Hardware Abstraction Layer.
- *      MB - Módulos incluídos no Kernel Base.
- *      I/O Manager.
- *
- *  Objetivo: 
- *      Interface comum para identificar e acessar arquiteturas diferentes.
- *      Principalmente placa mãe e processador.   
- *      ( cpu, context, mmu, trap, clock, interrupt )
- *
- * Obs: É esperado que a sondagem de sispositivos aconteça nesse módulo.
- *
- * @todo:
- *     +Os serviços oferecidos por esse módulo aparecerão aqui começando 
- *     por 'sys_'. ??
- *     Na verdade as rotinas aqui devem começar por hal_, o módulo system,
- *     fará interfaces começando por sys_.
- *     + halHal(); é o construtor.
- *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  *     //...
  */
  
@@ -50,7 +18,7 @@
 //unsigned char  HalName[] = "HAL LAYER";
 
 //
-// Variáveis importadas.
+// inport.
 //
 
 extern unsigned long gdt;
@@ -672,12 +640,6 @@ void hal_reboot()
  * init_hal:
  * Initialize kernel base hal.
  *     Archtecture independent inicialization ...
- *     (Inicialização de estruturas.)
- *
- *     Faz inicializações do hardware básico.
- *
- *     obs: Segue a ordem de importância.
- *          Cpu, Pci (bustype), Timer, Cmos/Rtc, Keyboard ...
  *
  */
 //int halInit() 

@@ -5,41 +5,10 @@
  *
  * File: k\microkernel.c 
  * 
- * Classes:
- *     system.io.cpu (K4)
- *     system.io.dma (K3)
- *
- * Obs: O microkernel lida especialmente com canais de transmissão
- *      entre a RAM e os dispositivos. Seu ambiente natural favorece
- *      o escalonamento de threads e processos. Atua como uma ponte, 
- *      decidindo quem vai ou volta da memória ram.
- *      Quando o microkernel escalona uma thread, ele determina quando
- * é a hora dela ir pra memória ram para que o processador atue sobre ela.
- *      O cpu tambem trabalha as vezes levando informação dos dispositivos
- * para a ram e da ram para os dispositivos. Um trabalho semelhante é feito
- * pelo dma, através de seus canais.
- *      É aceitável a presença de código em assembly nessa camada. Principalmente
- * relativos a configuração de cpu e dma.      
- *
- * Descrição:
- *    Arquivo principal do microkernel do kernel.
- *    MB - Módulos incluídos no Kernel Base.
- *    O microkernel trata do sistema de multitarefas, compreendendo 
- * principalmente IPC, process, threads, Irqs.
- *    The microkernel also serves as a socket for plugging in these 
- * extensions and coordinating their collaboration (ipc).
- *
- * In this file:
- *   + init_microkernel - Inicia o microkernel.
- *   + ...
- *
- * @todo:
- *     Os serviços oferecidos por esse módulo aparecerão aqui 
- * começando por 'sys_'.
- *
  * microkernelMicrokernel(); é o construtor.
  *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by fred Nora.
  */
 
  
@@ -58,11 +27,6 @@ int localsstuff1;
 
 /*
  * microkernelTestLimit:
- *     Rotina de testes variados de limites nos recursos
- * do microkernel. Como a criação de trheads e processos.
- * Obs: Essa rotina deve acionada pelo procedimento de 
- * janela do sistema. Em user mode os programas de teste criarão 
- * suas próprias rotinas. 
  *
  */
 void microkernelTestLimit()
@@ -74,7 +38,7 @@ void microkernelTestLimit()
 	
 	
 	
-	printf("microkernelTestLimit: Testando limites dos componentes do microkernel...\n");  
+	printf("microkernelTestLimit:\n");  
     refresh_screen();
 	
    //

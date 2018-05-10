@@ -1,7 +1,0 @@
-* sobre interrupções e serviços *
-
-o sistema terá várias interrupções:
-cada inbterrupção poderá ter vários serviços.
-cada interrupção poderá ser atendida por um arquivo diferente e em ambientes diferente.
-
-a interrupção 200 é a interrupção do sistema, ela tem 256 serviços que são atendidos pelo kernel base, porém poderá ter mais serviços que poderão ser atendidos em outros arquivos ou em outros ambientes.

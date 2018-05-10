@@ -1,70 +1,14 @@
 /*
- * File: gramado.c
- *
- *       Arquivo principal da camada gramado. (Antigo gui.c)
- *
- *  Gramado Display Server - GDS.
- *
- *  kernel base display server. Persistent.
- *
- * #Importante:
- *  Aqui poderão ficar variáveis globais relativas à inteface gráfica.
- * Essas variáveis globais serão acessíveis através de métodos. 
- *
- * isso deve preparar o ambiente para rodar os aplicativos para o 
- * ambiente de usuário. A área de trabalho.
- *
- * Esse módulo principalmente cria a estrutura 'gui->', que é espinha
- * dorsal de todos os elementos gráficos da interface gráfica. Nessa
- * estrutura conterá ponteiros para as principais janelas usadas pelo 
- * sistema e também conterá ponteiros para outros elementos importantes
- * da interface gráfica.
- *
- * Importante:
- * Lembrando que a estrutura 'gui->' é inicializada 'duas vezes', uma 
- * antes do logon e outra depois. Isso nos permite usarmos os recursos
- * gráficos de forma organizada, mesmo antes do logon.
- *
- * Sobre o logon:
- * Existem rotinas de logon dentro do kernel base, que serão chamadas pelo
- * processo de logon futuramente, quando ele tiver sido implementado. Por 
- * enquanto o próprio kernel realiza o logon. Obs: Existe um módulo para 
- * logon dentro do kernel base.
- *
- * Descrição:
- * Arquivo principal do Módulo GUI.
- * Responsável for oferecer rotinas gráficas em kernel mode.
- * Esse módulo está incluído no kernel base, a vantagem é ganho de velocidade.
- *
- * Obs: 
- * @todo: 
- * Ao fim da rotina de inicialização, da gui-> e do logon, podemos criar os 
- * buffers adicionais. Os buffers dedicados devem ser criados pela rotina 
- * 'create window'.
- *
- * @todo: ??
- * 'Identifies Session components'
- *     A inicialização da gui precisa identificar componentes de sessão.
- *
- * History:
- *     2015 - Created by Fred Nora.
- *     2016 - Revision.
- *     2017 - Revision.
- *     //...
+ * Gramado GUI - The main file for the GUI layer.
+ * (c) Copyright 2015~2018 - Fred Nora.
  */
  
 
 #include <kernel.h>
 
 
-// Obs: Um módulo no kernel base vai gerenciar os 
-// servidores usados pelo sistema, desde os que estão no kernel base
-// até os carregados. 
-// classe server, elemento display.
 // unsigned char  server_display[] = "Gramado Display Server";
-
-
-//unsigned char  GramadoName[] = "GRAMADO LAYER";
+// unsigned char  GramadoName[] = "GRAMADO LAYER";
 
 
 

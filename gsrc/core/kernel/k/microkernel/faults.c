@@ -1,25 +1,7 @@
 /*
  * File: faults.c
- *
- *     Rotinas para atender as faults da cpu x86.
- *
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
- *     As faults de páginas são usadas para as rotinas de memóvia virtual, 
- * Swap. Então, quando ouver uma falta de página, os módulos ou drivers 
- * apropriados devem ser acionados à partir daqui.
- *
- * Obs:
- *     No caso de exceções de falta de página, por exemplo, o núcleo tem 
- * informação suficiente para tratar completamente o evento e continuar a 
- * execução do processo. Porém, em outros tipos de exceção, o núcleo não 
- * consegue preceder de maneira inteligente e tem que transferir o 
- * tratamento da exceção para um processo de tratamento de falha. Esta 
- * transferência é realizada através do mecanismo de sinais, no qual o 
- * núcleo envia ao processo, um sinal correspondente a exceção ocorrida. 
- * (Wikipedia).
- *
- * @todo: Fazer rotinas para todas as faults.
- * Obs: Talvez o nome mais apropriado seria 'exceptions' enão 'faults'.
+ * 
+ * x86 faults.
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -38,12 +20,6 @@ void do_pagefault();
 
 /*
  * faults:
- *     Tratamento de faults.
- *     #Obs: O tratamento de faults é uma questão de hardware,
- *           Quando ocorrer uma pagefault a rotina apropriada deve 
- *           ser chamada no módulo /executive/pc para operar sobre o 
- *           processo com problemas. @todo: Nesse caso, é preciso 
- *           identificar qual era o processo atual.
  *
  */
 void faults(unsigned long number)
@@ -146,13 +122,6 @@ void KiCpuFaults(unsigned long number){
 
 
 // 14 PAGE FAULT
-//trata a page fault.
-//uma função completa, que trata a falta de página alocando
-//uma página para o processo.
-//aplicar alguns filtros pra saber se ainda podemos
-//recuperar o processo. caso contrário essa rotina 
-//deve fechar o processo com problema e chamar o scheduler.
-//Obs: essa função pode realizar muitas rotinas de verificação, alertas etc.
 void do_pagefault()
 {
 	unsigned long page_fault_address;
@@ -176,6 +145,6 @@ done:
 
 
 //
-// fim.
+// End.
 //
 

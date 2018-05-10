@@ -1,24 +1,7 @@
 /*
  * File: hal.h
  *
- * Descrição:
- *     Rotinas exportadas pelo /hal para os outros 2 módulos do kernel base.
- *
- *     Header principal da abstração de hardware.
- *     OBS: Abstração para hardware fundamental.
- *         (placa mae, bus, processor, microcontroller, pci, ram).
- *     CPUs em Desktops: Intel, AMD.
- *     Arquiteturas de microcontroladores em sistemas embarcados:
- *          ARM, MIPS, Coldfire/68k, PowerPC, x86, PIC, 
- *          8051, Atmel AVR, Renesas H8, SH, V850, FR-V, M32R, Z80 e Z8. 
- *
- *    Exemplo de interface serial para microcontroladores:
- *     (Por exemplo RS 232, I2C).
- *
- * @todo: Os serviços oferecidos por esse módulo aparecerão aqui começando 
- *        por 'sys_'.
- *
- * Versão 1.0, 2015, 2016.
+ *  HAL header file.
  */
 
  

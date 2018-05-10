@@ -5,43 +5,6 @@
  *
  * File: k\executive.c 
  * 
- * Classes:
- *     system.ram (K5)
- *
- * Obs: O executive lida com gerentes que manipulam rotinas independentes
- *      de dispositivos. Seu ambiente natural é a RAM. É o ambiente de maior
- *      liberdade, sem as restrições impostas pelos dispositivos externos.
- *      O ambiente do executive é ideal para oferecer variáveis e funções globais.
- * e públicas. O ideal é que os processos em user mode somente tenham acesso
- * ao que é oferecido por essa camada.
- *      Não é pertinente a inclusão de código assembly nessa camada.
- *
- * Descrição:
- *     Arquivo principal do módulo Executive do Kernel Base.
- *     MB - Módulos incluídos no Kernel Base.
- *     Contém drivers básicos em Kernel Mode, 
- *     compilados dentro do Kernel Base.
- *     Contém Managers e Servers e o SubSystem que recebe as 
- *     chamadas do usuário.
- *
- *   OBS: 
- *   *IMPORTANTE  
- *   Os módulos do executive são incluidos ao 'Kernel Base'
- *   na hora da compilação, pois são excenciais para o 
- *   funcionamento do Kernel.
- *
- *   Módulos em Kernel Mode também poderão ser ligados dinamicamente, 
- *   mas não podem ser sistemicamente importantes. Pois não é certo deixar
- *   o usuário incluir um módulo que possa travar o sistema.
- *
- * @todo:
- * Os serviços oferecidos por esse módulo aparecerão aqui 
- * começando por 'sys_'. Corrigindo, na verdade os serviços
- * devem começar por 'systemXXXXX'.
- *
- * executiveExecutive(); é o construtor
- *
- * Versão 1.0, 2015, 2016.
  */
  
  

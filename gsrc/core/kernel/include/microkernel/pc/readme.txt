@@ -1,13 +1,10 @@
 
 
-sobre o diretório /pc:
+ 
 
-   Process Control
+   Process Control support
+ 
 
-
-   Nessa pasta comtem arquivos header para gerenciamento de processos
-e threads além dos diretórios
-
-/ipc           - comunicação entre processos.
-/mm            - gerenciamento de memória.  
-/scheduler     - agendamento de thread.
+/ipc           
+/mm              
+/scheduler      

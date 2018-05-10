@@ -127,17 +127,12 @@ int kMain(int argc, char* argv[])
 	
 	
 	//verbose mode do kernel.
-	//permite que a tela do kernel funcione igual a um 
-	//terminal, imprimindo os printfs um abaixo do outro.
-	//sempre reiniciando x.	
+    //initializes a new line when '\n' is found.
 	stdio_verbosemode_flag = 1;
 
     videoVideo();
     videoInit();
 	
-	
-
-
 
     //
     // Init screen
@@ -192,16 +187,6 @@ int kMain(int argc, char* argv[])
 //createProcesses:
 
     // Creating Kernel process. PID=0.
-	// #importante: Obs: Nesse caso o kernel base também tem um processo,
-	// mas ele não é escalonado como os outros processos. O kernel base 
-	// possui uma estrutura de processo somente para efeito de organização 
-	// e compartilhamento de recursos.
-    // Cuidado para não corromper as informações que o processo precisa.
-    // #bugbug: A estrutura do processo kernel não é inicializada corretamente
-    // pois alguns valores são determinados e não pertencem ao processo kernel.
-    // Obs: Por enquanto está bom, pois estamos criando aumaticamente o processo 
-	// do mesmo jeito que criamos os outros processos.
-	//
     KernelProcess = (void*) create_process( NULL, // Window station.
 	                                        NULL, // Desktop.
 											NULL, // Window.
@@ -216,9 +201,7 @@ int kMain(int argc, char* argv[])
         printf("main-kMain: KernelProcess\n");
         die();
     }else{
-
-        //configurando o processador.
-        //#bugbug; Não sabemos se essa estrutura está inicializada.
+ 
         processor->CurrentProcess = (void*) KernelProcess;
         processor->NextProcess    = (void*) KernelProcess;
         //...
@@ -277,13 +260,6 @@ int kMain(int argc, char* argv[])
     }else{
         //...
     };
-
-
-    //
-    // *** NÃO HÁ PROBLEMA EM CRIAR MANUALMENTE AS 
-	//     PRIMEIRAS THREADS DO SISTEMA ***
-    //
-
 
     //
     // Creating threads. 
@@ -379,11 +355,7 @@ doDebug:
 	
 	//
 	// IN:
-	//    FORCEPIO = Força o driver a funcionar no modo pio.
-	//    0 = Dá ao driver a chance de funcionar em modo DMA.
-	//    Como o DMA anda não funciona, podemos ir usando ele 
-	// no modo PIO.
-	//
+	//    FORCEPIO = ATA driver operates in PIO mode.
 
     //ATAMSG_INITIALIZE = 1
     diskATADialog( 1, FORCEPIO, FORCEPIO );
@@ -398,7 +370,7 @@ doDebug:
 
    /*
     //===================================
-    // @todo: Carregar a estrelinha e usar como ponteiro de mouse.
+    // @todo: loads a bmp.
     //
     //janela de test
     CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
@@ -492,13 +464,11 @@ static inline void mainSetCr3( unsigned long value){
 
 /*
  * startStartIdle:
- *     Inicia a thead idle.
+ *     Initializes idle thread.
  *
  *     @todo: 
- *         + Iniciar o processo da idle.
- *         + Detectar se o aplicativo está carregado na memória 
- *           antes de passar o comando pra ele via iret.
- *           Mudar para startIdleThread().
+ *         + Initializes idle thread.
+ *           startIdleThread().
  *
  */
 void startStartIdle() 
@@ -512,24 +482,21 @@ void startStartIdle()
         die();
     }else{
 
-        //Checar se o programa já foi inicializado antes. 
-        //Ele não pode estar.
         if(IdleThread->saved != 0){
             printf("main-startStartIdle: saved\n");
             die();
         };
 
-        //Checar se o slot na estrutura de tarefas é válido.
         if(IdleThread->used != 1 || IdleThread->magic != 1234){
             printf("main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
             die();
         };
 
-        set_current(IdleThread->tid);      //Seta a thread atual.
+        set_current(IdleThread->tid);       
         //...
     };
 
-    // State ~ Checa o estado da tarefa.
+    // State  
     if(IdleThread->state != STANDBY){
         printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
         die();
@@ -543,9 +510,9 @@ void startStartIdle()
 //Done!
 done:
     //Debug:
-    //Alertando.
+ 
     //printf("* Starting idle TID=%d \n", Thread->tid);
-    //refresh_screen(); //@todo: isso é necessãrio ??
+    //refresh_screen(); //@todo:  
 
 
     for( i=0; i<=DISPATCHER_PRIORITY_MAX; i++){
@@ -564,23 +531,11 @@ done:
 
     /*
      * turn_task_switch_on:
-     * + Cria um vetor para o timer, IRQ0.
-     * + Habilita o funcionamento do mecanismo de taskswitch.
+     * + Creates a vector for timer irq, IRQ0.
+     * + Enable taskswitch.
      */
     turn_task_switch_on();
 
-
-    //
-    // @todo: Testando timer novamente.
-    //        *IMPORTANTE Me parece que tem que configurar o PIT por último.
-    //
-
-
-    //
-    //#importante;
-    // Os valores aqui devem vir da estrutura da thread idle e não 
-    // serem determinados.
-    //
 
     timerInit8253();
 

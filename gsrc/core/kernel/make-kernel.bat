@@ -1,5 +1,4 @@
 
-
 :SetUp
 @echo off
 
@@ -7,18 +6,8 @@ rem
 rem Compiling a kernel base for x86 processors.
 rem The binary format is PE. $.
 rem This script generate the file KERNEL.BIN.
-rem (c) Copyright 2005-2017 Fred Nora.
-rem
-
-rem
-rem Compila o Kernel e coloca o arquivo binário em /bin.
-rem
-rem { Engloba as 3 partes: Hal, Microkernel, Executive }
-rem
-rem Obs: 
-rem Um benefício imediato dessa nova organização de classes é trabalhar 
-rem primeiramente nas partes desbloqueadas deixando as partes bloqueadas 
-rem para depois.
+rem 
+rem (c) Copyright 2005-2018 Fred Nora.
 rem
 
 :Start_Job0
@@ -26,40 +15,31 @@ rem Main.
 echo -{ ...
 echo -{ Compiling KERNEL.BIN ...
 echo -{ Main.
-	gcc -c k/main.c  -I./include -o main.o 
+	gcc -c k/main.c -I./include -o main.o 
 	
 :Hal_Job1	
 rem hal	
 echo -{ ...
 echo -{ ux4 /hal	
-    rem -save-temps
-	rem hal .. arquivo principal do hal
-	gcc -c k/hal/hal.c     -I./include -o hal.o	
+	gcc -c k/hal/hal.c -I./include -o hal.o	
 	
 	
 	
 :Microkernel_Job2	
-rem kernel mínimo. (tasks)
 echo -{ ...
 echo -{ ux3 /microkernel
     
-	rem começamos com os principais módulos do microkernel.
-	rem (head e microkernel)  
 	rem head.s
 	nasm  -I./k/microkernel/head/x86/  k/microkernel/head/x86/head.s  -f elf -o head.o
     rem c. 
     gcc -c  k/microkernel/microkernel.c -I./include  -o microkernel.o
 	
-	rem cpu (lidam com registradores) (K4)
-	gcc -c  k/microkernel/cpu/context.c     -I./include  -o context.o
-	gcc -c  k/microkernel/cpu/start.c       -I./include  -o start.o
-
-	
-	rem dma (K3)
-	rem @todo gcc -c  k/microkernel/dma/dma.c  -I./include  -o dma.o
+	rem cpu
+	gcc -c  k/microkernel/cpu/context.c -I./include  -o context.o
+	gcc -c  k/microkernel/cpu/start.c -I./include  -o start.o
 	
 	rem
-	rem /pc process control (ipc,scheduler,mm)
+	rem /pc process control ( ipc, scheduler, mm )
 	rem
 	
 	gcc -c  k/microkernel/pc/taskswitch.c  -I./include  -o taskswitch.o	
@@ -74,7 +54,7 @@ echo -{ ux3 /microkernel
     gcc -c  k/microkernel/pc/tasks.c       -I./include  -o tasks.o	
 	gcc -c  k/microkernel/pc/create.c      -I./include  -o create.o
 	
-	rem microkernel/pc/ipc (callouts)
+	rem microkernel/pc/ipc 
 	gcc -c  k/microkernel/pc/ipc/spawn.c       -I./include  -o spawn.o
 	gcc -c  k/microkernel/pc/ipc/callout.c       -I./include  -o callout.o
 	gcc -c  k/microkernel/pc/ipc/callfar.c       -I./include  -o callfar.o
@@ -85,50 +65,32 @@ echo -{ ux3 /microkernel
 	rem microkernel/pc/scheduler
     gcc -c  k/microkernel/pc/scheduler/scheduler.c   -I./include  -o scheduler.o
     gcc -c  k/microkernel/pc/scheduler/scheduleri.c  -I./include  -o scheduleri.o    	
-
 	
-	
-	rem k/microkernel/pc/ram
-	
-	rem (RAM) (K5) módulo principal do executive
 	rem /microkernel/pc/mm (memory manager)
     gcc -c k/microkernel/pc/mm/memory.c  -I./include -o memory.o    
 	rem /microkernel/pc/mm (memory manager)
     gcc -c k/microkernel/pc/mm/pages.c   -I./include -o pages.o 	
 	
-	
-	rem pertencem ao microkernel mas não são controles de processos.
-	gcc -c  k/microkernel/request.c     -I./include  -o request.o	
-	gcc -c  k/microkernel/faults.c      -I./include  -o faults.o		
+	gcc -c  k/microkernel/request.c -I./include -o request.o	
+	gcc -c  k/microkernel/faults.c -I./include -o faults.o		
 	
 	
 :Executive_Job3	
-rem drivers VIP em kernel mode.	
-rem o executive é formado por três grupos: /sm,/uitm e /uigm.
 echo -{ ...
 echo -{ ux2 /executive
 	rem /executive
 	gcc -c k/executive/executive.c  -I./include -o executive.o	
 	
-	rem services (atende as systemcalls) 
+	rem services - System Call Interface.  
     gcc -c k/executive/sci/services.c  -I./include -o services.o		
 	
     rem executive/dd
-	
-	
-	rem O que segue são os módulos secundários do executive (sm,uitm,uigm).
-	
+		
 	rem sm
 	rem /executive/init
-    gcc -c k/executive/dd/sm/init/init.c  -I./include -o init.o
-	
-	rem sm
-	
-	rem sm
+    gcc -c k/executive/dd/sm/init/init.c -I./include -o init.o
 	rem /executive/sm/ob
-	gcc -c k/executive/dd/sm/ob/object.c  -I./include -o object.o		
-	
-	rem sm
+	gcc -c k/executive/dd/sm/ob/object.c -I./include -o object.o		
 	rem /executive/network
 	gcc -c k/executive/dd/sm/network/nic.c     -I./include -o nic.o
 	gcc -c k/executive/dd/sm/network/network.c -I./include -o network.o
@@ -186,8 +148,7 @@ echo -{ ux2 /executive
 	rem /executive/debug
 	gcc -c k/executive/dd/sm/debug/debug.c -I./include -o debug.o	
 	
-	
-	gcc -c k/executive/dd/device/device.c  -I./include -o device.o
+	gcc -c k/executive/dd/device/device.c -I./include -o device.o
 	
 	rem (unblocked) legados (K2).
 	gcc -c k/executive/dd/unblocked/video.c   -I./include -o video.o  
@@ -205,17 +166,13 @@ echo -{ ux2 /executive
     gcc -c k/executive/dd/unblocked/arch/x86/x86.c     -I./include -o x86.o	
 	gcc -c k/executive/dd/unblocked/arch/x86/ports.c   -I./include -o ports.o 	
 	gcc -c k/executive/dd/unblocked/arch/amd/cpuamd.c  -I./include -o cpuamd.o 	    
-
-
 	
 	rem (blocked) (K1).
-	gcc -c k/executive/dd/blocked/pci.c   -I./include -o pci.o
-	gcc -c k/executive/dd/blocked/usb.c   -I./include -o usb.o
-	gcc -c k/executive/dd/blocked/apic.c  -I./include -o apic.o 
+	gcc -c k/executive/dd/blocked/pci.c -I./include -o pci.o
+	gcc -c k/executive/dd/blocked/usb.c -I./include -o usb.o
+	gcc -c k/executive/dd/blocked/apic.c -I./include -o apic.o 
 
-	
-	
-	rem FILE System
+	rem File system
 	
 	rem /executive/fs
     gcc -c k/executive/fs/fs.c      -I./include -o fs.o						
@@ -226,83 +183,68 @@ echo -{ ux2 /executive
     gcc -c k/executive/fs/format.c  -I./include -o format.o	
     gcc -c k/executive/fs/vfs.c     -I./include -o vfs.o		
 	
-
-	
 echo -{ ...
 echo -{ ux1 /gramado \o/	
 
-	rem    ****    COMPILANDO A INTERFACE GRÁFICA    ****
-	rem k\gramado\gui
-	
+	rem k\gramado\gui	
     rem char
-    gcc -c k/gramado/gui/char.c   -I./include -o char.o
+    gcc -c k/gramado/gui/char.c -I./include -o char.o
     rem pixel
-    gcc -c k/gramado/gui/pixel.c  -I./include -o pixel.o 
+    gcc -c k/gramado/gui/pixel.c -I./include -o pixel.o 
     rem line
-    gcc -c k/gramado/gui/line.c   -I./include -o line.o	
+    gcc -c k/gramado/gui/line.c -I./include -o line.o	
     rem rect
-    gcc -c k/gramado/gui/rect.c   -I./include -o rect.o 
+    gcc -c k/gramado/gui/rect.c -I./include -o rect.o 
     rem draw
-    gcc -c k/gramado/gui/dtext.c  -I./include -o dtext.o
+    gcc -c k/gramado/gui/dtext.c -I./include -o dtext.o
     rem draw
-    gcc -c k/gramado/gui/font.c   -I./include -o font.o	
+    gcc -c k/gramado/gui/font.c -I./include -o font.o	
     rem createw
-    gcc -c k/gramado/gui/createw.c    -I./include -o createw.o    
+    gcc -c k/gramado/gui/createw.c -I./include -o createw.o    
     rem grid
-    gcc -c k/gramado/gui/grid.c       -I./include -o grid.o 
+    gcc -c k/gramado/gui/grid.c -I./include -o grid.o 
     rem statusbar
-    gcc -c k/gramado/gui/statusbar.c  -I./include -o statusbar.o 
+    gcc -c k/gramado/gui/statusbar.c -I./include -o statusbar.o 
     rem menubar
-    gcc -c k/gramado/gui/menubar.c    -I./include -o menubar.o 
+    gcc -c k/gramado/gui/menubar.c -I./include -o menubar.o 
     rem menu
-    gcc -c k/gramado/gui/menu.c       -I./include -o menu.o 
+    gcc -c k/gramado/gui/menu.c -I./include -o menu.o 
     rem bmp
-    gcc -c k/gramado/gui/bmp.c        -I./include -o bmp.o 
+    gcc -c k/gramado/gui/bmp.c -I./include -o bmp.o 
     rem button
-    gcc -c k/gramado/gui/button.c     -I./include -o button.o 
+    gcc -c k/gramado/gui/button.c -I./include -o button.o 
     rem messagebox
-    gcc -c k/gramado/gui/messagebox.c  -I./include -o messagebox.o
+    gcc -c k/gramado/gui/messagebox.c -I./include -o messagebox.o
     rem dialogboxbox
-    gcc -c k/gramado/gui/dialogbox.c   -I./include -o dialogbox.o
+    gcc -c k/gramado/gui/dialogbox.c -I./include -o dialogbox.o
 	rem background
-    gcc -c k/gramado/gui/background.c  -I./include -o background.o  
+    gcc -c k/gramado/gui/background.c -I./include -o background.o  
     rem window
-    gcc -c k/gramado/gui/window.c      -I./include -o window.o    
+    gcc -c k/gramado/gui/window.c -I./include -o window.o    
     rem desktop
-    gcc -c k/gramado/gui/desktop.c     -I./include -o desktop.o  
+    gcc -c k/gramado/gui/desktop.c -I./include -o desktop.o  
     rem window station
-    gcc -c k/gramado/gui/wstation.c    -I./include -o wstation.o    
+    gcc -c k/gramado/gui/wstation.c -I./include -o wstation.o    
     rem user section
-    gcc -c k/gramado/gui/usession.c    -I./include -o usession.o        
-
-	
-	rem terminal
-	rem gcc -c k/gramado/terminal/terminal.c -I./include -o terminal.o 
+    gcc -c k/gramado/gui/usession.c -I./include -o usession.o        
     
 	rem gramado logon e logoff
 	
 	rem /gramado/logon
-    gcc -c k/gramado/logon/logon.c  -I./include -o logon.o 
+    gcc -c k/gramado/logon/logon.c -I./include -o logon.o 
 	rem /gramado/logoff
-    gcc -c k/gramado/logoff/logoff.c  -I./include -o logoff.o 
+    gcc -c k/gramado/logoff/logoff.c -I./include -o logoff.o 
 
 	rem gramado/user
 	gcc -c k/gramado/user/userenv.c -I./include -o userenv.o 	
-	
 
 	rem *gui (GRAMADO)
-    gcc -c k/gramado/gramado.c         -I./include -o gramado.o    	
+    gcc -c k/gramado/gramado.c -I./include -o gramado.o    	
 	
-	rem
-	rem Compilando o módulo **** SYSTEM MANAGER ****
-	rem
-	 
-    REM Ordem: Hardware, Kernel, GUI (embrulo).
-	REM Ordem: Fica em último as rotinas usadas com menor frequência.
-	REM        Colocar por último, abort, faults...shutdown, reboot.
-	REM        Biblioteca padrão deve ir para o começo.
-	REM        Quem usa as bibliotecas vai depois.
-	REM 
+
+rem 
+rem ## Objects ##
+rem 
 	
 :Objects	
 set myObjects=head.o ^
@@ -415,7 +357,7 @@ services.o
 :Linking_Job4 
 echo -{ ...
 echo -{ Linking objects ...
-   ld -T link.ld -o KERNEL.BIN %myObjects%  -Map Kernel_Map.s
+   ld -T link.ld -o KERNEL.BIN %myObjects%  -Map kernel_map.s
    
 :Moving_Job5  
 echo -{ ...
