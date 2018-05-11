@@ -23,6 +23,21 @@
 // testando com buffer maior.
 #define PROMPT_MAX_DEFAULT 1024
 
+
+
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
+
+
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
+#endif
+
+#define FOPEN_MAX	(32)
+#define NUMBER_OF_FILES (32)
+
+
 /*
  * FILE:
  *     Estrutura padrão para arquivos.    
@@ -31,25 +46,86 @@
 typedef struct _iobuf FILE; 
 struct _iobuf 
 {
-	char *_ptr;      //Current position of file pointer (absolute address).
+	char *_ptr;      // Current position of file pointer (absolute address).
 	int   _cnt;      // number of available characters in buffer 
-	char *_base;     //Pointer to the base of the file. the buffer
-	int   _flag;     //Flags (see FileFlags). the state of the stream
-	int   _file;      //UNIX System file descriptor
+	char *_base;     // Pointer to the base of the file. the buffer
+	int   _flag;     // Flags (see FileFlags). the state of the stream
+	int   _file;     // UNIX System file descriptor
 	int   _charbuf;   
 	int   _bufsiz;
 	char *_tmpfname;
 };
 
-#define _IOREAD   01
-#define _IOWRT    02
-#define _IONBF    04
-#define _IOMYBUF  010
-#define _IOEOF    020
-#define _IOERR    040
-#define _IOSTRG   0100
-#define _IOLBF    0200
-#define _IORW     0400
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
+
+//listando os arquivos da biblioteca.
+unsigned long Streams[NUMBER_OF_FILES];
+
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
+
+/*  
+"flags" bits definitions
+*/
+
+//valores provisórios
+
+#define _IOREAD 	0x0001
+#define _IOWRT		0x0002
+
+#define _IOFBF		0x0010
+#define _IOLBF		0x0020
+#define _IONBF		0x0040
+
+#define _IOMYBUF	0x0100
+#define _IOEOF		0x0200
+#define _IOERR		0x0400
+#define _IOSTRG 	0x0800
+#define _IORW		0x1000
+#define	_IOAPPEND	0x2000
+
+//#define _IOREAD   01  /* Read only file        */
+//#define _IOWRT    02 /* Write only file       */
+//#define _IONBF    04    /* Malloc'ed Buffer data */
+//#define _IOMYBUF  010
+//#define _IOEOF    020
+//#define _IOERR    040 /* Error indicator       */
+//#define _IOSTRG   0100
+//#define _IOLBF    0200
+//#define _IORW     0400
+
+
+//#define	_IOFBF		0000	/* full buffered */
+//#define	_IOLBF		0100	/* line buffered */
+//#define	_IONBF		0004	/* not buffered */
+//#define	_IOEOF		0020	/* EOF reached on read */
+//#define	_IOERR		0040	/* I/O error from system */
+
+//#define	_IOREAD		0001	/* currently reading */
+//#define	_IOWRT		0002	/* currently writing */
+//#define	_IORW		0200	/* opened for reading and writing */
+//#define	_IOMYBUF	0010	/* stdio malloc()'d buffer */
+
+ 
+
+//#define	_IOFBF	0		/* setvbuf should set fully buffered */
+//#define	_IOLBF	1		/* setvbuf should set line buffered */
+//#define	_IONBF	2		/* setvbuf should set unbuffered */
+
+
+#ifndef SEEK_SET
+#define SEEK_SET        0       /* It moves file pointer position to the beginning of the file. */
+#endif
+#ifndef SEEK_CUR
+#define SEEK_CUR        1       /* It moves file pointer position to given location. */
+#endif
+#ifndef SEEK_END
+#define SEEK_END        2       /*  It moves file pointer position to the end of file. */
+#endif
+
 
 
 #ifndef NULL
@@ -157,32 +233,22 @@ int prompt_status;
 
 
 
-#define	STDIN_FILENO	0
-#define	STDOUT_FILENO	1
-#define	STDERR_FILENO	2
 
-
-#ifndef FILENAME_MAX
-#define	FILENAME_MAX	(260)
-#endif
-
-#define FOPEN_MAX	(20)
-#define NUMBER_OF_FILES (20)
 
 //unsigned long __iob[NUMBER_OF_FILES]
 
 
 
 //Fluxo padrão:
-FILE *stdin;
-FILE *stdout;
-FILE *stderr;
+//FILE *stdin;
+//FILE *stdout;
+//FILE *stderr;
 
-FILE *_io_table[NUMBER_OF_FILES];
+//FILE *_io_table[NUMBER_OF_FILES];
 
-#define stdin   (_io_table[0])	
-#define stdout 	(_io_table[1])
-#define stderr 	(_io_table[2])
+//#define stdin   (_io_table[0])	
+//#define stdout 	(_io_table[1])
+//#define stderr 	(_io_table[2])
 
 /*
  * Protótipos do padrão C.
@@ -217,7 +283,25 @@ int printf_main(void);    //@todo: Isso é para testes.
 unsigned long input(unsigned long ch);
 
 
+int getchar(void);
 
+int fflush( FILE *stream );
+int fprintf(FILE *stream, const char *format, ...);
+char *gets(char *s);
+int fgetc( FILE *stream );;
+#define getc fgetc
+
+int feof( FILE *stream );
+int ferror( FILE *stream );
+int fseek(FILE *stream, long offset, int whence);
+
+
+int fputc(int ch, FILE *stream);
+
+//sujo.
+//#define	feof(p)		(((p)->_flags & _IOEOF) != 0)
+//#define	ferror(p)	(((p)->_flags & _IOERR) != 0)
+//#define clearerr(p)     ((p)->_flags &= ~(_IOERR|_IOEOF))
 
 void stdioInitialize();
 

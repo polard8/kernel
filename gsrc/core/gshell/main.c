@@ -105,6 +105,19 @@ int ShellFlag = 0;
 //...
 
 
+static inline void pause(void) 
+{ 
+         asm volatile("pause" ::: "memory"); 
+} 
+
+/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
+static inline void rep_nop(void)
+{
+	__asm__ __volatile__("rep;nop": : :"memory");
+}
+
+#define cpu_relax()		rep_nop()
+
 //
 // Protótipos para funções internas.
 //
@@ -865,6 +878,8 @@ shellProcedure( struct window_d *window,
     unsigned long input_ret;
     unsigned long compare_return;	
 	
+	int q;
+	
 	
 	//if( msg == COMMAND_INITIALIZE_SHELL ){
 		//...
@@ -885,6 +900,11 @@ shellProcedure( struct window_d *window,
             {
 				// Null key.
 				case 0:
+				    pause();
+					pause();
+					pause();
+					pause();
+					cpu_relax();
 				    return (unsigned long) 0;
 				    break;
 				
@@ -933,7 +953,26 @@ shellProcedure( struct window_d *window,
 		        
 				//help
 				case VK_F1:
-				    MessageBox( 1, "Gramado Core - Shell","F1: HELP");
+				    //MessageBox( 1, "Gramado Core - Shell","F1: HELP");
+					
+				    //MessageBox( 1, "Gramado Core - Shell","F11: FULL SCREEN");
+					
+				    //APISetFocus(i1Window);
+					//APIredraw_window(i1Window);
+					//MessageBox( 1, "feedterminalDialog","F1: HELP");
+				    //APISetFocus(i2Window);
+					//APIredraw_window(i2Window);				
+				    //MessageBox( 1, "MessageBox","F1: Testing apiDialog() ");
+					
+					printf("Chamando apiDialog: ...\n");
+					q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
+					
+					if( q == 1 ){ printf("Voce escolheu Yes \n");};
+					if( q == 0 ){ printf("Voce escolheu No \n");};
+					
+					printf("apiDialog retornou.\n");
+					
+					//ShellFlag = SHELLFLAG_COMMANDLINE;						
 					
 					//testando formato amigável de string - ok
 					//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
@@ -944,7 +983,7 @@ shellProcedure( struct window_d *window,
                 //full screen
                 //colocar em full screen somente a área de cliente. 				
 		        case VK_F11:
-				    MessageBox( 1, "Gramado Core - Shell","F11: FULL SCREEN");
+				
 					break;
 					
 				//...
@@ -1334,6 +1373,7 @@ exit:
 unsigned long shellCompare(struct window_d *window)
 {
     unsigned long ret_value;
+	int q; //diálogo
 	
 	// O input pode ser copiado aqui, então manipularemos essa variável.
 	//char *FileName;
@@ -1563,11 +1603,11 @@ do_compare:
 
 	// Imprime a tabela ascii usando a fonte atual.
     // 128 chars.	
-    if( strncmp( prompt, "ascii", 5 ) == 0 )
-    {
-		shellASCII();
-		goto exit_cmp;
-	}		
+    //if( strncmp( prompt, "ascii", 5 ) == 0 )
+    //{
+		//shellASCII();
+	//	goto exit_cmp;
+	//}		
 	
 	// boot
 	// ?? Boot info talvez.
@@ -1896,8 +1936,18 @@ do_compare:
     // @todo: Isso deverá ser um aplicativo.	
     if( strncmp( prompt, "reboot", 6 ) == 0 )
 	{
-	    printf("~reboot\n");
-		system("reboot");
+	    //printf("~reboot\n");
+		printf("Tem certeza que deseja reiniciar o sistema?\n");
+		q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
+					
+		if( q == 1 ){ 
+		    printf("Rebooting...\n");
+		    system("reboot"); 
+		};
+		//if( q == 0 ){ printf("Voce escolheu No \n");};
+					
+		//printf("apiDialog retornou.\n");		
+		//system("reboot");
 		goto exit_cmp;
     };
 	
@@ -2042,6 +2092,24 @@ do_compare:
 	    shellTestThreads();
         goto exit_cmp;
     };
+	
+	
+	// t4 - testando fopen
+	if( strncmp( prompt, "t4", 2 ) == 0 )
+	{
+        FILE *f1;
+		f1 = fopen("init.txt","rb");  
+        if( f1 == NULL )
+		{
+			printf("fopen fail\n");
+		}else{
+			printf("fopen ok\n");
+		}
+		
+		printf("%s",f1->_base);
+		
+		goto exit_cmp;
+    };		
 	
 	// tasklist - Lista informações sobre os processos.
 	if( strncmp( prompt, "tasklist", 8 ) == 0 )
@@ -2675,13 +2743,8 @@ done:
 	// Testing welcome message.
 	//
 	
-	/*
 	printf("...\n");
-	test_operators();
-	*/
-	
-	printf("...\n");
-	printf("Welcome to Gramado Operating System.\n");
+	printf("Welcome to Gramado Operating System. ");
 	printf("Done!");
 	
 	
@@ -2788,6 +2851,7 @@ void shellTree(){
 //
 // C function to demonstrate the working of arithmetic operators
 //#include <stdio.h>
+/*
 int test_operators()
 {
     int a = 9,b = 4, c;
@@ -2811,7 +2875,7 @@ int test_operators()
     
     return 0;
 };
-
+*/
 
 /*
  ********************************************************************
@@ -3415,6 +3479,7 @@ void shellShowWindowInfo()
  *     O padrão tem 128 chars.
  *     Obs: Na fonte ROM BIOS temos esse padrão.
  */
+/* 
 void shellASCII()
 {
     unsigned char count;
@@ -3431,7 +3496,7 @@ void shellASCII()
 		}
     };	
 };
-
+*/
 
 //??
 //void shellSetScreenColors( ... ){}
@@ -3642,7 +3707,8 @@ void shellShowDesktopID()
 void shellShowProcessHeapPointer()
 {
 	int id = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0); 
-	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, id, 0, 0);
+	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, 
+	                                                 id, 0, 0);
 	
 	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
 };
@@ -3651,7 +3717,8 @@ void shellShowProcessHeapPointer()
 void shellShowKernelHeapPointer()
 {
 	int id = 0;  //Id do processo kernel. 
-	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, id, 0, 0);
+	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, 
+	                                                 id, 0, 0);
 	
 	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
 };
@@ -3871,6 +3938,7 @@ int feedterminalDialog( struct window_d *window,
 				      unsigned long long1, 
 				      unsigned long long2 )
 {
+	int q;
 	
 	switch(msg)
 	{
@@ -3898,7 +3966,6 @@ int feedterminalDialog( struct window_d *window,
                 // ## [CONTROL + C]  ou [ESC]  ## 
 				// >>> F12 POR ENQUANTO PARA TESTES.
 				//
-				
 				//help
 				case VK_F1:
 				    //APISetFocus(i1Window);
@@ -3931,7 +3998,7 @@ int feedterminalDialog( struct window_d *window,
 	
 done:
     return (int) 0;
-}
+};
 
 
 

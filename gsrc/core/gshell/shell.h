@@ -545,7 +545,7 @@ void shellTestThreads();
 void shellTestMBR();
 
 
-int test_operators();
+//int test_operators();
 
 void shellShowWindowInfo();
 void shellShowInfo();
@@ -574,7 +574,7 @@ void shellShell();               //Constructor.
  
  
 //show ascii table
-void shellASCII(); 
+//void shellASCII(); 
 
 
 // copia bytes	

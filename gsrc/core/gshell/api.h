@@ -2506,6 +2506,27 @@ void api_set_window_with_text_input( struct window_d *window );
 int api_get_window_with_text_input();
 
 
+
+int gramadocore_init_execve( const char *filename, 
+            const char *argv[], 
+            const char *envp[] ); 
+							 
+/* UNIX style */
+int fork();
+
+int execve( const char *filename, 
+            const char *argv[], 
+            const char *envp[] ); 
+			
+			
+			
+
+int apiDialog( const char *string );
+
+
+
+int api_getchar();
+
 //
 //...
 //
