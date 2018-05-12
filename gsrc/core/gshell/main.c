@@ -2109,6 +2109,13 @@ do_compare:
 		printf("%s",f1->_base);
 		
 		goto exit_cmp;
+    };
+
+	// t5 - gets
+	if( strncmp( prompt, "t5", 2 ) == 0 )
+	{
+		//...
+        goto exit_cmp;
     };		
 	
 	// tasklist - Lista informações sobre os processos.
@@ -2744,8 +2751,19 @@ done:
 	//
 	
 	printf("...\n");
-	printf("Welcome to Gramado Operating System. ");
-	printf("Done!");
+	printf("Welcome to Gramado Operating System.\n");
+	printf("\n");
+	
+	char sUsername[11];
+	char sPassword[11];
+		
+	printf("username:\n");
+	gets(sUsername);
+		
+	printf("password:\n");
+	gets(sPassword);
+		
+	printf("username={%s} password={%s}",sUsername,sPassword);
 	
 	
 	//
