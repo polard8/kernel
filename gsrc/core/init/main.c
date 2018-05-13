@@ -51,8 +51,11 @@ int idleStatus;
 int idleError;
 //...
 
-//Idle driver support.
-int driverInitialized;
+//
+//  ## Status do servidor INIT ##
+//
+
+int ServerStatus;
 //...
 
 
@@ -68,7 +71,7 @@ struct idle
 // Protótipos.
 //
 
-
+//funções internas.
 void idleLoop();
 void driverInitialize();      // processo sendo considerado um driver servidor.
 void driverUninitialize();    // desinicializa.
@@ -78,18 +81,59 @@ unsigned long idleServices(unsigned long number);  //Principal.
 
 
 
+static inline void pause(void) 
+{ 
+         asm volatile("pause" ::: "memory"); 
+} 
+
+
+/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
+static inline void rep_nop(void)
+{
+	__asm__ __volatile__("rep;nop": : :"memory");
+}
+
+
+#define cpu_relax()		rep_nop()
+
 
 //Another loop.
-void idleLoop(){
-    while(1){}	
+void idleLoop()
+{
+    while(1)
+	{
+		pause();
+		pause();
+		pause();
+		pause();
+		pause();
+		cpu_relax();
+	}	
 };
 
  
 
 
+ 
+/*
+ *********************************************************
+ * initMain:
+ *     main().
+ *
+ */ 
+static char * argv[] = { "-init",NULL };
+static char * envp[] = { "ROOT=root:/volume0", NULL };
+
+void initMain(void)
+{
+	//nothing for now.
+};
+
+
 
 
 /*
+ *********************************************************
  * driverInitialize:
  *     O Kernel solicitou a rotina de inicialização do processo Idle na forma 
  * de driver. Faremos uma chamada ao Kernel dizendo que o driver está 
@@ -99,10 +143,13 @@ void idleLoop(){
  */
 void driverInitialize()
 {
+	// Inicializando o servidor.
+	ServerStatus = 1;
+		
 	//printf("Idle: Initializing driver ...\n");
 	//refresh_screen();
 
-	driverInitialized = 1;	
+	
 	//system_call( 129, 4321, 4321, 4321 );	
 	
 done:	
@@ -113,6 +160,7 @@ done:
 
 
 /*
+ *********************************************************
  * driverUninitialize:
  *     This method is called to uninitialize the driver object. In a real 
  * driver, this is where the driver would clean up any resources held by 
@@ -120,6 +168,9 @@ done:
  */
 void driverUninitialize()
 {
+	// Finalizando o servidor.
+	ServerStatus = 0;
+	
 	//
 	// Dúvidas??
 	// Devemos nos preparar para desinicializar o driver.
@@ -134,8 +185,6 @@ void driverUninitialize()
 
 	//printf("Idle: Unitializing driver ...\n");
 	//refresh_screen();
-
-	driverInitialized = 0;	
 	
 	//Faremos uma chamada para o Kernel 'deslinkar' o driver.
 	//talvez 128. 127 126..???
@@ -149,22 +198,6 @@ done:
 
 
 /*
- * idleInit:
- *     Inicializando a aplicação Idle.
- */
-int idleInit()
-{
-	idleStatus = 0;
-	idleError = 0;
-	
-	//printf("Idle: Initializing idle application ..\n");
-	//refresh_screen();
-	//...
-	return (int) 0;
-};
-
-
-/*
  *****************************************************************************
  * idleServices:
  *     Essa função oferece serviços de acordo com o número passado via 
@@ -174,10 +207,17 @@ int idleInit()
  */
 unsigned long idleServices(unsigned long number)
 {
-    // Checar se o driver está inicializado.
-	if(driverInitialized != 1){
-		return (unsigned long) 1;    //erro
-	}
+  
+    //
+    //  ## O servidor precisa estar inicializado ##
+    //
+	
+	// Checando se o servidor está inicializado.
+	if(ServerStatus != 1)
+	{
+		// Erro !
+		return (unsigned long) 1;    
+	};
 	
 	
 	//
@@ -209,6 +249,23 @@ done:
     refresh_screen(); 
     return (unsigned long) 0;	
 };
+
+
+/*
+ * idleInit:
+ *     Inicializando a aplicação Idle.
+ */
+int idleInit()
+{
+	idleStatus = 0;
+	idleError = 0;
+	
+	//printf("Idle: Initializing idle application ..\n");
+	//refresh_screen();
+	//...
+	return (int) 0;
+};
+
 
 
 //

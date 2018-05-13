@@ -41,13 +41,8 @@ segment .head_x86
 
 
  
-;
-; Função importadas.
-;
+ 
 
-extern _idleServices
-extern _driverInitialize  ;Envia um sinal pro kernel inicializar esse driver.
-extern _driverUninitialize
 
 	;
 	; Atuando como driver:
@@ -87,30 +82,60 @@ _idle_entry_point:
     nop
 .checkFlag:	
 	
+	;Inicializa chamando main().
+	cmp edx, dword 0
+	je do_initMain
+	
+	;Inicializa o servidor INIT.
 	cmp edx, dword 0x00001234
-    je InitializeDriver    	     ;; Initialize driver.	
+    je do_InitializeDriver    	     ;; Initialize driver.	
 	
-	
+	;Finaliza o servidor INIT.
 	cmp edx, dword 0x00004321
-	je UninitializeDriver        ;; Uninitialize driver.
+	je do_UninitializeDriver        ;; Uninitialize driver.
 	
-	cmp edx, dword 0x12345678    ;; Magic.
-	je services
+	;Chama algum serviço do servidor se ele estiver inicializado.
+	cmp edx, dword 0x12345678       ;; Magic para usar serviços do servidor.
+	je do_services
+	
+.default:
+    nop
 	
 	;;
 	;;    * IDLE LOOP
 	;;
 	
+;;#bugbug
+;;Normalmente a thread idle deve ficar em kernelmode
+;;para invocar a instrução hlt	
 IdleLoop:
     NOP
+	PAUSE
+    PAUSE
+    PAUSE
+    PAUSE	
     JMP IdleLoop 
+	
+	
+	
+	
+;;====================================================================	
+;; do_initMain:
+;;
+;;  ## Sem argumentos.  ##
+;;
+extern _initMain
+do_initMain:
+	call _initMain 
+    jmp	IdleLoop
 	
 	
 ;;====================================================================	
 ;; InitializeDriver:
 ;;     Esse processo será inicializado como um driver em user mode.
-;;   
-InitializeDriver:
+;; 
+extern _driverInitialize  ;Envia um sinal pro kernel inicializar esse driver.  
+do_InitializeDriver:
     call _driverInitialize	
     JMP IdleLoop 
 	
@@ -118,8 +143,9 @@ InitializeDriver:
 ;;====================================================================	
 ;; UninitializeDriver:
 ;;     O processo deixa de atuar como um driver em user mode.
-;; 	
-UninitializeDriver:
+;;
+extern _driverUninitialize	 	
+do_UninitializeDriver:
     call _driverUninitialize
     JMP IdleLoop 
 	
@@ -129,24 +155,54 @@ UninitializeDriver:
 ;;     Chamaremos algum dos serviços oferecidos, que obviamente só
 ;; funcionarão se o driver estiver inicializado.
 ;;
-services:
+;; IN:
+;;     eax = Número do serviço solicitado.
+;;     ebx = arg1
+;;     ecx = arg2
+;;     edx = magic. (Precisa ser 0x12345678)
+;;
+extern _idleServices
+do_services:
     
-	;;
-	;; IN: EAX={Número do serviço solicitado.}
-	;;
+	;; Magic para usar serviços do servidor.
+	cmp edx, dword 0x12345678       
+	jne .fail
 
+	;;#EDX
+	;Limpa a magic.
+	xor edx, edx 
+	
+	;;#ECX
+	;colocar o argumento 2 na pilha
+	push ecx
+
+	;;#EBX
+	;colocar o argumento 1 na pilha
+	push ebx
+	
+	;;#EAX
+	;; Coloca o número do serviço na pilha.
 	push eax
+	
+
+	;;
+	;;  ## Chama o serviço solicitado ##
+	;;
+	
 	
     call _idleServices 
 	mov dword [.ret_val], eax
 	
-	pop eax
 	
 	;;
-	;; aqui podemos fazer alguma coisa com o valor retornado.
+	;; Aqui podemos fazer alguma coisa com o valor retornado.
 	;;
 	
+.fail:	
+    nop	
+.done:	
     JMP IdleLoop     	
+	
 	
 .ret_val: dd 0
 

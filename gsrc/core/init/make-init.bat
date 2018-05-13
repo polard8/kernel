@@ -4,7 +4,7 @@
 
 :Monting
 echo -{ ...
-echo -{ Creating application INIT.BIN ...
+echo -{ Creating INIT.BIN ...
 echo -{ head
     rem head.s
 	nasm head.s -felf -o head.o
@@ -12,7 +12,7 @@ echo -{ head
 	
 :Compiling	
 echo -{ ...
-echo -{ app1 (init task)
+echo -{ main
 	gcc  -c  main.c  -o main.o  
  
  
