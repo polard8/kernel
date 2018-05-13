@@ -33,7 +33,7 @@
  
 #include <kernel.h>
  
- 
+//int window_getch_lock;
  
 // 
 // Argumentos passados pelo Boot Loader em head.s. 
@@ -770,6 +770,11 @@ struct message_d *xxxxsavemessage;
  
 void *windowGetHandleWindow(struct window_d *window)
 {
+	
+	//if( window_getch_lock == 1){
+	//	return NULL;
+	//}
+	
 	//#importante.
 	//Essa rotina ainda não é chamada pelo consumidor,
 	//apenas as outras 3.
@@ -815,6 +820,12 @@ void *windowGetMessage(struct window_d *window)
 {
 	unsigned char SC;
 	
+	
+	//if( window_getch_lock == 1){
+	//	return NULL;
+	//}
+	
+	
 	SC = (unsigned char) keybuffer[keybuffer_head];
 	
 	//Limpa.
@@ -832,7 +843,11 @@ void *windowGetMessage(struct window_d *window)
 	//
 	
 	//Obs: isso alimenta a estrutura da janela com o foco de entrada.
-   	LINE_DISCIPLINE(SC);	
+   	//#importante: Não pode ser tipo 2 pois retornaria um caractere.
+	//O tipo 0 coloca a mensgem completa na estrutura do 
+	//janela com o foco de entrada.
+	//como é tipo 0, ignoraremos o retorno.
+	LINE_DISCIPLINE(SC, 0);	
 	
 	//fast way 
 	//@todo: melhorar isso
@@ -860,6 +875,12 @@ void *windowGetLong1(struct window_d *window)
 	//@todo: melhorar isso
 	struct window_d *wFocus;
 	
+	
+	//if( window_getch_lock == 1){
+	//	return NULL;
+	//}
+
+	
 	wFocus = (void *) windowList[window_with_focus];
 	
 	if( wFocus->newmessageFlag == 0 ){
@@ -876,6 +897,11 @@ fail:
 
 void *windowGetLong2(struct window_d *window)
 {
+	
+	//if( window_getch_lock == 1){
+	//	return NULL;
+	//}
+	
 	//@todo: Liberar long2.
 	return NULL;
 	
@@ -901,59 +927,100 @@ fail:
 };
 
 
-//suporte a getch().
-//será um serviço
+/*
+ * window_getch:
+ *
+ * Esse é o serviço 137.
+ * Isso é usado pela biblioteca stdio em user mode
+ * na função getchar()
+ * #bugbug: Não está pegando todos os caracteres digitados.
+ *
+ * um aplicativo que roda no shell pode estar chamando isso.
+ *
+ */
 int window_getch()
 {
 	unsigned char SC;
+	int save;
 	
+	//pode ser que esse aplicativo não tenha janela,
+	//mas esteja rodando na janela do shell.
+	struct window_d *wFocus;
+	
+	//
+	// Bloqueia pra que nenhum aplicativo pegue mensagens 
+	// na estrutura de janela até que window_getch termine.
+	//
+	
+	//window_getch_lock = 1;
+	
+	//
+	// Pegamos um scancode na fila do teclado,
+	// transformamos ela em mensagem e colocamos a 
+	// mensagem na estrutura da janela com o foco de entrada.
+	//
+	
+
 	SC = (unsigned char) keybuffer[keybuffer_head];
 	
-	//Limpa.
+	//Limpa o offset na fila de teclado 
+	//onde pegamos o scancode.
+	
 	keybuffer[keybuffer_head] = 0;
 	
+	//Circulamos a fila de teclado.
 	keybuffer_head++;
-	
 	if( keybuffer_head >= 128 ){
 	    keybuffer_head = 0;	
 	}
-		
-	//#bugbug
-	//alguma coisa está imprimindo o char duas vezes ...
-	//Talvez o próprio aplicativo esteja imprimeiro também.
-	//
+
+ 
+	LINE_DISCIPLINE(SC, 0);	
+
 	
-	//Obs: isso alimenta a estrutura da janela com o foco de entrada.
-   	LINE_DISCIPLINE(SC);	
+ 	
+	//
+	// Agora vamos pegar a somente a parte da mensagem 
+	// que nos interessa, que é o caractere armazenado em long1.
+	// Obs: Somente queremos o KEYDOWN. Vamos ignorar as outras 
+	// digitações.
+	//
 	
 	//fast way 
 	//@todo: melhorar isso
-	struct window_d *wFocus;
-	
 	wFocus = (void *) windowList[window_with_focus];
-	
-	
-	int save;
-	if( (void*) wFocus != NULL )
-	{
-		if( wFocus->msg == MSG_KEYDOWN )
-		{
-			save = (int) wFocus->long1;
-			
-			wFocus->msg_window = 0;
-			wFocus->msg = 0;
-			wFocus->long1 = 0;
-			wFocus->long2 = 0;
-			
-	        //sinaliza que a mensagem foi lida, e que não temos nova mensagem.
-	        wFocus->newmessageFlag = 0;
-	
-			return (int) save;
+	if( (void*) wFocus == NULL ){
+		//fail 
+		//free(wFocus);
+		goto fail;
+	}else{
+		
+		if( wFocus->msg != MSG_KEYDOWN ){
+		    goto fail;	
 		}
-	}
+		
+		save = (int) wFocus->long1;
+			
+		wFocus->msg_window = 0;
+		wFocus->msg = 0;
+		wFocus->long1 = 0;
+		wFocus->long2 = 0;
+			
+	    //sinaliza que a mensagem foi lida, e que não temos nova mensagem.
+	    wFocus->newmessageFlag = 0;
 	
+	    //window_getch_lock = 0;
+		return (int) save;
+	};
+
+	
+fail:
+done:
+   // window_getch_lock = 0;
 	return (int) -1; //erro	
-}
+};
+
+
 
 /*
  * windowCreateDedicatedBuffer: 

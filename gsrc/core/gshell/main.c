@@ -755,8 +755,8 @@ noArgs:
 		//          mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
 		//          qual foi o dispositivo gerador do evento. ??!!
 		
-
-       apiBeginPaint();
+       enterCriticalSection(); 
+       //apiBeginPaint();
 	   
 		//msg->window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
  		msg_Window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
@@ -786,8 +786,9 @@ noArgs:
 									 (unsigned long) hWindow, 
 									 (unsigned long) hWindow );
 									 
-		apiEndPaint();
-									 
+
+		//apiEndPaint();
+		exitCriticalSection(); 							 
 
         //
         // + PEGAMOS A MENSAGEM NA FILA DA JANELA COM O FOCO DE ENTRADA.
@@ -844,6 +845,9 @@ noArgs:
 			//Nothing.
 
 		};
+		
+		
+
 		
 		//Nothing.
 	};
@@ -2179,7 +2183,9 @@ do_compare:
 	
 	//fail.
 	int Execve_Ret = 1;
- 
+	
+    //unsigned long a1 = (unsigned long) tokenList[0];
+	
 palavra_nao_reservada:
 
     //
@@ -2214,9 +2220,15 @@ palavra_nao_reservada:
 	//                                                    tokenList[i+1], 
 	//													tokenList[i+2] );
 	
+	
+	
+	
+	  
+	
     //Presumindo ser um nome de aplicativo no formato 'test.bin'.
 	//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
-    Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 0, 0 );
+    Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 
+	                     "-xxxx", "-yyyy" );
 	
 	// Ok, funcionou e o arquivo foi carregado,
 	// mas demora para receber tempo de processamento.
@@ -3819,12 +3831,14 @@ void shell_fntos(char *name)
  *     Devemos suprimir a barra. 
  *     
  */									 
-int shell_gramado_core_init_execve( const char *filename, 
-                                    const char *argv[], 
-                                    const char *envp[] )
+int shell_gramado_core_init_execve( const char *arg1, 
+                                    const char *arg2, 
+                                    const char *arg3 )
 {
 	//erro.
 	int Status = 1;
+	
+	//unsigned long arg_address = (unsigned long) &argv[0];
 
 	// suprimindo dot-slash
 	// The dot is the current directory and the 
@@ -3838,10 +3852,10 @@ int shell_gramado_core_init_execve( const char *filename,
 	
 	
 	//suprimindo a barra.
-	if( *filename == '/' || 
-	    *filename == '\\' )
+	if( *arg1 == '/' || 
+	    *arg1 == '\\' )
 	{ 
-	    filename++; 
+	    arg1++; 
 	};
 	
 	
@@ -3850,7 +3864,7 @@ translate:
 	
 	//Isso faz uma conversão de 'test.bin' em 'TEST    BIN'.
 	//Ok funcionou.
-	shell_fntos( (char *) filename);
+	shell_fntos( (char *) arg1);
 	
 	//const char* isso não foi testado.
 	//shell_fntos(filename);
@@ -3894,9 +3908,9 @@ execve:
     //	
 	
 	Status = (int) system_call( 167, 
-	                          (unsigned long) filename,
-				              (unsigned long) argv,
-				              (unsigned long) envp );
+	                          (unsigned long) arg1,
+				              (unsigned long) arg2,
+				              (unsigned long) arg3 );
 							  
 							  
     if( Status == 0 )
@@ -3910,7 +3924,15 @@ execve:
 		// possam pegar essas mensgens de caractere.
 		//
 		
-		 
+		printf("shell: aplicativo inicializado.\n"); 
+		
+		//
+		// ## teste ##
+		//
+		// saindo do shell.
+		//
+		exit(0);
+		
 		ShellFlag = SHELLFLAG_FEEDTERMINAL;		
 		goto done;
 	}else{
@@ -3920,6 +3942,8 @@ execve:
 		// Status indica o tipo de erro.
 		// Se falhou significa que o aplicativo não vai executar,
 		// então não mais o que fazer.
+		
+		printf("shell: aplicativo nao foi inicializado.\n");
 		ShellFlag = SHELLFLAG_COMMANDLINE;
 		goto fail;
 	};
@@ -3936,7 +3960,7 @@ execve:
 	
 fail:
     //status = 1.
-    printf("shell_gramado_core_init_execve: fail retornando ao interpretador\n");
+    printf("shell_gramado_core_init_execve: \n fail retornando ao interpretador\n");
 done:
     return (int) Status;						  
 };

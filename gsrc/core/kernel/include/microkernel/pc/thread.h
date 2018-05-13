@@ -10,6 +10,13 @@
  */
  
 typedef int tid_t; 
+
+
+
+
+
+
+
  
 //
 //#define FIRST_THREAD theadList[0]
@@ -202,7 +209,8 @@ struct thread_d
 	
 	//ext.
 	
-	
+    //plano de execução.
+	int plane;
 	
 	//
 	// Names.

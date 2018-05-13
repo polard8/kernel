@@ -182,15 +182,66 @@ typedef enum {
 int userconfig_Status;
  
  
+//
+// Escalonamento de teclado.
+// Fila de threads que desejam receber input 
+// de teclado. 
+// 
+//
+
+// Escalonamento de dispositivo.
+// Todo dispositivo tem uma fila de threads esperando 
+// para usar o dispositivo.
+// Nessas variáveis colocaremos qual é a thread que 
+// está usando o dispositivo no momento.
+// #bugbug essa informações deve estar na estrutura de dispositivo.
+//
+//
+// ## input control 
+//
+
+typedef struct ioControl_d ioControl_t;
+struct ioControl_d
+{
+	int id;
+	
+	int used;
+	int magic;
+	
+	int did; //identificação do dispisitivo
+	
+	//
+	// Aqui identificaremos qual a thread que está 
+	// usando o dispositivo no momento.
+	//
+	
+	int tid; //identificação da thread.
+	
+	int wid;  // a janela que esta usando o dispositivo.
+	
+};
+ioControl_t *ioControl_keyboard;   //0
+ioControl_t *ioControl_mouse;      //1
+//ioControl_t *ioControl_systemdisk; //2
+//...
+
+unsigned long ioControl[32];
+ 
+ 
+//
+// ## keybuffer ##
+//
  
 int keybuffer_index; 
-
 int keybuffer_head;
 int keybuffer_tail;
 char keybuffer[128];
+
  
 int keyboard_message_head;
 int keyboard_message_tail;
+
+
  
 //estrutura para enviar mensagens de teclado do kernel para 
 //um aplicativo em user mode. 

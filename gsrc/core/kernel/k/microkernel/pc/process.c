@@ -305,7 +305,10 @@ get_next:
         Process->gid  = (int) GetCurrentGroupId();  //GID. 
 
 		//f,flag, State of process
-		Process->state = INITIALIZED;    	
+		Process->state = INITIALIZED;  
+
+		//@TODO: ISSO DEVERIA VIR POR ARGUMENTO
+        Process->plane = FOREGROUND;		
 		
 		//e - Error.
 		//Process->error = 0;

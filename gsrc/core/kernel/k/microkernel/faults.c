@@ -19,6 +19,7 @@ void do_pagefault();
 
 
 /*
+ *****************************************
  * faults:
  *
  */
@@ -55,12 +56,12 @@ void faults(unsigned long number)
 	
 	//Info. 
 	//(@todo: window station, desktop ...).
-	printf("logonStatus={%d}\n",logonStatus);
-	printf("guiStatus={%d}\n",guiStatus);
-	printf("RunningThreads={%d}\n",ProcessorBlock.running_threads);	
-    printf("t->tid={%d} t->step={%d}\n",current_thread,t->step);			
-	printf("FaultNumber={%d}\n",number);                   
+	printf("FaultNumber={  ## %d  ## }\n",number);               
     printf("KeInitPhase={%d}\n",KeInitPhase);
+	printf("logonStatus={%d} guiStatus={%d}\n", logonStatus, guiStatus );
+	printf("RunningThreads={%d} t->tid={%d} t->step={%d} \n", ProcessorBlock.running_threads,
+	    current_thread, t->step );			
+	
 	
 	//Mostra erro de acordo com o número.
     switch(number)

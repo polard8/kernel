@@ -121,10 +121,21 @@ void *services( unsigned long number,
     //Args. (strings)
 	unsigned char *stringZ  = (unsigned char *) arg2;
     unsigned char *stringZZ = (unsigned char *) arg3;	
+	
 	unsigned long *a2 = (unsigned long*) arg2;
 	unsigned long *a3 = (unsigned long*) arg3;
 	unsigned long *a4 = (unsigned long*) arg4;
-		
+	
+
+	char *aa2 = (char *) arg2;
+	char *aa3 = (char *) arg3;
+	char *aa4 = (char *) arg4;
+
+	
+    char *tokenList[8];
+	
+	*tokenList = (char*) arg3;
+	
 	//Char and string support.
 	char *argChar;
 	unsigned char* argString;
@@ -613,8 +624,12 @@ void *services( unsigned long number,
 		case SYS_EXIT:
             //Tornando zombie a thread atual se o argumento for 0.
 			//Na verdade tem muitos parametros de proteção pra levar em conta.
-			if(arg2 == 0){ sys_exit_thread(current_thread); break; }; 	 //Thread		
-            //if(arg2 == 1){ sys_exit_process(arg3,arg4); break; };  //Process.
+			if(arg2 == 0){ 
+			    sys_exit_thread(current_thread); 
+				break; 
+			}; 	 //Thread		
+            
+			//if(arg2 == 1){ sys_exit_process(arg3,arg4); break; };  //Process.
 			//...
 			//return NULL;
 			break;
@@ -838,7 +853,12 @@ void *services( unsigned long number,
 		    break;		
 			
 		//137
+		// Isso é usado pela biblioteca stdio em user mode
+		// na função getchar()
+		// #bugbug: Não está pegando todos os caracteres digitados.
+		//
         case SYS_GETCH:
+		    //window.c
 		    return (void*) window_getch();
             break;		
 			
@@ -898,7 +918,8 @@ void *services( unsigned long number,
 		case 167:
 		    // Testar
 			//executive.c
-		    return (void*) executive_gramado_core_init_execve( (const char *) arg2, 0, 0 );
+		    return (void*) executive_gramado_core_init_execve( 0, (const char *) arg2, 
+			                   (const char *) arg3, (const char *) arg4 );
 			break;
 			
 		//157 - get user session id	

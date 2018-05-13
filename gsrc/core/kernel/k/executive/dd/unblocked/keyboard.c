@@ -76,13 +76,16 @@ void abnt2_keyboard_handler()
 {  
     unsigned char scancode = inportb(0x60);	
 	
-	//#obs: Esse buffer está em user.h 
 	
+	
+
+	//#obs: Esse buffer está em user.h 
 	keybuffer[keybuffer_tail++] = (char) scancode;
 	
 	if( keybuffer_tail >= 128 ){
 		keybuffer_tail = 0;
 	}
+
 	
 //callLineDiscipline:	
 	

@@ -271,6 +271,10 @@ struct process_d
 	
 	//State.
 	process_state_t state; //f, flag,
+	
+
+    //plano de execução.
+	int plane;
 
     //unsigned long error; //e. error.	
 

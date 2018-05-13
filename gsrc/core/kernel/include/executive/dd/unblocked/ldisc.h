@@ -334,7 +334,7 @@ void ps2();
 //o kernelbase receberá uma mensagem do driver de teclado enviando o scancode
 //esse scacode passará por essa rotina, então o kernel base deve chamar essa rotina
 //apos ter recebido o scacode do driver de teclado.
-void LINE_DISCIPLINE(unsigned char SC);
+int LINE_DISCIPLINE(unsigned char SC, int type);
 
 
 //

@@ -223,6 +223,9 @@ get_next:
 		//seleciona uma thread para a execução colocando ela no
 		//state Standby.	
 		
+		//@TODO: ISSO DEVERIA VIR POR ARGUMENTO
+        Thread->plane = FOREGROUND;	
+		
 		// A prioridade básica da thread é igual a prioridade básica do processo.
 		// Process->base_priority;
 		// priority; A prioridade dinâmica da thread foi passada por argumento.

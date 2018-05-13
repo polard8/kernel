@@ -15,6 +15,8 @@
 #include <kernel.h>
 
 
+ 
+
 //=======================================================
 //++ Usadas pelo mouse.
 // hardwarelib.inc
@@ -444,7 +446,7 @@ void keyboard()
  * poderá encontrar um lugar melhor.
  *
  */
-void LINE_DISCIPLINE(unsigned char SC)
+int LINE_DISCIPLINE(unsigned char SC, int type)
 {
     //
     // Step 0 - Declarações de variáveis.
@@ -954,10 +956,16 @@ done:
 		  (unsigned long) ch ); 
 
 		  
+    //coloca na janela main.
+    //if( type == 2 )
+	//{
+		
+	//};
+		  
     //colocará a mensagem na estrutura de janle para que o aplicativo pegue.
     windowSendMessage( (unsigned long) w, (unsigned long) mensagem, (unsigned long) ch, (unsigned long) ch );		  
 	
-    return;
+    return (int) -1;
 };
 
 
@@ -1187,6 +1195,24 @@ int get_shift_status(){
 // void keyboardInit()
 void init_keyboard()
 {
+	//user.h
+	ioControl_keyboard = (struct ioControl_d*) malloc( sizeof(struct ioControl_d) );
+	
+	if( (void*) ioControl_keyboard == NULL )
+	{
+		printf("ldsic-init_keyboard: ioControl_keyboard fail");
+		die();
+	}else{
+	    
+	    ioControl_keyboard->id = 0;
+	    ioControl_keyboard->used = 1;
+	    ioControl_keyboard->magic = 1234;
+	    
+		ioControl_keyboard->tid = 0;  //qual threa está usando o dispositivo.
+	    //ioControl_keyboard->
+	};
+	
+	
     //int Type = 0;
 
     //
@@ -1317,6 +1343,24 @@ int init_mouse()
     int i; 
 	int bruto = 1;  //Método.
 	int mouse_ret;
+	
+	
+	//user.h
+	ioControl_mouse = (struct ioControl_d*) malloc( sizeof(struct ioControl_d) );
+	
+	if( (void*) ioControl_mouse == NULL )
+	{
+		printf("ldsic-init_mouse: ioControl_mouse fail");
+		die();
+	}else{
+	    
+	    ioControl_mouse->id = 0;
+	    ioControl_mouse->used = 1;
+	    ioControl_mouse->magic = 1234;
+	    
+		ioControl_mouse->tid = 0;  //qual threa está usando o dispositivo.
+	    //ioControl_mouse->
+	};	
 	
 	//
 	// Estamos espaço para o buffer de mensagens de mouse.
@@ -2121,6 +2165,7 @@ void ps2()
 	//@todo: isso deveria se chamar init_ps2_mouse ...
     init_keyboard();  //?? quem inicializará a porta do teclado ?? o driver ??
 	init_mouse();	  //?? quem inicializará a porta do mouse ?? o driver ??
+	
 };
 
 

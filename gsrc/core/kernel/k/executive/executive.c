@@ -21,14 +21,35 @@
  * dentro do ambiente Gramado Core. 
  * #obs: Isso funcionou.
  */
-int executive_gramado_core_init_execve( const char *filename, 
-                                        const char *argv[], 
-                                        const char *envp[] )
+int executive_gramado_core_init_execve( int i,
+                                        const char *arg1, //file name
+                                        const char *arg2, 
+                                        const char *arg3 )
 {
 	struct thread_d *Thread;
     
 	//fail.
 	int Status = 1;
+	
+	//Esse é o primeiro argumento.
+	int Plane;
+	char *s;
+	
+	
+	//printf("0=%s ",&argv[0]);
+    //printf("1=%s ",&argv[1]);
+    
+	//## teste
+	//
+	//if( ! strcmp( (char*)argv[0], "-f" ) ) 
+	//if( strncmp( (char*) &argv[1], "-f", 2 ) == 0 )
+	//{
+	//	printf("executive_gramado_core_init_execve: FOREGROUND\n");
+    //    Plane = FOREGROUND;
+    //}else{
+	//	printf("executive_gramado_core_init_execve: BACKGROUND\n");
+	//	Plane = BACKGROUND;
+	//};
 	
 	//fail.
 	//if( (const char *) filename == NULL ){
@@ -42,9 +63,11 @@ int executive_gramado_core_init_execve( const char *filename,
 	//
 	
 	printf("\nexecutive_gramado_core_init_execve: testing ...\n");
-	printf("fileneme={%s}\n",filename);
-	printf("arg={%x}\n",argv[0]);
-	printf("env={%x}\n",envp[0]);
+	printf("fileneme={%s}\n",arg1);
+	printf("arg1={%s}\n",arg2);
+	printf("arg2={%s}\n",arg3);
+	//printf("arg={%x}\n",argv[0]);
+	//printf("env={%x}\n",envp[0]);
 	
 	//
 	// Pegar o ponteiro da thread primária do processo 
@@ -65,6 +88,8 @@ int executive_gramado_core_init_execve( const char *filename,
 		// isso é importante, pois o spawn não funciona em thread 
 		// com o contexto salvo.
 		Thread->saved = 0; 
+		
+		Thread->plane = Plane;
 		
 	    //Context.
 	    //@todo: Isso deve ser uma estrutura de contexto.
@@ -101,7 +126,7 @@ int executive_gramado_core_init_execve( const char *filename,
 		
 		//fs/read.c
 	    // "FILE    BIN"
-        Status = (int) fsLoadFile( (unsigned char *) filename, 
+        Status = (int) fsLoadFile( (unsigned char *) arg1, 
 		                           (unsigned long) 0x00400000 );
 
         //fail

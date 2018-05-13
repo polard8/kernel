@@ -175,6 +175,9 @@ void *KiCreateIdle()
 	
 	IdleThread->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 	
+	
+	IdleThread->plane = BACKGROUND;
+
 	//
 	// Procedimento de janela.
 	//  
@@ -357,6 +360,8 @@ void *KiCreateShell()
 	t->magic = 1234;
 	t->name_address = (unsigned long) ThreadName;    //Funciona.
 	
+	t->plane = FOREGROUND;
+	
 	t->process = (void*) ShellProcess; //KernelProcess;
 	
 	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
@@ -532,6 +537,8 @@ void *KiCreateTaskManager()
 	t->name_address = (unsigned long) ThreadName;   //Funciona.
 	
 	t->process = (void*) KernelProcess;
+	
+	t->plane = BACKGROUND;
 	
 	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 

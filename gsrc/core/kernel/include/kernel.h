@@ -105,6 +105,17 @@
 
 
 //
+//  ## JOB CONTROL SUPPORT ##
+//
+
+#define PROCESS 10
+#define THREAD  20
+#define BACKGROUND 100 
+#define FOREGROUND 200
+
+
+
+//
 // Externs.
 //
 
@@ -386,8 +397,8 @@ int current_process;
 int current_thread;
 int current_disk;
 int current_volume;
-int current_directory;   //dirList[.]
-int current_file;        //fileList[.]
+int current_directory;   
+int current_file;        
 int current_terminal;
 //...
 
