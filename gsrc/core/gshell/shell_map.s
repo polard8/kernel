@@ -126,63 +126,63 @@ Linker script and memory map
                 0x00451000                shell_entry_point
                 0x00451018                VECTOR
  *(.text)
- .text          0x00451024       0x40 crt0.o
+ .text          0x00451024       0x80 crt0.o
                 0x00451024                crt0
- .text          0x00451064     0x2d80 main.o
-                0x00452cb7                shellPrompt
-                0x00453585                shellSendMessage
-                0x00452e73                shellTestThreads
-                0x00453663                shellTaskList
-                0x004513c3                shellProcedure
-                0x004526d6                shellShell
-                0x00453932                shellShowProcessHeapPointer
-                0x00452c76                shellThread
-                0x00453cff                concat
-                0x0045281b                shellInit
-                0x004537ca                shellShowPPID
-                0x0045399a                shellShowKernelHeapPointer
-                0x004515d8                shellWaitCmd
-                0x00452d70                shellShowScreenBuffer
-                0x00451064                GramadoMain
-                0x004538f6                shellShowDesktopID
-                0x00453104                shellInsertCharXY
-                0x0045314e                shellInsertCharPos
-                0x00453c93                die
-                0x00453a0e                shellShowPCIInfo
-                0x004515f0                shellCompare
-                0x00452d2e                shellClearBuffer
-                0x00452f88                shellRefreshScreen
-                0x00453bd7                feedterminalDialog
-                0x00452f03                shellClearScreen
-                0x0045346c                shellShowSystemInfo
-                0x00453186                shellInsertNextChar
-                0x00453a66                shell_fntos
-                0x004539e2                shellShowMemoryInfo
-                0x00452dde                shellTestLoadFile
-                0x0045327d                move_to
-                0x004531b2                shellInsertCR
-                0x0045336c                shellShowMetrics
-                0x00453842                shellShowGID
-                0x00452fd8                shellScroll
-                0x00453a3a                shellShowKernelInfo
-                0x004535d6                shellUpdateWorkingDiretoryString
-                0x004531f0                shellInsertNullTerminator
-                0x00453806                shellShowUID
-                0x004531d1                shellInsertLF
-                0x00453656                shellUpdateCurrentDirectoryID
-                0x004535ad                shell_memcpy_bytes
-                0x00452c4c                shellSetCursor
-                0x00453b55                shell_gramado_core_init_execve
-                0x004532a2                shellShowInfo
-                0x004534da                shellShowWindowInfo
-                0x0045378e                shellShowPID
-                0x00453d97                error
-                0x0045387e                shellShowUserSessionID
-                0x004538ba                shellShowWindowStationID
-                0x00453cd4                xmalloc
-                0x00452ca3                shellTree
-                0x00452c8f                shellHelp
-                0x0045320f                shellTestMBR
+ .text          0x004510a4     0x2d40 main.o
+                0x00452cba                shellPrompt
+                0x00453588                shellSendMessage
+                0x00452e76                shellTestThreads
+                0x00453666                shellTaskList
+                0x004513c8                shellProcedure
+                0x004526d9                shellShell
+                0x00453935                shellShowProcessHeapPointer
+                0x00452c79                shellThread
+                0x00453cf6                concat
+                0x0045281e                shellInit
+                0x004537cd                shellShowPPID
+                0x0045399d                shellShowKernelHeapPointer
+                0x004515dd                shellWaitCmd
+                0x00452d73                shellShowScreenBuffer
+                0x004510a4                GramadoMain
+                0x004538f9                shellShowDesktopID
+                0x00453107                shellInsertCharXY
+                0x00453151                shellInsertCharPos
+                0x00453c8a                die
+                0x00453a11                shellShowPCIInfo
+                0x004515f5                shellCompare
+                0x00452d31                shellClearBuffer
+                0x00452f8b                shellRefreshScreen
+                0x00453bce                feedterminalDialog
+                0x00452f06                shellClearScreen
+                0x0045346f                shellShowSystemInfo
+                0x00453189                shellInsertNextChar
+                0x00453a69                shell_fntos
+                0x004539e5                shellShowMemoryInfo
+                0x00452de1                shellTestLoadFile
+                0x00453280                move_to
+                0x004531b5                shellInsertCR
+                0x0045336f                shellShowMetrics
+                0x00453845                shellShowGID
+                0x00452fdb                shellScroll
+                0x00453a3d                shellShowKernelInfo
+                0x004535d9                shellUpdateWorkingDiretoryString
+                0x004531f3                shellInsertNullTerminator
+                0x00453809                shellShowUID
+                0x004531d4                shellInsertLF
+                0x00453659                shellUpdateCurrentDirectoryID
+                0x004535b0                shell_memcpy_bytes
+                0x00452c4f                shellSetCursor
+                0x00453b58                shell_gramado_core_init_execve
+                0x004532a5                shellShowInfo
+                0x004534dd                shellShowWindowInfo
+                0x00453791                shellShowPID
+                0x00453d8e                error
+                0x00453881                shellShowUserSessionID
+                0x004538bd                shellShowWindowStationID
+                0x00453ccb                xmalloc
+                0x00452ca6                shellTree
+                0x00452c92                shellHelp
+                0x00453212                shellTestMBR
  .text          0x00453de4      0x5a0 shellui.o
                 0x004541dc                shellTestDisplayBMP
                 0x00453f51                shellCreateEditBox
@@ -340,29 +340,30 @@ Linker script and memory map
                 0x00458000                . = ALIGN (0x1000)
  *fill*         0x00457854      0x7ac 00
 
-.rdata          0x00458000     0x2160
+.rdata          0x00458000     0x2220
  .rdata         0x00458000       0x10 conio.o
  .rdata         0x00458010      0x430 stdlib.o
  .rdata         0x00458440       0x40 stdio.o
  .rdata         0x00458480      0x320 api.o
  .rdata         0x004587a0      0x6c0 shellui.o
- .rdata         0x00458e60     0x1300 main.o
+ .rdata         0x00458e60     0x1340 main.o
+ .rdata         0x0045a1a0       0x80 crt0.o
 
-.data           0x0045a160      0xea0
-                0x0045a160                data = .
-                0x0045a160                _data = .
-                0x0045a160                __data = .
+.data           0x0045a220      0xde0
+                0x0045a220                data = .
+                0x0045a220                _data = .
+                0x0045a220                __data = .
  *(.data)
- .data          0x0045a160        0x0 crt0.o
- .data          0x0045a160       0x20 main.o
- .data          0x0045a180       0x20 shellui.o
- .data          0x0045a1a0        0x0 api.o
- .data          0x0045a1a0        0x0 stdio.o
- .data          0x0045a1a0       0x10 stdlib.o
- .data          0x0045a1b0        0x0 string.o
- .data          0x0045a1b0        0x0 conio.o
+ .data          0x0045a220       0x20 crt0.o
+ .data          0x0045a240       0x20 main.o
+ .data          0x0045a260       0x20 shellui.o
+ .data          0x0045a280        0x0 api.o
+ .data          0x0045a280        0x0 stdio.o
+ .data          0x0045a280       0x10 stdlib.o
+ .data          0x0045a290        0x0 string.o
+ .data          0x0045a290        0x0 conio.o
                 0x0045b000                . = ALIGN (0x1000)
- *fill*         0x0045a1b0      0xe50 00
+ *fill*         0x0045a290      0xd70 00
 
 .bss            0x0045b000     0xd8f0
                 0x0045b000                bss = .

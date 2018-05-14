@@ -101,6 +101,7 @@ int ShellFlag = 0;
 #define SHELLFLAG_USAGE 5
 #define SHELLFLAG_TOPBAR 6
 #define SHELLFLAG_FEEDTERMINAL 7
+#define SHELLFLAG_EXIT 8
 
 //...
 
@@ -213,20 +214,7 @@ int GramadoMain( int argc,
 	//Obs: Não criaremos a janela principal desse programa 
 	//para evitarmos erros com printf.
 	
-	/*
-	 *Obs: Isso funcionou bem.
-	apiBeginPaint();
-	    MessageBox( 1, "SHELL.BIN","Initializing ...");
-	apiEndPaint();
-	
-    refresh_screen();
-	*/
-	
-	//chamando uma system call que ative a rotina de testes de 
-	//escrita em janelas com o foco de entrada.
-    //cancelada, acionaremos via procedimento de janela do sistema F12.
-	//system_call( 222,0,0,0);
-	//while(1){}	
+ 
 	
 	
 	/*
@@ -274,122 +262,49 @@ int GramadoMain( int argc,
 	
 	shellShell(); 	
 	
-	
-	//#DEBUG
-	//printf("S");
-	//printf("Shell: testing strings \n");
-	//shellSetCursor(8,8); 
-	//printf("Shell: and cursor. \n");
-	//refresh_screen();
-	//while(1){}	
+ 
     
+	//
+	// ## ARGS ##
+	//
+	
+	//Ok isso funcionou.
+	//Argumentos passados com sucesso do crt0 para o main.
+	
+	//printf("argc={%d}\n",argc);
+	
+	//printf("arg[0]={%s}\n",argv[0]);
+	//printf("arg[1]={%s}\n",argv[1]);
+	//printf("arg[2]={%s}\n",argv[2]);
 	
 	//
 	// Filtra a quantidade de argumentos.
 	//
 	
+	//goto noArgs; 
+	
 	// Se não há argumentos.
-	if(argc < 1){
-		//#bugbug sprintf ( ?? o que deve ficar no argumentop ?? ) 
-        //sprintf( stderr->_base,"Starting Shell with no arguments...\n");	 //Test.	
+	if(argc < 1)
+	{
+		printf("No args !\n");
+		//#Test.
+        //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
 	    goto noArgs; 
+	}else{
+		
+		printf("Testing args ...\n");
+		
+	    if( strncmp( (char *) argv[0], "-a", 2 ) == 0 )
+	    {
+            printf("arg[0]={%s}\n",argv[0]);    
+        };		
+		
+	    if( strncmp( (char *) argv[1], "-b", 2 ) == 0 )
+	    {
+            printf("arg[1]={%s}\n",argv[1]);    
+        };			
+		
 	};
-	
-	//if (argc <= 1){
-    //    fprintf( stderr, "%s\n", usage ); //File??
-    //    exit(1);
-    //}
-	
-	//
-	// Filtra o primeiro argumento no formato 'palavra'.
-	//
-	
-    //if (!strcmp( argv[1], "-help" ))
-	//{
-    //    printf( "%s\n", usage );
-    //    refresh_screen();
-	//	exit(0);
-    //}
-    
-	//if (!strcmp( argv[1], "-version" ))
-	//{
-        //printf( "%s\n", shellGetVersion() );
-    //    refresh_screen();
-	//	exit(0);
-    //}	
-	
-	//
-	// Outras opções de argumentos.
-	//
-	
-	//Dependendo do argumento encontrado muda-se a flag.
-    while(argc--) 
-    {
-        s = *++argv;
-        if (*s == '-' || *s == '/') 
-		{
-            while(*++s) 
-			{
-                switch(*s) 
-				{
-					//Null
-					case 0:
-					    ShellFlag = SHELLFLAG_NULL; 
-						break;
-						
-					
-					// -c 
-                    // Modo command line.					
-					case 'c':
-					    ShellFlag = SHELLFLAG_COMMANDLINE;
-					    break;
-	
-					// -s 
-					// Modo script.
-					case 's':
-					    ShellFlag = SHELLFLAG_SCRIPT;
-						break;
-
-					// -h 
-                    // help					
-                    case 'h':
-					    ShellFlag = SHELLFLAG_HELP;
-                        //if (!strcmp( argv[argc], "help" )){ ... };
-						//if (!strcmp( argv[argc], "HELP" )){ ... };
-						//...
-                        break;
-
-					// -v 
-                    // version					
-                    case 'v':
-					    ShellFlag = SHELLFLAG_VERSION;
-					    //if (!strcmp( argv[argc], "version" )){ ... };
-						//if (!strcmp( argv[argc], "VERSION" )){ ... };
-						//...
-                        break;
-
-                    // -u 
-					// usage
-					case 'u':
-					    ShellFlag = SHELLFLAG_USAGE;
-					    //if (!strcmp( argv[argc], "XXX" )){ ... };
-                        break;
-
-                    //...
-
-                    default:    
-						ShellFlag = SHELLFLAG_USAGE;
-						//usage();
-						break;
-                };
-            };
-        
-		}else{
-			ShellFlag = SHELLFLAG_NULL;
-			//usage();
-			goto noArgs;   
-        };
-    };
 	
 	//Nothing.
 	
@@ -837,6 +752,10 @@ noArgs:
 			
 			switch(ShellFlag)
 			{
+				case SHELLFLAG_EXIT:
+				    goto end;
+					break;
+
 				// Para alimentar o terminal.
 				case SHELLFLAG_FEEDTERMINAL:
 			        feedterminalDialog( (struct window_d *) msg_Window, 
@@ -879,11 +798,7 @@ noArgs:
 	//
 	
 end:
-    printf("shell loop fail!");
-    refresh_screen();	
-    while(1){}    //Hang.
-    //MessageBox(...);	
-	exit(0);  
+    printf("SHELL.BIN: exiting main() ...\n");
 	return (int) 0;
 };
 
@@ -1759,8 +1674,9 @@ do_compare:
 	{
         printf("~exit\n");
 		printf("Exiting shell process ...\n");
-		refresh_screen();
-		exit(0);
+		//refresh_screen();
+		//exit(0);
+		ShellFlag = SHELLFLAG_EXIT;
 		goto exit_cmp;
     };
 	
@@ -3652,15 +3568,6 @@ void shellExit(int code){
 */
 
 
-/*
-void die(char * str);
-void die(char * str)
-{
-	fprintf(stderr,"%s\n",str);
-	exit(1);
-}
-*/
-
 void shellUpdateWorkingDiretoryString( int id )
 {
     switch(id)
@@ -4026,10 +3933,15 @@ execve:
 		// getpid...
 		// waitforpid(?);
 		
-		die("Exiting shell.bin\n");
+		//die("Exiting shell.bin\n");
+		
+		//Saindo sem erro.
 		//exit(0);
 		
-		ShellFlag = SHELLFLAG_FEEDTERMINAL;		
+		//Saída elegante, retornando para o crt0.
+		ShellFlag = SHELLFLAG_EXIT;
+		
+		//ShellFlag = SHELLFLAG_FEEDTERMINAL;		
 		goto done;
 	}else{
 		
