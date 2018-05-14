@@ -49,6 +49,12 @@ extern _crt0
 ;;     Entry point for the application.
 ;;
 ;;
+;; IN:
+;;     eax =  índice (Número de serviço)
+;;     ebx =  arg1
+;;     ecx =  arg2
+;;     edx =  arg3
+;;
 global _shell_entry_point              
 _shell_entry_point:
     nop
@@ -58,6 +64,22 @@ _shell_entry_point:
 	;;push 0
 	;;push 0
 	;;push 0
+	
+	
+	;;
+	;; ## RECEBER E EMPILHAR OS ARGUMENTOS ##
+	;;	
+
+	;push eax                       ; indice
+    ;MOV DWORD [_VECTOR._ebx], EBX  ;;arg1
+    ;MOV DWORD [_VECTOR._ecx], ECX  ;;arg2
+    ;MOV DWORD [_VECTOR._edx], EDX  ;;arg3
+	;; talvez possamos receber mais argumentos 
+	;; via registradores como RDI e RSI.
+	;;...
+	;push DWORD _VECTOR    ; INÍCIO DO VETOR.
+	;;#BUGBUG talvez main.c precise de usar exern 
+	;;para acessar o ponteiro do vetor.
 	
 	call _crt0
 	;;call _GramadoMain
@@ -87,7 +109,20 @@ retOk:
 	;mov byte [0x800000], byte "z"	
     ;mov byte [0x800001], byte 0x09	
 	JMP HANG
-
+	
+	
+;;
+;; Vetor enviado para main().
+;;
+	
+global _VECTOR 	
+_VECTOR:
+._ebx:	
+    DD 0
+._ecx:	
+	DD 0
+._edx:	
+    DD 0
 ;
 ; End.
 ;

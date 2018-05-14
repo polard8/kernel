@@ -14,6 +14,49 @@
 //unsigned char  EcecutiveName[] = "EXECUTIVE LAYER";
 
 
+//rotina interna de support.
+//isso deve ir para bibliotecas depois.
+//não tem protótipo ainda.
+// Credits: Luiz Felipe
+/*
+void executive_fntos(char *name)
+{
+    int  i, ns = 0;
+    char ext[4];
+    //const char ext[4];
+	
+    //transforma em maiúscula
+	while(*name && *name != '.')
+	{
+        if(*name >= 'a' && *name <= 'z')
+            *name -= 0x20;
+
+        name++;
+        ns++;
+    }
+
+    // aqui name[0] é o ponto.
+	// então constroi a extensão.
+	for(i=0; i < 3 && name[i+1]; i++)
+	{
+        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+            name[i+1] -= 0x20;
+
+        ext[i] = name[i+1];
+    }
+
+    while(ns < 8){
+        *name++ = ' ';
+        ns++;
+    }
+
+    for(i=0; i < 3; i++)
+        *name++ = ext[i];
+
+    *name = '\0';
+};
+*/
+
 /*
  *****************************************************************
  * executive_gramado_core_init_execve:
@@ -21,10 +64,10 @@
  * dentro do ambiente Gramado Core. 
  * #obs: Isso funcionou.
  */
-int executive_gramado_core_init_execve( int i,
-                                        const char *arg1, //file name
-                                        const char *arg2, 
-                                        const char *arg3 )
+int executive_gramado_core_init_execve( int i,              //serviço
+                                        const char *arg1,   //file name
+                                        const char *arg2,   //arg
+                                        const char *arg3 )  //env
 {
 	struct thread_d *Thread;
     
@@ -62,12 +105,11 @@ int executive_gramado_core_init_execve( int i,
 	// primária do processo !
 	//
 	
-	printf("\nexecutive_gramado_core_init_execve: testing ...\n");
-	printf("fileneme={%s}\n",arg1);
-	printf("arg1={%s}\n",arg2);
-	printf("arg2={%s}\n",arg3);
-	//printf("arg={%x}\n",argv[0]);
-	//printf("env={%x}\n",envp[0]);
+	printf("\nexecutive_gramado_core_init_execve: testing ...\n\n");
+	
+	printf(">>>fileneme={%s}\n",arg1);
+	printf(">>>arg={%s}\n",arg2);
+	printf(">>>env={%s}\n\n",arg3);
 	
 	//
 	// Pegar o ponteiro da thread primária do processo 
@@ -123,6 +165,12 @@ int executive_gramado_core_init_execve( int i,
 		// #importante Precisamos do ponteiro válido para filename.
 		// Não podemos auterá-lo e depois usá-lo.
 		//
+		
+		//#importante: Isso precisa ser nesse momento e não antes,
+		//pois pode corromper o espaço destinado aos argumentos 
+		//dentro do vetor ao acrescentar zeros.
+		//executive_fntos( (char *) arg1);
+		read_fntos( (char *) arg1);
 		
 		//fs/read.c
 	    // "FILE    BIN"

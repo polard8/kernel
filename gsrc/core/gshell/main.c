@@ -103,7 +103,7 @@ int ShellFlag = 0;
 #define SHELLFLAG_FEEDTERMINAL 7
 
 //...
-
+void die(char * str);
 
 static inline void pause(void) 
 { 
@@ -1403,7 +1403,8 @@ unsigned long shellCompare(struct window_d *window)
 	// to first part of user_input
 	// separated by delim
 	
-    tokenList[0] = strtok( prompt, LSH_TOK_DELIM);
+    //isso pega a primeira palavra digitada
+	tokenList[0] = strtok( prompt, LSH_TOK_DELIM);
 	
 	
 	//para o argumento atual
@@ -1411,23 +1412,25 @@ unsigned long shellCompare(struct window_d *window)
 	
 	char *token;
 	
+	//salva a primeira palavra digitada.
 	token = (char *) tokenList[0];
 	
 	i=0;                                  
     while( token != NULL )
 	{
         // Coloca na lista.
-        tokenList[i] = token;
+        //salva a primeira palavra digitada.
+		tokenList[i] = token;
 
 		//#debug
 		//Mostra
         //printf("shellCompare: %s \n", tokenList[i] );
         //refresh_screen();
-
-		// Incrementa o índice da lista
-        i++;
 		
 		token = strtok( NULL, LSH_TOK_DELIM );
+		
+		// Incrementa o índice da lista
+        i++;
 		
 		//salvando a contagem.
 		token_count = i;
@@ -1435,6 +1438,13 @@ unsigned long shellCompare(struct window_d *window)
 
 	//Finalizando a lista.
     tokenList[i] = NULL;
+	
+	
+	//
+	//#importante:
+	//nesse momento todos os argumentos estão certinhos no vetor.
+	//já conferimos.
+	//
 
 	//#debug
     //printf("shellCompare: %s \n", tokenList[i] );
@@ -1459,6 +1469,7 @@ unsigned long shellCompare(struct window_d *window)
 	//	refresh_screen();
 	//	token = strtok(NULL, " -");
     //}
+	
 	
 		
 		//do_command(argc, argv);
@@ -1488,34 +1499,34 @@ do_compare:
     // L1 RAM /objetcs   
 	// (diretório raiz para os arquivos que são diretórios de objetos)
 	// os objetos serão listador em um arquivo que nunca será salvo no disco.
-	if( strncmp( prompt, "/objects", 6 ) == 0 )
-	{
-	    printf("info: Open object manager root dir ...\n");
-        goto exit_cmp;
-    };
+	//if( strncmp( prompt, "/objects", 6 ) == 0 )
+	//{
+	//    printf("info: Open object manager root dir ...\n");
+    //    goto exit_cmp;
+    //};
 
 	// L2 disk  /diretório raiz do sistema de arquivos.
-	if( strncmp( prompt, "/", 5 ) == 0 )
-	{
-	    printf("info: Open file system root dir ...\n");
-        goto exit_cmp;
-    };
+	//if( strncmp( prompt, "/", 5 ) == 0 )
+	//{
+	//    printf("info: Open file system root dir ...\n");
+    //    goto exit_cmp;
+    //};
 
 	// L3 LAN  // acesso a arquivos da lan
 	//os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
-	if( strncmp( prompt, "/lan", 6 ) == 0 )
-	{
-	    printf("info: Open lan root dir ...\n");
-        goto exit_cmp;
-    };
+	//if( strncmp( prompt, "/lan", 6 ) == 0 )
+	//{
+	//    printf("info: Open lan root dir ...\n");
+    //    goto exit_cmp;
+    //};
  
 	// L4 WAN   //acesso a arquivos da wan
 	// os arquivos lan serão listador em um arquivo que nunca será salvo no disco.
-	if( strncmp( prompt, "/wan", 6 ) == 0 )
-	{
-	    printf("info: Open wan root dir ...\n");
-        goto exit_cmp;
-    };
+	//if( strncmp( prompt, "/wan", 6 ) == 0 )
+	//{
+	//    printf("info: Open wan root dir ...\n");
+    //    goto exit_cmp;
+    //};
 	
 	
 	//comentário
@@ -2186,6 +2197,9 @@ do_compare:
 	
     //unsigned long a1 = (unsigned long) tokenList[0];
 	
+	//char *a1 = tokenList[1];
+	//char *a1 = tokenList[2];
+	
 palavra_nao_reservada:
 
     //
@@ -2226,10 +2240,15 @@ palavra_nao_reservada:
 	  
 	
     //Presumindo ser um nome de aplicativo no formato 'test.bin'.
-	//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
-    Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 
-	                     "-xxxx", "-yyyy" );
-	
+    
+	//isso funcionou.
+	//Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 
+	//                     "-xxxx", "-yyyy" );
+						 
+
+    Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) tokenList[0], 
+	                     (const char*) tokenList[1], (const char*) tokenList[2]);
+						 
 	// Ok, funcionou e o arquivo foi carregado,
 	// mas demora para receber tempo de processamento.
 	if( Execve_Ret == 0 )
@@ -3831,9 +3850,9 @@ void shell_fntos(char *name)
  *     Devemos suprimir a barra. 
  *     
  */									 
-int shell_gramado_core_init_execve( const char *arg1, 
-                                    const char *arg2, 
-                                    const char *arg3 )
+int shell_gramado_core_init_execve( const char *arg1,  //nome
+                                    const char *arg2,  //arg
+                                    const char *arg3 ) //env
 {
 	//erro.
 	int Status = 1;
@@ -3852,19 +3871,35 @@ int shell_gramado_core_init_execve( const char *arg1,
 	
 	
 	//suprimindo a barra.
-	if( *arg1 == '/' || 
-	    *arg1 == '\\' )
-	{ 
-	    arg1++; 
-	};
+	//if( *arg1 == '/' || 
+	//    *arg1 == '\\' )
+	//{ 
+	//    arg1++; 
+	//};
 	
 	
 	
 translate:	
 	
+	//
+	// ## BUG BUG
+	//
+	// Talvez nesse momento, ao transformar a string ele 
+	// corrompa o espaço reservado para o argumento seguinte.
+	// vamos fazer um teste no quan a rotina não precise 
+	// acrescentar zeros.
+	//
+	
+	//
+	// correto é isso mesmo,
+	// para não corromper o espaço dos argumentos no vetor,
+	// teremos que transformar somente lá no kernel, pouco antes 
+	// de carregarmos o arquivo.
+	//
+	
 	//Isso faz uma conversão de 'test.bin' em 'TEST    BIN'.
 	//Ok funcionou.
-	shell_fntos( (char *) arg1);
+	//shell_fntos( (char *) arg1);
 	
 	//const char* isso não foi testado.
 	//shell_fntos(filename);
@@ -3907,10 +3942,15 @@ execve:
 	// '0' significa que funcionou e '1' que falhou.
     //	
 	
+	//
+	// Obs: Se retornar o número do processo então podemos esperar por ele 
+	// chamadno wait(ret);
+	//
+	
 	Status = (int) system_call( 167, 
-	                          (unsigned long) arg1,
-				              (unsigned long) arg2,
-				              (unsigned long) arg3 );
+	                          (unsigned long) arg1,    //Nome
+				              (unsigned long) arg2,    //arg
+				              (unsigned long) arg3 );  //env
 							  
 							  
     if( Status == 0 )
@@ -3931,7 +3971,12 @@ execve:
 		//
 		// saindo do shell.
 		//
-		exit(0);
+		
+		// getpid...
+		// waitforpid(?);
+		
+		die("Exiting shell.bin\n");
+		//exit(0);
 		
 		ShellFlag = SHELLFLAG_FEEDTERMINAL;		
 		goto done;
@@ -4043,5 +4088,9 @@ done:
 };
 
 
-
+void die(char * str)
+{
+	//fprintf(stderr,"%s\n",str);
+	exit(1);
+}
 

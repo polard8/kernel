@@ -863,6 +863,8 @@ void fsListFiles( int disk_id,
                   int volume_id, 
 				  int directory_id );
 				  
+void read_fntos(char *name);
+				  
 //
 // End.
 //

@@ -918,8 +918,10 @@ void *services( unsigned long number,
 		case 167:
 		    // Testar
 			//executive.c
-		    return (void*) executive_gramado_core_init_execve( 0, (const char *) arg2, 
-			                   (const char *) arg3, (const char *) arg4 );
+		    return (void*) executive_gramado_core_init_execve( 0,  //seviço 
+			                   (const char *) arg2,                //name
+			                   (const char *) arg3,                //arg
+							   (const char *) arg4 );              //env
 			break;
 			
 		//157 - get user session id	

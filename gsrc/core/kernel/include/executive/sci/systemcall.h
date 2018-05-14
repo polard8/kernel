@@ -408,6 +408,13 @@ systemcall_t *CurrentSystemCall;
 */
 
 
+//#importante:
+//@todo system call table.
+//unsigned long sys_call_table[] = {
+//    ...
+	//endereços dos serviços.
+//	...
+//};	
 
 //
 // End.

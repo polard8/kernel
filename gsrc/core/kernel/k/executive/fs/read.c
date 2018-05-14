@@ -31,6 +31,50 @@
 
 
 
+//rotina interna de support.
+//isso deve ir para bibliotecas depois.
+//não tem protótipo ainda.
+// Credits: Luiz Felipe
+
+void read_fntos(char *name)
+{
+    int  i, ns = 0;
+    char ext[4];
+    //const char ext[4];
+	
+    //transforma em maiúscula
+	while(*name && *name != '.')
+	{
+        if(*name >= 'a' && *name <= 'z')
+            *name -= 0x20;
+
+        name++;
+        ns++;
+    }
+
+    // aqui name[0] é o ponto.
+	// então constroi a extensão.
+	for(i=0; i < 3 && name[i+1]; i++)
+	{
+        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+            name[i+1] -= 0x20;
+
+        ext[i] = name[i+1];
+    }
+
+    while(ns < 8){
+        *name++ = ' ';
+        ns++;
+    }
+
+    for(i=0; i < 3; i++)
+        *name++ = ext[i];
+
+    *name = '\0';
+};
+	
+	
+	
 	
 /*
  * fatClustToSect:
@@ -229,6 +273,10 @@ unsigned long fsLoadFile( unsigned char *file_name,
      *      Na verdade a variável 'root' é do tipo short.
      *		 
 	 */
+	 
+	 
+	 
+	 
 	 
 	i = 0; 
 	
