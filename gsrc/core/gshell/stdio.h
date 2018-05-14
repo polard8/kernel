@@ -299,9 +299,18 @@ int fseek(FILE *stream, long offset, int whence);
 int fputc(int ch, FILE *stream);
 
 //sujo.
-//#define	feof(p)		(((p)->_flags & _IOEOF) != 0)
-//#define	ferror(p)	(((p)->_flags & _IOERR) != 0)
-//#define clearerr(p)     ((p)->_flags &= ~(_IOERR|_IOEOF))
+//#define feof(p)	  (((p)->_flags & _IOEOF) != 0)
+//#define ferror(p)	  (((p)->_flags & _IOERR) != 0)
+//#define clearerr(p) ((p)->_flags &= ~(_IOERR|_IOEOF))
+//#define feof(p)     (((p)->flag & _EOF) != 0)
+//#define ferror(p)   (((p)->flag & _ERR) != 0)
+//#define fileno(p)   ((p)->fd)
+//#define getc(p)     fgetc(p)
+//#define putc(x, p)  fputc(x, p)
+//#define getchar()   getc(stdin)
+//#define putchar(x)  putc((x), stdout)
+//
+
 
 void stdioInitialize();
 

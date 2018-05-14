@@ -7,7 +7,24 @@
  *     2018 - Created by Fred Nora.
  */
 
- 
+/*
+#define BLACK       0
+#define RED         1
+#define GREEN       2
+#define BROWN       3
+#define BLUE        4
+#define MAGENTA     5
+#define CYAN        6
+#define LIGHTGRAY   7
+#define DARKGRAY    8
+#define LIGHTRED    9
+#define LIGHTGREEN  10
+#define YELLOW      11
+#define LIGHTBLUE   12
+#define PINK        13
+#define LIGHTCYAN   14
+#define WHITE       15 
+*/ 
  
 //
 // Buffer support.

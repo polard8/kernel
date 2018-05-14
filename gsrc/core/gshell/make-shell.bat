@@ -22,7 +22,8 @@ shellui.o ^
 api.o ^
 stdio.o ^
 stdlib.o ^
-string.o 
+string.o ^
+conio.o  
 
 
 

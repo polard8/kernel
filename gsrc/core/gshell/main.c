@@ -103,7 +103,28 @@ int ShellFlag = 0;
 #define SHELLFLAG_FEEDTERMINAL 7
 
 //...
+
+/*
+//argument buffer
+char **argbuf;
+int argbuf_length;
+int argbuf_index;
+*/
+
+//
+// Protótipos
+//
+
 void die(char * str);
+void *
+xmalloc( int size);
+void error( char *msg, char *arg1, char *arg2 );
+char *
+concat( char *s1, char *s2, char *s3 );
+
+//
+// Internas.
+//
 
 static inline void pause(void) 
 { 
@@ -2108,11 +2129,14 @@ do_compare:
         goto exit_cmp;
     };
 	
+	FILE *f1;
+	int ch_test;
 	
 	// t4 - testando fopen
 	if( strncmp( prompt, "t4", 2 ) == 0 )
 	{
-        FILE *f1;
+		printf("\n t4: Open init.txt \n");
+        
 		f1 = fopen("init.txt","rb");  
         if( f1 == NULL )
 		{
@@ -2121,8 +2145,35 @@ do_compare:
 			printf("fopen ok\n");
 		}
 		
-		printf("%s",f1->_base);
+		//Isso mostra que o arquivo foi carregado corretamente 
+		//na base esperada.
+		//printf("Show f1->_base: %s\n",f1->_base);
 		
+		//printf("stream info:\n");
+		//printf("f1->_base: %x\n",f1->_base);
+		//printf("f1->_ptr: %x\n",f1->_ptr);
+		//printf("f1->_cnt: %d\n",f1->_cnt);
+		
+		//
+		// #bugbug ... o fgetc não lê na estrutura esperada.
+		//
+		printf("Testing fgetc ... \n\n");
+		while(1)
+		{
+			//ch_test = (int) fgetc(f1);
+			ch_test = (int) getc(f1); 
+			if( ch_test == EOF )
+			{
+				printf("\n\n");
+				printf("EOF reached :)\n\n");
+				//printf("Show f1->_base: %s\n",f1->_base);
+				goto exit_cmp;
+			}else{
+			    printf("%c", ch_test);	
+			};
+		};
+		
+		//fail.
 		goto exit_cmp;
     };
 
@@ -4090,7 +4141,50 @@ done:
 
 void die(char * str)
 {
-	//fprintf(stderr,"%s\n",str);
+	printf("die: %s",str);
+	//@todo
+	fprintf(stderr,"%s\n",str);
 	exit(1);
-}
+};
 
+
+void *
+xmalloc( int size)
+{
+    register int value = (int) malloc(size);
+    if(value == 0)
+        die("xmalloc fail.\n");
+	    //fatal("Virtual memory full.");
+done:  
+    return (void *) value;
+};
+
+
+char *
+concat( char *s1, char *s2, char *s3 )
+{
+  int len1 = (int) strlen(s1);
+  int len2 = (int) strlen(s2);
+  int len3 = (int) strlen(s3);
+  
+  char *result = (char *) xmalloc( len1 +len2 +len3 +1 );
+
+  strcpy( result, s1);
+  strcpy( result +len1, s2 );
+  strcpy( result +len1 +len2, s3 );
+  
+  *( result +len1 +len2 +len3 ) = 0;
+
+done:  
+  return (void *) result;
+};
+
+
+
+
+void error( char *msg, char *arg1, char *arg2 )
+{
+    //fprintf(stderr, "cc: ");
+    fprintf(stderr,"%s %s %s", msg, arg1, arg2);
+    fprintf(stderr, "\n");
+};
