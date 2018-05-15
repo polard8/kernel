@@ -1356,6 +1356,15 @@ unsigned long shellCompare(struct window_d *window)
     unsigned long ret_value;
 	int q; //diálogo
 	
+	
+	
+	//Se alguem pressiona [ENTER] com prompt vazio
+	//dá page fault.
+	//Isso cancela caso o buffer esteja vazio.
+	if( *prompt == (char) '\0' ){
+	    goto exit_cmp;	
+	}
+	
 	// O input pode ser copiado aqui, então manipularemos essa variável.
 	//char *FileName;
 	
