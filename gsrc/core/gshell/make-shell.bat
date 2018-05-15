@@ -12,7 +12,8 @@ echo -{ Creating main.o ...
     rem crt0.o não deve ser compilado aqui ... isso é só um teste.
     gcc  -c  crt0.c -o crt0.o 	
 	gcc  -c  main.c  -o main.o 
-    gcc  -c  shellui.c  -o shellui.o	
+    gcc  -c  shellui.c  -o shellui.o
+    gcc  -c  builtins.c  -o builtins.o	
 	
 :SetingObjects		
 set myObjects=head.o ^
@@ -23,8 +24,8 @@ api.o ^
 stdio.o ^
 stdlib.o ^
 string.o ^
-conio.o  
-
+conio.o ^
+builtins.o  
 
 
 

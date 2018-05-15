@@ -19,6 +19,11 @@
  *     2017 - procedure and command stuff.
  */
  
+ 
+ 
+
+ 
+ 
 //
 // File suppport.
 //
@@ -632,6 +637,11 @@ void bmpDisplayBMP( void* address,
 					unsigned long y, 
 					int width, 
 					int height );
+					
+				
+
+//um comando no shell aponta o script para executar.
+int shellExecuteThisScript( char* script_name );
 					
 					
 //

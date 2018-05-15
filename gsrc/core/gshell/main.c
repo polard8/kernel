@@ -70,7 +70,7 @@
 #include "string.h"
 #include "shell.h"
 #include "globals.h"
-
+#include "builtins.h"
 
 //inicialização silenciosa. Suprime alguns verboses.
 int quiet = 0;	
@@ -102,7 +102,6 @@ char *shell_config_file = "./shellcnf.txt";
 int shellStatus;
 int shellError;
 
-
 //
 // Input flags.
 //
@@ -120,7 +119,7 @@ int ShellFlag = 0;
 #define SHELLFLAG_FEEDTERMINAL 7
 #define SHELLFLAG_EXIT 8
 
-//...
+//... 
 
 /*
 //argument buffer
@@ -832,24 +831,8 @@ noArgs:
 	
 skip_input:	
 
-    //
-	// Aqui temos que carregar o arquivo de scripi indicado 
-	// nos argumentos.
-	//
-	
-	printf("Initializing script ...\n");
-    printf("CurrentFile={%s}\n",argv[3]);
+    shellExecuteThisScript(argv[3]);
 
-    FILE *script_file;	
-
-    script_file = fopen(argv[3],"rw");
-	
-	if( (void*) script_file == NULL )
-	{
-		printf("skip_input: Can't open script file!\n");
-		die("*");
-	}
-	
 	
 	//
 	// Exit process.
@@ -1475,6 +1458,48 @@ do_command:
 do_compare:
 
     //
+	// ## identificadores de iniciação de linha ##
+	//
+	
+	//Esses identificadores determinam o que 
+	//se vai encontrar na linha. E não existe volta, 
+	//o que o identificador determinou será obedecido.
+	
+	//
+	// ## Lista de identificadores ligado a execussão ##
+	//
+	// (do)
+	//
+	// dobin - Execute programa .bin
+	// dotry - Tenta executar qualquer extensão
+	// Obs: Esses comandos efetuam goto 
+	// dentro desse código, saltando diretamente 
+	// para as rotinas executadoras de programas ou scripts.
+	// Obs: O nome do progama está em tokenList[1] e os 
+    // argumentos nos próximos tokenList.	
+	//
+	//
+
+    if( strncmp( (char*) tokenList[0], "dobin", 5 ) == 0 )
+    {
+	    goto dobin;	
+	}
+
+    if( strncmp( (char*) tokenList[0], "dotry", 5 ) == 0 )		
+    {
+		goto dotry;
+	} 
+	
+	//um comando no shell pede para executar um script
+    if( strncmp( (char*) tokenList[0], "dosh", 4 ) == 0 )		
+    {
+		goto dosh;
+	} 	
+
+
+    //...
+
+    //
 	// #Importante:
 	// Devemos pegar os argumentos salvos na lista.
 	// O primeiro argumento é o nome do aplicativo que deve ser executado
@@ -1525,9 +1550,9 @@ do_compare:
 	
 	//comentário
 	// a linha é um comentário, podemos ignorar.
-    if( strncmp( prompt, "//", 2 ) == 0 ){
-		goto exit_cmp;
-	};		
+    //if( strncmp( prompt, "//", 2 ) == 0 ){
+	//	goto exit_cmp;
+	//};		
 	
     //
 	// Ordem alfabética.
@@ -1644,79 +1669,55 @@ do_compare:
 	
 	
 	
-	//cd
-	// change dir
-	if( strncmp( prompt, "cd", 2 ) == 0 )
-	{
+	// cd - Change dir.
+	if( strncmp( prompt, "cd", 2 ) == 0 ){
+		cd_buitins();
 	    goto exit_cmp;
 	}		
 
-	
-    // cls
-	// Clear the screen.
-	if( strncmp( prompt, "cls", 3 ) == 0 )
-	{
-		//@todo
-        shellClearScreen();
-        shellSetCursor(0,0);
-	    //shellPrompt();
+    // cls - Clear the screen.
+	if( strncmp( prompt, "cls", 3 ) == 0 ){
+        cls_builtins();
         goto exit_cmp;
 	};
 	
-	
 	// copy
-	if( strncmp( prompt, "copy", 4 ) == 0 )
-	{
+	if( strncmp( prompt, "copy", 4 ) == 0 ){
+		copy_builtins();
 	    goto exit_cmp;
 	}
-	
-	
+		
 	// date
-	if( strncmp( prompt, "date", 4 ) == 0 )
-	{
+	if( strncmp( prompt, "date", 4 ) == 0 ){
+		date_builtins();
         goto exit_cmp;
     };	
 
-
 	// del
-	if( strncmp( prompt, "del", 3 ) == 0 )
-	{
+	if( strncmp( prompt, "del", 3 ) == 0 ){
+		del_builtins();
 	    goto exit_cmp;
 	}		
 	
 	
-	// dir
-	// Lista os arquivos no estilo DOS.
-	if( strncmp( prompt, "dir", 3 ) == 0 )
-	{
-		//
-		// @todo: get set disk id e directory id.
-		//
-
-        printf("~dir \n");		
-        
-		//#test 
-		//173 Lista arquivos de um diretório, dado o número do disco,
-        //o número do volume e o número do diretório,	
-        system_call(173,0,0,0);		
-		
-		printf("~done\n");
+	// dir - Lista os arquivos no estilo DOS.
+	if( strncmp( prompt, "dir", 3 ) == 0 ){
+		dir_builtins();
         goto exit_cmp;
     };
 	
 	
-	// echo
-	// Echo de terminal.
-    if( strncmp( prompt, "echo", 4 ) == 0 )
-	{
-		printf("%s\n",prompt[4]);
-		//printf("%s\n",prompt);
+	// echo - Echo de terminal.
+    if( strncmp( prompt, "echo", 4 ) == 0 ){
+		echo_builtins();
 		goto exit_cmp;
     };
 
+	
 	// editbox
 	// Cria uma edibox.
-    if( strncmp( prompt, "editbox", 7 ) == 0 )
+    // #teste: deletar.
+	if( strncmp( prompt, "editbox", 7 ) == 0 )
 	{
 	    enterCriticalSection();    
 	    shellCreateEditBox();
@@ -1725,46 +1726,45 @@ do_compare:
 		goto exit_cmp;
     };		
 	
+	// exec - Executa um programa fechando o shell.
+    if( strncmp( prompt, "exec", 4 ) == 0 )
+	{
+		exec_builtins();
+		ShellFlag = SHELLFLAG_EXIT;
+		goto exit_cmp;
+    };	
 	
-	// exit
-	// Exit the application.
+	// exit - Exit the application.
     if( strncmp( prompt, "exit", 4 ) == 0 )
 	{
-        printf("~exit\n");
-		printf("Exiting shell process ...\n");
-		//refresh_screen();
-		//exit(0);
+		exit_builtins();
 		ShellFlag = SHELLFLAG_EXIT;
 		goto exit_cmp;
     };
 	
-    //getpid
-	if( strncmp( prompt, "getpid", 6 ) == 0 )
-	{
-	    shellShowPID();
+    // getpid
+	if( strncmp( prompt, "getpid", 6 ) == 0 ){
+	    getpid_builtins();
         goto exit_cmp;
     };
 	
-    //getppid
-	if( strncmp( prompt, "getppid", 7 ) == 0 )
-	{
-	    shellShowPPID();
-        goto exit_cmp;
-    };
-	
-	
-    //getuid get user id
-	if( strncmp( prompt, "getuid", 6 ) == 0 )
-	{
-	    shellShowUID();
+    // getppid
+	if( strncmp( prompt, "getppid", 7 ) == 0 ){
+	    getppid_builtins();
         goto exit_cmp;
     };
 	
 	
-    //getgid - get group id
-	if( strncmp( prompt, "getgid", 6 ) == 0 )
-	{
-	    shellShowGID();
+    // getuid - get user id
+	if( strncmp( prompt, "getuid", 6 ) == 0 ){
+	    getuid_builtins();
+        goto exit_cmp;
+    };
+	
+	
+    // getgid - get group id
+	if( strncmp( prompt, "getgid", 6 ) == 0 ){
+	    getgid_builtins();
         goto exit_cmp;
     };
 	
@@ -1812,30 +1812,21 @@ do_compare:
 		
 		if( token == NULL )
 		{
-			shellHelp();
-			goto exit_cmp;
+			help_builtins(1);
 		}else{
-		    //printf("\n argument_number={%d} argument={%s}\n", i, tokenList[i]);	
             
 			if( strncmp( (char*) tokenList[i], "-all", 4 ) == 0 )
-			{   
-				printf("Show all help topics.\n");
-				shellHelp();
-				goto exit_cmp;
+			{ 
+                help_builtins(1); 		
 			}
 			
 			if( strncmp( (char*) tokenList[i], "-min", 4 ) == 0 )
-			{   
-				printf("cls, help, exit ...\n");
-				refresh_screen();
-				//shellHelp();
-				goto exit_cmp;
+			{
+                help_builtins(2);				
 			}
 			
 			//...
 		};
-		
-		//shellHelp();
 		goto exit_cmp;
     };	
 	
@@ -1860,12 +1851,13 @@ do_compare:
 	
     // ls
 	// lista arquivos no estilo unix.
-	if( strncmp( prompt, "ls", 2 ) == 0 )
-	{
+	//isso será um programa.
+	//if( strncmp( prompt, "ls", 2 ) == 0 )
+	//{
 		//@todo: Isso deve ser um aplicativo.
-		printf("~ls\n");
-        goto exit_cmp;
-	};
+	//	printf("~ls\n");
+    //    goto exit_cmp;
+	//};
 	
 	
     // mm-info
@@ -1934,16 +1926,14 @@ do_compare:
     };	
 	
 	// pwd - print working directory
-	if( strncmp( prompt, "pwd", 3 ) == 0 )
-	{
-	    printf("~pwd - print working directory\n");
-        system_call(170,0,0,0);		
+	if( strncmp( prompt, "pwd", 3 ) == 0 ){
+		pwd_builtins();
 	    goto exit_cmp;
 	};		
 
 	
     // reboot
-    // @todo: Isso deverá ser um aplicativo.	
+    // @todo: Isso será um aplicativo. reboot.bin	
     if( strncmp( prompt, "reboot", 6 ) == 0 )
 	{
 	    //printf("~reboot\n");
@@ -1961,7 +1951,7 @@ do_compare:
 		goto exit_cmp;
     };
 	
-	// rename
+	// rename - reneme directory or file.
 	if( strncmp( prompt, "rename", 6 ) == 0 )
 	{
         goto exit_cmp;
@@ -2016,7 +2006,7 @@ do_compare:
     };	
 	
 	
-    // shutdown
+    // shutdown - isso será um programa. shutdown.bin
 	if( strncmp( prompt, "shutdown", 8 ) == 0 )
 	{
 	    printf("~shutdown \n");
@@ -2159,6 +2149,7 @@ do_compare:
     };		
 	
 	// tasklist - Lista informações sobre os processos.
+	//isso será um programa tasklist.bin
 	if( strncmp( prompt, "tasklist", 8 ) == 0 )
 	{
 		shellTaskList();
@@ -2194,6 +2185,7 @@ do_compare:
 	
 	
 	// version
+	//?? isso pode ser um programa
     if( strncmp( prompt, "version", 7 ) == 0 )
 	{
 	    printf("\n Gramado version %s \n", OS_VERSION );
@@ -2225,7 +2217,8 @@ do_compare:
 	//char *a1 = tokenList[1];
 	//char *a1 = tokenList[2];
 	
-palavra_nao_reservada:
+	
+doexec_first_command:
 
     //
 	// ## TEST ##
@@ -2260,19 +2253,14 @@ palavra_nao_reservada:
 	//													tokenList[i+2] );
 	
 	
-	
-	
-	  
-	
     //Presumindo ser um nome de aplicativo no formato 'test.bin'.
-    
-	//isso funcionou.
-	//Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 
-	//                     "-xxxx", "-yyyy" );
+ 
 						 
 
-    Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) tokenList[0], 
-	                     (const char*) tokenList[1], (const char*) tokenList[2]);
+    Execve_Ret = (int) shell_gramado_core_init_execve( 
+	                       (const char*) tokenList[0], 
+	                       (const char*) tokenList[1], 
+						   (const char*) tokenList[2] );
 						 
 	// Ok, funcionou e o arquivo foi carregado,
 	// mas demora para receber tempo de processamento.
@@ -2295,7 +2283,90 @@ palavra_nao_reservada:
 		// falhou. Significa que o serviço naõ conseguir encontrar 
 		// o arquivo ou falhou o carregamento.
 		printf("shell: execve fail\n");
-	}
+		goto fail;
+	};
+	
+	
+	//vamos executar um programa .bin.
+	//.bin é a extensão padrão.
+	//executaremos o segundo comando, pois o primeiro é dobin.
+	//
+dobin:
+
+    Execve_Ret = (int) shell_gramado_core_init_execve( 
+	                       (const char*) tokenList[1], 
+	                       (const char*) tokenList[2], 
+						   (const char*) tokenList[3] );
+						 
+	// Ok, funcionou e o arquivo foi carregado,
+	// mas demora para receber tempo de processamento.
+	if( Execve_Ret == 0 )
+	{
+		//
+		// ## WAIT ??
+		//
+		
+		// Aqui temos uma decisão a tomar.
+		// Se o aplicativo executou corretamente e esta em primeiro 
+		// plano então devemos entrar em wait.
+		// Se o aplicativo funcionou corretamente mas está em segundo 
+		// plano então decemos continuar. 
+		// Por enquanto estamos continuando e rodando concomitantemente.
+		//
+		
+	    goto exit_cmp;	
+	}else{
+		// falhou. Significa que o serviço naõ conseguir encontrar 
+		// o arquivo ou falhou o carregamento.
+		printf("shell: execve fail\n");
+		goto fail;
+	};	
+	
+	
+	
+//tente executar um aplicativo com outra extensão.
+//checaremos se é uma extensão das suportadas.	
+dotry:
+    	
+
+    Execve_Ret = (int) shell_gramado_core_init_execve( 
+	                       (const char*) tokenList[1], 
+	                       (const char*) tokenList[2], 
+						   (const char*) tokenList[3] );
+						 
+	// Ok, funcionou e o arquivo foi carregado,
+	// mas demora para receber tempo de processamento.
+	if( Execve_Ret == 0 )
+	{
+		//
+		// ## WAIT ??
+		//
+		
+		// Aqui temos uma decisão a tomar.
+		// Se o aplicativo executou corretamente e esta em primeiro 
+		// plano então devemos entrar em wait.
+		// Se o aplicativo funcionou corretamente mas está em segundo 
+		// plano então decemos continuar. 
+		// Por enquanto estamos continuando e rodando concomitantemente.
+		//
+		
+	    goto exit_cmp;	
+	}else{
+		// falhou. Significa que o serviço naõ conseguir encontrar 
+		// o arquivo ou falhou o carregamento.
+		printf("shell: execve fail\n");
+		goto fail;
+	};		
+	
+	
+	
+	//um comando no shell invoca a execussão de um script 
+	//dado o nome via tokenList.
+dosh:
+    //nothing for now.
+	//o comando [0] é o 'dosh' o [1] é o nome do script.
+    shellExecuteThisScript(tokenList[1]);	
+	goto exit_cmp;	
 	
 	//
 	// Se o arquivo não foi encontrado não há mais o que fazer.
@@ -2822,7 +2893,7 @@ done:
 	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s}",sUsername,sPassword);
-   };
+   }
 	
 	
 	//
@@ -4167,7 +4238,7 @@ void error( char *msg, char *arg1, char *arg2 )
 };
 
 
-
+/*
 void 
 reader_loop()
 {
@@ -4181,3 +4252,37 @@ reader_loop()
 	};
 	
 };
+*/
+
+ 
+
+
+int shellExecuteThisScript( char* script_name )
+{
+    //
+	// Aqui temos que carregar o arquivo de scripi indicado 
+	// nos argumentos.
+	//
+	
+	printf("shellExecuteThisScript:\n");	
+	printf("Initializing script ...\n");
+    printf("CurrentFile={%s}\n",script_name);
+
+    FILE *script_file;	
+
+    script_file = fopen(script_name,"rw");
+	
+	if( (void*) script_file == NULL )
+	{
+		printf("skip_input: Can't open script file!\n");
+		die("*");
+	}
+	
+	
+	//EOF_Reached = EOF;
+
+done:	
+    return (int) 0;		
+}
+
+

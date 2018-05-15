@@ -130,244 +130,262 @@ Linker script and memory map
  *(.text)
  .text          0x00451024       0x80 crt0.o
                 0x00451024                crt0
- .text          0x004510a4     0x2da0 main.o
-                0x00452d10                shellPrompt
-                0x004535de                shellSendMessage
-                0x00452ecc                shellTestThreads
-                0x004536bc                shellTaskList
-                0x0045140c                shellProcedure
-                0x0045271d                shellShell
-                0x0045398b                shellShowProcessHeapPointer
-                0x00452ccf                shellThread
-                0x00453d4c                concat
-                0x00452862                shellInit
-                0x00453823                shellShowPPID
-                0x004539f3                shellShowKernelHeapPointer
-                0x00451621                shellWaitCmd
-                0x00452dc9                shellShowScreenBuffer
-                0x00453e2b                reader_loop
+ .text          0x004510a4     0x2e10 main.o
+                0x00452d27                shellPrompt
+                0x004535f5                shellSendMessage
+                0x00452ee3                shellTestThreads
+                0x004536d3                shellTaskList
+                0x004513bf                shellProcedure
+                0x00452734                shellShell
+                0x004539a2                shellShowProcessHeapPointer
+                0x00452ce6                shellThread
+                0x00453d63                concat
+                0x00452879                shellInit
+                0x0045383a                shellShowPPID
+                0x00453a0a                shellShowKernelHeapPointer
+                0x004515d4                shellWaitCmd
+                0x00452de0                shellShowScreenBuffer
                 0x004510a4                GramadoMain
-                0x0045394f                shellShowDesktopID
-                0x0045315d                shellInsertCharXY
-                0x004531a7                shellInsertCharPos
-                0x00453ce0                die
-                0x00453a67                shellShowPCIInfo
-                0x00451639                shellCompare
-                0x00452d87                shellClearBuffer
-                0x00452fe1                shellRefreshScreen
-                0x00453c24                feedterminalDialog
-                0x00452f5c                shellClearScreen
-                0x004534c5                shellShowSystemInfo
-                0x004531df                shellInsertNextChar
-                0x00453abf                shell_fntos
-                0x00453a3b                shellShowMemoryInfo
-                0x00452e37                shellTestLoadFile
-                0x004532d6                move_to
-                0x0045320b                shellInsertCR
-                0x004533c5                shellShowMetrics
-                0x0045389b                shellShowGID
-                0x00453031                shellScroll
-                0x00453a93                shellShowKernelInfo
-                0x0045362f                shellUpdateWorkingDiretoryString
-                0x00453249                shellInsertNullTerminator
-                0x0045385f                shellShowUID
-                0x0045322a                shellInsertLF
-                0x004536af                shellUpdateCurrentDirectoryID
-                0x00453606                shell_memcpy_bytes
-                0x00452ca5                shellSetCursor
-                0x00453bae                shell_gramado_core_init_execve
-                0x004532fb                shellShowInfo
-                0x00453533                shellShowWindowInfo
-                0x004537e7                shellShowPID
-                0x00453de4                error
-                0x004538d7                shellShowUserSessionID
-                0x00453913                shellShowWindowStationID
-                0x00453d21                xmalloc
-                0x00452cfc                shellTree
-                0x00452ce8                shellHelp
-                0x00453268                shellTestMBR
- .text          0x00453e44      0x5a0 shellui.o
-                0x0045423c                shellTestDisplayBMP
-                0x00453fb1                shellCreateEditBox
-                0x00453e44                shellTopbarProcedure
-                0x004542b2                bmpDisplayBMP
-                0x0045405f                shellCreateTopBar
- .text          0x004543e4     0x1530 api.o
-                0x00455197                APIShowCurrentProcessInfo
-                0x004558e7                api_getchar
-                0x00454984                system11
-                0x00454a29                refresh_buffer
-                0x00455079                APISetFocus
-                0x004549e7                system14
-                0x00454d0e                apiInitBackground
-                0x00454f4d                APICreateWindow
-                0x004556c4                apiBeginPaint
-                0x00454d13                MessageBox
-                0x00455215                APIreplace_window
-                0x0045570b                apiGetSystemMetrics
-                0x004549c6                system13
-                0x0045557b                apiDown
-                0x00455613                enterCriticalSection
-                0x00455850                gramadocore_init_execve
-                0x00455551                apiFOpen
-                0x0045483a                system1
-                0x004548be                system5
-                0x004553c9                api_refresh_screen
-                0x0045586e                apiDialog
-                0x00455455                apiGetCursorY
-                0x00454cb9                carrega_bitmap_16x16
-                0x0045566c                exitCriticalSection
-                0x004543e4                system_call
-                0x004555c7                apiUp
-                0x0045440c                apiSystem
-                0x00455824                api_get_window_with_text_input
-                0x00454a08                system15
-                0x00455129                APISetActiveWindow
-                0x004554ad                apiSetClientAreaRect
-                0x004551ec                APIredraw_window
-                0x004554ff                apiCreateThread
-                0x00454c55                SetNextWindowProcedure
-                0x00455429                apiGetCursorX
-                0x00454c25                chama_procedimento
-                0x00454d3c                call_kernel
-                0x00454ff5                APIRegisterWindow
-                0x0045533f                api_strncmp
-                0x00455267                APIminimize_window
-                0x0045485b                system2
-                0x0045487c                system3
-                0x0045575d                api_get_current_keyboard_responder
-                0x004554d6                apiCreateProcess
-                0x004550bb                APIGetFocus
-                0x00454900                system7
-                0x004548df                system6
-                0x00455701                apiDefDialog
-                0x00455037                APICloseWindow
-                0x00455698                initializeCriticalSection
-                0x00454963                system10
-                0x00454c85                set_cursor
-                0x0045523e                APImaximize_window
-                0x00455864                execve
-                0x0045539d                refresh_screen
-                0x00454ebc                call_gui
-                0x00454942                system9
-                0x0045585a                fork
-                0x00455734                api_set_current_keyboard_responder
-                0x004551c3                APIresize_window
-                0x004556ce                apiEndPaint
-                0x00454cb4                put_char
-                0x00454bc0                print_string
-                0x00455481                apiGetClientAreaRect
-                0x00454bf6                edit_box
-                0x0045530e                kill
-                0x004553d3                apiReboot
-                0x00454ce2                apiShutDown
-                0x00455789                api_set_current_mouse_responder
-                0x004552e5                exit
-                0x00455290                APIget_foregroung_window
-                0x0045489d                system4
-                0x004553ff                apiSetCursor
-                0x004549a5                system12
-                0x00454bc5                vsync
-                0x00454921                system8
-                0x004557de                api_set_window_with_text_input
-                0x0045516b                APIGetActiveWindow
-                0x004557b2                api_get_current_mouse_responder
-                0x00455313                dead_thread_collector
-                0x00455528                apiStartThread
-                0x004550e7                APIKillFocus
-                0x004552bc                APIset_foregroung_window
-                0x004556d8                apiPutChar
- .text          0x00455914     0x1110 stdio.o
-                0x0045625b                putchar
-                0x00455914                stdio_fntos
-                0x00456217                sprintf
-                0x004568ee                feof
-                0x004569ce                fputc
-                0x004567a1                fputs
-                0x0045692c                ferror
-                0x00456447                input
-                0x00455b01                scroll
-                0x0045643d                printf_main
-                0x00456816                gets
-                0x00456287                outbyte
-                0x00455cab                app_print
-                0x004566bc                fflush
-                0x0045672c                fprintf
-                0x0045653e                stdio_system_call
-                0x00455a69                fopen
-                0x00456566                getchar
-                0x00456598                stdioInitialize
-                0x0045688b                fgetc
-                0x00455a03                fclose
-                0x00456954                fseek
-                0x0045640a                _outbyte
-                0x004561fc                printf
-                0x00455c3f                app_clear
- .text          0x00456a24      0x960 stdlib.o
-                0x00456cdf                FreeHeap
-                0x00456a24                rtGetHeapStart
-                0x00456f26                free
-                0x00456ec8                rand
-                0x00456e3f                stdlibInitMM
-                0x00456ce9                heapInit
-                0x00456a38                rtGetHeapPointer
-                0x00456a42                rtGetAvailableHeap
-                0x00456e9f                libcInitRT
-                0x00456a4c                heapSetLibcHeap
-                0x00456ee5                malloc
-                0x00456ccc                AllocateHeapEx
-                0x00456af3                AllocateHeap
-                0x0045731d                stdlib_strncmp
-                0x00456a2e                rtGetHeapEnd
-                0x00456f2b                system
- .text          0x00457384      0x4a0 string.o
-                0x004575eb                strcspn
-                0x0045754e                strcat
-                0x00457384                strcmp
-                0x004575a5                bzero
-                0x0045772b                strtok_r
-                0x004574e1                memcpy
-                0x004574b8                memoryZeroMemory
-                0x0045757e                bcopy
-                0x0045751e                strcpy
-                0x0045768b                strspn
-                0x00457800                strtok
-                0x0045743d                str_cmp
-                0x004573df                strncmp
-                0x004575c0                strlen
- .text          0x00457824       0x90 conio.o
-                0x00457892                getche
-                0x00457824                putch
-                0x00457847                cputs
-                0x0045787b                getch
+                0x00453966                shellShowDesktopID
+                0x00453174                shellInsertCharXY
+                0x004531be                shellInsertCharPos
+                0x00453cf7                die
+                0x00453a7e                shellShowPCIInfo
+                0x004515ec                shellCompare
+                0x00452d9e                shellClearBuffer
+                0x00452ff8                shellRefreshScreen
+                0x00453c3b                feedterminalDialog
+                0x00453e42                shellExecuteThisScript
+                0x00452f73                shellClearScreen
+                0x004534dc                shellShowSystemInfo
+                0x004531f6                shellInsertNextChar
+                0x00453ad6                shell_fntos
+                0x00453a52                shellShowMemoryInfo
+                0x00452e4e                shellTestLoadFile
+                0x004532ed                move_to
+                0x00453222                shellInsertCR
+                0x004533dc                shellShowMetrics
+                0x004538b2                shellShowGID
+                0x00453048                shellScroll
+                0x00453aaa                shellShowKernelInfo
+                0x00453646                shellUpdateWorkingDiretoryString
+                0x00453260                shellInsertNullTerminator
+                0x00453876                shellShowUID
+                0x00453241                shellInsertLF
+                0x004536c6                shellUpdateCurrentDirectoryID
+                0x0045361d                shell_memcpy_bytes
+                0x00452cbc                shellSetCursor
+                0x00453bc5                shell_gramado_core_init_execve
+                0x00453312                shellShowInfo
+                0x0045354a                shellShowWindowInfo
+                0x004537fe                shellShowPID
+                0x00453dfb                error
+                0x004538ee                shellShowUserSessionID
+                0x0045392a                shellShowWindowStationID
+                0x00453d38                xmalloc
+                0x00452d13                shellTree
+                0x00452cff                shellHelp
+                0x0045327f                shellTestMBR
+ .text          0x00453eb4      0x5a0 shellui.o
+                0x004542ac                shellTestDisplayBMP
+                0x00454021                shellCreateEditBox
+                0x00453eb4                shellTopbarProcedure
+                0x00454322                bmpDisplayBMP
+                0x004540cf                shellCreateTopBar
+ .text          0x00454454     0x1530 api.o
+                0x00455207                APIShowCurrentProcessInfo
+                0x00455957                api_getchar
+                0x004549f4                system11
+                0x00454a99                refresh_buffer
+                0x004550e9                APISetFocus
+                0x00454a57                system14
+                0x00454d7e                apiInitBackground
+                0x00454fbd                APICreateWindow
+                0x00455734                apiBeginPaint
+                0x00454d83                MessageBox
+                0x00455285                APIreplace_window
+                0x0045577b                apiGetSystemMetrics
+                0x00454a36                system13
+                0x004555eb                apiDown
+                0x00455683                enterCriticalSection
+                0x004558c0                gramadocore_init_execve
+                0x004555c1                apiFOpen
+                0x004548aa                system1
+                0x0045492e                system5
+                0x00455439                api_refresh_screen
+                0x004558de                apiDialog
+                0x004554c5                apiGetCursorY
+                0x00454d29                carrega_bitmap_16x16
+                0x004556dc                exitCriticalSection
+                0x00454454                system_call
+                0x00455637                apiUp
+                0x0045447c                apiSystem
+                0x00455894                api_get_window_with_text_input
+                0x00454a78                system15
+                0x00455199                APISetActiveWindow
+                0x0045551d                apiSetClientAreaRect
+                0x0045525c                APIredraw_window
+                0x0045556f                apiCreateThread
+                0x00454cc5                SetNextWindowProcedure
+                0x00455499                apiGetCursorX
+                0x00454c95                chama_procedimento
+                0x00454dac                call_kernel
+                0x00455065                APIRegisterWindow
+                0x004553af                api_strncmp
+                0x004552d7                APIminimize_window
+                0x004548cb                system2
+                0x004548ec                system3
+                0x004557cd                api_get_current_keyboard_responder
+                0x00455546                apiCreateProcess
+                0x0045512b                APIGetFocus
+                0x00454970                system7
+                0x0045494f                system6
+                0x00455771                apiDefDialog
+                0x004550a7                APICloseWindow
+                0x00455708                initializeCriticalSection
+                0x004549d3                system10
+                0x00454cf5                set_cursor
+                0x004552ae                APImaximize_window
+                0x004558d4                execve
+                0x0045540d                refresh_screen
+                0x00454f2c                call_gui
+                0x004549b2                system9
+                0x004558ca                fork
+                0x004557a4                api_set_current_keyboard_responder
+                0x00455233                APIresize_window
+                0x0045573e                apiEndPaint
+                0x00454d24                put_char
+                0x00454c30                print_string
+                0x004554f1                apiGetClientAreaRect
+                0x00454c66                edit_box
+                0x0045537e                kill
+                0x00455443                apiReboot
+                0x00454d52                apiShutDown
+                0x004557f9                api_set_current_mouse_responder
+                0x00455355                exit
+                0x00455300                APIget_foregroung_window
+                0x0045490d                system4
+                0x0045546f                apiSetCursor
+                0x00454a15                system12
+                0x00454c35                vsync
+                0x00454991                system8
+                0x0045584e                api_set_window_with_text_input
+                0x004551db                APIGetActiveWindow
+                0x00455822                api_get_current_mouse_responder
+                0x00455383                dead_thread_collector
+                0x00455598                apiStartThread
+                0x00455157                APIKillFocus
+                0x0045532c                APIset_foregroung_window
+                0x00455748                apiPutChar
+ .text          0x00455984     0x1110 stdio.o
+                0x004562cb                putchar
+                0x00455984                stdio_fntos
+                0x00456287                sprintf
+                0x0045695e                feof
+                0x00456a3e                fputc
+                0x00456811                fputs
+                0x0045699c                ferror
+                0x004564b7                input
+                0x00455b71                scroll
+                0x004564ad                printf_main
+                0x00456886                gets
+                0x004562f7                outbyte
+                0x00455d1b                app_print
+                0x0045672c                fflush
+                0x0045679c                fprintf
+                0x004565ae                stdio_system_call
+                0x00455ad9                fopen
+                0x004565d6                getchar
+                0x00456608                stdioInitialize
+                0x004568fb                fgetc
+                0x00455a73                fclose
+                0x004569c4                fseek
+                0x0045647a                _outbyte
+                0x0045626c                printf
+                0x00455caf                app_clear
+ .text          0x00456a94      0x960 stdlib.o
+                0x00456d4f                FreeHeap
+                0x00456a94                rtGetHeapStart
+                0x00456f96                free
+                0x00456f38                rand
+                0x00456eaf                stdlibInitMM
+                0x00456d59                heapInit
+                0x00456aa8                rtGetHeapPointer
+                0x00456ab2                rtGetAvailableHeap
+                0x00456f0f                libcInitRT
+                0x00456abc                heapSetLibcHeap
+                0x00456f55                malloc
+                0x00456d3c                AllocateHeapEx
+                0x00456b63                AllocateHeap
+                0x0045738d                stdlib_strncmp
+                0x00456a9e                rtGetHeapEnd
+                0x00456f9b                system
+ .text          0x004573f4      0x4a0 string.o
+                0x0045765b                strcspn
+                0x004575be                strcat
+                0x004573f4                strcmp
+                0x00457615                bzero
+                0x0045779b                strtok_r
+                0x00457551                memcpy
+                0x00457528                memoryZeroMemory
+                0x004575ee                bcopy
+                0x0045758e                strcpy
+                0x004576fb                strspn
+                0x00457870                strtok
+                0x004574ad                str_cmp
+                0x0045744f                strncmp
+                0x00457630                strlen
+ .text          0x00457894       0x90 conio.o
+                0x00457902                getche
+                0x00457894                putch
+                0x004578b7                cputs
+                0x004578eb                getch
+ .text          0x00457924      0x1a0 builtins.o
+                0x00457a89                pwd_builtins
+                0x00457a23                getuid_builtins
+                0x00457a35                getgid_builtins
+                0x004579ac                echo_builtins
+                0x00457968                dir_builtins
+                0x004579df                exit_builtins
+                0x004579ff                getpid_builtins
+                0x00457959                copy_builtins
+                0x00457a11                getppid_builtins
+                0x004579cb                exec_builtins
+                0x00457938                cls_builtins
+                0x0045795e                date_builtins
+                0x00457963                del_builtins
+                0x00457924                cd_buitins
+                0x00457a47                help_builtins
                 0x00458000                . = ALIGN (0x1000)
- *fill*         0x004578b4      0x74c 00
+ *fill*         0x00457ac4      0x53c 00
 
-.rdata          0x00458000     0x2290
- .rdata         0x00458000       0x10 conio.o
- .rdata         0x00458010      0x430 stdlib.o
- .rdata         0x00458440       0x40 stdio.o
- .rdata         0x00458480      0x320 api.o
- .rdata         0x004587a0      0x6c0 shellui.o
- .rdata         0x00458e60     0x1380 main.o
- .rdata         0x0045a1e0       0xb0 crt0.o
+.rdata          0x00458000     0x26b0
+ .rdata         0x00458000      0x480 builtins.o
+ .rdata         0x00458480       0x10 conio.o
+ .rdata         0x00458490      0x430 stdlib.o
+ .rdata         0x004588c0       0x40 stdio.o
+ .rdata         0x00458900      0x320 api.o
+ .rdata         0x00458c20      0x6c0 shellui.o
+ .rdata         0x004592e0     0x1320 main.o
+ .rdata         0x0045a600       0xb0 crt0.o
 
-.data           0x0045a290      0xd70
-                0x0045a290                data = .
-                0x0045a290                _data = .
-                0x0045a290                __data = .
+.data           0x0045a6b0      0x950
+                0x0045a6b0                data = .
+                0x0045a6b0                _data = .
+                0x0045a6b0                __data = .
  *(.data)
- .data          0x0045a290       0x30 crt0.o
- .data          0x0045a2c0       0x20 main.o
-                0x0045a2d8                shell_config_file
- .data          0x0045a2e0       0x20 shellui.o
- .data          0x0045a300        0x0 api.o
- .data          0x0045a300        0x0 stdio.o
- .data          0x0045a300       0x10 stdlib.o
- .data          0x0045a310        0x0 string.o
- .data          0x0045a310        0x0 conio.o
+ .data          0x0045a6b0       0x30 crt0.o
+ .data          0x0045a6e0       0x20 main.o
+                0x0045a6f8                shell_config_file
+ .data          0x0045a700       0x20 shellui.o
+ .data          0x0045a720        0x0 api.o
+ .data          0x0045a720        0x0 stdio.o
+ .data          0x0045a720       0x10 stdlib.o
+ .data          0x0045a730        0x0 string.o
+ .data          0x0045a730        0x0 conio.o
+ .data          0x0045a730       0x20 builtins.o
                 0x0045b000                . = ALIGN (0x1000)
- *fill*         0x0045a310      0xcf0 00
+ *fill*         0x0045a750      0x8b0 00
 
 .bss            0x0045b000     0xd910
                 0x0045b000                bss = .
@@ -386,8 +404,9 @@ Linker script and memory map
  .bss           0x0045b1f0     0x8000 stdlib.o
  .bss           0x004631f0       0x10 string.o
  .bss           0x00463200        0x0 conio.o
+ .bss           0x00463200       0xd0 builtins.o
                 0x00464000                . = ALIGN (0x1000)
- *fill*         0x00463200      0xe00 00
+ *fill*         0x004632d0      0xd30 00
  COMMON         0x00464000      0xd40 crt0.o
                 0x00464000                prompt
                 0x00464400                stderr
@@ -486,6 +505,7 @@ LOAD stdio.o
 LOAD stdlib.o
 LOAD string.o
 LOAD conio.o
+LOAD builtins.o
 OUTPUT(SHELL.BIN pe-i386)
 
 .comment        0x00000000       0x20
