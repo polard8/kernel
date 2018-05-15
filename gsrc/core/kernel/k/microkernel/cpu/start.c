@@ -190,6 +190,7 @@ unsigned long executa_tarefa( int id,
     asm(" pushl %0" :: "r" (eip)   : "%esp");  
 	
     //#bugbug ... isso realmente não é necessário ... @todo: deletar.
+	//parece que isso é realmente preciso, libera o teclado.
 	outb(0x20,0x20); 
 	
 	asm("sti");

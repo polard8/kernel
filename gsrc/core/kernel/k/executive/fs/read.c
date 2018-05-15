@@ -50,6 +50,8 @@ void read_fntos(char *name)
 
         name++;
         ns++;
+		
+		// ##bugbug: E se não encontrarmos o ponto??
     }
 
     // aqui name[0] é o ponto.

@@ -538,6 +538,9 @@ done:
 
 
     timerInit8253();
+	
+	//parece que isso é realmente preciso, libera o teclado.
+	//outb(0x20,0x20); 	
 
     asm volatile(" cli \n"
                  " mov $0x23, %ax  \n"

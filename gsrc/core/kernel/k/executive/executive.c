@@ -160,6 +160,47 @@ int executive_gramado_core_init_execve( int i,              //serviço
 		//
  		
 		
+		//#bugbug
+		//string lenght
+		//devemos ver se a string não passa dos limites.
+		//Como essa rotina é para executar um arquivo .bin,
+		//caso não exista uma extensão .bin e o nome seja 
+		//menor que 8 podemos adicionar a extensão .bin.
+		
+		size_t l;
+		l = (size_t) strlen( (char*) arg1);
+		
+		if( l > 11 )
+		{
+		    printf("executive_gramado_core_init_execve: File too long!\n");	
+		}else{
+			
+			
+			 
+			//se não existe um ponto entre os oito primeiros chars,
+            //então colocamos a extensão .bin logo após o nome passado.
+            //e ele é pelo menos menor que 11, mas deveria ser menor que oito.			
+			if( arg1[0] != '.' || 
+			    arg1[1] != '.' || 
+                arg1[2] != '.' || 
+                arg1[3] != '.' || 
+                arg1[4] != '.' || 
+                arg1[5] != '.' || 
+                arg1[6] != '.' || 
+                arg1[7] != '.' )
+				{ 
+				    l = (size_t) strlen( (char*) arg1);
+                    if( l > 8 )
+					{
+						printf("executive_gramado_core_init_execve: File without ext is too long!\n");
+					}
+					
+					char bin_string[] = ".bin";
+		            strcat( (char *)arg1, (const char *)bin_string);
+			    };
+			 
+		};
+		
 		//
 		// #bugbug
 		// #importante Precisamos do ponteiro válido para filename.

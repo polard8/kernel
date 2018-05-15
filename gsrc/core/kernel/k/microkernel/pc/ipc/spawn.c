@@ -193,6 +193,7 @@ threadSetUp:
     asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip)    : "%esp");    //eip.
 	// EOI and iret.
 	//Obs: Isso suja o registrador eax.
+	//parece que isso é realmente preciso, libera o teclado.
 	asm("movb $0x20, %al \n");
 	asm("outb %al, $0x20 \n");
 	//asm(" movl $0, %eax \n");
