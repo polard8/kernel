@@ -72,15 +72,32 @@
 #include "globals.h"
 
 
+//inicialização silenciosa. Suprime alguns verboses.
+int quiet = 0;	
+
 //Sendo assim, o shell poderia abrir no ambiente de logon.
 char *username;
 char *password; 
 
 //#define DEFAULT_WINDOW_TITLE "Shell"
 
-//
-// Variáveis internas.
-//
+
+//Se o shell vai ser usado para login.
+//Obs: Uma variável no kernel guardo o id do processo 
+//que fez login.
+int login_shell = 0;
+
+//Se for diferente de zero então esse shell é interativo.
+//Se for zero ele pode apenas estar executando um script.
+int interactive = 0;
+
+
+/* The name of this shell, as taken from argv[2]. */
+char *shell_name;
+
+/*nome do arquivo de configuração*/
+char *shell_config_file = "./shellcnf.txt";
+
 
 int shellStatus;
 int shellError;
@@ -235,8 +252,74 @@ int GramadoMain( int argc,
 
 	
 	int Status = 0;
-	char *s;    //String	
+	//char *s;    //String	
 
+	
+	//
+	// ## ARGS ##
+	//
+	
+	//Ok isso funcionou.
+	//Argumentos passados com sucesso do crt0 para o main.
+	
+	//printf("argc={%d}\n",argc);
+	
+	//printf("arg[0]={%s}\n",argv[0]);
+	//printf("arg[1]={%s}\n",argv[1]);
+	//printf("arg[2]={%s}\n",argv[2]);
+	
+	//
+	// Filtra a quantidade de argumentos.
+	//
+	
+	//goto noArgs; 
+	
+	//Não usar verbose nessa fase de tratar os argumentos
+	//pois a janela ainda não foi inicializada.
+	
+	// Se não há argumentos.
+	if(argc < 1)
+	{
+		//printf("No args !\n");
+		//#Test.
+        //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
+		die("No args!");
+		
+		goto noArgs; 
+	}else{
+		
+		//argv[0] = Tipo de shell: interativo ou não
+		//argv[1] = Tipo de uso: login ... outros ?? 
+		
+		//printf("Testing args ...\n");
+		
+	    if( strncmp( (char *) argv[0], "-interactive", 12 ) == 0 )
+	    {
+			interactive = 1;
+            
+            //printf("Initializing an interactive shell ...\n");
+            //printf("arg[0]={%s}\n",argv[0]);			
+        };		
+		
+	    if( strncmp( (char *) argv[1], "-login", 2 ) == 6 )
+	    {
+			login_shell = 1;
+			
+			//printf("Initializing login ...\n");
+            //printf("arg[1]={%s}\n",argv[1]);    
+        };	
+		
+		//Nome passado viar argumento.
+		//shell_name = (char*) argv[2];
+
+        //...		
+	};
+	
+	//Nothing.
+	
+noArgs:		
+	
+	
 	//...
 	
 	//@todo:
@@ -262,55 +345,6 @@ int GramadoMain( int argc,
 	
 	shellShell(); 	
 	
- 
-    
-	//
-	// ## ARGS ##
-	//
-	
-	//Ok isso funcionou.
-	//Argumentos passados com sucesso do crt0 para o main.
-	
-	//printf("argc={%d}\n",argc);
-	
-	//printf("arg[0]={%s}\n",argv[0]);
-	//printf("arg[1]={%s}\n",argv[1]);
-	//printf("arg[2]={%s}\n",argv[2]);
-	
-	//
-	// Filtra a quantidade de argumentos.
-	//
-	
-	//goto noArgs; 
-	
-	// Se não há argumentos.
-	if(argc < 1)
-	{
-		printf("No args !\n");
-		//#Test.
-        //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
-	    goto noArgs; 
-	}else{
-		
-		printf("Testing args ...\n");
-		
-	    if( strncmp( (char *) argv[0], "-a", 2 ) == 0 )
-	    {
-            printf("arg[0]={%s}\n",argv[0]);    
-        };		
-		
-	    if( strncmp( (char *) argv[1], "-b", 2 ) == 0 )
-	    {
-            printf("arg[1]={%s}\n",argv[1]);    
-        };			
-		
-	};
-	
-	//Nothing.
-	
-noArgs:	
-	
-
 	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
@@ -465,13 +499,9 @@ noArgs:
 	// Funcionou setar o foco, e a mensagem foi para a janela certa.
 	//
 	
-    //Registrar.
-    APIRegisterWindow(hWindow);
-	
-    //Configurar como ativa.
-    APISetActiveWindow(hWindow);
-	
-    //Setar foco.
+    // Registrar.
+	// Configurar como ativa.
+    // Setar foco.
 	// *IMPORTANTE: 
 	// É FUNDAMENTAL SETAR O FOCO, POIS O KERNEL DEPENDE DELE
 	// PARA RETORNAR A MENSAGEM DA JANELA COM O FOCO DE ENTRADA.
@@ -480,16 +510,15 @@ noArgs:
 	// @todo: O kernel deve reiniciar as variáveis de cursor 
 	// dentro da janela também, pois cada janela tem uma configuração 
 	// diferente de cursor.
-    APISetFocus(hWindow);
-	
-	
-
 	//
 	// ?? Show Window !!
 	// Precisamos mostrar a janela e não repintar 
 	// a tela toda.
 	//
 	
+    APIRegisterWindow(hWindow);
+    APISetActiveWindow(hWindow);	
+    APISetFocus(hWindow);	
 	refresh_screen();
 	
 	//#bugbug
@@ -519,38 +548,36 @@ noArgs:
 	// @todo: Apenas registrar o procedimento dessa janela na sua estrutura no kernel..
     // 
 	
-	
 	//
     // ...		
 	//
-	
 	
 	//
 	// Init Shell:
 	//     Inicializa variáveis, buffers e estruturas. Atualiza a tela.
 	//
 	
-	
-	
-	enterCriticalSection();    // * Enter Critical Section.	
+	enterCriticalSection();    	
 	Status = (int) shellInit(hWindow); 
-	if(Status != 0)
-	{
-		printf("[SHELL.BIN]: app_main: shellInit fail!");
-		refresh_screen();
-		while(1){};
-		//exit(0);
+	if(Status != 0){
+		die("[SHELL.BIN]: app_main: shellInit fail!");
 	};
-	exitCriticalSection();     // * Exit Critical section.		
+	exitCriticalSection();     		
 	
-	
-	
-	
-    	
-	
+
 	
 	//
-	// Messages.
+	//#importante:
+	//Agora é a hora de pegar mensagens de input de teclado.
+	//Mas se o shell não for interativo, então não pegaremos 
+	//mensagens de input de teclado.
+	//
+	
+	if( interactive != 1 ){
+        goto skip_input;
+	};
+	//
+	// ## Messages ##
 	//
 	
 
@@ -669,6 +696,9 @@ noArgs:
 	void *msg_Long2;
 	
 	//struct shell_message_d *msg;
+	
+	
+	
 
         //
 		// Get Message: 
@@ -791,6 +821,34 @@ noArgs:
 		
 		//Nothing.
 	};
+	
+	
+	
+	
+	//
+	// Pulamos a parte que pega mensgens de input de teclado 
+	// porque esse shell não está configurado como interativo.
+	//
+	
+skip_input:	
+
+    //
+	// Aqui temos que carregar o arquivo de scripi indicado 
+	// nos argumentos.
+	//
+	
+	printf("Initializing script ...\n");
+    printf("CurrentFile={%s}\n",argv[3]);
+
+    FILE *script_file;	
+
+    script_file = fopen(argv[3],"rw");
+	
+	if( (void*) script_file == NULL )
+	{
+		printf("skip_input: Can't open script file!\n");
+		die("*");
+	}
 	
 	
 	//
@@ -2744,24 +2802,27 @@ int shellInit( struct window_d *window )
 	
 	
 done:
-    //
-	// Testing welcome message.
-	//
+    
+	// Se o shell não for interativo não tem login.
+	if(interactive == 1)
+	{
+		// Testing welcome message.
+	    printf("...\n");
+	    printf("Welcome to Gramado Operating System.\n");
+	    printf("\n");
 	
-	printf("...\n");
-	printf("Welcome to Gramado Operating System.\n");
-	printf("\n");
+	    char sUsername[11];
+	    char sPassword[11];
+		
+	    printf("username:\n");
+	    gets(sUsername);
+		
+	    printf("password:\n");
+	    gets(sPassword);
 	
-	char sUsername[11];
-	char sPassword[11];
-		
-	printf("username:\n");
-	gets(sUsername);
-		
-	printf("password:\n");
-	gets(sPassword);
-		
-	printf("username={%s} password={%s}",sUsername,sPassword);
+        //@todo colocar o ponteiro na variável no início do arquivo.	
+	    printf("username={%s} password={%s}",sUsername,sPassword);
+   };
 	
 	
 	//
@@ -2804,9 +2865,13 @@ done:
 	//
 	*/
 	
-	shellPrompt();
-    refresh_screen();
 	
+	if( interactive == 1 ){
+	    shellPrompt();
+	}
+	
+	
+    refresh_screen();
     return (int) 0;
 };
 
@@ -4099,4 +4164,20 @@ void error( char *msg, char *arg1, char *arg2 )
     //fprintf(stderr, "cc: ");
     fprintf(stderr,"%s %s %s", msg, arg1, arg2);
     fprintf(stderr, "\n");
+};
+
+
+
+void 
+reader_loop()
+{
+	while( !EOF_Reached )
+	{
+		//...
+		
+		
+		
+		
+	};
+	
 };

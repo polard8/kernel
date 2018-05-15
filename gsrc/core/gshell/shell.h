@@ -27,7 +27,7 @@
 //...
 
 
-
+int EOF_Reached;
 
 //
 // SCREEN SUPPORT

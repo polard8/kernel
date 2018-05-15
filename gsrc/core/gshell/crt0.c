@@ -16,11 +16,18 @@ extern int GramadoMain( int argc,
 				        unsigned long long2 );
 
 
-static char *argv[] = { "-a", "-b", NULL };
+static char *argv[] = { 
+    "-interactive",        //shell interativo
+	"-login",              //login
+	"Gramado Core Shell",  //nome do shell
+	"test.sh",             //nome do arquivo de script.
+	NULL 
+};
+
 static char *envp[] = { 
-    "VFSROOT=root:/volume0",
-    "BOOTVOLUMEROOT=root:/volume1",
-    "SYSTEMVOLUMEROOT=root:/volume2", 
+    "VFSROOT=root:/volume0",         //root dir do vfs
+    "BOOTVOLUMEROOT=root:/volume1",  //root dir do volume de boot
+    "SYSTEMVOLUMEROOT=root:/volume2", //root dir do volume do sistema
 	NULL 
 };
 
@@ -42,7 +49,7 @@ void crt0()
 	
 	app_response = (int) GramadoMain( 3,     // Quantidade de argumentos.
 	                                  argv,  // Vetor de argumentos.
-									  0,     // Long1
+									  0,     // Long1 
 									  0 );   // Long2
 	
 	//
