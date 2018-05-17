@@ -82,6 +82,10 @@ int executive_gramado_core_init_execve( int i,              //serviço
 	//printf("0=%s ",&argv[0]);
     //printf("1=%s ",&argv[1]);
     
+
+	//...
+	
+	
 	//## teste
 	//
 	//if( ! strcmp( (char*)argv[0], "-f" ) ) 
@@ -110,6 +114,47 @@ int executive_gramado_core_init_execve( int i,              //serviço
 	printf(">>>fileneme={%s}\n",arg1);
 	printf(">>>arg={%s}\n",arg2);
 	printf(">>>env={%s}\n\n",arg3);
+	
+	
+	//origem.
+	unsigned char *src = (unsigned char *) arg2; 
+
+	//destino
+	unsigned char *pipe = (unsigned char *) pipe_gramadocore_init_execve->_base; 
+	
+    
+	//?? funcionou ??
+	//pois o base era um char*
+	//memória compartilhada entre o kernel e o aplicativo.
+	//o aplicativo vai ler esse trem
+	//unsigned char* shared_memory = (unsigned char*) (0x401000-0x100); 
+	unsigned char* shared_memory = (unsigned char*) (0xC0800000 -0x100);
+
+    //#IMPORTANTE:
+    //PRECISAMOS ENVIAR A MENSAGEM SOMENTE DEPOIS QUE 
+    //O NOVO APLICATIVO FOR COLOCADO NA MEMÓRIA
+    //SENÃO AO COLOCAR O APLICATIVO NA MEMÓRIA A MENSAGEM 
+    //SERÁ SOBRESCRITA.	
+
+	
+	
+	//
+	// ENVIADNO A MENSAGEM
+	//
+	
+	
+	for( i=0; i<512; i++ )
+	{
+        pipe[i] = src[i];
+		shared_memory[i] = src[i];
+	};
+	
+ 
+	
+	//ok. isso funcionou.
+	printf("Showpipe={%s}\n",pipe);
+	printf("Showsharedmemory={%s}\n",shared_memory);	 
+	
 	
 	//
 	// Pegar o ponteiro da thread primária do processo 
@@ -242,6 +287,15 @@ int executive_gramado_core_init_execve( int i,              //serviço
 fail:
     printf("fail ");
 done:
+	
+	//refresh_screen();
+	//while(1){
+	//	asm("hlt");
+	//}
+	//	
+
+
+
     printf("done\n");	
 	refresh_screen();
 	return (int) Status;	

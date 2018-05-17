@@ -816,6 +816,11 @@ int fsInit()
 	vfsInit();
 	
 	
+	//Agora inicialzamos as stream 4 e 5.
+	//As anteriores foram inicializadas em stdio,
+	//pois são o fluxo padrão.
+	
+	
     //  ## volume 1 root dir  ##
 	
 	//foi definido em stdio.h
@@ -824,7 +829,7 @@ int fsInit()
 	volume1_rootdir = (FILE *) malloc( sizeof(FILE) );
 	
 	volume1_rootdir->_base = (char*) VOLUME1_ROOTDIR_ADDRESS;
-	volume1_rootdir->_ptr = stdin->_base;
+	volume1_rootdir->_ptr = (char*) VOLUME1_ROOTDIR_ADDRESS;
 	volume1_rootdir->_cnt = (32 * 512) ;
 	volume1_rootdir->_file = 0; //?
 	volume1_rootdir->_tmpfname = "volume1-stream";
@@ -841,12 +846,36 @@ int fsInit()
 	volume2_rootdir = (FILE *) malloc( sizeof(FILE) );
 	
 	volume2_rootdir->_base = (char*) VOLUME2_ROOTDIR_ADDRESS;
-	volume2_rootdir->_ptr = stdin->_base;
+	volume2_rootdir->_ptr = (char*) VOLUME2_ROOTDIR_ADDRESS;
 	volume2_rootdir->_cnt = (32 * 512) ;
 	volume2_rootdir->_file = 0; //?
 	volume2_rootdir->_tmpfname = "volume2-stream";
 	
 	Streams[5] = (unsigned long) volume2_rootdir;
+	
+	
+	
+	//
+	// ## Inicializando os pipes usados em execve ## 
+	//
+	
+	//gramado core init execve 
+	
+	//aloca memória para a estrutura.
+	pipe_gramadocore_init_execve = (FILE *) malloc( sizeof(FILE) );
+	
+	
+	//aloca memória para o buffer.
+	unsigned long pipe0base = (unsigned long) malloc(512);
+	
+	pipe_gramadocore_init_execve->_base = (char*) pipe0base;
+	pipe_gramadocore_init_execve->_ptr  = (char*) pipe0base;
+	pipe_gramadocore_init_execve->_cnt  = 512;
+	pipe_gramadocore_init_execve->_file = 0; //??
+	pipe_gramadocore_init_execve->_tmpfname = "pipe0";
+	
+	//0
+	Pipes[0] = (unsigned long) pipe_gramadocore_init_execve;	
 	
 	//
 	// ## PWD ##

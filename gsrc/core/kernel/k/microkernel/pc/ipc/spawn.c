@@ -57,7 +57,7 @@ done:
  *     Execute a  thread for the first time.
  *     The thread needs to be in the state 'INITIALIZED'.
  *     @todo: Mudar para spawnThread(int tid).
- */
+ */ 
 //void spawnThread(int tid)  
 void spawn_task(int id)
 {
@@ -184,7 +184,22 @@ threadSetUp:
                  " mov %ax, %es \n"
                  " mov %ax, %fs \n"
                  " mov %ax, %gs \n");
+				 
+				 
+	
+    //unsigned long argc = 1234;	
+	//#test
+    //Tentando enviar linha de comando para crt0 ou main() do aplicativo.	
+	//#importante: O aplicativo não pode ler uma string que esteja escrito 
+	//em kernel mode, então não adianta passar o ponteiro.
+	
+	//asm("pushl %0" :: "r" ((unsigned long) ? ) : "%esp");			 
+	//asm("pushl %0" :: "r" ((unsigned long) argc ) : "%esp");  //argc 	
 
+	//argc 
+	//Ok. isso funcionou ... main no aplicativo recebeu argc do crt0.
+	asm( " mov $0x1234, %ebx \n" );
+	  
 	//Pilha para iret.
     asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->ss)     : "%esp");    //ss.
     asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->esp)    : "%esp");    //esp.

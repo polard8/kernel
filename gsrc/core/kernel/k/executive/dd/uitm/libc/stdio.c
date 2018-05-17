@@ -1391,6 +1391,7 @@ void stdioInitialize()
 	Streams[1] = (unsigned long) stdout;
 	Streams[2] = (unsigned long) stderr;
 	
+	//Os próximos são inicializados em fs.c
 	//Streams[3] volume0 root dir (vfs) 
 	//Streams[4] volume1 root dir (boot volume)
     //Streams[5] volume2 root dir  (system volume)	 
@@ -1401,7 +1402,7 @@ void stdioInitialize()
     //	
 	  
 	stdin->_base = &prompt[0];
-	stdin->_ptr = stdin->_base;
+	stdin->_ptr =  &prompt[0];
 	stdin->_cnt = PROMPT_MAX_DEFAULT;
 	stdin->_file = 0;
 	stdin->_tmpfname = "kernel-stdin";
@@ -1412,7 +1413,7 @@ void stdioInitialize()
     //	
 	
 	stdout->_base = &prompt_out[0];
-	stdout->_ptr = stdout->_base;
+	stdout->_ptr = &prompt_out[0];
 	stdout->_cnt = PROMPT_MAX_DEFAULT;
 	stdout->_file = 1;
 	stdout->_tmpfname = "kernel-stdout";
@@ -1423,7 +1424,7 @@ void stdioInitialize()
     //	
 	
 	stderr->_base = &prompt_err[0];
-	stderr->_ptr = stderr->_base;
+	stderr->_ptr =  &prompt_err[0];
 	stderr->_cnt = PROMPT_MAX_DEFAULT;
 	stderr->_file = 2;
 	stderr->_tmpfname = "kernel-stderr";	

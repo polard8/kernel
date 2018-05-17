@@ -522,6 +522,25 @@ FILE *file_pwd;         //23 - Diretório de trabalho. Diretório usado no comando
 //Array de ponteiros de estrutura. 
 unsigned long Streams[NUMBER_OF_FILES]; 
 
+//
+// Pipes support
+//
+
+// 0
+//Pipe para a rotina execve particular 
+//usada no no init do ambiente Gramado Core.
+FILE *pipe_gramadocore_init_execve;
+
+// 1
+//Pipe usado pela rotina execve.
+FILE *pipe_execve;
+
+//Continua ...
+
+#define NUMBER_OF_PIPES 8
+unsigned long Pipes[NUMBER_OF_PIPES];
+
+
 
 /*
  * Diretórios onde a pesquisa deve ser feita.

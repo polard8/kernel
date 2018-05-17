@@ -914,7 +914,13 @@ void *services( unsigned long number,
 		// 167
         // SYS_GRAMADOCORE_INIT_EXECVE
         // executa um novo programa dentro do processo INIT 
-		// do ambiente Gramado Core.		
+		// do ambiente Gramado Core.	
+        //
+        // #importante:
+        // os argumentos recebidos aqui precisam ir para ipc/spawn.c 
+        // que serão enviados via registradores para o aplicativo.
+        // Obs: Não adianta enviar ponteiros para o aplicativo, 
+        // pois ele não pode pegar no kernel.		
 		case 167:
 		    // Testar
 			//executive.c
