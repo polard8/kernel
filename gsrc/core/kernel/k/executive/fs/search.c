@@ -18,7 +18,7 @@
  **********************************************************************
  * KiSearchFile:
  *    Procura por um arquivo, dado o endereço do diretório.
- *    Com o diretório raiz já carregado na memória.
+ *    Com o diretório já carregado na memória.
  *
  *   file_name: Nome do arquivo.
  *     address: Endereço na memória onde o diretório está.

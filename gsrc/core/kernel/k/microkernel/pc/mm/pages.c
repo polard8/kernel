@@ -1754,16 +1754,19 @@ fail:
 };
 
 
-
-//#importante:
-//teste de memória é sempre importante.
-//@todo: Rotina de teste.  
+/*
+ * testingFrameAlloc:
+ *
+ * //#importante:
+ * //teste de memória é sempre importante.
+ * //@todo: Rotina de teste. 
+ */ 
 void testingFrameAlloc()
 {	
 	int Index;
     struct page_frame_d *pf;
-	struct page_frame_d *Ret; //#bugbug @todo: aqui deveria ser void*.
-	//void *Ret;
+	void *RetAddress;
+	unsigned long fileret;
 	
 	//#bugbug .;;;: mais que 100 dá erro ...
 	//@todo: melhorar o código de alocação de páginas.
@@ -1774,18 +1777,20 @@ void testingFrameAlloc()
 	// =============================================
 	//
 	
- 					  
+	// #test:
+	// Funcionou com 500.
+    //Ret = (void*) allocPageFrames(500);  
 	
-    //Ret = (void*) allocPageFrames(500);  // Funcionou com 500.
-	Ret = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
-	if( (void*) Ret == NULL )
+	//8KB. Para imagem pequena.
+	RetAddress = (void*) allocPageFrames(2);      
+	if( (void*) RetAddress == NULL )
 	{
-	    printf("Ret fail\n");
+	    printf("RetAddress fail\n");
         goto fail;		
 	}
 	
 	printf("\n");
-	printf("BaseOfList={%x} Showing #32 \n",Ret);
+	printf("BaseOfList={%x} Showing #32 \n",RetAddress);
     
 	for( Index=0; Index < 32; Index++ )   	
 	{  
@@ -1813,29 +1818,25 @@ void testingFrameAlloc()
 	//			  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
 	
 	
-	unsigned long fileret;
-		
-	//taskswitch_lock();
-	//scheduler_lock();
+	
 	//fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
 	//fileret = fsLoadFile( "FERRIS  BMP", (unsigned long) Ret);
 	//fileret = fsLoadFile( "GOONIES BMP", (unsigned long) Ret);
 	//fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
-	fileret = fsLoadFile( "BMP1    BMP", (unsigned long) Ret);  //LEVE PARA TESTES
+	fileret = fsLoadFile( "BMP1    BMP", (unsigned long) RetAddress);  
 	if(fileret != 0)
 	{
+		printf("BMP1    BMP FAIL\n");
 		//escrevendo string na janela
 	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
-		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
+		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
 	};
 	
 	
-	bmpDisplayBMP( Ret, 20, 20, 0, 0 );
-	//scheduler_unlock();
-	//taskswitch_unlock();
+	bmpDisplayBMP( (char*) RetAddress, 20, 20);
 
     //===================================							
     
@@ -1861,8 +1862,7 @@ void testingFrameAlloc()
 	//move_back_to_front(rc);
 	
 	printf("pc-mm-testingFrameAlloc: debug hang\n");
-	refresh_screen();
-	while(1){}
+    die();
 	
 done:
   // Nothing for now.	

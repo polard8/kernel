@@ -44,8 +44,21 @@ struct bmp_infoheader_d
  
  
 
-//mostra na tela uma imagem bmp carregada na memória. 
-void bmpDisplayBMP( void *address, unsigned long x, unsigned long y, int width, int height );
+/*
+ ********************************************************
+ * bmpDisplayBMP:
+ *
+ * Mostra na tela uma imagem bmp carregada na memória.
+ * 
+ * IN:
+ *     address = endereço base
+ *     x       = posicionamento 
+ *     y       = posicionamento
+ *
+ */
+void bmpDisplayBMP( char *address, 
+                    unsigned long x, 
+					unsigned long y );
 
 void load_bitmap_16x16( unsigned long ax, 
                         unsigned long bx, 

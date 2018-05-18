@@ -292,7 +292,7 @@
 #define	SYS_GETCURRENTVOLUMEID 171  // Get current volume id.
 #define	SYS_SETCURRENTVOLUMEID 172  // configura o id do volume atual.
 #define	SYS_LISTFILES          173  // Listar os arquivos do diretório atual.
-#define	SYS_174 174
+#define	SYS_SEARCHFILE         174  // Procurar arquivo. 
 #define	SYS_175 175
 #define	SYS_176 176
 #define	SYS_177 177

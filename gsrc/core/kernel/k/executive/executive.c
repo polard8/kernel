@@ -255,7 +255,6 @@ int executive_gramado_core_init_execve( int i,              //serviço
 		//#importante: Isso precisa ser nesse momento e não antes,
 		//pois pode corromper o espaço destinado aos argumentos 
 		//dentro do vetor ao acrescentar zeros.
-		//executive_fntos( (char *) arg1);
 		read_fntos( (char *) arg1);
 		
 		//fs/read.c

@@ -331,14 +331,15 @@ void *services( unsigned long number,
 			break;
 			
 		//6
+		//Put pixel. 
         //Coloca um pixel no backbuffer.
-        //Isso pode ser usado por um driver. 		
+        //Isso pode ser usado por um driver. 
+        //cor,x,y,0		
         case SYS_BUFFER_PUTPIXEL:
-		    //cor,x,y,0
             my_buffer_put_pixel( (unsigned long) a2, 
 			                     (unsigned long) a3, 
 								 (unsigned long) a4, 
-								  0 );    //Put pixel. 		
+								  0 );   		
 			break;
 
 		//7
@@ -969,6 +970,12 @@ void *services( unsigned long number,
             fsListFiles( arg2,   //disk id 
 			             arg3,   //volume id
 						 arg4);  //directory id
+			break;
+			
+		//174
+		case SYS_SEARCHFILE:
+		    return (void*) KiSearchFile( (unsigned char *) arg2, 
+                                         (unsigned long) arg3 );
 			break;
 
 		//184

@@ -1469,14 +1469,14 @@ done:
 	// e apresentando pela primeira vez.
 	//
 	
-	/*
+	
     mouse_ret = (int) load_mouse_bmp();	
 	if(mouse_ret != 0)
 	{
 		printf("ldisc-init_mouse: load_mouse_bmp");
 		die();
 	}
-	*/
+	
 	
 	
 #ifdef KERNEL_VERBOSE		
@@ -2027,44 +2027,37 @@ done:
 
 
 /*
+ **********************************************************
  * load_mouse_bmp:
  *     Carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
  *     Usar isso na inicialização do mouse.
  */
 int load_mouse_bmp()
 {
-	//printf("testingFrameAlloc:\n suspended!");
-	//return;
-
-	
+	int Status = 1;
 	int Index;
     struct page_frame_d *pf;
-	//struct page_frame_d *Ret; //#bugbug @todo: aqui deveria ser void*.
-	
-	//virou global
-	//void *mouseBMPBuffer;
-	
-	//#bugbug .;;;: mais que 100 dá erro ...
-	//@todo: melhorar o código de alocação de páginas.
-	//printf("testingFrameAlloc: #100\n");
+	unsigned long fileret;
 	
 #ifdef KERNEL_VERBOSE
 	printf("load_mouse_bmp:\n");
 #endif	
 	
-	//
-	// =============================================
-	//
+	// #Importante
+	// Fizemos um teste e funcionou com 500 páginas.
+	// Foi suficiente para testarmos um pano de fundo.
+	// Ret = (void*) allocPageFrames(500);  
 	
- 					  
-	
-    //Ret = (void*) allocPageFrames(500);  // Funcionou com 500.
-	mouseBMPBuffer = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
-	if( (void*) mouseBMPBuffer == NULL ){
+    // Alocando duas páginas para um BMP pequeno. 8KB.	
+	mouseBMPBuffer = (void*) allocPageFrames(2);      
+	if( (void*) mouseBMPBuffer == NULL )
+	{
 	    printf("unblocked-ldisc-load_mouse_bmp: mouseBMPBuffer\n");
-        goto done;		
-	}
+		goto fail;		
+	};
 	
+	
+	// #debug
 	//printf("\n");
 	//printf("BaseOfList={%x} Showing #32 \n",mouseBMPBuffer);
     //for(Index = 0; Index < 32; Index++)   	
@@ -2079,72 +2072,45 @@ int load_mouse_bmp()
 	//	}
 	//}
 	
-	
-    //===================================
-	// @todo: Carregar a estrelinha e usar como ponteiro de mouse.
 	//
-	//janela de test
-    //CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
-	//              (10-5), (10-5), (376+10), (156+10), 
-	//			  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
+	// ## Loading ...  ##
+	//
 	
+	//read_fntos( (char *) arg1);
 	
-	unsigned long fileret;
-		
-	//taskswitch_lock();
-	//scheduler_lock();
-	//fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
-	//fileret = fsLoadFile( "FERRIS  BMP", (unsigned long) Ret);
-	//fileret = fsLoadFile( "GOONIES BMP", (unsigned long) Ret);
-	//fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
-	fileret = fsLoadFile( "MOUSE   BMP", (unsigned long) mouseBMPBuffer);  //LEVE PARA TESTES
-	if(fileret != 0)
+	fileret = (unsigned long) fsLoadFile( "MOUSE   BMP", 
+	                              (unsigned long) mouseBMPBuffer );
+								  
+	if( fileret != 0 )
 	{
-		//escrevendo string na janela
-	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
-        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
-        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
-		draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
-		return 1;	
-	}
+		printf("MOUSE.BMP FAIL\n");		
+		// Escrevendo string na janela.
+		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
+		goto fail;	
+	};
 	
-	
-	bmpDisplayBMP( mouseBMPBuffer, 20, 20, 0, 0 );
-	//scheduler_unlock();
-	//taskswitch_unlock();
+	// Render BMP file on backbuffer.
+	bmpDisplayBMP( mouseBMPBuffer, 20, 20 );
 
     //===================================							
-    
 	
-	//
-	// *importante:
-	//  O REFRESH RECT SÓ FUNCIONA DAS DIMENSÕES NÃO O POSICIONAMENTO.
-	//
-	
+refresh_rectangle:
+
 	//Isso funcionou ...
 	refresh_rectangle( 20, 20, 16, 16 );
+	Status = (int) 0;
+	goto done;
 	
-	//struct myrect *rc;
-	
-	//rc = (void *) malloc( sizeof( struct myrect ) );
-	//if(
-	
-	//rc->left   = 40 ;
-	//rc->right  = 80;
-	//rc->top    = 40 ;
-	//rc->bottom = 80;
-	
-	//move_back_to_front(rc);
-	//while(1){}
-	
+fail:
+    printf("fail\n");
+    Status = (int) 1;		
 done:
 
 #ifdef KERNEL_VERBOSE
     printf("done\n");
 #endif	
 	//refresh_screen();
-    return 0;	
+    return (int) Status;	
 };
 
 
