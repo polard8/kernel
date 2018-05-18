@@ -439,9 +439,9 @@ void *services( unsigned long number,
             break;    
         
 	
+	    // ## CANCELADA! ##
         //42 Load bitmap 16x16.
 		case SYS_LOADBMP16X16 :       
-            load_bitmap_16x16( arg2, arg3, arg4, 0);
             return NULL;			
             break;
 

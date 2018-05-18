@@ -59,19 +59,14 @@ struct bmp_infoheader_d
 void bmpDisplayBMP( char *address, 
                     unsigned long x, 
 					unsigned long y );
-
-void load_bitmap_16x16( unsigned long ax, 
-                        unsigned long bx, 
-						unsigned long cx, 
-						unsigned long dx );
+					
+					
+	
 						
-void carrega_bitmap_16x16( unsigned long ax, 
-                           unsigned long bx, 
-						   unsigned long cx, 
-						   unsigned long dx );
+ 
 						   
 //
-//fim.
+// End.
 //
 
 
