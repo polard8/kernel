@@ -32,42 +32,45 @@ enum vga_color {
 */ 
  
 /* 
-#define COLOR_BLACK 0
-#define COLOR_BLUE 1
-#define COLOR_GREEN 2
-#define COLOR_CYAN 3
-#define COLOR_RED 4
-#define COLOR_MAGENTA 5
-#define COLOR_BROWN 6
-#define COLOR_LIGHT_GREY 7
+#define COLOR_BLACK 
+#define COLOR_BLUE 
+#define COLOR_GREEN 
+#define COLOR_CYAN 
+#define COLOR_RED 
+#define COLOR_MAGENTA 
+#define COLOR_BROWN 
+#define COLOR_LIGHT_GREY 
 
-#define COLOR_DARK_GREY 8
-#define COLOR_LIGHT_BLUE 9
-#define COLOR_LIGHT_GREEN 10
-#define COLOR_LIGHT_CYAN 11
-#define COLOR_LIGHT_RED 12
-#define COLOR_LIGHT_MAGENTA 13
-#define COLOR_LIGHT_BROWN 14
-#define COLOR_WHITE 15
+#define COLOR_DARK_GREY 
+#define COLOR_LIGHT_BLUE 
+#define COLOR_LIGHT_GREEN 
+#define COLOR_LIGHT_CYAN 
+#define COLOR_LIGHT_RED 
+#define COLOR_LIGHT_MAGENTA 
+#define COLOR_LIGHT_BROWN 
+#define COLOR_WHITE 
 */ 
+
 static unsigned long cga_16colors_palette[16] = {
-	0x00000000, // black 0
-	0x0000AA00, // blue  1
-	0x00AA0000, // green 2
-	0x00AAAA00, // cyan  3
-	0xAA000000, // red   4
-	0xAA00AA00, // magenta 5
-	0xAA550000, // brown 6
-	0xAAAAAA00, // light gray 7
 	
-	0x55555500, // gray 8
-	0x5555FF00, // light blue 9
-	0x55FF5500, // light green a
-	0x55FFFF00, // light cyan b
-	0xFF555500, // light red  c
-	0xFF55FF00, // light magenta d
-	0xFFFF5500, // yellow e
-	0xFFFFFF00  // white f
+	//Paleta do paint para 4bpp
+	0x00000000, // 
+	0x80000000, // 
+	0x00800000, // 
+	0x80800000, // 
+	0x00008000, // 
+	0x80008000, // 
+	0x00808000, // 
+	0x80808000, // 
+	
+	0xC0C0C000, // 
+	0xFF000000, // 
+	0x00FF0000, // 
+	0xFFFF0000, // 
+	0x0000FF00, // 
+	0xFF00FF00, // 
+	0x00FFFF00, // 
+	0xFFFFFF00  // 
 };
 
 
@@ -435,9 +438,9 @@ struct bmp_infoheader_d
  *     y       = posicionamento
  *
  */
-void bmpDisplayBMP( char *address, 
-                    unsigned long x, 
-					unsigned long y );
+int bmpDisplayBMP( char *address, 
+                   unsigned long x, 
+				   unsigned long y );
 					
 					
 	

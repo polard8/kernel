@@ -2049,7 +2049,8 @@ int load_mouse_bmp()
 	// Ret = (void*) allocPageFrames(500);  
 	
     // Alocando duas páginas para um BMP pequeno. 8KB.	
-	mouseBMPBuffer = (void*) allocPageFrames(2);      
+	//mouseBMPBuffer = (void*) allocPageFrames(2);
+	mouseBMPBuffer = (void*) allocPageFrames(10);
 	if( (void*) mouseBMPBuffer == NULL )
 	{
 	    printf("unblocked-ldisc-load_mouse_bmp: mouseBMPBuffer\n");
@@ -2078,6 +2079,9 @@ int load_mouse_bmp()
 	
 	//read_fntos( (char *) arg1);
 	
+	
+	//===================================
+	// MOUSE
 	fileret = (unsigned long) fsLoadFile( "MOUSE   BMP", 
 	                              (unsigned long) mouseBMPBuffer );
 								  
@@ -2091,13 +2095,33 @@ int load_mouse_bmp()
 	
 	// Render BMP file on backbuffer.
 	bmpDisplayBMP( mouseBMPBuffer, 20, 20 );
-
+	refresh_rectangle( 20, 20, 16, 16 );	
     //===================================							
+	
+	
+	//===================================
+	//DENNIS
+	fileret = (unsigned long) fsLoadFile( "DENNIS  BMP", 
+	                              (unsigned long) mouseBMPBuffer );
+								  
+	if( fileret != 0 )
+	{
+		printf("DENNIS  BMP FAIL\n");		
+		// Escrevendo string na janela.
+		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
+		goto fail;	
+	};
+	
+	// Render BMP file on backbuffer.
+	bmpDisplayBMP( mouseBMPBuffer, 20, 40 );	
+	refresh_rectangle( 20, 40, 300, 300 );
+	//===================================
+	
 	
 refresh_rectangle:
 
 	//Isso funcionou ...
-	refresh_rectangle( 20, 20, 16, 16 );
+	//refresh_rectangle( 20, 20, 16, 16 );
 	Status = (int) 0;
 	goto done;
 	

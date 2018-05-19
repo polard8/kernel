@@ -21,6 +21,16 @@
 #include <kernel.h>
 
 
+#define Swap2Bytes(val) \
+ ( (((val) >> 8) & 0x00FF) | (((val) << 8) & 0xFF00) )
+
+ 
+
+// Swap 4 byte, 32 bit values:
+#define Swap4Bytes(val) \
+ ( (((val) >> 24) & 0x000000FF) | (((val) >>  8) & 0x0000FF00) | \
+   (((val) <<  8) & 0x00FF0000) | (((val) << 24) & 0xFF000000) )
+
 
 /*
  ********************************************************
@@ -37,9 +47,9 @@
  */
 static int nibble_count_16colors = 0;
  
-void bmpDisplayBMP( char *address, 
-                    unsigned long x, 
-					unsigned long y )
+int bmpDisplayBMP( char *address, 
+                   unsigned long x, 
+				   unsigned long y )
 {
 	int i, j, base, offset;
 	
@@ -58,11 +68,20 @@ void bmpDisplayBMP( char *address,
 	
 	
 	// Endereço base do BMP que foi carregado na memória
-	unsigned char *bmp = (unsigned char *) address;
+	// Endereço do início da paleta de 16 cores.
+	// Endereço do início da paleta de 256 cores.
+	unsigned char *bmp        = (unsigned char *)  address;
+	//unsigned long *palette16  = (unsigned long *) (address + 0x36);
+	//unsigned long *palette256 = (unsigned long *) (address + 0x36);
+	unsigned long *palette    = (unsigned long *) (address + 0x36);		
+	
+	
 	
 	// Variável para salvar rgba.
 	unsigned char *c   = (unsigned char *) &color;	
 	unsigned char *xCh   = (unsigned char *) &color2;	
+	
+	
 	
 	//
 	// Limits
@@ -73,15 +92,10 @@ void bmpDisplayBMP( char *address,
 	
 	
 	//@todo: Refazer isso
-	if( x > xLimit )
-	{ 
-        return; 
-	};
+	if( x > xLimit || y > yLimit ){ 
+        return (int) 1; 
+	}
 	
-	if( y > yLimit )
-	{ 
-        return; 
-	};
 
 	
 	//
@@ -185,7 +199,7 @@ void bmpDisplayBMP( char *address,
 	//bottom = top + height;
 	bottom = (top + bi->bmpHeight );
 
-	
+		
 	
 	// Início da área de dados do BMP.
 	
@@ -247,7 +261,7 @@ void bmpDisplayBMP( char *address,
     //#define COLOR_GREEN 0x00FF0000
     //#define COLOR_BLUE  0x0000FF00
 
-    char palette_index;	
+    char palette_index[2];	
 	
 	for( i=0; i < bi->bmpHeight; i++ )	
 	{
@@ -263,24 +277,25 @@ void bmpDisplayBMP( char *address,
 	        {				
 				offset = base;
 							    
-				palette_index = (char) bmp[offset];
+				palette_index[0] = bmp[offset];
 												
                 //segundo nibble.
 				if( nibble_count_16colors == 2222 )
 				{
-					palette_index = (palette_index & 0x0F);
-                    color = (unsigned long) cga_16colors_palette[palette_index];
-				    nibble_count_16colors = 0;
+					palette_index[0] = ( palette_index[0] & 0x0F); 
+				    color = (unsigned long) cga_16colors_palette[  palette_index[0]  ];
+					//color = (unsigned long) palette[  palette_index[0]  ];
+					nibble_count_16colors = 0;
 					base = base + 1;
 					
 				//primeiro nibble.	
 				}else{
 
-			        palette_index = ( (palette_index >> 4) & 0x0F);
-                    color = (unsigned long) cga_16colors_palette[palette_index];
+			        palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
+					color = (unsigned long) cga_16colors_palette[  palette_index[0] ];
+					//color = (unsigned long) palette[  palette_index[0] ];
 				    nibble_count_16colors = 2222;
 					base = base;
-			
 				}
 	        };	
 
@@ -290,9 +305,9 @@ void bmpDisplayBMP( char *address,
 	        {   
 				offset = base;
 							    
-				palette_index = (char) bmp[offset];
+				palette_index[0] = (char) bmp[offset];
 				
-				color = (unsigned long) vga_256colors_palette[palette_index];
+				color = (unsigned long) vga_256colors_palette[ palette_index[0] ];
 				
 				base = base + 1;     
 	        };			
@@ -372,7 +387,7 @@ void bmpDisplayBMP( char *address,
 	        };
 			
 			
-		
+		    //Swap4Bytes(color);
 			my_buffer_put_pixel( (unsigned long) color, 
 			                     (unsigned long) left, 
 								 (unsigned long) bottom, 
@@ -390,14 +405,22 @@ void bmpDisplayBMP( char *address,
 		left = x;    
 	};	
 	
+	// ## test palette 
+	//int p;
 	
+	//printf("\n");
+	//for( p=0; p<16; ++p )
+	//{
+	//	printf("%x\n",palette[p]);
+	//}
+	//printf("\n");
 	
 fail:	
     //printf("fail");	
 done:	
 	//Debug
-	printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
-	return;
+	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
+	return (int) 0;
 };
 
 
