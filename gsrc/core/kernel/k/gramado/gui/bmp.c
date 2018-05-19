@@ -35,6 +35,8 @@
  *
  *	// @todo: Criar defines para esses deslocamentos.
  */
+static int nibble_count_16colors = 0;
+ 
 void bmpDisplayBMP( char *address, 
                     unsigned long x, 
 					unsigned long y )
@@ -163,6 +165,13 @@ void bmpDisplayBMP( char *address,
 	}
 	
 	
+	// 0 = Nenhuma compressão.
+	if(bi->bmpCompression != 0 )
+	{
+		//fail
+	}
+	
+	
 	//
 	// Draw !
 	//
@@ -176,19 +185,69 @@ void bmpDisplayBMP( char *address,
 	//bottom = top + height;
 	bottom = (top + bi->bmpHeight );
 
+	
+	
 	// Início da área de dados do BMP.
-	base = 0x36; 
+	
+	//#importante:
+	//a base é diferente para os tipos.
+	 
 
+	switch(bi->bmpBitCount)
+    {
+		//case 1:
+		//    base = (0x36 + 0x40);
+		//    break;
+		    
+		//case 2:
+		//    base = (0x36 + 0x40);
+		//    break;
+			
+		case 4:
+		    //4bytes pra cada cor, 16 cores, 64bytes.
+		    base = (0x36 + 0x40);
+		    break; 
+			
+		case 8:
+		    //4bytes pra cada cor, 256 cores, 1024bytes.
+		    base = (0x36 + 0x400);
+		    break; 
+			
+		default:
+		    base = 0x36;
+			break;
+	}	
+	
 
 //1 - 1 bpp (Mono)
 //4 - 4 bpp (Indexed)
-//8 - 8 bpp (Indexed)
+//8 - 8 bpp (Indexed) bbgggrrr
 //16565 - 16 bpp (5:6:5, RGB Hi color)
 //16    - 16 bpp (5:5:5:1, RGB Hi color)
 //160   - 16 bpp (5:5:5:1, RGBA Hi color)
 //24 - 24 bpp (True color)
 //32 - 32 bpp (True color, RGB)
 //320 - 32 bpp (True color, RGBA)	
+
+
+    //
+	// ## ABGR8888 ##
+	// Little-endian
+	// pegando os caracteres
+	//
+	// 0 = A (MSByte)(left byte) 
+	// 1 = B 
+	// 2 = G 
+	// 3 = R
+	//
+	// Output long = 0xRRGGBBAA
+    //	
+	// Exemplo: gramado GUI
+    //#define COLOR_RED   0xFF000000 
+    //#define COLOR_GREEN 0x00FF0000
+    //#define COLOR_BLUE  0x0000FF00
+
+    char palette_index;	
 	
 	for( i=0; i < bi->bmpHeight; i++ )	
 	{
@@ -197,32 +256,45 @@ void bmpDisplayBMP( char *address,
 		
 		for( j=0; j < bi->bmpWidth; j++ )	
 		{	
+	        // 16 cores
 			// Construindo o char.
-			
+			// um nibble por índice. @todo
+	        if(bi->bmpBitCount == 4 )
+	        {				
+				offset = base;
+							    
+				palette_index = (char) bmp[offset];
+												
+                //segundo nibble.
+				if( nibble_count_16colors == 2222 )
+				{
+					palette_index = (palette_index & 0x0F);
+                    color = (unsigned long) cga_16colors_palette[palette_index];
+				    nibble_count_16colors = 0;
+					base = base + 1;
+					
+				//primeiro nibble.	
+				}else{
 
+			        palette_index = ( (palette_index >> 4) & 0x0F);
+                    color = (unsigned long) cga_16colors_palette[palette_index];
+				    nibble_count_16colors = 2222;
+					base = base;
+			
+				}
+	        };	
+
+			// 256 cores
 			// Próximo pixel para 8bpp
 	        if(bi->bmpBitCount == 8 )
-	        {
-			    
+	        {   
 				offset = base;
-			    
-		        //b 1100 0000
-				c[1] = bmp[offset];
-				c[1] = ( c[1] & 0xE0 );
-			    
-				//g 0011 1000
-			    c[2] = bmp[offset];
-				c[2] =  (c[2] & 0x3C) ;
-			
-			    //r 0000 0111
-			    c[3] = bmp[offset];
-				c[3] =  (c[3] & 0x07);
-			
-			    //??
-			    c[0] = 0;
+							    
+				palette_index = (char) bmp[offset];
 				
-		        
-				base = base + 1;    
+				color = (unsigned long) vga_256colors_palette[palette_index];
+				
+				base = base + 1;     
 	        };			
 			
 			// Próximo pixel para 16bpp
@@ -230,9 +302,13 @@ void bmpDisplayBMP( char *address,
 			//testando apenas 4444
 	        if(bi->bmpBitCount == 16 )
 	        {
-			
-			    //b
 				offset = base;
+				
+				
+				//A
+			    c[0] = 0;	
+
+			    //b				
 			    c[1] = bmp[offset];
 			    c[1] =  (c[1] & 0xF8);  // 1111 1000  
 				
@@ -245,10 +321,7 @@ void bmpDisplayBMP( char *address,
 			    //r
 			    offset = base+1;
 			    c[3] = bmp[offset];
-			    c[3] = c[3] & 0xFF;  // 0001 1111 
-				
-			    //??
-			    c[0] = 0;											
+			    c[3] = c[3] & 0xFF;  // 0001 1111 										
 		        
 				base = base + 2;    
 	        };			
@@ -258,7 +331,12 @@ void bmpDisplayBMP( char *address,
 	        {
 			    //
 				offset = base;
-			    c[1] = bmp[offset];
+			    
+				
+				//A
+			    c[0] = 0;					
+				
+				c[1] = bmp[offset];
 			    
 				//
 			    offset = base+1;
@@ -267,9 +345,7 @@ void bmpDisplayBMP( char *address,
 			    //
 			    offset = base+2;
 			    c[3] = bmp[offset];
-			
-			    //??
-			    c[0] = 0;								
+										
 		        base = base + 3;    
 	        };
 			
@@ -277,7 +353,13 @@ void bmpDisplayBMP( char *address,
 			// Próximo pixel para 32bpp
 	        if(bi->bmpBitCount == 32 )
 	        {
-			    offset = base;
+			    
+			    
+				//A
+				//offset = base+3;
+			    c[0] = 0;				
+				
+				offset = base;
 			    c[1] = bmp[offset];
 			
 			    offset = base+1;
@@ -285,9 +367,6 @@ void bmpDisplayBMP( char *address,
 			
 			    offset = base+2;
 			    c[3] = bmp[offset];
-			
-			    offset = base+3;
-			    c[0] = bmp[offset];
 				
 		        base = base + 4;    
 	        };
