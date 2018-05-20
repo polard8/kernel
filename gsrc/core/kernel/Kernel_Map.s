@@ -1721,189 +1721,189 @@ Linker script and memory map
  .text          0xc001b8f0       0x60 vsync.o
                 0xc001b92e                vsync_inb
                 0xc001b8f0                vsync
- .text          0xc001b950      0x3b0 bmp.o
+ .text          0xc001b950      0x3d0 bmp.o
                 0xc001b950                bmpDisplayBMP
- .text          0xc001bd00      0xd30 createw.o
-                0xc001bd00                CreateWindow
- .text          0xc001ca30     0x1d20 window.o
-                0xc001d0f7                windowSendMessage
-                0xc001d6b6                redraw_window
-                0xc001de47                set_active_window
-                0xc001d174                windowGetHandleWindow
-                0xc001dc51                resize_window
-                0xc001e659                get_zorder
-                0xc001d235                windowGetLong2
-                0xc001e380                MinimizeWindow
-                0xc001e3bb                MaximizeWindow
-                0xc001ce59                GetWindowDesktop
-                0xc001e67f                getTopWindow
-                0xc001caa2                windowInitializeBrowserSupport
-                0xc001de3d                get_active_window
-                0xc001dd23                is_window_minimized
-                0xc001dd59                CloseWindow
-                0xc001e1f0                windowGetForegroundWindow
-                0xc001d392                windowUnlock
-                0xc001d3ac                set_current_window
-                0xc001df6a                SetFocus
-                0xc001e4a3                init_windows
-                0xc001ded8                CloseActiveWindow
-                0xc001d0af                windowShowWWFMessageBuffers
-                0xc001d3cc                get_current_window
-                0xc001e6a8                get_top_window
-                0xc001e6bf                closeActiveWindow
-                0xc001d3d6                RegisterWindow
-                0xc001d181                windowGetMessage
-                0xc001e2f8                KillFocus
-                0xc001df5b                windowUnblockFocus
-                0xc001de2a                DestroyWindow
-                0xc001e231                windowSwitchFocus
-                0xc001ce33                GetParentWindow
-                0xc001d242                window_getch
-                0xc001df4c                windowBlockfocus
-                0xc001e1df                GetFocus
-                0xc001db5c                redraw_screen
-                0xc001d200                windowGetLong1
-                0xc001ca68                windowGetMainWindowDescriptor
-                0xc001e453                init_window_manager
-                0xc001dcb7                is_window_full
-                0xc001d378                windowLock
-                0xc001debb                show_window_with_focus
-                0xc001e201                windowSetForegroundWindow
-                0xc001de9e                show_active_window
-                0xc001dc84                replace_window
-                0xc001d303                windowCreateDedicatedBuffer
-                0xc001ca30                windowGetWindowID
-                0xc001ce7f                windowSetUpColorScheme
-                0xc001dced                is_window_maximized
-                0xc001d461                windowShowWindowList
-                0xc001e6e7                z_order_get_free_slot
-                0xc001e6b2                set_top_window
-                0xc001de89                change_active_window
- .text          0xc001e750      0x3e0 desktop.o
-                0xc001e803                init_desktop_list
-                0xc001e91d                set_current_traywindow
-                0xc001e939                set_current_tooltipwindow
-                0xc001e7aa                set_current_desktop
-                0xc001ea0c                init_desktop
-                0xc001e901                set_current_messagewindow
-                0xc001e9d4                set_current_menuHScroll
-                0xc001e82d                CreateDesktop
-                0xc001e8e5                set_current_foreground
-                0xc001e955                change_foreground
-                0xc001e9b8                set_current_dialogsysMenu
-                0xc001e7c2                get_current_desktop
-                0xc001e750                RegisterDesktop
-                0xc001e99c                set_current_sysMenu
-                0xc001e7f9                get_current_desktop_id
-                0xc001e8c9                set_current_menuwindow
-                0xc001e9f0                set_current_menuVScroll
- .text          0xc001eb30      0x1d0 wstation.o
-                0xc001eb30                get_current_windowstation
-                0xc001ec94                init_window_station
-                0xc001ec6a                init_windowstation_list
-                0xc001ec10                RegisterWindowStation
-                0xc001eb74                CreateWindowStation
-                0xc001eb5c                set_current_windowstation
- .text          0xc001ed00      0x230 usession.o
-                0xc001ee9b                init_user_session
-                0xc001ed00                get_current_user_session
-                0xc001ee64                open_user_session
-                0xc001edfd                close_user_session
-                0xc001ed37                CreateUserSession
- .text          0xc001ef30      0xc90 gramado.o
-                0xc001f9b8                guiGetDebugWindow
-                0xc001fa64                guiGetShellWindowWindow
-                0xc001f752                gui_create_navigationbar
-                0xc001f937                guiGetTooltipWindow
-                0xc001f8e1                guiGetMenuWindow
-                0xc001f59f                gui_create_mainwindow
-                0xc001f714                gui_create_messagebox
-                0xc001fb54                init_gui
-                0xc001f962                guiGetMessageboxWindow
-                0xc001f88e                guiGetStatusbarWindow
-                0xc001f816                guiGetDesktopWindow
-                0xc001f6f5                gui_create_infobox
-                0xc001f90c                guiGetInfoboxWindow
-                0xc001f9e3                guiGetMbhWindowWindow
-                0xc001f7c6                guiGetBackgroundWindow
-                0xc001faba                guiSetUpMainWindow
-                0xc001f6f0                gui_create_controlmenu
-                0xc001f79e                guiGetDeveloperScreenWindow
-                0xc001fa8f                guiGetShellClientWindowWindow
-                0xc001fbaf                init_gramado
-                0xc001f866                guiGetMainWindow
-                0xc001f757                gui_create_grid
-                0xc001f22d                SetGuiParameters
-                0xc001f4ab                gui_create_taskbar
-                0xc001f83e                guiGetTaskbarWindow
-                0xc001fbaa                gramado
-                0xc001fa0e                guiGetTopbarWindow
-                0xc001ef30                create_gui
-                0xc001f733                gui_create_debug
-                0xc001fa39                guiGetNavigationbarWindow
-                0xc001f98d                guiGetDialogboxWindow
-                0xc001f776                guiGetScreenWindow
-                0xc001f2d0                gui_create_screen
-                0xc001f8b6                guiGetGridWindow
-                0xc001f7ee                guiGetLogoWindow
-                0xc001f6eb                gui_create_logo
-                0xc001f3b6                gui_create_background
- .text          0xc001fbc0       0x60 object.o
-                0xc001fbc0                init_object_manager
- .text          0xc001fc20      0x2f0 userenv.o
-                0xc001fdc1                SetCurrentGroupId
-                0xc001fded                GetCurrentGroupId
-                0xc001fef6                init_user_environment_manager
-                0xc001fd8b                SetCurrentUserId
-                0xc001fc20                startUserEnvironment
-                0xc001fcc0                CreateUser
-                0xc001fe43                init_user_info
-                0xc001fdb7                GetCurrentUserId
-                0xc001fcb1                config_user
-                0xc001fc52                ShowUserInfo
-                0xc001fdf7                UpdateUserInfo
- .text          0xc001ff10      0xa30 procedure.o
-                0xc00207b7                procedureMakeTests
-                0xc002004d                terminal_dialog
-                0xc0020384                SendMessage
-                0xc001ff10                ldisc_dialog
-                0xc002036f                SetProcedure
-                0xc0020057                system_procedure
-                0xc00203ac                procedureHelp
-                0xc002090d                procedureGrid
-                0xc0020357                registra_procedimento
-                0xc0020876                procedureWindowWithFocusTest
-                0xc002077c                procedureLinkDriverTest
- .text          0xc0020940       0x80 systemcall.o
-                0xc0020940                systemcall
-                0xc002099c                jmp_address
- .text          0xc00209c0       0x20 install.o
-                0xc00209ca                install_bootmanager_stage1
-                0xc00209cf                install_bootmanager_stage2
-                0xc00209c0                install_os
-                0xc00209d4                install_bootmanager_metafile
-                0xc00209c5                install_boot_manager
- .text          0xc00209e0      0x150 debug.o
-                0xc00209e0                debug_check_inicialization
-                0xc0020ad8                debug
-                0xc0020a80                debug_check_drivers
-                0xc0020aab                debug_compute_checksum
-                0xc0020a92                debug_breakpoint
- .text          0xc0020b30      0x140 abort.o
-                0xc0020b56                KiAbort
-                0xc0020b61                abort
-                0xc0020b49                systemAbort
-                0xc0020b30                KeAbort
- .text          0xc0020c70      0x200 faults.o
-                0xc0020e0b                KiCpuFaults
-                0xc0020e23                do_pagefault
-                0xc0020c70                faults
- .text          0xc0020e70      0xe80 services.o
-                0xc0020e70                services
-                0xc0021cdd                servicesChangeProcedure
-                0xc0021cf0                _code_end = .
+ .text          0xc001bd20      0xd30 createw.o
+                0xc001bd20                CreateWindow
+ .text          0xc001ca50     0x1d20 window.o
+                0xc001d117                windowSendMessage
+                0xc001d6d6                redraw_window
+                0xc001de67                set_active_window
+                0xc001d194                windowGetHandleWindow
+                0xc001dc71                resize_window
+                0xc001e679                get_zorder
+                0xc001d255                windowGetLong2
+                0xc001e3a0                MinimizeWindow
+                0xc001e3db                MaximizeWindow
+                0xc001ce79                GetWindowDesktop
+                0xc001e69f                getTopWindow
+                0xc001cac2                windowInitializeBrowserSupport
+                0xc001de5d                get_active_window
+                0xc001dd43                is_window_minimized
+                0xc001dd79                CloseWindow
+                0xc001e210                windowGetForegroundWindow
+                0xc001d3b2                windowUnlock
+                0xc001d3cc                set_current_window
+                0xc001df8a                SetFocus
+                0xc001e4c3                init_windows
+                0xc001def8                CloseActiveWindow
+                0xc001d0cf                windowShowWWFMessageBuffers
+                0xc001d3ec                get_current_window
+                0xc001e6c8                get_top_window
+                0xc001e6df                closeActiveWindow
+                0xc001d3f6                RegisterWindow
+                0xc001d1a1                windowGetMessage
+                0xc001e318                KillFocus
+                0xc001df7b                windowUnblockFocus
+                0xc001de4a                DestroyWindow
+                0xc001e251                windowSwitchFocus
+                0xc001ce53                GetParentWindow
+                0xc001d262                window_getch
+                0xc001df6c                windowBlockfocus
+                0xc001e1ff                GetFocus
+                0xc001db7c                redraw_screen
+                0xc001d220                windowGetLong1
+                0xc001ca88                windowGetMainWindowDescriptor
+                0xc001e473                init_window_manager
+                0xc001dcd7                is_window_full
+                0xc001d398                windowLock
+                0xc001dedb                show_window_with_focus
+                0xc001e221                windowSetForegroundWindow
+                0xc001debe                show_active_window
+                0xc001dca4                replace_window
+                0xc001d323                windowCreateDedicatedBuffer
+                0xc001ca50                windowGetWindowID
+                0xc001ce9f                windowSetUpColorScheme
+                0xc001dd0d                is_window_maximized
+                0xc001d481                windowShowWindowList
+                0xc001e707                z_order_get_free_slot
+                0xc001e6d2                set_top_window
+                0xc001dea9                change_active_window
+ .text          0xc001e770      0x3e0 desktop.o
+                0xc001e823                init_desktop_list
+                0xc001e93d                set_current_traywindow
+                0xc001e959                set_current_tooltipwindow
+                0xc001e7ca                set_current_desktop
+                0xc001ea2c                init_desktop
+                0xc001e921                set_current_messagewindow
+                0xc001e9f4                set_current_menuHScroll
+                0xc001e84d                CreateDesktop
+                0xc001e905                set_current_foreground
+                0xc001e975                change_foreground
+                0xc001e9d8                set_current_dialogsysMenu
+                0xc001e7e2                get_current_desktop
+                0xc001e770                RegisterDesktop
+                0xc001e9bc                set_current_sysMenu
+                0xc001e819                get_current_desktop_id
+                0xc001e8e9                set_current_menuwindow
+                0xc001ea10                set_current_menuVScroll
+ .text          0xc001eb50      0x1d0 wstation.o
+                0xc001eb50                get_current_windowstation
+                0xc001ecb4                init_window_station
+                0xc001ec8a                init_windowstation_list
+                0xc001ec30                RegisterWindowStation
+                0xc001eb94                CreateWindowStation
+                0xc001eb7c                set_current_windowstation
+ .text          0xc001ed20      0x230 usession.o
+                0xc001eebb                init_user_session
+                0xc001ed20                get_current_user_session
+                0xc001ee84                open_user_session
+                0xc001ee1d                close_user_session
+                0xc001ed57                CreateUserSession
+ .text          0xc001ef50      0xc90 gramado.o
+                0xc001f9d8                guiGetDebugWindow
+                0xc001fa84                guiGetShellWindowWindow
+                0xc001f772                gui_create_navigationbar
+                0xc001f957                guiGetTooltipWindow
+                0xc001f901                guiGetMenuWindow
+                0xc001f5bf                gui_create_mainwindow
+                0xc001f734                gui_create_messagebox
+                0xc001fb74                init_gui
+                0xc001f982                guiGetMessageboxWindow
+                0xc001f8ae                guiGetStatusbarWindow
+                0xc001f836                guiGetDesktopWindow
+                0xc001f715                gui_create_infobox
+                0xc001f92c                guiGetInfoboxWindow
+                0xc001fa03                guiGetMbhWindowWindow
+                0xc001f7e6                guiGetBackgroundWindow
+                0xc001fada                guiSetUpMainWindow
+                0xc001f710                gui_create_controlmenu
+                0xc001f7be                guiGetDeveloperScreenWindow
+                0xc001faaf                guiGetShellClientWindowWindow
+                0xc001fbcf                init_gramado
+                0xc001f886                guiGetMainWindow
+                0xc001f777                gui_create_grid
+                0xc001f24d                SetGuiParameters
+                0xc001f4cb                gui_create_taskbar
+                0xc001f85e                guiGetTaskbarWindow
+                0xc001fbca                gramado
+                0xc001fa2e                guiGetTopbarWindow
+                0xc001ef50                create_gui
+                0xc001f753                gui_create_debug
+                0xc001fa59                guiGetNavigationbarWindow
+                0xc001f9ad                guiGetDialogboxWindow
+                0xc001f796                guiGetScreenWindow
+                0xc001f2f0                gui_create_screen
+                0xc001f8d6                guiGetGridWindow
+                0xc001f80e                guiGetLogoWindow
+                0xc001f70b                gui_create_logo
+                0xc001f3d6                gui_create_background
+ .text          0xc001fbe0       0x60 object.o
+                0xc001fbe0                init_object_manager
+ .text          0xc001fc40      0x2f0 userenv.o
+                0xc001fde1                SetCurrentGroupId
+                0xc001fe0d                GetCurrentGroupId
+                0xc001ff16                init_user_environment_manager
+                0xc001fdab                SetCurrentUserId
+                0xc001fc40                startUserEnvironment
+                0xc001fce0                CreateUser
+                0xc001fe63                init_user_info
+                0xc001fdd7                GetCurrentUserId
+                0xc001fcd1                config_user
+                0xc001fc72                ShowUserInfo
+                0xc001fe17                UpdateUserInfo
+ .text          0xc001ff30      0xa30 procedure.o
+                0xc00207d7                procedureMakeTests
+                0xc002006d                terminal_dialog
+                0xc00203a4                SendMessage
+                0xc001ff30                ldisc_dialog
+                0xc002038f                SetProcedure
+                0xc0020077                system_procedure
+                0xc00203cc                procedureHelp
+                0xc002092d                procedureGrid
+                0xc0020377                registra_procedimento
+                0xc0020896                procedureWindowWithFocusTest
+                0xc002079c                procedureLinkDriverTest
+ .text          0xc0020960       0x80 systemcall.o
+                0xc0020960                systemcall
+                0xc00209bc                jmp_address
+ .text          0xc00209e0       0x20 install.o
+                0xc00209ea                install_bootmanager_stage1
+                0xc00209ef                install_bootmanager_stage2
+                0xc00209e0                install_os
+                0xc00209f4                install_bootmanager_metafile
+                0xc00209e5                install_boot_manager
+ .text          0xc0020a00      0x150 debug.o
+                0xc0020a00                debug_check_inicialization
+                0xc0020af8                debug
+                0xc0020aa0                debug_check_drivers
+                0xc0020acb                debug_compute_checksum
+                0xc0020ab2                debug_breakpoint
+ .text          0xc0020b50      0x140 abort.o
+                0xc0020b76                KiAbort
+                0xc0020b81                abort
+                0xc0020b69                systemAbort
+                0xc0020b50                KeAbort
+ .text          0xc0020c90      0x200 faults.o
+                0xc0020e2b                KiCpuFaults
+                0xc0020e43                do_pagefault
+                0xc0020c90                faults
+ .text          0xc0020e90      0xe80 services.o
+                0xc0020e90                services
+                0xc0021cfd                servicesChangeProcedure
+                0xc0021d10                _code_end = .
                 0xc0022000                . = ALIGN (0x1000)
- *fill*         0xc0021cf0      0x310 00
+ *fill*         0xc0021d10      0x2f0 00
 
 .data           0xc0022000    0x2f000
                 0xc0022000                _data_begin = .

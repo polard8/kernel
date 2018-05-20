@@ -15,6 +15,8 @@
  * 
  * History: 
  *     2015 - Created by Fred Nora. 
+ *     2018 - Display 4bpp, 8bpp, 24bpp and 32bpp BMPs.
+ *
  */
 
 
@@ -45,8 +47,8 @@ int bmpDisplayBMP( char *address,
 	
 	unsigned long left, top, bottom;
 	
-	unsigned long color;
-	unsigned long color2, pal_address;
+	unsigned long color, color2;
+	unsigned long pal_address;
 	
 	unsigned long Width;
 	unsigned long Height;
@@ -56,22 +58,15 @@ int bmpDisplayBMP( char *address,
 	struct bmp_header_d *bh;
 	struct bmp_infoheader_d *bi;
 	
-	
 	// Endereço base do BMP que foi carregado na memória
-	// Endereço do início da paleta de 16 cores.
-	// Endereço do início da paleta de 256 cores.
-	unsigned char *bmp        = (unsigned char *)  address;
-	//unsigned long *palette16  = (unsigned long *) (address + 0x36);
-	//unsigned long *palette256 = (unsigned long *) (address + 0x36);
-	unsigned long *palette    = (unsigned long *) (address + 0x36);		
-	
-	
+	unsigned char *bmp = (unsigned char *)  address;
 	
 	// Variável para salvar rgba.
-	unsigned char *c   = (unsigned char *) &color;	
-	unsigned char *xCh   = (unsigned char *) &color2;	
-	unsigned char *palette_index = (unsigned char *) &pal_address;	
+	unsigned char *c = (unsigned char *) &color;
+    unsigned char *c2 = (unsigned char *) &color2;	
 	
+	unsigned long *palette    = (unsigned long *) (address + 0x36);		
+	unsigned char *palette_index = (unsigned char *) &pal_address;	
 	
 	//
 	// Limits
@@ -254,15 +249,11 @@ int bmpDisplayBMP( char *address,
 
 	
 	for( i=0; i < bi->bmpHeight; i++ )	
-	{
-		//#bugbug: 
-		//Precisa ser o valor encontrado na estrutura +1.
-		
+	{		
 		for( j=0; j < bi->bmpWidth; j++ )	
 		{	
 	        // 16 cores
-			// Construindo o char.
-			// um nibble por índice. @todo
+            // Um pixel por nibble.
 	        if(bi->bmpBitCount == 4 )
 	        {				
 				offset = base;
@@ -299,52 +290,53 @@ int bmpDisplayBMP( char *address,
 				base = base + 1;     
 	        };			
 			
+			// 16bpp high color BMP
 			// Próximo pixel para 16bpp
-			//565 ou 4444 ou 5551
-			//testando apenas 4444
+			// apenas 565 por enquanto.  
 	        if(bi->bmpBitCount == 16 )
 	        {
-				offset = base;
-				
-				
-				//A
-			    c[0] = 0;	
 
-			    //b				
-			    c[1] = bmp[offset];
-			    c[1] =  (c[1] & 0xF8);  // 1111 1000  
+			    //565
+                //if(565 )
+                //{
+				    offset = base;					
+					
+				    //A
+			        c[0] = 0;	
+
+			        //b				
+			        c[1] = bmp[offset];
+			        c[1] = (c[1] & 0xF8);  // '1111 1000' 0000 0000  
 				
-				//g
-			    //offset = base+1;
-			    //c[2] = bmp[offset];
-			    c[2] = bmp[offset];
-			    c[2] = c[2] &  0x1F;  // 0000 0111 
-				
-			    //r
-			    offset = base+1;
-			    c[3] = bmp[offset];
-			    c[3] = c[3] & 0xFF;  // 0001 1111 										
+				    //g
+			        c2[0] = bmp[offset];
+			        c2[0] = c2[0] &  0x07;    // '0000 0111' 0000 0000 
+			        c2[1] = bmp[offset+1];
+			        c2[1] = c2[1] &  0xE0;    //  0000 0000 '1110 0000' 
+					c[2] = ( c2[0] | c2[1]  );
+					
+			        //r
+			        c[3] = bmp[offset+1];
+			        c[3] = c[3] & 0x1F;     // 0000 0000 '0001 1111' 										
 		        
-				base = base + 2;    
+				    base = base + 2;    
+				//};					
+				
 	        };			
 			
+
 			// Próximo pixel para 24bpp
 	        if(bi->bmpBitCount == 24 )
 	        {
-			    //
 				offset = base;
 			    
-				
-				//A
-			    c[0] = 0;					
+			    c[0] = 0; //A					
 				
 				c[1] = bmp[offset];
 			    
-				//
 			    offset = base+1;
 			    c[2] = bmp[offset];
 			
-			    //
 			    offset = base+2;
 			    c[3] = bmp[offset];
 										
