@@ -59,15 +59,27 @@ _gui_buffer_putpixel:
 	mov ebx, dword [.y]      ;coloca y em ebx.	 	
 	mov ecx, dword [.cor]    ;coloca a cor em ecx.
 	
-	;ecx (cor) AABBGGRR  
+	;ecx (cor) AABBGGRR antigo 
 
-	mov byte [.a], cl	 ;a.
+	;antigo    bb gg rr aa
+	;ecx (cor) aa bb gg rr  
+	
+	mov byte [.r], cl	 ;a.
 	shr ecx, 8
-	mov byte [.r], cl	 ;r.
+	mov byte [.g], cl	 ;r.
 	shr ecx, 8
-	mov byte [.g], cl    ;g.
+	mov byte [.b], cl    ;g.
 	shr ecx, 8
-	mov byte [.b], cl    ;b.
+	mov byte [.a], cl    ;b.
+
+    ;original
+	;mov byte [.a], cl	 ;a.
+	;shr ecx, 8
+	;mov byte [.r], cl	 ;r.
+	;shr ecx, 8
+	;mov byte [.g], cl    ;g.
+	;shr ecx, 8
+	;mov byte [.b], cl    ;b.
     
 	;segmento ES ... poderia ser 0x10
 	push eax

@@ -51,26 +51,27 @@ enum vga_color {
 #define COLOR_WHITE 
 */ 
 
+
 static unsigned long cga_16colors_palette[16] = {
 	
 	//Paleta do paint para 4bpp
-	0x00000000, // 
-	0x80000000, // 
-	0x00800000, // 
-	0x80800000, // 
-	0x00008000, // 
-	0x80008000, // 
-	0x00808000, // 
-	0x80808000, // 
+	0x000000, // 
+	0x800000, // 
+	0x008000, // 
+	0x808000, // 
+	0x000080, // 
+	0x800080, // 
+	0x008080, // 
+	0x808080, // 
 	
-	0xC0C0C000, // 
-	0xFF000000, // 
-	0x00FF0000, // 
-	0xFFFF0000, // 
-	0x0000FF00, // 
-	0xFF00FF00, // 
-	0x00FFFF00, // 
-	0xFFFFFF00  // 
+	0xC0C0C0, // 
+	0xFF0000, // 
+	0x00FF00, // 
+	0xFFFF00, // 
+	0x0000FF, // 
+	0xFF00FF, // 
+	0x00FFFF, // 
+	0xFFFFFF  // 
 };
 
 

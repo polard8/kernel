@@ -21,16 +21,6 @@
 #include <kernel.h>
 
 
-#define Swap2Bytes(val) \
- ( (((val) >> 8) & 0x00FF) | (((val) << 8) & 0xFF00) )
-
- 
-
-// Swap 4 byte, 32 bit values:
-#define Swap4Bytes(val) \
- ( (((val) >> 24) & 0x000000FF) | (((val) >>  8) & 0x0000FF00) | \
-   (((val) <<  8) & 0x00FF0000) | (((val) << 24) & 0xFF000000) )
-
 
 /*
  ********************************************************
@@ -56,7 +46,7 @@ int bmpDisplayBMP( char *address,
 	unsigned long left, top, bottom;
 	
 	unsigned long color;
-	unsigned long color2;
+	unsigned long color2, pal_address;
 	
 	unsigned long Width;
 	unsigned long Height;
@@ -80,7 +70,7 @@ int bmpDisplayBMP( char *address,
 	// Variável para salvar rgba.
 	unsigned char *c   = (unsigned char *) &color;	
 	unsigned char *xCh   = (unsigned char *) &color2;	
-	
+	unsigned char *palette_index = (unsigned char *) &pal_address;	
 	
 	
 	//
@@ -261,7 +251,7 @@ int bmpDisplayBMP( char *address,
     //#define COLOR_GREEN 0x00FF0000
     //#define COLOR_BLUE  0x0000FF00
 
-    char palette_index[2];	
+
 	
 	for( i=0; i < bi->bmpHeight; i++ )	
 	{
@@ -282,9 +272,9 @@ int bmpDisplayBMP( char *address,
                 //segundo nibble.
 				if( nibble_count_16colors == 2222 )
 				{
-					palette_index[0] = ( palette_index[0] & 0x0F); 
-				    color = (unsigned long) cga_16colors_palette[  palette_index[0]  ];
-					//color = (unsigned long) palette[  palette_index[0]  ];
+					palette_index[0] = ( palette_index[0] & 0x0F);  
+					color = (unsigned long) palette[  palette_index[0]  ];
+					
 					nibble_count_16colors = 0;
 					base = base + 1;
 					
@@ -292,22 +282,19 @@ int bmpDisplayBMP( char *address,
 				}else{
 
 			        palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
-					color = (unsigned long) cga_16colors_palette[  palette_index[0] ];
-					//color = (unsigned long) palette[  palette_index[0] ];
-				    nibble_count_16colors = 2222;
+					color = (unsigned long) palette[  palette_index[0] ];
+				    
+					nibble_count_16colors = 2222;
 					base = base;
 				}
 	        };	
 
 			// 256 cores
 			// Próximo pixel para 8bpp
-	        if(bi->bmpBitCount == 8 )
+	        if( bi->bmpBitCount == 8 )
 	        {   
 				offset = base;
-							    
-				palette_index[0] = (char) bmp[offset];
-				
-				color = (unsigned long) vga_256colors_palette[ palette_index[0] ];
+				color = (unsigned long) palette[  bmp[offset] ];
 				
 				base = base + 1;     
 	        };			
@@ -408,12 +395,15 @@ int bmpDisplayBMP( char *address,
 	// ## test palette 
 	//int p;
 	
-	//printf("\n");
-	//for( p=0; p<16; ++p )
+	//if(bi->bmpBitCount == 8 )
 	//{
-	//	printf("%x\n",palette[p]);
-	//}
-	//printf("\n");
+	//    printf("\n");
+	//    for( p=0; p<16; ++p )
+	//    {
+	//	   printf("%x\n",palette[p]);
+	//    }
+	//    printf("\n");
+	//};
 	
 fail:	
     //printf("fail");	
