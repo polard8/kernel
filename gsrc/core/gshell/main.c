@@ -1373,6 +1373,9 @@ unsigned long shellCompare(struct window_d *window)
 	int q; //diálogo
 	
 	
+  // Temos uma linha de comando em prompt[]
+  // que é o stdin.  
+NewCmdLine:	
 	
 	//Se alguem pressiona [ENTER] com prompt vazio
 	//dá page fault.
@@ -2409,9 +2412,15 @@ dotry:
 	//um comando no shell invoca a execussão de um script 
 	//dado o nome via tokenList.
 dosh:
+    //
+	// Vamos tentar colocar o arquivo de script no stdin 
+	// que é onde fica o prompt. Então retornaremos no 
+	// início dessa rotina mas agora com uma nova linha de comando.
+	//
     //nothing for now.
 	//o comando [0] é o 'dosh' o [1] é o nome do script.
     shellExecuteThisScript(tokenList[1]);	
+	goto NewCmdLine;
 	goto exit_cmp;	
 	
 	//
@@ -4355,11 +4364,18 @@ reader_loop()
 
  
 
-
+//
+// Aqui temos que carregar o arquivo de script indicado 
+// nos argumentos.
+// #importante:
+// Apenas colocaremos o arquivo em stdin, que é o pormpt[]
+// e retornaremos ao incio da função que compara, para 
+// comparar agora o que estava escrito no arquivo de script.
+//
 int shellExecuteThisScript( char* script_name )
 {
     //
-	// Aqui temos que carregar o arquivo de scripi indicado 
+	// Aqui temos que carregar o arquivo de script indicado 
 	// nos argumentos.
 	//
 	
@@ -4375,6 +4391,15 @@ int shellExecuteThisScript( char* script_name )
 	{
 		printf("skip_input: Can't open script file!\n");
 		die("*");
+	}
+	
+	
+	//atualizando a linha de comandos no prompt[], stdin.
+	
+	int i;
+	for( i=0; i< 128; i++ )
+	{
+		stdin->_base[i] = script_file->_base[i];
 	}
 	
 	
