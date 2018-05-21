@@ -22,12 +22,13 @@ void cd_buitins()
 };
 
 
+//cls
 void cls_builtins()
 {
 	//@todo
     shellClearScreen();
     shellSetCursor(0,0);
-	//shellPrompt();	
+	shellPrompt();	
 };
 
 

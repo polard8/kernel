@@ -630,8 +630,13 @@ int shell_gramado_core_init_execve( const char *arg1,
 //
 
 void shellCreateEditBox();
-void shellCreateTopBar(); 
+int shellCreateTopBar( int status );
+
+
+int shellDisplayBMP( char *file_name );
 void shellTestDisplayBMP();
+
+
 void bmpDisplayBMP( void* address, 
                     unsigned long x, 
 					unsigned long y, 

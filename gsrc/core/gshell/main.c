@@ -1,6 +1,8 @@
 /*
  * File: main.c 
  *
+ * GWM - Gramado Window manager.
+ * deve se comunicar com o GWS, Gramado Window Server. /gramado
  * General purpose application.
  *
  *     SHELL.BIN é um aplicativo de próposito geral. Desenvolvido como 
@@ -75,6 +77,8 @@
 //inicialização silenciosa. Suprime alguns verboses.
 int quiet = 0;	
 
+int running = 1;
+
 //Sendo assim, o shell poderia abrir no ambiente de logon.
 char *username;
 char *password; 
@@ -145,7 +149,7 @@ concat( char *s1, char *s2, char *s3 );
 
 static inline void pause(void) 
 { 
-         asm volatile("pause" ::: "memory"); 
+    asm volatile("pause" ::: "memory"); 
 } 
 
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
@@ -183,6 +187,13 @@ shellTopbarProcedure( struct window_d *window,
 			          unsigned long long1, 
 					  unsigned long long2 );
 					  
+ 
+ 
+void
+quit( int status )
+{
+	running = 0;
+} 
  
 /*
  *****************************************************************
@@ -455,10 +466,16 @@ noArgs:
 	// Criando a janela WT_OVERLAPPED.
 	//
 	
+	//hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
+	//                                   shell_window_x, shell_window_y, 
+	//								   shellWindowWidth, shellWindowHeight,    
+    //                                   0, 0, COLOR_BLACK, 0x83FCFF );	   
+									   
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
-	                                   shell_window_x, shell_window_y, 
-									   shellWindowWidth, shellWindowHeight,    
-                                       0, 0, COLOR_BLACK, 0x83FCFF00 );	   
+	                                   0, (8*3), 
+									   (800/2), (600-(8*3)),    
+                                       0, 0, COLOR_BLACK, 0x83FCFF );	   
+
 	if((void*) hWindow == NULL)
 	{	
 		printf("Shell: Window fail");
@@ -712,7 +729,8 @@ noArgs:
 		// com o foco de entrada. esse argumento foi passado mas não foi usado.
 		//
 		
-	while(1)
+Mainloop:		
+	while(running)
 	{
 
 
@@ -821,14 +839,12 @@ noArgs:
 		//Nothing.
 	};
 	
-	
-	
-	
 	//
 	// Pulamos a parte que pega mensgens de input de teclado 
 	// porque esse shell não está configurado como interativo.
 	//
 	
+//RunScript:	
 skip_input:	
 
     shellExecuteThisScript(argv[3]);
@@ -1650,7 +1666,24 @@ do_compare:
     //{
 		//shellASCII();
 	//	goto exit_cmp;
-	//}		
+	//}
+
+
+	//bmp exemplo.bmp
+    if( strncmp( prompt, "bmp", 3 ) == 0 )
+	{
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL )
+		{
+			printf("Error: No name!\n");
+		}else{
+			
+			shellDisplayBMP( (char*) tokenList[i] );
+		};
+		goto exit_cmp;
+    };	
 	
 	// boot
 	// ?? Boot info talvez.
@@ -1838,7 +1871,7 @@ do_compare:
 		};
 		goto exit_cmp;
     };	
-	
+		
 	
 	// install	
     // ?? 
@@ -2066,22 +2099,22 @@ do_compare:
 		
 		// teste.
 		// Escreve no buffer de saída e mostra o buffer de saida.
-		screen_buffer[0] = (char) 'F';
-		screen_buffer[1] = 7;
+		//screen_buffer[0] = (char) 'F';
+		//screen_buffer[1] = 7;
 		
-        screen_buffer[2] = (char) 'N';	
-        screen_buffer[3] = 7;
+        //screen_buffer[2] = (char) 'N';	
+        //screen_buffer[3] = 7;
 		
-		screen_buffer[4] = (char) '\0';			
-		screen_buffer[5] = 7;
+		//screen_buffer[4] = (char) '\0';			
+		//screen_buffer[5] = 7;
 		
-		printf( (const char *) stdout->_base );
+		//printf( (const char *) stdout->_base );
 		
-		printf("%s \n",stdout->_base);
-		printf("%s \n",stdout->_tmpfname);
-		printf("%d \n",stdout->_cnt);
-		printf("%d \n",stdout->_bufsiz);
-		printf("done \n");
+		//printf("%s \n",stdout->_base);
+		//printf("%s \n",stdout->_tmpfname);
+		//printf("%d \n",stdout->_cnt);
+		//printf("%d \n",stdout->_bufsiz);
+		//printf("done \n");
 		
         goto exit_cmp;
     };
@@ -2177,8 +2210,12 @@ do_compare:
     if( strncmp( prompt, "topbar", 6 ) == 0 )
 	{
 	    enterCriticalSection();    
-	    shellCreateTopBar();
-	    exitCriticalSection();    
+	    
+		//Apenas inicialize. Continuaremos com o procedimento 
+		//do shell e não o da barra,
+		shellCreateTopBar(1);
+	    
+		exitCriticalSection();    
 		
 		goto exit_cmp;
     };			
@@ -3085,17 +3122,32 @@ void shellClearBuffer()
 
 
 
+/*
+ * shellShowScreenBuffer:
+ *     Quando for efeturar o refresh da tela
+ * é o conteúdo desse buffer que deve ser pintado 
+ * no retãngulo que é a área de cliente do shell.  
+ */
+//mostra o buffer screen buffer, onde ficam 
+//armazenados os caracteres e atributos datela
+//do terminal virtual.
 //Isso é só um teste.
 void shellShowScreenBuffer()
 {
 	int i;
 	int j = 0;
 	
-    shellClearScreen();
-    shellSetCursor(0,0);	
+	//#teste 
+	screen_buffer[0] = 'd';
+	screen_buffer[2] = 'u';
+	screen_buffer[4] = 'r';
+	screen_buffer[6] = 't';
+	
+	//shellClearScreen();
+    shellSetCursor(0,0);
 	
 	// Shell buffer.
-	for( i=0; i<SCREEN_BUFFER_SIZE; i++)
+	for( i=0; i<SCREEN_BUFFER_SIZE; i++ )
 	{
 		
 	    printf( "%c", screen_buffer[j] );
@@ -3113,31 +3165,57 @@ void shellShowScreenBuffer()
  */
 void shellTestLoadFile()
 {
-	shellClearBuffer();
+	//Limpa a tela e reposiciona o cursor.
 	shellClearScreen();
     shellSetCursor(0,0);
-	shellPrompt();
-	//@todo: reposicionar o cursor.
 	
 	//
 	// *Testando carregar um arquivo.
 	// Ok, isso funcionou.
 	//
 	
-	int fRet;
+	int Ret;
 	printf("...\n");
 	printf("Testing buffer ... Loading file...\n");
 	
-	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
-	fRet = (int) system_call( SYSTEMCALL_READ_FILE, 
-	                          (unsigned long) init_file_name, 
-					          (unsigned long) &screen_buffer[0], 
-							  (unsigned long) &screen_buffer[0] );
-							  
-	printf("ret={%d}\n",fRet);
+	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS 
+	// #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
 	
-	printf("...\n\n");
-	printf(&screen_buffer[0]);		
+	//Ret = (int) system_call( SYSTEMCALL_READ_FILE, 
+	//                         (unsigned long) init_file_name, 
+	//  			             (unsigned long) &screen_buffer[0], 
+	//						 (unsigned long) &screen_buffer[0] );
+
+	//#test colocando no stdout para depois copiar 
+	//no screenbuffer considerando os atributos do caractere.
+	//Ret = (int) system_call( SYSTEMCALL_READ_FILE, 
+	//                         (unsigned long) init_file_name, 
+	//  			             (unsigned long) stdout->_base, 
+	//						 (unsigned long) stdout->_base );
+							 
+	//printf("ret={%d}\n",Ret);
+	
+    FILE *f;
+	
+    f = (FILE *) fopen( "init.txt", "wd" );
+	
+	//#test 
+	//testando com um arquivo com texto pequeno.
+	
+	int i;
+	for( i=0; i<128; i++ )
+	{
+		//movendo.
+	    screen_buffer[2*i] = f->_base[2*i]; //char	
+		screen_buffer[2*i +1] = 0x07;            //atributo
+	}
+	
+	
+	// Mostra na tela o conteúdo do screen buffer.
+	shellRefreshScreen();
+	
+	//printf("...\n\n");
+	//printf(&screen_buffer[0]);		
 };
 
 
@@ -3206,38 +3284,37 @@ void shellTestThreads()
 
 
 /*
+ *************************************************
  * shellClearScreen:
  *     Limpar a tela do shell.
+ *     usada pelo comando 'cls'.
  */
 void shellClearScreen()
 {
-	int lin, col;    
-
-	// @todo:
-	//system( "cls" ); // calls the cls command.
+	int i;
 	
-	//cursor.
-	shellSetCursor(0,0);
+	
+	//#debug
+	printf("shellClearScreen:\n");
+	
 	
 	//
-	// Tamanho da tela. 80x25
+	// Limpamos o screen buffer.
 	//
 	
-	//linhas.
-	for( lin=0; lin < 25; lin++)
+	// Shell buffer.
+	for( i=0; i<(SCREEN_BUFFER_SIZE/2); i++ )
 	{
-		col = 0;
-		shellSetCursor(col,lin);
-		
-		//colunas.
-		for( col=0; col < 80; col++)
-		{
-		    //@todo:
-			printf("%c",' ');
-	    }
+	    screen_buffer[ 2*i ] = ' ';     //char 
+		screen_buffer[ 2*i +1] = 0x7; //atributo 
 	};
 	
-	shellSetCursor(0,0);
+	//
+	// Copiamos o conteúdo do screenbuffer para 
+	// a área de cliente do shell.
+	//
+
+    shellRefreshScreen();
 };
 
 
@@ -3248,18 +3325,31 @@ void shellClearScreen()
  */
 void shellRefreshScreen()
 {
-	int i;
+    int lin, col;  
+	int Offset; //Deslocamento dentro do screen buffer.
+	
+		//#debug
+	printf("shellRefreshScreen:\n");
 
 	//cursor apontando par ao início da janela.
 	//usado pelo printf.
 	shellSetCursor(0,0);
 	
-	//o certo é copiar o buffer todo e a rotina printf faz o scroll
-	
-	//for( i=0; i < SCREEN_BUFFER_SIZE; i++)
-	for( i=0; i < (80*25); i++)
+	//linhas.
+	for( lin=0; lin < 25; lin++)
 	{
-		printf("%c", stdout->_ptr[i]);
+		col = 0;
+		shellSetCursor(col,lin);
+		
+		//colunas.
+		for( col=0; col < 80; col++)
+		{
+		    //Mostra um char do screen buffer.
+			printf( "%c", screen_buffer[Offset] );
+		    
+			Offset++; //ignora o atributo.
+		    Offset++;
+	    }
 	};
 	
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	

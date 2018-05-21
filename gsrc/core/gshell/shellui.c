@@ -34,6 +34,47 @@ extern int ShellFlag;
 #define SHELLFLAG_TOPBAR 6
 //...
 
+
+void shellui_fntos(char *name)
+{
+    int  i, ns = 0;
+    char ext[4];
+    //const char ext[4];
+	
+    //transforma em maiúscula
+	while(*name && *name != '.')
+	{
+        if(*name >= 'a' && *name <= 'z')
+            *name -= 0x20;
+
+        name++;
+        ns++;
+		
+		// ##bugbug: E se não encontrarmos o ponto??
+    }
+
+    // aqui name[0] é o ponto.
+	// então constroi a extensão.
+	for(i=0; i < 3 && name[i+1]; i++)
+	{
+        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+            name[i+1] -= 0x20;
+
+        ext[i] = name[i+1];
+    }
+
+    while(ns < 8){
+        *name++ = ' ';
+        ns++;
+    }
+
+    for(i=0; i < 3; i++)
+        *name++ = ext[i];
+
+    *name = '\0';
+};
+	
+
 /*
  ***********************************************
  * shellTopbarProcedure:
@@ -479,6 +520,7 @@ void shellCreateEditBox()
 
 
 /*
+ **********************************************************************
  * shellCreateTopBar:
  *
  *     CRIANDO A TOP BAR.
@@ -488,22 +530,26 @@ void shellCreateEditBox()
  * com resolução 800x600.
  *
  */
-void shellCreateTopBar()
+int shellCreateTopBar( int status )
 {
 	//
-	// Precisamos registrar no kernel
-	// que essa janela corresponde a área de taskbar 
-	// e que a área de trabalho agora é menor.
+	// Precisamos registrar no kernel que essa janela corresponde 
+	// a área de taskbar e que a área de trabalho agora é menor.
 	//
 	
-	// Topbar window.
+	//
+	// Criando a barra.
+	//
+	
 	topbarWindow = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar ",     
-                                       0, 0, 800, (600/8),    
+                                       0, 0, 800, (8*3),    
                                        0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	   
 	if((void*) topbarWindow == NULL){	
 		printf("shellCreateTopBar: topbar Window fail");
 		refresh_screen();
-		while(1){}
+		while(1){
+			asm("pause");
+		}
 		//exit(0);
 	};
 	    //Registrar.
@@ -513,16 +559,19 @@ void shellCreateTopBar()
 	// icon 1 window
 	//
 	
-	unsigned long iconMaxWidth  = (600/8);
-	unsigned long iconMaxHeight = (600/8);
+	unsigned long iconMaxWidth  = (8*3);
+	unsigned long iconMaxHeight = (8*3);
 
 	i1Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
-                                       2, 2, (iconMaxWidth-4), (iconMaxHeight-4),    
-                                       0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
-	if((void*) i1Window == NULL){	
+                                        0, 0, iconMaxWidth, iconMaxHeight,    
+                                        0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
+	if( (void*) i1Window == NULL )
+	{	
 		printf("shellCreateTopBar: icon1 Window fail");
 		refresh_screen();
-		while(1){}
+		while(1){
+			asm("pause");
+		}
 		//exit(0);
 	};
     //Registrar.
@@ -533,12 +582,15 @@ void shellCreateTopBar()
 	//
 
 	i2Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
-                                       (2+(iconMaxWidth-4)+2), 2, (iconMaxWidth-4), (iconMaxHeight-4),    
+                                       iconMaxWidth, 0, iconMaxWidth, iconMaxHeight,    
                                        0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
-	if((void*) i2Window == NULL){	
+	if((void*) i2Window == NULL)
+	{	
 		printf("shellCreateTopBar: icon2 Window fail");
 		refresh_screen();
-		while(1){}
+		while(1){
+			asm("pause");
+		}
 		//exit(0);
 	};
 	//Registrar.
@@ -629,8 +681,8 @@ void shellCreateTopBar()
 	// BMP . LABELS
 	//
 	
-    /*
-	 ** isso funcionou.
+    
+	// isso funcionou.
 	void *b;
 	b = (void*) malloc(1024*30); 	// testando malloc.
     if( (void*) b == NULL ){
@@ -650,13 +702,92 @@ loadFile:
 	
 
 	//16x16
+	//#teste
 	bmpDisplayBMP( b, 2, 2, 16, 16 );	
-	bmpDisplayBMP( b, 2+16+2, 2, 16, 16 );		
-	*/	
+	bmpDisplayBMP( b, iconMaxWidth +2, 2, 16, 16 );		
+		
 	
 	
+	if( status == 2 )
+	{
+	    ShellFlag = SHELLFLAG_TOPBAR;
+	}
 	
-	ShellFlag = SHELLFLAG_TOPBAR;
+done:
+	return (int) 0;
+};
+
+
+/*
+ * shellDisplayBMP:
+ *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+ *
+ */
+int shellDisplayBMP( char *file_name )
+{	
+	//
+	// #bugbug @todo: Aumenta o tamanho do heap do processo.
+	// Esse heap é gerenciando nas bibliotecas ou na API.
+	//Obs: 32Kb é alem do limite.
+	//
+	
+	void *b = (void*) malloc(1024*30); 	// testando malloc.
+    if( (void*) b == NULL ){
+		printf("shellTestDisplayBMP: allocation fail\n");
+		//while(1){}
+	}
+	
+	//Carregando o arquivo.
+loadFile:
+
+    shellui_fntos( (char *) file_name);
+
+    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+	// na verdade tem que fazer essas rotinas na API.
+	system_call( SYSTEMCALL_READ_FILE, 
+	             (unsigned long) file_name, 
+				 (unsigned long) b, 
+				 (unsigned long) b);	
+	
+	
+
+	//16x16
+	//bmpDisplayBMP( b, 10, 450, 16, 16 );
+	 
+	//Usando a API para exibir o bmp carregado. 
+	apiDisplayBMP((char *) b, 10, 400); 
+	 
+    //
+	//Mostrando informações sobre o arquivo.
+	//
+	
+	//base do bmp carregado na memória
+	//unsigned char *bmp = (unsigned char *) b;
+	
+	
+	//@todo: encontrando o magic
+	
+	//if( bmp[0] != 0x42 )
+	//{
+	//	printf("~Sig fail\n");
+	//    printf("magic0 %c\n", bmp[0]);	
+	//    printf("magic1 %c\n", bmp[1]);			
+	//	printf("buffer %x\n",bmp); //Ok
+    //    printf("buffer %x\n",b);   //Ok
+		//printf("width %d \n", bmp[0x12]);
+		//printf("height %d \n", bmp[0x16]);
+	//}
+	
+	//
+	//Mostrando características do bmp.
+	
+	//printf("magic0 %c\n", bmp[0]);	
+	//printf("magic1 %c\n", bmp[1]);
+	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
+	//printf("buffer %x \n",bmp);
+	//printf("data area address %x \n",&bmp[base]);
+	
+	return 0;
 };
 
 
