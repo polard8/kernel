@@ -3,11 +3,52 @@
  * (c) Copyright 2015~2018 - Fred Nora.
  */
  
+ 
+// ## GWS - Gramado Window Server ##
+
+// Aplicativo poderão se conectar com o servidor de recusros
+// gráficos, principalmente a GUI, que será chamada de 
+// Gramado Window Manager.
+// Outros window managers poderão ser criados, e eles precisarão 
+// ser registrados e abrirem o servidor para usarem seus recursos.
+// do mesmo modo o shell atual poderá se registrar,
+// o processo de logon poderá se registrar em um servidor de logon.
+//
 
 #include <kernel.h>
 
 
-// unsigned char  server_display[] = "Gramado Display Server";
+//Status do gws.
+//int gws_status;
+
+//Qual é o id do processo que é o atual window manager.
+//o oficial é o Gramado Window Manager, hoje 
+//chamado de shell.bin
+//int gws_wm_PID;
+
+/*
+int gwsOpen( int pid )
+{
+	gws_status
+	gws_wm_PID
+	//..
+}
+
+int gwsClose( int pid )
+{
+	gws_status
+	gws_wm_PID
+	//..
+}
+
+
+int gwsInitializeWindowManager( int pid )
+{
+	
+}
+*/
+
+// unsigned char  gws_bame[] = "GWS - Gramado Window Server";
 // unsigned char  GramadoName[] = "GRAMADO LAYER";
 
 

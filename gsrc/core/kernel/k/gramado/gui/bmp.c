@@ -15,12 +15,16 @@
  * 
  * History: 
  *     2015 - Created by Fred Nora. 
- *     2018 - Display 4bpp, 8bpp, 24bpp and 32bpp BMPs.
- *
+ *            24 bpp support.
+ *     2018 - Display 4bpp, 8bpp, and 32bpp BMPs.
  */
 
 
 #include <kernel.h>
+
+
+// 4bpp support.
+static int nibble_count_16colors = 0;
 
 
 
@@ -28,7 +32,7 @@
  ********************************************************
  * bmpDisplayBMP:
  *
- * Mostra na tela uma imagem bmp carregada na memória.
+ *     Mostra na tela uma imagem bmp carregada na memória.
  * 
  * IN:
  *     address = endereço base
@@ -36,9 +40,7 @@
  *     y       = posicionamento
  *
  *	// @todo: Criar defines para esses deslocamentos.
- */
-static int nibble_count_16colors = 0;
- 
+ */ 
 int bmpDisplayBMP( char *address, 
                    unsigned long x, 
 				   unsigned long y )
@@ -46,14 +48,14 @@ int bmpDisplayBMP( char *address,
 	int i, j, base, offset;
 	
 	unsigned long left, top, bottom;
+
+	unsigned long Width, Height;
+	unsigned long xLimit, yLimit;
+	
+	unsigned short sig;
 	
 	unsigned long color, color2;
-	unsigned long pal_address;
-	
-	unsigned long Width;
-	unsigned long Height;
-	
-	unsigned long xLimit, yLimit;
+	unsigned long pal_address;	
 	
 	struct bmp_header_d *bh;
 	struct bmp_infoheader_d *bi;
@@ -68,10 +70,7 @@ int bmpDisplayBMP( char *address,
 	unsigned long *palette    = (unsigned long *) (address + 0x36);		
 	unsigned char *palette_index = (unsigned char *) &pal_address;	
 	
-	//
 	// Limits
-	//
-	
 	xLimit = 800;
 	yLimit = 600;
 	
@@ -99,31 +98,18 @@ int bmpDisplayBMP( char *address,
 	// struct for Info header
 	//
 	
-	bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );
-	
+	bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );	
     if( (void*) bh == NULL )
 	{
 		//goto fail;
 	}	
 	
-
-	//
 	// Signature.
-	//
-	
-    unsigned short sig;
-	
 	sig = *( unsigned short* ) &bmp[0];
-	
 	bh->bmpType = sig;
 	
-	
-	//
 	// Size. ( 2 bytes )
-	//
-	
 	unsigned short Size = *( unsigned short* ) &bmp[2];
-	
 	bh->bmpSize = Size;
 	
 	
@@ -133,7 +119,6 @@ int bmpDisplayBMP( char *address,
 	
 	//Windows bmp.
 	bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
-	
     if( (void*) bi == NULL )
 	{
 		//goto fail;
@@ -175,10 +160,10 @@ int bmpDisplayBMP( char *address,
 	// Draw !
 	//
 	
-	
-	
-	left = x;    //
-	top  = y; 
+//DrawBMP:	
+
+	left = x;    
+	top = y; 
 	
 	
 	//bottom = top + height;
@@ -215,7 +200,7 @@ int bmpDisplayBMP( char *address,
 		default:
 		    base = 0x36;
 			break;
-	}	
+	};	
 	
 
 //1 - 1 bpp (Mono)
@@ -227,25 +212,6 @@ int bmpDisplayBMP( char *address,
 //24 - 24 bpp (True color)
 //32 - 32 bpp (True color, RGB)
 //320 - 32 bpp (True color, RGBA)	
-
-
-    //
-	// ## ABGR8888 ##
-	// Little-endian
-	// pegando os caracteres
-	//
-	// 0 = A (MSByte)(left byte) 
-	// 1 = B 
-	// 2 = G 
-	// 3 = R
-	//
-	// Output long = 0xRRGGBBAA
-    //	
-	// Exemplo: gramado GUI
-    //#define COLOR_RED   0xFF000000 
-    //#define COLOR_GREEN 0x00FF0000
-    //#define COLOR_BLUE  0x0000FF00
-
 
 	
 	for( i=0; i < bi->bmpHeight; i++ )	
@@ -365,8 +331,6 @@ int bmpDisplayBMP( char *address,
 		        base = base + 4;    
 	        };
 			
-			
-		    //Swap4Bytes(color);
 			my_buffer_put_pixel( (unsigned long) color, 
 			                     (unsigned long) left, 
 								 (unsigned long) bottom, 
@@ -406,13 +370,14 @@ done:
 };
 
 
- 
-
-
-
 /*
+int bmpInit();
 int bmpInit()
-{}
+{
+	int Status = 0;
+	//...
+    return (int) Status;	
+};
 */
 
 //
