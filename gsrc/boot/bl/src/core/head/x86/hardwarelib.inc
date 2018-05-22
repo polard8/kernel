@@ -68,28 +68,26 @@ _test_write:
 ;
 global _os_read_sector
 _os_read_sector:
-    push eax
+    
+	push eax
 	push ebx
 	
 	;call _reset_ide0
-
-	
-	;#bugbug: Essa rotina é antiga é lenta 
-	;e foi substituída.
-	;mov eax, dword [_hd_buffer]    ;buffer.
-	;mov ebx, dword [_hd_lba]       ;lba.
+	;mov eax, dword [_hd_buffer]    ;[900004h]    ;buffer.
+	;mov ebx, dword [_hd_lba]       ;[900008h]    ;lba.
 	;call hd0_read_sector
-
+	
+	
 	; Uma nova rotina, bem mais rápida.
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to read
     ; @param RDI The address of buffer to put data 
-    ; obtained from disk	
+    ; obtained from disk
 	mov eax, dword [_hd_lba]     
 	xor ecx, ecx 
 	mov cl, 1
 	mov edi, dword [_hd_buffer]      
-	call ata_lba_read	
+	call ata_lba_read		
 	
 	pop ebx
 	pop eax
@@ -103,15 +101,22 @@ global _os_write_sector
 _os_write_sector:
     push eax
 	push ebx
+ 
+	;mov byte [0xb8000], byte 'r'
+    ;mov byte [0xb8001], byte 9
     
 	;call _reset_ide0
-		
-		
-	;#bugbug: Essa rotina é antiga é lenta 
-	;e foi substituída.		
-	;mov eax, dword [_hd_buffer]    ;buffer.
-	;mov ebx, dword [_hd_lba]       ;lba.
+	
+	;mov byte [0xb8002], byte 'w'
+    ;mov byte [0xb8003], byte 9
+	
+	;mov eax, dword [_hd_buffer]    ;[900004h] ;buffer
+	;mov ebx, dword [_hd_buffer]    ;[900008h] ;lba
 	;call hd0_write_sector
+	
+	;mov byte [0xb8004], byte '$'
+    ;mov byte [0xb8005], byte 9
+	
 	
     ; Uma nova rotina, bem mais rápida. 
     ; @param EAX Logical Block Address of sector
@@ -123,13 +128,13 @@ _os_write_sector:
 	mov edi, dword [_hd_buffer]      
 	call ata_lba_write
 	
-	;mov byte [0xb8004], byte '$'
-    ;mov byte [0xb8005], byte 9
+	
 	
 	pop ebx
 	pop eax
 	ret
-
+	
+	
 	
 	
 ;=============================================================================
@@ -277,6 +282,7 @@ ata_lba_write:
 	
 	
 	
+
 	
 
 ;------------------------------------------
@@ -300,83 +306,83 @@ HD_LBA: DD 0
 ;Nothing. 
 hd0_read_sector:
 
-    PUSH EBP
-	MOV  EBP, ESP
+    ;PUSH EBP
+	;MOV  EBP, ESP
     
-	PUSHFD
-	PUSHA
+	;PUSHFD
+	;PUSHA
 	
-	CLI
+	;CLI
 	
     ;Salva em 'HD_BUFFER' o endereço do buffer passado por 'eax'. 	
-	MOV DWORD [HD_BUFFER], EAX
+	;MOV DWORD [HD_BUFFER], EAX
 	
     ;lba está em ebx
 	
 	;;LOW
-	MOV AL, bl
-	MOV BYTE [HD_A], AL
+	;MOV AL, bl
+	;MOV BYTE [HD_A], AL
     
-	shr ebx, 8
-	MOV AL, bl
-	MOV BYTE [HD_B], AL
+	;shr ebx, 8
+	;MOV AL, bl
+	;MOV BYTE [HD_B], AL
 	
 	;;HIGH
-	shr ebx, 8
-	MOV AL, bl
-	MOV BYTE [HD_L], AL
+	;shr ebx, 8
+	;MOV AL, bl
+	;MOV BYTE [HD_L], AL
 
 	;Seleciona 'drive number, lba mode, head number.
-    mov dx, word 01f6h    ;Drive and head port.
-	mov al, 0e0h          ;lba ;Drive 0, head 0.
-	out dx, al
+    ;mov dx, word 01f6h    ;Drive and head port.
+	;mov al, 0e0h          ;lba ;Drive 0, head 0.
+	;out dx, al
     
 	;QUANTIDADE DE SETORES. (1 setor).
-	mov dx, 1f2h         ;Sector count port.
-	mov al, 1            ;Read one sector.
-	out dx, al
+	;mov dx, 1f2h         ;Sector count port.
+	;mov al, 1            ;Read one sector.
+	;out dx, al
 
 	;LBA.
 	
 	;0-7
-	mov dx, 1f3h
-	MOV AL, BYTE [HD_A]    ;LOW.
-	out dx, al
+	;mov dx, 1f3h
+	;MOV AL, BYTE [HD_A]    ;LOW.
+	;out dx, al
 	
 	;8-15
-	mov dx, 1f4h
-	MOV AL, BYTE [HD_B] 
-	out dx, al
+	;mov dx, 1f4h
+	;MOV AL, BYTE [HD_B] 
+	;out dx, al
 
 	;16-31
-	mov dx, 1f5h
-	MOV AL, BYTE [HD_L] 
-	out dx, al
+	;mov dx, 1f5h
+	;MOV AL, BYTE [HD_L] 
+	;out dx, al
 	
 	;Comandos.
-	xor eax, eax
-	mov dx, 1f7h    ;Command port.
-	mov al, 20h     ;Read with retry. 30h write.
-	out dx, al
+	;xor eax, eax
+	;mov dx, 1f7h    ;Command port.
+	;mov al, 20h     ;Read with retry. 30h write.
+	;out dx, al
 	;Nothing.
-read_still_going:
-	in al, dx
-	test al, 8             ;This means the sector buffer requires.
-	jz read_still_going    ;Don't continue until the sector buffer is ready.
+;read_still_going:
+	;in al, dx
+	;test al, 8             ;This means the sector buffer requires.
+	;jz read_still_going    ;Don't continue until the sector buffer is ready.
 
-	mov cx, 256            ;(512/2) 256 words por setor.
+	;mov cx, 256            ;(512/2) 256 words por setor.
 
 	;Prepara o destino. (buffer).
-	PUSH EAX
-	xor eax, eax
-	MOV eax, DWORD [HD_BUFFER]
-	mov edi, eax    ;dword.  
-	POP EAX
+	;PUSH EAX
+	;xor eax, eax
+	;MOV eax, DWORD [HD_BUFFER]
+	;mov edi, eax    ;dword.  
+	;POP EAX
 	
-	mov dx, 1f0h    ;Data port, data comes in and out of here.
-	rep insw
+	;mov dx, 1f0h    ;Data port, data comes in and out of here.
+	;rep insw
 	;Nothing.
-    STI
+    ;STI
 	
 	;
 	;@todo: o função hd_wait funciona. usá-la
@@ -384,14 +390,14 @@ read_still_going:
 	
     ;call hd_wait 	
 	
-	call Small_Delay
-	call Small_Delay
-	call Small_Delay
-	call Small_Delay
-	call Small_Delay
-	POPA
-	POPFD
-	POP EBP	 
+	;call Small_Delay
+	;call Small_Delay
+	;call Small_Delay
+	;call Small_Delay
+	;call Small_Delay
+	;POPA
+	;POPFD
+	;POP EBP	 
 	RET
 
 
@@ -406,84 +412,84 @@ read_still_going:
 ;
 hd0_write_sector:
 
-    PUSH EBP
-	MOV  EBP, ESP
+    ;PUSH EBP
+	;MOV  EBP, ESP
     
-	PUSHFD
-	PUSHA
+	;PUSHFD
+	;PUSHA
 	
-	CLI
+	;CLI
 
 	;;SALVA 	
-	MOV DWORD [HD_BUFFER], EAX
+	;MOV DWORD [HD_BUFFER], EAX
   	
 	;;LOW
-	MOV AL, bl
-	MOV BYTE [HD_A], AL
+	;MOV AL, bl
+	;MOV BYTE [HD_A], AL
     
-	shr ebx, 8
-	MOV AL, bl
-	MOV BYTE [HD_B], AL
+	;shr ebx, 8
+	;MOV AL, bl
+	;MOV BYTE [HD_B], AL
 	
 	;;HIGH
-	shr ebx, 8
-	MOV AL, bl
-	MOV BYTE [HD_L], AL
+	;shr ebx, 8
+	;MOV AL, bl
+	;MOV BYTE [HD_L], AL
 
 	;Seleciona 'drive number, lba mode, head number
-    mov dx, word 01f6h    ;Drive and head port
-	mov al, 0e0h          ;lba   ;Drive 0, head 0
-	out dx, al
+    ;mov dx, word 01f6h    ;Drive and head port
+	;mov al, 0e0h          ;lba   ;Drive 0, head 0
+	;out dx, al
     
 	;QUANTIDADE DE SETORES. (1 setor)
-	mov dx, 1f2h         ;Sector count port
-	mov al, 1            ;Read one sector
-	out dx, al
+	;mov dx, 1f2h         ;Sector count port
+	;mov al, 1            ;Read one sector
+	;out dx, al
 
 	;LBA.
 	
 	;0-7
-	mov dx, 1f3h
-	MOV AL, BYTE [HD_A]    ;LOW.
-	out dx, al
+	;mov dx, 1f3h
+	;MOV AL, BYTE [HD_A]    ;LOW.
+	;out dx, al
 	
 	;8-15
-	mov dx, 1f4h
-	MOV AL, BYTE [HD_B] 
-	out dx, al
+	;mov dx, 1f4h
+	;MOV AL, BYTE [HD_B] 
+	;out dx, al
 
 	;16-31
-	mov dx, 1f5h
-	MOV AL, BYTE [HD_L] 
-	out dx, al
+	;mov dx, 1f5h
+	;MOV AL, BYTE [HD_L] 
+	;out dx, al
 	
 	;Comandos.
-	xor eax, eax
-	mov dx, 01f7h    ;Command port.
-	mov al, 30h      ;with retry. 30h write.
-	out dx, al
+	;xor eax, eax
+	;mov dx, 01f7h    ;Command port.
+	;mov al, 30h      ;with retry. 30h write.
+	;out dx, al
     ;Nothing.
-write_still_going:	
-	in   al, dx
-	test al, byte 8    ;This means the sector buffer requires servicing.
-	jz write_still_going    ;Don't continue until the sector buffer is ready.
-	mov ecx, dword 256      ;512/2, ;One sector/2.
+;write_still_going:	
+	;in   al, dx
+	;test al, byte 8    ;This means the sector buffer requires servicing.
+	;jz write_still_going    ;Don't continue until the sector buffer is ready.
+	;mov ecx, dword 256      ;512/2, ;One sector/2.
 
-	mov dx, 01f0h         ;Data port - data comes in and out of here.
+	;mov dx, 01f0h         ;Data port - data comes in and out of here.
 	
-	MOV esi, DWORD [HD_BUFFER]
+	;MOV esi, DWORD [HD_BUFFER]
 	
-	rep outsw	
+	;rep outsw	
     
-	STI  ;; #bugbug ... isso pode ser problema ...
+	;STI  ;; #bugbug ... isso pode ser problema ...
 	
 	
-	push eax
-	push ecx
-	mov ecx, 300
-	call delay_do_fred
-	pop ecx 
-	pop eax
+	;push eax
+	;push ecx
+	;mov ecx, 300
+	;call delay_do_fred
+	;pop ecx 
+	;pop eax
 	
     ;call hd_wait     ;@todo: Usar wait. 	
 	
@@ -494,9 +500,9 @@ write_still_going:
 	;call Small_Delay	
 	
 	
-	POPA
-	POPFD
-	POP EBP
+	;POPA
+	;POPFD
+	;POP EBP
 	RET
 
 

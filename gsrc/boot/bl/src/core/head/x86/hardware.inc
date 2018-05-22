@@ -106,17 +106,14 @@ _irq1:
 ;@input: -
 ;@output: -
 ;
-extern _ata_irq_handler1
 _irq14:        
 	PUSH AX
-	call _ata_irq_handler1
 	MOV AL, 020h
 	OUT 0A0h, AL
 	OUT 020h, AL
 	POP AX
 	IRETD
 	
-
 	
 ;------------------------------
 ; _irq15:	
@@ -124,10 +121,8 @@ _irq14:
 ;@input: -
 ;@output: -
 ;
-extern _ata_irq_handler2
 _irq15: 
 	PUSH AX
-	call _ata_irq_handler2
 	MOV AL, 020h
 	OUT 0A0h, AL
 	OUT 020h, AL

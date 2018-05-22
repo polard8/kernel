@@ -27,7 +27,6 @@ echo -{ ...
 echo -{ Libc
     gcc -c src/libc/stdio.c     -I./include  -o stdio.o
     gcc -c src/libc/string.c    -I./include  -o string.o
-	gcc -c src/libc/stdlib.c    -I./include  -o stdlib.o
 		
 echo -{ ...
 echo -{ Init
@@ -68,7 +67,6 @@ ports.o ^
 x86.o ^
 stdio.o ^
 string.o ^
-stdlib.o ^
 keyboard.o ^
 pci.o ^
 hdd.o ^

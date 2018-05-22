@@ -84,8 +84,7 @@ _bootloader_entry_point:
 	;; módulo do kernel em kernel mode.
 	;;
 	
-	;cmp eax, dword 0x12345678
-	cmp eax, dword 5
+	cmp eax, dword 0x12345678
     je _BlKernelModuleMain	
 
     ;Debug.
@@ -735,7 +734,6 @@ idt:
 ;IRQs.
 ;
 
-;; 0 timer
 ;32 interrupt 20h, _irq0, TIMER, IRQ0.
 	dw 0         
 	dw sys_code
@@ -743,7 +741,6 @@ idt:
 	db sys_interrupt
 	dw 0
 
-;; 1	
 ;33 interrupt 21h, Keyboard, IRQ1.
 	dw 0               
 	dw sys_code
@@ -835,7 +832,6 @@ idt:
 	db sys_interrupt
 	dw 0
 
-;; ide	
 ;46 interrupt 2Eh, Reserved, IRQ 14.
 	dw 0		   
 	dw sys_code
@@ -843,7 +839,6 @@ idt:
 	db sys_interrupt
 	dw 0
 
-; ide	
 ;47 interrupt 2Fh, Reserved, IRQ15.
 	dw 0		   
 	dw sys_code
