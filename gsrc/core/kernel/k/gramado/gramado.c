@@ -18,39 +18,62 @@
 #include <kernel.h>
 
 
-//Status do gws.
-//int gws_status;
-
-//Qual é o id do processo que é o atual window manager.
-//o oficial é o Gramado Window Manager, hoje 
-//chamado de shell.bin
-//int gws_wm_PID;
-
-/*
-int gwsOpen( int pid )
-{
-	gws_status
-	gws_wm_PID
-	//..
-}
-
-int gwsClose( int pid )
-{
-	gws_status
-	gws_wm_PID
-	//..
-}
-
-
-int gwsInitializeWindowManager( int pid )
-{
-	
-}
-*/
 
 // unsigned char  gws_bame[] = "GWS - Gramado Window Server";
 // unsigned char  GramadoName[] = "GRAMADO LAYER";
 
+//Status do gws.
+int gws_status;
+
+//Qual é o id do processo que é o atual window manager.
+//o oficial é o Gramado Window Manager, hoje 
+//chamado de shell.bin
+int gws_wm_PID;
+int gws_wm_status;
+ 
+ 
+//abrir o servidor de janelas. 
+int gwsOpen()
+{
+	//Aberto.
+	gws_status = 1;
+	//..
+	
+	return (int) 0;
+};
+
+
+//fechar o servidor de janelas
+int gwsClose()
+{
+	gws_status = 0;
+	
+	return (int) 0;
+};
+
+
+// Registrar um window manager.
+int gwsRegisterWindowManager( int pid )
+{
+	int Status = 0;
+	
+	if( gws_status != 1 )
+	{
+		Status = 1;
+		goto fail;
+	}else{
+		
+	    gws_wm_PID = (int) pid;	
+	    gws_wm_status = 1;
+		goto done;
+	};
+	
+fail:
+    printf("gwsRegisterWindowManager: fail\n");	
+done:
+    return (int) 0;		
+};
+ 
 
 
 //internas

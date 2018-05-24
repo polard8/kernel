@@ -64,15 +64,38 @@
 // Includes.
 // 
 
-#include "api.h"
+
+#include "compiler.h"
+
+//lib C
+//Isso deveria estar em um mesmo lugar para todos 
+//os aplicativos.
+//ex: c:\gramado\branch\libc
 #include "types.h"
 #include "stddef.h"   
 #include "stdio.h"   
 #include "stdlib.h"  
 #include "string.h"
+
 #include "shell.h"
 #include "globals.h"
 #include "builtins.h"
+#include "api.h"
+
+
+//salvando ordem
+//#include "api.h"
+//#include "types.h"
+//#include "stddef.h"   
+//#include "stdio.h"   
+//#include "stdlib.h"  
+//#include "string.h"
+//#include "shell.h"
+//#include "globals.h"
+//#include "builtins.h"
+
+
+//#define SHELL_VERBOSE 1
 
 //inicialização silenciosa. Suprime alguns verboses.
 int quiet = 0;	
@@ -226,6 +249,8 @@ int GramadoMain( int argc,
 				 unsigned long long1, 
 				 unsigned long long2 )
 {
+	register int i;
+	char *filename;
 	
 	//
 	// Obs: Esse não é um programa que roda em modo terminal,
@@ -309,7 +334,15 @@ int GramadoMain( int argc,
             
             //printf("Initializing an interactive shell ...\n");
             //printf("arg[0]={%s}\n",argv[0]);			
-        };		
+        };
+
+        //Se o shell foi iniciado com um arquivo de script para ser 
+        //executado.
+		//a Flag -f indica que o que segue é um arquivo de script.
+        //if( strncmp( (char *) argv[0], "-f", 2 ) == 0 )
+        //{
+		//	goto dosh2;
+		//}			
 		
 	    if( strncmp( (char *) argv[1], "-login", 2 ) == 6 )
 	    {
@@ -731,12 +764,20 @@ noArgs:
 		
 Mainloop:		
 	while(running)
-	{
-
+	{		
 
 		//  #bugbug SYSTEMCALL_GET_KEYBOARD_MESSAGE está pegando a mensagem de teclado,
 		//          mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
 		//          qual foi o dispositivo gerador do evento. ??!!
+		
+		
+		//
+		//@todo: Nesse momento podemos enviar um ponteiro de estrutura de 
+		//mensagem para que o kernel inicialize a estrutura com a mensagem 
+		//que está na fila de mensagens dessa thread ou janela.
+		// #bugbug: Como ainda não implementamos isso, então estamos usando 
+		//um método improvisado de pegar a mensagem por partes.
+		
 		
        enterCriticalSection(); 
        //apiBeginPaint();
@@ -771,7 +812,14 @@ Mainloop:
 									 
 
 		//apiEndPaint();
-		exitCriticalSection(); 							 
+		exitCriticalSection(); 
+
+        //@todo: 
+        //if( (int) msg_Message == 0 )
+        //{
+			//não há mensagens, podemos dormir.
+			//wait(getpid());
+		//}			 
 
         //
         // + PEGAMOS A MENSAGEM NA FILA DA JANELA COM O FOCO DE ENTRADA.
@@ -799,6 +847,7 @@ Mainloop:
 			
 			switch(ShellFlag)
 			{
+				// Sai do shell.
 				case SHELLFLAG_EXIT:
 				    goto end;
 					break;
@@ -855,7 +904,11 @@ skip_input:
 	//
 	
 end:
+
+#ifdef SHELL_VERBOSE		
     printf("SHELL.BIN: exiting main() ...\n");
+#endif 
+	
 	return (int) 0;
 };
 
@@ -2421,7 +2474,12 @@ dosh:
 	//o comando [0] é o 'dosh' o [1] é o nome do script.
     shellExecuteThisScript(tokenList[1]);	
 	goto NewCmdLine;
-	goto exit_cmp;	
+	
+   //Executar um script logo na inicialização do shell	
+//dosh2:	
+//    shellExecuteThisScript(argv[1]);	
+//	goto NewCmdLine;
+
 	
 	//
 	// Se o arquivo não foi encontrado não há mais o que fazer.
@@ -2550,16 +2608,27 @@ void shellShell()
 	// Setup buffers.
 	//
 	
+	//
+	// #inportante:
+	// #bugbug: Não podemos deixar o stdout como screenbuffer 
+	// pois no screen buffer os caracteres tem atributos ...
+	// e no stdout podemos ter um arquivo normal ...
+	//ou saída normal que servirá de entrada para  
+	//outro processo.
     // reiniciando as variáveis na estrutura do output
-	stdout->_base = &screen_buffer[0];
-	stdout->_ptr = stdout->_base;
-	stdout->_cnt = PROMPT_MAX_DEFAULT;
-	stdout->_file = 1;
-	stdout->_tmpfname = "shell_stdout";
+	//
+	
+	//obs: Ao cancelarmos isso o std volta a ser 
+	//o antigo e já configurado stdout.
+	//stdout->_base = &screen_buffer[0];
+	//stdout->_ptr = stdout->_base;
+	//stdout->_cnt = PROMPT_MAX_DEFAULT;
+	//stdout->_file = 1;
+	//stdout->_tmpfname = "shell_stdout";
+	
 	//...	
 	//
 	// Obs:
-	// shell_buffer[] = Aqui é o buffer de output. 
 	// prompt[] - Aqui ficam as digitações. 
 	//
 	shellClearBuffer();
@@ -2686,8 +2755,12 @@ int shellInit( struct window_d *window )
 		// mensagens !!
 		//
 		
+		
+#ifdef SHELL_VERBOSE		
 		printf("shellInit: Starting shell.bin ... \n");
-		printf("shellInit: Running tests ...\n");	
+		printf("shellInit: Running tests ...\n");
+#endif
+		
 	};
 	
 	
@@ -2702,8 +2775,10 @@ int shellInit( struct window_d *window )
 	if( ActiveWindowId == (-1)){
 	    printf("shellInit: ERROR getting Active window ID\n");	
 	}	
+	
+#ifdef SHELL_VERBOSE			
 	printf("ActiveWindowId={%d}\n", ActiveWindowId );
-
+#endif
 	
 	//
 	// Obtendo informações sobre a janela com o foco de entrada.
@@ -2718,18 +2793,21 @@ int shellInit( struct window_d *window )
 	if( WindowWithFocusId == (-1)){
 	    printf("shellInit: ERROR getting Window With Focus ID\n");	
 	}	
-	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
 	
+#ifdef SHELL_VERBOSE			
+	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
+#endif
 	
 	//
 	// Obetendo informações sobre linhas e colunas do shell.
 	//
 	
 	
+#ifdef SHELL_VERBOSE		
 	//columns and rows
 	printf("shellMaxColumns={%d} \n", shellMaxColumns );
 	printf("shellMaxRows={%d} \n", shellMaxRows );	
-		
+#endif
 	
 	
 	//
@@ -2773,10 +2851,9 @@ int shellInit( struct window_d *window )
 	    printf("ERROR getting PPID\n");	
 	}
   
+    //Mensagem ...
 	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n", PID, PPID );
 	
-	
-
 	
 	//
 	// @todo: Criar processos processos:
@@ -2784,8 +2861,13 @@ int shellInit( struct window_d *window )
  	//     (Mermaids) Usados para testes.
 	//
 
+#ifdef SHELL_VERBOSE			
 	printf("Creating processes ...\n");
+#endif	
 	
+	
+	
+#ifdef SHELL_VERBOSE			
 	//D.:)
 	P=(void*)apiCreateProcess(0x400000,PRIORITY_HIGH,"D");
 	if((void*)P==NULL){printf("Fail creating process D :)\n");};
@@ -2810,7 +2892,7 @@ int shellInit( struct window_d *window )
 	
 	printf("Created!\n");
 	//...
-	
+#endif	
 	
 	
 	//
@@ -2831,7 +2913,9 @@ int shellInit( struct window_d *window )
     //...
 
 	//stdlib.h
+#ifdef SHELL_VERBOSE			
 	printf("Testing stdlib:\n");
+#endif
 	
 	//
 	// *Importante:
@@ -2844,6 +2928,8 @@ int shellInit( struct window_d *window )
 //initRT:	
 	//libcInitRT(); 
 	
+	
+#ifdef SHELL_VERBOSE			
 	//Obs: Sempre inicia com o mesmo número.
 	int rand_value;
 	rand_value = (int) rand();
@@ -2853,7 +2939,7 @@ int shellInit( struct window_d *window )
     //rand_value = (int) rand();
 	//printf("RandValue3={%d}\n", rand_value);
 	//...
-	
+#endif	
 
 	//stddef.h
 	//printf("Testing stddef:\n");	
@@ -2868,8 +2954,8 @@ int shellInit( struct window_d *window )
 	
 	
 	//Funcionou...
-	//sprintf( shell_buffer,"Testando String dentro do buffer\n");
-	//printf("%s",shell_buffer);
+	//sprintf( buffer,"Testando String dentro do buffer\n");
+	//printf("%s",buffer);
 	
 
 	//
@@ -2886,7 +2972,7 @@ int shellInit( struct window_d *window )
 	//
 	// Testing commands.
 	//
-
+#ifdef SHELL_VERBOSE		
 	//Lib C.
 	//libC. (stdlib.c)
 	system("test");       
@@ -2894,13 +2980,17 @@ int shellInit( struct window_d *window )
 	system("start");
 	system("xxfailxx");
 	//...
+#endif
 	
+	
+#ifdef SHELL_VERBOSE			
 	//API.
 	apiSystem("test");    
     apiSystem("ls");
 	apiSystem("start");
 	apiSystem("xxfailxx");
 	//...
+#endif
 	
 	//Ok funcionando ...
 	//@todo: Testar outros comandos.
@@ -2916,8 +3006,9 @@ int shellInit( struct window_d *window )
 	
 	
 	//test: get current volume id.
-	CurrentVolumeID = (int) system_call(171,0,0,0);		
-
+	CurrentVolumeID = (int) system_call(171,0,0,0);
+	
+    //Mensagem importante.
 	printf("The current volume id is %d\n",CurrentVolumeID);
 	
 	// setup ID.
@@ -2927,16 +3018,24 @@ int shellInit( struct window_d *window )
 	shellUpdateWorkingDiretoryString(SHELL_ROOTWORKINGDIRECTORY_ID);
 	
 	
+//
+// Done.
+//	
+	
 done:
     
 	// Se o shell não for interativo não tem login.
 	if(interactive == 1)
 	{
+		
 		// Testing welcome message.
-	    printf("...\n");
+	    printf("\n");
 	    printf("Welcome to Gramado Operating System.\n");
 	    printf("\n");
 	
+	    //char sUsername[11] = "           ";
+	    //char sPassword[11] = "           ";
+
 	    char sUsername[11];
 	    char sPassword[11];
 		
@@ -2948,7 +3047,8 @@ done:
 	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s}",sUsername,sPassword);
-   }
+		printf("\n");
+    };
 	
 	
 	//
@@ -3044,60 +3144,37 @@ void shellThread()
 
 
 //help message
-void shellHelp(){
+void 
+shellHelp()
+{
     printf(help_banner);	
-	return;
 };
 
 //drawing a tree
-void shellTree(){
-    printf(tree_banner);	
-	return;
-};
-
-//
-// C function to demonstrate the working of arithmetic operators
-//#include <stdio.h>
-/*
-int test_operators()
+void 
+shellTree()
 {
-    int a = 9,b = 4, c;
-    
-	printf("Testing operators ...\n");
-	
-    c = a+b;
-    printf("a+b = %d \n",c);
-
-    c = a-b;
-    printf("a-b = %d \n",c);
-    
-    c = a*b;
-    printf("a*b = %d \n",c);
-    
-    c=a/b;
-    printf("a/b = %d \n",c);
-    
-    c=a%b;
-    printf("Remainder when a divided by b = %d \n",c);
-    
-    return 0;
+    printf(tree_banner);	
 };
-*/
+
 
 /*
  ********************************************************************
  * shellPrompt:
  *     Inicializa o prompt.
- *     Na inicialização de stdio, prompt foi definido como stdin->_base.
+ *     Na inicialização de stdio, 
+ * prompt foi definido como stdin->_base.
+ *
  */
-void shellPrompt()
+void 
+shellPrompt()
 {	
 	int i;
 	
 	//Linpando o buffer de entrada.
 	for( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
 		prompt[i] = (char) '\0';
-	};
+	}
 	
     prompt[0] = (char) '\0';
 	prompt_pos = 0;
@@ -3147,16 +3224,16 @@ void shellShowScreenBuffer()
 	int j = 0;
 	
 	//#teste 
-	screen_buffer[0] = 'd';
-	screen_buffer[2] = 'u';
-	screen_buffer[4] = 'r';
-	screen_buffer[6] = 't';
+	//screen_buffer[0] = 'd';
+	//screen_buffer[2] = 'u';
+	//screen_buffer[4] = 'r';
+	//screen_buffer[6] = 't';
 	
 	//shellClearScreen();
     shellSetCursor(0,0);
 	
 	// Shell buffer.
-	for( i=0; i<SCREEN_BUFFER_SIZE; i++ )
+	for( i=0; i<(DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS); i++ )
 	{
 		
 	    printf( "%c", screen_buffer[j] );
@@ -3164,7 +3241,7 @@ void shellShowScreenBuffer()
 		j++;
 	};	
 
-    screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+    //screen_buffer_pos = 0; 
 };
 
 
@@ -3184,8 +3261,12 @@ void shellTestLoadFile()
 	//
 	
 	int Ret;
+	
+#ifdef SHELL_VERBOSE	
 	printf("...\n");
 	printf("Testing buffer ... Loading file...\n");
+#endif
+
 	
 	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS 
 	// #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
@@ -3302,10 +3383,10 @@ void shellClearScreen()
 {
 	int i;
 	
-	
+#ifdef SHELL_VERBOSE	
 	//#debug
 	printf("shellClearScreen:\n");
-	
+#endif	
 	
 	//
 	// Limpamos o screen buffer.
@@ -3337,8 +3418,10 @@ void shellRefreshScreen()
     int lin, col;  
 	int Offset; //Deslocamento dentro do screen buffer.
 	
-		//#debug
+#ifdef SHELL_VERBOSE		
+	//#debug
 	printf("shellRefreshScreen:\n");
+#endif 
 
 	//cursor apontando par ao início da janela.
 	//usado pelo printf.
@@ -3495,6 +3578,12 @@ void shellFillOutputBuffer( char element, int element_type )
 //coloca um char na próxima posição do buffer
 void shellInsertNextChar(char c)
 {
+	screen_buffer_pos++;
+	if( screen_buffer_pos >= (80*25*2) )
+	{
+	    //#fim do buffer
+        printf("shellInsertNextChar: limit");		
+	}
 	screen_buffer[ screen_buffer_pos*2 ] = (char) c;
 	screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;
 };
@@ -3502,6 +3591,13 @@ void shellInsertNextChar(char c)
 
 void shellInsertCR()
 {
+	screen_buffer_pos++;
+	if( screen_buffer_pos >= (80*25*2) )
+	{
+	    //#fim do buffer
+        printf("shellInsertCR: limit");		
+	}
+	
    screen_buffer[screen_buffer_pos*2 ] = (char) '\r';
    screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;   
 };
@@ -3509,6 +3605,13 @@ void shellInsertCR()
 
 void shellInsertLF()
 {
+	screen_buffer_pos++;
+	if( screen_buffer_pos >= (80*25*2) )
+	{
+	    //#fim do buffer
+        printf("shellInsertLF: limit");		
+	}
+	
     screen_buffer[ screen_buffer_pos*2 ] = (char) '\n';
     screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;	
 };
@@ -3516,6 +3619,13 @@ void shellInsertLF()
 
 void shellInsertNullTerminator()
 {
+	screen_buffer_pos++;
+	if( screen_buffer_pos >= (80*25*2) )
+	{
+	    //#fim do buffer
+        printf("shellInsertNullTerminator: limit");		
+	}
+	
     screen_buffer[ screen_buffer_pos*2 ] = (char) '\0';
     screen_buffer[ (screen_buffer_pos*2)+1 ] = 7;	
 };
@@ -3591,8 +3701,7 @@ void shellShowInfo()
 {
 	int PID, PPID;
 	
-	
-    printf("shellShowInfo: Showing some infos ...\n");
+    printf(" ## shellShowInfo:  ##\n");
 	
 	
     PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
@@ -3606,11 +3715,9 @@ void shellShowInfo()
 	}
   
 	printf("Process info: PID={%d} PPID={%d} \n", PID, PPID );
-	
-	
 	printf("shellMaxColumns={%d} \n", shellMaxColumns );
 	printf("shellMaxRows={%d} \n", shellMaxRows );	
-	
+	//...
 };
 
 
@@ -3638,7 +3745,7 @@ void shellShowMetrics()
 	//...
 	
 	
-	printf("shellShowMetrics:\n");
+	printf("  ##  shellShowMetrics:  ##\n");
 	printf("screenWidth={%d} screenHeight={%d}\n",screen_width,screen_height);
 	printf("cursorWidth={%d} cursorHeight={%d}\n",cursor_width,cursor_height);
 	printf("mousepointerWidth={%d} mousepointerHeight={%d}\n", 
@@ -3646,9 +3753,10 @@ void shellShowMetrics()
 	printf("charWidth={%d} charHeight={%d}\n",char_width,char_height);	
 	//...
 	
-	
-done:	
-    printf("Done\n");	
+done:
+#ifdef SHELL_VERBOSE		
+    printf("Done\n");
+#endif	
 	return;
 };
 
@@ -3658,8 +3766,7 @@ void shellShowSystemInfo()
 	int ActiveWindowId;
 	int WindowWithFocusId;
 	
-	
-	printf("shellShowSystemInfo:\n");
+	printf("  ##  shellShowSystemInfo:  ##\n");
 	
 	//
 	//Active
@@ -3695,9 +3802,9 @@ void shellShowWindowInfo()
 	// da estrutura para um ponteiro em user mode.
 	// Podemos ter erros de memória com essas operações.
 		
-	printf("\n shell_info: \n");
-		
-	// esse printf funcionou.
+	printf("\n");	
+	printf("  ##  shellShowWindowInfo  ##\n");
+	
 	printf("mainWindow={%x}", shell_info.main_window );
 		
 	//#bugbug 
@@ -4166,7 +4273,9 @@ execve:
 		// possam pegar essas mensgens de caractere.
 		//
 		
+#ifdef SHELL_VERBOSE		
 		printf("shell: aplicativo inicializado.\n"); 
+#endif
 		
 		//
 		// ## teste ##
@@ -4195,7 +4304,9 @@ execve:
 		// Se falhou significa que o aplicativo não vai executar,
 		// então não mais o que fazer.
 		
+		//#importante: Error message.
 		printf("shell: aplicativo nao foi inicializado.\n");
+		
 		ShellFlag = SHELLFLAG_COMMANDLINE;
 		goto fail;
 	};
@@ -4211,15 +4322,12 @@ execve:
 
 	
 fail:
+    //#importante: Error message.
     //status = 1.
     printf("shell_gramado_core_init_execve: \n fail retornando ao interpretador\n");
 done:
     return (int) Status;						  
 };
-
-
-
-
 
 
 

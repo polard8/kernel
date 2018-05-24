@@ -180,6 +180,127 @@ fail:
 };
 
 
+
+//copiar um processo.
+//isso será usado por fork.
+int processCopyProcess( int p1, int p2 )
+{
+	int Status = 0;
+	
+    struct process_d *Process1;	
+	struct process_d *Process2;
+	
+	
+	//Check limits
+	//if( p1 < 1 ...
+	//if( p2 < 1 ...
+	
+	Process1 = (struct process_d *) processList[p1];
+	Process2 = (struct process_d *) processList[p2];
+	
+	
+	if( (void*) Process1 == NULL )
+	{
+		printf("processCopyProcess: Process1\n");
+		goto fail;
+	}else{
+		
+		if( Process1->used != 1 || Process1->magic != 1234 )
+		{
+		   printf("processCopyProcess: Process1 used magic \n");
+		   goto fail;			
+		}	
+	};
+	
+	if( (void*) Process2 == NULL )
+	{
+		printf("processCopyProcess: Process1\n");
+		goto fail;
+	}else{
+
+		if( Process2->used != 1 || Process2->magic != 1234 )
+		{
+		   printf("processCopyProcess: Process2 used magic \n");
+		   goto fail;			
+		}	
+	};
+	
+	
+	//copy
+copy:	
+	Process2->objectType = Process1->objectType;
+	Process2->objectClass = Process1->objectClass;	
+	
+	//Identificadores.
+	Process2->pid  = (int) p2;       //PID.
+    Process2->ppid = Process1->ppid; //PPID. 
+	Process2->uid  = Process1->uid;  //UID. 
+    Process2->gid  = Process1->gid;  //GID. 
+		
+	//State of process
+	Process2->state = Process1->state;  
+	
+	//Plano de execução.
+    Process2->plane = Process1->plane;		
+		
+	Process2->used = Process1->used;
+	Process2->magic = Process1->magic;			
+		
+	//Process->name_address = NULL;
+	
+	Process2->framepoolListHead = Process1->framepoolListHead;
+	
+	Process2->Directory = Process1->Directory;
+	
+	Process2->Image = Process1->Image;
+	
+    //heap
+	Process2->Heap = Process1->Heap;    
+	Process2->HeapEnd = Process1->HeapEnd; 
+	Process2->HeapSize = Process1->HeapSize;  	
+	
+	//stack
+	Process2->Stack = Process1->Stack;   
+	Process2->StackEnd = Process1->StackEnd; 
+	Process2->StackSize = Process1->StackSize;   	
+	Process2->StackOffset = Process1->StackOffset; 	
+	
+	
+	Process2->iopl = Process1->iopl;
+	
+	Process2->procedure = Process1->procedure;
+	
+	
+	//message support.
+	Process2->window = Process1->window;  //arg1. 
+	Process2->msg    = Process1->msg;     //arg2.
+	Process2->long1  = Process1->long1;   //arg3.
+	Process2->long2  = Process1->long2;   //arg4.	
+	
+	
+	Process2->base_priority = Process1->base_priority;
+	Process2->priority = Process1->priority;	
+	
+	//?? herda a lista de threads ??
+	Process2->threadListHead = Process1->threadListHead;
+	
+	Process2->zombieChildListHead = Process1->zombieChildListHead;
+		
+	Process2->exit_code = Process1->exit_code;
+		
+	Process2->Next = Process1->Next; 
+
+	Status = 0;
+	goto done;	
+	
+fail:
+	Status = 1;
+    printf("processCopyProcess: fail:\n");
+done:
+    return (int) Status;	
+};
+
+
 /*
  ***********************************************************************
  * create_process:
@@ -294,23 +415,21 @@ get_next:
 		Process->objectType = ObjectTypeProcess;
 		Process->objectClass = ObjectClassKernelObjects;
 		
-		//c
 		processNewPID = (int) i;
-		//processNewPID++;
 		
-		//b,a,g, Identificadores.
+		//Identificadores.
 		Process->pid  = (int) i;                    //PID.
-        Process->ppid = (int) ppid;                 //PPID.    @todo:
+        Process->ppid = (int) ppid;                 //PPID. 
 		Process->uid  = (int) GetCurrentUserId();   //UID. 
         Process->gid  = (int) GetCurrentGroupId();  //GID. 
 
-		//f,flag, State of process
+		//State of process
 		Process->state = INITIALIZED;  
 
 		//@TODO: ISSO DEVERIA VIR POR ARGUMENTO
         Process->plane = FOREGROUND;		
 		
-		//e - Error.
+		//Error.
 		//Process->error = 0;
 		
 		Process->used = 1;
@@ -1145,7 +1264,6 @@ int init_task(int id)
 void init_tasks()
 {
     init_processes();	
-	return;
 };
 
 
@@ -1388,7 +1506,6 @@ int get_caller_process_id()
 void set_caller_process_id(int pid)
 {
 	caller_process_id = (int) pid;
-	return;
 };
 
 
@@ -1476,7 +1593,8 @@ GetProcessPageDirectoryAddress( int pid )
 	struct process_d *process;
 	
 	//Limits.
-	if( pid < 0 || pid >= PROCESS_COUNT_MAX ){
+	if( pid < 0 || pid >= PROCESS_COUNT_MAX )
+	{
 		//erro
 		goto fail; 
 	};

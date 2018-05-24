@@ -900,6 +900,10 @@ void init_processes();
 void show_process_information();
 
 
+//copiar um processo.
+//isso será usado por fork.
+int processCopyProcess( int p1, int p2 );
+
 struct process_d *create_process( struct wstation_d *window_station,
                                   struct desktop_d  *desktop,
                                   struct window_d *window,

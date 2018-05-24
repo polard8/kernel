@@ -29,6 +29,30 @@
 #define WHITE       15 
 */ 
  
+ 
+ 
+//#ifndef whitespace
+//#define whitespace(c) (((c) == ' ') || ((c) == '\t'))
+//#endif 
+
+
+//#ifndef digit
+//#define digit(c)  ((c) >= '0' && (c) <= '9')
+//#endif
+
+//#ifndef isletter
+//#define isletter(c) (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
+//#endif
+
+//#ifndef digit_value
+//#define digit_value(c) ((c) - '0')
+//#endif
+ 
+ 
+//#define NEWLINE '\n' 
+//#define TAB '\t'
+//#define SPACE 0x020
+ 
 //
 // Buffer support.
 // 
