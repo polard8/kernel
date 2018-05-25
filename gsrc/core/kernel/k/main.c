@@ -437,6 +437,8 @@ doDebug:
 	// TESTANDO SALVAR UM ARQUIVO ...
     //?? stdin ??
 	
+	char file_1[] = "Isso é um arquivo de teste ..... \n testando salvar um arquivo!!!!:)";
+	
 	char file_name[] = "savetest.txt";
 	write_fntos( (char *) file_name );
 	
@@ -444,7 +446,7 @@ doDebug:
 	
 	//stdin->_base = (char*) file_name;
 	
-	fsSaveFile( file_name, 3, file_name);
+	fsSaveFile( file_name, 3, file_1);
     
 	//
     // RETURNING !

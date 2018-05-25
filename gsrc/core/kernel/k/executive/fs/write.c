@@ -431,7 +431,7 @@ SavingFile:
             //grava - aqui next esta certo!!!
 			printf("write_lba\n");
             refresh_screen();
-            write_lba( (unsigned long) address, next);
+            write_lba( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
             
             address += 512; 
         }; 
