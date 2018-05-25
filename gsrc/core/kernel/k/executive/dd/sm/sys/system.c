@@ -282,7 +282,7 @@ void *systemRam( int number,
 		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
 		    return (void *) fsSaveFile( (unsigned char *) arg1, 
 			                            (unsigned long) arg2, 
-										(unsigned long) arg3 );				    
+										(char *) arg3 );				    
 			break;
 		
 		//Create user.

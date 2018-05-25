@@ -67,6 +67,7 @@ int hddError;
  
 
 /*
+ *****************************************
  * my_read_hd_sector:
  * eax - buffer
  * ebx - lba
@@ -79,42 +80,18 @@ void my_read_hd_sector( unsigned long ax,
 						unsigned long cx, 
 						unsigned long dx )
 {
-	
-	
- 
-
-	
-   //endereço.
-   //_void *buf = (_void *) ax;
-
-  //
-  // read sector do nelson...
-  //
-   
-   //read_sector(void *buf,uint64_t addr,uint16_t count,char dev)  
-   
-    //read_sector( (void *) buf,
-	//             (uint64_t) bx,
-	//			  1,
-	//			  0 );  
-				  
-				  
-	//return;	
-	
-
-    //
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba    = (unsigned long) bx;    //arg2 = lba.
 	
-	//
-	// Read sector.
+	// Read sector. (ASM)
 	os_read_sector(); 	
     return;
 };
 
 
 /*
+ *************************************
  * my_write_hd_sector:
  * eax - buffer
  * ebx - lba
@@ -127,13 +104,11 @@ void my_write_hd_sector( unsigned long ax,
 						 unsigned long cx, 
 						 unsigned long dx )
 {
-    //
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba    = (unsigned long) bx;    //arg2 = lba.
 	
-	//
-	// Write sector.	 
+	// Write sector. (ASM)	 
 	os_write_sector(); 
 	return;
 };   

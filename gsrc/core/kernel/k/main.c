@@ -437,9 +437,16 @@ doDebug:
 	// TESTANDO SALVAR UM ARQUIVO ...
     //?? stdin ??
 	
-	fsSaveFile( NULL, 2, (unsigned long) stdin->_base );  
+	char file_name[] = "savetest.txt";
+	write_fntos( (char *) file_name );
 	
-    //
+	//fsSaveFile( file_name, 2, (unsigned long) stdin->_base );  
+	
+	//stdin->_base = (char*) file_name;
+	
+	fsSaveFile( file_name, 3, file_name);
+    
+	//
     // RETURNING !
     //
 

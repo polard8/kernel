@@ -811,7 +811,8 @@ void limpa_root();
 unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address); 
 unsigned long fsSaveFile( unsigned char *file_name, 
                           unsigned long file_size, 
-						  unsigned long file_address );
+						  char* file_address );
+						  
 int fsSearchFile( unsigned char *file_name);
 unsigned long fsSearchFileName( unsigned char *name);
 

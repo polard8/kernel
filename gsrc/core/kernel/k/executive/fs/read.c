@@ -146,6 +146,7 @@ void read_lba( unsigned long address, unsigned long lba)
 			break;		
 			
 	    case 16:
+		    //hdd.c
 	        my_read_hd_sector( address, lba, 0, 0);	    
             return;
 			break;		
