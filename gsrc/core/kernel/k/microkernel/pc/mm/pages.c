@@ -218,6 +218,7 @@ static inline void __native_flush_tlb_single(unsigned long addr)
 
 
 /*
+ *******************************************************
  * CreatePageDirectory:
  *     Cria um page directory para um processo.
  *     Obs:
@@ -225,29 +226,30 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  *     + Precisa ser um endereço físico.
  *     +...
  *
- *
  * Obs:
  *   **  Aviso importante!  **
- *     O endereço passado via argumento pode ser alocado ninamicamente antes 
- * ou então essa rotina pode corromper alguma área importante.
- * Ante de chamar essa rotina devemos alocar memória do tamanho de um diretório,
- * que é de 1024 entradas de 4bytes. (1024*4).
- *
+ *     O endereço passado via argumento pode ser alocado 
+ * dinamicamente antes ou então essa rotina pode corromper 
+ * alguma área importante.
+ * Antes de chamar essa rotina devemos alocar memória do 
+ * tamanho de um diretório, que é de 1024 entradas de 4 bytes. 
+ * (1024*4).
  */
-void *CreatePageDirectory(unsigned long directory_address)
+void *CreatePageDirectory( unsigned long directory_address )
 {	
 	int i;
-	unsigned long *newPD = (unsigned long *) directory_address;  //Diretório.
+	unsigned long *newPD = (unsigned long *) directory_address;  
 	
 	//Limits.
-	if(directory_address == 0){
+	if( directory_address == 0 ){
 		return NULL;
-	};
+	}
 
 	//Criamos um diretório vazio com páginas não presentes.
 	for( i=0; i < 1024; i++ )
 	{
-		newPD[i] = (unsigned long) 0 | 2;    //010 em binário.
+		// 0010 em binário.
+		newPD[i] = (unsigned long) 0 | 2;    
 	};
 
 	//
@@ -261,7 +263,6 @@ void *CreatePageDirectory(unsigned long directory_address)
 	
 	//pagedirectoryList[??] = (unsigned long) &newPD[0]; 
 	
-	
 	//...
 	
 done:	
@@ -271,6 +272,7 @@ done:
 
 
 /*
+ *********************************************************
  * CreatePageTable:
  *     Cria uma page table em um diretório.
  *     Obs:
@@ -280,48 +282,58 @@ done:
  *
  * Argumentos:
  *
- *     directory_address - O endereço do diretório onde colocaremos o endereço 
- * do início da página que criaremos.
+ *     directory_address
+ *         O endereço do diretório onde colocaremos o endereço 
+ * do início da tabela de página que criaremos.
  *
- *     offset - O deslocamento dentro do diretório para sabermos o lugar para 
- * salvarmos o endereço da tabela de páginas que estamos criando.
- * @todo: Na hora de salvarmos esse endereço também temos que incluir as flags.
+ *     offset
+ *         O deslocamento dentro do diretório para sabermos o 
+ * lugar para salvarmos o endereço da tabela de páginas 
+ * que estamos criando.
+ * @todo: Na hora de salvarmos esse endereço também 
+ * temos que incluir as flags.
  *
- *     page_address - O endereço da página que estamos criando.
- * Obs: Precisamos alocar memória para a pagetable que estamos criando, isso 
- * antes de chamarmos essa rotina. Obs: Uma pagetable tem 4096 bytes de tamanho.
- *
+ *     page_address
+ * O endereço da página que estamos criando.
+ * Obs: Precisamos alocar memória para a pagetable 
+ * que estamos criando, isso antes de chamarmos essa rotina. 
+ * Obs: Uma pagetable tem 4096 bytes de tamanho.
  * Obs: Criamos uma tabela de páginas, com páginas em user mode.
+ *
+ * #importante:
+ * O offset é um índice dentro do diretório de páginas.
  *
  */
 void *CreatePageTable( unsigned long directory_address, 
-                      int offset, 
-					  unsigned long page_address )
+                       int offset, 
+					   unsigned long page_address )
 {
 	int i;
 	unsigned long *PD = (unsigned long *) directory_address;  //Diretório.
 	unsigned long *newPT = (unsigned long *) page_address;    //Tabela de páginas.
 	
 	//Limits.
-	if(directory_address == 0){
+	if( directory_address == 0 ){
 		return NULL;
-	};
+	}
+	
+	//Limits.
+	if( offset < 0 ){
+		return NULL;
+	}
 
 	//Limits.
-	if(offset < 0){
+	if( page_address == 0 ){
 		return NULL;
-	};
-
-	//Limits.
-	if(page_address == 0){
-		return NULL;
-	};
+	}
 	
 
-	//Criando uma pagetable.
-	//4MB de memória física.
+	// Criando uma pagetable.
+	// 4MB de memória física.
 	// user mode pages
-	//será usado pelo processo em user mode. Note as flags.(7).
+	// Será usado pelo processo em user mode. 
+	// Note as flags.(7).
+	
 	for( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
@@ -357,17 +369,17 @@ void SetCR3(unsigned long address)
 {
 	if(address == 0){
 		return;
-	};
+	}
 	asm volatile("\n" :: "a"(address) );
 	set_page_dir();
-	return;
 };
 
 
 /*
+ ***********************************************************
  * SetUpPaging:
- *     Configura o diretório de páginas do processo Kernel e algumas tabelas 
- * de páginas.
+ *     Configura o diretório de páginas do processo Kernel e 
+ * algumas tabelas de páginas.
  *
  * Obs: 
  *     Na hora em que um processo é criado deve-se criar seu diretório de 
@@ -486,10 +498,6 @@ int SetUpPaging()
 	//
 	// **** Endereços iniciais áreas de memória 'não paginada'.
 	//
-	
-
-	
-	
 
 
 	//
@@ -721,7 +729,7 @@ int SetUpPaging()
     {
 		//IF SMALL
 	    km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     //011 binário.
-	    SMALL_kernel_base       = (unsigned long) SMALL_kernel_base + 4096;  //+4KB.
+	    SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096;  //+4KB.
 		
 		//if MEDIUM
 		
@@ -800,7 +808,7 @@ int SetUpPaging()
 	    //IF SMALL
 		//7 decimal é igual a 111 binário.
 		um_page_table[i] = (unsigned long) SMALL_user_address | 7;     
-	    SMALL_user_address     = (unsigned long) SMALL_user_address + 4096;  //+4KB.
+	    SMALL_user_address = (unsigned long) SMALL_user_address + 4096;  //+4KB.
 		
 		//if MEDIUM
 		
@@ -871,7 +879,7 @@ int SetUpPaging()
 		//ID SMALL
 		//7 decimal é igual a 111 binário.
 	    vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     
-	    SMALL_vga_address       = (unsigned long) SMALL_vga_address + 4096;  //+4KB.
+	    SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096;  //+4KB.
 		
 		//if MEDIUM
 		
@@ -1624,14 +1632,20 @@ void notfreePageframe(struct page_frame_d *pf)
 /*
  ******************************************************
  * newPageFrame:
- *    Aloca apenas uma página e retorna o ponteiro.
+ *    Aloca apenas um frame de memória física e retorna 
+ * o ponteiro.
  *    ? kernel mode ? user mode ?
  *    obs: isso funciona bem.
+ * Obs: Isso é usado pelo alocador de páginas, logo abaixo.
+ * 
  */
 void *newPageFrame()
 {
-	int Index;
-	struct page_frame_d *New;	
+	//#importante: 
+	//Essa estrutura é para frame na memória física.
+	struct page_frame_d *New;
+	
+	int Index;	
 	unsigned long Address = (unsigned long) (g_pagedpool_va);
 
 	//procura slot vazio.
@@ -1646,7 +1660,7 @@ void *newPageFrame()
 				goto fail;
 			};
 			
-			printf("$");
+			//printf("$");
 			New->id = Index;
 			New->used = 1;
 			New->magic = 1234;
@@ -1655,7 +1669,8 @@ void *newPageFrame()
 			
 			
 			//#bugbug ... isso tá errado.
-			//New->address = (unsigned long) Address;//endereço físico do inicio do frame.
+			//endereço físico do inicio do frame.
+			//New->address = (unsigned long) Address;
 			//...
 			
 			pageframeAllocList[Index] = ( unsigned long ) New; 
@@ -1676,20 +1691,30 @@ fail:
  * de pageframes.
  *     ? kernel Mode ? ou user mode ?
  *     Obs: Isso funciona bem.
+ * Obs: Alocaremos uma página de memória virtual e retornaremos 
+ * o ponteiro para o início da página.
+ * Para isso usaremos o alocador de frames de memória física.
  */
 void *newPage()
 {
-	// Esse é o endereço virtual do início do pool de pageframes.
-	unsigned long base = (unsigned long) g_pagedpool_va;	
-    
+	//#importante: 
+	//Essa estrutura é para frame na memória física.	
 	struct page_frame_d *New;
 	
+	// Esse é o endereço virtual do início do pool de pageframes.
+	// Isso significa que num pool temos vários pageframes.
+	
+	unsigned long base = (unsigned long) g_pagedpool_va;	
+    
+	
     //
-	// Pega o id do pageframe e multiplica pelo tamanho da página e 
-	// adiciona a base.	
+	// Pega o id do pageframe e 
+	// multiplica pelo tamanho do frame e 
+	// adiciona à base.	
 	//
 	
-    New	= (void*) newPageFrame();
+    // Novo frame.
+	New	= (void*) newPageFrame();
 	if( New == NULL )
 	{
 	    //fail	
@@ -1704,8 +1729,9 @@ void *newPage()
 			//checa o limite de slots.
 			if( New->id > 0 && New->id < PAGEFRAME_COUNT_MAX )
             {
-				base = (unsigned long) ( base + (New->id * 4096) );
-				return (void *) base;
+				return (void *) ( base + (New->id * 4096) );
+				//base = (unsigned long) ( base + (New->id * 4096) );
+				//return (void *) base;
 			}				
 		};		
 	};
@@ -1720,8 +1746,11 @@ fail:
 
 
 /*
+ ***************************************************************
  * firstSlotForAList:
- *     Retorna o primeiro índice de uma sequência de slots livres.
+ *     Retorna o primeiro índice de uma sequência de 
+ * slots livres no pageframeAllocList[].
+ *
  */
 int firstSlotForAList( int size )
 {

@@ -184,14 +184,13 @@ unsigned long heap_set_new_handler( unsigned long address )
 
 
 /*
+ ***********************************************************
  * get_process_heap_pointer:
- *     Pega o 'heap pointer' do heap de um processo.
- *     Pega o endereço do início do header da próxima alocação.
- * Obs: Isso será usado para alocar memória dentro do heap do processo.
- * Cada processo terá seu heap, cada heap tem ponteiros.
+ *     ?? Pega o 'heap pointer' do heap de um processo. ??
  *
  */
-unsigned long get_process_heap_pointer(int pid)
+unsigned long 
+get_process_heap_pointer( int pid )
 {
 	unsigned long heapLimit;
 	struct process_d *P;
@@ -223,7 +222,8 @@ unsigned long get_process_heap_pointer(int pid)
 	heapLimit = (unsigned long) (P->Heap + P->HeapSize);
 	
 	//Se for menor que o início ou maior que o limite.
-	if( P->HeapPointer < P->Heap || P->HeapPointer >= heapLimit )
+	if( P->HeapPointer < P->Heap || 
+	    P->HeapPointer >= heapLimit )
 	{
 		printf("get_process_heap_pointer: heap limits fail\n");
 		goto fail;
@@ -238,12 +238,16 @@ fail:
 
 
 /*
+ ****************************************************
  * SetKernelHeap:
  *    Configura o heap do kernel.
  *    Reconfiguração total do heap do kernel.
- *    @todo: Salvar em estrutura de processo. O kernel tem seu processo.
+ *    @todo: Salvar em estrutura de processo. 
+ * O kernel tem seu processo.
  */
-void SetKernelHeap( unsigned long HeapStart, unsigned long HeapSize)
+void 
+SetKernelHeap( unsigned long HeapStart, 
+               unsigned long HeapSize )
 {
 	struct heap_d *h;    //Kernel Heap struct.    
 	
@@ -263,9 +267,9 @@ void SetKernelHeap( unsigned long HeapStart, unsigned long HeapSize)
 	
 	kernel_heap_start = (unsigned long) HeapStart;                 
 	kernel_heap_end   = (unsigned long) (HeapStart + HeapSize);
+	
 	g_heap_pointer    = (unsigned long) kernel_heap_start;            
 	g_available_heap  = (unsigned long) (kernel_heap_end - kernel_heap_start); 
-	
 	
 	
 	//
@@ -276,8 +280,9 @@ void SetKernelHeap( unsigned long HeapStart, unsigned long HeapSize)
 	h = (void*) kernel_heap_start;
 	
 	//Configurando a estrutura.
-	h->HeapStart     = (unsigned long) kernel_heap_start;             
-	h->HeapEnd       = (unsigned long) kernel_heap_end;
+	h->HeapStart = (unsigned long) kernel_heap_start;             
+	h->HeapEnd   = (unsigned long) kernel_heap_end;
+	
 	h->HeapPointer   = (unsigned long) g_heap_pointer;            
 	h->AvailableHeap = (unsigned long) g_available_heap; 	
 	
@@ -360,32 +365,33 @@ void *GetHeap()
  * *IMPORTANTE: 
  *     Aloca BLOCOS de memória dentro do heap do processo Kernel.
  *
+ * @todo: 
+ *     ?? Ao fim dessa rotina, os valores da estrutura devem ser 
+ * armazenas no header, lá onde foi alocado espaço para o header, 
+ * assim tem-se informações sobre o header alocado. ??
+ *
+ *  A estrutura header do heap, é uma estrutura e deve ficar antes 
+ * da área desejada. Partes={ header,client,footer }.
+ *
+ * @todo: 
+ *     Essa rotina poderia se chamar: 
+ *     memoryKernelProcessHeapAlloc(unsigned long size).
  * Obs: 
  *     ?? A estrutura usada aqui é salva onde, ou não é salva ??
  *
- * @todo: 
- *     Ao fim dessa rotina, os valores da estrutura devem ser armazenas no 
- * header, lá onde foi alocado espaço para o header, assim tem-se informações 
- * sobre o header alocado. ??
- *
- *  A estrutura header do heap, é uma estrutura e deve ficar antes da área 
- * desejada. Partes={header,client,footer}.
- *
- * @todo: 
- *     Essa rotina poderia se chamar memoryKernelProcessHeapAlloc(unsigned long size).
- *
- * IN: size in bytes
+ * IN:  size in bytes
  * OUT: address if success. 0 if fail.
  *
- * 2015 - Created.
- * sep 2016 - Revision.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  * ...
  */
-unsigned long AllocateHeap( unsigned long size )
+unsigned long 
+AllocateHeap( unsigned long size )
 {
     struct mmblock_d *Current;
     //struct mmblock_d *Prev;
-
 
     //
     // @todo: Aplicar filtro.
@@ -422,18 +428,22 @@ unsigned long AllocateHeap( unsigned long size )
     // Size limits. (Min, max).
     //
 
-    //Se o tamanho desejado for igual a zero.
-    //@todo: Aqui podemos converter o size para uo tamanho mínimo.
+    // Se o tamanho desejado for igual a zero.
+    // @todo: Aqui podemos converter o size para o tamanho mínimo.
     // não há problema nisso.
-    if(size == 0){
+    if( size == 0 )
+	{
         //size = 1;
         printf("AllocateHeap error: size={0}\n");
         refresh_screen();
-        return (unsigned long) g_heap_pointer;
+        
+		//?? NULL seria o retorno para esse caso ??
+		return (unsigned long) g_heap_pointer;
     };
 
-    //Se o tamanho desejado é maior ou igual ao espaço disponível.
-    if(size >= g_available_heap)
+    // Se o tamanho desejado é maior ou 
+	// igual ao espaço disponível.
+    if( size >= g_available_heap )
     {
         //
         // @todo: Tentar crescer o heap para atender o size requisitado.
@@ -456,40 +466,46 @@ try_again:
 
     mmblockCount++;  
     
-    //#bugbug
-    //mesmo tendo espaço suficiente no heap, esta,os chegando nesse limite de indices.
-    //Obs: Temos um limite para a quantidade de índices na lista de blocos.
-    if( mmblockCount >= MMBLOCK_COUNT_MAX ){
+    // #bugbug
+    // Mesmo tendo espaço suficiente no heap, estamos chegando 
+	// nesse limite de indices.
+    // Obs: Temos um limite para a quantidade de índices 
+	// na lista de blocos.
+    
+	if( mmblockCount >= MMBLOCK_COUNT_MAX )
+	{
         printf("pc-mm-memory-AllocateHeap: MMBLOCK_COUNT_MAX");
         die();
     };
 
-    //Identificadores.
-
     //
-    // A variável 'Header', no header do bloco, é o início da estrutura que o
-    // define. 'b->Header'. Ou seja o endereço da varirál marca o início da
+	// #importante
+    // A variável 'Header', no header do bloco, 
+	// é o início da estrutura que o define. 'b->Header'. 
+	// Ou seja, o endereço da variável marca o início da
     // estrutura.
     //
-
-    //
     // Pointer Limits:
-    // (Não vamos querer um heap pointer fora dos limites do heap do kernel)
-    // Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
-    // devemos usar o último válido que provavelmente está nos limites.
-    // ?? #bugbug: Mas se o último válido está sendo usado por uma alocação 
-    // anterior. ?? temos flags que indiquem isso ??
+    // ( Não vamos querer um heap pointer fora dos limites 
+	//   do heap do kernel ).
+    // Se o 'g_heap_pointer' atual esta fora dos limites do heap, 
+	// então devemos usar o último válido, que provavelmente está 
+	// nos limites. ?? #bugbug: Mas se o último válido está sendo 
+	// usado por uma alocação anterior. ?? Temos flags que 
+	// indiquem isso ??
     //
-    // IMPORTANTE: O HEAP POINTER TAMBÉM É O INÍCIO DE UMA ESTRUTURA. 
+    // #importante: 
+	// O HEAP POINTER TAMBÉM É O INÍCIO DE UMA ESTRUTURA. 
     // NESSA ESTRUTURA PODEMOS SABER SE O HEAP ESTA EM USO OU NÃO.
-    // ISSO SE APLICA À TENTATIVA DE REUTILIZAR O ÚLTIMO HEAP POINTER VÁLIDO.
+    // ISSO SE APLICA À TENTATIVA DE REUTILIZAR O ÚLTIMO HEAP 
+	// POINTER VÁLIDO.
     //
 
     //Se estiver fora dos limites.
     if( g_heap_pointer < KERNEL_HEAP_START || 
         g_heap_pointer >= KERNEL_HEAP_END )
     {
-        //#bugbug: ?? Como saberemos, se o último válido,
+        // #bugbug: ?? Como saberemos, se o último válido,
         // não está em uso por uma alocação anterior. ??
 
         //Checa os limites o último last heap pointer válido.
@@ -519,28 +535,41 @@ try_again:
     last_valid = (unsigned long) g_heap_pointer;
     
     //
+	// #importante:
     // Criando um bloco, que é uma estrutura mmblock_d.
     // Estrutura mmblock_d interna.
     // Configurando a estrutura para o bloco atual.
     //
-    // Obs: A estutura deverá ficar lá no espaço reservado para o header.
-    // (antes da area alocada).
+    // Obs: A estutura deverá ficar lá no espaço reservado 
+	// para o header. (Antes da area alocada).
+	//
     // Current = (void*) g_heap_pointer;
     //
 
-    //O endereço do ponteiro da estrutura será o pointer do heap.
+    
+	// ## importante ##
+	// O endereço do ponteiro da estrutura será o pointer do heap.
+	
     Current = (void*) g_heap_pointer;    
 
     if( (void*) Current != NULL )
     {
-        //Obs: Perceba que 'Current' e 'Current->Header' devem ser iguais. 
+        // #importante:
+		// Obs: Perceba que 'Current' e 'Current->Header' 
+		// devem ser iguais. 
 
-        Current->Header = (unsigned long) g_heap_pointer;  //Endereço onde começa o header.
-        Current->headerSize = MMBLOCK_HEADER_SIZE;         //Tamanho do header. (*TAMANHO DA STRUCT).
-        Current->Id = mmblockCount;                        //Id do mmblock. (Índice na lista)
-        Current->Used = 1;                //Flag, 'sendo Usado' ou 'livre'.
-        Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
-        Current->Free = 0;                //0=not free 1=FREE (*SUPER IMPORTANTE)
+        // Identificadores básicos:
+		// Endereço onde começa o header.
+		// Tamanho do header. (*TAMANHO DA STRUCT).
+		// Id do mmblock. (Índice na lista)
+		// used and magic flags.
+		// 0=not free 1=FREE (*SUPER IMPORTANTE)
+		Current->Header = (unsigned long) g_heap_pointer;  
+        Current->headerSize = MMBLOCK_HEADER_SIZE;         
+        Current->Id = mmblockCount;                        
+        Current->Used = 1;                
+        Current->Magic = 1234;            
+        Current->Free = 0;                
         //Continua...
 
         //
@@ -560,23 +589,25 @@ try_again:
         // *Fácil. Isso fica logo depois do header.
         //
 
-        //Obseve que 'Current->headerSize' é igual a 'MMBLOCK_HEADER_SIZE'
+        // Obseve que 'Current->headerSize' é igual 
+		// a 'MMBLOCK_HEADER_SIZE'
         // E que 'Current->headerSize' é o início da estrutura.
 
         Current->userArea = (unsigned long) Current->Header + Current->headerSize;
 
-        //
         // Footer:
-        // O footer começa no 'endereço do início da área de cliente' + 'o tamanho dela'.
-        // O footer é o fim dessa alocação e início da próxima.
+        // >> O footer começa no 
+		// 'endereço do início da área de cliente' + 'o tamanho dela'.
+        // >> O footer é o fim dessa alocação e início da próxima.
         //
-
-        // #bugbug: Penso que aqui deveríamos considerar 'userareaSize' como 
-        // tamanho da área de cliente, esse tamanho equivale ao tamanho solicitado,
-        // mais o tanto de bytes não usados.
-        // Obs: Por enquanto o tamanho da área de cliente tem apenas o tamanho
-        // do espaço solicitado.
-        Current->Footer = (unsigned long) Current->userArea + size;
+		// #bugbug: Penso que aqui deveríamos considerar 
+		// 'userareaSize' como tamanho da área de cliente, 
+		// esse tamanho equivale ao tamanho solicitado mais o 
+		// tanto de bytes não usados.
+        // Obs: Por enquanto o tamanho da área de cliente tem 
+		// apenas o tamanho do espaço solicitado.
+        
+		Current->Footer = (unsigned long) Current->userArea + size;
 
         //
         // Heap pointer. 
@@ -598,7 +629,7 @@ try_again:
         // Coloca o ponteiro na lista de blocos.
         //
 
-         mmblockList[mmblockCount] = (unsigned long) Current;
+        mmblockList[mmblockCount] = (unsigned long) Current;
 
         //
         // Salva o ponteiro do bloco usado como 'prévio'.
@@ -612,10 +643,11 @@ try_again:
         //                **** SUPER IMPORTANTE ****
         // *****************************************************
         //
-        // Atualiza o ponteiro. Deve ser onde termina o último bloco 
-        // configurado.
-        // Isso significa que o próximo ponteiro onde começaremos a próxima 
-        // estrutura fica exatamente onde começa o footer dessa estrutura.
+        // Atualiza o ponteiro. 
+		// Deve ser onde termina o último bloco configurado.
+        // Isso significa que o próximo ponteiro onde começaremos 
+		// a próxima estrutura fica exatamente onde começa o footer 
+		// dessa estrutura.
         // Obs: O footer está aqui somente para isso. Para ajudar
         // a localizamarmos o início da próxima estrutura.
         //
@@ -635,14 +667,17 @@ try_again:
         g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);
 
         //
+		// ## Finalmente ##
+		//
         // Retorna o ponteiro para o início da área alocada.
+		// Essa área alocada chamado de user area.
         // Obs: Esse é o valor que será usado pela função malloc.
         //
-        // *Imporatate:
-        //     O que acontece se um aplicativo utilizar além da área alocada ??
+        // *Importante:
+        // O que acontece se um aplicativo utilizar além da área alocada ??
         // O aplicativo invadirá a área do footer, onde está a estrutura do 
         // próximo bloco. Inutilizando as informações sobre aquele bloco.
-        // *Aviso: Cuidado com isso. @todo: Como corrigir.?? o que fzer??
+        // *Aviso: Cuidado com isso. @todo: Como corrigir.?? O que fazer??
         //
 
         return (unsigned long) Current->userArea;
@@ -709,21 +744,28 @@ fail:
  * Ponteiros do início da área do cliente.
  * ??
  */
-unsigned long FreeHeap(unsigned long size){  		
-	return (unsigned long) g_heap_pointer;    //#cancelada!
+unsigned long FreeHeap(unsigned long size)
+{  		
+    // #cancelada !
+	// Usaremos flags e o GC. 
+	return (unsigned long) g_heap_pointer;    
 };
 
 
 /*
+ **********************************************
  * AllocateHeapEx:
  *     Aloca heap.
+ *     @todo: Deletar: Rotina inútil.
  */
-void *AllocateHeapEx(unsigned long size){
+void *AllocateHeapEx(unsigned long size)
+{
 	return (void *) AllocateHeap(size);  
 };
 
 
 /*
+ ********************************************************
  * show_memory_structs:
  *     *IMPORTANTE.
  *     Mostra as informações das estruturas de memória. 
@@ -821,40 +863,47 @@ int init_heap()
 	
 	
 	//Check Heap Pointer.
-	if(g_heap_pointer == 0){
+	if( g_heap_pointer == 0 )
+	{
 	    printf("init_heap fail: Heap pointer!\n");
 		goto fail;
-	};
+	}
 	
 	//Check Heap Pointer overflow.
-	if(g_heap_pointer > kernel_heap_end){
+	if( g_heap_pointer > kernel_heap_end )
+	{
         printf("init_heap fail: Heap Pointer Overflow!\n");
 		goto fail;
-    };	
+    }	
 	
     //Heap Start.
-	if(kernel_heap_start == 0){
+	if( kernel_heap_start == 0 )
+	{
 	    printf("init_heap fail: HeapStart={%x}\n" ,kernel_heap_start);
 	    goto fail;
-	};
+	}
 	
 	//Heap End.
-	if(kernel_heap_end == 0){
+	if( kernel_heap_end == 0 )
+	{
 	    printf("init_heap fail: HeapEnd={%x}\n" ,kernel_heap_end);
 	    goto fail;
-	};
+	}
 	
 	//Check available heap.
-	if(g_available_heap == 0)
+	if( g_available_heap == 0 )
 	{
 	    //@todo: Tentar crescer o heap.
 		
 		printf("init_heap fail: Available heap!\n");
 		goto fail;
-	};
+	}
 	
-	// Heap list ~ Inicializa a lista de heaps.
-	while(i < HEAP_COUNT_MAX){
+	// Heap list:
+	// Inicializa a lista de heaps.
+	
+	while( i < HEAP_COUNT_MAX )
+	{
         heapList[i] = (unsigned long) 0;
 		++i;
     };
@@ -866,14 +915,20 @@ int init_heap()
 	
 // Done.
 done:
-    printf("Done.\n");	
+
+#ifdef KERNEL_VERBOSE
+    printf("Done.\n");
+#endif	
+	
 	return (int) 0;
+	
 // Fail. Falha ao iniciar o heap do kernel.
 fail:
     printf("init_heap: Fail!\n");
-	//refresh_screen();
+	refresh_screen();
 	
 	/*
+	// #debug
 	printf("* Debug: %x %x %x %x \n", kernel_heap_start, 
 	                                  kernel_heap_end,
 									  kernel_stack_start,
@@ -887,6 +942,7 @@ fail:
 
 
 /*
+ **************************************************
  * init_stack:
  *     Iniciar a gerência de Stack do kernel. 
  *     @todo Usar stackInit(). 
@@ -919,6 +975,7 @@ fail:
 
 
 /*
+ ************************************
  * memoryShowMemoryInfo:
  *     Show memory info.
  */
@@ -978,16 +1035,23 @@ void memoryShowMemoryInfo()
 	
 	
         printf("\n[Kernel Heap and Stack info:]\n");
-	    printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",kernel_heap_start ,kernel_heap_end ,HeapTotal);	
+	    printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",
+		    kernel_heap_start, kernel_heap_end, HeapTotal );
+			
         printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
 	    
-		//@todo:
-		//mostrar o tamanho da pilha..
-		//#bugbug: A informações sobre a stack estão incorretas, pois essas variáveis mostram 
-		// o endereço da stack na hora da inicialização. Quando o processador retorna de ring3 para ring0
-		//ele usa o endereço de pilha indicado na TSS.
-		//Pois bem, é mais digno mostrar aqui o endereço da pilha, indicado no TSS.
-		printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n",kernel_stack_start ,kernel_stack_end ,StackTotal);
+		// @todo:
+		// Mostrar o tamanho da pilha..
+		// #bugbug: A informações sobre a stack estão incorretas, 
+		// pois essas variáveis mostram o endereço da stack na hora 
+		// da inicialização. Quando o processador retorna de ring3 
+		// para ring0 ele usa o endereço de pilha indicado na TSS.
+		// Pois bem, é mais digno mostrar aqui o endereço da pilha, 
+		// indicado no TSS.
+		
+		printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n", 
+		    kernel_stack_start, kernel_stack_end, StackTotal );
+			
         printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
 	
 	
@@ -1000,7 +1064,8 @@ void memoryShowMemoryInfo()
 	
 	    //Video mode.
 	    //printf("The video option is %x \n",g_video_mode);
-	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",g_frontbuffer_pa ,g_frontbuffer_va ,g_backbuffer_va);
+	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
+		    g_frontbuffer_pa, g_frontbuffer_va, g_backbuffer_va );
 	
 	
 	//...
@@ -1306,57 +1371,58 @@ int gcHAL()
 
 
 /*
- ***********************************************************
-    gc:
-	    Garbage Collector.
-		Call all Garbage Collections rotines.
-		Clear all layers.
-		/GRAMADO
-		/EXECUTIVE
-		/MICROKERNEL
-		/HAL
+ ******************************************************
+ * gc:
+ *     Garbage Collector.
+ *	   
+ * Call all Garbage Collections rotines.
+ * Clear all layers.
+ *	
+ * +GRAMADO +EXECUTIVE +MICROKERNEL +HAL
+ *
  */
 int gc()
 {
     int Status;
 	
-//clearGramadoLayer:
+clearGramadoLayer:
     Status = (int) gcGRAMADO();
-    if(Status == 1){
+    if( Status == 1 )
+	{
 		printf("gc: clearGramadoLayer:\n");
 		goto fail;
 	}
 	
-//clearExecutiveLayer:
+clearExecutiveLayer:
     Status = (int) gcEXECUTIVE();
-    if(Status == 1){
+    if( Status == 1 )
+	{
 		printf("gc: clearExecutiveLayer:\n");
 		goto fail;
 	}
 	
-//clearMicrokernelLayer:
+clearMicrokernelLayer:
     Status = (int) gcMICROKERNEL();
-    if(Status == 1){
+    if( Status == 1 )
+	{
 		printf("gc: clearMicrokernelLayer:\n");
 		goto fail;
 	}
 	
-//clearHalLayer:
+clearHalLayer:
     Status = (int) gcHAL();
-    if(Status == 1){
+    if( Status == 1 )
+	{
 		printf("gc: clearHalLayer:\n");
 		goto fail;
 	}
-	
-	goto done;
-	
-fail:
-    printf("gc: FAIL.\n");	
-	refresh_screen();
-	return (int) 1;
-	
+
 done:
     return (int) 0;	
+fail:
+    printf(" ## FAIL ## \n");	
+	refresh_screen();
+	return (int) 1;
 };
 
 

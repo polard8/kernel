@@ -884,6 +884,7 @@ struct free_mmblock_d
 //
 
 /*
+ ****************************************************************
  * page_frames_d:
  *     Guarda informações sobre um 'page frame' na memória física.
  *     @todo: Incluir todas as informações necessárias.
@@ -936,7 +937,7 @@ unsigned long pageframeList[PAGEFRAME_COUNT_MAX];
 // *importante
 //
 
-//pool de memória paginável usado par alocação.
+//pool de memória paginável usado para alocação.
 //aqui ficam os ponteiros para estrutura do tipo pageframe
 unsigned long pageframeAllocList[PAGEFRAME_COUNT_MAX];
 

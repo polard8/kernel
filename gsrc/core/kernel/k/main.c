@@ -432,7 +432,13 @@ doDebug:
     while(1){}
 
     */
-
+	
+	
+	// TESTANDO SALVAR UM ARQUIVO ...
+    //?? stdin ??
+	
+	fsSaveFile( NULL, 2, (unsigned long) stdin->_base );  
+	
     //
     // RETURNING !
     //

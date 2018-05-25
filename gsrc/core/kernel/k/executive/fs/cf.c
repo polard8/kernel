@@ -122,8 +122,12 @@ void fs_create_name( char *name, unsigned long id,unsigned long eid)
 //
 //salva_nome(.) - salva um nome no diretorio raiz dado o CLUSTER INICIAL
 //
-void salva_nome( unsigned char *file_name, unsigned long id, unsigned long eid, unsigned long cluster_inicial)
-{        
+void salva_nome( unsigned char *file_name, 
+                 unsigned long id, 
+				 unsigned long eid, 
+				 unsigned long cluster_inicial )
+{
+    //@todo	
 	return;
 };
 
