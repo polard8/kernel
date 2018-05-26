@@ -280,9 +280,10 @@ void *systemRam( int number,
 		//Save file.
         case 14:
 		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
-		    return (void *) fsSaveFile( (unsigned char *) arg1, 
-			                            (unsigned long) arg2, 
-										(char *) arg3 );				    
+		    //return (void *) fsSaveFile( (unsigned char *) arg1, 
+			//                            (unsigned long) arg2, 
+			//							(char *) arg3 
+			//							(char) arg4 );				    
 			break;
 		
 		//Create user.

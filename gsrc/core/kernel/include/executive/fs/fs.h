@@ -805,13 +805,25 @@ void fs_load_rootdirEx();
 void limpa_root(); 
 
 
-/*
- * File operations support.
- */
+//
+// Read
+//
+
 unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address); 
-unsigned long fsSaveFile( unsigned char *file_name, 
-                          unsigned long file_size, 
-						  char* file_address );
+
+
+//
+// Write
+//
+
+int
+fsSaveFile( char *file_name, 
+            unsigned long file_size,
+            unsigned long size_in_bytes, 			
+		    char* file_address,
+            char flag );
+
+
 						  
 int fsSearchFile( unsigned char *file_name);
 unsigned long fsSearchFileName( unsigned char *name);

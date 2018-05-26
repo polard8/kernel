@@ -442,11 +442,16 @@ doDebug:
 	char file_name[] = "savetest.txt";
 	write_fntos( (char *) file_name );
 	
-	//fsSaveFile( file_name, 2, (unsigned long) stdin->_base );  
+
+    //
+    //  ## Save ##
+    //
 	
-	//stdin->_base = (char*) file_name;
-	
-	fsSaveFile( file_name, 3, file_1);
+	fsSaveFile( file_name,  // Nome. 
+	            3,          // Quantidade de setores.
+				255,        // Tamanho do arquivo dado em bytes.     
+				file_1,     // Buffer onde está o arquivo.
+				0x20 );     // Tipo de entrada. 0x20=arquivo.
     
 	//
     // RETURNING !

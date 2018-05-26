@@ -183,11 +183,15 @@ done:
 //lista de clusters
 unsigned short list[fat_range_max];
  
-unsigned long 
-fsSaveFile( unsigned char *file_name, 
-            unsigned long file_size, 
-            char *file_address )  
+int
+fsSaveFile( char *file_name, 
+            unsigned long file_size,
+            unsigned long size_in_bytes,			
+            char *file_address,
+            char flag )  
 {
+	int Status = 0;
+	
     unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
     unsigned short *fat  = (unsigned short *) VOLUME1_FAT_ADDRESS;
 
@@ -201,24 +205,25 @@ fsSaveFile( unsigned char *file_name,
     unsigned short next;
     unsigned short sector;
     
-	// #provisório.
-	// Improvisando uma entrada do tipo fat16.
+	// Buffer para a entrada de diretório.
 	char Entry[32];	
 
     //Mensagem.	
-	printf("fsSaveFile:\n"); 
+	//printf("fsSaveFile:\n"); 
 	
     //Carrega root e fat.
 rootdir:
-	printf("Loading root..\n"); 
+    //#debug
+	//printf("Loading root..\n"); 
 	fs_load_rootdirEx();
 	
 fat:
-	printf("loading FAT..\n");
+    //#debug
+	//printf("loading FAT..\n");
 	fs_load_fatEx();
 	
 	//#debug
-	refresh_screen();
+	//refresh_screen();
 	
     
 	// Procurando cluster livre na fat.
@@ -269,8 +274,8 @@ out_of_range:
 save_file:
 
     //#debug
-    printf("fsSaveFile: save_file: \n"); 
-	refresh_screen();
+    //printf("fsSaveFile: save_file: \n"); 
+	//refresh_screen();
   
     // Início da lista.
     i = 0; 
@@ -282,29 +287,13 @@ save_file:
     // Pegamos o primeiro da lista.
     first = list[i];
 	
-	printf("first={%x}\n",first);
+	// #debug
+	// printf("first={%x}\n",first);
     
-    // #improvisando
-	// #provisório
-    // Salva no diretório raiz o nome e o 
-	// primeiro cluster
-    
-    // @todo: Usar uma função.
-	// poderá ser uma função interna.
-    // salva_nome(file_name, first); 
- 	
-	//Entry[0] = 'S';
-	//Entry[1] = 'A';
-	//Entry[2] = 'V';
-	//Entry[3] = 'E';
-	//Entry[4] = 'T';
-	//Entry[5] = 'E';
-	//Entry[6] = 'S';
-	//Entry[7] = 'T';
-	//Entry[8]  = 'T';
-	//Entry[9]  = 'X';
-	//Entry[10] = 'T';
 	
+CreateEntry:
+	
+	// Name.
 	Entry[0] = (char) file_name[0];
 	Entry[1] = (char) file_name[1];
 	Entry[2] = (char) file_name[2];
@@ -313,48 +302,60 @@ save_file:
 	Entry[5] = (char) file_name[5];
 	Entry[6] = (char) file_name[6];
 	Entry[7] = (char) file_name[7];
+	
+	// Ext.
 	Entry[8]  = (char) file_name[8];
 	Entry[9]  = (char) file_name[9];
 	Entry[10] = (char) file_name[10];
 	
+	// Flag and reserved.
+	// 0x20=arquivo.
+	Entry[11] = flag;   
+	Entry[12] = 0;       
 	
-	Entry[11] = 0x20;  //atributo. 0x20=arquivo.  
-	Entry[12] = 0;     //reservado.  
-	
-	//creation time 14 15 16
+	// Creation time. 14 15 16
 	Entry[13] = 0x08; 
 	Entry[14] = 0x08; 
 	Entry[15] = 0xb6;
 	
-	//creation date
+	// Creation date.
 	Entry[16] = 0xb8;
 	Entry[17] = 0x4c;
 	
-	//acess date
+	// Access date.
 	Entry[18] = 0xb8;
 	Entry[19] = 0x4c;
 	
-	//first cluster. 0 para fat12 ou 16
+	// First cluster. 
+	// 0 para fat12 ou 16
 	Entry[20] = 0;
 	Entry[21] = 0;
 	
-	//modifield time
+	// Modifield time.
 	Entry[22] = 0xa8;
 	Entry[23] = 0x49;
 	
-	//modifiled date
+	// Modifiled date.
 	Entry[24] = 0xb7;
 	Entry[25] = 0x4c;
 	
-	//first cluster low word.
-	Entry[26] = (char) (first);        //0x1A
-	Entry[27] = (char) (first >> 8);   //0x1B 
+	// First cluster. low word.
+	// 0x1A and 0x1B
+	Entry[26] = (char) (first);        
+	Entry[27] = (char) (first >> 8);    
 	
-	//file size (bytes ??)
-	Entry[28] = 0xff;
-	Entry[29] = 0;
-	Entry[30] = 0;
-	Entry[31] = 0;
+	// File size in bytes.
+	// size_in_bytes
+	Entry[28] = (char) size_in_bytes;//0xff; //255
+	
+	size_in_bytes = (size_in_bytes >> 8);
+	Entry[29] = (char) size_in_bytes;
+	
+	size_in_bytes = (size_in_bytes >> 8);
+	Entry[30] = (char) size_in_bytes;
+	
+	size_in_bytes = (size_in_bytes >> 8);
+	Entry[31] = (char) size_in_bytes;
 
 	
 	//
@@ -391,8 +392,9 @@ save_file:
 resetIDE:
 
 	//#debug
-	printf("fsSaveFile: reset and while\n"); 
-    refresh_screen();
+	//printf("fsSaveFile: reset and while\n"); 
+    //refresh_screen();
+	
 	reset_ide0();
 	
 	
@@ -450,7 +452,7 @@ SavingFile:
 fail:	
     printf("  ## FAIL ## \n");
     refresh_screen();
-    return 1;
+    return (int) 1;
 
 done:  
 
@@ -516,7 +518,7 @@ done:
     printf("fsSaveFile: done  \n"); 
     refresh_screen();	
     
-	return 0;
+	return (int) 0;
 };
 
 
