@@ -131,10 +131,9 @@ void KiInformation()
 	    printf("\n[System Info:]\n");
 	    //OS info.
 	    printf("%s ",OS_NAME);
-	    printf("Version: %d.%d.%d.%d \n\n" ,SYSTEM_VERSIONMAJOR
-	                                       ,SYSTEM_VERSIONMINOR
-									       ,SYSTEM_VERSIONBUILT
-									       ,SYSTEM_VERSIONREVISION );
+	    printf("Version: %d.%d.%d\n\n" ,SYSTEM_VERSIONMAJOR
+	                                   ,SYSTEM_VERSIONMINOR
+									   ,SYSTEM_VERSIONREVISION );
 	
 	    //
 		// Screen resolution. (first of all)
@@ -200,6 +199,10 @@ void KiInformation()
 			
 
 			
+		printf("\n## thread info ## \n");	
+		printf("threads running { %d }",ProcessorBlock.running_threads);	
+        show_thread_information();		
+		
         //
 	    // Mostra Heap e Stack do kernel..
 	    //

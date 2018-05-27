@@ -108,10 +108,10 @@ void systemSetTerminalRectangle( unsigned long left,
 //@todo:
 //Esse é padrão de versão. 
 //Não mudar, apenas fazer as atualizações. 
-#define SYSTEM_VERSIONMAJOR 1 
-#define SYSTEM_VERSIONMINOR 0
+#define SYSTEM_VERSIONMAJOR 0 
+#define SYSTEM_VERSIONMINOR 1
 #define SYSTEM_VERSIONBUILT 0
-#define SYSTEM_VERSIONREVISION 1   //++ inc.
+#define SYSTEM_VERSIONREVISION 0   //++ inc.
 
 
 /*

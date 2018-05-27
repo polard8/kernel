@@ -60,7 +60,7 @@ done:
 /*
  ***********************************************************************
  * create_thread:
- *     Cria um thread para rodar em user mode. 
+ *     Cria um thread para rodar em user mode. (just Ring 3) 
  *
  * @todo: O processo ao qual o thread vai ser atribuído deve ser passado 
  * via argumento, se o argumento for nulo, então usa-se o 
@@ -552,6 +552,7 @@ int GetThreadType(struct thread_d *Thread)
 
 
 /*
+ ***********************************************************
  * show_thread_information:
  *     Mostra informações sobre as threads.
  */
@@ -576,7 +577,9 @@ void show_thread_information()
 		//...
 	};
 
-    mostra_slots();    //Mostra Slots. ?/??onde fica isso??
+	//Mostra Slots. 
+	//threadi.c
+    mostra_slots();    
 	
 	/*
 	 * @todo: 

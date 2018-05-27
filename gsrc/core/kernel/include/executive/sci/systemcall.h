@@ -209,12 +209,18 @@
 #define	SYS_CLOSECHANNEL   109     //close channel.
 //Reboot.
 #define	SYS_REBOOT         110
-//Outros. @todo: Reservar para gerenciamento de energia. 111- 119
+//Outros. @todo: Reservar para gerenciamento de energia. 
 #define	SYS_111 111   
 #define	SYS_112 112
 #define	SYS_113 113
 #define	SYS_114 114
-#define	SYS_115 115
+
+//outros.
+
+//115 - o aplicativo envia um endereço de vetor 
+//para colocarmos os 4 elementos da mensagem
+//window.msg.long1.long2
+#define	SYS_115 115  //  ## message  ## 
 #define	SYS_116 116
 #define	SYS_117 117
 #define	SYS_118 118

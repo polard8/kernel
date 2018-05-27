@@ -158,6 +158,7 @@ void KiShowThreadList(){
 
 
 /*
+ *****************************************
  * mostra_slots:
  *
  * @todo:
@@ -175,6 +176,8 @@ void mostra_slots()
 	//
 	// Testando o for para process.
 	//
+	
+	/*
 	printf(" \n\n ** Process info ** \n\n");
 	
 	for( i=0; i<PROCESS_COUNT_MAX; i++)
@@ -190,7 +193,7 @@ void mostra_slots()
 		    printf("PID={%d} Directory={%x} Name={%s} \n",p->pid ,p->Directory ,p->name_address);
 	    };
     };
-	
+	*/
 	
 	//
 	// Testando o for para threads.

@@ -70,6 +70,9 @@ char copyright[] =
 /* BSD quote: Components of the first process. */
 
 
+
+ 
+
 /*
  *************************************************
  * kMain: 
@@ -316,6 +319,23 @@ int kMain(int argc, char* argv[])
         //...
     };
 
+	
+	
+    //===================================
+    //Create taskman Thread. tid=2.
+    RING0IDLEThread = (void*) KiCreateRing0Idle();
+    if( (void*) RING0IDLEThread == NULL )
+	{
+        printf("main-kMain: RING0IDLEThread\n");
+        die();
+    }else{
+
+        RING0IDLEThread->ownerPID = (int) TaskManProcess->pid;
+        //...
+    };
+	
+	
+	
     //...
 
 
@@ -433,6 +453,7 @@ doDebug:
 
     */
 	
+	/*
 	
 	// TESTANDO SALVAR UM ARQUIVO ...
     //?? stdin ??
@@ -452,6 +473,9 @@ doDebug:
 				255,        // Tamanho do arquivo dado em bytes.     
 				file_1,     // Buffer onde está o arquivo.
 				0x20 );     // Tipo de entrada. 0x20=arquivo.
+				
+				
+	*/
     
 	//
     // RETURNING !
@@ -560,8 +584,16 @@ done:
     timerInit8253();
 	
 	//parece que isso é realmente preciso, libera o teclado.
-	//outb(0x20,0x20); 	
+	//outb(0x20,0x20); 
 
+    //
+	// # go !
+	//
+	// Nos configuramos a idle thread em user mode 
+	// e agora vamos salta para ela via iret.
+	// 
+	//
+	
     asm volatile(" cli \n"
                  " mov $0x23, %ax  \n"
                  " mov %ax, %ds  \n"
@@ -578,6 +610,7 @@ done:
 
     panic("main-startStartIdle: panic *");
 };
+
 
 
 //

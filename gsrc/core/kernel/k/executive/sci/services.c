@@ -208,6 +208,12 @@ void *services( unsigned long number,
     struct rect_d *r;	
 	
 	
+	// ## message support ##
+	
+	//o endereço do vetor passado pelo aplicativo.
+	unsigned long *message_address = (unsigned long*) arg2;
+	unsigned char SC;
+	struct window_d *wFocus;
 	
 	//
 	// *Test:
@@ -294,19 +300,23 @@ void *services( unsigned long number,
 		case SYS_READ_LBA: 
 		    //@todo: chamar hal
 			systemDevicesUnblocked(36,arg2,arg3,0,0); 
-		    break;
+		    //read_lba( (unsigned long) arg2, (unsigned long) arg3 );
+			break;
 			
 		//2 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_WRITE_LBA: 
 		    //@todo: chamar hal
 			systemDevicesUnblocked(35,arg2,arg3,0,0); 
+			//write_lba( (unsigned long) arg2, (unsigned long) arg3 );
 		    break;
 
 		//3 fopen (i/o)
 		case SYS_READ_FILE:
 		    taskswitch_lock();
 	        scheduler_lock();	
-            Ret = (void *) fsLoadFile( (unsigned char *) a2, (unsigned long) arg3);    //name , address.  
+			//name , address.
+            Ret = (void *) fsLoadFile( (unsigned char *) a2, 
+			                           (unsigned long) arg3);      
 		    //fopen( const char *filename, const char *mode );
 		    //??retorno ??? 1 = fail ; 0=ok.
 			scheduler_unlock();
@@ -318,7 +328,18 @@ void *services( unsigned long number,
 		case SYS_WRITE_FILE:
 		    taskswitch_lock();
 	        scheduler_lock();	
-		    //fsSaveFile((unsigned char *) a2, (unsigned long) arg3, (unsigned long) arg4);
+		    
+			// #bugbug
+			// @todo:
+			// Faltam os tamanhos. 
+			// Temos um tamanho padrão improvisado 
+			// para arquivos de 255 bytes e 3 setores.
+			fsSaveFile( (char *) a2,             //name
+			            (unsigned long) 3,       //@todo: size in sectors 
+						(unsigned long) 255,       //@todo: size in bytes
+						(char *) arg3,           //address
+						(char) arg4 );           //flag
+						
 			scheduler_unlock();
 	        taskswitch_unlock();
 		    break;
@@ -801,6 +822,34 @@ void *services( unsigned long number,
 			break;
 			
 		//...
+		
+		//115 - pegar os 4 elementos da mensagem.
+		//o aplicativo envia um endereço de um vetor onde 
+		//a mensagem deve ser colocada.
+		case 115:
+
+			
+			SC = (unsigned char) keybuffer[keybuffer_head];
+		    keybuffer[keybuffer_head] = 0;
+			keybuffer_head++;
+			if( keybuffer_head >= 128 ){ keybuffer_head = 0; };
+			LINE_DISCIPLINE(SC, 0);	
+			
+			
+			wFocus = (void *) windowList[window_with_focus];
+			if( wFocus->newmessageFlag == 0 ){ return NULL; }
+			
+			message_address[0] = (unsigned long) wFocus->msg_window;
+			message_address[1] = (unsigned long) wFocus->msg;
+			message_address[2] = (unsigned long) wFocus->long1;
+			message_address[3] = (unsigned long) wFocus->long2;
+			
+			//sinaliza que não há amis mensagem.
+			wFocus->newmessageFlag = 0;
+			return NULL;
+			//return (void*) wFocus->msg;	
+			
+			break;
 		
 		//
 		// 129, Um driver confirmando que foi inicializado.

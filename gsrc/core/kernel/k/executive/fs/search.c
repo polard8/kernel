@@ -195,48 +195,86 @@ done:
 
 
 
-/*
- * fs_search_empty_entry:
- *     Procurar uma entrada vazia em um dado diretorio na estrutura do sistema
- * de arquivos menos a primeira. 0 é erro.
- *
- */
-unsigned long fs_search_empty_entry(unsigned long id){
-    return (unsigned long) 0; 	
-};
-
 
 /*
+ *****************************************************
  * fs_find_empty_entry:
  *     Encontrar uma entrada vazia na fat.
+ *     @todo: Isso pe importante:
  */
-unsigned long fs_find_empty_entry(){
-	return (unsigned long) 0;
+unsigned short 
+fs_find_empty_entry( char *fat_address )
+{
+	//@todo:
+	//encontrar uma entrada vazia na fat.
+	//fornecer o endereço da fat na memória.
+	return (unsigned short) 0;
+};
+
+
+
+
+/*
+ **************************************************************
+ * findEmptyDirectoryEntry:
+ * Procura uma entrada vazia no diretório 
+ *
+ * IN:
+ *     Endereço do diretório e número máximo de entradas.
+ */
+int 
+findEmptyDirectoryEntry( unsigned long dir_address, 
+                         int number_of_entries )
+{
+	int i;
+	int j=0;	
+	unsigned char *dir = (unsigned char *) dir_address;
+	
+	//
+	// Filtrando limites.
+	//
+	
+	if( dir_address == 0 ){
+	    goto fail;	
+	}
+	
+	if( number_of_entries < 0 ){
+		goto fail;
+	}
+	
+	
+	for( i=0; i<number_of_entries; ++i )
+	{
+		if( dir[j] == 0 )
+		{
+			return (int) i;
+		}
+		
+		//próxima entrada.
+		j = j+32;
+	}
+	
+fail:	
+	return (int) (-1);
 };
 
 
 /*
- * fs_find_not_empty_entry:
- *     Encontrar uma entrada NÃO vazia na fat.
- */
-unsigned long fs_find_not_empty_entry()
-{	
-    return (unsigned long) 0;
-};
-
-
-/*
+ ***************************************************************
  * fs_find_n_empty_entries:
  *     Encontrar uma quantidade específica de entradas na fat.
- *     Pois um arquivo demanda uma ou varias entradas, 
+ *     Pois um arquivo demanda uma ou várias entradas, 
  *  dependendo do tamanho.
- * 
+ * @todo: Corrigir essa função, ela é importante.
+ *  Obs: tem algo parecido na função que salva um arquivo.
+ *  O retorno deve ser short, mesmo tipo do cluster.
  */
-unsigned long fs_find_n_empty_entries(unsigned long n)
+unsigned short 
+fs_find_n_empty_entries( int n )
 {
-    unsigned long i;
-	unsigned long l;
-	unsigned long empty;
+    int i;
+	int l;
+	unsigned short empty;
 	
 	// Limits.
 	if( n < 0 || n > 1024 ){
@@ -246,12 +284,12 @@ unsigned long fs_find_n_empty_entries(unsigned long n)
 	// Loop ~ Procurar uma quantidade de entradas vazias.
 	for( i=0; i < n; i++ )
 	{	
-		empty = fs_find_empty_entry();
+		//empty = (unsigned short) fs_find_empty_entry(?);
 		
 		// Preenche a lista de entradas vazias.	
 		if( empty != 0 && empty < 1024 )
 		{
-		    file_cluster_list[l] = empty;
+		    file_cluster_list[l] = (unsigned short) empty;
             l++;
 		}else{
 		    goto fail;
@@ -259,13 +297,13 @@ unsigned long fs_find_n_empty_entries(unsigned long n)
 	};
 		
 	//Finaliza a lista com uma assinatura.
-    file_cluster_list[l] = 0x0000FFF8;    
+    file_cluster_list[l] = 0xFFF8;    
 	
 done:
     //Retorna o primeiro da lista.	
-	return (unsigned long) file_cluster_list[0];
+	return (unsigned short) file_cluster_list[0];
 fail:	
-    return (unsigned long) 0;
+    return (unsigned short) 0;
 };
 
 
@@ -275,9 +313,9 @@ fail:
  *     No caso é o diretório raiz.
  */
 //int fsSearchFileName( const char *name ) 
-unsigned long fsSearchFileName(unsigned char *name)
+int fsSearchFileName(unsigned char *name)
 {
-    return (unsigned long) fsSearchFile(name);
+    return (int) fsSearchFile(name);
 };
 
 

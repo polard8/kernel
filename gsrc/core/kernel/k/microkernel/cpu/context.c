@@ -223,6 +223,7 @@ void restore_current_context()
 	    // Check context ~ Não há porque salvar, se o contexto está corrompido.
 	    //
 	
+	    /*
 	    Status = (int) contextCheckThreadRing3Context(current_thread);
 	    if(Status != 0)
 	    {
@@ -231,6 +232,7 @@ void restore_current_context()
 		    refresh_screen();
 	        while(1){}
 	    };
+		*/
 		
 	    //
 	    // Restore.
@@ -329,8 +331,8 @@ int contextCheckThreadRing0Context(int tid)
 	return  0;//@todo
 }; 
  
-// 
-
+ 
+// Checar um contexto válido para threads em ring 3. 
 int contextCheckThreadRing3Context(int tid)
 {
 	int Status = 1;    //Error. (condição default).	

@@ -214,6 +214,8 @@ do_dispatch:
 		queue_insert_data(queue, (unsigned long) dispatch_Pointer, QUEUE_RUNNING);
 	};	
 			
+	
+	/*
 	//Check context.
 	Status = contextCheckThreadRing3Context(dispatch_Pointer->tid);
 	if(Status != 0)
@@ -222,6 +224,7 @@ do_dispatch:
 		refresh_screen();
 		while(1){}
 	};	
+	*/
 	
 	//Reinicia a contagem 'runningCount'.
 	dispatch_Pointer->runningCount = 0;	

@@ -430,7 +430,6 @@ struct fat_d
 	//...
 };
 fat_t *fat;
-//fat_t *Fat;
 
 
 /*
@@ -750,7 +749,12 @@ int g_spc;               //sectors per cluster.(spc é variável.)
 
 
 // Se é fat32, 16, 12.
-int fatbits;    
+int fatbits;   
+
+
+
+//list of clusters. 
+unsigned short file_cluster_list[1024]; 
 
 
 /*
@@ -778,11 +782,10 @@ void fs_set_structures();
  
 
 
-
-
-/*
- * FAT support.
- */
+//
+// FAT support.
+//
+ 
 void fsClearFat();   
 void fs_init_fat();
 void fs_put_list_on_fat();
@@ -794,9 +797,10 @@ unsigned long fs_check_fat();
 void fs_test_fat_vector();
 
 
-/*
- * ROOT DIR support.
- */ 
+//
+// root dir support
+//
+   
 void KiLoadRootDir(unsigned long address);
 void fs_load_rootdir();
 void fs_save_rootdir();
@@ -809,9 +813,21 @@ void limpa_root();
 // Read
 //
 
-unsigned long fsLoadFile( unsigned char *file_name, unsigned long file_address); 
+// @todo:
+// Mudar o retorno para int.
+// Mudar file_name para char*.
+// Mudar file_address para char*.
+// usar o save file como exemplo.
+unsigned long 
+fsLoadFile( unsigned char *file_name, 
+            unsigned long file_address ); 
 
-
+//vai ficar assim.			
+//int
+//fsLoadFile( char *file_name, 
+//            char *file_address ); 
+			
+			
 //
 // Write
 //
@@ -826,14 +842,17 @@ fsSaveFile( char *file_name,
 
 						  
 int fsSearchFile( unsigned char *file_name);
-unsigned long fsSearchFileName( unsigned char *name);
+int fsSearchFileName( unsigned char *name);
 
 int KiSearchFile( unsigned char *file_name, unsigned long address);
 void create_system_folders();
 void set_file( void *file, int Index);
 void *get_file(int Index);
+
 unsigned long fs_create_dir( char *name , unsigned long id);
-unsigned long fs_create_file( char *name , unsigned long id);
+
+int fs_create_file( char *name );
+
 void fs_create_entry( char *name, 
                       unsigned long id, 
 					  unsigned long eid, 
@@ -842,7 +861,7 @@ void fs_create_entry( char *name,
 void fs_create_name( char *name, unsigned long id,unsigned long eid);
 void fs_show_dir_entry(unsigned long id,unsigned long eid);
 void fs_show_dir(unsigned long id);
-unsigned long fs_search_empty_entry(unsigned long id);
+
 void fs_set_entry(unsigned long id, unsigned long eid);
 void fs_get_entry(unsigned long id, unsigned long eid);
 void fs_load_dir(unsigned long id);
@@ -854,10 +873,17 @@ void fs_delete_entry(unsigned long id, unsigned long eid);
 
 
 void fs_show_entry(unsigned long id, unsigned long eid);																			 
-unsigned long fs_find_n_empty_entries(unsigned long n);
-unsigned long fs_find_empty_entry();
+
+unsigned short 
+fs_find_n_empty_entries( int n);
+
+// #importante
+// Encontrar uma entrada vazia na fat.
+unsigned short 
+fs_find_empty_entry( char *fat_address );
+
 unsigned long fs_check_cluster(unsigned long id);
-unsigned long fs_find_not_empty_entry();
+//unsigned long fs_find_not_empty_entry();
 
 void salva_nome( unsigned char *file_name, 
                  unsigned long id, 
@@ -875,6 +901,15 @@ void fsCreateVFS();
 void fsListFiles( int disk_id, 
                   int volume_id, 
 				  int directory_id );
+				  
+				  
+				  
+//interna
+//procura uma entrada vazia no diretório 
+int 
+findEmptyDirectoryEntry( unsigned long dir_address, 
+                         int number_of_entries );
+				  
 				  
 void read_fntos(char *name);
 				  

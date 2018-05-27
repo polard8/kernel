@@ -529,8 +529,7 @@ unsigned long errno;
 // fs support.
 //
 
-//list of clusters. 
-unsigned long file_cluster_list[1024];
+
 
 //directory entries support.
 char buffer_dir_entry[512];

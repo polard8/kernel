@@ -116,12 +116,16 @@ void spawn_task(int id)
 	// Check context.
 	//
 
+	/*  ## suspenso ##
+	   //tentando rodar uma thread em ring0
+	// Checar um contexto válido para threads em ring 3. 
 	Status = contextCheckThreadRing3Context(id);
 	if(Status != 0){
 	    printf("spawn_task error: Context TID={%d}",id);
 		refresh_screen();
 		while(1){}
 	};
+	*/
 
     //
     // Preparar a thread para executar.

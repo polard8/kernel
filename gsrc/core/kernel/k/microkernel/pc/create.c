@@ -295,6 +295,7 @@ done:
 
 
 /*
+ **************************************************************
  * KiCreateShell:
  *     Criando Thread Shell manualmente.
  * @todo: Mudar o nome para createCreateShellThread()
@@ -470,6 +471,7 @@ done:
 
 
 /*
+ ***************************************************************
  * KiCreateTaskManager:
  *     Criando thread task manager manualmente.
  * @todo: Mudar o nome para createCreateTaskmanThread()
@@ -634,6 +636,177 @@ done:
     SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
     return (void*) t;
 };
+
+
+
+// =================  test  ====================
+
+
+
+
+
+
+void xxxRing0Idle()
+{
+Loop:
+    asm("sti");
+	asm("hlt");
+    goto Loop;
+}
+
+
+
+/*
+ ***************************************************************
+ * KiCreateRing0Idle:
+ *    Criando manualmente uma thread em ring 0.
+ *    Para o processador ficar em hlt quando não tiver outra 
+ * thread rodando.
+ */
+void *KiCreateRing0Idle()
+{
+    void *ring0IdleStack;                    // Stack pointer. 	
+	struct thread_d *t;
+	char *ThreadName = "ring0-idle-thread";    // Name.
+	
+
+	if( (void*) KernelProcess == NULL )
+	{
+	    printf("pc-create-KiCreateRing0Idle: KernelProcess\n");
+		die();
+	};	
+
+    //Thread.
+	//Alocando memória para a estrutura da thread.
+	t = (void*) malloc( sizeof(struct thread_d) );	
+	if( (void*) t == NULL ){
+	    printf("pc-create-KiCreateRing0Idle: t \n");
+		die();
+	}else{  
+	    //Indica à qual proesso a thread pertence.
+	    t->process = (void*) KernelProcess;
+	};
+	
+	//Stack.
+	//#bugbug
+	//estamos alocando uma stack dentro do heap do kernel.
+	//nesse caso serve para a thread idle em ring 0.
+	ring0IdleStack = (void*) malloc(8*1024);
+	if( (void*) ring0IdleStack == NULL ){
+	    printf("pc-create-KiCreateRing0Idle: ring0IdleStack\n");
+		die();
+	};
+  	
+	//@todo: object
+	
+    //Identificadores      
+	t->tid = 3;     
+	t->ownerPID = (int) KernelProcess->pid;         
+	t->used = 1;
+	t->magic = 1234;	
+	t->name_address = (unsigned long) ThreadName;   //Funciona.
+	
+	t->process = (void*) KernelProcess;
+	
+	t->plane = BACKGROUND;
+	
+	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
+
+	//Procedimento de janela.
+    t->procedure = (unsigned long) &system_procedure;	
+	t->window = NULL;  //window;  //arg1.
+	t->msg = 0;        //arg2.
+	t->long1 = 0;      //arg3.
+	t->long2 = 0;      //arg4.	
+
+    //Características.	
+	t->type = TYPE_SYSTEM;  
+	t->state = INITIALIZED; 
+
+	t->base_priority = KernelProcess->base_priority;  //básica.   
+  	t->priority = t->base_priority;                   //dinâmica.
+	
+	t->iopl = RING0;//RING3;   
+	t->saved = 0;
+	t->preempted = PREEMPTABLE;    //PREEMPT_NAOPODE; //nao pode.	
+	//t->Heap;
+	//t->HeapSize;
+	//t->Stack;
+	//t->StackSize;
+
+	//Temporizadores.
+	t->step = 0;
+	t->quantum       = QUANTUM_BASE;
+	t->quantum_limit = QUANTUM_LIMIT;	
+
+
+	t->standbyCount = 0;
+	t->runningCount = 0;    //Tempo rodando antes de parar.
+	t->readyCount = 0;      //Tempo de espera para retomar a execução.
+	t->ready_limit = READY_LIMIT;
+	t->waitingCount  = 0;
+	t->waiting_limit = WAITING_LIMIT;
+	t->blockedCount = 0;    //Tempo bloqueada.		
+	t->blocked_limit = BLOCKED_LIMIT;
+	
+
+	t->ticks_remaining = 1000;
+	
+	//signal
+	//Sinais para threads.
+	t->signal = 0;
+	t->signalMask = 0;
+	
+	//Context.
+	t->ss  = 0x10 | 0;               
+	t->esp = (unsigned long) (ring0IdleStack+(8*1024)); //0x004FFFF0;    //taskmanStack;//0x0045FFF0;  //pilha. 
+	t->eflags = 0x3200;  //???
+	t->cs = 8 | 0;                                
+	t->eip = (unsigned long) xxxRing0Idle; //0x004A1000;     	                                               
+	t->ds = 0x10 | 0;
+	t->es = 0x10 | 0;
+	t->fs = 0x10 | 0; 
+	t->gs = 0x10 | 0; 
+	t->eax = 0;
+	t->ebx = 0;
+	t->ecx = 0;
+	t->edx = 0;
+	t->esi = 0;
+	t->edi = 0;
+	t->ebp = 0;	
+	//...
+	
+	//#bugbug
+	//Obs: As estruturas precisam já estar decidamente inicializadas.
+	//IdleThread->root = (struct _iobuf *) file_root;
+	//IdleThread->pwd  = (struct _iobuf *) file_pwd;	
+
+	//CPU stuffs.
+	//t->cpuID = 0;              //Qual processador.
+	//t->confined = 1;           //Flag, confinado ou não.
+	//t->CurrentProcessor = 0;   //Qual processador.
+	//t->NextProcessor = 0;      //Próximo processador. 
+	
+	//Coloca na lista de estruturas.
+	threadList[3] = (unsigned long) t;
+	
+	t->Next = NULL;
+	
+	//
+	// Running tasks.
+	//
+	
+	ProcessorBlock.running_threads = 4;
+	
+// Done.
+done:
+    queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
+    SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
+    return (void*) t;
+};
+
+
+
 
 
 //

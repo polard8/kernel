@@ -18,30 +18,7 @@
 
 extern void reset_ide0();
 
-//interna
-//procura uma entrada vazia no diretório 
-int findEmptyDirectoryEntry( unsigned long dir_address, int number_of_entries )
-{
-	unsigned char *dir = (unsigned char *) dir_address;
-	
-	
-	int i;
-	int j=0;
-	
-	for( i=0; i<number_of_entries; ++i )
-	{
-		if( dir[j] == 0 )
-		{
-			return (int) i;
-		}
-		
-		//próxima entrada.
-		j = j+32;
-	}
-	
-fail:	
-	return (int) (-1);
-}
+
 
 
 //rotina interna de support.
@@ -174,6 +151,7 @@ done:
  * fsSaveFile:
  *     Salva um arquivo.
  *     Por enquanto no diretório raiz.
+ * #importante
  * @todo: A biblioteca C pode chamar essa funçao.
  */
  
@@ -261,11 +239,12 @@ SearchEmptyEntries:
     }; 
   
 out_of_range:  
-   printf("fsSaveFile: out_of_range - Max entries !");
-   refresh_screen();
-   while(1){
-	   asm("hlt");
-   }
+    printf("fsSaveFile: out_of_range - Max entries !");
+    goto fail;
+    //refresh_screen();
+    //while(1){
+	//   asm("hlt");
+    //}
    
 // Salva o arquivo.
 //     O arquivo tem na lista todos os clusters 
@@ -505,14 +484,8 @@ done:
 				  
        off = off + 0x200;
        lbaoff = lbaoff + 1;	   
-	}
+	};
 	
-
-    
-	//write_lba( VOLUME1_FAT_ADDRESS + 0x200, VOLUME1_FAT_LBA + 1); 
-	//write_lba( VOLUME1_FAT_ADDRESS + 0x400, VOLUME1_FAT_LBA + 2);
-    //write_lba( VOLUME1_FAT_ADDRESS + 0x600, VOLUME1_FAT_LBA + 3);
-
 	
     //#debug
     printf("fsSaveFile: done  \n"); 

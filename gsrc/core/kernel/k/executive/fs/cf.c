@@ -20,15 +20,17 @@
  */
 unsigned long fs_create_dir( char *name, unsigned long id )
 {
-	return fs_create_file( name, id ); 
+	return 1;
+	//return fs_create_file( name, id ); 
 };
 
 
 /*
+ *****************************************************
  * fs_create_file:
  *     Cria um arquivo.
  */
-unsigned long fs_create_file( char *name, unsigned long id )
+int fs_create_file( char *name )
 {
     unsigned long fat_entry;
     unsigned long dir_entry;
@@ -40,7 +42,7 @@ unsigned long fs_create_file( char *name, unsigned long id )
 	//
 	
 	// Encontra uma entrada vazia na FAT.
-	fat_entry = fs_find_empty_entry();
+	//fat_entry = fs_find_empty_entry(?);
 	
 	
 	// Testar antes a validade da entrada.
@@ -69,8 +71,10 @@ unsigned long fs_create_file( char *name, unsigned long id )
 	// ROOT STUFFS.
 	//
 	
+	//#bugbug
 	//Procura uma entrada vazia no diretório.
-	dir_entry = fs_search_empty_entry(id);
+	//@todo:
+	//dir_entry = findEmptyDirectoryEntry( ?, ?);
 	
     if( dir_entry == 0 ){
         printf("fs_create_file: No empty entry on this directoty!\n");
@@ -78,12 +82,12 @@ unsigned long fs_create_file( char *name, unsigned long id )
 	};	
   		 
 	if(dir_entry < 0 || dir_entry > 64){
-        printf("fs_create_file: Directory entry limits!\n");
+        printf("fs_create_file: Dir entry limits\n");
         goto fail;		
 	};	
 	
 	//Cria a entrada no diretório
-	fs_create_entry( name, id, dir_entry, fat_entry, size ); 
+	//fs_create_entry( name, id, dir_entry, fat_entry, size ); 
 	
 	
 	//@todo:
@@ -92,11 +96,13 @@ unsigned long fs_create_file( char *name, unsigned long id )
 	//Continua...
 		
 done:
-    printf("fs_create_file: Done! FatEntry={%d} DirectoryEntry={%d}\n",fat_entry,dir_entry);
-    return (unsigned long) 0;
+    printf("fs_create_file: Done FatEntry={%d} DirEntry={%d}\n",
+	    fat_entry, dir_entry );
+		
+    return (int) 0;
 	
 fail:   
-	return (unsigned long) 1;
+	return (int) 1;
 };
 
 	
@@ -144,64 +150,6 @@ void salva_nome( unsigned char *file_name,
  */
 void create_system_folders()
 {
-
-/*
-    //
-	// Aloca memória para as estruturas dos diretórios do sistema.
-	//
-	 	
-	//rootDir
-	rootDir = (void*) malloc( sizeof(struct d_dir)); 
-
-	
-	if( (void*) rootDir == NULL)
-	{
-	    printf("create_system_folders: nao foi possivel alocar memoria para rootDir!");
-		refresh_screen();
-		while(1){}
-	};
-
-
-	
-	//bootDir
-	bootDir = (void*) malloc( sizeof(struct d_dir)); 
-	if( (void*) bootDir == NULL)
-	{
-	    printf("create_system_folders: nao foi possivel alocar memoria para bootDir!");
-		refresh_screen();
-		while(1){}
-	};
-
-	//systemDir
-	systemDir = (void*) malloc( sizeof(struct d_dir)); 	
-	if( (void*) systemDir == NULL)
-	{
-	    printf("create_system_folders: nao foi possivel alocar memoria para systemDir!");
-		refresh_screen();
-		while(1){}
-	};
-
-	//userDir
-	userDir = (void*) malloc( sizeof(struct d_dir)); 	
-	if( (void*) userDir == NULL)
-	{
-	    printf("create_system_folders: nao foi possivel alocar memoria para userDir!");
-		refresh_screen();
-		while(1){}
-	};
-	
-	
-	//
-	// Coloca na lista.
-	//
-    fileList[0] = (unsigned long) rootDir;    
-    fileList[1] = (unsigned long) bootDir;    
-    fileList[2] = (unsigned long) systemDir;    
-    fileList[3] = (unsigned long) userDir;    	
-	
-*/	
-done:
-    //printf("done");	
 	return;
 };
 

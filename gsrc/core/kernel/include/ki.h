@@ -29,9 +29,13 @@ void KiSpawnTask(int id);
 void KiCalloutTest();
 void KiCallfarTest();
 
+
+//## bugbug ##
+// Isso deveria estar no módulo /pc em microkernel.
 void *KiCreateIdle();
 void *KiCreateShell();
-void *KiCreateTaskManager();	
+void *KiCreateTaskManager();
+void *KiCreateRing0Idle();	
 
 
 
