@@ -488,7 +488,8 @@ void *GetWindowDesktop(struct window_d * hwnd)
 		return NULL;
 	}
 	return (void*) hwnd->desktop;
-}
+};
+
 
 /*
  * ===============================================================
@@ -518,8 +519,6 @@ void windowSetUpColorScheme(int type)
     if( (void*) humility == NULL ){
 		printf("windowSetUpColorScheme: humility");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 		
 		//Object.
@@ -529,7 +528,6 @@ void windowSetUpColorScheme(int type)
 
 		humility->used = 1;
 		humility->magic = 1234;
-		
 		humility->name = "Humility";
 		
 		humility->elements[csiNull] = 0;                               //0
@@ -566,11 +564,9 @@ void windowSetUpColorScheme(int type)
 		//Object.
 		pride->objectType = ObjectTypeColorScheme;
 		pride->objectClass = ObjectClassGuiObjects;
-		
 
 		pride->used = 1;
 		pride->magic = 1234;
-		
 		pride->name = "Pride";
 		
 		//@todo:
@@ -578,16 +574,16 @@ void windowSetUpColorScheme(int type)
         pride->elements[csiDesktop] = COLOR_BACKGROUND; //0x00808000 verde escuro.
 		pride->elements[csiWindow] = COLOR_WINDOW;
         pride->elements[csiWindowBackground] = xCOLOR_GRAY1;
-		pride->elements[csiActiveWindowBorder] =  0x0080FFFF;
-        pride->elements[csiInactiveWindowBorder] = 0x0080FFFF;    //  (LIGHT GREEN) 
-		pride->elements[csiActiveWindowTitleBar] = 0x0080FFFF;    //  (LIGHT GREEN)
-        pride->elements[csiInactiveWindowTitleBar] =  0x0080FFFF;		
+		pride->elements[csiActiveWindowBorder] = 0x0080FFFF;
+        pride->elements[csiInactiveWindowBorder] = 0x0080FFFF;  //(LIGHT GREEN) 
+		pride->elements[csiActiveWindowTitleBar] = 0x0080FFFF;    
+        pride->elements[csiInactiveWindowTitleBar] = 0x0080FFFF;		
 		pride->elements[csiMenuBar] = COLOR_GRAY;
         pride->elements[csiScrollBar] = COLOR_GRAY;		
 		pride->elements[csiStatusBar] = 0x00404040;  //COLOR_STATUSBAR;  //#404040 cinza #FFFFFF branco
         pride->elements[csiMessageBox] = COLOR_GRAY;
-		pride->elements[csiSystemFontColor] =   COLOR_BLACK;		   //12
-		pride->elements[csiTerminalFontColor] = COLOR_WHITE;	       //13		
+		pride->elements[csiSystemFontColor] = COLOR_BLACK;    //12
+		pride->elements[csiTerminalFontColor] = COLOR_WHITE;  //13		
 		//...
 		
 		//Sanvando na estrutura padrão para o esquema pride.

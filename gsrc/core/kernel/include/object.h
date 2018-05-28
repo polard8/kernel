@@ -207,6 +207,7 @@
 
 
 /*
+ ***********************************************
  * struct object_d:
  *     Estrutura para objetos.
  */

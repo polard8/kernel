@@ -15,6 +15,7 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
+ *     2018 - Revision.
  */
 
  
@@ -26,7 +27,8 @@
  * @todo: Substituir a palavra task por thread. KiShowPreemptedThread
  *
  */
-void KiShowPreemptedTask(){
+void KiShowPreemptedTask()
+{
     return;
 };
 
@@ -40,16 +42,17 @@ void KiSetTaskStatus(unsigned long status)
     //@todo: criar interface para mudanca de status.
 	
 	set_task_status(status);
-	return;
 };
 
 
 /*
  * KiGetTaskStatus
  * @todo: Substituir a palavra task por thread. KiGetThreadStatus
- *
+ * #bugbgu task não é um termo usado.
  */
-unsigned long KiGetTaskStatus(){ 
+unsigned long 
+KiGetTaskStatus()
+{ 
     return (unsigned long) get_task_status(); 
 };
 
@@ -59,9 +62,12 @@ unsigned long KiGetTaskStatus(){
  * KiSaveContextOfNewTask
  * @todo: Substituir a palavra task por thread. KiSaveContextOfNewThread
  *
- *
+ * ?? isso está muito estranho !!
  */
-void KiSaveContextOfNewTask(int id, unsigned long *task_address){
+void 
+KiSaveContextOfNewTask( int id, 
+                        unsigned long *task_address )
+{
     return;
 };
 
@@ -71,89 +77,102 @@ void KiSaveContextOfNewTask(int id, unsigned long *task_address){
  *  @todo: Substituir a palavra task por thread. KiReloadCurrentThread.
  *
  */
-void KiReloadCurrentTask(){
+void KiReloadCurrentTask()
+{
     return;
 };
 
 
-void KiSetQuantum(unsigned long q){    
+void KiSetQuantum(unsigned long q)
+{    
     return;
 };
 
 
-unsigned long KiGetQuantum(){ 
+unsigned long KiGetQuantum()
+{ 
     return (unsigned long) 0; 
 };
 
 
-void KiSetCurrentQuantum( unsigned long q){
+void KiSetCurrentQuantum( unsigned long q)
+{
     return;
 };
 
 
-unsigned long KiGetCurrentQuantum(){ 
+unsigned long KiGetCurrentQuantum()
+{ 
     return (unsigned long) 0; 
 };
 
 
-void KiSetNextQuantum( unsigned long q){
+void KiSetNextQuantum( unsigned long q )
+{
     return;
 };
 
 
-unsigned long KiGetNextQuantum(){ 
+unsigned long KiGetNextQuantum()
+{ 
     return (unsigned long) 0; 
 };
 
 
-void KiSetFocus(int pid){
+void KiSetFocus(int pid)
+{
 	return;
 };
 
 
 //Pegar o foco do que? thread?!
-int KiGetFocus(){ 
+int KiGetFocus()
+{ 
     return (int) 0; 
 };
 
 
-void KiDebugBreakpoint(){
+void KiDebugBreakpoint()
+{
     return;
 };
 
 
-void KiShowTasksParameters(){
+void KiShowTasksParameters()
+{
     return;
 };
 
 
-void KiMostraSlots(){
-	//mostra_slots();
-    return;
+void KiMostraSlots()
+{
+	mostra_slots();
 };
 
 
-void KiMostraSlot(int id){ 
-	//mostra_slot(id);
-    return;
+void KiMostraSlot(int id)
+{ 
+	mostra_slot(id);
 };
 
 
-void KiMostraReg(int id){
+void KiMostraReg(int id)
+{
 	//mostra_reg(id);
     return;
 };
 
 
 /*
+ ***************************************
  * KiShowThreadList:
- *     Mostra os parametros de ALGUMAS das threads existentes em 
+ *     Mostra os parametros de ALGUMAS das 
+ * threads existentes em 
  * threadList[i]. (as primeiras da lista).
- *
  */
-void KiShowThreadList(){
+void KiShowThreadList()
+{
     mostra_slots();
-    return;	
 };
 
 
@@ -198,8 +217,9 @@ void mostra_slots()
 	//
 	// Testando o for para threads.
 	//
-	printf(" \n\n ** Thread info ** \n\n");
+	printf(" \n\n ## Thread info ## \n\n");
 	
+Scan:	
 	for( i=0; i<THREAD_COUNT_MAX; i++)
     {
 	    t = (void *) threadList[i];
@@ -209,8 +229,10 @@ void mostra_slots()
 		        t->used == 1 && 
 				t->magic == 1234 )
 	    {
-		  printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d} Handle={%x} Name={%s}\n\n",t->tid 
-		      ,t->step ,t->ownerPID, t->process ,t->state ,(void*) t ,t->name_address);
+			//@todo: Melhorar isso.
+		    printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d} Handle={%x} Name={%s}\n\n",
+		        t->tid, t->step, t->ownerPID, t->process, 
+				t->state, (void*) t, t->name_address );
 	    };
     };
     
@@ -218,12 +240,16 @@ void mostra_slots()
 	
 done:	
     printf("Done!\n");
+	
+	//#debug
 	//refresh_screen();
 	//while(1){}
     return;
 };
 
+
 /*
+ *****************************************************
  * mostra_slot:
  *     Mostra as variaveis mais importantes de um slot.
  *     obs: Não precisa mostrar o contexto, tem rotina pra isso.
@@ -267,6 +293,7 @@ done:
 
 
 /*
+ *************************************************
  * mostra_reg:
  *    Mostra conteúdo dos registradores de uma thread..
  *
@@ -308,20 +335,28 @@ done:
 
 
 /*
+ *******************************************************
  * set_thread_priority:
- *     Muda a prioridade de uma tarefa específica.
+ *     Muda a prioridade de uma thread específica.
  */
-void set_thread_priority(struct thread_d *t, unsigned long priority)
+void 
+set_thread_priority( struct thread_d *t, 
+                     unsigned long priority )
 {
     unsigned long ThreadPriority;
 	
-	if( (void*) t == NULL ){
+	if( (void*) t == NULL )
+	{
 	    return;
+	}else{
+		
+        if( t->used != 1 || t->magic != 1234 )
+	    {
+		    return;
+	    }	
+		//...
 	};
 	
-    if( t->used != 1 || t->magic != 1234 ){
-		return;
-	}	
 	
 	ThreadPriority = t->priority;
 
@@ -329,6 +364,8 @@ void set_thread_priority(struct thread_d *t, unsigned long priority)
 	if( priority == ThreadPriority ){
 		return;
 	};
+	
+do_change:
 	
 	// se aprioridade solicitada for diferente da prioridade atual.
 	if( priority != ThreadPriority )
@@ -367,35 +404,54 @@ done:
 
 
 /*
+ ************************************************************
  * SetThreadDirectory:
- *     Configura o diretório de páginas para uma thread.
+ *     Altera o endereço do diretório de páginas de uma thread.
  *     Apenas a variável. Não altera o CR3.
  */
-void SetThreadDirectory(struct thread_d *thread, unsigned long Address)
+void 
+SetThreadDirectory( struct thread_d *thread, 
+                    unsigned long Address )
 {
     if( (void*) thread == NULL ){
-        return;        
+        goto fail;        
+	}else{
+		
+		//@todo:
+		//Aqui podemos checar a validade da estrutura,
+		//antes de operarmos nela.
 	};
+	
 //Nothing.		
 done:
-	thread->Directory = (unsigned long) Address;
+	thread->Directory = (unsigned long) Address;	
+fail:
 	return;
 };
 
 
 /*
+ ***********************************************************
  * GetThreadDirectory:
- *     Pega o endereço do diretorio de páginas de uma thread.
- *
+ *     Pega o endereço do diretório de páginas de uma thread.
  */
-unsigned long GetThreadDirectory(struct thread_d *thread)
+unsigned long 
+GetThreadDirectory( struct thread_d *thread )
 {
-    if( (void*) thread == NULL ){
-        return (unsigned long) 0;        
+    if( (void*) thread == NULL )
+	{
+        goto fail;        
+	}else{
+		
+		//@todo:
+		//Aqui podemos checar a validade da estrutura,
+		//antes de operarmos nela.
 	};
 //Nothing.	
 done:
 	return (unsigned long) thread->Directory;
+fail:
+    return (unsigned long) 0;    
 };
 
 
@@ -420,68 +476,102 @@ void show_tasks_parameters(){
 };
 
 
-void release(struct thread_d *t)
-{
-	int i;
-	
-	struct thread_d *Thread;
-
-	if( (void*) t == NULL )
-	    return;
-	
-	for( i=1; i<THREAD_COUNT_MAX; i++ )
-	{	
-        Thread = (void*) threadList[i];
-		if( Thread == t )
-		{
-			threadList[i] = (unsigned long) 0;
-			
-			//free_page((long)p);
-			//schedule();
-			
-			return;
-		}
-	};
-	panic("pc-threadi-release:");
-}
 
 /*
- * exit_thread:
- *     Exit a thread.
- *     Torna o estado ZOMBIE mas não destrói a estrutura.
- *     Outra rotina destruirá as informações de uma estrutura de 
- * thread zombie.
+ ****************************************
+ * release:
+ * #importante
+ * Isso deve liberar uma thread que estava esperando 
+ * ou bloqueada por algum motivo.
+ * Obs: Aqui não dvemos julgar se ela pode ou não ser 
+ * liberada, apenas alteramos se estado.
+ *
  */
-void exit_thread(int tid)
+void 
+release( int tid )
 {
-	int i;
     struct thread_d *Thread;
-
 	
 	//Limits. 
-	if(tid < 0 || tid >= THREAD_COUNT_MAX){
-	    return;	
-	};    
+	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
+	    goto fail;
+	}
 	
 	Thread = (void*) threadList[tid];
 	
-	if( (void*) Thread == NULL ){
-		return;
+	if( (void*) Thread == NULL )
+	{
+		goto fail;
+		
 	}else{
 		
         //Se estiver corrompida.
-        if(Thread->magic != THREAD_MAGIC){
-			return;
+        if( Thread->magic != THREAD_MAGIC )
+		{
+			goto fail;
 		};
+		
+		//#importante:
+		//Não estamos selecionando ela para execução
+		//Apenas estamos dizendo que ela está pronta para 
+		//executar.
+		Thread->state = READY; 
+	};	
+	
+fail:
+done:
+    return;
+};
+
+
+
+/*
+ *******************************************************
+ * exit_thread:
+ *     Exit a thread.
+ *     Torna o estado ZOMBIE mas não destrói a estrutura.
+ *     Outra rotina destruirá as informações de uma 
+ * estrutura de thread zombie.
+ */
+void 
+exit_thread(int tid)
+{
+    struct thread_d *Thread;
+	
+	//Limits. 
+	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
+	    goto fail;
+	}
+	
+	Thread = (void*) threadList[tid];
+	
+	if( (void*) Thread == NULL )
+	{
+		goto fail;
+		
+	}else{
+		
+        //Se estiver corrompida.
+        if( Thread->magic != THREAD_MAGIC )
+		{
+			goto fail;
+		};
+		
 		//Thread->exit_code = 0;    //@todo: Isso é necessário. Onde está.
 		Thread->state = ZOMBIE; 
 	};
 		
-	//Se a thread fechada é a atual, necessitamos de algum escalonamento.	
-    if(tid = current_thread){
+	
+	// # reavaliar isso.
+	// Se a thread fechada é a atual, 
+	// necessitamos de algum escalonamento.	
+    if( tid = current_thread )
+	{
 	    scheduler();
     };
 	
+	
+fail:
 //Nothing.		
 done:
 	return;
@@ -489,32 +579,36 @@ done:
 
 
 /*
+ *****************************************************
  * kill_thread:
  *     Destrói uma thread.
  *     Destroi a estrutura e libera o espaço na lista. 
  */
-void kill_thread(int tid)
+void 
+kill_thread(int tid)
 {
     struct thread_d *Thread;
 	
 	//Limits.
-	if(tid < 0 || tid >= THREAD_COUNT_MAX){
-	    return;	
-	};    
+	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
+	    goto fail;	
+	}
 	
 	//
 	// @todo: 
-	//     Antes, deve acordar o pai que está esperando o filho fechar.
-	//	
-	
-	
-	//@todo: Checar used e magic.
+	//    Deve acordar o pai que está esperando o filho fechar.
+	//    Mas no caso estamos apenas fechando uma thread.
+    //    Caso essa não seja a thread primária, isso não deve 
+	// causar o fechamento do processo.	
+    //
 	
 	Thread = (void*) threadList[tid];
 	
-	if( (void*) Thread == NULL){
-		return;
+	if( (void*) Thread == NULL )
+	{
+		goto fail;
 	}else{
+		
 		
 	    //@todo pegar o id do pai e enviar um sinal e acorda-lo
         //se ele estiver esperando por filho.		
@@ -522,31 +616,46 @@ void kill_thread(int tid)
         Thread->magic = 0; 		
 		Thread->state = DEAD; 
 		//...
+		
+        //threadList[tid] = NULL;   //@todo: Liberar o espaço na lista.
+        //Thread = NULL;		
 	};
+	
+	
+	// # reavaliar isso.
+	// Se a thread fechada é a atual, 
+	// necessitamos de algum escalonamento.	
+    if( tid = current_thread )
+	{
+	    scheduler();
+    };
+	
+	
+fail:	
 	
 //Done.
 done:
-    //threadList[tid] = NULL;   //@todo: Liberar o espaço na lista.
-    Thread = NULL;		
 	return;
 };
 
 
 /*
+ **********************************************************
  * dead_thread_collector:
  *     Procura por uma thread no estado zombie mata ela.
  *
  * @todo
  *     Alerta o processo que a thread morreu.
- *
  */
-void dead_thread_collector()
+void 
+dead_thread_collector()
 {
 	int i;
-    struct thread_d  *Thread;   	  
+    struct thread_d *Thread;   	  
     struct process_d *p;         
 	
-	for( i = 0; i < THREAD_COUNT_MAX; i++ )
+Scan:
+	for( i=0; i < THREAD_COUNT_MAX; i++ )
 	{
 	    Thread = (void *) threadList[i];
 		
@@ -561,6 +670,18 @@ void dead_thread_collector()
 				Thread->magic = 0;
 				Thread->state = DEAD; // Por enquanto apenas fecha.
 				//...
+			    
+				// #importante:
+				// Nessa hora precisamos notificar o 
+				// a thread que estava esperando essa thread  
+				// terminar.
+				// Se essa for a thread primária então o processo 
+				// irá terminar também, então o processo que esperava 
+				// também deverá ser notificado.
+				
+                //Thread = NULL;
+	            //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.
+	
 			};
 			//Nothing.
 		};
@@ -571,9 +692,7 @@ void dead_thread_collector()
 	// * MOVEMENT 10 (zombie --> Dead)
 	// * MOVEMENT 11 (zombie --> Initialized) .. reinicializar.
 	
-done: 
-    //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.	
-    Thread = NULL;
+done: 	
 	return;
 };
 

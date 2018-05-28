@@ -1,10 +1,13 @@
 /*
- * Arquivo: queue.h
+ * File: queue.h
  *
  * Descrição:
  *     Header para queue.
  *     No fim da fila a prioridade é maior.
- *     OS ÚLTIMOS SERÃO OS PRIMEIROS.
+ *    
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2018 - Revision.
  */
 
  
@@ -12,19 +15,21 @@
 #define QUEUE_STANDBY  1
 #define QUEUE_RUNNING  2
 #define QUEUE_READY    3
-#define QUEUE_WAITING  4
+#define QUEUE_WAITING  4  //Fila das threads que estão esperando.
 #define QUEUE_BLOCKED  5
 #define QUEUE_ZOMBIE   6
 #define QUEUE_DEAD     7
-#define QUEUE_INITIALIZED 8
-#define QUEUE_SYSCOOP  9    // Sistema, cooperação.   
-#define QUEUE_USERCOOP 10   // Usuário, cooperação.   
-#define QUEUE_SYSCONC  11   // Sistema, concorrência. 
-#define QUEUE_USERCONC 12   // Usuário, concorrencia.  
-#define QUEUE_REALTIME 13 
-#define QUEUE_DEFAULT  14
+#define QUEUE_INITIALIZED   8
+#define QUEUE_SYSCOOP       9  // Sistema, cooperação.   
+#define QUEUE_USERCOOP     10  // Usuário, cooperação.   
+#define QUEUE_SYSCONC      11  // Sistema, concorrência. 
+#define QUEUE_USERCONC     12  // Usuário, concorrencia.  
+#define QUEUE_REALTIME     13 
+#define QUEUE_DEFAULT      14
+//...
 
-// Niveis de prioridade.
+// ??
+// Níveis de prioridade.
 #define QUEUE_LEVEL_MIN 15
 #define QUEUE_LEVEL_MED 16
 #define QUEUE_LEVEL_MAX 17
@@ -46,10 +51,13 @@ unsigned long queue_last;
  
  
 /*
- * IMPORTANTE
+ **********************************************************
+ * queue_d:
+ *    Estrutura para fila.
  *
- * @todo: usar array de estrutura dinamico. (alocado)
- * pois essa estrutura esta disperdiçando espaço com array estáticos.
+ * @todo: usar array de estrutura dinâmico. (alocado)
+ * pois essa estrutura esta disperdiçando espaço com 
+ * array estáticos.
  */
 typedef struct queue_d queue_t;
 struct queue_d
@@ -203,34 +211,29 @@ struct queue_d
     unsigned long maxList[128];
 	
 };
-//queue_t *Queue;
 queue_t *queue;
+//.
 
-
-
-
-
-
-unsigned long queueList[8]; //nao usar.
-
-
+// #bugbug
+// Não usar.
+unsigned long queueList[8]; 
 
 
 
 /*
- *  
- */ 
- // Estrutura que descreve uma fila
-typedef struct d_wait_queue wait_queue_t;
-struct d_wait_queue
+ ****************************************************
+ * wait_queue_d:
+ *     ## test  ##
+ *     Lista encadeada que pode ser usada para threads 
+ * que estão esperando por algum evento.
+ */
+typedef struct wait_queue_d wait_queue_t;
+struct wait_queue_d
 {
-	//fila de tamanho fixo, 2, um usando e outro esperando.
+	int size;
 	struct thread_d *head;
 	struct thread_d *tail;
-	//int head;
-	//int tail;
 };
-
 
 
 //
@@ -238,14 +241,30 @@ struct d_wait_queue
 //
 
 int init_queue(struct queue_d *q);
-/*
- * queue_insert_head:
- *     Coloca um dado no fim da fila. (LIFO)
- */
-int queue_insert_head(struct queue_d *q, unsigned long data, int type);
-int queue_insert_data(struct queue_d *q, unsigned long data, int type);
-void *queue_get_data(struct queue_d *q, int type);
+
+//queue_insert_head: Coloca um dado no fim da fila. (LIFO)
+int 
+queue_insert_head( struct queue_d *q, 
+                   unsigned long data, 
+				   int type );
+
+int 
+queue_insert_data( struct queue_d *q, 
+                   unsigned long data, 
+				   int type );
+
+void *queue_get_data( struct queue_d *q, 
+                      int type );
+					  
 void show_queue_information(struct queue_d *q);
 void ScanReadyQueue(struct queue_d *q);
-void feed_ready_queue(struct queue_d *q, int type);
+
+void 
+feed_ready_queue( struct queue_d *q, 
+                  int type );
+
+
+//
+// End.
+//
 

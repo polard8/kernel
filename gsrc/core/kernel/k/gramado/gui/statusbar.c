@@ -16,17 +16,22 @@
 
 
 /*
+ ************************************************
  * StatusBar:
- *     Desenha uma status bar, dada a janela, encontramos o retângula da área de cliente.
- *     @todo: Acrescentar uma borda delicada, usar outra cor, próximo do 
- * branco.
+ *     Desenha uma status bar, dada a janela, 
+ * encontramos o retângula da área de cliente.
+ *     @todo: Acrescentar uma borda delicada, 
+ * usar outra cor, próximo do branco.
  */
-int StatusBar( struct window_d *window, 
-               unsigned char *string1, 
-			   unsigned char *string2 )
-{     
+int 
+StatusBar( struct window_d *window, 
+           unsigned char *string1, 
+		   unsigned char *string2 )
+{
 	struct window_d *hWnd;
-		
+	unsigned long StatusBarColor;	
+	int desktopID; 
+	
 	if( (void*) window == NULL ){
         return (int) 1;
     }
@@ -38,16 +43,20 @@ int StatusBar( struct window_d *window,
 	
 	if( (void*) window->rcClient == NULL ){
 		return (int) 1;
-	};
+	}
 	
-	if( window->rcClient->used != 1 || window->rcClient->magic != 1234 ){
+	if( window->rcClient->used != 1 || 
+	    window->rcClient->magic != 1234 )
+	{
 		return (int) 1;
-	};
+	}
 
 	// Set Up Sizes.
-	unsigned long x      = (unsigned long) window->rcClient->left;        
-	unsigned long y      = (unsigned long) window->rcClient->bottom -32; //Começa 32pixels antes do fim. 
-	unsigned long width  = (unsigned long) window->rcClient->width;      //Mesma largura da janela. 
+	// Começa 32pixels antes do fim.
+	// Mesma largura da janela.
+	unsigned long x = (unsigned long) window->rcClient->left;        
+	unsigned long y = (unsigned long) window->rcClient->bottom -32;  
+	unsigned long width  = (unsigned long) window->rcClient->width;       
 	unsigned long height = (unsigned long) 32;                           
 	
 	//
@@ -61,16 +70,21 @@ int StatusBar( struct window_d *window,
 	// *Importante: Checando se o esquema de cores está funcionando.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL ){
+	if( (void*) CurrentColorScheme == NULL )
+	{
 		printf("StatusBar: CurrentColorScheme");
-		refresh_screen();
-		while(1){}
+		die();
+		//refresh_screen();
+		//while(1){}
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		if( CurrentColorScheme->used != 1 || 
+		    CurrentColorScheme->magic != 1234 )
+		{
 		    printf("StatusBar: CurrentColorScheme validation");
-		    refresh_screen();
-		    while(1){}			
+		    die();
+			//refresh_screen();
+		    //while(1){}			
 		};
 		//Nothing.
 	};
@@ -79,11 +93,9 @@ int StatusBar( struct window_d *window,
 	
 	// Configurando as cores usadas na status bar.
 	
-	unsigned long StatusBarColor;
-	StatusBarColor = CurrentColorScheme->elements[csiStatusBar];  
+
+	StatusBarColor = (unsigned long) CurrentColorScheme->elements[csiStatusBar];  
 	
-	
-	int desktopID; 
 	desktopID = (int) get_current_desktop_id();	
 
  
@@ -91,12 +103,14 @@ int StatusBar( struct window_d *window,
 	                             x, y, width, height, 
 								 window, desktopID, StatusBarColor, StatusBarColor); 
 	
-	if( (void*) hWnd == NULL ){
+	if( (void*) hWnd == NULL )
+	{
         return (int) 1;
-    };	 
+    }	 
 	
 	//
-	// @todo: Registrar! (Sabendo quem é janela mãe pode-se liberar memória depois).
+	// @todo: Registrar! 
+	// (Sabendo quem é janela mãe pode-se liberar memória depois).
 	//
 	
 	RegisterWindow(hWnd);

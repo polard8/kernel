@@ -4,7 +4,9 @@
  * Descrição:
  *     Rotinas de informações sobre o sistema.
  *
- *    Versão 1.0, 2015, 2016. 
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  */
  
 
@@ -40,11 +42,12 @@ void KeInformation(){
 
 
 /*
+ *********************************************************
  * KiInformation: 
  * Mostra uma lista de informações sobre o Sistema.
- * Obs: @todo: A lista de informações de ser bem completa, pois servirá
- * de ajuda ao desenvolvedor. Deve conter de tudo, abordando todas as 
- * camadas do sistema. 
+ * Obs: @todo: A lista de informações de ser bem completa, 
+ * pois servirá de ajuda ao desenvolvedor. Deve conter 
+ * de tudo, abordando todas as camadas do sistema. 
  * 
  * Ordem por classe:
  * ================
@@ -52,7 +55,6 @@ void KeInformation(){
  * IO: cpu, dma.
  * DEVICES: umblocked, blocked
  * THINGS:
- *
  *
  * Obs: As informções podem ser salvas em um arquivo de saída padrão.
  */
@@ -131,17 +133,18 @@ void KiInformation()
 	    printf("\n[System Info:]\n");
 	    //OS info.
 	    printf("%s ",OS_NAME);
-	    printf("Version: %d.%d.%d\n\n" ,SYSTEM_VERSIONMAJOR
-	                                   ,SYSTEM_VERSIONMINOR
-									   ,SYSTEM_VERSIONREVISION );
+	    printf("Version: %d.%d.%d\n\n",
+		    SYSTEM_VERSIONMAJOR,
+			SYSTEM_VERSIONMINOR,
+			SYSTEM_VERSIONREVISION );
 	
 	    //
 		// Screen resolution. (first of all)
 		//
 	    
 		printf("\n[Screen Resolution:]\n");
-		printf("Width={%d} Height={%d}\n",g_device_screen_width
-		                                 ,g_device_screen_height );
+		printf("Width={%d} Height={%d}\n",
+		    g_device_screen_width, g_device_screen_height );
 		
 		//
 	    // Kernel info.
@@ -189,18 +192,19 @@ void KiInformation()
 	    //
 	
 	    printf("\n[Dispatch criteria:]\n");
-	    printf("cIdle={%d} cInit={%d} cNext={%d} cCur={%d} cAny={%d} cIdeal={%d} cDisp={%d}\n",DispatchCountBlock->SelectIdleCount
-	    ,DispatchCountBlock->SelectInitializedCount
-	    ,DispatchCountBlock->SelectNextCount
-	    ,DispatchCountBlock->SelectCurrentCount
-	    ,DispatchCountBlock->SelectAnyCount
-        ,DispatchCountBlock->SelectIdealCount
-	    ,DispatchCountBlock->SelectDispatcherQueueCount);
+	    printf("cIdle={%d} cInit={%d} cNext={%d} cCur={%d} cAny={%d} cIdeal={%d} cDisp={%d}\n",
+		    DispatchCountBlock->SelectIdleCount,
+			DispatchCountBlock->SelectInitializedCount,
+			DispatchCountBlock->SelectNextCount,
+			DispatchCountBlock->SelectCurrentCount,
+			DispatchCountBlock->SelectAnyCount,
+			DispatchCountBlock->SelectIdealCount,
+			DispatchCountBlock->SelectDispatcherQueueCount );
 			
 
 			
 		printf("\n## thread info ## \n");	
-		printf("threads running { %d }",ProcessorBlock.running_threads);	
+		printf("\n{ %d } threads running\n",ProcessorBlock.running_threads);	
         show_thread_information();		
 		
         //
@@ -238,12 +242,12 @@ void KiInformation()
 	    printf("\n[User Info:]\n");
 	
 	    //Group and user.
-	    printf("Group={%d} User={%d} \n",current_group,current_user);
+	    printf("Group={%d} User={%d} \n", 
+		    current_group, current_user);
 	
 	    //user session, window station, desktop.
-	    printf("UserSession={%d} DesktopPool={%d} Desktop={%d} \n",current_usersession
-	                                                          ,current_windowstation
-															  ,current_desktop);
+	    printf("UserSession={%d} DesktopPool={%d} Desktop={%d} \n",
+		    current_usersession, current_windowstation, current_desktop );
 															
 	    ShowUserInfo(0);  //#bugbug
 	
@@ -254,7 +258,8 @@ void KiInformation()
 	
 	    printf("\n[Process Info:]\n");	
         //process, thread.
-	    printf("CurrentProcess={%d} CurrentThread={%d} \n\n",current_process ,current_thread);
+	    printf("CurrentProcess={%d} CurrentThread={%d} \n\n", 
+		    current_process, current_thread );
 	
 					
 	
@@ -319,7 +324,6 @@ void KiInformation()
 		g_cursor_y = g_cursor_top;
         //set_up_cursor(g_cursor_left,g_cursor_top); 		
 
-
 		StatusBar(hWindow,"Esc=EXIT","Enter=?");		
 		//Nothing.
 	};	   	
@@ -327,11 +331,10 @@ void KiInformation()
 	
 //Done
 done:
-	if(VideoBlock.useGui == 1)
-	{
-        //talvez possamo da refresh apenas da janela onde as strings aparecem...
+    //talvez possamos da refresh apenas da janela onde as strings aparecem...
+	if( VideoBlock.useGui == 1 ){
 		refresh_screen();
-	};
+	}
 	
 	//SetFocus(hWindow);	
     return;	

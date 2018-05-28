@@ -514,7 +514,7 @@ color_scheme_t PrideColorScheme;
 /*
  * Cores usadas nessa sistema.
  */
-
+#define COLOR_WINDOW              0x00FFFFFF
 #define COLOR_BLACK               0x000000
 #define COLOR_WHITE               0xFFFFFF 
 #define COLOR_RED                 0xFF0000 
@@ -579,7 +579,6 @@ color_scheme_t PrideColorScheme;
 #define COLOR_TITLEBAR_TEXT       COLOR_WHITE
 #define COLOR_TOPBAR              0x83F52C00
 #define COLOR_TOPBAR_TEXT         0x397D0200
-#define COLOR_WINDOW              0xFFFFFF00
 #define COLOR_WINDOWFRAME         COLOR_GRAY
 //(debug: Pink para contraste com quaquer cor de janela)
 #define COLOR_WINDOWTEXT          COLOR_PINK //COLOR_BLACK 
@@ -598,8 +597,8 @@ color_scheme_t PrideColorScheme;
 #define COLOR_ALICEBLUE           0xF0F8FF
 #define COLOR_ANTIQUEWHITE        0xFAEBD7
 #define COLOR_AQUA                0x00FFFF
-#define COLOR_AQUAMARINE          0x7FFFD4
-#define COLOR_AZURE               0xF0FFFF
+#define COLOR_AQUAMARINE          0x7FFFD4 //verde claro.
+#define COLOR_AZURE               0xF0FFFF //azul, quase branco. 
 #define COLOR_BEIGE               0xF5F5DC
 #define COLOR_BISQUE              0xFFE4C4
 #define COLOR_BLANCHEDALMOND      0xFFEBCD
@@ -644,10 +643,10 @@ color_scheme_t PrideColorScheme;
 #define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2
 #define COLOR_GREENYELLOW         0xADFF2F
 #define COLOR_HONEYDEW            0xF0FFF0
-#define COLOR_HOTPINK             0xFF69B4
-#define COLOR_HOTTRACK            0x0066CC
+#define COLOR_HOTPINK             0xFF69B4 //rosa chiclete.
+#define COLOR_HOTTRACK            0x0066CC //azul legal.
 #define COLOR_INDIANRED           0xCD5C5C
-#define COLOR_INDIGO              0x4B0082
+#define COLOR_INDIGO              0x4B0082 //violeta
 #define COLOR_IVORY               0xFFFFF0
 #define COLOR_KHAKI               0xF0E68C
 #define COLOR_LAVENDER            0xE6E6FA
@@ -660,7 +659,7 @@ color_scheme_t PrideColorScheme;
 #define COLOR_LIGHTPINK           0xFFB6C1
 #define COLOR_LIGHTSALMON         0xFFA07A
 #define COLOR_LIGHTSEAGREEN       0x20B2AA
-#define COLOR_LIGHTSKYBLUE        0x87CEFA
+#define COLOR_LIGHTSKYBLUE        0x87CEFA  //azul clarinho
 #define COLOR_LIGHTSLATEGRAY      0x778899
 #define COLOR_LIGHTSTEELBLUE      0xB0C4DE
 #define COLOR_LIGHTYELLOW         0xFFFFE0
@@ -682,7 +681,7 @@ color_scheme_t PrideColorScheme;
 #define COLOR_MINTCREAM           0xF5FFFA
 #define COLOR_MISTYROSE           0xFFE4E1
 #define COLOR_MOCCASIN            0xFFE4B5
-#define COLOR_NAVAJOWHITE         0xFFDEAD
+#define COLOR_NAVAJOWHITE         0xFFDEAD //branco areioso.
 #define COLOR_NAVY                0x000080
 #define COLOR_OLDLACE             0xFDF5E6
 #define COLOR_OLIVE               0x808000
@@ -708,14 +707,14 @@ color_scheme_t PrideColorScheme;
 #define COLOR_SANDYBROWN          0xF4A460
 #define COLOR_SCROLLBAR           0xC8C8C8
 #define COLOR_SEAGREEN            0x2E8B57
-#define COLOR_SEASHELL            0xFFF5EE
+#define COLOR_SEASHELL            0xFFF5EE  //branco sujinho
 #define COLOR_SIENNA              0xA0522D
-#define COLOR_SKYBLUE             0x87CEEB
-#define COLOR_SLATEBLUE           0x6A5ACD
+#define COLOR_SKYBLUE             0x87CEEB  //azul claro
+#define COLOR_SLATEBLUE           0x6A5ACD  //azul/violeta
 #define COLOR_SLATEGRAY           0x708090
-#define COLOR_SNOW                0xFFFAFA
+#define COLOR_SNOW                0xFFFAFA //branco
 #define COLOR_SPRINGGREEN         0x00FF7F
-#define COLOR_STEELBLUE           0x4682B4
+#define COLOR_STEELBLUE           0x4682B4 //azul legal.
 #define COLOR_TAN                 0xD2B48C
 #define COLOR_TEAL                0x008080
 #define COLOR_THISTLE             0xD8BFD8
@@ -724,7 +723,7 @@ color_scheme_t PrideColorScheme;
 #define COLOR_TURQUOISE           0x40E0D0
 #define COLOR_VIOLET              0xEE82EE
 #define COLOR_WHEAT               0xF5DEB3
-#define COLOR_WHITESMOKE          0xF5F5F5
+#define COLOR_WHITESMOKE          0xF5F5F5 //branco enfumaçado.
 #define COLOR_YELLOW              0xFFFF00
 #define COLOR_YELLOWGREEN         0x9ACD32
 #define STEALTH_ORANGE            0xFF8800
@@ -737,9 +736,9 @@ color_scheme_t PrideColorScheme;
 /*
  * (w) Colors, futuristic GUI. (Dark blu and Black)
  */ 
+ 
 //#define COLOR_DARKBLUE   0x00008B00 
 //#define COLOR_BLACK      0x00000000 
- 
  
  
 #define COLOR_KERNEL_BACKGROUND COLOR_BLUE     
@@ -748,89 +747,28 @@ color_scheme_t PrideColorScheme;
  * Padrão para janela de Aplicativo.  
  */
 
-#define APP_X 100
-#define APP_Y 100
-#define APP_LARGURA  640
-#define APP_ALTURA   480
-#define APP_COLOR_BG            0x000000 //@todo        
-#define APP_COLOR_BARRA_TITULO  0x000000 //@todo
-#define APP_COLOR_BORDA         0x000000 //@todo       
-#define APP_COLOR_TEXT          0x0001fe //@todo   
+#define APP_DEFAULT_X 0
+#define APP_DEFAULT_Y 0
+#define APP_DEFAULT_WIDTH  (800/3)
+#define APP_DEFAULT_HEIGHT  (600/3)
+#define APP_COLOR_BG            0x000000         
+#define APP_COLOR_BARRA_TITULO  0x000000 
+#define APP_COLOR_BORDA         0x000000        
+#define APP_COLOR_TEXT          0x0001fe    
 
-
-//barra de status
-#define BARRA_DE_STATUS_X        0
-#define BARRA_DE_STATUS_Y        KERNEL_LIN_MAX
-#define BARRA_DE_STATUS_LARGURA  KERNEL_COL_MAX
-#define BARRA_DE_STATUS_ALTURA   40
-
-
-//client area
-#define CLIENT_X_START  0
-#define CLIENT_X_END    KERNEL_COL_MAX
-#define CLIENT_Y_START  17
-#define CLIENT_Y_END    ( KERNEL_LIN_MAX-16 )
-
-
-//MESSAGE BOX - UTIL
-#define MB_X              100
-#define MB_Y              100
-#define MB_LARGURA        320
-#define MB_ALTURA         200
-#define MB_TITULO_ALTURA  24
-#define MB_STRING_X       (100 + (320/3))  
-#define MB_STRING_Y       (100 + (200/3))
-
-
-//barra de titulos BOX - UTIL
-#define TB_X           0
-#define TB_Y           0
-#define TB_LARGURA     KERNEL_COL_MAX
-#define TB_ALTURA      16
-#define TB_STRING_X    16+4  
-#define TB_STRING_Y    5
-
-
-
-
-//@todo: Inglês
-// barra de tarefas
-#define BARRA_DE_TAREFAS_X         0
-#define BARRA_DE_TAREFAS_Y         KERNEL_LIN_MAX
-#define BARRA_DE_TAREFAS_LARGURA   KERNEL_COL_MAX
-#define BARRA_DE_TAREFAS_ALTURA    20
-
-//area das tarefas na barra de tarefas
-#define AREA_DE_TAREFAS_X      MENU_INICIAR_LARGURA
-#define AREA_DE_TAREFAS_Y      KERNEL_LIN_MAX
-  
-#define AREA_DE_TAREFAS_LARGURA  (BARRA_DE_TAREFAS_LARGURA - MENU_INICIAR_LARGURA)
-#define AREA_DE_TAREFAS_ALTURA    20
 
 //desktop
-#define DESKTOP_X        0
-#define DESKTOP_Y        0
-#define DESKTOP_LARGURA  KERNEL_COL_MAX
-#define DESKTOP_ALTURA   KERNEL_LIN_MAX
+#define DESKTOP_X  0
+#define DESKTOP_Y  0
 
-//menu
-#define MENU_X         0
-#define MENU_Y         KERNEL_LIN_MAX
-#define MENU_LARGURA   200
-#define MENU_ALTURA    200
-#define MENU_INICIAR_X 0
-#define MENU_INICIAR_Y (600 - MENU_ALTURA - 50 ) //50=altura da taskbar
-#define MENU_INICIAR_LARGURA  MENU_LARGURA
-#define MENU_INICIAR_ALTURA   MENU_ALTURA
-#define menu_size  (MENU_ALTURA * 8)
 
 
 /*
  * Constants para a task bar.
  */
  
-#define TASKBUTTONS_BASE 40
-#define CLOCK_BASE  (KERNEL_COL_MAX-40)
+//#define TASKBUTTONS_BASE 40
+//#define CLOCK_BASE  (KERNEL_COL_MAX-40)
 
 
 //=========================================
@@ -1110,6 +1048,7 @@ msg_t *ProcedureMsg;
 
 
 /*
+ *******************************************************
  * rect_d:
  *     Estrutura para gerenciamento de retângulos.
  *     Um retângulo pertence à uma janela.
@@ -1260,6 +1199,7 @@ struct window_class_d
 
  
 /*
+ *********************************************************
  * window_d:
  *     Window - nível 1. 
  *     Estrutura para janelas.
@@ -1415,7 +1355,6 @@ struct window_d
 	int maxmizebuttonUsed;
 	int closebuttonUsed;
 	
-
 // 
 //==================================================	
 
@@ -1604,11 +1543,6 @@ struct window_d
 	struct rect_d *rectList;
 
 
-
-	
-
-	
-	
 	//
 	// Buffers support.
 	//
@@ -1626,9 +1560,6 @@ struct window_d
 	int LineArrayPointerY;      //em qual coluna o ponteiro está.
 	//...
 	
-
- 
-
 
     //
     //  Process support.
@@ -1751,6 +1682,8 @@ window_t *TABWINDOW;        //ponteiro para a janela da tab atual..
 //Importante: Estragar essa estrutura pode causar muitos problemas.
 window_t *FULLSCREEN_TABWINDOW;   
 
+
+
 /*
  estrutura para tabs do navegador do kernel.
  *@todo; Talvez deletar essa estrutura
@@ -1803,7 +1736,8 @@ struct browser_tab_d
 //browser_tab_t *BrowserTab;
 //...
 
-unsigned long browsertabList[TABWINDOW_COUNT_MAX]; //lista de ponteiros para estruturas de tabs.
+//lista de ponteiros para estruturas de tabs.
+unsigned long browsertabList[TABWINDOW_COUNT_MAX]; 
 
 
 //
@@ -1863,7 +1797,6 @@ struct zorder_d
 	
 	//toda janela está na lista de zorder de outra janela.
 	struct window_d *parent; //janela mãe... 
-	
 	
 	struct zorder_d *next;
 };
@@ -1953,8 +1886,10 @@ frontbufferinfo_t *FrontBufferInfo;
 
 
 /*
+ **********************************************************
  * gui:
- *     Nível 0 - gui.
+ *     Nível 0 
+ *     ## gui  ##
  *
  * Obs: Foi incluído aqui os ponteiros para as janelas principais usadas nos 
  * principais recursos gráficos, como control menu do desktop por exemplo.
@@ -2103,16 +2038,12 @@ struct gui_d
 	//
     struct window_d *DEVELOPERSCREEN;    
 	
-    /*
-	 * Background: 
-	 *     Uma janela popup com as dimensões da tela.
-	 */   
+    
+	// Background: 
+	//     Uma janela popup com as dimensões da tela.
 	struct window_d *background; 
 
-	/*
-	 * Logo:
-	 *     A imagem de pano de fundo.
-	 */
+	//Logo: A imagem de pano de fundo.
     struct window_d *logo;
 	
 	
@@ -2365,7 +2296,11 @@ void SetGuiParameters( int refresh,
 // Bars support. (menubar)
 //
 
-int StatusBar(struct window_d *window, unsigned char *string1, unsigned char *string2);
+int 
+StatusBar( struct window_d *window, 
+           unsigned char *string1, 
+		   unsigned char *string2 );
+
 void *create_menubar(struct window_d *pwindow); 
 int create_menubar_item(struct menu_d *menu, unsigned char *string, int status);
 int draw_menubar_item( struct window_d *window, unsigned char *string);
@@ -2376,21 +2311,33 @@ int menubarX();
 
 //Color.
 void set_up_color(unsigned long color);
-void set_up_text_color(unsigned char forecolor, unsigned char backcolor);
+
+void 
+set_up_text_color( unsigned char forecolor, 
+                   unsigned char backcolor );
 							
 
 //Button.
 void *draw_button( struct window_d *window,
-                  unsigned char *string, 
-                  unsigned long type, 
-                  unsigned long x, 
-                  unsigned long y, 
-                  unsigned long width, 
-                  unsigned long height, 
-                  unsigned long color);
+                   unsigned char *string, 
+                   unsigned long type, 
+                   unsigned long x, 
+                   unsigned long y, 
+                   unsigned long width, 
+                   unsigned long height, 
+                   unsigned long color );
 				  
-void MessageBox( struct window_d *parent_window, int type,char *title, char *string);
-void DialogBox(struct window_d *parent_window, int type, char *title, char *string);
+void 
+MessageBox( struct window_d *parent_window, 
+            int type, 
+		    char *title, 
+			char *string );
+				 
+void 
+DialogBox( struct window_d *parent_window, 
+           int type, 
+		   char *title, 
+		   char *string );
 
 
 // Focus support.
@@ -2455,7 +2402,11 @@ int backgroundInit();
 // Char and String support.
 //
 
-void draw_string( unsigned long x, unsigned long y, unsigned long color, unsigned char *string);
+void draw_string( unsigned long x, 
+                  unsigned long y, 
+				  unsigned long color, 
+				  unsigned char *string );
+
 void draw_text( struct window_d *window,
                 unsigned long x,  
                 unsigned long y,  
@@ -2528,10 +2479,12 @@ void my_buffer_put_pixel( unsigned long ax,
                           unsigned long bx, 
 						  unsigned long cx, 
 						  unsigned long dx );
+						  
 void my_buffer_horizontal_line( unsigned long x1,
                                 unsigned long y, 
 								unsigned long x2,  
 								unsigned long color );
+								
 void drawDataRectangle( unsigned long x, 
                         unsigned long y, 
 						unsigned long width, 
@@ -2547,8 +2500,17 @@ int init_windows();
 int RegisterWindow(struct window_d *window);
 void set_current_window(struct window_d *window);
 void *get_current_window();
-int resize_window(struct window_d *window, unsigned long cx, unsigned long cy);		  
-int replace_window(struct window_d *window, unsigned long x, unsigned long y);			  
+
+int 
+resize_window( struct window_d *window, 
+               unsigned long cx, 
+			   unsigned long cy );	
+				   
+int 
+replace_window( struct window_d *window, 
+                unsigned long x, 
+			    unsigned long y );			  
+
 int redraw_window(struct window_d *window);   //redraw window. 
 int redraw_screen();                          //redraw all windows.
 int is_window_full(struct window_d *window);
@@ -2594,10 +2556,12 @@ void windowLock(struct window_d *window);
 void windowUnlock(struct window_d *window);
 int windowCreateDedicatedBuffer(struct window_d *window);
 
-//
-//envia mensagem para a fila da janela com foco de entrada.
-//
-void windowSendMessage(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4);
+
+// Envia mensagem para a fila da janela com foco de entrada.
+void windowSendMessage( unsigned long arg1, 
+                        unsigned long arg2, 
+						unsigned long arg3, 
+						unsigned long arg4 );
 
 
 //

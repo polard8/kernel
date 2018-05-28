@@ -5,15 +5,12 @@
  *     Header para threads.
  *     Pertence ao módulo microkernel, dentro do kernel.
  *
- * @todo: Contagem de threads.
- * Versão 1.0, 2015, 2016.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2018 - Revision.
  */
  
 typedef int tid_t; 
-
-
-
-
 
 
 
@@ -65,19 +62,24 @@ typedef int tid_t;
  
   
 /*
+ **********************************************************
  * thread_event_type_t:
- *     Enumerando os tipos de eventos que fazem a tarefa entrar em modo de 
- * espera:
+ *     Enumerando os tipos de eventos que fazem a tarefa 
+ * entrar em modo de espera:
  *
  *  EVENT_NULL       - Nulo. 
  *	EVENT_PREMMPTED  - Preempção
  *  EVENT_SEMAPHORE  - Semáforo.
  *  //...
+  ## tavez usar o descritor de objetos que está em gdef. ##
  */
 typedef enum {
 	EVENT_NULL,           // Nulo. 
 	EVENT_PREMMPTED,      // Preempção.
 	EVENT_SEMAPHORE,      // Semáforo.
+	EVENT_WAIT4PID,       // Esperando o processo filho morrer.
+	EVENT_WAIT4TID,       // Esperando uma thread morrer.
+	
 	//continua... @todo
 }thread_event_type_t;
  
@@ -174,6 +176,7 @@ typedef enum {
 
  
 /*
+ *****************************************************************
  * thread_d: 
  *
  *    TCB - Thread Control Block.
@@ -202,6 +205,12 @@ struct thread_d
 	unsigned long used;     //a, @todo: Poderia ser int.
     unsigned long magic;    //g, @todo: Poderia ser int.
 	
+    //
+	// type: 
+	// Tipo de tarefa.
+    // (SYSTEM, PERIODIC, RR, IDLE).	
+	thread_type_t type;	
+	
 	thread_state_t state;    //f, flag, Estado atual da tarefa. ( RUNNING, DEAD ...).	
 	
 	//e, error. @todo:
@@ -223,7 +232,7 @@ struct thread_d
 	char *cmd;	   
 	
     //
-	// CPU.
+	// ## CPU support ##
 	//
     
 	int cpuID;            //Qual processador.
@@ -255,10 +264,12 @@ struct thread_d
 
 	
 	//IOPL of the task. (ring).
+	//@todo: isso pode ser um char.
 	unsigned long iopl; 
 	
 	/*
 	 * Contexto. @todo: usars uma estrutura.
+	 @todo: isso deve virar um ponteiro de estrutura.
 	 */
 	unsigned short ss;
     unsigned long esp;
@@ -295,7 +306,7 @@ struct thread_d
      *	   Uma tarefa de menor prioridade pode deixar o estado running 
 	 * para assumir o estado ready em favor de uma tarefa de maior prioridade
 	 * que assumirá o estado running.
-	 *
+	 * @todo: isso pode ser int, bool ou char.
 	 */
 	unsigned long preempted;
 	
@@ -305,6 +316,7 @@ struct thread_d
 	
 	/*
 	 * save ~ Sinaliza que a tarefa teve o seu contexto salvo.
+	 @todo: isso pode ser int, bool ou char.
 	 */
 	unsigned long saved;
 	
@@ -326,9 +338,9 @@ struct thread_d
 	//que a thread pode usar.
 	//unsigned long ServiceTable;
 	
-	/* 
-	 * Temporização da tarefa. 
-	 */
+    //
+	// ## Tmeporizadores  ##
+	//
 	
 	//
     // @todo: Ticks and Deadline.
@@ -359,9 +371,12 @@ struct thread_d
     //Contando o tempo nos estados de espera.
 	unsigned long readyCount;   //tempo de espera para retomar a execução.
 	unsigned long ready_limit;
+	
+	//Esperando por eventos.
 	unsigned long waitingCount; //tempo esperando algo.	
 	unsigned long waiting_limit;   //tempo limite que uma tarefa ready fica sem rodar.
-    unsigned long blockedCount;
+    
+	unsigned long blockedCount;
 	unsigned long blocked_limit;
 	
 	
@@ -371,6 +386,7 @@ struct thread_d
 	//unsigned long alarm;            //Tempo para o próximo alarme, dado em ticks.
 	
 	//??iopl??
+	//@todo: isso não precisa ser unsigned long.
 	unsigned long PreviousMode;	
 
 	
@@ -380,18 +396,6 @@ struct thread_d
     //int idealprocessornumber;
 	
 	
-	//
-	// event: 
-	// ?? Tipo de evento que fazem a tarefa entrar em modo de espera. 
-	//	
-    thread_event_type_t event;
-
-    //
-	// type: 
-	// Tipo de tarefa.
-    // (SYSTEM, PERIODIC, RR, IDLE).	
-	//
-	thread_type_t type;	
 		
 		
 	//
@@ -402,10 +406,20 @@ struct thread_d
 	//fluxo padrão. stdio, stdout, stderr
 	//unsigned long iob[8];
     
+	//#bugbug: o vetor Stream[] conterá essas stream também.
 	//ponteiros para as streams do fluxo padrão.
-	unsigned long standard_streams[3];
+	//O processo tem streams ... Stream[] ...
+	//cada tread pode ter suas stream ... mesmo que herde streams 
+	//de processo ...
+	// ?? threads diferentes do mesmo processo podem atuar em streams 
+	// diferentes ??
+	//unsigned long standard_streams[3];
+	//unsigned long Streams[8];
 	
-	struct _iobuf *root;	// 4 root directory
+	//Obs: Cada processo está atuando em um diretório,
+	// mas será cada thread precisa atuar em um diretório diferente??
+	//
+	//struct _iobuf *root;	// 4 root directory
 	struct _iobuf *pwd;	    // 5 (print working directory) 
 	//...
 		
@@ -413,9 +427,6 @@ struct thread_d
 	
 	//@todo: Uma thread pode estar esperando varias outras por motivos diferenes.
 	//struct wait_d WaitBlock;
-	
-
-
 	
 
     //process.
@@ -446,12 +457,29 @@ struct thread_d
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
 	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
 	
-	/*
-	 * wait4pid: 
-	 * Uma thread pode estar esperando um processo fechar para que ela prossiga.
-	 */
-	unsigned long wait4pid;    //@todo: pode ser 'int'.
 	
+	//
+	//  ## EVENT SUPPORT ##
+	//
+
+    // Tipo de evento pelo qual a threa está esperando.	
+    thread_event_type_t event;
+
+	// Objeto pelo qual a threa está esperando.
+	object_type_t obType;
+	object_class_t obClass;	
+	
+	// wait4pid: 
+	// Uma thread pode estar esperando um processo 
+    // fechar para que ela prossiga.
+	int wait4pid;
+	int wait4tid;
+	
+	
+	
+	//
+	// ## Exit support ##
+	//
 		
     //Motivo da thread fechar.
 	int exit_code; 	
@@ -540,11 +568,18 @@ void dispatch_thread(struct thread_d *thread);
 void set_thread_priority(struct thread_d *t, unsigned long priority);
 
 
-/*
- * Page directory support.
- */
-unsigned long GetThreadDirectory(struct thread_d *thread);
-void SetThreadDirectory(struct thread_d *thread, unsigned long Address);
+//
+// ## Page directory support ##
+// 
+
+// Pega o endereço do diretório de páginas usado pela thread.
+unsigned long 
+GetThreadDirectory( struct thread_d *thread );
+
+// Altera o endereço do diretório de páginas de uma thread.
+void 
+SetThreadDirectory( struct thread_d *thread, 
+                    unsigned long Address );
 
 
 /*
@@ -570,16 +605,25 @@ int GetCurrentThreadId();
 
 
 //
-// Finalizações...
+// ## Finalizações ##
 //
 
-void release(struct thread_d *t);
-void exit_thread(int tid);       //Torna zunbi uma thread.
-void kill_thread(int tid);       //Destrói uma thread.
+// Liberar uma thread que estava bloqueada ou esperando.
+void 
+release(int tid);
+
+//Torna zumbi uma thread.
+void 
+exit_thread(int tid);       
+
+//Destrói uma thread.
+void 
+kill_thread(int tid);       
+
 void dead_thread_collector();
 
 //
-//fim.
+// End.
 //
 
 
