@@ -154,20 +154,20 @@ extern void do_executa_new_task();
 
 
 // Global first.
-#include <microkernel/pc/mm/memmap.h>            //Memory Map - address.
+#include <mk/pc/mm/memmap.h>            //Memory Map - address.
 
 
 //
 // HAL (4)
 //
 
-#include <executive/dd/sm/disk/diskmap.h>        //Disk Map - sectors.
+#include <execve/dd/sm/disk/diskmap.h>        //Disk Map - sectors.
 #include <hal/screen.h> 
 #include <hal/video.h>                           //video.
 #include <hal/memory.h>                          //ram (hardware).
 #include <hal/cpu.h>                             //cpu
-#include <executive/dd/sm/disk/disk.h>           //disk.
-#include <executive/dd/sm/disk/volume.h>         //volume.
+#include <execve/dd/sm/disk/disk.h>           //disk.
+#include <execve/dd/sm/disk/volume.h>         //volume.
 #include <hal/serial.h>        
 #include <hal/mac.h>                             //mac address info. (hw)
 //...
@@ -177,28 +177,28 @@ extern void do_executa_new_task();
 //
 
 //Unblocked.
-#include <executive/dd/sm/network/host.h>        //host info.
-#include <executive/dd/unblocked/ports.h>        //Portas para dispositivos
-#include <executive/dd/unblocked/ps2.h>          //ps/2 
-#include <executive/dd/unblocked/timer.h>        //PIT. irq0.
-#include <executive/dd/unblocked/pic.h>          //PIC.
-#include <executive/dd/unblocked/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
-#include <executive/dd/unblocked/rtc.h>          //clock    ( South bridge).
-#include <executive/dd/unblocked/floppy.h>       //floppy   ( South bridge).
-#include <executive/dd/unblocked/keyboard.h>     //irq1     ( South bridge).   //keyboard
+#include <execve/dd/sm/network/host.h>        //host info.
+#include <execve/dd/unb/ports.h>        //Portas para dispositivos
+#include <execve/dd/unb/ps2.h>          //ps/2 
+#include <execve/dd/unb/timer.h>        //PIT. irq0.
+#include <execve/dd/unb/pic.h>          //PIC.
+#include <execve/dd/unb/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
+#include <execve/dd/unb/rtc.h>          //clock    ( South bridge).
+#include <execve/dd/unb/floppy.h>       //floppy   ( South bridge).
+#include <execve/dd/unb/keyboard.h>     //irq1     ( South bridge).   //keyboard
 
-#include <executive/dd/unblocked/ascii.h>     //ascii table 
-#include <executive/dd/unblocked/vk.h>         //virtual keys
-#include <executive/dd/unblocked/abnt2.h> 
-#include <executive/dd/unblocked/ldisc.h>        //ldisc
+#include <execve/dd/unb/ascii.h>     //ascii table 
+#include <execve/dd/unb/vk.h>         //virtual keys
+#include <execve/dd/unb/abnt2.h> 
+#include <execve/dd/unb/ldisc.h>        //ldisc
 
-#include <executive/dd/unblocked/ide.h>          //irq14/15 ( South bridge).
+#include <execve/dd/unb/ide.h>          //irq14/15 ( South bridge).
 //...
 
 //Blocked.
-#include <executive/dd/blocked/sata.h>           //(PCI BUS).
-#include <executive/dd/blocked/usb.h>            //usb.
-#include <executive/dd/blocked/pci.h>            //pci.
+#include <execve/dd/b/sata.h>           //(PCI BUS).
+#include <execve/dd/b/usb.h>            //usb.
+#include <execve/dd/b/pci.h>            //pci.
 //#include                                       //pcie.
 //...
 
@@ -217,20 +217,20 @@ extern void do_executa_new_task();
  * MICROKERNEL (3)
  */
  //++
-#include <microkernel/cpu/context.h>
-#include <microkernel/pc/taskswitch.h>
-#include <microkernel/pc/tasks.h>
-#include <microkernel/pc/process.h>
-#include <microkernel/pc/thread.h>
-#include <microkernel/pc/scheduler/scheduler.h>
-#include <microkernel/pc/ipc/ipc.h>
-#include <microkernel/pc/ipc/semaphore.h>
-#include <microkernel/pc/queue.h>
-#include <microkernel/pc/realtime.h>
-#include <microkernel/pc/dispatch.h>
-#include <microkernel/pc/event.h>
-#include <microkernel/pc/pc.h>
-#include <microkernel/microkernel.h>
+#include <mk/cpu/context.h>
+#include <mk/pc/ts.h>
+#include <mk/pc/tasks.h>
+#include <mk/pc/process.h>
+#include <mk/pc/thread.h>
+#include <mk/pc/sched/sched.h>
+#include <mk/pc/ipc/ipc.h>
+#include <mk/pc/ipc/sem.h>
+#include <mk/pc/queue.h>
+#include <mk/pc/realtime.h>
+#include <mk/pc/dispatch.h>
+#include <mk/pc/event.h>
+#include <mk/pc/pc.h>
+#include <mk/mk.h>
 //--
 
 
@@ -239,7 +239,7 @@ extern void do_executa_new_task();
 //
 
 //tty
-#include <executive/dd/tty/tty.h>
+#include <execve/dd/tty/tty.h>
 
 
 //
@@ -267,10 +267,6 @@ extern void do_executa_new_task();
 //principal
 #include <gramado/gramado.h>                     //main file.
 
-//
-// EXECUTIVE (2)
-//
-
 //uigm - User Interface Graphic Mode.
 //nothing for now.
 
@@ -281,44 +277,44 @@ extern void do_executa_new_task();
 #include <gramado/terminal/console.h>           //Console. Monitor support.
 
 //sm - System Management.  
-#include <executive/dd/sm/install.h>  
-#include <executive/dd/sm/init.h>
-#include <executive/dd/sm/network/nic.h>         //nic - network interface controller.
-#include <executive/dd/sm/network/nports.h>      //(network) Network Ports  (sw)
-#include <executive/dd/sm/network/socket.h>      //(network) Sockets info. (sw)
-#include <executive/dd/sm/network/ip.h>          //(network) IP info.      (sw)
-#include <executive/dd/sm/network/channel.h>     //(network) Channel       (sw)
-#include <executive/dd/sm/network/client.h>      //(network) Client process support. 
-#include <executive/dd/sm/network/ns.h>          //(network) Network Server.
-#include <executive/dd/sm/network/network.h>     //(network) Gerenciamento de rede. 
-#include <executive/fs/fs.h>                     //fs.
-#include <executive/fs/vfs.h>                     //vfs.
-#include <executive/dd/sm/io.h>                  //io.
-#include <executive/sci/systemcall.h>            //system calls.
-#include <executive/dd/sm/modules.h>             //module manager.
-#include <executive/dd/sm/debug.h>
-#include <executive/dd/sm/sys.h>                 //system calls 2.
-#include <executive/dd/sm/system.h>              //system manager.
-#include <executive/dd/dd.h>
+#include <execve/dd/sm/install.h>  
+#include <execve/dd/sm/init.h>
+#include <execve/dd/sm/network/nic.h>         //nic - network interface controller.
+#include <execve/dd/sm/network/nports.h>      //(network) Network Ports  (sw)
+#include <execve/dd/sm/network/socket.h>      //(network) Sockets info. (sw)
+#include <execve/dd/sm/network/ip.h>          //(network) IP info.      (sw)
+#include <execve/dd/sm/network/channel.h>     //(network) Channel       (sw)
+#include <execve/dd/sm/network/client.h>      //(network) Client process support. 
+#include <execve/dd/sm/network/ns.h>          //(network) Network Server.
+#include <execve/dd/sm/network/network.h>     //(network) Gerenciamento de rede. 
+#include <execve/fs/fs.h>                     //fs.
+#include <execve/fs/vfs.h>                     //vfs.
+#include <execve/dd/sm/io.h>                  //io.
+#include <execve/sci/syscall.h>            //system calls.
+#include <execve/dd/sm/modules.h>             //module manager.
+#include <execve/dd/sm/debug.h>
+#include <execve/dd/sm/sys.h>                 //system calls 2.
+#include <execve/dd/sm/system.h>              //system manager.
+#include <execve/dd/dd.h>
 
 //
 // MICROKERNEL (3)
 //
 
 //mm
-#include <microkernel/pc/mm/mmglobal.h>
-#include <microkernel/pc/mm/heap.h>          //Heap pointer support.
-#include <microkernel/pc/mm/aspace.h>        //Address Space, (data base account).
-#include <microkernel/pc/mm/dspace.h>        //Disk Space, (data base account).
-#include <microkernel/pc/mm/bank.h>          //Bank. database
-#include <microkernel/pc/mm/mm.h>            //mm, memory manager support.
+#include <mk/pc/mm/mmglobal.h>
+#include <mk/pc/mm/heap.h>          //Heap pointer support.
+#include <mk/pc/mm/aspace.h>        //Address Space, (data base account).
+#include <mk/pc/mm/dspace.h>        //Disk Space, (data base account).
+#include <mk/pc/mm/bank.h>          //Bank. database
+#include <mk/pc/mm/mm.h>            //mm, memory manager support.
 
 
 //
 // EXECUTIVE (2)
 //
 
-#include <executive/executive.h>              //main file.
+#include <execve/execve.h>              //main file.
 //--
 
 

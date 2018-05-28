@@ -168,7 +168,7 @@ ASpace              0x10              main.o
 objects_um          0x3840            main.o
 BootLoader          0x10              main.o
 downloadDir         0x10              main.o
-localsstuff1        0x10              microkernel.o
+localsstuff1        0x10              mk.o
 mmFramesSuperBlockSize
                     0x10              main.o
 kernel_stack_start  0x10              main.o
@@ -558,7 +558,7 @@ gcharHeight         0x10              main.o
 g_use_default_user  0x10              main.o
 mouse_buttom_1      0x10              ldisc.o
 RING0IDLEThread     0x10              main.o
-lock_taskswitch     0x10              taskswitch.o
+lock_taskswitch     0x10              ts.o
 mouse_status        0x10              ldisc.o
 CurrentDisk         0x10              main.o
 framepoolFrontBuffer2
@@ -966,7 +966,7 @@ Linker script and memory map
                 0xc0007bc3                hal_vsync
                 0xc0007c72                init_hal
                 0xc0007bb9                getIdt
- .text          0xc0007cc0      0x4c0 microkernel.o
+ .text          0xc0007cc0      0x4c0 mk.o
                 0xc0007fe6                sys_getpid
                 0xc0007e6a                microkernelTestLimit
                 0xc0007f0d                sys_dead_thread_collector
@@ -980,7 +980,7 @@ Linker script and memory map
                 0xc0007f34                sys_exit_thread
                 0xc0007f97                sys_create_thread
                 0xc0007ff0                sys_getppid
- .text          0xc0008180      0x340 executive.o
+ .text          0xc0008180      0x340 execve.o
                 0xc0008480                init_executive
                 0xc0008180                executive_gramado_core_init_execve
                 0xc0008473                sys_showkernelinfo
@@ -1387,7 +1387,7 @@ Linker script and memory map
                 0xc0011600                task0
                 0xc0011605                task1
                 0xc001160a                task2
- .text          0xc0011620      0x550 taskswitch.o
+ .text          0xc0011620      0x550 ts.o
                 0xc001168f                task_switch
                 0xc0011b35                set_task_status
                 0xc0011a04                taskswitchRR
@@ -1403,7 +1403,7 @@ Linker script and memory map
                 0xc00125a1                queue_get_data
                 0xc00127be                ScanReadyQueue
                 0xc0012730                show_queue_information
- .text          0xc0012a00      0x110 scheduler.o
+ .text          0xc0012a00      0x110 sched.o
                 0xc0012a00                scheduler
                 0xc0012af2                scheduler_get_status
                 0xc0012ae3                scheduler_unlock
@@ -1411,7 +1411,7 @@ Linker script and memory map
                 0xc0012afc                new_task_scheduler
                 0xc0012abb                scheduler_start
                 0xc0012b01                init_scheduler
- .text          0xc0012b10      0x790 scheduleri.o
+ .text          0xc0012b10      0x790 schedi.o
                 0xc0012ea9                do_thread_running
                 0xc0012c0b                KiKillTask
                 0xc00131aa                check_for_standby
@@ -1465,7 +1465,7 @@ Linker script and memory map
                 0xc00133a1                readyDispatcher
                 0xc001368c                periodicDispatcher
                 0xc001391c                dispatch_thread
- .text          0xc0013ad0      0x110 semaphore.o
+ .text          0xc0013ad0      0x110 sem.o
                 0xc0013afa                Down
                 0xc0013bae                semaphore_up
                 0xc0013ad0                init_semaphore
@@ -1660,7 +1660,7 @@ Linker script and memory map
                 0xc00192c1                systemShutdown
                 0xc0018c4e                systemSetupVersion
                 0xc0018ae7                systemShowDevicesInfo
- .text          0xc0019740      0x110 background.o
+ .text          0xc0019740      0x110 bg.o
                 0xc00197c7                backgroundSetColor
                 0xc0019836                backgroundInit
                 0xc0019740                backgroundDraw
@@ -1670,7 +1670,7 @@ Linker script and memory map
                 0xc0019b81                grid
                 0xc0019b03                CreateGrid
                 0xc0019850                InitializeGrid
- .text          0xc0019bd0      0x1e0 statusbar.o
+ .text          0xc0019bd0      0x1e0 sbar.o
                 0xc0019bd0                StatusBar
  .text          0xc0019db0      0x950 menubar.o
                 0xc001a33c                redraw_menubar_item
@@ -1692,10 +1692,10 @@ Linker script and memory map
                 0xc001a700                create_menu
                 0xc001abdb                get_current_menu
                 0xc001ac07                RegisterMenu
- .text          0xc001b030      0x4c0 messagebox.o
+ .text          0xc001b030      0x4c0 mbox.o
                 0xc001b030                MessageBox
                 0xc001b452                MessageBoxProcedure
- .text          0xc001b4f0      0x3b0 dialogbox.o
+ .text          0xc001b4f0      0x3b0 dbox.o
                 0xc001b829                DialogBoxProcedure
                 0xc001b4f0                DialogBox
  .text          0xc001b8a0      0x320 button.o
@@ -1873,7 +1873,7 @@ Linker script and memory map
                 0xc0020711                config_user
                 0xc00206b2                ShowUserInfo
                 0xc0020857                UpdateUserInfo
- .text          0xc0020970      0xa30 procedure.o
+ .text          0xc0020970      0xa30 proc.o
                 0xc0021217                procedureMakeTests
                 0xc0020aad                terminal_dialog
                 0xc0020de4                SendMessage
@@ -1885,7 +1885,7 @@ Linker script and memory map
                 0xc0020db7                registra_procedimento
                 0xc00212d6                procedureWindowWithFocusTest
                 0xc00211dc                procedureLinkDriverTest
- .text          0xc00213a0       0x80 systemcall.o
+ .text          0xc00213a0       0x80 syscall.o
                 0xc00213a0                systemcall
                 0xc00213fc                jmp_address
  .text          0xc0021420       0x20 install.o
@@ -1926,8 +1926,8 @@ Linker script and memory map
                 0xc0023204                copyright
  .data          0xc0023244      0x200 io.o
  .data          0xc0023444      0x200 hal.o
- .data          0xc0023644      0x200 microkernel.o
- .data          0xc0023844      0x200 executive.o
+ .data          0xc0023644      0x200 mk.o
+ .data          0xc0023844      0x200 execve.o
  .data          0xc0023a44      0x200 video.o
  .data          0xc0023c44      0x200 screen.o
  .data          0xc0023e44      0x200 runtime.o
@@ -1968,12 +1968,12 @@ Linker script and memory map
  .data          0xc0028124      0x200 start.o
  .data          0xc0028324      0x200 context.o
  .data          0xc0028524      0x200 tasks.o
- .data          0xc0028724      0x200 taskswitch.o
+ .data          0xc0028724      0x200 ts.o
  .data          0xc0028924      0x200 queue.o
- .data          0xc0028b24      0x200 scheduler.o
- .data          0xc0028d24      0x200 scheduleri.o
+ .data          0xc0028b24      0x200 sched.o
+ .data          0xc0028d24      0x200 schedi.o
  .data          0xc0028f24      0x200 dispatch.o
- .data          0xc0029124      0x200 semaphore.o
+ .data          0xc0029124      0x200 sem.o
  .data          0xc0029324      0x200 modules.o
  .data          0xc0029524      0x200 nic.o
  .data          0xc0029724      0x200 network.o
@@ -1997,13 +1997,13 @@ Linker script and memory map
  .data          0xc002bb44      0x200 info.o
  .data          0xc002bd44      0x200 signal.o
  .data          0xc002bf44      0x260 system.o
- .data          0xc002c1a4      0x200 background.o
+ .data          0xc002c1a4      0x200 bg.o
  .data          0xc002c3a4      0x200 grid.o
- .data          0xc002c5a4      0x200 statusbar.o
+ .data          0xc002c5a4      0x200 sbar.o
  .data          0xc002c7a4      0x200 menubar.o
  .data          0xc002c9a4      0x200 menu.o
- .data          0xc002cba4      0x200 messagebox.o
- .data          0xc002cda4      0x200 dialogbox.o
+ .data          0xc002cba4      0x200 mbox.o
+ .data          0xc002cda4      0x200 dbox.o
  .data          0xc002cfa4      0x200 button.o
  .data          0xc002d1a4      0x200 char.o
  .data          0xc002d3a4      0x200 pixel.o
@@ -2021,8 +2021,8 @@ Linker script and memory map
  .data          0xc002eba4      0x200 gramado.o
  .data          0xc002eda4      0x200 object.o
  .data          0xc002efa4      0x200 userenv.o
- .data          0xc002f1a4      0x200 procedure.o
- .data          0xc002f3a4      0x200 systemcall.o
+ .data          0xc002f1a4      0x200 proc.o
+ .data          0xc002f3a4      0x200 syscall.o
  .data          0xc002f5a4      0x200 install.o
  .data          0xc002f7a4      0x200 debug.o
  .data          0xc002f9a4      0x200 abort.o
@@ -2032,8 +2032,8 @@ Linker script and memory map
  .rdata         0xc002ffa4      0x200 main.o
  .rdata         0xc00301a4       0x10 io.o
  .rdata         0xc00301b4       0xc0 hal.o
- .rdata         0xc0030274       0xc0 microkernel.o
- .rdata         0xc0030334      0x140 executive.o
+ .rdata         0xc0030274       0xc0 mk.o
+ .rdata         0xc0030334      0x140 execve.o
  .rdata         0xc0030474       0x30 video.o
  .rdata         0xc00304a4       0x20 screen.o
  .rdata         0xc00304c4       0x10 runtime.o
@@ -2072,12 +2072,12 @@ Linker script and memory map
  .rdata         0xc0032464       0xd0 start.o
  .rdata         0xc0032534       0xf0 context.o
  .rdata         0xc0032624       0x10 tasks.o
- .rdata         0xc0032634      0x1e0 taskswitch.o
+ .rdata         0xc0032634      0x1e0 ts.o
  .rdata         0xc0032814      0x190 queue.o
- .rdata         0xc00329a4       0x10 scheduler.o
- .rdata         0xc00329b4       0x30 scheduleri.o
+ .rdata         0xc00329a4       0x10 sched.o
+ .rdata         0xc00329b4       0x30 schedi.o
  .rdata         0xc00329e4      0x1a0 dispatch.o
- .rdata         0xc0032b84       0x10 semaphore.o
+ .rdata         0xc0032b84       0x10 sem.o
  .rdata         0xc0032b94       0x10 modules.o
  .rdata         0xc0032ba4       0x10 nic.o
  .rdata         0xc0032bb4       0x10 network.o
@@ -2099,13 +2099,13 @@ Linker script and memory map
  .rdata         0xc0033934      0x270 info.o
  .rdata         0xc0033ba4       0x10 signal.o
  .rdata         0xc0033bb4      0x850 system.o
- .rdata         0xc0034404       0x10 background.o
+ .rdata         0xc0034404       0x10 bg.o
  .rdata         0xc0034414       0x50 grid.o
- .rdata         0xc0034464       0x70 statusbar.o
+ .rdata         0xc0034464       0x70 sbar.o
  .rdata         0xc00344d4      0x150 menubar.o
  .rdata         0xc0034624      0x1e0 menu.o
- .rdata         0xc0034804       0xb0 messagebox.o
- .rdata         0xc00348b4       0x70 dialogbox.o
+ .rdata         0xc0034804       0xb0 mbox.o
+ .rdata         0xc00348b4       0x70 dbox.o
  .rdata         0xc0034924       0x10 button.o
  .rdata         0xc0034934       0x80 char.o
  .rdata         0xc00349b4       0x40 pixel.o
@@ -2123,8 +2123,8 @@ Linker script and memory map
  .rdata         0xc0035044      0x1b0 gramado.o
  .rdata         0xc00351f4       0x40 object.o
  .rdata         0xc0035234       0xb0 userenv.o
- .rdata         0xc00352e4      0x360 procedure.o
- .rdata         0xc0035644       0x10 systemcall.o
+ .rdata         0xc00352e4      0x360 proc.o
+ .rdata         0xc0035644       0x10 syscall.o
  .rdata         0xc0035654       0x10 install.o
  .rdata         0xc0035664      0x150 debug.o
  .rdata         0xc00357b4       0xa0 abort.o
@@ -2142,8 +2142,8 @@ Linker script and memory map
  .bss           0xc0036000       0x40 main.o
  .bss           0xc0036040       0x40 io.o
  .bss           0xc0036080       0x40 hal.o
- .bss           0xc00360c0       0x40 microkernel.o
- .bss           0xc0036100       0x40 executive.o
+ .bss           0xc00360c0       0x40 mk.o
+ .bss           0xc0036100       0x40 execve.o
  .bss           0xc0036140       0x40 video.o
  .bss           0xc0036180       0x40 screen.o
  .bss           0xc00361c0       0x40 runtime.o
@@ -2184,12 +2184,12 @@ Linker script and memory map
  .bss           0xc0036a40       0x40 start.o
  .bss           0xc0036a80       0x40 context.o
  .bss           0xc0036ac0       0x40 tasks.o
- .bss           0xc0036b00       0x40 taskswitch.o
+ .bss           0xc0036b00       0x40 ts.o
  .bss           0xc0036b40       0x40 queue.o
- .bss           0xc0036b80       0x40 scheduler.o
- .bss           0xc0036bc0       0x40 scheduleri.o
+ .bss           0xc0036b80       0x40 sched.o
+ .bss           0xc0036bc0       0x40 schedi.o
  .bss           0xc0036c00       0x40 dispatch.o
- .bss           0xc0036c40       0x40 semaphore.o
+ .bss           0xc0036c40       0x40 sem.o
  .bss           0xc0036c80       0x40 modules.o
  .bss           0xc0036cc0       0x40 nic.o
  .bss           0xc0036d00       0x40 network.o
@@ -2212,13 +2212,13 @@ Linker script and memory map
  .bss           0xc0037170       0x40 info.o
  .bss           0xc00371b0       0x40 signal.o
  .bss           0xc00371f0       0x40 system.o
- .bss           0xc0037230       0x40 background.o
+ .bss           0xc0037230       0x40 bg.o
  .bss           0xc0037270       0x40 grid.o
- .bss           0xc00372b0       0x40 statusbar.o
+ .bss           0xc00372b0       0x40 sbar.o
  .bss           0xc00372f0       0x40 menubar.o
  .bss           0xc0037330       0x40 menu.o
- .bss           0xc0037370       0x40 messagebox.o
- .bss           0xc00373b0       0x40 dialogbox.o
+ .bss           0xc0037370       0x40 mbox.o
+ .bss           0xc00373b0       0x40 dbox.o
  .bss           0xc00373f0       0x40 button.o
  .bss           0xc0037430       0x40 char.o
  .bss           0xc0037470       0x40 pixel.o
@@ -2236,8 +2236,8 @@ Linker script and memory map
  .bss           0xc0037780       0x40 gramado.o
  .bss           0xc00377c0       0x40 object.o
  .bss           0xc0037800       0x40 userenv.o
- .bss           0xc0037840       0x40 procedure.o
- .bss           0xc0037880       0x40 systemcall.o
+ .bss           0xc0037840       0x40 proc.o
+ .bss           0xc0037880       0x40 syscall.o
  .bss           0xc00378c0       0x40 install.o
  .bss           0xc0037900       0x40 debug.o
  .bss           0xc0037940       0x40 abort.o
@@ -2824,7 +2824,7 @@ Linker script and memory map
                 0xc0057c20                EDITBOX_X
                 0xc0057c30                g_cursor_x
                 0xc0057c40                CurrentUser
- COMMON         0xc0057c50       0x10 microkernel.o
+ COMMON         0xc0057c50       0x10 mk.o
                 0xc0057c50                localsstuff1
  COMMON         0xc0057c60       0x20 video.o
                 0xc0057c60                videoError
@@ -2898,7 +2898,7 @@ Linker script and memory map
                 0xc0058010                contextEDI
                 0xc0058020                contextES
                 0xc0058030                contextSS
- COMMON         0xc0058040       0x10 taskswitch.o
+ COMMON         0xc0058040       0x10 ts.o
                 0xc0058040                lock_taskswitch
  COMMON         0xc0058050       0x10 network.o
                 0xc0058050                networkTesting
@@ -2943,8 +2943,8 @@ LOAD head.o
 LOAD main.o
 LOAD io.o
 LOAD hal.o
-LOAD microkernel.o
-LOAD executive.o
+LOAD mk.o
+LOAD execve.o
 LOAD video.o
 LOAD screen.o
 LOAD runtime.o
@@ -2985,12 +2985,12 @@ LOAD create.o
 LOAD start.o
 LOAD context.o
 LOAD tasks.o
-LOAD taskswitch.o
+LOAD ts.o
 LOAD queue.o
-LOAD scheduler.o
-LOAD scheduleri.o
+LOAD sched.o
+LOAD schedi.o
 LOAD dispatch.o
-LOAD semaphore.o
+LOAD sem.o
 LOAD modules.o
 LOAD nic.o
 LOAD network.o
@@ -3012,13 +3012,13 @@ LOAD request.o
 LOAD info.o
 LOAD signal.o
 LOAD system.o
-LOAD background.o
+LOAD bg.o
 LOAD grid.o
-LOAD statusbar.o
+LOAD sbar.o
 LOAD menubar.o
 LOAD menu.o
-LOAD messagebox.o
-LOAD dialogbox.o
+LOAD mbox.o
+LOAD dbox.o
 LOAD button.o
 LOAD char.o
 LOAD pixel.o
@@ -3036,8 +3036,8 @@ LOAD usession.o
 LOAD gramado.o
 LOAD object.o
 LOAD userenv.o
-LOAD procedure.o
-LOAD systemcall.o
+LOAD proc.o
+LOAD syscall.o
 LOAD install.o
 LOAD debug.o
 LOAD abort.o

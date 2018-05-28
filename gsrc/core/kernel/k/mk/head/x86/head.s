@@ -2736,12 +2736,12 @@ _IDT_register:
     %include "headlib.s" 
 
 	;Interrupções de hardware (irqs) e faults.
-    %include "hardware.inc"
-    %include "hardwarelib.inc"
+    %include "hw.inc"
+    %include "hwlib.inc"
 
 	;Interrupções de software.
-	%include "software.inc"
-    %include "softwarelib.inc"
+	%include "sw.inc"
+    %include "swlib.inc"
 
 
 ;

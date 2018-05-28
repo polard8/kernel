@@ -459,6 +459,7 @@ done:
 
 
 /*
+ *******************************************************
  * FindReadyThread:
  *     Pega a primeira thread READY que encontrar.
  *     E se não encontrar nenhuma, retorna NULL.
@@ -493,19 +494,25 @@ fail:
 
 
 /*
+ ********************************************************
  * SelectForExecution:
- *     Um thread entra em standby, sinalizando que está pronto para entrar 
- * em execução.
- *     Nesse caso, durante a rotina de taskswitch, checar-se-a se existe 
- * um thread em estado standby, caso haja, a thread é colocada pra executar 
- * pelo método spawn. Esse método de spawn já foi testado, segundo a contagem,
- * duas thread começaram a rodas através desse método de spawn. provavelmente 
- * as threads 'shell' e 'taskman', pois a thread 'idle' é chamada com um 
- * spawn exclusivo para ela, o que é desnecessário e poderá ser revisto. @todo
+ *     Um thread entra em standby, sinalizando que está 
+ * pronto para entrar em execução.
+ *     Nesse caso, durante a rotina de taskswitch, 
+ * checar-se-a se existe um thread em estado standby, 
+ * caso haja, a thread é colocada pra executar pelo 
+ * método spawn. Esse método de spawn já foi testado, 
+ * segundo a contagem, duas thread começaram a rodas 
+ * através desse método de spawn. 
+ * Provavelmente as threads 'shell' e 'taskman', 
+ * pois a thread 'idle' é chamada com um spawn 
+ * exclusivo para ela, o que é desnecessário e 
+ * poderá ser revisto. @todo
  *     
  *  *** MOVIMENTO 1, (Initialized --> Standby).
  */
-void SelectForExecution(struct thread_d *Thread)
+void 
+SelectForExecution( struct thread_d *Thread )
 { 
 	if( (void*) Thread == NULL){
         return;
