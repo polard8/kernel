@@ -33,9 +33,9 @@
  * no sistema de arquivo.
  *   Continua ...
  *   
- * Histórico:
- *    Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *    Versão 1.0: 2016 - Revisão.
+ * History: 
+ *    2015 - Created by Fred Nora.
+ *    2016 - Revision.
  *    ...
  */
  
@@ -51,10 +51,16 @@
 //...
 
 
-				  
-void fsListFiles( int disk_id, 
-                  int volume_id, 
-				  int directory_id )
+/*
+ * fsListFiles:
+ *     Lista os arquivos em um diretório, dados
+ * os indices de disco, volume e diretório.
+ * #test 
+ */				  
+void 
+fsListFiles( int disk_id, 
+             int volume_id, 
+			 int directory_id )
 {
 	printf("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
 	    disk_id, volume_id, directory_id);
@@ -96,6 +102,7 @@ fail:
     printf("fail\n");
 done:	
 	refresh_screen();
+	return;
 };
 
 
@@ -215,18 +222,20 @@ done:
 
 
 /*
- * fsListFiles:
+ ********************************************************
+ * fsFAT16ListFiles:
  *     Mostra os nomes dos arquivos de um diretório.
  *     Sistema de arquivos fat16.
  *
  * IN:
- *     dir = Ponteiro para um endereço de memória onde foi carregado 
- * o diretório.
+ *     dir_address = Ponteiro para um endereço de memória 
+ *                   onde foi carregado o diretório.
  *
  */
-void fsFAT16ListFiles( const char *dir_name, 
-                       unsigned short *dir_address, 
-					   int number_of_entries )
+void 
+fsFAT16ListFiles( const char *dir_name, 
+                  unsigned short *dir_address, 
+				  int number_of_entries )
 {
 	//@todo: O número de entradas é maior no diretório raiz.(512 ?)
 	
@@ -276,13 +285,15 @@ void fsFAT16ListFiles( const char *dir_name,
  *     @todo: Ke_ não é o certo, pois ke é chamadas 
  *            à rotinas externas. 
  *
- *  #bugbug a estrutura de canal será usada para troca de mensagens S|----|S
+ * #bugbug a estrutura de canal será usada para troca 
+ * de mensagens S|----|S
  */
-int KeLoadFile( struct channel_d *channel, 
-                unsigned char *file_name, 
-				unsigned long file_address )
+int 
+KeLoadFile( struct channel_d *channel, 
+            unsigned char *file_name, 
+			unsigned long file_address )
 {
-    unsigned long Status;
+    int Status;
 	
 	//validate
 	if((void*) channel == NULL){
@@ -301,7 +312,7 @@ int KeLoadFile( struct channel_d *channel,
 	
 	//confere se o canal passado por argumento está aberto.
 	
-    Status = fsLoadFile(file_name,file_address);
+    Status = (int) fsLoadFile(file_name,file_address);
 	if( Status != 0)
 	{
 	    channel->InUse = 0;
@@ -334,6 +345,7 @@ void *get_file(int Index)
 	if(Index < 0){
 	    return NULL;
 	};
+	
     return (void *) Streams[Index];
 };
 
@@ -344,7 +356,8 @@ void *get_file(int Index)
  * dado seu id.
  * 
  */
-void set_file( void *file, int Index )
+void 
+set_file( void *file, int Index )
 {
 	//Limits.	
 	if(Index < 0){
@@ -358,7 +371,7 @@ void set_file( void *file, int Index )
     // Structure.
 	if( (void*) file == NULL){
 		return;
-	};	
+	}	
 	
 	// Include pointer in the list.
 	Streams[Index] = (unsigned long) file;
@@ -366,58 +379,84 @@ void set_file( void *file, int Index )
 };
 
 
-void fs_test_fat_vector(){
-    return; //Ainda não implementada.
+void fs_test_fat_vector()
+{
+	//Ainda não implementada.
+    return; 
 };
 
 
-unsigned long fs_get_fat_entry(unsigned long n){	
-    return 0; //Ainda não implementada.
+unsigned long 
+fs_get_fat_entry(unsigned long n)
+{
+    //Ainda não implementada.	
+    return 0; 
 };
 											 
 
-void fs_set_fat_entry(unsigned long n, unsigned long value){	
-    return;	//Ainda não implementada.
+void 
+fs_set_fat_entry( unsigned long n, 
+                  unsigned long value )
+{	
+    //Ainda não implementada.
+    return;	
 };
 
 
-void fs_put_list_on_fat(){
-    return; //Ainda não implementada.
+void fs_put_list_on_fat()
+{
+	//Ainda não implementada.
+    return; 
 };
 
 
 void fs_set_structures()
 {
-    return; //Ainda não implementada.
+	//Ainda não implementada.
+    return;
 };
 
 
-void fs_set_entry(unsigned long id, unsigned long eid)
+void 
+fs_set_entry( unsigned long id, unsigned long eid )
 {
-    return; //suspensa
+	//suspensa
+    return; 
 };
 
 
-void fs_get_entry(unsigned long id, unsigned long eid)
+void 
+fs_get_entry( unsigned long id, unsigned long eid )
 {
-    return; //suspensa
+	//suspensa
+    return; 
 };
 
 
-void fs_show_dir_entry(unsigned long id,unsigned long eid){	
-	return; //Ainda não implementada.
+void 
+fs_show_dir_entry( unsigned long id,
+                   unsigned long eid )
+{
+    //Ainda não implementada.	
+	return; 
 };
 
 
 
-void fs_show_dir(unsigned long id){
-    return; //Ainda não implementada.
+void 
+fs_show_dir(unsigned long id)
+{
+	//Ainda não implementada.
+    return; 
 };
 
 
 //confere clusers de um diretorio.
-unsigned long fs_check_cluster(unsigned long id){
-	return 0; //Ainda não implementada.
+unsigned long 
+fs_check_cluster(unsigned long id)
+{
+	//Ainda não implementada.
+	return 0; 
 };
 
 
@@ -426,24 +465,40 @@ unsigned long fs_check_cluster(unsigned long id){
  * fs_check_fat:
  *     Check FAT.
  */
-unsigned long fs_check_fat(){
-	return 0; //Ainda não implementada.
+unsigned long 
+fs_check_fat()
+{
+	//Ainda não implementada.
+	return 0; 
 };
 
 
 
-void fs_show_entry(unsigned long id, unsigned long eid){
-	return; //Ainda não implementada.
+void 
+fs_show_entry( unsigned long id, 
+               unsigned long eid )
+{
+	//Ainda não implementada.
+	return; 
 };
 
 
-unsigned long fs_get_entry_status(unsigned long id, unsigned long eid){
-	return 0; //Ainda não implementada.
+unsigned long 
+fs_get_entry_status( unsigned long id, 
+                     unsigned long eid )
+{
+	//Ainda não implementada.
+	return 0; 
 };
 
 
-void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long status){
-    return; //Ainda não implementada.
+void 
+fs_set_entry_status( unsigned long id, 
+                     unsigned long eid, 
+					 unsigned long status )
+{
+	//Ainda não implementada.
+    return; 
 };
 
 
@@ -465,9 +520,9 @@ void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long stat
  * coordene o acesso a ele.
  */
 //void fsCheckMBR(unsigned char* buffer)  //@todo
-void fsCheckMbrFile( unsigned char *buffer )
+void 
+fsCheckMbrFile( unsigned char *buffer )
 {
-	//Onde carregar.
 	unsigned char *mbr = (unsigned char *) buffer; 
 
     //
@@ -488,14 +543,15 @@ void fsCheckMbrFile( unsigned char *buffer )
 	// Continua ...
 	//
 	
+    goto done;
+
+	
+fail:	
+    printf("fsCheckMbr: fail\n");	
 done:
-    printf("fsCheckMbr: Done.\n");
+    printf("Done\n");
 	refresh_screen();
 	return;
-	
-fail:
-    refresh_screen();
-    return;
 };
 
 
@@ -505,9 +561,9 @@ fail:
  *     Vai no endereço onde está armazenado o VBR do volume atual
  *     e confere as informações sobre o volume.
  */
-void fsCheckVbrFile( unsigned char *buffer )
+void 
+fsCheckVbrFile( unsigned char *buffer )
 {
-	//Onde carregar.
 	unsigned char *mbr = (unsigned char *) buffer; 
 
     //
@@ -527,15 +583,16 @@ void fsCheckVbrFile( unsigned char *buffer )
 	//
 	// Continua ...
 	//
+
+    goto done;
+
 	
+fail:	
+    printf("fsCheckMbr: fail\n");	
 done:
-    printf("fsCheckMbr: Done.\n");
+    printf("Done\n");
 	refresh_screen();
 	return;
-	
-fail:
-    refresh_screen();
-    return;
 };
 
 
@@ -603,9 +660,9 @@ done:
  * set_spc:
  *     Configura spc, 'Sector Per Cluster' em variável global.
  */
-void set_spc(int spc){
+void set_spc(int spc)
+{
     g_spc = (int) spc;
-    return;
 };
 
 
@@ -613,7 +670,8 @@ void set_spc(int spc){
  * get_spc:
  *     Pega spc, Sector Per Cluster.
  */
-int get_spc(){
+int get_spc()
+{
     return (int) g_spc;
 };
 
@@ -622,7 +680,8 @@ int get_spc(){
  * get_filesystem_type:
  *     Pega o tipo de sistema de arquivos.
  */
-int get_filesystem_type(){
+int get_filesystem_type()
+{
     return (int) g_filesystem_type;
 };
 
@@ -634,12 +693,12 @@ int get_filesystem_type(){
 void set_filesystem_type(int type)
 {
     g_filesystem_type = (int) type;
-    return;
 };
 
 
 
 /*
+ *******************************************************
  * fs_init_fat:
  *     Inicializa a estrutura usada no sistema de arquivos.
  *     fsInitFat()
@@ -675,6 +734,7 @@ done:
 	
 
 /*
+ ******************************************************
  * fs_init_structures:
  *     Inicializa a estrutura do sistema de arquivos.
  *     fsInitStructures
@@ -738,7 +798,7 @@ done:
 
 
 /*
- *************************************************************
+ ********************************************************
  * fsInit:
  *     Inicializa o file system manager.
  *
@@ -784,9 +844,12 @@ int fsInit()
 	//para que o usuário possa chamar o maior número de apps usando 
 	//apenas comandos simples.
     //#bugbug: isso deveria se passado pelo boot ??	
-	current_disk = 0;
-	current_volume = 0;
-	current_directory = 0;
+	
+	
+	//#bugbug: Deixaremos cada módulo inicializar sua variável.
+	//current_disk = 0;
+	//current_volume = 0;
+	//current_directory = 0;
 	
 
 	// Structures and fat.
@@ -804,17 +867,7 @@ int fsInit()
 	fs_init_fat();
 	
 	
-	
-	//
-	// VFS
-	//
-	
-#ifdef KERNEL_VERBOSE	
-	printf("fsInit: VFS..\n");
-#endif
-	
-	vfsInit();
-	
+ 
 	
 	//Agora inicialzamos as stream 4 e 5.
 	//As anteriores foram inicializadas em stdio,

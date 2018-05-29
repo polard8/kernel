@@ -102,6 +102,8 @@ int quiet = 0;
 
 int running = 1;
 
+int login_status = 0;
+
 //Sendo assim, o shell poderia abrir no ambiente de logon.
 char *username;
 char *password; 
@@ -1804,9 +1806,17 @@ do_compare:
         goto exit_cmp;
     };
 	
+    // disk-info
+	if( strncmp( prompt, "disk-info", 9 ) == 0 )
+	{
+	    shellShowDiskInfo();
+        goto exit_cmp;
+    };	
+	
 	
 	// echo - Echo de terminal.
-    if( strncmp( prompt, "echo", 4 ) == 0 ){
+    if( strncmp( prompt, "echo", 4 ) == 0 )
+	{
 		echo_builtins();
 		goto exit_cmp;
     };
@@ -2095,7 +2105,7 @@ do_compare:
 	
     // shellinfo
 	// informações sobre o aplicativo.
-	if( strncmp( prompt, "shellinfo", 9 ) == 0 )
+	if( strncmp( prompt, "shell-info", 10 ) == 0 )
 	{
 		
 	    printf("~@todo: shell info.\n");
@@ -2139,7 +2149,7 @@ do_compare:
 
     // systeminfo
 	// informações sobre o sistema.
-	if( strncmp( prompt, "systeminfo", 10 ) == 0 )
+	if( strncmp( prompt, "system-info", 11 ) == 0 )
 	{
 	    printf("~@todo: system info.\n");
 		shellShowSystemInfo();
@@ -2239,12 +2249,40 @@ do_compare:
 		goto exit_cmp;
     };
 
-	// t5 - gets
+	// t5 - 
 	if( strncmp( prompt, "t5", 2 ) == 0 )
 	{
+		printf("t5: tentando salvar um arquivo ...\n");
+		char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
+		char file_1_name[] = "FILE1UM TXT";
+		
+		enterCriticalSection();
+		system_call( 4,
+		             (unsigned long) file_1_name, //nome
+                     (unsigned long) file_1,      //endereço
+                     (unsigned long) 0x20 );      //flag
+		exitCriticalSection();
+		printf("t5: done.\n");
+		
 		//...
         goto exit_cmp;
-    };		
+    };	
+
+
+	// t6 - testando a api. rotina que salva arquivo. 
+	if( strncmp( prompt, "t6", 2 ) == 0 )	
+	{
+		printf("t6: tentando salvar um arquivo ...\n");
+		char file_2[] = "t6: Arquivo \n escrito \n em \n user mode. \n";
+		char file_2_name[] = "FILE2UM TXT";
+		
+        apiSaveFile( file_2_name,  //name 
+                     0,            //number of sectors.
+                     0,            //size in bytes			
+                     file_2,       //address
+                     0x20 );       //flag
+        goto exit_cmp;					 
+	};
 	
 	// tasklist - Lista informações sobre os processos.
 	//isso será um programa tasklist.bin
@@ -2293,6 +2331,14 @@ do_compare:
 	    printf("\n Gramado version %s \n", OS_VERSION );
         goto exit_cmp;
     };
+	
+    // volume-info
+	if( strncmp( prompt, "volume-info", 11 ) == 0 )
+	{
+	    shellShowVolumeInfo();
+        goto exit_cmp;
+    };	
+	
 
 	// window
     if( strncmp( prompt, "window", 6 ) == 0 )
@@ -2703,6 +2749,14 @@ int shellInit( struct window_d *window )
 	void *P;
 	int CurrentVolumeID = 0;
 	
+	
+	//char sUsername[11] = "           ";
+	//char sPassword[11] = "           ";
+    char sUsername[11];
+    char sPassword[11];
+		
+	char buffer[512];
+	
 	//
 	// #bugbug:
     //     Esse ponteiro de estrutura está em kernel mode. 
@@ -3027,17 +3081,16 @@ done:
 	// Se o shell não for interativo não tem login.
 	if(interactive == 1)
 	{
+		FILE *user_stream;
+		
+		user_stream = ( FILE* ) fopen("user.txt","w+");
 		
 		// Testing welcome message.
 	    printf("\n");
 	    printf("Welcome to Gramado Operating System.\n");
 	    printf("\n");
 	
-	    //char sUsername[11] = "           ";
-	    //char sPassword[11] = "           ";
 
-	    char sUsername[11];
-	    char sPassword[11];
 		
 	    printf("username:\n");
 	    gets(sUsername);
@@ -3048,8 +3101,116 @@ done:
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s}",sUsername,sPassword);
 		printf("\n");
+		
+		
+		char *c = (char*) &user_stream->_base[0];		
+		
+		int i;
+		
+		//procura user name.
+		while(*c && *c != 'U')
+		{			
+			c++;
+		};
+		
+		if( c[0] == 'U' &&
+            c[1] == 'S' &&
+            c[2] == 'E' &&
+            c[3] == 'R' &&
+            c[4] == 'N' &&
+            c[5] == 'A' &&
+            c[6] == 'M' && 			
+		    c[7] == 'E' )
+		{
+		    //USERNAME={fred}
+            c = c+10; 
+			
+		    
+		    for( i=0; i<4; i++ )
+		    {
+				//Move apenas 'fred'
+			    buffer[i] = c[i];
+		    }			
+			
+			//printf("\n");
+			//printf("%c", c[0]);
+			//printf("%c", c[1]);
+			//printf("%c", c[2]);
+			//printf("%c", c[3]);
+			//printf("\n");
+			
+			//printf("\n");
+			//printf("%c", buffer[0]);
+			//printf("%c", buffer[1]);
+			//printf("%c", buffer[2]);
+			//printf("%c", buffer[3]);
+			//printf("\n");
+			
+			printf(">>%s\n", sUsername);
+			printf(">>%s\n", buffer);
+			
+            if( strncmp( sUsername, buffer, 4 ) == 0 )
+            {
+				printf("  ## USERNAME OK  ##\n");
+				login_status = 1;
+			}else{
+				printf("  ## USERNAME FAIL  ##\n");
+				login_status = 0;
+			}				
+
+        }else{
+			
+			printf("USERNAME={ fail\n");
+		};
+
+
+
+		while(*c && *c != 'P')
+		{			
+			c++;
+		};
+		
+		if( c[0] == 'P' &&
+            c[1] == 'A' &&
+            c[2] == 'S' &&
+            c[3] == 'S' &&
+            c[4] == 'W' &&
+            c[5] == 'O' &&
+            c[6] == 'R' && 			
+		    c[7] == 'D' )
+		{
+		    //PASSWORD={1234}
+            c = c+10; 
+			
+		    
+		    for( i=0; i<4; i++ )
+		    {
+				//Move apenas '1234'
+			    buffer[i] = c[i];
+		    }
+
+
+			printf(">>%s\n", sPassword);
+			printf(">>%s\n", buffer);
+			
+            if( strncmp( sPassword, buffer, 4 ) == 0 )
+            {
+				printf("  ## PASSWORD OK  ##\n");
+				login_status = 1;
+			}else{
+				printf("  ## PASSWORD FAIL  ##\n");
+				login_status = 0;
+			}					
+			
+			
+		}else{
+		    printf("PASSWORD={ fail\n");	
+		};
+		
+		
+		printf("Login done!\n");
+		
     };
-	
 	
 	//
 	// @todo:
@@ -4081,6 +4242,20 @@ void shellShowKernelHeapPointer()
 	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
 };
 
+
+//mostra informações sobre o disco atual.
+void shellShowDiskInfo()
+{
+	//@todo: atualizar api.h
+	system_call( 251, 0, 0, 0);
+};
+
+//mostra informações sobre o volume atual.
+void shellShowVolumeInfo()
+{
+	//@todo: atualizar api.h
+	system_call( 252, 0, 0, 0);
+};
 
 //mostrar informações gerais sobre a memória.
 void shellShowMemoryInfo()

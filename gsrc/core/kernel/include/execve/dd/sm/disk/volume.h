@@ -1,5 +1,5 @@
 /*
- * File: include\executive\dd\sm\disk\volume.h
+ * File: include\execve\dd\sm\disk\volume.h
  *
  * Descrição:
  *     Gerenciador de volumes.
@@ -193,16 +193,14 @@ volume_t *volume_systempartition; // volume 2
 unsigned long volumeList[VOLUME_COUNT_MAX];
 
 
-
+void volumeShowCurrentVolume();
 void *volume_get_volume_handle( int number );
 void *volume_get_current_volume_info();
-
 int volumeShowVolumeInfo( int descriptor );
-
 int volume_init();
 
 
 //
-//fim.
+// End.
 //
 

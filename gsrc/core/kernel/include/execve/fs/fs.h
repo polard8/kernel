@@ -1,5 +1,5 @@
 /*
- * File: executive\fs\fs.h 
+ * File: execve\fs\fs.h 
  *
  * Obs: Dentro do kernel base somente teremos primitivas
  *      Operações complexas devem ir para servidores utilitários.
@@ -10,9 +10,13 @@
  *     Inicialmente suporte ao sistema de arquivos FAT16.
  *     Posteriormente suporte aos sistemas FAT12, FAT32, EXT2.     
  *
- * Versão 1.0 ~ 2014, 2015.
+ * History:
+ *     2014 - Created by Fred Nora.
+ *     2015 - Revision.
  */
  
+ 
+
  
 //
 // #BUGBUG

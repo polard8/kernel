@@ -22,6 +22,65 @@
 
 #include <kernel.h>
 
+//Mostra informações sobre o disco atual.
+void diskShowCurrentDiskInfo()
+{
+	printf("The current disk is %d\n",current_disk);
+	diskShowDiskInfo(current_disk);
+};
+
+
+
+int 
+diskShowDiskInfo( int descriptor )
+{
+	struct disk_d *d;
+	
+	printf("diskShowDiskInfo:\n");
+    if( descriptor < 0 || descriptor > DISK_COUNT_MAX )
+	{
+		printf("descriptor fail\n");
+		goto fail;
+	}		
+	
+	d = (struct disk_d *) diskList[descriptor];
+	
+	if( (void*) d == NULL )
+	{
+		printf("struct fail\n");
+		goto fail;
+	}else{
+		
+		
+		if( d->used != 1 || d->magic != 1234 )
+		{
+			printf("flags fail\n");
+			goto fail;
+		}		
+		
+		printf("id={%d}\n",d->id);
+		
+		printf("used={%d}\n",d->used);
+		printf("magic={%d}\n",d->magic);
+		
+		printf("diskType={%d}\n",d->diskType);
+		printf("name={%s}\n",d->name);		
+		//...
+		goto done;
+	};
+	
+	
+	goto done;
+	
+	
+fail:
+    printf("fail\n");
+    return (int) 1;
+
+done:
+    printf("done\n");
+	return (int) 0;
+};
 
 
 /*
@@ -52,6 +111,7 @@ void *disk_get_current_disk_info()
 
 
 /*
+ ********************************************************
  * disk_init:
  *     Inicializa o Disk Manager.
  *     Que é um módulo do tipo MB.
@@ -64,6 +124,14 @@ int disk_init()
 #ifdef KERNEL_VERBOSE	
     printf("disk_init: Initializing..\n");
 #endif	
+
+    //@todo: Tem que limpara a lista de discos.
+	int i;
+	for( i=0; i<DISK_COUNT_MAX; i++)
+	{
+		diskList[i] = 0;
+	};
+	
 	
 	//
 	// Inicializando uma estrutura global de informações sobre o 
@@ -108,12 +176,15 @@ int disk_init()
 		
 	    disk_conductor->id = 0;
 	    
-		disk_conductor->used = 1;
-	    disk_conductor->magic = 1234;
+		disk_conductor->used = (int) 1;
+	    disk_conductor->magic = (int) 1234;
 	    
 		disk_conductor->name = "DISK 0";
 		
 		disk_conductor->disk_info = (struct diskinfo_d *) diskinfo_conductor;
+		
+		//atualiza a lista
+		diskList[0] = (unsigned long) disk_conductor;
 	};	
 	
 	

@@ -157,12 +157,19 @@ unsigned long diskList[DISK_COUNT_MAX];
 
 
 
+
+void diskShowCurrentDiskInfo();
+
+int 
+diskShowDiskInfo( int descriptor );
+
 void *disk_get_disk_handle( int number );
 void *disk_get_current_disk_info();
-
-
 int disk_init();
 void init_test_disk();  //*teste de operação com disco. 
+
+
+
 
 
 //

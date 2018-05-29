@@ -2840,6 +2840,21 @@ void apiStartThread(void *Thread); //coloca no estado standby para executar pela
 //Open file.
 void *apiFOpen(const char *filename, const char *mode);
 
+/*
+ *************************************************************
+ * apiSaveFile:
+ *     Salva um arquivo no diretório raiz 
+ * do volume de boot.
+ *
+ */
+int
+apiSaveFile( char *file_name, 
+             unsigned long file_size,
+             unsigned long size_in_bytes,			
+             char *file_address,
+             char flag );  
+
+
 //Operação down em um semáforo indicado no argumento.
 void apiDown(struct semaphore_d *s);
 

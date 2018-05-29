@@ -16,6 +16,83 @@
 
 
 
+
+//Mostra informações sobre o volume atual.
+void volumeShowCurrentVolumeInfo()
+{
+	printf("The current volume is %d\n",current_volume);
+    volumeShowVolumeInfo(current_volume);	
+};
+
+/*
+ ************************************************
+ * volumeShowVolumeInfo:
+ *
+ */
+int 
+volumeShowVolumeInfo( int descriptor )
+{
+	struct volume_d *v;
+	
+	printf("volumeShowVolumeInfo:\n");
+	
+    if( descriptor < 0 || descriptor > VOLUME_COUNT_MAX )
+	{
+		printf("descriptor fail\n");
+		goto fail;
+	}	
+	
+	
+	v = (struct volume_d *) volumeList[descriptor];
+	
+	if( (void *) v == NULL )
+	{
+		printf("struct fail\n");
+		goto fail;
+		
+	}else{
+		
+		
+		if( v->used != 1 || v->magic != 1234 )
+		{
+			printf("flags fail\n");
+			goto fail;
+		}
+		
+		printf("id={%d}\n",v->id);
+		
+		printf("used={%d}\n",v->used);
+		printf("magic={%d}\n",v->magic);
+		
+		printf("volumeType={%d}\n",v->volumeType);
+		
+		//#bugbug
+		//@todo: Esse nome temos que pegar no diretório raiz.
+		printf("name={%s}\n",v->name);
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		//printf("");
+		goto done;
+	};
+	
+	goto done;
+	
+	
+fail:
+    printf("fail\n");
+    return (int) 1;
+
+done:
+    printf("done\n");
+	return (int) 0;
+};	
+
+
+
 void *volume_get_volume_handle( int number )
 {
 	//check limts
@@ -37,43 +114,6 @@ void *volume_get_current_volume_info()
 
 
 
-int volumeShowVolumeInfo( int descriptor )
-{
-    if( descriptor < 0 || descriptor > VOLUME_COUNT_MAX ){
-		goto fail;
-	}	
-	
-	struct volume_d *v;
-	
-	v = (struct volume_d *) volumeList[0];
-	
-	if( (void *) v == NULL )
-	{
-		
-	}else{
-		
-		if( v->used != 1 || v->magic == 1234 ){
-			goto fail;
-		}
-		
-		printf("volumeType={&d}\n",v->volumeType);
-		printf("name={%s}",v->name);
-		//printf("");
-		//printf("");
-		//printf("");
-		//printf("");
-		//printf("");
-		//printf("");
-		//printf("");
-		
-	};
-	
-	
-done:
-	return (int) 0;
-fail:
-    return (int) 1;
-};
 
 /*
  ***************************************************
@@ -87,6 +127,14 @@ int volume_init()
 #ifdef KERNEL_VERBOSE
     printf("volume_init: Initializing..\n");
 #endif
+
+    //@todo: tem que limpara a lista de volumes.
+	int i;
+	for( i=0; i<VOLUME_COUNT_MAX; i++)
+	{
+		volumeList[i] = 0;
+	};
+
 
     //
 	// Inicializando a estrutura do volume 0,
@@ -129,8 +177,8 @@ int volume_init()
 		
 	    volume_vfs->id = 0;
 	    
-		volume_vfs->used = 1;
-	    volume_vfs->magic = 1234;
+		volume_vfs->used = (int) 1;
+	    volume_vfs->magic = (int) 1234;
 	    
 		volume_vfs->name = "VOLUME 0";  
         
@@ -160,10 +208,10 @@ int volume_init()
 		// Será usado pelo VFS.
 		volume_bootpartition->volumeType = VOLUME_TYPE_DISK_PARTITION;
 		
-	    volume_bootpartition->id = 0;
+	    volume_bootpartition->id = 1;
 	    
-		volume_bootpartition->used = 1;
-	    volume_bootpartition->magic = 1234;
+		volume_bootpartition->used = (int) 1;
+	    volume_bootpartition->magic = (int) 1234;
 	    
 		volume_bootpartition->name = "VOLUME 1";  
         
@@ -172,7 +220,7 @@ int volume_init()
 		// Não configuraremos por enquanto.
         volume_bootpartition->volume_info = NULL;
 
-        volumeList[0] = (unsigned long) volume_bootpartition; 		
+        volumeList[1] = (unsigned long) volume_bootpartition; 		
 	};
 	
 	
@@ -193,10 +241,10 @@ int volume_init()
 		// Será usado pelo VFS.
 		volume_systempartition->volumeType = VOLUME_TYPE_DISK_PARTITION;
 		
-	    volume_systempartition->id = 0;
+	    volume_systempartition->id = 2;
 	    
-		volume_systempartition->used = 1;
-	    volume_systempartition->magic = 1234;
+		volume_systempartition->used = (int) 1;
+	    volume_systempartition->magic = (int) 1234;
 	    
 		volume_systempartition->name = "VOLUME 2";  
         
@@ -205,15 +253,16 @@ int volume_init()
 		// Não configuraremos por enquanto.
         volume_systempartition->volume_info = NULL;
 
-        volumeList[0] = (unsigned long) volume_systempartition; 		
+        volumeList[2] = (unsigned long) volume_systempartition; 		
 	};
 	
 	
 	//
-	//  selecionando o primeiro volume,
-	// que deve ser o volume do vfs
+	//  selecionando o volume atual.
+	//  a partição de boot.
+	//  
 	//
-	current_volume = 0;
+	current_volume = 1;
 	
 	
 	//

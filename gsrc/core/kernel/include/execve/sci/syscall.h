@@ -388,9 +388,9 @@
 #define	SYS_248 248
 #define	SYS_249 249
 //Info support.
-#define	SYS_GETSYSTEMMETRICS 250 
-#define	SYS_251 251
-#define	SYS_252 252
+#define	SYS_GETSYSTEMMETRICS  250 
+#define	SYS_SHOWDISKINFO      251 //Informações sobre o disco atual.            
+#define	SYS_SHOWVOLUMEINFO    252 //Informações sobre o volume atual.
 #define	SYS_MEMORYINFO        253
 #define	SYS_SHOWPCIINFO       254
 #define	SYS_SHOWKERNELINFO    255

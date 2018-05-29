@@ -495,11 +495,22 @@ int init()
 #endif    
 	volume_init();
 	
+	
+	
+#ifdef KERNEL_VERBOSE	
+	printf("fsInit: VFS..\n");
+#endif
+	
+	vfsInit();
+	
+	
+	
 #ifdef KERNEL_VERBOSE	
 	printf("sm-init-init: fsInit\n");
 #endif    
 	fsInit();
 	
+		
     //System folders.
     // ??@todo: /ux4 .../ux1	
 #ifdef KERNEL_VERBOSE	

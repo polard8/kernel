@@ -611,6 +611,8 @@ void shellShowDesktopID();
 void shellShowProcessHeapPointer();
 void shellShowKernelHeapPointer();
 
+void shellShowDiskInfo();
+void shellShowVolumeInfo();
 
 void shellShowMemoryInfo();
 void shellShowPCIInfo();

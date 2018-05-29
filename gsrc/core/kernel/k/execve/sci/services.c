@@ -1140,12 +1140,18 @@ void *services( unsigned long number,
 		    break;
 		
 		//251
-		//case 251:
-		//    break;
+		//Informações sobre o disco atual.
+		case SYS_SHOWDISKINFO:
+		    diskShowCurrentDiskInfo();
+			refresh_screen();
+			break;
 
 		//252
-		//case 252:
-		//    break;
+		//Informações sobre o volume atual.
+		case SYS_SHOWVOLUMEINFO:
+		    volumeShowCurrentVolumeInfo();
+			refresh_screen();
+			break;
 		
 		//253
 		case SYS_MEMORYINFO:
@@ -1156,14 +1162,12 @@ void *services( unsigned long number,
 			
 		//254 - Show PCI info.	
 		case SYS_SHOWPCIINFO: 
-		    //systemDevicesBlocked(1,0,0,0,0); 
 			systemShowDevicesInfo();
 			refresh_screen();
 			break;
 			
 		//255 - Mostra informações sobre o kernel.	
 		case SYS_SHOWKERNELINFO: 
-		    //systemRam(1,0,0,0,0); 
 			KiInformation();
 			refresh_screen();
 			break;
