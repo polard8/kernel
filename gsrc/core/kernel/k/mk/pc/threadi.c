@@ -682,6 +682,14 @@ Scan:
 				
                 //Thread = NULL;
 	            //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.
+				
+				ProcessorBlock.running_threads--;
+				if( ProcessorBlock.running_threads < 1 )
+				{
+					//#bugbug
+					panic("dead_thread_collector: ProcessorBlock.running_threads = 0");
+					die();
+				}
 	
 			};
 			//Nothing.

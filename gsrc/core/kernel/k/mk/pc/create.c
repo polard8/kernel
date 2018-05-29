@@ -653,11 +653,28 @@ done:
 void xxxRing0Idle()
 {
 Loop:
+
+    //#test
+    //Ok, está funcionando. :)
+	//printf(".");
+    
+	
+	//
+	// Esse negócio do cli e dead)thread_collector funcionou bem,
+	// mas precisamos atualizar o contador de threads rodando.
+	// Precisa decrementar o contador, e´o problema está aí,
+	// precisa checar se decrementar esse contador causa algum efeito 
+	// negativo.
+	// É necessário de decrementemos o contador.
+	//
+	
+	asm("cli");
+	dead_thread_collector();
     asm("sti");
+	
 	asm("hlt");
     goto Loop;
 };
-
 
 
 /*

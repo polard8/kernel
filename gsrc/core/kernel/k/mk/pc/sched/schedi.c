@@ -58,12 +58,27 @@ int KiScheduler()
         return (int) 0;
     };
 
-	// Retornaremos se a única thread rodando for a idle.
+	// Retornaremos se tivermos apenas um thread rodando.
+	// Pois não há o que trocar.
 	if(ProcessorBlock.running_threads == 1)
 	{
-        if(current_thread == 0){
+        if( current_thread == 0 )
+		{
 	        return (int) 0;
 		};
+		
+		
+		//
+		// ## Importante  ##
+		// E se a thread que estiver rodando sozinha 
+		// Não for a idle.
+		//
+		//if( current_thread != currrent_idle_thread )
+		//{
+		//	//fail
+		//}
+		
+		
 	};
     //Chama o Scheduler.
 done:
