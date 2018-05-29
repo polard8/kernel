@@ -2,9 +2,11 @@
  * File: pc\dispatch.c
  *
  * Descrição:
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
- *     Arquivo principal do dispatcher do kernel.    
- *     Coloca tarefas pra rodar que estejam em suas respectivas filas.
+ *     Arquivo principal do dispatcher do kernel.
+ *     Faz parte do Process Control, parte fundamental do 
+ * Kernel Base.    
+ *     Coloca tarefas pra rodar que estejam em suas 
+ * respectivas filas.
  *     Alterna entre as filas de acordo com o tipo de dispatcher.
  * As opções são:
  *     +System dispatcher. 
@@ -16,9 +18,9 @@
  * Observação:
  *    Somente um tipo de dispatcher está ativo no momento.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History
+ *     2015 - Created by Fred Nora.
+ *     2018 - Revision.
  *     //...
  */
 
@@ -54,24 +56,34 @@ int dispatch_Default();
 
 
 /*
+ *********************************************************
  * dispatcher:
- *     Dispacha a thread atual que foi escolhida pelo scheduler. Dispacha 
- * colocando ela no estado RUNNING e restaurando os valores dos registradores.
- *     Essa função é chamada no final da rotina task_switch, antes dela 
- * retornar.
- *     Obs: Dispacha a tarefa de acordo dom o tipo de dispatcher.
+ *     Despacha a thread atual que foi escolhida 
+ * pelo scheduler. 
+ *     Despacha colocando ela no estado RUNNING e 
+ * restaurando os valores dos registradores.
+ *     Essa função é chamada no final da rotina task_switch, 
+ * antes dela retornar.
+ *     Obs: Despacha a tarefa de acordo dom o tipo de dispatcher.
+ *          Porém os tipos diferentes de dispacher ainda 
+ * não estão habilitados, só um funciona.
+ *
  */
-void dispatcher(int type)
+void 
+dispatcher( int type )
 {
 	int Status;
 	struct thread_d *dispatch_Pointer;
 	
 	//
-	// Obs: (Fase de teste). 
-	//      Usando apenas um tipo de dispatcher. 	
+	// Obs: 
+	// @todo:
+	// (Fase de teste). 
+	// Usando apenas um tipo de dispatcher. 	
+	// Deteminando o tipo de dispacher por enquanto
 	//
 	
-	if(type != DISPATCHER_CURRENT)
+	if( type != DISPATCHER_CURRENT )
 	{
 	    type = DISPATCHER_CURRENT;
 	};
@@ -79,6 +91,8 @@ void dispatcher(int type)
 	//
 	// Seleciona o tipo.
 	//
+	
+//SelectDispatcherType:
 	
 	switch(type)
 	{
@@ -128,12 +142,13 @@ void dispatcher(int type)
 		    goto dispatchRealtime;
 		    break;
 		
-		//Dispacha a tarefa atual.
+		// ## PRINCIPAL ##
+		//Despacha a tarefa atual.
 		case DISPATCHER_CURRENT:
 		    goto dispatchCurrent;
 		    break;
 		 
-		//Dispacha da fila do dispatcher(ready queue)
+		//Despacha da fila do dispatcher(ready queue)
 		case DISPATCHER_READY:
 		    goto dispatchReady;
 		    break; 
@@ -180,6 +195,7 @@ dispatchReady:
     current_thread = readyDispatcher();
     goto do_dispatch;	
 	
+// ## Principal ##	
 //Dispatch current.
 dispatchCurrent:
     //current_thread = current_thread;
@@ -188,30 +204,33 @@ dispatchCurrent:
 //----------------------------------------	
 // Do Dispatch: Dispatch 'current_thread'.
 //----------------------------------------
+
 do_dispatch:		
+	
 	//Checa estrutura.
 	dispatch_Pointer = (void*) threadList[current_thread];
+	
 	if( (void*) dispatch_Pointer == NULL )
 	{
 	    printf("dispatcher fail: Struct.\n");
-		refresh_screen();
-		while(1){}
-	}
+		die();
+	};
 	
 	//Checa o 'state'.
-	if(dispatch_Pointer->state != READY)
+	if( dispatch_Pointer->state != READY )
 	{
 	    printf("dispatcher fail: State.\n");
-		refresh_screen();
-		while(1){}
+		die();
 	};
 	
 	//A thread passa para o estado RUNNING.
 	// * MOVEMENT 4 (Ready --> Running).	
-	if(dispatch_Pointer->state == READY)
+	if( dispatch_Pointer->state == READY )
 	{
 	    dispatch_Pointer->state = RUNNING;	
-		queue_insert_data(queue, (unsigned long) dispatch_Pointer, QUEUE_RUNNING);
+		queue_insert_data( queue, 
+		                   (unsigned long) dispatch_Pointer, 
+						   QUEUE_RUNNING );
 	};	
 			
 	
@@ -226,20 +245,20 @@ do_dispatch:
 	};	
 	*/
 	
-	//Reinicia a contagem 'runningCount'.
+	//Reinicia a contagem.
 	dispatch_Pointer->runningCount = 0;	
 	
 	
 	//
-	//
+	// ## RESTORE CONTEXT ##
 	//
 	
-	
-	//
-	// * RESTORE CONTEXT.
-	//
+	// Flag sinalizando contexto salvo.
+	// Talvez devamos acionar essa flag depois 
+	// de salvarmos o contexto. 
 	
 	dispatch_Pointer->saved = 0;
+	
 	restore_current_context();
 	
 //Done.
@@ -248,11 +267,18 @@ done:
 };
 
 
+//
+//  ## IMPORTANTE  ##
+//  Todos os outros modelos de dispacher abaixo ainda 
+//  não foram habilitados.
+//
+
 /*
  * readyDispatcher:
  *     Dispatcher principal. 
  *     Pega da fila do dispatcher. Que é a fila de READY tasks.
  *     Pega a head da fila de ready quando vencer o tempo dela de espera.
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int readyDispatcher()
 {
@@ -296,7 +322,7 @@ done:
 
 /*
  * syscoopDispatcher:
- *
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int syscoopDispatcher()
 {
@@ -331,7 +357,7 @@ fail:
 
 /*
  * usercoopDispatcher:
- *
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int usercoopDispatcher()
 {
@@ -366,7 +392,7 @@ fail:
 
 /*
  * sysconcDispatcher:
- *
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int sysconcDispatcher()
 {
@@ -401,7 +427,7 @@ fail:
 
 /*
  * userconcDispatcher:
- *
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int userconcDispatcher()
 {
@@ -435,33 +461,40 @@ fail:
 
 
 /*
+ ******************************************************
  * systemDispatcher:
  *     System dispatcher.
- *
+ *     ?? Penso que isso seja uma interface para 
+ * chamar o dispacher. 
  */
 int systemDispatcher()
 { 
-    // struct thread_d *New;
-	
-done:
+    // # suspensa #
     return (int) 0; 
 };
 
 
 /*
+ *****************************************************
  * idleDispatcher:
- *     Idle dispatcher.
- *    
+ *     Despachar a thread idle atual.
+ *     current_idle_thread.
+ *         
  * Obs:
- *     A tarefa idle pode ter qualquer id. ?!
+ *     A tarefa idle pode ter qualquer id.
+ *     Devemos despachar a idle quando o sistema estiver 
+ * ocioso ou quanto a thread idle é a única thread.
+ *     Se o kernel detectar quen não há mas nenhuma thread 
+ * no sistema então o kernel deve selecionar uma nova 
+ * idle atual e despacha-la. 
+ *
  */
 int idleDispatcher()
 { 
-    //
-    //@todo: 
-	//    A idle sempre será zero mas 
-	// pode haver rotina de checagem aqui.
-    //
+    //current_idle_thread
+	
+
+    // ## suspensa ##
 	
 done:
 	return (int) 0; 
@@ -471,7 +504,7 @@ done:
 /*
  * periodicDispatcher:
  *     Periodic dispatcher.
- *
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int periodicDispatcher()
 { 
@@ -485,11 +518,10 @@ done:
 /*
  * rrDispatcher:
  *     Round robin dispatcher.
- *
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int rrDispatcher()
 { 
-    // struct thread_d *New;
   
 done:  
 	return (int) 0; 
@@ -498,6 +530,7 @@ done:
 
 /*
  * realtimeDispatcher:
+ *     ## bugbug, na verdade ainda estou aprendendo sobre isso. :) sorry.
  *     Real time dispatcher.
  *     Pega uma tarefa na fila de tarefas com prioridade e tipo realtime.
  *
@@ -506,6 +539,7 @@ done:
  * pra tarefas de tempo real.
  * Obs:
  *     Na verdade não é tão real time assim.
+ *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int realtimeDispatcher()
 {
@@ -536,7 +570,7 @@ fail:
 
 /*
  * dispatch_Default:
- *
+ *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
 int dispatch_Default()
 {
@@ -673,8 +707,10 @@ int dispatch_Default()
 
 
 /*
+ *************************************************
  * dispatch_task:
- *     Reustaura o contexto e retorna.
+ *     Restaura o contexto e retorna.
+ *     #bugbug. Nem sei se essa rotina está em uso.
  */
 void dispatch_task()
 {	
@@ -711,8 +747,9 @@ done:
 
 
 /*
+ *****************************************************
  * dispatch_thread:
- *
+ *     #bugbug. Nem sei se essa rotina está em uso.
  */
 void dispatch_thread(struct thread_d *thread)
 {
@@ -724,12 +761,15 @@ void dispatch_thread(struct thread_d *thread)
 	
 	if( (void*) thread == NULL)
 	{
-        printf("pc-dispatch-dispatch_thread: thread tid={%d}",current_thread); 
+        printf("pc-dispatch-dispatch_thread: thread tid={%d}",
+		    current_thread); 
         die();
 	}
 	else
 	{
 	    // Context.	
+		// #bugbug: Não estamos mais usando esse filtro
+        // que seleciona apenas threads em ring 3.		
 	    Status = contextCheckThreadRing3Context(thread->tid);
 	    if(Status == 1){
 	        printf("pc-dispatch-dispatch_task: contextCheckThreadRing3Context\n");
@@ -745,6 +785,7 @@ void dispatch_thread(struct thread_d *thread)
 	 *     Dispacha de acordo com o status.
 	 *     +Spawn no caso de INITIALIZED.
 	 */
+	 
  	switch(thread->state)
 	{
 	    //Se vai rodar pela primeira vez
@@ -757,7 +798,7 @@ void dispatch_thread(struct thread_d *thread)
 		
         //Nothing for now.		
 		default:
-            printf("dispatch_thread fail: State!");  		
+            printf("dispatch_thread fail: State!\n");  		
 		    break;
 	};
 	
@@ -769,6 +810,7 @@ fail:
 
 
 /*
+ ******************************************************************
  * init_dispatcher:
  *     inicializa o dispacher.
  *
@@ -776,29 +818,35 @@ fail:
  *     Esta é a lista do dispatcher.
  *
  * *IMPORTANTE:
- *  As threads aqui estão no estado READY e ordenadas por prioridade.
+ *  As threads aqui estão no estado READY e ordenadas 
+ * por prioridade.
  *     
- *  A última thread da lista é a thread de maior prioridade.
- *  Cada elemento dessa lista é o elemento que está na HEAD de uma lista
- *  Cada uma dessas lista é uma lista para uma prioridade específica.
- *  Apenas a head de cada uma das listas é colocada aqui nessa lista do 
- * dispacher.
+ *  +A última thread da lista é a thread de maior prioridade.
+ *  +Cada elemento dessa lista é o elemento que está na HEAD 
+ * de uma lista
+ *  +Cada uma dessas lista é uma lista para uma prioridade 
+ * específica.
+ *  +Apenas a head de cada uma das listas é colocada aqui 
+ * nessa lista do dispacher.
  *
  * OBS: 
- * Nesse momento, essa lista do dispacher não está sendo usada.  
- * O kernel esta usando a lista de threads criadas, threadList[], não 
- * considerando a prioridade. ;)
+ * #bugbug
+ * Nesse momento, essa lista do dispacher não está em uso.  
+ * O kernel está usando a lista de threads criadas, 
+ * threadList[], não considerando a prioridade. :) sorry.
  *
  * @todo: Mudar o nome para dispachInit();.
  *
  */ 
-int init_dispatcher()
+int 
+init_dispatcher()
 {
 	int i;
 	
 	//
 	// Para um dispatcher na forma de array.
 	//
+	
 //dispatcher_array:
 	
 	//Index
@@ -808,7 +856,8 @@ int init_dispatcher()
 	dispatcherType = DISPATCHER_SYSTEM; 	
 	
 	//inicializa a fila do dispacher.
-	for( i=0; i<=DISPATCHER_PRIORITY_MAX; i++){
+	for( i=0; i<=DISPATCHER_PRIORITY_MAX; i++)
+	{
 	    dispatcherReadyList[i] = (unsigned long) 0;
 	};
 	
@@ -833,8 +882,10 @@ int init_dispatcher()
 	//Conductor = (void*) IdleThread;
 		
 	rootConductor = (void*) malloc( sizeof(struct thread_d) );
-	if( (void*) rootConductor == NULL ){
-		panic("init_dispatcher: Conductor struct.");
+	if( (void*) rootConductor == NULL )
+	{
+		panic("init_dispatcher: rootConductor");
+		die();
 	};
 	
 	//Usado para task switch.
@@ -852,21 +903,27 @@ done:
 
 
 /*
+ ************************************************
  * IncrementDispatcherCount:
  *     Mensura os critérios de escolha.
  *     Contagem por critério de seleção.
- *     Faz uma contagem de quantas vezes o dispatcher fez uso de 
- * cada critério.
+ *     Faz uma contagem de quantas vezes o dispatcher 
+ * fez uso de cada critério.
+ * Obs: Esse modelo apresentou bons resultados por muito 
+ * tempo. Vamos preserva-lo. 
  */
-void IncrementDispatcherCount(int type)
+void 
+IncrementDispatcherCount( int type )
 {	
 	// Testing struct.
-	if( (void*) DispatchCountBlock == NULL ){
+	if( (void*) DispatchCountBlock == NULL )
+	{
 		return;
 	};
 	
 	// type limits.
-	if(type < 0 || type > 10){
+	if(type < 0 || type > 10)
+	{
 	    return;	
 	};
 	
@@ -904,12 +961,14 @@ void IncrementDispatcherCount(int type)
 		
 		default:
 		    //Nothing.
+			//Aqui poderia ter um contador de indefinições.
 			break;
     };
 	
 	//
 	// Nothing.
-	//     Obs: @todo: O laço acima pode são selecionar nada.
+	//     #bugbug
+	//     Obs: @todo: O laço acima pode não selecionar nada.
 	//
 	
 done:

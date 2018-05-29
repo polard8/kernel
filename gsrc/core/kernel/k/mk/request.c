@@ -1,5 +1,5 @@
 /*
- * File: microkernel\request.c
+ * File: mk\request.c
  *
  * Descrição:
  *     Arquivo principal da central de requests do kernel.
@@ -44,6 +44,7 @@
 
 
 /*
+ *********************************************************
  * KiRequest: 
  *    Trata os requests. (eventos, solicitações , waits ...).
  *    Essa rotina é chamada pelo timer em todas as interrupções de timer.
@@ -78,6 +79,7 @@ done:
 
 
 /*
+ *******************************************************
  * request:
  *     Trata os requests do Kernel.
  *     2015 (Fred Nora) - Created.

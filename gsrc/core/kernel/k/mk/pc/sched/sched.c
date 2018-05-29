@@ -1,5 +1,5 @@
 /*
- * File: scheduler.c
+ * File: sched/sched.c
  *
  * Descrição:
  *     O escalonador de processos do Kernel.
@@ -47,16 +47,19 @@
 
 
 /*
+ ***************************************************************
  * scheduler:
- *    Troca a thread atual, escolhe uma nova thread atual para rodar no
- * momento.
+ *    Troca a thread atual, escolhe uma nova thread atual 
+ * para rodar no momento.
  *    O método é cooperativo, Round Robing.
  *
  * Ordem de escolha:
  * ================
  *  +fase 1 - Pega a próxima indicada na estrutura.
  *  +fase 2 - Pega nos slots a de maior prioridade.
- *  +fase 3 - pega a Idle.
+ *  +fase 3 - Pega a Idle. 
+ *            @todo: Nessa fase devemos usar a idle atual, 
+ *            indicada em current_idle_thread.  
  *  //...
  *
  * Obs:
@@ -68,11 +71,11 @@
  *     O scheduler deve sempre pegar da fila do dispatcher.
  *
  */
-int scheduler()
+int 
+scheduler()
 {
 	int Index;
 	struct thread_d *Thread;
-
 
 	//
 	// Constrói um caminho de vagões para o condutor andar.
@@ -83,32 +86,50 @@ int scheduler()
 
 	//Inicia a lista.
  	Conductor2 = (void*) rootConductor;
-	Conductor2->Next = (void*) threadList[0];  //Thread idle.
-
+	
+	//Thread idle em user mode.
+	Conductor2->Next = (void*) threadList[0]; 
+    
+	//#bugbug Isso trava o sistema.
+	// ?? por que ??
+	//Thread idle em ring 0.
+	//Conductor2->Next = (void*) threadList[current_idle_thread];  
 
 	//
-	// obs: *IMPORTANTE
-	// Os primeiros tipos a se pegar são os de prioridade maior.
+	// Obs: 
+	// ## IMPORTANTE  ##
+	// Os primeiros tipos a se pegar são os de 
+	// prioridade maior.
 	// @todo: Elevar a prioridade da threads interativas,
-	// como teclado e mouse, e não elevar das threads de i/o de disco.
-	// Elevar a prioridade da thread associada a janela com o foco de entada.
-	//
-
-
-	//
-	// Obs: A thread idle somente é usada quando o sistema estiver ocioso.
+	// como teclado e mouse, e não elevar das threads de 
+	// i/o de disco.
+	// Elevar a prioridade da thread associada a janela 
+	// com o foco de entada.
 	//
 
 	//
-	// Agora, antes de tudo, devemos pegar as threads nas listas onde estão
-	// as threads de maior prioridade.
+	// Obs: 
+	// ## IMPORTANTE  ##	
+	// A thread idle somente é usada quando o sistema 
+	// estiver ocioso ou quando ela for a única thread.
+	// E é importante que a thread idle seja usada, pois 
+	// ela tem as instruções sti/hlt que atenua a utilização 
+	// da CPU, reduzindo o consumo de energia.
 	//
 
-	//Encontra o id da thread de maior prioridade entre as threads que estão no estado READY.
+	//
+	// Agora, antes de tudo, devemos pegar as threads 
+	// nas listas onde estão as threads de maior prioridade.
+	//
+
+	//Encontra o id da thread de maior prioridade entre as 
+	// threads que estão no estado READY.
 	//KiFindHigherPriority();
 
 	//
-	// Daqui pra baixo pegaremos na lista threadList[] onde estão todas as trhreads.
+	// ## Importante  ##
+	// Daqui pra baixo pegaremos na lista threadList[] 
+	// onde estão todas as threads.
 	//
 
     //@todo pegar primeiro por prioridade.	
@@ -151,17 +172,19 @@ int scheduler()
 	*/
 
 	//READY.
-	for(Index=0; Index <= THREAD_COUNT_MAX; Index++)
+	for( Index=0; Index <= THREAD_COUNT_MAX; Index++ )
 	{
 		Thread = (void*) threadList[Index];
 		if( (void*) Thread != NULL )
 		{
-			if(Thread->used == 1 && Thread->magic == 1234 && Thread->state == READY )
+			if( Thread->used == 1 && 
+			    Thread->magic == 1234 && 
+				Thread->state == READY )
 			{
 			    Conductor2 = (void*) Conductor2->Next; 
 				Conductor2->Next = (void*) Thread;
 			};
-			
+		    //Nothing.
 		};
 		//Nothing.
 	};

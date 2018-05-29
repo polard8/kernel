@@ -627,6 +627,7 @@ kill_thread(int tid)
 	// necessitamos de algum escalonamento.	
     if( tid = current_thread )
 	{
+		//@todo: Usar a interface.
 	    scheduler();
     };
 	

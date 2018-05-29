@@ -3,13 +3,16 @@
  *
  * Descrição:
  *     Rotinas de criação de processos e threads.
- *     Faz parte do Process Manager, parte fundamental do Kernel Base.
+ *     Faz parte do Process Manager, parte fundamental 
+ * do Kernel Base.
  *     ?? Criar, cria a estrutura. ??
- *     ?? Inicializar inicializa estrutura passada por argumento. ??
+ *     ?? Inicializar inicializa estrutura passada por 
+ * argumento. ??
  *
  * @todo: 
- *     Separar as rotinas de criação de inicialização de threads e processos, 
- * pois assim pode haver algum tipo de reaproveitamento, apenas reinicializando 
+ *     Separar as rotinas de criação de inicialização 
+ * de threads e processos, pois assim pode haver algum 
+ * tipo de reaproveitamento, apenas reinicializando 
  * a thread.
  *
  * History:
@@ -96,6 +99,7 @@ int KiFork()
  *******************************************************************
  * KiCreateIdle:
  *     Criando Idle thread manualmente.
+ *     #bugbug Essa idle fica em user mode.
  *
  * *IMPORTANTE: Na verdade esse processos e threads devem ser criados 
  * com uma funçao que passe os parametros via argumento, tipo 
@@ -639,20 +643,20 @@ done:
 
 
 
-// =================  test  ====================
+// ==============  idle thread in ring 0  ===============
 
 
 
 
 
-
+// Isso é uma thread em ring 0 que será usada como idle.
 void xxxRing0Idle()
 {
 Loop:
     asm("sti");
 	asm("hlt");
     goto Loop;
-}
+};
 
 
 
@@ -700,7 +704,17 @@ void *KiCreateRing0Idle()
 	//@todo: object
 	
     //Identificadores      
-	t->tid = 3;     
+	t->tid = 3;  
+
+    //
+    //  ## Current idle thread  ##
+    //
+	
+	// #importante:
+	// Quando o sistema estiver ocioso, o scheduler 
+	// deve acionar a idle atual.
+	current_idle_thread = (int) t->tid; 
+	
 	t->ownerPID = (int) KernelProcess->pid;         
 	t->used = 1;
 	t->magic = 1234;	
