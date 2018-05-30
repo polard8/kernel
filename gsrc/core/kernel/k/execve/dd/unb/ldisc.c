@@ -2114,7 +2114,7 @@ int load_mouse_bmp()
 	
 	// Render BMP file on backbuffer.
 	bmpDisplayBMP( mouseBMPBuffer, 20, 40 );	
-	refresh_rectangle( 20, 40, 300, 300 );
+	refresh_rectangle( 20, 40, 400, 400 );
 	//===================================
 	
 	

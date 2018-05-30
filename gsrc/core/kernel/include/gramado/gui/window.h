@@ -1245,6 +1245,7 @@ struct window_d
 	
 	//dimensões e margens.
     
+	//retângulo do lado de fora da janela.
 	unsigned long x;           //deslocamento x
     unsigned long y;           //deslocamento y 
     unsigned long width;       //largura
@@ -1323,10 +1324,15 @@ struct window_d
 
 	// Client window support.
     
-    //é a janela propriamente dita, excluindo a moldura e a barra de rolagem.
+    // É a janela propriamente dita, 
+	// excluindo a moldura e a barra de rolagem.
+	// Tudo o que há dentro da janela menos o frame.
+	// É a parte que é exibida quando a janela está em full screen.
 	struct window_d *client_window;   	
 	struct rect_d *rcClient;     
-    unsigned long clientrect_color_bg;    //cor do retãngulo da área do cliente.
+	
+	//cor do retângulo da área do cliente.
+    unsigned long clientrect_color_bg;    
 		
 // 
 //==================================================
@@ -1395,7 +1401,23 @@ struct window_d
 // Gramado v 0.1 usa essa estrutura somente até aqui.
 //==================================================
 
-    // Buffer para mensagens pequenas.
+// Update !!
+// ## A partir daqui estamos incluindo novos elementos 
+//    que farão parte da noca versão do Gramado.
+    
+// 
+//==================================================	
+	
+	// Recomeçaremos com a relação entre janelas.
+	struct window_d *owner;
+	struct window_d *child; 
+ 
+ 
+// 
+//==================================================
+	
+	
+	// Buffer para mensagens pequenas.
     // Será usado pelo produtor e pelo consumidor.
     // char read_buf[WINDOW_MSG_BUFFER_SIZE];
     //
@@ -1625,6 +1647,7 @@ struct window_d
 	//
 	
     //
+	// ?? rever isso 
 	// Status do puxador da janela.
 	// Se está aberta ou não.
 	// HANDLE_STATUS_OPEN ou HANDLE_STATUS_CLOSE
@@ -1633,7 +1656,9 @@ struct window_d
 	int handle_status;
 	
 	//linked list. ( a linked list da janela)
-	struct linkedlist_d *linkedlist;	
+	// #bugbug: Não vejo motiva para isso.
+	// #suspenso.
+	//struct linkedlist_d *linkedlist;	
 	
 
 };

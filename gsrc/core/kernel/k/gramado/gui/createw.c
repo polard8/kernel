@@ -250,10 +250,31 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		Parent = (void*) pWindow;
 	};
 	
+	
 	//
-	// @todo: Checar se é uma janela filha, se for uma janela filha e não tiver 
-	// uma janela mãe associada a ela, não permita e encerre a função.
+	// Devemos checar se a janela está no mesmo desktop 
+	// que a ajnela mãe.
+	// No caso aqui, criarmos uma janela no mesmo desktop que a 
+	// janela mãe.
 	//
+	
+	//
+	// Devemos setar uma flag que indique que essa 
+	// é uma janela filha, caso seja uma. Essa flag 
+	// deve ser passada via argumento @todo.
+	//
+	
+	//
+	// @todo: Checar se é uma janela filha, 
+	// se for uma janela filha e não tiver 
+	// uma janela mãe associada a ela, 
+	// não permita e encerre a função.
+	//
+	
+	//if(FlagChild == 1)
+	//{
+		//if(pWindow = NULL) return NULL;
+	//}
 	
 	//
 	// @todo: A atualização da contagem de janela deve ficar aqui,
@@ -291,9 +312,8 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	};
 	
 	
-	
 	//
-    // New window.
+    // ## New window ##
     //	
 	
 //CreateStruct:

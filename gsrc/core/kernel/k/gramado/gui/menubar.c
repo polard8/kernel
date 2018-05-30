@@ -27,33 +27,48 @@
  * *IMPORTANTE: Toda janela tem menubar e o item '0' é o control menu da janela.
  *              Se a menubar esta desabilitada, pelo menos o item '0' está disponível. 
  *
- * Versão 1.0, 2015.
+ * #importante:
+ *    Creio que a implementação de meus não foi feita do modo certo,
+ *    mas isso é apenas um começo ... estou aprendendo isso. 
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
- 
 #include <kernel.h>
 
 
 
 /*
+ *************************************************************
  * create_menubar:
  *     Cria a menu bar.
  *     Aquela barra simples abaixo da barra de título da janela.
- *     Argumento: Janela mãe.
- *     Retorna a janela (menubar).
+ *     
+ * IN: 
+ * Janela mãe.
+ *
+ * OUT:
+ * Retorna a janela (menubar).
+ * Retorna um ponteiro para a estrutura.
+ *
  */
-void *create_menubar(struct window_d *pwindow)
+void *
+create_menubar( struct window_d *pwindow )
 {	
     struct window_d *mWindow; 
-    struct linkedlist_d *mb_linkedlist;
+    //struct linkedlist_d *mb_linkedlist;
    
-	//Parent window.	
-    if( (void*) pwindow == NULL ){
-	    printf("create_menubar:\n");
-		refresh_screen();
-	    //while(1){};
-        return NULL;
+	
+	// 
+	// Parent window.	
+    //
+	
+	if( (void*) pwindow == NULL )
+	{
+	    printf("create_menubar: pwindow\n");
+		goto fail;
     };
 	
 	// Size.
@@ -70,17 +85,17 @@ void *create_menubar(struct window_d *pwindow)
 	mWindow = (void*) CreateWindow( 1, 0, 0, "Menubar", 
 	                               x, y, width, height, 
 							       pwindow, 0, 0, COLOR_GRAY); 
-	if( (void*) mWindow == NULL ){
-		printf("create_menubar error: Struct.\n");
-		refresh_screen();
-	    while(1){};
-		//return NULL;	    
+	if( (void*) mWindow == NULL )
+	{
+		printf("create_menubar: mWindow\n");
+        goto fail;
+		
 	}else{
 	    RegisterWindow(mWindow);
 	};
 	
 	//
-	// @todo: Chacar se a estrutura está inicializada.
+	// @todo: Checar se a estrutura está inicializada.
 	//
 	
 	//
@@ -89,13 +104,12 @@ void *create_menubar(struct window_d *pwindow)
 	
 	// Menu structure. (Cria uma estrutura para o menu da menubar).
 	gui->mb = (void*) malloc(sizeof(struct menu_d));
-    if( (void*) gui->mb == NULL ){
-	    printf("create_menubar error: Menu struct.\n");
-		refresh_screen();
-		while(1){}	
-	}
-	else
+    if( (void*) gui->mb == NULL )
 	{
+	    printf("create_menubar error: Menu struct.\n");
+		goto fail;
+	}else{
+		
 	   //Registra na estrutura de menu a janela que é o menu.
 	    gui->mb->menuWindow = mWindow;
 
@@ -112,11 +126,13 @@ void *create_menubar(struct window_d *pwindow)
 	
 	// Array para items.
 	gui->mb->Items = (void*) malloc( sizeof(struct menuitem_d) * 16 );
-    if( (void*) gui->mb->Items == NULL){
+    if( (void*) gui->mb->Items == NULL)
+	{
 	    printf("create_menubar error: Menu array struct.\n");
-		refresh_screen();
-		while(1){}        
+        goto fail;       
 	};
+	
+	/*
 	
     // Linked list. (linked list na menubar).	
     mb_linkedlist = (void*) malloc( sizeof(struct linkedlist_d));
@@ -130,11 +146,15 @@ void *create_menubar(struct window_d *pwindow)
 	    //registra na estrutura da janela.
 	    mWindow->linkedlist = mb_linkedlist;
 	};
-	
+	*/
 	
 // Done ~ Retorna a janela (menubar).
 done:     
     return (void*) mWindow;
+fail:
+    printf("fail\n");
+    refresh_screen();
+	return NULL;
 };
 
 

@@ -116,6 +116,11 @@ typedef enum {
 // deichando os vindouros como subsequentes à esses.
 //
 
+//#importante: Isso faz parte do módulo de segurança
+//e deve estar associado ao sistema de arquivos ...
+//Pois estamos lidando com concessões de permissões 
+//de acessoa objetos ... que pode ser 'arquivos' ou 
+// dispositivos. 
 //talvez isso devesse ir para object.h
 typedef enum {
 	
@@ -123,7 +128,7 @@ typedef enum {
 	
 	//ram
 	//Nothing for now.	
-    ObjectTypeNull,               //0 Null.
+    ObjectTypeNull,               //0 Null. (Free)
 	ObjectTypeASpace,             //1 Address Space. (memory address)
 	ObjectTypeDSpace,             //2 Disk Space.
 	ObjectTypeBank,               //3 Bank. (banco de dados).
@@ -229,6 +234,12 @@ typedef enum {
 	ObjectTypeGrid,       //78
 	ObjectTypeMessage,    //79
 	//...
+	
+	//@todo: precisamos criar um tipo genérico
+	//       para validação de objetos não especificados 
+	// ou até nulos, talvez. :)
+	//ObjectTypeGeneric, //80
+	
 }object_type_t;
 
 //

@@ -2279,43 +2279,61 @@ done:
 
 
 /*
+ *************************************************
  * GetFocus: 
- *     Pega o ponteiro para a estrutura da janela com o foco de entrada.
+ *     Pega o ponteiro para a estrutura da janela 
+ * com o foco de entrada.
  */
-void *GetFocus(){
+void *GetFocus()
+{
     return (void *) windowList[window_with_focus];	
 };
 
 
 
 /*
+ ***********************************************
  * windowGetForegroundWindow:
- * recupera o handle da janela que o usuário está trabalhando.
-   ou seja, a janela em primeiro plano.
+ *     Recupera o handle da janela que o usuário 
+ * está trabalhando, ou seja, a janela em primeiro plano.
  */
-void *windowGetForegroundWindow(){
+void *windowGetForegroundWindow()
+{
     return (void *) windowList[window_with_focus];		
 };
 
 /*
+ **********************************************
  * windowSetForegroundWindow:
- *     coloca uma janela em primeiro plano para o usuário trabalhar nela.
- *     @todo: aumentar aprioridade da thread que configurou a janela de primeiro plano.
+ *     Coloca uma janela em primeiro plano para o 
+ * usuário trabalhar nela.
+ *     @todo: aumentar aprioridade da thread que 
+ * configurou a janela de primeiro plano.
  *     +o input do teclado deve vi pra essa janela.
- *     +modificações visuais deve ocorrer na janela que está em primeiro plano, para 
+ *     +modificações visuais deve ocorrer na janela 
+ * que está em primeiro plano, para 
  * que ela se destaque.
  * retorno: 0=OK  , 1=error.
  */
-int windowSetForegroundWindow(struct window_d *window)
+int 
+windowSetForegroundWindow( struct window_d *window )
 {
-	if( (void *) window == NULL ){
-		return;
+	if( (void *) window == NULL )
+	{
+		printf("windowSetForegroundWindow: window\n");
+		goto fail;
+	}else{
+		
+	    SetFocus(window);
+	    set_active_window(window); 
+		//...
 	};
-	SetFocus(window);
-	set_active_window(window); 
 	
 	//@todo: aumentar a prioridade da thread.
+done:	
 	return (int) 0;
+fail:
+    return (int) 1;
 };
 
 
@@ -2335,13 +2353,17 @@ void windowSwitchActiveWindow()
 
 
 /*
+ ********************************
  * windowSwitchFocus:
  *     Muda a janela que está com foco de entrada.
- *     @todo: Selecionar a janela indicada como next na estrutura.
+ *     @todo: Selecionar a janela indicada como next 
+ * na estrutura.
  *     Em cada momento o foco está em uma lista de janelas
  * e quando trocamos o foco, percorremos a lista atual.
- * mas a lista muda dependendo do ambeinte gráfico que estamos.
- * muda quando trocamos a janela ativa, muda quando trocamos o desktop.
+ * mas a lista muda dependendo do ambeinte gráfico que 
+ * estamos.
+ * Muda quando trocamos a janela ativa, muda quando 
+ * trocamos o desktop.
  * 
  */
 void windowSwitchFocus()
@@ -2360,23 +2382,28 @@ void windowSwitchFocus()
 	
 	//
 	// @todo: 
-	// Essa rotina precisa ser refeita. Seguindo uma lista linkada de janelas.
+	// Essa rotina precisa ser refeita. 
+	// Seguindo uma lista linkada de janelas.
 	//
 	
 	window = (void*) windowList[window_with_focus];	
 	
-	if( (void*) window == NULL ){
-	    return;    
+	if( (void*) window == NULL )
+	{
+		printf("windowSwitchFocus: window\n");
+	    goto fail; 
 	}else{
 		
-	    KillFocus(window);  //Kill.
+	    KillFocus(window);  
 		
 		//Se a próxima janela é válida.
 		if( (void*) window->next != NULL )
 		{
-		    next = (void*) window->next;  //Get next.
+			//Get next.
+		    next = (void*) window->next;  
 		   	    
-		    NextID = (int) next->id;     //Current id.
+			//Current id.	
+		    NextID = (int) next->id;     
 		   
 		    //Se estiver dentro dos limites usaremos a próxima.
 		    if(NextID > 0 && NextID < Max){
@@ -2406,6 +2433,9 @@ done:
 	//refresh_screen();
 	
 	return;
+	
+fail:
+    return;
 };
 
 
@@ -2414,11 +2444,13 @@ done:
  * KillFocus:
  *     Uma janela perde o foco.
  */
-void KillFocus(struct window_d *window)
+void KillFocus( struct window_d *window )
 {
     //Check.
-	if( (void *) window == NULL ){ 
-	    return; 
+	if( (void *) window == NULL )
+	{
+		printf("KillFocus: window\n");
+	    goto fail; 
 	};
 	
 	//Focus.
@@ -2429,7 +2461,9 @@ void KillFocus(struct window_d *window)
 	
 	if( (void*) gui->main != NULL )
 	{
-		if( gui->main->used == 1 && gui->main->magic == 1234 ){
+		if( gui->main->used == 1 && 
+		    gui->main->magic == 1234 )
+		{
 	        window_with_focus = (int) gui->main->id;
 		};
 	}
@@ -2440,17 +2474,24 @@ void KillFocus(struct window_d *window)
 	//set next window
 	if( (void*) window->parent != NULL )
 	{
-		if( window->parent->used == 1 && window->parent->magic == 1234 ){
+		if( window->parent->used == 1 && 
+		    window->parent->magic == 1234 )
+		{
 		    SetFocus(window->parent); 	
-		} 	    
+		}; 	    
     };	
+	
+	// Nothing.
 	
 done:
 	return;
+fail:
+    return;
 };
 
 
 /*
+ ******************************************
  * MinimizeWindow:
  *     Minimiza uma janela.
  *     @todo windowMinimize()
@@ -2459,13 +2500,17 @@ void MinimizeWindow(struct window_d *window)
 {
 	int Status;
 	
-    if( (void *) window == NULL){
-		return;
+    if( (void *) window == NULL)
+	{
+		printf("MinimizeWindow: window\n");
+	    goto fail; 
 	};
 	
 	Status = (int) is_window_minimized(window);
-    if(Status == 1){
-	    return;
+    if(Status == 1)
+	{
+		printf("MinimizeWindow: Status\n");
+	    goto fail; 
 	};	
 	
 	//
@@ -2475,11 +2520,14 @@ void MinimizeWindow(struct window_d *window)
 done:
     KillFocus(window);
 	window->view = (int) VIEW_MINIMIZED;
+    return;
+fail:
     return;	
 };
 
 
 /*
+ **************************************
  * MaximizeWindow:
  *     Maximiza uma janela.
  *     @todo: windowMazimize()
@@ -2488,20 +2536,26 @@ void MaximizeWindow(struct window_d *window)
 {
 	int Status;
 	
-    if( (void *) window == NULL){
-	    return;
+    if( (void *) window == NULL)
+	{
+		printf("MaximizeWindow: window\n");
+	    goto fail; 
 	};
 	
 	Status = (int) is_window_maximized(window);
-    if(Status == 1){
-	    return;
+    if(Status == 1)
+	{
+		printf("MaximizeWindow: Status\n");
+	    goto fail; 
 	};
 
     //redimensionar.
-	if(gui->main != NULL){
-        window->left   = gui->main->left;             
-        window->top    = gui->main->top;                   
-	    window->width  = gui->main->width;             
+	if( gui->main != NULL )
+	{
+        window->left = gui->main->left;             
+        window->top = gui->main->top;                   
+	    
+		window->width = gui->main->width;             
         window->height = gui->main->height;
 	}; 	
 
@@ -2513,11 +2567,14 @@ done:
     set_active_window(window);
 	SetFocus(window);
 	window->view = (int) VIEW_MAXIMIZED;
+    return;
+fail:
     return;	
 };
 
 
 /*
+ *************************************************
  * init_window_manager:
  *     Inicializa o gerenciamento de janelas.
  *     @todo windowmanagerInit()
@@ -2529,82 +2586,98 @@ int init_window_manager()
 	// de janela da thread atual.
 	//
 	
-	WindowProcedure = (void*) malloc( sizeof( struct window_procedure_d ) );
-	if( (void*) WindowProcedure == NULL ){
-	    printf("init_window_manager fail: Structure.");
-		die();
-		//refresh_screen();
-		//while(1){}
-	};  
-
 	//
-	// Configura a janela ativa. 
-	// Configura a janela com o foco de entrada. 
-	// Se a janela com o foco de entrada for uma janela filha,
-	// então a janela mãe será a janela ativa.
+	// ## Window procedure struct ##
 	//
 	
-	WindowProcedure->active_window = (int) 0;
-	WindowProcedure->window_with_focus = (int) 0;
+	
+	WindowProcedure = (void*) malloc( sizeof( struct window_procedure_d ) );
+	
+	if( (void*) WindowProcedure == NULL )
+	{
+	    printf("init_window_manager: WindowProcedure\n");
+		die();
+	}else{
+		
+ 	    //
+	    // Configura a janela ativa. 
+	    // Configura a janela com o foco de entrada. 
+	    // Se a janela com o foco de entrada for uma 
+		// janela filha,então a janela mãe será a 
+		// janela ativa.
+	    //
+	
+	    WindowProcedure->active_window = (int) 0;
+	    WindowProcedure->window_with_focus = (int) 0;
+		//...
+	};
+
 
 	//
 	// @todo:  
-	//     Continua fazendo inicializações de procedimento de janela.
+	//     Continua fazendo inicializações de 
+	// procedimento de janela.
 	//
 	
 done:
+
 #ifdef KERNEL_VERBOSE
-    printf("done!\n");
+    printf("done\n");
 #endif
+
     return (int) 0;
 };
 
 
 /*
- *******************************************************
+ *****************************************
  * init_windows:
  *     Inicializa a lista de janelas.
  *     Inicializa globais relativas à janelas.
  */
 int init_windows()
 {
-	int Offset = 0;
-	
-	windows_count = 0;
-	
+		
+	//#debug
 	// Inicializa a lista de janelas.
 	//printf("init_windows:\n");  	
 	
-	while(Offset < WINDOW_COUNT_MAX){
+	int Offset;
+	for( Offset=0; Offset < WINDOW_COUNT_MAX; ++Offset ){
 	    windowList[Offset] = (unsigned long) 0;
-        ++Offset;
-	};
+	}
+	
+	windows_count = 0;
 	
 	// Set current.
 	set_current_window(NULL);
 	
 	//
-	// Inicializando a estrutura do retângulo da área de cliente.
+	// ## Client Area ##
+	// Inicializando a estrutura do retângulo 
+	// da área de cliente.
 	//
 	
 	rectClientArea = (void*) malloc( sizeof(struct rect_d) );
-    if((void*) rectClientArea == NULL){	
-	    printf("init_windows:");
+    
+	if( (void*) rectClientArea == NULL )
+	{	
+	    printf("init_windows: rectClientArea\n");
 		die();
-		//refresh_screen();
-		//while(1){}
 	}else{
 	    setClientAreaRect( 0, 0, 0, 0);	
 	};
 	
 	
 	//
-    // Set fonts. @todo: Criar uma estrutura para características do char.
+    // Set fonts. @todo: Criar uma estrutura para 
+	// características do char.
 	//
 		
 	// 8x8 
-	g8x8fontAddress  = (unsigned long) BIOSFONT8X8; //0x000FFA6E;    //ROM.
-	//g8x16fontAddress = (unsigned long) 0x000FFA6E;  //@todo.
+	// 0x000FFA6E;    //ROM.
+	g8x8fontAddress  = (unsigned long) BIOSFONT8X8; 
+	//g8x16fontAddress = (unsigned long) 0x000FFA6E; 
 	//...
 	
 	//@todo: create SetFontAddress(.)
@@ -2670,10 +2743,15 @@ int init_windows()
 //
 // Backbuffer support. (espelho da memória de video)
 //
+
+//BackBufferSupport:
 	
 	BackBufferInfo = (void*) malloc( sizeof(struct backbufferinfo_d) );
-    if((void*) BackBufferInfo == NULL){
-	    //fail	
+    
+	if((void*) BackBufferInfo == NULL)
+	{
+	    //goto fail;
+	
 	}else{
 	    BackBufferInfo->used = 1;
         BackBufferInfo->magic = 1234;
@@ -2688,9 +2766,13 @@ int init_windows()
 // Frontbuffer support. (memória de vídeo)
 //
 	
+//FrontBufferSupport:
+
 	FrontBufferInfo = (void*) malloc( sizeof(struct frontbufferinfo_d) );
-    if((void*) FrontBufferInfo == NULL){	
-	    //fail	
+    
+	if( (void*) FrontBufferInfo == NULL )
+	{	
+	     //goto fail;	
 	}else{
 		
 		//Algumas informações foram enviadas pelo boot loader.
@@ -2740,6 +2822,8 @@ int init_windows()
 done:	
     //printf("Done.\n");
 	return (int) 0;
+fail:
+	return (int) 1;
 };
 
 
@@ -2754,9 +2838,6 @@ fail:
 };
 
 
-//pegando a o id da janela que está no topo da lista de uma janela.
-struct window_d *getTopWindow(struct window_d *window)
-{
 	//refletindo ??
     //se um argumento for passado teremos que examinar a ordem das janelas filhas.	
 	//sendo assim cada estrutura de janela precisa de uma lista de janelas filhas 
@@ -2775,6 +2856,9 @@ struct window_d *getTopWindow(struct window_d *window)
 	// da janela que está no topo da z-order da janela.
 	//
 	
+//pegando a o id da janela que está no topo da lista de uma janela.
+struct window_d *getTopWindow(struct window_d *window)
+{
 	
 	if( (void*) window == NULL )
 	{
@@ -2785,15 +2869,15 @@ struct window_d *getTopWindow(struct window_d *window)
 }; 
 
 
-int get_top_window(){
+int get_top_window()
+{
 	return (int) top_window;
 };
 
-//configurando a top window.
+//Setando a top window.
 void set_top_window( int id )
 {
 	top_window = (int) id;
-	return;
 };
 
 //fecha a janela ativa.
@@ -2818,7 +2902,7 @@ int z_order_get_free_slot()
 	int z; 
 	struct window_d *zWindow;
 
-	for( z = 0; z < ZORDER_COUNT_MAX; z++ )
+	for( z=0; z < ZORDER_COUNT_MAX; z++ )
 	{
 	    zWindow = (void*) zorderList[z];
         
@@ -2830,7 +2914,7 @@ int z_order_get_free_slot()
 			
 			zorderCounter++;
 			if(zorderCounter >= ZORDER_COUNT_MAX){
-				printf("CreateWindow: zorderCounter\n");
+				printf("z_order_get_free_slot: zorderCounter\n");
 				goto fail;
 			}
             
