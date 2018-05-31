@@ -1,7 +1,7 @@
 # gramado
 
 <br>Gramado Operating System v 0.1 
-<br>(c) Coppyright 2018 - Fred Nora.
+<br>(c) Copyright 2018 - Fred Nora.
 
 <br>
 <img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado-gui.png">
