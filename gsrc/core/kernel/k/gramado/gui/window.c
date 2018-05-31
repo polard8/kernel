@@ -355,15 +355,11 @@ int windowInitializeBrowserSupport()
     if( (void*) w == NULL ){
 	    printf("windowInitializeBrowserSupport:~fail");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 		
 	    if( w->used != 1 || w->magic != 1234 ){
 	        printf("windowInitializeBrowserSupport: ~fail");
-	        die();
-			//refresh_screen();
-	        //while(1){};			
+	        die();			
 	    }
 		
 		//Aqui temos uma janela válida. Essa janela é uma aba.

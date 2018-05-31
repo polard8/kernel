@@ -156,6 +156,8 @@ int window_getch();
 #define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
 #define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
 #define WT_EDITBOX_MULTIPLE_LINES 7
+#define WT_BUTTON 8    //#test
+//button (control)
 //... 
 
 
@@ -1415,6 +1417,9 @@ struct window_d
  
 // 
 //==================================================
+	
+	// scroll bar
+	struct window_d *scrollbar;
 	
 	
 	// Buffer para mensagens pequenas.

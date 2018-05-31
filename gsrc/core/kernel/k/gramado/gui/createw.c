@@ -666,6 +666,9 @@ unsigned long color         //12 - color (bg) (para janela simples)
 	        Background = 1;       // bg.
 	        TitleBar = 1;         // Título + Borda.
 		    ClientArea = 1;
+			
+			//essas flags farão a chamar createwindow 
+			//recursivamente para desenahr os botões.
 			MinimizeButton = 1;   // Botão para minimizar
 		    CloseButton = 1;      // Botão para fechar. 
 		    //MenuBar       = 1;  // Barra de menu. 
@@ -703,13 +706,25 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//6) scroll bar.
         //   // Cria uma scroll bar. Para ser usada como janela filha.
 		case WT_SCROLLBAR:
-	        Background = 1;    //bg.
-		    window->backgroundUsed = 1;
+	        //Background = 1;    //bg.
+		    //window->backgroundUsed = 1;
             //bordas.
             //Border = 1;
  			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
 		    break;
 			
+		// 8) button
+        //Obs: existe uma rotina que desenha um botão.
+        //quando create window for chamada para criarmos um botão 
+        //podemos chamar essa rotina que desenha o botão ...
+        //apenas isso.	
+        //aqui nesse case podemos selecionar algumas caractrerísticas 
+        //do botão que são acionadas através das características 
+        //da janela.  		
+		case WT_BUTTON:	
+            //Nothing for now ...
+            //Deixaremos a rotina de desenahr o botão fazer tudo por enquanto.			
+			break;	
 			
 		//barra de rolagem
 		//botões de radio .. 
@@ -920,7 +935,7 @@ drawBegin:
 		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_EDITBOX){ window->color_bg = color; }
 		if( (unsigned long) type == WT_CHECKBOX){ window->color_bg = color; }
-		if( (unsigned long) type == WT_SCROLLBAR){ window->color_bg = color; }
+		//if( (unsigned long) type == WT_SCROLLBAR){ window->color_bg = color; }
 		//...
 		
 		//Pintar o retângulo.
@@ -1049,20 +1064,29 @@ drawBegin:
 			//deslocamentos em relação às margens. (x=window->width-?) (y=2).
 			//A função draw_button vai somar a margem obtida pelo handle 'window'
 			//ao deslocamento obtido em (x=window->width-?).
-	        draw_button( window, "V", 1, 
-			             (window->width -42 -1), 4, 
-						 21, 21, 
-						 COLOR_BUTTONFACE); //@todo: criar elemento no esquema de cores.	
+	        //draw_button( window, "V", 1, 
+			//             (window->width -42 -1), 4, 
+			//			    21, 21, 
+			//			   COLOR_BUTTONFACE); //@todo: criar elemento no esquema de cores.
+
+            //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
+			CreateWindow( WT_BUTTON, 1, 1, "V", 
+	            (window->width -42 -1), 4, 21, 21,									  
+			    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
 	    if(CloseButton == 1)
 		{
 			window->closebuttonUsed = 1;
-	        draw_button( window, "X", 1, 
-			            (window->width -21), 4, 
-						21, 21, 
-						COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.			
+	        //draw_button( window, "X", 1, 
+			//            (window->width -21), 4, 
+			//			21, 21, 
+			//			COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.
+            //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
+			CreateWindow( WT_BUTTON, 1, 1, "X", 
+	            (window->width -21), 4, 21, 21,									  
+			    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
 	    };					 
 			
 		//#bugbug O kernel não pode ficar tanto tempo assim carregando uma imagem.
@@ -1249,11 +1273,17 @@ drawBegin:
 	//completaremos 
 	if( (unsigned long) type == WT_SCROLLBAR )
 	{ 
-	    //botão 1 da barra horizontal.
-		draw_button( window, "^", 1, 
-			         1, 1,  //deslocamento 
-					(window->width -2), 16, 
-					COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.
+        //bg
+		drawDataRectangle( window->left, 
+		                   window->top, 
+						   window->width,  
+						   window->height, 
+						   window->color_bg ); 
+						   
+	    //Botão de cima da scrollbar vertival
+		CreateWindow( WT_BUTTON, 1, 1, "^", 
+	        1, 1, (window->width -2), 16,									  
+		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);	
 			
 	
 	    //limits
@@ -1261,18 +1291,30 @@ drawBegin:
 		{ 
 		    window->height = 2; 
 		}
-		draw_button( window, "=", 1, 
-			         1, (window->height/2), //#bugbug cuidado
-					(window->width -2), 16, 
-					COLOR_BUTTONFACE);				
+
+	    //Botão do meio da scrollbar vertival
+		CreateWindow( WT_BUTTON, 1, 1, "=", 
+	        1, (window->height/2), (window->width -2), 16,									  
+		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);	
+		
 					
 	    //botão 2 da barra horizontal.
-		draw_button( window, "v", 1, 
-			         1, (window->height -17), 
-					(window->width -2), 16, 
-					COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.			
+        //Botão de baixo da scrollbar vertival
+	    CreateWindow( WT_BUTTON, 1, 1, "v", 
+	        1, (window->height -17), (window->width -2), 16,									  
+		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
 	};				   
 
+	
+	
+	if( (unsigned long) type == WT_BUTTON )
+	{
+	    //as posições de left e roght são da janela do botão.
+		draw_button( Parent, windowname, 1, 
+		             window->left, window->top, 
+					 window->width, window->height, 
+					 COLOR_BUTTONFACE);
+	};					 
 	
 	//
 	// Continua ... ( Pinta detalhes da janela, caso ouver )
@@ -1300,6 +1342,25 @@ drawBegin:
 	//
 	
 	
+	//
+	// ## test ##
+	//
+	
+	// testando recursividade.
+	// criaremos uma scrollbar para janelas do tipo aplicativo.
+	// mas na verdade não ´pe em todos os casos que criamos 
+	// uma janela de aplicativo com srollbar.
+	// OK isso funcionou bem ... vamos aplicar a outros elementos gráficos.
+	
+	if(window->type == WT_OVERLAPPED)
+	{
+        window->scrollbar = CreateWindow( WT_SCROLLBAR, 1, 1, "scroll-test", 
+	                            window->right -24, window->top+25, 
+								24, window->height-25,									  
+					            window, 0, 
+								(unsigned long) CurrentColorScheme->elements[csiScrollBar], 
+								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);		
+	};
 
 	
 	
