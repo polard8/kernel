@@ -209,10 +209,17 @@
 /*
  ***********************************************
  * struct object_d:
- *     Estrutura para objetos.
+ *     Object controle ...
+ *     Estrutura para controle de objetos.
+ *     Isso deve ficar no início de cada estrutura 
+ *     para controlar a utilização do objeto por parte 
+ * dos processos e threads.
+ * 
  */
+ 
 //typedef struct object_d object_t;
 typedef struct object_d object_descriptor_t;
+typedef struct object_d object_t;
 struct object_d 
 {
 	//@todo: 
@@ -226,19 +233,32 @@ struct object_d
 	
    //identificadores
    int id;            // Id do objeto.
+   
+   
+   //char *name;
+   
    unsigned long name_address;
    char name[16];	  // Nome do objeto com 16 chars. @todo: usar ponteiro para nome.
+   
    int used;          // Se o slot esta sendo usado.
    int magic;         // Número mágico pra ver se o slot não esta corrompido.
+   
+   
+   //Lista de processos que possuem o objeto.
+   int pidList[32];
+   int pidCount;
+   int currentPID;
+   
+   
    
 	
    //endereços
    unsigned long obj_address;
    unsigned long obj_procedure;
    
-    /*
-	 * Status do objeto.
-	 */   
+    //
+	// Status do objeto.
+	//   
 	 
 	int token; //algum processo 'pegou' o objeto e esta usando.
     
@@ -255,7 +275,9 @@ struct object_d
 	
 	//continua...
 };
-object_descriptor_t *object;  //object
+object_t *object;  //object
+//object_descriptor_t *object;  //object
+
 //...
 
 

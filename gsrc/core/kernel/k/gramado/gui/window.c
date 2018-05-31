@@ -371,7 +371,7 @@ int windowInitializeBrowserSupport()
 
         
 		//Test: Criando alguns elementos gráficos dentro da aba no navegador.
-		draw_text( TABWINDOW, 0, 0, COLOR_PINK, "bt: This is a text on the browser tab number 1");	
+		draw_text( TABWINDOW, 0, 0, COLOR_TEXT, "bt: This is a text on the browser tab number 1");	
         draw_button( TABWINDOW, "bt: Button label 11 11", 1, 11, 11, 56, 24, COLOR_BUTTONFACE); 
 		StatusBar( TABWINDOW, "bt: Status bar, string 1", "bt: Status bar, string 2");
 	};
@@ -1513,7 +1513,7 @@ redrawBegin:
 		//@todo: Se estivermos em full screen, não teremos string.				   
 		draw_string( window->left +8 +16 +8, 
 		             window->top +8 +4, 
-					 COLOR_PINK,  //*test
+					 COLOR_TEXT,  //*test
 					 window->name );  
 					 
 					 
@@ -2247,7 +2247,7 @@ setup_wwf:
 	        //configurando o cursor específico da janela com o foco de entrada.
 			window->CursorX = g_cursor_x;
 			window->CursorY = g_cursor_y;
-            window->CursorColor = COLOR_PINK;
+            window->CursorColor = COLOR_TEXT;
 			
 			
 			//

@@ -2675,7 +2675,7 @@ check_window:
         g_cursor_height = 8; //??
         
 		//cor do cursor
-		g_cursor_color = COLOR_PINK;
+		g_cursor_color = COLOR_TERMINALTEXT;
 
 		
 		//left

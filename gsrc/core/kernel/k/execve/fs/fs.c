@@ -335,6 +335,7 @@ KeLoadFile( struct channel_d *channel,
     Status = (int) fsLoadFile(file_name,file_address);
 	if( Status != 0)
 	{
+		// Aqui tem que ter uma mensagem @todo.
 	    channel->InUse = 0;
 		channel->State = 0;
 	    return (int) 1;

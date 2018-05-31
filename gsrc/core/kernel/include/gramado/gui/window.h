@@ -156,8 +156,8 @@ int window_getch();
 #define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
 #define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
 #define WT_EDITBOX_MULTIPLE_LINES 7
-#define WT_BUTTON 8   
-#define WT_STATUSBAR 9
+#define WT_BUTTON     8   
+#define WT_STATUSBAR  9
 //... 
 
 
@@ -393,8 +393,11 @@ typedef enum {
 }ColorSchemeIndex;  
  
  
- 
-//estrutura para esquema de cores. 
+/*
+ * color_scheme_d:
+ *     Estrutura para esquema de cores. 
+ *
+ */ 
 typedef struct color_scheme_d* color_scheme_t;
 struct color_scheme_d
 {
@@ -422,8 +425,8 @@ struct color_scheme_d
 	//...
 };
 color_scheme_t CurrentColorScheme;
-color_scheme_t HumilityColorScheme;
-color_scheme_t PrideColorScheme;
+color_scheme_t HumilityColorScheme; // Simples.
+color_scheme_t PrideColorScheme;    // Colorido.
 //... 
  
  
@@ -516,6 +519,7 @@ color_scheme_t PrideColorScheme;
 /*
  * Cores usadas nessa sistema.
  */
+#define COLOR_TEXT                0x00000000  //default
 #define COLOR_WINDOW              0x00FFFFFF
 #define COLOR_BLACK               0x000000
 #define COLOR_WHITE               0xFFFFFF 
@@ -532,60 +536,111 @@ color_scheme_t PrideColorScheme;
 #define COLOR_LIGHTBLUE           0xADD8E6
 #define COLOR_SILVER              0xC0C0C0
 
-//window colors
+
+//
+// ## WINDOW COLORS ##
+//  
+
+
 #define COLOR_ACTIVEBORDER        0xB4B4B4
+
 #define COLOR_ACTIVECAPTION       0x99B4D1
-#define COLOR_ACTIVECAPTIONTEXT   0x000000
-#define COLOR_APPWORKSPACE        COLOR_SILVER 
+#define COLOR_ACTIVECAPTION_TEXT   0x000000
+
+#define COLOR_APPWORKSPACE  COLOR_SILVER 
+
 // A cor padrão para o Bg é azul quase escuro,
 // o azul escuro é usado em seleção de item.
-#define COLOR_BACKGROUND          0x008080  
-#define COLOR_BORDER              COLOR_SILVER 
+
+#define COLOR_BACKGROUND  0x008080  
+#define COLOR_BACKGROUNDTEXT  COLOR_TEXT  
+
+#define COLOR_BORDER  COLOR_SILVER 
+
 #define COLOR_BUTTONFACE          0xF0F0F0
-#define COLOR_BUTTONHIGHLIGHT     0xFFFFFF
-#define COLOR_BUTTONSHADOW        0xA0A0A0  //COLOR_BLACK
-#define COLOR_BUTTONTEXT          COLOR_WINDOWTEXT
+
+#define COLOR_BUTTONHIGHLIGHT  0xFFFFFF
+#define COLOR_BUTTONHIGHLIGHTTEXT  COLOR_WHITE
+
+#define COLOR_BUTTONSHADOW  0xA0A0A0  
+
+#define COLOR_BUTTONTEXT  COLOR_TEXT
+
 #define COLOR_CONTROL             0xF0F0F0
+#define COLOR_CONTROLTEXT COLOR_TEXT
 #define COLOR_CONTROLDARK         0xA0A0A0
 #define COLOR_CONTROLDARKDARK     0x696969
 #define COLOR_CONTROLLIGHT        0xE3E3E3
+
 #define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF
-#define COLOR_CONTROLTEXT         0x000000
-#define COLOR_DESKTOP             0x000000
-#define COLOR_FOCUS_TOPBAR        0x7FFF00
-#define COLOR_GRAYTEXT            0x808080
+#define COLOR_CONTROLLIGHTLIGHTTEXT COLOR_WHITE
+
+#define COLOR_DESKTOP  0x000000
+
+#define COLOR_FOCUS_TOPBAR  0x7FFF00
+
+//TEXT SUPPORT
+#define COLOR_GRAYTEXT  0x808080
 #define COLOR_HIGHLIGHT           0x3399FF
 #define COLOR_HIGHLIGHTTEXT       0xFFFFFF
+
+
 #define COLOR_INACTIVEBORDER      0xF4F7FC
 #define COLOR_INACTIVECAPTION     0xBFCDDB
 #define COLOR_INACTIVECAPTIONTEXT 0x434E54
-#define COLOR_INFO                0xFFFFE1
-#define COLOR_INFOTEXT            0x000000
 
-#define COLOR_MENU                  COLOR_GRAY
-#define COLOR_MENUTEXT              COLOR_BLACK
-#define COLOR_MENUITEM              COLOR_WHITE
-#define COLOR_MENUITEMTEXT          COLOR_BLACK
-#define COLOR_MENUITEM_SELECTED     COLOR_BLUE
-#define COLOR_MENUITEMTEXT_SELECTED COLOR_WHITE
-#define COLOR_MENUBAR               COLOR_GRAY
-#define COLOR_MENUHIGHLIGHT         0x3399FF00
+#define COLOR_INFO  0xFFFFE1
+#define COLOR_INFOTEXT  TEXT_COLOR
+
+#define COLOR_MENU  COLOR_GRAY
+#define COLOR_MENUTEXT  COLOR_TEXT
+
+#define COLOR_MENUITEM  COLOR_WHITE
+#define COLOR_MENUITEMTEXT  COLOR_TEXT
+
+#define COLOR_MENUITEMSELECTED  COLOR_BLUE
+#define COLOR_MENUITEMSELECTEDTEXT  COLOR_WHITE
+
+#define COLOR_MENUBAR  COLOR_GRAY
+#define COLOR_MENUBARTEXT  COLOR_TEXT
+
+#define COLOR_MENUHIGHLIGHT  0x003399FF
+#define COLOR_MENUHIGHLIGHTTEXT  COLOR_WHITE
 
 #define COLOR_NAVIGATIONBAR       COLOR_BLACK
-#define COLOR_NAVIGATIONBAR_TEXT  COLOR_WHITE
-#define COLOR_STATUSBAR           COLOR_WINDOW
-#define COLOR_TASKBAR             COLOR_WINDOW
-#define COLOR_TASKBAR_TEXT        COLOR_TEXT
-#define COLOR_TEXT                0x00000000
-#define COLOR_TITLEBAR            COLOR_BLUE
-#define COLOR_TITLEBAR_TEXT       COLOR_WHITE
-#define COLOR_TOPBAR              0x83F52C00
-#define COLOR_TOPBAR_TEXT         0x397D0200
-#define COLOR_WINDOWFRAME         COLOR_GRAY
-//(debug: Pink para contraste com quaquer cor de janela)
-#define COLOR_WINDOWTEXT          COLOR_PINK //COLOR_BLACK 
-#define COLOR_WORKSPACE           0x0000FF00 //area de trabalho
+#define COLOR_NAVIGATIONBARTEXT  COLOR_WHITE
 
+#define COLOR_STATUSBAR           COLOR_WINDOW
+#define COLOR_STATUSBARTEXT      COLOR_TEXT
+
+#define COLOR_TASKBAR             COLOR_WINDOW
+#define COLOR_TASKBARTEXT        COLOR_TEXT
+
+#define COLOR_TITLEBAR            COLOR_BLUE
+#define COLOR_TITLEBARTEXT       COLOR_TEXT
+
+#define COLOR_TOPBAR  0x83F52C
+#define COLOR_TOPBARTEXT  COLOR_TEXT
+
+#define COLOR_WINDOWFRAME  COLOR_GRAY
+
+// NÃO FAREMOS JANELAS PRETAS
+// PRETO É O BACKGROUND
+#define COLOR_WINDOWTEXT COLOR_TEXT  
+
+//area de trabalho
+#define COLOR_WORKSPACE 0x0000FF00 
+#define COLOR_WORKSPACETEXT COLOR_TEXT
+
+//virtual terminal
+#define COLOR_TERMINAL  COLOR_BLACK
+#define COLOR_TERMINALTEXT COLOR_WHITE
+  
+//
+// ========
+//  
+  
+  
 //Tipos de azul
 #define COLOR_BLUE1 0x067AB5
 #define COLOR_BLUE2CYAN   0x1BA1E2
@@ -1230,7 +1285,11 @@ struct window_d
 
     // Identificadores.
 	object_type_t objectType;
-	object_class_t objectClass;		
+	object_class_t objectClass;
+
+	//object control
+	struct object_d *object;	
+
 	
     unsigned long id;    //Window Id. 
 	char *name;          //Window name.

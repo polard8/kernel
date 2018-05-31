@@ -31,11 +31,18 @@
 // deixe pra depois, vai usado as globais.
 //
 
+//
+// ## Cursor ##
+//
+
 //Cursor. (disciplica de linhas).
+
 unsigned long g_cursor_x;
 unsigned long g_cursor_y;
-unsigned long g_cursor_width; //??
-unsigned long g_cursor_height; //??
+
+unsigned long g_cursor_width;   //??
+unsigned long g_cursor_height;  //??
+
 unsigned long g_cursor_color;
 
 unsigned long g_cursor_left;     // margem esquerda dada em linhas
@@ -43,7 +50,11 @@ unsigned long g_cursor_top;      // margem superior dada em linhas
 unsigned long g_cursor_right;    // margem direita dada em linhas
 unsigned long g_cursor_bottom;   // margem inferior dada em linhas
 
-//*IMPORTANTE: Isso é ótimo, por permitira escolher uma posição dentro do terminal.
+
+
+// ## IMPORTANTE ## 
+// Isso é ótimo, por permitir escolher 
+// uma posição dentro do terminal.
 
 
 typedef enum {
@@ -60,9 +71,16 @@ typedef enum {
     //...	
 }cursor_type_t;
 
+
+
+
 /*
- * Estrutura de suporte à cursor.
- * Essa estrutura deve ser incluída na estrutura de janela.
+ *********************************************
+ * cursor_d:
+ *     Estrutura de suporte à cursor.
+ *     Essa estrutura deve ser incluída na 
+ * estrutura de janela.
+ *
  */
 typedef struct cursor_d cursor_t;
 struct cursor_d

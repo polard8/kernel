@@ -248,6 +248,9 @@ struct process_d
 	object_type_t objectType;
 	object_class_t objectClass;
 	
+	//object control
+	struct object_d *object;
+	
 	//callback ,d.
 	
     /*

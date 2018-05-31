@@ -957,12 +957,6 @@ void _outbyte(int c)
 	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
 	// um todo. Só está considerando as dimensões do 'char'.
 	//
-	
-	//
-	//
-	//
-	//
-	//
 
     //
     // Caso estivermos em modo gráfico.
@@ -977,20 +971,23 @@ void _outbyte(int c)
  
 		if ( stdio_terminalmode_flag == 1 )
 		{
-			// NÃO TRANPARENTE
-            //se estamos no modo terminal então usaremos as cores 
-            //configuradas na estrutura do terminal atual.			
-			//draw_char( x, y, c, fgcolor, bgcolor );	
-			draw_char( 8*g_cursor_x, 8*g_cursor_y, c, COLOR_WHITE, COLOR_BLACK );	
+			// ## NÃO TRANPARENTE ##
+            // se estamos no modo terminal então usaremos as cores 
+            // configuradas na estrutura do terminal atual.
+            // Branco no preto é um padrão para terminal.			
+			// draw_char( x, y, c, fgcolor, bgcolor );	
+			//draw_char( 8*g_cursor_x, 8*g_cursor_y, c, COLOR_WHITE, COLOR_BLACK );
+            draw_char( 8*g_cursor_x, 8*g_cursor_y, c, COLOR_TERMINALTEXT, COLOR_TERMINAL );			
 			
 		}else{
 			
-			// TRANSPARENTE
-		   //se não estamos no modo terminal então usaremos
-		   //char transparente.			
-			//drawchar_transparent( x, y, color, c);
-			drawchar_transparent( 8*g_cursor_x, 8*g_cursor_y, COLOR_PINK, c);
-			
+			// ## TRANSPARENTE ##
+		    // se não estamos no modo terminal então usaremos
+		    // char transparente.
+            // Não sabemos o fundo. Vamos selecionar o foreground.			
+			// drawchar_transparent( x, y, color, c);
+			//drawchar_transparent( 8*g_cursor_x, 8*g_cursor_y, COLOR_PINK, c);
+			drawchar_transparent( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
 		};
 		
 		/*
@@ -1440,16 +1437,36 @@ void stdioInitialize()
 	
 	
 	//
-	// Inicializa o cursor com margens bem abertas.
+	//  ## Cursor ##
 	//
-		
-	g_cursor_left   = (0);
-	g_cursor_top    = (0);   
-	g_cursor_right  = (800/8);
+	
+	
+	// Inicializa o cursor com margens bem abertas.	
+	
+	g_cursor_left = (0);
+	g_cursor_top = (0); 
+
+	//@todo:
+	//Isso é complicado.
+	//Temos que pegar esses valores.
+	//g_cursor_width = ?;
+	//g_cursor_height = ?;	
+	
+	//precisamos saber as dimensões da tela e do char.
+	g_cursor_right = (800/8);
 	g_cursor_bottom = (600/8);
 	
-    g_cursor_x = g_cursor_left; 
+    //x e y.
+	g_cursor_x = g_cursor_left; 
 	g_cursor_y = g_cursor_top;  		
+	
+	// Default color.
+	// Não sabemos se o esquema de cores do sistema já
+	// está configurado, então usaremos uma cor padrão.
+	// A QUALQUER HORA O KERNEL PODE ESCREVER NO TERMINAL 
+	// E PARA USARMOS JANELAS PRETAS TEMOS QUE CONFIGURA A 
+	// COR DA FONTE, ENTÃO JANELAS TERÃO FONTE PRETA.
+	g_cursor_color = COLOR_TERMINALTEXT;
 	
 	
 	//

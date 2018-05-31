@@ -373,7 +373,7 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		//icon, cursor, cursor x, cursor y, bg etc...
 		window->CursorX = 0;
 		window->CursorY = 0;
-		window->CursorColor = COLOR_PINK;
+		window->CursorColor = COLOR_WINDOWTEXT; 
 		//@todo: As outras características do cursor.
 		//Características.
 		
@@ -1050,7 +1050,7 @@ drawBegin:
 		//@todo: Se estivermos em full screen, não teremos string.				   
 		draw_string( window->left +8 +16 +8, 
 		             window->top +8 +4, 
-					 COLOR_PINK,  //*test
+					 COLOR_WINDOWTEXT,  //*test
 					 window->name );  
 					 
 					 
