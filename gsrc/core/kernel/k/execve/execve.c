@@ -57,32 +57,72 @@ void executive_fntos(char *name)
 };
 */
 
+
 /*
  *****************************************************************
  * executive_gramado_core_init_execve:
  *     Executa um programa no processo INIT 
  * dentro do ambiente Gramado Core. 
  * #obs: Isso funcionou.
+ *
+ * IN:
+ * serviço, file name, arg, env.
+ *
  */
-int executive_gramado_core_init_execve( int i,              //serviço
-                                        const char *arg1,   //file name
-                                        const char *arg2,   //arg
-                                        const char *arg3 )  //env
+int 
+executive_gramado_core_init_execve( int i,              
+                                    const char *arg1,   
+                                    const char *arg2,   
+                                    const char *arg3 )  
 {
-	struct thread_d *Thread;
-    
-	//fail.
-	int Status = 1;
+	int Status = 1;  //fail.
 	
 	//Esse é o primeiro argumento.
 	int Plane;
+	
 	char *s;
+	struct thread_d *Thread;
+
 	
-	
+	//#debug
 	//printf("0=%s ",&argv[0]);
     //printf("1=%s ",&argv[1]);
     
 
+	//
+	// Testando carregar um programa para 
+	// rodar no processo INIT, usando a thread 
+	// primária do processo !
+	//
+	
+		
+	//origem e destino.
+	unsigned char *src = (unsigned char *) arg2; 
+	unsigned char *pipe = (unsigned char *) pipe_gramadocore_init_execve->_base; 
+	
+    
+	//?? funcionou ??
+	//pois o base era um char*
+	//memória compartilhada entre o kernel e o aplicativo.
+	//o aplicativo vai ler esse trem
+	//unsigned char* shared_memory = (unsigned char*) (0x401000-0x100); 
+	unsigned char* shared_memory = (unsigned char*) (0xC0800000 -0x100);
+
+    //#IMPORTANTE:
+    //PRECISAMOS ENVIAR A MENSAGEM SOMENTE DEPOIS QUE 
+    //O NOVO APLICATIVO FOR COLOCADO NA MEMÓRIA
+    //SENÃO AO COLOCAR O APLICATIVO NA MEMÓRIA A MENSAGEM 
+    //SERÁ SOBRESCRITA.	
+
+	
+	
+	//#debug
+	//printf("\nexecutive_gramado_core_init_execve: testing ...\n\n");
+	//printf(">>>fileneme={%s}\n",arg1);
+	//printf(">>>arg={%s}\n",arg2);
+	//printf(">>>env={%s}\n\n",arg3);
+	
+	
 	//...
 	
 	
@@ -104,42 +144,7 @@ int executive_gramado_core_init_execve( int i,              //serviço
 	//}
 	
 	//
-	// Testando carregar um programa para 
-	// rodar no processo INIT, usando a thread 
-	// primária do processo !
-	//
-	
-	printf("\nexecutive_gramado_core_init_execve: testing ...\n\n");
-	
-	printf(">>>fileneme={%s}\n",arg1);
-	printf(">>>arg={%s}\n",arg2);
-	printf(">>>env={%s}\n\n",arg3);
-	
-	
-	//origem.
-	unsigned char *src = (unsigned char *) arg2; 
-
-	//destino
-	unsigned char *pipe = (unsigned char *) pipe_gramadocore_init_execve->_base; 
-	
-    
-	//?? funcionou ??
-	//pois o base era um char*
-	//memória compartilhada entre o kernel e o aplicativo.
-	//o aplicativo vai ler esse trem
-	//unsigned char* shared_memory = (unsigned char*) (0x401000-0x100); 
-	unsigned char* shared_memory = (unsigned char*) (0xC0800000 -0x100);
-
-    //#IMPORTANTE:
-    //PRECISAMOS ENVIAR A MENSAGEM SOMENTE DEPOIS QUE 
-    //O NOVO APLICATIVO FOR COLOCADO NA MEMÓRIA
-    //SENÃO AO COLOCAR O APLICATIVO NA MEMÓRIA A MENSAGEM 
-    //SERÁ SOBRESCRITA.	
-
-	
-	
-	//
-	// ENVIADNO A MENSAGEM
+	// ENVIANDO A MENSAGEM
 	//
 	
 	
@@ -150,10 +155,10 @@ int executive_gramado_core_init_execve( int i,              //serviço
 	};
 	
  
-	
+	//#debug
 	//ok. isso funcionou.
-	printf("Showpipe={%s}\n",pipe);
-	printf("Showsharedmemory={%s}\n",shared_memory);	 
+	//printf("Showpipe={%s}\n",pipe);
+	//printf("Showsharedmemory={%s}\n",shared_memory);	 
 	
 	
 	//
@@ -164,10 +169,14 @@ int executive_gramado_core_init_execve( int i,              //serviço
 	Thread = (struct thread_d *) threadList[0];
 	if( (void*) Thread == NULL )
 	{
+		printf("executive_gramado_core_init_execve: Thread\n");
 		goto fail;
 	}else{
 		
-		if( Thread->used != 1 || Thread->magic != 1234 ){
+		if( Thread->used != 1 || 
+		    Thread->magic != 1234 )
+		{
+			printf("executive_gramado_core_init_execve: used magic\n");
 			goto fail;
 		}
 		
@@ -218,6 +227,7 @@ int executive_gramado_core_init_execve( int i,              //serviço
 		if( l > 11 )
 		{
 		    printf("executive_gramado_core_init_execve: File too long!\n");	
+			//Obs: Não sairemos da função pois isso é um teste ainda.
 		}else{
 			
 			
@@ -238,10 +248,11 @@ int executive_gramado_core_init_execve( int i,              //serviço
                     if( l > 8 )
 					{
 						printf("executive_gramado_core_init_execve: File without ext is too long!\n");
+					    //Obs: Não sairemos da função pois isso é um teste ainda.
 					}
 					
 					char bin_string[] = ".bin";
-		            strcat( (char *)arg1, (const char *)bin_string);
+		            strcat( (char *)arg1, (const char *) bin_string );
 			    };
 			 
 		};
@@ -267,14 +278,31 @@ int executive_gramado_core_init_execve( int i,              //serviço
 		{
 			// @todo:
 			// Configurar estrutura.
+			printf("executive_gramado_core_init_execve: Status\n");
+			printf("Can't load file.\n");
 			goto fail;
 		};
 		
 		// Se deu certo.
+		// Conseguimos carregar o arquivos.
+		// Devemos checar a validade do arquivo na memória.
 		if( Status == 0 )
 		{
-		    queue_insert_data(queue, (unsigned long) Thread, QUEUE_INITIALIZED);
-            SelectForExecution(Thread);    // * MOVEMENT 1 ( Initialized ---> Standby ).
+			//checar
+			//#bugbug: Não deve existir suporte a PE dentro do kernel.
+			//PE é proprietário.
+			Status = (int) fsCheckPEFile( (unsigned long) 0x00400000 );
+			if( Status == 0 )
+			{
+				printf("executive_gramado_core_init_execve: Status\n");
+			    printf("It's not a valid PE file.\n");
+			}
+			
+		    queue_insert_data( queue, 
+			    (unsigned long) Thread, QUEUE_INITIALIZED );
+            
+			// * MOVEMENT 1 ( Initialized ---> Standby ).
+			SelectForExecution(Thread);    
             goto done; 
         };	
          
@@ -284,7 +312,7 @@ int executive_gramado_core_init_execve( int i,              //serviço
 	//fail
 	
 fail:
-    printf("fail ");
+    printf("fail\n");
 done:
 	
 	//refresh_screen();
@@ -292,10 +320,10 @@ done:
 	//	asm("hlt");
 	//}
 	//	
-
-
-
-    printf("done\n");	
+    
+	//#debug
+	//printf("done\n");	
+	
 	refresh_screen();
 	return (int) Status;	
 };
@@ -307,6 +335,8 @@ void executiveMain(){
 	return;
 };
 */
+
+
 
 /*
  * executive_config_exported_functions:
@@ -347,18 +377,22 @@ done:
 
 */
 
+
 /*
+ *************************************
  * sys_showkernelinfo:
  *     Show kernel info.
  */
-void sys_showkernelinfo()
+void 
+sys_showkernelinfo()
 {
 	KiInformation();
-	return;
 };
 
 
+
 /*
+ ************************************************
  * init_executive:
  *     Initialize the kernel executive.
  *     Archtecture (independent) inicialization. 
@@ -395,6 +429,7 @@ Done:
 int executiveInit()
 {};
 */
+
 
 //
 // End.

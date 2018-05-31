@@ -726,6 +726,12 @@ unsigned long color         //12 - color (bg) (para janela simples)
             //Deixaremos a rotina de desenahr o botão fazer tudo por enquanto.			
 			break;	
 			
+		//9) Status bar.	
+		case WT_STATUSBAR:
+	        Background = 1;    //bg.
+	        window->backgroundUsed = 1;
+		    break;
+			
 		//barra de rolagem
 		//botões de radio .. 
 		//...

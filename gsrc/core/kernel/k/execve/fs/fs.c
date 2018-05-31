@@ -51,6 +51,26 @@
 //...
 
 
+
+int fsCheckPEFile( unsigned long address )
+{
+	unsigned char *buffer = (unsigned char *) address;
+	
+	//i386
+	if( buffer[0] != 0x4C || buffer[1] != 0x01 )
+	{
+		printf("fsCheckPEFile: Sig\n");
+		goto fail;
+	}
+	
+done:	
+	return (int) 0;
+fail:
+    printf("fail\n");
+    return (int) 1;
+};
+
+
 /*
  * fsListFiles:
  *     Lista os arquivos em um diretório, dados

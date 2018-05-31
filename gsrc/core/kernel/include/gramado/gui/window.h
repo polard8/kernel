@@ -156,8 +156,8 @@ int window_getch();
 #define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
 #define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
 #define WT_EDITBOX_MULTIPLE_LINES 7
-#define WT_BUTTON 8    //#test
-//button (control)
+#define WT_BUTTON 8   
+#define WT_STATUSBAR 9
 //... 
 
 
@@ -1422,6 +1422,9 @@ struct window_d
 	struct window_d *scrollbar;
 	
 	
+	// status bar
+	struct window_d *statusbar;	
+	
 	// Buffer para mensagens pequenas.
     // Será usado pelo produtor e pelo consumidor.
     // char read_buf[WINDOW_MSG_BUFFER_SIZE];
@@ -2326,7 +2329,7 @@ void SetGuiParameters( int refresh,
 // Bars support. (menubar)
 //
 
-int 
+struct window_d*
 StatusBar( struct window_d *window, 
            unsigned char *string1, 
 		   unsigned char *string2 );

@@ -761,13 +761,22 @@ int fatbits;
 unsigned short file_cluster_list[1024]; 
 
 
+
+
+//
+// ## Prototypes ##
+//
+
+
 /*
  * Initialization support.
  */
 int fsInit();
-void fsFAT16ListFiles( const char *dir_name, 
-                       unsigned short *dir_address, 
-					   int number_of_entries );
+
+void 
+fsFAT16ListFiles( const char *dir_name, 
+                  unsigned short *dir_address, 
+				  int number_of_entries );
 
 //MBR support.
 void fsCheckMbrFile( unsigned char *buffer );
@@ -894,10 +903,23 @@ void salva_nome( unsigned char *file_name,
 				 unsigned long eid, 
 				 unsigned long cluster_inicial);//exec
 
-unsigned long fatClustToSect(unsigned short cluster, unsigned long spc, unsigned long first_data_sector);
-void fatLoadCluster(unsigned long sector, unsigned long address, unsigned long spc);
-void fatWriteCluster(unsigned long sector, unsigned long address, unsigned long spc); 
-void MountShortFileName(char *buffer, struct dir_entry_d *entry);
+unsigned long 
+fatClustToSect( unsigned short cluster, 
+                unsigned long spc, 
+				unsigned long first_data_sector );
+
+void fatLoadCluster( unsigned long sector, 
+                     unsigned long address, 
+					 unsigned long spc );
+					 
+void fatWriteCluster( unsigned long sector, 
+                      unsigned long address, 
+					  unsigned long spc );
+					  
+void 
+MountShortFileName( char *buffer, 
+                    struct dir_entry_d *entry );
+
 void fs_check_disk();
 
 void fsCreateVFS();
@@ -915,7 +937,11 @@ findEmptyDirectoryEntry( unsigned long dir_address,
                          int number_of_entries );
 				  
 				  
+//Modificador de string.
 void read_fntos(char *name);
+				  
+				  
+int fsCheckPEFile( unsigned long address );				  
 				  
 //
 // End.
