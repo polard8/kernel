@@ -339,9 +339,7 @@ int windowInitializeBrowserSupport()
    
     if( bt->used != 1 || bt->magic != 1234 ){
 	    printf("windowInitializeBrowserSupport: bt fail");
-		die();
-		//refresh_screen();
-	    //while(1){};			
+		die();		
 	}
 
 
@@ -488,18 +486,24 @@ void *GetWindowDesktop(struct window_d * hwnd)
 
 
 /*
- * ===============================================================
+ * =====================================================
  * windowSetUpColorScheme:
- *     Isso configura os esquemas de cores utilizados pelo sistema.
- *     O esquema de cores a ser utilizado deve estar salvo no perfil
- * do usuário que fez o logon.
+ *     Isso configura os esquemas de cores utilizados 
+ * pelo sistema.
+ *     Essa rotina é chamada apenas uma vez na inicialização
+ * do kernel.
+ *     O esquema de cores a ser utilizado deve estar 
+ * salvo no perfil do usuário que fez o logon.
  * Os dois esquemas padrão chamam-se: 'humility' e 'pride'.
- * + O esquema 'humility' são cores com tema cinza, lembrando interfaces antigas.
+ * + O esquema 'humility' são cores com tema cinza, 
+ * lembrando interfaces antigas.
  * + O esquema 'pride' são cores modernas 
- *   ( Aquele verde e preto e cinza, das primeiras versões, com imagens publicadas. )
- * @todo: é preciso criar rotinas que selecionem entre os modo criados e habilitados.
- * é preciso criar rotinas que permitam que aplicativos em user mode criem esquemas de 
- * de cores e habilite eles.
+ *   ( Aquele verde e preto e cinza, das primeiras versões, 
+ * com imagens publicadas. )
+ * @todo: é preciso criar rotinas que selecionem entre os 
+ * modo criados e habilitados.
+ * É preciso criar rotinas que permitam que aplicativos 
+ * em user mode criem esquemas de cores e habilite eles.
  */
 void windowSetUpColorScheme(int type)
 {	
@@ -570,13 +574,13 @@ void windowSetUpColorScheme(int type)
         pride->elements[csiDesktop] = COLOR_BACKGROUND; //0x00808000 verde escuro.
 		pride->elements[csiWindow] = COLOR_WINDOW;
         pride->elements[csiWindowBackground] = xCOLOR_GRAY1;
-		pride->elements[csiActiveWindowBorder] = 0x0080FFFF;
-        pride->elements[csiInactiveWindowBorder] = 0x0080FFFF;  //(LIGHT GREEN) 
+		pride->elements[csiActiveWindowBorder] = 0x0080FFFF; //(LIGHT GREEN) 
+        pride->elements[csiInactiveWindowBorder] = 0x0080FFFF;  
 		pride->elements[csiActiveWindowTitleBar] = 0x0080FFFF;    
         pride->elements[csiInactiveWindowTitleBar] = 0x0080FFFF;		
 		pride->elements[csiMenuBar] = COLOR_GRAY;
         pride->elements[csiScrollBar] = COLOR_GRAY;		
-		pride->elements[csiStatusBar] = 0x00404040;  //COLOR_STATUSBAR;  //#404040 cinza #FFFFFF branco
+		pride->elements[csiStatusBar] = 0x00404040;  
         pride->elements[csiMessageBox] = COLOR_GRAY;
 		pride->elements[csiSystemFontColor] = COLOR_BLACK;    //12
 		pride->elements[csiTerminalFontColor] = COLOR_WHITE;  //13		
@@ -619,6 +623,73 @@ void windowSetUpColorScheme(int type)
 
 done:	
 	return;
+};
+
+//seleciona o tipo ...isso é um serviço.
+int windowSelectColorScheme( int type )
+{
+	printf("windowSelectColorScheme: type={%d} \n", type);
+	
+    switch(type)
+	{
+		case ColorSchemeHumility:
+		    goto do_humility;
+		    break;
+			
+		case ColorSchemePride:
+		    goto do_pride;
+			break;
+			
+		default:
+		    printf("windowSelectColorScheme: Type not defined\n");
+			goto fail;
+			break;
+	};
+
+	
+	
+do_humility:
+    if( (void *) HumilityColorScheme == NULL )
+    {
+		printf("HumilityColorScheme fail\n");
+        goto fail;     	    	
+	}else{
+	    if(	HumilityColorScheme->used != 1 || 
+		    HumilityColorScheme->magic != 1234 )
+		{
+			printf("HumilityColorScheme sig fail\n");
+			goto fail;
+		}
+		
+		printf("Humility selected\n");
+	    CurrentColorScheme = HumilityColorScheme;	
+	    goto done;
+	};		
+	
+	
+do_pride:	
+    if( (void *) PrideColorScheme == NULL )
+    {
+		printf("PrideColorScheme fail\n");
+        goto fail;     	    	
+	}else{
+	    if(	PrideColorScheme->used != 1 || 
+		    PrideColorScheme->magic != 1234 )
+		{
+			printf("PrideColorScheme sig fail\n");
+			goto fail;
+		}
+		
+	    printf("Pride selected\n"); 
+		CurrentColorScheme = PrideColorScheme;	
+	    goto done;
+	};		
+
+done:
+    return (int) 0;	
+fail:
+    printf("fail\n");
+    return (int) 1;	    
 };
 
 

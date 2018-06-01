@@ -181,7 +181,7 @@ int videoInit()
 	// Configuração inicial em modo gráfico.
 	//
 	
-	if(g_useGUI == 1 || VideoBlock.useGui == 1)
+	if( g_useGUI == 1 || VideoBlock.useGui == 1 )
 	{
 	    g_useGUI = 1;
 		VideoBlock.useGui = 1;
@@ -236,7 +236,7 @@ int videoInit()
 		g_cursor_width = 8;
 		g_cursor_height = 8;
 		
-		g_cursor_color = COLOR_PINK;
+		g_cursor_color = COLOR_TERMINALTEXT;
         
 		//@todo; Criar defines para default.
 		g_cursor_left = 0;      // Margem esquerda dada em linhas.

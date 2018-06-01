@@ -1599,16 +1599,13 @@ done:
  */
 void systemShowDevicesInfo()
 {
-	//
-	//
-	//
 	
 #ifdef KERNEL_VERBOSE	
 	printf("sm-sys-system-systemShowDevicesInfo:\n");
 #endif	
 	
     //Título.
-	printf(" == DEVICES: == \n\n");
+	printf(" ## DEVICES ## \n");
     //...	
 	
 	//CPU Devices.

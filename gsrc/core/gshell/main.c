@@ -499,16 +499,11 @@ noArgs:
 
     //
 	// Criando a janela WT_OVERLAPPED.
-	//
-	
-	//hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
-	//                                   shell_window_x, shell_window_y, 
-	//								   shellWindowWidth, shellWindowHeight,    
-    //                                   0, 0, COLOR_BLACK, 0x83FCFF );	   
+	// 
 									   
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
-	                                   0, (8*3), 
-									   (800/2), (600-(8*3)),    
+	                                   (8*1), (8*3), 
+									   (800/3)*2, (600/3)*2,    
                                        0, 0, COLOR_BLACK, 0x83FCFF );	   
 
 	if((void*) hWindow == NULL)
@@ -1780,6 +1775,47 @@ do_compare:
         cls_builtins();
         goto exit_cmp;
 	};
+	
+	
+	// color
+	// color-scheme
+	// Seleciona um dos 2 modos de cores padrão do sistema.
+    if( strncmp( prompt, "color", 5 ) == 0 || 
+	    strncmp( prompt, "color-scheme", 12 ) == 0 )
+	{
+
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL )
+		{
+			printf("No args\n");
+			goto exit_cmp;
+		}else{
+            
+			//humility
+			if( strncmp( (char*) tokenList[i], "-humility", 9 ) == 0 )
+			{ 
+		        printf("Selecting Humility color scheme\n"); 
+                system_call(119, (unsigned long)1, (unsigned long)1, (unsigned long)1);
+				printf("done\n");
+                goto exit_cmp;				
+			}
+			
+			//pride
+			if( strncmp( (char*) tokenList[i], "-pride", 6 ) == 0 )
+			{
+				printf("Selecting Pride color scheme\n");
+                system_call(119, (unsigned long)2, (unsigned long)2, (unsigned long)2);
+                printf("done\n");
+				goto exit_cmp;				
+			}
+			
+			// Talvez haverão mais esquemas ...
+			//...
+		};
+		goto exit_cmp;
+    };		
 	
 	// copy
 	if( strncmp( prompt, "copy", 4 ) == 0 ){

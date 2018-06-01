@@ -337,9 +337,9 @@ int window_getch();
 //enumerando os esquemas de cores. 
 // temos 2 tipos de esquema de cores.
 typedef enum {
-	ColorSchemeNull,      // Null.
-	ColorSchemeHumility,  // Gray stuff.
-	ColorSchemePride,     // Colorful.
+	ColorSchemeNull,      // 0 - Null.
+	ColorSchemeHumility,  // 1 - Gray stuff.
+	ColorSchemePride,     // 2 - Colorful.
 	//...
 }ColorSchemeType;	
 
@@ -2669,6 +2669,7 @@ void windowShowWWFMessageBuffers(); //mostra o buffer de mensagens da janela com
 
 //color support.
 void windowSetUpColorScheme(int type);
+int windowSelectColorScheme( int type );
 
 /*Inicialização do sistema de suporte ao navegador shell*/
 int windowInitializeBrowserSupport();

@@ -221,10 +221,14 @@
 //para colocarmos os 4 elementos da mensagem
 //window.msg.long1.long2
 #define	SYS_115 115  //  ## message  ## 
+
 #define	SYS_116 116
 #define	SYS_117 117
 #define	SYS_118 118
-#define	SYS_119 119
+
+//119 - select color scheme
+#define	SYS_SELECTCOLORSCHEME 119
+
 //120-125 bars
 #define	SYS_CREATEMENUBAR   120    
 #define	SYS_CREATETASKBAR   121    

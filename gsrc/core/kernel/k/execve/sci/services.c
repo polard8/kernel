@@ -850,6 +850,12 @@ void *services( unsigned long number,
 			//return (void*) wFocus->msg;	
 			
 			break;
+			
+		//119
+		case SYS_SELECTCOLORSCHEME:
+		    printf("Service 119\n");
+		    return (void *) windowSelectColorScheme( (int) arg2 );
+			break;
 		
 		//
 		// 129, Um driver confirmando que foi inicializado.
