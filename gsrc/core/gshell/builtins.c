@@ -18,17 +18,14 @@
 void cd_buitins()
 {
 	printf("cd_buitins:\n");
-	return;
 };
 
 
 //cls
 void cls_builtins()
 {
-	//@todo
     shellClearScreen();
-    shellSetCursor(0,0);
-	shellPrompt();	
+    shellSetCursor(0,0);	
 };
 
 

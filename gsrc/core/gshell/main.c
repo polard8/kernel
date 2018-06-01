@@ -502,17 +502,13 @@ noArgs:
 	// 
 									   
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
-	                                   (8*1), (8*3), 
-									   (800/3)*2, (600/3)*2,    
-                                       0, 0, COLOR_BLACK, 0x83FCFF );	   
+	                      (8*1), (8*3), 
+						  800-(8*2), 600-(8*7),    
+                           0, 0, COLOR_BLACK, 0x83FCFF );	   
 
-	if((void*) hWindow == NULL)
-	{	
-		printf("Shell: Window fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
+	if((void*) hWindow == NULL){	
+		die("shell.bin: hWindow fail");
+	}
 	
 	/*
 	 Imprimindo o ponteiro para a estrutura da janela criada 
@@ -2618,6 +2614,11 @@ fail:
 	refresh_screen(); 	
 	return (unsigned long) 1;
 	
+	
+//
+// ## EXIT CMP ##
+//	
+
 exit_cmp:
 
 	// Limpando a lista de argumentos.
@@ -3134,10 +3135,11 @@ done:
 	    printf("password:\n");
 	    gets(sPassword);
 	
+#ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s}",sUsername,sPassword);
 		printf("\n");
-		
+#endif
 		
 		char *c = (char*) &user_stream->_base[0];		
 		
@@ -3182,12 +3184,16 @@ done:
 			//printf("%c", buffer[3]);
 			//printf("\n");
 			
+#ifdef SHELL_VERBOSE			
 			printf(">>%s\n", sUsername);
 			printf(">>%s\n", buffer);
+#endif
 			
             if( strncmp( sUsername, buffer, 4 ) == 0 )
             {
+#ifdef SHELL_VERBOSE				
 				printf("  ## USERNAME OK  ##\n");
+#endif				
 				login_status = 1;
 			}else{
 				printf("  ## USERNAME FAIL  ##\n");
@@ -3197,6 +3203,7 @@ done:
         }else{
 			
 			printf("USERNAME={ fail\n");
+			login_status = 0;
 		};
 
 
@@ -3225,13 +3232,16 @@ done:
 			    buffer[i] = c[i];
 		    }
 
-
+#ifdef SHELL_VERBOSE				
 			printf(">>%s\n", sPassword);
 			printf(">>%s\n", buffer);
+#endif			
 			
             if( strncmp( sPassword, buffer, 4 ) == 0 )
             {
+#ifdef SHELL_VERBOSE								
 				printf("  ## PASSWORD OK  ##\n");
+#endif
 				login_status = 1;
 			}else{
 				printf("  ## PASSWORD FAIL  ##\n");
@@ -3240,13 +3250,15 @@ done:
 			
 			
 		}else{
-		    printf("PASSWORD={ fail\n");	
+		    printf("PASSWORD={ fail\n");
+            login_status = 0; 			
 		};
 		
-		
+#ifdef SHELL_VERBOSE
 		printf("Login done!\n");
-		
-    };
+#endif
+    
+	};
 	
 	//
 	// @todo:
@@ -3571,7 +3583,7 @@ void shellTestThreads()
 
 
 /*
- *************************************************
+ *************************************
  * shellClearScreen:
  *     Limpar a tela do shell.
  *     usada pelo comando 'cls'.
@@ -3592,8 +3604,8 @@ void shellClearScreen()
 	// Shell buffer.
 	for( i=0; i<(SCREEN_BUFFER_SIZE/2); i++ )
 	{
-	    screen_buffer[ 2*i ] = ' ';     //char 
-		screen_buffer[ 2*i +1] = 0x7; //atributo 
+	    screen_buffer[ 2*i ] = ' ';    //char 
+		screen_buffer[ 2*i +1] = 0x7;  //atributo 
 	};
 	
 	//
@@ -3606,8 +3618,10 @@ void shellClearScreen()
 
 
 /*
+ *******************************************
  * shellRefreshScreen:
- *     Copia o conteúdo do buffer de output para a tela. (dentro da janela).
+ *     Copia o conteúdo do buffer de output 
+ * para a tela. (dentro da janela).
  *
  */
 void shellRefreshScreen()

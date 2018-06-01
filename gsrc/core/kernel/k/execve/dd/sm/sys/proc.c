@@ -986,7 +986,10 @@ unsigned long SendMessage( struct window_d *window,
 };
 
 
+
+
 /*
+ *********************************************
  * procedureHelp:
  *     Mensagem de ajuda ao usuário.
  */
@@ -994,83 +997,121 @@ void procedureHelp()
 { 
 	struct window_d *hWindow; 		
 	
+	unsigned long left;
+	unsigned long top;    
+	unsigned long width;  
+	unsigned long height; 	
+	
+	if( VideoBlock.useGui != 1 )
+	{
+		printf("procedureHelp: no GUI\n");
+		goto fail;
+	}	
+	
 	//Parent window.
-	if( (void*) gui->main == NULL){
-	    return;
+	
+	if( (void*) gui->main == NULL )
+	{
+		printf("procedureHelp: parent window fail\n");
+	    goto fail;
+	}else{
+		
+
+	    left = 20;  // gui->main->left;
+	    top = 20;  // gui->main->top;
+	    
+		width = 240; // gui->main->width;
+	    height = 200; // gui->main->height;		
+		
+		//...
+
+	    g_cursor_x = (left/8);
+	    g_cursor_y = (top/8); 
+		
 	};
 	
-	unsigned long left   = 20;  // gui->main->left;
-	unsigned long top    = 20;  // gui->main->top;
-	unsigned long width  = 240; // gui->main->width;
-	unsigned long height = 200; // gui->main->height;
+
+	//backgroundDraw(COLOR_BACKGROUND);	
 	
-	g_cursor_x = (left/8);
-	g_cursor_y = (top/8); 
-	
-	//backgroundDraw(COLOR_BACKGROUND);
+	//
+	// ## Window ##
+	//	
 	
 	//VIEW_MAXIMIZED
 	//Create.
-	hWindow = (void*) CreateWindow( 3, 0, VIEW_NORMAL, "{} procedureHelp:", 
-	                                left, top, width, height, 
-							        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR );     
-	if( (void*) hWindow == NULL){
-	    printf("procedureHelp:\n");
-		return;
+	hWindow = (void*) CreateWindow( 3, 0, VIEW_NORMAL, "procedureHelp", 
+	                  left, top, width, height, 
+					  gui->main, 0, 
+					  KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, 
+					  KERNEL_WINDOW_DEFAULT_BGCOLOR );
+					  
+	if( (void*) hWindow == NULL )
+	{
+	    printf("procedureHelp: hWindow\n");
+		goto fail;
     }else{
 		RegisterWindow(hWindow);
+        
+		//Coloca as mensagens na janela.	
+	    //Somente se tivermos uma janela válida. 
+	
+	    draw_text( hWindow, 8,  2*(height/20), 
+	        COLOR_WINDOWTEXT, "F1 Help.");
+        draw_text( hWindow, 8,  3*(height/20), 
+	        COLOR_WINDOWTEXT, "F2 Kernel info.");
+	    draw_text( hWindow, 8,  4*(height/20), 
+	        COLOR_WINDOWTEXT, "F3 CPU info.");
+	    draw_text( hWindow, 8,  5*(height/20), 
+	        COLOR_WINDOWTEXT, "F4 Window tests.");
+	    draw_text( hWindow, 8,  6*(height/20), 
+	        COLOR_WINDOWTEXT, "F5 Device info.");
+	    draw_text( hWindow, 8,  7*(height/20), 
+	        COLOR_WINDOWTEXT, "F6 Clock info.");
+	    draw_text( hWindow, 8,  8*(height/20), 
+	        COLOR_WINDOWTEXT, "F7 MessageBox.");
+	    draw_text( hWindow, 8,  9*(height/20), 
+	        COLOR_WINDOWTEXT, "F8 Cls.");
+	    draw_text( hWindow, 8, 10*(height/20), 
+	        COLOR_WINDOWTEXT, "F9 Reboot.");
+	    draw_text( hWindow, 8, 11*(height/20), 
+	        COLOR_WINDOWTEXT, "F10 Task Manager.");
+	    draw_text( hWindow, 8, 12*(height/20), 
+	        COLOR_WINDOWTEXT, "F11 Program manager.");
+        draw_text( hWindow, 8, 13*(height/20), 
+	        COLOR_WINDOWTEXT, "F12 Tests");	
+	
+	    //...
 	};
 	
-//Coloca as mensagens na janela.
-messages: 
-	draw_text( hWindow, 8,  2*(height/20), 
-	           COLOR_WINDOWTEXT, "F1 Help.");
-    draw_text( hWindow, 8,  3*(height/20), 
-	           COLOR_WINDOWTEXT, "F2 Kernel info.");
-	draw_text( hWindow, 8,  4*(height/20), 
-	           COLOR_WINDOWTEXT, "F3 CPU info.");
-	draw_text( hWindow, 8,  5*(height/20), 
-	           COLOR_WINDOWTEXT, "F4 Window tests.");
-	draw_text( hWindow, 8,  6*(height/20), 
-	           COLOR_WINDOWTEXT, "F5 Device info.");
-	draw_text( hWindow, 8,  7*(height/20), 
-	           COLOR_WINDOWTEXT, "F6 Clock info.");
-	draw_text( hWindow, 8,  8*(height/20), 
-	           COLOR_WINDOWTEXT, "F7 MessageBox.");
-	draw_text( hWindow, 8,  9*(height/20), 
-	           COLOR_WINDOWTEXT, "F8 Cls.");
-	draw_text( hWindow, 8, 10*(height/20), 
-	           COLOR_WINDOWTEXT, "F9 Reboot.");
-	draw_text( hWindow, 8, 11*(height/20), 
-	           COLOR_WINDOWTEXT, "F10 Task Manager.");
-	draw_text( hWindow, 8, 12*(height/20), 
-	           COLOR_WINDOWTEXT, "F11 Program manager.");
-    draw_text( hWindow, 8, 13*(height/20), 
-	           COLOR_WINDOWTEXT, "F12 Tests");
+
+
 			   
 			   
 
 		
-    //
-    // Testing Status Bar
-    //
-    
-	StatusBar( hWindow, "Esc=EXIT", "Enter=?" );
+    //#bugbug:
+    //O que queremos é apenas atualizar as strings
+    //na status bar existente enão criar uma status bar.    
+	//UpdateStatusBar( hWindow, "Esc=EXIT", "Enter=?" );
 	
 	
 	//
 	// @todo: Habilitar o procedimento de janela.
 	//
+	
+	
+	
+	goto done;
 		
-//Done.
+		
+fail:		
+    printf("fail\n");
 done:
-	if(VideoBlock.useGui == 1)
-	{    
-		//@todo: 
-		//Devemos dar o refresh somente da janela.
-		refresh_screen();
-	};
     SetFocus(hWindow);
+   
+	//@todo: 
+	//Devemos dar o refresh somente da janela.
+	refresh_screen();
     return;
 };
 

@@ -303,7 +303,8 @@ unsigned long color         //12 - color (bg) (para janela simples)
 		die();
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 )
+		if( CurrentColorScheme->used != 1 || 
+		    CurrentColorScheme->magic != 1234 )
 		{
 		    printf("CreateWindow: CurrentColorScheme validation");
 		    die();			
@@ -1360,12 +1361,21 @@ drawBegin:
 	
 	if(window->type == WT_OVERLAPPED)
 	{
-        window->scrollbar = CreateWindow( WT_SCROLLBAR, 1, 1, "scroll-test", 
+		//scrollbar
+        window->scrollbar = CreateWindow( WT_SCROLLBAR, 1, 1, "scrollbar-test", 
 	                            window->right -24, window->top+25, 
-								24, window->height-25,									  
+								24, window->height-25-25,									  
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar], 
-								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);		
+								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);
+
+        //status bar.
+		window->statusbar = CreateWindow( WT_STATUSBAR, 1, 1, "statusbar-test", 
+	                            window->left, window->bottom-25, 
+								window->width, 25,									  
+					            window, 0, 
+								(unsigned long) CurrentColorScheme->elements[csiStatusBar], 
+								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);								
 	};
 
 	

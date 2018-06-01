@@ -519,7 +519,28 @@ color_scheme_t PrideColorScheme;    // Colorido.
 /*
  * Cores usadas nessa sistema.
  */
-#define COLOR_TEXT                0x00000000  //default
+ 
+// Preto. 
+//50% 	#808080
+//45% 	#737373
+//40% 	#666666
+//35% 	#595959
+//30% 	#4d4d4d
+//25% 	#404040
+//20% 	#333333
+//15% 	#262626
+//10%   #1a1a1a
+//5%    #0d0d0d
+//0%    #000000
+ 
+ 
+//#Default 
+//...
+#define COLOR_TEXT2  0x00404040   //25%
+#define COLOR_TEXT1  0x00333333   //20% 
+#define COLOR_TEXT   COLOR_TEXT1 
+//#define COLOR_TEXT  0x00000000  
+
 #define COLOR_WINDOW              0x00FFFFFF
 #define COLOR_BLACK               0x000000
 #define COLOR_WHITE               0xFFFFFF 

@@ -530,6 +530,7 @@ void windowSetUpColorScheme(int type)
 		humility->magic = 1234;
 		humility->name = "Humility";
 		
+		//Colors
 		humility->elements[csiNull] = 0;                               //0
         humility->elements[csiDesktop] = COLOR_BACKGROUND;             //1		
 		humility->elements[csiWindow]  = COLOR_WINDOW;                 //2
@@ -569,7 +570,7 @@ void windowSetUpColorScheme(int type)
 		pride->magic = 1234;
 		pride->name = "Pride";
 		
-		//@todo:
+		//Colors
 		pride->elements[csiNull] = 0;
         pride->elements[csiDesktop] = COLOR_BACKGROUND; //0x00808000 verde escuro.
 		pride->elements[csiWindow] = COLOR_WINDOW;

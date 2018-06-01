@@ -16,12 +16,32 @@
 
 
 /*
+int UpdateStatusBar( struct window_d *window, 
+                     unsigned char *string1, 
+		             unsigned char *string2 );
+
+int UpdateStatusBar( struct window_d *window, 
+                     unsigned char *string1, 
+		             unsigned char *string2 )
+{
+	//@todo:
+	//atualizar as strings de uma status bar caso
+	//a janela tenha uma status bar.
+};
+*/
+
+
+/*
  ************************************************
  * StatusBar:
  *     Desenha uma status bar, dada a janela, 
  * encontramos o retângula da área de cliente.
  *     @todo: Acrescentar uma borda delicada, 
  * usar outra cor, próximo do branco.
+ *
+ * O tamanho da status bar deve ser to tamanho da 
+ * largura da janela. A scroll bar não deve invadir 
+ * o espaço da status bar.
  */
 struct window_d*
 StatusBar( struct window_d *window, 
@@ -46,11 +66,11 @@ StatusBar( struct window_d *window,
 	//  ## Parent Window ##
 	//
 	
-	if( (void*) pWnd== NULL )
+	if( (void*) pWnd == NULL )
 	{
 		printf("StatusBar: pWnd\n");
         goto fail;
-		//return (int) 1;
+
     }else{
 				
 	    // A Status bar é um elemento dentro da janela.
@@ -59,7 +79,6 @@ StatusBar( struct window_d *window,
 		{
 			printf("StatusBar: pWnd->rcClient\n");
 		    goto fail;
-			//return (int) 1;
 	    }
 		
 		//magic
@@ -68,7 +87,6 @@ StatusBar( struct window_d *window,
 	    {
 			printf("StatusBar: used magic\n");
 		    goto fail;
-			//return (int) 1;
 	    }		
 		
 		
@@ -171,7 +189,7 @@ ColorSchemeSupport:
 				   string2 );
 				   
 				   
-		//seleciona a statusbar da parent window.
+		// Seleciona a statusbar da parent window.
 		pWnd->statusbar = hWnd;		   
       
 	  

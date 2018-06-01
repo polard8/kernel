@@ -181,8 +181,10 @@ void KiShowThreadList()
  * mostra_slots:
  *
  * @todo:
- * Obs: Estamos mostrando informações sobre todos os processos e todas threads.
- * Porém esse arquivo é para lidar com threads, então a torina de lidar com processos
+ * Obs: Estamos mostrando informações sobre todos 
+ * os processos e todas threads.
+ * Porém esse arquivo é para lidar com threads, 
+ * então a torina de lidar com processos
  * deve ir pra outro arquivo.
  */
 void mostra_slots()
@@ -217,7 +219,7 @@ void mostra_slots()
 	//
 	// Testando o for para threads.
 	//
-	printf(" \n\n ## Thread info ## \n\n");
+	printf("\n ## Thread info ## \n");
 	
 Scan:	
 	for( i=0; i<THREAD_COUNT_MAX; i++)
@@ -230,10 +232,12 @@ Scan:
 				t->magic == 1234 )
 	    {
 			//@todo: Melhorar isso.
-		    printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d} Handle={%x} Name={%s}\n\n",
+		    printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d}" 
+			    "Handle={%x} Name={%s}\n\n",
 		        t->tid, t->step, t->ownerPID, t->process, 
 				t->state, (void*) t, t->name_address );
-	    };
+	        //...
+		};
     };
     
 	
@@ -260,18 +264,20 @@ void mostra_slot(int id)
     struct thread_d *t;
 
 	// Limits.
-    if(id < 0 || id >= THREAD_COUNT_MAX){
+    if( id < 0 || id >= THREAD_COUNT_MAX )
+	{
 	    printf("pc-threadi-mostra_slot: id\n");
-		return;
+		goto fail;
 	};
 	
 	
 	// Structure.
 	t = (void *) threadList[id];
 	
-	if( (void*) t == NULL){
+	if( (void*) t == NULL )
+	{
 	    printf("pc-threadi-mostra_slot: t\n");
-		return;	
+		goto fail;	
 	}else{
 	
 	    // Show one slot.
@@ -285,9 +291,13 @@ void mostra_slot(int id)
 														         ,t->state
 														         ,t->name_address);
 	};
-															 
+	
+    goto done;
+
+	
+fail:	
+    printf("fail\n");	
 done:
-    printf("Done\n");
     return; 
 };
 
@@ -310,27 +320,38 @@ void mostra_reg(int id)
     struct thread_d *t; 
 
 	// Limits.
-    if(id < 0 || id >= THREAD_COUNT_MAX){
-	    return;
+    if( id < 0 || id >= THREAD_COUNT_MAX )
+	{
+	    goto fail;
 	};
 	
 	// Structure.
     t = (void *) threadList[id];
 	
-	if( (void*) t == NULL){
-	    return;
+	if( (void*) t == NULL )
+	{
+	    goto fail;
 	};
     	
 	// Show registers.	
     printf("\n");
-	printf("eflags=[%x]\n",t->eflags);
-	printf("cs:eip=[%x:%x]\n",t->cs ,t->eip );
-	printf("ss:esp=[%x:%x]\n",t->ss ,t->esp); 
-    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",t->ds ,t->es ,t->fs ,t->gs);
-	printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",t->eax ,t->ebx ,t->ecx ,t->edx); 
+	printf("eflags=[%x]\n",
+	    t->eflags);
+	printf("cs:eip=[%x:%x]\n",
+	    t->cs, t->eip );
+	printf("ss:esp=[%x:%x]\n",
+	    t->ss, t->esp ); 
+    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
+	    t->ds, t->es, t->fs, t->gs );
+	printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",
+	    t->eax, t->ebx, t->ecx, t->edx ); 
+    goto done;
+
 	
-done:    
-	return; 
+fail:	
+    printf("fail\n");	
+done:
+    return; 
 };
 
 

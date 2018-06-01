@@ -605,7 +605,11 @@ void *systemRam( int number,
                          (unsigned long) arg4);
 		    break;
 			
-        case 77:
+		// #bugbug	
+		// Para criar uma status bar em uma janela mãe existente.	
+        // Devemos observar que a barra de status e o scroll 
+		// disputam espaço.
+		case 77:
             return (void*) StatusBar( (struct window_d *) arg1, 
 			                          (unsigned char *) arg2, 
 									  (unsigned char *) arg3 );
@@ -1921,12 +1925,16 @@ unsigned long SystemMenuProcedure( struct window_d *window,
             {   
 				//Restaturar janela	
 				case VK_F1:
-				    StatusBar( gui->screen, "Status Bar", "F1");
+				    //#bugbug: Aqui não devemos criar a 
+					//status bar apenas atualizar as strings.
+					//StatusBar( gui->screen, "Status Bar", "F1");
                     break;
 					
 				//Minimizar janela
                 case VK_F2:
-				    StatusBar( gui->screen, "Status Bar", "F2");
+				    //#bugbug: Aqui não devemos criar a 
+					//status bar apenas atualizar as strings.				
+				    //StatusBar( gui->screen, "Status Bar", "F2");
                     break;
 					
 				//Maximizar janela
@@ -2199,8 +2207,9 @@ void systemReboot()
 		g_cursor_y = g_cursor_top;
         //set_up_cursor(g_cursor_left,g_cursor_top); 		
 
-
-		StatusBar(hWindow,"Esc=EXIT","Enter=?");		
+        //#bugbug: Aqui não devemos criar uma status bar 
+        //apenas atualizar as strings 		
+		//StatusBar(hWindow,"Esc=EXIT","Enter=?");		
 		//Nothing.
 	};	   
 

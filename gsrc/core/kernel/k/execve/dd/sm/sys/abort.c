@@ -10,6 +10,7 @@
  
 #include <kernel.h>
 
+
 /*
  * KeAbort:
  *     Interface para chamar módulo externo.
@@ -21,8 +22,7 @@
 void KeAbort() 
 {
     printf("KeAbort:");
-	refresh_screen();
-	while(1){}
+    die();
 };
 
 
@@ -49,18 +49,16 @@ void systemAbort()
 /*
  * KiAbort:
  *     Interface para abortar o kernel..
+ *     Sem retorno !
  */
 void KiAbort() 
 {
     abort();	
-	
-	//
-	// Sem retorno !
-	//
 };
 
 
 /*
+ ***********************************************************
  * abort:
  *     Módulo interno do tipo MB. Faz parte do Kernel Base.
  *     Aborta o kernel e mostra o erro.
@@ -93,14 +91,14 @@ void abort()
 	    printf("KeAbort: KeInitPhase={%d}\n",KeInitPhase);
 	};
 	
-	/*
-     * Mostra o erro dado o número.
-	 */
+	
+    // Mostra o número do último erro.
+	
 	 
     switch(errno)
 	{
 	    case 0:
-		    printf("erro %d", errno);
+		    printf("erro %d\n", errno);
 		    break;
 
 	    //tempo esgotado pra uma tarefa sensível ao tempo.		 
@@ -109,22 +107,22 @@ void abort()
 		    break;
 
 	    case 2:
-		    printf("erro %d", errno);
+		    printf("erro %d\n", errno);
 		    break;
 			
 		//...
 		
 		default:
-		    printf("erro desconhecido %d", errno);
+		    printf("default errno %d\n", errno);
 		    break;
 	};
     		
 	mostra_slot(current_thread);
 	mostra_reg(current_thread);
 	
-	/*
-     *  Final message !
-     */
+	
+    //  Final message !
+    
 	 
 	
 	//@todo: Usar apenas uma printf.
@@ -150,6 +148,6 @@ void abort()
 };
 
 //
-//fim.
+// End.
 //
 
