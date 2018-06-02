@@ -74,13 +74,28 @@ Bits         Usage
 // Variáveis internas.
 //
 
+//Status do módulo.
 int timerStatus;
-unsigned long timerTicks;  //Contador de ticks.
+
+//Contador de ticks.
+unsigned long timerTicks;
+
+//??  
 int timerColor;
+
+//??
 unsigned long timerLine;
+
+//??
 unsigned long timerIdleState;
+
+//??
 int timerLock;
+
+//??
 int timerError;
+
+//??
 //unsigned long timerCountSeconds;  //Count Seconds.
 //...
 
@@ -89,7 +104,9 @@ int timerError;
 // Funções internas.
 //
 
-void timer();        //Rotina principal.
+
+//Rotina principal.
+void timer();        
 //...
 
 
@@ -101,7 +118,7 @@ void timer();        //Rotina principal.
  *           Com essa função o kernel chamará o handler do modulo externo.
  * Obs:
  *     Apenas a ISR0, _irq0, pode chamar essa rotina.
- *
+ *     #bugbug deletar essa rotina.
  */
 void KeTimer()
 {
@@ -116,12 +133,13 @@ void KeTimer()
 	
 	
 	KiTimer();	//#suspensa. (usando o handler do kernel base.)
-    return;
+    //return;
 };
 
 
 
 /*
+ ********************************************************
  * KiTimer:
  *     Chama o handler do kernel que está no kernel base.
  */
@@ -129,21 +147,24 @@ void KiTimer()
 {
 
     //
-	// Observar alguns procedimentos antes de chamar a rotina.
+	// Observar alguns procedimentos antes de 
+	// chamar a rotina.
 	//
 	
 done:
 	timer();
-    return;
+    //return;
 };
 
 
 
 
 /*
+ ***********************************************
  * timer: 
  *     Handler chamado pelo ISR do timer (IRQ 0).
- *     (Contagem de tempo, tempo das tarefas, quantum ...).
+ *     (Contagem de tempo, tempo das tarefas, 
+ * quantum ...).
  *     (tick tick tick)
  */
 void timer()
@@ -233,11 +254,17 @@ done:
 
 
 /*
+ ******************************************
  * timerInit8253:
- * Seta a frequência de funcionamento do controlador 8253. "3579545 / 3" 
- * instead of 1193182 Hz. Pois o valor é mais preciso, considera até os 
+ *    @todo: Compreender melhor isso.
+ *
+ * Seta a frequência de funcionamento do 
+ * controlador 8253. "3579545 / 3" 
+ * instead of 1193182 Hz. 
+ * Pois o valor é mais preciso, considera até os 
  * quebrados. 
- * Reprograma o timer 8253 para operar à uma frequencia de "HZ".
+ * Reprograma o timer 8253 para operar 
+ * à uma frequencia de "HZ".
  * Obs: Essa rotina substitui a rotina init_8253.
  */
 void timerInit8253()
@@ -251,99 +278,120 @@ void timerInit8253()
     
     //More?!
 	
-	return;
+	//return;
 };
 
 
 /*
- * set_quantum
- * ??
+ * set_quantum:
+ * ?? Provavelmente alguma configuração de quantum 
+ * padrão para o sistema. 
+ * Isso poderá ser usado por rotinas que lidam 
+ * com tempo.
  */
-void set_quantum( unsigned long q){
+void set_quantum( unsigned long q)
+{
     quantum = (unsigned long) q;
-	return;
+	//return;
 };
 
 
 /*
+ **************************************
  * get_quantum
  * ??
  */
-unsigned long get_quantum(){
+unsigned long get_quantum()
+{
     return (unsigned long ) quantum;
 }; 
 
 
 /*
+ *******************************************
  * set_current_quantum
  * ??
  */
-void set_current_quantum( unsigned long q){
+void set_current_quantum( unsigned long q)
+{
     current_quantum = (unsigned long) q;
-	return;
+	//return;
 };
 
 
 /*
+ **********************************************
  * get_current_quantum  
  * ??
  */
-unsigned long get_current_quantum(){
+unsigned long get_current_quantum()
+{
     return (unsigned long ) current_quantum;
 }; 
 
 
 /*
+ *************************************
  * set_next_quantum   
  * ??
  */
-void set_next_quantum( unsigned long q){
+void set_next_quantum( unsigned long q)
+{
     next_quantum = (unsigned long) q;
-	return;
+	//return;
 };
 
 
 /*
+ **********************************
  * get_next_quantum   
  * ??
  */
-unsigned long get_next_quantum(){
+unsigned long get_next_quantum()
+{
     return (unsigned long ) next_quantum;
 }; 
 
 
 /*
+ ******************************************
  * now   
- * ??
+ * ?? Obs: Estou reavaliando isso.
  */
-unsigned long now(){
-    return (unsigned long) get_tick_count(); //??
+unsigned long now()
+{
+	//??
+    return (unsigned long) get_tick_count(); 
 };
 
 
-unsigned long get_tick_count(){
+/*
+ * get_tick_count:
+ */
+unsigned long get_tick_count()
+{
     return (unsigned long) timerTicks;
 };
 
 
 /*
+ ***************************************
  * sleep:
  *     Apenas uma espera, um delay.
- *     Essa não é a função que coloca uma tarefa pra dormir no caso de evento.
+ *     Essa não é a função que coloca uma 
+ * tarefa pra dormir no caso de evento.
  */
 void sleep(unsigned long ms) 
 {
-    unsigned long t = (ms*512);
+    unsigned long t = (unsigned long) ( ms * 512 );
 	
-	do
-	{
-	    --t;
-		
-	}while(t > 0);
-
-done:	
-	return;
+	while(t > 0){
+		t--;
+	}
+//done:	
+//	return;
 };
+
 
 /*
 unsigned long timerGetTicks();
@@ -354,17 +402,34 @@ unsigned long timerGetTicks()
 */
 
 
-void set_timeout(unsigned long ticks){
+/*
+ ****************************************
+ * set_timeout:
+ *
+ *
+ */
+void set_timeout( unsigned long ticks )
+{
+	//??
 	time_out = (unsigned long) ticks;
 };
 
-unsigned long get_timeout(){
+
+/*
+ ****************************************
+ * get_timeout
+ */
+unsigned long get_timeout()
+{
 	return (unsigned long) time_out;
 };
 
 
 /*
- * Constructor.
+ **************************************
+ * timerTimer: 
+ *     Constructor.
+ *     Inciaialização de variáveis do módulo.
  */
 int timerTimer()
 {
@@ -373,15 +438,19 @@ int timerTimer()
     kernel_tick = 0;
     kernel_tick_total = 0;	
 	
+	
+done:
 	return (int) 0;
 };
 
 
 /*
+ ********************************************
  * timerInit:
  *     Inicializa o driver de timer.
  *     Inicializa as variáveis do timer.
- *     @todo: KiTimerInit(unsigned long CallBackExemplo); 
+ *     @todo: KiTimerInit 
+ * (unsigned long CallBackExemplo); 
  */
 int timerInit()
 {
@@ -395,20 +464,22 @@ int timerInit()
    
    //config frequências...
    //@todo: Isso poderia ser por último.
+   //?? Isso pertence a i386 ??
+   //?? Quais máquinas possuem esse controlador ??
     timerInit8253();
    
    /*
     * @todo: criar a estrutura do timer.
 	*/
 
-	/*
-	 *@todo:
-	 *    alocar memoria para a estrutura do timer.
-	 *    inicializar algumas variaveis do timer.
-	 *    por enquanto estamos usando variaveis globais.
-	 *    ?? Não se se ja foi configurado o timer.
-	 * ou devemos chamr init_8253() agora. ou depois.
-	 */
+	//
+	//@todo:
+	//    alocar memoria para a estrutura do timer.
+	//    inicializar algumas variaveis do timer.
+	//    por enquanto estamos usando variaveis globais.
+	//    ?? Não se se ja foi configurado o timer.
+	// ou devemos chamr init_8253() agora. ou depois.
+	//
 	
 	
 	//Constructor.
@@ -429,7 +500,11 @@ int timerInit()
 //Done.
 done:
     g_driver_timer_initialized = (int) 1;
-    printf("timerInit: Done.\n");	
+	
+#ifdef KERNEL_VERBOSE
+    printf("timerInit: Done.\n");
+#endif
+	
 	return (int) 0;
 };
 

@@ -208,6 +208,12 @@ unsigned long color         //12 - color (bg) (para janela simples)
     struct rect_d *clientRect;  //rect
 	
 	
+	//#improvisando uma largura de borda.
+	//@todo: isso deve ir para outro lugar.
+	unsigned long border_size = 0;
+	unsigned long border_color = COLOR_BORDER;
+	
+	
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
     //unsigned long saveTop;
@@ -729,8 +735,8 @@ unsigned long color         //12 - color (bg) (para janela simples)
 			
 		//9) Status bar.	
 		case WT_STATUSBAR:
-	        Background = 1;    //bg.
-	        window->backgroundUsed = 1;
+	        //Background = 1;    //bg.
+	        //window->backgroundUsed = 1;
 		    break;
 			
 		//barra de rolagem
@@ -899,28 +905,44 @@ drawBegin:
 	//
 	//
 	
+	//
+	//  ## Shadow ##
+	//
 	
     //Sombra.	
-	if(Shadow == 1)
+	if( Shadow == 1 )
 	{
 		//CurrentColorScheme->elements[??]
 		
-		//@todo: Se tiver barra de rolagem a largura da sombra deve ser maior.
+		//@todo: 
+		// ?? Se tiver barra de rolagem a largura da 
+		// sombra deve ser maior. ?? Não ...
 		//if()
 		
 		
 		if( (unsigned long) type == WT_OVERLAPPED )
 		{
-		    //@todo: Passar a estrutura de janela.
-            // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
-			// @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-			//Cinza escuro.  CurrentColorScheme->elements[??] @TODO: criar elemento sombra no esquema. 
+            // @todo: Adicionar a largura das bordas verticais 
+			// e barra de rolagem se tiver.
+			// @todo: Adicionar as larguras das 
+			// bordas horizontais e da barra de títulos.
+			// Cinza escuro.  CurrentColorScheme->elements[??] 
+			// @TODO: criar elemento sombra no esquema. 
+			
 			drawDataRectangle( window->left +1, 
-		                   window->top  +1, 
-						   window->width  +1 +1,      
-						   window->height +1 +24 +1,  
-						   xCOLOR_GRAY1 );             
-        };						   
+		        window->top  +1, 
+				window->width  +1 +1,      
+				window->height +1 +1, //window->height +1 +24 +1,  //?? Por que +24 ??  
+				xCOLOR_GRAY1 );             
+        };
+
+        // ??
+		// E os outros tipos, não tem sombra ??
+		// Os outros tipos devem ter escolha para sombra ou não ??
+		// Flat design pode usar sombra para definir se o botão 
+		// foi pressionado ou não.
+		
+		//...
 	};	
 	
     
@@ -929,15 +951,16 @@ drawBegin:
 	//    Background para todo o espaço ocupado pela janela e pelo seu frame.
 	//
 	
+	//
+	// ## Background ##
+	//
+	
 	//Background.
-	if(Background == 1)
+	if( Background == 1 )
 	{		
-        //Configurando a cor padrão de background.
-		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; //xCOLOR_GRAY2;  //CINZA UM POUQUINHO MAIS CLARO.
+		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; 
 	    
-		//Configurando par tipos específicos.
-		//Cor do background para o tipo 1.
-		//Para o tipo 1 tem que usar a cor passada pelo argumento.
+		// O argumento 'color' será a cor do bg para alguns tipos.
 		if( (unsigned long) type == WT_SIMPLE ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_EDITBOX){ window->color_bg = color; }
@@ -946,22 +969,28 @@ drawBegin:
 		//...
 		
 		//Pintar o retângulo.
+		// @todo: ?? width Adicionar a largura da bordas bordas verticais.
+		// @todo: ?? height Adicionar as larguras das bordas horizontais e da barra de títulos.
+		
 		drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width,  // @todo: Adicionar a largura da bordas bordas verticais.
-						   window->height, // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-						   window->color_bg ); 						   
+		    window->top, 
+			window->width, 
+			window->height, 
+			window->color_bg ); 
+
+        //?? More
+        //...		
 	};
 	
 	
-	//#improvisando uma largura de borda.
-	//@todo: isso deve ir para outro lugar.
-	unsigned long border_size = 0;
-	unsigned long border_color = COLOR_BORDER;
+	//
+	// ## Border ##
+	//
 	
 	// BORDA COLOR_INACTIVEBORDER 
 	// Borda para as janelas.
-	// Obs: As bordas dependem do tipo de janela e do estilo de janela.
+	// Obs: As bordas dependem do tipo de janela e do 
+	// estilo de janela.
 	if( Border == 1 )
 	{
 		// A largura da borda pode sinalizar o status (ativo ou inativo) 
@@ -1005,13 +1034,21 @@ drawBegin:
 		
 	};
 	
-    //Título + borda.	
+	//
+	// ## Title bar ##
+	//
+	
+    // Título + borda.
+    // #importante: Isso pinta a barra de tótulos e as 
+    // bordas para janelas de aplicativos. Ou seja,
+    // as bordas não são pintadas individualmente.	
 	if(TitleBar == 1)
 	{ 
-        //*Cor enviada por argumento.
+        //#importante:  
+        //A cor sempre deve ser enviada por argumento.
 		window->color_bg = color;  
 		
-		//@todo: Precisamos definir a questão o foco.
+		//@todo: Preciso definir a questão o foco.
 		// ?? Quando uma jamela é criada, ela é criada com o foco ou não??
 		//Se a janela estiver com o foco de entrada.
 		//if(window->id == window_with_focus){
@@ -1029,10 +1066,12 @@ drawBegin:
 		//Rectangle and string.
 		
 		//retângulao
+		//??width  @todo: Adicionar a largura da bordas bordas verticais.
+		//??height @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
         drawDataRectangle( window->left, 
 		                   window->top, 
-						   window->width  +1 +1,  // @todo: Adicionar a largura da bordas bordas verticais.
-						   window->height +1 +24 +1, // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
+						   window->width  +1 +1,  
+						   window->height +1 +1,//window->height +1 +24 +1, //?? porquê. 
 						   window->color_bg );
 						   
 						   
@@ -1041,11 +1080,17 @@ drawBegin:
         //if(window->id == window_with_focus)
 		if(window->id == active_window)
 		{
+			// ## bugbug ##
+			// Não usaremos mais isso.
+			// As janelas terão apenas cores diferentes 
+			// para diferenciar ativa de não ativa.
+			/*
             drawDataRectangle( window->left, 
 		                       window->top, 
 				    		   window->width  +1 +1,  // largura do retângulo que marca que a janela está ativa.
 						       4,                     // altura do retângulo que marca que a janela está ativa.
 						       COLOR_SALMON );		  //@todo: Incluir essa cor no esquema padrão.	
+		   */
 		};
 						   
 		//@todo: Se estivermos em full screen, não teremos string.				   
@@ -1078,7 +1123,8 @@ drawBegin:
 
             //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
 			CreateWindow( WT_BUTTON, 1, 1, "V", 
-	            (window->width -42 -1), 4, 21, 21,									  
+	            (window->width -42 -1), 2, 
+				21, 21,									  
 			    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
 	    };
 		
@@ -1092,7 +1138,8 @@ drawBegin:
 			//			COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.
             //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
 			CreateWindow( WT_BUTTON, 1, 1, "X", 
-	            (window->width -21), 4, 21, 21,									  
+	            (window->width -21), 2, 
+				21, 21,									  
 			    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
 	    };					 
 			
@@ -1310,8 +1357,18 @@ drawBegin:
 	    CreateWindow( WT_BUTTON, 1, 1, "v", 
 	        1, (window->height -17), (window->width -2), 16,									  
 		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
-	};				   
+	};	
 
+	
+	if( (unsigned long) type == WT_STATUSBAR )
+	{
+        //bg
+		drawDataRectangle( window->left, 
+		                   window->top, 
+						   window->width -1,  
+						   window->height, 
+						   window->color_bg ); 	
+	};
 	
 	
 	if( (unsigned long) type == WT_BUTTON )
@@ -1362,16 +1419,18 @@ drawBegin:
 	if(window->type == WT_OVERLAPPED)
 	{
 		//scrollbar
+		//Esses valores precisam ser melhor declarados.
         window->scrollbar = CreateWindow( WT_SCROLLBAR, 1, 1, "scrollbar-test", 
 	                            window->right -24, window->top+25, 
-								24, window->height-25-25,									  
+								24, window->height-25-25-1,									  
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar], 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);
 
         //status bar.
+		//Esses valores precisam ser melhor declarados.
 		window->statusbar = CreateWindow( WT_STATUSBAR, 1, 1, "statusbar-test", 
-	                            window->left, window->bottom-25, 
+	                            window->left+1, window->bottom-25-1, 
 								window->width, 25,									  
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar], 

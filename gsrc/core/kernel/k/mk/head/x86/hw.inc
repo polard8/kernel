@@ -69,16 +69,13 @@ extern _KiPciHandler4
 extern _current_process_pagedirectory_address
 ;;...
 
-
-;;=========================================================================
+;;=====================================================
+;;  ## TIMER ##
+;;=====================================================
 ;; _irq0: 
 ;;
-;;     * TIMER *
-;;
-;; IRQ 0. Handler da interrupção do timer.
-;;
-;; Obs: 
-;;     No momento, toda tarefa interrompida pelo timer esta rodando em ring3.
+;; IRQ 0. 
+;; Handler da interrupção do timer.
 ;;
 global _irq0
 _irq0:
@@ -143,14 +140,7 @@ _irq0:
 	mov fs, ax  ;*   
 	mov gs, ax  ;*              
 	
-	
-	
-	;
     ; Chama as rotinas em C.
-    ; 	
-	
-	
-	;
 	; As rotinas em executarão serviços oferecidos pelo kernel
 	; ou pelos seus modulos ou drivers.
 	; Durante a execução dessas rotinas, as interrupções podem
@@ -158,10 +148,6 @@ _irq0:
 	; não queremos que a interrupção de timer irq0 chame essas rotinas
 	; em c novamente. Então desabilitaremos a rechamada dessas funções
 	; enquanto elas estivere em execução e habilitaremos novamnete ao sairmos delas.
-	;
-	;
-	;	
-	
 	
 ;;.TimerStuff:	
 
@@ -307,6 +293,7 @@ dummy_flush:
 
 	;
     ;EOI - sinal.
+	;Sinalizamos apenas o primeiro controlador.
     mov al, 20h
     out 20h, al  
  	

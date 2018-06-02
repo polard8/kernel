@@ -46,6 +46,88 @@ extern unsigned long kArg4;	   //??.
 
 
 
+
+int 
+windowKillTimer( struct window_d *window,
+                 int id )
+{
+    int Status = 0;
+	
+	if( (void*) window == NULL )
+	{
+		Status = 1;
+		goto fail;
+	}else{
+		
+		if( window->used != 1 ||
+		    window->magic != 1234 )
+		{
+			Status = 1;
+		    goto fail;
+		}
+    
+	    //...
+	};
+
+fail:
+done:	
+    return (int) Status;	
+};
+
+/*
+ *windowSetTimer:
+ * 
+ */
+// A janela receberá uma mensagem MSG_TIMER 
+// sempre que o contador chegar a '0'.
+// +Essa rotina deve utilizar o driver de timer 
+// para conseguir a contagem que precisa.
+// #teste, começaremos contagem simples para teste.
+int
+windowSetTimer( struct window_d *window, //janela
+                int id,                  //id do timer
+				int time                //tempo(medida indefinida ainda)
+				)
+{
+    int Status = 0;
+	
+    //
+	// ## Window  ##
+	//
+	
+	if( (void*) window == NULL )
+	{
+		Status = 1;
+		goto fail;
+	}else{
+		
+		if( window->used != 1 ||
+		    window->magic != 1234 )
+		{
+			Status = 1;
+		    goto fail;
+		}
+		
+		//Ok.
+		// Aqui devemos registra na estrutura 
+		// da janela o id do timer e o tempo 
+        //desejado. 		
+		
+		//obs: temos um limite para ids.
+		//window->timer[id].id = id;
+		//window->timer[id].time = time;
+		
+		//...
+	};
+	
+	
+fail:
+done:	
+    return (int) Status;
+};
+
+
+
 /*
   test - queue support *******************************
  */

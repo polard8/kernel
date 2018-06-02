@@ -2701,6 +2701,22 @@ void guiSetUpMainWindow( unsigned long x,
                          unsigned long y, 
 						 unsigned long width, 
 						 unsigned long height );
+						 
+						 
+//
+//  ## timer support  ##
+//
+
+int 
+windowKillTimer( struct window_d *window,
+                 int id );
+				 
+int
+windowSetTimer( struct window_d *window, //janela
+                int id,                  //id do timer
+				int time                //tempo(medida indefinida ainda)
+				);
+
 
 /*
  * CreateWindow:
