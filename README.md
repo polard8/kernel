@@ -1,6 +1,13 @@
 # gramado
 
-<br>Gramado Operating System v 0.1 
+<br>Gramado Operating System v0.2
+<br>
+<br>Version:
+<br>    Major 0
+<br>    Minor 2
+<br>    Release 0
+<br>    Name "No name for now"
+<br>
 <br>(c) Copyright 2018 - Fred Nora.
 
 <br>
