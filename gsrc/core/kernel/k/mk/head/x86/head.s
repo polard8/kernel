@@ -25,10 +25,10 @@
 ; ======================================
 ; (1) head.s
 ; (2) headlib.s
-; (3) hardware.inc
-; (4) hardwarelib.inc
-; (5) software.inc
-; (6) softwarelib.inc.
+; (3) hw.inc
+; (4) hwlib.inc
+; (5) sw.inc
+; (6) swlib.inc.
 ; Obs: Essa é uma ordem padrão, nunca mudar, nunca excluir arquivos, 
 ;      nunca incluir outros arquivos.
 ;

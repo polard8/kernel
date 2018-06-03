@@ -1469,13 +1469,14 @@ done:
 	// e apresentando pela primeira vez.
 	//
 	
-	
-    mouse_ret = (int) load_mouse_bmp();	
-	if(mouse_ret != 0)
-	{
-		printf("ldisc-init_mouse: load_mouse_bmp");
-		die();
-	}
+	// ## test ##
+	//susenso. Isso funciona.
+    //mouse_ret = (int) load_mouse_bmp();	
+	//if(mouse_ret != 0)
+	//{
+	//	printf("ldisc-init_mouse: load_mouse_bmp");
+	//	die();
+	//}
 	
 	
 	
@@ -2028,7 +2029,7 @@ done:
 
 /*
  **********************************************************
- * load_mouse_bmp:
+ * load_mouse_bmp:  ## teste ##
  *     Carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
  *     Usar isso na inicialização do mouse.
  *     #bugbug isso pode ir para windowLoadGramadoIcons

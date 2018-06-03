@@ -1029,9 +1029,41 @@ void memoryShowMemoryInfo()
 	};
 	
 	
-        //
-	    // Mostra Heap e Stack do kernel..
-	    //
+	//
+	// ## code data bss ##
+	//
+	
+	//#debug
+	extern unsigned long code_begin;
+	extern unsigned long code_end;
+	extern unsigned long data_begin;
+	extern unsigned long data_end;
+	extern unsigned long bss_begin;
+	extern unsigned long bss_end;
+	
+	//printf("\n");
+	//printf("\n");
+	//printf("#debug\n");
+	//printf("======\n");
+	
+	printf("\n");
+	printf("code_begin={%x}\n", &code_begin );
+	printf("  code_end={%x}\n", &code_end );
+
+	printf("\n");
+	printf("data_begin={%x}\n", &data_begin );
+	printf("  data_end={%x}\n", &data_end );
+
+	printf("\n");
+	printf(" bss_begin={%x}\n", &bss_begin );
+	printf("   bss_end={%x}\n", &bss_end );
+	
+	//printf("\n");	
+	
+	
+    //
+	//  ## heap e stack ##
+	//
 	
 	
         printf("\n[Kernel Heap and Stack info:]\n");
@@ -1066,6 +1098,9 @@ void memoryShowMemoryInfo()
 	    //printf("The video option is %x \n",g_video_mode);
 	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
 		    g_frontbuffer_pa, g_frontbuffer_va, g_backbuffer_va );
+			
+			
+
 	
 	
 	//...

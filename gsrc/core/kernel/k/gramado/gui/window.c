@@ -3085,6 +3085,8 @@ done:
 };
 
 
+
+//isso funcionou bem
 //carrega alguns iícones do sistema.
 int windowLoadGramadoIcons()
 {
@@ -3097,11 +3099,13 @@ int windowLoadGramadoIcons()
 iconSupport:	
 	// Carregando alguns ícones básicos usados pelo sistema.
 	
+	// ## size ##
+	// Vamos carregar ícones pequenos.
 	//@todo checar a validade dos ponteiros.
-    appIconBuffer = (void*) allocPageFrames(10);
-	fileIconBuffer = (void*) allocPageFrames(10);
-	folderIconBuffer = (void*) allocPageFrames(10);
-	terminalIconBuffer = (void*) allocPageFrames(10);
+    appIconBuffer = (void*) allocPageFrames(4);
+	fileIconBuffer = (void*) allocPageFrames(4);
+	folderIconBuffer = (void*) allocPageFrames(4);
+	terminalIconBuffer = (void*) allocPageFrames(4);
 	
 	if( (void*) appIconBuffer == NULL )
 	{

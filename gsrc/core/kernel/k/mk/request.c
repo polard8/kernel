@@ -46,11 +46,17 @@
 /*
  *********************************************************
  * KiRequest: 
- *    Trata os requests. (eventos, solicitações , waits ...).
- *    Essa rotina é chamada pelo timer em todas as interrupções de timer.
+ *    Trata os requests. 
+ *    São serviços que terão seu atendimento atrazado até
+ * pouco antes de retornar da interrupção do timer.
+ * São serviços para o ambiente ring0.    
  *
- *    @todo: Aqui deve ficar apenas as intefaces que chamam as rotinas de 
- * tratamento dos requests.
+ *    (eventos, solicitações , waits ...).
+ *    Essa rotina é chamada em todas as 
+ * interrupções de timer.
+ *
+ *    @todo: Aqui deve ficar apenas as intefaces que 
+ * chamam as rotinas de tratamento dos requests.
  */
 void KiRequest()
 {
@@ -61,20 +67,17 @@ void KiRequest()
 	//     Check some limits.
     //	
 	
-	//Limits
-    if( kernel_request < 0 || kernel_request > Max )
+	// Limits
+    if( kernel_request < 0 || 
+	    kernel_request > Max )
 	{
-        printf("KiRequest: Number={%d}",kernel_request);
-		refresh_screen();
-		while(1){}
+        printf("KiRequest: n={%d}",
+		    kernel_request );
+		die();
 	};
-	
 	//...
-	
-	
 done:
     request();
-    return;
 };
 
 
@@ -82,6 +85,9 @@ done:
  *******************************************************
  * request:
  *     Trata os requests do Kernel.
+ *    São serviços que terão seu atendimento atrazado até
+ * pouco antes de retornar da interrupção do timer.
+ * São serviços para o ambiente ring0.  
  *     2015 (Fred Nora) - Created.
  *     2016 (FN) - Revisão.
  *     ...
@@ -126,9 +132,7 @@ void request()
 	if( r < 0 || r > Max )
 	{
         printf("request: Limits! %d\n",r);
-		refresh_screen();
-		while(1){}
-		return;
+		die();
     };
 	
 	//Number.	
@@ -148,21 +152,23 @@ void request()
                     //Nothing.				
                     break;
 
-                case TYPE_PERIODIC:   //periodic
-					/*
-	                 * Ticks Remaining: Quando o tempo de execução de uma 
-	                 * thread se esgota. (Não faz parte do task switch,     
-					 * apenas trata o tempo que a tarefa tem para ficar     
-					 * executando). O tempo restante vai diminuindo.     
-	                 */
+				//periodic
+	            //Ticks Remaining: Quando o tempo de execução de uma 
+	            //thread se esgota. (Não faz parte do task switch,     
+				//apenas trata o tempo que a tarefa tem para ficar     
+				//executando). O tempo restante vai diminuindo.     					
+                case TYPE_PERIODIC:   
 				    Thread->ticks_remaining--;
-					if(Thread->ticks_remaining == 0){
-		                panic("request: Time out TIP={%d}",Thread->tid);
-                        while(1){} 						
+					if( Thread->ticks_remaining == 0 )
+					{
+		                panic("request: Time out TIP={%d}", 
+						    Thread->tid );
+                        die();						
 	                };
                     break;
 					
-                case TYPE_RR:   //round robin.
+				//round robin.	
+                case TYPE_RR:   
 				    //Nothing.
 					break;
 					
@@ -206,13 +212,13 @@ void request()
 		//7 - tick do timer.
 		case KR_TIMER_TICK:
 		    panic("KR_TIMER_TICK");
-			while(1){};
+			die();
 		    break;
         
 		//8 - limite de funcionamento do kernel.
         case KR_TIMER_LIMIT:
-		    panic("* KR_TIMER_LIMIT!\n");
-			while(1){};
+		    panic("KR_TIMER_LIMIT!\n");
+			die();
 		    break;
 			
 		//9 - checa se ha threads para serem inicializadas e 

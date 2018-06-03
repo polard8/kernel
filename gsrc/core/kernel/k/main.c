@@ -500,6 +500,37 @@ doDebug:
 	
 	windowLoadGramadoIcons();
 	
+	
+	//#debug
+	//extern unsigned long code_begin;
+	//extern unsigned long code_end;
+	//extern unsigned long data_begin;
+	//extern unsigned long data_end;
+	//extern unsigned long bss_begin;
+	//extern unsigned long bss_end;
+	
+	//printf("\n");
+	//printf("\n");
+	//printf("#debug\n");
+	//printf("======\n");
+	
+	//printf("\n");
+	//printf("code_begin={%x}\n", &code_begin );
+	//printf("  code_end={%x}\n", &code_end );
+
+	//printf("\n");
+	//printf("data_begin={%x}\n", &data_begin );
+	//printf("  data_end={%x}\n", &data_end );
+
+	//printf("\n");
+	//printf(" bss_begin={%x}\n", &bss_begin );
+	//printf("   bss_end={%x}\n", &bss_end );
+	
+	//printf("\n");
+	//refresh_screen();
+	//die();
+	
+	
 	//
     // RETURNING !
     //
