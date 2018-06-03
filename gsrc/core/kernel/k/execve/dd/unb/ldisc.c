@@ -2031,6 +2031,7 @@ done:
  * load_mouse_bmp:
  *     Carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
  *     Usar isso na inicialização do mouse.
+ *     #bugbug isso pode ir para windowLoadGramadoIcons
  */
 int load_mouse_bmp()
 {

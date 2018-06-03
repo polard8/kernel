@@ -13,6 +13,28 @@
  *     Versão: 1.0, 2016 - Revisão.
  */
  
+ 
+//
+//  ## Ponteiros para ícones ##
+// 
+ 
+// Ponteiros para o endereço onde os ícones 
+// foram carregados.
+
+ 
+ 
+void *appIconBuffer;  
+void *fileIconBuffer; 
+void *folderIconBuffer; 
+void *terminalIconBuffer;  
+//... 
+ 
+//testando ... devemos chamar isso
+//somente depois que todas as estruturas 
+//necessárias estiverem inicializadas.
+//como filsystem. 
+int windowLoadGramadoIcons(); 
+ 
 //test: suporte a getch();
 int window_getch(); 
 

@@ -476,7 +476,16 @@ doDebug:
 				
 				
 	*/
+	
     
+	//## test
+	//Isso funcionou, não mudar de lugar.
+	//Mas isso faz parte da interface gráfica,
+	//Só que somente nesse momento temos recursos 
+	//suficientes para essa rotina funcionar.
+	
+	windowLoadGramadoIcons();
+	
 	//
     // RETURNING !
     //

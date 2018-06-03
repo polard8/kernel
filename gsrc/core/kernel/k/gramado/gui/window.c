@@ -2964,7 +2964,12 @@ int init_windows()
 	keybuffer_head = 0;
 
 	
-	
+	//
+	// #importante:
+	// Nesse momento não existem estruturas prontas 
+	// para carregar arquivos.
+	//
+   		
 	//
 	// Continua ...
 	//
@@ -3078,6 +3083,95 @@ fail:
 done:
     return (int) response;	
 };
+
+
+//carrega alguns iícones do sistema.
+int windowLoadGramadoIcons()
+{
+	printf("windowLoadGramadoIcons:\n");
+	
+	//
+	//  ## Icon support ##
+	//
+	
+iconSupport:	
+	// Carregando alguns ícones básicos usados pelo sistema.
+	
+	//@todo checar a validade dos ponteiros.
+    appIconBuffer = (void*) allocPageFrames(10);
+	fileIconBuffer = (void*) allocPageFrames(10);
+	folderIconBuffer = (void*) allocPageFrames(10);
+	terminalIconBuffer = (void*) allocPageFrames(10);
+	
+	if( (void*) appIconBuffer == NULL )
+	{
+		printf("init_windows: appIconBuffer\n");
+	    die();	
+	}
+
+	if( (void*) fileIconBuffer == NULL )
+	{
+		printf("init_windows: fileIconBuffer\n");
+		die();
+	}
+
+	if( (void*) folderIconBuffer == NULL )
+	{
+		printf("init_windows: folderIconBuffer\n");
+		die();
+	}
+
+	if( (void*) terminalIconBuffer == NULL )
+	{
+		printf("init_windows: terminalIconBuffer\n");
+		die();
+	}
+	
+	unsigned long fRet;
+	
+	//@todo: Checar os retornos.
+    fRet = (unsigned long) fsLoadFile("APP     BMP", 
+	    (unsigned long) appIconBuffer );	
+    if( fRet != 0 )
+	{
+		printf("init_windows: APP.BMP\n");
+		die();		
+	}		
+    
+	fRet = (unsigned long) fsLoadFile("FILE    BMP", 
+	    (unsigned long) fileIconBuffer );
+    if( fRet != 0 )
+	{
+		printf("init_windows: FILE.BMP\n");
+		die();				
+	}
+	
+	fRet = (unsigned long) fsLoadFile("FOLDER  BMP", 
+	    (unsigned long) folderIconBuffer );	
+    if( fRet != 0 )
+	{
+		printf("init_windows: FOLDER.BMP\n");
+		die();				
+	}
+	
+	fRet = (unsigned long) fsLoadFile("TERMINALBMP", 
+	    (unsigned long) terminalIconBuffer );	
+    if( fRet != 0 )
+	{
+		printf("init_windows: TERMINAL.BMP\n");
+		die();				
+	}	
+	
+	
+	//#debug
+	//isso funcionou.
+    //bmpDisplayBMP( appIconBuffer, 1, 1 );
+	//refresh_rectangle( 1, 1, 16, 16 );
+	//die();	
+	
+    return 0;
+};
+
 
 //
 // End.

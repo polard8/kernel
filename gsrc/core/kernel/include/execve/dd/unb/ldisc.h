@@ -303,7 +303,9 @@ void reboot();
 unsigned long g_mousepointer_width;
 unsigned long g_mousepointer_height;
 
-void *mouseBMPBuffer; //buffer para o bmp
+
+//buffer para o bmp
+void *mouseBMPBuffer; 
 
 int init_mouse();
 void mouse_write(unsigned char write);

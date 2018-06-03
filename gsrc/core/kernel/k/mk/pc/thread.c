@@ -98,6 +98,9 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	int ProcessID;	
 	int i = USER_BASE_TID;		
 	
+	//wait reasons
+	int w;
+	
 	//
 	// Limits da thread atual.
 	//
@@ -380,11 +383,17 @@ get_next:
 		
 		//Thread->wait4pid =
 
+		//razões para esperar.
+		for( w=0; w<8; w++){
+			Thread->wait_reason[w] = (int) 0;
+		}
+		
 		//...
         //@todo:
         //herdar o quantum do processo.
         //herdar a afinidade do processo.(cpu affinity) 
 
+		
 
         Thread->exit_code = 0;
 	    

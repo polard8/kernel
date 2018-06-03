@@ -74,7 +74,19 @@ void scheduler_start();
 void scheduler_lock();
 void scheduler_unlock();
 void preempt();
-void dispatch_task();
+
+
+//acordar uma determinada thread se ela estiver 
+//esperando por um evento desse tipo.
+int wakeup_thread_reason( int tid, int reason );
+
+//procura alguma thread que esteja esperando 
+//por um evento desse tipo e acorda ela.
+int wakeup_scan_thread_reason( int reason );
+
+//@todo, enviar isso para dispatch.h
+void dispatch_thread2();
+
 unsigned long scheduler_get_status();
 int find_higher_priority();
 int SelectNextThread(int current);
@@ -85,7 +97,9 @@ void new_task_scheduler(); //cancelada
 int set_priority();
 void taskexit();
 void kill_task(int id);
+
 void wakeup_thread(int tid);
+
 void set_task_status(unsigned long status);
 unsigned long get_task_status();
 

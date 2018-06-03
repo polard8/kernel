@@ -59,14 +59,19 @@ void taskswitchFlushTLB(){
  *********************************************************
  * KiTaskSwitch:
  *     Interface para chamar a rotina de Task Switch.
- *     KiTaskSwitch em taskswitch.c gerencia a rotina de 
- * troca de thread, 
- * realizando operações de salvamento e restauração de contexto utilizado 
- * variáveis globais e extrutura de dados, seleciona a próxima thread através 
- * do scheduler, despacha a thread selecionada através do dispatcher e 
- * retorna para a função _irq0 em head\x86\hardware.inc, que configurará os 
- * registradores e executará a thread através do método iret.
- * Na verdade, esta servido de interface pra uma rotina que faz tudo isso.
+ *     Essa rotina somente é chamada por hw.inc.
+ *     KiTaskSwitch em ts.c gerencia a rotina de 
+ * troca de thread, realizando operações de salvamento e 
+ * restauração de contexto utilizado variáveis globais e 
+ * extrutura de dados, seleciona a próxima thread através 
+ * do scheduler, despacha a thread selecionada através do 
+ * dispatcher e retorna para a função _irq0 em hw.inc, 
+ * que configurará os registradores e executará a 
+ * thread através do método iret.
+ *
+ * #importante:
+ * Na verdade, é uma interface pra uma rotina que 
+ * faz tudo isso.
  * 
  */
 void KiTaskSwitch()
@@ -105,11 +110,12 @@ void KiTaskSwitch()
 	    printf("KiTaskSwitch error: current_thread TID={%d}",
 		    current_process );										   
         die();
-	};
-
+	};	
 	
-	//...
 	
+	//
+	// ## Task switch ##
+	//
 	
 TaskSwitch:	
 	task_switch();
@@ -134,11 +140,12 @@ done:
  * task_switch:
  *
  *     Gerencia a rotina de troca de thread, realizando 
- * operações de 
- * salvamento e restauração de contexto, seleciona a próxima thread através 
- * do scheduler, despacha a thread selecionada através do dispatcher e retorna 
- * para a função _irq0 em hardware.inc, que configurará os registradores e 
- * executará a thread através do método iret.
+ * operações de salvamento e restauração de contexto, 
+ * seleciona a próxima thread através do scheduler, 
+ * despacha a thread selecionada através do dispatcher e 
+ * retorna para a função _irq0 em hw.inc, que configurará 
+ * os registradores e executará a thread através do 
+ * método iret.
  *
  * Obs:
  *     Apenas a interface KiTaskSwitch chama essa rotina.

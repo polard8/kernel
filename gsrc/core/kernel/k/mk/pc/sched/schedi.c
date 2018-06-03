@@ -7,14 +7,97 @@
  *     Faz parte do Process Manager, parte fundamental do Kernel Base.
  *     Rotinas de apoio ao módulo scheduler.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - More basic functions.
+ *     2018 - More basic functions.
  *     //...
  */
 
 
 #include <kernel.h>
+
+
+
+//acordar uma determinada thread se ela estiver 
+//esperando por um evento desse tipo.
+int wakeup_thread_reason( int tid, int reason )
+{
+	struct thread_d *t;
+	
+    if( tid < 0 ||
+        tid >= THREAD_COUNT_MAX )
+	{
+	    goto fail;		
+	} 
+	
+	if( reason < 0 ||
+	    reason >= 8 )
+	{
+	    goto fail;		
+	} 
+	
+	//thread
+	t = ( struct thread_d * ) threadList[tid];
+	
+	if( (void*) t == NULL )
+	{
+		goto fail;
+	}else{
+		
+		if( t->used != 1 ||
+		    t->magic != 1234 )
+		{
+			goto fail;
+		}
+		
+		//OK.
+		
+		if( t->wait_reason[reason] != 1 )
+		{
+		    goto fail;
+		}else{
+            //ok 
+            t->wait_reason[reason] = 0;
+            t->state = RUNNING;
+            goto done;
+		}
+		
+		//nothing
+	};
+	
+fail:
+    return (int) 1;	
+done:
+    return (int) 0;	
+};
+
+
+
+//procura alguma thread que esteja esperando 
+//por um evento desse tipo e acorda ela.
+int wakeup_scan_thread_reason( int reason )
+{
+    int i;
+	
+	if( reason < 0 ||
+	    reason >= 8 )
+	{
+	    goto fail;		
+	} 
+	
+	for( i=0; i< THREAD_COUNT_MAX; i++)
+	{
+        wakeup_thread_reason( i, reason );		    	
+	}
+	
+done:
+    return (int) 0;		
+fail:
+    return (int) 1;	
+};
+
+
 
 
 /*
@@ -153,7 +236,9 @@ void KiDoThreadDead(int id){
 };
 
 
-void KiStartTask(unsigned long id, unsigned long *task_address){
+void KiStartTask( unsigned long id, 
+                  unsigned long *task_address)
+{
     return;
 };
 
@@ -654,9 +739,11 @@ done:
 
 
 /*
+ **************************************************
  * wakeup_thread: 
- *    Para acordar uma thread, basta colocar ela no estado RUNNING se ela
- * estiver com seu contexto salvo e seu estado WAITING. 
+ *    Para acordar uma thread, basta colocar ela no 
+ * estado RUNNING se ela estiver com seu contexto 
+ * salvo e seu estado WAITING. 
  *
  * @todo:
  *     Criar scheduleriWakeupYhread(int tid);
@@ -687,16 +774,15 @@ void wakeup_thread(int tid)
 		if(t->state == BLOCKED){ return; }; 
 		
 		//Check context.
-	    Status = contextCheckThreadRing3Context(tid);
-		if(Status == 1 ){ return; };
+	    //Status = contextCheckThreadRing3Context(tid);
+		//if(Status == 1 ){ return; };
 		
 	    //Set current.
 	    current_thread = (int) tid;	
 		
 		//Dispach current.
-		//Obs: O que acontece aqui? Tem iret pra thread ou não ?
-		//
-		dispatch_task();
+		//isso não executa a thread ?? #bugbug
+		dispatch_thread2();
 	};
 
     //
@@ -1038,6 +1124,7 @@ done:
 token:
 	return (int) New->tid;	
 };
+
 
 
 //

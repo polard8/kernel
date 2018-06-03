@@ -1894,6 +1894,9 @@ done:
 
 
 /*
+ ***********************************
+ * diskATAIRQHandler1
+ *     irq 14 handler
  */
 void diskATAIRQHandler1()
 {
@@ -1902,6 +1905,9 @@ void diskATAIRQHandler1()
 
 
 /*
+ ***********************************
+ * diskATAIRQHandler2
+ *     irq 15 handler
  */
 void diskATAIRQHandler2()
 {
@@ -1911,7 +1917,7 @@ void diskATAIRQHandler2()
 
 
 /*
- **********************************************************
+ ******************************************************
  * show_ide_info:
  *     Mostrar as informações obtidas na inicializações 
  * do controlador.

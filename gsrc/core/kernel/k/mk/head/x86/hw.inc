@@ -163,6 +163,7 @@ _irq0:
     
 ;;.TaskSwitchStuff:	
     ;Task switch. Troca a tarefa a ser executada.
+	;ts.c
 	call _KiTaskSwitch 	    
 
 
@@ -422,7 +423,7 @@ timer_interrupt:
 	jmp $
 
 	
-;----------------------------------------------
+;========================================
 ; _irq1:
 ;     IRQ 1 - #teclado.
 ;
@@ -430,7 +431,9 @@ timer_interrupt:
 global _irq1  
 _irq1:
  
-	cli	;;INTERRUPÇÕES DESABILITADAS. (O TIMER NÃO INTERROMPE.)
+	;; INTERRUPÇÕES DESABILITADAS. 
+	;; (O TIMER NÃO INTERROMPE.)
+	cli	
 	
 	;pushad
 	push dword eax
@@ -438,7 +441,8 @@ _irq1:
 	push es
 	push fs
 	push gs	
-    ;
+    
+	;
 	;preparando os registradores, para funcionarem em kernel mode.
 	xor eax, eax
 	mov ax, word 0x10    ;Kernel mode segment.	
@@ -487,37 +491,51 @@ _irq1:
 ; (any devices configured to use IRQ 2 will actually be using IRQ 9)
 
 
-;--------------
+;=======================================================
 ; IRQ 3 – serial port controller for serial port 2 
 ; (shared with serial port 4, if present)
 global _irq3
 _irq3:
+
     cli
+	pushad
+	
 	;call _second_serial_port_Handler
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd	
 
 	
-;--------------
+;====================================================
 ; IRQ 4 – serial port controller for serial port 1 
 ;(shared with serial port 3, if present)
 global _irq4
 _irq4:
+
     cli
+	pushad
+	
 	;call _first_serial_port_Handler
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd	
 
+	
+	
 ;--------------
 ; IRQ 5 – parallel port 2 and 3  or  sound card
 ;_irq5:
 ;    iretd
+
+
 
 ;--------------
 ; IRQ 6 – floppy disk controller
@@ -525,50 +543,50 @@ _irq4:
 ;    iretd
 
 
-;IRQ 7 – parallel port 1. It is used for printers or for any parallel port 
-;if a printer is not present. It can also be potentially be shared with a 
-;secondary sound card with careful management of the port.
+;===================================================
+;IRQ 7 – parallel port 1. It is used for printers 
+; or for any parallel port 
+;if a printer is not present. It can also be potentially 
+; be shared with a secondary sound card with careful 
+; management of the port.
 global _irq7
 _irq7:
     cli
+	pushad
+	
 	;call _first_parallel_port_Handler
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd	
 	
-;-----------------------------------------------
+;================================================
 ; _irq8:
 ;     System CMOS, Realtime clock.
 ;     IRQ 8 – real-time clock (RTC)
 ;
 global _irq8
 _irq8:
-    cli
-	
-	
-	;preparando os registradores, para funcionarem em kernel mode.
-	;xor eax, eax
-	;mov ax, word 0x10    ;Kernel mode segment.	
-	;mov ds, ax
-	;mov es, ax
-	;mov fs, ax  ;Usar seletor 0.
-	;mov gs, ax  ;Usar seletor 0.	
-	
-	pushad
-	call _KiRtcIrq
-	popad
 
+    cli
+	pushad
+		
+	call _KiRtcIrq
+	
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
 	
+	popad
 	sti
 	iret
 	
 	
-;IRQ 9 – Advanced Configuration and Power Interface (ACPI) 
+;=========================================================	
+;IRQ 9 – (ACPI) - Advanced Configuration and Power Interface  
 ;system control interrupt on Intel chipsets.[1] 
 ;Other chipset manufacturers might use another interrupt for this purpose, 
 ;or make it available for the use of peripherals 
@@ -576,134 +594,160 @@ _irq8:
 global _irq9
 _irq9:
     cli
+	pushad
+	
 	;call _acpiHandler
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd	
 
-;IRQ 10 – The Interrupt is left open for the use of peripherals (open interrupt/available, SCSI or NIC)
+;========================================================	
+;IRQ 10 – The Interrupt is left open for the use 
+;of peripherals (open interrupt/available, SCSI or NIC)
 ;nvidia
 global _irq10
 _irq10:
     cli
+	pushad
+	
 	;call _KiPciHandler1
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd
 	
-;IRQ 11 – The Interrupt is left open for the use of peripherals (open interrupt/available, SCSI or NIC)
+	
+;=======================================	
+;IRQ 11 – The Interrupt is left open for 
+;the use of peripherals (open interrupt/available, SCSI or NIC)
 ;audio.
 global _irq11
 _irq11:
     cli
+	pushad
+	
 	;call _KiPciHandler2
+	
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd
-
+	
+	
+	
+;=======================================
 ;IRQ 12 – mouse on PS/2 connector
 global _irq12
 _irq12:
-    cli
-	
-	;#bugbug depois que inclui essa inicialização 
-	;ocorreu uma falha nos segmentos alertada pelo taskswitch.
-	;ocurreu uma falha nos segmentos.
-	;preparando os registradores, para funcionarem em kernel mode.
-	;xor eax, eax
-	;mov ax, word 0x10    ;Kernel mode segment.	
-	;mov ds, ax
-	;mov es, ax
-	;mov fs, ax  ;Usar seletor 0.
-	;mov gs, ax  ;Usar seletor 0.	
-	
+    
+	cli	
 	pushad
+	
 	call _mouse_handler
-	popad
 	
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	popad
 	sti
     iretd
 	
-;IRQ 13 – CPU co-processor  or  integrated floating point unit  or  inter-processor interrupt (use depends on OS)
+	
+;;============================================================	
+; IRQ 13 
+; CPU co-processor  or  integrated floating point unit  
+; or  inter-processor interrupt (use depends on OS)
+;
 global _irq13
 _irq13:
     cli
+	push ax 
+	
 	;call _coprocessorHandler
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	pop ax
 	sti
     iretd
 	
-;------------------------------------------------	
+	
+;=================================================	
 ; _irq14:
 ;     Tratador de interrupções para unidade master.
 ;     IRQ 14 – primary ATA channel 
-;     (ATA interface usually serves hard disk drives and CD drives) 
+;     (ATA interface usually serves hard disk 
+; drives and CD drives) 
+; ;O timer precisa ser desbilitado. ??
 ;
 extern _diskATAIRQHandler1
 global _irq14
 _irq14:
-
-    ;O timer precisa ser desbilitado.    
-	cli 
-	
+   
+	cli 	
 	PUSH AX
+	
 	call _diskATAIRQHandler1
 	MOV AL,020h
 	OUT 0A0h,AL
 	OUT 020h,AL
+	
 	POP AX
-	
 	sti
-	
 	IRETD
 
-;------------------------------------------------	
+	
+;=================================================	
 ; _irq15:
 ;     Tratador de interrupções para unidade slave.
 ;     IRQ 15 – secondary ATA channel
+; ; ;O timer precisa ser desbilitado. ??
 ;
 extern _diskATAIRQHandler2
 global _irq15
 _irq15:
-   
-    ;O timer precisa ser desbilitado.
-	cli
-	
+
+	cli	
 	PUSH AX
+	
 	call _diskATAIRQHandler2
 	MOV AL,020h
 	OUT 0A0h,AL
 	OUT 020h,AL
+	
 	POP AX
-	
 	sti
-	
 	IRETD
 
 
-;----------------------------------------
+;========================================
 ; unhandled_irq:
 ;     Interrupção de hardware genérica. 
 ;++ 
 unhandled_irq:
     cli
+	push ax
+	
     ;pushad 
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
     ;popad
-    sti 
+    
+	pop ax
+	sti 
     iretd
 ;--
 
@@ -727,332 +771,236 @@ extern _faults
 ; int 0 
 global _fault_N0
 _fault_N0:
-    ;cli
 	mov dword [save_fault_number], dword 0
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 
 ;
 ; int 1 
 global _fault_N1
 _fault_N1:
-    ;cli
 	mov dword [save_fault_number], dword 1
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 2 
 global _fault_N2
 _fault_N2:
-    ;cli
 	mov dword [save_fault_number], dword 2
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 3 
 global _fault_N3
 _fault_N3:
-    ;cli
 	mov dword [save_fault_number], dword 3
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 4 
 global _fault_N4
 _fault_N4:
-    ;cli
 	mov dword [save_fault_number], dword 4
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
+	
 
 ;
 ; int 5 
 global _fault_N5
 _fault_N5:
-    ;cli
 	mov dword [save_fault_number], dword 5
-    call all_faults	
-	hlt
-	jmp $	
+    jmp all_faults	
 
 ;
 ; int 6 - Instrução inválida.
 global _fault_INTRUCAO_INVALIDA
 _fault_INTRUCAO_INVALIDA:
-    ;cli
 	mov dword [save_fault_number], dword 6
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 
 ;
 ; int 7
 global _fault_N7
 _fault_N7:
-    ;cli
 	mov dword [save_fault_number], dword 7
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 
 ;
 ; int 8 - double fault
 global _fault_DOUBLE
 _fault_DOUBLE:
-    ;cli
 	mov dword [save_fault_number], dword 8
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 9 
 global _fault_N9
 _fault_N9:
-    ;cli
 	mov dword [save_fault_number], dword 9
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 10 
 global _fault_N10
 _fault_N10:
-    ;cli
 	mov dword [save_fault_number], dword 10
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 11
 global _fault_N11
 _fault_N11:
-    ;cli
 	mov dword [save_fault_number], dword 11
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 
 ;
 ; int 12 - Falha de pilha (interrupção 12).
 global _fault_STACK
 _fault_STACK:
-    ;cli
 	mov dword [save_fault_number], dword 12
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 
 ;
 ; int 13 - general protection fault (GPF).
 global _fault_GP
-_fault_GP:
-    ;cli   
+_fault_GP:   
 	mov dword [save_fault_number], dword 13
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 
 ;
 ; int 14
 global _fault_N14
 _fault_N14:
-    ;cli
 	mov dword [save_fault_number], dword 14
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 15 
 global _fault_N15
 _fault_N15:
-    ;cli
 	mov dword [save_fault_number], dword 15
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 16 
 global _fault_N16
 _fault_N16:
-    ;cli
 	mov dword [save_fault_number], dword 16
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 17 
 global _fault_N17
 _fault_N17:
-    ;cli
 	mov dword [save_fault_number], dword 17
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 18
 global _fault_N18
 _fault_N18:
-    ;cli
 	mov dword [save_fault_number], dword 18
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 19
 global _fault_N19
 _fault_N19:
-    ;cli
 	mov dword [save_fault_number], dword 19
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 20 
 global _fault_N20
 _fault_N20:
-    ;cli
 	mov dword [save_fault_number], dword 20
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 21
 global _fault_N21
 _fault_N21:
-    ;cli
 	mov dword [save_fault_number], dword 21
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 22
 global _fault_N22
 _fault_N22:
-    ;cli
 	mov dword [save_fault_number], dword 22
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 23 
 global _fault_N23
 _fault_N23:
-    ;cli
 	mov dword [save_fault_number], dword 23
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 24 
 global _fault_N24
 _fault_N24:
-    ;cli
 	mov dword [save_fault_number], dword 24
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 25 
 global _fault_N25
 _fault_N25:
-    ;cli
 	mov dword [save_fault_number], dword 25
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 26 
 global _fault_N26
 _fault_N26:
-    ;cli
 	mov dword [save_fault_number], dword 26
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 27 
 global _fault_N27
 _fault_N27:
-    ;cli
 	mov dword [save_fault_number], dword 27
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 28 
 global _fault_N28
 _fault_N28:
-    ;cli
 	mov dword [save_fault_number], dword 28
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 29
 global _fault_N29
 _fault_N29:
-    ;cli
 	mov dword [save_fault_number], dword 29
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 30
 global _fault_N30
 _fault_N30:
-    ;cli
 	mov dword [save_fault_number], dword 30
-    call all_faults	
-	hlt
-	jmp $
+    jmp all_faults	
 	
 ;
 ; int 31 
 global _fault_N31
 _fault_N31:
-    ;cli
 	mov dword [save_fault_number], dword 31
-    call all_faults	
-	hlt
-	jmp $
-	
-
+    jmp all_faults	
 	
 	
-;----------------------------------------------------
+;===============================================
 ; all_faults:
 ;     As faltas são tratadas em kernel mode, 
 ;     tem que ajustar os registradores para isso.
 ;
-;   @todo: Enviar o número a falta para uma variável global.
-;          Essa rotina poderia se chamar headlibAllFaults.
+;   @todo: Enviar o número a falta para uma 
+; variável global.
+; Essa rotina poderia se chamar headlibAllFaults.
 ;
 all_faults:
 ;headlibAllFaults:
@@ -1105,8 +1053,16 @@ all_faults:
 	; Chama a rotina em C.
     ;Passa o argumento via pilha.	
 	push dword [save_fault_number]     
+	
+	;; Chama código em C. (faults.c)
+	
 	call _faults 
-	jmp $
+
+;hang	
+.hang:	
+    cli
+	hlt
+	jmp .hang
 	
 	;
 	; @todo: 
@@ -1118,5 +1074,5 @@ save_fault_number:
     dd 0	
 	
 ;
-; Fim.
+; End.
 ;

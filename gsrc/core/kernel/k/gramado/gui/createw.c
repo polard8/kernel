@@ -1434,7 +1434,17 @@ drawBegin:
 								window->width, 25,									  
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar], 
-								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);								
+								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);
+
+
+        //  ## test  ##
+		// os ícones já estão carregados, vamos apenas 
+		// decodificá lo no backbuffer 
+		
+		// ## BUGBUG PAGE FAULT !!!
+        // Render BMP file on backbuffer.
+	    bmpDisplayBMP( appIconBuffer, window->left+1, window->top+1 );
+	
 	};
 
 	

@@ -476,10 +476,22 @@ struct thread_d
 	// wait4pid: 
 	// Uma thread pode estar esperando um processo 
     // fechar para que ela prossiga.
-	int wait4pid;
-	int wait4tid;
+	//int wait4pid;
+	//int wait4tid;
 	
 	
+	
+	//razões para esperar
+	//@todo: tem que fazer um enum para enumerar as razões.
+	//o índice é o selecionador da razão pela 
+	//qual a thread está esperando.
+	//existem umas 20 razões pra esperar.
+	// 0 - esperando por mensagem.(presa num loop)
+	// 1 - esperando outra thread finalizar. wait4tid
+	// 2 - esperando um processo finalizar. wait4pid
+	// 3 - esperando um objeto. (espera genérica)
+	// ...
+	int wait_reason[8];
 	
 	//
 	// ## Exit support ##

@@ -22,6 +22,7 @@
 #include <kernel.h>
 
 
+
 /*
  * KiShowPreemptedTask
  * @todo: Substituir a palavra task por thread. KiShowPreemptedThread

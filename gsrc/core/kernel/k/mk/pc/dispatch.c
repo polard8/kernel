@@ -708,11 +708,11 @@ int dispatch_Default()
 
 /*
  *************************************************
- * dispatch_task:
+ * dispatch_thread:
  *     Restaura o contexto e retorna.
  *     #bugbug. Nem sei se essa rotina está em uso.
  */
-void dispatch_task()
+void dispatch_thread2()
 {	
     struct thread_d *t;  
 	
@@ -728,8 +728,10 @@ void dispatch_task()
 	
 	t = (void *) threadList[current_thread]; 
 	
-	if( (void*) t == NULL){
-	    current_thread = (int) 0;
+	if( (void*) t == NULL )
+	{
+		//deveria ser a current_idle_thread
+	    current_thread = (int) 0;  //current_idle_thread
 	    return;
 	}else{
 	    t->saved = 0;         //Náo está mais salvo o contexto.
@@ -741,7 +743,7 @@ void dispatch_task()
 //	
 
 done:
-	return; //retorna para o assembly para dar 'IRET'.	
+	return; 	
 };
 
 
@@ -770,11 +772,11 @@ void dispatch_thread(struct thread_d *thread)
 	    // Context.	
 		// #bugbug: Não estamos mais usando esse filtro
         // que seleciona apenas threads em ring 3.		
-	    Status = contextCheckThreadRing3Context(thread->tid);
-	    if(Status == 1){
-	        printf("pc-dispatch-dispatch_task: contextCheckThreadRing3Context\n");
-		    die();
-	    };
+	    //Status = contextCheckThreadRing3Context(thread->tid);
+	    //if(Status == 1){
+	    //    printf("pc-dispatch-dispatch_task: contextCheckThreadRing3Context\n");
+		//    die();
+	    //};
 	    //...
 	};
 	

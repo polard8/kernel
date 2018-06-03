@@ -201,7 +201,7 @@ _setup_system_interrupt:
 .number: dd 0
 
 
-;----------------------------------------------------
+;=============================================
 ; setup_faults:
 ;    Configura vetores da idt para faults.
 ;
@@ -374,7 +374,7 @@ setup_faults:
 	ret	
 	
 
-;======================================================
+;=====================================
 ; setup_vectors:
 ;    Configura alguns vetores da idt.
 ;	
@@ -382,66 +382,66 @@ setup_vectors:
 	push eax
 	push ebx 
 	
-    ;
-	; int 200 - A interrupção de sistema.
-	mov eax, dword _int200
-	mov ebx, dword 200
-	call _setup_system_interrupt  ;;??porque não usar a outra chamada.
-	;call _setup_idt_vector       ;;usar essa chamada.
-   
-    ;
-	; int 213 - Executa nova tarefa.
-	mov eax, dword _int213
-	mov ebx, dword 213        
-	call _setup_idt_vector	
-	
-	
-    ;
-	; int 216 - Fast Create Window.
-	mov eax, dword _int216
-	mov ebx, dword 216        
-	call _setup_idt_vector	
-	
-	
-	;
-	; int 32 - Timer.
-	;
-	; Obs:
-	; Iniciamos um timer provisório, depois o kMain() inicia o definitivo.
-	;
-	
+
+	;32
+	;Iniciamos um timer provisório, 
+	;depois o kMain() inicia o definitivo.
 	;mov eax,  dword _irq0         ;Será inicializado em C. 
 	mov eax, dword _timer_test     ;Provisório.
 	mov ebx, dword 32
 	call _setup_idt_vector	
 
-	;
-	; int 33 - Keyboard.
+	;33
+	;Keyboard.
 	mov eax, dword  _irq1
 	mov ebx, dword 33
 	call _setup_idt_vector
 	
-	;
-	; int 40 - Clock, rtc.
+	;40
+	;Clock, rtc.
 	mov eax, dword  _irq8
 	mov ebx, dword 40
 	call _setup_idt_vector
 	
-	
-	;
-	; int 44 - Mouse.
+	;44
+	;Mouse.
 	mov eax, dword  _irq12
 	mov ebx, dword 44
 	call _setup_idt_vector	
 	
+	;46
 	;ide
 	mov eax,  dword _irq14     
 	mov ebx, dword 46
 	call _setup_idt_vector	
 
+	;47
 	;ide
 	mov eax,  dword _irq15     
 	mov ebx, dword 47
+	call _setup_idt_vector	
+	
+	
+    ;200
+	;A interrupção de sistema.
+	;#obs: Utilizamos uma chamada dirferente
+	;para configurar essa interrupção.
+	mov eax, dword _int200
+	mov ebx, dword 200
+	call _setup_system_interrupt  
+	;call _setup_idt_vector       
+   
+    ;213
+	;Executa nova tarefa.
+	mov eax, dword _int213
+	mov ebx, dword 213        
+	call _setup_idt_vector	
+	
+	
+    ;216
+	;Fast Create Window.
+	mov eax, dword _int216
+	mov ebx, dword 216        
 	call _setup_idt_vector	
 	
 	pop ebx
@@ -450,7 +450,7 @@ setup_vectors:
 		
 
 
-;----------------------------------------------------------------------------
+;====================================================
 ; _do_executa_new_task:
 ;
 ;  _contextSS      -  user data + RPL
@@ -459,8 +459,8 @@ setup_vectors:
 ;  _contextCS      -  user code + RPL
 ;  _contextEIP*    -  *** entry point da tarefa.
 ;
-; PS:. essa rotina é chamada pelo kernel depois de salvo o contexto da thread 
-; interrompida.
+; PS:. Essa rotina é chamada pelo kernel depois de 
+; salvo o contexto da thread interrompida.
 ;
 global _do_executa_new_task
 _do_executa_new_task:	
@@ -540,7 +540,7 @@ _test_cpuid_support:
     
 	push eax                ;put altered EAX on stack.
     popfd                   ;pop stack into flags.
-    
+	
 	pushfd                  ;push flags back onto stack.
     pop eax                 ;put them back into EAX.
     
@@ -581,7 +581,7 @@ _set_page_dir:
 	ret
 	
 	
-;-------------------------------
+;=============================================
 ; _get_page_fault_adr: 
 ;     Pega o cr2.
 ;     endereço quando da pagefault.
@@ -600,7 +600,7 @@ _halt:
 	hlt
 	ret
 	
-;--------------------------------------------------------------
+;================================================
 ; setup_gdt:
 ;     Carrega gdtr.
 ;
@@ -608,7 +608,8 @@ setup_gdt:
 	lgdt [_GDT_register]
 	ret
 	
-;--------------------------------------------------------------
+	
+;=================================================
 ; setup_idt:
 ;     Configura a IDT.
 ;     Dado o endereço da IDT, 
@@ -640,7 +641,7 @@ rp_sidt:
 ;;--	
 
 
-;--------------------------------------------------	
+;=====================================
 ; _setup_idt_vector:
 ;     Configura um vetor da IDT.
 ; IN:
@@ -685,9 +686,10 @@ _setup_idt_vector:
 .number: dd 0
 
 
-;---------------------------------------------------
+;=====================================
 ; _enable_pse:
 ;     Enable PSE para páginas de 4MB.
+;     Não usaremos isso.
 ;
 global _enable_pse
 _enable_pse:
@@ -698,7 +700,7 @@ _enable_pse:
 	pop eax
 	ret
 	
-;--------------------------------------------
+;=====================================
 ; _asm_shut_down:
 ; * shut down
 ; @todo: ainda não implementada.
@@ -708,8 +710,10 @@ _asm_shut_down:
 	jmp _asm_reboot  ;;Errado.      
     jmp $
 	
-;------------------------
-; * reboot via teclado.
+	
+;=====================================
+; _asm_reboot:
+;     Reboot via teclado.
 ; @todo: Essa rotina poderia se chamar _headlibReboot. 
 ;
 global _asm_reboot	

@@ -102,22 +102,7 @@ _turn_task_switch_off:
 	mov dword [_task_switch_status], dword 0    ;LOCKED.	
 	ret
 	
-	
-;------------------------
-; _test_write:
-;     Testa hd.
-;     funciona.
-;
-global _test_write
-_test_write:
-    mov eax, dword 0x0e00
-	mov ebx, dword 1020
-    call hd0_write_sector
-    ret
-
-	
-	
-	
+		
 	
 ;;================================================
 ;; 
@@ -165,25 +150,17 @@ _ide_channel1_slave_writesector:
 	
 
 	
-;--------------------------------	
+;===================================	
 ; _os_read_sector:
 ;
 ; Read sector on PATA PIO 0 MODE.
-;
+; IN: [_hd_lba] e [_hd_buffer]
+; 
 global _os_read_sector
 _os_read_sector:
     push eax
 	push ebx
 	
-	;call _reset_ide0
-
-	
-	;#bugbug: Essa rotina é antiga é lenta 
-	;e foi substituída.
-	;mov eax, dword [_hd_buffer]    ;buffer.
-	;mov ebx, dword [_hd_lba]       ;lba.
-	;call hd0_read_sector
-
 	; Uma nova rotina, bem mais rápida.
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to read
@@ -193,6 +170,7 @@ _os_read_sector:
 	xor ecx, ecx 
 	mov cl, 1
 	mov edi, dword [_hd_buffer]      
+	
 	call ata_lba_read	
 	
 	pop ebx
@@ -200,24 +178,16 @@ _os_read_sector:
 	ret
 
 	
-;-------------------------------
+;======================================
 ; _os_write_sector:
 ;     Write sector on PATA PIO 0 MODE.
+; IN: [_hd_lba] e [_hd_buffer]
 ;
 global _os_write_sector
 _os_write_sector:
     push eax
 	push ebx
-    
-	;call _reset_ide0
-		
-		
-	;#bugbug: Essa rotina é antiga é lenta 
-	;e foi substituída.		
-	;mov eax, dword [_hd_buffer]    ;buffer.
-	;mov ebx, dword [_hd_lba]       ;lba.
-	;call hd0_write_sector
-	
+    	
     ; Uma nova rotina, bem mais rápida. 
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to write
@@ -226,10 +196,8 @@ _os_write_sector:
 	xor ecx, ecx 
 	mov cl, 1
 	mov edi, dword [_hd_buffer]      
-	call ata_lba_write
 	
-	;mov byte [0xb8004], byte '$'
-    ;mov byte [0xb8005], byte 9
+	call ata_lba_write
 	
 	pop ebx
 	pop eax
@@ -237,16 +205,18 @@ _os_write_sector:
 
 	
 	
-;=============================================================================
-; ATA read sectors (LBA mode) 
+;==================================================
+; ata_lba_read:
+;     ATA read sectors (LBA mode) 
 ;
 ; @param EAX Logical Block Address of sector
 ; @param CL  Number of sectors to read
-; @param RDI The address of buffer to put data obtained from disk
+; @param RDI The address of buffer to put data 
+; obtained from disk
 ;
 ; @return None
-;=============================================================================
 ;;isso é bem rápido.
+;====================================================
 ata_lba_read:
     
 	pushf
@@ -276,7 +246,6 @@ ata_lba_read:
     mov eax, ebx         ; Get LBA from EBX
     shr eax, 8           ; Get bit 8 - 15 in AL
     out dx, al
- 
  
     mov edx, 0x1F5       ; Port to send bit 16 - 23 of LBA
     mov eax, ebx         ; Get LBA from EBX
@@ -309,16 +278,17 @@ ata_lba_read:
     ret	
 	
 	
-;=============================================================================
-; ATA write sectors (LBA mode) 
+;=========================================
+; ata_lba_write:
+;     ATA write sectors (LBA mode) 
 ;
 ; @param EAX Logical Block Address of sector
 ; @param CL  Number of sectors to write
 ; @param RDI The address of data to write to the disk
 ;
+;
 ; @return None
-;=============================================================================
- 
+;=================================================
 ata_lba_write:
     pushf
     and eax, 0x0FFFFFFF
@@ -358,7 +328,8 @@ ata_lba_write:
     mov al, 0x30         ; Write with retry.
     out dx, al
  
-.still_going:  in al, dx
+.still_going:  
+    in al, dx
     test al, 8           ; the sector buffer requires servicing.
     jz .still_going      ; until the sector buffer is ready.
  
@@ -379,268 +350,40 @@ ata_lba_write:
     popf
     ret
 
-;-------------------------------------------
-; hd0_read_sector:
-;     Read sector on PATA PIO 0 MODE.
-;
-; eax - endereço
-; ebx - lba
-; ecx - null
-; edx - null
-;
-
-HD_BUFFER:  DD 0    ;A.
-HD_L:       DB 0    ;B.
-HD_B:       DB 0    ;C.
-HD_A:       DB 0    ;D.
-HD_LBA:     DD 0
-
-hd0_read_sector:
-
-    ;;#bugbug 
-	;;Essa rotina é muito lenta e fou subtituída.
-
-    ;PUSH EBP
-	;MOV  EBP, ESP
-    
-	;PUSHFD
-	;PUSHA
-	
-	;CLI
-
-	;;SALVA 	
-	;MOV DWORD [HD_BUFFER], EAX
-	
-   ;;lba esta em ebx
-	
-	;;LOW
-	;MOV AL, bl
-	;MOV BYTE [HD_A], AL
-    
-	;shr ebx, 8
-	;MOV AL, bl
-	;MOV BYTE [HD_B], AL
-	
-	;;HIGH
-	;shr ebx, 8
-	;MOV AL, bl
-	;MOV BYTE [HD_L], AL
-
-	;;
-	;; Seleciona 'drive number, lba mode, head number.
-    ;;
-	;mov  dx, word 01f6h    ;Drive and head port.
-	;mov  al,  0e0h         ;lba   ;Drive 0, head 0.
-	;out  dx, al
-    
-	;QUANTIDADE DE SETORES. (1 setor)
-	;mov dx, 1f2h         ;Sector count port.
-	;mov al, 1            ;Read one sector.
-	;out dx, al
-
-	;LBA- teste 2304 900h
-	
-	;0-7
-	;mov dx, 1f3h
-	;MOV AL, BYTE [HD_A]    ;; - LOW.
-	;out dx, al
-	
-	;8-15
-	;mov dx, 1f4h
-	;MOV AL, BYTE [HD_B] 
-	;out dx, al
-
-	;16-31
-	;mov dx, 1f5h
-	;MOV AL, BYTE [HD_L] 
-	;out dx, al	
-	
-	;comandos
-	;xor eax, eax
-	;mov  dx, 1f7h    ;Command port.
-	;mov  al, 20h     ;Read with retry. 30h write.
-	;out  dx, al
-;read_still_going:
-	;in al, dx
-	
-	;test al, 8             ;This means the sector buffer requires servicing.			
-	;jz read_still_going    ;Don't continue until the sector buffer is ready.
-	
-	;mov  cx,  256    ;; (512/2) ;One sector /2.
-	
-	;PUSH EAX
-	;xor eax, eax
-	;MOV eax, DWORD [HD_BUFFER]
-	;mov edi, eax                ;dword  0x0900000 ;buffer ;offset buffer.
-	;POP EAX
-	
-	;mov dx, 1f0h         ;Data port - data comes in and out of here.
-	;rep insw
-	
-    ;STI           ;;@todo bugbug isso pode acionar a irq0. e trocar de tarefa???
-	
-    ;call hd_wait 	
-	;call Small_Delay
-	;call Small_Delay
-	;call Small_Delay
-	;call Small_Delay
-	;call Small_Delay
-	
-	;POPA
-	;POPFD
-	
-	;POP EBP	 
-	RET
-
-
-;--------------------------------------------
-; hd0_write_sector:
-;     Write sector on PATA PIO 0 MODE.
-;
-; eax - endereço
-; ebx - lba
-; ecx - null
-; edx - null
-;
-hd0_write_sector:
-
-    ;;#bugbug 
-	;;Essa rotina é muito lenta e fou subtituída.
-
-
-    ;PUSH EBP
-	;MOV  EBP, ESP
-    
-	;PUSHFD
-	;PUSHA
-	
-	;CLI
-
-	;;SALVA 	
-	;MOV DWORD [HD_BUFFER] , EAX
-  	
-	;;LOW
-	;MOV AL, bl
-	;MOV BYTE [HD_A] , AL
-    
-	;shr ebx, 8
-	;MOV AL, bl
-	;MOV BYTE [HD_B] , AL
-	
-	;;HIGH
-	;shr ebx, 8
-	;MOV AL, bl
-	;MOV BYTE [HD_L] , AL
-	
-	;; Seleciona 'drive number, lba mode, head number
-    ;mov  dx, word 01f6h    ;Drive and head port.
-	;mov  al, 0e0h          ;lba   ;Drive 0, head 0.
-	;out  dx, al
-    
-	;QUANTIDADE DE SETORES. (1 setor)
-	;mov dx, 1f2h         ;Sector count port.
-	;mov al, 1            ;Read one sector.
-	;out dx, al
-
-	;LBA
-	
-	;0-7
-	;mov dx, 1f3h
-	;MOV AL, BYTE [HD_A]    ;LOW.
-	;out dx, al
-	
-	;8-15
-	;mov dx, 1f4h
-	;MOV AL, BYTE [HD_B] 
-	;out dx, al
-
-	;16-31
-	;mov dx, 1f5h
-	;MOV AL, BYTE [HD_L] 
-	;out dx, al
-		
-	;comandos
-	;xor eax, eax
-	;mov dx, 01f7h    ;Command port.
-	;mov al, 30h      ;with retry. 30h write.
-	;out dx, al
-  	
-;write_still_going:	
-	;in  al, dx
-	
-	;test al, byte 8          ;This means the sector buffer requires servicing.
-	;jz write_still_going     ;Don't continue until the sector buffer is ready.
-	
-	;mov ecx, dword 256    ;(512/2) ;One sector /2.	
-	;mov dx, 01f0h         ;Data port - data comes in and out of here.
-	
-	;MOV esi, DWORD [HD_BUFFER]
-	;rep outsw
-    	
-    ;STI
-	
-    ;call hd_wait    ;Test. 		
-	;call Small_Delay
-	;call Small_Delay
-	;call Small_Delay
-	;call Small_Delay
-	;call Small_Delay	
-		
-	;POPA
-	;POPFD
-	
-	;POP EBP
-	RET
-	
-;-------------------------------
-; hd_wait:
-;     Hard Disk Wait Function.
-; 
-hd_wait: 
-    cli 
-    mov dx, 1F7h 
-waitloop:  
-    in al, dx 
-    
-	cmp al, 50h 
-    je waitok     
-	
-	cmp al, 0 
-    je waitok
-	
-	jmp waitloop 
-waitok: 
-    ;sti 
-    ret 
-
+ 
 
 ;--------------------------------
 ; _reset_ide0:
 ;
 global _reset_ide0
 _reset_ide0:
+    push dx
     mov dl, byte 0
 	call IDE_RESET_DISK
+	pop dx
 	ret
 
+	
 ;--------------------------------	
 ; init_ide0_master:	
 ;     Reseta o ide0 master.
 ;
-;
 init_ide0_master:
-    mov dl, byte 0
+    push dx
+	mov dl, byte 0
 	call IDE_RESET_DISK
+	pop dx
 	ret
 
-;--------------------------------------------
+	
+;==============================================
 ; IDE_RESET_DISK:
 ;
-;   dl = Drive (0=master,1=slave)
+; Some disks will respond to the reset command 
+; if the other is given it.
 ;
-;   Note: 
-;       Some disks will respond to the reset command 
-;       if the other is given it.
+; IN: 
+;     dl = Drive (0=master,1=slave)
 ;
 IDE_RESET_DISK:
 
@@ -687,42 +430,28 @@ commanddone db 0    ;Command done flag.
 commandok   db 0    ;Command completed properly flag.	
 
 
-;------------------------
-; Small_Delay:                                        
-;
-Small_Delay:
-    push ecx
-    mov  ecx, 0xfffff
-BusyDelay3a:                                  
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    loop BusyDelay3a
-    pop ecx
-    ret
-	
-;
-; CMOS ------------------------------
-;
+;;
+;;  ## CMOS ##
+;;
 
 
-;
-; Save info from CMOS.
+;; Hour
 global _hour
-_hour:    db 0
+_hour:    
+    db 0
+	
+;;Minute	
 global _minute
-_minute:  db 0
+_minute:  
+    db 0
+	
+;;Second	
 global _second
-_second:  db 0
+_second:  
+    db 0
 
-
-
-;--------------------------------------------
+	
+;==================================
 ; CMOS_GET_DATE:
 ;     Pega Hora, Minuto e Segundo.
 ;

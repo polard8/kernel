@@ -229,21 +229,21 @@ unsigned long fsLoadFile( unsigned char *file_name,
 	//Checa se é válida a estrutura do sistema de arquivos.
 	if( (void*) filesystem == NULL )
 	{
-	    printf("fs-read-fsLoadFile: filesystem");
+	    printf("fs-read-fsLoadFile: filesystem\n");
 		goto fail;
 	}else{
 		
 	    //Setores por cluster.
 	    Spc = filesystem->spc;
 	    if(Spc <= 0){
-	        printf("fs-read-fsLoadFile: Spc");
+	        printf("fs-read-fsLoadFile: Spc\n");
 		    goto fail;
 	    };
 	
 	    //Max entries ~ Número de entradas no rootdir.
 	    max = filesystem->rootdir_entries;	
 	    if(max <= 0){
-	        printf("fs-read-fsLoadFile: max");
+	        printf("fs-read-fsLoadFile: max\n");
 			goto fail;
 	    };
 		

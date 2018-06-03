@@ -2423,7 +2423,8 @@ int systemStartUp()
 		set_up_cursor(0,1);
 		
 #ifdef KERNEL_VERBOSE		
-        printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",KERNEL_VERSION);
+        printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
+		    KERNEL_VERSION);
 #endif		
 		
 #ifdef KERNEL_VERBOSE		
@@ -2434,10 +2435,11 @@ int systemStartUp()
 #endif
 
 #ifdef KERNEL_VERBOSE
-		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",(unsigned long) SavedLFB
-		                                                                       ,(unsigned long) SavedX
-											       					           ,(unsigned long) SavedY
-																               ,(unsigned long) SavedBPP );
+		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",
+		    (unsigned long) SavedLFB,
+			(unsigned long) SavedX,
+			(unsigned long) SavedY,
+			(unsigned long) SavedBPP );
 #endif
 
         //
@@ -2469,6 +2471,9 @@ int systemStartUp()
 	    };	
         //...	 
 	};
+	
+	
+	
 	
 	 
 	

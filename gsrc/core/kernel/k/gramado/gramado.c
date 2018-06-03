@@ -1272,6 +1272,7 @@ int init_gui()
 	// no estado 'Initialized' e executar.
 	//	
 
+
 done:
     //?? erro fatal ??
     if( (void*) gui == NULL )
