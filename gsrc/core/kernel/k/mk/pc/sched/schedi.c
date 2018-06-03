@@ -1,5 +1,5 @@
 /*
- * File: scheduleri.c
+ * File: schedi.c
  *
  * Descrição:
  *     Scheduler (Internal).
@@ -112,18 +112,21 @@ int KiIncreasePriority(int pid)
 
 
 /*
+ *************************************************
  * KiScheduler:
  *    Interface para chamar a rotina de scheduler.
- *    Troca as threads que estão em user mode, usando o método cooperativo. 
+ *    Troca as threads que estão em user mode, 
+ * usando o método cooperativo. 
  * Round Robing. 
  *    As tarefas tem a mesma prioridade.
- *    + Quando encontrada uma tarefa de maior prioridade, escolhe ela 
- * imediatamente.
- *    + Quando encontrar uma tarefa de menor prioridade, apenas eleva a 
- * prioridade dela em até dois valores acima da prioridade base, pegando a 
- * próxima tarefa. 
- *    + Quando uma tarefa está rodando à dois valores acima da sua prioridade, 
- * volta a prioridade para a sua prioridade básica e executa.
+ *    + Quando encontrada uma tarefa de maior prioridade, 
+ * escolhe ela imediatamente.
+ *    + Quando encontrar uma tarefa de menor prioridade, 
+ * apenas eleva a prioridade dela em até dois valores 
+ * acima da prioridade base, pegando a próxima tarefa. 
+ *    + Quando uma tarefa está rodando à dois valores 
+ * acima da sua prioridade, volta a prioridade para a 
+ * sua prioridade básica e executa.
  *
  * @todo: 
  *     Essa rotina deve ter retorno do tipo 'int'.
@@ -171,15 +174,20 @@ done:
 
 
 /*
+ *************************************************
  * KiFindHigherPriority:
- *     Interface para chamar a rotina de encontrar tarefa com maior prioridade.
- *     Encontra uma tarefa de maior prioridade entre as tarefas de estado
- * READY para que possa assumir o estado RUNNING.
- *     Essa rotina é usada após a preempçao, onde uma thread de baixa
- * prioridade para de executar para que rode uma de maior prioridade.
+ *     Interface para chamar a rotina de encontrar 
+ * tarefa com maior prioridade.
+ * Encontra uma tarefa de maior prioridade entre as 
+ * threads de estado READY para que possa assumir o 
+ * estado RUNNING.
+ * Essa rotina é usada após a preempçao, onde uma thread 
+ * de baixa prioridade para de executar para que rode 
+ * uma de maior prioridade.
  * 
  */ 
-int KiFindHigherPriority(){ 
+int KiFindHigherPriority()
+{ 
     return (int) find_higher_priority(); 
 }; 
  
@@ -205,86 +213,37 @@ done:
     return (int) SelectNextThread(current);
 };
 
-
-void KiDoThreadReady(int id){
+void KiDoThreadReady(int id)
+{
     do_thread_ready(id);
-	return;
 };
 
 
-void KiDoThreadRunning(int id){
+void KiDoThreadRunning(int id)
+{
     do_thread_running(id);
-	return;
 };
 
-
-void KiDoThreadSleeping(int id){
+void KiDoThreadSleeping(int id)
+{
     do_thread_sleeping(id);
-	return;
 };
 
-
-void KiDoThreadZombie(int id){
+void KiDoThreadZombie(int id)
+{
 	do_thread_zombie(id);
-    return;
 };
 
-
-void KiDoThreadDead(int id){
+void KiDoThreadDead(int id)
+{
     do_thread_dead(id);
-	return;
 };
 
-
-void KiStartTask( unsigned long id, 
-                  unsigned long *task_address)
-{
-    return;
-};
+ 
 
 
-void KiAcordarTarefa(int id){
-    wakeup_thread(id);
-	return;
-}; 
-
-
-/*
- * KiTaskExit:
- *     Sai da tarefa atual.
- *     Ela entra no estado zombie para ser morta depois.
- *     @todo: Mudar para KiThreadExit();.
- */
-
-void KiTaskExit()
-{
-	//
-    //@todo: Criar rotina de interface.
-	//
-	
-	
-	
-done:	
-	taskexit();
-	return;
-};
-
-
-/*
- * KiKillTask:
- *     Mata uma thread.
- *     @todo: Mudar para KiKillThread(int tid). 
- */
-void KiKillTask(int id)
-{
-	//
-    //@todo: alguma rotina de checagem, algum filtro.
-	//
-	
-done:
-    kill_task(id);
-	return;
-};
+ 
+ 
 
 
 /*
@@ -749,40 +708,51 @@ done:
  *     Criar scheduleriWakeupYhread(int tid);
  * 
  */
-void wakeup_thread(int tid)
+ 
+void wakeup_thread( int tid )
 {
     int Status;
     struct thread_d *t; 	
 	//...
 	
 	//Limits.
-	if(tid < 0 || tid >= THREAD_COUNT_MAX){
+	if( tid < 0 || 
+	    tid >= THREAD_COUNT_MAX )
+	{
 	    return;
 	};	
 
     //Struct.
 	t = (void *) threadList[tid]; 
+	
 	if( (void*) t == NULL )
 	{ 	
-	    return;    //Retorna sem despachar.
+	    return;    
+	
 	}else{
 	    
-		//Se o contexto nao foi salvo. Não tem como acorda-la.
-		if(t->saved == 0){ return; };
+		//Se o contexto nao foi salvo. 
+		//Não tem como acorda-la.
+		//Pois acordar significa apenas retornar 
+		//ao estado RUNNING.
+		if( t->saved == 0 )
+		{ 
+	        return; 
+		};
 		
-		//Se estiver bloqueada, não tem como acordar ainda. precisa desbloquear.
-		if(t->state == BLOCKED){ return; }; 
-		
-		//Check context.
-	    //Status = contextCheckThreadRing3Context(tid);
-		//if(Status == 1 ){ return; };
-		
-	    //Set current.
-	    current_thread = (int) tid;	
-		
-		//Dispach current.
-		//isso não executa a thread ?? #bugbug
-		dispatch_thread2();
+		// Se estiver bloqueada, 
+		// não tem como acordar ainda. 
+		// precisa desbloquear.
+		if(t->state == BLOCKED)
+		{ 
+	        return; 
+		}; 
+			
+	    //Isso acorda a thread,
+		//mas não coloca ela imediatamente para rodar,
+		//nem precisa.
+	    do_thread_running(tid);
+	
 	};
 
     //
@@ -793,184 +763,17 @@ void wakeup_thread(int tid)
 done: 
     return;	
 };
+ 
 
 
 
 /*
- * kill_task:
- *    Deleta uma thread, liberando o slot.
- *
- * @todo: 
- *     +Quando uma thread finaliza, deve-se mudar o número de tarefas 
- * rodando. (Feito)
- *     +Mudar o nome da função para scheduleriKillThread(int tid);.
- *
- */
-void kill_task(int id)
-{
-    struct thread_d *t; 	   
-
-	// @todo: 
-	//     Checar se algo impede que a tarefa seja fechada. 
-	//
-	
-	// Limits.
-	if (id <= 0 || id >= THREAD_COUNT_MAX){
-	    return;
-	};	
-
-    // Struct.		
-	t = (void *) threadList[id]; 		
-	if( (void*) t == NULL){
-	    return;
-	}else{
-	    
-		//Zerar as variáveis da estrutura.
-	    t->tid = 0;
-	    t->ownerPID = 0;    
-	    t->used = 0;
-	    t->magic = 0;
-	    t->state = DEAD;
-		//...
-		
-		//@todo: Zerar as variáveis de contexto.
-		
-		//lista
-		threadList[id] = 0;
-		//t = NULL;
-	};
-	
-	//
-	// Contador de tarefas que estão rodando.
-	//
-	
-	//@todo: Check struct.
-	
-	if(ProcessorBlock.running_threads > 1)
-	{
-        ProcessorBlock.running_threads--;	 
-	    //...
-	};	 
- 	
-	
-	//
-	// More ?!
-	//
-	
-// Done.	
-done:
-    current_thread = (int) 0;    //Idle.
-	return;
-};
-
-
-/* 
- * taskexit:
- *    Finaliza a execução de uma ?. 
- *
- *    Passa o comando para a tarefa Pai.
- *    ex: Quando fechamos uma janela filha.
- *
- *    @todo: 
- *        Essa função deve ser um recurso oferecido 
- *        nos serviços do sistema, assim os aplicativos 
- *        em user mode podem chama-la.
- *
- *  @todo: Analizar o que essa rotina faz, se finaliza
- *         uma thread ou sai de processo. 
- */
-void taskexit()
-{
-    int i;
-	int Parent;     //Parent process.
-	int Current;    //Current thread.
-	struct thread_d *t; 
-    struct process_d *p; 
-	
-	//
-	// Current.
-	//
-	
-	Current = (int) current_thread;
-
-	
-	if(Current <= 0 || Current >= THREAD_COUNT_MAX ){
-	    return;
-	};
-	
-    //Struct.
-    t = (void *) threadList[Current]; 	
-	if( (void*) t == NULL)
-	{
-		//
-	    //@todo: Enviar mensagem de erro.
-	    //
-		return;
-	}
-	else
-	{
-        t->state = ZOMBIE;    //Zombie current.	
-	
-	    //
-	    // Parent. //Parent process
-	    //
-
-    	Parent = t->ownerPID;    //Parent process.
- 	
-	    if(Parent < 0){
-		    return;
-		}else{
-			
-			
-		    //Process.
-	        p = (void *) processList[Parent];	
-	        if( (void *) p == NULL ){
-			    return;
-			}else{
-				
-			  /*
-			    //se a parent estava esperando a filha fechar.
-	            if( p->wait4pid == 0) 
-				{ 
-				    current_thread = (int) 0; 
-					return; 
-				};	
-                
-				//se não estava esperando.
-				if( p->wait4pid == 1)
-	            { 
-	                p->wait4pid = 0;
-		            current_thread = (int) Parent;
-	            };
-				*/
-			};
-		
-		};
-	
-	};
-	
-	
-//
-// Done.    
-//	
-done:
-
-    //
-    //@todo: Usar outra função...(wakeup()).
-    //
-	
-	wakeup_thread(current_thread);
-	return; 
-};
-
-
-
-/*
+ ***************************************
  * SelectNextThread:
- *     Seleciona a próxima thread indicanda na estrutura da thread 
- * passada via argumento.
+ *     Configurando a próxima thread da thread
+ * indicada via argumento.
  *
- * @todo: Mudar para scheduleriSelectNextThread(int current);.
+ * @todo: Mudar para schediSelectNextThread(int current);.
  *
  */
 int SelectNextThread(int current)
@@ -981,7 +784,9 @@ int SelectNextThread(int current)
 
     
 	//Limits.
-	if( current < 0 || current >= THREAD_COUNT_MAX ){
+	if( current < 0 || 
+	    current >= THREAD_COUNT_MAX )
+	{
 	    return (int) 0;
 	};
 	
@@ -1000,10 +805,13 @@ int SelectNextThread(int current)
 		    Next = (int) find_higher_priority();
 			
 		    n = (void*) threadList[Next];
-		    if( (void*) n == NULL ){
-		        Next = 0;    //Pega Idle.
+		    if( (void*) n == NULL )
+			{
+		        //#bugbug: Usar current_idle_thread.
+				Next = 0;    //Pega Idle.
 			    return (int) Next; 
 		    }else{
+				
 			    Next = (int) n->tid;    //Pega id.
 			    return (int) Next;
 			};
@@ -1012,7 +820,9 @@ int SelectNextThread(int current)
 	    {
 			n = (void *) t->Next;
 			
-			if( (void*) n == NULL ){
+			if( (void*) n == NULL )
+			{
+				//#bugbug: Usar current_idle_thread.
 			    Next = (int) 0;    //Pega idle.
 			    return (int) Next;
 			}else{
@@ -1038,11 +848,15 @@ done:
 
 
 /*
+ *****************************************
  * check_for_standby:
- *     Procura na lista de threads no estado StandyBy.
- *     Se tiver uma thread nessa lista, ela se torna a current.
- *     Para rodar pela primeira vez, atravéz de Spawn.
- *     @todo: na verdade essa função deveria se chamar check for standby
+ *     Procura na lista de threads no 
+ * estado StandyBy.
+ * Se tiver uma thread nessa lista, ela se torna 
+ * a current. Para rodar pela primeira vez, 
+ * atravéz de Spawn.
+ * Não retorna se encontrar uma threa na lista.
+ *
  */
 void check_for_standby()
 {
@@ -1054,8 +868,6 @@ void check_for_standby()
 	
 	do
 	{
-        //New = (void*) threadList[i];    	
-		
 		New = (void*) queue->standbyList[i];
 		
 		if( (void *) New != NULL )
@@ -1074,20 +886,28 @@ void check_for_standby()
 //Done. Nenhuma tarefa precisa ser inicializada.
 done:
     return;
+	
+	//
+	//  ## No return ##
+	//
+	
 //Do Spawn.
 do_spawn:
     KiSpawnTask(current_thread);  //spawn.c
 	//spawn_task(current_thread);
     panic("check_for_initialized:");
-	while(1){};	
+	die();	
 };
 
 
 /*
+ *****************************************************
  * check_quantum:
  *     Checa o quantum atribuido às threads da lista.
+ *     Seleciona a primeira thrad encontrada com o 
+ * quantum no limite. #todo: rever isso.
  *
- * @todo: Mudar para scheduleriCheckThreadQuantum();
+ * @todo: Mudar para schediCheckThreadQuantum();
  *
  */
 int check_quantum()
@@ -1128,6 +948,6 @@ token:
 
 
 //
-// Fim.
+// End.
 //
 

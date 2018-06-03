@@ -95,8 +95,7 @@ int get_current();
 int get_current_task();
 void new_task_scheduler(); //cancelada
 int set_priority();
-void taskexit();
-void kill_task(int id);
+
 
 void wakeup_thread(int tid);
 

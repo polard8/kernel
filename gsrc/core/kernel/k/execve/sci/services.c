@@ -658,7 +658,7 @@ void *services( unsigned long number,
 		
         //71 		
 		case SYS_FORK: 
-		    return (void*) systemIoCpu(4,0,0,0,0); 
+		    return (void*) do_fork_process();
 			break;	
 
 		//72 - Create thread.	

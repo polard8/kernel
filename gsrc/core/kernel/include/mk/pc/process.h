@@ -874,6 +874,17 @@ struct process_info_d
 // Protótipos de função.
 //
 
+
+//clona um processo sem thread.
+int do_fork_process();
+
+//cria uma estrutura do tipo processo, mas não inicializada.
+struct process_d *processObject();
+
+//pegar um slot vazio na lista de processos.
+//isso permite clonar um processo,
+int getNewPID();
+
 int processSendSignal(struct process_d *p, unsigned long signal);
 
 

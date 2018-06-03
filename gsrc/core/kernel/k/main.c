@@ -178,6 +178,11 @@ int kMain(int argc, char* argv[])
         KernelStatus = KERNEL_ABORTED;
         goto fail;
     };
+	
+	
+	//
+	//  ## Processes ##
+	//
 
     //
     //=================================================
@@ -245,8 +250,9 @@ int kMain(int argc, char* argv[])
     }else{
         //...
     };
-
-
+	
+	
+	
     //Creating Taskman process. 
     TaskManProcess = (void*) create_process( NULL, 
 	                                         NULL, 
@@ -256,13 +262,20 @@ int kMain(int argc, char* argv[])
 											 KernelProcess->pid, 
 											 "TASKMANPROCESS", 
 											 RING3, 
-											 (unsigned long ) KERNEL_PAGEDIRECTORY);	
+											 (unsigned long ) KERNEL_PAGEDIRECTORY );	
     if((void*) TaskManProcess == NULL){
         printf("main-kMain: TaskManProcess\n");
         die();
     }else{
         //...
     };
+	
+	
+	
+	//
+	//  ## Threads  ##
+	//
+	
 
     //
     // Creating threads. 
@@ -322,7 +335,8 @@ int kMain(int argc, char* argv[])
 	
 	
     //===================================
-    //Create taskman Thread. tid=2.
+    // Cria uma thread em ring 0.
+	// Ok. isso funcionou bem.
     RING0IDLEThread = (void*) KiCreateRing0Idle();
     if( (void*) RING0IDLEThread == NULL )
 	{

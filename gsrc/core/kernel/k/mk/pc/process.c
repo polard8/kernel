@@ -92,6 +92,111 @@ int processNewPID;   //??
 //...
 //
 
+//clona um processo sem thread.
+//retorna o pid do clone
+int do_fork_process()
+{
+	int PID;
+	
+	struct process_d *clone;
+	struct process_d *current;
+	
+	//
+	// ## Current ##
+	//
+	
+	current = (struct process_d *) processList[current_process];
+	if( (void*) current == NULL )
+	{
+		goto fail;
+	}else{
+		
+		if( current->used != 1 ||
+		    current->magic != 1234 )
+		{
+		    goto fail;		
+		}
+		
+		goto do_clone;
+		//...
+	};
+	
+	//
+	// ## Clone ##
+	//
+do_clone:
+	
+	//cria uma estrutura do tipo processo, mas não inicializada.
+	clone = (struct process_d *) processObject();
+	
+	if( (void*) clone == NULL )
+	{
+		goto fail;
+	}else{
+		
+	    PID = (int) getNewPID();
+		
+		if( PID == -1 || PID == 0 )
+		{
+			goto fail;
+		}
+		
+		clone->pid = PID;
+		clone->used = 1;
+		clone->magic = 1234;
+		
+		// ## clone  ##
+		processCopyProcess(  current->pid, clone->pid );
+        goto done;		
+	};	
+	
+done:
+    return (int) PID;	
+fail:
+    return (int) -1;	
+};
+
+
+//cria uma estrutura do tipo processo, mas não inicializada.
+struct process_d *processObject()
+{
+	struct process_d *p;
+	
+	p = (void *) malloc( sizeof(struct process_d) );
+	if( (void*) p == NULL )
+	{
+	    printf("processObject");
+		die();
+	};	
+	
+	return (struct process_d *) p;
+}
+
+//pegar um slot vazio na lista de processos.
+//isso permite clonar um processo
+int getNewPID()
+{
+	struct process_d *p;
+	
+	int i=0;
+	while( i < PROCESS_COUNT_MAX )
+	{
+		
+	    p = (struct process_d *) processList[i];	
+		
+		//Se encontramos um slot vazio.
+		if( (void *) p == NULL )
+		{
+			return (int) i;
+		}
+		//else
+		i++;
+	};
+	
+fail:
+    return (int) -1;	
+};
+
 
 /*
 struct process_d *processNew();
@@ -180,16 +285,24 @@ fail:
 };
 
 
-
-//copiar um processo.
-//isso será usado por fork.
-int processCopyProcess( int p1, int p2 )
+/*
+ ****************************************
+ * processCopyProcess
+ *     copiar um processo.
+ *     isso será usado por fork.
+ *
+ */
+int 
+processCopyProcess( int p1, int p2 )
 {
 	int Status = 0;
 	
     struct process_d *Process1;	
 	struct process_d *Process2;
 	
+	if( p1 == p2 ){
+		goto fail;
+	}
 	
 	//Check limits
 	//if( p1 < 1 ...

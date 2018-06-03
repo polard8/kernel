@@ -115,10 +115,11 @@ int KiInitTask(int id);
 int KiFork();	
 unsigned long KiExecutaTarefa(int id, unsigned long *task_address);
 void KiSwitchToUserMode();
-void KiStartTask(unsigned long id, unsigned long *task_address);	
-void KiAcordarTarefa(int id);
-void KiTaskExit();
-void KiKillTask(int id);
+
+  
+
+ 
+
 void KiSaveCurrentContext();
 void KiRestoreCurrentContext();	
 void KiNewTaskScheduler();

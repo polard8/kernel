@@ -223,7 +223,7 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  *     Cria um page directory para um processo.
  *     Obs:
  *     + O endereço precisa ser alocado antes.
- *     + Precisa ser um endereço físico.
+ *     + Precisa ser um endereço ( ## físico  ## ).
  *     +...
  *
  * Obs:
@@ -238,10 +238,11 @@ static inline void __native_flush_tlb_single(unsigned long addr)
 void *CreatePageDirectory( unsigned long directory_address )
 {	
 	int i;
-	unsigned long *newPD = (unsigned long *) directory_address;  
+	unsigned long *buffer = (unsigned long *) directory_address;  
 	
 	//Limits.
-	if( directory_address == 0 ){
+	if( directory_address == 0 )
+	{
 		return NULL;
 	}
 
@@ -249,19 +250,19 @@ void *CreatePageDirectory( unsigned long directory_address )
 	for( i=0; i < 1024; i++ )
 	{
 		// 0010 em binário.
-		newPD[i] = (unsigned long) 0 | 2;    
+		buffer[i] = (unsigned long) 0 | 2;    
 	};
 
 	//
 	//@todo:
 	//    Save on a list of directories.
 	//    Registra na lista de diretórios.
-	//    Antes precisamos saber em qual índice devemos salvar o endereço 
-	// do diretório de páginas que criamos.
+	//    Antes precisamos saber em qual índice devemos 
+	// salvar o endereço do diretório de páginas que criamos.
 	//
 	//
 	
-	//pagedirectoryList[??] = (unsigned long) &newPD[0]; 
+	//pagedirectoryList[??] = (unsigned long) &buffer[0]; 
 	
 	//...
 	
@@ -306,24 +307,30 @@ done:
  */
 void *CreatePageTable( unsigned long directory_address, 
                        int offset, 
-					   unsigned long page_address )
+					   unsigned long pagetable_address )
 {
 	int i;
 	unsigned long *PD = (unsigned long *) directory_address;  //Diretório.
-	unsigned long *newPT = (unsigned long *) page_address;    //Tabela de páginas.
+	unsigned long *newPT = (unsigned long *) pagetable_address;    //Tabela de páginas.
+	
+	unsigned long base = pagetable_address;
+	
 	
 	//Limits.
-	if( directory_address == 0 ){
+	if( directory_address == 0 )
+	{
 		return NULL;
 	}
 	
 	//Limits.
-	if( offset < 0 ){
+	if( offset < 0 )
+	{
 		return NULL;
 	}
 
 	//Limits.
-	if( page_address == 0 ){
+	if( pagetable_address == 0 )
+	{
 		return NULL;
 	}
 	
@@ -337,13 +344,14 @@ void *CreatePageTable( unsigned long directory_address,
 	for( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
-	    newPT[i] = (unsigned long) page_address | 7;             
-	    page_address     = (unsigned long) page_address + 4096;  //+4KB.
+	    newPT[i] = (unsigned long) pagetable_address | 7;             
+	    pagetable_address = (unsigned long) pagetable_address + 4096;  //+4KB.
     };
 
 	//Aqui devemos incluir as flags também.
+	//Configurando os atributos.
 	PD[offset] = (unsigned long) &newPT[0];
-    PD[offset] = (unsigned long) PD[offset] | 7;      //Configurando os atributos.
+    PD[offset] = (unsigned long) PD[offset] | 7;      
 
 	//
 	// @todo: 
@@ -353,7 +361,7 @@ void *CreatePageTable( unsigned long directory_address,
 	//unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
 
 done:
-    return (void*) page_address;
+    return (void*) base;
 };
 
 

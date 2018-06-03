@@ -1155,9 +1155,10 @@ void SetCR3(unsigned long address);
 //
 
 void *CreatePageDirectory(unsigned long directory_address);
+
 void *CreatePageTable( unsigned long directory_address, 
                        int offset, 
-					   unsigned long page_address );
+					   unsigned long pagetable_address );
 
 
 					   

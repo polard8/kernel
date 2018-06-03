@@ -1882,6 +1882,15 @@ do_compare:
 		goto exit_cmp;
     };
 	
+    // fork - testando a função fork.
+	if( strncmp( prompt, "fork", 4 ) == 0 )
+	{
+		int pidFORK = (int) fork();
+        printf("PID={%d}\n",pidFORK);
+        goto exit_cmp;
+	};	
+	
+	
     // getpid
 	if( strncmp( prompt, "getpid", 6 ) == 0 ){
 	    getpid_builtins();
