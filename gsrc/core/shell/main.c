@@ -95,18 +95,35 @@
 //#include "builtins.h"
 
 
-//#define SHELL_VERBOSE 1
-
 //inicialização silenciosa. Suprime alguns verboses.
 int quiet = 0;	
 
+//O shell está rodadndo.
 int running = 1;
+
+//o shell está executando um comando que 
+//está emprimeiro plando.
+int executing = 0;
 
 int login_status = 0;
 
 //Sendo assim, o shell poderia abrir no ambiente de logon.
 char *username;
 char *password; 
+
+#ifndef PPROMPT
+#define PPROMPT "shell\\$ "
+#endif
+char *primary_prompt = PPROMPT;
+
+#ifndef SPROMPT
+#define SPROMPT "shell> "
+#endif
+char *secondary_prompt = SPROMPT;
+
+//O ambiente que o shell passa para 
+//o comando que ele executou.
+char **shell_environment;
 
 //#define DEFAULT_WINDOW_TITLE "Shell"
 
@@ -251,9 +268,10 @@ int GramadoMain( int argc,
 				 unsigned long long1, 
 				 unsigned long long2 )
 {
-	register int i;
-	char *filename;
 	
+	//char **internal;
+	char *filename;
+	register int i;
 	//
 	// Obs: Esse não é um programa que roda em modo terminal,
 	// ele na verdade cria um terminal dentro de uma janela filha.
@@ -346,7 +364,7 @@ int GramadoMain( int argc,
 		//	goto dosh2;
 		//}			
 		
-	    if( strncmp( (char *) argv[1], "-login", 2 ) == 6 )
+	    if( strncmp( (char *) argv[1], "-login", 6 ) == 0 )
 	    {
 			login_shell = 1;
 			
@@ -1405,7 +1423,6 @@ exit:
  *
  * Credits:
  * + Stephen Brennan - https://brennan.io/2015/01/16/write-a-shell-in-c/
- * + Frederico Lamberti Pissarra 
  * + Frederico Martins Nora (frednora)
  */
  
@@ -1415,9 +1432,19 @@ exit:
  
 unsigned long shellCompare(struct window_d *window)
 {
+    //char **stringarray1;
+	char *tokenList[TOKENLIST_MAX_DEFAULT];
+	char *token;
+	int token_count;	
+	int i = 0;
+
     unsigned long ret_value;
-	int q; //diálogo
+	int q;    //diálogo
+	char c;
 	
+    //?? é um pathname absoluto ou não. ??
+	//Ok. isso funcionou.
+    int absolute; 
 	
   // Temos uma linha de comando em prompt[]
   // que é o stdin.  
@@ -1426,9 +1453,58 @@ NewCmdLine:
 	//Se alguem pressiona [ENTER] com prompt vazio
 	//dá page fault.
 	//Isso cancela caso o buffer esteja vazio.
-	if( *prompt == (char) '\0' ){
+	
+	//>(NULL)
+	c = *prompt;
+	if( c == (char) '\0' ){
 	    goto exit_cmp;	
 	}
+	
+    //>/
+    //>.
+    //>./
+    //>..
+    //>../
+ 
+
+    absolute = absolute_pathname( (char*) prompt );
+    if(absolute == 1)
+	{
+		// Aqui estamso invocando alguma coisa em um 
+        // determinado diretório, pode ser o deretório raiz 
+        // o próprio diretório, algo no próprio diretório,
+        // o diretório pai ou algo no diretório pai. 		
+		printf("absolute pathname\n");
+		goto check_directory;
+	}else{
+		
+		// Aqui pode ser que começamos com o 
+		// nome de um programa. Ex: >gcc
+		// Obs: Se isso é um comando então 
+		// podemos checar mais à frente novamente 
+		// se o pathname é absoluto ou não.
+		printf("not absolute pathname\n");
+	    goto this_directory;
+	}
+	
+
+//precisamos checar em que diretório 
+//o programa está.
+//o comando tem um pathname absoluto ...
+//Precisamos invocar esse programa 
+//que está em um diretório apontado no pathname.
+//ex: ../cmd 	
+check_directory:
+	
+	
+//O primeiro elemento da linha de comandos 
+// é um comando simples	
+// cd ..
+this_directory:	
+	
+	//if( *prompt == (char) '\0' ){
+	//    goto exit_cmp;	
+	//}
 	
 	// O input pode ser copiado aqui, então manipularemos essa variável.
 	//char *FileName;
@@ -1444,9 +1520,7 @@ NewCmdLine:
     //printf("shellCompare: Testing ...\n");
     //refresh_screen();	
    
-    char *tokenList[TOKENLIST_MAX_DEFAULT];
-    int i = 0;
-	int token_count;
+
 	
 	
 	// ?? what ?
@@ -1461,7 +1535,7 @@ NewCmdLine:
 	//para o argumento atual
 	//@todo: isso precisa ser limpado sempre.
 	
-	char *token;
+
 	
 	//salva a primeira palavra digitada.
 	token = (char *) tokenList[0];
@@ -1633,10 +1707,9 @@ do_compare:
 	//
 	
 
-	
-	//@todo
 	//token
 	//testando tokenList
+	//comando usado para testes de comando.
 	if( strncmp( prompt, "token", 5 ) == 0 )
     {
 		printf("\nTesting tokenList ...\n");
@@ -1729,6 +1802,8 @@ do_compare:
 			printf("Error: No name!\n");
 		}else{
 			
+			//@todo: podemos checar se o pathname é absoluto,
+			//e onde se encontra o arquivo que queremos.
 			shellDisplayBMP( (char*) tokenList[i] );
 		};
 		goto exit_cmp;
@@ -1761,7 +1836,11 @@ do_compare:
 	
 	
 	// cd - Change dir.
-	if( strncmp( prompt, "cd", 2 ) == 0 ){
+	if( strncmp( prompt, "cd", 2 ) == 0 )
+	{
+		// o que segue o comando cd é um pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.
 		cd_buitins();
 	    goto exit_cmp;
 	}		
@@ -1814,7 +1893,11 @@ do_compare:
     };		
 	
 	// copy
-	if( strncmp( prompt, "copy", 4 ) == 0 ){
+	if( strncmp( prompt, "copy", 4 ) == 0 )
+	{
+		// o que segue o comando copy são dois pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.		
 		copy_builtins();
 	    goto exit_cmp;
 	}
@@ -1826,14 +1909,23 @@ do_compare:
     };	
 
 	// del
-	if( strncmp( prompt, "del", 3 ) == 0 ){
+	if( strncmp( prompt, "del", 3 ) == 0 )
+	{
+		// o que segue o comando del é um pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.		
 		del_builtins();
 	    goto exit_cmp;
 	}		
 	
 	
 	// dir - Lista os arquivos no estilo DOS.
-	if( strncmp( prompt, "dir", 3 ) == 0 ){
+	if( strncmp( prompt, "dir", 3 ) == 0 )
+	{
+		// o que segue o comando dir é um pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.
+        //se o pathname for null então o comando atua sobre o pwd		
 		dir_builtins();
         goto exit_cmp;
     };
@@ -1869,6 +1961,9 @@ do_compare:
 	// exec - Executa um programa fechando o shell.
     if( strncmp( prompt, "exec", 4 ) == 0 )
 	{
+		// o que segue o comando exec é um pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.		
 		exec_builtins();
 		ShellFlag = SHELLFLAG_EXIT;
 		goto exit_cmp;
@@ -1984,6 +2079,17 @@ do_compare:
     // ?? 
 	if( strncmp( prompt, "install", 7 ) == 0 )
 	{
+		// o que segue o comando install é um pathname.
+		//com o nome do aplicativo instalador
+		//no fim do pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.
+        //o comando install colocará nos argumentos 
+        //o indicativo que de que desejamos que 
+        //o aplicativo executado seja um instalador.
+        //por exemplo: -install-bin  -install-package -install-lib etc...
+        //install.bin é um aplicativo. 
+        //>install app.bin -install-bin		
 	    printf("~install\n");
 		//fs_install();
         goto exit_cmp;
@@ -2034,6 +2140,9 @@ do_compare:
 	// mov
 	if( strncmp( prompt, "mov", 3 ) == 0 )
 	{
+		// o que segue o comando mov são dois pathnames.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.		
 	    goto exit_cmp;
 	}		
 
@@ -2048,7 +2157,7 @@ do_compare:
 
 	// new
 	if( strncmp( prompt, "new", 3 ) == 0 )
-	{
+	{		
 	    printf("~new - New file or directory\n");		
 	    goto exit_cmp;
 	}		
@@ -2103,6 +2212,9 @@ do_compare:
 	// rename - reneme directory or file.
 	if( strncmp( prompt, "rename", 6 ) == 0 )
 	{
+		// o que segue o comando rename são dois pathnames.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.		
         goto exit_cmp;
     };	
 	
@@ -2120,12 +2232,17 @@ do_compare:
     // save
 	if( strncmp( prompt, "save", 4 ) == 0 )
 	{
+		// o que segue o comando save é um pathname.
+		//@todo: podemos checar se o pathname é absoluto,
+		//e onde se encontra o arquivo que queremos.		
 	    printf("~save root\n");
         goto exit_cmp;
     };
 	
 	
 	// service
+	//podemos tertar serviços do kernel 
+	//enviando argumentos nulos.
 	if( strncmp( prompt, "service", 7 ) == 0 )
 	{
 	    printf("~service - testa servicos do kernel:\n");
@@ -2174,6 +2291,8 @@ do_compare:
 	// start
 	// Inicia uma nova janela(instancia ??) para executar 
 	// um programa ou comando desejado.
+	//??#bugbug: O que isso deveria fazer ?? 
+	//??reiniciar o shell ou iniciar um programa ??
     if( strncmp( prompt, "start", 5 ) == 0 )
 	{
 		// Isso deve setar o foco na janela do shell.
@@ -2414,36 +2533,58 @@ doexec_first_command:
 	//
 
     //
+	// #importante:
 	// Se estamos aqui é porque o comando não corresponde a
 	// nenhuma das palavras reservadas acima, então executaremos
 	// presumindo ser um nome de aplicativo no formato 'test.bin'
-	// Obs: Isso é um teste, o comando digitado ainda 
-	// precisa de mais análises como as barras '/'
-	//
+	// >>> Mas esse comando pode ser o último elemento  
+	//     de um pathname, então vamos checar se o pathname é 
+	//     absoluto. Isso é a primeira coisa que podemos fazer.
 	//
 	
-    //
-    // ## Se o comando começa com barra.
-    //	
-	
-	//if( prompt[0] == '/' )
-	//{
+    absolute = absolute_pathname( (char*) tokenList[0] );
+    if(absolute == 1)
+	{
+		// Aqui estamso invocando alguma coisa em um 
+        // determinado diretório, pode ser o deretório raiz 
+        // o próprio diretório, algo no próprio diretório,
+        // o diretório pai ou algo no diretório pai. 		
+		printf("doexec_first_command: absolute pathname\n");
 		
-	//}
+		// eliminando ./ do pathname
+		char *t = (char*) tokenList[0];
+		if( *t == '.' )
+		{
+			t++;
+		    if( *t == '/' )
+			{
+				t++;
+				tokenList[0] = (char*) t;
+			}
+	    }	
+	
+	}else{
+		
+		// Aqui pode ser que começamos com o 
+		// nome de um programa. Ex: >gcc
+		// Obs: Se isso é um comando então 
+		// podemos checar mais à frente novamente 
+		// se o pathname é absoluto ou não.
+		printf("doexec_first_command: not absolute pathname\n");
+	}
 	
 	
 	//
 	// ## Executando um programa no formato ">test.bin"
 	//
 	
-    //teste: com argumentos.
-    //Execve_Ret = (int) shell_gramado_core_init_execve( (const char*) prompt, 
-	//                                                    tokenList[i+1], 
-	//													tokenList[i+2] );
 	
 	
     //Presumindo ser um nome de aplicativo no formato 'test.bin'.
- 
+    //o token 0 é o nome do programa e o os próximos são argumenteos ..
+	//dessa forma podemos enviar um comando e dois argumentos ...
+	//?? Talvez devessemos enviar um ponteiro para um array de strings 
+	// no último argumento. (argv) ou ainda um env
 						 
 
     Execve_Ret = (int) shell_gramado_core_init_execve( 
@@ -3469,6 +3610,10 @@ void shellShowScreenBuffer()
  */
 void shellTestLoadFile()
 {
+	FILE *f;
+	int Ret;
+	int i;
+	
 	//Limpa a tela e reposiciona o cursor.
 	shellClearScreen();
     shellSetCursor(0,0);
@@ -3478,7 +3623,7 @@ void shellTestLoadFile()
 	// Ok, isso funcionou.
 	//
 	
-	int Ret;
+	
 	
 #ifdef SHELL_VERBOSE	
 	printf("...\n");
@@ -3503,14 +3648,14 @@ void shellTestLoadFile()
 							 
 	//printf("ret={%d}\n",Ret);
 	
-    FILE *f;
+    
 	
     f = (FILE *) fopen( "init.txt", "wd" );
 	
 	//#test 
 	//testando com um arquivo com texto pequeno.
 	
-	int i;
+	
 	for( i=0; i<128; i++ )
 	{
 		//movendo.
@@ -3746,7 +3891,10 @@ static void del(void)
 
 
 //insere um caractere entro do buffer
-void shellInsertCharXY(unsigned long x, unsigned long y, char c)
+void 
+shellInsertCharXY( unsigned long x, 
+                   unsigned long y, 
+				   char c )
 {
 	unsigned long offset = (unsigned long) ((y*80) + x); 
 	
@@ -3891,7 +4039,7 @@ void shellTestMBR()
 done:
 	printf("done");
 	refresh_screen(); //??
-	return;
+	//return;
 };
 
 
@@ -3912,7 +4060,7 @@ void move_to( unsigned long x, unsigned long y )
 	
 	screen_buffer_x = x;
 	screen_buffer_y = y;
-	return;
+	//return;
 };
 
 
@@ -4637,7 +4785,7 @@ done:
 };
 
 
-void die(char * str)
+void die(char *str)
 {
 	printf("die: %s",str);
 	//@todo
@@ -4714,8 +4862,12 @@ reader_loop()
 // e retornaremos ao incio da função que compara, para 
 // comparar agora o que estava escrito no arquivo de script.
 //
-int shellExecuteThisScript( char* script_name )
+int 
+shellExecuteThisScript( char* script_name )
 {
+    FILE *script_file;	
+	int i;
+	
     //
 	// Aqui temos que carregar o arquivo de script indicado 
 	// nos argumentos.
@@ -4724,8 +4876,6 @@ int shellExecuteThisScript( char* script_name )
 	printf("shellExecuteThisScript:\n");	
 	printf("Initializing script ...\n");
     printf("CurrentFile={%s}\n",script_name);
-
-    FILE *script_file;	
 
     script_file = fopen(script_name,"rw");
 	
@@ -4738,7 +4888,7 @@ int shellExecuteThisScript( char* script_name )
 	
 	//atualizando a linha de comandos no prompt[], stdin.
 	
-	int i;
+
 	for( i=0; i< 128; i++ )
 	{
 		stdin->_base[i] = script_file->_base[i];
@@ -4752,3 +4902,84 @@ done:
 }
 
 
+/*
+char **
+array_of_strings()
+{
+	char **a;
+	
+	a[0] = "test0";
+	a[1] = "test1";
+	a[2] = NULL;
+	
+	return (a);
+};
+*/
+
+
+/*
+//retorna o pool de strings contendo os nomes dos arquivos
+//em um diretório que está no buffer.
+char **
+get_dir_files( char *buffer )
+{
+    char **poll;	
+	
+	// ...
+	
+	
+    return (poll);	
+}
+*/
+
+/*
+//coloca no pool de strings passado por argumento 
+//as strings que correspondem  aos nomes 
+// dos arquivos encontrados no diretório 
+//indicado pelo buffer.
+int set_dir_files( char **poll, char *buffer )
+{
+	
+	//...
+	
+    return (0);
+};
+*/
+
+
+/*
+ **************************************
+ * absolute_pathname:
+ * Retorna 1 nos seguintes casos:
+ *
+ * >/
+ * >.
+ * >./
+ * >..
+ * >../
+ *
+ * Credits: bash 1.05
+ */
+int
+absolute_pathname( char *string )
+{
+    if( !string || !strlen(string))
+        return (0);
+
+    if( *string == '/' )
+        return (1);
+
+	//.
+    if( *string++ == '.' )
+    {
+        // ./
+		if( (!*string) || *string == '/' )
+	        return (1);
+
+        // ..
+		if( *string++ == '.' )
+	        if(!*string || *string == '/')  //../
+	        return (1);
+    }
+    return (0);
+};

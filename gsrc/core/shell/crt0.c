@@ -37,6 +37,7 @@ static char *envp[] = {
 //
 void crt0()
 {
+	//char **empty_string_pool;
     int app_response;	
 
 //initRT:	

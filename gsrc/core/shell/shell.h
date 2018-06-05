@@ -19,8 +19,139 @@
  *     2017 - procedure and command stuff.
  */
  
+//#define SHELL_VERBOSE 1
+
+//
+// pool
+//
+
+//tipo array de strings
+typedef char ** poll;
+typedef char ** POLL;
+
+//array de unsigned longs contendo ponteiros 
+//para pools de strings;
+typedef unsigned long pool_list_t;
+typedef unsigned long POOLLIST;
  
  
+//command type 
+typedef enum {
+	ctNull,
+	//...
+}command_type_t;
+ 
+
+//command struct
+typedef struct command_d command_t;
+struct command_d
+{
+	// Typo de comando.
+    command_type_t type;
+	
+	//@todo: Criar essas estruturas.
+    //struct start_com_d     *Start;
+    //struct finish_com_d    *Finish;
+    //struct super_com_d     *Super;
+    //struct rules_com_d     *Rules;
+    //struct condition_d     *Condition;
+    //struct open_com_d      *Open;
+    //struct close_com_d     *Close;
+    //struct run_com_d       *Run;
+    //struct stop_com_d      *Stop;
+    //struct guarantee_com_d *Guarantee;	
+    //struct mix_com_d       *Mix;
+    //struct here_com_d      *Here;
+    //struct there_com_d     *There;	
+	
+	//...
+};
+command_t *current_command;
+
+
+//command struct
+typedef struct connection_d connection_t;
+struct connection_d
+{
+    struct command_d *first;
+    struct command_d *second;
+    
+	//qual é o tipo de conector entre os comandos
+	// | ??? 
+	int connectorType;  	
+};
+connection_t *current_connection;
+
+//...
+
+//Lista de palavras reservadas.
+//São as mesmas da gramado language, pois 
+//a gramado language é uma linguagem de script.
+//*.gra  usar esse >>> (*.gl1)
+static char *RESERVED[] = {
+	"start",   //início do script
+	"finish",  //fim do script
+	"super",   //tipo genérico.
+	"rules",   //fecha declaração (;)
+	"condition",   //
+	"open",        //( 
+	"close",       //)
+	"run",         //{
+	"stop",        //} 
+	"guarantee",   //while
+	"mix",         //done: ?? 
+	"here",        //system() command 
+	"there",       // fecha (;)
+};
+
+
+static unsigned char SPECIAL[] = {
+	'(',
+	')',
+	'{',
+	'}',
+	'/',
+	'*',
+	'-',
+	'+',
+	'|',
+	'\'',
+	'@',
+	'$',
+	'%',
+	'&',
+	'+',	
+	//...
+}; 
+
+
+static unsigned char SPECIALOPEN[] = {
+	'(',
+	'{',
+	'[',
+	//...
+}; 
+
+static unsigned char SPECIALCLOSE[] = {
+	')',
+	'{',
+	']',
+	//...
+}; 
+
+
+static unsigned char SPECIALMATH[] = {
+	'/',
+	'*',
+	'-',
+	'+',
+	'.',
+	',',
+	//...
+}; 
+
+
+
 
  
  
@@ -621,8 +752,9 @@ void shellShowKernelInfo();
 
 /*
  * gramado core specials execve SUPPORT.
+ * Executa um programa exclusivamente dentro 
+ * do ambiente Gramado Core no lugar do processo init.bin.
  */
- 
 int shell_gramado_core_init_execve( const char *arg1, 
                                     const char *arg2, 
                                     const char *arg3 );
@@ -650,6 +782,22 @@ void bmpDisplayBMP( void* address,
 //um comando no shell aponta o script para executar.
 int shellExecuteThisScript( char* script_name );
 					
+/*
+ **************************************
+ * absolute_pathname:
+ * Retorna 1 nos seguintes casos:
+ *
+ * >/
+ * >.
+ * >./
+ * >..
+ * >../
+ *
+ * Credits: bash 1.05
+ */
+int
+absolute_pathname( char *string );
+
 					
 //
 // End.
