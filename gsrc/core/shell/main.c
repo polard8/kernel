@@ -973,6 +973,9 @@ shellProcedure( struct window_d *window,
 				// Finaliza a string e compara.
 				case VK_RETURN:
 				    input('\0'); 
+					//input('\0');
+					//input(0);
+					//input(0);
 					shellCompare(window);
 					goto done;
                     break; 					
@@ -1440,7 +1443,7 @@ unsigned long shellCompare(struct window_d *window)
 
     unsigned long ret_value;
 	int q;    //diálogo
-	char c;
+	char *c;
 	
     //?? é um pathname absoluto ou não. ??
 	//Ok. isso funcionou.
@@ -1449,16 +1452,91 @@ unsigned long shellCompare(struct window_d *window)
   // Temos uma linha de comando em prompt[]
   // que é o stdin.  
 NewCmdLine:	
+
+    //#debug
+	printf("prompt:{%s}\n",prompt);
+	
+	c = prompt;
 	
 	//Se alguem pressiona [ENTER] com prompt vazio
 	//dá page fault.
 	//Isso cancela caso o buffer esteja vazio.
 	
 	//>(NULL)
-	c = *prompt;
-	if( c == (char) '\0' ){
+	//[ENTER] finalizou a atring antes de ter digitado alguma coisa.
+	if( *c == '\0' ){
 	    goto exit_cmp;	
 	}
+	
+	//>' '
+	//Só faz o tratamento com while se for igual a ' '.
+    if( *c == ' ' || *c == '\t' )
+	{
+        int j;		
+        //#importante:
+		//Aqui estamos tratando uma linha de comando inteira.
+		
+	    //enquanto c[] for diverente de ' ' c avança.
+	    //isso elimina os espaços para c[]
+	    j=0;
+		while( *c == ' ' || *c == '\t' )
+		{ 
+	        
+			//Limits
+		    j++;
+			if( j > 80 )
+			{
+			   //#debug
+               //Isso significa que uma string 
+			   //construida em prompt[] não foi 
+			   //corretamente finalizada.
+			   //ou algum problema no while anterior.
+			   printf("#debug \n");				
+			   printf(" ** while1 fail  **\n");	
+			   while(1){}
+			}
+			
+			//desrepeitamos o limite imposto pelo fim da string.
+			//por isso temos que fazer a marcação exata do início 
+			//da linha de comando e do fim da linha de comando.
+			// |            |.......|        |
+			// start       left   right     end
+			
+			c++; 
+		}
+		
+		//se depois de eliminarmos os espaços encontrarmos
+		//um '\0' de fim de string.
+		//significa que o usuário digitou um monte de espaços
+		//depois apertou enter.
+		//não há mais o que fazer.
+	    if( *c == '\0' ){
+	        goto exit_cmp;	
+	    }		
+	    
+		int line_rest = (80-j);
+		
+		//copia todo o resto da linha para o inpicio da linha.
+        for( j=0; j<line_rest; j++ )
+		{
+			prompt[j] = c[j];
+			
+			//se enquanto estamos copiando,
+			//ja copiamos o finalizador de string,
+			//não precisamos copiar mais nada.
+			if( *c == '\0' )
+            {
+				goto commandlineok;
+			}				
+		}
+        
+		//#bugbug
+        //se estamos aqui é porque copiamos quase 80 chars.		
+    };
+
+commandlineok:	
+    //#debug
+	printf("prompt:{%s}\n",prompt);	
 	
     //>/
     //>.
@@ -2553,6 +2631,7 @@ doexec_first_command:
 		
 		// eliminando ./ do pathname
 		char *t = (char*) tokenList[0];
+		
 		if( *t == '.' )
 		{
 			t++;
@@ -2751,39 +2830,33 @@ dosh:
 	
 	// set current directory
 	
+//
+//  ## Fail ##
+//	
+	
+	
 fail:	
-	for( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){
-		tokenList[i] = NULL;
-	};
-	
-	printf(" Unknown command!\n");
-	printf("%s\n", prompt);
-	
-	shellPrompt();
-	//Mostrando as strings da rotina de comparação.
-	refresh_screen(); 	
-	return (unsigned long) 1;
-	
+    printf(" Unknown command!\n");
+    ret_value=1;
+	goto done;
 	
 //
 // ## EXIT CMP ##
 //	
 
 exit_cmp:
-
+    ret_value=0;	
+done:
 	// Limpando a lista de argumentos.
 	// Um array de ponteiros.
 	
 	for( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){
 		tokenList[i] = NULL;
 	};
-	
-	// Limpando o buffer de entrada
-	
 	shellPrompt();
 	//Mostrando as strings da rotina de comparação.	
-	refresh_screen(); 
-    return (unsigned long) 0;
+	refresh_screen();
+    return (unsigned long) ret_value;
 };
 
 
@@ -2801,11 +2874,6 @@ void shellShell()
 	// Internas.
 	//
 	
-	//
-	// Obs: Configurar cursor para tela pequena.
-    // Screen 320x480.(Celular).
-	// Client Area = (Altura - 24)
-    //	
 	
     shellStatus = 0;
     shellError = 0;
@@ -3541,8 +3609,9 @@ shellPrompt()
 	prompt_max = PROMPT_MAX_DEFAULT;  
 
     printf("\n");	
-	printf("%s/%s",current_workingdiretory_string ,SHELL_PROMPT );
-	return;
+	printf("%s/%s", current_workingdiretory_string,
+	    SHELL_PROMPT );
+	//return;
 };
 
 
@@ -3774,9 +3843,12 @@ void shellClearScreen()
 /*
  *******************************************
  * shellRefreshScreen:
- *     Copia o conteúdo do buffer de output 
- * para a tela. (dentro da janela).
- *
+ *     Copia o conteúdo do (screen_buffer) buffer de output 
+ * para a tela. (dentro da janela). 
+ * ## Acho que se trata de stdout.
+ * É uma memória VGA virtual com caractere e atributo.
+ * na hora de efetuar refresh precisamos considerar o atributo 
+ * para sabermos a cor do caractere e de seu background.
  */
 void shellRefreshScreen()
 {
@@ -3790,6 +3862,9 @@ void shellRefreshScreen()
 
 	//cursor apontando par ao início da janela.
 	//usado pelo printf.
+	//@todo: podemos colocar o cursor no 
+	//início da área de cliente.
+	//left será a coluna.
 	shellSetCursor(0,0);
 	
 	//linhas.
