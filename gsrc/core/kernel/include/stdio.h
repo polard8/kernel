@@ -6,7 +6,9 @@
  *   
  * @todo: Trabalhar nas funções de abrir e fechar arquivos.
  * 
- * Versão 1.0, 2015, 2016.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  */
 
  
@@ -301,6 +303,26 @@
 #define INPUT_MODE_MULTIPLE_LINES      1
 int g_inputmode;
  
+ 
+//
+// Numero de stream no array global de streams.
+//  
+//
+//
+int g_nstream; 
+ 
+// Ponteiro para o array de streams dinâmico,
+// Para o caso de termos um novo array de tamanho maior 
+// que o padrão, então alocaremos memória para ele e 
+// usaremos esse ponteiro aí.
+// Ate mesmo para o caso de usarmos apenas o tamanho 
+// padrão podemos usar esse ponteiro aí,
+// apontando Streams[] para gStreams. 
+unsigned long *gStreams; 
+
+//Tmanho dinâmico.?? 
+//unsigned long gStreams[?];
+ 
 // 
 //printf support 
 //
@@ -428,20 +450,33 @@ int stdio_verbosemode_flag;
 
 
 /*
+ **********************************************
  * FILE:
  *     Estrutura padrão para arquivos.
  *     >>> i/o buffer 
+ *
+ *     Ambiente: RING 0.
  */
 typedef struct _iobuf FILE; 
 struct _iobuf 
 {
+	//Object support.
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
-	char *_ptr;      //Current position of file pointer (absolute address).
+	//object control
+	struct object_d *object;
+	
+	
+	//Current position of file pointer (absolute address).
+	char *_ptr;     
+	
 	int   _cnt;
-	char *_base;    //Pointer to the base of the file.
-	int   _flag;    //Flags (see FileFlags).
+	
+	//Pointer to the base of the file.
+	char *_base;    
+	
+	int   _flag;    
 	int   _file;
 	int   _charbuf;
 	int   _bufsiz;
@@ -473,7 +508,7 @@ FILE *vfs;              //3 - Diretório raiz do vfs.
 FILE *volume1_rootdir;  //4 - Diretório raiz do volume de boot.
 FILE *volume2_rootdir;  //5 - Diretório raiz do volume do sistema. 
 FILE *file_InitTXT;     //6 - Arquivo de configuração de inicialização. INIT.TXT.
-FILE *file_users;       //7 - Pasta para perfis de usuários.
+FILE *file_users;       //7 - Pasta para perfis de usuários. /users
 FILE *file_BootManager; //8 - Boot Manager. BM.BIN.
 FILE *file_BootLoader;  //9 - Boot Loader. BL.BIN.
 
@@ -516,11 +551,49 @@ FILE *file_pwd;         //23 - Diretório de trabalho. Diretório usado no comando
 
 
 /*
+ * ## Aprendendo sobre streams ##
  * #importante 
  * Lista de endereços de estruturas de streams.
+ * Essas são as streas que pertencem ao processo kernel.
+ * Array de ponteiros de estrutura.
+ *
+ *
+ * Isso poderia ser um array de acesso global,
+ * contendo streams de todos os processos,
+ * As primeiras sreasm seriam do processo kernel.
+ * Obs: Quando um processo solicitar um descritor 
+ * para a biblioteca C ele estará usando um índice que 
+ * seleciona o descritor real do arquivo, que será usado 
+ * nessa lista.
+ * Vários processos selecionarão o descritor '0',
+ * mas esse descritor deve ser traduzido para 
+ * um verdadeiro descritor usado nessa lista global.
+ *
+ * ## IMPORTANTE ##
+ * O kernel precisa gerenciar os recursos 
+ * usados pelos processos e liberar esses recursos 
+ * quando o processo não estiver mais usando ..
+ * >>> Não é trabalho da libc se preocupar
+ * com o gerenciamento de recursos do processo.
+ *
+ * ## facilita as coisas ##
+ * Pois o kernel pode alocar memória 
+ * para alguns arquivos usando o alocador de páginas, 
+ * mas o processo não tem acesso a essa memória,
+ * então o processo em user mode teria que fazer 
+ * muitas chamadas para acessar o conteúdo do arquivo, 
+ * a não ser que o kernel compartilhe a memória 
+ * com o processo.
+ *
+ *
  */
-//Array de ponteiros de estrutura. 
 unsigned long Streams[NUMBER_OF_FILES]; 
+
+/*
+ * #importante 
+ * ## suspenso ##
+ */
+//unsigned long GlobalStreams[??]; 
 
 //
 // Pipes support
@@ -567,7 +640,7 @@ int printf(const char *format, ...);
 int sprintf(char *str, const char *format, ...);
 int fprintf(FILE *stream, const char *format, ...);
 int putchar( int ch );
-int panic(const char *format, ...);
+void panic( const char *format, ... );
 //...
 
 //BUFFER:
@@ -618,8 +691,9 @@ int kprint(char *message, unsigned int line, int color);
 //int getchar();
 
 //inicializa os buffers do fluxo padrão em stdio.c
-void stdioInitialize();
+int stdioInitialize();
+
 //
-// Fim.
+// End.
 //
 

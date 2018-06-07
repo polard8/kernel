@@ -425,24 +425,31 @@ done:
 
 
 //
-//printi
+// printi
 //
-static int printi( char **out, int i, int b, int sg, int width, int pad, int letbase)
+static int 
+printi( char **out, 
+        int i, 
+		int b, 
+		int sg, 
+		int width, 
+		int pad, 
+		int letbase )
 {
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
 	register int t, neg = 0, pc = 0;
 	register unsigned int u = i;
 
-	if(i == 0) {
+	if( i == 0 ) 
+	{
 		print_buf[0] = '0';
 		print_buf[1] = '\0';
 		return prints(out, print_buf, width, pad);
 	};
 	
-	
-
-	if(sg && b == 10 && i < 0){
+	if( sg && b == 10 && i < 0 )
+	{
 		neg = 1;
 		u = -i;
 	};
@@ -454,7 +461,7 @@ static int printi( char **out, int i, int b, int sg, int width, int pad, int let
 	{
 		t = u % b;
 		
-		if ( t >= 10 )
+		if( t >= 10 )
 		    t += letbase - '0' - 10;
 		    *--s = t + '0';
 		    u /= b;
@@ -479,9 +486,10 @@ static int printi( char **out, int i, int b, int sg, int width, int pad, int let
 
 
 //
-//print
+// print
 //
-static int print(char **out, int *varg)
+static int 
+print( char **out, int *varg )
 {
 	register int width, pad;
 	register int pc = 0;
@@ -569,21 +577,20 @@ static int print(char **out, int *varg)
 
 
 /*
+ ***************************************************
  * printf:
  *     The printf function.
  *     Assuming sizeof(void *) == sizeof(int).
  */
-int printf(const char *format, ...)
+int printf( const char *format, ... )
 {    
-    //sincronisa.  
-    // vsync();
-    
-	register int *varg = (int *)(&format);
-	return print(0, varg);
+    register int *varg = (int *)(&format);
+	return print(0,varg);
 };
 
 
 /*
+ *************************************************
  * panic:
  *     Kernel panic function.
  *     @todo: Esse função deve retornar void.
@@ -591,30 +598,29 @@ int printf(const char *format, ...)
  *     Essa rotina deveria ir para outro lugar.
  *     provavelmente em /sm
  */
-int panic(const char *format, ...)
+void panic( const char *format, ... )
 {           
 	register int *varg = (int *)(&format);
-	
-gui_mode:
-    if(VideoBlock.useGui == 1)
-	{
-	    backgroundDraw(COLOR_BLACK);
-		printf("uitm-libc-stdio-panic: KERNEL PANIC\n\n");
-		print(0, varg);
-		die();
-	};
+		
+    switch(VideoBlock.useGui)
+    {
+		//text mode
+		case 0:
+	        kclear(0);
+	        print(0,varg);		
+		    break;
+		
+		//graphics mode
+		case 1:
+	        backgroundDraw(COLOR_BLACK);
+		    printf("uitm-libc-stdio-panic: KERNEL PANIC\n\n");
+		    print(0,varg);		
+		    break;
 
-text_mode:
-    if(VideoBlock.useGui == 0)
-	{
-	    kclear(0);
-	    print(0, varg);
-	    die();
-	};
-	
-//Done.
-done:	
-	return (int) 0;
+        default:
+            break; 		
+	}
+    die();	
 };
 
 
@@ -1314,14 +1320,15 @@ input_done:
 
 
 /*
- ***********************************************************
+ *******************************************************
  * stdioInitialize:
  *     Inicializando stdio pertencente ao kernel base.
  *     Inicializa as estruturas do fluxo padrão.
  *     Quem chamou essa inicialização ?? Em que hora ??
  */
-void stdioInitialize()
+int stdioInitialize()
 {
+	int Status = 0;
 	int i;
 
 	// Buffers para as estruturas.
@@ -1341,30 +1348,32 @@ void stdioInitialize()
 	//
 	// Alocando uma página para cada buffer.
 	// 4KB size.
+	// #importante
+	// Obs: Essas páginas são alocadas em user mode.
 	//
 	
 	//4KB
-	buffer0 = (unsigned char *) newPage(); //?? kernel mode ??
+	buffer0 = (unsigned char *) newPage(); 
 	if( (unsigned char *) buffer0 == NULL )
 	{
-		printf("stdioInitialize: buffer0");
-        die();
+		printf("buffer0\n");
+        goto fail;
 	}
 	
 	//4KB
 	buffer1 = (unsigned char *) newPage();
 	if( (unsigned char *) buffer1 == NULL )
 	{
-		printf("stdioInitialize: buffer1");
-        die();
+		printf("buffer1\n");
+        goto fail;
 	}
 	
 	//4KB
 	buffer2 = (unsigned char *) newPage();
 	if( (unsigned char *) buffer2 == NULL )
 	{
-		printf("stdioInitialize: buffer2");
-        die();
+		printf("buffer2\n");
+        goto fail;
 	}
 	
 	//
@@ -1377,7 +1386,32 @@ void stdioInitialize()
 	stdout = (FILE *) &buffer1[0];	
 	stderr = (FILE *) &buffer2[0];	
 	  
-	  
+
+    // Configurando a estrutura de stdin. 
+	stdin->_base = &prompt[0];
+	stdin->_ptr =  &prompt[0];
+	stdin->_cnt = PROMPT_MAX_DEFAULT;
+	stdin->_file = 0;
+	stdin->_tmpfname = "k-stdin";
+	//...
+
+    // Configurando a estrutura de stdout.
+	stdout->_base = &prompt_out[0];
+	stdout->_ptr = &prompt_out[0];
+	stdout->_cnt = PROMPT_MAX_DEFAULT;
+	stdout->_file = 1;
+	stdout->_tmpfname = "k-stdout";
+	//...
+	
+    // Configurando a estrutura de stderr.
+	stderr->_base = &prompt_err[0];
+	stderr->_ptr =  &prompt_err[0];
+	stderr->_cnt = PROMPT_MAX_DEFAULT;
+	stderr->_file = 2;
+	stderr->_tmpfname = "k-stderr";	
+	//...
+	
+	
 	//
     // #importante
     // Salvando os ponteiros na lista de arquivos.	
@@ -1390,41 +1424,16 @@ void stdioInitialize()
 	//Streams[3] volume0 root dir (vfs) 
 	//Streams[4] volume1 root dir (boot volume)
     //Streams[5] volume2 root dir  (system volume)	 
-	//...  
-	  
-	//
-    // Configurando a estrutura de stdin.
-    //	
-	  
-	stdin->_base = &prompt[0];
-	stdin->_ptr =  &prompt[0];
-	stdin->_cnt = PROMPT_MAX_DEFAULT;
-	stdin->_file = 0;
-	stdin->_tmpfname = "kernel-stdin";
-	//...
-
-	//
-    // Configurando a estrutura de stdout.
-    //	
+	//...  	
 	
-	stdout->_base = &prompt_out[0];
-	stdout->_ptr = &prompt_out[0];
-	stdout->_cnt = PROMPT_MAX_DEFAULT;
-	stdout->_file = 1;
-	stdout->_tmpfname = "kernel-stdout";
-	//...
 	
-	//
-    // Configurando a estrutura de stderr.
-    //	
 	
-	stderr->_base = &prompt_err[0];
-	stderr->_ptr =  &prompt_err[0];
-	stderr->_cnt = PROMPT_MAX_DEFAULT;
-	stderr->_file = 2;
-	stderr->_tmpfname = "kernel-stderr";	
-	//...
+    //Configurando o array global para ser o 
+    //mesmo que o array local.	
+	gStreams = (unsigned long *) &Streams[0];
 	
+	//Número de streams no array global
+	g_nstream = NUMBER_OF_FILES;
 	
 	//
 	// Flag para o tipo de input.
@@ -1493,7 +1502,10 @@ void stdioInitialize()
 	//
 	
 done:
-    return;	
+    return (int) 0;	
+fail:
+    printf("uitm-libc-stdio-stdioInitialize: fail\n");
+	die();
 };
 
 

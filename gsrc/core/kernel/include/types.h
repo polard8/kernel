@@ -24,6 +24,20 @@
 //...
 
 
+//
+// pool
+//
+
+//tipo array de strings
+typedef char ** poll;
+typedef char ** POLL;
+
+//array de unsigned longs contendo ponteiros 
+//para pools de strings;
+typedef unsigned long pool_list_t;
+typedef unsigned long POOLLIST;
+
+
 /*
  *  HANDLE
  */
