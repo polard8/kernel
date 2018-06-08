@@ -4,8 +4,6 @@
 // header do gerenciador de fonts usados pelo módulo /gramado
 
 
-
-
 typedef enum {
 	FONTNULL,
 	FONT8X8,

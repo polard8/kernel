@@ -2830,8 +2830,12 @@ int init_windows()
 	//g8x16fontAddress = (unsigned long) 0x000FFA6E; 
 	//...
 	
-	//@todo: create SetFontAddress(.)
-	gfontAddress = (unsigned long) g8x8fontAddress;
+		//#bugbug: 
+		//Na verdade window.c não tem acesso a essa variável,
+		//é preciso chamar o servidor através de um método para 
+        //configurá-la.
+        //@todo: gwsSetCurrentFontAddress( g8x8fontAddress );
+	gws_currentfont_address = (unsigned long) g8x8fontAddress;
 	
 	//
 	// Char parameters.

@@ -12,7 +12,7 @@
  */
  
 
-#define DESKTOP_COUNT_MAX 16
+
 
 
 
@@ -163,7 +163,8 @@ struct desktop_info_d
 /*
  * Contagem de desktops.
  */
-int desktops_count;  
+//movido para gws.h 
+//int desktops_count;  
 
 
 

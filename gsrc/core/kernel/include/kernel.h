@@ -248,15 +248,17 @@ extern void do_executa_new_task();
 //
 
 //gramado - GUI. (presentation layer)
-#include <gramado/gui/usession.h>
-#include <gramado/gui/wstation.h>
-#include <gramado/gui/desktop.h>
-#include <gramado/gui/window.h>
-#include <gramado/gui/menu.h>
-#include <gramado/gui/grid.h>
-#include <gramado/gui/bmp.h>
-#include <gramado/gui/fonts.h>
-#include <gramado/gui/guiconf.h>  //*principal.
+//Gramado Window Server
+#include <gramado/gws/gws.h>
+#include <gramado/gws/usession.h>
+#include <gramado/gws/wstation.h>
+#include <gramado/gws/desktop.h>
+#include <gramado/gws/window.h>
+#include <gramado/gws/menu.h>
+#include <gramado/gws/grid.h>
+#include <gramado/gws/bmp.h>
+#include <gramado/gws/fonts.h>
+#include <gramado/gws/guiconf.h>  //*principal.
 
 // gramado/user
 #include <gramado/user/user.h>
@@ -382,13 +384,17 @@ typedef enum {
 int g_platform_type;
 
 
-int current_user;
-int current_group;
-int current_usersession;
-int current_windowstation;
-int current_desktop;
-int current_window;
-int current_menu;
+int current_user;    //gramado ?
+int current_group;   //gramado ?
+
+//#importante:
+//isso foi movido para gws.h
+//int current_usersession;    //gws
+//int current_windowstation;  //gws
+//int current_desktop;        //gws 
+//int current_window;         //gws
+//int current_menu; //gws
+
 int current_process;
 int current_thread;
 int current_idle_thread;  //ring0

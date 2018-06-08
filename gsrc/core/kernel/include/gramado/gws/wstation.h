@@ -21,7 +21,7 @@
  */
 
  
-#define WINDOW_STATION_COUNT_MAX 16 
+
  
  
 /*
@@ -77,7 +77,8 @@ unsigned long windowstationList[WINDOW_STATION_COUNT_MAX];
  * Contagem de window stations.
  *
  */
-int windowstations_count;  
+//movido para gws.h 
+//int windowstations_count;  
 
 void init_window_station();
 void init_windowstation_list();

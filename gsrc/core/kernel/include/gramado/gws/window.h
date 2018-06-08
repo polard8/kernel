@@ -91,8 +91,7 @@ int window_getch();
  
 // Número máximo de janelas.
 //@todo: Aumentar esse tamanho.
-#define WINDOW_COUNT_MAX 256
-#define MAX_WINDOWS WINDOW_COUNT_MAX 
+
 
 
 #define WINDOW_LOCKED 1
@@ -910,43 +909,50 @@ unsigned long g_navigationbar_height;
  * Status de ambientes gráficos.
  *
  */
-int logonStatus;              //Logon status.
-int logoffStatus;             //Logoff status.
-int userenvironmentStatus;    //User environment status.
+//movido para gws.h 
+//int logonStatus;              //Logon status.
+//int logoffStatus;             //Logoff status.
+//int userenvironmentStatus;    //User environment status.
 
-int guiStatus;        //Status da Interface gráfica do usuário.
-//outros...
-
-int g_guiMinimal; //Light or Full gui.
+//movido para gws.h
+//int guiStatus;        //Status da Interface gráfica do usuário.
+//int g_guiMinimal; //Light or Full gui.
 
 
 /*
  * Contagem de janelas.
  */
-int windows_count;  
+//movido para gws.h 
+//int windows_count;  
 
 
 //editbox.
 //A janela com o foco de entrada.
-int window_with_focus;   
+//movido para gws.h
+//int window_with_focus;   
 
 //janela do terminal.
 //Configurando a variável global que diz qual é 
 //o ID da janela que tem o terminal virtual ativo.
-int terminal_window;
+//movido para gws.h
+//int terminal_window;
 
 //Current editbox window id.
-int editbox_window;
+//movido para gws.h
+//int editbox_window;
 
 //current combobox window id;
-int combobox_window;
+//movido para gws.h
+//int combobox_window;
 
 
 //Id da janela ativa.
-int active_window;
+//movido para gws.h
+//int active_window;
 
 //Janela de id 0 na z-order
-int top_window;
+//movido para gws.h
+//int top_window;
 
 //
 // ...
@@ -955,32 +961,37 @@ int top_window;
 
 
 // LFB - address for kernel graphic mode
-unsigned long g_kernel_lfb; 
+//movido para gws.h
+//unsigned long g_kernel_lfb; 
 
 
 //video mode
-unsigned long g_current_vm; //video memory
-unsigned long g_current_video_mode; //video mode
+//unsigned long g_current_vm; //video memory
+//unsigned long g_current_video_mode; //video mode
  
 
 //font
-unsigned long gfontAddress;      //fonte atual.
-unsigned long g8x8fontAddress;   //8×8, 80×25,CGA, EGA
-unsigned long g8x14fontAddress;  //8x14,80×25,EGA
-unsigned long g8x16fontAddress;  //??
-unsigned long g9x14fontAddress;  //9x14,80×25,MDA, Hercules
-unsigned long g9x16fontAddress;  //9x16,80×25,VGA
+//movidos para gws.h
+//unsigned long gfontAddress;      //fonte atual.
+//unsigned long g8x8fontAddress;   //8×8, 80×25,CGA, EGA
+//unsigned long g8x14fontAddress;  //8x14,80×25,EGA
+//unsigned long g8x16fontAddress;  //??
+//unsigned long g9x14fontAddress;  //9x14,80×25,MDA, Hercules
+//unsigned long g9x16fontAddress;  //9x16,80×25,VGA
 //...
 
 //char
-int gcharWidth;
-int gcharHeight;
+//movido para gws.h
+//int gcharWidth;
+//int gcharHeight;
 
-int gfontSize;
+//movido para gws.h
+//int gfontSize;
 
 //color  
-unsigned long g_system_color;
-unsigned long g_char_attrib;
+//movido para gws.h
+//unsigned long g_system_color;
+//unsigned long g_char_attrib;
  
  
 unsigned long  STATUS_X;

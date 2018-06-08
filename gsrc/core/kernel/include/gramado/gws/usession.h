@@ -24,8 +24,8 @@
 
  
  
-//#bugbug: teremos somente uma user session. 
-#define USER_SESSION_COUNT_MAX 16
+  
+
  
  
 //user session start

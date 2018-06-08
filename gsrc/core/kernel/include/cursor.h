@@ -35,20 +35,20 @@
 // ## Cursor ##
 //
 
-//Cursor. (disciplica de linhas).
-
-unsigned long g_cursor_x;
-unsigned long g_cursor_y;
-
-unsigned long g_cursor_width;   //??
-unsigned long g_cursor_height;  //??
-
-unsigned long g_cursor_color;
-
-unsigned long g_cursor_left;     // margem esquerda dada em linhas
-unsigned long g_cursor_top;      // margem superior dada em linhas
-unsigned long g_cursor_right;    // margem direita dada em linhas
-unsigned long g_cursor_bottom;   // margem inferior dada em linhas
+//Cursor. 
+//(disciplica de linhas).
+//gws - é natural que o gerenciador de recursos gráficos 
+//centralise o gerenciamento dos recursos gráficos, como o cursor.
+//#importante: movido para gws.h
+//unsigned long g_cursor_x;
+//unsigned long g_cursor_y;
+//unsigned long g_cursor_width;   //??
+//unsigned long g_cursor_height;  //??
+//unsigned long g_cursor_color;
+//unsigned long g_cursor_left;     // margem esquerda dada em linhas
+//unsigned long g_cursor_top;      // margem superior dada em linhas
+//unsigned long g_cursor_right;    // margem direita dada em linhas
+//unsigned long g_cursor_bottom;   // margem inferior dada em linhas
 
 
 

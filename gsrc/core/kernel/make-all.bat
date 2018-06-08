@@ -10,10 +10,16 @@ rem
 rem (c) Copyright 2005-2018 Fred Nora.
 rem
 
+echo ~{ ...
+echo ~{ Gramado 0.2
+echo ~{ Mile 2
+
 :Start_Job0
 rem Main.
 echo ~{ ...
 echo ~{ Compiling KERNEL.BIN ...
+
+echo ~{ ...
 echo ~{ Main.
 	gcc -c k/main.c -I./include -o main.o 
 	
@@ -184,49 +190,51 @@ echo ~{ ux2 /execve
     gcc -c k/execve/fs/vfs.c    -I./include -o vfs.o		
 	
 echo ~{ ...
-echo ~{ ux1 /gramado \o/	
-
-	rem k\gramado\gui	
-    rem char
-    gcc -c k/gramado/gui/char.c -I./include -o char.o
+echo ~{ ux1 /gramado \o/
+    	
+    
+	rem k\gramado\gws	
+    rem Gramado Window Server.
+	rem char
+    gcc -c k/gramado/gws/char.c -I./include -o char.o
     rem pixel
-    gcc -c k/gramado/gui/pixel.c -I./include -o pixel.o 
+    gcc -c k/gramado/gws/pixel.c -I./include -o pixel.o 
     rem line
-    gcc -c k/gramado/gui/line.c -I./include -o line.o	
+    gcc -c k/gramado/gws/line.c -I./include -o line.o	
     rem rect
-    gcc -c k/gramado/gui/rect.c -I./include -o rect.o 
+    gcc -c k/gramado/gws/rect.c -I./include -o rect.o 
     rem draw
-    gcc -c k/gramado/gui/dtext.c -I./include -o dtext.o
+    gcc -c k/gramado/gws/dtext.c -I./include -o dtext.o
     rem draw
-    gcc -c k/gramado/gui/font.c -I./include -o font.o	
+    gcc -c k/gramado/gws/font.c -I./include -o font.o	
     rem createw
-    gcc -c k/gramado/gui/createw.c -I./include -o createw.o    
+    gcc -c k/gramado/gws/createw.c -I./include -o createw.o    
     rem grid
-    gcc -c k/gramado/gui/grid.c -I./include -o grid.o 
+    gcc -c k/gramado/gws/grid.c -I./include -o grid.o 
     rem statusbar
-    gcc -c k/gramado/gui/sbar.c -I./include -o sbar.o 
+    gcc -c k/gramado/gws/sbar.c -I./include -o sbar.o 
     rem menubar
-    gcc -c k/gramado/gui/menubar.c -I./include -o menubar.o 
+    gcc -c k/gramado/gws/menubar.c -I./include -o menubar.o 
     rem menu
-    gcc -c k/gramado/gui/menu.c -I./include -o menu.o 
+    gcc -c k/gramado/gws/menu.c -I./include -o menu.o 
     rem bmp
-    gcc -c k/gramado/gui/bmp.c -I./include -o bmp.o 
+    gcc -c k/gramado/gws/bmp.c -I./include -o bmp.o 
     rem button
-    gcc -c k/gramado/gui/button.c -I./include -o button.o 
+    gcc -c k/gramado/gws/button.c -I./include -o button.o 
     rem messagebox
-    gcc -c k/gramado/gui/mbox.c -I./include -o mbox.o
+    gcc -c k/gramado/gws/mbox.c -I./include -o mbox.o
     rem dialogboxbox
-    gcc -c k/gramado/gui/dbox.c -I./include -o dbox.o
+    gcc -c k/gramado/gws/dbox.c -I./include -o dbox.o
 	rem background
-    gcc -c k/gramado/gui/bg.c -I./include -o bg.o  
+    gcc -c k/gramado/gws/bg.c -I./include -o bg.o  
     rem window
-    gcc -c k/gramado/gui/window.c -I./include -o window.o    
+    gcc -c k/gramado/gws/window.c -I./include -o window.o    
     rem desktop
-    gcc -c k/gramado/gui/desktop.c -I./include -o desktop.o  
+    gcc -c k/gramado/gws/desktop.c -I./include -o desktop.o  
     rem window station
-    gcc -c k/gramado/gui/wstation.c -I./include -o wstation.o    
+    gcc -c k/gramado/gws/wstation.c -I./include -o wstation.o    
     rem user section
-    gcc -c k/gramado/gui/usession.c -I./include -o usession.o        
+    gcc -c k/gramado/gws/usession.c -I./include -o usession.o        
     
 	rem gramado logon e logoff
 	

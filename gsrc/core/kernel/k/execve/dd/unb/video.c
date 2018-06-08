@@ -29,10 +29,12 @@
 // Variáveis importadas.
 //
 
+//??
 extern unsigned long SavedBootMode;
 
 //Variáveis. (head.s)
 extern unsigned long SavedBootBlock;    //Parâmtros passados pelo Boot Loader.
+
 extern unsigned long SavedLFB;          //LFB address.  
 extern unsigned long SavedX;            //Screen width. 
 extern unsigned long SavedY;            //Screen height.
@@ -216,14 +218,21 @@ int videoInit()
 		//
 		
 		//Font. (BIOS font).
-		gfontAddress = (unsigned long) VIDEO_BIOS_FONT8X8_ADDRESS;  
+		//#bugbug: 
+		//Na verdade video.c não tem acesso a essa variável,
+		//é preciso chamar o servidor através de um método para 
+        //configurá-la.
+        
+		gwsSetCurrentFontAddress( VIDEO_BIOS_FONT8X8_ADDRESS );		
+ 
+		
 	    gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
 	    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
 
 		gfontSize = FONT8X8;
 		
 		//Font. (test).
-		//gfontAddress = (unsigned long) ??;  
+		//gws_currentfont_address = (unsigned long) ??;  
 	    //gcharWidth = ??;
 	    //gcharHeight = ??;
 
