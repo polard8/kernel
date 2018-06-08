@@ -1001,10 +1001,16 @@ void *services( unsigned long number,
 		    return (void*) current_desktop; 
 			break;
 			
-		//170	
+		//170
+        //pwd ...
+        //?? mostra p pathname gerenciado pelo kernel 
+        //para o diretório de trabalho.		
 		case SYS_PWD:
-            printf("service 170:.pwd  disk={%d} volume={%d} directory={%d}\n",
-			current_disk, current_volume, current_directory );
+		    printf("\n");
+            printf("service 170:.pwd \n"); 
+			printf("disk={%d} volume={%d} directory={%d}\n",
+			    current_disk, current_volume, current_directory );
+			printf("%s\n",current_workingdiretory_string);
 			refresh_screen();
 			break;	
 		
@@ -1031,6 +1037,12 @@ void *services( unsigned long number,
 		case SYS_SEARCHFILE:
 		    return (void*) KiSearchFile( (unsigned char *) arg2, 
                                          (unsigned long) arg3 );
+			break;
+			
+		//175	
+		//atualizar string no pathname do pwd. 		
+		case 175:
+		    fsUpdateWorkingDiretoryString( (char *) arg2 );
 			break;
 
 		//184

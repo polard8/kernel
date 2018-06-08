@@ -229,7 +229,12 @@ void setClientAreaRect( unsigned long x,
  ***********************************************************
  * refresh_rectangle:
  *     Copiar um retângulo do backbuffer para o frontbuffer.   
- * 
+ *     @todo: rotina parecida com essa pode ser criada e usada 
+ * para manipular regiões da tela, como área de cliente
+ * efetuar scroll de buffer em páginas de navegador ou menus ..
+ * mas para isso a cópia seria dentro do próprio backbuffer 
+ * ou de um terceiro buffer para o backbuffer. 
+ *
  * Histórico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.

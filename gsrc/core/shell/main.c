@@ -164,7 +164,6 @@ int ShellFlag = 0;
 #define SHELLFLAG_TOPBAR 6
 #define SHELLFLAG_FEEDTERMINAL 7
 #define SHELLFLAG_EXIT 8
-
 //... 
 
 /*
@@ -518,10 +517,12 @@ noArgs:
     //
 	// Criando a janela WT_OVERLAPPED.
 	// 
+	
+	// Com base nas informações obtidas no sistema.
 									   
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
-	                      (8*1), (8*3), 
-						  800-(8*2), 600-(8*7),    
+	                      shell_window_x, shell_window_y, 
+						  shellWindowWidth, shellWindowHeight,    
                            0, 0, COLOR_BLACK, 0x83FCFF );	   
 
 	if((void*) hWindow == NULL){	
@@ -1454,7 +1455,7 @@ unsigned long shellCompare(struct window_d *window)
 NewCmdLine:	
 
     //#debug
-	printf("prompt:{%s}\n",prompt);
+	//printf("prompt:{%s}\n",prompt);
 	
 	c = prompt;
 	
@@ -1536,7 +1537,7 @@ NewCmdLine:
 
 commandlineok:	
     //#debug
-	printf("prompt:{%s}\n",prompt);	
+	//printf("prompt:{%s}\n",prompt);	
 	
     //>/
     //>.
@@ -1552,7 +1553,7 @@ commandlineok:
         // determinado diretório, pode ser o deretório raiz 
         // o próprio diretório, algo no próprio diretório,
         // o diretório pai ou algo no diretório pai. 		
-		printf("absolute pathname\n");
+		//printf("absolute pathname\n");
 		goto check_directory;
 	}else{
 		
@@ -1561,7 +1562,7 @@ commandlineok:
 		// Obs: Se isso é um comando então 
 		// podemos checar mais à frente novamente 
 		// se o pathname é absoluto ou não.
-		printf("not absolute pathname\n");
+		//printf("not absolute pathname\n");
 	    goto this_directory;
 	}
 	
@@ -1910,16 +1911,33 @@ do_compare:
 		shellSendMessage( NULL, MSG_CLOSE, 0, 0);
 	    goto exit_cmp;
 	}	
-	
-	
-	
+
+
 	// cd - Change dir.
 	if( strncmp( prompt, "cd", 2 ) == 0 )
 	{
+		
+		i++;
+		token = (char *) tokenList[i];
+		
+		if( token == NULL )
+		{
+			printf("cd error: no arg\n");
+		}else{
+			
+	        // updating the current working directory string.
+	        shellUpdateWorkingDiretoryString( (char*) tokenList[i] );
+			
+			//@todo: podemos checar se o pathname é absoluto,
+			//e onde se encontra o arquivo que queremos.
+			//shellDisplayBMP( (char*) tokenList[i] );
+		};		
+		
+		
 		// o que segue o comando cd é um pathname.
 		//@todo: podemos checar se o pathname é absoluto,
 		//e onde se encontra o arquivo que queremos.
-		cd_buitins();
+		//cd_buitins();
 	    goto exit_cmp;
 	}		
 
@@ -2884,24 +2902,46 @@ void shellShell()
 	//
 	
 	//
-	// Usar o get system metrics para pegar o tamanho da tela.
+	// #importante:
+	// O aplicativo tem que confiar nas informações 
+	// retornadas pelo sistema.
+	//
+	
+	//
+	// Usar o get system metrics para pegar o 
+	// tamanho da tela.
+	//
+	
+	//
+	// ## Screen size ##
 	//
 	
 	// Tamanho da tela.	
-	//screen sizes
-	shellScreenWidth  = apiGetSystemMetrics(1);
+	shellScreenWidth = apiGetSystemMetrics(1);
     shellScreenHeight = apiGetSystemMetrics(2); 	
+
+	//
+	// ## Window size ##
+	//
 	
 	//Tamanho da janela do shell	
-	shellWindowWidth = 640;
-	shellWindowHeight = 480; 
+	shellWindowWidth = ((shellScreenWidth/3) * 2);
+	shellWindowHeight = ((shellScreenHeight/3) * 2); 
+	
+	
+	//
+	// ## cursor limits ##
+	//	
+	
 	
 	//window position
+	//Isso está muito legal. Não mudar.
 	shell_window_x = (unsigned long) ( (shellScreenWidth - shellWindowWidth)/2 );
 	shell_window_y = (unsigned long) ( (shellScreenHeight - shellWindowHeight)/2 );   
 	
-    shellMaxColumns = DEFAULT_MAX_COLUMNS;  // 80; shellWindowWidth/8
-    shellMaxRows    = DEFAULT_MAX_ROWS;     // 25; shellWindowHeight/8
+	//limits.
+    shellMaxColumns = (shellWindowWidth/8);   //DEFAULT_MAX_COLUMNS; 
+    shellMaxRows = (shellWindowHeight/8);     //DEFAULT_MAX_ROWS;     
  
     //...	
 
@@ -3002,7 +3042,7 @@ int shellInit( struct window_d *window )
 	int ActiveWindowId = 0;
 	int WindowWithFocusId = 0;
 	void *P;
-	int CurrentVolumeID = 0;
+	//int CurrentVolumeID = 0;
 	
 	
 	//char sUsername[11] = "           ";
@@ -3314,17 +3354,11 @@ int shellInit( struct window_d *window )
 	//        System call redraw client area.
 	
 	
-	//test: get current volume id.
-	CurrentVolumeID = (int) system_call(171,0,0,0);
-	
-    //Mensagem importante.
-	printf("The current volume id is %d\n",CurrentVolumeID);
-	
-	// setup ID.
-	shellUpdateCurrentDirectoryID(SHELL_ROOTWORKINGDIRECTORY_ID);
-	
-	// updating the current working directory string.
-	shellUpdateWorkingDiretoryString(SHELL_ROOTWORKINGDIRECTORY_ID);
+	//
+	// ## prompt string support ##
+	//
+	shellInitializeWorkingDiretoryString();
+
 	
 	
 //
@@ -3586,7 +3620,7 @@ shellTree()
 
 
 /*
- ********************************************************************
+ **************************************************
  * shellPrompt:
  *     Inicializa o prompt.
  *     Na inicialização de stdio, 
@@ -3681,11 +3715,54 @@ void shellTestLoadFile()
 {
 	FILE *f;
 	int Ret;
-	int i;
+	int i=0;
+	int ch_test;
 	
-	//Limpa a tela e reposiciona o cursor.
-	shellClearScreen();
-    shellSetCursor(0,0);
+	int pos;
+	
+	//#importante:
+	//precisa ser arquivo pequeno.
+	f = fopen("init.txt","rb");  
+    if( f == NULL )
+	{
+		printf("fopen fail\n");
+	}else{
+		printf("fopen ok\n");
+	};	
+	
+	
+	//#test 
+	//testando com um arquivo com texto pequeno.
+	
+
+	while(1)
+	{
+		ch_test = (int) getc(f); 
+		if( ch_test == EOF )
+		{
+			printf("\n");
+			printf("EOF reached :)\n");
+			goto done;
+		}else{
+		    			
+		    //movendo.
+			pos = 2*i;	
+
+            if( pos >= SCREEN_BUFFER_SIZE ) 
+            {
+				printf("shellTestLoadFile: screen_buffer[] limits\n");
+				goto fail;
+			}				
+			
+	        screen_buffer[pos] = (char) ch_test; //char	
+		    screen_buffer[pos +1] = (char) 0x09; //atributo	
+            i++;
+ 		
+	    };
+	};	
+	
+	
+
 	
 	//
 	// *Testando carregar um arquivo.
@@ -3694,10 +3771,7 @@ void shellTestLoadFile()
 	
 	
 	
-#ifdef SHELL_VERBOSE	
-	printf("...\n");
-	printf("Testing buffer ... Loading file...\n");
-#endif
+ 
 
 	
 	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS 
@@ -3719,25 +3793,23 @@ void shellTestLoadFile()
 	
     
 	
-    f = (FILE *) fopen( "init.txt", "wd" );
+
 	
-	//#test 
-	//testando com um arquivo com texto pequeno.
-	
-	
-	for( i=0; i<128; i++ )
-	{
-		//movendo.
-	    screen_buffer[2*i] = f->_base[2*i]; //char	
-		screen_buffer[2*i +1] = 0x07;            //atributo
-	}
-	
-	
-	// Mostra na tela o conteúdo do screen buffer.
-	shellRefreshScreen();
-	
+
+
 	//printf("...\n\n");
-	//printf(&screen_buffer[0]);		
+	//printf(&screen_buffer[0]);
+
+done:
+	//Limpa a tela e reposiciona o cursor.
+	//shellClearScreen();
+    shellSetCursor(0,0);
+	// Mostra na tela o conteúdo do screen buffer.
+	//shellRefreshScreen();
+	shellShowScreenBuffer();
+//
+fail:
+    return;	
 };
 
 
@@ -3889,24 +3961,71 @@ void shellRefreshScreen()
 
 
 /*
+ ********************************************
  * shellScroll:
- *     @todo:
+ *     @todo: Efetuar um scroll somente dentro 
+ * da VGA virtual.
+ * #importante: isso não deveria estar aqui,
+ * deve ser uma rotina de automação, presente 
+ * em alguma biblioteca, servidor ou kernel.
  */
 void shellScroll()
 {
+	int index = 0;
+	int next_line_index = 0;
+	
+	//screen buffer.
+	//atualiza o terminal buffer dentro do limite visivel.
+	
 	int i;
+	int j;
 	
-	//cursor apontando par ao início da janela.
-	shellSetCursor(0,0);
-	
-	// tamanho da tela.
-	for( i = 0; i < ( 80*25 ); i++ )
+	//copiaremos 24 linhas
+	for( i=0; i < (25 -1); i++) 
 	{
-        //começa da segunda linha e copia a tela toda.
-		printf("%c", stdout->_ptr[i+80]);
+		//copiar uma linha de caracteres e atributos.
+		//Copia uma linha na linha anterior.
+		for( j=0; j < (80*2); j++) 
+		{
+			//(linha)+offset
+			//o deslocamento máximo é 80*2.
+			index = (i * (80*2)) + j;
+			
+			//temos que começar da linha 1 e não da linha 0.
+			next_line_index = index + (80*2);
+			
+			screen_buffer[index] = screen_buffer[next_line_index];
+		}
 	};
 	
-    //screen_buffer_pos = 0;  //?? posição dentro do buffer do shell.		
+	
+	//nesse momento copiamos 24 linhas,
+	//então vamos limpara a linha 24, que é a última linha,
+	//essa é a vigésima quinta linha.
+	int up_count = ((25 -1) * (80*2));
+	
+	//deslocamento dentro da linha.
+	//80 deslocamentos.
+	for( j=0; j < 80; i++) 
+	{
+		//base referente ao início da última linha,
+		//mais o deslocamento.
+		index = up_count + j;
+		
+		//pinta espaço na última linha.		
+	    screen_buffer[ 2*index ] = ' ';    //char 
+		screen_buffer[ 2*index +1] = 0x7;  //atributo 
+	}
+
+
+    //
+    // ## Refresh ##
+    //
+	
+	//depois de atualizado o conteúdo do buffer 
+	//é necessário efetuar refresh e mostrar na tela.
+	//shellRefreshScreen();
+	shellShowScreenBuffer();
 };
 
 
@@ -4165,42 +4284,46 @@ void shellShowInfo()
 
 
 //metrics
-void shellShowMetrics()
+void 
+shellShowMetrics()
 {
 	unsigned long screen_width;
 	unsigned long screen_height;
 	unsigned long cursor_width;
 	unsigned long cursor_height;
-	unsigned long mouse_pointer_width;
-	unsigned long mouse_pointer_height;
+	//unsigned long mouse_pointer_width;
+	//unsigned long mouse_pointer_height;
 	unsigned long char_width;
 	unsigned long char_height;	
 	//...
 
-	screen_width         = apiGetSystemMetrics(1);
-	screen_height        = apiGetSystemMetrics(2);
-	cursor_width         = apiGetSystemMetrics(3);
-	cursor_height        = apiGetSystemMetrics(4);
-	mouse_pointer_width  = apiGetSystemMetrics(5);
-	mouse_pointer_height = apiGetSystemMetrics(6);
-	char_width           = apiGetSystemMetrics(7);
-	char_height          = apiGetSystemMetrics(8);
+	screen_width = apiGetSystemMetrics(1);
+	screen_height = apiGetSystemMetrics(2);
+	
+	cursor_width = apiGetSystemMetrics(3);
+	cursor_height = apiGetSystemMetrics(4);
+	
+	//mouse_pointer_width = apiGetSystemMetrics(5);
+	//mouse_pointer_height = apiGetSystemMetrics(6);
+	
+	char_width = apiGetSystemMetrics(7);
+	char_height = apiGetSystemMetrics(8);
 	//...
 	
-	
+	printf("\n");  
 	printf("  ##  shellShowMetrics:  ##\n");
-	printf("screenWidth={%d} screenHeight={%d}\n",screen_width,screen_height);
-	printf("cursorWidth={%d} cursorHeight={%d}\n",cursor_width,cursor_height);
-	printf("mousepointerWidth={%d} mousepointerHeight={%d}\n", 
-	        mouse_pointer_width,mouse_pointer_height);
-	printf("charWidth={%d} charHeight={%d}\n",char_width,char_height);	
+	printf("screenWidth={%d} screenHeight={%d}\n",screen_width, screen_height );
+		
+	printf("cursorWidth={%d} cursorHeight={%d}\n", cursor_width, cursor_height );
+		
+	//printf("mousepointerWidth={%d} mousepointerHeight={%d}\n", 
+	//    mouse_pointer_width, mouse_pointer_height );
+	
+	printf("charWidth={%d} charHeight={%d}\n",char_width, char_height );	
 	//...
 	
-done:
-#ifdef SHELL_VERBOSE		
-    printf("Done\n");
-#endif	
-	return;
+    printf("Done\n");	
+	//return;
 };
 
 //show system info
@@ -4237,7 +4360,7 @@ void shellShowSystemInfo()
 //mostrar informações sobre janelas.
 void shellShowWindowInfo()
 {
-	
+    int wID;	
 	//
 	// #bugbug.
 	// Testando a estrutura de janela.
@@ -4260,7 +4383,10 @@ void shellShowWindowInfo()
 	//}
 		
 		
-	printf("\n terminal_rect: \n");	
+	//obs: Isso é uma estrutura interna, não reflete 
+    //a informação usada pelo kernel.	
+	printf("\n");		
+	printf("terminal_rect: \n");	
     printf("l={%d} t={%d} w={%d} h={%d}\n", terminal_rect.left,
 		                                    terminal_rect.top,
 									  	    terminal_rect.width,
@@ -4273,7 +4399,7 @@ void shellShowWindowInfo()
     //    shellSetCursor( (terminal_rect.left/8), (terminal_rect.top/8) );													  
 	//};
 		
-    int wID;		
+		
 	wID = (int) system_call( SYSTEMCALL_GETTERMINALWINDOW, 0, 0, 0); 
 	
 	printf("\n current terminal: \n");
@@ -4283,30 +4409,6 @@ void shellShowWindowInfo()
 };
 
 
-/*
- * shellASCII:
- *     Mostrar os caracteres da tabela ascii padrão.
- *     O padrão tem 128 chars.
- *     Obs: Na fonte ROM BIOS temos esse padrão.
- */
-/* 
-void shellASCII()
-{
-    unsigned char count;
-	unsigned char standard_ascii_max = 128;
-	
-	
-	printf("shellASCII:\n");
-	
-    for( count=0; count<standard_ascii_max; count++ )
-    {
-		printf(" %d - %c",count,count);
-        if( count % 4 == 0 ){
-            printf("\n");
-		}
-    };	
-};
-*/
 
 //??
 //void shellSetScreenColors( ... ){}
@@ -4353,46 +4455,196 @@ void shell_write_to_screen( struct shell_screen_d *screen,
 };
 */
 
-/*
- * @todo: Criar rotina de saída do shell.
-void shellExit(int code);
-void shellExit(int code){
-	exit(code);
-}
-*/
-
-
-void shellUpdateWorkingDiretoryString( int id )
+ 
+//@todo: Criar rotina de saída do shell.
+void shellExit(int code)
 {
-    switch(id)
+	//@todo ...
+	exit(code);
+};
+ 
+
+/*
+ *****************************************
+ * shellUpdateWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */
+void 
+shellUpdateWorkingDiretoryString( char *string )
+{
+    //
+    //  ## volume list ##
+    //	
+	
+    //primeiro colocamos a string que indica 
+	//a lista de volumes.
+    sprintf( current_workingdiretory_string, 
+             SHELL_VOLUMELIST_STRING ); 
+	
+	
+	//
+	// ## separador ##
+	//
+
+	strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+	
+	//
+	//  ## volume root dir ##
+	//
+	
+    switch(current_volume_id)
     {
-		// ROOT
+		// VFS
 		case 0:
-	        sprintf( current_workingdiretory_string, 
-	                 SHELL_ROOTWORKINGDIRECTORY_STRING ); 		
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, SHELL_VOLUME0_STRING );
+			//continua concatenando.		
 		    break;
 
 		// BOOT	
 		case 1:
-	        sprintf( current_workingdiretory_string, 
-	                 SHELL_BOOTWORKINGDIRECTORY_STRING ); 		
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, SHELL_VOLUME1_STRING );
+			//continua concatenando.		
 		    break;
 
 		// SYSTEM	
 		case 2:
-	        sprintf( current_workingdiretory_string, 
-	                 SHELL_SYSTEMWORKINGDIRECTORY_STRING ); 		
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, SHELL_VOLUME2_STRING );
+			//continua concatenando.		
+
 		    break;
 
+		
+		// ?? @todo
 		// UNKNOWN	
 		default:
-	        sprintf( current_workingdiretory_string, 
-	                 SHELL_UNKNOWNWORKINGDIRECTORY_STRING ); 		
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, current_volume_string );
+			//continua concatenando.		
 		    break;
 	};
 	
+	
+	//#importante:
+	//Já temos alguns elementos do pathname 
+	//que devem estar presentes em todos os pathnames. 
+	//"root:/volumex"
+	
+	
+	//Incluiremos o separador se o diretório indicado não for nulo.
+	
+	if( (void*) string == NULL )
+	{
+		goto done;
+	}else{
+	    
+		//
+	    // ## separador ##
+	    //		
+        
+		strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );		
+		
+		//
+	    // ## separador ##
+	    //		
+				
+		strcat( current_workingdiretory_string, string );				
+	};
+	
+	
+    //Atualizar no gerenciamento feito pelo kernel.
+	system_call( 175,
+	    (unsigned long)string,
+		(unsigned long)string, 
+		(unsigned long)string );
+	
+done:
     return;
 };
+
+
+/*
+ *****************************************
+ * shellInitializeWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */
+void 
+shellInitializeWorkingDiretoryString()
+{
+	
+	//get info
+	
+	//test: get current volume id.
+	current_volume_id = (int) system_call(171,0,0,0);
+	
+	//global usada para string do nome do volume.
+	current_volume_string = (char *) SHELL_VOLUME1_STRING;
+	
+	
+    //
+    //  ## volume list ##
+    //	
+	
+    //primeiro colocamos a string que indica 
+	//a lista de volumes.
+    sprintf( current_workingdiretory_string, 
+             SHELL_VOLUMELIST_STRING ); 
+	
+	
+	//
+	// ## separador ##
+	//
+
+	strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+	
+	//
+	//  ## volume root dir ##
+	//
+	
+	strcat( current_workingdiretory_string, current_volume_string );
+
+	
+	
+done:
+    return;
+};
+
+
+
 
 
 // atualiza a variável global para id de diretório atual de trabalho.
@@ -4511,7 +4763,8 @@ void shellShowProcessHeapPointer()
 	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, 
 	                                                 id, 0, 0);
 	
-	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
+	printf("Current Process heap pointer address %x\n", 
+	    (unsigned long) heap_pointer);
 };
 
 
@@ -4521,7 +4774,8 @@ void shellShowKernelHeapPointer()
 	unsigned long heap_pointer = (unsigned long) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, 
 	                                                 id, 0, 0);
 	
-	printf("Current Process heap pointer address %x\n", (unsigned long) heap_pointer);
+	printf("Current Process heap pointer address %x\n", 
+	    (unsigned long) heap_pointer );
 };
 
 
@@ -5058,3 +5312,59 @@ absolute_pathname( char *string )
     }
     return (0);
 };
+
+
+
+//inicializaremos o supporte a pathname
+int shellInitPathname()
+{
+	int i;
+	
+	if(pathname_initilized == 1){
+		goto done;
+	}
+	
+	for( i=0; i<PATHNAME_LENGHT; i++ )
+	{
+		pathname_buffer[i] = (char) '\0';
+	}
+	
+	pathname_lenght = 0;
+	
+    	
+	//...
+	
+done:	
+    pathname_initilized = 1;
+	return (int) 0;
+};
+
+
+
+
+ 
+//inicializaremos o supporte a filename
+int shellInitFilename()
+{
+	int i;
+	
+	if(filename_initilized == 1){
+		goto done;
+	}
+	
+	for( i=0; i<FILENAME_LENGHT; i++ )
+	{
+		filename_buffer[i] = (char) '\0';
+	}
+	
+	filename_lenght = 0;
+	
+    	
+	//...
+	
+done:	
+    filename_initilized = 1;
+	return (int) 0;
+};
+
+

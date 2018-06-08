@@ -102,8 +102,6 @@
 #define FS_DIR_DEFAULTUSER  'root:/volume2/user/default' // default user
 
 
-
- 
 #define FS_MAX_NAME_LENGHT (8+3)   // Max name lenght.   8.3
 #define PS1                '/'     // Primary path separator.
 #define PS2                '\\'    // Alternate path separator.

@@ -303,7 +303,10 @@
 #define	SYS_SETCURRENTVOLUMEID 172  // configura o id do volume atual.
 #define	SYS_LISTFILES          173  // Listar os arquivos do diretório atual.
 #define	SYS_SEARCHFILE         174  // Procurar arquivo. 
+
+//175 atualizar string no pathname do pwd. 
 #define	SYS_175 175
+
 #define	SYS_176 176
 #define	SYS_177 177
 #define	SYS_178 178

@@ -641,12 +641,16 @@ done:
 
 
 /*
+ **************************************************
  * MountShortFileName:
- *     This function parses a directory entry name which is in the form 
+ *     This function parses a directory entry name 
+ * which is in the form 
  * of "FILE   EXT" and puts it in Buffer in the form of "FILE.TXT".
  * @todo fsMountShortFileName(...)
  */
-void MountShortFileName(char *buffer, struct dir_entry_d *entry)
+void 
+MountShortFileName( char *buffer, 
+                    struct dir_entry_d *entry )
 {
     int i = 0;
     
@@ -719,9 +723,10 @@ void set_filesystem_type(int type)
 
 
 /*
- *******************************************************
+ ***********************************************
  * fs_init_fat:
- *     Inicializa a estrutura usada no sistema de arquivos.
+ *     Inicializa a estrutura usada no sistema 
+ * de arquivos.
  *     fsInitFat()
  */
 void fs_init_fat()
@@ -993,6 +998,9 @@ int fsInit()
 	
 	*/
 	
+	//inicializa p pwd support.
+	fsInitializeWorkingDiretoryString();
+	
 	//
 	// @todo: Continua ...
 	//
@@ -1005,6 +1013,186 @@ done:
 
     return (int) 0;    	
 };
+
+
+/*
+ *****************************************
+ * fsInitializeWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */
+void 
+fsInitializeWorkingDiretoryString()
+{
+	
+	//get info
+	
+	//test: get current volume id.
+	//current_volume_id = (int) system_call(171,0,0,0);
+	//current_volume = (int) 
+	
+	//global usada para string do nome do volume.
+	current_volume_string = (char *) FS_VOLUME1_STRING;
+	
+	
+    //
+    //  ## volume list ##
+    //	
+	
+    //primeiro colocamos a string que indica 
+	//a lista de volumes.
+    sprintf( current_workingdiretory_string, 
+        FS_VOLUMELIST_STRING ); 
+	
+	
+	//
+	// ## separador ##
+	//
+
+	strcat( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+	
+	//
+	//  ## volume root dir ##
+	//
+	
+	strcat( current_workingdiretory_string, current_volume_string );
+
+	
+	
+done:
+    return;
+};
+
+
+/*
+ *****************************************
+ * fsUpdateWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */ 
+void 
+fsUpdateWorkingDiretoryString( char *string )
+{
+    //
+    //  ## volume list ##
+    //	
+	
+    //primeiro colocamos a string que indica 
+	//a lista de volumes.
+    sprintf( current_workingdiretory_string, 
+        FS_VOLUMELIST_STRING ); 
+	
+	
+	//
+	// ## separador ##
+	//
+
+	strcat( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+	
+	//
+	//  ## volume root dir ##
+	//
+	
+    switch(current_volume)
+    {
+		// VFS
+		case 0:
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, FS_VOLUME0_STRING );
+			//continua concatenando.		
+		    break;
+
+		// BOOT	
+		case 1:
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, FS_VOLUME1_STRING );
+			//continua concatenando.		
+		    break;
+
+		// SYSTEM	
+		case 2:
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, FS_VOLUME2_STRING );
+			//continua concatenando.		
+
+		    break;
+
+		
+		// ?? @todo
+		// UNKNOWN	
+		default:
+		    //primeiro colocamos a string que indica 
+			//a lista de volumes.
+	        //sprintf( current_workingdiretory_string, 
+	        //         SHELL_VOLUMELIST_STRING ); 
+            //concatenamos o primeiro separador.
+            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
+			//concatenamos a string do volume atual.
+			strcat( current_workingdiretory_string, current_volume_string );
+			//continua concatenando.		
+		    break;
+	};
+	
+	
+	//#importante:
+	//Já temos alguns elementos do pathname 
+	//que devem estar presentes em todos os pathnames. 
+	//"root:/volumex"
+	
+	
+	//Incluiremos o separador se o diretório indicado não for nulo.
+	
+	if( (void*) string == NULL )
+	{
+		goto done;
+	}else{
+	    
+		//
+	    // ## separador ##
+	    //		
+        
+		strcat( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );		
+		
+		//
+	    // ## separador ##
+	    //		
+				
+		strcat( current_workingdiretory_string, string );				
+	};
+	
+	
+
+	
+	
+done:
+    return;
+};
+
+
 
 
 //

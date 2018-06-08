@@ -21,6 +21,37 @@
  
 //#define SHELL_VERBOSE 1
 
+
+
+
+
+//
+// ## pathname suppport ##
+//
+
+#define PATH_SEPARATOR '/'
+#define PATH_TERMINATOR '\0'
+
+#define PATHNAME_LENGHT (64)
+char pathname_buffer[PATHNAME_LENGHT];
+int pathname_lenght; //tamanho do atual pathname.
+int pathname_initilized;
+
+
+//
+// ## filename suppport ##
+//
+
+#define FILENAME_LENGHT (8+3)
+char filename_buffer[FILENAME_LENGHT];
+int filename_lenght; //tamanho do nome de arquivo atual.
+int filename_initilized;
+
+//@todo:
+//devemos criar uma rotina que inicialisa
+//esses buffers.
+
+
 //
 // pool
 //
@@ -222,7 +253,7 @@ int EOF_Reached;
 // Strings
 //
 
-#define SHELL_PATHNAME_SEPARATOR "\\"
+#define SHELL_PATHNAME_SEPARATOR "/"
 #define SHELL_PATHNAME_TERMINATOR "\0"
 
 #define SHELL_STRING_TERMINATOR "\0" 
@@ -246,26 +277,31 @@ int EOF_Reached;
 // Volume support
 //
 
-#define SHELL_UNKNOWNVOLUME_STRING "unknown-volume/"
-#define SHELL_ROOTVOLUME_STRING "root:/"
-#define SHELL_VOLUME0_STRING "volume0/"
-#define SHELL_VOLUME1_STRING "volume1/"
-#define SHELL_VOLUME2_STRING "volume2/"
+//Volume list
+#define SHELL_ROOT_STRING        "root:"
+#define SHELL_VOLUMELIST_STRING  "root:"
+
+//volumes
+#define SHELL_UNKNOWNVOLUME_STRING "unknown-volume"
+#define SHELL_VOLUME0_STRING "volume0"   //vfs
+#define SHELL_VOLUME1_STRING "volume1"   //boot volume
+#define SHELL_VOLUME2_STRING "volume2"   //system volume.
 //...
 
+char *current_volume_string;
+int current_volume_id;
 
 //
 // pwd support
 //
 
-#define SHELL_ROOTWORKINGDIRECTORY_ID    0
+#define SHELL_UNKNOWNWORKINGDIRECTORY_ID (-1)
 #define SHELL_VFSWORKINGDIRECTORY_ID     0
 #define SHELL_BOOTWORKINGDIRECTORY_ID    1
 #define SHELL_SYSTEMWORKINGDIRECTORY_ID  2
-#define SHELL_UNKNOWNWORKINGDIRECTORY_ID (-1)
 
-#define SHELL_ROOTWORKINGDIRECTORY_STRING    "root:"
-#define SHELL_VFSWORKINGDIRECTORY_STRING     "root:"
+
+#define SHELL_VFSWORKINGDIRECTORY_STRING     "volume1"
 #define SHELL_BOOTWORKINGDIRECTORY_STRING    "volume1"
 #define SHELL_SYSTEMWORKINGDIRECTORY_STRING  "volume2"
 #define SHELL_UNKNOWNWORKINGDIRECTORY_STRING "unknown-directory"
@@ -624,6 +660,8 @@ COMMANDHISTORY_T *CommandHistory;
 
 void shellClearScreen();
 void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
+
+//scroll dentro da screen_buffer. (VGA emulada)
 void shellScroll();
 //...
 
@@ -721,7 +759,10 @@ void shell_memcpy_bytes( unsigned char *Dest,
  
  
 void shellUpdateCurrentDirectoryID( int id ); 
-void shellUpdateWorkingDiretoryString( int id ); 
+void shellUpdateWorkingDiretoryString( char *string );
+
+void 
+shellInitializeWorkingDiretoryString();
 
 //lista informações sobre os processos.
 void shellTaskList();
@@ -798,7 +839,15 @@ int shellExecuteThisScript( char* script_name );
 int
 absolute_pathname( char *string );
 
-					
+
+//inicializaremos o supporte a pathname
+int shellInitPathname();
+
+
+//inicializaremos o supporte a filename
+int shellInitFilename();
+
+void shellExit(int code);					
 //
 // End.
 //
