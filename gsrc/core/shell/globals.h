@@ -8,6 +8,9 @@
  */
  
  
+#define SHELL_TERMINAL_COLOR 0
+#define SHELL_TERMINAL_COLOR2 0x303030
+//...
 
 
 /*

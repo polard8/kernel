@@ -982,7 +982,12 @@ void _outbyte(int c)
             // configuradas na estrutura do terminal atual.
             // Branco no preto é um padrão para terminal.			
 			// draw_char( x, y, c, fgcolor, bgcolor );	
-            draw_char( 8*g_cursor_x, 8*g_cursor_y, c, COLOR_TERMINALTEXT, COLOR_TERMINAL );			
+            //draw_char( 8*g_cursor_x, 8*g_cursor_y, c, COLOR_TERMINALTEXT, COLOR_TERMINAL );	
+            draw_char( 8*g_cursor_x, 
+			    8*g_cursor_y, 
+				c, 
+				COLOR_TERMINALTEXT, 
+				COLOR_TERMINAL2 );			
 			
 		}else{
 			
@@ -991,7 +996,10 @@ void _outbyte(int c)
 		    // char transparente.
             // Não sabemos o fundo. Vamos selecionar o foreground.			
 			// drawchar_transparent( x, y, color, c);
-			drawchar_transparent( 8*g_cursor_x, 8*g_cursor_y, g_cursor_color, c);
+			drawchar_transparent( 8*g_cursor_x, 
+			    8*g_cursor_y, 
+				g_cursor_color, 
+				c );
 		};
 		
 		/*

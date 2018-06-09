@@ -1094,9 +1094,16 @@ drawBegin:
 		};
 						   
 		//@todo: Se estivermos em full screen, não teremos string.				   
+		//draw_string( window->left +8 +16 +8, 
+		//             window->top +8 +4, 
+		//			 COLOR_WINDOWTEXT,  
+		//			 window->name );  
+		
+        //O texto não é tão claro quanto o texto dentro 
+        //da área de cliente, dando foco no conteúdo.		
 		draw_string( window->left +8 +16 +8, 
 		             window->top +8 +4, 
-					 COLOR_WINDOWTEXT,  //*test
+					 COLOR_TERMINALTEXT2,  
 					 window->name );  
 					 
 					 
@@ -1368,16 +1375,27 @@ drawBegin:
 						   window->width -1,  
 						   window->height, 
 						   window->color_bg ); 	
+						   
+						   
+		draw_string( window->left +8, 
+		             window->top +8, 
+					 COLOR_TEXT,  
+					 window->name );  
 	};
 	
 	
 	if( (unsigned long) type == WT_BUTTON )
 	{
-	    //as posições de left e roght são da janela do botão.
+	    //as posições de left e right são da janela do botão.
+		//draw_button( Parent, windowname, 1, 
+		//             window->left, window->top, 
+		//			 window->width, window->height, 
+		//			 COLOR_BUTTONFACE );
+					 
 		draw_button( Parent, windowname, 1, 
 		             window->left, window->top, 
 					 window->width, window->height, 
-					 COLOR_BUTTONFACE);
+					 COLOR_TERMINAL2 );
 	};					 
 	
 	//
@@ -1429,7 +1447,7 @@ drawBegin:
 
         //status bar.
 		//Esses valores precisam ser melhor declarados.
-		window->statusbar = CreateWindow( WT_STATUSBAR, 1, 1, "statusbar-test", 
+		window->statusbar = CreateWindow( WT_STATUSBAR, 1, 1, "Status: ...", 
 	                            window->left+1, window->bottom-25-1, 
 								window->width, 25,									  
 					            window, 0, 

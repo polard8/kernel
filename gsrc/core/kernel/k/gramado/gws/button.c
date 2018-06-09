@@ -47,7 +47,7 @@ void *draw_button( struct window_d *window,
 	
 	//validade da janela onde o botão está.
 	if( (void*) window == NULL ){
-	    return;
+	    return NULL;
 	}
 	
 
@@ -98,10 +98,10 @@ void *draw_button( struct window_d *window,
         case BN_DOWN:
 		    Selected = 0;
 			b->selected = 0;
-		    border1 = COLOR_BUTTONHIGHLIGHT;
-			border2 = COLOR_BUTTONSHADOW;
-			b->border1 = COLOR_BUTTONHIGHLIGHT;
-			b->border2 = COLOR_BUTTONSHADOW;
+		    border1 = COLOR_BUTTONHIGHLIGHT2;
+			border2 = COLOR_BUTTONSHADOW2;
+			b->border1 = COLOR_BUTTONHIGHLIGHT2;
+			b->border2 = COLOR_BUTTONSHADOW2;
             goto do_draw_button;			
 			break;
                                     
@@ -109,10 +109,10 @@ void *draw_button( struct window_d *window,
         case BN_UP:
 		    Selected = 0;
 		    b->selected = 0;
-			border1 = COLOR_BUTTONSHADOW;
-			border2 = COLOR_BUTTONHIGHLIGHT;
-            b->border1 = COLOR_BUTTONSHADOW;
-			b->border2 = COLOR_BUTTONHIGHLIGHT;
+			border1 = COLOR_BUTTONSHADOW2;
+			border2 = COLOR_BUTTONHIGHLIGHT2;
+            b->border1 = COLOR_BUTTONSHADOW2;
+			b->border2 = COLOR_BUTTONHIGHLIGHT2;
 			goto do_draw_button;			
             break;
                        
@@ -120,10 +120,10 @@ void *draw_button( struct window_d *window,
         case BN_SELECTED:
 		    Selected = 1;
 			b->selected = 1;
-		    border1 = COLOR_BUTTONHIGHLIGHT;
-			border2 = COLOR_BUTTONSHADOW;
-            b->border1 = COLOR_BUTTONHIGHLIGHT;
-			b->border2 = COLOR_BUTTONSHADOW;
+		    border1 = COLOR_BUTTONHIGHLIGHT2;
+			border2 = COLOR_BUTTONSHADOW2;
+            b->border1 = COLOR_BUTTONHIGHLIGHT2;
+			b->border2 = COLOR_BUTTONSHADOW2;
 			goto do_draw_button;			
             break;
         
@@ -184,10 +184,18 @@ do_draw_label:
 					 COLOR_WHITE, 
 					 string);	
     }else{
+		
+		
+	    //draw_string( window->left +x +8, 
+		//             window->top  +y +8, 
+		//			 COLOR_WINDOWTEXT, 
+		//			 string);	
+
 	    draw_string( window->left +x +8, 
 		             window->top  +y +8, 
-					 COLOR_WINDOWTEXT, 
+					 COLOR_TERMINALTEXT, 
 					 string);	
+					 
 	};
 	
 	

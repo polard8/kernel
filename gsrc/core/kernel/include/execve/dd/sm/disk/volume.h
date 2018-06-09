@@ -16,48 +16,7 @@
 #define VOLUME_COUNT_MAX 16
 
 
-#define FS_PATHNAME_SEPARATOR "/"
-#define FS_PATHNAME_TERMINATOR "\0"
 
-#define FS_STRING_TERMINATOR "\0" 
-//
-// Volume support
-//
-
-//Volume list
-#define FS_ROOT_STRING        "root:"
-#define FS_VOLUMELIST_STRING  "root:"
-
-//volumes
-#define FS_UNKNOWNVOLUME_STRING "unknown-volume"
-#define FS_VOLUME0_STRING "volume0"   //vfs
-#define FS_VOLUME1_STRING "volume1"   //boot volume
-#define FS_VOLUME2_STRING "volume2"   //system volume.
-//...
-
-char *current_volume_string;
-//int current_volume_id; //DEFINIDO NO KERNEL.H COMO current_volume.
-
-
-//
-// pwd support
-//
-
-
-#define FS_UNKNOWNWORKINGDIRECTORY_ID (-1)
-#define FS_VFSWORKINGDIRECTORY_ID     0
-#define FS_BOOTWORKINGDIRECTORY_ID    1
-#define FS_SYSTEMWORKINGDIRECTORY_ID  2
-
-
-#define FS_VFSWORKINGDIRECTORY_STRING     "volume1"
-#define FS_BOOTWORKINGDIRECTORY_STRING    "volume1"
-#define FS_SYSTEMWORKINGDIRECTORY_STRING  "volume2"
-#define FS_UNKNOWNWORKINGDIRECTORY_STRING "unknown-directory"
-
-#define WORKINGDIRECTORY_STRING_MAX 32
-// a stringo do diretório de trabalho.
-char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
 
 
 /*

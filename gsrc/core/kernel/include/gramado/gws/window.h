@@ -599,14 +599,18 @@ color_scheme_t PrideColorScheme;    // Colorido.
 
 #define COLOR_BORDER  COLOR_SILVER 
 
+//
+// ## button support ##
+//
+
 #define COLOR_BUTTONFACE          0xF0F0F0
-
 #define COLOR_BUTTONHIGHLIGHT  0xFFFFFF
+#define COLOR_BUTTONHIGHLIGHT2  0x404040
 #define COLOR_BUTTONHIGHLIGHTTEXT  COLOR_WHITE
-
-#define COLOR_BUTTONSHADOW  0xA0A0A0  
-
+#define COLOR_BUTTONSHADOW  0xA0A0A0
+#define COLOR_BUTTONSHADOW2  0x303030  
 #define COLOR_BUTTONTEXT  COLOR_TEXT
+
 
 #define COLOR_CONTROL             0xF0F0F0
 #define COLOR_CONTROLTEXT COLOR_TEXT
@@ -652,7 +656,11 @@ color_scheme_t PrideColorScheme;    // Colorido.
 #define COLOR_NAVIGATIONBAR       COLOR_BLACK
 #define COLOR_NAVIGATIONBARTEXT  COLOR_WHITE
 
-#define COLOR_STATUSBAR           COLOR_WINDOW
+//status bar
+#define COLOR_STATUSBAR  COLOR_WINDOW   //branca
+#define COLOR_STATUSBAR2 xCOLOR_GRAY6   //cinza
+#define COLOR_STATUSBAR3 0x83FCFF       //verde
+//...
 #define COLOR_STATUSBARTEXT      COLOR_TEXT
 
 #define COLOR_TASKBAR             COLOR_WINDOW
@@ -674,9 +682,18 @@ color_scheme_t PrideColorScheme;    // Colorido.
 #define COLOR_WORKSPACE 0x0000FF00 
 #define COLOR_WORKSPACETEXT COLOR_TEXT
 
-//virtual terminal
+
+//
+// ## virtual terminal support ##
+//
+
 #define COLOR_TERMINAL  COLOR_BLACK
+#define COLOR_TERMINAL2 0x303030
+//...
+
 #define COLOR_TERMINALTEXT COLOR_WHITE
+#define COLOR_TERMINALTEXT2 xCOLOR_GRAY7
+//...
   
 //
 // ========

@@ -519,11 +519,15 @@ noArgs:
 	// 
 	
 	// Com base nas informações obtidas no sistema.
-									   
+	// verde 0x83FCFF
+	// preto COLOR_BLACK
+						
+    //para flat os dois poem ser a mesma cor.
+    //não completamente preto.	
 	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1," {} SHELL.BIN ",
 	                      shell_window_x, shell_window_y, 
 						  shellWindowWidth, shellWindowHeight,    
-                           0, 0, COLOR_BLACK, 0x83FCFF );	   
+                           0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
 
 	if((void*) hWindow == NULL){	
 		die("shell.bin: hWindow fail");
@@ -4476,118 +4480,34 @@ void shellExit(int code)
 void 
 shellUpdateWorkingDiretoryString( char *string )
 {
-    //
-    //  ## volume list ##
-    //	
-	
-    //primeiro colocamos a string que indica 
-	//a lista de volumes.
-    sprintf( current_workingdiretory_string, 
-             SHELL_VOLUMELIST_STRING ); 
-	
-	
-	//
-	// ## separador ##
-	//
-
-	strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-	
-	//
-	//  ## volume root dir ##
-	//
-	
-    switch(current_volume_id)
-    {
-		// VFS
-		case 0:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, SHELL_VOLUME0_STRING );
-			//continua concatenando.		
-		    break;
-
-		// BOOT	
-		case 1:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, SHELL_VOLUME1_STRING );
-			//continua concatenando.		
-		    break;
-
-		// SYSTEM	
-		case 2:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, SHELL_VOLUME2_STRING );
-			//continua concatenando.		
-
-		    break;
-
-		
-		// ?? @todo
-		// UNKNOWN	
-		default:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, current_volume_string );
-			//continua concatenando.		
-		    break;
-	};
-	
-	
-	//#importante:
-	//Já temos alguns elementos do pathname 
-	//que devem estar presentes em todos os pathnames. 
-	//"root:/volumex"
-	
-	
-	//Incluiremos o separador se o diretório indicado não for nulo.
-	
-	if( (void*) string == NULL )
-	{
-		goto done;
+	if( pwd_initialized == 0 ){
+		goto fail;
 	}else{
-	    
-		//
-	    // ## separador ##
-	    //		
-        
-		strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );		
 		
-		//
-	    // ## separador ##
-	    //		
-				
-		strcat( current_workingdiretory_string, string );				
+        if( (void*) string == NULL )
+	    {
+		    goto fail;
+	    }else{
+	    
+	        // ## separador ##
+		    strcat( current_workingdiretory_string, 
+			    SHELL_PATHNAME_SEPARATOR );		
+		
+		    //
+	        // ## separador ##		
+		    strcat( current_workingdiretory_string, 
+			    string );				
+	    
+		
+            //Atualizar no gerenciamento feito pelo kernel.
+	        system_call( 175,
+	            (unsigned long) string,
+		        (unsigned long) string, 
+		        (unsigned long) string );		
+		};
 	};
-	
-	
-    //Atualizar no gerenciamento feito pelo kernel.
-	system_call( 175,
-	    (unsigned long)string,
-		(unsigned long)string, 
-		(unsigned long)string );
-	
+	//...
+fail:	
 done:
     return;
 };
@@ -4640,6 +4560,7 @@ shellInitializeWorkingDiretoryString()
 	
 	
 done:
+    pwd_initialized = 1;
     return;
 };
 
@@ -5157,7 +5078,9 @@ done:
 
 
 
-void error( char *msg, char *arg1, char *arg2 )
+void error( char *msg, 
+            char *arg1, 
+	        char *arg2 )
 {
     //fprintf(stderr, "cc: ");
     fprintf(stderr,"%s %s %s", msg, arg1, arg2);
@@ -5183,14 +5106,16 @@ reader_loop()
 
  
 
-//
-// Aqui temos que carregar o arquivo de script indicado 
-// nos argumentos.
-// #importante:
-// Apenas colocaremos o arquivo em stdin, que é o pormpt[]
-// e retornaremos ao incio da função que compara, para 
-// comparar agora o que estava escrito no arquivo de script.
-//
+/*
+ **********************************************************
+ * shellExecuteThisScript:
+ *     Aqui temos que carregar o arquivo de script indicado 
+ * nos argumentos.
+ * #importante:
+ * Apenas colocaremos o arquivo em stdin, que é o pormpt[]
+ * e retornaremos ao incio da função que compara, para 
+ * comparar agora o que estava escrito no arquivo de script.
+ */
 int 
 shellExecuteThisScript( char* script_name )
 {
@@ -5228,7 +5153,7 @@ shellExecuteThisScript( char* script_name )
 
 done:	
     return (int) 0;		
-}
+};
 
 
 /*

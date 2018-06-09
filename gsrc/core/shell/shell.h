@@ -315,7 +315,7 @@ int g_current_workingdirectory_id;  //??
 #define WORKINGDIRECTORY_STRING_MAX 32
 // a stringo do diretório de trabalho.
 char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
-
+int pwd_initialized;
 
 #define CalculateRowScanLine(WindowY,CharHeight) \
     ( WindowY * CharHeight )

@@ -1052,17 +1052,20 @@ fsInitializeWorkingDiretoryString()
 	// ## separador ##
 	//
 
-	strcat( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+	strcat( current_workingdiretory_string, 
+	    FS_PATHNAME_SEPARATOR );
 	
 	//
 	//  ## volume root dir ##
 	//
 	
-	strcat( current_workingdiretory_string, current_volume_string );
+	strcat( current_workingdiretory_string, 
+	    current_volume_string );
 
 	
 	
 done:
+    pwd_initialized = 1;
     return;
 };
 
@@ -1079,117 +1082,28 @@ done:
 void 
 fsUpdateWorkingDiretoryString( char *string )
 {
-    //
-    //  ## volume list ##
-    //	
-	
-    //primeiro colocamos a string que indica 
-	//a lista de volumes.
-    sprintf( current_workingdiretory_string, 
-        FS_VOLUMELIST_STRING ); 
-	
-	
-	//
-	// ## separador ##
-	//
-
-	strcat( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
-	
-	//
-	//  ## volume root dir ##
-	//
-	
-    switch(current_volume)
-    {
-		// VFS
-		case 0:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, FS_VOLUME0_STRING );
-			//continua concatenando.		
-		    break;
-
-		// BOOT	
-		case 1:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, FS_VOLUME1_STRING );
-			//continua concatenando.		
-		    break;
-
-		// SYSTEM	
-		case 2:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, FS_VOLUME2_STRING );
-			//continua concatenando.		
-
-		    break;
-
-		
-		// ?? @todo
-		// UNKNOWN	
-		default:
-		    //primeiro colocamos a string que indica 
-			//a lista de volumes.
-	        //sprintf( current_workingdiretory_string, 
-	        //         SHELL_VOLUMELIST_STRING ); 
-            //concatenamos o primeiro separador.
-            //strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
-			//concatenamos a string do volume atual.
-			strcat( current_workingdiretory_string, current_volume_string );
-			//continua concatenando.		
-		    break;
-	};
-	
-	
-	//#importante:
-	//Já temos alguns elementos do pathname 
-	//que devem estar presentes em todos os pathnames. 
-	//"root:/volumex"
-	
-	
-	//Incluiremos o separador se o diretório indicado não for nulo.
-	
-	if( (void*) string == NULL )
-	{
-		goto done;
+	if( pwd_initialized == 0 ){
+		goto fail;
 	}else{
-	    
-		//
-	    // ## separador ##
-	    //		
-        
-		strcat( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );		
 		
-		//
-	    // ## separador ##
-	    //		
-				
-		strcat( current_workingdiretory_string, string );				
+        if( (void*) string == NULL )
+	    {
+		    goto fail;
+	    }else{
+	    
+	        // ## separador ##
+		    strcat( current_workingdiretory_string, 
+			    FS_PATHNAME_SEPARATOR );		
+		
+	        // ## separador ##		
+		    strcat( current_workingdiretory_string, 
+			    string );			
+		};
 	};
-	
-	
-
-	
-	
+	//...
+fail:	
 done:
-    return;
+    return;	
 };
 
 
