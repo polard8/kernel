@@ -2,11 +2,12 @@
 ; Gramado Header - The kernel entry point for x86 processors.
 ; (c) Copyright 2005-2017 Fred Nora.
 ;
-; File: x86\head.s 
+; File: x86\head\head.s 
 ;
 ; Descrição:
-;      Parte principal do núcleo na arquitetura x86. Essa é a parte inicial
-; do núcleo de 32bit. Nesse arquivo está o entry point do Kernel Base.
+;      Parte principal do núcleo na arquitetura x86. 
+; Essa é a parte inicial do núcleo de 32 bit. 
+; Nesse arquivo está o entry point do Kernel Base.
 ;
 ; Endereço:
 ;     O Kernel é carregado no endereço físico 0x00100000, com o entry point 
@@ -15,11 +16,14 @@
 ;
 ; Heap and Stack:
 ; ==============
-;     O heap do Kernel será configurado em  kernel_heap_start  = 0xC0100000.(up).
-;     A pilha do Kernel será configurada em kernel_stack_start = 0xC03FFFF0.(down). 
+;     O heap do Kernel será configurado em  
+; kernel_heap_start  = 0xC0100000.(up).
+;     A pilha do Kernel será configurada em 
+; kernel_stack_start = 0xC03FFFF0.(down). 
 ;
 ; O Kernel faz algumas inicializações.
-; No final desse arquivo estão a GDT, IDT e includes padronizados.
+; No final desse arquivo estão a GDT, IDT e 
+; includes padronizados.
 ;
 ; Ordem padrão dos arquivos em assembly:
 ; ======================================

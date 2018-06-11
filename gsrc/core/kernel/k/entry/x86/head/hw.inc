@@ -653,6 +653,7 @@ _irq12:
 	cli	
 	pushad
 	
+	;unb/mouse.c
 	call _mouse_handler
 	
 	mov al, 0x20

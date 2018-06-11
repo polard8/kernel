@@ -614,6 +614,12 @@ unsigned long system_procedure( struct window_d *window,
 					ldisc_init_lock_keys();
 					videoInit();
 					SetFocus( gui->main );
+					
+					//#test
+					//init_mouse();
+					//g_mousepointer_x = (unsigned long) 200;
+		            //g_mousepointer_y = (unsigned long) 200;
+					
 					refresh_screen();
 					goto done;	
 					break;

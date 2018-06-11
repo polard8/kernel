@@ -1358,7 +1358,8 @@ int init_mouse()
 	    ioControl_mouse->used = 1;
 	    ioControl_mouse->magic = 1234;
 	    
-		ioControl_mouse->tid = 0;  //qual threa está usando o dispositivo.
+		//Qual thread está usando o dispositivo.
+		ioControl_mouse->tid = 0;  
 	    //ioControl_mouse->
 	};	
 	
@@ -1370,8 +1371,14 @@ int init_mouse()
 	//Inicializando as variáveis usadas na rotina em Assemly
     //em hardwarelib.inc
     
-	mouse_x = 0;
-	mouse_y = 0;
+	//Coordenadas do cursor.
+	g_mousepointer_x = (unsigned long) 200;
+    g_mousepointer_y = (unsigned long) 200;	
+    mouse_x = 0;
+    mouse_y = 0;
+	
+	//mouse_x = 0;
+	//mouse_y = 0;
 	
 	//#bugbug: Essa inicialização está travando o mouse.
 	//fazer com cuidado.
@@ -1380,9 +1387,7 @@ int init_mouse()
 	g_mousepointer_width = 16;
 	g_mousepointer_height = 16;
 	
-	//Coordenadas do cursor.
-    //mouse_x = (800/2);
-    //mouse_y = (600/2);
+
 
     //Bytes do controlador.
    // mouse_packet_data = 0;
@@ -1471,12 +1476,12 @@ done:
 	
 	// ## test ##
 	//susenso. Isso funciona.
-    //mouse_ret = (int) load_mouse_bmp();	
-	//if(mouse_ret != 0)
-	//{
-	//	printf("ldisc-init_mouse: load_mouse_bmp");
-	//	die();
-	//}
+    mouse_ret = (int) load_mouse_bmp();	
+	if(mouse_ret != 0)
+	{
+		printf("ldisc-init_mouse: load_mouse_bmp");
+		die();
+	}
 	
 	
 	
@@ -1537,14 +1542,13 @@ void kbdc_wait(unsigned char type)
  *     Handler de mouse. 
  *
  * *Importante: 
- *     Se estamos aqui é porque os dados disponíveis no controlador 8042 
- * pertencem ao mouse.
+ *     Se estamos aqui é porque os dados disponíveis no 
+ * controlador 8042 pertencem ao mouse.
  *
  * @todo: Essa rotina não pertence ao line discipline.
  * Obs: Temos externs no início desse arquivo.
  * 
- */
- 
+ */ 
 void mouseHandler()
 {
 	// ?? #bugbug.
@@ -1666,25 +1670,38 @@ void mouseHandler()
 		// refresh_screen();
 		
 		// Limits.
-        if( posX < 0 ){ posX = 0; }	
-		if(	posY < 0 ){ posY = 0; }
-		if(	posX > 800-8 ){ posX = 800-8; }
-		if(	posY > 600-8 ){ posY = 600-8; }
+        if( posX < 100 ){ posX = 100; }	
+		if(	posY < 100 ){ posY = 100; }
+		if(	posX > 400-8 ){ posX = 400-8; }
+		if(	posY > 400-8 ){ posY = 400-8; }
 		
 		//
 		// Atualizando o mesmo cursor usado pelo teclado.
 		//
 		
-		g_cursor_x = (unsigned long) posX;
-		g_cursor_y = (unsigned long) posY;
+		
+		g_mousepointer_x = (unsigned long) posX;
+		g_mousepointer_y = (unsigned long) posY;
+		//g_cursor_x = (unsigned long) posX;
+		//g_cursor_y = (unsigned long) posY;
+		
+		//limits
+		//if( g_mousepointer_x < 0 ){ g_mousepointer_x = 0; };
+		//if( g_mousepointer_x > 800 ){ g_mousepointer_x = 800; };
+		//if( g_mousepointer_y < 0 ){ g_mousepointer_y = 0; };
+		//if( g_mousepointer_y > 600 ){ g_mousepointer_y = 600; };
 		
 		//
 		// Draw !
 		//
 		
+		//#test
+		bmpDisplayBMP( mouseBMPBuffer, g_mousepointer_x, g_mousepointer_y );
+		refresh_rectangle( g_mousepointer_x, g_mousepointer_y, 16, 16 );
+		
 		//Imprimindo o caractere que está servindo de ponteiro provisório.
-        printf("%c", (char) '0'); 
-		refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );		
+        //printf("%d %d\n",g_mousepointer_x,g_mousepointer_y ); 
+		//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );		
 		
 		// @todo:
 		// ?? Porque não estamos testando o bmp como ponteiro ??
@@ -2051,8 +2068,9 @@ int load_mouse_bmp()
 	// Ret = (void*) allocPageFrames(500);  
 	
     // Alocando duas páginas para um BMP pequeno. 8KB.	
-	//mouseBMPBuffer = (void*) allocPageFrames(2);
-	mouseBMPBuffer = (void*) allocPageFrames(10);
+	mouseBMPBuffer = (void*) allocPageFrames(2);
+	//mouseBMPBuffer = (void*) allocPageFrames(10);
+	//mouseBMPBuffer = (void*) allocPageFrames(100);  //400KB
 	if( (void*) mouseBMPBuffer == NULL )
 	{
 	    printf("unblocked-ldisc-load_mouse_bmp: mouseBMPBuffer\n");
@@ -2096,27 +2114,28 @@ int load_mouse_bmp()
 	};
 	
 	// Render BMP file on backbuffer.
-	bmpDisplayBMP( mouseBMPBuffer, 20, 20 );
-	refresh_rectangle( 20, 20, 16, 16 );	
+	//bmpDisplayBMP( mouseBMPBuffer, 20, 20 );
+	//refresh_rectangle( 20, 20, 16, 16 );	
     //===================================							
 	
 	
 	//===================================
 	//DENNIS
-	fileret = (unsigned long) fsLoadFile( "DENNIS  BMP", 
-	                              (unsigned long) mouseBMPBuffer );
+	//fileret = (unsigned long) fsLoadFile( "DENNIS  BMP", 
+	//                              (unsigned long) mouseBMPBuffer );
 								  
-	if( fileret != 0 )
-	{
-		printf("DENNIS  BMP FAIL\n");		
+	//if( fileret != 0 )
+	//{
+	//	printf("DENNIS  BMP FAIL\n");		
 		// Escrevendo string na janela.
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
-		goto fail;	
-	};
+	//	goto fail;	
+	//};
 	
 	// Render BMP file on backbuffer.
-	bmpDisplayBMP( mouseBMPBuffer, 20, 40 );	
-	refresh_rectangle( 20, 40, 400, 400 );
+	//bmpDisplayBMP( mouseBMPBuffer, 0, 0 );
+    //refresh_rectangle( 0, 0, 800, 600 );	
+	//refresh_rectangle( 20, 40, 400, 400 );
 	//===================================
 	
 	
@@ -2141,8 +2160,10 @@ done:
 
 
 /*
+ *****************************************************
  * ps2:
- *     Essa rotina de inicialização do controladro poderá ter seu próprio módulo.
+ *     Essa rotina de inicialização do controladro 
+ * poderá ter seu próprio módulo.
  *     Inicializa o controlador ps2.
  *     Inicializa a porta do teclado no controlador.
  *     Inicializa a porta do mouse no controlador.

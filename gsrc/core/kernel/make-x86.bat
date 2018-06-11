@@ -20,8 +20,13 @@ echo ~{ ...
 echo ~{ Compiling KERNEL.BIN ...
 
 echo ~{ ...
-echo ~{ Main.
-	gcc -c k/main.c -I./include -o main.o 
+echo ~{ /entry
+
+	rem head.s
+	nasm  -I./k/entry/x86/head/  k/entry/x86/head/head.s  -f elf -o head.o
+	
+	rem x86main.o
+	gcc -c k/entry/x86/x86main.c -I./include -o x86main.o 
 	
 :Hal_Job1	
 rem hal	
@@ -35,8 +40,7 @@ echo ~{ ux4 /hal
 echo ~{ ...
 echo ~{ ux3 /mk
     
-	rem head.s
-	nasm  -I./k/mk/head/x86/  k/mk/head/x86/head.s  -f elf -o head.o
+
     rem c. 
     gcc -c  k/mk/mk.c -I./include  -o mk.o
 	
@@ -48,20 +52,20 @@ echo ~{ ux3 /mk
 	rem /pc process control ( ipc, sched, mm )
 	rem
 	
-	gcc -c  k/mk/pc/ts.c -I./include -o ts.o	
-    gcc -c  k/mk/pc/dispatch.c  -I./include  -o dispatch.o	
-	gcc -c  k/mk/pc/queue.c     -I./include  -o queue.o
-	gcc -c  k/mk/pc/process.c   -I./include  -o process.o
-    gcc -c  k/mk/pc/pheap.c     -I./include  -o pheap.o	
-    gcc -c  k/mk/pc/thread.c    -I./include  -o thread.o		
-    gcc -c  k/mk/pc/threadi.c   -I./include  -o threadi.o
-    gcc -c  k/mk/pc/theap.c     -I./include  -o theap.o
-    gcc -c  k/mk/pc/tstack.c    -I./include  -o tstack.o	
-    gcc -c  k/mk/pc/tasks.c     -I./include  -o tasks.o	
-	gcc -c  k/mk/pc/create.c    -I./include  -o create.o
+	gcc -c  k/mk/pc/action/ts.c -I./include -o ts.o	
+    gcc -c  k/mk/pc/action/dispatch.c  -I./include  -o dispatch.o	
+	gcc -c  k/mk/pc/action/queue.c     -I./include  -o queue.o
+	gcc -c  k/mk/pc/action/process.c   -I./include  -o process.o
+    gcc -c  k/mk/pc/action/pheap.c     -I./include  -o pheap.o	
+    gcc -c  k/mk/pc/action/thread.c    -I./include  -o thread.o		
+    gcc -c  k/mk/pc/action/threadi.c   -I./include  -o threadi.o
+    gcc -c  k/mk/pc/action/theap.c     -I./include  -o theap.o
+    gcc -c  k/mk/pc/action/tstack.c    -I./include  -o tstack.o	
+    gcc -c  k/mk/pc/action/tasks.c     -I./include  -o tasks.o	
+	gcc -c  k/mk/pc/action/create.c    -I./include  -o create.o
+	gcc -c  k/mk/pc/action/spawn.c  -I./include  -o spawn.o
 	
 	rem mk/pc/ipc 
-	gcc -c  k/mk/pc/ipc/spawn.c  -I./include  -o spawn.o
 	gcc -c  k/mk/pc/ipc/callout.c  -I./include  -o callout.o
 	gcc -c  k/mk/pc/ipc/callfar.c  -I./include  -o callfar.o
     gcc -c  k/mk/pc/ipc/ipc.c  -I./include  -o ipc.o	
@@ -256,7 +260,7 @@ rem
 	
 :Objects	
 set myObjects=head.o ^
-main.o ^
+x86main.o ^
 io.o ^
 hal.o ^
 mk.o ^

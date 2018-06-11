@@ -1,5 +1,5 @@
 /*
- * Arquivo: channel.h 
+ * File: channel.h 
  *
  * Descrição:
  *     Header for channel manager.
@@ -8,6 +8,8 @@
  * processos.
  *    " Um canal de comunicação é composto de dois soquetes, um para o cliente 
  * e outro para o servidor. "
+ *
+ * ?? isso não deveria fazer parte do /pc/ipc
  *
  * Versão 1.0, 2015, 2016.    
  */
@@ -32,7 +34,12 @@ typedef enum _ECHANNEL_STATE {
 
 /*
  * Estrutura para canal.
- *
+ * Serve para estabelecer uma conexão,
+ * ?? pelo jeito não serve para 
+ * trocar mensagens, somente para estabelecer a 
+ * conexão.
+ * Obs: Essa estrutura é aceitável, está em conformidade 
+ * com os padrões encontrados
  */
 typedef struct channel_d channel_t;
 struct channel_d
@@ -42,29 +49,34 @@ struct channel_d
 	
     int Used;
 	int Magic;
+	
 	int Type;
 	
     int State;    //Aberto ou fechado.
     int InUse;    //Em uso ou não.	
-	
-	//
-	// @todo: essas estruturas estão esquisitas , o formato deveria ser process_d.
-	//
-	
-    //struct d_process *OwnerProcess;
-    //struct d_thread *ClientThread;
-    //struct d_thread *ServerThread;
-	
+		
     struct process_d *OwnerProcess;
+	
     struct thread_d *ClientThread;
     struct thread_d *ServerThread;
 	
 	
 	//Os dois soquetes do canal de comunicação.
-	struct sockets_d *clientSocket;
-	struct sockets_d *serverSocket;
+	struct socket_d *clientSocket;
+	struct socket_d *serverSocket;
+	
+	//#importante:
+	//context ??
+	//me parece que um ponteiro pra uma estrutura do 
+	//tipo context é necessário 
+	//context deve conter os elementos necessários 
+	//para a transmissão da mensagem. Como o buffer 
+	//de memória compartilhada.
+	//
     
-	//struct channel_d *severchannel;
+	//?? O que é isso ???
+	//me parece que é necessário.
+	//struct channel_d *serverchannel;
 };
 channel_t *defaultChannel;
 channel_t *CurrentChannel;

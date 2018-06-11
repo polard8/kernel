@@ -17,6 +17,10 @@
  ********************************************
  * mouse_handler:
  *     Mouse handler do driver de mouse.
+ *     #importante: Essa rotina vai ficar no driver de 
+ * mouse carregado em ring0 e provavelmente enviará mensagens 
+ * para o kernel.
+ *    talvez pertenã ao driver do controlador 8042
  */
 void mouse_handler()
 {

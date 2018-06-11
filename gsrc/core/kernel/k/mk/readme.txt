@@ -5,5 +5,5 @@
  Folders:
 
  /cpu
- /head
+ /head (movido para k/entry ...)
  /pc - Process Control.

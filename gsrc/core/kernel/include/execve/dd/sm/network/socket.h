@@ -12,7 +12,7 @@
 
 
 /*
- * struct sockets_d:
+ * struct socket_d:
  *     ex: 192.168.1.1:80
  *         127.0.0.1:80  
  */

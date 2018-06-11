@@ -127,6 +127,11 @@ unsigned long g_cursor_top;      // margem superior dada em linhas
 unsigned long g_cursor_right;    // margem direita dada em linhas
 unsigned long g_cursor_bottom;   // margem inferior dada em linhas
 
+
+unsigned long g_mousepointer_x;
+unsigned long g_mousepointer_y;
+
+
 void 
 gwsSetCurrentFontAddress( unsigned long address );
 

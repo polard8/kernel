@@ -2,11 +2,11 @@
  * Gramado Operating System - The main file for the kernel.
  * (c) Copyright 2015~2018 - Fred Nora.
  *
- * File: k\main.c 
+ * File: k\entry\x86\x86main.c 
  * 
  * Description:
- *     project browser: 'SHELL.BIN IS MY MASTER.'
- *     This is the Kernel Base. It's the mains file for a 32bit Kernel. 
+ *     This is the Kernel Base. 
+ *     It's the mains file for a 32 bit x86 Kernel. 
  *     The type is 'hybrid'.
  *     The entry point is in 'head.s'.
  *
