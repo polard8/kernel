@@ -1372,8 +1372,8 @@ int init_mouse()
     //em hardwarelib.inc
     
 	//Coordenadas do cursor.
-	g_mousepointer_x = (unsigned long) 200;
-    g_mousepointer_y = (unsigned long) 200;	
+	g_mousepointer_x = (unsigned long) 0;
+    g_mousepointer_y = (unsigned long) 0;	
     mouse_x = 0;
     mouse_y = 0;
 	
@@ -1536,6 +1536,53 @@ void kbdc_wait(unsigned char type)
 };
 
 
+
+/*
+//rotina interna de suporta ao mouseHandler 
+#define _MOUSE_X_SIGN 0x10
+#define _MOUSE_Y_SIGN 0x20
+
+void
+update_mouse1()
+{
+
+char x = (mouse_packet_data & _MOUSE_X_SIGN);
+char y = ( mouse_packet_data & _MOUSE_Y_SIGN );
+
+
+//do_x:
+	    //x 
+		//checando o sinal para x.
+		//se for diferente de 0 então x é negativo
+		if(x != 0)
+		{
+			//complemento de 2.
+			mouse_packet_x = ~mouse_packet_x + 1;
+			mouse_x = mouse_x - mouse_packet_x;
+		}else{
+
+			mouse_x = mouse_x + mouse_packet_x;
+		}
+
+		
+//do_y:		
+		//y
+		//se for diferente de 0 então y é negativo
+		if(y != 0)
+		{
+			//complemento de 2.
+			mouse_packet_y = ~mouse_packet_y + 1;
+			mouse_y = mouse_y + mouse_packet_y;
+		}else{
+			mouse_y = mouse_y - mouse_packet_y;
+		};		
+		
+    return;		
+};
+*/
+
+
+
 /*
  ***************************************************
  * mouseHandler:
@@ -1549,6 +1596,17 @@ void kbdc_wait(unsigned char type)
  * Obs: Temos externs no início desse arquivo.
  * 
  */ 
+#define MOUSE_DATA_BIT 1
+#define MOUSE_SIG_BIT  2
+#define MOUSE_F_BIT  0x20
+#define MOUSE_V_BIT  0x08 
+
+//contador
+static int count_mouse=0;
+
+// Buffer.
+static char buffer_mouse[3];
+	
 void mouseHandler()
 {
 	// ?? #bugbug.
@@ -1556,10 +1614,8 @@ void mouseHandler()
 	// ?? Não tem um contador global para isso ??
 	// E o fato de serem 'static' ???
 	// Obs: A função entra com esse mouse count zerado.
-    static int count_mouse=0;
+
 	
-	// Buffer.
-    static char buffer_mouse[3];
 	
     // Coordenadas do mouse.
     // Obs: Isso pode ser global.
@@ -1574,13 +1630,92 @@ void mouseHandler()
 	// Lendo um char no controlador.
 	//
 
-	buffer_mouse[count_mouse++] = mouse_read();		
+
+	char *_byte;
+	
+	*_byte = (char) mouse_read();
+	
+	//buffer_mouse[count_mouse++] = mouse_read();		
 	
 	//
 	// Contagem de interruções:
 	// Obs: Precisamos esperar 3 interrupções.
 	//
 	
+	//#bugbue essa variável está inicializando toda vez que 
+	//se chama o handler porque ela é interna. ??
+	switch( count_mouse )
+	{
+		case 0:
+		    buffer_mouse[0] = (char) *_byte;
+            if(*_byte & MOUSE_V_BIT)
+                count_mouse++;
+		    break;
+			
+		case 1:
+		    buffer_mouse[1] = (char) *_byte;
+			count_mouse++;
+		    break;
+			
+		case 2:
+            buffer_mouse[2] = (char) *_byte;
+			count_mouse = 0;
+			
+            //pega os valores dos deltas ??
+			//mouse_x = mouse_byte[1];
+            //mouse_y = mouse_byte[2];
+			
+            //isso ficará assim caso não aja overflow ...
+			mouse_packet_data = buffer_mouse[0];
+	 	    mouse_packet_x = buffer_mouse[1];       
+		    mouse_packet_y = buffer_mouse[2];
+            
+			//#importante:
+			//Isso está em assembly, lá em hwlib.inc 
+			//mas queremos que seja feito em C.
+			//Uma rotina interna aqui nesse arquivo está tentando isso.
+			update_mouse();			
+			
+			
+		    mouse_x = (mouse_x & 0x00000FFF ); 
+		    mouse_y = (mouse_y & 0x00000FFF );
+		
+		    // Limits.
+		
+            if( mouse_x < 1 ){ mouse_x = 1; }	
+		    if(	mouse_y < 1 ){ mouse_y = 1; }
+		
+		    if(	mouse_x > 750 ){ mouse_x = 750; }
+		    if(	mouse_y > 550 ){ mouse_y = 550; }
+
+			
+		    //
+		    // Draw !
+		    //
+		
+		    //#test
+			//ISSO FUNCIONOU.
+			//#bugbug: 
+			//#importante: Talvez essa rotina esteja usando malloc ... 
+			//##verificar.
+		    //g_mousepointer_width g_mousepointer_height
+		    bmpDisplayBMP( mouseBMPBuffer, mouse_x, mouse_y );
+		    refresh_rectangle( mouse_x, mouse_y, 16, 16 );			
+			
+			//#importante: Isso funcionou bem.
+		    //drawchar_transparent( mouse_x, mouse_y, COLOR_PINK, 'T' );	
+		    //refresh_rectangle( mouse_x, mouse_y, 8, 8 );			
+			
+            break;
+
+        default:
+		    count_mouse = 0;
+            break;		
+			
+	};
+	
+	
+/*	
 	if( count_mouse >= 3 )
 	{
 		// Salvando os bytes obtidos.
@@ -1660,8 +1795,8 @@ void mouseHandler()
         // Obs: mouse_x e mouse_y são variáveis globais.
 		//
 		
-		posX = mouse_x;
-	    posY = mouse_y;
+		//posX = mouse_x;
+	    //posY = mouse_y;
 		
 		// #debug:
 		// #importante:
@@ -1670,18 +1805,32 @@ void mouseHandler()
 		// refresh_screen();
 		
 		// Limits.
-        if( posX < 100 ){ posX = 100; }	
-		if(	posY < 100 ){ posY = 100; }
-		if(	posX > 400-8 ){ posX = 400-8; }
-		if(	posY > 400-8 ){ posY = 400-8; }
+        //if( posX < 1 ){ posX = 1; }	
+		//if(	posY < 1 ){ posY = 1; }
+		//if(	posX > 255 ){ posX = 255; }
+		//if(	posY > 255 ){ posY = 255; }
+
+		
+		mouse_x = (mouse_x & 0x00000FFF ); 
+		mouse_y = (mouse_y & 0x00000FFF );
+		
+		// Limits.
+		
+        if( mouse_x < 1 ){ mouse_x = 1; }	
+		if(	mouse_y < 1 ){ mouse_y = 1; }
+		
+		if(	mouse_x > 750 ){ mouse_x = 750; }
+		if(	mouse_y > 550 ){ mouse_y = 550; }
 		
 		//
 		// Atualizando o mesmo cursor usado pelo teclado.
 		//
 		
+		//g_mousepointer_x = (unsigned long) mouse_x;
+		//g_mousepointer_y = (unsigned long) mouse_y;
 		
-		g_mousepointer_x = (unsigned long) posX;
-		g_mousepointer_y = (unsigned long) posY;
+		//g_mousepointer_x = (unsigned long) posX & 0x000000FF;
+		//g_mousepointer_y = (unsigned long) posY & 0x000000FF;
 		//g_cursor_x = (unsigned long) posX;
 		//g_cursor_y = (unsigned long) posY;
 		
@@ -1696,8 +1845,9 @@ void mouseHandler()
 		//
 		
 		//#test
-		bmpDisplayBMP( mouseBMPBuffer, g_mousepointer_x, g_mousepointer_y );
-		refresh_rectangle( g_mousepointer_x, g_mousepointer_y, 16, 16 );
+		//g_mousepointer_width g_mousepointer_height
+		//bmpDisplayBMP( mouseBMPBuffer, g_mousepointer_x, g_mousepointer_y );
+		//refresh_rectangle( g_mousepointer_x, g_mousepointer_y, 16, 16 );
 		
 		//Imprimindo o caractere que está servindo de ponteiro provisório.
         //printf("%d %d\n",g_mousepointer_x,g_mousepointer_y ); 
@@ -1709,6 +1859,15 @@ void mouseHandler()
 		//bmpDisplayBMP( mouseBMPBuffer, g_cursor_x*8, g_cursor_y*8, 0, 0 );
 		//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 16, 16 );
 		
+		
+		//printf("%c", (char)'0');
+		drawchar_transparent( mouse_x, mouse_y, COLOR_PINK, 'T' );	
+		refresh_rectangle( mouse_x, mouse_y, 8, 8 );
+		
+
+		//printf("%d %d\n",mouse_x,mouse_y ); 
+		//refresh_rectangle( 0, 0, 20*8, 600 );
+		
 		//
 		// ?? #bugbug: Porque essa variável é local, dentro da função.
 		// Zerando a contagem de interrupções de mouse.
@@ -1716,7 +1875,7 @@ void mouseHandler()
 		
 		count_mouse=0;
     };
-	
+*/	
 	
 	//
 	// *importante:

@@ -617,8 +617,10 @@ unsigned long system_procedure( struct window_d *window,
 					
 					//#test
 					//init_mouse();
-					//g_mousepointer_x = (unsigned long) 200;
-		            //g_mousepointer_y = (unsigned long) 200;
+					//g_mousepointer_x = (unsigned long) 1;
+		            //g_mousepointer_y = (unsigned long) 1;
+					//mouse_x = 0;
+					//mouse_y = 0;
 					
 					refresh_screen();
 					goto done;	

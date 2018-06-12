@@ -98,8 +98,18 @@ int bmpDisplayBMP( char *address,
 	// struct for Info header
 	//
 	
-	bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );	
-    if( (void*) bh == NULL )
+	//## BUGBUG 
+	// Um malloc aqui pode esgotar o heap 
+	//na hora de movimentar o mouse.
+	//precisamos usar um buffer interno para
+	//essa estrutura.
+	
+	char buffer[512];
+	char buffer2[512];
+	
+	//bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );	
+    bh = (struct bmp_header_d *) &buffer[0];
+	if( (void*) bh == NULL )
 	{
 		//goto fail;
 	}	
@@ -118,8 +128,9 @@ int bmpDisplayBMP( char *address,
 	//
 	
 	//Windows bmp.
-	bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
-    if( (void*) bi == NULL )
+	//bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
+    bi = (struct bmp_infoheader_d *)  &buffer2[0];
+	if( (void*) bi == NULL )
 	{
 		//goto fail;
 	}	
