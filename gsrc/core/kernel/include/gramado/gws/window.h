@@ -13,6 +13,8 @@
  *     Versão: 1.0, 2016 - Revisão.
  */
  
+ //id da janela que o mouse está em cima.
+int window_mouse_over; 
  
 //
 //  ## Ponteiros para ícones ##
@@ -115,7 +117,6 @@ int window_getch();
 #define BUFFER_MSG_NULL   0 
 #define CAT_MSG_NULL      0 
 
-
  
 //window (1-19)  
 #define MSG_CREATE        1
@@ -141,9 +142,24 @@ int window_getch();
 #define MSG_KEYUP         21
 #define MSG_SYSKEYDOWN    22
 #define MSG_SYSKEYUP      23
+
 //mouse (30 - 39)
+//tem uma lista de eventos de mouse em events.h
 #define MSG_MOUSEKEYDOWN  30
 #define MSG_MOUSEKEYUP    31
+#define MSG_MOUSEBUTTONDOWN	30
+#define MSG_MOUSEBUTTONUP	31 
+#define MSG_MOUSEMOVE	    32
+#define MSG_MOUSEOVER	    33
+#define MSG_MOUSEWHEEL	    34
+#define MSG_MOUSEPRESSED	  35
+#define MSG_MOUSERELEASED	  36
+#define MSG_MOUSECLICKED	  37
+#define MSG_MOUSEENTERED	  38
+#define MSG_MOUSEEXITED	       39
+//#define MSG_MOUSEMOVEBYOFFSET
+//#define MSG_MOUSEMOVETOELEMENT
+
 //outros (40 - ...)
 #define MSG_COMMAND       40
 #define MSG_CUT           41
@@ -603,13 +619,16 @@ color_scheme_t PrideColorScheme;    // Colorido.
 // ## button support ##
 //
 
-#define COLOR_BUTTONFACE          0xF0F0F0
-#define COLOR_BUTTONHIGHLIGHT  0xFFFFFF
-#define COLOR_BUTTONHIGHLIGHT2  0x404040
-#define COLOR_BUTTONHIGHLIGHTTEXT  COLOR_WHITE
-#define COLOR_BUTTONSHADOW  0xA0A0A0
-#define COLOR_BUTTONSHADOW2  0x303030  
-#define COLOR_BUTTONTEXT  COLOR_TEXT
+#define COLOR_BUTTONFACE 0xF0F0F0
+#define COLOR_BUTTONFACE2 0xE0E0E0
+#define COLOR_BUTTONFACE3 0xD0D0D0
+#define COLOR_BUTTONHIGHLIGHT 0xFFFFFF
+#define COLOR_BUTTONHIGHLIGHT2 0x404040
+#define COLOR_BUTTONHIGHLIGHTTEXT COLOR_WHITE
+#define COLOR_BUTTONHIGHLIGHTTEXT2 COLOR_WHITE //@todo: branco menos intenso.
+#define COLOR_BUTTONSHADOW 0xA0A0A0
+#define COLOR_BUTTONSHADOW2 0x303030  
+#define COLOR_BUTTONTEXT COLOR_TEXT
 
 
 #define COLOR_CONTROL             0xF0F0F0
@@ -2766,6 +2785,12 @@ windowSetTimer( struct window_d *window, //janela
                 int id,                  //id do timer
 				int time                //tempo(medida indefinida ainda)
 				);
+				
+				
+				
+//escaneia as janelas existentes procurando uma 
+//que contenha o posicionamento do cursor.				
+int windowScan( unsigned long x, unsigned long y );
 
 
 /*

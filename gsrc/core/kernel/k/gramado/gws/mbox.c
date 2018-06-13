@@ -10,7 +10,8 @@
  * como já temos o argumento 'type', ele pode servir para isso, é só criar um tipo que 
  * considere as estruturas da aba do navegador e incluir a rotina no switch.
  * O message box é uma janela dentro de outra janela, isso facilita as coisas..
- * é só criar um message box dentro da aba do navegador, que também é uma janela.
+ * é só criar um message box dentro da aba do navegador, 
+ * que também é uma janela.
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -21,11 +22,11 @@
 #include <kernel.h>
 
 
-unsigned long MessageBoxProcedure( struct window_d *window, 
-                                   int msg, 
-								   unsigned long long1, 
-								   unsigned long long2 );
-
+unsigned long 
+MessageBoxProcedure( struct window_d *window, 
+                     int msg, 
+				     unsigned long long1, 
+					 unsigned long long2 );
 								   
 	
 /*
@@ -69,35 +70,41 @@ void messageboxOut(struct window_d *parent_window, int type, char *title, char *
  * Message string.
  *
  */
-void MessageBox( struct window_d *parent_window,        
-                 int type,                        
-				 char *title,                     
-				 char *string )                   
-{	
-	struct button_d *b1; 
-	struct button_d *b2;
+void 
+MessageBox( struct window_d *parent_window,        
+            int type,                        
+		    char *title,                     
+			char *string )                   
+{		
+	//Desktop support.
+	int desktopID = (int) get_current_desktop_id();	 
 
+	//Window support.
+	
 	struct window_d *hWnd;    //Window.
 	struct window_d *pWnd;    //Parent.
 	struct window_d *bWnd;    //Button.
 	
 	unsigned long WindowClientAreaColor;
 	unsigned long WindowColor;
-	
-	int desktopID; 
-
-	int Button = 0;
-	int Icon = 0;
-	//...
-
-	
+		
 	//x and y
 	// @todo centralizado: metade | um terço.
 	//@todo: Pegar a métrica do dispositivo.
 	unsigned long x  = (unsigned long) 20;  //deslocamento x
-    unsigned long cx = (unsigned long) 400;         //largura   
 	unsigned long y  = (unsigned long) 20;  //deslocamento y
-    unsigned long cy = (unsigned long) 100;         //altura	
+	
+    unsigned long cx = (unsigned long) 800/2;         //largura   
+    unsigned long cy = (unsigned long) 600/3;         //altura	
+	
+	//Button support.
+	struct button_d *b1; 
+	struct button_d *b2;
+	int Button = 0;
+	
+	//icon.
+	int Icon = 0;
+	//...
 
 	
 	//No GUI.
@@ -120,87 +127,125 @@ void MessageBox( struct window_d *parent_window,
 	
 	
 	//
-	// *Importante: Checando se o esquema de cores está funcionando.
+	// *Importante: 
+	// Checando se o esquema de cores está funcionando.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL ){
+	if( (void*) CurrentColorScheme == NULL )
+	{
 		printf("MessageBox: CurrentColorScheme");
-		refresh_screen();
-		while(1){}
+		die();
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		if( CurrentColorScheme->used != 1 || 
+		    CurrentColorScheme->magic != 1234 )
+		{
 		    printf("MessageBox: CurrentColorScheme validation");
-		    refresh_screen();
-		    while(1){}			
+		    die();			
 		};
 		//Nothing.
 	};
 	
 	// Configurando as cores.
-	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  	
-	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
 	
-	//Desktop support.
-	desktopID = (int) get_current_desktop_id();
+	// Client area.
+	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  	
+	
+	// Window.
+	WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
+	
 	
 	// Criando a janela.
 	
-//creatingFrame:
+frame:
+    //
+	//  ## type ##
+	//
 
     //@todo: Criar definições de tipos de message boxs.
 	//@todo: Criar um tipo light.
+	
+	//Obs: Por enquanto para todos os tipos de messagebox 
+	// estamos usando o mesmo tipo de janela.
 	switch(type)
 	{	
 	    // Com botão, considera o título.
 	    case 1:
 		    Button = 1;
 	        hWnd = (void*) CreateWindow( 3, 0, 0, title, 
-			                             x, y, cx, cy, 
-										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
+			                x, y, 
+							cx, cy, 
+							pWnd, desktopID, 
+							WindowClientAreaColor, WindowColor); 
 		    break;
 			
 		// Sem botão, considera o título.	
 	    case 2:
 		    Button = 0;
 	        hWnd = (void*) CreateWindow( 3, 0, 0, title, 
-			                             x, y, cx, cy, 
-										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
+			                x, y, 
+							cx, cy, 
+							pWnd, desktopID, 
+							WindowClientAreaColor, WindowColor); 
 	        break;
 			
 		// Com botão, Título de alerta.	
 	    case 3:
 	        Button = 1;
 			hWnd = (void*) CreateWindow( 3, 0, 0, "Alert", 
-			                             x, y, cx, cy, 
-										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
+			                x, y, 
+							cx, cy, 
+							pWnd, desktopID, 
+							WindowClientAreaColor, WindowColor); 
 	        break;
 			
 		//Com botão, título de mensagem do sistema.	
 	    case 4:
 		    Button = 1;
 	        hWnd = (void*) CreateWindow( 3, 0, 0, "System Message", 
-			                             x, y, cx, cy, 
-										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
+			                x, y, 
+							cx, cy, 
+							pWnd, desktopID, 
+							WindowClientAreaColor, WindowColor); 
 	        break;
 			
 		//Tipo negligenciado. Usamos o formato padrão.	
 		default:
 		    Button = 1;
 	        hWnd = (void*) CreateWindow( 3, 0, 0, "Error", 
-			                             x, y, cx, cy, 
-										 pWnd, desktopID, WindowClientAreaColor, WindowColor); 
+			                x, y, 
+							cx, cy, 
+							pWnd, desktopID, 
+							WindowClientAreaColor, WindowColor); 
 		    break;
 	};
 	
-	// registrando a janela.
-	if((void*) hWnd == NULL){
-	    printf("MessageBox:");
-		refresh_screen();
-	    while(1){};
+	
+	//
+	// ## Window ##
+	//
+	
+	if( (void*) hWnd == NULL )
+	{
+	    printf("MessageBox: hWnd \n");
+		die();
 	}else{   
+	
+	    //Registrar e ativar.
 		RegisterWindow(hWnd);
         set_active_window(hWnd);
+		
+	    //Configurando qual vai ser a janela atual.
+	    CurrentWindow = (void*) hWnd;
+	    //current_window ?? id ?? hWnd->id
+	
+	    //Habilitando o procedimento de janela do message box.
+	    SetProcedure( (unsigned long) &MessageBoxProcedure );			
+		
+		//Setar foco.
+		//Quando um controle recebe o foco 
+		//Os eventos de input deverão ser 
+		//tratados pelo procedimento de janela do controle.
 		SetFocus(hWnd);  	 
 		//...
 	};
@@ -219,7 +264,11 @@ void MessageBox( struct window_d *parent_window,
 	//S = (size_t) strlen( (const char*) string);
 	
 drawString:
-	draw_text( hWnd, 1*(cx/16), (cy-16), COLOR_WINDOWTEXT, string);
+	draw_text( hWnd, 
+	    1*(cx/16), 
+		1*(cy/3), 
+		COLOR_WINDOWTEXT, 
+		string );
 
 	//
     // Button: 
@@ -227,15 +276,25 @@ drawString:
     //    @todo: É preciso criar um botão do tipo janela.
 	//           para colocar foco na janela.
 	//
-	//
+	// Obs: A quantidade de botão vai depender do tipo. 
 	//
 drawButton:	
     if(Button == 1)
 	{
 		//@todo: Criar uma janela do tipo botão para setar o foco.
         //       Pegar o tamanho da string para definir o tamanho do botão.
-        b1 = (void*) draw_button( hWnd, "Close", 1, (cx-56-8), (cy-24-8), 56, 24, COLOR_BUTTONFACE); 
-		if((void*) b1 == NULL ){
+		
+        b1 = (void*) draw_button( hWnd, 
+		                 "Close", 
+						 1, 
+						 3*(cx/4), 
+						 2*(cy/3), 
+						 64, 
+						 36, 
+						 COLOR_TERMINAL2 );
+						 
+		if((void*) b1 == NULL )
+		{
 			printf("button 1 fail\n");
 		}
 		
@@ -251,53 +310,19 @@ drawButton:
 		//SetFocus(??);
 	};
 	
-/*
-    ** Outra maneira de cria um botão ***
-    ** Obs: Retorna o haldle da janela **
-    ** Obs: Precisamos de um handle para setar o foco. ***
-	** e o botão terá o message box como janela mãe.
-	
-        bWnd = CreateWindow( 11, 0, 0, "Close", 
-		                     cx-102, y+2, 100, 24, 
-							 hWnd, 0, 0, 0);
-							 
-	    if( (void*) bWnd == NULL )
-	    {
-	        printf("MessageBox error: Button Struct.\n");
-		    refresh_screen();
-	        while(1){};
-	    }
-	    else
-	    {
-		    SetFocus(bWnd);   //o botão tem o foco de entrada.
-			RegisterWindow(bWnd); 
-	    };	
-*/		
-		
-	//Configurando qual vai ser a janela atual.
-	CurrentWindow = (void*) hWnd;
-	//current_window ?? id ??
-	
-	//Habilitando o procedimento de janela do message box.
-	SetProcedure( (unsigned long) &MessageBoxProcedure );	
-	
-	
+ 	
 	//
 	// ?? Continua ...
 	//	
 	
 done:
-    //SetFocus(hWnd);	//??	
-    //refresh_screen();
-
-    //refresh apenas do message box ... teste.	
     refresh_rectangle( x, y, cx, cy );
-	
 	return;
 };
 
 
 /*
+ **************************************************
  * MessageBoxProcedure:
  *     O procedimento padrão de message box.
  */																

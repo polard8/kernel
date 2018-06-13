@@ -1074,6 +1074,7 @@ fail:
 
 
 /*
+ **********************************************************
  * window_getch:
  *
  * Esse é o serviço 137.
@@ -1277,6 +1278,7 @@ int get_current_window_id()
 
 
 /*
+ *******************************************************
  * RegisterWindow: 
  *     Registrando uma janela numa lista de janelas.
  */
@@ -1297,11 +1299,10 @@ int RegisterWindow(struct window_d *window)
 	
 	windows_count++;
 	
-	if(windows_count >= WINDOW_COUNT_MAX){
+	if( windows_count >= WINDOW_COUNT_MAX )
+	{
 	    printf("RegisterWindow: Limits.");
 		die();
-		//refresh_screen();
-		//while(1){}
 	};
     
 	// Create empty.	
@@ -1474,6 +1475,7 @@ done:
 
 
 /*
+ *********************************************************
  * redraw_window:
  *     O OBJETICO DESSA ROTINA DEVE SER APENAS REPINTAR UM RETÂNGULO
  * QUE FOI PINTADO DENTRO DA ÁREA DE CLIENTE DA JANELA QUE FOI PASSADA 
@@ -3178,6 +3180,60 @@ iconSupport:
 	//die();	
 	
     return 0;
+};
+
+
+
+
+
+//escaneia as janelas existentes procurando uma 
+//que contenha o posicionamento do cursor.
+int windowScan( unsigned long x, unsigned long y )
+{
+	int WID;
+	
+	struct window_d *w;
+	
+	int i;
+	for( i=0; i <= windows_count; i++ )
+	{
+		w = (struct window_d *) windowList[i];
+		
+		//Ignorando as janelas principais.
+		if( (void*) w != NULL )
+		{	
+			if( w->used == 1 && w->magic == 1234 )
+			{
+				
+				if( x > w->left && 
+				    x < w->right && 
+				    y > w->top &&
+				    y < w->bottom )
+				{
+                    //if( w->id  == active_window || w->id  == window_with_focus  )
+                    if( w->type == WT_EDITBOX ||
+                        w->type == WT_OVERLAPPED ||	
+                        w->type == WT_CHECKBOX ||	
+                        w->type == WT_SCROLLBAR ||	
+                        w->type == WT_EDITBOX_MULTIPLE_LINES ||	
+						w->type == WT_BUTTON ||	 
+                        w->type == WT_STATUSBAR )						
+					{						
+					   WID = w->id;
+					   window_mouse_over = w->id;
+					   goto done;
+					}
+				} 
+			}
+				
+		};
+		
+	}
+	
+fail:
+    return (int) -1;	
+done:	
+    return (int) WID;	
 };
 
 

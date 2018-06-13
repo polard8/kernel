@@ -10,6 +10,11 @@
  *     (RING 0).
  *      Módulo interno, dentro do kernenel base.
  *
+ * @todo: Criar funções que criam a estrutura timer ...
+ * que será usada peloa aplicativos na forma de objeto .
+ * elas devem ter um contador que enviará mensagens para o 
+ * aplicativo sempre que se esgota a contagem.
+ *
  * Histórico:
  *     Versão: 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
  *     Versão: 1.0, 2014 - Revisão. 
@@ -507,6 +512,18 @@ done:
 	
 	return (int) 0;
 };
+
+
+/*
+struct timer_d *timerObject();
+struct timer_d *timerObject()
+{
+	//@todo: criar uma estrutura e retornar o ponteiro.
+	return (struct timer_d *) x;
+}
+*/
+
+
 
 
 //

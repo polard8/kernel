@@ -16,7 +16,7 @@
  
  
 //PIT. 
-#define TIMER_DRIVER_PATHNAME "/root/drivers/timer.bin"  
+#define TIMER_DRIVER_PATHNAME "root:/volume2/drivers/timer.bin"  
  
  
 /*
@@ -50,6 +50,15 @@ unsigned long timer_handler_address;    //global _irq0:
 
 
 
+/*
+ *******************************************************
+ * timer_d:
+ * Estrutura do objeto timer que será usado pelos aplicativos.
+ * 
+ * Precisamos identificar quem está usando para podermos enviar 
+ * mensagem para quem possui o timer.
+ *
+ */
 typedef struct timer_d timer_t; 
 struct timer_d 
 {
@@ -57,10 +66,25 @@ struct timer_d
 	object_type_t objectType;
 	object_class_t objectClass;
 	
+	
+	int used;
+	int magic;
+	
+	//owner.
+    struct process_d *process;
+	struct thread_d *thread;
+	struct window_d *window;
+	
+	int counter;
+	
+	int status;
+	
+	
 	//cal back ;d
 	
 	
-	int dummy;    //c
+	//deletar
+	//int dummy;    //c
     //...
 
     //unsigned long timer_handler_address; 	

@@ -1937,6 +1937,50 @@ void mouseHandler()
 	//
 	
 	
+	
+	//
+	// ## On mouse over ##
+	//
+	
+	int wID;
+	struct window_d *wScan;
+	
+	//Escaneamos para achar qual janela bate com 
+	//os valores indicados.
+	//return: (int) window id.
+	wID = (int) windowScan( mouse_x, mouse_y );
+	
+	//Se for válido e diferente da atual.
+	if( wID != -1 )
+	{
+		wScan = (struct window_d *) windowList[wID];
+		//redraw_window(wScan);
+        
+		
+        //colocará a mensagem na estrutura de janele 
+		//para que o aplicativo pegue.
+        windowSendMessage( (unsigned long) wScan, 
+		    (unsigned long) MSG_MOUSEOVER, 
+			(unsigned long) 0, 
+			(unsigned long) 0 );		
+		
+		
+        draw_text( wScan,
+                   0,  
+                   0,  
+				   COLOR_RED, 
+				   "+" );
+			   
+		
+		refresh_rectangle( wScan->left, 
+		    wScan->top, 
+			8, 
+			8 );
+
+	};
+	
+	
+	
 exit_irq:	
     // EOI.		
     outportb(0xa0, 0x20); 

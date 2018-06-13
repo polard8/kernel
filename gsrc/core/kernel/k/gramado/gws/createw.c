@@ -167,6 +167,8 @@ unsigned long color         //12 - color (bg) (para janela simples)
 )
 {
 	
+	struct window_d *internal_window;
+	
 	// @todo: O argumento style está faltando.
 	//        cada tipo de tanela poderá ter vários estilos.
 	// Obs: Podemos ir usando apenas um estilo padrão por enquanto.
@@ -1129,10 +1131,12 @@ drawBegin:
 			//			   COLOR_BUTTONFACE); //@todo: criar elemento no esquema de cores.
 
             //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
-			CreateWindow( WT_BUTTON, 1, 1, "V", 
+			internal_window = CreateWindow( WT_BUTTON, 1, 1, "V", 
 	            (window->width -42 -1), 2, 
 				21, 21,									  
-			    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
+			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+			RegisterWindow(internal_window);
+ 				
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
@@ -1144,10 +1148,12 @@ drawBegin:
 			//			21, 21, 
 			//			COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.
             //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
-			CreateWindow( WT_BUTTON, 1, 1, "X", 
+			internal_window = CreateWindow( WT_BUTTON, 1, 1, "X", 
 	            (window->width -21), 2, 
 				21, 21,									  
-			    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
+			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+            RegisterWindow(internal_window);
+				
 	    };					 
 			
 		//#bugbug O kernel não pode ficar tanto tempo assim carregando uma imagem.
@@ -1342,9 +1348,10 @@ drawBegin:
 						   window->color_bg ); 
 						   
 	    //Botão de cima da scrollbar vertival
-		CreateWindow( WT_BUTTON, 1, 1, "^", 
+		internal_window = CreateWindow( WT_BUTTON, 1, 1, "^", 
 	        1, 1, (window->width -2), 16,									  
-		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);	
+		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
+        RegisterWindow(internal_window); 			
 			
 	
 	    //limits
@@ -1354,16 +1361,17 @@ drawBegin:
 		}
 
 	    //Botão do meio da scrollbar vertival
-		CreateWindow( WT_BUTTON, 1, 1, "=", 
+		internal_window = CreateWindow( WT_BUTTON, 1, 1, "=", 
 	        1, (window->height/2), (window->width -2), 16,									  
-		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);	
-		
+		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+		RegisterWindow(internal_window);
 					
 	    //botão 2 da barra horizontal.
         //Botão de baixo da scrollbar vertival
-	    CreateWindow( WT_BUTTON, 1, 1, "v", 
+	    internal_window = CreateWindow( WT_BUTTON, 1, 1, "v", 
 	        1, (window->height -17), (window->width -2), 16,									  
-		    window, 0, (unsigned long) COLOR_BUTTONFACE, (unsigned long) COLOR_BUTTONFACE);			
+		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);			
+	    RegisterWindow(internal_window);
 	};	
 
 	
@@ -1386,16 +1394,11 @@ drawBegin:
 	
 	if( (unsigned long) type == WT_BUTTON )
 	{
-	    //as posições de left e right são da janela do botão.
-		//draw_button( Parent, windowname, 1, 
-		//             window->left, window->top, 
-		//			 window->width, window->height, 
-		//			 COLOR_BUTTONFACE );
-					 
+	    //as posições de left e right são da janela do botão.		 
 		draw_button( Parent, windowname, 1, 
 		             window->left, window->top, 
 					 window->width, window->height, 
-					 COLOR_TERMINAL2 );
+					 window->color_bg );
 	};					 
 	
 	//
@@ -1444,6 +1447,7 @@ drawBegin:
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar], 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);
+		RegisterWindow(window->scrollbar);
 
         //status bar.
 		//Esses valores precisam ser melhor declarados.
@@ -1453,8 +1457,7 @@ drawBegin:
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar], 
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);
-
-
+        RegisterWindow(window->statusbar);
         //  ## test  ##
 		// os ícones já estão carregados, vamos apenas 
 		// decodificá lo no backbuffer 

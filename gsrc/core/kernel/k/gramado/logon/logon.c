@@ -105,8 +105,7 @@ void create_logon()
 	gui = (void*) malloc( sizeof(struct gui_d) );
     if( (void*) gui == NULL){
 	    printf("create_logon:");
-		refresh_screen();
-		while(1){}
+		die();
 	}else{
 	    
         //Set session ,window station, desktop, window and menu.
@@ -381,6 +380,7 @@ done:
 
 
 /*
+ **************************************
  * logon_create_screen:
  *     Cria a tela. 
  *     Atribuindo as dimensões.
@@ -403,8 +403,6 @@ void logon_create_screen()
 	if( (void*) hWindow == NULL ){
 	    printf("logon_create_screen:");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
@@ -428,6 +426,7 @@ done:
 
 
 /*
+ ***********************************************
  * logon_create_background:
  *     Cria o background. Pinta ele de uma cor.
  *
@@ -453,8 +452,6 @@ void logon_create_background()
 	if( (void*) hWindow == NULL){
 	    printf("logon_create_background:");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 	    
 		RegisterWindow(hWindow);
@@ -478,6 +475,7 @@ done:
 
 
 /*
+ *************************************************
  * logon_create_mainwindow:
  *      A área de trabalho.
  *      *Importante: É a área disponível na tela para o aplicativo. 
