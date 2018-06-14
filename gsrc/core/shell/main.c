@@ -108,8 +108,15 @@ int executing = 0;
 int login_status = 0;
 
 //Sendo assim, o shell poderia abrir no ambiente de logon.
-char *username;
-char *password; 
+
+char username[11];
+char password[11];
+//char sUsername[11];
+//char sPassword[11];
+//char *username;
+//char *password; 
+
+	
 
 #ifndef PPROMPT
 #define PPROMPT "shell\\$ "
@@ -1127,6 +1134,11 @@ shellProcedure( struct window_d *window,
 		case MSG_DESTROY:
 		    printf("SHELL.BIN: MSG_DESTROY\n");
 		    break;
+			
+		// MSG_MOUSEOVER	
+		case 33:
+            printf("SHELL.BIN: Mouse over");
+            break;			
 		
 		//Quando a aplicativo em user mode chama o kernel para 
 		//que o kernel crie uma janela, depois que o kernel criar a janela,
@@ -1929,6 +1941,18 @@ do_compare:
 			printf("cd error: no arg\n");
 		}else{
 			
+			//#bugbug: não é possivel fazer isso por enquanto,
+			//pois não estamos fazendo parse de char por char.
+			//if( strncmp( (char*) tokenList[i], ".", 2 ) == 0 )
+			//{}
+				
+			if( strncmp( (char*) tokenList[i], "..", 2 ) == 0 )
+			{
+				//Apaga o nome do último diretório.
+			    shell_pathname_backup( current_workingdiretory_string, 1); 
+                goto exit_cmp;				
+		    }			
+			
 	        // updating the current working directory string.
 	        shellUpdateWorkingDiretoryString( (char*) tokenList[i] );
 			
@@ -2509,7 +2533,8 @@ do_compare:
 		goto exit_cmp;
     };
 
-	// t5 - 
+	// t5 - ( save file )
+	//Ok isso funcionou.
 	if( strncmp( prompt, "t5", 2 ) == 0 )
 	{
 		printf("t5: tentando salvar um arquivo ...\n");
@@ -2530,6 +2555,7 @@ do_compare:
 
 
 	// t6 - testando a api. rotina que salva arquivo. 
+	//ok, isso funcionou.
 	if( strncmp( prompt, "t6", 2 ) == 0 )	
 	{
 		printf("t6: tentando salvar um arquivo ...\n");
@@ -3047,12 +3073,6 @@ int shellInit( struct window_d *window )
 	int WindowWithFocusId = 0;
 	void *P;
 	//int CurrentVolumeID = 0;
-	
-	
-	//char sUsername[11] = "           ";
-	//char sPassword[11] = "           ";
-    char sUsername[11];
-    char sPassword[11];
 		
 	char buffer[512];
 	
@@ -3386,14 +3406,15 @@ done:
 
 		
 	    printf("username:\n");
-	    gets(sUsername);
+	    gets(username);
 		
 	    printf("password:\n");
-	    gets(sPassword);
+	    gets(password);
 	
 #ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
-	    printf("username={%s} password={%s}",sUsername,sPassword);
+	    printf("username={%s} password={%s}",
+		    username, password);
 		printf("\n");
 #endif
 		
@@ -3441,11 +3462,11 @@ done:
 			//printf("\n");
 			
 #ifdef SHELL_VERBOSE			
-			printf(">>%s\n", sUsername);
+			printf(">>%s\n", username);
 			printf(">>%s\n", buffer);
 #endif
 			
-            if( strncmp( sUsername, buffer, 4 ) == 0 )
+            if( strncmp( username, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE				
 				printf("  ## USERNAME OK  ##\n");
@@ -3489,11 +3510,11 @@ done:
 		    }
 
 #ifdef SHELL_VERBOSE				
-			printf(">>%s\n", sPassword);
+			printf(">>%s\n", password);
 			printf(">>%s\n", buffer);
 #endif			
 			
-            if( strncmp( sPassword, buffer, 4 ) == 0 )
+            if( strncmp( password, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE								
 				printf("  ## PASSWORD OK  ##\n");
@@ -3646,9 +3667,9 @@ shellPrompt()
     prompt_status = 0;
 	prompt_max = PROMPT_MAX_DEFAULT;  
 
-    printf("\n");	
-	printf("%s/%s", current_workingdiretory_string,
-	    SHELL_PROMPT );
+    printf("\n");
+    printf("[%s]",current_workingdiretory_string);	
+	printf("%s",SHELL_PROMPT );
 	//return;
 };
 
@@ -4490,14 +4511,16 @@ shellUpdateWorkingDiretoryString( char *string )
 	    }else{
 	    
 	        // ## separador ##
-		    strcat( current_workingdiretory_string, 
-			    SHELL_PATHNAME_SEPARATOR );		
+		    //strcat( current_workingdiretory_string, 
+			//    SHELL_PATHNAME_SEPARATOR );		
 		
 		    //
 	        // ## separador ##		
 		    strcat( current_workingdiretory_string, 
-			    string );				
-	    
+			    string );	
+
+		    strcat( current_workingdiretory_string, 
+			    SHELL_PATHNAME_SEPARATOR );				
 		
             //Atualizar no gerenciamento feito pelo kernel.
 	        system_call( 175,
@@ -4539,6 +4562,7 @@ shellInitializeWorkingDiretoryString()
     //  ## volume list ##
     //	
 	
+	//root:
     //primeiro colocamos a string que indica 
 	//a lista de volumes.
     sprintf( current_workingdiretory_string, 
@@ -4549,15 +4573,22 @@ shellInitializeWorkingDiretoryString()
 	// ## separador ##
 	//
 
+	//root:/
 	strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
 	
 	//
 	//  ## volume root dir ##
 	//
 	
+	//root:/volumex
 	strcat( current_workingdiretory_string, current_volume_string );
 
-	
+	//
+	// ## separador ##
+	//
+
+	//root:/volumex/
+	strcat( current_workingdiretory_string, SHELL_PATHNAME_SEPARATOR );
 	
 done:
     pwd_initialized = 1;
@@ -5290,6 +5321,49 @@ int shellInitFilename()
 done:	
     filename_initilized = 1;
 	return (int) 0;
+};
+
+
+/* 
+ Remove the last N directories from PATH.  
+ Do not leave a blank path.
+ PATH must contain enough space for MAXPATHLEN characters. 
+ Credits: bash 1.05
+ */
+void 
+shell_pathname_backup( char *path, int n )
+{
+    register char *p = path + strlen(path);
+	
+	unsigned long saveN = (unsigned long) n;
+
+    //#debug 
+	//printf("%s", path);
+	
+	if(*path)
+       p--;
+
+    while(n--)
+    {
+        while(*p == '/')
+	        p--;
+
+        while(*p != '/')
+	        p--;
+
+        *++p = '\0';
+    };
+	
+//
+//
+	//@todo: Criar em kernelmode uma roptina que 
+	//que faça o mesmo que a shell_pathname_backup 	
+            //Atualizar no gerenciamento feito pelo kernel.
+	        system_call( 176,
+	            (unsigned long) saveN,
+		        (unsigned long) saveN, 
+		        (unsigned long) saveN );			
+    	
 };
 
 

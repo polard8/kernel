@@ -1007,10 +1007,11 @@ void *services( unsigned long number,
         //para o diretório de trabalho.		
 		case SYS_PWD:
 		    printf("\n");
-            printf("service 170:.pwd \n"); 
-			printf("disk={%d} volume={%d} directory={%d}\n",
-			    current_disk, current_volume, current_directory );
+            //printf("service 170:.pwd \n"); 
+			//printf("disk={%d} volume={%d} directory={%d}\n",
+			//    current_disk, current_volume, current_directory );
 			printf("%s\n",current_workingdiretory_string);
+			printf("\n");
 			refresh_screen();
 			break;	
 		
@@ -1040,9 +1041,20 @@ void *services( unsigned long number,
 			break;
 			
 		//175	
-		//atualizar string no pathname do pwd. 		
+		//atualizar string no pathname do pwd. 
+        //em argumento veio o que se deve acrescentar.		
 		case 175:
 		    fsUpdateWorkingDiretoryString( (char *) arg2 );
+			break;
+			
+		//176	
+		//atualizar string no pathname do pwd. 
+        //em argumento veio a quantidade de diretórios a se retirar.		
+		case 176:
+		    //apaga n quantidade de nomes de diretórios 
+			//começando do último.
+		    fs_pathname_backup( (char *) current_workingdiretory_string, 
+			    (int) arg3 );
 			break;
 
 		//184

@@ -983,7 +983,44 @@ findEmptyDirectoryEntry( unsigned long dir_address,
 void read_fntos(char *name);
 				  
 				  
-int fsCheckPEFile( unsigned long address );				  
+int fsCheckPEFile( unsigned long address );	
+
+
+
+
+
+/*
+ *****************************************
+ * fsInitializeWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */
+void 
+fsInitializeWorkingDiretoryString(); 
+
+/*
+ *****************************************
+ * fsUpdateWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */ 
+void 
+fsUpdateWorkingDiretoryString( char *string );
+
+/* 
+ Remove the last N directories from PATH.  
+ Do not leave a blank path.
+ PATH must contain enough space for MAXPATHLEN characters. 
+ Credits: bash 1.05
+ */
+void 
+fs_pathname_backup( char *path, int n ); 			  
 				  
 //
 // End.

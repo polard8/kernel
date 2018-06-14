@@ -305,12 +305,12 @@
 #define	SYS_SEARCHFILE         174  // Procurar arquivo. 
 
 //175 atualizar string no pathname do pwd. 
-#define	SYS_175 175
-
-#define	SYS_176 176
-#define	SYS_177 177
+#define	SYS_175 175  //#usado para atualiza pwd
+#define	SYS_176 176  //#usado para atualiza pwd
+#define	SYS_177 177  
 #define	SYS_178 178
 #define	SYS_179 179
+
 //Memory support.
 #define	SYS_CREATEPAGEDIRECTORY 180    //cria um pagedir.
 #define	SYS_CREATEPAGETABLE     181    //cria uma pagetable.

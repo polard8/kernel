@@ -265,10 +265,10 @@ int EOF_Reached;
 #define SHELL_VERSION  "0.1"
 
 //prompt
-#define SHELL_PROMPT   ">"
-#define SHELL_PROMPT2  "$"
+#define SHELL_PROMPT   "$"
+#define SHELL_PROMPT2  "#"
 #define SHELL_PROMPT3  "%"
-//#define SHELL_PROMPT4  "shell: " 
+#define SHELL_PROMPT4  ">"
 //... 
 
 
@@ -847,7 +847,18 @@ int shellInitPathname();
 //inicializaremos o supporte a filename
 int shellInitFilename();
 
-void shellExit(int code);					
+void shellExit(int code);	
+
+/* 
+ Remove the last N directories from PATH.  
+ Do not leave a blank path.
+ PATH must contain enough space for MAXPATHLEN characters. 
+ Credits: bash 1.05
+ */
+void 
+shell_pathname_backup( char *path, int n ); 
+
+				
 //
 // End.
 //

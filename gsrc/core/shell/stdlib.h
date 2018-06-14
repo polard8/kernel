@@ -61,6 +61,11 @@ void *stdlib_system_call( unsigned long ax,
 
 void exit(int status);
 
+
+
+char *
+getenv(const char *name);
+
 /*
  * malloc:
  *    Allocates the requested memory and returns a pointer to it.

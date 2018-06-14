@@ -197,29 +197,6 @@ unsigned long volumeList[VOLUME_COUNT_MAX];
 
 
 
-/*
- *****************************************
- * fsInitializeWorkingDiretoryString:
- *     Atualiza a string do diretório de trabalho.
- * Essa é a string que será mostrada antes do prompt.
- * 'pwd'> 
- * ?? isso deve sser todo o pathname do pwd ?? 
- * ex: root:/volume0>
- */
-void 
-fsInitializeWorkingDiretoryString(); 
-
-/*
- *****************************************
- * fsUpdateWorkingDiretoryString:
- *     Atualiza a string do diretório de trabalho.
- * Essa é a string que será mostrada antes do prompt.
- * 'pwd'> 
- * ?? isso deve sser todo o pathname do pwd ?? 
- * ex: root:/volume0>
- */ 
-void 
-fsUpdateWorkingDiretoryString( char *string );
 
 
 void volumeShowCurrentVolume();

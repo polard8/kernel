@@ -1061,6 +1061,14 @@ fsInitializeWorkingDiretoryString()
 	
 	strcat( current_workingdiretory_string, 
 	    current_volume_string );
+		
+		
+	//
+	// ## separador ##
+	//
+
+	strcat( current_workingdiretory_string, 
+	    FS_PATHNAME_SEPARATOR );		
 
 	
 	
@@ -1078,6 +1086,7 @@ done:
  * 'pwd'> 
  * ?? isso deve sser todo o pathname do pwd ?? 
  * ex: root:/volume0>
+ * #bugbug o protótipo deveria estar em fs.h;
  */ 
 void 
 fsUpdateWorkingDiretoryString( char *string )
@@ -1092,18 +1101,49 @@ fsUpdateWorkingDiretoryString( char *string )
 	    }else{
 	    
 	        // ## separador ##
-		    strcat( current_workingdiretory_string, 
-			    FS_PATHNAME_SEPARATOR );		
+		    //strcat( current_workingdiretory_string, 
+			//    FS_PATHNAME_SEPARATOR );		
 		
 	        // ## separador ##		
 		    strcat( current_workingdiretory_string, 
-			    string );			
+			    string );	
+
+	        // ## separador ##
+		    strcat( current_workingdiretory_string, 
+			    FS_PATHNAME_SEPARATOR );				
 		};
 	};
 	//...
 fail:	
 done:
     return;	
+};
+
+
+/* 
+ Remove the last N directories from PATH.  
+ Do not leave a blank path.
+ PATH must contain enough space for MAXPATHLEN characters. 
+ Credits: bash 1.05
+ */
+void 
+fs_pathname_backup( char *path, int n )
+{
+    register char *p = path + strlen(path);
+
+    if(*path)
+       p--;
+
+    while(n--)
+    {
+        while(*p == '/')
+	        p--;
+
+        while(*p != '/')
+	        p--;
+
+        *++p = '\0';
+    };	
 };
 
 
