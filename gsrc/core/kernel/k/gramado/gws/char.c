@@ -129,6 +129,10 @@ void drawchar_transparent( unsigned long x,
 	    gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
 		gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
+		
+		//debug
+		printf("drawchar_transparent: address fail\n");
+		die();
 	};
 	
 
@@ -136,7 +140,7 @@ void drawchar_transparent( unsigned long x,
 	switch(gfontSize)
 	{
 		case FONT8X8:
-	        gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+	        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
 		    gcharWidth = 8;
 		    gcharHeight = 8;
 		    break;
@@ -156,13 +160,13 @@ void drawchar_transparent( unsigned long x,
 		// que usar o tamanho padrão.
 		//
 		default:
-		    printf("gui-char-drawchar_transparent: Font size fail.");
-			printf("gui-char-drawchar_transparent: Using default ...");
+		   // printf("gui-char-drawchar_transparent: Font size fail.");
+		//	printf("gui-char-drawchar_transparent: Using default ...");
 	        
 			// Fonte padrão.
-			gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
-		    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
+		//	gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		  //  gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		   // gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
             
             //gfontStatus = 0;  //fail 			
 		    
@@ -282,13 +286,16 @@ void draw_char( unsigned long x,
 	    gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
 		gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
 		gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
+		//debug
+		printf("draw_char: address fail\n");
+		die();
 	};
 	
     //@todo: Criar essas variáveis e definições.
 	switch(gfontSize)
 	{
 		case FONT8X8:
-	        gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+	        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
 		    gcharWidth = 8;
 		    gcharHeight = 8;
 		    break;
@@ -307,18 +314,18 @@ void draw_char( unsigned long x,
 		// Se não temos um tamanho selecionado então teremos 
 		// que usar o tamanho padrão.
 		//
-		default:
-		    printf("gui-char-drawchar_transparent: Font size fail.");
-			printf("gui-char-drawchar_transparent: Using default ...");
+		//default:
+		//    printf("gui-char-drawchar_transparent: Font size fail.");
+		//	printf("gui-char-drawchar_transparent: Using default ...");
 	        
 			// Fonte padrão.
-			gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
-		    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
+		//	gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+		//    gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
+		//    gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.	
             
             //gfontStatus = 0;  //fail 			
 		    
-			break;
+		//	break;
 	};
 	
 	

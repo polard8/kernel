@@ -170,6 +170,7 @@ done:
 
 
 /*
+ ***********************************************
  * videoInit:
  *     Inicia variáveis de video de acordo com o modo gráfico utilizado.
  */ 
