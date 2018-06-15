@@ -210,7 +210,7 @@
 //Reboot.
 #define	SYS_REBOOT         110
 //Outros. @todo: Reservar para gerenciamento de energia. 
-#define	SYS_111 111   
+#define	SYS_111 111   //#usando provisóriamente como test de mensagem.
 #define	SYS_112 112
 #define	SYS_113 113
 #define	SYS_114 114

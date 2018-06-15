@@ -785,7 +785,41 @@ noArgs:
 		// com o foco de entrada. esse argumento foi passado mas não foi usado.
 		//
 		
-Mainloop:		
+	unsigned long message_buffer[5];	
+		
+Mainloop:
+    
+	// #### Test ####
+	/* ## Nesse teste vamos enviar um ponteiro de array e pegarmos os 4 elementos da mensagem ## */
+	
+	while(running)
+	{
+		enterCriticalSection(); 
+		system_call( 111,
+		    (unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0] );
+		exitCriticalSection(); 
+			
+		if(	message_buffer[1] != 0 )
+		{
+	        shellProcedure( (struct window_d *) message_buffer[0], 
+		        (int) message_buffer[1], 
+		        (unsigned long) message_buffer[2], 
+		        (unsigned long) message_buffer[3] );
+			
+			//clear
+			message_buffer[0] = 0;
+            message_buffer[1] = 0;
+            message_buffer[3] = 0;
+            message_buffer[4] = 0;	
+        };				
+	};
+	
+
+
+    /*
+		
 	while(running)
 	{		
 
@@ -910,6 +944,8 @@ Mainloop:
 		
 		//Nothing.
 	};
+	
+	*/
 	
 	//
 	// Pulamos a parte que pega mensgens de input de teclado 
@@ -2237,6 +2273,19 @@ do_compare:
 	//	printf("~ls\n");
     //    goto exit_cmp;
 	//};
+
+
+    // message-box
+	//Testing message box.
+	if( strncmp( prompt, "message-box", 11 ) == 0 )
+	{
+		//@todo:testar os 4 tipos 
+	    MessageBox( 1, "Shell message box","Testing message box...");
+        goto exit_cmp;
+    };	
+	
+
+
 	
 	
     // mm-info

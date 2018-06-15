@@ -210,8 +210,10 @@ void *services( unsigned long number,
 	
 	// ## message support ##
 	
-	//o endereço do vetor passado pelo aplicativo.
+	//o endereço do array passado pelo aplicativo
+	//usaremos para enviar uma mensagem com 4 elementos.
 	unsigned long *message_address = (unsigned long*) arg2;
+	
 	unsigned char SC;
 	struct window_d *wFocus;
 	
@@ -822,6 +824,59 @@ void *services( unsigned long number,
 			break;
 			
 		//...
+		
+		//
+		// #### test ####
+		//
+		
+		//O aplicativo envia um endereço de array 
+		//e devemos colocar 4 longs como mensagens.
+		case 111:
+		    if( &message_address[0] == 0 )
+			{
+				printf("111: null pointer");
+				die();
+			}else{
+				
+			    wFocus = (void *) windowList[window_with_focus];
+			    
+				//se não há mensagens.
+				if( wFocus->newmessageFlag == 0 )
+				{
+                    //Se não há mensagens na estrutura da janela,
+					//então devemos alimentar a estrutura para
+					//que da próxima vez exista alguma mensagem.
+					//Nossas opções são o teclado, pois o próprio mouse 
+					//alimentará por si só a estrutura da janela.
+					
+					//alimentando através de mensagens de teclado
+			        SC = (unsigned char) keybuffer[keybuffer_head];
+		            keybuffer[keybuffer_head] = 0;
+			        keybuffer_head++;
+			        if( keybuffer_head >= 128 ){ keybuffer_head = 0; };
+			        LINE_DISCIPLINE(SC, 0);
+                    
+					//sinalizando, mas acho que o ldisc já faz isso.
+                    wFocus->newmessageFlag = 1;  					
+			
+			        return NULL; 
+				}else{
+					
+					//pegando a mensagem.
+			        message_address[0] = (unsigned long) wFocus->msg_window;
+			        message_address[1] = (unsigned long) wFocus->msg;
+			        message_address[2] = (unsigned long) wFocus->long1;
+			        message_address[3] = (unsigned long) wFocus->long2;
+                    
+					//sinalizamos que a mensagem foi consumida.
+                    wFocus->newmessageFlag = 0; 					
+				}
+			
+				
+			}
+		    break;
+		
+		
 		
 		//115 - pegar os 4 elementos da mensagem.
 		//o aplicativo envia um endereço de um vetor onde 

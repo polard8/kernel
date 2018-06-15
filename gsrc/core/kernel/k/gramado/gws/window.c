@@ -965,13 +965,33 @@ fail:
 void *windowGetMessage(struct window_d *window)
 {
 	unsigned char SC;
+	//fast way 
+	//@todo: melhorar isso
+	struct window_d *wFocus;	
 	
 	
 	//if( window_getch_lock == 1){
 	//	return NULL;
 	//}
 	
+	//
+	// E se nesse momento já existe uma mensagem para 
+	// ser consumida, que foi colocada por outro 
+	// dispositivo de input. ??
+	//
 	
+	
+	//
+	// ## Keyboard ##
+	//
+	
+	//#bugbug:
+	//Obs: Isso deve ser feito em outra ocasião,
+	// Talvez a interrupção de teclado pode 
+	//acinar um 'request' dizendo que o 
+	//kernel deve enviar uma mensagem da fila de teclado 
+	// para a janela com o foco de entrada.
+	//
 	SC = (unsigned char) keybuffer[keybuffer_head];
 	
 	//Limpa.
@@ -995,9 +1015,7 @@ void *windowGetMessage(struct window_d *window)
 	//como é tipo 0, ignoraremos o retorno.
 	LINE_DISCIPLINE(SC, 0);	
 	
-	//fast way 
-	//@todo: melhorar isso
-	struct window_d *wFocus;
+
 	
 	wFocus = (void *) windowList[window_with_focus];
 	

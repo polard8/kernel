@@ -1,5 +1,5 @@
 /*
- * File: gui\messagebox.c
+ * File: gws\mbox.c
  *
  * Descrição:
  *     Mostra um Message Box na tela.
@@ -162,7 +162,7 @@ frame:
 	//  ## type ##
 	//
 
-    //@todo: Criar definições de tipos de message boxs.
+    //@todo: Criar definições de tipos de message boxs.(enum)
 	//@todo: Criar um tipo light.
 	
 	//Obs: Por enquanto para todos os tipos de messagebox 
@@ -172,7 +172,8 @@ frame:
 	    // Com botão, considera o título.
 	    case 1:
 		    Button = 1;
-	        hWnd = (void*) CreateWindow( 3, 0, 0, title, 
+			//janela tipo simples.
+	        hWnd = (void*) CreateWindow( WT_SIMPLE, 0, 0, title, 
 			                x, y, 
 							cx, cy, 
 							pWnd, desktopID, 
@@ -182,7 +183,7 @@ frame:
 		// Sem botão, considera o título.	
 	    case 2:
 		    Button = 0;
-	        hWnd = (void*) CreateWindow( 3, 0, 0, title, 
+	        hWnd = (void*) CreateWindow( WT_POPUP, 0, 0, title, 
 			                x, y, 
 							cx, cy, 
 							pWnd, desktopID, 
@@ -191,8 +192,9 @@ frame:
 			
 		// Com botão, Título de alerta.	
 	    case 3:
+		    //janela de aplicativo.
 	        Button = 1;
-			hWnd = (void*) CreateWindow( 3, 0, 0, "Alert", 
+			hWnd = (void*) CreateWindow( WT_OVERLAPPED, 0, 0, "Alert", 
 			                x, y, 
 							cx, cy, 
 							pWnd, desktopID, 
@@ -202,7 +204,7 @@ frame:
 		//Com botão, título de mensagem do sistema.	
 	    case 4:
 		    Button = 1;
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "System Message", 
+	        hWnd = (void*) CreateWindow( WT_OVERLAPPED, 0, 0, "System Message", 
 			                x, y, 
 							cx, cy, 
 							pWnd, desktopID, 
@@ -212,7 +214,7 @@ frame:
 		//Tipo negligenciado. Usamos o formato padrão.	
 		default:
 		    Button = 1;
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "Error", 
+	        hWnd = (void*) CreateWindow( WT_OVERLAPPED, 0, 0, "Error", 
 			                x, y, 
 							cx, cy, 
 							pWnd, desktopID, 
@@ -279,24 +281,35 @@ drawString:
 	// Obs: A quantidade de botão vai depender do tipo. 
 	//
 drawButton:	
+
+    //#bugbug:
+	//Aqui estamos apenas desenhando o botão, mas precisamos 
+	//criar uma janela filha do tipo botão.
     if(Button == 1)
 	{
 		//@todo: Criar uma janela do tipo botão para setar o foco.
         //       Pegar o tamanho da string para definir o tamanho do botão.
 		
-        b1 = (void*) draw_button( hWnd, 
-		                 "Close", 
-						 1, 
-						 3*(cx/4), 
-						 2*(cy/3), 
-						 64, 
-						 36, 
-						 COLOR_TERMINAL2 );
-						 
-		if((void*) b1 == NULL )
-		{
-			printf("button 1 fail\n");
-		}
+        
+		bWnd = CreateWindow( WT_BUTTON, 1, 1, " Close ", 
+	               3*(cx/4), 2*(cy/3), 
+			       64, 36,									  
+		           hWnd, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+		RegisterWindow(bWnd);		
+		
+		//b1 = (void*) draw_button( hWnd, 
+		//                 "Close", 
+		//				 1, 
+		//				 3*(cx/4), 
+		//				 2*(cy/3), 
+		//				 64, 
+		//				 36, 
+		//				 COLOR_TERMINAL2 );
+		//				 
+		//if((void*) b1 == NULL )
+		//{
+		//	printf("button 1 fail\n");
+		//}
 		
 		//b2 = (void*) draw_button( hWnd, "Close", 1, 12*(cx/16), 8*(cy/16), 48, 24, COLOR_BLACK);		
 		//if((void*) b2 == NULL ){

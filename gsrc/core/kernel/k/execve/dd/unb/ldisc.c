@@ -1956,13 +1956,16 @@ void mouseHandler()
 		wScan = (struct window_d *) windowList[wID];
 		//redraw_window(wScan);
         
-		
+		//#suspenso,
+		//isso está certo, mas vamos suspender por enquanto
         //colocará a mensagem na estrutura de janele 
 		//para que o aplicativo pegue.
-        windowSendMessage( (unsigned long) wScan, 
-		    (unsigned long) MSG_MOUSEOVER, 
-			(unsigned long) 0, 
-			(unsigned long) 0 );		
+        //windowSendMessage( (unsigned long) wScan, 
+		//    (unsigned long) MSG_MOUSEOVER, 
+		//	(unsigned long) 0, 
+		//	(unsigned long) 0 );
+        //obs: tem que sinalizar que uma mensagem existe...
+        // windowSendMessage já faz isso ??		
 		
 		
         draw_text( wScan,
