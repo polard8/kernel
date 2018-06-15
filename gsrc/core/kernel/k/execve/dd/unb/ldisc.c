@@ -36,10 +36,20 @@ extern char mouse_packet_y;
  
 extern void update_mouse();
 
-//usado pelo mouse.
+
+//Estado dos botões do mouse
 int mouse_buttom_1; 
 int mouse_buttom_2;
 int mouse_buttom_3;
+
+//Estado anterior dos botões do mouse.
+int old_mouse_buttom_1; 
+int old_mouse_buttom_2;
+int old_mouse_buttom_3;
+
+//se ouve alguma modificação no estado 
+//dos botões.
+int mouse_button_action;
 
 //--
 //=========================================================
@@ -442,8 +452,8 @@ void keyboard()
  ***********************************************
  * LINE DISCIPLINE
  * Funciona como um filtro.
- * Obs: Essa é a rotina principal desse arquivo, todo o resto 
- * poderá encontrar um lugar melhor.
+ * Obs: Essa é a rotina principal desse arquivo, 
+ * todo o resto poderá encontrar um lugar melhor.
  *
  */
 int LINE_DISCIPLINE(unsigned char SC, int type)
@@ -462,7 +472,7 @@ int LINE_DISCIPLINE(unsigned char SC, int type)
     // Text mode support.
 	// Tela para debug em RING 0.
     // unsigned char *screen = (unsigned char *) 0x000B8000;   
-    unsigned char *screen = (unsigned char *) SCREEN_START;    //Virtual.   
+    //unsigned char *screen = (unsigned char *) SCREEN_START;    //Virtual.   
     //...
 	
 	//Window.
@@ -887,54 +897,25 @@ done:
 			printf("LINE_DISCIPLINE: w magic");
 			die();
 		}
+		
+		// Aqui temos uma janela válida.
+		// Vamos enviar a mensagem para ela.
+		
+		
+        windowSendMessage( (unsigned long) w, 
+	        (unsigned long) mensagem, 
+		    (unsigned long) ch, 
+		    (unsigned long) ch );
 	};
 	
+ 
 	//
-	// @todo: (( IMPORTANTE ))
+	// ## Test ##
 	//
-	// TRABALHANDO PARA COLOCAR A MENSAGEM NA FILA.
-	// A intenção é que a mensagem fique na fila de mensagens da 
-	// janela com o foco de entrada, para que depois o aplicativo 
-	// possa desenfileirar as mensagens.
-	// Obs: A fila deve ser circular.
-	//
-
-	//Colocando a mensagem na fila de mensagens do sistema.
-	
-	//struct message_d* m;	
-	
-	//Preenchendo a estrutura de mensagem. 
-		
-	//?? object ??	
-	//m->used = 1;
-	//m->magic = 1234;
-	//m->empty = 0;
-	//m->window = (struct window_d *) w;
-	//m->msg    = (int) mensagem;
-	//m->long1  = (unsigned long) ch;
-	//m->long2  = (unsigned long) ch;
-	//...
-	
-	//
-	// Tentando enviar para fila ...
-	//
-	
-	//Circulando o offset para write.
-	//system_message_write++; //index ++
-	//if( system_message_write < 0 || 
-	//    system_message_write >= SYSTEM_MESSAGE_QUEUE_MAX )
-	//{
-	//	system_message_write = 0;
-	//}
-			
-	// Colocando na fila.
-    // Colocando o ponteiro da estrutura de mensagem na fila do sistema.	
-	//system_message_queue[system_message_write] = (unsigned long) m;
-	
-	//#importante (teste)
-	//Testando outra fila ...
-	//Colocando o ponteiro da estrutura na fila.
-	//xenqueue( (void *) m, ld_keyboard_queue);
+ 
+    //Estamos chamado o procedimento de janelas do kernel 
+	//para todos os casos. Mas isso deve ser um procedimento chamado pelo 
+	//aplicativo depois que ele trata as mensagens que quer.
 		
 	//Chamando o procedimento de janelas do sistema.
 	//Talvez isso seja apenas por enquanto...
@@ -945,7 +926,7 @@ done:
 	//Obs: #importante. Isso talvez deva ser chamado depois do 
 	//procedimento de janelas do aplicativo. Ou seja, chamado em user mode.
 	
-	// sm\sys\procedure.c
+	// sm\sys\proc.c
 	
 	
 	//o procedimento tratará as mensagens de sistema, colocará o cham no 
@@ -956,15 +937,9 @@ done:
 		  (unsigned long) ch ); 
 
 		  
-    //coloca na janela main.
-    //if( type == 2 )
-	//{
-		
-	//};
-		  
-    //colocará a mensagem na estrutura de janle para que o aplicativo pegue.
-    windowSendMessage( (unsigned long) w, (unsigned long) mensagem, (unsigned long) ch, (unsigned long) ch );		  
-	
+ 
+	  
+	//?? porque -1.
     return (int) -1;
 };
 
@@ -1937,9 +1912,72 @@ void mouseHandler()
 	//
 	
 	
+	//
+	//  ## Button ##
+	//
+	
+	//Apenas obtendo o estado dos botões.
+	
+	if( ( mouse_packet_data & 0x01 ) == 0 )
+	{
+		//liberada.
+		mouse_buttom_1 = 0;
+	}else if( ( mouse_packet_data & 0x01 ) != 0 )
+	    {
+		  //pressionada.
+		  mouse_buttom_1 = 1;
+	  }
+			  
+
+	if( ( mouse_packet_data & 0x02 ) == 0 )
+	{
+	    //liberada.
+	    mouse_buttom_2 = 0;
+	}else if( ( mouse_packet_data & 0x02 ) != 0 )
+	    {
+		 //pressionada.
+			 mouse_buttom_2 = 1;
+	  }
+			  
+	if( ( mouse_packet_data & 0x04 ) == 0 )
+	{
+	    //liberada.
+	    mouse_buttom_3 = 0;
+	}else if( ( mouse_packet_data & 0x04 ) != 0 )
+	    {
+	         //pressionada.
+	        mouse_buttom_3 = 1;
+	    }			
+	
+	
+    //mouse_button_action	
+	//Confrontando o estado atual com o estado anterior 
+	//para saber se ouve alguma alteração ou não.
+	
+	if( mouse_buttom_1 != old_mouse_buttom_1 ||
+	    mouse_buttom_2 != old_mouse_buttom_2 ||
+		mouse_buttom_3 != old_mouse_buttom_3 )
+	{
+		//Sinalizamos que ouve alteração.
+		mouse_button_action = 1;
+	}else{
+		mouse_button_action = 0;
+	};
+	
 	
 	//
-	// ## On mouse over ##
+	// #bugbug 
+	// ?? E no caso de apenas considerarmos que 
+	// que o mouse está se movendo, mandaremos 
+	// para janela over. ???
+	// Obs: A mensagen over pode ser enviada apenas uma vez. 
+	// será usada para 'capturar' o mouse ... e depois 
+	// tem a mensagem para 'descapturar'.
+	// 
+	//
+	
+	//
+	// ## On mouse over ## (capture)
 	//
 	
 	int wID;
@@ -1950,22 +1988,90 @@ void mouseHandler()
 	//return: (int) window id.
 	wID = (int) windowScan( mouse_x, mouse_y );
 	
+	//#IMPORTANTE
 	//Se for válido e diferente da atual.
+	//significa que estamos dentro de uma janela.
 	if( wID != -1 )
 	{
 		wScan = (struct window_d *) windowList[wID];
 		//redraw_window(wScan);
         
-		//#suspenso,
-		//isso está certo, mas vamos suspender por enquanto
-        //colocará a mensagem na estrutura de janele 
-		//para que o aplicativo pegue.
-        //windowSendMessage( (unsigned long) wScan, 
-		//    (unsigned long) MSG_MOUSEOVER, 
-		//	(unsigned long) 0, 
-		//	(unsigned long) 0 );
-        //obs: tem que sinalizar que uma mensagem existe...
-        // windowSendMessage já faz isso ??		
+        //#importante
+		//Se um botão foi pressionado ou liberado, então 
+		//enviaremos o uma mensagem relativa ao estado do botão 
+		//caso contrário enviaremos uma mensagem sobre a movimentação 
+		//do mouse.
+		
+		//#importante
+		// Se houve mudança em relação ao estado anterior.
+		if( mouse_button_action == 1 )
+		{
+			//Qual botão mudou seu estado??
+			//Checaremos um por um.
+			
+			//1
+			if( mouse_buttom_1 != old_mouse_buttom_1 )
+			{
+				//down
+				if( mouse_buttom_1 == 1 ){
+			        windowSendMessage( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 1, (unsigned long) 0 );
+                }else{
+					//up
+			        windowSendMessage( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 1, (unsigned long) 0 );
+				}
+			}; 
+			
+			
+			//2
+			if( mouse_buttom_2 != old_mouse_buttom_2 )
+			{
+				//down
+				if( mouse_buttom_2 == 1 ){
+			        windowSendMessage( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 2, (unsigned long) 0 );
+                }else{
+					//up
+			        windowSendMessage( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 2, (unsigned long) 0 );
+				}
+			}; 
+			
+			
+			//3
+			if( mouse_buttom_3 != old_mouse_buttom_3 )
+			{
+				//down
+				if( mouse_buttom_3 == 1 ){
+			        windowSendMessage( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 3, (unsigned long) 0 );
+                }else{
+					//up
+			        windowSendMessage( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 3, (unsigned long) 0 );
+				}
+			}; 
+			
+			
+		}else{
+			
+			//#importante
+			//lembrando que estamos dentro de uma janela ...
+			//por isso a mensagen é over e não move.
+			//se NÂO ouve alteração no estado dos botões 
+			//então apenas enviaremos a mensagem de movimento 
+			//do mouse.
+			//isso está certo, mas vamos suspender por enquanto
+            //colocará a mensagem na estrutura de janele 
+		    //para que o aplicativo pegue.
+            windowSendMessage( (unsigned long) wScan, 
+		        (unsigned long) MSG_MOUSEOVER, 
+			    (unsigned long) 0, 
+			    (unsigned long) 0 );
+		};
+		
+		
 		
 		
         draw_text( wScan,

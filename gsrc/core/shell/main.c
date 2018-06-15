@@ -1171,10 +1171,30 @@ shellProcedure( struct window_d *window,
 		    printf("SHELL.BIN: MSG_DESTROY\n");
 		    break;
 			
+		// MSG_MOUSEKEYDOWN	
+		case 30:
+            APISetFocus(window);
+			//printf("Down");
+			printf("Focus");
+            break;
+
+		// MSG_MOUSEKEYUP	
+		case 31:
+            //APISetFocus(window);
+			//printf("Up");
+            break;	
+
+		// MSG_MOUSEMOVE	
+		case 32:
+            //APISetFocus(window);
+			//printf("m");
+            break;	
+
 		// MSG_MOUSEOVER	
 		case 33:
-            printf("SHELL.BIN: Mouse over");
-            break;			
+            //APISetFocus(window);
+			//printf("o");
+            break;				
 		
 		//Quando a aplicativo em user mode chama o kernel para 
 		//que o kernel crie uma janela, depois que o kernel criar a janela,
