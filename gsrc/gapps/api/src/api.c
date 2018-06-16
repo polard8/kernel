@@ -285,7 +285,7 @@ int apiSystem(const char *command)
 	{
 		printf("apiSystem: exit\n");
 		//exit(exit_code);
-		exit(0);
+		apiExit(0);
 		goto fail;
     };
 		
@@ -1110,8 +1110,12 @@ void apiInitBackground()
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
-void MessageBox(int type, char *string1, char *string2){
-	system_call( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, (unsigned long) string1, (unsigned long) string2);
+void MessageBox( int type, char *string1, char *string2 )
+{
+	system_call( SYSTEMCALL_MESSAGE_BOX, 
+	             (unsigned long) type, 
+				 (unsigned long) string1, 
+				 (unsigned long) string2 );
 	return;
 };
 
@@ -1585,10 +1589,21 @@ void APIresize_window(struct window_d *window, unsigned long x, unsigned long y)
 }
 
 
-void APIredraw_window(struct window_d *window){
-	system_call( SYSTEMCALL_REDRAWWINDOW , (unsigned long) window, (unsigned long) window, (unsigned long) window);
+/*
+ ****************************************
+ * APIredraw_window:
+ *
+ */
+void 
+APIredraw_window( struct window_d *window, 
+                  unsigned long flags)
+{
+	system_call( SYSTEMCALL_REDRAWWINDOW, 
+	    (unsigned long) window, 
+		(unsigned long) flags, 
+		(unsigned long) flags );
 	return;
-}
+};
 
 
 void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y){
@@ -1597,16 +1612,35 @@ void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y
 }
 
 
-void APImaximize_window(struct window_d *window){
-	system_call( SYSTEMCALL_MAXIMIZEWINDOW, (unsigned long) window, (unsigned long) window, (unsigned long) window);
+void APImaximize_window(struct window_d *window)
+{
+	system_call( SYSTEMCALL_MAXIMIZEWINDOW, 
+	    (unsigned long) window, 
+		(unsigned long) window, 
+		(unsigned long) window);
 	return;	
 }
 
 
-void APIminimize_window(struct window_d *window){
-	system_call( SYSTEMCALL_MINIMIZEWINDOW, (unsigned long) window, (unsigned long) window, (unsigned long) window);
+void APIminimize_window(struct window_d *window)
+{
+	system_call( SYSTEMCALL_MINIMIZEWINDOW, 
+	    (unsigned long) window, 
+		(unsigned long) window, 
+		(unsigned long) window);
 	return;	
 }
+
+
+//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+void APIupdate_window(struct window_d *window)
+{
+	system_call( 113, 
+	    (unsigned long) window, 
+		(unsigned long) window, 
+		(unsigned long) window);
+	return;			
+};
 
 
 void *APIget_foregroung_window(){
@@ -1628,13 +1662,16 @@ void APIset_foregroung_window(struct window_d *window){
  *     programa, terminando o processo e
  *     liberar os recursos que o processo estava usando.
  */
-void exit(int exit_code)
+//void exit(int exit_code)
+void apiExit(int exit_code)
 {	
     system_call( SYSTEMCALL_EXIT, (unsigned long) exit_code, 
 				 (unsigned long) exit_code, (unsigned long) exit_code );
     //Nothing.
 wait_forever:	
-    while(1){};	
+    while(1){
+		asm("pause");
+	};	
 };
 
 
@@ -1826,18 +1863,58 @@ void apiStartThread(void *Thread)
 	return;
 }
 
+
+
 /*
+ *****************************************************
  * apiFOpen:
  *     Carrega na memória um arquivo.
- *     Usa um serviço do kernel para carregar um arquivo na memória.
- *     Obs: Devemos pasasr um endereço válido, previamente alocado. 
+ *     Usa um serviço do kernel para carregar um arquivo 
+ * na memória.
+ *     Obs: Devemos passar um endereço válido, previamente 
+ * alocado. 
  */
 void *apiFOpen(const char *filename, const char *mode)
-{	
-	return (void*) system_call( SYSTEMCALL_READ_FILE, 
+{
+    void *Ret;	
+	
+	enterCriticalSection();
+	Ret = (void*) system_call( SYSTEMCALL_READ_FILE, 
 	                            (unsigned long) filename, 
 								(unsigned long) mode, 
 								0 );
+	exitCriticalSection();
+
+done:
+    return (void *) Ret;								
+};
+
+
+
+/*
+ *************************************************************
+ * apiSaveFile:
+ *     Salva um arquivo no diretório raiz 
+ * do volume de boot.
+ *
+ */
+int
+apiSaveFile( char *file_name, 
+             unsigned long file_size,
+             unsigned long size_in_bytes,			
+             char *file_address,
+             char flag )  
+{
+    int Ret;
+		enterCriticalSection();
+		Ret = (int) system_call( SYSTEMCALL_WRITE_FILE,
+		                        (unsigned long) file_name,     //nome
+                                (unsigned long) file_address,  //endereço
+                                (unsigned long) flag );        //flag
+		exitCriticalSection(); 
+
+done:
+    return (int) Ret;		
 };
 
 
@@ -2107,6 +2184,496 @@ void api_receive_message( struct api_receive_message_d *m )
 };
 */
 
+
+
+/*
+ * gramadocore_init_execve:
+ *     Executa um novo programa usando os 
+ * recursos do processo INIT. 
+ *     Utiliza-se o mesmo processo, apenas 
+ * renomiamos o processo. 
+ *     utiliza-se a mesma thread primária,
+ * apenas renomeamos a thread.
+ */
+int gramadocore_init_execve( const char *filename, 
+                             const char *argv[], 
+                             const char *envp[] )
+{
+	
+	
+	//system_call( , , ,)
+	//@todo: Ainda não implementada.
+	return (int) -1;
+};
+
+
+
+
+/* UNIX style */
+int fork()
+{
+    return (int) system_call( SYSTEMCALL_FORK, 
+	                 (unsigned long) 0, 
+					 (unsigned long) 0, 
+					 (unsigned long) 0 ); 
+};
+
+
+
+/*
+ * execve:
+ * Executes a new process.
+ * PS: Does not return on success, and the text, data, bss, 
+ * and stack of the calling process are overwritten by 
+ * that of the program loaded. 
+ */
+int execve( const char *filename, 
+            const char *argv[], 
+            const char *envp[] )
+{
+	//@todo: Ainda não implementada.
+	return (int) -1;
+};
+
+
+
+
+/*
+ *******************************************
+ * apiDialog:
+ *     Diálogo de yes ou no.
+ */
+int apiDialog( const char *string )
+{	
+    int Status = 1; // Yes!
+	int ch;
+	
+	// Dialog message
+	printf(string);
+	
+    while(1)
+	{
+	    ch = (int) api_getchar();	    
+		if( ch != -1 )
+	    {
+	        switch(ch)
+            {
+				case VK_RETURN:
+				    goto done;
+                    break;				
+					
+			    case 'y':
+				    printf("Yes\n");
+			        Status = 1;
+				    break;
+				   
+			    case 'n':
+			        printf("No\n");
+					Status = 0;
+				    break;
+		    };		   
+		};
+		asm("pause");
+	};
+    
+done:		
+    return (int) Status;
+};
+
+
+
+int api_getchar()
+{
+	return (int) stdio_system_call( 137, 0, 0, 0 );
+};
+
+
+
+/*
+ ********************************************************
+ * apiDisplayBMP:
+ *
+ * Mostra na tela uma imagem bmp carregada na memória.
+ * 
+ * IN:
+ *     address = endereço base
+ *     x       = posicionamento 
+ *     y       = posicionamento
+ *     @todo: deletar w h 
+ *
+ *	// @todo: Criar defines para esses deslocamentos.
+ */
+ static int nibble_count_16colors = 0;
+ 
+int apiDisplayBMP( char *address, 
+                   unsigned long x, 
+				   unsigned long y )
+{
+	int i, j, base, offset;
+	
+	unsigned long left, top, bottom;
+	
+	unsigned long color, color2;
+	unsigned long pal_address;
+	
+	unsigned long Width;
+	unsigned long Height;
+	
+	unsigned long xLimit, yLimit;
+	
+	struct bmp_header_d *bh;
+	struct bmp_infoheader_d *bi;
+	
+	// Endereço base do BMP que foi carregado na memória
+	unsigned char *bmp = (unsigned char *)  address;
+	
+	// Variável para salvar rgba.
+	unsigned char *c = (unsigned char *) &color;
+    unsigned char *c2 = (unsigned char *) &color2;	
+	
+	unsigned long *palette    = (unsigned long *) (address + 0x36);		
+	unsigned char *palette_index = (unsigned char *) &pal_address;	
+	
+	//
+	// Limits
+	//
+	
+	xLimit = 800;
+	yLimit = 600;
+	
+	
+	//@todo: Refazer isso
+	if( x > xLimit || y > yLimit ){ 
+        return (int) 1; 
+	}
+	
+
+	
+	//
+	// @todo:
+	// Testar validade do endereço.
+	//
+	
+	
+	if( address == 0 )
+	{
+		//goto fail;
+	};
+	
+	
+	//
+	// struct for Info header
+	//
+	
+	bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );
+	
+    if( (void*) bh == NULL )
+	{
+		//goto fail;
+	}	
+	
+
+	//
+	// Signature.
+	//
+	
+    unsigned short sig;
+	
+	sig = *( unsigned short* ) &bmp[0];
+	
+	bh->bmpType = sig;
+	
+	
+	//
+	// Size. ( 2 bytes )
+	//
+	
+	unsigned short Size = *( unsigned short* ) &bmp[2];
+	
+	bh->bmpSize = Size;
+	
+	
+	//
+	// struct for Info header
+	//
+	
+	//Windows bmp.
+	bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
+	
+    if( (void*) bi == NULL )
+	{
+		//goto fail;
+	}	
+	
+	//The size of this header.
+	bi->bmpSize = *( unsigned long* ) &bmp[14];
+	
+	// Width and height.
+    Width = *( unsigned long* ) &bmp[18];
+    Height = *( unsigned long* ) &bmp[22];	
+	
+	//@todo: checar validade da altura e da largura encontrada.
+	
+	// Salvar.
+	bi->bmpWidth = (unsigned long) Width;
+	bi->bmpHeight = (unsigned long) Height;
+	
+	
+	/* Number of bits per pixel */
+	//1, 4, 8, 16, 24 and 32.
+	bi->bmpBitCount = *( unsigned short* ) &bmp[28];
+	
+	// Único suportado ainda.
+	if(bi->bmpBitCount != 24 )
+	{
+		//fail
+	}
+	
+	
+	// 0 = Nenhuma compressão.
+	if(bi->bmpCompression != 0 )
+	{
+		//fail
+	}
+	
+	
+	//
+	// Draw !
+	//
+	
+	
+	
+	left = x;    //
+	top  = y; 
+	
+	
+	//bottom = top + height;
+	bottom = (top + bi->bmpHeight );
+
+		
+	
+	// Início da área de dados do BMP.
+	
+	//#importante:
+	//a base é diferente para os tipos.
+	 
+
+	switch(bi->bmpBitCount)
+    {
+		//case 1:
+		//    base = (0x36 + 0x40);
+		//    break;
+		    
+		//case 2:
+		//    base = (0x36 + 0x40);
+		//    break;
+			
+		case 4:
+		    //4bytes pra cada cor, 16 cores, 64bytes.
+		    base = (0x36 + 0x40);
+		    break; 
+			
+		case 8:
+		    //4bytes pra cada cor, 256 cores, 1024bytes.
+		    base = (0x36 + 0x400);
+		    break; 
+			
+		default:
+		    base = 0x36;
+			break;
+	}	
+	
+
+//1 - 1 bpp (Mono)
+//4 - 4 bpp (Indexed)
+//8 - 8 bpp (Indexed) bbgggrrr
+//16565 - 16 bpp (5:6:5, RGB Hi color)
+//16    - 16 bpp (5:5:5:1, RGB Hi color)
+//160   - 16 bpp (5:5:5:1, RGBA Hi color)
+//24 - 24 bpp (True color)
+//32 - 32 bpp (True color, RGB)
+//320 - 32 bpp (True color, RGBA)	
+
+
+    //
+	// ## ABGR8888 ##
+	// Little-endian
+	// pegando os caracteres
+	//
+	// 0 = A (MSByte)(left byte) 
+	// 1 = B 
+	// 2 = G 
+	// 3 = R
+	//
+	// Output long = 0xRRGGBBAA
+    //	
+	// Exemplo: gramado GUI
+    //#define COLOR_RED   0xFF000000 
+    //#define COLOR_GREEN 0x00FF0000
+    //#define COLOR_BLUE  0x0000FF00
+
+
+	
+	for( i=0; i < bi->bmpHeight; i++ )	
+	{		
+		for( j=0; j < bi->bmpWidth; j++ )	
+		{	
+	        // 16 cores
+            // Um pixel por nibble.
+	        if(bi->bmpBitCount == 4 )
+	        {				
+				offset = base;
+							    
+				palette_index[0] = bmp[offset];
+												
+                //segundo nibble.
+				if( nibble_count_16colors == 2222 )
+				{
+					palette_index[0] = ( palette_index[0] & 0x0F);  
+					color = (unsigned long) palette[  palette_index[0]  ];
+					
+					nibble_count_16colors = 0;
+					base = base + 1;
+					
+				//primeiro nibble.	
+				}else{
+
+			        palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
+					color = (unsigned long) palette[  palette_index[0] ];
+				    
+					nibble_count_16colors = 2222;
+					base = base;
+				}
+	        };	
+
+			// 256 cores
+			// Próximo pixel para 8bpp
+	        if( bi->bmpBitCount == 8 )
+	        {   
+				offset = base;
+				color = (unsigned long) palette[  bmp[offset] ];
+				
+				base = base + 1;     
+	        };			
+			
+			// 16bpp high color BMP
+			// Próximo pixel para 16bpp
+			// apenas 565 por enquanto.  
+	        if(bi->bmpBitCount == 16 )
+	        {
+
+			    //565
+                //if(565 )
+                //{
+				    offset = base;					
+					
+				    //A
+			        c[0] = 0;	
+
+			        //b				
+			        c[1] = bmp[offset];
+			        c[1] = (c[1] & 0xF8);  // '1111 1000' 0000 0000  
+				
+				    //g
+			        c2[0] = bmp[offset];
+			        c2[0] = c2[0] &  0x07;    // '0000 0111' 0000 0000 
+			        c2[1] = bmp[offset+1];
+			        c2[1] = c2[1] &  0xE0;    //  0000 0000 '1110 0000' 
+					c[2] = ( c2[0] | c2[1]  );
+					
+			        //r
+			        c[3] = bmp[offset+1];
+			        c[3] = c[3] & 0x1F;     // 0000 0000 '0001 1111' 										
+		        
+				    base = base + 2;    
+				//};					
+				
+	        };			
+			
+
+			// Próximo pixel para 24bpp
+	        if(bi->bmpBitCount == 24 )
+	        {
+				offset = base;
+			    
+			    c[0] = 0; //A					
+				
+				c[1] = bmp[offset];
+			    
+			    offset = base+1;
+			    c[2] = bmp[offset];
+			
+			    offset = base+2;
+			    c[3] = bmp[offset];
+										
+		        base = base + 3;    
+	        };
+			
+			
+			// Próximo pixel para 32bpp
+	        if(bi->bmpBitCount == 32 )
+	        {
+			    
+			    
+				//A
+				//offset = base+3;
+			    c[0] = 0;				
+				
+				offset = base;
+			    c[1] = bmp[offset];
+			
+			    offset = base+1;
+			    c[2] = bmp[offset];
+			
+			    offset = base+2;
+			    c[3] = bmp[offset];
+				
+		        base = base + 4;    
+	        };
+			
+			
+			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, 
+			             (unsigned long) color, 
+						 (unsigned long) left, 
+						 (unsigned long) bottom );
+			
+			// Próximo pixel.
+			left++; 
+		};
+		
+		
+		// Vamos para a linha anterior.
+		bottom = bottom-1;
+		
+		// Reiniciamos o x.
+		left = x;    
+	};	
+	
+	// ## test palette 
+	//int p;
+	
+	//if(bi->bmpBitCount == 8 )
+	//{
+	//    printf("\n");
+	//    for( p=0; p<16; ++p )
+	//    {
+	//	   printf("%x\n",palette[p]);
+	//    }
+	//    printf("\n");
+	//};
+	
+fail:	
+    //printf("fail");	
+done:	
+	//Debug
+	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
+	return (int) 0;
+};
+
+
+
+
+		
 
 //
 // End.

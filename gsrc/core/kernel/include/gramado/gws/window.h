@@ -788,6 +788,7 @@ struct window_d
 	int minimizebuttonUsed;
 	int maxmizebuttonUsed;
 	int closebuttonUsed;
+	int borderUsed;
 	
 // 
 //==================================================	
@@ -1970,7 +1971,10 @@ replace_window( struct window_d *window,
                 unsigned long x, 
 			    unsigned long y );			  
 
-int redraw_window(struct window_d *window);   //redraw window. 
+ 
+int 
+redraw_window(struct window_d *window, unsigned long flags );
+    
 int redraw_screen();                          //redraw all windows.
 int is_window_full(struct window_d *window);
 int is_window_maximized(struct window_d *window);
@@ -2069,6 +2073,8 @@ windowSetTimer( struct window_d *window, //janela
 //que contenha o posicionamento do cursor.				
 int windowScan( unsigned long x, unsigned long y );
 
+//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+void windowUpdateWindow( struct window_d *window );
 
 /*
  * CreateWindow:

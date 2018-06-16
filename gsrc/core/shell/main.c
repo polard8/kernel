@@ -1174,6 +1174,8 @@ shellProcedure( struct window_d *window,
 		// MSG_MOUSEKEYDOWN	
 		case 30:
             APISetFocus(window);
+			APIredraw_window(window,1);
+			//refresh_screen();
 			//printf("Down");
 			printf("Focus");
             break;
@@ -1213,9 +1215,13 @@ shellProcedure( struct window_d *window,
 		case MSG_KILLFOCUS:
             break;
 
-		//isso pinta os elementos da área de cliente.	
+		//isso pinta os elementos da área de cliente.
+        //essa mensagem é enviada para o aplicativo quando 
+        //a função 'update window'	é chamada.	
         case MSG_PAINT:
-            break;
+            printf("SHELL.BIN: MSG_PAINT\n");
+			break;
+			
 
 		//@todo: isso ainda não existe na biblioteca. criar.	
         //case MSG_CLS:

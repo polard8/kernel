@@ -603,6 +603,8 @@ typedef enum {
 	csiTerminalFontColor,       //13 WHITE
 	//...
 	
+	//@todo: focus,
+	
 	//@todo: Window 'shadow' (black??)
 }ColorSchemeIndex;  
  

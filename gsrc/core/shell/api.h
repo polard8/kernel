@@ -523,7 +523,7 @@
 //@todo: Reservar para gerenciamento de energia. 111- 119
 #define	SYSTEMCALL_111  111
 #define	SYSTEMCALL_112  112
-#define	SYSTEMCALL_113  113
+#define	SYSTEMCALL_113  113 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 #define	SYSTEMCALL_114  114
 #define	SYSTEMCALL_115  115
 #define	SYSTEMCALL_116  116
@@ -2726,10 +2726,14 @@ void apiSetClientAreaRect(struct rect_d *r);
 
 /*window support.*/
 void APIresize_window(struct window_d *window, unsigned long x, unsigned long y);
-void APIredraw_window(struct window_d *window);
+void APIredraw_window(struct window_d *window, unsigned long flags);
 void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y);
 void APImaximize_window(struct window_d *window);
 void APIminimize_window(struct window_d *window);
+
+//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+void APIupdate_window(struct window_d *window);
+
 void *APIget_foregroung_window();
 void APIset_foregroung_window(struct window_d *window);
 	

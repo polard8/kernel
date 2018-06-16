@@ -514,7 +514,7 @@ void *services( unsigned long number,
 		//51 redraw window.
 		case SYS_BUFFER_REDRAWWINDOW:
 		    //(handle)
-		    return (void*) redraw_window((struct window_d*) arg2);
+		    return (void*) redraw_window((struct window_d*) arg2, arg3);
 		    break;
 		
 		//52  replace window.
@@ -876,31 +876,34 @@ void *services( unsigned long number,
 			}
 		    break;
 		
-		
+		//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+		case 113:
+		    windowUpdateWindow( (struct window_d *) arg2 );
+			break;
 		
 		//115 - pegar os 4 elementos da mensagem.
 		//o aplicativo envia um endereço de um vetor onde 
 		//a mensagem deve ser colocada.
 		case 115:
 
+			//#deletar isso ... estamos usando 111.
+			//SC = (unsigned char) keybuffer[keybuffer_head];
+		    //keybuffer[keybuffer_head] = 0;
+			//keybuffer_head++;
+			//if( keybuffer_head >= 128 ){ keybuffer_head = 0; };
+			//LINE_DISCIPLINE(SC, 0);	
 			
-			SC = (unsigned char) keybuffer[keybuffer_head];
-		    keybuffer[keybuffer_head] = 0;
-			keybuffer_head++;
-			if( keybuffer_head >= 128 ){ keybuffer_head = 0; };
-			LINE_DISCIPLINE(SC, 0);	
 			
+			//wFocus = (void *) windowList[window_with_focus];
+			//if( wFocus->newmessageFlag == 0 ){ return NULL; }
 			
-			wFocus = (void *) windowList[window_with_focus];
-			if( wFocus->newmessageFlag == 0 ){ return NULL; }
-			
-			message_address[0] = (unsigned long) wFocus->msg_window;
-			message_address[1] = (unsigned long) wFocus->msg;
-			message_address[2] = (unsigned long) wFocus->long1;
-			message_address[3] = (unsigned long) wFocus->long2;
+			//message_address[0] = (unsigned long) wFocus->msg_window;
+			//message_address[1] = (unsigned long) wFocus->msg;
+			//message_address[2] = (unsigned long) wFocus->long1;
+			//message_address[3] = (unsigned long) wFocus->long2;
 			
 			//sinaliza que não há amis mensagem.
-			wFocus->newmessageFlag = 0;
+			//wFocus->newmessageFlag = 0;
 			return NULL;
 			//return (void*) wFocus->msg;	
 			

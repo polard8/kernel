@@ -790,7 +790,9 @@ drawBegin:
 	
 	
 	// se o view for igual NULL talvez signifique 
-	if( window->view == VIEW_NULL ){
+	if( window->view == VIEW_NULL )
+	{
+		//#bugbug: fail.
 		//window->show = 0;
 		//window->redraw = 0;
 		//return (void*) window;
@@ -914,6 +916,9 @@ drawBegin:
     //Sombra.	
 	if( Shadow == 1 )
 	{
+		//flag.
+		window->shadowUsed = 1;
+		
 		//CurrentColorScheme->elements[??]
 		
 		//@todo: 
@@ -934,7 +939,7 @@ drawBegin:
 			drawDataRectangle( window->left +1, 
 		        window->top  +1, 
 				window->width  +1 +1,      
-				window->height +1 +1, //window->height +1 +24 +1,  //?? Por que +24 ??  
+				window->height +1 +1, 
 				xCOLOR_GRAY1 );             
         };
 
@@ -959,7 +964,10 @@ drawBegin:
 	
 	//Background.
 	if( Background == 1 )
-	{		
+	{
+		//flag.
+        window->backgroundUsed = 1;
+		
 		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; 
 	    
 		// O argumento 'color' será a cor do bg para alguns tipos.
@@ -995,6 +1003,9 @@ drawBegin:
 	// estilo de janela.
 	if( Border == 1 )
 	{
+		//flag.
+		window->borderUsed = 1;
+		
 		// A largura da borda pode sinalizar o status (ativo ou inativo) 
 		// de uma caixa de edição.
 		if( status == 0 ){ 
@@ -1007,8 +1018,7 @@ drawBegin:
 		}
 		//if( status == 2 ){ border_size = 3; } //just for fun
 		
-	    //board1, borda de cima e esquerda.
-	    
+	    //board1, borda de cima e esquerda.    
 		drawDataRectangle( window->left, 
 		                   window->top, 
 						   window->width, 
@@ -1040,12 +1050,15 @@ drawBegin:
 	// ## Title bar ##
 	//
 	
-    // Título + borda.
+    // Título + borda(frame).
     // #importante: Isso pinta a barra de tótulos e as 
     // bordas para janelas de aplicativos. Ou seja,
     // as bordas não são pintadas individualmente.	
 	if(TitleBar == 1)
 	{ 
+        //flag.
+        window->titlebarUsed = 1;
+		
         //#importante:  
         //A cor sempre deve ser enviada por argumento.
 		window->color_bg = color;  
@@ -1073,7 +1086,7 @@ drawBegin:
         drawDataRectangle( window->left, 
 		                   window->top, 
 						   window->width  +1 +1,  
-						   window->height +1 +1,//window->height +1 +24 +1, //?? porquê. 
+						   window->height +1 +1, 
 						   window->color_bg );
 						   
 						   
@@ -1125,10 +1138,6 @@ drawBegin:
 			//deslocamentos em relação às margens. (x=window->width-?) (y=2).
 			//A função draw_button vai somar a margem obtida pelo handle 'window'
 			//ao deslocamento obtido em (x=window->width-?).
-	        //draw_button( window, "V", 1, 
-			//             (window->width -42 -1), 4, 
-			//			    21, 21, 
-			//			   COLOR_BUTTONFACE); //@todo: criar elemento no esquema de cores.
 
             //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
 			internal_window = CreateWindow( WT_BUTTON, 1, 1, "V", 
@@ -1143,10 +1152,6 @@ drawBegin:
 	    if(CloseButton == 1)
 		{
 			window->closebuttonUsed = 1;
-	        //draw_button( window, "X", 1, 
-			//            (window->width -21), 4, 
-			//			21, 21, 
-			//			COLOR_BUTTONFACE);	//@todo: criar elemento no esquema de cores.
             //ISSO FUNCIONOU BEM ... SERÁ ASSIM DAQUI PRA FRENTE.
 			internal_window = CreateWindow( WT_BUTTON, 1, 1, "X", 
 	            (window->width -21), 2, 
@@ -1187,6 +1192,9 @@ drawBegin:
 	//
     if( ClientArea == 1 )
 	{
+		//flag.
+		window->clientAreaUsed = 1;
+		
 		//
 		// Obs: A Client Area é apenas um retângulo.
 		//

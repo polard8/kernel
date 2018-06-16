@@ -449,7 +449,7 @@ void *systemRam( int number,
 		//...
 		
 		case 46:	
-            return (void*) redraw_window( (struct window_d *) arg1);
+            return (void*) redraw_window( (struct window_d *) arg1, (unsigned long) arg2 );
 			break;
 
 		case 47:

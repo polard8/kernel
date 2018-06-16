@@ -1,5 +1,5 @@
 /*
- * File: gui\window.c 
+ * File: gws\window.c 
  *
  * Descrição:
  *     Arquivo principal do Window Manager.
@@ -1495,43 +1495,68 @@ done:
 /*
  *********************************************************
  * redraw_window:
- *     O OBJETICO DESSA ROTINA DEVE SER APENAS REPINTAR UM RETÂNGULO
- * QUE FOI PINTADO DENTRO DA ÁREA DE CLIENTE DA JANELA QUE FOI PASSADA 
- * VIA ARGUMENTO.  @TODO 
- * Obs: Esse retângulo deve pertencer a janela que foi passada por argumento.
- * na estrutura de retângulo deve haver um ponteiro para  ajanela à qual ele pertence.
- * também deve-se repintar os elementos incluidos na área de cliente pelo programa aplicativo.
- * a estrutura de janela deve registrar totos os elementos que foram incluidos na hora da sua criação.
- * *****************
+ *     (Em fase de desenvolvimento)
  *     Repinta uma janela de acordo com os parâmetros na estrutura.
- *     Repinta uma janela válida. Tem que estar registrada. 
+ *     Isso depende do tipo. Para alguns tipos o trabalho será fácil. 
+ *     Repinta uma janela válida. Tem que estar registrada.  
+ *     O OBJETICO DESSA ROTINA DEVE SER APENAS REPINTAR 
+ * UM RETÂNGULO QUE FOI PINTADO DENTRO DA ÁREA DE CLIENTE 
+ * DA JANELA QUE FOI PASSADA VIA ARGUMENTO. (isso para o caso 
+ * de janelas do tipo overlapped)
+ * 
+ * Obs: Esse retângulo deve pertencer a janela que foi passada 
+ * por argumento. 
+ * Na estrutura de retângulo deve haver um ponteiro para 
+ * a janela à qual ele pertence.
+ * Também deve-se repintar os elementos incluidos na 
+ * área de cliente pelo programa aplicativo.
+ *
+ * A estrutura de janela deve registrar todos os elementos 
+ * que foram incluídos na hora da sua criação.
+ * *****************
+ *
  *     @todo: Mudar para windowRedrawWindow(.)
- * Obs: Esse é o tipo de rotina que exige o recurso de buffer dedicado.??
- * Pois podemos redezenhar a janela em seu buffer dedicado e depois copiar
- * o conteúdo do buffer dedicado para o backbuffer... na hora de atualizar a tela
+ *
+ * Obs: Esse é o tipo de rotina que exige o recurso 
+ * de buffer dedicado.??
+ * Pois podemos redezenhar a janela em seu buffer dedicado e 
+ * depois copiar o conteúdo do buffer dedicado para o 
+ * backbuffer... na hora de atualizar a tela
  * é so copiar o backbuffer no frontbuffer(LFB).
-
- * pois bem, essa janela vai ter muitos elementos para incluir isso leva muito tempo.
- * Devemos registrar na estrutura da janela todos os botões que ela tem.
- * todos os textos gravados nela... todas as cores etc..
+ *
+ * Pois bem, essa janela vai ter muitos elementos para 
+ * incluir isso leva muito tempo.
+ * Devemos registrar na estrutura da janela todos os 
+ * botões que ela tem na hora de criá-la.
+ * Todos os textos gravados nela... todas as cores etc..
+ * Obs: Talvez essa rotina seja recursiva assim como 
+ * a função create window.
  */
 //int windowRedrawWindow(struct window_d *window) 
-//int redraw_window(struct window_d *window, struct rect_d *rect)
-int redraw_window(struct window_d *window)
+int 
+redraw_window(struct window_d *window, unsigned long flags )
 {
-	int Status;  
+	int Status; 
+	unsigned long border_size = 0;
+	unsigned long border_color = COLOR_BORDER;	
  
-	//Checar se a estrutura é válida.
-	
+	//Checar se a estrutura é válida.	
 	//handle
-	if((void*) window == NULL){
-		return (int) 1;
+	if( (void*) window == NULL )
+	{
+		goto fail;
+	}else{
+		
+		//used magic
+	    if( window->used != 1 || 
+		    window->magic != 1234 )
+		{
+		    goto fail;
+	    }
+		
+		//...
 	};
 	
-	//used magic
-	if( window->used != 1 || window->magic != 1234 ){
-		return (int) 1;
-	};
 	
 	
 	//@todo: Pra que serva a flag redraw ??
@@ -1543,11 +1568,12 @@ int redraw_window(struct window_d *window)
 	//
 	
 	// Minimized? Se tiver minimizada, não precisa repintar.
-	//então está tudo certo?? retorna 0??
 	Status = (int) is_window_minimized(window);
-    if(Status == 1){
-	    return (int) 0;  //??
-	};	
+    if(Status == 1)
+	{
+		//?? tem qua mudar alguma flag antes ??
+	    goto done;
+	}	
 	
 	//E se ela estiver travada ??
 	//O que significa travada?? não pode se mover??
@@ -1574,83 +1600,164 @@ int redraw_window(struct window_d *window)
 	
 	
 	//
-	// *Importante: Checando se o esquema de cores está funcionando.
+	// *Importante: 
+	// Checando se o esquema de cores está funcionando.
+	// obs: Essa checagem está se tornando repetitiva.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL ){
+	if( (void*) CurrentColorScheme == NULL )
+	{
 		printf("redraw_window: CurrentColorScheme");
 		die();
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
+		if( CurrentColorScheme->used != 1 || 
+		    CurrentColorScheme->magic != 1234 )
+		{
 		    printf("redraw_window: CurrentColorScheme validation");
 		    die();			
 		};
 		//Nothing.
 	};	
 	
+	
 	// ****************************
 	// Importante:
-	// Agora na hora de efetivamente redezenhar podemos ver na estrutura
-	// quais são os elementos presentes nela. Lembrando que esses elementos 
-	// podem ter sido modificados, então o melhor lugar para pegar essas
-	// informações é na estrutura mesmo, pois lá serão salvos as preferências
-	// atuais do usuário em relação a janela que deve ser repintada.
-	// Ex: O usuário pode ter redimencionado ou arrastado elementos da janela,
-	// ou ocultado apenas. Afinal, feito escolhas ... usuarísses.
-	//*************************************
+	// Agora, na hora de efetivamente redezenhar, 
+	// podemos ver na estrutura quais são os elementos 
+	// presentes nela. Lembrando que esses elementos podem ter 
+	// sido modificados, então o melhor lugar para pegar essas
+	// informações é na estrutura mesmo, pois lá serão salvos 
+	// as preferências atuais do usuário em relação a janela 
+	// que deve ser repintada.
+	// Ex: O usuário pode ter redimencionado ou arrastado 
+	// elementos da janela, ou ocultado apenas. 
+	// Afinal, feito escolhas ... 
+	//******************************
 	
     //
-	// Redraw !
+	// # Redraw #
 	//	
+	
+	// Cada estilo de design tem suas características,
+	// essas características precisas ser registradas 
+	// na estrutura de janel, bem como o próprio estilo 
+	// de design.
+	
+	//
+	//
+	//
 	
 redrawBegin:
 
-
-	if( window->view == VIEW_NULL ){
-		//@todo: temos um problema, dvemos retornar??
-	    //return NULL;
+	if( window->view == VIEW_NULL )
+	{
+		//#bugbug
+	    goto fail;
 	};		
 
     //Sombra.	
 	if(window->shadowUsed == 1)
 	{
-        drawDataRectangle( window->left +1, 
-		                   window->top  +1, 
-						   window->width  +1 +1,   // @todo: Adicionar a largura da bordas bordas verticais e barra de rolagem se tiver.
-						   window->height +1 +24 +1,   // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-						   xCOLOR_GRAY1 );         //Cinza escuro.       
+		//#bugbug
+		//A sombra deve ter suas dimensões registradas também.
+		if( window->type == WT_OVERLAPPED )
+		{
+            // @todo: Adicionar a largura das bordas verticais 
+			// e barra de rolagem se tiver.
+			// @todo: Adicionar as larguras das 
+			// bordas horizontais e da barra de títulos.
+			// Cinza escuro.  CurrentColorScheme->elements[??] 
+			// @TODO: criar elemento sombra no esquema. 
+			
+			drawDataRectangle( window->left +1, 
+		        window->top  +1, 
+				window->width  +1 +1,      
+				window->height +1 +1,  
+				xCOLOR_GRAY1 );             
+        };                
 	};
 
     //Background.
 	if(window->backgroundUsed == 1)
 	{		
-	    //if( (unsigned long) type == WT_SIMPLE){
-		//    window->color_bg = color;
-		//};
-		
-		//Validando o argumento para todos os tipos de janelas.
-		window->color_bg = xCOLOR_GRAY2;  //CINZA UM POUQUINHO MAIS CLARO.
-		
-		//@todo: Se tiver barra de rolagem a largura do backgrond deve ser maior.
-		//if()
-		
-		//@todo: Passar a estrutura de janela.
 		drawDataRectangle( window->left, 
 		                   window->top, 
-						   window->width,  // @todo: Adicionar a largura da bordas bordas verticais.
-						   window->height, // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
+						   window->width,   
+						   window->height,    
 						   window->color_bg );      	
 	};
 	
 	
 	
-    //Título + borda.	
+	//borda.
+	//para os casos de editbox por exemplo.
+	if( window->borderUsed == 1 )
+	{
+		//#bugbug 
+		//a cor da borda e o size vão depender do status da janela.
+		border_color = COLOR_BLUE;
+		//border_color = COLOR_INACTIVEBORDER; 
+		
+		//border_size = 1;
+		border_size = 2;
+		
+		
+	    //board1, borda de cima e esquerda.    
+		drawDataRectangle( window->left, 
+		                   window->top, 
+						   window->width, 
+						   border_size, 
+						   border_color );
+						   
+	    drawDataRectangle( window->left, 
+		                   window->top, 
+						   border_size, 
+						   window->height, 
+						   border_color );
+
+	    //board2, borda direita e baixo.
+	    drawDataRectangle( window->left +window->width -1, 
+	                       window->top, 
+					       border_size, 
+					       window->height, 
+					       border_color );
+					   
+	    drawDataRectangle( window->left, 
+	                       window->top +window->height -1, 
+					       window->width, 
+					       border_size,
+					       border_color );		
+		
+	};
+	
+	
+	
+    //Título + borda(frame).	
 	if(window->titlebarUsed == 1)
 	{ 
+      
+	    //
+		//#importante:
+		//@todo:Ainda há muito o que levar em consideração 
+		//na hora de repintar uma janela com relação 
+		//ao fato de serem ativas ou não ou de terem 
+		//o foco ou não.
+		//
+ 
+        //no caso de janela mãe.
+        if(window->id == active_window)
+		{
+			window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar];
+		}else{
+			window->color_bg = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
+		};
+	
 		//Focus.
 		//Cores diferentes se tiver foco e se não tiver.
-		if(window->id == window_with_focus){
+		//no caso de janelas filhas
+		if(window->id == window_with_focus)
+		{
 		    window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
 		}else{
 			window->color_bg = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
@@ -1667,29 +1774,18 @@ redrawBegin:
 		
         drawDataRectangle( window->left, 
 		                   window->top, 
-						   window->width  +1 +1,  // @todo: Adicionar a largura da bordas bordas verticais.
-						   window->height +1 +24 +1, // @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
+						   window->width  +1 +1,  
+						   window->height +1 +1, 
 						   window->color_bg );
 						   
-		//ressaltando a barra de títulos da janala com o foco de entrada.
-        //quem deve ser pintada diferente é a janela com o foco de entrada e não a janela ativa.
-        //Obs: Isso vale para janelas com bordas. 		
-        //if(window->id == window_with_focus)
-		if(window->id == active_window)
-		{
-            drawDataRectangle( window->left, 
-		                       window->top, 
-				    		   window->width  +1 +1,  // largura do retângulo que marca que a janela está ativa.
-						       4,                     // altura do retângulo que marca que a janela está ativa.
-						       COLOR_SALMON );			
-		}
 						   
-		//@todo: Se estivermos em full screen, não teremos string.				   
+		//@todo: 
+		//string da barra de títulos.
+		//Se estivermos em full screen, não teremos string.				   
 		draw_string( window->left +8 +16 +8, 
 		             window->top +8 +4, 
-					 COLOR_TEXT,  //*test
-					 window->name );  
-					 
+					 COLOR_TERMINALTEXT2,  
+					 window->name );  		 
 					 
 	    //Isso é um teste.
 	    //A janela nem foi registrada ainda e já estamos passando o handle
@@ -1707,18 +1803,18 @@ redrawBegin:
 			//A função draw_button vai somar a margem obtida pelo handle 'window'
 			//ao deslocamento obtido em (x=window->width-?).
 	        draw_button( window, "V", 1, 
-			             (window->width -42 -1), 4, 
+			             (window->width -42 -1), 2, 
 						 21, 21, 
-						 COLOR_BUTTONFACE);	
+						 COLOR_TERMINAL2);	
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
 	    if(window->closebuttonUsed == 1)
 		{
 	        draw_button( window, "X", 1, 
-			            (window->width -21), 4, 
+			            (window->width -21), 2, 
 						21, 21, 
-						COLOR_BUTTONFACE);				
+						COLOR_TERMINAL2);				
 	    };					 
 					
 		//More??...			 		 
@@ -1737,49 +1833,34 @@ redrawBegin:
 		
 		
 		//
-		// #BUGBUG :: NÃO PODEMOS REALOCAR NOVAMENTE ... TEMOS QUE CHECAR 
-		// SE A ESTRUTURA É VÁLIDA...
-		// SE TRATA APENAS DE UMA ESTRUTTURA DE RETÃNGULO, NÃO ESPERAMOS MUITOS PROBLEMAS.
+		// #BUGBUG :: 
+		// ( NÃO ) PODEMOS REALOCAR NOVAMENTE ... 
+		// TEMOS QUE CHECAR SE A ESTRUTURA É VÁLIDA...
+		// SE TRATA APENAS DE UMA ESTRUTTURA DE RETÃNGULO, 
+		// NÃO ESPERAMOS MUITOS PROBLEMAS.
 		//
 		
 		 
 		if( (void*) window->rcClient == NULL )
 		{
-			printf("redraw_window: a estrututura de client falhou");
+			printf("redraw_window: rcClient");
 			die();
-			//refresh_screen();
-            //while(1){}			
-		     
 		}else{
 			
 			//conferir validade.
-			if( window->rcClient->used != 1 || window->rcClient->magic != 1234 ){
-			    printf("redraw_window: validade falhou");
-			    die();
-				//refresh_screen();
-                //while(1){}							
+			if( window->rcClient->used != 1 || 
+			    window->rcClient->magic != 1234 )
+			{
+			    printf("redraw_window: rcClient validation");
+			    die();							
 			}
-		    
-            //dimensões e posicionamento da área de cliente.
-			//Esse é o posicionamento e as dimensões da janela propriamente dita.
-			//Nesse espaço serão incluídos elementos adicionais.
-			//Essa é a parte que deve parecer em full screen.
-			window->rcClient->x  = (unsigned long)(window->left +1);     //+ borda
-            window->rcClient->y  = (unsigned long)(window->top  +1 +24); //+borda +barra de títulos.     
-            window->rcClient->cx = (unsigned long)(window->width);    
-            window->rcClient->cy = (unsigned long)(window->height);	
-            
-            window->rcClient->width  = (unsigned long) window->rcClient->cx;
-            window->rcClient->height = (unsigned long) window->rcClient->cy;
 			
-            window->rcClient->left   = (unsigned long) window->rcClient->x;
-            window->rcClient->top    = (unsigned long) window->rcClient->y;
-  			window->rcClient->right  = (unsigned long) (window->rcClient->left + window->rcClient->width);
-			window->rcClient->bottom = (unsigned long) (window->rcClient->top + window->rcClient->height);
-		
-		    //zerando o deslocamento.
-		    window->rcClient->x = 0;
-			window->rcClient->y = 0;			
+			//
+			// Aqui devemos respeitar a forma que a área de cliente 
+			// foi desenhada.
+			// Mas todos os valores que precisamod devar estar 
+			// salvos na estrutura de área de cliente.
+			//		
 			
 			//draw
             drawDataRectangle( (unsigned long) window->rcClient->left, 
@@ -1793,8 +1874,14 @@ redrawBegin:
 	};
 
 
+    //if( (unsigned long) type == WT_SCROLLBAR )
+		
+	//if( (unsigned long) type == WT_STATUSBAR )
+		
+	//if( (unsigned long) type == WT_BUTTON )
 
-
+	//if(window->type == WT_OVERLAPPED)
+		
 	//
 	// Outros elementos ainda não implementados ...
 	//
@@ -1811,18 +1898,32 @@ redrawBegin:
 	// estrutura. como por exemplo: arquivos abertos.
 	//
 
+	
+	//poderemos ter mais valores em flags no futuro.
+	if( flags == 1 )
+	{
+	    refresh_rectangle( window->left, window->top, window->width, window->height );
+	};
+	
 	//Continua ...
 	
 done:
     return (int) 0; 
+fail:
+    return (int) 1;
 };
 
+
 /*
+ ****************************************************************
  * redraw_screen:
+ *
  *     Repinta todas as janelas com base na zorder.
- *     @todo: Obs: Ao repintar cada janela a rotina redraw_window deverá 
- * incluir todos os elementos da janela. Do mesmo jeito que o usuário 
- * modificou de acordo com suas prefeências.
+ *     @todo: 
+ * Obs: Ao repintar cada janela a rotina redraw_window deverá 
+ * incluir todos os elementos da janela. 
+ * Do mesmo jeito que o usuário modificou de acordo com suas 
+ * prefeências.
  *
  */
 int redraw_screen()
@@ -1855,7 +1956,7 @@ int redraw_screen()
 				//KillFocus(zWindow);
 				
 				//Repinta uma janela.
-				RedrawStatus = (int) redraw_window(zWindow);
+				RedrawStatus = (int) redraw_window(zWindow, 1);
 				if(RedrawStatus == 1){
 					printf("redraw_screen: redraw error\n");
 					goto fail;
@@ -1879,7 +1980,7 @@ int redraw_screen()
             SetFocus(zWindow);
 
 	        //Repinta uma janela.
-	        RedrawStatus = (int) redraw_window(zWindow);
+	        RedrawStatus = (int) redraw_window(zWindow, 1);
 	        if(RedrawStatus == 1){
 		        printf("redraw_screen: redraw error\n");
 		        goto fail;
@@ -2244,11 +2345,11 @@ void windowUnblockFocus(){
  * #importante:
  *  Isso depende do tipo de janela. Se for um editbox tem que colocar o 
  * cursor no início da área de edição.
+ *
  * ...
  */
 void SetFocus( struct window_d *window )
 {
-	
 	int i;
 	int WindowID;
 	
@@ -2267,62 +2368,66 @@ void SetFocus( struct window_d *window )
 	{
 		//Isso e recursivo, pode dar problema.
 		//SetFocus(gui->screen);    
-		return;
+		goto fail;
 	}else{
 		
 		//validade e estado da estrutura.
-		if( window->used != 1 || window->magic != 1234 ){
-			return;
+		if( window->used != 1 || 
+		    window->magic != 1234 )
+		{
+			goto fail;
 		}
 		
 		//validade e estado da estrutura.
-		if( window->used == 1 && window->magic == 1234 )
+ 
+		
+		//Salvando id localmente.
+		WindowID = (int) window->id; 
+			
+		//Se a janela já tem o foco não precisa fazer nada.
+		if( window->id == window_with_focus ){
+			goto setup_wwf;
+		}
+			
+		//Se a janela é a janela ativa.
+		//Então atribuimos o foco e configuramos o procedimento de janela.
+		if( window->id == active_window )
 		{
-			//Salvando id localmente.
-			WindowID = (int) window->id; 
-			
-			//Se a janela já tem o foco não precisa fazer nada.
-			if( window->id == window_with_focus ){
-				goto setup_wwf;
-			}
-			
-		    //Se a janela é a janela ativa.
-			//Então atribuimos o foco e configuramos o procedimento de janela.
-			if( window->id == active_window )
-			{
-	            //set wwf id.
-			    window_with_focus = (int) window->id;
+	        //set wwf id.
+		    window_with_focus = (int) window->id;
 
-			    //set wwf pointer.
-			    WindowWithFocus = (void *) window;
+		    //set wwf pointer.
+		    WindowWithFocus = (void *) window;
 				
-		        //Procedure.
-		        //?? Não sei se é o ideal.
-		        SetProcedure((unsigned long) window->procedure);
-				goto setup_wwf;
-			};
+		    //Procedure.
+		    //?? Não sei se é o ideal.
+		    SetProcedure((unsigned long) window->procedure);
+			goto setup_wwf;
+		};
 			
 			// Se ela não é a janela ativa, tentamos ativar sua janela mãe.
 			// Isso se a janela mão já não for a janela ativa.
             // As janelas filhas nunca são janelas ativas. Se uma janela filha 
 			// tem o foco de entrada, então sua janela mãe é a ativa. 			
-			if( window->id != active_window )
-			{
+		if( window->id != active_window )
+		{
 				
 			    // Se a janela mãe tem um ponteiro inválido. Então ela não tem uma 
 				// janela mãe, então ativamos a janela filha.
                 // ?? #bugbug talvez não seja essa ideia certa.			
-		        if( (void*) window->parent == NULL ){
-			        set_active_window(window);				
-		        }else{
+		    if( (void*) window->parent == NULL ){
+		        set_active_window(window);				
+		    }else{
 
 					// Testando a validade da janela mãe
 				    // Ativar a janela mãe se ela tem um ponteiro válido
 					// Pois janela filha nunca é a janela ativa, mesmo tendo o foco.
-			        if( window->parent->used == 1 && window->parent->magic == 1234 ){
-			            set_active_window(window->parent);	
-			        };				
-				};
+			    if( window->parent->used == 1 && 
+				    window->parent->magic == 1234 )
+				{
+			        set_active_window(window->parent);	
+			    };				
+			};
 
                 //Obs: Nesse momento a janela ativa está configurada.
 				// a janela ativa é a própria janela ou a sua janela mãe.
@@ -2332,17 +2437,17 @@ void SetFocus( struct window_d *window )
 				// procedimento de janela.				
 
 	            //set wwf id.
-			    window_with_focus = (int) window->id;				
+			window_with_focus = (int) window->id;				
 		    
 			    //set wwf pointer.
-			    WindowWithFocus = (void *) window;
+			WindowWithFocus = (void *) window;
 
 		        //Procedure.
 		        //?? Não sei se é o ideal.
-		        SetProcedure((unsigned long) window->procedure);
+		    SetProcedure((unsigned long) window->procedure);
 
-                goto setup_wwf;				
-			};
+            goto setup_wwf;				
+		};
 			
 			
 //
@@ -2396,8 +2501,8 @@ setup_wwf:
 			    if( window->rcClient->used == 1 && 
 				    window->rcClient->magic == 1234 )
 			    {
-			        g_cursor_left   = (window->rcClient->left/8);
-	                g_cursor_top    = (window->rcClient->top/8) +1; //?? Ajuste temporário.   
+			        g_cursor_left = (window->rcClient->left/8);
+	                g_cursor_top = (window->rcClient->top/8) +1; //?? Ajuste temporário.   
 	                g_cursor_right  = g_cursor_left + (window->rcClient->right/8);
 	                g_cursor_bottom = g_cursor_top + (window->rcClient->height/8);					
 			    }
@@ -2438,13 +2543,18 @@ setup_wwf:
             prompt_pos = 0;				
 		    
 			//... 				
-		};
 		
 	};
 	
+ 
+	
+
+//...	
 done:	
 	//Nothing.
 	return;
+fail:
+    return;	
 };
 
 
@@ -2595,7 +2705,7 @@ void windowSwitchFocus()
 	};
 	//Nothing.
 done:
-    redraw_window(window);
+    redraw_window(window,1);
 	
     //Debug message:  
 	//@todo: Criar mecanismo melhor pra mostrar a janela com o foco.
@@ -3254,6 +3364,15 @@ done:
     return (int) WID;	
 };
 
+
+//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+void windowUpdateWindow( struct window_d *window )
+{
+            windowSendMessage( (unsigned long) window, 
+		        (unsigned long) MSG_PAINT, 
+			    (unsigned long) 0, 
+			    (unsigned long) 0 );	
+}
 
 //
 // End.

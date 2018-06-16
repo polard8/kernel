@@ -209,10 +209,11 @@
 #define	SYS_CLOSECHANNEL   109     //close channel.
 //Reboot.
 #define	SYS_REBOOT         110
-//Outros. @todo: Reservar para gerenciamento de energia. 
-#define	SYS_111 111   //#usando provisóriamente como test de mensagem.
+//Outros. @todo: mensagem  
+#define	SYS_111 111   //#mensagem.pega 4 elementos.
 #define	SYS_112 112
-#define	SYS_113 113
+//janela
+#define	SYS_113 113  //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 #define	SYS_114 114
 
 //outros.

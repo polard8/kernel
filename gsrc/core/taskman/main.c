@@ -465,6 +465,23 @@ done:
 };
 
 
+
+static inline void pause(void) 
+{ 
+         asm volatile("pause" ::: "memory"); 
+} 
+
+/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
+static inline void rep_nop(void)
+{
+	__asm__ __volatile__("rep;nop": : :"memory");
+}
+
+#define cpu_relax()		rep_nop()
+
+
+
+
 /*
  **************************************************************
  * appMain:
@@ -480,13 +497,53 @@ int appMain(int argc, char *argv[])
 	void *P;
     struct window_d *hWindow;
 	
+	//#debug 
+	// ## suspenso ##
+	// Isso funciona mas está atrapalhando.
+	//printf("\n# taskman.bin lives #\n");
+	
 	//
 	// #debug 
 	// Não há problemas ao mostrar o message box, 
 	// só estamos tirando ele para não incomodar
 	// enquanto trabalhamos no outro aplicativo.
 	//
-	while(1){}
+	
+	unsigned long buffer[5];
+	
+	while(1)
+	{
+		
+		//pega uma mensagem com 4 elementos.
+		enterCriticalSection(); 
+		system_call(111, 
+		    (unsigned long) &buffer[0], 
+			(unsigned long) &buffer[0], 
+			(unsigned long) &buffer[0] );
+		exitCriticalSection(); 
+			
+			
+		if( buffer[0] == 1 &&  
+		    buffer[1] == 2 &&
+			buffer[2] == 3 &&
+			buffer[3] == 4 )
+		{
+			//isso funcionou.
+			//printf(".");
+		}
+		
+		//asm("pause");
+		cpu_relax();
+		pause();
+		pause();
+		pause();
+		pause();
+		pause();
+		pause();
+		pause();
+		pause();
+		exit(0);
+	}
 
     //
 	// Opção: Tratar os argumentos recebidos.

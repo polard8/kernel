@@ -54,9 +54,12 @@
 
 #define RAND_MAX  32767 
 
+void *stdlib_system_call( unsigned long ax, 
+                   unsigned long bx, 
+				   unsigned long cx, 
+				   unsigned long dx );
 
-
-
+void exit(int status);
 
 /*
  * malloc:
