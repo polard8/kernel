@@ -1,6 +1,10 @@
-
-/* Gramado Core Shell - Builtins support */
-
+/*
+ * File: builtins.h
+ *     Buittin commands for Gramado Core Shell.
+ *
+ * History:
+ *     2018 - Created by Fred Nora.
+ */
 
 void cd_buitins();
 
@@ -11,7 +15,9 @@ void copy_builtins();
 void date_builtins();
 void del_builtins();
 void dir_builtins();
-void echo_builtins();
+
+void echo_builtins(char *list[]);
+
 void exec_builtins();
 void exit_builtins();
 int getpid_builtins();

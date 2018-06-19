@@ -1,7 +1,11 @@
-
-
-/* Gramado Core shell - builtins commands */
-
+/*
+ * File: builtins.c
+ *     Buittin commands for Gramado Core Shell.
+ *
+ * History:
+ *     2018 - Created by Fred Nora.
+ */
+ 
 
 #include "api.h"
 #include "types.h"
@@ -12,7 +16,6 @@
 #include "shell.h"
 #include "globals.h"
 #include "builtins.h"
-
 
 
 void cd_buitins()
@@ -34,10 +37,12 @@ void copy_builtins()
 	
 };
 
+
 void date_builtins()
 {
 	
 };
+
 
 void del_builtins()
 {
@@ -62,29 +67,28 @@ void dir_builtins()
 };
 
 
-void echo_builtins()
+//echo command.
+//imprimir a lista de comandos de uma linha de comandos.
+void echo_builtins(char *list[])
 {
-	//output the args.
-	
-	//@todo
-	
-	printf("\n %s \n",prompt[4]);
-	//printf("%s\n",prompt);	
+    shell_print_tokenList( list, " ");
+	//shell_print_tokenList( list, "/");
 };
 
 
 void exec_builtins()
 {
-    printf("~exec\n");	
+    printf("@todo: ~exec\n");	
 };
+
 
 void exit_builtins()
 {
     printf("~exit\n");
 	printf("Exiting shell process ...\n");
-	//refresh_screen();
-	//exit(0);	
+	exit(0);	
 };
+
 
 int getpid_builtins()
 {
@@ -92,17 +96,20 @@ int getpid_builtins()
 	return (int) 0; 
 };
 
+
 int getppid_builtins()
 {
 	shellShowPPID();
 	return (int) 0;
 };
 
+
 int getuid_builtins()
 {
 	shellShowUID();
 	return (int) 0;
 };
+
 
 int getgid_builtins()
 {
@@ -111,8 +118,7 @@ int getgid_builtins()
 };
 
 
-
-void help_builtins( int arg )
+void help_builtins(int arg)
 {
 	switch( arg )
 	{
@@ -136,9 +142,7 @@ void help_builtins( int arg )
 
 void pwd_builtins()
 {
-    printf("~pwd - print working directory\n");
+    //printf("~pwd - print working directory\n");
     system_call(170,0,0,0);		
 };
-
-
 

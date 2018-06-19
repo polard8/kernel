@@ -1172,18 +1172,46 @@ shellProcedure( struct window_d *window,
 		    break;
 			
 		// MSG_MOUSEKEYDOWN	
+		//#bugbug: a janela foi pintada duas vezes, não sabemos,
+		//se dias mensagens foi enviada para o procedimento ou se 
+		//a rotina de redraw foi chamada duas vezes ou ainda 
+		//se apenas o refresh_rectangle foi chamado duas vezes.
+		//obs: pode ser que dois botões estejam selecionados como clicados.
+		//e o sistema enviou duas mensagens. Uma opção seria checarmos 
+		// qual botão foi clicado, isso aparece em long1.
 		case 30:
-            APISetFocus(window);
-			APIredraw_window(window,1);
-			//refresh_screen();
-			//printf("Down");
-			printf("Focus");
+		    //printf("Down");
+			if( long1 == 1 )
+			{
+                printf("button 1\n"); 				
+                APISetFocus(window);
+			    APIredraw_window(window,1);
+			    //refresh_screen();
+			}
+			if( long1 == 2 )
+			{
+				printf("button 2\n");
+			}
+			if( long1 == 3 )
+			{
+				printf("button 3\n");
+			}			
             break;
 
 		// MSG_MOUSEKEYUP	
 		case 31:
-            //APISetFocus(window);
-			//printf("Up");
+			if( long1 == 1 )
+			{
+                printf("up button 1\n"); 				
+			}
+			if( long1 == 2 )
+			{
+				printf("up button 2\n");
+			}
+			if( long1 == 3 )
+			{
+				printf("up button 3\n");
+			}	
             break;	
 
 		// MSG_MOUSEMOVE	
@@ -2127,7 +2155,7 @@ do_compare:
 	// echo - Echo de terminal.
     if( strncmp( prompt, "echo", 4 ) == 0 )
 	{
-		echo_builtins();
+		echo_builtins(tokenList);
 		goto exit_cmp;
     };
 
@@ -2554,7 +2582,8 @@ do_compare:
 	
 	
 	// t3 - Test thread
-	if( strncmp( prompt, "t3", 2 ) == 0 )
+	if( strncmp( prompt, "t3", 2 ) == 0 ||
+        strncmp( prompt, "test-thread", 11 ) == 0	)
 	{
 	    shellTestThreads();
         goto exit_cmp;
@@ -3693,13 +3722,27 @@ setGlobals:
  */
 void shellThread()
 {
-	// ?? Message Box ??
 	
-    printf("shellThread: This is a thread for test!\n");
+	printf("\n");
+	printf("$\n");
+	printf("$$\n");
+	printf("$$$\n");
+    printf(" ############## This is a thread #############\n");
+	printf("$$$\n");
+	printf("$$\n");
+	printf("$\n");
+    printf("\n");
+	
     refresh_screen();
 	
-    while(1){	
+	while(1){}
+    while(1)
+	{	
 	    //printf("$");
+		asm ( "pause" );
+		asm ( "pause" );
+		asm ( "pause" );
+		asm ( "pause" );
     }	
 };
 
@@ -3914,18 +3957,24 @@ fail:
 
 
 /*
+ *************************************************************
  * shellTestThreads:
  *     Cria um thread e executa.
- *     #bugbug ...já funcionou uma vez.
+ *     #bugbug ...já funcionou uma vez, mas agora está com problemas.
+ *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
  */
 void shellTestThreads()
 {
     void *T;	
+	
 	//
-	// Obs: As threads criadas aqui etão sendo atribuídas ao processo PID=0.
-	//      @todo: No kernel, quando criar uma thread ela deve ser atribuída
-    //      ao processo que chamou a rotina de criação.	
+	// Obs: 
+	// As threads criadas aqui são atribuídas ao processo PID=0.
+	// @todo: 
+	// No kernel, quando criar uma thread ela deve ser atribuída
+    // ao processo que chamou a rotina de criação.	
 	//
+	
 	printf("Creating threads...\n");
 	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
 	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
@@ -3934,45 +3983,92 @@ void shellTestThreads()
 	//...
 	
 	//
+	// # Criar e executar #
+	//
+	
 	// Tentando executar um thread.
-	//
-	
-	
 	// *******************************
-     //OBS: ISSO FUNCIONOU. ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O TAMANHO DO 
-     //     HEAP USADO PELO PROCESSO PARA ALOCAÇÃO DINÂMICA, ELE NÃO TA DANDO CONTA 
-     //     DE TODA A DEMANDA POR MEMÓRIA.		  
-	
-	//>>dessa vez pegaremos o retorno, que deve ser o ponteiro para a estrutura da thread.
-	//>>chamaremos a systemcall que executa essa thread que temos o ponteiro da estrutura.
-    void* ThreadTest1;	
-	
-	//#bugbug, não temos mais epapo no heap do preocesso para alocar memória 
-	//pois gastamos o heap com a imagem bmp.
+    // OBS: 
+	// ISSO JÁ FUNCIONOU. 
+	// ESTAMOS SUSPENDENDO PORQUE PRECISAMOS AUMENTAR O 
+	// TAMANHO DO HEAP USADO PELO PROCESSO PARA 
+	// ALOCAÇÃO DINÂMICA, ELE NÃO TÁ DANDO CONTA 
+    // DE TODA A DEMANDA POR MEMÓRIA.		  
 	//
+	
+	//>>Dessa vez pegaremos o retorno, 
+	// que deve ser o ponteiro para a estrutura da thread.
+	// Obs: Não podemos usar a estrutura porque ela está 
+	// em ring0.
+	//>>Chamaremos a system_call que executa essa thread 
+	// que temos o ponteiro da estrutura.
+    
+	void* ThreadTest1;	
+	
+	//#bugbug: 
+	// Não temos mais espaço no heap do preocesso 
+	// para alocar memória pois gastamos o heap com 
+	// a imagem bmp. (isso aconteceu kkk).
+
 	unsigned long *threadstack1;
-	threadstack1 = (unsigned long *) malloc(30*1024);
-	threadstack1 = ( threadstack1 + (30*1024) - 4 ); //Ajuste para o início da pilha.
-	ThreadTest1  = (void*) apiCreateThread( (unsigned long)&shellThread, 
-	                                        (unsigned long) threadstack1, 
+	
+	
+	enterCriticalSection();
+	// #importante:
+	// Como a torina de thread é bem pequena e o 
+	// alocador tem pouquíssimo heap, vamos alocar o mínimo.
+	// Isso é apenas um teste, vamos var se a thread funciona 
+	// com um a pilha bem pequena. 2KB.
+	threadstack1 = (unsigned long *) malloc(2*1024);
+	
+	//Ajuste para o início da pilha.
+	//threadstack1 = ( threadstack1 + (2*1024) - 4 ); 
+	
+	//
+	// # Criando a thread #
+	//
+//creating:	
+	
+	ThreadTest1  = (void*) apiCreateThread( (unsigned long) &shellThread, 
+	                                        (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
 										    "ThreadTest1" );
 										   
 	
 	printf("shell: Tentando executar um thread ...\n");
-	refresh_screen();
 	
-	if( (void*) ThreadTest1 == NULL ){
-	    printf("shell: Tentando executar um thread FAIL NULL ...\n");	
-	    refresh_screen();
-		while(1){}
+	if( (void*) ThreadTest1 == NULL )
+	{
+	    printf("shell-shellTestThreads: apiCreateThread fail \n");	
+	    die("ThreadTest1");
 	}
-	//Lá no kernel isso deve selecionar a thread para execussão colocando ela no estado standby
+	
+	//
+	// # executando #
+	//
+	
+	
+	//Obs:
+	//Lá no kernel, isso deve selecionar a thread para 
+	//execussão colocando ela no estado standby.
+	
 	apiStartThread(ThreadTest1);
-	printf("shell: Tentando executar um thread [ok] hang...\n");
-	refresh_screen();
+	exitCriticalSection();
+	
+	//
+	// #bugbug:
+	// NÃO ESTÁ RETORNANDO !!
+	//
+	printf("shell: Tentando executar um thread [ok]...\n");
+	//while(1){
+	//	
+	//	asm( "pause" );
+	//}
+	//refresh_screen();
 	
 	//while(1){}
 	// **************************
+	
+	//permitir que o shell continue.
 	return;	
 };
 
@@ -5440,5 +5536,47 @@ shell_pathname_backup( char *path, int n )
 		        (unsigned long) saveN );			
     	
 };
+
+
+
+
+
+//isso vai ser usado pelo echo.
+void
+shell_print_tokenList(char *token_list[], char *separator)
+{ 
+	char *token;
+	
+	token = (char *) token_list[0];
+	
+	if( token == NULL )
+	    goto fail;
+	
+	
+	//token = (char *) tokenList[i];
+		
+	//	if( token == NULL ){
+			
+    int i;
+	for( i=0; i,128; i++ )
+    {
+		token = (char *) token_list[i];
+
+	    if( token == NULL )
+	        goto done;
+		
+		if( strncmp( (char*) token_list[i], "echo", 4 ) == 0 )
+		    continue;	
+		
+		printf("%s", token_list[i]);
+		printf("%s", separator);
+    }
+	
+	
+fail:
+done:
+    return;	
+}
+
 
 

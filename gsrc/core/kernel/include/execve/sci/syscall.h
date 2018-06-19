@@ -270,8 +270,9 @@
 #define	SYS_SETCLIENTAREARECT 145
 #define	SYS_146 146
 #define	SYS_147 147
-#define	SYS_148 148
-#define	SYS_149 149
+//grid
+#define	SYS_148 148 //create grid
+#define	SYS_149 149 //initialize grid.
 //150-159 user and group support.
 #define	SYS_CREATEUSER         150
 #define	SYS_SETCURRENTUSERID   151

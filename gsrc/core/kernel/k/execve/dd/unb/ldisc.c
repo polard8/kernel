@@ -1917,6 +1917,9 @@ void mouseHandler()
 	//
 	
 	//Apenas obtendo o estado dos botões.
+	mouse_buttom_1 = 0;
+	mouse_buttom_2 = 0;
+	mouse_buttom_3 = 0;
 	
 	if( ( mouse_packet_data & 0x01 ) == 0 )
 	{
@@ -1924,9 +1927,12 @@ void mouseHandler()
 		mouse_buttom_1 = 0;
 	}else if( ( mouse_packet_data & 0x01 ) != 0 )
 	    {
-		  //pressionada.
-		  mouse_buttom_1 = 1;
-	  }
+		    //pressionada.
+		    //Não tem como pressionar mais de um botão por vez.
+	        mouse_buttom_1 = 1;
+	        mouse_buttom_2 = 0;
+	        mouse_buttom_3 = 0;		  
+	    }
 			  
 
 	if( ( mouse_packet_data & 0x02 ) == 0 )
@@ -1935,9 +1941,12 @@ void mouseHandler()
 	    mouse_buttom_2 = 0;
 	}else if( ( mouse_packet_data & 0x02 ) != 0 )
 	    {
-		 //pressionada.
-			 mouse_buttom_2 = 1;
-	  }
+		    //pressionada.
+		    //Não tem como pressionar mais de um botão por vez.
+	        mouse_buttom_1 = 0;
+	        mouse_buttom_2 = 1;
+	        mouse_buttom_3 = 0;		  			 
+	    }
 			  
 	if( ( mouse_packet_data & 0x04 ) == 0 )
 	{
@@ -1945,8 +1954,11 @@ void mouseHandler()
 	    mouse_buttom_3 = 0;
 	}else if( ( mouse_packet_data & 0x04 ) != 0 )
 	    {
-	         //pressionada.
-	        mouse_buttom_3 = 1;
+	        //pressionada.
+		    //Não tem como pressionar mais de um botão por vez.			 
+	        mouse_buttom_1 = 0;
+	        mouse_buttom_2 = 0;
+	        mouse_buttom_3 = 1;		  			
 	    }			
 	
 	
@@ -2010,48 +2022,91 @@ void mouseHandler()
 			//Checaremos um por um.
 			
 			//1
-			if( mouse_buttom_1 != old_mouse_buttom_1 )
+			//igual ao estado anterior
+			if( mouse_buttom_1 == old_mouse_buttom_1 )
 			{
+				//...
+			}else{
 				//down
-				if( mouse_buttom_1 == 1 ){
-			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 1, (unsigned long) 0 );
-                }else{
+				if( mouse_buttom_1 == 1 )
+				{                
+					
+					//clicou
+					if( old_mouse_buttom_1 == 0 ){
+                        windowSendMessage( (unsigned long) wScan, 
+					        (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 1, (unsigned long) 0 );  						
+				    
+					    //atualiza o estado anterior.
+					    old_mouse_buttom_1 = 1;
+					}
+					
+				}else{
 					//up
 			        windowSendMessage( (unsigned long) wScan, 
 					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 1, (unsigned long) 0 );
+					old_mouse_buttom_1 = 0;	
 				}
 			}; 
 			
 			
 			//2
-			if( mouse_buttom_2 != old_mouse_buttom_2 )
+			//igual ao estado anterior
+			if( mouse_buttom_2 == old_mouse_buttom_2 )
 			{
+				//...
+			}else{
+				
 				//down
-				if( mouse_buttom_2 == 1 ){
-			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 2, (unsigned long) 0 );
+				if( mouse_buttom_2 == 1 )
+				{
+					
+					//clicou
+					if( old_mouse_buttom_2 == 0 ){
+                        windowSendMessage( (unsigned long) wScan, 
+					        (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 2, (unsigned long) 0 );  						
+				    
+					    //atualiza o estado anterior.
+					    old_mouse_buttom_2 = 1;
+					}
+
                 }else{
 					//up
 			        windowSendMessage( (unsigned long) wScan, 
 					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 2, (unsigned long) 0 );
+					old_mouse_buttom_2 = 0;
 				}
 			}; 
 			
 			
 			//3
-			if( mouse_buttom_3 != old_mouse_buttom_3 )
+			//igual ao estado anterior
+			if( mouse_buttom_3 == old_mouse_buttom_3 )
 			{
+				//...
+			}else{
 				//down
-				if( mouse_buttom_3 == 1 ){
-			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 3, (unsigned long) 0 );
+				if( mouse_buttom_3 == 1 )
+				{
+					
+					//clicou
+					if( old_mouse_buttom_3 == 0 ){
+                        windowSendMessage( (unsigned long) wScan, 
+					        (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 3, (unsigned long) 0 );  						
+				    
+					    //atualiza o estado anterior.
+					    old_mouse_buttom_3 = 1;
+					}
+
                 }else{
 					//up
 			        windowSendMessage( (unsigned long) wScan, 
 					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 3, (unsigned long) 0 );
+					old_mouse_buttom_3 = 0;
 				}
 			}; 
+			
+			//Ação concluída.
+			mouse_button_action = 0;
 			
 			
 		}else{
@@ -2062,13 +2117,22 @@ void mouseHandler()
 			//se NÂO ouve alteração no estado dos botões 
 			//então apenas enviaremos a mensagem de movimento 
 			//do mouse.
-			//isso está certo, mas vamos suspender por enquanto
-            //colocará a mensagem na estrutura de janele 
-		    //para que o aplicativo pegue.
-            windowSendMessage( (unsigned long) wScan, 
-		        (unsigned long) MSG_MOUSEOVER, 
-			    (unsigned long) 0, 
-			    (unsigned long) 0 );
+            //Obs: Se a janela for a mesma que capturou o mouse,
+			//então não precisamos reenviar a mensagem.
+			if( wScan->id != mouseover_window )
+			{
+                windowSendMessage( (unsigned long) wScan, 
+		            (unsigned long) MSG_MOUSEOVER, 
+			        (unsigned long) 0, 
+			        (unsigned long) 0 );
+			    
+				mouseover_window = wScan->id; 
+			}else{ };
+			
+			
+			//Ação concluída.
+			//Para o caso de um valor incostante na flag.
+			mouse_button_action = 0;			
 		};
 		
 		

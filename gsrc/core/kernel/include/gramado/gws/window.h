@@ -99,9 +99,7 @@ int window_getch();
  */
 
  
- 
  //??tipos de mensagens ??
- //@todo:
 #define MSG_NULL          0 
 #define SIGNAL_NULL       0 
 #define STREAM_MSG_NULL   0 

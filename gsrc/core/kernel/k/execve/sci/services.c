@@ -666,7 +666,14 @@ void *services( unsigned long number,
 		//72 - Create thread.	
         case SYS_CREATETHREAD:			
             //systemIoCpu( 3, 0, 0, 0, 0);
-			return (void*) create_thread( NULL, NULL, NULL, arg2, arg3, 0, (char *) a4);
+			return (void*) create_thread( 
+			                   NULL,             // w. station 
+							   NULL,             // desktop
+							   NULL,             // w.
+							   arg2,             // init eip
+							   arg3,             // init stack
+							   current_process,  // pid (determinado)(provisório).
+							   (char *) a4 );    // name
 			break; 
 
 		//73 - Create process.
@@ -748,8 +755,8 @@ void *services( unsigned long number,
 			//spawn
 			//printf("services:94 spawn\n");
 			//refresh_screen();
-			current_thread = t->tid;
-			KiSpawnTask(current_thread); 
+			//current_thread = t->tid;
+			//KiSpawnTask(current_thread); 
 			
 			break;		
 			
@@ -1014,6 +1021,17 @@ void *services( unsigned long number,
 		    //@todo: O ponteiro para estrutura de retângulo é passado via argumento.
 			setClientAreaRect( arg2, arg3, arg4, 0);
             break;
+			
+		//create grid and itens.
+		case 148:
+		    //n, view 
+		    return (void*) grid( (struct window_d*) arg2 ,(int) arg3, (int) arg4 );
+            break;		
+
+        //test. menu.
+		case 149:
+            MainMenu((struct window_d*) arg2 );		
+            break;		
 			
 		//152 - get user id	
 		case SYS_GETCURRENTUSERID:

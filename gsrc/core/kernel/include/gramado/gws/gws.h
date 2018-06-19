@@ -671,7 +671,7 @@ int current_usersession;    //gws
 int current_windowstation;  //gws
 int current_desktop;        //gws 
 int current_window;         //gws
-int current_menu; //gws
+int current_menu;           //gws
 
 //
 // # Outras variáveis globais #
@@ -681,6 +681,8 @@ int current_menu; //gws
 int active_window;
 //janela com foco de entrada. 
 int window_with_focus;
+//janela com o mouse em cima.(captured mouse);
+int mouseover_window;
 //Indice 0 na zorder atual.  
 int top_window;
 //edit box atual

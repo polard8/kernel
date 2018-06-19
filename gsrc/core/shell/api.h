@@ -750,9 +750,29 @@
 #define PRIORITY_REALTIME  10    
 
 
+ 
+//
+//  ## COLOR DEFINES ##
+// 
+ 
+ 
+//CORES BÁSICAS.
+#define rgbBlack   0x000000
+#define rgbBlue    0x0000FF
+#define rgbCyan    0x00FFFF
+#define rgbGreen   0x00FF00
+#define rgbMagenta 0xFF00FF
+#define rgbRed     0xFF0000
+#define rgbYellow  0xFFFF00
+#define rgbWhite   0xFFFFFF 
 
- 
- 
+// ## blue support ##
+#define COLOR_BLUE1 0x067AB5
+#define COLOR_BLUE2CYAN   0x1BA1E2
+#define COLOR_BLUE3COBALT 0x0050EF
+#define COLOR_BLUE4INDIGO 0x6A00FF
+
+// ## gray support ## 
 //cinza para pintar janela
 //a janela tem camadas que vai do mais escuro para o mais claro.
 #define xCOLOR_BLACK 0x000000  //preto
@@ -763,28 +783,31 @@
 #define xCOLOR_GRAY5 0xa0a0a0  //cinza
 #define xCOLOR_GRAY6 0xc0c0c0  //cinza
 #define xCOLOR_GRAY7 0xe0e0e0  //cinza mais clarinho
-#define xCOLOR_WHITE 0xffffff  //branco 
+#define xCOLOR_WHITE 0xffffff  //branco  
+ 
 
-
-//WIN23
-//TRÊS TIPOS DE CINZA.
+//WIN23 - TRÊS TIPOS DE CINZA.
 #define COLOR_LITBUTTON  0xE0E0E0
 #define COLOR_LTGRAY     0xC0C0C0
-#define COLOR_GRAY       0x808080
-
-//CORES BÁSICAS.
-#define rgbBlack   0x000000
-#define rgbBlue    0x0000FF
-#define rgbCyan    0x00FFFF
-#define rgbGreen   0x00FF00
-#define rgbMagenta 0xFF00FF
-#define rgbRed     0xFF0000
-#define rgbYellow  0xFFFF00
-#define rgbWhite   0xFFFFFF
+#define COLOR_GRAY       0x808080 
 
 
+// ## black support ##
+// Preto. 
+//50% 	#808080
+//45% 	#737373
+//40% 	#666666
+//35% 	#595959
+//30% 	#4d4d4d
+//25% 	#404040
+//20% 	#333333
+//15% 	#262626
+//10%   #1a1a1a
+//5%    #0d0d0d
+//0%    #000000
 
-//windows2k system colors
+//w2k - system colors
+//#bugbug delete;
 #define COLOR_TEST_0  0x8080FF  // COLOR_BACKGROUND(verde claro) ??
 #define COLOR_TEST_1  0x80FFFF  // COLOR_APPWORKSPACE, MDIWINDOW 
 #define COLOR_TEST_2  0x80FF80  // COLOR_WINDOW, CLIENT
@@ -825,108 +848,24 @@
 #define COLOR_TEST_37 0x400000 
 #define COLOR_TEST_38 0x400040
 #define COLOR_TEST_39 0x800040
-#define COLOR_TEST_40 0x000000 //COLOR_BTNSHADOW ~ preto text
+#define COLOR_TEST_40 0x000000  //COLOR_BTNSHADOW ~ preto text
 #define COLOR_TEST_41 0x008080  //vrde escuro
 #define COLOR_TEST_42 0x408080  //vrde escuro
 #define COLOR_TEST_43 0x808080  //COLOR_APPWORKSPACE (cinza)
 #define COLOR_TEST_44 0x808040 
 #define COLOR_TEST_45 0xC0C0C0  //silver
-#define COLOR_TEST_46 0x400040
- 
+#define COLOR_TEST_46 0x400040 
  
 //outros teste
 #define COLOR_TEST_47 0x3366FF  //azul claro
+
     
-
-/*
- * Cores usadas nessa sistema.
- */
-
-#define COLOR_BLACK               0x000000
-#define COLOR_WHITE               0xFFFFFF 
-#define COLOR_RED                 0xFF0000 
-#define COLOR_GREEN               0x00FF00
-#define COLOR_BLUE                0x0000FF
-#define COLOR_DARKRED             0x8B0000
-#define COLOR_DARKGREEN           0x006400
-#define COLOR_DARKBLUE            0x00008B
-//#define COLOR_GRAY                0x808080
-#define COLOR_GREY                0xAFAFAF
-#define COLOR_LIGHTGRAY           0xD3D3D3
-#define COLOR_LIGHTGREEN          0x90EE90
-#define COLOR_LIGHTBLUE           0xADD8E6
-#define COLOR_SILVER              0xC0C0C0
-
-//window colors
-#define COLOR_ACTIVEBORDER        0xB4B4B4
-#define COLOR_ACTIVECAPTION       0x99B4D1
-#define COLOR_ACTIVECAPTIONTEXT   0x000000
-#define COLOR_APPWORKSPACE        COLOR_SILVER 
-// A cor padrão para o Bg é azul quase escuro,
-// o azul escuro é usado em seleção de item.
-#define COLOR_BACKGROUND          0x008080  
-#define COLOR_BORDER              COLOR_SILVER 
-#define COLOR_BUTTONFACE          0xF0F0F0
-#define COLOR_BUTTONHIGHLIGHT     0xFFFFFF
-#define COLOR_BUTTONSHADOW        0xA0A0A0  //COLOR_BLACK
-#define COLOR_BUTTONTEXT          COLOR_WINDOWTEXT
-#define COLOR_CONTROL             0xF0F0F0
-#define COLOR_CONTROLDARK         0xA0A0A0
-#define COLOR_CONTROLDARKDARK     0x696969
-#define COLOR_CONTROLLIGHT        0xE3E3E3
-#define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF
-#define COLOR_CONTROLTEXT         0x000000
-#define COLOR_DESKTOP             0x000000
-#define COLOR_FOCUS_TOPBAR        0x7FFF00
-#define COLOR_GRAYTEXT            0x808080
-#define COLOR_HIGHLIGHT           0x3399FF
-#define COLOR_HIGHLIGHTTEXT       0xFFFFFF
-#define COLOR_INACTIVEBORDER      0xF4F7FC
-#define COLOR_INACTIVECAPTION     0xBFCDDB
-#define COLOR_INACTIVECAPTIONTEXT 0x434E54
-#define COLOR_INFO                0xFFFFE1
-#define COLOR_INFOTEXT            0x000000
-
-#define COLOR_MENU                  COLOR_GRAY
-#define COLOR_MENUTEXT              COLOR_BLACK
-#define COLOR_MENUITEM              COLOR_WHITE
-#define COLOR_MENUITEMTEXT          COLOR_BLACK
-#define COLOR_MENUITEM_SELECTED     COLOR_BLUE
-#define COLOR_MENUITEMTEXT_SELECTED COLOR_WHITE
-#define COLOR_MENUBAR               COLOR_GRAY
-#define COLOR_MENUHIGHLIGHT         0x3399FF
-
-#define COLOR_NAVIGATIONBAR       COLOR_BLACK
-#define COLOR_NAVIGATIONBAR_TEXT  COLOR_WHITE
-#define COLOR_STATUSBAR           COLOR_WINDOW
-#define COLOR_TASKBAR             COLOR_WINDOW
-#define COLOR_TASKBAR_TEXT        COLOR_TEXT
-#define COLOR_TEXT                0x000000
-#define COLOR_TITLEBAR            COLOR_BLUE
-#define COLOR_TITLEBAR_TEXT       COLOR_WHITE
-#define COLOR_TOPBAR              0x83F52C
-#define COLOR_TOPBAR_TEXT         0x397D02
-#define COLOR_WINDOW              0xFFFFFF
-#define COLOR_WINDOWFRAME         COLOR_GRAY
-//(debug: Pink para contraste com quaquer cor de janela)
-#define COLOR_WINDOWTEXT          COLOR_PINK //COLOR_BLACK 
-#define COLOR_WORKSPACE           0x0000FF //area de trabalho
-
-//Tipos de azul
-#define COLOR_BLUE1 0x067AB5
-#define COLOR_BLUE2CYAN   0x1BA1E2
-#define COLOR_BLUE3COBALT 0x0050EF
-#define COLOR_BLUE4INDIGO 0x6A00FF
-
-/*
- *  Lista de cores de 32 bit usando Alpha.
- */
-
+// # testes #
 #define COLOR_ALICEBLUE           0xF0F8FF
 #define COLOR_ANTIQUEWHITE        0xFAEBD7
 #define COLOR_AQUA                0x00FFFF
-#define COLOR_AQUAMARINE          0x7FFFD4
-#define COLOR_AZURE               0xF0FFFF
+#define COLOR_AQUAMARINE          0x7FFFD4 //verde claro.
+#define COLOR_AZURE               0xF0FFFF //azul, quase branco. 
 #define COLOR_BEIGE               0xF5F5DC
 #define COLOR_BISQUE              0xFFE4C4
 #define COLOR_BLANCHEDALMOND      0xFFEBCD
@@ -971,10 +910,10 @@
 #define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2
 #define COLOR_GREENYELLOW         0xADFF2F
 #define COLOR_HONEYDEW            0xF0FFF0
-#define COLOR_HOTPINK             0xFF69B4
-#define COLOR_HOTTRACK            0x0066CC
+#define COLOR_HOTPINK             0xFF69B4 //rosa chiclete.
+#define COLOR_HOTTRACK            0x0066CC //azul legal.
 #define COLOR_INDIANRED           0xCD5C5C
-#define COLOR_INDIGO              0x4B0082
+#define COLOR_INDIGO              0x4B0082 //violeta
 #define COLOR_IVORY               0xFFFFF0
 #define COLOR_KHAKI               0xF0E68C
 #define COLOR_LAVENDER            0xE6E6FA
@@ -987,7 +926,7 @@
 #define COLOR_LIGHTPINK           0xFFB6C1
 #define COLOR_LIGHTSALMON         0xFFA07A
 #define COLOR_LIGHTSEAGREEN       0x20B2AA
-#define COLOR_LIGHTSKYBLUE        0x87CEFA
+#define COLOR_LIGHTSKYBLUE        0x87CEFA  //azul clarinho
 #define COLOR_LIGHTSLATEGRAY      0x778899
 #define COLOR_LIGHTSTEELBLUE      0xB0C4DE
 #define COLOR_LIGHTYELLOW         0xFFFFE0
@@ -1009,7 +948,7 @@
 #define COLOR_MINTCREAM           0xF5FFFA
 #define COLOR_MISTYROSE           0xFFE4E1
 #define COLOR_MOCCASIN            0xFFE4B5
-#define COLOR_NAVAJOWHITE         0xFFDEAD
+#define COLOR_NAVAJOWHITE         0xFFDEAD //branco areioso.
 #define COLOR_NAVY                0x000080
 #define COLOR_OLDLACE             0xFDF5E6
 #define COLOR_OLIVE               0x808000
@@ -1035,14 +974,14 @@
 #define COLOR_SANDYBROWN          0xF4A460
 #define COLOR_SCROLLBAR           0xC8C8C8
 #define COLOR_SEAGREEN            0x2E8B57
-#define COLOR_SEASHELL            0xFFF5EE
+#define COLOR_SEASHELL            0xFFF5EE  //branco sujinho
 #define COLOR_SIENNA              0xA0522D
-#define COLOR_SKYBLUE             0x87CEEB
-#define COLOR_SLATEBLUE           0x6A5ACD
+#define COLOR_SKYBLUE             0x87CEEB  //azul claro
+#define COLOR_SLATEBLUE           0x6A5ACD  //azul/violeta
 #define COLOR_SLATEGRAY           0x708090
-#define COLOR_SNOW                0xFFFAFA
+#define COLOR_SNOW                0xFFFAFA //branco
 #define COLOR_SPRINGGREEN         0x00FF7F
-#define COLOR_STEELBLUE           0x4682B4
+#define COLOR_STEELBLUE           0x4682B4 //azul legal.
 #define COLOR_TAN                 0xD2B48C
 #define COLOR_TEAL                0x008080
 #define COLOR_THISTLE             0xD8BFD8
@@ -1051,7 +990,7 @@
 #define COLOR_TURQUOISE           0x40E0D0
 #define COLOR_VIOLET              0xEE82EE
 #define COLOR_WHEAT               0xF5DEB3
-#define COLOR_WHITESMOKE          0xF5F5F5
+#define COLOR_WHITESMOKE          0xF5F5F5 //branco enfumaçado.
 #define COLOR_YELLOW              0xFFFF00
 #define COLOR_YELLOWGREEN         0x9ACD32
 #define STEALTH_ORANGE            0xFF8800
@@ -1060,16 +999,162 @@
 #define STEALTH_PINK              0xFF22EE
 #define STEALTH_BLUE              0x0077BB
  
+// ## text support ##
+#define COLOR_TEXT2  0x00404040   //25%
+#define COLOR_TEXT1  0x00333333   //20% 
+#define COLOR_TEXT   COLOR_TEXT1 
+//#define COLOR_TEXT  0x00000000  
+
+ 
+#define COLOR_WINDOW              0x00FFFFFF
+#define COLOR_BLACK               0x000000
+#define COLOR_WHITE               0xFFFFFF 
+#define COLOR_RED                 0xFF0000 
+#define COLOR_GREEN               0x00FF00
+#define COLOR_BLUE                0x0000FF
+#define COLOR_DARKRED             0x8B0000
+#define COLOR_DARKGREEN           0x006400
+#define COLOR_DARKBLUE            0x00008B
+//#define COLOR_GRAY                0x808080
+#define COLOR_GREY                0xAFAFAF
+#define COLOR_LIGHTGRAY           0xD3D3D3
+#define COLOR_LIGHTGREEN          0x90EE90
+#define COLOR_LIGHTBLUE           0xADD8E6
+#define COLOR_SILVER              0xC0C0C0
+ 
+
+
+//
+// ## WINDOW COLORS ##
+//   
+ 
+#define COLOR_ACTIVEBORDER        0xB4B4B4
+
+#define COLOR_ACTIVECAPTION       0x99B4D1
+#define COLOR_ACTIVECAPTION_TEXT   0x000000
+
+#define COLOR_APPWORKSPACE  COLOR_SILVER 
+
+// A cor padrão para o Bg é azul quase escuro,
+// o azul escuro é usado em seleção de item.
+
+#define COLOR_BACKGROUND  0x008080  
+#define COLOR_BACKGROUNDTEXT  COLOR_TEXT  
+
+#define COLOR_BORDER  COLOR_SILVER 
+
+
+
+// ## button support ##
+#define COLOR_BUTTONFACE 0xF0F0F0
+#define COLOR_BUTTONFACE2 0xE0E0E0
+#define COLOR_BUTTONFACE3 0xD0D0D0
+#define COLOR_BUTTONHIGHLIGHT 0xFFFFFF
+#define COLOR_BUTTONHIGHLIGHT2 0x404040
+#define COLOR_BUTTONHIGHLIGHTTEXT COLOR_WHITE
+#define COLOR_BUTTONHIGHLIGHTTEXT2 COLOR_WHITE //@todo: branco menos intenso.
+#define COLOR_BUTTONSHADOW 0xA0A0A0
+#define COLOR_BUTTONSHADOW2 0x303030  
+#define COLOR_BUTTONTEXT COLOR_TEXT
+
+
+// # control support #
+#define COLOR_CONTROL             0xF0F0F0
+#define COLOR_CONTROLTEXT COLOR_TEXT
+#define COLOR_CONTROLDARK         0xA0A0A0
+#define COLOR_CONTROLDARKDARK     0x696969
+#define COLOR_CONTROLLIGHT        0xE3E3E3
+#define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF
+#define COLOR_CONTROLLIGHTLIGHTTEXT COLOR_WHITE
+
+#define COLOR_DESKTOP  0x000000
+
+#define COLOR_FOCUS_TOPBAR  0x7FFF00
+
+
+
+//TEXT SUPPORT
+#define COLOR_GRAYTEXT  0x808080
+#define COLOR_HIGHLIGHT           0x3399FF
+#define COLOR_HIGHLIGHTTEXT       0xFFFFFF
+
+
+#define COLOR_INACTIVEBORDER      0xF4F7FC
+#define COLOR_INACTIVECAPTION     0xBFCDDB
+#define COLOR_INACTIVECAPTIONTEXT 0x434E54
+
+#define COLOR_INFO  0xFFFFE1
+#define COLOR_INFOTEXT  TEXT_COLOR
+
+#define COLOR_MENU  COLOR_GRAY
+#define COLOR_MENUTEXT  COLOR_TEXT
+
+#define COLOR_MENUITEM  COLOR_WHITE
+#define COLOR_MENUITEMTEXT  COLOR_TEXT
+
+#define COLOR_MENUITEMSELECTED  COLOR_BLUE
+#define COLOR_MENUITEMSELECTEDTEXT  COLOR_WHITE
+
+#define COLOR_MENUBAR  COLOR_GRAY
+#define COLOR_MENUBARTEXT  COLOR_TEXT
+
+#define COLOR_MENUHIGHLIGHT  0x003399FF
+#define COLOR_MENUHIGHLIGHTTEXT  COLOR_WHITE
+
+#define COLOR_NAVIGATIONBAR       COLOR_BLACK
+#define COLOR_NAVIGATIONBARTEXT  COLOR_WHITE
+
+//status bar
+#define COLOR_STATUSBAR  COLOR_WINDOW   //branca
+#define COLOR_STATUSBAR2 xCOLOR_GRAY6   //cinza
+#define COLOR_STATUSBAR3 0x83FCFF       //verde
+//...
+#define COLOR_STATUSBARTEXT      COLOR_TEXT
+
+#define COLOR_TASKBAR             COLOR_WINDOW
+#define COLOR_TASKBARTEXT        COLOR_TEXT
+
+#define COLOR_TITLEBAR            COLOR_BLUE
+#define COLOR_TITLEBARTEXT       COLOR_TEXT
+
+#define COLOR_TOPBAR  0x83F52C
+#define COLOR_TOPBARTEXT  COLOR_TEXT
+
+#define COLOR_WINDOWFRAME  COLOR_GRAY
+
+
+// NÃO FAREMOS JANELAS PRETAS
+// PRETO É O BACKGROUND
+#define COLOR_WINDOWTEXT COLOR_TEXT  
+
+//area de trabalho
+#define COLOR_WORKSPACE 0x0000FF00 
+#define COLOR_WORKSPACETEXT COLOR_TEXT
+
+
+// ## virtual terminal support ##
+#define COLOR_TERMINAL  COLOR_BLACK
+#define COLOR_TERMINAL2 0x303030
+//...
+
+#define COLOR_TERMINALTEXT COLOR_WHITE
+#define COLOR_TERMINALTEXT2 xCOLOR_GRAY7
+//...
+
+//
+// ========
+//  
+ 
  
 /*
  * (w) Colors, futuristic GUI. (Dark blu and Black)
  */ 
-//#define COLOR_DARKBLUE   0x00008B 
-//#define COLOR_BLACK      0x000000 
+ 
+//#define COLOR_DARKBLUE   0x00008B00 
+//#define COLOR_BLACK      0x00000000 
  
  
- 
-#define COLOR_KERNEL_BACKGROUND COLOR_BLUE     
+#define COLOR_KERNEL_BACKGROUND COLOR_BLUE   
 
 
 
@@ -1816,15 +1901,26 @@ static unsigned long vga_256colors_palette[256] = {
 //****
 
 
+
 /*
+ ***********************************************
  * Messages.
- *     Lista de mensagens suportadas pelo sistema.
- *     ...
+ * mensagens para procedimentos de janelas e 
+ * para diálogos dentro do gws.
+ * Obs: Isso refere-se principalmente à janelas.
  */
+
  
-//window (0-19) 
-#define MSG_NULL          0  //@todo: Criar pequeno comentário descritivo.  
-#define MSG_CREATE        1  //...
+ //??tipos de mensagens ??
+#define MSG_NULL          0 
+#define SIGNAL_NULL       0 
+#define STREAM_MSG_NULL   0 
+#define BUFFER_MSG_NULL   0 
+#define CAT_MSG_NULL      0  
+
+ 
+//window (1-19)  
+#define MSG_CREATE        1
 #define MSG_DESTROY       2
 #define MSG_MOVE          3 
 #define MSG_SIZE          4
@@ -1837,17 +1933,36 @@ static unsigned long vga_256colors_palette[256] = {
 #define MSG_ACTIVATE      11
 #define MSG_SHOWWINDOW    12 
 #define MSG_SETCURSOR     13
+#define MSG_HIDE          14
+#define MSG_MAXIMIZE      15
+#define MSG_RESTORE       16
+#define MSG_SHOWDEFAULT   17
+
 //keyboard (20-29)
 #define MSG_KEYDOWN       20
 #define MSG_KEYUP         21
 #define MSG_SYSKEYDOWN    22
 #define MSG_SYSKEYUP      23
+
 //mouse (30 - 39)
+//tem uma lista de eventos de mouse em events.h
 #define MSG_MOUSEKEYDOWN  30
 #define MSG_MOUSEKEYUP    31
+#define MSG_MOUSEBUTTONDOWN	30
+#define MSG_MOUSEBUTTONUP	31 
+#define MSG_MOUSEMOVE	    32
+#define MSG_MOUSEOVER	    33
+#define MSG_MOUSEWHEEL	    34
+#define MSG_MOUSEPRESSED	  35
+#define MSG_MOUSERELEASED	  36
+#define MSG_MOUSECLICKED	  37
+#define MSG_MOUSEENTERED	  38
+#define MSG_MOUSEEXITED	       39
+//#define MSG_MOUSEMOVEBYOFFSET
+//#define MSG_MOUSEMOVETOELEMENT
+
 //outros (40 - ...)
 #define MSG_COMMAND       40
-
 #define MSG_CUT           41
 #define MSG_COPY          42
 #define MSG_PASTE         43
@@ -1856,23 +1971,34 @@ static unsigned long vga_256colors_palette[256] = {
 #define MSG_INSERT        46
 #define MSG_RUN_PROCESS   47
 #define MSG_RUN_THREAD    48
-// Continua ...
-// Muitas outras mensagens podem ser criadas,
-// A variável é do tipo int.
+//Quando um comando é enviado para o console. ele será atendido pelo
+//módulo /sm no procedimento de janela do sistema.
+//Todas as mensagens de console serão atencidas pelo procedimento de janela 
+//nessa mensagem.
+#define MSG_CONSOLE_COMMAND 49
+#define MSG_CONSOLE_SHUTDOWN 50
+#define MSG_CONSOLE_REBOOT   51
+#define MSG_DEVELOPER 52
 //...
 
  
-/*
- * Window Type - Tipos de janela.
- */
+ 
+// # Window Type #
 #define WT_NULL          0 
 #define WT_SIMPLE        1
-#define WT_EDITBOX       2 // igual simples, mais uma bordinha preta.
-#define WT_OVERLAPPED    3 //sobreposta(completa)(barra de titulo + borda +client area)
-#define WT_POPUP         4 //um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
-#define WT_BUTTON_DOWN   5 //rever
-#define WT_BUTTON_UP     6 //rever
-//...
+// igual simples, mais uma bordinha preta.
+#define WT_EDITBOX       2
+// sobreposta(completa)(barra de titulo + borda +client area)  
+#define WT_OVERLAPPED    3  
+// um tipo especial de sobreposta,
+//usada em dialog ou message box. (com ou sem barra de titulo ou borda)
+#define WT_POPUP         4    					   
+#define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
+#define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
+#define WT_EDITBOX_MULTIPLE_LINES 7
+#define WT_BUTTON     8   
+#define WT_STATUSBAR  9
+//... 
 
 //apresentação.
 #define VIEW_NULL      0
@@ -2116,13 +2242,17 @@ rect_t *rect;
 
 
 /*
+ *******************************************************
  * window_d:
  *     Window Structure.
  *     @todo: *Deve ficar igual a do kernel.
  *     Obs: Não sei se essa estrutura pode ser pública.
+ *     #bugbug: isso ainda não está igual a do kernel, 
+ * pois ainda está em transformação e não temos nenhuma 
+ * versão definida.
  *
- * Histórico:
- *     2015 - Created.
+ * History:
+ *     2015 - Created by Fred Nora.
  *     Oct 2016 - Revision.
  *     ...
  */
@@ -2416,6 +2546,9 @@ struct api_receive_message_d
 */
 
 
+//
+// ## BMP support ##
+//
 
 #define BMP_TYPE 0x4D42             /* "MB" */
 
@@ -2455,17 +2588,19 @@ struct bmp_infoheader_d
 
 
 //
-// Principais chamadas ao sistema.
+// ## Principais chamadas ao sistema ##
 //
 
  
 /*
+ ******************************************************
  * apiSystem: 
- *     Interpreta um comando e envia uma systemcall para o Kernel.
+ *     Interpreta um comando e envia uma systemcall 
+ * para o Kernel.
  *
- * Obs: Há comandos predefinidos, porém um comando pode ser o nome
- * abreviado de um programa ou uma variável de ambiante representando
- * um diretório.
+ * Obs: Há comandos predefinidos, porém um comando 
+ * pode ser o nome abreviado de um programa ou uma 
+ * variável de ambiante representando um diretório.
  *
  * Argumento:
  *     String de comando.
@@ -2477,9 +2612,11 @@ int apiSystem(const char *command);
 
 
 /*
+ ******************************************************
  * system_call: 
- *     Interrupção de sistema, número 200, pode chamar vários serviços do 
- * Kernel com a mesma interrupção. O número do serviço é passado via 
+ *     Interrupção de sistema, número 200, 
+ * pode chamar vários serviços do kernel com a 
+ * mesma interrupção. O número do serviço é passado via 
  * argumento.
  *     Essa é a chamada mais simples.
  *
@@ -2602,7 +2739,10 @@ int edit_box( unsigned long x,
 
 //int 200 - serviço 17.
 int SetNextWindowProcedure(unsigned long next_procedure);
-int chama_procedimento(unsigned long proximo_procedure);  //@todo: traduzir para inglês.
+
+
+//@todo: traduzir para inglês.
+int chama_procedimento(unsigned long proximo_procedure);  
  
  
 //Carrega bitmap 16x16.
@@ -2661,11 +2801,12 @@ int call_gui( unsigned long int_number,
 
 
 //
-// Window support.
+// ## Window support ##
 //
 
 					   
 /*
+ **********************************************************
  * APICreateWindow: 
  *     Cria uma janela com base em uma struct.
  *     Retorna o endereço da estrutura da janela criada. 
@@ -2723,12 +2864,24 @@ int APIGetActiveWindow();
 void *apiGetClientAreaRect();
 void apiSetClientAreaRect(struct rect_d *r);
 
+//resize
+void APIresize_window( struct window_d *window, 
+                       unsigned long x, 
+					   unsigned long y );
+					   
+//redraw					   
+void APIredraw_window( struct window_d *window, 
+                       unsigned long flags );
 
-/*window support.*/
-void APIresize_window(struct window_d *window, unsigned long x, unsigned long y);
-void APIredraw_window(struct window_d *window, unsigned long flags);
-void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y);
+//replace
+void APIreplace_window( struct window_d *window, 
+                        unsigned long x, 
+						unsigned long y );
+						
+//max
 void APImaximize_window(struct window_d *window);
+
+//min
 void APIminimize_window(struct window_d *window);
 
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
@@ -2750,17 +2903,23 @@ void put_char( unsigned long x,
 	
 
 //
-// String support.
+// ## String support ##
 //
 
+//compare
 int api_strncmp(char *s1, char *s2, int len);
 
-//int 200 - serviço 10.
-void print_string( unsigned long x,  
-                   unsigned long y,  
-				   unsigned long color, 
-				   unsigned char *string );
-			  
+
+/*
+ ***************************************
+ * print_string:
+ *     int 200 - serviço 10.
+ */
+void 
+print_string( unsigned long x,  
+              unsigned long y,  
+		      unsigned long color, 
+			  unsigned char *string );
 
 
 //
@@ -2808,11 +2967,13 @@ void apiSetCursor( unsigned long x, unsigned long y);
 
 
 //
-// Process support.
+// ## Process support ##
 //
 
 //Create process.
-void *apiCreateProcess(unsigned long process_eip, unsigned long process_priority, char *name);
+void *apiCreateProcess( unsigned long process_eip, 
+                        unsigned long process_priority, 
+						char *name );
 
 //Mostra informações sobre o processo atual.	
 void APIShowCurrentProcessInfo();
@@ -2830,12 +2991,16 @@ void kill(int exit_code);
 	
 
 //
-// Thread support.
+// ## Thread support ##
 //
 
 //Create thread.
-void *apiCreateThread(unsigned long thread_eip, unsigned long thread_priority, char *name);
-void apiStartThread(void *Thread); //coloca no estado standby para executar pela primeira vez
+void *apiCreateThread( unsigned long thread_eip, 
+                       unsigned long thread_priority, 
+					   char *name );
+
+//coloca no estado standby para executar pela primeira vez.					   
+void apiStartThread(void *Thread); 
 
 //
 // File support.
@@ -2844,8 +3009,9 @@ void apiStartThread(void *Thread); //coloca no estado standby para executar pela
 //Open file.
 void *apiFOpen(const char *filename, const char *mode);
 
+
 /*
- *************************************************************
+ **********************************************
  * apiSaveFile:
  *     Salva um arquivo no diretório raiz 
  * do volume de boot.
@@ -2887,7 +3053,8 @@ int getpid();
  ***********************************************
  * apiDefDialog:
  *     Procedimento de janela adiado. 
- *     Usado pelos aplicativos ao fim dos seus procedimentos de janela.
+ *     Usado pelos aplicativos ao fim dos seus 
+ * procedimentos de janela.
  */
 unsigned long 
 apiDefDialog( struct window_d *window, 
@@ -2908,14 +3075,19 @@ void api_set_window_with_text_input( struct window_d *window );
 int api_get_window_with_text_input();
 
 
-
+/*
+ ******************************************************
+ * gramadocore_init_execve:
+ *     Um execve apenas para o ambiente gramado core.
+ *     Roda usando o processo init.
+ *
+ */
 int gramadocore_init_execve( const char *filename, 
             const char *argv[], 
             const char *envp[] ); 
 							 
 /* UNIX style */
 int fork();
-
 int execve( const char *filename, 
             const char *argv[], 
             const char *envp[] ); 
@@ -2930,7 +3102,11 @@ int apiDialog( const char *string );
 int api_getchar();
 
 
-
+/*
+ ************************************
+ * apiDisplayBMP:
+ *     
+ */
 int apiDisplayBMP( char *address, 
                    unsigned long x, 
 				   unsigned long y );

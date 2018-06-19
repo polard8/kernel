@@ -1,5 +1,5 @@
 /*
- * File: pc\thread.c
+ * File: pc\action\thread.c
  *
  * Descrição:
  *     TM - Thread Manager (Parte fundamental do Kernel Base).
@@ -146,7 +146,7 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	Process = (void*) processList[ProcessID]; 		
 	if( (void*) Process == NULL )
 	{
-		printf("pc-thread-create_thread: Process\n");
+		printf("pc-action-thread-create_thread: Process\n");
 		die();
 	};
 	
@@ -155,7 +155,7 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	Thread = (void*) malloc( sizeof(struct thread_d) );	
 	if( (void*) Thread == NULL )
 	{
-	    printf("pc-thread-create_thread: Thread\n");
+	    printf("pc-action-thread-create_thread: Thread\n");
 		die();
 	}else{  
 	    //Indica à qual proesso a thread pertence.

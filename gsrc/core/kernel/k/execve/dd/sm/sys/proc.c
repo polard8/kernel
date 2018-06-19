@@ -1368,7 +1368,7 @@ void procedureGrid()
 {
 	int Status;
 	
-	Status = grid(GRID_VERTICAL);
+	Status = grid( (struct window_d*) gui->main ,(int) 4, (int) GRID_HORIZONTAL ); 
 	if(Status == 1){
 		printf("sm-sys-procedureGrid: grid\n");
 	}

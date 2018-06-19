@@ -477,7 +477,7 @@ unsigned long MenuBarProcedure( struct window_d *window,
 	switch(n)
 	{
 		case 0:
-		    ControlMenu();
+		    ControlMenu(gui->main);
 		    break;
 	    
 		default:

@@ -42,9 +42,17 @@ grid_t *GRID;
 unsigned long screenGrid[GRID_COUNT_MAX];   
 
 
-int InitializeGrid(struct grid_d *g, int n, int view);
+
 void *CreateGrid();
-int grid(int view);
+int 
+InitializeGrid( struct window_d *window, 
+                struct grid_d *g, 
+                int n, 
+				int view );
+				
+int grid( struct window_d *window, 
+          int n, 
+		  int view );
 
 
 //

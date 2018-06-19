@@ -697,10 +697,10 @@ void freeArray(Array *a)
  * dos tipos de menu.
  *
  */
-int ControlMenu()
+int ControlMenu(struct window_d * window)
 {
 	//@todo: Rever isso aqui.
-    return (int) MainMenu();	
+    return (int) MainMenu(window);	
 };
 
 
@@ -711,7 +711,7 @@ int ControlMenu()
  *     Nada mais na tela, apenas um menu centralizado.
  *     ??
  */
-int MainMenu()
+int MainMenu(struct window_d * window)
 {	
 	struct window_d *cmWindow;
 	struct window_d *pWindow;
@@ -725,7 +725,9 @@ int MainMenu()
 	// utilizaremos a janela 'gui->main' por enquanto. 
 	// Somente para fins de teste. 	
 	
-	pWindow = (struct window_d *) GetFocus(); 
+	//pWindow = (struct window_d *) GetFocus(); 
+	
+	pWindow = (struct window_d *) window;
 	
 	if( (void*) pWindow == NULL )
 	{
@@ -785,13 +787,13 @@ int MainMenu()
 	{
 	    printf("MainMenu: cmWindow\n");
 		goto fail;	
+	}else{
+		
+	    // ## Init array ##	
+	    initmenuArray( cmWindow->defaultMenu, 4);		
 	};
 	
-	//
-	// ## Init array ##
-	//
-	
-	initmenuArray( cmWindow->defaultMenu, 4);
+
 	
 	//
 	// ## Create itens ##

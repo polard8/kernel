@@ -238,8 +238,8 @@ void initmenuArray(struct menu_d *a, int initialSize);
  *     Cria o menu principal.
  *     Nada mais na tela, apenas um menu centralizado.
  */
-int MainMenu();    //o main menu é o control menu.
-int ControlMenu(); //control menu
+int MainMenu(struct window_d * window);   //o main menu é o control menu.
+int ControlMenu(struct window_d * window); //control menu
 
 
 /*

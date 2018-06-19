@@ -858,7 +858,9 @@ void shellExit(int code);
 void 
 shell_pathname_backup( char *path, int n ); 
 
-				
+//isso vai ser usado pelo echo.
+void
+shell_print_tokenList(char *token_list[], char *separator);				
 //
 // End.
 //
