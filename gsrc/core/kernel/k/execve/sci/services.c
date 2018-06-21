@@ -217,26 +217,9 @@ void *services( unsigned long number,
 	unsigned char SC;
 	struct window_d *wFocus;
 	
-	//
-	// *Test:
-	//  Se o número do serviço for igual ou superior a 1000,
-	// chamaremos a rotina servicesEx(.) ... que encontrará esses 
-	// serviços no processo IDLE, em user mode.
-	//
-	
-	/*
-	if(number >= 1000){
-		servicesEx( (unsigned long) number,
-                    (unsigned long) arg2,
-                    (unsigned long) arg3,
-					(unsigned long) arg4 );
-	};
-	*/
-	
-	
-	//
-	// *Importante: Checando se o esquema de cores está funcionando.
-	//
+
+	// *Importante: 
+	// Checando se o esquema de cores está funcionando.
 	
 	if( (void*) CurrentColorScheme == NULL ){
 		printf("StatusBar: CurrentColorScheme");
@@ -267,26 +250,62 @@ void *services( unsigned long number,
 	
 	if(gui->main == NULL){
 		printf("services: main");
-		refresh_screen();
-		while(1){}
+		die();
 	};		
 	
-	//Apenas posicionamento.
-	//if(gui->main != NULL)
-	//{
-        //WindowX = (unsigned long) (gui->main->width / 3);             
-        //WindowY = (unsigned long) (gui->main->height / 4);                   
-	    //WindowWidth  = (unsigned long) (gui->main->width / 3);             
-        //WindowHeight = (unsigned long) (gui->main->height / 3);       
-	//};
-	
 	//
-	// Limits. (Limites do número do serviço).
+	// ## Limits. ## 
+	// (Limites do número do serviço).
 	//
 	
-	if( number < 0 || number > SERVICE_NUMBER_MAX ){
+	if( number < 0 || number > SERVICE_NUMBER_MAX )
+	{
 	    return NULL;	
 	};
+	
+	
+	//
+	// ## Create Window ##
+	//
+	
+	if( number == SYS_118 )
+	{
+		//printf("#test# 118 %x %x \n",&message_address[0], arg2 );
+		//refresh_screen();
+		//while(1){}
+		
+		//Aciona a flag.
+	    //Se a flag tiver acionada, 
+		//os argumentos usarão os valores 
+	    //que foram configurados aqui.
+		cwFlag  = 1234;
+
+        
+		cwArg1 = message_address[0]; //arg2; //arg2 Type. 		
+        cwArg2 = message_address[1]; //arg2; //WindowStatus 
+        cwArg3 = message_address[2]; //arg3; //arg3 view
+		
+		cwArg4 = (char *) message_address[3]; //a4; //arg4 Window name.
+		
+		cwArg5 = message_address[4]; //arg2;  //x
+		cwArg6 = message_address[5]; //arg3;  //y
+		cwArg7 = message_address[6]; //arg2; //width
+		cwArg8 = message_address[7]; //arg3; //height
+		
+		//parent window.
+		//message_address[8];
+		cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
+		
+		//onde?
+		//message_address[9];
+		//cwArg10 = arg4;  //desktop ID 		
+		
+		cwArg11 = message_address[10]; //arg3;  //cor da area de cliente.
+		cwArg12 = message_address[11]; //arg4;  //cor da janela.
+		
+		goto do_create_window;		
+	};
+	
 
 	//Number.
 	switch(number)
@@ -838,6 +857,7 @@ void *services( unsigned long number,
 		
 		//O aplicativo envia um endereço de array 
 		//e devemos colocar 4 longs como mensagens.
+		//Isso funcionou. Esse será o padrão.
 		case 111:
 		    if( &message_address[0] == 0 )
 			{
@@ -892,28 +912,7 @@ void *services( unsigned long number,
 		//o aplicativo envia um endereço de um vetor onde 
 		//a mensagem deve ser colocada.
 		case 115:
-
-			//#deletar isso ... estamos usando 111.
-			//SC = (unsigned char) keybuffer[keybuffer_head];
-		    //keybuffer[keybuffer_head] = 0;
-			//keybuffer_head++;
-			//if( keybuffer_head >= 128 ){ keybuffer_head = 0; };
-			//LINE_DISCIPLINE(SC, 0);	
-			
-			
-			//wFocus = (void *) windowList[window_with_focus];
-			//if( wFocus->newmessageFlag == 0 ){ return NULL; }
-			
-			//message_address[0] = (unsigned long) wFocus->msg_window;
-			//message_address[1] = (unsigned long) wFocus->msg;
-			//message_address[2] = (unsigned long) wFocus->long1;
-			//message_address[3] = (unsigned long) wFocus->long2;
-			
-			//sinaliza que não há amis mensagem.
-			//wFocus->newmessageFlag = 0;
 			return NULL;
-			//return (void*) wFocus->msg;	
-			
 			break;
 			
 		//119

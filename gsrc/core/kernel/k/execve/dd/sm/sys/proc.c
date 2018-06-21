@@ -657,24 +657,8 @@ unsigned long system_procedure( struct window_d *window,
 				//Program manager.
                 //@todo: usar F11 para FULL SCREEN.				
 				case VK_F11:
-				
-				    //saltando para o boot loader
-				    //asm(" movl $5, %eax   ");
-					//asm(" jmp  $0x8, $0x21000  ");
-					vfs_show_handle_list();
-					//if(AltStatus == 1){ window_with_focus = 11; break;};
-					//if(CtrlStatus == 1){ active_window = 11; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F11\n"); break;};
-					//printf("@todo Program manager.\n");
-					//printf("F11\n");
-					
-					//aumentando gradativamente a janela de pouco em pouco.
-					//xxxx = (void*) windowList[6];
-					//xxxx->width  += 20;
-					//xxxx->height += 20;
-					//resize_window(xxxx, xxxx->width, xxxx->height);
-					//redraw_window(xxxx);
-					//refresh_screen();
+				    windowSwitchFullScreen();
+					goto done;
 					break;
 					
 					
@@ -1374,6 +1358,7 @@ void procedureGrid()
 	}
 	return;
 };
+
 
 
 //

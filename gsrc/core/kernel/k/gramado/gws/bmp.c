@@ -32,7 +32,8 @@ static int nibble_count_16colors = 0;
  ********************************************************
  * bmpDisplayBMP:
  *
- *     Mostra na tela uma imagem bmp carregada na memória.
+ *     Mostra na tela uma imagem bmp que já está 
+ * carregada na memória.
  * 
  * IN:
  *     address = endereço base
@@ -342,11 +343,66 @@ int bmpDisplayBMP( char *address,
 		        base = base + 4;    
 	        };
 			
-			my_buffer_put_pixel( (unsigned long) color, 
-			                     (unsigned long) left, 
-								 (unsigned long) bottom, 
-								 0 );
+			//
+			// # Put pixel #
+			//
 			
+			//Nesse momento já temos a cor selecionada 
+			//no formato 0xaarrggbb ... 
+			//Agora se a flag de mascara estiver selecionada,
+			//então devemos ignora o pixel e não pintá-lo.	
+			
+			switch(bmp_change_color_flag)
+			{
+				//1000
+				//flag para ignorarmos a cor selecionada.
+				//Não pinte nada.
+				//Devemos pintar caso a cor atual seja  
+				//diferente da cor selecionada.
+				case BMP_CHANGE_COLOR_TRANSPARENT:
+				    if( color != bmp_selected_color )
+					{
+		                my_buffer_put_pixel( (unsigned long) color, 
+			                (unsigned long) left, 
+						    (unsigned long) bottom, 
+						    0 );								
+					};
+				    break;
+					
+				//2000	
+				//Substitua pela cor indicada.
+				//Se a cor atual é igual a cor selecionada,
+				//devemos substituir a cor atual pela substituta.
+				//Mas se a cor atual for diferente da cor selecionada,
+				//pintamos normalmente a cor atual.
+				case BMP_CHANGE_COLOR_SUBSTITUTE:
+				    if( color == bmp_selected_color )
+					{
+			            my_buffer_put_pixel( (unsigned long) bmp_substitute_color, 
+			                (unsigned long) left, 
+						    (unsigned long) bottom, 
+						     0 );
+                    }else{
+		                my_buffer_put_pixel( (unsigned long) color, 
+			                (unsigned long) left, 
+						    (unsigned long) bottom, 
+						    0 );														
+					};							 
+				    break;
+					
+				//...	
+					
+				// 0 and default
+				// Pintamos normalmente a cor atual.
+                case BMP_CHANGE_COLOR_NULL:				
+				default:
+			        my_buffer_put_pixel( (unsigned long) color, 
+			            (unsigned long) left, 
+						(unsigned long) bottom, 
+						0 );				
+				    break;
+			};
+
 			// Próximo pixel.
 			left++; 
 		};
@@ -380,6 +436,30 @@ done:
 	return (int) 0;
 };
 
+
+
+//mostra no backbuffer o ponteiro de mouse,
+//levando em consideração tratamento de transparência.
+int bmpDisplayMousePointerBMP( char *address, 
+                               unsigned long x, 
+				               unsigned long y )
+{
+	
+	//flag para ignorarmos a cor selecionada.
+	bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
+	
+    //background do bitmap é branco.
+	bmp_selected_color = COLOR_WHITE;	
+    
+	
+	bmpDisplayBMP( address, x, y );
+
+	//clear flags.
+	bmp_change_color_flag = 0;
+	bmp_selected_color = 0;
+	
+    return (int) 0;	
+};
 
 /*
 int bmpInit();

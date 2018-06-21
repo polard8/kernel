@@ -1660,26 +1660,17 @@ void mouseHandler()
             if( mouse_x < 1 ){ mouse_x = 1; }	
 		    if(	mouse_y < 1 ){ mouse_y = 1; }
 		
-		    if(	mouse_x > 750 ){ mouse_x = 750; }
-		    if(	mouse_y > 550 ){ mouse_y = 550; }
+		    if(	mouse_x > (800-16) ){ mouse_x = (800-16); }
+		    if(	mouse_y > (600-16) ){ mouse_y = (600-16); }
 
 			
 		    //
-		    // Draw !
+		    // # Draw BMP #
 		    //
-		
-		    //#test
-			//ISSO FUNCIONOU.
-			//#bugbug: 
-			//#importante: Talvez essa rotina esteja usando malloc ... 
-			//##verificar.
-		    //g_mousepointer_width g_mousepointer_height
-		    bmpDisplayBMP( mouseBMPBuffer, mouse_x, mouse_y );
-		    refresh_rectangle( mouse_x, mouse_y, 16, 16 );			
-			
-			//#importante: Isso funcionou bem.
-		    //drawchar_transparent( mouse_x, mouse_y, COLOR_PINK, 'T' );	
-		    //refresh_rectangle( mouse_x, mouse_y, 8, 8 );			
+
+		    //bmpDisplayBMP( mouseBMPBuffer, mouse_x, mouse_y );
+			bmpDisplayMousePointerBMP( mouseBMPBuffer, mouse_x, mouse_y );
+		    refresh_rectangle( mouse_x, mouse_y, 16, 16 );					
 			
             break;
 
@@ -1689,168 +1680,6 @@ void mouseHandler()
 			
 	};
 	
-	
-/*	
-	if( count_mouse >= 3 )
-	{
-		// Salvando os bytes obtidos.
-		// Isso garante os dados que serão usados pelo assembly, mas não 
-		// queremos que eles sejam modificados antes de chegarem lá.
-		
-        mouse_packet_data = buffer_mouse[0];
-		mouse_packet_x = buffer_mouse[1];       
-		mouse_packet_y = buffer_mouse[2];
-		//mouse_packet_scroll = buffer_mouse[3];  // Suspenso.
-		
-		
-		//
-		//@todo:
-		// Nessa hora podemos dividir os deltas.
-		// Essa variável divisora pode ser usada para configuração.
-		// @todo: Subistituir esse '2' por uma variável global.
-		//
-		
-		//#bugbug:
-		// Isso não apresentou um bom resultado.
-		// apresentando descontinuidade no traço.
-		//mouse_packet_x = (mouse_packet_x/2);
-		//mouse_packet_y = (mouse_packet_y/2); 
-
-
-
-		//
-        // Obs:
-        // salvando o estado dos botões.
-        // Isso não deve causar problemas.		
-		// ?? Será que essas operações corrompem os dados ??
-		// 
-		
-		if( ( mouse_packet_data & 0x01 ) == 0 )
-		{
-			//liberada.
-			mouse_buttom_1 = 0;
-		}else if( ( mouse_packet_data & 0x01 ) != 0 )
-		      {
-				  //pressionada.
-				  mouse_buttom_1 = 1;
-			  }
-			  
-
-	    if( ( mouse_packet_data & 0x02 ) == 0 )
-		{
-		    //liberada.
-		    mouse_buttom_2 = 0;
-		}else if( ( mouse_packet_data & 0x02 ) != 0 )
-		      {
-				 //pressionada.
-				 mouse_buttom_2 = 1;
-			  }
-			  
-	    if( ( mouse_packet_data & 0x04 ) == 0 )
-		{
-		    //liberada.
-		    mouse_buttom_3 = 0;
-		}else if( ( mouse_packet_data & 0x04 ) != 0 )
-		      {
-		          //pressionada.
-		          mouse_buttom_3 = 1;
-		      }			  
-			  
-
-			  
-		//
-		// Chamando assembly para calcular as coodenadas.
-		// Salvando os valores em variáveis globais.
-		//
-		
-		update_mouse();	
-		
-        // 
-		// Pegando os valores encontrados calculados pela rotina acima.
-        // Obs: mouse_x e mouse_y são variáveis globais.
-		//
-		
-		//posX = mouse_x;
-	    //posY = mouse_y;
-		
-		// #debug:
-		// #importante:
-		// Mostrando os resultados obtidos.
-		// printf("X={%d} Y={%d} \n",posX,posY);
-		// refresh_screen();
-		
-		// Limits.
-        //if( posX < 1 ){ posX = 1; }	
-		//if(	posY < 1 ){ posY = 1; }
-		//if(	posX > 255 ){ posX = 255; }
-		//if(	posY > 255 ){ posY = 255; }
-
-		
-		mouse_x = (mouse_x & 0x00000FFF ); 
-		mouse_y = (mouse_y & 0x00000FFF );
-		
-		// Limits.
-		
-        if( mouse_x < 1 ){ mouse_x = 1; }	
-		if(	mouse_y < 1 ){ mouse_y = 1; }
-		
-		if(	mouse_x > 750 ){ mouse_x = 750; }
-		if(	mouse_y > 550 ){ mouse_y = 550; }
-		
-		//
-		// Atualizando o mesmo cursor usado pelo teclado.
-		//
-		
-		//g_mousepointer_x = (unsigned long) mouse_x;
-		//g_mousepointer_y = (unsigned long) mouse_y;
-		
-		//g_mousepointer_x = (unsigned long) posX & 0x000000FF;
-		//g_mousepointer_y = (unsigned long) posY & 0x000000FF;
-		//g_cursor_x = (unsigned long) posX;
-		//g_cursor_y = (unsigned long) posY;
-		
-		//limits
-		//if( g_mousepointer_x < 0 ){ g_mousepointer_x = 0; };
-		//if( g_mousepointer_x > 800 ){ g_mousepointer_x = 800; };
-		//if( g_mousepointer_y < 0 ){ g_mousepointer_y = 0; };
-		//if( g_mousepointer_y > 600 ){ g_mousepointer_y = 600; };
-		
-		//
-		// Draw !
-		//
-		
-		//#test
-		//g_mousepointer_width g_mousepointer_height
-		//bmpDisplayBMP( mouseBMPBuffer, g_mousepointer_x, g_mousepointer_y );
-		//refresh_rectangle( g_mousepointer_x, g_mousepointer_y, 16, 16 );
-		
-		//Imprimindo o caractere que está servindo de ponteiro provisório.
-        //printf("%d %d\n",g_mousepointer_x,g_mousepointer_y ); 
-		//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );		
-		
-		// @todo:
-		// ?? Porque não estamos testando o bmp como ponteiro ??
-		// Talvez porque o bmp é 16x16.
-		//bmpDisplayBMP( mouseBMPBuffer, g_cursor_x*8, g_cursor_y*8, 0, 0 );
-		//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 16, 16 );
-		
-		
-		//printf("%c", (char)'0');
-		drawchar_transparent( mouse_x, mouse_y, COLOR_PINK, 'T' );	
-		refresh_rectangle( mouse_x, mouse_y, 8, 8 );
-		
-
-		//printf("%d %d\n",mouse_x,mouse_y ); 
-		//refresh_rectangle( 0, 0, 20*8, 600 );
-		
-		//
-		// ?? #bugbug: Porque essa variável é local, dentro da função.
-		// Zerando a contagem de interrupções de mouse.
-		//
-		
-		count_mouse=0;
-    };
-*/	
 	
 	//
 	// *importante:
@@ -2137,7 +1966,7 @@ void mouseHandler()
 		
 		
 		
-		
+		//#debug. (+)
         draw_text( wScan,
                    0,  
                    0,  
@@ -2145,6 +1974,8 @@ void mouseHandler()
 				   "+" );
 			   
 		
+		//refresh bmp rectangle.
+		//isso coloca o (+) no frontbuffer.
 		refresh_rectangle( wScan->left, 
 		    wScan->top, 
 			8, 

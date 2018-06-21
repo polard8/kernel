@@ -677,6 +677,8 @@ int current_menu;           //gws
 // # Outras variáveis globais #
 //
 
+//a janela que está em full screen.
+int fullscreen_window;
 //janela ativa
 int active_window;
 //janela com foco de entrada. 

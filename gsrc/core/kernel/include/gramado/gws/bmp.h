@@ -9,6 +9,20 @@
  *    2018 - 4bpp, 8bpp, 32bpp support.
  */
  
+#define  BMP_CHANGE_COLOR_NULL  0
+#define  BMP_CHANGE_COLOR_TRANSPARENT  1000
+#define  BMP_CHANGE_COLOR_SUBSTITUTE   2000
+//...
+  
+ 
+//flag que avisa que dve haver alguma mudança nas cores. 
+int bmp_change_color_flag; 
+ 
+//salva-se aqui uma cor para substituir outra. 
+unsigned long bmp_substitute_color; 
+ 
+//cor selecionada para ser substituída ou ignorada. 
+unsigned long bmp_selected_color;  
  
 /* ## Cancelada ! ## */
 static unsigned long cga_16colors_palette[1] = { 0x000000, };
@@ -81,6 +95,10 @@ struct bmp_infoheader_d
 int bmpDisplayBMP( char *address, 
                    unsigned long x, 
 				   unsigned long y );
+				   
+int bmpDisplayMousePointerBMP( char *address, 
+                               unsigned long x, 
+				               unsigned long y );
 					
 						   
 //

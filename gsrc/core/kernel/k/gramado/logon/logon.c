@@ -74,8 +74,10 @@ int ExitLogon();
 
 
 /* 
+ ***************************************************
  * create_logon:
  *     Cria a interface gráfica do Logon.
+ *     É o ambiente onde o processo de logon deve rodar. 
  *
  *     Fundo -> Screen, Background.
  *     Logo  -> Sobreposto. 
@@ -103,7 +105,8 @@ void create_logon()
 	// 	
 	
 	gui = (void*) malloc( sizeof(struct gui_d) );
-    if( (void*) gui == NULL){
+    if( (void*) gui == NULL)
+	{
 	    printf("create_logon:");
 		die();
 	}else{
@@ -152,7 +155,8 @@ void create_logon()
 	};
 	
 	// Configura elementos da tela de login.
-    if( g_guiMinimal == 1){
+    if( g_guiMinimal == 1 )
+	{
         SetLogonParameters(0,1,1,0,0,1,0,0,0,0,0,0); 	
 	}else{
 		
@@ -171,7 +175,7 @@ void create_logon()
 	};	
 
     //
-	// Draw.
+	// ## Draw windows ##
 	//
 					   
 draw_logon_stuffs:	
@@ -214,54 +218,40 @@ draw_logon_stuffs:
 	    logon_create_grid(); 
 	};
 	
-	
-	/*
-	 *  Client Area:
-	 *
-	 * Criar a janela gui->ClientArea.
-	 * e inicializar seus parâmtros.
-	 */
-	 
-	/* 
-	gui->ClientArea = CreateWindow( 1, 0, 0, "ClientArea", 
-	                                0, (480/8), 640, (480-(480/8)), 
-							        gui->screen, 0, 0, COLOR_WINDOW ); 
-	
-	if( (void*) gui->ClientArea == NULL){
-	    gui->ClientArea = gui->screen;
-	}else{		
-		RegisterWindow(gui->ClientArea);
-	};	 
-	 
-	*/
-	
-	
-	// Strings
-	if( (void*) CurrentUser != NULL ){
 		
+	//
+	// ## Strings ##
+	//
+	
+	if( (void*) CurrentUser != NULL )
+	{
+
+		// Obs: 
+		// As mensagens aqui são para auxiliar 
+		// o desenvolvedor no processo de inicialização.
+		//@todo: Informar o desktop atual.
+			
         if(g_guiMinimal != 1)
-		{		
-	        //
-			// Obs: 
-			// As mensagens aqui são para auxiliar o desenvolvedor no 
-			// processo de inicialização.
-			//
+		{
+            //draw_text(gui->screen, 8, 1*8, 
+			//    COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
+   			
+			draw_text( gui->main, 400 +8, 8*1, 
+			    COLOR_WHITE, "Gramado 0.1" );
+				
+			draw_text( gui->main, 400 +8, 8*2, 
+			    COLOR_WHITE, "(c) Copyright 2005-2018, Fred Nora" );
 			
-			//@todo: Informar o desktop atual.
-			
-			//draw_text(gui->main, 0, 0, COLOR_WHITE, "Logon:");
-			//draw_text(gui->main, 0, 8, COLOR_WHITE, "=============");
-			//draw_text(gui->main, 8*12, 8*5, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
-			draw_text(gui->main, 400 +8, 8*1, COLOR_WHITE, "Gramado 0.1");			
-			draw_text(gui->main, 400 +8, 8*2, 
-			          COLOR_WHITE, "(c) Copyright 2005-2018, Fred Nora");
-			draw_text(gui->main, 400 +8, 8*3, COLOR_WHITE, "(under construction)");
-			draw_text(gui->main, 400 +8, 8*4, COLOR_WHITE, "(This is the enviroment to run logon.bin)");
-			//draw_text(gui->main, 8*10, 8*12, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
-			//draw_text(gui->main, 8*10, 8*13, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
-			//draw_text(gui->main, 8*10, 8*14, COLOR_WHITE, "Welcome to Logon Desktop, press F1=START or F2=REBOOT!");
+			draw_text( gui->main, 400 +8, 8*3, 
+			    COLOR_WHITE, "(under construction) ");
+				
+			draw_text( gui->main, 400 +8, 8*4, 
+			    COLOR_WHITE, "(This is the enviroment to run logon.bin)" );
+				
 			//...
-			
+ 	        
+			//draw_text(gui->screen, 640/2, 8, COLOR_WHITE, "Press F1 to Log on");
+	
 			//Opções:
 			//StatusBar( gui->screen, "Logon", "Press F1 to start User Environment or F2 to Reboot");
 			//Message Box.
@@ -271,49 +261,36 @@ draw_logon_stuffs:
 		//Nothing.
 	};
 	
-	    //draw_text(gui->screen, 8, 1*8, COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
-		//draw_text(gui->screen, 8, 2*8, COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
-		//draw_text(gui->screen, 8, 3*8, COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
-		//draw_text(gui->screen, 8, 4*8, COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
-		//draw_text(gui->screen, 8, 5*8, COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
-	
-	//draw_text(gui->screen, 640/2, 8, COLOR_WHITE, "Press F1 to Log on");
-	
-    //StatusBar( gui->screen, "StatusBar: ", "Press F1 to Log on as default user!");
-
-
 	//Debug:
-	//printf("#debug LOGON");				   
-	//refresh_screen();
-	//while(1){}	
-	
+	//printf("#debug logon.c");				   
+	//die();
+		
 	//
-	// Depois de criado todos os elementos gráficos, vamos criar em definitivo
-	// a janela do desenvolvedor.
+	// # Done # 
 	//
 	
-//CREATING_DEVELOPER_SCREEN:
-	//logon_create_developer_screen();
-	
-	
-	//Done.
 done:
-	// Refresh. 	
-	if(gui->refresh == 1)
+
+	// # Refresh #
+ 	
+	if( gui->refresh == 1 )
 	{
 		refresh_screen();
 		gui->refresh = 0;
 	};
+	
     gui->initialised = 1;
     return;
 };
 
 
-
 /*
+ *****************************************************
  * ExitLogon:
  *     Fecha o ambeinte de logon.
  *     @todo: logonExit();
+ *     Isso pode ser chamado nas rotinas de 
+ * reboot e shutdown.
  */
 int ExitLogon()
 {					
@@ -334,9 +311,12 @@ done:
 	return (int) 0;
 };
 
+
 /*
+ ******************************************
  * SetGuiParameters:
- *     Configura a inicialização das janelas gerenciadas pelo kernel.
+ *     Configura a inicialização das janelas 
+ * gerenciadas pelo kernel.
  *     @todo: Limite de janelas (+- 10)
  *
  */
@@ -355,26 +335,29 @@ int grid             // Grid da janela principal.
 //limites ...
 )
 {
-    if( (void*) gui == NULL ){
+    if( (void*) gui == NULL )
+	{
+		//@todo:
+		//precisamos de uma mensagem de alerta.
+		printf("SetLogonParameters: fail\n");
 	    return;	
+	}else{
+		
+	    gui->refresh = refresh; 
+	    gui->screenStatus = screen;
+	    gui->backgroundStatus = background; 
+	    gui->mainStatus = main; 
+	    gui->logoStatus = logo;	
+	    gui->taskbarStatus = taskbar;
+	    gui->menuStatus = menu;
+	    gui->infoboxStatus = infobox;
+	    gui->messageboxStatus = messagebox;
+	    gui->debugStatus = debug;	
+	    gui->navigationbarStatus = navigationbar; 
+	    gui->gridStatus = grid;  
+	    //...		
+		
 	};	
-	
-	gui->refresh = refresh; 
-	gui->screenStatus = screen;
-	gui->backgroundStatus = background; 
-	gui->mainStatus = main; 
-	gui->logoStatus = logo;	
-	gui->taskbarStatus = taskbar;
-	gui->menuStatus = menu;
-	gui->infoboxStatus = infobox;
-	gui->messageboxStatus = messagebox;
-	gui->debugStatus = debug;	
-	gui->navigationbarStatus = navigationbar; 
-	gui->gridStatus = grid;  
-
-	//*Padrões	
-	
-done:
     return;
 };
 
@@ -420,7 +403,9 @@ void logon_create_screen()
 	};
 	
 done:
-    //bugbug: Não usar set focus nessa que é a primeira janela.	
+    //#bugbug: 
+	//Não usar set focus nessa que é a primeira janela.	
+	//windowLock(hWindow);
     return; 
 };
 
@@ -469,7 +454,8 @@ void logon_create_background()
 	};
 	
 done:
-    SetFocus(hWindow);	
+    SetFocus(hWindow);
+    //windowLock(hWindow);	
     return; 
 };
 
@@ -844,6 +830,7 @@ done:
 
 
 /*
+ *********************************************
  * LogonProcedure:
  *     O procedimento de janela do Logon.
  *
@@ -895,6 +882,7 @@ done:
 
 						
 /*
+ **********************************************
  * init_logon:
  *     Inicializa o Logon.
  *     Obs: Aceita argumentos.

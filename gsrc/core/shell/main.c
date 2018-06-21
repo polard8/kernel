@@ -645,9 +645,14 @@ noArgs:
 	//mensagens de input de teclado.
 	//
 	
-	if( interactive != 1 ){
-        goto skip_input;
+	if( interactive != 1 )
+	{
+		//#debug
+        printf("shell is not interactive.\n");
+		goto skip_input;
 	};
+	
+	
 	//
 	// ## Messages ##
 	//
@@ -790,7 +795,9 @@ noArgs:
 Mainloop:
     
 	// #### Test ####
-	/* ## Nesse teste vamos enviar um ponteiro de array e pegarmos os 4 elementos da mensagem ## */
+	
+	/* ## Nesse teste vamos enviar um ponteiro de array e 
+	  pegarmos os 4 elementos da mensagem ## */
 	
 	while(running)
 	{
@@ -816,143 +823,34 @@ Mainloop:
         };				
 	};
 	
-
-
-    /*
-		
-	while(running)
-	{		
-
-		//  #bugbug SYSTEMCALL_GET_KEYBOARD_MESSAGE está pegando a mensagem de teclado,
-		//          mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
-		//          qual foi o dispositivo gerador do evento. ??!!
-		
-		
-		//
-		//@todo: Nesse momento podemos enviar um ponteiro de estrutura de 
-		//mensagem para que o kernel inicialize a estrutura com a mensagem 
-		//que está na fila de mensagens dessa thread ou janela.
-		// #bugbug: Como ainda não implementamos isso, então estamos usando 
-		//um método improvisado de pegar a mensagem por partes.
-		
-		
-       enterCriticalSection(); 
-       //apiBeginPaint();
-	   
-		//msg->window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
- 		msg_Window = (struct window_d *) system_call( SYSTEMCALL_GET_HWINDOW, 
-		                              (unsigned long) hWindow,  
-									  (unsigned long) hWindow, 
-									  (unsigned long) hWindow );
-									  
-        //#bugbug ( Aqui devemos pegar a mensagem sem se preocupar em
-		//identificar o dispositivo gerador do evento.
-		//msg->msg = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE,
-        msg_Message = (int) system_call( SYSTEMCALL_GET_KEYBOARD_MESSAGE, 		
-		                              (unsigned long) hWindow,  
-									  (unsigned long) hWindow, 
-									  (unsigned long) hWindow );
-									  
-		 
-		//msg->long1 = (unsigned long) system_call( SYSTEMCALL_GET_LONG1,
-        msg_Long1 = (void*) system_call( SYSTEMCALL_GET_LONG1,		
-		                             (unsigned long) hWindow, 
-									 (unsigned long) hWindow, 
-									 (unsigned long) hWindow );
-									 
-		 
-		//msg->long2 = (unsigned long) system_call( SYSTEMCALL_GET_LONG2,
-        msg_Long2 = (void*) system_call( SYSTEMCALL_GET_LONG2,		
-		                             (unsigned long) hWindow, 
-									 (unsigned long) hWindow, 
-									 (unsigned long) hWindow );
-									 
-
-		//apiEndPaint();
-		exitCriticalSection(); 
-
-        //@todo: 
-        //if( (int) msg_Message == 0 )
-        //{
-			//não há mensagens, podemos dormir.
-			//wait(getpid());
-		//}			 
-
-        //
-        // + PEGAMOS A MENSAGEM NA FILA DA JANELA COM O FOCO DE ENTRADA.
-        //   ?? COMO DECIDIREMOS QUAL JANELA SERÁ AFETADA PELO PROCEDIMENTO 
-        //	    QUE CHAMAREMOS AGORA ??
-        //		
-		
-		// Send Message to procedure.
-		
-		//if( (int) msg->msg != 0 )
-        if( (int) msg_Message != 0 )			
-		{
-            //
-            // *IMPORTANTE:
-			//  SE TEMOS UM HANDLE DE JANELA, SIGNIFICA QUE O PROCEDIMENTO PODE 
-			//  AFETAR MAIS DE UMA JANELA. PORTANTO JANELAS FILHAS OU ATE MESMO JANELAS 
-			//  CRIADAS PELO SISTEMA PODERÃO SER AFETADAS POR ESSE PROCEDIMENTO??
-			//  @TODO: PASSAR O HANDLE DE JANELA PARA O PROCEDIMENTO.
-            //			
-		    
-			
-			//
-			// ## call procedure ##
-			//
-			
-			switch(ShellFlag)
-			{
-				// Sai do shell.
-				case SHELLFLAG_EXIT:
-				    goto end;
-					break;
-
-				// Para alimentar o terminal.
-				case SHELLFLAG_FEEDTERMINAL:
-			        feedterminalDialog( (struct window_d *) msg_Window, 
-			                            (int) msg_Message, 
-							            (unsigned long) msg_Long1, 
-							            (unsigned long) msg_Long2 );
-				    break;
-					
-				// Para utilizar a topbar.	
-				case SHELLFLAG_TOPBAR:
-			        shellTopbarProcedure( (struct window_d *) msg_Window, 
-			                              (int) msg_Message, 
-							              (unsigned long) msg_Long1, 
-							              (unsigned long) msg_Long2 );
-				    break;
-					
-				// Para os demais casos use o procedimento 
-				// do shell.
-				default:
-			        shellProcedure( (struct window_d *) msg_Window, 
-			                        (int) msg_Message, 
-							        (unsigned long) msg_Long1, 
-							        (unsigned long) msg_Long2 );				
-				    break;
-			};
-			
-			//Nothing.
-
-		};
-		
-		
-
-		
-		//Nothing.
-	};
 	
-	*/
+	
+	switch(ShellFlag)
+	{
+	    // Sai do shell.
+		case SHELLFLAG_EXIT:
+		    goto end;
+			break;
+
+		//@todo:
+        //opções ...
+		
+		// Sai do shell.	
+        default:
+            goto end;
+			break;		
+	};
+
 	
 	//
 	// Pulamos a parte que pega mensgens de input de teclado 
 	// porque esse shell não está configurado como interativo.
 	//
 	
-//RunScript:	
+//	
+// # RunScript #	
+//
+
 skip_input:	
 
     shellExecuteThisScript(argv[3]);
@@ -2839,6 +2737,14 @@ doexec_first_command:
 		// Por enquanto estamos continuando e rodando concomitantemente.
 		//
 		
+		//
+		// # Stop running #
+		//
+		
+		//Isso sai do loop de mensagens e 
+		//sai do shell elegantemente.
+		running = 0;
+		
 	    goto exit_cmp;	
 	}else{
 		// falhou. Significa que o serviço naõ conseguir encontrar 
@@ -2848,11 +2754,21 @@ doexec_first_command:
 	};
 	
 	
+	//
+	// # dobin #
+	//
+	
 	//vamos executar um programa .bin.
 	//.bin é a extensão padrão.
-	//executaremos o segundo comando, pois o primeiro é dobin.
+	//executaremos o segundo comando, pois o primeiro é ~$dobin.
 	//
 dobin:
+
+    if( is_bin( (char *) tokenList[1] ) != 1 )
+	{
+		printf("dobin: it's not a .bin filename.\n");
+		printf("dobin: fail\n");
+	};
 
     Execve_Ret = (int) shell_gramado_core_init_execve( 
 	                       (const char*) tokenList[1], 
@@ -2874,6 +2790,14 @@ dobin:
 		// plano então decemos continuar. 
 		// Por enquanto estamos continuando e rodando concomitantemente.
 		//
+		
+		//
+		// # Stop running #
+		//
+		
+		//Isso sai do loop de mensagens e 
+		//sai do shell elegantemente.
+		running = 0;
 		
 	    goto exit_cmp;	
 	}else{
@@ -2911,6 +2835,14 @@ dotry:
 		// Por enquanto estamos continuando e rodando concomitantemente.
 		//
 		
+		//
+		// # Stop running #
+		//
+		
+		//Isso sai do loop de mensagens e 
+		//sai do shell elegantemente.
+		running = 0;		
+		
 	    goto exit_cmp;	
 	}else{
 		// falhou. Significa que o serviço naõ conseguir encontrar 
@@ -2920,10 +2852,14 @@ dotry:
 	};		
 	
 	
+	//
+	// # Script #
+	//
 	
 	//um comando no shell invoca a execussão de um script 
 	//dado o nome via tokenList.
 dosh:
+
     //
 	// Vamos tentar colocar o arquivo de script no stdin 
 	// que é onde fica o prompt. Então retornaremos no 
@@ -2931,56 +2867,16 @@ dosh:
 	//
     //nothing for now.
 	//o comando [0] é o 'dosh' o [1] é o nome do script.
-    shellExecuteThisScript(tokenList[1]);	
+
+    if( is_sh1( (char *) tokenList[1] ) != 1 )
+	{
+		printf("dosh: it's not a .sh1 filename.\n");
+		printf("dosh: fail\n");
+	};
+
+    shellExecuteThisScript( tokenList[1] );	
 	goto NewCmdLine;
 	
-   //Executar um script logo na inicialização do shell	
-//dosh2:	
-//    shellExecuteThisScript(argv[1]);	
-//	goto NewCmdLine;
-
-	
-	//
-	// Se o arquivo não foi encontrado não há mais o que fazer.
-	//
-	
-	
-	//@todo: Se retornar 0 vamos para exit_cmp.
-	// caso contrário mostramos a mensagem de comando desconhecido.
-
-	
-    //shellParseFileName(); @todo
-	
-	// Se a apavra não é reservada, então talvez seja o nome de um app.
-	// Procuraremos esse app no diretório corrente.
-	//@todo: criar o ponteiro app_name
-	//while( *app_name == ' ' )
-    //    app_name++;
-
-    //@todo: Criar função, argumentos e retorno.
-    //app_return = shellExecute( app_name );
-	
-	//switch( app_return )
-	//{
-		//retorno null.
-	//	case 0:
-	//	    break;
-			
-		//@todo Criar os tipos de erro possíveis.	
-	//	case xxx:
-    //        break;
-
-        //...
-		
-	//	default:
-	//	    app_return = 0;
-    //        break;		
-	//};
-	
-	
-	// set cursor ?
-	
-	// set current directory
 	
 //
 //  ## Fail ##
@@ -5577,6 +5473,121 @@ fail:
 done:
     return;	
 }
+
+
+/* 
+This way I don't have to know whether fclose is a function or a macro. 
+Credits: bash 1.05.
+ */
+/*
+int
+stream_close( FILE *file );
+int
+stream_close( FILE *file )
+{
+     return ( fclose(file) );
+};
+*/
+
+/* 
+ Return the octal number parsed from STRING, or -1 to indicate
+ that the string contained a bad number. 
+ Credits: bash 1.05.
+ */
+/* 
+int
+read_octal( char *string );
+int
+read_octal( char *string )
+{
+    int result = 0;
+    int digits = 0;
+    
+	while( *string && 
+	       *string >= '0' && 
+		   *string < '8' )
+    {
+        digits++;
+        result = (result * 8) + *string++ - '0';
+    };
+
+    if(!digits || result > 0777 || *string)
+        result = -1;
+
+    
+done:	
+	return (result);
+};
+*/
+
+/*  Credits: bash 1.05. */
+/*
+void 
+decrement_variable( int *var );
+void 
+decrement_variable( int *var )
+{
+    *var = *var - 1;
+};
+*/
+
+
+
+
+/* Check if it's a .bin file */
+int
+is_bin( char *cmd )
+{
+    char *p;
+	
+	p = cmd;
+	
+	int len = strlen(p);
+    
+	if( len <= 4 ) 
+		return 0;
+	
+    p += len - 4;
+    
+	if( *p++ != '.' ) 
+		return 0;
+	
+    if( strncmp( (char*) p, "bin", 3 ) == 0 )
+    {
+	    return 1;	
+	}
+
+fail:	
+    return 0;
+};
+
+
+/* Check if it's a .sh1 file */
+int
+is_sh1( char *cmd )
+{
+    char *p;
+	
+	p = cmd;
+	
+	int len = strlen(p);
+    
+	if( len <= 4 ) 
+		return 0;
+	
+    p += len - 4;
+    
+	if( *p++ != '.' ) 
+		return 0;
+	
+    if( strncmp( (char*) p, "sh1", 3 ) == 0 )
+    {
+	    return 1;	
+	}
+
+fail:	
+    return 0;
+};
 
 
 

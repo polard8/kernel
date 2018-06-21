@@ -172,7 +172,8 @@ done:
 /*
  ***********************************************
  * videoInit:
- *     Inicia variáveis de video de acordo com o modo gráfico utilizado.
+ *     Inicia variáveis de video de acordo com o 
+ * modo gráfico utilizado.
  */ 
 int videoInit()
 {

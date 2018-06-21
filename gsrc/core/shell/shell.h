@@ -860,7 +860,19 @@ shell_pathname_backup( char *path, int n );
 
 //isso vai ser usado pelo echo.
 void
-shell_print_tokenList(char *token_list[], char *separator);				
+shell_print_tokenList(char *token_list[], char *separator);	
+
+
+/* Check if it's a .bin file */
+int
+is_bin( char *cmd );
+
+/* Check if it's a .sh1 file */
+int
+is_sh1( char *cmd );
+
+
+			
 //
 // End.
 //

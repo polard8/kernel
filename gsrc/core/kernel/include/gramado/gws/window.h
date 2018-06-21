@@ -2074,6 +2074,11 @@ int windowScan( unsigned long x, unsigned long y );
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 void windowUpdateWindow( struct window_d *window );
 
+
+
+//faz a janela atual entrar ou sair do modo fullscreen.
+int windowSwitchFullScreen();
+
 /*
  * CreateWindow:
  *     Cria uma janela com base em um tipo.

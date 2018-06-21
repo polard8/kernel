@@ -1,6 +1,6 @@
 /*
- * File: dialogbox.c
- *
+ * File: dbox.c
+ *     Dialog Box support. 
  * Descrição: 
  *     Gerência de caixas de diálogo.
  *     Faz parte do módulo Window Manager do tipo MB.
@@ -22,7 +22,8 @@ unsigned long DialogBoxProcedure( struct window_d *window,
 								  
 /*
  * DialogBox:
- *     Cria uma janela do tipo 3 (normal) e mostra uma mensagem.
+ *     Cria uma janela do tipo 3 (normal) e 
+ * mostra uma mensagem.
  *
  */
 void DialogBox( struct window_d *parent_window, 
@@ -33,13 +34,6 @@ void DialogBox( struct window_d *parent_window,
 	struct window_d *hWnd; 
 	struct window_d *pWnd; 
 	struct window_d *bWnd;
-	
-	//Set up.
-	//unsigned long x = (unsigned long) 800/3;	
-	//unsigned long y = (unsigned long) 600/3;
-    //unsigned long cx = (unsigned long) 800/3;
-    //unsigned long cy = (unsigned long) 600/3;
-	
 	
     //retângulo abaixo do grid.
 	
@@ -62,27 +56,39 @@ void DialogBox( struct window_d *parent_window,
 	switch(type)
 	{
 	    case 1:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, title, x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
+	        hWnd = (void*) CreateWindow( 3, 0, 0, title, 
+			                   x, y, cx, cy, 
+							   pWnd, 0, 0, COLOR_WINDOW); 
 		    break;
+			
 	    case 2:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox2", x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
+	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox2", 
+			                   x, y, cx, cy, 
+							   pWnd, 0, 0, COLOR_WINDOW); 
 	        break;
+			
 	    case 3:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox3", x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
+	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox3", 
+			                   x, y, cx, cy, 
+							   pWnd, 0, 0, COLOR_WINDOW); 
 	        break;
+			
 	    case 4:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox4", x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
+	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox4", 
+			                   x, y, cx, cy, 
+							   pWnd, 0, 0, COLOR_WINDOW); 
 	        break;
+			
 		default:
 	        //hWnd = (void*) CreateWindow( 3, 0, 0, "Error", x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
 		    break;
 	};
 	
 	// Register.
-	if( (void*) hWnd == NULL){
+	if( (void*) hWnd == NULL)
+	{
 	    printf("DialogBox: hWnd\n");
-		refresh_screen();
-	    while(1){};    //Hang.
+		die();
 	}else{
 		RegisterWindow(hWnd);
 		set_active_window(hWnd);
@@ -91,18 +97,20 @@ void DialogBox( struct window_d *parent_window,
     // String. 
 	//(@todo: Get client area rect).
 d_string:
-	draw_text( hWnd, 1*(cx/16), 4*(cy/16), COLOR_WINDOWTEXT, string);
+	draw_text( hWnd, 1*(cx/16), 4*(cy/16), 
+	    COLOR_WINDOWTEXT, string );
 
     // Button. 
     // (@todo: Get client area rect).
 d_button:	 
 	bWnd = (void*) CreateWindow( 11, 0, 0, "Close", 
 	                             2*(cx/6), 3*(cy/6), cx/4, cy/6, 
-						         hWnd, 0, 0, COLOR_BUTTONFACE); 
-	if( (void*) bWnd == NULL){
+						         hWnd, 0, 0, COLOR_BUTTONFACE );
+								 
+	if( (void*) bWnd == NULL)
+	{
 	    printf("DialogBox error: bWnd\n");
-		refresh_screen();
-	    while(1){};
+		die();
 	}else{
 	    RegisterWindow(bWnd);
         SetFocus(bWnd);		
