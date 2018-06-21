@@ -908,12 +908,65 @@ void *services( unsigned long number,
 		    windowUpdateWindow( (struct window_d *) arg2 );
 			break;
 		
-		//115 - pegar os 4 elementos da mensagem.
-		//o aplicativo envia um endereço de um vetor onde 
-		//a mensagem deve ser colocada.
+		//
+		// ## IMPORTANTE ##
+		//
+		//115 - usado por servidores do sistema 
+		//para se comunicarem com o kernel.
 		case 115:
-			return NULL;
+		    //magic 1234: acoplar taskman
+			if( arg3 == 1234 ){
+				current_taskman_server = (int) arg4;
+				printf("115: acoplando ...\n");
+				refresh_screen();
+                return NULL; 				
+			}
+		    //magic 4321: desacoplar taskman
+			if( arg3 == 1234 )
+			{
+				if( current_taskman_server == arg4 ){
+				    current_taskman_server = (int) 0;
+				    printf("115: desacoplando ...\n");
+				    refresh_screen();
+				    return NULL;
+				} 
+			}
+		    //magic 12345678: pegar mensagem
+			if( arg3 == 12345678 )
+			{
+				if( current_taskman_server == arg4 )
+				{
+					if( gui->taskmanWindow->newmessageFlag == 0 )
+					{
+			            message_address[0] = (unsigned long) 0;
+			            message_address[1] = (unsigned long) 0; //*importante: mensagem nula.
+			            message_address[2] = (unsigned long) 0;
+			            message_address[3] = (unsigned long) 0;
+					    gui->taskmanWindow->newmessageFlag = 0;
+                        return NULL;						
+					}
+					//se existe uma mensagem na janela do servidor taskman.
+					if( gui->taskmanWindow->newmessageFlag == 1 )
+					{
+			            message_address[0] = (unsigned long) gui->taskmanWindow->msg_window;
+			            message_address[1] = (unsigned long) gui->taskmanWindow->msg; //temos uma mensagem.
+			            message_address[2] = (unsigned long) gui->taskmanWindow->long1;
+			            message_address[3] = (unsigned long) gui->taskmanWindow->long2;
+					    gui->taskmanWindow->newmessageFlag = 0;
+						return NULL;
+					};
+				}
+			};
 			break;
+			
+		//envia uma mensagem de teste para o servidor taskman	
+		case 116:
+	        gui->taskmanWindow->msg_window = NULL;
+		    gui->taskmanWindow->msg = 123; //temos uma mensagem.
+		    gui->taskmanWindow->long1 = 0;
+		    gui->taskmanWindow->long2 = 0;
+            gui->taskmanWindow->newmessageFlag = 1;				
+		    break;
 			
 		//119
 		case SYS_SELECTCOLORSCHEME:

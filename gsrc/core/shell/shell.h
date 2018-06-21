@@ -23,6 +23,27 @@
 
 
 
+//
+// # env. support # 
+//
+
+//home directory of the present user.
+#define ENV_HOME "HOME"
+
+//login name
+#define ENV_USER "USER"
+#define ENV_LOGNAME "LOGNAME"
+
+//the language she would like to see messages
+#define ENV_LANG "LANG"
+
+//the default printer to be used
+#define ENV_PRINTER "PRINTER"
+#define ENV_LPDEST "LPDEST"
+
+//the local time zone
+#define ENV_TZ "TZ"
+
 
 
 //

@@ -533,6 +533,37 @@ doDebug:
 	
 	printf("OK\n");
 	
+	//
+	// ## Criando a janela do servidor taskman ## 
+	// usada para comunicação.
+	//
+	
+	gui->taskmanWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "taskman-server-window", 
+	                             1, 1, 1, 1,           
+							     gui->main, 0, 0, COLOR_WINDOW  ); 
+								 
+	if( (void *) gui->taskmanWindow == NULL )
+	{
+		printf("kMain: falaha ao criar a janela do servidor taskman\n");
+		die();
+	}else{
+		
+		//inicializando a primeira mensagem
+		////envia uma mensagem de teste para o servidor taskman
+	    gui->taskmanWindow->msg_window = NULL;
+		gui->taskmanWindow->msg = 0; //temos uma mensagem.
+		gui->taskmanWindow->long1 = 0;
+		gui->taskmanWindow->long2 = 0;
+        gui->taskmanWindow->newmessageFlag = 0;		
+		
+	    //gui->taskmanWindow->msg_window = NULL;
+		//gui->taskmanWindow->msg = 123; //temos uma mensagem.
+		//gui->taskmanWindow->long1 = 0;
+		//gui->taskmanWindow->long2 = 0;
+        //gui->taskmanWindow->newmessageFlag = 1;		
+		
+	};
+	
 	//#debug
 	//extern unsigned long code_begin;
 	//extern unsigned long code_end;

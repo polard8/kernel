@@ -7,6 +7,17 @@
  *     2018 - Created by Fred Nora.
  */
  
+//"global command" stuff 
+#define glob_percent_sign '%' 
+#define glob_underscore '_'
+#define glob_square_brackets_left '['
+#define glob_square_brackets_right ']'
+#define glob_caret '^'
+#define glob_asterisk '*'
+#define glob_number_sign '#'
+#define glob_question_mark '?'
+//... 
+ 
  
 #define SHELL_TERMINAL_COLOR 0
 #define SHELL_TERMINAL_COLOR2 0x303030

@@ -1372,8 +1372,10 @@ done:
 
 
 /*
+ ******************************
  * shellWaitCmd:
- *     Espera completar o comando com um [ENTER]. ##suspensa
+ *     Espera completar o comando 
+ * com um [ENTER]. ##suspensa
  */
 void shellWaitCmd()
 {
@@ -2579,6 +2581,14 @@ do_compare:
 		shellTaskList();
         goto exit_cmp;
     };	
+	
+	
+    //test-taskman-server - testando servidor taskman
+	if( strncmp( prompt, "test-taskman-server", 19 ) == 0 )
+	{
+        system_call( 116,0,0,0);
+        goto exit_cmp;
+	};	
 	
 	// time
 	if( strncmp( prompt, "time", 4 ) == 0 )

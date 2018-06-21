@@ -4,6 +4,9 @@
  */
  
  
+int current_taskman_server; 
+ 
+ 
 int init_executive();
 
 

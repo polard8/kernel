@@ -60,6 +60,8 @@
 // Variáveis internas.
 //
 
+int listening = 1;
+
 int taskmanagerStatus;
 int taskmanagerError;
 
@@ -497,10 +499,46 @@ int appMain(int argc, char *argv[])
 	void *P;
     struct window_d *hWindow;
 	
-	//#debug 
-	// ## suspenso ##
-	// Isso funciona mas está atrapalhando.
-	//printf("\n# taskman.bin lives #\n");
+
+	
+	//buffer de mensagens.
+	
+	unsigned long buffer[5];
+	
+    //@todo:
+    //+pegar o id do processo e chamar uma rotina 
+    //para inicializar o processo como o 
+    //servidor de gerenciamento de tarefas.
+    //obs: o kernel registrará o servidor de grenciamento de 
+    //de tarefas, e apenas um gerenciador de tarefas poderá existir.
+    //
+
+	// ## IMPORTANTE ##
+    //115
+    //esse é o serviço usado pelos servidores 
+    //para dialogar com o kernel.
+    //
+	//
+	
+	
+	printf("taskman: inicializando servidor ...\n");
+	
+	//o kernel deverá associar o PID a um magic.
+	
+	int PID;
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
+	
+	enterCriticalSection(); 
+	system_call(115,                 
+	    (unsigned long) &buffer[0], //ponteiro para o vetor de mensagem.  
+		(unsigned long) 1234,       //acoplar taskman.  
+		(unsigned long) PID );      //magic para taskman.
+	exitCriticalSection(); 	
+
+    //reason?	
+	//O servidor chamará o kernel para se acoplar 
+	//e para se desacoplar..
+	//
 	
 	//
 	// #debug 
@@ -508,30 +546,43 @@ int appMain(int argc, char *argv[])
 	// só estamos tirando ele para não incomodar
 	// enquanto trabalhamos no outro aplicativo.
 	//
+
 	
-	unsigned long buffer[5];
+	//O servidor vai solicitar mensagens para o kernel 
+	//e indicar o número do seu processo.
+	//se o número do processo for um nómeo registrado na lista 
+	//de servidores, então o kernel coloca a mensagem 
+	//no vetor passado pelo servidor.
 	
-	while(1)
+	
+	while(listening)
 	{
 		
 		//pega uma mensagem com 4 elementos.
 		enterCriticalSection(); 
-		system_call(111, 
-		    (unsigned long) &buffer[0], 
-			(unsigned long) &buffer[0], 
-			(unsigned long) &buffer[0] );
+		system_call(115,                 //Número do serviço invocado pelo servidor
+		    (unsigned long) &buffer[0],        
+			(unsigned long) 12345678,    //magic para pegar mensagens.          
+			(unsigned long) PID );       //PID do taskman.      
 		exitCriticalSection(); 
 			
 			
-		if( buffer[0] == 1 &&  
-		    buffer[1] == 2 &&
-			buffer[2] == 3 &&
-			buffer[3] == 4 )
+		//msg. Se existe uma mensagem válida.	
+		if( buffer[1] != 0  )
 		{
 			//isso funcionou.
 			//printf(".");
-		}
-		
+		    //tmProc( int junk, int message, unsigned long long1, unsigned long long2 );	
+
+            //# mensagem de teste #
+
+			if(  buffer[1] == 123  )
+			{
+				printf("Hello from server PID={%d}", PID);
+				refresh_screen();
+			};
+		};		
+				
 		//asm("pause");
 		cpu_relax();
 		pause();
@@ -542,8 +593,8 @@ int appMain(int argc, char *argv[])
 		pause();
 		pause();
 		pause();
-		exit(0);
-	}
+		//exit(0);
+	};
 
     //
 	// Opção: Tratar os argumentos recebidos.

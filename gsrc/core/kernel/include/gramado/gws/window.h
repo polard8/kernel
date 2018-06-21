@@ -1663,6 +1663,16 @@ struct gui_d
 	//Seja ele de qual tipo for.
 	struct menu_d *currentMenu;       //Current. Para outros ambiente.
 	
+	
+	//
+	// #taskman server.#
+	//
+	
+	//janela usada pelo servidor taskman para 
+	//se comunicar com o kernel.
+	struct window_d *taskmanWindow;     //server 
+	struct window_d *taskmanClientWindow; //client
+	
 	//
 	// Shell.
 	//
@@ -1675,8 +1685,8 @@ struct gui_d
 	// Assim como as aplicações e janelas de diálogo do sistema, 
 	// poderão ser exibidas dentro e fora da janela de cliente do shell.
 	//
-	struct window_d *shellWindow;
-	struct window_d *shellClientWindow;
+	struct window_d *shellWindow;      //server 
+	struct window_d *shellClientWindow; //client
 	
 	
 	//Informações sobre a tela.

@@ -217,11 +217,11 @@
 #define	SYS_114 114
 
 //outros.
-
-//115 - o aplicativo envia um endereço de vetor 
-//para colocarmos os 4 elementos da mensagem
-//window.msg.long1.long2
-#define	SYS_115 115  //  ## message  ## 
+//#importante 
+//115 usado pelos servidores para se comunicarem com o kernel.
+#define	SYS_115 115  
+//116 testando servidor
+////envia uma mensagem de teste para o servidor taskman
 #define	SYS_116 116
 #define	SYS_117 117
 
