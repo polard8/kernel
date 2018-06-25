@@ -1,6 +1,0 @@
-
-IRP - I/O request packet.
-
-
-   @todo: Aprender sobre formas de enviar argumentos
-          e dados para o kernel quando se faz uma sytemcall.

@@ -11,13 +11,6 @@
 <br>(c) Copyright 2018 - Fred Nora.
 
 <br>
-<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado-gui.png">
-<br>
-<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gui.png">
-<br>
-<img src="https://github.com/frednora/gramado/blob/master/gdocs/2018/scrshots/gramado2.png">
-
-<br>
 <br><b>// Compilation process:</b>
 <br>I'm using a .bat file on Windows platform.
 <br>Check the file make-kernel.bat.
@@ -34,10 +27,9 @@
 
 <br>
 <br><b>// Folders:</b>
-<br>/gbuilt  = Built support.
-<br>/gdocs   = Docs.
-<br>/gsdk    = SDK.
-<br>/gsrc    = source code.
+<br>/include  = Headers.
+<br>/k        = Source.
+
 
 <br>
 <br>@frednora

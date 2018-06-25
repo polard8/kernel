@@ -1,1 +1,0 @@
-"Bad, bad server. No donut for you!"
