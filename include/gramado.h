@@ -28,7 +28,8 @@
 
 
 // ## Kernel version. ##
-#define KERNEL_VERSION "0.1"
+#define KERNEL_VERSION "0.2"
+#define KERNEL_VERSION_NAME "Mile 2"
 
 #endif
 

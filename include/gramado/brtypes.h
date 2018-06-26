@@ -2,12 +2,11 @@
 // brtypes.h 
 // Defines some tropical and exotic types.
 //
-// spiritual quote:
+// Spiritual quote:
 // " This is just for fun. "
 //
 
 #ifndef _BRTYPES_
-
 #define _BRTYPES_
 
 #define FUNK ((void*)0)

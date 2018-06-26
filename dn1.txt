@@ -1,0 +1,7 @@
+ 
+ Design note 1.
+
+
+ @todo: 
+     +Shared heap walker.
+     A heap of shared memory for dinamic allocation. 

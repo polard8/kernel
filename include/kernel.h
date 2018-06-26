@@ -132,6 +132,7 @@ extern void do_executa_new_task();
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <iso646.h>
 #include <signal.h>
 //...

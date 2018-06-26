@@ -91,6 +91,14 @@ echo ~{ ux2 /execve
 	rem /execve
 	gcc -c k/execve/execve.c  -I./include -o execve.o	
 	
+	
+	rem crts
+	rem /execve/crts/libc
+    gcc -c k/execve/crts/libc/ctype.c  -I./include -o ctype.o	
+	gcc -c k/execve/crts/libc/stdlib.c -I./include -o stdlib.o
+	gcc -c k/execve/crts/libc/stdio.c  -I./include -o stdio.o
+    gcc -c k/execve/crts/libc/string.c -I./include -o string.o	
+	
 	rem services - System Call Interface.  
     gcc -c k/execve/sci/services.c  -I./include -o services.o		
 	
@@ -133,18 +141,6 @@ echo ~{ ux2 /execve
 	
 	rem tty
     gcc -c k/execve/dd/tty/tty.c -I./include -o tty.o		
-	
-	rem uitm
-	rem /execve/uitm/libk
-    gcc -c k/execve/dd/uitm/libk/misc.c   -I./include -o misc.o	
-	
-	rem uitm
-	rem /execve/uitm/libc
-	gcc -c k/execve/dd/uitm/libc/stdlib.c -I./include -o stdlib.o
-	gcc -c k/execve/dd/uitm/libc/stdio.c  -I./include -o stdio.o
-    gcc -c k/execve/dd/uitm/libc/string.c -I./include -o string.o
-	
-	rem uigm Nothing for now.	
 		
 	rem sm
 	rem /execve/sm/disk
@@ -304,7 +300,7 @@ disk.o ^
 volume.o ^
 fs.o ^
 vfs.o ^
-misc.o ^
+ctype.o ^
 request.o ^
 info.o ^
 signal.o ^
