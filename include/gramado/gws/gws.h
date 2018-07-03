@@ -1,6 +1,7 @@
 
 
-// gramado.h - 
+// gws.h - 
+
 // ## GWS - Gramado Window Server ##
 
 

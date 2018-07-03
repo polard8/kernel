@@ -1,5 +1,5 @@
 /*
- * File: gramado\gui\char.c
+ * File: gws\gws\char.c
  *
  * Descrição:
  *     Constrói caractere em modo gráfico.
@@ -220,7 +220,7 @@ done:
  * draw_char:
  *     Constrói um caractere 8x8 no buffer.
  *     Desenha um caractere e pinta o pano de fundo.
- */
+ */ 
 void draw_char( unsigned long x, 
                 unsigned long y,  
 				unsigned long c,
@@ -231,7 +231,8 @@ void draw_char( unsigned long x,
     int y2;
     unsigned char bit_mask = 0x80;	
     char *work_char;  
-    struct window_d *hWindow;			
+    struct window_d *hWindow;
+
 	  
     //
 	// Window Terminal.
@@ -352,22 +353,14 @@ void draw_char( unsigned long x,
 
         for( x2 = 0; x2 < gcharWidth; x2++ )
         {
-			//
-			// @todo: o nome dessa rotina de putpixel será mudado.
-			//
-			
-			//putpixel( glyph[cy] & mask[cx] ? fgcolor: bgcolor, x+cx, y+cy-12 );
-			
+				
 			//Put pixel.
 			my_buffer_put_pixel( *work_char & bit_mask ? fgcolor: bgcolor, 
 			                     x + x2, 
 								 y, 
 								 0 );
-            bit_mask = (bit_mask >> 1); 								 
 			
-            //if( (*work_char & bit_mask) )
-            //    my_buffer_put_pixel(color, x + x2, y, 0);  //Put pixel.
-            //    bit_mask = (bit_mask >> 1);                //Rotate bitmask.
+            bit_mask = (bit_mask >> 1); 								 
         };
 		
 		y++;            //Próxima linha da 8 linhas do caractere.

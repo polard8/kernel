@@ -1,30 +1,29 @@
 
-
 // ctype.h
 
 
-// Style.
-#define	_U	01    /* Upper */
-#define	_L	02    /* Lower */
-#define	_N	04    /* Number */
-#define	_S	010   /* Space */
-#define _P	020   /* Punct */
-#define _C	040   /* Control */
-#define _X	0100  /* X digit */
-#define	_B	0200  /* Blank */
+/*gramado */
+#define _C	0x01   /* Control */
+#define	_U	0x02   /* Upper */
+#define	_L	0x04   /* Lower */
+#define	_D	0x08   /* dígito digit[0-9] */
+#define _X	0x10   /* X digit */
+#define _P	0x20   /* Punct */
+#define	_S	0x40   /* Space  white space (space/lf/tab) */
+#define	_B	0x80   /* Blank  hard space (0x20) */
+
 
 
 //Apelidos para as letras.
 #define _UPPER   _U  //letra maiúscula
 #define _LOWER   _L  //letra minúscula.
-#define _DIGIT   _N   //dígito digit[0-9]
+#define _DIGIT   _D   //dígito digit[0-9]
 #define _SPACE   _S  // \n \r \t
 #define _PUNCT   _P  /* punctuation */
 #define _CONTROL _C	 /* control character */
 #define _HEX     _X  /* hexadecimal digit */
 #define _BLANK   _B  /* space char */
 //.
-#define	_D _N
 
 
 
@@ -43,13 +42,13 @@ extern char _ctype_[];
 #define	__isalpha(c)   ((_ctype_+1)[c]&(_U|_L))
 #define	__isupper(c)   ((_ctype_+1)[c]&_U)
 #define	__islower(c)   ((_ctype_+1)[c]&_L)
-#define	__isdigit(c)   ((_ctype_+1)[c]&_N)
-#define	__isxdigit(c)  ((_ctype_+1)[c]&(_N|_X))
+#define	__isdigit(c)   ((_ctype_+1)[c]&_D)
+#define	__isxdigit(c)  ((_ctype_+1)[c]&(_D|_X))
 #define	__isspace(c)   ((_ctype_+1)[c]&_S)
 #define __ispunct(c)   ((_ctype_+1)[c]&_P)
-#define __isalnum(c)   ((_ctype_+1)[c]&(_U|_L|_N))
-#define __isprint(c)   ((_ctype_+1)[c]&(_P|_U|_L|_N|_B))
-#define __isgraph(c)   ((_ctype_+1)[c]&(_P|_U|_L|_N))
+#define __isalnum(c)   ((_ctype_+1)[c]&(_U|_L|_D))
+#define __isprint(c)   ((_ctype_+1)[c]&(_P|_U|_L|_D|_B))
+#define __isgraph(c)   ((_ctype_+1)[c]&(_P|_U|_L|_D))
 #define __iscntrl(c)   ((_ctype_+1)[c]&_C)
 #define __isascii(c)   ((unsigned)(c)<=0177)
 #define __toupper(c)   ((c)-'a'+'A')
@@ -62,16 +61,14 @@ extern char _ctype_[];
 // # intermediário #
 //
 
-//#define _isdigit(x) (TABLE[x] & 1)
-//#define _isdigit(x) ((x) >= '0' && (x) <= '9') 
-//#define _isascii(c) (((unsigned) c)<=0x7f)
-//#define _toascii(c) (((unsigned) c)&0x7f)
-//#define _isascii(_c)	( (unsigned)(_c) < 0x80 )
-//#define _toascii(_c)	( (_c) & 0x7f )
+//#define _isdigit(c) ((_ctype_+1)[c]&_D)
+#define _isdigit(c) ((c) >= '0' && (c) <= '9') 
+#define _isascii(c) (((unsigned) c)<=0x7f)
+#define _toascii(c) (((unsigned) c)&0x7f)
+//#define _isascii(c)	( (unsigned)(c) < 0x80 )
+//#define _toascii(c)	((c) & 0x7f )
 //#define _isascii(c)	(((c) & ~0x7f) == 0)	/* If C is a 7 bit value.  */
 //#define _toascii(c)	((c) & 0x7f)		/* Mask off high bits.  */
-//#define _isascii(c)	(((c) & ~0x7F) == 0)
-//#define _toascii(c)	((c) & 0x7F)
 
 //letter in ascci
 //if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'))
@@ -83,48 +80,58 @@ extern char _ctype_[];
 
 //Sr.No.	Function & Description
 //1	
-//int isalnum(int c);
 //This function checks whether the passed character is alphanumeric.
+int isalnum(int c);
+
 
 //2	
-//int isalpha(int c);
 //This function checks whether the passed character is alphabetic.
+int isalpha(int c);
+
 
 //3	
-//int iscntrl(int c);
 //This function checks whether the passed character is control character.
+int iscntrl(int c);
+
 
 //4	
-//int isdigit(int c);
 //This function checks whether the passed character is decimal digit.
+int isdigit(int c);
+
 
 //5	
-//int isgraph(int c);
 //This function checks whether the passed character has graphical representation using locale.
+int isgraph(int c);
+
 
 //6	
-//int islower(int c);
 //This function checks whether the passed character is lowercase letter.
+int islower(int c);
 
 //7	
-//int isprint(int c);
 //This function checks whether the passed character is printable.
+int isprint(int c);
+
 
 //8	
-//int ispunct(int c);
 //This function checks whether the passed character is a punctuation character.
+int ispunct(int c);
+
 
 //9	
-//int isspace(int c);
 //This function checks whether the passed character is white-space.
+int isspace(int c);
+
 
 //10	
-//int isupper(int c);
 //This function checks whether the passed character is an uppercase letter.
+int isupper(int c);
+
 
 //11	
-//int isxdigit(int c);
 //This function checks whether the passed character is a hexadecimal digit.
+int isxdigit(int c);
+
 
 
 

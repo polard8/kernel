@@ -154,6 +154,9 @@ kernel fica com o 1GB superior."
  
  
  
+#define PAGE_SIZE 4096 
+ 
+ 
  //
  // **  ENDEREÇOS DOS PRINCIPAIS PAGE DIRECTORIES **
  //
@@ -257,6 +260,7 @@ unsigned long systemzoneSize;
 unsigned long windowzoneStart;
 unsigned long windowzoneEnd;    //?? Devemos levar em consideração o calculo do tamanho da memória
 unsigned long windowzoneSize;
+
 //
 // tables support
 //
@@ -562,8 +566,6 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //Contagem de mmblock. 
 #define MMBLOCK_COUNT_MAX  (2*4096)
  
- 
-#define PAGE_SIZE 0x1000    //4096.
 
 //
 // Size support.

@@ -38,9 +38,11 @@
  *     2014~2018 - Resision.
  */
 
+/* Configuração de produto */ 
+#include <gramado/gramado.h> 
  
-#include <gramado.h> 
- 
+/* Configuração de compilação */ 
+#include <gramado/config.h> 
 
 // Global definitions.
 // This must be on top.

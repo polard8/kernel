@@ -70,16 +70,16 @@ char _ctype_[1 + 256] = {
 	_P,	//45 -
 	_P,	//46 .
 	_P, //47 /
-	_N,	//48  0 (dígito) Número
-	_N,	//49
-	_N,	//50
-	_N,	//51
-	_N,	//52
-	_N,	//53
-	_N,	//54
-	_N, //55 
-	_N,	//56
-	_N,	//57
+	_D,	//48  0 (dígito) Número
+	_D,	//49
+	_D,	//50
+	_D,	//51
+	_D,	//52
+	_D,	//53
+	_D,	//54
+	_D, //55 
+	_D,	//56
+	_D,	//57
 	_P,	//58 :
 	_P,	//59 ;
 	_P,	//60 <
@@ -279,6 +279,94 @@ char _ctype_[1 + 256] = {
 0, //254
 0 //255
 };
+
+
+/*
+unsigned char __tolower(unsigned char c) {
+  if (isupper(c)) {
+    c -= 'A' - 'a';
+  }
+
+  return c;
+}
+
+unsigned char __toupper(unsigned char c) {
+  if (islower(c)) {
+    c -= 'a' - 'A';
+  }
+
+  return c;
+}
+*/
+
+
+int isalnum(int c)
+{
+	return (int) __isalnum(c);
+}
+
+
+int isalpha(int c)
+{
+	return (int) __isalpha(c);	
+}
+
+int iscntrl(int c)
+{
+	return (int) __iscntrl(c);		
+}
+
+
+int isdigit(int c)
+{
+	return (int) __isdigit(c);			
+}
+
+
+int isgraph(int c)
+{
+	return (int) __isgraph(c);	
+}
+
+
+int islower(int c)
+{
+	return (int) __islower(c);		
+}
+
+
+int isprint(int c)
+{
+	return (int) __isprint(c);			
+}
+
+
+int ispunct(int c)
+{
+	return (int) __ispunct(c);	
+}
+
+
+int isspace(int c)
+{
+	return (int) __isspace(c);		
+}
+
+
+
+int isupper(int c)
+{
+	return (int) __isupper(c);		
+}
+
+
+
+int isxdigit(int c)
+{
+	return (int) __isxdigit(c);		
+}
+
+
 
 
 //

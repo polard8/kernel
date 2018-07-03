@@ -1,16 +1,25 @@
 /*
- * File: scheduler.h
+ * File: sched\sched.h
  *
  * Descrição:
  *     Header do scheduler. 
  *     Parte do módulo microkernel do kernel base.
  *
  * @todo: 
- *     Fazem sentido estarem aqui todos os manipuladores de estado da thread ?
+ *     Fazem sentido estarem aqui todos os manipuladores de 
+ * estado da thread ?
  *
- * Versão: 1.0, 2015.
+ * Obs: Esse modo deve estar associado ao sistema de arquivos
+ * e ao gerenciador de memória.
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
+ 
+//#define NR_TASKS ??
+//#define FIRST_TASK ?
+//#define LAST_TASK ? 
 
 //Status do scheduler.
 #define LOCKED   0                            

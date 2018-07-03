@@ -1,5 +1,5 @@
 /*
- * File gws.h
+ * File ws.h
  *     GWS - Gramado Window Server
  *
  * Esse é o principal header do gws, preferenciamente
