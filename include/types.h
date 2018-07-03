@@ -12,6 +12,47 @@
 #define FALSE 0
 #define TRUE 1
 
+/* Void */
+typedef void VOID; 
+ 
+/* Basics */
+typedef char  CHAR;
+typedef short SHORT;
+typedef int INT;        //32bit
+typedef long  LONG;     //32bit
+
+
+/* Unsigned Basics */
+typedef unsigned char  UCHAR;
+typedef unsigned short USHORT;
+typedef unsigned int   UINT;      //32bit
+typedef unsigned long  ULONG;     //32bit
+
+/* sysv - unix system v */
+typedef unsigned char   unchar;
+typedef unsigned short  ushort;
+typedef unsigned int    uint;
+typedef unsigned long   ulong;
+
+/* bsd */
+typedef unsigned char   u_char;
+typedef unsigned short  u_short;
+typedef unsigned int    u_int;
+typedef unsigned long   u_long;
+
+
+/* bsd - Basic integral types. */ 
+typedef char            int8_t;
+typedef unsigned char   uint8_t;
+typedef short           int16_t;
+typedef unsigned short  uint16_t;
+typedef int             int32_t;
+typedef unsigned int    uint32_t;
+//typedef	long long		  int64_t;
+//typedef	unsigned long long	u_int64_t;
+
+
+
 
 //
 // System types.
@@ -29,8 +70,8 @@
 //
 
 //tipo array de strings
-typedef char ** poll;
-typedef char ** POLL;
+typedef char **poll;
+typedef char **POLL;
 
 //array de unsigned longs contendo ponteiros 
 //para pools de strings;
@@ -56,51 +97,30 @@ typedef void *HMENU;               //Menu.
 //...
 
 
-
-
-/*
- *  Void
- */
-typedef void VOID; 
- 
-
-/*
- *  Basics
- */
-typedef char  CHAR;
-typedef short SHORT;
-typedef int INT;        //32bit
-typedef long  LONG;     //32bit
-
-
-/*
- *  Unsigned Basics
- */
-typedef unsigned char  UCHAR;
-typedef unsigned short USHORT;
-typedef unsigned int   UINT;      //32bit
-typedef unsigned long  ULONG;     //32bit
-
-
-
+//??
 typedef	unsigned long  vm_offset_t;
 typedef	unsigned long  vm_size_t;
 
-/*
- * Basic integral types.
- * (BSD style)
- *
- */ 
- 
-typedef char  int8_t;
-typedef unsigned char  uint8_t;
-typedef short  int16_t;
-typedef unsigned short  uint16_t;
-typedef int  int32_t;
-typedef unsigned int  uint32_t;
-//typedef	long long		  int64_t;
-//typedef	unsigned long long	u_int64_t;
 
+/* 
+ Process IDentifier 
+ linux,  
+ */
+typedef int pid_t; 
+
+
+/* 
+ Parent Process IDentifier 
+   
+ */
+typedef int ppid_t;
+
+
+/* 
+ Thread IDentifier 
+ linux,  
+ */
+typedef int tid_t; 
 
 //
 // End

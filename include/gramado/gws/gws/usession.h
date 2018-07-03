@@ -37,7 +37,6 @@ unsigned long usersession_start;
  * User section structure (u.session)
  * 
  */ 
-typedef struct usession_d usession_t; 
 struct usession_d
 {
 	object_type_t objectType;
@@ -101,9 +100,9 @@ struct usession_d *usession0;
 //
 
 // Lista encadeada de user section.
-usession_t *usession_Conductor2;
-usession_t *usession_Conductor;
-usession_t *usession_rootConductor;
+struct usession_d *usession_Conductor2;
+struct usession_d *usession_Conductor;
+struct usession_d *usession_rootConductor;
 
 unsigned long usessionList[USER_SESSION_COUNT_MAX];
 

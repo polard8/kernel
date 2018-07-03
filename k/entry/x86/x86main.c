@@ -83,7 +83,10 @@ char copyright[] =
  *     2016~2018 - Revision.
  *     ...
  */
-int kMain(int argc, char* argv[])
+int
+kMain (argc, argv)
+    int argc;
+    char **argv;
 {
     int Status = 0;
 

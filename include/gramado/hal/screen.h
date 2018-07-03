@@ -27,10 +27,7 @@
 //#define SCREEN_START 0x000B8000   //Físico.
 #define SCREEN_START 0x800000       //Virtual.(remapeado pelo Boot Loader.)    
 #define ScreenStart SCREEN_START
-#define COLUMNS 80
-#define SCREEN_WIDTH COLUMNS
-#define ROWS 25
-#define SCREEN_HEIGHT ROWS
+
 
 
 #define SCREEN_CGA_START 0x800000  //FISICO= B8000.

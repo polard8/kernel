@@ -137,9 +137,35 @@ extern void do_executa_new_task();
 #include <ctype.h>
 #include <iso646.h>
 #include <signal.h>
+#include <unistd.h>
 //...
 //--
 
+
+//
+// ## hardware ## 
+//
+
+#include <sharedhw/intel.h>
+#include <sharedhw/memory.h>
+#include <sharedhw/pci.h>
+#include <sharedhw/cpuid.h>
+#include <sharedhw/screen.h>
+#include <sharedhw/video.h>
+#include <sharedhw/rtc.h>
+//...
+
+//
+// ## shared ## 
+//
+
+#include <sharedsw/brtypes.h>
+#include <sharedsw/fonts.h>
+#include <sharedsw/ascii.h>     //ascii table 
+#include <sharedsw/fs.h> 
+#include <sharedsw/prompt.h>
+#include <sharedsw/bmp.h>
+//...
 
 //
 // MICROKERNEL (3)
@@ -180,7 +206,7 @@ extern void do_executa_new_task();
 #include <gramado/execve/dd/unb/floppy.h>       //floppy   ( South bridge).
 #include <gramado/execve/dd/unb/keyboard.h>     //irq1     ( South bridge).   //keyboard
 
-#include <gramado/execve/dd/unb/ascii.h>     //ascii table 
+
 #include <gramado/execve/dd/unb/vk.h>         //virtual keys
 #include <gramado/execve/dd/unb/abnt2.h> 
 #include <gramado/execve/dd/unb/ldisc.h>        //ldisc
@@ -250,7 +276,6 @@ extern void do_executa_new_task();
 #include <gramado/gws/gws/menu.h>
 #include <gramado/gws/gws/grid.h>
 #include <gramado/gws/gws/bmp.h>
-#include <gramado/gws/gws/fonts.h>
 #include <gramado/gws/gws/guiconf.h>  //*principal.
 
 // gramado/user
@@ -320,9 +345,6 @@ extern void do_executa_new_task();
 //Cursor support.
 #include <gramado/cursor.h>
 
-//Prompt support.
-#include <gramado/prompt.h>
-
 //Kernel request support.
 #include <gramado/request.h>
 
@@ -335,8 +357,6 @@ extern void do_executa_new_task();
 
 //system signals. (SS)
 #include <gramado/ss.h>
-
-#include <gramado/brtypes.h>
 
 
 #include <gramado/events.h>
@@ -551,7 +571,6 @@ char KernelLogBuffer[512];
  * ring0_exported_d:
  *  Pointers to export tables.
  */
-typedef struct ring0_exported_d ring0_exported_t;
 struct ring0_exported_d
 {
     unsigned long bm_exported;    //Boot Manager exported functions.
@@ -559,11 +578,10 @@ struct ring0_exported_d
     unsigned long bk_exported;    //Kernel exported functions.
     //... 
 };
-ring0_exported_t *ring0_exported;
+struct ring0_exported_d *ring0_exported;
 
 
 //node od a linked list.
-typedef struct node_d node_t;
 struct node_d
 {
     void *data;
@@ -579,7 +597,6 @@ struct node_d
 
 
 //Linked list support.
-typedef struct linkedlist_d linkedlist_t;
 struct linkedlist_d
 {
     struct node_d *head;
@@ -588,7 +605,6 @@ struct linkedlist_d
 
 
 //save args support. 
-typedef struct kernel_args_d kernel_args_t;
 struct kernel_args_d
 {
     unsigned long arg1;
@@ -596,11 +612,10 @@ struct kernel_args_d
     unsigned long arg3;
     unsigned long arg4;
 }; 
-kernel_args_t KernelArgs;
+struct kernel_args_d KernelArgs;
 
 
 //system classes.
-typedef struct system_classes_d system_classes_t;
 struct system_classes_d
 {
     //unsigned long Gramado; //@todo: Include this one.
@@ -608,22 +623,20 @@ struct system_classes_d
     unsigned long Microkernel;
     unsigned long Hal;
 };
-system_classes_t SystemClasses;
+struct system_classes_d SystemClasses;
 
 
 //Kernel classes.
-typedef struct kernel_classes_d kernel_classes_t;
 struct kernel_classes_d
 {
     struct system_classes_d *System;
     //..
 };
-kernel_classes_t KernelClasses;
+struct kernel_classes_d KernelClasses;
 //...
 
 
 //Kernel Manager.
-typedef struct kernel_d kernel_t;
 struct kernel_d
 {
     //
@@ -660,17 +673,17 @@ struct kernel_d
 
     //...
 };
-kernel_t *KernelInfo; 
+struct kernel_d *KernelInfo; 
 //...
 
 
 /*
+ **********************************************************
  * plataform_d:
  *     Os componentes básicos da máquina.
  *     As estruturas de Hardware e Software.
  *     * IMPORTANTE Essa é a estrutura BASE do kernel.
  */
-typedef struct platform_d platform_t;
 struct platform_d
 {
     //Name.
@@ -691,15 +704,15 @@ struct platform_d
     //kernel struct ...
     struct kernel_d *Kernel;
 };
-platform_t *Platform; 
+struct platform_d *Platform; 
 
 
 //
-// main function.
+// ## MAIN ##
 //
 
 
-int kMain(int argc, char* argv[]);
+int kMain( int, char** );
 
 
 //

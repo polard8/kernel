@@ -36,8 +36,7 @@
  */
 
 
-typedef int pid_t; 
-typedef int ppid_t;
+
  
 //
 //#define FIRST_PROCESS processList[0]
@@ -242,7 +241,6 @@ typedef enum {
  *          O kernel precisa alocar memória para Heap e Stack dos processos.
  *          //...
  */
-typedef struct process_d process_t;
 struct process_d 
 {
 	object_type_t objectType;

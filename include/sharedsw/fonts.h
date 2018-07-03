@@ -3,6 +3,9 @@
 
 // header do gerenciador de fonts usados pelo módulo /gramado
 
+// @todo:
+// fontes pode ser compartilhada com outros sistemas
+// operacionais então deve ir para shared/fonts.h
 
 // # fontes # 
 //Endereços das fonts presentes no CMOS BIOS. 

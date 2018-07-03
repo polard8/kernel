@@ -5,12 +5,15 @@
  *     Definições padrão da linguagem C, versão C99.
  */
  
-/*
+
+ 
+ 
+ 
 enum {
-	false	= 0,
-	true	= 1
+	false  = 0,
+	true   = 1
 };
-*/
+
  
 /* 
     @todo:

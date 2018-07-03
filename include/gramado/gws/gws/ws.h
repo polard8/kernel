@@ -617,7 +617,6 @@ typedef enum {
  * de recursos gráficos. GWS.
  *
  */ 
-typedef struct color_scheme_d* color_scheme_t;
 struct color_scheme_d
 {
     //@todo: É preciso ainda definir esse tipo de objeto.
@@ -643,9 +642,9 @@ struct color_scheme_d
 	
 	//...
 };
-color_scheme_t CurrentColorScheme;
-color_scheme_t HumilityColorScheme; // Simples.
-color_scheme_t PrideColorScheme;    // Colorido.
+struct color_scheme_d* CurrentColorScheme;
+struct color_scheme_d* HumilityColorScheme; // Simples.
+struct color_scheme_d* PrideColorScheme;    // Colorido.
 //... 
 
 //

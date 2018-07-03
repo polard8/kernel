@@ -20,7 +20,6 @@
  * desktop_d:
  *     Desktop structure.
  */
-typedef struct desktop_d desktop_t; 
 struct desktop_d
 {
 	object_type_t objectType;
@@ -126,17 +125,15 @@ struct desktop_d
 	//
 };
 // Lista encadeada de desktops.
-desktop_t *desktop_Conductor2;
-desktop_t *desktop_Conductor;
-desktop_t *desktop_rootConductor;
-//desktop_t *Desktop;
+struct desktop_d *desktop_Conductor2;
+struct desktop_d *desktop_Conductor;
+struct desktop_d *desktop_rootConductor;
 
 //Outros.
 struct desktop_d *CurrentDesktop;
 struct desktop_d *desktopDefault;
 struct desktop_d *desktop0;
 struct desktop_d *desktop1;
-//struct desktop_d *desktop2;
 
 
 

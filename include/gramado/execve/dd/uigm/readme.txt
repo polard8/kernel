@@ -1,1 +1,0 @@
-o conteudo daqui foi mudado para include/gramado/gui

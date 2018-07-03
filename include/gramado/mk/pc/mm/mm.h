@@ -153,9 +153,7 @@ kernel fica com o 1GB superior."
 */ 
  
  
- 
-#define PAGE_SIZE 4096 
- 
+  
  
  //
  // **  ENDEREÇOS DOS PRINCIPAIS PAGE DIRECTORIES **
@@ -261,47 +259,9 @@ unsigned long windowzoneStart;
 unsigned long windowzoneEnd;    //?? Devemos levar em consideração o calculo do tamanho da memória
 unsigned long windowzoneSize;
 
-//
-// tables support
-//
 
-//PDE - Page Directory Entry
-typedef struct page_directory_entry_d page_directory_entry_t;
-struct page_directory_entry_d
-{
-    unsigned long Present              :1;
-    unsigned long ReadWrite            :1;
-    unsigned long UserSupervisor       :1;
-    unsigned long WriteThrough         :1;
-    unsigned long CacheDisabled        :1;
-    unsigned long Accessed             :1;
-    unsigned long Reserved             :1;
-    unsigned long PageSize             :1;
-    unsigned long GlobalPage           :1;
-    unsigned long Available1           :1;
-    unsigned long Available2           :1;
-    unsigned long Available3           :1;
-    unsigned long PageTableBaseAddress :20;
-};
 
-//PTE - Page Table Entry
-typedef struct page_table_entry_d page_table_entry_t;
-struct page_table_entry_d
-{
-    unsigned long Present         :1;
-    unsigned long ReadWrite       :1;
-    unsigned long UserSupervisor  :1;
-    unsigned long WriteThrough    :1;
-    unsigned long CacheDisabled   :1;
-    unsigned long Accessed        :1;
-    unsigned long Reserved        :1;
-    unsigned long PAT             :1;  // Page Table Attribute Index.
-    unsigned long GlobalPage      :1;
-    unsigned long Available1      :1;
-    unsigned long Available2      :1;
-    unsigned long Available3      :1;
-    unsigned long PageBaseAddress :20;
-};
+
 
 
 /*
@@ -567,13 +527,7 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 #define MMBLOCK_COUNT_MAX  (2*4096)
  
 
-//
-// Size support.
-//
 
-#define KB  (1024)
-#define MB	(1024 * 1024)
-#define GB	(1024 * 1024 * 1024)
 
 //
 // ## MEMORY PARTITION ##

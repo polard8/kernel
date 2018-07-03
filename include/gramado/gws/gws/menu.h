@@ -34,7 +34,6 @@
  *     Estrutura para menuitem.
  *
  */
-typedef struct menuitem_d menuitem_t;
 struct menuitem_d
 {
 	object_type_t objectType;
@@ -76,10 +75,7 @@ struct menuitem_d
 	//...
 
 };
-menuitem_t *menuitemDefault;
-//menuitem_t *menuitem;
-//menuitem_t *MenuItem;
-//menuitem_t *CurrentMenuItem;
+struct menuitem_d *menuitemDefault;
 //...
 
 
@@ -91,7 +87,6 @@ menuitem_t *menuitemDefault;
  * (todo menu tem uma janela que recebe as mensagens,
  *   e a janela tem seu procedimento de janela).
  */
-typedef struct menu_d menu_t;
 struct menu_d
 {
 	object_type_t objectType;
@@ -141,14 +136,10 @@ struct menu_d
 	//...
    
 };
-//menu_t *ControlMenu;   //O menu da janela com foco de entrada.
-menu_t *logonMenu;
-menu_t *guiMenu;
-menu_t *menubarDefault;
-menu_t *menuDefault;
-//menu_t *menu;
-//menu_t *Menu;
-//menu_t *CurrentMenu;
+struct menu_d *logonMenu;
+struct menu_d *guiMenu;
+struct menu_d *menubarDefault;
+struct menu_d *menuDefault;
 //...
 
 
@@ -175,7 +166,6 @@ int menus_count;
  *     Estrutura para o menu atual, (ativo).
  *
  */
-typedef struct current_menu_d current_menu_t;
 struct current_menu_d
 {
     unsigned long menuId;    //Id do menu ativo, (índice na lista de menus).
@@ -184,35 +174,7 @@ struct current_menu_d
 	//desktop...
 	//...
 };
-//current_menu_t *CurrentMenu;
 
-//
-// MenuBar struct.
-//
-/*
-typedef struct menu_bar_d menu_bar_t;
-struct menu_bar_d
-{
-    struct window_d *window;	
-};
-menu_bar_t *MenuBar;
-menu_bar_t *CurrentMenuBar;
-*/
-
-
-
-/*
-typedef struct menu_info_d menu_info_t;
-struct menu_info_d
-{
-	struct window_d *Window;
-    struct menu_bar_d *MenuBar;
-    struct menu_d     *Menu;
-	struct menuitem_d *MenuItem;
-};
-menu_info_t *MenuInfo;
-menu_info_t *CurrentMenuInfo;
-*/
 
 
 //

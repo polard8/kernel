@@ -20,15 +20,12 @@
  * Versão 1.0, 2015.
  */
 
- 
 
- 
  
 /*
  * Window Station:
  *
  */ 
-typedef struct wstation_d wstation_t; 
 struct wstation_d
 {
 	object_type_t objectType;
@@ -66,9 +63,9 @@ struct wstation_d *ws1;
 struct wstation_d *ws2;
 
 // Lista encadeada de window stations.
-wstation_t *wstation_Conductor2;
-wstation_t *wstation_Conductor;
-wstation_t *wstation_rootConductor;
+struct wstation_d *wstation_Conductor2;
+struct wstation_d *wstation_Conductor;
+struct wstation_d *wstation_rootConductor;
 
 unsigned long windowstationList[WINDOW_STATION_COUNT_MAX];
 

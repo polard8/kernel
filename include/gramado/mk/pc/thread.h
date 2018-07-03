@@ -10,7 +10,7 @@
  *     2018 - Revision.
  */
  
-typedef int tid_t; 
+
 
 
 
@@ -176,16 +176,16 @@ typedef enum {
 
  
 /*
- *****************************************************************
+ ***********************************************************
  * thread_d: 
  *
  *    TCB - Thread Control Block.
  *
  *    A estrutura onde guarda informações sobre a thread.
  *    @todo: Começar com informações sobre disco e arquivos.
- *    Obs: Deve ficar por último o que for referenciado com menos frequência.
+ *    Obs: Deve ficar por último o que for referenciado 
+ * com menos frequência.
  */
-typedef struct thread_d thread_t;
 struct thread_d 
 {	
 	object_type_t objectType;
@@ -513,11 +513,6 @@ struct thread_d *IdleThread;       // Idle Thread. TID=0
 struct thread_d *ShellThread;      // Shell Thread. TID=1
 struct thread_d *TaskManThread;    // TaskMan Thread. TID=2
 struct thread_d *RING0IDLEThread;    // RING0 IDLE Thread. TID=3
-
-
-
-
-
 
 struct thread_d *Thread;           // Current.
 //outros.

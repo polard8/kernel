@@ -1,5 +1,5 @@
 /*
- * File: gramado\gws\window.h 
+ * File: gws\gws\window.h 
  *
  * Descrição:
  *    Funções e parâmetros para o kernel controlar a interface gráfica 
@@ -314,7 +314,6 @@ unsigned long g_navigationbar_height;
  * button_d:
  *     Estrutura para botões.
  */
-typedef struct button_d button_t;
 struct button_d
 {
 	object_type_t objectType;
@@ -344,9 +343,9 @@ struct button_d
     struct button_d *Next;  //proximo botão dentro da mesma janela.??
 };
 //Botões na janela principal.				  
-button_t *mainButton1;  
-button_t *mainButton2;  
-button_t *mainButton3;  
+struct button_d *mainButton1;  
+struct button_d *mainButton2;  
+struct button_d *mainButton3;  
 //...
 
 
@@ -362,10 +361,8 @@ button_t *mainButton3;
  * O kernel terá registro disso para salvar as dimensões da
  * área de trabalho, que é o tamanho da tela menos o tamanho da barra.
  */
-typedef struct taskbar_d taskbar_t;
 struct taskbar_d
 {
-
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
@@ -380,7 +377,7 @@ struct taskbar_d
     unsigned long Width;
     unsigned long Height;
 }; 
-taskbar_t TaskBar;    //*Importante: Sem Ponteiro.
+struct taskbar_d *TaskBar;    //*Importante: Sem Ponteiro.
 
 
 /*
@@ -396,7 +393,6 @@ taskbar_t TaskBar;    //*Importante: Sem Ponteiro.
  *     um conjunto de menus para manipular
  *     o porcesso com a janela ativa.
  */
-typedef struct menubar_d menubar_t;
 struct menubar_d
 {
 	object_type_t objectType;
@@ -413,7 +409,7 @@ struct menubar_d
     unsigned long Width;
     unsigned long Height;
 }; 
-menubar_t MenuBar;    //*Importante: Sem Ponteiro.
+struct menubar_d *MenuBar;    //*Importante: Sem Ponteiro.
 
  
 
@@ -422,7 +418,6 @@ menubar_t MenuBar;    //*Importante: Sem Ponteiro.
  *     Estrutura para procedimento de janela.
  *
  */ 
-typedef struct window_procedure_d window_procedure_t;
 struct window_procedure_d
 {
 
@@ -446,37 +441,19 @@ struct window_procedure_d
 
 	//...
 };
-window_procedure_t *CurrentProcedure;
-window_procedure_t *WindowProcedure;
+struct window_procedure_d *CurrentProcedure;
+struct window_procedure_d *WindowProcedure;
 //... 
  
 
 
-/* Message structure */
 /*
-typedef struct msg_d msg_t;
-struct msg_d
-{
-	struct window_d *window;
-	int 	        message;
-	unsigned long	long1;
-	unsigned long	lomg2;
-	unsigned long	time;
-};
-msg_t *Msg;
-msg_t *ProcedureMsg;
-*/
-
-
-
-/*
- *******************************************************
+ **************************************************
  * rect_d:
  *     Estrutura para gerenciamento de retângulos.
  *     Um retângulo pertence à uma janela.
  *
  */
-typedef struct rect_d rect_t;
 struct rect_d 
 {
 	object_type_t objectType;
@@ -511,16 +488,16 @@ struct rect_d
 	
 	//Essa é  ajanela à qual o retângulo pertence.
 	struct window_d *window;
+	
+	struct rect_d *next;
 };
-//rect_t *ShellRect;    //retangulo da área de cliente do shell atual.
-rect_t *rect;
-rect_t *rectClientArea;   //Retângulo da área de cliente da janela ativa.
-//rect_t *RC;
-//rect_t *Rect;
+struct rect_d *rect;
+//Retângulo da área de cliente da janela ativa.
+struct rect_d *rectClientArea;   
 //...
 
 
-typedef struct tagRGBA RGBA_t;
+/* rgba */
 struct tagRGBA
 {
 	object_type_t objectType;
@@ -531,7 +508,7 @@ struct tagRGBA
    char blue;
    char alpha;
 };
-RGBA_t *RGBA;
+struct tagRGBA *RGBA;
 
 
 /*
@@ -591,7 +568,6 @@ typedef enum {
 
 
 //estrutura para window class
-typedef struct window_class_d window_class_t; 
 struct window_class_d
 {
 	
@@ -640,7 +616,6 @@ struct window_class_d
  * gerenciado por uma estrutura tradicional de terminal.
  *
  */
-typedef struct window_d window_t;
 struct window_d
 {
 	
@@ -1095,20 +1070,16 @@ struct window_d
 	
 
 };
-window_t *CurrentWindow;    //Janela atual
-window_t *ActiveWindow;     //Janela atual.
-window_t *WindowWithFocus;  //Janela com o foco de entrada.   
-//window_t *ShellWindow;    //Shell Window
-//window_t *ControlMenuWindow;    //O control menu usado para fechar janelas.
-//window_t *Window;
-//window_t *ConsoleWindow;
+struct window_d *CurrentWindow;    //Janela atual
+struct window_d *ActiveWindow;     //Janela atual.
+struct window_d *WindowWithFocus;  //Janela com o foco de entrada.   
 //...
 
 // Lista encadeada de janelas.
-window_t *window_Conductor2;
-window_t *window_Conductor;
-window_t *window_rootConductor;
-
+struct window_d *window_Conductor2;
+struct window_d *window_Conductor;
+struct window_d *window_rootConductor;
+//...
 
 
 
@@ -1129,8 +1100,8 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 quando um aplicativo chamar serviços do kernel para criar elementos na aba.*/
 int current_tab;
 
-window_t *BROWSERWINDOW;    //Ponteiro para a janela do navegador.
-window_t *TABWINDOW;        //ponteiro para a janela da tab atual..
+struct window_d *BROWSERWINDOW;    //Ponteiro para a janela do navegador.
+struct window_d *TABWINDOW;        //ponteiro para a janela da tab atual..
 
 //janela full screen que será usada pelo navegador...
 //essa janela deve ter as dimensões da tela...
@@ -1138,7 +1109,7 @@ window_t *TABWINDOW;        //ponteiro para a janela da tab atual..
 //gui->screen ... lenbrando que não queremos que a janela gui->screen tenha 
 //os valores de sua estrutura alterados ... pois refletem as características do dispositivo.
 //Importante: Estragar essa estrutura pode causar muitos problemas.
-window_t *FULLSCREEN_TABWINDOW;   
+struct window_d *FULLSCREEN_TABWINDOW;   
 
 
 
@@ -1146,7 +1117,6 @@ window_t *FULLSCREEN_TABWINDOW;
  estrutura para tabs do navegador do kernel.
  *@todo; Talvez deletar essa estrutura
  */
-typedef struct browser_tab_d browser_tab_t;
 struct browser_tab_d
 {
 	object_type_t objectType;
@@ -1190,9 +1160,6 @@ struct browser_tab_d
 
     struct browser_tab_d *next;    	
 };
-//browser_tab_t *CurrentTab;
-//browser_tab_t *BrowserTab;
-//...
 
 //lista de ponteiros para estruturas de tabs.
 unsigned long browsertabList[TABWINDOW_COUNT_MAX]; 
@@ -1238,7 +1205,6 @@ int zorderTopWindow;
 // Obs: uma estrutura de janela pode ter um poteiro para essa 
 // estrutura que controlará todas as propriedades de zorder relaticas a aquela janela.
 //
-typedef struct zorder_d zorder_t;
 struct zorder_d
 {
 	// tipo ... top ou bottom.
@@ -1292,7 +1258,6 @@ unsigned long zorderList[ZORDER_COUNT_MAX];
 // Backbuffer support. (espelho da memória de video)
 //
 
-typedef struct backbufferinfo_d backbufferinfo_t;
 struct backbufferinfo_d
 {
 	//@todo: object support
@@ -1310,7 +1275,7 @@ struct backbufferinfo_d
 	// terminal., window, line disciplice, cursor ...
 	//input buffer? z-order ??
 };
-backbufferinfo_t *BackBufferInfo;
+struct backbufferinfo_d *BackBufferInfo;
 
 
 
@@ -1319,7 +1284,6 @@ backbufferinfo_t *BackBufferInfo;
 // Frontbuffer support. (memória de vídeo)
 //
 
-typedef struct frontbufferinfo_d frontbufferinfo_t;
 struct frontbufferinfo_d
 {
 	//@todo: object support
@@ -1340,7 +1304,7 @@ struct frontbufferinfo_d
 	// ?? O que nos podemos ter aqui ??	
 	// terminal., window, line disciplice, cursor ...	
 };
-frontbufferinfo_t *FrontBufferInfo;
+struct frontbufferinfo_d *FrontBufferInfo;
 
 
 /*
@@ -1357,7 +1321,6 @@ frontbufferinfo_t *FrontBufferInfo;
  * 2016 - incluíndo novos elementos.
  * ...
  */
-typedef struct gui_d gui_t;
 struct gui_d
 {
     /*
@@ -1703,7 +1666,13 @@ struct gui_d
 	
 	//...
 };
-gui_t *gui;   //Estrutura global. (Usada para passar estutura entre funções) 
+// Estrutura global. 
+// (Usada para passar estutura entre funções)
+// Primeira e única. 
+struct gui_d *gui; 
+
+
+  
 
 
 
