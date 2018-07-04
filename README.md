@@ -1,13 +1,13 @@
 # gramado
 
-<br>Gramado 0.2
+<br>Gramado 0.3
 <br>
 <br>Version:
 <br>    Major 0
-<br>    Minor 2
+<br>    Minor 3
 <br>    Release 0
-<br>    Name "Mile 2"
-<br>
+<br>    Name "Style"
+<br>    Spiritual quote "Each project has a personal style based on their values and traits."
 <br>(c) Copyright 2018 - Fred Nora.
 
 <br>
@@ -29,7 +29,6 @@
 <br><b>// Folders:</b>
 <br>/include  = Headers.
 <br>/k        = Source.
-
 
 <br>
 <br>@frednora

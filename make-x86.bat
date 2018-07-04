@@ -11,8 +11,8 @@ rem (c) Copyright 2005-2018 Fred Nora.
 rem
 
 echo ~{ ...
-echo ~{ Gramado 0.2
-echo ~{ Mile 2
+echo ~{ Gramado 0.3
+echo ~{ ~~ Style ~~
 
 :Start_Job0
 rem Main.
