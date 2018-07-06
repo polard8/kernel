@@ -908,17 +908,15 @@ void *services( unsigned long number,
 		    windowUpdateWindow( (struct window_d *) arg2 );
 			break;
 		
-		//
-		// ## IMPORTANTE ##
-		//
-		//115 - usado por servidores do sistema 
-		//para se comunicarem com o kernel.
+		// 115 - ## IMPORTANTE ## 
+		// Usado por servidores do sistema 
+		// para se comunicarem com o kernel.
 		case 115:
 		    //magic 1234: acoplar taskman
 			if( arg3 == 1234 ){
 				current_taskman_server = (int) arg4;
-				printf("115: acoplando ...\n");
-				refresh_screen();
+				//printf("115: acoplando ...\n");
+				//refresh_screen();
                 return NULL; 				
 			}
 		    //magic 4321: desacoplar taskman
@@ -926,8 +924,8 @@ void *services( unsigned long number,
 			{
 				if( current_taskman_server == arg4 ){
 				    current_taskman_server = (int) 0;
-				    printf("115: desacoplando ...\n");
-				    refresh_screen();
+				    //printf("115: desacoplando ...\n");
+				    //refresh_screen();
 				    return NULL;
 				} 
 			}
@@ -959,7 +957,7 @@ void *services( unsigned long number,
 			};
 			break;
 			
-		//envia uma mensagem de teste para o servidor taskman	
+		//Envia uma mensagem de teste para o servidor taskman	
 		case 116:
 	        gui->taskmanWindow->msg_window = NULL;
 		    gui->taskmanWindow->msg = 123; //temos uma mensagem.

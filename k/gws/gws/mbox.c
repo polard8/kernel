@@ -88,14 +88,13 @@ MessageBox( struct window_d *parent_window,
 	unsigned long WindowClientAreaColor;
 	unsigned long WindowColor;
 		
-	//x and y
+	// x and y
 	// @todo centralizado: metade | um terço.
-	//@todo: Pegar a métrica do dispositivo.
-	unsigned long x  = (unsigned long) 20;  //deslocamento x
-	unsigned long y  = (unsigned long) 20;  //deslocamento y
-	
-    unsigned long cx = (unsigned long) 800/2;         //largura   
-    unsigned long cy = (unsigned long) 600/3;         //altura	
+	// @todo: Pegar a métrica do dispositivo.
+	unsigned long x  = (unsigned long) 20;       //deslocamento x
+	unsigned long y  = (unsigned long) 20;       //deslocamento y
+    unsigned long cx = (unsigned long) (800/2);  //largura   
+    unsigned long cy = (unsigned long) (600/3);  //altura	
 	
 	//Button support.
 	struct button_d *b1; 
@@ -108,30 +107,29 @@ MessageBox( struct window_d *parent_window,
 
 	
 	//No GUI.
-	if(VideoBlock.useGui != 1){
+	//?? deletar
+	if( VideoBlock.useGui != 1 )
+	{
 		printf("MessageBox: No GUI\n");
 	    return;	
 	};
 	
-	if( (void*) gui->screen == NULL ){
+	if( (void *) gui->screen == NULL ){
 	    return;
 	};
 	
 	// Parent.
-	if( (void*) parent_window == NULL ){
+	if( (void *) parent_window == NULL )
+	{
 	    pWnd = gui->screen;
 	}else{
 	    pWnd = (void*) parent_window;
 	};
 	
-	
-	
-	//
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
-	//
 	
-	if( (void*) CurrentColorScheme == NULL )
+	if( (void *) CurrentColorScheme == NULL )
 	{
 		printf("MessageBox: CurrentColorScheme");
 		die();
@@ -146,21 +144,15 @@ MessageBox( struct window_d *parent_window,
 		//Nothing.
 	};
 	
-	// Configurando as cores.
-	
-	// Client area.
+	// Colors: background and client area.
+	WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
 	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  	
 	
-	// Window.
-	WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
-	
-	
-	// Criando a janela.
+	// # Create Window #
 	
 frame:
-    //
+    
 	//  ## type ##
-	//
 
     //@todo: Criar definições de tipos de message boxs.(enum)
 	//@todo: Criar um tipo light.
@@ -223,11 +215,9 @@ frame:
 	};
 	
 	
-	//
 	// ## Window ##
-	//
 	
-	if( (void*) hWnd == NULL )
+	if( (void *) hWnd == NULL )
 	{
 	    printf("MessageBox: hWnd \n");
 		die();
@@ -238,7 +228,7 @@ frame:
         set_active_window(hWnd);
 		
 	    //Configurando qual vai ser a janela atual.
-	    CurrentWindow = (void*) hWnd;
+	    CurrentWindow = (void *) hWnd;
 	    //current_window ?? id ?? hWnd->id
 	
 	    //Habilitando o procedimento de janela do message box.
@@ -369,9 +359,9 @@ MessageBoxProcedure( struct window_d *window,
 				    //DestroyWindow(window);
                     break;
 					
-                case VK_F2:
+                //case VK_F2:
 				    //Nothing.
-					break;
+				//	break;
 									
 				default:
 				    return (unsigned long) 0;
@@ -393,6 +383,7 @@ MessageBoxProcedure( struct window_d *window,
 	
 done:
 	//Refresh screen. 
+	//?? deletar.
 	if(VideoBlock.useGui == 1){
 	    refresh_screen();
 	};	

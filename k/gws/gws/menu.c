@@ -1,5 +1,5 @@
 /*
- * File: gui\menu.c 
+ * File: gws\gws\menu.c 
  *
  * Descrição:
  *     Criação e gerenciamento de menus.
@@ -51,16 +51,12 @@ create_menu( struct window_d *pwindow,  // Parent window.
 	struct window_d *hWindow;           //Window.
 	//struct linkedlist_d *LinkedList;    //Linked list.
 
-	
-	//
 	// ## Parent window ##
-	//
 	
-    if( (void*) pwindow == NULL )
+    if( (void *) pwindow == NULL )
 	{
 		printf("create_menu: pwindow\n");
         goto fail;
-    
 	}else{
 		
 		// Ítem.
@@ -72,9 +68,10 @@ create_menu( struct window_d *pwindow,  // Parent window.
 
         // Menu.
 		//height = (iHeight*iCount)+(sHeight*sCount);
-		x      = (unsigned long)  pwindow->left; 
-        y      = (unsigned long)  pwindow->top;
-	    width  = (unsigned long) (pwindow->width / 4);   
+		x = (unsigned long)  pwindow->left; 
+        y = (unsigned long)  pwindow->top;
+	    
+		width = (unsigned long) (pwindow->width / 4);   
 	    height = (unsigned long) (pwindow->height);      
 		
 		//...
@@ -86,9 +83,7 @@ create_menu( struct window_d *pwindow,  // Parent window.
 	//
 	
 	
-    //
     // ## Create  ##
-    //	
 	
 Create:
 
@@ -134,34 +129,28 @@ do_create:
 
     //@todo: Rever o esquema de cores para menu.
     hWindow = (void*) CreateWindow( 1, 0, 0, "Menu",
-	                                x, y, width, height,
-						            pwindow, 0, 0, COLOR_BLACK );
-	if( (void*) hWindow == NULL )
+	                    x, y, width, height,
+						pwindow, 0, 0, COLOR_BLACK );
+						
+	if( (void *) hWindow == NULL )
 	{
-		
 		printf("create_menu: hWindow\n");
-        goto fail;
-		
+        goto fail;	
 	}else{
 		RegisterWindow(hWindow);
 	};
 	
-		
-	//
 	// Menu structure. 
-	// (Cria uma estrutura para o menu).
-	//
-	
+	// (Cria uma estrutura para o menu).	
 	
 menuStructure:
 	
-	menuDefault = (void*) malloc( sizeof( struct menu_d ) );  
+	menuDefault = (void *) malloc( sizeof( struct menu_d ) );  
 	
-	if( (void*) menuDefault == NULL )
+	if( (void *) menuDefault == NULL )
 	{
 	    printf("create_menu: menuDefault\n");
         goto fail;
-		
 	}else{
 		
 	    //Registra na estrutura de menu a janela que é o menu.
@@ -285,7 +274,7 @@ create_menu_item( struct menu_d *menu,
 	// Check 'menu' structure.
     //
 	
-	if( (void*) menu == NULL )
+	if( (void *) menu == NULL )
 	{
 		printf("create_menu_item: menu\n");
         goto fail;
@@ -328,7 +317,7 @@ create_menu_item( struct menu_d *menu,
 	//
 
 	// Ajust string.	
-    const char *s = (const char*) string;    
+    const char *s = (const char *) string;    
 
     // Dimensões.
 	unsigned long x = (unsigned long) menu->menuWindow->left;
@@ -339,14 +328,11 @@ create_menu_item( struct menu_d *menu,
 	menu->newitemLeft = (unsigned long) x;
 	menu->newitemTop  = (unsigned long) y;
 	
-	
-	//
 	//  ## menu window ##
-	//
 	
-	if( (void*) menu->menuWindow == NULL )
+	if( (void *) menu->menuWindow == NULL )
 	{
-	    printf("menu window fail.\n");
+	    printf("menu window fail\n");
 		goto fail;
 	}else{
 		
@@ -383,33 +369,28 @@ draw_window:
     // Selected support.
 	// @rever as cores padrão no esquema de cores.
 	
-	if( Selected == 1 )
-	{	
-        Color = COLOR_BLUE;
-    }else{
+	if( Selected == 1 ){ 
+	    Color = COLOR_BLUE;
+    }else{ 
 	    Color = COLOR_BLACK; 
 	};	
     
-    //
 	// ## Create Window ##	
-	//
 	
 	hWindow = (void*) CreateWindow( 1, 0, 0, "MenuItem", 
-	                                x, y, width, height, 
-							        menu->parentWindow, 0, 0, Color);
-	if( (void*) hWindow == NULL )
+	                    x, y, width, height, 
+						menu->parentWindow, 0, 0, Color );
+						
+	if( (void *) hWindow == NULL )
 	{
 		printf("create_menu_item: hWindow\n");
         goto fail;
 	}else{
-		
 	    RegisterWindow(hWindow);
 		SetFocus(hWindow);  
 	};
 
-	//
 	// ## String ##
-	//
 	
 strings:
   
@@ -424,14 +405,12 @@ strings:
 	};	
 
     draw_string( menu->newitemLeft +8, 
-	             menu->newitemTop +8, 
-				 Color, 
-				 string ); 	
+	    menu->newitemTop +8, 
+		Color, 
+		string ); 	
     
     
-	//
 	// ## next ##
-	//
 	
 ajust_next:
 	
@@ -477,7 +456,7 @@ void
 set_current_menu( struct menu_d *menu )
 {
     //Check.
-	if( (void*) menu == NULL ){
+	if( (void *) menu == NULL ){
 	    return;
     };  
 done:
@@ -512,7 +491,7 @@ RegisterMenu( struct menu_d *menu )
     struct menu_d *Empty;      
 
 	//Erro de entrada.
-    if( (void*) menu == NULL ){
+    if( (void *) menu == NULL ){
 		goto fail;
     }
  	
@@ -527,13 +506,11 @@ get_next:
 		goto fail;
 	};
     
-	//
 	// ## Get empty ##
- 	//
 	
-	Empty = (void*) menuList[menus_count]; 
+	Empty = (void *) menuList[menus_count]; 
     
-	if( (void*) Empty != NULL )
+	if( (void *) Empty != NULL )
 	{
 		// Lets try again.
         goto get_next;
@@ -593,9 +570,10 @@ initmenuArray( struct menu_d *a,
 	
 ArraySupport:
  	
-    a->Items = (void*) malloc( sizeof( struct menuitem_d ) * initialSize );	
+	// Obs: Multiplicamos para encontrar a quantidade a ser alocada.
+    a->Items = (void *) malloc( sizeof( struct menuitem_d ) * initialSize );	
 	
-	if( (void*) a->Items == NULL )
+	if( (void *) a->Items == NULL )
 	{
 	   printf("initmenuArray: a->Items\n");	
 	   goto fail;
@@ -697,7 +675,7 @@ void freeArray(Array *a)
  * dos tipos de menu.
  *
  */
-int ControlMenu(struct window_d * window)
+int ControlMenu(struct window_d *window)
 {
 	//@todo: Rever isso aqui.
     return (int) MainMenu(window);	
@@ -711,7 +689,7 @@ int ControlMenu(struct window_d * window)
  *     Nada mais na tela, apenas um menu centralizado.
  *     ??
  */
-int MainMenu(struct window_d * window)
+int MainMenu(struct window_d *window)
 {	
 	struct window_d *cmWindow;
 	struct window_d *pWindow;
@@ -729,11 +707,11 @@ int MainMenu(struct window_d * window)
 	
 	pWindow = (struct window_d *) window;
 	
-	if( (void*) pWindow == NULL )
+	if( (void *) pWindow == NULL )
 	{
 		pWindow = (void *) gui->main;
 		
-		if( (void*) pWindow == NULL )
+		if( (void *) pWindow == NULL )
 		{
 			//#bugbug: Erro fatal.
 		    goto fail;	
@@ -835,10 +813,10 @@ MainMenuProcedure( struct window_d *window,
   				   unsigned long long1, 
 				   unsigned long long2 ) 
 {
-    switch(msg)
+    switch (msg)
 	{	
         case MSG_KEYDOWN:
-            switch(long1)
+            switch (long1)
             {
                 case VK_ESCAPE:
                    //KillFocus(window);				
@@ -852,7 +830,7 @@ MainMenuProcedure( struct window_d *window,
         break;
 		
 		case MSG_SYSKEYDOWN:                 
-            switch(long1)	       
+            switch (long1)	       
             {   
 				//Screen
 				case VK_F1:

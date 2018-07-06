@@ -35,7 +35,6 @@
 //isso deve ir para bibliotecas depois.
 //não tem protótipo ainda.
 // Credits: Luiz Felipe
-
 void read_fntos(char *name)
 {
     int  i, ns = 0;
@@ -179,15 +178,18 @@ done:
  *    Apenas FAT16.
  *
  *  @todo: 
- *      Deve-se alocar memória dinamicamente para o root dir e para a fat
- *  caso eles não estejam carregados e não tenham seus endereços salvos.
- *   Obs:   Pode existir uma estrutura pra dizer se o root dir e fat estão 
+ *      Deve-se alocar memória dinamicamente para o root dir e 
+ * para a fat caso eles não estejam carregados e não tenham seus 
+ * endereços salvos.
+ * Obs: Pode existir uma estrutura pra dizer se o root dir e fat estão 
  * carregados na memória e qual o endereço o tipo o tamanho etc.
- * + O argumento nome poderia ser const char* para compatibilidade com a libC.
+ * + O argumento nome poderia ser const char* para compatibilidade 
+ * com a libC.
  */
-//unsigned long fsLoadFile( const char *name, unsigned long address ) 
-unsigned long fsLoadFile( unsigned char *file_name, 
-                          unsigned long file_address )
+//int fsLoadFile( const char *name, unsigned long address ) 
+unsigned long 
+fsLoadFile( unsigned char *file_name, 
+            unsigned long file_address )
 {
     int Status;	
 	
@@ -223,7 +225,11 @@ unsigned long fsLoadFile( unsigned char *file_name,
 //loadRoot:
 	
 	//Carrega o diretório raiz na memória.
+	
+#ifdef KERNEL_VERBOSE	
 	printf("fsLoadFile: Loading root..\n"); 
+#endif	
+	
 	fs_load_rootdirEx();
 	
 	//Checa se é válida a estrutura do sistema de arquivos.
@@ -277,10 +283,6 @@ unsigned long fsLoadFile( unsigned char *file_name,
      *		 
 	 */
 	 
-	 
-	 
-	 
-	 
 	i = 0; 
 	
 	// Procura o arquivo no diretório raiz.
@@ -318,7 +320,8 @@ unsigned long fsLoadFile( unsigned char *file_name,
 	
     // O arquivo não foi encontrado.	
 notFound:
-    printf( "fs-read-fsLoadFile: %s not found!\n", file_name );  
+    printf( "fs-read-fsLoadFile: %s not found!\n", 
+	    file_name );  
     //printf("root: %s ",root);	
     goto fail;
 	
@@ -341,8 +344,10 @@ found:
 	// Isso varia de acordo com o tamanho do disco.
 	// O número máximo do cluster nesse caso é (256*64).
 	
-	if( cluster <= 0 || cluster > 0xfff0 ){
-	    printf("fs-read-fsLoadFile: error, Cluster limits {%x}\n", cluster );
+	if( cluster <= 0 || cluster > 0xfff0 )
+	{
+	    printf("fs-read-fsLoadFile: error, Cluster limits {%x}\n", 
+		    cluster );
 		goto fail;
 	};	
 	
@@ -351,15 +356,20 @@ found:
 	
     //Carrega fat na memória.
 	
-	printf("loading FAT..\n");	
+#ifdef KERNEL_VERBOSE		
+	printf("loading FAT..\n");
+#endif 
+	
 	fs_load_fatEx();
 	
     // Carregar o arquivo, cluster por cluster.
     // @todo: Por enquanto, um cluster é igual à um setor, 512 bytes.
  
     //Debug:
+#ifdef KERNEL_VERBOSE		
     printf("Loading clusters..\n");
     //refresh_screen();
+#endif
 
     //
 	// Loop: 
@@ -427,14 +437,18 @@ next_entry:
 	
 //Falha ao carregar o arquivo.
 fail:
-    printf("fs-read-fsLoadFile fail: file={%s}!\n", file_name );	
+    printf("fs-read-fsLoadFile fail: file={%s}!\n", 
+	    file_name );	
     refresh_screen();
 	return (unsigned long) 1;
 //Done. 	
 done:
-    //printf("fsLoadFile: done\n");
-	refresh_screen(); 
-    return (unsigned long) 0;
+    
+	//#debug support
+	//printf("fsLoadFile: done\n");
+	//refresh_screen(); 
+    
+	return (unsigned long) 0;
 };
 
 

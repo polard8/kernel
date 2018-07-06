@@ -8,6 +8,9 @@
  *
  *     O Gerenciador de Discos é um módulo muito importante do Kernel.
  *
+ * Credits:
+ *     Some IDE/SATA support - Nelson Cole.
+ *
  * History:
  *     2015 - Created by Fred Nora.
  *     2018 - IDE COntroller by Nelson Cole.
@@ -1638,14 +1641,16 @@ fail:
 
 
 /*
- ****************************************************************
+ *********************************************
  * diskATAInitialize:
- *     Inicializa o IDE e mostra informações sobre o disco.
- *
+ *     Inicializa o IDE e mostra informações 
+ * sobre o disco.
+ * Credits: Nelson Cole;
  */
 int diskATAInitialize( int ataflag )
 {
 	int Status = 1;  //error
+	int port;
 	
 	_u32 data;
 	
@@ -1664,11 +1669,11 @@ int diskATAInitialize( int ataflag )
 	// Messages
 	//
 	
-//#ifdef KERNEL_VERBOSE
+#ifdef KERNEL_VERBOSE
     kprintf("sm-disk-disk-diskATAInitialize:\n");
     kprintf("Initializing IDE/AHCI support ...\n");
 	//refresh_screen();
-//#endif
+#endif
 
     //
     // Sondando a interface PCI para encontrarmos um dispositivo
@@ -1758,7 +1763,7 @@ int diskATAInitialize( int ataflag )
 	
 	    //ide_mass_storage_initialize();
 		
-	int port;
+	
 	
 
     //
@@ -1842,8 +1847,9 @@ fail:
 done:
 
 //#ifdef KERNEL_VERBOSE 
-    kprintf("done!\n");
-    refresh_screen();
+    //#debug
+	//kprintf("done!\n");
+    //refresh_screen();
 //#endif 
 	
     return (int) Status;	

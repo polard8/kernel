@@ -1,5 +1,5 @@
 /*
- * File: gui\statusbar.c
+ * File: gws\sbar.c
  *
  * Descrição:
  *     Cria uma status bar em uma janela.
@@ -43,10 +43,9 @@ int UpdateStatusBar( struct window_d *window,
  * largura da janela. A scroll bar não deve invadir 
  * o espaço da status bar.
  */
-struct window_d*
-StatusBar( struct window_d *window, 
-           unsigned char *string1, 
-		   unsigned char *string2 )
+struct window_d *StatusBar( struct window_d *window, 
+                            unsigned char *string1, 
+		                    unsigned char *string2 )
 {
 	int desktopID;
 	unsigned long StatusBarColor;	
@@ -62,22 +61,19 @@ StatusBar( struct window_d *window,
     // A janela da status bar.
     struct window_d *hWnd;	
 	
-	//
 	//  ## Parent Window ##
-	//
 	
-	if( (void*) pWnd == NULL )
+	if( (void *) pWnd == NULL )
 	{
 		printf("StatusBar: pWnd\n");
         goto fail;
-
     }else{
 				
 	    // A Status bar é um elemento dentro da janela.
 	    // não podemos considerar as bordas e a barra de títulos.
-	    if( (void*) pWnd->rcClient == NULL )
+	    if( (void *) pWnd->rcClient == NULL )
 		{
-			printf("StatusBar: pWnd->rcClient\n");
+			printf("StatusBar: rcClient\n");
 		    goto fail;
 	    }
 		
@@ -85,7 +81,7 @@ StatusBar( struct window_d *window,
 	    if( pWnd->rcClient->used != 1 || 
 	        pWnd->rcClient->magic != 1234 )
 	    {
-			printf("StatusBar: used magic\n");
+			printf("StatusBar: validation\n");
 		    goto fail;
 	    }		
 		
@@ -149,17 +145,13 @@ ColorSchemeSupport:
 	//Desktop.
 	desktopID = (int) get_current_desktop_id();	
 	
-	
-	//
 	// ## Window  ##
-	//
-
  
-	hWnd = (void*) CreateWindow( WT_STATUSBAR, 0, 0, "statusbar", 
+	hWnd = (void *) CreateWindow( WT_STATUSBAR, 0, 0, "statusbar", 
 	                   x, y, width, height, 
 					   pWnd, desktopID, StatusBarColor, StatusBarColor); 
 	
-	if( (void*) hWnd == NULL )
+	if( (void *) hWnd == NULL )
 	{
 		printf("StatusBar: hWnd\n");
         goto fail;
@@ -203,7 +195,7 @@ ColorSchemeSupport:
 	
 done:     
     //return (int) 0;
-	return (struct window_d*) hWnd;
+	return (struct window_d *) hWnd;
 fail:
     printf("fail\n");
 	return NULL;

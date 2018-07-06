@@ -83,10 +83,8 @@ char copyright[] =
  *     2016~2018 - Revision.
  *     ...
  */
-int
-kMain (argc, argv)
-    int argc;
-    char **argv;
+int 
+kMain( int argc, char **argv )
 {
     int Status = 0;
 
@@ -503,38 +501,9 @@ doDebug:
 	
 	windowLoadGramadoIcons();
 	
-	
-	//
+
 	// ## Testando font nelson Cole 2 ##
-	//
-	
-	printf(" #### Loading font ####\n");
-	
-	//14KB	
-	void *font_buffer = (void*) allocPageFrames(8);
-	if( (void*) font_buffer == NULL )
-	{
-	    printf("kMain: loading font fail\n");
-		die();		
-	};
-	
-	unsigned long fileret;
-	
-	fileret = (unsigned long) fsLoadFile("NC2     FON", 
-	                              (unsigned long) font_buffer );
-								  
-	if( fileret != 0 )
-	{
-		printf("kmain: NC2.FON FAIL\n");		
-		die();
-	};	
-	
-	//Configurando o endereço da fonte atual.
-	//gws_currentfont_address = (unsigned long) (font_buffer + 0x2000);
-	gwsSetCurrentFontAddress( (unsigned long) (font_buffer + 0x2000) );	
-	
-	
-	printf("OK\n");
+    gwsInstallFont("NC2     FON");
 	
 	//
 	// ## Criando a janela do servidor taskman ## 

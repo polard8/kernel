@@ -1491,10 +1491,12 @@ done:
 
 
 /*
+ ***********************************************
  * allocPageFrames:
  *
  * @param número de páginas contíguas.
- * Obs: Pode ser que os pageframes não sejam contíguos mas as páginas serão.
+ * Obs: Pode ser que os pageframes não sejam 
+ * contíguos mas as páginas serão.
  * estamos usando uma page table toda já mapeada. 4MB.
  * @TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
  *
@@ -1552,7 +1554,9 @@ void *allocPageFrames( int size )
 		goto fail;
 	}
 	
+#ifdef KERNEL_VERBOSE	
     printf("allocPageFrames: for ...\n");		
+#endif 
  
 	//começamos a contar do frame logo após o condutor.
 	for(Index = Base; Index < (Base+size+1); Index++)
@@ -1595,7 +1599,7 @@ fail:
     printf("allocPageFrames: fail ...\n");		
     return NULL;	
 done:
-    printf("allocPageFrames: done ...\n");	
+    //printf("allocPageFrames: done ...\n");	
     
 	//*Importante:
 	//retornaremos o endereço virtual inicial do primeiro pageframe da lista.

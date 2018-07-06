@@ -764,6 +764,9 @@ gwsSetCurrentFontAddress( unsigned long address );
 unsigned long
 gwsGetCurrentFontAddress();
 
+/* Carregando e instalando uma fonte dado o nome. */
+int gwsInstallFont( char *file_name );
+
 //
 // End
 //

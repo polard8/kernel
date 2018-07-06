@@ -46,14 +46,12 @@ extern unsigned long kArg4;	   //??.
 
 
 
-
 int 
-windowKillTimer( struct window_d *window,
-                 int id )
+windowKillTimer( struct window_d *window, int id )
 {
     int Status = 0;
 	
-	if( (void*) window == NULL )
+	if( (void *) window == NULL )
 	{
 		Status = 1;
 		goto fail;
@@ -87,16 +85,13 @@ done:
 int
 windowSetTimer( struct window_d *window, //janela
                 int id,                  //id do timer
-				int time                //tempo(medida indefinida ainda)
-				)
+				int time )               //tempo(medida indefinida ainda)
 {
     int Status = 0;
 	
-    //
 	// ## Window  ##
-	//
 	
-	if( (void*) window == NULL )
+	if( (void *) window == NULL )
 	{
 		Status = 1;
 		goto fail;
@@ -248,9 +243,9 @@ void printQueue(circularQueue_t *theQueue)
 
 
 //retorna o id de uma janela.
-int windowGetWindowID( struct window_d *window)
+int windowGetWindowID( struct window_d *window )
 {
-	if( (void*) window != NULL )
+	if( (void *) window != NULL )
 	{
 		if( window->used == 1 && window->magic == 1234 ){
 		    return (int) window->id; 	
@@ -266,11 +261,11 @@ fail:
 // Para os aplicativos lidarem com a área de trabalho. 
 int windowGetMainWindowDescriptor()
 {	
-	if( (void*) gui == NULL ){
+	if( (void *) gui == NULL ){
 		goto fail;
 	}else{
 		
-		if( (void*) gui->main == NULL ){
+		if( (void *) gui->main == NULL ){
 		    goto fail;
 		}
 		return (int) gui->main->id;
@@ -302,8 +297,8 @@ int windowInitializeBrowserSupport()
 {
 	int i;
 	
-	printf("Initializing browser support\n");
-	
+	//#debug
+	//printf("Initializing browser support\n");
 	
 	for(i=0; i< TABWINDOW_COUNT_MAX; i++){
 		browsertabList[i] = (unsigned long) 0;
@@ -325,21 +320,18 @@ int windowInitializeBrowserSupport()
 	
 
     w = (void*) CreateWindow( 3, 0, 0,"KSOC - Kernel Standard Output Container", 
-			                             0, 0, 800, 600, 
-										 gui->screen, 0, COLOR_WINDOW, 0xC0C0C0 );
+			        0, 0, 800, 600, 
+					gui->screen, 0, COLOR_WINDOW, 0xC0C0C0 );
 
-    if( (void*) w == NULL ){
+    if( (void *) w == NULL )
+	{
 	    printf("windowInitializeBrowserSupport:");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}else{
 		
 		if( w->used != 1 || w->magic != 1234 ){
 	        printf("windowInitializeBrowserSupport: fail");
 		    die();
-			//refresh_screen();
-	        //while(1){};			
 		}
 		
 		RegisterWindow(w);
@@ -347,7 +339,7 @@ int windowInitializeBrowserSupport()
 		SetFocus(w);
 
         //Ponteiro exclusivo.
-        BROWSERWINDOW = (void*) w;		
+        BROWSERWINDOW = (void *) w;		
 	};
 
 
@@ -362,11 +354,9 @@ int windowInitializeBrowserSupport()
 	for(i=1; i<4; i++)
 	{
 		bt = (void*) malloc( sizeof(struct browser_tab_d) );
-	    if((void*) bt == NULL){
+	    if((void *) bt == NULL){
 	        printf("erro tab struct");
 		    die();
-			//refresh_screen();
-	        //while(1){};
 	    }		
 		
 		bt->used = 1;
@@ -384,14 +374,13 @@ int windowInitializeBrowserSupport()
         // podemos criar janelas minimizadas, que não precisam pintar. 		
 		//
         w = (void*) CreateWindow( 1, 0, 0,"TAB", 
-			                             0, 24, 800, 600-24, 
-										 gui->screen, 0, COLOR_WINDOW, COLOR_WINDOW );		
+			            0, 24, 800, 600-24, 
+						gui->screen, 0, COLOR_WINDOW, COLOR_WINDOW );		
 		
-	    if((void*) w == NULL){
+	    if( (void *) w == NULL )
+		{
 	        printf(".");
 		    die();
-			//refresh_screen();
-	        //while(1){};
 	    }else{   
 		    RegisterWindow(w);
 		    //...
@@ -405,7 +394,7 @@ int windowInitializeBrowserSupport()
 		//salvando o ponteiro para a tab na lista de ponteiros de tab.
 		browsertabList[i] = (unsigned long) bt;
 	
-	}
+	};
 	
 
    //
@@ -413,13 +402,11 @@ int windowInitializeBrowserSupport()
    //   
    
     //testando a aba 1.
-    bt = (void*) browsertabList[1];
+    bt = (void *) browsertabList[1];
     
-	if((void*) bt == NULL){
+	if( (void *) bt == NULL ){
 	    printf("~erro tab struct");
 		die();
-		//refresh_screen();
-	    //while(1){};
 	}	   
    
     if( bt->used != 1 || bt->magic != 1234 ){
@@ -427,15 +414,15 @@ int windowInitializeBrowserSupport()
 		die();		
 	}
 
-
 	//Determinado que a tab 1 é a tab atual.
 	//Obs; Isso não é a janela com o foco de entrada.
     current_tab = 1;
 	
 	//janela da aba. (a aba propriamente dita.
-    w = (void*) bt->window;	
+    w = (void *) bt->window;	
 
-    if( (void*) w == NULL ){
+    if( (void *) w == NULL )
+	{
 	    printf("windowInitializeBrowserSupport:~fail");
 		die();
 	}else{
@@ -450,7 +437,7 @@ int windowInitializeBrowserSupport()
 		
 		//Ponteiro para a janela da aba atual.
 		//Obs: Rotinas que desejam pintar na aba atual usam esse ponteiro.
-        TABWINDOW = (void*) w;
+        TABWINDOW = (void *) w;
 
         
 		//Test: Criando alguns elementos gráficos dentro da aba no navegador.

@@ -36,7 +36,7 @@
  */
 
 
-
+#define gramado_pid_t pid_t
  
 //
 //#define FIRST_PROCESS processList[0]

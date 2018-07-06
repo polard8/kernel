@@ -1,5 +1,5 @@
 /*
- * File: pixel.c
+ * File: gws\gws\pixel.c
  *
  * Descrição:
  *     Rotinas de pintura de pixel.
@@ -77,13 +77,15 @@ void pixelDirectPutPixel( void* FrontBuffer, unsigned long x, unsigned long y, u
 
 										 
 //Pinta um pixel em um buffer de janela.
-void pixelPutPixelWindowBuffer( void* buffer, 
-                          unsigned long x, 
-						  unsigned long y, 
-						  unsigned long color )
+void 
+pixelPutPixelWindowBuffer( void *buffer, 
+                           unsigned long x, 
+						   unsigned long y, 
+						   unsigned long color )
 {
 	return; //@todo: Ainda não implementada.					  
 };
+
 										 
 /*
  * *IMPORTANTE
@@ -96,18 +98,18 @@ void pixelPutPixelWindowBuffer( void* buffer,
  * que podemos chamar de 'desktop', mas não é a estrutura de desktop
  * como a conhecemos.
 */										 
-void pixelPutPixelDedicatedWindowBuffer( struct window_d *window, 
-                                         unsigned long x, 
-										 unsigned long y, 
-										 unsigned long color )
+void 
+pixelPutPixelDedicatedWindowBuffer( struct window_d *window, 
+                                    unsigned long x, 
+									unsigned long y, 
+									unsigned long color )
 {
 	//O buffer será selecionado por essa rotina ficará aqui
-	//
 	void *buff;
 	
 	//Se temos uma estrutura de janela, essa estrutura pode
 	//conter um ponteiro para um buffer dedicado de janela.
-	if((void*) window == NULL )
+	if( (void *) window == NULL )
 	{
 		buff = NULL;
 		goto useDefaultBuffer;
@@ -166,6 +168,7 @@ useDedicatedBuffer:
 
 
 /*
+ ******************************************************
  * my_buffer_put_pixel:
  *     Coloca um pixel o buffer backbuffer. 
  *     Obs: O backbuffer deverá ser o buffer dedicado da janela principal gui->main.     
@@ -175,25 +178,22 @@ useDedicatedBuffer:
  * c = y
  * d = null
  *
- *** O lugar dessa rotina é no hal.
+ * O lugar dessa rotina é no hal.
+ *
+ * @todo: Aqui podemos fazer algum tipo de filtro, considerar
+ * a métrica do buffer e chamar a rotina de /hal apropriada.
+ * Usando o módulo /hal como interface entre
+ * a /gui e o hardware.
  */
 //void pixelPutPixelBackBuffer( unsigned long ax, unsigned long bx, unsigned long cx, unsigned long dx )
-void my_buffer_put_pixel( unsigned long ax, 
-                          unsigned long bx, 
-						  unsigned long cx, 
-						  unsigned long dx )
+void 
+my_buffer_put_pixel( unsigned long ax, 
+                     unsigned long bx, 
+				     unsigned long cx, 
+					 unsigned long dx )
 {
-
-	
-	//
-	// @todo: Aqui podemos fazer algum tipo de filtro, considerar
-	// a métrica do buffer e chamar a rotina de /hal apropriada.
-	//
-	
-	//Usando o módulo /hal como interface entre
-	//a /gui e o hardware.
     hal_backbuffer_putpixel( ax, bx, cx, dx );
-	return;
+	//return;
 };
 
 
@@ -236,7 +236,7 @@ void refresh_pixel( unsigned long x,  unsigned long y )
 	//pego o pixel no backbuffer
 	COLOR = get_pixel( x, y );
 	
-	*( unsigned long* )&frontbuffer[pos] = COLOR;
+	*( unsigned long* ) &frontbuffer[pos] = COLOR;
 	//*( unsigned long* )&frontbuffer[pos] = get_pixel( x, y );
 
 	

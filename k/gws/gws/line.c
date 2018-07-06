@@ -1,5 +1,5 @@
 /*
- * File: line.c
+ * File: gws\gws\line.c
  *
  * Descrição:
  *     Rotinas de pintura de linha.
@@ -45,67 +45,36 @@ void lineDrawHorizontalLineWindowBuffer(struct window_d *window,
  * my_buffer_horizontal_line:
  *     Pinta uma linha horinzontal no backbuffer.
  */
-void my_buffer_horizontal_line( unsigned long x1,
-                                unsigned long y, 
-								unsigned long x2,  
-								unsigned long color )
+void 
+my_buffer_horizontal_line( unsigned long x1,
+                           unsigned long y, 
+						   unsigned long x2,  
+						   unsigned long color )
 {
 	while(x1 < x2){
-        my_buffer_put_pixel( color, x1, y, 0);
+        my_buffer_put_pixel( color, x1, y, 0 );
         x1++;  
-    };
-	return;
+    }
+	//return;
 };
 
-
-
-
- 
-
-							  
-void refresh_horizontal_line( unsigned long x1,
-                              unsigned long y, 
-			  				  unsigned long x2 )
+//@todo: ??						  
+void 
+refresh_horizontal_line( unsigned long x1,
+                         unsigned long y, 
+	  				     unsigned long x2 )
 {
-    
-	//unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;	
-	//unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_ADDRESS;		
-    
-	/*
-	void *s = (void *) FRONTBUFFER_ADDRESS;
-	void *d;
+	void *s = (void *) (BACKBUFFER_ADDRESS)  + (y*3*800) + (x1*3);
+    void *d = (void *) (FRONTBUFFER_ADDRESS) + (y*3*800) + (x2*3);
 	
-	s = (void*) (s) + (y*3*800) + (x1*3);
-	d = (void*) (s) + (x2*3); 
+	// ??
+	// Não pode ser isso. Tem que ser uma string de tamanho definido.
+	// strcpy(d,s);	
 	
-	memcpy(d,s, x2-x1);
-	*/
+	unsigned long size = (unsigned long) ( (x2-x1)*3 ); 
 	
-	/*
-	unsigned long X = x1;
-	unsigned long Y = y;
-	
-	int i;
-	for( i=0; i< (x2-x1); i++ )
-	{
-	    refresh_pixel( X, Y );
-		X++; 
-	};
-	*/
-	
-	//void *s = (void*) BACKBUFFER_ADDRESS;	
-	//void *d = (void*) FRONTBUFFER_ADDRESS;
-	
-	void *s = (void*) (BACKBUFFER_ADDRESS)  + (y*3*800) + (x1*3);
-    void *d = (void*) (FRONTBUFFER_ADDRESS) + (y*3*800) + (x2*3);
-	
-	//não pode ser isso. tem que ser uma string de tamanho definido.
-	//strcpy(d,s);	
-	
-	unsigned long size = (unsigned long) ((x2-x1)*3); 
-	
-	memcpy(  (void *) d, (const void *) s, size);
-	return;
+	memcpy( (void *) d, (const void *) s, size );
+	//return;
 };
 
 

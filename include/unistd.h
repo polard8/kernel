@@ -25,3 +25,12 @@
 #define	STDOUT_FILENO	1	/* standard output file descriptor */
 #define	STDERR_FILENO	2	/* standard error file descriptor */
 
+
+
+/* 
+ Process IDentifier 
+ posix.  
+ */
+typedef int pid_t;
+
+

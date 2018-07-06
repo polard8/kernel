@@ -1,31 +1,14 @@
 /*
- * File: gramado\gui\grid.c
+ * File: gws\gws\grid.c
  *
- *     ****    KERNEL GRID    ****
- * 
- * Descrição:
- *     Um pequeno grid no topo da tela.
- *     O objetivo é oferecer acesso aos principais programas do 
- * sistema, mesmo quando o gerenciador de prrogramas não esteja em uso.
- *     Em outras palavras é um "MINI GERENCIADOR DE PROGRAMAS" dentro do 
- * kernel base.
+ *     # grid support #
  *
- * Esse mini gerenciador de programas se chamará 'Kernel Grid'.
- * +Uma janela simples será o backgroundo do Kernel Grid e servirá de 
- * referência para o posicionamento dos ítens.
- * +Cada ítem é um link para um programa em user mode que esteja rodando
- * no momento. 
- * +Clicar no ítem restaura a janela do aplicativo se ele estiver minimizado,
- * ou minimiza se ele estiver em outro estado.
- * 
- * Obs: Podemos usa botões para os ítens do grid.
- *
- * Versão 1.0, 2015.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
 #include <kernel.h>
-
 
 
 /*
@@ -59,16 +42,14 @@ InitializeGrid( struct window_d *window,
 	
 	if( (void*) g == NULL )
 	{
-		printf("InitializeGrid: g pointer.\n");
+		printf("InitializeGrid: g\n");
 		goto fail;
 	}else{
 		
-	    if( g->used != 1 || g->magic != 1234 )
-	    {
-		    printf("InitializeGrid: g pointer.\n");
+	    if( g->used != 1 || g->magic != 1234 ){
+		    printf("InitializeGrid: g validation\n");
 		    goto fail;
 	    }
-		
 		//...
 	};
 	
@@ -81,16 +62,15 @@ InitializeGrid( struct window_d *window,
 		
 	}else{
 		
-		if( window->used != 1 || window->magic != 1234 )
-		{
-		    //fail.
+		//fail.
+		if( window->used != 1 || window->magic != 1234 ){
             printf("InitializeGrid: validation\n");
             goto fail; 			
 		}
 		
 		//@todo: filtros.
 		
-		if( view == GRID_HORIZONTAL)
+		if( view == GRID_HORIZONTAL )
 	    {
 		    WindowLeft = window->left;
 	 	    WindowTop = window->top;
@@ -102,11 +82,11 @@ InitializeGrid( struct window_d *window,
 		
 	        //horizontal..
 		    //muda métrica da área de trabalho.
-	        replace_window(gui->main, 0, WindowHeight);           //left, top
-	        resize_window(gui->main, 800, (600-WindowHeight));	 //width, height
+	        replace_window( gui->main, 0, WindowHeight );        //left, top
+	        resize_window( gui->main, 800, (600-WindowHeight) ); //width, height
 	    };
 
-	    if( view == GRID_VERTICAL)
+	    if( view == GRID_VERTICAL )
 	    {
 		    WindowLeft = window->left;
 	 	    WindowTop = window->top;
@@ -118,44 +98,36 @@ InitializeGrid( struct window_d *window,
 		
 		    //vertical.
 	        //métrica da área de trabalho.
-	        replace_window(gui->main, WindowWidth, 0);           //left, top
-	        resize_window(gui->main, (800-WindowWidth), 600);	 //width, height
+	        replace_window( gui->main, WindowWidth, 0 );        //left, top
+	        resize_window( gui->main, (800-WindowWidth), 600 ); //width, height
 	    };		
 		
 	    //...	
 	};
 	
-	
-	
-
-	
-	//
 	// Background do grid da janela principal.
-	//
-	 
+		 
 	//o grid pertence a janela principal. 
 	
-	gridWindow = (void*) CreateWindow( 1, 0, 0, "Grid Bg", 
-	                                   WindowLeft, WindowTop, WindowWidth, WindowHeight, 
-							           gui->main, 0, COLOR_BACKGROUND, 0 ); //popup						
-    if( (void*) gridWindow == NULL)
+	gridWindow = (void *) CreateWindow( 1, 0, 0, "Grid Bg", 
+	                        WindowLeft, WindowTop, WindowWidth, WindowHeight, 
+							gui->main, 0, COLOR_BACKGROUND, 0 ); 
+							
+    if( (void*) gridWindow == NULL )
 	{
-	    printf("drawScreenGrid fail: bg.\n");
+	    printf("drawScreenGrid: gridWindow\n");
 		goto fail;
 	}else{
 		RegisterWindow(gridWindow);
 	};	
 	
-	
 	// Pintando os ítens.
 	
-	//
-	// * Nessa hora devemos pegar o nome dos processos e colocar como etiqueta do ítem.
-	//
+	// * Nessa hora devemos pegar o nome dos processos e 
+	// colocar como etiqueta do ítem.
 	
 	unsigned char *string; //label.
 	string = "$";
-	
 	
 	//Os processos de usuário começam em 100.
 	i = 100;
@@ -168,13 +140,13 @@ InitializeGrid( struct window_d *window,
 		//#bugbug tem que usar create window.
 	    //griditemWindow = (void*) draw_button( gridWindow, string, 1, x, y, cx, cy, COLOR_BUTTONFACE);    						                 						
         
-	    griditemWindow = (void*) CreateWindow( WT_BUTTON, 0, 0, "Item", 
-	                                   x, y, cx, cy, 
-							           gridWindow, 0, COLOR_TERMINAL, COLOR_TERMINAL ); 		
+	    griditemWindow = (void *) CreateWindow( WT_BUTTON, 0, 0, "Item", 
+	                                x, y, cx, cy, 
+							        gridWindow, 0, COLOR_TERMINAL, COLOR_TERMINAL ); 		
 									   
 		if((void*) griditemWindow == NULL)
 		{
-	        printf("drawScreenGrid fail: ítem.\n");
+	        printf("drawScreenGrid fail: ítem\n");
 		    goto fail;		    
 	    }else{
 			RegisterWindow(griditemWindow);
@@ -189,8 +161,7 @@ InitializeGrid( struct window_d *window,
 		
 		if( view == GRID_VERTICAL ){
 			y = (unsigned long) y + cy;   //vertical.
-		}
-		    
+		}   
 				
 		i++;			
 	};
@@ -220,7 +191,9 @@ void *CreateGrid()
 	
 	g = (void*) malloc( sizeof( struct grid_d) );
 	
-	if( (void*) g == NULL ){
+	if( (void*) g == NULL )
+	{
+		//@todo: Message.
 		return NULL;
 	}else{
 		
@@ -237,7 +210,7 @@ void *CreateGrid()
 		
 		g->next = NULL;
 	};
-    return (void*) g;
+    return (void *) g;
 };
 
 
@@ -251,21 +224,22 @@ int grid( struct window_d *window,
 	struct grid_d *g;
 	//int n = 8;
 	
-	g = (void*) CreateGrid();
+	g = (void *) CreateGrid();
 	
 	//se o objeto for válido.
-	if( (void*) g != NULL )
+	if( (void *) g != NULL )
 	{
 		//Ele será o grid do kernel.
-		GRID = (void*) g;
+		GRID = (void *) g;
 		
 		//Inicializaremos a estrutura e pintaremos o grid.
 	    Status = (int) InitializeGrid( window, g, n, view);	
 	};	
 		
 	return (int) Status; 	
-}
+};
+
 
 //
-//fim.
+// End.
 //

@@ -124,13 +124,13 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
  *
  *
  */
-void drawDataRectangle( unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height, 
-						unsigned long color )
+void 
+drawDataRectangle( unsigned long x, 
+                   unsigned long y, 
+				   unsigned long width, 
+				   unsigned long height, 
+				   unsigned long color )
 {
-	
 	struct rect_d *rect;
 	
 	//A estrutura base é usada para efetuar essa rotina aqui,
@@ -147,7 +147,7 @@ void drawDataRectangle( unsigned long x,
    
     //Margens.
     rect->left = x;    
-    rect->top  = y;
+    rect->top = y;
     rect->right = rect->left + rect->width;
     rect->bottom = rect->top + rect->height; 
 
@@ -159,7 +159,7 @@ void drawDataRectangle( unsigned long x,
 	// o backbuffer.
     if( rect->right > 800 ){
         rect->right = 800;
-	};	
+	}	
 
 	/* @todo:
     if( rect->bottom > 600 ){
@@ -171,16 +171,15 @@ void drawDataRectangle( unsigned long x,
 	while( height-- )
 	{
 	    my_buffer_horizontal_line( rect->left, 
-		                           y, 
-								   rect->right, 
-								   rect->color_bg );
+		    y, 
+			rect->right, 
+			rect->color_bg );
 		y++;
     };    
   
     //Nothing.
-	
-done: 
-    return;
+//done: 
+    //return;
 };
   
   
@@ -191,7 +190,8 @@ done:
  *     da área de cliente da janela ativa.
  *     @todo: oferecer esse serviço para a api.
  */  
-void *getClientAreaRect(){
+void *getClientAreaRect()
+{
     return (void *) rectClientArea;	
 };
 
@@ -214,15 +214,13 @@ void setClientAreaRect( unsigned long x,
 	r->cy = cy;
 	
 	//Se a estrutura ainda não foi inicializada.
-    if((void*) rectClientArea == NULL){
+    if( (void *) rectClientArea == NULL ){
 	    return;
-	};
+	}
 	 
     rectClientArea = (void *) r;
     return;	
 };
-
-
 
 
 /*
@@ -240,24 +238,25 @@ void setClientAreaRect( unsigned long x,
  *     2018 - Fred Nora.
  * 
  */					
-void refresh_rectangle( unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height )
+void 
+refresh_rectangle( unsigned long x, 
+                   unsigned long y, 
+				   unsigned long width, 
+				   unsigned long height )
 {    
 	void *p = (void*) FRONTBUFFER_ADDRESS;		
 	void *q = (void*) BACKBUFFER_ADDRESS;
 
 	unsigned int line_size, lines;
 	unsigned int offset;
-	unsigned long Width  = (unsigned long) screenGetWidth();
+	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
 
 	line_size = (unsigned int) width; 
 	lines     = (unsigned int) height;
 	offset    = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
-	p = (void*) (p + offset);    
-	q = (void*) (q + offset);    
+	p = (void *) (p + offset);    
+	q = (void *) (q + offset);    
 	 
     vsync();	
 	
@@ -271,12 +270,10 @@ void refresh_rectangle( unsigned long x,
 };
 
 
-
 /*
 int rectInit()
 {}  
 */
-
 
 
 //
