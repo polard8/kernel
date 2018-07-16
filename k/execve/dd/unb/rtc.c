@@ -106,6 +106,7 @@ done:
 
 
 /* 
+ **************************************************
  * read_cmos_bcd:
  *     Lê da CMOS um determinado registro. 
  */
@@ -126,8 +127,8 @@ unsigned long read_cmos_bcd( unsigned reg )
 };
 
 
-
-/* 
+/*
+ *************************************************************** 
  * get_time:
  * Pega o horário armazenado na CMOS.
  * Formato: Cada unidade representa 1 segundo. 
@@ -149,6 +150,7 @@ unsigned long get_time()
 
 
 /*
+ ***************************************************************
  * get_date: 
  * Pega a data armazenada na CMOS. 
  * Formato(bytes): YYMD 
@@ -168,6 +170,7 @@ unsigned long get_date()
 
 
 /* 
+ ************************************************************
  * rtcGetExtendedMemory:
  *     Get total memory info via CMOS. 
  *
@@ -218,6 +221,7 @@ done:
 
 
 /* 
+ **************************************************************
  * rtcGetBaseMemory:
  *     Get base memory info via CMOS. 
  *
@@ -267,6 +271,7 @@ done:
 
 
 /*
+ *****************************************************************
  * get_cmos_info:
  *     Obs: Essa função deve ser chamada apenas uma vez na inicialização
  * do módulo. @todo: Criar métodos que pegam esses valores salvos na 
@@ -281,35 +286,34 @@ void *get_cmos_info()
 	// na inicialização, depois somente atualizados os valores.
 	//
 	
-	Rtc = (void*) malloc( sizeof(struct rtc_d) );
-    if( (void*) Rtc == NULL)
+	Rtc = (void *) malloc( sizeof(struct rtc_d) );
+    if( (void *) Rtc == NULL)
 	{
 	    printf("get_cmos_info fail: Struct\n");
 		refresh_screen();
 		//free(Rtc);
 		return NULL;
-	}
-	else
-	{
+	}else{
+		
 	    //time
 	    Rtc->Seconds = read_cmos_bcd(0);  // Seconds.
 	    Rtc->Minutes = read_cmos_bcd(2);  // Minutes.
-	    Rtc->Hours   = read_cmos_bcd(4);  // Hours.
+	    Rtc->Hours = read_cmos_bcd(4);  // Hours.
 
 	    //date.
-	    Rtc->Year       = read_cmos_bcd(9);    
-	    Rtc->Year       = (2000 + Rtc->Year);
-		Rtc->Month      = read_cmos_bcd(8);    
+	    Rtc->Year = read_cmos_bcd(9);    
+	    Rtc->Year = (2000 + Rtc->Year);
+		Rtc->Month = read_cmos_bcd(8);    
 	    Rtc->DayOfMonth = read_cmos_bcd(7);    
 			
 		//@todo: put on structure.
     };
 	
 	//struct
-	if( (void*) Hardware == NULL)
+	if( (void *) Hardware == NULL )
 	{
 		//erro
-	    printf("get_cmos_info fail: Hardware struct\n");
+	    printf("get_cmos_info: Hardware\n");
 		refresh_screen();
 		//free(Rtc);
 		return NULL;		 
@@ -317,15 +321,20 @@ void *get_cmos_info()
 		Hardware->Rtc = Rtc;	//Save.	
 	};
 
-show_message:	
-	printf("Time={%d:%d:%d}\n",Rtc->Hours      ,Rtc->Minutes ,Rtc->Seconds);
-	printf("Date={%d/%d/%d}\n",Rtc->DayOfMonth ,Rtc->Month   ,Rtc->Year);
+//show_message:
+	
+#ifdef KERNEL_VERBOSE	
+	printf("Time=%d:%d:%d\n", Rtc->Hours, Rtc->Minutes, Rtc->Seconds );
+	printf("Date=%d/%d/%d\n", Rtc->DayOfMonth, Rtc->Month, Rtc->Year );
+#endif	
+	
 done:
-	return (void*) Rtc;
+	return (void *) Rtc;
 };
 
 
 /*
+ ************************************************************
  * init_clock: 
  *     Inicia a data e a hora do controlador.
  *

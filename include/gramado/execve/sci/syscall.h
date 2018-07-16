@@ -371,8 +371,10 @@
 #define	SYS_EXECUTEPROGRAM 221
 #define	SYS_222 222
 #define	SYS_223 223
-#define	SYS_224 224
-#define	SYS_225 225
+
+//time date
+#define	SYS_GETTIME 224
+#define	SYS_GETDATE 225
 
 //Critical section support.
 #define	SYS_GET_KERNELSEMAPHORE    226  //Get.     

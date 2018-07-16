@@ -143,8 +143,8 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	// Já temos um PID para o processo que é dono da thread.
 	//
 
-	Process = (void*) processList[ProcessID]; 		
-	if( (void*) Process == NULL )
+	Process = (void *) processList[ProcessID]; 		
+	if( (void *) Process == NULL )
 	{
 		printf("pc-action-thread-create_thread: Process\n");
 		die();
@@ -152,8 +152,8 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	
 	//Alocando memória para a estrutura da thread.
 	//Obs: Estamos alocando memória dentro do heap do kernel.
-	Thread = (void*) malloc( sizeof(struct thread_d) );	
-	if( (void*) Thread == NULL )
+	Thread = (void *) malloc( sizeof(struct thread_d) );	
+	if( (void *) Thread == NULL )
 	{
 	    printf("pc-action-thread-create_thread: Thread\n");
 		die();
@@ -177,10 +177,10 @@ get_next:
 	};
 	
 	//Get empty.
-	Empty = (void*) threadList[i];
+	Empty = (void *) threadList[i];
     
 	//Se o slot estiver ocupado.
-	if( (void*) Empty != NULL )
+	if( (void *) Empty != NULL )
 	{
 		// Voltamos.
 		// #bugbug: Isso pode não parar nunca.
@@ -373,7 +373,7 @@ get_next:
 	    Thread->blockedCount = 0;    //Tempo bloqueada.	
 	
         //À qual processo pertence a thread.  
-		Thread->process = (void*) Process; 	 	                      
+		Thread->process = (void *) Process; 	 	                      
         
 		//Thread->window_station
 		//Thread->desktop
@@ -429,7 +429,7 @@ done:
 	//
 	
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
-    return (void*) Thread;
+    return (void *) Thread;
 };
 
 
@@ -438,7 +438,8 @@ done:
  *     Pega o id da thread atual.
  *     Obs: current_thread já é o id.
  */
-int GetCurrentThreadId(){
+int GetCurrentThreadId()
+{
 	return (int) current_thread;
 };
 
@@ -457,13 +458,13 @@ void *GetCurrentThread()
 		return NULL;
 	};
 	
-	Current = (void*) threadList[current_thread];	
-	if( (void*) Current == NULL ){
+	Current = (void *) threadList[current_thread];	
+	if( (void *) Current == NULL ){
         return NULL;
 	};
 //Done.
 done:
-	return (void*) Current;
+	return (void *) Current;
 };
 
 
@@ -523,7 +524,7 @@ fail:
 void 
 SelectForExecution( struct thread_d *Thread )
 { 
-	if( (void*) Thread == NULL){
+	if( (void *) Thread == NULL){
         return;
 	};  
 
@@ -559,7 +560,7 @@ int GetThreadState(struct thread_d *Thread)
 //Get Type. (Zero é tipo NULL?).
 int GetThreadType(struct thread_d *Thread)
 {
-	if( (void*) Thread == NULL){
+	if( (void *) Thread == NULL){
         return (int) 0;
 	};  
     return (int) Thread->type;
@@ -576,22 +577,25 @@ void show_thread_information()
 {
 	struct thread_d *Current;	
 	
-	printf("Threads info:\n\n");		
+	printf("Threads info:\n");		
 	
 	//Limits.
 	if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
 		return;
 	};	
 	
-	Current = (void*) threadList[current_thread];
-	if( (void*) Current == NULL){
+	Current = (void *) threadList[current_thread];
+	if( (void *) Current == NULL )
+	{
 	    printf("pc-thread-show_thread_information:\n");	
 	    return;
 	}else{
 	    
-		printf("CurrentThreadId={%d}\n",current_thread);
+		printf("currentTID={%d}\n",current_thread);
 		//...
 	};
+	
+	printf("idle={%d}\n",idle);
 
 	//Mostra Slots. 
 	//threadi.c
@@ -609,7 +613,7 @@ void show_thread_information()
 	
 //Done.	
 done:	
-    printf("Done.\n");
+    printf("Done\n");
 	refresh_screen();
 	return;
 };
@@ -617,6 +621,7 @@ done:
 
 
 /*
+ *******************************************************
  * init_threads:
  *     Inicializa o thread manager.
  *     Inicializa as estruturas e variáveis 
@@ -627,7 +632,7 @@ int init_threads()
 { 
 	//Globais.	 
 	current_thread = 0;                        //Atual. 
-	ProcessorBlock.running_threads = (int) 0;    //Número de tarefas rodando.	
+	ProcessorBlock.threads_counter = (int) 0;  //Número de threads no processador.	
 	old = 0;                                   //?
     forkid = 0;                                //
     task_count = (unsigned long) 0;            //Zera o contador de tarefas criadas.

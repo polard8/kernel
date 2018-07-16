@@ -507,7 +507,7 @@ done:
     g_driver_timer_initialized = (int) 1;
 	
 #ifdef KERNEL_VERBOSE
-    printf("timerInit: Done.\n");
+    printf("timerInit: Done\n");
 #endif
 	
 	return (int) 0;

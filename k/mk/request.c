@@ -21,23 +21,52 @@
  * Lista de requests:
  * =================
  *
- * KERNEL_REQUEST_NONE: Request null, sem motivo definido.
- * KERNEL_REQUEST_TIME: Contador de vezes que a thread rodou.
- * KERNEL_REQUEST_SLEEP: Faz a thread atual dormir. Entrando no estado waiting.
- * KERNEL_REQUEST_WAKEUP: Acorda a thread atual.
- * KERNEL_REQUEST_ZOMBIE: Torna zombie a thread atual.
- * KERNEL_REQUEST_NEW: Inicia uma nova thread. A thread roda pela primeira vez.
- * Ela estar no estado INITIALIZED.
- * KERNEL_REQUEST_NEXT: ?? Reinicia a execução de uma thread.
- * KERNEL_REQUEST_TIMER_TICK: ?? O tick do timer.
- * KERNEL_REQUEST_TIMER_LIMIT: ?? Um limite de contagem.
+ * KERNEL_REQUEST_NONE: 
+ *     Request null, sem motivo definido.
+ * KERNEL_REQUEST_TIME: 
+ *     Contador de vezes que a thread rodou.
+ * KERNEL_REQUEST_SLEEP: 
+ *     Faz a thread atual dormir. Entrando no estado waiting.
+ * KERNEL_REQUEST_WAKEUP: 
+ *     Acorda a thread atual.
+ * KERNEL_REQUEST_ZOMBIE: 
+ *     Torna zombie a thread atual.
+ * KERNEL_REQUEST_NEW: 
+ *     Inicia uma nova thread. A thread roda pela primeira vez.
+ *     Ela estar no estado INITIALIZED.
+ * KERNEL_REQUEST_NEXT: 
+ *     ?? Reinicia a execução de uma thread.
+ * KERNEL_REQUEST_TIMER_TICK: 
+ *      ?? O tick do timer.
+ * KERNEL_REQUEST_TIMER_LIMIT: 
+ *     ?? Um limite de contagem.
  * //...
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão das rotinas basicas.
+ * History:
+ *     2015 - Created by Fred Nora.
  *     //...
  */  
+ 
+ 
+/*
+    # planejando próximos eventos ...
+
+	{
+	#bugbug: Situação em que temos que acordar uma threa por causa de evento de input.	
+	+ Ocorreu um evento de input, devemos acordar a trhead que estava esperando por ele.
+	#importante: Me parece que esse caso não deve ser tratado aqui e sim na hora do 
+	tratamento da interrupção, pois input não pode esperar. O tempo de resposta é importante.
+	Lembrando que esse tratamento de requests é 'adiado' até o fim da rotina de interrupção 
+	de timer.
+	}
+	
+	{
+	   ...	
+	}
+	
+
+*/ 
+ 
  
  
 #include <kernel.h>
@@ -60,6 +89,7 @@
  */
 void KiRequest()
 {
+	//#todo: #bugbug: limite imposto
 	int Max = 11;
 	
     //
@@ -71,12 +101,11 @@ void KiRequest()
     if( kernel_request < 0 || 
 	    kernel_request > Max )
 	{
-        printf("KiRequest: n={%d}",
-		    kernel_request );
+        printf("KiRequest: %d", kernel_request );
 		die();
 	};
 	//...
-done:
+//done:
     request();
 };
 
@@ -94,17 +123,16 @@ done:
  */
 void request()
 {  
+    struct process_d *Process; 
+    struct thread_d *Thread;	
+
 	int Current;
 	unsigned long r;    //Número do request.
 	unsigned long t;    //Tipo de thread. (sistema, periódica...).
 	int Max = 11;	
-    struct process_d *Process; 
-    struct thread_d  *Thread;	
 	
-    //
+   
 	// Current thread.
-	//
-	
 	Current = (int) current_thread;
 	
 	//
@@ -114,7 +142,7 @@ void request()
 	//if(Current ...){}
 	
 	Thread = (void *) threadList[Current];
-	if( (void*) Thread == NULL )
+	if( (void *) Thread == NULL )
 	{
 		//kernel_request = 0;
 		//...
@@ -124,7 +152,7 @@ void request()
 	{
 	    r = (unsigned long) kernel_request;
 	    t = (unsigned long) Thread->type; 
-		Process = (void*) Thread->process;
+		Process = (void *) Thread->process;
 	    //...
 	};
 	
@@ -135,7 +163,10 @@ void request()
 		die();
     };
 	
-	//Number.	
+    //
+	// # Number #
+	//
+	
 	switch(r) 
 	{
 	    //0 - request sem motivo, (a variável foi negligenciada).
@@ -161,9 +192,8 @@ void request()
 				    Thread->ticks_remaining--;
 					if( Thread->ticks_remaining == 0 )
 					{
-		                panic("request: Time out TIP={%d}", 
-						    Thread->tid );
-                        die();						
+		                panic("request: Time out TIP={%d}", Thread->tid );
+                        //die();						
 	                };
                     break;
 					
@@ -199,7 +229,8 @@ void request()
 		//Uma nova thread passa a ser a current, para rodar pela primeira vez.
 		case KR_NEW:	
 		    //Start a new thread. 
-	        if(start_new_task_status == 1){		
+	        if(start_new_task_status == 1)
+			{		
 		        current_thread = start_new_task_id;
 	        };
 		    break;
@@ -211,23 +242,25 @@ void request()
 			
 		//7 - tick do timer.
 		case KR_TIMER_TICK:
-		    panic("KR_TIMER_TICK");
-			die();
+		    panic("KR_TIMER_TICK\n");
+			//die();
 		    break;
         
 		//8 - limite de funcionamento do kernel.
         case KR_TIMER_LIMIT:
-		    panic("KR_TIMER_LIMIT!\n");
-			die();
+		    panic("KR_TIMER_LIMIT\n");
+			//die();
 		    break;
 			
-		//9 - checa se ha threads para serem inicializadas e 
-		//inicializa pelo método spawn.	
+		//9 - Checa se ha threads para serem inicializadas e 
+		// inicializa pelo método spawn.	
 		case KR_CHECK_INITIALIZED:
             check_for_standby();		
 		    break;
 			
+		
 		//@todo: Tratar mais tipos.	
+		//...
 		
 		default:
 		    //printf("Default Request={%d}\n",r);

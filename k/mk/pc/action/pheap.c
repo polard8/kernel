@@ -8,7 +8,8 @@
  *     Cada desktop tem seu próprio heap de memória. 
  *     Um processo usa o heap de memória usado pelo seu desktop.
  *
- * Versão 1.0, 2016.
+ * History:
+ *     2016 - Created by Fred Nora.
  */
  
  

@@ -4,8 +4,6 @@
 
 
 
-
-
 void KiCallfarTest()
 {
     // call 8:20000 //chama o módulo em kernel mode.

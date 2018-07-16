@@ -1269,12 +1269,24 @@ void *services( unsigned long number,
         case SYS_DESTROYTERMINAL:
             break; 		
 			
+			
+		//224 - get time	
+		case SYS_GETTIME:	
+		    return (void *) get_time();
+			break;
+			
+		//225 - get date
+		case SYS_GETDATE:
+		    return (void *) get_date();
+            break;		
+			
+			
 		//Obs: @todo: poderia ser uma chamada para configurar o posicionamento 
         //e outra para configurar as dimensões.		
 			
 		//226 get
         case SYS_GET_KERNELSEMAPHORE:
-            return (void*) __ipc_kernel_spinlock;
+            return (void *) __ipc_kernel_spinlock;
             break;
         
         //227 close critical section	

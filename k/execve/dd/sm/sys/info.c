@@ -78,7 +78,7 @@ void KiInformation()
 	}	
 	
 	//Parent window.
-	if( (void*) gui->main == NULL )
+	if( (void *) gui->main == NULL )
 	{
 		printf("KiInformation: parent window fail\n");
 		goto fail;
@@ -97,10 +97,7 @@ void KiInformation()
 		//...
 	};
 	
-	
-	//
 	// ## Window ##
-	//
 		
     //Obs: Podemos usar o esquema de cores padrão.
     //Mas a intenção é que as janelas do kernel tenham
@@ -135,9 +132,9 @@ void KiInformation()
 		//rotina deveria perceber as dimensões da janela de do caractere e determinar
 		//as margens.
 		
-		g_cursor_left   = (hWindow->left/8);
-		g_cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-		g_cursor_right  = g_cursor_left + (width/8);
+		g_cursor_left = (hWindow->left/8);
+		g_cursor_top = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+		g_cursor_right = g_cursor_left + (width/8);
 		g_cursor_bottom = g_cursor_top  + (height/8);
 	
 	
@@ -150,13 +147,10 @@ void KiInformation()
 	
 	};										
 		
-		
-	//
 	// ## Messages ##
-	//
 	
 	printf("\n");
-	printf("[System Info:]\n");
+	//printf("[System Info:]\n");
 	
 	// OS info.
 	printf("%s ",OS_NAME);
@@ -179,20 +173,17 @@ void KiInformation()
 												   
     //ShowUserInfo(int user_id);	
 
-
-	//
     // ## Status ##
-    //
 
 	// Status do mecanismo de task switch.
 	switch( task_switch_status )
 	{
 	    case LOCKED:
-		    printf("Task switch is LOCKED.\n");
+		    printf("Task switch is LOCKED\n");
 			break; 
 	    
 		case UNLOCKED:
-		    printf("Task switch is UNLOCKED.\n");
+		    printf("Task switch is UNLOCKED\n");
 		    break; 	
 	};
 
@@ -200,11 +191,11 @@ void KiInformation()
 	switch( g_scheduler_status )
 	{
 	    case LOCKED:
-		    printf("Scheduler is LOCKED.\n");
+		    printf("Scheduler is LOCKED\n");
 		    break; 
 	    
 		case UNLOCKED:
-		    printf("Scheduler is UNLOCKED.\n");
+		    printf("Scheduler is UNLOCKED\n");
 		    break; 
 	};
 
@@ -215,7 +206,7 @@ void KiInformation()
 	
 	printf("\n");
     printf("[Dispatch criteria:]\n");
-	printf("cIdle={%d} cInit={%d} cNext={%d} cCur={%d}"
+	printf("cIdle={%d} cInit={%d} cNext={%d} cCur={%d} "
 	       "cAny={%d} cIdeal={%d} cDisp={%d}\n\n",
 		DispatchCountBlock->SelectIdleCount,
 		DispatchCountBlock->SelectInitializedCount,
@@ -226,8 +217,8 @@ void KiInformation()
 		DispatchCountBlock->SelectDispatcherQueueCount );
 		
 	printf("## thread info ## \n");	
-	printf("\n{ %d } threads running\n\n",
-	    ProcessorBlock.running_threads);	
+	printf("\n{ %d } threads_counter\n\n",
+	    ProcessorBlock.threads_counter );	
     
 	show_thread_information();		
 		

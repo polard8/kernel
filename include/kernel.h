@@ -408,9 +408,20 @@ int current_group;   //gramado ?
 //int current_window;         //gws
 //int current_menu; //gws
 
+//
+// #importante
+// Essa é a verdadeira idle, que está em ring 0 e trabalha 
+// quando sistema está ocioso.
+// ela deve ficar bloqueada quendo outras estão trabalhando. 
+// Ela não pode ser destruída e nem alterada ... uma vez configurada 
+// ficará sendo ela pra sempre, se ela fechar o sistema deve falhar.
+int idle;   
+
+//Próxima thread das threads em user mode.
+int next_thread;   
+  
 int current_process;
 int current_thread;
-int current_idle_thread;  //ring0
 int current_disk;
 int current_volume;
 int current_directory;   
@@ -522,7 +533,8 @@ unsigned long KernelStatus;
 
 
 //Task support variables.
-unsigned long kernel_request;
+
+//??
 unsigned long kernel_switch;
 
 
@@ -539,6 +551,7 @@ unsigned long kernel_tick_total;
 
 
 //error support.
+//isso deve ir para a libc
 unsigned long errno;
 
 //
@@ -546,10 +559,11 @@ unsigned long errno;
 //
 
 
-
+//??
 //directory entries support.
 char buffer_dir_entry[512];
 
+//??Isso pode ir para outro lugar ou podemos usar uma stream.
 //log buffer
 char KernelLogBuffer[512];
 

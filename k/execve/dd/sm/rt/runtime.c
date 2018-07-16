@@ -25,6 +25,7 @@
 
 
 /*
+ *********************************
  * init_runtime:
  *     Initializing run time. 
  *     Kernel heap and stack stuffs.

@@ -577,6 +577,9 @@ int dispatch_Default()
 	struct thread_d *New;
 	struct thread_d *Current;
 	
+	Current = NULL;
+	
+	
 	/*
 	 * Fase1 - Tenta tarefa de quantum vencido.
 	 */
@@ -641,9 +644,8 @@ int dispatch_Default()
 	    New = (void *) threadList[nextId]; 
 		if( (void*) New == NULL )
 		{
-		    printf("scheduler fail: findhigerpriority return null.");
-			refresh_screen();
-			while(1){}
+		    printf("scheduler fail: findhigerpriority return null");
+			die();
 		}
 		//inicio da fila, lifo
 		if( New->state == READY)
@@ -679,7 +681,7 @@ int dispatch_Default()
 			if(New->tid != 0)
 			{
 			    New->quantum = 0;
-			    New->Next = (void*) Current;
+			    New->Next = (void *) Current;
 				return (int) New->tid;
             };				
 		};	
@@ -883,19 +885,19 @@ init_dispatcher()
 	//inicializa a lista
 	//Conductor = (void*) IdleThread;
 		
-	rootConductor = (void*) malloc( sizeof(struct thread_d) );
-	if( (void*) rootConductor == NULL )
+	rootConductor = (void *) malloc( sizeof(struct thread_d) );
+	if( (void *) rootConductor == NULL )
 	{
 		panic("init_dispatcher: rootConductor");
-		die();
+		//die();
 	};
 	
 	//Usado para task switch.
-	Conductor = (void*) rootConductor;
+	Conductor = (void *) rootConductor;
 	
 	//Inicia a lista.
- 	Conductor2 = (void*) rootConductor;
-	Conductor2->Next = (void*) threadList[0]; 
+ 	Conductor2 = (void *) rootConductor;
+	Conductor2->Next = (void *) threadList[0]; 
 	
 //Done.	
 done:

@@ -250,7 +250,7 @@ bmpDisplayBMP( char *address,
 					color = (unsigned long) palette[  palette_index[0] ];
 				    
 					nibble_count_16colors = 2222;
-					base = base;
+					//base = base;
 				};
 	        };	
 

@@ -66,8 +66,7 @@ KiGetTaskStatus()
  * ?? isso está muito estranho !!
  */
 void 
-KiSaveContextOfNewTask( int id, 
-                        unsigned long *task_address )
+KiSaveContextOfNewTask( int id, unsigned long *task_address )
 {
     return;
 };
@@ -362,8 +361,7 @@ done:
  *     Muda a prioridade de uma thread específica.
  */
 void 
-set_thread_priority( struct thread_d *t, 
-                     unsigned long priority )
+set_thread_priority( struct thread_d *t, unsigned long priority )
 {
     unsigned long ThreadPriority;
 	
@@ -432,8 +430,7 @@ done:
  *     Apenas a variável. Não altera o CR3.
  */
 void 
-SetThreadDirectory( struct thread_d *thread, 
-                    unsigned long Address )
+SetThreadDirectory( struct thread_d *thread, unsigned long Address )
 {
     if( (void*) thread == NULL ){
         goto fail;        
@@ -561,8 +558,14 @@ exit_thread(int tid)
     struct thread_d *Thread;
 	
 	//Limits. 
-	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
+	if( tid < 0 || tid >= THREAD_COUNT_MAX )
+	{
 	    goto fail;
+	}
+	
+	if( tid == idle )
+	{
+		goto fail;
 	}
 	
 	Thread = (void*) threadList[tid];
@@ -612,9 +615,16 @@ kill_thread(int tid)
     struct thread_d *Thread;
 	
 	//Limits.
-	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
+	if( tid < 0 || tid >= THREAD_COUNT_MAX )
+	{
 	    goto fail;	
 	}
+	
+	if( tid == idle )
+	{
+		goto fail;
+	}
+	
 	
 	//
 	// @todo: 
@@ -624,9 +634,9 @@ kill_thread(int tid)
 	// causar o fechamento do processo.	
     //
 	
-	Thread = (void*) threadList[tid];
+	Thread = (void *) threadList[tid];
 	
-	if( (void*) Thread == NULL )
+	if( (void *) Thread == NULL )
 	{
 		goto fail;
 	}else{
@@ -639,25 +649,32 @@ kill_thread(int tid)
 		Thread->state = DEAD; 
 		//...
 		
-        //threadList[tid] = NULL;   //@todo: Liberar o espaço na lista.
-        //Thread = NULL;		
+		
+				ProcessorBlock.threads_counter--;
+				if( ProcessorBlock.threads_counter < 1 )
+				{
+					//#bugbug
+					panic("kill_thread: threads_counter");
+					//die();
+				}		
+		
+        threadList[tid] = (unsigned long) 0;
+        Thread = NULL;		
 	};
 	
 	
 	// # reavaliar isso.
 	// Se a thread fechada é a atual, 
 	// necessitamos de algum escalonamento.	
-    if( tid = current_thread )
-	{
-		//@todo: Usar a interface.
+    if( tid == current_thread )
 	    scheduler();
-    };
 	
 	
 fail:	
 	
 //Done.
 done:
+    current_thread = idle;
 	return;
 };
 
@@ -688,6 +705,13 @@ Scan:
 			    Thread->used == 1 && 
 				Thread->magic == 1234 )
 			{
+				
+				if( Thread->tid == idle )
+				{
+					printf("dead_thread_collector: we can't close idle\n");
+					die();
+				}
+				
 				//kill_thread(Thread->tid);
 				Thread->used = 0;
 				Thread->magic = 0;
@@ -705,12 +729,12 @@ Scan:
                 //Thread = NULL;
 	            //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.
 				
-				ProcessorBlock.running_threads--;
-				if( ProcessorBlock.running_threads < 1 )
+				ProcessorBlock.threads_counter--;
+				if( ProcessorBlock.threads_counter < 1 )
 				{
 					//#bugbug
-					panic("dead_thread_collector: ProcessorBlock.running_threads = 0");
-					die();
+					panic("dead_thread_collector: threads_counter");
+					//die();
 				}
 	
 			};
@@ -726,6 +750,18 @@ Scan:
 done: 	
 	return;
 };
+
+
+
+void kill_all_threads()
+{
+	int i;
+    for( i=0; i < THREAD_COUNT_MAX; i++ )
+	{
+	    kill_thread(i);	
+	};
+}
+
 
 
 //

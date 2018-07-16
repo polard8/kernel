@@ -100,7 +100,7 @@ void reload_current_task()
 void switch_to_user_mode()
 { 
     panic("switch_to_user_mode:");    //Cancelada!	
-    die();
+    //die();
 }; 
 
 
@@ -142,19 +142,16 @@ unsigned long executa_tarefa( int id,
 	if( (void *) t == NULL )
 	{
 	    panic("start-executa_tarefa: t\n");
-	    die();
-	}
-    else
-    {
+	    //die();
+	}else{
+		
         // Status.	
 	    if( t->state != READY ){
 	        panic("start-executa_tarefa: state",id);
-            die();
-			//while(1){}; 	    
+            //die(); 
 	    }else{
 			
-	        t->state = RUNNING;
-			
+	        t->state = RUNNING;	
 	    };
 	
 	    //...
@@ -164,7 +161,7 @@ unsigned long executa_tarefa( int id,
 	// Running tasks ~ Incrementa o número de tarefas que estão rodando.
 	//
 	
-    ProcessorBlock.running_threads++;   
+    ProcessorBlock.threads_counter++;   
 	
 	IncrementDispatcherCount(SELECT_ANY_COUNT);
 
@@ -216,7 +213,7 @@ unsigned long executa_tarefa( int id,
 	
 fail:
     panic("start-executa_tarefa: fail");
-    die();
+    //die();
 	//while(1){};    
 };
 

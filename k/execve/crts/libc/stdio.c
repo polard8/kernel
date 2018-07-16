@@ -341,6 +341,7 @@ done:
 
 
 /*
+ **************************************************************
  * kprintf:
  *     Rotina simples de escrita em kernel mode.
  *     @todo: isso deve ir para outro lugar. uitm/libk 
@@ -352,25 +353,24 @@ int kprint( char *message, unsigned int line, int color )
 
 	i = (line*SCREEN_WIDTH*2); 
 
-    while(*message!=0) 
+    while( *message != 0 ) 
     { 
-        if(*message=='\n')
+        if( *message == '\n' )
         { 
             line++; 
-            i=(line*SCREEN_WIDTH*2); 
-            *message++; 
-        }
-        else
-        { 
-            vm[i]=*message; 
-            *message++; 
+            i = ( line*SCREEN_WIDTH*2 ); 
+            message++; 
+        }else{
+			
+            vm[i] = *message; 
+            message++; 
             i++; 
             vm[i]= color; 
             i++; 
         }; 
     };
 	
-done:	
+//done:	
     return (int) 0; 
 }; 
 
@@ -601,25 +601,31 @@ int printf( const char *format, ... )
 void panic( const char *format, ... )
 {           
 	register int *varg = (int *)(&format);
+	
+	
+	printf("crts-libc-stdio-panic: KERNEL PANIC\n");
 		
     switch(VideoBlock.useGui)
     {
 		//text mode
 		case 0:
-	        kclear(0);
+	        //kclear(0);
 	        print(0,varg);		
 		    break;
 		
 		//graphics mode
 		case 1:
-	        backgroundDraw(COLOR_BLACK);
-		    printf("uitm-libc-stdio-panic: KERNEL PANIC\n\n");
+	        //backgroundDraw(COLOR_BLACK);
+		    //printf("crts-libc-stdio-panic: KERNEL PANIC\n");
 		    print(0,varg);		
 		    break;
 
         default:
+	        //backgroundDraw(COLOR_BLACK);
+		    //printf("crts-libc-stdio-panic: KERNEL PANIC\n");
+		    print(0,varg);			
             break; 		
-	}
+	};
     die();	
 };
 

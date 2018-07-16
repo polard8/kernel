@@ -744,13 +744,20 @@ void fs_test_fat_vector();
 // root dir support
 //
    
-void KiLoadRootDir(unsigned long address);
+
 void fs_load_rootdir();
 void fs_save_rootdir();
 void fs_save_entry_on_root(unsigned long eid);
 void fs_load_rootdirEx();
 void limpa_root(); 
 
+
+//   Carrega o diretório na memória, dados o endereço, 
+//o lba inicial e o número de setores.
+void 
+load_directory( unsigned long address, 
+                unsigned long lba, 
+				unsigned sectors );
 
 //
 // Read

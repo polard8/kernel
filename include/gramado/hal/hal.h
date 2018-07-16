@@ -175,13 +175,19 @@ struct motherboard_d
 
 
 /*
+ ******************************************************
  * ProcessorBlock_d:
  *     Processor Block.
  *     Usado para task switch.
  *     Contém informações sobre o processador. 
  *     Que processo está nele.
+ *     #importante:
+ *     obs: talvez devamos ter um desses para cada 
+ * processador ??
+ *     +A contagem de thrads feita aqui refere-se somente 
+ * a um processador ?
+ *
  */
-typedef struct ProcessorBlock_d ProcessorBlock_t; 
 struct ProcessorBlock_d
 {
     object_type_t objectType;
@@ -190,6 +196,7 @@ struct ProcessorBlock_d
     //
 	// Processor Info. 
 	//
+	
 	int Id;
 	int Used;
 	struct tagProcessor *processorInfo; //informações sobre o processador. 
@@ -197,7 +204,10 @@ struct ProcessorBlock_d
 	//
 	// Process.
 	//
-	int running_processes;
+	
+	//int running_processes;
+	int processes_counter;
+	
 	struct process_d *CurrentProcess;  
 	struct process_d *KernelProcess;  
 	//struct process_d *CurrentProcess;  
@@ -205,9 +215,15 @@ struct ProcessorBlock_d
 	//
 	// Threads.
 	//
-	//int running_tasks;    // (@todo: Mudar para running_threads.)
-	int running_threads;  //Número de threads rodando nesse processador.
-    
+
+	//Número de threads rodando nesse processador.
+	//não importa o estado que elas estejam, então 
+	//talvez esse nome não seja apropriado, pois 
+	//dá a impressão que a trhead está no rodando no momento.
+	
+	//int running_threads;   
+    int threads_counter;
+	
 	struct thread_d *CurrentThread;    
     struct thread_d *NextThread;
     struct thread_d *IdleThread;	
@@ -215,10 +231,17 @@ struct ProcessorBlock_d
 	
     //Continua ...
 };
-ProcessorBlock_t ProcessorBlock;    //Obs: Não tem ponteiro.
+
+//Obs: Não tem ponteiro.
+//Pois se refere ao processador atual, quando temos apenas 
+//um processador.
+struct ProcessorBlock_d ProcessorBlock;    
   
 
+//lista de informações sobre os processadores.  
+//unsigned long processorblocList[32];  
 
+  
 //...
  
 

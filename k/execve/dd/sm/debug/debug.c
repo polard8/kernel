@@ -49,7 +49,7 @@ typedef enum {
    NATURALIST,   
 }MindType_t;
 
-typedef struct Mind_d Mind_t;
+
 struct Mind_d
 {
     unsigned long Mythic;
@@ -57,7 +57,7 @@ struct Mind_d
 	unsigned long Realist;
 	unsigned long Naturalist;	
 };
-Mind_t Mind;
+struct Mind_d Mind;
 
 
 //Internas.
@@ -123,7 +123,8 @@ int debug_check_inicialization()
     int Status = 0;
 	
 	// Check phase.
-	if(KeInitPhase != 3){
+	if( KeInitPhase != 3 )
+	{
 	   Status = 1;
 	   printf("sm-debug-debug_check_inicialization: KeInitPhase phase={%d}\n",KeInitPhase);
 	   goto fail;
@@ -146,7 +147,8 @@ int debug_check_inicialization()
 	//SetMind(NATURALIST);
 	
 	// Executive.
-	if(Initialization.executive != 1){
+	if( Initialization.executive != 1 )
+	{
 	   Status = 1;
 	   printf("sm-debug-debug_check_inicialization: executive\n");
 	   goto fail;
@@ -155,7 +157,8 @@ int debug_check_inicialization()
 	
 	
 	// Microkernel.
-    if(Initialization.microkernel != 1){
+    if( Initialization.microkernel != 1 )
+	{
 	   Status = 1;
 	   printf("sm-debug-debug_check_inicialization: microkernel\n");
 	   goto fail;
@@ -163,7 +166,8 @@ int debug_check_inicialization()
 	//SetMind(ROMANTIC);
 	
 	// Hal.
-    if(Initialization.hal != 1){
+    if( Initialization.hal != 1 )
+	{
 	   Status = 1;
 	   printf("sm-debug-debug_check_inicialization: hal\n");
 	   goto fail;
@@ -217,11 +221,13 @@ done:
 
 
 /*
+ ********************************************
  * debug_breakpoint:
  *     Para a execução do sistema.
  *     @todo: isso pode ir para o arquivo debug.c.
  */
-void debug_breakpoint(){
+void debug_breakpoint()
+{
     printf("sm-debug-debug_breakpoint:\n");
 	die();
 };
@@ -265,7 +271,7 @@ int debug()
 	};
 	
     // 'processor' struct.	
-	if( (void*) processor == NULL ){
+	if( (void *) processor == NULL ){
 	    printf("sm-debug-debug: processor\n");
 		die();
 	};

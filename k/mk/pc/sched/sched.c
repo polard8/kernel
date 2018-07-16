@@ -82,19 +82,18 @@ scheduler()
 	//
 
 	//Usado para task switch.
-	Conductor  = (void*) rootConductor;
+	Conductor = (void *) rootConductor;
 
 	//Inicia a lista.
- 	Conductor2 = (void*) rootConductor;
-	
-	//Thread idle em user mode.
-	Conductor2->Next = (void*) threadList[0]; 
+ 	Conductor2 = (void *) rootConductor;
+
+	//#bugbug
+	//Conductor2->Next = (void *) threadList[idle];  	
     
-	//#bugbug Isso trava o sistema.
 	// ?? por que ??
 	//Thread idle em ring 0.
-	//Conductor2->Next = (void*) threadList[current_idle_thread];  
-
+	Conductor2->Next = (void *) threadList[next_thread];  
+	
 	//
 	// Obs: 
 	// ## IMPORTANTE  ##
@@ -172,17 +171,17 @@ scheduler()
 	*/
 
 	//READY.
-	for( Index=0; Index <= THREAD_COUNT_MAX; Index++ )
+	for( Index=0; Index < THREAD_COUNT_MAX; Index++ )
 	{
-		Thread = (void*) threadList[Index];
-		if( (void*) Thread != NULL )
+		Thread = (void *) threadList[Index];
+		if( (void *) Thread != NULL )
 		{
 			if( Thread->used == 1 && 
 			    Thread->magic == 1234 && 
 				Thread->state == READY )
 			{
-			    Conductor2 = (void*) Conductor2->Next; 
-				Conductor2->Next = (void*) Thread;
+			    Conductor2 = (void *) Conductor2->Next; 
+				Conductor2->Next = (void *) Thread;
 			};
 		    //Nothing.
 		};
@@ -235,7 +234,7 @@ scheduler()
 
 
 	//finaliza a lista
-	Conductor2 = (void*) Conductor2->Next; 
+	Conductor2 = (void *) Conductor2->Next; 
 	Conductor2->Next = NULL;
 
 done:
@@ -244,6 +243,7 @@ done:
 
 
 /*
+ ***************************************************
  * scheduler_start:
  *     +Inicializa o sheduler.
  *     +Trava o scheduler.
@@ -254,9 +254,7 @@ done:
  *     @todo: Mudar para schedulerInit,ou schedulerStart. ??
  *
  */
- 
 //void schedulerStart()
-
 void scheduler_start()
 {  
     scheduler_lock();     //Lock Scheduler.
@@ -276,10 +274,11 @@ done:
  *
  */
 //void schedulerLock()
- 
-void scheduler_lock(){
+void 
+scheduler_lock()
+{
     g_scheduler_status = (unsigned long) LOCKED;
-	return;
+	//return;
 };
 
 
@@ -289,11 +288,12 @@ void scheduler_lock(){
  *     @todo: Mudar para schedulerUnlock().
  *
  */  
-//void schedulerUnlock()
- 
-void scheduler_unlock(){
+//void schedulerUnlock() 
+void 
+scheduler_unlock()
+{
     g_scheduler_status = (unsigned long) UNLOCKED;
-	return;
+	//return;
 };
 
 
@@ -305,7 +305,8 @@ void scheduler_unlock(){
  */
 //unsigned long schedulerGetStatus() 
  
-unsigned long scheduler_get_status(){
+unsigned long scheduler_get_status()
+{
     return (unsigned long) g_scheduler_status;
 };
 
@@ -314,7 +315,8 @@ unsigned long scheduler_get_status(){
  * new_task_scheduler: 
  *     ?? 
  */
-void new_task_scheduler(){   
+void new_task_scheduler()
+{   
     return;    /* CANCELADA !*/  		
 };	
 
@@ -323,11 +325,9 @@ void new_task_scheduler(){
  * init_scheduler:
  *    Inicaliza o scheduler.
  *    @todo: Mudar para schedulerInit()
- *
+ *    #burbug: faz o mesmo que scheduler_start.
  */
-
 //void schedulerInit()
- 
 void init_scheduler()
 {
 	//

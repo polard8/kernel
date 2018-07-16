@@ -322,8 +322,8 @@ create_menu_item( struct menu_d *menu,
     // Dimensões.
 	unsigned long x = (unsigned long) menu->menuWindow->left;
 	unsigned long y = (unsigned long) menu->newitemTop;
-	unsigned long width;
-	unsigned long height;
+	unsigned long width = 0;
+	unsigned long height = 0;
 	
 	menu->newitemLeft = (unsigned long) x;
 	menu->newitemTop  = (unsigned long) y;

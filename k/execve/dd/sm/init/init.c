@@ -69,7 +69,8 @@ void save_kernel_args()
  *            Boot do volume sinalizado.
  *            Identificar volumes.
  */
-void boot(){    
+void boot()
+{    
 	panic("sm-init-boot:");	
 };	
 

@@ -18,6 +18,7 @@
 
 
 /*
+ ****************************************************
  * CreateChannel:
  *     Cria um canal.
  *
@@ -28,32 +29,35 @@ void *CreateChannel( struct process_d *OwnerProcess,
 {
     struct channel_d *NewChannel;
 
-	NewChannel = (void*) malloc(sizeof(struct channel_d));
+	NewChannel = (void *) malloc( sizeof(struct channel_d) );
     
-	if((void*) NewChannel == NULL ){
+	if( (void *) NewChannel == NULL )
+	{
 	    return NULL;
 	}else{
-	    NewChannel->OwnerProcess = (void*) OwnerProcess;
-		NewChannel->ClientThread = (void*) ClientThread;
-		NewChannel->ServerThread = (void*) ServerThread;
+	    NewChannel->OwnerProcess = (void *) OwnerProcess;
+		NewChannel->ClientThread = (void *) ClientThread;
+		NewChannel->ServerThread = (void *) ServerThread;
 	    NewChannel->State = 0;
 	};	
 	//Nothing.
 done:
-    return (void*) NewChannel;
+    return (void *) NewChannel;
 };
 
 
 /*
+ *******************************************
  * DestroyChannel:
  *     Destroy um canal.
- *     +libera a memoria.
+ *     +libera a memória.
  *     +destrói a estrutura.
  *     ...
  */
 int DestroyChannel(struct channel_d *channel)
 {
-	if((void*) channel == NULL ){
+	if((void *) channel == NULL )
+	{
 	    return (int) 0;    //Nothing to do.	    	
 	};
     

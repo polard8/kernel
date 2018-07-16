@@ -1,5 +1,5 @@
 /*
- * File: microkernel\thread.h
+ * File: mk\pc\thread.h
  *
  * Descrição:
  *     Header para threads.
@@ -9,11 +9,6 @@
  *     2015 - Created by Fred Nora.
  *     2018 - Revision.
  */
- 
-
-
-
-
  
 //
 //#define FIRST_THREAD theadList[0]
@@ -206,8 +201,10 @@ struct thread_d
 	int ownerPID;           //ID do processo ao qual o thread pertencer. 
 	//int ownerPPID;        //Acho que isso não é necessário !! 
 	
-	unsigned long used;     //a, @todo: Poderia ser int.
-    unsigned long magic;    //g, @todo: Poderia ser int.
+	//#importante:
+	//Isso pode ser unsigne long mesmo.
+	unsigned long used;     
+    unsigned long magic;    
 	
     //
 	// type: 
@@ -215,9 +212,9 @@ struct thread_d
     // (SYSTEM, PERIODIC, RR, IDLE).	
 	thread_type_t type;	
 	
-	thread_state_t state;    //f, flag, Estado atual da tarefa. ( RUNNING, DEAD ...).	
+	thread_state_t state;    //flag, Estado atual da tarefa. ( RUNNING, DEAD ...).	
 	
-	//e, error. @todo:
+	// error. @todo:
 	//unsigned long error;
 	
 	//ext.
@@ -442,7 +439,7 @@ struct thread_d
 	 * Janela e procedimento.
 	 */
 	struct wstation_d *window_station;  //Window Station da thread.
-	struct desktop_d  *desktop;         //Desktop da thread.
+	struct desktop_d *desktop;         //Desktop da thread.
 	
 	unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
 	//unsigned long control_menu_procedure; //procedimento do control menu.
@@ -480,7 +477,7 @@ struct thread_d
 	//int wait4tid;
 	
 	
-	
+	//#importante
 	//razões para esperar
 	//@todo: tem que fazer um enum para enumerar as razões.
 	//o índice é o selecionador da razão pela 
@@ -596,13 +593,15 @@ SetThreadDirectory( struct thread_d *thread,
 /*
  * Thread heap support.
  */
-unsigned long GetThreadHeapStart(struct thread_d *thread);
+unsigned long 
+GetThreadHeapStart(struct thread_d *thread);
 //...
 
 /*
  * Thread Stack support.
  */
-unsigned long GetThreadStackStart(struct thread_d *thread);
+unsigned long 
+GetThreadStackStart(struct thread_d *thread);
 //...
 
 void SelectForExecution(struct thread_d *Thread);
@@ -613,6 +612,12 @@ void show_thread_information();
 int init_threads();
 
 int GetCurrentThreadId();
+
+
+//
+// Usadas durante a inicialização e execução de uma thread.
+// @todo: mudar apenas o protótipo para thread.h
+void spawn_thread(int id);
 
 
 //
@@ -632,6 +637,8 @@ void
 kill_thread(int tid);       
 
 void dead_thread_collector();
+
+void kill_all_threads();
 
 //
 // End.

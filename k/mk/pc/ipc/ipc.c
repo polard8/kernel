@@ -1,5 +1,5 @@
 /*
- * File: pc\ipc.c 
+ * File: pc\ipc\ipc.c 
  *
  * Descrição:
  *     IPCM - Inter-Process Communication Manager.

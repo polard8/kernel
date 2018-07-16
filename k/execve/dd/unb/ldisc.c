@@ -1,5 +1,5 @@
 /*
- * File: unblocked\ldisc.c
+ * File: unb\ldisc.c
  *
  * Descrição:
  *    Esse será o gerenciador de Line Discipline.
@@ -298,7 +298,8 @@ struct keyboardMessage
 
 
 //Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState(unsigned char key)
+unsigned long 
+keyboardGetKeyState( unsigned char key )
 {
 	unsigned long State = 0;
 	
@@ -355,6 +356,7 @@ Done:
 
 
 /*
+ *************************************************
  * keyboardEnable:
  *     Enable keyboard.
  */
@@ -376,6 +378,7 @@ done:
 
 
 /*
+ ********************************************
  * keyboardDisable:
  *     Disable keyboard.
  */
@@ -397,6 +400,7 @@ done:
 
 
 /*
+ ******************************************
  * keyboard_set_leds:
  *     Set keyboard flags.
  *     ED = Set led.
@@ -456,7 +460,7 @@ void keyboard()
  * todo o resto poderá encontrar um lugar melhor.
  *
  */
-int LINE_DISCIPLINE(unsigned char SC, int type)
+int LINE_DISCIPLINE( unsigned char SC, int type )
 {
     //
     // Step 0 - Declarações de variáveis.

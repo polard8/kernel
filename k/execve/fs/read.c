@@ -195,13 +195,18 @@ fsLoadFile( unsigned char *file_name,
 	
 	int i;
     unsigned short next;
+	
 
+	// #importante:
+	// Poderíamos usar malloc ou alocador de páginas ??
     unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
     unsigned long max = 64;    //Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 	char NameX[13];	
 
+	// #importante:
+	// Poderíamos usar malloc ou alocador de páginas ??	
     unsigned short *fat  = (unsigned short *) VOLUME1_FAT_ADDRESS;
 	unsigned short cluster;    //Cluster inicial
 
@@ -233,7 +238,7 @@ fsLoadFile( unsigned char *file_name,
 	fs_load_rootdirEx();
 	
 	//Checa se é válida a estrutura do sistema de arquivos.
-	if( (void*) filesystem == NULL )
+	if( (void *) filesystem == NULL )
 	{
 	    printf("fs-read-fsLoadFile: filesystem\n");
 		goto fail;
@@ -454,23 +459,29 @@ done:
 
 
 /*
- * KiLoadRootDir:
- *    Carrega o diretório raiz na memória.
+ ***********************************************************
+ * load_directory:
+ *    Carrega o diretório na memória, dados o endereço, 
+ * o lba inicial e o número de setores.
+ *
  */
-void KiLoadRootDir(unsigned long address)
+void 
+load_directory( unsigned long address, 
+                unsigned long lba, 
+				unsigned sectors )
 {
 	unsigned long i;
 	unsigned long b = 0;
-	unsigned long szRoot = 32;    //32 setores.
 	
 	//Carregar root dir na memória.
-	for( i=0; i < szRoot; i++ )
+	for( i=0; i < sectors; i++ )
 	{
-	    read_lba( address + b, VOLUME1_ROOTDIR_LBA + i );    
-		b = b+512;    //Incrementa buffer.
+	    read_lba( address + b, lba + i );    
+		
+		// Incrementa buffer.
+		b = b+512;    
 	};
-done:	
-    return;
+    //return;
 };
 
 

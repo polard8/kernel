@@ -75,9 +75,10 @@ unsigned long task_count;      //contador de tarefas criadas.
 
 //
 // Usadas durante a inicialização e execução de uma thread.
-//
+// @todo: mudar apenas o protótipo para thread.h
+//void spawn_thread(int id);
 
-void spawn_task(int id);
+
 void init_tasks();
 int init_task(int id);
 unsigned long executa_tarefa(int id, unsigned long *task_address);

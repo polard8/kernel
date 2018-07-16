@@ -143,16 +143,16 @@ void halMain(){
 
 
 
-
-
 /*
+ ************************************************
  * hal_backbuffer_putpixel:
  *     Coloca um pixel no backbuffer.
  */
-void hal_backbuffer_putpixel( unsigned long ax, 
-                              unsigned long bx, 
-						      unsigned long cx, 
-						      unsigned long dx )
+void 
+hal_backbuffer_putpixel( unsigned long ax, 
+                         unsigned long bx, 
+						 unsigned long cx, 
+						 unsigned long dx )
 {	
 	// Chama a rotina em assembly depois de enviar os valores para os 
 	// registradores.
@@ -167,7 +167,7 @@ void hal_backbuffer_putpixel( unsigned long ax,
 	// @todo: Devemos chamar o módulo hal.
 	
 	gui_buffer_putpixel(); 	
-	return;
+	//return;
 };
 
 
@@ -179,7 +179,7 @@ void hal_backbuffer_putpixel( unsigned long ax,
 void sys_vsync()
 {
     hal_vsync();	
-    return;
+    //return;
 };
 
 
@@ -187,7 +187,8 @@ void sys_vsync()
  * sys_showpciinfo:
  *     Mostra informações encontradas na interface PCI.
  */
-int sys_showpciinfo(){
+int sys_showpciinfo()
+{
     return (int) hal_showpciinfo();
 };
 
@@ -200,7 +201,7 @@ int sys_showpciinfo(){
 void sys_reboot()
 {
     KiReboot();
-    die();
+    panic("sys_reboot:");
 };
 
 
@@ -211,11 +212,12 @@ void sys_reboot()
 void sys_shutdown()
 {
     KiShutDown();
-    die();
+    panic("sys_shutdown:");
 };
 
 
 /*
+ *********************************************************
  * hal_hardware_detect:
  *     Detecta fabricantes específicos suportados pelo núcleo.
  *
@@ -235,7 +237,9 @@ int hal_hardware_detect()
 	// Check system struct.	
     //
 	
-	if((void*) System == NULL){
+	if((void *) System == NULL)
+	{
+		//@todo: goto fail.
 	    return (int) 1;    //Fail.	
 	}else{
 		
@@ -285,7 +289,8 @@ done:
 //hal_showpciinfo deveria ser a rotina que pci.c chama 
 //para obter acesso as informações em baixo nível.
 //@todo: rever os nomes das funções.
-int hal_showpciinfo(){
+int hal_showpciinfo()
+{
 	return (int) pciInfo();
 };
 
@@ -339,6 +344,7 @@ fail:
 
 
 /*
+ ******************************************
  * init_cpu:
  *     Inicializa a estrutura do processador e as coisas associadas a ele.
  *     Inicializa apenas o que for independente da arquitetura.
@@ -348,10 +354,13 @@ void init_cpu()
 {
     int Status = 0;
 	
-	processor = (void*) malloc( sizeof(struct tagProcessor) );
-	if((void*) processor == NULL){
+	processor = (void *) malloc( sizeof(struct tagProcessor) );
+	
+	if( (void *) processor == NULL )
+	{
 	    printf("init_cpu: processor");
 	    die();
+		
 	}else{
 	    
 		//@todo: set processor id: escolhe o processador atual. ??
@@ -363,15 +372,18 @@ void init_cpu()
         
 		//...
         
-		if( (void*) Hardware != NULL ){
+		if( (void *) Hardware != NULL ){
 			Hardware->Processor = processor;
-		};
+		}
         //Nothing.		
     };	
 	
+	//sonda.
 	//Checa qual cpu é e inicializa mais variaveis.
-	Status = (int) hal_probe_cpu(); //sonda.
-	if(Status != 0){
+	Status = (int) hal_probe_cpu(); 
+	
+	if( Status != 0 )
+	{
 	    printf("init_cpu: hal_probe_cpu");
         die();  		
 	};
@@ -383,23 +395,27 @@ done:
 #ifdef KERNEL_VERBOSE
     printf("Done\n");
 #endif	
+
     return;
 };
 
 
-void hal_set_machine_type(unsigned long type)
+void 
+hal_set_machine_type( unsigned long type )
 {
     g_machine_type = (unsigned long) type;
-	return;
+	//return;
 };
 
 
-unsigned long hal_get_machine_type(){
+unsigned long hal_get_machine_type()
+{
     return (unsigned long) g_machine_type;
 };
 
 
 /*
+ *****************************************************
  *  hal_init_machine:
  *      Faz inicializações dado o tipo de máquina.
  *      @todo: Trocar o nome para hal_init_current_machine. 
@@ -440,7 +456,7 @@ int hal_init_machine()
 		//Unknow.
 		default:
 		    //processor->Type = (unsigned char) 0;
-	        printf("hal_init_machine error: default type.\n");
+	        printf("hal_init_machine error: default type\n");
             return (int) 0; 			
 		    break;
 	};
@@ -452,8 +468,8 @@ done:
 };
 
 
-
 /*
+ **********************************************************
  * hal_probe_cpu:
  *     Detectar qual é o tipo de processador. 
  *     Salva o tipo na estrutura.
@@ -508,30 +524,39 @@ Fail:
 };
 
 
-unsigned long getGdt(){
+unsigned long getGdt()
+{
     return (unsigned long) &gdt; 
 };
 
-unsigned long getIdt(){
+
+unsigned long getIdt()
+{
     return (unsigned long) &idt; 
 };
 
-void hal_vsync(){
+
+void 
+hal_vsync()
+{
     vsync();
-    return;	
+    //return;	
 };
 
 
 /*
+ ********************************
  * hal_shutdown:    
  */
-void hal_shutdown(){
+void hal_shutdown()
+{
     shutdown();
-    die();
+    panic("hal_shutdown:");
 };
 
 
 /*
+ ***********************************************
  * shutdown:
  *     Desligar a máquina.
  *     @todo: APM, ACPI.
@@ -566,7 +591,7 @@ void shutdown()
 	// @todo: Background.
 	//
 	
-    MessageBox(gui->screen ,1 ,"shutdown:" ,"@todo:");
+    MessageBox( gui->screen, 1, "shutdown:", "@todo:" );
 	
 	//
 	// @todo: switch APM, ACPI. modo smm	
@@ -581,9 +606,8 @@ fail:
 };
 
 
-
-
 /*
+ *****************************
  * KiReboot:
  *     Inicialização da parte de hardware do processo de reboot.   
  */
@@ -612,15 +636,14 @@ do_reboot:
 
 
 /*
+ **************************************
  * KiShutDown:
  *    @todo: Isso será uma interface para chamar o deligamanto.
- *
- *
  */
 void KiShutDown()
 {
     hal_shutdown();
-    die();
+    panic("KiShutDown");
 };
 
 
@@ -632,11 +655,12 @@ void KiShutDown()
 void hal_reboot()
 {
     asm_reboot(); 
-	die();
+	panic("hal_reboot:");
 };
 
 
 /*
+ ********************************************************
  * init_hal:
  * Initialize kernel base hal.
  *     Archtecture independent inicialization ...
@@ -653,7 +677,7 @@ int init_hal()
 	
 	// CPU - Cria e inicializa a estrutura de cpu.
 #ifdef KERNEL_VERBOSE	
-	printf("init_hal: cpu..\n");
+	printf("init_hal: cpu\n");
 #endif	
 	init_cpu();
 
@@ -664,7 +688,7 @@ int init_hal()
 	
 	// PCI - Cria e inicializa estrutura de pci.
 #ifdef KERNEL_VERBOSE	
-	printf("init_hal: pci..(BUG) \n");
+	printf("init_hal: pci (BUG) \n");
 #endif	
 	init_pci();    //bugbug (a rotina esta incompleta.)	
 
@@ -676,13 +700,13 @@ int init_hal()
 	
 	// TIMER - Cria e inicializa estrutura do timer.
 #ifdef KERNEL_VERBOSE	
-	printf("init_hal: Timer..\n");
+	printf("init_hal: Timer\n");
 #endif    
 	timerInit();	
 
 	// RTC - Cria e inicializa estrutura de rtc.
 #ifdef KERNEL_VERBOSE	
-	printf("init_hal: rtc..\n");
+	printf("init_hal: rtc\n");
 #endif	
 	init_clock();
 	get_cmos_info();
@@ -695,7 +719,7 @@ int init_hal()
 		
     //keyboard.
 #ifdef KERNEL_VERBOSE	
-	printf("init_hal: kd..\n");
+	printf("init_hal: kd\n");
 #endif	
 	init_keyboard();
 	
@@ -736,7 +760,7 @@ Done:
     Initialization.hal = 1;	
 	
 #ifdef KERNEL_VERBOSE
-	printf("Done!\n");
+	printf("Done\n");
 #endif
 	
 	return (int) Status;

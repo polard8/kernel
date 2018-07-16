@@ -1,5 +1,5 @@
 /*
- * File: microkernel\pc\ts.c
+ * File: mk\pc\ts.c
  *
  * Descrição:
  *     Task Switching.
@@ -426,7 +426,7 @@ try_next:
 	if( (void*) Conductor->Next != NULL )
 	{
 	    // O condutor avança e pega o próximo da lista.
-		Conductor = (void*) Conductor->Next;
+		Conductor = (void *) Conductor->Next;
 		goto go_ahead;
 	}else{ 
 	    //@todo: Se o próximo for NULL.
@@ -535,7 +535,7 @@ dispatch_current:
 	if( (void *) Current == NULL )
 	{
 		panic("task_switch.dispatch_current error: Struct");
-	    die();
+	    //die();
 	}else{
 		
 		// @todo: Resiliência. Tomar uma decisão e não desistir.
@@ -544,8 +544,8 @@ dispatch_current:
 		    Current->magic != 1234 || 
 			Current->state != READY )
 	    {
-	        panic("task_switch.dispatch_current error: Param.");
-	        die();
+	        panic("task_switch.dispatch_current error: Param");
+	        //die();
 	    };
         //Obs: Podemos filtrar outros parâmetros sistemicamente importante.		
 		//Nothing.
@@ -747,7 +747,7 @@ doneRET:
 void taskswitchRR()
 {
 	int i;
-	int Max = (int) ProcessorBlock.running_threads;
+	int Max = (int) ProcessorBlock.threads_counter;
 	struct thread_d *Current; //Thread atual.
 	
 	//Filtro.
@@ -757,7 +757,7 @@ void taskswitchRR()
 	if((void *) Current == NULL)
 	{
 	    panic("taskswitchRR error: Struct");
-		die();
+		//die();
 	};
 	
 	//
@@ -832,7 +832,7 @@ void taskswitchRR()
 		}while(i < Max);
 			
         panic("taskswitchRR error: *HANG");
-        die();   			
+        //die();   			
 		//Use idle. Não havendo outra alem da idle usa ela.
 		//current_idle_thread.
 		//current_thread = (int) 0;

@@ -139,32 +139,21 @@ int KiScheduler()
     // @todo: Talvez haja mais casos onde não se deva trocar a tarefa.
     //
 
+	//#bugbug 
+	//Porque retornamos 0 ???
 	//Scheduler Status. (LOCKED, UNLOCKED).
-	if(g_scheduler_status == LOCKED){
+	if(g_scheduler_status == LOCKED)
+	{
         return (int) 0;
     };
 
 	// Retornaremos se tivermos apenas um thread rodando.
 	// Pois não há o que trocar.
-	if(ProcessorBlock.running_threads == 1)
-	{
-        if( current_thread == 0 )
-		{
-	        return (int) 0;
-		};
-		
-		
-		//
-		// ## Importante  ##
-		// E se a thread que estiver rodando sozinha 
-		// Não for a idle.
-		//
-		//if( current_thread != currrent_idle_thread )
-		//{
-		//	//fail
-		//}
-		
-		
+	if ( ProcessorBlock.threads_counter == 1 )
+	{ 
+		//Se só temos uma então devemos retornar a idle.
+		current_thread = idle;
+		return (int) idle;
 	};
     //Chama o Scheduler.
 done:
@@ -204,10 +193,9 @@ int KiSelectNextThread(int current)
 	//
 	
 	//@todo: Max.
-	if(current < 0)
-	{
-	    current = 0;
-	};
+	if(current < 0){
+		current = next_thread;
+	}
 	
 done:
     return (int) SelectNextThread(current);
@@ -251,7 +239,8 @@ void KiDoThreadDead(int id)
  *     ??
  *    @todo: Mudar para KiSchedulerNewThread().
  */
-void KiNewTaskScheduler(){
+void KiNewTaskScheduler()
+{
     return;    //Cancelada.
 };
 
@@ -274,7 +263,8 @@ done:
  * KiSetPriority:
  *     Interface. Faz alterações na prioridade de acordo com o status.
  */
-int KiSetPriority(){
+int KiSetPriority()
+{
 	return (int) set_priority();
 };
 
@@ -298,7 +288,8 @@ done:
  * KiGetCurrent:
  *     Pega o tid da thread atual.
  */
-int KiGetCurrent(){
+int KiGetCurrent()
+{
     return (int) get_current();
 };
 
@@ -307,7 +298,8 @@ int KiGetCurrent(){
  * KiGetCurrentTask:
  *     @todo: Modar para KiGetCurrentProcess.
  */
-int KiGetCurrentTask(){ 
+int KiGetCurrentTask()
+{ 
     return (int) get_current_task(); 
 };
 
@@ -331,13 +323,14 @@ int find_higher_priority()
     struct thread_d *t;  	
 	
 	//Only Idle? return.
-	if(ProcessorBlock.running_threads == 1)
+	if ( ProcessorBlock.threads_counter == 1 )
 	{
 		//#bugbug, Nã devemos determinar o valor da thread idle dessa forma.
 		//tempos um ponteiro para a estrutura da thread idle.
 	    if(current_thread == 0){
-		    return (int) 0;
-		};
+			return (int) next_thread;
+		}
+		
 		//@todo: E caso a única thread que está rodando não seja a thread idle??
 	};	
 	
@@ -394,8 +387,8 @@ int find_higher_priority()
 	// Limites, overflow. Não encontrando nenhuma tarefa retorna o id da Idle. 
 	//
 	
-	if( i >= (2*THREAD_COUNT_MAX) ){		
-		return (int) 0;		
+	if( i >= (2*THREAD_COUNT_MAX) ){
+        return (int) next_thread;			
 	};
 	
 	
@@ -432,13 +425,13 @@ void preempt()
 	
 	//Struct.
 	t = (void *) threadList[Current]; 	
-	if( (void*) t == NULL )
+	if( (void *) t == NULL )
 	{
-	    current_thread = (int) 0;    //We can't.
+		current_thread = (int) next_thread;
 	    return;
 	}else{
 	    
-		//Checa se a tarefa atual pode entrar em preempção, flag=1.	    
+		//Checa se a tarefa atual pode entrar sofrer preempção, flag=1.	    
 		if(t->preempted == 1)
 		{
 		    //Colocando ela numa fila de espera.
@@ -459,7 +452,7 @@ void preempt()
 	
 	//Use idle.
 	if(Next <= 0){
-	    current_thread = (int) 0;
+		current_thread = (int) next_thread;
         goto done;		
 	};
 	
@@ -484,7 +477,8 @@ done:
  *    Obtendo o TID da thread atual.
  *    @todo: Criar scheduleriGetCurrentTID();
  */
-int get_current(){ 
+int get_current()
+{ 
 	return (int) current_thread;
 };
 
@@ -495,7 +489,8 @@ int get_current(){
  *     Pega o id da thrad atual.
  *    @todo: Criar scheduleriGetCurrentTID();
  */
-int get_current_task(){
+int get_current_task()
+{
     return (int) get_current();
 };
 
@@ -574,7 +569,7 @@ void do_thread_ready(int id)
     //Struct.
 	t = (void *) threadList[id]; 	
 	
-	if( (void*) t != NULL){
+	if( (void*) t != NULL ){
 	    t->state = READY;
 	};
 	
@@ -601,7 +596,7 @@ void do_thread_running(int id)
     // Struct.
 	t = (void *) threadList[id]; 	
 	
-	if( (void*) t != NULL){
+	if( (void *) t != NULL ){
 	    t->state = RUNNING;
 	};
 	
@@ -628,7 +623,7 @@ void do_thread_sleeping(int id)
     // Struct.
 	t = (void *) threadList[id];	
 	
-	if( (void*) t != NULL){
+	if( (void *) t != NULL){
 	    t->state = BLOCKED;
     };
 
@@ -655,7 +650,7 @@ void do_thread_zombie(int id)
     //Struct.
 	t = (void *) threadList[id]; 
 	
-	if( (void*) t == NULL){
+	if( (void *) t == NULL){
 	    return;
 	}else{
         
@@ -687,7 +682,7 @@ void do_thread_dead(int id)
     // Struct.	
 	t = (void *) threadList[id]; 	
 	
-	if( (void*) t != NULL){
+	if( (void *) t != NULL ){
 	    t->state = DEAD;
 	};	
 	
@@ -708,7 +703,6 @@ done:
  *     Criar scheduleriWakeupYhread(int tid);
  * 
  */
- 
 void wakeup_thread( int tid )
 {
     int Status;
@@ -725,26 +719,24 @@ void wakeup_thread( int tid )
     //Struct.
 	t = (void *) threadList[tid]; 
 	
-	if( (void*) t == NULL )
+	if( (void *) t == NULL )
 	{ 	
 	    return;    
 	
 	}else{
 	    
-		//Se o contexto nao foi salvo. 
+		//Se o contexto não foi salvo. 
 		//Não tem como acorda-la.
 		//Pois acordar significa apenas retornar 
 		//ao estado RUNNING.
-		if( t->saved == 0 )
-		{ 
+		if( t->saved == 0 ){ 
 	        return; 
 		};
 		
 		// Se estiver bloqueada, 
 		// não tem como acordar ainda. 
 		// precisa desbloquear.
-		if(t->state == BLOCKED)
-		{ 
+		if(t->state == BLOCKED){ 
 	        return; 
 		}; 
 			
@@ -807,8 +799,7 @@ int SelectNextThread(int current)
 		    n = (void*) threadList[Next];
 		    if( (void*) n == NULL )
 			{
-		        //#bugbug: Usar current_idle_thread.
-				Next = 0;    //Pega Idle.
+				Next = next_thread;
 			    return (int) Next; 
 		    }else{
 				
@@ -822,8 +813,7 @@ int SelectNextThread(int current)
 			
 			if( (void*) n == NULL )
 			{
-				//#bugbug: Usar current_idle_thread.
-			    Next = (int) 0;    //Pega idle.
+				Next = next_thread;
 			    return (int) Next;
 			}else{
 			    Next = (int) n->tid;    //Pega o tid.
@@ -892,11 +882,10 @@ done:
 	//
 	
 //Do Spawn.
+//spawn.c
 do_spawn:
-    KiSpawnTask(current_thread);  //spawn.c
-	//spawn_task(current_thread);
-    panic("check_for_initialized:");
-	die();	
+    KiSpawnTask(current_thread);  
+    panic("check_for_initialized:");	
 };
 
 
@@ -904,7 +893,7 @@ do_spawn:
  *****************************************************
  * check_quantum:
  *     Checa o quantum atribuido às threads da lista.
- *     Seleciona a primeira thrad encontrada com o 
+ *     Seleciona a primeira thread encontrada com o 
  * quantum no limite. #todo: rever isso.
  *
  * @todo: Mudar para schediCheckThreadQuantum();

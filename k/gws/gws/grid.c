@@ -29,10 +29,11 @@ InitializeGrid( struct window_d *window,
     int i = 0;
 	unsigned long x, y, cx, cy;
 	
-	unsigned long WindowLeft;
-	unsigned long WindowTop;
-	unsigned long WindowWidth;
-    unsigned long WindowHeight;
+	unsigned long WindowLeft = 0;
+	unsigned long WindowTop = 0;
+	unsigned long WindowWidth = 0;
+    unsigned long WindowHeight = 0;
+	
 	unsigned long ItensCount = (unsigned long) n; //quantidade de itens.
 
 	// dimensões dos botões.

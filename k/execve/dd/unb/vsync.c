@@ -63,6 +63,7 @@ char vsync_inb(int port)
 	asm(" nop \n");
 	asm(" nop \n");
 	asm(" nop \n");
+	
 	return (char) Value;    
 };
 

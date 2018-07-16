@@ -114,20 +114,20 @@ void *KiCreateIdle()
 	char *ThreadName = "idlethread";    // Name.
 	
     //Aloca memória mara a estrutura.
-	IdleThread = (void*) malloc( sizeof(struct thread_d) );	
+	IdleThread = (void *) malloc( sizeof(struct thread_d) );	
 	if( (void*) IdleThread == NULL )
 	{
-	    printf("pc-create-KiCreateIdle: IdleThread\n");
+	    printf("pc-action-create-KiCreateIdle: IdleThread\n");
 		die();
 	}else{
 		
 	    //Ver se a estrutura do processo é válida.
-		if( (void*) KernelProcess == NULL ){
-	        printf("pc-create-KiCreateIdle: KernelProcess\n");
+		if( (void *) InitProcess == NULL ){
+	        printf("pc-action-create-KiCreateIdle: InitProcess\n");
 		    die();
 	    }else{
 			//Indica à qual processo a thread pertence.
-	        IdleThread->process = (void*) KernelProcess;
+	        IdleThread->process = (void*) InitProcess;
 		};		
 		
 	    //Continua...
@@ -152,9 +152,10 @@ void *KiCreateIdle()
 	//Stack. @todo: A stack deve ser a que está na TSS
 	//#BugBug.
 	// Estamos alocando mas não etamos usando.
-	idleStack = (void*) malloc(4*1024);
-	if( (void*) idleStack == NULL ){
-	    printf("pc-create-KiCreateIdle: idleStack\n");
+	//# podemos usar o alocador de páginas e alocar uma página para isso.
+	idleStack = (void *) malloc(4*1024);
+	if( (void *) idleStack == NULL ){
+	    printf("pc-action-create-KiCreateIdle: idleStack\n");
 		die();
 	};
 	
@@ -169,23 +170,18 @@ void *KiCreateIdle()
 	
     //Identificadores.
 	IdleThread->tid = 0;
-	IdleThread->ownerPID = (int) KernelProcess->pid;  
+	IdleThread->ownerPID = (int) InitProcess->pid;  
 	IdleThread->used = 1;
 	IdleThread->magic = 1234;
 	IdleThread->name_address = (unsigned long) ThreadName;   //Funciona.
 
-	IdleThread->process = (void*) KernelProcess;
-	
+	IdleThread->process = (void*) InitProcess;
 	
 	IdleThread->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 	
-	
 	IdleThread->plane = BACKGROUND;
 
-	//
 	// Procedimento de janela.
-	//  
-
     //O procedimento.
 	IdleThread->procedure = (unsigned long) &system_procedure;
 	
@@ -196,10 +192,11 @@ void *KiCreateIdle()
 	IdleThread->long2 = 0;     //arg4.
 	
 	//Características.
-	IdleThread->type  = TYPE_IDLE;    //TYPE_SYSTEM.
-	IdleThread->iopl  = RING3;        //Idle thread é uma thread de um processo em user mode.
+	IdleThread->type = TYPE_IDLE;    //TYPE_SYSTEM.
+	IdleThread->iopl = RING3;        //Idle thread é uma thread de um processo em user mode.
 	IdleThread->state = INITIALIZED;   
 	
+	//?? E a validade da estrutura KernelProcess ??
 	IdleThread->base_priority = KernelProcess->base_priority;  //básica.   
   	IdleThread->priority = IdleThread->base_priority;          //dinâmica.
 	
@@ -208,7 +205,7 @@ void *KiCreateIdle()
 	
 	//Temporizadores.
 	IdleThread->step = 0;          
-	IdleThread->quantum       = QUANTUM_BASE;
+	IdleThread->quantum = QUANTUM_BASE;
 	IdleThread->quantum_limit = QUANTUM_LIMIT;
 
 	IdleThread->standbyCount = 0;
@@ -270,14 +267,18 @@ void *KiCreateIdle()
 	//IdleThread->NextProcessor = 0;      //Próximo processador. 
 	
 	//Coloca na lista de estruturas.
-	threadList[0]  = (unsigned long) IdleThread;
+	threadList[0] = (unsigned long) IdleThread;
+	
+	// #importante
+	// # current idle thread #
+	//current_idle_thread = IdleThread->tid;
 	
 	//Próxima thread.
 	IdleThread->Next = NULL;
 	//IdleThread->Next = (void*) IdleThread;    //Opção.
 	
 	// Running tasks. (Quantas threads estão rodando).
-    ProcessorBlock.running_threads = (int) 1;
+    ProcessorBlock.threads_counter = (int) 1;
 	
 	//@todo: setar a idle como current.
 	
@@ -332,8 +333,8 @@ void *KiCreateShell()
 		while(1){}
 	};
 	*/
-	if( (void*) KernelProcess == NULL ){
-	    printf("pc-create-KiCreateShell: KernelProcess\n");
+	if( (void*) ShellProcess == NULL ){
+	    printf("pc-create-KiCreateShell: ShellProcess\n");
 		die();
 	};	
 	
@@ -346,7 +347,7 @@ void *KiCreateShell()
 	else
 	{  
 	    //Indica à qual proesso a thread pertence.
-	    t->process = (void*) TaskManProcess; //KernelProcess;
+	    t->process = (void*) ShellProcess; 
 	};
 
 	//Stack.
@@ -360,14 +361,14 @@ void *KiCreateShell()
 
     //Identificadores.       	
 	t->tid = 1;     
-	t->ownerPID = (int) KernelProcess->pid;         
+	t->ownerPID = (int) ShellProcess->pid;         
 	t->used = 1;
 	t->magic = 1234;
 	t->name_address = (unsigned long) ThreadName;    //Funciona.
 	
 	t->plane = FOREGROUND;
 	
-	t->process = (void*) ShellProcess; //KernelProcess;
+	t->process = (void *) ShellProcess;  
 	
 	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
 	
@@ -462,7 +463,7 @@ void *KiCreateShell()
 	// Running tasks.
 	//
 	
-	ProcessorBlock.running_threads = 2;
+	ProcessorBlock.threads_counter = 2;
 
 	
 // Done.
@@ -508,26 +509,26 @@ void *KiCreateTaskManager()
 		while(1){}
 	};
 	*/
-	if( (void*) KernelProcess == NULL ){
-	    printf("pc-create-KiCreatetaskManager: KernelProcess\n");
+	if( (void *) TaskManProcess == NULL ){
+	    printf("pc-create-KiCreatetaskManager: TaskManProcess\n");
 		die();
 	};	
 
     //Thread.
 	//Alocando memória para a estrutura da thread.
-	t = (void*) malloc( sizeof(struct thread_d) );	
-	if( (void*) t == NULL ){
+	t = (void *) malloc( sizeof(struct thread_d) );	
+	if( (void *) t == NULL ){
 	    printf("pc-create-KiCreateTaskManager: t \n");
 		die();
 	}else{  
 	    //Indica à qual proesso a thread pertence.
-	    t->process = (void*) KernelProcess;
+	    t->process = (void *) TaskManProcess;
 	};
 	
 	//Stack.
 	//#bugbug
 	//estamos alocando uma stack dentro do heap do kernel.
-	taskmanStack = (void*) malloc(4*1024);
+	taskmanStack = (void *) malloc(4*1024);
 	if( (void*) taskmanStack == NULL ){
 	    printf("pc-create-KiCreateTaskManager: taskmanStack\n");
 		die();
@@ -537,12 +538,12 @@ void *KiCreateTaskManager()
 	
     //Identificadores      
 	t->tid = 2;     
-	t->ownerPID = (int) KernelProcess->pid;         
+	t->ownerPID = (int) TaskManProcess->pid;         
 	t->used = 1;
 	t->magic = 1234;	
 	t->name_address = (unsigned long) ThreadName;   //Funciona.
 	
-	t->process = (void*) KernelProcess;
+	t->process = (void*) TaskManProcess;
 	
 	t->plane = BACKGROUND;
 	
@@ -632,21 +633,18 @@ void *KiCreateTaskManager()
 	// Running tasks.
 	//
 	
-	ProcessorBlock.running_threads = 3;
+	ProcessorBlock.threads_counter = 3;
 	
 // Done.
 done:
     queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
     SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
-    return (void*) t;
+    return (void *) t;
 };
 
 
 
 // ==============  idle thread in ring 0  ===============
-
-
-
 
 
 // Isso é uma thread em ring 0 que será usada como idle.
@@ -691,7 +689,7 @@ void *KiCreateRing0Idle()
 	char *ThreadName = "ring0-idle-thread";    // Name.
 	
 
-	if( (void*) KernelProcess == NULL )
+	if( (void *) KernelProcess == NULL )
 	{
 	    printf("pc-create-KiCreateRing0Idle: KernelProcess\n");
 		die();
@@ -699,21 +697,21 @@ void *KiCreateRing0Idle()
 
     //Thread.
 	//Alocando memória para a estrutura da thread.
-	t = (void*) malloc( sizeof(struct thread_d) );	
-	if( (void*) t == NULL ){
+	t = (void *) malloc( sizeof(struct thread_d) );	
+	if( (void *) t == NULL ){
 	    printf("pc-create-KiCreateRing0Idle: t \n");
 		die();
 	}else{  
 	    //Indica à qual proesso a thread pertence.
-	    t->process = (void*) KernelProcess;
+	    t->process = (void *) KernelProcess;
 	};
 	
 	//Stack.
 	//#bugbug
 	//estamos alocando uma stack dentro do heap do kernel.
 	//nesse caso serve para a thread idle em ring 0.
-	ring0IdleStack = (void*) malloc(8*1024);
-	if( (void*) ring0IdleStack == NULL ){
+	ring0IdleStack = (void *) malloc(8*1024);
+	if( (void *) ring0IdleStack == NULL ){
 	    printf("pc-create-KiCreateRing0Idle: ring0IdleStack\n");
 		die();
 	};
@@ -730,14 +728,14 @@ void *KiCreateRing0Idle()
 	// #importante:
 	// Quando o sistema estiver ocioso, o scheduler 
 	// deve acionar a idle atual.
-	current_idle_thread = (int) t->tid; 
+	//current_idle_thread = (int) t->tid; 
 	
 	t->ownerPID = (int) KernelProcess->pid;         
 	t->used = 1;
 	t->magic = 1234;	
 	t->name_address = (unsigned long) ThreadName;   //Funciona.
 	
-	t->process = (void*) KernelProcess;
+	t->process = (void *) KernelProcess;
 	
 	t->plane = BACKGROUND;
 	
@@ -757,7 +755,7 @@ void *KiCreateRing0Idle()
 	t->base_priority = KernelProcess->base_priority;  //básica.   
   	t->priority = t->base_priority;                   //dinâmica.
 	
-	t->iopl = RING0;//RING3;   
+	t->iopl = RING0;
 	t->saved = 0;
 	t->preempted = PREEMPTABLE;    //PREEMPT_NAOPODE; //nao pode.	
 	//t->Heap;
@@ -790,10 +788,10 @@ void *KiCreateRing0Idle()
 	
 	//Context.
 	t->ss  = 0x10 | 0;               
-	t->esp = (unsigned long) (ring0IdleStack+(8*1024)); //0x004FFFF0;    //taskmanStack;//0x0045FFF0;  //pilha. 
+	t->esp = (unsigned long) (ring0IdleStack+(8*1024));  //pilha. 
 	t->eflags = 0x3200;  //???
 	t->cs = 8 | 0;                                
-	t->eip = (unsigned long) xxxRing0Idle; //0x004A1000;     	                                               
+	t->eip = (unsigned long) xxxRing0Idle; 	                                               
 	t->ds = 0x10 | 0;
 	t->es = 0x10 | 0;
 	t->fs = 0x10 | 0; 
@@ -827,13 +825,13 @@ void *KiCreateRing0Idle()
 	// Running tasks.
 	//
 	
-	ProcessorBlock.running_threads = 4;
+	ProcessorBlock.threads_counter = 4;
 	
 // Done.
 done:
     queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
     SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
-    return (void*) t;
+    return (void *) t;
 };
 
 

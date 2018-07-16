@@ -19,7 +19,9 @@
 
 #include <kernel.h>
 
+
 /*
+ **********************************************************************
  * KiSpawnTask:
  *     Interface para chamada de módulo interno para rotina de spawn de 
  * thread.
@@ -43,7 +45,7 @@ void KiSpawnTask(int id)
 
 //Done.	
 done:
-	spawn_task(id);
+	spawn_thread(id);
 
 	//
 	// No return.
@@ -53,13 +55,13 @@ done:
 
 
 /*
- * spawn_task: 
+ *********************************************************
+ * spawn_thread: 
  *     Execute a  thread for the first time.
  *     The thread needs to be in the state 'INITIALIZED'.
  *     @todo: Mudar para spawnThread(int tid).
  */ 
-//void spawnThread(int tid)  
-void spawn_task(int id)
+void spawn_thread(int id)
 {
 	int Status;
 	struct thread_d *Current;
@@ -90,24 +92,21 @@ void spawn_task(int id)
 	spawn_Pointer = (void *) threadList[id]; 
 	if((void*) spawn_Pointer == NULL)
 	{
-	    printf("spawn_task error: Pointer TID={%d}",id);
-		refresh_screen();
-		while(1){};
+	    printf("spawn_thread: Pointer TID={%d}",id);
+		die();
 	}
     else
     {
 	    // State ~ Checa o estado da tarefa.	 
         if(spawn_Pointer->state != STANDBY){
-            printf("spawn_task error: State TID={%d}\n",id);
-		    refresh_screen();
-		    while(1){}
+            printf("spawn_thread: State TID={%d}\n",id);
+		    die();
         };
 
 	    // Saved ~ Se o contexto está salvo, é porque não é a primeira vez.
         if(spawn_Pointer->saved == 1){
-            printf("spawn_task error: Saved TID={%d}\n",id);
-		    refresh_screen();
-		    while(1){}
+            printf("spawn_thread: Saved TID={%d}\n",id);
+		    die();
         };    
 	    //More checks ?!!...
 	};	
@@ -148,7 +147,8 @@ threadSetUp:
 	{
 	    current_thread = (int) spawn_Pointer->tid;    //Set current.
 		
-		spawn_Pointer->Next = (void*) Current;        //Next thread. A next será a antiga current.
+		//Next thread. A next será a antiga current.
+		spawn_Pointer->Next = (void *) Current;        
 
 		// * MOVEMENT 2 (Standby --> Running).
         if(spawn_Pointer->state == STANDBY){
@@ -167,10 +167,14 @@ threadSetUp:
 	if(spawn_Pointer->state != RUNNING)
 	{
 		//...
-        printf("* spawn_task error: State TID={%d}\n",id);
-		refresh_screen();
-		while(1){}
+        printf("* spawn_thread: State TID={%d}\n",id);
+		die();
 	};
+	
+	
+	//Current process.
+	current_process = spawn_Pointer->process->pid;
+	
 
 	//Debug:
 	//printf("spawn_task: Spawn thread %d ... \n",id);
@@ -220,8 +224,8 @@ threadSetUp:
 	asm("iret \n");    //Fly!
     //Nothing.
 fail:
-	panic("spawn_task error: *Return!");
-	while(1){};
+	panic("*spawn_task: Return");
+	//die();
 };
 
 

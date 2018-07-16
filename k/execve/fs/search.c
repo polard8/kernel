@@ -272,8 +272,8 @@ fail:
 unsigned short 
 fs_find_n_empty_entries( int n )
 {
-    int i;
-	int l;
+    int i = 0;
+	int l = 0;
 	unsigned short empty;
 	
 	// Limits.

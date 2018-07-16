@@ -1,5 +1,5 @@
 /*
- * File: unblocked\keyboard.c
+ * File: unb\keyboard.c
  *
  * Driver de teclado presente dentro do Kernel Base.
  * Esse será o driver de teclado para o modelo abnt2.
@@ -71,14 +71,26 @@ int _read_offset;
  * @TODO: ISSO DEVERÁ IR PARA UM ARQUIVO MENOR ... OU AINDA PARA UM DRIVER.
  * Pega o scacode cru e envia para a disciplina de linhas que deve ficar no kernelbase.
  * Essa é a parte do driver de dispositivo de caractere.
+ *
+ * #importante:
+ * O driver deverá de alguma maneira notificar o kernel sobrea a ocorrência
+ * do evento de input. Para que o kernel acorde as trheads que estão esperando 
+ * por eventos desse tipo.
+ *
  */
 void abnt2_keyboard_handler()
 {  
     unsigned char scancode = inportb(0x60);	
 	
 	
+	//
+	//#importante:
+	// Provavelmente uma interrupção irá fazer esse trabalho de 
+	// enviar o scancode para o kernel para que ele coloque na fila.
+	// Nesse momento o kernel de sentir-se alertado sobre o evento de 
+	// input e acordar a threa que está esperando por esse tipo de evento. 
 	
-
+	
 	//#obs: Esse buffer está em user.h 
 	keybuffer[keybuffer_tail++] = (char) scancode;
 	

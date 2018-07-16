@@ -192,8 +192,8 @@ unsigned long heap_set_new_handler( unsigned long address )
 unsigned long 
 get_process_heap_pointer( int pid )
 {
-	unsigned long heapLimit;
 	struct process_d *P;
+	unsigned long heapLimit;
 	
 	//@todo: Limite máximo.
 	if(pid < 0)
@@ -202,9 +202,9 @@ get_process_heap_pointer( int pid )
 		goto fail;
 	};
 	
-	P = (void*) processList[pid];
+	P = (void *) processList[pid];
 	
-	if((void*) P == NULL )
+	if((void *) P == NULL )
 	{
 		printf("get_process_heap_pointer: struct fail\n");
 		goto fail;
@@ -277,7 +277,7 @@ SetKernelHeap( unsigned long HeapStart,
 	//
 	
 	//A estrutura fica no início do heap.??!!
-	h = (void*) kernel_heap_start;
+	h = (void *) kernel_heap_start;
 	
 	//Configurando a estrutura.
 	h->HeapStart = (unsigned long) kernel_heap_start;             
@@ -292,7 +292,7 @@ SetKernelHeap( unsigned long HeapStart,
 	// kernel. 'KernelHeap'
 	//
 	
-	KernelHeap = (void*) h;
+	KernelHeap = (void *) h;
 	
 	//
 	// Lista de heaps.
@@ -550,9 +550,9 @@ try_again:
 	// ## importante ##
 	// O endereço do ponteiro da estrutura será o pointer do heap.
 	
-    Current = (void*) g_heap_pointer;    
+    Current = (void *) g_heap_pointer;    
 
-    if( (void*) Current != NULL )
+    if( (void *) Current != NULL )
     {
         // #importante:
 		// Obs: Perceba que 'Current' e 'Current->Header' 
@@ -794,10 +794,10 @@ void show_memory_structs()
 	//Mostra os heap da lista.		
 	while(i < MMBLOCK_COUNT_MAX) 
 	{
-        B = (void*) mmblockList[i];
+        B = (void *) mmblockList[i];
 		++i;
 		
-		if( (void*) B != NULL )
+		if( (void *) B != NULL )
 		{
 			//Validade.
 		    if( B->Used == 1 && B->Magic == 1234){
@@ -847,46 +847,47 @@ done:
 //int memoryInitializeHeapManager() 
 int init_heap()
 {
-	//Internas.
 	int i = 0;
 
     //Globals.	
-	kernel_heap_start  = (unsigned long) KERNEL_HEAP_START;  
-    kernel_heap_end    = (unsigned long) KERNEL_HEAP_END;  
-	g_heap_pointer     = (unsigned long) kernel_heap_start;    //Heap Pointer.	
-    g_available_heap   = (unsigned long) (kernel_heap_end - kernel_heap_start);    	// Available heap.
-	heapCount = 0;      // Contador.
+	kernel_heap_start = (unsigned long) KERNEL_HEAP_START;  
+    kernel_heap_end = (unsigned long) KERNEL_HEAP_END;  
 	
-	//Último heap pointer válido. (*IMPORTANTE)
+	//Heap Pointer, Available heap and Counter.
+	g_heap_pointer = (unsigned long) kernel_heap_start;    	
+    g_available_heap = (unsigned long) (kernel_heap_end - kernel_heap_start);    	 
+	heapCount = 0;      
+	
+	// #importante
+	// Último heap pointer válido. 
 	last_valid = (unsigned long) g_heap_pointer;
 	last_size = 0;
-	
 	
 	//Check Heap Pointer.
 	if( g_heap_pointer == 0 )
 	{
-	    printf("init_heap fail: Heap pointer!\n");
+	    printf("init_heap fail: Heap pointer\n");
 		goto fail;
 	}
 	
 	//Check Heap Pointer overflow.
 	if( g_heap_pointer > kernel_heap_end )
 	{
-        printf("init_heap fail: Heap Pointer Overflow!\n");
+        printf("init_heap fail: Heap Pointer Overflow\n");
 		goto fail;
     }	
 	
     //Heap Start.
 	if( kernel_heap_start == 0 )
 	{
-	    printf("init_heap fail: HeapStart={%x}\n" ,kernel_heap_start);
+	    printf("init_heap fail: HeapStart={%x}\n",kernel_heap_start);
 	    goto fail;
 	}
 	
 	//Heap End.
 	if( kernel_heap_end == 0 )
 	{
-	    printf("init_heap fail: HeapEnd={%x}\n" ,kernel_heap_end);
+	    printf("init_heap fail: HeapEnd={%x}\n",kernel_heap_end);
 	    goto fail;
 	}
 	
@@ -895,19 +896,17 @@ int init_heap()
 	{
 	    //@todo: Tentar crescer o heap.
 		
-		printf("init_heap fail: Available heap!\n");
+		printf("init_heap fail: Available heap\n");
 		goto fail;
 	}
 	
 	// Heap list:
 	// Inicializa a lista de heaps.
 	
-	while( i < HEAP_COUNT_MAX )
-	{
+	while ( i < HEAP_COUNT_MAX ){
         heapList[i] = (unsigned long) 0;
 		++i;
     };
-	
 	
 	//KernelHeap = (void*) x??;
 	
@@ -917,14 +916,14 @@ int init_heap()
 done:
 
 #ifdef KERNEL_VERBOSE
-    printf("Done.\n");
+    printf("Done\n");
 #endif	
 	
 	return (int) 0;
 	
 // Fail. Falha ao iniciar o heap do kernel.
 fail:
-    printf("init_heap: Fail!\n");
+    printf("init_heap: Fail\n");
 	refresh_screen();
 	
 	/*
@@ -952,20 +951,23 @@ int init_stack()
 {
     //Globals.
 	//#bugbug
-	kernel_stack_end   = (unsigned long) KERNEL_STACK_END; 
+	kernel_stack_end = (unsigned long) KERNEL_STACK_END; 
 	kernel_stack_start = (unsigned long) KERNEL_STACK_START; 
 	
     //End.
-	if(kernel_stack_end == 0){
-	    printf("init_stack fail: StackEnd={%x}\n" ,kernel_stack_end);
+	if ( kernel_stack_end == 0 )
+	{
+	    printf("init_stack fail: StackEnd={%x}\n",kernel_stack_end);
 	    goto fail;
 	};
 	
 	//Start.
-	if(kernel_stack_start == 0){
-	    printf("init_stack fail: StackStart={%x}\n" ,kernel_stack_start);
+	if ( kernel_stack_start == 0 )
+	{
+	    printf("init_stack fail: StackStart={%x}\n",kernel_stack_start);
 	    goto fail;
 	};
+	
 	//Nothing.
 done:
     return (int) 0;
@@ -1004,10 +1006,7 @@ void memoryShowMemoryInfo()
 	//printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
-	//
 	// System type
-	//
-	
 	switch(g_mm_system_type)
 	{
 		case stSmallSystem:
@@ -1028,10 +1027,7 @@ void memoryShowMemoryInfo()
 			break;
 	};
 	
-	
-	//
 	// ## code data bss ##
-	//
 	
 	//#debug
 	extern unsigned long code_begin;
@@ -1061,16 +1057,14 @@ void memoryShowMemoryInfo()
 	//printf("\n");	
 	
 	
-    //
 	//  ## heap e stack ##
-	//
 	
 	
-        printf("\n[Kernel Heap and Stack info:]\n");
-	    printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",
-		    kernel_heap_start, kernel_heap_end, HeapTotal );
+    printf("\n[Kernel Heap and Stack info:]\n");
+	printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",
+	    kernel_heap_start, kernel_heap_end, HeapTotal );
 			
-        printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
+    printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
 	    
 		// @todo:
 		// Mostrar o tamanho da pilha..
@@ -1081,27 +1075,20 @@ void memoryShowMemoryInfo()
 		// Pois bem, é mais digno mostrar aqui o endereço da pilha, 
 		// indicado no TSS.
 		
-		printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n", 
-		    kernel_stack_start, kernel_stack_end, StackTotal );
+    printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n", 
+        kernel_stack_start, kernel_stack_end, StackTotal );
 			
-        printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
+    printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
 	
 	
-	
-	    //
 	    // Video info
-	    //
 	
-	    printf("\n[Video Info:]\n");
+	//printf("\nVideo: ");
 	
 	    //Video mode.
 	    //printf("The video option is %x \n",g_video_mode);
-	    printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
-		    g_frontbuffer_pa, g_frontbuffer_va, g_backbuffer_va );
-			
-			
-
-	
+	printf("\n FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
+        g_frontbuffer_pa, g_frontbuffer_va, g_backbuffer_va );
 	
 	//...
 
@@ -1133,10 +1120,7 @@ int init_mm()
 	// Criar mmClearBSS()
 	//
 	//
-	
 
-	
-	
 	
 	//
 	// Chamando uma rotina que cria e inicializa o heap do kernel manualmente.
@@ -1144,14 +1128,16 @@ int init_mm()
 	
 	//Heap.
 	Status = (int) init_heap();
-	if(Status != 0){
+	if(Status != 0)
+	{
 	    printf("init_mm fail: Heap.\n");
 	    return (int) 1;
 	};	
 	
 	//Stack.
 	Status = (int) init_stack();
-	if(Status != 0){
+	if(Status != 0)
+	{
 	    printf("init_mm fail: Stack.\n");
 	    return (int) 1;
 	};		
@@ -1170,10 +1156,7 @@ int init_mm()
 	// MEMORY SIZES
 	//
 	
-	
-	//
 	// Get memory sizes via RTC.
-	//
 	
 	//Get extended Memory. (KB)
 	memorysizeBaseMemory     = (unsigned long)  rtcGetBaseMemory(); //@todo 

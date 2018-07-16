@@ -1,5 +1,5 @@
 /*
- * File: microkernel\pc\ipc\semaphore.c  
+ * File: mk\pc\ipc\sem.c  
  *
  * Descrrição:  
  *     Gerenciamento de semáforos.
@@ -11,9 +11,9 @@
  * tem que ter em mão um ponteiro para uma estrutura válida. Então através de
  * de uma system call ele consegue utilizar os métodos down e up. 
  *
- * Histórico:
- *      Versão: 1.0, 2015 - Created.
- *      Versão: 1.0, 2016 - Revisão.
+ * History:
+ *      2015 - Created by Fred Nora.
+ *      2016 - Revision.
  */		
  
 
@@ -21,16 +21,19 @@
 
 
 /*
+ **************************************************************
  * init_semaphore:
  *     Inicializa uma estrutura de semáforo.
- *     Obs: Quem chama essa função deve alocar memória para a estrutura e
- * passar por argumento uma estrutura válida.
+ *     Obs: Quem chama essa função deve alocar memória para a 
+ * estrutura e passar por argumento uma estrutura válida.
  */
-int init_semaphore(struct semaphore_d *s,  unsigned int count)
+int 
+init_semaphore( struct semaphore_d *s,  unsigned int count )
 {
 
     //Checa a validade da estrutura. 
-	if( (void *) s ==  NULL){
+	if( (void *) s ==  NULL)
+	{
 	    return (int) 1;    //Semáforo inválido.
 	};
 	
@@ -41,11 +44,13 @@ int init_semaphore(struct semaphore_d *s,  unsigned int count)
 	//
 	
 	s->count = (unsigned int) count;    //1.
-    return (int) 0;
+    
+	return (int) 0;
 };
 
 
 /*
+ ************************************************
  * Down:
  * Quando um processo vai entrar na sua região crítica ele executa um Down.
  * Se o semáforo estiver com zero, significa que
@@ -100,6 +105,7 @@ int Down(struct semaphore_d *s)
 
 
 /*
+ ***************************************************
  * Up:
  *     Quando um processo sai da sua região crítica
  *     ele dá um Up no semáforo, mudando seu valor pra 1.

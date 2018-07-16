@@ -15,24 +15,25 @@
  
 void *createTTYLine()
 {
+	int i;
 	struct ttyline_d *l;
 	
 	
 	//Alocando memória para uma estrutura de linha.
-	l = (void*) malloc( sizeof(struct ttyline_d) );
+	l = (void *) malloc( sizeof(struct ttyline_d) );
 
-    if( (void*) l == NULL ){
+    if( (void *) l == NULL )
+	{
 		printf("createTTYLine:");
-		refresh_screen();
-		while(1){}
+		die();
 	}
 
 	//@todo:
 	//Inicializar as variáveis dentro da estrutura.
 	
-	int i;
-	for(i = 0; i< TTYCHARS_COUNT_MAX; i++){
-	    l->c[i] = 0;  //zerando o buffer de caracteres.	
+	//zerando o buffer de caracteres.	
+	for(i = 0; i < TTYCHARS_COUNT_MAX; i++){
+	    l->c[i] = 0;  
 	}
 	
 	l->used = 1;
@@ -42,11 +43,13 @@ void *createTTYLine()
 	
 	
 	ttyLineCounter++;
-	if(ttyLineCounter >= TTYLINES_COUNT_MAX){
+	if( ttyLineCounter >= TTYLINES_COUNT_MAX )
+	{
 		printf("createTTYLine: Line limits\n");
 		refresh_screen();
 		//free(l);
 		return NULL;
+		
 	}else{
 	    //developer_ttylines[ttyLineCounter] = (void*) l;	
 		
@@ -63,11 +66,12 @@ void *createTTYLine()
 	//...
 	
 done:	
-    return (void*) l;	
+    return (void *) l;	
 }; 
  
  
 /*
+ ***********************************
  * ttyInit:
  *     Inicialização do módulo.
  *
@@ -75,14 +79,15 @@ done:
 int ttyInit()
 {
 	int i;
-	for(i = 0; i< TTYLINES_COUNT_MAX; i++){
+	
+	for( i=0; i < TTYLINES_COUNT_MAX; i++ ){
 	    //developer_ttylines[i] = NULL;	
 	}
 	
 	ttyLineCounter = 0;
 	
 	//
-	input_line = (void*) createTTYLine(); 
+	input_line = (void *) createTTYLine(); 
 	
 	//...
 done: 

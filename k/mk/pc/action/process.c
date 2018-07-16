@@ -813,7 +813,7 @@ get_next:
 	
 //Done.
 done:
-    return (void*) Process;
+    return (void *) Process;
 };
 
  
@@ -829,7 +829,7 @@ void CloseAllProcesses()
     struct process_d *P;
 
 	//Menos o 0. 
-    for(Index = 1; Index <= PROCESS_COUNT_MAX; Index++)
+    for( Index = 1; Index < PROCESS_COUNT_MAX; Index++ )
 	{
 		//Pega, bloqueia e tira da lista.
 		P = (void*) processList[Index];
@@ -838,9 +838,10 @@ void CloseAllProcesses()
 	};		
 	
 	//Check process 0.
-	P = (void*) processList[0];
-	if( (void*) P == NULL ){
-		panic("CloseAllProcesses error: Process 0 Struct.\n");
+	P = (void *) processList[0];
+	if( (void *) P == NULL )
+	{
+		panic("CloseAllProcesses: P\n");
 	};
 	
 	
@@ -858,6 +859,7 @@ done:
 /*
  * KeSaveCurrentContext:
  *     Interface para chamar rotina de salvamento de contexto de registradores.
+  * obs: Não usaremos inicial Ke_
  */
 void KeSaveCurrentContext()
 {
@@ -869,6 +871,7 @@ void KeSaveCurrentContext()
 /*
  * KeRestoreCurrentContext:
  *     Interface para chamar rotina de restauração de contexto de registradores.
+  * obs: Não usaremos inicial Ke_
  */
 void KeRestoreCurrentContext()
 {
@@ -882,7 +885,7 @@ void KeRestoreCurrentContext()
  * KeCpuFaults:
  *     Interface para chamar a rotina de tratamento das fault de CPU.
  *     @todo: Talvez essa rotina possa ir para cpu.c
- *
+ *  * obs: Não usaremos inicial Ke_
  */ 
 void KeCpuFaults(unsigned long fault_number)
 { 
@@ -902,7 +905,7 @@ void KeCpuFaults(unsigned long fault_number)
  * KeSpawnTask:
  *     Interface para rotina que executa pela primeira vez
  * uma tarefa em user mode.
- * @todo: deletar.
+ * @todo: deletar.  * obs: Não usaremos inicial Ke_
  */
 void KeSpawnTask(int id)
 {
@@ -917,7 +920,7 @@ void KeSpawnTask(int id)
  * KeSelectNextThread:
  *     Interface para chamar a rotina que seleciona a proxima tarefa para
  * rodar, baseado em criterios.
- *
+ * * obs: Não usaremos inicial Ke_
  */
 int KeSelectNextThread(int current)
 {
@@ -930,6 +933,7 @@ int KeSelectNextThread(int current)
 /*
  * KeCheckTaskContext:
  *     Interface para chamar uma rotina de análise de contexto.
+  * obs: Não usaremos inicial Ke_
  */
 int KeCheckTaskContext( int task_id )
 {
@@ -947,7 +951,7 @@ int KeCheckTaskContext( int task_id )
  * KeInitTasks:
  *     Interface para chamar uma rotina de inicialização de variaveis
  * do mecanismo de gerenciamento de tarefas.
- *
+ *  * obs: Não usaremos inicial Ke_
  */
 void KeInitTasks()
 {
@@ -964,12 +968,13 @@ void KeInitTasks()
  * KeCreateTask:
  *     Interface para chamar uma rotina de criação de um processo.
  * nao uma thread.
- *
+ * obs: Não usaremos inicial Ke_
  */
-int KeCreateTask( int task_id, 
-                 unsigned long *task_eip, 
-				 unsigned long *task_stack, 
-				 unsigned long prior )
+int 
+KeCreateTask( int task_id, 
+              unsigned long *task_eip, 
+			  unsigned long *task_stack, 
+			  unsigned long prior )
 {
     return 0;
 };
@@ -1289,7 +1294,7 @@ void show_process_information()
 	//...
 	
 done:	
-    printf("Done.\n");
+    printf("Done\n");
 	refresh_screen();
 	return;
 };
@@ -1303,8 +1308,8 @@ done:
  * para um gerenciador de processos em user mode usar.
  * @todo: processSetDirectory(...)
  */
-void SetProcessDirectory( struct process_d *process, 
-                          unsigned long Address )
+void 
+SetProcessDirectory( struct process_d *process, unsigned long Address )
 {
     if( (void*) process != NULL )
 	{

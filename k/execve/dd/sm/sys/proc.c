@@ -75,16 +75,17 @@ void procedureGrid();
  * ou algum processo deseja interagir com o driver de teclado 
  *  ?? planejando a funcionalidade desse diálogo ??
  */
-unsigned long ldisc_dialog( struct window_d *window, 
-                            int msg, 
-							unsigned long long1, 
-							unsigned long long2 ) 
+unsigned long 
+ldisc_dialog( struct window_d *window, 
+              int msg, 
+			  unsigned long long1, 
+			  unsigned long long2 ) 
 {
-	//cuidado
-	//ponteiro para um buffer em user mode.
+	//#cuidado
+	//Ponteiro para um buffer em user mode.
 	unsigned long *buffer;
 	
-	if( (void*) window == NULL ){
+	if( (void *) window == NULL ){
 		return (unsigned long) 0;
 	}
 	
@@ -183,10 +184,11 @@ done:
 /*
  *O procedimento de janela do (terminal.)
  */
-unsigned long terminal_dialog( struct window_d *window, 
-                               int msg, 
-							   unsigned long long1, 
-							   unsigned long long2 ) 
+unsigned long 
+terminal_dialog( struct window_d *window, 
+                 int msg, 
+			     unsigned long long1, 
+				 unsigned long long2 ) 
 {
     //#suspenso esse diálogo.
 	//repensando ele.
@@ -195,6 +197,7 @@ unsigned long terminal_dialog( struct window_d *window,
 
 
 /*
+ ***********************************************************************
  * system_procedure:
  *     Procedimento de janela da janela com o foco de entrada ... (edit box.)
  *     Procedimento de janela default.
@@ -210,10 +213,11 @@ unsigned long terminal_dialog( struct window_d *window,
  *      POR ENQUANTO ESTÁ PASSANDO UM HANDLE DE JANELA NULO. 
  *
  */
-unsigned long system_procedure( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2) 
+unsigned long 
+system_procedure( struct window_d *window, 
+                  int msg, 
+				  unsigned long long1, 
+				  unsigned long long2 ) 
 { 	
 	//
 	// @todo: *importante:
@@ -245,11 +249,7 @@ unsigned long system_procedure( struct window_d *window,
 	//...
 	
 
-	//
 	// Lidando com a janela com o foco de entrada.
-	//
-
-
 	unsigned long left; 
 	unsigned long top;   
 	unsigned long width; 
@@ -274,7 +274,7 @@ unsigned long system_procedure( struct window_d *window,
 	// Window With Focus !
 	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
 	//e passada via argumento.
-	if( (void*) window == NULL ){
+	if( (void *) window == NULL ){
 	    printf("sm-sys-system_procedure: window");
         die();		
 	}else{
@@ -633,6 +633,9 @@ unsigned long system_procedure( struct window_d *window,
 
 				//Task Manager.	
 				case VK_F10:
+				    kill_all_threads();
+					KiInformation();
+					//current_idle_thread = 3;
 					//if(AltStatus == 1){ window_with_focus = 10; break;};
 					//if(CtrlStatus == 1){ active_window = 10; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F10\n"); break;};
@@ -641,7 +644,7 @@ unsigned long system_procedure( struct window_d *window,
 					//mostra_slots();  //threadi.c
 					
 					//@todo: abrir o gerenciador de tarefas.
-					volumeShowVolumeInfo(0);
+					//volumeShowVolumeInfo(0);
 					//show_process_information();
 					//show_thread_information();					
 				    
@@ -1203,12 +1206,13 @@ void procedureMakeTests()
 	printf("sm-sys-procedureMakeTests:\n");
 	
 	//Fluxo padrão. (file structure)
-	stdout = (void*) malloc( sizeof(FILE) );
-	if( (void*) stdout != NULL )
+	stdout = (void *) malloc( sizeof(FILE) );
+	if( (void *) stdout != NULL )
 	{
 		//File size.
-		//buff = (unsigned long) malloc( sizeof(4096) );
-		stdout->_ptr = (char*) malloc( sizeof(4096) );
+		//@todo: Fazer assim.
+		//stdout->_ptr = (char *) malloc( 4096 );
+		stdout->_ptr = (char *) malloc( sizeof(4096) );
 		
 		if(stdout->_ptr == 0)
 		{

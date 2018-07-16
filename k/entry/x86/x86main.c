@@ -71,8 +71,6 @@ char copyright[] =
 
 
 
- 
-
 /*
  *************************************************
  * kMain: 
@@ -83,11 +81,11 @@ char copyright[] =
  *     2016~2018 - Revision.
  *     ...
  */
-int 
-kMain( int argc, char **argv )
-{
+int kMain( int argc, char **argv ){
+	
     int Status = 0;
-
+    int zIndex;
+	
     KernelStatus = KERNEL_NULL;
 
     //Initializing the global spinlock.
@@ -95,7 +93,7 @@ kMain( int argc, char **argv )
 
     // #test.
     // initializing zorder list.
-    int zIndex;
+    
     for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
         zorderList[zIndex] = (unsigned long) 0;
     }
@@ -142,15 +140,16 @@ kMain( int argc, char **argv )
     // Init screen
     //
 
+#ifdef KERNEL_VERBOSE	
     //If we are using graphics mode.
     if(VideoBlock.useGui == GUI_ON){
-#ifdef KERNEL_VERBOSE
-        printf("kMain: Using GUI!\n");
+        printf("kMain: Using GUI\n");
+    }
 #endif
-    };
 
     //If we are using text mode.
-    if(VideoBlock.useGui != GUI_ON){
+    if(VideoBlock.useGui != GUI_ON)
+	{
         set_up_text_color(0x0F, 0x00);
 
         //g_current_vm = 0x800000;
@@ -174,7 +173,9 @@ kMain( int argc, char **argv )
 
     systemSystem();	
     Status = (int) systemInit();
-    if(Status != 0){
+	
+    if ( Status != 0 )
+	{
         printf("main-kMain: systemInit\n");
         KernelStatus = KERNEL_ABORTED;
         goto fail;
@@ -338,8 +339,8 @@ kMain( int argc, char **argv )
     //===================================
     // Cria uma thread em ring 0.
 	// Ok. isso funcionou bem.
-    RING0IDLEThread = (void*) KiCreateRing0Idle();
-    if( (void*) RING0IDLEThread == NULL )
+    RING0IDLEThread = (void *) KiCreateRing0Idle();
+    if( (void *) RING0IDLEThread == NULL )
 	{
         printf("main-kMain: RING0IDLEThread\n");
         die();
@@ -350,6 +351,16 @@ kMain( int argc, char **argv )
     };
 	
 	
+	//
+	// ## importante ## 
+	//
+	
+	next_thread = 0;
+	
+	// #importante: 
+	// Essa não pode fechar nunca.
+	// idle thread ... 
+	idle = 3;
 	
     //...
 
@@ -357,9 +368,12 @@ kMain( int argc, char **argv )
 //Kernel base Debugger.
 doDebug:
     Status = (int) debug();
-    if(Status != 0){    
-        MessageBox(gui->screen,1,"main-kMain","debug");
-        KernelStatus = KERNEL_ABORTED;
+    
+	if ( Status != 0 )
+	{    
+        //MessageBox(gui->screen,1,"main-kMain","debug");
+        printf("kMain: debug\n");
+		KernelStatus = KERNEL_ABORTED;
         goto fail;
     }else{
         KernelStatus = KERNEL_INITIALIZED;
@@ -591,8 +605,7 @@ doDebug:
 	while(1){}
 	*/
 	
-	
-	
+
 	
 	//
     // RETURNING !
@@ -601,7 +614,8 @@ doDebug:
 done:
 
     // Return to assembly file, (head.s).
-    if(KernelStatus == KERNEL_INITIALIZED){
+    if ( KernelStatus == KERNEL_INITIALIZED )
+	{
 
 #ifdef KERNEL_VERBOSE
     refresh_screen();
@@ -618,14 +632,18 @@ fail:
 };
 
 
-static inline void mainSetCr3( unsigned long value){
+static inline void mainSetCr3( unsigned long value )
+{
     __asm__ ( "mov %0, %%cr3" : : "r"(value) );
-}
+};
 
 
 /*
+ *********************************************************
  * startStartIdle:
  *     Initializes idle thread.
+ *     # fake idle thread 
+ *     idle thread em ring3.
  *
  *     @todo: 
  *         + Initializes idle thread.
@@ -636,10 +654,10 @@ void startStartIdle()
 {
     int i;
  
-    if((void*) IdleThread == NULL)
+    if ( (void *) IdleThread == NULL )
     {
-        //printf("KeStartIdle error: Struct!\n");
-        MessageBox(gui->screen,1,"main-startStartIdle","IdleThread");
+        //MessageBox(gui->screen,1,"main-startStartIdle","IdleThread");		
+        printf("main-startStartIdle: IdleThread\n");
         die();
     }else{
 
@@ -658,16 +676,21 @@ void startStartIdle()
     };
 
     // State  
-    if(IdleThread->state != STANDBY){
+    if( IdleThread->state != STANDBY ){
         printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
         die();
-    };
+    }
 
     // * MOVEMENT 2 ( Standby --> Running)
-    if(IdleThread->state == STANDBY){
+    if( IdleThread->state == STANDBY ){
         IdleThread->state = RUNNING;
         queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_RUNNING);
-    };
+    }
+	
+	
+	//Current process.
+	current_process = IdleThread->process->pid;
+	
 //Done!
 done:
     //Debug:
@@ -676,9 +699,9 @@ done:
     //refresh_screen(); //@todo:  
 
 
-    for( i=0; i<=DISPATCHER_PRIORITY_MAX; i++){
+    for( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) IdleThread;
-    };
+    }
 
 
     IncrementDispatcherCount(SELECT_IDLE_COUNT);
@@ -717,15 +740,15 @@ done:
                  " mov %ax, %es  \n"
                  " mov %ax, %fs  \n"
                  " mov %ax, %gs  \n"
-                 " pushl $0x23            \n"    //ss.
-                 " movl $0x0044FFF0, %eax \n"
-                 " pushl %eax             \n"    //esp.
-                 " pushl $0x3200          \n"    //eflags.
-                 " pushl $0x1B            \n"    //cs.
-                 " pushl $0x00401000      \n"    //eip.
+                 " pushl $0x23  \n"              // ss.
+                 " movl $0x0044FFF0, %eax  \n"
+                 " pushl %eax  \n"               // esp.
+                 " pushl $0x3200  \n"            // eflags.
+                 " pushl $0x1B  \n"              // cs.
+                 " pushl $0x00401000  \n"        // eip.
                  " iret \n" );
 
-    panic("main-startStartIdle: panic *");
+    panic("main-startStartIdle:");
 };
 
 

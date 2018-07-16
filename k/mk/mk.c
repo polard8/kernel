@@ -3,7 +3,7 @@
  * kernel base. 
  * (c) Copyright 2015 Fred Nora.
  *
- * File: k\microkernel.c 
+ * File: k\mk.c 
  * 
  * microkernelMicrokernel(); é o construtor.
  *
@@ -191,9 +191,9 @@ void microkernelTestLimit()
 	struct thread_d *t;
 	
 	
-	
-	printf("microkernelTestLimit:\n");  
-    refresh_screen();
+	//#debug
+	//printf("microkernelTestLimit:\n");  
+	//refresh_screen();
 	
    //
    // Criando todos os processos possíveis.
@@ -201,19 +201,25 @@ void microkernelTestLimit()
 testProcess:   
     printf("Creating processes...\n");      
     i=128;	
-    while(i<PROCESS_COUNT_MAX)
+    while( i<PROCESS_COUNT_MAX )
 	{
-		p = (void*) create_process( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits", RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	    
-		if((void*)p == NULL ){
+		p = (void *) create_process( NULL, NULL, gui->screen, 0x400000, 
+		                 DISPATCHER_PRIORITY_LOW, 0, "TestLimits", 
+						 RING3, (unsigned long ) KERNEL_PAGEDIRECTORY);	    
+		
+		
+		if( (void *) p == NULL )
+		{
 			goto testThread;
 		}
 		i++;	
-	}
+	};
       
 
    //
    // Criando todas as threads possíveis.
-   //	
+   //
+   
 testThread:	  
 /* 
     printf("Creating threads...\n");      	  
@@ -237,27 +243,34 @@ done:
 
 
 
-void sys_dead_thread_collector(){
+void 
+sys_dead_thread_collector()
+{
     dead_thread_collector();
-	return;
+	//return;
 };
 
 
 //exit process.
 //serviço do sistema.
-void sys_exit_process(int pid, int code){
+void 
+sys_exit_process( int pid, int code )
+{
 	exit_process(pid,code);
-	return;
+	//return;
 };
 
 //exit thread.
-void sys_exit_thread(int tid){
+void 
+sys_exit_thread(int tid)
+{
     exit_thread(tid);
-    return;
+    //return;
 };
 
 
 /*
+ *****************************************************
  * sys_create_process:
  *     Serviço do sistema.
  *     Interface para criação de um processo.
@@ -291,6 +304,7 @@ done:
 
 
 /*
+ *********************************************************
  * sys_create_thread:
  *    Serviço do sistema.
  *    Interface para criação de uma thread.
@@ -312,7 +326,7 @@ void *sys_create_thread( struct wstation_d *window_station,
 	
 	// Create thread.
     create_thread( window_station, desktop, window, init_eip, 
-	               priority, ppid, name); 
+	    priority, ppid, name); 
 				   
     //@todo: return da função create.
 	
@@ -322,10 +336,13 @@ done:
 
 
 /*
+ *********************************************
  * sys_fork:
  * Fork ... Serviço do sistema.
  */
-int sys_fork(){
+int 
+sys_fork()
+{
 	return (int) fork();
 };
 
@@ -340,13 +357,16 @@ void sys_reboot(void)
 
 
 //Pega o id do processo atual.
-int sys_getpid(){
+int 
+sys_getpid()
+{
 	return (int) current_process;
 };
 
 
 //Pega o ID do processo pai do processo atual.
-int sys_getppid()
+int 
+sys_getppid()
 {
     int pid;
 	int ppid;
@@ -396,6 +416,7 @@ void KeReboot()
 
 
 /*
+ *****************************************************
  * init_microkernel:
  *     Initialize the kernel base microkernel.
  *     Archtecture independent inicialization ...
@@ -439,9 +460,10 @@ int init_microkernel()
 	
 	//Inicializar as filas que alimentarão a lista do dispatcher.	
 	queue = malloc( sizeof( struct queue_d ) );
-	if( (void*) queue == NULL ){
+	if( (void *) queue == NULL )
+	{
 	    panic("init_microkernel: queue\n");
-	    die();
+	    //die();
 	}else{
 		
 		//Inicializa todas as filas do microkernel.
@@ -459,9 +481,11 @@ int init_microkernel()
 	//
 	
 	DispatchCountBlock = malloc( sizeof( struct dispatch_count_d ) );
-	if( (void*) DispatchCountBlock == NULL ){
+	
+	if( (void *) DispatchCountBlock == NULL )
+	{
 	    panic("init_microkernel: DispatchCountBlock\n");
-	    die();
+	    //die();
 	}else{
 		
 		DispatchCountBlock->SelectIdleCount = 0;

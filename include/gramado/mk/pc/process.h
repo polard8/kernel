@@ -1,5 +1,5 @@
 /*
- * Frile: process.h
+ * File: mk\pc\process.h
  *
  * Descrição:
  *     Header principal para as rotinas de gerenciamento de processos.
@@ -203,7 +203,7 @@ typedef enum {
 typedef enum {
     APPMODE_NULL,      // Isso se aplica ao processo kernel e ao processo idle por exemplo.	
     APPMODE_TERMINAL,  // O kernel cria uma janela de terminal para o aplicativo.
-	APPMODE_WINDOW,    // o kernel não cria janela de terminal para o aplicativo
+	APPMODE_WINDOW,    // O kernel não cria janela de terminal para o aplicativo
 }appmode_t;
 
 /*
@@ -271,13 +271,13 @@ struct process_d
 	unsigned long Streams[NUMBER_OF_FILES];
 	
 	//State.
-	process_state_t state; //f, flag,
+	process_state_t state; // flag,
 	
 
     //plano de execução.
 	int plane;
 
-    //unsigned long error; //e. error.	
+    //unsigned long error; // error.	
 
 	unsigned long used;     //@todo: Poderia ser short.
     unsigned long magic;    //@todo: Poderia ser short.
@@ -699,7 +699,7 @@ struct process_d
 	//@todo: usar processWindowStation processDesktop;
 	//struct usession_d *processUserSession;
 	struct wstation_d *window_station;    //Window Station do processo.  
-	struct desktop_d  *desktop;           //Desktop do processo.        
+	struct desktop_d *desktop;           //Desktop do processo.        
 	
 
 	//
@@ -734,18 +734,15 @@ struct process_d
 	//generic bytes i/o. contagem de bytes para operações genéricas de i/o, excluindo disco.
 	
 
-	
-	/*
-	 * wait4pid: 
-     * O processo pode estar esperando um processo filho fechar. 
-	 * Para que ele prossiga.
-	 */
+	//wait4pid: 
+    //O processo pode estar esperando um processo filho fechar. 
+	//@todo: usar 'int'.
 	unsigned long wait4pid; 
 	
-	//Motivo da thread fechar.
+	//Motivo do processo fechar.
 	int exit_code;
 	
-	//Lista de processos filhos que estão no estado zumbi.
+	// Lista de processos filhos que estão no estado zumbi.
 	// List of terminated childs
 	struct process_d *zombieChildListHead;           
 	
@@ -764,7 +761,6 @@ struct process_d
     //struct process_d *NextInitialized;    //Próximo pronto pra rodar.		
 	//struct process_d *Parent;
 	//struct process_d *Prev;
-	
 	
 	
 	//Signal
@@ -835,31 +831,31 @@ struct proc_list_d
 	struct process_d *tail;
 	
 }; 
-proc_list_t *system_procs;      //Processos do sistema.
-proc_list_t *periodic_procs;    //Processos periódicos.
-proc_list_t *rr_procs;          //Processos do tipo round robin.
-proc_list_t *waiting_procs;     //Processos que estão esperando.
-  
+struct proc_list_d *system_procs;      //Processos do sistema.
+struct proc_list_d *periodic_procs;    //Processos periódicos.
+struct proc_list_d *rr_procs;          //Processos do tipo round robin.
+struct proc_list_d *waiting_procs;     //Processos que estão esperando.
+//...  
 
 
 
 
 /*
  * process_info_d:
- *
- *
+ *    Informações básicas sobre um processo. 
+ *    Quick access.
  */
-struct process_info_d process_info_t; 
 struct process_info_d 
 {
 	int processId;
 	struct process_d *process; 	
     
+	// Thread principal.
 	int threadId;
-	struct thread_d  *thread; 	
-};
-//process_info_t *process_info;
+	struct thread_d *thread;
 
+    //... 	
+};
 
 
 /* 
@@ -883,16 +879,26 @@ struct process_d *processObject();
 //isso permite clonar um processo,
 int getNewPID();
 
-int processSendSignal(struct process_d *p, unsigned long signal);
+
+// Signal.
+int 
+processSendSignal( struct process_d *p, 
+                   unsigned long signal );
 
 
 //
 // Page directory support.
 //
  
-unsigned long GetPageDirValue();
-unsigned long GetProcessDirectory(struct process_d *process);
-void SetProcessDirectory(struct process_d *process, unsigned long Address);
+unsigned long 
+GetPageDirValue();
+
+unsigned long 
+GetProcessDirectory( struct process_d *process );
+
+void 
+SetProcessDirectory( struct process_d *process, 
+                     unsigned long Address );
 
 
 //

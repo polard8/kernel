@@ -1,7 +1,7 @@
 
 
-//taskswitch.h header para rotinas de operação de troca de contexto de threads e processos.
-
+//ts.h header para rotinas de operação de troca de contexto de threads e processos.
+// task switching
 
 
 void task_switch();

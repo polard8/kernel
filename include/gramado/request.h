@@ -17,11 +17,29 @@
  * momento ideal é logo após a thread atual utilizar o processador durante 
  * todo o seu quantum.
  *
- * Histórico:
- *      Versão: 1.0, 2015 - Created.
- *      Versão: 1.0, 2016 - Revisão.
+ * #importante:
+ * Do mesmo modo isso pode ser usado para tratamento de eventos.
+ * Ou seja, pouco antes de retornar de uma interrupção de tempo,
+ * o kernel irá tratar os eventos(requests) pendentes.
+ * + Que evento ocorreu ?
+ * + Quem está esperando por esse tipo de evento ?
+ *
+ * History
+ *     2015 - Created by Fred Nora.
+ *     2016 ~ 2018 Revision.
  */
 
+ 
+ 
+// #importante:
+// Devemos incluir aqui mais eventos importantes,
+// principalmente os eventos referentes a espera bloqueante.
+// Obs:
+// + eventos de input (mouse, teclado) ...
+// + eventos com threads, ( dormir , acordar, iniciar, fechar ... )
+// ###importante: Esses eventos com threads permitirão muitas melhorias no estado 
+// atual do sistema.
+ 
 //Enumerando. 
 #define  KR_NULL        0 
 #define  KR_NONE        KR_NULL  // Request sem motivo. 
@@ -29,7 +47,7 @@
 #define  KR_SLEEP       2        // Faz a tarefa atual dormir. 
 #define  KR_WAKEUP      3        // Acorda a tarefa atual.
 #define  KR_ZOMBIE      4        // Torna a tarefa atual zombie.
-#define  KR_NEW         5        // Inicia uma nova tarefa.
+#define  KR_NEW         5        // *Inicia uma nova tarefa.
 #define  KR_NEXT        6        // Reinicia a execução de uma tarefa.
 #define  KR_TIMER_TICK  7        // O tick do timer.
 #define  KR_TIMER_LIMIT 8        // Um limite de contagem.
@@ -47,12 +65,16 @@ typedef enum {
 #define KERNEL_REQUEST_MAX 32
 
 
+
+unsigned long kernel_request;
+
+
 /*
+ *****************************************************
  * request_d:
  *     Estrutura para os requests.
  *
  */
-typedef struct request_d request_t;
 struct request_d
 {
 	object_type_t objectType;
@@ -62,12 +84,11 @@ struct request_d
     unsigned long count;
     //unsigned long data[4];    
 };
-request_t *KernelRequests;
-//request_t *UserRequests;
-//request_t *RemoteRequests;
-//request_t *Requests;
+struct request_d *KernelRequests;
+struct request_d *UserRequests;
+struct request_d *RemoteRequests;
 
-
+//list.
 unsigned long requestList[KERNEL_REQUEST_MAX];
 
 
@@ -80,6 +101,6 @@ void request();
 
 
 //
-//fim.
+// End.
 //
 

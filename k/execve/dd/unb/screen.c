@@ -58,12 +58,14 @@ unsigned long screen_height;
 
 
 //Get width.
-unsigned long screenGetWidth(){
+unsigned long screenGetWidth()
+{
 	return (unsigned long) screen_width;
 };
  
 //Get height. 
-unsigned long screenGetHeight(){
+unsigned long screenGetHeight()
+{
 	return (unsigned long) screen_height;	
 };
 
@@ -73,10 +75,11 @@ unsigned long screenGetHeight(){
  *     Configura as dimensões da tela.
  *     Tamanho do monitor.
  */
-void screenSetSize(unsigned long width, unsigned long height){
-    screen_width  = (unsigned long) width; 
+void screenSetSize( unsigned long width, unsigned long height )
+{
+    screen_width = (unsigned long) width; 
     screen_height = (unsigned long) height;
-    return;
+    //return;
 };
 
 
@@ -84,53 +87,57 @@ void screenSetSize(unsigned long width, unsigned long height){
  * refresh_screen:
  *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
  */
-void refresh_screen(){
+void refresh_screen()
+{
     screenRefresh();
-	return;
+	//return;
 };
 
 
 /*
+ *****************************************
  * screenRefresh:
  *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
  *     Se o modo de vídeo permite.
  */
 void screenRefresh()
-{	
-    if(g_useGUI == 1 || SavedBootMode == 1){
-        asm_refresh_screen();
-    };	
-	return;	
+{
+    //?? SavedBootMode	
+    if( g_useGUI == 1 || SavedBootMode == 1 )
+	    asm_refresh_screen();
 };
 
 
 /*
+ **********************************************
  * screenInit:
  *     Inicializando o gerenciamento de tela.
  */ 
 int screenInit()
 {
-
     //Configura globais com base nos valores passados pelo Boot Loader.
-	screenSetSize( (unsigned long) SavedX, (unsigned long) SavedY);
+	screenSetSize( (unsigned long) SavedX, (unsigned long) SavedY );
 	
 	// Setup Screen structure.
-    Screen = (void*) malloc( sizeof(struct screen_d) );
-    if((void*) Screen == NULL){	
+    Screen = (void *) malloc( sizeof(struct screen_d) );
+    
+	if( (void *) Screen == NULL )
+	{	
 	    printf("screenInit:");
-		refresh_screen();
-		while(1){}
+		die();
+		
 	}else{
 		
-	    Screen->left   = SCREEN_DEFAULT_LEFT;
-	    Screen->top    = SCREEN_DEFAULT_TOP; 
-		Screen->width  = (unsigned long) screenGetWidth();
+	    Screen->left = SCREEN_DEFAULT_LEFT;
+	    Screen->top = SCREEN_DEFAULT_TOP; 
+		
+		Screen->width = (unsigned long) screenGetWidth();
 	    Screen->height = (unsigned long) screenGetHeight();
 		//...
          
 		// salvando o ponteiro da estrutura. 
-        ScreenInfo    = (void*) Screen;
-        CurrentScreen = (void*) Screen;
+        ScreenInfo = (void *) Screen;
+        CurrentScreen = (void *) Screen;
         //...		
     };
 	
