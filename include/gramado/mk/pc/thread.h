@@ -586,8 +586,7 @@ GetThreadDirectory( struct thread_d *thread );
 
 // Altera o endereço do diretório de páginas de uma thread.
 void 
-SetThreadDirectory( struct thread_d *thread, 
-                    unsigned long Address );
+SetThreadDirectory( struct thread_d *thread, unsigned long Address );
 
 
 /*
@@ -625,20 +624,17 @@ void spawn_thread(int id);
 //
 
 // Liberar uma thread que estava bloqueada ou esperando.
-void 
-release(int tid);
+void release ( int tid );
 
 //Torna zumbi uma thread.
-void 
-exit_thread(int tid);       
+void exit_thread ( int tid );       
 
 //Destrói uma thread.
-void 
-kill_thread(int tid);       
+void kill_thread (int tid);       
 
-void dead_thread_collector();
+void dead_thread_collector ();
 
-void kill_all_threads();
+void kill_all_threads ();
 
 //
 // End.

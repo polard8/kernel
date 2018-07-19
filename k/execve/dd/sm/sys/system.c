@@ -163,6 +163,79 @@ static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginaç
 
 
 
+
+
+
+/*
+ *******************************************************
+ * set_up_system_color: 
+ *     Configura cor padrão para o sistema.
+ *     @todo: Isso pode ir para outro lugar.   
+ */
+void set_up_color ( unsigned long color ){   
+	g_system_color = (unsigned long) color;	
+	//return;
+};
+
+
+/* 
+ *********************************************************************
+ * set_up_text_color:
+ *     Atribui o primeiro plano e o fundo que nós usaremos. 
+ *     Top 4 bytes are the background,  bottom 4 bytes
+ *     are the foreground color.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
+    g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);	
+	//return;
+};
+
+
+/*
+ ***************************************************************
+ * set_up_cursor:
+ *     Configura cursor.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+void set_up_cursor ( unsigned long x, unsigned long y ){   
+	g_cursor_x = (unsigned long) x;
+	g_cursor_y = (unsigned long) y;	
+	//return;
+};
+
+
+/*
+ **************************************************
+ * get_cursor_x:
+ *     Pega o valor de x.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+unsigned long get_cursor_x (){   	
+	return (unsigned long) g_cursor_x;
+};
+
+
+/*
+ **************************************************
+ * get_cursor_y:
+ *     Pega o valor de y.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+unsigned long get_cursor_y (){         
+    return (unsigned long) g_cursor_y; 	
+};
+
+
+
+
+
+
+
+
+
+
+
 /*
  * Classes:
  *     O que segue são as funções principais do Kernel. São seis rotinas 
@@ -1638,7 +1711,7 @@ void systemShowDevicesInfo()
 	//
 	
 done:
-    printf("done.\n");
+    printf("done\n");
 	refresh_screen();
     return;
 }; 
@@ -1698,7 +1771,7 @@ void *systemCreateSystemMenuBar()
 	
 	
 done:
-	return (void*) hwBar;
+	return (void *) hwBar;
 }; 
  
 
@@ -1712,16 +1785,23 @@ void systemCheck3TierArchitecture(){
 
 
 /*
+ ***************************************
  * systemSetupVersion:
  *     Setup version info.     
  */
-void systemSetupVersion()
-{
+void systemSetupVersion (){
+	
 	//Version.
-    Version = (void*) malloc( sizeof(struct version_d) );
-    if((void*) Version == NULL){	
-	    printf("sm-sys-system-systemSetupVersion: Version");
-        die();  
+    Version = (void *) malloc( sizeof(struct version_d) );
+    
+	if ( (void *) Version == NULL )
+	{
+        //#todo:
+        //Isso deve ser considerado um erro fatal,
+        //pois existem aplicações que dependem da versão do sistema 
+        //para funcionarem corretamente.. 		
+	    panic("sm-sys-system-systemSetupVersion: Version");
+          
 	}else{	
         Version->Major = SYSTEM_VERSIONMAJOR;
 		Version->Minor = SYSTEM_VERSIONMINOR;
@@ -1730,14 +1810,20 @@ void systemSetupVersion()
 	};
 	
 	//VersionInfo.
-    VersionInfo = (void*) malloc( sizeof(struct version_info_d) );
-    if((void*) VersionInfo == NULL){	
-	    printf("sm-sys-system-systemSetupVersion: VersionInfo");
-		die();
+    VersionInfo = (void *) malloc( sizeof(struct version_info_d) );
+	
+    if ( (void*) VersionInfo == NULL )
+	{	
+        //#todo:
+        //Isso deve ser considerado um erro fatal,
+        //pois existem aplicações que dependem da versão do sistema 
+        //para funcionarem corretamente.. 	
+	    panic("sm-sys-system-systemSetupVersion: VersionInfo");
+		
 	}else{
 		
-		if( (void*) Version != NULL  )
-		{
+		if ( (void *) Version != NULL  ){
+			
             //VersionInfo->version = (void *) Version;
             //...VersionInfo->string = (char*) ...;
             //... 			
@@ -1750,18 +1836,18 @@ void systemSetupVersion()
 	// Colocando na estrutura System se ela for válida.
 	//
 	
-	if((void*) System != NULL)
+	if( (void *) System != NULL )
 	{
-		if( System->used == 1 && System->magic == 1234 ){
-			System->version      = (void *) Version;
+		if ( System->used == 1 && System->magic == 1234 ){
+			System->version = (void *) Version;
 			System->version_info = (void *) VersionInfo;
-		};
+		}
 		//Nothing
 	};
 	
 	//More ?!
 	
-done:
+//done:
     return;
 };
 
@@ -1971,6 +2057,7 @@ done:
 
 
 /*
+ *******************************************************
  * systemReboot:
  *     Interface de inicialização da parte de sistema para o processo de reboot.
  *     realiza rotinas de desligamento de sistema antes de chamar o reiniciamento de hardware.
@@ -1979,60 +2066,59 @@ done:
  *     Quando essa rotina checar os processos verá que não há mais nada pra fechar.
  *     se ainda tiver algum processo pra fechar, então essa rotina fecha, senão termina a rotina. 
  */
-void systemReboot()
-{
+void systemReboot (){
+	
 	int i;
+	unsigned long left;
+	unsigned long top;
+	unsigned long width;
+	unsigned long height;		
+	
 	struct process_d *P;
 	struct thread_d *T;
 		
 	struct window_d *hWnd;
 	struct window_d *hWindow;	
-
-	unsigned long left;
-	unsigned long top;
-	unsigned long width;
-	unsigned long height;	
 	
-	asm("cli");
+	asm ("cli");
 	
 	//No graphics.	
-    if(VideoBlock.useGui != 1){
+    if ( VideoBlock.useGui != 1 ){
 		hal_reboot();
-	};
+	}
 		
 	//Parent window.
-	if( (void*) gui->main == NULL){
-	    hal_reboot();
+	if ( (void *) gui->main == NULL )
+	{
+	    hal_reboot ();
+		
 	}else{
 	    
-		left   = gui->main->left;
-	    top    = gui->main->top;
-	    width  = gui->main->width;
+		left = gui->main->left;
+	    top = gui->main->top;
+	    
+		width = gui->main->width;
 	    height = gui->main->height;	
 		
 	    set_up_cursor( (left/8) , (top/8) );
-	    //g_cursor_x = (left/8);
-	    //g_cursor_y = (top/8); 
-		
+		//...
 	};
 	
-    //
 	// @todo: Usar esquema de cores padrão.
-	//
 	
-	if(VideoBlock.useGui == 1)
+	if ( VideoBlock.useGui == 1 )
 	{
 		//Parent window.
-	    if( (void*) gui->main == NULL){
+	    if ( (void *) gui->main == NULL ){
 	        hal_reboot();
-	    };
+	    }
 			
 	    //Create.
-	    hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "//KERNEL Reboot", 
-	                                    left, top, width, height, 
-			     				        gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
+	    hWindow = (void *) CreateWindow( 3, 0, VIEW_MAXIMIZED, "systemReboot:", 
+	                        left, top, width, height, 
+			     			gui->main, 0, KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
 
-	    if( (void*) hWindow == NULL){
+	    if ( (void *) hWindow == NULL ){
 	        hal_reboot();
         }else{
 		    RegisterWindow(hWindow);
@@ -2052,9 +2138,10 @@ void systemReboot()
 		//rotina deveria perceber as dimensões da janela de do caractere e determinar
 		//as margens.
 		
-		g_cursor_left   = (hWindow->left/8);
-		g_cursor_top    = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-		g_cursor_right  = g_cursor_left + (width/8);
+		g_cursor_left = (hWindow->left/8);
+		g_cursor_top = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+		
+		g_cursor_right = g_cursor_left + (width/8);
 		g_cursor_bottom = g_cursor_top  + (height/8);
 		
 		//cursor (0, mas com margem nova).
@@ -2108,14 +2195,14 @@ void systemReboot()
 		//init message.
 		sleep(8000);
         printf("\n REBOOT:\n");	
-	    printf("The computer will restart in seconds.\n");
+	    printf("The computer will restart in seconds\n");
 	
 	    //
 	    // Scheduler stuffs.
 	    //
 	
 	    sleep(8000);
-	    printf("Locking Scheduler and taskswitch.\n");
+	    printf("Locking Scheduler and taskswitch\n");
 	    scheduler_lock();
 	    taskswitch_lock();
 	
@@ -2178,7 +2265,7 @@ void systemReboot()
 			{
 #ifdef KERNEL_VERBOSE				
 		        //Termina o processo. (>> TERMINATED)
-		        printf("Killing Process PID={%d} ...\n",i);
+		        printf("Killing Process PID %d\n", i);
 		        //refresh_screen();
 #endif
                 if( P->used == 1 ){
@@ -2197,9 +2284,10 @@ void systemReboot()
 		
 		//voltando a margem normal a margem
 		//?? isso não é necessário??
-		g_cursor_left   = (left/8);    //0;
-		g_cursor_top    = (top/8);        //0;
-		g_cursor_right  = (width/8);   
+		g_cursor_left = (left/8);    //0;
+		g_cursor_top = (top/8);        //0;
+		
+		g_cursor_right = (width/8);   
 		g_cursor_bottom = (height/8);  
 		
 		//cursor (0, mas com margem nova)
@@ -2220,20 +2308,19 @@ void systemReboot()
 done:
     refresh_screen();
 	sleep(8*8000);
-	MessageBox(gui->screen, 1, "sm-sys-system-systemReboot:","Rebooting..");
+	MessageBox(gui->screen, 1, "sm-sys-system-systemReboot:","Rebooting");
     refresh_screen();
 	KiReboot();
-hang: 
     die();
 };
 
 
 /*
+ ****************************************
  * systemShutdown:
  *     Interface para shutdown.
  */ 
-void systemShutdown()
-{
+void systemShutdown (){
 	 
 	//@todo ...
 
@@ -2255,8 +2342,7 @@ hang:
  *     Desliga a máquina via APM.
  *     (Deve chamar uma rotina herdada do BM).
  */
-void systemShutdownViaAPM()
-{
+void systemShutdownViaAPM (){
 
    //
     // Obs: @todo:
@@ -2282,9 +2368,8 @@ void systemShutdownViaAPM()
 		
 	//};
 	
-hang:	
-    printf("sm-sys-system-systemShutdownViaAPM:\n");
-	die();
+//hang:	
+    panic("sm-sys-system-systemShutdownViaAPM:\n");
 };
 
 
@@ -2299,13 +2384,16 @@ hang:
  * Obs: É muito apropriado essa função ficar no arquivo \sm\sys\system.c
  * Pois é a parte mais importante do módulo System Manegement".
  */
-void *systemGetSystemMetric(int number)
-{
-	switch(number)
+void *systemGetSystemMetric (int number){
+	
+	if ( number <= 0 )
+        return NULL;	
+	
+	switch ( number )
 	{
-		case SM_NULL:
-		    return NULL;
-			break;
+		//case SM_NULL:
+		//    return NULL;
+		//	break;
 			
 		case SM_SCREENWIDTH:
             //pegar uma global
@@ -2331,6 +2419,7 @@ void *systemGetSystemMetric(int number)
 
 
 /*
+ ********************************************************************
  * systemGetSystemstatus:
  *     Retorna o valor de alguma variável global relativa 
  * apenas a status de algum elemento do sistema.
@@ -2338,227 +2427,30 @@ void *systemGetSystemMetric(int number)
  * Pois é a parte mais importante do módulo System Manegement".
  *
  */
-void *systemGetSystemStatus(int number)
-{
-	switch(number)
+void *systemGetSystemStatus (int number){
+    
+	if ( number <= 0 )
+        return NULL;		
+	
+	
+	switch ( number )
 	{
-		case SS_NULL:
-		    return NULL;
-			break;
+		//case SS_NULL:
+		//    return NULL;
+		//	break;
 			
 		case SS_LOGGED:
-            return (void*) g_logged;
+            return (void *) g_logged;
 			break;
 		
         case SS_USING_GUI:
-            return (void*) g_useGUI;
+            return (void *) g_useGUI;
 			break;
         //Continuar ... 			
 		 	
 		default:
 		    return NULL;
 	};
-};
-
-/*
- *******************************************************************
- * systemStartUp:
- *     Rotina de inicialização do sistema.
- *
- * Fase 1:
- *     Inicia elementos independentes da arquitetura.
- *	   + Inicia vídeo, cursor, monitor. 
- *       Somente o necessário para ver mensagens.
- * Fase 2:
- *     Inicia elementos dependentes da arquiterura.
- *	   + inicia elementos de I/O e elementos conservadores de dados.
- *	   + inicia runtime.
- *     + inicia hal, microkernel, executive.
- *     + Inicia as tarefas. (@todo: threads ou processos ?).
- * Fase 3:
- *     classe system.device.unblocked.
- *	   @todo: Inicializar dispositivos LPC/super io.
- *            Keyboard, mouse, TPM, parallel port, serial port, FDC. 
- * Fase 4:
- *     classe system.device.unblocked.
- *     @todo: Dispositivos PCI, ACPI ...
- *
- *     Continua ...
- *
- * 2015 - Created.
- * 2016 - Revisão.
- */
-int systemStartUp()
-{
-    int Status = 0;
-
-	KeInitPhase = 0;  //Set Kernel phase.    
-
-    //
-	// Antes de tudo: CLI, Video, runtime.
-	//
-	
-	if(KeInitPhase != 0)
-	{	
-		//@todo: As mensagens do abort podem não funcionarem nesse caso.
-		KiAbort();	
-	}else{
-		
-	    //Disable interrupts, lock taskswitch and scheduler.	    
-		asm("cli");	
-	    taskswitch_lock();
-	    scheduler_lock();
-		
-		//Set scheduler type. (Round Robin).
-	    schedulerType = SCHEDULER_RR; 
-		
-	    
-		//Obs: O video já foi inicializado em main.c.
-				
-		//
-		// BANNER !
-		//
-		
-        //Welcome message. (Poderia ser um banner.) 
-		set_up_cursor(0,1);
-		
-#ifdef KERNEL_VERBOSE		
-        printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
-		    KERNEL_VERSION);
-#endif		
-		
-#ifdef KERNEL_VERBOSE		
-		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
-		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
-		    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
-		};
-#endif
-
-#ifdef KERNEL_VERBOSE
-		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",
-		    (unsigned long) SavedLFB,
-			(unsigned long) SavedX,
-			(unsigned long) SavedY,
-			(unsigned long) SavedBPP );
-#endif
-
-        //
-        // RUNTIME !
-        //		
-
-#ifdef KERNEL_VERBOSE		
-	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
-#endif			
-	    Status = (int) KiInitRuntime();
-	    if(Status != 0){
-	        printf("sm-sys-system-systemStartUp error: Runtime.\n");
-		    die();
-	    };		
-        
-        //
-        // INIT ! 
-        //  		
-		
-#ifdef KERNEL_VERBOSE
-		//(inicializa as 4 fases.)
-	    // Básico. ( Variáveis globais e estruturas ... ).
-	    printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
-#endif		
-        Status = (int) init(); 
-	    if(Status != 0){
-	        printf("sm-sys-system-systemStartUp error: init\n");
-	        die();
-	    };	
-        //...	 
-	};
-	
-	
-	
-	
-	 
-	
-	//
-	// System Version:
-	//     Configurando a versão do sistema.
-	//     
-	//
-	
-	systemSetupVersion();
-	
-	//
-	// Inicializa a edição do sistema.
-	// Define um tipo de destinação para a versão do sistema operacional.
-	//
-	
-    switch(SYSTEM_EDITION)
-	{
-		case SYSTEM_DEVELOPER_EDITION:
-		    gSystemEdition = SYSTEM_DEVELOPER_EDITION; 
-		    break;
-
-		case SYSTEM_WORKSTATION_EDITION:
-		    gSystemEdition = SYSTEM_WORKSTATION_EDITION;
-		    break;
-
-		case SYSTEM_SERVER_EDITION:
-		    gSystemEdition = SYSTEM_SERVER_EDITION;
-			break;
-
-		case SYSTEM_IOT_EDITION:
-		    gSystemEdition = SYSTEM_SERVER_EDITION;
-			break;
-
-        //...
-        default:
-		    gSystemEdition = 0;
-            break; 		
-	};
-	
-//
-// Done: 
-//     Completas as 3 fases de inicialização do sistema.
-//     @todo: Na verdade serão mais fases..
-//           as fases estão em init().
-done:	
-    //printf("systemStartUp: Done!\n");	
-	//refresh_screen();	
-	if(KeInitPhase != 3){ 
-	    Status = (int) 1; 
-	};
-    return (int) Status;
-};
-
-
-/*
- *******************************************
- * systemInit:
- *     Inicializando algumas variáveis.
- */
-int systemInit()
-{
-	//Colocando na variável global, a opção selecionada manualmente pelo 
-	//desenvolvedor.
-    gSystemEdition = SYSTEM_EDITION;
-    //...
-	
-	// Podemos fazer algumas inicializações antes de chamarmos 
-	//a rotina de start up.
-	
-done:
-    //Retornando para o kMain. em main.c.	
-	return (int) systemStartUp();	
-};
-
-
-/*
- * systemSystem:
- *     Construtor.
- * Não tem valor de retorno, tem o mesmo nome que a classe.
- * Uma chamada à um construtor criaria uma estrutura com seu nome e 
- * o construtor pode inicializar alguma variável.
- */
-void systemSystem(){
-    gSystemStatus = 1;
 };
 
 
@@ -2568,30 +2460,31 @@ void systemSystem(){
  * die:
  *     Função sem retorno. Aqui termina tudo.
  *      O sistema trava e não tem volta.
+ * Final message!	
+ * Refresh.	
+ * HALT.
  */
-void die()
-{
-    // Final message!	
-	// Refresh.	
-	// HALT.
+void die (){
 	
-    printf("sm-sys-system-die: * System Halted!\n");    //*Bullet.  
+	//*Bullet.
+    printf("sm-sys-system-die: * System Halted!\n");      
 	
-	if(VideoBlock.useGui == 1){
-	    refresh_screen();
-	};
-halt:
-	asm("hlt");   
-	while(1)
-	{
+	if ( VideoBlock.useGui == 1 ){
+	    refresh_screen ();
+	}
+	
+//halt:
+	asm ("hlt");   
+	
+	while (1){
 		asm("cli");
-	    asm("hlt");                        //Halt system.
+	    asm("hlt");                        
 	};     	
 };
 
 
 //o ID da janela que tem o terminal virtual ativo.
-int systemGetTerminalWindow(){
+int systemGetTerminalWindow (){
     return (int) terminal_window;	
 }; 
 
@@ -2615,15 +2508,12 @@ void systemSetTerminalWindow( struct window_d *window )
 	// para não correr o risco de imprimir no lugar errado.
     //	
 		
-check_window:	
+//check_window:	
 
-	if( (void*) window == NULL )
+	if( (void *) window == NULL )
 	{
 		goto fail;
-	
-	}
-	else
-	{
+	}else{
 		
 		if( window->used != 1 || window->magic != 1234 ){
 			goto fail;
@@ -2767,22 +2657,23 @@ fail:
 
 
 
-
-//retorna informações sobre o sistema.
-//@todo: Criam um enum para essa função, aqui mesmo nesse arquivo.
-unsigned long systemGetSystemMetrics( int index )
+/*
+ ***************************************
+ * systemGetSystemMetrics:
+ *     Retorna informações sobre o sistema.
+ *     @todo: Criam um enum para essa função, aqui mesmo nesse arquivo.
+ */
+unsigned long systemGetSystemMetrics ( int index )
 {
-	//@todo:
-	//Função ainda não implementada.
 	
 	//print("#debug: systemGetSystemMetrics: i={%d} \n",index)
 	
-	switch(index)
-	{
-		case 0:
-		    return (unsigned long) 0;
-            break;		
-		
+	if ( index <= 0 )
+	    return (unsigned long) 0;	
+	
+	
+	switch( index )
+	{		
 		//screen width.
 		case 1:
 		    return (unsigned long) screenGetWidth();
@@ -2849,15 +2740,15 @@ done:
  * newLinkedlist:
  *     Cria uma nova linked list.
  */
-void* newLinkedlist()
+void *newLinkedlist ()
 {
-    /* allocate list */
     struct linkedlist_d *new_list; 
 	
-	new_list = (void*) malloc( sizeof(struct linkedlist_d) );
-    if( (void*) new_list == NULL){
+	new_list = (void *) malloc( sizeof(struct linkedlist_d) );
+	
+    if ( (void *) new_list == NULL ){
 		return NULL;
-	};
+	}
 
     /* put in the data  */
     //new_node->data  = new_data;
@@ -2865,8 +2756,8 @@ void* newLinkedlist()
 	new_list->head =  NULL;
     new_list->tail =  NULL;
 	
-done:
-    return (void*) new_list;
+//done:
+    return (void *) new_list;
 };
 
 
@@ -2875,23 +2766,23 @@ done:
  * newNode:
  *     Cria um novo nodo.
  */
-void* newNode()
+void *newNode ()
 {
-    /* allocate node */
     struct node_d *new_node; 
 	
-	new_node = (void*) malloc( sizeof(struct node_d) );
-    if( (void*) new_node == NULL){
+	new_node = (void *) malloc( sizeof(struct node_d) );
+	
+    if ( (void *) new_node == NULL ){
 		return NULL;
-	};
+	}
  
     /* put in the data  */
     //new_node->data  = new_data;
     
-	new_node->flink =  NULL;
+	new_node->flink = NULL;
  
-done:
-    return (void*) new_node;
+//done:
+    return (void *) new_node;
 };
 
 
@@ -2940,59 +2831,197 @@ done:
 };
 
 
-
-
 /*
- * set_up_system_color: 
- *     Configura cor padrão para o sistema.
- *     @todo: Isso pode ir para outro lugar.   
+ *******************************************************************
+ * systemStartUp:
+ *     Rotina de inicialização do sistema.
+ *
+ * Fase 1:
+ *     Inicia elementos independentes da arquitetura.
+ *	   + Inicia vídeo, cursor, monitor. 
+ *       Somente o necessário para ver mensagens.
+ * Fase 2:
+ *     Inicia elementos dependentes da arquiterura.
+ *	   + inicia elementos de I/O e elementos conservadores de dados.
+ *	   + inicia runtime.
+ *     + inicia hal, microkernel, executive.
+ *     + Inicia as tarefas. (@todo: threads ou processos ?).
+ * Fase 3:
+ *     classe system.device.unblocked.
+ *	   @todo: Inicializar dispositivos LPC/super io.
+ *            Keyboard, mouse, TPM, parallel port, serial port, FDC. 
+ * Fase 4:
+ *     classe system.device.unblocked.
+ *     @todo: Dispositivos PCI, ACPI ...
+ *
+ *     Continua ...
+ *
+ * 2015 - Created.
+ * 2016 - Revisão.
  */
-void set_up_color(unsigned long color){   
-	g_system_color = (unsigned long) color;	
-	return;
-};
-
-/* 
- * set_up_text_color:
- *     Atribui o primeiro plano e o fundo que nós usaremos. 
- *     Top 4 bytes are the background,  bottom 4 bytes
- *     are the foreground color.
- *     @todo: Isso pode ir para outro lugar.
- */
-void set_up_text_color(unsigned char forecolor, unsigned char backcolor)
+int systemStartUp()
 {
-    g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);	
-	return;
+    int Status = 0;
+
+	KeInitPhase = 0;  //Set Kernel phase.    
+
+    //
+	// Antes de tudo: CLI, Video, runtime.
+	//
+	
+	if(KeInitPhase != 0)
+	{	
+		//@todo: As mensagens do abort podem não funcionarem nesse caso.
+		KiAbort();	
+	}else{
+		
+	    //Disable interrupts, lock taskswitch and scheduler.	    
+		asm("cli");	
+	    taskswitch_lock();
+	    scheduler_lock();
+		
+		//Set scheduler type. (Round Robin).
+	    schedulerType = SCHEDULER_RR; 
+		
+	    
+		//Obs: O video já foi inicializado em main.c.
+				
+		//
+		// BANNER !
+		//
+		
+        //Welcome message. (Poderia ser um banner.) 
+		set_up_cursor(0,1);
+		
+#ifdef KERNEL_VERBOSE		
+        printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
+		    KERNEL_VERSION);
+#endif		
+		
+#ifdef KERNEL_VERBOSE		
+		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
+		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
+		    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
+		};
+#endif
+
+#ifdef KERNEL_VERBOSE
+		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",
+		    (unsigned long) SavedLFB,
+			(unsigned long) SavedX,
+			(unsigned long) SavedY,
+			(unsigned long) SavedBPP );
+#endif
+
+        //
+        // RUNTIME !
+        //		
+
+#ifdef KERNEL_VERBOSE		
+	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
+#endif			
+	    Status = (int) KiInitRuntime();
+	    if ( Status != 0 ){
+	        panic("sm-sys-system-systemStartUp error: Runtime.\n");
+	    }		
+        
+        //
+        // INIT ! 
+        //  		
+		
+#ifdef KERNEL_VERBOSE
+		//(inicializa as 4 fases.)
+	    // Básico. ( Variáveis globais e estruturas ... ).
+	    printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
+#endif		
+        Status = (int) init(); 
+	    if ( Status != 0 ){
+	        panic("sm-sys-system-systemStartUp error: init\n");
+	    }	
+        //...	 
+		
+	}; //--else
+	
+	
+	// System Version:
+	//     Configurando a versão do sistema.
+	systemSetupVersion();
+	
+	//
+	// Inicializa a edição do sistema.
+	// Define um tipo de destinação para a versão do sistema operacional.
+	//
+	
+    switch(SYSTEM_EDITION)
+	{
+		case SYSTEM_DEVELOPER_EDITION:
+		    gSystemEdition = SYSTEM_DEVELOPER_EDITION; 
+		    break;
+
+		case SYSTEM_WORKSTATION_EDITION:
+		    gSystemEdition = SYSTEM_WORKSTATION_EDITION;
+		    break;
+
+		case SYSTEM_SERVER_EDITION:
+		    gSystemEdition = SYSTEM_SERVER_EDITION;
+			break;
+
+		case SYSTEM_IOT_EDITION:
+		    gSystemEdition = SYSTEM_SERVER_EDITION;
+			break;
+
+        //...
+        default:
+		    gSystemEdition = 0;
+            break; 		
+	};
+	
+//
+// Done: 
+//     Completas as 3 fases de inicialização do sistema.
+//     @todo: Na verdade serão mais fases..
+//           as fases estão em init().
+done:	
+    //printf("systemStartUp: Done!\n");	
+	//refresh_screen();	
+	if(KeInitPhase != 3){ 
+	    Status = (int) 1; 
+	};
+    return (int) Status;
 };
 
 
 /*
- * set_up_cursor:
- *     Configura cursor.
- *     @todo: Isso pode ir para outro lugar.
+ *******************************************
+ * systemInit:
+ *     Inicializando algumas variáveis.
  */
-void set_up_cursor(unsigned long x, unsigned long y){   
-	g_cursor_x = (unsigned long) x;
-	g_cursor_y = (unsigned long) y;	
-	return;
+int systemInit (){
+	
+	//Colocando na variável global, a opção selecionada manualmente pelo 
+	//desenvolvedor.
+    gSystemEdition = SYSTEM_EDITION;
+    //...
+	
+	// Podemos fazer algumas inicializações antes de chamarmos 
+	//a rotina de start up.
+	
+//done:
+    //Retornando para o kMain. em main.c.	
+	return (int) systemStartUp ();	
 };
 
-/*
- * get_cursor_x:
- *     Pega o valor de x.
- *     @todo: Isso pode ir para outro lugar.
- */
-unsigned long get_cursor_x(){   	
-	return (unsigned long) g_cursor_x;
-};
 
 /*
- * get_cursor_y:
- *     Pega o valor de y.
- *     @todo: Isso pode ir para outro lugar.
+ ************************************************************
+ * systemSystem:
+ *     Construtor.
+ * Não tem valor de retorno, tem o mesmo nome que a classe.
+ * Uma chamada à um construtor criaria uma estrutura com seu nome e 
+ * o construtor pode inicializar alguma variável.
  */
-unsigned long get_cursor_y(){         
-    return (unsigned long) g_cursor_y; 	
+void systemSystem (){
+    gSystemStatus = 1;
 };
 
 

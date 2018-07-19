@@ -88,7 +88,7 @@ void boot()
  *
  * Obs: Dependente significa dependente da marca do procesador.
  */
-int init_arquitecture_dependent()
+int init_arquitecture_dependent ()
 {
 	int Status = 0;
 	unsigned char Type;
@@ -97,10 +97,9 @@ int init_arquitecture_dependent()
 	// Fase. (Verificar se essa rotina foi chamada na fase certa de inicialização.)
     //
 	
-	if(KeInitPhase != 1){
-		printf("sm-init-init_arquitecture_dependent: KeInitPhase\n");
-        die();		
-	};
+	if ( KeInitPhase != 1 ){
+		panic("sm-init-init_arquitecture_dependent: KeInitPhase\n");	
+	}
 
 
 	//
@@ -120,10 +119,9 @@ int init_arquitecture_dependent()
 	//
 	
 	// Check structure.
-	if( (void*) processor == NULL ){
-	    printf("sm-init-init_arquitecture_dependent: processor\n");
-		die();
-    };
+	if ( (void *) processor == NULL ){
+	    panic("sm-init-init_arquitecture_dependent: processor\n");
+    }
 	
 	//
 	// Sonda pra ver qual é a marca do processador.
@@ -140,7 +138,7 @@ int init_arquitecture_dependent()
 	//Inicializa de acordo com o tipo de processador..
 	//
 	
-	switch(Type)
+	switch (Type)
 	{
 	    //Intel. (pega os parâmetros do processador intel e coloca na estrutura).
 	    case Processor_INTEL: 
@@ -156,8 +154,7 @@ int init_arquitecture_dependent()
 			
 		//@todo: Aqui é um erro fatal.	
 		default:
-		    printf("sm-init-init_arquitecture_dependent: default Type\n");
-			die();
+		    panic ("sm-init-init_arquitecture_dependent: default Type\n");
             break;		
 	};
 	
@@ -194,8 +191,7 @@ int init_arquitecture_independent()
     int Status;
 		
     if(KeInitPhase != 0){
-		printf("sm-init-init_arquitecture_independent: KeInitPhase\n");
-        die();
+		panic("sm-init-init_arquitecture_independent: KeInitPhase\n");
 	}; 
 
 	
@@ -208,8 +204,7 @@ int init_arquitecture_independent()
 #endif	
 	Status = init_hal();	
 	if(Status != 0){
-	    printf("sm-init-init_arquitecture_independent: init_hal\n");
-		die();
+	    panic("sm-init-init_arquitecture_independent: init_hal\n");
 	};
 
 	// Microkernel:
@@ -222,8 +217,7 @@ int init_arquitecture_independent()
 #endif	
 	Status = init_microkernel();
 	if(Status != 0){
-	    printf("sm-init-init_arquitecture_independent: init_microkernel\n");
-		die();
+	    panic("sm-init-init_arquitecture_independent: init_microkernel\n");
 	};
 	
     // Executive:
@@ -236,8 +230,7 @@ int init_arquitecture_independent()
 #endif	
 	Status = init_executive();
 	if(Status != 0){
-	    printf("sm-init-init_arquitecture_independent: init_executive\n");
-		die(); 
+	    panic("sm-init-init_arquitecture_independent: init_executive\n"); 
 	};
 	
 	// Gramado:
@@ -246,8 +239,7 @@ int init_arquitecture_independent()
 #endif
 	Status = init_gramado();
 	if(Status != 0){
-	    printf("sm-init-init_arquitecture_independent: init_gramado\n");
-		die(); 
+	    panic("sm-init-init_arquitecture_independent: init_gramado\n"); 
 	};
 	
 	//
@@ -313,14 +305,7 @@ WindowManager:
 		init_window_manager();				
 	};
 	
- 
-	
-
-	
-	//
 	// tty support.
-	//
-	
 	ttyInit();
 
 	//
@@ -335,7 +320,7 @@ WindowManager:
 done:
 #ifdef KERNEL_VERBOSE
     //debug
-    printf("Done!\n");	
+    printf("Done\n");	
 	//refresh_screen();
     //while(1){}
 #endif	
@@ -344,11 +329,12 @@ done:
 
 
 /*
+ **************************************************
  * Init globals: 
  *     Inicia variáveis globais do Kernel Base.
  *     Obs: Inicializar por categorias.
  */
-void init_globals()
+void init_globals ()
 {
 
 #ifdef KERNEL_VERBOSE	
@@ -386,8 +372,8 @@ void init_globals()
 	
 	
 	//Globais no ambiente GUI.
-	if(g_useGUI == 1)
-	{		        
+	if ( g_useGUI == 1 ){
+		
 		//Próximo procedimento de janela.
 	    g_next_proc = (unsigned long) &system_procedure; 
 		
@@ -401,10 +387,8 @@ void init_globals()
 		current_menu = (int) 0;           //Current Menu.
         //Continua...	
 
-		//Inicializa globais relativas à janelas.
+		// windows, menus ...
 		init_windows();
-	    
-        //Menus
         init_menus();	
 	
         //Continua...		
@@ -422,11 +406,10 @@ void init_globals()
 	//Outros.
 	errno = 0;
 	
-	
 	//alocando memória para as estruturas do fluxo padrão.
-	stdin   = (void*) malloc( sizeof(FILE) );
-	stdout  = (void*) malloc( sizeof(FILE) );
-	stderr  = (void*) malloc( sizeof(FILE) );
+	stdin = (void *) malloc( sizeof(FILE) );
+	stdout = (void *) malloc( sizeof(FILE) );
+	stderr = (void *) malloc( sizeof(FILE) );
 	
 	//kstdin  = (void*) malloc( sizeof(FILE) );
 	//kstdout = (void*) malloc( sizeof(FILE) );
@@ -446,7 +429,7 @@ void init_globals()
 	//Continua ...
 
 // Done.
-done:	
+//done:	
     return;
 };
 
@@ -456,15 +439,15 @@ done:
  * init:
  * Base initializations. (Four phases).
  */ 
-int init()
+int init ()
 {
     int Status = 0;
 	
 	//Check kernel phase.
-	if(KeInitPhase != 0){
+	if ( KeInitPhase != 0 ){
 		printf("sm-init-init: KeInitPhase\n");
         die();		
-	}; 
+	}
  
     //Globals.
 #ifdef KERNEL_VERBOSE	
@@ -528,33 +511,37 @@ int init()
     //
 	// Initialize Platform structure.
 	//
+	
 #ifdef KERNEL_VERBOSE
 	printf("sm-init-init: Platform\n");	
 #endif
 
-	Platform = (void*) malloc( sizeof(struct platform_d) );
-	if( (void*) Platform ==  NULL ){
-		printf("sm-init-init: Platform\n");	
-	    die();
+	Platform = (void *) malloc( sizeof(struct platform_d) );
+	
+	if( (void *) Platform ==  NULL )
+	{
+		// # This is the Root struct #
+		panic("sm-init-init: Platform\n");	
+	
 	}else{
 		
 		//Hardware
-	    Hardware = (void*) malloc( sizeof(struct hardware_d) );
-	    if( (void*) Hardware ==  NULL ){
+	    Hardware = (void *) malloc( sizeof(struct hardware_d) );
+	    if( (void *) Hardware ==  NULL ){
 		    printf("sm-init-init: Hardware\n");	
 	        die();
 		}else{
-		    Platform->Hardware = (void*) Hardware;
+		    Platform->Hardware = (void *) Hardware;
             //printf(".");			
 		};
 		
 		//Firmware
-	    Firmware = (void*) malloc( sizeof(struct firmware_d) );
-	    if( (void*) Firmware ==  NULL ){
+	    Firmware = (void *) malloc( sizeof(struct firmware_d) );
+	    if( (void *) Firmware ==  NULL ){
 		    printf("sm-init-init: Firmware\n");	
 	        die();
 		}else{
-		    Platform->Firmware = (void*) Firmware;
+		    Platform->Firmware = (void *) Firmware;
             //printf(".");  			
 		};
 
@@ -565,8 +552,8 @@ int init()
 		// *IMPORTATE: Aqui estamos inicializando a estrutura do systema.
 		//
 		
-		System = (void*) malloc( sizeof(struct system_d) );
-	    if( (void*) System ==  NULL ){
+		System = (void *) malloc( sizeof(struct system_d) );
+	    if( (void *) System ==  NULL ){
 		    printf("sm-init-init: System\n");	
 	        die();
 		}else{
@@ -574,7 +561,7 @@ int init()
 			System->used = 1;    //Sinaliza que a estrutura esta em uso.
 			System->magic = 1234; //sinaliza que a estrutura não esta corrompida.
 			
-		    Platform->System = (void*) System;
+		    Platform->System = (void *) System;
             //printf(".");			
 		};
 		
@@ -604,15 +591,16 @@ int init()
 	//
 	
 	//Fase3: Logon. 
-Logon:
+//Logon:
+
 	//
 	// Logon. 
     // Cria Background, main window, navigation bar.
     // de acordo com predefinição.
     //
 
-	if(g_useGUI == 1)
-	{
+	if ( g_useGUI == 1 ){
+		
 #ifdef KERNEL_VERBOSE		
 		printf("sm-init-init: Logon\n");
 #endif	    
@@ -638,15 +626,12 @@ Logon:
 	
 	
 // Done.
-done:
+//done:
     //printf("Done!\n");	
 	//refresh_screen();
 	//@todo: Deve retornar a variável Status.
     return (int) 0;  
 };
-
-
-
 
 
 /*

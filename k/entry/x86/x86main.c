@@ -33,8 +33,9 @@
  *
  *  In this file:
  *  ============
- *      + kMain - The entry point for a C part of the Kernel.
- *      + Nothing!
+ *      + mainSetCr3
+ *      + startStartIdle
+ *      + x86main - The entry point for a C part of the Kernel.
  *
  * Revision History:
  *     2015      - Created by Fred Nora.
@@ -42,6 +43,9 @@
  *     //... 
  */ 
 #include <kernel.h>
+
+
+// # external dependencies #
 
 // Variables from Boot Loader.
 extern unsigned long SavedBootBlock;    //Boot Loader Block.
@@ -58,16 +62,135 @@ extern unsigned long kArg3;
 extern unsigned long kArg4;
 //...
 
-
+// Boot mode.
 extern unsigned long SavedBootMode;
 
+
+// Task switching support.
 extern void turn_task_switch_on();
+
+
+
 
 
 char copyright[] =
 "Copyright (c) 2005-2018\n\tFred Nora.  All rights reserved.\n\n";
 
-/* BSD quote: Components of the first process. */
+
+static inline void mainSetCr3 ( unsigned long value ) {
+    __asm__ ( "mov %0, %%cr3" : : "r"(value) );
+};
+
+
+
+/*
+ *********************************************************
+ * startStartIdle:
+ *     Initializes idle thread.
+ *     # fake idle thread 
+ *     idle thread em ring3.
+ *
+ *     @todo: 
+ *         + Initializes idle thread.
+ *           startIdleThread().
+ *
+ */
+void startStartIdle () 
+{
+    int i;
+ 
+    if ( (void *) IdleThread == NULL )
+    {		
+        printf("main-startStartIdle: IdleThread\n");
+        die();
+    }else{
+
+        if(IdleThread->saved != 0){
+            printf("main-startStartIdle: saved\n");
+            die();
+        };
+
+        if(IdleThread->used != 1 || IdleThread->magic != 1234){
+            printf("main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
+            die();
+        };
+
+        set_current(IdleThread->tid);       
+        //...
+    };
+
+    // State  
+    if( IdleThread->state != STANDBY ){
+        printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
+        die();
+    }
+
+    // * MOVEMENT 2 ( Standby --> Running)
+    if( IdleThread->state == STANDBY ){
+        IdleThread->state = RUNNING;
+        queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_RUNNING);
+    }
+	
+	
+	//Current process.
+	current_process = IdleThread->process->pid;
+	
+//Done!
+//done:
+    //Debug:
+ 
+    //printf("* Starting idle TID=%d \n", Thread->tid);
+    //refresh_screen(); //@todo:  
+
+
+    for( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
+        dispatcherReadyList[i] = (unsigned long) IdleThread;
+    }
+
+
+    IncrementDispatcherCount(SELECT_IDLE_COUNT);
+
+
+    //Set cr3 and flush TLB.
+    mainSetCr3( (unsigned long) IdleThread->Directory);
+    asm("movl %cr3, %eax");
+    asm("movl %eax, %cr3");
+
+
+    /*
+     * turn_task_switch_on:
+     * + Creates a vector for timer irq, IRQ0.
+     * + Enable taskswitch.
+     */
+    turn_task_switch_on();
+
+
+    timerInit8253();
+	
+	//parece que isso é realmente preciso, libera o teclado.
+	//outb(0x20,0x20); 
+
+   
+	// # go!
+	// Nos configuramos a idle thread em user mode e agora vamos saltar 
+	// para ela via iret.
+	
+    asm volatile(" cli \n"
+                 " mov $0x23, %ax  \n"
+                 " mov %ax, %ds  \n"
+                 " mov %ax, %es  \n"
+                 " mov %ax, %fs  \n"
+                 " mov %ax, %gs  \n"
+                 " pushl $0x23  \n"              // ss.
+                 " movl $0x0044FFF0, %eax  \n"
+                 " pushl %eax  \n"               // esp.
+                 " pushl $0x3200  \n"            // eflags.
+                 " pushl $0x1B  \n"              // cs.
+                 " pushl $0x00401000  \n"        // eip.
+                 " iret \n" );
+
+    panic("main-startStartIdle:");
+};
 
 
 
@@ -81,7 +204,7 @@ char copyright[] =
  *     2016~2018 - Revision.
  *     ...
  */
-int kMain( int argc, char **argv ){
+int x86main ( int argc, char *argv[] ){
 	
     int Status = 0;
     int zIndex;
@@ -197,7 +320,7 @@ int kMain( int argc, char **argv ){
 //createProcesses:
 
     // Creating Kernel process. PID=0.
-    KernelProcess = (void*) create_process( NULL, // Window station.
+    KernelProcess = (void *) create_process( NULL, // Window station.
 	                                        NULL, // Desktop.
 											NULL, // Window.
 											(unsigned long) 0xC0001000,  // Entry point. 
@@ -219,7 +342,7 @@ int kMain( int argc, char **argv ){
 
 
     //Creating Idle process.
-    InitProcess = (void*) create_process( NULL, 
+    InitProcess = (void *) create_process( NULL, 
 	                                      NULL, 
 										  NULL, 
 										  (unsigned long) 0x00401000, 
@@ -237,7 +360,7 @@ int kMain( int argc, char **argv ){
     };
 
     //Creating Shell process.
-    ShellProcess = (void*) create_process( NULL, 
+    ShellProcess = (void *) create_process( NULL, 
 	                                       NULL, 
 										   NULL, 
 										   (unsigned long) 0x00401000, 
@@ -246,7 +369,7 @@ int kMain( int argc, char **argv ){
 										   "SHELLPROCESS", 
 										   RING3, 
 										   (unsigned long ) KERNEL_PAGEDIRECTORY );	
-    if((void*) ShellProcess == NULL){
+    if((void *) ShellProcess == NULL){
         printf("main-kMain: ShellProcess\n");
         die();
     }else{
@@ -256,7 +379,7 @@ int kMain( int argc, char **argv ){
 	
 	
     //Creating Taskman process. 
-    TaskManProcess = (void*) create_process( NULL, 
+    TaskManProcess = (void *) create_process( NULL, 
 	                                         NULL, 
 											 NULL, 
 											 (unsigned long) 0x00401000, 
@@ -265,7 +388,7 @@ int kMain( int argc, char **argv ){
 											 "TASKMANPROCESS", 
 											 RING3, 
 											 (unsigned long ) KERNEL_PAGEDIRECTORY );	
-    if((void*) TaskManProcess == NULL){
+    if((void *) TaskManProcess == NULL){
         printf("main-kMain: TaskManProcess\n");
         die();
     }else{
@@ -292,7 +415,7 @@ int kMain( int argc, char **argv ){
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
     IdleThread = (void*) KiCreateIdle();
-    if( (void*) IdleThread == NULL )
+    if( (void *) IdleThread == NULL )
 	{
         printf("main-kMain: IdleThread\n");
         die();
@@ -310,8 +433,8 @@ int kMain( int argc, char **argv ){
 
     //=============================================
     // Create shell Thread. tid=1. 
-    ShellThread = (void*) KiCreateShell();
-    if( (void*) ShellThread == NULL )
+    ShellThread = (void *) KiCreateShell();
+    if( (void *) ShellThread == NULL )
 	{
         printf("main-kMain: ShellThread\n");
         die();
@@ -323,8 +446,8 @@ int kMain( int argc, char **argv ){
 
     //===================================
     //Create taskman Thread. tid=2.
-    TaskManThread = (void*) KiCreateTaskManager();
-    if( (void*) TaskManThread == NULL )
+    TaskManThread = (void *) KiCreateTaskManager();
+    if( (void *) TaskManThread == NULL )
 	{
         printf("main-kMain: TaskManThread\n");
         die();
@@ -366,7 +489,8 @@ int kMain( int argc, char **argv ){
 
 
 //Kernel base Debugger.
-doDebug:
+//doDebug:
+
     Status = (int) debug();
     
 	if ( Status != 0 )
@@ -632,124 +756,8 @@ fail:
 };
 
 
-static inline void mainSetCr3( unsigned long value )
-{
-    __asm__ ( "mov %0, %%cr3" : : "r"(value) );
-};
 
 
-/*
- *********************************************************
- * startStartIdle:
- *     Initializes idle thread.
- *     # fake idle thread 
- *     idle thread em ring3.
- *
- *     @todo: 
- *         + Initializes idle thread.
- *           startIdleThread().
- *
- */
-void startStartIdle() 
-{
-    int i;
- 
-    if ( (void *) IdleThread == NULL )
-    {
-        //MessageBox(gui->screen,1,"main-startStartIdle","IdleThread");		
-        printf("main-startStartIdle: IdleThread\n");
-        die();
-    }else{
-
-        if(IdleThread->saved != 0){
-            printf("main-startStartIdle: saved\n");
-            die();
-        };
-
-        if(IdleThread->used != 1 || IdleThread->magic != 1234){
-            printf("main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
-            die();
-        };
-
-        set_current(IdleThread->tid);       
-        //...
-    };
-
-    // State  
-    if( IdleThread->state != STANDBY ){
-        printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
-        die();
-    }
-
-    // * MOVEMENT 2 ( Standby --> Running)
-    if( IdleThread->state == STANDBY ){
-        IdleThread->state = RUNNING;
-        queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_RUNNING);
-    }
-	
-	
-	//Current process.
-	current_process = IdleThread->process->pid;
-	
-//Done!
-done:
-    //Debug:
- 
-    //printf("* Starting idle TID=%d \n", Thread->tid);
-    //refresh_screen(); //@todo:  
-
-
-    for( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
-        dispatcherReadyList[i] = (unsigned long) IdleThread;
-    }
-
-
-    IncrementDispatcherCount(SELECT_IDLE_COUNT);
-
-
-    //Set cr2 and flush TLB.
-    mainSetCr3( (unsigned long) IdleThread->Directory);
-    asm("movl %cr3, %eax");
-    asm("movl %eax, %cr3");
-
-
-    /*
-     * turn_task_switch_on:
-     * + Creates a vector for timer irq, IRQ0.
-     * + Enable taskswitch.
-     */
-    turn_task_switch_on();
-
-
-    timerInit8253();
-	
-	//parece que isso é realmente preciso, libera o teclado.
-	//outb(0x20,0x20); 
-
-    //
-	// # go !
-	//
-	// Nos configuramos a idle thread em user mode 
-	// e agora vamos salta para ela via iret.
-	// 
-	//
-	
-    asm volatile(" cli \n"
-                 " mov $0x23, %ax  \n"
-                 " mov %ax, %ds  \n"
-                 " mov %ax, %es  \n"
-                 " mov %ax, %fs  \n"
-                 " mov %ax, %gs  \n"
-                 " pushl $0x23  \n"              // ss.
-                 " movl $0x0044FFF0, %eax  \n"
-                 " pushl %eax  \n"               // esp.
-                 " pushl $0x3200  \n"            // eflags.
-                 " pushl $0x1B  \n"              // cs.
-                 " pushl $0x00401000  \n"        // eip.
-                 " iret \n" );
-
-    panic("main-startStartIdle:");
-};
 
 
 

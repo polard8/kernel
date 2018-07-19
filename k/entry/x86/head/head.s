@@ -137,7 +137,8 @@ extern _dispatch_task
 ; Funções importadas.
 ;
 
-extern _kMain  
+extern _x86main
+
 ;extern _KeStartIdle         ;Start Idle (entra em User Mode). 
 extern _startStartIdle 
 extern _save_kernel_args
@@ -687,38 +688,38 @@ dummyJmpAfterLTR:
 
 	;Debug
 	;#A
-	mov eax, 0xA0A0A0
-	mov ebx, 440
-	mov ecx, 440
-	call _gui_buffer_putpixel
+	;mov eax, 0xA0A0A0
+	;mov ebx, 440
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
 
 	;Debug
 	;#B
-	mov eax, 0xB0B0B0
-	mov ebx, 494
-	mov ecx, 440
-	call _gui_buffer_putpixel
+	;mov eax, 0xB0B0B0
+	;mov ebx, 494
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
 
 	;Debug
 	;#C
-	mov eax, 0xC0C0C0
-	mov ebx, 523
-	mov ecx, 440
-	call _gui_buffer_putpixel
+	;mov eax, 0xC0C0C0
+	;mov ebx, 523
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
 
 	;Debug
 	;#D
-	mov eax, 0xD0D0D0
-	mov ebx, 587
-	mov ecx, 440
-	call _gui_buffer_putpixel
+	;mov eax, 0xD0D0D0
+	;mov ebx, 587
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
 	
 	;;
 	;; ## Refresh screen ##
 	;;
 	
 	;Debug
-	call _asm_refresh_screen    
+	;call _asm_refresh_screen    
 	
 	;debug
 	;jmp $
@@ -732,14 +733,13 @@ dummyJmpAfterLTR:
 	;; @todo: Argumentos.
 	;;
 	
-	call _kMain
+	call _x86main
 
 ;;
 ;; HANG
 ;;	
 	
 _hang: 
-    ;pause
     hlt	
 	jmp _hang	
 		
@@ -749,7 +749,6 @@ _hang:
 		
 global __die
 __die:
-    ;pause
 	hlt
     jmp __die	
 	

@@ -19,7 +19,7 @@ rem Main.
 echo ~{ ...
 echo ~{ Compiling KERNEL.BIN ...
 
-echo ~{ ...
+rem echo ~{ ...
 echo ~{ /entry
 
 	rem head.s
@@ -30,14 +30,14 @@ echo ~{ /entry
 	
 :Hal_Job1	
 rem hal	
-echo ~{ ...
+rem echo ~{ ...
 echo ~{ ux4 /hal	
 	gcc -c k/hal/hal.c -I./include -o hal.o	
 	
 	
 	
 :Microkernel_Job2	
-echo ~{ ...
+rem echo ~{ ...
 echo ~{ ux3 /mk
     
 
@@ -86,7 +86,7 @@ echo ~{ ux3 /mk
 	
 	
 :Executive_Job3	
-echo ~{ ...
+rem echo ~{ ...
 echo ~{ ux2 /execve
 	rem /execve
 	gcc -c k/execve/execve.c  -I./include -o execve.o	
@@ -94,7 +94,8 @@ echo ~{ ux2 /execve
 	
 	rem crts
 	rem /execve/crts/libc
-    gcc -c k/execve/crts/libc/ctype.c  -I./include -o ctype.o	
+    gcc -c k/execve/crts/libc/cedge.c  -I./include -o cedge.o	
+	gcc -c k/execve/crts/libc/ctype.c  -I./include -o ctype.o	
 	gcc -c k/execve/crts/libc/stdlib.c -I./include -o stdlib.o
 	gcc -c k/execve/crts/libc/stdio.c  -I./include -o stdio.o
     gcc -c k/execve/crts/libc/string.c -I./include -o string.o	
@@ -189,7 +190,7 @@ echo ~{ ux2 /execve
     gcc -c k/execve/fs/format.c -I./include -o format.o	
     gcc -c k/execve/fs/vfs.c    -I./include -o vfs.o		
 	
-echo ~{ ...
+rem echo ~{ ...
 echo ~{ ux1 /gws \o/
     	
     
@@ -300,6 +301,7 @@ disk.o ^
 volume.o ^
 fs.o ^
 vfs.o ^
+cedge.o ^
 ctype.o ^
 request.o ^
 info.o ^
@@ -350,7 +352,7 @@ echo ~{ Moving ...
     move KERNEL.BIN bin\KERNEL.BIN
 	
 :Clean_Job6	
-echo ~{ ...
+rem echo ~{ ...
 echo ~{ Clean.
     del *.o
  

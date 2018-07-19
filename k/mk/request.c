@@ -157,6 +157,11 @@ void request()
 	};
 	
 	//Number limits.
+	
+	//#bugbug
+	//obs: Estamos checando se uma variável unsigned long é menor que zero.
+	//     Isso  não é necessário.	
+	
 	if( r < 0 || r > Max )
 	{
         printf("request: Limits! %d\n",r);

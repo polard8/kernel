@@ -772,11 +772,7 @@ void systemShowDevicesInfo();
  
 void *systemCreateSystemMenuBar();  //Cria a barra de menu do sistema.
 
-/*
- * systemStartUp:
- *     Inicialização do sistema.
- */
-int systemStartUp();
+
 
 /*
  * systemCheck3TierArchitecture:
@@ -814,6 +810,7 @@ unsigned long SystemMenuProcedure( struct window_d *window,
                                    int msg, 
 								   unsigned long long1, 
 								   unsigned long long2);
+								   
 void systemReboot();	    //systemReboot: Reboot stuff.						   
 void systemShutdown();      //systemShutdown: Shut down stuff.
 //Chamar a função de 32 bit herdado do BM.
@@ -822,10 +819,14 @@ void systemShutdownViaAPM();
 void *systemGetSystemMetric(int number);
 //Pega informações de status de elementos do systema.
 void *systemGetSystemStatus(int number);
-int systemInit();     //Inicializador.
-void systemSystem();  //Construtor.
+
+
+// ## Initializing ##
+int systemStartUp();   // Inicialização do sistema.
+int systemInit();      // Inicializador.
+void systemSystem();   // Construtor.
 
 			
 //
-// Fim.
+// End
 //

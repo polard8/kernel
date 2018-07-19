@@ -258,6 +258,10 @@ void *services( unsigned long number,
 	// (Limites do número do serviço).
 	//
 	
+	//#bugbug
+	//obs: Estamos checando se uma variável unsigned long é menor que zero.
+	//     Isso  não é necessário.
+	
 	if( number < 0 || number > SERVICE_NUMBER_MAX )
 	{
 	    return NULL;	
