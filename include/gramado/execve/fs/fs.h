@@ -740,16 +740,11 @@ unsigned long fs_check_fat();
 void fs_test_fat_vector();
 
 
-//
 // root dir support
-//
-   
-
 void fs_load_rootdir();
 void fs_save_rootdir();
 void fs_save_entry_on_root(unsigned long eid);
 void fs_load_rootdirEx();
-void limpa_root(); 
 
 
 //   Carrega o diretório na memória, dados o endereço, 
@@ -835,10 +830,6 @@ fs_find_empty_entry( char *fat_address );
 unsigned long fs_check_cluster(unsigned long id);
 //unsigned long fs_find_not_empty_entry();
 
-void salva_nome( unsigned char *file_name, 
-                 unsigned long id, 
-				 unsigned long eid, 
-				 unsigned long cluster_inicial);//exec
 
 unsigned long 
 fatClustToSect( unsigned short cluster, 

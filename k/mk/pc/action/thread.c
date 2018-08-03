@@ -117,16 +117,14 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	    current_thread >= THREAD_COUNT_MAX )
 	{
 		return NULL;
-	};
+	}
 	
 	//@todo:
 	//Checar se a prioridade é um argumento válido.
 	//if( priority == 0 ){}
 	
 	
-	//
 	// Filtrar o processo ao qual a thread pertencerá.
-	//
 	
 	ProcessID = (int) pid;
 	
@@ -137,23 +135,22 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 		// Não sabemos a condição do processo atual para 
 		// permitirmos que ele seja o dono da thread.
 		ProcessID = current_process;
-	};
+	}
 	
-	//
 	// Já temos um PID para o processo que é dono da thread.
-	//
 
 	Process = (void *) processList[ProcessID]; 		
 	if( (void *) Process == NULL )
 	{
 		printf("pc-action-thread-create_thread: Process\n");
 		die();
-	};
+	}
 	
 	//Alocando memória para a estrutura da thread.
 	//Obs: Estamos alocando memória dentro do heap do kernel.
 	Thread = (void *) malloc( sizeof(struct thread_d) );	
-	if( (void *) Thread == NULL )
+	
+	if ( (void *) Thread == NULL )
 	{
 	    printf("pc-action-thread-create_thread: Thread\n");
 		die();
@@ -271,28 +268,22 @@ get_next:
 	    // Not used now. But it works fine.
 		Thread->ticks_remaining = 1000;    	
 
-
 	    // Signal
 	    // Sinais para threads.
 	    Thread->signal = 0;
         Thread->signalMask = 0;	
 
 
-        //
 		// @todo: 
 		// Essa parte é dependente da arquitetura i386.
 		// Poderá ir pra outro arquivo.
-		//
 		
-        //
 		// init_stack:
 		// O endereço de início da pilha é passado via argumento.
 		// Então quem chama precisa alocar memória para a pilha.
 		// @todo: Podemos checar a validade dessa pilha ou é problema 
 		// na certa.
-		//
 		
-		//
 		// init_eip:
 		// O endereço início da sessão de código da thread é 
 		// passado via argumento. Então quem chama essa rotina 
@@ -300,15 +291,11 @@ get_next:
 		// Obs: init_eip Aceita endereços inválidos pois a thread 
 		// fecha nesses casos por PG fault. Mas o sistema pode travar 
 		// se for a única thread e um único processo. 
-		//
 		
 		//if( init_stack == 0 ){ ... }
 		//if( init_eip == 0 ){ ... }
 		
-		
-	    //
 		// Contexto x86 usado pela thread.
-		//
 		
 		//Context.
 		// ss (0x20 | 3)
@@ -339,11 +326,9 @@ get_next:
 		//Thread->CurrentProcessor = 0;
 		//Thread->NextProcessor = 0;
 		
-		//
 		// @todo: 
         // O processo dono da thread precisa ter um diretório 
 		// de páginas válido.
-		//
 		
 		// #bugbug
 		// Page Directory. (#CR3).
@@ -363,11 +348,8 @@ get_next:
 		
 		//Thread->event
 		
-	
-	    //
 	    // ORDEM: 
 		// O que segue é referenciado com pouca frequência.
-	    //
 
 	    Thread->waitingCount = 0;    //Tempo esperando algo.
 	    Thread->blockedCount = 0;    //Tempo bloqueada.	
@@ -384,7 +366,7 @@ get_next:
 		//Thread->wait4pid =
 
 		//razões para esperar.
-		for( w=0; w<8; w++){
+		for ( w=0; w<8; w++){
 			Thread->wait_reason[w] = (int) 0;
 		}
 		
@@ -392,8 +374,6 @@ get_next:
         //@todo:
         //herdar o quantum do processo.
         //herdar a afinidade do processo.(cpu affinity) 
-
-		
 
         Thread->exit_code = 0;
 	    
@@ -408,25 +388,18 @@ get_next:
 		threadList[i] = (unsigned long) Thread;	
 	};
 
-	//
 	// Running tasks.
-	//
 	
 	//ProcessorBlock.running_tasks = 2;
     //@todo: isso deve ir pra outro lugar.
 	//talvez dentro de SelectForExecution.
 		
-//
 // Done.
-//
-	
 done:
     
-	//
 	// Warning !!! 
 	// ( NÃO COLOCAR PARA EXECUÇÃO, 
 	//   OUTRA FUNÇÃO DEVE COLOCAR PARA EXECUÇÃO )
-	//
 	
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
     return (void *) Thread;
@@ -434,36 +407,40 @@ done:
 
 
 /*
+ *********************************************
  * GetCurrentThreadId
  *     Pega o id da thread atual.
  *     Obs: current_thread já é o id.
  */
-int GetCurrentThreadId()
-{
+int GetCurrentThreadId (){
+	
 	return (int) current_thread;
 };
 
 
 /*
+ ********************************************************
  * GetCurrentThread:
  *     Retorna o endereço da estrutura da thread atual.
  *
  */
-void *GetCurrentThread()
-{
+void *GetCurrentThread (){
+	
     struct thread_d *Current;
 	
 	//Limits.
-	if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+	if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
 		return NULL;
-	};
+	}
 	
 	Current = (void *) threadList[current_thread];	
-	if( (void *) Current == NULL ){
+	
+	if ( (void *) Current == NULL ){
         return NULL;
-	};
+	}
+	
 //Done.
-done:
+//done:
 	return (void *) Current;
 };
 
@@ -474,20 +451,20 @@ done:
  *     Pega a primeira thread READY que encontrar.
  *     E se não encontrar nenhuma, retorna NULL.
  */
-void *FindReadyThread()
-{
+void *FindReadyThread (){
+	
 	int Index;
     struct thread_d *Thread;  
     
-	for(Index=0; Index<THREAD_COUNT_MAX; Index++)
+	for ( Index=0; Index<THREAD_COUNT_MAX; Index++ )
 	{
 	    Thread = (void *) threadList[Index];	
 		
-		if( (void*) Thread != NULL )
+		if ( (void*) Thread != NULL )
 		{
-            if( Thread->used == 1 && 
-			    Thread->magic == 1234 && 
-				Thread->state == READY )
+            if ( Thread->used == 1 && 
+			     Thread->magic == 1234 && 
+				 Thread->state == READY )
 			{
 				//Done.
 	            return (void *) Thread;
@@ -497,7 +474,7 @@ void *FindReadyThread()
         //Nothing.		
 	};
 //Nenhuma foi encontrada.   
-fail:
+//fail:
     return NULL;
 };
 
@@ -521,14 +498,12 @@ fail:
  *     
  *  *** MOVIMENTO 1, (Initialized --> Standby).
  */
-void 
-SelectForExecution( struct thread_d *Thread )
-{ 
-	if( (void *) Thread == NULL){
+void SelectForExecution ( struct thread_d *Thread ){
+	
+	if ( (void *) Thread == NULL){
         return;
-	};  
+	} 
 
-	//
 	// @todo: if initialized ---> Standby.
 	// @todo: if zombie ---> Standby.
 	//
@@ -538,53 +513,53 @@ SelectForExecution( struct thread_d *Thread )
 	// >> Uma thread no estado zombie pode entrar no estado standby.
 	// >> @todo: se uma thread estiver em qualquer um dos outros estados ela 
 	// não pode entrar em stadby.
-	//
 	
-setState:
+//setState:
     //*MOVIMENTO 1, (Initialized --> Standby).
     Thread->state = (int) STANDBY;
-	queue_insert_data(queue, (unsigned long) Thread, QUEUE_STANDBY);	
-	return;
+	queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );	
+	//return;
 };
 
 
 //Get State. (Zero é tipo NULL?).
-int GetThreadState(struct thread_d *Thread)
-{ 
-	if( (void*) Thread == NULL){
+int GetThreadState (struct thread_d *Thread){
+	
+	if ( (void *) Thread == NULL ){
         return (int) 0;
-	};  
+	}
 	return (int) Thread->state;
 };
 
 //Get Type. (Zero é tipo NULL?).
-int GetThreadType(struct thread_d *Thread)
-{
-	if( (void *) Thread == NULL){
+int GetThreadType (struct thread_d *Thread){
+	
+	if( (void *) Thread == NULL ){
         return (int) 0;
-	};  
+	}  
     return (int) Thread->type;
 };
 
 
 
 /*
- ***********************************************************
+ ********************************************
  * show_thread_information:
  *     Mostra informações sobre as threads.
  */
-void show_thread_information()
-{
+void show_thread_information (){
+	
 	struct thread_d *Current;	
 	
 	printf("Threads info:\n");		
 	
 	//Limits.
-	if(current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
 		return;
-	};	
+	}
 	
 	Current = (void *) threadList[current_thread];
+	
 	if( (void *) Current == NULL )
 	{
 	    printf("pc-thread-show_thread_information:\n");	
@@ -628,8 +603,8 @@ done:
  *     que lidam com threads.
  *
  */
-int init_threads()
-{ 
+int init_threads (){
+	
 	//Globais.	 
 	current_thread = 0;                        //Atual. 
 	ProcessorBlock.threads_counter = (int) 0;  //Número de threads no processador.	
@@ -638,10 +613,8 @@ int init_threads()
     task_count = (unsigned long) 0;            //Zera o contador de tarefas criadas.
 	//...
 	
-	//
 	// @todo: Porque essas variáveis usam o termo 'task'?
 	//        task é sinonimo de process.
-	//	
 	
 	//Variáveis usadas na inicialização de uma nova tarefa.	
 	start_new_task_status  = (unsigned long) 0;    //Se há uma nova tarefa.
@@ -653,10 +626,10 @@ int init_threads()
 	
 	//Zerando a lista de threads.
 	int i=0;
-	while(i < THREAD_COUNT_MAX){
-	    threadList[i] = (unsigned long) 0;    //NULL.
+	while ( i < THREAD_COUNT_MAX ){
+	    threadList[i] = (unsigned long) 0;   
         ++i;
-	};
+	}
 	
 	//
 	// @todo: Nada mais?

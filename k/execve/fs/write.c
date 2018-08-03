@@ -18,52 +18,52 @@
 
 extern void reset_ide0();
 
-
-
-
-//rotina interna de support.
-//isso deve ir para bibliotecas depois.
-//não tem protótipo ainda.
-// Credits: Luiz Felipe
-
-void write_fntos(char *name)
-{
+/*
+ ************************************
+ * write_fntos
+ *     Rotina interna de support.
+ *     isso deve ir para bibliotecas depois.
+ *     não tem protótipo ainda.
+ * Credits: Luiz Felipe
+ */
+void write_fntos (char *name){
+	
     int  i, ns = 0;
     char ext[4];
-    //const char ext[4];
 	
-    //transforma em maiúscula
-	while(*name && *name != '.')
+    //Transforma em maiúscula
+	while ( *name && *name != '.' )
 	{
-        if(*name >= 'a' && *name <= 'z')
+        if (*name >= 'a' && *name <= 'z')
             *name -= 0x20;
 
         name++;
         ns++;
 		
 		// ##bugbug: E se não encontrarmos o ponto??
-    }
+    };
 
     // aqui name[0] é o ponto.
 	// então constroi a extensão.
-	for(i=0; i < 3 && name[i+1]; i++)
+	for ( i=0; i < 3 && name[i+1]; i++ )
 	{
-        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+        if( name[i+1] >= 'a' && name[i+1] <= 'z' )
             name[i+1] -= 0x20;
 
         ext[i] = name[i+1];
-    }
+    };
 
-    while(ns < 8){
+    while (ns < 8){
         *name++ = ' ';
         ns++;
     }
 
-    for(i=0; i < 3; i++)
+    for ( i=0; i < 3; i++ )
         *name++ = ext[i];
 
     *name = '\0';
 };
+
 
 /*
  * fatWriteCluster:
@@ -86,7 +86,7 @@ void fatWriteCluster( unsigned long sector,
 	unsigned long i;
 
 	//Começa do primeiro setor do cluster.
-	for( i=0; i < spc; i++ )
+	for ( i=0; i < spc; i++ )
 	{
         write_lba( address, sector + i );
 		address = address +512; 
@@ -94,7 +94,7 @@ void fatWriteCluster( unsigned long sector,
 	
 	//...
 	
-done:
+//done:
     //return (int) 0;	
 	return;
 };
@@ -107,16 +107,16 @@ done:
  *     
  */
 //int write_lba( unsigned long address, unsigned long lba ) 
-void write_lba( unsigned long address, unsigned long lba )
-{    
+void write_lba ( unsigned long address, unsigned long lba ){
+    
     //@todo: Check limits.
 	
 	// ?? onde está fatbits ??
 	
-    switch(fatbits)
+    switch (fatbits)
     {
 	    case 32:
-			printf("fs-write-write_lba: fat32 not supported. \n");
+			printf("fs-write-write_lba: fat32 not supported \n");
 			goto fail;
 			break;		
 			
@@ -127,12 +127,12 @@ void write_lba( unsigned long address, unsigned long lba )
 			break;		
 			
 	    case 12:
-			printf("fs-write-write_lba: fat12 not supported. \n");
+			printf("fs-write-write_lba: fat12 not supported \n");
 			goto fail;	    
 			break;
 
         default:
-			printf("fs-write-write_lba: Unknow fat fs. \n");
+			printf("fs-write-write_lba: Unknow fat fs \n");
 			goto fail;		    
             break;		
 	};
@@ -190,12 +190,12 @@ fsSaveFile( char *file_name,
 	//printf("fsSaveFile:\n"); 
 	
     //Carrega root e fat.
-rootdir:
+//rootdir:
     //#debug
 	//printf("Loading root..\n"); 
 	fs_load_rootdirEx();
 	
-fat:
+//fat:
     //#debug
 	//printf("loading FAT..\n");
 	fs_load_fatEx();
@@ -210,15 +210,15 @@ SearchEmptyEntries:
     
 	// #bugbug
 	// Obs: Esse limite é improvisado.
-    while( i < fat_range_max )
+    while ( i < fat_range_max )
     {
         //procurando cluster livre na fat.
         //@todo:isso poderia ser uma função.		
-        if(fat[c] == 0)
+        if (fat[c] == 0)
         {
             // Encontrado todos os espaços livres 
 			// que o arquivo precisa.
-            if(file_size == 0)
+            if (file_size == 0)
 			{
 				//Marca o fim.
                 list[j] = (unsigned short) 0xfff8;          
@@ -239,12 +239,12 @@ SearchEmptyEntries:
     }; 
   
 out_of_range:  
-    printf("fsSaveFile: out_of_range - Max entries !");
+    printf("fsSaveFile: out_of_range - Max entries");
     goto fail;
+	
+	//#debug
     //refresh_screen();
-    //while(1){
-	//   asm("hlt");
-    //}
+    //while(1){ asm("hlt"); }
    
 // Salva o arquivo.
 //     O arquivo tem na lista todos os clusters 
@@ -268,7 +268,6 @@ save_file:
 	
 	// #debug
 	// printf("first={%x}\n",first);
-    
 	
 CreateEntry:
 	
@@ -337,10 +336,8 @@ CreateEntry:
 	Entry[31] = (char) size_in_bytes;
 
 	
-	//
 	// root[]
 	// #importante: root[] é um array de short.
-	//
 	
 	// Copia o nome para dentro da entrada do diretório.
 	// Obs: #bugbug O número da entrada é improvisado.
@@ -352,34 +349,30 @@ CreateEntry:
 	//int xxxx_entryindex = 24;
 
 	//address e número máximo de entradas.
-	int xxxx_entryindex = (int) findEmptyDirectoryEntry( VOLUME1_ROOTDIR_ADDRESS,128);
-	if(xxxx_entryindex == -1)
-	{
-		printf("No empty entry.\n");
+	int xxxx_entryindex = (int) findEmptyDirectoryEntry ( VOLUME1_ROOTDIR_ADDRESS, 128 );
+	
+	if (xxxx_entryindex == -1){
+		
+		printf("No empty entry\n");
 		goto fail;
 	}
 	
-	
 	int xxxx_entrysize = 16;
-	
 	
 	//Copia 32bytes.
 	int xxxx = (int) ( xxxx_entryindex * xxxx_entrysize );
-	memcpy( &root[xxxx], Entry, 32 );
-
 	
+	memcpy ( &root[xxxx], Entry, 32 );
+
 resetIDE:
 
 	//#debug
 	//printf("fsSaveFile: reset and while\n"); 
     //refresh_screen();
 	
-	reset_ide0();
+	reset_ide0 ();
 	
-	
-	//
 	// ## Save ##
-	//
 
 	i=0; 
 	
@@ -389,7 +382,7 @@ resetIDE:
 	
 SavingFile:	
 
-	while(1)
+	while (1)
     {            
         //Pega um conteúdo da lista.
         next = list[i];
@@ -397,12 +390,13 @@ SavingFile:
 		printf("next={%x}\n",next);
                 
         //encontrada a assinatura na lista!
-        if( next == 0xfff8)
+        if ( next == 0xfff8)
         {
             next = list[i-1];
             fat[next] = 0xfff8;  
             goto done;         
-        }else{
+        
+		}else{
 
             //não é assinatura ainda
 			
@@ -412,24 +406,26 @@ SavingFile:
             //grava - aqui next esta certo!!!
 			printf("write_lba\n");
             refresh_screen();
-            write_lba( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
+            write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
             
             address += 512; 
         }; 
          
-         //próximo valor da lista
+        //próximo valor da lista
         i++;
 		 
         //limite #test #bugbug
 		//limitando o tamanho do arquivo a 16 entradas.
-        if(i > 16){
+        if (i > 16){
 		    goto fail;       	
-		}		
+		}
+
+        //??		
     };
     
 	
 fail:	
-    printf("  ## FAIL ## \n");
+    printf(" # FAIL # \n");
     refresh_screen();
     return (int) 1;
 
@@ -440,7 +436,6 @@ done:
     refresh_screen();
 	
 	reset_ide0();
-		
 		
     printf("write_lba\n");      
     refresh_screen();		
@@ -462,16 +457,14 @@ done:
     //#bugbug: Devemos salvar ela toda.	
     //salva 4 setores da fat!       
     
-	
-	
     printf("write_lba  ... tentando salvar fat\n");      
     refresh_screen();		
 
-	
 	int f;
     int off = 0;
     int lbaoff = 0;	
-	for( f=0; f<8; f++ )
+	
+	for ( f=0; f<8; f++ )
 	{
 	   //#bugbug:
        //pelo jeito a rotina de salvamento precisa de 
@@ -488,12 +481,11 @@ done:
 	
 	
     //#debug
-    printf("fsSaveFile: done  \n"); 
+    printf("fsSaveFile: done \n"); 
     refresh_screen();	
     
 	return (int) 0;
 };
-
 
 
 /*
@@ -501,9 +493,9 @@ done:
  *     Salva o diretório raiz no disco.
  *     @todo: Identificar parâmetros do sistema de arquivos atual.
  */
-void fs_save_rootdir()
+void fs_save_rootdir ()
 {
-	return;
+	//return;
 };
 
 
@@ -511,9 +503,9 @@ void fs_save_rootdir()
  * fs_save_dir:
  *     Salva um diretório.
  */
-void fs_save_dir(unsigned long id)
+void fs_save_dir (unsigned long id)
 {
-	return;
+	//return;
 };
 
 
@@ -527,14 +519,15 @@ void fs_save_dir(unsigned long id)
  */
 void fs_save_entry_on_root(unsigned long eid)
 {
-    return;
+    //return;
 };
 
 
 void fs_save_structure()
 {   
-	return;
+	//return;
 };
+
 
 //
 // End.

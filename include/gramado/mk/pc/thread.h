@@ -576,13 +576,10 @@ void dispatch_thread(struct thread_d *thread);
 void set_thread_priority(struct thread_d *t, unsigned long priority);
 
 
-//
-// ## Page directory support ##
-// 
+// ## Page directory support ## 
 
 // Pega o endereço do diretório de páginas usado pela thread.
-unsigned long 
-GetThreadDirectory( struct thread_d *thread );
+unsigned long GetThreadDirectory( struct thread_d *thread );
 
 // Altera o endereço do diretório de páginas de uma thread.
 void 
@@ -592,15 +589,13 @@ SetThreadDirectory( struct thread_d *thread, unsigned long Address );
 /*
  * Thread heap support.
  */
-unsigned long 
-GetThreadHeapStart(struct thread_d *thread);
+unsigned long GetThreadHeapStart(struct thread_d *thread);
 //...
 
 /*
  * Thread Stack support.
  */
-unsigned long 
-GetThreadStackStart(struct thread_d *thread);
+unsigned long GetThreadStackStart(struct thread_d *thread);
 //...
 
 void SelectForExecution(struct thread_d *Thread);
@@ -613,15 +608,12 @@ int init_threads();
 int GetCurrentThreadId();
 
 
-//
 // Usadas durante a inicialização e execução de uma thread.
 // @todo: mudar apenas o protótipo para thread.h
-void spawn_thread(int id);
+void spawn_thread (int id);
 
 
-//
 // ## Finalizações ##
-//
 
 // Liberar uma thread que estava bloqueada ou esperando.
 void release ( int tid );

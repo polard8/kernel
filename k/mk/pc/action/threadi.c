@@ -30,7 +30,7 @@
  */
 void KiShowPreemptedTask()
 {
-    return;
+    //return;
 };
 
  
@@ -51,8 +51,7 @@ void KiSetTaskStatus(unsigned long status)
  * @todo: Substituir a palavra task por thread. KiGetThreadStatus
  * #bugbgu task não é um termo usado.
  */
-unsigned long 
-KiGetTaskStatus()
+unsigned long KiGetTaskStatus ()
 { 
     return (unsigned long) get_task_status(); 
 };
@@ -68,7 +67,7 @@ KiGetTaskStatus()
 void 
 KiSaveContextOfNewTask( int id, unsigned long *task_address )
 {
-    return;
+    //return;
 };
 
 
@@ -77,89 +76,89 @@ KiSaveContextOfNewTask( int id, unsigned long *task_address )
  *  @todo: Substituir a palavra task por thread. KiReloadCurrentThread.
  *
  */
-void KiReloadCurrentTask()
-{
-    return;
+void KiReloadCurrentTask (){
+	
+    //return;
 };
 
 
-void KiSetQuantum(unsigned long q)
-{    
-    return;
+void KiSetQuantum (unsigned long q){
+    
+    //return;
 };
 
 
-unsigned long KiGetQuantum()
-{ 
+unsigned long KiGetQuantum (){
+	
     return (unsigned long) 0; 
 };
 
 
-void KiSetCurrentQuantum( unsigned long q)
-{
-    return;
+void KiSetCurrentQuantum (unsigned long q){
+	
+    //return;
 };
 
 
-unsigned long KiGetCurrentQuantum()
-{ 
+unsigned long KiGetCurrentQuantum (){
+	
     return (unsigned long) 0; 
 };
 
 
-void KiSetNextQuantum( unsigned long q )
-{
-    return;
+void KiSetNextQuantum ( unsigned long q ){
+	
+    //return;
 };
 
 
-unsigned long KiGetNextQuantum()
-{ 
+unsigned long KiGetNextQuantum (){
+	
     return (unsigned long) 0; 
 };
 
 
-void KiSetFocus(int pid)
-{
-	return;
+void KiSetFocus (int pid){
+	
+	//return;
 };
 
 
 //Pegar o foco do que? thread?!
-int KiGetFocus()
-{ 
+int KiGetFocus (){
+	
     return (int) 0; 
 };
 
 
-void KiDebugBreakpoint()
-{
-    return;
+void KiDebugBreakpoint (){
+	
+    //return;
 };
 
 
-void KiShowTasksParameters()
-{
-    return;
+void KiShowTasksParameters (){
+	
+    //return;
 };
 
 
-void KiMostraSlots()
-{
+void KiMostraSlots (){
+	
 	mostra_slots();
 };
 
 
-void KiMostraSlot(int id)
-{ 
+void KiMostraSlot (int id){
+	
 	mostra_slot(id);
 };
 
 
-void KiMostraReg(int id)
-{
+void KiMostraReg (int id){
+	
 	//mostra_reg(id);
-    return;
+    //return;
 };
 
 
@@ -170,8 +169,8 @@ void KiMostraReg(int id)
  * threads existentes em 
  * threadList[i]. (as primeiras da lista).
  */
-void KiShowThreadList()
-{
+void KiShowThreadList (){
+	
     mostra_slots();
 };
 
@@ -186,9 +185,12 @@ void KiShowThreadList()
  * Porém esse arquivo é para lidar com threads, 
  * então a torina de lidar com processos
  * deve ir pra outro arquivo.
+ * @todo: Mudar nome.
+ * #bugbug: Não encontro o protótipo dessa função.
  */
-void mostra_slots()
-{
+//void threadiShowSlots(){ 
+void mostra_slots(){
+	
     int i; 	
 	struct process_d *p;    
     struct thread_d  *t;   
@@ -243,7 +245,7 @@ Scan:
 	
 	
 done:	
-    printf("Done!\n");
+    printf("Done\n");
 	
 	//#debug
 	//refresh_screen();
@@ -258,14 +260,16 @@ done:
  *     Mostra as variaveis mais importantes de um slot.
  *     obs: Não precisa mostrar o contexto, tem rotina pra isso.
  *     @todo: Mudar nome.
+ *     #bugbug: Não encontro o protótipo dessa função. 
  */
-void mostra_slot(int id)
-{
+//void threadiShowSlot(int id){  
+void mostra_slot (int id){
+	
     struct thread_d *t;
 
 	// Limits.
-    if( id < 0 || id >= THREAD_COUNT_MAX )
-	{
+    if ( id < 0 || id >= THREAD_COUNT_MAX ){
+		
 	    printf("pc-threadi-mostra_slot: id\n");
 		goto fail;
 	};
@@ -313,39 +317,40 @@ done:
  *    ds,es,fs,gs
  *    a,b,c,d
  *
- *    @todo Mudar nome: KiShowRegs(int tid)
+ *    @todo Mudar nome
  */
-void mostra_reg(int id)
-{
+//void threadiShowRegisters (int id){   
+void mostra_reg (int id){
+	
     struct thread_d *t; 
 
 	// Limits.
-    if( id < 0 || id >= THREAD_COUNT_MAX )
-	{
+    if ( id < 0 || id >= THREAD_COUNT_MAX ){
+		
 	    goto fail;
-	};
+	}
 	
 	// Structure.
     t = (void *) threadList[id];
 	
-	if( (void*) t == NULL )
-	{
+	if ( (void *) t == NULL ){
+		
 	    goto fail;
-	};
+	}
     	
 	// Show registers.	
     printf("\n");
-	printf("eflags=[%x]\n",
-	    t->eflags);
-	printf("cs:eip=[%x:%x]\n",
-	    t->cs, t->eip );
-	printf("ss:esp=[%x:%x]\n",
-	    t->ss, t->esp ); 
-    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
+	printf("eflags=[%x]\n", t->eflags);
+	printf("cs:eip=[%x:%x]\n", t->cs, t->eip );
+	printf("ss:esp=[%x:%x]\n", t->ss, t->esp ); 
+    
+	printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
 	    t->ds, t->es, t->fs, t->gs );
+	
 	printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",
 	    t->eax, t->ebx, t->ecx, t->edx ); 
-    goto done;
+    
+	goto done;
 
 	
 fail:	
@@ -360,35 +365,33 @@ done:
  * set_thread_priority:
  *     Muda a prioridade de uma thread específica.
  */
-void 
-set_thread_priority( struct thread_d *t, unsigned long priority )
-{
+void set_thread_priority ( struct thread_d *t, unsigned long priority ){
+	
     unsigned long ThreadPriority;
 	
-	if( (void*) t == NULL )
+	if ( (void *) t == NULL )
 	{
 	    return;
+		
 	}else{
 		
-        if( t->used != 1 || t->magic != 1234 )
-	    {
+        if ( t->used != 1 || t->magic != 1234 ){
 		    return;
 	    }	
 		//...
 	};
 	
-	
 	ThreadPriority = t->priority;
 
 	// se aprioridade solicitada for igual da prioridade atual.	
-	if( priority == ThreadPriority ){
+	if ( priority == ThreadPriority ){
 		return;
-	};
+	}
 	
 do_change:
 	
 	// se aprioridade solicitada for diferente da prioridade atual.
-	if( priority != ThreadPriority )
+	if ( priority != ThreadPriority )
 	{
 		//Muda a prioridade.
         t->priority = priority;
@@ -429,11 +432,12 @@ done:
  *     Altera o endereço do diretório de páginas de uma thread.
  *     Apenas a variável. Não altera o CR3.
  */
-void 
-SetThreadDirectory( struct thread_d *thread, unsigned long Address )
-{
-    if( (void*) thread == NULL ){
-        goto fail;        
+void SetThreadDirectory ( struct thread_d *thread, unsigned long Address ){
+	
+    if ( (void *) thread == NULL )
+	{
+        goto fail;
+        
 	}else{
 		
 		//@todo:
@@ -454,10 +458,9 @@ fail:
  * GetThreadDirectory:
  *     Pega o endereço do diretório de páginas de uma thread.
  */
-unsigned long 
-GetThreadDirectory( struct thread_d *thread )
-{
-    if( (void*) thread == NULL )
+unsigned long GetThreadDirectory ( struct thread_d *thread ){
+	
+    if ( (void *) thread == NULL )
 	{
         goto fail;        
 	}else{
@@ -486,12 +489,14 @@ fail:
  *
  */
 void show_preempted_task(){
-    return;
+    
+	//return;
 };
 
 
 void show_tasks_parameters(){  
-	return; 
+	
+	//return; 
 };
 
 
@@ -506,29 +511,29 @@ void show_tasks_parameters(){
  * liberada, apenas alteramos se estado.
  *
  */
-void 
-release( int tid )
-{
+void release ( int tid ){
+	
     struct thread_d *Thread;
 	
 	//Limits. 
-	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
-	    goto fail;
+	if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+	    
+		goto fail;
 	}
 	
-	Thread = (void*) threadList[tid];
+	Thread = (void *) threadList[tid];
 	
-	if( (void*) Thread == NULL )
+	if ( (void *) Thread == NULL )
 	{
 		goto fail;
 		
 	}else{
 		
         //Se estiver corrompida.
-        if( Thread->magic != THREAD_MAGIC )
-		{
+        if ( Thread->magic != THREAD_MAGIC ){
+			
 			goto fail;
-		};
+		}
 		
 		//#importante:
 		//Não estamos selecionando ela para execução
@@ -552,35 +557,34 @@ done:
  *     Outra rotina destruirá as informações de uma 
  * estrutura de thread zombie.
  */
-void 
-exit_thread(int tid)
-{
+void exit_thread (int tid){
+	
     struct thread_d *Thread;
 	
 	//Limits. 
-	if( tid < 0 || tid >= THREAD_COUNT_MAX )
-	{
+	if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+		
 	    goto fail;
 	}
 	
-	if( tid == idle )
-	{
+	if ( tid == idle ){
+		
 		goto fail;
 	}
 	
-	Thread = (void*) threadList[tid];
+	Thread = (void *) threadList[tid];
 	
-	if( (void*) Thread == NULL )
+	if ( (void *) Thread == NULL )
 	{
 		goto fail;
 		
 	}else{
 		
         //Se estiver corrompida.
-        if( Thread->magic != THREAD_MAGIC )
-		{
+        if ( Thread->magic != THREAD_MAGIC ){
+			
 			goto fail;
-		};
+		}
 		
 		//Thread->exit_code = 0;    //@todo: Isso é necessário. Onde está.
 		Thread->state = ZOMBIE; 
@@ -590,10 +594,10 @@ exit_thread(int tid)
 	// # reavaliar isso.
 	// Se a thread fechada é a atual, 
 	// necessitamos de algum escalonamento.	
-    if( tid = current_thread )
-	{
+    if ( tid = current_thread ){
+		
 	    scheduler();
-    };
+    }
 	
 	
 fail:
@@ -609,19 +613,18 @@ done:
  *     Destrói uma thread.
  *     Destroi a estrutura e libera o espaço na lista. 
  */
-void 
-kill_thread(int tid)
-{
+void kill_thread (int tid){
+	
     struct thread_d *Thread;
 	
 	//Limits.
-	if( tid < 0 || tid >= THREAD_COUNT_MAX )
-	{
+	if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+		
 	    goto fail;	
 	}
 	
-	if( tid == idle )
-	{
+	if ( tid == idle ){
+		
 		goto fail;
 	}
 	
@@ -636,9 +639,10 @@ kill_thread(int tid)
 	
 	Thread = (void *) threadList[tid];
 	
-	if( (void *) Thread == NULL )
+	if ( (void *) Thread == NULL )
 	{
 		goto fail;
+		
 	}else{
 		
 		
@@ -649,26 +653,21 @@ kill_thread(int tid)
 		Thread->state = DEAD; 
 		//...
 		
-		
-				ProcessorBlock.threads_counter--;
-				if( ProcessorBlock.threads_counter < 1 )
-				{
-					//#bugbug
-					panic("kill_thread: threads_counter");
-					//die();
-				}		
+		ProcessorBlock.threads_counter--;
+		if ( ProcessorBlock.threads_counter < 1 ){
+			//#bugbug
+			panic("kill_thread: threads_counter");
+		}		
 		
         threadList[tid] = (unsigned long) 0;
         Thread = NULL;		
 	};
 	
-	
 	// # reavaliar isso.
 	// Se a thread fechada é a atual, 
 	// necessitamos de algum escalonamento.	
-    if( tid == current_thread )
+    if ( tid == current_thread )
 	    scheduler();
-	
 	
 fail:	
 	
@@ -687,15 +686,15 @@ done:
  * @todo
  *     Alerta o processo que a thread morreu.
  */
-void 
-dead_thread_collector()
-{
+void dead_thread_collector (){
+	
 	int i;
     struct thread_d *Thread;   	  
     struct process_d *p;         
 	
 Scan:
-	for( i=0; i < THREAD_COUNT_MAX; i++ )
+	
+	for ( i=0; i < THREAD_COUNT_MAX; i++ )
 	{
 	    Thread = (void *) threadList[i];
 		
@@ -752,16 +751,14 @@ done:
 };
 
 
-
-void kill_all_threads()
-{
+void kill_all_threads (){
+	
 	int i;
-    for( i=0; i < THREAD_COUNT_MAX; i++ )
-	{
-	    kill_thread(i);	
-	};
-}
-
+    
+	for ( i=0; i < THREAD_COUNT_MAX; i++ ){
+	    kill_thread (i);	
+	}
+};
 
 
 //

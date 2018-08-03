@@ -1528,33 +1528,32 @@ Linker script and memory map
                 0xc0013f26                ipcProcedureEx
                 0xc0013f1c                ipcProcedure
                 0xc0013f30                ipc_dispatch_message
- .text          0xc0013f8c      0x510 read.o
-                0xc00142e0                load_directory
-                0xc0014326                fs_load_rootdirEx
-                0xc0014387                fs_load_fatEx
+ .text          0xc0013f8c      0x520 read.o
+                0xc00142f4                load_directory
+                0xc001433a                fs_load_rootdirEx
+                0xc001439b                fs_load_fatEx
                 0xc0014113                fsLoadFile
                 0xc0013f8c                read_fntos
                 0xc00140dd                read_lba
-                0xc00143fa                fs_load_dir
+                0xc001440e                fs_load_dir
                 0xc00140a1                fatLoadCluster
-                0xc00143e6                fs_load_rootdir
+                0xc00143fa                fs_load_rootdir
                 0xc001407b                fatClustToSect
- .text          0xc001449c      0x5b0 write.o
-                0xc001458b                fatWriteCluster
-                0xc0014a33                fs_save_rootdir
-                0xc001449c                write_fntos
-                0xc0014a3d                fs_save_entry_on_root
-                0xc0014a42                fs_save_structure
-                0xc0014644                fsSaveFile
-                0xc0014a38                fs_save_dir
-                0xc00145c7                write_lba
- .text          0xc0014a4c       0xf0 cf.o
-                0xc0014b19                fs_create_entry
-                0xc0014a4c                fs_create_dir
-                0xc0014a56                fs_create_file
-                0xc0014b28                create_system_folders
-                0xc0014b1e                fs_create_name
-                0xc0014b23                salva_nome
+ .text          0xc00144ac      0x5b0 write.o
+                0xc001459b                fatWriteCluster
+                0xc0014a43                fs_save_rootdir
+                0xc00144ac                write_fntos
+                0xc0014a4d                fs_save_entry_on_root
+                0xc0014a52                fs_save_structure
+                0xc0014654                fsSaveFile
+                0xc0014a48                fs_save_dir
+                0xc00145d7                write_lba
+ .text          0xc0014a5c       0xe0 cf.o
+                0xc0014b29                fs_create_entry
+                0xc0014a5c                fs_create_dir
+                0xc0014a66                fs_create_file
+                0xc0014b33                create_system_folders
+                0xc0014b2e                fs_create_name
  .text          0xc0014b3c      0x300 search.o
                 0xc0014c47                fsSearchFile
                 0xc0014e24                fsSearchFileName
@@ -1565,8 +1564,7 @@ Linker script and memory map
  .text          0xc0014e3c       0x20 format.o
                 0xc0014e49                fs_delete_entry
                 0xc0014e3c                fs_apaga_fat
-                0xc0014e53                fsClearFat
-                0xc0014e4e                limpa_root
+                0xc0014e4e                fsClearFat
  .text          0xc0014e5c     0x1b80 disk.o
                 0xc00152d4                ata_status_read
                 0xc0015c49                ide_dma_stop
@@ -2152,55 +2150,55 @@ Linker script and memory map
  .rdata         0xc0034fe4       0x10 sm.o
  .rdata         0xc0034ff4       0x10 channel.o
  .rdata         0xc0035004       0x10 ipc.o
- .rdata         0xc0035014      0x120 read.o
- .rdata         0xc0035134      0x170 write.o
- .rdata         0xc00352a4      0x130 cf.o
- .rdata         0xc00353d4       0x70 search.o
- .rdata         0xc0035444       0x10 format.o
- .rdata         0xc0035454      0x4e0 disk.o
- .rdata         0xc0035934      0x110 volume.o
- .rdata         0xc0035a44      0x180 fs.o
- .rdata         0xc0035bc4      0x1d0 vfs.o
- .rdata         0xc0035d94       0x10 cedge.o
- .rdata         0xc0035da4       0x10 ctype.o
- .rdata         0xc0035db4       0xa0 request.o
- .rdata         0xc0035e54      0x290 info.o
- .rdata         0xc00360e4       0x10 signal.o
- .rdata         0xc00360f4      0x820 system.o
- .rdata         0xc0036914       0x10 bg.o
- .rdata         0xc0036924       0xc0 grid.o
- .rdata         0xc00369e4       0xc0 sbar.o
- .rdata         0xc0036aa4      0x120 menubar.o
- .rdata         0xc0036bc4      0x240 menu.o
- .rdata         0xc0036e04       0xb0 mbox.o
- .rdata         0xc0036eb4       0x70 dbox.o
- .rdata         0xc0036f24       0x10 button.o
- .rdata         0xc0036f34       0x50 char.o
- .rdata         0xc0036f84       0x40 pixel.o
- .rdata         0xc0036fc4       0x10 line.o
- .rdata         0xc0036fd4       0x10 rect.o
- .rdata         0xc0036fe4       0x10 dtext.o
- .rdata         0xc0036ff4       0x50 font.o
- .rdata         0xc0037044       0x10 vsync.o
- .rdata         0xc0037054       0x30 bmp.o
- .rdata         0xc0037084       0xd0 createw.o
- .rdata         0xc0037154      0x780 window.o
- .rdata         0xc00378d4       0x40 desktop.o
- .rdata         0xc0037914       0x50 wstation.o
- .rdata         0xc0037964       0x90 usession.o
- .rdata         0xc00379f4      0x1b0 gws.o
- .rdata         0xc0037ba4       0x40 object.o
- .rdata         0xc0037be4       0xb0 userenv.o
- .rdata         0xc0037c94      0x390 proc.o
- .rdata         0xc0038024       0x10 syscall.o
- .rdata         0xc0038034       0x10 install.o
- .rdata         0xc0038044      0x150 debug.o
- .rdata         0xc0038194       0xa0 abort.o
- .rdata         0xc0038234      0x1c0 faults.o
- .rdata         0xc00383f4      0x4f0 services.o
-                0xc00388e4                _data_end = .
+ .rdata         0xc0035014      0x110 read.o
+ .rdata         0xc0035124      0x160 write.o
+ .rdata         0xc0035284      0x130 cf.o
+ .rdata         0xc00353b4       0x60 search.o
+ .rdata         0xc0035414       0x10 format.o
+ .rdata         0xc0035424      0x4e0 disk.o
+ .rdata         0xc0035904      0x110 volume.o
+ .rdata         0xc0035a14      0x170 fs.o
+ .rdata         0xc0035b84      0x1d0 vfs.o
+ .rdata         0xc0035d54       0x10 cedge.o
+ .rdata         0xc0035d64       0x10 ctype.o
+ .rdata         0xc0035d74       0xa0 request.o
+ .rdata         0xc0035e14      0x290 info.o
+ .rdata         0xc00360a4       0x10 signal.o
+ .rdata         0xc00360b4      0x820 system.o
+ .rdata         0xc00368d4       0x10 bg.o
+ .rdata         0xc00368e4       0xc0 grid.o
+ .rdata         0xc00369a4       0xc0 sbar.o
+ .rdata         0xc0036a64      0x120 menubar.o
+ .rdata         0xc0036b84      0x240 menu.o
+ .rdata         0xc0036dc4       0xb0 mbox.o
+ .rdata         0xc0036e74       0x70 dbox.o
+ .rdata         0xc0036ee4       0x10 button.o
+ .rdata         0xc0036ef4       0x50 char.o
+ .rdata         0xc0036f44       0x40 pixel.o
+ .rdata         0xc0036f84       0x10 line.o
+ .rdata         0xc0036f94       0x10 rect.o
+ .rdata         0xc0036fa4       0x10 dtext.o
+ .rdata         0xc0036fb4       0x50 font.o
+ .rdata         0xc0037004       0x10 vsync.o
+ .rdata         0xc0037014       0x30 bmp.o
+ .rdata         0xc0037044       0xd0 createw.o
+ .rdata         0xc0037114      0x780 window.o
+ .rdata         0xc0037894       0x40 desktop.o
+ .rdata         0xc00378d4       0x50 wstation.o
+ .rdata         0xc0037924       0x90 usession.o
+ .rdata         0xc00379b4      0x1b0 gws.o
+ .rdata         0xc0037b64       0x40 object.o
+ .rdata         0xc0037ba4       0xb0 userenv.o
+ .rdata         0xc0037c54      0x390 proc.o
+ .rdata         0xc0037fe4       0x10 syscall.o
+ .rdata         0xc0037ff4       0x10 install.o
+ .rdata         0xc0038004      0x150 debug.o
+ .rdata         0xc0038154       0xa0 abort.o
+ .rdata         0xc00381f4      0x1c0 faults.o
+ .rdata         0xc00383b4      0x4f0 services.o
+                0xc00388a4                _data_end = .
                 0xc0039000                . = ALIGN (0x1000)
- *fill*         0xc00388e4      0x71c 00
+ *fill*         0xc00388a4      0x75c 00
 
 .bss            0xc0039000    0x3f000
                 0xc0039000                _bss_begin = .

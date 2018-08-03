@@ -890,11 +890,9 @@ processSendSignal( struct process_d *p,
 // Page directory support.
 //
  
-unsigned long 
-GetPageDirValue();
+unsigned long GetPageDirValue();
 
-unsigned long 
-GetProcessDirectory( struct process_d *process );
+unsigned long GetProcessDirectory( struct process_d *process );
 
 void 
 SetProcessDirectory( struct process_d *process, 
@@ -905,11 +903,9 @@ SetProcessDirectory( struct process_d *process,
 // Process support.
 //
 
-unsigned long 
-GetProcessHeapStart( int pid );
+unsigned long GetProcessHeapStart( int pid );
 
-unsigned long 
-GetProcessPageDirectoryAddress( int pid );
+unsigned long GetProcessPageDirectoryAddress( int pid );
 
 
 int processTesting(int pid);

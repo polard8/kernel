@@ -19,67 +19,18 @@
 
 
 //@todo: mudar o nome da função para fs_clear_fat.
-void fs_apaga_fat()
+void fs_apaga_fat ()
 {
-    fs_init_fat();
-    return;
+    fs_init_fat ();
+    //return;
 };
 
 
-void fs_delete_entry(unsigned long id, unsigned long eid){
-    return;
-};
-
-
-/*
- * limpa_root: 
- *
- * Atribuições:
- *     +Salvar o o conteúdo da memória no hd.
- *     +Zerar o buffer na memória ram.
- *     Continua...
- *
- * @todo: 
- *     Mudar o nome da função para fsClearRoot.
- */
-void limpa_root()
+void fs_delete_entry ( unsigned long id, unsigned long eid )
 {
-    //int i;	
-	//unsigned char *root = (unsigned char *) FAT16_ROOTDIR_ADDRESS;
-
-    
-	/*
-     * @todo: 
-	 *     O endereço do rootdir deveria estar definido em uma
-	 * variável global. Por enquanto esse endereço é constante.
-	 */	
-    
-	/*
-     * Tamanho do rootdir.
-     *
-     * @todo: 
-	 *     O tamanho do rootdir deveria estar definido em uma
-	 * variável global. Por enquanto o tamanho é constante.
-	 */
-	//i = 0;
-     
-	 
-	
-	/*
-	 * Limpando o rootdir. (32 setores.) 512 entradas de 32bytes. 
-     */
-	//while(i < (32*512)){
-    //    root[i] = (unsigned char) 0;    
-    //    ++i;
-    //};
-     
-    /*
-	 * Salva o root dir. (size?)    
-     */
-	//write_lba(FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA);
-     
     return;
 };
+
 
 
 /*
