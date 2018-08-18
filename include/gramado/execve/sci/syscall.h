@@ -305,13 +305,19 @@
 #define	SYS_PWD 170                 // Print Working Directory.
 #define	SYS_GETCURRENTVOLUMEID 171  // Get current volume id.
 #define	SYS_SETCURRENTVOLUMEID 172  // configura o id do volume atual.
-#define	SYS_LISTFILES          173  // Listar os arquivos do diretório atual.
+
+// Listar os arquivos do diretório. 
+// Dados ids de disco, volume e diretório.
+#define	SYS_LISTFILES          173  
 #define	SYS_SEARCHFILE         174  // Procurar arquivo. 
 
 //175 atualizar string no pathname do pwd. 
 #define	SYS_175 175  //#usado para atualiza pwd
 #define	SYS_176 176  //#usado para atualiza pwd
+
+//listando arquivos em um diretório dado o nome.
 #define	SYS_177 177  
+
 #define	SYS_178 178
 
 // # test #

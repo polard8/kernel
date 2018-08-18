@@ -554,7 +554,17 @@ system_procedure( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-				    memoryShowMemoryInfo();
+				    
+					//#test
+					fsList("volume1");
+					
+					//testando listar os arquivos de um diretório que está na memória.
+					//obs: isso funcionou.
+					//fsFAT16ListFiles ( "directory default name:\n", 
+					//    (unsigned short *) VOLUME1_ROOTDIR_ADDRESS,
+					//	256 );
+						
+					//memoryShowMemoryInfo();
 					
 				    //vfsListFiles();
 					//vfsShowVFSInfo();

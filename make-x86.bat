@@ -11,8 +11,7 @@ rem (c) Copyright 2005-2018 Fred Nora.
 rem
 
 echo ~{ ...
-echo ~{ Gramado 0.3
-echo ~{ ~~ Style ~~
+echo ~{ Gramado 0.3 Style
 
 :Start_Job0
 rem Main.

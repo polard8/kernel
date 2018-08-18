@@ -74,13 +74,10 @@ void taskswitchFlushTLB(){
  * faz tudo isso.
  * 
  */
-void KiTaskSwitch()
-{
-	//
-	// @todo: Fazer alguma rotina antes aqui ?!
-    //
+void KiTaskSwitch (){
 	
-	//
+	// @todo: Fazer alguma rotina antes aqui ?!
+	
 	// Obs: A qui poderemos criar rotinas que não lidem com a troca de 
 	// threads propriamente, mas com atualizações de variáveis e gerenciamento 
 	// de contagem.
@@ -88,50 +85,41 @@ void KiTaskSwitch()
 	// >> A rotina task_switch fica responsável apenas troca de contexto, não fazendo 
 	// atualização de variáveis de contagem.
 	// >> ?? Na saída ??
-	//
 	
 	// ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
 	
 	
 	//Limits.
-	if( current_thread < 0 || 
-	    current_thread >= THREAD_COUNT_MAX )
-	{
+	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+		
 	    printf("KiTaskSwitch error: current_thread TID={%d}", 
 		    current_thread );										   
         die();
-	};
+	}
 	
 
 	//Limits.
-	if( current_process < 0 || 
-	    current_process >= PROCESS_COUNT_MAX )
-	{
+	if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+		
 	    printf("KiTaskSwitch error: current_thread TID={%d}",
 		    current_process );										   
         die();
-	};	
-	
-	
-	//
-	// ## Task switch ##
-	//
-	
-TaskSwitch:	
-	task_switch();
+	}
 	
 
-    //
+	// ## Task switch ##
+	
+//TaskSwitch:	
+	task_switch();
+	
     // obs: Nessa hora ja temos um thread atual e um processo atual selecionados.
     // podemos checar as variáveis para conferir se não está fora dos limites.
     // Se estiverem fora dos limites, podemos usar algum etodo para selecioanrmos 
     // outro processo ou outra thread com limites válidos.
-    //	
 	
-	
-done:	
+//done:	
 	//Retornando para _irq0 em head\x86\hw.inc.
-    return;
+//    return;
 };
 
 
@@ -150,8 +138,8 @@ done:
  * Obs:
  *     Apenas a interface KiTaskSwitch chama essa rotina.
  */
-void task_switch()
-{
+void task_switch (){
+	
 	int New;
 	int Max;    
 	
@@ -160,8 +148,6 @@ void task_switch()
     struct thread_d *Current;    // Thread atual. 	
 	//...
 	
-	
-	//
 	// Obs: Devemos atualizar a variável global que indica quel é a thread atual 
 	//      e a variável global que indica qual é o processo atual.
 	//      >> Essas variáveis sofre alterações durante essa rotina. Pois 
@@ -169,37 +155,34 @@ void task_switch()
 	// quando essa rotina termina as variáveis devem representar o próximo contexto.
 	//      >> Portanto a única atualização que interessa é no termino dessa rotina.
 	//         ?? Essa atualização pode ser feita na interface KiTaskSwitch ??
-	//
-	//
-	
 	
 	Max = DISPATCHER_PRIORITY_MAX;
 	
-	//
 	// Thread atual e processo atual.
-	//
 	
 	// Valida 'Struct' da thread atual.	
     Current = (void *) threadList[current_thread]; 
-	if( (void*) Current == NULL )
+	
+	if ( (void *) Current == NULL )
 	{
-	    printf("task_switch error: Struct={%x}", (void*) Current );										   
+	    printf("task_switch error: Struct={%x}", (void *) Current );										   
         die();
-	};
+	}
 
 	// Processo atual.
 	// No caso da estrutura do processo so qual o thread 
 	// pertence ser inválida.
 	// Obs: Não queremos que a thread pertença a um processo inválido.
-    P = (void*) Current->process;
-	if( (void*) P == NULL )
-	{
-	    printf("task_switch error: P Struct={%x}", (void*) P );										   
+    P = (void *) Current->process;
+	
+	if ( (void *) P == NULL ){
+		
+	    printf("task_switch error: P Struct={%x}", (void *) P );										   
         die();		
-	};
+	}
 	
 	//Ok o processo ao qual o thread pertence é um processo válido.
-	if( (void*) P != NULL )
+	if ( (void *) P != NULL )
 	{
 		/* #testar #bugbug ... antes de liberarmos esse filtro precisamos 
 		                       atualizar corretamente o current process
@@ -215,12 +198,12 @@ void task_switch()
 		*/
 		
 		
-		if(P->used == 1 && P->magic == 1234)
-		{
+		if ( P->used == 1 && P->magic == 1234 ){
+			
 			//Obs: Se o if mais acima for verdadeiro essa 
 			//atualização não é nessessária. 
 		    current_process = (int) P->pid;
-		};
+		}
 		
 		//Obs: Podemos fazer outros testes referentes ao 
 		//processo que o thread pertence.
@@ -229,23 +212,19 @@ void task_switch()
 	};
 	//...	
 	
-	//
 	// Contagem.
 	//            step: Quantas vezes ela já rodou no total.
 	//    runningCount: Quanto tempo ela está rodando antes de parar.
-	//
+
 	Current->step++;          
 	Current->runningCount++;
 	
-	//
 	// @todo: Agora a estrutura de processo tem uma 
 	// variável double Cycles.
 	// A contagem de ticks será registrada na estrutura 
 	// do processo também.      
-	//
 
     //Outras configurações iniciais.
-	
 	
 	
 	/*
@@ -260,7 +239,8 @@ void task_switch()
 	 *                  é bom fazermos todas as checagens antes de acionarmos 
 	 *                  essa condicional.
 	 */	 
-	if(task_switch_status == LOCKED)
+	
+	if ( task_switch_status == LOCKED )
 	{    		
 	    //
 	    // @todo: 
@@ -289,7 +269,8 @@ void task_switch()
 	 * > Checamos se existem 'requests': Pedidos pendentes.
 	 *
 	 */
-	if( task_switch_status == UNLOCKED )
+	 
+	if ( task_switch_status == UNLOCKED )
 	{   
 		//
 	    // ## SAVE CONTEXT ##
@@ -443,20 +424,22 @@ try_next:
 	
 go_ahead:
     
-	//
-	// Pronto, temos uma nova thread atual.	
-	// Ela é representada pelo Conductor.
-    //
+	// Pronto, temos uma nova thread atual. Ela é representada pelo 'Conductor'.
 	
 	Current = (void *) Conductor;
 	
     // Checa a validade da estrutura.	
-    // Se for inválida, tentamos a próxima novamente.
-	// @todo: #bugbug Isso pode gerar um loop infinito.
+    // Se for inválida, tentamos a próxima novamente pegando o próximo da lista;
+	
+	// ## BUGBUG ## : 
+	// Se Current for NULL, certamente não teremos uma next, e teremos uma PF
+	// ao tentarmos acessar a estrutura. Para tratar isso podemos tentar 
+	// reescalonar antes de tentarmos novamente, daí estrutura vai ser válida.
 	
 	if( (void *) Current == NULL )
 	{ 
 	    //#bugbug Isso pode gerar um loop infinito.
+		KiScheduler ();
 		goto try_next;  
 	}else{
 		
@@ -608,12 +591,9 @@ done:
 	// Checar se não é maior que o número máximo de índices 
 	// que a lista suporta.
 	
-	if( Current->ownerPID < 0 || 
-	    Current->ownerPID >= PROCESS_COUNT_MAX )
-	{
-		//fail;
-		printf("taskswitch: ownerPID fail \n", 
-		    Current->ownerPID );
+	if ( Current->ownerPID < 0 || Current->ownerPID >= THREAD_COUNT_MAX ){
+		
+		printf("taskswitch: ownerPID fail \n", Current->ownerPID );
 		die();
 	};
 	

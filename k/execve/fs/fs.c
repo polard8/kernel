@@ -72,9 +72,10 @@ fail:
 
 
 /*
+ *******************************************************
  * fsListFiles:
- *     Lista os arquivos em um diretório, dados
- * os indices de disco, volume e diretório.
+ *     Lista os arquivos em um diretório, dados os índices de disco, 
+ * volume e diretório.
  * #test 
  */				  
 void 
@@ -83,33 +84,26 @@ fsListFiles( int disk_id,
 			 int directory_id )
 {
 	printf("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
-	    disk_id, volume_id, directory_id);
+	    disk_id, volume_id, directory_id );
 
-    //
 	// @todo: Checar mais limites.
-	//
 	
-	if( disk_id == -1 || 
-	    volume_id == -1 || 
-		directory_id == -1 )
+	if ( disk_id == -1 || 
+	     volume_id == -1 || 
+		 directory_id == -1 )
 	{
 		goto fail;	
 	}
 	
 	
-	//
 	// Show!
-	//
 	
-	
-	//
 	// Se o diretório selecionado é o diretório raiz 
 	// do VFS.
-	//
 	
-	if( current_disk == 0 && 
-	    current_volume == 0 &&
-		current_directory == 0 )
+	if ( current_disk == 0 && 
+	     current_volume == 0 &&
+		 current_directory == 0 )
 	{
 	    vfsListFiles();
         goto done;		
@@ -239,6 +233,34 @@ done:
 */
 
 
+int fsList ( const char *dir_name ){
+	
+	// #todo
+	// #obs: Precisamos checar na estrutura de diretório as 
+	// informações sobre o diretório em questão.
+
+	
+	//#test
+	//boot volume
+	if ( strncmp( (char *) dir_name, "volume1", 7 ) == 0 )
+	{
+		
+		//#todo:
+		//pegar na estrutura do diretório as informações sobre 
+		// esse diretório.
+		
+		//# improvisando os valores.
+		fsFAT16ListFiles ( "Boot Volume:\n",            //name 
+		    (unsigned short *) VOLUME1_ROOTDIR_ADDRESS, //address
+			256 );		                                //number of entries
+	};
+	
+	//...
+	
+	return (int) 0;
+};
+
+
 /*
  ********************************************************
  * fsFAT16ListFiles:
@@ -265,11 +287,11 @@ fsFAT16ListFiles( const char *dir_name,
 	unsigned short *DirBaseAddress = (unsigned short *) dir_address;
 	
 	
-	if( number_of_entries <= 0 ){
+	if ( number_of_entries <= 0 ){
 		return;
 	}
 	
-	printf("fsListFiles: Listing names in %s ...\n", dir_name);
+	printf("fsListFiles: Listing names in [%s]\n", dir_name );
 	
     
 	// Mostra.
@@ -292,6 +314,7 @@ fsFAT16ListFiles( const char *dir_name,
 	
 	//printf("fsListFiles: done\n");
 	printf ("Done\n");	
+	refresh_screen();
 	//return; 
 };
 

@@ -29,6 +29,14 @@
  *     //...
  */
 
+ /*
+  * #importante:
+  * Para implementarmos um scheduler como um processo, devemos separar 
+  * as funções em funções de biblioteca e funções primitivas, que serão 
+  * aquelas presentes no stub do scheduler. As funções primitivas 
+  * serão as mesmas para todos os schedulers que criarmos.
+  */
+ 
 
 #include <kernel.h>
 
@@ -71,15 +79,13 @@
  *     O scheduler deve sempre pegar da fila do dispatcher.
  *
  */
-int 
-scheduler()
-{
+int scheduler (){
+	
 	int Index;
 	struct thread_d *Thread;
 
-	//
+	// spiritual quote:
 	// Constrói um caminho de vagões para o condutor andar.
-	//
 
 	//Usado para task switch.
 	Conductor = (void *) rootConductor;
@@ -94,7 +100,6 @@ scheduler()
 	//Thread idle em ring 0.
 	Conductor2->Next = (void *) threadList[next_thread];  
 	
-	//
 	// Obs: 
 	// ## IMPORTANTE  ##
 	// Os primeiros tipos a se pegar são os de 
@@ -104,9 +109,7 @@ scheduler()
 	// i/o de disco.
 	// Elevar a prioridade da thread associada a janela 
 	// com o foco de entada.
-	//
 
-	//
 	// Obs: 
 	// ## IMPORTANTE  ##	
 	// A thread idle somente é usada quando o sistema 
@@ -114,22 +117,17 @@ scheduler()
 	// E é importante que a thread idle seja usada, pois 
 	// ela tem as instruções sti/hlt que atenua a utilização 
 	// da CPU, reduzindo o consumo de energia.
-	//
 
-	//
 	// Agora, antes de tudo, devemos pegar as threads 
 	// nas listas onde estão as threads de maior prioridade.
-	//
 
 	//Encontra o id da thread de maior prioridade entre as 
 	// threads que estão no estado READY.
 	//KiFindHigherPriority();
 
-	//
 	// ## Importante  ##
 	// Daqui pra baixo pegaremos na lista threadList[] 
 	// onde estão todas as threads.
-	//
 
     //@todo pegar primeiro por prioridade.	
 
@@ -171,14 +169,15 @@ scheduler()
 	*/
 
 	//READY.
-	for( Index=0; Index < THREAD_COUNT_MAX; Index++ )
+	for ( Index=0; Index < THREAD_COUNT_MAX; Index++ )
 	{
 		Thread = (void *) threadList[Index];
-		if( (void *) Thread != NULL )
+		
+		if ( (void *) Thread != NULL )
 		{
-			if( Thread->used == 1 && 
-			    Thread->magic == 1234 && 
-				Thread->state == READY )
+			if ( Thread->used == 1 && 
+			     Thread->magic == 1234 && 
+				 Thread->state == READY )
 			{
 			    Conductor2 = (void *) Conductor2->Next; 
 				Conductor2->Next = (void *) Thread;
@@ -187,7 +186,6 @@ scheduler()
 		};
 		//Nothing.
 	};
-
 
 	/*
 	//READY. again (de traz pra frente.
@@ -237,7 +235,7 @@ scheduler()
 	Conductor2 = (void *) Conductor2->Next; 
 	Conductor2->Next = NULL;
 
-done:
+//done:
     return (int) Conductor2->tid;
 };
 
@@ -255,45 +253,38 @@ done:
  *
  */
 //void schedulerStart()
-void scheduler_start()
-{  
+void scheduler_start (){
+	
     scheduler_lock();     //Lock Scheduler.
 	set_current(IDLE);    //Set current.
 	
 	//...
 
-done:
-	return;
+//done:
+//	return;
 };
 
 
 /*
+ ****************************************
  * scheduler_lock:
  *     Trava o scheduler.
- *     @todo: Mudar para schedulerLock().
- *
  */
-//void schedulerLock()
-void 
-scheduler_lock()
-{
+void scheduler_lock (){
+	
     g_scheduler_status = (unsigned long) LOCKED;
-	//return;
 };
 
 
 /*
+ ********************************************
  * scheduler_unlock:
  *     Destrava o scheduler.
- *     @todo: Mudar para schedulerUnlock().
- *
  */  
 //void schedulerUnlock() 
-void 
-scheduler_unlock()
-{
+void scheduler_unlock (){
+	
     g_scheduler_status = (unsigned long) UNLOCKED;
-	//return;
 };
 
 
@@ -328,15 +319,13 @@ void new_task_scheduler()
  *    #burbug: faz o mesmo que scheduler_start.
  */
 //void schedulerInit()
-void init_scheduler()
-{
-	//
+void init_scheduler (){
+	
 	// @todo: Implementar inicialização de variaveis do scheduler.
 	//        O nome poderia ser schedulerInit().
 	//        Formato de classes.Init é um método. 
-	//
 
-	return;    //Não implementada.
+//	return;    //Não implementada.
 };
 
 

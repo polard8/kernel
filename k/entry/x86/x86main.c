@@ -70,9 +70,6 @@ extern unsigned long SavedBootMode;
 extern void turn_task_switch_on();
 
 
-
-
-
 char copyright[] =
 "Copyright (c) 2005-2018\n\tFred Nora.  All rights reserved.\n\n";
 
@@ -80,7 +77,6 @@ char copyright[] =
 static inline void mainSetCr3 ( unsigned long value ) {
     __asm__ ( "mov %0, %%cr3" : : "r"(value) );
 };
-
 
 
 /*
@@ -95,12 +91,12 @@ static inline void mainSetCr3 ( unsigned long value ) {
  *           startIdleThread().
  *
  */
-void startStartIdle () 
-{
+void startStartIdle (){
+	
     int i;
  
     if ( (void *) IdleThread == NULL )
-    {		
+    {
         printf("main-startStartIdle: IdleThread\n");
         die();
     }else{
@@ -120,18 +116,18 @@ void startStartIdle ()
     };
 
     // State  
-    if( IdleThread->state != STANDBY ){
+    if ( IdleThread->state != STANDBY ){
         printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
         die();
     }
 
     // * MOVEMENT 2 ( Standby --> Running)
-    if( IdleThread->state == STANDBY ){
+    if ( IdleThread->state == STANDBY ){
         IdleThread->state = RUNNING;
         queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_RUNNING);
     }
-	
-	
+
+
 	//Current process.
 	current_process = IdleThread->process->pid;
 	
@@ -143,7 +139,7 @@ void startStartIdle ()
     //refresh_screen(); //@todo:  
 
 
-    for( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
+    for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) IdleThread;
     }
 
@@ -157,19 +153,16 @@ void startStartIdle ()
     asm("movl %eax, %cr3");
 
 
-    /*
-     * turn_task_switch_on:
+    /* turn_task_switch_on:
      * + Creates a vector for timer irq, IRQ0.
-     * + Enable taskswitch.
-     */
+     * + Enable taskswitch. */
+	 
     turn_task_switch_on();
-
 
     timerInit8253();
 	
 	//parece que isso é realmente preciso, libera o teclado.
 	//outb(0x20,0x20); 
-
    
 	// # go!
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 
@@ -217,7 +210,7 @@ int x86main ( int argc, char *argv[] ){
     // #test.
     // initializing zorder list.
     
-    for( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
+    for ( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
         zorderList[zIndex] = (unsigned long) 0;
     }
 
@@ -228,11 +221,9 @@ int x86main ( int argc, char *argv[] ){
     SetProcedure( (unsigned long) &system_procedure);
 
 
-    //
     // Video.
     // First of all.
     // ps: Boot loader is mapping the LFB.
-    //
 
 //setupVideo:
 
@@ -240,7 +231,8 @@ int x86main ( int argc, char *argv[] ){
     // Device screen sizes.
 
     //Set graphics mode or text mode using a flag.
-    if(SavedBootMode == 1){
+    if ( SavedBootMode == 1 ){
+		
         g_useGUI = GUI_ON;
         VideoBlock.useGui = GUI_ON;
         //...
@@ -258,20 +250,17 @@ int x86main ( int argc, char *argv[] ){
     videoVideo();
     videoInit();
 	
-
-    //
     // Init screen
-    //
 
 #ifdef KERNEL_VERBOSE	
     //If we are using graphics mode.
-    if(VideoBlock.useGui == GUI_ON){
-        printf("kMain: Using GUI\n");
+    if (VideoBlock.useGui == GUI_ON){
+        printf("x86main: Using GUI\n");
     }
 #endif
 
     //If we are using text mode.
-    if(VideoBlock.useGui != GUI_ON)
+    if (VideoBlock.useGui != GUI_ON)
 	{
         set_up_text_color(0x0F, 0x00);
 
@@ -282,13 +271,13 @@ int x86main ( int argc, char *argv[] ){
     //Debug.
 #ifdef KERNEL_VERBOSE
         kclear(0);
-        kprint("kMain: Debug" ,9 ,9 );
-        printf("kMain: Text Mode!\n");
+        kprint("x86main: Debug" ,9 ,9 );
+        printf("x86main: Text Mode\n");
 #endif
     };
 
 #ifdef KERNEL_VERBOSE
-    printf("kMain: Starting kernel...\n");
+    printf("x86main: Starting kernel..\n");
     refresh_screen(); 
 #endif
 
@@ -297,46 +286,41 @@ int x86main ( int argc, char *argv[] ){
     systemSystem();	
     Status = (int) systemInit();
 	
-    if ( Status != 0 )
-	{
-        printf("main-kMain: systemInit\n");
+    if ( Status != 0 ){
+        printf("x86main: systemInit\n");
         KernelStatus = KERNEL_ABORTED;
         goto fail;
-    };
+    }
 	
 	
-	//
 	//  ## Processes ##
-	//
 
-    //
     //=================================================
     // processes and threads initialization.
     // Creating processes and threads.
     // The processes are: Kernel, Idle, Shell, Taskman.
     // ps: The images are loaded in the memory.
-    //
 
 //createProcesses:
 
     // Creating Kernel process. PID=0.
     KernelProcess = (void *) create_process( NULL, // Window station.
-	                                        NULL, // Desktop.
-											NULL, // Window.
-											(unsigned long) 0xC0001000,  // Entry point. 
-                                            PRIORITY_HIGH,               // Priority.
-											(int) 0,                     // ppid.
-											"KERNEL-PROCESS",            // Name.
-											RING0,                       // iopl. 
-											(unsigned long ) KERNEL_PAGEDIRECTORY ); // Page directory.	
-    if( (void*) KernelProcess == NULL )
+	                                         NULL, // Desktop.
+											 NULL, // Window.
+											 (unsigned long) 0xC0001000,  // Entry point. 
+                                             PRIORITY_HIGH,               // Priority.
+											 (int) 0,                     // ppid.
+											 "KERNEL-PROCESS",            // Name.
+											 RING0,                       // iopl. 
+											 (unsigned long ) KERNEL_PAGEDIRECTORY ); // Page directory.	
+    if( (void *) KernelProcess == NULL )
 	{
-        printf("main-kMain: KernelProcess\n");
+        printf("x86main: KernelProcess\n");
         die();
     }else{
  
-        processor->CurrentProcess = (void*) KernelProcess;
-        processor->NextProcess    = (void*) KernelProcess;
+        processor->CurrentProcess = (void *) KernelProcess;
+        processor->NextProcess = (void *) KernelProcess;
         //...
     };
 
@@ -351,9 +335,9 @@ int x86main ( int argc, char *argv[] ){
 										  "IDLEPROCESS", 
 										  RING3, 
 										  (unsigned long ) KERNEL_PAGEDIRECTORY );	
-    if((void*) InitProcess == NULL)
+    if ( (void *) InitProcess == NULL )
 	{
-        printf("main-kMain: InitProcess\n");
+        printf("x86main: InitProcess\n");
         die();
     }else{
         //processor->IdleProcess = (void*) IdleProcess;	
@@ -370,7 +354,7 @@ int x86main ( int argc, char *argv[] ){
 										   RING3, 
 										   (unsigned long ) KERNEL_PAGEDIRECTORY );	
     if((void *) ShellProcess == NULL){
-        printf("main-kMain: ShellProcess\n");
+        printf("x86main: ShellProcess\n");
         die();
     }else{
         //...
@@ -388,36 +372,30 @@ int x86main ( int argc, char *argv[] ){
 											 "TASKMANPROCESS", 
 											 RING3, 
 											 (unsigned long ) KERNEL_PAGEDIRECTORY );	
-    if((void *) TaskManProcess == NULL){
-        printf("main-kMain: TaskManProcess\n");
+    if ( (void *) TaskManProcess == NULL ){
+        printf("x86main: TaskManProcess\n");
         die();
     }else{
         //...
     };
 	
 	
-	
-	//
 	//  ## Threads  ##
-	//
 	
-
-    //
     // Creating threads. 
     // The threads are: Idle, Shell, Taskman.
     // The Idle thread belong to Idle process.
     // The Shell thread belongs to Shell process.
     // The Taskman thread belongs to Taskman process.
-    //
 
 //createThreads:
 
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
     IdleThread = (void*) KiCreateIdle();
-    if( (void *) IdleThread == NULL )
+    if ( (void *) IdleThread == NULL )
 	{
-        printf("main-kMain: IdleThread\n");
+        printf("x86main: IdleThread\n");
         die();
     }else{
 
@@ -436,7 +414,7 @@ int x86main ( int argc, char *argv[] ){
     ShellThread = (void *) KiCreateShell();
     if( (void *) ShellThread == NULL )
 	{
-        printf("main-kMain: ShellThread\n");
+        printf("x86main: ShellThread\n");
         die();
     }else{
 
@@ -449,7 +427,7 @@ int x86main ( int argc, char *argv[] ){
     TaskManThread = (void *) KiCreateTaskManager();
     if( (void *) TaskManThread == NULL )
 	{
-        printf("main-kMain: TaskManThread\n");
+        printf("x86main: TaskManThread\n");
         die();
     }else{
 
@@ -465,7 +443,7 @@ int x86main ( int argc, char *argv[] ){
     RING0IDLEThread = (void *) KiCreateRing0Idle();
     if( (void *) RING0IDLEThread == NULL )
 	{
-        printf("main-kMain: RING0IDLEThread\n");
+        printf("x86main: RING0IDLEThread\n");
         die();
     }else{
 
@@ -495,8 +473,7 @@ int x86main ( int argc, char *argv[] ){
     
 	if ( Status != 0 )
 	{    
-        //MessageBox(gui->screen,1,"main-kMain","debug");
-        printf("kMain: debug\n");
+        printf("x86main: debug\n");
 		KernelStatus = KERNEL_ABORTED;
         goto fail;
     }else{
@@ -504,10 +481,8 @@ int x86main ( int argc, char *argv[] ){
     };
 
 
-    //
     // TESTS:
-    // We can make some testes here.
-    //
+    // We can make some tests here.
 
 
     //Inicializando as variáveis do cursor piscante do terminal.
@@ -518,8 +493,6 @@ int x86main ( int argc, char *argv[] ){
 
 //doTests:
    //...
-
- 
 	
     // Initializing ps/2 controller.
 	//unblocked/ldisc.c
@@ -643,18 +616,16 @@ int x86main ( int argc, char *argv[] ){
 	// ## Testando font nelson Cole 2 ##
     gwsInstallFont("NC2     FON");
 	
-	//
 	// ## Criando a janela do servidor taskman ## 
 	// usada para comunicação.
-	//
 	
-	gui->taskmanWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "taskman-server-window", 
+	gui->taskmanWindow = (void *) CreateWindow( 1, 0, VIEW_MINIMIZED, "taskman-server-window", 
 	                             1, 1, 1, 1,           
 							     gui->main, 0, 0, COLOR_WINDOW  ); 
 								 
-	if( (void *) gui->taskmanWindow == NULL )
+	if ( (void *) gui->taskmanWindow == NULL )
 	{
-		printf("kMain: falaha ao criar a janela do servidor taskman\n");
+		printf("x86main: falaha ao criar a janela do servidor taskman\n");
 		die();
 	}else{
 		
@@ -730,7 +701,6 @@ int x86main ( int argc, char *argv[] ){
 	*/
 	
 
-	
 	//
     // RETURNING !
     //
@@ -750,15 +720,10 @@ done:
     };
 
 fail:
-    MessageBox(gui->screen,1,"main-kMain","EXIT_FAILURE");
-    refresh_screen();
+    printf("x86main: EXIT_FAILURE \n");
+	refresh_screen();
     return (int) EXIT_FAILURE;
 };
-
-
-
-
-
 
 
 //

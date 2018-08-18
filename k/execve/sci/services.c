@@ -1164,6 +1164,7 @@ void *services( unsigned long number,
 						 arg4);  //directory id
 			break;
 			
+			
 		//174
 		case SYS_SEARCHFILE:
 		    return (void*) KiSearchFile( (unsigned char *) arg2, 
@@ -1186,6 +1187,11 @@ void *services( unsigned long number,
 		    fs_pathname_backup( (char *) current_workingdiretory_string, 
 			    (int) arg3 );
 			break;
+			
+		//listando arquivos em um diretório dado o nome.	
+		case 177:
+		    fsList( (const char *) arg2 );
+            break;		
 			
 			
 		// # test #	

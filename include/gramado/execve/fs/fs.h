@@ -852,6 +852,8 @@ void fs_check_disk();
 
 void fsCreateVFS();
 
+int fsList( const char *dir_name );
+
 void fsListFiles( int disk_id, 
                   int volume_id, 
 				  int directory_id );
