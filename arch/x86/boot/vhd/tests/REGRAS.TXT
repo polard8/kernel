@@ -1,0 +1,81 @@
+### REGRAS DO GRUPO ###
+
+### 1 - Adesão: Somente será permitido a adesão ao grupo 
+os indivíduos que responderem, de forma satisfatória, 
+as seguintes questões 
+(através de funcionalidade própria do Facebook):
+
+?Costuma ler as regras e segui-las?
+?Tem conhecimento na área ou é somente um curioso?
+?Qual o real interesse em participar do grupo?
+
+§1)O candidato que não responder as questões no prazo de 
+DOZE HORAS terá seu pedido de ingresso negado.
+§2) Os presentes membros ficam dispensados de 
+responder o questionário citado.
+§3) Uma nova adesão é vetada para os 
+indivíduos que foram banidos.
+
+### 2 - Permanência: A permanência no grupo está condicionada 
+ao cumprimento de todas as regras.
+§1) Em caso de descumprimento o membro deverá ser notificado.
+§2) Em casos graves o membro será sumariamente removido.
+
+### 3 - As penalidades, adequadas às funcionalidades do Facebook, 
+segundo suas faltas são:
+§1) Leve - Advertência.
+§2) Média – Advertência, seguida de silenciamento, 
+com obrigação de retratação no retorno.
+§3) Grave - Remoção. O membro será removido do grupo, 
+podendo este ser adicionado novamente ao grupo somente uma vez.
+§4) Gravíssima - Banimento. O membro será banido, não podendo 
+este enviar solicitação para participar novamente.
+§5) Em caso de reincidência a pena será acrescida um nível.
+
+### 4 - Os novos membros, no momento de seu ingresso ou 
+em até TRÊS DIAS, deverão se apresentar ao grupo, em post próprio, 
+com as seguintes informações:
+§1) A HASHTAG #Apresentação.
+§2) Nome, caso não utilize o nome verdadeiro no perfil. 
+(Não é necessário que seja o nome completo).
+§3) Forma como conheceu o grupo. (Por amigo, página, site, etc...).
+§4) Conhecimento ou formação na área de TI.
+§5) Linguagens conhecidas (com ou sem domínio).
+§6) Motivo de interesses por SOs, Kernels, etc...
+§7) A apresentação deverá ser direta sem enumeração de itens.
+
+### 5 - Além dos itens da regra anterior o novo membro poderá, 
+por vontade própria, na apresentação constar os seguintes itens:
+§1) Idade.
+§2) Região/Estado.
+§3) Profissão/Tempo. (Sem detalhes, somente ramo de atividade).
+§4) Projetos dos quais participa e aspirações pessoais (projetos).
+
+### 6 - A não apresentação dentro do prazo, ou apresentação 
+DIFERENTE das regras #4 e #5, caracteriza falta Leve.
+
+### 7 - Fica terminantemente proibido:
+§1) Desrespeito aos demais membros. [Média] 
+(Tempo de silenciamento a critério do Moderador)
+§2) Postagem de conteúdo pornográfico ou violento. [Grave]
+§3) No caso do parágrafo anterior ter sido realizado por 
+ação involuntária, por exemplo vírus, a pena não será aplicada 
+desde que os conteúdos sejam imediatamente removidos.
+§4) Postagem que não tenha ligação com o assunto do post 
+ou do grupo. [Leve]
+§5) Não tomar providências para remoção de vírus assim que avisado. 
+[Média] (Tempo de silenciamento de 24 hs)
+§6) Publicar código fonte diretamente nas postagens, 
+exceto em se tratando de poucas linhas (a critério do Moderador). 
+Use, preferencialmente, um Pastebin. [Leve]
+§7) Publicar arquivos que não sejam código fonte ou PDFs. 
+[Média] (Tempo de silenciamento de 12 hs)
+§8) Contrariar orientação direta da moderação. [Grave]
+§9) Desviar o assunto do post para convicções pessoais 
+fora do âmbito técnico. [Média]
+
+### 8 - Qualquer postagem ou comentário que esteja em 
+desacordo com as regras será sumariamente removida.
+
+### 9 - Todas as apresentações constantes da regra #4 
+ficarão indexadas em uma publicação. 

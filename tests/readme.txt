@@ -1,0 +1,1 @@
+Nesse diretório ficam os aplicativos de teste do sistema.
