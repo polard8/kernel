@@ -1,6 +1,0 @@
-
-
-/sci   system call interface 
-
-
- 
