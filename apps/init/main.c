@@ -84,27 +84,27 @@ unsigned long idleServices(unsigned long number);  //Principal.
 
 
 
-static inline void pause(void) 
-{ 
+static inline void pause (void){
+	
     asm volatile("pause" ::: "memory"); 
-} 
+}; 
 
 
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
-static inline void rep_nop(void)
-{
+static inline void rep_nop (void){
+	
 	__asm__ __volatile__("rep;nop": : :"memory");
-}
+};
 
 
-#define cpu_relax()		rep_nop()
+#define cpu_relax()  rep_nop()
 
 
 //Another loop.
-void idleLoop()
-{
-    while(1)
-	{
+void idleLoop (){
+	
+    while (1){
+		
 		pause();
 		pause();
 		pause();
@@ -119,7 +119,7 @@ void idleLoop()
 
  
 /*
- *********************************************************
+ ************************
  * initMain:
  *     main().
  *
@@ -127,8 +127,8 @@ void idleLoop()
 static char * argv[] = { "-init",NULL };
 static char * envp[] = { "ROOT=root:/volume0", NULL };
 
-void initMain(void)
-{
+void initMain (void){
+	
 	//nothing for now.
 };
 
@@ -144,8 +144,8 @@ void initMain(void)
  * serviço, 129 e o código de confirmação, 1234. 4321.
  *
  */
-void driverInitialize()
-{
+void driverInitialize (){
+	
 	// Inicializando o servidor.
 	ServerStatus = 1;
 		
@@ -155,10 +155,11 @@ void driverInitialize()
 	
 	//system_call( 129, 4321, 4321, 4321 );	
 	
-done:	
-	printf("IDLE.BIN: Initialized.\n");
-	refresh_screen();
-	return;
+//done:	
+	printf("IDLE.BIN: Initialized\n");
+	
+	//refresh_screen();
+	//return;
 };
 
 
@@ -169,8 +170,8 @@ done:
  * driver, this is where the driver would clean up any resources held by 
  * this driver. (m$)
  */
-void driverUninitialize()
-{
+void driverUninitialize (){
+	
 	// Finalizando o servidor.
 	ServerStatus = 0;
 	
@@ -193,10 +194,11 @@ void driverUninitialize()
 	//talvez 128. 127 126..???
 	//system_call( ?? , 4321, 4321, 4321 ); 		
 	
-done:	
-	printf("IDLE.BIN: Uninitialized.\n");
-	refresh_screen();
-	return;
+//done:	
+	printf("IDLE.BIN: Uninitialized\n");
+	
+	//refresh_screen();
+	//return;
 };
 
 
@@ -208,15 +210,14 @@ done:
  * Essa deve ficar por último e ter acesso à qualquer rotina acima ou em
  * bibliotecas incluídas.
  */
-unsigned long idleServices(unsigned long number)
-{
+unsigned long idleServices (unsigned long number){
   
     //
     //  ## O servidor precisa estar inicializado ##
     //
 	
 	// Checando se o servidor está inicializado.
-	if(ServerStatus != 1)
+	if (ServerStatus != 1)
 	{
 		// Erro !
 		return (unsigned long) 1;    
@@ -227,7 +228,7 @@ unsigned long idleServices(unsigned long number)
 	// Selecionar o serviço.
 	//
 	
-    switch(number)
+    switch (number)
     {
 		case 0:
 		    printf("Idle Driver: NULL service.\n");
@@ -248,8 +249,9 @@ unsigned long idleServices(unsigned long number)
 	};	
 	
 	
-done:
-    refresh_screen(); 
+//done:
+    //refresh_screen(); 
+	
     return (unsigned long) 0;	
 };
 
@@ -258,8 +260,8 @@ done:
  * idleInit:
  *     Inicializando a aplicação Idle.
  */
-int idleInit()
-{
+int idleInit (){
+	
 	idleStatus = 0;
 	idleError = 0;
 	
@@ -268,7 +270,6 @@ int idleInit()
 	//...
 	return (int) 0;
 };
-
 
 
 //

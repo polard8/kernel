@@ -1,11 +1,14 @@
 /* alias.h -- structure definitions. */
 
+
 #ifndef _ALIAS_
 #define _ALIAS_
+
 
 #ifndef whitespace
 #define whitespace(c) (((c) == ' ') || ((c) == '\t'))
 #endif
+
 
 #ifndef savestring
 #define savestring(x) (char *)strcpy (xmalloc (1 + strlen (x)), (x))
@@ -14,11 +17,12 @@
 
 typedef struct assoc_d assoc_t;
 typedef struct assoc_d ASSOC;
-struct assoc_d
+struct assoc_d 
 {
     char *name;
     char *value;
 };
+
 
 //#ifndef NULL
 //#define NULL 0x0

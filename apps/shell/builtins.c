@@ -20,15 +20,15 @@
 #include "builtins.h"
 
 
-void cd_buitins()
-{
+void cd_buitins (){
+	
 	printf("cd_buitins:\n");
 };
 
 
 //cls
-void cls_builtins()
-{
+void cls_builtins (){
+	
     shellClearScreen();
     shellSetCursor(0,0);	
 };
@@ -52,8 +52,8 @@ void del_builtins()
 };
 
 
-void dir_builtins()
-{
+void dir_builtins (){
+	
 	//
 	// @todo: get set disk id e directory id.
 	//
@@ -71,80 +71,84 @@ void dir_builtins()
 
 //echo command.
 //imprimir a lista de comandos de uma linha de comandos.
-void echo_builtins(char *list[])
-{
+void echo_builtins (char *list[]){
+	
     shell_print_tokenList( list, " ");
 	//shell_print_tokenList( list, "/");
 };
 
 
-void exec_builtins()
-{
+void exec_builtins (){
+	
     printf("@todo: ~exec\n");	
 };
 
 
-void exit_builtins()
-{
-    printf("~exit\n");
-	printf("Exiting shell process ...\n");
+void exit_builtins (){
+	
+    //printf("~exit\n");
+	printf("Exiting shell process..\n");
 	exit(0);	
 };
 
 
-int getpid_builtins()
-{
+int getpid_builtins (){
+	
     shellShowPID();	
+	
 	return (int) 0; 
 };
 
 
-int getppid_builtins()
-{
+int getppid_builtins (){
+	
 	shellShowPPID();
+	
 	return (int) 0;
 };
 
 
-int getuid_builtins()
-{
+int getuid_builtins (){
+	
 	shellShowUID();
+	
 	return (int) 0;
 };
 
 
-int getgid_builtins()
-{
+int getgid_builtins (){
+	
 	shellShowGID();
+	
 	return (int) 0;
 };
 
 
-void help_builtins(int arg)
-{
-	switch( arg )
+void help_builtins (int arg){
+	
+	switch (arg)
 	{
 		//all
 		case 1:
-		    printf("Show all help topics.\n");
+		    printf("Show all help topics\n");
 			shellHelp();
 		    break;
 		//min
 		case 2:
-		    printf("cls, help, exit ...\n");
+		    printf("cls, help, exit..\n");
 			break;
 		
 		default:
-			shellHelp();
+			shellHelp ();
 			break;
 			
-	}
-}
+	};
+};
 
 
-void pwd_builtins()
-{
+void pwd_builtins (){
+	
     //printf("~pwd - print working directory\n");
-    system_call(170,0,0,0);		
+    system_call ( 170, 0, 0, 0 );		
 };
 

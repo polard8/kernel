@@ -28,23 +28,6 @@
 ;     2016 - Revision.
 ;
 
-;;
-;; codename db 'miami'
-;;
-
-
-segment .head_x86
-
-
- 
-[bits 32]
-
-
- 
- 
-
-
-	;
 	; Atuando como driver:
 	; ====================
 	; Para o Kernel utilizar esse processo como driver, ele precisa linkar 
@@ -54,9 +37,7 @@ segment .head_x86
 	; driver. Logo após inicializarmos o driver, enviaremos uma mensagem para 
 	; o Kernel na forma de system call, então o Kernel linkará ao sistema o 
 	; driver inicializado.
-	;
 
-	;
 	; Testar se devemos ou não inicializar o driver:
 	; ==============================================
 	; O Kernel envia uma flag no registrado edx, se a flag for encontrada,
@@ -64,7 +45,12 @@ segment .head_x86
 	;
 	; Status do teste: Ok, funcionou. Podemos usar outros argumentos para 
 	; efetuarmos outras operações no driver. Como uninitilization.
-	;
+
+
+segment .head_x86
+
+ 
+[bits 32]
 
 	
 ;;============================================
@@ -77,6 +63,7 @@ segment .head_x86
 ;;     + edx comtém uma flag.
 ;;     + EAX={Número do serviço solicitado.}
 ;;
+
 global _idle_entry_point              
 _idle_entry_point:
     nop
@@ -88,26 +75,28 @@ _idle_entry_point:
 	
 	;Inicializa o servidor INIT.
 	cmp edx, dword 0x00001234
-    je do_InitializeDriver    	     ;; Initialize driver.	
+    je do_InitializeDriver    	     
 	
 	;Finaliza o servidor INIT.
 	cmp edx, dword 0x00004321
-	je do_UninitializeDriver        ;; Uninitialize driver.
+	je do_UninitializeDriver        
 	
 	;Chama algum serviço do servidor se ele estiver inicializado.
-	cmp edx, dword 0x12345678       ;; Magic para usar serviços do servidor.
+	;; Magic para usar serviços do servidor.
+	cmp edx, dword 0x12345678       
 	je do_services
 	
 .default:
     nop
 	
 	;;
-	;;    * IDLE LOOP
+	;; *IDLE LOOP
 	;;
 	
 ;;#bugbug
 ;;Normalmente a thread idle deve ficar em kernelmode
 ;;para invocar a instrução hlt	
+
 IdleLoop:
     NOP
 	PAUSE
@@ -119,14 +108,16 @@ IdleLoop:
 	
 	
 	
-;;====================================================================	
+;;======================	
 ;; do_initMain:
 ;;
 ;;  ## Sem argumentos.  ##
 ;;
+
 extern _initMain
 do_initMain:
-	call _initMain 
+    
+    call _initMain 
     jmp	IdleLoop
 	
 	
@@ -168,35 +159,24 @@ do_services:
 	cmp edx, dword 0x12345678       
 	jne .fail
 
-	;;#EDX
-	;Limpa a magic.
+	;;#EDX Limpa a magic.
+	;;#ECX colocar o argumento 2 na pilha
+	;;#EBX colocar o argumento 1 na pilha
+	;;#EAX Coloca o número do serviço na pilha.
+	
 	xor edx, edx 
-	
-	;;#ECX
-	;colocar o argumento 2 na pilha
 	push ecx
-
-	;;#EBX
-	;colocar o argumento 1 na pilha
 	push ebx
-	
-	;;#EAX
-	;; Coloca o número do serviço na pilha.
 	push eax
 	
-
-	;;
 	;;  ## Chama o serviço solicitado ##
-	;;
-	
 	
     call _idleServices 
 	mov dword [.ret_val], eax
 	
 	
-	;;
+	;; @todo:
 	;; Aqui podemos fazer alguma coisa com o valor retornado.
-	;;
 	
 .fail:	
     nop	
@@ -204,8 +184,9 @@ do_services:
     JMP IdleLoop     	
 	
 	
-.ret_val: dd 0
+.ret_val: 
+    dd 0
 
 ;
-;End.
+; End.
 ;

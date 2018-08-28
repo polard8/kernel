@@ -83,6 +83,22 @@ int taskmanagerBufferPos;
 //FILE *taskmanOutput;
 
 
+static inline void pause (void){
+	
+    asm volatile("pause" ::: "memory"); 
+}; 
+
+
+/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
+static inline void rep_nop (void){
+	
+	__asm__ __volatile__("rep;nop": : :"memory");
+};
+
+
+#define cpu_relax()  rep_nop()
+
+
 //
 // Protótipos de funções internas.
 //
@@ -132,25 +148,20 @@ int tmInit();
 
 
 
-//
-//
-//
-
-
 /*
  * sleep:
  *     Apenas uma espera, um delay.
  */
-void tmSleep(unsigned long ms) 
-{
+void tmSleep (unsigned long ms){
+	
     unsigned long t = (ms*512);
 	
 	do{
 	    --t;
 	}while(t > 0);
 
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
@@ -160,13 +171,13 @@ done:
  *     Se retornar 1234 (MAGIC) é um processo válido.
  *
  */
-int tmProbeProcessList(int pid)
-{
+int tmProbeProcessList (int pid){
+	
 	//if(pid < 1){
 	//    return (int) -1; //error.	
 	//};
 	
-	return (int) system_call( SYSTEMCALL_88, pid, pid, pid );
+	return (int) system_call ( SYSTEMCALL_88, pid, pid, pid );
 };
 
  
@@ -174,22 +185,23 @@ int tmProbeProcessList(int pid)
  * tmCreateTaskBar:
  *     ??
  */
-int tmCreateTaskBar()
-{
+int tmCreateTaskBar (){
+	
 	int i;
 	int j=0;
+	
 	int Magic;
 	
 	g_cursor_x = 0;
 	g_cursor_y = 0;
 	
 	//@todo: Variável para número máximo.
-	for(i=0; i<256; i++)
+	for ( i=0; i<256; i++ )
 	{
 	    Magic = (int) tmProbeProcessList(i);
 	    
-		if(Magic == MAGIC)
-		{
+		if (Magic == MAGIC){
+			
 			    //APICreateWindow( 1, 1, 1,"Process",     
                 //                 0, j, 20, 20,    
                 //                 0, 0, 0 , COLOR_WINDOW );
@@ -198,7 +210,7 @@ int tmCreateTaskBar()
 			
 			//@TODO: #BUGBUG: Esta bagunçando tudo,
 			//pintando strings na área de cliente de otro processo.
-			printf("process magic %d\n",i);	
+			printf ("process magic %d\n", i );	
 		};
 		//Nothing
 	};
@@ -206,7 +218,7 @@ int tmCreateTaskBar()
 	
 	//nothing
 	
-Done:
+//Done:
 	return (int) 0;
 };
 
@@ -217,11 +229,14 @@ Done:
  *     O procedimento intercepta algumas mensagens e as mensagens de sistema
  * são passadas para o procedimento do sistema na opção default.
  */
-int tmProc( int junk, int message, unsigned long long1, unsigned long long2)
+int tmProc ( int junk, 
+             int message, 
+			 unsigned long long1, 
+			 unsigned long long2 )
 {
     //Filtrar mensagem.
 	
-	switch(message)
+	switch (message)
 	{
 	    case MSG_KEYDOWN:
     		switch(long1)
@@ -263,7 +278,8 @@ int tmProc( int junk, int message, unsigned long long1, unsigned long long2)
 
 	//Nothing.
 	
-done:
+//done:
+
     return (int) 0;
 };
 
@@ -272,8 +288,8 @@ done:
  * tmUpdateStatus:
  *
  */
-void tmUpdateStatus()
-{
+void tmUpdateStatus (){
+	
 	int CpuStep;
     int ActiveWindow;	
 	int wFocus;
@@ -291,21 +307,18 @@ void tmUpdateStatus()
 	
 	
 	//tmDrawBar(0x7f);
-	tmSetCursor(1,0);
+	tmSetCursor (1,0);
 		
-	printf("Task Manager: wFocus[%d] | ActiveWindow[%d] | CpuStep[%d]",wFocus
-	                                                                  ,ActiveWindow
-	                                                                  ,CpuStep );
+	printf("Task Manager: wFocus[%d] | ActiveWindow[%d] | CpuStep[%d]",
+	    wFocus, ActiveWindow, CpuStep );
 		
-	
-	
 	//Cursor.
 	tmSetCursor(0,1);
 
 	//...
 	
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
@@ -314,16 +327,15 @@ done:
  *     Desenhar uma barra em modo texto.
  *    #bugbug Não é esse o ambiente que estamos. @todo
  */
-int tmDrawBar(int color)
-{
+int tmDrawBar (int color){
+	
     unsigned int i = 0;	
 	char *vm = (char *) 0x00800000;  //g_current_vm; //phis=0x000B8000; 
 	
-	//
-	// @todo: Usar alguma função de uma biblioteca GUI em user mode.
-	//
 	
-	while(i < ( SCREEN_WIDTH * 2) ) 
+	// @todo: Usar alguma função de uma biblioteca GUI em user mode.
+	
+	while (i < ( SCREEN_WIDTH * 2) ) 
     { 
         vm[i] = 219; 
         i++; 
@@ -332,13 +344,10 @@ int tmDrawBar(int color)
         i++; 
     };
 	
-	
 	//Cursor.
 	tmSetCursor(0,0);
-    
 	
-	
-done:	
+//done:	
     return (int) 0; 
 };
 
@@ -347,22 +356,22 @@ done:
  * tmSetCursor:
  *     Configurando o cursor. (stdio.h).
  */
-void tmSetCursor(unsigned long x, unsigned long y)
-{
-	//
+void tmSetCursor (unsigned long x, unsigned long y){
+	
 	// #BUGBUG: Aconteceu uma pagefault depois de incluir essa função. 
 	// Vou testar sem ela.
-	//
 	
     //Atualizamos as variáveis dentro da estrutura da janela com o foco de entrada.
     //system_call( SYSTEMCALL_SETCURSOR, x, y, 0);	
 	
 
 //Atualizando as variáveis globais usadas somente aqui no shell.
-setGlobals:	
+//setGlobals:	
+
     g_cursor_x = (unsigned long) x;
     g_cursor_y = (unsigned long) y;	
-	return;
+	
+	//return;
 };
 
 
@@ -370,13 +379,14 @@ setGlobals:
 // strlen:
 //     Tamanho de uma string.
 // 
-size_t tmstrlen(const char *s)
-{	
+size_t tmstrlen (const char *s){
+	
     size_t i = 0;
 	
-	for(i = 0; s[i] != '\0'; ++i){ 
-	; 
+	for ( i=0; s[i] != '\0'; i++ ){ 
+	    ; 
 	};
+	
 	return ( (size_t) i );
 };
 
@@ -391,8 +401,8 @@ size_t tmstrlen(const char *s)
 //     Credits: Progress bar source code found on 
 //     codeproject.com/Tips/537904/Console-simple-progress 
 //
-void DoProgress( char label[], int step, int total )
-{
+void DoProgress ( char label[], int step, int total ){
+	
     //progress width
     const int pwidth = 72;
 
@@ -408,7 +418,8 @@ void DoProgress( char label[], int step, int total )
 
     //fill progress bar with =
 	int i;
-    for( i = 0; i < pos; i++ ){
+    
+	for ( i=0; i < pos; i++ ){
 		printf("%c", '=');
     };
 	
@@ -419,33 +430,36 @@ void DoProgress( char label[], int step, int total )
     //reset text color, only on Windows
     //SetConsoleTextAttribute(  GetStdHandle( STD_OUTPUT_HANDLE ), 0x08 );
 	
-    return;	
+    //return;	
 };
 
 
-void DoSome()
-{
+void DoSome (){
+	
     int total = 1000;
     int step = 0;
 
-    while( step < total )
-	{   
+    while ( step < total ){
+		
 		tmSleep(5000);    // Do some action.
         
 		step+=1;
         
 		DoProgress("Loading: ",step,total);
     };
+	
     // Nothing.
-done:
+//done:
     printf("\n");
-	return;
+	//return;
 };
 
 
-void progress_bar_test(){
-    DoSome();
-    return;
+void progress_bar_test (){
+    
+	DoSome();
+    
+	//return;
 };
 
 
@@ -454,8 +468,8 @@ void progress_bar_test(){
  * tmInit:
  *     Inicializações.
  */
-int tmInit()
-{
+int tmInit (){
+	
 	taskmanagerStatus = 0;
 	taskmanagerError = 0;
 	//taskmanagerBuffer = '\0'
@@ -469,25 +483,10 @@ int tmInit()
 	
 	//...
 	
-done:
+//done:
+
     return (int) 0;
 };
-
-
-
-static inline void pause(void) 
-{ 
-         asm volatile("pause" ::: "memory"); 
-} 
-
-/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
-static inline void rep_nop(void)
-{
-	__asm__ __volatile__("rep;nop": : :"memory");
-}
-
-#define cpu_relax()		rep_nop()
-
 
 
 
@@ -499,8 +498,8 @@ static inline void rep_nop(void)
  * @todo:
  *     +... 
  */
-int appMain( int argc, char *argv[] ) 
-{
+int appMain ( int argc, char *argv[] ){
+	
 	//int Status;	
 	int Flag;
 	void *P;
@@ -516,14 +515,11 @@ int appMain( int argc, char *argv[] )
     //servidor de gerenciamento de tarefas.
     //obs: o kernel registrará o servidor de grenciamento de 
     //de tarefas, e apenas um gerenciador de tarefas poderá existir.
-    //
 
 	// ## IMPORTANTE ##
     //115
     //esse é o serviço usado pelos servidores 
     //para dialogar com o kernel.
-    //
-	//
 	
 #ifdef TASKMAN_VERBOSE
 	printf("taskman: inicializando servidor ...\n");
@@ -532,10 +528,10 @@ int appMain( int argc, char *argv[] )
 	//o kernel deverá associar o PID a um magic.
 	
 	int PID;
-    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
+    PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
 	
 	enterCriticalSection(); 
-	system_call(115,                 
+	system_call ( 115,                 
 	    (unsigned long) &buffer[0], //ponteiro para o vetor de mensagem.  
 		(unsigned long) 1234,       //acoplar taskman.  
 		(unsigned long) PID );      //magic para taskman.
@@ -544,15 +540,11 @@ int appMain( int argc, char *argv[] )
     //reason?	
 	//O servidor chamará o kernel para se acoplar 
 	//e para se desacoplar..
-	//
 	
-	//
 	// #debug 
 	// Não há problemas ao mostrar o message box, 
 	// só estamos tirando ele para não incomodar
 	// enquanto trabalhamos no outro aplicativo.
-	//
-
 	
 	//O servidor vai solicitar mensagens para o kernel 
 	//e indicar o número do seu processo.
@@ -561,12 +553,12 @@ int appMain( int argc, char *argv[] )
 	//no vetor passado pelo servidor.
 	
 	
-	while(listening)
+	while (listening)
 	{
 		
 		//pega uma mensagem com 4 elementos.
 		enterCriticalSection(); 
-		system_call(115,                 //Número do serviço invocado pelo servidor
+		system_call ( 115,                 //Número do serviço invocado pelo servidor
 		    (unsigned long) &buffer[0],        
 			(unsigned long) 12345678,    //magic para pegar mensagens.          
 			(unsigned long) PID );       //PID do taskman.      
@@ -594,10 +586,10 @@ int appMain( int argc, char *argv[] )
 		pause();
 		pause();
 		pause();
-		pause();
-		pause();
-		pause();
-		pause();
+		//pause();
+		//pause();
+		//pause();
+		//pause();
 		//exit(0);
 	};
 
@@ -611,7 +603,7 @@ debugStuff:
     // Uma mensagem de sinal de vida.
 	apiBeginPaint();
 	    //(type, string1, string2)
-	    MessageBox( 1, "TASKMAN.BIN:", "Initializing ...");
+	    MessageBox( 1, "TASKMAN.BIN:", "Initializing..");
 	apiEndPaint();
 	
 	
@@ -681,7 +673,6 @@ creatingSecurityControl:
 		while(1){}
 	};
 	
-	//
 	// Obs:
 	// Os processos criados qui ainda são um conjunto de testes.
 	// Estamos criando os processos que compoem o security control,
@@ -689,7 +680,6 @@ creatingSecurityControl:
 	// @todo: Podemos testar a qui a criação de algumas threads
 	// associadas à esses processos.
 	// Obs: Quando criamos um processo, uma thread inicial deve ser criada.
-	//
 	
     /*
      * @todo: 
@@ -786,7 +776,7 @@ getmessageLoop:
 	    MessageBox( 1, "TASKMAN:", "Get message loop");	
 	apiEndPaint();
     
-	while(1)
+	while (1)
 	{
         //
         // Test: 		
