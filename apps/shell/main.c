@@ -2203,13 +2203,20 @@ do_compare:
 		goto exit_cmp;
     };
 	
-    // fork - testando a função fork.
-	if ( strncmp( prompt, "fork", 4 ) == 0 )
+    // fork - Testando a função fork.
+	// Apenas obtendo o retorno na rotina de clonagem.
+	if ( strncmp ( prompt, "fork", 4 ) == 0 )
 	{
-		int pidFORK = (int) fork();
-        printf("PID={%d}\n",pidFORK);
-        goto exit_cmp;
-	};	
+		int pidFORK = (int) fork ();
+        
+		//mostra o id do processo atual.
+		shellShowPID ();
+		
+		//Retornando o id do processo clone.
+		printf("PID={%d}\n", pidFORK );
+        
+		goto exit_cmp;
+	};		
 	
 	
     // getpid

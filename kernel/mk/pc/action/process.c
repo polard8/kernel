@@ -94,50 +94,66 @@ int processNewPID;   //??
 
 //clona um processo sem thread.
 //retorna o pid do clone
-int do_fork_process()
-{
+int do_fork_process (){
+	
 	int PID;
 	
 	struct process_d *clone;
 	struct process_d *current;
+	
+	int Ret = -1;
+	
+	//printf(">>do_fork_process:\n");
 	
 	//
 	// ## Current ##
 	//
 	
 	current = (struct process_d *) processList[current_process];
-	if( (void*) current == NULL )
+	
+	if ( (void *) current == NULL )
 	{
+		printf("current struct \n");
 		goto fail;
+	
 	}else{
 		
-		if( current->used != 1 ||
-		    current->magic != 1234 )
-		{
-		    goto fail;		
+		if ( current->used != 1 || current->magic != 1234 ){
+		    
+			printf("current validation \n");
+			goto fail;		
 		}
 		
+	    //#debug
+	    //printf(">>> check current process: %d %d \n", current_process, current->pid );		
 		goto do_clone;
 		//...
 	};
 	
+	
 	//
 	// ## Clone ##
 	//
+	
 do_clone:
 	
 	//cria uma estrutura do tipo processo, mas não inicializada.
+	
 	clone = (struct process_d *) processObject();
 	
-	if( (void*) clone == NULL )
+	if ( (void *) clone == NULL )
 	{
+		printf("clone struct \n");
 		goto fail;
+	
 	}else{
 		
 	    PID = (int) getNewPID();
 		
-		if( PID == -1 || PID == 0 )
-		{
+		//if ( PID <= 0 ){
+		if ( PID == -1 || PID == 0 ){
+			
+			printf(" PID fail %d \n", PID);
 			goto fail;
 		}
 		
@@ -145,55 +161,78 @@ do_clone:
 		clone->used = 1;
 		clone->magic = 1234;
 		
+		//salvando na lista.
+		processList[PID] = (unsigned long) clone;
+		
 		// ## clone  ##
-		processCopyProcess(  current->pid, clone->pid );
-        goto done;		
+		// Clona efetivamente. 
+		
+		//#bugbug:
+		//essa rotina tem que ter um retorno, para falharmos 
+		//caso ela falhe.
+		Ret = processCopyProcess ( current->pid, clone->pid );
+		if ( Ret != 0 )
+		    goto fail;
+	   
+		//return (int) PID;	
+		goto done;		
 	};	
 	
 done:
+    //retornando o número do processo clonado.
     return (int) PID;	
 fail:
     return (int) -1;	
 };
 
 
+
 //cria uma estrutura do tipo processo, mas não inicializada.
-struct process_d *processObject()
-{
+struct process_d *processObject (){
+	
 	struct process_d *p;
 	
-	p = (void *) malloc( sizeof(struct process_d) );
-	if( (void*) p == NULL )
+	p = (void *) malloc ( sizeof(struct process_d) );
+	if( (void *) p == NULL )
 	{
 	    printf("processObject");
 		die();
 	};	
 	
 	return (struct process_d *) p;
-}
+};
 
-//pegar um slot vazio na lista de processos.
-//isso permite clonar um processo
-int getNewPID()
-{
+
+/*
+ * getNewPID:
+ *     Pegar um slot vazio na lista de processos.
+ *     Isso permite clonar um processo.
+ */
+int getNewPID (){
+	
 	struct process_d *p;
 	
-	int i=0;
-	while( i < PROCESS_COUNT_MAX )
+	//int i = 0;
+	//int i = 1;
+	
+	//Começaremos a busca onde começam o range de IDs de 
+	//processos de usuário.
+	int i = USER_BASE_PID;
+	
+	while ( i < PROCESS_COUNT_MAX )
 	{
 		
 	    p = (struct process_d *) processList[i];	
 		
 		//Se encontramos um slot vazio.
-		if( (void *) p == NULL )
-		{
+		if ( (void *) p == NULL ){
+			
 			return (int) i;
 		}
-		//else
+		
 		i++;
 	};
 	
-fail:
     return (int) -1;	
 };
 

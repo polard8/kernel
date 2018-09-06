@@ -683,7 +683,7 @@ void *services( unsigned long number,
 		
         //71 		
 		case SYS_FORK: 
-		    return (void*) do_fork_process();
+		    return (void *) do_fork_process ();
 			break;	
 
 		//72 - Create thread.	
