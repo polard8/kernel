@@ -189,23 +189,23 @@ unsigned long heap_set_new_handler( unsigned long address )
  *     ?? Pega o 'heap pointer' do heap de um processo. ??
  *
  */
-unsigned long 
-get_process_heap_pointer( int pid )
-{
+unsigned long get_process_heap_pointer ( int pid ){
+	
 	struct process_d *P;
+	
 	unsigned long heapLimit;
 	
 	//@todo: Limite máximo.
-	if(pid < 0)
-	{
+	if (pid < 0){
+		
 		printf("get_process_heap_pointer: pid fail\n");
 		goto fail;
 	};
 	
 	P = (void *) processList[pid];
 	
-	if((void *) P == NULL )
-	{
+	if ( (void *) P == NULL ){
+		
 		printf("get_process_heap_pointer: struct fail\n");
 		goto fail;
 	};
@@ -222,14 +222,14 @@ get_process_heap_pointer( int pid )
 	heapLimit = (unsigned long) (P->Heap + P->HeapSize);
 	
 	//Se for menor que o início ou maior que o limite.
-	if( P->HeapPointer < P->Heap || 
-	    P->HeapPointer >= heapLimit )
-	{
-		printf("get_process_heap_pointer: heap limits fail\n");
+	if ( P->HeapPointer < P->Heap || P->HeapPointer >= heapLimit ){
+		
+		printf("get_process_heap_pointer: heapLimit\n");
 		goto fail;
 	};
 	
-done:
+//done:
+
     //Retorna o heap pointer do processo. 
 	return (unsigned long) P->HeapPointer;
 fail:
@@ -252,9 +252,7 @@ SetKernelHeap( unsigned long HeapStart,
 	struct heap_d *h;    //Kernel Heap struct.    
 	
 	
-	//
 	// Check limits.
-	//
 	
 	//if(HeapStart == 0){}
 	//if(HeapSize == 0){}
@@ -310,8 +308,8 @@ SetKernelHeap( unsigned long HeapStart,
 	
 	//Contagem? ainda em zero.?!
 	
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
@@ -387,9 +385,8 @@ void *GetHeap()
  *     2016 - Revision.
  * ...
  */
-unsigned long 
-AllocateHeap( unsigned long size )
-{
+unsigned long AllocateHeap ( unsigned long size ){
+	
     struct mmblock_d *Current;
     //struct mmblock_d *Prev;
 
@@ -744,8 +741,8 @@ fail:
  * Ponteiros do início da área do cliente.
  * ??
  */
-unsigned long FreeHeap(unsigned long size)
-{  		
+unsigned long FreeHeap (unsigned long size){
+	
     // #cancelada !
 	// Usaremos flags e o GC. 
 	return (unsigned long) g_heap_pointer;    
@@ -758,8 +755,8 @@ unsigned long FreeHeap(unsigned long size)
  *     Aloca heap.
  *     @todo: Deletar: Rotina inútil.
  */
-void *AllocateHeapEx(unsigned long size)
-{
+void *AllocateHeapEx (unsigned long size){
+	
 	return (void *) AllocateHeap(size);  
 };
 
@@ -1285,7 +1282,7 @@ int gcEXECUTIVE (){
 	// Importante: Limparemos somente as listas que pertencem ao módulo /ram
 	
 	//mmblockList[]
-	for( i=0; i<MMBLOCK_COUNT_MAX; i++)
+	for ( i=0; i<MMBLOCK_COUNT_MAX; i++ )
 	{
 	    b = (void*) mmblockList[i];
 		
@@ -1301,7 +1298,7 @@ int gcEXECUTIVE (){
 	
 	
 	//heapList[]
-	for( i=0; i<HEAP_COUNT_MAX; i++)
+	for ( i=0; i<HEAP_COUNT_MAX; i++ )
 	{
 	    h = (void*) heapList[i];
 		
@@ -1330,7 +1327,8 @@ int gcEXECUTIVE (){
 	//Nothing
 	
 clear_mmblock:	
-    if( (void*) b != NULL )
+    
+	if ( (void *) b != NULL )
     {
 		//Checar se a área alocada está dentro dos limites.
 	    if( (b->userArea + b->userareaSize) != b->Footer ){
@@ -1346,7 +1344,8 @@ clear_mmblock:
 	//Nothing.
 	
 clear_heap:
-    if( (void*) h != NULL )
+
+    if ( (void *) h != NULL )
 	{
 		// ?? O que fazer aqui ??
 		
