@@ -408,7 +408,7 @@ void quit ( int status ){
  
 /*
  **************
- * GramadoMain: 
+ * shmain: 
  *     Função principal.
  *     The Application Entry Point.
  *
@@ -1160,21 +1160,13 @@ shellProcedure( struct window_d *window,
 		    break;
 			
 		// MSG_MOUSEKEYDOWN	
-		//#bugbug: a janela foi pintada duas vezes, não sabemos,
-		//se dias mensagens foi enviada para o procedimento ou se 
-		//a rotina de redraw foi chamada duas vezes ou ainda 
-		//se apenas o refresh_rectangle foi chamado duas vezes.
-		//obs: pode ser que dois botões estejam selecionados como clicados.
-		//e o sistema enviou duas mensagens. Uma opção seria checarmos 
-		// qual botão foi clicado, isso aparece em long1.
 		case 30:
-		    //printf("Down");
 			if( long1 == 1 )
 			{
                 printf("button 1\n"); 				
-                APISetFocus(window);
-			    APIredraw_window(window,1);
-			    //refresh_screen();
+                
+				//APISetFocus(window);
+			    //APIredraw_window(window,1);
 			}
 			if( long1 == 2 )
 			{
@@ -1218,8 +1210,7 @@ shellProcedure( struct window_d *window,
 		//que o kernel crie uma janela, depois que o kernel criar a janela,
 		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
         //MSG_CREATE, se o aplicativo retornar -1, então a rotina em kernel mode que 
-        //esta criando a janela, cancela a janela que está criando e retorn NULL.
-        //		
+        //esta criando a janela, cancela a janela que está criando e retorn NULL.		
 		case MSG_CREATE:
 		    printf("SHELL.BIN: MSG_CREATE\n");
 		    break;

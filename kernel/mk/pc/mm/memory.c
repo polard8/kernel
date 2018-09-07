@@ -782,8 +782,8 @@ void *AllocateHeapEx(unsigned long size)
  * um refresh screen
  * 
  */
-void show_memory_structs()
-{
+void show_memory_structs (){
+	
 	int i = 0;
     struct mmblock_d *B;	
 	
@@ -792,19 +792,19 @@ void show_memory_structs()
 	//printf("=========================\n");
 	
 	//Mostra os heap da lista.		
-	while(i < MMBLOCK_COUNT_MAX) 
+	while (i < MMBLOCK_COUNT_MAX) 
 	{
         B = (void *) mmblockList[i];
-		++i;
 		
-		if( (void *) B != NULL )
+		i++;
+		
+		if ( (void *) B != NULL )
 		{
 			//Validade.
-		    if( B->Used == 1 && B->Magic == 1234){
-		        printf("Id={%d} Header={%x} userA={%x} Footer{%x}\n",B->Id
-		                                                            ,B->Header
-				                                                    ,B->userArea
-				                                                    ,B->Footer );
+		    if ( B->Used == 1 && B->Magic == 1234 ){
+				
+		        printf("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
+				    B->Id, B->Header, B->userArea, B->Footer );
 			};
 			//Nothing.
 		};
@@ -812,22 +812,21 @@ void show_memory_structs()
     };
 	
 	
-	//
 	// Aqui podemos aprentar informações sobre o heap.
 	// como tamanho, espaço disponível, ponteiro, à que processo ele 
 	// pertence.
 	// mas estamos lidando a estrtutura de mmblock_d, que é especial e meio 
 	// engessada.
-	//
 	
 	//More?!
 	
 //
 // Done.
 //	
-done:
-    printf("Done\n");
-	return;
+
+//done:
+    //printf("Done\n");
+	//return;
 };
 
 
@@ -845,8 +844,8 @@ done:
  * @todo: Rotinas de automação da criação de heaps para processos.
  */
 //int memoryInitializeHeapManager() 
-int init_heap()
-{
+int init_heap (){
+	
 	int i = 0;
 
     //Globals.	
@@ -864,8 +863,8 @@ int init_heap()
 	last_size = 0;
 	
 	//Check Heap Pointer.
-	if( g_heap_pointer == 0 )
-	{
+	if ( g_heap_pointer == 0 ){
+		
 	    printf("init_heap fail: Heap pointer\n");
 		goto fail;
 	}
@@ -947,8 +946,8 @@ fail:
  *     @todo Usar stackInit(). 
  *
  */
-int init_stack()
-{
+int init_stack (){
+	
     //Globals.
 	//#bugbug
 	kernel_stack_end = (unsigned long) KERNEL_STACK_END; 
@@ -981,8 +980,7 @@ fail:
  * memoryShowMemoryInfo:
  *     Show memory info.
  */
-void memoryShowMemoryInfo()
-{
+void memoryShowMemoryInfo (){
 	
 	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
@@ -1007,7 +1005,7 @@ void memoryShowMemoryInfo()
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
 	// System type
-	switch(g_mm_system_type)
+	switch (g_mm_system_type)
 	{
 		case stSmallSystem:
 		    printf("stSmallSystem={%d KB}\n",memorysizeTotal);
@@ -1061,7 +1059,8 @@ void memoryShowMemoryInfo()
 	
 	
     printf("\n[Kernel Heap and Stack info:]\n");
-	printf("HEAP: Start={%x} | End={%x} | Total={%d KB} \n",
+	
+	printf("HEAP: [%x...%x] Total={%d KB} \n",
 	    kernel_heap_start, kernel_heap_end, HeapTotal );
 			
     printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
@@ -1075,7 +1074,7 @@ void memoryShowMemoryInfo()
 		// Pois bem, é mais digno mostrar aqui o endereço da pilha, 
 		// indicado no TSS.
 		
-    printf("STACK: Start={%x} | End={%x} | Total={%d KB} \n", 
+    printf("STACK: [%x...%x] Total={%d KB} \n", 
         kernel_stack_start, kernel_stack_end, StackTotal );
 			
     printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
@@ -1087,13 +1086,15 @@ void memoryShowMemoryInfo()
 	
 	    //Video mode.
 	    //printf("The video option is %x \n",g_video_mode);
-	printf("\n FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
-        g_frontbuffer_pa, g_frontbuffer_va, g_backbuffer_va );
+	printf ("\n FrontbufferPA={%x} FrontbufferVA={%x} \n", 
+	    g_frontbuffer_pa, g_frontbuffer_va );  
+	
+	printf ("\n BackbufferVA={%x} \n", g_backbuffer_va );
 	
 	//...
 
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
@@ -1103,8 +1104,8 @@ done:
  *   Inicializa o memory manager.
  *    @todo: Usar mmInit().
  */
-int init_mm()
-{	
+int init_mm (){
+	
     int Status = 0;
 	int i = 0;	
 	
@@ -1205,7 +1206,8 @@ int init_mm()
 	// Continua...
 	//
 	
-done:	
+//done:	
+
     return (int) Status;	
 }; 
 
@@ -1218,8 +1220,8 @@ done:
 //
 
 //limpa a camada /gramado
-int gcGRAMADO()
-{
+int gcGRAMADO (){
+	
 	//Ainda não implementado.
 	return (int) 0;
 };
@@ -1271,8 +1273,8 @@ estrutura.
 	
 	
  */
-int gcEXECUTIVE()
-{
+int gcEXECUTIVE (){
+	
 	int i;
 	struct mmblock_d *b;  //memory block.
 	struct heap_d *h;     //heap.
@@ -1399,12 +1401,12 @@ int gcHAL()
  * +GRAMADO +EXECUTIVE +MICROKERNEL +HAL
  *
  */
-int gc()
-{
+int gc (){
+	
     int Status;
 	
 clearGramadoLayer:
-    Status = (int) gcGRAMADO();
+    Status = (int) gcGRAMADO ();
     if( Status == 1 )
 	{
 		printf("gc: clearGramadoLayer:\n");
@@ -1438,7 +1440,7 @@ clearHalLayer:
 done:
     return (int) 0;	
 fail:
-    printf(" ## FAIL ## \n");	
+    printf("# FAIL #\n");	
 	refresh_screen();
 	return (int) 1;
 };
