@@ -447,6 +447,8 @@ save_file:
 			//printf("write_lba\n");
             //refresh_screen();
 			
+			disk_ata_wait_irq ();
+			
             //grava - aqui next esta certo!!!			
             write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
             

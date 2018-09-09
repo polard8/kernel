@@ -907,8 +907,7 @@ fsUpdateWorkingDiretoryString( char *string );
  PATH must contain enough space for MAXPATHLEN characters. 
  Credits: bash 1.05
  */
-void 
-fs_pathname_backup( char *path, int n ); 			  
+void fs_pathname_backup ( char *path, int n ); 			  
 				  
 //
 // End.

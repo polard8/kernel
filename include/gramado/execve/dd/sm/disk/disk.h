@@ -592,8 +592,11 @@ int diskATADialog( int msg,
                    unsigned long long1, 
 				   unsigned long long2 );
 				   
+
 				   
-//
+				   
+int disk_ata_wait_irq ();
+
 void show_ide_info();
 
 #endif
