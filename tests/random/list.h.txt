@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+typedef struct listElem {
+  char *item;
+  struct listElem* next_p;
+} listElem_t;
+
+typedef struct list {
+  listElem_t* first_p;
+  int numElements;
+} list_t;
+
+list_t* newList();
+int size( list_t* );
+void add( list_t* list_p, int index, char* item );
+char *get( list_t*, int index );
+void removeAll( list_t* );

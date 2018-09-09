@@ -1,0 +1,347 @@
+/*
+ * File: stdio.h
+ *
+ * Descrição:
+ *     Parte da biblioteca C para API 32bit.
+ *     c99 - ISO/IEC 9899:1999
+ *
+ * @todo: 
+ *     Usar padrão C e colocar em outro arquivo o que não for daqui.
+ *
+ * Versão 1.0, 2016 - Created.
+ */
+
+ 
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
+
+ 
+
+/*  
+"flags" bits definitions
+*/
+
+
+/* Flags for the iobuf structure  */
+#define _IOREAD  1
+#define _IOWRT	 2
+#define _IORW	 0x0080
+
+#define	STDIN_FILENO  0
+#define	STDOUT_FILENO 1
+#define	STDERR_FILENO 2
+
+
+#define _IOFBF    0x0000  /* full buffered */
+#define _IOLBF    0x0040  /* line buffered */
+#define _IONBF    0x0004  /* not buffered */
+
+/* Returned by various functions on end of file condition or error. */
+#ifndef EOF
+#define EOF (-1)
+#endif
+
+
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
+#endif
+
+#define FOPEN_MAX	(32)
+#define NUMBER_OF_FILES (32)
+
+#define TMP_MAX	32767
+
+
+#define _IOMYBUF  0x0008  /* stdio malloc()'d buffer */
+#define _IOEOF    0x0010  /* EOF reached on read */
+#define _IOERR    0x0020  /* I/O error from system */
+#define _IOSTRG   0x0040  /* Strange or no file descriptor */
+
+#ifdef __POSIX__
+#define	_IOAPPEND 0x0200
+#endif
+
+/*
+ * The buffer size as used by setbuf such that it is equivalent to
+ * (void) setvbuf(fileSetBuffer, caBuffer, _IOFBF, BUFSIZ).
+ */
+#define BUFSIZ  1024
+
+
+/* It moves file pointer position to the beginning of the file. */
+#ifndef SEEK_SET
+#define SEEK_SET        0       
+#endif
+
+/* It moves file pointer position to given location. */
+#ifndef SEEK_CUR
+#define SEEK_CUR        1       
+#endif
+
+/*  It moves file pointer position to the end of file. */
+#ifndef SEEK_END
+#define SEEK_END        2       
+#endif
+
+
+/*
+ * FILE:
+ *     Estrutura padrão para arquivos.    
+ *     
+ */
+typedef struct _iobuf FILE; 
+struct _iobuf 
+{
+	char *_ptr;      // Current position of file pointer (absolute address).
+	int   _cnt;      // number of available characters in buffer 
+	char *_base;     // Pointer to the base of the file. the buffer
+	int   _flag;     // Flags (see FileFlags). the state of the stream
+	int   _file;     // UNIX System file descriptor
+	int   _charbuf;   
+	int   _bufsiz;
+	char *_tmpfname;
+};
+
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
+
+//listando os arquivos da biblioteca.
+unsigned long Streams[NUMBER_OF_FILES];
+
+
+
+/*
+ // outra lista.
+ // lista tradicional
+
+  // _ptr, _cnt, _base,  _flag, _file, _charbuf, _bufsiz  
+  // stdin (_iob[0]) 
+  // stdout (_iob[1])  
+  // stderr (_iob[3]) 
+ 
+char buf_stdin[BUFSIZ];
+FILE _iob[NUMBER_OF_FILES] = {
+	{ buf_stdin, 0, buf_stdin, _IOREAD | _IOYOURBUF, 0, 0, _INTERNAL_BUFSIZ },
+	{ NULL, 0, NULL, _IOWRT, 1, 0, 0 },
+	{ NULL, 0, NULL, _IOWRT, 2, 0, 0 },
+};
+
+#define stdin  (&_iob[0])
+#define stdout (&_iob[1])
+#define stderr (&_iob[2])
+
+*/
+
+
+
+ 
+//
+// Posição virtual da memória de vídeo.
+//  VA=0x800000 = PA=0x000B8000.
+//
+#define SCREEN_START 0x800000 
+#define ScreenStart SCREEN_START
+
+#define COLUMNS 80
+#define SCREEN_WIDTH COLUMNS
+
+#define ROWS 25
+#define SCREEN_HEIGHT ROWS
+
+#define SCREEN_WIDTH COLUMNS
+#define HEIGHT ROWS
+
+//limite máximo. provisório.
+#define SCREEN_MAX_HEIGHT 256  //linhas.
+#define SCREEN_MAX_WIDTH  256  //colunas.
+
+#define REVERSE_ATTRIB 0x70
+
+#define PAD_RIGHT 1
+#define PAD_ZERO 2
+
+#define PRINT_BUF_LEN 12
+
+#define KEY_RETURN   13    //@todo: Pertence ao teclado.
+
+
+
+//
+// Obs: O tipo da variável aqui é provisório. (UL).
+//
+
+//cursor
+unsigned long g_cursor_x;
+unsigned long g_cursor_y;
+
+//char.
+unsigned long g_char_attrib;
+
+//columns and rows
+//@todo: Esse precisa ser inicializado
+//Obs: Se essas variáveis forem 0, 
+// as rotinas de stdio usarão os valores default.
+//COLUMNS e ROWS.
+unsigned long g_columns;
+unsigned long g_rows;
+
+int g_using_gui; //modo gráfico?
+
+
+
+
+
+
+
+//===========================================
+
+//
+// Prompt support.
+//
+
+// Obs: Esses buffers são usados pela libe como arquivo.
+// #importante: 
+// Qual o tamanho máximo que eu posso usar nesse buffer.
+// Qual é o padrão de tamanho usado para o fluxo padrão.
+//
+
+//Buffer para o buffer usado para input de comandos.
+//prompt[] 
+#define PROMPT_MAX_DEFAULT 1024
+
+
+
+
+// Normalmente quem cria o fluxo padrão é a rotina 
+// que cria o processo.
+
+// Fluxo padrão.
+char prompt[PROMPT_MAX_DEFAULT];      //stdin
+char prompt_out[PROMPT_MAX_DEFAULT];  //stdout 
+char prompt_err[PROMPT_MAX_DEFAULT];  //stderr 
+   
+int prompt_pos;
+int prompt_max;
+int prompt_status;
+
+//char prompt_text[] = "$> ";
+
+//...
+
+//===========================================
+// ## Protótipos do padrão C. ##
+//===========================================
+
+ 
+ 
+/*
+ * File Operations
+ */ 
+ 
+FILE *fopen( const char *filename, const char *mode ); 
+int fflush( FILE *stream ); 
+int fclose(FILE *stream); 
+//#define fileno(p)   ((p)->fd)
+ 
+ 
+/*
+ * Normal output.
+ */ 
+ 
+int puts(const char *str); 
+ 
+int app_print(char *message, unsigned int line, int color);
+static int prints(char **out, const char *string, int width, int pad);
+static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase);
+static int print(char **out, int *varg);
+static void printchar(char **str, int c);
+void outbyte(int c);
+void _outbyte(int c);
+ 
+ 
+/*
+ * Formatted Output
+ */ 
+ 
+int fprintf(FILE *stream, const char *format, ...); 
+int printf(const char *format, ...); 
+int sprintf(char *out, const char *format, ...);
+int printf_main(void);    //Isso é para testes.
+
+
+/*
+ * Normal input.
+ */
+ 
+//Usado por interpretadores de comando.
+//Recebem input e colocam em prompt[] 
+unsigned long input(unsigned long ch);
+
+
+/*
+ * Formatted Input
+ */
+int scanf( const char *fmt, ... );
+
+ 
+/*
+ * Character Input and Output Functions
+ */
+ 
+int fgetc( FILE *stream );;
+#define getc fgetc
+int ungetc( int c, FILE *stream );
+
+int fputc(int ch, FILE *stream);
+char *gets(char *s);
+int getchar(void);
+int putchar(int ch);
+//#define getc(p)     fgetc(p)
+//#define putc(x, p)  fputc(x, p)
+//#define getchar()   getc(stdin)
+//#define putchar(x)  putc((x), stdout)
+
+
+/*
+ * Direct Input and Output Functions
+ */
+ 
+ 
+ 
+/*
+ * File Positioning Functions
+ */
+int fseek(FILE *stream, long offset, int whence);
+
+
+
+/*
+ * Error Functions
+ */
+ 
+int feof( FILE *stream );
+int ferror( FILE *stream ); 
+//#define feof(p)	  (((p)->_flags & _IOEOF) != 0)
+//#define ferror(p)	  (((p)->_flags & _IOERR) != 0)
+//#define clearerr(p) ((p)->_flags &= ~(_IOERR|_IOEOF))
+//#define feof(p)     (((p)->flag & _EOF) != 0)
+//#define ferror(p)   (((p)->flag & _ERR) != 0) 
+ 
+//
+// More stuff.
+//
+
+void scroll(void);
+int app_clear(int color);
+int drawBar(int color);  //??
+
+
+
+/*Inicialização da biblioteca*/
+void stdioInitialize();
+
+//
+// End.
+//
