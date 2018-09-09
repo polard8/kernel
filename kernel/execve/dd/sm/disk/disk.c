@@ -23,20 +23,20 @@
 // Obs: o foco está na lista de discos. diskList
 //
 
+
 #include <kernel.h>
 
+
 //Mostra informações sobre o disco atual.
-void diskShowCurrentDiskInfo()
-{
-	printf("The current disk is %d\n",current_disk);
+void diskShowCurrentDiskInfo (){
+	
+	printf ("The current disk is %d\n", current_disk );
 	diskShowDiskInfo(current_disk);
 };
 
 
-
-int 
-diskShowDiskInfo( int descriptor )
-{
+int diskShowDiskInfo ( int descriptor ){
+	
 	struct disk_d *d;
 	
 	printf("diskShowDiskInfo:\n");
@@ -48,15 +48,14 @@ diskShowDiskInfo( int descriptor )
 	
 	d = (struct disk_d *) diskList[descriptor];
 	
-	if( (void*) d == NULL )
+	if ( (void *) d == NULL )
 	{
 		printf("struct fail\n");
 		goto fail;
 	}else{
 		
-		
-		if( d->used != 1 || d->magic != 1234 )
-		{
+		if ( d->used != 1 || d->magic != 1234 ){
+			
 			printf("flags fail\n");
 			goto fail;
 		}		
@@ -89,14 +88,13 @@ done:
 /*
  * disk_get_disk_handle:
  *     Obtem o ponteiro da estrutura dado o descritor.
- *
  */
-void *disk_get_disk_handle( int number )
-{
-	//check limts
-	if( number < 0 || number >= DISK_COUNT_MAX ){
+void *disk_get_disk_handle ( int number ){
+	
+	if ( number < 0 || number >= DISK_COUNT_MAX ){
 		return NULL;
 	}
+	
 	return (void *) diskList[number];
 };
 
@@ -107,8 +105,8 @@ void *disk_get_disk_handle( int number )
  *     Obtem o ponteiro da estrutura de informações do disco atual.
  *
  */
-void *disk_get_current_disk_info()
-{
+void *disk_get_current_disk_info (){
+	
 	return (void *) CurrentDiskInfo; 
 };
 
@@ -121,26 +119,25 @@ void *disk_get_current_disk_info()
  *
  */
 //int diskInit() 
-int disk_init()
-{
+int disk_init (){
+
+	int i;
+
 	
 #ifdef KERNEL_VERBOSE	
     printf("disk_init: Initializing..\n");
 #endif	
 
-    //@todo: Tem que limpara a lista de discos.
-	int i;
-	for( i=0; i<DISK_COUNT_MAX; i++)
-	{
+    //@todo: Tem que limpara a lista de discos.	
+	for ( i=0; i<DISK_COUNT_MAX; i++ ){
+		
 		diskList[i] = 0;
 	};
 	
 	
-	//
 	// Inicializando uma estrutura global de informações sobre o 
 	// disco do sistema.
 	// ?? Em que arquivo está essa estrutura.
-	//
 
 	// disk info
     diskinfo_conductor = (void*) malloc( sizeof(struct diskinfo_d) );
@@ -331,17 +328,30 @@ int init_disk_manager()
 /* *
  * Copyright (C) 2017-2018 (Nelson Sapalo da Silva Cole)
  * Khole OS v0.3
- *
- *
  */
 
 
 extern st_dev_t *current_dev;
-static _u32 ata_irq_invoked = 1; 
+//static _u32 ata_irq_invoked = 1; 
+static _u32 ata_irq_invoked = 0;
 
-_void ata_wait(_i32 val)
-{ 
-   val/=100;
+
+int disk_get_ata_irq_invoked ()
+{
+	return (int) ata_irq_invoked;
+}
+
+void disk_reset_ata_irq_invoked ()
+{
+	ata_irq_invoked = 0;
+}
+
+
+
+_void ata_wait (_i32 val){
+	
+   val /= 100;
+   
    while(val--)io_delay();
    //while(val--)delay();
 }
@@ -391,19 +401,19 @@ _u8 ata_wait_drq()
 
 
 
-
-
-
-
-_u8 ata_wait_irq()
-{
+_u8 ata_wait_irq (){
+	
    _u32 tmp = 0x10000;
    _u8 data;
-   while (!ata_irq_invoked){
-    data = ata_status_read();
-    if((data &ATA_SR_ERR)){
-        ata_irq_invoked = 0;
-        return -1;
+   
+    while (!ata_irq_invoked)
+    {
+        data = ata_status_read();
+        
+		if( (data &ATA_SR_ERR) )
+		{
+            ata_irq_invoked = 0;
+            return -1;
         }
                          //ns
         if(--tmp)ata_wait(100);
@@ -425,11 +435,14 @@ _void ata_soft_reset()
 }
 
 
-_u8 ata_status_read()
-{
-   	return inb(ata.cmd_block_base_address + ATA_REG_STATUS);
+//#bugbug
+//Lê o status de um disco determinado, se os valores  
+//na estrutura estiverem certos.
+_u8 ata_status_read (){
+	
+   	return inb( ata.cmd_block_base_address + ATA_REG_STATUS );
+};
 
-}
 
 void ata_cmd_write(_i32 cmd_val)
 {
@@ -1975,6 +1988,55 @@ done:
     return;	
 };
 
+
+
+
+
+//esperando pela interrupção.
+//OUT:
+// 0    = ok por status da interrupção. 
+// -1   = ok por status do controlador.
+// 0x80 = ok por tempo esperado.
+
+int disk_ata_wait_irq (){
+	
+   _u32 tmp = 0x10000;
+   _u8 data;
+   
+    while (!ata_irq_invoked)
+    {
+        data = ata_status_read ();
+        
+		if( (data &ATA_SR_ERR) )
+		{
+			
+			//ok por status do controlador.
+            ata_irq_invoked = 0;
+            
+			return (int) -1;
+        }
+        
+		//ns
+        if (tmp--)  //??
+		{
+			ata_wait (100);
+        
+		}else{
+			
+            //ok por tempo esperado.
+			ata_irq_invoked = 0;
+			
+			return (int) 0x80;
+        };
+    };
+ 
+    //ok por status da interrupção.
+	ata_irq_invoked = 0;
+	
+	// ok 
+	
+    return (int) 0;
+};
 
 //
 // End.

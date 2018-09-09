@@ -192,6 +192,7 @@ _os_write_sector:
     ; @param EAX Logical Block Address of sector
     ; @param CL  Number of sectors to write
     ; @param RDI The address of data to write to the disk 
+	
 	mov eax, dword [_hd_lba]     
 	xor ecx, ecx 
 	mov cl, 1
@@ -217,6 +218,8 @@ _os_write_sector:
 ; @return None
 ;;isso é bem rápido.
 ;====================================================
+;;ide_channel0_master_read:
+
 ata_lba_read:
     
 	pushf
@@ -286,9 +289,11 @@ ata_lba_read:
 ; @param CL  Number of sectors to write
 ; @param RDI The address of data to write to the disk
 ;
+; obs: Escreve apenas no canal 0, master.
 ;
 ; @return None
 ;=================================================
+;;ide_channel0_master_write:
 ata_lba_write:
     pushf
     and eax, 0x0FFFFFFF
@@ -317,7 +322,6 @@ ata_lba_write:
     mov eax, ebx         ; Get LBA from EBX
     shr eax, 8           ; Get bit 8 - 15 in AL
     out dx, al
- 
  
     mov edx, 0x1F5       ; Port to send bit 16 - 23 of LBA
     mov eax, ebx         ; Get LBA from EBX

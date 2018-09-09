@@ -116,23 +116,23 @@ void write_lba ( unsigned long address, unsigned long lba ){
     switch (fatbits)
     {
 	    case 32:
-			printf("fs-write-write_lba: fat32 not supported \n");
+			printf("fs-write-write_lba: fat32 not supported\n");
 			goto fail;
 			break;		
 			
 	    case 16:
-		    //hdd.c
-            my_write_hd_sector( address, lba, 0, 0 );
+		    //unb/hdd.c
+            my_write_hd_sector ( address, lba, 0, 0 );
             goto done;			
 			break;		
 			
 	    case 12:
-			printf("fs-write-write_lba: fat12 not supported \n");
+			printf("fs-write-write_lba: fat12 not supported\n");
 			goto fail;	    
 			break;
 
         default:
-			printf("fs-write-write_lba: Unknow fat fs \n");
+			printf("fs-write-write_lba: Unknow fat fs\n");
 			goto fail;		    
             break;		
 	};
@@ -189,6 +189,12 @@ fsSaveFile( char *file_name,
     //Mensagem.	
 	//printf("fsSaveFile:\n"); 
 	
+	
+	//file_size
+	//#todo: precisamos implementar um limite para o tamanho do arquivo,
+	//principamente nessa fase de teste.
+	
+	
     //Carrega root e fat.
 //rootdir:
     //#debug
@@ -206,7 +212,10 @@ fsSaveFile( char *file_name,
     
 	// Procurando cluster livre na fat.
 	// Nesse momento construimos uma lista de clusters livres.
-SearchEmptyEntries:
+	// #todo: Essa lista já devia existir e agora somente 
+	// usaríamos.
+	
+//SearchEmptyEntries:
     
 	// #bugbug
 	// Obs: Esse limite é improvisado.
@@ -218,17 +227,24 @@ SearchEmptyEntries:
         {
             // Encontrado todos os espaços livres 
 			// que o arquivo precisa.
-            if (file_size == 0)
+            // Marca o fim.
+			
+			if (file_size == 0)
 			{
-				//Marca o fim.
-                list[j] = (unsigned short) 0xfff8;          
+                list[j] = (unsigned short) 0xfff8;   
+
+                //#importante:
+                //Se der certo, saímos do loop.
+				
                 goto save_file;
             };    
             
             //salva um endereço livre
             //salvamos um índice na fat dentro da lista			
-            list[j] = (unsigned short) c;   
-            j++;   //incrementa a lisa
+            //incrementa a lista
+			
+			list[j] = (unsigned short) c;   
+            j++;   
 
 			//decrementa o tamanho do arquivo!
             file_size--;                   
@@ -238,17 +254,23 @@ SearchEmptyEntries:
         i++; //incrementa a quantidade de busca.
     }; 
   
+    // Fail
+    // Nossa busca por clusters livres dentro da fat não deu certo.
+    // Provavelmente não encontramos uma quantidade sufciente.
+	
 out_of_range:  
-    printf("fsSaveFile: out_of_range - Max entries");
+
+    printf("fsSaveFile: out_of_range");
     goto fail;
 	
 	//#debug
     //refresh_screen();
     //while(1){ asm("hlt"); }
    
+// #importante:
+// Deu certo. Encontramos na fat todos os clusters que o arquivo precisa.   
 // Salva o arquivo.
-//     O arquivo tem na lista todos os clusters 
-// que ele precisa.
+// O arquivo tem na lista todos os clusters que ele precisa.
 
 save_file:
 
@@ -269,7 +291,7 @@ save_file:
 	// #debug
 	// printf("first={%x}\n",first);
 	
-CreateEntry:
+//CreateEntry:
 	
 	// Name.
 	Entry[0] = (char) file_name[0];
@@ -282,8 +304,8 @@ CreateEntry:
 	Entry[7] = (char) file_name[7];
 	
 	// Ext.
-	Entry[8]  = (char) file_name[8];
-	Entry[9]  = (char) file_name[9];
+	Entry[8] = (char) file_name[8];
+	Entry[9] = (char) file_name[9];
 	Entry[10] = (char) file_name[10];
 	
 	// Flag and reserved.
@@ -304,6 +326,7 @@ CreateEntry:
 	Entry[18] = 0xb8;
 	Entry[19] = 0x4c;
 	
+	// ??
 	// First cluster. 
 	// 0 para fat12 ou 16
 	Entry[20] = 0;
@@ -313,18 +336,20 @@ CreateEntry:
 	Entry[22] = 0xa8;
 	Entry[23] = 0x49;
 	
-	// Modifiled date.
+	// Modifield date.
 	Entry[24] = 0xb7;
 	Entry[25] = 0x4c;
 	
-	// First cluster. low word.
+	// First cluster. Low word.
 	// 0x1A and 0x1B
 	Entry[26] = (char) (first);        
 	Entry[27] = (char) (first >> 8);    
 	
 	// File size in bytes.
-	// size_in_bytes
-	Entry[28] = (char) size_in_bytes;//0xff; //255
+	// (size_in_bytes)
+	// 4 bytes: (28,29,30,31)
+	
+	Entry[28] = (char) size_in_bytes;   
 	
 	size_in_bytes = (size_in_bytes >> 8);
 	Entry[29] = (char) size_in_bytes;
@@ -336,35 +361,47 @@ CreateEntry:
 	Entry[31] = (char) size_in_bytes;
 
 	
-	// root[]
-	// #importante: root[] é um array de short.
+	// #importante:
+	// Vamos encontrar uma entrada livre no diretório para
+	// salvarmos o nome do arquivo.
 	
 	// Copia o nome para dentro da entrada do diretório.
-	// Obs: #bugbug O número da entrada é improvisado.
-	// Temos que fazer um rotina que encontre uma entrada livre 
-	// no diretório.
 	
 	// Obs: As entradas são de 32 bytes. Como root[] é um 
 	// array de short então faremos um deslocamento de 16 shorts.
-	//int xxxx_entryindex = 24;
+	
+	// root[]
+	// #importante: root[] é um array de short.	
 
-	//address e número máximo de entradas.
+	// IN: 
+	// Endereço do diretótio e número máximo de entradas.
+	// #todo: talvez possamos ampliar esse número para o máximo 
+	// de entradas no diretório.
+	
 	int xxxx_entryindex = (int) findEmptyDirectoryEntry ( VOLUME1_ROOTDIR_ADDRESS, 128 );
 	
-	if (xxxx_entryindex == -1){
+	if ( xxxx_entryindex == -1 ){
 		
-		printf("No empty entry\n");
+		printf ("No empty entry\n");
 		goto fail;
 	}
 	
 	int xxxx_entrysize = 16;
 	
-	//Copia 32bytes.
+	
+	// xxxx =  Deslocamento dentro do diretório.
+	// representa o início da entrada que encontramos.
+	// Encontramos multiplicando o índice da entrada pelo tamanho da entrada.
+	
 	int xxxx = (int) ( xxxx_entryindex * xxxx_entrysize );
 	
+	//Copia 32 bytes.
 	memcpy ( &root[xxxx], Entry, 32 );
 
-resetIDE:
+// reset	
+// Reiniciamos o controlador antes de usarmos.
+	
+//resetIDE:
 
 	//#debug
 	//printf("fsSaveFile: reset and while\n"); 
@@ -373,20 +410,23 @@ resetIDE:
 	reset_ide0 ();
 	
 	// ## Save ##
-
-	i=0; 
+    // Vamos ao salvamento propriamente dito.
+   
+	i = 0; 
 	
 	//#debug 
 	//improvisando um endereço válido
+	
 	unsigned long address = (unsigned long) file_address;
 	
-SavingFile:	
+//SavingFile:	
 
 	while (1)
     {            
         //Pega um conteúdo da lista.
         next = list[i];
 		
+		//#debug.
 		printf("next={%x}\n",next);
                 
         //encontrada a assinatura na lista!
@@ -403,9 +443,11 @@ SavingFile:
 			//grava na fat o endereço do próximo cluster
             fat[next] = list[i+1];
             
-            //grava - aqui next esta certo!!!
-			printf("write_lba\n");
-            refresh_screen();
+            //#debug 
+			//printf("write_lba\n");
+            //refresh_screen();
+			
+            //grava - aqui next esta certo!!!			
             write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
             
             address += 512; 
@@ -425,40 +467,65 @@ SavingFile:
     
 	
 fail:	
-    printf(" # FAIL # \n");
+    printf("# FAIL #\n");
     refresh_screen();
     return (int) 1;
 
 done:  
 
+    //Nesse momento já salvamos os clusters do arquivo.
+	
     //#debug
-    printf("fsSaveFile: reset save root and fat \n");      
+    printf("fsSaveFile: clusters saved\n");
+    printf("Saving root..\n");	
     refresh_screen();
 	
-	reset_ide0();
-		
-    printf("write_lba\n");      
-    refresh_screen();		
-    //@todo: devemos salvar o root dir.
-    write_lba( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA);
-    
-    printf("write_lba\n");      
-    refresh_screen();		
 	
-	write_lba( VOLUME1_ROOTDIR_ADDRESS + 0x200, VOLUME1_ROOTDIR_LBA + 1);
+	int r;
+    int roff = 0;
+    int rlbaoff = 0;	
+	
+	//int ticks = 1000;
+	
+	for ( r=0; r<3; r++ )
+	{
+	    //reset_ide0 ();
+        
+		//printf("write_lba n={%d} \n",r);      
+        //refresh_screen();		
+	    
+		//Wait interrpt!
+		//Isso funcionou.
+		disk_ata_wait_irq ();
+		
+		write_lba( VOLUME1_ROOTDIR_ADDRESS + roff, 
+	               VOLUME1_ROOTDIR_LBA     + rlbaoff );
+				  
+        roff = roff + 0x200;
+        rlbaoff = rlbaoff + 1;	  		
+	
+	    //wait irq
+		
+	};
+
+    //reset_ide0 ();
+    //write_lba ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA);	
+	
+	//reset_ide0 ();
+	//write_lba ( VOLUME1_ROOTDIR_ADDRESS + 0x200, VOLUME1_ROOTDIR_LBA + 1);
     //write_lba( VOLUME1_ROOTDIR_ADDRESS + 0x400, VOLUME1_ROOTDIR_LBA + 2);
     //write_lba( VOLUME1_ROOTDIR_ADDRESS + 0x600, VOLUME1_ROOTDIR_LBA + 3);
 
 	//........
 	
-    printf("write_lba\n");      
-    refresh_screen();		
+    //printf("write_lba\n");      
+    //refresh_screen();		
 	
     //#bugbug: Devemos salvar ela toda.	
     //salva 4 setores da fat!       
     
-    printf("write_lba  ... tentando salvar fat\n");      
-    refresh_screen();		
+    //printf("write_lba  ... tentando salvar fat\n");      
+    //refresh_screen();		
 
 	int f;
     int off = 0;
@@ -469,11 +536,14 @@ done:
 	   //#bugbug:
        //pelo jeito a rotina de salvamento precisa de 
        //de um wait ... um sleep  ... eu checar a interrupção. 	   
-       printf("write_lba n={%d} \n",f);      
-       refresh_screen();		
+       
+	   //printf("write_lba n={%d} \n",f);      
+       //refresh_screen();		
 	
-	   write_lba( VOLUME1_FAT_ADDRESS + off, 
-	              VOLUME1_FAT_LBA     + lbaoff );
+	    disk_ata_wait_irq ();
+		
+	    write_lba ( VOLUME1_FAT_ADDRESS + off, 
+	                VOLUME1_FAT_LBA     + lbaoff );
 				  
        off = off + 0x200;
        lbaoff = lbaoff + 1;	   

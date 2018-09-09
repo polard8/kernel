@@ -1,5 +1,5 @@
 /*
- * File: unblocked\hdd.c 
+ * File: unb\hdd.c 
  * 
  * Descrição:
  *     Interface de acesso a discos do tipo HDD.
@@ -106,10 +106,13 @@ void my_write_hd_sector( unsigned long ax,
 {
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
-	hd_lba    = (unsigned long) bx;    //arg2 = lba.
+	hd_lba = (unsigned long) bx;       //arg2 = lba.
 	
-	// Write sector. (ASM)	 
+	// Write sector. (ASM)	
+    // entry/x86/head/hwlib.inc
+	
 	os_write_sector(); 
+	
 	return;
 };   
 
