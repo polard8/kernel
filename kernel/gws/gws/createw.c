@@ -1520,7 +1520,7 @@ done:
 	//window->top  =  saveTop;
 	
     //SetFocus(window);
-	return (void*) window;
+	return (void *) window;
 };
 
 //

@@ -47,7 +47,7 @@ unsigned long stdioGetCursorY();
 //isso deve ir para bibliotecas depois.
 //não tem protótipo ainda.
 // Credits: Luiz Felipe
-//void shell_fntos(const char *name)
+
 void stdio_fntos (char *name){
 	
     int  i, ns = 0;
@@ -118,13 +118,11 @@ void *stdio_system_call( unsigned long ax,
  */
 int fclose (FILE *stream){
 	
-	//
 	// @todo: Implementar.
-	//
 	
 	//provisório.
-	if ( (void *) stream != NULL )
-	{
+	if ( (void *) stream != NULL ){
+		
 		stream->_ptr = NULL;
 		stream->_cnt = 0;
 		stream->_base = NULL;
@@ -139,7 +137,8 @@ int fclose (FILE *stream){
 	
 	//...
 	
-done:
+//done:
+
 	return (int) 0;
 };
 
@@ -154,9 +153,7 @@ done:
  */
 FILE *fopen ( const char *filename, const char *mode ){
 	
-	//
 	//  Deveríamos checar o tamanho do arquivo antes de criar o buffer.
-	//
 	
 	//unsigned char *a = (unsigned char *) filename;
 	unsigned long m = (unsigned long) mode;
@@ -212,7 +209,8 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//};
 	
 	
-done:	
+//done:
+	
 	return (FILE *) stream; 
 };
 
@@ -300,6 +298,7 @@ void scroll (void){
 
 /*
  * app_clear:
+ *    (#bugbug: Isso não faz mais sentido, deletar.) 
  *     Limpa a tela.
  *     0x800000 = Endereço virtual da memoria de vídeo.
  *     g_current_vm; 0x000B8000fis = 0x800000vir
@@ -349,7 +348,7 @@ done:
 int puts ( const char *str ){
 	
 	//provisório ...
-	return (int) printf("%s",str);
+	return (int) printf ("%s",str);
 };
 
 
@@ -405,7 +404,6 @@ static int prints ( char **out, const char *string, int width, int pad ){
 		++pc;
 	};
 
-//done:
 	return pc;
 };
 
@@ -466,8 +464,10 @@ static int printi ( char **out,
 			*--s = '-';
 		};
 	};
+	
     //Nothing.
-done:
+//done:
+
 	return pc + prints(out, s, width, pad);
 };
 
@@ -484,7 +484,7 @@ static int print ( char **out, int *varg ){
 	register char *format = (char *) (*varg++);
 	char scr[2];
 
-	for ( ; *format != 0; ++format ) 
+	for ( ; *format != 0; format++ ) 
 	{
 		//switch.
 		if ( *format == '%' ) 
@@ -583,9 +583,11 @@ static int print ( char **out, int *varg ){
  * não estariamos usando o printf da biblioteca em user mode e sim 
  * a printf do kernel.
  */
+ 
 int printf ( const char *format, ... ){
     
 	register int *varg = (int *)(&format);
+	
 	return (int) print ( 0, varg );
 };
 
@@ -599,8 +601,10 @@ int printf ( const char *format, ... ){
  * Em caso de sucesso, a função retorna o número de caracteres 
  * da string formatada. Em caso de erro, um valor negativo é retornado.
  */
+ 
 //opção 
 //int sprintf(char *str, const char *format, ...) ?? 
+
 int sprintf ( char *out, const char *format, ... ){
 	
     register int *varg = (int *)(&format);
@@ -608,22 +612,24 @@ int sprintf ( char *out, const char *format, ... ){
 };
 
 
-static void printchar( char **str, int c )
+static void printchar ( char **str, int c )
 {
-	if(str) 
+	if (str) 
     {
 		**str = c;
 		++(*str);
-	}
-	else (void) putchar(c);
+	
+	}else (void) putchar(c);
 };
 
 
 /*
- ********************************************************************
+ **********
  * putchar:
  *     Put a char in the screen.
- *     Obs: Isso funciona bem. O kernel pinta o char no backbuffer e
+ *     Obs: Isso funciona bem. 
+ *
+ *     #importante: O kernel pinta o char no backbuffer e
  *     em seguida efetua um refresh do char para mostra-lo na tela.
  */
 int putchar (int ch){
@@ -642,25 +648,24 @@ int putchar (int ch){
 	//Estamos deixando o kernel gerenciar as mensagens de digitação 
 	//usando seu próprio cursor.
     //put char.
-	stdio_system_call( 65, 
-                       (unsigned long) ch, 
-				       (unsigned long) ch, 
-				       (unsigned long) ch );
 	
-    //#suspensa
-	//Nessa opção o cursor é gerenciado em user mode.
-	//outbyte(ch);
+	stdio_system_call ( 65, (unsigned long) ch, (unsigned long) ch, 
+		(unsigned long) ch );
 	
 	return (int) ch;    
 };
 
 
 /*
- **************************************************
+ **********
  * outbyte:
  * @todo: Colocar no buffer de arquivo.
+ * #obs: essa função chamará _outbyte.
  *
+ * #importante: Não me lebro se o kernel efetua o refresh do char 
+ * nesse caso.
  */
+ 
 void outbyte (int c){
 	
     static char prev = 0;
@@ -775,6 +780,7 @@ void outbyte (int c){
 	//Obs: O scroll ainda não está implementado.
 	//O scroll será feito depois que implementarmos o array de ponteiros
 	//para estruturas de linha.
+	
 	if ( g_cursor_y > g_rows )
 	{ 
 	    scroll();
@@ -784,41 +790,32 @@ void outbyte (int c){
 
     // Imprime os caracteres normais.
 
-	_outbyte(c);
+	_outbyte (c);
 
-    prev = c;    //Atualisa o prev. 	
-	//return;
+	//Atualisa o prev.
+    prev = c;     	
 };
 
 
 /*
- ********************************************************************
+ ***********
  * _outbyte:
  *     Just output a byte on the screen.
  *
  *     Obs: A função não se preocupa com o cursor.
  *          Essa rotina está preparada somente par ao modo gráfico.
  *          Talvez usaremos um selecionador de modo.   
+ *
+ * #obs: 
+ * #importante: Não me lebro se o kernel efetua o refresh do char 
+ * nesse caso.
  */
-	//#impasse:
-	//ok, isso funciona.
-	//mas o que acontece é que o char é imprimido apenas no backbuffer e 
-	// não é efetuado o refresh ..., é isso o que queremos em alguns casos,
-	// como na construção de janelas, mas não é isso o que queremos nas digitações 
-	//de teclado. A solução talvez fosse não usar printf na construção de janelas.
-	//mas no caso da printf em user mode ela deve aparecer na tela imediatamente.
-	//para isso precisamos chamar alguma rotina que faça refresh do char, essa rotina 
-	//ja existe no kernel.
-	//também pode existir dois tipos de print char, um que faça refresh do char e outro 
-	//que não faça. o que não faz é usado para construir janelas e o que faz é usado 
-	//no terminal.
-	//a função printf pode ser a função apenas de terminal e imprimirá o char na tela.
-	//outra função de print char poderá ser criada para janelas, e essa imprimirá 
-	//apenas no backbuffer.
   
 void _outbyte ( int c ){
 	
-	//#obs: Tamanho do char constante. 
+	//#obs: Tamanho do char constante = 8. 
+	//o que queremos é usar uma variável.
+	
 	stdio_system_call( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
 };
 
@@ -840,7 +837,8 @@ unsigned long input ( unsigned long ch ){
 	char c = (char) ch;    
 	
 	// Ajust prompt max.
-	if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT ){
+	if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
+	{
 		prompt_max = PROMPT_MAX_DEFAULT;
 	}
 	
@@ -928,7 +926,7 @@ input_done:
 
 
 /*
- *****************************************************************************
+ ********************
  * stdio_system_call:
  *     System call usada pelo módulo stdio.  
  *     Função interna. 
@@ -955,7 +953,7 @@ void *stdio_system_call( unsigned long ax,
 	asm volatile( " int %1 \n"
 		          : "=a"(Ret)	
 		          : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-//done:
+
 	return (void *) Ret; 
 };
 
@@ -970,17 +968,17 @@ int input_file_buffer_size(void)
 */
 
 
-	//@todo:
-	//Podemos pegar esse char e colocá-lo stdin 
-	//slave (local) de input.
+// getchar:
+// pegando diretamente do kernel e não do arquivo.
+// me parece que o tradicional é pegar do arquivo,
+// mas isso acontece em outras situações.
+//@todo:
+//Podemos pegar esse char e colocá-lo stdin 
+//slave (local) de input.
 
 int getchar (void){
 	
-	int ch;	
-	ch = (int) stdio_system_call ( 137, 0, 0, 0 );
-	
-//done:	
-	return (int) ch; 
+	return (int) stdio_system_call ( 137, 0, 0, 0 ); 
 };
 
 
@@ -1005,13 +1003,9 @@ void stdioInitialize (){
 	stdout = (FILE *) &buffer1[0];	
 	stderr = (FILE *) &buffer2[0];
 
-
-    //
     // A biblioteca tem 3 pequenos buffers,
 	// que serão usados como base para os stream.
 	// ?? Podemos almentar esses buffers ?? @todo: testar.
-    //	
-	
 
 	//stdin - Usando o buffer 'prompt[.]' como arquivo.
 	stdin->_base = &prompt[0];
@@ -1037,21 +1031,16 @@ void stdioInitialize (){
 	stderr->_tmpfname = "stderr";	
 	//...
 	
-	
-	//
 	// Limpando os buffers.
-	//
 	
 	//#bugbug: Cuidado com o tamanho.
 	
 	for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
+		
 		prompt[i] = (char) '\0';
 		prompt_out[i] = (char) '\0';
 		prompt_err[i] = (char) '\0';
 	}
-	
-//done:
-    return;
 };
 
 
@@ -1076,7 +1065,8 @@ int fflush ( FILE *stream ){
 //clear:
     //#bugbug: Se essa base aponta para um lugar inválido poderemos 
 	//ter uma page fault.
-    for ( i=0; i < stream->_bufsiz; i++ ){
+    for ( i=0; i < stream->_bufsiz; i++ )
+	{
 	    stream->_base[i] = (char) '\0';		
 	}		
 		
@@ -1115,6 +1105,7 @@ int fprintf ( FILE *stream, const char *format, ... ){
         
 		return (int) 0;		
 	};
+	
 	return (int) (-1);
 };
 
@@ -1144,8 +1135,10 @@ int fputs ( const char *str, FILE *stream ){
 		sprintf( stream->_ptr, str );
 		
 		stream->_ptr = stream->_ptr + size;
+		
         return (int) 0;		
 	};
+	
 	return (int) (-1);
 };
 
@@ -1154,6 +1147,7 @@ int fputs ( const char *str, FILE *stream ){
  *********************************
  * gets:
  *
+ * os: gets() devolve um ponteiro para s
  */
 char *gets (char *s){
 	
@@ -1161,24 +1155,20 @@ char *gets (char *s){
     int t;
 	char *p;
 	
-
-	/* gets() devolve um ponteiro para s */
     //salva
 	p = s; 	
-    
-	//printf("gets:");
 	
 	while (1)
 	{
-        ch = (int) getchar();
+        ch = (int) getchar ();
+		
         if ( ch != -1 )
 		{
             switch (ch) 
 		    {
-				//case '9': //teste
+				/* termina a string */
 			    case '\n':
 				case VK_RETURN: 
-			        /* termina a string */
                     s[t] =  (char) '\0'; 
                     goto done;
 				    break;
@@ -1196,13 +1186,13 @@ char *gets (char *s){
 					break;
            };
 		};
-		asm("pause");
+		
+		asm ("pause");
     };
 	
     s[t] = (char) '\0';
 	
-done:
-   // printf("gets:done");	
+done:	
     return (char *) p;
 };
 
@@ -1240,9 +1230,6 @@ int ungetc ( int c, FILE *stream ){
 int fgetc ( FILE *stream ){
 	
     int ch;	
-	
-	//#debug
-	//printf("fgetc: stream->_base: %s\n",stream->_base);
  
 	if( (void *) stream == NULL )
 	{
@@ -1251,10 +1238,11 @@ int fgetc ( FILE *stream ){
 		
 		//Não há mais caracteres disponíveis entre 
 		//stream->_ptr e o tamanho do buffer.
-		if( stream->_cnt <= 0)
+		if ( stream->_cnt <= 0)
 		{
 			stream->_flag = (stream->_flag | _IOEOF); 
 			stream->_cnt = 0;
+			
 			return (int) (-1);
 		};
 				
@@ -1284,10 +1272,13 @@ int feof ( FILE *stream ){
 	if ( (void *) stream == NULL )
 	{
 		return (int) (-1);
+		
 	}else{
 	
-	    ch = fgetc(stream);
-        if ( ch == EOF ){
+	    ch = fgetc (stream);
+		
+        if ( ch == EOF )
+		{
 			return (int) 1;
 		}else{
 			return (int) 0;
@@ -1309,8 +1300,10 @@ int feof ( FILE *stream ){
 int ferror ( FILE *stream ){
 	
 	if ( (void *) stream == NULL ){
+		
 		return (int) (-1);
 	}
+	
     return (int) ( ( stream->_flag & _IOERR ) );
 };
 
@@ -1329,8 +1322,8 @@ int fseek ( FILE *stream, long offset, int whence ){
 	
 	//checar limites do offset.
 	
-	switch (whence)
-	{
+	switch (whence){
+		
 		case SEEK_SET:    
 		    stream->_ptr = (stream->_base + offset); 
 			goto done;
@@ -1365,19 +1358,18 @@ done:
  */
 int fputc ( int ch, FILE *stream ){
 	
-	if( (void *) stream == NULL ){
-	    goto fail;	
-	}
+	if ( (void *) stream == NULL )
+	{
+	    return (int) (-1);	
+		
+	}else{
+		
+        sprintf ( stream->_ptr, "%c", ch);
 	
-    sprintf ( stream->_ptr, "%c", ch);
-	
-	stream->_ptr++;
-	stream->_cnt--;
-	goto done;
-	
-fail:	
-    return (int) (-1);	
-done:	
+	    stream->_ptr++;
+	    stream->_cnt--;		
+	};
+
     return (int) (0);		
 };
 
@@ -1389,8 +1381,9 @@ done:
  *     e não dentro do terminal.
  */
 void stdioSetCursor ( unsigned long x, unsigned long y ){
+	
 	//34 - set cursor.
-    stdio_system_call( 34, x, y, 0);	
+    stdio_system_call ( 34, x, y, 0);	
 };
 
 
@@ -1400,8 +1393,8 @@ void stdioSetCursor ( unsigned long x, unsigned long y ){
  *     estamos falando do posicionamento do cursor dentro da janela
  *     e não dentro do terminal.
  */  
-unsigned long stdioGetCursorX ()
-{
+unsigned long stdioGetCursorX (){
+	
     return (unsigned long) stdio_system_call ( 240, 0, 0, 0 );
 };
 
@@ -1412,8 +1405,8 @@ unsigned long stdioGetCursorX ()
  *     estamos falando do posicionamento do cursor dentro da janela
  *     e não dentro do terminal. 
  */
-unsigned long stdioGetCursorY ()
-{
+unsigned long stdioGetCursorY (){
+	
     return (unsigned long) stdio_system_call ( 241, 0, 0, 0 );
 };
 

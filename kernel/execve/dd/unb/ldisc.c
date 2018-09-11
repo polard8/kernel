@@ -16,7 +16,6 @@
 
 
  
-
 //=======================================================
 //++ Usadas pelo mouse.
 // hardwarelib.inc
@@ -298,13 +297,13 @@ struct keyboardMessage
 
 
 //Pega o status das teclas de modificação.
-unsigned long 
-keyboardGetKeyState( unsigned char key )
-{
+
+unsigned long keyboardGetKeyState ( unsigned char key ){
+	
 	unsigned long State = 0;
 	
-	switch(key)
-	{   
+	switch (key){
+		
 		case VK_LSHIFT: 
 		    State = shift_status; 
 			break;
@@ -350,20 +349,23 @@ keyboardGetKeyState( unsigned char key )
 
 	//Nothing.
 	
-Done:
+//Done:
+
     return (unsigned long) State;		
 };
 
 
 /*
- *************************************************
+ ***************
  * keyboardEnable:
  *     Enable keyboard.
+ *
  */
-void keyboardEnable()
-{
+void keyboardEnable (){
+	
 	//Wait for bit 1 of status reg to be zero.
-    while( (inportb(0x64) & 2) != 0 )
+    
+	while ( (inportb(0x64) & 2) != 0 )
 	{
 		//Nothing.
 	};
@@ -372,8 +374,8 @@ void keyboardEnable()
     outportb(0x60,0xF4);
     //sleep(100);
 
-done:
-	return;
+//done:
+	//return;
 };
 
 
@@ -382,10 +384,11 @@ done:
  * keyboardDisable:
  *     Disable keyboard.
  */
-void keyboardDisable()
-{
+void keyboardDisable (){
+	
 	//Wait for bit 1 of status reg to be zero.
-    while( (inportb(0x64) & 2) != 0 )
+    
+	while ( (inportb(0x64) & 2) != 0 )
 	{
 		//Nothing.
 	};
@@ -394,8 +397,8 @@ void keyboardDisable()
     outportb(0x60,0xF5);
     //sleep(100);
 	
-done:
-	return;
+//done:
+	//return;
 };
 
 
@@ -406,8 +409,9 @@ done:
  *     ED = Set led.
  */
 // void keyboardSetLEDs(cahr flag)
-void keyboard_set_leds(char flag)
-{
+
+void keyboard_set_leds (char flag){
+	
 	//@todo: filtro.
 
 	//Wait for bit 1 of status reg to be zero.
@@ -432,8 +436,8 @@ void keyboard_set_leds(char flag)
 		
 	//}	
 
-done:
-	return;
+//done:
+	//return;
 };
 
 
@@ -453,15 +457,16 @@ void keyboard()
 
 
 /*
- ***********************************************
+ ***************
  * LINE DISCIPLINE
  * Funciona como um filtro.
  * Obs: Essa é a rotina principal desse arquivo, 
  * todo o resto poderá encontrar um lugar melhor.
  *
  */
-int LINE_DISCIPLINE( unsigned char SC, int type )
-{
+ 
+int LINE_DISCIPLINE ( unsigned char SC, int type ){
+	
     //
     // Step 0 - Declarações de variáveis.
     //
@@ -498,7 +503,7 @@ int LINE_DISCIPLINE( unsigned char SC, int type )
 
 	//Debug stuff.
     //Show the scancode if the flag is enabled.	
-	if(scStatus == 1){
+	if (scStatus == 1){
 	    printf("{%d,%x}\n",scancode,scancode);
 	};
 	
@@ -1563,7 +1568,7 @@ char y = ( mouse_packet_data & _MOUSE_Y_SIGN );
 
 
 /*
- ***************************************************
+ **************
  * mouseHandler:
  *     Handler de mouse. 
  *
@@ -1581,20 +1586,18 @@ char y = ( mouse_packet_data & _MOUSE_Y_SIGN );
 #define MOUSE_V_BIT  0x08 
 
 //contador
-static int count_mouse=0;
+static int count_mouse = 0;
 
 // Buffer.
 static char buffer_mouse[3];
 	
-void mouseHandler()
-{
+void mouseHandler (){
+	
 	// ?? #bugbug.
 	// ?? Porque isso é local. ??
 	// ?? Não tem um contador global para isso ??
 	// E o fato de serem 'static' ???
 	// Obs: A função entra com esse mouse count zerado.
-
-	
 	
     // Coordenadas do mouse.
     // Obs: Isso pode ser global.
@@ -1605,25 +1608,22 @@ void mouseHandler()
     //Char para o cursor provisório.
     static char mouse_char[] = "T";
 
-    //
-	// Lendo um char no controlador.
-	//
-
-
 	char *_byte;
+
+
+	// Lendo um char no controlador.
 	
 	*_byte = (char) mouse_read();
 	
-	//buffer_mouse[count_mouse++] = mouse_read();		
 	
-	//
+	// #importante:
 	// Contagem de interruções:
 	// Obs: Precisamos esperar 3 interrupções.
-	//
 	
-	//#bugbue essa variável está inicializando toda vez que 
+	//#bugbug essa variável está inicializando toda vez que 
 	//se chama o handler porque ela é interna. ??
-	switch( count_mouse )
+	
+	switch ( count_mouse )
 	{
 		case 0:
 		    buffer_mouse[0] = (char) *_byte;
@@ -1653,6 +1653,7 @@ void mouseHandler()
 			//Isso está em assembly, lá em hwlib.inc 
 			//mas queremos que seja feito em C.
 			//Uma rotina interna aqui nesse arquivo está tentando isso.
+			
 			update_mouse();			
 			
 			
@@ -1673,7 +1674,7 @@ void mouseHandler()
 		    //
 
 		    //bmpDisplayBMP( mouseBMPBuffer, mouse_x, mouse_y );
-			bmpDisplayMousePointerBMP( mouseBMPBuffer, mouse_x, mouse_y );
+			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
 		    refresh_rectangle( mouse_x, mouse_y, 16, 16 );					
 			
             break;
@@ -1681,23 +1682,18 @@ void mouseHandler()
         default:
 		    count_mouse = 0;
             break;		
-			
 	};
 	
 	
-	//
-	// *importante:
-    // Esse é o memento em que enviamos a mensagem !!
-    //	
+	// #importante:
+    // Esse é o momento em que enviamos a mensagem!
 	
-    //
-	// *importante:
+	// #importante:
 	// Devemos enviar a mensagem de mouse para quem. ??
 	// First responder ?? (wwf)
-	//
 	
-	// O aplicativo poderá interceptar mensgens como mouse hover.
-	// mousehover é flutuando por cima do objeto.
+	// O aplicativo poderá interceptar mensagens como 'mouse hover'.
+	// mousehover é 'flutuando por cima do objeto'.
 	
 	//
 	// FIRST RESPONDER
@@ -1706,7 +1702,7 @@ void mouseHandler()
 	struct window_d *w;
 	w = (void *) windowList[window_with_focus];
 	
-	if( (void*) w != NULL )
+	if( (void *) w != NULL )
 	{
 		// Envia as mensagens para os aplicativos intercepta-las.
 		if( w->used == 1 && w->magic == 1234 )
@@ -1728,7 +1724,6 @@ void mouseHandler()
 	};		
 	
 	
-	//
 	// #importante 
 	// Por outro lado o mouse deve confrontar seu posicionamento com 
 	// todas as janelas, para saber se as coordenadas atuais estão passando 
@@ -1736,13 +1731,12 @@ void mouseHandler()
 	// janela que o mouse passou por cima. Ela deve ser sinalizada como hover,
 	// 
 	// #importante:
-	// Se houver um click, o elemento com mousehover será afetado, e enviaremos,
-	// mesagens para ele, se apertarem enter ou application key, quem 
-	// recebe a mensagem é o first responder, ou seja. a janela com o focod e entrada.
-	//
+	// Se houver um click, o elemento com mousehover será afetado, e 
+	// enviaremos mesagens para ele, se apertarem enter ou application key, 
+	// quem recebe a mensagem é o first responder, ou seja, a janela com o 
+	// foco de entrada.
     // Se clicarmos com o botão da direita, quem recebe a mensagem é 
     // a janela que o mouse está passando por cima.	
-	//
 	
 	
 	//
@@ -1750,6 +1744,7 @@ void mouseHandler()
 	//
 	
 	//Apenas obtendo o estado dos botões.
+	
 	mouse_buttom_1 = 0;
 	mouse_buttom_2 = 0;
 	mouse_buttom_3 = 0;
@@ -1810,16 +1805,12 @@ void mouseHandler()
 	};
 	
 	
-	//
 	// #bugbug 
-	// ?? E no caso de apenas considerarmos que 
-	// que o mouse está se movendo, mandaremos 
-	// para janela over. ???
-	// Obs: A mensagen over pode ser enviada apenas uma vez. 
-	// será usada para 'capturar' o mouse ... e depois 
-	// tem a mensagem para 'descapturar'.
-	// 
-	//
+	// ?? E no caso de apenas considerarmos que o mouse está se movendo, 
+	// mandaremos para janela over. ???
+	// Obs: A mensagem over pode ser enviada apenas uma vez. 
+	// será usada para 'capturar' o mouse ... 
+	// e depois tem a mensagem para 'descapturar'.
 	
 	//
 	// ## On mouse over ## (capture)
@@ -1828,28 +1819,33 @@ void mouseHandler()
 	int wID;
 	struct window_d *wScan;
 	
-	//Escaneamos para achar qual janela bate com 
-	//os valores indicados.
+	//Escaneamos para achar qual janela bate com os valores indicados.
 	//return: (int) window id.
-	wID = (int) windowScan( mouse_x, mouse_y );
+	
+	wID = (int) windowScan ( mouse_x, mouse_y );
 	
 	//#IMPORTANTE
 	//Se for válido e diferente da atual.
 	//significa que estamos dentro de uma janela.
-	if( wID != -1 )
+	
+	if ( wID != -1 )
 	{
 		wScan = (struct window_d *) windowList[wID];
+		
+		//#bugbug 
+		//#todo:
+		// Deveriamos aqui checarmos a validade da estrutura ??
+		
 		//redraw_window(wScan);
         
-        //#importante
-		//Se um botão foi pressionado ou liberado, então 
-		//enviaremos o uma mensagem relativa ao estado do botão 
-		//caso contrário enviaremos uma mensagem sobre a movimentação 
-		//do mouse.
+        // #importante
+		// Se um botão foi pressionado ou liberado, então enviaremos uma 
+		// mensagem relativa ao estado do botão, caso contrário, enviaremos 
+		// uma mensagem sobre a movimentação do mouse.
 		
 		//#importante
 		// Se houve mudança em relação ao estado anterior.
-		if( mouse_button_action == 1 )
+		if ( mouse_button_action == 1 )
 		{
 			//Qual botão mudou seu estado??
 			//Checaremos um por um.
@@ -1942,16 +1938,19 @@ void mouseHandler()
 			mouse_button_action = 0;
 			
 			
+			//se NÃO ouve alteração no estado dos botões, 
+			//então apenas enviaremos a mensagem de movimento 
+			//do mouse.
+			
 		}else{
 			
 			//#importante
 			//lembrando que estamos dentro de uma janela ...
-			//por isso a mensagen é over e não move.
-			//se NÂO ouve alteração no estado dos botões 
-			//então apenas enviaremos a mensagem de movimento 
-			//do mouse.
+			//por isso a mensagem é over e não move.
+			
             //Obs: Se a janela for a mesma que capturou o mouse,
 			//então não precisamos reenviar a mensagem.
+			
 			if( wScan->id != mouseover_window )
 			{
                 windowSendMessage( (unsigned long) wScan, 
@@ -1960,7 +1959,9 @@ void mouseHandler()
 			        (unsigned long) 0 );
 			    
 				mouseover_window = wScan->id; 
-			}else{ };
+			}else{ 
+			    //nothing ...
+			};
 			
 			
 			//Ação concluída.
@@ -1968,28 +1969,16 @@ void mouseHandler()
 			mouse_button_action = 0;			
 		};
 		
-		
-		
 		//#debug. (+)
-        draw_text( wScan,
-                   0,  
-                   0,  
-				   COLOR_RED, 
-				   "+" );
-			   
+        draw_text ( wScan, 0, 0, COLOR_RED, "+" );
 		
 		//refresh bmp rectangle.
 		//isso coloca o (+) no frontbuffer.
-		refresh_rectangle( wScan->left, 
-		    wScan->top, 
-			8, 
-			8 );
-
+		refresh_rectangle( wScan->left, wScan->top, 8, 8 );
 	};
 	
-	
-	
-exit_irq:	
+//exit_irq:	
+
     // EOI.		
     outportb(0xa0, 0x20); 
     outportb(0x20, 0x20);
@@ -1999,8 +1988,8 @@ exit_irq:
 // Input.
 // Input a value from the keyboard controller's data port, after checking
 // to make sure that there's some data there for us.
-static unsigned char inPort60(void)
-{
+static unsigned char inPort60 (void){
+	
     unsigned char data = 0;
 
     while (!(data & 0x01))
@@ -2008,16 +1997,17 @@ static unsigned char inPort60(void)
 
     kernelProcessorInPort8(0x60, data);
 	
-done:  
-  return (data);
+//done:
+  
+    return (data);
 };
 
 
 // Output.
 // Output a value to the keyboard controller's data port, after checking
 // to make sure it's ready for the data.
-static void outPort60(unsigned char value)
-{
+static void outPort60 (unsigned char value){
+	
     unsigned char data;
   
     // Wait for the controller to be ready
@@ -2028,7 +2018,8 @@ static void outPort60(unsigned char value)
     data = value;
     kernelProcessorOutPort8(0x60, data);
   
-done:  
+//done: 
+ 
     return;
 };
 
@@ -2036,20 +2027,22 @@ done:
 // Output.
 // Output a value to the keyboard controller's command port, after checking
 // to make sure it's ready for the command
-static void outPort64(unsigned char value)
-{
+static void outPort64 (unsigned char value){
+	
     unsigned char data;
   
     // Wait for the controller to be ready
     data = 0x02;
+	
     while (data & 0x02)
         kernelProcessorInPort8(0x64, data);
 
     data = value;
     kernelProcessorOutPort8(0x64, data);
 	
-done:	
-    return;
+//done:	
+    
+	return;
 };
 
 
@@ -2059,8 +2052,8 @@ done:
  * Input a value from the keyboard controller's data port, after checking
  * to make sure that there's some mouse data there for us.
  */
-static unsigned char getMouseData(void)
-{
+static unsigned char getMouseData (void){
+	
     unsigned char data = 0;
 
     while ((data & 0x21) != 0x21)
@@ -2068,8 +2061,9 @@ static unsigned char getMouseData(void)
 
     kernelProcessorInPort8(0x60, data);
 	
-done:
-    return (data);
+//done:
+    
+	return (data);
 };
 
 
@@ -2174,20 +2168,20 @@ done:
 
 
 /* 
- * ***************************************************************
+ * ******************
  * P8042_install:
  *     Configurando o controlador PS/2, 
  *     e activar a segunda porta PS/2 (mouse).
  *     (Nelson Cole)
  */
-void P8042_install()
-{
+void P8042_install (){
+	
 	unsigned char status;
 
     // Desativar dispositivos PS/2 , isto evita que os dispositivos PS/2 
 	// envie dados no momento da configuração.
 
-desablePorts:
+//desablePorts:
 	
 	// Desativar a primeira porta PS/2.
   	kbdc_wait(1);
@@ -2198,7 +2192,7 @@ desablePorts:
 	kbdc_wait(1);
 	outportb(0x64,0xA7); 
 
-goAhead:
+//goAhead:
 	
 	 // Defina a leitura do byte actual de configuração do controlador PS/2.
 	kbdc_wait(1);    
@@ -2229,7 +2223,7 @@ goAhead:
     // Reabilitando portas.
     //
 	
-enablePorts:
+//enablePorts:
 	
 	// Ativar a primeira porta PS/2.
 	kbdc_wait(1);
@@ -2243,11 +2237,12 @@ enablePorts:
 	// Done!
 	//
 	
-done:	
+//done:	
 	// espera.
 	// ?? Pra que isso ??
 	kbdc_wait(1);  
-    return;
+    
+	//return;
     // NOTA. 
 	// Esta configuração discarta do teste do controlador PS/2 e de seus dispositivos. 
 	// Depois façamos a configuração decente e minuciosa do P8042.
@@ -2262,8 +2257,8 @@ done:
  *     Usar isso na inicialização do mouse.
  *     #bugbug isso pode ir para windowLoadGramadoIcons
  */
-int load_mouse_bmp()
-{
+int load_mouse_bmp (){
+	
 	int Status = 1;
 	int Index;
     struct page_frame_d *pf;
@@ -2279,11 +2274,12 @@ int load_mouse_bmp()
 	// Ret = (void*) allocPageFrames(500);  
 	
     // Alocando duas páginas para um BMP pequeno. 8KB.	
-	mouseBMPBuffer = (void*) allocPageFrames(2);
+	mouseBMPBuffer = (void *) allocPageFrames(2);
 	//mouseBMPBuffer = (void*) allocPageFrames(10);
 	//mouseBMPBuffer = (void*) allocPageFrames(100);  //400KB
-	if( (void*) mouseBMPBuffer == NULL )
-	{
+	
+	if ( (void *) mouseBMPBuffer == NULL ){
+		
 	    printf("unblocked-ldisc-load_mouse_bmp: mouseBMPBuffer\n");
 		goto fail;		
 	};
@@ -2300,7 +2296,8 @@ int load_mouse_bmp()
 	//	    printf("null\n");	 
 	//	}
 	//   if( (void*) pf != NULL ){
-	//	    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
+	//	    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",
+	//          pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
 	//	}
 	//}
 	
@@ -2314,7 +2311,7 @@ int load_mouse_bmp()
 	//===================================
 	// MOUSE
 	fileret = (unsigned long) fsLoadFile( "MOUSE   BMP", 
-	                              (unsigned long) mouseBMPBuffer );
+	                            (unsigned long) mouseBMPBuffer );
 								  
 	if( fileret != 0 )
 	{
@@ -2371,7 +2368,7 @@ done:
 
 
 /*
- *****************************************************
+ ***************
  * ps2:
  *     Essa rotina de inicialização do controladro 
  * poderá ter seu próprio módulo.
@@ -2382,33 +2379,41 @@ done:
  *     As vezes os dois não funcionam ao mesmo tempo se a 
  *     inicialização não for feita desse jeito. 
  */
-void ps2()
-{
-    P8042_install();  //deverá ir para ps2.c @todo: criar arquivo.
+void ps2 (){
+	
+	//deverá ir para ps2.c @todo: criar arquivo.
+    
+	P8042_install();  
 	
 	//@todo: isso deveria se chamar init_ps2_mouse ...
-    init_keyboard();  //?? quem inicializará a porta do teclado ?? o driver ??
-	init_mouse();	  //?? quem inicializará a porta do mouse ?? o driver ??
-	
+    //?? quem inicializará a porta do teclado ?? o driver ??
+	//?? quem inicializará a porta do mouse ?? o driver ??
+	 
+	init_keyboard();  
+	init_mouse();	 
 };
 
 
-
-
-void set_current_keyboard_responder( int i ){
+void set_current_keyboard_responder ( int i ){
+	
 	current_keyboard_responder = i;
 };
 
-int get_current_keyboard_responder(){
+
+int get_current_keyboard_responder (){
+	
 	return (int) current_keyboard_responder;
 };
 
 
-void set_current_mouse_responder( int i ){
+void set_current_mouse_responder ( int i ){
+	
     current_mouse_responder = i;	
 };
 
-int get_current_mouse_responder(){
+
+int get_current_mouse_responder (){
+	
     return (int) current_mouse_responder;	
 };
 
@@ -2416,16 +2421,18 @@ int get_current_mouse_responder(){
 //inicializando a fila de mensagens do sistema
 //com ponteiros para estruturas de mensagens ...
 //es estruturas serão reutilizáveis.
-void initialize_system_message_queue()
-{
+void initialize_system_message_queue (){
+	
 	struct message_d *m;
 	
 	int i;
-	for( i=0; i<SYSTEM_MESSAGE_QUEUE_MAX; ++i )
+	
+	for ( i=0; i<SYSTEM_MESSAGE_QUEUE_MAX; i++ )
 	{
 		
-		m = (void*) malloc( sizeof(struct message_d) );
-		if( (void*) m == NULL )
+		m = (void *) malloc( sizeof(struct message_d) );
+		
+		if ( (void *) m == NULL )
 		{
 			printf("unblocked-ldisc-initialize_system_message_queue:");
 			die();
@@ -2443,15 +2450,14 @@ void initialize_system_message_queue()
 	system_message_write = 0;
 	system_message_read = 0;
 	
-	//
+
 	// ==================================================
 	// #importante:   (teste)
 	// initializaes keyboard queue
-	//
 	
 	xinit_queue(ld_keyboard_queue);
 	
-    return;	
+    //return;	
 };
 
 //==========================================
@@ -2464,14 +2470,16 @@ void xinit_queue(ld_queue_t *queue) {
 	queue->data = malloc(QUEUE_INITIAL_SIZE*sizeof(void*));
 	queue->size = QUEUE_INITIAL_SIZE;
 	queue->reads = queue->writes = 0;
-}
+};
+
 
 void xdestroy_queue(ld_queue_t *queue) {
 	//pthread_mutex_destroy(&(queue->lock));
 	//pthread_cond_destroy(&(queue->wait));
 
 	free(queue->data);
-}
+};
+
 
 //size should always be a power of 2
 static void xresize_queue(ld_queue_t *queue, size_t new_size) {
@@ -2489,7 +2497,7 @@ static void xresize_queue(ld_queue_t *queue, size_t new_size) {
 	queue->size = new_size;
 	queue->writes = k;
 	queue->reads = 0;
-}
+};
 
 
 // xenqueue - por na fila.
@@ -2512,8 +2520,8 @@ void xenqueue(void *element, ld_queue_t *queue)
 
 
 // xdequeue - Retirar da fila.
-void *xdequeue(ld_queue_t *queue)
-{
+void *xdequeue (ld_queue_t *queue){
+	
 	void *ret;
 	//pthread_mutex_lock(&(queue->lock));
 
@@ -2532,7 +2540,7 @@ void *xdequeue(ld_queue_t *queue)
 
 	//pthread_mutex_unlock(&(queue->lock));
 
-	return (void*) ret;
+	return (void *) ret;
 };
 
 
@@ -2540,8 +2548,8 @@ void *xdequeue(ld_queue_t *queue)
 // Inicializa o status das teclas de modificação.
 // são usadas em comjunto com outras teclas para criar atalhos.
 // modificam temporariamente a função de outra tecla.
-void ldisc_init_modifier_keys()
-{
+void ldisc_init_modifier_keys (){
+	
 	// Modifier keys.
 	
 	// Shift.
@@ -2568,8 +2576,8 @@ void ldisc_init_modifier_keys()
 
 // modificam permanentemente a função de outra tecla.
 //ativa as teclas extendidas.
-void ldisc_init_lock_keys()
-{
+void ldisc_init_lock_keys (){
+	
     // Capital Lock.	
 	capslock_status = 0;
 	

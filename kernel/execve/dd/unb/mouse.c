@@ -22,19 +22,16 @@
  * para o kernel.
  *    talvez pertenã ao driver do controlador 8042
  */
-void mouse_handler()
-{
-	//
+void mouse_handler (){
+	
 	//*importante:
 	// Estamos no driver de mouse.
 	// Chamaremos o mouse handler dentro do kernel base.
-	//
 	
-callMouseHandler:
+//callMouseHandler:
 
     //Obs: Essa função ainda está em ldisc.c
-    mouseHandler();	
-	return;
+    mouseHandler ();	
 };
 
 
