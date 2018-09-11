@@ -108,8 +108,9 @@ echo -{ ...
 	rem copy tests\NC2.FON       F:\
 	copy c:\gramado\bin\NC2.FON F:\
 	
+	copy c:\gramado\bin\TEDITOR.BIN   F:\
+	
 	rem copy tests\TASCII.BIN    F:\
-	rem copy tests\TEDITOR.BIN   F:\
 	rem copy tests\TPRINTF.BIN   F:\	
 	rem copy tests\TSCROLL.BIN   F:\
 	rem copy tests\TGFE.BIN      F:\
