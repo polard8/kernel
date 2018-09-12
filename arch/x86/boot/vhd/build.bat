@@ -83,6 +83,8 @@ echo -{ ...
     copy c:\gramado\arch\x86\boot\vhd\INIT.TXT  F:\
     copy c:\gramado\arch\x86\boot\vhd\USER.TXT  F:\
 	
+	copy c:\gramado\arch\x86\boot\vhd\GRAMADO.TXT  F:\
+	
 	rem BMPs
 	copy c:\gramado\arch\x86\boot\vhd\images\BMP1.BMP   F:\
 	copy c:\gramado\arch\x86\boot\vhd\images\MOUSE.BMP  F:\
