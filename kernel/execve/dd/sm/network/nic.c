@@ -57,12 +57,12 @@ void nicHandler()
  *     Inicializa o módulo gerenciador de rede.
  *     @todo: deletar: Usar nicInit()
  */
-int init_network()
-{
+int init_network (){
 	
 	//...
 	
-done:	
+//done:	
+
     return (int) 0;	
 };
 

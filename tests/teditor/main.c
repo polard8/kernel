@@ -94,7 +94,7 @@ int mainGetMessage (){
 		//#debug
         //printf("shellCompare: %s \n", tokenList[i] );
 		
-		token = strtok( NULL, LSH_TOK_DELIM );
+		token = strtok ( NULL, LSH_TOK_DELIM );
 		
 		// Incrementa o índice da lista
         index++;
@@ -170,6 +170,9 @@ int mainTextEditor ( int argc, char *argv[] ){
     int char_count = 0;	
 	
 	struct window_d *hWindow;
+	
+	
+	//#todo: analizar a contagem de argumentos.
 	
 	
 //#ifdef TEDITOR_VERBOSE			
@@ -268,11 +271,21 @@ file:
     
 	// Pegando o argumento 1, porque o argumento 0 é o nome do editor.
 	
-	fp = fopen( (char*) argv[1], "rb" );	
+
+	//#test
+	if ( (char *) argv[1] == NULL )
+	{
+		//printf("no file\n");
+	    goto startTyping;	
+	}
+	
+	fp = fopen( (char *) argv[1], "rb" );	
+	
 	if( fp == NULL )
     {
         printf("fopen fail\n");
-        goto fail;		
+        goto startTyping;
+		//goto fail;		
     }else{
 		
 #ifdef TEDITOR_VERBOSE			
@@ -289,6 +302,7 @@ file:
         printf(".\n");		
 #endif
 
+startTyping:
 
 //#ifdef TEDITOR_VERBOSE	
 		printf("\n");

@@ -2,15 +2,10 @@
  * File: network.c
  *
  * Descrição:
- *     Parte principal do módulo executive/network.
+ *     Parte principal do módulo sm/network.
  *
- * Versão: 1.0, 2016 - Created.
+ * 2016 - Created by Fred Nora.
  */
-
-
-
-#include <kernel.h>
-
 
 /*
  @todo:
@@ -50,29 +45,33 @@
  service protocol
  Network security
 
-
-
 */
 
-int networkTesting;
+
+
+#include <kernel.h>
+
+
+//int networkTesting;
 
  
-
-int networkInit()
-{
+int networkInit (){
+	
 	//criando socket para local host porta 80
 	
-	LocalHostHTTPSocket = (struct socket_d *) create_socket( 0x0100007F, 80 );  /* Localhost (127.0.0.1):80 */
+	
+	// Localhost (127.0.0.1):80 
+	LocalHostHTTPSocket = (struct socket_d *) create_socket ( 0, 0 );  
+	
 	CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
 	//...
 	
-	return 0;
-}
- 
+	return (int) 0;
+};
 
 
 //
-// Fim
+// End
 //
 
 
