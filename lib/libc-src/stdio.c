@@ -150,22 +150,27 @@ int fclose (FILE *stream){
  *     @todo: Abrir onde? saída padrão?
  *     @retorna o que? o endereço do buffer?
  *     Obs: Tem função na api que carrega um arquivo em um buffer.
+ *
+ * #obs: Deveríamos checar o tamanho do arquivo antes de criar o buffer.
+ *
+ * #todo: E se o ponteiro para o nome do arquivo for inválido? tem que  
+ * falhar e retornar null.
  */
 FILE *fopen ( const char *filename, const char *mode ){
-	
-	//  Deveríamos checar o tamanho do arquivo antes de criar o buffer.
-	
-	//unsigned char *a = (unsigned char *) filename;
-	unsigned long m = (unsigned long) mode;
+
+    //#importante:
+	//#bugbug
+	//#todo: Repare que não tem alocação nesse caso.
+	//precisamos de alocadores.
 	
 	//buffer para a estrutura de stream.
+	
 	unsigned char struct_buffer[BUFSIZ];  //struct
 	unsigned char buffer[BUFSIZ];         //file.
 	
-	//
-	// @todo: Criar filtros para os argumentos. Retornar NULL
-	// se os argumentos forem inválidos.
-	//
+	
+	//unsigned char *a = (unsigned char *) filename;
+	unsigned long m = (unsigned long) mode;
 	
 
 	//Criando as estruturas.
@@ -185,22 +190,26 @@ FILE *fopen ( const char *filename, const char *mode ){
 	stream->_cnt = PROMPT_MAX_DEFAULT;
 	
 	stream->_file = 0;
-	stream->_tmpfname = (char*) filename;	
+	stream->_tmpfname = (char *) filename;	
 	
+
+	// @todo: Criar filtros para os argumentos. Retornar NULL
+	// se os argumentos forem inválidos.
 	
+	//#test
+	if ( (char *) filename == NULL )
+	    return NULL;
 	
 	//transformando a string do nome de file.txt em 'FILE    TXT'
-	stdio_fntos( (char *) filename);
+	stdio_fntos( (char *) filename );
 	
 	//@todo: 
 	// Chamar uma  rotina que carregue um arquivo ...
 	// usar a mesma chamada pela api.
 	
 	
-    stdio_system_call( SYSTEMCALL_READ_FILE, 
-	                   (unsigned long) filename, 
-					   (unsigned long) &buffer[0], 
-					   (unsigned long) &buffer[0] );		
+    stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
+		(unsigned long) &buffer[0], (unsigned long) &buffer[0] );		
 	
 	
 	//if( (void*) a == NULL ){
