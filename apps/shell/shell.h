@@ -1185,7 +1185,7 @@ int is_bin ( char *cmd );
 /* Check if it's a .sh1 file */
 int is_sh1 ( char *cmd );
 
-
+int shellCheckPassword();
 			
 //
 // End.

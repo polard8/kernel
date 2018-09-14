@@ -3556,23 +3556,78 @@ int shellInit ( struct window_d *window ){
 	
 	
 	// ## prompt string support ##
-	shellInitializeWorkingDiretoryString();
+	shellInitializeWorkingDiretoryString ();
 
 	
 // Done.
 	
 done:
     
+	if ( shellCheckPassword() != 1 ){
+		
+	    printf("shellCheckPassword FAIL \n");		
+	}
+	
+
+	// @todo:
+	// Gerenciamento do heap do processo. ??
+	
+	// @todo:
+	// Chamar rotinas da biblioteca que ofereçam informações sobre 
+	// o heap oferecido pela biblioteca.
+	// Obs: A rt foi inicializada logo acima.
+	
+	
+    //heapTest:
+    /*	
+	printf("\n...\n");
+	printf("Testing C99 RT ...\n");
+	
+	unsigned long hStart, hEnd, hPointer, hAvail;
+	
+	hStart   = (unsigned long) rtGetHeapStart();
+	hEnd     = (unsigned long) rtGetHeapEnd();
+	hPointer = (unsigned long) rtGetHeapPointer();
+	hAvail   = (unsigned long) rtGetAvailableHeap();
+	
+	printf("heapStart{%x} heapEnd{%x} heapPointer{%x} heapAvailable={%x}\n", 
+	     hStart, hEnd, hPointer, hAvail);
+	
+	// resultados do teste:
+	// os valores parecem satisfatórios pois estão realmente dentro da área 
+	// de memória do aplicativo.
+	// @todo: Confirmar no memorymap gerado pelo compilador se essa área de memória 
+	// é apropriada. #bugbug
+	// observando o mmmap pelo jeito o compilador colocou o buffer do heap 
+	// no bss do arquivo e do tamanho certo.
+	// tudo indica que é saudável aumentar o tamanho do buffer usado pelo heap.
+	*/
+	
+	
+	if ( interactive == 1 )
+	    shellPrompt ();
+	
+	
+    refresh_screen();
+    return (int) 0;
+};
+
+
+
+int shellCheckPassword (){
+	
+    char buffer[512];	
+	
 	// Se o shell não for interativo não tem login.
-	if(interactive == 1)
+	if (interactive == 1)
 	{
 		FILE *user_stream;
 		
-		user_stream = (FILE *) fopen("user.txt","w+");
+		user_stream = (FILE *) fopen ("user.txt","w+");
 		
 		// Testing welcome message.
 	    printf("\n");
-	    printf("Welcome to Gramado Operating System.\n");
+	    printf("Welcome to Gramado!\n");
 	    printf("\n");
 	
         
@@ -3590,8 +3645,7 @@ done:
 	
 #ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
-	    printf("username={%s} password={%s}",
-		    username, password);
+	    printf("username={%s} password={%s}", username, password );
 		printf("\n");
 #endif
 		
@@ -3702,60 +3756,18 @@ done:
 		    printf("PASSWORD={ fail\n");
             login_status = 0; 			
 		};
+		    
+	}else{
 		
+		printf("shell not interactive\n");
+		login_status = 0;
+	};
+	
 #ifdef SHELL_VERBOSE
 		printf("Login done!\n");
 #endif
-    
-	};
 	
-	//
-	// @todo:
-	// Gerenciamento do heap do processo. ??
-	//
-	
-	
-	//
-	// @todo:
-	// Chamar rotinas da biblioteca que ofereçam informações sobre 
-	// o heap oferecido pela biblioteca.
-	// Obs: A rt foi inicializada logo acima.
-    //	
-	
-	
-    //heapTest:
-    /*	
-	printf("\n...\n");
-	printf("Testing C99 RT ...\n");
-	
-	unsigned long hStart, hEnd, hPointer, hAvail;
-	
-	hStart   = (unsigned long) rtGetHeapStart();
-	hEnd     = (unsigned long) rtGetHeapEnd();
-	hPointer = (unsigned long) rtGetHeapPointer();
-	hAvail   = (unsigned long) rtGetAvailableHeap();
-	
-	printf("heapStart{%x} heapEnd{%x} heapPointer{%x} heapAvailable={%x}\n", 
-	     hStart, hEnd, hPointer, hAvail);
-	
-	// resultados do teste:
-	// os valores parecem satisfatórios pois estão realmente dentro da área 
-	// de memória do aplicativo.
-	// @todo: Confirmar no memorymap gerado pelo compilador se essa área de memória 
-	// é apropriada. #bugbug
-	// observando o mmmap pelo jeito o compilador colocou o buffer do heap 
-	// no bss do arquivo e do tamanho certo.
-	// tudo indica que é saudável aumentar o tamanho do buffer usado pelo heap.
-	//
-	*/
-	
-	
-	if ( interactive == 1 )
-	    shellPrompt ();
-	
-	
-    refresh_screen();
-    return (int) 0;
+	return (int) login_status;
 };
 
 
