@@ -19,8 +19,8 @@
  *     do sistema.
  *     Chama módulo externo (Server em user mode).
  */
-void KeAbort() 
-{
+void KeAbort (){
+	
     printf("KeAbort:");
     die();
 };
@@ -31,8 +31,8 @@ void KeAbort()
  *     Chama interface pra abortar todo o sistema
  *     inclusive o kernel.
  */
-void systemAbort()
-{
+void systemAbort (){
+	
 	//
 	// @todo: Aborta o sistema operacional, nao somente o kernel. ??
 	//
@@ -67,12 +67,12 @@ void KiAbort()
  *     @todo: Pode-se criar um arquivo de log de erro.
  *           //...
  */ 
-void abort()
-{   
-	asm(" cli ");
+void abort (){
+	
+	asm (" cli ");
 	save_current_context();
 	
-	if(KernelStatus != KERNEL_ABORTED)
+	if (KernelStatus != KERNEL_ABORTED)
 	{
         KernelStatus = KERNEL_ABORTED;
 	    scheduler_lock();  //@todo: tirar daqui.
@@ -95,7 +95,7 @@ void abort()
     // Mostra o número do último erro.
 	
 	 
-    switch(errno)
+    switch (errno)
 	{
 	    case 0:
 		    printf("erro %d\n", errno);
@@ -134,18 +134,19 @@ void abort()
 	    refresh_screen();
 	};
 	
-
     
 	/*
      *  No return.
-     */	     	
-	while(1){         //Wait forever.
+     */	  
+	 
+	while (1){         
 		
-	asm("cli");
-	asm("hlt");                        //Halt system.
+	    asm("cli");
+	    asm("hlt");                 
 	
 	};                          
 };
+
 
 //
 // End.

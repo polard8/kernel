@@ -66,6 +66,37 @@ int init_network (){
     return (int) 0;	
 };
 
+//testando controlador ... 
+//encontrando o controlador e identificando vendor e device.
+void nic_test1 (){
+	
+	//pci info.
+	uint32_t data; 
+	unsigned char bus;
+	unsigned char dev;
+	unsigned char fun;		
+	
+					printf("\n");
+					printf("probing pci ...\n");
+					
+					data = (uint32_t) diskPCIScanDevice ( PCI_CLASSCODE_NETWORK);
+					//#test: testando encontrar placa de rede.
+					if( data == -1 )
+					{
+						printf("**fail**\n");
+						refresh_screen();
+					}
+					
+					bus = ( data >> 8 &0xff );
+                    dev = ( data >> 3 &31 );
+                    fun = ( data &7 );
+					
+					data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
+					
+					printf("Vendor=%x \n", (data & 0xffff) );
+					printf("Device=%x \n", (data >> 16 &0xffff) );
+					printf("done\n");	
+};
 
 /*
 int nicInit()

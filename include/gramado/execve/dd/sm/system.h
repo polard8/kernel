@@ -649,7 +649,7 @@ unsigned long system_procedure( struct window_d *window,
  *     As chamadas ao sistema são feitas via interrupção, ou via kernel request.
  *     ??? @todo: Onde está essa rotina ???
  */
-int systemcall( unsigned long numero, 
+int systemcall( unsigned long number, 
                 unsigned long ax, 
 				unsigned long bx, 
 				unsigned long cx, 

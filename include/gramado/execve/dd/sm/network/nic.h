@@ -48,6 +48,10 @@ struct nic_info_d
  
 int init_network();
 
+//testando controlador ... 
+//encontrando o controlador e identificando vendor e device.
+void nic_test1();
+
 //
 //fim.
 //

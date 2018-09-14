@@ -227,6 +227,7 @@ system_procedure( struct window_d *window,
 	//        O aplicativo ?? acionando a flag através de ShowWindow por exemplo??
 	//
 	
+
 	
 	//debug!
 	//printf("system_procedure: msg={%d} long1={%d}\n", msg, long1);  
@@ -554,9 +555,12 @@ system_procedure( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-				    
+					
 					//#test
-					fsList("volume1");
+					nic_test1();
+					
+					//#test
+					//fsList("volume1");
 					
 					//testando listar os arquivos de um diretório que está na memória.
 					//obs: isso funcionou.

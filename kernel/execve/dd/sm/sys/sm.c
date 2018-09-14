@@ -1,6 +1,8 @@
 /*
- * File: k\sm.c  
+ * File: sm\sys\sm.c  
+ *
  *     Server Manager 
+ *
  *     Gerenciamento de servidores feito pelo kernel base.
  *     #importante: Um aplicativo gerenciador de servidores 
  * deverá invocar esse módulo para pegar informações sobre 

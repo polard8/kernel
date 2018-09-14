@@ -172,9 +172,9 @@ static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginaç
  *     Configura cor padrão para o sistema.
  *     @todo: Isso pode ir para outro lugar.   
  */
-void set_up_color ( unsigned long color ){   
+void set_up_color ( unsigned long color ){  
+ 
 	g_system_color = (unsigned long) color;	
-	//return;
 };
 
 
@@ -187,8 +187,8 @@ void set_up_color ( unsigned long color ){
  *     @todo: Isso pode ir para outro lugar.
  */
 void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
+	
     g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);	
-	//return;
 };
 
 
@@ -199,9 +199,9 @@ void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
  *     @todo: Isso pode ir para outro lugar.
  */
 void set_up_cursor ( unsigned long x, unsigned long y ){   
+
 	g_cursor_x = (unsigned long) x;
 	g_cursor_y = (unsigned long) y;	
-	//return;
 };
 
 
@@ -211,7 +211,8 @@ void set_up_cursor ( unsigned long x, unsigned long y ){
  *     Pega o valor de x.
  *     @todo: Isso pode ir para outro lugar.
  */
-unsigned long get_cursor_x (){   	
+unsigned long get_cursor_x (){   
+	
 	return (unsigned long) g_cursor_x;
 };
 
@@ -222,18 +223,10 @@ unsigned long get_cursor_x (){
  *     Pega o valor de y.
  *     @todo: Isso pode ir para outro lugar.
  */
-unsigned long get_cursor_y (){         
+unsigned long get_cursor_y (){  
+       
     return (unsigned long) g_cursor_y; 	
 };
-
-
-
-
-
-
-
-
-
 
 
 /*
@@ -261,14 +254,14 @@ unsigned long get_cursor_y (){
 //    São os serviços oferecidos pelo executive.
 //    que lidam com a ram e não com os dispositivos de armazenamento.
 //
-void *systemRam( int number, 
+void *systemRam ( int number, 
                  unsigned long arg1,
 		         unsigned long arg2,
 		         unsigned long arg3,
 		         unsigned long arg4 )
 {
     //@todo: filtrar limites.	
-	switch(number)
+	switch (number)
 	{
 		//Esse serviço é apenas retornar NULL.
 		case 0: 

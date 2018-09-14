@@ -1,5 +1,5 @@
 /*
- * Aquivo: systemcall.c
+ * File: syscall.c
  *
  * Estabelece contato como servidor de serviços do kernel via interrupção.
  *
@@ -21,28 +21,36 @@
  *            de dentro do kernel).
  *   Não sei se pode chamar interrupções estando em kernel mode.
  */
-int systemcall( unsigned long numero, 
+int systemcall( unsigned long number, 
                 unsigned long ax, 
 				unsigned long bx, 
-				unsigned long cx, unsigned long dx)
+				unsigned long cx, 
+				unsigned long dx )
 {
     int ret_val;
 	
+	//##bugbug rever isso.
 	unsigned long *int_args = (unsigned long *) 0x00900000;
 	
+	
+	//if ( number < 0 )
+        //return (int) -1;
+	
+	
     //Salvando os argumentos.
-    int_args[0] = numero;    //arg0 - Número do serviço.
+    int_args[0] = number;    //arg0 - Número do serviço.
 	int_args[1] = ax;        //arg1 ... 
     int_args[2] = bx;        //arg2
 	int_args[3] = cx;        //arg3
 	int_args[4] = dx;        //arg4
 		
     //chamando a interrupção
-    asm volatile( "int %1\n" 
+    asm volatile ( "int %1\n" 
 	              : "=a"(ret_val) 
 				  : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) ); 
 //Done.
-done:
+//done:
+
 	return ret_val;
 };
 
@@ -77,6 +85,7 @@ int jmp_address( unsigned long arg1,
 	return (int) 0;
 };  
 
+
 //
-//fim.
+// End.
 //

@@ -115,8 +115,9 @@ int Signal;
  * signalSend:
  *     Envia um sinal para um processo.
  */
-int signalSend( struct process_d *process, int signal )
-{
+ 
+int signalSend ( struct process_d *process, int signal ){
+	
 	//SIGNAL_COUNT_MAX
 	
 	//Limit
@@ -124,26 +125,26 @@ int signalSend( struct process_d *process, int signal )
 	//	return 1;
 	//}
 	
-	if(signal == 0){
+	if (signal == 0){
 		return 1;
 	};
 	
 	//struct fail
-	if( (void*) process == NULL ){
+	if ( (void *) process == NULL ){
 		return 1;
 	}		
 	
 	//Ok
-	if( (void*) process != NULL )
-	{
-		
+	if ( (void *) process != NULL )
+	{	
 		process->signal = (unsigned long) signal;
 		return 0; 
 	}
 	
 	//...
 	
-fail:
+//fail:
+
 	return (int) 1;	
 };
 
@@ -153,12 +154,12 @@ fail:
  *     Inicialização do módulo de gerenciamento de sinais.
  *
  */
-int signalInit()
-{
+int signalInit (){
+	
     Signal = 0;	
 	
-	
-done:	
+//done:	
+
 	return (int) 0;
 };
 

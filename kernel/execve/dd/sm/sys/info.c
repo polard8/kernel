@@ -36,8 +36,9 @@ extern unsigned long bss_end;
  *    Obs: As informções podem ser salvas em um arquivo
  *         de saída padrão.
  */
-void KeInformation(){	
-	return;    //Ainda não implementada.
+void KeInformation (){
+	
+	//return;    //Ainda não implementada.
 };
 
 
@@ -59,8 +60,8 @@ void KeInformation(){
  * Obs: As informções podem ser salvas em um arquivo de saída padrão.
  */
 //void infoShowKernelInfo() 
-void KiInformation()
-{
+void KiInformation (){
+	
 	struct window_d *hWnd;
 	struct window_d *hWindow;
 
@@ -102,14 +103,13 @@ void KiInformation()
     //Obs: Podemos usar o esquema de cores padrão.
     //Mas a intenção é que as janelas do kernel tenham
     //sua própria cor.	
-	hWindow = (void*) CreateWindow( 3, 0, VIEW_MAXIMIZED, "KiInformation", 
-	                      left, top, 
-						  width, height, 
-			     		  gui->main, 0, 
-						  KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, 
-						  KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
+	hWindow = (void *) CreateWindow ( 3, 0, VIEW_MAXIMIZED, "KiInformation", 
+	                    left, top, width, height, 
+			     		gui->main, 0, 
+						KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, 
+						KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
 
-	if( (void*) hWindow == NULL)
+	if( (void *) hWindow == NULL)
 	{
 	    printf("KiInformation: hWindow\n");
 	    goto fail;

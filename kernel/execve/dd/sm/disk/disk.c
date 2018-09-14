@@ -1347,8 +1347,8 @@ void diskWritePCIConfigAddr( int bus,
  * diskATAPCIConfigurationSpace:
  *     Espaço de configuraçao PCI Mass Storage
  */
-int diskATAPCIConfigurationSpace( char bus, char dev, char fun )
-{
+int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
+	
     uint32_t data;
 
 #ifdef KERNEL_VERBOSE	
@@ -1594,8 +1594,8 @@ done:
  * de acordo a classe.
  *
  */
-uint32_t diskPCIScanDevice( int class )
-{
+uint32_t diskPCIScanDevice ( int class ){
+	
     int bus, dev, fun;
     
 	uint32_t data = -1;
@@ -1624,10 +1624,10 @@ uint32_t diskPCIScanDevice( int class )
 					
 					
                     // Message.
-#ifdef KERNEL_VERBOSE							
+//#ifdef KERNEL_VERBOSE							
 					kprintf( "[ Detected PCI device: %s ]\n", 
 					         pci_classes[class] );
-#endif
+//#endif
 							 
 					//
 					// Done !
@@ -1644,7 +1644,7 @@ uint32_t diskPCIScanDevice( int class )
 	// Fail !
 	//
 	
-fail:	
+//fail:	
     
 	kprintf("[ PCI device NOT detected ]\n");		
 	refresh_screen();
@@ -1654,14 +1654,14 @@ fail:
 
 
 /*
- *********************************************
+ ********************
  * diskATAInitialize:
  *     Inicializa o IDE e mostra informações 
  * sobre o disco.
  * Credits: Nelson Cole;
  */
-int diskATAInitialize( int ataflag )
-{
+int diskATAInitialize ( int ataflag ){
+	
 	int Status = 1;  //error
 	int port;
 	
@@ -1692,6 +1692,8 @@ int diskATAInitialize( int ataflag )
     // Sondando a interface PCI para encontrarmos um dispositivo
     // que seja de armazenamento de dados.
     //	
+	
+	//PCI_CLASSCODE_MASS
 	
     data = (_u32) diskPCIScanDevice(PCI_CLASSE_MASS);
     
@@ -1882,7 +1884,7 @@ int diskATADialog( int msg,
     int Status = 1; //erro
 	
 	
-    switch(msg)
+    switch (msg)
     {
 		//ATAMSG_INITIALIZE
 		//Initialize driver.
@@ -1941,8 +1943,8 @@ void diskATAIRQHandler2()
  *     Mostrar as informações obtidas na inicializações 
  * do controlador.
  */
-void show_ide_info()
-{
+void show_ide_info (){
+	
 	printf("sm-disk-disk-show_ide_info:\n");
 	
 	//
@@ -1983,9 +1985,9 @@ void show_ide_info()
 
    //...
 	
-done:
-    refresh_screen();
-    return;	
+//done:
+    //refresh_screen();
+    //return;	
 };
 
 

@@ -51,14 +51,14 @@
  * save_kernel_args:
  *     Salvando em estrutura os argumentos recebidos.
  */
-void save_kernel_args()
-{
+void save_kernel_args (){
+	
     //KernelArgs.arg1 = ;
     //KernelArgs.arg2 = ;
 	//KernelArgs.arg3 = ;
 	//KernelArgs.arg4 = ;
 	
-    return;
+    //return;
 };
 
 
@@ -69,8 +69,8 @@ void save_kernel_args()
  *            Boot do volume sinalizado.
  *            Identificar volumes.
  */
-void boot()
-{    
+void boot (){
+    
 	panic("sm-init-boot:");	
 };	
 
@@ -88,8 +88,8 @@ void boot()
  *
  * Obs: Dependente significa dependente da marca do procesador.
  */
-int init_arquitecture_dependent ()
-{
+int init_arquitecture_dependent (){
+	
 	int Status = 0;
 	unsigned char Type;
 	
@@ -102,10 +102,8 @@ int init_arquitecture_dependent ()
 	}
 
 
-	//
 	// Os parâmetros de tela dependem das propriedades de hardware
 	// como monitor e placa de vídeo.
-	//
 	
 	screenInit();
 
@@ -123,10 +121,8 @@ int init_arquitecture_dependent ()
 	    panic("sm-init-init_arquitecture_dependent: processor\n");
     }
 	
-	//
 	// Sonda pra ver qual é a marca do processador.
 	// @todo: É a segunda vez que fazemos a sondagem ?!
-	//
 	
 	Type = (int) hal_probe_processor_type();
 	
@@ -174,7 +170,9 @@ int init_arquitecture_dependent ()
 //
 // Done.
 //
-done:
+
+//done:
+
     return (int) Status;
 };
 
@@ -186,11 +184,11 @@ done:
  * arquitetura presente. Independente da tipo de processador. 
  * Obs: Essa é a fase 1 de inicialização.
  */
-int init_arquitecture_independent()
-{
+int init_arquitecture_independent (){
+	
     int Status;
 		
-    if(KeInitPhase != 0){
+    if (KeInitPhase != 0){
 		panic("sm-init-init_arquitecture_independent: KeInitPhase\n");
 	}; 
 
@@ -285,11 +283,10 @@ Desktop:
 #endif    
 	init_desktop(); 
  
-	//
+	
 	// Window manager. - (Inicializa janelas e cria o logon).
 	// @todo: Essas informações são independentes da arquitetura,
 	//      Essa rotina pode ir pra outro lugar.
-	//
 	
 WindowManager:	
 
@@ -334,8 +331,7 @@ done:
  *     Inicia variáveis globais do Kernel Base.
  *     Obs: Inicializar por categorias.
  */
-void init_globals ()
-{
+void init_globals (){
 
 #ifdef KERNEL_VERBOSE	
     printf("sm-init-init_globals:\n");	
@@ -430,7 +426,7 @@ void init_globals ()
 
 // Done.
 //done:	
-    return;
+    //return;
 };
 
 
@@ -439,8 +435,8 @@ void init_globals ()
  * init:
  * Base initializations. (Four phases).
  */ 
-int init ()
-{
+int init (){
+	
     int Status = 0;
 	
 	//Check kernel phase.

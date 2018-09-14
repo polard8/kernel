@@ -118,15 +118,17 @@ void SetMind(int Type)
  *     Checa o valor das flags.
  *     checar todos contextos de tarefas válidas.
  */
-int debug_check_inicialization()
-{
+int debug_check_inicialization (){
+	
     int Status = 0;
 	
 	// Check phase.
-	if( KeInitPhase != 3 )
-	{
+	if ( KeInitPhase != 3 ){
 	   Status = 1;
-	   printf("sm-debug-debug_check_inicialization: KeInitPhase phase={%d}\n",KeInitPhase);
+	   
+	   printf("sm-debug-debug_check_inicialization: KeInitPhase phase={%d}\n",
+	       KeInitPhase);
+	   
 	   goto fail;
 	};
 	
@@ -191,8 +193,8 @@ fail:
  * debug_check_drivers:
  *    Checar se os drivers estão inicializados.
  */
-int debug_check_drivers()
-{
+int debug_check_drivers (){
+	
 	int Status = 0;
     
 	if(g_driver_hdd_initialized != 1){
@@ -215,7 +217,8 @@ int debug_check_drivers()
 	    //erro
 	};
 	
-done:
+//done:
+
     return (int) Status;
 };
 
@@ -226,8 +229,8 @@ done:
  *     Para a execução do sistema.
  *     @todo: isso pode ir para o arquivo debug.c.
  */
-void debug_breakpoint()
-{
+void debug_breakpoint (){
+	
     printf("sm-debug-debug_breakpoint:\n");
 	die();
 };
@@ -251,8 +254,8 @@ unsigned long debug_compute_checksum( unsigned char *Buffer, unsigned long Lengh
  * debug:
  *     Checa por falhas depois de cumpridas as três fases de inicialização.
  */
-int debug()
-{   
+int debug (){
+	
 	int Status;
 		
 	//printf("debug: Starting..\n");
@@ -321,9 +324,11 @@ int debug()
 	
 	//...
 
-done:
+//done:
+
     //printf("debug:OK!\n");
     //printf("debug: Done.\n");	
+	
 	return (int) 0; 
 };
 
