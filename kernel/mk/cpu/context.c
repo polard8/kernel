@@ -33,10 +33,10 @@
 extern void set_page_dir();
 
 
-static inline void ckSetCr3( unsigned long value)
-{
+static inline void ckSetCr3 ( unsigned long value){
+	
     __asm__ ( "mov %0, %%cr3" : : "r"(value) );
-}
+};
 
 
 //
@@ -48,7 +48,7 @@ static inline void ckSetCr3( unsigned long value)
 //int contextCpuType;
 //...
 
-//
+
 // Context:
 //     Variáveis para salvar o contexto.
 //     Essas variáveis devem permanecer encapsuladas
@@ -59,7 +59,7 @@ static inline void ckSetCr3( unsigned long value)
 //         Obviamente a rotina _irq0, que é o handler
 //         do timer está acessando essas variáveis
 //         fazendo uso d 'extern'. 
-//
+
 unsigned long contextSS;        //User mode.
 unsigned long contextESP;       //User mode.
 unsigned long contextEFLAGS;
@@ -100,8 +100,8 @@ unsigned long contextEBP;
  *     Mudar nome para contextSaveCurrent();.
  *
  */
-void save_current_context()
-{	
+void save_current_context (){
+	
     int Status;
 	struct thread_d *t;
     
@@ -127,15 +127,21 @@ void save_current_context()
 	
 	// Structure ~ Colocando o contexto na estrutura.	
 	t = (void *) threadList[current_thread];
-	if( (void*) t == NULL )
+	
+	if ( (void *) t == NULL )
 	{
-	    printf("save_current_context error: Struct Thread={%d}\n",current_thread);
-		show_process_information();    //Mostra informações do PROCESSO atual.
-		refresh_screen();
-		while(1){};
-	}
-    else
-    {
+	    printf ("save_current_context error: Struct Thread={%d}\n",
+		    current_thread );
+			
+		show_process_information();    
+		
+		die ();
+		
+		//refresh_screen();
+		//while(1){};
+	
+	}else{
+		
 	    // 
 	    // @todo: Checar. 
 	    //
@@ -166,8 +172,8 @@ void save_current_context()
 	//
 	
 //Done.
-done:
-    return;
+//done:
+    //return;
 };
 
 
@@ -183,8 +189,8 @@ done:
  *     Mudar nome para contextRestoreCurrent();.
  *
  */
-void restore_current_context()
-{
+void restore_current_context (){
+	
 	int Status;
 	struct thread_d *t;
 	
@@ -209,15 +215,19 @@ void restore_current_context()
 
 	// Structure.
 	t = (void *) threadList[current_thread]; 
-	if( (void*) t == NULL)
+	
+	if ( (void *) t == NULL )
 	{
-	    printf("restore_current_context error: Struct.\n");
-		show_process_information();    //Mostra informações do PROCESSO atual.
-		refresh_screen();
-		while(1){}
-	}
-	else
-	{
+	    printf("restore_current_context error: t\n");
+		
+		show_process_information();    
+	
+		die ();
+		
+		//refresh_screen();
+		//while(1){}
+	
+	}else{
 	
 	    //
 	    // Check context ~ Não há porque salvar, se o contexto está corrompido.
@@ -265,26 +275,21 @@ void restore_current_context()
 		
 		//set_page_dir();
 		 
-		 
-		 
-		ckSetCr3( (unsigned long) t->Directory);
+		ckSetCr3 ( (unsigned long) t->Directory );
 
 	    //flush TLB
 	    asm("movl %cr3, %eax");
         asm("movl %eax, %cr3");		
 	};
 
-	
 	//
 	//flag ??...
 	//
 	
-	
-
-	
 //Done.
-done:
-    return;
+//done:
+
+    //return;
 };
 
 
@@ -326,15 +331,15 @@ int check_thread_ring3_context(int task_id)
  
  
  
-int contextCheckThreadRing0Context(int tid)
-{
+int contextCheckThreadRing0Context (int tid){
+	
 	return  0;//@todo
 }; 
  
  
 // Checar um contexto válido para threads em ring 3. 
-int contextCheckThreadRing3Context(int tid)
-{
+int contextCheckThreadRing3Context (int tid){
+	
 	int Status = 1;    //Error. (condição default).	
     struct thread_d *t; 
     //...
@@ -346,12 +351,13 @@ int contextCheckThreadRing3Context(int tid)
 	
 	//Structure.
 	t = (void *) threadList[tid]; 
-    if( (void*) t == NULL )
+    
+	if ( (void *) t == NULL )
 	{
-	    return (int) 1; //Erro. Status.
-	}
-	else
-	{
+	    //Erro. Status.
+		return (int) 1; 
+	
+	}else{
 		
 	    //
 	    // Checar validade do thread.
@@ -380,7 +386,7 @@ int contextCheckThreadRing3Context(int tid)
 		    t->gs != 0x23 ||
 		    t->ss != 0x23 ) 
 	    {
-	        printf("check_task_context: Falha nos segmento! t={%d}\n",tid);
+	        printf("check_task_context: segments fail t={%d}\n", tid );
 		    return (int) 1; 
 	    };
 
@@ -391,7 +397,9 @@ int contextCheckThreadRing3Context(int tid)
  * Done:
  *     Ok o contexto foi aprovado para ring 3. Retorna 0.
  */ 
-done:
+
+//done:
+
 	return (int) 0;
 };
 
@@ -401,33 +409,36 @@ done:
  *     Chama módulo interno pra checar o contexto de uma thread.
  *
  */
-int KiCheckTaskContext(int thread_id)
-{
+int KiCheckTaskContext (int thread_id){
+	
 	//@todo: filtrar argumento.
-    return (int) contextCheckThreadRing3Context(thread_id);
+    
+	return (int) contextCheckThreadRing3Context(thread_id);
 };
 
 
-void KiSaveCurrentContext()
-{
+void KiSaveCurrentContext (){
+	
     save_current_context();
-    return;
+	
+    //return;
 };
 
 
-void KiRestoreCurrentContext()
-{
+void KiRestoreCurrentContext (){
+	
     restore_current_context();
-    return;
+    
+	//return;
 };
 
  
 /*
  * save_context_of_new_task: 
  */ 
-void save_context_of_new_task(int id, unsigned long *task_address)
-{
-	return;    /* CANCELADA !*/
+void save_context_of_new_task (int id, unsigned long *task_address){
+	
+	//return;    /* CANCELADA !*/
 };
 
 
@@ -455,6 +466,6 @@ static inline uint32_t ckGetCr3()
 
 
 //
-// Fim.
+// End.
 //
 

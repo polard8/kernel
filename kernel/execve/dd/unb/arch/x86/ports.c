@@ -30,126 +30,128 @@
 
 
 //inport byte
-inline unsigned char kinportb(int port)
-{
+inline unsigned char kinportb (int port){
+	
     unsigned char ret;
  
-    asm(" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+    asm (" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+	
 	return (unsigned char) ret;
 };
+
 
 /*
  * koutportb:
  * Escreve um byte em uma determina porta.
  */
-inline void koutportb(unsigned int port,unsigned int value){
-    asm volatile(" outb %%al, %%dx " :: "d" (port), "a" (value) );
+inline void koutportb (unsigned int port,unsigned int value){
+    
+	asm volatile (" outb %%al, %%dx " :: "d" (port), "a" (value) );
 };
 
-
-//
-// ...
-//
 
 //inport byte.
-inline unsigned char inb(int port)
-{
+inline unsigned char inb (int port){
+	
     unsigned char ret;
  
-    asm(" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+    asm (" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+	
 	return (unsigned char) ret;
 };
+
 
 //outpot byte
-void outb(int port, int data){
-    asm(" outb %%al, %%dx " :: "a" (data), "d" (port) );
+void outb (int port, int data){
+    
+	asm (" outb %%al, %%dx " :: "a" (data), "d" (port) );
 };
 
 
-
-//
-// ...
-//
-
-inline unsigned char inportb(int port)
-{
+inline unsigned char inportb (int port){
+	
     unsigned char ret;
  
     asm(" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+	
 	return (unsigned char) ret;
 };
+
 
 void outportb(int port, int data){
     asm(" outb %%al, %%dx " :: "a" (data), "d" (port) );
 };
 
 
-//
-// ... Obs: input sem retorno.
-//
-
-int inport8(int port)
-{
+int inport8 (int port){
+	
 	unsigned char ret;
 	
-    __asm("inb %%dx, %%al" : "=a" (ret) : "d" (port));
+    __asm ("inb %%dx, %%al" : "=a" (ret) : "d" (port) );
 	
 	return (unsigned char) ret;
 };
 
-void outport8(int port, int data){
-    __asm("outb %%al, %%dx" :: "a" (data), "d" (port));
+
+void outport8 (int port, int data){
+    
+	__asm ("outb %%al, %%dx" :: "a" (data), "d" (port) );
 };
 
-int inport16(int port)
-{
+
+int inport16 (int port){
+	
     unsigned short ret;
 	
-    __asm("inw %%dx, %%ax" : "=a" (ret) : "d" (port));
+    __asm ("inw %%dx, %%ax" : "=a" (ret) : "d" (port) );
 	
 	return (unsigned short) ret;
 };
 
-void outport16(int port, int data){
-    __asm("outw %%ax, %%dx" :: "a" (data), "d" (port));
+
+void outport16 (int port, int data){
+    
+	__asm ("outw %%ax, %%dx" :: "a" (data), "d" (port) );
 };
 
-int inport32(int port)
-{
+
+int inport32 (int port){
+	
 	unsigned long ret;
-    __asm("inl %%dx, %%eax" : "=a" (ret) : "d" (port));
+    
+	__asm("inl %%dx, %%eax" : "=a" (ret) : "d" (port) );
 	
 	return (unsigned long) ret;
 };
 
-void outport32(int port,int data){ 
-    __asm("outl %%eax, %%dx" :: "a" (data), "d" (port));
+
+void outport32 (int port,int data){ 
+
+    __asm ("outl %%eax, %%dx" :: "a" (data), "d" (port) );
 };
-
-
-//
-// ...
-//
 
 
 /*
  * inportl:
  *     Lê um dword de uma determina porta.
  */
-inline unsigned long inportl(unsigned long port)
-{
+inline unsigned long inportl (unsigned long port){
+	
 	unsigned long ret;
 
-	asm volatile ("inl %%dx,%%eax" : "=a" (ret) : "d"(port));
+	asm volatile ("inl %%dx,%%eax" : "=a" (ret) : "d"(port) );
+	
 	return ret;
 };
+
 
 /*
  * outportl:
  *     Escreve um dword em uma determinada porta.
  */
-inline void outportl(unsigned long port, unsigned long value){
-	asm volatile ("outl %%eax,%%dx" :: "d" (port), "a" (value));
+inline void outportl (unsigned long port, unsigned long value){
+	
+	asm volatile ("outl %%eax,%%dx" :: "d" (port), "a" (value) );
 };
 
 //

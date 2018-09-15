@@ -51,40 +51,40 @@ void cpux86_enable_caches();
  * core per die         = 0x80000008.
  *
  */
-void get_cpu_intel_parameters()
-{
+ 
+void get_cpu_intel_parameters (){
+	
     int MASK_LSB_8 = 0xFF;  
 	unsigned long eax, ebx, ecx, edx;
 	unsigned long name[32];	
-		
-	//debug.
-	//printf("Scaning x86 CPU ...\n");
 		
     //Vendor.
 	//eax = Maximum meaningful value for the InfoType parameter. @todo:
     //ebx = Identification String (part 1)
 	//ecx = Identification String (part 3)
 	//edx = Identification String (part 2)
-	cpuid( 0, eax, ebx, ecx, edx ); 
+	
+	cpuid ( 0, eax, ebx, ecx, edx ); 
 	name[0] = ebx;
 	name[1] = edx;
 	name[2] = ecx;
 	name[3] = 0;	
-	//salva na estrutura.
+
 	processor->Vendor[0] = ebx;
 	processor->Vendor[1] = edx;
 	processor->Vendor[2] = ecx;
 	processor->Vendor[3] = 0;	
 	
-	//
 	// Confere se é Intel.
-	//
 	
-	if( ebx == CPUID_VENDOR_INTEL_1 && 
-	    edx == CPUID_VENDOR_INTEL_2 && 
-		ecx == CPUID_VENDOR_INTEL_3 )
+	if ( ebx == CPUID_VENDOR_INTEL_1 && 
+	     edx == CPUID_VENDOR_INTEL_2 && 
+		 ecx == CPUID_VENDOR_INTEL_3 )
 	{
-	    hal_set_machine_type(1);    //Intel.
+		
+		//#todo: definir Intel como 1.
+	    hal_set_machine_type(1);    
+	
 	};
 	
 	
@@ -155,7 +155,7 @@ void get_cpu_intel_parameters()
 	
 	
 	
-	cpuid( 1, eax, ebx, ecx, edx );
+	cpuid ( 1, eax, ebx, ecx, edx );
 	
 	//eax:
 	//processor->xx = (unsigned long)( eax & 0xF);       //stepping
@@ -186,7 +186,7 @@ void get_cpu_intel_parameters()
 	//cpuid( 4, eax, ebx, ecx, edx );
 	
    /*name part 1*/
-    cpuid( 0x80000002, eax, ebx, ecx, edx);
+    cpuid ( 0x80000002, eax, ebx, ecx, edx);
 	name[0] = eax; //Processor Brand String
 	name[1] = ebx; //Processor Brand String
 	name[2] = ecx; //Processor Brand String
@@ -201,7 +201,7 @@ void get_cpu_intel_parameters()
 	//printf("%s",&name[0]);		
 
    /*name part 2*/
-    cpuid( 0x80000003, eax, ebx, ecx, edx);
+    cpuid ( 0x80000003, eax, ebx, ecx, edx);
 	name[0] = eax; //Processor Brand String, continued
 	name[1] = ebx; //Processor Brand String, continued
 	name[2] = ecx; //Processor Brand String, continued
@@ -215,7 +215,7 @@ void get_cpu_intel_parameters()
 	//printf("%s",&name[0]);	
 
    /*name part 3*/
-    cpuid( 0x80000004, eax, ebx, ecx, edx);
+    cpuid ( 0x80000004, eax, ebx, ecx, edx);
 	name[0] = eax; //Processor Brand String, continued
 	name[1] = ebx; //Processor Brand String, continued
 	name[2] = ecx; //Processor Brand String, continued
@@ -230,7 +230,7 @@ void get_cpu_intel_parameters()
 	
 	
 	//Max feature id.
-    cpuid( 0x80000000, eax, ebx, ecx, edx);
+    cpuid ( 0x80000000, eax, ebx, ecx, edx);
 	name[0] = eax; //Maximum meaningful value of InfoType for extended function CPUID information.
 	name[1] = ebx; //reserved
 	name[2] = ecx; //reserved
@@ -239,9 +239,12 @@ void get_cpu_intel_parameters()
 	processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
 	//printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
 	
-    if(	processor->MaxFeatureId < 6){  	
-		printf("Cache Extended Feature not supported.\n");
-		goto done;
+    if ( processor->MaxFeatureId < 6)
+	{ 
+		//printf("Cache Extended Feature not supported\n");
+		//goto done;
+		
+		return;
 	};
 	
 	
@@ -256,7 +259,7 @@ void get_cpu_intel_parameters()
 	 *     Bits 16-31: Cache size in 1K units.   
 	 * EDX Reserved
 	 */
-    cpuid( 0x80000006, eax, ebx, ecx, edx );
+    cpuid ( 0x80000006, eax, ebx, ecx, edx );
 	name[0] = eax;
 	name[1] = ebx;
 	name[2] = ecx;
@@ -275,7 +278,7 @@ void get_cpu_intel_parameters()
 	 */
 	
     //EAX=80000008h: Virtual and Physical address Sizes	
-    cpuid( 0x80000008, eax, ebx, ecx, edx );
+    cpuid ( 0x80000008, eax, ebx, ecx, edx );
 	name[0] = eax;    //Virtual and physical memory sizes.
 	name[1] = ebx;    //reserved
 	name[2] = ecx;    //reserved
@@ -286,14 +289,13 @@ void get_cpu_intel_parameters()
 	//printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
 	//printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
 	
-	
 //
 // Done.
 //	
 
-done:
+//done:
     //printf("done\n");
-    return;
+    //return;
 };
 
 
@@ -304,12 +306,14 @@ done:
  *   (OEM)
  *
  */ 
-int cpu_get_parameters()
-{
+int cpu_get_parameters (){
+	
     // @todo: Copiar a função KeTestCPU aqui.
 	// @todo: Mudar nome para KeProbeCPU(
 	
-    return (int) KeTestCPU(); 
+	//#bugbug: A inicial Ke está errada nessa situação.
+	
+    return (int) KeTestCPU (); 
 };
  
 
@@ -322,22 +326,12 @@ int cpu_get_parameters()
  * 
  * @todo: 
  *     Mudar para scanCPUx86()
- *
+ *     Get info.
  */
-int KeTestCPU()
-{
-    //
-	// Get info.
-	//
+int KeTestCPU (){
 	
 	get_cpu_intel_parameters();
-	
-	
-//
-// Done.
-//
-	
-done:	
+
 	return (int) 0;
 };
 
@@ -352,8 +346,8 @@ done:
  *     Criar funções: TerminalShowCPUIntelParameters()
  *                    ShowCPUIntelParameters()
  */
-void show_cpu_intel_parameters()
-{
+void show_cpu_intel_parameters (){
+	
     //Title.
     printf("\nx86 CPU Info:\n\n");
 	//printf("=============\n");
@@ -363,17 +357,20 @@ void show_cpu_intel_parameters()
     // L2 Line size, L2 cache size,
     //
 	
-	printf("          Vendor: {%s}\n", &processor->Vendor[0]);
-	printf("             Cpu: {%s}\n", &processor->BrandName[0]);	
+	printf("          Vendor: {%s}\n", &processor->Vendor[0] );
+	printf("             Cpu: {%s}\n", &processor->BrandName[0] );	
 	//printf("ApicSupport={%x}\n", processor->isApic);
-	printf("  Max feature id: {%d}\n",(unsigned long) processor->MaxFeatureId);
-	printf("    L2 line size: {%d Byte}\n",(unsigned long) processor->L2LineSize); //Bits 0-7: Cache Line Size.	
+	printf("  Max feature id: {%d}\n", 
+	    (unsigned long) processor->MaxFeatureId);
 	
-	//
+	//Bits 0-7: Cache Line Size.
+	printf("    L2 line size: {%d Byte}\n", 
+	    (unsigned long) processor->L2LineSize); 	
+	
+
 	// L2 Associativity. 	
-	//
 	
-	switch(processor->L2Associativity)
+	switch (processor->L2Associativity)
 	{
 		//Bits 12-15: L2 Associativity.
 	    case 0x00:
@@ -399,7 +396,9 @@ void show_cpu_intel_parameters()
 		    break; 
 	};
 
-	printf("   L2 cache size: {%d KB}\n",(unsigned long) processor->L2Cachesize); //Bits 16-31: Cache size in 1K units.	
+	//Bits 16-31: Cache size in 1K units.
+	printf("   L2 cache size: {%d KB}\n", 
+	    (unsigned long) processor->L2Cachesize ); 	
 
 	//
 	// Physical and Virtual Address.
@@ -410,8 +409,12 @@ void show_cpu_intel_parameters()
 	//36 ou 39 indica memória extendida. normal é 32=(4GB).
 	// maximum physical address bits  
 	//maximum linear (virtual) address bits 
-	printf("         PA Lim.: {%d}\n",(unsigned long) processor->Physical_Address_Size);
-	printf("         VA Lim.: {%d}\n",(unsigned long) processor->Virtual_Address_Size);
+	
+	printf("         PA Lim.: {%d}\n", 
+	    (unsigned long) processor->Physical_Address_Size );
+		
+	printf("         VA Lim.: {%d}\n", 
+	    (unsigned long) processor->Virtual_Address_Size );
 	
 	//printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
 	
@@ -421,43 +424,45 @@ void show_cpu_intel_parameters()
 // Done.
 //	
 
-done:
+//done:
     //como não usa janelas devemos dar refresh na tela todo por enquanto.
+	
 	refresh_screen();
-	return;
 };
 
 
 
 //habilita cache.
 //credits: barrelfish
-void cpux86_enable_caches()
-{
+void cpux86_enable_caches (){
+	
     uint32_t cr0;
 
-    __asm volatile("mov %%cr0, %[cr0]" : [cr0] "=r" (cr0));
+    __asm volatile ("mov %%cr0, %[cr0]" : [cr0] "=r" (cr0) );
+	
     cr0 &= ~CPUX86_CR0_CD;
     cr0 &= ~CPUX86_CR0_NW;
-    __asm volatile("mov %[cr0], %%cr0" :: [cr0] "r" (cr0));
+    
+	__asm volatile ("mov %[cr0], %%cr0" :: [cr0] "r" (cr0) );
 }  
 
 
 /*
  * init_intel:
  *     Inicializa processador Intel.
- *
  */
-int init_intel()
-{
+int init_intel (){
 	
-	cpux86_enable_caches();
+	cpux86_enable_caches ();
 	
 	// Get info.
-	get_cpu_intel_parameters();
+	get_cpu_intel_parameters ();
+	
 	return (int) 0;
 };
 
+
 //
-//fim.
+// End.
 //
 

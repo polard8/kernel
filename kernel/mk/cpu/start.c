@@ -27,10 +27,10 @@ extern void turn_task_switch_on();
  * KeStartShell:
  *     Executa o programa SHELL.BIN.
  */
-void KeStartShell()
-{
+void KeStartShell (){
+	
     panic("KeStartShell:");    //Cancelada! 	
-    die();
+    //die();
 };
 
 
@@ -38,10 +38,10 @@ void KeStartShell()
  * KeStartTaskManager:
  *     Executa o programa TASKMAN.BIN.
  */
-void KeStartTaskManager()
-{
+void KeStartTaskManager (){
+	
     panic("KeStartTaskManager:");    //Cancelada! 	
-	die();
+	//die();
 };
 
 
@@ -53,11 +53,9 @@ void KeStartTaskManager()
  *
  * @todo: 
  *     Poderia ser um kernel request?!
- *
+ *     #esse nome precisa ser resolvido ... não usaremos o termo task.
  */
-void start_task( unsigned long id, 
-                 unsigned long *task_address )
-{     	
+void start_task ( unsigned long id, unsigned long *task_address ){     	
 	
 	//@todo: filtrar argumentos.
 	
@@ -80,32 +78,32 @@ void start_task( unsigned long id,
     //Só isso ??!!	
 	
 //Done.
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
 /*
  * reload_current_task:
  */
-void reload_current_task()
-{
-    return;    //Cancelada!
+void reload_current_task (){
+	
+    //return;    //Cancelada!
 };
 
 
 /*
  * switch_to_user_mode:     
  */
-void switch_to_user_mode()
-{ 
+void switch_to_user_mode (){
+	
     panic("switch_to_user_mode:");    //Cancelada!	
     //die();
 }; 
 
 
 /*
- ***************************************************
+ ******************
  * executa_tarefa:
  *     Executa uma nova thread.
  *     @todo: Mudar o nome. startExecuteThread(...)
@@ -124,7 +122,7 @@ unsigned long executa_tarefa( int id,
 	
 	if( current_thread != id )
 	{
-        printf("executa_tarefa: current_thread = %d | new task = %d ",
+        printf ("executa_tarefa: current_thread = %d | new task = %d ",
 		    current_thread, id );
 			
         die();
@@ -139,17 +137,19 @@ unsigned long executa_tarefa( int id,
     //
 	
 	t = (void *) threadList[id];	
-	if( (void *) t == NULL )
+	
+	if ( (void *) t == NULL )
 	{
 	    panic("start-executa_tarefa: t\n");
-	    //die();
+		
 	}else{
 		
         // Status.	
 	    if( t->state != READY ){
-	        panic("start-executa_tarefa: state",id);
-            //die(); 
-	    }else{
+			
+	        panic ("start-executa_tarefa: state", id ); 
+	    
+		}else{
 			
 	        t->state = RUNNING;	
 	    };
@@ -157,17 +157,16 @@ unsigned long executa_tarefa( int id,
 	    //...
 	};	
    
-	//
-	// Running tasks ~ Incrementa o número de tarefas que estão rodando.
-	//
+	// Running tasks 
+	// Incrementa o número de tarefas que estão rodando.
 	
     ProcessorBlock.threads_counter++;   
 	
 	IncrementDispatcherCount(SELECT_ANY_COUNT);
 
-	//verbose.	
+	// verbose.	
     // printf("executa_tarefa: Executando %d \n",current_thread);
-	//refresh_screen();
+	// refresh_screen();
 	
 	//pilha
 	unsigned long eflags = 0x3200;
@@ -176,22 +175,25 @@ unsigned long executa_tarefa( int id,
 			
 	// ?? #bugbug ?? rever ?? é esse mesmo o seletor que queremos para ring3 ???		
 	//segmento de dados.
-	asm(" movw $0x0010, %ax ");	   
-	asm(" movw %ax, %ds ");
-	asm(" movw %ax, %es ");
-	asm(" movw %ax, %fs ");
-	asm(" movw %ax, %gs ");
 	
-    asm(" pushl %0" :: "r" (eflags): "%esp");  
-    asm(" pushw %0" :: "r" (cs)    : "%esp");             
-    asm(" pushl %0" :: "r" (eip)   : "%esp");  
+	asm (" movw $0x0010, %ax ");	   
+	asm (" movw %ax, %ds ");
+	asm (" movw %ax, %es ");
+	asm (" movw %ax, %fs ");
+	asm (" movw %ax, %gs ");
+	
+    asm (" pushl %0" :: "r" (eflags): "%esp");  
+    asm (" pushw %0" :: "r" (cs)    : "%esp");             
+    asm (" pushl %0" :: "r" (eip)   : "%esp");  
 	
     //#bugbug ... isso realmente não é necessário ... @todo: deletar.
 	//parece que isso é realmente preciso, libera o teclado.
-	outb(0x20,0x20); 
 	
-	asm("sti");
-    asm("iret");
+	outb (0x20,0x20); 
+	
+	asm ("sti");
+    asm ("iret");
+	
 	//Nothing.	
 	
 	/*
@@ -211,33 +213,35 @@ unsigned long executa_tarefa( int id,
                  " iret \n" );
 */		
 	
-fail:
+//fail:
+
     panic("start-executa_tarefa: fail");
-    //die();
+    
+	//die();
 	//while(1){};    
 };
 
 
-void KiSwitchToUserMode()
-{
+void KiSwitchToUserMode (){
+	
     //
 	//@todo: Fazer rotina de interface.
 	//
 	
 	switch_to_user_mode();
-	//while(1){};    
 };
 
 
 unsigned long KiExecutaTarefa(int id, unsigned long *task_address){
+	
     return 0;  //Cancelada.
 };
 
 
-int KiInitTask(int id)
-{
+int KiInitTask (int id){
+	
 	//@todo: Algum filtro.
-	if(id < 0){
+	if (id < 0){
 	    return (int) 0;	
 	};
 	//Nothing.
@@ -246,12 +250,15 @@ int KiInitTask(int id)
 
 
 
-void KiInitTasks(){
-    init_tasks();
-    return;	
+void KiInitTasks (){
+	
+    init_tasks ();
+	
+    //return;	
 };
 
+
 //
-//fim.
+// End.
 //
 

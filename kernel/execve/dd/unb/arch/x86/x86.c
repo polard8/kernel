@@ -19,26 +19,24 @@
 // habilita as interrupções
 int enable (){
 	
-    asm("sti");
-
-//done:
+    asm ("sti");
 
     //@todo: Porque habilitar as interrupções deveria mudar o valor do registrador eax.
     //talvez deveria ser void o tipo da função.	
-    return (int) 0;
+    
+	return (int) 0;
 };
 
 
 // desabilita as interrupções
 int disable (){
 	
-    asm("cli"); 
-	
-//done:
+    asm ("cli"); 
 
     //@todo: Porque desabilitar as interrupções deveria mudar o valor do registrador eax.
     //talvez deveria ser void o tipo da função.		
-    return (int) 0;
+    
+	return (int) 0;
 };
 
 
@@ -79,37 +77,37 @@ int setFlags (int variable){
 
 int kernelProcessorInPort8 ( int port, int data){
 	
-    asm ("inb %%dx, %%al" : "=a" (data) : "d" (port));
+    asm ("inb %%dx, %%al" : "=a" (data) : "d" (port) );
 };
     
 
 int kernelProcessorOutPort8 (int port, int data){
 	
-    __asm ("outb %%al, %%dx" : : "a" (data), "d" (port));
+    __asm ("outb %%al, %%dx" : : "a" (data), "d" (port) );
 };
 
 
 int kernelProcessorInPort16 (int port,int data){
 	
-    __asm ("inw %%dx, %%ax" : "=a" (data) : "d" (port));
+    __asm ("inw %%dx, %%ax" : "=a" (data) : "d" (port) );
 };
 
 
 int kernelProcessorOutPort16 (int port, int data){
 	
-    __asm ("outw %%ax, %%dx" : : "a" (data), "d" (port));
+    __asm ("outw %%ax, %%dx" : : "a" (data), "d" (port) );
 };
 
 
 int kernelProcessorInPort32 (int port, int data){
 	
-    __asm ("inl %%dx, %%eax" : "=a" (data) : "d" (port));
+    __asm ("inl %%dx, %%eax" : "=a" (data) : "d" (port) );
 };
 
 
 int kernelProcessorOutPort32 (int port,int data){ 
 
-    __asm ("outl %%eax, %%dx" : : "a" (data), "d" (port));
+    __asm ("outl %%eax, %%dx" : : "a" (data), "d" (port) );
 };
 
 
@@ -151,7 +149,7 @@ int popFlags (){
 
 int getStackPointer (int addr){
 	
-    __asm ("movl %%esp, %0" : "=r" (addr));
+    __asm ("movl %%esp, %0" : "=r" (addr) );
 };
 
 
@@ -159,6 +157,7 @@ int setStackPointer (int addr){
 	
     __asm ("movl %0, %%esp" : : "r" (addr) : "%esp");
 };
+
 
 //
 // End.

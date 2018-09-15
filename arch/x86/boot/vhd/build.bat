@@ -110,19 +110,26 @@ echo -{ ...
 	rem copy tests\NC2.FON       F:\
 	copy c:\gramado\bin\NC2.FON F:\
 	
-	copy c:\gramado\bin\TEDITOR.BIN   F:\
 	
-	rem copy tests\TASCII.BIN    F:\
+	
+	copy c:\gramado\bin\FCLASS.BIN    F:\
+	copy c:\gramado\bin\GRAMCC.BIN    F:\
+    copy c:\gramado\bin\JACKPOT.BIN   F:\	
+	copy c:\gramado\bin\TASCII.BIN    F:\
+	copy c:\gramado\bin\TEDITOR.BIN   F:\	
+	copy c:\gramado\bin\TGFE.BIN      F:\
+
+	
 	rem copy tests\TPRINTF.BIN   F:\	
 	rem copy tests\TSCROLL.BIN   F:\
-	rem copy tests\TGFE.BIN      F:\
+
 	rem copy tests\TMETRICS.BIN  F:\
-	rem copy tests\JACKPOT.BIN   F:\
+	
 	
 	rem copy tests\TSCANF.BIN   F:\
 	
 	
-	rem copy tests\FCLASS.BIN   F:\
+	
 	
 	
 	REM copy TESTTEST.BIN  F:\
@@ -132,7 +139,7 @@ echo -{ ...
 	rem compiladores
 	
     rem copy tests\FNCC.BIN      F:\	
-    rem copy tests\GRAMCC.BIN      F:\		
+    
 	rem copy tests\C4.BIN F:\
 	
 	rem arquivos de texto.
