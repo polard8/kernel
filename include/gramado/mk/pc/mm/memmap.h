@@ -219,7 +219,8 @@
 #define PAGETABLE_FRONTBUFFER  0x0008B000
 #define PAGETABLE_BACKBUFFER   0x0008A000
 #define PAGETABLE_PAGEDPOOL    0x00089000  //?? isso é um teste ... Cuidado. #bugbug
-//?? Obs: Não sei o quanto podemos ir escolhendo endereços nessa região sem sobrepor o boot loader.
+//?? Obs: Não sei o quanto podemos ir escolhendo endereços nessa região sem sobrepor
+//o rootdir do volume2 que começa em 0x70000
 
 //
 // @todo: Com as informações de backbuffer e lfb pode-se

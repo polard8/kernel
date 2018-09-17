@@ -385,6 +385,39 @@ void SetCR3 (unsigned long address){
 };
 
 
+//mapeando o nic principal.
+//considerando que tenhamos mais de uma placa de rede, 
+//esse mapeamento só será válido para o primeiro.
+
+unsigned long mapping_nic0_device_address( unsigned long address )
+{
+    unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;      
+
+	
+	//##bugbug: 
+	//Esse endereço é improvisado. Parece que não tem nada nesse endereço.
+	
+	
+    unsigned long *nic0_page_table = (unsigned long *) 0x91000;   
+
+	int i;
+	for ( i=0; i < 1024; i++ ){
+		
+		nic0_page_table[i] = (unsigned long) address | 3;     
+	    address   = (unsigned long) address + 4096;  
+    };
+	
+
+	//0xC1000000    772  ##test
+	
+    page_directory[772] = (unsigned long) &nic0_page_table[0];      
+    page_directory[772] = (unsigned long) page_directory[0] | 3;   	
+	
+	//endereço equivalente à entrada 772
+	return (unsigned long) 0xC1000000;
+};
+
+
 /*
  ***************
  * SetUpPaging:

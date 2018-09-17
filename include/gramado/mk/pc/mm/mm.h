@@ -1104,7 +1104,10 @@ int init_stack();
 int SetUpPaging();    //Configura paginação.
 void SetCR3(unsigned long address);
 
-
+//mapeando o nic principal.
+//considerando que tenhamos mais de uma placa de rede, 
+//esse mapeamento só será válido para o primeiro.
+unsigned long mapping_nic0_device_address( unsigned long address );
 
 //
 // Directory and Page Tables.

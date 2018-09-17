@@ -161,8 +161,8 @@ int disk_init (){
 	
 	
 	// disk.
-    disk_conductor = (void*) malloc( sizeof(struct disk_d) );
-	if( (void*) disk_conductor == NULL )
+    disk_conductor = (void *) malloc( sizeof(struct disk_d) );
+	if( (void *) disk_conductor == NULL )
 	{
 	    printf("sm-disk-disk_init:");
 		die();
@@ -200,7 +200,7 @@ int disk_init (){
 	//
 	
 done:
-    printf("Done.\n");
+    printf("Done\n");
     return (int) 0;
 };
 
@@ -216,8 +216,8 @@ done:
  *   informações.
  * 
  */
-void init_test_disk()
-{
+void init_test_disk (){
+	
 	/*@todo: Teste desse tipo pode ser feito em user mode.*/
 	
  	/*
@@ -1357,12 +1357,9 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 #endif
 
     // Indentification Device
-    data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
+    data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
 	
-	//
 	// Salvando configurações.
-	//
-    
     ata_pci.vendor_id = data &0xffff;
     ata_pci.device_id = data >> 16 &0xffff;
 	
@@ -1373,12 +1370,9 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 #endif	
 	
     // Classe code, programming interface, revision id
-    data  = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 8 );
+    data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
     
-	
-	//
 	// Salvando configurações.
-	//
 	
 	// Classe e sub-classe.
     ata_pci.classe = data >> 24 &0xff;
@@ -1515,11 +1509,10 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 
 
     // PCI cacheline, Latancy, Headr type, end BIST
+	
     data = diskReadPCIConfigAddr( bus, dev, fun, 0xC );
 
-	//
 	// Salvando configurações.
-	//    
 	
 	// ??
 	ata_pci.primary_master_latency_timer = data >>8 &0xff;
@@ -1688,10 +1681,8 @@ int diskATAInitialize ( int ataflag ){
 	//refresh_screen();
 #endif
 
-    //
     // Sondando a interface PCI para encontrarmos um dispositivo
     // que seja de armazenamento de dados.
-    //	
 	
 	//PCI_CLASSCODE_MASS
 	
@@ -1715,7 +1706,7 @@ int diskATAInitialize ( int ataflag ){
 	// Vamos saber mais sobre o dispositivo enconrtado. 
 	//
 	
-    data = (_u32) diskATAPCIConfigurationSpace( bus, dev, fun );
+    data = (_u32) diskATAPCIConfigurationSpace ( bus, dev, fun );
 
 	// Error.	
     if( data == PCI_MSG_ERROR )
@@ -1889,7 +1880,7 @@ int diskATADialog( int msg,
 		//ATAMSG_INITIALIZE
 		//Initialize driver.
 		case 1:
-		    diskATAInitialize( (int) long1 );
+		    diskATAInitialize ( (int) long1 );
 		    Status = 0;
 			goto done;
 			break;

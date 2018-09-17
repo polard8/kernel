@@ -45,6 +45,13 @@ struct nic_info_d
 	//pci device.
     struct pci_device_d *pci;	
 	
+	unsigned char mac0;
+	unsigned char mac1;
+	unsigned char mac2;
+	unsigned char mac3;
+	unsigned char mac4;
+	unsigned char mac5;
+	
 	//unsigned char bus;
 	//unsigned char dev;
 	//unsigned char fun;	

@@ -455,10 +455,10 @@ struct process_d
 	unsigned long Image;          //Base da imagem do processo.
 	unsigned long ImageSize;      //Tamanho da imagem do processo.
 
-	/*
-	 * Heap. 
-	 */
 
+	// ## Heap ##     
+
+	//#importante 
 	unsigned long Heap;            //Endereço do início do Heap do processo.
 	unsigned long HeapEnd;
 	unsigned long HeapSize;        //Tamanho do heap.
@@ -470,10 +470,8 @@ struct process_d
 	//struct heap_d *processHeap;  //@todo: Usar essa estrutura.
 
 	
-	/*
-	 *  Stack 
-	 */	
-	
+	//  ## Stack ##
+		
 	unsigned long Stack;          //Endereço do início da Stack do processo.
 	unsigned long StackEnd;
 	unsigned long StackSize;      //Tamanho da pilha.	

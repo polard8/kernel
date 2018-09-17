@@ -117,9 +117,56 @@ int init_nic (){
 		pci_device->Vendor = (unsigned short) (data & 0xffff);
 		pci_device->Device = (unsigned short) (data >> 16 &0xffff);
 		
+		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
+		pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x14 ); 
+		pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
+		pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
+		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
+		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
+		
 		//...
 	};
+	
+	
 
+    //##importante:
+	//##todo tem que mapear esse endereço.
+	
+	unsigned long phy_address = (pci_device->BAR0 & 0xFFFFFFF0);
+	
+	//mapeando para obter o endereço virtual que o kernel pode manipular.
+	unsigned long virt_address = mapping_nic0_device_address( phy_address );
+	
+	//endereço base.
+	unsigned char *base_address = (unsigned char *) virt_address;
+
+	//se for 0 temos que pegar de outro jeito.
+	if ( base_address[0x5400 + 0] == 0 &&
+	     base_address[0x5400 + 1] == 0 &&
+		 base_address[0x5400 + 2] == 0 &&
+         base_address[0x5400 + 3] == 0 &&
+         base_address[0x5400 + 4] == 0 &&
+         base_address[0x5400 + 5] == 0  )
+	{
+		//pegar em outro lugar.	 
+	}  		 
+	
+	//ok, os endereços estão certos.
+	//printf("phy_address = %x\n", phy_address );
+	//printf("virt_address = %x\n", virt_address );
+	
+	//int z;
+	
+	//for( z=0; z< (0x5400+0x20); z++ )
+	//{
+	//    printf("%x ",base_address[z]);	
+	//}
+
+	//printf("%x ",base_address[26]);
+	//printf("%x ",base_address[27]);
+	//refresh_screen();
+	//while(1){}
+	
     //
 	//  NIC
 	//
@@ -135,6 +182,14 @@ int init_nic (){
 		currentNIC->magic = 1234;
 		
 		currentNIC->pci = (struct pci_device_d *) pci_device;
+		
+		
+		currentNIC->mac0 = base_address[ 0x5400 + 0 ];
+		currentNIC->mac1 = base_address[ 0x5400 + 1 ];
+		currentNIC->mac2 = base_address[ 0x5400 + 2 ];
+		currentNIC->mac3 = base_address[ 0x5400 + 3 ];
+		currentNIC->mac4 = base_address[ 0x5400 + 4 ];
+		currentNIC->mac5 = base_address[ 0x5400 + 5 ];
 		
 		//...
 		
@@ -207,6 +262,23 @@ void show_current_nic_info (){
 		printf("NIC device info:\n");
 		printf("Vendor %x Device %x \n", 
 		    currentNIC->pci->Vendor, currentNIC->pci->Device );
+			
+			
+		//bars	
+		printf("BAR0 %x\n",currentNIC->pci->BAR0);
+		printf("BAR1 %x\n",currentNIC->pci->BAR1);
+		printf("BAR2 %x\n",currentNIC->pci->BAR2);
+		printf("BAR3 %x\n",currentNIC->pci->BAR3);
+		printf("BAR4 %x\n",currentNIC->pci->BAR4);
+		printf("BAR5 %x\n \n",currentNIC->pci->BAR5);
+		
+		
+		printf("MAC %x ", currentNIC->mac0 );
+		printf("%x ", currentNIC->mac1 );
+		printf("%x ", currentNIC->mac2 );
+		printf("%x ", currentNIC->mac3 );
+		printf("%x ", currentNIC->mac4 );
+		printf("%x \n", currentNIC->mac5 );
 		
 		//...
 		
