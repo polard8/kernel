@@ -498,15 +498,10 @@ system_procedure( struct window_d *window,
 					break;
 				
 	
-                //CPU info. 				
+                //CPU info.
+                //intel? deveria ser independente. 				
                 case VK_F3: 
 					show_cpu_intel_parameters();
-				    //alt_status = 0;
-					//ctrl_status = 0;
-					//shift_status = 0;
-                    // backgroundDraw(COLOR_BLACK);
-					//printf("%s",stderr->_base);  //mostrar a entrada padrão.
-					//refresh_screen();
 					break;
 					
 				//Window tests.	
@@ -556,8 +551,11 @@ system_procedure( struct window_d *window,
                 //testes				
 				case VK_F6:
 					
+					//vamos mostrar informações antes obtidas pelo sistema.
+					show_current_nic_info ();
+					
 					//#test
-					nic_test1();
+					//nic_test1();
 					
 					//#test
 					//fsList("volume1");

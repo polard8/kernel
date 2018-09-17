@@ -1,8 +1,9 @@
 /*
- * File: executive\sci\systemcall.h
+ * File: execve\sci\syscall.h
  *
  * Descrição:
  *     SCI - System Call Interface header.
+ *
  *     Header do subsistema do kernel. 
  *     Pertence ao executive.
  *
@@ -407,7 +408,9 @@
 #define	SYS_243 243
 #define	SYS_244 244
 #define	SYS_245 245
+
 #define	SYS_246 246
+
 #define	SYS_247 247
 #define	SYS_248 248
 #define	SYS_249 249

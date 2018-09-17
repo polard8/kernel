@@ -504,6 +504,15 @@ int init (){
 #endif	
 	initialize_system_message_queue(); 
 	
+	
+	
+	//
+	// NIC
+	//
+	
+    init_nic ();
+	
+	
     //
 	// Initialize Platform structure.
 	//

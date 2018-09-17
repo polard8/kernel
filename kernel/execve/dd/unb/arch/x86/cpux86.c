@@ -49,7 +49,6 @@ void cpux86_enable_caches();
  * Max feature id       = 0x80000000.
  * L2 cache information = 0x80000006.(Extended L2 Cache Features)
  * core per die         = 0x80000008.
- *
  */
  
 void get_cpu_intel_parameters (){
@@ -277,8 +276,11 @@ void get_cpu_intel_parameters (){
 	 * Virtual and physical memory sizes.
 	 */
 	
-    //EAX=80000008h: Virtual and Physical address Sizes	
-    cpuid ( 0x80000008, eax, ebx, ecx, edx );
+    //EAX=80000008h: 
+	//Virtual and Physical address Sizes	
+    //Returns largest virtual and physical address sizes.
+	
+	cpuid ( 0x80000008, eax, ebx, ecx, edx );
 	name[0] = eax;    //Virtual and physical memory sizes.
 	name[1] = ebx;    //reserved
 	name[2] = ecx;    //reserved
@@ -410,10 +412,12 @@ void show_cpu_intel_parameters (){
 	// maximum physical address bits  
 	//maximum linear (virtual) address bits 
 	
-	printf("         PA Lim.: {%d}\n", 
+	printf("[Largest virtual and physical address sizes]\n");
+	
+	printf("          PA Lim: {%d}\n", 
 	    (unsigned long) processor->Physical_Address_Size );
 		
-	printf("         VA Lim.: {%d}\n", 
+	printf("          VA Lim: {%d}\n", 
 	    (unsigned long) processor->Virtual_Address_Size );
 	
 	//printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);

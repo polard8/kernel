@@ -27,7 +27,7 @@ Bugs:
 QEMU does not properly handle the software reset operation (CTRL.RST) in builds prior to June 2009.
 */
  
-//NIC 82540EM Intel PRO/1000 MT
+//NIC 82540EM Intel PRO/1000 MT   8086 100e
 
 typedef struct nic_info_d nic_info_t; 
 struct nic_info_d
@@ -35,22 +35,48 @@ struct nic_info_d
 	object_type_t objectType;
 	object_class_t objectClass;
 	
+	//validação da estrutura.
+	//se as flags estiverem acionadas, devemos
+	//procurar as informações na estrutura de dispositivo pci.
+	
+	int used;
+	int magic;
+	
+	//pci device.
+    struct pci_device_d *pci;	
+	
+	//unsigned char bus;
+	//unsigned char dev;
+	//unsigned char fun;	
+	
+	
+	//unsigned short vendor;
+	//unsigned short device;
+
 	// rede.
 	//struct network_info_d *network;
 	
-	//struct pci_device_d *pci;
 	//struct device_d     *device;
 
     //struct nic_info_d *next;	
 };
+struct nic_info_d *currentNIC;
+//...
+
 //nic_info_t *NicControllerHook;
 //...
  
-int init_network();
+//lista de placas de rede.
+//#todo: o valor máximo precisa ser definido. 
+unsigned long nicList[8]; 
+ 
+int init_nic();
 
 //testando controlador ... 
 //encontrando o controlador e identificando vendor e device.
 void nic_test1();
+
+void show_current_nic_info ();
 
 //
 //fim.

@@ -44,16 +44,18 @@ struct pci_device_d
 	object_type_t objectType;
 	object_class_t objectClass;		
 
-	//callback //d
+	//callback 
 	
 	//Identificação.
-	int deviceId;    //c
-	int deviceUsed;   //b
-	int deviceMagic;   //a
-    char *name;        //g  
+	int deviceId;
+    
+	int deviceUsed;   
+	int deviceMagic;   
+    
+	char *name;         
 
-	//unsigned long flag;   //f
-    //unsigned long error;  //e
+	//unsigned long flag;   
+    //unsigned long error;  
 	
 	// Status do dispositivo.
 	//int device_status;

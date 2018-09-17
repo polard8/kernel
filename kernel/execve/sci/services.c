@@ -688,15 +688,14 @@ void *services( unsigned long number,
 
 		//72 - Create thread.	
         case SYS_CREATETHREAD:			
-            //systemIoCpu( 3, 0, 0, 0, 0);
-			return (void*) create_thread( 
-			                   NULL,             // w. station 
-							   NULL,             // desktop
-							   NULL,             // w.
-							   arg2,             // init eip
-							   arg3,             // init stack
-							   current_process,  // pid (determinado)(provisório).
-							   (char *) a4 );    // name
+			return (void *) create_thread( 
+			                NULL,             // w. station 
+							NULL,             // desktop
+							NULL,             // w.
+							arg2,             // init eip
+							arg3,             // init stack
+							current_process,  // pid (determinado)(provisório).
+							(char *) a4 );    // name
 			break; 
 
 		//73 - Create process.
@@ -744,7 +743,7 @@ void *services( unsigned long number,
 		
 		//Down. 87
 		case SYS_SEMAPHORE_DOWN:
-		    return (void*) Down( (struct semaphore_d *) arg2);
+		    return (void *) Down( (struct semaphore_d *) arg2);
 		    break;
 		//Testa se o processo é válido
         //se for válido retorna 1234		
@@ -755,7 +754,7 @@ void *services( unsigned long number,
 			
 		//Up. 89	
 		case SYS_SEMAPHORE_UP:
-		    return (void*) Up( (struct semaphore_d *) arg2);
+		    return (void *) Up( (struct semaphore_d *) arg2);
 		    break;
 		
 		//90 Coletor de threads Zombie. (a tarefa idle pode chamar isso.)		
@@ -765,38 +764,27 @@ void *services( unsigned long number,
 			
 		//94	
 		//REAL (coloca a thread em standby para executar pela primeira vez.)
+		// * MOVEMENT 1 (Initialized --> Standby).
 		case SYS_STARTTHREAD:
 
-		    //#debug
-		    //select
-   		    //printf("services:94 select\n");
-			//refresh_screen();
-		    t = (struct thread_d*) arg2;
-            SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
-		    
-			//#debug
-			//spawn
-			//printf("services:94 spawn\n");
-			//refresh_screen();
-			//current_thread = t->tid;
-			//KiSpawnTask(current_thread); 
-			
+		    t = (struct thread_d *) arg2;
+            SelectForExecution(t);    
+		    			
 			break;		
 			
 	    //
         // 99,100,101,102 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
         //
 
-        //
         // *importante: 
 		//  #bugbug SYS_GETKEYBOARDMESSAGE (44) está pegando a mensagem de teclado,
 		//          mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
 		//          qual foi o dispositivo gerador do evento. ??!!
-        //  		
+
 			
 		//**** 99,  Pega 'hwnd' na fila da janela com o foco de entrada.
 		case SYS_GETHWINDOW:
-		    return (void*) systemDevicesUnblocked(43,arg2,arg2,arg2,arg2);
+		    return (void *) systemDevicesUnblocked(43,arg2,arg2,arg2,arg2);
 		    break;
 			
 		//#bugbug
@@ -847,9 +835,9 @@ void *services( unsigned long number,
 			break;
 
 			
-		//110 Reboot. (Teclado é legado, é desbloqueado)
+		//110 Reboot.
+        //(Teclado é legado, é desbloqueado)		
 	    case SYS_REBOOT: 
-		    //systemDevicesUnblocked(2,0,0,0,0); 
 			systemReboot();
 			break;
 			
@@ -972,7 +960,7 @@ void *services( unsigned long number,
 			
 		//119
 		case SYS_SELECTCOLORSCHEME:
-		    printf("Service 119\n");
+		    //printf("Service 119\n");
 		    return (void *) windowSelectColorScheme( (int) arg2 );
 			break;
 		
@@ -984,14 +972,14 @@ void *services( unsigned long number,
 		// essa mesma.
 		//
 		case SYS_DRIVERINITIALIZED: 
-		    return (void*) systemLinkDriver(arg2,arg3,arg4); 
+		    return (void *) systemLinkDriver(arg2,arg3,arg4); 
 			break;
 			
 		//130
 		case SYS_DRAWTEXT:
 		    
 			//@todo: Podeira pintar na janela atual.
-			argString = (unsigned char*) arg4;
+			argString = (unsigned char *) arg4;
 		    draw_text( gui->screen, arg2,  arg3, COLOR_TEXT, argString);
 			break;
 			
@@ -1031,15 +1019,15 @@ void *services( unsigned long number,
 		// Isso é usado pela biblioteca stdio em user mode
 		// na função getchar()
 		// #bugbug: Não está pegando todos os caracteres digitados.
-		//
-        case SYS_GETCH:
-		    //window.c
-		    return (void*) window_getch();
+		// window.c
+		
+        case SYS_GETCH:  
+		    return (void *) window_getch();
             break;		
 			
 		//139
         case SYS_GETSCANCODE:
-		    return (void*) get_scancode();
+		    return (void *) get_scancode();
             break;		
 
         //140
@@ -1049,7 +1037,7 @@ void *services( unsigned long number,
 			
 		//141	
 		case SYS_GET_CURRENT_KEYBOARD_RESPONDER:
-		    return (void*) get_current_keyboard_responder();
+		    return (void *) get_current_keyboard_responder();
 		    break;
 			
 		//142	
@@ -1059,7 +1047,7 @@ void *services( unsigned long number,
 			
 		//143	
 		case SYS_GET_CURRENT_MOUSE_RESPONDER:
-		    return (void*) get_current_mouse_responder();
+		    return (void *) get_current_mouse_responder();
 			break;
 
 			
@@ -1070,16 +1058,18 @@ void *services( unsigned long number,
 			break;
 		
 		//145
-        //configura a client area		
+        //configura a client area	
+        //@todo: O ponteiro para estrutura de retângulo é passado via argumento.		
 		case SYS_SETCLIENTAREARECT:
-		    //@todo: O ponteiro para estrutura de retângulo é passado via argumento.
 			setClientAreaRect( arg2, arg3, arg4, 0);
             break;
 			
 		//create grid and itens.
+		//n, view 
 		case 148:
-		    //n, view 
-		    return (void*) grid( (struct window_d*) arg2 ,(int) arg3, (int) arg4 );
+		    return (void *) grid ( (struct window_d *) arg2, 
+			                    (int) arg3, 
+								(int) arg4 );
             break;		
 
         //test. menu.
@@ -1089,12 +1079,12 @@ void *services( unsigned long number,
 			
 		//152 - get user id	
 		case SYS_GETCURRENTUSERID:
-		    return (void*) current_user;
+		    return (void *) current_user;
 			break;			
 		
 		//154 - get group id	
 		case SYS_GETCURRENTGROUPID:
-		    return (void*) current_group;
+		    return (void *) current_group;
 			break;
 			
 		// 167
@@ -1106,29 +1096,30 @@ void *services( unsigned long number,
         // os argumentos recebidos aqui precisam ir para ipc/spawn.c 
         // que serão enviados via registradores para o aplicativo.
         // Obs: Não adianta enviar ponteiros para o aplicativo, 
-        // pois ele não pode pegar no kernel.		
+        // pois ele não pode pegar no kernel.	
+		
 		case 167:
 		    // Testar
 			//executive.c
-		    return (void*) executive_gramado_core_init_execve( 0,  //serviço 
-			                   (const char *) arg2,                //name
-			                   (const char *) arg3,                //(arg)(endereço da linha de comando)
-							   (const char *) arg4 );              //env
+		    return (void *) executive_gramado_core_init_execve( 0,  //serviço 
+			                (const char *) arg2,                //name
+			                (const char *) arg3,                //(arg)(endereço da linha de comando)
+							(const char *) arg4 );              //env
 			break;
 			
 		//157 - get user session id	
 		case SYS_GETCURRENTUSERSESSION:
-		    return (void*) current_usersession;
+		    return (void *) current_usersession;
 			break;
 			
         //158 - get window station id		
 		case SYS_GETCURRENTWINDOWSTATION:	
-		    return (void*) current_windowstation; 
+		    return (void *) current_windowstation; 
 			break;	
 			
 		//159 - get desktop id
         case SYS_GETCURRENTDESKTOP:		
-		    return (void*) current_desktop; 
+		    return (void *) current_desktop; 
 			break;
 			
 		//170
@@ -1136,18 +1127,17 @@ void *services( unsigned long number,
         //?? mostra p pathname gerenciado pelo kernel 
         //para o diretório de trabalho.		
 		case SYS_PWD:
-		    printf("\n");
+		    //printf("\n");
             //printf("service 170:.pwd \n"); 
 			//printf("disk={%d} volume={%d} directory={%d}\n",
 			//    current_disk, current_volume, current_directory );
-			printf("%s\n",current_workingdiretory_string);
-			printf("\n");
+			printf("\n %s \n\n", current_workingdiretory_string );
 			refresh_screen();
 			break;	
 		
 		//171 - retorna o id do volume atual.
 		case SYS_GETCURRENTVOLUMEID:
-		    return (void*) current_volume;
+		    return (void *) current_volume;
             break;	
 
 		//172 - configura o id do volume atual.
@@ -1157,56 +1147,55 @@ void *services( unsigned long number,
             break;	
 
 		//173 Lista arquivos de um diretório, dado o número do disco,
-        //o número do volume e o número do diretório,		
+        //o número do volume e o número do diretório,
+        //args in: disk id, volume id, directory id		
         case SYS_LISTFILES:
-            fsListFiles( arg2,   //disk id 
-			             arg3,   //volume id
-						 arg4);  //directory id
+            fsListFiles ( arg2, arg3, arg4 );  
 			break;
 			
 			
 		//174
 		case SYS_SEARCHFILE:
-		    return (void*) KiSearchFile( (unsigned char *) arg2, 
-                                         (unsigned long) arg3 );
+		    return (void *) KiSearchFile ( (unsigned char *) arg2, 
+                                (unsigned long) arg3 );
 			break;
 			
 		//175	
 		//atualizar string no pathname do pwd. 
         //em argumento veio o que se deve acrescentar.		
 		case 175:
-		    fsUpdateWorkingDiretoryString( (char *) arg2 );
+		    fsUpdateWorkingDiretoryString ( (char *) arg2 );
 			break;
 			
 		//176	
 		//atualizar string no pathname do pwd. 
         //em argumento veio a quantidade de diretórios a se retirar.		
-		case 176:
-		    //apaga n quantidade de nomes de diretórios 
-			//começando do último.
-		    fs_pathname_backup( (char *) current_workingdiretory_string, 
+		//apaga n quantidade de nomes de diretórios 
+		//começando do último.
+		
+		case 176:	
+		    fs_pathname_backup ( (char *) current_workingdiretory_string, 
 			    (int) arg3 );
 			break;
 			
 		//listando arquivos em um diretório dado o nome.	
 		case 177:
-		    fsList( (const char *) arg2 );
+		    fsList ( (const char *) arg2 );
             break;		
-			
 			
 		// # test #	
 		// #bugbug: suspenso.
 		// passando vetor de ponteiros.
 		// executando um novo programa no processo init.
 		//case 179:
-		    // contador, endereço.
+		// contador, endereço.
 		//    return (void*) execve_execute_on_init( (int) arg2, (const char *) arg3 );
         //    break;		
 
 		//184
 		//pega o endereço do heap do processo dado seu id.	
         case SYS_GETPROCESSHEAPPOINTER:
-            return (void*) GetProcessHeapStart( (int) arg2 );
+            return (void *) GetProcessHeapStart( (int) arg2 );
 			break;		
 			
 
@@ -1216,9 +1205,9 @@ void *services( unsigned long number,
 		    break;
 		
 		//200 - Envia um sinal para um processo.	
+		//argumentos (process handle, signal number).
 		case SYS_SENDSIGNAL:
-		    //argumentos (process handle, signal number).
-		    signalSend((void*) a2, (int) arg3);
+		    signalSend ((void *) a2, (int) arg3);
 		    break;
 			
 		//...	
@@ -1245,15 +1234,15 @@ void *services( unsigned long number,
 		    break;
 			
 		//215
-		case SYS_GETTERMINALWINDOW:
-		    //retorna o ID.
+		//retorna o ID.
+		case SYS_GETTERMINALWINDOW: 
 		    return (void *) systemGetTerminalWindow(); 
 		    break;
 			
 		//216
         //configura qual vai ser a janela do terminal. 		
 		case SYS_SETTERMINALWINDOW:	
-		   systemSetTerminalWindow( (struct window_d*) arg2 );	
+		   systemSetTerminalWindow ( (struct window_d *) arg2 );	
 		   break;
 		   
 		//217
@@ -1303,20 +1292,22 @@ void *services( unsigned long number,
 		case SYS_CLOSE_KERNELSEMAPHORE:
 		    __ipc_kernel_spinlock = 0;
 			return;
+			break;
 			
 		//228 open critical section
 		case SYS_OPEN_KERNELSEMAPHORE:
 		    __ipc_kernel_spinlock = 1;
 			return;
-
+            break;
+			
 		//240
 		case SYS_GETCURSORX:
-		    return (void*) get_cursor_x();
+		    return (void *) get_cursor_x();
 		    break;
 
 		//241
 		case SYS_GETCURSORY:
-		    return (void*) get_cursor_y();
+		    return (void *) get_cursor_y();
 		    break;
 			
 		//Info. (250 ~ 255).
@@ -1324,7 +1315,7 @@ void *services( unsigned long number,
 		//250
 		//Get system metrics
 		case SYS_GETSYSTEMMETRICS:
-		    return (void*) systemGetSystemMetrics( (int) arg2 );
+		    return (void *) systemGetSystemMetrics ( (int) arg2 );
 		    break;
 		
 		//251
@@ -1367,7 +1358,9 @@ void *services( unsigned long number,
 		//
 		
 		default:	
-			printf("Default SystemService={%d}\n",number);
+			printf ("services: Default {%d}\n", number );
+			//#todo: retorno.
+			//return NULL;
 			break;
 	};
 	
@@ -1375,17 +1368,11 @@ void *services( unsigned long number,
 	//printf("SystemService={%d}\n",number);
     
 	
-	//
 	// * importante:
 	//   Depois de esgotados os 'cases', saltamos para a saída da função.
-	//
 	
 	goto done;	
 
-
-
-	
-//
 // * Aviso: #Importante.
 //
 // Juntando os argumentos para a função CreateWindow(.).
@@ -1397,26 +1384,19 @@ void *services( unsigned long number,
 // a rotina da API deve fazer 4 system calls, as 3 primeiras passando 
 // os argumentos e a última criando a janela.
 // >> do_create_window: é acionada depois de passados todos os argumentos. 
-// 
-//	
 	
 	
 //
-// Create window.
+// ## Create window ##
 //
 
 do_create_window:	
 	
-
-	
 	//?? @TODO
 	//if(WindowType >= 0 || WindowType <= 5){
 	//	
-	//}
+	//}	
 	
-		
-	
-	//
 	// @todo: bugbug.
 	// Obs: A parent window é 'gui->screen'. Talvez essa estrutura nem esteja 
     // inicializada ainda no ambiente de logon.
@@ -1425,25 +1405,30 @@ do_create_window:
     // uma estrutura de retângulo na estrutura do desktop e/ou uma estrutura de
     // retângula na estrututra gui->.
     //      ...
-    //
- 
-	
-
 
 	//
 	// *Importante: Checando se o esquema de cores está funcionando.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL ){
+	if ( (void *) CurrentColorScheme == NULL )
+	{
 		printf("services: CurrentColorScheme");
-		refresh_screen();
-		while(1){}
+		//refresh_screen();
+		die ();
+		
+		//while(1){}
+	
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
-		    printf("services: CurrentColorScheme validation");
-		    refresh_screen();
-		    while(1){}			
+		if ( CurrentColorScheme->used != 1 || 
+		     CurrentColorScheme->magic != 1234 )
+		{
+		    
+			printf("services: CurrentColorScheme validation");
+		    //refresh_screen();
+		    die();
+			
+			//while(1){}			
 		};
 		//Nothing.
 	};
@@ -1461,28 +1446,32 @@ do_create_window:
 	
 	//*Importante
 	//definimos as cores psdrão caso a flag esteja desligada.
-	WindowColor           = CurrentColorScheme->elements[csiWindowBackground];  
+	WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
 	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
 
-	//
 	// * Primeira coisa a fazer é ver se os argumentos estão disponíveis.
 	//   Vamos conferir a flag que indica que argumentos foram enviados 
 	//   previamente.
-	//
 	
-	//se a flag tiver acionada, os argumentos usarão os valores 
-	//que foram previamente passados
-	if(cwFlag == 1234){		
-        WindowType    = cwArg1; 
-		WindowStatus  = cwArg2; 
-		WindowView    = cwArg3; 
-		WindowName    = (char*) cwArg4; 
-	    WindowX       = cwArg5; 
-		WindowY       = cwArg6; 
-		WindowWidth   = cwArg7; 
-        WindowHeight  = cwArg8;									  
+	// Se a flag tiver acionada, os argumentos usarão os valores 
+	// que foram previamente passados
+	
+	if (cwFlag == 1234)
+	{		
+        WindowType = cwArg1; 
+		WindowStatus = cwArg2; 
+		WindowView = cwArg3; 
+		WindowName = (char *) cwArg4; 
+	    
+		WindowX = cwArg5; 
+		WindowY = cwArg6; 
+		
+		WindowWidth = cwArg7; 
+        WindowHeight = cwArg8;									  
+		
 		//gui->screen  = cwArg9; 
 		//desktopID = cwArg10; 
+		
 		WindowClientAreaColor = (unsigned long) cwArg11;  //Obs: A cor da área de cliente será escolhida pelo app.   
 		WindowColor = (unsigned long) cwArg12;            //a cor da janela escolhida pelo app. 
 	};	
@@ -1499,25 +1488,31 @@ do_create_window:
 	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
 	//com um endereço da área de memória do app.
-    NewWindow = (void*) CreateWindow( WindowType, WindowStatus, WindowView, WindowName, 
-	                                  WindowX, WindowY, WindowWidth, WindowHeight,									  
-								      gui->screen, desktopID, (unsigned long) WindowClientAreaColor, (unsigned long) WindowColor);
+    NewWindow = (void *) CreateWindow( WindowType, WindowStatus, 
+	                        WindowView, WindowName, 
+	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
+							gui->screen, 
+							desktopID, 
+							(unsigned long) WindowClientAreaColor, 
+							(unsigned long) WindowColor );
 
 	
 	
 	
 	
-	if( (void*) NewWindow == NULL )
+	if ( (void *) NewWindow == NULL )
 	{ 
         //?? Mensagem.
 	    return NULL; 
+		
 	}else{	
         
 		
 		//se a janela foi criada com sucesso, podemos desativar a flag.
-		cwFlag = 0;                  //*importante, nesse momento precisamos desativar a flag.
+		//*importante, nesse momento precisamos desativar a flag.
 		
-		//
+		cwFlag = 0;                  
+		
         // Obs: 
 		// Quem solicitou a criação da janela pode estar em user mode
         // porém a estrutura da janela está em kernel mode. #bugbug
@@ -1526,8 +1521,7 @@ do_create_window:
 		// pode enviar diversas chamadas, Se não enviar, serão considerados
 		// os valores padrão referentes ao tipo de janela criada.
 		// Cada tipo tem suas características e mesmo que o solicitante
-		// não seja específico nos detalhes ele terá a janela do tipo que deseja.
-        //		
+		// não seja específico nos detalhes ele terá a janela do tipo que deseja.	
 		
         //  
         //@todo: Pode-se refinar os parâmetros da janela na estrutura.
@@ -1541,11 +1535,11 @@ do_create_window:
 		// Se a tarefa atual está pintando, vamos melhorar a sua prioridade.
 		//
 		
-		t = (void*) threadList[current_thread];
+		t = (void *) threadList[current_thread];
 		
 		set_thread_priority( t, PRIORITY_HIGH4);
 		
-	    return (void*) NewWindow; 
+	    return (void *) NewWindow; 
 	};
 
 //More ...
@@ -1553,15 +1547,9 @@ do_create_window:
 //yyy:
 //zzz:
 
-
-		
-    //
     //    No caso de um aplicativo ter chamado essa rotina, 
 	// o retorno será para o ISR da int 200, feito em assembly.
     //    No caso do kernel ter chamado essa rotina, apenas retorna.
-    //    
-    //
-	
 	
 //Done.
 done:
@@ -1628,9 +1616,9 @@ void syscall_handler()
  *     @todo: Passar argumento via registrador. ??
  *     @todo: Outra função já esta fazendo isso, deletar essa.
  */
-void servicesChangeProcedure()
-{
-	return;
+void servicesChangeProcedure (){
+	
+	//return;
 };
 
 

@@ -2317,15 +2317,15 @@ void systemShutdown (){
 	 
 	//@todo ...
 
-	MessageBox(gui->screen, 1, "sm-sys-system-systemShutdown:","I's safe to turnoff your computer.");
+	MessageBox( gui->screen, 1, "sm-sys-system-systemShutdown:","I's safe to turnoff your computer.");
 	
 	//Nothing.
 	
-done:		
+//done:		
 	//systemShutdownViaAPM(); //@todo: usar essa.
 	//KiShutdown(); //??
 	//hal_shutdown();
-hang:	
+//hang:	
 	die();
 };
 
@@ -2852,8 +2852,8 @@ done:
  * 2015 - Created.
  * 2016 - Revisão.
  */
-int systemStartUp()
-{
+int systemStartUp (){
+	
     int Status = 0;
 
 	KeInitPhase = 0;  //Set Kernel phase.    
