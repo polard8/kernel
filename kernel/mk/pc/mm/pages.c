@@ -398,23 +398,27 @@ unsigned long mapping_nic0_device_address( unsigned long address )
 	//Esse endereço é improvisado. Parece que não tem nada nesse endereço.
 	
 	
-    unsigned long *nic0_page_table = (unsigned long *) 0x91000;   
-
+    //unsigned long *nic0_page_table = (unsigned long *) 0x91000;   
+	//unsigned long *nic0_page_table = (unsigned long *) 0;   
+	unsigned long *nic0_page_table = (unsigned long *) 0x88000;
+	
+	
 	int i;
 	for ( i=0; i < 1024; i++ ){
 		
 		nic0_page_table[i] = (unsigned long) address | 3;     
-	    address   = (unsigned long) address + 4096;  
+	    address = (unsigned long) address + 4096;  
     };
 	
 
 	//0xC1000000    772  ##test
+	//f0000000      960
 	
-    page_directory[772] = (unsigned long) &nic0_page_table[0];      
-    page_directory[772] = (unsigned long) page_directory[0] | 3;   	
+    page_directory[960] = (unsigned long) &nic0_page_table[0];      
+    page_directory[960] = (unsigned long) page_directory[960] | 3;   	
 	
 	//endereço equivalente à entrada 772
-	return (unsigned long) 0xC1000000;
+	return (unsigned long) 0xF0000000;
 };
 
 
@@ -697,7 +701,7 @@ int SetUpPaging (){
 	for ( i=0; i < 1024; i++ ){
 		
 		km_page_table[i] = (unsigned long) SMALL_kernel_address | 3;     
-	    SMALL_kernel_address   = (unsigned long) SMALL_kernel_address + 4096;  
+	    SMALL_kernel_address = (unsigned long) SMALL_kernel_address + 4096;  
     };
 	
     page_directory[0] = (unsigned long) &km_page_table[0];      

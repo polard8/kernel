@@ -56,6 +56,8 @@ void nicHandler()
  * init_network:
  *     Inicializa o módulo gerenciador de rede.
  *     @todo: deletar: Usar nicInit()
+ *
+ * ## bugbug: problemas no mapeamento do endereço encontrado em BAR0
  */
  
 int init_nic (){
@@ -132,6 +134,9 @@ int init_nic (){
     //##importante:
 	//##todo tem que mapear esse endereço.
 	
+	//########### todo
+	//## bugbug: problemas no mapeamento do endereço encontrado em BAR0
+	
 	unsigned long phy_address = (pci_device->BAR0 & 0xFFFFFFF0);
 	
 	//mapeando para obter o endereço virtual que o kernel pode manipular.
@@ -139,17 +144,18 @@ int init_nic (){
 	
 	//endereço base.
 	unsigned char *base_address = (unsigned char *) virt_address;
+	unsigned long *base_address32 = (unsigned long *) virt_address;
 
 	//se for 0 temos que pegar de outro jeito.
-	if ( base_address[0x5400 + 0] == 0 &&
-	     base_address[0x5400 + 1] == 0 &&
-		 base_address[0x5400 + 2] == 0 &&
-         base_address[0x5400 + 3] == 0 &&
-         base_address[0x5400 + 4] == 0 &&
-         base_address[0x5400 + 5] == 0  )
-	{
+	//if ( base_address[0x5400 + 0] == 0 &&
+	//     base_address[0x5400 + 1] == 0 &&
+	//	 base_address[0x5400 + 2] == 0 &&
+    //     base_address[0x5400 + 3] == 0 &&
+    //     base_address[0x5400 + 4] == 0 &&
+    //     base_address[0x5400 + 5] == 0  )
+	//{
 		//pegar em outro lugar.	 
-	}  		 
+	//}  		 
 	
 	//ok, os endereços estão certos.
 	//printf("phy_address = %x\n", phy_address );
@@ -157,13 +163,18 @@ int init_nic (){
 	
 	//int z;
 	
-	//for( z=0; z< (0x5400+0x20); z++ )
+	//for( z=0; z<50; z++ )
 	//{
-	//    printf("%x ",base_address[z]);	
+	//    printf("%x \n",base_address32[z]);		
 	//}
-
-	//printf("%x ",base_address[26]);
-	//printf("%x ",base_address[27]);
+	
+	//printf("%x ",base_address32[0]);
+	//printf("%x ",base_address32[0]);
+	//printf("%x ",base_address32[0]);
+	//printf("%x ",base_address32[0]);
+	//printf("%x ",base_address32[0]);
+	//printf("%x ",base_address32[0]);
+		
 	//refresh_screen();
 	//while(1){}
 	
