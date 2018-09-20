@@ -10,6 +10,8 @@
 
 
 
+
+
  
 //estrutura de rede
 typedef struct network_info_d network_info_t;
@@ -45,7 +47,12 @@ struct network_info_d
 
 int networkInit();
 
+
+void networkSetstatus (int status);
+int networkGetStatus ();
+void show_network_info ();
+
 //
-//fim
+// End.
 //
 

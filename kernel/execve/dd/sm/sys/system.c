@@ -2805,12 +2805,12 @@ void Removing_from_the_middle(struct linkedlist_d *list)
 };
 
 
-void Removing_from_the_end(struct linkedlist_d *list)
-{
+void Removing_from_the_end (struct linkedlist_d *list){
+	
     struct node_d *old_tail;
     struct node_d *new_tail;
 
-	if( (void*) list == NULL){
+	if ( (void *) list == NULL){
 	   return;
 	};
 
@@ -2819,8 +2819,8 @@ void Removing_from_the_end(struct linkedlist_d *list)
 	
 	list->tail = new_tail; 
 	
-done:
-	return;
+//done:
+	//return;
 };
 
 

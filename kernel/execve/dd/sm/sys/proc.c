@@ -552,7 +552,8 @@ system_procedure( struct window_d *window,
 				case VK_F6:
 					
 					//vamos mostrar informações antes obtidas pelo sistema.
-					show_current_nic_info ();
+					show_network_info ();
+					//show_current_nic_info ();
 					
 					//#test
 					//nic_test1();

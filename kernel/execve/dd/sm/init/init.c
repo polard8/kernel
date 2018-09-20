@@ -505,12 +505,12 @@ int init (){
 	initialize_system_message_queue(); 
 	
 	
-	
 	//
-	// NIC
+	// Network
 	//
 	
-    init_nic ();
+	networkInit ();
+	
 	
 	
     //

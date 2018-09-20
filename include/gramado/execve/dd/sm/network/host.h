@@ -105,6 +105,16 @@ struct host_info_d
 	unsigned short hostVersionRevision;
     int hostArchitecture; //identificador de tipo de arquitetura. ex: (x86)
 	
+	
+	//IP
+	char hostIP[3];
+	char *hostIPString;
+	
+	
+	//MAC
+	char hostMAC[6];
+	char *hostMACString;
+	
 	//...
 };
 host_info_t *HostInfo;
