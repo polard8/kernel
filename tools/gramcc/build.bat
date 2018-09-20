@@ -12,14 +12,14 @@
 echo -{ ...
 echo -{ Creating application GRAMCC.BIN ...
     
-	nasm c:\gramado\tests\gramcc\crt0.asm -f elf -o crt0.o
+	nasm c:\gramado\tools\gramcc\crt0.asm -f elf -o crt0.o
 	
 :Compiling	
 echo -{ ...
 echo -{ Compiling ...
-	gcc -c c:\gramado\tests\gramcc\main.c   -I c:\gramado\include\libc -o main.o  
-	gcc -c c:\gramado\tests\gramcc\lexer.c  -I c:\gramado\include\libc -o lexer.o
-	gcc -c c:\gramado\tests\gramcc\parser.c -I c:\gramado\include\libc -o parser.o 	
+	gcc -c c:\gramado\tools\gramcc\main.c   -I c:\gramado\include\libc -o main.o  
+	gcc -c c:\gramado\tools\gramcc\lexer.c  -I c:\gramado\include\libc -o lexer.o
+	gcc -c c:\gramado\tools\gramcc\parser.c -I c:\gramado\include\libc -o parser.o 	
  
  
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
@@ -46,7 +46,7 @@ parser.o
 echo -{ ...
 echo -{ Linking objects ... 
    
-   ld -T c:\gramado\tests\gramcc\link.ld -o GRAMCC.BIN %myObjects% -Map  test_map.s
+   ld -T c:\gramado\tools\gramcc\link.ld -o GRAMCC.BIN %myObjects% -Map  test_map.s
    
    rem Não deletar os objetos.
  
