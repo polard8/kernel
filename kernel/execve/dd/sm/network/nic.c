@@ -194,7 +194,19 @@ int init_nic (){
 		
 		currentNIC->pci = (struct pci_device_d *) pci_device;
 		
+		//salvando o endereço para outras rotinas usarem.
+		currentNIC->registers_base_address = (unsigned long) &base_address[0];
 		
+		
+		//
+		// #### Get Info ####
+		//
+		
+		//device status
+		currentNIC->DeviceStatus = base_address[ 0x8];
+		
+		
+		//mac
 		currentNIC->mac0 = base_address[ 0x5400 + 0 ];
 		currentNIC->mac1 = base_address[ 0x5400 + 1 ];
 		currentNIC->mac2 = base_address[ 0x5400 + 2 ];
@@ -218,6 +230,7 @@ int init_nic (){
 //encontrando o controlador e identificando vendor e device.
 void nic_test1 (){
 	
+/*	
 	//pci info.
 	uint32_t data; 
 	unsigned char bus;
@@ -245,6 +258,8 @@ void nic_test1 (){
 	printf("Vendor=%x \n", (data & 0xffff) );
 	printf("Device=%x \n", (data >> 16 &0xffff) );
 	printf("done\n");	
+*/
+
 };
 
 
@@ -284,6 +299,18 @@ void show_current_nic_info (){
 		printf("BAR5 %x\n \n",currentNIC->pci->BAR5);
 		
 		
+		
+		printf("Device status %x \n", currentNIC->DeviceStatus );
+		
+		if (currentNIC->DeviceStatus & 1){
+			printf("Full duplex \n");
+		}	
+		
+		
+		if (currentNIC->DeviceStatus & 0x80){
+			printf("1000Mbs\n");
+		}	
+		
 		printf("MAC %x ", currentNIC->mac0 );
 		printf("%x ", currentNIC->mac1 );
 		printf("%x ", currentNIC->mac2 );
@@ -295,6 +322,124 @@ void show_current_nic_info (){
 		
 	};	    
 	
+};
+
+
+
+void nic_i8254x_reset(){
+	
+	
+	printf("nic_i8254x_reset: \n");
+
+	//#todo: precisamos checar a validade dessa estrutura e do endereço.
+	
+	//endereço base.
+	unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
+	unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
+	
+	
+	//; Disable all interrupt causes
+	//; Interrupt Mask Clear Register
+	base_address32[0x00D8] = 0xFFFFFFFF;
+	
+	
+	//Disable interrupt throttling logic
+	//Interrupt Throttling Register
+	base_address32[0x00C4] = 0; 
+	
+	
+	//PBA: set the RX buffer size to 48KB (TX buffer is calculated as 64-RX buffer)
+	//Transmit Configuration Word
+	base_address32[0x0178] = 0x00000030; 
+	
+	
+	//#todo:
+	// CTRL: clear LRST, set SLU and ASDE, clear RSTPHY, VME, and ILOS
+	//0x0000
+	//limpar alguns bit so Control
+	
+	
+	
+	
+	//; MTA: reset
+	//; Multicast Table Array
+	//0x5200
+	base_address32[0x5200] = 0xFFFFFFFF;
+	
+	
+	//configurar a recepção.
+	
+	
+	// TDBAL
+	//; Transmit Descriptor Base Address Low
+	base_address32[0x3800] = 0x80000;
+	
+	//TX Descriptor Length
+	base_address32[0x3808] = (32 * 8);	
+	
+	//TDH - Transmit Descriptor Head
+	base_address32[0x3810] = 0;
+	
+	//TDL - Transmit Descriptor Tail
+    base_address32[0x3818] = 1;
+	
+	//; Enabled, Pad Short Packets, 15 retries, 64-byte COLD, Re-transmit on Late Collision
+	//; Transmit Control Register	
+	base_address32[0x0400] = 0x010400FA;
+	
+	
+	//; IPGT 10, IPGR1 8, IPGR2 6
+	//; Transmit IPG Register
+	//; Transmit Inter Packet Gap
+	//0x0060200A	0x0410
+	base_address32[0x0410] = 0x0060200A;
+	
+	
+	//; Clear the Receive Delay Timer Register 0x2820 RX Delay Timer Register
+	// Clear the Receive Interrupt Absolute Delay Timer 0x282C RX Int. Absolute Delay Timer
+	// Clear the Receive Small Packet Detect Interrupt 0x2C00  RX Small Packet Detect Interrupt
+	base_address32[0x2820] = 0; 
+	base_address32[0x282C] = 0; 
+	base_address32[0x2C00] = 0; 
+	
+	
+	
+	//#bugbug: essa parte pode ser complicada.
+	//; Temp enable all interrupt types
+	//; Enable interrupt types
+	//Interrupt Mask Set/Read Register 
+	base_address32[0x00D0] = 0x1FFFF; 
+	
+	
+	printf("nic_i8254x_reset: done\n");
+	refresh_screen();
+};
+
+
+
+void nic_i8254x_transmit(){
+	
+	
+	printf("nic_i8254x_transmit: \n");
+
+	//#todo: precisamos checar a validade dessa estrutura e do endereço.
+	
+	//endereço base.
+	unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
+	unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
+	
+	// TDBAL
+	base_address32[0x3800] = 0x80000;
+	
+	// TDH - Transmit Descriptor Head
+	base_address32[0x3810] = 0;
+	
+	// TDL - Transmit Descriptor Tail
+    base_address32[0x3818] = 1;
+	
+	
+	printf("nic_i8254x_transmit: done\n");
+	refresh_screen();
 };
 
 /*

@@ -385,12 +385,13 @@ void SetCR3 (unsigned long address){
 };
 
 
+//82540 test
+//e, 88000h ficará a pagetable para mapear o endereço físico f0000000
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 
 //esse mapeamento só será válido para o primeiro.
-
-unsigned long mapping_nic0_device_address( unsigned long address )
-{
+unsigned long mapping_nic0_device_address ( unsigned long address ){
+	
     unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;      
 
 	

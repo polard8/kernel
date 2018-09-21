@@ -45,6 +45,13 @@ struct nic_info_d
 	//pci device.
     struct pci_device_d *pci;	
 	
+	//salvando o endereço base.
+	unsigned long registers_base_address;
+	
+	unsigned long DeviceControl;
+	
+	unsigned long DeviceStatus;
+	
 	unsigned char mac0;
 	unsigned char mac1;
 	unsigned char mac2;
@@ -85,7 +92,11 @@ void nic_test1();
 
 void show_current_nic_info ();
 
+void nic_i8254x_transmit();
+
+void nic_i8254x_reset();
+
 //
-//fim.
+// End.
 //
 
