@@ -526,7 +526,11 @@ system_procedure( struct window_d *window,
 				    //pci_info();     //PCI information.
 				    
 					//Obs: Não usa janelas, isso não mudará o foco.
-					systemShowDevicesInfo();
+					//systemShowDevicesInfo();
+					
+					//testando a função que converte endereço virtual em físico.
+					printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, KERNEL_PAGEDIRECTORY) ); 
+					
 					
 					/*
 					//testando chamar o bootloader na forma de módulo.

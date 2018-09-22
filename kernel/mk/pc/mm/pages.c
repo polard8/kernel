@@ -1731,6 +1731,34 @@ fail:
 };
 
 
+unsigned long 
+virtual_to_physical( unsigned long virtual_address, 
+                     unsigned long dir_address ) 
+{
+	
+	unsigned long address;
+	
+	unsigned long *dir = (unsigned long *) dir_address;
+
+	unsigned long tmp;
+	
+	int d = (int) virtual_address >> 22 & 0x3FF;
+    int t = (int) virtual_address >> 12 & 0x3FF;
+    int o = (int) (virtual_address & 0xFFF);
+
+	//temos o endereço da pt junto com as flags.
+	tmp = (unsigned long) dir[d];
+	
+	unsigned long *pt = (unsigned long *) (tmp & 0xFFFFF000);
+	
+	//encontramos o endereço base do page frame.
+	tmp = (unsigned long) pt[t];	
+	
+	address = (tmp & 0xFFFFF000);
+	
+	return (unsigned long) (address + o);	
+};
+
 //
 // End.
 //

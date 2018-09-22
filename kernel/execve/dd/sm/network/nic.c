@@ -354,11 +354,24 @@ void nic_i8254x_reset(){
 	
 	
 	//#todo:
+	//rever esses bits;
 	// CTRL: clear LRST, set SLU and ASDE, clear RSTPHY, VME, and ILOS
 	//0x0000
 	//limpar alguns bit so Control
+	//; LRST = 0        3
+	//; SLU = 1         6
+	//; ASDE = 1        5
+	//; PHY_RST = 0     31
+	//; VME = 0 (Disable 802.1Q)   30
+	//; ILOS = 0                   7
 	
+	//#todo
+	//0011 1111 1111 1111 1111 1111 0111 0111
+	//2    f    f    f    f    f    7    7 
+	//0x2fffff77
 	
+	unsigned long tmp = base_address32[0];
+	base_address32[0] = (tmp & 0x2fffff77); 
 	
 	
 	//; MTA: reset

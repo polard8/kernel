@@ -1139,6 +1139,12 @@ void *allocPageFrames(int size);
 void *newPage();   //aloca uma página e retorna seu endereço virtual inicial
 void testingFrameAlloc();   //@todo: Rotina de teste. deletar.
 
+
+unsigned long 
+virtual_to_physical( unsigned long virtual_address, 
+                     unsigned long dir_address ) ;
+					 
+
 //
 // Debug support.
 //
