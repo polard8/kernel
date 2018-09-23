@@ -59,55 +59,6 @@ int mouse_button_action;
 #define outanyb(p) __asm__ __volatile__( "outb %%al,%0" : : "dN"((p)) : "eax" )
 
 
-/*
- aqui não é o lugar disso.
-char*  cursor[] =
-{
-    "1..........",
-    "11.........",
-    "121........",
-    "1221.......",
-    "12221......",
-    "122221.....",
-    "1222221....",
-    "12222221...",
-    "122222221..",
-    "1222222221.",
-    "12222211111",
-    "1221221....",
-    "121.1221...",
-    "11..1221...",
-    "1....1221..",
-    ".....1221..",
-    "......11..."
-};
-
-*/
-
-
-/*
- aqui não é o lugar disso.
-static char cursor[16][16] = {
-		"**************..",
-		"*OOOOOOOOOOO*...",
-		"*OOOOOOOOOO*....",
-		"*OOOOOOOOO*.....",
-		"*OOOOOOOO*......",
-		"*OOOOOOO*.......",
-		"*OOOOOOO*.......",
-		"*OOOOOOOO*......",
-		"*OOOO**OOO*.....",
-		"*OOO*..*OOO*....",
-		"*OO*....*OOO*...",
-		"*O*......*OOO*..",
-		"**........*OOO*.",
-		"*..........*OOO*",
-		"............*OO*",
-		".............***"
-	};
-
-*/
-
 //
 // Imported functions.
 //
@@ -117,10 +68,6 @@ static char cursor[16][16] = {
 //
 
 
-
-
-
-//
 // Ports:
 // =====
 //     The entire range for the keyboard is 60-6F,
@@ -129,7 +76,7 @@ static char cursor[16][16] = {
 //  @todo:
 //      As portas do controlador ainda estão subutilizadas.
 //      fazer um driver mais completo utilizando melhor o controlador.
-//
+
 
 
 //
@@ -254,8 +201,6 @@ unsigned long scrolllock_status;
 // Mouse support
 //
 
-
-
 //bytes do controlador.
 char mouse_status;
 char delta_x;
@@ -348,18 +293,14 @@ unsigned long keyboardGetKeyState ( unsigned char key ){
 	};
 
 	//Nothing.
-	
-//Done:
 
     return (unsigned long) State;		
 };
 
 
 /*
- ***************
  * keyboardEnable:
  *     Enable keyboard.
- *
  */
 void keyboardEnable (){
 	
@@ -373,14 +314,10 @@ void keyboardEnable (){
 	//Send code for setting Enable command.
     outportb(0x60,0xF4);
     //sleep(100);
-
-//done:
-	//return;
 };
 
 
 /*
- ********************************************
  * keyboardDisable:
  *     Disable keyboard.
  */
@@ -396,20 +333,14 @@ void keyboardDisable (){
 	//Send code for setting disable command.
     outportb(0x60,0xF5);
     //sleep(100);
-	
-//done:
-	//return;
 };
 
 
 /*
- ******************************************
  * keyboard_set_leds:
  *     Set keyboard flags.
  *     ED = Set led.
  */
-// void keyboardSetLEDs(cahr flag)
-
 void keyboard_set_leds (char flag){
 	
 	//@todo: filtro.
@@ -435,9 +366,6 @@ void keyboard_set_leds (char flag){
     //{
 		
 	//}	
-
-//done:
-	//return;
 };
 
 
@@ -796,13 +724,7 @@ int LINE_DISCIPLINE ( unsigned char SC, int type ){
 
     //Nothing.
 	
-	
-	//
-	// ++ Para finalizar, vamos enviar a mensagem para fila certa ++
-	//
-		
-
-//Done.
+	// Para finalizar, vamos enviar a mensagem para fila certa.
 done:
 
 	/*
@@ -889,20 +811,24 @@ done:
 	//
 	
 	// Envia as mensagens para os aplicativos intercepta-las
-	//so mandamos mensagem para um aplicativo no estavo válido.	
+	// so mandamos mensagem para um aplicativo no estavo válido.	
 
 	
-	//Apenas checando a validade da janela com o foco de entrada.
+	// Apenas checando a validade da janela com o foco de entrada.
+	// Janela com o foco de entrada. (first responder ??)
 	
-	struct window_d *w;    //janela com o foco de entrada.(first responder ??)
+	struct window_d *w;    
 	w = (void *) windowList[window_with_focus];
 	
-	if( (void*) w == NULL ){
+	if ( (void *) w == NULL )
+	{
 		printf("LINE_DISCIPLINE: w");
 		die();
+		
 	}else{
 		
-		if( w->used != 1 || w->magic != 1234 ){
+		if ( w->used != 1 || w->magic != 1234 )
+		{
 			printf("LINE_DISCIPLINE: w magic");
 			die();
 		}
@@ -910,11 +836,8 @@ done:
 		// Aqui temos uma janela válida.
 		// Vamos enviar a mensagem para ela.
 		
-		
-        windowSendMessage( (unsigned long) w, 
-	        (unsigned long) mensagem, 
-		    (unsigned long) ch, 
-		    (unsigned long) ch );
+        windowSendMessage( (unsigned long) w, (unsigned long) mensagem, 
+		    (unsigned long) ch, (unsigned long) ch );
 	};
 	
  
@@ -940,14 +863,9 @@ done:
 	
 	//o procedimento tratará as mensagens de sistema, colocará o cham no 
 	//stdin e imprimirá o char na tela.
-	system_procedure(  w, 
-	      (int) mensagem, 
-		  (unsigned long) ch, 
-		  (unsigned long) ch ); 
-
-		  
+	system_procedure(  w, (int) mensagem, 
+		(unsigned long) ch, (unsigned long) ch ); 
  
-	  
 	//?? porque -1.
     return (int) -1;
 };
@@ -959,22 +877,25 @@ done:
  *     Dado o id de uma thread, retorna o ponteiro de estrutura da janela 
  * à qual a thread pertence.
  */
-void *KdGetWindowPointer(int tid)
-{
+void *KdGetWindowPointer (int tid){
+	
 	struct thread_d *t;
 
-	//@todo: filtrar argumento. Mudar para tid.
-	//if(thread_id<0){}
-
+	//@todo: filtrar argumento. 
+	
+	if ( tid < 0 )
+        return NULL;
+        
+		
 	// Structure.
-	t = (void*) threadList[tid];
+	t = (void *) threadList[tid];
 
-	if( (void*) t == NULL ){
-        return NULL;        //@todo: fail;
+	if ( (void *) t == NULL )
+	{
+        return NULL;        
 	};
-// Done.
-done:
-	return (void*) t->window;
+	
+	return (void *) t->window;
 };
 
 
@@ -990,25 +911,25 @@ done:
  *
  * @todo: bugbug: A mensagem deve estar na fila do processo, na
  *                estrutura do proceso. (Talvez não na thread e nem na janela.)
- *
  */
-int KbGetMessage(int tid)
-{   
+int KbGetMessage (int tid){
+	
 	int ret_val;
 	struct thread_d *t;
 	
-	//
 	// Structure.
 	t = (void*) threadList[tid];
 
-	if( (void*) t != NULL ){
+	if ( (void *) t != NULL )
+	{
         ret_val = (int) t->msg;
 	}else{
 	    ret_val = (int) -1;    //Fail.
 	};
 
 // Done.
-done:
+//done:
+
 	WindowProcedure->msgStatus = 0;    //Muda o status.
 	return (int) ret_val;              //Retorna a mensagem.
 };
@@ -1018,19 +939,20 @@ done:
  * KbGetLongParam1:
  *    Pega o parametro "long1" do procedimento de janela de uma thread.
  */
-unsigned long KbGetLongParam1(int tid)
-{   	
+unsigned long KbGetLongParam1 (int tid){
+   	
 	struct thread_d *t;
 	
 	// Structure.
-	t = (void*) threadList[tid];
+	t = (void *) threadList[tid];
 
-	if( (void*) t == NULL){
+	if ( (void *) t == NULL)
+	{
         return (unsigned long) 0;    //@todo: fail;
 	};
 
 // Done.
-done:
+//done:
     return (unsigned long) t->long1;
 };
 
@@ -1038,19 +960,20 @@ done:
  * KbGetLongParam2:
  *     Pega o parametro "long2" do procedimento de janela de uma thread.
  */
-unsigned long KbGetLongParam2(int tid)
-{
+unsigned long KbGetLongParam2 (int tid){
+	
 	struct thread_d *t;
 	
 	// Structure.
-	t = (void*) threadList[tid];
+	t = (void *) threadList[tid];
 
-	if( (void*) t == NULL){
+	if ( (void *) t == NULL)
+	{
         return (unsigned long) 0;    //@todo: fail;
 	};
 
 // Done.
-done:
+//done:
     return (unsigned long) t->long2;
 };
 
@@ -1072,11 +995,9 @@ done:
  *     + Fechar todas tarefas antes.
  *     + Efetuar o tipo de reboot especificado.
  *    + Outras ...
- *
  */
-void reboot()
-{
-    //
+void reboot (){
+    
     //@todo: 
 	// +criar uma variavel global que especifique o tipo de reboot.
     // +criar um switch para efetuar os tipos de reboot.
@@ -1088,8 +1009,6 @@ void reboot()
 	//
 	// Video.
 	//
-	
-
 	
 	/*
 	sleep(2000);
@@ -1143,30 +1062,32 @@ void reboot()
 // Done.
 //
 
-done:
-    hal_reboot();
-	die();
+//done:
+
+    hal_reboot ();
+	die ();
 };
 
 
 //Get alt Status.
-int get_alt_status(){
+int get_alt_status (){
+	
     return (int) alt_status;
 };
 
+
 //Get control status.
-int get_ctrl_status(){
+int get_ctrl_status (){
+	
     return (int) ctrl_status;
 };
 
  
-
-int get_shift_status(){
+int get_shift_status (){
+	
     return (int) shift_status;	
-}
+};
  
-
-
 
 /*
  * init_keyboard:
@@ -1177,12 +1098,12 @@ int get_shift_status(){
  *         criar a variável keyboard_type ;;; ABNT2 
  */
 // void keyboardInit()
-void init_keyboard()
-{
-	//user.h
-	ioControl_keyboard = (struct ioControl_d*) malloc( sizeof(struct ioControl_d) );
+void init_keyboard (){
 	
-	if( (void*) ioControl_keyboard == NULL )
+	//user.h
+	ioControl_keyboard = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
+	
+	if ( (void *) ioControl_keyboard == NULL )
 	{
 		printf("ldsic-init_keyboard: ioControl_keyboard fail");
 		die();
@@ -1195,7 +1116,6 @@ void init_keyboard()
 		ioControl_keyboard->tid = 0;  //qual threa está usando o dispositivo.
 	    //ioControl_keyboard->
 	};
-	
 	
     //int Type = 0;
 
@@ -1280,9 +1200,7 @@ void init_keyboard()
 	//Debug support.
 	scStatus = 0;
 
-done:
     g_driver_keyboard_initialized = (int) 1;
-    return;
 };
 
 
@@ -1315,13 +1233,13 @@ int keyboardInit(){
 
 
 /*
- ********************************************************
+ ***********************************************
  * init_mouse:
  *     Inicializando o mouse no controlador 8042.
  *     Carregando o bmp para o curso do mouse.
  */		
-int init_mouse()
-{
+int init_mouse (){
+	
     unsigned char response = 0;
     unsigned char deviceId = 0;
     int i; 
@@ -1330,9 +1248,9 @@ int init_mouse()
 	
 	
 	//user.h
-	ioControl_mouse = (struct ioControl_d*) malloc( sizeof(struct ioControl_d) );
+	ioControl_mouse = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
 	
-	if( (void*) ioControl_mouse == NULL )
+	if ( (void *) ioControl_mouse == NULL )
 	{
 		printf("ldsic-init_mouse: ioControl_mouse fail");
 		die();
@@ -1392,7 +1310,7 @@ int init_mouse()
 	//
 	
 	
-tryModoBruto:	
+//tryModoBruto:	
 	
 	//Modo bruto.
 	//Obs: Esse modo está funcionando.
@@ -1436,7 +1354,7 @@ tryModoBruto:
 	// Aqui podemos tentar outros modos mais completos.
 	//
 	
-done:
+//done:
 
     // Reabilitando as duas portas.
 	
@@ -1460,14 +1378,13 @@ done:
 	
 	// ## test ##
 	//susenso. Isso funciona.
-    mouse_ret = (int) load_mouse_bmp();	
-	if(mouse_ret != 0)
+    
+	mouse_ret = (int) load_mouse_bmp ();	
+	if (mouse_ret != 0)
 	{
 		printf("ldisc-init_mouse: load_mouse_bmp");
 		die();
 	}
-	
-	
 	
 #ifdef KERNEL_VERBOSE		
     MessageBox(gui->screen, 1, "init_mouse:","Mouse initialized!");   
@@ -1484,12 +1401,13 @@ done:
  *     Envia um byte para a porta 0x60.
  *     (Nelson Cole) 
  */
-void mouse_write(unsigned char write)
-{
+void mouse_write (unsigned char write){
+	
 	kbdc_wait(1);
-	outportb(0x64,0xD4);
+	outportb (0x64,0xD4);
+	
 	kbdc_wait(1);
-	outportb(0x60,write);
+	outportb (0x60,write);
 };
 
 
@@ -1498,9 +1416,10 @@ void mouse_write(unsigned char write)
  *     Pega um byte na porta 0x60.
  *     (Nelson Cole) 
  */
-unsigned char mouse_read()
-{
+unsigned char mouse_read (){
+	
 	kbdc_wait(0);
+	
 	return inportb(0x60);
 };
 
@@ -1510,15 +1429,24 @@ unsigned char mouse_read()
  *     Espera por flag de autorização para ler ou escrever.
  *     (Nelson Cole) 
  */
-void kbdc_wait(unsigned char type)
-{
-	if(type==0){
-        while(!inportb(0x64)&1)outanyb(0x80);
+void kbdc_wait (unsigned char type){
+	
+	if (type==0)
+	{
+		//#bugbug rever
+        while ( !inportb(0x64) & 1 )
+		{
+			outanyb (0x80);
+		};
+		
     }else{
-        while(inportb(0x64)&2)outanyb(0x80);
+		
+        while ( inportb(0x64) & 2 )
+		{
+			outanyb (0x80);
+		};
 	};
 };
-
 
 
 /*
@@ -1668,12 +1596,16 @@ void mouseHandler (){
 		    if(	mouse_x > (800-16) ){ mouse_x = (800-16); }
 		    if(	mouse_y > (600-16) ){ mouse_y = (600-16); }
 
-			
-		    //
 		    // # Draw BMP #
-		    //
-
-		    //bmpDisplayBMP( mouseBMPBuffer, mouse_x, mouse_y );
+		    // Isso está funcionando bem.
+			// #todo: precisamos colocar no backbuffer o retãngulo salvo previamente.
+            // #todo: Precisamos salvar o conteúdo de um retângulo 
+			// que está no backbuffer, para depois pintarmos o mouse.
+			
+			//#todo: Criar essas funções e variáveis.
+			//ex: display_saved_rect( saved_rect_Buffer, old_mouse_x, old_mouse_y );
+            //ex: save_rect(x,y);
+			
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
 		    refresh_rectangle( mouse_x, mouse_y, 16, 16 );					
 			
@@ -1974,14 +1906,13 @@ void mouseHandler (){
 		
 		//refresh bmp rectangle.
 		//isso coloca o (+) no frontbuffer.
-		refresh_rectangle( wScan->left, wScan->top, 8, 8 );
+		//isso funciona.
+		refresh_rectangle ( wScan->left, wScan->top, 8, 8 );
 	};
-	
-//exit_irq:	
 
     // EOI.		
-    outportb(0xa0, 0x20); 
-    outportb(0x20, 0x20);
+    outportb ( 0xa0, 0x20 ); 
+    outportb ( 0x20, 0x20 );
 };
 
 
@@ -1997,8 +1928,6 @@ static unsigned char inPort60 (void){
 
     kernelProcessorInPort8(0x60, data);
 	
-//done:
-  
     return (data);
 };
 
@@ -2017,8 +1946,6 @@ static void outPort60 (unsigned char value){
   
     data = value;
     kernelProcessorOutPort8(0x60, data);
-  
-//done: 
  
     return;
 };
@@ -2040,8 +1967,6 @@ static void outPort64 (unsigned char value){
     data = value;
     kernelProcessorOutPort8(0x64, data);
 	
-//done:	
-    
 	return;
 };
 
@@ -2061,8 +1986,6 @@ static unsigned char getMouseData (void){
 
     kernelProcessorInPort8(0x60, data);
 	
-//done:
-    
 	return (data);
 };
 
@@ -2074,101 +1997,13 @@ static unsigned char getMouseData (void){
  *     This gets called whenever there is a mouse interrupt
  *     @todo: Rever as entradas no array.         
  */
-void kernelPS2MouseDriverReadData(void)
-{
-
-/*
- * #suspensa !	
-	
-    // Botões do mouse.
-	static volatile int button1, button2, button3;
-    
-	// Bytes da mensagem.
-	unsigned char byte1=0, byte2=0, byte3=0;
-    
-	// Posicionamento.
-	int xChange, yChange;
-	
-	
-	// Zera o estado do mouse.
-	mousemsg[9] = 0;  
-
-	//
-	// Get bytes.
-	//
-
-getBytes:
-	
-    // The first byte contains button information and sign information
-    // for the next two bytes
-    byte1 = mouse_status;
-	
-    // The change in X position
-    byte2 = delta_x;
-	
-    // The change in Y position
-    byte3 = delta_y;
-	
-	//
-	// Procedimento com base nos bytes.
-	//
-	
-takeSomeAction:
-	
-    if( (byte1 & 0x01) != button1 )
-    {
-        // kernelMouseButtonChange(1, button1 = (byte1 & 0x01));
-        mousemsg[2] = 1;
-        mousemsg[9] = MSG_MOUSEKEYDOWN; // clicado ou nao
-        return;
-    }else if( (byte1 & 0x04) != button2 )
-          {
-              //  kernelMouseButtonChange(2, button2 = (byte1 & 0x04));
-              mousemsg[2]= 2;
-              mousemsg[9] = MSG_MOUSEKEYDOWN; // clicado ou nao                                      
-              return;
-          }else if( (byte1 & 0x02) != button3 )
-                {
-                    //  kernelMouseButtonChange(3, button3 = (byte1 & 0x02));
-                    mousemsg[2]= 3;
-                    mousemsg[9] = MSG_MOUSEKEYDOWN; // clicado ou nao                                      
-                    return;
-                }else{
-                    
-					//++=======
-					// Sign them
-                    if(byte1 & 0x10){
-	                    xChange = (int) ((256 - byte2) * -1);
-                    }else{ xChange = (int) byte2; };
-					//--=======
-
-					//++=======
-                    if (byte1 & 0x20){
-                        yChange = (int) (256 - byte3);
-                    }else{ yChange = (int) (byte3 * -1); };
-					//--=======
-
-                    //  char_blt(xChange * 8,yChange * 8,55,'A'); 
-                    //  kernelMouseMove(xChange, yChange);
-                    //  mousemove(xChange, yChange);
-                    
-					my_buffer_char_blt( xChange, yChange, COLOR_PINK, 'T');
-					
-					mousemsg[0]= xChange;
-                    mousemsg[1]= yChange;
-                };
-				
-	//Nothing.	
-	
-*/
-	
-done:							
-    return;
+void kernelPS2MouseDriverReadData (void){
+    //#suspensa !	
 };
 
 
 /* 
- * ******************
+ * **************
  * P8042_install:
  *     Configurando o controlador PS/2, 
  *     e activar a segunda porta PS/2 (mouse).
@@ -2347,7 +2182,7 @@ int load_mouse_bmp (){
 	//===================================
 	
 	
-refresh_rectangle:
+//refresh_rectangle:
 
 	//Isso funcionou ...
 	//refresh_rectangle( 20, 20, 16, 16 );
@@ -2459,6 +2294,7 @@ void initialize_system_message_queue (){
 	
     //return;	
 };
+
 
 //==========================================
 // marlls1989 - marcos - queue 
@@ -2587,8 +2423,6 @@ void ldisc_init_lock_keys (){
 	// Number Lock.
 	numlock_status = 0;	
 };
-
-
 
 
 //

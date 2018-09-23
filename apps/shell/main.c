@@ -969,11 +969,9 @@ shellProcedure( struct window_d *window,
 				unsigned long long1, 
 				unsigned long long2 )
 {
-    unsigned long input_ret;
+	unsigned long input_ret;
     unsigned long compare_return;	
-	
-	int q;
-	
+    int q;	
 	
 	//if( msg == COMMAND_INITIALIZE_SHELL ){
 		//...
@@ -990,7 +988,7 @@ shellProcedure( struct window_d *window,
 		//    break; 
 		 
 		case MSG_KEYDOWN:
-            switch(long1)
+            switch (long1)
             {
 				// Null key.
 				case 0:
@@ -1064,7 +1062,7 @@ shellProcedure( struct window_d *window,
 					//APIredraw_window(i2Window);				
 				    //MessageBox( 1, "MessageBox","F1: Testing apiDialog() ");
 					
-					printf("Chamando apiDialog: ...\n");
+					printf("Testing apiDialog: ...\n");
 					q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
 					
 					if ( q == 1 ){ printf("Voce escolheu Yes \n");};
@@ -1161,37 +1159,36 @@ shellProcedure( struct window_d *window,
 			
 		// MSG_MOUSEKEYDOWN	
 		case 30:
-			if( long1 == 1 )
+		    switch (long1)
 			{
-                printf("button 1\n"); 				
-                
-				//APISetFocus(window);
-			    //APIredraw_window(window,1);
-			}
-			if( long1 == 2 )
-			{
-				printf("button 2\n");
-			}
-			if( long1 == 3 )
-			{
-				printf("button 3\n");
-			}			
+				case 1:
+				    printf("button 1\n");
+				    //APISetFocus(window);
+					//APIredraw_window(window,1);
+					break;
+				case 2:
+				    printf("button 2\n");
+				    break;
+				case 3:
+				    printf("button 3\n");
+				    break;
+			};			
             break;
 
 		// MSG_MOUSEKEYUP	
 		case 31:
-			if( long1 == 1 )
-			{
-                printf("up button 1\n"); 				
-			}
-			if( long1 == 2 )
-			{
-				printf("up button 2\n");
-			}
-			if( long1 == 3 )
-			{
-				printf("up button 3\n");
-			}	
+		    switch (long1)
+			{		
+				case 1:
+				    printf("up button 1\n");
+					break;
+				case 2:
+				    printf("up button 2\n");
+				    break;
+				case 3:
+				    printf("up button 3\n");
+				    break;
+			};		
             break;	
 
 		// MSG_MOUSEMOVE	

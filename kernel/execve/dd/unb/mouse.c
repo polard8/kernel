@@ -1,11 +1,10 @@
 /*
- * File: unblocked\mouse.c
+ * File: unb\mouse.c
  *
- * Isso aqui está no kernel base, mas deverá ser um driver.
+ * Isso aqui está no kernel base.
  * 
  * History:
- * 2017 - Created by fred Nora. 
- *
+ * 2017 - Created by Fred Nora. 
  */
 
 
@@ -36,7 +35,7 @@ void mouse_handler (){
 
 
 //
-//fim.
+// End.
 //
 
 
