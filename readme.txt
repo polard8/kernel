@@ -1,5 +1,5 @@
-
- Main folders for gramado Operating system.
+    
+    Main folders for Gramado Operating System.
 
 
 //(super)
