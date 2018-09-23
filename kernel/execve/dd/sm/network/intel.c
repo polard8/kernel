@@ -62,7 +62,6 @@ void nicHandler()
  
 int init_nic (){
 	
-	
 	//pci info.
 	uint32_t data; 
 	unsigned char bus;
@@ -70,11 +69,10 @@ int init_nic (){
 	unsigned char fun;			
 
 
-	
 	printf("\n");
 	printf("probing pci ...\n");
 					
-	data = (uint32_t) diskPCIScanDevice ( PCI_CLASSCODE_NETWORK);
+	data = (uint32_t) diskPCIScanDevice (PCI_CLASSCODE_NETWORK);
 	
 	//#test: testando encontrar placa de rede.
 	if( data == -1 )
@@ -119,12 +117,23 @@ int init_nic (){
 		pci_device->Vendor = (unsigned short) (data & 0xffff);
 		pci_device->Device = (unsigned short) (data >> 16 &0xffff);
 		
+		//if ( pci_device->Vendor != 0x8086 ){
+		//	printf("init_nic: fail \n");
+		//	pci_device->deviceUsed = 0;
+		//	free(pci_device);	
+		//	return (int) 1;
+		//}
+		
 		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
 		pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x14 ); 
 		pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
 		pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
 		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
 		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
+		
+		
+		//#todo:
+		//Temos que pegar o número da interrupção.
 		
 		//...
 	};
@@ -182,6 +191,8 @@ int init_nic (){
 	//  NIC
 	//
 	
+	unsigned short tmp16;
+	
 	currentNIC = (void *) malloc ( sizeof( struct nic_info_d ) );
 	
 	if ( (void *) currentNIC ==  NULL )
@@ -207,12 +218,34 @@ int init_nic (){
 		
 		
 		//mac
+		//pegando o mac nos registradores.
 		currentNIC->mac0 = base_address[ 0x5400 + 0 ];
 		currentNIC->mac1 = base_address[ 0x5400 + 1 ];
 		currentNIC->mac2 = base_address[ 0x5400 + 2 ];
 		currentNIC->mac3 = base_address[ 0x5400 + 3 ];
 		currentNIC->mac4 = base_address[ 0x5400 + 4 ];
 		currentNIC->mac5 = base_address[ 0x5400 + 5 ];
+		
+		
+        //Read MAC address using eeprom
+        //## BUGBUG ##		
+        //fail: travando no loop		
+		
+		//#debug
+		//printf("#debug reading eeprom\n");
+        //refresh_screen();
+		//tmp16 = e1000_eeprom_read_8254x( (unsigned long) &base_address[0], 0);
+        //currentNIC->mac0 = (unsigned char) tmp16 & 0xff;
+        //currentNIC->mac1 = (unsigned char) (tmp16 >> 8) & 0xff;
+		//tmp16 = e1000_eeprom_read_8254x( (unsigned long) &base_address[0], 1);
+        //currentNIC->mac2 = (unsigned char) tmp16 & 0xff;
+        //currentNIC->mac3 = (unsigned char) (tmp16 >> 8) & 0xff;
+		//tmp16 = e1000_eeprom_read_8254x( (unsigned long) &base_address[0], 2);
+        //currentNIC->mac4 = (unsigned char) tmp16 & 0xff;
+        //currentNIC->mac5 = (unsigned char) (tmp16 >> 8) & 0xff;		
+		//#debug
+		//printf("#debug reading eeprom ok\n");
+		//refresh_screen();
 		
 		//...
 		
@@ -338,20 +371,35 @@ void nic_i8254x_reset(){
 	unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
 	
 	
+	//
+	// ## BUGBUG ##
+	//
+	// Erro ao aplicar o deslocamento em bytes num array de dwords.
+	//
+	
 	//; Disable all interrupt causes
 	//; Interrupt Mask Clear Register
-	base_address32[0x00D8] = 0xFFFFFFFF;
-	
+	//0xFFFFFFFF;
+	base_address[0x00D8 + 0] = 0xFF;
+	base_address[0x00D8 + 1] = 0xFF;
+	base_address[0x00D8 + 2] = 0xFF;
+	base_address[0x00D8 + 3] = 0xFF;
 	
 	//Disable interrupt throttling logic
 	//Interrupt Throttling Register
-	base_address32[0x00C4] = 0; 
-	
+	//0; 
+	base_address[0x00C4 + 0] = 0;
+	base_address[0x00C4 + 1] = 0;
+	base_address[0x00C4 + 2] = 0;
+	base_address[0x00C4 + 3] = 0;
 	
 	//PBA: set the RX buffer size to 48KB (TX buffer is calculated as 64-RX buffer)
 	//Transmit Configuration Word
-	base_address32[0x0178] = 0x00000030; 
-	
+	//0x00000030; 
+	base_address[0x0178 + 0] = 0x30; 
+	base_address[0x0178 + 1] =  0;
+	base_address[0x0178 + 2] =  0; 
+	base_address[0x0178 + 3] =  0;
 	
 	//#todo:
 	//rever esses bits;
@@ -370,6 +418,7 @@ void nic_i8254x_reset(){
 	//2    f    f    f    f    f    7    7 
 	//0x2fffff77
 	
+	//pegamos modificamos e salvamos.
 	unsigned long tmp = base_address32[0];
 	base_address32[0] = (tmp & 0x2fffff77); 
 	
@@ -377,52 +426,120 @@ void nic_i8254x_reset(){
 	//; MTA: reset
 	//; Multicast Table Array
 	//0x5200
-	base_address32[0x5200] = 0xFFFFFFFF;
+	//0xFFFFFFFF;
+	base_address[0x5200 + 0] = 0xff; 
+	base_address[0x5200 + 1] = 0xff;
+	base_address[0x5200 + 2] = 0xff;
+	base_address[0x5200 + 3] = 0xff;
 	
+	//
+	// ## TX RING ##
+	//
 	
 	//configurar a recepção.
 	
+	//#todo: talvez tenha que fazer isso.
+	// TXCW: set ANE, TxConfigWord (Half/Full duplex, Next Page Request)
+	//0x80008060
 	
 	// TDBAL
 	//; Transmit Descriptor Base Address Low
-	base_address32[0x3800] = 0x80000;
+	//0x0080000;  //low
+	base_address[0x3800 + 0] = 0;     //low
+	base_address[0x3800 + 1] = 0;
+	base_address[0x3800 + 2] = 0x80;
+	base_address[0x3800 + 3] = 0;
+    base_address[0x3800 + 4] = 0;     //high
+    base_address[0x3800 + 5] = 0;
+    base_address[0x3800 + 6] = 0;
+    base_address[0x3800 + 7] = 0;	
 	
-	//TX Descriptor Length
-	base_address32[0x3808] = (32 * 8);	
+	//TX Descriptor Length 256 = 0x0100
+	//(32 * 8);	
+	base_address[0x3808 + 0] = 0; 
+	base_address[0x3808 + 1] = 0x01; 
+	base_address[0x3808 + 2] = 0; 
+	base_address[0x3808 + 3] = 0; 
+	base_address[0x3808 + 4] = 0; 
+	base_address[0x3808 + 5] = 0; 
+	base_address[0x3808 + 6] = 0; 
+	base_address[0x3808 + 7] = 0; 
+	
 	
 	//TDH - Transmit Descriptor Head
-	base_address32[0x3810] = 0;
+	//0;
+	base_address[0x3810 + 0] = 0;
+	base_address[0x3810 + 1] = 0;
+	base_address[0x3810 + 2] = 0;
+	base_address[0x3810 + 3] = 0;
+	base_address[0x3810 + 4] = 0;
+	base_address[0x3810 + 5] = 0;
+	base_address[0x3810 + 6] = 0;
+	base_address[0x3810 + 7] = 0;
 	
 	//TDL - Transmit Descriptor Tail
-    base_address32[0x3818] = 1;
+    //1;
+	base_address[0x3818 + 0] = 1;
+	base_address[0x3818 + 1] = 0;
+	base_address[0x3818 + 2] = 0;
+	base_address[0x3818 + 3] = 0;
+	base_address[0x3818 + 4] = 0;
+	base_address[0x3818 + 5] = 0;
+	base_address[0x3818 + 6] = 0;
+	base_address[0x3818 + 7] = 0;
+
 	
 	//; Enabled, Pad Short Packets, 15 retries, 64-byte COLD, Re-transmit on Late Collision
 	//; Transmit Control Register	
-	base_address32[0x0400] = 0x010400FA;
-	
+	//0x 01 04 00 FA;
+	base_address[0x0400 + 0] = 0xfa;
+	base_address[0x0400 + 1] = 0;
+	base_address[0x0400 + 2] = 0x04;
+	base_address[0x0400 + 3] = 0x01;
 	
 	//; IPGT 10, IPGR1 8, IPGR2 6
 	//; Transmit IPG Register
 	//; Transmit Inter Packet Gap
 	//0x0060200A	0x0410
-	base_address32[0x0410] = 0x0060200A;
-	
+	//0x 00 60 20 0A;
+	base_address[0x0410 + 0] = 0x0A;
+	base_address[0x0410 + 1] = 0x20;
+	base_address[0x0410 + 2] = 0x60;
+	base_address[0x0410 + 3] = 0;
 	
 	//; Clear the Receive Delay Timer Register 0x2820 RX Delay Timer Register
 	// Clear the Receive Interrupt Absolute Delay Timer 0x282C RX Int. Absolute Delay Timer
 	// Clear the Receive Small Packet Detect Interrupt 0x2C00  RX Small Packet Detect Interrupt
-	base_address32[0x2820] = 0; 
-	base_address32[0x282C] = 0; 
-	base_address32[0x2C00] = 0; 
+	
+	//0;
+    base_address[0x2820 + 0] = 0;
+	base_address[0x2820 + 1] = 0;
+	base_address[0x2820 + 2] = 0;
+	base_address[0x2820 + 3] = 0;
+
+	//0; 
+	base_address[0x282C + 0] = 0;
+	base_address[0x282C + 1] = 0;
+	base_address[0x282C + 2] = 0;
+	base_address[0x282C + 3] = 0;
 	
 	
+	//0; 
+	base_address[0x2C00 + 0] = 0;
+	base_address[0x2C00 + 1] = 0;
+	base_address[0x2C00 + 2] = 0;
+	base_address[0x2C00 + 3] = 0;
 	
 	//#bugbug: essa parte pode ser complicada.
 	//; Temp enable all interrupt types
 	//; Enable interrupt types
-	//Interrupt Mask Set/Read Register 
-	base_address32[0x00D0] = 0x1FFFF; 
-	
+	//Interrupt Mask Set/Read Register
+	//base_address32[0x00D0] =  0x1F6DC ; // enable all interrupts (and clear existing pending ones)
+	//0x 0 1 FF FF; 
+	base_address[0x00D0 + 0] = 0xFF; 
+	base_address[0x00D0 + 1] = 0xFF;
+	base_address[0x00D0 + 2] = 0x01;
+	base_address[0x00D0 + 3] = 0;
 	
 	printf("nic_i8254x_reset: done\n");
 	refresh_screen();
@@ -442,18 +559,98 @@ void nic_i8254x_transmit(){
 	unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
 	
 	// TDBAL
-	base_address32[0x3800] = 0x80000;
+	//0x80000;
+	base_address[0x3800 + 0] = 0;     //low
+	base_address[0x3800 + 1] = 0;
+	base_address[0x3800 + 2] = 0x80;
+	base_address[0x3800 + 3] = 0;
+    base_address[0x3800 + 4] = 0;     //high
+    base_address[0x3800 + 5] = 0;
+    base_address[0x3800 + 6] = 0;
+    base_address[0x3800 + 7] = 0;	
 	
 	// TDH - Transmit Descriptor Head
-	base_address32[0x3810] = 0;
+	//0;
+	base_address[0x3810 + 0] = 0;
+	base_address[0x3810 + 1] = 0;
+	base_address[0x3810 + 2] = 0;
+	base_address[0x3810 + 3] = 0;
+	base_address[0x3810 + 4] = 0;
+	base_address[0x3810 + 5] = 0;
+	base_address[0x3810 + 6] = 0;
+	base_address[0x3810 + 7] = 0;	
 	
 	// TDL - Transmit Descriptor Tail
-    base_address32[0x3818] = 1;
+    //1;
+	base_address[0x3818 + 0] = 1;
+	base_address[0x3818 + 1] = 0;
+	base_address[0x3818 + 2] = 0;
+	base_address[0x3818 + 3] = 0;
+	base_address[0x3818 + 4] = 0;
+	base_address[0x3818 + 5] = 0;
+	base_address[0x3818 + 6] = 0;
+	base_address[0x3818 + 7] = 0;	
 	
 	
 	printf("nic_i8254x_transmit: done\n");
 	refresh_screen();
 };
+
+
+
+/*
+### exemplo
+Hirochika Asai  <asai@jar.jp>
+
+static __inline__ volatile u32
+mmio_read32(u64 base, u64 offset)
+{
+    return *(volatile u32 *)(base + offset);
+}
+
+static __inline__ void
+mmio_write32(u64 base, u64 offset, volatile u32 value)
+{
+    *(volatile u32 *)(base + offset) = value;
+}
+*/
+
+    //## BUGBUG ##		
+    //fail: travando no loop
+unsigned short e1000_eeprom_read_8254x (unsigned long mmio, unsigned char addr)
+{
+    unsigned long data;
+	
+	unsigned char *base = (unsigned char *) mmio;
+
+	//#todo:
+	
+	return (unsigned short) 0;
+};
+
+
+/*
+u16
+e1000_eeprom_read(u64 mmio, u8 addr)
+{
+    u16 data;
+    u32 tmp;
+
+    // Start 
+    *(u32 *)(mmio + E1000_REG_EERD) = ((u32)addr << 2) | 1;
+
+    // Until it's done 
+    while ( !((tmp = *(u32 *)(mmio + E1000_REG_EERD)) & (1<<1)) ) {
+        pause();
+    }
+    data = (u16)((tmp >> 16) & 0xffff);
+
+    return data;
+}
+*/
+
+
+
 
 /*
 int nicInit()

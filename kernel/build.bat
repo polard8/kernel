@@ -111,7 +111,7 @@ echo ~{ ux2 /execve
 	rem /execve/sm/ob
 	gcc -c c:/gramado/kernel/execve/dd/sm/ob/object.c -I c:/gramado/include -o object.o		
 	rem /execve/network
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/nic.c     -I c:/gramado/include -o nic.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/network/intel.c     -I c:/gramado/include -o nicintel.o
 	gcc -c c:/gramado/kernel/execve/dd/sm/network/network.c -I c:/gramado/include -o network.o
 	gcc -c c:/gramado/kernel/execve/dd/sm/network/socket.c  -I c:/gramado/include -o socket.o
 	rem System Management.
@@ -286,7 +286,7 @@ schedi.o ^
 dispatch.o ^
 sem.o ^
 modules.o ^
-nic.o ^
+nicintel.o ^
 network.o ^
 socket.o ^
 sm.o ^

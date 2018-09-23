@@ -299,7 +299,7 @@ extern void do_executa_new_task();
 //sm - System Management.  
 #include <gramado/execve/dd/sm/install.h>  
 #include <gramado/execve/dd/sm/init.h>
-#include <gramado/execve/dd/sm/network/nic.h>         //nic - network interface controller.
+#include <gramado/execve/dd/sm/network/intel.h>         //intel nic - network interface controller.
 #include <gramado/execve/dd/sm/network/nports.h>      //(network) Network Ports  (sw)
 #include <gramado/execve/dd/sm/network/socket.h>      //(network) Sockets info. (sw)
 #include <gramado/execve/dd/sm/network/ip.h>          //(network) IP info.      (sw)
