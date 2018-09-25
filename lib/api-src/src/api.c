@@ -96,7 +96,9 @@ void *system_call( unsigned long ax,
 	             : "=a"(RET)	
 		         : "i"(SYSTEM), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
     //Nothing.
-done:
+
+//done:
+
 	return (void *) RET; 
 };
 
@@ -106,77 +108,75 @@ done:
  *
  * Argumento:
  *    Interpreta um comando e envia uma systemcall para o kernel.
+ *    Obs: Assim como system, isso deve chamar aplicativos. 
+ * ?? Talvez deva chamar o próprio shell ??     
  */
-int apiSystem(const char *command)
-{
-    //
+int apiSystem (const char *command){
+    
     // @todo: Checar se comando é válido, se os primeiros caracteres
 	//        são espaço. Ou talvez somente compare, sem tratar o argumento.
-    //	
 
-	
-	//
 	//@todo:
 	// Criar rotina para pular os caracteres em branco no início do comando.
-	//
 	
 	//@todo: version, ...
 	
-	//
 	//OBS: ESSES SÃO OS COMANDOS DO SISTEMA, USADOS POR TODOS OS PROGRAMAS
 	//     QUE INCLUIREM A API. 
-	//
 	
 	//test - Exibe uma string somente para teste.
-	if( api_strncmp( (char *) command, "test", 4 ) == 0 ){
-	    printf("apiSystem: Testing commands ...\n");
+	if ( api_strncmp( (char *) command, "test", 4 ) == 0 )
+	{
+	    printf("apiSystem: Testing commands..\n");
 		goto exit;
 	}; 	
   
 	//ls - List files in a folder.
-	if( api_strncmp( (char *) command, "ls", 2 ) == 0 ){
-	    printf("apiSystem: @todo: ls ...\n");
+	if ( api_strncmp( (char *) command, "ls", 2 ) == 0 )
+	{
+	    printf("apiSystem: @todo: ls..\n");
 		goto exit;
 	}; 
 	
 	//makeboot - Cria arquivos e diretórios principais.
-	if( api_strncmp( (char *) command, "makeboot", 8 ) == 0 )
+	if ( api_strncmp( (char *) command, "makeboot", 8 ) == 0 )
 	{
-	    printf("apiSystem: @todo: makeboot ...\n");
+	    printf("apiSystem: @todo: makeboot..\n");
 		
 		//ret_value = fs_makeboot();
 		//if(ret_value != 0){
 		//    printf("shell: makeboot fail!");
 		//};
+		
         goto exit;
     };
 	
 	//format.
-	if( api_strncmp( (char *) command, "format", 6 ) == 0 )
+	if ( api_strncmp( (char *) command, "format", 6 ) == 0 )
 	{
-	    printf("apiSystem: @todo: format ...\n");
+	    printf("apiSystem: @todo: format..\n");
 		//fs_format(); 
         goto exit;
     };	
 	
 	//debug.
-	if( api_strncmp( (char *) command, "debug", 5 ) == 0 )
+	if ( api_strncmp( (char *) command, "debug", 5 ) == 0 )
 	{
-	    printf("apiSystem: @todo: debug ...\n");
+	    printf("apiSystem: @todo: debug..\n");
 		//debug();
         goto exit;
     };
 	
     //dir.
-	if( api_strncmp( (char *) command, "dir", 3 ) == 0 )
+	if ( api_strncmp( (char *) command, "dir", 3 ) == 0 )
 	{
-	    printf("apiSystem: @todo: dir ...\n");
+	    printf("apiSystem: @todo: dir..\n");
 		//fs_show_dir(0); 
         goto exit;
     };
 
 	//newfile.
-	if( api_strncmp( (char *) command, "newfile", 7 ) == 0 )
+	if ( api_strncmp( (char *) command, "newfile", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~newfile - Create empty file.\n");
 		//fs_create_file( "novo    txt", 0);
@@ -184,7 +184,7 @@ int apiSystem(const char *command)
     };
 	
 	//newdir.
-	if( api_strncmp( (char *) command, "newdir", 7 ) == 0 )
+	if ( api_strncmp( (char *) command, "newdir", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~newdir - Create empty folder.\n");
 		//fs_create_dir( "novo    dir", 0);
@@ -192,7 +192,7 @@ int apiSystem(const char *command)
     };
 	
     //mbr - Testa mbr.
-    if( api_strncmp( (char *) command, "mbr", 3 ) == 0 )
+    if ( api_strncmp( (char *) command, "mbr", 3 ) == 0 )
 	{
 	    printf("apiSystem: ~mbr\n");
 		//testa_mbr();
@@ -200,7 +200,7 @@ int apiSystem(const char *command)
     }; 
 	
     //root - Testa diretório /root.
-    if( api_strncmp( (char *) command, "root", 4 ) == 0 )
+    if ( api_strncmp( (char *) command, "root", 4 ) == 0 )
 	{
 	    printf("apiSystem: ~/root\n");
 		//testa_root();
@@ -208,7 +208,7 @@ int apiSystem(const char *command)
     }; 
 
 	//start.
-    if( api_strncmp( (char *) command, "start", 5 ) == 0 )
+    if ( api_strncmp( (char *) command, "start", 5 ) == 0 )
 	{
 	    printf("apiSystem: ~start\n");
 		goto exit;
@@ -216,7 +216,7 @@ int apiSystem(const char *command)
 	
 	//help.
 	//?? O que mostrar aqui ??
-    if( api_strncmp( (char *) command, "help", 4 ) == 0 )
+    if ( api_strncmp( (char *) command, "help", 4 ) == 0 )
 	{
 		printf("apiSystem: help stuff\n");
 		//printf(help_string);
@@ -225,7 +225,7 @@ int apiSystem(const char *command)
     };
 	
 	//cls.
-    if( api_strncmp( (char *) command, "cls", 3 ) == 0 )
+    if ( api_strncmp( (char *) command, "cls", 3 ) == 0 )
 	{
 	    printf("apiSystem: cls\n");
 		//black
@@ -234,7 +234,7 @@ int apiSystem(const char *command)
 	};
 	
 	//save.
-	if( api_strncmp( (char *) command, "save", 4 ) == 0 )
+	if ( api_strncmp( (char *) command, "save", 4 ) == 0 )
 	{
 	    printf("apiSystem: ~save\n");
         goto exit;
@@ -243,7 +243,7 @@ int apiSystem(const char *command)
 	//install.
 	//muda um arquivo da area de transferencia para 
 	//o sistema de arquivos...
-	if( api_strncmp( (char *) command, "install", 7 ) == 0 )
+	if ( api_strncmp( (char *) command, "install", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~install\n");
 		//fs_install();
@@ -252,7 +252,7 @@ int apiSystem(const char *command)
 	
 	
 	//boot - Inicia o sistema.
-	if( api_strncmp( (char *) command, "boot", 4 ) == 0 )
+	if ( api_strncmp( (char *) command, "boot", 4 ) == 0 )
 	{
 	    printf("apiSystem: ~boot\n");
 		//boot();
@@ -260,7 +260,7 @@ int apiSystem(const char *command)
     };
 
 	//service
-	if( api_strncmp( (char *) command, "service", 7 ) == 0 )
+	if ( api_strncmp( (char *) command, "service", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~service - rotina de servicos do kernel base\n");
 		//test_services();
@@ -268,7 +268,7 @@ int apiSystem(const char *command)
     };
 
 	//slots - slots de processos ou threads.
-	if( api_strncmp( (char *) command, "slots", 5 ) == 0 )
+	if ( api_strncmp( (char *) command, "slots", 5 ) == 0 )
 	{
 	    printf("apiSystem: ~slots - mostra slots \n");
 		//mostra_slots();
@@ -281,7 +281,7 @@ int apiSystem(const char *command)
     //
 	
 	//exit - Exit the current program
-    if( api_strncmp( (char *) command, "exit", 4 ) == 0 )
+    if ( api_strncmp( (char *) command, "exit", 4 ) == 0 )
 	{
 		printf("apiSystem: exit\n");
 		//exit(exit_code);
@@ -290,7 +290,7 @@ int apiSystem(const char *command)
     };
 		
     //reboot.
-	if( api_strncmp( (char *) command, "reboot", 6 ) == 0 )
+	if ( api_strncmp( (char *) command, "reboot", 6 ) == 0 )
 	{
 		printf("apiSystem: reboot\n");
 		apiReboot();
@@ -298,7 +298,7 @@ int apiSystem(const char *command)
     };
 
 	//shutdown.
-    if( api_strncmp( (char *) command, "shutdown", 8 ) == 0 )
+    if ( api_strncmp( (char *) command, "shutdown", 8 ) == 0 )
 	{
 		printf("apiSystem: shutdown\n");
 		apiShutDown();
@@ -340,35 +340,17 @@ exit:
  * system1:
  *     int 201, serviço 1, Print pixel. (rever)
  */ 
-int system1( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system1 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
     int ret_val;
 	
-	//
-	// ATENÇÃO: Não enviar argumentos via memória.
-	//
-	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-	
-    // salvando os argumentos
-
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-    //chamando a interrupção.
-    asm volatile( " int %1 \n"
+    asm volatile (" int %1 \n"
 		          : "=a"(ret_val)	
 		          : "i"(201), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
-done:
+				  
 	return (int) ret_val;
 };
 
@@ -378,75 +360,36 @@ done:
  * system2:
  *     int 202, serviço 2, Print horizontal line.  (rever)
  */
-int system2( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system2 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-  
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4	
-	*/
-	
-	
-	//
-    // Chamando a interrup��o.
-	//
-	
-    asm volatile( " int %1 \n"
+    asm volatile (" int %1 \n"
 		          : "=a"(ret_val)		
 		          : "i"(202), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
 				  
-done:
 	return (int) ret_val;
 };
-
 
 
 /*
  * system3:
  *     int 203, serviço 3. Retângulo.  (rever)
  */
-int system3( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system3 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
-
     int ret_val;
-		
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
 	
-    // salvando os argumentos
-
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-    // Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ( "int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(203), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-//
-// Done.
-//
-done:
+		          : "i"(203), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -455,34 +398,17 @@ done:
  * system4:
  *     int 204, serviço 4. Putch.  (rever)
  */
-int system4( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system4 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
-
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-  	
-    // salvando os argumentos
-    
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(204), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(204), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -491,34 +417,17 @@ done:
  * system5:
  *     int 205, serviço 5. Print string.  (rever)
  */
-int system5( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system5 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
-
     int ret_val;
-
-    /*	
-	unsigned long *int_args  = (unsigned long *) 0x900000;
 	
-    // salvando os argumentos
- 
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(205), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(205), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -527,34 +436,17 @@ done:
  * system6:
  *     int 206, serviço 6. Message box using buffer.  (rever)
  */
-int system6( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system6 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
-
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
- 
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(206), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(206), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -563,33 +455,17 @@ done:
  * system7:
  *     int 207, serviço 7.  (rever)
  */
-int system7( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system7 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-  
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(207), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(207), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -598,34 +474,17 @@ done:
  * system8:
  *     int 208, serviço 8.  (rever)
  */
-int system8( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system8 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
-
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *)0x900000;
-	
-    // salvando os argumentos
-  
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-    //
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(208), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(208), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -636,33 +495,17 @@ done:
  *     Chama o procedimento da vez. 
  *     Executa outro procedimento.  (rever)
  */  
-int system9( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx )
+int system9 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-  
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(209), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(209), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -671,33 +514,17 @@ done:
  * system10:
  *     int 210, serviço 10. v
  */
-int system10( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
+int system10 ( unsigned long ax, 
+               unsigned long bx, 
+			   unsigned long cx, 
+			   unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
- 
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(210), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(210), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -706,33 +533,17 @@ done:
  * system11:
  *     int 211, serviço 11.  (rever)
  */
-int system11( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
+int system11 ( unsigned long ax, 
+               unsigned long bx, 
+			   unsigned long cx, 
+			   unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-  
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-    //
-	// CAll.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(211), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(211), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -741,33 +552,17 @@ done:
  * system12:
  *     int 212, serviço 12.
  */
-int system12( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
+int system12 ( unsigned long ax, 
+               unsigned long bx, 
+			   unsigned long cx, 
+			   unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-	// Call.
-	//
-	
-    asm volatile( "int %1\n"
+    asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
-		          : "i"(212), "a"(ax), "b"(bx), "c"(cx), "d"(dx));
-
-done:
+		          : "i"(212), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				  
 	return (int) ret_val;
 };
 
@@ -777,36 +572,17 @@ done:
  * system13:
  *     int 213, serviço 13.
  */
-int system13( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
+int system13 ( unsigned long ax, 
+               unsigned long bx, 
+			   unsigned long cx, 
+			   unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-   
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-    // Call.
-    //
-	
-	asm volatile( " int %1 \n"
+	asm volatile (" int %1 \n"
 		          : "=a"(ret_val)		
 		          : "i"(213), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
-//
-// Done.
-//
-done:
 	return (int) ret_val;
 };
 
@@ -815,36 +591,17 @@ done:
  * system14:
  *     int 214, serviço 14.  (rever)
  */
-int system14( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
+int system14 ( unsigned long ax, 
+               unsigned long bx, 
+			   unsigned long cx, 
+			   unsigned long dx )
 {
     int ret_val;
 	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
-  
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-    // Call.
-	//
-	
-    asm volatile( " int %1 \n "
+    asm volatile (" int %1 \n "
 		          : "=a"(ret_val)		
 		          : "i"(214), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
-//
-// Done.
-//				  
-done:
+				  
 	return (int) ret_val;
 };
 
@@ -853,42 +610,17 @@ done:
  * system15:
  *      int 215, serviço 15.  (rever)
  */
-int system15( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
+int system15 ( unsigned long ax, 
+               unsigned long bx, 
+			   unsigned long cx, 
+			   unsigned long dx )
 {
-    //
-	// Return.
-	//
-	
 	int ret_val;
 	
-	
-	/*
-	unsigned long *int_args  = (unsigned long *) 0x900000;
-	
-    // salvando os argumentos
- 
-	int_args[4]  = ax;  //arg1 ... so usa o primeiro .
-    int_args[8]  = bx;  //arg2
-	int_args[12] = cx;  //arg3
-	int_args[16] = dx;  //arg4
-	*/
-	
-	//
-    // Call.
-    //
-	
-	asm volatile( "int %1\n"
+	asm volatile ("int %1\n"
 		          : "=a"(ret_val)		
 		          : "i"(215), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
-//
-// Done.
-//
-
-done:
+				  
 	return (int) ret_val;
 };
 
@@ -899,46 +631,65 @@ done:
  *     Refresh buffer.
  *     Atualiza um buffer dado seu número.  (rever)
  */
-void refresh_buffer(unsigned long n)
-{
+void refresh_buffer (unsigned long n){
+	
 	// Limits.
-	if(n < 1 || n > 9){
+	if (n < 1 || n > 9)
+	{
 	    return;
 	};
-	
-	// Number.	
-    switch(n)
-    {   
+		
+    switch (n){
+		
         //refresh buffer 1,2,3
-        case 1: system_call( 1, 0, 0, 0); break;
-        case 2: system_call( 2, 0, 0, 0); break;
-        case 3: system_call( 3, 0, 0, 0); break;
+        
+		case 1: 
+		    system_call( 1, 0, 0, 0); 
+			break;
+        case 2: 
+		    system_call( 2, 0, 0, 0); 
+			break;
+        case 3: 
+		    system_call( 3, 0, 0, 0); 
+			break;
                  
         //refresh screen     
-        case 4: system_call( 4, 0, 0, 0); break;
+        case 4: 
+		    system_call( 4, 0, 0, 0); 
+			break;
              
         //refresh title bar    
-        case 5: system_call( 5, 0, 0, 0); break;
+        case 5: 
+		    system_call( 5, 0, 0, 0); 
+			break;
                  
         //refresh menu bar     
-        case 6: system_call( 6, 0, 0, 0); break;
+        case 6: 
+		    system_call( 6, 0, 0, 0); 
+			break;
                  
         //refresh tollbar    
-        case 7: system_call( 7, 0, 0, 0); break;
+        case 7: 
+		    system_call( 7, 0, 0, 0); 
+			break;
                  
         //refresh status bar   
-        case 8: system_call( 8, 0, 0, 0); break;
+        case 8: 
+		    system_call( 8, 0, 0, 0); 
+			break;
 
         //refresh taskbar   
-        case 9: system_call( 9, 0, 0, 0); break;
+        case 9: 
+		    system_call( 9, 0, 0, 0); 
+			break;
                  
         default:
             //Nothing
 			break;
     };
     //Nothing.
-done:
-    return;
+//done:
+    //return;
 };
 
 
@@ -947,24 +698,12 @@ done:
  *     int 200, serviço 10.
  *     Print string no buffer.  (rever)
  */
-void print_string( unsigned long x,  
-                   unsigned long y,  
-				   unsigned long color, 
-				   unsigned char *string )
-{
-
-    //
-	// Call.
-	//
-	
+void print_string ( unsigned long x,  
+                    unsigned long y,  
+				    unsigned long color, 
+				    unsigned char *string )
+{	
     //system( 10, x, y, (unsigned long) string);        
-    
-//
-// Done.
-//
-
-done:	
-	return;
 };
 
 
@@ -973,9 +712,11 @@ done:
  *     Int 200, serviço 15.
  *     Sincroniza o retraço vertical do monitor.  (rever)
  */
-int vsync(){
-	system_call(SYSTEMCALL_VSYNC,0,0,0);
-    return (int) 0;
+int vsync (){
+	
+	system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
+    
+	return (int) 0;
 };
 
 
@@ -983,13 +724,14 @@ int vsync(){
  * edit_box:
  *     Interrupção 200, serviço SYSTEMCALL_EDITBOX.  (rever)
  */
-int edit_box( unsigned long x,  
-              unsigned long y, 
-			  unsigned long height, 
-			  unsigned long width)
+int edit_box ( unsigned long x,  
+               unsigned long y, 
+			   unsigned long height, 
+			   unsigned long width)
 {
 	//@todo: Altura e largura negligenciados.
-    system_call( SYSTEMCALL_EDITBOX, x, y, 0);
+    system_call ( SYSTEMCALL_EDITBOX, x, y, 0 );
+	
 	return (int) 0;
 };
 
@@ -1000,8 +742,10 @@ int edit_box( unsigned long x,
  *     Chama o proximo procesimento de janela.
  *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
  */
-int chama_procedimento( unsigned long proximo_procedure){	
-    system_call( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0);    
+int chama_procedimento (unsigned long proximo_procedure){
+	
+    system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
+	
 	return (int) 0;
 };
 
@@ -1012,8 +756,10 @@ int chama_procedimento( unsigned long proximo_procedure){
  *     Setar o endereço do procedimento que deverá ser chamado. 
  *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
  */
-int SetNextWindowProcedure(unsigned long next_procedure){
-    system_call( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0);    
+int SetNextWindowProcedure (unsigned long next_procedure){
+	
+    system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
+    
 	return (int) 0;	
 };
 
@@ -1024,8 +770,10 @@ int SetNextWindowProcedure(unsigned long next_procedure){
  *     Interrupção 200, serviço SYSTEMCALL_SETCURSOR.  (rever)
  *     @todo: Criar o protótipo no header.
  */
-int set_cursor(unsigned long x, unsigned long y){
-    system_call( SYSTEMCALL_SETCURSOR, x, y, 0);
+int set_cursor (unsigned long x, unsigned long y){
+	
+    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
+	
 	return (int) 0;
 };
 
@@ -1034,12 +782,12 @@ int set_cursor(unsigned long x, unsigned long y){
  * put_char:
  *     Put char.  (rever)
  */
-void put_char( unsigned long x,  
-               unsigned long y,  
-			   unsigned long color, 
-			   unsigned char *ch )
+void put_char ( unsigned long x,  
+                unsigned long y,  
+			    unsigned long color, 
+			    unsigned char *ch )
 {
-    return;    //Nothing for now.
+    //return;    //Nothing for now.
 };
 
 
@@ -1059,12 +807,12 @@ void put_char( unsigned long x,
  * Obs: 
  *     Lembrar que estamos usando endereços lógicos.  (rever)
  */
-void carrega_bitmap_16x16( unsigned long img_address, 
-                           unsigned long x, 
-						   unsigned long y )                           
+void carrega_bitmap_16x16 ( unsigned long img_address, 
+                            unsigned long x, 
+						    unsigned long y )                           
 {
-    system_call( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y); 	
-	return;
+    system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
+	//return;
 };
 
 
@@ -1074,22 +822,20 @@ void carrega_bitmap_16x16( unsigned long img_address,
  *     Interrupção 200, serviço SYSTEMCALL_SHUTDOWN.
  *     Metodo? ACPI, APM ...  (rever)
  */
-void apiShutDown()
-{
+void apiShutDown (){
 	
-	//
 	// @todo: 
 	// A API pode chamar algumas rotinas ainda aqui em user mode
 	// antes de chamar o kernel.
-	//
 	
-	//
 	// Um messagebox pode aparece antes de chamar o kernel.
-	//
 	
 	//Argumentos podem ser enviados.
-    system_call( SYSTEMCALL_SHUTDOWN, 0, 0, 0);
-    while(1){};	
+    system_call ( SYSTEMCALL_SHUTDOWN, 0, 0, 0 );
+	
+    while (1){
+		//
+	};	
 };
 
 
@@ -1097,10 +843,10 @@ void apiShutDown()
  * apiInitBackground:
  *     Initialize default background configuration.  (rever)
  */
-void apiInitBackground()
-{
+void apiInitBackground (){
+	
     //@todo: Implementar.	
-    return;    //Não há uma chamada para isso ainda.            
+    //return;    //Não há uma chamada para isso ainda.            
 };
 
 
@@ -1110,13 +856,12 @@ void apiInitBackground()
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
-void MessageBox( int type, char *string1, char *string2 )
-{
-	system_call( SYSTEMCALL_MESSAGE_BOX, 
-	             (unsigned long) type, 
-				 (unsigned long) string1, 
-				 (unsigned long) string2 );
-	return;
+void MessageBox ( int type, char *string1, char *string2 ){
+	
+	system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
+		(unsigned long) string1, (unsigned long) string2 );
+	
+	//return;
 };
 
 
@@ -1136,25 +881,24 @@ void MessageBox( int type, char *string1, char *string2 )
  * Os recursos acessados por essa chamada são mais críticos e 
  * sistemicamente importantes.  (rever)
  */
-int call_kernel( unsigned long int_number, 
-                 unsigned long service_number, 
-                 unsigned long arg1, 
-                 unsigned long arg2, 
-                 unsigned long arg3, 
-                 unsigned long arg4,
-                 unsigned long arg5, 
-                 unsigned long arg6, 
-                 unsigned long arg7, 
-                 unsigned long arg8,
-                 unsigned long arg9, 
-                 unsigned long arg10, 
-                 unsigned long arg11, 
-                 unsigned long arg12 )
+int call_kernel ( unsigned long int_number, 
+                  unsigned long service_number, 
+                  unsigned long arg1, 
+                  unsigned long arg2, 
+                  unsigned long arg3, 
+                  unsigned long arg4,
+                  unsigned long arg5, 
+                  unsigned long arg6, 
+                  unsigned long arg7, 
+                  unsigned long arg8,
+                  unsigned long arg9, 
+                  unsigned long arg10, 
+                  unsigned long arg11, 
+                  unsigned long arg12 )
 {
+	int ret_val;
 	
-	int ret_val;    //Retorno.
-	
-    switch(int_number)
+    switch (int_number)
     { 
                       
         //48 - Vários serviços de Kernel Requests.
@@ -1240,7 +984,8 @@ int call_kernel( unsigned long int_number,
     };
 	//Nothing.
 // Done.
-done:
+//done:
+
 	return (int) ret_val;
 };
 
@@ -1261,25 +1006,24 @@ done:
  *     pode usar essa chamada para utilizar recursos 
  *     gráficos do kernel.  (rever)
  */
-int call_gui( unsigned long int_number, 
-              unsigned long service_number, 
-              unsigned long arg1, 
-              unsigned long arg2, 
-              unsigned long arg3, 
-              unsigned long arg4,
-              unsigned long arg5, 
-              unsigned long arg6, 
-              unsigned long arg7, 
-              unsigned long arg8,
-              unsigned long arg9, 
-              unsigned long arg10, 
-              unsigned long arg11, 
-              unsigned long arg12 )
+int call_gui ( unsigned long int_number, 
+               unsigned long service_number, 
+               unsigned long arg1, 
+               unsigned long arg2, 
+               unsigned long arg3, 
+               unsigned long arg4,
+               unsigned long arg5, 
+               unsigned long arg6, 
+               unsigned long arg7, 
+               unsigned long arg8,
+               unsigned long arg9, 
+               unsigned long arg10, 
+               unsigned long arg11, 
+               unsigned long arg12 )
 {
+	int ret_val;  
 	
-	int ret_val;    //Retorno.
-	
-    switch(int_number)
+    switch (int_number)
     { 
          
         //Vários serviços. 
@@ -1314,7 +1058,8 @@ int call_gui( unsigned long int_number,
 		    break; 
     };
 // Done.
-done:
+//done:
+
 	return (int) ret_val;
 };
  
@@ -1363,12 +1108,8 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 	// Call. ( int 200, service SYSTEMCALL_BUFFER_CREATEWINDOW. )
 	//
 	
-	//
 	// @todo:  É necessário criar um fastcall que envie bastante argumentos 
 	//         para o kernel e que o kernel atenda a chamada prontamente.
-	//     
-	//
-	
 	
 	//
 	// @todo: test. poderia enviar um ponteiro pra uma estrutura de retãngulo.
@@ -1437,55 +1178,53 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
 	
-    Window = (void *) system_call( 118 , 
-	                               (unsigned long) &message_buffer[0], 
-								   (unsigned long) &message_buffer[0], 
-								   (unsigned long) &message_buffer[0] );
-    //exitCriticalSection();								   
+    Window = (void *) system_call ( 118 , (unsigned long) &message_buffer[0], 
+					    (unsigned long) &message_buffer[0], 
+						(unsigned long) &message_buffer[0] );
+    
+	//exitCriticalSection();								   
 								   
 	//Nothing.
 	
 	//Struct.
-	if( (void*) Window == NULL ){
+	if ( (void *) Window == NULL )
+	{
 	    return NULL;    //Fail.
-    }else{
+    
+	}else{
 		
-		//
 		// Obs: Temos as propriedades da janela criada.
 		//      Talvez o endereço retornado esteja em área
 		//      de memória protegida. Acessar essa estrutura pode 
 		//      gerar um excessão.
         //      @todo: Cuidado com o retorno #bugbug 		
-		//
 		
 		//...
 	    goto done;
 	};
+	
 	//Nothing.
 done:
-	return (void*) Window;    
+	return (void *) Window;    
 };
 
 
 /*
  * APIRegisterWindow:
  *     Register Window.
- *
  */
-int APIRegisterWindow(struct window_d *window)
-{
-    //
-    // @todo: Filtrar argumento.
-    //	
+int APIRegisterWindow (struct window_d *window){
+    
+    // @todo: Filtrar argumento.	
 	
-	if( (void*) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 		return (int) 1;
 	};		
 	
-    system_call( SYSTEMCALL_REGISTERWINDOW, 
-	             (unsigned long) window, 
-				 (unsigned long) window, 
-				 (unsigned long) window);		
+    system_call ( SYSTEMCALL_REGISTERWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window);
+		
     return (int) 0;	
 };
 
@@ -1494,43 +1233,38 @@ int APIRegisterWindow(struct window_d *window)
  * APICloseWindow:
  *     Close Window. 
  */
-int APICloseWindow(struct window_d *window)
-{
-    //
-    // @todo: Filtrar argumento.
-    //	
+int APICloseWindow (struct window_d *window){
 	
-	if( (void*) window == NULL ){
+    // @todo: Filtrar argumento.	
+	
+	if ( (void *) window == NULL )
+	{
 		return (int) 1;
 	};		
 	
-    system_call( SYSTEMCALL_CLOSEWINDOW, 
-	             (unsigned long) window, 
-				 (unsigned long) window, 
-				 (unsigned long) window );	
-    return (int) 0;	
+    system_call ( SYSTEMCALL_CLOSEWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window );	
+    
+	return (int) 0;	
 };
 
 
 /*
- ********************************************
  * APISetFocus:
  *     Set Focus.
  */
-int APISetFocus(struct window_d *window)
-{
-    //
-    // @todo: Filtrar argumento.
-    //	
+int APISetFocus (struct window_d *window){
 	
-	if( (void*) window == NULL ){
+    // @todo: Filtrar argumento.
+    	
+	if ( (void *) window == NULL )
+	{
 		return (int) 1;
 	};		
 	
-    system_call( SYSTEMCALL_SETFOCUS, 
-	             (unsigned long) window, 
-				 (unsigned long) window, 
-				 (unsigned long) window );	
+    system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window );
+		
     return (int) 0;	
 };
 
@@ -1539,8 +1273,9 @@ int APISetFocus(struct window_d *window)
  * APIGetFocus:
  *     Get Focus.
  */
-int APIGetFocus(){
-    return (int) system_call( SYSTEMCALL_GETFOCUS, 0, 0, 0);	
+int APIGetFocus (){
+	
+    return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
 };
 
 
@@ -1548,21 +1283,18 @@ int APIGetFocus(){
  * APIKillFocus:
  *     Kill Focus.
  */
-int APIKillFocus(struct window_d *window)
-{
+int APIKillFocus (struct window_d *window){
 
-    //
     // @todo: Filtrar argumento.
-    //	
 	
-	if( (void*) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 		return (int) 1;
 	};	
 	
-    system_call( SYSTEMCALL_KILLFOCUS, 
-	             (unsigned long) window, 
-				 (unsigned long) window, 
-				 (unsigned long) window );	
+    system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window );
+		
     return (int) 0;	
 };
 
@@ -1572,20 +1304,18 @@ int APIKillFocus(struct window_d *window)
  *     Set Active Window.
  * @todo: Esse retorno pode ser void.
  */
-int APISetActiveWindow(struct window_d *window)
-{
-    //
-    // @todo: Filtrar argumento.
-    //	
+int APISetActiveWindow (struct window_d *window){
 	
-	if( (void*) window == NULL ){
+    // @todo: Filtrar argumento.	
+	
+	if ( (void *) window == NULL )
+	{
 		return (int) 1;
 	};
 	
-    system_call( SYSTEMCALL_SETACTIVEWINDOW, 
-	             (unsigned long) window, 
-				 (unsigned long) window, 
-				 (unsigned long) window );	
+    system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window );
+		
     return (int) 0;	
 };
 
@@ -1594,8 +1324,9 @@ int APISetActiveWindow(struct window_d *window)
  * APIGetActiveWindow:
  *     Get Active Window Id.
  */
-int APIGetActiveWindow(){
-    return (int) system_call( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0);	
+int APIGetActiveWindow (){
+	
+    return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );	
 };
 
 
@@ -1603,92 +1334,95 @@ int APIGetActiveWindow(){
  * APIShowCurrentProcessInfo:
  *     Mostra informações sobre o processo atual.
  */
-void APIShowCurrentProcessInfo()
-{
-	//
+void APIShowCurrentProcessInfo (){
+	
 	// @todo: Essa rotina devira apenas pegar os valores via system call
 	//        e imprimir os valores obtidos usando rotinas em user mode.
-	//
 	
+	system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
 	
-	system_call( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0);
-	return;
+	//return;
 };
 
 
 
 //*********
  
-void APIresize_window(struct window_d *window, unsigned long x, unsigned long y){	
-	system_call( SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y);
-	return;
-}
+void APIresize_window ( struct window_d *window, 
+                        unsigned long x, 
+						unsigned long y )
+{	
+	system_call ( SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
+	
+	//return;
+};
 
 
 /*
- ****************************************
  * APIredraw_window:
- *
  */
-void 
-APIredraw_window( struct window_d *window, 
-                  unsigned long flags)
-{
-	system_call( SYSTEMCALL_REDRAWWINDOW, 
-	    (unsigned long) window, 
-		(unsigned long) flags, 
-		(unsigned long) flags );
-	return;
+void APIredraw_window( struct window_d *window, unsigned long flags ){
+	
+	system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
+		(unsigned long) flags, (unsigned long) flags );
+	
+	//return;
 };
 
 
-void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y){
-	system_call( SYSTEMCALL_REPLACEWINDOW , (unsigned long) window, x, y);
-	return;	
-}
-
-
-void APImaximize_window(struct window_d *window)
+void APIreplace_window ( struct window_d *window, 
+                         unsigned long x, 
+						 unsigned long y )
 {
-	system_call( SYSTEMCALL_MAXIMIZEWINDOW, 
-	    (unsigned long) window, 
-		(unsigned long) window, 
-		(unsigned long) window);
-	return;	
-}
+	system_call ( SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
+	
+	//return;	
+};
 
 
-void APIminimize_window(struct window_d *window)
-{
-	system_call( SYSTEMCALL_MINIMIZEWINDOW, 
-	    (unsigned long) window, 
-		(unsigned long) window, 
-		(unsigned long) window);
-	return;	
-}
+void APImaximize_window (struct window_d *window){
+	
+	system_call ( SYSTEMCALL_MAXIMIZEWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window);
+	
+	//return;	
+};
+
+
+void APIminimize_window (struct window_d *window){
+	
+	system_call ( SYSTEMCALL_MINIMIZEWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window);
+	
+	//return;	
+};
 
 
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
-void APIupdate_window(struct window_d *window)
-{
-	system_call( 113, 
-	    (unsigned long) window, 
-		(unsigned long) window, 
-		(unsigned long) window);
-	return;			
+void APIupdate_window (struct window_d *window){
+	
+	system_call ( 113, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window);
+	
+	//return;			
 };
 
 
-void *APIget_foregroung_window(){
-	system_call( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0);
-	return;	
-}
+void *APIget_foregroung_window (){
+	
+	system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );
+	
+	//return;	
+};
 
 
-void APIset_foregroung_window(struct window_d *window){
-	system_call( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, (unsigned long) window, (unsigned long) window);
-	return;	
-}
+void APIset_foregroung_window (struct window_d *window){
+	
+	system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, 
+	    (unsigned long) window, (unsigned long) window );
+	
+	//return;	
+};
 
 
 /*
@@ -1698,15 +1432,14 @@ void APIset_foregroung_window(struct window_d *window){
  *     programa, terminando o processo e
  *     liberar os recursos que o processo estava usando.
  */
-//void exit(int exit_code)
-void apiExit(int exit_code)
-{	
-    system_call( SYSTEMCALL_EXIT, (unsigned long) exit_code, 
-				 (unsigned long) exit_code, (unsigned long) exit_code );
-    //Nothing.
-wait_forever:	
-    while(1){
-		asm("pause");
+void apiExit (int exit_code){
+	
+    system_call ( SYSTEMCALL_EXIT, (unsigned long) exit_code, 
+		(unsigned long) exit_code, (unsigned long) exit_code );
+    
+    while (1){
+		
+		asm ("pause");
 	};	
 };
 
@@ -1715,9 +1448,10 @@ wait_forever:
  * kill:
  *     @todo: Poderia ser o envio de um sinal para um processo dado deu PID.  
  */
-void kill(int exit_code)
-{	
-    return; //Não há uma chamada para isso ainda.
+void kill (int exit_code){
+	
+	//#todo
+    //return; //Não há uma chamada para isso ainda.
 };
 
 
@@ -1729,14 +1463,13 @@ void kill(int exit_code)
  * ficando à cargo do kernel apenas fazer a realocação dos recursos de destruição das
  * estruturas. 
  */
-void dead_thread_collector()
-{	
-    system_call( SYSTEMCALL_DEAD_THREAD_COLLECTOR, 
-	             (unsigned long) 0, 
-				 (unsigned long) 0, 
-				 (unsigned long) 0 );	
-done:	
-    return;
+void dead_thread_collector (){
+	
+    system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, (unsigned long) 0, 
+		(unsigned long) 0, (unsigned long) 0 );	
+
+//done:	
+    //return;
 };
 
 
@@ -1745,15 +1478,16 @@ done:
  *     Compara duas strings.
  *     @todo: Isso deve ser oferecido peloa libC e não pela api. 
  */
-int api_strncmp(char *s1, char *s2, int len)
-{
+int api_strncmp (char *s1, char *s2, int len){
+	
 	int n = len;
 	
-	while(n > 0)
+	while (n > 0)
 	{	
 	    n--;
         
-		if(*s1 != *s2){
+		if (*s1 != *s2)
+		{
             return (int) 1;
         };
 		
@@ -1761,11 +1495,14 @@ int api_strncmp(char *s1, char *s2, int len)
 		*s2++;
 	};				
 			
-	if (*s1 != '\0' || *s2 != '\0' ){	
+	if ( *s1 != '\0' || *s2 != '\0' ){
+		
 	    return (int) 2;
 	};
+	
 	//Nothing.		
-done:
+//done:
+
 	return (int) 0;
 };
 
@@ -1775,9 +1512,11 @@ done:
  *     Refresh Screen.
  *     Passa o conteúdo do backbuffer para o lfb.
  */
-void refresh_screen(){
-	system_call(SYSTEMCALL_REFRESHSCREEN, 0, 0, 0);
-	return;
+void refresh_screen (){
+	
+	system_call (SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
+	
+	//return;
 };
 
 
@@ -1786,9 +1525,11 @@ void refresh_screen(){
  *     Refresh the LFB.
  *     Move the content of BackBuffer to LFB.
  */
-void api_refresh_screen(){
-	refresh_screen();
-	return;
+void api_refresh_screen (){
+	
+	refresh_screen ();
+	
+	//return;
 };
 
 
@@ -1796,15 +1537,13 @@ void api_refresh_screen(){
  * apiReboot:
  *     Reboot.
  */
-void apiReboot()
-{
-	//
+void apiReboot (){
+	
 	// @todo: Fazer outras chamadas para
 	//        as camadas de software de mais alto nível antes
     //        de efetuar o reboot de hardware propriamente dito. 	
-	//
 	
-    system_call(SYSTEMCALL_REBOOT, 0, 0, 0);	
+    system_call ( SYSTEMCALL_REBOOT, 0, 0, 0 );	
 };
 
 
@@ -1812,9 +1551,10 @@ void apiReboot()
  * apiSetCursor: 
  *     Set cursor.
  */
-void apiSetCursor( unsigned long x, unsigned long y )
-{
-    system_call(SYSTEMCALL_SETCURSOR, x, y, 0);	
+void apiSetCursor ( unsigned long x, unsigned long y ){
+	
+    system_call (SYSTEMCALL_SETCURSOR, x, y, 0 );	
+	
 	//return;
 };
 
@@ -1823,9 +1563,9 @@ void apiSetCursor( unsigned long x, unsigned long y )
  * apiGetCursorX:
  *     Get cursor x. 
  */
-unsigned long apiGetCursorX()
-{
-    return (unsigned long) system_call(SYSTEMCALL_GETCURSORX, 0, 0, 0);
+unsigned long apiGetCursorX (){
+	
+    return (unsigned long) system_call ( SYSTEMCALL_GETCURSORX, 0, 0, 0 );
 };
 
 
@@ -1833,9 +1573,9 @@ unsigned long apiGetCursorX()
  * apiGetCursorY:
  *     Get cursor y.
  */
-unsigned long apiGetCursorY()
-{
-    return (unsigned long) system_call(SYSTEMCALL_GETCURSORY, 0, 0, 0);
+unsigned long apiGetCursorY (){
+	
+    return (unsigned long) system_call (SYSTEMCALL_GETCURSORY, 0, 0, 0 );
 };
 
 
@@ -1843,8 +1583,9 @@ unsigned long apiGetCursorY()
  * apiGetClientAreaRect:
  *     Get client area rect.
  */
-void *apiGetClientAreaRect(){
-    return (void *) system_call(SYSTEMCALL_GETCLIENTAREARECT, 0, 0, 0);	
+void *apiGetClientAreaRect (){
+	
+    return (void *) system_call ( SYSTEMCALL_GETCLIENTAREARECT, 0, 0, 0 );	
 };
 
 
@@ -1852,12 +1593,12 @@ void *apiGetClientAreaRect(){
  * apiSetClientAreaRect:
  *     Enviar uma estrutura de retângulo criada em user mode para o kernel.
  */
-void apiSetClientAreaRect(struct rect_d *r){
-    system_call( SYSTEMCALL_SETCLIENTAREARECT, 
-	             (unsigned long) r, 
-				 (unsigned long) r, 
-				 (unsigned long) r );
-    return;	
+void apiSetClientAreaRect (struct rect_d *r){
+	
+    system_call ( SYSTEMCALL_SETCLIENTAREARECT, (unsigned long) r, 
+		(unsigned long) r, (unsigned long) r );
+    
+	//return;	
 };
 
 
@@ -1897,20 +1638,17 @@ void *apiCreateThread( unsigned long thread_eip,
  * coloca no estado standby para executar pela primeira vez
  * #BUGBUG: Não retornou. 
  */
-void apiStartThread(void *Thread)
-{
+void apiStartThread (void *Thread){
 
-    system_call( SYSTEMCALL_STARTTHREAD, 
-	             (unsigned long) Thread, 
-				 (unsigned long) Thread, 
-				 (unsigned long) Thread );	
-	return;
-}
+    system_call ( SYSTEMCALL_STARTTHREAD, (unsigned long) Thread, 
+		(unsigned long) Thread, (unsigned long) Thread );	
+	
+	//return;
+};
 
 
 
 /*
- *****************************************************
  * apiFOpen:
  *     Carrega na memória um arquivo.
  *     Usa um serviço do kernel para carregar um arquivo 
@@ -1918,21 +1656,19 @@ void apiStartThread(void *Thread)
  *     Obs: Devemos passar um endereço válido, previamente 
  * alocado. 
  */
-void *apiFOpen(const char *filename, const char *mode)
-{
+void *apiFOpen(const char *filename, const char *mode){
+	
     void *Ret;	
 	
 	enterCriticalSection();
-	Ret = (void*) system_call( SYSTEMCALL_READ_FILE, 
-	                            (unsigned long) filename, 
-								(unsigned long) mode, 
-								0 );
+	
+	Ret = (void *) system_call ( SYSTEMCALL_READ_FILE, 
+	                (unsigned long) filename, (unsigned long) mode, 0 );
+					
 	exitCriticalSection();
-
-done:
-    return (void *) Ret;								
+    
+	return (void *) Ret;								
 };
-
 
 
 /*
@@ -1950,6 +1686,7 @@ apiSaveFile( char *file_name,
              char flag )  
 {
     int Ret;
+	
 		enterCriticalSection();
 		Ret = (int) system_call( SYSTEMCALL_WRITE_FILE,
 		                        (unsigned long) file_name,     //nome
@@ -1957,7 +1694,8 @@ apiSaveFile( char *file_name,
                                 (unsigned long) flag );        //flag
 		exitCriticalSection(); 
 
-done:
+//done:
+
     return (int) Ret;		
 };
 
@@ -2063,11 +1801,11 @@ fail:
 
 
 //P (Proberen) testar.
-void enterCriticalSection()
-{
+void enterCriticalSection (){
+	
 	int S;
 	
-	while(1)
+	while (1)
 	{
 	    S = (int) system_call( SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0);
 	    
@@ -2086,19 +1824,21 @@ done:
 };
 
 //V (Verhogen)incrementar.
-void exitCriticalSection()
-{
+void exitCriticalSection (){
+	
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
     system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0);
-    return;	
+    
+	//return;	
 };
 
-void initializeCriticalSection()
-{
+void initializeCriticalSection (){
+	
 	//Inicializa em 1 o semáforo do kernel para que 
 	//o primeiro possa usar.
 	system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0);
-    return;
+    
+	//return;
 };
 
 void apiBeginPaint(){

@@ -2,7 +2,7 @@
 @echo off  
 
 rem
-rem File: makeApi.bat
+rem File: make-api.bat
 rem
 rem Esse script compila a API para sistema de 32bit para desktop.
 rem Apenas gera um arquivo objeto, que será incluído na aplicação

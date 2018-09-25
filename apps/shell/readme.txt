@@ -1,6 +1,9 @@
 
   shell log:
 
+   #todo: Incluir o suporte a lexer e parser, semelhante ao que acontece com os compiladores.
+          Isso é necessário para interpretar os scripts;
+
 na versão 2.1, o sistema de enviar mensagens para o procedimento da janela com o foco de entrada foi implementado. e funcionou corretamente. Ou seja.
 o procedimento de janela de um processo em user mode é ativado toda vez que
 pressionamos uma tecla do teclado.

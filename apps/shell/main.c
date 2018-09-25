@@ -329,8 +329,6 @@ struct
 
 
 
-
-
 int shellStatus;
 int shellError;
 
@@ -366,7 +364,7 @@ static inline void pause (void){
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
 static inline void rep_nop (void){
 	
-	__asm__ __volatile__("rep;nop": : :"memory");
+    __asm__ __volatile__ ("rep;nop": : :"memory");
 };
 
 
@@ -420,12 +418,12 @@ void quit ( int status ){
  *    +Definir a janela que é área do cliente.
  *    +Carregar um arquivo na área de cliente.
  *    +Testar outros recursos do Kernel.
- *    +Testar as chamadas para pegar informções sobre o proesso.
+ *    +Testar as chamadas para pegar informções sobre o processo.
  *    +...
  *
  *  
- *  ## O SHELL É UM APLICATIVO DO TIPO JANELA, 
- *     DEVE TER UM MAIN DO TIPO JANELA ##
+ *  ## O SHELL É UM APLICATIVO DO TIPO JANELA, DEVE TER UM MAIN 
+ *     DO TIPO JANELA ##
  *
  * Obs: Esses argumentos podem ser um padrão.
  */
@@ -672,7 +670,7 @@ noArgs:
 	// da janela principal.
 	
 	terminal_rect.left = shell_window_x;
-	terminal_rect.top  = shell_window_y;
+	terminal_rect.top = shell_window_y;
 	terminal_rect.width = shellWindowWidth;
 	terminal_rect.height = shellWindowHeight;
 	
@@ -692,7 +690,7 @@ noArgs:
 	
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    shell_window_x, shell_window_y, 
-						shellWindowWidth, shellWindowHeight,    
+					    shellWindowWidth, shellWindowHeight,    
                         0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
 
 	if ( (void *) hWindow == NULL ){
@@ -750,6 +748,8 @@ noArgs:
     APIRegisterWindow (hWindow);
     APISetActiveWindow (hWindow);	
     APISetFocus (hWindow);	
+	
+	//#importante
 	refresh_screen();
 	
 	//#bugbug
@@ -800,6 +800,7 @@ noArgs:
 		
 		//#debug
         printf("shell is not interactive\n");
+		
 		goto skip_input;
 	};
 	
@@ -869,27 +870,22 @@ noArgs:
 	//struct shell_message_d *msg;
 	
 
-        //
-		// Get Message: 
-		// Systemcall get message
-		// Enviamos um ponteiro de estrutura de janela para que o Kernel possa 
-		// pegar a mensagem que esta dentro da estrutura. Essa estrtura fica 
-		// protegida no Kernel.
-		//
+	// Get Message: 
+	// Systemcall get message
+	// Enviamos um ponteiro de estrutura de janela para que o Kernel possa 
+	// pegar a mensagem que esta dentro da estrutura. Essa estrtura fica 
+	// protegida no Kernel.
 		
-		//
-		// #bugbug: Na verdade essa rotina está pegando a mensagem na janela 
-		// com o foco de entrada. esse argumento foi passado mas não foi usado.
-		//
+	// #bugbug: ??
+	// Na verdade essa rotina está pegando a mensagem na janela 
+	// com o foco de entrada. Esse argumento foi passado mas não foi usado.
 		
 	unsigned long message_buffer[5];	
 		
 Mainloop:
     
-	// #### Test ####
-	
-	/* ## Nesse teste vamos enviar um ponteiro de array e 
-	  pegarmos os 4 elementos da mensagem ## */
+	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
+	   elementos da mensagem e depois zerar o buffer */
 	
 	while (running)
 	{
@@ -907,7 +903,6 @@ Mainloop:
 		        (unsigned long) message_buffer[2], 
 		        (unsigned long) message_buffer[3] );
 			
-			//clear
 			message_buffer[0] = 0;
             message_buffer[1] = 0;
             message_buffer[3] = 0;
@@ -1441,16 +1436,12 @@ void shellWaitCmd (){
 	// @todo: Cuidado com loop infinito.
 
 	
-	//
 	// Obs: Quem muda o status é o procedimento,
 	//      quando recebe o retorno da função input:
-	//
 	
-	
-	//
+
 	// Uma interrupção de teclado aciona o procedimento
 	// do shell que atualiza o status.
-	//
 	
 	
 	// BUG BUG :
@@ -1466,21 +1457,24 @@ void shellWaitCmd (){
     //Loop.  
 	
     do{	 
-		if( prompt_status == 1 ){
+		if ( prompt_status == 1 )
+		{
 			prompt_status = 0;     
 			return;
 	    };
 	
 	}while(1);
 	
-exit:
+//exit:
+
     prompt_status = 0;
-    return;	
+    
+	//return;	
 };
 
 
 /*
- **********************************************************
+ ****************
  * shellCompare:
  *     Compara comandos digitados com palavras chave.
  *     Compara a palavra em 'prompt[]' com outras e chama o serviço.
@@ -1511,8 +1505,11 @@ unsigned long shellCompare (struct window_d *window){
 	//Ok. isso funcionou.
     int absolute; 
 	
-	//transferir toda alinha de comando para a memória 
+	//#importante:
+	//Transferir toda alinha de comando para a memória 
 	//compartilhada.
+	//obs: Possivelmente isso não continuaá assim, pas por enquanto tá bom.
+
 	unsigned char *shared_memory = (unsigned char *) (0xC0800000 -0x100);
 	
 	//linha de 80 chars no máx.
@@ -1903,7 +1900,7 @@ do_compare:
 			
 		    printf("\n argument_number={%d} argument={%s}\n", i, tokenList[i] );	
             
-			if ( strncmp( (char*) tokenList[i], "-c", 2 ) == 0 ){
+			if ( strncmp( (char *) tokenList[i], "-c", 2 ) == 0 ){
 			    printf("[OK] argumento %s selecionado.\n", tokenList[i] );
 		    }
 			//...
@@ -2786,8 +2783,10 @@ doexec_first_command:
 	//     de um pathname, então vamos checar se o pathname é 
 	//     absoluto. Isso é a primeira coisa que podemos fazer.
 	
-    absolute = absolute_pathname( (char*) tokenList[0] );
-    if (absolute == 1){
+    absolute = absolute_pathname ( (char *) tokenList[0] );
+	
+    if (absolute == 1)
+	{
 		
 		// Aqui estamso invocando alguma coisa em um 
         // determinado diretório, pode ser o deretório raiz 
@@ -2950,7 +2949,6 @@ dobin:
 		// Se o aplicativo funcionou corretamente mas está em segundo 
 		// plano então decemos continuar. 
 		// Por enquanto estamos continuando e rodando concomitantemente.
-		//
 		
 		//
 		// # Stop running #
@@ -2995,7 +2993,6 @@ dotry:
 		// Se o aplicativo funcionou corretamente mas está em segundo 
 		// plano então decemos continuar. 
 		// Por enquanto estamos continuando e rodando concomitantemente.
-		//
 		
 		//
 		// # Stop running #
@@ -3030,7 +3027,7 @@ dosh:
     //nothing for now.
 	//o comando [0] é o 'dosh' o [1] é o nome do script.
 
-    if( is_sh1( (char *) tokenList[1] ) != 1 )
+    if ( is_sh1( (char *) tokenList[1] ) != 1 )
 	{
 		printf("dosh: it's not a .sh1 filename.\n");
 		printf("dosh: fail\n");
@@ -3043,7 +3040,6 @@ dosh:
 //
 //  ## Fail ##
 //	
-	
 	
 fail:	
     printf(" Unknown command!\n");
@@ -3065,8 +3061,10 @@ done:
 	};
 	
 	shellPrompt();
+	
 	//Mostrando as strings da rotina de comparação.	
 	refresh_screen();
+	
     return (unsigned long) ret_value;
 };
 
@@ -3086,21 +3084,15 @@ void shellShell (){
     shellStatus = 0;
     shellError = 0;
 	
-	//
 	// Deve ser pequena, clara e centralizada.
 	// Para ficar mais rápido.
-	//
 	
-	//
 	// #importante:
 	// O aplicativo tem que confiar nas informações 
 	// retornadas pelo sistema.
-	//
-	
-	//
+		
 	// Usar o get system metrics para pegar o 
 	// tamanho da tela.
-	//
 	
 	// ## Screen size ##
 	
@@ -3133,7 +3125,7 @@ void shellShell (){
 	// Setup buffers.
 	//
 	
-	//
+
 	// #inportante:
 	// #bugbug: Não podemos deixar o stdout como screenbuffer 
 	// pois no screen buffer os caracteres tem atributos ...
@@ -3141,7 +3133,6 @@ void shellShell (){
 	//ou saída normal que servirá de entrada para  
 	//outro processo.
     // reiniciando as variáveis na estrutura do output
-	//
 	
 	//obs: Ao cancelarmos isso o std volta a ser 
 	//o antigo e já configurado stdout.
@@ -3152,10 +3143,10 @@ void shellShell (){
 	//stdout->_tmpfname = "shell_stdout";
 	
 	//...	
-	//
+	
 	// Obs:
 	// prompt[] - Aqui ficam as digitações. 
-	//
+
 	shellClearBuffer();
 
 	
@@ -3181,8 +3172,8 @@ void shellShell (){
 		current_workingdiretory_string[i] = (char) '\0';
 	};
 	
-    sprintf( current_workingdiretory_string, 
-	         SHELL_UNKNOWNWORKINGDIRECTORY_STRING );    
+    sprintf ( current_workingdiretory_string, 
+	    SHELL_UNKNOWNWORKINGDIRECTORY_STRING );    
 	
 	//...
 	
@@ -3201,13 +3192,11 @@ void shellShell (){
 	//shellSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));	
 	
 	//shellPrompt();
-    //return;	
 };
 
 
-
 /*
- ********************************************************************
+ *************
  * shellInit:
  *     Inicializa o Shell.  
  *
@@ -3230,11 +3219,10 @@ int shellInit ( struct window_d *window ){
 		
 	char buffer[512];
 	
-	//
+	
 	// #bugbug:
     //     Esse ponteiro de estrutura está em kernel mode. 
 	//     Não podemos usá-lo.
-	//
 	
 	//stream status
 	shell_info.stream_status = 0;
@@ -3267,14 +3255,11 @@ int shellInit ( struct window_d *window ){
 /*-- HAVE_SETLINEBUF */
 	
 	
-	//
 	// Antes dessa função ser chamada, o foco foi setado 
 	// na janela do aplicativo.
 	// Test: Não mechemos no cursor nesse momento, deicharemos 
 	// a função SetFocus configurar o curso.
 	// Não mostraremos o prompt, somente depois dos testes de inicialização.
-	//
-	//
 	
     //bugbug	
 	//cursor
@@ -3295,7 +3280,8 @@ int shellInit ( struct window_d *window ){
 	// #importante: A estrutura está em kernel mode 
 	// e não podemos acessa-la.
 	
-	if ( (void *) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 	    printf("shellInit: window fail.\n");    
 	}else{
 		
@@ -3308,7 +3294,7 @@ int shellInit ( struct window_d *window ){
 		// mensagens !!
 		
 #ifdef SHELL_VERBOSE		
-		printf("shellInit: Starting shell.bin ... \n");
+		printf("shellInit: Starting shell.bin ...\n");
 		printf("shellInit: Running tests ...\n");
 #endif
 		
@@ -3323,7 +3309,7 @@ int shellInit ( struct window_d *window ){
 	ActiveWindowId = (int) APIGetActiveWindow();
 	
 	//valor de erro
-	if( ActiveWindowId == (-1)){
+	if ( ActiveWindowId == (-1) ){
 	    printf("shellInit: ERROR getting Active window ID\n");	
 	}	
 	
@@ -3337,7 +3323,7 @@ int shellInit ( struct window_d *window ){
 	WindowWithFocusId = (int) APIGetFocus();
 	
 	//valor de erro
-	if( WindowWithFocusId == (-1)){
+	if ( WindowWithFocusId == (-1) ){
 	    printf("shellInit: ERROR getting Window With Focus ID\n");	
 	}	
 	
@@ -3361,7 +3347,6 @@ int shellInit ( struct window_d *window ){
 	// Process support.
 	//
 	
-	//
 	// @todo: 
 	// Essa mensagem está aparecendo fora da área de trabalho do shell
 	// pois ainda não temos um ponteiro para a memória que representa essa área.
@@ -3373,28 +3358,26 @@ int shellInit ( struct window_d *window ){
 	// devem ser escritos. Na verdade é um ponteiro para um retãngulo e não para 
 	// uma janela. Obs: Esse retângulo do terminal deve esr configurável e uma rotina 
 	// deve dar suporte a essa configuração.
-	//
 	
-	//
+
 	// @todo: 
 	// O que tevemos fazer aqui é pegar informações sobre o processo Shell
 	// e coloca-las na tela.
-	//
 	
-	//
+
 	// @todo: Criar na API uma rotina de inteface que use essa chamada.
 	// ex: APIGetPID().
-	//
+
 	
 	//PID = (int) APIGetPID();
 	
-    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
-	if( PID == (-1)){
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0 );
+	if ( PID == (-1) ){
 	    printf("ERROR getting PID\n");	
 	}
   
-    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0);
-	if( PPID == (-1)){
+    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0 );
+	if ( PPID == (-1) ){
 	    printf("ERROR getting PPID\n");	
 	}
   
@@ -3402,19 +3385,17 @@ int shellInit ( struct window_d *window ){
 	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n", PID, PPID );
 	
 	
-	//
 	// @todo: Criar processos processos:
 	//     E.BIN, F.BIN, G.BIN, A.BIN, B.BIN, C.BIN, D.BIN
  	//     (Mermaids) Usados para testes.
-	//
 
-#ifdef SHELL_VERBOSE			
-	printf("Creating processes ...\n");
-#endif	
+//#ifdef SHELL_VERBOSE			
+//	printf("Creating processes ...\n");
+//#endif	
 	
-	
-	
-#ifdef SHELL_VERBOSE			
+#ifdef SHELL_VERBOSE
+    
+    printf("Creating processes ...\n");	
 	//D.:)
 	P=(void*)apiCreateProcess(0x400000,PRIORITY_HIGH,"D");
 	if((void*)P==NULL){printf("Fail creating process D :)\n");};
@@ -3514,7 +3495,6 @@ int shellInit ( struct window_d *window ){
 	// Get thread info.
 	//
 	
-
 	
 	//
 	// Testing commands.
@@ -3535,7 +3515,7 @@ int shellInit ( struct window_d *window ){
 	apiSystem("test");    
     apiSystem("ls");
 	apiSystem("start");
-	apiSystem("xxfailxx");
+	//apiSystem("xxfailxx");
 	//...
 #endif
 	
@@ -3642,11 +3622,11 @@ int shellCheckPassword (){
 	
 #ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
-	    printf("username={%s} password={%s}", username, password );
-		printf("\n");
+	    printf("username={%s} password={%s} \n", username, password );
+		//printf("\n");
 #endif
 		
-		char *c = (char*) &user_stream->_base[0];		
+		char *c = (char *) &user_stream->_base[0];		
 		
 		int i;
 		
@@ -3655,14 +3635,14 @@ int shellCheckPassword (){
 			c++;
 		};
 		
-		if( c[0] == 'U' &&
-            c[1] == 'S' &&
-            c[2] == 'E' &&
-            c[3] == 'R' &&
-            c[4] == 'N' &&
-            c[5] == 'A' &&
-            c[6] == 'M' && 			
-		    c[7] == 'E' )
+		if ( c[0] == 'U' &&
+             c[1] == 'S' &&
+             c[2] == 'E' &&
+             c[3] == 'R' &&
+             c[4] == 'N' &&
+             c[5] == 'A' &&
+             c[6] == 'M' && 			
+		     c[7] == 'E' )
 		{
 		    //USERNAME={fred}
             c = c+10; 
@@ -3695,34 +3675,33 @@ int shellCheckPassword (){
             if( strncmp( username, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE				
-				printf("  ## USERNAME OK  ##\n");
+				printf("## USERNAME OK ##\n");
 #endif				
 				login_status = 1;
 			}else{
-				printf("  ## USERNAME FAIL  ##\n");
+				printf("## USERNAME FAIL ##\n");
 				login_status = 0;
-			}				
+			};				
 
         }else{
 			
-			printf("USERNAME={ fail\n");
+			printf("## USERNAME FAIL ##\n");
 			login_status = 0;
 		};
-
 
 
 		while ( *c && *c != 'P' ){			
 			c++;
 		};
 		
-		if( c[0] == 'P' &&
-            c[1] == 'A' &&
-            c[2] == 'S' &&
-            c[3] == 'S' &&
-            c[4] == 'W' &&
-            c[5] == 'O' &&
-            c[6] == 'R' && 			
-		    c[7] == 'D' )
+		if ( c[0] == 'P' &&
+             c[1] == 'A' &&
+             c[2] == 'S' &&
+             c[3] == 'S' &&
+             c[4] == 'W' &&
+             c[5] == 'O' &&
+             c[6] == 'R' && 			
+		     c[7] == 'D' )
 		{
 		    //PASSWORD={1234}
             c = c+10; 
@@ -3737,20 +3716,20 @@ int shellCheckPassword (){
 			printf(">>%s\n", buffer);
 #endif			
 			
-            if( strncmp( password, buffer, 4 ) == 0 )
+            if ( strncmp( password, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE								
-				printf("  ## PASSWORD OK  ##\n");
+				printf("## PASSWORD OK ##\n");
 #endif
 				login_status = 1;
 			}else{
-				printf("  ## PASSWORD FAIL  ##\n");
+				printf("## PASSWORD FAIL ##\n");
 				login_status = 0;
-			}					
-			
+			};					
 			
 		}else{
-		    printf("PASSWORD={ fail\n");
+			
+		    printf("## PASSWORD FAIL ##\n");
             login_status = 0; 			
 		};
 		    
