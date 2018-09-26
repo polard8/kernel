@@ -33,8 +33,8 @@ int gws_wm_status;
  
  
 //abrir o servidor de janelas. 
-int gwsOpen()
-{
+int gwsOpen (){
+	
 	//Aberto.
 	gws_status = 1;
 	//..
@@ -44,8 +44,8 @@ int gwsOpen()
 
 
 //fechar o servidor de janelas
-int gwsClose()
-{
+int gwsClose (){
+	
 	gws_status = 0;
 	
 	return (int) 0;
@@ -53,8 +53,8 @@ int gwsClose()
 
 
 // Registrar um window manager.
-int gwsRegisterWindowManager( int pid )
-{
+int gwsRegisterWindowManager ( int pid ){
+	
 	int Status = 0;
 	
 	if( gws_status != 1 )
@@ -100,8 +100,8 @@ void gui_create_grid();
  * Obs: esse é o user environment. 
  *(deixe o desenvolvedor saber em qual desktop ele está.)
  */
-void create_gui()
-{	
+void create_gui (){
+	
 	struct window_d *hWindow; 	 
 
 	//

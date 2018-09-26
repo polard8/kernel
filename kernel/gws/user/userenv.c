@@ -66,8 +66,8 @@ void config_user();
  * 
  * Mudar o nome para userenvironmentStart(int argc, char* argv[]).
  */
-int startUserEnvironment(int argc, char* argv[])
-{
+int startUserEnvironment ( int argc, char* argv[] ){
+	
     int Status = 0;
 	
 	//
@@ -97,9 +97,11 @@ int startUserEnvironment(int argc, char* argv[])
 	// ...
 	//
 
-done:
-    SetProcedure( (unsigned long) &system_procedure);
-    return (int) Status;
+//done:
+
+    SetProcedure ( (unsigned long) &system_procedure);
+    
+	return (int) Status;
 };
 
 
@@ -107,31 +109,34 @@ done:
  * ShowUserInfo:
  *     Mostra informações sobre o usuário atual.
  */
-void ShowUserInfo(int user_id)
-{
+void ShowUserInfo (int user_id){
+	
 	struct user_info_d *User;
 	
-	if(user_id < 0 || user_id >= USER_COUNT_MAX){
+	if ( user_id < 0 || user_id >= USER_COUNT_MAX )
+	{
 	    return;
 	};  
 	
 	User = (void *) userList[user_id];
-	if( (void*) User == NULL ){
+	
+	if ( (void *) User == NULL )
+	{
 	    printf("ShowUserInfo: Error\n");
         return;		
+	
 	}else{
 	    
-		printf("Name={%s} Id={%d} Type={%d} \n",User->name_address
-		                                       ,User->userId
-											   ,User->userType );		
+		printf ("Name={%s} Id={%d} Type={%d} \n", User->name_address,
+		    User->userId, User->userType );		
 	    return;
 	};
 	
 	//...
 	
 // Done.
-done:
-    return;
+//done:
+    //return;
 };
 
 
@@ -142,14 +147,14 @@ done:
  * sobre o usuário e serão colocanas nas estruturas.
  *
  */
-void config_user()
-{
+void config_user (){
+	
     userconfig_Status = 0;	
 	
 	//...
 	
-done:
-    return;    //Ainda não implementada.
+//done:
+    //return;    //Ainda não implementada.
 };
 
 

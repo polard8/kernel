@@ -57,14 +57,14 @@ int fsCheckPEFile ( unsigned long address ){
 	unsigned char *buffer = (unsigned char *) address;
 	
 	//i386
-	if ( buffer[0] != 0x4C || buffer[1] != 0x01 ){
-		
-		printf("fsCheckPEFile: Sig\n");
+	if ( buffer[0] != 0x4C || buffer[1] != 0x01 )
+	{
+		printf("fsCheckPEFile: Sig \n");
 		goto fail;
 	}
 	
-done:	
 	return (int) 0;
+	
 fail:
     printf("fail\n");
     return (int) 1;
@@ -72,11 +72,10 @@ fail:
 
 
 /*
- *******************************************************
  * fsListFiles:
  *     Lista os arquivos em um diretório, dados os índices de disco, 
  * volume e diretório.
- * #test 
+ * #test isso funciona.
  */				  
 void 
 fsListFiles( int disk_id, 
@@ -95,11 +94,8 @@ fsListFiles( int disk_id,
 		goto fail;	
 	}
 	
-	
 	// Show!
-	
-	// Se o diretório selecionado é o diretório raiz 
-	// do VFS.
+	// Se o diretório selecionado é o diretório raiz do VFS.
 	
 	if ( current_disk == 0 && 
 	     current_volume == 0 &&
@@ -111,6 +107,8 @@ fsListFiles( int disk_id,
 	
 	// @todo: Suportar outros diretórios.
 	// ...
+	
+	goto done;
 	
 fail:
     printf("fail\n");
@@ -134,8 +132,8 @@ done:
 //criando o diretório '/vfs'
 
 **/
-void fsCreateVFS()
-{
+void fsCreateVFS (){
+	
 /*	
     FILE *vfs;
     char *vfs_root;
@@ -238,7 +236,6 @@ int fsList ( const char *dir_name ){
 	// #todo
 	// #obs: Precisamos checar na estrutura de diretório as 
 	// informações sobre o diretório em questão.
-
 	
 	//#test
 	//boot volume
@@ -262,7 +259,6 @@ int fsList ( const char *dir_name ){
 
 
 /*
- ********************************************************
  * fsFAT16ListFiles:
  *     Mostra os nomes dos arquivos de um diretório.
  *     Sistema de arquivos fat16.
@@ -302,7 +298,7 @@ fsFAT16ListFiles( const char *dir_name,
 		if ( DirBaseAddress[j] != 0 ){
 			
 			//O problema é a terminação da string '\0'
-			printf( "%s\n", &DirBaseAddress[j] );
+			printf ("%s\n", &DirBaseAddress[j] );
         } 
 		
 		//(32/2) próxima entrada! (16 words) 512 vezes!
@@ -312,10 +308,8 @@ fsFAT16ListFiles( const char *dir_name,
 	
 	//...
 	
-	//printf("fsListFiles: done\n");
 	printf ("Done\n");	
 	refresh_screen();
-	//return; 
 };
 
 
@@ -336,8 +330,8 @@ KeLoadFile( struct channel_d *channel,
 {
     int Status;
 	
-	//validate
-	if ( (void *) channel == NULL ){
+	if ( (void *) channel == NULL )
+	{
 	    return (int) 1;
 	}else{
 	    
@@ -354,6 +348,7 @@ KeLoadFile( struct channel_d *channel,
 	//confere se o canal passado por argumento está aberto.
 	
     Status = (int) fsLoadFile ( file_name, file_address );
+	
 	if ( Status != 0 )
 	{
 		// Aqui tem que ter uma mensagem @todo.
@@ -367,8 +362,7 @@ KeLoadFile( struct channel_d *channel,
 	
 	//Close channel.
 	channel->State = 0;
-	
-done:
+
     return (int) 0;	
 };
 
@@ -420,15 +414,13 @@ void set_file ( void *file, int Index ){
 };
 
 
-void fs_test_fat_vector()
-{
+void fs_test_fat_vector (){
 	//Ainda não implementada.
-   // return; 
 };
 
 
-unsigned long fs_get_fat_entry (unsigned long n)
-{
+unsigned long fs_get_fat_entry (unsigned long n){
+	
     //Ainda não implementada.	
     return 0; 
 };
@@ -438,38 +430,29 @@ void
 fs_set_fat_entry( unsigned long n, 
                   unsigned long value )
 {	
-    //Ainda não implementada.
-   // return;	
+    //Ainda não implementada.	
 };
 
 
-void fs_put_list_on_fat()
-{
+void fs_put_list_on_fat (){
+	
 	//Ainda não implementada.
-   // return; 
 };
 
 
-void fs_set_structures()
-{
+void fs_set_structures (){
+	
 	//Ainda não implementada.
-   // return;
 };
 
 
-void 
-fs_set_entry( unsigned long id, unsigned long eid )
-{
+void fs_set_entry ( unsigned long id, unsigned long eid ){
 	//suspensa
-   // return; 
 };
 
 
-void 
-fs_get_entry( unsigned long id, unsigned long eid )
-{
+void fs_get_entry ( unsigned long id, unsigned long eid ){
 	//suspensa
-   // return; 
 };
 
 
@@ -483,11 +466,8 @@ fs_show_dir_entry( unsigned long id,
 
 
 
-void 
-fs_show_dir(unsigned long id)
-{
+void fs_show_dir(unsigned long id){
 	//Ainda não implementada.
-   // return; 
 };
 
 
@@ -570,7 +550,7 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	// Check signature.
 	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA ){
 		
-	    printf("fsCheckMbr: Sig. Fail\n");
+	    printf("fsCheckMbr: Sig ");
         goto fail;		
 	}
 	
@@ -579,7 +559,7 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 
 	
 fail:	
-    printf("fsCheckMbr: fail\n");	
+    printf("fail\n");	
 done:
     printf("Done\n");
 	refresh_screen();
@@ -642,11 +622,8 @@ void fs_check_disk (){
 	//fsCheckVbrFile();
     //...
 	
-// Done.
-//done:
     printf("Done\n");
-	//refresh_screen();
-    //return;	
+	//refresh_screen();	
 };
 
 
@@ -683,9 +660,6 @@ MountShortFileName( char *buffer,
         buffer[i++] = (entry->FileName[ 9] == ' ') ? '\0' : entry->FileName[ 9];
         buffer[i++] = (entry->FileName[10] == ' ') ? '\0' : entry->FileName[10];
     };
-
-//done:	
-//    return;
 };
 
 

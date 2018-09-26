@@ -160,8 +160,6 @@ void tmSleep (unsigned long ms){
 	    --t;
 	}while(t > 0);
 
-//done:	
-	//return;
 };
 
 
@@ -200,7 +198,8 @@ int tmCreateTaskBar (){
 	{
 	    Magic = (int) tmProbeProcessList(i);
 	    
-		if (Magic == MAGIC){
+		if (Magic == MAGIC)
+		{
 			
 			    //APICreateWindow( 1, 1, 1,"Process",     
                 //                 0, j, 20, 20,    
@@ -218,7 +217,6 @@ int tmCreateTaskBar (){
 	
 	//nothing
 	
-//Done:
 	return (int) 0;
 };
 
@@ -449,17 +447,14 @@ void DoSome (){
     };
 	
     // Nothing.
-//done:
+
     printf("\n");
-	//return;
 };
 
 
 void progress_bar_test (){
     
 	DoSome();
-    
-	//return;
 };
 
 
@@ -482,8 +477,6 @@ int tmInit (){
 	//printf("taskman: and cursor. \n");
 	
 	//...
-	
-//done:
 
     return (int) 0;
 };
@@ -583,9 +576,9 @@ int appMain ( int argc, char *argv[] ){
 		//asm("pause");
 		cpu_relax();
 		pause();
+		//pause();
 		pause();
-		pause();
-		pause();
+		//pause();
 		//pause();
 		//pause();
 		//pause();
@@ -612,13 +605,11 @@ debugStuff:
 	//while(1){}
 	
 	
-	//
 	// Obs:
 	//  **** O message box apresenta mensagens corretamente. ****
 	// O desafio agora é enviar mensagens para a área de cliente 
 	// do utilitário TaskMan.
 	// mensagens de erro serão apresentadas via MessageBox.
-	//
 	
     //Initializing ...	
 initializing:	

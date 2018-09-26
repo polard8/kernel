@@ -2696,7 +2696,7 @@ do_compare:
     //test-taskman-server - testando servidor taskman
 	if ( strncmp( prompt, "test-taskman-server", 19 ) == 0 )
 	{
-        system_call( 116,0,0,0);
+        system_call ( 116, 0, 0, 0 );
         goto exit_cmp;
 	};	
 	
