@@ -145,8 +145,14 @@ echo ~{ ux2 /execve
 		
 	rem sm
 	rem /execve/sm/disk
-    gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c   -I c:/gramado/include -o disk.o						
-    gcc -c c:/gramado/kernel/execve/dd/sm/disk/volume.c -I c:/gramado/include -o volume.o	
+    
+	rem colocando o código do nelson em 3rdparty
+	rem gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c   -I c:/gramado/include -o disk.o
+    gcc -c c:/gramado/3rdparty/kernel/disk/disk1.c   -I c:/gramado/include -o disk1.o
+	
+	rem o volume vira disk para absorver o código do fred que esta no código acima.
+    rem gcc -c c:/gramado/kernel/execve/dd/sm/disk/volume.c -I c:/gramado/include -o volume.o	
+	gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c -I c:/gramado/include -o disk.o
 	
   	rem sm
     gcc -c c:/gramado/kernel/execve/dd/sm/install/install.c -I c:/gramado/include -o install.o    
@@ -297,8 +303,8 @@ write.o ^
 cf.o ^
 search.o ^
 format.o ^
+disk1.o ^
 disk.o ^
-volume.o ^
 fs.o ^
 vfs.o ^
 cedge.o ^

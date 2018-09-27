@@ -185,7 +185,14 @@ extern void do_executa_new_task();
 #include <gramado/hal/video.h>                           //video.
 #include <gramado/hal/memory.h>                          //ram (hardware).
 #include <gramado/hal/cpu.h>                             //cpu
+
+
+//#todo:
+#include "c:\gramado\3rdparty\kernel\disk\disk1.h"           //disk1 - nelson
+
 #include <gramado/execve/dd/sm/disk/disk.h>           //disk.
+
+
 #include <gramado/execve/dd/sm/disk/volume.h>         //volume.
 #include <gramado/hal/serial.h>        
 #include <gramado/hal/mac.h>                             //mac address info. (hw)
