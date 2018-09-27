@@ -1,5 +1,5 @@
 
-// crt0.c - testando a implementação do crt no processo shell.bin 
+// crt0.c
 
 
 //usado para inicializar a rt na libc99
@@ -27,23 +27,21 @@ void crt0 (){
 
 //initRT:	
 
-    //inicializando o suporte a alocação dinâmica de memória.
+    //Inicializando o suporte a alocação dinâmica de memória.
 	libcInitRT();
 
-	//inicializando o suporte ao fluxo padrão.
+	//Inicializando o suporte ao fluxo padrão.
     stdioInitialize();	
 	
-	ExitCode = (int) appMain( 0, 0); 
+	ExitCode = (int) appMain ( 0, 0 ); 
 	
-	//
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
 	// o erro pode vir no retorno ou implementa-se uma forma de pegar a execessão 
 	// ocorrida durante a execussão de main.
-	//
 	
-	exit( ExitCode );
+	exit ( ExitCode );
 	
-	while(1){
+	while (1){
 		asm ("pause");
 	};
 };

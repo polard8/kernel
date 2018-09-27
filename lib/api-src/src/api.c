@@ -1827,7 +1827,7 @@ done:
 void exitCriticalSection (){
 	
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
-    system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0);
+    system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
     
 	//return;	
 };
@@ -1836,28 +1836,34 @@ void initializeCriticalSection (){
 	
 	//Inicializa em 1 o semáforo do kernel para que 
 	//o primeiro possa usar.
-	system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0);
-    
+	system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
+};
+
+
+void apiBeginPaint (){
+	
+	enterCriticalSection ();
+	
 	//return;
 };
 
-void apiBeginPaint(){
-	enterCriticalSection();
-	return;
-}
 
-void apiEndPaint(){
-	exitCriticalSection();
-	return;
-}
+void apiEndPaint (){
+	
+	exitCriticalSection ();
+	
+	//return;
+};
 
 
 //imprime um caractere usando o cursor do sistema.
-void apiPutChar( int c )
-{
-	system_call( SYSTEMCALL_SYS_PUTCHAR, c, c, c);
-    return;	
-}
+void apiPutChar (int c){
+	
+	system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
+	
+    //return;	
+};
+
 
 //Get process ID.
 /*
@@ -1869,7 +1875,6 @@ int getpid(){
 
 
 /*
- ***********************************************
  * apiDefDialog:
  *     Procedimento de janela adiado. 
  *     Usado pelos aplicativos ao fim dos 
@@ -1882,38 +1887,35 @@ apiDefDialog( struct window_d *window,
 			  unsigned long long2 )
 {
     
-
-
-
+    //#todo
 
 	return (unsigned long) 0;
 };
 
 
 /*
- ********************************************************
  * apiGetSystemMetrics:
  *     Obtem informações sobre dimensões e posicionamentos.
  */
-unsigned long 
-apiGetSystemMetrics( int index )
-{
-    return (unsigned long) system_call( SYSTEMCALL_GETSYSTEMMETRICS, 
-	                                    (unsigned long) index, 
-										(unsigned long) index, 
-										(unsigned long) index );
+ 
+unsigned long apiGetSystemMetrics (int index){
+	
+    return (unsigned long) system_call ( SYSTEMCALL_GETSYSTEMMETRICS, 
+	                                     (unsigned long) index, 
+										 (unsigned long) index, 
+										 (unsigned long) index );
 };
 
 
-
-void api_set_current_keyboard_responder( int i ){
-    system_call( SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER, 
-	             (unsigned long) i, 
-				 (unsigned long) i, 
-				 (unsigned long) i );
+void api_set_current_keyboard_responder ( int i ){
+	
+    system_call ( SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER, 
+	    (unsigned long) i, (unsigned long) i, (unsigned long) i );
 };
 
-int api_get_current_keyboard_responder(){
+
+int api_get_current_keyboard_responder (){
+	
     return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER, 
 	                                    (unsigned long) 0, 
 										(unsigned long) 0, 
@@ -1921,15 +1923,14 @@ int api_get_current_keyboard_responder(){
 };
 
 
-void api_set_current_mouse_responder( int i ){
-    system_call( SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER, 
-	             (unsigned long) i, 
-	             (unsigned long) i, 
-				 (unsigned long) i );	
+void api_set_current_mouse_responder (int i){
+	
+    system_call ( SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER, (unsigned long) i, 
+	    (unsigned long) i, (unsigned long) i );	
 };
 
-int api_get_current_mouse_responder()
-{
+int api_get_current_mouse_responder (){
+	
     return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER, 
 	                                    (unsigned long) 0, 
 										(unsigned long) 0, 
@@ -1938,31 +1939,26 @@ int api_get_current_mouse_responder()
 
 
 
-void api_set_window_with_text_input( struct window_d *window )
-{
-	if( (void*) window == NULL ) {
+void api_set_window_with_text_input ( struct window_d *window ){
+	
+	if ( (void *) window == NULL ) {
 		return;
 	}
 	
-	if( window->used != 1 || window->magic != 1234 ){
+	if ( window->used != 1 || window->magic != 1234 ){
 		return;
 	}
 	
-    system_call( SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT, 
-	             (unsigned long) window, 
-	             (unsigned long) window, 
-				 (unsigned long) window );
-}
-
-
-int api_get_window_with_text_input()
-{
-    return (int) system_call( SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT, 
-	                          (unsigned long) 0, 
-				  			  (unsigned long) 0, 
-							  (unsigned long) 0 );	
+    system_call ( SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT, (unsigned long) window, 
+	    (unsigned long) window, (unsigned long) window );
 };
 
+
+int api_get_window_with_text_input (){
+	
+    return (int) system_call ( SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT, 
+	                (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
+};
 
 
 /*
@@ -1979,24 +1975,26 @@ void api_receive_message( struct api_receive_message_d *m )
 */
 
 
-
 /*
  * gramadocore_init_execve:
- *     Executa um novo programa usando os 
- * recursos do processo INIT. 
- *     Utiliza-se o mesmo processo, apenas 
- * renomiamos o processo. 
+ *     Executa um novo programa usando os recursos do processo INIT. 
+ *     Utiliza-se o mesmo processo, apenas renomiamos o processo. 
  *     utiliza-se a mesma thread primária,
  * apenas renomeamos a thread.
+ *
+ * #importante: Por enquanto o shell tem uma dessa funcionando.
  */
-int gramadocore_init_execve( const char *filename, 
-                             const char *argv[], 
-                             const char *envp[] )
+ 
+int 
+gramadocore_init_execve ( const char *filename, 
+                          const char *argv[], 
+                          const char *envp[] )
 {
 	
+	//@todo: Ainda não implementada.
 	
 	//system_call( , , ,)
-	//@todo: Ainda não implementada.
+	
 	return (int) -1;
 };
 
@@ -2004,70 +2002,81 @@ int gramadocore_init_execve( const char *filename,
 
 
 /* UNIX style */
-int fork()
-{
-    return (int) system_call( SYSTEMCALL_FORK, 
-	                 (unsigned long) 0, 
-					 (unsigned long) 0, 
-					 (unsigned long) 0 ); 
+/* Ainda estamos testando isso. A rotina no kernel está 
+clonando o a estrutura do processo mas ainda há outras coisas pra 
+fazer como memória, diretório e a troca correta de diretório de 
+páginas dutante o taskswitch */
+
+int fork (){
+	
+    return (int) system_call( SYSTEMCALL_FORK, (unsigned long) 0, 
+					(unsigned long) 0, (unsigned long) 0 ); 
 };
 
 
 
 /*
+ ********************************************************
  * execve:
  * Executes a new process.
  * PS: Does not return on success, and the text, data, bss, 
  * and stack of the calling process are overwritten by 
  * that of the program loaded. 
  */
-int execve( const char *filename, 
-            const char *argv[], 
-            const char *envp[] )
+ 
+int 
+execve ( const char *filename, 
+         const char *argv[], 
+         const char *envp[] )
 {
+	
 	//@todo: Ainda não implementada.
+	
 	return (int) -1;
 };
 
 
-
-
 /*
- *******************************************
  * apiDialog:
  *     Diálogo de yes ou no.
  */
-int apiDialog( const char *string )
-{	
+int apiDialog ( const char *string ){
+	
     int Status = 1; // Yes!
 	int ch;
 	
-	// Dialog message
-	printf(string);
+	printf (string);
 	
-    while(1)
+    while (1)
 	{
-	    ch = (int) api_getchar();	    
-		if( ch != -1 )
+	    ch = (int) api_getchar ();	    
+		
+		if ( ch != -1 )
 	    {
-	        switch(ch)
+	        switch (ch)
             {
 				case VK_RETURN:
 				    goto done;
                     break;				
 					
-			    case 'y':
+			    case 'Y':
+				case 'y':
 				    printf("Yes\n");
 			        Status = 1;
 				    break;
 				   
-			    case 'n':
+			    case 'N':
+				case 'n':
 			        printf("No\n");
 					Status = 0;
 				    break;
+					
+				//default:
+				//    break;
 		    };		   
 		};
-		asm("pause");
+		
+		asm ("pause");
 	};
     
 done:		
@@ -2075,16 +2084,13 @@ done:
 };
 
 
-
-int api_getchar()
-{
-	return (int) stdio_system_call( 137, 0, 0, 0 );
+int api_getchar (){
+	
+	return (int) stdio_system_call ( 137, 0, 0, 0 );
 };
 
 
-
 /*
- ********************************************************
  * apiDisplayBMP:
  *
  * Mostra na tela uma imagem bmp carregada na memória.
@@ -2099,9 +2105,10 @@ int api_getchar()
  */
  static int nibble_count_16colors = 0;
  
-int apiDisplayBMP( char *address, 
-                   unsigned long x, 
-				   unsigned long y )
+int 
+apiDisplayBMP ( char *address, 
+                unsigned long x, 
+				unsigned long y )
 {
 	int i, j, base, offset;
 	
@@ -2128,16 +2135,16 @@ int apiDisplayBMP( char *address,
 	unsigned long *palette    = (unsigned long *) (address + 0x36);		
 	unsigned char *palette_index = (unsigned char *) &pal_address;	
 	
-	//
+	
 	// Limits
-	//
 	
 	xLimit = 800;
 	yLimit = 600;
 	
 	
 	//@todo: Refazer isso
-	if( x > xLimit || y > yLimit ){ 
+	if ( x > xLimit || y > yLimit )
+	{ 
         return (int) 1; 
 	}
 	
@@ -2149,7 +2156,7 @@ int apiDisplayBMP( char *address,
 	//
 	
 	
-	if( address == 0 )
+	if ( address == 0 )
 	{
 		//goto fail;
 	};
@@ -2161,7 +2168,7 @@ int apiDisplayBMP( char *address,
 	
 	bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );
 	
-    if( (void*) bh == NULL )
+    if ( (void *) bh == NULL )
 	{
 		//goto fail;
 	}	
@@ -2173,7 +2180,7 @@ int apiDisplayBMP( char *address,
 	
     unsigned short sig;
 	
-	sig = *( unsigned short* ) &bmp[0];
+	sig = *( unsigned short * ) &bmp[0];
 	
 	bh->bmpType = sig;
 	
@@ -2194,17 +2201,17 @@ int apiDisplayBMP( char *address,
 	//Windows bmp.
 	bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
 	
-    if( (void*) bi == NULL )
+    if ( (void *) bi == NULL )
 	{
 		//goto fail;
 	}	
 	
 	//The size of this header.
-	bi->bmpSize = *( unsigned long* ) &bmp[14];
+	bi->bmpSize = *( unsigned long * ) &bmp[14];
 	
 	// Width and height.
-    Width = *( unsigned long* ) &bmp[18];
-    Height = *( unsigned long* ) &bmp[22];	
+    Width = *( unsigned long * ) &bmp[18];
+    Height = *( unsigned long * ) &bmp[22];	
 	
 	//@todo: checar validade da altura e da largura encontrada.
 	
@@ -2215,17 +2222,17 @@ int apiDisplayBMP( char *address,
 	
 	/* Number of bits per pixel */
 	//1, 4, 8, 16, 24 and 32.
-	bi->bmpBitCount = *( unsigned short* ) &bmp[28];
+	bi->bmpBitCount = *( unsigned short * ) &bmp[28];
 	
 	// Único suportado ainda.
-	if(bi->bmpBitCount != 24 )
+	if ( bi->bmpBitCount != 24 )
 	{
 		//fail
 	}
 	
 	
 	// 0 = Nenhuma compressão.
-	if(bi->bmpCompression != 0 )
+	if ( bi->bmpCompression != 0 )
 	{
 		//fail
 	}
@@ -2235,8 +2242,6 @@ int apiDisplayBMP( char *address,
 	// Draw !
 	//
 	
-	
-	
 	left = x;    //
 	top  = y; 
 	
@@ -2244,16 +2249,14 @@ int apiDisplayBMP( char *address,
 	//bottom = top + height;
 	bottom = (top + bi->bmpHeight );
 
-		
-	
 	// Início da área de dados do BMP.
 	
 	//#importante:
 	//a base é diferente para os tipos.
 	 
 
-	switch(bi->bmpBitCount)
-    {
+	switch (bi->bmpBitCount){
+		
 		//case 1:
 		//    base = (0x36 + 0x40);
 		//    break;
@@ -2275,7 +2278,7 @@ int apiDisplayBMP( char *address,
 		default:
 		    base = 0x36;
 			break;
-	}	
+	};	
 	
 
 //1 - 1 bpp (Mono)
@@ -2289,7 +2292,7 @@ int apiDisplayBMP( char *address,
 //320 - 32 bpp (True color, RGBA)	
 
 
-    //
+  
 	// ## ABGR8888 ##
 	// Little-endian
 	// pegando os caracteres
@@ -2306,15 +2309,14 @@ int apiDisplayBMP( char *address,
     //#define COLOR_GREEN 0x00FF0000
     //#define COLOR_BLUE  0x0000FF00
 
-
 	
-	for( i=0; i < bi->bmpHeight; i++ )	
+	for ( i=0; i < bi->bmpHeight; i++ )	
 	{		
-		for( j=0; j < bi->bmpWidth; j++ )	
+		for ( j=0; j < bi->bmpWidth; j++ )	
 		{	
 	        // 16 cores
             // Um pixel por nibble.
-	        if(bi->bmpBitCount == 4 )
+	        if ( bi->bmpBitCount == 4 )
 	        {				
 				offset = base;
 							    
@@ -2337,7 +2339,7 @@ int apiDisplayBMP( char *address,
 				    
 					nibble_count_16colors = 2222;
 					base = base;
-				}
+				};
 	        };	
 
 			// 256 cores
@@ -2353,7 +2355,7 @@ int apiDisplayBMP( char *address,
 			// 16bpp high color BMP
 			// Próximo pixel para 16bpp
 			// apenas 565 por enquanto.  
-	        if(bi->bmpBitCount == 16 )
+	        if ( bi->bmpBitCount == 16 )
 	        {
 
 			    //565
@@ -2381,12 +2383,11 @@ int apiDisplayBMP( char *address,
 		        
 				    base = base + 2;    
 				//};					
-				
 	        };			
 			
 
 			// Próximo pixel para 24bpp
-	        if(bi->bmpBitCount == 24 )
+	        if ( bi->bmpBitCount == 24 )
 	        {
 				offset = base;
 			    
@@ -2405,10 +2406,8 @@ int apiDisplayBMP( char *address,
 			
 			
 			// Próximo pixel para 32bpp
-	        if(bi->bmpBitCount == 32 )
-	        {
-			    
-			    
+	        if ( bi->bmpBitCount == 32 )
+	        { 
 				//A
 				//offset = base+3;
 			    c[0] = 0;				
@@ -2426,15 +2425,12 @@ int apiDisplayBMP( char *address,
 	        };
 			
 			
-			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, 
-			             (unsigned long) color, 
-						 (unsigned long) left, 
-						 (unsigned long) bottom );
+			system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
+				(unsigned long) left, (unsigned long) bottom );
 			
 			// Próximo pixel.
 			left++; 
 		};
-		
 		
 		// Vamos para a linha anterior.
 		bottom = bottom-1;

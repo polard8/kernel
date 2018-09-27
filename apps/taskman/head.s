@@ -47,23 +47,25 @@ extern _crt0
 ;extern _exit
 
 
-;==================================================
+;==============================
 ; _taskmanager_entry_point:
 ;     Entry point
 ;
 ; IN: ??
 ;
-;
 global _taskmanager_entry_point              
 _taskmanager_entry_point:
-    NOP	
+    
+	;NOP	
+	
 	call _crt0
 	
 	cmp eax, dword 0
 	je retOk
 
 HANG:	
-	NOP
+	;NOP
+	PAUSE
 	JMP HANG
 
 retOk:	
@@ -74,6 +76,7 @@ retOk:
 	;call _exit
 	;mov byte [0x800000], byte "z"	
     ;mov byte [0x800001], byte 0x09	
+	
 	JMP HANG
 
 ;

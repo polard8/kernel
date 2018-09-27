@@ -93,7 +93,7 @@ static inline void pause (void){
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
 static inline void rep_nop (void){
 	
-	__asm__ __volatile__("rep;nop": : :"memory");
+	__asm__ __volatile__ ("rep;nop": : :"memory");
 };
 
 
@@ -109,7 +109,8 @@ void idleLoop (){
 		pause();
 		pause();
 		pause();
-		pause();
+		//pause();
+		
 		cpu_relax();
 	}	
 };
@@ -150,16 +151,9 @@ void driverInitialize (){
 	ServerStatus = 1;
 		
 	//printf("Idle: Initializing driver ...\n");
-	//refresh_screen();
-
-	
 	//system_call( 129, 4321, 4321, 4321 );	
 	
-//done:	
 	printf("IDLE.BIN: Initialized\n");
-	
-	//refresh_screen();
-	//return;
 };
 
 
@@ -188,17 +182,12 @@ void driverUninitialize (){
 	//
 
 	//printf("Idle: Unitializing driver ...\n");
-	//refresh_screen();
 	
 	//Faremos uma chamada para o Kernel 'deslinkar' o driver.
 	//talvez 128. 127 126..???
 	//system_call( ?? , 4321, 4321, 4321 ); 		
 	
-//done:	
 	printf("IDLE.BIN: Uninitialized\n");
-	
-	//refresh_screen();
-	//return;
 };
 
 
@@ -224,9 +213,7 @@ unsigned long idleServices (unsigned long number){
 	};
 	
 	
-	//
 	// Selecionar o serviço.
-	//
 	
     switch (number)
     {
@@ -248,10 +235,6 @@ unsigned long idleServices (unsigned long number){
 			break;
 	};	
 	
-	
-//done:
-    //refresh_screen(); 
-	
     return (unsigned long) 0;	
 };
 
@@ -266,7 +249,7 @@ int idleInit (){
 	idleError = 0;
 	
 	//printf("Idle: Initializing idle application ..\n");
-	//refresh_screen();
+
 	//...
 	return (int) 0;
 };

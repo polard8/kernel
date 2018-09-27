@@ -2,6 +2,8 @@
     Main folders for Gramado Operating System.
 
 
+//3rdparty - This Fred Nora does not have the copyright.
+
 //(super)
 /allegory   - Spiritual quotes and not productive stuff.
 

@@ -13,11 +13,11 @@ rem
 echo -{ API
 echo -{ ...
 echo -{ Compiling nc2.c
-    gcc -c c:\gramado\lib\fonts\nc2\nc2.c -o nc2.o  
+    gcc -c c:\gramado\3rdparty\fonts\nc2\nc2.c -o nc2.o  
     rem Nothing.
 	
 :Linking
-    ld -T c:\gramado\lib\fonts\nc2\link.ld -o NC2.FON nc2.o -Map  test_map.s	
+    ld -T c:\gramado\3rdparty\fonts\nc2\link.ld -o NC2.FON nc2.o -Map  test_map.s	
 	
 :Moving
 echo -{ ...

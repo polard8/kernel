@@ -1,5 +1,5 @@
 /*
- * TASKMAN - Task manager application  for Gramado.
+ * TASKMAN - Task manager application for Gramado 0.3.
  * (c) Copyright 2015-2017 - Fred Nora.
  *
  * File: main.c 
@@ -25,22 +25,18 @@
  * @todo: + Incluir bibliotecas disponíveis.
  *        + Dar algum sinal de vida na tela.
  *
- *
- * *** A COR PREDOMINANTE NESSE UTILITÁRIO SERÁ CINZA ****
- *
  * WIN23
  * #define COLOR_LITBUTTON  0x00E0E0E0
  * #define COLOR_LTGRAY     0x00C0C0C0
  * #define COLOR_GRAY       0x00808080
  *
- * Historico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016~2018 - Updates.
  *     ...
  */
 
 
- 
 //
 // # Includes #
 //
@@ -85,14 +81,14 @@ int taskmanagerBufferPos;
 
 static inline void pause (void){
 	
-    asm volatile("pause" ::: "memory"); 
+    asm volatile ("pause" ::: "memory"); 
 }; 
 
 
 /* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
 static inline void rep_nop (void){
 	
-	__asm__ __volatile__("rep;nop": : :"memory");
+	__asm__ __volatile__ ("rep;nop": : :"memory");
 };
 
 
@@ -502,7 +498,9 @@ int appMain ( int argc, char *argv[] ){
 	// buffer de mensagens	
 	unsigned long buffer[5];
 	
-    //@todo:
+    int PID;
+	
+	//@todo:
     //+pegar o id do processo e chamar uma rotina 
     //para inicializar o processo como o 
     //servidor de gerenciamento de tarefas.
@@ -515,12 +513,12 @@ int appMain ( int argc, char *argv[] ){
     //para dialogar com o kernel.
 	
 #ifdef TASKMAN_VERBOSE
-	printf("taskman: inicializando servidor ...\n");
+	printf("appMain: Initializing taskman server..\n");
 #endif	
 	
 	//o kernel deverá associar o PID a um magic.
 	
-	int PID;
+	
     PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
 	
 	enterCriticalSection(); 
@@ -545,6 +543,9 @@ int appMain ( int argc, char *argv[] ){
 	//de servidores, então o kernel coloca a mensagem 
 	//no vetor passado pelo servidor.
 	
+	//
+	// ## LOOP ##
+	//
 	
 	while (listening)
 	{
@@ -569,22 +570,29 @@ int appMain ( int argc, char *argv[] ){
 
 			if(  buffer[1] == 123  )
 			{
-				printf("Hello from server PID={%d}", PID);
+				printf("Hello from server PID={%d}\n", PID);
 			};
 		};		
 				
-		//asm("pause");
 		cpu_relax();
 		pause();
-		//pause();
 		pause();
 		//pause();
 		//pause();
 		//pause();
 		//pause();
 		//pause();
+		//pause();
+		//asm("pause");
 		//exit(0);
 	};
+	
+	
+	//
+	// #todo:
+	// Nesse momento o servidor parou de ouvir por mensagens,
+	// devemos então efetuarmos uma rotina de finalização.
+	//
 
     //
 	// Opção: Tratar os argumentos recebidos.
@@ -592,7 +600,8 @@ int appMain ( int argc, char *argv[] ){
 	
 	
 	//#debug
-debugStuff:
+//debugStuff:
+
     // Uma mensagem de sinal de vida.
 	apiBeginPaint();
 	    //(type, string1, string2)
@@ -612,7 +621,8 @@ debugStuff:
 	// mensagens de erro serão apresentadas via MessageBox.
 	
     //Initializing ...	
-initializing:	
+//initializing:	
+
 	tmInit();  
 	
 	//
@@ -632,34 +642,34 @@ initializing:
 // acesso aos objetos. Permitindo que grupos, usuários, processos e 
 // e threads denham acesso aos recursos do sistema. 
 //	
-creatingSecurityControl:	
+//creatingSecurityControl:	
 	
 	//Logon.
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGON");
-	if( (void*) P == NULL  ){
+	P = (void *) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGON");
+	if ( (void *) P == NULL  ){
 	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process LOGON");		
 		while(1){}
 	};
 
 	//Logoff.
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGOFF");
-	if( (void*) P == NULL  ){
+	P = (void *) apiCreateProcess( 0x400000, PRIORITY_HIGH,"LOGOFF");
+	if( (void *) P == NULL  ){
 	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process LOGOFF");		
 		while(1){}
 	};
 	
 	//Object Manager. 
 	//(Pertence ao Security Control).
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"OM");
-	if( (void*) P == NULL  ){
+	P = (void *) apiCreateProcess( 0x400000, PRIORITY_HIGH,"OM");
+	if( (void *) P == NULL  ){
 	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process OM");		
 		while(1){}
 	};
 
 	//System Security.
 	//(Pertence ao Security Control).
-	P = (void*) apiCreateProcess( 0x400000, PRIORITY_HIGH,"SS");
-    if( (void*) P == NULL ){ 
+	P = (void *) apiCreateProcess( 0x400000, PRIORITY_HIGH,"SS");
+    if( (void *) P == NULL ){ 
 	    MessageBox( 1, "TASKMAN.BIN:", "Fail creating process SS");		
 		while(1){}
 	};
@@ -758,7 +768,7 @@ creatingSecurityControl:
 	// * Hang.
 	//
 	
-getmessageLoop:	
+//getmessageLoop:	
 	
 	// Debug:
 	
