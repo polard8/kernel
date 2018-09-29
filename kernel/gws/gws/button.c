@@ -30,31 +30,34 @@
  *
  *
  */
-void *draw_button( struct window_d *window,
-                  unsigned char *string,
-                  unsigned long type, 
-                  unsigned long x, 
-                  unsigned long y, 
-                  unsigned long width, 
-                  unsigned long height, 
-                  unsigned long color)
+void *draw_button ( struct window_d *window,
+                    unsigned char *string,
+                    unsigned long type, 
+                    unsigned long x, 
+                    unsigned long y, 
+                    unsigned long width, 
+                    unsigned long height, 
+                    unsigned long color )
 {
-    int i; //??
 	int Selected;
 	unsigned long border1;
     unsigned long border2;
+	
 	struct button_d *b;
 	
 	//validade da janela onde o botão está.
-	if( (void*) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 	    return NULL;
 	}
 	
-
 	//Alocando memória para a estrutura do botão.
-	b = (void*) malloc( sizeof(struct button_d) );
-    if( (void*) b == NULL ){
+	b = (void *) malloc ( sizeof(struct button_d) );
+    
+	if ( (void *) b == NULL )
+	{
 		return NULL;
+		
 	}else{
 		
 		// Object.
@@ -71,7 +74,7 @@ void *draw_button( struct window_d *window,
         b->width = width;
         b->height = height;
 		
-        b->window = (void*) window;
+        b->window = (void *) window;
         b->color = color; 	
         b->Next = NULL;		 
 		//...
@@ -86,13 +89,14 @@ void *draw_button( struct window_d *window,
 	//Todo: Usar esquema padrão de cores.
 	
     //Quem chamou precisa saber ao menos o tipo de botão que quer.	
-    if(type == 0){
+    if (type == 0)
+	{
 		//printf("draw_button: The button needs a type.\n");
 		//refresh_screen();
         return NULL;
     };    
 	
-    switch(type)
+    switch (type)
     {
         //Não pressionado.
         case BN_DOWN:
@@ -135,36 +139,31 @@ void *draw_button( struct window_d *window,
 //
 // Do draw the button.
 //
-		
 	
 do_draw_button:
 
-    //
 	// Usaremos retângulos para desenharmos o botão.
-	//
    
     // Temos a intenção de uar estilos diferentes, como flat design,
 	// por exemplo.
 	
 	//bg
-	drawDataRectangle( window->left +x, window->top +y, width, height, color);
+	drawDataRectangle ( window->left +x, window->top +y, 
+	    width, height, color );
     
 	//board1, borda de cima e esquerda.
-	drawDataRectangle( window->left +x, window->top +y, width, 1, border1);
-	drawDataRectangle( window->left +x, window->top +y, 1, height, border1);
+	drawDataRectangle ( window->left +x, window->top +y, 
+	    width, 1, border1 );
+		
+	drawDataRectangle ( window->left +x, window->top +y, 
+	    1, height, border1 );
 
 	//board2, borda direita e baixo.
-	drawDataRectangle( window->left +x +width -1, 
-	                   window->top +y, 
-					   1, 
-					   height, 
-					   border2);
+	drawDataRectangle ( window->left +x +width -1, window->top +y, 
+		1, height, border2 );
 					   
-	drawDataRectangle( window->left +x, 
-	                   window->top  +y +height -1, 
-					   width, 
-					   1,
-					   border2);
+	drawDataRectangle ( window->left +x, window->top +y +height -1, 
+		width, 1, border2 );
 
 //
 // Do draw label.
@@ -177,12 +176,11 @@ do_draw_label:
 	//if(useImage == 1{ ... goto done;}
 	
 	//button label								   
-    if(Selected == 1)
+    if (Selected == 1)
 	{
-	    draw_string( window->left +x +8, 
-		             window->top  +y +8, 
-					 COLOR_WHITE, 
-					 string);	
+	    draw_string ( window->left +x +8, window->top +y +8, 
+			COLOR_WHITE, string );	
+			
     }else{
 		
 		
@@ -191,13 +189,9 @@ do_draw_label:
 		//			 COLOR_WINDOWTEXT, 
 		//			 string);	
 
-	    draw_string( window->left +x +8, 
-		             window->top  +y +8, 
-					 COLOR_TERMINALTEXT, 
-					 string);	
-					 
+	    draw_string ( window->left +x +8, window->top +y +8, 
+			COLOR_TERMINALTEXT, string );	
 	};
-	
 	
 	//
 	// @todo: Algo mais?
@@ -205,8 +199,9 @@ do_draw_label:
 	
 // Done! 
 done:
-    //Retornando o ponteiro para a estrutura do botão.
-    return (void*) b;          
+    
+	//Retornando o ponteiro para a estrutura do botão.
+    return (void *) b;          
 };
 
 
@@ -215,6 +210,8 @@ int buttonInit()
 {}
 */
 
+
 //
-// Fim.
+// End.
 //
+

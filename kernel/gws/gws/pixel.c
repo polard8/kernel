@@ -83,7 +83,7 @@ pixelPutPixelWindowBuffer( void *buffer,
 						   unsigned long y, 
 						   unsigned long color )
 {
-	return; //@todo: Ainda não implementada.					  
+	//return; //@todo: Ainda não implementada.					  
 };
 
 										 
@@ -109,15 +109,18 @@ pixelPutPixelDedicatedWindowBuffer( struct window_d *window,
 	
 	//Se temos uma estrutura de janela, essa estrutura pode
 	//conter um ponteiro para um buffer dedicado de janela.
-	if( (void *) window == NULL )
+	if ( (void *) window == NULL )
 	{
 		buff = NULL;
 		goto useDefaultBuffer;
+		
 	}else{
 		
 		//Se o ponteiro para buffer dedicado indicado na estrutura
 		//for inválido.
-		if( (void*) window->DedicatedBuffer == NULL ){
+		
+		if ( (void *) window->DedicatedBuffer == NULL )
+		{
 			goto useDefaultBuffer;
 		}
 		
@@ -127,44 +130,51 @@ pixelPutPixelDedicatedWindowBuffer( struct window_d *window,
 		//tem que alocar dinâmicamente memória para o buffer corretamente.
 		//e não pode admitir falha nesse requesito.
 		
-		
-		buff = (void*) window->DedicatedBuffer;
+		buff = (void *) window->DedicatedBuffer;
 		goto useDedicatedBuffer;
-		//
-		//
-	}
+	};
+	
 	//Nothing.
 	
 // Somos obrigados a usar o buffer dedicado da janela principal.	
 //@por enquanto isso não será considerado uma falha.
 useDefaultBuffer:
+
 	//@todo: pegar o buffer default.
-	buff = (void*) gui->defaultWindowDedicatedBuffer1;
-	if( (void*) buff == NULL ){
+	buff = (void *) gui->defaultWindowDedicatedBuffer1;
+	
+	if ( (void *) buff == NULL )
+	{
 		//@todo: Alocamos memória par a o buffer
 		
 		//buff = (void*) malloc(SIZE??);
 		
 		printf("pixelPutPixelDedicatedWindowBuffer:");
-		refresh_screen();
-		while(1){}
-	}
+		die();
+		//refresh_screen();
+		//while(1){}
+	};
+	
 	//...pinta asm_putpixel()
 //Aqui conseguimos encontrar o buffer dedicado da janela em questão.	
 //O buffer selecionad foi o buffer dedicado da janela. temos que checar.
 useDedicatedBuffer:	
-	if( (void*) buff == NULL ){
+
+	if ( (void *) buff == NULL )
+	{
 		//@todo: Alocamos memória par a o buffer
 		
 		//buff = (void*) malloc(SIZE??);
 		
 		printf("pixelPutPixelDedicatedWindowBuffer:");
-		refresh_screen();
-		while(1){}
+		die();
+		
+		//refresh_screen();
+		//while(1){}
 	}
 	//pinta. asm_putpixel()
     return;	
-}
+};
 
 
 /*
@@ -192,14 +202,14 @@ my_buffer_put_pixel( unsigned long ax,
 				     unsigned long cx, 
 					 unsigned long dx )
 {
-    hal_backbuffer_putpixel( ax, bx, cx, dx );
-	//return;
+    hal_backbuffer_putpixel ( ax, bx, cx, dx );
 };
 
 
 //pega um pixel no backbuffer
-unsigned long get_pixel( unsigned long x,  unsigned long y )
-{
+//tem que usar variável pra bytes per pixel e screen width. 
+unsigned long get_pixel ( unsigned long x,  unsigned long y ){
+	
 	//SALVA A COR
 	unsigned long COLOR;
 	
@@ -208,7 +218,7 @@ unsigned long get_pixel( unsigned long x,  unsigned long y )
     unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;	
 	unsigned long pos = (unsigned long) (y*3*800)+(x*3);
 	
-	COLOR  = *( unsigned long* )&backbuffer[pos];
+	COLOR  = *( unsigned long * ) &backbuffer[pos];
 	
 	//talvez isso seja invertido
 	//rgba[3] = backbuffer[pos];
@@ -217,12 +227,13 @@ unsigned long get_pixel( unsigned long x,  unsigned long y )
 	//rgba[0] = backbuffer[pos+3+3+3];
 
     return (unsigned long) COLOR;	
-}
+};
 
 
 //copia um pixel do backbuffer para o frontbuffer
-void refresh_pixel( unsigned long x,  unsigned long y )
-{	
+//tem que usar variável pra bytes per pixel e screen width.
+void refresh_pixel ( unsigned long x,  unsigned long y ){
+	
 	//SALVA A COR
 	unsigned long COLOR;
 	
@@ -236,7 +247,7 @@ void refresh_pixel( unsigned long x,  unsigned long y )
 	//pego o pixel no backbuffer
 	COLOR = get_pixel( x, y );
 	
-	*( unsigned long* ) &frontbuffer[pos] = COLOR;
+	*( unsigned long * ) &frontbuffer[pos] = COLOR;
 	//*( unsigned long* )&frontbuffer[pos] = get_pixel( x, y );
 
 	
@@ -251,11 +262,4 @@ void refresh_pixel( unsigned long x,  unsigned long y )
 //
 // End.
 //
-
-
-
-
-
-
-
 
