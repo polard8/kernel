@@ -1890,7 +1890,16 @@ void refresh_horizontal_line( unsigned long x1,
 void refresh_rectangle( unsigned long x, 
                         unsigned long y, 
 						unsigned long width, 
-						unsigned long height );					
+						unsigned long height );	
+
+//envia um retângulo de um buffer para outro.
+void 
+refresh_rectangle2 ( unsigned long x, 
+                    unsigned long y, 
+				    unsigned long width, 
+				    unsigned long height,
+                    unsigned long buffer1,
+                    unsigned long buffer2 );						
 
 	
 //Pinta um pixel em um buffer de janela.
