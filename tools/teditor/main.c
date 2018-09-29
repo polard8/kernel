@@ -1,7 +1,11 @@
-// main.c 
-// Arquivo principal do aplicativo teditor.bin
-// O aplicativo é usado para testes do sistema operacional 
-// Gramado 0.3
+/*
+ * File: main.c
+ *
+ * Arquivo principal do aplicativo teditor.bin 
+ * O aplicativo é usado para testes do sistema operacional Gramado 0.3.
+ *
+ * 2018 - Created by Fred Nora.
+ */
 
 
 #include <types.h>
@@ -31,13 +35,14 @@ int running = 1;
 
 void editorClearScreen(); 
 
+
 /*
  ************************************************************
  * mainGetMessage:
  *     Função principla chamada pelo crt0.asm.
  *     Testando o recebimento de mensagens enviadas pelo shell.
- *
  */
+ 
 #define LSH_TOK_DELIM " \t\r\n\a" 
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
@@ -55,13 +60,11 @@ int mainGetMessage (){
 	char *shared_memory = (char *) (0xC0800000 -0x100);	
 	
 	
-//#ifdef TEDITOR_VERBOSE	
+#ifdef TEDITOR_VERBOSE	
+	
 	printf("\n");
 	printf("mainGetMessage:\n");
-	printf("Initializing teditor.bin ...\n\n");
-//#endif	
-	
-//#ifdef TEDITOR_VERBOSE		
+	printf("Initializing teditor.bin ...\n\n");	
 	//printf("\n");
 	//printf(".\n");
 	printf("..\n");
@@ -69,13 +72,16 @@ int mainGetMessage (){
 	printf("..\n");
 	//printf(".\n");
 	//printf("\n");
-//#endif
 	
+	//#debug
 	//while(1){
 	//	asm ("pause");
 	//}
+	
+#endif
+	
 
-// Criando o ambiente.
+    // Criando o ambiente.
 	// Transferindo os ponteiros do vetor para o ambiente.
 
 	tokenList[0] = strtok( &shared_memory[0], LSH_TOK_DELIM);
@@ -83,7 +89,6 @@ int mainGetMessage (){
  	// Salva a primeira palavra digitada.
 	token = (char *) tokenList[0];
  
-
 	index = 0;                                  
     while ( token != NULL )
 	{
@@ -107,7 +112,6 @@ int mainGetMessage (){
     tokenList[index] = NULL;	
 	
 	
-	
 	// #debug 
 	// Mostra argumentos.
 #ifdef TEDITOR_VERBOSE	
@@ -116,15 +120,15 @@ int mainGetMessage (){
 	printf("token_count={%d}\n", token_count );
 	
 	//Mostra os primeiros argumentos.
-	for( index=0; index < token_count; index++ )
+	for ( index=0; index < token_count; index++ )
 	{
 		token = (char *) tokenList[index];
-	    if( token == NULL )
+	    if ( token == NULL )
 		{
 			printf("mainGetMessage: for fail!\n")
 			goto hang;
 		}
-	    printf(" ## argv{%d}={%s} ##  \n", index, tokenList[index] );		
+	    printf("## argv{%d}={%s} ## \n", index, tokenList[index] );		
 	};
 #endif	
 	
@@ -136,21 +140,22 @@ int mainGetMessage (){
 	printf("Calling mainTextEditor ... \n"); 
 #endif	
 	
-	if( mainTextEditor( token_count, tokenList ) == 1 )
+	if ( mainTextEditor( token_count, tokenList ) == 1 )
 	{
-//#ifdef TEDITOR_VERBOSE				
+#ifdef TEDITOR_VERBOSE				
 		printf("mainGetMessage: mainTextEditor returned 1.\n");
-//#endif 
+#endif 
 	}else{
 //#ifdef TEDITOR_VERBOSE				
-		printf("mainGetMessage: mainTextEditor returned 0.\n");
+		//printf("mainGetMessage: mainTextEditor returned 0.\n");
 //#endif
 	};
 	
     printf("*HANG\n");
-hang:
-    asm("pause");
-    goto hang;
+	
+    while (1){
+        asm("pause");
+    };
 };
 
 
@@ -175,12 +180,12 @@ int mainTextEditor ( int argc, char *argv[] ){
 	//#todo: analizar a contagem de argumentos.
 	
 	
-//#ifdef TEDITOR_VERBOSE			
+#ifdef TEDITOR_VERBOSE			
 	printf("\n");
 	printf("Initializing Text Editor:\n");
-	printf("mainTextEditor:  # argv0={%s} # \n", argv[0] );	
-	printf("mainTextEditor:  # argv1={%s} # \n", argv[1] );
-//#endif	
+	printf("mainTextEditor: # argv0={%s} # \n", argv[0] );	
+	printf("mainTextEditor: # argv1={%s} # \n", argv[1] );
+#endif	
 
     //#debug
     //while(1){
@@ -218,14 +223,12 @@ int mainTextEditor ( int argc, char *argv[] ){
 	
 
 	//
-	// ## BARs ##
+	// ## Window ##
 	//
-	
-bars:
     
 	//Criando uma janela para meu editor de textos.
 	apiBeginPaint(); 
-	hWindow = (void *) APICreateWindow( WT_OVERLAPPED, 1, 1,"TEDITOR",
+	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1,"TEDITOR",
 	                    20, 20, 800-40, 600-40,    
                         0, 0, 0x303030, 0x303030 );	   
 
@@ -259,55 +262,57 @@ bars:
 	//  ## Testing file support. ##
 	//
 	
-file:
+//file:
 
-//#ifdef TEDITOR_VERBOSE		
+#ifdef TEDITOR_VERBOSE		
 	printf("\n");
 	printf("\n");
     printf("Loading file ...\n");
-//#endif	
+#endif	
 	
 	//Page fault:
     
 	// Pegando o argumento 1, porque o argumento 0 é o nome do editor.
 	
-
 	//#test
-	if ( (char *) argv[1] == NULL )
-	{
-		//printf("no file\n");
+	//Se nenhum nome de arquivo foi especificado, então começamos a digitar.
+	if ( (char *) argv[1] == NULL ){
+		
 	    goto startTyping;	
-	}
+	};
 	
+	//Carregando arquivo.
 	fp = fopen( (char *) argv[1], "rb" );	
 	
-	if( fp == NULL )
+	if ( fp == NULL )
     {
         printf("fopen fail\n");
         goto startTyping;
-		//goto fail;		
+		
     }else{
+		
+		//Mostrando o arquivo.
 		
 #ifdef TEDITOR_VERBOSE			
         printf(".\n");		
         printf("..\n");		
-        printf("...\n");
+        //printf("...\n");
 #endif 
-		// Exibe o arquivo.
+	
         printf ( "%s", fp->_base );	
 
 #ifdef TEDITOR_VERBOSE	        
-		printf("...\n");
+		//printf("...\n");
         printf("..\n");		
         printf(".\n");		
 #endif
 
 startTyping:
 
-//#ifdef TEDITOR_VERBOSE	
+#ifdef TEDITOR_VERBOSE	
 		printf("\n");
 		printf("Typing a text ...\n");
-//#endif
+#endif
 
 
 //#importante:
@@ -317,23 +322,24 @@ startTyping:
 //Pois o aplicativo deve receber mensagens 
 //sobre eventos de input de teclado e mouse,
 //assim como os controles.
+
 Mainloop:		
+
 	    while (running)
 	    {
 			//enterCriticalSection(); 
 	        ch = (int) getchar();
 			//exitCriticalSection();
 			
-			if(ch == -1)
+			if (ch == -1)
 			{
 			    asm("pause");
                // printf("EOF reached! ?? \n");  				
 			};
 			
-	        if(ch != -1)
+	        if (ch != -1)
 	        {
-				
-	            printf("%c",ch);
+	            printf ("%c", ch );
 	    
 	            //switch(ch)
                 //{
@@ -359,7 +365,7 @@ done:
     running = 0;
     printf("Exiting editor ...\n");
     printf("done.\n");
-	while(1)
+	while (1)
 	{
 		asm("pause");
 		exit(0);

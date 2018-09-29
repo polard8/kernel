@@ -7,15 +7,15 @@
 echo -{ ...
 echo -{ Creating application TEDITOR.BIN ...
 
-    nasm c:\gramado\tests\teditor\crt0.asm -f elf -o crt0.o
+    nasm c:\gramado\tools\teditor\crt0.asm -f elf -o crt0.o
 	
 :Compiling	
 echo -{ ...
 echo -{ Compiling ...
 
-	gcc -c c:\gramado\tests\teditor\main.c   -I c:\gramado\include\libc -o main.o  
-	gcc -c c:\gramado\tests\teditor\status.c -I c:\gramado\include\libc -o status.o 
-	gcc -c c:\gramado\tests\teditor\topbar.c -I c:\gramado\include\libc -o topbar.o 
+	gcc -c c:\gramado\tools\teditor\main.c   -I c:\gramado\include\libc -o main.o  
+	gcc -c c:\gramado\tools\teditor\status.c -I c:\gramado\include\libc -o status.o 
+	gcc -c c:\gramado\tools\teditor\topbar.c -I c:\gramado\include\libc -o topbar.o 
  
 
     copy c:\gramado\lib\ctype.o     c:\sdk\bin\ctype.o 
@@ -44,7 +44,7 @@ topbar.o
 echo -{ ...
 echo -{ Linking objects ... 
    
-   ld -T c:\gramado\tests\teditor\link.ld -o TEDITOR.BIN %myObjects% -Map  test_map.s
+   ld -T c:\gramado\tools\teditor\link.ld -o TEDITOR.BIN %myObjects% -Map  test_map.s
    
    rem Não deletar os objetos.
  
