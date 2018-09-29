@@ -1,8 +1,8 @@
 /*
  * File: mk\pc\ts.c
  *
- * Descrição:
  *     Task Switching.
+ *
  *     Faz parte do Process Manager, parte fundamental do Kernel Base.
  *     Rotinas de Task Switch. Salva o contexto da tarefa, chama o scheduler 
  * pra trocar a tarefa e depois chama o dispatcher pra rodar a próxima.
@@ -56,7 +56,6 @@ void taskswitchFlushTLB(){
 
 
 /*
- *********************************************************
  * KiTaskSwitch:
  *     Interface para chamar a rotina de Task Switch.
  *     Essa rotina somente é chamada por hw.inc.
@@ -124,15 +123,13 @@ void KiTaskSwitch (){
 
 
 /*
- *******************************************************
  * task_switch:
  *
- *     Gerencia a rotina de troca de thread, realizando 
- * operações de salvamento e restauração de contexto, 
- * seleciona a próxima thread através do scheduler, 
- * despacha a thread selecionada através do dispatcher e 
- * retorna para a função _irq0 em hw.inc, que configurará 
- * os registradores e executará a thread através do 
+ *     Gerencia a rotina de troca de thread, realizando operações de 
+ * salvamento e restauração de contexto, seleciona a próxima thread 
+ * através do scheduler, despacha a thread selecionada através do 
+ * dispatcher e retorna para a função _irq0 em hw.inc, que 
+ * configurará os registradores e executará a thread através do 
  * método iret.
  *
  * Obs:
@@ -304,28 +301,26 @@ void task_switch (){
 			//
 		
 		    // * MOVEMENT 3 (Running --> Ready).
-		    if( Current->state == RUNNING )
+		    if ( Current->state == RUNNING )
 		    {
                 // MOVEMENT 3 (running >> ready)  				
 			    Current->state = READY;    //Preempt.
 		    
 			    // Início da fila onde a prioridade é menor.
-			    if( Current->preempted = PREEMPTABLE )
+			    if ( Current->preempted == PREEMPTABLE )
 				{
 					// @todo: Nesse momento prioridade pode ser baixada para 
 					// o nível de equilíbrio.
-			        queue_insert_head( queue, 
-					                   (unsigned long) Current, 
-									   QUEUE_READY );	
+			        queue_insert_head ( queue, (unsigned long) Current, 
+					    QUEUE_READY );	
 			    };
 			
 			    // Fim da fila onde a prioridade é maior.
-			    if(Current->preempted = UNPREEMPTABLE)
+			    if ( Current->preempted == UNPREEMPTABLE )
 				{
 					//Obs: Não abaixa a prioridade.
-			        queue_insert_data( queue, 
-					                   (unsigned long) Current, 
-									   QUEUE_READY );	
+			        queue_insert_data( queue, (unsigned long) Current, 
+						QUEUE_READY );	
 			    };
 			    //Nothing.
 		    };
@@ -390,7 +385,7 @@ try_next:
 	//
 	
 	// Checa se é o último da lista encadeada.
-	if( (void*) Conductor->Next == NULL )
+	if ( (void *) Conductor->Next == NULL )
 	{
 		// #Agendar.
 		// Fim da lista.  
@@ -404,7 +399,7 @@ try_next:
 	
 	
 	// Se ainda não for o último da lista encadeada.
-	if( (void*) Conductor->Next != NULL )
+	if ( (void *) Conductor->Next != NULL )
 	{
 	    // O condutor avança e pega o próximo da lista.
 		Conductor = (void *) Conductor->Next;
@@ -453,8 +448,7 @@ go_ahead:
 		// Se for inválido, tentamos novamente.
 		// @todo: #bugbug Isso pode gerar um loop infinito.
 		
-		if( Current->used != 1 || 
-		    Current->magic != 1234 )
+		if( Current->used != 1 || Current->magic != 1234 )
 		{
 			//#bugbug Isso pode gerar um loop infinito.
 			goto try_next;	
@@ -463,7 +457,7 @@ go_ahead:
 		//Se não está pronta a thread.
 		//Tentamos novamente.
 		//@todo: #bugbug Isso pode gerar um loop infinito.
-	    if( Current->state != READY )
+	    if ( Current->state != READY )
 		{
 			//#bugbug Isso pode gerar um loop infinito.
 	        goto try_next; 
@@ -515,10 +509,10 @@ dispatch_current:
 	// @todo: Resiliência. Tomar uma decisão e não desistir.
 	// A idle é sempre uma última opção.
     Current = (void *) threadList[current_thread];
-	if( (void *) Current == NULL )
+	
+	if ( (void *) Current == NULL )
 	{
 		panic("task_switch.dispatch_current error: Struct");
-	    //die();
 	}else{
 		
 		// @todo: Resiliência. Tomar uma decisão e não desistir.
@@ -528,9 +522,10 @@ dispatch_current:
 			Current->state != READY )
 	    {
 	        panic("task_switch.dispatch_current error: Param");
-	        //die();
 	    };
+		
         //Obs: Podemos filtrar outros parâmetros sistemicamente importante.		
+		
 		//Nothing.
 	};
 	
@@ -538,13 +533,10 @@ dispatch_current:
 	// quantas vezes a thread usou a CPU até esgotar o quantum, sua cota.
 	Current->runningCount = 0;
 	
-	
-	//
 	// #importante:
 	// Chama o dispatcher. 
 	// Isso coloca a thread selecionada no estado RUNNING 
 	// e restaura o contexto.
-	//
 	
 	//
 	// * MOVEMENT 4 (Ready --> Running).
@@ -552,7 +544,6 @@ dispatch_current:
 	
 	dispatcher(DISPATCHER_CURRENT);    	
 	
-	//
 	// #importante: 
 	// Retornamos do dispatcher.
 	// O dispatcher restaurou o contexto para a próxima thread, 
@@ -561,14 +552,13 @@ dispatch_current:
 	// Agora vamos retornar para a rotina da _irq0 feita em assembly, 
 	// que está em head\x86\hw.inc, mas antes, voltamos para a 
 	// interface KiTaskSwitch() que chamou essa rotina.
-	//
 	
 	//Nothing.
 	
 //Done.
 done:
     
-	//
+	
 	// @todo: 
 	// Salvar em uma variável global o cr3 do processo 
 	// da thread selecionada para que a rotina em assembly, 
@@ -585,13 +575,14 @@ done:
 	//        Isso resolve o problema.
 	//
 	// #bugbug @todo: filtrar se o id é válido.
-	//
+	
 	
 	// #Overflow. 
 	// Checar se não é maior que o número máximo de índices 
 	// que a lista suporta.
 	
-	if ( Current->ownerPID < 0 || Current->ownerPID >= THREAD_COUNT_MAX ){
+	if ( Current->ownerPID < 0 || Current->ownerPID >= THREAD_COUNT_MAX )
+	{
 		
 		printf("taskswitch: ownerPID fail \n", Current->ownerPID );
 		die();
@@ -599,23 +590,21 @@ done:
 	
 	// Checando processo.
 	
-    P = (void*) processList[Current->ownerPID];
+    P = (void *) processList[Current->ownerPID];
 	
+	//fail;
 	// Estrutura inválida
-	if( (void*) P == NULL )
+	if ( (void *) P == NULL )
 	{
-		//fail;
-		printf("taskswitch: Process %s struct fail \n", 
-		    P->name_address );
+		printf("taskswitch: Process %s struct fail \n", P->name_address );
 		die();
 	};
 	
 	// Estrutura válida.
-	if( (void*) P != NULL )
+	if ( (void *) P != NULL )
 	{
 		// Corrompida.
-		if( P->used != 1 || 
-		    P->magic != 1234 )
+		if ( P->used != 1 || P->magic != 1234 )
 		{
 			//fail
 		    printf("taskswitch: Process %s corrompido \n", 
@@ -624,8 +613,7 @@ done:
 		};
 			
 		// Não corrompida.	
-		if( P->used == 1 && 
-		    P->magic == 1234 )
+		if ( P->used == 1 && P->magic == 1234 )
 		{
 		    current_process = (int) P->pid;
 			
@@ -684,7 +672,8 @@ done:
 	//#breakpoint
 	printf("task_switch: debug breakpoint\n");
 	refresh_screen();
-	while(1){
+	
+	while (1){
 		asm("hlt");
 	}
 		
@@ -840,8 +829,7 @@ dispatch_current:
  * @todo: Mudar o nome dessa função para taskswitchSetStatus(.);
  *
  */ 
-void 
-set_task_status( unsigned long status )
+void set_task_status( unsigned long status )
 {
     //#bugbug: Mudar para int.	
 	task_switch_status = (unsigned long) status;
@@ -855,8 +843,7 @@ set_task_status( unsigned long status )
  *
  * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
  */
-unsigned long 
-get_task_status()
+unsigned long get_task_status()
 {
     //#bugbug: Mudar para int.		
     return (unsigned long) task_switch_status;
@@ -869,9 +856,8 @@ get_task_status()
  *     Trava o mecanismo de taskswitch.
  *     @todo: Mudar para taskswitchLock().
  */ 
-void 
-taskswitch_lock()
-{
+void taskswitch_lock (){
+	
     task_switch_status = (unsigned long) LOCKED;
 };
 
@@ -882,9 +868,8 @@ taskswitch_lock()
  *     Destrava o mecanismo de taskswitch.
  *     @todo: Mudar para taskswitchUnlock().
  */ 
-void 
-taskswitch_unlock()
-{
+void taskswitch_unlock (){
+	
     task_switch_status = (unsigned long) UNLOCKED;
 };
 

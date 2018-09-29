@@ -1184,13 +1184,15 @@ void *services( unsigned long number,
 		//184
 		//pega o endereço do heap do processo dado seu id.	
         case SYS_GETPROCESSHEAPPOINTER:
-            return (void *) GetProcessHeapStart( (int) arg2 );
+            return (void *) GetProcessHeapStart ( (int) arg2 );
 			break;		
 			
 
 		//199 - Garbage Collector.	
+		//A ideia é que os utilitários de gerência de memória possam usar isso.
 		case SYS_GC:
-		    gc();
+		    gc ();
+			//return (void *) gc (); 
 		    break;
 		
 		//200 - Envia um sinal para um processo.	

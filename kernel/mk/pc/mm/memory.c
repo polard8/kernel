@@ -1226,39 +1226,57 @@ int gcGRAMADO (){
 
 /*
  gcEXECUTIVE:
-    //limpa a camada /executive.
-    Esse é o Garbage Collector, o trabalho dele é checar nas listas 
- de ponteiros de estrutura se encontra, estruturas sinalizadas para serem 
-  liberadas. Quando encontra uma estrutura sinalizada, libera os recurso da 
+ 
+    Limpa a camada /execve.
+    
+	Esse é o Garbage Collector, o trabalho dele é checar nas listas 
+ de ponteiros de estrutura e encontrar estruturas sinalizadas para 
+ serem liberadas. 
+ 
+    Quando encontra uma estrutura sinalizada, libera os recurso da 
 estrutura.
-  Obs: As estruturas poderão ser deletadas ou não.
-  Obs: A área do cliente na estrutura mmblock deverá se preenchida com zero
-       quando a estrutura estiver sinalizada.
-       O garbage collector é um serviço do kernel, e poderá ser 
-	   chamado por interrupção. Pois utilitários de gerência de memória 
-	   usarão recursos de gerência de memória oferecidos pelo kernel.
-  Obs: a função gc() poderá ser chamada de tempod em tempos do mesmo modo 
-       que o dead thread collector.
+   
+   --------
+
+    Obs:
+        #importante: 
+        As estruturas poderão ser deletadas ou não.
+  
+    Obs: 
+	    A área do cliente na estrutura mmblock deverá se preenchida com zero
+        quando a estrutura estiver sinalizada como reutilizável.
+        
+	Obs:	
+		O garbage collector é um serviço do kernel, e poderá ser 
+	    chamado por interrupção. Pois utilitários de gerência de memória 
+	    usarão recursos de gerência de memória oferecidos pelo kernel.
+		
+    Obs: 
+	    A função gc() poderá ser chamada de tempos em tempos, do mesmo modo 
+        que o dead thread collector.
+		#todo: Resta encontrarmos quais são os momentos em que essas rotinas 
+		são chamadas.
 	   
-  Obs: 
-        Importante:
+    Obs: 
+        #Importante:
 		O GC deve efetuar apenas uma operação de liberação, mesmo que 
         haja muita coisa pra fazer, pois não queremos que ele use 
 		muito tempo de processamento prejudicando os outros processos.
 		Pois bem, ele efetua apenas uma operação de limpeza e sai sem erro.
-		se não encontrar nada pra fazer, também sai sem erro.
+		Se não encontrar nada pra fazer, também sai sem erro.
 		
 		@todo: Cria os 'for's para as outras listas.
-		 @todo: Criar as rotinas de limpeza para as outras listas.
+		@todo: Criar as rotinas de limpeza para as outras listas.
 		 
-	//@todo 
 	
-	//+Checar as etruturas de mmblock e liberar 
-	// as estruturas marcadas como Free=1.
-	//para isso deve haver um array mmblockList[].
+	#### #todo: #### 
 	
-	//+Checar as estruturas de janela e liberar as 
-	//estiverem marcadas como used=216 e magic=4321.
+	#importante:
+	+Checar as etruturas de mmblock e liberar as estruturas marcadas como Free=1.
+	 ?? Para isso deve haver um array mmblockList[].
+	
+	+Checar as estruturas de janela e liberar as estiverem marcadas 
+	 como used=216 e magic=4321.
 
 	*Importante:
 	Essa rotina deve limpar alocações de memória e não estruturas de 
@@ -1266,9 +1284,6 @@ estrutura.
 	+O módulo de gerência de recursos gráficos que limpe suas listas.
 	+O módulo de gerência de processos que limpe suas listas.
     +O módulo de gerência de threads que limpe suas listas.
-	
-	
-	
  */
 int gcEXECUTIVE (){
 	
@@ -1281,16 +1296,26 @@ int gcEXECUTIVE (){
 	// Importante: Cada lista contêm um tipo de estrutura.
 	// Importante: Limparemos somente as listas que pertencem ao módulo /ram
 	
+	
+	//#importante:
+	//mmblock_d é a estrutura usada pelo malloc para organizar as alocações 
+	//dentro de um heap. 
+	//Essa estrutura será sinalizada com Free=1 e precisa liberar a área do cliente.
+	
 	//mmblockList[]
+	//#importante: Nessa lista tem ponteiros para uma estrutura especial,
+	//usada pela malloc para organizar os blocos de memória que serão utilizados 
+	//para alocação dinâmica.
 	for ( i=0; i<MMBLOCK_COUNT_MAX; i++ )
 	{
-	    b = (void*) mmblockList[i];
+	    b = (void *) mmblockList[i];
 		
 		//ponteiro válido.
-	    if( (void*) b != NULL )
+	    if( (void *) b != NULL )
 		{
 			//sinalizado para o GC.
-			if( b->Used == 216 && b->Magic == 4321 ){
+			if( b->Used == 216 && b->Magic == 4321 && b->Free == 1 )
+			{
 				goto clear_mmblock;
 			}
 		}
@@ -1298,23 +1323,28 @@ int gcEXECUTIVE (){
 	
 	
 	//heapList[]
+	//Limpar a lista de heaps.
+	//Existirão vários heaps que poderão ser usados pelos alocadores.
+	//Essa lista tem o pnteiros para heaps.
 	for ( i=0; i<HEAP_COUNT_MAX; i++ )
 	{
-	    h = (void*) heapList[i];
+	    h = (void *) heapList[i];
 		
 		//ponteiro válido.
-	    if( (void*) h != NULL )
+	    if( (void *) h != NULL )
 		{
 			//sinalizado para o GC.
-			if( h->Used == 216 && h->Magic == 4321 ){
+			if( h->Used == 216 && h->Magic == 4321 )
+			{
 				goto clear_heap;
 			}
 		}
 	};
 	
 	//
+	// #### #importante ####
 	// @todo: Cria os 'for's para as outras listas.
-	//
+	// ex: session, window station, desktop, window etc ...
 
 	
     goto done;
@@ -1331,13 +1361,23 @@ clear_mmblock:
 	if ( (void *) b != NULL )
     {
 		//Checar se a área alocada está dentro dos limites.
-	    if( (b->userArea + b->userareaSize) != b->Footer ){
-			printf("gc fail: User Area Size");
-			goto fail;
+	    //O inicio da área mais o tamanho dela tem que coincidir 
+		//com o footer.
+		if ( (b->userArea + b->userareaSize) != b->Footer )
+		{
+			//#debug
+			//printf("gc fail: User Area Size");
+			//goto fail;
+			
+			return (int) 1;
+		
 		}else{
-	        //preenche com zeros.
-			bzero( (char*) b->userArea , (int) b->userareaSize);
+			
+	        //preenche com zeros a área do cliente.
+			bzero ( (char *) b->userArea, (int) b->userareaSize );
+		
 		};
+		
         //Nothing.		
 	};
 	goto done;
@@ -1353,12 +1393,20 @@ clear_heap:
 		//h->Used  = 1;
 		//h->Magic = 1234;
 		
+		//#todo: 
+		//Por enquanto vamos desabilitar a estrutura cancelada 
+		//pelo sistema.
+		if ( h->Used == 216 && h->Magic == 4321 )
+		{
+			h->Used = 0;
+			h->Magic = 0;
+			h = NULL;
+		}
+		
 		//lista encadeada de blocos que formavam o heap.
 		//podemos apenas sinalizar todos os mmblocks dessa lista e depois o GC acaba com eles.
 		//para isso precisamos de um 'for'.
-		//h->mmblockListHead = NULL;
-        		
-		
+		//h->mmblockListHead = NULL;		
 	};
 	goto done;
 	//Nothing.
@@ -1376,74 +1424,103 @@ done:
 
 
 //limpa a camada /microkernel
-int gcMICROKERNEL()
-{
+int gcMICROKERNEL (){
+	
 	return (int) 0;
 };
 
 
 //limpa a camada /hal
-int gcHAL()
-{
+int gcHAL (){
+	
 	return (int) 0;
 };
 
 
 /*
- ******************************************************
  * gc:
- *     Garbage Collector.
+ *     Garbage Collector.     
  *	   
  * Call all Garbage Collections rotines.
  * Clear all layers.
  *	
- * +GRAMADO +EXECUTIVE +MICROKERNEL +HAL
+ * +GRAMADO 
+ * +EXECUTIVE 
+ * +MICROKERNEL 
+ * +HAL
  *
+ * #importante:
+ *    Em duas condições as estruturas poderão ser destruidas ou
+ * reaproveitadas: Quando a estrutura usada pelo malloc estiver sinalizada com Free=1
+ * e quando as outras estruturas estiverem com a flag igual a used=216 e magic=4321.
+ *
+ *   #importante:
+ *   Para não perdermos muito tempo com a rotina de limpeza devemos limpar
+ *   apenas uma estrutura e saírmos.
  */
+
+
+ 
 int gc (){
 	
     int Status;
 	
-clearGramadoLayer:
+//clearGramadoLayer:
+
     Status = (int) gcGRAMADO ();
-    if( Status == 1 )
+    if ( Status == 1 )
 	{
-		printf("gc: clearGramadoLayer:\n");
-		goto fail;
+		//#debug
+		//printf("gc: clearGramadoLayer:\n");
+		//goto fail;
+		
+		return (int) 1;
 	}
 	
-clearExecutiveLayer:
+//clearExecutiveLayer:
+
     Status = (int) gcEXECUTIVE();
-    if( Status == 1 )
+    if ( Status == 1 )
 	{
-		printf("gc: clearExecutiveLayer:\n");
-		goto fail;
+		//#debug
+		//printf("gc: clearExecutiveLayer:\n");
+		//goto fail;
+		
+		return (int) 1;
 	}
 	
-clearMicrokernelLayer:
+//clearMicrokernelLayer:
+
     Status = (int) gcMICROKERNEL();
     if( Status == 1 )
 	{
-		printf("gc: clearMicrokernelLayer:\n");
-		goto fail;
+		//#debug
+		//printf("gc: clearMicrokernelLayer:\n");
+		//goto fail;
+		
+		return (int) 1;
 	}
 	
-clearHalLayer:
+//clearHalLayer:
+
     Status = (int) gcHAL();
     if( Status == 1 )
 	{
-		printf("gc: clearHalLayer:\n");
-		goto fail;
+		//#debug
+		//printf("gc: clearHalLayer:\n");
+		//goto fail;
+	    
+		return (int) 1;
 	}
 
-done:
+//done:
     return (int) 0;	
-fail:
-    printf("# FAIL #\n");	
-	refresh_screen();
-	return (int) 1;
+	
+//fail:
+    //printf("# FAIL #\n");	
+	//refresh_screen();
+	//return (int) 1;
 };
-
 
 
 /*
@@ -1453,6 +1530,7 @@ int mmInit()
 }
 */
 
+
 //
-//fim.
+// End.
 //

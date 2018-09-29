@@ -1157,6 +1157,7 @@ void show_memory_structs();
 //
 
 int gc();
+
 int gcGRAMADO();
 int gcEXECUTIVE();
 int gcMICROKERNEL();

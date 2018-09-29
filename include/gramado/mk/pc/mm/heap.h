@@ -1,5 +1,5 @@
 /*
- * File: ram\heap.h
+ * File: \heap.h
  *
  * Descrição:
  *     Gerenciar o ponteiro global para o heap atual, onde será

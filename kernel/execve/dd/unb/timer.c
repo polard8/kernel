@@ -1,5 +1,5 @@
 /*
- * File: unblocked\timer.c 
+ * File: unb\timer.c 
  *  
  * Descrição:
  *     Arquivo principal do driver do PIT. 
@@ -125,55 +125,40 @@ void timer();
  *     Apenas a ISR0, _irq0, pode chamar essa rotina.
  *     #bugbug deletar essa rotina.
  */
-void KeTimer()
-{
+void KeTimer (){
     
-	//
 	// A estrutura para o dispositivo
 	// tem informações sobre o driver.
 	// parte das rotinas de timer podem
 	// ser implementadas em user mode
 	// ou módulo externo do kernel.
-	//
 	
-	
-	KiTimer();	//#suspensa. (usando o handler do kernel base.)
-    //return;
+	KiTimer ();	//#suspensa. (usando o handler do kernel base.)
 };
 
 
 
 /*
- ********************************************************
  * KiTimer:
  *     Chama o handler do kernel que está no kernel base.
  */
-void KiTimer()
-{
+void KiTimer (){
 
-    //
-	// Observar alguns procedimentos antes de 
-	// chamar a rotina.
-	//
-	
-done:
-	timer();
-    //return;
+	// Observar alguns procedimentos antes de chamar a rotina.
+
+	timer ();
 };
 
 
-
-
 /*
- ***********************************************
  * timer: 
  *     Handler chamado pelo ISR do timer (IRQ 0).
  *     (Contagem de tempo, tempo das tarefas, 
  * quantum ...).
  *     (tick tick tick)
  */
-void timer()
-{		
+void timer (){
+	
     //Contador de ticks.
 	timerTicks++;    
 
@@ -186,8 +171,6 @@ void timer()
 	//	time_out--;
 	//};
 	
-
-	
 	//
 	// @todo: Tentando clacular os segundos.
 	//
@@ -196,11 +179,9 @@ void timer()
 	//printf("%c", (char) 219 );   	
 	//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 	//g_cursor_x--;			
-
 	
-	// De tempos em tempos.
-	//if( timerTicks % 18 == 0 )  
-	if( timerTicks % 9 == 0 )	 
+	// De tempos em tempos. 
+	if ( timerTicks % 9 == 0 )	 
     {   
         //Incrementa a contagem de tempo de funcionamento do kernel.	
 		kernel_tick++;   
