@@ -336,19 +336,45 @@ struct softlink_d
  *     Structure for MBR parameters.
  *
  */ 
+ 
+#define BS_JmpBoot			0		/* x86 jump instruction (3-byte) */
+#define BS_OEMName			3		/* OEM name (8-byte) */
+#define BPB_BytsPerSec		11		/* Sector size [byte] (WORD) */
+#define BPB_SecPerClus		13		/* Cluster size [sector] (BYTE) */
+#define BPB_RsvdSecCnt		14		/* Size of reserved area [sector] (WORD) */
+#define BPB_NumFATs			16		/* Number of FATs (BYTE) */
+#define BPB_RootEntCnt		17		/* Size of root directory area for FAT [entry] (WORD) */
+#define BPB_TotSec16		19		/* Volume size (16-bit) [sector] (WORD) */
+#define BPB_Media			21		/* Media descriptor byte (BYTE) */
+#define BPB_FATSz16			22		/* FAT size (16-bit) [sector] (WORD) */
+#define BPB_SecPerTrk		24		/* Number of sectors per track for int13h [sector] (WORD) */
+#define BPB_NumHeads		26		/* Number of heads for int13h (WORD) */
+#define BPB_HiddSec			28		/* Volume offset from top of the drive (DWORD) */
+#define BPB_TotSec32		32		/* Volume size (32-bit) [sector] (DWORD) */
+#define BS_DrvNum			36		/* Physical drive number for int13h (BYTE) */
+#define BS_NTres			37		/* WindowsNT error flag (BYTE) */
+#define BS_BootSig			38		/* Extended boot signature (BYTE) */
+#define BS_VolID			39		/* Volume serial number (DWORD) */
+#define BS_VolLab			43		/* Volume label string (8-byte) */
+#define BS_FilSysType		54		/* Filesystem type string (8-byte) */
+#define BS_BootCode			62		/* Boot code (448-byte) */
+#define BS_55AA				510		/* Signature word (WORD) */
+ 
+#define MBR_Table			446		/* MBR: Offset of partition table in the MBR */ 
+ 
 typedef struct mbr_d mbr_t; 
 struct mbr_d
 {
-   /*
-    //Código para realocação do mbr.
-	char relocation_code[19];
+
+/*
+	//jmp code (3 bytes)
 	
-	//Código do boot sector.
-    char boot_code[400];
-      
+	//os name 
 	//Sistem info. 
-    char OEM_ID[4];  //"NORA "
+    char OEM_ID[5];  //"NORA "
     char VERSION[3]; //"1.0"
+	
+	//bpb 
 	  
     //Bpb.	
     unsigned short BytesPerSector;  // dw 512
@@ -370,24 +396,24 @@ struct mbr_d
 	char Flags;                     // db 0x00
 	char bootSignature;             // db 0           ;Extended Boot Signature.
 	long VolumeID;                  // dd 0x00000001
-	char VolumeLabel[10];           // db "FREDNORA8MB"
-	char SystemID[7];               // db "FAT16   "		
+	char VolumeLabel[11];           // db "FREDNORA8MB"
+	char SystemID[8];               // db "FAT16   "		
 	
 	//PointerTable
-	unsigned short SystemName;
-	unsigned short SystemVersion;
-	unsigned short SystemBPB;
-	unsigned short SystemSignature;
+	//unsigned short SystemName;
+	//unsigned short SystemVersion;
+	//unsigned short SystemBPB;
+	//unsigned short SystemSignature;
 	
 	//Partition Table
-	unsigned long p0[3];
-	unsigned long p1[3];
-	unsigned long p2[3];
-	unsigned long p3[3];
+	//unsigned long p0[3];
+	//unsigned long p1[3];
+	//unsigned long p2[3];
+	//unsigned long p3[3];
 	
 	//Signature.
-	unsigned short Signature;	
-	*/
+	unsigned short Signature;
+*/
 }; 
 mbr_t *mbr; 
 //mbr_t *Mbr; 

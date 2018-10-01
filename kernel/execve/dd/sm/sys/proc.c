@@ -1,5 +1,7 @@
 /*
- * File: sm\sys\procedure.c
+ * File: sm\sys\proc.c
+ *
+ *     System Procedure.
  *
  *     ****   Central de diálogo.   ****
  *
@@ -85,7 +87,7 @@ ldisc_dialog( struct window_d *window,
 	//Ponteiro para um buffer em user mode.
 	unsigned long *buffer;
 	
-	if( (void *) window == NULL ){
+	if ( (void *) window == NULL ){
 		return (unsigned long) 0;
 	}
 	
@@ -214,20 +216,16 @@ terminal_dialog( struct window_d *window,
  *
  */
 unsigned long 
-system_procedure( struct window_d *window, 
-                  int msg, 
-				  unsigned long long1, 
-				  unsigned long long2 ) 
+system_procedure ( struct window_d *window, 
+                   int msg, 
+				   unsigned long long1, 
+				   unsigned long long2 ) 
 { 	
-	//
 	// @todo: *importante:
 	//        Não rpecisa dar refresh_screen para todos os casos.
 	//        Cada caso é diferente ... 
 	//        ?? Quem deve chamar esse refresh dos elentos gráficos ??
 	//        O aplicativo ?? acionando a flag através de ShowWindow por exemplo??
-	//
-	
-
 	
 	//debug!
 	//printf("system_procedure: msg={%d} long1={%d}\n", msg, long1);  
@@ -275,9 +273,12 @@ system_procedure( struct window_d *window,
 	// Window With Focus !
 	//window é a janela com o foco de entrada, obtita pelo ldisc.c 
 	//e passada via argumento.
-	if( (void *) window == NULL ){
-	    printf("sm-sys-system_procedure: window");
+	if ( (void *) window == NULL )
+	{
+	    
+		printf("sm-sys-system_procedure: window");
         die();		
+	
 	}else{
 	
 	    //
@@ -339,11 +340,11 @@ system_procedure( struct window_d *window,
 	// o foco de entrada sem fecharmos o terminal.
     //	
     
-	switch(msg)
+	switch (msg)
     { 
 		//teclas de digitação.
 		case MSG_KEYDOWN:
-            switch(long1)
+            switch (long1)
             {	
 				// [ ENTER ]
 				case VK_RETURN:
@@ -469,7 +470,7 @@ system_procedure( struct window_d *window,
           
 		/* ## Teclas do sistema interceptadas pelo kernel ## */  
         case MSG_SYSKEYDOWN:                 
-            switch(long1)	       
+            switch (long1)	       
             {   
                 //
 				// As funções F1 à F12 são opções para o desenvolvedor.
@@ -483,7 +484,6 @@ system_procedure( struct window_d *window,
 				
 				//Obs: 
 				// *Importante: Tem que chamar método pra pegar variável dentro de driver.
-				 
 				
 				//Help. 
 				case VK_F1:	
@@ -525,11 +525,15 @@ system_procedure( struct window_d *window,
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
 				    //pci_info();     //PCI information.
 				    
+					//testando mbr.					
+					fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
+					
 					//Obs: Não usa janelas, isso não mudará o foco.
 					//systemShowDevicesInfo();
 					
+					//isso funciona.
 					//testando a função que converte endereço virtual em físico.
-					printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, KERNEL_PAGEDIRECTORY) ); 
+					//printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, KERNEL_PAGEDIRECTORY) ); 
 					
 					
 					/*

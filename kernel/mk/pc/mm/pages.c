@@ -1641,7 +1641,7 @@ void testingFrameAlloc (){
     //Ret = (void*) allocPageFrames(500);  
 	
 	//8KB. Para imagem pequena.
-	RetAddress = (void*) allocPageFrames(2);      
+	RetAddress = (void *) allocPageFrames(2);      
 	if( (void*) RetAddress == NULL )
 	{
 	    printf("RetAddress fail\n");
@@ -1653,13 +1653,13 @@ void testingFrameAlloc (){
     
 	for ( Index=0; Index < 32; Index++ )   	
 	{  
-        pf = (void*) pageframeAllocList[Index]; 
+        pf = (void *) pageframeAllocList[Index]; 
 		
 		if( (void *) pf == NULL ){
 		    printf("null\n");	 
 		}
 	    
-		if( (void*) pf != NULL )
+		if ( (void *) pf != NULL )
 		{
 		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", pf->id,
 			    pf->used, pf->magic, pf->free, pf, pf->next ); 	

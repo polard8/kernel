@@ -58,9 +58,6 @@ file_flag db 0
 
 
 
-
-
-
 ;Inicialização.
 boot_string		  db     'boot', 0    ;Inicia com a configuração atual. 
 reboot_string	  db   'reboot', 0    ;Reinicia o sistema.
@@ -197,7 +194,7 @@ msg_file_op7 db "Open app", 13, 10 ,0
 
 ;Strings e messages.   
 version_msg:		db 'Gramado Boot Manager Version ', BOOT_VER, 
-                    db ' (c) Copyright 2013-2017', 13, 10, 0
+                    db ' (c) Copyright 2013-2018', 13, 10, 0
 
 not_found_msg:	    db 'Command or file not found', 13, 10, 0
 hd_msg:             db 'Reading sector', 13, 10, 0

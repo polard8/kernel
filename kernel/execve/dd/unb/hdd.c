@@ -82,11 +82,13 @@ void my_read_hd_sector( unsigned long ax,
 {
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
-	hd_lba    = (unsigned long) bx;    //arg2 = lba.
+	hd_lba = (unsigned long) bx;       //arg2 = lba.
 	
 	// Read sector. (ASM)
 	os_read_sector(); 	
-    return;
+    
+	//#todo: deletar esse return.
+	return;
 };
 
 

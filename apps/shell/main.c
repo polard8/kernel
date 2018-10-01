@@ -764,12 +764,12 @@ noArgs:
 	//definindo a janela como sendo uma janela de terminal.
 	//isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
 	//para essa janela e não apenas ao procedimento de janela do sistema.
-	system_call( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, 
+	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, 
 		(unsigned long) hWindow, (unsigned long) hWindow );
 				 
 				 
 	//salva ponteiro da janela principal. 
-	shell_info.main_window = ( struct window_d* ) hWindow;			 
+	shell_info.main_window = ( struct window_d * ) hWindow;			 
 		
 	
 	//
@@ -1041,7 +1041,7 @@ shellProcedure( struct window_d *window,
 		//do sistema.
 		
 		case MSG_SYSKEYDOWN:
-		    switch(long1)
+		    switch (long1)
 			{
 		        
 				//help
@@ -1060,8 +1060,8 @@ shellProcedure( struct window_d *window,
 					printf("Testing apiDialog: ...\n");
 					q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
 					
-					if ( q == 1 ){ printf("Voce escolheu Yes \n");};
-					if ( q == 0 ){ printf("Voce escolheu No \n");};
+					if ( q == 1 ){ printf("Voce escolheu Yes \n"); };
+					if ( q == 0 ){ printf("Voce escolheu No \n"); };
 					
 					printf("apiDialog retornou.\n");
 					
@@ -1089,7 +1089,7 @@ shellProcedure( struct window_d *window,
 		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
 		//como o context menu [Application Key]
 		case MSG_SYSKEYUP:
-            switch(long1)
+            switch (long1)
 			{
 				
 				//O MENU APPLICATION É O CONTEXT MENU.
@@ -1103,7 +1103,7 @@ shellProcedure( struct window_d *window,
 
         // Commands.		
 		case MSG_COMMAND:
-            switch(long1)
+            switch (long1)
 			{
 				// Null.
 				case 0:
@@ -1463,13 +1463,9 @@ void shellWaitCmd (){
 			return;
 	    };
 	
-	}while(1);
-	
-//exit:
+	} while (1);
 
-    prompt_status = 0;
-    
-	//return;	
+    prompt_status = 0;	
 };
 
 
@@ -1562,7 +1558,7 @@ NewCmdLine:
 			   //ou algum problema no while anterior.
 			   //printf("#debug \n");				
 			   printf("shellCompare: *hang while1\n");	
-			   while(1){
+			   while (1){
 				   asm ("pause");
 			   }
 			}

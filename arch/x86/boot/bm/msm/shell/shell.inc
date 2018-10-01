@@ -2,22 +2,27 @@
 ; File: shell\shell.inc
 ;
 ; Descrição:
+;
 ;     Boot Manager Shell.
+;
 ;     Arquivo principal do Shell do Boot Manager.
-;     *Importante: No Boot Manager o interpretador de comandos 
-; se revela importante, especialmente quando é usado para ver informações
-; sobre os dispositivos de armazenamento e sobre o boot.
+;
+; #importante: 
+; No Boot Manager, o interpretador de comandos se revela importante, 
+; especialmente quando é usado para ver informações sobre os dispositivos 
+; de armazenamento e sobre o boot.
 ; Ou seja, o foco do interpretador de comandos do Boot Manager deve ser
-; as informações sobre o disco de boot e sobre a partição ativa. o único
-; arquivo que o boot manager deve se preocupar é o Boot Moader, no caso
+; as informações sobre o disco de boot e sobre a partição ativa. O único
+; arquivo que o boot manager deve se preocupar é o Boot Loader, no caso
 ; BL.BIN.
 ;
-; *todo: Visualizar e manipular informações no metafile sobre arquivos e 
+; #todo: 
+; Visualizar e manipular informações no metafile sobre arquivos e 
 ; armazenamento de dados.
 ;
-; *Importante: 
-;  É obrigação da rotina que fizer alguma alteração no metafile,
-; sinalizar configurando a flag 'shell_exit_flag' com as opções '0' ou '1'.
+; #importante: 
+; É obrigação da rotina que fizer alguma alteração no metafile sinalizar, 
+; configurando a flag 'shell_exit_flag' com as opções '0' ou '1'.
 ; Assim a rotina exit decidirá se salva o metafile antes de iniciar ou não.
 ; '1' significa salvar o metafile e '0' significa não salvar.
 ;     
@@ -38,6 +43,9 @@ align 1
 ;=====================================================
 ; os_command_line:
 ;     Início do loop para pegar comandos.
+;
+;     #### LOOP ####
+;
 ; IN:
 ;     Nothing.
 ; OUT:
@@ -57,6 +65,7 @@ os_command_line:
 	;mov [os_Font_Color], ebx
 	
 .do_change_name:
+
     ;Mostra uma string, que é um prompt para mudar o nome do arquivo.	
 	mov esi, prompt_change_file 	
 	call os_output

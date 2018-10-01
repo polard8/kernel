@@ -37,8 +37,8 @@ void fs_delete_entry ( unsigned long id, unsigned long eid )
  * fsClearFat:
  *      Zera o buffer e grava zeros no hd.
  */
-void fsClearFat()
-{
+void fsClearFat (){
+	
 	//int i;
     //unsigned char *fat_base = (unsigned char *) FAT16_FAT_ADDRESS;
 	

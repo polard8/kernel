@@ -27,9 +27,9 @@
 
 
 ;Definições usadas apenas em 32bit.
-%DEFINE BOOT_VER '1.0'
-%DEFINE BOOT_MANAGER_VER '1.0'
-%DEFINE SHELL_VER '1.0'
+%DEFINE BOOT_VER '0.1'
+%DEFINE BOOT_MANAGER_VER '0.1'
+%DEFINE SHELL_VER '0.1'
 ;...
 
 ;

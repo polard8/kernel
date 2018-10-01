@@ -26,10 +26,8 @@ ROOTDIRSIZE  EQU (BUFFER_NAME+4)
 
 ;; 16bit. Esse é o MBR do VHD.
 [bits 16]
-    jmp START
-	;jmp short START ;@todo:
-    ;nop
 
+    jmp START
 
 ;BPB Personalizado para o VHD de 32MB usado pelo Gramado.
 BUFFER_NAME           db "MSDOS5.0"    ;GRAMADO.

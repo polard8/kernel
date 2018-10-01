@@ -374,6 +374,8 @@ KeLoadFile( struct channel_d *channel,
  *     Com um índice da lista de arquivos, a função retorna o ponteiro da
  *     estrutura do arquivo.
  */
+ 
+// void *get_stream (int Index)
 void *get_file (int Index){
 	
 	//Limits.	
@@ -392,6 +394,8 @@ void *get_file (int Index){
  * dado seu id.
  * 
  */
+ 
+//void set_stream ( void *stream, int Index ){ 
 void set_file ( void *file, int Index ){
 	
 	//Limits.	
@@ -426,10 +430,8 @@ unsigned long fs_get_fat_entry (unsigned long n){
 };
 											 
 
-void 
-fs_set_fat_entry( unsigned long n, 
-                  unsigned long value )
-{	
+void fs_set_fat_entry ( unsigned long n, unsigned long value ){
+	
     //Ainda não implementada.	
 };
 
@@ -466,15 +468,14 @@ fs_show_dir_entry( unsigned long id,
 
 
 
-void fs_show_dir(unsigned long id){
+void fs_show_dir (unsigned long id){
 	//Ainda não implementada.
 };
 
 
 //confere clusers de um diretorio.
-unsigned long 
-fs_check_cluster(unsigned long id)
-{
+unsigned long fs_check_cluster (unsigned long id){
+	
 	//Ainda não implementada.
 	return 0; 
 };
@@ -485,8 +486,8 @@ fs_check_cluster(unsigned long id)
  * fs_check_fat:
  *     Check FAT.
  */
-unsigned long fs_check_fat()
-{
+unsigned long fs_check_fat (){
+	
 	//Ainda não implementada.
 	return 0; 
 };
@@ -522,8 +523,8 @@ fs_set_entry_status( unsigned long id,
 
 
 /*
- **************************************************************************
- * fsCheckMbr:
+ *************
+ * fsCheckMbrFile:
  *     Checamos um mbr carregado em algum endereço de memória.
  *
  *     Checa o registro do disco. (MBR). (disco do sistema).
@@ -537,22 +538,55 @@ fs_set_entry_status( unsigned long id,
  * argumento.
  * @todo: O mbr do sisco do sistema precisa de uma estruura que 
  * coordene o acesso a ele.
+ *
+ * #todo: precisa colocar tudo na estrutura que está em fs.h
  */
 //void fsCheckMBR(unsigned char* buffer)  //@todo
 void fsCheckMbrFile ( unsigned char *buffer ){
 	
 	unsigned char *mbr = (unsigned char *) buffer; 
 
+	
+	my_read_hd_sector( (unsigned long) &mbr[0] , 0, 0 , 0 );  //setor 0.
+	//my_read_hd_sector( (unsigned long) &mbr[0] , 1, 0 , 0 );
+	
+	
+	//message:
+	printf("\n");
+	printf("fsCheckMbrFile: testing MBR ...\n");
+	
 	// @todo:
 	// Checar uma estrutura do mbr do disco do sistema,
 	// para validar o acesso à ele.	
 	
 	// Check signature.
-	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA ){
+	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+	{
 		
-	    printf("fsCheckMbr: Sig ");
+	    printf("fsCheckMbrFile: Sig FAIL \n" );
         goto fail;		
 	}
+	
+	//jmp
+	printf("JMP: [ %x ", mbr[ BS_JmpBoot + 0 ] );
+	printf("%x ", mbr[ BS_JmpBoot + 1 ] );
+	printf("%x ]\n", mbr[ BS_JmpBoot + 2 ] );
+	
+	
+	//name
+	int i;
+	
+	printf("OS name: [ ");
+	for ( i=0; i<8; i++ )
+	{
+	    printf("%c", mbr[ BS_OEMName + i ] );
+	};
+	printf(" ]\n");
+	
+	//...
+	
+	
+	printf("Signature: [ %x %x ] \n" , mbr[0x1FE], mbr[0x1FF] );
 	
 	// Continua ...
     goto done;
@@ -575,7 +609,7 @@ done:
  */
 void fsCheckVbrFile( unsigned char *buffer ){
 	
-	unsigned char *mbr = (unsigned char *) buffer; 
+	unsigned char *vbr = (unsigned char *) buffer; 
 
     //
 	// @todo:
@@ -585,9 +619,9 @@ void fsCheckVbrFile( unsigned char *buffer ){
 	
 	
 	// Check signature.
-	if( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+	if( vbr[0x1FE] != 0x55 || vbr[0x1FF] != 0xAA )
 	{
-	    printf("fsCheckMbr: Sig. Fail\n");
+	    printf("fsCheckVbrFile: Sig. Fail\n");
         goto fail;		
 	};
 	
@@ -599,7 +633,7 @@ void fsCheckVbrFile( unsigned char *buffer ){
 
 	
 fail:	
-    printf("fsCheckMbr: fail\n");	
+    printf("fsCheckVbrFile: fail\n");	
 done:
     printf("Done\n");
 	refresh_screen();

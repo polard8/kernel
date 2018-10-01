@@ -10,15 +10,14 @@
 ;     Arquivo principal do System4Nora. (Começa com o BM).
 ;
 ; *Importante:
-; O arquivo main.asm faz uma sequencia de inclusões de módulos
-; que compõem o Boot manager, começando pelos módulos de 16bit
-; e depois os módulos de 32bit. O arquivo header32.inc deve ficar no 
-; início das inclusões dos módulos de 32bit, para que os módulos
-; de 32bit possam utiliza-lo adequadamente.
+; + O arquivo main.asm faz uma sequência de inclusões de módulos que compõem 
+; o Boot manager, começando pelos módulos de 16bit e depois os módulos de 
+; 32bit. 
+; + O arquivo header32.inc deve ficar no início das inclusões dos módulos de 
+; 32bit, para que os módulos de 32bit possam utiliza-lo adequadamente.
 ;
-;Sobre o sistema System4Nora:
+;Sobre o sistema System4Nora: (#cancelado)
 ;========================================
-;
 ;    O sistema é chamado SYSTEM.VHD.
 ;    É um VHD de 32 MB feito em assembly. (NASM).
 ;    Comtém 4 programas compilados juntos.
@@ -117,14 +116,13 @@
 ;     (2005-2016) - Created by Fred Nora. 
 ;---------------------------------------------------
 
-;;
-;; codename db 'curitiba'
-;;
 
 ;;
+;; #importante
 ;; O arquivo foi carregado em 0:8000. Fica mais fácil lidar com a gdt 
 ;; configurando o org em 0x8000 e colocando os segmentos em 0.
 ;;
+
 
 [ORG 0x8000]
 
@@ -135,7 +133,8 @@
 
 
 ;;
-;; 16bit: Estamos no primeiro setor do BM.BIN, ele começa em 16bit.
+;; 16 bit: 
+;; Estamos no primeiro setor do BM.BIN, ele começa em 16 bit.
 ;;
 
 
@@ -146,7 +145,7 @@ boot_main:
 
 
 ;;
-;; ===========================================================================
+;; =================================================
 ;;
 
 ;=================

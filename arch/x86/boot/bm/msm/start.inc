@@ -101,7 +101,7 @@ startSetupMode:
 	;jmp $
 	
 
-;==============================================================
+;============================
 ; startCLI:	
 ;     Inicia o Shell do Boot Manager. 
 ;	
@@ -109,18 +109,18 @@ startCLI:
 	
 	call setup_machine
 	
+	;Segmentos e pilha.
 	cli
-	;Segmentos.
 	mov ax, word 0x10  
 	mov ds, ax		 
 	mov es, ax 
-	;Pilha.
 	mov eax, stack_ptr
 	mov esp, eax 
 	
 	;Configura volume.
+	;;?? onde ?? blconfig.inc
 	mov al, byte 1
-	call set_fs_volume  ;;?? onde ?? blconfig.inc
+	call set_fs_volume  
 	
 	;Configura fs type.
 	mov al, byte 1
@@ -789,6 +789,11 @@ configura_lfb:
 ; configura_buffer:
 ;     Configura buffer para modo gráfico.
 ;     
+;  #bugbug 
+; nem lembro desses endereços, 
+; mas eles estão acima de 16MB e isso é problema, pois o 
+; sistema tem a configuração mínima de 16MB.
+;
 ;     @todo: Confirmar os endereços dos buffer.
 ;            Configurar páginas para eles.  
 ;

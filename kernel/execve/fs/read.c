@@ -82,9 +82,8 @@ void read_fntos ( char *name ){
 };
 	
 	
-	
 /*
- *****************************************************************
+ ***********************
  * fatClustToSect:
  *     Calcula qual é o setor inicial de um dado cluster.
  *     Informações para o calculo: 
@@ -92,17 +91,17 @@ void read_fntos ( char *name ){
  *     ~ Número de setores por cluster.
  *     ~ Lba inicial da area de dados.
  */	
-unsigned long fatClustToSect(unsigned short cluster, 
-                             unsigned long spc, 
-							 unsigned long first_data_sector )
+unsigned long fatClustToSect ( unsigned short cluster, 
+                               unsigned long spc, 
+							   unsigned long first_data_sector )
 {
     unsigned long C = (unsigned long) cluster;
 
 	C -= 2;
 	
 	//@todo: Check limits.
-
-done:	
+//done:
+	
 	return (unsigned long) (C * spc) + first_data_sector;
 };
 
@@ -125,11 +124,9 @@ void fatLoadCluster ( unsigned long sector,
 	//Começa do primeiro setor do cluster.	
 	for ( i=0; i < spc; i++ ){
 		
-        read_lba( address, sector + i );
+        read_lba ( address, sector + i );
 		address = address +512; 
 	};
-//done:
-	//return;
 };
 
 
@@ -148,8 +145,8 @@ void read_lba ( unsigned long address, unsigned long lba ){
  	//taskswitch_lock();
 	//scheduler_lock();	          	
 	
-    switch(fatbits)
-    {
+    switch (fatbits){
+		
 	    case 32:
 	        //Nothing.	    
             return;
@@ -157,7 +154,7 @@ void read_lba ( unsigned long address, unsigned long lba ){
 			
 	    case 16:
 		    //hdd.c
-	        my_read_hd_sector( address, lba, 0, 0);	    
+	        my_read_hd_sector ( address, lba, 0, 0 );	    
             return;
 			break;		
 			
@@ -170,20 +167,20 @@ void read_lba ( unsigned long address, unsigned long lba ){
 		    //@todo: 
 			// Precisamos fazer alguma coisa se essa variável for 
 			// um valor inválido.
-		    return;
+		    //return;
             break;		
 	};	
 	
 	//scheduler_unlock();
 	//taskswitch_unlock();
 	
-done:
-	return;
+//done:
+	//return;
 };
 
 
 /*
- ************************************************************************
+ **************
  * fsLoadFile:
  *    Carrega um arquivo na memória dado o nome e o endereço.
  *    Apenas FAT16.
@@ -196,19 +193,26 @@ done:
  * carregados na memória e qual o endereço o tipo o tamanho etc.
  * + O argumento nome poderia ser const char* para compatibilidade 
  * com a libC.
+ *
+ * #obs: A fat deve estar o tempo todo na memória, mas precisamos carregar 
+ * na memória o dretório atual para lermos um arquivo.
+ * Essa função de leitura não precisa carregar a FAT toda vez que for chamada.
+ * ela deve apenas checar se a fat está na memória através de uma flag.
+ * Mas essa função precisa carregar o diretório atual na memória para 
+ * procurar pelo nome indicado.
+ * #bugbug: No momento estamos apenas procurando no diretório raiz, 
+ * então devemos substituir o ponteiro *root por *current_dir.
  */
 //int fsLoadFile( const char *name, unsigned long address ) 
 unsigned long 
-fsLoadFile( unsigned char *file_name, 
-            unsigned long file_address )
+fsLoadFile ( unsigned char *file_name, 
+             unsigned long file_address )
 {
     int Status;		
 	int i;
     unsigned short next;
 
-	// #importante:
-	// Poderíamos usar malloc ou alocador de páginas ??
-    unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
+	
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
@@ -216,13 +220,27 @@ fsLoadFile( unsigned char *file_name,
 
 	// #importante:
 	// Poderíamos usar malloc ou alocador de páginas ??	
-    unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
+    // A FAT permanece a mesma para a situaçãod e termos apenas uma partição.
+	//mas se tivermos mai de uma partição também precisamos carregar a FAT 
+	//da partição atual.
+	unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
 	unsigned short cluster;    //Cluster inicial
 
     //??	
 	unsigned long S;  //Primeiro setor do cluster.
 	int Spc;
 
+	// #importante:
+	// Poderíamos usar malloc ou alocador de páginas ??
+	// #todo: Devemos carregar o diretório atual.
+    unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
+
+	// #todo: Devemos carregar o diretório atual.
+	//unsigned long current_dir_address = (unsigned long) Newpage();
+    //#todo: devemos checar se o endereço é válido.
+	//unsigned short *current_dir = (unsigned short *) current_dir_address;	
+	// #todo: devemos chamar uma função que carregue um diretório no endereço passado 
+	//via argumento.
     //...
 	
 	// Lock ??.
@@ -240,13 +258,19 @@ fsLoadFile( unsigned char *file_name,
 	printf("fsLoadFile: Loading root..\n"); 
 #endif	
 	
-	fs_load_rootdirEx();
+	//carregando o diretório raiz.
+	fs_load_rootdirEx ();
+	
+	//#todo:
+	//precisamos na verdade carregarmos o diretório corrente.
+	
 	
 	//Checa se é válida a estrutura do sistema de arquivos.
-	if( (void *) filesystem == NULL )
+	if ( (void *) filesystem == NULL )
 	{
 	    printf("fs-read-fsLoadFile: filesystem\n");
 		goto fail;
+	
 	}else{
 		
 	    //Setores por cluster.
@@ -479,7 +503,6 @@ load_directory( unsigned long address,
 		// Incrementa buffer.
 		b = b+512;    
 	};
-    //return;
 };
 
 
@@ -490,6 +513,15 @@ load_directory( unsigned long address,
  *    Sistema de arquivos fat16.
  *    ? qual disco ?
  *    ? qual volume ? 
+ *
+ * #importante:
+ * O tamanho do diretório raiz é padronizado.
+ * mas é importante calcularmos o tamanho do diretório a ser carregado 
+ * para podermos carregar outros diretórios.
+ * O tamanho do diretório fica registrado em sua entrada e deve ser 
+ * estar realcionado com o tanto de entradas no diretório.
+ * Quando um diretório é criado, devemos colocar na sua entrada o tamanho 
+ * do diretório.
  */
 void fs_load_rootdirEx (){
 	
@@ -501,14 +533,42 @@ void fs_load_rootdirEx (){
 	for ( i=0; i < szRoot; i++ )
 	{
 	    //read_lba( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i );
-        my_read_hd_sector (VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i, 0, 0 );
+        my_read_hd_sector ( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i, 0, 0 );
 		
 		//Incrementa buffer.
 		b = b+512;    
 	};
-//done:	
-//    return;
 };
+
+
+/*
+ ###todo: Estamos tentando carregar um diretório qualquer, usando a 
+          uma função semelhante à que carrega o diretório raiz.
+void fs_load_directory ( unsigned long address, 
+                         unsigned long lba, 
+				         unsigned sectors );
+void fs_load_directory ( unsigned long address, 
+                         unsigned long lba, 
+				         unsigned sectors )
+
+
+{
+	unsigned long i;
+	unsigned long b = 0;
+	unsigned long szRoot = 32; //todo: precisamos do tamanho do diretório.
+	
+	//Carregar root dir na memória.
+	for ( i=0; i < szRoot; i++ )
+	{
+	    //read_lba( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i );
+        my_read_hd_sector ( address + b, lba + i, 0, 0 );
+		
+		//Incrementa buffer.
+		b = b+512;    
+	};
+};
+*/
+
 
 
 /*
@@ -540,10 +600,10 @@ void fs_load_fatEx (){
 };
  
 //preenche o diretorio raiz com informações guardadas em disco. 
-void fs_load_rootdir()
-{
-    fs_load_dir (0);	
-	//return;
+void fs_load_rootdir (){
+	
+    //fs_load_rootdirEx ();
+	fs_load_dir (0);	
 }; 
 
 
@@ -595,9 +655,6 @@ void fs_load_dir ( unsigned long id ){
 		fs_set_entry(id,i);
 		n++;
 	};
-	
-//done:	
-//	return;
 };
 
 

@@ -332,9 +332,8 @@ void volumeShowCurrentVolumeInfo()
  * volumeShowVolumeInfo:
  *
  */
-int 
-volumeShowVolumeInfo( int descriptor )
-{
+int volumeShowVolumeInfo ( int descriptor ){
+	
 	struct volume_d *v;
 	
 	printf("volumeShowVolumeInfo:\n");
