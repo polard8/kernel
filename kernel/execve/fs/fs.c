@@ -231,6 +231,7 @@ done:
 */
 
 
+//Listando arquivos em um diretório dado o nome.
 int fsList ( const char *dir_name ){
 	
 	// #todo
@@ -239,7 +240,7 @@ int fsList ( const char *dir_name ){
 	
 	//#test
 	//boot volume
-	if ( strncmp( (char *) dir_name, "volume1", 7 ) == 0 )
+	if ( strncmp ( (char *) dir_name, "volume1", 7 ) == 0 )
 	{
 		
 		//#todo:
@@ -247,7 +248,7 @@ int fsList ( const char *dir_name ){
 		// esse diretório.
 		
 		//# improvisando os valores.
-		fsFAT16ListFiles ( "Boot Volume:\n",            //name 
+		fsFAT16ListFiles ( "Boot Volume:",              //name 
 		    (unsigned short *) VOLUME1_ROOTDIR_ADDRESS, //address
 			256 );		                                //number of entries
 	};
@@ -287,7 +288,8 @@ fsFAT16ListFiles( const char *dir_name,
 		return;
 	}
 	
-	printf("fsListFiles: Listing names in [%s]\n", dir_name );
+	printf("\n");
+	printf("fsFAT16ListFiles: Listing names in [%s]\n\n", dir_name );
 	
     
 	// Mostra.
@@ -308,7 +310,7 @@ fsFAT16ListFiles( const char *dir_name,
 	
 	//...
 	
-	printf ("Done\n");	
+	//printf ("Done\n");	
 	refresh_screen();
 };
 

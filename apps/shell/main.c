@@ -586,6 +586,14 @@ noArgs:
 	shellShell (); 	
 	
 	
+	
+	// # Draw bar #
+	// Criando a topbar antes de criarmos a janela principal.
+	//enterCriticalSection();    
+	//shellCreateTopBar(1);
+	//exitCriticalSection();    
+	
+	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
 	//	
@@ -2097,14 +2105,14 @@ do_compare:
 	
 	
 	// dir - Lista os arquivos no estilo DOS.
-	if ( strncmp( prompt, "dir", 3 ) == 0 )
+	if ( strncmp ( prompt, "dir", 3 ) == 0 )
 	{
 		char dir_name[] = "volume1";
 		
 		i++;
 		token = (char *) tokenList[i];
 		
-		if( token == NULL )
+		if ( token == NULL )
 		{
 			
 		    //listar os arquivos em um diretório dado o nome do diretório.

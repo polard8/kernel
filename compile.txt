@@ -1,0 +1,12 @@
+
+    Compiling the kernel file:
+    ===========================
+    
+    gramado/kernel/build.bat
+
+
+
+    Creating the virtual disk:
+    ============================
+
+    gramado/arch/x86/boot/vhd/buid.bat as administrator.

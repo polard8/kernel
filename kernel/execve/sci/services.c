@@ -1,5 +1,5 @@
 /*
- * File: executive\sci\services.c 
+ * File: execve\sci\services.c 
  *
  *       (SCI) = SYSTEM CALL INTERFACE
  *
@@ -1167,7 +1167,9 @@ void *services( unsigned long number,
 			    (int) arg3 );
 			break;
 			
-		//listando arquivos em um diretório dado o nome.	
+		//177
+		//comando dir no shell.
+		//Listando arquivos em um diretório dado o nome.	
 		case 177:
 		    fsList ( (const char *) arg2 );
             break;		
