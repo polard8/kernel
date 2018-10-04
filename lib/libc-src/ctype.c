@@ -1,5 +1,7 @@
 /*
- * File: usado na lib c em user mode
+ * File: ctype.c
+ *
+ * usado na lib c em user mode
  *
  * Descrição:
  *    Rotinas variadas em kernel mode.
@@ -8,14 +10,14 @@
  */
 
 
-#include "types.h" 
-#include "ctype.h"
+#include <types.h> 
+#include <ctype.h>
+
 
 //#if defined(LIBC_SCCS) && !defined(lint)
 //static char sccsid[] = "@(#)ctype_.c	5.4 (Berkeley) 3/9/86";
 //#endif LIBC_SCCS and not lint
 
-//#include	<ctype.h>
 
 char _ctype_[1 + 256] = {
     0,  //

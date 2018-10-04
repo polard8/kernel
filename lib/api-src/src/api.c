@@ -2087,13 +2087,13 @@ apiDisplayBMP ( char *address,
 	struct bmp_infoheader_d *bi;
 	
 	// Endereço base do BMP que foi carregado na memória
-	unsigned char *bmp = (unsigned char *)  address;
+	unsigned char *bmp = (unsigned char *) address;
 	
 	// Variável para salvar rgba.
 	unsigned char *c = (unsigned char *) &color;
     unsigned char *c2 = (unsigned char *) &color2;	
 	
-	unsigned long *palette    = (unsigned long *) (address + 0x36);		
+	unsigned long *palette = (unsigned long *) (address + 0x36);		
 	unsigned char *palette_index = (unsigned char *) &pal_address;	
 	
 	
