@@ -80,10 +80,10 @@
  * 2016 - Revisão.
  * ...
  */
-void *system_call( unsigned long ax, 
-                   unsigned long bx, 
-				   unsigned long cx, 
-				   unsigned long dx )
+void *system_call ( unsigned long ax, 
+                    unsigned long bx, 
+				    unsigned long cx, 
+				    unsigned long dx )
 {
     
 	//##BugBug: Aqui 0 retorno não pode ser inteiro.
@@ -92,13 +92,11 @@ void *system_call( unsigned long ax,
 	//unsigned long RET = 0;
 	
     //System interrupt. 	
-	asm volatile("int %1 \n"
-	             : "=a"(RET)	
-		         : "i"(SYSTEM), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+	asm volatile ("int %1 \n"
+	              : "=a"(RET)	
+		          : "i"(SYSTEM), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
     //Nothing.
-
-//done:
-
+	
 	return (void *) RET; 
 };
 
@@ -812,7 +810,6 @@ void carrega_bitmap_16x16 ( unsigned long img_address,
 						    unsigned long y )                           
 {
     system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
-	//return;
 };
 
 
@@ -860,8 +857,6 @@ void MessageBox ( int type, char *string1, char *string2 ){
 	
 	system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
 		(unsigned long) string1, (unsigned long) string2 );
-	
-	//return;
 };
 
 
@@ -1340,8 +1335,6 @@ void APIShowCurrentProcessInfo (){
 	//        e imprimir os valores obtidos usando rotinas em user mode.
 	
 	system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
-	
-	//return;
 };
 
 
@@ -1353,8 +1346,6 @@ void APIresize_window ( struct window_d *window,
 						unsigned long y )
 {	
 	system_call ( SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
-	
-	//return;
 };
 
 
@@ -1365,8 +1356,6 @@ void APIredraw_window( struct window_d *window, unsigned long flags ){
 	
 	system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
 		(unsigned long) flags, (unsigned long) flags );
-	
-	//return;
 };
 
 
@@ -1375,8 +1364,6 @@ void APIreplace_window ( struct window_d *window,
 						 unsigned long y )
 {
 	system_call ( SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
-	
-	//return;	
 };
 
 
@@ -1384,17 +1371,13 @@ void APImaximize_window (struct window_d *window){
 	
 	system_call ( SYSTEMCALL_MAXIMIZEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);
-	
-	//return;	
 };
 
 
 void APIminimize_window (struct window_d *window){
 	
 	system_call ( SYSTEMCALL_MINIMIZEWINDOW, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window);
-	
-	//return;	
+		(unsigned long) window, (unsigned long) window);	
 };
 
 
@@ -1402,17 +1385,13 @@ void APIminimize_window (struct window_d *window){
 void APIupdate_window (struct window_d *window){
 	
 	system_call ( 113, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window);
-	
-	//return;			
+		(unsigned long) window, (unsigned long) window);	
 };
 
 
 void *APIget_foregroung_window (){
 	
-	system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );
-	
-	//return;	
+	system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
 };
 
 
@@ -1420,8 +1399,6 @@ void APIset_foregroung_window (struct window_d *window){
 	
 	system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );
-	
-	//return;	
 };
 
 
@@ -1467,9 +1444,6 @@ void dead_thread_collector (){
 	
     system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, (unsigned long) 0, 
 		(unsigned long) 0, (unsigned long) 0 );	
-
-//done:	
-    //return;
 };
 
 
@@ -1514,9 +1488,7 @@ int api_strncmp (char *s1, char *s2, int len){
  */
 void refresh_screen (){
 	
-	system_call (SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
-	
-	//return;
+	system_call ( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
 };
 
 
@@ -1528,8 +1500,6 @@ void refresh_screen (){
 void api_refresh_screen (){
 	
 	refresh_screen ();
-	
-	//return;
 };
 
 
@@ -1553,9 +1523,7 @@ void apiReboot (){
  */
 void apiSetCursor ( unsigned long x, unsigned long y ){
 	
-    system_call (SYSTEMCALL_SETCURSOR, x, y, 0 );	
-	
-	//return;
+    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );	
 };
 
 
@@ -1819,7 +1787,7 @@ void enterCriticalSection (){
     //Nothing
 done:
     //Muda para zero para que ninguém entre.
-    system_call( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0);	
+    system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );	
 	return;
 };
 
@@ -1827,32 +1795,26 @@ done:
 void exitCriticalSection (){
 	
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
-    system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
-    
-	//return;	
+    system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
 
 void initializeCriticalSection (){
 	
 	//Inicializa em 1 o semáforo do kernel para que 
 	//o primeiro possa usar.
-	system_call( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
+	system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
 
 
 void apiBeginPaint (){
 	
 	enterCriticalSection ();
-	
-	//return;
 };
 
 
 void apiEndPaint (){
 	
 	exitCriticalSection ();
-	
-	//return;
 };
 
 
@@ -1860,8 +1822,6 @@ void apiEndPaint (){
 void apiPutChar (int c){
 	
 	system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
-	
-    //return;	
 };
 
 
@@ -1929,6 +1889,7 @@ void api_set_current_mouse_responder (int i){
 	    (unsigned long) i, (unsigned long) i );	
 };
 
+
 int api_get_current_mouse_responder (){
 	
     return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER, 
@@ -1936,7 +1897,6 @@ int api_get_current_mouse_responder (){
 										(unsigned long) 0, 
 										(unsigned long) 0 );	
 };
-
 
 
 void api_set_window_with_text_input ( struct window_d *window ){
@@ -2009,7 +1969,7 @@ páginas dutante o taskswitch */
 
 int fork (){
 	
-    return (int) system_call( SYSTEMCALL_FORK, (unsigned long) 0, 
+    return (int) system_call ( SYSTEMCALL_FORK, (unsigned long) 0, 
 					(unsigned long) 0, (unsigned long) 0 ); 
 };
 
@@ -2103,7 +2063,8 @@ int api_getchar (){
  *
  *	// @todo: Criar defines para esses deslocamentos.
  */
- static int nibble_count_16colors = 0;
+
+static int nibble_count_16colors = 0;
  
 int 
 apiDisplayBMP ( char *address, 
@@ -2461,9 +2422,14 @@ done:
 };
 
 
+/*
+//Coloca uma mensagem na estrutura de uma janela.
+int apiPostMessage ( struct window_d *window, int message )
+{
+    //#todo	
+};	
+*/
 
-
-		
 
 //
 // End.

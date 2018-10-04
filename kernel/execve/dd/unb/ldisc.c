@@ -1520,21 +1520,17 @@ static int count_mouse = 0;
 static char buffer_mouse[3];
 	
 void mouseHandler (){
-	
-	// ?? #bugbug.
-	// ?? Porque isso é local. ??
-	// ?? Não tem um contador global para isso ??
-	// E o fato de serem 'static' ???
-	// Obs: A função entra com esse mouse count zerado.
-	
+		
     // Coordenadas do mouse.
     // Obs: Isso pode ser global.
     // O tratador em assembly tem as variáveis globais do posicionamento.
-    int posX=0;
+    
+	int posX=0;
     int posY=0;	
 
     //Char para o cursor provisório.
-    static char mouse_char[] = "T";
+	//#todo: Isso foi subtituido por uma bmp. Podemos deletar.
+    //static char mouse_char[] = "T";
 
 	char *_byte;
 
@@ -1553,46 +1549,57 @@ void mouseHandler (){
 	
 	switch ( count_mouse )
 	{
+		// Essa foi a primeira interrupção.
 		case 0:
+		    //Pegamos o primeiro char.
 		    buffer_mouse[0] = (char) *_byte;
             if(*_byte & MOUSE_V_BIT)
                 count_mouse++;
 		    break;
 			
+		// Essa foi a segunda interrupção.	
 		case 1:
+		    //Pegamos o segundo char.
 		    buffer_mouse[1] = (char) *_byte;
 			count_mouse++;
 		    break;
 			
+		// Essa foi a terceira interrupção.	
 		case 2:
+		    //Pegamos o terceiro char.
             buffer_mouse[2] = (char) *_byte;
 			count_mouse = 0;
 			
-            //pega os valores dos deltas ??
-			//mouse_x = mouse_byte[1];
-            //mouse_y = mouse_byte[2];
+			//#importante:
+			//A partir de agora já temos os três chars.
 			
-            //isso ficará assim caso não aja overflow ...
+			//??
+			//Colocando os três chars em variáveis globais.
+            //Isso ficará assim caso não aja overflow ...
 			mouse_packet_data = buffer_mouse[0];
 	 	    mouse_packet_x = buffer_mouse[1];       
 		    mouse_packet_y = buffer_mouse[2];
             
-			//#importante:
-			//Isso está em assembly, lá em hwlib.inc 
-			//mas queremos que seja feito em C.
-			//Uma rotina interna aqui nesse arquivo está tentando isso.
+			// #importante:
+			// #todo: Isso está em Assembly, lá em hwlib.inc, 
+			// mas queremos que seja feito em C.
+			// #obs: Uma rotina interna aqui nesse arquivo está tentando isso.
 			
 			update_mouse();			
 			
+		    // #importante:
+			// Agora vamos manipular os valores obtidos através da 
+			// função de atualização dos valores.
 			
-		    mouse_x = (mouse_x & 0x00000FFF ); 
+			mouse_x = (mouse_x & 0x00000FFF ); 
 		    mouse_y = (mouse_y & 0x00000FFF );
 		
-		    // Limits.
-		
-            if( mouse_x < 1 ){ mouse_x = 1; }	
+		    // Checando limites.
+            // #todo: Os valores foram determinados. 
+			// Precisamos usar variáveis.
+			
+			if( mouse_x < 1 ){ mouse_x = 1; }	
 		    if(	mouse_y < 1 ){ mouse_y = 1; }
-		
 		    if(	mouse_x > (800-16) ){ mouse_x = (800-16); }
 		    if(	mouse_y > (600-16) ){ mouse_y = (600-16); }
 
@@ -1607,7 +1614,7 @@ void mouseHandler (){
             //ex: save_rect(x,y);
 			
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
-		    refresh_rectangle( mouse_x, mouse_y, 16, 16 );					
+		    refresh_rectangle ( mouse_x, mouse_y, 16, 16 );					
 			
             break;
 
@@ -1615,45 +1622,6 @@ void mouseHandler (){
 		    count_mouse = 0;
             break;		
 	};
-	
-	
-	// #importante:
-    // Esse é o momento em que enviamos a mensagem!
-	
-	// #importante:
-	// Devemos enviar a mensagem de mouse para quem. ??
-	// First responder ?? (wwf)
-	
-	// O aplicativo poderá interceptar mensagens como 'mouse hover'.
-	// mousehover é 'flutuando por cima do objeto'.
-	
-	//
-	// FIRST RESPONDER
-	// 
-	
-	struct window_d *w;
-	w = (void *) windowList[window_with_focus];
-	
-	if( (void *) w != NULL )
-	{
-		// Envia as mensagens para os aplicativos intercepta-las.
-		if( w->used == 1 && w->magic == 1234 )
-		{
-			// ?? O que sabemos sobre o evento de mouse até aqui ??
-			// sabemos que ele se movimentou e temos as coordenadas dele.
-			
-			// se o mouse alcançar as coordenadas da janela com o foco de 
-			// entrada podemos enviar uma mensagem para ela. assim ela 
-			// pode criar uma janelinha que alerta sobre o mouse hover.
-			// essa mesagem pode ser de mouse hover.
-			
-	        //windowSendMessage( 0, 0, 0, 0);
-		};			
-		
-		//Chama o procedimento de janelas do sistema.
-		//O procedimento de janela do terminal está em cascata.
-		//system_procedure( w, (int) 0, (unsigned long) 0, (unsigned long) 0 );					
-	};		
 	
 	
 	// #importante 
@@ -1675,6 +1643,7 @@ void mouseHandler (){
 	//  ## Button ##
 	//
 	
+	// ===
 	//Apenas obtendo o estado dos botões.
 	
 	mouse_buttom_1 = 0;
@@ -1722,46 +1691,54 @@ void mouseHandler (){
 	    }			
 	
 	
-    //mouse_button_action	
-	//Confrontando o estado atual com o estado anterior 
-	//para saber se ouve alguma alteração ou não.
+    // ===	
+	// Confrontando o estado atual com o estado anterior para saber se ouve 
+	// alguma alteração ou não.
+	// 1 = ouve alteração.
 	
 	if( mouse_buttom_1 != old_mouse_buttom_1 ||
 	    mouse_buttom_2 != old_mouse_buttom_2 ||
 		mouse_buttom_3 != old_mouse_buttom_3 )
 	{
-		//Sinalizamos que ouve alteração.
 		mouse_button_action = 1;
 	}else{
 		mouse_button_action = 0;
 	};
 	
-	
-	// #bugbug 
+	// #refletindo: 
 	// ?? E no caso de apenas considerarmos que o mouse está se movendo, 
 	// mandaremos para janela over. ???
+	
+	// #refletindo:
 	// Obs: A mensagem over pode ser enviada apenas uma vez. 
 	// será usada para 'capturar' o mouse ... 
 	// e depois tem a mensagem para 'descapturar'.
 	
+	//===========
+	// (capture) - On mouse over. 
 	//
-	// ## On mouse over ## (capture)
-	//
-	
-	int wID;
+
 	struct window_d *wScan;
 	
-	//Escaneamos para achar qual janela bate com os valores indicados.
-	//return: (int) window id.
+	// wID = ID da janela.
+	// Escaneamos para achar qual janela bate com os valores indicados.
+	// Ou seja. Sobre qual janela o mouse está passando.
+
+	// #IMPORTANTE
+	// Se for válido e diferente da atual, significa que 
+	// estamos dentro de uma janela.
+	// -1 significa que ouve algum problema no escaneamento.
 	
-	wID = (int) windowScan ( mouse_x, mouse_y );
+	int wID; 
 	
-	//#IMPORTANTE
-	//Se for válido e diferente da atual.
-	//significa que estamos dentro de uma janela.
+	wID = (int) windowScan ( mouse_x, mouse_y );	
 	
-	if ( wID != -1 )
-	{
+	if ( wID == -1 )
+	{ 
+        // Nothing.
+		
+    }else{
+		
 		wScan = (struct window_d *) windowList[wID];
 		
 		//#bugbug 
@@ -1783,85 +1760,113 @@ void mouseHandler (){
 			//Checaremos um por um.
 			
 			//1
-			//igual ao estado anterior
+			//Igual ao estado anterior
 			if( mouse_buttom_1 == old_mouse_buttom_1 )
 			{
 				//...
+			
+			//Diferente do estado anterior.
 			}else{
+				
 				//down
-				if( mouse_buttom_1 == 1 )
+				if ( mouse_buttom_1 == 1 )
 				{                
 					
 					//clicou
-					if( old_mouse_buttom_1 == 0 ){
-                        windowSendMessage( (unsigned long) wScan, 
-					        (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 1, (unsigned long) 0 );  						
+					if ( old_mouse_buttom_1 == 0 ){
+						
+                        windowSendMessage ( (unsigned long) wScan, 
+					        (unsigned long) MSG_MOUSEKEYDOWN, 
+							(unsigned long) 1, 
+							(unsigned long) 0 );  						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_1 = 1;
 					}
 					
 				}else{
+					
 					//up
-			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 1, (unsigned long) 0 );
+			        windowSendMessage ( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYUP, 
+						(unsigned long) 1, 
+						(unsigned long) 0 );
 					old_mouse_buttom_1 = 0;	
 				}
 			}; 
 			
 			
 			//2
-			//igual ao estado anterior
-			if( mouse_buttom_2 == old_mouse_buttom_2 )
+			//Igual ao estado anterior
+			if ( mouse_buttom_2 == old_mouse_buttom_2 )
 			{
 				//...
+				
+			//Diferente do estado anterior.	
 			}else{
 				
 				//down
-				if( mouse_buttom_2 == 1 )
+				if ( mouse_buttom_2 == 1 )
 				{
 					
 					//clicou
 					if( old_mouse_buttom_2 == 0 ){
-                        windowSendMessage( (unsigned long) wScan, 
-					        (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 2, (unsigned long) 0 );  						
+						
+                        windowSendMessage ( (unsigned long) wScan, 
+					        (unsigned long) MSG_MOUSEKEYDOWN, 
+							(unsigned long) 2, 
+							(unsigned long) 0 );  						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_2 = 1;
 					}
 
                 }else{
+					
 					//up
-			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 2, (unsigned long) 0 );
+			        windowSendMessage ( (unsigned long) wScan, 
+					    (unsigned long) MSG_MOUSEKEYUP, 
+						(unsigned long) 2, 
+						(unsigned long) 0 );
+						
 					old_mouse_buttom_2 = 0;
 				}
 			}; 
 			
 			
 			//3
-			//igual ao estado anterior
-			if( mouse_buttom_3 == old_mouse_buttom_3 )
+			//Igual ao estado anterior
+			if ( mouse_buttom_3 == old_mouse_buttom_3 )
 			{
 				//...
+				
+				
+			//Diferente do estado anterior.	
 			}else{
+				
 				//down
-				if( mouse_buttom_3 == 1 )
+				if ( mouse_buttom_3 == 1 )
 				{
-					
 					//clicou
-					if( old_mouse_buttom_3 == 0 ){
-                        windowSendMessage( (unsigned long) wScan, 
-					        (unsigned long) MSG_MOUSEKEYDOWN, (unsigned long) 3, (unsigned long) 0 );  						
+					if ( old_mouse_buttom_3 == 0 ){
+                        
+						windowSendMessage( (unsigned long) wScan, 
+					        (unsigned long) MSG_MOUSEKEYDOWN, 
+							(unsigned long) 3, 
+							(unsigned long) 0 );  						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_3 = 1;
 					}
 
                 }else{
+					
 					//up
 			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYUP, (unsigned long) 3, (unsigned long) 0 );
+					    (unsigned long) MSG_MOUSEKEYUP, 
+						(unsigned long) 3, 
+						(unsigned long) 0 );
+						
 					old_mouse_buttom_3 = 0;
 				}
 			}; 
@@ -1870,29 +1875,38 @@ void mouseHandler (){
 			mouse_button_action = 0;
 			
 			
-			//se NÃO ouve alteração no estado dos botões, 
-			//então apenas enviaremos a mensagem de movimento 
-			//do mouse.
+		// Se NÃO ouve alteração no estado dos botões, então apenas 
+		// enviaremos a mensagem de movimento do mouse e sinalizamos 
+		// qual é a janela que o mouse está em cima.
 			
 		}else{
 			
-			//#importante
-			//lembrando que estamos dentro de uma janela ...
-			//por isso a mensagem é over e não move.
+			// #importante
+			// Lembrando que estamos dentro de uma janela ...
+			// por isso a mensagem é over e não move.
 			
             //Obs: Se a janela for a mesma que capturou o mouse,
 			//então não precisamos reenviar a mensagem.
+			//Mas se o mouse estiver em cima de uma janela diferente da 
+			//que ele estava anteriormente, então precisamos enviar uma 
+			//mensagem pra essa nova janela.
 			
-			if( wScan->id != mouseover_window )
-			{
-                windowSendMessage( (unsigned long) wScan, 
+			if ( wScan->id != mouseover_window )
+			{				
+				//Agora enviamos uma mensagem pra a nova janela que o mouse 
+				//está passando por cima.
+				mouseover_window = wScan->id;
+				
+                windowSendMessage ( (unsigned long) wScan, 
 		            (unsigned long) MSG_MOUSEOVER, 
-			        (unsigned long) 0, 
-			        (unsigned long) 0 );
-			    
-				mouseover_window = wScan->id; 
+			        (unsigned long) mouseover_window, 
+			        (unsigned long) mouseover_window );
+				
 			}else{ 
-			    //nothing ...
+			    
+				//nothing ...
+				//não precisamos reenviar a mensagem, poi o mouse 
+				//continua na mesma janela que antes.
 			};
 			
 			
@@ -1901,12 +1915,9 @@ void mouseHandler (){
 			mouse_button_action = 0;			
 		};
 		
-		//#debug. (+)
-        draw_text ( wScan, 0, 0, COLOR_RED, "+" );
-		
-		//refresh bmp rectangle.
-		//isso coloca o (+) no frontbuffer.
-		//isso funciona.
+		// #debug. (+)
+		// Isso coloca o (+) no frontbuffer.
+		draw_text ( wScan, 0, 0, COLOR_YELLOW, "+" );
 		refresh_rectangle ( wScan->left, wScan->top, 8, 8 );
 	};
 
@@ -2054,9 +2065,7 @@ void P8042_install (){
 	// Obs:
 	// Agora temos dois dispositivos seriais teclado e mouse (PS/2).
 
-    //
     // Reabilitando portas.
-    //
 	
 //enablePorts:
 	
@@ -2068,16 +2077,12 @@ void P8042_install (){
 	kbdc_wait(1);
 	outportb(0x64,0xA8);  
 
-    //
-	// Done!
-	//
+    // Done!
 	
-//done:	
 	// espera.
 	// ?? Pra que isso ??
 	kbdc_wait(1);  
     
-	//return;
     // NOTA. 
 	// Esta configuração discarta do teste do controlador PS/2 e de seus dispositivos. 
 	// Depois façamos a configuração decente e minuciosa do P8042.

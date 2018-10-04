@@ -144,8 +144,8 @@ int window_getch();
 #define MSG_MOUSEPRESSED	  35
 #define MSG_MOUSERELEASED	  36
 #define MSG_MOUSECLICKED	  37
-#define MSG_MOUSEENTERED	  38
-#define MSG_MOUSEEXITED	       39
+#define MSG_MOUSEENTERED	  38    //?? capturou ??
+#define MSG_MOUSEEXITED	       39   //?? descapturou ??
 //#define MSG_MOUSEMOVEBYOFFSET
 //#define MSG_MOUSEMOVETOELEMENT
 

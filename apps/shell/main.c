@@ -1168,6 +1168,9 @@ shellProcedure( struct window_d *window,
 				    printf("button 1\n");
 				    //APISetFocus(window);
 					//APIredraw_window(window,1);
+					//Se a janela for igual a um botão e o botão for o de fechar, 
+					//então saímos do aplicativo. Mas não temos informações sobre 
+					//essa janela, pois a estrutura está no kernel.
 					break;
 				case 2:
 				    printf("button 2\n");

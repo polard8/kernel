@@ -2738,9 +2738,11 @@ int edit_box( unsigned long x,
 // 
 
 //int 200 - serviço 17.
+//??rever isso
 int SetNextWindowProcedure(unsigned long next_procedure);
 
 
+//??rever isso
 //@todo: traduzir para inglês.
 int chama_procedimento(unsigned long proximo_procedure);  
  
@@ -3085,6 +3087,7 @@ int api_get_window_with_text_input();
 int gramadocore_init_execve( const char *filename, 
             const char *argv[], 
             const char *envp[] ); 
+			
 							 
 /* UNIX style */
 int fork();
@@ -3097,19 +3100,22 @@ int execve( const char *filename,
 
 int apiDialog( const char *string );
 
-
-
 int api_getchar();
 
 
 /*
- ************************************
  * apiDisplayBMP:
- *     
  */
 int apiDisplayBMP( char *address, 
                    unsigned long x, 
 				   unsigned long y );
+				   
+				   
+/*				   
+//Coloca uma mensagem na estrutura de uma janela.				   
+int apiPostMessage ( struct window_d *window, int message );
+*/
+
 
 //
 //...
