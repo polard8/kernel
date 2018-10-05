@@ -51,12 +51,13 @@ my_buffer_horizontal_line( unsigned long x1,
 						   unsigned long x2,  
 						   unsigned long color )
 {
-	while(x1 < x2){
+	while (x1 < x2){
+		
         my_buffer_put_pixel( color, x1, y, 0 );
         x1++;  
     }
-	//return;
 };
+
 
 //@todo: ??						  
 void 
@@ -73,8 +74,7 @@ refresh_horizontal_line( unsigned long x1,
 	
 	unsigned long size = (unsigned long) ( (x2-x1)*3 ); 
 	
-	memcpy( (void *) d, (const void *) s, size );
-	//return;
+	memcpy ( (void *) d, (const void *) s, size );
 };
 
 

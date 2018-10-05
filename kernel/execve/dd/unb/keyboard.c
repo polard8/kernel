@@ -78,12 +78,10 @@ int _read_offset;
  * por eventos desse tipo.
  *
  */
-void abnt2_keyboard_handler()
-{  
+void abnt2_keyboard_handler (){
+	
     unsigned char scancode = inportb(0x60);	
 	
-	
-	//
 	//#importante:
 	// Provavelmente uma interrupção irá fazer esse trabalho de 
 	// enviar o scancode para o kernel para que ele coloque na fila.
@@ -94,10 +92,10 @@ void abnt2_keyboard_handler()
 	//#obs: Esse buffer está em user.h 
 	keybuffer[keybuffer_tail++] = (char) scancode;
 	
-	if( keybuffer_tail >= 128 ){
+	if ( keybuffer_tail >= 128 )
+	{
 		keybuffer_tail = 0;
 	}
-
 	
 //callLineDiscipline:	
 	
@@ -107,18 +105,23 @@ void abnt2_keyboard_handler()
 	
 	//LINE_DISCIPLINE(scancode);
 	
-eoi:
-    outportb(0x20,0x20);    //EOI.
-	return;
+//eoi:
+    //EOI.
+    
+	outportb ( 0x20, 0x20 );    
+	
+	//return;
 };
 
 
-unsigned long get_scancode()
-{	
+unsigned long get_scancode (){
+	
 	unsigned long c;
 	
 	_read_offset++;
-	if( _read_offset >= 32 ){
+	
+	if ( _read_offset >= 32 )
+	{
 		_read_offset = 0;
 	}
 	
@@ -130,7 +133,7 @@ unsigned long get_scancode()
 
 
 /*
- *******************************************************************
+ **************
  * KiKeyboard:
  *     Interface pra chamar o driver de teclado
  *     atual.
@@ -140,8 +143,9 @@ unsigned long get_scancode()
  *     com o driver instalado.
  * 
  */
-void KiKeyboard()
-{
+ 
+void KiKeyboard (){
+	
     //@todo: sondar o driver instalado.	
 	//       um estrutura de dispositivo
 	//       indica informações sobre o driver de teclado.
@@ -151,16 +155,18 @@ void KiKeyboard()
 	//@todo: Criar a variável keyboard_type no kernel base.
     //Não aqui ... pois cada driver deve ser para um tipo de teclado.
 	
-    if(abnt2 == 1){
-	    abnt2_keyboard_handler();
+    if (abnt2 == 1)
+	{
+	    abnt2_keyboard_handler ();
 	};
 
-    if(abnt2 != 1){
-	    panic("unblocked-KiKeyboard: not abnt2.\n");
+    if (abnt2 != 1)
+	{
+	    panic ("unblocked-KiKeyboard: not abnt2.\n");
 	};
 
-done:
-    return;
+//done:
+    //return;
 };
 
 

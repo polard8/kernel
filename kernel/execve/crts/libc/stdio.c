@@ -992,15 +992,28 @@ input_done:
 
 
 /*
- *******************************************************
+ *****************
  * stdioInitialize:
  *     Inicializando stdio pertencente ao kernel base.
  *     Inicializa as estruturas do fluxo padrão.
  *     Quem chamou essa inicialização ?? Em que hora ??
  */
-int stdioInitialize()
-{
+int stdioInitialize (){
+	
 	int Status = 0;
+	
+	// ## char dimentions ##
+	
+	int cWidth = get_char_width ();
+	int cHeight = get_char_height ();
+	
+	if ( cWidth == 0 || cHeight == 0 )
+	{
+		//#debug
+		printf("stdioInitialize: fail w h ");
+		die();
+	}	
+	
 	int i;
 
 	// Buffers para as estruturas.
@@ -1128,9 +1141,23 @@ int stdioInitialize()
 	//g_cursor_width = ?;
 	//g_cursor_height = ?;	
 	
+	//#bugbug 
+	//#todo: precisamos as dimensões do char com base na fonte antes de tudo.
+	//?? Talvez aqui devamos inicializar a fonte e as dimensões de char..
+	//pois estamos na inicialização da libc. Mas isso ja pode ter acontecido na 
+	//inicialização do kernel, quando era necessário algum tipo de fonte para 
+	//mensagens de debug.
+	//?? será que já configuramos as dimensões da tela. Devemos usar as variáveis.
+	//?? se as dimensões da tela foram configuradas na inicialização,
+	//então podemos usar as variáveis aqui.
+	
 	//precisamos saber as dimensões da tela e do char.
-	g_cursor_right = (800/8);
-	g_cursor_bottom = (600/8);
+	//g_cursor_right = (800/8);
+	//g_cursor_bottom = (600/8);
+	g_cursor_right = (800/cWidth);
+	g_cursor_bottom = (600/cHeight);
+	
+	
 	
     //x e y.
 	g_cursor_x = g_cursor_left; 

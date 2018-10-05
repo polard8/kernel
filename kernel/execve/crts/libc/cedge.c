@@ -1,5 +1,8 @@
 
-// cedge.c - edge field fpr libc.
+// cedge.c - edge field for libc.
+
+// extremidades das funções de impressão de caracteres ...
+// aqui ficará só o output de byte.
 
 #include <kernel.h>
 
@@ -37,15 +40,27 @@ void _outbyte (int c){
 	char *vm = (char *) g_current_vm;    
 	
 	
-	//
+	// #test
+	// Tentando pegar as dimensões do char.
+	// #importante: Não pode ser 0, pois poderíamos ter divisão por zero.
+	
+	
+	int cWidth = get_char_width ();
+	int cHeight = get_char_height ();
+	
+	if ( cWidth == 0 || cHeight == 0 )
+	{
+		//#debug
+		printf("crts-libc-cedge-_outbyte: fail w h ");
+		die();
+	}
+	
 	// #Importante: 
 	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
 	// um todo. Só está considerando as dimensões do 'char'.
-	//
 
-    //
+
     // Caso estivermos em modo gráfico.
-    //
 	 
 	if ( VideoBlock.useGui == 1 )
 	{
@@ -60,7 +75,7 @@ void _outbyte (int c){
             // se estamos no modo terminal então usaremos as cores 
             // configuradas na estrutura do terminal atual.
             // Branco no preto é um padrão para terminal.			
-            draw_char( 8*g_cursor_x, 8*g_cursor_y, c, 
+            draw_char ( cWidth*g_cursor_x, cHeight*g_cursor_y, c, 
 				COLOR_TERMINALTEXT, COLOR_TERMINAL2 );			
 			
 		}else{
@@ -69,17 +84,21 @@ void _outbyte (int c){
 		    // se não estamos no modo terminal então usaremos
 		    // char transparente.
             // Não sabemos o fundo. Vamos selecionar o foreground.			
-			drawchar_transparent( 8*g_cursor_x, 8*g_cursor_y, 
+			drawchar_transparent ( cWidth*g_cursor_x, cHeight*g_cursor_y, 
 				g_cursor_color, c );
 		};
 		
-     	goto done;	
+     	//goto done;
+        return;		
 	};
  
-    // ??
+    // #bugbug
+    // #testando
 	// Caso estivermos em text mode.
-    if ( VideoBlock.useGui == 0 ){
-		
+    // #obs: Nunca usamos isso. :)
+	
+	if ( VideoBlock.useGui == 0 )
+	{	
 	    // Calcula o valor do deslocamento para text mode 80x25.
 	    y = (g_cursor_y * 80 *2);
         x = g_cursor_x*2;    
@@ -88,10 +107,7 @@ void _outbyte (int c){
 		//envia o caractere e o atributo.
 		vm[i+0] = ch;           
         vm[i+1] = ch_atributo;  
-	};
-	
-done:    
-    return;     
+	};   
 };
 
 
@@ -285,13 +301,13 @@ void outbyte (int c){
 	//
 
     // Imprime os caracteres normais.
-	_outbyte(c);
+	_outbyte (c);
 	
 	// Atualisa o prev.	
 	prev = c;	   
 
-done:
-    return;
+//done:
+    //return;
 };
 
 

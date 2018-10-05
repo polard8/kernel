@@ -67,6 +67,7 @@ unsigned long cwArg12;     // WindowColor
 // Protótipos de funções internas.
 //
 
+void servicesPutChar ( int c );
 void servicesChangeProcedure();
 
 
@@ -616,12 +617,10 @@ void *services( unsigned long number,
 		// Coloca um char usando o 'terminal mode' de stdio.
 		// selecionado em _outbyte.
 		// stdio_terminalmode_flag = não transparente.
+		// Chama função interna.
 		
-		case SYS_PUTCHAR:	
-		    stdio_terminalmode_flag = 1;  
-			putchar( (int) arg2 );
-			refresh_rectangle ( g_cursor_x*8, g_cursor_y*8, 8, 8 );
-		    stdio_terminalmode_flag = 0;  
+		case SYS_PUTCHAR: 
+			servicesPutChar ( (int) arg2 );		
 			break;
 
 		//66 - reservado pra input de usuário.
@@ -1601,7 +1600,32 @@ void syscall_handler()
  */
 
 
-
+// Coloca um char usando o 'terminal mode' de stdio.
+// selecionado em _outbyte.
+// stdio_terminalmode_flag = não transparente.
+// Chama função interna.
+void servicesPutChar ( int c )
+{
+	
+	int cWidth = get_char_width ();
+	int cHeight = get_char_height ();
+	
+	if ( cWidth == 0 || cHeight == 0 )
+	{
+		//#debug
+		printf("servicesPutChar: fail w h ");
+		die();
+	}
+	
+    stdio_terminalmode_flag = 1;  
+	
+	putchar ( (int) c );
+	refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, cWidth, cHeight );
+	
+	stdio_terminalmode_flag = 0;  	
+}; 
+ 
+ 
 /*
  * servicesChangeProcedure:
  *     Função interna. 

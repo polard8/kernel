@@ -493,6 +493,10 @@ int shmain ( int argc, char **argv ){
 	// ## ARGS ##
 	//
 	
+	//
+	// ## Command Switch ##
+	//
+	
 	//Ok isso funcionou.
 	//Argumentos passados com sucesso do crt0 para o main.
 	
@@ -526,6 +530,9 @@ int shmain ( int argc, char **argv ){
 		//argv[1] = Tipo de uso: login ... outros ?? 
 		
 		//printf("Testing args ...\n");
+		
+		//#todo: (possibilidades)
+		//As flags poderia começar com f. Ex: fInteractive, fLoginShell,
 		
 	    if ( strncmp ( (char *) argv[0], "-interactive", 12 ) == 0 ){
 			

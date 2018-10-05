@@ -1,5 +1,5 @@
 /*
- * File: unblocked\video.c
+ * File: unb\video.c
  *
  * Descrição: 
  *     Rotinas paga gerenciar os controladores de video.
@@ -55,11 +55,12 @@ int videoError;
  *     Configura o endereço inicial da memória de video em modo texto   
  *     fis=b8000  vir=0x800000 
  */
-void videoSetupCGAStartAddress(unsigned long address)
-{
+void videoSetupCGAStartAddress (unsigned long address){
+	
     g_current_vm = (unsigned long) address;
+	
 	//g_current_cga_address
-	return;
+	//return;
 };
 
 
@@ -78,7 +79,8 @@ void videoSetupVGAStartAddress( unsigned long address)
  * get_video_mode: 
  *     Obtem o modo de video atual.
  */
-unsigned long videoGetMode(){
+unsigned long videoGetMode (){
+	
 	return (unsigned long) g_current_video_mode;
 };
 
@@ -87,8 +89,8 @@ unsigned long videoGetMode(){
  * videoSetMode:
  *     Configura o modo de video atual.
  */
-void videoSetMode(unsigned long mode)
-{
+void videoSetMode (unsigned long mode){
+	
     unsigned long VideoMode;
     unsigned long Width;
 	unsigned long Height;
@@ -105,7 +107,7 @@ void videoSetMode(unsigned long mode)
 	
 
 	//Se estiver nos limites.
-	if( VideoMode > 0 && VideoMode < 9000)
+	if ( VideoMode > 0 && VideoMode < 9000)
 	{
 		//g_current_video_mode = (unsigned long) VideoMode;
         g_video_mode = (unsigned long) VideoMode;
@@ -120,8 +122,8 @@ void videoSetMode(unsigned long mode)
 	// usando os recursos do VESA BIOS.
 	//
 	
-    switch(VideoMode)
-	{
+    switch (VideoMode){
+		
 	    case 0x110: 
 		    Width = 800;
 			Height = 600;
@@ -159,13 +161,15 @@ void videoSetMode(unsigned long mode)
 	};    
 	
 	
-	screenSetSize(Width,Height);
+	screenSetSize (Width,Height);
 	
 	// Continua... (outros parametros)
 	
-done:
+//done:
+
     g_current_video_mode = (unsigned long) VideoMode;
-    return;
+    
+	//return;
 };
 
 
@@ -175,17 +179,16 @@ done:
  *     Inicia variáveis de video de acordo com o 
  * modo gráfico utilizado.
  */ 
-int videoInit()
-{
+int videoInit (){
+	
 	int Status = 0;
 	
 	//uintptr_t addr;
 	
-	//
-	// Configuração inicial em modo gráfico.
-	//
 	
-	if( g_useGUI == 1 || VideoBlock.useGui == 1 )
+	// Configuração inicial em modo gráfico.
+	
+	if ( g_useGUI == 1 || VideoBlock.useGui == 1 )
 	{
 	    g_useGUI = 1;
 		VideoBlock.useGui = 1;
@@ -216,7 +219,7 @@ int videoInit()
 		//Poderíamos copiar a font da ROM para a RAM.
 		
 		//
-		// Font support
+		// ## Font support ##
 		//
 		
 		//Font. (BIOS font).
@@ -225,10 +228,10 @@ int videoInit()
 		//é preciso chamar o servidor através de um método para 
         //configurá-la.
         
-		gwsSetCurrentFontAddress( VIDEO_BIOS_FONT8X8_ADDRESS );		
+		gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
  
-		
-	    gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
+	    //#todo: usar a função que configura essas variáveis.
+		gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
 	    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
 
 		gfontSize = FONT8X8;
@@ -266,7 +269,7 @@ int videoInit()
 	// Configuração inicial em modo texto.
 	//
 	
-	if(g_useGUI == 0 || VideoBlock.useGui == 0)
+	if (g_useGUI == 0 || VideoBlock.useGui == 0)
 	{
 	    g_useGUI = 0;
 		VideoBlock.useGui = 0;
