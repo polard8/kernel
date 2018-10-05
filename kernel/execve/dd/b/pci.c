@@ -1,5 +1,5 @@
 /*
- * File: blocked\pci.c
+ * File: b\pci.c
  * 
  * Descrição:
  *     Driver de PCI presente no kernel Base.
@@ -10,7 +10,6 @@
  * History:
  *     2013 - Created by Fred Nora.
  *     2016 - Small changes.
- *  
  */
  
 /*
@@ -272,6 +271,8 @@ or the ACPI ones to solve the mess. Good luck.
 //
 // Variáveis internas.
 //
+
+int pci_supported;
 
 //int pciStatus;
 //int pciError;
@@ -1212,19 +1213,62 @@ done:
  *
  *     Obs: Essa rotina está incompleta.
  */
-int init_pci()
-{
+int init_pci (){
+	
 	int Status = 0;
     int Index;
-    int Max = 32;   //@todo.
+    int Max = 32;   //@todo.	
 	
-    //
+	//===========
+	
+    unsigned long data;
+	
+	outportl ( 0xCF8, 0x80000000);
+	
+	data = (unsigned long) inportl (0xCF8);
+ 
+    if ( data != 0x80000000 )
+    {
+		//#todo:
+		//Fazer alguma coisa pra esse caso.
+		//Talvez seja um 386 ou 486 sem suporte a PCI.
+		//Talvez ISA.
+		
+		pci_supported = 0;
+		
+	    //STATUS_NOT_SUPPORTED	
+		printf("b-pci-init_pci: PCI NOT supported");
+		die();
+		
+	}else{
+		
+		pci_supported = 1;
+		
+	    //STATUS_SUCCESS
+        //printf("PCI supported!");		
+	};
+	
+	
+	//#todo: 
+	//Colocar esse status na estrutura platform->pci_supported.
+	//Talvez assim: platform->platform_type.
+	
+	//#debug
+	//refresh_screen();
+	//while(1){}
+		
+	
+	//==========
+	
+
+	
     // Initializa PCI device list.
-    //
    
     //@todo: Criar um construtor que faça isso.
 	//Exemplo: pciPci().
-    for( Index=0; Index<Max; Index++ ){
+    
+	for ( Index=0; Index<Max; Index++ )
+	{
 		pcideviceList[Index] = (unsigned long) 0;
 	};
    
@@ -1235,18 +1279,27 @@ int init_pci()
 	//
    
 	Status = (int) pci_setup_devices(); 
-	if(Status != 0){
+	
+	if (Status != 0)
+	{
 	    printf("blocked-pci-init_pci:\n");
         die();		
 	};
     
     //...
 	
-done:	
+//done:	
+
     g_driver_pci_initialized = (int) 1; 
-	printf("Done.\n");
-    return (int) Status; 
+	
+	//printf("Done\n");
+    
+	return (int) Status; 
 };
+
+
+
+
 
 
 /*
@@ -1262,7 +1315,11 @@ int pciPci(){
  * pciInit:
  *     Inicialização do módulo.
  */
-int pciInit(){
+
+//#define PCI_CONFIG_ADDRESS 	0xCF8 
+ 
+int pciInit (){
+	
 	return (int) init_pci();
 }; 
  
