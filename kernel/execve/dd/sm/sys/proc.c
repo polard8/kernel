@@ -559,14 +559,16 @@ system_procedure ( struct window_d *window,
                 //testes				
 				case VK_F6:
 					
-					//vamos mostrar informações antes obtidas pelo sistema.
-					show_network_info ();
+					init_nic ();
 					
 					//inicializando o controlador.
 					nic_i8254x_reset();
 					
 					//vamos testar a rotina de configuração da transmissão.
 					nic_i8254x_transmit();
+
+					//vamos mostrar informações antes obtidas pelo sistema.
+					show_network_info ();
 					
 					//show_current_nic_info ();
 					

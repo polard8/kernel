@@ -1,5 +1,5 @@
 /*
- * File: nic.c   
+ * File: intel.c   
  *
  * Descrição:
  *     Network interface controller
@@ -59,6 +59,8 @@ void nicHandler()
  *
  * ## bugbug: problemas no mapeamento do endereço encontrado em BAR0
  */
+ 
+//intel_init_nic() 
  
 int init_nic (){
 	
@@ -251,6 +253,10 @@ int init_nic (){
 		
 	};	
 	
+	
+	//reset
+	nic_i8254x_reset();
+	
 	printf("done\n");		
 	
 
@@ -359,8 +365,9 @@ void show_current_nic_info (){
 
 
 
-void nic_i8254x_reset(){
+void nic_i8254x_reset (){
 	
+	//unsigned long tmp;
 	
 	printf("nic_i8254x_reset: \n");
 
@@ -373,7 +380,6 @@ void nic_i8254x_reset(){
 	
 	//
 	// ## BUGBUG ##
-	//
 	// Erro ao aplicar o deslocamento em bytes num array de dwords.
 	//
 	
@@ -384,6 +390,9 @@ void nic_i8254x_reset(){
 	base_address[0x00D8 + 1] = 0xFF;
 	base_address[0x00D8 + 2] = 0xFF;
 	base_address[0x00D8 + 3] = 0xFF;
+	
+	
+	//#todo: 0x00C0 clear pending interrupts;
 	
 	//Disable interrupt throttling logic
 	//Interrupt Throttling Register
@@ -396,10 +405,17 @@ void nic_i8254x_reset(){
 	//PBA: set the RX buffer size to 48KB (TX buffer is calculated as 64-RX buffer)
 	//Transmit Configuration Word
 	//0x00000030; 
-	base_address[0x0178 + 0] = 0x30; 
-	base_address[0x0178 + 1] =  0;
+	base_address[0x1000 + 0] = 0x30; 
+	base_address[0x1000 + 1] =  0;
+	base_address[0x1000 + 2] =  0; 
+	base_address[0x1000 + 3] =  0;
+	
+	//; TXCW: set ANE, TxConfigWord (Half/Full duplex, Next Page Request)
+	//0x80008060 
+	base_address[0x0178 + 0] = 0x60; 
+	base_address[0x0178 + 1] = 0x80;
 	base_address[0x0178 + 2] =  0; 
-	base_address[0x0178 + 3] =  0;
+	base_address[0x0178 + 3] =  0x80;
 	
 	//#todo:
 	//rever esses bits;
@@ -418,9 +434,12 @@ void nic_i8254x_reset(){
 	//2    f    f    f    f    f    7    7 
 	//0x2fffff77
 	
+	//#bugbug: precisamos setar alguns bits;
 	//pegamos modificamos e salvamos.
 	unsigned long tmp = base_address32[0];
-	base_address32[0] = (tmp & 0x2fffff77); 
+	//base_address32[0] = (tmp & 0x2fffff77);
+    //base_address32[0] = (tmp | 0x2fffff77);	
+	base_address32[0] = 0x2fffff77;	
 	
 	
 	//; MTA: reset
@@ -431,6 +450,21 @@ void nic_i8254x_reset(){
 	base_address[0x5200 + 1] = 0xff;
 	base_address[0x5200 + 2] = 0xff;
 	base_address[0x5200 + 3] = 0xff;
+	
+	base_address[0x5204 + 0] = 0xff; 
+	base_address[0x5204 + 1] = 0xff;
+	base_address[0x5204 + 2] = 0xff;
+	base_address[0x5204 + 3] = 0xff;
+
+	base_address[0x5208 + 0] = 0xff; 
+	base_address[0x5208 + 1] = 0xff;
+	base_address[0x5208 + 2] = 0xff;
+	base_address[0x5208 + 3] = 0xff;
+
+	base_address[0x520c + 0] = 0xff; 
+	base_address[0x520c + 1] = 0xff;
+	base_address[0x520c + 2] = 0xff;
+	base_address[0x520c + 3] = 0xff;	
 	
 	//
 	// ## TX RING ##

@@ -111,6 +111,44 @@
 //...
 
 
+/*
+
+ //para ficar igual a do Nelson;
+
+struct shell_command {
+	
+    char *name;
+    void *fun;
+    char *help;
+	
+};
+
+//extern struct command cmd_table[];
+struct shell_command cmd_table[];
+
+struct command cmd_table[] = {
+    {"?",           cmd_help,           "This help"                                     },
+    {"cd",          cmd_cd,             "Change current directory"                      },
+    {"cls",         cmd_cls,            "Clear screen"                                  },
+    {"copy",        cmd_copy,           "Copy file or directory"                        },
+    {"date",        cmd_date,           "Date"                                          },
+    {"del",         cmd_del,            "Delete file or directory"                      },
+    {"dir",         cmd_dir,            "List directory"                                },
+    {"echo",        cmd_echo,           "This ---"                                      },
+    {"exit",        cmd_exit,           "Exit shell"                                    },
+    {"help",        cmd_help,           "This help"                                     },
+    {"mov",         cmd_mov,            "Move file or directory"                        },
+    {"new",         cmd_new,            "New file or directory"                         },
+    {"reboot",      cmd_reboot,         "Reboot system"                                 },
+    {"rename",      cmd_rename,         "Rename file or directory"                      },
+    {"shutdown",    cmd_shutdown,       "Shutdown your computer locally or remotely"    },
+    {"time",        cmd_time,           "Time"                                          },
+    {"version",     cmd_version,        "Shell version"                                 },
+};
+
+*/
+
+
 //#define MIN(x,y) ((x < y) ? x : y)
 
 int ShellFlag = 0;
@@ -253,6 +291,7 @@ int no_brace_expansion = 0;	/* Non-zero means no foo{a,b} -> fooa fooa. */
 //
 
 // ??
+//é semelhante à estrutura acima.
 /* Some long-winded argument names.  These are obviously new. */
 // Argumentos.
 #define Int 1

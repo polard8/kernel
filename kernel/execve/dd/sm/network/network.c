@@ -128,6 +128,8 @@ int networkInit (){
 	// NIC
 	//
 	
+	//intel.c
+	
     init_nic ();
 
 	

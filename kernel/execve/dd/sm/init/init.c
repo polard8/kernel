@@ -441,6 +441,7 @@ int init (){
 	
 	//Check kernel phase.
 	if ( KeInitPhase != 0 ){
+		
 		printf("sm-init-init: KeInitPhase\n");
         die();		
 	}
