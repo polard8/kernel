@@ -14,6 +14,12 @@
  */
  
  
+ //#todo:
+ // +++ fazer os rings de transmissão e de recepção 
+ // +++ providenciar buffers. 
+ // +++ criar os descritores.
+ 
+ 
 // >> The register at offset 0x00 is the "IOADDR" window. 
 // >> The register at offset 0x04 is the "IODATA" window. 
 
@@ -302,69 +308,6 @@ void nic_test1 (){
 };
 
 
-
-void show_current_nic_info (){
-
-	if ( (void *) currentNIC ==  NULL )
-	{
-		printf("show_current_nic_info: struct fail\n");
-	    return;	
-	}else{
-		
-		if ( currentNIC->used != 1 || currentNIC->magic != 1234 )
-		{
-		    printf("show_current_nic_info: validation fail\n");
-	        return;				
-		}
-		
-		if ( (void *) currentNIC->pci == NULL )
-		{
-		    printf("show_current_nic_info: pci struct fail\n");
-	        return;				
-		}
-
-        //messages  		
-		printf("NIC device info:\n");
-		printf("Vendor %x Device %x \n", 
-		    currentNIC->pci->Vendor, currentNIC->pci->Device );
-			
-			
-		//bars	
-		printf("BAR0 %x\n",currentNIC->pci->BAR0);
-		printf("BAR1 %x\n",currentNIC->pci->BAR1);
-		printf("BAR2 %x\n",currentNIC->pci->BAR2);
-		printf("BAR3 %x\n",currentNIC->pci->BAR3);
-		printf("BAR4 %x\n",currentNIC->pci->BAR4);
-		printf("BAR5 %x\n \n",currentNIC->pci->BAR5);
-		
-		
-		
-		printf("Device status %x \n", currentNIC->DeviceStatus );
-		
-		if (currentNIC->DeviceStatus & 1){
-			printf("Full duplex \n");
-		}	
-		
-		
-		if (currentNIC->DeviceStatus & 0x80){
-			printf("1000Mbs\n");
-		}	
-		
-		printf("MAC %x ", currentNIC->mac0 );
-		printf("%x ", currentNIC->mac1 );
-		printf("%x ", currentNIC->mac2 );
-		printf("%x ", currentNIC->mac3 );
-		printf("%x ", currentNIC->mac4 );
-		printf("%x \n", currentNIC->mac5 );
-		
-		//...
-		
-	};	    
-	
-};
-
-
-
 void nic_i8254x_reset (){
 	
 	//unsigned long tmp;
@@ -581,8 +524,10 @@ void nic_i8254x_reset (){
 
 
 
+// transmit:
+// temos que configurar os campos referentes a transmissão.
+// base address, lenght, head, tail
 void nic_i8254x_transmit(){
-	
 	
 	printf("nic_i8254x_transmit: \n");
 
@@ -591,6 +536,26 @@ void nic_i8254x_transmit(){
 	//endereço base.
 	unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
 	unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
+	
+	//
+	// ## Configurando o ring de transmissão ##
+	//
+	
+	
+	//o endereço base aponta para o início do array de descritores.
+	//depois lenght, head, tail.
+	
+	//o endereço indica o início do ring
+	
+	//antes, na hora da inicialização, temos que criar o array de descritores ...
+	//o endereço base desse array será usado aqui. 
+	//#importante: ; Transmit Descriptor Base Address. Me parece que pode ser um 
+	//endereço virtual normal.
+	//já cada descritor terá um endereço físico para um buffer.
+	
+	
+	//base address. 
+	//intel_transmission_ring_base_address
 	
 	// TDBAL
 	//0x80000;
@@ -649,6 +614,67 @@ mmio_write32(u64 base, u64 offset, volatile u32 value)
 }
 */
 
+
+void show_current_nic_info (){
+
+	if ( (void *) currentNIC ==  NULL )
+	{
+		printf("show_current_nic_info: struct fail\n");
+	    return;	
+	}else{
+		
+		if ( currentNIC->used != 1 || currentNIC->magic != 1234 )
+		{
+		    printf("show_current_nic_info: validation fail\n");
+	        return;				
+		}
+		
+		if ( (void *) currentNIC->pci == NULL )
+		{
+		    printf("show_current_nic_info: pci struct fail\n");
+	        return;				
+		}
+
+        //messages  		
+		printf("NIC device info:\n");
+		printf("Vendor %x Device %x \n", 
+		    currentNIC->pci->Vendor, currentNIC->pci->Device );
+			
+			
+		//bars	
+		printf("BAR0 %x\n",currentNIC->pci->BAR0);
+		printf("BAR1 %x\n",currentNIC->pci->BAR1);
+		printf("BAR2 %x\n",currentNIC->pci->BAR2);
+		printf("BAR3 %x\n",currentNIC->pci->BAR3);
+		printf("BAR4 %x\n",currentNIC->pci->BAR4);
+		printf("BAR5 %x\n \n",currentNIC->pci->BAR5);
+		
+		
+		
+		printf("Device status %x \n", currentNIC->DeviceStatus );
+		
+		if (currentNIC->DeviceStatus & 1){
+			printf("Full duplex \n");
+		}	
+		
+		
+		if (currentNIC->DeviceStatus & 0x80){
+			printf("1000Mbs\n");
+		}	
+		
+		printf("MAC %x ", currentNIC->mac0 );
+		printf("%x ", currentNIC->mac1 );
+		printf("%x ", currentNIC->mac2 );
+		printf("%x ", currentNIC->mac3 );
+		printf("%x ", currentNIC->mac4 );
+		printf("%x \n", currentNIC->mac5 );
+		
+		//...
+		
+	};	    
+	
+};
+
     //## BUGBUG ##		
     //fail: travando no loop
 unsigned short e1000_eeprom_read_8254x (unsigned long mmio, unsigned char addr)
@@ -661,7 +687,6 @@ unsigned short e1000_eeprom_read_8254x (unsigned long mmio, unsigned char addr)
 	
 	return (unsigned short) 0;
 };
-
 
 /*
 u16

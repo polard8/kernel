@@ -29,6 +29,96 @@ QEMU does not properly handle the software reset operation (CTRL.RST) in builds 
  
 //NIC 82540EM Intel PRO/1000 MT   8086 100e
 
+
+
+
+
+//======================
+//legacy transmit descriptor
+//  63            48 47   40 39   32 31   24 23   16 15             0
+//  +---------------------------------------------------------------+
+//  |                         Buffer address                        |
+//  +---------------+-------+-------+-------+-------+---------------+
+//  |    Special    |  CSS  | Status|  Cmd  |  CSO  |    Length     |
+//  +---------------+-------+-------+-------+-------+---------------+
+
+/*
+
+ #obs: Vamos alocar dinamicamente um array com estruturas como essas.
+       Cada estrutura vai apontar para um buffer. O endereço do buffer 
+	   precisa ser um endereço físico.
+	   
+struct legacy_tx_desc 
+{	
+	//uint64_t addr;
+	uint32_t addr1;  //endereço físico do buffer.
+	uint32_t addr2;
+	
+	uint16_t length;
+	uint8_t cso;
+	uint8_t cmd;
+	
+	uint8_t status;
+	uint8_t css;
+	uint16_t special;
+};
+*/
+
+//==========
+
+/* Transmit Descriptor */
+/*
+   
+   esse tipo não é o legado.
+ 
+struct e1000_tx_desc {
+	
+    //uint64_t buffer_addr;       // Address of the descriptor's data buffer 
+    uint32_t buffer_addr1;
+	uint32_t buffer_addr2;
+	
+	union {
+        uint32_t data;
+        struct {
+            uint16_t length;    // Data buffer length 
+            uint8_t cso;        // Checksum offset 
+            uint8_t cmd;        // Descriptor control 
+        } flags;
+    } lower;
+    
+	union {
+        uint32_t data;
+        struct {
+            uint8_t status;     // Descriptor status 
+            uint8_t css;        // Checksum start
+            uint16_t special;
+        } fields;
+    } upper;
+};
+*/
+//==========
+
+
+/* Receive Descriptor */
+/*
+struct e1000_rx_desc {
+	
+    //uint64_t buffer_addr; // Address of the descriptor's data buffer 
+    
+	uint32_t buffer_addr1;
+	uint32_t buffer_addr2;
+	
+	uint16_t length;     // Length of data DMAed into data buffer 
+    uint16_t csum;       // Packet checksum 
+    uint8_t status;      // Descriptor status 
+    uint8_t errors;      // Descriptor Errors 
+    uint16_t special;
+	
+};
+*/
+//===============
+
+
 typedef struct nic_info_d nic_info_t; 
 struct nic_info_d
 {
