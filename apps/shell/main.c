@@ -804,7 +804,7 @@ noArgs:
     APISetFocus (hWindow);	
 	
 	//#importante
-	refresh_screen();
+	refresh_screen ();
 	
 	//#bugbug
 	//janela usada para input de textos ...
@@ -1212,11 +1212,16 @@ shellProcedure( struct window_d *window,
 			{
 				case 1:
 				    printf("button 1\n");
-				    //APISetFocus(window);
-					//APIredraw_window(window,1);
+				      
+					  //APISetFocus(window);
+					  APIresize_window(window,200, 200);
+					  APIredraw_window(window,1);
+					  refresh_screen ();
+					  
 					//Se a janela for igual a um botão e o botão for o de fechar, 
 					//então saímos do aplicativo. Mas não temos informações sobre 
 					//essa janela, pois a estrutura está no kernel.
+					
 					break;
 				case 2:
 				    printf("button 2\n");

@@ -3459,7 +3459,9 @@ void windowUpdateWindow( struct window_d *window )
 
 
 
-
+//
+// ## Full screen support ##
+//
 
 
 //salvando os valores usados para configura o modo 
@@ -3473,8 +3475,8 @@ int fsStatus;
 
 // uma janela entra ou sai do modo full screen.
 // @todo: isso pode ir pra outro lugar, provavelmente gws.
-int windowSwitchFullScreen()
-{
+int windowSwitchFullScreen (){
+	
 	struct window_d *window;
 	
 	//1 = entrar
@@ -3490,7 +3492,7 @@ int windowSwitchFullScreen()
 	
 	//se a janela ativa já é a fullscreen 
 	//então é hora de sair.
-	if( fsStatus == 1 )
+	if ( fsStatus == 1 )
 	{
 	    //sair
 		current_window    = active_window;
@@ -3520,21 +3522,21 @@ doswitch:
 	
 	window = (struct window_d *) windowList[current_window];
 
-    if( (void*) window ==  NULL  )
+    if ( (void *) window ==  NULL  )
     {
 		printf("windowSwitchFullScreen: window\n");
 		goto fail;
+		
 	}else{
 		
-		if( window->used != 1 || 
-		    window->magic != 1234 )
+		if ( window->used != 1 || window->magic != 1234 )
 		{
 			printf("windowSwitchFullScreen: window validation\n");
 			goto fail;
 		}
 		
 		//validade da estrutura do retângulo do cliente.
-		if( (void*) window->rcClient == NULL )
+		if ( (void *) window->rcClient == NULL )
 		{
 			printf("windowSwitchFullScreen: rcClient\n");
 			goto fail;
@@ -3584,14 +3586,14 @@ doswitch:
 				    window->view = VIEW_NORMAL;				
 					
 					//flag = 1 ( refresh rectangle.)
-					redraw_window((struct window_d*) window, 1);
+					redraw_window ( (struct window_d *) window, 1 );
 				};			
 			
 		};
 		
 		//Isso também atualiza o cursor.
 		//pode ser um problema quando saímos do modo fullscreen.
-		SetFocus( window );		
+		SetFocus (window);		
 		 
 	};		
 	
