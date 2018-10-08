@@ -144,10 +144,9 @@
 
 // driver >> executive >> destino certo.
 
-//de65à69 é reservado para input de usuário.
+//de65à69 é reservado para evento de usuário.
 //O driver do dispositivo envirá a mensagem pra cá para ser
 //enviada para o destino certo.
-//65~67-Resevado para input de usuário.
 #define	SYS_PUTCHAR 65
 #define	SYS_66 66  
 #define	SYS_67 67
@@ -257,7 +256,7 @@
 #define	SYS_FEEDTERMINAL 135
 #define	SYS_136 136
 #define	SYS_GETCH 137  //SUPORTE a getch()
-#define	SYS_138 138
+#define	SYS_138 138    //get key state.
 #define	SYS_GETSCANCODE 139  
 
 //keyboard responder

@@ -2738,6 +2738,23 @@ do_compare:
         goto exit_cmp;					 
 	};
 	
+	//testando estado das teclas.
+	if ( strncmp( prompt, "t7", 2 ) == 0 )	
+	{
+		printf("VK_CAPITAL %d \n", system_call ( 138, VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );
+				
+	    printf("VK_LSHIFT %d \n", system_call ( 138, VK_LSHIFT, VK_LSHIFT, VK_LSHIFT ) );
+		printf("VK_RSHIFT %d \n", system_call ( 138, VK_RSHIFT, VK_RSHIFT, VK_RSHIFT ) );
+		
+		printf("VK_CONTROL %d \n", system_call ( 138, VK_CONTROL, VK_CONTROL, VK_CONTROL ) );
+		
+		printf("VK_WINKEY %d \n", system_call ( 138, VK_WINKEY, VK_WINKEY, VK_WINKEY ) );
+		
+		printf("VK_LMENU %d \n", system_call ( 138, VK_LMENU, VK_LMENU, VK_LMENU ) );
+		//...
+		goto exit_cmp;
+	}
+	
 	// tasklist - Lista informações sobre os processos.
 	//isso será um programa tasklist.bin
 	if ( strncmp( prompt, "tasklist", 8 ) == 0 ){

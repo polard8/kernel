@@ -1016,6 +1016,11 @@ void *services( unsigned long number,
 		
         case SYS_GETCH:  
 		    return (void *) window_getch();
+            break;
+
+		//138 - get key state.	
+        case 138:
+		    return (void *) keyboardGetKeyState ( (unsigned char) arg2 );
             break;		
 			
 		//139
