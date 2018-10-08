@@ -3147,26 +3147,22 @@ void shellShell (){
 	// Usar o get system metrics para pegar o 
 	// tamanho da tela.
 	
-	// ## Screen size ##
+	// ## Window size and position ##
+	//#obs: Isso está muito legal. Não mudar.
 	
 	// Tamanho da tela.	
 	shellScreenWidth = apiGetSystemMetrics(1);
     shellScreenHeight = apiGetSystemMetrics(2); 	
-
-	// ## Window size ##
 	
 	//Tamanho da janela do shell	
 	shellWindowWidth = ((shellScreenWidth/3) * 2);
 	shellWindowHeight = ((shellScreenHeight/3) * 2); 
-	
-	
-	// ## cursor limits ##
-	
-	
+		
 	//window position
-	//Isso está muito legal. Não mudar.
 	shell_window_x = (unsigned long) ( (shellScreenWidth - shellWindowWidth)/2 );
 	shell_window_y = (unsigned long) ( (shellScreenHeight - shellWindowHeight)/2 );   
+	
+	
 	
 	//limits.
     shellMaxColumns = (shellWindowWidth/8);   //DEFAULT_MAX_COLUMNS; 
