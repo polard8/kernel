@@ -230,8 +230,6 @@ void setClientAreaRect( unsigned long x,
 	}
 	 
     rectClientArea = (void *) r;
-    
-	//return;	
 };
 
 

@@ -228,8 +228,6 @@ void *services( unsigned long number,
 	{
 		printf("StatusBar: CurrentColorScheme");
 		die();
-		//refresh_screen();
-		//while(1){}
 	
 	}else{
 		
@@ -237,9 +235,7 @@ void *services( unsigned long number,
 		     CurrentColorScheme->magic != 1234 )
 		{
 		    printf("StatusBar: CurrentColorScheme validation");
-		    die();
-			//refresh_screen();
-		    //while(1){}			
+		    die();		
 		};
 		//Nothing.
 	};	
@@ -441,7 +437,8 @@ void *services( unsigned long number,
 			
 		//11, Coloca o conteúdo do backbuffer no LFB.
         case SYS_REFRESHSCREEN: 
-		    systemRam(3,0,0,0,0); 
+		    //systemRam ( 3, 0, 0, 0, 0 ); 
+			refresh_screen ();
 			break;			
 			
         //rede: 12,13,14,15			
@@ -523,7 +520,7 @@ void *services( unsigned long number,
 		
 		//51 redraw window. (handle)
 		case SYS_BUFFER_REDRAWWINDOW:
-		    return (void *) redraw_window((struct window_d*) arg2, arg3);
+		    return (void *) redraw_window ( (struct window_d*) arg2, arg3 );
 		    break;
 		
 		//52  replace window. (handle,x,y)

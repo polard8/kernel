@@ -46,19 +46,18 @@ extern unsigned long kArg4;	   //??.
 
 
 
-int 
-windowKillTimer( struct window_d *window, int id )
-{
+int windowKillTimer ( struct window_d *window, int id ){
+	
     int Status = 0;
 	
 	if( (void *) window == NULL )
 	{
 		Status = 1;
 		goto fail;
+		
 	}else{
 		
-		if( window->used != 1 ||
-		    window->magic != 1234 )
+		if ( window->used != 1 || window->magic != 1234 )
 		{
 			Status = 1;
 		    goto fail;
@@ -243,8 +242,8 @@ void printQueue(circularQueue_t *theQueue)
 
 
 //retorna o id de uma janela.
-int windowGetWindowID( struct window_d *window )
-{
+int windowGetWindowID ( struct window_d *window ){
+	
 	if( (void *) window != NULL )
 	{
 		if( window->used == 1 && window->magic == 1234 ){
@@ -259,8 +258,8 @@ fail:
 
 // Pegar o id da janela main.
 // Para os aplicativos lidarem com a área de trabalho. 
-int windowGetMainWindowDescriptor()
-{	
+int windowGetMainWindowDescriptor (){
+	
 	if( (void *) gui == NULL ){
 		goto fail;
 	}else{
@@ -293,8 +292,8 @@ fail:
  * para a thread idle.
  *
  */
-int windowInitializeBrowserSupport()
-{
+int windowInitializeBrowserSupport (){
+	
 	int i;
 	
 	//#debug
@@ -578,8 +577,8 @@ void *GetWindowDesktop(struct window_d * hwnd)
  * É preciso criar rotinas que permitam que aplicativos 
  * em user mode criem esquemas de cores e habilite eles.
  */
-void windowSetUpColorScheme(int type)
-{	
+void windowSetUpColorScheme (int type){
+	
     struct color_scheme_d *humility;
     struct color_scheme_d *pride;	
 	
@@ -588,10 +587,13 @@ void windowSetUpColorScheme(int type)
 	//
 	
     //Criando o esquema de cores humility. (cinza)
-    humility = (void*) malloc( sizeof(struct color_scheme_d) );
-    if( (void*) humility == NULL ){
+    humility = (void *) malloc ( sizeof(struct color_scheme_d) );
+    
+	if( (void*) humility == NULL )
+	{
 		printf("windowSetUpColorScheme: humility");
 		die();
+		
 	}else{
 		
 		//Object.
@@ -629,10 +631,13 @@ void windowSetUpColorScheme(int type)
 	//
 	
     //Criando o esquema de cores PRIDE. (colorido)
-    pride = (void*) malloc( sizeof(struct color_scheme_d) );
-    if( (void*) pride == NULL ){
+    pride = (void *) malloc ( sizeof(struct color_scheme_d) );
+    
+	if ( (void *) pride == NULL )
+	{
 		printf("windowSetUpColorScheme: pride");
 		die();
+	
 	}else{
 		
 		//Object.
@@ -661,7 +666,7 @@ void windowSetUpColorScheme(int type)
 		//...
 		
 		//Sanvando na estrutura padrão para o esquema pride.
-		PrideColorScheme = (void*) pride;
+		PrideColorScheme = (void *) pride;
 	};	
 		
 	
@@ -675,38 +680,38 @@ void windowSetUpColorScheme(int type)
 	//
 	
 	
-    switch(type)
-	{
+    switch (type){
+		
 		case ColorSchemeNull:
-		    CurrentColorScheme = (void*) humility;
+		    CurrentColorScheme = (void *) humility;
 		    break;
 		
 		case ColorSchemeHumility:
-		    CurrentColorScheme = (void*) humility;
+		    CurrentColorScheme = (void *) humility;
 		    break;
 		
 		case ColorSchemePride:
-	        CurrentColorScheme = (void*) pride; 
+	        CurrentColorScheme = (void *) pride; 
 		    break;
 		
 		default:
-		    CurrentColorScheme = (void*) humility;
+		    CurrentColorScheme = (void *) humility;
 			break;
-	}	
+	};	
 	
 
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
 //seleciona o tipo ...isso é um serviço.
-int windowSelectColorScheme( int type )
-{
+int windowSelectColorScheme ( int type ){
+	
 	//#debug
 	//printf("windowSelectColorScheme: type={%d} \n", type);
 	
-    switch(type)
+    switch (type)
 	{
 		case ColorSchemeHumility:
 		    goto do_humility;
@@ -724,13 +729,14 @@ int windowSelectColorScheme( int type )
 
 	
 do_humility:
-    if( (void *) HumilityColorScheme == NULL )
+    if ( (void *) HumilityColorScheme == NULL )
     {
 		printf("HumilityColorScheme fail\n");
         goto fail;     	    	
 	}else{
-	    if(	HumilityColorScheme->used != 1 || 
-		    HumilityColorScheme->magic != 1234 )
+		
+	    if ( HumilityColorScheme->used != 1 || 
+		     HumilityColorScheme->magic != 1234 )
 		{
 			printf("HumilityColorScheme sig fail\n");
 			goto fail;
@@ -774,17 +780,20 @@ fail:
  *     #Rotinas de teste. @todo: Enviar para a pasta /test.
  *     Esse rotina funcionou e se mostrou bem útil.
  */
-void windowShowWWFMessageBuffers()
-{
+void windowShowWWFMessageBuffers (){
+	
 	struct window_d *wFocus;
     wFocus = (void *) windowList[window_with_focus];
 
 	int i;
+	
 	//Obs: Tipo.
-	for( i=0; i<32; i++){
+	for ( i=0; i<32; i++ )
+	{
 	    printf("%d ", wFocus->msgList[i]);
     };
-    return;	
+	
+    //return;	
 };
 
 
@@ -1095,8 +1104,8 @@ fail:
  * um aplicativo que roda no shell pode estar chamando isso.
  *
  */
-int window_getch()
-{
+int window_getch (){
+	
 	unsigned char SC;
 	int save;
 	
@@ -1225,14 +1234,17 @@ done:
  *     Bloqueia uma janela.
  *     @todo: Quem pode realizar essa operação??
  */
-void windowLock(struct window_d *window)
-{
+void windowLock (struct window_d *window){
+	
     //Check.
-	if( (void*) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 	    return;
-    };  
+    };
+	
     window->locked = (int) WINDOW_LOCKED;  //1.
-    return;
+    
+	//return;
 };
 
 
@@ -1241,14 +1253,17 @@ void windowLock(struct window_d *window)
  *     Desbloqueia uma janela.
  *     @todo: Quem pode realizar essa operação??
  */
-void windowUnlock(struct window_d *window)
-{
+void windowUnlock (struct window_d *window){
+	
     //Check.
-	if( (void*) window == NULL ){
+	if ( (void *) window == NULL )
+	{
 	    return;
     };  
-    window->locked = (int) WINDOW_UNLOCKED;  //0.
-    return;
+    
+	window->locked = (int) WINDOW_UNLOCKED;  //0.
+    
+	//return;
 };
 
 
@@ -1256,16 +1271,18 @@ void windowUnlock(struct window_d *window)
  * set_current_window:
  *     @todo: Mudar para windowSetCurrentWindow
  */
-void set_current_window(struct window_d *window)
-{
+void set_current_window (struct window_d *window){
+	
     //Check.
-	if( (void*) window == NULL ){ 
+	if ( (void *) window == NULL )
+	{ 
 	    return; 
 	};  
     
-	CurrentWindow = (void*) window;
+	CurrentWindow = (void *) window;
 	current_window = (int) window->id;
-    return;
+    
+	//return;
 };
 
 
@@ -1273,7 +1290,8 @@ void set_current_window(struct window_d *window)
  * get_current_window: 
  *     Get current window pointer.
  */
-void *get_current_window(){
+void *get_current_window (){
+	
 	return (void *) CurrentWindow;
 };
 
@@ -1292,8 +1310,8 @@ int get_current_window_id()
  * RegisterWindow: 
  *     Registrando uma janela numa lista de janelas.
  */
-int RegisterWindow(struct window_d *window)
-{
+int RegisterWindow (struct window_d *window){
+	
 	int Offset = 0; 
     struct window_d *Empty; 
 	
@@ -1531,30 +1549,27 @@ done:
  * a função create window.
  */
 //int windowRedrawWindow(struct window_d *window) 
-int 
-redraw_window(struct window_d *window, unsigned long flags )
-{
+int redraw_window (struct window_d *window, unsigned long flags ){
+	
 	int Status; 
 	unsigned long border_size = 0;
 	unsigned long border_color = COLOR_BORDER;	
  
 	//Checar se a estrutura é válida.	
 	//handle
-	if( (void*) window == NULL )
+	if ( (void *) window == NULL )
 	{
 		goto fail;
 	}else{
 		
 		//used magic
-	    if( window->used != 1 || 
-		    window->magic != 1234 )
+	    if ( window->used != 1 || window->magic != 1234 )
 		{
 		    goto fail;
 	    }
 		
 		//...
 	};
-	
 	
 	
 	//@todo: Pra que serva a flag redraw ??
@@ -1659,7 +1674,7 @@ redrawBegin:
 	{
 		//#bugbug
 		//A sombra deve ter suas dimensões registradas também.
-		if( window->type == WT_OVERLAPPED )
+		if ( window->type == WT_OVERLAPPED )
 		{
             // @todo: Adicionar a largura das bordas verticais 
 			// e barra de rolagem se tiver.
@@ -1668,7 +1683,7 @@ redrawBegin:
 			// Cinza escuro.  CurrentColorScheme->elements[??] 
 			// @TODO: criar elemento sombra no esquema. 
 			
-			drawDataRectangle( window->left +1, 
+			drawDataRectangle ( window->left +1, 
 		        window->top  +1, 
 				window->width  +1 +1,      
 				window->height +1 +1,  
@@ -1898,9 +1913,10 @@ redrawBegin:
 
 	
 	//poderemos ter mais valores em flags no futuro.
-	if( flags == 1 )
+	if ( flags == 1 )
 	{
-	    refresh_rectangle( window->left, window->top, window->width, window->height );
+	    refresh_rectangle ( window->left, window->top, window->width, 
+		    window->height );
 	};
 	
 	//Continua ...

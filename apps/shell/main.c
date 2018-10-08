@@ -1216,7 +1216,7 @@ shellProcedure( struct window_d *window,
 					  //APISetFocus(window);
 					  APIresize_window(window,200, 200);
 					  APIredraw_window(window,1);
-					  refresh_screen ();
+					  //refresh_screen (); //não precis isso
 					  
 					//Se a janela for igual a um botão e o botão for o de fechar, 
 					//então saímos do aplicativo. Mas não temos informações sobre 
