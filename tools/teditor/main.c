@@ -68,7 +68,7 @@ int mainGetMessage (){
 	//printf("\n");
 	//printf(".\n");
 	printf("..\n");
-	printf("  ## MESSAGE={%s} ##  \n", shared_memory );
+	printf("# MESSAGE={%s} #\n", shared_memory );
 	printf("..\n");
 	//printf(".\n");
 	//printf("\n");
@@ -84,7 +84,7 @@ int mainGetMessage (){
     // Criando o ambiente.
 	// Transferindo os ponteiros do vetor para o ambiente.
 
-	tokenList[0] = strtok( &shared_memory[0], LSH_TOK_DELIM);
+	tokenList[0] = strtok ( &shared_memory[0], LSH_TOK_DELIM );
 	
  	// Salva a primeira palavra digitada.
 	token = (char *) tokenList[0];
@@ -128,7 +128,7 @@ int mainGetMessage (){
 			printf("mainGetMessage: for fail!\n")
 			goto hang;
 		}
-	    printf("## argv{%d}={%s} ## \n", index, tokenList[index] );		
+	    printf("# argv{%d}={%s} #\n", index, tokenList[index] );		
 	};
 #endif	
 	
@@ -228,9 +228,15 @@ int mainTextEditor ( int argc, char *argv[] ){
     
 	//Criando uma janela para meu editor de textos.
 	apiBeginPaint(); 
-	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1,"TEDITOR",
+	
+	//hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1,"TEDITOR",
+	//                    20, 20, 800-40, 600-40,    
+    //                    0, 0, 0x303030, 0x303030 );
+
+	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, argv[1],
 	                    20, 20, 800-40, 600-40,    
                         0, 0, 0x303030, 0x303030 );	   
+	
 
 	if ( (void *) hWindow == NULL )
 	{	
@@ -276,8 +282,8 @@ int mainTextEditor ( int argc, char *argv[] ){
 	
 	//#test
 	//Se nenhum nome de arquivo foi especificado, então começamos a digitar.
-	if ( (char *) argv[1] == NULL ){
-		
+	if ( (char *) argv[1] == NULL )
+	{	
 	    goto startTyping;	
 	};
 	
@@ -333,7 +339,7 @@ Mainloop:
 			
 			if (ch == -1)
 			{
-			    asm("pause");
+			    asm ("pause");
                // printf("EOF reached! ?? \n");  				
 			};
 			

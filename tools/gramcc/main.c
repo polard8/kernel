@@ -113,7 +113,7 @@ int mainGetMessage (){
 	printf("\n");
 	printf(" mainGetMessage: Initializing fncc ...\n");
 	printf("\n");
-	printf("## cmdline={%s} ##\n", shared_memory);
+	printf ("# cmdline={%s} #\n", shared_memory );
 #endif
 	
     
@@ -164,12 +164,15 @@ int mainGetMessage (){
 			printf("mainGetMessage: for fail!\n")
 			goto hang;
 		}
-	    printf(" ## argv{%d}={%s} ##  \n", index, tokenList[index] );		
+	    printf (" # argv{%d}={%s} # \n", index, tokenList[index] );		
 	};
 #endif
  
-	// ## Call main ##	
-    Ret = (int) fnccmain ( token_count, tokenList );	
+	//
+	// ## Main ##	
+    //
+	
+	Ret = (int) fnccmain ( token_count, tokenList );	
 	
 	if (Ret == 1){
 //#ifdef FNCC_VERBOSE				
@@ -314,9 +317,12 @@ init:
 	//#importante.
 	stdin = fp;
 	finput = fp;
-		
+	
+	//
+	// ## Parse ##
+	//
 
-	// ## Testando funções do compilador ##
+	//Testando funções do compilador.
 	parse();
 
 	
@@ -325,7 +331,7 @@ init:
 	//isso dependerá da flag -s
 	
 	if ( asm_flag == 1 )
-	    printf("\nOUTPUT:\n%s\n\n",outfile);
+	    printf (" \n OUTPUT: \n%s\n\n", outfile );
    
     // More ...   
 	
