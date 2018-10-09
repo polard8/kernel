@@ -3414,27 +3414,37 @@ done:
  * janelas filhas, pois o ponteiro pode passar em cima 
  * de uma janela que está dentro de outra janela.  
  */
-int windowScan( unsigned long x, unsigned long y )
-{
+int windowScan ( unsigned long x, unsigned long y ){
+	
+	//register int i;
+	int i;
 	int WID;
 	
 	struct window_d *w;
 	
-	int i;
-	for( i=0; i <= windows_count; i++ )
+	// #bugbug
+	// Nesse for, o número de comparações é insuficiente.
+	// Precisamos sondar toda a lista de janelas.
+	// pois pode haver fragmentação na lista de janelas.
+	// Então mesmo com uma contagem baixa de janelas pode haver 
+	// janelas válidas em posições altas.
+	// Então vamos sondar por toda a lista.
+	
+	//for ( i=0; i <= windows_count; i++ )
+	for ( i=0; i < WINDOW_COUNT_MAX; i++ )	
 	{
 		w = (struct window_d *) windowList[i];
 		
 		//Ignorando as janelas principais.
-		if( (void*) w != NULL )
+		if ( (void *) w != NULL )
 		{	
-			if( w->used == 1 && w->magic == 1234 )
+			if ( w->used == 1 && w->magic == 1234 )
 			{
 				
-				if( x > w->left && 
-				    x < w->right && 
-				    y > w->top &&
-				    y < w->bottom )
+				if ( x > w->left && 
+				     x < w->right && 
+				     y > w->top &&
+				     y < w->bottom )
 				{
                     if( w->type == WT_EDITBOX ||
                         w->type == WT_OVERLAPPED ||	

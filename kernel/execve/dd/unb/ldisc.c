@@ -1714,6 +1714,10 @@ void mouseHandler (){
 	// será usada para 'capturar' o mouse ... 
 	// e depois tem a mensagem para 'descapturar'.
 	
+	//
+	//  ## Scan ##
+	//
+	
 	//===========
 	// (capture) - On mouse over. 
 	//
