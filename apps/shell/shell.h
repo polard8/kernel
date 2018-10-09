@@ -1186,6 +1186,10 @@ int is_bin ( char *cmd );
 int is_sh1 ( char *cmd );
 
 int shellCheckPassword();
+
+
+//testando botão.
+int shellTestButton ();
 			
 //
 // End.

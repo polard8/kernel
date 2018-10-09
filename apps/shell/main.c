@@ -2005,7 +2005,7 @@ do_compare:
 			
 			//@todo: podemos checar se o pathname é absoluto,
 			//e onde se encontra o arquivo que queremos.
-			shellDisplayBMP( (char*) tokenList[i] );
+			shellDisplayBMP ( (char *) tokenList[i] );
 		};
 		goto exit_cmp;
     };	
@@ -2758,7 +2758,15 @@ do_compare:
 		printf("VK_LMENU %d \n", system_call ( 138, VK_LMENU, VK_LMENU, VK_LMENU ) );
 		//...
 		goto exit_cmp;
-	}
+	};
+	
+	//testando a criação de botão e a interação com ele através do mouse.
+	if ( strncmp( prompt, "t8", 2 ) == 0 )
+    {
+	    shellTestButton ();	
+		refresh_screen ();
+		goto exit_cmp;
+	};		
 	
 	// tasklist - Lista informações sobre os processos.
 	//isso será um programa tasklist.bin

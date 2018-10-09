@@ -3,7 +3,9 @@
  *
  * Shell User Interface.
  *     Suporte às rotinas gráficas do aplicativo shell.
- *
+ *     #importante: A intenção é usar esse módulo do aplicativo shell 
+ *                  para construir e testar os recursos gráicos do sistema.
+ *                  Aqui é um campo de testes. 
  * @frednora
  */
 
@@ -37,16 +39,16 @@ extern int ShellFlag;
 //...
 
 
-void shellui_fntos(char *name)
-{
+void shellui_fntos (char *name){
+	
     int  i, ns = 0;
     char ext[4];
     //const char ext[4];
 	
     //transforma em maiúscula
-	while(*name && *name != '.')
+	while ( *name && *name != '.' )
 	{
-        if(*name >= 'a' && *name <= 'z')
+        if ( *name >= 'a' && *name <= 'z' )
             *name -= 0x20;
 
         name++;
@@ -57,20 +59,21 @@ void shellui_fntos(char *name)
 
     // aqui name[0] é o ponto.
 	// então constroi a extensão.
-	for(i=0; i < 3 && name[i+1]; i++)
+	for ( i=0; i < 3 && name[i+1]; i++ )
 	{
-        if(name[i+1] >= 'a' && name[i+1] <= 'z')
+        if ( name[i+1] >= 'a' && name[i+1] <= 'z' )
             name[i+1] -= 0x20;
 
         ext[i] = name[i+1];
     }
 
-    while(ns < 8){
+    while (ns < 8)
+	{
         *name++ = ' ';
         ns++;
     }
 
-    for(i=0; i < 3; i++)
+    for ( i=0; i < 3; i++ )
         *name++ = ext[i];
 
     *name = '\0';
@@ -97,7 +100,7 @@ shellTopbarProcedure( struct window_d *window,
 		//...
 	//}
 	
-    switch(msg)
+    switch (msg)
     {
 		//Faz algumas inicializações de posicionamento e dimensões.
         //case MSG_INITDIALOG:
@@ -471,16 +474,9 @@ shellTopbarProcedure( struct window_d *window,
 		    break;	  
     };
 
-
-    //
     // Nothing for now !
-    //
-
 
 //printf("Shell procedure\n");
-
-	
-	
 done:
     //@todo: variavel que indica que estamos em modo gráfico.
 	//if(VideoBlock.useGui == 1)
@@ -495,12 +491,12 @@ done:
     return (unsigned long) 0;	
 };
 
-//isso é um test.
-//o tipo dois funciona.
+
+
+// Criando edit box
+// o tipo dois funciona.
 // testando colocar o ponteiro no edit box. setar foco.
-//
-void shellCreateEditBox()
-{
+void shellCreateEditBox (){
     
 	editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-editbox1",     
                                        80, 80, 200, 22,    
@@ -522,7 +518,7 @@ void shellCreateEditBox()
 
 
 /*
- **********************************************************************
+ ******************** 
  * shellCreateTopBar:
  *
  *     CRIANDO A TOP BAR.
@@ -532,29 +528,31 @@ void shellCreateEditBox()
  * com resolução 800x600.
  *
  */
-int shellCreateTopBar( int status )
-{
-	//
+ 
+int shellCreateTopBar (int status){
+	
 	// Precisamos registrar no kernel que essa janela corresponde 
 	// a área de taskbar e que a área de trabalho agora é menor.
-	//
-	
+		
 	//
 	// Criando a barra.
 	//
 	
-	topbarWindow = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar ",     
-                                       0, 0, 800, (8*3),    
-                                       0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	   
-	if((void*) topbarWindow == NULL){	
+	topbarWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-topbar ",     
+                                0, 0, 800, (8*3),    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+	if ( (void *) topbarWindow == NULL )
+	{	
 		printf("shellCreateTopBar: topbar Window fail");
 		refresh_screen();
-		while(1){
+		
+		while (1){
 			asm("pause");
 		}
 		//exit(0);
 	};
-	    //Registrar.
+	//Registrar.
     APIRegisterWindow(topbarWindow);
 	
 	//
@@ -564,14 +562,16 @@ int shellCreateTopBar( int status )
 	unsigned long iconMaxWidth  = (8*3);
 	unsigned long iconMaxHeight = (8*3);
 
-	i1Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
-                                        0, 0, iconMaxWidth, iconMaxHeight,    
-                                        0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
-	if( (void*) i1Window == NULL )
+	i1Window = (void *) APICreateWindow ( 1, 1, 1, "shell-topbar-icon ",     
+                            0, 0, iconMaxWidth, iconMaxHeight,    
+                            0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
+							
+	if ( (void *) i1Window == NULL )
 	{	
 		printf("shellCreateTopBar: icon1 Window fail");
 		refresh_screen();
-		while(1){
+		
+		while (1){
 			asm("pause");
 		}
 		//exit(0);
@@ -583,14 +583,16 @@ int shellCreateTopBar( int status )
 	// icon 2 window
 	//
 
-	i2Window = (void*) APICreateWindow( 1, 1, 1," {} shell-topbar-icon ",     
-                                       iconMaxWidth, 0, iconMaxWidth, iconMaxHeight,    
-                                       0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );	   
-	if((void*) i2Window == NULL)
+	i2Window = (void *) APICreateWindow ( 1, 1, 1, "shell-topbar-icon ",     
+                            iconMaxWidth, 0, iconMaxWidth, iconMaxHeight,    
+                            0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
+							
+	if ( (void *) i2Window == NULL )
 	{	
 		printf("shellCreateTopBar: icon2 Window fail");
 		refresh_screen();
-		while(1){
+		
+		while (1){
 			asm("pause");
 		}
 		//exit(0);
@@ -676,46 +678,42 @@ int shellCreateTopBar( int status )
     APIRegisterWindow(topbar_scrollbarWindow);
 */
 	
-		
-	
-	
 	//
 	// BMP . LABELS
 	//
-	
     
-	// isso funcionou.
 	void *b;
-	b = (void*) malloc(1024*30); 	// testando malloc.
-    if( (void*) b == NULL ){
+	
+	// testando malloc.
+	b = (void *) malloc (1024*30); 	
+    
+	if ( (void *) b == NULL )
+	{
 		printf("shellTestDisplayBMP: allocation fail\n");
+		return -1;
 		//while(1){}
 	}
 	
 	//Carregando o arquivo.
 loadFile:
-    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+    
+	//@todo: Usar alguma rotina da API específica para carregar arquivo.
 	// na verdade tem que fazer essas rotinas na API.
-	system_call( SYSTEMCALL_READ_FILE, 
-	             (unsigned long) bmp1_file_name, 
-				 (unsigned long) b, 
-				 (unsigned long) b);	
-	
-	
-
-	//16x16
-	//#teste
-	bmpDisplayBMP( b, 2, 2, 16, 16 );	
-	bmpDisplayBMP( b, iconMaxWidth +2, 2, 16, 16 );		
+	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) bmp1_file_name, 
+		(unsigned long) b, (unsigned long) b );
 		
+		
+	apiDisplayBMP ( (char *) b, 2, 2 ); 
+	apiDisplayBMP ( (char *) b, iconMaxWidth +2, 2 ); 
 	
 	
-	if( status == 2 )
+	if (status == 2)
 	{
 	    ShellFlag = SHELLFLAG_TOPBAR;
 	}
 	
-done:
+//done:
+
 	return (int) 0;
 };
 
@@ -723,41 +721,36 @@ done:
 /*
  * shellDisplayBMP:
  *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
- *
  */
-int shellDisplayBMP( char *file_name )
-{	
-	//
+int shellDisplayBMP (char *file_name){	
+	
 	// #bugbug @todo: Aumenta o tamanho do heap do processo.
 	// Esse heap é gerenciando nas bibliotecas ou na API.
 	//Obs: 32Kb é alem do limite.
-	//
 	
-	void *b = (void*) malloc(1024*30); 	// testando malloc.
-    if( (void*) b == NULL ){
+	// testando malloc.
+	void *b = (void *) malloc (1024*30); 	
+    
+	if ( (void *) b == NULL )
+	{
 		printf("shellTestDisplayBMP: allocation fail\n");
 		//while(1){}
+		return -1;
 	}
 	
 	//Carregando o arquivo.
 loadFile:
 
-    shellui_fntos( (char *) file_name);
+    shellui_fntos ( (char *) file_name );
 
     //@todo: Usar alguma rotina da API específica para carregar arquivo.
 	// na verdade tem que fazer essas rotinas na API.
-	system_call( SYSTEMCALL_READ_FILE, 
-	             (unsigned long) file_name, 
-				 (unsigned long) b, 
-				 (unsigned long) b);	
 	
-	
-
-	//16x16
-	//bmpDisplayBMP( b, 10, 450, 16, 16 );
+	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) file_name, 
+		(unsigned long) b, (unsigned long) b);	
 	 
 	//Usando a API para exibir o bmp carregado. 
-	apiDisplayBMP((char *) b, 10, 400); 
+	apiDisplayBMP ( (char *) b, 10, 400 ); 
 	 
     //
 	//Mostrando informações sobre o arquivo.
@@ -806,8 +799,10 @@ void shellTestDisplayBMP()
 	//Obs: 32Kb é alem do limite.
 	//
 	
-	void *b = (void*) malloc(1024*30); 	// testando malloc.
-    if( (void*) b == NULL ){
+	void *b = (void *) malloc (1024*30); 	// testando malloc.
+    
+	if ( (void *) b == NULL )
+	{
 		printf("shellTestDisplayBMP: allocation fail\n");
 		//while(1){}
 	}
@@ -816,16 +811,11 @@ void shellTestDisplayBMP()
 loadFile:
     //@todo: Usar alguma rotina da API específica para carregar arquivo.
 	// na verdade tem que fazer essas rotinas na API.
-	system_call( SYSTEMCALL_READ_FILE, 
-	             (unsigned long) bmp1_file_name, 
-				 (unsigned long) b, 
-				 (unsigned long) b);	
-	
+	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) bmp1_file_name, 
+		(unsigned long) b, (unsigned long) b);	
 	
 
-	//16x16
-	bmpDisplayBMP( b, 10, 450, 16, 16 );
-	 
+	apiDisplayBMP ( (char *) b, 10, 450 );  
 	 
     //
 	//Mostrando informações sobre o arquivo.
@@ -863,42 +853,48 @@ loadFile:
 /*
  * bmpDisplayBMP:
  *     Mostra na tela uma imagem .bmp carregada na memória.
+ *     #todo: No kernel ou na api tem rotina mais aprimorada que essa.
  */
-void bmpDisplayBMP( void *address, 
-                    unsigned long x, 
-					unsigned long y, 
-					int width, 
-					int height )
+void bmpDisplayBMP ( void *address, 
+                     unsigned long x, 
+					 unsigned long y, 
+					 int width, 
+					 int height )
 {
-	
+
+    apiDisplayBMP ( (char *) address, x, y ); 
+    
+	/*
 	int i, j, base, offset;	
 	unsigned long left, top, bottom;
 	unsigned long color;
 	
-	base = 0x36;  //início da área de dados do bmp
+	//início da área de dados do bmp
+	base = 0x36;  
 	
 	//limits
-	
 	//@todo: Refazer isso
-	if( x > 800 ){ return; }
-	if( y > 600 ){ return; }
-	if( width > 800 ){ return; }
-	if( height > 600 ){ return; }
+	if ( x > 800 ){ return; }
+	if ( y > 600 ){ return; }
+	if ( width > 800 ){ return; }
+	if ( height > 600 ){ return; }
 	
-	if(address == 0){return;}
+	if (address == 0){
+	    return;
+	}
 	
-	left = x;    //
-	top  = y; 
+	left = x;    
+	top = y; 
+	
 	bottom = top + height;
 	
 	//base do bmp carregado na memória
 	unsigned char *bmp = (unsigned char *) address;
-	unsigned char *c   = (unsigned char *) &color;
+	unsigned char *c = (unsigned char *) &color;
 	
-	
-	for(i=0; i<height; i++)
+	for ( i=0; i<height; i++ )
 	{
-		for(j=0; j<width; j++)
+		for ( j=0; j<width; j++ )
 		{	
 			//construindo o char.
 			
@@ -917,23 +913,34 @@ void bmpDisplayBMP( void *address,
 			
 			//put pixel.
 			//number,cor,x,y
-			system_call( SYSTEMCALL_BUFFER_PUTPIXEL, 
-			             (unsigned long) color, 
-						 (unsigned long) left, 
-						 (unsigned long) bottom );
+			system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
+				(unsigned long) left, (unsigned long) bottom );
 						 
 			//my_buffer_put_pixel( (unsigned long) color, (unsigned long) left, (unsigned long) bottom, 0);
 			
-			left++; //próximo pixel.
+			//próximo pixel.
+			left++; 
 		}
 		
 		//vamos para a linha anterior.
 		bottom = bottom-1;
 		left = x;    //reiniciamos o x.
-	};	
+	};
 	
+	*/
 	return;
 };
 
 
+//testando botão.
+int shellTestButton (){
+	
+	struct button_d *button1;
+	
+	button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "button1",     
+                                100, 100, 100, 40,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	
 
+	
+    return 0;	
+};
