@@ -234,29 +234,24 @@ CreateWindow( unsigned long type,
 	//unsigned long saveLeft;
     //unsigned long saveTop;
 	
-	//
+	
 	// Desktop:
 	// @todo: Configurar desktop antes de tudo. 
 	// @todo: Quando criamos uma janela temos de definir que ela
 	// pertence ao desktop atual se não for enviado por argumento 
 	// o desktop que desejamos que a janela pertença.
-	//
 
 	
-	//
 	// O argumento onde:
 	// Indica onde devemos pintar a janela. Serve para indicar as janelas 
 	// principais. Ex: Se o valor do argumento for 0, indica que devemos 
 	// pintar na tela screen(background) etc...
-	//
 
 
-	//
 	// full screen mode ??
 	// Se a janela a ser criada estiver no modo full screen, ela não deve ter
 	// um frame, então as dimensões da janela serão as dimensões do retângulo
 	// que forma a janela. Talvez chamado de Client Area.
-	//
 	
 	//
 	// Parent window.
@@ -268,11 +263,13 @@ CreateWindow( unsigned long type,
 	// ?? Qual deve ser a janela mãe ? Limites ?
 	// @todo: devemos checar used e magic da janela mãe.
 	// #bugbug: E quando formos criar a gui->screen, quem será a janela mãe ?
-	if( (void*) pWindow == NULL )
+	
+	if ( (void *) pWindow == NULL )
     {
-		Parent = (void*) gui->screen;	
-	}else{
-		Parent = (void*) pWindow;
+		Parent = (void *) gui->screen;	
+	
+	} else {
+		Parent = (void *) pWindow;
 	};
 	
 	
@@ -322,14 +319,15 @@ CreateWindow( unsigned long type,
 	// *Importante: Checando se o esquema de cores está funcionando.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL )
+	if ( (void *) CurrentColorScheme == NULL )
 	{
 		printf("CreateWindow: CurrentColorScheme");
 		die();
+		
 	}else{
 		
-		if( CurrentColorScheme->used != 1 || 
-		    CurrentColorScheme->magic != 1234 )
+		if ( CurrentColorScheme->used != 1 || 
+		     CurrentColorScheme->magic != 1234 )
 		{
 		    printf("CreateWindow: CurrentColorScheme validation");
 		    die();			
@@ -532,13 +530,13 @@ CreateWindow( unsigned long type,
 		//Filas de mensagens.
 		//São dessas filas que os programas em user mode
 		//são pegar as mensagens, solicitando através de system call.
-		window->hwndList[0]  = 0;
-		window->msgList[0]   = 0;
+		window->hwndList[0] = 0;
+		window->msgList[0] = 0;
 		window->long1List[0] = 0;
 		window->long2List[0] = 0;
 		
 		//Offsets
-		window->sendOffset    = 0;
+		window->sendOffset = 0;
 		window->receiveOffset = 0;
 		
 		//Buffers support.
@@ -638,7 +636,6 @@ CreateWindow( unsigned long type,
 	// Preparando os parametros da pintura de acordo com o tipo.
 	//	
 
-	//
 	// De acordo com o tipo de janela, preparamos a configuração
 	// e a própria rotina create window está pintando.
 	// Porém nesse momento o 'case' pode chamar rotinas de pintura em 
@@ -648,22 +645,17 @@ CreateWindow( unsigned long type,
 	// pois quando chamarmos draw.c a estrutura de janela ja deve estar 
 	// inicializada.
 	// Rotinas grandes como pintar um barra de rolagem podem ficar em draw.c
-	//
 	
-	//
 	// #importante
 	// Deveria ter uma variável global indicando o tipo de 
 	// design atual, se é 3D ou flat.
-	//
 	
 	
-	//
 	// Configurando os elementos de acordo com o tipo.
 	// @todo: Salvar as flags para os elementos presentes
 	// na estrutura da janela.
-	//
 	
-    switch(type)
+    switch (type)
     {
 		//0) Null.
 		//Ainda não implementada.
@@ -822,6 +814,7 @@ drawBegin:
 	
 	View = 0;
 	View = (int) is_window_minimized(window);
+	
     if ( View == 1 )
 	{
 		//window->draw = 1; //Devemos pintála no buffer dedicado.
@@ -847,16 +840,17 @@ drawBegin:
 	
 	View = 0;
 	View = (int) is_window_maximized(window);
-    if( View == 1 )
+	
+    if ( View == 1 )
 	{
 		//Dimensões.	
         window->width  = gui->main->width;
         window->height = gui->main->height;  
 		
 		//Margens.
-		window->left   = gui->main->x;    
-        window->top    = gui->main->y;
-        window->right  = (unsigned long) window->left + window->width;
+		window->left = gui->main->x;    
+        window->top = gui->main->y;
+        window->right = (unsigned long) window->left + window->width;
         window->bottom = (unsigned long) window->top  + window->height;       
 
 		//Deslocamentos em relação às margens.
@@ -912,7 +906,7 @@ drawBegin:
 	//  ## Shadow ##
 	
     // Sombra.	
-	if( Shadow == 1 )
+	if ( Shadow == 1 )
 	{
 		//flag.
 		window->shadowUsed = 1;
@@ -925,7 +919,7 @@ drawBegin:
 		//if()
 		
 		
-		if( (unsigned long) type == WT_OVERLAPPED )
+		if ( (unsigned long) type == WT_OVERLAPPED )
 		{
             // @todo: Adicionar a largura das bordas verticais 
 			// e barra de rolagem se tiver.
@@ -934,11 +928,8 @@ drawBegin:
 			// Cinza escuro.  CurrentColorScheme->elements[??] 
 			// @TODO: criar elemento sombra no esquema. 
 			
-			drawDataRectangle( window->left +1, 
-		        window->top +1, 
-				window->width +1 +1,      
-				window->height +1 +1, 
-				xCOLOR_GRAY1 );             
+			drawDataRectangle ( window->left +1, window->top +1, 
+				window->width +1 +1, window->height +1 +1, xCOLOR_GRAY1 );             
         };
 
         // ??
@@ -954,7 +945,7 @@ drawBegin:
 	//    Background para todo o espaço ocupado pela janela e pelo seu frame.
 			
 	// Background.
-	if( Background == 1 )
+	if ( Background == 1 )
 	{
 		// Flag.
         window->backgroundUsed = 1;
@@ -986,18 +977,19 @@ drawBegin:
 	// Obs: As bordas dependem do tipo de janela e do 
 	// estilo de janela.
 	
-	if( Border == 1 )
+	if ( Border == 1 )
 	{
 		//flag.
 		window->borderUsed = 1;
 		
 		// A largura da borda pode sinalizar o status (ativo ou inativo) 
 		// de uma caixa de edição.
-		if( status == 0 ){ 
+		if ( status == 0 ){ 
 		    border_size = 1;
             border_color = COLOR_INACTIVEBORDER; 			
 		}
-		if( status == 1 ){ 
+		
+		if ( status == 1 ){ 
 		    border_size = 2; 
 		    border_color = COLOR_BLUE;
 		}
@@ -1014,11 +1006,8 @@ drawBegin:
 	    drawDataRectangle( window->left +window->width -1, 
 	        window->top, border_size, window->height, border_color );
 					   
-	    drawDataRectangle( window->left, 
-	                       window->top +window->height -1, 
-					       window->width, 
-					       border_size,
-					       border_color );
+	    drawDataRectangle ( window->left, window->top +window->height -1, 
+			window->width, border_size, border_color );
 		
 	};
 	
@@ -1028,7 +1017,7 @@ drawBegin:
     // bordas para janelas de aplicativos. Ou seja,
     // as bordas não são pintadas individualmente.	
 	
-	if( TitleBar == 1 )
+	if ( TitleBar == 1 )
 	{ 
         //flag.
         window->titlebarUsed = 1;
@@ -1057,11 +1046,8 @@ drawBegin:
 		//retângulao
 		//??width  @todo: Adicionar a largura da bordas bordas verticais.
 		//??height @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-        drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width +1 +1,  
-						   window->height +1 +1, 
-						   window->color_bg );
+        drawDataRectangle ( window->left, window->top, 
+			window->width +1 +1, window->height +1 +1, window->color_bg );
 						   
 		// ??
 		// Active window.		
@@ -1070,7 +1056,7 @@ drawBegin:
 		// e não a janela ativa.		
         
 		//if(window->id == window_with_focus)
-	    if( window->id == active_window )
+	    if ( window->id == active_window )
 		{
 			// ## bugbug ##
 			// Não usaremos mais isso.
@@ -1089,10 +1075,8 @@ drawBegin:
         // O texto não é tão claro quanto o texto dentro 
         // da área de cliente, dando foco no conteúdo.
 		
-		draw_string( window->left +8 +16 +8, 
-		             window->top +8 +4, 
-					 COLOR_TERMINALTEXT2,  
-					 window->name );  
+		draw_string ( window->left +8 +16 +8, window->top +8 +4, 
+			COLOR_TERMINALTEXT2, window->name );  
 					 
 					 
 	    // #bugbug
@@ -1106,7 +1090,7 @@ drawBegin:
 		
 		//@todo: Se estivermos em full screen, não teremos botão.	
 		
-		if(MinimizeButton == 1)
+		if (MinimizeButton == 1)
 		{
 			window->minimizebuttonUsed = 1;
 			
@@ -1121,9 +1105,8 @@ drawBegin:
 			// SERÁ ASSIM DAQUI PRA FRENTE.
 			
 			// Criar.
-			internal_window = CreateWindow( WT_BUTTON, 1, 1, "V", 
-	            (window->width -42 -1), 2, 
-				21, 21,									  
+			internal_window = CreateWindow ( WT_BUTTON, 1, 1, "V", 
+	            (window->width -42 -1), 2, 21, 21,									  
 			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
 			// Registrar.
@@ -1131,7 +1114,7 @@ drawBegin:
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
-	    if(CloseButton == 1)
+	    if (CloseButton == 1)
 		{
 			window->closebuttonUsed = 1;
             
@@ -1139,10 +1122,9 @@ drawBegin:
 			// SERÁ ASSIM DAQUI PRA FRENTE.
 			
 			// Criar.
-			internal_window = CreateWindow( WT_BUTTON, 1, 1, "X", 
-	            (window->width -21), 2, 
-				21, 21,									  
-			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+			internal_window = CreateWindow ( WT_BUTTON, 1, 1, "X", 
+	            (window->width -21), 2, 21, 21,									  
+			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
             
 			// Registrar.
 			//RegisterWindow(internal_window);
@@ -1162,7 +1144,7 @@ drawBegin:
     // não tem.
     // #Testando para diferentes tipos de janela.
 	
-    if( ClientArea == 1 )
+    if ( ClientArea == 1 )
 	{
 		//flag.
 		window->clientAreaUsed = 1;
@@ -1170,8 +1152,9 @@ drawBegin:
 		// Obs: A Client Area é apenas um retângulo.
 		//@todo: Passar a estrutura de janela.
 		
-		clientRect = (void*) malloc( sizeof(struct rect_d) ); 
-		if( (void*) clientRect == NULL )
+		clientRect = (void *) malloc ( sizeof(struct rect_d) ); 
+		
+		if ( (void *) clientRect == NULL )
 		{
 			//free(clientRect);
 		    window->rcClient = NULL;
@@ -1181,7 +1164,7 @@ drawBegin:
 			// #bugbug
 			// Nenhum alerta será emitido aqui por enquanto.
 			
-		}else{
+		} else {
 			
 			//@todo: Criar função rectSetup(....)
 			// Testando, isso pode falhar.
@@ -1210,7 +1193,7 @@ drawBegin:
 			
 			// janela.
 			// O retângulo pertence à essa janela.
-			window->rcClient->window = (void*) window; 
+			window->rcClient->window = (void *) window; 
 			
 			// #importante
 			// ( Posicionamento e dimencionamento. )
@@ -1228,7 +1211,7 @@ drawBegin:
 			
 			// ## OVERLAPPED WINDOW ##
 			
-            if( window->type == WT_OVERLAPPED )
+            if ( window->type == WT_OVERLAPPED )
             {
 			    //left top
                 window->rcClient->left = (unsigned long) (window->left +1);
@@ -1312,19 +1295,16 @@ drawBegin:
 	// SCROLL BAR
 	//se create window foi usada para criar uma janela filha do tipo scroll bar. 		
 	//completaremos 
-	if( (unsigned long) type == WT_SCROLLBAR )
+	if ( (unsigned long) type == WT_SCROLLBAR )
 	{ 
         //bg
-		drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width,  
-						   window->height, 
-						   window->color_bg ); 
+		drawDataRectangle ( window->left, window->top, 
+			window->width, window->height, window->color_bg ); 
 						   
 	    //Botão de cima da scrollbar vertival
 		
 		// Criar.
-		internal_window = CreateWindow( WT_BUTTON, 1, 1, "^", 
+		internal_window = CreateWindow ( WT_BUTTON, 1, 1, "^", 
 	        1, 1, (window->width -2), 16,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
         
@@ -1333,7 +1313,7 @@ drawBegin:
 			
 		//#test	
 	    //limits
-	    if( window->height == 0 || window->height > 800 ){ 
+	    if ( window->height == 0 || window->height > 800 ){ 
 		    window->height = 2; 
 		}
 
@@ -1360,30 +1340,23 @@ drawBegin:
 	};	
 
 	
-	if( (unsigned long) type == WT_STATUSBAR )
+	if ( (unsigned long) type == WT_STATUSBAR )
 	{
         //bg
-		drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width -1,  
-						   window->height, 
-						   window->color_bg ); 	
+		drawDataRectangle ( window->left, window->top, 
+			window->width -1, window->height, window->color_bg ); 	
 						   
-						   
-		draw_string( window->left +8, 
-		             window->top +8, 
-					 COLOR_TEXT,  
-					 window->name );  
+		draw_string ( window->left +8, window->top +8, COLOR_TEXT,  
+			window->name );  
 	};
 	
 	
-	if( (unsigned long) type == WT_BUTTON )
+	if ( (unsigned long) type == WT_BUTTON )
 	{
 	    //as posições de left e right são da janela do botão.		 
-		draw_button( Parent, windowname, 1, 
-		             window->left, window->top, 
-					 window->width, window->height, 
-					 window->color_bg );
+		draw_button ( Parent, windowname, 1, 
+		    window->left, window->top, window->width, window->height, 
+			window->color_bg );
 	};					 
 	
 	//

@@ -829,14 +829,15 @@ void *services( unsigned long number,
 		//...
 		
 		//
-		// #### test ####
+		// #### Get Message ####
 		//
 		
+		//Esse é o get message usado pelos aplicativos.
 		//O aplicativo envia um endereço de array 
 		//e devemos colocar 4 longs como mensagens.
 		//Isso funcionou. Esse será o padrão.
 		case 111:
-		    if( &message_address[0] == 0 )
+		    if ( &message_address[0] == 0 )
 			{
 				printf("111: null pointer");
 				die();

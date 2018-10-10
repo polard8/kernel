@@ -800,6 +800,8 @@ void windowShowWWFMessageBuffers (){
 /*
  *****************************************************************************
  * windowSendMessage:
+ *     Uma mensagem será enviada para uma janela.
+ *
  *    Uma mensagem deve ser enviada para a estrutura da janela com o 
  * foco de entrada.
  *    A classe system.devices.unblocked. pois essa rotina é um método dela.
@@ -859,20 +861,21 @@ void windowSendMessage( unsigned long arg1,
 	// Não fazer nada caso não haja uma janela com o foco de entrada, 
 	// pois quem decide que janela tem o foco de entrada é o usuário.
 		
-	if( (void*) wFocus == NULL )
+	if( (void *) wFocus == NULL )
 	{
 		printf("windowSendMessage: wFocus fail\n");
 		refresh_screen();
 	    return;
+		
 	}else{
 		
 		//Valida a estrutura da janela com o foco de entrada.
-		if( wFocus->used == 1 && wFocus->magic == 1234 )
+		if ( wFocus->used == 1 && wFocus->magic == 1234 )
 		{
 			
 			//ok funcionou
 			wFocus->msg_window = (struct window_d *) arg1;
-			wFocus->msg   = (int) arg2;      
+			wFocus->msg = (int) arg2;      
 			wFocus->long1 = (unsigned long) arg3;
 			wFocus->long2 = (unsigned long) arg4;
 			wFocus->newmessageFlag = 1;
@@ -888,9 +891,8 @@ void windowSendMessage( unsigned long arg1,
           		
 	};
 	
-	
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
@@ -1683,29 +1685,22 @@ redrawBegin:
 			// Cinza escuro.  CurrentColorScheme->elements[??] 
 			// @TODO: criar elemento sombra no esquema. 
 			
-			drawDataRectangle ( window->left +1, 
-		        window->top  +1, 
-				window->width  +1 +1,      
-				window->height +1 +1,  
-				xCOLOR_GRAY1 );             
+			drawDataRectangle ( window->left +1, window->top  +1, 
+				window->width  +1 +1, window->height +1 +1, xCOLOR_GRAY1 );             
         };                
 	};
 
     //Background.
-	if(window->backgroundUsed == 1)
+	if (window->backgroundUsed == 1)
 	{		
-		drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width,   
-						   window->height,    
-						   window->color_bg );      	
+		drawDataRectangle ( window->left, window->top, 
+			window->width, window->height, window->color_bg );      	
 	};
-	
 	
 	
 	//borda.
 	//para os casos de editbox por exemplo.
-	if( window->borderUsed == 1 )
+	if ( window->borderUsed == 1 )
 	{
 		//#bugbug 
 		//a cor da borda e o size vão depender do status da janela.
@@ -1715,51 +1710,33 @@ redrawBegin:
 		//border_size = 1;
 		border_size = 2;
 		
-		
 	    //board1, borda de cima e esquerda.    
-		drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width, 
-						   border_size, 
-						   border_color );
+		drawDataRectangle ( window->left, window->top, 
+			window->width, border_size, border_color );
 						   
-	    drawDataRectangle( window->left, 
-		                   window->top, 
-						   border_size, 
-						   window->height, 
-						   border_color );
+	    drawDataRectangle ( window->left, window->top, 
+			border_size, window->height, border_color );
 
 	    //board2, borda direita e baixo.
-	    drawDataRectangle( window->left +window->width -1, 
-	                       window->top, 
-					       border_size, 
-					       window->height, 
-					       border_color );
+	    drawDataRectangle ( window->left +window->width -1, window->top, 
+		    border_size, window->height, border_color );
 					   
-	    drawDataRectangle( window->left, 
-	                       window->top +window->height -1, 
-					       window->width, 
-					       border_size,
-					       border_color );		
-		
+	    drawDataRectangle ( window->left, window->top +window->height -1, 
+			window->width, border_size, border_color );		
 	};
 	
 	
 	
     //Título + borda(frame).	
-	if(window->titlebarUsed == 1)
+	if (window->titlebarUsed == 1)
 	{ 
-      
-	    //
 		//#importante:
 		//@todo:Ainda há muito o que levar em consideração 
 		//na hora de repintar uma janela com relação 
-		//ao fato de serem ativas ou não ou de terem 
-		//o foco ou não.
-		//
+		//ao fato de serem ativas ou não ou de terem o foco ou não.
  
         //no caso de janela mãe.
-        if(window->id == active_window)
+        if (window->id == active_window)
 		{
 			window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar];
 		}else{
@@ -1785,20 +1762,15 @@ redrawBegin:
 		
 		//Rectangle and string.
 		
-        drawDataRectangle( window->left, 
-		                   window->top, 
-						   window->width  +1 +1,  
-						   window->height +1 +1, 
-						   window->color_bg );
+        drawDataRectangle ( window->left, window->top, 
+			window->width +1 +1, window->height +1 +1, window->color_bg );
 						   
 						   
 		//@todo: 
 		//string da barra de títulos.
 		//Se estivermos em full screen, não teremos string.				   
-		draw_string( window->left +8 +16 +8, 
-		             window->top +8 +4, 
-					 COLOR_TERMINALTEXT2,  
-					 window->name );  		 
+		draw_string ( window->left +8 +16 +8, window->top +8 +4, 
+			COLOR_TERMINALTEXT2, window->name );  		 
 					 
 	    //Isso é um teste.
 	    //A janela nem foi registrada ainda e já estamos passando o handle
@@ -1810,20 +1782,28 @@ redrawBegin:
 		//@todo: Se estivermos em full screen, não teremos botão.	
 		if(window->minimizebuttonUsed == 1)
 		{
+			// #bugbug:
+			// Erro: Essa função é de redraw, então não podemos usar draw_button 
+			// ao invés, precisamos usar redraw_button, que será criada.
+			
 			//Quando passamos o handle da janela, a função draw_button
 			//obtem as margens que precisa. nos resta passarmos os 
 			//deslocamentos em relação às margens. (x=window->width-?) (y=2).
 			//A função draw_button vai somar a margem obtida pelo handle 'window'
 			//ao deslocamento obtido em (x=window->width-?).
-	        draw_button( window, "V", 1, 
+	        draw_button ( window, "V", 1, 
 			             (window->width -42 -1), 2, 
 						 21, 21, 
 						 COLOR_TERMINAL2);	
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
-	    if(window->closebuttonUsed == 1)
-		{
+	    if (window->closebuttonUsed == 1)
+		{			
+			// #bugbug:
+			// Erro: Essa função é de redraw, então não podemos usar draw_button 
+			// ao invés, precisamos usar redraw_button, que será criada.
+			
 	        draw_button( window, "X", 1, 
 			            (window->width -21), 2, 
 						21, 21, 
@@ -1836,7 +1816,7 @@ redrawBegin:
 	
 
    // Client Area. 	
-	if(window->clientAreaUsed == 1)
+	if (window->clientAreaUsed == 1)
 	{
 		//
 		// Obs: A Client Area é apenas um retângulo.
@@ -1845,16 +1825,14 @@ redrawBegin:
 		//@todo: Passar a estrutura de janela.
 		
 		
-		//
 		// #BUGBUG :: 
 		// ( NÃO ) PODEMOS REALOCAR NOVAMENTE ... 
 		// TEMOS QUE CHECAR SE A ESTRUTURA É VÁLIDA...
 		// SE TRATA APENAS DE UMA ESTRUTTURA DE RETÃNGULO, 
 		// NÃO ESPERAMOS MUITOS PROBLEMAS.
-		//
 		
 		 
-		if( (void*) window->rcClient == NULL )
+		if ( (void *) window->rcClient == NULL )
 		{
 			printf("redraw_window: rcClient");
 			die();
@@ -1868,32 +1846,35 @@ redrawBegin:
 			    die();							
 			}
 			
-			//
 			// Aqui devemos respeitar a forma que a área de cliente 
 			// foi desenhada.
 			// Mas todos os valores que precisamod devar estar 
-			// salvos na estrutura de área de cliente.
-			//		
+			// salvos na estrutura de área de cliente.	
 			
 			//draw
-            drawDataRectangle( (unsigned long) window->rcClient->left, 
-		                       (unsigned long) window->rcClient->top, 
-						       (unsigned long) window->rcClient->width, 
-						       (unsigned long) window->rcClient->height, 
-						       (unsigned long) window->rcClient->color_bg );         
+            drawDataRectangle ( (unsigned long) window->rcClient->left, 
+		                        (unsigned long) window->rcClient->top, 
+						        (unsigned long) window->rcClient->width, 
+						        (unsigned long) window->rcClient->height, 
+						        (unsigned long) window->rcClient->color_bg );         
 							    
 		};
 		//Nothing.
 	};
 
 
-    //if( (unsigned long) type == WT_SCROLLBAR )
+    //if( window->type == WT_SCROLLBAR )
 		
-	//if( (unsigned long) type == WT_STATUSBAR )
+	//if( window->type == WT_STATUSBAR )
 		
-	//if( (unsigned long) type == WT_BUTTON )
+	
+	//#bugbug: 
+	//Até agora repintamos a janela relativa ao botão. Provavelmente 
+	//referese à apenas seu background. Porém para redesenharmos o botão
+	//precisamos criar uma função redraw_button, semelhante a função draw_button.
+	//if( window->type == WT_BUTTON )
 
-	//if(window->type == WT_OVERLAPPED)
+	//if( window->type == WT_OVERLAPPED)
 		
 	//
 	// Outros elementos ainda não implementados ...
@@ -1929,39 +1910,38 @@ fail:
 
 
 /*
- ****************************************************************
+ ****************
  * redraw_screen:
  *
  *     Repinta todas as janelas com base na zorder.
  *     @todo: 
  * Obs: Ao repintar cada janela a rotina redraw_window deverá 
  * incluir todos os elementos da janela. 
- * Do mesmo jeito que o usuário modificou de acordo com suas 
- * prefeências.
- *
+ * Do mesmo jeito que o usuário modificou de acordo com suas preferências.
  */
-int redraw_screen()
-{
+ 
+int redraw_screen (){
+	
 	int z;
     int RedrawStatus;	
+	
 	struct window_d *zWindow;
 	
-	//
 	// Vamos procurar na lista por ponteiros válidos.
 	// Repintaremos todas as janelas com ponteiros válidos.
-	//
 	
-	for( z = 0; z < ZORDER_COUNT_MAX; z++ )
+	for ( z = 0; z < ZORDER_COUNT_MAX; z++ )
 	{
-	    zWindow = (void*) zorderList[z];
+	    zWindow = (void *) zorderList[z];
 	
 		//Pegando um ponteiro de janela válido na zorderList.
-		if( (void*) zWindow != NULL )
+		if ( (void *) zWindow != NULL )
 		{
-			if( zWindow->used == 1 && zWindow->magic == 1234 )
+			if ( zWindow->used == 1 && zWindow->magic == 1234 )
             {
 				//compara os índices.
-				if( zWindow->zIndex != z ){
+				if ( zWindow->zIndex != z ){
+					
 					printf("redraw_screen: z index error\n");
 					goto fail;
 				};
@@ -1971,7 +1951,9 @@ int redraw_screen()
 				
 				//Repinta uma janela.
 				RedrawStatus = (int) redraw_window(zWindow, 1);
-				if(RedrawStatus == 1){
+				
+				if (RedrawStatus == 1){
+					
 					printf("redraw_screen: redraw error\n");
 					goto fail;
 				};
@@ -1986,16 +1968,18 @@ int redraw_screen()
     // Repintaremos novamente a última janela.
     //Agora com foco de entrada.	
 
-    if( (void*) zWindow != NULL )
+    if ( (void *) zWindow != NULL )
 	{
-		if( zWindow->used == 1 && zWindow->magic == 1234 )
+		if ( zWindow->used == 1 && zWindow->magic == 1234 )
 		{
             set_active_window(zWindow);	
             SetFocus(zWindow);
 
 	        //Repinta uma janela.
 	        RedrawStatus = (int) redraw_window(zWindow, 1);
-	        if(RedrawStatus == 1){
+			
+	        if (RedrawStatus == 1){
+				
 		        printf("redraw_screen: redraw error\n");
 		        goto fail;
 	        };
@@ -2023,11 +2007,13 @@ resize_window( struct window_d *window,
                unsigned long cx, 
 			   unsigned long cy )
 {
-    if( (void*) window == NULL )
+    
+	if ( (void *) window == NULL )
 	{
 		//Erro, estrutura inválida.
 	    return (int) 1;    
-	}else{	
+	
+	} else {	
 	    
 		//@todo: Checar limites.
 	
@@ -2035,7 +2021,8 @@ resize_window( struct window_d *window,
         window->height = (unsigned long) cy;	
 	};
 
-done:
+//done:
+
     return (int) 0;
 };
 

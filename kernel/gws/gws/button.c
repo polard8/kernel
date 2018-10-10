@@ -1,5 +1,5 @@
 /*
- * File: gui\button.c
+ * File: gws\button.c
  *
  * Descrição:
  *     Rotinas de criação e gerenciamento de botões. 
@@ -10,11 +10,27 @@
  * Por exemplo: draw_3d_button e draw_flat_button 
  * seria muito confuso uma rotina só que acione o tipo via argumento.
  *
- * Versão 1.0, 2015.
+ *  #todo: precisamos de uma função de redraw button 
+ *         para o caso de redraw da janela do tipo botão.
+ *
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2018 - redraw_button created. #todo  
  */
 
 
 #include <kernel.h>
+
+
+/*
+//#todo: Create redraw_button( ...
+//fazer semelhante a função draw_button(.
+void *redraw_button ( struct window_d *window );
+void *redraw_button ( struct window_d *window )
+{
+    //todo
+}
+*/
 
 
 /*
@@ -27,8 +43,6 @@
  * deslocamento dentro da janela e endereço da imagem carregada como etiqueta.
  *
  * Retorna o ponteiro pra estrutura do botão.
- *
- *
  */
 void *draw_button ( struct window_d *window,
                     unsigned char *string,
@@ -96,8 +110,8 @@ void *draw_button ( struct window_d *window,
         return NULL;
     };    
 	
-    switch (type)
-    {
+    switch (type){
+		
         //Não pressionado.
         case BN_DOWN:
 		    Selected = 0;
