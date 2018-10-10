@@ -1098,59 +1098,7 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
                        unsigned long color )      //12, Color (bg) (para janela simples).
 { 
 	struct window_d *Window;
-		
-	//
-	// Call. ( int 200, service SYSTEMCALL_BUFFER_CREATEWINDOW. )
-	//
 	
-	// @todo:  É necessário criar um fastcall que envie bastante argumentos 
-	//         para o kernel e que o kernel atenda a chamada prontamente.
-	
-	//
-	// @todo: test. poderia enviar um ponteiro pra uma estrutura de retãngulo.
-	//
-	
-	//struct rect_d *r;
-	
-	//r->x  = (unsigned long) x;
-	//r->y  = (unsigned long) y;
-	//r->cx = (unsigned long) width;
-	//r->cy = (unsigned long) height;
-	
-	
-	/*
-	
-	//suporte 47 , status
-    system_call( SYSTEMCALL_CREATEWINDOW0, 
-	                               (unsigned long) status, 
-								   (unsigned long) clientcolor, 
-								   (unsigned long) color ); 
-
-    //suporte 48 x,y,janela mãe.
-    system_call( SYSTEMCALL_CREATEWINDOW1, 
-	                               (unsigned long) x, 
-								   (unsigned long) y, 
-								   (unsigned long) pWindow ); 
-
-    //suporte 49, largura , altura
-    system_call( SYSTEMCALL_CREATEWINDOW2, 
-	                               (unsigned long) width, 
-								   (unsigned long) height, 
-								   (unsigned long) 0 ); 								   
-	
-	
-	
-	//Número do serviço(10), tipo , view, nome 
-    Window = (void *) system_call( SYSTEMCALL_BUFFER_CREATEWINDOW, 
-	                               (unsigned long) type, 
-								   (unsigned long) view, 
-								   (unsigned long) windowname ); 
-								   
-	*/							   
-								   
-	
-	
-	// # test #
     // Enviando tudo via argumento.
 	// Esse método dá a possibilidade de enviarmos ainda 
 	// mais argumentos. 
@@ -1186,7 +1134,7 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 	{
 	    return NULL;    //Fail.
     
-	}else{
+	} else {
 		
 		// Obs: Temos as propriedades da janela criada.
 		//      Talvez o endereço retornado esteja em área
@@ -1194,8 +1142,18 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 		//      gerar um excessão.
         //      @todo: Cuidado com o retorno #bugbug 		
 		
+		
+		// Se a janela criada for do tipo botão, então precisamos registrar. 
+		// #obs: Podem haver outros tipo que precisam ser registrados.
+		
+		//if ( type == WT_BUTTON ){
+			
+		//    APIRegisterWindow (Window);
+		//};
+		
 		//...
-	    goto done;
+	    
+		goto done;
 	};
 	
 	//Nothing.

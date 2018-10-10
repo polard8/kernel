@@ -345,8 +345,8 @@ CreateWindow( unsigned long type,
 //CreateStruct:
 	
 	//Alocando memória para a estrutura da janela.
-	window = (void*) malloc( sizeof(struct window_d) );	           
-	if( (void*) window == NULL )
+	window = (void *) malloc( sizeof(struct window_d) );	           
+	if ( (void *) window == NULL )
 	{
         //
         // @todo: 
@@ -822,7 +822,7 @@ drawBegin:
 	
 	View = 0;
 	View = (int) is_window_minimized(window);
-    if( View == 1 )
+    if ( View == 1 )
 	{
 		//window->draw = 1; //Devemos pintála no buffer dedicado.
 		window->show = 0;
@@ -832,7 +832,7 @@ drawBegin:
 		//@todo: Não retornar. 
 		//como teste estamos retornando.
 		//goto done;
-	    return (void*) window;
+	    return (void *) window;
 	};
 	
 	// @todo: Maximized ?
@@ -973,11 +973,8 @@ drawBegin:
 		// @todo: ?? width Adicionar a largura da bordas bordas verticais.
 		// @todo: ?? height Adicionar as larguras das bordas horizontais e da barra de títulos.
 		
-		drawDataRectangle( window->left, 
-		    window->top, 
-			window->width, 
-			window->height, 
-			window->color_bg ); 
+		drawDataRectangle ( window->left, window->top, 
+			window->width, window->height, window->color_bg ); 
 
         //?? More
         //...		
@@ -1130,7 +1127,7 @@ drawBegin:
 			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
 			// Registrar.
-			RegisterWindow(internal_window);
+			//RegisterWindow(internal_window);
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
@@ -1148,7 +1145,7 @@ drawBegin:
 			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
             
 			// Registrar.
-			RegisterWindow(internal_window);
+			//RegisterWindow(internal_window);
 	    };					 
 		
 		//...			 
@@ -1332,7 +1329,7 @@ drawBegin:
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
         
 		// Registrar.
-		RegisterWindow(internal_window); 			
+		//RegisterWindow(internal_window); 			
 			
 		//#test	
 	    //limits
@@ -1348,7 +1345,7 @@ drawBegin:
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 		
 		// Registrar.
-		RegisterWindow(internal_window);
+		//RegisterWindow(internal_window);
 					
 	    //botão 2 da barra horizontal.
         //Botão de baixo da scrollbar vertival
@@ -1359,7 +1356,7 @@ drawBegin:
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);			
 	    
 		// Registrar.
-		RegisterWindow(internal_window);
+		//RegisterWindow(internal_window);
 	};	
 
 	
@@ -1425,7 +1422,7 @@ drawBegin:
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);
 		
 		// Registrar.
-		RegisterWindow(window->scrollbar);
+		//RegisterWindow(window->scrollbar);
 
         //status bar.
 		//Esses valores precisam ser melhor declarados.
@@ -1439,7 +1436,7 @@ drawBegin:
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);
         
 		// Registrar.
-		RegisterWindow(window->statusbar);
+		//RegisterWindow(window->statusbar);
         
         // # icon #
 		// Os ícones já estão carregados, 
@@ -1506,7 +1503,9 @@ drawBegin:
 	//@todo: Colocar essa definição no início da função.
     int z;
 	z = (int) z_order_get_free_slot();	
-    if( z >= 0 && z < ZORDER_COUNT_MAX ){
+    
+	if( z >= 0 && z < ZORDER_COUNT_MAX )
+	{
 	    zorderList[z] = (unsigned long) window;
 	};
 	
@@ -1520,6 +1519,15 @@ done:
 	//window->top  =  saveTop;
 	
     //SetFocus(window);
+	
+	if ( window->type == WT_BUTTON || 
+	     window->type == WT_SCROLLBAR || 
+         window->type == WT_STATUSBAR )
+	{
+	    RegisterWindow (window);	
+	}
+	    
+	
 	return (void *) window;
 };
 
