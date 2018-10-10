@@ -604,17 +604,36 @@ int x86main ( int argc, char *argv[] ){
 	*/
 	
     
-	//## test
 	//Isso funcionou, não mudar de lugar.
 	//Mas isso faz parte da interface gráfica,
 	//Só que somente nesse momento temos recursos 
 	//suficientes para essa rotina funcionar.
 	
-	windowLoadGramadoIcons();
+	windowLoadGramadoIcons ();
 	
 
 	// ## Testando font nelson Cole 2 ##
     gwsInstallFont("NC2     FON");
+	
+	//
+	// ## testando suporte a salvamento de retângulo ##
+	//
+	
+	//#debug
+	//printf ("testando salvamento de retangulo\n");
+	//refresh_screen();
+	
+	initialize_saved_rect ();
+	
+	//testando salvar um retângulo ...
+	save_rect ( 0, 0, 100, 100 );
+	
+	//copiando aqui no backbuffer
+	show_saved_rect ( 20, 20, 100, 100 );
+	
+	//
+	// ## servidor taskman ##
+	//
 	
 	// ## Criando a janela do servidor taskman ## 
 	// usada para comunicação.

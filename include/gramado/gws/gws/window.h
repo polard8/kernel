@@ -1899,8 +1899,63 @@ refresh_rectangle2 ( unsigned long x,
 				    unsigned long width, 
 				    unsigned long height,
                     unsigned long buffer1,
-                    unsigned long buffer2 );						
+                    unsigned long buffer2 );	
 
+
+					
+//
+// ## salvando retângulos ##
+//
+
+//a ideia é salvar os bytes usados por um retângulo que está no backbuffer 
+//em um buffer do tamanho do retângulo.
+//um buffer cosntante, suficientemente grande para salvar um retângulo do tamanho da 
+//tela será alocado e gerenciado por uma estrutura.
+//essa estrutura deverá registrar as dimensões e posicionamento do retângulo,
+//e tamabém controlar o fluxo do transmissão do retângulo do backbuffer para esse buffer 
+//e de volta para o backbuffer.
+//isso será usado nas operações de movimentação de janela.
+//múltiplos buffers poderãos ser usados no futuro. Principalmente para gerar eleito.
+
+struct saved_rect_d
+{
+    void *buffer_address;
+	
+    unsigned long x;
+    unsigned long y;
+    unsigned long width;
+    unsigned long height;
+
+    int pixels;  //quantidade de pixels.
+    int bytes;   //quantidade de bytes.
+	int bpp;     //bytes per pixel.
+	
+	int full;    //O buffer está cheio. Um retângulo foi salvo nele.
+};
+struct saved_rect_d *SavedRect;
+
+int initialize_saved_rect ();
+
+//#testando ...
+//salvar um retângulo no buffer será semelhante ao método de salvar um bmp em um arquivo.
+int save_rect ( unsigned long x, 
+                unsigned long y, 
+				unsigned long width, 
+				unsigned long height );	
+	
+//pintar no backbuffer o retângulo salvo vai ser semelhante ao processo 
+//de decodificar um bmp, copiando do arquivo para o backbuffer.
+// esses argumentos devem representar o posicionamentod esejado do 
+//retângulo no backbuffer.
+int show_saved_rect ( unsigned long x, 
+                      unsigned long y, 
+				      unsigned long width, 
+				      unsigned long height );	
+	
+//
+//  ...
+//	
+	
 	
 //Pinta um pixel em um buffer de janela.
 void pixelPutPixelWindowBuffer( void* buffer, 
