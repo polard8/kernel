@@ -374,7 +374,8 @@ int initialize_saved_rect (){
 
 
 //#testando ...
-//salvar um retângulo no buffer será semelhante ao método de salvar um bmp em um arquivo.
+//salvar um retângulo no buffer será semelhante ao método de 
+//salvar um bmp em um arquivo.
 int save_rect ( unsigned long x, 
                 unsigned long y, 
 				unsigned long width, 
@@ -421,8 +422,8 @@ int save_rect ( unsigned long x,
 	//configurando o offset do buffer de salvamento.
 	offset2 = 0;
 	
-	p = (void *) (p + offset1);    
-	q = (void *) (q + offset2);    
+	p = (void *) (p + offset2);    
+	q = (void *) (q + offset1);    
 	 
     
 	//não precisa de sincronização pois não estamos enviando para o LFB.
@@ -436,11 +437,11 @@ int save_rect ( unsigned long x,
 	};	   
 };
 
+
 //pintar no backbuffer o retângulo salvo vai ser semelhante ao processo 
 //de decodificar um bmp, copiando do arquivo para o backbuffer.
 // esses argumentos devem representar o posicionamentod esejado do 
 //retângulo no backbuffer.
-
 int show_saved_rect ( unsigned long x, 
                       unsigned long y, 
 				      unsigned long width, 

@@ -626,10 +626,10 @@ int x86main ( int argc, char *argv[] ){
 	initialize_saved_rect ();
 	
 	//testando salvar um retângulo ...
-	save_rect ( 0, 0, 100, 100 );
+	//save_rect ( 0, 0, 100, 100 );
 	
 	//copiando aqui no backbuffer
-	show_saved_rect ( 20, 20, 100, 100 );
+	//show_saved_rect ( 20, 20, 100, 100 );
 	
 	//
 	// ## servidor taskman ##

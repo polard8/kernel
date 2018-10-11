@@ -2002,17 +2002,25 @@ int RegisterWindow(struct window_d *window);
 void set_current_window(struct window_d *window);
 void *get_current_window();
 
+//salva o retãngulo de uma janela no buffer de salvamento.
+//isso será usado para mover a janela.
+int save_window (struct window_d *window);
+
+//mostrar uma janela que tem seu retãngulo salvo no buffer de salvamento.
+//#obs: antes de chamarmos essa função podemos chamar a função replace_window
+//para mudar a janela de lugar.
+int show_saved_window (struct window_d *window);
+
+
 int 
 resize_window( struct window_d *window, 
                unsigned long cx, 
 			   unsigned long cy );	
 				   
-int 
-replace_window( struct window_d *window, 
-                unsigned long x, 
-			    unsigned long y );			  
+int replace_window ( struct window_d *window, 
+                     unsigned long x, 
+			         unsigned long y );			  
 
- 
 int 
 redraw_window(struct window_d *window, unsigned long flags );
     
@@ -2047,7 +2055,7 @@ void set_top_window( int id );
 void closeActiveWindow();
 
 //bloqueando e desbloqueando o foco.
-void windowBlockfocus();
+void windowBlockFocus();
 void windowUnblockFocus();
 
 int windowGetMainWindowDescriptor();

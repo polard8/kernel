@@ -525,8 +525,20 @@ system_procedure ( struct window_d *window,
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
 				    //pci_info();     //PCI information.
 				    
+					//#testando...
+					save_window ( (struct window_d *) windowList[window_with_focus] );
+					replace_window ( (struct window_d *) windowList[window_with_focus], 20, 20 );
+					show_saved_window ( (struct window_d *) windowList[window_with_focus] );
+					refresh_screen();
+					
+					
+					//save_rect ( 100, 100, 200, 200 );
+	                //show_saved_rect ( 2, 2, 200, 200 );
+					//refresh_screen();
+					
 					//testando mbr.					
-					fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
+					//ok isso funcionou.
+					//fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
 					
 					//Obs: Não usa janelas, isso não mudará o foco.
 					//systemShowDevicesInfo();
