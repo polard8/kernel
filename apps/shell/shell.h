@@ -20,7 +20,15 @@
  *     2018 - Add some bash 1.05 stuff. 
  */
  
+ 
+//
+// botões
+// 
+ 
 struct window_d *reboot_button;
+struct window_d *close_button;
+ 
+ 
  
 //#define SHELL_VERBOSE 1
 
@@ -1191,7 +1199,7 @@ int shellCheckPassword();
 
 
 //testando botão.
-int shellTestButton ();
+int shellTestButtons ();
 			
 //
 // End.

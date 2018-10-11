@@ -933,12 +933,31 @@ void bmpDisplayBMP ( void *address,
 
 
 //testando botão.
-int shellTestButton (){
+int shellTestButtons (){
+    
+	//
+	// botão de reboot
+	//
 	
     //em shell.h está o ponteiro.	
 	reboot_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " REBOOT ",     
-                                20, 20, 100, 40,    
-                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	
+                                10, 10, 100, 40,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+    APIRegisterWindow (reboot_button);
+
+
+	//
+	// botão de close
+	//
+	
+    //em shell.h está o ponteiro.	
+	close_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " CLOSE ",     
+                                10, 200, 100, 40,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+    APIRegisterWindow (close_button);
+
 
 	
     return 0;	

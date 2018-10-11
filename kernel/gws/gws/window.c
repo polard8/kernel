@@ -1695,14 +1695,15 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	// obs: Essa checagem está se tornando repetitiva.
 	//
 	
-	if( (void*) CurrentColorScheme == NULL )
+	if ( (void *) CurrentColorScheme == NULL )
 	{
 		printf("redraw_window: CurrentColorScheme");
 		die();
-	}else{
 		
-		if( CurrentColorScheme->used != 1 || 
-		    CurrentColorScheme->magic != 1234 )
+	} else {
+		
+		if ( CurrentColorScheme->used != 1 || 
+		     CurrentColorScheme->magic != 1234 )
 		{
 		    printf("redraw_window: CurrentColorScheme validation");
 		    die();			
@@ -1740,14 +1741,14 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	
 redrawBegin:
 
-	if( window->view == VIEW_NULL )
+	if ( window->view == VIEW_NULL )
 	{
 		//#bugbug
 	    goto fail;
 	};		
 
     //Sombra.	
-	if(window->shadowUsed == 1)
+	if (window->shadowUsed == 1)
 	{
 		//#bugbug
 		//A sombra deve ter suas dimensões registradas também.
@@ -1975,11 +1976,18 @@ redrawBegin:
 	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y + window->button->height -1, 
 		                window->button->width, 1, window->button->border2 );					
 				    
-					//if
-                    draw_string ( window->left + window->button->x +8, window->top + window->button->y +8, 
-			            COLOR_TERMINALTEXT, window->button->string );
-
+					//#todo: if aqui tem duas opções de draw string.
+                    if ( window->button->selected == 1 )
+					{
+					    draw_string ( window->left + window->button->x +8, window->top + window->button->y +8, 
+			                COLOR_WHITE, window->button->string );
+                    }
 					
+                    if ( window->button->selected == 0 )
+                    {
+					    draw_string ( window->left + window->button->x +8, window->top + window->button->y +8, 
+			                COLOR_TERMINALTEXT, window->button->string );					
+					}						
 				}				
 			}
 		}			

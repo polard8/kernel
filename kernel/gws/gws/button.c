@@ -22,16 +22,6 @@
 #include <kernel.h>
 
 
-/*
-//#todo: Create redraw_button( ...
-//fazer semelhante a função draw_button(.
-void *redraw_button ( struct window_d *window );
-void *redraw_button ( struct window_d *window )
-{
-    //todo
-}
-*/
-
 
 /*
  * draw_button:

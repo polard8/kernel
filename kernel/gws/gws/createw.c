@@ -215,8 +215,15 @@ CreateWindow( unsigned long type,
 	int WindowDesktopId;          //Id do desktop da janela a ser criada.
 
 	// ??
-	struct window_d *internal_window;	
-
+	//struct window_d *internal_window;	
+	
+	struct window_d *windowButton1;	
+    struct window_d *windowButton2;
+	
+	struct window_d *windowButton3;
+	struct window_d *windowButton4;
+	struct window_d *windowButton5;
+	
     // Structs.	
 	struct window_d *window;
 	struct window_d *Parent;
@@ -1105,12 +1112,12 @@ drawBegin:
 			// SERÁ ASSIM DAQUI PRA FRENTE.
 			
 			// Criar.
-			internal_window = CreateWindow ( WT_BUTTON, 1, 1, "V", 
+			windowButton1 = CreateWindow ( WT_BUTTON, 1, 1, "V", 
 	            (window->width -42 -1), 2, 21, 21,									  
 			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
 			// Registrar.
-			//RegisterWindow(internal_window);
+			RegisterWindow (windowButton1);
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
@@ -1122,12 +1129,12 @@ drawBegin:
 			// SERÁ ASSIM DAQUI PRA FRENTE.
 			
 			// Criar.
-			internal_window = CreateWindow ( WT_BUTTON, 1, 1, "X", 
+			windowButton2 = CreateWindow ( WT_BUTTON, 1, 1, "X", 
 	            (window->width -21), 2, 21, 21,									  
 			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
             
 			// Registrar.
-			//RegisterWindow(internal_window);
+			RegisterWindow(windowButton2);
 	    };					 
 		
 		//...			 
@@ -1304,12 +1311,12 @@ drawBegin:
 	    //Botão de cima da scrollbar vertival
 		
 		// Criar.
-		internal_window = CreateWindow ( WT_BUTTON, 1, 1, "^", 
+		windowButton3 = CreateWindow ( WT_BUTTON, 1, 1, "^", 
 	        1, 1, (window->width -2), 16,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
         
 		// Registrar.
-		//RegisterWindow(internal_window); 			
+		RegisterWindow (windowButton3); 			
 			
 		//#test	
 	    //limits
@@ -1320,23 +1327,23 @@ drawBegin:
 	    //Botão do meio da scrollbar vertival
 		
 		// Criar.
-		internal_window = CreateWindow( WT_BUTTON, 1, 1, "=", 
+		windowButton4 = CreateWindow( WT_BUTTON, 1, 1, "=", 
 	        1, (window->height/2), (window->width -2), 16,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 		
 		// Registrar.
-		//RegisterWindow(internal_window);
+		RegisterWindow (windowButton4);
 					
 	    //botão 2 da barra horizontal.
         //Botão de baixo da scrollbar vertival
 	    
 		// Criar.
-		internal_window = CreateWindow( WT_BUTTON, 1, 1, "v", 
+		windowButton5 = CreateWindow( WT_BUTTON, 1, 1, "v", 
 	        1, (window->height -17), (window->width -2), 16,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);			
 	    
 		// Registrar.
-		//RegisterWindow(internal_window);
+		RegisterWindow (windowButton5);
 	};	
 
 	
@@ -1397,7 +1404,7 @@ drawBegin:
 		//Esses valores precisam ser melhor declarados.
         
 		// Criar.
-		window->scrollbar = CreateWindow( WT_SCROLLBAR, 1, 1, "scrollbar-test", 
+		window->scrollbar = CreateWindow ( WT_SCROLLBAR, 1, 1, "scrollbar-test", 
 	                            window->right -24, window->top+25, 
 								24, window->height-25-25-1,									  
 					            window, 0, 
@@ -1405,13 +1412,13 @@ drawBegin:
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);
 		
 		// Registrar.
-		//RegisterWindow(window->scrollbar);
+		RegisterWindow (window->scrollbar);
 
         //status bar.
 		//Esses valores precisam ser melhor declarados.
 		
 		// Criar.
-		window->statusbar = CreateWindow( WT_STATUSBAR, 1, 1, "Status: ...", 
+		window->statusbar = CreateWindow ( WT_STATUSBAR, 1, 1, "Status: ...", 
 	                            window->left+1, window->bottom-25-1, 
 								window->width, 25,									  
 					            window, 0, 
@@ -1419,13 +1426,13 @@ drawBegin:
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);
         
 		// Registrar.
-		//RegisterWindow(window->statusbar);
+		RegisterWindow (window->statusbar);
         
         // # icon #
 		// Os ícones já estão carregados, 
 		// vamos apenas decodificá lo no backbuffer 
 		
-	    bmpDisplayBMP( appIconBuffer, window->left+1, window->top+1 );
+	    bmpDisplayBMP ( appIconBuffer, window->left+1, window->top+1 );
 	};
 
 	
@@ -1503,12 +1510,11 @@ done:
 	
     //SetFocus(window);
 	
-	if ( window->type == WT_BUTTON || 
-	     window->type == WT_SCROLLBAR || 
-         window->type == WT_STATUSBAR )
-	{
-	    RegisterWindow (window);	
-	}
+	//if ( window->type == WT_BUTTON || 
+    //     window->type == WT_STATUSBAR )
+	//{
+	//    RegisterWindow (window);	
+	//}
 	    
 	
 	return (void *) window;

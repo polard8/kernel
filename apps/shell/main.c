@@ -1211,28 +1211,34 @@ shellProcedure( struct window_d *window,
 		    switch (long1)
 			{
 				case 1:
-				    
+				
+				    //#debug
+					printf("button 1\n");     
+					
+					//botão de reboot;
 					if ( window == reboot_button )
                     {
 					    printf("Rebooting...\n");
 		                system("reboot"); 	
-					}						
-				    printf("button 1\n");
-				      
-					  //APISetFocus(window);
-					  APIresize_window(window,200, 200);
-					  APIredraw_window(window,1);
-					  //refresh_screen (); //não precisa isso
-					  
-					//Se a janela for igual a um botão e o botão for o de fechar, 
-					//então saímos do aplicativo. Mas não temos informações sobre 
-					//essa janela, pois a estrutura está no kernel.
+					}
 					
+					//botão de close
+					if ( window == close_button )
+				    {
+					  //APISetFocus(window);
+					  APIresize_window ( window, 200, 200 );
+					  APIredraw_window ( window, 1 );
+					  //refresh_screen (); //não precisa isso						
+					}    
 					break;
+					
 				case 2:
+				    //#debug
 				    printf("button 2\n");
 				    break;
+					
 				case 3:
+				    //#debug
 				    printf("button 3\n");
 				    break;
 			};			
@@ -2769,7 +2775,7 @@ do_compare:
 	//testando a criação de botão e a interação com ele através do mouse.
 	if ( strncmp( prompt, "t8", 2 ) == 0 )
     {
-	    shellTestButton ();	
+	    shellTestButtons ();	
 		refresh_screen ();
 		goto exit_cmp;
 	};		
