@@ -1252,22 +1252,23 @@ done:
  *     @todo: se o status for (1) devemos imprimir o conteúdo 
  * de stderr na tela.
  */
-void exit(int status)
-{
+void exit (int status){
 	
 	//#importante:
     //     @todo: se o status for (1) devemos imprimir o conteúdo 
     // de stderr na tela.
 
  
-    stdlib_system_call( SYSTEMCALL_EXIT, (unsigned long) status, 
+    stdlib_system_call ( SYSTEMCALL_EXIT, (unsigned long) status, 
 	    (unsigned long) status, (unsigned long) status );
     
 	
 	//Nothing.
-wait_forever:	
+//wait_forever:
+	
     //die();
-    while(1){
+    while (1){
+		
 		asm ("pause");
 	};	
 };

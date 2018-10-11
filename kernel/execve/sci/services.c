@@ -650,21 +650,32 @@ void *services( unsigned long number,
 			    arg3, (unsigned long) arg4, 0);  		
 			break;
 			
-		//70 - Exit. Torna zombie a thread atual.
-        //Tornando zombie a thread atual se o argumento for 0.		
-		//Na verdade tem muitos parametros de proteção pra levar em conta.
-		//#todo: Podemos chamar uma rotina, que terá um switch que trate o argumento.
-		//ex: do_sys_exit(arg2);
+		//
+        // ## EXIT ##
+        //		
+			
+		// 70 - Exit. Torna zombie a thread atual.
+        // Tornando zombie a thread atual se o argumento for 0.		
+		// Na verdade tem muitos parametros de proteção pra levar em conta.
+		// #todo: Podemos chamar uma rotina, que terá um switch que trate o argumento.
+		// ex: do_sys_exit(arg2);
+		// #obs: É isso que o aplicativo está chamando quando quer sair. Então 
+		// se for a thread primária do aplicativo, então tem fechar tudo o que ele 
+		// estiver usando.
+		
 		case SYS_EXIT:
+			
+			//0 = Estamos saindo de aplicativo normalmente, sem erros.
 			if (arg2 == 0)
 			{ 
-			    sys_exit_thread(current_thread); 
+			    sys_exit_thread (current_thread); 
 				break; 
-			}; 	 //Thread		
+			}; 	 		
             
 			//if(arg2 == 1){ sys_exit_process(arg3,arg4); break; };  //Process.
+			
 			//...
-			//return NULL;
+			
 			break;
 		
         //71 		

@@ -964,6 +964,9 @@ Mainloop:
         };				
 	};
 	
+	//
+	// Entramos aqui se running for igual a 0.
+	//
 	
 	switch (ShellFlag)
 	{
@@ -998,9 +1001,9 @@ skip_input:
 	// Exit process.
 end:
 
-#ifdef SHELL_VERBOSE		
-    printf("SHELL.BIN: exiting main() ...\n");
-#endif 
+//#ifdef SHELL_VERBOSE		
+    printf("SHELL.BIN: exiting code '0' ...\n");
+//#endif 
 	
 	return (int) 0;
 };
@@ -1225,10 +1228,12 @@ shellProcedure( struct window_d *window,
 					//botão de close
 					if ( window == close_button )
 				    {
-					  //APISetFocus(window);
-					  APIresize_window ( window, 200, 200 );
-					  APIredraw_window ( window, 1 );
-					  //refresh_screen (); //não precisa isso						
+					    //APIresize_window ( window, 200, 200 );
+					    //APIredraw_window ( window, 1 );
+					    //refresh_screen (); //não precisa isso	
+
+						running = 0;
+                        ShellFlag = SHELLFLAG_EXIT;						
 					}    
 					break;
 					
@@ -1268,9 +1273,15 @@ shellProcedure( struct window_d *window,
 
 		// MSG_MOUSEOVER	
 		case 33:
-            //APISetFocus(window);
-			//printf("o");
-            break;				
+		    
+			//se tiver passando em cima do botão de close.
+			if ( window == close_button )
+			{
+			    //APIresize_window ( window, 200, 200 );
+				//APIredraw_window ( window, 1 );	
+			}
+            
+		    break;				
 		
 		//Quando a aplicativo em user mode chama o kernel para 
 		//que o kernel crie uma janela, depois que o kernel criar a janela,

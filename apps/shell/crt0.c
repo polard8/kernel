@@ -48,7 +48,7 @@ void crt0 (){
     stdioInitialize();	
 
     // Call main().	
-	Response = (int) shmain( 3, argv ); 
+	Response = (int) shmain ( 3, argv ); 
 								
 									
 	//
@@ -57,18 +57,22 @@ void crt0 (){
 	// ocorrida durante a execussão de main.
 	//
 	
-	switch(Response)
+	switch (Response)
 	{
 	    case 0:
-		    exit(0);
+		    exit (0);
             break;
  
         default:
 		    //exit(app_response);
 			//exit(1);
-			die("crt0: EXIT ERROR! \n");
+			die ("crt0: EXIT ERROR! \n");
             break;		
 	};
+	
+	//
+	// ## ERROR ##
+	//
 	
 hang:	
     printf("crt0: EXIT ERROR! \n");
