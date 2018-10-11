@@ -935,10 +935,9 @@ void bmpDisplayBMP ( void *address,
 //testando botão.
 int shellTestButton (){
 	
-	struct button_d *button1;
-	
-	button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "button1",     
-                                100, 100, 100, 40,    
+    //em shell.h está o ponteiro.	
+	reboot_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " REBOOT ",     
+                                20, 20, 100, 40,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	
 
 	

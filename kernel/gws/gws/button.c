@@ -42,7 +42,9 @@ void *redraw_button ( struct window_d *window )
  * Talvez uma estrutura de botão seja necessário, para armazenas coisas como 
  * deslocamento dentro da janela e endereço da imagem carregada como etiqueta.
  *
+ * #importante: 
  * Retorna o ponteiro pra estrutura do botão.
+ *
  */
 void *draw_button ( struct window_d *window,
                     unsigned char *string,

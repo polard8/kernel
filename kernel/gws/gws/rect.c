@@ -408,9 +408,8 @@ int save_rect ( unsigned long x,
 	
 	unsigned int line_size, lines;
 	
-	//unsigned int offset;
-	unsigned int offset1;  //offset dentro do backbuffer
-	unsigned int offset2;  //offset dentro do buffer de salvamento.
+	unsigned int offset1;  
+	unsigned int offset2;  
 	
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
@@ -475,7 +474,6 @@ int show_saved_rect ( unsigned long x,
 	
 	unsigned int line_size, lines;
 	
-	//unsigned int offset;
 	unsigned int offset1;  //offset dentro do buffer de salvamento.
 	unsigned int offset2;  //offset dentro do backbuffer
 	

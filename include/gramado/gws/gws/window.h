@@ -1011,10 +1011,14 @@ struct window_d
 	
     // Flag par indicar se a janela é um item de menu.	
 	//ou um botão.
-	int isMenu;   //deletar??
-	int isButton; //deletar??
-	//int isIcon; //deletar??
+	int isMenu;   
+	int isButton; //#importante: Indica que a janela é um botão.
+	//int isIcon; 
 	//...
+	
+	// Se a flag indicar que a janela é um botão, então 
+	// essa será a estrutura para o botão.
+	struct button_d *button;
 	
 	int selected;     //seleção  de item de menu.
     const char *text; //@todo usar unsigned char.

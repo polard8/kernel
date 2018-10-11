@@ -749,7 +749,7 @@ CreateWindow( unsigned long type,
         //da janela.  		
 		case WT_BUTTON:	
             //Nothing for now ...
-            //Deixaremos a rotina de desenahr o botão fazer tudo por enquanto.			
+            //Deixaremos a rotina de desenhar o botão fazer tudo por enquanto.			
 			break;	
 			
 		//9) Status bar.	
@@ -1353,10 +1353,20 @@ drawBegin:
 	
 	if ( (unsigned long) type == WT_BUTTON )
 	{
-	    //as posições de left e right são da janela do botão.		 
-		draw_button ( Parent, windowname, 1, 
+	    //as posições de left e right são da janela do botão.	
+        //#obs: Essa função retorna uma estrutura de botão.	
+        //Então uma janela, quando acianoada sua flag que indica que ela é um botão,
+        //podemos usar a estrutura de botão para acessar as características do botão.		
+		
+		//draw_button ( Parent, windowname, 1, 
+		//    window->left, window->top, window->width, window->height, 
+		//	window->color_bg );
+
+		window->button = (struct button_d *) draw_button ( Parent, windowname, 1, 
 		    window->left, window->top, window->width, window->height, 
 			window->color_bg );
+		
+		window->isButton = 1;	
 	};					 
 	
 	//

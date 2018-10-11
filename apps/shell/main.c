@@ -1211,6 +1211,12 @@ shellProcedure( struct window_d *window,
 		    switch (long1)
 			{
 				case 1:
+				    
+					if ( window == reboot_button )
+                    {
+					    printf("Rebooting...\n");
+		                system("reboot"); 	
+					}						
 				    printf("button 1\n");
 				      
 					  //APISetFocus(window);

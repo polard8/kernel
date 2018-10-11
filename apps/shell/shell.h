@@ -20,6 +20,8 @@
  *     2018 - Add some bash 1.05 stuff. 
  */
  
+struct window_d *reboot_button;
+ 
 //#define SHELL_VERBOSE 1
 
 

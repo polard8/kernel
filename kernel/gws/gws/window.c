@@ -1658,7 +1658,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	//
 	
 	// Minimized? Se tiver minimizada, não precisa repintar.
-	Status = (int) is_window_minimized(window);
+	Status = (int) is_window_minimized (window);
     if(Status == 1)
 	{
 		//?? tem qua mudar alguma flag antes ??
@@ -1947,7 +1947,43 @@ redrawBegin:
 	//Até agora repintamos a janela relativa ao botão. Provavelmente 
 	//referese à apenas seu background. Porém para redesenharmos o botão
 	//precisamos criar uma função redraw_button, semelhante a função draw_button.
-	//if( window->type == WT_BUTTON )
+	if ( window->type == WT_BUTTON )
+	{
+	    if ( window->isButton == 1 )
+        {
+			if ( (void *) window->button != NULL )
+			{
+				if ( window->button->used == 1 && window->button->magic == 1234 )
+				{
+				    //redesenhar o botão com base nas informações da estrutura.
+					
+	                //bg
+	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y, 
+	                    window->button->width, window->button->height, window->button->color );
+    
+	                //board1, borda de cima e esquerda.
+	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y, 
+	                    window->button->width, 1, window->button->border1 );
+		
+	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y, 
+	                    1, window->button->height, window->button->border1 );
+
+	                //board2, borda direita e baixo.
+	                drawDataRectangle ( window->left + window->button->x + window->button->width -1, window->top + window->button->y, 
+		                1, window->button->height, window->button->border2 );
+					   
+	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y + window->button->height -1, 
+		                window->button->width, 1, window->button->border2 );					
+				    
+					//if
+                    draw_string ( window->left + window->button->x +8, window->top + window->button->y +8, 
+			            COLOR_TERMINALTEXT, window->button->string );
+
+					
+				}				
+			}
+		}			
+	}
 
 	//if( window->type == WT_OVERLAPPED)
 		
