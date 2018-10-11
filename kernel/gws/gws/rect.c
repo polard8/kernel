@@ -330,7 +330,8 @@ int initialize_saved_rect (){
 
     if ( (void *) SavedRect ==  NULL )
     {
-	    return 1;	
+	    return (int) 1;	
+		
 	} else {
      
         // 800x600x3 (resolução máxima) 351+ páginas.
@@ -368,7 +369,7 @@ int initialize_saved_rect (){
 	//	asm("hlt");
 	//}
 	
-    return 0;	
+    return (int) 0;	
 };
 
 
@@ -383,7 +384,8 @@ int save_rect ( unsigned long x,
 {		
     if ( (void *) SavedRect ==  NULL )
     {
-	    return 1;	
+	    return (int) 1;
+		
 	} else {
 
 	    if ( (void *) SavedRect->buffer_address == NULL )
@@ -434,7 +436,9 @@ int save_rect ( unsigned long x,
 		memcpy( p, q, (line_size * 3) );
 		q += (Width * 3);
 		p += (Width * 3);
-	};	   
+	};	 
+
+    return (int) 0;		
 };
 
 
@@ -449,7 +453,8 @@ int show_saved_rect ( unsigned long x,
 {		
     if ( (void *) SavedRect ==  NULL )
     {
-	    return 1;	
+	    return (int) 1;
+		
 	} else {
 
 	    if ( (void *) SavedRect->buffer_address == NULL )
@@ -461,8 +466,6 @@ int show_saved_rect ( unsigned long x,
 
    // ## transferindo ... ##
    //======================
-
-    //do backbuffer para o buffer de salvamento.
 	
 	void *p = (void *) BACKBUFFER_ADDRESS;   	
 	void *q = (void *) SavedRect->buffer_address;         
@@ -498,7 +501,9 @@ int show_saved_rect ( unsigned long x,
 		memcpy( p, q, (line_size * 3) );
 		q += (Width * 3);
 		p += (Width * 3);
-	};	   
+	};	 
+
+    return (int) 0;	
 };
 
 

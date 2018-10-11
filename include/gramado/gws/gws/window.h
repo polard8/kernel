@@ -1660,7 +1660,16 @@ struct gui_d
 	
 	struct frontbufferinfo_d *frontbufferInfo; // Frontbuffer support. (memória de vídeo)
 	
-    //Lista de informações sobre usuários.
+    
+	//
+	// ## globais ##
+	//
+	
+	struct desktop_d *CurrentDesktop;
+	struct wstation_d *CurrentWindowStation;
+	struct usession_d *CurrentUserSession;
+	
+	//Lista de informações sobre usuários.
     //@todo: Isso não precisa ficar aqui.	
 	struct user_info_d *User; 	
 	

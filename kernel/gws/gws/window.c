@@ -46,6 +46,17 @@ extern unsigned long kArg4;	   //??.
 
 
 
+/*
+ #importante:
+ Isso é uma rotina de movimento de janela.
+ vamos construir uma função pra isso.
+ 
+ 					save_window ( (struct window_d *) windowList[window_with_focus] );
+					replace_window ( (struct window_d *) windowList[window_with_focus], 20, 20 );
+					show_saved_window ( (struct window_d *) windowList[window_with_focus] );
+					show_window_rect ( (struct window_d *) windowList[window_with_focus] );
+ */
+
 
 //salva o retãngulo de uma janela no buffer de salvamento.
 //isso será usado para mover a janela.
