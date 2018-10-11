@@ -45,6 +45,8 @@ extern unsigned long kArg3;	   //??.
 extern unsigned long kArg4;	   //??.	
 
 
+
+
 //salva o retãngulo de uma janela no buffer de salvamento.
 //isso será usado para mover a janela.
 int save_window (struct window_d *window){
@@ -82,6 +84,27 @@ int show_saved_window (struct window_d *window){
 
 		show_saved_rect ( window->left, window->top, window->width, window->height );
         //... 		
+		
+	};		
+};
+
+
+//mostra o retãngulo de uma janela que está no backbuffer.
+//tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
+int show_window_rect (struct window_d *window){
+	
+    if( (void *) window == NULL )
+    {
+		return 1;
+	} else {
+	
+        if ( window->used != 1 || window->magic != 1234 )
+        {
+			return 1;
+		}
+
+	    refresh_rectangle ( window->left, window->top, window->width, 
+		    window->height ); 		
 		
 	};		
 };

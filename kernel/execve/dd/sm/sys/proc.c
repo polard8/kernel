@@ -529,7 +529,8 @@ system_procedure ( struct window_d *window,
 					save_window ( (struct window_d *) windowList[window_with_focus] );
 					replace_window ( (struct window_d *) windowList[window_with_focus], 20, 20 );
 					show_saved_window ( (struct window_d *) windowList[window_with_focus] );
-					refresh_screen();
+					show_window_rect ( (struct window_d *) windowList[window_with_focus] );
+					//refresh_screen();
 					
 					
 					//save_rect ( 100, 100, 200, 200 );

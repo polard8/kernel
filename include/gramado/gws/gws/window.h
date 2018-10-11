@@ -2011,6 +2011,9 @@ int save_window (struct window_d *window);
 //para mudar a janela de lugar.
 int show_saved_window (struct window_d *window);
 
+//mostra o retãngulo de uma janela que está no backbuffer.
+//tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
+int show_window_rect (struct window_d *window);
 
 int 
 resize_window( struct window_d *window, 
