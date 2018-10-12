@@ -218,6 +218,7 @@ int tmCreateTaskBar (){
 
 
 /*
+ *****************************************************************
  * tmProc:
  *     Procedimento de janela do Task Manager.
  *     O procedimento intercepta algumas mensagens e as mensagens de sistema
@@ -232,42 +233,23 @@ int tmProc ( int junk,
 	
 	switch (message)
 	{
-	    case MSG_KEYDOWN:
-    		switch(long1)
-			{
-			    case '1':
-					printf("1");
-				    break;
-					
-			    case '9':
-				    //taskmanagerStatus = 1234;  
-					apiReboot();
-				    break;
-	
-			    case 'a':
-				    printf("a");
-					break;
-			    case KEY_TAB:
-				    printf("tab");
-				    break;
-                default:
-				    printf("default key down\n");
-					break;
-			};
+		case 1000:
+		    printf ("taskman server - message 1000 \n");
 			break;
-	    
-		case MSG_KEYUP:
+	
+		case 2000:
+		    printf ("taskman server - message 2000 \n");
+			break;
+
+		case 3000:
+		    printf ("taskman server - message 3000 \n");
 		    break;
-	
-        case MSG_CREATE:
-            break; 		
-	
+
+		case 4000:
+		    printf ("taskman server - message 4000 \n");
+		    break;
+			
 	    //...
-		
-		default:
-		    //Falta passar a janela.
-			//system_call(SYSTEMCALL_CALL_SYSTEMPROCEDURE, message, long1, long2);			
-            break;		
 	};
 
 	//Nothing.
@@ -560,18 +542,26 @@ int appMain ( int argc, char *argv[] ){
 			
 			
 		//msg. Se existe uma mensagem válida.	
-		if( buffer[1] != 0  )
+		if ( buffer[1] != 0  )
 		{
 			//isso funcionou.
-			//printf(".");
-		    //tmProc( int junk, int message, unsigned long long1, unsigned long long2 );	
+			printf(".message={%d}\n", buffer[1]);
 
             //# mensagem de teste #
-
-			if(  buffer[1] == 123  )
+			if (  buffer[1] == 123  )
 			{
-				printf("Hello from server PID={%d}\n", PID);
+				printf ("message 123: Hello from server PID={%d}\n", PID );
 			};
+			
+			
+			//#todo:
+			// Chamar o procedimento de janelas. (diálogo)
+			
+            tmProc ( (int) buffer[0], 
+			         (int) buffer[1], 
+			         (unsigned long) buffer[2], 
+			         (unsigned long) buffer[3] );
+			
 		};		
 				
 		cpu_relax();

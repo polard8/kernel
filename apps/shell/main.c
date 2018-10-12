@@ -2802,7 +2802,14 @@ do_compare:
     //test-taskman-server - testando servidor taskman
 	if ( strncmp( prompt, "test-taskman-server", 19 ) == 0 )
 	{
-        system_call ( 116, 0, 0, 0 );
+		//só podemos enviar a próxima mensagem depois que a primeira for atendida.
+		//pois ainda não temos fila de mensagens e o servidor demora para receber 
+		//tempo de processamento.
+        system_call ( 116, 123, 0, 0 );
+		//system_call ( 116, 1000, 0, 0 );
+		//system_call ( 116, 2000, 0, 0 );
+		//system_call ( 116, 3000, 0, 0 );
+		//system_call ( 116, 4000, 0, 0 );
         goto exit_cmp;
 	};	
 	

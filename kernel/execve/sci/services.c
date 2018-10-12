@@ -898,12 +898,12 @@ void *services( unsigned long number,
 			break;
 		
 		// 115 - ## IMPORTANTE ## 
-		// Usado por servidores do sistema 
-		// para se comunicarem com o kernel.
-		// magic 1234: acoplar taskman.
-		// magic 4321: desacoplar taskman
-		// magic 12345678: pegar mensagem
-		// #todo: chamar uma função que trate o argumento com um switch.
+		// Usado por servidores do sistema para se comunicarem 
+		// com o kernel.
+		// >> magic 1234: Acoplar taskman.
+		// >> magic 4321: Desacoplar taskman
+		// >> magic 12345678: Pegar mensagem
+		// #todo: Chamar uma função que trate o argumento com um switch.
 		case 115:
 		
 			if ( arg3 == 1234 )
@@ -916,7 +916,8 @@ void *services( unsigned long number,
 			
 			if ( arg3 == 1234 )
 			{
-				if( current_taskman_server == arg4 ){
+				if( current_taskman_server == arg4 )
+				{
 				    current_taskman_server = (int) 0;
 				    //printf("115: desacoplando ...\n");
 				    //refresh_screen();
@@ -941,22 +942,22 @@ void *services( unsigned long number,
 					if( gui->taskmanWindow->newmessageFlag == 1 )
 					{
 			            message_address[0] = (unsigned long) gui->taskmanWindow->msg_window;
-			            message_address[1] = (unsigned long) gui->taskmanWindow->msg; //temos uma mensagem.
+			            message_address[1] = (unsigned long) gui->taskmanWindow->msg; 
 			            message_address[2] = (unsigned long) gui->taskmanWindow->long1;
 			            message_address[3] = (unsigned long) gui->taskmanWindow->long2;
 					    gui->taskmanWindow->newmessageFlag = 0;
 						return NULL;
 					};
-				}
+				};
 			};
 			break;
 			
 		//Envia uma mensagem de teste para o servidor taskman	
 		case 116:
 	        gui->taskmanWindow->msg_window = NULL;
-		    gui->taskmanWindow->msg = 123; //123=temos uma mensagem. 
-		    gui->taskmanWindow->long1 = 0;
-		    gui->taskmanWindow->long2 = 0;
+		    gui->taskmanWindow->msg = (int) arg2;             //123; //123=temos uma mensagem. 
+		    gui->taskmanWindow->long1 = (unsigned long) arg3;    //0;
+		    gui->taskmanWindow->long2 = (unsigned long) arg4;    //0;
             gui->taskmanWindow->newmessageFlag = 1;				
 		    break;
 			
