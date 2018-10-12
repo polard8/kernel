@@ -1623,7 +1623,7 @@ void mouseHandler (){
 			
 			
 			//  copiar para o lfb o antigo retângulo. Para apagar o ponteiro que está no lfb.
-			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 16, 16 );	
+			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );	
 			
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
 		    //refresh_rectangle ( mouse_x, mouse_y, 16, 16 );	
