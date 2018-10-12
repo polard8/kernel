@@ -74,6 +74,13 @@ int bmpDisplayBMP( char *address,
 int bmpDisplayMousePointerBMP( char *address, 
                                unsigned long x, 
 				               unsigned long y );
+							   
+							   
+//mostra no lfb
+//levando em consideração tratamento de transparência.
+int bmpDisplayCursorBMP( char *address, 
+                         unsigned long x, 
+				         unsigned long y );
 					
 						   
 //

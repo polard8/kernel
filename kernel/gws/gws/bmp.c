@@ -863,7 +863,7 @@ fail:
 
 
 
-//mostra no backbuffer o ponteiro de mouse,
+//mostra no lfb
 //levando em consideração tratamento de transparência.
 int bmpDisplayMousePointerBMP( char *address, 
                                unsigned long x, 
@@ -882,9 +882,6 @@ int bmpDisplayMousePointerBMP( char *address,
 	//
 	// Display !!
 	//
-	
-	//no backbuffer
-	//bmpDisplayBMP ( address, x, y );
     
 	//no LFB
 	bmpDirectDisplayBMP ( address, x, y );
@@ -896,6 +893,42 @@ int bmpDisplayMousePointerBMP( char *address,
 	
     return (int) 0;	
 };
+
+
+
+
+						 
+//mostra no lfb
+//levando em consideração tratamento de transparência.
+int bmpDisplayCursorBMP( char *address, 
+                         unsigned long x, 
+				         unsigned long y )
+{
+	
+	//flag para ignorarmos a cor selecionada.
+	bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
+	
+	
+	//#importante:
+	//Selecionamos a cor que será ignorada.
+    //background do bitmap é branco.
+	bmp_selected_color = COLOR_WHITE;	
+    
+	//
+	// Display !!
+	//
+    
+	//no LFB
+	bmpDirectDisplayBMP ( address, x, y );
+	
+	
+	//clear flags.
+	bmp_change_color_flag = 0;
+	bmp_selected_color = 0;
+	
+    return (int) 0;	
+};
+
 
 
 /*

@@ -29,6 +29,7 @@ void *appIconBuffer;
 void *fileIconBuffer; 
 void *folderIconBuffer; 
 void *terminalIconBuffer;  
+void *cursorIconBuffer; 
 //... 
  
 //testando ... devemos chamar isso

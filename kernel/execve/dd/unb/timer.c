@@ -100,6 +100,8 @@ int timerLock;
 //??
 int timerError;
 
+int cursorBlink;
+
 //??
 //unsigned long timerCountSeconds;  //Count Seconds.
 //...
@@ -179,6 +181,30 @@ void timer (){
 	//printf("%c", (char) 219 );   	
 	//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
 	//g_cursor_x--;			
+	
+	//de tempos em tempos atualiza o cursor
+	if ( timerTicks % 32 == 0 )	
+	{
+		if ( cursorBlink == 0 )
+		{ 
+	        //apaga
+	        refresh_rectangle ( g_cursor_x*8, g_cursor_y*8, 20, 20 );	
+            cursorBlink = 1;
+		    goto goAhead;
+		}
+	
+		if ( cursorBlink == 1 )
+        {			
+		    //acende
+            bmpDisplayCursorBMP ( cursorIconBuffer, g_cursor_x*8, g_cursor_y*8 );		
+		    cursorBlink = 0;
+			goto goAhead;
+		}
+	};
+	
+
+goAhead:	
+	
 	
 	// De tempos em tempos. 
 	if ( timerTicks % 9 == 0 )	 

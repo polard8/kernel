@@ -1215,26 +1215,28 @@ shellProcedure( struct window_d *window,
 			{
 				case 1:
 				
+				    //#obs: No keydown a gente só abaixa o botão.
+					
 				    //#debug
 					printf("button 1\n");     
 					
 					//botão de reboot;
-					if ( window == reboot_button )
-                    {
-					    printf("Rebooting...\n");
-		                system("reboot"); 	
-					}
+					//if ( window == reboot_button )
+                    //{
+					//    printf("Rebooting...\n");
+		            //    system("reboot"); 	
+					//}
 					
 					//botão de close
-					if ( window == close_button )
-				    {
+					//if ( window == close_button )
+				    //{
 					    //APIresize_window ( window, 200, 200 );
 					    //APIredraw_window ( window, 1 );
 					    //refresh_screen (); //não precisa isso	
 
-						running = 0;
-                        ShellFlag = SHELLFLAG_EXIT;						
-					}    
+					//	running = 0;
+                    //    ShellFlag = SHELLFLAG_EXIT;						
+					//}    
 					break;
 					
 				case 2:
@@ -1255,10 +1257,30 @@ shellProcedure( struct window_d *window,
 			{		
 				case 1:
 				    printf("up button 1\n");
+					
+					//botão de reboot;
+					if ( window == reboot_button )
+                    {
+					    printf("Rebooting...\n");
+		                system("reboot"); 	
+					}
+					
+					//botão de close
+					if ( window == close_button )
+				    {
+					    //APIresize_window ( window, 200, 200 );
+					    //APIredraw_window ( window, 1 );
+					    //refresh_screen (); //não precisa isso	
+
+						running = 0;
+                        ShellFlag = SHELLFLAG_EXIT;						
+					}  
 					break;
+					
 				case 2:
 				    printf("up button 2\n");
 				    break;
+					
 				case 3:
 				    printf("up button 3\n");
 				    break;
@@ -1277,12 +1299,29 @@ shellProcedure( struct window_d *window,
 			//se tiver passando em cima do botão de close.
 			if ( window == close_button )
 			{
+				printf(".");
 			    //APIresize_window ( window, 200, 200 );
 				//APIredraw_window ( window, 1 );	
 			}
             
-		    break;				
-		
+		    break;
+
+		//entered	
+        case 38:
+		    if ( window == close_button )
+			{
+			    printf("entered\n");	
+			}
+            break;		
+
+		//exited	
+        case 39:
+		    if ( window == close_button )
+		    {
+			    printf("exited\n");
+		    }
+            break;
+			
 		//Quando a aplicativo em user mode chama o kernel para 
 		//que o kernel crie uma janela, depois que o kernel criar a janela,
 		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 

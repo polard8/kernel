@@ -94,6 +94,8 @@ echo -{ ...
 	copy c:\gramado\arch\x86\boot\vhd\images\FOLDER.BMP    F:\
 	copy c:\gramado\arch\x86\boot\vhd\images\TERMINAL.BMP    F:\
 	
+	copy c:\gramado\arch\x86\boot\vhd\images\CURSOR.BMP    F:\
+	
 	
 	rem
 	rem ## TESTS ##

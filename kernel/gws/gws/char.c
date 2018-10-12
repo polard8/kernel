@@ -201,8 +201,7 @@ void drawchar_transparent ( unsigned long x,
         {			
 	        //Put pixel. 
             if ( ( *work_char & bit_mask ) )
-			{
-                //my_buffer_put_pixel ( color, x + x2, y, 0 );  
+			{ 
                 backbuffer_putpixel ( color, x + x2, y, 0 );  				
 			}
             
@@ -350,11 +349,7 @@ void draw_char ( unsigned long x,
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
 				
-			//Put pixel.
-			
-			//my_buffer_put_pixel( *work_char & bit_mask ? fgcolor: bgcolor, 
-			//    x + x2, y, 0 );
-				
+			//Put pixel.				
 			backbuffer_putpixel ( *work_char & bit_mask ? fgcolor: bgcolor, 
 			    x + x2, y, 0 );
 				

@@ -1616,17 +1616,13 @@ void mouseHandler (){
 			// #todo: precisamos colocar no backbuffer o retãngulo salvo previamente.
             // #todo: Precisamos salvar o conteúdo de um retângulo 
 			// que está no backbuffer, para depois pintarmos o mouse.
-			
-			//#todo: Criar essas funções e variáveis.
-			//ex: display_saved_rect( saved_rect_Buffer, old_mouse_x, old_mouse_y );
-            //ex: save_rect(x,y);
-			
+						
 			
 			//  copiar para o lfb o antigo retângulo. Para apagar o ponteiro que está no lfb.
 			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );	
 			
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
-		    //refresh_rectangle ( mouse_x, mouse_y, 16, 16 );	
+
 
             //nova técnica.
             //+ copia no LFB um retângulo do backbuffer para apagar o ponteiro antigo.
@@ -1895,10 +1891,9 @@ void mouseHandler (){
 			mouse_button_action = 0;
 			
 			
-		// Se NÃO ouve alteração no estado dos botões, então apenas 
-		// enviaremos a mensagem de movimento do mouse e sinalizamos 
-		// qual é a janela que o mouse está em cima.
-			
+		    // Se NÃO ouve alteração no estado dos botões, então apenas 
+		    // enviaremos a mensagem de movimento do mouse e sinalizamos 
+		    // qual é a janela que o mouse está em cima.
 		}else{
 			
 			// #importante
@@ -1912,21 +1907,39 @@ void mouseHandler (){
 			//mensagem pra essa nova janela.
 			
 			if ( wScan->id != mouseover_window )
-			{				
+			{
+                //Antes vamos avisr qual é a janela que o mouse está
+                //deixando. windowList[mouseover_window]
+                
+				windowSendMessage ( (unsigned long) windowList[mouseover_window], 
+		            (unsigned long) MSG_MOUSEEXITED, 
+			        (unsigned long) 0, 
+			        (unsigned long) 0 );
+ 								
+                //windowSendMessage ( (unsigned long) wScan, 
+		        //    (unsigned long) MSG_MOUSEENTERED, 
+			    //    (unsigned long) 0, 
+			    //    (unsigned long) 0 );				
+				
 				//Agora enviamos uma mensagem pra a nova janela que o mouse 
 				//está passando por cima.
-				mouseover_window = wScan->id;
 				
                 windowSendMessage ( (unsigned long) wScan, 
 		            (unsigned long) MSG_MOUSEOVER, 
-			        (unsigned long) mouseover_window, 
-			        (unsigned long) mouseover_window );
+			        (unsigned long) 0, 
+			        (unsigned long) 0 );
 				
 			}else{ 
 			    
 				//nothing ...
 				//não precisamos reenviar a mensagem, poi o mouse 
 				//continua na mesma janela que antes.
+                
+				//windowSendMessage ( (unsigned long) wScan, 
+		        //    (unsigned long) MSG_MOUSEOVER, 
+			    //    (unsigned long) 0, 
+			    //    (unsigned long) 0 );				
+				
 			};
 			
 			

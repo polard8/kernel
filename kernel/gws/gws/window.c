@@ -3442,6 +3442,7 @@ int windowLoadGramadoIcons (){
 	fileIconBuffer = (void *) allocPageFrames(4);
 	folderIconBuffer = (void *) allocPageFrames(4);
 	terminalIconBuffer = (void *) allocPageFrames(4);
+	cursorIconBuffer = (void *) allocPageFrames(4);
 	//...
 	
 	if( (void*) appIconBuffer == NULL )
@@ -3467,6 +3468,12 @@ int windowLoadGramadoIcons (){
 		printf("init_windows: terminalIconBuffer\n");
 		die();
 	}
+	
+	if( (void*) cursorIconBuffer == NULL )
+	{
+		printf("init_windows: cursorIconBuffer\n");
+		die();
+	}	
 	
 	//
 	// # Load #
@@ -3505,6 +3512,14 @@ int windowLoadGramadoIcons (){
 		printf("init_windows: TERMINAL.BMP\n");
 		die();				
 	}	
+	
+	fRet = (unsigned long) fsLoadFile("CURSOR  BMP", 
+	    (unsigned long) cursorIconBuffer );	
+    if( fRet != 0 )
+	{
+		printf("init_windows: CURSOR.BMP\n");
+		die();				
+	}		
 	
 	
 //done:
