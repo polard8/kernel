@@ -180,7 +180,7 @@ useDedicatedBuffer:
 /*
  ******************************************************
  * my_buffer_put_pixel:
- *     Coloca um pixel o buffer backbuffer. 
+ *     Coloca um pixel no BACKBUFFER. 
  *     Obs: O backbuffer deverá ser o buffer dedicado da janela principal gui->main.     
  *
  * a = cor
@@ -207,7 +207,7 @@ my_buffer_put_pixel( unsigned long ax,
 
 
 //#importante:
-//pega um pixel no backbuffer
+//pega um pixel no BACKBUFFER
 //tem que usar variável pra bytes per pixel e screen width. 
 //A ideia é poder pegar os píxel de um retãngulo e salvá los
 //para depois devolver ao backbuffer.
@@ -235,6 +235,7 @@ unsigned long get_pixel ( unsigned long x,  unsigned long y ){
 
 //copia um pixel do backbuffer para o frontbuffer
 //tem que usar variável pra bytes per pixel e screen width.
+//#todo: TESTAR ESSA FUNÇÃO
 void refresh_pixel ( unsigned long x,  unsigned long y ){
 	
 	//SALVA A COR

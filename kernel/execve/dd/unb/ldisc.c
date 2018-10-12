@@ -1614,7 +1614,11 @@ void mouseHandler (){
             //ex: save_rect(x,y);
 			
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
-		    refresh_rectangle ( mouse_x, mouse_y, 16, 16 );					
+		    refresh_rectangle ( mouse_x, mouse_y, 16, 16 );	
+
+            //nova técnica.
+            //+ copia no LFB um retângulo do backbuffer para apagar o ponteiro antigo.
+            //+ decodifica o mouse diretamente no LFB.			
 			
             break;
 

@@ -251,10 +251,17 @@ struct ProcessorBlock_d ProcessorBlock;
 // GUI support.
 // 
  
-void hal_backbuffer_putpixel( unsigned long ax, 
-                              unsigned long bx, 
-						      unsigned long cx, 
-						      unsigned long dx ); 
+void 
+hal_backbuffer_putpixel ( unsigned long ax, 
+                          unsigned long bx, 
+						  unsigned long cx, 
+						  unsigned long dx ); 
+							  
+void 
+hal_lfb_putpixel ( unsigned long ax, 
+                   unsigned long bx, 
+				   unsigned long cx, 
+				   unsigned long dx ); 
 							  
 							  
 							  

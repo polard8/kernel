@@ -344,9 +344,9 @@ bmpDisplayBMP( char *address,
 				//Devemos pintar caso a cor atual seja  
 				//diferente da cor selecionada.
 				case BMP_CHANGE_COLOR_TRANSPARENT:
-				    if( color != bmp_selected_color )
+				    if ( color != bmp_selected_color )
 					{
-		                my_buffer_put_pixel( (unsigned long) color, 
+		                my_buffer_put_pixel ( (unsigned long) color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
 						    0 );								
@@ -362,7 +362,7 @@ bmpDisplayBMP( char *address,
 				case BMP_CHANGE_COLOR_SUBSTITUTE:
 				    if( color == bmp_selected_color )
 					{
-			            my_buffer_put_pixel( (unsigned long) bmp_substitute_color, 
+			            my_buffer_put_pixel ( (unsigned long) bmp_substitute_color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
 						     0 );

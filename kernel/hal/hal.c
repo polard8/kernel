@@ -26,6 +26,10 @@ extern unsigned long idt;
 
 extern void gui_buffer_putpixel();
 
+extern void swlib_backbuffer_putpixel();
+extern void swlib_lfb_putpixel();
+
+
 //
 //@todo: criar rotina hal_get_page_dir();
 //extern unsigned long _get_page_dir();
@@ -149,16 +153,16 @@ void halMain(){
  *     Coloca um pixel no backbuffer.
  */
 void 
-hal_backbuffer_putpixel( unsigned long ax, 
-                         unsigned long bx, 
-						 unsigned long cx, 
-						 unsigned long dx )
+hal_backbuffer_putpixel ( unsigned long ax, 
+                          unsigned long bx, 
+						  unsigned long cx, 
+						  unsigned long dx )
 {	
 	// Chama a rotina em assembly depois de enviar os valores para os 
 	// registradores.
 	// IN: cor, x, y, 0
 	
-	asm volatile(" \n " : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
 
     //? Questionamentos: 	
@@ -166,9 +170,38 @@ hal_backbuffer_putpixel( unsigned long ax,
 	// ?? De onde vem essa rotina ??
 	// @todo: Devemos chamar o módulo hal.
 	
-	gui_buffer_putpixel(); 	
-	//return;
+	//gui_buffer_putpixel (); 
+    swlib_backbuffer_putpixel();	
 };
+
+
+/*
+ ************************************************
+ * hal_lfb_putpixel:
+ *     Coloca um pixel no LFB.
+ */
+void 
+hal_lfb_putpixel ( unsigned long ax, 
+                   unsigned long bx, 
+				   unsigned long cx, 
+				   unsigned long dx )
+{	
+	// Chama a rotina em assembly depois de enviar os valores para os 
+	// registradores.
+	// IN: cor, x, y, 0
+	
+	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+
+
+    //? Questionamentos: 	
+	//Coloca um pixel no backbuffer. 
+	// ?? De onde vem essa rotina ??
+	// @todo: Devemos chamar o módulo hal.
+	
+	//gui_buffer_putpixel (); 	
+	swlib_lfb_putpixel();
+};
+
 
 
 /*
@@ -176,10 +209,9 @@ hal_backbuffer_putpixel( unsigned long ax,
  *     Sincroniza o retraço vertical do monitor.
  *     ? Isso ainda está em uso ?
  */
-void sys_vsync()
-{
-    hal_vsync();	
-    //return;
+void sys_vsync (){
+	
+    hal_vsync ();	
 };
 
 
@@ -187,9 +219,9 @@ void sys_vsync()
  * sys_showpciinfo:
  *     Mostra informações encontradas na interface PCI.
  */
-int sys_showpciinfo()
-{
-    return (int) hal_showpciinfo();
+int sys_showpciinfo (){
+	
+    return (int) hal_showpciinfo ();
 };
 
 
@@ -400,16 +432,14 @@ done:
 };
 
 
-void 
-hal_set_machine_type( unsigned long type )
-{
+void hal_set_machine_type ( unsigned long type ){
+	
     g_machine_type = (unsigned long) type;
-	//return;
 };
 
 
-unsigned long hal_get_machine_type()
-{
+unsigned long hal_get_machine_type (){
+	
     return (unsigned long) g_machine_type;
 };
 
@@ -536,11 +566,9 @@ unsigned long getIdt()
 };
 
 
-void 
-hal_vsync()
-{
-    vsync();
-    //return;	
+void hal_vsync (){
+	
+    vsync ();
 };
 
 

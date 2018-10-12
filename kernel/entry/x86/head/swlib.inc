@@ -32,14 +32,25 @@ _um_buffer_putpixel:
     jmp _gui_buffer_putpixel
     jmp $
 	
-	
 
+;;
+;; ## Wrappers para putpixel ##
+;;
+
+global _swlib_backbuffer_putpixel
+_swlib_backbuffer_putpixel:
+    jmp _gui_buffer_putpixel 
+	
+global _swlib_lfb_putpixel
+_swlib_lfb_putpixel:
+    jmp _gui_buffer_putpixel2 
+
+	
+	
 ;===================================================================
 ; _gui_buffer_putpixel:
 ;     Coloca um pixel no backbuffer.
 ;     O módulo /hal deve chamar essa rotina e não a /gui. 
-;
-;
 ; a =  cor
 ; b =  x
 ; c =  y
@@ -126,6 +137,97 @@ _gui_buffer_putpixel:
 .b db 0	
 .a db 0	
 
+
+;===================================================================
+; _gui_buffer_putpixel:
+;     Coloca um pixel no LFB.
+;     O módulo /hal deve chamar essa rotina e não a /gui. 
+; a =  cor
+; b =  x
+; c =  y
+; d = ?
+;
+global _gui_buffer_putpixel2
+_gui_buffer_putpixel2:
+
+	push  es
+    push  ecx   
+   
+    ;Ajuste provisório.
+	mov dword [.cor], eax    ;salva cor.
+	mov dword [.x],   ebx    ;salva x.
+	mov dword [.y],   ecx    ;salva y.		
+    mov eax, dword [.x]
+	mov ebx, dword [.y]      ;coloca y em ebx.	 	
+	mov ecx, dword [.cor]    ;coloca a cor em ecx.
+	
+	;ecx (cor) AABBGGRR antigo 
+
+	;antigo    bb gg rr aa
+	;ecx (cor) aa bb gg rr  
+	
+	mov byte [.r], cl	 ;a.
+	shr ecx, 8
+	mov byte [.g], cl	 ;r.
+	shr ecx, 8
+	mov byte [.b], cl    ;g.
+	shr ecx, 8
+	mov byte [.a], cl    ;b.
+
+    ;original
+	;mov byte [.a], cl	 ;a.
+	;shr ecx, 8
+	;mov byte [.r], cl	 ;r.
+	;shr ecx, 8
+	;mov byte [.g], cl    ;g.
+	;shr ecx, 8
+	;mov byte [.b], cl    ;b.
+    
+	;segmento ES ... poderia ser 0x10
+	push eax
+	mov ax, 0x10
+	mov es, ax
+    pop eax   
+	
+	;;[BytesPerScanLineMOS] ; ebx = y * y multiplier 800*4 ;1024*4 ;640*4      
+	
+	imul ebx, 800*3    ;640*3        
+    
+	;eax*3
+	mov ecx, dword 3
+	mul ecx
+	add eax, ebx    ;Adiciona ebx.
+	
+	mov  edi, eax ;dword [ebx+eax*3]  ;[ebx+eax*4] ; edi = x*4+(y*y multiplier)
+    
+	;mov eax, ecx       ;[MenColor] ; eax = color
+    
+	;(base) buffer 1 
+	;;mov ecx, dword 0xC0800000  ;;backbuffer  
+    mov ecx, dword 0xC0400000	 ;;lfb
+    add edi, ecx     ;(deslocamento)
+   	
+	;a
+	;mov al, byte [.a]
+	;stosb 	
+	;envia r, g e b.
+	mov al, byte [.r]
+	stosb 
+	mov al, byte [.g]
+	stosb 
+	mov al, byte [.b]
+	stosb 
+    
+	pop ecx
+    pop es
+    ret		
+.cor: dd 0
+.x: dd 0
+.y: dd 0
+.r db 0	
+.g db 0
+.b db 0	
+.a db 0	
 
 
 ;---------------------------
