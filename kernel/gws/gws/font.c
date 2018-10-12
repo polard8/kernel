@@ -8,9 +8,6 @@
 #include <kernel.h>
 
 
-//int dummyzzzfontstuff;
-
-
 void gwsSetCurrentFontAddress ( unsigned long address ){
 	
 	gws_currentfont_address = (unsigned long) address;

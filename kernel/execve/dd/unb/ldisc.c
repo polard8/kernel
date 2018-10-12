@@ -23,6 +23,10 @@
 #define MOUSE_X_SIGN	0x10
 #define MOUSE_Y_SIGN	0x20
 
+
+int saved_mouse_x;
+int saved_mouse_y;
+
 //Coordenadas do cursor.
 extern int mouse_x;
 extern int mouse_y;
@@ -1520,7 +1524,7 @@ static int count_mouse = 0;
 static char buffer_mouse[3];
 	
 void mouseHandler (){
-		
+	
     // Coordenadas do mouse.
     // Obs: Isso pode ser global.
     // O tratador em assembly tem as variáveis globais do posicionamento.
@@ -1585,6 +1589,10 @@ void mouseHandler (){
 			// mas queremos que seja feito em C.
 			// #obs: Uma rotina interna aqui nesse arquivo está tentando isso.
 			
+		    //salvando antes de atualizar.
+			saved_mouse_x = mouse_x;
+		    saved_mouse_y = mouse_y;			
+			
 			update_mouse();			
 			
 		    // #importante:
@@ -1613,8 +1621,12 @@ void mouseHandler (){
 			//ex: display_saved_rect( saved_rect_Buffer, old_mouse_x, old_mouse_y );
             //ex: save_rect(x,y);
 			
+			
+			//  copiar para o lfb o antigo retângulo. Para apagar o ponteiro que está no lfb.
+			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 16, 16 );	
+			
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
-		    refresh_rectangle ( mouse_x, mouse_y, 16, 16 );	
+		    //refresh_rectangle ( mouse_x, mouse_y, 16, 16 );	
 
             //nova técnica.
             //+ copia no LFB um retângulo do backbuffer para apagar o ponteiro antigo.

@@ -38,14 +38,28 @@ static unsigned long vga_256colors_palette[1] = { 0x00000000, };
 
       
 
-
+/*
+ ******************************************************
+ * bmpDirectDisplayBMP:
+ *
+ * Mostra na tela uma imagem bmp carregada na memória. (no LFB)
+ * 
+ * IN:
+ *     address = endereço base
+ *     x       = posicionamento 
+ *     y       = posicionamento
+ *
+ */
+int bmpDirectDisplayBMP( char *address, 
+                   unsigned long x, 
+				   unsigned long y );
 
 
 /*
  ******************************************************
  * bmpDisplayBMP:
  *
- * Mostra na tela uma imagem bmp carregada na memória.
+ * Mostra na tela uma imagem bmp carregada na memória. no backbuffer()
  * 
  * IN:
  *     address = endereço base

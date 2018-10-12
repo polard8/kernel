@@ -1,10 +1,12 @@
 /*
  * File: dbox.c
- *     Dialog Box support. 
+ *     Dialog Box support.
+ * 
  * Descrição: 
  *     Gerência de caixas de diálogo.
  *     Faz parte do módulo Window Manager do tipo MB.
  *     Obs: Dialogbox é basicamente um 'form'.
+ *
  * History:
  *     2015 - Created by fred Nora.
  */
@@ -14,10 +16,11 @@
 
 
 //Protótipo do procedimento.
-unsigned long DialogBoxProcedure( struct window_d *window, 
-                                  int msg, 
-								  unsigned long long1, 
-								  unsigned long long2 );
+unsigned long 
+DialogBoxProcedure ( struct window_d *window, 
+                     int msg, 
+					 unsigned long long1, 
+					 unsigned long long2 );
 								  
 								  
 /*
@@ -26,10 +29,10 @@ unsigned long DialogBoxProcedure( struct window_d *window,
  * mostra uma mensagem.
  *
  */
-void DialogBox( struct window_d *parent_window, 
-                int type, 
-				char *title, 
-				char *string )
+void DialogBox ( struct window_d *parent_window, 
+                 int type, 
+				 char *title, 
+				 char *string )
 {
 	struct window_d *hWnd; 
 	struct window_d *pWnd; 
@@ -42,76 +45,97 @@ void DialogBox( struct window_d *parent_window,
     unsigned long cx = (unsigned long) (14*(800/20));    //sobra 3 de cada lado.
 	
 	//y
-	unsigned long y  = (unsigned long) (2*(600/20)); //V
+	unsigned long y  = (unsigned long) (2*(600/20));     //V
     unsigned long cy = (unsigned long) (2*(600/20));		
 	
+	//
 	// Parent window.
-	if( (void*) parent_window == NULL ){
-	    pWnd = (void*) gui->screen;
-	}else{
-	    pWnd = (void*) parent_window;
+	//
+	
+	if ( (void *) parent_window == NULL )
+	{
+	    pWnd = (void *) gui->screen;
+	
+	} else {
+	    pWnd = (void *) parent_window;
 	};
 
+	//
 	// Type.
-	switch(type)
+	//
+	
+	switch (type)
 	{
 	    case 1:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, title, 
-			                   x, y, cx, cy, 
-							   pWnd, 0, 0, COLOR_WINDOW); 
+	        hWnd = (void *) CreateWindow ( 3, 0, 0, title, 
+			                    x, y, cx, cy, 
+							    pWnd, 0, 0, COLOR_WINDOW ); 
 		    break;
 			
 	    case 2:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox2", 
+	        hWnd = (void *) CreateWindow ( 3, 0, 0, "DialogBox2", 
 			                   x, y, cx, cy, 
-							   pWnd, 0, 0, COLOR_WINDOW); 
+							   pWnd, 0, 0, COLOR_WINDOW ); 
 	        break;
 			
 	    case 3:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox3", 
+	        hWnd = (void *) CreateWindow ( 3, 0, 0, "DialogBox3", 
 			                   x, y, cx, cy, 
-							   pWnd, 0, 0, COLOR_WINDOW); 
+							   pWnd, 0, 0, COLOR_WINDOW ); 
 	        break;
 			
 	    case 4:
-	        hWnd = (void*) CreateWindow( 3, 0, 0, "DialogBox4", 
+	        hWnd = (void *) CreateWindow ( 3, 0, 0, "DialogBox4", 
 			                   x, y, cx, cy, 
-							   pWnd, 0, 0, COLOR_WINDOW); 
+							   pWnd, 0, 0, COLOR_WINDOW ); 
 	        break;
 			
 		default:
-	        //hWnd = (void*) CreateWindow( 3, 0, 0, "Error", x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
+	        //hWnd = (void*) CreateWindow( 3, 0, 0, "Error", 
+			//                    x, y, cx, cy, pWnd, 0, 0, COLOR_WINDOW); 
 		    break;
 	};
 	
 	// Register.
-	if( (void*) hWnd == NULL)
+	
+	if( (void *) hWnd == NULL)
 	{
 	    printf("DialogBox: hWnd\n");
 		die();
-	}else{
+	
+	} else {
+		
 		RegisterWindow(hWnd);
 		set_active_window(hWnd);
 	};
 	
+	//
     // String. 
+	//
+	
 	//(@todo: Get client area rect).
-d_string:
-	draw_text( hWnd, 1*(cx/16), 4*(cy/16), 
-	    COLOR_WINDOWTEXT, string );
+//d_string:
 
+	draw_text ( hWnd, 1*(cx/16), 4*(cy/16), COLOR_WINDOWTEXT, string );
+
+	//
     // Button. 
+	//
+	
     // (@todo: Get client area rect).
-d_button:	 
-	bWnd = (void*) CreateWindow( 11, 0, 0, "Close", 
-	                             2*(cx/6), 3*(cy/6), cx/4, cy/6, 
-						         hWnd, 0, 0, COLOR_BUTTONFACE );
+//d_button:
+	 
+	bWnd = (void *) CreateWindow ( 11, 0, 0, "Close", 
+	                    2*(cx/6), 3*(cy/6), cx/4, cy/6, 
+						hWnd, 0, 0, COLOR_BUTTONFACE );
 								 
-	if( (void*) bWnd == NULL)
+	if ( (void *) bWnd == NULL)
 	{
 	    printf("DialogBox error: bWnd\n");
 		die();
-	}else{
+		
+	} else {
+		
 	    RegisterWindow(bWnd);
         SetFocus(bWnd);		
 	};		
@@ -120,11 +144,13 @@ d_button:
 	// Continua ...
 	//
 
-	SetProcedure( (unsigned long) &DialogBoxProcedure);	
+	SetProcedure ( (unsigned long) &DialogBoxProcedure );	
 	
-done:
+//done:
+
     refresh_screen();	
-    return;
+    
+	//return;
 };
 
 
@@ -140,8 +166,11 @@ unsigned long DialogBoxProcedure( struct window_d *window,
 								  unsigned long long1, 
 								  unsigned long long2 ) 
 {
-    //Msg. 
-    switch(msg)
+	
+	//if (msg < 0)
+	//    return 0;
+	
+    switch (msg)
 	{	
         case MSG_KEYDOWN:
             switch(long1)
@@ -176,8 +205,8 @@ unsigned long DialogBoxProcedure( struct window_d *window,
 				case VK_F4:
                     break;					
 
-				case VK_F5:
-                    break;	
+				//case VK_F5:
+                //    break;	
 					
                 //
                 // Testes: Install, format, create volume, delete volume, files operations...
@@ -194,7 +223,8 @@ unsigned long DialogBoxProcedure( struct window_d *window,
 		    break;
 	};
 	
-done:
+//done:
+
 	return (unsigned long) 0;
 };
 
@@ -205,6 +235,6 @@ int dialogboxInit()
 */
 
 //
-//fim
+// End.
 //
 
