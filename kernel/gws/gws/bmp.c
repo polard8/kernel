@@ -346,10 +346,15 @@ bmpDisplayBMP( char *address,
 				case BMP_CHANGE_COLOR_TRANSPARENT:
 				    if ( color != bmp_selected_color )
 					{
-		                my_buffer_put_pixel ( (unsigned long) color, 
+		                //my_buffer_put_pixel ( (unsigned long) color, 
+			            //    (unsigned long) left, 
+						//    (unsigned long) bottom, 
+						//    0 );	
+
+		                backbuffer_putpixel ( (unsigned long) color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
-						    0 );								
+						    0 );							
 					};
 				    break;
 					
@@ -362,15 +367,31 @@ bmpDisplayBMP( char *address,
 				case BMP_CHANGE_COLOR_SUBSTITUTE:
 				    if( color == bmp_selected_color )
 					{
-			            my_buffer_put_pixel ( (unsigned long) bmp_substitute_color, 
+			            
+						//my_buffer_put_pixel ( (unsigned long) bmp_substitute_color, 
+			            //    (unsigned long) left, 
+						//    (unsigned long) bottom, 
+						//     0 );
+							 
+						backbuffer_putpixel ( (unsigned long) bmp_substitute_color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
 						     0 );
-                    }else{
-		                my_buffer_put_pixel( (unsigned long) color, 
+
+							 
+                    } else {
+		                
+						//my_buffer_put_pixel( (unsigned long) color, 
+			            //    (unsigned long) left, 
+						//    (unsigned long) bottom, 
+						//    0 );
+							
+						backbuffer_putpixel ( (unsigned long) color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
-						    0 );														
+						    0 );
+
+							
 					};							 
 				    break;
 					
@@ -380,11 +401,18 @@ bmpDisplayBMP( char *address,
 				// Pintamos normalmente a cor atual.
                 case BMP_CHANGE_COLOR_NULL:				
 				default:
-			        my_buffer_put_pixel( (unsigned long) color, 
+				
+			        //my_buffer_put_pixel( (unsigned long) color, 
+			        //    (unsigned long) left, 
+					//	(unsigned long) bottom, 
+					//	0 );				
+				    
+			        backbuffer_putpixel ( (unsigned long) color, 
 			            (unsigned long) left, 
 						(unsigned long) bottom, 
-						0 );				
-				    break;
+						0 );		
+						
+					break;
 			};
 
 			// Próximo pixel.

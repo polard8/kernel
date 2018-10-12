@@ -1994,6 +1994,24 @@ void my_buffer_put_pixel( unsigned long ax,
 						  unsigned long cx, 
 						  unsigned long dx );
 						  
+						  
+//
+// ## putpixel ##
+//					
+
+void 
+backbuffer_putpixel( unsigned long ax, 
+                     unsigned long bx, 
+				     unsigned long cx, 
+				     unsigned long dx );
+void 
+lfb_putpixel( unsigned long ax, 
+              unsigned long bx, 
+		      unsigned long cx, 
+		      unsigned long dx );
+	  
+						  
+						  
 void my_buffer_horizontal_line( unsigned long x1,
                                 unsigned long y, 
 								unsigned long x2,  

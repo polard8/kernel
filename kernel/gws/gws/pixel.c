@@ -206,6 +206,33 @@ my_buffer_put_pixel( unsigned long ax,
 };
 
 
+
+//
+// ## putpixel: backbuffer e lfb ##
+//
+
+void 
+backbuffer_putpixel( unsigned long ax, 
+                     unsigned long bx, 
+				     unsigned long cx, 
+				     unsigned long dx )
+{
+    hal_backbuffer_putpixel ( ax, bx, cx, dx );
+};
+
+
+void 
+lfb_putpixel( unsigned long ax, 
+              unsigned long bx, 
+		      unsigned long cx, 
+		      unsigned long dx )
+{
+    hal_lfb_putpixel ( ax, bx, cx, dx );
+};
+
+
+
+
 //#importante:
 //pega um pixel no BACKBUFFER
 //tem que usar variável pra bytes per pixel e screen width. 

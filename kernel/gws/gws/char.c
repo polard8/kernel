@@ -202,7 +202,8 @@ void drawchar_transparent ( unsigned long x,
 	        //Put pixel. 
             if ( ( *work_char & bit_mask ) )
 			{
-                my_buffer_put_pixel ( color, x + x2, y, 0 );  
+                //my_buffer_put_pixel ( color, x + x2, y, 0 );  
+                backbuffer_putpixel ( color, x + x2, y, 0 );  				
 			}
             
 			//Rotate bitmask.
@@ -350,8 +351,13 @@ void draw_char ( unsigned long x,
         {
 				
 			//Put pixel.
-			my_buffer_put_pixel( *work_char & bit_mask ? fgcolor: bgcolor, 
+			
+			//my_buffer_put_pixel( *work_char & bit_mask ? fgcolor: bgcolor, 
+			//    x + x2, y, 0 );
+				
+			backbuffer_putpixel ( *work_char & bit_mask ? fgcolor: bgcolor, 
 			    x + x2, y, 0 );
+				
 			
             bit_mask = (bit_mask >> 1); 								 
         };
