@@ -96,9 +96,7 @@ bmpDirectDisplayBMP ( char *address,
 
 	// @todo:
 	// Testar validade do endereço.
-	
-	
-	if( address == 0 ){
+	if ( address == 0 ){
 		//goto fail;
 	};
 	
@@ -118,7 +116,8 @@ bmpDirectDisplayBMP ( char *address,
 	
 	//bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );	
     bh = (struct bmp_header_d *) &buffer[0];
-	if( (void*) bh == NULL )
+	
+	if ( (void *) bh == NULL )
 	{
 		//goto fail;
 	}	
@@ -139,13 +138,14 @@ bmpDirectDisplayBMP ( char *address,
 	//Windows bmp.
 	//bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
     bi = (struct bmp_infoheader_d *)  &buffer2[0];
-	if( (void*) bi == NULL )
+	
+	if ( (void *) bi == NULL )
 	{
 		//goto fail;
 	}	
 	
 	//The size of this header.
-	bi->bmpSize = *( unsigned long* ) &bmp[14];
+	bi->bmpSize = *(unsigned long *) &bmp[14];
 	
 	// Width and height.
     Width = *( unsigned long * ) &bmp[18];
@@ -169,7 +169,7 @@ bmpDirectDisplayBMP ( char *address,
 	
 	
 	// 0 = Nenhuma compressão.
-	if( bi->bmpCompression != 0 ){
+	if ( bi->bmpCompression != 0 ){
 		//fail
 	}
 	
@@ -189,7 +189,7 @@ bmpDirectDisplayBMP ( char *address,
 	//#importante:
 	//A base é diferente para os tipos ?? 
 
-	switch( bi->bmpBitCount )
+	switch ( bi->bmpBitCount )
     {
 		//Obs: Cada cor é representada com 4 bytes. RGBA.
 		
@@ -228,13 +228,13 @@ bmpDirectDisplayBMP ( char *address,
 //320   - 32 bpp (True color, RGBA)	
 
 	
-	for( i=0; i < bi->bmpHeight; i++ )	
+	for ( i=0; i < bi->bmpHeight; i++ )	
 	{		
-		for( j=0; j < bi->bmpWidth; j++ )	
+		for ( j=0; j < bi->bmpWidth; j++ )	
 		{	
 	        // 16 cores
             // Um pixel por nibble.
-	        if(bi->bmpBitCount == 4 )
+	        if ( bi->bmpBitCount == 4 )
 	        {				
 				offset = base;
 							    
@@ -243,7 +243,7 @@ bmpDirectDisplayBMP ( char *address,
                 // Segundo nibble.
 				if( nibble_count_16colors == 2222 )
 				{
-					palette_index[0] = ( palette_index[0] & 0x0F);  
+					palette_index[0] = ( palette_index[0] & 0x0F );  
 					color = (unsigned long) palette[  palette_index[0]  ];
 					
 					nibble_count_16colors = 0;
@@ -252,7 +252,7 @@ bmpDirectDisplayBMP ( char *address,
 				// Primeiro nibble.	
 				}else{
 
-			        palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
+			        palette_index[0] = ( (  palette_index[0] >> 4 ) & 0x0F );
 					color = (unsigned long) palette[  palette_index[0] ];
 				    
 					nibble_count_16colors = 2222;
@@ -262,7 +262,7 @@ bmpDirectDisplayBMP ( char *address,
 
 			// 256 cores
 			// Próximo pixel para 8bpp
-	        if( bi->bmpBitCount == 8 )
+	        if ( bi->bmpBitCount == 8 )
 	        {   
 				offset = base;
 				color = (unsigned long) palette[  bmp[offset] ];
@@ -272,7 +272,7 @@ bmpDirectDisplayBMP ( char *address,
 			
 			
 			// Próximo pixel para 16bpp
-	        if( bi->bmpBitCount == 16 )
+	        if ( bi->bmpBitCount == 16 )
 	        {
 				//a
 				c[0] = 0;  	
@@ -317,7 +317,7 @@ bmpDirectDisplayBMP ( char *address,
 			
 			
 			// Próximo pixel para 32bpp.
-	        if( bi->bmpBitCount == 32 )
+	        if ( bi->bmpBitCount == 32 )
 	        {	
 			    c[0] = 0;  //A				
 				
@@ -342,7 +342,7 @@ bmpDirectDisplayBMP ( char *address,
 			//Agora se a flag de mascara estiver selecionada,
 			//então devemos ignora o pixel e não pintá-lo.	
 			
-			switch(bmp_change_color_flag)
+			switch (bmp_change_color_flag)
 			{
 				//1000
 				//flag para ignorarmos a cor selecionada.
@@ -352,11 +352,6 @@ bmpDirectDisplayBMP ( char *address,
 				case BMP_CHANGE_COLOR_TRANSPARENT:
 				    if ( color != bmp_selected_color )
 					{
-		                //my_buffer_put_pixel ( (unsigned long) color, 
-			            //    (unsigned long) left, 
-						//    (unsigned long) bottom, 
-						//    0 );	
-
 		                lfb_putpixel ( (unsigned long) color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
@@ -371,33 +366,20 @@ bmpDirectDisplayBMP ( char *address,
 				//Mas se a cor atual for diferente da cor selecionada,
 				//pintamos normalmente a cor atual.
 				case BMP_CHANGE_COLOR_SUBSTITUTE:
-				    if( color == bmp_selected_color )
-					{
-			            
-						//my_buffer_put_pixel ( (unsigned long) bmp_substitute_color, 
-			            //    (unsigned long) left, 
-						//    (unsigned long) bottom, 
-						//     0 );
-							 
+				    if ( color == bmp_selected_color )
+					{	 
 						lfb_putpixel ( (unsigned long) bmp_substitute_color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
 						     0 );
-
 							 
                     } else {
-		                
-						//my_buffer_put_pixel( (unsigned long) color, 
-			            //    (unsigned long) left, 
-						//    (unsigned long) bottom, 
-						//    0 );
-							
+		                							
 						lfb_putpixel ( (unsigned long) color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
 						    0 );
-
-							
+	
 					};							 
 				    break;
 					
@@ -408,11 +390,6 @@ bmpDirectDisplayBMP ( char *address,
                 case BMP_CHANGE_COLOR_NULL:				
 				default:
 				
-			        //my_buffer_put_pixel( (unsigned long) color, 
-			        //    (unsigned long) left, 
-					//	(unsigned long) bottom, 
-					//	0 );				
-				    
 			        lfb_putpixel ( (unsigned long) color, 
 			            (unsigned long) left, 
 						(unsigned long) bottom, 
@@ -896,6 +873,9 @@ int bmpDisplayMousePointerBMP( char *address,
 	//flag para ignorarmos a cor selecionada.
 	bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
 	
+	
+	//#importante:
+	//Selecionamos a cor que será ignorada.
     //background do bitmap é branco.
 	bmp_selected_color = COLOR_WHITE;	
     

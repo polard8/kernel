@@ -94,22 +94,13 @@ echo -{ ...
 	copy c:\gramado\arch\x86\boot\vhd\images\FOLDER.BMP    F:\
 	copy c:\gramado\arch\x86\boot\vhd\images\TERMINAL.BMP    F:\
 	
-	REM copy FREDNORA.BMP  F:\
-	REM copy SPOON.BMP     F:\
-	REM copy FERRIS2.BMP   F:\
-	REM copy GOONIES.BMP   F:\
-	rem copy GRAMADO.BMP   F:\
 	
-	
-
 	rem
 	rem ## TESTS ##
     rem 
 	
 	rem font
-	rem copy tests\NC2.FON       F:\
 	copy c:\gramado\bin\NC2.FON F:\
-	
 	
 	
 	copy c:\gramado\bin\FCLASS.BIN    F:\
@@ -119,29 +110,7 @@ echo -{ ...
 	copy c:\gramado\bin\TEDITOR.BIN   F:\	
 	copy c:\gramado\bin\TGFE.BIN      F:\
 
-	
-	rem copy tests\TPRINTF.BIN   F:\	
-	rem copy tests\TSCROLL.BIN   F:\
-
-	rem copy tests\TMETRICS.BIN  F:\
-	
-	
-	rem copy tests\TSCANF.BIN   F:\
-	
-	
-	
-	
-	
-	REM copy TESTTEST.BIN  F:\
-	REM copy LONGEST1.BIN  F:\
-    REM copy OPER1.BIN     F:\
-	
-	rem compiladores
-	
-    rem copy tests\FNCC.BIN      F:\	
-    
-	rem copy tests\C4.BIN F:\
-	
+		
 	rem arquivos de texto.
 	rem copy tests\TEST.C F:\
 	rem copy tests\TEST2.C  F:\
