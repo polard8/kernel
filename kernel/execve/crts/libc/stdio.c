@@ -698,9 +698,12 @@ static void printchar (char **str, int c)
  * depois é que o caractere será enviado para a tela.
  *     Essa rotina é chamada pelas funções: /printchar/input/.
  */
-int putchar (int ch){    
-    outbyte(ch);
-    return (int) ch;    
+int putchar (int ch){ 
+   
+    //Em cedge.c
+    outbyte (ch);
+    
+	return (int) ch;    
 };
 
 

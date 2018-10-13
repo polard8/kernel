@@ -400,13 +400,14 @@
 #define	SYS_237 237 //reservado para boot support.
 #define	SYS_238 238 //reservado para boot support.
 #define	SYS_SETBOOTOPTIONS 239 //boot support.
+
 //240-249 Reservar próximos para gerenciamento de cursor e ponteiros.
 #define	SYS_GETCURSORX 240
 #define	SYS_GETCURSORY 241
 #define	SYS_242 242
 #define	SYS_243 243
-#define	SYS_244 244
-#define	SYS_245 245
+#define	SYS_244 244   //enable text cursor.
+#define	SYS_245 245   //disable text cursor.
 
 #define	SYS_246 246
 

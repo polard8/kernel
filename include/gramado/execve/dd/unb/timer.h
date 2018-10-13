@@ -117,6 +117,8 @@ unsigned long now();
 unsigned long get_timeout();
 void set_timeout(unsigned long ticks);
 
+void timerEnableTextCursor ();
+void timerDisableTextCursor ();
 
 //
 // End.

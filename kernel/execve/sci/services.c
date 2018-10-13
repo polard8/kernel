@@ -1317,6 +1317,20 @@ void *services( unsigned long number,
 		    return (void *) get_cursor_y();
 		    break;
 			
+		//244 enable text cursor.	
+		case 244:
+		    timerEnableTextCursor ();
+		    //timerShowTextCursor = 1;
+		    //gwsEnableTextCursor ();
+            break;		
+		
+		//245 disable text cursor.
+		case 245:
+		    timerDisableTextCursor ();
+		    //timerShowTextCursor = 0;
+		    //gwsDisableTextCursor ();
+            break;		
+			
 		//Info. (250 ~ 255).
 		
 		//250
@@ -1619,8 +1633,7 @@ void syscall_handler()
 // selecionado em _outbyte.
 // stdio_terminalmode_flag = não transparente.
 // Chama função interna.
-void servicesPutChar ( int c )
-{
+void servicesPutChar ( int c ){
 	
 	int cWidth = get_char_width ();
 	int cHeight = get_char_height ();
@@ -1635,9 +1648,42 @@ void servicesPutChar ( int c )
     stdio_terminalmode_flag = 1;  
 	
 	putchar ( (int) c );
-	refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, cWidth, cHeight );
+	refresh_rectangle ( g_cursor_x * cWidth, 
+	                    g_cursor_y * cHeight, 
+						cWidth, 
+						cHeight );
 	
-	stdio_terminalmode_flag = 0;  	
+	stdio_terminalmode_flag = 0;  
+
+    //
+	// Update cursor
+	//
+	/*
+    //Limites para o número de caracteres numa linha.
+    if ( g_cursor_x >= (g_cursor_right-1) )
+	{
+        g_cursor_x = g_cursor_left;
+        g_cursor_y++;  
+		
+    }else{   
+	
+	    //
+		// ## Incremento ##
+		//
+		
+		// Apenas incrementa a coluna. 
+        g_cursor_x++;                          
+    };
+    
+	
+	//Número máximo de linhas. (8 pixels por linha.)
+    if( g_cursor_y >= g_cursor_bottom )  
+    { 
+	    scroll();
+        g_cursor_y = g_cursor_bottom;
+    };	
+	*/
+
 }; 
  
  

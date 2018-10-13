@@ -69,7 +69,8 @@ void _outbyte (int c){
         //dentro do terminal.
         //então essa flag não faz sentido.		
  
-		if ( stdio_terminalmode_flag == 1 ){
+		if ( stdio_terminalmode_flag == 1 )
+		{
 			
 			// ## NÃO TRANPARENTE ##
             // se estamos no modo terminal então usaremos as cores 
@@ -88,7 +89,10 @@ void _outbyte (int c){
 				g_cursor_color, c );
 		};
 		
-     	//goto done;
+		//#testando ...
+		//g_cursor_x++;
+     	
+		//goto done;
         return;		
 	};
  
@@ -109,8 +113,6 @@ void _outbyte (int c){
         vm[i+1] = ch_atributo;  
 	};   
 };
-
-
 
 
 /*
@@ -140,9 +142,10 @@ void outbyte (int c){
     //	
     
     //Início da próxima linha.    
-    if( c == '\n' && prev == '\r' ) 
+    if ( c == '\n' && prev == '\r' ) 
     {
-		if ( g_cursor_y >= (g_cursor_bottom-1) ){
+		if ( g_cursor_y >= (g_cursor_bottom-1) )
+		{
 	        
 			scroll();
             g_cursor_y = (g_cursor_bottom-1);
@@ -275,6 +278,10 @@ void outbyte (int c){
 // caracteres normais.
 //default:
 
+
+    // Imprime os caracteres normais.
+	//_outbyte (c);
+
     //Limites para o número de caracteres numa linha.
     if ( g_cursor_x >= (g_cursor_right-1) )
 	{
@@ -283,7 +290,11 @@ void outbyte (int c){
 		
     }else{   
 	
-	    // Apenas incrementa a coluna. 
+	    //
+		// ## Incremento ##
+		//
+		
+		// Apenas incrementa a coluna. 
         g_cursor_x++;                          
     };
     
@@ -305,9 +316,6 @@ void outbyte (int c){
 	
 	// Atualisa o prev.	
 	prev = c;	   
-
-//done:
-    //return;
 };
 
 

@@ -806,6 +806,13 @@ noArgs:
 	//#importante
 	refresh_screen ();
 	
+	
+	//
+	// Habilitando o cursor de textos.
+	//
+	
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
+	
 	//#bugbug
 	//janela usada para input de textos ...
 	//o input de texto pode vir de várias fontes.
@@ -1000,6 +1007,12 @@ skip_input:
 
 	// Exit process.
 end:
+
+    // Desabilitando o cursor de texto.
+    // Quando outro aplicativo precisar ele clica em uma janela, 
+	// ela ganha o foco e habilita o cursor piscante.	
+	
+    system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 
 //#ifdef SHELL_VERBOSE		
     printf("SHELL.BIN: exiting code '0' ...\n");
@@ -1299,7 +1312,7 @@ shellProcedure( struct window_d *window,
 			//se tiver passando em cima do botão de close.
 			if ( window == close_button )
 			{
-				printf(".");
+				//printf(".");
 			    //APIresize_window ( window, 200, 200 );
 				//APIredraw_window ( window, 1 );	
 			}
@@ -1310,7 +1323,7 @@ shellProcedure( struct window_d *window,
         case 38:
 		    if ( window == close_button )
 			{
-			    printf("entered\n");	
+			    //printf("entered\n");	
 			}
             break;		
 
@@ -1318,7 +1331,7 @@ shellProcedure( struct window_d *window,
         case 39:
 		    if ( window == close_button )
 		    {
-			    printf("exited\n");
+			    //printf("exited\n");
 		    }
             break;
 			

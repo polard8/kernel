@@ -825,7 +825,7 @@ void _outbyte ( int c ){
 	//#obs: Tamanho do char constante = 8. 
 	//o que queremos é usar uma variável.
 	
-	stdio_system_call( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
+	stdio_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
 };
 
 

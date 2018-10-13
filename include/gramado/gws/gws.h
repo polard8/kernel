@@ -5,6 +5,11 @@
 // ## GWS - Gramado Window Server ##
 
 
+
+//void gwsEnableTextCursor ();
+//void gwsDisableTextCursor ();
+
+
 //abrir o servidor de janelas. 
 int gwsOpen();
 

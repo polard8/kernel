@@ -1,5 +1,5 @@
 /*
- * File: gramado\user\userenv.c 
+ * File: gws\user\userenv.c 
  *
  * Descrição:
  * User Environment Manager, (UEM).
@@ -346,21 +346,24 @@ done:
  * /root/user/config.txt
  * ...
  */
-void init_user_info()
-{	 
+void init_user_info (){
+	
 	int Id = 0;
     int Index = 0;	
 	
 	//Initialize list.
-	while(Index < USER_COUNT_MAX){
+	while (Index < USER_COUNT_MAX){
+		
 	    userList[Index] = (unsigned long) 0;
-        ++Index;
+        Index++;
 	};	
 	
 	//Configurando a estrutura global.
 	// Create default user. (default,interactive)
-	DefaultUser = (void*) CreateUser(default_user_name, USER_TYPE_INTERACTIVE);
-	if( (void*) DefaultUser == NULL ){
+	DefaultUser = (void *) CreateUser(default_user_name, USER_TYPE_INTERACTIVE);
+	
+	if ( (void *) DefaultUser == NULL )
+	{
 	    printf("init_user_info:");
 	    die();
 	}else{
@@ -387,9 +390,9 @@ void init_user_info()
 	
     // Continua...??!!
 
-done:
-    printf("Done\n"); 
-    return;
+//done:
+    //printf("Done\n"); 
+    //return;
 };
 
 

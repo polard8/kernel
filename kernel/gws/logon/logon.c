@@ -88,8 +88,8 @@ int ExitLogon();
  *    @todo: logonCreate();
  *
  */
-void create_logon()
-{
+void create_logon (){
+	
 	struct window_d *hWindow; 	 
 	
 	//g_guiMinimal = 1;
@@ -104,12 +104,14 @@ void create_logon()
 	// GUI Structure. 
 	// 	
 	
-	gui = (void*) malloc( sizeof(struct gui_d) );
-    if( (void*) gui == NULL)
+	gui = (void *) malloc( sizeof(struct gui_d) );
+    
+	if ( (void *) gui == NULL)
 	{
-	    printf("create_logon:");
+	    printf ("create_logon:");
 		die();
-	}else{
+		
+	} else {
 	    
         //Set session ,window station, desktop, window and menu.
 	    current_usersession = 0;       // User Session.
@@ -150,7 +152,12 @@ void create_logon()
 #endif	    
 		init_menus();        
 	    
-		//init_menus( ... 	
+
+        //
+		//
+		//
+
+		
 	    //...
 	};
 	

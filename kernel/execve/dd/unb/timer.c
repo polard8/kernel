@@ -100,7 +100,6 @@ int timerLock;
 //??
 int timerError;
 
-int cursorBlink;
 
 //??
 //unsigned long timerCountSeconds;  //Count Seconds.
@@ -152,6 +151,21 @@ void KiTimer (){
 };
 
 
+int timerShowTextCursor;     //se tá habilitado ou não
+int timerTextCursorStatus;   //0=apaga 1=acende 
+    
+	
+void timerEnableTextCursor (){
+	
+    timerShowTextCursor = 1;	
+};
+
+void timerDisableTextCursor (){
+	
+    timerShowTextCursor = 0;	
+};	
+	
+
 /*
  * timer: 
  *     Handler chamado pelo ISR do timer (IRQ 0).
@@ -183,23 +197,28 @@ void timer (){
 	//g_cursor_x--;			
 	
 	//de tempos em tempos atualiza o cursor
-	if ( timerTicks % 32 == 0 )	
+	if ( timerTicks % 64 == 0 )	
 	{
-		if ( cursorBlink == 0 )
-		{ 
-	        //apaga
-	        refresh_rectangle ( g_cursor_x*8, g_cursor_y*8, 20, 20 );	
-            cursorBlink = 1;
-		    goto goAhead;
-		}
+		//Se o cursor piscante está habilitado.
+		//Essa flag é acionada pelo aplicativo.
+		if (timerShowTextCursor == 1)
+		{
+		    if ( timerTextCursorStatus != 1 )
+		    { 
+	            //apaga
+	            refresh_rectangle ( (g_cursor_x + 1)  *8, g_cursor_y*8, 16, 16 );	
+                timerTextCursorStatus = 1;
+		        goto goAhead;
+		    }
 	
-		if ( cursorBlink == 1 )
-        {			
-		    //acende
-            bmpDisplayCursorBMP ( cursorIconBuffer, g_cursor_x*8, g_cursor_y*8 );		
-		    cursorBlink = 0;
-			goto goAhead;
-		}
+		    if ( timerTextCursorStatus == 1 )
+            {			
+		        //acende
+                bmpDisplayCursorBMP ( cursorIconBuffer, (g_cursor_x + 1) * 8, g_cursor_y*8 );		
+		        timerTextCursorStatus = 0;
+			    goto goAhead;
+		    }
+		};
 	};
 	
 

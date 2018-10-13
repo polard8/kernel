@@ -754,6 +754,17 @@ unsigned long g_cursor_right;    // margem direita dada em linhas
 unsigned long g_cursor_bottom;   // margem inferior dada em linhas
 
 
+//status do cursor.
+//se ele deve aparecer e piscar ou não.
+int g_show_text_cursor;
+
+//status: aceso ou apagado.
+//0=apaga 1=acende.
+int textcursorStatus;      
+
+
+
+
 unsigned long g_mousepointer_x;
 unsigned long g_mousepointer_y;
 

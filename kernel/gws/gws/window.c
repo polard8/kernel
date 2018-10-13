@@ -3102,6 +3102,7 @@ int init_windows (){
 	int Offset;
 	
 	for ( Offset=0; Offset < WINDOW_COUNT_MAX; Offset++ ){
+		
 	    windowList[Offset] = (unsigned long) 0;
 	}
 	
@@ -3112,19 +3113,30 @@ int init_windows (){
 	
 	//
 	// ## Client Area ##
-	// Inicializando a estrutura do retângulo 
-	// da área de cliente.
+	// Inicializando a estrutura do retângulo da área de cliente.
 	//
 	
-	rectClientArea = (void*) malloc( sizeof(struct rect_d) );
+	rectClientArea = (void*) malloc ( sizeof(struct rect_d) );
     
-	if( (void*) rectClientArea == NULL )
+	if ( (void *) rectClientArea == NULL )
 	{	
 	    printf("init_windows: rectClientArea\n");
 		die();
-	}else{
+		
+	} else {
 	    setClientAreaRect( 0, 0, 0, 0);	
 	};
+	
+	
+	//
+	// # cursor #
+	// Desabilitar o cursor de textos.
+	// Cada aplicativo habilita quando for usar.
+	//
+		
+	//gwsDisableTextCursor ();
+	//timerShowTextCursor = 0; 
+    timerDisableTextCursor ();	
 	
 	
 	//

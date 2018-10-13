@@ -30,7 +30,25 @@ int gws_status;
 //chamado de shell.bin
 int gws_wm_PID;
 int gws_wm_status;
- 
+
+
+
+
+//
+// cursor
+//
+
+/*
+void gwsEnableTextCursor (){
+	
+    g_show_text_cursor = 1;	
+};
+
+void gwsDisableTextCursor (){
+	
+    g_show_text_cursor = 0;	
+};
+*/ 
  
 //abrir o servidor de janelas. 
 int gwsOpen (){
@@ -1258,8 +1276,8 @@ void guiSetUpMainWindow( unsigned long x,
  *     @todo: Mudar para guiInit().
  * Obs: Nada alem de recursos gráficos. 
  */
-int init_gui()
-{
+int init_gui (){
+	
 	// ??
 	// Habilita taskswitch e scheduler.
 	set_task_status(UNLOCKED);
