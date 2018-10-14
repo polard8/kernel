@@ -1522,10 +1522,18 @@ static int count_mouse = 0;
 
 // Buffer.
 static char buffer_mouse[3];
+
+
+int flagRefreshMouseOver;
 	
 void mouseHandler (){
 	
-    // Coordenadas do mouse.
+    
+	struct window_d *mOver;
+	
+
+	
+	// Coordenadas do mouse.
     // Obs: Isso pode ser global.
     // O tratador em assembly tem as variáveis globais do posicionamento.
     
@@ -1751,7 +1759,23 @@ void mouseHandler (){
 	
 	if ( wID == -1 )
 	{ 
-        // Nothing.
+        
+		//essa flag indica que podemos fazer o refresh da mouse ouver,
+		//mas somente uma vez.
+		if ( flagRefreshMouseOver == 1 )
+		{
+		    mOver = (struct window_d *) windowList[mouseover_window];	
+		    refresh_rectangle ( mOver->left, mOver->top, 20, 20 );
+			
+			//não podemos mais fazer refresh.
+			flagRefreshMouseOver = 0;
+			
+			//#importante
+			//inicializa.
+			mouseover_window = 0;
+		}
+		
+		
 		
     }else{
 		
@@ -1908,14 +1932,25 @@ void mouseHandler (){
 			
 			if ( wScan->id != mouseover_window )
 			{
+				//#importante:
                 //Antes vamos avisr qual é a janela que o mouse está
                 //deixando. windowList[mouseover_window]
+				//mOver = (struct window_d *) windowList[mouseover_window];
                 
-				windowSendMessage ( (unsigned long) windowList[mouseover_window], 
+				//#bugbug: temos que checar a validade da janela.
+				
+				//#test:
+				//vamos tentar dar refresh na janela que estamos deixando.
+				//refresh_rectangle ( mOver->left, mOver->top, 32, 32 );
+				
+                if ( mouseover_window != 0 )
+				{
+			        windowSendMessage ( (unsigned long) windowList[mouseover_window], 
 		            (unsigned long) MSG_MOUSEEXITED, 
 			        (unsigned long) 0, 
 			        (unsigned long) 0 );
- 								
+				};
+				
                 //windowSendMessage ( (unsigned long) wScan, 
 		        //    (unsigned long) MSG_MOUSEENTERED, 
 			    //    (unsigned long) 0, 
@@ -1929,10 +1964,29 @@ void mouseHandler (){
 			        (unsigned long) 0, 
 			        (unsigned long) 0 );
 				
+			
+			    //ja que entramos em uma nova janela, vamos mostra isso.
+			    if ( wScan->isButton == 1 )
+				{    
+			        bmpDisplayCursorBMP ( cursorIconBuffer, wScan->left, wScan->top);	
+			    };
+				
+				if ( wScan->isButton == 0 )
+				{
+				    bmpDisplayCursorBMP ( folderIconBuffer, wScan->left, wScan->top);		
+				}
+				
+				//nova mouse over
+				mouseover_window = wScan->id;
+				
+				//#importante:
+				//flag que ativa o refresh do mouseover somente uma vez.
+				flagRefreshMouseOver = 1;
+			
 			}else{ 
 			    
 				//nothing ...
-				//não precisamos reenviar a mensagem, poi o mouse 
+				//não precisamos reenviar a mensagem, pois o mouse 
 				//continua na mesma janela que antes.
                 
 				//windowSendMessage ( (unsigned long) wScan, 
@@ -1948,10 +2002,23 @@ void mouseHandler (){
 			mouse_button_action = 0;			
 		};
 		
-		// #debug. (+)
-		// Isso coloca o (+) no frontbuffer.
-		draw_text ( wScan, 0, 0, COLOR_YELLOW, "+" );
-		refresh_rectangle ( wScan->left, wScan->top, 8, 8 );
+		
+		//if ( wScan->isButton == 1 )
+		//{
+			//colocamos ao passarmos por cima do botão,
+			//#obs: tem que dar refresh do retângulo no backbuffer quando sair
+			//substituir essa imagem.
+		//    bmpDisplayCursorBMP ( cursorIconBuffer, wScan->left, wScan->top);	
+		//}
+		
+        //if ( wScan->isButton == 0 )
+        //{
+		    // #debug. (+)
+		    // Isso coloca o (+) no frontbuffer.
+		//    draw_text ( wScan, 0, 0, COLOR_YELLOW, "+" );
+		//    refresh_rectangle ( wScan->left, wScan->top, 8, 8 );
+		//}			
+		
 	};
 
     // EOI.		
