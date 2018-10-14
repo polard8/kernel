@@ -1932,23 +1932,13 @@ void mouseHandler (){
 			
 			if ( wScan->id != mouseover_window )
 			{
-				//#importante:
-                //Antes vamos avisr qual é a janela que o mouse está
-                //deixando. windowList[mouseover_window]
-				//mOver = (struct window_d *) windowList[mouseover_window];
-                
-				//#bugbug: temos que checar a validade da janela.
-				
-				//#test:
-				//vamos tentar dar refresh na janela que estamos deixando.
-				//refresh_rectangle ( mOver->left, mOver->top, 32, 32 );
 				
                 if ( mouseover_window != 0 )
 				{
 			        windowSendMessage ( (unsigned long) windowList[mouseover_window], 
 		            (unsigned long) MSG_MOUSEEXITED, 
 			        (unsigned long) 0, 
-			        (unsigned long) 0 );
+			        (unsigned long) 0 ); 
 				};
 				
                 //windowSendMessage ( (unsigned long) wScan, 
@@ -1966,11 +1956,14 @@ void mouseHandler (){
 				
 			
 			    //ja que entramos em uma nova janela, vamos mostra isso.
+				
+				//botão.
 			    if ( wScan->isButton == 1 )
 				{    
-			        bmpDisplayCursorBMP ( cursorIconBuffer, wScan->left, wScan->top);	
+			        bmpDisplayCursorBMP ( fileIconBuffer, wScan->left, wScan->top);	
 			    };
 				
+				//não botão.
 				if ( wScan->isButton == 0 )
 				{
 				    bmpDisplayCursorBMP ( folderIconBuffer, wScan->left, wScan->top);		
