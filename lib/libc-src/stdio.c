@@ -136,8 +136,6 @@ int fclose (FILE *stream){
 	};		
 	
 	//...
-	
-//done:
 
 	return (int) 0;
 };
@@ -217,18 +215,15 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//    return NULL;	
 	//};
 	
-	
-//done:
-	
 	return (FILE *) stream; 
 };
 
 
 /*
  * scroll:
- *     Scroll the screen in text mode.
+ *     Scroll the screen in (text mode).
  *     @todo: Mudar para tmScroll(void);
- *     @todo: Criar gmScroll(void);
+ *     @todo: Criar gmScroll(void) talvez;
  *     @todo: Essa rotina precisa ser revisada e aprimorada.
  */
 void scroll (void){
@@ -313,7 +308,10 @@ void scroll (void){
  *     g_current_vm; 0x000B8000fis = 0x800000vir
  * @todo: Mudar para tmClearScreen(int color);
  */
-int app_clear(int color)
+
+//#bugbug: deletando isso... 
+ /*
+int app_clear (int color)
 {
     unsigned int i = 0;	
 	char *vm = (char *) 0x00800000;  //Endereço virtual da VGA. b8000Fis.    
@@ -346,13 +344,12 @@ int app_clear(int color)
 done:
     return (int) 0; 
 };
- 
+*/ 
  
  
 /*
  ***********************
  * puts:
- *
  */
 int puts ( const char *str ){
 	
@@ -617,15 +614,17 @@ int printf ( const char *format, ... ){
 int sprintf ( char *out, const char *format, ... ){
 	
     register int *varg = (int *)(&format);
+	
 	return (int) print( &out, varg );
 };
 
 
-static void printchar ( char **str, int c )
-{
+static void printchar ( char **str, int c ){
+	
 	if (str) 
     {
 		**str = c;
+		
 		++(*str);
 	
 	}else (void) putchar(c);
@@ -951,17 +950,18 @@ input_done:
  *    ecx = arg3.
  *    edx = arg4.
  */
-void *stdio_system_call( unsigned long ax, 
-                         unsigned long bx, 
-				         unsigned long cx, 
-				         unsigned long dx )
+void *stdio_system_call ( unsigned long ax, 
+                          unsigned long bx, 
+				          unsigned long cx, 
+				          unsigned long dx )
 {
     int Ret = 0;	
 	
-    //System interrupt. 	
-	asm volatile( " int %1 \n"
-		          : "=a"(Ret)	
-		          : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+    //System interrupt.
+ 	
+	asm volatile ( " int %1 \n"
+		           : "=a"(Ret)	
+		           : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
 	return (void *) Ret; 
 };
@@ -995,10 +995,11 @@ int getchar (void){
  **************************************************
  * stdioInitialize:
  *     Inicializa stdio para usar o fluxo padrão.
- *
+ *     O retorno deve ser (int) e falhar caso dê algo errado.
  */
 void stdioInitialize (){
 	
+	//register int i;
 	int i;
 	
 	// Buffers para as estruturas.
@@ -1062,18 +1063,25 @@ int fflush ( FILE *stream ){
 	
 	register int i = 0;
 	
-	if ( (void *) stream == NULL ){
+	if ( (void *) stream == NULL )
+	{
 		return (int) (-1);
 	}
 		
 	// Limits.	
 	if ( stream->_bufsiz == 0 || stream->_bufsiz > BUFSIZ ){
+		
 		return (int) (-1);
 	}
     
-//clear:
-    //#bugbug: Se essa base aponta para um lugar inválido poderemos 
-	//ter uma page fault.
+    //
+	// Clear.
+    //
+	
+    // #bugbug: 
+	// Se essa base aponta para um lugar inválido poderemos 
+	// ter uma page fault.
+	
     for ( i=0; i < stream->_bufsiz; i++ )
 	{
 	    stream->_base[i] = (char) '\0';		
@@ -1098,11 +1106,13 @@ int fprintf ( FILE *stream, const char *format, ... ){
 	if ( (void *) stream == NULL )
 	{
 		return (int) (-1);
-	}else{
+		
+	} else {
 		
 		size = (int) strlen (format);
 		
-		if ( size > stream->_cnt ){
+		if ( size > stream->_cnt )
+		{
 			return (int) (-1);
 		}
 		
@@ -1131,11 +1141,13 @@ int fputs ( const char *str, FILE *stream ){
 	if ( (void *) stream == NULL )
 	{
 		return (int) (-1);
-	}else{
+		
+	} else {
 		
 		size = (int) strlen (str);
 		
-		if( size > stream->_cnt ){
+		if ( size > stream->_cnt )
+		{
 			return (int) (-1);
 		}
 		
@@ -1216,7 +1228,8 @@ int ungetc ( int c, FILE *stream ){
     if (c == EOF) 
 	    return (int) c;	
 	
-	if ( (void *) stream == NULL ){
+	if ( (void *) stream == NULL )
+	{
 		return (int) EOF;
 	}
 
@@ -1240,14 +1253,15 @@ int fgetc ( FILE *stream ){
 	
     int ch;	
  
-	if( (void *) stream == NULL )
+	if ( (void *) stream == NULL )
 	{
 		return (int) (-1);
-	}else{
+		
+	} else {
 		
 		//Não há mais caracteres disponíveis entre 
 		//stream->_ptr e o tamanho do buffer.
-		if ( stream->_cnt <= 0)
+		if ( stream->_cnt <= 0 )
 		{
 			stream->_flag = (stream->_flag | _IOEOF); 
 			stream->_cnt = 0;
@@ -1282,7 +1296,7 @@ int feof ( FILE *stream ){
 	{
 		return (int) (-1);
 		
-	}else{
+	} else {
 	
 	    ch = fgetc (stream);
 		
@@ -1325,7 +1339,8 @@ int ferror ( FILE *stream ){
  */
 int fseek ( FILE *stream, long offset, int whence ){
 	
-	if ( (void *) stream == NULL ){
+	if ( (void *) stream == NULL )
+	{
 	    goto fail;	
 	}
 	
@@ -1344,7 +1359,7 @@ int fseek ( FILE *stream, long offset, int whence ){
 			break;
 
 		case SEEK_END:
-		    stream->_ptr = ((stream->_base + stream->_bufsiz) + offset) ; 
+		    stream->_ptr = ((stream->_base + stream->_bufsiz) + offset); 
 		    goto done;
 			break;
 
@@ -1392,7 +1407,7 @@ int fputc ( int ch, FILE *stream ){
 void stdioSetCursor ( unsigned long x, unsigned long y ){
 	
 	//34 - set cursor.
-    stdio_system_call ( 34, x, y, 0);	
+    stdio_system_call ( 34, x, y, 0 );	
 };
 
 
@@ -1423,9 +1438,9 @@ unsigned long stdioGetCursorY (){
 //======================================================================
 // scanf support (start)
 //======================================================================
+
 //todo
 //faltam outros switches ... temos apenas o %s 
-
 
 //atoi. # talvez isso possa ir para o topo do 
 //arquivo para servir mais funções.
@@ -1464,7 +1479,6 @@ int stdio_atoi (char * s){
 };
 
 
-
 int scanf ( const char *fmt, ... ){
 	
     va_list ap;
@@ -1489,9 +1503,7 @@ int scanf ( const char *fmt, ... ){
 	char *t;
 
 	int nread;
-	int size = (int) strlen(fmt);
-	
-	
+	int size = (int) strlen (fmt);
 	
 	nread = 0;
 	
@@ -1502,12 +1514,15 @@ int scanf ( const char *fmt, ... ){
 			return (0); //erro
 		
 		// pulando os espaços
-		if (isspace(c)) {
-			while ( size > 0 && isspace(*fmt) ){
+		if ( isspace(c) ) 
+		{
+			while ( size > 0 && isspace(*fmt) )
+			{
 				nread++; 
 				size--; 
 				fmt++;
 			};
+			
 			continue;
 		}
 		
@@ -1517,8 +1532,10 @@ int scanf ( const char *fmt, ... ){
             case 's':              
 				//pego o ponteiro para  a string, depois é só usar o gets. ??
 				s = va_arg(ap, char *);
+				
 				//usaremos esse ponteiro para colocar uma string digitada.
-				if( (void *) s != NULL ){
+				if ( (void *) s != NULL )
+				{
 				    gets(s);					
 				}else{
 				    printf("scanf s null pointer\n");	
@@ -1532,13 +1549,15 @@ int scanf ( const char *fmt, ... ){
 			case 'd': 
 				//pego o ponteiro para  a string, depois é só usar o gets. ??
 				i = va_arg(ap, int *);
+				
 				//usaremos esse ponteiro para colocar uma string digitada.
-				if( (void *) i != NULL ){
+				if( (void *) i != NULL )
+				{
 				    //pego uma string de caracteres, que são números digitados.
 					gets(tmp);
 					
 					//converte essa string em dígito
-					i[0] = (int) stdio_atoi(tmp);                     
+					i[0] = (int) stdio_atoi (tmp);                     
 					
 				}else{
 				    printf("scanf s null pointer\n");	
@@ -1554,12 +1573,15 @@ int scanf ( const char *fmt, ... ){
 			/* char */
 			case 'c':    
                 t = va_arg(ap, char *);
-				if( (void *) t != NULL ){
+				if ( (void *) t != NULL )
+				{
 				
                     while (1)
                     {
 			            ch = (int) getchar();
-						if ( ch != -1 ){
+						
+						if ( ch != -1 )
+						{
 						    t[0] = ch;
                             //printf("scanf ch={%c}",ch);							
 						    break;	
@@ -1580,8 +1602,6 @@ int scanf ( const char *fmt, ... ){
    
    return (int) 0;
 };
-
-
 
 //======================================================================
 // scanf support (end)

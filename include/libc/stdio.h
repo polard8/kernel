@@ -333,7 +333,10 @@ int ferror( FILE *stream );
 //
 
 void scroll(void);
-int app_clear(int color);
+
+//#bugbug: deletando isso...
+//int app_clear(int color);
+
 int drawBar(int color);  //??
 
 

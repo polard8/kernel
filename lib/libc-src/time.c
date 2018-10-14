@@ -1,4 +1,9 @@
-
+/*
+ * File: time.c 
+ *
+ * 2018 - Created by Fred Nora.
+ */
+ 
 
 #include <time.h>
 #include <types.h> 
@@ -20,21 +25,23 @@
  *    ecx = arg3.
  *    edx = arg4.
  */
-void *time_system_call( unsigned long ax, 
+void *time_system_call ( unsigned long ax, 
                          unsigned long bx, 
 				         unsigned long cx, 
 				         unsigned long dx );
 
 						 
 						 
-// time 						 
-time_t time(time_t *timer)
-{
+// time 
+// #obs: O que representa esse retorno ?
+// Isso funciona.						 
+time_t time (time_t *timer){
+	
 	time_t Ret;
 	
-	
 	//system call. (224) get time
-	Ret = (time_t) time_system_call( 224, 0, 0, 0 );
+	
+	Ret = (time_t) time_system_call ( 224, 0, 0, 0 );
 	
     *timer = Ret;
 
@@ -59,7 +66,7 @@ time_t time(time_t *timer)
  *    ecx = arg3.
  *    edx = arg4.
  */
-void *time_system_call( unsigned long ax, 
+void *time_system_call ( unsigned long ax, 
                          unsigned long bx, 
 				         unsigned long cx, 
 				         unsigned long dx )
@@ -67,13 +74,11 @@ void *time_system_call( unsigned long ax,
     int Ret = 0;	
 	
     //System interrupt. 	
-	asm volatile( " int %1 \n"
-		          : "=a"(Ret)	
-		          : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-done:
+	
+	asm volatile (" int %1 \n"
+		           : "=a"(Ret)	
+		           : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+				   
 	return (void *) Ret; 
 };
-
-
-
 

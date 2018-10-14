@@ -8,7 +8,11 @@
 //@todo: Deve ser const char.
 int strcmp(char *s1, char *s2);
 int strncmp(char *s1, char *s2, int len);
-int str_cmp(unsigned char *str1, unsigned char *str2);
+
+
+//#bugbug deletando porque tá errado.
+//int str_cmp(unsigned char *str1, unsigned char *str2);
+
 void *memoryZeroMemory(void* ptr, size_t cnt);
 void *memcpy(void *v_dst, const void *v_src, unsigned long c);
 //@todo: void *memcpy(void *dst, const void *src, size_t c); 

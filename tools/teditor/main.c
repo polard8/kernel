@@ -34,7 +34,7 @@ int running = 1;
 //static unsigned char dest_msg[512];
 
 void editorClearScreen(); 
-
+int editor_save_file ();
 
 /*
  ************************************************************
@@ -288,7 +288,7 @@ int mainTextEditor ( int argc, char *argv[] ){
 	};
 	
 	//Carregando arquivo.
-	fp = fopen( (char *) argv[1], "rb" );	
+	fp = fopen ( (char *) argv[1], "rb" );	
 	
 	if ( fp == NULL )
     {
@@ -329,7 +329,13 @@ startTyping:
 //sobre eventos de input de teclado e mouse,
 //assim como os controles.
 
-Mainloop:		
+Mainloop:	
+
+	//
+	// Habilitando o cursor de textos.
+	//
+	
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
 
 	    while (running)
 	    {
@@ -414,4 +420,91 @@ void editorClearScreen (){
 	
 	apiSetCursor(0,2);
 };
+
+
+
+
+//testando a rotina de salvar um arquivo.
+//estamos usando a API.
+int editor_save_file (){
+	
+	//
+	// #importante:
+	// Não podemos chamar a API sem que todos os argumentos estejam corretos.
+	//
+	
+	// #obs:
+	// Vamos impor o limite de 4 setores por enquanto. 
+	// 512*4 = 2048  (4 setores) 2KB
+	// Se a quantidade de bytes for '0'. ???
+	
+	int Ret;
+	
+	char file_1[] = "Arquivo \n escrito \n em \n user mode no editor de textos teditor.bin :) \n";
+	char file_1_name[] = "FILE2UM TXT";
+	
+	printf("editor_save_file: Salvando um arquivo ...\n");
+	
+	unsigned long number_of_sectors = 0;
+    size_t len = 0;
+	
+	
+	//
+	// Lenght in bytes.
+	//
+	
+	len = (size_t) strlen (file_1);
+
+	if (len <= 0)
+	{
+	    printf ("editor_save_file:  Fail. Empty file.\n");
+        return (int) 1;		
+	}
+	
+	if (len > 2048)
+	{
+	    printf ("editor_save_file:  Limit Fail. The  file is too long.\n");
+        return (int) 1;		
+	}
+	
+    //
+    // Number os sectors.
+    //
+	
+	number_of_sectors = (unsigned long) ( len / 512 );
+	
+	if ( len > 0 && len < 512 ){
+	    number_of_sectors = 1; 
+    }		
+	
+	if ( number_of_sectors == 0 )
+	{
+	    printf ("editor_save_file:  Limit Fail. (0) sectors so save.\n");
+        return (int) 1;				
+	}
+	
+	//limite de teste.
+	//Se tivermos que salvar mais que 4 setores.
+	if ( number_of_sectors > 4 )
+	{
+	    printf ("editor_save_file:  Limit Fail. (%d) sectors so save.\n",
+		    number_of_sectors );
+        return (int) 1;				
+	}
+	
+	
+    Ret = (int) apiSaveFile ( file_1_name,  //name 
+                              number_of_sectors,            //number of sectors.
+                              len,            //size in bytes			
+                              file_1,       //address
+                              0x20 );       //flag		
+				
+	//if (Ret == 0)
+	
+	printf("t5: done.\n");	
+	
+	return (int) Ret;
+};
+
+
 

@@ -24,45 +24,45 @@ int strcmp (char * s1, char * s2){
 	
 	int i;
 	
-	for( i=0; s1[i] == s2[i]; ++i )
-	{
-		if( s1[i] == '\0' ){ 
+	for ( i=0; s1[i] == s2[i]; i++ ){
+		
+		if ( s1[i] == '\0' ){ 
+		
 		    return (int) 0; 
 		}
 	};
 	
-//done:	
-
-	return( (int) ( s1[i] - s2[i] ) );
+	return ( (int) ( s1[i] - s2[i] ) );
 };
+
 
 /*
  * strncmp:
  *     Compara duas strings.
  *     Obs: Essa tem funcionado bem.
  */
-int strncmp( char *s1, char *s2, int len )
-{
+int strncmp ( char *s1, char *s2, int len ){
+	
 	int n = len;
 	
-	while(n > 0)
+	while (n > 0)
 	{	
 	    n--;
         
-		if( *s1 != *s2 ){ 
+		if ( *s1 != *s2 )
+		{ 
 		    return (int) 1; 
-		};
+		}
 		
 		*s1++; 
 		*s2++;
 	};		
 			
-	if( *s1 != '\0' || *s2 != '\0' )
+	if ( *s1 != '\0' || *s2 != '\0' )
 	{	
 	    return (int) 2;
 	};
 	
-done:
 	return (int) 0;
 };
 
@@ -71,68 +71,87 @@ done:
  * str_cmp:
  *     Compara strings.
  */
-int str_cmp( unsigned char *str1, unsigned char *str2 )
-{
-	while( *str1 == *str2 && *str1 != 0 && *str2 != 0 )
+ 
+/* 
+//#bugbug deletando porque tá errado. 
+int str_cmp ( unsigned char *str1, unsigned char *str2 ){
+	
+	while ( *str1 == *str2 && 
+	        *str1 != 0 && 
+			*str2 != 0 )
 	{ 
         str1++; 
         str2++; 
     };
     
-	// Mesma quantidade de chars iguais.
+
+	// 
+	// #bugubug: 
+	// Isso não faz sentido.
+	// Deve tá errado.
+	//
 	
-    if( *str1 == *str2 ){ 
+    
+	// #obs:
+	// Só faria sentido se estivesse medindo quantidades 
+	// de chars iguais.
+	
+	
+	if( *str1 == *str2 )
+	{ 
 	    return (int) 0; 
 	};
 	
-	if( *str1 > *str2 ){ 
+	if( *str1 > *str2 )
+	{ 
 	    return (int) 1; 
 	};
 	
-	if( *str1 < *str2 ){ 
+	if( *str1 < *str2 )
+	{ 
 	    return (int) -1; 
 	};
 	
 	//Nothing.
-	
-fail:	
+
     return (int) -1;
 };
+*/
 
 
-
-void *memoryZeroMemory( void* ptr, size_t cnt )
-{
+//#todo: mover para memory.c ??
+void *memoryZeroMemory ( void* ptr, size_t cnt ){
+	
     volatile char *vptr = (volatile char *) ptr;
     
-	while( cnt )
+	while (cnt)
 	{
         *vptr = 0;
-        vptr++;
+        
+		vptr++;
         cnt--;
     };
 	
-done:	
-    return (void*) ptr;
+    return (void *) ptr;
 };
 
 
 /*
  * memcpy:
- *
  */
-void *memcpy( void *v_dst, const void *v_src, unsigned long c )
-{
+//#todo: mover para memory.c ?? 
+void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
+	
 	const char *src = v_src;
 	char *dst = v_dst;
 
 	// Simple, byte oriented memcpy. 
-	while( c-- )
-	{ 
+	while (c--){
+		
         *dst++ = *src++; 
 	};
 	
-done:
+	//#todo: Tipar o retorno.
 	return v_dst;
 };
 
@@ -141,17 +160,16 @@ done:
  * strcpy: 
  *     Copia uma string.
  */
-char *strcpy( char *to, const char *from )
-{
-	int i = 0;
+char *strcpy ( char *to, const char *from ){
+	
+	int i=0;
 
-	while( to[i] = from[i] )
+	while ( to[i] = from[i] )
 	{ 
         i += 1; 
 	};
 
-done:
-    //@todo ?? É esso o padrão de retorno ??	
+	//#todo: Tipar o retorno.
 	return (to);
 };
 
@@ -160,18 +178,18 @@ done:
  * strcat:
  *     Acrescenta uma string ao fim de outra.
  */
-char *strcat( char *to, const char *from )
-{
+char *strcat ( char *to, const char *from ){
+	
 	char *ret = to;
 
-	while( *to )
+	while ( *to )
 	{ 
         to += 1; 
 	};
 	
-	strcpy( to, from );
+	strcpy ( to, from );
 	
-done:
+	//#todo: Tipar o retorno.	
 	return (ret);
 };
 
@@ -180,15 +198,15 @@ done:
  *  bcopy:
  *      Copia.
  */
-void bcopy( char *from, char *to, int len )
-{
-	while( len-- )
+void bcopy ( char *from, char *to, int len ){
+	
+	//if ( len < 0 )
+	//    return;
+	
+	while ( len-- )
 	{ 
         *to++ = *from++; 
 	};
-	
-done:
-    return;
 };
 
 
@@ -196,15 +214,15 @@ done:
  *  bzero:
  *      Preenche com zeros.
  */
-void  bzero( char *cp, int len )
-{
-	while( len-- )
+void  bzero ( char *cp, int len ){
+	
+	//if ( len < 0 )
+	//    return;	
+	
+	while ( len-- )
 	{ 
         *(cp + len) = 0; 
 	};
-	
-done:
-    return;
 };
 
 
@@ -220,30 +238,9 @@ size_t strlen ( const char *s ){
 	{ 
         ; 
 	};
-	
-	//Nothing.
-	
-//done:	
 
 	return (size_t) i;
 };
-
-
-/*
-int kstrlen(const char *s);
-int kstrlen(const char *s)
-{	
-    int i = 0;
-	
-	for (i = 0; s[i] != '\0'; ++i) {
-	;
-	};
-	
-done:
-	return((int) i);
-};
-*/
-
 
 
 /*
@@ -301,32 +298,34 @@ int strcmp(const char *a, const char *b)
 /*
  * strcspn:
  *     ??
- *
- * Credits: Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
- *
+ * Credits: 
+ *     Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
  */
-size_t strcspn( const char *str, const char *reject )
-{
+size_t strcspn ( const char *str, const char *reject ){
+	
+	int result;
+	
 	//size_t reject_length = 0;
 	int reject_length = 0;
 	
-	while( reject[reject_length] )
+	while ( reject[reject_length] )
 		reject_length++;
 	
 	
 	// ?? Não seria "result==1" ??
 	//for ( size_t result = 0; 1; result++ )
-    int result;
-    for( result=0; result=1; result++ )
+    for ( result=0; result=1; result++ )
 	{
 		char c = str[result];
-		if( !c )
+		
+		if ( !c )
 			return (size_t) result;
+		
 		//bool matches = 0;
 		int matches = 0;
 		int i;
 		
-		for( i=0; i < reject_length; i++ )
+		for ( i=0; i < reject_length; i++ )
 		{
 			if ( str[result] != reject[i] )
 				continue;
@@ -334,7 +333,7 @@ size_t strcspn( const char *str, const char *reject )
 			break;
 		};
 		
-		if( matches )
+		if ( matches )
 			return (size_t) result;
 	};
 	
@@ -345,32 +344,37 @@ size_t strcspn( const char *str, const char *reject )
 /*
  * strspn:
  *   ??
- *
- * Credits: Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
- *
+ * Credits: 
+ * Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
  */
-size_t strspn(const char* str, const char* accept)
-{
+size_t strspn ( const char* str, const char* accept ){
+	
+	int result;
+	
 	//size_t accept_length = 0;
 	int accept_length = 0; 
+	
 	while ( accept[accept_length] )
 		accept_length++;
 	
 	
 	// ?? Não seria "result==1" ??
 	//for ( size_t result = 0; true; result++ )
-	int result;
-    for( result = 0; result = 1; result++ )
+    
+    for ( result = 0; result = 1; result++ )
 	{
 		char c = str[result];
+		
 		if ( !c )
 			return (size_t) result;
 		
 		//bool matches = false;
 		int matches = 0;
 		int i;
+		
 		//for ( size_t i = 0; i < accept_length; i++ )
-		for( i=0; i<accept_length; i++ )
+		
+	    for ( i=0; i<accept_length; i++ )
 		{
 			if ( str[result] != accept[i] )
 				continue;
@@ -378,13 +382,12 @@ size_t strspn(const char* str, const char* accept)
 			break;
 		};
 		
-		if( !matches )
+		if ( !matches )
 			return (size_t) result;
 	};
 	
 	//??
 };
-
 
 
 
@@ -421,11 +424,13 @@ char* strtok(char* str, const char* delim)
 */
 
 
-
 /*
  **************************************
  * strtok_r:
- * Credits: Apple. (Open Source)
+ *     Usada em strtok.
+ *
+ * Credits: 
+ *     Apple. (Open Source)
  */
 char *strtok_r ( char *s, const char *delim, char **last ){
 	
@@ -434,6 +439,7 @@ char *strtok_r ( char *s, const char *delim, char **last ){
     char *tok;
 
     if ( s == NULL && (s = *last) == NULL ){
+		
 	    return NULL;
     };
 
@@ -452,7 +458,7 @@ cont:
     };
 
 	// No non-delimiter characters. 
-    if( c == 0 )		
+    if ( c == 0 )		
     {
 	    *last = NULL;
 	    return NULL;
@@ -470,14 +476,17 @@ cont:
 	    
 		do
 	    {
-	        if( (sc = *spanp++) == c )
+	        if ( (sc = *spanp++) == c )
 	        {
-		        if( c == 0 ){
+		        if ( c == 0 )
+				{
 		            s = NULL;
+					
 		        }else{
 					
 		            char *w = s -1;
-		            *w = '\0';
+		            
+					*w = '\0';
 		        };
 				
 		        *last = s;
@@ -504,7 +513,6 @@ char *strtok ( char *s, const char *delim ){
 	
     static char *last;
 	
-done:
     return strtok_r( s, delim, &last );
 };
 
@@ -577,8 +585,6 @@ void *memmove(void *dest, const void *src, size_t count)
   	return (void *)p;
 }
 */
-
-
 
 
 /**
