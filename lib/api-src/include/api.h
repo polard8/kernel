@@ -3020,11 +3020,11 @@ void *apiFOpen(const char *filename, const char *mode);
  *
  */
 int
-apiSaveFile( char *file_name, 
-             unsigned long file_size,
-             unsigned long size_in_bytes,			
-             char *file_address,
-             char flag );  
+apiSaveFile ( char *file_name, 
+              unsigned long file_size, //size in sectors 
+              unsigned long size_in_bytes,			
+              char *file_address,
+              char flag );  
 
 
 //Operação down em um semáforo indicado no argumento.

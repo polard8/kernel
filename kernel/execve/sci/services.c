@@ -213,7 +213,7 @@ void *services( unsigned long number,
 	
 	//o endereço do array passado pelo aplicativo
 	//usaremos para enviar uma mensagem com 4 elementos.
-	unsigned long *message_address = (unsigned long*) arg2;
+	unsigned long *message_address = (unsigned long *) arg2;
 	
 	unsigned char SC;
 	struct window_d *wFocus;
@@ -268,9 +268,11 @@ void *services( unsigned long number,
 	    return NULL;	
 	};
 	
+	//
 	// ## Create Window ##
-	// Serviço especial. Antes dos outros.
+	//
 	
+	// Serviço especial. Antes dos outros.
 	if ( number == SYS_118 )
 	{		
 		//Aciona a flag.
@@ -352,11 +354,11 @@ void *services( unsigned long number,
 			// Faltam os tamanhos. 
 			// Temos um tamanho padrão improvisado 
 			// para arquivos de 255 bytes e 3 setores.
-			fsSaveFile( (char *) a2,             //name
-			            (unsigned long) 3,       //@todo: size in sectors 
-						(unsigned long) 255,       //@todo: size in bytes
-						(char *) arg3,           //address
-						(char) arg4 );           //flag
+			fsSaveFile ( (char *) message_address[0],         //name
+			             (unsigned long) message_address[1],  //3, //@todo: size in sectors 
+						 (unsigned long) message_address[2],  //255, //@todo: size in bytes
+						 (char *) message_address[3],         //arg3,//address
+						 (char) message_address[4] );         //,arg4 ); //flag
 						
 			scheduler_unlock();
 	        taskswitch_unlock();

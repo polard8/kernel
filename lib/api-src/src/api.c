@@ -1600,27 +1600,53 @@ void *apiFOpen(const char *filename, const char *mode){
 /*
  *************************************************************
  * apiSaveFile:
- *     Salva um arquivo no diretório raiz 
- * do volume de boot.
- *
+ *     Salva um arquivo no diretório raiz do volume de boot.
+ *     Obs: Talvez possamos ter mais argumentos.
+ *     #bugbug: Essa rotina seria mais fácil se todas as informações sobre
+ * o arquivo fossem gerenciadas pelo kernel. Mas não é o que estamos fazendo agora.
  */
+ 
 int
-apiSaveFile( char *file_name, 
-             unsigned long file_size,
-             unsigned long size_in_bytes,			
-             char *file_address,
-             char flag )  
+apiSaveFile ( char *file_name, 
+              unsigned long file_size,  //size in sectors 
+              unsigned long size_in_bytes,			
+              char *file_address,
+              char flag )  
 {
     int Ret;
 	
-		enterCriticalSection();
-		Ret = (int) system_call( SYSTEMCALL_WRITE_FILE,
-		                        (unsigned long) file_name,     //nome
-                                (unsigned long) file_address,  //endereço
-                                (unsigned long) flag );        //flag
-		exitCriticalSection(); 
-
-//done:
+	
+    // Enviando tudo via argumento.
+	// Esse método dá a possibilidade de enviarmos ainda 
+	// mais argumentos. 
+	// #importante: Isso está funcionado, Vamos fazer assim e 
+	// não do jeito antigo.
+	
+	unsigned long message_buffer[12];
+	
+	//enterCriticalSection();
+	message_buffer[0] = (unsigned long) file_name;
+	message_buffer[1] = (unsigned long) file_size;
+	message_buffer[2] = (unsigned long) size_in_bytes;
+	message_buffer[3] = (unsigned long) file_address;
+	message_buffer[4] = (unsigned long) flag;
+	//message_buffer[5] = (unsigned long) x;
+	//message_buffer[6] = (unsigned long) x;
+	//message_buffer[7] = (unsigned long) x;
+	//message_buffer[8] = (unsigned long) x;
+	//message_buffer[9] = (unsigned long) x;
+	//message_buffer[10] = (unsigned long) x;
+	//message_buffer[11] = (unsigned long) x;
+		
+	
+	enterCriticalSection();
+		
+	Ret = (int) system_call ( SYSTEMCALL_WRITE_FILE,
+	                (unsigned long) &message_buffer[0],     
+                    (unsigned long) &message_buffer[0],  
+                    (unsigned long) &message_buffer[0] );        
+								
+	exitCriticalSection(); 
 
     return (int) Ret;		
 };

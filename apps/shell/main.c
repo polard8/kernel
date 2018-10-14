@@ -390,6 +390,8 @@ void *xmalloc( int size);
 char *concat( char *s1, char *s2, char *s3 );
 char *save_string ( char *s, int len );
 
+int shell_save_file();
+
 //
 // Internas.
 //
@@ -2782,39 +2784,21 @@ do_compare:
     };
 
 	// t5 - ( save file )
-	//Ok isso funcionou.
+	// Ok isso funcionou.
 	if ( strncmp( prompt, "t5", 2 ) == 0 )
 	{
-		printf("t5: tentando salvar um arquivo ...\n");
-		char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
-		char file_1_name[] = "FILE1UM TXT";
+		printf("t5: save file\n");
+		shell_save_file ();
 		
-		enterCriticalSection();
-		system_call( 4,
-		             (unsigned long) file_1_name, //nome
-                     (unsigned long) file_1,      //endereço
-                     (unsigned long) 0x20 );      //flag
-		exitCriticalSection();
-		printf("t5: done.\n");
-		
-		//...
         goto exit_cmp;
     };	
 
 
 	// t6 - testando a api. rotina que salva arquivo. 
-	//ok, isso funcionou.
+	// ok, isso funcionou.
 	if ( strncmp( prompt, "t6", 2 ) == 0 )	
 	{
-		printf("t6: tentando salvar um arquivo ...\n");
-		char file_2[] = "t6: Arquivo \n escrito \n em \n user mode. \n";
-		char file_2_name[] = "FILE2UM TXT";
-		
-        apiSaveFile( file_2_name,  //name 
-                     0,            //number of sectors.
-                     0,            //size in bytes			
-                     file_2,       //address
-                     0x20 );       //flag
+        printf("t6: todo\n");
         goto exit_cmp;					 
 	};
 	
@@ -5897,6 +5881,88 @@ void show_shell_version (){
 	    shell_name, dist_version, build_version );
 };
 
+
+//testando a rotina de salvar um arquivo.
+//estamos usando a API.
+int shell_save_file (){
+	
+	//
+	// #importante:
+	// Não podemos chamar a API sem que todos os argumentos estejam corretos.
+	//
+	
+	// #obs:
+	// Vamos impor o limite de 4 setores por enquanto. 
+	// 512*4 = 2048  (4 setores) 2KB
+	// Se a quantidade de bytes for '0'. ???
+	
+	int Ret;
+	
+	char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
+	char file_1_name[] = "FILE1UM TXT";
+	
+	printf("shell_save_file: Salvando um arquivo ...\n");
+	
+	unsigned long number_of_sectors = 0;
+    size_t len = 0;
+	
+	
+	//
+	// Lenght in bytes.
+	//
+	
+	len = (size_t) strlen (file_1);
+
+	if (len <= 0)
+	{
+	    printf ("shell_save_file:  Fail. Empty file.\n");
+        return (int) 1;		
+	}
+	
+	if (len > 2048)
+	{
+	    printf ("shell_save_file:  Limit Fail. The  file is too long.\n");
+        return (int) 1;		
+	}
+	
+    //
+    // Number os sectors.
+    //
+	
+	number_of_sectors = (unsigned long) ( len / 512 );
+	
+	if ( len > 0 && len < 512 ){
+	    number_of_sectors = 1; 
+    }		
+	
+	if ( number_of_sectors == 0 )
+	{
+	    printf ("shell_save_file:  Limit Fail. (0) sectors so save.\n");
+        return (int) 1;				
+	}
+	
+	//limite de teste.
+	//Se tivermos que salvar mais que 4 setores.
+	if ( number_of_sectors > 4 )
+	{
+	    printf ("shell_save_file:  Limit Fail. (%d) sectors so save.\n",
+		    number_of_sectors );
+        return (int) 1;				
+	}
+	
+	
+    Ret = (int) apiSaveFile ( file_1_name,  //name 
+                              number_of_sectors,            //number of sectors.
+                              len,            //size in bytes			
+                              file_1,       //address
+                              0x20 );       //flag		
+				
+	//if (Ret == 0)
+	
+	printf("t5: done.\n");	
+	
+	return (int) Ret;
+};
 
 /*
  Credits: gcc 0.9 
