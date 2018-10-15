@@ -39,8 +39,8 @@ void editorClearScreen();
  *     Testando o recebimento de mensagens enviadas pelo shell.
  *
  */
-int mainGetMessage()
-{
+int mainGetMessage (){
+	
 	//char buff[512];
 
 	// #importante:
@@ -62,7 +62,7 @@ int mainGetMessage()
 	printf("\n");
 	printf(".\n");
 	printf("..\n");
-	printf("  ## MESSAGE={%s} ##  \n", shared_memory );
+	printf("# MESSAGE={%s} #\n", shared_memory );
 	printf("..\n");
 	printf(".\n");
 	printf("\n");
@@ -102,8 +102,8 @@ hang:
  *     Initializes stdio.
  *
  */
-int mainTextEditor( int argc, char *argv[] )
-{
+int mainTextEditor ( int argc, char *argv[] ){
+	
 	int ch;
 	FILE *fp;
     int char_count = 0;	
@@ -113,9 +113,8 @@ int mainTextEditor( int argc, char *argv[] )
 	
 #ifdef TEDITOR_VERBOSE			
 	printf("\n");
-	printf("Initializing Text Editor:\n");
-	printf("mainTextEditor:  ## argv={%s} ##  \n",
-	    &argv[0] );
+	printf("Initializing File explorer:\n");
+	printf("mainTextEditor: # argv={%s} # \n", &argv[0] );
 #endif	
 	
 	//
@@ -148,31 +147,26 @@ int mainTextEditor( int argc, char *argv[] )
     stdioInitialize();	
 	
 
-	//
-	// ## BARs ##
-	//
-	
-bars:
     
 	//Criando uma janela.
 	
 	//app window.
 	apiBeginPaint(); 
-	hWindow = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1,"{} TGFE.BIN - (Test) Gramado File Explorer",
+	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "File Explorer",
 	                    20, 20, 
 						800-40, 600-40,    
                         0, 0, COLOR_WHITESMOKE, 0x303030 );	  
 
-	if((void*) hWindow == NULL)
+	if ( (void *) hWindow == NULL )
 	{	
 		printf("TGFE.BIN: hWindow fail");
 		apiEndPaint();
 		goto fail;
 	}
-    APIRegisterWindow(hWindow);
-    APISetActiveWindow(hWindow);	
-    APISetFocus(hWindow);	
-	refresh_screen();	
+    APIRegisterWindow (hWindow);
+    APISetActiveWindow (hWindow);	
+    APISetFocus (hWindow);	
+	refresh_screen ();	
 	apiEndPaint();
 	
 	
@@ -201,10 +195,11 @@ bars:
    // printf("Loading file ...\n");
 #endif	
 	
-	
+	//#atenção
 	//30KB ?? não é muito ??
-	void *b = (void*) malloc(1024*30); 	// testando malloc.
-    if( (void*) b == NULL )
+	void *b = (void *) malloc (1024*30); 	 
+    
+	if ( (void *) b == NULL )
 	{
 		printf("allocation fail\n");
 		goto done;
@@ -213,76 +208,81 @@ bars:
 
 	//printf("Loading icon...\n");
 	
-    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+    // @todo: 
+	// Usar alguma rotina da API específica para carregar arquivo.
 	// na verdade tem que fazer essas rotinas na API.
-	system_call( SYSTEMCALL_READ_FILE, 
-	             (unsigned long) "FOLDER  BMP", 
-				 (unsigned long) b, 
-				 (unsigned long) b);	
 	
-	 
-	 
-	 
+	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) "FOLDER  BMP", 
+		(unsigned long) b, (unsigned long) b );	
+	
 	//
     // ## testes ##
     //
  
-    struct window_d *gWindow; 
-	struct window_d *mWindow;
+    struct window_d *gWindow;  //grid 
+	struct window_d *mWindow;  //menu
 	
-	//grid
+	//
+	// Grid.
+	//
+	
 	apiBeginPaint(); 
-	gWindow = (void*) APICreateWindow( WT_SIMPLE, 1, 1,"GRID-WINDOW",
-	                    60, 60, 
-						480, 60,    
+	gWindow = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "GRID-WINDOW",
+	                    60, 60, 480, 60,    
                         hWindow, 0, 0x303030, 0x303030 );	  
 
-	if((void*) gWindow == NULL)
+	if ( (void *) gWindow == NULL )
 	{	
 		printf("TGFE.BIN: gWindow fail");
 		apiEndPaint();
 		goto fail;
 	}
-    APIRegisterWindow(gWindow);
+    APIRegisterWindow (gWindow);
 	refresh_screen();	
     apiEndPaint();
 	
+	//
+	// Menu.
+	//
 	
-	//menu
 	apiBeginPaint(); 
-	mWindow = (void*) APICreateWindow( WT_SIMPLE, 1, 1,"menu",
-	                    60, 200, 
-						200, 100,    
+	mWindow = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "MENU-WINDOW",
+	                    60, 200, 200, 100,    
                         hWindow, 0, 0x303030, 0x303030 );	  
 
-	if((void*) mWindow == NULL)
+	if ( (void *) mWindow == NULL )
 	{	
 		printf("TGFE.BIN: mWindow fail");
 		apiEndPaint();
 		goto fail;
 	}
-    APIRegisterWindow(mWindow);
-	refresh_screen();	
+    APIRegisterWindow (mWindow);
+	refresh_screen ();	
     apiEndPaint();
 	
 	
 	 
-
-	//#isso funcionou ... mas estão se sobrepondo.
+	//#isso funcionou ... 
+	// mas estão se sobrepondo.
 	//fazer apenas um deles.
     //#debug 
 	//grid.
     //printf("Creating  grid \n");	 
-	int s = (int) system_call( 148, (unsigned long) gWindow, 4, (unsigned long) GRID_HORIZONTAL );
+	
+	//#obs: Acho que isso cria grid.
+	int s = (int) system_call ( 148, (unsigned long) gWindow, 4, 
+	                (unsigned long) GRID_HORIZONTAL );
 	 
-	if(s == 1)
+	if (s == 1)
     {
 		printf("148 fail.\n");
 	}	
 
     //menu.
 	//criando menu de teste.
-    system_call( 149, (unsigned long) mWindow, (unsigned long) mWindow, (unsigned long) mWindow);	
+	//#obs: Acho que isso cria menu.
+    system_call ( 149, (unsigned long) mWindow, (unsigned long) mWindow, 
+	    (unsigned long) mWindow );	
 	 
 	//#debug 
     //printf("## test done ##\n");	 
@@ -331,19 +331,18 @@ bars:
 	//fp = fopen( (char*) &argv[0],"rb");	
 	
 	//folder icon.
-	fp = fopen( "folder.bmp","rb");
-	if( fp == NULL )
+	fp = fopen ("folder.bmp", "rb" );
+	
+	if ( fp == NULL )
     {
         printf("fopen fail\n");
         goto fail;		
-    }else{
-		
+    
+	} else {
 		
 		//
 		// mostrar o icone.
 		//
-		
- 
 		
 #ifdef TEDITOR_VERBOSE			
         //printf(".\n");		
@@ -366,19 +365,19 @@ bars:
 #endif
 
 Mainloop:		
-	    while(running)
+	    while (running)
 	    {
 			//enterCriticalSection(); 
-	        ch = (int) getchar();
+	        ch = (int) getchar ();
 			//exitCriticalSection();
 			
-			if(ch == -1)
+			if (ch == -1)
 			{
 			    asm("pause");
                // printf("EOF reached! ?? \n");  				
 			};
 			
-	        if(ch != -1)
+	        if (ch != -1)
 	        {
 				
 	            printf("%c",ch);
