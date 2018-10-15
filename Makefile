@@ -18,6 +18,112 @@ CFLAGS = -m32 \
 	-fleading-underscore \
 	-fno-stack-protector \
 	-s
+
+OBJECTS=head.o \
+x86main.o \
+io.o \
+hal.o \
+mk.o \
+execve.o \
+video.o \
+screen.o \
+runtime.o \
+ports.o \
+x86.o \
+stdio.o \
+stdlib.o \
+string.o \
+tty.o \
+init.o \
+logon.o \
+logoff.o \
+cpux86.o \
+cpuamd.o \
+memory.o \
+pages.o \
+apic.o \
+pic.o \
+timer.o \
+rtc.o \
+keyboard.o \
+mouse.o \
+ldisc.o \
+hdd.o \
+pci.o \
+usb.o \
+device.o \
+spawn.o \
+callout.o \
+callfar.o \
+process.o \
+pheap.o \
+thread.o \
+threadi.o \
+theap.o \
+tstack.o \
+create.o \
+start.o \
+context.o \
+tasks.o \
+ts.o \
+queue.o \
+sched.o \
+schedi.o \
+dispatch.o \
+sem.o \
+modules.o \
+nicintel.o \
+network.o \
+socket.o \
+sm.o \
+channel.o \
+ipc.o \
+read.o \
+write.o \
+cf.o \
+search.o \
+format.o \
+disk1.o \
+disk.o \
+fs.o \
+vfs.o \
+cedge.o \
+ctype.o \
+request.o \
+info.o \
+signal.o \
+system.o \
+bg.o \
+grid.o \
+sbar.o \
+menubar.o \
+menu.o \
+mbox.o \
+dbox.o \
+button.o \
+char.o \
+pixel.o \
+line.o \
+rect.o \
+dtext.o \
+font.o \
+vsync.o \
+bmp.o \
+createw.o \
+window.o \
+desktop.o \
+wstation.o \
+usession.o \
+gws.o \
+object.o \
+userenv.o \
+proc.o \
+syscall.o \
+install.o \
+debug.o \
+abort.o \
+faults.o \
+services.o  
 	
 x86:
 	# entry
@@ -206,7 +312,7 @@ x86:
 	gcc -c kernel/gws/gws.c   -I include/ $(CFLAGS) -o gws.o
 
 link-x86:
-	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
+	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(OBJECTS) -Map kernel/kmap.s
 
 vhd-x86:
 	nasm -I arch/x86/boot/vhd/stage1/ \
