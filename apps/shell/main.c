@@ -961,7 +961,7 @@ Mainloop:
 			
 		if (	message_buffer[1] != 0 )
 		{
-	        shellProcedure( (struct window_d *) message_buffer[0], 
+	        shellProcedure ( (struct window_d *) message_buffer[0], 
 		        (int) message_buffer[1], 
 		        (unsigned long) message_buffer[2], 
 		        (unsigned long) message_buffer[3] );
@@ -1290,6 +1290,13 @@ shellProcedure( struct window_d *window,
 						running = 0;
                         ShellFlag = SHELLFLAG_EXIT;						
 					}  
+					
+					if ( window == editboxWindow )
+					{
+						APIredraw_window (editboxWindow,1);
+					    APISetFocus (editboxWindow);
+					}
+					
 					break;
 					
 				case 2:

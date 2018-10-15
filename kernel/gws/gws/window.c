@@ -2532,16 +2532,15 @@ void SetFocus ( struct window_d *window ){
 	// porém se ela tiver uma janela mãe, então a janela mãe será a 
 	// janela ativa.
 	
-    if( (void *) window == NULL )
+    if ( (void *) window == NULL )
 	{
 		//Isso e recursivo, pode dar problema.
 		//SetFocus(gui->screen);    
 		goto fail;
-	}else{
+	
+	} else {
 		
-		//validade e estado da estrutura.
-		if( window->used != 1 || 
-		    window->magic != 1234 )
+		if ( window->used != 1 || window->magic != 1234 )
 		{
 			goto fail;
 		}
@@ -2553,13 +2552,13 @@ void SetFocus ( struct window_d *window ){
 		WindowID = (int) window->id; 
 			
 		//Se a janela já tem o foco não precisa fazer nada.
-		if( window->id == window_with_focus ){
+		if ( window->id == window_with_focus ){
 			goto setup_wwf;
 		}
 			
 		//Se a janela é a janela ativa.
 		//Então atribuimos o foco e configuramos o procedimento de janela.
-		if( window->id == active_window )
+		if ( window->id == active_window )
 		{
 	        //set wwf id.
 		    window_with_focus = (int) window->id;
@@ -2666,7 +2665,7 @@ setup_wwf:
 			
 			// Usaremos a área de cliente caso ela exista,
 			// pois tem janela que simplesmente não tem, o ponteiro é nulo.
-			if( (void*) window->rcClient != NULL )
+			if ( (void *) window->rcClient != NULL )
 			{
 			    if( window->rcClient->used == 1 && 
 				    window->rcClient->magic == 1234 )
@@ -2689,8 +2688,20 @@ setup_wwf:
 			};
 			
 	
-            g_cursor_x = g_cursor_left; 
-	        g_cursor_y = g_cursor_top;  
+            //#importante: 
+			//Posicionando o cursor. 
+			
+			g_cursor_x = g_cursor_left; 
+	        g_cursor_y = g_cursor_top; 
+
+            if ( window->isEditBox == 1 )
+            {
+				//#teste
+				//para ficar na segunda linha do editbox.
+				//tem que trabalhar isso melhor.
+				
+				g_cursor_y++; 
+			}				
 
 	
 	        //configurando o cursor específico da janela com o foco de entrada.
@@ -2704,7 +2715,7 @@ setup_wwf:
 			// Esse buffer pode ser o arquivo usado pelo editbox.
 			//
 	
-	        for( i=0; i<PROMPT_MAX_DEFAULT; i++ )
+	        for ( i=0; i<PROMPT_MAX_DEFAULT; i++ )
 	        {
 		        prompt[i] = (char) '\0';
 		        prompt_out[i] = (char) '\0';

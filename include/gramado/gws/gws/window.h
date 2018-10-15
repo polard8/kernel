@@ -1013,7 +1013,8 @@ struct window_d
     // Flag par indicar se a janela é um item de menu.	
 	//ou um botão.
 	int isMenu;   
-	int isButton; //#importante: Indica que a janela é um botão.
+	int isButton;  //#importante: Indica que a janela é um botão.
+	int isEditBox; //#importante: Indica que a janela é um editbox.
 	//int isIcon; 
 	//...
 	

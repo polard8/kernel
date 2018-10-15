@@ -87,10 +87,10 @@ void shellui_fntos (char *name){
  *     LOCAL
  */
 unsigned long 
-shellTopbarProcedure( struct window_d *window, 
-                      int msg, 
-				      unsigned long long1, 
-				      unsigned long long2 )
+shellTopbarProcedure ( struct window_d *window, 
+                       int msg, 
+				       unsigned long long1, 
+				       unsigned long long2 )
 {
     unsigned long input_ret;
     unsigned long compare_return;	
@@ -111,7 +111,7 @@ shellTopbarProcedure( struct window_d *window,
 		//    break; 
 		 
 		case MSG_KEYDOWN:
-            switch(long1)
+            switch (long1)
             {
 				// Null key.
 				case 0:
@@ -498,22 +498,25 @@ done:
 // testando colocar o ponteiro no edit box. setar foco.
 void shellCreateEditBox (){
     
-	editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-editbox1",     
-                                       80, 80, 200, 22,    
-                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
+	editboxWindow = (void *) APICreateWindow ( 2, 1, 1, "shell-editbox1",     
+                                100, 50, 200, 24,    
+                                0, 0, COLOR_WINDOW, COLOR_WINDOW );
 									   
 									   
-	if((void*) editboxWindow == NULL){	
+	if ( (void *) editboxWindow == NULL)
+	{	
 		printf("shellCreateEditBox: fail");
+		
 		refresh_screen();
 		while(1){}
 		//exit(0);
 	};
-	    //Registrar.
-    APIRegisterWindow(editboxWindow);
+	
+	//Registrar.
+    APIRegisterWindow (editboxWindow);
 
 
-	shellSetCursor( 8, 8 );								   
+	//shellSetCursor ( 8, 8 );								   
 };
 
 

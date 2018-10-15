@@ -603,6 +603,7 @@ CreateWindow( unsigned long type,
 		window->defaultMenu = NULL; 
 		window->isMenu = 0;
 		window->isButton = 0;
+		window->isEditBox = 0;
 		window->selected = 0;  //Caso a janela seja um ítem de menu.
 		//window->text = NULL; //Texto, caso a janela seja um ítem de menu
 
@@ -1374,8 +1375,15 @@ drawBegin:
 			window->color_bg );
 		
 		window->isButton = 1;	
-	};					 
-	
+	};	
+
+
+    if ( (unsigned long) type == WT_EDITBOX )	
+	{
+		window->isEditBox = 1;
+	}
+
+
 	//
 	// Continua ... ( Pinta detalhes da janela, caso ouver )
 	//
