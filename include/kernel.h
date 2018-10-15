@@ -188,7 +188,7 @@ extern void do_executa_new_task();
 
 
 //#todo:
-#include "c:\gramado\3rdparty\kernel\disk\disk1.h"           //disk1 - nelson
+#include "../3rdparty/kernel/disk/disk1.h"           //disk1 - nelson
 
 #include <gramado/execve/dd/sm/disk/disk.h>           //disk.
 
