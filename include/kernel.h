@@ -38,10 +38,10 @@
  *     2014~2018 - Resision.
  */
 
-/* ConfiguraÁ„o de produto */ 
+/* Configura√ß√£o de produto */ 
 #include <gramado/gramado.h> 
  
-/* ConfiguraÁ„o de compilaÁ„o */ 
+/* Configura√ß√£o de compila√ß√£o */ 
 #include <gramado/config.h> 
 
 // Global definitions.
@@ -417,14 +417,14 @@ int current_group;   //gramado ?
 
 //
 // #importante
-// Essa È a verdadeira idle, que est· em ring 0 e trabalha 
-// quando sistema est· ocioso.
-// ela deve ficar bloqueada quendo outras est„o trabalhando. 
-// Ela n„o pode ser destruÌda e nem alterada ... uma vez configurada 
-// ficar· sendo ela pra sempre, se ela fechar o sistema deve falhar.
+// Essa √© a verdadeira idle, que est√° em ring 0 e trabalha 
+// quando sistema est√° ocioso.
+// ela deve ficar bloqueada quendo outras est√£o trabalhando. 
+// Ela n√£o pode ser destru√≠da e nem alterada ... uma vez configurada 
+// ficar√° sendo ela pra sempre, se ela fechar o sistema deve falhar.
 int idle;   
 
-//PrÛxima thread das threads em user mode.
+//Pr√≥xima thread das threads em user mode.
 int next_thread;   
   
 int current_process;
@@ -443,38 +443,38 @@ unsigned long current_process_pagedirectory_address;
 //Lista para armazenas os ponteiros das estruturas de todos os processadores.
 //unsigned long processorsList[32];
 
-//Quais processadores est„o no estado IDLE.
+//Quais processadores est√£o no estado IDLE.
 //int idleprocessorList[8];
 
-//Quais processadores est„o no estado ACTIVE.
+//Quais processadores est√£o no estado ACTIVE.
 //int activeprocessorList[8];
 
 
 //Tempo absoluto em que o sistema iniciou.
 //unsigned long BootTime;
 
-//Conta o n˙mero de processadores.
+//Conta o n√∫mero de processadores.
 //int processors_count;
 
 //A arquitetura do processador.(marca)
 //int processor_architecture;
 
-//Lista os serviÁos oferecidos pelo kernel atravÈz da systemcall int 200.
-//endereÁo da funÁ„o. talvez seja uma chamada ‡ um mÛdulo esterno ou server.
+//Lista os servi√ßos oferecidos pelo kernel atrav√©z da systemcall int 200.
+//endere√ßo da fun√ß√£o. talvez seja uma chamada √† um m√≥dulo esterno ou server.
 //unsigned long SystemServices[256];
 
 
 //Contador de thread switch.
 //unsigned long thread_switch_count;
 
-//Armazena o endereÁo da rotina de debug do sistema.
+//Armazena o endere√ßo da rotina de debug do sistema.
 //unsigned long system_debugger_address;
 
 
-//Armazena qual ser· o n˙mero de identificaÁ„o
-//do prÛximo processo ou thread criados.
+//Armazena qual ser√° o n√∫mero de identifica√ß√£o
+//do pr√≥ximo processo ou thread criados.
 // se for '0', tem que procurar um novo.
-//se usar o n˙mero contido aqui, deve atualizar para 0.
+//se usar o n√∫mero contido aqui, deve atualizar para 0.
 //int NewPID;
 //int NewTID;
 
@@ -701,9 +701,9 @@ struct kernel_d *KernelInfo;
 /*
  **********************************************************
  * plataform_d:
- *     Os componentes b·sicos da m·quina.
+ *     Os componentes b√°sicos da m√°quina.
  *     As estruturas de Hardware e Software.
- *     * IMPORTANTE Essa È a estrutura BASE do kernel.
+ *     * IMPORTANTE Essa √© a estrutura BASE do kernel.
  */
 struct platform_d
 {
