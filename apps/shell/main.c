@@ -638,8 +638,17 @@ noArgs:
 	// # Draw bar #
 	// Criando a topbar antes de criarmos a janela principal.
 	//enterCriticalSection();    
-	//shellCreateTopBar(1);
-	//exitCriticalSection();    
+	//shellCreateTaskBar(1);
+	//exitCriticalSection();  
+
+
+	    enterCriticalSection();    
+	    
+		//Apenas inicialize. Continuaremos com o procedimento 
+		//do shell e não o da barra,
+		shellCreateTaskBar (1);
+	    
+		exitCriticalSection();	
 	
 	
 	//
@@ -775,7 +784,7 @@ noArgs:
 	
 	//#bug bug
 	//enterCriticalSection();    // * Enter Critical Section.
-	//shellCreateTopBar();
+	//shellCreateTaskBar();
 	//exitCriticalSection();     // * Exit Critical section.	
 	
 	
@@ -1191,12 +1200,12 @@ shellProcedure( struct window_d *window,
 				
 				//clicaram no botão
 				case BN_CLICKED:
-				    if(window == i1Window){
+				    //if(window == i1Window){
 					     //@todo: abre o menu de aplicativos
-					}
-				    if(window == i2Window){
+					//}
+				    //if(window == i2Window){
 					   //@todo: abre o interpretador de comandos.
-					}
+					//}
 					//#debug
 					printf(" * BN_CLICKED * \n");
 				break;
@@ -1271,7 +1280,13 @@ shellProcedure( struct window_d *window,
 		    switch (long1)
 			{		
 				case 1:
-				    printf("up button 1\n");
+				    //printf("up button 1\n");
+					if (window == menu_button)
+					{
+	                    shellTestButtons ();	
+		                refresh_screen ();						
+					}
+					
 					
 					//botão de reboot;
 					if ( window == reboot_button )
@@ -2862,15 +2877,15 @@ do_compare:
     };	
 	
 	
-	// topbar
+	// taskbar
 	// Cria uma top bar.
-    if ( strncmp( prompt, "topbar", 6 ) == 0 )
+    if ( strncmp( prompt, "taskbar", 7 ) == 0 )
 	{
 	    enterCriticalSection();    
 	    
 		//Apenas inicialize. Continuaremos com o procedimento 
 		//do shell e não o da barra,
-		shellCreateTopBar(1);
+		shellCreateTaskBar (1);
 	    
 		exitCriticalSection();    
 		

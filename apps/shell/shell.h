@@ -24,7 +24,25 @@
 //
 // botões
 // 
+
+//janela da taskbar
+struct window_d *taskbarWindow;  //task bar.
+
+//menu iniciar.
+struct window_d *menu_button;
+
  
+//...
+
+//grid de aplicativos.
+struct window_d *app1_button;
+struct window_d *app2_button;
+struct window_d *app3_button;
+struct window_d *app4_button;
+
+struct window_d *editboxWindow;  //edit box.
+
+ //outros.
 struct window_d *reboot_button;
 struct window_d *close_button;
  
@@ -754,16 +772,7 @@ struct _iobuf *pwd;
 struct _iobuf *root;
 //...
 
-//Janelas usadas pelo aplicativo.
 
-struct window_d *topbar_scrollbarWindow;
-struct window_d *topbar_checkboxWindow;
-struct window_d *topbar_editboxWindow;  //edit box.
-struct window_d *editboxWindow;  //edit box.
-struct window_d *topbarWindow;  //task bar.
-struct window_d *i1Window;      //icone 1.
-struct window_d *i2Window;      //icone 2.
-//...
 
 
 	
@@ -1132,7 +1141,7 @@ int shell_gramado_core_init_execve( const char *arg1,
 //
 
 void shellCreateEditBox();
-int shellCreateTopBar( int status );
+int shellCreateTaskBar( int status );
 
 
 int shellDisplayBMP( char *file_name );

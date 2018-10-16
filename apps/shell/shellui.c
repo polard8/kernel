@@ -223,12 +223,12 @@ shellTopbarProcedure ( struct window_d *window,
 				
 				//clicaram no botão
 				case BN_CLICKED:
-				    if(window == i1Window){
+				    //if(window == i1Window){
 					     //@todo: abre o menu de aplicativos
-					}
-				    if(window == i2Window){
+					//}
+				   // if(window == i2Window){
 					   //@todo: abre o interpretador de comandos.
-					}
+					//}
 					//#debug
 					printf("  Topbar ** BN_CLICKED  **  \n");
 				break;
@@ -522,7 +522,7 @@ void shellCreateEditBox (){
 
 /*
  ******************** 
- * shellCreateTopBar:
+ * shellCreateTaskBar:
  *
  *     CRIANDO A TOP BAR.
  *     Obs: Essa é uma janela filha.
@@ -532,7 +532,7 @@ void shellCreateEditBox (){
  *
  */
  
-int shellCreateTopBar (int status){
+int shellCreateTaskBar (int status){
 	
 	// Precisamos registrar no kernel que essa janela corresponde 
 	// a área de taskbar e que a área de trabalho agora é menor.
@@ -541,13 +541,13 @@ int shellCreateTopBar (int status){
 	// Criando a barra.
 	//
 	
-	topbarWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-topbar ",     
-                                0, 0, 800, (8*3),    
+	taskbarWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-taskbar",     
+                                0, 600-24, 800, (8*3),    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-	if ( (void *) topbarWindow == NULL )
+	if ( (void *) taskbarWindow == NULL )
 	{	
-		printf("shellCreateTopBar: topbar Window fail");
+		printf("shellCreateTaskBar: taskbar Window fail");
 		refresh_screen();
 		
 		while (1){
@@ -556,20 +556,20 @@ int shellCreateTopBar (int status){
 		//exit(0);
 	};
 	//Registrar.
-    APIRegisterWindow(topbarWindow);
+    APIRegisterWindow(taskbarWindow);
 	
 	//
 	// icon 1 window
 	//
 	
-	unsigned long iconMaxWidth  = (8*3);
-	unsigned long iconMaxHeight = (8*3);
+	unsigned long iconMaxWidth  = 100; //(8*3);
+	unsigned long iconMaxHeight = 24; //(8*3);
 
-	i1Window = (void *) APICreateWindow ( 1, 1, 1, "shell-topbar-icon ",     
-                            0, 0, iconMaxWidth, iconMaxHeight,    
+	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "MENU",     
+                            0, 600-24, iconMaxWidth, iconMaxHeight,    
                             0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
 							
-	if ( (void *) i1Window == NULL )
+	if ( (void *) menu_button == NULL )
 	{	
 		printf("shellCreateTopBar: icon1 Window fail");
 		refresh_screen();
@@ -580,106 +580,11 @@ int shellCreateTopBar (int status){
 		//exit(0);
 	};
     //Registrar.
-    APIRegisterWindow(i1Window);
+    APIRegisterWindow(menu_button);
 	
-	//
-	// icon 2 window
-	//
-
-	i2Window = (void *) APICreateWindow ( 1, 1, 1, "shell-topbar-icon ",     
-                            iconMaxWidth, 0, iconMaxWidth, iconMaxHeight,    
-                            0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
-							
-	if ( (void *) i2Window == NULL )
-	{	
-		printf("shellCreateTopBar: icon2 Window fail");
-		refresh_screen();
-		
-		while (1){
-			asm("pause");
-		}
-		//exit(0);
-	};
-	//Registrar.
-    APIRegisterWindow(i2Window);
-	
-	
-    //
-    // edit box na topbar
-    //
+ 
 	
 /*	
-	//o tipo 2 funciona.
-	topbar_editboxWindow = (void*) APICreateWindow( 2, 1, 1,"{}shell-topbar-editbox1",     
-                                       (iconMaxWidth*2) +20, 
-									   20, 
-									   (800/3) , 
-									   22,    
-                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
-									   
-									   
-	if((void*) topbar_editboxWindow == NULL){	
-		printf("shellCreateTopBar: fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-	    //Registrar.
-    APIRegisterWindow(topbar_editboxWindow);
-*/	
-	
-	
-	
-	
-    //
-    // check box na topbar
-    //
-	
-
-/*	
-	topbar_checkboxWindow = (void*) APICreateWindow( 5, 1, 1,"{}shell-topbar-checkbox1",     
-                                       80, 
-									   80, 
-									   20, 
-									   20,    
-                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
-									   
-									   
-	if((void*) topbar_checkboxWindow == NULL){	
-		printf("shellCreateTopBar: fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-	    //Registrar.
-    APIRegisterWindow(topbar_checkboxWindow);
-*/
-	
-	
-	
-	
-    //
-    // scroll bar na topbar
-    //
-	
-/*
-	topbar_scrollbarWindow = (void*) APICreateWindow( 6, 1, 1,"{}shell-topbar-scrollbar",     
-                                       (800-41), 
-									   0, 
-									   40, 
-									   (600/8),    
-                                       0, 0, COLOR_WINDOW, COLOR_WINDOW );
-									   
-									   
-	if((void*) topbar_scrollbarWindow == NULL){	
-		printf("shellCreateTopBar: fail");
-		refresh_screen();
-		while(1){}
-		//exit(0);
-	};
-	    //Registrar.
-    APIRegisterWindow(topbar_scrollbarWindow);
-*/
 	
 	//
 	// BMP . LABELS
@@ -714,6 +619,8 @@ loadFile:
 	{
 	    ShellFlag = SHELLFLAG_TOPBAR;
 	}
+	
+*/	
 	
 //done:
 
@@ -937,17 +844,36 @@ void bmpDisplayBMP ( void *address,
 
 //testando botão.
 int shellTestButtons (){
+	
+	
+	
+	// Tamanho da tela.	
+	unsigned long ScreenWidth = apiGetSystemMetrics(1);
+    unsigned long ScreenHeight = apiGetSystemMetrics(2); 	
+	
+
+	unsigned long app1Left = ((ScreenWidth/8) * 2);
+	unsigned long app2Left = ((ScreenWidth/8) * 3);
+	unsigned long app3Left = ((ScreenWidth/8) * 4);
+	unsigned long app4Left = ((ScreenWidth/8) * 5);
+	
+	unsigned long app1Top = ( (ScreenHeight/10) * 1); 
+	unsigned long app2Top = app1Top; 
+	unsigned long app3Top = app1Top; 
+	unsigned long app4Top = app1Top;
+	
+	
     
 	//
 	// botão de reboot
 	//
 	
     //em shell.h está o ponteiro.	
-	reboot_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " REBOOT ",     
-                                10, 10, 100, 40,    
+	app1_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP1 ",     
+                                app1Left, app1Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (reboot_button);
+    APIRegisterWindow (app1_button);
 
 
 	//
@@ -955,12 +881,40 @@ int shellTestButtons (){
 	//
 	
     //em shell.h está o ponteiro.	
-	close_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " CLOSE ",     
-                                10, 200, 100, 40,    
+	app2_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP2 ",     
+                                app2Left, app2Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (close_button);
+    APIRegisterWindow (app2_button);
+	
+	
+	
+	//
+	// botão de close
+	//
+	
+    //em shell.h está o ponteiro.	
+	app3_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP3 ",     
+                                app3Left, app3Top, 80, 24,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+    APIRegisterWindow (app3_button);
 
+
+
+
+	//
+	// botão de close
+	//
+	
+	
+    //em shell.h está o ponteiro.	
+	app4_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP4 ",     
+                                app4Left, app4Top, 80, 24,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+    APIRegisterWindow (app4_button);	
+    
 
 	
     return 0;	
