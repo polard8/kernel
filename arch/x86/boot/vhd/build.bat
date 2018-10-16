@@ -7,7 +7,8 @@
 	rem e também os elementos básicos do sistema de arquivos fat16, como
 	rem vbr, fat, root ...
     rem
-	
+	rem nasm 2.05.01
+	rem
     rem SET BuildFlags=-h
     rem if "%BuildFlags%" == "-h" goto HowItWorks
     rem if "%BuildFlags%" == "-?" goto Usage	

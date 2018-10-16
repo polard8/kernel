@@ -7,6 +7,10 @@ rem Compiling a kernel base for x86 processors.
 rem The binary format is PE. $.
 rem This script generate the file KERNEL.BIN.
 rem 
+rem  gcc 3.4.2 mingw-special
+rem  nasm 2.05.01
+rem  ld 2.19
+rem
 rem (c) Copyright 2005-2018 Fred Nora.
 rem
     cd c:\sdk\bin
