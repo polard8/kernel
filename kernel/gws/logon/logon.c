@@ -244,7 +244,7 @@ draw_logon_stuffs:
 			//    COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
    			
 			draw_text( gui->main, 400 +8, 8*1, 
-			    COLOR_WHITE, "Gramado 0.3" );
+			    COLOR_WHITE, "Gramado 0.4" );
 				
 			draw_text( gui->main, 400 +8, 8*2, 
 			    COLOR_WHITE, "(c) Copyright 2005-2018, Fred Nora" );

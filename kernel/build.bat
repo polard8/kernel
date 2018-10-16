@@ -16,7 +16,7 @@ rem
     cd c:\sdk\bin
 
 echo ~{ ...
-echo ~{ Gramado 0.3 Style
+echo ~{ Gramado 0.4 Love and Forgiveness
 
 :Start_Job0
 rem Main.
