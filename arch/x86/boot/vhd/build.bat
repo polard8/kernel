@@ -62,7 +62,7 @@ echo -{ Partition starts on sector 63.
 :attachingVHD
 	rem Montando um disco já formatado.
 	imdisk -a -f GRAMADO.VHD -s 31M -m F: -b 63b
-	
+		
 :Copying
 echo -{ ...
 
@@ -125,6 +125,57 @@ echo -{ ...
 	
 	
 	rem ...
+	
+:creatingFolders:
+
+    REM ESSA ROTINA DEVERÁ SER FEITA PELO INSTALADOR.
+	REM MAS NO CASO ESSE É O INSTALADOR POR ENQUANTO.
+
+    rem #todo 	
+	rem #importante:
+	rem O host Windows usa letras maiúsculas para criar os diretórios.
+    rem O usuário digita letras minúsculas, mas o Gramado procura pode letras 
+	rem maiúsculas.
+	rem Esse problema aparecerá em todos os sistemas operacionais que usaram 
+	rem o Windows como host.
+	rem 
+	
+    mkdir F:\DEV
+    mkdir F:\SECURITY
+	mkdir F:\TOOLS
+	mkdir F:\USERS
+	
+	
+	REM 
+	REM  /DB
+	REM 
+
+	REM #IMPORTANTE:
+	REM BANCO DE DADOS USADOS PELO SISTEMA PARA
+	REM ARMAZENAS ARQUIVOS 'SISTEMICAMENTE IMPORTANTES' E 
+	REM ARQUIVOS DE TESTE DE NOVOS RECURSOS.
+
+	mkdir F:\TOOLS\DB	
+	copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\TOOLS\DB\*.BMP
+ 	copy c:\gramado\arch\x86\boot\vhd\*.TXT         F:\TOOLS\DB\*.TXT
+	copy c:\gramado\bin\*.BIN                       F:\TOOLS\DB\*.BIN
+	copy c:\gramado\bin\*.FON                       F:\TOOLS\DB\*.FON
+	rem  ...
+
+
+	
+	REM 
+	REM  /BOOT
+	REM 
+	
+	mkdir F:\TOOLS\BOOT
+	copy c:\gramado\bin\BM.BIN    F:\TOOLS\BOOT\BM.BIN
+	copy c:\gramado\bin\BL.BIN    F:\TOOLS\BOOT\BL.BIN
+	
+	
+    mkdir F:\USERS\DEFAULT
+    copy c:\gramado\arch\x86\boot\vhd\USER.TXT         F:\USERS\DEFAULT\USER.TXT	
+
 
 :detachingVHD
 echo -{ ...

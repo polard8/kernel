@@ -1,13 +1,13 @@
 # gramado
 
-<br>Gramado 0.3
+<br>Gramado 0.4
 <br>
 <br>Version:
 <br>    Major 0
-<br>    Minor 3
+<br>    Minor 4
 <br>    Release 0
-<br>    Name "Style"
-<br>    Spiritual quote "Each project has a personal style based on their values and traits."
+<br>    Name "Love and Forgiveness"
+<br>    Spiritual quote "Love and Forgiveness"
 <br>(c) Copyright 2018 - Fred Nora.
 
 <br>
