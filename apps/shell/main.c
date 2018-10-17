@@ -1115,7 +1115,7 @@ shellProcedure( struct window_d *window,
 					//obs: tem que olhar o que a rotina no kernel faz no caso do backspace.
 					
 					shellRefreshCurrentChar();
-					//printf ("%c", (char) long1 ); 					
+					//printf ("%c", (char) long1 ); 	//deletar.				
 					
 					goto done;
                     break;               
@@ -2722,30 +2722,12 @@ do_compare:
 	
 	
     // t1 - Test file
+	// Carrega um arquivo no buffer de words 
+	// depois exibe todo o buffer mantendo o posicionamento 
+	//no cursor. Isso força um scroll.
 	if ( strncmp( prompt, "t1", 2 ) == 0 )
 	{	
-		// Carrega e exibe um arquivo.
-		shellTestLoadFile();
-		
-		// teste.
-		// Escreve no buffer de saída e mostra o buffer de saida.
-		//screen_buffer[0] = (char) 'F';
-		//screen_buffer[1] = 7;
-		
-        //screen_buffer[2] = (char) 'N';	
-        //screen_buffer[3] = 7;
-		
-		//screen_buffer[4] = (char) '\0';			
-		//screen_buffer[5] = 7;
-		
-		//printf( (const char *) stdout->_base );
-		
-		//printf("%s \n",stdout->_base);
-		//printf("%s \n",stdout->_tmpfname);
-		//printf("%d \n",stdout->_cnt);
-		//printf("%d \n",stdout->_bufsiz);
-		//printf("done \n");
-		
+		shellTestLoadFile();		
         goto exit_cmp;
     };
 	
@@ -4052,6 +4034,10 @@ void shellClearBuffer (){
 //mostra o buffer screen buffer, onde ficam 
 //armazenados os caracteres e atributos datela
 //do terminal virtual.
+
+//#importante: vamos mostrar todo o buffer de words, a partir 
+//da posição atual do cursor, forçando um scroll
+
 //Isso é só um teste.
 void shellShowScreenBuffer (){
 	
@@ -4064,11 +4050,14 @@ void shellShowScreenBuffer (){
 	//screen_buffer[4] = 'r';
 	//screen_buffer[6] = 't';
 	
+    //#importante: vamos mostrar todo o buffer de words, a partir 
+    //da posição atual do cursor, forçando um scroll	
+	
 	//shellClearScreen();
-    shellSetCursor(0,0);
+    //shellSetCursor(0,0);
 	
 	// Shell buffer.
-	for( i=0; i<(DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS); i++ )
+	for ( i=0; i<(DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS); i++ )
 	{
 		
 	    printf( "%c", screen_buffer[j] );
@@ -4087,6 +4076,7 @@ void shellShowScreenBuffer (){
 void shellTestLoadFile (){
 	
 	FILE *f;
+	
 	int Ret;
 	int i=0;
 	int ch_test;
@@ -4095,7 +4085,8 @@ void shellTestLoadFile (){
 	
 	//#importante:
 	//precisa ser arquivo pequeno.
-	f = fopen("init.txt","rb");  
+	f = fopen ("init.txt","rb");  
+	
     if( f == NULL )
 	{
 		printf("fopen fail\n");
@@ -4106,65 +4097,50 @@ void shellTestLoadFile (){
 	
 	//#test 
 	//testando com um arquivo com texto pequeno.
+	//enviando para o buffer de words, 
+	//obs: agora tem rotinas de refresh.
 	
 	while (1)
 	{
-		ch_test = (int) getc(f); 
+		ch_test = (int) getc (f); 
+		
 		if( ch_test == EOF )
 		{
 			printf("\n");
 			printf("EOF reached :)\n");
 			goto done;
-		}else{
+		
+		} else {
 		    			
 		    //movendo.
 			pos = 2*i;	
 
-            if( pos >= SCREEN_BUFFER_SIZE ) 
+            if ( pos >= SCREEN_BUFFER_SIZE ) 
             {
 				printf("shellTestLoadFile: screen_buffer[] limits\n");
 				goto fail;
 			}				
 			
-	        screen_buffer[pos] = (char) ch_test; //char	
-		    screen_buffer[pos +1] = (char) 0x09; //atributo	
+	        screen_buffer[pos] = (char) ch_test;    //char	
+		    screen_buffer[pos +1] = (char) 0x09;    //atributo	
             i++;
  		
 	    };
 	};	
 	
 
-	// *Testando carregar um arquivo.
-	// Ok, isso funcionou.
-	
-	//A QUESTÃO DO TAMANHO PODE SER UM PROBLEMAS 
-	// #BUGBUG ;... SUJANDO ALGUMA ÁREA DO SHELL
-	
-	//Ret = (int) system_call( SYSTEMCALL_READ_FILE, 
-	//                         (unsigned long) init_file_name, 
-	//  			             (unsigned long) &screen_buffer[0], 
-	//						 (unsigned long) &screen_buffer[0] );
-
-	//#test colocando no stdout para depois copiar 
-	//no screenbuffer considerando os atributos do caractere.
-	//Ret = (int) system_call( SYSTEMCALL_READ_FILE, 
-	//                         (unsigned long) init_file_name, 
-	//  			             (unsigned long) stdout->_base, 
-	//						 (unsigned long) stdout->_base );
-							 
-	//printf("ret={%d}\n",Ret);
-	
-
-	//printf("...\n\n");
-	//printf(&screen_buffer[0]);
-
+ 
 done:
 	//Limpa a tela e reposiciona o cursor.
 	//shellClearScreen();
-    shellSetCursor(0,0);
+    //shellSetCursor (0,0);
+	
+	//#obs:
+	//Continuaremos com o cursor onde ele está.
+	
 	// Mostra na tela o conteúdo do screen buffer.
 	//shellRefreshScreen();
-	shellShowScreenBuffer();
+	shellShowScreenBuffer ();
 //
 fail:
     return;	
