@@ -8,7 +8,9 @@
  *
  *     Obs: O Gerenciador de Volumes um módulo muito importante do Kernel.
  *
- * Versão 1.0, 2015, 2016.
+ * 2015 - Created by Fred Nora.
+ * 2018 - Revision.
+ *
  */
 
 
@@ -20,8 +22,6 @@
 //
 
 
-
-
 //Mostra informações sobre o disco atual.
 void diskShowCurrentDiskInfo (){
 	
@@ -30,12 +30,16 @@ void diskShowCurrentDiskInfo (){
 };
 
 
+//Mostra informações sobre um disco dado seu descritor.
 int diskShowDiskInfo ( int descriptor ){
 	
 	struct disk_d *d;
 	
-	printf("diskShowDiskInfo:\n");
-    if( descriptor < 0 || descriptor > DISK_COUNT_MAX )
+	//#debug
+	printf("diskShowDiskInfo:\n\n");
+	
+	
+    if ( descriptor < 0 || descriptor > DISK_COUNT_MAX )
 	{
 		printf("descriptor fail\n");
 		goto fail;
@@ -47,7 +51,8 @@ int diskShowDiskInfo ( int descriptor ){
 	{
 		printf("struct fail\n");
 		goto fail;
-	}else{
+		
+	} else {
 		
 		if ( d->used != 1 || d->magic != 1234 ){
 			
@@ -55,13 +60,10 @@ int diskShowDiskInfo ( int descriptor ){
 			goto fail;
 		}		
 		
-		printf("id={%d}\n",d->id);
+		printf ("id={%d} used={%d} magic={%d} \n", d->id, d->used, d->magic );
 		
-		printf("used={%d}\n",d->used);
-		printf("magic={%d}\n",d->magic);
-		
-		printf("diskType={%d}\n",d->diskType);
-		printf("name={%s}\n",d->name);		
+		printf ("diskType={%d}\n", d->diskType );
+		printf("name={%s}\n", d->name );		
 		//...
 		goto done;
 	};

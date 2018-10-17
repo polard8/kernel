@@ -1,7 +1,11 @@
 
- Sobre o diretório \drivers:
+ Sobre o diretório \dd\drivers:
  ==========================
 
+   #importante
+   Ainda não estamos falando de drivers carregáveis.
+   Os drivers carrgáveis ficarão em /gramado/drivers.
+   
    Os drivers aqui no kernel base são simples.
    Oferecem rotinas primárias para os dispositivos
    mais tradicionais.

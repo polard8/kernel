@@ -62,9 +62,9 @@ typedef enum {
  * init_device_manager:
  *
  */
-void init_device_manager()
-{
-    return;
+void init_device_manager (){
+	
+    //return;
 };
 
 

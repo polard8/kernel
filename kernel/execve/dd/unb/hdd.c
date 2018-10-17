@@ -20,7 +20,10 @@
  *
  *     Ambiente: (RING 0).
  *
- *  Versão: 1.0 - 2013, 2014, 2015, 2016.
+ * #obs: Vamos montar dispositivos em /DEV
+ *
+ *    2013 - Created by Fred Nora.
+ *    2016 - Revision.
  */
 
  
@@ -75,10 +78,11 @@ int hddError;
  * edx - null
  * Opção: void hddReadSector(....)
  */
-void my_read_hd_sector( unsigned long ax, 
-                        unsigned long bx, 
-						unsigned long cx, 
-						unsigned long dx )
+ 
+void my_read_hd_sector ( unsigned long ax, 
+                         unsigned long bx, 
+						 unsigned long cx, 
+						 unsigned long dx )
 {
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
@@ -88,6 +92,7 @@ void my_read_hd_sector( unsigned long ax,
 	os_read_sector(); 	
     
 	//#todo: deletar esse return.
+	//testar sem ele antes.
 	return;
 };
 
@@ -101,10 +106,10 @@ void my_read_hd_sector( unsigned long ax,
  * edx - null
  * Opção: void hddWriteSector(....)
  */
-void my_write_hd_sector( unsigned long ax, 
-                         unsigned long bx, 
-						 unsigned long cx, 
-						 unsigned long dx )
+void my_write_hd_sector ( unsigned long ax, 
+                          unsigned long bx, 
+						  unsigned long cx, 
+						  unsigned long dx )
 {
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
@@ -115,24 +120,29 @@ void my_write_hd_sector( unsigned long ax,
 	
 	os_write_sector(); 
 	
+	//#todo: deletar esse return.
+	//testar sem ele antes.	
 	return;
 };   
 
 
 /*
+ ***************************************
  * init_hdd:
  *     Inicializa o driver de hd.
  *     @todo: Mudar para hddInit().
  */
-int init_hdd()
-{
+int init_hdd (){
+	
     //
     // @todo: We need to do something here.
     //	
 
-done:
+//done:
+
     g_driver_hdd_initialized = (int) 1;
-    return (int) 0;
+    
+	return (int) 0;
 };
 
 

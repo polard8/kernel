@@ -17,14 +17,14 @@
 /*
  **********************************************************************
  * KiSearchFile:
- *    Procura por um arquivo, dado o endereço do diretório.
- *    Com o diretório já carregado na memória.
+ *    Procura por um arquivo, dado o endereço do diretório, com o diretório 
+ * já carregado na memória.
  *
  *   file_name: Nome do arquivo.
  *     address: Endereço na memória onde o diretório está.
  *
- * @todo: 
- *    Atender à especificações diferentes de sistemas de arquivos, como:
+ * #todo: 
+ *    Atender à especificações do sistemas de arquivos, como:
  *    +Tamanho do cluster
  *    +Tamanho do disco
  *    +Tipo de sistema de arquivos. 
@@ -34,15 +34,22 @@
 int KiSearchFile ( unsigned char *file_name, unsigned long address ){
 	
 	int Status = 1;
-    unsigned long i = 0;        // Deslocamento do dir. 
-    unsigned long j = 0;        // Deslocamento no nome.
-    unsigned long NumberOfEntries = 512;    // Número máximo de entradas no diretório.	
+    unsigned long i = 0;                  // Deslocamento do dir. 
+    unsigned long j = 0;                  // Deslocamento no nome.
+    unsigned long NumberOfEntries = 512;  // Número máximo de entradas no diretório.	
     
 	char NameX[13];	
 	
 	// Buffer.
+	//#importante: O endereço do diretório foi passado via argumento.
+	
 	char *dir = (char *) address;
 
+	
+	//??
+	//Não aceitaremos 0, definitivamente.
+    //Mas barra poderemos reconsiderar no futuro.
+	//Talvez devamos considerar ./ também.
 	
 	if ( file_name[0] == '/' || file_name[0] == 0 ){
 		

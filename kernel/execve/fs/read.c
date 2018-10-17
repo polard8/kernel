@@ -13,6 +13,15 @@
  */
  
  
+/*
+ #todo: Usar estruturas para gerenciar partição, FAT e Root dir.
+ #obs: Cada partição deve ter uma estrutura.
+ precisamos checar na estrutura o status da FAT e do 
+ diretório raiz, para não carregálos repetidas vezes.
+
+ */ 
+ 
+ 
 #include <kernel.h>
 
     /*
@@ -100,7 +109,6 @@ unsigned long fatClustToSect ( unsigned short cluster,
 	C -= 2;
 	
 	//@todo: Check limits.
-//done:
 	
 	return (unsigned long) (C * spc) + first_data_sector;
 };
@@ -173,9 +181,6 @@ void read_lba ( unsigned long address, unsigned long lba ){
 	
 	//scheduler_unlock();
 	//taskswitch_unlock();
-	
-//done:
-	//return;
 };
 
 
@@ -204,6 +209,7 @@ void read_lba ( unsigned long address, unsigned long lba ){
  * então devemos substituir o ponteiro *root por *current_dir.
  */
 //int fsLoadFile( const char *name, unsigned long address ) 
+
 unsigned long 
 fsLoadFile ( unsigned char *file_name, 
              unsigned long file_address )
@@ -275,14 +281,19 @@ fsLoadFile ( unsigned char *file_name,
 		
 	    //Setores por cluster.
 	    Spc = filesystem->spc;
-	    if(Spc <= 0){
+		
+	    if (Spc <= 0)
+		{
 	        printf("fs-read-fsLoadFile: Spc\n");
 		    goto fail;
 	    };
 	
 	    //Max entries ~ Número de entradas no rootdir.
+		//#bugbug: Devemos ver o número de entradas no diretório corrente.
 	    max = filesystem->rootdir_entries;	
-	    if(max <= 0){
+		
+	    if (max <= 0)
+		{
 	        printf("fs-read-fsLoadFile: max\n");
 			goto fail;
 	    };
@@ -318,7 +329,7 @@ fsLoadFile ( unsigned char *file_name,
 	
 //search_file:
 
-    size_t size = (size_t) strlen(file_name); 
+    size_t size = (size_t) strlen (file_name); 
 	
 	//Compara.
 	while ( i < max )
@@ -332,7 +343,8 @@ fsLoadFile ( unsigned char *file_name,
 			
             // Compara 11 caracteres do nome desejado, 
 			// com o nome encontrado na entrada atual.
-			Status = strncmp( file_name, NameX, size );
+			Status = strncmp ( file_name, NameX, size );
+			
             if ( Status == 0 ){ 
 			    goto found; 
 			}
@@ -341,7 +353,7 @@ fsLoadFile ( unsigned char *file_name,
 		
 		//(32/2) próxima entrada! (16 words) 512 vezes!
         z += 16;    
-        ++i;        
+        i++;        
     }; 
 	
 	// Sai do while. O arquivo não foi encontrado.
@@ -387,6 +399,8 @@ found:
 	printf("loading FAT..\n");
 #endif 
 	
+	//#bugbug: Não devemos carregar a FAT na memória toda vez que 
+	//formos carregar um arquivo. Talvez ela deva ficar sempre na memória.
 	fs_load_fatEx();
 	
     // Carregar o arquivo, cluster por cluster.
@@ -394,7 +408,7 @@ found:
  
     //Debug:
 #ifdef KERNEL_VERBOSE		
-    printf("Loading clusters..\n");
+    printf ("Loading clusters..\n");
     //refresh_screen();
 #endif
 
@@ -433,7 +447,7 @@ next_entry:
     };
 	*/
 	
-	read_lba( file_address, VOLUME1_DATAAREA_LBA + cluster -2 ); 
+	read_lba ( file_address, VOLUME1_DATAAREA_LBA + cluster -2 ); 
 	
 	//Incrementa o buffer. +512;
 	//SECTOR_SIZE;
@@ -578,6 +592,13 @@ void fs_load_directory ( unsigned long address,
  *    Sistema de arquivos fat16.
  *    ? qual disco ?
  *    ? qual volume ? 
+ *    #obs: Essa rotina poderia carregar a fat do volume atual do 
+ * disco atual. É só checar na estrutura.
+ *
+ * current disk, current volume, fat status.
+ *
+ * +se o status da fat para o vulume atual indicar que ela já está carregada,
+ *  então não precisamos carregar novamente.
  */
 void fs_load_fatEx (){
 	
@@ -588,6 +609,15 @@ void fs_load_fatEx (){
 	//Estamos atribuindo um tamanho, mas tem que calcular.
 	unsigned long szFat = 128;
 	
+	
+	//#todo:
+	//+checar qual é o disco atual.
+	//+checar qual é o volume atual.
+	//+checar o status da FAT. Talvez ela já esteja na memória.
+	//obs: a estrutura deve informar onde está a fat do volume,
+	//caso ja esteja na memória.
+	//obs: padronizaremos alguns endereços, e alocaremos outros.
+	
 	//Carregar root dir na memória.
 	for ( i=0; i < szFat; i++ )
 	{
@@ -595,9 +625,8 @@ void fs_load_fatEx (){
 		my_read_hd_sector( VOLUME1_FAT_ADDRESS + b, VOLUME1_FAT_LBA + i, 0 , 0 );
 		b = b+512;    //Incrementa buffer.
 	};
-//done:	
-//    return;
 };
+ 
  
 //preenche o diretorio raiz com informações guardadas em disco. 
 void fs_load_rootdir (){
@@ -609,7 +638,7 @@ void fs_load_rootdir (){
 
 /*
  * fs_load_dir:
- *     Carrega um dado diretorio da lista de arquivos, dado o índice.
+ *     Carrega um dado diretório da lista de arquivos, dado o índice.
  */
 void fs_load_dir ( unsigned long id ){
 	
@@ -618,6 +647,12 @@ void fs_load_dir ( unsigned long id ){
 	unsigned long lba;
 	
     struct dir_d *File;
+	
+	
+	//#todo:
+	//+checar qual é o disco atual.
+	//+checar qual é o volume atual.	
+	
 
 	File = (void *) Streams[id];	
 	

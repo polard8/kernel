@@ -1,15 +1,19 @@
+/*
+ * File: usb.c
+ *
+ * Suporte ao controlador de USB.
+ */
 
-
-// usb.c usb stuffs
 
 
 //int usbInit()
-void usbInit()
-{
-	return;
+void usbInit (){
+	
+	//return;
 };
 
+
 //
-//fim.
+// End.
 //
 

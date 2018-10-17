@@ -79,9 +79,9 @@ void write_fntos (char *name){
 //                     unsigned long address, 
 //	  				   int spc )
 					  
-void fatWriteCluster( unsigned long sector, 
-                      unsigned long address, 
-					  unsigned long spc )
+void fatWriteCluster ( unsigned long sector, 
+                       unsigned long address, 
+					   unsigned long spc )
 {
 	unsigned long i;
 
@@ -162,13 +162,19 @@ done:
 unsigned short list[fat_range_max];
  
 int
-fsSaveFile( char *file_name, 
-            unsigned long file_size,
-            unsigned long size_in_bytes,			
-            char *file_address,
-            char flag )  
+fsSaveFile ( char *file_name, 
+             unsigned long file_size,
+             unsigned long size_in_bytes,			
+             char *file_address,
+             char flag )  
 {
 	int Status = 0;
+	
+	//#bugbug: 
+	//Não vale esse determinismo. 
+	//Temos que saber qual é o disco atual e o volume atual.
+	//Precisamos saber se o root dir já está na memória e se
+	//a fat já está na memória.
 	
     unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
     unsigned short *fat  = (unsigned short *) VOLUME1_FAT_ADDRESS;
@@ -283,6 +289,7 @@ save_file:
 
 	// #bugbug
 	// Limite máximo improvisado.
+	
     j = 512*4;    
  
     // Pegamos o primeiro da lista.
@@ -496,18 +503,22 @@ done:
 		//printf("write_lba n={%d} \n",r);      
         //refresh_screen();		
 	    
-		//Wait interrpt!
+		//Wait interrupt!
 		//Isso funcionou.
 		disk_ata_wait_irq ();
 		
-		write_lba( VOLUME1_ROOTDIR_ADDRESS + roff, 
-	               VOLUME1_ROOTDIR_LBA     + rlbaoff );
+		//#bugbug: Não podemos determinar os valores. 
+		// Precisamos de estruturas.
+		
+		write_lba ( VOLUME1_ROOTDIR_ADDRESS + roff, 
+	                VOLUME1_ROOTDIR_LBA     + rlbaoff );
 				  
         roff = roff + 0x200;
         rlbaoff = rlbaoff + 1;	  		
 	
-	    //wait irq
-		
+	    //#bugbug
+		//?? Estamos esperando antes de gravarmos o próximo.
+		//wait irq
 	};
 
     //reset_ide0 ();

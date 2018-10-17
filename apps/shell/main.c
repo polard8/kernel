@@ -8,6 +8,13 @@
  * deve se comunicar com o GWS, Gramado Window Server. /gramado
  * General purpose application.
  *
+ * #importante 
+ * Observar o conceito de fluxo padrão e o fato de printf enviar conteúdo 
+ * para o buffer stdout. Depois é só imprimir o que está em stdout.
+ * Talvez isso implique em midanças na libc pra ficar parecido com a 
+ * implementação UNIX de output. E o refresh do buffer de saída?
+ * O lado bom é que o buffer de saída poderá ser usado no PIPE.
+ *
  *     SHELL.BIN é um aplicativo de próposito geral. Desenvolvido como 
  * ferramenta do desenvolvedor para prover varios tipos de testes de recursos do sistema.
  *
@@ -1106,7 +1113,10 @@ shellProcedure( struct window_d *window,
 					// Ok, no caso de backspace não deve imprimir nada,
 					// mas talvez avançe.
 					//obs: tem que olhar o que a rotina no kernel faz no caso do backspace.
-					printf ("%c", (char) long1 ); 					
+					
+					shellRefreshCurrentChar();
+					//printf ("%c", (char) long1 ); 					
+					
 					goto done;
                     break;               
             };
@@ -4305,13 +4315,16 @@ void shellClearScreen (){
 	// a área de cliente do shell.
 	//
 
-    shellRefreshScreen();
+    shellRefreshScreen ();
 };
 
 
 /*
  *******************************************
  * shellRefreshScreen:
+ * 
+ *     #importante 
+ *
  *     Copia o conteúdo do (screen_buffer) buffer de output 
  * para a tela. (dentro da janela). 
  * ## Acho que se trata de stdout.
@@ -4355,6 +4368,89 @@ void shellRefreshScreen (){
 	
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
+
+
+// a intenção aqui é fazer o refresh de apenas uma linha do arquivo.
+//#todo podemos fazer o mesmo para um char apenas.
+
+void shellRefreshLine ( int line_number ){
+	
+    int lin = (int) line_number; 
+	int col;  
+	
+	int Offset = 0; //Deslocamento dentro do screen buffer.
+	
+#ifdef SHELL_VERBOSE		
+	//#debug
+	printf("shellRefreshScreen:\n");
+#endif 
+
+	//cursor apontando par ao início da janela.
+	//usado pelo printf.
+	//@todo: podemos colocar o cursor no 
+	//início da área de cliente.
+	//left será a coluna.
+	
+	shellSetCursor (0,0);
+	
+	shellSetCursor ( col, lin );
+		
+	//colunas.
+	for ( col=0; col < 80; col++ )
+	{
+	    //Mostra um char do screen buffer.
+		printf( "%c", screen_buffer[Offset] );
+		    
+		Offset++; //ignora o atributo.
+	    Offset++;
+	};
+	
+    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+};
+
+
+// a intenção aqui é fazer o refresh de apenas uma linha do arquivo.
+//#todo podemos fazer o mesmo para um char apenas.
+
+void shellRefreshChar ( int line_number, int col_number ){
+	
+    
+	int lin = (int) line_number; 
+	int col = (int) col_number;  
+	
+	int Offset = 0; //Deslocamento dentro do screen buffer.
+	
+#ifdef SHELL_VERBOSE		
+	//#debug
+	printf("shellRefreshScreen:\n");
+#endif 
+
+	//cursor apontando par ao início da janela.
+	//usado pelo printf.
+	//@todo: podemos colocar o cursor no 
+	//início da área de cliente.
+	//left será a coluna.
+	
+	shellSetCursor (0,0);
+	
+	shellSetCursor ( col, lin );
+
+	//Mostra um char do screen buffer.
+	printf( "%c", screen_buffer[Offset] );
+		
+    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+};
+
+
+//refresh do char que está na posição usada pelo input.
+void shellRefreshCurrentChar()
+{
+	char c = (char) screen_buffer[ screen_buffer_pos * 2];
+	char attribute = (char) screen_buffer[ (screen_buffer_pos * 2) +1 ];	
+	
+	printf ("%c", (char) c );
+};
+
 
 
 /*
@@ -4492,9 +4588,9 @@ static void del (void){
 
 // Insere um caractere sentro do buffer.
 void 
-shellInsertCharXY( unsigned long x, 
-                   unsigned long y, 
-				   char c )
+shellInsertCharXY ( unsigned long x, 
+                    unsigned long y, 
+				    char c )
 {
 	unsigned long offset = (unsigned long) ((y*80*2) + (x*2)); 
 	
@@ -4566,7 +4662,8 @@ void shellInsertNextChar (char c){
 	    //#fim do buffer
         printf("shellInsertNextChar: limit");		
 	}
-	screen_buffer[ screen_buffer_pos * 2]       = (char) c;
+	
+	screen_buffer[ screen_buffer_pos * 2] = (char) c;
 	screen_buffer[ (screen_buffer_pos * 2) +1 ] = 7;
 };
 
@@ -5381,9 +5478,9 @@ int feedterminalDialog( struct window_d *window,
 				      unsigned long long1, 
 				      unsigned long long2 )
 {
-	int q;
+	//int q;
 	
-	switch(msg)
+	switch (msg)
 	{
 	
 	    //para alimentar o terminal
@@ -5438,7 +5535,8 @@ int feedterminalDialog( struct window_d *window,
 	
     };
 	
-done:
+//done:
+
     return (int) 0;
 };
 
@@ -5479,6 +5577,7 @@ char *concat( char *s1, char *s2, char *s3 ){
 //done:  
   return (void *) result;
 };
+
 
 /* error */
 void error ( char *msg, char *arg1, char *arg2 ){
@@ -5545,9 +5644,10 @@ int shellExecuteThisScript ( char *script_name ){
 	printf("Initializing script ...\n");
     printf("CurrentFile={%s}\n",script_name);
 
-    script_file = fopen(script_name,"rw");
+    script_file = fopen (script_name,"rw");
 	
 	if ( (void *) script_file == NULL ){
+		
 		printf("shellExecuteThisScript: Can't open script file!\n");
 		die("*");
 	}
@@ -5557,13 +5657,13 @@ int shellExecuteThisScript ( char *script_name ){
 	
 
 	for ( i=0; i< 128; i++ ){
+		
 		stdin->_base[i] = script_file->_base[i];
 	}
 	
 	
 	//EOF_Reached = EOF;
 
-//done:	
     return (int) 0;		
 };
 
@@ -5647,7 +5747,7 @@ int absolute_pathname ( char *string ){
 	        return (1);
     }
 	
-    return (0);
+    return (int) 0;
 };
 
 
@@ -5657,11 +5757,14 @@ int shellInitPathname (){
 	
 	int i;
 	
-	if(pathname_initilized == 1){
-		goto done;
+	if (pathname_initilized == 1)
+	{
+		return (int) 0;
+		//goto done;
 	}
 	
 	for ( i=0; i<PATHNAME_LENGHT; i++ ){
+		
 		pathname_buffer[i] = (char) '\0';
 	}
 	
@@ -5669,7 +5772,8 @@ int shellInitPathname (){
 	
 	//...
 	
-done:	
+//done:	
+
     pathname_initilized = 1;
 	return (int) 0;
 };
@@ -5679,15 +5783,17 @@ done:
 
  
 //inicializaremos o supporte a filename
-int shellInitFilename()
-{
+int shellInitFilename (){
+	
 	int i;
 	
-	if(filename_initilized == 1){
-		goto done;
+	if (filename_initilized == 1)
+	{	
+		return (int) 0;
+		//goto done;
 	}
 	
-	for( i=0; i<FILENAME_LENGHT; i++ )
+	for ( i=0; i<FILENAME_LENGHT; i++ )
 	{
 		filename_buffer[i] = (char) '\0';
 	}
@@ -5697,7 +5803,8 @@ int shellInitFilename()
     	
 	//...
 	
-done:	
+//done:
+	
     filename_initilized = 1;
 	return (int) 0;
 };
@@ -5718,8 +5825,8 @@ void shell_pathname_backup ( char *path, int n ){
     //#debug 
 	//printf("%s", path);
 	
-	if(*path)
-       p--;
+	if (*path)
+        p--;
 
     while (n--)
     {
@@ -5736,10 +5843,8 @@ void shell_pathname_backup ( char *path, int n ){
 	//que faça o mesmo que a shell_pathname_backup 	
     //Atualizar no gerenciamento feito pelo kernel.
 	
-	system_call( 176,
-	    (unsigned long) saveN,
-	    (unsigned long) saveN, 
-		(unsigned long) saveN );			
+	system_call ( 176, (unsigned long) saveN, (unsigned long) saveN, 
+        (unsigned long) saveN );			
     	
 };
 
@@ -5747,41 +5852,39 @@ void shell_pathname_backup ( char *path, int n ){
 
 // Imprime todas as strings de um vetor de ponteiros.
 // Isso vai ser usado pelo echo.
-void
-shell_print_tokenList( char *token_list[], char *separator )
-{ 
+
+void shell_print_tokenList ( char *token_list[], char *separator ){
+	
+	int i;
 	char *token;
 	
 	token = (char *) token_list[0];
 	
-	if( token == NULL )
-	    goto fail;
+	if ( token == NULL )
+	    return;
+	    //goto fail;
 	
 	
 	//token = (char *) tokenList[i];
 		
 	//	if( token == NULL ){
-			
-    int i;
-	for( i=0; i,128; i++ )
+		
+    //#todo: Limits.		
+    
+	for ( i=0; i,128; i++ )
     {
 		token = (char *) token_list[i];
 
-	    if( token == NULL )
-	        goto done;
+	    if ( token == NULL )
+	        return;
 		
-		if( strncmp( (char*) token_list[i], "echo", 4 ) == 0 )
+		if ( strncmp ( (char *) token_list[i], "echo", 4 ) == 0 )
 		    continue;	
 		
-		printf("%s", token_list[i]);
-		printf("%s", separator);
-    }
-	
-	
-fail:
-done:
-    return;	
-}
+		printf ("%s", token_list[i] );
+		printf ("%s", separator );
+    };
+};
 
 
 /* 
@@ -5850,21 +5953,20 @@ int is_bin ( char *cmd ){
 	
 	p = cmd;
 	
-	int len = strlen(p);
+	int len = strlen (p);
     
 	if( len <= 4 ) 
 		return 0;
 	
     p += len - 4;
     
-	if( *p++ != '.' ) 
+	if ( *p++ != '.' ) 
 		return 0;
 	
-    if ( strncmp( (char*) p, "bin", 3 ) == 0 ){
+    if ( strncmp ( (char *) p, "bin", 3 ) == 0 ){
 	    return 1;	
 	}
 
-//fail:	
     return 0;
 };
 
@@ -5876,21 +5978,20 @@ int is_sh1 ( char *cmd ){
 	
 	p = cmd;
 	
-	int len = strlen(p);
+	int len = strlen (p);
     
-	if( len <= 4 ) 
+	if ( len <= 4 ) 
 		return 0;
 	
     p += len - 4;
     
-	if( *p++ != '.' ) 
+	if ( *p++ != '.' ) 
 		return 0;
 	
-    if ( strncmp( (char*) p, "sh1", 3 ) == 0 ){
+    if ( strncmp ( (char *) p, "sh1", 3 ) == 0 ){
 	    return 1;	
 	}
-
-//fail:	
+	
     return 0;
 };
 

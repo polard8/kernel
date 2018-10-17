@@ -19,16 +19,15 @@
 
 
 //@todo: mudar o nome da função para fs_clear_fat.
-void fs_apaga_fat ()
-{
+void fs_apaga_fat (){
+	
     fs_init_fat ();
-    //return;
 };
 
 
 void fs_delete_entry ( unsigned long id, unsigned long eid )
 {
-    return;
+    //return;
 };
 
 

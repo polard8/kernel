@@ -49,9 +49,10 @@ int fclose (FILE *stream){
 	//
 
 
-done:	
+//done:
+	
 	return (int) 0;
-}
+};
 
 
 /*
@@ -59,7 +60,14 @@ done:
  * fopen:
  *     @field 2
  *     Open a file.
- *     #bugbug: Por enquanto o limite do tamanho do arquvo é 4KB.
+ *
+ *     #bugbug: 
+ *     Por enquanto o limite do tamanho do arquivo é 4KB.
+ *     
+ *     #todo: 
+ *     Mas já temos recursos para abrimos arquivos maiores 
+ *     usando essa função. É só obtermos o tamanho do arquivo 
+ *     e alocarmos um buffer do tamanho necessário
  */
 FILE *fopen ( const char *filename, const char *mode ){
 	
@@ -81,7 +89,8 @@ FILE *fopen ( const char *filename, const char *mode ){
 	Ret = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
 	if( (void*) Ret == NULL ){
 	    printf("Ret fail\n");
-        goto done;		
+        goto fail;	
+        //return NULL;		
 	}
     */	
 	
@@ -90,9 +99,15 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//Buffer do arquivo.
 	//@todo: Deve ser maior. Do tamanho do arquivo.
 	//Podemos usar outra rotina de alocação de página.
+	
+	//#todo:
+	//já temos recursos para alocar memória para um buffer maior.
+	//obs: Essa alocação vai depender do tamanho do arquivo.
+	
 	file_buffer = (unsigned char *) newPage();
 	
-	if ( (unsigned char *) file_buffer == NULL ){
+	if ( (unsigned char *) file_buffer == NULL )
+	{
 		printf("fopen: file_buffer");
 		die();
 	}	
@@ -101,22 +116,27 @@ FILE *fopen ( const char *filename, const char *mode ){
 	stream->_ptr = stdin->_base;
 	stream->_cnt = PROMPT_MAX_DEFAULT;
 	stream->_file = 0;
-	stream->_tmpfname = (char*) filename;	
+	stream->_tmpfname = (char *) filename;	
 	
 	// Loading file.
-loadingFile:
+//loadingFile:
 
-	fileret = fsLoadFile( (unsigned char *) stream->_tmpfname, (unsigned long) stream->_base);
+	fileret = fsLoadFile ( (unsigned char *) stream->_tmpfname, 
+	            (unsigned long) stream->_base );
 	
-	if ( fileret != 0 ){
+	if ( fileret != 0 )
+	{	
+		printf("fopen: fsLoadFile fail\n");
 		
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "fopen: fsLoadFile");
-	    printf("fopen: fsLoadFile fail\n");
 		stream = NULL;
+		
 		return NULL;
 	};
+	
 	//...
-done:
+	
+//done:
+
 	return (FILE *) stream; 	
 };
 
@@ -1005,7 +1025,12 @@ int stdioInitialize (){
 	
 	int Status = 0;
 	
-	// ## char dimentions ##
+	int i;
+
+	// Buffers para as estruturas.
+	unsigned char *buffer0;
+	unsigned char *buffer1;
+	unsigned char *buffer2;
 	
 	int cWidth = get_char_width ();
 	int cHeight = get_char_height ();
@@ -1017,28 +1042,19 @@ int stdioInitialize (){
 		die();
 	}	
 	
-	int i;
 
-	// Buffers para as estruturas.
-	unsigned char *buffer0;
-	unsigned char *buffer1;
-	unsigned char *buffer2;
-	
-	//
 	// #bugbug:
 	//  4KB alocados para cada estrutura. Isso é muito.
 	//  Mas ao mesmo tempo estamos economizando o heap 
 	//  usado pelo malloc.
 	//  Podemos alocar 4KB para o buffer. 'prompt'
-	//
 	
 	
-	//
 	// Alocando uma página para cada buffer.
 	// 4KB size.
 	// #importante
 	// Obs: Essas páginas são alocadas em user mode.
-	//
+	
 	
 	//4KB
 	buffer0 = (unsigned char *) newPage(); 
@@ -1196,8 +1212,11 @@ int stdioInitialize (){
     prompt_pos = 0;	
 	
 	// Done !
-done:
+	
+//done:
+
     return (int) 0;	
+	
 fail:
     panic ("uitm-libc-stdio-stdioInitialize: fail\n");
 };

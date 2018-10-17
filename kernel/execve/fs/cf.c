@@ -18,8 +18,8 @@
  * fs_create_dir:
  *     Cria um diretório.
  */
-unsigned long fs_create_dir( char *name, unsigned long id )
-{
+unsigned long fs_create_dir ( char *name, unsigned long id ){
+	
 	return 1;
 	//return fs_create_file( name, id ); 
 };
@@ -107,14 +107,14 @@ void fs_create_entry( char *name,            //nome do arquivo
 					 unsigned long size )    //tamanho do arquivo.
 					                         //continua
 {
-    return;
+   // return;
 };   
 
 
 
 void fs_create_name( char *name, unsigned long id,unsigned long eid)
 {
-    return;
+    //return;
 };   
 
 
@@ -129,7 +129,7 @@ void fs_create_name( char *name, unsigned long id,unsigned long eid)
  */
 void create_system_folders()
 {
-	return;
+	//return;
 };
 
 

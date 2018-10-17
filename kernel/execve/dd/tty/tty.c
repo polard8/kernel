@@ -8,19 +8,20 @@
  * o driver tty deve enviar o caractere para o dispositivo de saíta adequado 
  * atravéz do kernel.
  *
+ * #obs: Vamos montar dispositivos de terminal virtual em /DEV
  */
+ 
  
 #include <kernel.h> 
  
  
-void *createTTYLine()
-{
+void *createTTYLine (){
+	
 	int i;
 	struct ttyline_d *l;
 	
-	
 	//Alocando memória para uma estrutura de linha.
-	l = (void *) malloc( sizeof(struct ttyline_d) );
+	l = (void *) malloc ( sizeof(struct ttyline_d) );
 
     if( (void *) l == NULL )
 	{
@@ -32,7 +33,8 @@ void *createTTYLine()
 	//Inicializar as variáveis dentro da estrutura.
 	
 	//zerando o buffer de caracteres.	
-	for(i = 0; i < TTYCHARS_COUNT_MAX; i++){
+	for (i = 0; i < TTYCHARS_COUNT_MAX; i++ ){
+		
 	    l->c[i] = 0;  
 	}
 	
@@ -43,8 +45,10 @@ void *createTTYLine()
 	
 	
 	ttyLineCounter++;
-	if( ttyLineCounter >= TTYLINES_COUNT_MAX )
+	
+	if ( ttyLineCounter >= TTYLINES_COUNT_MAX )
 	{
+		//#debug
 		printf("createTTYLine: Line limits\n");
 		refresh_screen();
 		//free(l);
@@ -65,7 +69,8 @@ void *createTTYLine()
 	
 	//...
 	
-done:	
+//done:
+	
     return (void *) l;	
 }; 
  
@@ -76,11 +81,12 @@ done:
  *     Inicialização do módulo.
  *
  */
-int ttyInit()
-{
+int ttyInit (){
+	
 	int i;
 	
-	for( i=0; i < TTYLINES_COUNT_MAX; i++ ){
+	for ( i=0; i < TTYLINES_COUNT_MAX; i++ )
+	{
 	    //developer_ttylines[i] = NULL;	
 	}
 	
@@ -90,7 +96,8 @@ int ttyInit()
 	input_line = (void *) createTTYLine(); 
 	
 	//...
-done: 
+//done: 
+
 	return (int) 0; 
 };
 

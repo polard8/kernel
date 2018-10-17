@@ -1,7 +1,10 @@
 /*
  * File: fs\vfs.c
+ *
  *     Virtual File System
  *     Sistema de arquivos virtual gerenciado pelo kernel base.
+ *
+ * 2018 - Created by Fred Nora.
  */
 
 
@@ -9,7 +12,6 @@
 
 
 /*
- **********************************
  * vfsInit:
  *     Initializing VFS.
  *     #todo: esse retorno tem que ser int.
@@ -38,22 +40,26 @@ void vfsInit (){
 	VFS_INFO.help_string = "Virtual File System help string @todo";
 	
 	// ## root dir address  ##
-	VFS_INFO.rootdir_address = (unsigned long) malloc( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE);
+	VFS_INFO.rootdir_address = (unsigned long) malloc ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
 	
 	if ( VFS_INFO.rootdir_address = 0 ){
 		
-	    printf("VFS fail!\n");	
+	    printf("vfsInit: VFS_INFO.rootdir_address\n");	
 	    die();
 	}
 	
 	//foi definido em stdio.h
 	//FILE *vfs;
 	
-	vfs = (FILE *) malloc( sizeof(FILE) );
+	vfs = (FILE *) malloc ( sizeof(FILE) );
+	
+	//#bugbug:
+	//#todo:
+	//Checar antes a validade dessa estrutura.
 	
 	vfs->_base = (char *) VFS_INFO.rootdir_address;
 	vfs->_ptr = stdin->_base;
-	vfs->_cnt = (VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE);
+	vfs->_cnt = ( VFS_ROOTDIR_NUMBER_OF_ENTRIES * VFS_ROOTDIR_ENTRY_SIZE );
 	vfs->_file = 0; //?
 	vfs->_tmpfname = "vfs-stream";
 	
@@ -70,7 +76,6 @@ void vfsInit (){
 	printf("VFS Initialized\n");
 #endif	
 	
-	//return;
 };
 
 

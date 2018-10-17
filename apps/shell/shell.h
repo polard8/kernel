@@ -996,6 +996,11 @@ int shmain ( int argc, char **argv );
 
 void shellClearScreen();
 void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
+void shellRefreshLine ( int line_number );
+void shellRefreshChar ( int line_number, int col_number );
+void shellRefreshCurrentChar(); //refresh do char que está na posição usada pelo input.
+
+
 
 //scroll dentro da screen_buffer. (VGA emulada)
 void shellScroll();
@@ -1061,6 +1066,7 @@ void shellShowWindowInfo();
 void shellShowInfo();
 void shellShowMetrics();
 void shellShowSystemInfo();
+
 unsigned long 
 shellSendMessage( struct window_d *window, 
                   int msg, 
@@ -1073,7 +1079,7 @@ shellSendMessage( struct window_d *window,
 void shellWaitCmd();             
  
  // Compare comands.
-unsigned long shellCompare(struct window_d *window);    //Compare command. 
+unsigned long shellCompare (struct window_d *window);   
  
 // Initialization. 
 int shellInit( struct window_d *window );                //Init.
@@ -1088,17 +1094,16 @@ void shellShell();               //Constructor.
 
 
 // copia bytes	
-void shell_memcpy_bytes( unsigned char *Dest, 
-                         unsigned char *Source,
-                         unsigned long Length );
+void shell_memcpy_bytes ( unsigned char *Dest, 
+                          unsigned char *Source,
+                          unsigned long Length );
 
  
  
 void shellUpdateCurrentDirectoryID( int id ); 
 void shellUpdateWorkingDiretoryString( char *string );
 
-void 
-shellInitializeWorkingDiretoryString();
+void shellInitializeWorkingDiretoryString ();
 
 //lista informações sobre os processos.
 void shellTaskList();
@@ -1148,16 +1153,16 @@ int shellDisplayBMP( char *file_name );
 void shellTestDisplayBMP();
 
 
-void bmpDisplayBMP( void* address, 
-                    unsigned long x, 
-					unsigned long y, 
-					int width, 
-					int height );
+void bmpDisplayBMP ( void* address, 
+                     unsigned long x, 
+					 unsigned long y, 
+					 int width, 
+					 int height );
 					
 				
 
 //um comando no shell aponta o script para executar.
-int shellExecuteThisScript( char* script_name );
+int shellExecuteThisScript ( char* script_name );
 					
 /*
  **************************************
@@ -1176,13 +1181,13 @@ int absolute_pathname ( char *string );
 
 
 //inicializaremos o supporte a pathname
-int shellInitPathname();
+int shellInitPathname ();
 
 
 //inicializaremos o supporte a filename
-int shellInitFilename();
+int shellInitFilename ();
 
-void shellExit(int code);	
+void shellExit (int code);	
 
 /* 
  Remove the last N directories from PATH.  
@@ -1190,12 +1195,10 @@ void shellExit(int code);
  PATH must contain enough space for MAXPATHLEN characters. 
  Credits: bash 1.05
  */
-void 
-shell_pathname_backup( char *path, int n ); 
+void shell_pathname_backup ( char *path, int n ); 
 
 //isso vai ser usado pelo echo.
-void
-shell_print_tokenList(char *token_list[], char *separator);	
+void shell_print_tokenList ( char *token_list[], char *separator );	
 
 
 /* Check if it's a .bin file */
