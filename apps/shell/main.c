@@ -155,6 +155,7 @@ struct command cmd_table[] = {
 
 */
 
+ 
 
 //#define MIN(x,y) ((x < y) ? x : y)
 
@@ -398,6 +399,13 @@ char *concat( char *s1, char *s2, char *s3 );
 char *save_string ( char *s, int len );
 
 int shell_save_file();
+
+
+//
+// testes de scroll.
+//
+void testScrollChar();
+
 
 //
 // Internas.
@@ -737,7 +745,7 @@ noArgs:
 	//
 	
 	//#bugbug 
-	// esses valores são usados para construir a janela princpal.
+	// esses valores são usados para construir a janela principal.
 	// o que desejamos são os valores do retângulo da área de cliente 
 	// da janela principal.
 	
@@ -1114,7 +1122,10 @@ shellProcedure( struct window_d *window,
 					// mas talvez avançe.
 					//obs: tem que olhar o que a rotina no kernel faz no caso do backspace.
 					
-					shellRefreshCurrentChar();
+					//#importante: A ROTINA QUE INSERE O CHAR TEM QUE EFETUAR O REFRESH 
+					//ASSIM ELA PODE CHAMAR O SCROLL SE PRECISAR.
+					
+					//shellRefreshCurrentChar();
 					//printf ("%c", (char) long1 ); 	//deletar.				
 					
 					goto done;
@@ -2644,6 +2655,23 @@ do_compare:
     };
 	
 	
+	//scroll1
+	if ( strncmp( prompt, "scroll1", 7 ) == 0 )
+	{
+	    testScrollChar((int) '1');
+        goto exit_cmp;		
+	}
+	
+	
+	//scroll2
+	if ( strncmp( prompt, "scroll2", 7 ) == 0 )
+	{
+	     testScrollChar((int) '2');
+        goto exit_cmp;		
+	}	
+	
+	
+	
 	// service
 	//podemos tertar serviços do kernel 
 	//enviando argumentos nulos.
@@ -3264,6 +3292,8 @@ void shellShell (){
 	shellScreenWidth = apiGetSystemMetrics(1);
     shellScreenHeight = apiGetSystemMetrics(2); 	
 	
+	
+	
 	//Tamanho da janela do shell	
 	shellWindowWidth = ((shellScreenWidth/3) * 2);
 	shellWindowHeight = ((shellScreenHeight/3) * 2); 
@@ -3383,6 +3413,7 @@ int shellInit ( struct window_d *window ){
     //     Esse ponteiro de estrutura está em kernel mode. 
 	//     Não podemos usá-lo.
 	
+	//??
 	//stream status
 	shell_info.stream_status = 0;
 	
@@ -3441,14 +3472,15 @@ int shellInit ( struct window_d *window ){
 	
 	if ( (void *) window == NULL )
 	{
-	    printf("shellInit: window fail.\n");    
-	}else{
+	    printf("shellInit: window fail.\n"); 
+		
+	} else {
 		
 		// Nesse momento temos um ponteiro válido,
 		// mas infelismente não podemos testar outros elementos 
 		// da estrutura.
 		
-		APISetFocus( window );
+		APISetFocus ( window );
 		
 		// mensagens !!
 		
@@ -3465,10 +3497,11 @@ int shellInit ( struct window_d *window ){
 	//
 	
 	//Active window
-	ActiveWindowId = (int) APIGetActiveWindow();
+	ActiveWindowId = (int) APIGetActiveWindow ();
 	
 	//valor de erro
 	if ( ActiveWindowId == (-1) ){
+		
 	    printf("shellInit: ERROR getting Active window ID\n");	
 	}	
 	
@@ -3939,7 +3972,7 @@ void shellThread (){
 	printf("$\n");
 	printf("$$\n");
 	//printf("$$$\n");
-    printf(" #### This is a thread ####\n");
+    printf("#### This is a thread ####\n");
 	//printf("$$$\n");
 	printf("$$\n");
 	printf("$\n");
@@ -4085,13 +4118,21 @@ void shellTestLoadFile (){
 	
 	//#importante:
 	//precisa ser arquivo pequeno.
-	f = fopen ("init.txt","rb");  
+	
+	
+	f = fopen ("gramado.txt","rb");  	
+	
+	//pequeno
+	//f = fopen ("init.txt","rb");  
+	
+	//grande
+	//f = fopen ("init.txt","rb");  	
 	
     if( f == NULL )
 	{
 		printf("fopen fail\n");
 	}else{
-		printf("fopen ok\n");
+		//printf("fopen ok\n");
 	};	
 	
 	
@@ -4106,8 +4147,8 @@ void shellTestLoadFile (){
 		
 		if( ch_test == EOF )
 		{
-			printf("\n");
-			printf("EOF reached :)\n");
+			//printf("\n");
+			//printf("EOF reached :)\n");
 			goto done;
 		
 		} else {
@@ -4268,6 +4309,10 @@ void shellTestThreads (){
  */
 void shellClearScreen (){
 	
+	
+    //desabilita o cursor
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+	
 	int i;
 	
 #ifdef SHELL_VERBOSE	
@@ -4292,6 +4337,9 @@ void shellClearScreen (){
 	//
 
     shellRefreshScreen ();
+	
+	//reabilita o cursor
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
 
 
@@ -4323,10 +4371,21 @@ void shellRefreshScreen (){
 	//@todo: podemos colocar o cursor no 
 	//início da área de cliente.
 	//left será a coluna.
-	shellSetCursor(0,0);
+	
+	//shellSetCursor(0,0);
+	
+	
+	unsigned long left, top, right, bottom;
+ 
+    left = (terminal_rect.left/8);
+    top = (terminal_rect.top/8);
+	
+    shellSetCursor ( left, top );
+	
+	bottom = ( (terminal_rect.top + terminal_rect.height) /8);
 	
 	//linhas.
-	for( lin=0; lin < 25; lin++)
+	for( lin=top; lin < bottom ; lin++ )
 	{
 		col = 0;
 		shellSetCursor(col,lin);
@@ -4341,6 +4400,8 @@ void shellRefreshScreen (){
 		    Offset++;
 	    }
 	};
+	
+	
 	
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
@@ -4440,61 +4501,53 @@ void shellRefreshCurrentChar()
  */
 void shellScroll (){
 	
-	int index = 0;
-	int next_line_index = 0;
+	//desabilita o cursor
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+
+	uint8_t attribute_byte = (0 << 4) | (15 & 0x0F);	/* attribute_byte background BLACK foreground WHITE */
+	uint16_t blank = 0x20 | (attribute_byte << 8);	/* 0x20 is space */
+
 	
-	//screen buffer.
-	//atualiza o terminal buffer dentro do limite visivel.
+	//apontamos para o início do buffer.
+	uint16_t *w_screen_buffer = (uint16_t *) &screen_buffer[0];
 	
-	int i;
-	int j;
-	
-	//copiaremos 24 linhas
-	for( i=0; i < (25 -1); i++) 
-	{
-		//copiar uma linha de caracteres e atributos.
-		//Copia uma linha na linha anterior.
-		for( j=0; j < (80*2); j++) 
-		{
-			//(linha)+offset
-			//o deslocamento máximo é 80*2.
-			index = (i * (80*2)) + j;
-			
-			//temos que começar da linha 1 e não da linha 0.
-			next_line_index = index + (80*2);
-			
-			screen_buffer[index] = screen_buffer[next_line_index];
-		}
-	};
-	
-	
-	//nesse momento copiamos 24 linhas,
-	//então vamos limpara a linha 24, que é a última linha,
-	//essa é a vigésima quinta linha.
-	int up_count = ((25 -1) * (80*2));
-	
-	//deslocamento dentro da linha.
-	//80 deslocamentos.
-	for( j=0; j < 80; i++) 
-	{
-		//base referente ao início da última linha,
-		//mais o deslocamento.
-		index = up_count + j;
+	/* 
+	 * while cursor y postion equal 25, than should get new line,
+	 * copy all the data to previous, so clear the first row,
+	 * and the last row fill space
+	 */
+	//if (pos_y >= 25) 
+	//{
+		int i;
 		
-		//pinta espaço na última linha.		
-	    screen_buffer[ 2*index ] = ' ';    //char 
-		screen_buffer[ 2*index +1] = 0x7;  //atributo 
-	}
+		for (i = 0 * 80; i < 24 * 80; i++) 
+		{
+		    w_screen_buffer[i] = w_screen_buffer[i+80];
+		}
 
+		for (i = 24 * 80; i < 25 * 80; i++) 
+		{
+		    w_screen_buffer[i] = blank;
+		}
 
-    //
-    // ## Refresh ##
-    //
+		//pos_y = 24;
+	//}
 	
-	//depois de atualizado o conteúdo do buffer 
-	//é necessário efetuar refresh e mostrar na tela.
-	//shellRefreshScreen();
+	//devemos voltar para o inpicio da janela e mostrar o buffer que foi atualizado.
+	//#todo: corrigir esse posicionamento.
+	
+	unsigned long left, top, right, bottom;
+ 
+    left = (terminal_rect.left/8);
+    top = (terminal_rect.top/8);	
+	
+	//shellSetCursor(0,0);
+	shellSetCursor(left,top);
+	
 	shellShowScreenBuffer();
+	
+	//reabilita o cursor
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
 
 
@@ -4615,7 +4668,25 @@ void shellFillOutputBuffer( char element, int element_type )
 }
 */
 
-
+//usado para teste de scroll.
+//imprime varias vezes o char indicado.
+void testScrollChar( int c )
+{
+    int i;
+	
+	//char c = '1';
+	
+    //for ( i=0; i < (80*26); i++ )
+	//	shellInsertNextChar ((int) c);		
+	
+    for ( i=0; i < (80*26); i++ )
+	{
+	    //se chegamos no limite do screen_buffer
+		    //...
+			shellInsertNextChar ((int) c);	
+		
+	}		
+}
 
 /*
  ***************************************************
@@ -4633,14 +4704,22 @@ void shellInsertNextChar (char c){
 	//o máximo será 80*25
 	
 	screen_buffer_pos++;
-	if( screen_buffer_pos >= (80*25) )
+	if ( screen_buffer_pos >= (80*25) )
 	{
 	    //#fim do buffer
-        printf("shellInsertNextChar: limit");		
+        //printf("X");
+        shellScroll ();	
+		
+		//início da última linha.
+		screen_buffer_pos = (80*24) + 1;
 	}
 	
 	screen_buffer[ screen_buffer_pos * 2] = (char) c;
 	screen_buffer[ (screen_buffer_pos * 2) +1 ] = 7;
+	
+	
+	//mostra o char.
+	shellRefreshCurrentChar();
 };
 
 
@@ -6058,10 +6137,11 @@ int shell_save_file (){
 				
 	//if (Ret == 0)
 	
-	printf("t5: done.\n");	
+	printf("t5: done\n");	
 	
 	return (int) Ret;
 };
+
 
 /*
  Credits: gcc 0.9 
