@@ -179,18 +179,58 @@ struct screen_buffer_d
 unsigned long screenbufferList[8];
 
 //
-// Metrics.
+// ## System Metrics ##
 //
 
+int smScreenWidth;                   //1 
+int smScreenHeight;                  //2
+unsigned long smCursorWidth;         //3
+unsigned long smCursorHeight;        //4
+unsigned long smMousePointerWidth;   //5
+unsigned long smMousePointerHeight;  //6
+unsigned long smCharWidth;           //7
+unsigned long smCharHeight;          //8
+//...
 
-//Screen size.
-int shellMaxColumns;       //80   
-int shellMaxRows;          //25
-int shellScreenWidth;      //800 
-int shellScreenHeight;     //600
+//
+// ## Window limits ##
+//
+
+//full screen support
+unsigned long wlFullScreenLeft;
+unsigned long wlFullScreenTop;
+unsigned long wlFullScreenWidth;
+unsigned long wlFullScreenHeight;
+
+//limite de tamanho da janela.
+unsigned long wlMinWindowWidth;
+unsigned long wlMinWindowHeight;
+unsigned long wlMaxWindowWidth;
+unsigned long wlMaxWindowHeight;
+
+//quantidade de linhas e colunas na área de cliente.
+int wlMinColumns;
+int wlMinRows;
+int wlMaxColumns;
+int wlMaxRows;
+
+//...
 
 
-//linux style.
+//
+//  ## Window size ##
+//
+
+unsigned long wsWindowWidth;
+unsigned long wsWindowHeight;
+//...
+
+
+
+
+//
+// ## Linux style ##
+//
 
 //Screen start and screen end.
 

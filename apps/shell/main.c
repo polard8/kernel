@@ -400,6 +400,8 @@ char *save_string ( char *s, int len );
 
 int shell_save_file();
 
+void shellInitSystemMetrics();
+void shellInitWindowLimits();
 
 //
 // testes de scroll.
@@ -751,8 +753,8 @@ noArgs:
 	
 	terminal_rect.left = shell_window_x;
 	terminal_rect.top = shell_window_y;
-	terminal_rect.width = shellWindowWidth;
-	terminal_rect.height = shellWindowHeight;
+	terminal_rect.width = wsWindowWidth;
+	terminal_rect.height = wsWindowHeight;
 	
 	apiBeginPaint();
 	
@@ -770,7 +772,7 @@ noArgs:
 	
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    shell_window_x, shell_window_y, 
-					    shellWindowWidth, shellWindowHeight,    
+					    wsWindowWidth, wsWindowHeight,    
                         0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
 
 	if ( (void *) hWindow == NULL ){
@@ -921,24 +923,7 @@ noArgs:
 
 	//@todo: 0,0 não está na área de cliente.
 	
-	/*
-	printf("Testing cursor ...\n");
-    
-	shellSetCursor(shellMaxColumns,shellMaxRows);  
-	printf("C");
-	shellSetCursor(shellMaxColumns-1,shellMaxRows-1);
-	printf("U");
-	shellSetCursor(shellMaxColumns-2,shellMaxRows-2);
-	printf("R");
-	shellSetCursor(shellMaxColumns-3,shellMaxRows-3);
-	printf("S");
-	shellSetCursor(shellMaxColumns-4,shellMaxRows-4);
-	printf("O");
-	shellSetCursor(shellMaxColumns-5,shellMaxRows-5);
-	printf("R");
-	shellSetCursor(shellMaxColumns-6,shellMaxRows-6);
-	printf(":)");
-	*/
+ 
 	
 	//
 	// **** Mensagens  ****
@@ -3260,6 +3245,52 @@ done:
 };
 
 
+
+void shellInitSystemMetrics()
+{
+	//pegaremos todas as metricas de uma vez só,
+	//se uma falhar, então pegaremos tudo novamente.
+	
+	// Tamanho da tela.	
+	smScreenWidth = apiGetSystemMetrics(1);
+    smScreenHeight = apiGetSystemMetrics(2); 
+	smCursorWidth = apiGetSystemMetrics(3);
+	smCursorHeight = apiGetSystemMetrics(4);
+	smMousePointerWidth = apiGetSystemMetrics(5);
+	smMousePointerHeight = apiGetSystemMetrics(6);
+	smCharWidth = apiGetSystemMetrics(7);
+	smCharHeight = apiGetSystemMetrics(8);	
+	//...
+} 
+
+void shellInitWindowLimits()
+{
+    //
+    // ## Window limits ##
+    //
+
+    //full screen support
+    wlFullScreenLeft = 0;
+    wlFullScreenTop = 0;
+    wlFullScreenWidth = smScreenWidth;
+    wlFullScreenHeight = smScreenHeight;
+	
+    //limite de tamanho da janela.
+    wlMinWindowWidth = smCharWidth * 80;
+    wlMinWindowHeight = smCharWidth * 25;
+    wlMaxWindowWidth = wlFullScreenWidth;
+    wlMaxWindowHeight = wlFullScreenHeight;	
+	
+    //quantidade de linhas e colunas na área de cliente.
+    wlMinColumns = 80;
+    wlMinRows = 1;
+    wlMaxColumns = (wlFullScreenWidth / 8);
+    wlMaxRows = (wlFullScreenHeight / 8);
+	
+	//...
+}
+
+
 /*
  ******************************************
  * shellShell:
@@ -3285,28 +3316,31 @@ void shellShell (){
 	// Usar o get system metrics para pegar o 
 	// tamanho da tela.
 	
+
+	
+	//inicializa as metricas do sistema.
+	shellInitSystemMetrics ();
+	
+    //inicializa os limites da janela.
+	shellInitWindowLimits();
+	
+	
 	// ## Window size and position ##
-	//#obs: Isso está muito legal. Não mudar.
-	
-	// Tamanho da tela.	
-	shellScreenWidth = apiGetSystemMetrics(1);
-    shellScreenHeight = apiGetSystemMetrics(2); 	
-	
-	
+	//#obs: Isso está muito legal. Não mudar.	
 	
 	//Tamanho da janela do shell	
-	shellWindowWidth = ((shellScreenWidth/3) * 2);
-	shellWindowHeight = ((shellScreenHeight/3) * 2); 
+	wsWindowWidth = ((smScreenWidth/3) * 2);
+	wsWindowHeight = ((smScreenHeight/3) * 2); 
 		
 	//window position
-	shell_window_x = (unsigned long) ( (shellScreenWidth - shellWindowWidth)/2 );
-	shell_window_y = (unsigned long) ( (shellScreenHeight - shellWindowHeight)/2 );   
+	shell_window_x = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
+	shell_window_y = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
 	
 	
 	
 	//limits.
-    shellMaxColumns = (shellWindowWidth/8);   //DEFAULT_MAX_COLUMNS; 
-    shellMaxRows = (shellWindowHeight/8);     //DEFAULT_MAX_ROWS;     
+    wlMaxColumns = (wsWindowWidth/8);   //DEFAULT_MAX_COLUMNS; 
+    wlMaxRows = (wsWindowHeight/8);     //DEFAULT_MAX_ROWS;     
  
     //...	
 
@@ -3352,8 +3386,8 @@ void shellShell (){
 	//
 	
 	// Número máximo de colunas e linhas.
-	g_columns = shellMaxColumns;  // 80;
-	g_rows = shellMaxRows;        // 25;
+	g_columns = wlMaxColumns;  // 80;
+	g_rows = wlMaxRows;        // 25;
     //...
 	
 	
@@ -3530,8 +3564,8 @@ int shellInit ( struct window_d *window ){
 	
 #ifdef SHELL_VERBOSE		
 	//columns and rows
-	printf("shellMaxColumns={%d} \n", shellMaxColumns );
-	printf("shellMaxRows={%d} \n", shellMaxRows );	
+	printf("wlMaxColumns={%d} \n", wlMaxColumns );
+	printf("wlMaxRows={%d} \n", wlMaxRows );	
 #endif
 	
 	
@@ -4849,8 +4883,8 @@ void shellShowInfo (){
 	}
   
 	printf("Process info: PID={%d} PPID={%d} \n", PID, PPID );
-	printf("shellMaxColumns={%d} \n", shellMaxColumns );
-	printf("shellMaxRows={%d} \n", shellMaxRows );	
+	printf("wlMaxColumns={%d} \n", wlMaxColumns );
+	printf("wlMaxRows={%d} \n", wlMaxRows );	
 	//...
 };
 
@@ -4858,39 +4892,20 @@ void shellShowInfo (){
 //metrics
 void shellShowMetrics (){
 	
-	unsigned long screen_width;
-	unsigned long screen_height;
-	unsigned long cursor_width;
-	unsigned long cursor_height;
-	//unsigned long mouse_pointer_width;
-	//unsigned long mouse_pointer_height;
-	unsigned long char_width;
-	unsigned long char_height;	
-	//...
-
-	screen_width = apiGetSystemMetrics(1);
-	screen_height = apiGetSystemMetrics(2);
+    //reinicializa as metricas do sistema.
+	//isso pega os valores e coloca nas variáveis globais.
 	
-	cursor_width = apiGetSystemMetrics(3);
-	cursor_height = apiGetSystemMetrics(4);
+	shellInitSystemMetrics();
 	
-	//mouse_pointer_width = apiGetSystemMetrics(5);
-	//mouse_pointer_height = apiGetSystemMetrics(6);
-	
-	char_width = apiGetSystemMetrics(7);
-	char_height = apiGetSystemMetrics(8);
-	//...
 	
 	printf("\n");  
-	printf(" # shellShowMetrics: #\n");
-	printf("screenWidth={%d} screenHeight={%d}\n",screen_width, screen_height );
-		
-	printf("cursorWidth={%d} cursorHeight={%d}\n", cursor_width, cursor_height );
-		
-	//printf("mousepointerWidth={%d} mousepointerHeight={%d}\n", 
-	//    mouse_pointer_width, mouse_pointer_height );
+	printf(" # shellShowMetrics: # \n");
 	
-	printf("charWidth={%d} charHeight={%d}\n",char_width, char_height );	
+	printf("screenWidth={%d} screenHeight={%d}\n",smScreenWidth, smScreenHeight );
+	printf("cursorWidth={%d} cursorHeight={%d}\n", smCursorWidth, smCursorHeight );
+	printf("mousepointerWidth={%d} mousepointerHeight={%d}\n", 
+	    smMousePointerWidth, smMousePointerHeight );
+	printf("charWidth={%d} charHeight={%d}\n", smCharWidth, smCharHeight );	
 	//...
 	
     printf("Done\n");	
