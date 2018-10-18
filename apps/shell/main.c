@@ -402,6 +402,7 @@ int shell_save_file();
 
 void shellInitSystemMetrics();
 void shellInitWindowLimits();
+void shellInitWindowSizes();
 
 //
 // testes de scroll.
@@ -751,8 +752,8 @@ noArgs:
 	// o que desejamos são os valores do retângulo da área de cliente 
 	// da janela principal.
 	
-	terminal_rect.left = shell_window_x;
-	terminal_rect.top = shell_window_y;
+	terminal_rect.left = wpWindowLeft;
+	terminal_rect.top = wpWindowTop;
 	terminal_rect.width = wsWindowWidth;
 	terminal_rect.height = wsWindowHeight;
 	
@@ -771,7 +772,7 @@ noArgs:
     //não completamente preto.	
 	
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
-	                    shell_window_x, shell_window_y, 
+	                    wpWindowLeft, wpWindowTop, 
 					    wsWindowWidth, wsWindowHeight,    
                         0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
 
@@ -3291,6 +3292,18 @@ void shellInitWindowLimits()
 }
 
 
+void shellInitWindowSizes()
+{
+	
+//
+//  ## Window size ##
+//
+
+    wsWindowWidth = wlMinWindowWidth;
+    wsWindowHeight = wlMinWindowHeight;	
+}
+
+
 /*
  ******************************************
  * shellShell:
@@ -3324,17 +3337,29 @@ void shellShell (){
     //inicializa os limites da janela.
 	shellInitWindowLimits();
 	
+	//inicia o tamanho da janela.
+	shellInitWindowSizes();
+	
 	
 	// ## Window size and position ##
 	//#obs: Isso está muito legal. Não mudar.	
 	
 	//Tamanho da janela do shell	
-	wsWindowWidth = ((smScreenWidth/3) * 2);
-	wsWindowHeight = ((smScreenHeight/3) * 2); 
+	
+	if ( wsWindowWidth < wlMinWindowWidth )
+	{
+		wsWindowWidth = wlMinWindowWidth;
+	}
+	
+	if ( wsWindowHeight < wlMinWindowHeight )
+	{
+	    wsWindowHeight = wlMinWindowHeight;	
+	}
+	
 		
 	//window position
-	shell_window_x = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
-	shell_window_y = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
+	wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
+	wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
 	
 	
 	
