@@ -251,7 +251,7 @@
 #define	SYS_BUFFER_DRAWCHAR_WWF 131
 #define	SYS_132 132
 #define	SYS_133 133
-#define	SYS_134 134
+#define	SYS_134 134  //pegar informações sobre a área de cliente de uma janela;
  //coloca caracteres na estrutura de terminal, para aplciativos pegarem
 #define	SYS_FEEDTERMINAL 135
 #define	SYS_136 136

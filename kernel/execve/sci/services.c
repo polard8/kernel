@@ -1003,6 +1003,26 @@ void *services( unsigned long number,
     		break;
 			
 			
+		//134
+		//pegar informações sobre a área de cliente de uma janela;
+		case 134:
+		        hWnd = (struct window_d *) arg2;
+                if ( (void *) hWnd != NULL )
+                {	
+                    //#bugbug: temos que checar mais validade de estrutura.
+					
+					//obs: No começo dessa função, colocamos o arg3 como ponteiro para a3.
+					//um buffer de longs.
+					
+		    	    a3[0] = (unsigned long) hWnd->rcClient->left;
+			        a3[1] = (unsigned long) hWnd->rcClient->top; //*importante: mensagem nula.
+			        a3[2] = (unsigned long) hWnd->rcClient->width;
+			        a3[3] = (unsigned long) hWnd->rcClient->height;
+					a3[3] = (unsigned long) hWnd->rcClient->color_bg;
+					//...
+				}
+		    break;
+		
 		// 135
 		// Coloca caracteres na estrutura de terminal, para aplciativos pegarem
         case SYS_FEEDTERMINAL:
@@ -1064,7 +1084,8 @@ void *services( unsigned long number,
 		//144	
 		//Pega o ponteiro da client area.	
 		case SYS_GETCLIENTAREARECT:	
-		    return (void *) getClientAreaRect();	
+		    //#bugbug: pegamos o ponteiro mas não temos permissão para acessar a estrutura.
+			return (void *) getClientAreaRect();	
 			break;
 		
 		//145

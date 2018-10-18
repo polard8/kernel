@@ -195,6 +195,8 @@ int wlMinRows;
 int wlMaxColumns;
 int wlMaxRows;
 
+
+
 //...
 
 
@@ -253,6 +255,10 @@ int textBottomRow;
 //linha e coluna atuais
 int textCurrentRow;
 int textCurrentCol;
+
+int textWheelDelta; //delta para rolagem do texto.
+int textMinWheelDelta;  //mínimo que se pode rolar o texto
+int textMaxWheelDelta;  //máximo que se pode rolar o texto
 //...
 
 

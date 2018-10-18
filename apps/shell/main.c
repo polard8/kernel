@@ -68,7 +68,12 @@
  passes it to all active console devices if the priority of the message is 
  less than console_loglevel. 
 */ 
- 
+
+//# usado para teste 
+#define WINDOW_WIDTH     400 
+#define WINDOW_HEIGHT    600
+#define WINDOW_LEFT      0
+#define WINDOW_TOP       0
  
 //
 // Includes.
@@ -417,7 +422,11 @@ int textGetBottomRow ();
 
 
 void clearLine ( int line_number );
+
+
 void testShowLines();
+void testChangeVisibleArea();
+
 
 void shellRefreshVisibleArea();
 
@@ -840,6 +849,34 @@ noArgs:
 	//#importante
 	refresh_screen ();
 	
+	
+	//
+	// #importante:
+	// +pegamos o retângulo referente à area de cliente da janela registrada. 
+	// +atualizamos as variáveis que precisam dessa informação. 
+	// reposicionamos o cursor.
+	// reabilitamos a piscagem de cursor.
+	//
+	
+	/*
+	#bugbug: isso deixou i sistema lerdo.
+	unsigned long xbuffer[4];
+	
+	system_call ( 134, (unsigned long) hWindow, (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );
+	
+	
+	terminal_rect.left = xbuffer[0];
+	terminal_rect.top = xbuffer[1];
+	terminal_rect.width = xbuffer[2];
+	terminal_rect.height = xbuffer[3];	
+	
+	//wpWindowLeft = 
+	//wpWindowTop = 
+	
+	//if( 
+	shellSetCursor ( (terminal_rect.left / 8) , ( terminal_rect.top/8) );
+	//...
+	*/
 	
 	//
 	// Habilitando o cursor de textos.
@@ -2872,9 +2909,19 @@ do_compare:
 	if ( strncmp( prompt, "t9", 2 ) == 0 )
     {    
         testShowLines();	
-		refresh_screen ();
+		//refresh_screen ();
 		goto exit_cmp;
 	};
+	
+
+	if ( strncmp( prompt, "x1", 2 ) == 0 )
+    {    
+	    testChangeVisibleArea();
+		//refresh_screen ();
+		goto exit_cmp;
+	};
+	
+
 	
 	// tasklist - Lista informações sobre os processos.
 	//isso será um programa tasklist.bin
@@ -3312,6 +3359,10 @@ void shellInitWindowLimits(){
     wlMaxColumns = (wlFullScreenWidth / 8);
     wlMaxRows = (wlFullScreenHeight / 8);
 	
+	//dado em quantidade de linhas.
+    textMinWheelDelta = 1;  //mínimo que se pode rolar o texto
+    textMaxWheelDelta = 4;  //máximo que se pode rolar o texto	
+	textWheelDelta = textMinWheelDelta;
 	//...
 }
 
@@ -3390,6 +3441,10 @@ void shellShell (){
 	
 	//Tamanho da janela do shell	
 	
+	wsWindowWidth =  WINDOW_WIDTH;
+	wsWindowHeight = WINDOW_HEIGHT;
+	
+	
 	if ( wsWindowWidth < wlMinWindowWidth )
 	{
 		wsWindowWidth = wlMinWindowWidth;
@@ -3402,8 +3457,11 @@ void shellShell (){
 	
 		
 	//window position
-	wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
-	wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
+	wpWindowLeft = WINDOW_LEFT;
+	wpWindowTop = WINDOW_TOP;
+	
+	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
+	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
 	
 	
 	//limits.
@@ -4610,8 +4668,13 @@ void shellRefreshCurrentChar()
 void shellScroll (){
 	
 	//reajustando a área visível do buffer 
-	textTopRow++;
-	textBottomRow++;
+	//todo: criar uma função para fazer essa rolagem.
+	
+	//textTopRow++;
+	//textBottomRow++;
+	
+	textTopRow += textWheelDelta;
+	textBottomRow += textWheelDelta;
 	
 	//fim do buffer
 	if ( textBottomRow > 32 )
@@ -6435,6 +6498,12 @@ void shellRefreshVisibleArea()
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 }
 
-
+void testChangeVisibleArea()
+{
+	textTopRow += textWheelDelta;
+	textBottomRow += textWheelDelta;
+	
+	shellRefreshVisibleArea();	
+}
 
 
