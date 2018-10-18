@@ -29,13 +29,7 @@ void cd_buitins (){
 //cls
 void cls_builtins (){
 	
-	unsigned long left, top, right, bottom;
- 
-    left = (terminal_rect.left/8);
-    top = (terminal_rect.top/8);	
-	
     shellClearScreen();
-    shellSetCursor(left,top);	
 };
 
 

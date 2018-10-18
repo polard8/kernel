@@ -67,27 +67,7 @@
 //#define TAB '\t'
 //#define SPACE 0x020
  
-//
-// Buffer support.
-// 
 
-
-//
-//  ** SCREEN BUFFER ***
-//
-
-//Uma tela igual a vga, com caracteres e atributos.
-
-char screen_buffer[SCREEN_BUFFER_SIZE]; 
-unsigned long screen_buffer_pos; 
-unsigned long screen_buffer_x; 
-unsigned long screen_buffer_y; 
-//unsigned long shell_buffer_width;  //Largura dada em número de caracteres.
-//unsigned long shell_buffer_height; //Altura dada em número de caracteres.
-//...
-//Buffer size.
-int shellScreenBufferMaxColumns;  //80
-int shellScreenBufferMaxRows;     //25
 
 
 
@@ -178,6 +158,7 @@ struct screen_buffer_d
 //Conterá ponteiros para estruturas de linha.
 unsigned long screenbufferList[8];
 
+
 //
 // ## System Metrics ##
 //
@@ -236,30 +217,38 @@ unsigned long wpWindowTop;
 
 
 
+//
+// ## Text support #@#
+//
 
+//número da linha
+int textTopRow;
+int textBottomRow;
+//...
 
 
 //
-// ## Linux style ##
+// Buffer support.
+// 
+
+
+//
+//  ** SCREEN BUFFER ***
 //
 
-//Screen start and screen end.
+//O buffer
+char screen_buffer[SCREEN_BUFFER_SIZE]; 
 
-//SCREEN_START;
-static unsigned long origin = (unsigned long) &screen_buffer[0];                         
-//SCREEN_START+LINES*COLUMNS*2;
-static unsigned long scr_end = (unsigned long) (&screen_buffer[0] + (LINES * COLUMNS));  
+//marcador do cursor.
+unsigned long screen_buffer_pos;    //(offset) 
 
-static unsigned long pos;    //posição dentro do buffer
-static unsigned long x, y;
-static unsigned long top = 0, bottom = LINES;
-static unsigned long lines = LINES,columns = COLUMNS;
-static unsigned long state = 0;
-static unsigned long npar, par[NPAR];
-static unsigned long ques = 0;
-static unsigned char attr = 0x07;
-static unsigned long saved_x = 0;
-static unsigned long saved_y = 0;
+unsigned long screen_buffer_x;      //current col 
+unsigned long screen_buffer_y;      //current row
+
+static unsigned long screen_buffer_saved_x = 0;
+static unsigned long screen_buffer_saved_y = 0;
+
+
 //...
 
 
