@@ -179,11 +179,13 @@ uint8_t kybrd_ctrl_read_status () {
 
 //Status
 //@todo: Status pode ser (int).
-//variáveis usadas pelo line discipline para controlar o estado das teclas de controle.
+//variáveis usadas pelo line discipline para controlar o 
+//estado das teclas de controle.
+
 unsigned long key_status;
 unsigned long escape_status;
 unsigned long tab_status;
-unsigned long winkey_status;  // >> Winkey shotcuts. #super
+unsigned long winkey_status;
 unsigned long ctrl_status;
 unsigned long alt_status;
 unsigned long shift_status;
@@ -453,7 +455,8 @@ int LINE_DISCIPLINE ( unsigned char SC, int type ){
 
 		//Configurando se é do sistema ou não.
 		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
-		switch(key)
+		
+		switch (key)
 		{
 			//Os primeiros 'case' é quando libera tecla do sistema.
 			//O case 'default' é pra quando libera tecla que não é do sistema.
@@ -570,7 +573,8 @@ int LINE_DISCIPLINE ( unsigned char SC, int type ){
 		//O Último bit é zero para key press.
 		//Checando se é a tecla pressionada é o sistema ou não.
 		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
-		switch(key)
+		
+		switch (key)
 		{
 			//back space será tratado como tecla normal
 			
@@ -580,12 +584,14 @@ int LINE_DISCIPLINE ( unsigned char SC, int type ){
 			//caps lock keydown
 			case VK_CAPITAL:
 			    //muda o status do capslock não importa o anterior.
-				if(capslock_status == 0){ 
+				if (capslock_status == 0)
+				{ 
 				    capslock_status = 1; 
 					mensagem = MSG_SYSKEYDOWN; 
 					break; 
 				};
-				if(capslock_status == 1){ 
+				if (capslock_status == 1)
+				{ 
 				    capslock_status = 0; 
 					mensagem = MSG_SYSKEYDOWN; 
 					break; 
@@ -696,32 +702,37 @@ int LINE_DISCIPLINE ( unsigned char SC, int type ){
 				break;
 		};
 
-		if(mensagem == MSG_SYSKEYDOWN)
+		//uma tecla do sistema foi pressionada.
+		if (mensagem == MSG_SYSKEYDOWN)
 		{
-			//uma tecla do sistema foi pressionada.
-            //poderiamos ter opções dependendo do status das modificadoras.
 			ch = map_abnt2[key];
             goto done;
 		};
 
-		if(mensagem == MSG_KEYDOWN)
+		//uma tecla normal foi pressionada.
+		//mensagem de digitação.		
+		//Se o shift ou o capslock estiverem acionados, ela vira maiúscula.
+		//#bugbug: Como o shift  não funciona ainda, então vamos usar 
+		//só o capslock como tecla de modificação da digitação por enquanto.
+		if (mensagem == MSG_KEYDOWN)
 		{
-			//uma tecla normal foi pressionada.
-			//mensagem de diitação.
-			
-			//Se os shift o capslock estiverem acionado ela vira maiúscula.
-		    //if(shift_status == 1 || capslock_status == 1)
-			//{
-			//    ch = shift_abnt2[key];
-			//    goto done;
-			//};
+            //maiúsculas.			
+			if (capslock_status == 1)
+			{
+			    ch = shift_abnt2[key];
+			    goto done;
+			}
 
 			//minúsculas.
-		    ch = map_abnt2[key];
-			goto done;
+			if (capslock_status == 0)
+			{
+		        ch = map_abnt2[key];
+			    goto done;
+			};
 			
             //Nothing.
 		};
+		
 		//Nothing.
 		goto done;
 	};//fim do else
@@ -840,7 +851,7 @@ done:
 		// Aqui temos uma janela válida.
 		// Vamos enviar a mensagem para ela.
 		
-        windowSendMessage( (unsigned long) w, (unsigned long) mensagem, 
+        windowSendMessage ( (unsigned long) w, (unsigned long) mensagem, 
 		    (unsigned long) ch, (unsigned long) ch );
 	};
 	
@@ -867,8 +878,8 @@ done:
 	
 	//o procedimento tratará as mensagens de sistema, colocará o cham no 
 	//stdin e imprimirá o char na tela.
-	system_procedure(  w, (int) mensagem, 
-		(unsigned long) ch, (unsigned long) ch ); 
+	system_procedure (  w, (int) mensagem, (unsigned long) ch, 
+	    (unsigned long) ch ); 
  
 	//?? porque -1.
     return (int) -1;

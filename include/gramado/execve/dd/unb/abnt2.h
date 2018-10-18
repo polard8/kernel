@@ -19,7 +19,7 @@
 //ASCII
 
 //A disciplina de linhas precisa disso.
-#define KEY_RETURN   13     //sc 28
+#define KEY_RETURN   28 //13     //sc 28 #bugbug tem que ser 28
 #define KEY_TAB	     15
 #define KEY_SHIFT	 42     //16
 #define KEY_CONTROL	 29     //17
@@ -97,7 +97,7 @@ static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'p',          //25
  ' ',          //26 (00b4 @) dead_acute dead_grave
  '[',          //27   bracketleft   braceleft
- VK_RETURN,    //28 Enter.
+ VK_RETURN,    //28 [Enter].
  VK_LCONTROL,  //29 ms right control. ??
  'a',          //30 (O a minúsculo é 30 em abnt 2).
  's',          //31.
@@ -240,7 +240,7 @@ static unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {
 'P',    //25
 '`',    //26
 '{',    //27
-KEY_RETURN,
+VK_RETURN,   //28
 CTL,
 'A',    //30
 'S',

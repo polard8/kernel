@@ -109,8 +109,6 @@ void abnt2_keyboard_handler (){
     //EOI.
     
 	outportb ( 0x20, 0x20 );    
-	
-	//return;
 };
 
 
@@ -162,11 +160,8 @@ void KiKeyboard (){
 
     if (abnt2 != 1)
 	{
-	    panic ("unblocked-KiKeyboard: not abnt2.\n");
+	    panic ("unblocked-KiKeyboard: not abnt2\n");
 	};
-
-//done:
-    //return;
 };
 
 

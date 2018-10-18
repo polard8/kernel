@@ -392,7 +392,7 @@ system_procedure ( struct window_d *window,
 				
 				
 
-
+                //??quem deve tratar essa tecla ?? 
                 //o tab deve fazer parte das teclas de difitação. ??
                 case VK_TAB:
 					//if(AltStatus == 1){
@@ -405,6 +405,7 @@ system_procedure ( struct window_d *window,
 					goto done;
 				    break;
                 
+				//??quem deve tratar essa tecla ??
 				case VK_BACK:
 				    g_cursor_x--;
 					printf(" ");
@@ -476,12 +477,9 @@ system_procedure ( struct window_d *window,
 				// As funções F1 à F12 são opções para o desenvolvedor.
 				//
 				
-				//
-				// Obs: Essa variáveis de estadus serão variáveis encapsuladas
+				// Obs: Essa variáveis de estatus serão variáveis encapsuladas
 				//      no driver de teclado. Para saber o valor delas
 				//      tem que chamar uma função do driver. keyboard.c
-				//
-				
 				//Obs: 
 				// *Importante: Tem que chamar método pra pegar variável dentro de driver.
 				
@@ -780,35 +778,25 @@ system_procedure ( struct window_d *window,
 					//redraw_window(xxxx);
 				//	break;
 				
+				
+				//#IMPORTANTE
 				//caps lock keydown
+				//#test testando a utilização de maiúsculas,
+				//já que estamos usando o Windos como host e 
+				//ele escreve no diretório com maiúsculas.
 				case VK_CAPITAL:
-			        //Apenas percebe o status e efetua uma ação, 
-					//mas não altera o status.
-				    if(capslock_status == 1){ 
-				        keyboard_set_leds(LED_CAPSLOCK);
-					    break; 
-				    };
 				    break;
 					
                 // Nothing for now!  				
                 case VK_LMENU:
-                    if( alt_status == 1 ){ 
-					    //todo 
-					};				
 				    break;
 					
 				// Nothing for now!	
                 case VK_LCONTROL: 
-				    if( ctrl_status == 1 ){ 
-					    //todo
-					};
 					break;
                 
 				// Nothing for now!
 				case VK_LSHIFT:   
-				    if( shift_status == 1 ){ 
-					    //todo.    
-					}
 				    break;
 					
 			    //Num Lock.	
@@ -835,7 +823,7 @@ system_procedure ( struct window_d *window,
 		/* ## Teclas do sistema interceptadas pelo kernel ## */  
 		
 		case MSG_SYSKEYUP: 
-            switch(long1)  
+            switch (long1)  
             {
 				//0x5B.
                 //Left WinKey system keyup. 
@@ -846,9 +834,12 @@ system_procedure ( struct window_d *window,
 
                 case VK_LWIN:
                 case VK_RWIN:
-				    //control menu.
-					MessageBox(gui->screen, 1, "Win Key:","MSG_SYSKEYUP VK_LWIN or VK_RWIN");
-                    break;
+				    if ( winkey_status == 0 )
+					{
+						//printf ("winkey\n");
+					    MessageBox (gui->screen, 1, "Win Key:","MSG_SYSKEYUP VK_LWIN or VK_RWIN");
+                    };
+					break;
 					
 				//test.
 				//control menu. (application)

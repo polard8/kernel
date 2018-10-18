@@ -2183,7 +2183,9 @@ do_compare:
 	}		
 
     // cls - Clear the screen.
-	if ( strncmp( prompt, "cls", 3 ) == 0 ){
+	if ( strncmp( prompt, "CLS", 3 ) == 0 || 
+	     strncmp( prompt, "cls", 3 ) == 0 )
+	{
         cls_builtins();
         goto exit_cmp;
 	};
@@ -2429,8 +2431,9 @@ do_compare:
 	// help
 	// ?
 	// Mostra ajuda.
-    if ( strncmp( prompt, "help", 4 ) == 0 || 
-	    strncmp( prompt, "?", 1 ) == 0 )
+    if ( strncmp( prompt, "HELP", 4 ) == 0 ||  
+	     strncmp( prompt, "help", 4 ) == 0 || 
+	     strncmp( prompt, "?", 1 ) == 0 )
 	{
 
 		i++;
@@ -2593,7 +2596,8 @@ do_compare:
 	
     // reboot
     // @todo: Isso será um aplicativo. reboot.bin	
-    if ( strncmp( prompt, "reboot", 6 ) == 0 )
+    if ( strncmp( prompt, "REBOOT", 6 ) == 0 || 
+	     strncmp( prompt, "reboot", 6 ) == 0 )
 	{
 	    //printf("~reboot\n");
 		printf("Tem certeza que deseja reiniciar o sistema?\n");
@@ -2830,8 +2834,13 @@ do_compare:
         goto exit_cmp;					 
 	};
 	
+	//t7
+	//#test
 	//testando estado das teclas.
-	if ( strncmp( prompt, "t7", 2 ) == 0 )	
+	if ( strncmp( prompt, "KEYS", 4 ) == 0 ||
+         strncmp( prompt, "keys", 4 ) == 0 || 
+         strncmp( prompt, "T7", 2 ) == 0 || 		 
+	     strncmp( prompt, "t7", 2 ) == 0 )	
 	{
 		printf("VK_CAPITAL %d \n", system_call ( 138, VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );
 				
