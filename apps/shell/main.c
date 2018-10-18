@@ -419,6 +419,7 @@ int textGetBottomRow ();
 void clearLine ( int line_number );
 void testShowLines();
 
+void shellRefreshVisibleArea();
 
 //
 // Internas.
@@ -4255,6 +4256,7 @@ void shellTestLoadFile (){
     if( f == NULL )
 	{
 		printf("fopen fail\n");
+		return;
 	}else{
 		//printf("fopen ok\n");
 	};	
@@ -4275,38 +4277,16 @@ void shellTestLoadFile (){
 			//printf("EOF reached :)\n");
 			goto done;
 		
-		} else {
-		    			
-		    //movendo.
-			pos = 2*i;	
-
-            if ( pos >= SCREEN_BUFFER_SIZE ) 
-            {
-				printf("shellTestLoadFile: screen_buffer[] limits\n");
-				goto fail;
-			}				
-			
-	        screen_buffer[pos] = (char) ch_test;    //char	
-		    screen_buffer[pos +1] = (char) 0x09;    //atributo	
-            i++;
- 		
+		} else {   			
+		    
+			shellInsertNextChar( (char) ch_test ); 		
 	    };
 	};	
 	
 
  
 done:
-	//Limpa a tela e reposiciona o cursor.
-	//shellClearScreen();
-    //shellSetCursor (0,0);
-	
-	//#obs:
-	//Continuaremos com o cursor onde ele está.
-	
-	// Mostra na tela o conteúdo do screen buffer.
-	//shellRefreshScreen();
-	shellShowScreenBuffer ();
-//
+    //
 fail:
     return;	
 };
@@ -4629,53 +4609,66 @@ void shellRefreshCurrentChar()
  */
 void shellScroll (){
 	
+	//reajustando a área visível do buffer 
+	textTopRow++;
+	textBottomRow++;
+	
+	//fim do buffer
+	if ( textBottomRow > 32 )
+	{
+	    printf("shellScroll: 32 fim do buffer");
+        while(1){}		
+	}
+	
+	shellRefreshVisibleArea();
+	
 	//desabilita o cursor
-	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+	//system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 
-	uint8_t attribute_byte = (0 << 4) | (15 & 0x0F);	/* attribute_byte background BLACK foreground WHITE */
-	uint16_t blank = 0x20 | (attribute_byte << 8);	/* 0x20 is space */
+	//uint8_t attribute_byte = (0 << 4) | (15 & 0x0F);	/* attribute_byte background BLACK foreground WHITE */
+	//uint16_t blank = 0x20 | (attribute_byte << 8);	/* 0x20 is space */
 
 	
 	//apontamos para o início do buffer.
-	uint16_t *w_screen_buffer = (uint16_t *) &screen_buffer[0];
+	//uint16_t *w_screen_buffer = (uint16_t *) &screen_buffer[0];
 	
 	/* 
 	 * while cursor y postion equal 25, than should get new line,
 	 * copy all the data to previous, so clear the first row,
 	 * and the last row fill space
 	 */
-	//if (pos_y >= 25) 
-	//{
-		int i;
+	 
+	
+	//	int i;
 		
-		for (i = 0 * wlMaxColumns; i < 24 * wlMaxColumns; i++) 
-		{
-		    w_screen_buffer[i] = w_screen_buffer[i+wlMaxColumns];
-		}
+	//	for (i = 0 * wlMaxColumns; i < 24 * wlMaxColumns; i++) 
+	//	{
+	//	    w_screen_buffer[i] = w_screen_buffer[i+wlMaxColumns];
+	//	}
 
-		for (i = 24 * wlMaxColumns; i < wlMaxRows * wlMaxColumns; i++) 
-		{
-		    w_screen_buffer[i] = blank;
-		}
+	//	for (i = 24 * wlMaxColumns; i < wlMaxRows * wlMaxColumns; i++) 
+	//	{
+	//	    w_screen_buffer[i] = blank;
+	//	}
 
-		//pos_y = 24;
-	//}
+		
+	
 	
 	//devemos voltar para o inpicio da janela e mostrar o buffer que foi atualizado.
 	//#todo: corrigir esse posicionamento.
 	
-	unsigned long left, top, right, bottom;
+	//unsigned long left, top, right, bottom;
  
-    left = (terminal_rect.left/8);
-    top = (terminal_rect.top/8);	
+    //left = (terminal_rect.left/8);
+    //top = (terminal_rect.top/8);	
 	
 	//shellSetCursor(0,0);
-	shellSetCursor (left,top);
+	//shellSetCursor (left,top);
 	
-	shellShowScreenBuffer ();
+	//shellShowScreenBuffer ();
 	
 	//reabilita o cursor
-	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+	//system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
 
 
@@ -4872,7 +4865,8 @@ void shellInsertNextChar (char c){
 		
 		if ( textCurrentRow >= 25 )
 		{
-			printf("shellInsertNextChar: *SCROLL");
+			shellScroll ();
+			//printf("shellInsertNextChar: *SCROLL");
 			while(1){}
 		}
 	}
@@ -6390,6 +6384,7 @@ void clearLine ( int line_number )
 };
 
 
+//um teste mostrando todas as linhas do boffer de linhas.
 void testShowLines()
 {
 	//desabilita o cursor
@@ -6413,5 +6408,33 @@ void testShowLines()
 	//reabilita o cursor
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
+
+
+//mostra a área visível dentro do buffer de linhas.
+void shellRefreshVisibleArea()
+{
+	//desabilita o cursor
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+	
+	int i=0;
+	int j=0;
+	
+	for ( i=textTopRow; i<textBottomRow; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{
+		    //LINES[i].CHARS[j] = (char) 'x';
+		    //LINES[i].ATTRIBUTES[j] = (char) 7;
+	        
+			printf ("%c", LINES[i].CHARS[j] );
+		}
+		printf ("\n");
+	};
+
+	//reabilita o cursor
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+}
+
+
 
 
