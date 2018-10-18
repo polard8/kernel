@@ -71,7 +71,7 @@
 
 //# usado para teste 
 #define WINDOW_WIDTH     400 
-#define WINDOW_HEIGHT    600
+#define WINDOW_HEIGHT    500
 #define WINDOW_LEFT      0
 #define WINDOW_TOP       0
  
@@ -4223,20 +4223,22 @@ void shellPrompt (){
  */
 void shellClearBuffer (){
 	
-	int i;
+	int i = 0;
+	int j = 0;
 	
-	// Shell buffer.
-	for ( i=0; i<SCREEN_BUFFER_SIZE; i++ ){
-		screen_buffer[i] = (char) '\0';
-	}
-	
-	screen_buffer[0] = (char) '\0';
-	screen_buffer[1] = 7;
-	
-    //Posição dentro do buffer do shell.	
-	screen_buffer_pos = 0;  
-	screen_buffer_x = 0; 
-	screen_buffer_y = 0; 
+	//inicializamos com espaços.
+	for ( i=0; i<32; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{
+		    LINES[i].CHARS[j] = (char) ' ';
+		    LINES[i].ATTRIBUTES[j] = (char) 7;
+	    }
+		
+		LINES[i].left = 0;
+		LINES[i].right = 0;
+		LINES[i].pos = 0;
+	};
 };
 
 
@@ -4257,31 +4259,7 @@ void shellClearBuffer (){
 //Isso é só um teste.
 void shellShowScreenBuffer (){
 	
-	int i;
-	int j = 0;
-	
-	//#teste 
-	//screen_buffer[0] = 'd';
-	//screen_buffer[2] = 'u';
-	//screen_buffer[4] = 'r';
-	//screen_buffer[6] = 't';
-	
-    //#importante: vamos mostrar todo o buffer de words, a partir 
-    //da posição atual do cursor, forçando um scroll	
-	
-	//shellClearScreen();
-    //shellSetCursor(0,0);
-	
-	// Shell buffer.
-	for ( i=0; i<(DEFAULT_BUFFER_MAX_COLUMNS*DEFAULT_BUFFER_MAX_ROWS); i++ )
-	{
-		
-	    printf( "%c", screen_buffer[j] );
-		j++; //ignora o atributo.
-		j++;
-	};	
-
-    //screen_buffer_pos = 0; 
+    shellRefreshVisibleArea();
 };
 
 
@@ -4475,23 +4453,9 @@ void shellClearScreen (){
     //desabilita o cursor
 	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 	
-	int i;
 	
-#ifdef SHELL_VERBOSE	
-	//#debug
-	printf("shellClearScreen:\n");
-#endif	
 	
-	//
-	// Limpamos o screen buffer.
-	//
-	
-	// Shell buffer.
-	for ( i=0; i<(SCREEN_BUFFER_SIZE/2); i++ )
-	{
-	    screen_buffer[ 2*i ] = ' ';    //char 
-		screen_buffer[ 2*i +1] = 0x7;  //atributo 
-	};
+	shellClearBuffer ();
 	
 	//
 	// Copiamos o conteúdo do screenbuffer para 
@@ -4518,6 +4482,9 @@ void shellClearScreen (){
  * shellRefreshScreen:
  * 
  *     #importante 
+ *      
+       #OBS
+       NA VERDADE SE REFERE AO REFRESH DA ÁREA DE CLIENTE DO SHELL.
  *
  *     Copia o conteúdo do (screen_buffer) buffer de output 
  * para a tela. (dentro da janela). 
@@ -4527,53 +4494,28 @@ void shellClearScreen (){
  * para sabermos a cor do caractere e de seu background.
  */
 void shellRefreshScreen (){
-	
-    int lin, col;  
-	int Offset; //Deslocamento dentro do screen buffer.
-	
-#ifdef SHELL_VERBOSE		
-	//#debug
-	printf("shellRefreshScreen:\n");
-#endif 
 
-	//cursor apontando par ao início da janela.
-	//usado pelo printf.
-	//@todo: podemos colocar o cursor no 
-	//início da área de cliente.
-	//left será a coluna.
+	//desabilita o cursor
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 	
-	//shellSetCursor(0,0);
+	int i=0;
+	int j=0;
 	
-	
-	unsigned long left, top, right, bottom;
- 
-    left = (terminal_rect.left/8);
-    top = (terminal_rect.top/8);
-	
-    shellSetCursor ( left, top );
-	
-	bottom = ( (terminal_rect.top + terminal_rect.height) /8);
-	
-	//linhas.
-	for( lin=top; lin < bottom ; lin++ )
+	for ( i=textTopRow; i<textBottomRow; i++ )
 	{
-		//col = 0;
-		col = left;
-		shellSetCursor (col,lin);
-		
-		//colunas.
-		//for( col=0; col < wlMaxColumns; col++)
-		for( col=left; col < wlMaxColumns; col++)	
+		for ( j=0; j<80; j++ )
 		{
-		    //Mostra um char do screen buffer.
-			printf( "%c", screen_buffer[Offset] );
-		    
-			Offset++; //ignora o atributo.
-		    Offset++;
-	    }
+		    //LINES[i].CHARS[j] = (char) 'x';
+		    //LINES[i].ATTRIBUTES[j] = (char) 7;
+	        
+			printf ("%c", LINES[i].CHARS[j] );
+		}
+		printf ("\n");
 	};
+
+	//reabilita o cursor
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 	
-    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
 
 
@@ -4582,10 +4524,13 @@ void shellRefreshScreen (){
 
 void shellRefreshLine ( int line_number ){
 	
-    int lin = (int) line_number; 
+    
+	if ( line_number > wlMaxRows )
+		return;	
+	
+	int lin = (int) line_number; 
 	int col = 0;  
 	
-	int Offset = 0; //Deslocamento dentro do screen buffer.
 	
 #ifdef SHELL_VERBOSE		
 	//#debug
@@ -4604,10 +4549,7 @@ void shellRefreshLine ( int line_number ){
 	for ( col=0; col < wlMaxColumns; col++ )
 	{
 	    //Mostra um char do screen buffer.
-		printf( "%c", screen_buffer[Offset] );
-		    
-		Offset++; //ignora o atributo.
-	    Offset++;
+		printf( "%c", LINES[lin].CHARS[col] );
 	};
 	
 };
@@ -4618,39 +4560,19 @@ void shellRefreshLine ( int line_number ){
 
 void shellRefreshChar ( int line_number, int col_number ){
 	
-    
-	int lin = (int) line_number; 
-	int col = (int) col_number;  
+	if ( col_number > wlMaxColumns || line_number > wlMaxRows )
+		return;
 	
-	int Offset = 0; //Deslocamento dentro do screen buffer.
-	
-#ifdef SHELL_VERBOSE		
-	//#debug
-	printf("shellRefreshScreen:\n");
-#endif 
-
-	//cursor apontando par ao início da janela.
-	//usado pelo printf.
-	//@todo: podemos colocar o cursor no 
-	//início da área de cliente.
-	//left será a coluna.
-	
-	shellSetCursor ( col, lin );
+	shellSetCursor ( col_number, line_number );
 
 	//Mostra um char do screen buffer.
-	printf( "%c", screen_buffer[Offset] );
-		
-    //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
+	printf( "%c", LINES[line_number].CHARS[col_number] );	
 };
 
 
 //refresh do char que está na posição usada pelo input.
-void shellRefreshCurrentChar()
-{
-	//char c = (char) screen_buffer[ screen_buffer_pos * 2];
-	//char attribute = (char) screen_buffer[ (screen_buffer_pos * 2) +1 ];	
+void shellRefreshCurrentChar (){
 	
-	//printf ("%c", (char) c );
 	printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
 };
 
@@ -4738,16 +4660,15 @@ void shellScroll (){
 
 static void save_cur (void){
 	
-	screen_buffer_saved_x = screen_buffer_x;
-	screen_buffer_saved_y = screen_buffer_y;
+	textSavedCol = textCurrentCol;
+	textSavedRow = textCurrentRow;
 };
 
 
 static void restore_cur (void){
 	
-	screen_buffer_x = screen_buffer_saved_x;
-	screen_buffer_y = screen_buffer_saved_y;
-	screen_buffer_pos = (screen_buffer_y * wlMaxColumns + screen_buffer_x);
+	textCurrentCol = textSavedCol;
+	textCurrentRow = textSavedRow;
 };
 
 
@@ -4755,11 +4676,9 @@ static void restore_cur (void){
 static void lf (void){
 	
 	//enquanto for menor que o limite de linhas, avança.
-	if ( screen_buffer_y+1 < wlMaxRows )
+	if ( textCurrentRow+1 < wlMaxRows )
 	{
-		screen_buffer_y++;
-		
-		screen_buffer_pos += screen_buffer_x;  
+		textCurrentRow++; 
 		return;
 	}
 	
@@ -4788,17 +4707,14 @@ static void ri (void){
 //carriege return
 static void cr (void){
 	
-	screen_buffer_pos = (screen_buffer_pos - screen_buffer_x); 
-	screen_buffer_x = 0;
+    textCurrentCol = 0;
 };
 
 
 static void del (void){
 	
-	int i = (int) ( screen_buffer_pos *2 );
-	
-	screen_buffer[i] = (char) '\0';
-	screen_buffer[i +1] = 7;
+	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) '\0';
+	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
 };
 
 
@@ -4808,34 +4724,18 @@ shellInsertCharXY ( unsigned long x,
                     unsigned long y, 
 				    char c )
 {
-	unsigned long offset = (unsigned long) ((y * wlMaxColumns * 2) + (x*2)); 
 	
-	if ( x >= wlMaxColumns ){
-		return;
-	}
-	
-	if ( y >= wlMaxRows ){
-		return;
-	}
-
-	screen_buffer[offset] = (char) c;
-	screen_buffer[ (offset)+1 ] = 7;
-};
-
-
-//insere um caractere no buffer de output 
-//#bugbug, talvez o buffer seja stdout. 
-void shellInsertCharPos (unsigned long offset, char c){
-	
-	unsigned long offsetMax = (unsigned long)(wlMaxColumns * wlMaxRows); 
+	if ( x >= wlMaxColumns || y >= wlMaxRows ){
 		
-	if(offset >= offsetMax){
 		return;
 	}
-	
-	screen_buffer[offset*2] = (char) c;
-	screen_buffer[ (offset*2)+1 ] = 7;
+
+	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
+	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
 };
+
+
+ 
 
 
 /*
@@ -4847,6 +4747,7 @@ void shellInsertStringPos( unsigned long offset, char *string )
 };
 */
 
+
 /*
  preenche todo o buffer de saída com char ou atributo
 void shellFillOutputBuffer( char element, int element_type )
@@ -4855,25 +4756,21 @@ void shellFillOutputBuffer( char element, int element_type )
 }
 */
 
+
 //usado para teste de scroll.
 //imprime varias vezes o char indicado.
-void testScrollChar( int c )
-{
+void testScrollChar ( int c ){
+	
     int i;
-	
-	//char c = '1';
-	
-    //for ( i=0; i < (80*26); i++ )
-	//	shellInsertNextChar ((int) c);		
 	
     for ( i=0; i < (wlMaxColumns*26); i++ )
 	{
 	    //se chegamos no limite do screen_buffer
-		    //...
-			shellInsertNextChar ((char) c);	
-		
+		//...
+		shellInsertNextChar ((char) c);	
 	}		
-}
+};
+
 
 /*
  ***************************************************
@@ -5013,10 +4910,13 @@ void move_to ( unsigned long x, unsigned long y )
 	if ( x > wlMaxColumns || y > wlMaxRows )
 		return;
 	
-	screen_buffer_x = x;
-	screen_buffer_y = y;
+	//screen_buffer_x = x;
+	//screen_buffer_y = y;
 	
-	screen_buffer_pos = ( screen_buffer_y * wlMaxColumns + screen_buffer_x ) ;
+	textCurrentCol = x;
+	textCurrentRow = y;
+	
+	//screen_buffer_pos = ( screen_buffer_y * wlMaxColumns + screen_buffer_x ) ;
 };
 
 

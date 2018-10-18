@@ -1028,7 +1028,7 @@ void shellInsertLF();
 void shellInsertNullTerminator();
 void shellInsertNextChar(char c);
 void shellInsertCharXY(unsigned long x, unsigned long y, char c);
-void shellInsertCharPos(unsigned long offset, char c);
+ 
 static void lf(void);
 static void ri(void);
 static void cr(void);

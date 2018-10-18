@@ -256,6 +256,10 @@ int textBottomRow;
 int textCurrentRow;
 int textCurrentCol;
 
+int textSavedRow;
+int textSavedCol;
+
+
 int textWheelDelta; //delta para rolagem do texto.
 int textMinWheelDelta;  //mínimo que se pode rolar o texto
 int textMaxWheelDelta;  //máximo que se pode rolar o texto
