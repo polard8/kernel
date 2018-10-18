@@ -1717,7 +1717,7 @@ NewCmdLine:
 	        
 			//Limits
 		    j++;
-			if ( j > 80 )
+			if ( j > wlMaxColumns )
 			{
 			   //#debug
                //Isso significa que uma string 
@@ -1749,7 +1749,7 @@ NewCmdLine:
 	        goto exit_cmp;	
 	    }		
 	    
-		int line_rest = (80-j);
+		int line_rest = (wlMaxColumns-j);
 		
 		//copia todo o resto da linha para o inpicio da linha.
         for ( j=0; j<line_rest; j++ )
@@ -3264,8 +3264,8 @@ void shellInitSystemMetrics()
 	//...
 } 
 
-void shellInitWindowLimits()
-{
+void shellInitWindowLimits(){
+	
     //
     // ## Window limits ##
     //
@@ -3362,12 +3362,23 @@ void shellShell (){
 	wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
 	
 	
-	
 	//limits.
-    wlMaxColumns = (wsWindowWidth/8);   //DEFAULT_MAX_COLUMNS; 
-    wlMaxRows = (wsWindowHeight/8);     //DEFAULT_MAX_ROWS;     
+	//quantidade de linhas de colunas da janela.
+	//na verdade deve ser da área de cliente.
+    wlMaxColumns = (wsWindowWidth/8);    
+    wlMaxRows = (wsWindowHeight/8);         
  
-    //...	
+    if ( wlMaxColumns < wlMinColumns )
+	{
+	    wlMaxColumns = wlMinColumns;	
+	}
+		
+	if ( wlMaxRows < wlMinRows )
+	{
+		wlMaxRows = wlMinRows;
+	}
+	
+	//...	
 
 	//
 	// Setup buffers.
@@ -4384,7 +4395,7 @@ void shellClearScreen (){
 	//
 	
 	// Shell buffer.
-	for( i=0; i<(SCREEN_BUFFER_SIZE/2); i++ )
+	for ( i=0; i<(SCREEN_BUFFER_SIZE/2); i++ )
 	{
 	    screen_buffer[ 2*i ] = ' ';    //char 
 		screen_buffer[ 2*i +1] = 0x7;  //atributo 
@@ -4446,11 +4457,13 @@ void shellRefreshScreen (){
 	//linhas.
 	for( lin=top; lin < bottom ; lin++ )
 	{
-		col = 0;
-		shellSetCursor(col,lin);
+		//col = 0;
+		col = left;
+		shellSetCursor (col,lin);
 		
 		//colunas.
-		for( col=0; col < 80; col++)
+		//for( col=0; col < wlMaxColumns; col++)
+		for( col=left; col < wlMaxColumns; col++)	
 		{
 		    //Mostra um char do screen buffer.
 			printf( "%c", screen_buffer[Offset] );
@@ -4459,8 +4472,6 @@ void shellRefreshScreen (){
 		    Offset++;
 	    }
 	};
-	
-	
 	
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
@@ -4487,12 +4498,10 @@ void shellRefreshLine ( int line_number ){
 	//início da área de cliente.
 	//left será a coluna.
 	
-	shellSetCursor (0,0);
-	
 	shellSetCursor ( col, lin );
 		
 	//colunas.
-	for ( col=0; col < 80; col++ )
+	for ( col=0; col < wlMaxColumns; col++ )
 	{
 	    //Mostra um char do screen buffer.
 		printf( "%c", screen_buffer[Offset] );
@@ -4526,8 +4535,6 @@ void shellRefreshChar ( int line_number, int col_number ){
 	//@todo: podemos colocar o cursor no 
 	//início da área de cliente.
 	//left será a coluna.
-	
-	shellSetCursor (0,0);
 	
 	shellSetCursor ( col, lin );
 
@@ -4579,12 +4586,12 @@ void shellScroll (){
 	//{
 		int i;
 		
-		for (i = 0 * 80; i < 24 * 80; i++) 
+		for (i = 0 * wlMaxColumns; i < 24 * wlMaxColumns; i++) 
 		{
-		    w_screen_buffer[i] = w_screen_buffer[i+80];
+		    w_screen_buffer[i] = w_screen_buffer[i+wlMaxColumns];
 		}
 
-		for (i = 24 * 80; i < 25 * 80; i++) 
+		for (i = 24 * wlMaxColumns; i < wlMaxRows * wlMaxColumns; i++) 
 		{
 		    w_screen_buffer[i] = blank;
 		}
@@ -4601,9 +4608,9 @@ void shellScroll (){
     top = (terminal_rect.top/8);	
 	
 	//shellSetCursor(0,0);
-	shellSetCursor(left,top);
+	shellSetCursor (left,top);
 	
-	shellShowScreenBuffer();
+	shellShowScreenBuffer ();
 	
 	//reabilita o cursor
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
@@ -4680,13 +4687,13 @@ shellInsertCharXY ( unsigned long x,
                     unsigned long y, 
 				    char c )
 {
-	unsigned long offset = (unsigned long) ((y*80*2) + (x*2)); 
+	unsigned long offset = (unsigned long) ((y * wlMaxColumns * 2) + (x*2)); 
 	
-	if ( x >= 80 ){
+	if ( x >= wlMaxColumns ){
 		return;
 	}
 	
-	if ( y >= 25 ){
+	if ( y >= wlMaxRows ){
 		return;
 	}
 
@@ -4699,7 +4706,7 @@ shellInsertCharXY ( unsigned long x,
 //#bugbug, talvez o buffer seja stdout. 
 void shellInsertCharPos (unsigned long offset, char c){
 	
-	unsigned long offsetMax = (unsigned long)(80*25); 
+	unsigned long offsetMax = (unsigned long)(wlMaxColumns * wlMaxRows); 
 		
 	if(offset >= offsetMax){
 		return;
@@ -4738,7 +4745,7 @@ void testScrollChar( int c )
     //for ( i=0; i < (80*26); i++ )
 	//	shellInsertNextChar ((int) c);		
 	
-    for ( i=0; i < (80*26); i++ )
+    for ( i=0; i < (wlMaxColumns*26); i++ )
 	{
 	    //se chegamos no limite do screen_buffer
 		    //...
@@ -4763,14 +4770,16 @@ void shellInsertNextChar (char c){
 	//o máximo será 80*25
 	
 	screen_buffer_pos++;
-	if ( screen_buffer_pos >= (80*25) )
+	
+	if ( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
 	{
 	    //#fim do buffer
-        //printf("X");
         shellScroll ();	
 		
+		//#bugbug
+		//#todo: isso precisa ser calculado ainda.
 		//início da última linha.
-		screen_buffer_pos = (80*24) + 1;
+		screen_buffer_pos = (wlMaxColumns * (wlMaxRows-2) ) + 1;
 	}
 	
 	screen_buffer[ screen_buffer_pos * 2] = (char) c;
@@ -4785,7 +4794,7 @@ void shellInsertNextChar (char c){
 void shellInsertCR (){
 	
 	screen_buffer_pos++;
-	if( screen_buffer_pos >= (80*25) )
+	if( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
 	{
 	    //#fim do buffer
         printf("shellInsertCR: limit");		
@@ -4799,7 +4808,7 @@ void shellInsertCR (){
 void shellInsertLF (){
 	
 	screen_buffer_pos++;
-	if( screen_buffer_pos >= (80*25) )
+	if( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
 	{
 	    //#fim do buffer
         printf("shellInsertLF: limit");		
@@ -4813,7 +4822,7 @@ void shellInsertLF (){
 void shellInsertNullTerminator (){
 	
 	screen_buffer_pos++;
-	if( screen_buffer_pos >= (80*25) )
+	if( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
 	{
 	    //#fim do buffer
         printf("shellInsertNullTerminator: limit");		
