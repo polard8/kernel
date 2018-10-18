@@ -221,9 +221,38 @@ unsigned long wpWindowTop;
 // ## Text support #@#
 //
 
+struct shell_line
+{
+    char CHARS[80];
+    char ATTRIBUTES[80];	
+	
+	//início e fim da string dentro da linha.
+	//o resto é espaço.
+	int left;
+	int right;
+	
+	//posição do cursor dentro da linha.
+	int pos;
+};
+
+//PROVISÓRIO
+//O TEXTO TEM 32 LINHAS NO MÁXIMO.
+//ESSA É A PARTE DO TEXTO QUE PODERÁ SER MANIPULADA,
+//O RESTO DO TEXTO DEVERÁ FICAR ESPERANDO NO BUFFER.
+//#IMPORTANTE: 25 DESSAS 32 LINHAS SERÃO VISÍVEIS.
+struct shell_line LINES[32]; 
+
+
+//#importante:
+//Linhas visíveis.
 //número da linha
-int textTopRow;
+//isso será atualizado na hora do scroll.
+int textTopRow;  //Top nem sempre será '0'.
 int textBottomRow;
+
+//linha e coluna atuais
+int textCurrentRow;
+int textCurrentCol;
 //...
 
 

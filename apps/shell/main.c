@@ -415,6 +415,11 @@ void textSetBottomRow ( int number );
 int textGetTopRow ();
 int textGetBottomRow ();
 
+
+void clearLine ( int line_number );
+void testShowLines();
+
+
 //
 // Internas.
 //
@@ -658,12 +663,6 @@ noArgs:
 	
 	
 	
-	// # Draw bar #
-	// Criando a topbar antes de criarmos a janela principal.
-	//enterCriticalSection();    
-	//shellCreateTaskBar(1);
-	//exitCriticalSection();  
-
 
 	    enterCriticalSection();    
 	    
@@ -2867,7 +2866,14 @@ do_compare:
 	    shellTestButtons ();	
 		refresh_screen ();
 		goto exit_cmp;
-	};		
+	};	
+
+	if ( strncmp( prompt, "t9", 2 ) == 0 )
+    {    
+        testShowLines();	
+		refresh_screen ();
+		goto exit_cmp;
+	};
 	
 	// tasklist - Lista informações sobre os processos.
 	//isso será um programa tasklist.bin
@@ -3330,11 +3336,33 @@ void shellInitWindowSizes()
 void shellShell (){
 	
 	int i=0;
+	int j=0;
 	
 	// Internas.
 	
     shellStatus = 0;
     shellError = 0;
+	
+	
+	//
+	// ## Inicializando as estruturas de linha ##
+	//
+	
+	//inicializamos com espaços.
+	for ( i=0; i<32; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{
+		    LINES[i].CHARS[j] = (char) ' ';
+		    LINES[i].ATTRIBUTES[j] = (char) 7;
+	    }
+		
+		LINES[i].left = 0;
+		LINES[i].right = 0;
+		LINES[i].pos = 0;
+	};
+	
+	
 	
 	// Deve ser pequena, clara e centralizada.
 	// Para ficar mais rápido.
@@ -3345,8 +3373,6 @@ void shellShell (){
 		
 	// Usar o get system metrics para pegar o 
 	// tamanho da tela.
-	
-
 	
 	//inicializa as metricas do sistema.
 	shellInitSystemMetrics ();
@@ -4583,10 +4609,11 @@ void shellRefreshChar ( int line_number, int col_number ){
 //refresh do char que está na posição usada pelo input.
 void shellRefreshCurrentChar()
 {
-	char c = (char) screen_buffer[ screen_buffer_pos * 2];
-	char attribute = (char) screen_buffer[ (screen_buffer_pos * 2) +1 ];	
+	//char c = (char) screen_buffer[ screen_buffer_pos * 2];
+	//char attribute = (char) screen_buffer[ (screen_buffer_pos * 2) +1 ];	
 	
-	printf ("%c", (char) c );
+	//printf ("%c", (char) c );
+	printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
 };
 
 
@@ -4807,25 +4834,51 @@ void shellInsertNextChar (char c){
 	//Nos temos um buffer de chars ...
 	//o máximo será 80*25
 	
-	screen_buffer_pos++;
+	//screen_buffer_pos++;
 	
-	if ( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
-	{
+	//if ( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
+	//{
 	    //#fim do buffer
-        shellScroll ();	
+    //    shellScroll ();	
 		
 		//#bugbug
 		//#todo: isso precisa ser calculado ainda.
 		//início da última linha.
-		screen_buffer_pos = (wlMaxColumns * (wlMaxRows-2) ) + 1;
-	}
+	//	screen_buffer_pos = (wlMaxColumns * (wlMaxRows-2) ) + 1;
+	//}
 	
-	screen_buffer[ screen_buffer_pos * 2] = (char) c;
-	screen_buffer[ (screen_buffer_pos * 2) +1 ] = 7;
+	//screen_buffer[ screen_buffer_pos * 2] = (char) c;
+	//screen_buffer[ (screen_buffer_pos * 2) +1 ] = 7;
 	
 	
 	//mostra o char.
+	//shellRefreshCurrentChar();
+	
+	//cursor da linha
+	
+	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
+	
+	//refresh
 	shellRefreshCurrentChar();
+	
+	//update
+	textCurrentCol++;
+	
+	if (textCurrentCol >= 80 )
+	{
+		textCurrentCol = 0;
+		
+		textCurrentRow++;
+		
+		if ( textCurrentRow >= 25 )
+		{
+			printf("shellInsertNextChar: *SCROLL");
+			while(1){}
+		}
+	}
+	
+	LINES[textCurrentRow].pos = textCurrentCol;
+	LINES[textCurrentRow].right = textCurrentCol;
 };
 
 
@@ -6307,7 +6360,7 @@ int textGetBottomRow ()
 };
 
 
-void clearLine ( int line_number );
+
 void clearLine ( int line_number )
 {
     int lin = (int) line_number; 
@@ -6335,4 +6388,30 @@ void clearLine ( int line_number )
 	
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
+
+
+void testShowLines()
+{
+	//desabilita o cursor
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+	
+	int i=0;
+	int j=0;
+	
+	for ( i=0; i<32; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{
+		    //LINES[i].CHARS[j] = (char) 'x';
+		    //LINES[i].ATTRIBUTES[j] = (char) 7;
+	        
+			printf ("%c", LINES[i].CHARS[j] );
+		}
+		printf ("\n");
+	};
+
+	//reabilita o cursor
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+};
+
 

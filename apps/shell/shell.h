@@ -557,9 +557,9 @@ int EOF_Reached;
 //linux 
 //#define SCREEN_START 0xb8000
 //#define SCREEN_END   0xc0000
-#define LINES 25
-#define COLUMNS 80
-#define NPAR 16
+//#define LINES 25
+//#define COLUMNS 80
+//#define NPAR 16
    
 
 //
@@ -979,6 +979,9 @@ struct COMMANDHISTORY_D
 };
 COMMANDHISTORY_T *CommandHistory;  
 
+
+
+ 
  
 //
 // Macros.
