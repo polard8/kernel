@@ -337,8 +337,24 @@ Mainloop:
 	
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
 
-	    while (running)
+	    
+	//
+    // #importante:
+    // Nessa hora podemos usar esse loop para pegarmos mensagens 
+    // e enviarmos para o procedimento de janela do editor de texto.
+    // Para assim tratarmos mensagens de mouse, para clicarmos e 
+    // botões para salvarmos o arquivo. 
+    // Devemos copiar a forma que foi feita o shell.
+    //   
+
+		while (running)
 	    {
+			//
+			// #todo:
+			// Isso é provisório, usaremos mensagens.
+			// Aqui mesmo, nesse loop.
+			//
+			
 			//enterCriticalSection(); 
 	        ch = (int) getchar();
 			//exitCriticalSection();
