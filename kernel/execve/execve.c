@@ -61,7 +61,10 @@ void executive_fntos(char *name)
 /*
  *****************************************************************
  * executive_gramado_core_init_execve:
+ *
  *     Executa um programa no processo INIT dentro do ambiente Gramado Core. 
+ *     Ou seja, na thread primária do processo INIT.
+ *     Ou seja, a aplicação tem que ser compilada no mesmo endereço do INIT.
  *     #obs: Isso funcionou.
  *
  * IN:
@@ -395,385 +398,54 @@ done:
 };
 
 
-
-
 /*
- *****************************************************************
- * execve_execute_on_init:
- *     Executa um programa no processo INIT 
- * dentro do ambiente Gramado Core. 
- *
- * IN:
- * contador e endereço do vetor.
- *
- */
-
-// #bugbug: suspenso. 
- 
-/* 
-int 
-execve_execute_on_init( int n, const char *address )
-{
-	int Status = 1;  //fail.
-	
-	//Esse é o primeiro argumento.
-	int Plane;
-	
-	char *s;
-	struct thread_d *Thread;
-
-	
-	//#debug
-	//printf("0=%s ",&argv[0]);
-    //printf("1=%s ",&argv[1]);
-    
-
-	//
-	// Testando carregar um programa para 
-	// rodar no processo INIT, usando a thread 
-	// primária do processo !
-	//
-	
-		
-	//origem e destino.
-	unsigned long *src = (unsigned long *) address; //endereço da linha de comando.
-	
-	//Nome.
-	//o primeiro elemento do array é o endereço do nome do arquivo.
-	unsigned char *filename = (unsigned char*) src[0]; 
-	
-	//unsigned char *pipe = (unsigned char *) pipe_gramadocore_init_execve->_base; 
-	
-    
-	//?? funcionou ??
-	//pois o base era um char*
-	//memória compartilhada entre o kernel e o aplicativo.
-	//o aplicativo vai ler esse trem
-	//unsigned char* shared_memory = (unsigned char*) (0x401000-0x100); 
-	unsigned long *shared_memory = (unsigned long*) (0xC0800000 -0x100);
-
-    //#IMPORTANTE:
-    //PRECISAMOS ENVIAR A MENSAGEM SOMENTE DEPOIS QUE 
-    //O NOVO APLICATIVO FOR COLOCADO NA MEMÓRIA
-    //SENÃO AO COLOCAR O APLICATIVO NA MEMÓRIA A MENSAGEM 
-    //SERÁ SOBRESCRITA.	
-
-	
-	
-	//#debug
-	//printf("\nexecutive_gramado_core_init_execve: testing ...\n\n");
-	//printf(">>>fileneme={%s}\n",arg1);
-	//printf(">>>arg={%s}\n",arg2);
-	//printf(">>>env={%s}\n\n",arg3);
-	
-	
-	//...
-	
-	
-	//## teste
-	//
-	//if( ! strcmp( (char*)argv[0], "-f" ) ) 
-	//if( strncmp( (char*) &argv[1], "-f", 2 ) == 0 )
-	//{
-	//	printf("executive_gramado_core_init_execve: FOREGROUND\n");
-    //    Plane = FOREGROUND;
-    //}else{
-	//	printf("executive_gramado_core_init_execve: BACKGROUND\n");
-	//	Plane = BACKGROUND;
-	//};
-	
-	//fail.
-	//if( (const char *) filename == NULL ){
-	//	return 1;
-	//}
-	
-	//
-	// ENVIANDO A MENSAGEM
-	//
-	
-	
-	//copiando o vetor de ponteiros para a memória compartilhada.
-	int i;
-	for( i=0; i<n; i++ )
-	{
-        //pipe[i] = src[i];
-		shared_memory[i] = src[i];
-	};
-	
- 
-	//#debug
-	//ok. isso funcionou.
-	//printf("Showpipe={%s}\n",pipe);
-	//printf("Showsharedmemory={%s}\n",shared_memory);	 
-	
-	
-	//
-	// ## Thread ##
-	//
-	
-	
-	//
-	// Pegar o ponteiro da thread primária do processo 
-	// INIT.
-	//
-	
-	Thread = (struct thread_d *) threadList[0];
-	if( (void*) Thread == NULL )
-	{
-		printf("executive_gramado_core_init_execve: Thread\n");
-		goto fail;
-	}else{
-		
-		if( Thread->used != 1 || 
-		    Thread->magic != 1234 )
-		{
-			printf("executive_gramado_core_init_execve: used magic\n");
-			goto fail;
-		}
-		
-		// Significa que o contexto nunca foi salvo ...
-		// isso é importante, pois o spawn não funciona em thread 
-		// com o contexto salvo.
-		Thread->saved = 0; 
-		
-		Thread->plane = Plane;
-		
-	    //Context.
-	    //@todo: Isso deve ser uma estrutura de contexto.
-	    Thread->ss  = 0x23;                          //RING 3.
-	    Thread->esp = (unsigned long) 0x0044FFF0;    //idleStack; (*** RING 3)
-	    Thread->eflags = 0x3200;  //0x3202, pois o bit 1 é reservado e está sempre ligado.
-	    Thread->cs = 0x1B;                                
-	    Thread->eip = (unsigned long) 0x00401000;   //entry point  	                                               
-	    Thread->ds = 0x23; 
-	    Thread->es = 0x23; 
-	    Thread->fs = 0x23; 
-	    Thread->gs = 0x23; 
-	    Thread->eax = 0;
-	    Thread->ebx = 0;
-	    Thread->ecx = 0;
-	    Thread->edx = 0;
-	    Thread->esi = 0;
-	    Thread->edi = 0;
-	    Thread->ebp = 0;
-		
-		
-		Thread->Next = NULL;
-		
-		//
-		// Load file.
-		//
- 		
-		
-		//#bugbug
-		//string lenght
-		//devemos ver se a string não passa dos limites.
-		//Como essa rotina é para executar um arquivo .bin,
-		//caso não exista uma extensão .bin e o nome seja 
-		//menor que 8 podemos adicionar a extensão .bin.
-		
-		size_t l;
-		l = (size_t) strlen( (char*) filename);
-		
-		if( l > 11 )
-		{
-		    printf("executive_gramado_core_init_execve: File too long!\n");	
-			//Obs: Não sairemos da função pois isso é um teste ainda.
-		}else{
-			
-			
-			 
-			//se não existe um ponto entre os oito primeiros chars,
-            //então colocamos a extensão .bin logo após o nome passado.
-            //e ele é pelo menos menor que 11, mas deveria ser menor que oito.			
-			if( filename[0] != '.' || 
-			    filename[1] != '.' || 
-                filename[2] != '.' || 
-                filename[3] != '.' || 
-                filename[4] != '.' || 
-                filename[5] != '.' || 
-                filename[6] != '.' || 
-                filename[7] != '.' )
-				{ 
-				    l = (size_t) strlen( (char*) filename);
-                    if( l > 8 )
-					{
-						printf("executive_gramado_core_init_execve: File without ext is too long!\n");
-					    //Obs: Não sairemos da função pois isso é um teste ainda.
-					}
-					
-					char bin_string[] = ".bin";
-		            strcat( (char *) filename, (const char *) bin_string );
-			    };
-			 
-		};
-		
-		//
-		// #bugbug
-		// #importante Precisamos do ponteiro válido para filename.
-		// Não podemos auterá-lo e depois usá-lo.
-		//
-		
-		//#importante: Isso precisa ser nesse momento e não antes,
-		//pois pode corromper o espaço destinado aos argumentos 
-		//dentro do vetor ao acrescentar zeros.
-		read_fntos( (char *) filename );
-		
-		//fs/read.c
-	    // "FILE    BIN"
-        Status = (int) fsLoadFile( (unsigned char *) filename, 
-		                           (unsigned long) 0x00400000 );
-
-        //fail
-		if( Status == 1 )
-		{
-			// @todo:
-			// Configurar estrutura.
-			printf("executive_gramado_core_init_execve: Status\n");
-			printf("Can't load file.\n");
-			goto fail;
-		};
-		
-		// Se deu certo.
-		// Conseguimos carregar o arquivos.
-		// Devemos checar a validade do arquivo na memória.
-		if( Status == 0 )
-		{
-			//checar
-			//#bugbug: Não deve existir suporte a PE dentro do kernel.
-			//PE é proprietário.
-			Status = (int) fsCheckPEFile( (unsigned long) 0x00400000 );
-			if( Status == 0 )
-			{
-				printf("executive_gramado_core_init_execve: Status\n");
-			    printf("It's not a valid PE file.\n");
-			}
-			
-		    queue_insert_data( queue, 
-			    (unsigned long) Thread, QUEUE_INITIALIZED );
-            
-			// * MOVEMENT 1 ( Initialized ---> Standby ).
-			SelectForExecution(Thread);    
-            goto done; 
-        };	
-         
-        //fail		 
-	};
-	
-	//fail
-	
-fail:
-    printf("fail\n");
-done:
-	
-	//refresh_screen();
-	//while(1){
-	//	asm("hlt");
-	//}
-	//	
-    
-	//#debug
-	//printf("done\n");	
-	
-	refresh_screen();
-	return (int) Status;	
-};
-*/
-
-
-
-/*
-void executiveMain();
-void executiveMain(){
-	return;
-};
-*/
-
-
-
-/*
- * executive_config_exported_functions:
- *
- *     Configura a tabela do Kernel de funções exportadas
- *	   e a tabela de ponteiros para tabelas dos outros programas em Kernel Mode.
- *
- */
-/*
-int executive_config_exported_functions(); 
-int executive_config_exported_functions()
-{
-	
-    ring0_exported = (void*) malloc(sizeof(struct ring0_exported_d));
-	
-	if( (void*) ring0_exported == NULL )
-	{
-	    return (int) 1;
-	}
-	else
-	{
-	    //ring0_exported->bm_exported  = ( ponteiro para a tabela de funções exportadas pelo boot manager)
-		//ring0_exported->bl_exported  = ( ponteiro para a tabela de funções exportadas pelo boot loader)
-		//ring0_exported->bk_exported  = ( ponteiro para a tabela de funções exportadas pelo kernel)
-		
-		
-		//@todo: Criar a tabela do kernel e salvar o ponteiro nessa estrutura ai.
-		//       Pegar os ponteiros de bootmanager e bootloader e colocar ai.
-		
-	};
-	
-	
-	// @todo: Nothing more?
-	
-done:
-    return (int) 0;
-};
-
-*/
-
-
-/*
- *************************************
  * sys_showkernelinfo:
  *     Show kernel info.
  */
-void 
-sys_showkernelinfo()
-{
-	KiInformation();
+void sys_showkernelinfo (){
+	
+	KiInformation ();
 };
-
 
 
 /*
  ************************************************
  * init_executive:
+ *
  *     Initialize the kernel executive.
  *     Archtecture (independent) inicialization. 
  */
-int init_executive()
-{
+ 
+int init_executive (){
+	
     int Status = 0;
 	
+	//#debug
 	printf("EXECUTIVE:\n");
 	
-	//  PCI - Pega informações da PCI.
+	// PCI - Pega informações da PCI.
+	// CLOCK - Pega informações de Hora e Data.	
+	
 	init_pci();
-	
-	// CLOCK - Pega informações de Hora e Data.
     init_clock();
+	//...
 	
-	//configura a tabela do kernel de funções exportadas
-	//e tabela de ponteiros para tabelas dos outros programas em kernel mode.
-    //Status = (int) executive_config_exported_functions();
+	// ??
+	// configura a tabela do kernel de funções exportadas
+	// e tabela de ponteiros para tabelas dos outros programas em kernel mode.
+    // Status = (int) executive_config_exported_functions();
 
 	//Continua ...
 	
-Done:
+//Done:
     
 	//@todo: Checar a validade de 'Initialization' ??
 
+	//#debug
+	//printf("Done!\n");
+	
     Initialization.executive = 1;	
-	printf("Done!\n");	
+	
 	return (int) Status;
 };
 
