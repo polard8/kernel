@@ -3,7 +3,7 @@
  * kernel base. 
  * (c) Copyright 2015-2016 Fred Nora.
  *
- * File: k\executive.c 
+ * File: execve\execve.c 
  * 
  */
  
@@ -61,22 +61,22 @@ void executive_fntos(char *name)
 /*
  *****************************************************************
  * executive_gramado_core_init_execve:
- *     Executa um programa no processo INIT 
- * dentro do ambiente Gramado Core. 
- * #obs: Isso funcionou.
+ *     Executa um programa no processo INIT dentro do ambiente Gramado Core. 
+ *     #obs: Isso funcionou.
  *
  * IN:
  * serviço, file name, arg, env.
- *
  */
+ 
 int 
-executive_gramado_core_init_execve( int i,              
-                                    const char *arg1,   //name
-                                    const char *arg2,    //arg
-                                    const char *arg3 )   //env
+executive_gramado_core_init_execve ( int i,              
+                                     const char *arg1,   //name
+                                     const char *arg2,    //arg
+                                     const char *arg3 )   //env
 {
 	int Status = 1;  //fail.
 	
+	//??
 	//Esse é o primeiro argumento.
 	int Plane;
 	
@@ -84,52 +84,45 @@ executive_gramado_core_init_execve( int i,
 	struct thread_d *Thread;
 
 	
+	//Usados gerenciamento de arquivo.
+	size_t l; //lenght.
+ 	char bin_string[] = ".bin";	
+	//char xxx_string[] = ".xxx";	
+	
 	//#debug
 	//printf("0=%s ",&argv[0]);
     //printf("1=%s ",&argv[1]);
     
 
-	//
-	// Testando carregar um programa para 
-	// rodar no processo INIT, usando a thread 
-	// primária do processo !
-	//
-	
+	// #importante
+	// Testando carregar um programa para rodar no processo INIT, 
+	// usando a thread primária do processo !
+	// É o mesmo que consierar que o processo INIT já seja o clone 
+	// de outro válido.
 		
-	//origem e destino.
-	//unsigned char *src = (unsigned char *) arg2; //endereço da linha de comando.
-	//unsigned char *pipe = (unsigned char *) pipe_gramadocore_init_execve->_base; 
-	
+    //??		
 	//array de ponteiros.
 	unsigned long *p = (unsigned long *) arg2;
     
-	//?? funcionou ??
-	//pois o base era um char*
-	//memória compartilhada entre o kernel e o aplicativo.
-	//o aplicativo vai ler esse trem 
-	unsigned char *shared_memory = (unsigned char*) (0xC0800000 -0x100);
+	// #importante:
+	// Memória compartilhada entre o kernel e o aplicativo.
+	// O aplicativo vai ler esse trem 
+	unsigned char *shared_memory = (unsigned char *) (0xC0800000 -0x100);
 	
-	//destino para o array de ponteiros.
-	//ele deve ficar na memória compartilhada para o aplicativo usar.
-	//unsigned long *shared_p = (unsigned long *) (0xC0800000 -0x100);
-
-    //#IMPORTANTE:
-    //PRECISAMOS ENVIAR A MENSAGEM SOMENTE DEPOIS QUE 
-    //O NOVO APLICATIVO FOR COLOCADO NA MEMÓRIA
-    //SENÃO AO COLOCAR O APLICATIVO NA MEMÓRIA A MENSAGEM 
-    //SERÁ SOBRESCRITA.	
-
-	
-	
-	
+    // #IMPORTANTE:
+    // PRECISAMOS ENVIAR A MENSAGEM SOMENTE DEPOIS QUE O NOVO PROGRAMA FOR 
+	// COLOCADO NA MEMÓRIA, SENÃO AO COLOCAR O PROGRAMA NA MEMÓRIA A MENSAGEM 
+    // SERÁ SOBRESCRITA.	
+    // #TODO: CRIAR UM MECANISMO DE TROCA DE MENSAGENS MAIS EFICIENTE,
+	// BASEADO NESSE.
 	
 	//#debug
 	//tentando receber uma linha de ocmando inteira.
-	printf("\nexecutive_gramado_core_init_execve: testing ...\n\n");
+	//printf("\nexecutive_gramado_core_init_execve: testing..\n\n");
 	
 	//# ISSO DEU CERTO #
 	//testando se o shell transferiu toda alinha de comandos para a memória compartilhada.
-	printf(">>>cmdline2={%s}\n", shared_memory);
+	//printf(">>>cmdline2={%s}\n", shared_memory);
 	
 	
 	//#IMPORTANTE:
@@ -137,10 +130,6 @@ executive_gramado_core_init_execve( int i,
 	//e o nome do arquivo programa foi passado via endereço 
 	//então temos tudo o que é preciso 
 	//para enviarmos a linha de comandos para o aplicativo.
-	
-	
- 
-	
 	
 	//...
 	
@@ -197,34 +186,39 @@ executive_gramado_core_init_execve( int i,
 	//printf("Showsharedmemory={%s}\n",shared_memory);	 
 	
 	
-	//
-	// Pegar o ponteiro da thread primária do processo 
-	// INIT.
-	//
+	// Pegar o ponteiro da thread primária do processo INIT.
+	// #bugbug: Perceba que isso é uma constante.
+	// ?? usar uma variável, por exemplo:
+	// init_thread ou dolly thread ou IdleThread->tid;
 	
-	Thread = (struct thread_d *) threadList[0];
-	if( (void*) Thread == NULL )
+	//Thread = (struct thread_d *) threadList[0];
+	
+	Thread = (struct thread_d *) IdleThread; 
+	
+	if ( (void *) Thread == NULL )
 	{
-		printf("executive_gramado_core_init_execve: Thread\n");
+		//#fail
+		printf("executive_gramado_core_init_execve: Thread Fail \n");
 		goto fail;
-	}else{
 		
-		if( Thread->used != 1 || 
-		    Thread->magic != 1234 )
+	} else {
+		
+		if ( Thread->used != 1 || Thread->magic != 1234 )
 		{
-			printf("executive_gramado_core_init_execve: used magic\n");
+			printf("executive_gramado_core_init_execve: Validation fail \n");
 			goto fail;
 		}
 		
-		// Significa que o contexto nunca foi salvo ...
-		// isso é importante, pois o spawn não funciona em thread 
-		// com o contexto salvo.
+		// Significa que o contexto nunca foi salvo, pois o spawn 
+		// não funciona em thread com o contexto salvo.
+		
 		Thread->saved = 0; 
 		
 		Thread->plane = Plane;
 		
 	    //Context.
 	    //@todo: Isso deve ser uma estrutura de contexto.
+		
 	    Thread->ss  = 0x23;                          //RING 3.
 	    Thread->esp = (unsigned long) 0x0044FFF0;    //idleStack; (*** RING 3)
 	    Thread->eflags = 0x3200;  //0x3202, pois o bit 1 é reservado e está sempre ligado.
@@ -242,135 +236,161 @@ executive_gramado_core_init_execve( int i,
 	    Thread->edi = 0;
 	    Thread->ebp = 0;
 		
-		
 		Thread->Next = NULL;
 		
 		//
-		// Load file.
+		// ## Load file ##
 		//
- 		
 		
-		//
+		// #bugbug
 		// # arg1=name ##
-		//
 		
-		//#bugbug
-		//string lenght
-		//devemos ver se a string não passa dos limites.
-		//Como essa rotina é para executar um arquivo .bin,
-		//caso não exista uma extensão .bin e o nome seja 
-		//menor que 8 podemos adicionar a extensão .bin.
+		// Devemos ver se a string não passa dos limites.
 		
-		size_t l;
-		l = (size_t) strlen( (char*) arg1);
+		// Como essa rotina é para executar um arquivo .bin,
+		// caso não exista uma extensão .bin e o nome seja menor que 8, 
+		// podemos adicionar a extensão .bin.
 		
-		if( l > 11 )
+		l = (size_t) strlen ( (char *) arg1 );
+		
+		if ( l > 11 )
 		{
-		    printf("executive_gramado_core_init_execve: File too long!\n");	
+		    // #fail 
+			printf("executive_gramado_core_init_execve: File name fail\n");	
 			//Obs: Não sairemos da função pois isso é um teste ainda.
-		}else{
+			//goto fail;
+		
+		} else {
 			
 			
-			 
 			//se não existe um ponto entre os oito primeiros chars,
             //então colocamos a extensão .bin logo após o nome passado.
             //e ele é pelo menos menor que 11, mas deveria ser menor que oito.			
-			if( arg1[0] != '.' || 
-			    arg1[1] != '.' || 
-                arg1[2] != '.' || 
-                arg1[3] != '.' || 
-                arg1[4] != '.' || 
-                arg1[5] != '.' || 
-                arg1[6] != '.' || 
-                arg1[7] != '.' )
-				{ 
-				    l = (size_t) strlen( (char*) arg1);
-                    if( l > 8 )
+			
+			if ( arg1[0] != '.' && 
+			     arg1[1] != '.' && 
+                 arg1[2] != '.' && 
+                 arg1[3] != '.' && 
+                 arg1[4] != '.' && 
+                 arg1[5] != '.' && 
+                 arg1[6] != '.' && 
+                 arg1[7] != '.' )
+				{
+                    //#bugbug: Já pegamos esse valor.					
+				    //l = (size_t) strlen ( (char *) arg1);
+                    
+					if ( l > 8 )
 					{
-						printf("executive_gramado_core_init_execve: File without ext is too long!\n");
+						printf("executive_gramado_core_init_execve: File without ext is too long\n");
 					    //Obs: Não sairemos da função pois isso é um teste ainda.
+					    //goto fail;
 					}
 					
-					char bin_string[] = ".bin";
-		            strcat( (char *)arg1, (const char *) bin_string );
+		            strcat ( (char *) arg1, (const char *) bin_string );
 			    };
-			 
+				
+			// #obs:	
+			// Se estamos aqui, isso significa existe um ponto 
+            // nos primeiros oito bytes.
+            // Ainda não sabemos se todo o nome do arquivo está certo,
+            // mas ja sabemos que não precisamos incluir uma extenção.			
 		};
 		
-		//
+		
 		// #bugbug
-		// #importante Precisamos do ponteiro válido para filename.
-		// Não podemos auterá-lo e depois usá-lo.
-		//
+		// #importante: 
+		// +Precisamos do ponteiro válido para filename.
+		// +Não podemos auterá-lo e depois usá-lo.
 		
-		//#importante: Isso precisa ser nesse momento e não antes,
-		//pois pode corromper o espaço destinado aos argumentos 
-		//dentro do vetor ao acrescentar zeros.
-		read_fntos( (char *) arg1);
+		// #importante: 
+		// Isso precisa ser nesse momento e não antes, pois pode corromper o 
+		// espaço destinado aos argumentos dentro do vetor ao acrescentar 
+		// zeros.
 		
-		//fs/read.c
-	    // "FILE    BIN"
-        Status = (int) fsLoadFile( (unsigned char *) arg1, 
-		                           (unsigned long) 0x00400000 );
+		// Isso está em fs/read.c
+	    // fsLoadFile usa o formado "FILE    BIN".
+        // Vamos transformar 'file.txt' em "FILE    BIN". 		
+		
+		read_fntos ( (char *) arg1 );
+		
+        Status = (int) fsLoadFile ( (unsigned char *) arg1, 
+		                (unsigned long) 0x00400000 );
 
-        //fail
-		if( Status == 1 )
+		// Se não conseguimos carregar o arquivo, devemos abortar.
+		if ( Status == 1 )
 		{
 			// @todo:
 			// Configurar estrutura.
-			printf("executive_gramado_core_init_execve: Status\n");
-			printf("Can't load file.\n");
+			
+			//printf("executive_gramado_core_init_execve: Status\n");
+			printf("executive_gramado_core_init_execve: ERROR. Can't load file\n");
 			goto fail;
 		};
 		
-		// Se deu certo.
-		// Conseguimos carregar o arquivos.
-		// Devemos checar a validade do arquivo na memória.
-		if( Status == 0 )
+		// Se conseguimos carregar o arquivo, devemos checar a validade 
+		// do arquivo na memória.
+		if ( Status == 0 )
 		{
-			//checar
-			//#bugbug: Não deve existir suporte a PE dentro do kernel.
-			//PE é proprietário.
-			Status = (int) fsCheckPEFile( (unsigned long) 0x00400000 );
-			if( Status == 0 )
-			{
-				printf("executive_gramado_core_init_execve: Status\n");
-			    printf("It's not a valid PE file.\n");
+			// #bugbug: 
+			// Não deve existir suporte a PE dentro do kernel.
+			// PE é proprietário.
+			
+			Status = (int) fsCheckPEFile ( (unsigned long) 0x00400000 );
+			
+			if ( Status == 1 ){
+				printf("executive_gramado_core_init_execve: ERROR. It's not a valid PE file\n");
+				//goto fail;
 			}
 			
-		    queue_insert_data( queue, 
+			// ??
+			// Colocar a trhead na fila de inicializadas.
+			
+		    queue_insert_data ( queue, 
 			    (unsigned long) Thread, QUEUE_INITIALIZED );
             
+			
+			// #importante:
 			// * MOVEMENT 1 ( Initialized ---> Standby ).
-			SelectForExecution(Thread);    
-            goto done; 
+			SelectForExecution (Thread);    
+            
+			goto done; 
         };	
          
-        //fail		 
+        //fail	
+        printf("executive_gramado_core_init_execve:  File support fail\n");
 	};
 	
-	//fail
-	
+	//fail	
 fail:
-    printf("fail\n");
+    printf("executive_gramado_core_init_execve: #fail\n");
+	//refresh_screen();
 done:
 
-
+    //#debug
 	//printf(">>>shared_p0={%s}\n"     ,shared_p[0]);
 	//printf(">>>shared_p1={%s}\n"     ,shared_p[1]);
 	//printf(">>>shared_p2={%s}\n\n"   ,shared_p[2]);
 	//printf(">>>shared_p3={%s}\n\n"   ,shared_p[3]);	
-	
 	//refresh_screen();
 	//while(1){
 	//	asm("hlt");
 	//}
 	//	
     
+	
 	//#debug
 	//printf("done\n");	
 	
+	//
+	// #Obs: 
+	// +Não devemos emitir mensagens no caso de acerto.
+	// +refresh_screen só no caso de erro.
+	//
+	
+	//#bugbug
+	//#obs: Estamos usando isso só por enquanto para debug.
 	refresh_screen();
+	
 	return (int) Status;	
 };
 

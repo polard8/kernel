@@ -51,7 +51,9 @@
 //...
 
 
-
+// Checando a validade de arquivos binários no formato PE.
+// #bugbug: Isso não deve ficar no kernel, pois PE é proprietário.
+// Nem usaremos PE no futuro.
 int fsCheckPEFile ( unsigned long address ){
 	
 	unsigned char *buffer = (unsigned char *) address;
@@ -63,6 +65,15 @@ int fsCheckPEFile ( unsigned long address ){
 		goto fail;
 	}
 	
+	//i486
+	
+	//Continua...
+	
+	//
+	// # OK #
+	//
+	
+//done:	
 	return (int) 0;
 	
 fail:
