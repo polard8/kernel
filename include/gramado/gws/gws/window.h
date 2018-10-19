@@ -617,6 +617,7 @@ struct window_class_d
  * gerenciado por uma estrutura tradicional de terminal.
  *
  */
+ 
 struct window_d
 {
 	

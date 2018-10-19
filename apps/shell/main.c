@@ -70,7 +70,7 @@
 */ 
 
 //# usado para teste 
-#define WINDOW_WIDTH     400 
+#define WINDOW_WIDTH     640 
 #define WINDOW_HEIGHT    500
 #define WINDOW_LEFT      0
 #define WINDOW_TOP       0
@@ -1690,6 +1690,9 @@ void shellWaitCmd (){
  * + Stephen Brennan - https://brennan.io/2015/01/16/write-a-shell-in-c/
  * + Frederico Martins Nora (frednora)
  */
+ 
+//#TEST 
+//#define LSH_TOK_DELIM " \t\r\n\a+!:=/.<>;|&" 
  
 #define LSH_TOK_DELIM " \t\r\n\a" 
 #define SPACE " "
