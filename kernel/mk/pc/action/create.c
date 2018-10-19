@@ -789,7 +789,17 @@ void *KiCreateRing0Idle()
 	//Context.
 	t->ss  = 0x10 | 0;               
 	t->esp = (unsigned long) (ring0IdleStack+(8*1024));  //pilha. 
-	t->eflags = 0x3200;  //???
+	
+	//#bugbug 
+	//Problemas nos bits 12 e 13.
+	//queremos que esse código rode em ring0.
+	
+	//#obs: mudei para 0x0200 e funcionou. 
+	//
+	
+	//t->eflags = 0x3200;  
+	t->eflags = 0x0200;  
+	
 	t->cs = 8 | 0;                                
 	t->eip = (unsigned long) xxxRing0Idle; 	                                               
 	t->ds = 0x10 | 0;

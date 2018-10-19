@@ -623,7 +623,8 @@ int x86main ( int argc, char *argv[] ){
 	//printf ("testando salvamento de retangulo\n");
 	//refresh_screen();
 	
-	initialize_saved_rect ();
+	//isso funcionou ...
+	//initialize_saved_rect ();
 	
 	//testando salvar um retângulo ...
 	//save_rect ( 0, 0, 100, 100 );
