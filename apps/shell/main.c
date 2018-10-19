@@ -1822,29 +1822,38 @@ commandlineok:
     //>./
     //>..
     //>../
+	
+	// #importante:
+	// Vamos checar se o pathname é absoluto ou relativo.
+	// +Se tiver barra, significa que o pathname é absoluto e 
+	// começa no diretório raiz do volume do sistema. root:/volume1/
+	// +Se começar por root:/ também é absoluto.
+	// +Pathname relativo é somente aquele que é apenas um nome 
+	// de arquivo dentro do diretório atual. Como: 'name' ou name1/name2,
+	// sem barra ou ponto.
+	// $/ é o diretório raiz do volume do sistema.
+	// $v/ é o diretório raiz do vfs.	
  
 
     absolute = absolute_pathname ( (char *) prompt );
 	
-    if (absolute == 1){
-		
-		// Aqui estamso invocando alguma coisa em um 
-        // determinado diretório, pode ser o deretório raiz 
-        // o próprio diretório, algo no próprio diretório,
-        // o diretório pai ou algo no diretório pai. 		
-		//printf("absolute pathname\n");
-		goto check_directory;
-	}else{
-		
-		// Aqui pode ser que começamos com o 
-		// nome de um programa. Ex: >gcc
-		// Obs: Se isso é um comando então 
-		// podemos checar mais à frente novamente 
-		// se o pathname é absoluto ou não.
-		//printf("not absolute pathname\n");
-	    goto this_directory;
-	}
-	
+    switch (absolute)
+	{
+		//Não é absoluto ou falhar
+		case 0:
+		    goto this_directory;
+		    break;
+			
+		//é absoluto	
+		case 1:
+		    goto check_directory; 
+			break;
+		//falha	
+		case 2:
+		default:
+		    goto this_directory;
+			break;
+	};
 
 //precisamos checar em que diretório 
 //o programa está.
@@ -1852,6 +1861,7 @@ commandlineok:
 //Precisamos invocar esse programa 
 //que está em um diretório apontado no pathname.
 //ex: ../cmd 	
+
 check_directory:
 	
 	
@@ -3024,47 +3034,61 @@ doexec_first_command:
 	//
 
 	// #importante:
-	// Se estamos aqui é porque o comando não corresponde a
-	// nenhuma das palavras reservadas acima, então executaremos
-	// presumindo ser um nome de aplicativo no formato 'test.bin'
-	// >>> Mas esse comando pode ser o último elemento  
-	//     de um pathname, então vamos checar se o pathname é 
-	//     absoluto. Isso é a primeira coisa que podemos fazer.
+	// Se estamos aqui é porque o comando não corresponde a nenhuma das 
+	// palavras reservadas acima, então executaremos, presumindo ser um nome 
+	// de aplicativo no formato 'test.bin'. 
+	
+	// #importante:
+	// Vamos checar se o pathname é absoluto ou relativo.
+	// +Se tiver barra, significa que o pathname é absoluto e 
+	// começa no diretório raiz do volume do sistema.
+	// root:/volume1/
+	// +Se começar por root:/ também é absoluto.
+	// +Pathname relativo é somente aquele que é apenas um nome 
+	// de arquivo dentro do diretório atual. Como: 'name' ou name1/name2,
+	// sem barra ou ponto.
 	
     absolute = absolute_pathname ( (char *) tokenList[0] );
 	
-    if (absolute == 1)
+    switch (absolute)
 	{
-		
-		// Aqui estamso invocando alguma coisa em um 
-        // determinado diretório, pode ser o deretório raiz 
-        // o próprio diretório, algo no próprio diretório,
-        // o diretório pai ou algo no diretório pai. 		
-		printf("doexec_first_command: absolute pathname\n");
-		
-		// eliminando ./ do pathname
-		char *t = (char*) tokenList[0];
+		//Não é absoluto ou falhar
+		case 0:
+		    //printf("doexec_first_command: not absolute pathname\n");
+		    break;
+			
+		//é absoluto	
+		case 1:
+		    printf("doexec_first_command: absolute pathname\n");
+			
+			break;
+			
+		//falha	
+		case 2:
+		default:
+		    printf("doexec_first_command: pathname fail\n");
+			break;
+	};   
+
+    // Trata no caso de ser absoluto.
+	// + Eliminar ./ pois se trata de arquivo no diretório atual.
+	if (absolute == 1)
+	{
+		//#bugbug: Essa definição não deve ficar aqui.
+		char *t = (char *) tokenList[0];
 		
 		if ( *t == '.' )
 		{
 			t++;
 			
-		    if ( *t == '/' ){
-				
+		    if ( *t == '/' )
+			{	
 				t++;
-				tokenList[0] = (char*) t;
+				tokenList[0] = (char *) t;
 			}
 	    };	
-	
-	}else{
-		
-		// Aqui pode ser que começamos com o 
-		// nome de um programa. Ex: >gcc
-		// Obs: Se isso é um comando então 
-		// podemos checar mais à frente novamente 
-		// se o pathname é absoluto ou não.
-		printf("doexec_first_command: not absolute pathname\n");
 	};
+		
 	
 	
 	//
@@ -5855,26 +5879,102 @@ int set_dir_files( char **poll, char *buffer )
  *
  * Credits: bash 1.05
  */
+	
+	// #importante:
+	// Vamos checar se o pathname é absoluto ou relativo.
+	// +Se tiver barra, significa que o pathname é absoluto e 
+	// começa no diretório raiz do volume do sistema. root:/volume1/
+	// +Se começar por root:/ também é absoluto.
+	// +Pathname relativo é somente aquele que é apenas um nome 
+	// de arquivo dentro do diretório atual. Como: 'name' ou name1/name2,
+	// sem barra ou ponto.
+	// $/ é o diretório raiz do volume do sistema.
+	// $v/ é o diretório raiz do vfs.
+	
 int absolute_pathname ( char *string ){
 	
-    if( !string || !strlen(string))
+	// Checar nulidade.
+    if( !string || !strlen(string) )
         return (0);
 
+	//Começa por barra.
+	//Então essa barra significa o diretório raiz do 
+	//volume do sistema. Ex: root:/volume1/
     if( *string == '/' )
         return (1);
 
-	//.
-    if( *string++ == '.' )
+	
+	// .
+    // É absoluto, pois estamos determinando o diretório.
+	// Se for ponto, avança em seguida.
+	if( *string++ == '.' )
     {
         // ./
+		// Significa que se trata do diretório atual
 		if( (!*string) || *string == '/' )
 	        return (1);
 
         // ..
+		// ../
+		// Significa que se trata do diretório pai.
+		// Se for ponto, avança em seguida.
+		// se for barra ou nada é absoluto.
+		//obs: o nada nesse caso significa que foi digitado apenas '..'
 		if( *string++ == '.' )
-	        if(!*string || *string == '/')  //../
-	        return (1);
+	        if( !*string || *string == '/' )  
+	            return (1);
+		
+		// ?? Continua ...
+		// Se estamos aqui, significa que é um ponto que não é seguido 
+		// de outro ponto ou barra.
+		//?? deveríamos falhar com a opção 2. 
+		return (2);
     }
+	
+	// root:/
+	if ( *string == 'r' )
+	{
+	    if ( string[0] == 'r' &&
+             string[1] == 'o' &&
+             string[2] == 'o' &&
+             string[3] == 't' &&
+             string[4] == ':' &&
+             string[5] == '/' )
+	    {
+		    return (1);		 
+		}
+
+
+        return (2);		
+	};
+	
+	// #teste:
+	// invendando esquema.
+	// Volume do sistema.
+	// O número do volume do sistema é um padrão.
+	if ( *string == '$' )
+	{
+		
+	    // root:/volume1/ = $/ (volume do sistema)	    
+		if ( string[0] == '$' && 		
+		     string[1] == '/' )
+	    {
+		    return (1);		 
+		}
+		
+	    // root:/volume1/ = $v/ (vfs)
+		if ( string[0] == '$' &&
+             string[1] == 'v' && 		
+		     string[2] == '/' )
+	    {
+		    return (1);		 
+		}
+
+        return (2);		
+	};	
+	
+//fail:
+//Não é absoluto.
 	
     return (int) 0;
 };
