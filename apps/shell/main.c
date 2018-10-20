@@ -866,8 +866,6 @@ noArgs:
 	// reabilitamos a piscagem de cursor.
 	//
 	
-	
-	
 	//#bugbug: isso deixou i sistema lerdo.
 	unsigned long xbuffer[8];
 	
@@ -881,10 +879,10 @@ noArgs:
 	//r.cy = xbuffer[3];	
 	
 	
-	//terminal_rect.left = xbuffer[0];
-	//terminal_rect.top = xbuffer[1];
-	//terminal_rect.width = xbuffer[2];
-	//terminal_rect.height = xbuffer[3];	
+	terminal_rect.left = xbuffer[0];
+	terminal_rect.top = xbuffer[1];
+	terminal_rect.width = xbuffer[2];
+	terminal_rect.height = xbuffer[3];	
 	//...
 	
 
@@ -898,6 +896,7 @@ noArgs:
 		 terminal_rect.height > wsWindowHeight )
 	{
         //#debug
+		printf("## fail ## \n");
 	    printf("terminal_rect: 2\n");	
         printf("l={%d} t={%d} w={%d} h={%d}\n", 
 	        terminal_rect.left, terminal_rect.top,
@@ -925,9 +924,12 @@ noArgs:
 	// ++ terminal ++
 	//
 	
-	//definindo a janela como sendo uma janela de terminal.
-	//isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
-	//para essa janela e não apenas ao procedimento de janela do sistema.
+	// #importante
+	// Definindo a janela como sendo uma janela de terminal.
+	// Isso faz com que as digitações tenham acesso ao procedimento de janela de terminal 
+	// para essa janela e não apenas ao procedimento de janela do sistema.
+	// # provavelmente isso marca os limites para a impressão de caractere em modo terminal 
+	
 	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, 
 		(unsigned long) hWindow, (unsigned long) hWindow );
 				 
@@ -5091,10 +5093,10 @@ void shellShowWindowInfo (){
 	//obs: Isso é uma estrutura interna, não reflete 
     //a informação usada pelo kernel.	
 	printf("\n");		
-	printf("terminal_rect: \n");	
+	printf("Window info: \n");	
     printf("l={%d} t={%d} w={%d} h={%d}\n", 
-	    terminal_rect.left, terminal_rect.top,
-		terminal_rect.width, terminal_rect.height );
+	    wpWindowLeft, wpWindowTop,
+		wsWindowWidth, wsWindowHeight );
 
 													  
 	//Obs: isso funcionou. setando o cursor.

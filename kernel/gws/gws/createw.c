@@ -1230,6 +1230,9 @@ drawBegin:
                 // height = windows height - as bordas horizontais - a barra de títulos.
                 window->rcClient->width = (unsigned long) (window->width -1 -1);
                 window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
+				
+				window->rcClient->right = window->rcClient->left + window->rcClient->width;
+				window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
                 
 			};
 			

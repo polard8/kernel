@@ -2548,6 +2548,9 @@ struct window_d
 	unsigned long teminal_width;
 	unsigned long teminal_height;
 	
+	unsigned long teminal_right;
+	unsigned long teminal_bottom;		
+	
 	//...
 	
 	//@todo: isso deve pertencer a uma janela.

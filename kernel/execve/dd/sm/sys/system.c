@@ -2503,12 +2503,13 @@ void systemSetTerminalWindow( struct window_d *window )
 		
 //check_window:	
 
-	if( (void *) window == NULL )
+	if ( (void *) window == NULL )
 	{
 		goto fail;
-	}else{
 		
-		if( window->used != 1 || window->magic != 1234 ){
+	} else {
+		
+		if ( window->used != 1 || window->magic != 1234 ){
 			goto fail;
 		}
 		
@@ -2532,12 +2533,14 @@ void systemSetTerminalWindow( struct window_d *window )
 		
 		
 	    //rect
+		//configura por último
 	    window->teminal_left = 0;
 	    window->teminal_top = 0;
 	    window->teminal_width = 0;
 	    window->teminal_height = 0;		
 		//..
 		
+		//rcClient
 		
 		//
 		// test:
@@ -2551,61 +2554,56 @@ void systemSetTerminalWindow( struct window_d *window )
 		// #bugbug:
         // #importante		
 		// Esse ajuste pode significar problemas.
-        
-		//x
-		if( window->x > 0 )
+        if ( (void *) window->rcClient !=  NULL )
 		{
-            g_cursor_x = (window->x/8 );     
-		}		
+		    //x inicial
+		    if ( window->rcClient->left > 0 )
+		    {
+                g_cursor_x = (window->rcClient->left/8 );   
+                g_cursor_left = g_cursor_x;
+				
+                window->teminal_left = window->rcClient->left; 				
+		    }		
 		
-		//y
-		if( window->y > 0 )
-		{
-            g_cursor_y = (window->y/8 );     
-        }		
-
-        //dimensões do cursor.
-		g_cursor_width = 8;  //??
-        g_cursor_height = 8; //??
-        
-		//cor do cursor
-		g_cursor_color = COLOR_TERMINALTEXT;
-
+		    //y inicial
+		    if ( window->rcClient->top > 0 )
+		    {
+                g_cursor_y = (window->rcClient->top/8 ); 
+                g_cursor_top = g_cursor_y;
+				
+                window->teminal_top = window->rcClient->top; 				
+            }		
+        };
 		
-		//left
-		if( window->left > 0 )
+        if( window->rcClient->width > 0 )
 		{
-			// margem esquerda dada em linhas
-            window->teminal_left = (window->left/8 );     
-            g_cursor_left = window->teminal_left; 
+			window->teminal_width = window->rcClient->width; 
 		}
-		
-		//top
-		if( window->top > 0 )
-		{
-			// margem superior dada em linhas
-		    window->teminal_top = (window->top/8 ); 
-			g_cursor_top = window->teminal_top;
-        }
-		
+	    
+		if( window->rcClient->height > 0 )
+	    {
+			window->teminal_height = window->rcClient->height;
+		}
 	
-	    if( (window->left + window->width) > 0 )
+	    if( window->rcClient->right > 0 )
 		{
 			// margem direita dada em linhas
-			window->teminal_width = (window->left + window->width)/8;
-		    g_cursor_right = window->teminal_width;     
+			g_cursor_right = window->rcClient->right /8;
+			
+            window->teminal_right = window->rcClient->right; 			
         }
 		
-		if( (window->top + window->height) > 0 )
+		if( window->rcClient->bottom > 0 )
 		{
 			// margem inferior dada em linhas
-			window->teminal_height = (window->top + window->height)/8;
-		    g_cursor_bottom = window->teminal_height;   
+			g_cursor_bottom = window->rcClient->bottom /8;
+			
+		    window->teminal_bottom = window->rcClient->bottom;   
 		}
 		
 		//limits
 		//@todo: corrigir.
-		// ajustes temporários ...
+		// ajustes temporários caso tenha havido um erro anteriormente...
 		if( g_cursor_left > 800 ){
 			g_cursor_left = 795;
 		};
@@ -2621,6 +2619,12 @@ void systemSetTerminalWindow( struct window_d *window )
 		if( g_cursor_bottom > 600 ){
 			g_cursor_bottom = 595;
 		};
+		
+		
+        //Cursor.
+		g_cursor_width = 8;  
+        g_cursor_height = 8; 
+		g_cursor_color = COLOR_TERMINALTEXT;		
 		
 	};
 		

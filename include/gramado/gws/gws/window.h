@@ -902,10 +902,14 @@ struct window_d
 	int terminal_tab; // em qual tab do gerenciador de terminais está o terminal.
 	
 	//rect
+	
 	unsigned long teminal_left;
 	unsigned long teminal_top;
 	unsigned long teminal_width;
 	unsigned long teminal_height;
+	
+	unsigned long teminal_right;
+	unsigned long teminal_bottom;	
 	
 	//...
 	

@@ -196,10 +196,6 @@ int wlMaxColumns;
 int wlMaxRows;
 
 
-
-//...
-
-
 //
 //  ## Window size ##
 //
