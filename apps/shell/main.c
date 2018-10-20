@@ -1262,31 +1262,35 @@ shellProcedure( struct window_d *window,
 		    switch (long1)
 			{
 		        
-				//help
 				case VK_F1:
-				    //MessageBox( 1, "Gramado Core - Shell","F1: HELP");
+                    shellTestLoadFile ();
 					
-				    //MessageBox( 1, "Gramado Core - Shell","F11: FULL SCREEN");
+					//inicializa a área visível.
+					textTopRow = 0;
+	                textBottomRow = 0 + 24;
 					
-				    //APISetFocus(i1Window);
-					//APIredraw_window(i1Window);
 					//MessageBox( 1, "feedterminalDialog","F1: HELP");
 				    //APISetFocus(i2Window);
 					//APIredraw_window(i2Window);				
 				    //MessageBox( 1, "MessageBox","F1: Testing apiDialog() ");
 					
-					printf("Testing apiDialog: ...\n");
-					q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
+					//printf("Testing apiDialog: ...\n");
+					//q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
 					
-					if ( q == 1 ){ printf("Voce escolheu Yes \n"); };
-					if ( q == 0 ){ printf("Voce escolheu No \n"); };
+					//if ( q == 1 ){ printf("Voce escolheu Yes \n"); };
+					//if ( q == 0 ){ printf("Voce escolheu No \n"); };
 					
-					printf("apiDialog retornou.\n");
+					//printf("apiDialog retornou.\n");
 					
 					//ShellFlag = SHELLFLAG_COMMANDLINE;						
+					break;
 					
-					//testando formato amigável de string - ok
-					//shell_gramado_core_init_execve( "testtest.bin", 0, 0 );
+				case VK_F2:
+				    testChangeVisibleArea();
+					break;
+					
+				case VK_F3:
+				    shellRefreshVisibleArea();
 					break;
 					
 				//...
@@ -1294,7 +1298,7 @@ shellProcedure( struct window_d *window,
                 //full screen
                 //colocar em full screen somente a área de cliente. 				
 		        case VK_F11:
-				
+				    
 					break;
 					
 				//...
@@ -4817,12 +4821,24 @@ shellInsertCharXY ( unsigned long x,
 		return;
 	}
 
-	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
-	LINES[textCurrentRow].ATTRIBUTES[textCurrentCol] = 7;
+	LINES[y].CHARS[x] = (char) c;
+	LINES[y].ATTRIBUTES[x] = 7;
 };
 
 
- 
+ // Insere um caractere sentro do buffer.
+char 
+shellGetCharXY ( unsigned long x, 
+                 unsigned long y )
+{
+	
+	if ( x >= wlMaxColumns || y >= wlMaxRows ){
+		
+		return;
+	}
+
+	return (char) LINES[y].CHARS[x];
+};
 
 
 /*
@@ -4921,6 +4937,7 @@ void shellInsertNextChar (char c){
 	LINES[textCurrentRow].pos = textCurrentCol;
 	LINES[textCurrentRow].right = textCurrentCol;
 };
+
 
 
 void shellInsertCR (){
@@ -6537,36 +6554,62 @@ void testShowLines()
 
 
 //mostra a área visível dentro do buffer de linhas.
-void shellRefreshVisibleArea()
-{
+void shellRefreshVisibleArea (){
+	
 	//desabilita o cursor
 	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
+	
+	
+	//
+	//seta o cursor no início da janela.
+	//
+	
+	unsigned long left, top, right, bottom;
+ 
+    left = (terminal_rect.left/8);
+    top = (terminal_rect.top/8);
+	
+    shellSetCursor ( left, top );
+	
+
+	//
+	// efetua o refresh do char atual, que agora é o primeiro 
+	// depois os outros consecutivos.
+	//
 	
 	int i=0;
 	int j=0;
 	
+	//textTopRow = 3;
+	//textBottomRow = 3 + 25;
+	
+	if ( textTopRow > textBottomRow )
+	{
+		printf("shellRefreshVisibleArea: textTopRow fail");
+	}
+	
+	//toda a área visível.
+	//for ( i=0; i<25; i++ )	
 	for ( i=textTopRow; i<textBottomRow; i++ )
 	{
 		for ( j=0; j<80; j++ )
-		{
-		    //LINES[i].CHARS[j] = (char) 'x';
-		    //LINES[i].ATTRIBUTES[j] = (char) 7;
-	        
-			printf ("%c", LINES[i].CHARS[j] );
+		{	
+	        //refresh
+            printf ("%c", LINES[i].CHARS[j] );						
 		}
-		printf ("\n");
 	};
 
 	//reabilita o cursor
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
-}
+};
+
 
 void testChangeVisibleArea()
 {
 	textTopRow += textWheelDelta;
 	textBottomRow += textWheelDelta;
 	
-	shellRefreshVisibleArea();	
+	//shellRefreshVisibleArea();	
 }
 
 

@@ -1029,7 +1029,11 @@ void shellInsertCR();
 void shellInsertLF();
 void shellInsertNullTerminator();
 void shellInsertNextChar(char c);
+
 void shellInsertCharXY(unsigned long x, unsigned long y, char c);
+char 
+shellGetCharXY ( unsigned long x, 
+                 unsigned long y );
  
 static void lf(void);
 static void ri(void);

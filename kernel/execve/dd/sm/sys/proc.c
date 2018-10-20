@@ -492,14 +492,14 @@ system_procedure ( struct window_d *window,
 				
 				//Kernel info.	
                 case VK_F2:
-					KiInformation();
+					//KiInformation();
 					break;
 				
 	
                 //CPU info.
                 //intel? deveria ser independente. 				
                 case VK_F3: 
-					show_cpu_intel_parameters();
+					//show_cpu_intel_parameters();
 					break;
 					
 				//Window tests.	
