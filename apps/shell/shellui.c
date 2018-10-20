@@ -857,7 +857,7 @@ int shellTestButtons (){
 	unsigned long app3Left = ((ScreenWidth/8) * 4);
 	unsigned long app4Left = ((ScreenWidth/8) * 5);
 	
-	unsigned long app1Top = ( (ScreenHeight/10) * 1); 
+	unsigned long app1Top = ( (ScreenHeight/10) * 8); 
 	unsigned long app2Top = app1Top; 
 	unsigned long app3Top = app1Top; 
 	unsigned long app4Top = app1Top;
@@ -869,7 +869,7 @@ int shellTestButtons (){
 	//
 	
     //em shell.h está o ponteiro.	
-	app1_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP1 ",     
+	app1_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "(CIMA)",     
                                 app1Left, app1Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
@@ -881,7 +881,7 @@ int shellTestButtons (){
 	//
 	
     //em shell.h está o ponteiro.	
-	app2_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP2 ",     
+	app2_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "(BAIXO)",     
                                 app2Left, app2Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								

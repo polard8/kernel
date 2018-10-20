@@ -427,6 +427,7 @@ void clearLine ( int line_number );
 
 void testShowLines();
 void testChangeVisibleArea();
+void updateVisibleArea( int direction );
 
 
 void shellRefreshVisibleArea();
@@ -1266,23 +1267,9 @@ shellProcedure( struct window_d *window,
                     shellTestLoadFile ();
 					
 					//inicializa a área visível.
-					textTopRow = 0;
-	                textBottomRow = 0 + 24;
-					
-					//MessageBox( 1, "feedterminalDialog","F1: HELP");
-				    //APISetFocus(i2Window);
-					//APIredraw_window(i2Window);				
-				    //MessageBox( 1, "MessageBox","F1: Testing apiDialog() ");
-					
-					//printf("Testing apiDialog: ...\n");
-					//q = (int) apiDialog("Pressione 'y' para Yes ou 'n' para No.\n");
-					
-					//if ( q == 1 ){ printf("Voce escolheu Yes \n"); };
-					//if ( q == 0 ){ printf("Voce escolheu No \n"); };
-					
-					//printf("apiDialog retornou.\n");
-					
-					//ShellFlag = SHELLFLAG_COMMANDLINE;						
+					//textTopRow = 0;
+	                //textBottomRow = 0 + 24;
+						
 					break;
 					
 				case VK_F2:
@@ -1383,14 +1370,22 @@ shellProcedure( struct window_d *window,
 				    //#obs: No keydown a gente só abaixa o botão.
 					
 				    //#debug
-					printf("button 1\n");     
+					//printf("button 1\n");     
 					
-					//botão de reboot;
-					//if ( window == reboot_button )
-                    //{
-					//    printf("Rebooting...\n");
-		            //    system("reboot"); 	
-					//}
+                    //cima
+					if ( window == app1_button )
+                    {
+						updateVisibleArea( 0 );
+						shellRefreshVisibleArea(); 
+                        //shellScroll();
+					}
+
+					//baixo
+					if ( window == app2_button )
+                    {
+                        updateVisibleArea( 1 );
+						shellRefreshVisibleArea();
+					}
 					
 					//botão de close
 					//if ( window == close_button )
@@ -3587,7 +3582,13 @@ void shellShell (){
 	//inicializar a posição da janela.
 	shellInitWindowPosition();
  
+ 
+    //
+	// initi visible area.
+	// #todo: criar função para isso
 	
+	textTopRow = 0;
+	textBottomRow = 24;
 	
 	//limits.
 	//quantidade de linhas de colunas da janela.
@@ -4736,7 +4737,7 @@ void shellScroll (){
  
 
 	//desliga o cursor
-	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+	//system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 
     testChangeVisibleArea();	//desloca a área visível usando delta.
 	shellRefreshVisibleArea();
@@ -4744,7 +4745,7 @@ void shellScroll (){
 	//#todo:posicionar cursor
 	
 	//reabilita o cursor
-	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+	//system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
 
 
@@ -6607,9 +6608,23 @@ void shellRefreshVisibleArea (){
 void testChangeVisibleArea()
 {
 	textTopRow += textWheelDelta;
-	textBottomRow += textWheelDelta;
-	
-	//shellRefreshVisibleArea();	
+	textBottomRow += textWheelDelta;	
 }
 
+
+void updateVisibleArea( int direction )
+{
+    switch (direction)
+    {
+	    case 0:
+	        textTopRow += textWheelDelta;
+	        textBottomRow += textWheelDelta;			
+            break; 		
+			
+	    case 1:
+	        textTopRow -= textWheelDelta;
+	        textBottomRow -= textWheelDelta;					
+            break; 		
+	}	
+}
 
