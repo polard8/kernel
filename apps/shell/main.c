@@ -4729,70 +4729,18 @@ void shellRefreshCurrentChar (){
 void shellScroll (){
 	
 	//reajustando a área visível do buffer 
-	//todo: criar uma função para fazer essa rolagem.
-	
-	//textTopRow++;
-	//textBottomRow++;
-	
-	textTopRow += textWheelDelta;
-	textBottomRow += textWheelDelta;
-	
-	//fim do buffer
-	if ( textBottomRow > 32 )
-	{
-	    printf("shellScroll: 32 fim do buffer");
-        while(1){}		
-	}
-	
+ 
+
+	//desliga o cursor
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+
+    testChangeVisibleArea();	//desloca a área visível usando delta.
 	shellRefreshVisibleArea();
 	
-	//desabilita o cursor
-	//system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
-
-	//uint8_t attribute_byte = (0 << 4) | (15 & 0x0F);	/* attribute_byte background BLACK foreground WHITE */
-	//uint16_t blank = 0x20 | (attribute_byte << 8);	/* 0x20 is space */
-
-	
-	//apontamos para o início do buffer.
-	//uint16_t *w_screen_buffer = (uint16_t *) &screen_buffer[0];
-	
-	/* 
-	 * while cursor y postion equal 25, than should get new line,
-	 * copy all the data to previous, so clear the first row,
-	 * and the last row fill space
-	 */
-	 
-	
-	//	int i;
-		
-	//	for (i = 0 * wlMaxColumns; i < 24 * wlMaxColumns; i++) 
-	//	{
-	//	    w_screen_buffer[i] = w_screen_buffer[i+wlMaxColumns];
-	//	}
-
-	//	for (i = 24 * wlMaxColumns; i < wlMaxRows * wlMaxColumns; i++) 
-	//	{
-	//	    w_screen_buffer[i] = blank;
-	//	}
-
-		
-	
-	
-	//devemos voltar para o inpicio da janela e mostrar o buffer que foi atualizado.
-	//#todo: corrigir esse posicionamento.
-	
-	//unsigned long left, top, right, bottom;
- 
-    //left = (terminal_rect.left/8);
-    //top = (terminal_rect.top/8);	
-	
-	//shellSetCursor(0,0);
-	//shellSetCursor (left,top);
-	
-	//shellShowScreenBuffer ();
+	//#todo:posicionar cursor
 	
 	//reabilita o cursor
-	//system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
 
 
