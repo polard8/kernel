@@ -1213,9 +1213,24 @@ drawBegin:
 			// entrar em modo full screen.
 			//
 			
-			// ??
-			// Isso está meio atrapalhado, então vamos configura apenas o básico
-			// por enquanto. left top width height right bottom.
+			// ## SIMPLE ##
+
+			if( window->type == WT_SIMPLE )
+			{	
+                //left top
+                window->rcClient->left = (unsigned long) (window->left);
+                window->rcClient->top = (unsigned long) (window->top);
+            
+                // width e height.
+                // width = window widdth - as bordas verticais.
+                // height = windows height - as bordas horizontais - a barra de títulos.
+                window->rcClient->width = (unsigned long) (window->width);
+                window->rcClient->height = (unsigned long) (window->height);
+				
+				//window->rcClient->right = window->rcClient->left + window->rcClient->width;
+				//window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
+			};			
+			
 			
 			// ## OVERLAPPED WINDOW ##
 			
@@ -1231,8 +1246,8 @@ drawBegin:
                 window->rcClient->width = (unsigned long) (window->width -1 -1);
                 window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
 				
-				window->rcClient->right = window->rcClient->left + window->rcClient->width;
-				window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
+				//window->rcClient->right = window->rcClient->left + window->rcClient->width;
+				//window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
                 
 			};
 			
@@ -1243,16 +1258,20 @@ drawBegin:
 			{	
                 //left top
                 window->rcClient->left = (unsigned long) (window->left +1);
-                window->rcClient->top = (unsigned long) (window->top  +1 +24);
+                window->rcClient->top = (unsigned long) (window->top  +1);
             
                 // width e height.
                 // width = window widdth - as bordas verticais.
                 // height = windows height - as bordas horizontais - a barra de títulos.
                 window->rcClient->width = (unsigned long) (window->width -1 -1);
-                window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
+                window->rcClient->height = (unsigned long) (window->height -1 -1);
+				
+				//window->rcClient->right = window->rcClient->left + window->rcClient->width;
+				//window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
 			};
 			
 			//right bottom.
+			//válido para todos os tipos de janela.
   			window->rcClient->right = (unsigned long) (window->rcClient->left + window->rcClient->width);
 			window->rcClient->bottom = (unsigned long) (window->rcClient->top + window->rcClient->height);
 			
@@ -1411,7 +1430,7 @@ drawBegin:
 	// Overlapped.
 	if(window->type == WT_OVERLAPPED)
 	{
-		//scrollbar
+		// ## scrollbar ##
 		//Esses valores precisam ser melhor declarados.
         
 		// Criar.
@@ -1424,8 +1443,21 @@ drawBegin:
 		
 		// Registrar.
 		RegisterWindow (window->scrollbar);
-
-        //status bar.
+        
+		//Se a scrollbar foi criada então a área de cliete deve ser atualizada, 
+        //para isso a área de cliente deve ter sido configurada antes disso.		
+		//if ( window->clientAreaUsed  == 1 )
+		//{
+		//	if ( window->rcClient != NULL )
+		//	{
+			    //só atualiza a largura da área de cliente, a altura continua igual,
+				//mas isso depende se o scroll é vertical ou horizontal.
+		//		window->rcClient->width = window->rcClient->width - (24);
+                //window->rcClient->height = window->rcClient->height;  				
+		//	}
+		//}
+		
+        // ## status bar ##
 		//Esses valores precisam ser melhor declarados.
 		
 		// Criar.

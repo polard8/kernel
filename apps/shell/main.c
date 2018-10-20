@@ -546,7 +546,10 @@ int shmain ( int argc, char **argv ){
 	
 	
 	// A janela principal do aplicativo.
-	struct window_d *hWindow;        
+	struct window_d *hWindow;    
+
+	//JANELA CRIADA NA ÁREA DE CLIENTE DA JANELA PRINCIPAL.
+    struct window_d *hWindow2;       
 	
 	//struct message_d *m;
 
@@ -779,7 +782,7 @@ noArgs:
 	//	terminal_rect.width, terminal_rect.height );
 	//while(1){}
 	
-	apiBeginPaint();
+	
 	
 
     //
@@ -792,6 +795,7 @@ noArgs:
 						
     //para flat os dois poem ser a mesma cor.
     //não completamente preto.	
+	apiBeginPaint();
 	
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    wpWindowLeft, wpWindowTop, 
@@ -852,10 +856,13 @@ noArgs:
 	
     APIRegisterWindow (hWindow);
     APISetActiveWindow (hWindow);	
-    APISetFocus (hWindow);	
+    APISetFocus (hWindow);
+
+	
 	
 	//#importante
-	refresh_screen ();
+	//VAMOS EFETUAR ESSE REFRESH DEPOIS DE CRIARMOS OUTRA JANELA.
+	//refresh_screen ();
 	
 	
 	//
@@ -866,9 +873,10 @@ noArgs:
 	// reabilitamos a piscagem de cursor.
 	//
 	
-	//#bugbug: isso deixou i sistema lerdo.
+ 
 	unsigned long xbuffer[8];
 	
+	// +pegamos o retângulo referente à area de cliente da janela registrada. 
 	system_call ( 134, (unsigned long) hWindow, (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );
 
 	
@@ -904,15 +912,50 @@ noArgs:
         while(1){}			
 	}
 	
-	//if( 
-	shellSetCursor ( (terminal_rect.left / 8) , ( terminal_rect.top/8) );
-	//...
-	 
+    //
+	// ## Janela para texto ##
+	//
+	
+
+    apiBeginPaint();
+	
+	//mudando as dimensões a janela dentro da área de cliente.
+	terminal_rect.left = terminal_rect.left + 40;
+	terminal_rect.top = terminal_rect.top + 40;
+	terminal_rect.width = terminal_rect.width - 150;
+	terminal_rect.height = terminal_rect.height - 150;
+	
+	
+	//hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
+	//                    terminal_rect.left, terminal_rect.top, 
+	//				    terminal_rect.width, terminal_rect.height,    
+    //                    0, 0, COLOR_RED, COLOR_RED );	   
+
+	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
+	                    terminal_rect.left, terminal_rect.top, 
+					    terminal_rect.width, terminal_rect.height,    
+                        0, 0, COLOR_RED, COLOR_RED );	   
+
+						
+	if ( (void *) hWindow2 == NULL ){
+		
+		die ("shell.bin: hWindow2 fail");
+	}	
+	
+	apiEndPaint();
+	
+    APIRegisterWindow (hWindow2);
+    APISetActiveWindow (hWindow2);	
+    APISetFocus (hWindow2);	 
+	
+	//#importante
+	refresh_screen ();	
 	
 	//
 	// Habilitando o cursor de textos.
 	//
 	
+	shellSetCursor ( (terminal_rect.left / 8) , ( terminal_rect.top/8) );	
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
 	
 	//#bugbug
@@ -930,9 +973,12 @@ noArgs:
 	// para essa janela e não apenas ao procedimento de janela do sistema.
 	// # provavelmente isso marca os limites para a impressão de caractere em modo terminal 
 	
-	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, 
-		(unsigned long) hWindow, (unsigned long) hWindow );
-				 
+	//system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, 
+	//	(unsigned long) hWindow, (unsigned long) hWindow );
+
+	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow2, 
+		(unsigned long) hWindow2, (unsigned long) hWindow2 );
+		
 				 
 	//salva ponteiro da janela principal. 
 	shell_info.main_window = ( struct window_d * ) hWindow;			 
@@ -945,8 +991,12 @@ noArgs:
 	// Init Shell:
 	//     Inicializa variáveis, buffers e estruturas. Atualiza a tela.
 	
-	enterCriticalSection();    	
+	enterCriticalSection();
+
+    //#BUGBUG
+    //Estamos passando um ponteiro que é uma variável local.	
 	Status = (int) shellInit (hWindow); 
+	//Status = (int) shellInit (hWindow2);  //#BUGBUG (ldisc error)
 	
 	if ( Status != 0 ){
 		die ("SHELL.BIN: app_main: shellInit fail");
@@ -3637,6 +3687,10 @@ void shellShell (){
  *
  */
 int shellInit ( struct window_d *window ){
+	
+	//#bugbug 
+	//o ponteiro do argumento pode ser inválido, pois 
+	//é uma variáveç local.
 	
 	int PID;
 	int PPID;
