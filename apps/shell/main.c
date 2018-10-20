@@ -922,8 +922,12 @@ noArgs:
 	//mudando as dimensões a janela dentro da área de cliente.
 	terminal_rect.left = terminal_rect.left + 40;
 	terminal_rect.top = terminal_rect.top + 40;
-	terminal_rect.width = terminal_rect.width - 150;
-	terminal_rect.height = terminal_rect.height - 150;
+
+	terminal_rect.width = 8 * 80;
+	terminal_rect.height = 8 * 25;
+	
+	//terminal_rect.width = terminal_rect.width - 150;
+	//terminal_rect.height = terminal_rect.height - 150;
 	
 	
 	//hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
@@ -995,8 +999,8 @@ noArgs:
 
     //#BUGBUG
     //Estamos passando um ponteiro que é uma variável local.	
-	Status = (int) shellInit (hWindow); 
-	//Status = (int) shellInit (hWindow2);  //#BUGBUG (ldisc error)
+	//Status = (int) shellInit (hWindow); 
+	Status = (int) shellInit (hWindow2);  //#BUGBUG (ldisc error)
 	
 	if ( Status != 0 ){
 		die ("SHELL.BIN: app_main: shellInit fail");
