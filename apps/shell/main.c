@@ -70,10 +70,10 @@
 */ 
 
 //# usado para teste 
-#define WINDOW_WIDTH     640 
-#define WINDOW_HEIGHT    500
-#define WINDOW_LEFT      0
-#define WINDOW_TOP       0
+#define WINDOW_WIDTH     750 
+#define WINDOW_HEIGHT    400
+#define WINDOW_LEFT      10
+#define WINDOW_TOP       10
  
 //
 // Includes.
@@ -984,9 +984,9 @@ noArgs:
 		(unsigned long) hWindow2, (unsigned long) hWindow2 );
 		
 				 
-	//salva ponteiro da janela principal. 
+	//salva ponteiro da janela principal e da janela do terminal. 
 	shell_info.main_window = ( struct window_d * ) hWindow;			 
-		
+	shell_info.terminal_window = ( struct window_d * ) hWindow2;		
 	
 	//
 	// @todo: Apenas registrar o procedimento dessa janela na sua estrutura no kernel..
@@ -4440,7 +4440,7 @@ void shellTestLoadFile (){
 		
 		} else {   			
 		    
-			shellInsertNextChar( (char) ch_test ); 		
+			shellInsertNextChar ( (char) ch_test ); 		
 	    };
 	};	
 	
@@ -4574,6 +4574,7 @@ void shellTestThreads (){
  */
 void shellClearScreen (){
 	
+	struct window_d *w;
 	
     //desabilita o cursor
 	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
@@ -4582,12 +4583,14 @@ void shellClearScreen (){
 	
 	shellClearBuffer ();
 	
-	//
-	// Copiamos o conteúdo do screenbuffer para 
-	// a área de cliente do shell.
-	//
+	
+	w = (void *) shell_info.terminal_window;
+	
+	if ( (void *) w != NULL )
+	{
+		APIredraw_window(w,1);
+	}
 
-    shellRefreshScreen ();
 	
 	
 	unsigned long left, top, right, bottom;
@@ -4595,7 +4598,18 @@ void shellClearScreen (){
     left = (terminal_rect.left/8);
     top = (terminal_rect.top/8);
 	
-    shellSetCursor ( left, top );	
+    shellSetCursor ( left, top );
+
+
+	//
+	// Copiamos o conteúdo do screenbuffer para 
+	// a área de cliente do shell.
+	// obs: A outra opção seria repintarmos a janela.
+	//
+
+    //shellRefreshScreen ();	
+	
+	//shellRefreshVisibleArea();
 	
 	//reabilita o cursor
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	

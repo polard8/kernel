@@ -919,6 +919,8 @@ typedef struct shell_info_d shell_info_t;
 struct shell_info_d
 {
 	struct window_d *main_window;
+	struct window_d *terminal_window;
+	
 	//stream support.
     int stream_status;  //inpout ou output.
 	

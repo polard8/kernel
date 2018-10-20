@@ -165,6 +165,13 @@ FILE *fopen ( const char *filename, const char *mode ){
  */
 void scroll (void){
 	
+	// #suspenso
+
+	// Isso funciona para a tela inteira.
+    // mas temos que criar um scroll de janela.	
+	
+/*	
+	
     unsigned short i;
     unsigned short j;
 
@@ -272,6 +279,8 @@ void scroll (void){
     };
 	
     //Nothing.	
+	
+*/
 	
 done:
 	return;
