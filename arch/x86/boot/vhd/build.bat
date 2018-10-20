@@ -8,6 +8,7 @@
 	rem vbr, fat, root ...
     rem
 	rem nasm 2.05.01
+	rem imdisk 2.0.9
 	rem
     rem SET BuildFlags=-h
     rem if "%BuildFlags%" == "-h" goto HowItWorks
