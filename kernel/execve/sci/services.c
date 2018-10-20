@@ -1015,7 +1015,7 @@ void *services( unsigned long number,
 					//um buffer de longs.
 					
 		    	    a3[0] = (unsigned long) hWnd->rcClient->left;
-			        a3[1] = (unsigned long) hWnd->rcClient->top; //*importante: mensagem nula.
+			        a3[1] = (unsigned long) hWnd->rcClient->top;     
 			        a3[2] = (unsigned long) hWnd->rcClient->width;
 			        a3[3] = (unsigned long) hWnd->rcClient->height;
 					a3[3] = (unsigned long) hWnd->rcClient->color_bg;

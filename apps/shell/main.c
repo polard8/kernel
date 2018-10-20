@@ -408,6 +408,7 @@ int shell_save_file();
 void shellInitSystemMetrics();
 void shellInitWindowLimits();
 void shellInitWindowSizes();
+void shellInitWindowPosition();
 
 //
 // testes de scroll.
@@ -766,10 +767,17 @@ noArgs:
 	// o que desejamos são os valores do retângulo da área de cliente 
 	// da janela principal.
 	
-	terminal_rect.left = wpWindowLeft;
-	terminal_rect.top = wpWindowTop;
-	terminal_rect.width = wsWindowWidth;
-	terminal_rect.height = wsWindowHeight;
+	//terminal_rect.left = wpWindowLeft;
+	//terminal_rect.top = wpWindowTop;
+	//terminal_rect.width = wsWindowWidth;
+	//terminal_rect.height = wsWindowHeight;
+	
+	//#debug
+	//printf("terminal_rect: 1\n");	
+    //printf("l={%d} t={%d} w={%d} h={%d}\n", 
+	//    terminal_rect.left, terminal_rect.top,
+	//	terminal_rect.width, terminal_rect.height );
+	//while(1){}
 	
 	apiBeginPaint();
 	
@@ -858,25 +866,49 @@ noArgs:
 	// reabilitamos a piscagem de cursor.
 	//
 	
-	/*
-	#bugbug: isso deixou i sistema lerdo.
-	unsigned long xbuffer[4];
+	
+	
+	//#bugbug: isso deixou i sistema lerdo.
+	unsigned long xbuffer[8];
 	
 	system_call ( 134, (unsigned long) hWindow, (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );
+
+	
+	//struct rect_d *r;
+	//r.x = xbuffer[0];
+	//r.y = xbuffer[1];
+	//r.cx = xbuffer[2];
+	//r.cy = xbuffer[3];	
 	
 	
-	terminal_rect.left = xbuffer[0];
-	terminal_rect.top = xbuffer[1];
-	terminal_rect.width = xbuffer[2];
-	terminal_rect.height = xbuffer[3];	
+	//terminal_rect.left = xbuffer[0];
+	//terminal_rect.top = xbuffer[1];
+	//terminal_rect.width = xbuffer[2];
+	//terminal_rect.height = xbuffer[3];	
+	//...
 	
-	//wpWindowLeft = 
-	//wpWindowTop = 
+
+	//
+	// ## Se der problema no tamanho da área de cliente ##
+	//
+	
+	if ( terminal_rect.left < wpWindowLeft ||
+         terminal_rect.top < wpWindowTop ||	
+	     terminal_rect.width > wsWindowWidth ||
+		 terminal_rect.height > wsWindowHeight )
+	{
+        //#debug
+	    printf("terminal_rect: 2\n");	
+        printf("l={%d} t={%d} w={%d} h={%d}\n", 
+	        terminal_rect.left, terminal_rect.top,
+		    terminal_rect.width, terminal_rect.height );
+        while(1){}			
+	}
 	
 	//if( 
 	shellSetCursor ( (terminal_rect.left / 8) , ( terminal_rect.top/8) );
 	//...
-	*/
+	 
 	
 	//
 	// Habilitando o cursor de textos.
@@ -3401,10 +3433,40 @@ void shellInitWindowSizes()
 //  ## Window size ##
 //
 
-    wsWindowWidth = wlMinWindowWidth;
-    wsWindowHeight = wlMinWindowHeight;	
-}
+    //wsWindowWidth = wlMinWindowWidth;
+    //wsWindowHeight = wlMinWindowHeight;	
+	
+	//Tamanho da janela do shell com base nos limites 
+    //que ja foram configurados.	
+	
+	wsWindowWidth =  WINDOW_WIDTH;
+	wsWindowHeight = WINDOW_HEIGHT;
+	
+	
+	if ( wsWindowWidth < wlMinWindowWidth )
+	{
+		wsWindowWidth = wlMinWindowWidth;
+	}
+	
+	if ( wsWindowHeight < wlMinWindowHeight )
+	{
+	    wsWindowHeight = wlMinWindowHeight;	
+	}
 
+
+};
+
+
+void shellInitWindowPosition()
+{
+	
+	//window position
+	wpWindowLeft = WINDOW_LEFT;
+	wpWindowTop = WINDOW_TOP;
+	
+	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
+	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
+}
 
 /*
  ******************************************
@@ -3462,33 +3524,9 @@ void shellShell (){
 	//inicia o tamanho da janela.
 	shellInitWindowSizes();
 	
-	
-	// ## Window size and position ##
-	//#obs: Isso está muito legal. Não mudar.	
-	
-	//Tamanho da janela do shell	
-	
-	wsWindowWidth =  WINDOW_WIDTH;
-	wsWindowHeight = WINDOW_HEIGHT;
-	
-	
-	if ( wsWindowWidth < wlMinWindowWidth )
-	{
-		wsWindowWidth = wlMinWindowWidth;
-	}
-	
-	if ( wsWindowHeight < wlMinWindowHeight )
-	{
-	    wsWindowHeight = wlMinWindowHeight;	
-	}
-	
-		
-	//window position
-	wpWindowLeft = WINDOW_LEFT;
-	wpWindowTop = WINDOW_TOP;
-	
-	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
-	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );   
+	//inicializar a posição da janela.
+	shellInitWindowPosition();
+ 
 	
 	
 	//limits.
