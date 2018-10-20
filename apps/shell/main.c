@@ -4977,10 +4977,10 @@ void shellTestMBR (){
 	printf("shellTestMBR: Initializing MBR test ...\n");
 	
 	//read sector
-	system_call( SYSTEMCALL_READ_LBA, 
-	             (unsigned long) &buffer[0],  //address 
-				 (unsigned long) 0,           //lba
-				 (unsigned long) 0);
+	system_call ( SYSTEMCALL_READ_LBA, 
+	              (unsigned long) &buffer[0],  //address 
+				  (unsigned long) 0,           //lba
+				  (unsigned long) 0);
 				 
 	
 	exitCriticalSection();   
@@ -4990,7 +4990,8 @@ void shellTestMBR (){
 	//
 	
 	//?? address #bugbug
-	printf("%s",&buffer[0]);
+	printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] );
+	
 	
 	//
 	// @todo: Sondar cada elemento do MBR para 

@@ -524,10 +524,11 @@ system_procedure ( struct window_d *window,
 				    //pci_info();     //PCI information.
 				    
 					//#testando...
-					save_window ( (struct window_d *) windowList[window_with_focus] );
-					replace_window ( (struct window_d *) windowList[window_with_focus], 20, 20 );
-					show_saved_window ( (struct window_d *) windowList[window_with_focus] );
-					show_window_rect ( (struct window_d *) windowList[window_with_focus] );
+					//isso funciona, não sei se completamente.
+					//save_window ( (struct window_d *) windowList[window_with_focus] );
+					//replace_window ( (struct window_d *) windowList[window_with_focus], 20, 20 );
+					//show_saved_window ( (struct window_d *) windowList[window_with_focus] );
+					//show_window_rect ( (struct window_d *) windowList[window_with_focus] );
 					//refresh_screen();
 					
 					
@@ -537,7 +538,7 @@ system_procedure ( struct window_d *window,
 					
 					//testando mbr.					
 					//ok isso funcionou.
-					//fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
+					fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
 					
 					//Obs: Não usa janelas, isso não mudará o foco.
 					//systemShowDevicesInfo();

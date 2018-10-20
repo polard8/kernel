@@ -319,15 +319,17 @@ void *services( unsigned long number,
 		//1 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_READ_LBA: 
 		    //@todo: chamar hal
-			systemDevicesUnblocked(36,arg2,arg3,0,0); 
+			//systemDevicesUnblocked(36,arg2,arg3,0,0); 
 		    //read_lba( (unsigned long) arg2, (unsigned long) arg3 );
+			my_read_hd_sector( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
 			break;
 			
 		//2 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_WRITE_LBA: 
 		    //@todo: chamar hal
-			systemDevicesUnblocked(35,arg2,arg3,0,0); 
+			//systemDevicesUnblocked(35,arg2,arg3,0,0); 
 			//write_lba( (unsigned long) arg2, (unsigned long) arg3 );
+			my_write_hd_sector( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
 		    break;
 
 		//3 fopen (i/o)

@@ -561,7 +561,6 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 
 	
 	my_read_hd_sector( (unsigned long) &mbr[0] , 0, 0 , 0 );  //setor 0.
-	//my_read_hd_sector( (unsigned long) &mbr[0] , 1, 0 , 0 );
 	
 	
 	//message:
