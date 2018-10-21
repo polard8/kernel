@@ -2228,6 +2228,7 @@ do_compare:
 	if ( strncmp( prompt, "about", 5 ) == 0 )
 	{
 		shellSendMessage( NULL, MSG_COMMAND, CMD_ABOUT, 0);
+		//apiSendMessage ( NULL, (int) MSG_COMMAND, (unsigned long) CMD_ABOUT, (unsigned long) 0 );
 	    goto exit_cmp;
 	};
 
@@ -3009,18 +3010,29 @@ do_compare:
 	if ( strncmp( prompt, "t9", 2 ) == 0 )
     {    
         testShowLines();	
-		//refresh_screen ();
 		goto exit_cmp;
 	};
 	
 
-	if ( strncmp( prompt, "x1", 2 ) == 0 )
+	if ( strncmp( prompt, "t10", 3 ) == 0 )
     {    
 	    testChangeVisibleArea();
-		//refresh_screen ();
+
 		goto exit_cmp;
 	};
 	
+	//t11 - testando o envio de mensagens para o procedimento,
+	//usando o kernel.
+	if ( strncmp( prompt, "t11", 3 ) == 0 )
+    {    
+        //chama message box com mensagem about.
+        apiSendMessage ( (struct window_d *) 0, 
+		                 (int) MSG_COMMAND, 
+						 (unsigned long) CMD_ABOUT, 
+						 (unsigned long) 0 );
+		
+		goto exit_cmp;
+	};
 
 	
 	// tasklist - Lista informações sobre os processos.

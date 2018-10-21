@@ -50,10 +50,11 @@
  *     + Muitas outras ...
  *
  *
- * Histórico: 
- *     Version 1.0, 2014 - Esse arquivo foi criado por Fred Nora.
- *     Version 1.0, 2015 - Implimentação de novas chamadas.
- *     Version 1.0, 2016 - Implementação de novas chamadas.
+ * History: 
+ *     2014 - Created by Fred Nora.
+ *     2015 - New services.
+ *     2016 - New services.
+ *     2018 - Revision.
  *     ...
  */
 
@@ -66,6 +67,7 @@
 
 
 /*
+ ***********************************************************************
  * system_call:  #ux4 (maior experiência)
  *    Interrupção de sistema, número 200, chama vários serviços do Kernel com 
  * a mesma interrupção. Essa é a chamada mais simples.
@@ -306,7 +308,7 @@ int apiSystem (const char *command){
 	//@todo: exec
 	
     //:default
-	printf("apiSystem: Unknown command!\n");
+	printf ("apiSystem: Unknown command!\n");
 	
 	//
 	// o que devemos fazer aqui é pegar o nome digitado e comparar
@@ -685,9 +687,6 @@ void refresh_buffer (unsigned long n){
             //Nothing
 			break;
     };
-    //Nothing.
-//done:
-    //return;
 };
 
 
@@ -831,7 +830,8 @@ void apiShutDown (){
     system_call ( SYSTEMCALL_SHUTDOWN, 0, 0, 0 );
 	
     while (1){
-		//
+		
+        asm ("pause");
 	};	
 };
 
@@ -875,6 +875,8 @@ void MessageBox ( int type, char *string1, char *string2 ){
  * Quem deve usar ela são os drivers e servers. 
  * Os recursos acessados por essa chamada são mais críticos e 
  * sistemicamente importantes.  (rever)
+ *
+ * #todo: esse retorno deve ser unsigned long
  */
 int call_kernel ( unsigned long int_number, 
                   unsigned long service_number, 
@@ -893,73 +895,72 @@ int call_kernel ( unsigned long int_number,
 {
 	int ret_val;
 	
-    switch (int_number)
-    { 
+    switch (int_number){ 
                       
         //48 - Vários serviços de Kernel Requests.
         case KERNEL:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
     
         //49
         case KERNEL49:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL49), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
              
         //50
         case KERNEL50:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL50), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
         
         //51     
         case KERNEL51:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL51), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
              
         //52
         case KERNEL52:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL52), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
 
         //53
         case KERNEL53:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL53), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
         
         //54     
         case KERNEL54:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL54), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
 
         
         case KERNEL55:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL55), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
              
         case KERNEL56:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL56), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
              
         case KERNEL57:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL57), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
@@ -969,7 +970,7 @@ int call_kernel ( unsigned long int_number,
 		//
 		
 		case KERNEL199:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(KERNEL199), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
@@ -977,10 +978,7 @@ int call_kernel ( unsigned long int_number,
             //Nothing.
             break;			
     };
-	//Nothing.
-// Done.
-//done:
-
+	
 	return (int) ret_val;
 };
 
@@ -1000,6 +998,8 @@ int call_kernel ( unsigned long int_number,
  *     Um subsistema de recursos gráficos em user mode
  *     pode usar essa chamada para utilizar recursos 
  *     gráficos do kernel.  (rever)
+ *
+ *  #todo: esse retorno deve ser unsigned long.
  */
 int call_gui ( unsigned long int_number, 
                unsigned long service_number, 
@@ -1018,33 +1018,32 @@ int call_gui ( unsigned long int_number,
 {
 	int ret_val;  
 	
-    switch (int_number)
-    { 
-         
-        //Vários serviços. 
+	//Vários serviços. 
+			
+    switch (int_number){      
 
         //Fast Create Window.		
         case FAST_CREATE_WINDOW:
 		//case GUI:
-            asm volatile( " int %1 \n"
+            asm volatile ( " int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(FAST_CREATE_WINDOW), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
     
         case GUI217:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(GUI217), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
              
         case GUI218:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(GUI218), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
              
         case GUI219:
-            asm volatile( "int %1 \n"
+            asm volatile ( "int %1 \n"
 		                  : "=a"(ret_val)		
 		                  : "i"(GUI219), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
 	                       break;
@@ -1052,8 +1051,6 @@ int call_gui ( unsigned long int_number,
 		    //Nothing.
 		    break; 
     };
-// Done.
-//done:
 
 	return (int) ret_val;
 };
@@ -1523,8 +1520,6 @@ void apiSetClientAreaRect (struct rect_d *r){
 	
     system_call ( SYSTEMCALL_SETCLIENTAREARECT, (unsigned long) r, 
 		(unsigned long) r, (unsigned long) r );
-    
-	//return;	
 };
 
 
@@ -1536,10 +1531,8 @@ void *apiCreateProcess( unsigned long process_eip,
                         unsigned long process_priority, 
 						char *name )
 {
-    return (void *) system_call( SYSTEMCALL_CREATEPROCESS, 
-	                             process_eip, 
-								 process_priority, 
-								 (unsigned long) name );		
+    return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, process_eip, 
+						process_priority, (unsigned long) name );		
 };
 
 
@@ -1551,10 +1544,8 @@ void *apiCreateThread( unsigned long thread_eip,
                        unsigned long thread_priority, 
 					   char *name )
 {
-    return (void *) system_call( SYSTEMCALL_CREATETHREAD, 
-	                             thread_eip, 
-								 thread_priority, 
-								 (unsigned long) name );		
+    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, thread_eip, 
+						thread_priority, (unsigned long) name );		
 };
 
 
@@ -1568,8 +1559,6 @@ void apiStartThread (void *Thread){
 
     system_call ( SYSTEMCALL_STARTTHREAD, (unsigned long) Thread, 
 		(unsigned long) Thread, (unsigned long) Thread );	
-	
-	//return;
 };
 
 
@@ -1653,8 +1642,8 @@ apiSaveFile ( char *file_name,
 
 
 //Operação down em um semáforo indicado no argumento.
-void apiDown(struct semaphore_d *s)
-{
+void apiDown (struct semaphore_d *s){
+	
 	int Status = 1;    //fail.
 	
 	if( (void*) s == NULL  )
@@ -1662,7 +1651,14 @@ void apiDown(struct semaphore_d *s)
 	    //Semáforo inválido, 
         //Bloquear a thread, não adianta fazer a system call.
         //@todo: Chamar rotina que bloqueia a thread.
-		while(1){}		
+		
+		printf ("apiDown: *fail");
+		while (1){
+		    
+            asm ("pause");			
+		}
+        
+		//return;	
 	};
 		
 tryAgain:	
@@ -1702,16 +1698,23 @@ fail:
 
 
 //Operação up em um semáforo indicado no argumento.
-void apiUp(struct semaphore_d *s)
-{
+void apiUp (struct semaphore_d *s){
+	
 	int Status = 1; //fail.
 	
-	if( (void*) s == NULL  )
+	if ( (void *) s == NULL  )
 	{
 	    //Semáforo inválido, 
         //Bloquear a thread, não adianta fazer a system call.
         //@todo: Chamar rotina que bloqueia a thread.
-		while(1){}		
+		
+		printf ("apiUp: *fail");
+		while (1){
+		    
+            asm ("pause");			
+		}
+        
+		//return;		
 	};
 
     //0 = deu certo, podemos asir da sessão crítica.
@@ -1719,18 +1722,16 @@ void apiUp(struct semaphore_d *s)
 	
 tryAgain:	
 
-	Status = (int) system_call( SYSTEMCALL_SEMAPHORE_UP, 
-	                            (unsigned long) s, 
-								(unsigned long) s, 
-								(unsigned long) s );	
+	Status = (int) system_call ( SYSTEMCALL_SEMAPHORE_UP, (unsigned long) s, 
+						(unsigned long) s, (unsigned long) s );	
 
 	//Ok , podemos sair sa sessão crítica.
-	if(Status == 0){
+	if (Status == 0){
 		return;
 	};
 
 	//Deu errado a nossa tentativa d sair da sessão crítica.
-	if(Status = 1)
+	if (Status = 1)
 	{
 		//
 		// Opções:
@@ -1748,8 +1749,6 @@ tryAgain:
 fail:
 	goto tryAgain;
 };
-
-
 
 
 //P (Proberen) testar.
@@ -2030,7 +2029,7 @@ done:
 
 int api_getchar (){
 	
-	return (int) stdio_system_call ( 137, 0, 0, 0 );
+	return (int) system_call ( 137, 0, 0, 0 );
 };
 
 
@@ -2406,13 +2405,31 @@ done:
 };
 
 
-/*
+
 //Coloca uma mensagem na estrutura de uma janela.
-int apiPostMessage ( struct window_d *window, int message )
-{
-    //#todo	
+//ainda não temos filas de mensagem, então mensagens podem se perder 
+//sendo sobrepostas.
+unsigned long apiSendMessage ( struct window_d *window, 
+                               int message,
+                               unsigned long long1,
+                               unsigned long long2 )
+{	
+	
+	unsigned long message_buffer[5];
+	
+	//enterCriticalSection();
+	message_buffer[0] = (unsigned long) window;
+	message_buffer[1] = (unsigned long) message;
+	message_buffer[2] = (unsigned long) long1;
+	message_buffer[3] = (unsigned long) long2;  	
+	
+	
+	return (unsigned long) system_call ( 114 , 
+	                                     (unsigned long) &message_buffer[0], 
+										 (unsigned long) &message_buffer[0], 
+										 (unsigned long) &message_buffer[0] );	
 };	
-*/
+
 
 
 //

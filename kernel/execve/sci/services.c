@@ -850,7 +850,8 @@ void *services( unsigned long number,
 		//Esse é o get message usado pelos aplicativos.
 		//O aplicativo envia um endereço de array 
 		//e devemos colocar 4 longs como mensagens.
-		//Isso funcionou. Esse será o padrão.
+		//Isso funcionou. 
+		//Esse será o padrão até usarmos ponteiro para estrutura.
 		case 111:
 		    if ( &message_address[0] == 0 )
 			{
@@ -860,6 +861,9 @@ void *services( unsigned long number,
 				
 			    wFocus = (void *) windowList[window_with_focus];
 			    
+				//#bugbug:
+				//temos que checar a validade da janela.
+				
 				//se não há mensagens.
 				if( wFocus->newmessageFlag == 0 )
 				{
@@ -900,7 +904,36 @@ void *services( unsigned long number,
 		case 113:
 		    windowUpdateWindow( (struct window_d *) arg2 );
 			break;
-		
+			
+		// 114	
+        // ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
+		case SYS_SENDWINDOWMESSAGE:
+		    if ( &message_address[0] == 0 )
+			{
+				printf("114: null pointer");
+				die();
+			}else{
+				
+				//hWnd = (struct window_d *) message_address[0];
+				hWnd = (void *) windowList[window_with_focus];
+				
+				//temos que checar a validade da janela.
+				if ( (void *) hWnd != NULL )
+                {
+                    if ( hWnd->used == 1 && hWnd->magic == 1234 ){					
+				        
+						hWnd->msg_window = (struct window_d *) message_address[0];
+				        hWnd->msg = (int) message_address[1];
+				        hWnd->long1 = (unsigned long) message_address[2];
+				        hWnd->long2 = (unsigned long) message_address[3];
+				
+				        //sinalizando que temos uma mensagem.
+				        hWnd->newmessageFlag = 1; 
+					};
+			    };
+			};
+		    break;
+			
 		// 115 - ## IMPORTANTE ## 
 		// Usado por servidores do sistema para se comunicarem 
 		// com o kernel.

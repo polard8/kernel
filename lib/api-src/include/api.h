@@ -3580,9 +3580,9 @@ int gramadocore_init_execve( const char *filename,
 							 
 /* UNIX style */
 int fork();
-int execve( const char *filename, 
-            const char *argv[], 
-            const char *envp[] ); 
+int execve ( const char *filename, 
+             const char *argv[], 
+             const char *envp[] ); 
 			
 			
 			
@@ -3595,15 +3595,18 @@ int api_getchar();
 /*
  * apiDisplayBMP:
  */
-int apiDisplayBMP( char *address, 
-                   unsigned long x, 
-				   unsigned long y );
+int apiDisplayBMP ( char *address, 
+                    unsigned long x, 
+				    unsigned long y );
 				   
 				   
-/*				   
+			     
 //Coloca uma mensagem na estrutura de uma janela.				   
-int apiPostMessage ( struct window_d *window, int message );
-*/
+unsigned long apiSendMessage ( struct window_d *window, 
+                               int message,
+                               unsigned long long1,
+                               unsigned long long2 );
+
 
 
 //

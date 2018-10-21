@@ -200,8 +200,11 @@
 #define	SYS_GETLONG2              102
 
 //(103~109) Rotinas de mensagens. Channels, Sockets.
+
+//usado na comunicação entre processos.
 #define	SYS_RECEIVEMESSAGE    103  //Pega uma mensagem no PCB de um processo.
 #define	SYS_SENDMESSAGE       104  //Envia uma mensagem para o PCB de um processo.
+
 #define	SYS_REGISTERPROCEDURE 105  //REGISTER PROCEDURE.
 #define	SYS_CREATECHANNEL  106     //create channel. 
 #define	SYS_DESTROYCHANNEL 107     //destroy channel.
@@ -214,7 +217,9 @@
 #define	SYS_112 112
 //janela
 #define	SYS_113 113  //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
-#define	SYS_114 114
+
+//  ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
+#define	SYS_SENDWINDOWMESSAGE 114  
 
 //outros.
 //#importante 
