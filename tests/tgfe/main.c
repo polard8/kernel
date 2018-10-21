@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 #include "status.h"
-#include "topbar.h"
+#include "addrbar.h"
 
 
 //#define TEDITOR_VERBOSE 1
@@ -26,11 +26,24 @@
 //static int running = 1;
 int running = 1;
 
+
+    //
+	// ## Janelas de teste ##
+	//
+	
+    struct window_d *gWindow;  //grid 
+	struct window_d *mWindow;  //menu
+
 //static char *dest_argv[] = { "-sujo0","-sujo1","-sujo2",NULL };
 //static unsigned char *dest_envp[] = { "-sujo", NULL };
 //static unsigned char dest_msg[512];
 
 void editorClearScreen(); 
+
+int tgfeProcedure ( struct window_d *window, 
+                    int msg, 
+					unsigned long long1, 
+					unsigned long long2 );
 
 /*
  ************************************************************
@@ -147,14 +160,13 @@ int mainTextEditor ( int argc, char *argv[] ){
     stdioInitialize();	
 	
 
-    
-	//Criando uma janela.
+    //
+	// ## app window ##
+	//
 	
-	//app window.
 	apiBeginPaint(); 
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "File Explorer",
-	                    20, 20, 
-						800-40, 600-40,    
+	                    10, 10, 700, 250,    
                         0, 0, COLOR_WHITESMOKE, 0x303030 );	  
 
 	if ( (void *) hWindow == NULL )
@@ -165,7 +177,10 @@ int mainTextEditor ( int argc, char *argv[] ){
 	}
     APIRegisterWindow (hWindow);
     APISetActiveWindow (hWindow);	
-    APISetFocus (hWindow);	
+    
+	//#importante: Focus.
+	APISetFocus (hWindow);	
+	
 	refresh_screen ();	
 	apiEndPaint();
 	
@@ -219,8 +234,7 @@ int mainTextEditor ( int argc, char *argv[] ){
     // ## testes ##
     //
  
-    struct window_d *gWindow;  //grid 
-	struct window_d *mWindow;  //menu
+
 	
 	//
 	// Grid.
@@ -228,7 +242,7 @@ int mainTextEditor ( int argc, char *argv[] ){
 	
 	apiBeginPaint(); 
 	gWindow = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "GRID-WINDOW",
-	                    60, 60, 480, 60,    
+	                    200, 450, 320, 50,    
                         hWindow, 0, 0x303030, 0x303030 );	  
 
 	if ( (void *) gWindow == NULL )
@@ -247,7 +261,7 @@ int mainTextEditor ( int argc, char *argv[] ){
 	
 	apiBeginPaint(); 
 	mWindow = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "MENU-WINDOW",
-	                    60, 200, 200, 100,    
+	                    50, 450, 100, 80,    
                         hWindow, 0, 0x303030, 0x303030 );	  
 
 	if ( (void *) mWindow == NULL )
@@ -323,10 +337,9 @@ int mainTextEditor ( int argc, char *argv[] ){
 	//MOSTRA
 	
 	refresh_screen();
-    goto done;
+    //goto done;
 	
-	
-
+/*
     //fp = fopen("test1.txt","rb");	
 	//fp = fopen( (char*) &argv[0],"rb");	
 	
@@ -364,40 +377,43 @@ int mainTextEditor ( int argc, char *argv[] ){
 		//printf("Typing a text ...\n");
 #endif
 
-Mainloop:		
-	    while (running)
-	    {
-			//enterCriticalSection(); 
-	        ch = (int) getchar ();
-			//exitCriticalSection();
-			
-			if (ch == -1)
-			{
-			    asm("pause");
-               // printf("EOF reached! ?? \n");  				
-			};
-			
-	        if (ch != -1)
-	        {
-				
-	            printf("%c",ch);
-	    
-	            //switch(ch)
-                //{
-			        //quit
-			    //    case 'q':
-			    //        goto hang;
-				//        break;				 
-		        //};		   
-		    };
-	    };		
+
 		
 		//saiu.
         printf(".\n");		
         printf(".\n");		
         printf(".\n");
-		goto done;
+
 	};
+	
+*/	
+	
+    unsigned long message_buffer[5];	
+
+Mainloop:		
+	while (running)
+	{
+		enterCriticalSection(); 
+		system_call ( 111,
+		    (unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0] );
+		exitCriticalSection(); 
+			
+		if (	message_buffer[1] != 0 )
+		{
+	        tgfeProcedure ( (struct window_d *) message_buffer[0], 
+		        (int) message_buffer[1], 
+		        (unsigned long) message_buffer[2], 
+		        (unsigned long) message_buffer[3] );
+			
+			message_buffer[0] = 0;
+            message_buffer[1] = 0;
+            message_buffer[3] = 0;
+            message_buffer[4] = 0;	
+        };				
+	};	
+	
 	
 	
 fail:	
@@ -450,5 +466,69 @@ void editorClearScreen()
 	};
 	
 	apiSetCursor(0,2);
+};
+
+
+int tgfeProcedure ( struct window_d *window, 
+                    int msg, 
+					unsigned long long1, 
+					unsigned long long2 )
+{
+	switch (msg)
+	{
+		
+		case MSG_SYSKEYDOWN:
+		    switch (long1)
+			{
+		        
+				case VK_F1:
+						
+					break;
+					
+				case VK_F2:
+ 
+					break;
+					
+				case VK_F3:
+ 
+					break;
+					
+				//...
+				
+                //full screen
+                //colocar em full screen somente a área de cliente. 				
+		        case VK_F11:
+				    
+					break;
+					
+				//...
+
+			};
+			break;		
+		
+		// MSG_MOUSEKEYDOWN	
+		case 30:
+		    switch (long1)
+			{
+				//botão 1.
+				case 1:
+				    if ( window == gWindow )
+					{
+						printf("grid window\n");
+					}
+				    if ( window == mWindow )
+					{
+						printf("menu window\n");
+					}
+
+					break;
+			};
+			break;
+		
+		default:
+		    break;
+	};
+	
+    return (int) 0;	
 };
 

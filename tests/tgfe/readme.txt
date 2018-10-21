@@ -19,3 +19,7 @@ __crt0Main:
 mainGetMessage()
 
 
+flags na linha de comando poderão alterar o funcionamento desse aplicativo,
+para que ele sirva de suporte ao desenvovledor.
+
+ex: tgfe.bin -list-files

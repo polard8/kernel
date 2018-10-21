@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 #include "status.h"
-
+#include "addrbar.h"
 
 /*
  * topbarInitializeTopBar:
@@ -41,9 +41,9 @@ void topbarInitializeTopBar()
 	apiSetCursor( 44, 0 );	
 	printf("|Application for testing system resources");
 	
-done:
+//done:
     apiSetCursor(OldX,OldY);
-    return;	
+   // return;	
 };
 
 

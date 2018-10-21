@@ -16,7 +16,7 @@ echo -{ ...
 echo -{ Compiling ...
 	gcc -c c:\gramado\tests\tgfe\main.c    -I c:\gramado\include\libc -o main.o  
 	gcc -c c:\gramado\tests\tgfe\status.c  -I c:\gramado\include\libc -o status.o 
-	gcc -c c:\gramado\tests\tgfe\topbar.c  -I c:\gramado\include\libc -o topbar.o 
+	gcc -c c:\gramado\tests\tgfe\addrbar.c  -I c:\gramado\include\libc -o addrbar.o 
  
     
 	copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
@@ -35,7 +35,7 @@ stdio.o ^
 string.o ^
 api.o ^
 status.o ^
-topbar.o   
+addrbar.o   
 
 
 

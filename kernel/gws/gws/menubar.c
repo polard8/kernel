@@ -54,9 +54,9 @@
  * Retorna um ponteiro para a estrutura.
  *
  */
-void *
-create_menubar( struct window_d *pwindow )
-{	
+ 
+void *create_menubar ( struct window_d *pwindow ){
+	
     struct window_d *mWindow; 
     //struct linkedlist_d *mb_linkedlist;
    
@@ -72,9 +72,9 @@ create_menubar( struct window_d *pwindow )
     };
 	
 	// Size.
-    unsigned long x      = pwindow->left; 
-    unsigned long y      = pwindow->top;
-	unsigned long width  = (unsigned long) pwindow->width; 
+    unsigned long x = pwindow->left; 
+    unsigned long y = pwindow->top;
+	unsigned long width = (unsigned long) pwindow->width; 
 	unsigned long height = (unsigned long) (8*3);    //@todo: declarar constante.
 
 	//
@@ -82,10 +82,11 @@ create_menubar( struct window_d *pwindow )
 	//
 	
     // Cria uma janela para a menubar.
-	mWindow = (void*) CreateWindow( 1, 0, 0, "Menubar", 
-	                               x, y, width, height, 
-							       pwindow, 0, 0, COLOR_GRAY); 
-	if( (void*) mWindow == NULL )
+	mWindow = (void *) CreateWindow ( 1, 0, 0, "Menubar", 
+	                    x, y, width, height, 
+						pwindow, 0, 0, COLOR_GRAY );
+						
+	if ( (void *) mWindow == NULL )
 	{
 		printf("create_menubar: mWindow\n");
         goto fail;
@@ -103,11 +104,13 @@ create_menubar( struct window_d *pwindow )
 	//
 	
 	// Menu structure. (Cria uma estrutura para o menu da menubar).
-	gui->mb = (void*) malloc(sizeof(struct menu_d));
-    if( (void*) gui->mb == NULL )
+	gui->mb = (void *) malloc ( sizeof(struct menu_d) );
+	
+    if ( (void *) gui->mb == NULL )
 	{
 	    printf("create_menubar error: Menu struct.\n");
 		goto fail;
+	
 	}else{
 		
 	   //Registra na estrutura de menu a janela que é o menu.
@@ -125,8 +128,9 @@ create_menubar( struct window_d *pwindow )
 	};
 	
 	// Array para items.
-	gui->mb->Items = (void*) malloc( sizeof(struct menuitem_d) * 16 );
-    if( (void*) gui->mb->Items == NULL)
+	gui->mb->Items = (void *) malloc ( sizeof(struct menuitem_d) * 16 );
+    
+	if ( (void *) gui->mb->Items == NULL )
 	{
 	    printf("create_menubar error: Menu array struct.\n");
         goto fail;       
@@ -320,11 +324,11 @@ int unselect_menubar_item(int n)
 };
 
 
-int redraw_menubar_item(int n)
-{
+int redraw_menubar_item (int n){
+	
     int Selected;
 	
-    if(n<0){
+    if (n<0){
 	    return (int) 1;
 	};
 
@@ -344,14 +348,17 @@ int redraw_menubar_item(int n)
 	};
 	
 	//Escreve.	
-strings:
+//strings:
+
 	draw_string( gui->mb->Items[n].left, 
 	             gui->mb->Items[n].top, 
 				 COLOR_WINDOWTEXT, 
 				 gui->mb->Items[n].string );
 				 
-done:
-    return (int) 0;
+
+//done:
+    
+	return (int) 0;
 };
 
 
@@ -367,10 +374,10 @@ int get_menubar_selected_item()
  *     Cria uma menubar na janela screen.
  *     Usanda para teste de criação de menubars.
  */
-int menubarX()
-{
+int menubarX (){
+	
 	//Usando a janela screen anteriormente criada.
-    if( (void*) gui->screen == NULL ){
+    if ( (void *) gui->screen == NULL ){
         return (int) 1;
     };		
 	
@@ -400,7 +407,8 @@ int menubarX()
 	
 	//More?!
 	
-done:
+//done:
+
     SetProcedure( (unsigned long) &MenuBarProcedure);	 
     return (int) 0;
 };

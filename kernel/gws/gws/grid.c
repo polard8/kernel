@@ -18,10 +18,10 @@
  *
  */
 int 
-InitializeGrid( struct window_d *window, 
-                struct grid_d *g, 
-                int n, 
-				int view )
+InitializeGrid ( struct window_d *window, 
+                 struct grid_d *g, 
+                 int n, 
+				 int view )
 {	
 	struct window_d *gridWindow;        //bg.
 	struct window_d *griditemWindow;    //item.
@@ -34,20 +34,21 @@ InitializeGrid( struct window_d *window,
 	unsigned long WindowWidth = 0;
     unsigned long WindowHeight = 0;
 	
-	unsigned long ItensCount = (unsigned long) n; //quantidade de itens.
+	//quantidade de itens.
+	unsigned long ItensCount = (unsigned long) n; 
 
 	// dimensões dos botões.
 	x = 0; //deslocamento em relação à margem da janela de background 
 	y = 0; //deslocamento em relação à margem da janela de background 
 	
 	
-	if( (void*) g == NULL )
+	if ( (void *) g == NULL )
 	{
 		printf("InitializeGrid: g\n");
 		goto fail;
 	}else{
 		
-	    if( g->used != 1 || g->magic != 1234 ){
+	    if ( g->used != 1 || g->magic != 1234 ){
 		    printf("InitializeGrid: g validation\n");
 		    goto fail;
 	    }
@@ -55,7 +56,7 @@ InitializeGrid( struct window_d *window,
 	};
 	
 	
-	if( (void*) window == NULL )
+	if ( (void *) window == NULL )
 	{
 		//fail;
 		printf("InitializeGrid: window\n");
@@ -64,14 +65,14 @@ InitializeGrid( struct window_d *window,
 	}else{
 		
 		//fail.
-		if( window->used != 1 || window->magic != 1234 ){
+		if ( window->used != 1 || window->magic != 1234 ){
             printf("InitializeGrid: validation\n");
             goto fail; 			
 		}
 		
 		//@todo: filtros.
 		
-		if( view == GRID_HORIZONTAL )
+		if ( view == GRID_HORIZONTAL )
 	    {
 		    WindowLeft = window->left;
 	 	    WindowTop = window->top;
@@ -82,9 +83,13 @@ InitializeGrid( struct window_d *window,
 	        cy = (unsigned long) (WindowHeight);              //altura do ítem.
 		
 	        //horizontal..
-		    //muda métrica da área de trabalho.
-	        replace_window( gui->main, 0, WindowHeight );        //left, top
-	        resize_window( gui->main, 800, (600-WindowHeight) ); //width, height
+		    //muda o posicionamento e o tamanho.
+			//mas temos que atuar em uma janela já registrada.
+			//estamos atuando sobre a janela main modificando o tamanho dela 
+			//de acordo com o grid criado. Mas não é isso que queromos por enquanto.
+			
+	        //replace_window( gui->main, 0, WindowHeight );        //left, top
+	        //resize_window( gui->main, 800, (600-WindowHeight) ); //width, height
 	    };
 
 	    if( view == GRID_VERTICAL )
@@ -98,9 +103,13 @@ InitializeGrid( struct window_d *window,
 	        cy = (unsigned long) (WindowHeight/ItensCount);     //altura do ítem.
 		
 		    //vertical.
-	        //métrica da área de trabalho.
-	        replace_window( gui->main, WindowWidth, 0 );        //left, top
-	        resize_window( gui->main, (800-WindowWidth), 600 ); //width, height
+		    //muda o posicionamento e o tamanho.
+			//mas temos que atuar em uma janela já registrada.
+			//estamos atuando sobre a janela main modificando o tamanho dela 
+			//de acordo com o grid criado. Mas não é isso que queromos por enquanto.
+			
+	        //replace_window( gui->main, WindowWidth, 0 );        //left, top
+	        //resize_window( gui->main, (800-WindowWidth), 600 ); //width, height
 	    };		
 		
 	    //...	
@@ -110,9 +119,9 @@ InitializeGrid( struct window_d *window,
 		 
 	//o grid pertence a janela principal. 
 	
-	gridWindow = (void *) CreateWindow( 1, 0, 0, "Grid Bg", 
+	gridWindow = (void *) CreateWindow ( 1, 0, 0, "Grid Bg", 
 	                        WindowLeft, WindowTop, WindowWidth, WindowHeight, 
-							gui->main, 0, COLOR_BACKGROUND, 0 ); 
+							window, 0, COLOR_BACKGROUND, 0 ); 
 							
     if( (void*) gridWindow == NULL )
 	{
@@ -135,29 +144,30 @@ InitializeGrid( struct window_d *window,
 	ItensCount += 100;
 	
 	//draw (horizontal.)
-    while(i < ItensCount)
+    while (i < ItensCount)
     {		
 		//grid item 
 		//#bugbug tem que usar create window.
 	    //griditemWindow = (void*) draw_button( gridWindow, string, 1, x, y, cx, cy, COLOR_BUTTONFACE);    						                 						
         
-	    griditemWindow = (void *) CreateWindow( WT_BUTTON, 0, 0, "Item", 
+	    griditemWindow = (void *) CreateWindow ( WT_BUTTON, 0, 0, "Item", 
 	                                x, y, cx, cy, 
 							        gridWindow, 0, COLOR_TERMINAL, COLOR_TERMINAL ); 		
 									   
-		if((void*) griditemWindow == NULL)
+		if ( (void *) griditemWindow == NULL )
 		{
 	        printf("drawScreenGrid fail: ítem\n");
 		    goto fail;		    
 	    }else{
-			RegisterWindow(griditemWindow);
+			
+			RegisterWindow (griditemWindow);
 		}
 		
 		//@todo: fazer a lista encadeada de botões.
 		//g->b = (void*) griditemWindow;
 		
 		if( view == GRID_HORIZONTAL ){
-		    x = (unsigned long) x + cx; //horizontal.	
+		    x = (unsigned long) x + cx + 2; //horizontal.	
 		}
 		
 		if( view == GRID_VERTICAL ){
@@ -168,9 +178,10 @@ InitializeGrid( struct window_d *window,
 	};
 		
 	
-done:
-    refresh_rectangle( WindowLeft, WindowTop, 
-	    WindowWidth, WindowHeight );
+//done:
+
+    refresh_rectangle ( WindowLeft, WindowTop, WindowWidth, WindowHeight );
+		
     return (int) 0;
 fail:
     refresh_screen();
@@ -186,17 +197,18 @@ fail:
  * Área de trabalho.
  * @todo: #define gridObject CreateGrid
  */
-void *CreateGrid()
-{
+void *CreateGrid (){
+	
 	struct grid_d *g;
 	
-	g = (void*) malloc( sizeof( struct grid_d) );
+	g = (void *) malloc ( sizeof( struct grid_d) );
 	
-	if( (void*) g == NULL )
+	if ( (void *) g == NULL )
 	{
 		//@todo: Message.
 		return NULL;
-	}else{
+		
+	} else {
 		
 		//Object.
 		g->objectType = ObjectTypeGrid;
@@ -223,9 +235,10 @@ int grid( struct window_d *window,
 {
 	int Status = 1;  //erro
 	struct grid_d *g;
-	//int n = 8;
 	
-	g = (void *) CreateGrid();
+	//Cria o objeto grid. 
+	//apenas a estrutura.
+	g = (void *) CreateGrid ();
 	
 	//se o objeto for válido.
 	if( (void *) g != NULL )
@@ -234,7 +247,7 @@ int grid( struct window_d *window,
 		GRID = (void *) g;
 		
 		//Inicializaremos a estrutura e pintaremos o grid.
-	    Status = (int) InitializeGrid( window, g, n, view);	
+	    Status = (int) InitializeGrid ( window, g, n, view );	
 	};	
 		
 	return (int) Status; 	

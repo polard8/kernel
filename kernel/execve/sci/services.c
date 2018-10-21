@@ -1106,7 +1106,8 @@ void *services( unsigned long number,
 
         //test. menu.
 		case 149:
-            MainMenu ( (struct window_d *) arg2 );		
+            //essa é uma rotina de teste, qua chama várias funções.
+			MainMenu ( (struct window_d *) arg2 );		
             break;		
 			
 		//152 - get user id	
