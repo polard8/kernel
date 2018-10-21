@@ -1,17 +1,24 @@
 :SetUp
 @echo off  
 
-:Monting
-echo -{ ...
-echo -{ Creating application JACKPOT.BIN ...
+
 
     cd c:\sdk\bin
 	
+:Monting
+echo -{ ...
+echo -{ Creating application TPRINTF.BIN ...
+echo -{ head
+    
+	rem head.s
+	nasm c:\gramado\tests\tprintf\head.s -felf -o head.o
+
+	
 :Compiling	
 echo -{ ...
-echo -{ Compiling ...
+echo -{ app1 (init task)
 
-	gcc  -c c:\gramado\tests\jackpot\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\tests\tprintf\main.c -I c:\gramado\include\libc -o main.o  
  
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -19,29 +26,29 @@ echo -{ Compiling ...
 	copy c:\gramado\lib\string.o  c:\sdk\bin\string.o
     copy c:\gramado\lib\time.o	  c:\sdk\bin\time.o
  
+ 
 :Objects	
-set myObjects=main.o ^
-ctype.o ^
+set myObjects=head.o ^
+main.o ^
 stdio.o ^
 stdlib.o ^
+ctype.o ^
 string.o ^
-time.o    
-
+api.o  
 
 
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-
-   ld -T c:\gramado\tests\jackpot\link.ld -o JACKPOT.BIN %myObjects% -Map c:\gramado\tests\jackpot\map.s
+   ld -T  c:\gramado\tests\tprintf\link.ld -o TPRINTF.BIN %myObjects%  -Map   c:\gramado\tests\tprintf\map.s
    
    rem Não deletar os objetos.
  
+ 
 :Moving   
+   move TPRINTF.BIN c:\gramado\bin\TPRINTF.BIN
 
-   move JACKPOT.BIN c:\gramado\bin\JACKPOT.BIN
    
 :End   
 echo End!
-	
 	pause

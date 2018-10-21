@@ -82,23 +82,20 @@ echo -{ ...
     rem Gramado LA	
 	
 	rem config stuff
-    copy c:\gramado\arch\x86\boot\vhd\INIT.TXT  F:\
-    copy c:\gramado\arch\x86\boot\vhd\USER.TXT  F:\
-	
+    copy c:\gramado\arch\x86\boot\vhd\INIT.TXT     F:\
+    copy c:\gramado\arch\x86\boot\vhd\USER.TXT     F:\
 	copy c:\gramado\arch\x86\boot\vhd\GRAMADO.TXT  F:\
-	
 	
 	REM copy c:\gramado\arch\x86\boot\vhd\FILE2KB.TXT  F:\
 	
 	rem BMPs
-	copy c:\gramado\arch\x86\boot\vhd\images\BMP1.BMP   F:\
-	copy c:\gramado\arch\x86\boot\vhd\images\MOUSE.BMP  F:\
+	copy c:\gramado\arch\x86\boot\vhd\images\BMP1.BMP      F:\
+	copy c:\gramado\arch\x86\boot\vhd\images\MOUSE.BMP     F:\
 	copy c:\gramado\arch\x86\boot\vhd\images\DENNIS.BMP    F:\
-	copy c:\gramado\arch\x86\boot\vhd\images\APP.BMP    F:\
-	copy c:\gramado\arch\x86\boot\vhd\images\FILE.BMP    F:\
+	copy c:\gramado\arch\x86\boot\vhd\images\APP.BMP       F:\
+	copy c:\gramado\arch\x86\boot\vhd\images\FILE.BMP      F:\
 	copy c:\gramado\arch\x86\boot\vhd\images\FOLDER.BMP    F:\
-	copy c:\gramado\arch\x86\boot\vhd\images\TERMINAL.BMP    F:\
-	
+	copy c:\gramado\arch\x86\boot\vhd\images\TERMINAL.BMP  F:\	
 	copy c:\gramado\arch\x86\boot\vhd\images\CURSOR.BMP    F:\
 	
 	
@@ -178,7 +175,7 @@ echo -{ ...
 	
 	
     mkdir F:\USERS\DEFAULT
-    copy c:\gramado\arch\x86\boot\vhd\USER.TXT         F:\USERS\DEFAULT\USER.TXT	
+    copy c:\gramado\arch\x86\boot\vhd\USER.TXT    F:\USERS\DEFAULT\USER.TXT	
 
 
 :detachingVHD

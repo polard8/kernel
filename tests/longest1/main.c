@@ -7,7 +7,7 @@
 #include "stddef.h"
 #include "string.h"
 #include "stdio.h"
-
+#include "ctype.h"
 
 #define MAXLINE 32
 

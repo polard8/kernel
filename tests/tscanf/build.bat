@@ -3,7 +3,7 @@
 
 :Monting
 echo -{ ...
-echo -{ Creating application JACKPOT.BIN ...
+echo -{ Creating application TSCANF.BIN ...
 
     cd c:\sdk\bin
 	
@@ -11,7 +11,7 @@ echo -{ Creating application JACKPOT.BIN ...
 echo -{ ...
 echo -{ Compiling ...
 
-	gcc  -c c:\gramado\tests\jackpot\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\tests\tscanf\main.c -I c:\gramado\include\libc -o main.o  
  
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -21,27 +21,27 @@ echo -{ Compiling ...
  
 :Objects	
 set myObjects=main.o ^
-ctype.o ^
 stdio.o ^
 stdlib.o ^
 string.o ^
-time.o    
+ctype.o  
+
+
+
 
 
 
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-
-   ld -T c:\gramado\tests\jackpot\link.ld -o JACKPOT.BIN %myObjects% -Map c:\gramado\tests\jackpot\map.s
+   ld -T c:\gramado\tests\tscanf\link.ld -o TSCANF.BIN %myObjects% -Map c:\gramado\tests\tscanf\map.s
    
    rem Não deletar os objetos.
  
 :Moving   
 
-   move JACKPOT.BIN c:\gramado\bin\JACKPOT.BIN
+   move TSCANF.BIN c:\gramado\bin\TSCANF.BIN
    
 :End   
 echo End!
-	
 	pause

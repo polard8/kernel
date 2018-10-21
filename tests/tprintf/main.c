@@ -37,10 +37,12 @@
 // Includes.
 // 
  
-#include "api.h"      //api.
-#include "stdio.h"    //libC em user mode.
-#include "stddef.h"   //libC em user mode. 
 
+#include <stdio.h>   //libC em user mode.
+#include <stdlib.h>  
+#include <stddef.h>   //libC em user mode. 
+#include <ctype.h>
+#include "api.h"      //api.
 
 //
 // Variáveis internas.

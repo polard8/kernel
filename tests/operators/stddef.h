@@ -1,9 +1,16 @@
 /*
- * Arquivo: stddef.h 
+ * File: stddef.h 
  *
  * About:
  *     Header for standard defines. C99.
- *
+ */
+ 
+ 
+/* 
+enum {
+	false	= 0,
+	true	= 1
+};
  */
  
  
@@ -26,7 +33,10 @@ Variables:
  * Obs: 
  *     This define is also in types.h.
  */ 
+
+#ifndef NULL
 #define NULL ((void *)0)
+#endif
 
 
 /*
@@ -36,13 +46,12 @@ typedef int ptrdiff_t;
 
   
 /*
- * Integral type whose range of values can represent distinct 
- * wide-character codes for all members of the largest character set 
- * specified among the locales supported by the compilation environment:
- * the null character has the code value 0 and 
- * each member of the Portable Character 
- * Set has a code value equal to its value when used as 
- * the lone character in an integer character constant.
+ * Integral type whose range of values can represent distinct wide-character 
+ * codes for all members of the largest character set specified among the 
+ * locales supported by the compilation environment:
+ * the null character has the code value 0 and each member of the Portable 
+ * Character Set has a code value equal to its value when used as the lone 
+ * character in an integer character constant.
  */ 
 typedef int wchar_t;
 
@@ -61,6 +70,6 @@ typedef int size_t;
 
 
 //
-//fim.
+// End.
 //
 

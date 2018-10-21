@@ -36,7 +36,7 @@ string.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\tests\fclass\link.ld -o FCLASS.BIN %myObjects% -Map  test_map.s
+   ld -T c:\gramado\tests\fclass\link.ld -o FCLASS.BIN %myObjects% -Map  c:\gramado\tests\fclass\map.s
    
    rem Não deletar os objetos.
  

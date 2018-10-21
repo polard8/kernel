@@ -43,7 +43,7 @@ addrbar.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\tests\tgfe\link.ld -o TGFE.BIN %myObjects% -Map  test_map.s
+   ld -T c:\gramado\tests\tgfe\link.ld -o TGFE.BIN %myObjects% -Map c:\gramado\tests\tgfe\map.s
    
    rem Não deletar os objetos.
  

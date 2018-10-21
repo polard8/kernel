@@ -32,7 +32,7 @@ string.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\tests\tascii\link.ld -o TASCII.BIN %myObjects% -Map  test_map.s
+   ld -T c:\gramado\tests\tascii\link.ld -o TASCII.BIN %myObjects% -Map  c:\gramado\tests\tascii\map.s
    
    rem Não deletar os objetos.
  
