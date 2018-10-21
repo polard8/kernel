@@ -2227,8 +2227,14 @@ do_compare:
 	//um message box ou uma janela.
 	if ( strncmp( prompt, "about", 5 ) == 0 )
 	{
-		shellSendMessage( NULL, MSG_COMMAND, CMD_ABOUT, 0);
-		//apiSendMessage ( NULL, (int) MSG_COMMAND, (unsigned long) CMD_ABOUT, (unsigned long) 0 );
+		shellSendMessage ( NULL, MSG_COMMAND, CMD_ABOUT, 0);
+		
+        //chama message box com mensagem about.
+        //apiSendMessage ( (struct window_d *) 0, 
+		//                 (int) MSG_COMMAND, 
+		//				 (unsigned long) CMD_ABOUT, 
+		//				 (unsigned long) 0 );
+						 
 	    goto exit_cmp;
 	};
 
@@ -2291,12 +2297,12 @@ do_compare:
 			if( strncmp( (char*) tokenList[i], "..", 2 ) == 0 )
 			{
 				//Apaga o nome do último diretório.
-			    shell_pathname_backup( current_workingdiretory_string, 1); 
+			    shell_pathname_backup ( current_workingdiretory_string, 1 ); 
                 goto exit_cmp;				
 		    }			
 			
 	        // updating the current working directory string.
-	        shellUpdateWorkingDiretoryString( (char*) tokenList[i] );
+	        shellUpdateWorkingDiretoryString ( (char *) tokenList[i] );
 			
 			//@todo: podemos checar se o pathname é absoluto,
 			//e onde se encontra o arquivo que queremos.
@@ -5181,10 +5187,10 @@ void shellShowWindowInfo (){
 
 				  
 unsigned long 
-shellSendMessage( struct window_d *window, 
-                  int msg, 
-				  unsigned long long1, 
-				  unsigned long long2 )
+shellSendMessage ( struct window_d *window, 
+                   int msg, 
+				   unsigned long long1, 
+				   unsigned long long2 )
 {
 	return (unsigned long) shellProcedure ( window, msg, long1, long2 );
 };

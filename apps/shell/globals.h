@@ -271,6 +271,8 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
 //  ** SCREEN BUFFER ***
 //
 
+//#bugbug: ALGUMAS AQUI NÃO SÃO MAIS USDAS. DELETAR !!!
+
 //O buffer
 char screen_buffer[SCREEN_BUFFER_SIZE]; 
 

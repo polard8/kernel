@@ -2,8 +2,11 @@
  * File: main.c
  *
  * Arquivo principal do aplicativo teditor.bin 
- * O aplicativo é usado para testes do sistema operacional Gramado 0.3.
+ * O aplicativo é usado para testes do sistema operacional Gramado 0.4
  *
+    ## todo: pegar algumas funções do shell e usar aqui.
+	         agora eles usam o mesmo esquema de strutura de linhas para o texto.
+ 
  * 2018 - Created by Fred Nora.
  */
 
@@ -21,8 +24,15 @@
 #include "status.h"
 #include "topbar.h"
 
+#include "teditor.h"
 
 //#define TEDITOR_VERBOSE 1
+
+//# usado para teste 
+#define WINDOW_WIDTH     640 
+#define WINDOW_HEIGHT    480
+#define WINDOW_LEFT      10
+#define WINDOW_TOP       10
 
 
 
@@ -35,6 +45,25 @@ int running = 1;
 
 void editorClearScreen(); 
 int editor_save_file ();
+
+void teditorTeditor ();
+
+void shellInitSystemMetrics();
+void shellInitWindowLimits();
+void shellInitWindowSizes();
+void shellInitWindowPosition();
+
+
+void teditorInsertNextChar (char c);
+void teditorRefreshCurrentChar (); 
+
+
+unsigned long 
+teditorProcedure( struct window_d *window, 
+                int msg, 
+				unsigned long long1, 
+				unsigned long long2 );
+
 
 /*
  ************************************************************
@@ -221,6 +250,13 @@ int mainTextEditor ( int argc, char *argv[] ){
 	//inicializando o suporte ao fluxo padrão.
     stdioInitialize();	
 	
+	
+	//#importante
+	//inicializa as variáveis antes de pintar.
+	//
+	
+    teditorTeditor ();	
+	
 
 	//
 	// ## Window ##
@@ -234,7 +270,7 @@ int mainTextEditor ( int argc, char *argv[] ){
     //                    0, 0, 0x303030, 0x303030 );
 
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, argv[1],
-	                    20, 20, 800-40, 600-40,    
+	                    wpWindowLeft, wpWindowTop, wsWindowWidth, wsWindowHeight,    
                         0, 0, 0x303030, 0x303030 );	   
 	
 
@@ -329,7 +365,7 @@ startTyping:
 //sobre eventos de input de teclado e mouse,
 //assim como os controles.
 
-Mainloop:	
+
 
 	//
 	// Habilitando o cursor de textos.
@@ -337,7 +373,17 @@ Mainloop:
 	
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
 
-	    
+	
+		//saiu.
+        printf(".\n");		
+        printf(".\n");		
+        printf(".\n");
+
+	};
+	
+	unsigned long message_buffer[5];	
+	
+Mainloop:		    
 	//
     // #importante:
     // Nessa hora podemos usar esse loop para pegarmos mensagens 
@@ -347,45 +393,30 @@ Mainloop:
     // Devemos copiar a forma que foi feita o shell.
     //   
 
-		while (running)
-	    {
-			//
-			// #todo:
-			// Isso é provisório, usaremos mensagens.
-			// Aqui mesmo, nesse loop.
-			//
-			
-			//enterCriticalSection(); 
-	        ch = (int) getchar();
-			//exitCriticalSection();
-			
-			if (ch == -1)
-			{
-			    asm ("pause");
-               // printf("EOF reached! ?? \n");  				
-			};
-			
-	        if (ch != -1)
-	        {
-	            printf ("%c", ch );
-	    
-	            //switch(ch)
-                //{
-			        //quit
-			    //    case 'q':
-			    //        goto hang;
-				//        break;				 
-		        //};		   
-		    };
-	    };		
-		
-		//saiu.
-        printf(".\n");		
-        printf(".\n");		
-        printf(".\n");
-		goto done;
-	};
+    
 	
+	while (running)
+	{
+		enterCriticalSection(); 
+		system_call ( 111,
+		    (unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0] );
+		exitCriticalSection(); 
+			
+		if (	message_buffer[1] != 0 )
+		{
+	        teditorProcedure ( (struct window_d *) message_buffer[0], 
+		        (int) message_buffer[1], 
+		        (unsigned long) message_buffer[2], 
+		        (unsigned long) message_buffer[3] );
+			
+			message_buffer[0] = 0;
+            message_buffer[1] = 0;
+            message_buffer[3] = 0;
+            message_buffer[4] = 0;	
+        };				
+	};	
 	
 fail:	
     printf("fail.\n");
@@ -520,6 +551,263 @@ int editor_save_file (){
 	printf("t5: done.\n");	
 	
 	return (int) Ret;
+};
+
+
+unsigned long 
+teditorProcedure( struct window_d *window, 
+                int msg, 
+				unsigned long long1, 
+				unsigned long long2 )
+{
+	unsigned long input_ret;
+    unsigned long compare_return;	
+    int q;	
+	
+	
+    switch (msg)
+    {
+		//Faz algumas inicializações de posicionamento e dimensões.
+        //case MSG_INITDIALOG:
+        //    break;
+
+		//Torna a janela visível.
+        //case MSG_SHOWWINDOW:
+		//    break; 
+		 
+		case MSG_KEYDOWN:
+            switch (long1)
+            {
+				// Null key.
+				case 0:
+				break;
+				
+				//teclas de digitação.
+				default:
+				    teditorInsertNextChar ( (char) long1 );  
+				    break;
+			};
+			break;
+			
+		case MSG_SYSKEYDOWN:
+		    switch (long1)
+			{
+				//#bugbug
+				//vamos testar usando as teclas de função.
+				//mas no futuro usaremos as setas.
+				//o problema é que o procedimento do sistema também usa isso
+		        
+				//esquerda
+				case VK_F1:
+				   //textCurrentCol -= 1;
+				   break;
+				
+				//direita
+				case VK_F2:
+				   //textCurrentCol += 1;
+				   break;
+
+				//baixo  
+				case VK_F3:
+				   //textCurrentRow += 1;
+				   break;
+
+				//cima   
+				case VK_F4:
+				   //textCurrentRow -= 1;
+				   break;
+
+			};
+			break;
+			
+		default:
+		    break;
+				
+	};
+	
+	return 0;
+};
+
+
+
+void teditorTeditor (){
+	
+	int i=0;
+	int j=0;
+	
+	//
+	// ## Inicializando as estruturas de linha ##
+	//
+	
+	//inicializamos com espaços.
+	for ( i=0; i<32; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{
+		    LINES[i].CHARS[j] = (char) ' ';
+		    LINES[i].ATTRIBUTES[j] = (char) 7;
+	    }
+		
+		LINES[i].left = 0;
+		LINES[i].right = 0;
+		LINES[i].pos = 0;
+	};	
+	
+	
+	//inicializa as metricas do sistema.	
+    //inicializa os limites da janela.
+	//inicia o tamanho da janela.
+	//inicializar a posição da janela.
+	
+    shellInitSystemMetrics();
+    shellInitWindowLimits();
+    shellInitWindowSizes();
+    shellInitWindowPosition();
+	
+};
+
+
+
+void shellInitSystemMetrics()
+{
+	//pegaremos todas as metricas de uma vez só,
+	//se uma falhar, então pegaremos tudo novamente.
+	
+	// Tamanho da tela.	
+	smScreenWidth = apiGetSystemMetrics(1);
+    smScreenHeight = apiGetSystemMetrics(2); 
+	smCursorWidth = apiGetSystemMetrics(3);
+	smCursorHeight = apiGetSystemMetrics(4);
+	smMousePointerWidth = apiGetSystemMetrics(5);
+	smMousePointerHeight = apiGetSystemMetrics(6);
+	smCharWidth = apiGetSystemMetrics(7);
+	smCharHeight = apiGetSystemMetrics(8);	
+	//...
+} 
+
+
+void shellInitWindowLimits(){
+	
+    //
+    // ## Window limits ##
+    //
+
+    //full screen support
+    wlFullScreenLeft = 0;
+    wlFullScreenTop = 0;
+    wlFullScreenWidth = smScreenWidth;
+    wlFullScreenHeight = smScreenHeight;
+	
+    //limite de tamanho da janela.
+    wlMinWindowWidth = smCharWidth * 80;
+    wlMinWindowHeight = smCharWidth * 25;
+    wlMaxWindowWidth = wlFullScreenWidth;
+    wlMaxWindowHeight = wlFullScreenHeight;	
+	
+    //quantidade de linhas e colunas na área de cliente.
+    wlMinColumns = 80;
+    wlMinRows = 1;
+    wlMaxColumns = (wlFullScreenWidth / 8);
+    wlMaxRows = (wlFullScreenHeight / 8);
+	
+	//dado em quantidade de linhas.
+    textMinWheelDelta = 1;  //mínimo que se pode rolar o texto
+    textMaxWheelDelta = 4;  //máximo que se pode rolar o texto	
+	textWheelDelta = textMinWheelDelta;
+	//...
+}
+
+
+
+
+void shellInitWindowSizes()
+{
+	
+//
+//  ## Window size ##
+//
+
+    //wsWindowWidth = wlMinWindowWidth;
+    //wsWindowHeight = wlMinWindowHeight;	
+	
+	//Tamanho da janela do shell com base nos limites 
+    //que ja foram configurados.	
+	
+	wsWindowWidth =  WINDOW_WIDTH;
+	wsWindowHeight = WINDOW_HEIGHT;
+	
+	
+	if ( wsWindowWidth < wlMinWindowWidth )
+	{
+		wsWindowWidth = wlMinWindowWidth;
+	}
+	
+	if ( wsWindowHeight < wlMinWindowHeight )
+	{
+	    wsWindowHeight = wlMinWindowHeight;	
+	}
+
+
+};
+
+
+void shellInitWindowPosition()
+{
+	
+	//window position
+	wpWindowLeft = WINDOW_LEFT;
+	wpWindowTop = WINDOW_TOP;
+	
+	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
+	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
+}
+
+
+
+/*
+ ***************************************************
+ * teditorInsertNextChar:
+ *     Coloca um char na próxima posição do buffer.
+ *     Memória de vídeo virtual, semelhante a vga.
+ */
+
+void teditorInsertNextChar (char c){
+	
+	
+	//cursor da linha
+	
+	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
+	
+	//refresh
+	teditorRefreshCurrentChar();
+	
+	//update
+	textCurrentCol++;
+	
+	if (textCurrentCol >= 80 )
+	{
+		textCurrentCol = 0;
+		
+		textCurrentRow++;
+		
+		if ( textCurrentRow >= 25 )
+		{
+			//shellScroll ();
+			printf(" *SCROLL");
+			while(1){}
+		}
+	}
+	
+	LINES[textCurrentRow].pos = textCurrentCol;
+	LINES[textCurrentRow].right = textCurrentCol;
+};
+
+
+//refresh do char que está na posição usada pelo input.
+
+void teditorRefreshCurrentChar (){
+	
+	printf ("%c", LINES[textCurrentRow].CHARS[textCurrentCol] );
 };
 
 
