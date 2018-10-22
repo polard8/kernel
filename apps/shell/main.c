@@ -2419,6 +2419,15 @@ do_compare:
         goto exit_cmp;
 	};	
 	
+
+    // dialog-box
+	//Testing dialog box.
+	if ( strncmp( prompt, "dialog-box", 10 ) == 0 )
+	{
+		//@todo:testar os 4 tipos 
+	    MessageBox( 1, "Shell dialog box","Testing dialog box...");
+        goto exit_cmp;
+    };		
 	
 	// dir - Lista os arquivos no estilo DOS.
 	if ( strncmp ( prompt, "dir", 3 ) == 0 )

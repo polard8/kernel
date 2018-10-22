@@ -3246,7 +3246,7 @@ void apiInitBackground();
 
 //Message Box.
 int MessageBox ( int type, char *string1, char *string2 );
-
+int DialogBox ( int type, char *string1, char *string2 );
 
 /*
  * call_kernel:
