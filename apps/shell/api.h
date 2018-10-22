@@ -3245,7 +3245,7 @@ void carrega_bitmap_16x16( unsigned long img_address,
 void apiInitBackground();
 
 //Message Box.
-void MessageBox(int type, char *string1, char *string2);
+int MessageBox ( int type, char *string1, char *string2 );
 
 
 /*

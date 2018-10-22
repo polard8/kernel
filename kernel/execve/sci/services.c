@@ -1019,7 +1019,11 @@ void *services( unsigned long number,
 		    
 			//@todo: Podeira pintar na janela atual.
 			argString = (unsigned char *) arg4;
-		    draw_text( gui->screen, arg2,  arg3, COLOR_TEXT, argString);
+		    draw_text( (struct window_d *) message_address[0], //window
+			    (unsigned long) message_address[1],  //x
+				(unsigned long) message_address[2],  //y
+				(unsigned long) message_address[3],   //color
+				(unsigned char *) message_address[4] ); //string
 			break;
 			
 		//131

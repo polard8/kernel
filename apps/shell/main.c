@@ -937,9 +937,9 @@ noArgs:
     //                    0, 0, COLOR_RED, COLOR_RED );	   
 
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
-	                    terminal_rect.left, terminal_rect.top, 
-					    terminal_rect.width, terminal_rect.height,    
-                        0, 0, COLOR_RED, COLOR_RED );	   
+	                        terminal_rect.left, terminal_rect.top, 
+					        terminal_rect.width, terminal_rect.height,    
+                            0, 0, COLOR_RED, COLOR_RED );	   
 
 						
 	if ( (void *) hWindow2 == NULL ){
@@ -1309,7 +1309,7 @@ shellProcedure( struct window_d *window,
 				//O MENU APPLICATION É O CONTEXT MENU.
 				//
 				case VK_APPS:
-				    MessageBox( 1, "Gramado Core Shell:", "Context Menu" );
+				    MessageBox ( 1, "Gramado Core Shell:", "VK_APPS Context Menu" );
 					break;
 			}		
 		    break;

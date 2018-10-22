@@ -16,7 +16,7 @@ rem
 echo -{ Gramado API
 echo -{ ...
 echo -{ Compiling api.c
-    gcc -c c:\gramado\lib\api-src\src\api.c -I c:\mises\lib\api-src\include -o api.o -save-temps 
+    gcc -c c:\gramado\lib\api-src\src\api.c -I c:\gramado\lib\api-src\include -o api.o -save-temps 
     rem Nothing.
 	
 :Moving

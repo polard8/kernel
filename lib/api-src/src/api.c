@@ -65,7 +65,17 @@
 #include <api.h>     //público, exportado para as aplicações.
 
 
+//message box button pointer
+struct window_d *messagebox_button1;
+struct window_d *messagebox_button2;
 
+
+unsigned long 
+mbProcedure( struct window_d *window, 
+                     int msg, 
+   				     unsigned long long1, 
+					 unsigned long long2 );
+					 
 /*
  ***********************************************************************
  * system_call:  #ux4 (maior experiência)
@@ -853,12 +863,281 @@ void apiInitBackground (){
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
-void MessageBox ( int type, char *string1, char *string2 ){
+int MessageBox ( int type, char *string1, char *string2 ){
+    
+    //
+    // Antes nós chamávamos o kernel, agora tentaremos 
+    // implantar na api.
+	//
 	
-	system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
-		(unsigned long) string1, (unsigned long) string2 );
+	//system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
+	//	(unsigned long) string1, (unsigned long) string2 );
+	
+
+	//#debug
+	printf ("Testing new Message Box type=%d \n", type);
+
+int Response = 0;	
+int running = 1;
+
+    //
+    // Draw !
+    //	
+	
+	struct window_d *hWnd;    //Window.
+	struct window_d *pWnd;    //Parent.
+	struct window_d *bWnd;    //Button.	
+	
+	// x and y
+	// @todo centralizado: metade | um terço.
+	// @todo: Pegar a métrica do dispositivo.
+	unsigned long x  = (unsigned long) 20;       //deslocamento x
+	unsigned long y  = (unsigned long) 20;       //deslocamento y
+    unsigned long cx = (unsigned long) (800/2);  //largura   
+    unsigned long cy = (unsigned long) (600/3);  //altura		
+
+	int Button = 0;	
+	
+	unsigned long WindowClientAreaColor;
+	unsigned long WindowColor;
+	
+	
+	WindowClientAreaColor = COLOR_YELLOW;
+	WindowColor = COLOR_PINK;	
+	
+	//Obs: Por enquanto para todos os tipos de messagebox 
+	// estamos usando o mesmo tipo de janela.
+	switch (type)
+	{	
+	    // Com botão, considera o título.
+	    case 1:
+		    apiBeginPaint();
+		    Button = 1;
+			//janela tipo simples.
+	        hWnd = (void*) APICreateWindow (  WT_SIMPLE, 1, 1, string1, 
+			                x, y, cx, cy, 
+							NULL, 0, 
+							WindowClientAreaColor, WindowColor); 
+			if ( (void *) hWnd == NULL ){
+				printf("hWnd fail\n");
+			};
+			apiEndPaint();
+            
+			APIRegisterWindow (hWnd);
+            APISetActiveWindow (hWnd);	
+            APISetFocus (hWnd);	 			
+		    break;
+			
+		// Sem botão, considera o título.	
+	    case 2:
+		    Button = 0;
+	        hWnd = (void*) APICreateWindow( WT_POPUP, 1, 1, string1, 
+			                x, y, cx, cy, 
+							NULL, 0, 
+							WindowClientAreaColor, WindowColor); 
+	        break;
+			
+		// Com botão, Título de alerta.	
+	    case 3:
+		    //janela de aplicativo.
+	        Button = 1;
+			hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Alert", 
+			                x, y, cx, cy, 
+							NULL, 0, 
+							WindowClientAreaColor, WindowColor); 
+	        break;
+			
+		//Com botão, título de mensagem do sistema.	
+	    case 4:
+		    Button = 1;
+	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "System Message", 
+			                x, y, cx, cy, 
+							NULL, 0, 
+							WindowClientAreaColor, WindowColor); 
+	        break;
+			
+		//Tipo negligenciado. Usamos o formato padrão.	
+		default:
+		    Button = 1;
+	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Error", 
+			                x, y, cx, cy, 
+							NULL, 0, 
+							WindowClientAreaColor, WindowColor); 
+		    break;
+	};
+	
+	
+	//
+	// button
+	//
+	
+	//obs: o procedure vai precisar dos botões então tem que declarar global.
+	
+	//unsigned long app1Left = ((ScreenWidth/8) * 2);
+	//unsigned long app2Left = ((ScreenWidth/8) * 3);
+	
+	//unsigned long app1Top = ( (ScreenHeight/10) * 8); 
+	//unsigned long app2Top = app1Top; 
+
+
+
+	//
+	// botão de reboot
+	//
+	
+    //.	
+	messagebox_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "OK",     
+                                10, 10, 80, 24,    
+                                hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+    APIRegisterWindow (messagebox_button1);
+
+
+	//
+	// botão de close
+	//
+	
+    //.	
+	messagebox_button2 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "CANCEL",     
+                                100, 10, 80, 24,    
+                                hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+    APIRegisterWindow (messagebox_button2);	
+	
+	
+	//
+	// string
+	//
+	
+    apiDrawText ( (struct window_d *) hWnd,
+        1*(cx/16),
+        1*(cy/3),
+        COLOR_WINDOWTEXT,
+        string1	);	
+	
+	//#importante
+	refresh_screen ();		 
+	
+	//
+	// loop
+	//
+	
+	unsigned long message_buffer[5];	
+	
+			message_buffer[0] = 0;
+            message_buffer[1] = 0;
+            message_buffer[3] = 0;
+            message_buffer[4] = 0;	
+		
+Mainloop:
+	
+	while (running)
+	{
+		enterCriticalSection(); 
+		system_call ( 111, (unsigned long)&message_buffer[0],
+			(unsigned long)&message_buffer[0], 
+			(unsigned long)&message_buffer[0] );
+		exitCriticalSection(); 
+			
+		if ( message_buffer[1] != 0 )
+		{
+	        
+			Response = (int) mbProcedure ( (struct window_d *) message_buffer[0], 
+		                        (int) message_buffer[1], 
+		                        (unsigned long) message_buffer[2], 
+		                        (unsigned long) message_buffer[3] );
+			
+			if (Response > 100)
+			{
+				printf ("Response=%d \n", Response );
+				goto exit_messagebox;
+			}
+			message_buffer[0] = 0;
+            message_buffer[1] = 0;
+            message_buffer[3] = 0;
+            message_buffer[4] = 0;	
+        };				
+	};	
+
+exit_messagebox:
+
+	//#debug
+	printf ("Exiting Message Box \n");
+	
+    return (int) Response;	
 };
 
+/*
+ **************************************************
+ * MessageBoxProcedure:
+ *     O procedimento padrão de message box.
+ */																
+unsigned long 
+mbProcedure( struct window_d *window, 
+                     int msg, 
+   				     unsigned long long1, 
+					 unsigned long long2 )
+{
+    switch (msg)
+	{
+        case MSG_KEYDOWN:
+            switch(long1)
+            {
+                case VK_ESCAPE:	
+				    printf ("scape\n");
+                    return (unsigned long) 101;				   
+				    break;
+				   
+                default:
+				    //printf ("defaul keydown\n");
+				    return (unsigned long) 0;
+                    break; 
+            };
+        break;
+	
+        case MSG_SYSKEYDOWN:                 
+            switch(long1)	       
+            {	
+				//Test.
+				case VK_F1:
+				    printf ("f1\n");
+                    return (unsigned long) 102;
+					break;
+					
+                //case VK_F2:
+				    //Nothing.
+				//	break;
+									
+				default:
+				    //printf ("default sys key down\n");
+				    return (unsigned long) 0;
+				    break;
+		    };              
+        break;
+		
+	    case MSG_SYSKEYUP:
+		   //printf ("sys key up\n");
+		   return (unsigned long) 0; 
+           break;
+		
+        //@todo case command .. button ??
+		
+		default:
+		    //printf ("default message\n");
+		    return (unsigned long) 0;
+            break;		
+	};
+	
+	
+done:
+	//Refresh screen. 
+	//?? deletar.
+	//if(VideoBlock.useGui == 1){
+	//    refresh_screen();
+	//};
+    printf ("done\n");	
+	return (unsigned long) 0;
+};
 
 
 /*
@@ -2432,6 +2711,27 @@ unsigned long apiSendMessage ( struct window_d *window,
 
 
 
+int apiDrawText ( struct window_d *window, 
+                  unsigned long x, 
+				  unsigned long y, 
+				  unsigned long color, 
+				  char *string )
+{
+	
+	unsigned long msg[8];
+	
+    msg[0] = (unsigned long) window;
+	msg[1] = (unsigned long) x;
+	msg[2] = (unsigned long) y;
+	msg[3] = (unsigned long) color;
+	msg[4] = (unsigned long) string;
+	//...
+	
+	return (int) system_call ( SYSTEMCALL_DRAWTEXT , 
+	                (unsigned long) &msg[0], 
+					(unsigned long) &msg[0], 
+					(unsigned long) &msg[0] );		
+};
 //
 // End.
 //
