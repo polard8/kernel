@@ -34,6 +34,11 @@ void DialogBox ( struct window_d *parent_window,
 				 char *title, 
 				 char *string )
 {
+
+/*
+
+    ### cancelada. Essa rotina agora está na API em user mode. deletar essa função ###	
+	
 	struct window_d *hWnd; 
 	struct window_d *pWnd; 
 	struct window_d *bWnd;
@@ -151,6 +156,9 @@ void DialogBox ( struct window_d *parent_window,
     refresh_screen();	
     
 	//return;
+	
+*/
+
 };
 
 
@@ -167,6 +175,10 @@ unsigned long DialogBoxProcedure( struct window_d *window,
 								  unsigned long long2 ) 
 {
 	
+	
+/*	
+	    ### cancelada. Essa rotina agora está na API em user mode. deletar essa função ###
+		
 	//if (msg < 0)
 	//    return 0;
 	
@@ -224,6 +236,8 @@ unsigned long DialogBoxProcedure( struct window_d *window,
 	};
 	
 //done:
+
+*/
 
 	return (unsigned long) 0;
 };

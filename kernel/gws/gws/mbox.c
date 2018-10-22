@@ -75,7 +75,12 @@ MessageBox( struct window_d *parent_window,
             int type,                        
 		    char *title,                     
 			char *string )                   
-{		
+{	
+
+/*
+
+    ### cancelada. Essa rotina agora está na API em user mode. deletar essa função ###
+	
 	//Desktop support.
 	int desktopID = (int) get_current_desktop_id();	 
 
@@ -321,6 +326,8 @@ drawButton:
 done:
     refresh_rectangle( x, y, cx, cy );
 	return;
+	
+*/
 };
 
 
@@ -335,6 +342,10 @@ MessageBoxProcedure( struct window_d *window,
    				     unsigned long long1, 
 					 unsigned long long2 )
 {
+	
+/*
+    ### cancelada. Essa rotina agora está na API em user mode. deletar essa função ###
+	
     switch(msg)
 	{
         case MSG_KEYDOWN:
@@ -387,6 +398,9 @@ done:
 	if(VideoBlock.useGui == 1){
 	    refresh_screen();
 	};	
+	
+	*/
+	
 	return (unsigned long) 0;
 };
 

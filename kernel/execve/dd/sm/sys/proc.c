@@ -838,7 +838,7 @@ system_procedure ( struct window_d *window,
 				    if ( winkey_status == 0 )
 					{
 						//printf ("winkey\n");
-					    MessageBox (gui->screen, 1, "Win Key:","MSG_SYSKEYUP VK_LWIN or VK_RWIN");
+					    //MessageBox (gui->screen, 1, "Win Key:","MSG_SYSKEYUP VK_LWIN or VK_RWIN");
                     };
 					break;
 					
