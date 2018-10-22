@@ -223,12 +223,35 @@ int window_getch();
 #define VIEW_NORMAL    1003  //Normal (restaurada)
 //...
 
+//
+// ## botoes  ##
+//
 
-//botoes
-#define BN_CLICKED  200
-#define BN_DOWN     1
-#define BN_UP       2
-#define BN_SELECTED 3
+//button state
+#define BS_NULL 0 
+#define BS_DEFAULT 1
+#define BS_FOCUS   2
+#define BS_PRESS   3
+#define BS_HOVER   4
+#define BS_DISABLED 5
+#define BS_PROGRESS 6
+//...
+
+
+    //button states:
+    //0. NULL.
+	//1. Default 
+    //2. Focus
+    //3. Expanded/Toggled/Selected
+    //4. Disabled
+    //5. Hover and Active	
+
+//#define BN_CLICKED  200
+//#define BN_DOWN     1
+//#define BN_UP       2
+//#define BN_SELECTED 3
+
+
 
  
 //@todo: what ??? 
@@ -320,29 +343,75 @@ struct button_d
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
-    int used;
+	
+	int used;
     int magic;
-	
-	//estilo de design.
-	int style;
 
-    int selected;	
-    unsigned long border1; //color
-    unsigned long border2; //color	
+	// ??
+	// Ordem dos botões que pertencam à mesma janela.
+    // A qual janela o botão pertence.
+	// Esse índice pode trabalhar junto com 
+	// a lista encadeada de 'next'.
 	
-    struct window_d *window; //A qual janela o botão pertence.
-    unsigned char *string; //label
-    unsigned long type; //tipo de botão.
-    unsigned long x;    //deslocamento em relação à margem da janela
-    unsigned long y;  //deslocamento em relação à margem da janela
-    unsigned long width; 
-    unsigned long height; 
+	//int index;	
+    struct window_d *window; 
+    
+	// label
+	//#todo: mudar o tipo para (char *)
+	unsigned char *string;   	
+	
+	// Estilo de design.
+	// 3D, flat ...
+	int style;
+	
+	
+    //button states:
+    //1. Default
+    //2. Focus
+    //3. Expanded/Toggled/Selected
+    //4. Disabled
+    //5. Hover and Active	
+    int state;	
+	
+
+	//Check Boxes
+	//Group Boxes
+	//Push Buttons
+	//Radio Buttons
+	int type;
+
+   
+    int selected;
+	
+	// Border color
+    // Isso é para o caso do estilo 3D.
+	// Ou para causar alguns efito em outros estilos.
+	
+	unsigned long border1; 
+    unsigned long border2; 	
+	
+	
+	// Deslocamento em relação ao left da janela
+    // Deslocamento em relação ao top da janela
+	
+	unsigned long x;    
+    unsigned long y;   
+    
+	unsigned long width; 
+    unsigned long height;
+
+    // Cor do background.	
     unsigned long color;
 	
 	//More ??
-				  
-    struct button_d *Next;  //proximo botão dentro da mesma janela.??
+	//...
+	
+	//??
+	//proximo botão dentro da mesma janela.
+    
+	struct button_d *Next;  
 };
+
 //Botões na janela principal.				  
 struct button_d *mainButton1;  
 struct button_d *mainButton2;  
@@ -1784,14 +1853,28 @@ set_up_text_color( unsigned char forecolor,
 							
 
 //Button.
-void *draw_button( struct window_d *window,
-                   unsigned char *string, 
-                   unsigned long type, 
-                   unsigned long x, 
-                   unsigned long y, 
-                   unsigned long width, 
-                   unsigned long height, 
-                   unsigned long color );
+void *draw_button ( struct window_d *window,
+                    unsigned char *string,
+					int style,
+                    int state,
+                    int type,  	 
+                    unsigned long x, 
+                    unsigned long y, 
+                    unsigned long width, 
+                    unsigned long height, 
+                    unsigned long color );
+				   
+void updateButton ( struct button_d *button,
+                    struct window_d *window,
+                    unsigned char *string,
+					int style,
+                    int state,
+                    int type,  					
+                    unsigned long x, 
+                    unsigned long y, 
+                    unsigned long width, 
+                    unsigned long height, 
+                    unsigned long color );
 				  
 void 
 MessageBox( struct window_d *parent_window, 

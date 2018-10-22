@@ -1971,13 +1971,14 @@ void mouseHandler (){
 				//botão.
 			    if ( wScan->isButton == 1 )
 				{    
-			        bmpDisplayCursorBMP ( fileIconBuffer, wScan->left, wScan->top);	
+			        bmpDisplayCursorBMP ( fileIconBuffer, wScan->left, wScan->top );	
+					
 			    };
 				
 				//não botão.
 				if ( wScan->isButton == 0 )
 				{
-				    bmpDisplayCursorBMP ( folderIconBuffer, wScan->left, wScan->top);		
+				    bmpDisplayCursorBMP ( folderIconBuffer, wScan->left, wScan->top );		
 				}
 				
 				//nova mouse over

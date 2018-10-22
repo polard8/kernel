@@ -1,7 +1,7 @@
 /*
  * # Jackpot Game #
  *
- * Portando para o sistema operacional Gramado 0.3
+ * Portando para o sistema operacional Gramado 0.4
  * Portando para a linguagem C.
  * Original: Dev C++.
  * This version: Fred Nora.
@@ -20,9 +20,9 @@
 int  i, j, life, maxrand;
 int c;
 
-//string do número digitado.
-char number[16]; 
 
+// String do número digitado.
+char number[16]; 
 
 
 void Start ();
@@ -32,26 +32,40 @@ int jackpot_main ();
 
 
 /*
- ************************************
  * app_main:
  *     Entry point.
  */
 void app_main (){
 	
+	int code = 0;
+	
 	printf("\n");
 	printf("####################################################\n");
 	  puts("################## JackPot #########################\n");
 	printf("####################################################\n");
-	
+	printf("\n");	
 	
 	// # call main #
 	
-	jackpot_main ();
+	code = (int) jackpot_main ();
     
 	printf("*HANG\n");
-hang:
-    asm("pause");
-    goto hang;
+	
+	switch (code) {
+	    
+        case 0:
+		    exit (code);
+            break;	
+
+        //...			
+	};
+	
+	// *hang
+	
+	while (1){
+		
+	    asm ("pause");	
+	};
 };	
 
 
@@ -71,7 +85,7 @@ void Start (){
     printf("1 : Easy (0-15)\n");
     printf("2 : Medium (0-30)\n");
     printf("3 : Difficult (0-50)\n");
-    printf("or type another key to quit.\n");
+    printf("or type another key to quit.\n\n");
     
 	c = 30;
 
@@ -80,12 +94,12 @@ void Start (){
 	
 	while (1)
 	{
-        c = (int) getchar();
+        c = (int) getchar ();
         
 		if (c == -1){
 			
 			//printf("EOF reached! ?? \n");
-		    asm("pause");				
+		    asm ("pause");				
 		};
 			
 	    if ( c != -1 ){
@@ -125,12 +139,12 @@ selected:
     
 	
 	// init Rand() function.
-	srand ( (unsigned int) time(time1) );
+	srand ( (unsigned int) time (time1) );
 	
 	// j get a random value between 0 and maxrand.
 	j = rand() % maxrand;  
 	
-    GetResults();
+    GetResults ();
 };
 
 
@@ -138,17 +152,18 @@ void GetResults (){
 	
 	// if player has no more life then he lose
     if ( life <= 0 ){
+		
         printf("You lose !\n\n");
         Start();
     }
 
 	// #  Pedimos para digitar um número ... #
-	printf("Type a number: \n");
+	printf ("Type a number: \n");
 	
 	//isso coloca a string digitada em 'number'
-	gets(number);
+	gets (number);
 	
-	i = jackpot_atoi( number );
+	i = jackpot_atoi ( number );
 	
 checkNumber:
 
@@ -168,10 +183,11 @@ checkNumber:
 		
 	    printf("\n");	
 	    printf("####################################################\n");
-	    printf("################## YOU WIN ! #######################\n");
+	      puts("################## YOU WIN ! #######################\n");
 	    printf("####################################################\n");		
+		printf("\n");
 		
-        Start();
+        Start ();
 		
 		//#todo:
         //Podemos criar uma solução mais elegante para filalizar.
@@ -186,7 +202,7 @@ checkNumber:
 		//#check.
 		printf("Number of remaining life:  %d \n\n", life);
 		
-        GetResults();
+        GetResults ();
 		
      }else if (i<j){
 		 
@@ -197,7 +213,7 @@ checkNumber:
 		//#check.
 		printf("Number of remaining life:  %d \n\n", life);
         
-		GetResults();
+		GetResults ();
       };
 	//Nothing.  
 };
@@ -247,18 +263,18 @@ int jackpot_main (){
 	
     //stdlib
 	//inicializando o suporte a alocação dinâmica de memória.
-	libcInitRT();
+	libcInitRT ();
 
 	//stdio
 	//inicializando o suporte ao fluxo padrão.
-    stdioInitialize();		
+    stdioInitialize ();		
 	
-    printf("** Jackpot game **\n");
-    printf("The goal of this game is to guess a number. You will be ask to type\n");
-    printf("a number (you have 5 guess)\n");
-    printf("Jackpot will then tell you if this number is too big of too small compared to the secret number to find\n\n");
+    printf ("** Jackpot game **\n");
+    printf ("The goal of this game is to guess a number. You will be ask to type\n");
+    printf ("a number (you have 5 guess)\n");
+    printf ("Jackpot will then tell you if this number is too big of too small compared to the secret number to find\n\n");
     
-	Start();
+	Start ();
 	
 //done:	
 	return (int) 0;

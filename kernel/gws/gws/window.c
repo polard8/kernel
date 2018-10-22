@@ -142,7 +142,7 @@ int windowKillTimer ( struct window_d *window, int id ){
 	};
 
 fail:
-done:	
+//done:	
     return (int) Status;	
 };
 
@@ -515,9 +515,13 @@ int windowInitializeBrowserSupport (){
 
         
 		//Test: Criando alguns elementos gráficos dentro da aba no navegador.
-		draw_text( TABWINDOW, 0, 0, COLOR_TEXT, "bt: This is a text on the browser tab number 1");	
-        draw_button( TABWINDOW, "bt: Button label 11 11", 1, 11, 11, 56, 24, COLOR_BUTTONFACE); 
-		StatusBar( TABWINDOW, "bt: Status bar, string 1", "bt: Status bar, string 2");
+		draw_text ( TABWINDOW, 0, 0, COLOR_TEXT, "bt: This is a text on the browser tab number 1");	
+        
+		draw_button ( TABWINDOW, "bt: Button label 11 11", 
+		    1, 0, 0, 
+			11, 11, 56, 24, COLOR_BUTTONFACE); 
+		
+		StatusBar ( TABWINDOW, "bt: Status bar, string 1", "bt: Status bar, string 2");
 	};
 
 	
@@ -1624,6 +1628,13 @@ done:
  * Todos os textos gravados nela... todas as cores etc..
  * Obs: Talvez essa rotina seja recursiva assim como 
  * a função create window.
+ *
+ * 
+ * >>> e se a janela for um botão ?? ...
+ *     gostaríamos de mudar o status do botão e depois repintá-lo 
+ **   Criar a função que muda o status do botão 
+ *    usar redraw_window para repintar uma janela do tipo botão. 
+ *    assim poderemos setar o foco em janela e em botão.
  */
 //int windowRedrawWindow(struct window_d *window) 
 int redraw_window (struct window_d *window, unsigned long flags ){
@@ -1867,10 +1878,10 @@ redrawBegin:
 			//deslocamentos em relação às margens. (x=window->width-?) (y=2).
 			//A função draw_button vai somar a margem obtida pelo handle 'window'
 			//ao deslocamento obtido em (x=window->width-?).
-	        draw_button ( window, "V", 1, 
-			             (window->width -42 -1), 2, 
-						 21, 21, 
-						 COLOR_TERMINAL2);	
+	        draw_button ( window, "V", 
+			    1, 0, 0, 
+			    (window->width -42 -1), 2, 21, 21, 
+				COLOR_TERMINAL2 );	
 	    };
 		
 		//@todo: Se estivermos em full screen, não teremos botão.
@@ -1880,10 +1891,10 @@ redrawBegin:
 			// Erro: Essa função é de redraw, então não podemos usar draw_button 
 			// ao invés, precisamos usar redraw_button, que será criada.
 			
-	        draw_button( window, "X", 1, 
-			            (window->width -21), 2, 
-						21, 21, 
-						COLOR_TERMINAL2);				
+	        draw_button ( window, "X", 
+			    1, 0, 0, 
+			    (window->width -21), 2, 21, 21, 
+				COLOR_TERMINAL2 );				
 	    };					 
 					
 		//More??...			 		 
@@ -1958,11 +1969,50 @@ redrawBegin:
 				{
 				    //redesenhar o botão com base nas informações da estrutura.
 					
+
+    
+	                
+					//#todo: checar sytle state type 
+					
+					//com focus a borda fica azul.
+					//pois redraw pode ter vindo após uma atualização do botão.
+					if (window->button->state == BS_FOCUS )
+					{
+						window->button->border1 = COLOR_BLUE;
+						window->button->border2 = COLOR_BLUE; 
+					}
+					
+					//se o botão foi pressionado, mudaram o state e precisam repintar.
+					if (window->button->state == BS_PRESS )
+					{
+						window->button->border1 = COLOR_BUTTONHIGHLIGHT2;
+						window->button->border2 = COLOR_BUTTONSHADOW2; 
+					}		
+
+					if (window->button->state == BS_DEFAULT )
+					{
+						window->button->border1 = COLOR_BUTTONSHADOW2;
+						window->button->border2 = COLOR_BUTTONHIGHLIGHT2; 
+					}	
+
+					if (window->button->state == BS_DISABLED )
+					{
+						window->button->border1 = COLOR_GRAY;
+						window->button->border2 = COLOR_GRAY; 
+						window->button->color = COLOR_GRAY;
+					}	
+
+					if (window->button->state == BS_HOVER )
+					{
+						window->button->color = ( window->button->color - 20);
+					}					
+					
+					
 	                //bg
 	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y, 
-	                    window->button->width, window->button->height, window->button->color );
-    
-	                //board1, borda de cima e esquerda.
+	                    window->button->width, window->button->height, window->button->color );					
+					
+					//board1, borda de cima e esquerda.
 	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y, 
 	                    window->button->width, 1, window->button->border1 );
 		
@@ -1991,7 +2041,7 @@ redrawBegin:
 				}				
 			}
 		}			
-	}
+	};
 
 	//if( window->type == WT_OVERLAPPED)
 		
@@ -2469,11 +2519,8 @@ void CloseActiveWindow (){
 	};	
 	
 // Done.
-//done:
 
     DestroyWindow (Window);
-    
-	//return;
 };
 
 
@@ -2566,9 +2613,11 @@ void SetFocus ( struct window_d *window ){
 		    //set wwf pointer.
 		    WindowWithFocus = (void *) window;
 				
-		    //Procedure.
+		    //bugbug
+			//Procedure.
 		    //?? Não sei se é o ideal.
 		    SetProcedure((unsigned long) window->procedure);
+			
 			goto setup_wwf;
 		};
 			

@@ -663,8 +663,10 @@ void *systemRam ( int number,
         case 76:
             draw_button( (struct window_d *) arg1,
                          (unsigned char *) arg2, 
-                         (unsigned long) arg3, 
-                         (unsigned long) 0, 
+                         (int) arg3, //style 
+                         (int) 0,    //state
+						 (int) 0,    //type.
+						 (unsigned long) 0, 
                          (unsigned long) 0, 
                          (unsigned long) 0, 
                          (unsigned long) 0, 
@@ -676,19 +678,18 @@ void *systemRam ( int number,
         // Devemos observar que a barra de status e o scroll 
 		// disputam espaço.
 		case 77:
-            return (void*) StatusBar( (struct window_d *) arg1, 
-			                          (unsigned char *) arg2, 
-									  (unsigned char *) arg3 );
+            return (void *) StatusBar ( (struct window_d *) arg1, 
+			                    (unsigned char *) arg2, 
+							    (unsigned char *) arg3 );
             break;
 			
         case 78: 
-            return (void *) create_menubar( (struct window_d *) arg1); 
+            return (void *) create_menubar ( (struct window_d *) arg1 ); 
             break;
 			
         case 79:  
-            return (void*) create_menubar_item( (struct menu_d *) arg1, 
-			                                    (unsigned char *) arg2, 
-												(int) arg3 );
+            return (void*) create_menubar_item ( (struct menu_d *) arg1, 
+			                    (unsigned char *) arg2, (int) arg3 );
 		    break;
 		
         case 80:

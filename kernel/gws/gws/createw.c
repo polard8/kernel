@@ -985,6 +985,12 @@ drawBegin:
 	// Obs: As bordas dependem do tipo de janela e do 
 	// estilo de janela.
 	
+	//vamos pintar a borda de acordo com o status da janela.
+	//se a janela for um botão, e pintarmos essa borda, 
+	//na hora de desenhar o botão essa borda vai desaparecer.
+	//para isso podemos simplesmente, desenha um botão menor que 
+	//a janela dele.
+	
 	if ( Border == 1 )
 	{
 		//flag.
@@ -992,6 +998,7 @@ drawBegin:
 		
 		// A largura da borda pode sinalizar o status (ativo ou inativo) 
 		// de uma caixa de edição.
+		
 		if ( status == 0 ){ 
 		    border_size = 1;
             border_color = COLOR_INACTIVEBORDER; 			
@@ -1380,7 +1387,9 @@ drawBegin:
 			window->name );  
 	};
 	
-	
+	//JANELA DO TIPO BOTÃO.
+	//#BUGBUG: NÃO TEMOS INFORMAÇÕES SOBRE O TIPO DE BOTÃO 
+	//QUE DEVEMOS CRIAR. SÓ SABEMOS QUE A JANELA É DO TIPO BOTÃO.
 	if ( (unsigned long) type == WT_BUTTON )
 	{
 	    //as posições de left e right são da janela do botão.	
@@ -1392,7 +1401,7 @@ drawBegin:
 		//    window->left, window->top, window->width, window->height, 
 		//	window->color_bg );
 
-		window->button = (struct button_d *) draw_button ( Parent, windowname, 1, 
+		window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0, 
 		    window->left, window->top, window->width, window->height, 
 			window->color_bg );
 		
@@ -1428,11 +1437,15 @@ drawBegin:
 	
 	
 	// Overlapped.
-	if(window->type == WT_OVERLAPPED)
+	if (window->type == WT_OVERLAPPED)
 	{
 		// ## scrollbar ##
 		//Esses valores precisam ser melhor declarados.
         
+		//#BUGBUG
+		//SÓ CRIAREMOS SCROLL BAR NUMA OVERLAPPED SE A FLAG INDICAR ISSO;
+		//ISSO VALE PRA OUTROS TIPOS DE JANELA NÃO SOMENTE ESSE TIPO.
+		
 		// Criar.
 		window->scrollbar = CreateWindow ( WT_SCROLLBAR, 1, 1, "scrollbar-test", 
 	                            window->right -24, window->top+25, 
@@ -1460,6 +1473,10 @@ drawBegin:
         // ## status bar ##
 		//Esses valores precisam ser melhor declarados.
 		
+		//#BUGBUG
+		//SÓ CRIAREMOS STATUS BAR NUMA OVERLAPPED SE A FLAG INDICAR ISSO;
+		//ISSO VALE PRA OUTROS TIPOS DE JANELA NÃO SOMENTE ESSE TIPO.		
+		
 		// Criar.
 		window->statusbar = CreateWindow ( WT_STATUSBAR, 1, 1, "Status: ...", 
 	                            window->left+1, window->bottom-25-1, 
@@ -1473,7 +1490,7 @@ drawBegin:
         
         // # icon #
 		// Os ícones já estão carregados, 
-		// vamos apenas decodificá lo no backbuffer 
+		// vamos apenas decodificá-lo no backbuffer 
 		
 	    bmpDisplayBMP ( appIconBuffer, window->left+1, window->top+1 );
 	};

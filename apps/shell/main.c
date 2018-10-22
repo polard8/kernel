@@ -921,11 +921,11 @@ noArgs:
     apiBeginPaint();
 	
 	//mudando as dimensões a janela dentro da área de cliente.
-	terminal_rect.left = terminal_rect.left + 40;
-	terminal_rect.top = terminal_rect.top + 40;
+	terminal_rect.left = terminal_rect.left + 28;
+	terminal_rect.top = terminal_rect.top + 28;
 
 	terminal_rect.width = 8 * 80;
-	terminal_rect.height = 8 * 25;
+	terminal_rect.height = 8 * 38;
 	
 	//terminal_rect.width = terminal_rect.width - 150;
 	//terminal_rect.height = terminal_rect.height - 150;
@@ -956,12 +956,17 @@ noArgs:
 	//#importante
 	refresh_screen ();	
 	
+
+	
 	//
 	// Habilitando o cursor de textos.
 	//
 	
 	shellSetCursor ( (terminal_rect.left / 8) , ( terminal_rect.top/8) );	
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
+	
+    //Mensagem ...
+	printf("Starting SHELL.BIN ...\n");		
 	
 	//#bugbug
 	//janela usada para input de textos ...
@@ -3894,7 +3899,7 @@ int shellInit ( struct window_d *window ){
 	}
   
     //Mensagem ...
-	printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n", PID, PPID );
+	//printf("Starting SHELL.BIN ... PID={%d} PPID={%d} \n", PID, PPID );
 	
 	
 	// @todo: Criar processos processos:
