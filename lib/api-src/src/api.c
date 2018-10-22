@@ -888,11 +888,14 @@ int running = 1;
 	struct window_d *pWnd;    //Parent.
 	struct window_d *bWnd;    //Button.	
 	
+	
+	//#todo: usar get system metrics
+	
 	// x and y
 	// @todo centralizado: metade | um terço.
 	// @todo: Pegar a métrica do dispositivo.
-	unsigned long x  = (unsigned long) 20;       //deslocamento x
-	unsigned long y  = (unsigned long) 20;       //deslocamento y
+	unsigned long x  = (unsigned long) 10;       //deslocamento x
+	unsigned long y  = (unsigned long) 300;       //deslocamento y
     unsigned long cx = (unsigned long) (800/2);  //largura   
     unsigned long cy = (unsigned long) (600/3);  //altura		
 
@@ -987,7 +990,7 @@ int running = 1;
 	
     //.	
 	messagebox_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "OK",     
-                                10, 10, 80, 24,    
+                                (cx/3), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
     APIRegisterWindow (messagebox_button1);
@@ -999,7 +1002,7 @@ int running = 1;
 	
     //.	
 	messagebox_button2 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "CANCEL",     
-                                100, 10, 80, 24,    
+                                ((cx/3)*2), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
     APIRegisterWindow (messagebox_button2);	

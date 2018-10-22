@@ -293,7 +293,8 @@ void *services( unsigned long number,
 		
 		//parent window.
 		//message_address[8];
-		cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
+		//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
+		cwArg9 = (struct window_d *) message_address[8];  //parent
 		
 		//onde?
 		//message_address[9];
@@ -490,27 +491,27 @@ void *services( unsigned long number,
         //47, Create Window support.		
         //envia argumentos de controle.
 		case SYS_BUFFER_CREATEWINDOWx:
-		    cwFlag  = 1234;  //Aciona a flag.
-            cwArg2  = arg2;  //WindowStatus 
-			cwArg11 = arg3;  //cor da area de cliente.
-			cwArg12 = arg4;  //cor da janela.
+		    //cwFlag  = 1234;  //Aciona a flag.
+            //cwArg2  = arg2;  //WindowStatus 
+			//cwArg11 = arg3;  //cor da area de cliente.
+			//cwArg12 = arg4;  //cor da janela.
 			return NULL;
 			break;
 		
 		//48, Create Window support.
 		//envia argumentos de posicionamento.
 		case SYS_BUFFER_CREATEWINDOW1:
-		    cwArg5 = arg2;  //x
-			cwArg6 = arg3;  //y
-			cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window.    
+		    //cwArg5 = arg2;  //x
+			//cwArg6 = arg3;  //y
+			//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window.    
 			return NULL;
 			break;
 		
 		//49, Create Window support.
 		//envia argumentos de dimensões.
 		case SYS_BUFFER_CREATEWINDOW2:
-		    cwArg7 = arg2; //width
-			cwArg8 = arg3; //height
+		    //cwArg7 = arg2; //width
+			//cwArg8 = arg3; //height
 			//cwArg10 = arg4;  //desktop ID 
 			return NULL;
 			break;	
@@ -1019,7 +1020,7 @@ void *services( unsigned long number,
 		    
 			//@todo: Podeira pintar na janela atual.
 			argString = (unsigned char *) arg4;
-		    draw_text( (struct window_d *) message_address[0], //window
+		    draw_text ( (struct window_d *) message_address[0], //window
 			    (unsigned long) message_address[1],  //x
 				(unsigned long) message_address[2],  //y
 				(unsigned long) message_address[3],   //color
@@ -1553,6 +1554,7 @@ do_create_window:
 		WindowWidth = cwArg7; 
         WindowHeight = cwArg8;									  
 		
+		//#todo
 		//gui->screen  = cwArg9; 
 		//desktopID = cwArg10; 
 		
@@ -1575,7 +1577,7 @@ do_create_window:
     NewWindow = (void *) CreateWindow( WindowType, WindowStatus, 
 	                        WindowView, WindowName, 
 	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
-							gui->screen, 
+							cwArg9, 
 							desktopID, 
 							(unsigned long) WindowClientAreaColor, 
 							(unsigned long) WindowColor );

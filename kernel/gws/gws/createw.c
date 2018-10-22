@@ -1401,7 +1401,8 @@ drawBegin:
 		//    window->left, window->top, window->width, window->height, 
 		//	window->color_bg );
 
-		window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0, 
+		//window->button = (struct button_d *) draw_button ( window, windowname, BS_DEFAULT, 0, 0,
+            window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
 		    window->left, window->top, window->width, window->height, 
 			window->color_bg );
 		
