@@ -59,7 +59,14 @@ extern void reset_ide0();
 extern unsigned long hd_buffer;
 extern unsigned long hd_lba;
 
-
+//suporte ao read sector. usado no assembly.
+extern unsigned long read_port_drive_and_lba_24_27;
+extern unsigned long read_port_nos;
+extern unsigned long read_port_lba_0_7;
+extern unsigned long read_port_lba_8_15;
+extern unsigned long read_port_lba_16_23;
+extern unsigned long read_port_cmd;
+extern unsigned long read_port_data;
 
 //Variáveis internas
 int hddStatus;
@@ -87,6 +94,81 @@ void my_read_hd_sector ( unsigned long ax,
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba = (unsigned long) bx;       //arg2 = lba.
+	
+	
+	// #importante:
+	// O QUE INDICA EM QUAL DISCO SERÁ ESCRITO É O CONJUNTO DE PORTAS.
+	// DISCO TEM SEU CONJUNTO DE PORTAS.
+	
+	//cada disco terá um conjunbto diferente de portas.
+	//criar um argumento que seleciona o disco.
+	
+    //suporte ao read sector. usado no assembly.
+    
+	//0 primary master 
+	//1 primary slave 
+	//2 secondary master 
+	//3 secondary slave.
+	
+	int port_numer = 0;  
+	
+	//#importante
+	//#todo: 
+	// + o número da porta deve vir via argumento.
+	// + os números das portas devem estar configurados em estrutura. 
+	// o número da porta pode estar na estrutura também.
+	
+	switch (port_numer)
+	{
+		case 0:
+	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
+            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
+            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
+            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
+            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
+            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
+            read_port_data = 0x1F0;
+		    break;
+		
+		case 1:
+	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
+            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
+            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
+            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
+            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
+            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
+            read_port_data = 0x1F0;
+		
+		    break;
+
+		case 2:
+	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
+            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
+            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
+            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
+            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
+            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
+            read_port_data = 0x1F0;
+		
+		    break;
+
+		case 3:
+	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
+            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
+            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
+            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
+            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
+            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
+            read_port_data = 0x1F0;
+		
+		    break;
+
+	    //ERROR
+	    default:
+		    break;
+	};
+	
+	
 	
 	// Read sector. (ASM)
 	os_read_sector(); 	
