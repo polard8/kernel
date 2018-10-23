@@ -74,6 +74,28 @@ int hddError;
 //...
 
 
+void initialize_ide_ports (){
+	
+	int i;
+	
+	for ( i=0; i<4; i++ )
+	{
+	    ide_ports[i].id = (int) i;
+        
+		//Só iremos habilitar quando o dispositivo for encontrado.
+		ide_ports[i].used = 0;
+        ide_ports[i].magic = 0;
+        
+		ide_ports[i].type = -1;	
+
+        ide_ports[i].name = "NO NAME";		
+		
+		ide_ports[i].base_port = (unsigned short) 0;
+		
+		//...
+		
+	};
+};
  
 
 /*
@@ -120,7 +142,7 @@ void my_read_hd_sector ( unsigned long ax,
 	
 	switch (port_numer)
 	{
-		case 0:
+		case ideportsPrimaryMaster:
 	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
             read_port_nos = 0x01F2;                  // ; Port to send number of sectors
             read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
@@ -130,18 +152,7 @@ void my_read_hd_sector ( unsigned long ax,
             read_port_data = 0x1F0;
 		    break;
 		
-		case 1:
-	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
-            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
-            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
-            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
-            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
-            read_port_data = 0x1F0;
-		
-		    break;
-
-		case 2:
+		case ideportsPrimarySlave:
 	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
             read_port_nos = 0x01F2;                  // ; Port to send number of sectors
             read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
@@ -152,7 +163,18 @@ void my_read_hd_sector ( unsigned long ax,
 		
 		    break;
 
-		case 3:
+		case ideportsSecondaryMaster:
+	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
+            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
+            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
+            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
+            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
+            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
+            read_port_data = 0x1F0;
+		
+		    break;
+
+		case ideportsSecondarySlave:
 	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
             read_port_nos = 0x01F2;                  // ; Port to send number of sectors
             read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA

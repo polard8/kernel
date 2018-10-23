@@ -8,8 +8,8 @@
  * 
  * Versão 1.0, 2015.
  */
-
-
+ 
+ 
 #define IDE_ATA 0
 #define IDE_ATAPI 1
 
@@ -27,6 +27,60 @@
 #define IDE_CMD_WRMUL   0xC5
  
 unsigned long ide_handler_address;
+ 
+ //
+ // IDE ports.
+ //
+ 
+//0 primary master 
+//1 primary slave 
+//2 secondary master 
+//3 secondary slave.
+	
+typedef enum {
+	
+	ideportsPrimaryMaster,      // 0
+	ideportsPrimarySlave,       // 1
+	ideportsSecondaryMaster,    // 2
+	ideportsSecondarySlave      // 3
+	
+}ide_ports_t;	
+
+
+typedef enum {
+	
+	idetypesPrimaryMaster,      // 0
+	idetypesPrimarySlave,       // 1
+	idetypesSecondaryMaster,    // 2
+	idetypesSecondarySlave      // 3
+	
+}ide_types_t;			
+	
+struct ide_ports_d 
+{
+    int id;
+
+    int used;
+    int magic;
+
+	//PATA, SATA, PATAPI, SATAPI
+	int type;
+	
+	char *name;
+	
+    unsigned short base_port;
+
+    //...
+
+    // Dá pra colocar aqui mais informações sobre 
+    // o dispositivo conectado a porta.
+    // podemos usar ponteiros para estruturas.
+	
+};	
+struct ide_ports_d ide_ports[4];
+
+	
+
  
 
 //estrutura para canais da controladora IDE. 
@@ -120,6 +174,9 @@ void my_write_hd_sector( unsigned long ax,
                          unsigned long bx, 
 						 unsigned long cx, 
 						 unsigned long dx );    //exec.
+						 
+						 
+void initialize_ide_ports ();
 				
 /* 
  * init_hdd:
