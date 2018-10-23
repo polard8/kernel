@@ -430,6 +430,9 @@ int init_executive (){
     init_clock();
 	//...
 	
+	init_hdd ();
+	
+	
 	// ??
 	// configura a tabela do kernel de funções exportadas
 	// e tabela de ponteiros para tabelas dos outros programas em kernel mode.

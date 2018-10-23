@@ -241,11 +241,23 @@ int init_hdd (){
     //
     // @todo: We need to do something here.
     //	
+	
+	
+	initialize_ide_ports ();
 
-//done:
+
+    //
+    // IDE struct
+    //	
+	
+	IDE.primary_master = NULL;
+	IDE.primary_slave = NULL;
+	IDE.secondary_master = NULL;
+	IDE.secondary_slave = NULL;
+	
+	
 
     g_driver_hdd_initialized = (int) 1;
-    
 	return (int) 0;
 };
 

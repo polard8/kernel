@@ -240,6 +240,9 @@ int ide_identify_device ( uint8_t nport ){
 	if ( ata_status_read() == 0xff )
 	{
 		//??message
+		//se não há dispositivo, temos que zerar os valores dentro das
+		//estruturas de controle do ide.
+		
         return (int) -1;
 	};
 	
@@ -300,7 +303,15 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_not_busy();
         ata_wait_no_drq();
         
-        return 0x80;
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "PATAPI";			
+		ide_ports[nport].type = (int) idedevicetypesPATAPI;
+		
+		
+		return 0x80;
    
     // ??
     }
@@ -313,6 +324,13 @@ int ide_identify_device ( uint8_t nport ){
         ata_pio_read(ata_identify_dev_buf,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "SATAPI";	
+		ide_ports[nport].type = (int) idedevicetypesSATAPI;
 		
         return 0x80;
 
@@ -329,6 +347,13 @@ int ide_identify_device ( uint8_t nport ){
         ata_pio_read(ata_identify_dev_buf,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "SATA";	
+		ide_ports[nport].type = (int) idedevicetypesSATA;
 		
         return 0;
     
@@ -347,6 +372,14 @@ int ide_identify_device ( uint8_t nport ){
 
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "PATA";	
+		ide_ports[nport].type = (int) idedevicetypesPATA;
 		
         return 0;
     };
@@ -1576,9 +1609,20 @@ int diskATAInitialize ( int ataflag ){
     ATA_BAR1 = ( ata_pci.bar1 & ~3 )   + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
     ATA_BAR2 = ( ata_pci.bar2 & ~7 )   + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
     ATA_BAR3 = ( ata_pci.bar3 & ~3 )   + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
-    ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
+    
+	ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
     ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
-
+	
+	//
+	// Colocando nas estruturas.
+	//
+	
+	ide_ports[0].base_port = (unsigned short) ATA_BAR0;
+	ide_ports[1].base_port = (unsigned short) ATA_BAR1;
+	ide_ports[2].base_port = (unsigned short) ATA_BAR2;
+	ide_ports[3].base_port = (unsigned short) ATA_BAR3;
+	//tem ainda a porta do dma na bar4
+	
 	
 	//
 	// De acordo com o tipo.
@@ -1621,7 +1665,7 @@ int diskATAInitialize ( int ataflag ){
     //	
 	
 	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
 	
 	current_dev = ( struct st_dev * ) ready_queue_dev;
     current_dev->dev_id      = dev_next_pid++;
@@ -1639,11 +1683,17 @@ int diskATAInitialize ( int ataflag ){
 	// Sondando dispositivos e imprimindo na tela.
 	//
 	
-    // As primeiras quatro portas do controlador IDE.    
-	for( port=0; port < 4; port++ )
+    //
+	// #importante:
+	// Sondando as quatro portas e salvando as informações sobre os dispositivos  
+	// encontrados nela.
+	//
+	
+	// As primeiras quatro portas do controlador IDE.    
+	
+	for ( port=0; port < 4; port++ )
 	{
-		// ??
-        ide_dev_init(port);
+        ide_dev_init (port);
 	};		
 		
 		
@@ -1782,6 +1832,27 @@ void show_ide_info (){
 	
 	printf("sm-disk-disk-show_ide_info:\n");
 	
+	
+	int i;
+	
+	for ( i=0; i<4; i++ )
+	{
+		printf("\n\n");
+		
+		printf ("id=%d\n", ide_ports[i].id );
+		
+		printf ("id=%d\n", ide_ports[i].used );
+		printf ("id=%d\n", ide_ports[i].magic );
+		
+		printf ("id=%d\n", ide_ports[i].type );
+		
+		printf ("name=%s\n", ide_ports[i].name );
+		
+		printf ("base_port=%x\n", ide_ports[i].base_port );
+	}
+	
+/*	
+	
 	// Estrutura 'ata'
 	// Qual lista ??
 	
@@ -1854,6 +1925,8 @@ void show_ide_info (){
 	
 
    //...
+   
+  */
 	
 //done:
     refresh_screen();

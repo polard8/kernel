@@ -56,6 +56,16 @@ typedef enum {
 	
 }ide_types_t;			
 	
+	
+typedef enum {
+	
+	idedevicetypesPATA,      // 0
+	idedevicetypesSATA,       // 1
+	idedevicetypesPATAPI,    // 2
+	idedevicetypesSATAPI      // 3
+	
+}ide_device_types_t;				
+	
 struct ide_ports_d 
 {
     int id;
@@ -137,23 +147,33 @@ struct ide_disk_d
 };
 
 
- 
- 
-// estrutura para configurar a interface IDE. 
+/*
+ * ide_d:
+ *
+ * #IMPORTANTE
+ * Estrutura para configurar a interface IDE. 
+ * Essa será a estrutura raiz para gerenciamento do controlador de IDE.
+ */
+
 typedef struct ide_d ide_t;
 struct ide_d
 {
-	//...
-	int dummy;
-	//unsigned long ide_handler_address;
+    // devemos colocar aqui um ponteiro para estrutura de informações 
+    // sobre o dispositivo controlador de ide.	
+	
+    struct ide_ports_d *primary_master; 
+    struct ide_ports_d *primary_slave; 
+    struct ide_ports_d *secondary_master; 
+    struct ide_ports_d *secondary_slave; 	
 };
-//ide_t *Ide;
+struct ide_d IDE;
 
 
 
 typedef struct hdd_d hdd_t;
 struct hdd_d
 {
+	
 	//...
 	int dummy;
 	//unsigned long hdd_handler_address;
