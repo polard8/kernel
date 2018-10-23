@@ -172,89 +172,126 @@ void ata_cmd_write(_i32 cmd_val)
 _u8 ata_assert_dever(_i8 nport)
 {
 
-    switch(nport){
-    case 0:
-        ata.channel = 0;
-        ata.dev_num = 0;
-    break;
-    case 1:   
-        ata.channel = 0;
-        ata.dev_num = 1;
-    break;
-    case 2:
-        ata.channel = 1;
-        ata.dev_num = 0;
-    break;
-    case 3:
-        ata.channel = 1;
-        ata.dev_num = 1;
-    break;
-    default:
-        kprintf("Port %d, volue not used\n",nport);
-        return -1;
-     break;
-    }
+    switch (nport)
+	{
+        case 0:
+            ata.channel = 0;
+            ata.dev_num = 0;
+        break;
+		
+        case 1:   
+            ata.channel = 0;
+            ata.dev_num = 1;
+            break;
+        
+		case 2:
+            ata.channel = 1;
+            ata.dev_num = 0;
+        break;
+       
+	    case 3:
+            ata.channel = 1;
+            ata.dev_num = 1;
+        break;
+		
+        default:
+            kprintf ("ata_assert_dever: Port %d, volue not used\n", nport );
+            return -1;
+            break;
+    };
 
-    set_ata_addr(ata.channel);
-
-
+    set_ata_addr (ata.channel);
+	
     return 0;
-
-}
+};
 
 
 /*
  *********************************************
  * ide_identify_device:
  * 
+ * IN:
+ *
+ * OUT:
+ *     -1   =  Error. 
+ *     0x80 = PATAPI ou SATAPI.
+ *     0    = PATA ou SATA. 
+ *
  */
-int ide_identify_device( uint8_t nport )
-{
+int ide_identify_device ( uint8_t nport ){
+	
     _u8 status;
-    _u8 lba1,lba2;
+    _u8 lba1, lba2;
 
-    ata_assert_dever(nport);
+    ata_assert_dever (nport);
 
-    // Ponto flutuante
-	//Sem unidade conectada ao barramento
-    if(ata_status_read() == 0xff){
-        return -1;
-	}
+	//
+    // ## Ponto flutuante ##
+	//
+	
+	
+
+    // ??
+	// Pelo jeito isso significa que se o registrador de status retornar 
+	// -1, significa que nenhum disco está conectado ao controlador.
+	
+	// Sem unidade conectada ao barramento.	
+	
+	if ( ata_status_read() == 0xff )
+	{
+		//??message
+        return (int) -1;
+	};
 	
 	//
-	//
+	// ??
+	// O que isso faz?
+	// Parece inicialização com '0'.
 	//
 
-    outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-	outb( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0   
-	outb( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
-	outb( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
+    outb ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+	outb ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0   
+	outb ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
+	outb ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
 
-    
+    //
     // Select device,
-    outb( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0| ata.dev_num << 4 );
-    ata_wait(400);
+    // ??
+	//
+	
+	outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0 | ata.dev_num << 4 );    
+	ata_wait (400);
 
+	//
     // cmd
-    ata_cmd_write(ATA_CMD_IDENTIFY_DEVICE); 
-    // ata_wait_irq();
+    // O Comando é para identificar o dispositivo.
+	//
+	
+	ata_cmd_write (ATA_CMD_IDENTIFY_DEVICE); 
+    ata_wait (400);
+    
+	// ata_wait_irq();
     // Nunca espere por um IRQ aqui
     // Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
     // Melhor seria fazermos polling
-     
-    ata_wait(400);
-
 
 	//Sem unidade no canal
-    if(ata_status_read() == 0){  
-        return -1;
-	}
+    if ( ata_status_read() == 0 )
+	{
+        //??message		
+        return (int) -1;
+	};
 
-   lba1 = inb( ata.cmd_block_base_address + ATA_REG_LBA1 );
-   lba2 = inb( ata.cmd_block_base_address + ATA_REG_LBA2 );
+    //
+	// ?? LBA ??
+	//
+	
+	lba1 = inb ( ata.cmd_block_base_address + ATA_REG_LBA1 );
+    lba2 = inb ( ata.cmd_block_base_address + ATA_REG_LBA2 );
 
-   if(lba1 == 0x14 && lba2 == 0xEB)
-   {
+	// ??
+    if ( lba1 == 0x14 && lba2 == 0xEB )
+    {
         //kputs("Unidade PATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
@@ -264,8 +301,10 @@ int ide_identify_device( uint8_t nport )
         ata_wait_no_drq();
         
         return 0x80;
-   }
-   else if(lba1 == 0x69  && lba2 == 0x96){
+   
+    // ??
+    }
+    else if ( lba1 == 0x69  && lba2 == 0x96 ){
 
         //kputs("Unidade SATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
@@ -277,37 +316,45 @@ int ide_identify_device( uint8_t nport )
 		
         return 0x80;
 
-   }
-   else if(lba1 == 0x3C && lba2 == 0xC3){
+    // ??
+	}
+    else if ( lba1 == 0x3C && lba2 == 0xC3 ){
+		
         //kputs("Unidade SATA\n");   
         // O dispositivo responde imediatamente um erro ao cmd Identify device
         // entao devemos esperar pelo DRQ ao invez de um BUSY
         // em seguida enviar 256 word de dados PIO.
-        ata_wait_drq(); 
+        
+		ata_wait_drq(); 
         ata_pio_read(ata_identify_dev_buf,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
 		
         return 0;
-   }
-
-
-   else if(lba1 == 0 && lba2 == 0){
+    
+	// ??
+	}
+    else if ( lba1 == 0 && lba2 == 0 ){
+		
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
         // e eviamoos 256 word de dados PIO
-        ata_wait_drq();
-        ata_pio_read(ata_identify_dev_buf,512);
+        
+		ata_wait_drq();
+        
+		// ## read ##
+		ata_pio_read ( ata_identify_dev_buf, 512 );
 
         ata_wait_not_busy();
         ata_wait_no_drq();
 		
         return 0;
-    }
+    };
 
 
 done:
-	return 0;   
+
+	return (int) 0;   
 };
 
 
@@ -355,14 +402,14 @@ static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Addres
 
  
 
-void set_ata_addr(int channel)
-{
+void set_ata_addr (int channel){
+	
 	//
 	// @todo:
 	// Checar a validade da estrutura.
 	//
 
-    switch(channel)
+    switch (channel)
 	{
         case ATA_PRIMARY:
             ata.cmd_block_base_address  = ATA_BAR0;
@@ -414,8 +461,8 @@ uint32_t  dev_next_pid = 0;  // O próximo ID de unidade disponível.
  * armazenamento de dados.
  *
  */
-void ide_mass_storage_initialize()
-{
+void ide_mass_storage_initialize (){
+	
 	int port;
 	
 
@@ -424,9 +471,10 @@ void ide_mass_storage_initialize()
     //	
 	
 	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
 	
 	current_dev = ( struct st_dev * ) ready_queue_dev;
+	
     current_dev->dev_id      = dev_next_pid++;
     current_dev->dev_type    = -1;
     current_dev->dev_num     = -1;
@@ -435,7 +483,7 @@ void ide_mass_storage_initialize()
     current_dev->next        = NULL;
 
     // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc(4096);
+	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
 
 	//
@@ -443,10 +491,10 @@ void ide_mass_storage_initialize()
 	//
 	
     // As primeiras quatro portas do controlador IDE.    
-	for( port=0; port < 4; port++ )
+	for ( port=0; port < 4; port++ )
 	{
 		// ??
-        ide_dev_init(port);
+        ide_dev_init (port);
 	};
     
 done:
@@ -700,25 +748,27 @@ done:
  *
  */
 
-void ata_pio_read( void *buffer, _i32 bytes )
-{
-    __asm__ __volatile__(\
+ 
+// ?? 
+// ## PIO READ ##  
+void ata_pio_read ( void *buffer, _i32 bytes ){
+	
+    __asm__ __volatile__ (\
                 "cld;\
-                rep; insw"::"D"(buffer),\
-                "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2));
-				
+                rep; insw": :"D" (buffer),\
+                "d" ( ata.cmd_block_base_address + ATA_REG_DATA ),\
+                "c" ( bytes/2 ) );
 };
 
-
-void ata_pio_write( void *buffer, _i32 bytes )
-{
-    __asm__ __volatile__(\
+// ??
+// ## PIO WRITE ## 
+void ata_pio_write ( void *buffer, _i32 bytes ){
+	
+    __asm__ __volatile__ (\
                 "cld;\
-                rep; outsw"::"S"(buffer),\
-                "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2));
-
+                rep; outsw": :"S" (buffer),\
+                "d" ( ata.cmd_block_base_address + ATA_REG_DATA ),\
+                "c" ( bytes/2 ) );
 };
 
 
