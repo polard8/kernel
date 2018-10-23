@@ -1841,10 +1841,10 @@ void show_ide_info (){
 		
 		printf ("id=%d\n", ide_ports[i].id );
 		
-		printf ("id=%d\n", ide_ports[i].used );
-		printf ("id=%d\n", ide_ports[i].magic );
+		printf ("used=%d\n", ide_ports[i].used );
+		printf ("magic=%d\n", ide_ports[i].magic );
 		
-		printf ("id=%d\n", ide_ports[i].type );
+		printf ("type=%d\n", ide_ports[i].type );
 		
 		printf ("name=%s\n", ide_ports[i].name );
 		
