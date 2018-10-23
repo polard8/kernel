@@ -13,6 +13,7 @@
 
 
 int ATAFlag;
+
 #define FORCEPIO 1234
 
 
@@ -28,25 +29,26 @@ int ATAFlag;
 #define __ATA_H__
 
 
+//
+// Definições de tipos usados pelo Nelson en disk.h e disk.c
+//
 
-//
-// Definições de tipos usados pelo Nelson el disk.h e disk.c
-//
+typedef void _void;
 
 typedef char _i8;
 typedef short _i16;
 typedef int _i32;
 typedef long long _i64;
+
 typedef unsigned char _u8;
 typedef unsigned short _u16;
 typedef unsigned long _u32;
 typedef unsigned long long _u64;
+
 //typedef unsigned char uint8_t;
 //typedef unsigned short uint16_t;
 //typedef unsigned long uint32_t;
 typedef unsigned long long uint64_t;
-typedef void _void;
-
 
 
 // IO Delay.
@@ -61,26 +63,25 @@ typedef void _void;
 //#define DMA_PHYS_ADDR3 (DMA_PHYS_ADDR2 + 0x10000)
 
 
-
 //
 // ## bug bug precisamos encontrar endereços válidos.
 //
 
-//#bugbug: precisa encontrar endereços válidos.
-//user mode 1:1
+//#bugbug: 
+// Precisa encontrar endereços válidos.
+// user mode 1:1
 #define DMA_PHYS_ADDR0 0xa0000
 #define DMA_PHYS_ADDR1 0xb0000
 #define DMA_PHYS_ADDR2 0xb0000
 #define DMA_PHYS_ADDR3 0xb0000 
 
 
+//
+// PCI support
+//
+
 
 #define PCI_CLASSE_MASS 1
-
-// Controladores de unidades ATA.
-#define ATA_IDE_CONTROLLER  0x1
-#define ATA_RAID_CONTROLLER 0x4
-#define ATA_AHCI_CONTROLLER 0x6
 
 // Retorno da inicializacao PCI. 
 #define PCI_MSG_ERROR       -1
@@ -88,44 +89,49 @@ typedef void _void;
 #define PCI_MSG_SUCCESSFUL  0
 
 
+
+// Controladores de unidades ATA.
+#define ATA_IDE_CONTROLLER   0x1
+#define ATA_RAID_CONTROLLER  0x4
+#define ATA_AHCI_CONTROLLER  0x6
+
+
 // IO Space Legacy BARs IDE. 
-#define ATA_IDE_BAR0 0x1F0  // Primary Command Block Base Address.
-#define ATA_IDE_BAR1 0x3F6  // Primary Control Block Base Address.
-#define ATA_IDE_BAR2 0x170  // Secondary Command Block Base Address.
-#define ATA_IDE_BAR3 0x376  // Secondary Control Block Base Address.
-#define ATA_IDE_BAR4 0      // Bus Master Base Address.
-#define ATA_IDE_BAR5 0      // Usado pelo AHCI.
-
-
+#define ATA_IDE_BAR0  0x1F0  // Primary Command Block Base Address.
+#define ATA_IDE_BAR1  0x3F6  // Primary Control Block Base Address.
+#define ATA_IDE_BAR2  0x170  // Secondary Command Block Base Address.
+#define ATA_IDE_BAR3  0x376  // Secondary Control Block Base Address.
+#define ATA_IDE_BAR4  0      // Bus Master Base Address.
+#define ATA_IDE_BAR5  0      // Usado pelo AHCI.
 
 
 // ATA/ATAPI Command Set.
+#define ATA_CMD_CFA_ERASE_SECTORS                0xC0
+#define ATA_CMD_CFA REQUEST_EXTENDED_ERROR_CODE  0x03
+#define ATA_CMD_CHECK_MEDIA_CARD_TYPE            0xD1
+#define ATA_CMD_CHECK_POWER_MODE                 0xE5
+#define ATA_CMD_DEVICE_RESET                     0x08
+#define ATA_CMD_EXECUTE_DEVICE_DIAGNOSTIC        0x90
+#define ATA_CMD_FLUSH_CACHE                      0xE7
+#define ATA_CMD_FLUSH_CACHE_EXT                  0xEA
+#define ATA_CMD_IDENTIFY_DEVICE                  0xEC
+#define ATA_CMD_IDENTIFY_PACKET_DEVICE           0xA1
+#define ATA_CMD_PACKET                           0xA0
+#define ATA_CMD_READ_BUFFER                      0xE4
+#define ATA_CMD_READ_DMA                         0xC8
+#define ATA_CMD_READ_DMA_EXT                     0x25
+#define ATA_CMD_READ_SECTORS                     0x20    //read
+#define ATA_CMD_READ_SECTORS_EXT                 0x24
+#define ATA_CMD_WRITE_BUFFER                     0xE8
+#define ATA_CMD_WRITE_DMA                        0xCA
+#define ATA_CMD_WRITE_DMA_EXT                    0x35
+#define ATA_CMD_WRITE_SECTORS                    0x30    //write
+#define ATA_CMD_WRITE_SECTORS_EXT                0x34
 
-#define ATA_CMD_CFA_ERASE_SECTORS               0xC0
-#define ATA_CMD_CFA REQUEST_EXTENDED_ERROR_CODE 0x03
-#define ATA_CMD_CHECK_MEDIA_CARD_TYPE           0xD1
-#define ATA_CMD_CHECK_POWER_MODE                0xE5
-#define ATA_CMD_DEVICE_RESET                    0x08
-#define ATA_CMD_EXECUTE_DEVICE_DIAGNOSTIC       0x90
-#define ATA_CMD_FLUSH_CACHE                     0xE7
-#define ATA_CMD_FLUSH_CACHE_EXT                 0xEA
-#define ATA_CMD_IDENTIFY_DEVICE                 0xEC
-#define ATA_CMD_IDENTIFY_PACKET_DEVICE          0xA1
-#define ATA_CMD_PACKET                          0xA0
-#define ATA_CMD_READ_BUFFER                     0xE4
-#define ATA_CMD_READ_DMA                        0xC8
-#define ATA_CMD_READ_DMA_EXT                    0x25
-#define ATA_CMD_READ_SECTORS                    0x20
-#define ATA_CMD_READ_SECTORS_EXT                0x24
-#define ATA_CMD_WRITE_BUFFER                    0xE8
-#define ATA_CMD_WRITE_DMA                       0xCA
-#define ATA_CMD_WRITE_DMA_EXT                   0x35
-#define ATA_CMD_WRITE_SECTORS                   0x30
-#define ATA_CMD_WRITE_SECTORS_EXT               0x34
 
 // ATAPI descrito no SCSI.
-#define ATAPI_CMD_READ  0xA8
-#define ATAPI_CMD_EJECT 0x1B
+#define ATAPI_CMD_READ   0xA8
+#define ATAPI_CMD_EJECT  0x1B
 
 //ATA bits de status control (alternativo).
 #define ATA_SC_HOB  0x80    // High Order Byte.
@@ -133,58 +139,59 @@ typedef void _void;
 #define ATA_SC_nINE 0x02    // INTRQ.
 
 
-
-
 //ATA bits de status. 
-#define ATA_SR_BSY  0x80    // Busy
-#define ATA_SR_DRDY 0x40    // Device Ready
-#define ATA_SR_DF   0x20    // Device Fault
-#define ATA_SR_DSC  0x10    // Device Seek Complete
-#define ATA_SR_DRQ  0x08    // Data Request
-#define ATA_SR_SRST 0x04    // 
-#define ATA_SR_IDX  0x02    // Index
-#define ATA_SR_ERR  0x01    // Error
+#define ATA_SR_BSY   0x80    // Busy
+#define ATA_SR_DRDY  0x40    // Device Ready
+#define ATA_SR_DF    0x20    // Device Fault
+#define ATA_SR_DSC   0x10    // Device Seek Complete
+#define ATA_SR_DRQ   0x08    // Data Request
+#define ATA_SR_SRST  0x04    // 
+#define ATA_SR_IDX   0x02    // Index
+#define ATA_SR_ERR   0x01    // Error
 
 //ATA bits de errro após a leitura.
-#define ATA_ER_BBK   0x80    // 
-#define ATA_ER_UNC   0x40    //
-#define ATA_ER_MC    0x20    //
-#define ATA_ER_IDNF  0x10    //
-#define ATA_ER_MCR   0x08    //
-#define ATA_ER_ABRT  0x04    //
-#define ATA_ER_TK0NF 0x02    //
-#define ATA_ER_AMNF  0x01    //
+#define ATA_ER_BBK    0x80    // 
+#define ATA_ER_UNC    0x40    //
+#define ATA_ER_MC     0x20    //
+#define ATA_ER_IDNF   0x10    //
+#define ATA_ER_MCR    0x08    //
+#define ATA_ER_ABRT   0x04    //
+#define ATA_ER_TK0NF  0x02    //
+#define ATA_ER_AMNF   0x01    //
 
 // Registradores. 
-#define ATA_REG_DATA     0x00
-#define ATA_REG_ERROR    0x01
-#define ATA_REG_FEATURES 0x01
-#define ATA_REG_SECCOUNT 0x02
-#define ATA_REG_LBA0     0x03
-#define ATA_REG_LBA1     0x04
-#define ATA_REG_LBA2     0x05
-#define ATA_REG_DEVSEL   0x06
-#define ATA_REG_CMD      0x07
-#define ATA_REG_STATUS   0x07
+#define ATA_REG_DATA      0x00  //data
+#define ATA_REG_ERROR     0x01
+#define ATA_REG_FEATURES  0x01
+#define ATA_REG_SECCOUNT  0x02
+#define ATA_REG_LBA0      0x03
+#define ATA_REG_LBA1      0x04
+#define ATA_REG_LBA2      0x05
+#define ATA_REG_DEVSEL    0x06
+#define ATA_REG_CMD       0x07  //cmd
+#define ATA_REG_STATUS    0x07
 
 
 // Devices.
-#define ATA_MASTER_DEV 0x00
-#define ATA_SLAVE_DEV  0x01
+#define ATA_MASTER_DEV  0x00
+#define ATA_SLAVE_DEV   0x01
 
 // Bus.
-#define ATA_PRIMARY   0x00
-#define ATA_SECONDARY 0x01
+#define ATA_PRIMARY  0x00
+#define ATA_SECONDARY  0x01
 
 // ATA type.
-#define ATA_DEVICE_TYPE   0x00
-#define ATAPI_DEVICE_TYPE 0x01
+#define ATA_DEVICE_TYPE  0x00
+#define ATAPI_DEVICE_TYPE  0x01
+
 
 // Modo de transferência.
-#define ATA_PIO_MODO 0 
-#define ATA_DMA_MODO 1
-#define ATA_LBA28    28
-#define ATA_LBA48    48
+
+#define ATA_PIO_MODO  0 
+#define ATA_DMA_MODO  1
+
+#define ATA_LBA28  28
+#define ATA_LBA48  48
 
 
 
@@ -246,7 +253,7 @@ struct dev_nport dev_nport;
 /*
  * ata_pci:
  *     Suporta a IDE Controller.
- *     Essa é uma estrutura de superte a discos ata.
+ *     Essa é uma estrutura de suporte a discos ata.
  */
 struct ata_pci
 {

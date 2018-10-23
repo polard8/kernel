@@ -45,42 +45,47 @@ extern st_dev_t *current_dev;
 static _u32 ata_irq_invoked = 0;
 
 
-int disk_get_ata_irq_invoked ()
-{
+
+int disk_get_ata_irq_invoked (){
+	
 	return (int) ata_irq_invoked;
-}
+};
 
-void disk_reset_ata_irq_invoked ()
-{
+
+void disk_reset_ata_irq_invoked (){
+	
 	ata_irq_invoked = 0;
-}
+};
 
 
-
-_void ata_wait (_i32 val){
+void ata_wait (_i32 val){
 	
    val /= 100;
    
-   while(val--)io_delay();
-   //while(val--)delay();
-}
-
+    
+	//while(val--)delay();
+	while (val--)
+    {
+	   io_delay();
+	};
+};
 
 
 // TODO: Nelson, ao configurar os bits BUSY e DRQ 
 // devemos verificar retornos de erros.
-_u8 ata_wait_not_busy()
-{
-    while(ata_status_read() &ATA_SR_BSY)
-    if(ata_status_read() &ATA_SR_ERR)
-    return 1;
+
+_u8 ata_wait_not_busy (){
+	
+    while ( ata_status_read() & ATA_SR_BSY )
+        if ( ata_status_read() &ATA_SR_ERR )
+            return 1;
 
     return 0;
+};
 
-}
 
-_u8 ata_wait_busy()
-{
+_u8 ata_wait_busy (){
+	
     while(!(ata_status_read() &ATA_SR_BSY))
     if(ata_status_read() &ATA_SR_ERR)
     return 1;
@@ -1060,10 +1065,10 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	
     uint32_t data;
 
-#ifdef KERNEL_VERBOSE	
+//#ifdef KERNEL_VERBOSE	
 	kprintf("diskATAPCIConfigurationSpace:\n");
     kprintf("Initializing PCI Mass Storage support ...\n");
-#endif
+//#endif
 
     // Indentification Device
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
@@ -1072,16 +1077,19 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     ata_pci.vendor_id = data &0xffff;
     ata_pci.device_id = data >> 16 &0xffff;
 	
-#ifdef KERNEL_VERBOSE	
+//#ifdef KERNEL_VERBOSE	
 	kprintf("\nDisk info:\n");
     kprintf("[ Vendor ID: %X,Device ID: %X ]\n", ata_pci.vendor_id, 
 	    ata_pci.device_id );
-#endif	
+//#endif	
 	
     // Classe code, programming interface, revision id
     data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
     
-	// Salvando configurações.
+	//
+	// #importante:
+	// Salvando na estrutura as informações obtidas.
+	//
 	
 	// Classe e sub-classe.
     ata_pci.classe = data >> 24 &0xff;
@@ -1093,6 +1101,9 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     // Revision.
     ata_pci.revision_id = data &0xff;
 
+	//
+	// Se for classe 1 subclasse 1. (IDE)
+	//
 	
     if( ata_pci.classe == 1 && 
 	    ata_pci.subclasse == 1 )
@@ -1136,27 +1147,38 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	    data = diskReadPCIConfigAddr( bus, dev, fun, 0x48 );
 	    diskWritePCIConfigAddr( bus, dev, fun, 0x48, data | 0xf);
 
-#ifdef KERNEL_VERBOSE 		
+//#ifdef KERNEL_VERBOSE 		
         kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
             ata_sub_class_code_register_strings[ata.chip_control_type],
 	        ata_pci.prog_if,
 			ata_pci.revision_id );
-#endif
+//#endif
+
+        //
+		// Se a classe for 1 e a sbclasse for 4 (RAID)
+		//
+
             
     }else if( ata_pci.classe == 1 && ata_pci.subclasse == 4 )
 	      {
               //RAID
               ata.chip_control_type = ATA_RAID_CONTROLLER;
 			  
-#ifdef KERNEL_VERBOSE              
+//#ifdef KERNEL_VERBOSE              
 			  kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
                   ata_sub_class_code_register_strings[ata.chip_control_type], 
 				  ata_pci.prog_if,
 				  ata_pci.revision_id );
-#endif
+//#endif
     
 			  // Em avaliacao
               return PCI_MSG_AVALIABLE;
+			  
+			  
+			  
+            //
+		    // Se a classe for 1 e a sbclasse for 6 (AHCI)
+		    //			  
 			  
           }else if( ata_pci.classe == 1 && 
 	                ata_pci.subclasse == 6)
@@ -1204,6 +1226,11 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 			            ata_pci.revision_id );
 #endif			
 
+                    //
+					// #importante:
+					// Se o dispositivo não tiver nem a classe nem a subclasse desejanda.
+					//
+					
                     //Ok.
                 }else{
 					
@@ -1211,17 +1238,22 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
                      // PANIC! 
                      //
 					 
-					 kprintf("sm-disk-disk-diskATAPCIConfigurationSpace: PANIC DRIVER BLOCK!");
-		             die();
+					 kprintf ("sm-disk-disk-diskATAPCIConfigurationSpace: PANIC DRIVER BLOCK!");
+		             //die();
+					 
+					//panic code. 
+					return 666; 
                  };
-
+				 
+				 
+	//
+    // Vamos salvar mais informações na estrutura.
+    //	
 
 
     // PCI cacheline, Latancy, Headr type, end BIST
 	
     data = diskReadPCIConfigAddr( bus, dev, fun, 0xC );
-
-	// Salvando configurações.
 	
 	// ??
 	ata_pci.primary_master_latency_timer = data >>8 &0xff;
@@ -1241,7 +1273,7 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     //--------------
     
     // Interrupt
-    data = diskReadPCIConfigAddr( bus, dev, fun, 0x3C );
+    data = diskReadPCIConfigAddr ( bus, dev, fun, 0x3C );
     
     //
     // Salvando configurações.
@@ -1252,31 +1284,31 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 
 
     // PCI command and status
-    data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+    data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
     
     //
     // Salvando configurações.
     //	
 	
-	ata_pci.command = data &0xffff; 
-    ata_pci.status  = data >>16 &0xffff;
+	ata_pci.command = data & 0xffff; 
+    ata_pci.status  = data >>16 & 0xffff;
 	
 	
-#ifdef KERNEL_VERBOSE	
-    kprintf("[ Command %x Status %x ]\n", ata_pci.command, 
+//#ifdef KERNEL_VERBOSE	
+    kprintf ("[ Command %x Status %x ]\n", ata_pci.command, 
 	    ata_pci.status );
 		
-    kprintf("[ Interrupt Line %x Interrupt Pin %x ]\n", ata_pci.interrupt_pin, 
+    kprintf ("[ Interrupt Line %x Interrupt Pin %x ]\n", ata_pci.interrupt_pin, 
 	    ata_pci.interrupt_line );
-#endif		
+//#endif		
 	
-    data = diskReadPCIConfigAddr(bus,dev,fun,0x48);
+    data = diskReadPCIConfigAddr (bus,dev,fun,0x48);
 	
-#ifdef KERNEL_VERBOSE		
+//#ifdef KERNEL_VERBOSE		
     kprintf("[ Synchronous DMA Control Register %X ]\n", data );
-#endif
+//#endif
 	
-done:
+//done:
 
 #ifdef KERNEL_VERBOSE	
     refresh_screen();
@@ -1318,10 +1350,11 @@ uint32_t diskPCIScanDevice ( int class ){
 		{
             for( fun=0; fun < 8; fun++ )
 			{
-                outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
-                data = inportl(PCI_PORT_DATA);
+                outportl ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
+				
+                data = inportl (PCI_PORT_DATA);
                 
-				if( ( data >> 24 &0xff ) == class )
+				if ( ( data >> 24 &0xff ) == class )
 				{
 					
 					
@@ -1384,21 +1417,22 @@ int diskATAInitialize ( int ataflag ){
 	// Messages
 	//
 	
-#ifdef KERNEL_VERBOSE
+//#ifdef KERNEL_VERBOSE
+    kprintf("\n");
     kprintf("sm-disk-disk-diskATAInitialize:\n");
     kprintf("Initializing IDE/AHCI support ...\n");
 	//refresh_screen();
-#endif
+//#endif
 
     // Sondando a interface PCI para encontrarmos um dispositivo
     // que seja de armazenamento de dados.
 	
 	//PCI_CLASSCODE_MASS
 	
-    data = (_u32) diskPCIScanDevice(PCI_CLASSE_MASS);
+    data = (_u32) diskPCIScanDevice (PCI_CLASSE_MASS);
     
 	// Error.	
-	if( data == -1 )
+	if ( data == -1 )
 	{
 		kprintf("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", (_u32) data );
 		
@@ -1407,18 +1441,62 @@ int diskATAInitialize ( int ataflag ){
 		goto fail;
 	};
     
+	//
+	//
+	//
+	
     bus = ( data >> 8 &0xff );
     dev = ( data >> 3 &31 );
     fun = ( data &7 );
 
 	//
-	// Vamos saber mais sobre o dispositivo enconrtado. 
+	// Vamos saber mais sobre o dispositivo encontrado. 
 	//
+	
+	// Nessa funções pegaremos várias informações e colocaremos em estrutura.
 	
     data = (_u32) diskATAPCIConfigurationSpace ( bus, dev, fun );
 
+	// Analisando o retorno. 
+	
+	switch (data)
+	{
+		//Retornou com sucesso.
+		case PCI_MSG_SUCCESSFUL:
+		    kprintf("diskATAPCIConfigurationSpace returned ok\n");
+			break;
+			
+        //RAID foi encontrado mas não é suportado.
+        case PCI_MSG_AVALIABLE:
+            kprintf("sm-disk-disk-diskATAInitialize: RAID Controller Not supported.\n");
+		    kprintf("RAID found but not supported\n ");
+			Status = (int) 1;		
+            break;
+
+		//PANIC
+		case 666:
+		    kprintf("sm-disk-disk-diskATAInitialize: PANIC Not a valid class or subclass \n");
+			die ();
+		    break;
+			
+        //#bugbug 		
+		//?? Esse retorno não existe na funçao.
+		case PCI_MSG_ERROR:
+            kprintf("sm-disk-disk-diskATAInitialize: Error Driver [%X]\n",data);
+		    Status = (int) 1;		
+            goto fail;
+			break;
+			
+        default:
+		    kprintf("sm-disk-disk-diskATAInitialize: ERROR Unexpected return value\n");
+			die ();		
+		    //Nothing.
+            break;		
+	};
+	
+	/*
 	// Error.	
-    if( data == PCI_MSG_ERROR )
+    if ( data == PCI_MSG_ERROR )
 	{
         kprintf("sm-disk-disk-diskATAInitialize: Error Driver [%X]\n",data);
 		Status = (int) 1;
@@ -1430,17 +1508,24 @@ int diskATAInitialize ( int ataflag ){
 		      Status = (int) 1;
 		      goto fail;  
           };
-		  
+	*/
+
+	
 	//
     // Salvando informações.
     //	
+	
+	// Aqui estamos pegando informações na estrutura ata_pci sobre as BARs 
+	// e manipulando essas informações.
+	// ?? Não sei o que está fazendo aqui, talvez procurando endereço de porta.
 
     // Initialize base address
     // AHCI/IDE Compativel com portas IO IDE legado
-    ATA_BAR0 = ( ata_pci.bar0 & ~7   ) + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
-    ATA_BAR1 = ( ata_pci.bar1 & ~3   ) + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
-    ATA_BAR2 = ( ata_pci.bar2 & ~7   ) + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
-    ATA_BAR3 = ( ata_pci.bar3 & ~3   ) + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
+	
+    ATA_BAR0 = ( ata_pci.bar0 & ~7 )   + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
+    ATA_BAR1 = ( ata_pci.bar1 & ~3 )   + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
+    ATA_BAR2 = ( ata_pci.bar2 & ~7 )   + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
+    ATA_BAR3 = ( ata_pci.bar3 & ~3 )   + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
     ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
     ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
 
@@ -1455,22 +1540,22 @@ int diskATAInitialize ( int ataflag ){
 	//
 	
 	// Type
-    if( ata.chip_control_type == ATA_IDE_CONTROLLER )
+    if ( ata.chip_control_type == ATA_IDE_CONTROLLER )
 	{
 
         //Soft Reset, defina IRQ
-        outb( ATA_BAR1, 0xff );
-        outb( ATA_BAR3, 0xff );
-        outb( ATA_BAR1, 0x00 );
-        outb( ATA_BAR3, 0x00 );
+        outb ( ATA_BAR1, 0xff );
+        outb ( ATA_BAR3, 0xff );
+        outb ( ATA_BAR1, 0x00 );
+        outb ( ATA_BAR3, 0x00 );
 
         ata_record_dev = 0xff;
         ata_record_channel = 0xff;
 
-#ifdef KERNEL_VERBOSE	
+//#ifdef KERNEL_VERBOSE	
 	    printf("Initializing IDE Mass Storage device ...\n");
 	    refresh_screen();
-#endif    
+//#endif    
 	
 	    //
 	    // As estruturas de disco serão colocadas em uma lista encadeada.
@@ -1497,7 +1582,7 @@ int diskATAInitialize ( int ataflag ){
     current_dev->next        = NULL;
 
     // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc(4096);
+	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
 
 	//
@@ -1577,9 +1662,9 @@ done:
  * diskATADialog:
  *     Rotina de diálogo com o driver ATA.
  */
-int diskATADialog( int msg, 
-                   unsigned long long1, 
-				   unsigned long long2 )
+int diskATADialog ( int msg, 
+                    unsigned long long1, 
+				    unsigned long long2 )
 {
     int Status = 1; //erro
 	
@@ -1619,8 +1704,8 @@ done:
  * diskATAIRQHandler1
  *     irq 14 handler
  */
-void diskATAIRQHandler1()
-{
+void diskATAIRQHandler1 (){
+	
     ata_irq_invoked = 1;  
 };
 
@@ -1630,8 +1715,8 @@ void diskATAIRQHandler1()
  * diskATAIRQHandler2
  *     irq 15 handler
  */
-void diskATAIRQHandler2()
-{
+void diskATAIRQHandler2 (){
+	
     ata_irq_invoked = 1;   
 };
 
@@ -1655,19 +1740,60 @@ void show_ide_info (){
 	//if( ata != NULL )
 	//{
 		printf("ata:\n");
- 	    printf("type={%d}\n", (int) ata.chip_control_type);
-	    printf("channel={%d}\n", (int) ata.channel);
-	    printf("devType={%d}\n", (int) ata.dev_type);
-	    printf("devNum={%d}\n", (int) ata.dev_num);
-	    printf("accessType={%d}\n", (int) ata.access_type);
-	    printf("cmdReadMode={%d}\n", (int) ata.cmd_read_modo);
-	    printf("cmdBlockBaseAddress={%d}\n", (int) ata.cmd_block_base_address);
-	    printf("controlBlockBaseAddress={%d}\n", (int) ata.ctrl_block_base_address);
-		printf("busMasterBaseAddress={%d}\n", (int) ata.bus_master_base_address);
-		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
+ 	    printf("type={%d}\n",                    (int) ata.chip_control_type);
+	    printf("channel={%d}\n",                 (int) ata.channel);
+	    printf("devType={%d}\n",                 (int) ata.dev_type);
+	    printf("devNum={%d}\n",                  (int) ata.dev_num);
+	    printf("accessType={%d}\n",              (int) ata.access_type);
+	    printf("cmdReadMode={%d}\n",             (int) ata.cmd_read_modo);
+		
+	    printf("cmdBlockBaseAddress={%x}\n",     (int) ata.cmd_block_base_address);
+	    printf("controlBlockBaseAddress={%x}\n", (int) ata.ctrl_block_base_address);
+		printf("busMasterBaseAddress={%x}\n",    (int) ata.bus_master_base_address);
+		printf("ahciBaseAddress={%x}\n",         (int) ata.ahci_base_address);
 	//};
 	
 	
+	
+	printf ("\n\n ata_pci: \n");
+	
+	printf (" vendor %x \n", (int) ata_pci.vendor_id );
+	printf (" device %x \n", (int) ata_pci.device_id );
+	
+	printf (" cmd %x \n", (int) ata_pci.command );
+	printf (" status %x \n", (int) ata_pci.status );
+	
+	printf ("prog if %x \n", (int) ata_pci.prog_if );
+	printf ("revision  %x \n", (int) ata_pci.revision_id );
+	printf ("class %x \n", (int) ata_pci.classe );
+	printf ("subclass %x \n", (int) ata_pci.subclasse );
+	printf ("primary_master_latency_timer %x \n", (int) ata_pci.primary_master_latency_timer );
+	printf ("header type %x \n", (int) ata_pci.header_type );
+	printf ("bist %x \n", (int) ata_pci.BIST );
+	
+	printf ("bar 0 %x \n", (int) ata_pci.bar0 );
+	printf ("bar 1 %x \n", (int) ata_pci.bar1 );
+	printf ("bar 2 %x \n", (int) ata_pci.bar2 );
+	printf ("bar 3 %x \n", (int) ata_pci.bar3 );
+	printf ("bar 4 %x \n", (int) ata_pci.bar4 );
+	printf ("bar 5 %x \n", (int) ata_pci.bar5 );
+	
+	printf ("subsystem vendor %x \n ", (int) ata_pci.subsystem_vendor_id );
+	printf ("subsystem id %x \n ", (int) ata_pci.subsystem_id );
+	
+	printf ("capabilities_pointer %x \n ", (int) ata_pci.capabilities_pointer );
+	printf ("int line %x \n ", (int) ata_pci.interrupt_line );
+	printf ("int pin %x \n ", (int) ata_pci.interrupt_pin );
+	
+	// ...
+	printf("more...\n");
+	
+	printf ("port bar 0 %x \n", (int) ATA_BAR0 );
+	printf ("port bar 1 %x \n", (int) ATA_BAR1 );
+	printf ("port bar 2 %x \n", (int) ATA_BAR2 );
+	printf ("port bar 3 %x \n", (int) ATA_BAR3 );
+	printf ("port bar 4 %x \n", (int) ATA_BAR4 );
+	printf ("port bar 5 %x \n", (int) ATA_BAR5 );	
 	
 	// Estrutura 'atapi'
 	// Qual lista ??
@@ -1680,8 +1806,7 @@ void show_ide_info (){
    //...
 	
 //done:
-    //refresh_screen();
-    //return;	
+    refresh_screen();
 };
 
 
