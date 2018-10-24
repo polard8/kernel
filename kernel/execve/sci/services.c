@@ -352,11 +352,6 @@ void *services( unsigned long number,
 		    taskswitch_lock();
 	        scheduler_lock();	
 		    
-			// #bugbug
-			// @todo:
-			// Faltam os tamanhos. 
-			// Temos um tamanho padrão improvisado 
-			// para arquivos de 255 bytes e 3 setores.
 			fsSaveFile ( (char *) message_address[0],         //name
 			             (unsigned long) message_address[1],  //3, //@todo: size in sectors 
 						 (unsigned long) message_address[2],  //255, //@todo: size in bytes

@@ -72,7 +72,7 @@ void procTestF6()
 	
 	unsigned char *buffer = (unsigned char *) address;
 
-    
+    /*
     //tentando carregar setores específicos pra saber se a função está 
 	//carregando quanquer setor.
 	
@@ -80,6 +80,10 @@ void procTestF6()
     pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x20, (int) 0 );	
 	 
 	printf("%s",buffer); 
+	*/
+	
+	
+	pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x30, (int) 0 );	
 	 
 	//printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
 };

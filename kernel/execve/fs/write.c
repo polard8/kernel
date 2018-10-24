@@ -168,6 +168,11 @@ fsSaveFile ( char *file_name,
              char *file_address,
              char flag )  
 {
+	
+	printf ("ds-fsSaveFile: #todo \n");
+	
+/*	
+	
 	int Status = 0;
 	
 	//#bugbug: 
@@ -414,7 +419,7 @@ save_file:
 	//printf("fsSaveFile: reset and while\n"); 
     //refresh_screen();
 	
-	reset_ide0 ();
+	//reset_ide0 ();
 	
 	// ## Save ##
     // Vamos ao salvamento propriamente dito.
@@ -457,8 +462,9 @@ save_file:
 			disk_ata_wait_irq ();
 			
             //grava - aqui next esta certo!!!			
-            write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
-            
+            //write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
+            my_write_hd_sector ( (unsigned long) address, (unsigned long) ( VOLUME1_DATAAREA_LBA + next -2), 0, 0  );
+			
             address += 512; 
         }; 
          
@@ -510,8 +516,10 @@ done:
 		//#bugbug: Não podemos determinar os valores. 
 		// Precisamos de estruturas.
 		
-		write_lba ( VOLUME1_ROOTDIR_ADDRESS + roff, 
-	                VOLUME1_ROOTDIR_LBA     + rlbaoff );
+		//write_lba ( VOLUME1_ROOTDIR_ADDRESS + roff, 
+	    //            VOLUME1_ROOTDIR_LBA     + rlbaoff );
+					
+		my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 0, 0  );			
 				  
         roff = roff + 0x200;
         rlbaoff = rlbaoff + 1;	  		
@@ -555,8 +563,10 @@ done:
 	
 	    disk_ata_wait_irq ();
 		
-	    write_lba ( VOLUME1_FAT_ADDRESS + off, 
-	                VOLUME1_FAT_LBA     + lbaoff );
+	    //write_lba ( VOLUME1_FAT_ADDRESS + off, 
+	    //            VOLUME1_FAT_LBA     + lbaoff );
+		
+        my_write_hd_sector ( (unsigned long) VOLUME1_FAT_ADDRESS + off, (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 0, 0  );		
 				  
        off = off + 0x200;
        lbaoff = lbaoff + 1;	   
@@ -564,9 +574,11 @@ done:
 	
 	
     //#debug
-    printf("fsSaveFile: done \n"); 
+    printf("fsSaveFile: done hang \n"); 
     refresh_screen();	
     
+*/	
+	
 	return (int) 0;
 };
 

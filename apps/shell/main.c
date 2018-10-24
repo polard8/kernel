@@ -2984,7 +2984,7 @@ do_compare:
 	{
 		printf("t5: save file\n");
 		shell_save_file ();
-		
+		printf("t5: done\n");
         goto exit_cmp;
     };	
 
@@ -6422,7 +6422,7 @@ int shell_save_file (){
 				
 	//if (Ret == 0)
 	
-	printf("t5: done\n");	
+	printf("shell_save_file: done\n");	
 	
 	return (int) Ret;
 };
