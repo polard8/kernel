@@ -66,21 +66,23 @@ void procedureWindowWithFocusTest();
 void procedureGrid();
 
 
- void procTestF6()
- {
-	 
+void procTestF6()
+{	 
 	void *address = (void *) kmalloc (1024);
 	
 	unsigned char *buffer = (unsigned char *) address;
 
     
-
+    //tentando carregar setores específicos pra saber se a função está 
+	//carregando quanquer setor.
+	
 	//read test (buffer, lba, rw flag, port number )
-    pio_rw_sector ( (unsigned long) buffer, (unsigned long) 0, (int) 0x20, (int) 0 );	
+    pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x20, (int) 0 );	
 	 
+	printf("%s",buffer); 
 	 
-	printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
- }
+	//printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
+};
 
 
 /*
@@ -586,10 +588,11 @@ system_procedure ( struct window_d *window,
 				case VK_F6:
 					
 					
-										//1 = initialize.
+					//1 = initialize.
 					diskATADialog ( 1, FORCEPIO, FORCEPIO );
 					show_ide_info ();
-                    procTestF6();
+                    //rotina provisória de teste de read.
+					procTestF6();
                     					
 					
 					//

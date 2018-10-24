@@ -109,44 +109,44 @@ _turn_task_switch_off:
 
 
 ;; chanel 0, master, read sector
-global _ide_channel0_master_readsector
-_ide_channel0_master_readsector:
-    ret
+;global _ide_channel0_master_readsector
+;_ide_channel0_master_readsector:
+;    ret
 
 ;; channel 0, master write sector	
-global _ide_channel0_master_writesector
-_ide_channel0_master_writesector:
-    ret
+;global _ide_channel0_master_writesector
+;_ide_channel0_master_writesector:
+;    ret
 	
 ;; channel 0, slave, read sector	
-global _ide_channel0_slave_readsector
-_ide_channel0_slave_readsector:
-    ret
+;global _ide_channel0_slave_readsector
+;_ide_channel0_slave_readsector:
+;    ret
 		
 ;; channel 0, slave, write sector	
-global _ide_channel0_slave_writesector
-_ide_channel0_slave_writesector:
-    ret
+;global _ide_channel0_slave_writesector
+;_ide_channel0_slave_writesector:
+;    ret
 
 ;; chanel 1, master, read sector
-global _ide_channel1_master_readsector
-_ide_channel1_master_readsector:
-    ret
+;global _ide_channel1_master_readsector
+;_ide_channel1_master_readsector:
+;    ret
 	
 ;; channel 1, master write sector		
-global _ide_channel1_master_writesector
-_ide_channel1_master_writesector:
-    ret
+;global _ide_channel1_master_writesector
+;_ide_channel1_master_writesector:
+;    ret
 
 ;; channel 1, slave, read sector		
-global _ide_channel1_slave_readsector
-_ide_channel1_slave_readsector:
-    ret
+;global _ide_channel1_slave_readsector
+;_ide_channel1_slave_readsector:
+;    ret
 		
 ;; channel 1, slave, write sector		
-global _ide_channel1_slave_writesector
-_ide_channel1_slave_writesector:
-    ret
+;global _ide_channel1_slave_writesector
+;_ide_channel1_slave_writesector:
+;    ret
 	
 
 	

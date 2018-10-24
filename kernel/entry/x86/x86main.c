@@ -283,6 +283,8 @@ int x86main ( int argc, char *argv[] ){
 
 //initializeSystem:
 
+  
+
     systemSystem();	
     Status = (int) systemInit();
 	
@@ -469,7 +471,7 @@ int x86main ( int argc, char *argv[] ){
 //Kernel base Debugger.
 //doDebug:
 
-    Status = (int) debug();
+    Status = (int) debug ();
     
 	if ( Status != 0 )
 	{    
@@ -491,6 +493,8 @@ int x86main ( int argc, char *argv[] ){
     timer_cursor_status = 0;
 
 
+ 
+	
 //doTests:
    //...
 	
@@ -499,13 +503,7 @@ int x86main ( int argc, char *argv[] ){
     ps2();
 	
 	
-	//
-	// IN:
-	//    FORCEPIO = ATA driver operates in PIO mode.
-
-    //ATAMSG_INITIALIZE = 1
-    diskATADialog( 1, FORCEPIO, FORCEPIO );
-
+ 
     //
     // Loading file tests.
     //

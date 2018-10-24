@@ -430,6 +430,8 @@ int init_executive (){
     init_clock();
 	//...
 	
+	diskATADialog( 1, FORCEPIO, FORCEPIO );
+	
 	// ??
 	// configura a tabela do kernel de funções exportadas
 	// e tabela de ponteiros para tabelas dos outros programas em kernel mode.

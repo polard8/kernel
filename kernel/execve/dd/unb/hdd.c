@@ -178,6 +178,19 @@ void my_read_hd_sector ( unsigned long ax,
 						 unsigned long cx, 
 						 unsigned long dx )
 {
+	
+	// #IMPORTANTE:
+	//
+	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
+	// do IDE num momento específico da inicialização do sistema.
+	
+ 
+	// read test (buffer, lba, rw flag, port number )
+     pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
+ 
+	
+	/*
+	
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba = (unsigned long) bx;       //arg2 = lba.
@@ -187,6 +200,8 @@ void my_read_hd_sector ( unsigned long ax,
     
 	//#todo: deletar esse return.
 	//testar sem ele antes.
+	
+	*/
 	return;
 };
 

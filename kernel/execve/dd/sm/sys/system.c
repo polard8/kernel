@@ -2932,7 +2932,7 @@ int systemStartUp (){
 	    // Básico. ( Variáveis globais e estruturas ... ).
 	    printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
 #endif		
-        Status = (int) init(); 
+        Status = (int) init (); 
 	    if ( Status != 0 ){
 	        panic("sm-sys-system-systemStartUp error: init\n");
 	    }	
@@ -3019,6 +3019,7 @@ int systemInit (){
  * o construtor pode inicializar alguma variável.
  */
 void systemSystem (){
+	
     gSystemStatus = 1;
 };
 
