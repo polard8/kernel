@@ -203,8 +203,8 @@ _u8 ata_assert_dever(_i8 nport)
  * ide_identify_device:
  * 
  */
-int ide_identify_device( uint8_t nport )
-{
+int ide_identify_device ( uint8_t nport ){
+	
     _u8 status;
     _u8 lba1,lba2;
 
@@ -257,6 +257,13 @@ int ide_identify_device( uint8_t nport )
         ata_pio_read(ata_identify_dev_buf,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "PATAPI";			
+		ide_ports[nport].type = (int) idedevicetypesPATAPI;
         
         return 0x80;
    }
@@ -269,6 +276,13 @@ int ide_identify_device( uint8_t nport )
         ata_pio_read(ata_identify_dev_buf,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "SATAPI";	
+		ide_ports[nport].type = (int) idedevicetypesSATAPI;
 		
         return 0x80;
 
@@ -283,10 +297,15 @@ int ide_identify_device( uint8_t nport )
         ata_wait_not_busy();
         ata_wait_no_drq();
 		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "SATA";	
+		ide_ports[nport].type = (int) idedevicetypesSATA;
+		
         return 0;
    }
-
-
    else if(lba1 == 0 && lba2 == 0){
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
@@ -296,6 +315,13 @@ int ide_identify_device( uint8_t nport )
 
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+        //salvando o tipo em estrutura de porta.
+		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].used = (int) 1;
+		ide_ports[nport].magic = (int) 1234;
+		ide_ports[nport].name = "PATA";	
+		ide_ports[nport].type = (int) idedevicetypesPATA;
 		
         return 0;
     }
@@ -1434,15 +1460,31 @@ int diskATAInitialize ( int ataflag ){
 	//
     // Salvando informações.
     //	
+	
+	// Aqui estamos pegando informações na estrutura ata_pci sobre as BARs 
+	// e manipulando essas informações.
+	// ?? Não sei o que está fazendo aqui, talvez procurando endereço de porta.
 
     // Initialize base address
     // AHCI/IDE Compativel com portas IO IDE legado
-    ATA_BAR0 = ( ata_pci.bar0 & ~7   ) + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
-    ATA_BAR1 = ( ata_pci.bar1 & ~3   ) + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
-    ATA_BAR2 = ( ata_pci.bar2 & ~7   ) + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
-    ATA_BAR3 = ( ata_pci.bar3 & ~3   ) + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
-    ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
+	
+    ATA_BAR0 = ( ata_pci.bar0 & ~7 )   + ATA_IDE_BAR0 * ( !ata_pci.bar0 );
+    ATA_BAR1 = ( ata_pci.bar1 & ~3 )   + ATA_IDE_BAR1 * ( !ata_pci.bar1 );       
+    ATA_BAR2 = ( ata_pci.bar2 & ~7 )   + ATA_IDE_BAR2 * ( !ata_pci.bar2 );
+    ATA_BAR3 = ( ata_pci.bar3 & ~3 )   + ATA_IDE_BAR3 * ( !ata_pci.bar3 );
+    
+	ATA_BAR4 = ( ata_pci.bar4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.bar4 );
     ATA_BAR5 = ( ata_pci.bar5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.bar5 );
+	
+	//
+	// Colocando nas estruturas.
+	//
+	
+	ide_ports[0].base_port = (unsigned short) ATA_BAR0;
+	ide_ports[1].base_port = (unsigned short) ATA_BAR1;
+	ide_ports[2].base_port = (unsigned short) ATA_BAR2;
+	ide_ports[3].base_port = (unsigned short) ATA_BAR3;
+	//tem ainda a porta do dma na bar4
 
 	
 	//
@@ -1647,6 +1689,25 @@ void show_ide_info (){
 	
 	printf("sm-disk-disk-show_ide_info:\n");
 	
+	int i;
+	
+	for ( i=0; i<4; i++ )
+	{
+		printf("\n\n");
+		
+		printf ("id=%d\n", ide_ports[i].id );
+		
+		printf ("used=%d\n", ide_ports[i].used );
+		printf ("magic=%d\n", ide_ports[i].magic );
+		
+		printf ("type=%d\n", ide_ports[i].type );
+		
+		printf ("name=%s\n", ide_ports[i].name );
+		
+		printf ("base_port=%x\n", ide_ports[i].base_port );
+	}	
+	
+	/*
 	// Estrutura 'ata'
 	// Qual lista ??
 	
@@ -1667,7 +1728,7 @@ void show_ide_info (){
 		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
 	//};
 	
-	
+	*/
 	
 	// Estrutura 'atapi'
 	// Qual lista ??

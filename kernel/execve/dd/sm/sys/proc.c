@@ -571,16 +571,22 @@ system_procedure ( struct window_d *window,
                 //testes				
 				case VK_F6:
 					
-					init_nic ();
 					
+										//1 = initialize.
+					diskATADialog ( 1, FORCEPIO, FORCEPIO );
+					show_ide_info (); 		
+					
+					//
+					// NIC test
+					//
+					
+					//init_nic ();
 					//inicializando o controlador.
-					nic_i8254x_reset();
-					
+					//nic_i8254x_reset();
 					//vamos testar a rotina de configuração da transmissão.
-					nic_i8254x_transmit();
-
+					//nic_i8254x_transmit();
 					//vamos mostrar informações antes obtidas pelo sistema.
-					show_network_info ();
+					//show_network_info ();
 					
 					//show_current_nic_info ();
 					
