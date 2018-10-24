@@ -78,8 +78,9 @@ inline unsigned char inportb (int port){
 };
 
 
-void outportb(int port, int data){
-    asm(" outb %%al, %%dx " :: "a" (data), "d" (port) );
+void outportb ( int port, int data ){
+	
+    asm (" outb %%al, %%dx " :: "a" (data), "d" (port) );
 };
 
 

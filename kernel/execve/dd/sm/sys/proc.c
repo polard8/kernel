@@ -66,7 +66,21 @@ void procedureWindowWithFocusTest();
 void procedureGrid();
 
 
- 
+ void procTestF6()
+ {
+	 
+	void *address = (void *) kmalloc (1024);
+	
+	unsigned char *buffer = (unsigned char *) address;
+
+    
+
+	//read test (buffer, lba, rw flag, port number )
+    pio_rw_sector ( (unsigned long) buffer, (unsigned long) 0, (int) 0x20, (int) 0 );	
+	 
+	 
+	printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
+ }
 
 
 /*
@@ -574,7 +588,9 @@ system_procedure ( struct window_d *window,
 					
 										//1 = initialize.
 					diskATADialog ( 1, FORCEPIO, FORCEPIO );
-					show_ide_info (); 		
+					show_ide_info ();
+                    procTestF6();
+                    					
 					
 					//
 					// NIC test

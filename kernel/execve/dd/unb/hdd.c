@@ -67,6 +67,100 @@ int hddError;
 //...
 
 
+
+//interna
+static void hdd_ata_pio_read ( int p, void *buffer, int bytes ){
+	
+    __asm__ __volatile__ (\
+                "cld;\
+                rep; insw":: "D" (buffer),\
+                "d" ( ide_ports[p].base_port + 0 ),\
+                "c" (bytes/2));
+};
+
+/*
+ rw_sector
+ 
+ IN:
+    buffer - Buffer address
+	lba - LBA number 
+    rw - Flag read or write.	
+
+    //inline unsigned char inportb (int port)
+    //outportb ( int port, int data )
+	
+ */
+int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port ) 
+{
+	
+	unsigned long tmplba = (unsigned long) lba;
+	
+	
+	if ( port < 0 || port >= 4 )
+		return -1;
+	
+	
+	//0x01F6 ; Port to send drive and bit 24 - 27 of LBA
+	tmplba = tmplba >> 24;	
+	tmplba = tmplba | 0x000000E0; //1110 0000b;
+	outportb ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
+	
+	//0x01F2 ; Port to send number of sectors
+	outportb ( (int) ide_ports[port].base_port + 2 , (int) 1 );
+	
+	
+	//0x1F3  ; Port to send bit 0 - 7 of LBA
+	tmplba = lba;
+    tmplba = tmplba & 0x000000FF;	
+	outportb ( (int) ide_ports[port].base_port + 3 , (int) tmplba );
+	
+	
+	//0x1F4  ; Port to send bit 8 - 15 of LBA
+	tmplba = lba;
+	tmplba = tmplba >> 8;	
+    tmplba = tmplba & 0x000000FF;	
+	outportb ( (int) ide_ports[port].base_port + 4 , (int) tmplba );
+	
+
+	//0x1F5  ; Port to send bit 16 - 23 of LBA
+	tmplba = lba;
+	tmplba = tmplba >> 16;	
+    tmplba = tmplba & 0x000000FF;	
+	outportb ( (int) ide_ports[port].base_port + 5 , (int) tmplba );
+	
+	
+	// 0x1F7       ; Command port
+	//rw
+	rw = rw & 0x000000FF;	
+	outportb ( (int) ide_ports[port].base_port + 7 , (int) rw );
+	
+	
+	//
+	//
+	//
+	
+	unsigned char c; 
+	
+again:
+	
+	c = (unsigned char) inportb ( (int) ide_ports[port].base_port + 7);
+	
+	c = ( c & 8 );
+	
+	if ( c == 0 )
+	{
+	   goto again;	
+	}
+    
+	
+	//
+	// ler
+	//
+	
+	hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
+	
+    return 0;	
+} ;
  
 
 /*
