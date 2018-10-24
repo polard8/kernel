@@ -733,7 +733,8 @@ struct platform_d *Platform;
 //
 
 
-int kMain ( int argc, char **argv );
+int 
+kMain( int argc, char **argv );
 
 
 //

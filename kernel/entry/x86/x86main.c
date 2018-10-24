@@ -504,10 +504,7 @@ int x86main ( int argc, char *argv[] ){
 	//    FORCEPIO = ATA driver operates in PIO mode.
 
     //ATAMSG_INITIALIZE = 1
-    //Não inicializaremos no momento, para não termos problemas,
-	//estamos testando o driver usndo o procedimento de janela do sistema.
-	
-	//diskATADialog( 1, FORCEPIO, FORCEPIO );
+    diskATADialog( 1, FORCEPIO, FORCEPIO );
 
     //
     // Loading file tests.

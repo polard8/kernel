@@ -65,31 +65,31 @@
 #include <api.h>     //público, exportado para as aplicações.
 
 
-// Button pointers.
+//message box button pointer
 struct window_d *messagebox_button1;
 struct window_d *messagebox_button2;
+
+
 struct window_d *dialogbox_button1;
 struct window_d *dialogbox_button2;
 
 
 unsigned long 
-mbProcedure ( struct window_d *window, 
-              int msg, 
-   			  unsigned long long1, 
-			  unsigned long long2 );
-
-			  
+mbProcedure( struct window_d *window, 
+                     int msg, 
+   				     unsigned long long1, 
+					 unsigned long long2 );
+					 
 unsigned long 
-dbProcedure ( struct window_d *window, 
-              int msg, 
-   			  unsigned long long1, 
-			  unsigned long long2 );
-
-			  
+dbProcedure( struct window_d *window, 
+                     int msg, 
+   				     unsigned long long1, 
+					 unsigned long long2 );
+					 
 /*
- * system_call:  
- *
- *    Interrupção de sistema, número 200, chama vários serviços do kernel com 
+ ***********************************************************************
+ * system_call:  #ux4 (maior experiência)
+ *    Interrupção de sistema, número 200, chama vários serviços do Kernel com 
  * a mesma interrupção. Essa é a chamada mais simples.
  *
  * Argumentos:
@@ -98,12 +98,10 @@ dbProcedure ( struct window_d *window,
  *    ecx = arg3.
  *    edx = arg4.
  *
- * History:
- *     2015 - Created by Fred Nora.
- *     2016 ~ 2018 - New functions. 
- *     ...
+ * 2015 - Created.
+ * 2016 - Revisão.
+ * ...
  */
- 
 void *system_call ( unsigned long ax, 
                     unsigned long bx, 
 				    unsigned long cx, 
@@ -115,10 +113,11 @@ void *system_call ( unsigned long ax,
 	int RET = 0;	
 	//unsigned long RET = 0;
 	
-    // System interrupt. 	
+    //System interrupt. 	
 	asm volatile ("int %1 \n"
 	              : "=a"(RET)	
 		          : "i"(SYSTEM), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+    //Nothing.
 	
 	return (void *) RET; 
 };
@@ -665,40 +664,38 @@ void refresh_buffer (unsigned long n){
         //refresh buffer 1,2,3
         
 		case 1: 
-		    system_call ( 1, 0, 0, 0 ); 
+		    system_call( 1, 0, 0, 0); 
 			break;
-			
         case 2: 
-		    system_call ( 2, 0, 0, 0 ); 
+		    system_call( 2, 0, 0, 0); 
 			break;
-			
         case 3: 
-		    system_call ( 3, 0, 0, 0 ); 
+		    system_call( 3, 0, 0, 0); 
 			break;
                  
         //refresh screen     
         case 4: 
-		    system_call ( 4, 0, 0, 0 ); 
+		    system_call( 4, 0, 0, 0); 
 			break;
              
         //refresh title bar    
         case 5: 
-		    system_call ( 5, 0, 0, 0 ); 
+		    system_call( 5, 0, 0, 0); 
 			break;
                  
         //refresh menu bar     
         case 6: 
-		    system_call ( 6, 0, 0, 0 ); 
+		    system_call( 6, 0, 0, 0); 
 			break;
                  
         //refresh tollbar    
         case 7: 
-		    system_call ( 7, 0, 0, 0 ); 
+		    system_call( 7, 0, 0, 0); 
 			break;
                  
         //refresh status bar   
         case 8: 
-		    system_call ( 8, 0, 0, 0 ); 
+		    system_call( 8, 0, 0, 0); 
 			break;
 
         //refresh taskbar   
@@ -733,8 +730,10 @@ void print_string ( unsigned long x,
  *     Sincroniza o retraço vertical do monitor.  (rever)
  */
 int vsync (){
-
-    return (int) system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
+	
+	system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
+    
+	return (int) 0;
 };
 
 
@@ -747,12 +746,8 @@ int edit_box ( unsigned long x,
 			   unsigned long height, 
 			   unsigned long width)
 {
-	
-	//@todo: 
-	//Altura e largura negligenciados.
-    //Precismos de um array para enviarmos todos os argumentos necessários.
-	
-	system_call ( SYSTEMCALL_EDITBOX, x, y, 0 );
+	//@todo: Altura e largura negligenciados.
+    system_call ( SYSTEMCALL_EDITBOX, x, y, 0 );
 	
 	return (int) 0;
 };
@@ -765,9 +760,6 @@ int edit_box ( unsigned long x,
  *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
  */
 int chama_procedimento (unsigned long proximo_procedure){
-	
-	//#bugbug
-	//rever
 	
     system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
 	
@@ -783,9 +775,6 @@ int chama_procedimento (unsigned long proximo_procedure){
  */
 int SetNextWindowProcedure (unsigned long next_procedure){
 	
-	//#bugbug
-	//rever	
-	
     system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
     
 	return (int) 0;	
@@ -798,9 +787,11 @@ int SetNextWindowProcedure (unsigned long next_procedure){
  *     Interrupção 200, serviço SYSTEMCALL_SETCURSOR.  (rever)
  *     @todo: Criar o protótipo no header.
  */
-int set_cursor ( unsigned long x, unsigned long y ){
+int set_cursor (unsigned long x, unsigned long y){
 	
-	return (int) system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
+    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
+	
+	return (int) 0;
 };
 
 
@@ -837,11 +828,6 @@ void carrega_bitmap_16x16 ( unsigned long img_address,
                             unsigned long x, 
 						    unsigned long y )                           
 {
-	
-	//#bugbug 
-	//Não usaremos uma chama específica para bmp de 16x16.
-	//temos uma chamad genérica.
-	
     system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
 };
 
@@ -863,8 +849,6 @@ void apiShutDown (){
 	//Argumentos podem ser enviados.
     system_call ( SYSTEMCALL_SHUTDOWN, 0, 0, 0 );
 	
-	printf ("apiShutDown: fail");
-	
     while (1){
 		
         asm ("pause");
@@ -877,8 +861,6 @@ void apiShutDown (){
  *     Initialize default background configuration.  (rever)
  */
 void apiInitBackground (){
-	
-	//#bugbug: rever.
 	
     //@todo: Implementar.	
     //return;    //Não há uma chamada para isso ainda.            
@@ -1106,14 +1088,14 @@ exit_messagebox:
  */																
 unsigned long 
 mbProcedure( struct window_d *window, 
-             int msg, 
-   			 unsigned long long1, 
-			 unsigned long long2 )
+                     int msg, 
+   				     unsigned long long1, 
+					 unsigned long long2 )
 {
     switch (msg)
 	{
         case MSG_KEYDOWN:
-            switch (long1)
+            switch(long1)
             {
                 case VK_ESCAPE:	
 				    printf ("scape\n");
@@ -1128,7 +1110,7 @@ mbProcedure( struct window_d *window,
         break;
 	
         case MSG_SYSKEYDOWN:                 
-            switch (long1)	       
+            switch(long1)	       
             {	
 				//Test.
 				case VK_F1:
@@ -1161,8 +1143,7 @@ mbProcedure( struct window_d *window,
 	};
 	
 	
-//done:
-
+done:
 	//Refresh screen. 
 	//?? deletar.
 	//if(VideoBlock.useGui == 1){
@@ -1331,7 +1312,10 @@ int running = 1;
 	//
 	
     apiDrawText ( (struct window_d *) hWnd,
-        1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );	
+        1*(cx/16),
+        1*(cy/3),
+        COLOR_WINDOWTEXT,
+        string1	);	
 	
 	//#importante
 	refresh_screen ();		 
@@ -1342,10 +1326,10 @@ int running = 1;
 	
 	unsigned long message_buffer[5];	
 	
-	message_buffer[0] = 0;
-    message_buffer[1] = 0;
-    message_buffer[3] = 0;
-    message_buffer[4] = 0;	
+			message_buffer[0] = 0;
+            message_buffer[1] = 0;
+            message_buffer[3] = 0;
+            message_buffer[4] = 0;	
 		
 Mainloop:
 	
@@ -1385,22 +1369,21 @@ exit_dialogbox:
     return (int) Response;	
 };
 
-
 /*
  **************************************************
  * dbProcedure:
- *     O procedimento de janela do dialog box.
+ *     O procedimento padrão de message box.
  */																
 unsigned long 
-dbProcedure ( struct window_d *window, 
-              int msg, 
-   			  unsigned long long1, 
-			  unsigned long long2 )
+dbProcedure( struct window_d *window, 
+                     int msg, 
+   				     unsigned long long1, 
+					 unsigned long long2 )
 {
     switch (msg)
 	{
         case MSG_KEYDOWN:
-            switch (long1)
+            switch(long1)
             {
                 case VK_ESCAPE:	
 				    printf ("scape\n");
@@ -1415,7 +1398,7 @@ dbProcedure ( struct window_d *window,
         break;
 	
         case MSG_SYSKEYDOWN:                 
-            switch (long1)	       
+            switch(long1)	       
             {	
 				//Test.
 				case VK_F1:
@@ -1448,8 +1431,7 @@ dbProcedure ( struct window_d *window,
 	};
 	
 	
-//done:
-
+done:
 	//Refresh screen. 
 	//?? deletar.
 	//if(VideoBlock.useGui == 1){
@@ -1681,18 +1663,18 @@ int call_gui ( unsigned long int_number,
  * CONTINUA ...
  *
  */
-void *APICreateWindow ( unsigned long type,        //1, Tipo de janela (popup,normal,...)
-                        unsigned long status,      //2, Estado da janela (ativa ou nao)
-                        unsigned long view,        //3, (min, max ...)
-                        char *windowname,          //4, Título.                          
-                        unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
-                        unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
-                        unsigned long width,       //7, Largura da janela.
-                        unsigned long height,      //8, Altura da janela.
-                        struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
-                        unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
-                        unsigned long clientcolor, //11, Cor da área de cliente
-                        unsigned long color )      //12, Color (bg) (para janela simples).
+void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,normal,...)
+                       unsigned long status,      //2, Estado da janela (ativa ou nao)
+                       unsigned long view,        //3, (min, max ...)
+                       char *windowname,          //4, Título.                          
+                       unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+                       unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
+                       unsigned long width,       //7, Largura da janela.
+                       unsigned long height,      //8, Altura da janela.
+                       struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
+                       unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
+                       unsigned long clientcolor, //11, Cor da área de cliente
+                       unsigned long color )      //12, Color (bg) (para janela simples).
 { 
 	struct window_d *Window;
 	
@@ -1766,16 +1748,16 @@ done:
 int APIRegisterWindow (struct window_d *window){
     
     // @todo: Filtrar argumento.	
-
-    if ( (void *) window == NULL )
-    {
-        return (int) 1;
-    };
-
-    return (int) system_call ( SYSTEMCALL_REGISTERWINDOW, 
-                    (unsigned long) window, 
-                    (unsigned long) window, 
-                    (unsigned long) window);
+	
+	if ( (void *) window == NULL )
+	{
+		return (int) 1;
+	};		
+	
+    system_call ( SYSTEMCALL_REGISTERWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window);
+		
+    return (int) 0;	
 };
 
 
@@ -1792,10 +1774,10 @@ int APICloseWindow (struct window_d *window){
 		return (int) 1;
 	};		
 	
-    return (int) system_call ( SYSTEMCALL_CLOSEWINDOW, 
-	                (unsigned long) window, 
-		            (unsigned long) window, 
-					(unsigned long) window );	
+    system_call ( SYSTEMCALL_CLOSEWINDOW, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window );	
+    
+	return (int) 0;	
 };
 
 
@@ -1812,8 +1794,10 @@ int APISetFocus (struct window_d *window){
 		return (int) 1;
 	};		
 	
-    return (int) system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
-                     (unsigned long) window, (unsigned long) window );
+    system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
+		(unsigned long) window, (unsigned long) window );
+		
+    return (int) 0;	
 };
 
 
@@ -1822,8 +1806,8 @@ int APISetFocus (struct window_d *window){
  *     Get Focus.
  */
 int APIGetFocus (){
-
-    return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );
+	
+    return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
 };
 
 
@@ -1840,8 +1824,10 @@ int APIKillFocus (struct window_d *window){
 		return (int) 1;
 	};	
 	
-    return (int) system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
+    system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
+		
+    return (int) 0;	
 };
 
 
@@ -1859,8 +1845,10 @@ int APISetActiveWindow (struct window_d *window){
 		return (int) 1;
 	};
 	
-    return (int) system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
+    system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
+		
+    return (int) 0;	
 };
 
 
@@ -2240,14 +2228,13 @@ void apiDown (struct semaphore_d *s){
 	
 	int Status = 1;    //fail.
 	
-	if ( (void *) s == NULL  )
+	if( (void*) s == NULL  )
 	{
 	    //Semáforo inválido, 
         //Bloquear a thread, não adianta fazer a system call.
         //@todo: Chamar rotina que bloqueia a thread.
 		
 		printf ("apiDown: *fail");
-		
 		while (1){
 		    
             asm ("pause");			
@@ -2267,12 +2254,12 @@ tryAgain:
     //1 = algo deu errado espere tentando novamente.
     
 	//Podemos entrar na região crítica.
-	if (Status == 0){
+	if(Status == 0){
 		return;
 	};
 	
 	//Devemos esperar, monitorando a flag ou bloquando a thread.
-	if (Status = 1)
+	if(Status = 1)
 	{
 		//
 		// Opções:
@@ -2304,7 +2291,6 @@ void apiUp (struct semaphore_d *s){
         //@todo: Chamar rotina que bloqueia a thread.
 		
 		printf ("apiUp: *fail");
-		
 		while (1){
 		    
             asm ("pause");			
@@ -2370,14 +2356,12 @@ done:
 	return;
 };
 
-
 //V (Verhogen)incrementar.
 void exitCriticalSection (){
 	
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
-
 
 void initializeCriticalSection (){
 	
@@ -2414,6 +2398,7 @@ int getpid(){
 */
 
 
+
 /*
  * apiDefDialog:
  *     Procedimento de janela adiado. 
@@ -2421,10 +2406,10 @@ int getpid(){
  * seus procedimentos de janela.
  */
 unsigned long 
-apiDefDialog ( struct window_d *window, 
-               int msg, 
-			   unsigned long long1, 
-			   unsigned long long2 )
+apiDefDialog( struct window_d *window, 
+              int msg, 
+			  unsigned long long1, 
+			  unsigned long long2 )
 {
     
     //#todo
@@ -2676,8 +2661,7 @@ apiDisplayBMP ( char *address,
 	unsigned long *palette = (unsigned long *) (address + 0x36);		
 	unsigned char *palette_index = (unsigned char *) &pal_address;	
 	
-	unsigned short sig;
-	 
+	
 	// Limits
 	
 	xLimit = 800;
@@ -2720,6 +2704,8 @@ apiDisplayBMP ( char *address,
 	// Signature.
 	//
 	
+    unsigned short sig;
+	
 	sig = *( unsigned short * ) &bmp[0];
 	
 	bh->bmpType = sig;
@@ -2739,7 +2725,7 @@ apiDisplayBMP ( char *address,
 	//
 	
 	//Windows bmp.
-	bi = (struct bmp_infoheader_d *) malloc ( sizeof(struct bmp_infoheader_d) );
+	bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
 	
     if ( (void *) bi == NULL )
 	{
@@ -2782,8 +2768,8 @@ apiDisplayBMP ( char *address,
 	// Draw !
 	//
 	
-	left = x;    
-	top = y; 
+	left = x;    //
+	top  = y; 
 	
 	
 	//bottom = top + height;
@@ -3021,10 +3007,11 @@ unsigned long apiSendMessage ( struct window_d *window,
 	
 	
 	return (unsigned long) system_call ( 114 , 
-	                        (unsigned long) &message_buffer[0], 
-							(unsigned long) &message_buffer[0], 
-							(unsigned long) &message_buffer[0] );	
+	                                     (unsigned long) &message_buffer[0], 
+										 (unsigned long) &message_buffer[0], 
+										 (unsigned long) &message_buffer[0] );	
 };	
+
 
 
 int apiDrawText ( struct window_d *window, 
@@ -3043,13 +3030,11 @@ int apiDrawText ( struct window_d *window,
 	msg[4] = (unsigned long) string;
 	//...
 	
-	return (int) system_call ( SYSTEMCALL_DRAWTEXT, 
+	return (int) system_call ( SYSTEMCALL_DRAWTEXT , 
 	                (unsigned long) &msg[0], 
 					(unsigned long) &msg[0], 
 					(unsigned long) &msg[0] );		
 };
-
-
 //
 // End.
 //

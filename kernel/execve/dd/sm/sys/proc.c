@@ -570,37 +570,22 @@ system_procedure ( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-				
 					
-					//
-					// IDE test
-					//
+					init_nic ();
 					
-					//#test testando inicialização do IDE, #funcionou.
-					
-					//1 = initialize.
-					diskATADialog ( 1, FORCEPIO, FORCEPIO );
-					show_ide_info (); 					
-					
-					//ata_initialize();
-					//diskATAInitialize (FORCEPIO);
-					
-
-				
-					
-					//
-					// NIC test
-					//
-					
-					//init_nic ();
 					//inicializando o controlador.
-					//nic_i8254x_reset();
+					nic_i8254x_reset();
+					
 					//vamos testar a rotina de configuração da transmissão.
-					//nic_i8254x_transmit();
+					nic_i8254x_transmit();
+
 					//vamos mostrar informações antes obtidas pelo sistema.
-					//show_network_info ();
+					show_network_info ();
+					
 					//show_current_nic_info ();
 					
+					//#test
+					//nic_test1();
 					
 					//#test
 					//fsList("volume1");
@@ -616,6 +601,17 @@ system_procedure ( struct window_d *window,
 				    //vfsListFiles();
 					//vfsShowVFSInfo();
 					
+					//#test testando inicialização do IDE, #funcionou.
+					//ata_initialize();
+					//show_ide_info(); //(#teste)
+					
+					//if(AltStatus == 1){ window_with_focus = 6; break;};
+					//if(CtrlStatus == 1){ active_window = 6; break;};
+			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
+					
+					//habilitando o cursor.
+					//timer_cursor_used = 1;
+					//timer_cursor_status = 0;
 					
 					
 				    //testingFrameAlloc();

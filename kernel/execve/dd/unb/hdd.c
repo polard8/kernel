@@ -59,14 +59,7 @@ extern void reset_ide0();
 extern unsigned long hd_buffer;
 extern unsigned long hd_lba;
 
-//suporte ao read sector. usado no assembly.
-extern unsigned long read_port_drive_and_lba_24_27;
-extern unsigned long read_port_nos;
-extern unsigned long read_port_lba_0_7;
-extern unsigned long read_port_lba_8_15;
-extern unsigned long read_port_lba_16_23;
-extern unsigned long read_port_cmd;
-extern unsigned long read_port_data;
+
 
 //Variáveis internas
 int hddStatus;
@@ -74,28 +67,6 @@ int hddError;
 //...
 
 
-void initialize_ide_ports (){
-	
-	int i;
-	
-	for ( i=0; i<4; i++ )
-	{
-	    ide_ports[i].id = (int) i;
-        
-		//Só iremos habilitar quando o dispositivo for encontrado.
-		ide_ports[i].used = 0;
-        ide_ports[i].magic = 0;
-        
-		ide_ports[i].type = -1;	
-
-        ide_ports[i].name = "NO NAME";		
-		
-		ide_ports[i].base_port = (unsigned short) 0;
-		
-		//...
-		
-	};
-};
  
 
 /*
@@ -116,122 +87,6 @@ void my_read_hd_sector ( unsigned long ax,
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba = (unsigned long) bx;       //arg2 = lba.
-	
-	
-	// #importante:
-	// O QUE INDICA EM QUAL DISCO SERÁ ESCRITO É O CONJUNTO DE PORTAS.
-	// DISCO TEM SEU CONJUNTO DE PORTAS.
-	
-	//cada disco terá um conjunbto diferente de portas.
-	//criar um argumento que seleciona o disco.
-	
-    //suporte ao read sector. usado no assembly.
-    
-	//0 primary master 
-	//1 primary slave 
-	//2 secondary master 
-	//3 secondary slave.
-	
-	int current_port = 0;  
-	
-	//#importante:
-	//Criar função getCurrentPost()
-	
-	//current_port = (int) IDE.current_port;
-	current_port = (int) ideportsPrimaryMaster;
-	
-	
-	if (current_port < 0 || current_port >= 4)
-	{
-		//fail 
-		
-		printf("my_read_hd_sector: current_port fail");
-		die();
-	}
-	
-	
-	// #importante:
-	// Se temos uma currente port válida.
-	
-	read_port_drive_and_lba_24_27 = ide_ports[current_port].base_port + 6;  // 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-    read_port_nos                 = ide_ports[current_port].base_port + 2;  // 0x01F2;  // ; Port to send number of sectors
-    read_port_lba_0_7             = ide_ports[current_port].base_port + 3;  // 0x1F3;   //  ; Port to send bit 0 - 7 of LBA
-    read_port_lba_8_15            = ide_ports[current_port].base_port + 4;  // 0x1F4;   // ; Port to send bit 8 - 15 of LBA
-    read_port_lba_16_23           = ide_ports[current_port].base_port + 5;  // 0x1F5 ;  //  ; Port to send bit 16 - 23 of LBA
-    read_port_cmd                 = ide_ports[current_port].base_port + 7;  // 0x1F7;   //  ; Command port  ; Data port
-    read_port_data                = ide_ports[current_port].base_port + 0;  //0x1F0;
-			
-	
-	
-	
-	//#importante
-	//#todo: 
-	// + o número da porta deve vir via argumento.
-	// + os números das portas devem estar configurados em estrutura. 
-	// o número da porta pode estar na estrutura também.
-	
-    /*	
-	
-	switch (current_port)
-	{
-		case ideportsPrimaryMaster:
-	        
-			//read_port_drive_and_lba_24_27 = ide_ports[current_port].base_port + 6;// 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-           // read_port_nos = ide_ports[current_port].base_port + 2; // 0x01F2;                  // ; Port to send number of sectors
-            //read_port_lba_0_7 = ide_ports[current_port].base_port + 3; // 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
-           // read_port_lba_8_15 = ide_ports[current_port].base_port + 4; // 0x1F4;              // ; Port to send bit 8 - 15 of LBA
-           // read_port_lba_16_23 = ide_ports[current_port].base_port + 5; // 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
-           // read_port_cmd = ide_ports[current_port].base_port + 7; // 0x1F7;                   //  ; Command port  ; Data port
-           // read_port_data = ide_ports[current_port].base_port + 0;  //0x1F0;
-		
-	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
-            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
-            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
-            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
-            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
-            read_port_data = 0x1F0;
-		    break;
-		
-		case ideportsPrimarySlave:
-	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
-            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
-            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
-            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
-            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
-            read_port_data = 0x1F0;
-		
-		    break;
-
-		case ideportsSecondaryMaster:
-	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
-            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
-            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
-            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
-            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
-            read_port_data = 0x1F0;
-		
-		    break;
-
-		case ideportsSecondarySlave:
-	        read_port_drive_and_lba_24_27 = 0x01F6;  //; Port to send drive and bit 24 - 27 of LBA
-            read_port_nos = 0x01F2;                  // ; Port to send number of sectors
-            read_port_lba_0_7 = 0x1F3;               //  ; Port to send bit 0 - 7 of LBA
-            read_port_lba_8_15 = 0x1F4;              // ; Port to send bit 8 - 15 of LBA
-            read_port_lba_16_23 = 0x1F5 ;            //  ; Port to send bit 16 - 23 of LBA
-            read_port_cmd = 0x1F7;                   //  ; Command port  ; Data port
-            read_port_data = 0x1F0;
-		
-		    break;
-
-	    //ERROR
-	    default:
-		    break;
-	};
-	
-	*/
 	
 	// Read sector. (ASM)
 	os_read_sector(); 	
@@ -282,31 +137,11 @@ int init_hdd (){
     //
     // @todo: We need to do something here.
     //	
-	
-	
-	initialize_ide_ports ();
 
-
-    //
-    // IDE struct
-    //	
-	
-	IDE.primary_master = NULL;
-	IDE.primary_slave = NULL;
-	IDE.secondary_master = NULL;
-	IDE.secondary_slave = NULL;
-	
-	
-	//
-	// #importante:
-	// Estamos determinando qual é a porta atual.
-	// Mas precisamos de algum jeito de obter isso.
-	// o boot loader deve passar essa informação.
-	//
-	
-	IDE.current_port = ideportsPrimaryMaster;
+//done:
 
     g_driver_hdd_initialized = (int) 1;
+    
 	return (int) 0;
 };
 
