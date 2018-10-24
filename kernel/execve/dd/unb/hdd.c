@@ -78,6 +78,59 @@ static void hdd_ata_pio_read ( int p, void *buffer, int bytes ){
                 "c" (bytes/2));
 };
 
+
+void hdd_ata_pio_write ( int p, void *buffer, int bytes ){
+	
+    __asm__ __volatile__ (\
+                "cld;\
+                rep; outsw"::"S"(buffer),\
+                "d"( ide_ports[p].base_port + 0 ),\
+                "c"(bytes/2));
+};
+
+
+uint8_t hdd_ata_status_read(int p)
+{
+    //#bugbug: 
+	//rever o offset
+   	
+	//return inb(ata[p].cmd_block_base_addr + ATA_REG_STATUS);
+    return (uint8_t) inportb ( (int) ide_ports[p].base_port + 7);
+
+}
+ 
+ int hdd_ata_wait_not_busy(int p)
+{
+    while( hdd_ata_status_read(p) & ATA_SR_BSY )
+    if ( hdd_ata_status_read(p) & ATA_SR_ERR )
+        return 1;
+
+    return 0;
+}
+
+void hdd_ata_cmd_write( int port, int cmd_val)
+{
+           
+    	// no_busy      	
+	hdd_ata_wait_not_busy(port);
+	
+	//outb(ata.cmd_block_base_address + ATA_REG_CMD,cmd_val);
+	
+	outportb ( (int) ide_ports[port].base_port + 7 , (int) cmd_val );
+	
+	ata_wait(400);  // Esperamos 400ns
+}
+
+
+int hdd_ata_wait_no_drq(int p)
+{
+    while( hdd_ata_status_read(p) &ATA_SR_DRQ)
+    if(hdd_ata_status_read(p) &ATA_SR_ERR)
+    return 1;
+
+    return 0;
+}
+
 /*
  rw_sector
  
@@ -153,12 +206,39 @@ again:
 	}
     
 	
-	//
-	// ler
-	//
 	
-	hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
+	switch (rw)
+    {
+		//read
+	    case 0x20:
+		    hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
+		    break;
+        
+		//write
+		case 0x30:
+		    hdd_ata_pio_write ( (int) port, (void *) buffer, (int) 512 );
+			
+            //Flush Cache
+    
+	        //ata_cmd_write(p,ATA_CMD_FLUSH_CACHE);
+	        hdd_ata_cmd_write( (int) port, (int) ATA_CMD_FLUSH_CACHE );
+            hdd_ata_wait_not_busy(port);
+            if ( hdd_ata_wait_no_drq(port) != 0)
+	        {
+                return -1;
+            }	
+			break;
+        
+		//fail
+		default:
+            printf ("pio_rw_sector: fail *hang");
+			die();
+			break; 		
+	};
 	
+	
+  
+		
     return 0;	
 } ;
  

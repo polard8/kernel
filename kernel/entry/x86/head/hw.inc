@@ -692,6 +692,7 @@ _irq13:
 ;     (ATA interface usually serves hard disk 
 ; drives and CD drives) 
 ; ;O timer precisa ser desbilitado. ??
+; \3rdparty\kernel\disk\disk1.c
 ;
 extern _diskATAIRQHandler1
 global _irq14
@@ -715,6 +716,7 @@ _irq14:
 ;     Tratador de interrupções para unidade slave.
 ;     IRQ 15 – secondary ATA channel
 ; ; ;O timer precisa ser desbilitado. ??
+; \3rdparty\kernel\disk\disk1.c
 ;
 extern _diskATAIRQHandler2
 global _irq15

@@ -169,9 +169,19 @@ fsSaveFile ( char *file_name,
              char flag )  
 {
 	
-	printf ("ds-fsSaveFile: #todo \n");
+	printf ("ds-fsSaveFile:  \n");
 	
-/*	
+	
+	//info
+	//me parece que todas as informações estão chegando aqui corretas.
+	//
+	
+	//#debug:
+	printf ("name=%s  \n", file_name ); //o nome está salvando corretamente;
+	printf ("size=%d  \n", file_size );
+	printf ("nbytes=%d  \n",size_in_bytes);
+	printf ("address=%x  \n",file_address);
+	printf ("flag=%x \n", flag);
 	
 	int Status = 0;
 	
@@ -331,7 +341,7 @@ save_file:
 	Entry[15] = 0xb6;
 	
 	// Creation date.
-	Entry[16] = 0xb8;
+	Entry[16] = 0xb6;
 	Entry[17] = 0x4c;
 	
 	// Access date.
@@ -349,7 +359,7 @@ save_file:
 	Entry[23] = 0x49;
 	
 	// Modifield date.
-	Entry[24] = 0xb7;
+	Entry[24] = 0xb8;
 	Entry[25] = 0x4c;
 	
 	// First cluster. Low word.
@@ -496,13 +506,20 @@ done:
     refresh_screen();
 	
 	
+	
+	
 	int r;
     int roff = 0;
     int rlbaoff = 0;	
 	
 	//int ticks = 1000;
 	
-	for ( r=0; r<3; r++ )
+	
+    //
+    //#bugbug: precisamos saber o tamanho do root ... precismos de estrututra de root	
+	//	
+	
+	for ( r=0; r<32; r++ )
 	{
 	    //reset_ide0 ();
         
@@ -550,9 +567,13 @@ done:
 
 	int f;
     int off = 0;
-    int lbaoff = 0;	
+    int lbaoff = 0;
+
+    //
+    //#bugbug: precisamos saber o tamanho da fat ... precismos de estrututra de fat	
+	//
 	
-	for ( f=0; f<8; f++ )
+	for ( f=0; f<32; f++ )
 	{
 	   //#bugbug:
        //pelo jeito a rotina de salvamento precisa de 
@@ -577,7 +598,6 @@ done:
     printf("fsSaveFile: done hang \n"); 
     refresh_screen();	
     
-*/	
 	
 	return (int) 0;
 };

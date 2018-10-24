@@ -1661,8 +1661,8 @@ done:
  * diskATAIRQHandler1
  *     irq 14 handler
  */
-void diskATAIRQHandler1()
-{
+void diskATAIRQHandler1 (){
+	
     ata_irq_invoked = 1;  
 };
 
@@ -1672,8 +1672,8 @@ void diskATAIRQHandler1()
  * diskATAIRQHandler2
  *     irq 15 handler
  */
-void diskATAIRQHandler2()
-{
+void diskATAIRQHandler2 (){
+	
     ata_irq_invoked = 1;   
 };
 
