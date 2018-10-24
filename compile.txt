@@ -1,12 +1,12 @@
-** Compiling and Running **
-========================
+    Compiling and Running
+
+
 
 ** Window 7 32 bit **
 ==============================
 
 Tools:
 ======
-
 gcc 3.4.2 mingw-special
 nasm 2.05.01
 ld 2.19
@@ -15,18 +15,16 @@ imdisk 2.0.9
 
 Compiling the kernel file:
 ===========================
-
 run gramado/kernel/build.bat
 
 Creating the virtual disk:
 ============================
-
 run gramado/arch/x86/boot/vhd/buid.bat as administrator.
 
 Run the .VHD file on Oracle Virtual Box.
 Use IDE channel 0, master.
 
+
 ** Linux ** 
 =================
-
 make compile
