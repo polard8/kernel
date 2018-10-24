@@ -2,10 +2,13 @@
     Main folders for Gramado Operating System.
 
 
+
 //3rdparty - This Fred Nora does not have the copyright.
+
 
 //(super)
 /allegory   - Spiritual quotes and not productive stuff.
+
 
 
 //(realtions of production)
@@ -23,8 +26,10 @@
 /tests    - Apps.
 
 
+
 //(material productive forces)
 */tools    - Different tools. 
+
 
 
 //(User ideas, human action)
