@@ -161,6 +161,8 @@ struct ide_d
     // devemos colocar aqui um ponteiro para estrutura de informações 
     // sobre o dispositivo controlador de ide.	
 	
+    int current_port;
+	
     struct ide_ports_d *primary_master; 
     struct ide_ports_d *primary_slave; 
     struct ide_ports_d *secondary_master; 
