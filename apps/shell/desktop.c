@@ -32,12 +32,15 @@ char *primary_desktop_folder = PDESKTOPFOLDER;
 #endif
 char *secondary_desktop_folder = SDESKTOPFOLDER;
 
-int desktopInitialize()
-{
+
+
+int desktopInitialize (){
+	
 	printf("Initializing desktop ...\n");
 	printf("%s\n",primary_desktop_folder);
     printf("%s\n",secondary_desktop_folder);	
+	
 	return 0;
-}
+};
 
 

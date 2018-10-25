@@ -1,21 +1,10 @@
 /*
- * File: sm\disk\disk.c 
- * 
- * Descrição:
- *     Gerenciador de discos. 
- *     Arquivo principal do Disk Manager.
- *     MB - Módulos incluídos no Kernel Base.
+ * File: disk1.c
  *
- *     O Gerenciador de Discos é um módulo muito importante do Kernel.
+ * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
+ * para suporte à IDE/AHCI.
  *
- * Credits:
- *     Some IDE/SATA support - Nelson Cole.
- *
- * History:
- *     2015 - Created by Fred Nora.
- *     2018 - IDE COntroller by Nelson Cole.
- *            Revision.
- *
+ * 2018 - Created by Nelson Cole. 
  */
 
  
@@ -45,49 +34,45 @@ extern st_dev_t *current_dev;
 static _u32 ata_irq_invoked = 0;
 
 
-int disk_get_ata_irq_invoked ()
-{
+int disk_get_ata_irq_invoked (){
+	
 	return (int) ata_irq_invoked;
-}
+};
 
-void disk_reset_ata_irq_invoked ()
-{
+
+void disk_reset_ata_irq_invoked (){
+	
 	ata_irq_invoked = 0;
-}
+};
 
-
-
-_void ata_wait (_i32 val){
+void ata_wait (_i32 val){
 	
    val /= 100;
    
+   //while(val--)delay();   
    while(val--)io_delay();
-   //while(val--)delay();
-}
-
+};
 
 
 // TODO: Nelson, ao configurar os bits BUSY e DRQ 
 // devemos verificar retornos de erros.
-_u8 ata_wait_not_busy()
-{
+_u8 ata_wait_not_busy (){
+	
     while(ata_status_read() &ATA_SR_BSY)
     if(ata_status_read() &ATA_SR_ERR)
     return 1;
 
     return 0;
+};
 
-}
-
-_u8 ata_wait_busy()
-{
+_u8 ata_wait_busy (){
+	
     while(!(ata_status_read() &ATA_SR_BSY))
     if(ata_status_read() &ATA_SR_ERR)
     return 1;
 
     return 0;
-
-}
+};
 
 
 _u8 ata_wait_no_drq()
@@ -164,10 +149,10 @@ void ata_cmd_write(_i32 cmd_val)
 
 
 
-_u8 ata_assert_dever(_i8 nport)
-{
+_u8 ata_assert_dever (_i8 nport){
 
-    switch(nport){
+    switch (nport){
+		
     case 0:
         ata.channel = 0;
         ata.dev_num = 0;
@@ -184,18 +169,17 @@ _u8 ata_assert_dever(_i8 nport)
         ata.channel = 1;
         ata.dev_num = 1;
     break;
-    default:
+    
+	default:
         kprintf("Port %d, volue not used\n",nport);
         return -1;
      break;
-    }
+    };
 
     set_ata_addr(ata.channel);
 
-
     return 0;
-
-}
+};
 
 
 /*
@@ -332,10 +316,6 @@ done:
 };
 
 
-
-
-
-
 /* *
  * Copyright (C) 2017-2018 (Nelson Sapalo da Silva Cole)
  * Khole OS v0.3
@@ -374,10 +354,8 @@ static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Addres
 
 
 
- 
-
-void set_ata_addr(int channel)
-{
+void set_ata_addr (int channel){
+	
 	//
 	// @todo:
 	// Checar a validade da estrutura.
@@ -435,10 +413,9 @@ uint32_t  dev_next_pid = 0;  // O próximo ID de unidade disponível.
  * armazenamento de dados.
  *
  */
-void ide_mass_storage_initialize()
-{
-	int port;
+void ide_mass_storage_initialize (){
 	
+	int port;
 
     //
     // Vamos trabalhar na lista de dispositivos.
@@ -589,7 +566,7 @@ int ide_dev_init(char port)
 	// port
 	//
 	
-	switch( port )
+	switch ( port )
 	{
         case 0:
             dev_nport.dev0 = 0x81;
@@ -721,24 +698,24 @@ done:
  *
  */
 
-void ata_pio_read( void *buffer, _i32 bytes )
-{
-    __asm__ __volatile__(\
+void ata_pio_read ( void *buffer, _i32 bytes ){
+	
+    __asm__ __volatile__ (\
                 "cld;\
                 rep; insw"::"D"(buffer),\
                 "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2));
+                "c"(bytes/2) );
 				
 };
 
 
-void ata_pio_write( void *buffer, _i32 bytes )
-{
-    __asm__ __volatile__(\
+void ata_pio_write ( void *buffer, _i32 bytes ){
+	
+    __asm__ __volatile__ (\
                 "cld;\
                 rep; outsw"::"S"(buffer),\
                 "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2));
+                "c"(bytes/2) );
 
 };
 
@@ -762,19 +739,14 @@ extern uint8_t *dma_addr;
  *
  *
  */
-static inline void atapi_pio_read( void *buffer, uint32_t bytes )
-{
-    __asm__ __volatile__(\
+static inline void atapi_pio_read ( void *buffer, uint32_t bytes ){
+	
+    __asm__ __volatile__ (\
                 "cld;\
                 rep; insw"::"D"(buffer),\
                 "d"(ata.cmd_block_base_address + ATA_REG_DATA),\
-                "c"(bytes/2));
-
+                "c"(bytes/2) );
 };
-
-
- 
-
 
 
 /* *
@@ -796,8 +768,8 @@ _u8 *dma_addr;
  *
  *
  */
-static inline _void ata_set_device_and_sector( _u32 count, _u64 addr,\
-                                               _i32 access_type, _i8 nport )
+static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
+                                                _i32 access_type, _i8 nport )
 {
     ata_assert_dever(nport);
 
@@ -805,7 +777,7 @@ static inline _void ata_set_device_and_sector( _u32 count, _u64 addr,\
 	// Access type.
 	//
 	
-    switch( access_type )
+    switch ( access_type )
 	{
 	    case 28:
             //Mode LBA28
@@ -857,13 +829,7 @@ static inline _void ata_set_device_and_sector( _u32 count, _u64 addr,\
         // Default ??
 
     };
-       
-//done:
-    // ??
 };
-
-
- 
 
 
 /**
@@ -911,8 +877,10 @@ static inline _void ata_set_device_and_sector( _u32 count, _u64 addr,\
  *
  */
 struct {
+	
     uint32_t addr;
     uint32_t len;
+	
 }ide_dma_prdt[4];
 
 
@@ -999,9 +967,9 @@ done:
  * ide_dma_read_status:
  *     DMA read status.
  */
-int ide_dma_read_status()
-{
-    return inb( ata.bus_master_base_address + ide_dma_reg_status );
+int ide_dma_read_status (){
+	
+    return inb ( ata.bus_master_base_address + ide_dma_reg_status );
 };
 
 
@@ -1619,12 +1587,12 @@ done:
  * diskATADialog:
  *     Rotina de diálogo com o driver ATA.
  */
-int diskATADialog( int msg, 
-                   unsigned long long1, 
-				   unsigned long long2 )
+int 
+diskATADialog ( int msg, 
+                unsigned long long1, 
+				unsigned long long2 )
 {
-    int Status = 1; //erro
-	
+    int Status = 1;    //Error.	
 	
     switch (msg)
     {

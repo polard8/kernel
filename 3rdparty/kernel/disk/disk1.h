@@ -1,3 +1,12 @@
+/*
+ * File: disk1.h
+ *
+ * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
+ * para suporte à IDE/AHCI.
+ *
+ * 2018 - Created by Nelson Cole. 
+ */
+
 
 // nelson cole
 // suporte a disco.

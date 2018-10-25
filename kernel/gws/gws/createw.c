@@ -961,6 +961,7 @@ drawBegin:
 		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; 
 	    
 		// O argumento 'color' será a cor do bg para alguns tipos.
+		// Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
 		if( (unsigned long) type == WT_SIMPLE ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
 		if( (unsigned long) type == WT_EDITBOX){ window->color_bg = color; }
@@ -979,58 +980,15 @@ drawBegin:
         //...		
 	};
 	
-	// ## Border ##
-	// BORDA COLOR_INACTIVEBORDER 
-	// Borda para as janelas.
-	// Obs: As bordas dependem do tipo de janela e do 
-	// estilo de janela.
-	
-	//vamos pintar a borda de acordo com o status da janela.
-	//se a janela for um botão, e pintarmos essa borda, 
-	//na hora de desenhar o botão essa borda vai desaparecer.
-	//para isso podemos simplesmente, desenha um botão menor que 
-	//a janela dele.
-	
-	if ( Border == 1 )
-	{
-		//flag.
-		window->borderUsed = 1;
-		
-		// A largura da borda pode sinalizar o status (ativo ou inativo) 
-		// de uma caixa de edição.
-		
-		if ( status == 0 ){ 
-		    border_size = 1;
-            border_color = COLOR_INACTIVEBORDER; 			
-		}
-		
-		if ( status == 1 ){ 
-		    border_size = 2; 
-		    border_color = COLOR_BLUE;
-		}
-		//if( status == 2 ){ border_size = 3; } //just for fun
-		
-	    //board1, borda de cima e esquerda.    
-		drawDataRectangle( window->left, 
-		    window->top, window->width, border_size, border_color );
-						   
-	    drawDataRectangle( window->left, 
-		    window->top, border_size, window->height, border_color );
 
-	    //board2, borda direita e baixo.
-	    drawDataRectangle( window->left +window->width -1, 
-	        window->top, border_size, window->height, border_color );
-					   
-	    drawDataRectangle ( window->left, window->top +window->height -1, 
-			window->width, border_size, border_color );
-		
-	};
 	
 	// ## Title bar ##
     // Título + borda(frame).
-    // #importante: Isso pinta a barra de tótulos e as 
+    // #importante: Isso pinta a barra de títulos e as 
     // bordas para janelas de aplicativos. Ou seja,
-    // as bordas não são pintadas individualmente.	
+    // as bordas não são pintadas individualmente nesse momento, mas 
+    // logo abaixo, pintaremos as bordas para as janelas onde esse for o caso. 
+    // só falta criar elemento na estrutura para gerenciar as bordas.	
 	
 	if ( TitleBar == 1 )
 	{ 
@@ -1058,12 +1016,17 @@ drawBegin:
 		
 		//Rectangle and string.
 		
+		//#importante
 		//retângulao
-		//??width  @todo: Adicionar a largura da bordas bordas verticais.
-		//??height @todo: Adicionar as larguras das bordas horizontais e da barra de títulos.
-        drawDataRectangle ( window->left, window->top, 
-			window->width +1 +1, window->height +1 +1, window->color_bg );
+		//??width  @todo: Adicionando a largura da bordas bordas verticais.
+		//??height @todo: Adicionando as larguras das bordas horizontais e da barra de títulos.
+        
+		//drawDataRectangle ( window->left, window->top, 
+		//	window->width +1 +1, window->height +1 +1, window->color_bg );
 						   
+		drawDataRectangle ( window->left, window->top, 
+			window->width +1 +1, window->height +1 +1, window->color_bg );	
+			
 		// ??
 		// Active window.		
 		// Ressaltando a barra de títulos da janela com o foco de entrada.
@@ -1121,8 +1084,9 @@ drawBegin:
 			
 			// Criar.
 			windowButton1 = CreateWindow ( WT_BUTTON, 1, 1, "V", 
-	            (window->width -42 -1), 2, 21, 21,									  
-			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+	                           (window->width -40 -40 -1), 2, 40, 40,									  
+			                   window, 0, 
+							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
 			// Registrar.
 			RegisterWindow (windowButton1);
@@ -1138,14 +1102,63 @@ drawBegin:
 			
 			// Criar.
 			windowButton2 = CreateWindow ( WT_BUTTON, 1, 1, "X", 
-	            (window->width -21), 2, 21, 21,									  
-			    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
+	                            (window->width -40), 2, 40, 40,									  
+			                    window, 0, 
+								(unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
             
 			// Registrar.
-			RegisterWindow(windowButton2);
+			RegisterWindow (windowButton2);
 	    };					 
 		
 		//...			 
+	};	
+	
+	
+	// ## Border ##
+	// BORDA COLOR_INACTIVEBORDER 
+	// Borda para as janelas.
+	// Obs: As bordas dependem do tipo de janela e do 
+	// estilo de janela.
+	
+	//vamos pintar a borda de acordo com o status da janela.
+	//se a janela for um botão, e pintarmos essa borda, 
+	//na hora de desenhar o botão essa borda vai desaparecer.
+	//para isso podemos simplesmente, desenha um botão menor que 
+	//a janela dele.
+	
+	if ( Border == 1 )
+	{
+		//flag.
+		window->borderUsed = 1;
+		
+		// A largura da borda pode sinalizar o status (ativo ou inativo) 
+		// de uma caixa de edição.
+		
+		if ( status == 0 ){ 
+		    border_size = 1;
+            border_color = COLOR_INACTIVEBORDER; 			
+		}
+		
+		if ( status == 1 ){ 
+		    border_size = 2; 
+		    border_color = COLOR_BLUE;
+		}
+		//if( status == 2 ){ border_size = 3; } //just for fun
+		
+	    //board1, borda de cima e esquerda.    
+		drawDataRectangle( window->left, 
+		    window->top, window->width, border_size, border_color );
+						   
+	    drawDataRectangle( window->left, 
+		    window->top, border_size, window->height, border_color );
+
+	    //board2, borda direita e baixo.
+	    drawDataRectangle( window->left +window->width -1, 
+	        window->top, border_size, window->height, border_color );
+					   
+	    drawDataRectangle ( window->left, window->top +window->height -1, 
+			window->width, border_size, border_color );
+		
 	};	
 	
 	// # Client Area #
@@ -1245,13 +1258,13 @@ drawBegin:
             {
 			    //left top
                 window->rcClient->left = (unsigned long) (window->left +1);
-                window->rcClient->top = (unsigned long) (window->top  +1 +24);
+                window->rcClient->top = (unsigned long) (window->top  +2 +40 +2);
             
                 // width e height.
                 // width = window widdth - as bordas verticais.
                 // height = windows height - as bordas horizontais - a barra de títulos.
                 window->rcClient->width = (unsigned long) (window->width -1 -1);
-                window->rcClient->height = (unsigned long) (window->height -1 -24 -1);
+                window->rcClient->height = (unsigned long) (window->height -2 -40 -2 -24 -2);
 				
 				//window->rcClient->right = window->rcClient->left + window->rcClient->width;
 				//window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
@@ -1293,7 +1306,8 @@ drawBegin:
 			// * ESSA COR FOI PASSADA VIA ARGUMENTO.
 			//
 			
-            window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
+            //window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
+            window->rcClient->color_bg = (unsigned long) COLOR_YELLOW;	      
 			
 			// #TESTE: VERMELHÃO.
 			//window->rcClient->color_bg = (unsigned long) COLOR_RED;
@@ -1342,7 +1356,7 @@ drawBegin:
 		
 		// Criar.
 		windowButton3 = CreateWindow ( WT_BUTTON, 1, 1, "^", 
-	        1, 1, (window->width -2), 16,									  
+	        1, 1, (window->width -2), 32,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
         
 		// Registrar.
@@ -1358,7 +1372,7 @@ drawBegin:
 		
 		// Criar.
 		windowButton4 = CreateWindow( WT_BUTTON, 1, 1, "=", 
-	        1, (window->height/2), (window->width -2), 16,									  
+	        1, (window->height/2), (window->width -2), 32,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 		
 		// Registrar.
@@ -1369,7 +1383,7 @@ drawBegin:
 	    
 		// Criar.
 		windowButton5 = CreateWindow( WT_BUTTON, 1, 1, "v", 
-	        1, (window->height -17), (window->width -2), 16,									  
+	        1, (window->height -32 -1), (window->width -2), 32,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);			
 	    
 		// Registrar.
@@ -1449,8 +1463,8 @@ drawBegin:
 		
 		// Criar.
 		window->scrollbar = CreateWindow ( WT_SCROLLBAR, 1, 1, "scrollbar-test", 
-	                            window->right -24, window->top+25, 
-								24, window->height-25-25-1,									  
+	                            window->right -40, window->top +2 +40 +2, 
+								40, (window->height -2 -40 -2 -24 -2),									  
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar], 
 								(unsigned long) CurrentColorScheme->elements[csiScrollBar]);

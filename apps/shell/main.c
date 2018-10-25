@@ -925,7 +925,7 @@ noArgs:
 	terminal_rect.top = terminal_rect.top + 28;
 
 	terminal_rect.width = 8 * 80;
-	terminal_rect.height = 8 * 38;
+	terminal_rect.height = 8 * 32;
 	
 	//terminal_rect.width = terminal_rect.width - 150;
 	//terminal_rect.height = terminal_rect.height - 150;

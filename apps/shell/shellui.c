@@ -534,6 +534,7 @@ void shellCreateEditBox (){
  
 int shellCreateTaskBar (int status){
 	
+	// #todo:
 	// Precisamos registrar no kernel que essa janela corresponde 
 	// a área de taskbar e que a área de trabalho agora é menor.
 		
@@ -541,8 +542,21 @@ int shellCreateTaskBar (int status){
 	// Criando a barra.
 	//
 	
+	
+	unsigned long left;
+	unsigned long top;
+	unsigned long width;
+	unsigned long height;
+	
+	//todo: get system metrics.
+	
+	left = 0;
+	top = (600 - (600/8));
+	width = 800;
+	height = (600/8);
+	
 	taskbarWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-taskbar",     
-                                0, 600-24, 800, (8*3),    
+                                left, top, width, height,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
 	if ( (void *) taskbarWindow == NULL )
@@ -556,17 +570,22 @@ int shellCreateTaskBar (int status){
 		//exit(0);
 	};
 	//Registrar.
-    APIRegisterWindow(taskbarWindow);
+    APIRegisterWindow (taskbarWindow);
 	
 	//
-	// icon 1 window
+	// menu icon window
 	//
 	
-	unsigned long iconMaxWidth  = 100; //(8*3);
-	unsigned long iconMaxHeight = 24; //(8*3);
+	//todo: get system metrics.
+	
+	//menu icon
+	unsigned long miLeft = 0;
+	unsigned long miTop = (600 - (600/8));
+	unsigned long miWidth  = (800/8); 
+	unsigned long miHeight = (600/8);
 
-	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "MENU",     
-                            0, 600-24, iconMaxWidth, iconMaxHeight,    
+	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
+                            miLeft, miTop, miWidth, miHeight,    
                             0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
 							
 	if ( (void *) menu_button == NULL )
@@ -579,6 +598,7 @@ int shellCreateTaskBar (int status){
 		}
 		//exit(0);
 	};
+	
     //Registrar.
     APIRegisterWindow(menu_button);
 	
@@ -699,15 +719,14 @@ loadFile:
 /*
  * shellTestDisplayBMP:
  *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
- *
+ *     Devemos usar a função oferecida pela api.
  */
-void shellTestDisplayBMP()
-{	
-	//
+void shellTestDisplayBMP (){
+	
+	
 	// #bugbug @todo: Aumenta o tamanho do heap do processo.
 	// Esse heap é gerenciando nas bibliotecas ou na API.
-	//Obs: 32Kb é alem do limite.
-	//
+	// Obs: 32Kb é alem do limite.
 	
 	void *b = (void *) malloc (1024*30); 	// testando malloc.
     
@@ -843,6 +862,8 @@ void bmpDisplayBMP ( void *address,
 
 
 //testando botão.
+//quando clicamos no menu da barra de tarefas.
+//todo mudar o nome da função.
 int shellTestButtons (){
 	
 	
