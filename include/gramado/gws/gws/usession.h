@@ -82,8 +82,9 @@ struct usession_d
 	//struct wstation_d *arrayWindowStation; //ponteiro para um array de estruturas de window station.
 	
 	//linked list. (a linked list da window station)
-	struct linkedlist_d *linkedlist;	
+	//struct linkedlist_d *linkedlist;
 	
+    struct usession_d *next;	
 };
 struct usession_d *DefaultUserSession;
 struct usession_d *CurrentUserSession;

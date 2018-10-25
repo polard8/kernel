@@ -1,4 +1,5 @@
 /*
+ * <3
  * Gramado Operating System - The main file for the kernel.
  * (c) Copyright 2015~2018 - Fred Nora.
  *

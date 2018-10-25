@@ -22,11 +22,13 @@
  * get_current_user_session:
  *     Get yhe current user session handle.
  */
-void *get_current_user_session()
-{
+void *get_current_user_session (){
+	
     //return (void*) CurrentUserSession;
 	
-	if(current_usersession < 0 || current_usersession >= USER_SESSION_COUNT_MAX){
+	if ( current_usersession < 0 || 
+	     current_usersession >= USER_SESSION_COUNT_MAX )
+    {
 	    return NULL;
 	};
 	
@@ -38,10 +40,12 @@ void *get_current_user_session()
  * CreateUserSection:
  *     Cria uma user section para um usuário válido.
  */
-void *CreateUserSession(int userID)
-{
+void *CreateUserSession (int userID){
+	
+	int i=0;
+	
 	struct usession_d *NewUserSession;
-	int Offset = 0;
+	
 
 	// Check limits.
     if( userID < 0 || userID >= USER_COUNT_MAX ){
@@ -49,17 +53,23 @@ void *CreateUserSession(int userID)
 	};
 	
 	// Create a new user section struct.
-    NewUserSession = malloc(sizeof(struct usession_d));
-	if( (void*) NewUserSession == NULL ){
-	    printf("CreateUserSection:");
-		refresh_screen();
-		while(1){}	
-	}
-	else
+    
+	NewUserSession = (void *) malloc ( sizeof(struct usession_d) );
+	
+	if ( (void *) NewUserSession == NULL )
 	{
+	    printf("CreateUserSection:");
+		die ();
+		
+		//refresh_screen();
+		//while(1){}	
+	
+	} else {
+		
 		NewUserSession->usUsed  = (int) 1;         //flag, está em uso.
 		NewUserSession->usMagic = (int) 1234;      //magic
-	    NewUserSession->userID  = (int) userID;    //*IMPORTANTE id do usuário da seção.
+	    
+		NewUserSession->userID  = (int) userID;    //*IMPORTANTE id do usuário da seção.
 		//@todo: group.
 		NewUserSession->initialized = 0;           //Apenas criada, não inicializada.
 		
@@ -70,67 +80,75 @@ void *CreateUserSession(int userID)
 	};
 			
 	//Procura uma entrada vazia na lista.
-	while(Offset < USER_SESSION_COUNT_MAX)
+	
+	while ( i < USER_SESSION_COUNT_MAX )
 	{		
         //Coloca na lista em um lugar vazio.
-        if( (void *) usessionList[Offset] == NULL)
+        
+		if ( (void *) usessionList[i] == NULL )
 		{
-			usessionList[Offset] = (unsigned long) NewUserSession; 
-		    NewUserSession->usId = Offset;    //User session id.		
-		    goto done;
+			usessionList[i] = (unsigned long) NewUserSession; 
+		    NewUserSession->usId = i;    //User session id.		
+		    
+			return (void *) NewUserSession;
 		};	
-		Offset++;
+		
+		i++;
 	};
-	//Nothing.
-fail:
-    printf("CreateUserSession error: Can't create!\n");
-    refresh_screen();
-	while(1){};
-	return NULL;	
-done:	
-    return (void*) NewUserSession;
+    
+	printf("CreateUserSession error: Can't create!\n");
+    die ();
+	
+	//refresh_screen();
+	//while(1){};
+	
+	//#bugbug: Talvez devamos retornar.
+	return NULL;
 };
 
 
 //Close User Session.
-void close_user_session()
-{
-	if((void*) CurrentUserSession == NULL){
-		printf("close_user_session:");
+void close_user_session (){
+	
+	if ( (void *) CurrentUserSession == NULL )
+	{
+		printf("close_user_session: fail \n");
 		return;
 	};
 	
 	//@todo: Criar tempo de fim de sessão.
 	//tempo de fim de sessão
+	
 	CurrentUserSession->EndTime = (unsigned long) 0;
 	
 	
 	CurrentUserSession->usId = 0; 
+	
 	CurrentUserSession->usUsed = 0; 
 	CurrentUserSession->usMagic = 0; 
+	
 	CurrentUserSession->userID = 0; 
 	
 	CurrentUserSession->initialized = 0; 
 	
 	//...
-	
-	return;
 };
 
 
 //Open User Session.
-void open_user_session()
-{
-	if((void*) CurrentUserSession == NULL){
-		printf("open_user_session:");
+void open_user_session (){
+	
+	if ( (void *) CurrentUserSession == NULL )
+	{
+		printf ("open_user_session: fail \n");
 		return;
 	};
 	
 	//@todo: Criar tempo de início de sessão.
 	//tempo de inicio de sessão
+	
 	CurrentUserSession->BeginTime = (unsigned long) 0;	
 	CurrentUserSession->initialized = 1; 
-	return;
 };
 
 
@@ -138,15 +156,18 @@ void open_user_session()
  * init_user_session:
  *     Inicializa user session.
  */
-void init_user_session()
-{	
-    int CurrentUser = 0;
- 	int Offset = 0;
+void init_user_session (){
+	
+    int i = 0;
+	int CurrentUser = 0;
+ 	
 	
 	//Init list	
-	while(Offset < USER_SESSION_COUNT_MAX){		
-        usessionList[Offset] = 0;
-		Offset++;
+	
+	while ( i < USER_SESSION_COUNT_MAX )
+	{		
+        usessionList[i] = 0;
+		i++;
 	};
 	
 	//
@@ -156,7 +177,8 @@ void init_user_session()
 	CurrentUser = (int) GetCurrentUserId();
 	
 	//Limits.
-	if(CurrentUser < 0 || CurrentUser >= USER_COUNT_MAX ){
+	if ( CurrentUser < 0 || CurrentUser >= USER_COUNT_MAX )
+	{
 		return;
 	};
 	
@@ -166,23 +188,26 @@ void init_user_session()
 	//
 	
 	//Struct.
-    DefaultUserSession = (void *) CreateUserSession(CurrentUser);
-	if( (void*) DefaultUserSession == NULL){
-	    printf("init_user_session:");
-	    refresh_screen();
-	    while(1){}
+	
+    DefaultUserSession = (void *) CreateUserSession (CurrentUser);
+	
+	if ( (void *) DefaultUserSession == NULL )
+	{
+	    printf("init_user_session: DefaultUserSession");
+		die ();
+		
+	    //refresh_screen();
+	    //while(1){}
 	}; 
 	
-	CurrentUserSession = (void*) DefaultUserSession;
+	CurrentUserSession = (void *) DefaultUserSession;
 	
 	//Open.
-	open_user_session();
+	open_user_session ();
 	
 	//...
 	
-done:
     DefaultUserSession->initialized = 1;
-    return;
 };
 
 
@@ -190,6 +215,7 @@ done:
 int usersessionInit()
 {}
 */
+
 
 //
 // End.

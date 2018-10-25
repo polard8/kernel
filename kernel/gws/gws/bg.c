@@ -1,16 +1,16 @@
 /*
- * File: gramado\gui\background.c 
+ * File: gws\gws\bg.c 
  *
  * Descrição:
  *     Rotinas de configuração do background de um desktop.
  *     O background de um desktop é onde fica a imagem de pano de fundo.
  * Também é conhecido como Backbuffer.
  *
- *     Faz parte do módulo Window Manager do tipo MB.
+ * Window server.
  *
- * Histórico:
- *     Version: 1.0, 2013 - Created.
- *     Version: 1.0, 2014-2016 - Revisão.
+ * History:
+ *     2013 - Created by Fred Nora.
+ *     2016 - Revision.
  */
 
 
@@ -73,7 +73,7 @@ void backgroundDraw (unsigned long color){
 	};
 	
 	//Modo texto.
-drawTextMode:
+//drawTextMode:
 	
 	if (VideoBlock.useGui == 0)
 	{
@@ -115,13 +115,13 @@ done:
  */
 void backgroundSetColor (unsigned long color){
 	
-    if ( gui->backgroundStatus == 0 )
-	{
+    if ( gui->backgroundStatus == 0 ){
+		
         return;
     };	
 
-	if ( (void *) gui->background != NULL )
-	{
+	if ( (void *) gui->background != NULL ){
+		
 	    gui->background->bg_color = (unsigned long) color;
 	};
 };
@@ -133,13 +133,13 @@ void backgroundSetColor (unsigned long color){
  */
 void backgroundRedraw (unsigned long color){
 	
-    if ( gui->backgroundStatus == 0 )
-	{
+    if ( gui->backgroundStatus == 0 ){
+		
         return;
     };
 	
-	if ( (void *) gui->background != NULL )
-	{
+	if ( (void *) gui->background != NULL ){
+		
 	   backgroundDraw (color);	
 	};
 };
@@ -156,10 +156,13 @@ void backgroundBackground (){
 //Init.
 int backgroundInit (){
 	
+	// #todo:
+	// Ainda não implementada.
+	
 	backgroundBackground ();
 	//...
 	
-	return 0; //Ainda não implementada.
+	return (int) 0; 
 };	
 
 

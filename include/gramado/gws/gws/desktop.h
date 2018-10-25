@@ -7,14 +7,15 @@
  *     Um desktop contém janelas, menus e outras coisas.
  *     ...
  *
+ * #importante:
+ * Cada desktop deve ter seu backbuffer.
+ * Um ponteiro para o backbuffer deve ser criado na estrutura de desctop.
+ *
  *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
  * Versão 1.0, 2015.
  */
  
-
-
-
-
+ 
 
 /*
  * desktop_d:
@@ -33,9 +34,13 @@ struct desktop_d
 	//
 	
 	int desktopId;
+	
 	int desktopUsed;
 	int desktopMagic;
 
+	// #importante
+	//unsigned long backbuffer_address;
+	
 	
 	int userID;
 	
@@ -101,14 +106,13 @@ struct desktop_d
 	//struct window_d *programmanager;
 	
 	
-	
     unsigned long windows[256];    //@todo: Usar alocação dinâmica, igual nos menus.
     unsigned long menus[256];      //@todo: Usar alocação dinâmica, igual nos menus.
 	//Continua ...
 	
 	//Linked List. 
 	//( a linked list de janelas no desktop ).
-	struct linkedlist_d *linkedlist;
+	//struct linkedlist_d *linkedlist;
 	
 
 	//Window Station. 
@@ -123,7 +127,10 @@ struct desktop_d
 	//
 	// @todo: user ??, Something more ??
 	//
+	
+    struct desktop_d *next;	
 };
+
 // Lista encadeada de desktops.
 struct desktop_d *desktop_Conductor2;
 struct desktop_d *desktop_Conductor;
@@ -134,9 +141,6 @@ struct desktop_d *CurrentDesktop;
 struct desktop_d *desktopDefault;
 struct desktop_d *desktop0;
 struct desktop_d *desktop1;
-
-
-
 
 //List.
 unsigned long desktopList[DESKTOP_COUNT_MAX];

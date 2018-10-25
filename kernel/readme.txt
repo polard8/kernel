@@ -1,10 +1,10 @@
-   
+ 
  List of folders:
  ================
 
     /entry    - Entry point.
 
-    segue as quatro camadas.
+    Segue as quatro camadas.
 
     /gws      - (4) GUI.
     /execve   - (3) Executive. Sharead with all modules in the kernel base

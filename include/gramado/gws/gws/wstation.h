@@ -56,6 +56,7 @@ struct wstation_d
 	//next
 	struct wstation_d *next;
 };
+
 struct wstation_d *CurrentWindowStation;
 struct wstation_d *wsDefault;
 struct wstation_d *ws0;
