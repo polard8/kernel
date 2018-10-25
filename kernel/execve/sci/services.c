@@ -1053,7 +1053,7 @@ void *services( unsigned long number,
 			        a3[1] = (unsigned long) hWnd->rcClient->top;     
 			        a3[2] = (unsigned long) hWnd->rcClient->width;
 			        a3[3] = (unsigned long) hWnd->rcClient->height;
-					a3[4] = (unsigned long) hWnd->rcClient->color_bg;
+					a3[4] = (unsigned long) hWnd->rcClient->bg_color;
 					//...
 				}
 		    break;

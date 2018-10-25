@@ -117,7 +117,7 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
 	y      = window->top + rect->y;
 	width  = rect->width;
 	height = rect->height;
-	color = rect->color_bg;
+	color = rect->bg_color;
 	
     drawDataRectangle( x, y, width, height, color );
 	
@@ -145,8 +145,7 @@ drawDataRectangle( unsigned long x,
 	//A estrutura base é usada para efetuar essa rotina aqui,
 	//e depois permanece suja.
     
-	//bg
-    rect->color_bg = color;
+    rect->bg_color = color;
    
     //Dimensões.
 	rect->x = 0;        
@@ -183,13 +182,11 @@ drawDataRectangle( unsigned long x,
     //Pinta as linhas no Backbuffer.  
 	while ( height-- )
 	{
-	    my_buffer_horizontal_line( rect->left, y, rect->right, 
-		    rect->color_bg );
+	    my_buffer_horizontal_line ( rect->left, y, rect->right, 
+		    rect->bg_color );
 		
 		y++;
     };    
-  
-    //Nothing.
 };
   
   

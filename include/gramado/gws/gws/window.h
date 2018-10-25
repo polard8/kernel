@@ -554,7 +554,7 @@ struct rect_d
 	unsigned long right;
 	unsigned long bottom;
 	
-	unsigned long color_bg;
+	unsigned long bg_color; //color_bg;
 	
 	//Essa é  ajanela à qual o retângulo pertence.
 	struct window_d *window;
@@ -737,7 +737,7 @@ struct window_d
     unsigned long y;           //deslocamento y 
 
 
-    unsigned long color_bg;    //cor  	
+    unsigned long bg_color; //color_bg;    //cor do background da janela;  	
  	
 // 
 //==================================================
@@ -813,7 +813,7 @@ struct window_d
 	struct rect_d *rcClient;     
 	
 	//cor do retângulo da área do cliente.
-    unsigned long clientrect_color_bg;    
+    unsigned long clientrect_bg_color;    
 		
 // 
 //==================================================

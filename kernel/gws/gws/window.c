@@ -1781,7 +1781,7 @@ redrawBegin:
 	if (window->backgroundUsed == 1)
 	{		
 		drawDataRectangle ( window->left, window->top, 
-			window->width, window->height, window->color_bg );      	
+			window->width, window->height, window->bg_color );      	
 	};
 	
 	
@@ -1825,9 +1825,9 @@ redrawBegin:
         //no caso de janela mãe.
         if (window->id == active_window)
 		{
-			window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar];
+			window->bg_color = CurrentColorScheme->elements[csiActiveWindowTitleBar];
 		}else{
-			window->color_bg = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
+			window->bg_color = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
 		};
 	
 		//Focus.
@@ -1835,9 +1835,9 @@ redrawBegin:
 		//no caso de janelas filhas
 		if(window->id == window_with_focus)
 		{
-		    window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
+		    window->bg_color = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
 		}else{
-			window->color_bg = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
+			window->bg_color = CurrentColorScheme->elements[csiInactiveWindowTitleBar]; 
 		};
 		
 		//@todo: String color.
@@ -1850,7 +1850,7 @@ redrawBegin:
 		//Rectangle and string.
 		
         drawDataRectangle ( window->left, window->top, 
-			window->width +1 +1, window->height +1 +1, window->color_bg );
+			window->width +1 +1, window->height +1 +1, window->bg_color );
 						   
 						   
 		//@todo: 
@@ -1943,7 +1943,7 @@ redrawBegin:
 		                        (unsigned long) window->rcClient->top, 
 						        (unsigned long) window->rcClient->width, 
 						        (unsigned long) window->rcClient->height, 
-						        (unsigned long) window->rcClient->color_bg );         
+						        (unsigned long) window->rcClient->bg_color );         
 							    
 		};
 		//Nothing.
@@ -3795,7 +3795,7 @@ doswitch:
 			        
                     window->view = VIEW_FULL;
 					
-                    backgroundDraw( (unsigned long) window->rcClient->color_bg );  
+                    backgroundDraw( (unsigned long) window->rcClient->bg_color );  
 					refresh_screen();					
 				};
 			

@@ -122,7 +122,7 @@ void backgroundSetColor (unsigned long color){
 
 	if ( (void *) gui->background != NULL )
 	{
-	    gui->background->color_bg = (unsigned long) color;
+	    gui->background->bg_color = (unsigned long) color;
 	};
 };
 

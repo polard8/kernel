@@ -478,8 +478,8 @@ CreateWindow( unsigned long type,
 		//saveTop  = window->top;
 		
 		// Background support.
-		window->color_bg = (unsigned long) color; 
-		window->clientrect_color_bg = (unsigned long) clientcolor;
+		window->bg_color = (unsigned long) color; 
+		window->clientrect_bg_color = (unsigned long) clientcolor;
 		
 		// ??
 		// O retângulo da janela.
@@ -958,15 +958,15 @@ drawBegin:
 		// Flag.
         window->backgroundUsed = 1;
 		
-		window->color_bg = CurrentColorScheme->elements[csiWindowBackground]; 
+		window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
 	    
 		// O argumento 'color' será a cor do bg para alguns tipos.
 		// Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
-		if( (unsigned long) type == WT_SIMPLE ){ window->color_bg = color; };
-		if( (unsigned long) type == WT_POPUP ){ window->color_bg = color; };
-		if( (unsigned long) type == WT_EDITBOX){ window->color_bg = color; }
-		if( (unsigned long) type == WT_CHECKBOX){ window->color_bg = color; }
-		//if( (unsigned long) type == WT_SCROLLBAR){ window->color_bg = color; }
+		if( (unsigned long) type == WT_SIMPLE ){ window->bg_color = color; };
+		if( (unsigned long) type == WT_POPUP ){ window->bg_color = color; };
+		if( (unsigned long) type == WT_EDITBOX){ window->bg_color = color; }
+		if( (unsigned long) type == WT_CHECKBOX){ window->bg_color = color; }
+		//if( (unsigned long) type == WT_SCROLLBAR){ window->bg_color = color; }
 		//...
 		
 		//Pintar o retângulo.
@@ -974,7 +974,7 @@ drawBegin:
 		// @todo: ?? height Adicionar as larguras das bordas horizontais e da barra de títulos.
 		
 		drawDataRectangle ( window->left, window->top, 
-			window->width, window->height, window->color_bg ); 
+			window->width, window->height, window->bg_color ); 
 
         //?? More
         //...		
@@ -997,14 +997,14 @@ drawBegin:
 		
         //#importante:  
         //A cor sempre deve ser enviada por argumento.
-		window->color_bg = color;  
+		window->bg_color = color;  
 		
 		//@todo: Preciso definir a questão o foco.
 		// ?? Quando uma jamela é criada, ela é criada com o foco ou não??
 		//Se a janela estiver com o foco de entrada.
 		//if(window->id == window_with_focus){
 			//esquema de cor. No caso de inativa.
-		//    window->color_bg = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
+		//    window->bg_color = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
 		//}
 		
 		//@todo: String color.
@@ -1022,10 +1022,10 @@ drawBegin:
 		//??height @todo: Adicionando as larguras das bordas horizontais e da barra de títulos.
         
 		//drawDataRectangle ( window->left, window->top, 
-		//	window->width +1 +1, window->height +1 +1, window->color_bg );
+		//	window->width +1 +1, window->height +1 +1, window->bg_color );
 						   
 		drawDataRectangle ( window->left, window->top, 
-			window->width +1 +1, window->height +1 +1, window->color_bg );	
+			window->width +1 +1, window->height +1 +1, window->bg_color );	
 			
 		// ??
 		// Active window.		
@@ -1306,11 +1306,10 @@ drawBegin:
 			// * ESSA COR FOI PASSADA VIA ARGUMENTO.
 			//
 			
-            //window->rcClient->color_bg = (unsigned long) window->clientrect_color_bg;	      
-            window->rcClient->color_bg = (unsigned long) COLOR_YELLOW;	      
-			
-			// #TESTE: VERMELHÃO.
-			//window->rcClient->color_bg = (unsigned long) COLOR_RED;
+			//#debug
+			//window->rcClient->bg_color = (unsigned long) COLOR_YELLOW; 
+            
+			window->rcClient->bg_color = (unsigned long) window->clientrect_bg_color;	      	      
 			
 			//
 			// Draw!
@@ -1321,7 +1320,7 @@ drawBegin:
 		                       (unsigned long) window->rcClient->top, 
 						       (unsigned long) window->rcClient->width, 
 						       (unsigned long) window->rcClient->height, 
-							   (unsigned long) window->rcClient->color_bg );
+							   (unsigned long) window->rcClient->bg_color );
 							   
             // Done.
 		};
@@ -1350,7 +1349,7 @@ drawBegin:
 	{ 
         //bg
 		drawDataRectangle ( window->left, window->top, 
-			window->width, window->height, window->color_bg ); 
+			window->width, window->height, window->bg_color ); 
 						   
 	    //Botão de cima da scrollbar vertival
 		
@@ -1393,9 +1392,8 @@ drawBegin:
 	
 	if ( (unsigned long) type == WT_STATUSBAR )
 	{
-        //bg
 		drawDataRectangle ( window->left, window->top, 
-			window->width -1, window->height, window->color_bg ); 	
+			window->width -1, window->height, window->bg_color ); 	
 						   
 		draw_string ( window->left +8, window->top +8, COLOR_TEXT,  
 			window->name );  
@@ -1413,12 +1411,12 @@ drawBegin:
 		
 		//draw_button ( Parent, windowname, 1, 
 		//    window->left, window->top, window->width, window->height, 
-		//	window->color_bg );
+		//	window->bg_color );
 
 		//window->button = (struct button_d *) draw_button ( window, windowname, BS_DEFAULT, 0, 0,
             window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
 		    window->left, window->top, window->width, window->height, 
-			window->color_bg );
+			window->bg_color );
 		
 		window->isButton = 1;	
 	};	
