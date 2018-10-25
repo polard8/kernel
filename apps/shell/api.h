@@ -857,7 +857,7 @@
 #define COLOR_TEST_46 0x400040 
  
 //outros teste
-#define COLOR_TEST_47 0x3366FF  //azul claro
+#define COLOR_TEST_47 0x3366FF  //azul claro ESQUISITO
 
     
 // # testes #
@@ -976,7 +976,7 @@
 #define COLOR_SEAGREEN            0x2E8B57
 #define COLOR_SEASHELL            0xFFF5EE  //branco sujinho
 #define COLOR_SIENNA              0xA0522D
-#define COLOR_SKYBLUE             0x87CEEB  //azul claro
+#define COLOR_SKYBLUE             0x87CEEB  //azul claro (BONITINHO)
 #define COLOR_SLATEBLUE           0x6A5ACD  //azul/violeta
 #define COLOR_SLATEGRAY           0x708090
 #define COLOR_SNOW                0xFFFAFA //branco

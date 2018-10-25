@@ -801,7 +801,7 @@ noArgs:
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    wpWindowLeft, wpWindowTop, 
 					    wsWindowWidth, wsWindowHeight,    
-                        0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
+                        0, 0, xCOLOR_GRAY3, xCOLOR_GRAY1 );	   
 
 	if ( (void *) hWindow == NULL ){
 		
@@ -939,7 +939,7 @@ noArgs:
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
 	                        terminal_rect.left, terminal_rect.top, 
 					        terminal_rect.width, terminal_rect.height,    
-                            0, 0, COLOR_RED, COLOR_RED );	   
+                            0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
 
 						
 	if ( (void *) hWindow2 == NULL ){
