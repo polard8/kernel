@@ -2521,13 +2521,17 @@ do_compare:
 	// Apenas obtendo o retorno na rotina de clonagem.
 	if ( strncmp ( prompt, "fork", 4 ) == 0 )
 	{
+		printf("fork: Tentando clonar o processo atual ...\n");
+		
 		int pidFORK = (int) fork ();
-        
+
+ 		//Mostra o ID do processo clone.
+		printf("Clone PID={%d}\n", pidFORK );
+		
 		//mostra o id do processo atual.
 		shellShowPID ();
 		
-		//Retornando o id do processo clone.
-		printf("PID={%d}\n", pidFORK );
+		printf("fork: done\n");
         
 		goto exit_cmp;
 	};		
@@ -2749,6 +2753,12 @@ do_compare:
 		//puts(" # puts Ok# \n");
         goto exit_cmp;
 	};	
+	
+	if ( strncmp ( prompt, "current-process", 15 ) == 0 )
+	{
+		system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
+		goto exit_cmp; 
+	}
 	
 	// pwd - print working directory
 	if ( strncmp( prompt, "pwd", 3 ) == 0 ){

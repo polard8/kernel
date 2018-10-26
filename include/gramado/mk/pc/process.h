@@ -909,7 +909,9 @@ unsigned long GetProcessPageDirectoryAddress( int pid );
 int processTesting(int pid);
 
 void init_processes();
-void show_process_information();
+
+void show_currentprocess_info ();
+void show_process_information ();
 
 
 //copiar um processo.

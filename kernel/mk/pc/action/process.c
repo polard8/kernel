@@ -93,9 +93,11 @@ int processNewPID;   //??
 //
 
 /*
+ ***************************************
  * do_fork_process
  *     (Função em desenvolvimento)
  *     Clona um processo sem thread.
+ *     Clona o processo atual.
  *     Retorna o PID do clone.
  */
  
@@ -108,7 +110,10 @@ int do_fork_process (){
 	
 	int Ret = -1;
 	
-	//printf(">>do_fork_process:\n");
+	
+	//printf("\n");
+	printf("do_fork_process: Cloning the current process ...\n");
+	
 	
 	//
 	// ## Current ##
@@ -118,14 +123,14 @@ int do_fork_process (){
 	
 	if ( (void *) Current == NULL )
 	{
-		printf("current struct \n");
+		printf("do_fork_process: current, struct \n");
 		goto fail;
 	
 	}else{
 		
 		if ( Current->used != 1 || Current->magic != 1234 ){
 		    
-			printf("current validation \n");
+			printf("do_fork_process: current, validation \n");
 			goto fail;		
 		}
 		
@@ -142,32 +147,39 @@ int do_fork_process (){
 	
 do_clone:
 	
-	//cria uma estrutura do tipo processo, mas não inicializada.
+	//Cria uma estrutura do tipo processo, mas não inicializada.
 	
 	Clone = (struct process_d *) processObject();
 	
 	if ( (void *) Clone == NULL )
 	{
-		printf("clone struct \n");
+		printf("do_fork_process: Clone struct fail \n");
+		
 		goto fail;
 	
 	}else{
 		
-	    PID = (int) getNewPID();
+		
+		// Obtêm um índice para um slot vazio na lista de processos.
+		
+	    PID = (int) getNewPID ();
 		
 		//if ( PID <= 0 ){
-		if ( PID == -1 || PID == 0 ){
 			
-			printf(" PID fail %d \n", PID);
+		if ( PID == -1 || PID == 0 )
+		{	
+			printf("do_fork_process: getNewPID fail %d \n", PID);
 			goto fail;
 		}
 		
 		Clone->pid = PID;
+		
 		Clone->used = 1;
 		Clone->magic = 1234;
 		//...
 		
-		//salvando na lista.
+		//Salvando na lista.
+		
 		processList[PID] = (unsigned long) Clone;
 		
 		//
@@ -176,21 +188,31 @@ do_clone:
 		
 		// Clona efetivamente. 
 		
-		//#bugbug:
-		//essa rotina tem que ter um retorno, para falharmos 
-		//caso ela falhe.
+		// #bugbug:
+		// Essa rotina tem que ter um retorno, para falharmos 
+		// caso ela falhe.
+		
 		Ret = processCopyProcess ( Current->pid, Clone->pid );
 		
 		if ( Ret != 0 )
-		    goto fail;
-	   
-		//return (int) PID;	
-		goto done;		
-	};	
-	
-done:
-    //retornando o número do processo clonado.
-    return (int) PID;	
+		{
+			printf("do_fork_process: processCopyProcess fail \n");
+		    goto fail;	
+		}
+		    
+	    //
+		// Ok, funcionou.
+		//
+		
+		// ??
+		// Retornando o número do processo clonado.
+		
+		printf("do_fork_process: done\n");
+		return (int) PID;	
+	};
+
+    // Fail.	
+    	
 fail:
     return (int) -1;	
 };
@@ -1226,133 +1248,133 @@ int KeGetFocus()
 
 void KeDebugBreakpoint()
 {
-    return;
+    //return;
 };
 
 void KeShowTasksParameters()
 {
-    return;
+    //return;
 };
 
 void KeMostraSlots()
 {
-    return;
+    //return;
 };
 
 void KeMostraSlot(int id)
 {
-    return;
+    //return;
 };
 
 void KeMostraReg(int id)
 {
-    return;
+    //return;
 };
 
 void KeShowPreemptedTask()
 {
-    return;
+    //return;
 };
 
 
-
-/*
- ********************************************************
- * show_process_information:
- *    Mostra informações sobre o processo atual.
- *    Current Process Info.
- *    @todo: Mostrar em uma janela própria.
- */
-void show_process_information()
-{
-	int i;
-	struct process_d *Current;	
-    
+void show_currentprocess_info (){
 	
-	//
-	// Janela: @deve-se criar a janela e fazer os resultados 
-	// aparecerem dentro dela.
-	//
+    struct process_d *Current;		
 	
-	//struct window_d *hWindow;    //janela. 	
-	
-	
-	printf("\n Current Process Info:\n\n");
-	
-	//Limits.
 	if( current_process < 0 || 
 	    current_process >= PROCESS_COUNT_MAX )
 	{
+		//printf("show_process_information: current_process fail\n");
 		return;
 	};
-	
+
 	//Struct.
-	Current = (void*) processList[current_process];
-	if( (void*) Current == NULL )
+	Current = (void *) processList[current_process];
+	
+	if ( (void *) Current == NULL )
 	{
-	    printf("show_process_information:\n");
+	    printf("show_process_information: Struct fail\n");
         return; 		
 	
-	}else{
+	} else {
+		
 		//Index.
-		printf("PID={%d} PPID={%d} UID={%d} GID={%d} \n",Current->pid
-		                                                ,Current->ppid
-                                                        ,Current->uid
-                                                        ,Current->gid);
+		printf ("PID={%d} PPID={%d} UID={%d} GID={%d} \n",
+		    Current->pid, Current->ppid, Current->uid, Current->gid );
 	    //Name
-		printf("Name={%s} \n",Current->name_address);
+		printf("Name={%s} \n", Current->name_address );
 		
 		//Image Address.
-		printf("ImageAddress={%x} \n",Current->Image);
+		printf("ImageAddress={%x} \n", Current->Image );
 		
 		//Directory Address. *IMPORTANTE.
-		printf("CurrentProcessDirectoryAddress={%x} \n",Current->Directory);		
+		printf ("CurrentProcessDirectoryAddress={%x} \n", Current->Directory );		
 		
 		//Heap and stack.
 		printf("Heap={%x}  HeapSize={%d KB}  \n", Current->Heap, 
-		                                          Current->HeapSize );
+		    Current->HeapSize );
 												  
 		printf("Stack={%x} StackSize={%d KB} \n", Current->Stack, 
-		                                          Current->StackSize );
+		    Current->StackSize );
 		
 		//...
 	};
 	
+	refresh_screen();
+};
+
+/*
+ ********************************************************
+ * show_process_information:
+ *     Mostra informações sobre os processos. 
+ *     #todo: na verdade um aplicativo em user mode deve fazer esse trabalho
+ * solicitando informações sobre cada processo através de chamadas.
+ */
+void show_process_information (){
+	
+	int i;
+	
+	struct process_d *p;	
+    
+ 
+	
+	printf("show_process_information: \n\n");
+	
+ 
 	
 	
-	//
-	// Testando.
-	//
+	// #test
+	// Mostrar informações sobre os processos da lista.
 	
 	printf("Process info:\n\n");
 	
-	for( i=0; i<PROCESS_COUNT_MAX; i++ )
+	for ( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
-	    Current = (void *) processList[i];
+	    p = (void *) processList[i];
 	    
-		//
+		
 		// Mostra as tarefas válidas, 
 		// mesmo que estejam com problemas.
-		//
 		
-		if( (void*) Current != NULL && 
-		        Current->used == 1 && 
-				Current->magic == 1234 )
+		if ( (void *) p != NULL && 
+		           p->used == 1 && 
+				   p->magic == 1234 )
 	    {
 			//@todo: Mostrar quem é o processo pai.
-		    printf("PID={%d} Name={%s} Directory={%x} \n", Current->pid, 
-			    Current->name_address, Current->Directory );
+		    
+			printf("PID={%d} Name={%s} Directory={%x} \n", p->pid, 
+			    p->name_address, p->Directory );
 
 	    }
+		
 		//Nothing.
     };	
 
 	//...
 	
-done:	
-    printf("Done\n");
+    printf("show_process_information: done\n");
+	
 	refresh_screen();
-	return;
 };
 
 
@@ -1367,11 +1389,12 @@ done:
 void 
 SetProcessDirectory( struct process_d *process, unsigned long Address )
 {
-    if( (void*) process != NULL )
+    if ( (void *) process != NULL )
 	{
         process->Directory = (unsigned long) Address;        
 	};
-	return;
+	
+	//return;
 };
 
 

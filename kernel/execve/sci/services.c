@@ -709,9 +709,11 @@ void *services( unsigned long number,
             break;
 			
 		//80 Show current process info.
-		//@todo: Mostrar em uma janela própria.
+		//#todo: Mostrar em uma janela própria.
+		//#todo: Devemos chamar uma função que mostre informações 
+		//apenas do processo atual. 
 		case SYS_CURRENTPROCESSINFO:
-		    show_process_information();
+		    show_currentprocess_info ();
 		    break;
 			
 		//81

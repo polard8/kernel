@@ -541,7 +541,10 @@ system_procedure ( struct window_d *window,
 					//if(AltStatus == 1){ window_with_focus = 5; break;};
 					//if(CtrlStatus == 1){ active_window = 5; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
-				    //pci_info();     //PCI information.
+				    
+					//
+					show_process_information ();
+					//pci_info();     //PCI information.
 				    
 					//#testando...
 					//isso funciona, não sei se completamente.
@@ -558,7 +561,7 @@ system_procedure ( struct window_d *window,
 					
 					//testando mbr.					
 					//ok isso funcionou.
-					fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
+					//fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
 					
 					//Obs: Não usa janelas, isso não mudará o foco.
 					//systemShowDevicesInfo();
@@ -567,21 +570,7 @@ system_procedure ( struct window_d *window,
 					//testando a função que converte endereço virtual em físico.
 					//printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, KERNEL_PAGEDIRECTORY) ); 
 					
-					
-					/*
-					//testando chamar o bootloader na forma de módulo.
-					asm (" pushl %eax ");
-					asm (" pushl %ebx ");
-					
-					asm (" movl $0x12345678,  %eax "); //flag.
-					
-					asm (" movl $0x00021000,  %ebx "); //endereço do entrypoint do boot loader.
-					asm (" call *%ebx "); 
-					
-					asm (" popl %ebx ");
-					asm (" popl %eax ");
-					*/
-					
+										
 					//Test teclado scancode. (FUNCIONOU BEM)
 					//Quando aciona esse status, o kernel mostra o scancode.
 					//scStatus = 1;
@@ -590,8 +579,7 @@ system_procedure ( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-					
-					
+										
 					//1 = initialize.
 					diskATADialog ( 1, FORCEPIO, FORCEPIO );
 					show_ide_info ();
