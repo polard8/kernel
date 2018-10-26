@@ -1,14 +1,17 @@
+/*
+ * File: cedge.c 
+ *
+ * edge field for klibc.
+ *
+ * Etremidades das funções de impressão de caracteres ...
+ * aqui ficará só o output de byte.
+ */
 
-// cedge.c - edge field for libc.
-
-// extremidades das funções de impressão de caracteres ...
-// aqui ficará só o output de byte.
 
 #include <kernel.h>
 
 
 /*
- **********************************************************************
  * _outbyte:
  *     @field 1
  *     Essa rotina efetivamente envia o caractere para a tela, não 
@@ -23,9 +26,11 @@
  * #importante: Essa rotina de pintura deveria ser exclusiva para 
  * dentro do terminal. 
  */
+ 
 void _outbyte (int c){
 	
     unsigned long i;
+	
 	unsigned long x;
 	unsigned long y;
 	
@@ -33,10 +38,10 @@ void _outbyte (int c){
 	char ch = (char) c;
 	char ch_atributo = (char) g_char_attrib;
 
-
 	//suporte ao modo texto.
 	//Base atual da memória de vídeo 0x000B8000;
     //@todo: usar VideoBlock.currentVM.
+	
 	char *vm = (char *) g_current_vm;    
 	
 	

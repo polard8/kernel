@@ -118,15 +118,18 @@ _u8 ata_wait_irq (){
     }
  
     ata_irq_invoked = 0;
-    return 0;
-}
+    
+	return 0;
+};
 
-_void ata_soft_reset()
-{
-    _u8 data =  inb(ata.ctrl_block_base_address + 2);
-    outb(ata.ctrl_block_base_address, data | 0x4);
-    outb(ata.ctrl_block_base_address, data &0xfb);    
-}
+
+void ata_soft_reset (){
+	
+    _u8 data =  inb (ata.ctrl_block_base_address + 2);
+    
+	outb (ata.ctrl_block_base_address, data | 0x4 );
+    outb (ata.ctrl_block_base_address, data & 0xfb );    
+};
 
 
 //#bugbug
@@ -134,19 +137,18 @@ _void ata_soft_reset()
 //na estrutura estiverem certos.
 _u8 ata_status_read (){
 	
-   	return inb( ata.cmd_block_base_address + ATA_REG_STATUS );
+   	return inb ( ata.cmd_block_base_address + ATA_REG_STATUS );
 };
 
 
-void ata_cmd_write(_i32 cmd_val)
-{
+void ata_cmd_write (_i32 cmd_val){
            
-    	// no_busy      	
+    // no_busy      	
 	ata_wait_not_busy();
 	outb(ata.cmd_block_base_address + ATA_REG_CMD,cmd_val);
+	
 	ata_wait(400);  // Esperamos 400ns
-}
-
+};
 
 
 _u8 ata_assert_dever (_i8 nport){
@@ -190,24 +192,22 @@ _u8 ata_assert_dever (_i8 nport){
 int ide_identify_device ( uint8_t nport ){
 	
     _u8 status;
-    _u8 lba1,lba2;
+    _u8 lba1, lba2;
 
     ata_assert_dever(nport);
 
     // Ponto flutuante
 	//Sem unidade conectada ao barramento
-    if(ata_status_read() == 0xff){
+    
+	if ( ata_status_read() == 0xff )
+	{
         return -1;
 	}
-	
-	//
-	//
-	//
 
-    outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-	outb( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0   
-	outb( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
-	outb( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
+    outb ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+	outb ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0   
+	outb ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
+	outb ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
 
     
     // Select device,
@@ -225,14 +225,16 @@ int ide_identify_device ( uint8_t nport ){
 
 
 	//Sem unidade no canal
-    if(ata_status_read() == 0){  
+    
+	if ( ata_status_read() == 0 )
+	{  
         return -1;
 	}
 
-   lba1 = inb( ata.cmd_block_base_address + ATA_REG_LBA1 );
-   lba2 = inb( ata.cmd_block_base_address + ATA_REG_LBA2 );
+   lba1 = inb ( ata.cmd_block_base_address + ATA_REG_LBA1 );
+   lba2 = inb ( ata.cmd_block_base_address + ATA_REG_LBA2 );
 
-   if(lba1 == 0x14 && lba2 == 0xEB)
+   if ( lba1 == 0x14 && lba2 == 0xEB )
    {
         //kputs("Unidade PATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
@@ -251,7 +253,7 @@ int ide_identify_device ( uint8_t nport ){
         
         return 0x80;
    }
-   else if(lba1 == 0x69  && lba2 == 0x96){
+   else if (lba1 == 0x69  && lba2 == 0x96){
 
         //kputs("Unidade SATAPI\n");   
         ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
@@ -271,7 +273,8 @@ int ide_identify_device ( uint8_t nport ){
         return 0x80;
 
    }
-   else if(lba1 == 0x3C && lba2 == 0xC3){
+   else if (lba1 == 0x3C && lba2 == 0xC3){
+	   
         //kputs("Unidade SATA\n");   
         // O dispositivo responde imediatamente um erro ao cmd Identify device
         // entao devemos esperar pelo DRQ ao invez de um BUSY
@@ -290,7 +293,8 @@ int ide_identify_device ( uint8_t nport ){
 		
         return 0;
    }
-   else if(lba1 == 0 && lba2 == 0){
+   else if (lba1 == 0 && lba2 == 0){
+	   
         // kputs("Unidade PATA\n");
         // aqui esperamos pelo DRQ
         // e eviamoos 256 word de dados PIO
@@ -310,7 +314,6 @@ int ide_identify_device ( uint8_t nport ){
         return 0;
     }
 
-
 done:
 	return 0;   
 };
@@ -322,7 +325,6 @@ done:
  *
  *
  */
-//#include "ata.h"
 
 #define DISK1 1
 #define DISK2 2
@@ -343,7 +345,6 @@ static const char *ata_sub_class_code_register_strings[] ={
 extern st_dev_t *current_dev;
 
 
-
 // base address 
 static _u32 ATA_BAR0;    // Primary Command Block Base Address
 static _u32 ATA_BAR1;    // Primary Control Block Base Address
@@ -355,13 +356,8 @@ static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Addres
 
 
 void set_ata_addr (int channel){
-	
-	//
-	// @todo:
-	// Checar a validade da estrutura.
-	//
 
-    switch(channel)
+    switch (channel)
 	{
         case ATA_PRIMARY:
             ata.cmd_block_base_address  = ATA_BAR0;
@@ -433,7 +429,7 @@ void ide_mass_storage_initialize (){
     current_dev->next        = NULL;
 
     // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc(4096);
+	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
 
 	//
@@ -441,11 +437,10 @@ void ide_mass_storage_initialize (){
 	//
 	
     // As primeiras quatro portas do controlador IDE.    
-	for( port=0; port < 4; port++ )
-	{
-		// ??
+	for ( port=0; port < 4; port++ ){
+		
         ide_dev_init(port);
-	};
+	}
     
 done:
     return;
@@ -456,22 +451,24 @@ done:
  *******************************************************************
  * ide_dev_init:
  *     ?? Alguma rotina de configuração de dispositivos.
- *
  */
-int ide_dev_init(char port)
-{
+int ide_dev_init (char port){
+	
     int data;
 
     st_dev_t *new_dev;	
 	
-    new_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+    new_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
     
 	//@todo: Checar a validade da estrutura.
-	if( (void*) new_dev ==  NULL ){
+	if ( (void *) new_dev ==  NULL )
+	{
 		
 		printf("ide_dev_init: struct");
-		refresh_screen();
-		while(1){}
+		die ();
+		
+		//refresh_screen();
+		//while(1){}
 	} 
 	
 	
@@ -603,7 +600,10 @@ int ide_dev_init(char port)
 	
 	tmp_dev = ( struct st_dev * ) ready_queue_dev;
 
-    while( tmp_dev->next )
+	//#todo:
+	//Checar a validade da estrutura.
+	
+    while ( tmp_dev->next )
 	{
         tmp_dev = tmp_dev->next;
     };
@@ -619,20 +619,24 @@ done:
  * dev_switch:
  *     ?? Porque esse tipo ??
  */
-static inline void dev_switch(void)
-{
+static inline void dev_switch (void){
+	
 	// ??
     // Pula, se ainda não tiver nenhuma unidade.
-    if( !current_dev ){
+	
+    if ( !current_dev )
+	{
         return;
 	}
 	
     // Obter a próxima tarefa a ser executada.
-    current_dev = current_dev->next;
-    
     // Se caímos no final da lista vinculada, 
     // comece novamente do início.
-    if( !current_dev ){
+
+    current_dev = current_dev->next;    
+    
+	if ( !current_dev ){
+		
         current_dev = ready_queue_dev;
     }
 };
@@ -642,8 +646,11 @@ static inline void dev_switch(void)
  * getpid_dev:
  *     ?? Deve ser algum suporte a Processos.
  */
-static inline int getpid_dev()
-{
+static inline int getpid_dev (){
+	
+	//#todo:
+	//Checar a validade da estrutura.
+	
     return current_dev->dev_id;
 };
 
@@ -652,35 +659,38 @@ static inline int getpid_dev()
  * getnport_dev:
  *
  */
-static inline int getnport_dev()
-{
+static inline int getnport_dev (){
+
+	//#todo:
+	//Checar a validade da estrutura.
+	
     return current_dev->dev_nport;
 };
 
 
 /*
  * nport_ajuste:
- *
- *
  */
-int nport_ajuste( char nport )
-{
+int nport_ajuste ( char nport ){
+	
     _i8 i = 0;
 	
-    while( nport != getnport_dev() )
+    while ( nport != getnport_dev() )
 	{
-        if( i == 4 ){ 
+        if ( i == 4 )
+		{ 
 		    return (int) 1; 
 		}
         
 		dev_switch();
-        i++;
+        
+		i++;
     };
 	
-    if( getnport_dev() == -1 ){ 
+    if ( getnport_dev() == -1 )
+	{ 
 	    return (int) 1; 
 	}
-	
 	
 done:
     return (int) 0;
@@ -736,8 +746,6 @@ extern uint8_t *dma_addr;
 
 /*
  * atapi_pio_read:
- *
- *
  */
 static inline void atapi_pio_read ( void *buffer, uint32_t bytes ){
 	
@@ -781,12 +789,14 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
 	{
 	    case 28:
             //Mode LBA28
-	        outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT,count);	// Sector Count 7:0
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA0,addr);		        // LBA 7-0   
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 8);          // LBA 15-8
-	        outb( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 16);	        // LBA 23-16
-            // Modo LBA active, Select device, and LBA 27-24
-            outb( ata.cmd_block_base_address + ATA_REG_DEVSEL,0x40 |(ata.dev_num << 4) | (addr >> 24 &0x0f));
+	        outb( ata.cmd_block_base_address + ATA_REG_SECCOUNT, count );   // Sector Count 7:0
+	        outb( ata.cmd_block_base_address + ATA_REG_LBA0, addr );		// LBA 7-0   
+	        outb( ata.cmd_block_base_address + ATA_REG_LBA1, addr >> 8 );   // LBA 15-8
+	        outb( ata.cmd_block_base_address + ATA_REG_LBA2, addr >> 16 );  // LBA 23-16
+            
+			// Modo LBA active, Select device, and LBA 27-24
+            outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 
+			    0x40 | (ata.dev_num << 4) | (addr >> 24 &0x0f) );
             
 			// Verifique se e a mesma unidade para não esperar pelos 400ns.
             if( ata_record_dev != ata.dev_num && 
@@ -794,7 +804,7 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
 			{
                 ata_wait(400);
                 //verifique erro
-                ata_record_dev      = ata.dev_num;
+                ata_record_dev = ata.dev_num;
                 ata_record_channel  = ata.channel;
 			};
             break;
@@ -809,7 +819,9 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
 	        outb( ata.cmd_block_base_address + ATA_REG_LBA0,addr);		  // LBA 7-0   
 	        outb( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 8);   // LBA 15-8
 	        outb( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 16);  // LBA 23-16
-            outb( ata.cmd_block_base_address + ATA_REG_DEVSEL,0x40 | ata.dev_num << 4);   // Modo LBA active, Select device,        
+            
+			outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL,
+			    0x40 | ata.dev_num << 4 );   // Modo LBA active, Select device,        
             
 			// Verifique se e a mesma unidade para não esperar pelos 400ns.
             if( ata_record_dev != ata.dev_num && 
@@ -827,7 +839,6 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
             break;
 
         // Default ??
-
     };
 };
 
@@ -838,12 +849,11 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
  * Khole OS v0.3
  * Legacy Bus Master Base Address
  *
- *  TODO Nelson, já mais se esqueça de habiliatar o // Bus Master Enable
+ *  TODO Nelson, Não se esqueça de habiliatar o // Bus Master Enable
  *  no espaço de configuraçao PCI (offset 0x4 Command Register)
  *
- * Obs: O que segue é um suporte ao controlador de DMA para uso nas
- * rotinas de IDE.
- *
+ * Obs: 
+ * O que segue é um suporte ao controlador de DMA para uso nas rotinas de IDE.
  */
 
  
@@ -889,10 +899,10 @@ struct {
  *     ??
  *
  */
-void ide_dma_data( void *addr, 
-                   uint16_t byte_count,
-				   uint8_t flg,
-				   uint8_t nport )
+void ide_dma_data ( void *addr, 
+                    uint16_t byte_count,
+				    uint8_t flg,
+				    uint8_t nport )
 {
     _u8 data;
     uint32_t phy;
@@ -902,12 +912,12 @@ void ide_dma_data( void *addr,
     //
 	
     ide_dma_prdt[nport].addr = (_u32) addr;  //@todo: (&~1)sera que e necessario?
-    ide_dma_prdt[nport].len  = byte_count |0x80000000;
+    ide_dma_prdt[nport].len  = byte_count | 0x80000000;
 
     phy = (uint32_t) &ide_dma_prdt[nport];
 
     // prds physical.
-    outportl( ata.bus_master_base_address + ide_dma_reg_addr, phy );
+    outportl ( ata.bus_master_base_address + ide_dma_reg_addr, phy );
  
     // (bit 3 read/write)
     // 0 = Memory reads.
@@ -939,8 +949,8 @@ done:
  * ide_dma_start:
  *
  */
-void ide_dma_start()
-{
+void ide_dma_start (){
+	
     _u8 data = inb( ata.bus_master_base_address + ide_dma_reg_cmd );
     outb( ata.bus_master_base_address + ide_dma_reg_cmd, data | 1);
 };
@@ -950,8 +960,8 @@ void ide_dma_start()
  * ide_dma_stop:
  *
  */
-void ide_dma_stop()
-{
+void ide_dma_stop (){
+	
     _u8 data = inb( ata.bus_master_base_address + ide_dma_reg_cmd );  
 	outb( ata.bus_master_base_address + ide_dma_reg_cmd, data &~1);
 	
@@ -989,6 +999,11 @@ int ide_dma_read_status (){
                        ((uint32_t)(offset) &0xfc)|0x80000000)
 					   
 					   
+					   
+					   
+// #todo:
+// Checar se temos uma lista dessa no suporte a PCI.
+					   
 const char *pci_classes[] = {
     "Unknown [old]",
     "Mass storage",
@@ -1016,10 +1031,10 @@ const char *pci_classes[] = {
  * read_pci_config_addr:
  *     READ
  */
-uint32_t diskReadPCIConfigAddr( int bus, 
-                               int dev,
-							   int fun, 
-							   int offset )
+uint32_t diskReadPCIConfigAddr ( int bus, 
+                                 int dev,
+							     int fun, 
+							     int offset )
 {
     outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 	
@@ -1032,11 +1047,11 @@ done:
  * write_pci_config_addr:
  *     WRITE
  */
-void diskWritePCIConfigAddr( int bus, 
-                            int dev,
-							int fun, 
-							int offset, 
-							int data )
+void diskWritePCIConfigAddr ( int bus, 
+                              int dev,
+						 	 int fun, 
+							 int offset, 
+							 int data )
 {
     outportl(PCI_PORT_ADDR,CONFIG_ADDR(bus,dev,fun, offset));
     outportl(PCI_PORT_DATA,data);
@@ -1306,16 +1321,16 @@ uint32_t diskPCIScanDevice ( int class ){
 	// Probe.
 	//
 	
-	for( bus=0; bus < 256; bus++ )
+	for ( bus=0; bus < 256; bus++ )
 	{
-        for( dev=0; dev < 32; dev++ )
+        for ( dev=0; dev < 32; dev++ )
 		{
-            for( fun=0; fun < 8; fun++ )
+            for ( fun=0; fun < 8; fun++ )
 			{
                 outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
                 data = inportl(PCI_PORT_DATA);
                 
-				if( ( data >> 24 &0xff ) == class )
+				if ( ( data >> 24 &0xff ) == class )
 				{
 					
 					
@@ -1339,8 +1354,6 @@ uint32_t diskPCIScanDevice ( int class ){
 	//
 	// Fail !
 	//
-	
-//fail:	
     
 	kprintf("[ PCI device NOT detected ]\n");		
 	refresh_screen();
@@ -1465,14 +1478,15 @@ int diskATAInitialize ( int ataflag ){
 	//
 	
 	// Type
-    if( ata.chip_control_type == ATA_IDE_CONTROLLER )
+    if ( ata.chip_control_type == ATA_IDE_CONTROLLER )
 	{
 
         //Soft Reset, defina IRQ
-        outb( ATA_BAR1, 0xff );
-        outb( ATA_BAR3, 0xff );
-        outb( ATA_BAR1, 0x00 );
-        outb( ATA_BAR3, 0x00 );
+        
+		outb ( ATA_BAR1, 0xff );
+        outb ( ATA_BAR3, 0xff );
+        outb ( ATA_BAR1, 0x00 );
+        outb ( ATA_BAR3, 0x00 );
 
         ata_record_dev = 0xff;
         ata_record_channel = 0xff;
@@ -1496,18 +1510,23 @@ int diskATAInitialize ( int ataflag ){
     //	
 	
 	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
+	
+	//#todo:
+	//Checar a validade da estrutura.
 	
 	current_dev = ( struct st_dev * ) ready_queue_dev;
-    current_dev->dev_id      = dev_next_pid++;
-    current_dev->dev_type    = -1;
-    current_dev->dev_num     = -1;
+    
+	current_dev->dev_id = dev_next_pid++;
+    
+	current_dev->dev_type = -1;
+    current_dev->dev_num = -1;
     current_dev->dev_channel = -1;
-    current_dev->dev_nport   = -1;
-    current_dev->next        = NULL;
+    current_dev->dev_nport = -1;
+    current_dev->next = NULL;
 
     // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc(4096);
+	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
 
 	//
@@ -1515,9 +1534,8 @@ int diskATAInitialize ( int ataflag ){
 	//
 	
     // As primeiras quatro portas do controlador IDE.    
-	for( port=0; port < 4; port++ )
+	for ( port=0; port < 4; port++ )
 	{
-		// ??
         ide_dev_init(port);
 	};		
 		
@@ -1555,7 +1573,7 @@ int diskATAInitialize ( int ataflag ){
                
 			   kprintf(" # Panic! # \n");
 			   kprintf("sm-disk-disk-diskATAInitialize:\n");
-		       kprintf("IDE and AHCI not found!\n");
+		       kprintf("IDE and AHCI not found\n");
 			   die();
           };
 	
@@ -1729,7 +1747,7 @@ int disk_ata_wait_irq (){
     {
         data = ata_status_read ();
         
-		if( (data &ATA_SR_ERR) )
+		if ( (data &ATA_SR_ERR) )
 		{
 			
 			//ok por status do controlador.
