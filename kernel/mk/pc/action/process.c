@@ -539,7 +539,7 @@ struct process_d *create_process( struct wstation_d *window_station,
 								  unsigned long iopl,
 								  unsigned long directory_address )
 {
-	int i;
+	int PID;
 	struct process_d *Process;
 	
 	// Para a entrada vazia no array de processos.
@@ -555,10 +555,11 @@ struct process_d *create_process( struct wstation_d *window_station,
 		processNewPID = (int) USER_BASE_PID;	
 	};
 	
-	i = (int) processNewPID;
+	PID = (int) processNewPID;
 	
-	Process = (void *) malloc( sizeof(struct process_d) );
-	if( (void*) Process == NULL )
+	Process = (void *) malloc ( sizeof(struct process_d) );
+	
+	if ( (void *) Process == NULL )
 	{
 	    printf("pc-process-create_process: Process");
 		die();
@@ -567,49 +568,63 @@ struct process_d *create_process( struct wstation_d *window_station,
 	};
 
 
-//Loop.	
-get_next:	
-	
-	//
+    //Loop.	
 	// #BugBug: 
 	// Isso pode virar um loop infinito.
-	//
 	
+get_next:
+	
+/*	
 	i++;
 	
-	if( i >= PROCESS_COUNT_MAX )
+	if ( i >= PROCESS_COUNT_MAX )
 	{
-		// #bugbug: Isso dexa o sistema devagar caso não apareça 
+		// #bugbug: 
+		// Isso deixa o sistema devagar caso não apareça 
 		// a mensagem.
 		
 		printf("pc-process-create_process: End of list");
         refresh_screen();
+		
 		return NULL;
 		//while(1){}
-		
-		//i = USER_BASE_PID;
 	};
 	
-	//
+*/	
+	
 	// Get empty.
-	//
+		// Obtêm um índice para um slot vazio na lista de processos.
+		
+	PID = (int) getNewPID ();
+			
+	if ( PID == -1 || PID == 0 )
+	{	
+		printf("do_fork_process: getNewPID fail %d \n", PID);
+		refresh_screen();
+		return NULL;
+	}
+		
+	Empty = (void *) processList[PID];
 	
-	Empty = (void*) processList[i];
+	//Se o slot estiver ocupado tentaremos o próximo.
+	//Na verdade podemos usar aquela função que procura por um vazio. 
+   	
 	
-	//Se o slot estiver ocupado.
-    if( (void*) Empty != NULL )
+    if ( (void *) Empty != NULL )
 	{
+		
 		goto get_next;
+		
 	}else{
 		
 		//Object.
 		Process->objectType = ObjectTypeProcess;
 		Process->objectClass = ObjectClassKernelObjects;
 		
-		processNewPID = (int) i;
+		processNewPID = (int) PID;
 		
 		//Identificadores.
-		Process->pid  = (int) i;                    //PID.
+		Process->pid  = (int) PID;                    //PID.
         Process->ppid = (int) ppid;                 //PPID. 
 		Process->uid  = (int) GetCurrentUserId();   //UID. 
         Process->gid  = (int) GetCurrentGroupId();  //GID. 
@@ -878,7 +893,7 @@ get_next:
 		Process->Next = NULL; 
 
 		//Coloca o processo criado na lista de processos.
-		processList[i] = (unsigned long) Process;		
+		processList[PID] = (unsigned long) Process;		
 		//Nothing.
 	};	
 
