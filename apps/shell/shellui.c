@@ -551,7 +551,7 @@ int shellCreateTaskBar (int status){
 	//todo: get system metrics.
 	
 	left = 0;
-	top = (600 - (600/8));
+	top = (600 - (600/16));
 	width = 800;
 	height = (600/8);
 	
@@ -580,9 +580,9 @@ int shellCreateTaskBar (int status){
 	
 	//menu icon
 	unsigned long miLeft = 0;
-	unsigned long miTop = (600 - (600/8));
-	unsigned long miWidth  = (800/8); 
-	unsigned long miHeight = (600/8);
+	unsigned long miTop = (600 - (600/16));
+	unsigned long miWidth = (800/8); 
+	unsigned long miHeight = (600/16);
 
 	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
                             miLeft, miTop, miWidth, miHeight,    
@@ -878,7 +878,7 @@ int shellTestButtons (){
 	unsigned long app3Left = ((ScreenWidth/8) * 4);
 	unsigned long app4Left = ((ScreenWidth/8) * 5);
 	
-	unsigned long app1Top = ( (ScreenHeight/10) * 8); 
+	unsigned long app1Top = (ScreenHeight - ((ScreenHeight/16)*2) ); //( (ScreenHeight/10) * 8 ); 
 	unsigned long app2Top = app1Top; 
 	unsigned long app3Top = app1Top; 
 	unsigned long app4Top = app1Top;
