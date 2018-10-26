@@ -5,11 +5,12 @@
  *     Acesso ao hardware na arquitetura x86.
  *
  * Ambiente:
- *    Boot Loader. RING0.
+ *    Boot Loader. BL.BIN. Ring 0.
  *
- * Revison history:
- *     2005, Created.
- *     2016, Adaptação para o boot loader dos nomes das funções.
+ * Revision history:
+ *
+ *     2005 - Created by Fred Nora.
+ *     2016 - Revision.
  */
 
 
@@ -18,40 +19,48 @@
 
 /*
  * enable:
- *     Habilita as interrupções. @todo: isso pode ser void.
+ *     Habilita as interrupções. 
+ * @todo: isso pode ser void.
  */ 
-int enable()
-{ 
-    asm(" sti ");	
-    return (int) 0;
+void enable (){
+	
+    asm (" sti ");
+	
+    //return (int) 0;
 };
+
 
 /*
  * disable:
- *     Desabilita as interrupções.  @todo: isso pode ser void.
+ *     Desabilita as interrupções.  
+ * @todo: isso pode ser void.
  */ 
-int disable()
-{ 
-    asm(" cli ");   
-	return (int) 0;
+void disable (){
+	
+    asm (" cli ");   
 };
 
-int stopCpu()
-{      
-    __asm(" cli \n\t" 
-	      " hlt ");		  
+
+void stopCpu (){
+	
+    __asm ( " cli \n\t" 
+	        " hlt ");		  
 };
 
-int intReturn()
-{ 
-    __asm(" iret ");
+
+void intReturn (){
+	
+    __asm (" iret ");
 };
 
-int farReturn()
-{
-    __asm(" lret ");
+
+void farReturn (){
+	
+    __asm (" lret ");
 };
 
+
+//#todo: Rever isso.
 int getFlags(int variable) 
 {
     __asm("pushfl \n\t"     
@@ -59,6 +68,8 @@ int getFlags(int variable)
           : "=r" (variable));
 };
 
+
+//#todo: Rever isso.
 int setFlags(int variable)
 {
     __asm("pushl %0 \n\t"   
@@ -66,79 +77,92 @@ int setFlags(int variable)
           : : "r" (variable));
 };
 
-int BlProcessorInPort8( int port, int data)
-{
-    asm("inb %%dx, %%al" : "=a" (data) : "d" (port));
-};
-        
-int BlProcessorOutPort8(int port, int data) 
-{
-    __asm("outb %%al, %%dx" : : "a" (data), "d" (port));
+
+int BlProcessorInPort8 ( int port, int data ){
+	
+    asm ("inb %%dx, %%al" : "=a" (data) : "d" (port) );
 };
 
-int BlProcessorInPort16(int port,int data)
-{ 
-    __asm("inw %%dx, %%ax" : "=a" (data) : "d" (port));
+
+int BlProcessorOutPort8 ( int port, int data ){
+	
+    __asm ("outb %%al, %%dx" : : "a" (data), "d" (port) );
 };
 
-int BlProcessorOutPort16(int port, int data) 
-{
-    __asm("outw %%ax, %%dx"  : : "a" (data), "d" (port));
+
+int BlProcessorInPort16 (int port,int data){
+	
+    __asm ("inw %%dx, %%ax" : "=a" (data) : "d" (port) );
 };
 
-int BlProcessorInPort32(int port, int data) 
-{
-    __asm("inl %%dx, %%eax" : "=a" (data) : "d" (port));
+
+int BlProcessorOutPort16 ( int port, int data ){
+	
+    __asm ("outw %%ax, %%dx" :: "a" (data), "d" (port) );
 };
 
-int BlProcessorOutPort32(int port,int data)
-{ 
-    __asm("outl %%eax, %%dx" : : "a" (data), "d" (port));
+
+int BlProcessorInPort32 ( int port, int data ){
+	
+    __asm ("inl %%dx, %%eax" : "=a" (data) : "d" (port) );
 };
 
-int Push(int value)
-{
-    __asm("pushl %0" : : "r" (value) : "%esp");
+
+int BlProcessorOutPort32 ( int port,int data ){
+	
+    __asm ("outl %%eax, %%dx" : : "a" (data), "d" (port) );
 };
 
-int Pop(int variable)
-{
-    __asm("popl %0" : "=r" (variable) : : "%esp");
+
+int Push (int value){
+	
+    __asm ("pushl %0" : : "r" (value) : "%esp" );
 };
 
-int pushRegs()
-{ 
-    __asm("pushal" : : : "%esp");
+
+int Pop (int variable){
+	
+    __asm ("popl %0" : "=r" (variable) : : "%esp" );
 };
 
-int popRegs()
-{ 
-    __asm("popal" : : : "%esp");
+
+void pushRegs (){
+	
+    __asm ("pushal" : : : "%esp");
 };
 
-int pushFlags()
-{ 
-    __asm("pushfl" : : : "%esp");
+
+void popRegs (){
+	
+    __asm ("popal" : : : "%esp");
 };
 
-int popFlags()
-{ 
-    __asm("popfl" : : : "%esp");
+
+void pushFlags (){
+	
+    __asm ("pushfl" : : : "%esp" );
 };
 
-int getStackPointer(int addr) 
-{
-    __asm("movl %%esp, %0" : "=r" (addr));
+
+void popFlags (){
+	
+    __asm ("popfl" : : : "%esp" );
 };
 
-int setStackPointer(int addr) 
-{
-    __asm("movl %0, %%esp" : : "r" (addr) : "%esp");
+
+int getStackPointer (int addr){
+	
+    __asm ("movl %%esp, %0" : "=r" (addr) );
+};
+
+
+int setStackPointer (int addr){
+	
+    __asm ("movl %0, %%esp" : : "r" (addr) : "%esp" );
 };  
 
 
 //
 //End.
 //
-
 

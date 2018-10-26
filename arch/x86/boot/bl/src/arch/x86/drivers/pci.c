@@ -1,5 +1,5 @@
 /*
- * File: pci.c
+ * File: x86\drivers\pci.c
  *
  * Descrição:
  *     Rotinas de suporte à PCI, exclusivamente para driver de disco SATA.
@@ -12,7 +12,7 @@
  *
  * Class Code: 0x01  (Mass storage controller).
  *
- *  Versão 1.0, 2016.
+ *  2016 - Created by Fred Nora.
  */
  
  
@@ -285,69 +285,79 @@
  *  Ex: 0x80000000 | bus << 16 | device << 11 | function <<  8 | offset.
  *
  */
-unsigned short pciConfigReadWord( unsigned char bus, 
-                                  unsigned char slot, 
-								  unsigned char func, 
-								  unsigned char offset )
+
+unsigned short 
+pciConfigReadWord ( unsigned char bus, 
+                    unsigned char slot, 
+                    unsigned char func, 
+                    unsigned char offset )
 {
     unsigned long address;
-    unsigned long lbus  = (unsigned long) bus;
+    
+	unsigned long lbus  = (unsigned long) bus;
     unsigned long lslot = (unsigned long) slot;
     unsigned long lfunc = (unsigned long) func;
-    unsigned short tmp = 0;
- 
-    // 
-    // Create configuration address.
-	//
-    address = (unsigned long)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | ((unsigned long)0x80000000));
- 
-    //
-    // Write out the address.
-	//
-    outportl(PCI_ADDRESS_PORT, address);
     
-	//
-	// Read in the data port.
-	//
-	tmp = (unsigned short)(( inportl(PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xffff);
-	
-	//
-    // (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
-    //
+	unsigned short tmp = 0;
+ 
 
-done:    
+    // Create configuration address.
+    
+	address = (unsigned long) ( (lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | ((unsigned long) 0x80000000) );
+ 
+    
+    // Write out the address.
+
+    outportl ( PCI_ADDRESS_PORT, address );
+    
+	
+	// Read in the data port.
+	
+	tmp = (unsigned short) ( ( inportl (PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xffff );
+	
+	
+    // (offset & 2) * 8) = 0 
+	// Will choose the first word of the 32 bits register.
+    
+
+//done:  
+  
 	return (unsigned short) tmp; 
 };
  
-
-
-
-
 
 /*
  * pciCheckDevice:
  *     Check device, offset 2.
  *
  */ 
-unsigned short pciCheckDevice(unsigned char bus, unsigned char slot) 
-{    
-    unsigned short Vendor;    //Off 0.
-    unsigned short Device;    //Offset 2 = device.
+unsigned short pciCheckDevice ( unsigned char bus, unsigned char slot ){
+    
+    //Off 0.
+	//Offset 2 = device.
+	
+	unsigned short Vendor;    
+    unsigned short Device;    
  	
 	//Pega o vendor.
-	Vendor = pciConfigReadWord( bus, slot, 0, 0);    //PCI_OFFSET_VENDORID
+	//PCI_OFFSET_VENDORID
+	
+	Vendor = pciConfigReadWord ( bus, slot, 0, 0 );    
     
 	//Vendor inválido.
-    if(Vendor == PCI_INVALID_VENDORID){
+	
+    if ( Vendor == PCI_INVALID_VENDORID )
+	{
 	    return (unsigned short) 0;
     };
 	
 	//Pega o device
-	Device = pciConfigReadWord( bus, slot, 0, 2);    //PCI_OFFSET_DEVICEID		
+	//PCI_OFFSET_DEVICEID
+	
+	Device = pciConfigReadWord ( bus, slot, 0, 2 );    		
     
 	return (unsigned short) Device;
 };
-
 
 
 /*
@@ -355,26 +365,37 @@ unsigned short pciCheckDevice(unsigned char bus, unsigned char slot)
  *     Check vendor, offset 0.
  *
  */ 
-unsigned short pciCheckVendor(unsigned char bus, unsigned char slot)
-{
-    unsigned short Vendor;    //Offset 0.
+unsigned short pciCheckVendor ( unsigned char bus, unsigned char slot ){
+	
+    //Offset 0.
+	
+	unsigned short Vendor;    
 	
 	//Pega o vendor.
-	Vendor = pciConfigReadWord( bus, slot, 0, 0);    //PCI_OFFSET_VENDORID
+	//PCI_OFFSET_VENDORID
+	
+	Vendor = pciConfigReadWord ( bus, slot, 0, 0 );    
     
 	//Vendor inválido.
-    if( Vendor == PCI_INVALID_VENDORID ){
+	
+    if ( Vendor == PCI_INVALID_VENDORID )
+	{
 	    return (unsigned short) 0;
     };	
+	
 	return (unsigned short) Vendor; 
 };
 
 
-unsigned char pciGetClassCode(unsigned char bus, unsigned char slot)
-{
+unsigned char pciGetClassCode ( unsigned char bus, unsigned char slot ){
+	
 	unsigned char ClassCode;
 	
-	ClassCode = (unsigned char) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_CLASSCODE);
+	ClassCode = (unsigned char) pciConfigReadWord ( bus, slot, 0, 
+	                                PCI_OFFSET_CLASSCODE );
+	
+	
+	//#todo: Checar a validade do class code.
 	
 	return (unsigned char) ClassCode;
 };
@@ -384,39 +405,48 @@ unsigned char pciGetClassCode(unsigned char bus, unsigned char slot)
  * pciInfo:
  *    Pega e mostra informações sobre PCI.
  */
-int pciInfo()
-{
+ 
+int pciInfo (){
+	
 	unsigned char i;
     unsigned char j;
-	unsigned short Vendor;    //Offset 0.
-	unsigned short Device;    //Offset 2.
+	
+	//Offset 0.
+	//Offset 2.
+	
+	unsigned short Vendor;    
+	unsigned short Device;    
 	
 	printf("PCI INFO:\n");
 	printf("=========\n");
 	
-	//
+	
 	// This allows up to 256 buses, 
 	// each with up to 32 devices, 
 	// each supporting 8 functions.
-	//
 	
-
-	i=0;    //Bus.
-	j=0;    //Slots. (devices)
+    //Bus.
+	//Slots. (devices)
+	
+	i=0;    
+	j=0;    
 	
 	//bus
-	for(i=0; i< 0xFF; i++)    //0xFF
+	for ( i=0; i< 0xFF; i++ )    
 	{
 		//Device.
-	    for(j=0; j<32; j++)
+	    for ( j=0; j<32; j++ )
         {
 		    //Checks.
-		    Vendor = pciCheckVendor(i, j);
-		    Device = pciCheckDevice(i, j);
+		    Vendor = pciCheckVendor (i, j);
+		    Device = pciCheckDevice (i, j);
 		   
 		    //Show. (Se existe um dispositivo.)
-		    if(Device != 0){
-	            printf("/BUS_%d/SLOT_%d/VENDOR_%x/DEVICE_%x \n" ,i ,j ,Vendor ,Device);
+		    
+			if (Device != 0)
+			{
+	            printf ("/BUS_%d/SLOT_%d/VENDOR_%x/DEVICE_%x \n", 
+				    i, j, Vendor, Device );
 		    };
 
             //@todo: Registrar o que foi encontrado em estrutura.
@@ -493,22 +523,26 @@ int pciInfo()
 // Done.
 //	
 done:
-	printf("Done!\n");
+	printf("Done\n");
     return (int) 0; 
 };
-
 
 
 /*
  * pciInit:
  *     Initialize PCI.
- */ 
-int pciInit()
-{
+ */
+ 
+int pciInit (){
+	
 	int i;
 	int j;	
-    unsigned short Vendor;    //Offset 0.
-	unsigned short Device;    //Offset 2.
+    
+	//Offset 0.
+	//Offset 2.
+	
+	unsigned short Vendor;    
+	unsigned short Device;    
     //...
 	
    //

@@ -605,22 +605,21 @@ inline void outportl(unsigned long port, unsigned long value);
  * CPU instructions support.
  */
  
-int enable();
-int disable();
-int stopCpu();      
-int intReturn();
-int farReturn();
+void enable();
+void disable();
+void stopCpu();      
+void intReturn();
+void farReturn();
 int getFlags(int variable);
 int setFlags(int variable);
 int Push(int value);
 int Pop(int variable);
-int pushRegs();
-int popRegs();
-int pushFlags();
-int popFlags();
+void pushRegs();
+void popRegs();
+void pushFlags();
+void popFlags();
 int getStackPointer(int addr);
 int setStackPointer(int addr);
-
 
 
 //

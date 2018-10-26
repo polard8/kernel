@@ -6,9 +6,10 @@
  *     Obs: O Boot Loader tem procedimento de janela, pois trata intervenções 
  * feitas pelo usuário na hora da inicialização.
  *
- * Versão: 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
+ 
 #include <bootloader.h>
 
 
@@ -22,18 +23,20 @@
  *    Principalmente de F1 à F4.
  *    @todo: Mudar para BlProcedure(...).
  */
-unsigned long bl_procedure(unsigned long window, 
-                           int msg, 
-				    	   unsigned long long1, 
-						   unsigned long long2) 
+
+unsigned long 
+bl_procedure ( unsigned long window, 
+               int msg, 
+               unsigned long long1, 
+               unsigned long long2 ) 
 { 
 
     //printf("Procedure do bootloader!\n");  
   
-    switch(msg)
+    switch (msg)
     {             
         case MSG_KEYDOWN:
-            switch(long1)
+            switch (long1)
             {   
                 /* 			
 			     * Cancela a atividade atual que o Boot Loader 
@@ -50,7 +53,7 @@ unsigned long bl_procedure(unsigned long window,
         break;
           
         case MSG_SYSKEYDOWN:                 
-            switch(long1)	       
+            switch (long1)	       
             {   
                 //4 possibilidades apenas.
 				case VK_F1:
@@ -77,13 +80,16 @@ unsigned long bl_procedure(unsigned long window,
 		    //Nothing.
 			break;
     };
+	
+	
 // Done.
-done:	
+//done:
+	
     return (unsigned long) 0;	
 };  
 
 
 //
-//fim.
+// End.
 //
 

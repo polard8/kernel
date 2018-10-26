@@ -41,6 +41,7 @@ unsigned long prompt_pos;
 unsigned long destroy_window = 1; 
 unsigned long quit_message = 1;
 
+
 /* 
  * KBDUS:
  *     Means US Keyboard Layout. 
@@ -51,8 +52,11 @@ unsigned long quit_message = 1;
  * You can change that to whatever you want using a macro, if you wish! 
  */
 
-
-
+ 
+// #todo:
+// Esse arquivo foi melhor trabalhado no Kernel. Podemos aproveitar 
+// coisas de lá.
+ 
  
 /* 
  * No shift (MAP) 
@@ -224,42 +228,38 @@ CPS|L,     0,     0,     0,     0,     0,     0,     0,		/* scan 64-71 */
 
 
 
-
-
-
-
-
-
-
 /*
  * keyboardHandler:
  *     Keyboard interrupt handler. 
  *     A interrupcao de teclado vai chamar isso.
  */
-void keyboardHandler()
-{
+ 
+void keyboardHandler (){
+	
     //
 	// Step 0: Declarações.
 	//
 	
     //Variáveis para armazenar valores que pegaremos.
-    unsigned char scancode;
+    
+	unsigned char scancode;
     unsigned long status;
 	
 	//@todo: ?? Por que esses valores ??
 	
     //Suporte ao envio de mensagens. 
+	
 	unsigned char *msg = (unsigned char *) 0x00090500;   
     unsigned long mensagem; 	
 	
 	//Suporte ao envio de char.
-    unsigned char *wParam  = ( unsigned char *) 0x00090120;       
+    
+	unsigned char *wParam  = ( unsigned char *) 0x00090120;       
     unsigned long ch;
 
-    //
+
 	// @todo: 
 	// Uma biblioteca de video satisfatória deve existir no Boot Loader.
-    //
 	
 	//Tela para debug.
 	unsigned char *screen = (unsigned char *) 0x000B8000;   
@@ -267,6 +267,7 @@ void keyboardHandler()
     //
     // Step1: Pegar o scancode.       
     //	
+	
 	scancode = inportb(0x60); 
 	
     //
@@ -274,7 +275,7 @@ void keyboardHandler()
     //    
     
 	//Se a tecla foi liberada.
-	if(scancode & 0x80)
+	if (scancode & 0x80)
     {
         //Analiza a tecla.
         status = map[scancode];  
@@ -372,17 +373,22 @@ void keyboardHandler()
 	// Step 4: Send message to Boot Loader procedure.
 	//
 	
-	bl_procedure(0, (int) mensagem, (unsigned long) ch, (unsigned long) status);
+	bl_procedure ( 0, (int) mensagem, (unsigned long) ch, 
+	    (unsigned long) status );
 
 	
 	//
 	// Step 5: EOI.
 	//
    
-done:
-    outportb(0x20,0x20);    //EOI. 
-    return;   
+//done:
+
+    outportb ( 0x20, 0x20 );    //EOI. 
+    
+	//return;   
 };
+
+
 
 //
 // End.

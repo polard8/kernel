@@ -12,7 +12,7 @@
  *     + load_kernel: Carrega o KERNEL.BIN.
  *     + load_files: Carrega IDLE.BIN, SHELL.BIN, TASKMAN.BIN.
  *
- * Histórico:
+ * Históry:
  *     2015 - Created by Fred Nora.
  *     2016 - Revision.
  *     ...
@@ -66,17 +66,18 @@ int load_kernel (){
 	unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;    //0x00100000.  
 	
 	//Name.
+	
 	char *kernel_name = "KERNEL.BIN";
 	
 	//Message.
 #ifdef BL_VERBOSE	
-	printf("load_kernel: Loading %s .. PA=%x | VA=%x \n",kernel_name
-	                                                    ,kernel_pa
-													    ,kernel_va );
+	printf ("load_kernel: Loading %s .. PA=%x | VA=%x \n", kernel_name,
+	    kernel_pa, kernel_va );
 #endif
 														
     //Carregando KERNEL.BIN no endereço físico.
-	Status = (int) fsLoadFile("KERNEL  BIN",kernel_pa);
+	
+	Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa );
     
 	if (Status != 0 )
 	{
@@ -111,9 +112,11 @@ int load_kernel (){
 	 */ 
 	 
 	//Check for intel i386. 0x014C. 
-	if ( kernel[0] != 0x4C || kernel[1] != 0x01 ){	    
-	    printf("load_kernel fail: %s Validation.\n",kernel_name);
-	    goto fail;	
+	if ( kernel[0] != 0x4C || kernel[1] != 0x01 ){	
+    
+	    printf ("load_kernel fail: %s Validation\n", kernel_name );
+	    
+		goto fail;	
 	};
 	
 	
@@ -139,10 +142,11 @@ int load_kernel (){
     // O header está em 0xC0001000.	
 	// 0x1BADB002
 	// tem um jmp antes do header.
-	if( kernel[0x1008] != 0x02 ||
-        kernel[0x1009] != 0xB0 ||
-        kernel[0x100A] != 0xAD ||  		
-	    kernel[0x100B] != 0x1B )
+	
+	if ( kernel[0x1008] != 0x02 ||
+         kernel[0x1009] != 0xB0 ||
+         kernel[0x100A] != 0xAD ||  		
+	     kernel[0x100B] != 0x1B )
 	{	    
         //
 	};	
@@ -151,16 +155,23 @@ int load_kernel (){
 	
 //Kernel carregado.	
 //Done.
-done:	
+
+//done:	
+
 #ifdef BL_VERBOSE
 	printf("Done\n");
 	refresh_screen();
 #endif
-    return (int) 0;  //Status.
+
+    //Status.
+	
+    return (int) 0;  
 	
 //
-// Fail ~ O Kernel não pode ser carregado.
-//	
+// Fail 
+// O Kernel não pôde ser carregado.	
+//
+
 fail:
     printf("load_kernel: Fail\n");
     die();	
@@ -184,12 +195,14 @@ fail:
  *
  *     Mudar para loaderLoadFiles()
  */ 
+ 
 //int loaderLoadFiles()
 int load_files (){
 	
     int Status;   
 	
     //Names.
+	
     char *init_name = "INIT.BIN";
     char *shell_name = "SHELL.BIN";
 	char *taskmanager_name = "TASKMAN.BIN";
@@ -217,17 +230,28 @@ int load_files (){
 	 *
 	 * Por enquanto todos processos estão usando o mesmo diretório de páginas
 	 * e cada um é carregado em um endereço lógico diferente, definido à seguir.
-	 *
+	 * 
 	 */
-	unsigned char *init = (unsigned char *) INIT_ADDRESS;                //0x00400000;   	 
-	unsigned char *shell = (unsigned char *) SHELL_ADDRESS;              //0x00450000;   	 
-	unsigned char *taskmanager = (unsigned char *) TASKMANAGER_ADDRESS;  //0x004A0000;   	 	
+	 
+	
+	// #todo:
+	// Todos eles deverão ter o mesmo endereço virtual.
+	// Então eles serão carregados em endereços físicos 
+	// mas serão mapedos depois pelo kernel.
+	
+	// 0x00400000; 
+	// 0x00450000; 
+	// 0x004A0000;
+	
+	unsigned char *init = (unsigned char *) INIT_ADDRESS;                   	 
+	unsigned char *shell = (unsigned char *) SHELL_ADDRESS;                 	 
+	unsigned char *taskmanager = (unsigned char *) TASKMANAGER_ADDRESS;     	 	
 	//...
 	
-	//
+	
 	// Limites: O endereço base deve estar acima do limite mínimo
 	//          estabelecido para um processo de usuário.
-	//
+
 	
 	if ( INIT_ADDRESS < USER_BASE || 
 	     SHELL_ADDRESS < USER_BASE || 
@@ -245,9 +269,12 @@ int load_files (){
 	//0, IDLE.BIN. 
 #ifdef BL_VERBOSE
 	printf("load_files: Loading %s..\n", init_name );
-#endif	
-	Status = (int) fsLoadFile("INIT    BIN", INIT_ADDRESS );
-	if(Status != 0){
+#endif
+	
+	Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS );
+	
+	if (Status != 0){
+		
 	    printf("load_files: Error loading file: %s\n", init_name );
 	    goto fail;
 	};
@@ -258,11 +285,14 @@ int load_files (){
     //==================		
 	//1, SHELL.BIN.
 #ifdef BL_VERBOSE
-	printf("load_files: Loading %s..\n",shell_name);
+	printf ("load_files: Loading %s..\n", shell_name );
 #endif
-	Status = (int) fsLoadFile("SHELL   BIN",SHELL_ADDRESS);
-	if(Status != 0){
-	    printf("load_files: Error loading file: %s\n",shell_name);
+
+	Status = (int) fsLoadFile ("SHELL   BIN", SHELL_ADDRESS );
+	
+	if (Status != 0){
+	    
+		printf("load_files: Error loading file: %s\n",shell_name);
 	    goto fail;
 	};
 	
@@ -272,11 +302,14 @@ int load_files (){
     //================== 
 	//2, TASKMAN.BIN.
 #ifdef BL_VERBOSE
-	printf("load_files: Loading %s..\n",taskmanager_name);
+	printf("load_files: Loading %s..\n", taskmanager_name );
 #endif
-	Status = (int) fsLoadFile("TASKMAN BIN",TASKMANAGER_ADDRESS);
-	if(Status != 0){
-	    printf("load_files: Error loading file: %s\n",taskmanager_name);
+
+	Status = (int) fsLoadFile ("TASKMAN BIN", TASKMANAGER_ADDRESS );
+	
+	if (Status != 0){
+		
+	    printf("load_files: Error loading file: %s\n", taskmanager_name );
 	    goto fail;
 	};
 	
@@ -284,20 +317,17 @@ int load_files (){
 	//updateProgressBar();
 
 
-	//
 	// Continua? 
 	//     O Boot Loader pode carregar vários arquivos. Principalmete 
 	// arquivos de configuração e módulos do kernel com endereço definido.
 	// Pode também carregar imagens para a interface gráfica. Além de fontes e
 	// drivers. 
-	//
 	
-	//
 	// Validação: 
 	//     Checando os arquivos carregados na memória se são realmente do tipo 
 	// PE, 386. 
 	// @todo: Aqui pode haver opções, como ELF.  
-	//
+	
 	
 	// Init. 
 	if ( init[0] != 0x4C || init[1] != 0x01 ){

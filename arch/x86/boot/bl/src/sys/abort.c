@@ -4,9 +4,10 @@
  * Descrição:
  *     Rotina para abortar o Boot Loader.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
+ 
 #include <stdio.h>
  
  
@@ -16,16 +17,24 @@ extern void refresh_screen();
  * abort:
  *     Função principal para abortar o Boot Loader.
  */ 
-void abort()
-{
+ 
+void abort (){
+	
 	//clear screen
 	//... 
 	
-done:
-    printf("abort: Boot Loader abort!");
+//done:
+
+    printf("BL.BIN abort");
+	
 	refresh_screen();
-	while(1){};
+	
+	while (1){
+		
+		asm ("hlt");
+	};
 };
+
 
 //
 // End.

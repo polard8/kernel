@@ -22,8 +22,8 @@
  *     Os valores das estruturas podem ser salvos em um registro. No registro 
  * pode ter um registro das operações efetuadas no sistema de arquivo.
  *
- * Versão 1.0, 2015 - Created.
- * Versão 1.0, 2016 - Revision.
+ * 2015 - Created by Fred Nora.
+ * 2016 - Revision.
  */
 
 
@@ -33,8 +33,8 @@
 /*
  * fs_load_file:
  *     Carrega um arquivo na memória.
- * 
  */
+ 
 /* 
 int fs_load_file( unsigned char *file_name, unsigned long file_address ){    
 	return (int) 0;    //Ainda não implementada.
@@ -47,6 +47,7 @@ int fs_load_file( unsigned char *file_name, unsigned long file_address ){
  * fs_search_file:
  *    Procura por um nome de arquivo no diretório raiz.
  */
+ 
 /*
 int fs_search_file(unsigned char *file_name){
 	return (int) 0;
@@ -76,15 +77,20 @@ unsigned short is_FAT16()
 
 /*
  * fatClustToSect:
- *     Converte. ??
+ *     Converte. 
+ *     Suporte a clusters.
  */
-unsigned long fatClustToSect( unsigned short cluster, 
-                              unsigned long spc, 
-							  unsigned long first_data_sector )
+ 
+unsigned long 
+fatClustToSect ( unsigned short cluster, 
+                 unsigned long spc, 
+                 unsigned long first_data_sector )
 {
     unsigned long C = (unsigned long) cluster;
-done:	
-	return (unsigned long) ( ( C - 2 ) * spc) + first_data_sector;
+
+	//done:	
+
+    return (unsigned long) ( ( C - 2 ) * spc) + first_data_sector;
 };
 
 
@@ -92,19 +98,21 @@ done:
  * fatLoadCluster:
  *     Load a clusterfull of data
  */
-void fatLoadCluster( unsigned long sector, 
-                     unsigned long address, 
-					 unsigned long spc )
+void fatLoadCluster ( unsigned long sector, 
+                      unsigned long address, 
+					  unsigned long spc )
 {
 	unsigned long i;
 
 	// Começa do primeiro setor do cluster.
-	for(i = 0; i < spc; i++){
-        read_lba( address, sector + i );
+	for ( i=0; i < spc; i++ )
+	{
+        read_lba ( address, sector + i );
 		
 		address = (unsigned long) address + SECTOR_SIZE;    //+512;
 	};
-	return;
+	
+	//return;
 };
 
 
@@ -119,8 +127,7 @@ void fatLoadCluster( unsigned long sector,
  */
 void fs_format (){
 	
-	printf("fs_format:\n");
-    //return;	
+	printf ("fs_format:\n");
 };
 
 
@@ -140,29 +147,28 @@ unsigned long fs_search_empty_entry (unsigned long id){
  *     Procura entrada NÃO vazia na FAT.
  *     A entrada 0, sempre esta ocupada.
  */
-unsigned long 
-fs_find_not_empty_entry()
-{		
-   return (unsigned long) 0;
+
+unsigned long fs_find_not_empty_entry (){
+	
+    return (unsigned long) 0;
 };
 
 
 /*
  *
  */
-void fs_test_fat_vector()
-{
-    return;
+void fs_test_fat_vector (){
+	
+    //return;
 };
 
 
 /*
  *
  */
-unsigned long 
-fs_get_fat_entry(unsigned long n)
-{	
-	return (unsigned long) 0;
+unsigned long fs_get_fat_entry (unsigned long n){
+	
+    return (unsigned long) 0;
 };
 
 
@@ -184,7 +190,7 @@ void fs_create_entry( char *name,
 					  unsigned long cluster,
 					  unsigned long size )
 {
-    return;    //Nothing for now.
+    //return;    //Nothing for now.
 };
 
 
@@ -193,11 +199,11 @@ void fs_create_entry( char *name,
  *     Cria um nome de arquivo.    
  */
 void 
-fsCreateFileName( char *name, 
-                  unsigned long id,
-				  unsigned long eid )
+fsCreateFileName ( char *name, 
+                   unsigned long id,
+				   unsigned long eid )
 {
-    return;
+    //return;
 };
 
 
@@ -205,12 +211,12 @@ fsCreateFileName( char *name,
  * fsSaveFileName: 
  *     Salva um nome no diretório dado o cluster inicial.
  */
-void fsSaveFileName( unsigned char *name, 
-                 unsigned long id, 
-				 unsigned long eid, 
-				 unsigned long initial_cluster )
+void fsSaveFileName ( unsigned char *name, 
+                      unsigned long id, 
+				      unsigned long eid, 
+				      unsigned long initial_cluster )
 {        
-	return;    //Nothing for now.
+	//return;    //Nothing for now.
 };
 
 
@@ -218,59 +224,56 @@ void fsSaveFileName( unsigned char *name,
  * fs_save_entry_on_disc:
  *     @todo: O buffer deve ser salvo no disco.
  */
-void 
-fs_save_entry_on_disc( unsigned long id, unsigned long eid )
-{
-	return;
+void fs_save_entry_on_disc ( unsigned long id, unsigned long eid ){
+	
+	//return;
 };
 
 
 /*
  *
  */
-void 
-fs_set_structures()
-{
-   return;
+ 
+void fs_set_structures (){
+	
+   //return;
 };
 
 
 /*
  *
  */
-void 
-fs_set_entry( unsigned long id, unsigned long eid )
-{
-    return;
+
+void fs_set_entry ( unsigned long id, unsigned long eid ){
+	
+    //return;
 };
 
 
 /*
  *
  */
-void 
-fs_get_entry( unsigned long id, unsigned long eid )
-{ 	
-    return; 
+void fs_get_entry ( unsigned long id, unsigned long eid ){
+ 	
+    //return; 
 };
 
   
 /*
  *
  */
-void 
-fs_show_dir_entry( unsigned long id, unsigned long eid )
-{
-	return; 
+void fs_show_dir_entry ( unsigned long id, unsigned long eid ){
+	
+	//return; 
 };
 
 
 /*
  *
  */
-void fs_show_dir(unsigned long id)
-{
-    return; 
+void fs_show_dir (unsigned long id){
+	
+    //return; 
 };
 
 
@@ -284,9 +287,8 @@ void fs_show_dir(unsigned long id)
  *
  *     Obs: Pertence ao Boot Loader.
  */
-unsigned long 
-fs_check_cluster(unsigned long id)
-{
+unsigned long fs_check_cluster (unsigned long id){
+	
 	return 0;    // Ainda não implementada.
 };
 
@@ -312,9 +314,9 @@ fs_check_cluster(unsigned long id)
  *          carregar arquivos e não salvar arquivos.
  *          
  */
-void fsSaveRootDir()
-{
-	return;    //Ainda não implementada.
+void fsSaveRootDir (){
+	
+	//return;    //Ainda não implementada.
 };
 
 
@@ -323,9 +325,9 @@ void fsSaveRootDir()
  *     Carrega um diretório na memória.
  * 
  */
-void fs_load_dir(unsigned long id)
-{    
-	return;    //Ainda não implementada.
+void fs_load_dir (unsigned long id){
+    
+	//return;    //Ainda não implementada.
 };
 
 
@@ -334,18 +336,18 @@ void fs_load_dir(unsigned long id)
  *     Grava um diretório no disco.
  *
  */
-void fs_save_dir(unsigned long id)
-{
-	return;    //Ainda não implementada.
+void fs_save_dir (unsigned long id){
+	
+	//return;    //Ainda não implementada.
 };
 
 
 /*
  *
  */
-void fs_save_structure()
-{   
-	return;    //Ainda não implementada.
+void fs_save_structure (){
+	
+	//return;    //Ainda não implementada.
 };
 
 
@@ -355,9 +357,9 @@ void fs_save_structure()
  *      dado o número da entrada.
  *      @todo: bugug ? tem alguma incoerência aqui.
  */
-void fs_save_entry_on_root(unsigned long eid)
-{
-	return;    //Ainda não implementada.
+void fs_save_entry_on_root (unsigned long eid){
+	
+	//return;    //Ainda não implementada.
 };
 
 
@@ -365,9 +367,9 @@ void fs_save_entry_on_root(unsigned long eid)
  * fs_show_entry:
  *     Mostra os dados da entrada de diretório.
  */
-void fs_show_entry(unsigned long id, unsigned long eid)
-{    
-	return;    //Ainda não implementada.
+void fs_show_entry (unsigned long id, unsigned long eid){
+    
+	//return;    //Ainda não implementada.
 };
 
 
@@ -375,18 +377,18 @@ void fs_show_entry(unsigned long id, unsigned long eid)
  * fs_delete_entry:
  *     Deleta uma entrada.
  */
-void fs_delete_entry(unsigned long id, unsigned long eid)
-{
-	return;    //Ainda não implementada.
+void fs_delete_entry (unsigned long id, unsigned long eid){
+	
+	//return;    //Ainda não implementada.
 };
 
 
 /*
  *
  */
-void fs_init_bootfile_struct()
-{
-	return;    //Ainda não implementada.
+void fs_init_bootfile_struct (){
+	
+	//return;    //Ainda não implementada.
 };
 
 
@@ -394,7 +396,7 @@ void fs_init_bootfile_struct()
  *
  */
 unsigned long 
-fs_get_entry_status(unsigned long id, unsigned long eid)
+fs_get_entry_status (unsigned long id, unsigned long eid)
 {
     return 0;    //Ainda não implementada.
 };
@@ -404,11 +406,11 @@ fs_get_entry_status(unsigned long id, unsigned long eid)
  *
  */
 void 
-fs_set_entry_status( unsigned long id, 
-                     unsigned long eid, 
-					 unsigned long status )
+fs_set_entry_status ( unsigned long id, 
+                      unsigned long eid, 
+					  unsigned long status )
 {
-    return;    //Ainda não implementada.
+    //return;    //Ainda não implementada.
 };
 
 
@@ -416,8 +418,8 @@ fs_set_entry_status( unsigned long id,
  * fs_makeboot:
  *     @todo: Reanalizar o propósito dessa rotina.
  */
-unsigned long fs_makeboot()
-{   	
+unsigned long fs_makeboot (){
+   	
     return 0;    //Suspensa.
 };
 
@@ -425,10 +427,9 @@ unsigned long fs_makeboot()
 /*
  *
  */											 
-void 
-fs_set_fat_entry(unsigned long n, unsigned long value)
-{
-    return;
+void fs_set_fat_entry (unsigned long n, unsigned long value){
+	
+    //return;
 };
 
 
@@ -436,9 +437,8 @@ fs_set_fat_entry(unsigned long n, unsigned long value)
  * fs_find_empty_entry:
  *
  */
-unsigned short 
-fs_find_empty_entry()
-{
+unsigned short fs_find_empty_entry (){
+	
     return 0;
 };
 
@@ -448,9 +448,9 @@ fs_find_empty_entry()
  *     Instalador.
  *     @todo: Essa função deve ser usada em aplicativo.
  */
-void fs_install()
-{
-	return;   //@todo: Instala o bootmanager no disco.
+void fs_install (){
+	
+	//return;   //@todo: Instala o bootmanager no disco.
 };
 
 
@@ -458,9 +458,9 @@ void fs_install()
  * fs_relood_dir: 
  *     Recarrega na memória um diretório dado seu Id.
  */
-void fs_relood_dir(unsigned long id)
-{
-	return;    //Ainda não implementada.   
+void fs_relood_dir (unsigned long id){
+	
+	//return;    //Ainda não implementada.   
 };
 
 
@@ -773,8 +773,9 @@ found:
  *     Procura um nome de arquivo no diretório.
  *     @todo: Rever o tipo de retorno.
  */
-unsigned long fsSearchFileName( unsigned char *name){        
-    return fsSearchFile(name);
+unsigned long fsSearchFileName ( unsigned char *name ){   
+     
+    return fsSearchFile (name);
 };
 
 
@@ -788,8 +789,8 @@ unsigned long fsSearchFileName( unsigned char *name){
  *    512 entradas de 32 bytes cada.
  *
  */
-void fs_load_rootdirEx()
-{
+void fs_load_rootdirEx (){
+	
 	unsigned long i;
 	unsigned long n = 0;
 	unsigned long root_size = 32;    //@todo: Pegar de estrutura. 
@@ -801,7 +802,8 @@ void fs_load_rootdirEx()
 	// Carregar 32 setores na memória.
 	//
 	 
-	for( i=0; i < root_size; i++){	
+	for ( i=0; i < root_size; i++ )
+	{	
 		read_lba( FAT16_ROOTDIR_ADDRESS + n, FAT16_ROOTDIR_LBA + i); 
 		n = n+512;    //Incrementa buffer.	
 	};
@@ -818,8 +820,8 @@ done:
  *     Carrega a FAT na memória. (size = 64 setores).
  *
  */
-void fs_load_fatEx()
-{
+void fs_load_fatEx (){
+	
 	unsigned long i;
 	unsigned long n = 0;
 	
@@ -833,15 +835,16 @@ void fs_load_fatEx()
 	// Carregar FAT na memória.
 	//
 	
-	for( i=0; i < fat_size; i++){
+	for ( i=0; i < fat_size; i++ )
+	{
 	    read_lba( FAT16_FAT_ADDRESS + n, FAT16_FAT_LBA + i);   
 		n = n+512;    //Incrementa Buffer
 	};
 	
 	//@todo: test ??
 
-done:
-    return;
+//done:
+    //return;
 };
 
 
@@ -931,8 +934,9 @@ fail:
  *     Carrega o diretório raiz na memória.
  */ 
 void fs_load_rootdir(){
+	
     fs_load_rootdirEx();
-	return;
+	//return;
 };
 
 
@@ -941,9 +945,11 @@ void fs_load_rootdir(){
  *     Lê uma lba no hd. (um setor)
  *     Operação de hardware.
  */
-void read_lba( unsigned long address, unsigned long lba){       
+void read_lba( unsigned long address, unsigned long lba){   
+    
     my_read_hd_sector( address, lba, 0, 0);
-    return;
+    
+	//return;
 };
 
 
@@ -951,9 +957,11 @@ void read_lba( unsigned long address, unsigned long lba){
  * write_lba: 
  *     Grava uma lba no HD. (um setor).
  */
-void write_lba( unsigned long address, unsigned long lba){     
+void write_lba( unsigned long address, unsigned long lba){    
+ 
     my_write_hd_sector( address, lba, 0, 0);     
-    return;
+    
+	//return;
 };
 
 
@@ -1183,7 +1191,7 @@ fail:
 void fsClearFat()
 {
     fsInitFat();  //Provisório.	 
-    return;
+    //return;
 };
 
 
@@ -1231,7 +1239,7 @@ fail:
  *    Inicializa as estruturas da FAT.
  */
 void fsInitFat(){
-	return;  //Ainda não implementada.
+	//return;  //Ainda não implementada.
 };
 
 
@@ -1244,7 +1252,7 @@ void fsInitFat(){
  * OBS: Quem vai usar essas estuturas é o bootloader.
  */
 void fsInitStructures(){
-	return;  //Ainda não implementada.
+	//return;  //Ainda não implementada.
 };
 
 
@@ -1253,8 +1261,8 @@ void fsInitStructures(){
  *     Inicializa o sistema de arquivos da partição do sistema.
  *     Obs: Isso deve ficar no fim do arquivo.
  */
-int fsInit()
-{
+int fsInit (){
+	
 
 #ifdef BL_VERBOSE
     printf("fsInit: Initializing structs..\n");
@@ -1268,7 +1276,8 @@ int fsInit()
 
 	//More?!
 
-done:
+//done:
+
     return (int) 0;
 };
 

@@ -11,16 +11,18 @@
  * @todo: 
  * Criar rotina de identificação do hd, configuração e inicialização.
  *    
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
+ 
+// #todo:
+// No kernel temos um esquema melhorado de read e write  
+// em todos os canaid IDE. Devemos reproduzir isso aqui.
+ 
  
 #include <bootloader.h>
 
 
-/*
- * externs.
- */
 extern void os_read_sector();
 extern void os_write_sector();
 extern void reset_ide0();	
@@ -92,6 +94,13 @@ void my_write_hd_sector( unsigned long ax,
  */
 void limpa_root (){
 	
+	
+	//#CANCELADA.
+	
+	//#bugbug: ESSE VALOR DE MEMÓRIA É INACEITÁVEL.
+	//O SISTEMA TEN QUE FUNCIONAR COM O MÍNIMO DE 16MB
+
+/*	
 	unsigned char *root = (unsigned char *) 0x04700000;
     unsigned long i;
     
@@ -108,6 +117,8 @@ void limpa_root (){
     //Nothing. 
 done:
     return;
+	
+*/	
 };
 
 
@@ -119,6 +130,13 @@ done:
  */
 void limpa_fat (){
 	
+	//#CANCELADA.
+	
+	//#bugbug: ESSE VALOR DE MEMÓRIA É INACEITÁVEL.
+	//O SISTEMA TEN QUE FUNCIONAR COM O MÍNIMO DE 16MB	
+	
+/*
+	
     unsigned char *fat_base = (unsigned char *) 0x04500000;
     unsigned long i;
     
@@ -129,10 +147,10 @@ void limpa_fat (){
         i--;
     };
  
-	/* 
-     * Salva 4 setor da fat no hd. 
-     * @todo: #bugbug ESSES VALORES ESTÃO ESTRANHOS. ???
-	 */
+	 
+    //Salva 4 setor da fat no hd. 
+    //@todo: #bugbug ESSES VALORES ESTÃO ESTRANHOS. ???
+	
 	write_lba(0x04500000, 3);
     write_lba(0x04500200, 4);      
     write_lba(0x04500400, 5);
@@ -141,7 +159,8 @@ void limpa_fat (){
 	//@todo: usar while.      
     
 done:
-	return;
+	return; 
+    */
 };
 
 

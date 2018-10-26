@@ -7,7 +7,7 @@
  *     O Boot Loader deve oferecer serviços, funcionando como
  * módulo do kernel em kernel mode.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
  
@@ -24,12 +24,15 @@ void *blServices ( unsigned long arg1,
 		case 1:
 		    break;
 			
-		case 2:
-		    break;
+		//case 2:
+		//    break;
+		
 		//...
 	}
+	
 	return NULL;
-}
+};
+
 
 /*
  * system_services:
@@ -38,10 +41,11 @@ void *blServices ( unsigned long arg1,
 void system_services (){
 	
     //Nothing.
-	return;   
+	//return;   
 };
 
+
 //
-// fim.
+// End.
 //
 

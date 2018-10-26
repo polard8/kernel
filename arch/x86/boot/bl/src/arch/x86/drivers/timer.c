@@ -1,5 +1,5 @@
 /*
- * File: timer.c 
+ * File: x86\drivers\timer.c 
  *
  * Descrição:
  *     Handler da irq0 para o Boot Loader.
@@ -9,7 +9,7 @@
  *    O timer será usado principalmente para timeout de driver.
  *    O timer pode ser usado para contar tempo de inicialização.
  *    
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
  
@@ -22,19 +22,25 @@ unsigned long timerTicks;
 /*
  * timer:
  *     Timer handler for Boot Loader.
+ *     #bugbug: Nem sei se devemos habilitar o timer durante o boot loader.
  */
-void timer()
-{
-    timerTicks++;    //Incrementa o contador.
+ 
+void timer (){
 	
-    if(timerTicks % 100 == 0){		
-        //De tempos em tempos.
+	// Incrementa o contador.
+	// De tempos em tempos, faz alguma coisa.
+	
+    timerTicks++;    
+	
+    if ( timerTicks % 100 == 0 )
+	{		
+        
     };
     
     //Nothing for now.
 	
-done:
-    return;      
+//done:
+    //return;      
 };
 
 
@@ -42,19 +48,21 @@ done:
  * BltimerInit:
  *     Inicializa o módulo timer.
  */
-int BltimerInit()
-{
+int BltimerInit (){
+	
     int Status = 0;
 	
 	timerTicks = 0;
     
 	//...
 	
-done:	
+//done:
+	
 	return (int) Status;	
 };
 
+
 //
-//Fim.
+// End.
 //
 
