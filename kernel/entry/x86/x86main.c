@@ -300,6 +300,30 @@ int x86main ( int argc, char *argv[] ){
 #endif
 
 
+     //
+	 // #test
+	 // Tentaremos inicializar a runtime aqui.
+	 // para obtermos suporte ao texto o mais cedo possível.
+	 
+	 
+        //
+        // RUNTIME !
+        //	
+
+        //#bugbug:
+        //Somente depois da inicialização da runtime é que temos suporte a mensagens,
+        //mas queremos mensagens antes, antão vamos tentar antecipar a inicialização da runtime.		
+
+#ifdef EXECVE_VERBOSE		
+	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
+#endif	
+
+        //sm\rt\runtime.c
+ 		
+	    Status = (int) KiInitRuntime ();
+	    if ( Status != 0 ){
+	        panic("x86main error: Runtime\n");
+	    }
 
 //initializeSystem:
 

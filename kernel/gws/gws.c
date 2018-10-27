@@ -386,8 +386,6 @@ void create_gui (){
 		//Status.
 		gui->refresh = 0;  
 	};
-	
-    //return;
 };
 
 
@@ -1292,7 +1290,8 @@ int init_gui (){
 	//	
 
 
-done:
+//done:
+
     //?? erro fatal ??
     if( (void*) gui == NULL )
 	{
@@ -1313,14 +1312,28 @@ int guiInit()
 {};
 */
 
-
+//deletar
 void gramado(){
+	
     return; 	
 }
 
+//deletar
 int init_gramado(){
+	
 	return 0;
 }
+
+/*
+int gwsInit();
+int gwsInit()
+{
+	printf("GWS:")
+	//#todo:
+	
+}
+*/
+
 
 //
 // End.

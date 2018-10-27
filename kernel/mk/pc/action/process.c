@@ -1576,7 +1576,7 @@ void exit_process( int pid, int code )
 	
 	// Mais limites ??
 
-#ifdef KERNEL_VERBOSE	
+#ifdef MK_VERBOSE	
 	//Debug:
 	printf("exit_process: Terminating process %d.\n",pid);
 	refresh_screen();
@@ -1607,7 +1607,7 @@ void exit_process( int pid, int code )
 		//...
 	};
 		
-#ifdef KERNEL_VERBOSE
+#ifdef MK_VERBOSE
 	//Debug:
 	printf("exit_process: Terminating threads..\n");
 	refresh_screen();
@@ -1655,7 +1655,7 @@ void exit_process( int pid, int code )
 		
 		}else{
     
-#ifdef KERNEL_VERBOSE    
+#ifdef MK_VERBOSE    
 		    //fecha a thread.
 		    printf("exit_process: Killing thread %d.\n",Thread->tid);
 #endif			

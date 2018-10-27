@@ -39,11 +39,9 @@ int init_runtime (){
 	init_mm();
 	
 	
-	//
 	// Nessa hora a memória já funciona e o malloc tambem. e mensagens.
 	//
 	// o video esta usando ainda as configurações de buffer e lfb faitas pelo boot loader.
-	//
 	
 	//
 	//@todo: Suspensa a configurações de páginas
@@ -58,21 +56,11 @@ int init_runtime (){
 	
     // Continua ...
 	
-//done:
+ 
 
     g_module_runtime_initialized = 1;
 	
-	
-#ifdef BREAKPOINT_TARGET_AFTER_RUNTIME
-    //#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
-	printf(">>>debug hang: after runtime initialization");
-	refresh_screen(); 
-	while (1){
-		asm ("hlt");
-	}
-#endif
+
 		
     return (int) 0;    
 };
@@ -89,11 +77,49 @@ int init_runtime (){
  *         de inicialização da runtime.
  *
  */
-int KiInitRuntime()
-{
-    //@todo: ... interface.
+int KiInitRuntime (){
 	
-    return (int) init_runtime();
+	int Status = 0;
+	
+	
+	//#todo 
+	//preparar a tela para as mesagens;
+	//mas somente se a flag de debug estiver acionada.
+
+
+//#bugbug: Isso aqui não seviu pra coisa alguma,
+//pois é preciso inicializar a memória antes de usar 
+//a rotina que pinta o bg.	
+//#ifdef EXECVE_VERBOSE
+//	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
+//#endif	
+	
+    Status = (int) init_runtime ();
+	
+	// #### importante ####
+	// provavelmente aqui é o primeiro lugar onde as mensagens funcional.
+	//
+	
+#ifdef EXECVE_VERBOSE
+	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
+#endif		
+	
+	//#todo:
+	//podemos analisar o status aqui.
+	
+#ifdef BREAKPOINT_TARGET_AFTER_RUNTIME
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after runtime initialization");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif	
+	
+    return (int) Status;	
+	
 };
 
 

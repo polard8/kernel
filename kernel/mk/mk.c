@@ -24,8 +24,8 @@ int localsstuff1;
 
 
 //coloca um processo ou thread em um dos planos de execução
-int jobcontrol( int type, int id, int plane )
-{
+int jobcontrol ( int type, int id, int plane ){
+	
 	struct process_d *p;
 	struct thread_d *t;
 	
@@ -103,8 +103,8 @@ done:
 
 //se o processo ou thread estiver em background o retorno será -1
 //indicando que ele não pode pegar input de teclado.
-int jobcheck( int type, int id )
-{
+int jobcheck ( int type, int id ){
+	
 	struct process_d *p;
 	struct thread_d *t;
 	
@@ -181,10 +181,12 @@ done:
 
 /*
  * microkernelTestLimit:
- *
+ * #bugbug: isso tem que ir pra for do kernel base.
  */
-void microkernelTestLimit()
-{
+void microkernelTestLimit(){
+	
+	/*
+	
     //Índice genérico.
 	int i;
 	struct process_d *p;
@@ -221,51 +223,55 @@ testProcess:
    //
    
 testThread:	  
-/* 
-    printf("Creating threads...\n");      	  
-    i=128;
-    while(i<THREAD_COUNT_MAX)
-	{
-		t = (void*) create_thread( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits");  
-		if((void*)t == NULL ){
-			goto done;
-		}	    
-		i++;	
-	}
+ 
+   // printf("Creating threads...\n");      	  
+   // i=128;
+   // while(i<THREAD_COUNT_MAX)
+	//{
+	//	t = (void*) create_thread( NULL, NULL, gui->screen, 0x400000, DISPATCHER_PRIORITY_LOW, 0, "TestLimits");  
+	//	if((void*)t == NULL ){
+	//		goto done;
+	//	}	    
+	//	i++;	
+//	}
   
-*/  
+  
    //Nothing for now.
    
 done:
     printf("microkernelTestLimit: Done.\n");   
-	return;
+	return;	
+	
+	*/
 };
 
 
 
-void 
-sys_dead_thread_collector()
-{
-    dead_thread_collector();
-	//return;
+void sys_dead_thread_collector (){
+	
+    dead_thread_collector ();
 };
 
 
 //exit process.
 //serviço do sistema.
-void 
-sys_exit_process( int pid, int code )
-{
-	exit_process(pid,code);
-	//return;
+
+void sys_exit_process ( int pid, int code ){
+	
+	//if ( pid < 0 )
+	//    return;
+	
+	exit_process ( pid, code );
 };
 
+
 //exit thread.
-void 
-sys_exit_thread(int tid)
-{
-    exit_thread(tid);
-    //return;
+void sys_exit_thread (int tid){
+
+	//if ( pid < 0 )
+	//    return;
+	
+    exit_thread (tid);
 };
 
 
@@ -298,7 +304,8 @@ void *sys_create_process( struct wstation_d *window_station,
 	
 	//@todo: Return da função create.
 	
-done:
+//done:
+
     return NULL;
 };
 
@@ -330,7 +337,8 @@ void *sys_create_thread( struct wstation_d *window_station,
 				   
     //@todo: return da função create.
 	
-done:
+//done:
+
     return NULL;
 };
 
@@ -340,10 +348,10 @@ done:
  * sys_fork:
  * Fork ... Serviço do sistema.
  */
-int 
-sys_fork()
-{
-	return (int) fork();
+ 
+int sys_fork (){
+	
+	return (int) fork ();
 };
 
 
@@ -357,36 +365,37 @@ void sys_reboot(void)
 
 
 //Pega o id do processo atual.
-int 
-sys_getpid()
-{
+int sys_getpid (){
+	
 	return (int) current_process;
 };
 
 
 //Pega o ID do processo pai do processo atual.
-int 
-sys_getppid()
-{
+int sys_getppid (){
+	
     int pid;
 	int ppid;
+	
 	struct process_d *p;
 	
 	pid = (int) current_process;
 	
-	if( pid >= 0 && pid < PROCESS_COUNT_MAX )
+	if ( pid >= 0 && pid < PROCESS_COUNT_MAX )
 	{
         //Ponteiro da estrutura.
-		p = (void*) processList[pid]; 		
+		p = (void *) processList[pid]; 		
 		
 		//erro.
-		if( (void*) p == NULL ){
+		if ( (void *) p == NULL )
+		{
 			return (int) -1;
 		}
 		
 		//erro.
 		if ( p->used != 1 || p->magic != 1234 ){
-		    return (int) -1;	
+		    
+			return (int) -1;	
 		}
 		
 		//Retorna o id do processo pai.
@@ -394,7 +403,8 @@ sys_getppid()
 	};
 	
 //fail.
-fail:
+//fail:
+
     return (int) -1;	
 };
 
@@ -405,13 +415,9 @@ fail:
  *     Uma interface para chamar um servidor em user mode que realize a 
  * rotina de reboot. 
  */
-void KeReboot()
-{
-	//
-	// @todo
-	//
+void KeReboot (){
 	
-    return;
+    //return;
 };
 
 
@@ -432,11 +438,14 @@ void KeReboot()
  *
  */
 //int microkernelInit() 
-int init_microkernel()
-{
+
+int init_microkernel (){
+	
     int Status = 0;
 	
+#ifdef KERNEL_VERBOSE	
     printf("MICROKERNEL:\n");
+#endif
 
     // Lock task switch and lock scheduler. 
 	set_task_status(LOCKED);
@@ -480,13 +489,13 @@ int init_microkernel()
 	// Dispatch Count Block.
 	//
 	
-	DispatchCountBlock = malloc( sizeof( struct dispatch_count_d ) );
+	DispatchCountBlock = (void *) malloc ( sizeof( struct dispatch_count_d ) );
 	
-	if( (void *) DispatchCountBlock == NULL )
+	if ( (void *) DispatchCountBlock == NULL )
 	{
-	    panic("init_microkernel: DispatchCountBlock\n");
-	    //die();
-	}else{
+	    panic ("init_microkernel: DispatchCountBlock\n");
+	   
+	} else {
 		
 		DispatchCountBlock->SelectIdleCount = 0;
         DispatchCountBlock->SelectInitializedCount = 0;
@@ -500,13 +509,23 @@ int init_microkernel()
 
     //More?!
 
-// Done.
-Done:
     Initialization.microkernel = 1;
 
-#ifdef KERNEL_VERBOSE
-    printf("Done!\n");
+#ifdef MK_VERBOSE
+    printf("Done\n");
 #endif
+
+#ifdef BREAKPOINT_TARGET_AFTER_MK
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after init_microkernel");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif	
+
 
     return (int) Status;
 };

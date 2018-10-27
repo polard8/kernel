@@ -123,7 +123,7 @@ int ipc_dispatch_message( unsigned long a,
 //
 // Done.
 //
-done:
+//done:
     return (int) 0;
 };
 
@@ -138,7 +138,7 @@ done:
  */
 void init_ipc()
 {  
-    return;    //Não implemantada ainda.
+    //return;    //Não implemantada ainda.
 };
 
 

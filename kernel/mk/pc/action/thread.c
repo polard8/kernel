@@ -636,7 +636,8 @@ int init_threads (){
 	//
 	
 //Done.	
-done:
+//done:
+
 	return (int) 0;
 };
 

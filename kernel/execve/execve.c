@@ -421,7 +421,9 @@ int init_executive (){
     int Status = 0;
 	
 	//#debug
+#ifdef KERNEL_VERBOSE
 	printf("EXECUTIVE:\n");
+#endif	
 	
 	// PCI - Pega informações da PCI.
 	// CLOCK - Pega informações de Hora e Data.	

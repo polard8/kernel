@@ -2916,17 +2916,22 @@ int systemStartUp (){
 
         //
         // RUNTIME !
-        //		
+        //	
 
-#ifdef EXECVE_VERBOSE		
-	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
-#endif	
+        //#bugbug:
+        //Somente depois da inicialização da runtime é que temos suporte a mensagens,
+        //mas queremos mensagens antes, antão vamos tentar antecipar a inicialização da runtime.		
+
+//#ifdef EXECVE_VERBOSE		
+	    //printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
+//#endif	
+
         //sm\rt\runtime.c
  		
-	    Status = (int) KiInitRuntime();
-	    if ( Status != 0 ){
-	        panic("sm-sys-system-systemStartUp error: Runtime\n");
-	    }
+	   // Status = (int) KiInitRuntime();
+	   // if ( Status != 0 ){
+	   //     panic("sm-sys-system-systemStartUp error: Runtime\n");
+	   // }
 	
         
         //

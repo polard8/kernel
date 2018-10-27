@@ -638,7 +638,7 @@ int SetUpPaging (){
 	
     //
 	// Message. (verbose).
-#ifdef KERNEL_VERBOSE	
+#ifdef MK_VERBOSE	
 	printf("SetUpPaging: Initializing Pages..\n");
 #endif
 	
@@ -1033,7 +1033,7 @@ int SetUpPaging (){
 	//     #verbose.
 
 	
-#ifdef KERNEL_VERBOSE	
+#ifdef MK_VERBOSE	
 	printf("Debug:\n");
 	printf("Configurando CR3={%x}\n", (unsigned long) &page_directory[0]);
 	printf("Page={%x} \n", (unsigned long) &km_page_table[0]);
@@ -1249,7 +1249,7 @@ int SetUpPaging (){
 
 // Done.
 done:
-#ifdef KERNEL_VERBOSE
+#ifdef MK_VERBOSE
 	printf("Done\n");
 #endif	
     return (int) 0;
@@ -1336,7 +1336,7 @@ void *allocPageFrames( int size ){
 	// Checando limites.
 	//
 	
-#ifdef KERNEL_VERBOSE
+#ifdef MK_VERBOSE
     printf("allocPageFrames: Initializing ...\n");	
 #endif
 
@@ -1370,7 +1370,7 @@ void *allocPageFrames( int size ){
 		goto fail;
 	}
 	
-#ifdef KERNEL_VERBOSE	
+#ifdef MK_VERBOSE	
     printf("allocPageFrames: for ...\n");		
 #endif 
  

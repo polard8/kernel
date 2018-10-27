@@ -414,7 +414,15 @@ void init_globals (){
     //inicializa as estruturas do fluxo padrão.	
 	stdioInitialize();
 	
+	// #importante:
+	// provavelmente isso altere o comportamento do cursor,
+	// levando o cursor par ao início da tela. Então precisamos
+	// repintar o background para recomeçarmos.
 	
+#ifdef EXECVE_VERBOSE
+	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
+#endif
+
 	//
 	// Keyboard support.
 	//
@@ -424,9 +432,6 @@ void init_globals (){
 	
 	//Continua ...
 
-// Done.
-//done:	
-    //return;
 };
 
 
@@ -451,6 +456,12 @@ int init (){
 	printf("sm-init-init: init_globals\n");     
 #endif    
 	init_globals();
+	
+	//#bugbug:
+	//Depois de iniciar as globais, provavelmente o cursor mude 
+	//para o início da tela.
+	//então após iniciarmos as globais temos que repintar o background e 
+	// fazer um refresh da tela se a flag de verbose estiver ligada.
 	
     //Object manager.	
 #ifdef EXECVE_VERBOSE	

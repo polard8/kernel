@@ -911,7 +911,7 @@ int init_heap (){
 // Done.
 done:
 
-#ifdef KERNEL_VERBOSE
+#ifdef MK_VERBOSE
     printf("Done\n");
 #endif	
 	

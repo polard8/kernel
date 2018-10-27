@@ -230,8 +230,8 @@ int sys_showpciinfo (){
  *     Reboot, Serviço do sistema.
  *     Chamando uma rotina interna de reboot do sistema.
  */
-void sys_reboot()
-{
+void sys_reboot (){
+	
     KiReboot();
     panic("sys_reboot:");
 };
@@ -241,8 +241,8 @@ void sys_reboot()
  * sys_shutdown:
  *     Chama uma rotina interna para desligar a máquina.
  */
-void sys_shutdown()
-{
+void sys_shutdown (){
+	
     KiShutDown();
     panic("sys_shutdown:");
 };
@@ -261,15 +261,13 @@ void sys_shutdown()
  * //...
  *
  */
-int hal_hardware_detect()
-{		
+int hal_hardware_detect (){
+	
     //int Status;
 	
-	//
 	// Check system struct.	
-    //
 	
-	if((void *) System == NULL)
+	if ( (void *) System == NULL)
 	{
 		//@todo: goto fail.
 	    return (int) 1;    //Fail.	
@@ -312,7 +310,8 @@ int hal_hardware_detect()
 
     //Continua...
 	
-done:
+//done:
+
     return (int) 0;	
 };
 
@@ -321,8 +320,8 @@ done:
 //hal_showpciinfo deveria ser a rotina que pci.c chama 
 //para obter acesso as informações em baixo nível.
 //@todo: rever os nomes das funções.
-int hal_showpciinfo()
-{
+int hal_showpciinfo (){
+	
 	return (int) pciInfo();
 };
 
@@ -331,9 +330,10 @@ int hal_showpciinfo()
  * hal_probe_processor_type:
  *     Sonda pra ver apenas qual é a empresa do processador.
  */
-int hal_probe_processor_type()
-{
+int hal_probe_processor_type (){
+	
     int MASK_LSB_8 = 0xFF;  
+	
 	unsigned long eax, ebx, ecx, edx;
 	unsigned long name[32];	
 		
@@ -382,11 +382,11 @@ fail:
  *     Inicializa apenas o que for independente da arquitetura.
  *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
  */
-void init_cpu()
-{
+void init_cpu (){
+	
     int Status = 0;
 	
-	processor = (void *) malloc( sizeof(struct tagProcessor) );
+	processor = (void *) malloc ( sizeof(struct tagProcessor) );
 	
 	if( (void *) processor == NULL )
 	{
@@ -424,7 +424,7 @@ void init_cpu()
 	
 done:
 
-#ifdef KERNEL_VERBOSE
+#ifdef HAL_VERBOSE
     printf("Done\n");
 #endif	
 
@@ -450,8 +450,8 @@ unsigned long hal_get_machine_type (){
  *      Faz inicializações dado o tipo de máquina.
  *      @todo: Trocar o nome para hal_init_current_machine. 
  */
-int hal_init_machine()
-{	
+int hal_init_machine (){
+	
 	// Limits for machine type.
 	if( g_machine_type < 0 || g_machine_type > 4)
 	{
@@ -507,11 +507,11 @@ done:
  * @todo: Estamos usando cpuid para testar os 2 tipos de arquitetura.
  * nao sei qual ha instruções diferentes para arquiteturas diferentes.
  */
-int hal_probe_cpu()
-{
+int hal_probe_cpu (){
+	
 	unsigned long eax, ebx, ecx, edx;
 	
-#ifdef KERNEL_VERBOSE
+#ifdef HAL_VERBOSE
     printf("hal_probe_cpu:\n");	
 #endif
 	
@@ -576,8 +576,8 @@ void hal_vsync (){
  ********************************
  * hal_shutdown:    
  */
-void hal_shutdown()
-{
+void hal_shutdown (){
+	
     shutdown();
     panic("hal_shutdown:");
 };
@@ -613,13 +613,13 @@ void hal_shutdown()
  which is in the DSDT and therefore AML encoded.
  
  */
-void shutdown()
-{
-	//
-	// @todo: Background.
-	//
+void shutdown (){
 	
-    MessageBox( gui->screen, 1, "shutdown:", "@todo:" );
+	
+	// @todo: Background.
+	
+	
+    MessageBox ( gui->screen, 1, "shutdown:", "@todo:" );
 	
 	//
 	// @todo: switch APM, ACPI. modo smm	
@@ -629,7 +629,8 @@ void shutdown()
 	//            (Ex: O computador pode ser desligado com segurança).  
 	//
 	
-fail:	
+//fail:	
+    printf("hal-shutdown: fail");
     die();
 };
 
@@ -639,26 +640,29 @@ fail:
  * KiReboot:
  *     Inicialização da parte de hardware do processo de reboot.   
  */
-void KiReboot()
-{
-	//
+void KiReboot (){
+	
 	// @todo: fechar as coisas aqui antes de chamar hal_reboot()
 	// pois hal fica responsavel pela parte de hardware.
     // As rotinas de desligamento do sistema foram para syste.c systemReboot().
 	// ficará aqui somente o que prescede o shamamento de hal.
 	// em hal ficarão as rotinas de reiniamento de hardware.
-    //
+    
 
     //
     // hal	
     // Reboot via keyboard.	
 	//
 	
-do_reboot:
+//do_reboot:
+
     StatusBar( gui->screen, "StatusBar:", "Rebooting...");	
+	
 	refresh_screen();
+	
 	hal_reboot();
-    die();	 
+    
+	die();	 
 };
 
 
@@ -668,8 +672,8 @@ do_reboot:
  * KiShutDown:
  *    @todo: Isso será uma interface para chamar o deligamanto.
  */
-void KiShutDown()
-{
+void KiShutDown (){
+	
     hal_shutdown();
     panic("KiShutDown");
 };
@@ -680,8 +684,8 @@ void KiShutDown()
  *     O hal é a camada mis próxima do hardware, não há tratamento nenhum
  * para fazer, somente chamar o reboot via teclado. 
  */
-void hal_reboot()
-{
+void hal_reboot (){
+	
     asm_reboot(); 
 	panic("hal_reboot:");
 };
@@ -695,8 +699,8 @@ void hal_reboot()
  *
  */
 //int halInit() 
-int init_hal()
-{	
+int init_hal (){
+	
     int Status = 0;
 	
 #ifdef KERNEL_VERBOSE	
@@ -704,7 +708,7 @@ int init_hal()
 #endif	
 	
 	// CPU - Cria e inicializa a estrutura de cpu.
-#ifdef KERNEL_VERBOSE	
+#ifdef HAL_VERBOSE
 	printf("init_hal: cpu\n");
 #endif	
 	init_cpu();
@@ -715,8 +719,8 @@ int init_hal()
 	//
 	
 	// PCI - Cria e inicializa estrutura de pci.
-#ifdef KERNEL_VERBOSE	
-	printf("init_hal: pci (BUG) \n");
+#ifdef HAL_VERBOSE	
+	printf("init_hal: pci\n");
 #endif	
 	init_pci();    //bugbug (a rotina esta incompleta.)	
 
@@ -727,13 +731,13 @@ int init_hal()
 	
 	
 	// TIMER - Cria e inicializa estrutura do timer.
-#ifdef KERNEL_VERBOSE	
+#ifdef HAL_VERBOSE	
 	printf("init_hal: Timer\n");
 #endif    
 	timerInit();	
 
 	// RTC - Cria e inicializa estrutura de rtc.
-#ifdef KERNEL_VERBOSE	
+#ifdef HAL_VERBOSE	
 	printf("init_hal: rtc\n");
 #endif	
 	init_clock();
@@ -746,7 +750,7 @@ int init_hal()
     //P8042_install();	
 		
     //keyboard.
-#ifdef KERNEL_VERBOSE	
+#ifdef HAL_VERBOSE	
 	printf("init_hal: kd\n");
 #endif	
 	init_keyboard();
@@ -784,12 +788,25 @@ int init_hal()
 	// Continua ...
 	//
 
-Done:
+//Done:
+
     Initialization.hal = 1;	
 	
-#ifdef KERNEL_VERBOSE
+#ifdef HAL_VERBOSE
 	printf("Done\n");
 #endif
+
+
+#ifdef BREAKPOINT_TARGET_AFTER_HAL
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after init");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif	
 	
 	return (int) Status;
 };
