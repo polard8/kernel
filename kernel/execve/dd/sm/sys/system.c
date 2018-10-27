@@ -2867,13 +2867,16 @@ int systemStartUp (){
 	// Antes de tudo: CLI, Video, runtime.
 	//
 	
+	//@todo: As mensagens do abort podem não funcionarem nesse caso.
+	
 	if(KeInitPhase != 0)
-	{	
-		//@todo: As mensagens do abort podem não funcionarem nesse caso.
+	{		
 		KiAbort();	
+		
 	}else{
 		
-	    //Disable interrupts, lock taskswitch and scheduler.	    
+	    //Disable interrupts, lock taskswitch and scheduler.
+	    
 		asm("cli");	
 	    taskswitch_lock();
 	    scheduler_lock();
@@ -2889,21 +2892,21 @@ int systemStartUp (){
 		//
 		
         //Welcome message. (Poderia ser um banner.) 
-		set_up_cursor(0,1);
+		set_up_cursor (0,1);
 		
-#ifdef KERNEL_VERBOSE		
+#ifdef EXECVE_VERBOSE		
         printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
 		    KERNEL_VERSION);
 #endif		
 		
-#ifdef KERNEL_VERBOSE		
+#ifdef EXECVE_VERBOSE		
 		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
 		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
 		    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
 		};
 #endif
 
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
 		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",
 		    (unsigned long) SavedLFB,
 			(unsigned long) SavedX,
@@ -2915,19 +2918,22 @@ int systemStartUp (){
         // RUNTIME !
         //		
 
-#ifdef KERNEL_VERBOSE		
+#ifdef EXECVE_VERBOSE		
 	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
-#endif			
+#endif	
+        //sm\rt\runtime.c
+ 		
 	    Status = (int) KiInitRuntime();
 	    if ( Status != 0 ){
-	        panic("sm-sys-system-systemStartUp error: Runtime.\n");
-	    }		
+	        panic("sm-sys-system-systemStartUp error: Runtime\n");
+	    }
+	
         
         //
         // INIT ! 
         //  		
 		
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
 		//(inicializa as 4 fases.)
 	    // Básico. ( Variáveis globais e estruturas ... ).
 	    printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
@@ -2996,6 +3002,7 @@ done:
  */
 int systemInit (){
 	
+	int Status;
 	//Colocando na variável global, a opção selecionada manualmente pelo 
 	//desenvolvedor.
     gSystemEdition = SYSTEM_EDITION;
@@ -3004,9 +3011,22 @@ int systemInit (){
 	// Podemos fazer algumas inicializações antes de chamarmos 
 	//a rotina de start up.
 	
-//done:
-    //Retornando para o kMain. em main.c.	
-	return (int) systemStartUp ();	
+	Status =  (int) systemStartUp ();	
+	
+	
+#ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after init");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif		
+	
+	//retornando para a rotina de entrypoint da arquitetura alvo.
+	return (int) Status;
 };
 
 

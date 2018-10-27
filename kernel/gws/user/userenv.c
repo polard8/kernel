@@ -2,7 +2,9 @@
  * File: gws\user\userenv.c 
  *
  * Descrição:
+ *
  * User Environment Manager, (UEM).
+ *
  * Cria o ambiente do usuário, Área de trabalho, onde o usuário interage 
  * com a máquina (logo após o logon). 
  *
@@ -133,10 +135,6 @@ void ShowUserInfo (int user_id){
 	};
 	
 	//...
-	
-// Done.
-//done:
-    //return;
 };
 
 
@@ -167,16 +165,21 @@ void config_user (){
  * configuração dentro da pasta.
  * 
  */
-void *CreateUser(char *name, int type)
-{
+ 
+void *CreateUser ( char *name, int type ){
+	
 	int Index = 0;	
+	
    	struct user_info_d *New;
 
-	New = (void*) malloc( sizeof(struct user_info_d) ); 
-	if( (void*) New == NULL ){
+	New = (void *) malloc ( sizeof(struct user_info_d) ); 
+	
+	if ( (void *) New == NULL )
+	{
 	    printf("user-userenv-CreateUser:");
 	    die();
-	}else{
+		
+	} else {
 	    
 		New->used = 1;
 		New->magic = 1234;
@@ -185,11 +188,15 @@ void *CreateUser(char *name, int type)
 		
 		New->name = (char *) name;      
 	    New->name_address = (unsigned long) name;
-	    New->userType = type;    
+	    New->userType = type;  
+
+ 		//Session.
+        //Window Station. (Desktop pool).
+        //Desktop.		 
 	
-	    New->sessionId       = current_usersession;      //Session. 
-	    New->windowstationId = current_windowstation;    //Window Station. (Desktop pool). 
-	    New->desktopId       = current_desktop;          //Desktop.
+	    New->sessionId = current_usersession;           
+	    New->windowstationId = current_windowstation;   
+	    New->desktopId = current_desktop;          
 
 	    //Inicializa tokens. (rever)
 	    //New->k_token = KERNEL_TOKEN_NULL;
@@ -202,24 +209,28 @@ void *CreateUser(char *name, int type)
 	
 
 	//Procurando uma entrada livre na lista.
-	while(Index < USER_COUNT_MAX)
+	while ( Index < USER_COUNT_MAX )
 	{	
-        if( (void *) userList[Index] == NULL )
+        if ( (void *) userList[Index] == NULL )
 		{
+		    //User Id. 
+			New->userId = Index;     
+						
 		    userList[Index] = (unsigned long) New;
-	        New->userId = Index;    //User Id.     
-		    goto done;
+
+            //printf("CreateUser: Done.\n"); 
+	        return (void *) New;			
 		};
-        ++Index;
+        
+		Index++;
 	};
+	
 //Fail: 
 //Fim do loop. 
 //Não encontramos uma entrada livre.
+
 fail:
     return NULL;
-done:
-    //printf("CreateUser: Done.\n"); 
-	return (void *) New;			
 };
 
 
@@ -227,15 +238,17 @@ done:
  * SetCurrentUserId:
  *     Configura o ID do usuário atual.  
  */
-void SetCurrentUserId(int user_id)
-{
-	//Limits.
-	if(user_id < 0 || user_id > USER_COUNT_MAX){
+void SetCurrentUserId (int user_id){
+	
+	if ( user_id < 0 || user_id >= USER_COUNT_MAX )
+	{
 		printf("user-userenv-SetCurrentUserId:\n");
 		return;
 	};
+	
     current_user = (int) user_id;
-	return;
+	
+	//return;
 };
 
 
@@ -243,20 +256,23 @@ void SetCurrentUserId(int user_id)
  * GetCurrentUserId: 
  *     Pega o ID do usuário atual.
  */
-int GetCurrentUserId(){
+int GetCurrentUserId (){
+	
    return (int) current_user;
 };
 
 
-void SetCurrentGroupId(int group_id)
-{
-	//Limits.
-	if(group_id < 0 || group_id > GROUP_COUNT_MAX){
+void SetCurrentGroupId (int group_id){
+	
+	if ( group_id < 0 || group_id >= GROUP_COUNT_MAX )
+	{
 		printf("SetCurrentGroupId:\n");
 		return;
 	};
+	
     current_group = (int) group_id;
-	return;
+	
+	//return;
 };
 
 
@@ -264,7 +280,8 @@ void SetCurrentGroupId(int group_id)
  * GetCurrentGroupId: 
  *     Pega o GID do usuário atual.
  */
-int GetCurrentGroupId(){
+int GetCurrentGroupId (){
+	
     return (int) current_group;
 };
 
@@ -273,40 +290,40 @@ int GetCurrentGroupId(){
  * UpdateUserInfo:
  *    Atualiza todas as informações de usuário.
  */					 
-void UpdateUserInfo( struct user_info_d *user, 
-                     int id, 
-					 char *name, 
-					 int type, 
-					 int user_session_id, 
-					 int window_station_id,
-					 int desktop_id )
+void UpdateUserInfo ( struct user_info_d *user, 
+                      int id, 
+					  char *name, 
+					  int type, 
+					  int user_session_id, 
+					  int window_station_id,
+					  int desktop_id )
 {  
-	if( (void*) user == NULL ){
+	if ( (void *) user == NULL )
+	{
         return;
-	}else{
+	
+	} else {
 		
 		//Estamos tentando atualizar uma estrutura válida.
 
-        if( user->used != 1 ){
+        if ( user->used != 1 || user->magic != 1234 )
+		{
 			//fail;
-		}  	
-
-        if( user->magic != 1234 ){
-			//fail;
+			//return;
 		}  	
 	    
 		user->userId = (int) id;                      //Id.     
+		
 		user->name = (char *) name;                   //Name.
 	    user->name_address = (unsigned long) name;    //Name.
+		
 		user->userType = type;                        //Type.
-	    user->sessionId = user_session_id;            //Session.
+	    
+		user->sessionId = user_session_id;            //Session.
 	    user->windowstationId = window_station_id;    //Window Station.
         user->desktopId = desktop_id;                 //Desktop.
 		//...
 	};
-	//Nothing.
-done:
-    return;
 };
 
 
@@ -346,6 +363,7 @@ done:
  * /root/user/config.txt
  * ...
  */
+ 
 void init_user_info (){
 	
 	int Id = 0;
@@ -366,7 +384,8 @@ void init_user_info (){
 	{
 	    printf("init_user_info:");
 	    die();
-	}else{
+		
+	} else {
 		
 		//Coloca no início da lista.
 		//userList[0] = (unsigned long) SystemUser;    //System.
@@ -389,10 +408,6 @@ void init_user_info (){
 	};
 	
     // Continua...??!!
-
-//done:
-    //printf("Done\n"); 
-    //return;
 };
 
 
@@ -400,12 +415,13 @@ void init_user_info (){
  * init_user_environment_manager:
  *    Inicializa o User Environment Manager. (UEM). 
  */
-int init_user_environment_manager(int argc, char *argv[]) 
-{
+int init_user_environment_manager ( int argc, char *argv[] ){
+	
 	//...
 	
     //g_module_uem_initialized = 1;
     userenvironmentStatus = 1;
+	
 	return (int) 0;
 };
 
@@ -415,6 +431,7 @@ int init_user_environment_manager(int argc, char *argv[])
 void userenvironmentUserEnvironment()
 {}
 */
+
 
 /*
 int userenvironmentInit()

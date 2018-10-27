@@ -221,9 +221,12 @@ int x86main ( int argc, char *argv[] ){
     // set system window procedure.
     SetProcedure( (unsigned long) &system_procedure);
 
-
-    // Video.
-    // First of all.
+    //
+    // ## Video support ##
+    //
+	
+	
+	// First of all.
     // ps: Boot loader is mapping the LFB.
 
 //setupVideo:
@@ -232,8 +235,8 @@ int x86main ( int argc, char *argv[] ){
     // Device screen sizes.
 
     //Set graphics mode or text mode using a flag.
-    if ( SavedBootMode == 1 ){
-		
+    if ( SavedBootMode == 1 )
+	{	
         g_useGUI = GUI_ON;
         VideoBlock.useGui = GUI_ON;
         //...
@@ -248,12 +251,14 @@ int x86main ( int argc, char *argv[] ){
     //initializes a new line when '\n' is found.
 	stdio_verbosemode_flag = 1;
 
+	//unb\video.c 
+	
     videoVideo();
     videoInit();
 	
     // Init screen
 
-#ifdef KERNEL_VERBOSE	
+#ifdef ENTRY_VERBOSE	
     //If we are using graphics mode.
     if (VideoBlock.useGui == GUI_ON){
         printf("x86main: Using GUI\n");
@@ -270,20 +275,37 @@ int x86main ( int argc, char *argv[] ){
         videoSetupCGAStartAddress(SCREEN_CGA_START); 
 
     //Debug.
-#ifdef KERNEL_VERBOSE
+#ifdef ENTRY_VERBOSE
         kclear(0);
         kprint("x86main: Debug" ,9 ,9 );
         printf("x86main: Text Mode\n");
 #endif
+
+        //
+		// ## bug bug ##
+		//
+		
+		// Text mode not supported.
+
+		printf ("x86main: Text mode is the current mode. Its not supported.");
+		//die ();
+		while (1){
+			asm ("hlt");
+		}
     };
 
-#ifdef KERNEL_VERBOSE
+#ifdef ENTRY_VERBOSE
     printf("x86main: Starting kernel..\n");
     refresh_screen(); 
 #endif
 
+
+
 //initializeSystem:
 
+    //
+	// ## system ##
+	//
   
 
     systemSystem();	
@@ -720,8 +742,21 @@ int x86main ( int argc, char *argv[] ){
 	*/
 	
 
+	
+#ifdef BREAKPOINT_TARGET_AFTER_ENTRY
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after entry");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif	
+	
+	
 	//
-    // RETURNING !
+    // done !
     //
 
 done:

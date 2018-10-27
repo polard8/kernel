@@ -52,14 +52,17 @@
 
 
 
-#define KERNEL      0
 
 //layer.
-//@todo: Change numbers.
-#define HAL         2   //4
+
+#define HAL         4   //4
 #define MICROKERNEL 3   //3
-#define EXECUTIVE   1   //2
-//#define GRAMADO     4   //1
+#define EXECUTIVE   2   //2
+#define GRAMADO     1   //1 gws
+
+#define KERNEL      0
+
+
 
 
 //IOPL constants.

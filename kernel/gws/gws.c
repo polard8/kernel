@@ -118,9 +118,10 @@ void gui_create_grid();
  * Obs: esse é o user environment. 
  *(deixe o desenvolvedor saber em qual desktop ele está.)
  */
+ 
 void create_gui (){
 	
-	struct window_d *hWindow; 	 
+	//struct window_d *hWindow; 	 
 
 	//
 	// Set minimal gui set up!.
@@ -138,17 +139,16 @@ void create_gui (){
 	//        que devem ser deletadas na finalização do logon. @todo.
     // 		
 	
-	gui = (void*) malloc( sizeof(struct gui_d) );
-    if((void*) gui == NULL){	
+	gui = (void *) malloc( sizeof(struct gui_d) );
+	
+    if ( (void *) gui == NULL )
+	{	
 	    printf("create_gui:");
 		die();
-		//refresh_screen();
-		//while(1){};
-	}else{
 		
-        //
+	} else {
+		
 		// Set user session, window station, desktop, window and menu.
-	    //
 		
 		current_usersession = 0;        //User Session.
 	    current_windowstation = 0;  //Window Station.
@@ -157,43 +157,40 @@ void create_gui (){
 	    current_menu = 0;           //Menu.
 		
 		
-		//
 		// @todo: O logon devveria ter selecionado o perfil do usuário
 		//        e essa rotina não deveria ser chamada.
-		//
+				
+		init_user_info ();
 		
-		init_user_info();
-		
-		//
 		// Em ordem:
 		// user section, window station and desktop.
 		// windows and menus.
-		//
+		
 		
 #ifdef KERNEL_VERBOSE		
 		printf("create_gui: User Session..\n");
 #endif
-		init_user_session();
+		init_user_session ();
 		
 #ifdef KERNEL_VERBOSE				
 		printf("create_gui: Window Station..\n");
 #endif
-		init_window_station();
+		init_window_station ();
 	 
 #ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Desk..\n");
 #endif
-	    init_desktop();	
+	    init_desktop ();	
 	 
 #ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Wind..\n");
 #endif	    
-		init_windows();	
+		init_windows ();	
 	 
 #ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Menu..\n");
 #endif	    
-		init_menus();
+		init_menus ();
 		
 		//
 		// System MenuBar: (Barra no topo da tela). 
@@ -252,7 +249,8 @@ void create_gui (){
 	// *** Filtro importante.
 	//
 	
-	if( (void*) gui == NULL ){
+	if ( (void *) gui == NULL )
+	{
 		printf("create_gui: gui struct");
 		die();
 	};
@@ -276,15 +274,15 @@ void create_gui (){
 	//Base windows:
 	//screen,background,taskbar
 	
-	if(gui->screenStatus == 1){ 
+	if (gui->screenStatus == 1){ 
 	    gui_create_screen(); 
 	};
 	
-	if(gui->backgroundStatus == 1){	
+	if (gui->backgroundStatus == 1){	
 	    gui_create_background(); 
 	};
 
-	if(gui->taskbarStatus == 1){	
+	if (gui->taskbarStatus == 1){	
 	    gui_create_taskbar(); 
 	};
 
@@ -292,7 +290,7 @@ void create_gui (){
 	//main (com base na screen e na taskbar.)
 	
 	
-    if(gui->mainStatus == 1){ 
+    if (gui->mainStatus == 1){ 
 	    gui_create_mainwindow(); 
 	};
 
@@ -300,57 +298,55 @@ void create_gui (){
 	//outros.
 
 	
-	if(gui->logoStatus == 1){ 
+	if (gui->logoStatus == 1){ 
 	    gui_create_logo(); 
 	};	
 	
 	
-    if(gui->messageboxStatus == 1){ 
+    if (gui->messageboxStatus == 1){ 
 	    gui_create_messagebox(); 
 	};
 	
-    if(gui->menuStatus == 1){ 
+    if (gui->menuStatus == 1){ 
 	    gui_create_controlmenu(); 
 	};	
 
-    if(gui->navigationbarStatus == 1){ 
+    if (gui->navigationbarStatus == 1){ 
 	    gui_create_navigationbar(); 
 	};
 	
-	//
 	// Grid: Dentro do grid haverá sempre 3 partes: 
 	//       Header | Content | Footer.
 	//       Obs: @todo: O grid deve levar em consideração a
 	// área que lhe pertence, ou seja a área de trabalho.  
-	//
 	
-    if(gui->gridStatus == 1){ 
+    if (gui->gridStatus == 1){ 
 	    gui_create_grid(); 
 	};
 	
 	
 //drawingStrings:
 	
-	//
 	// Strings.
 	// String no background.
-	//
 	
-	if( (void*) CurrentUser != NULL )
+	if ( (void *) CurrentUser != NULL )
 	{
-        if(g_guiMinimal != 1)
+        if (g_guiMinimal != 1)
 	    {		
-	        //
             // Obs: Informações de ambiemte para o desenvolvedor.
-            //
-			
 			//@todo: Informar o desktop atual.
 			
-		    draw_text(gui->main, 0, 0, COLOR_WHITE, "User Environment:");
-		    draw_text(gui->main, 0, 8, COLOR_WHITE, "================");
-			draw_text(gui->main, 8*14, 8*4, 
-			          COLOR_WHITE, "Welcome to User Environmet, press F1=HELP.");
-			draw_text(gui->main, 8*14, 8*5, COLOR_WHITE, "This is the user environment");
+			//#bugbug:
+			//
+			
+		    draw_text ( gui->main, 0, 0, COLOR_WHITE, "User Environment:");
+		    draw_text ( gui->main, 0, 8, COLOR_WHITE, "================");
+			draw_text ( gui->main, 8*14, 8*4, 
+			    COLOR_WHITE, "Welcome to User Environmet, press F1=HELP.");
+			draw_text ( gui->main, 8*14, 8*5, COLOR_WHITE, 
+			    "This is the user environment");
+			
 			//draw_text(gui->main, 8*10, 8*12, COLOR_WHITE, "F1=HELP");
 			//...
 			
@@ -379,14 +375,19 @@ void create_gui (){
 	// @todo: More ?!!
 	//
 	
-done:
+//done:
+
 	//Refresh.
     //(O 1 avisa que é necessário dar refresh pois foram efetuadas rotinas de pintura).	
-	if(gui->refresh == 1){
+	if ( gui->refresh == 1 )
+	{
 		refresh_screen();
-		gui->refresh = 0;  //Status.
+		
+		//Status.
+		gui->refresh = 0;  
 	};
-    return;
+	
+    //return;
 };
 
 

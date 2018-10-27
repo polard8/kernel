@@ -447,38 +447,38 @@ int init (){
 	}
  
     //Globals.
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: init_globals\n");     
 #endif    
 	init_globals();
 	
     //Object manager.	
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: init_object_manager\n");
 #endif	
 	init_object_manager();
 	
 	//i/o Manager.
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: ioInit\n");	
 #endif	
 	ioInit();
 	
 	//Disk manager, volume manager and fs manager.
 	
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: disk_init\n");
 #endif    
 	disk_init();
 	
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: volume_init\n");
 #endif    
 	volume_init();
 	
 	
 	
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("fsInit: VFS..\n");
 #endif
 	
@@ -486,7 +486,7 @@ int init (){
 	
 	
 	
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: fsInit\n");
 #endif    
 	fsInit();
@@ -494,13 +494,13 @@ int init (){
 		
     //System folders.
     // ??@todo: /ux4 .../ux1	
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: create_system_folders\n");
 #endif	
 	create_system_folders(); 
     
 
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: initialize_system_message_queue\n");
 #endif	
 	initialize_system_message_queue(); 
@@ -518,7 +518,7 @@ int init (){
 	// Initialize Platform structure.
 	//
 	
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
 	printf("sm-init-init: Platform\n");	
 #endif
 
@@ -607,7 +607,7 @@ int init (){
 
 	if ( g_useGUI == 1 ){
 		
-#ifdef KERNEL_VERBOSE		
+#ifdef EXECVE_VERBOSE		
 		printf("sm-init-init: Logon\n");
 #endif	    
 		create_logon();
@@ -636,6 +636,21 @@ int init (){
     //printf("Done!\n");	
 	//refresh_screen();
 	//@todo: Deve retornar a variável Status.
+	
+	
+#ifdef BREAKPOINT_TARGET_AFTER_INIT
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after init");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif	
+	
+	
+	
     return (int) 0;  
 };
 

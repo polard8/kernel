@@ -31,12 +31,11 @@
  *     Kernel heap and stack stuffs.
  *     @todo: Mudar para runtimeInit().
  */
-int init_runtime()
-{
-    //	
+int init_runtime (){
+	
 	// Init Memory Manager:	
 	// Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
-	//
+	
 	init_mm();
 	
 	
@@ -54,12 +53,27 @@ int init_runtime()
 	
 	//Cria o diretório de páginas do processo kernel, page tables e 
 	//area para pageframes de memória paginada.
+	
 	SetUpPaging();		
 	
     // Continua ...
 	
-done:
+//done:
+
     g_module_runtime_initialized = 1;
+	
+	
+#ifdef BREAKPOINT_TARGET_AFTER_RUNTIME
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after runtime initialization");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif
+		
     return (int) 0;    
 };
 

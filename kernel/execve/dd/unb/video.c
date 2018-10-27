@@ -58,9 +58,7 @@ int videoError;
 void videoSetupCGAStartAddress (unsigned long address){
 	
     g_current_vm = (unsigned long) address;
-	
 	//g_current_cga_address
-	//return;
 };
 
 
@@ -164,28 +162,23 @@ void videoSetMode (unsigned long mode){
 	screenSetSize (Width,Height);
 	
 	// Continua... (outros parametros)
-	
-//done:
 
     g_current_video_mode = (unsigned long) VideoMode;
-    
-	//return;
 };
 
 
 /*
  ***********************************************
  * videoInit:
- *     Inicia variáveis de video de acordo com o 
- * modo gráfico utilizado.
+ *     Inicia variáveis de video de acordo com o modo gráfico utilizado.
  */ 
+ 
 int videoInit (){
 	
 	int Status = 0;
 	
 	//uintptr_t addr;
-	
-	
+		
 	// Configuração inicial em modo gráfico.
 	
 	if ( g_useGUI == 1 || VideoBlock.useGui == 1 )
@@ -212,7 +205,7 @@ int videoInit (){
 		//
 		
 		//Background.
-		backgroundDraw(COLOR_KERNEL_BACKGROUND);  //COLOR_BLUE
+		backgroundDraw (COLOR_KERNEL_BACKGROUND);  //COLOR_BLUE
 		
 	    //@todo: Isso deve fazer parte do construtor.
 		
@@ -287,13 +280,15 @@ int videoInit (){
 		//video_mem = (uint16_t *)(addr);
 		
 	    //Screen.
+		
         videoSetupCGAStartAddress(SCREEN_CGA_START);
 	    
 		//Background.
-		kclear(0);
+
+		backgroundDraw ( COLOR_BLUE );
 		
 		//text color. (branco em preto).
-	    set_up_text_color(0x0F, 0x00); 
+	    set_up_text_color (0x0F, 0x00); 
 		
 		//set video mode
 		//SetVideoMode(3);
@@ -307,15 +302,29 @@ int videoInit (){
 	// Outras configurações de vídeo independentes do modo de vídeo.
 	//
 	
-config:	
+//config:
+	
 	set_up_cursor(0,0);    //Cursor.
 	
 	//
     // @todo: Sizes, atribute, atribute color, row, column
 	//
+
+    g_driver_video_initialized = 1;
 	
-done:
-    g_driver_video_initialized = 0;
+	
+#ifdef BREAKPOINT_TARGET_AFTER_VIDEO
+    //#debug 
+	//a primeira mensagem só aparece após a inicialização da runtime.
+	//por isso não deu pra limpar a tela antes.
+	printf(">>>debug hang: after video");
+	refresh_screen(); 
+	while (1){
+		asm ("hlt");
+	}
+#endif		
+	
+	
     return (int) Status;    
 };
 
@@ -327,14 +336,14 @@ done:
  *     Confgura algumas variáveis.
  *     @todo: isso poderia ter retorno void.
  */
-int videoVideo()
-{
+int videoVideo (){
+	
     videoStatus = 0;
     videoError = 0;
     //...
-	
-	
-Done:	
+		
+//Done:	
+
 	return (int) 0;
 };
 
