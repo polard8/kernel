@@ -185,6 +185,10 @@ kernel fica com o 1GB superior."
 
 unsigned long gKernelPageDirectoryAddress; 
 
+unsigned long gInitPageDirectoryAddress; 
+unsigned long gShellPageDirectoryAddress; 
+unsigned long gTaskmanPageDirectoryAddress; 
+
 
 /* 
  * As configurações de memória foram feitas pelo Boot Loader.

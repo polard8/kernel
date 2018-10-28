@@ -3927,7 +3927,18 @@ int shellInit ( struct window_d *window ){
 
 //#ifdef SHELL_VERBOSE			
 //	printf("Creating processes ...\n");
-//#endif	
+//#endif
+
+/*
+    printf("Creating process ...\n");	
+	//D.:)
+	P = (void *) apiCreateProcess ( 0x400000, PRIORITY_HIGH, "NEW-PROCESS");
+	if ( (void *) P==NULL )
+	{
+		printf ("Fail creating process D :)\n");
+	};
+*/	
+	
 	
 #ifdef SHELL_VERBOSE
     

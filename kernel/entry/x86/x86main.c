@@ -75,8 +75,9 @@ char copyright[] =
 "Copyright (c) 2005-2018\n\tFred Nora.  All rights reserved.\n\n";
 
 
-static inline void mainSetCr3 ( unsigned long value ) {
-    __asm__ ( "mov %0, %%cr3" : : "r"(value) );
+static inline void mainSetCr3 ( unsigned long value ){
+	
+    __asm__ ( "mov %0, %%cr3" : : "r" (value) );
 };
 
 
@@ -169,21 +170,21 @@ void startStartIdle (){
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 
 	// para ela via iret.
 	
-    asm volatile(" cli \n"
-                 " mov $0x23, %ax  \n"
-                 " mov %ax, %ds  \n"
-                 " mov %ax, %es  \n"
-                 " mov %ax, %fs  \n"
-                 " mov %ax, %gs  \n"
-                 " pushl $0x23  \n"              // ss.
-                 " movl $0x0044FFF0, %eax  \n"
-                 " pushl %eax  \n"               // esp.
-                 " pushl $0x3200  \n"            // eflags.
-                 " pushl $0x1B  \n"              // cs.
-                 " pushl $0x00401000  \n"        // eip.
-                 " iret \n" );
+    asm volatile (" cli \n"
+                  " mov $0x23, %ax  \n"
+                  " mov %ax, %ds  \n"
+                  " mov %ax, %es  \n"
+                  " mov %ax, %fs  \n"
+                  " mov %ax, %gs  \n"
+                  " pushl $0x23  \n"              // ss.
+                  " movl $0x0044FFF0, %eax  \n"
+                  " pushl %eax  \n"               // esp.
+                  " pushl $0x3200  \n"            // eflags.
+                  " pushl $0x1B  \n"              // cs.
+                  " pushl $0x00401000  \n"        // eip.
+                  " iret \n" );
 
-    panic("main-startStartIdle:");
+    panic ("main-startStartIdle:");
 };
 
 
@@ -374,6 +375,10 @@ int x86main ( int argc, char *argv[] ){
     };
 
 
+	//Cria um diretório que é clone do diretório do kernel base 
+	//e retorna o endereço físico desse novo diretório.
+	//gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
+	
     //Creating Idle process.
     InitProcess = (void *) create_process( NULL, 
 	                                      NULL, 

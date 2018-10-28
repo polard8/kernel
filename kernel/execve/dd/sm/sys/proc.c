@@ -542,11 +542,14 @@ system_procedure ( struct window_d *window,
 					//if(CtrlStatus == 1){ active_window = 5; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
 				    
-					//
-					//show_process_information ();
+					//printf ("%x \n", CreatePageDirectory() );
+					
+					//mostrar informações sobre os processos criados.
+					show_process_information ();
+					
 					//pci_info();     //PCI information.
 				    
-					printf ("%x \n", CreatePageDirectory() );
+					
 					
 					//#testando...
 					//isso funciona, não sei se completamente.

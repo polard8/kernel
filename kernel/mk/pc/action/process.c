@@ -710,11 +710,15 @@ get_next:
 		//@todo: Alocar um endereço físico antes, depois chamar a função que 
 		// cria o pagedirectory.
 		//@todo: 
-        //opção: KERNEL_PAGEDIRECTORY; //@todo: Usar um pra cada processo.		
+        //opção: KERNEL_PAGEDIRECTORY; //@todo: Usar um pra cada processo.
+
+        if (directory_address == 0)
+        {
+			printf("create_process: page directory address fail\n");
+			return NULL;
+		}			
 		
 		Process->Directory = (unsigned long ) directory_address; 
-		//Process->Directory = (unsigned long ) CreatePageDirectory(unsigned long directory_address)
-		//Process->page_directory->Address = (unsigned long) KERNEL_PAGEDIRECTORY;
 		
         //cancelados. 
 		//Process->mmBlocks[32]

@@ -179,7 +179,8 @@ void *KiCreateIdle (){
 
 	IdleThread->process = (void*) InitProcess;
 	
-	IdleThread->Directory = (unsigned long ) gKernelPageDirectoryAddress;
+	//IdleThread->Directory = (unsigned long ) gKernelPageDirectoryAddress;
+	IdleThread->Directory = (unsigned long ) gKernelPageDirectoryAddress; //gInitPageDirectoryAddress;
 	
 	IdleThread->plane = BACKGROUND;
 
