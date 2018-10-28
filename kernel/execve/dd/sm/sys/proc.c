@@ -543,9 +543,11 @@ system_procedure ( struct window_d *window,
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
 				    
 					//
-					show_process_information ();
+					//show_process_information ();
 					//pci_info();     //PCI information.
 				    
+					printf ("%x \n", CreatePageDirectory() );
+					
 					//#testando...
 					//isso funciona, não sei se completamente.
 					//save_window ( (struct window_d *) windowList[window_with_focus] );
@@ -568,7 +570,7 @@ system_procedure ( struct window_d *window,
 					
 					//isso funciona.
 					//testando a função que converte endereço virtual em físico.
-					//printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, KERNEL_PAGEDIRECTORY) ); 
+					//printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, gKernelPageDirectoryAddress) ); 
 					
 										
 					//Test teclado scancode. (FUNCIONOU BEM)

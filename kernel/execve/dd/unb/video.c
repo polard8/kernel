@@ -341,8 +341,6 @@ int videoVideo (){
     videoStatus = 0;
     videoError = 0;
     //...
-		
-//Done:	
 
 	return (int) 0;
 };

@@ -361,7 +361,7 @@ int x86main ( int argc, char *argv[] ){
 											 (int) 0,                     // ppid.
 											 "KERNEL-PROCESS",            // Name.
 											 RING0,                       // iopl. 
-											 (unsigned long ) KERNEL_PAGEDIRECTORY ); // Page directory.	
+											 (unsigned long ) gKernelPageDirectoryAddress ); // Page directory.	
     if( (void *) KernelProcess == NULL )
 	{
         printf("x86main: KernelProcess\n");
@@ -383,7 +383,7 @@ int x86main ( int argc, char *argv[] ){
 										  (int) KernelProcess->pid, 
 										  "IDLEPROCESS", 
 										  RING3, 
-										  (unsigned long ) KERNEL_PAGEDIRECTORY );	
+										  (unsigned long ) gKernelPageDirectoryAddress );	
     if ( (void *) InitProcess == NULL )
 	{
         printf("x86main: InitProcess\n");
@@ -401,7 +401,7 @@ int x86main ( int argc, char *argv[] ){
 										   (int) KernelProcess->pid, 
 										   "SHELLPROCESS", 
 										   RING3, 
-										   (unsigned long ) KERNEL_PAGEDIRECTORY );	
+										   (unsigned long ) gKernelPageDirectoryAddress );	
     if((void *) ShellProcess == NULL){
         printf("x86main: ShellProcess\n");
         die();
@@ -420,7 +420,7 @@ int x86main ( int argc, char *argv[] ){
 											 KernelProcess->pid, 
 											 "TASKMANPROCESS", 
 											 RING3, 
-											 (unsigned long ) KERNEL_PAGEDIRECTORY );	
+											 (unsigned long ) gKernelPageDirectoryAddress );	
     if ( (void *) TaskManProcess == NULL ){
         printf("x86main: TaskManProcess\n");
         die();
@@ -484,7 +484,6 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 
-	
 	
     //===================================
     // Cria uma thread em ring 0.

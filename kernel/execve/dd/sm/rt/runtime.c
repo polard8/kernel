@@ -9,9 +9,9 @@
  *    Fazer a inicialização do mecanismo de alocação dinâmica, incluindo 
  * configurações de heaps, stacks, mmblocks ... 
  *
- * Histórico:
- *    Versão 1.0, 2015 - Created.
- *    Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *    2015 - Created by Fred Nora.
+ *    2016 - Some basic functions.
  *    ...
  */
 
@@ -36,7 +36,7 @@ int init_runtime (){
 	// Init Memory Manager:	
 	// Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
 	
-	init_mm();
+	init_mm ();
 	
 	
 	// Nessa hora a memória já funciona e o malloc tambem. e mensagens.
@@ -52,7 +52,7 @@ int init_runtime (){
 	//Cria o diretório de páginas do processo kernel, page tables e 
 	//area para pageframes de memória paginada.
 	
-	SetUpPaging();		
+	SetUpPaging ();		
 	
     // Continua ...
 	
@@ -60,8 +60,6 @@ int init_runtime (){
 
     g_module_runtime_initialized = 1;
 	
-
-		
     return (int) 0;    
 };
 
@@ -119,7 +117,6 @@ int KiInitRuntime (){
 #endif	
 	
     return (int) Status;	
-	
 };
 
 

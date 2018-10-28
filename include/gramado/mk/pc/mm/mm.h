@@ -176,13 +176,14 @@ kernel fica com o 1GB superior."
 //outro lugar de fácil acesso.
 //Obs: #bugbug No momento estamos usando apenas o diretório do 
 //porcesso kernel para tosos os aplicativos do ambiente Gramado Core.
-#define KERNEL_PAGEDIRECTORY  (0x0009C000)                        
-#define IDLE_PAGEDIRECTORY    (0x0009C000 + 4096)                
-#define SHELL_PAGEDIRECTORY   (0x0009C000 + 4096 + 4096)         
-#define TASKMAN_PAGEDIRECTORY (0x0009C000 + 4096 + 4096 + 4096)  
+
+//#define KERNEL_PAGEDIRECTORY  (0x0009C000)                        
+//#define IDLE_PAGEDIRECTORY    (0x0009C000 + 4096)                
+//#define SHELL_PAGEDIRECTORY   (0x0009C000 + 4096 + 4096)         
+//#define TASKMAN_PAGEDIRECTORY (0x0009C000 + 4096 + 4096 + 4096)  
 //...
 
- 
+unsigned long gKernelPageDirectoryAddress; 
 
 
 /* 
@@ -1113,7 +1114,9 @@ unsigned long mapping_nic0_device_address( unsigned long address );
 // Directory and Page Tables.
 //
 
-void *CreatePageDirectory(unsigned long directory_address);
+//deve retornar o endereço do diretório de páginas criado,
+//que é um clone do diretório de páginas do kernel.
+void *CreatePageDirectory();
 
 void *CreatePageTable( unsigned long directory_address, 
                        int offset, 

@@ -194,7 +194,7 @@ int init_arquitecture_independent (){
 
 	
 	// Hal:
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	// Obs: Nesse momento deve haver alguma sondagem de dispositivos,
 	//      salvando os parâmetros encontrados.
 	//#bugbug @todo: Se é hal ... acho que leva em consideração a arquitetura.
@@ -206,7 +206,7 @@ int init_arquitecture_independent (){
 	};
 
 	// Microkernel:
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
 	// Obs: O Microkernel lida com informações dependentes da arquitetura,
 	// porém inicializa a gerencia de processos e threads e de comunicação
 	//entre processos.
@@ -219,7 +219,7 @@ int init_arquitecture_independent (){
 	};
 	
     // Executive:
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
 	// Obs: O executive não é tão dependente da arquitetura, ele é
 	//uma camada mais alta, porém será inicializado aqui para
 	//efeito de ordem, já que estamos inicializando os tres módulos
@@ -232,7 +232,7 @@ int init_arquitecture_independent (){
 	};
 	
 	// Gramado:
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf("Initializing Gramado..\n");
 #endif
 	Status = init_gramado();
@@ -253,7 +253,7 @@ int init_arquitecture_independent (){
 	//      Essa rotina pode ir pra outro lugar.
 	//
 UserInfo:
-#ifdef KERNEL_VERBOSE	  
+#ifdef EXECVE_VERBOSE	  
     printf("sm-init-init_arquitecture_independent: init_user_info\n");
 #endif
     init_user_info();       //initialize user info structure.	
@@ -266,19 +266,19 @@ UserInfo:
 	//
 	
 UserSession:
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
     printf("sm-init-init_arquitecture_independent: init_user_session\n");   
 #endif    
 	init_user_session();    //initialize user session.	 
 	
 WindowStation:
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf("sm-init-init_arquitecture_independent: init_window_station\n");   
 #endif    
 	init_window_station();
 
 Desktop:
-#ifdef KERNEL_VERBOSE 
+#ifdef EXECVE_VERBOSE
     printf("sm-init-init_arquitecture_independent: init_desktop\n");   
 #endif    
 	init_desktop(); 
@@ -296,7 +296,7 @@ WindowManager:
 	}else{
         
 		// Window manager.
-#ifdef KERNEL_VERBOSE	    
+#ifdef EXECVE_VERBOSE	    
 		printf("sm-init-init_arquitecture_independent: init_window_manager\n");
 #endif	    
 		init_window_manager();				
@@ -315,7 +315,7 @@ WindowManager:
     // Continua ...	 
 	
 done:
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     //debug
     printf("Done\n");	
 	//refresh_screen();
@@ -333,7 +333,7 @@ done:
  */
 void init_globals (){
 
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE	
     printf("sm-init-init_globals:\n");	
 #endif
 

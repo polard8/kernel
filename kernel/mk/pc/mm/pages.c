@@ -220,53 +220,92 @@ static inline void __native_flush_tlb_single(unsigned long addr)
 /*
  ************************
  * CreatePageDirectory:
+ *
  *     Cria um page directory para um processo.
+ *
  *     Obs:
  *     + O endereço precisa ser alocado antes.
  *     + Precisa ser um endereço ( ## físico  ## ).
  *     +...
  *
  * Obs:
+ *
  *   **  Aviso importante!  **
- *     O endereço passado via argumento pode ser alocado 
- * dinamicamente antes ou então essa rotina pode corromper 
- * alguma área importante.
- * Antes de chamar essa rotina devemos alocar memória do 
- * tamanho de um diretório, que é de 1024 entradas de 4 bytes. 
- * (1024*4).
+ *
+ *    O endereço precisa ser um endereço físico.
+ * 
+ *    O endereço passado via argumento pode ser alocado dinamicamente antes 
+ * ou então essa rotina pode corromper alguma área importante.
+ *
+ *    Antes de chamar essa rotina devemos alocar memória do tamanho de 
+ * um diretório, que é de 1024 entradas de 4 bytes. (1024*4).
+ *
+ * #obs: 
+ * #bugbug: Quando criamos um novo diretório de páginas ele não tem nada,
+ * nem mesmo o kernel base foi mapeado a parte superior da memória virtual.
+ * para todo novo diretório criado, precisamos mapear as páginas que o 
+ * kernel base vai usar.
+ * >> Por isso que clonar o diretório de páginas do kernel parece se uma boa opção.
  */
-void *CreatePageDirectory ( unsigned long directory_address ){
+ 
+//deve retornar o endereço do diretório de páginas criado,
+//que é um clone do diretório de páginas do kernel.
+void *CreatePageDirectory (){
 	
 	int i;
-	unsigned long *buffer = (unsigned long *) directory_address;  
 	
-	//Limits.
-	if ( directory_address == 0 ){
+	unsigned long destAddressVA;  //virtual.
+	unsigned long destAddressPA;  //físico.
+	
+	//alocaremos uma página apenas, pois tem 4KB.
+	destAddressVA = (unsigned long) allocPageFrames(1);
+	if ( destAddressVA == 0 ){
 		return NULL;
 	}
+	
+	//o endereço do diretório de páginas clone.
+    //precisamos uar o endereço virtual para manipularmos os dados,
+	//pois estamos no esquema de memória do kernel base.
+	unsigned long *dest = (unsigned long *) destAddressVA;  
+	
+	//o endereço do diretório de páginas do kernel.
+	unsigned long *src = (unsigned long *) gKernelPageDirectoryAddress;  
+	
+	
+    //Nesse momento já temos o endereço da origem e do destino.
+    //O endereço lógico e físico do diretório de páginas do kernel 
+    //são iguais, porém os endereços físico e virtual do diretório 
+    //de páginas clone são diferentes.
+    //#importante: A rotina de cópia do conteúdo entre os buffers precisa usar 
+    //endereços lógicos, pois estamos usando o kernel base e sua 
+    //configuração de memória.	
+	
+	//
+	// ## Copiar ##
+	//
 
+	// Agora vamos apenas copiar o diretório de páginas do kernel 
+	// para o diretório de páginas clone.
+	// São 1024 dwords.
+	
 	// Criamos um diretório vazio com páginas não presentes.
 	// 0010 em binário.	
-	for ( i=0; i < 1024; i++ ){
-		buffer[i] = (unsigned long) 0 | 2;    
+	for ( i=0; i < 1024; i++ )
+	{
+		dest[i] = (unsigned long) src[i];    
 	};
-
+	
 	//
-	//@todo:
-	//    Save on a list of directories.
-	//    Registra na lista de diretórios.
-	//    Antes precisamos saber em qual índice devemos 
-	// salvar o endereço do diretório de páginas que criamos.
-	//
+	// Retornaremos o endereço físico do diretório clone.
 	//
 	
-	//pagedirectoryList[??] = (unsigned long) &buffer[0]; 
+	destAddressPA = (unsigned long) virtual_to_physical ( destAddressVA, gKernelPageDirectoryAddress );
+	if ( destAddressPA == 0 ){
+		return NULL;
+	}
 	
-	//...
 	
-//done:
-	
-	return (void *) directory_address;
+	return (void *) destAddressPA;
 };
 
 
@@ -359,8 +398,6 @@ void *CreatePageTable( unsigned long directory_address,
 	//
 	//unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
 
-//done:
-
     return (void *) base;
 };
 
@@ -392,12 +429,12 @@ void SetCR3 (unsigned long address){
 //esse mapeamento só será válido para o primeiro.
 unsigned long mapping_nic0_device_address ( unsigned long address ){
 	
-    unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;      
+    unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
 
 	
 	//##bugbug: 
 	//Esse endereço é improvisado. Parece que não tem nada nesse endereço.
-	
+	//#todo: temos que alocar memória e converter o endereço lógico em físico.
 	
     //unsigned long *nic0_page_table = (unsigned long *) 0x91000;   
 	//unsigned long *nic0_page_table = (unsigned long *) 0;   
@@ -424,7 +461,7 @@ unsigned long mapping_nic0_device_address ( unsigned long address ){
 
 
 /*
- ***************
+ *************************************************************
  * SetUpPaging:
  *     Configura o diretório de páginas do processo Kernel e 
  * algumas tabelas de páginas.
@@ -475,13 +512,13 @@ int SetUpPaging (){
 	//                  ****    SMALL SYSTEMS    ****
 	//==============================================================
 	
-	unsigned long SMALL_kernel_address       = SMALLSYSTEM_KERNELADDRESS;
-	unsigned long SMALL_kernel_base          = SMALLSYSTEM_KERNELBASE;
-	unsigned long SMALL_user_address         = SMALLSYSTEM_USERBASE;
-	unsigned long SMALL_vga_address          = SMALLSYSTEM_VGA;
-	unsigned long SMALL_frontbuffer_address  = (unsigned long) SavedLFB;                     //frontbuffer
-	unsigned long SMALL_backbuffer_address   = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
-	unsigned long SMALL_pagedpool_address    = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  
+	unsigned long SMALL_kernel_address = SMALLSYSTEM_KERNELADDRESS;
+	unsigned long SMALL_kernel_base = SMALLSYSTEM_KERNELBASE;
+	unsigned long SMALL_user_address = SMALLSYSTEM_USERBASE;
+	unsigned long SMALL_vga_address = SMALLSYSTEM_VGA;
+	unsigned long SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
+	unsigned long SMALL_backbuffer_address = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
+	unsigned long SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  
 	//...
 	
 	
@@ -489,26 +526,26 @@ int SetUpPaging (){
 	//                  ****    MEDIUM SYSTEMS    ****
 	//==============================================================	
 	
-	unsigned long MEDIUM_kernel_address       = MEDIUMSYSTEM_KERNELADDRESS;
-	unsigned long MEDIUM_kernel_base          = MEDIUMSYSTEM_KERNELBASE;
-	unsigned long MEDIUM_user_address         = MEDIUMSYSTEM_USERBASE;
-	unsigned long MEDIUM_vga_address          = MEDIUMSYSTEM_VGA ;
-	unsigned long MEDIUM_frontbuffer_address  = (unsigned long) SavedLFB;
-	unsigned long MEDIUM_backbuffer_address   = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
-	unsigned long MEDIUM_pagedpool_address    = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
+	unsigned long MEDIUM_kernel_address = MEDIUMSYSTEM_KERNELADDRESS;
+	unsigned long MEDIUM_kernel_base = MEDIUMSYSTEM_KERNELBASE;
+	unsigned long MEDIUM_user_address = MEDIUMSYSTEM_USERBASE;
+	unsigned long MEDIUM_vga_address = MEDIUMSYSTEM_VGA ;
+	unsigned long MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
+	unsigned long MEDIUM_backbuffer_address = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
+	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
 
 	
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
 	//==============================================================	
 	
-	unsigned long LARGE_kernel_address       = LARGESYSTEM_KERNELADDRESS;
-	unsigned long LARGE_kernel_base          = LARGESYSTEM_KERNELBASE;
-	unsigned long LARGE_user_address         = LARGESYSTEM_USERBASE;
-	unsigned long LARGE_vga_address          = LARGESYSTEM_VGA;
-	unsigned long LARGE_frontbuffer_address  = (unsigned long) SavedLFB;
-	unsigned long LARGE_backbuffer_address   = (unsigned long) LARGESYSTEM_BACKBUFFER;
-	unsigned long LARGE_pagedpool_address    = (unsigned long) LARGESYSTEM_PAGEDPOLL_START; 	
+	unsigned long LARGE_kernel_address = LARGESYSTEM_KERNELADDRESS;
+	unsigned long LARGE_kernel_base = LARGESYSTEM_KERNELBASE;
+	unsigned long LARGE_user_address = LARGESYSTEM_USERBASE;
+	unsigned long LARGE_vga_address = LARGESYSTEM_VGA;
+	unsigned long LARGE_frontbuffer_address = (unsigned long) SavedLFB;
+	unsigned long LARGE_backbuffer_address = (unsigned long) LARGESYSTEM_BACKBUFFER;
+	unsigned long LARGE_pagedpool_address = (unsigned long) LARGESYSTEM_PAGEDPOLL_START; 	
 	
 	// ** bank 1 ** //
 	// O primeiro banco representa o mínimo de memória RAM que o sistema 
@@ -567,12 +604,21 @@ int SetUpPaging (){
 	// utilizando a mesma localizaçao. KERNEL_PAGEDIRECTORY.
 	// ??
 	
+	//
+	// Esse valor precisa ser determinado, pois ainda não temos 
+	// como usar algum alocador, pois sem a memória inicializada,
+	// não temos alocador.
+	//
+	
+	//inicializando o endereço.
+	gKernelPageDirectoryAddress = 0x0009C000;  
+	
 	// 0x0009C000
-	unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;         
-
+	//unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;         
+    unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress; 
 	
 	// O que temos logo abaixo são pequenas partições de memória física.
-	// cada partição tem 1024 unsigned longs. o que dá 4kb cada. 
+	// cada partição tem 1024 unsigned longs. o que dá 4KB cada. 
 	
 	
 	// TABLES: 
@@ -1298,10 +1344,7 @@ void initializeFramesAlloc (){
 	    //...	
 	
 	    pageframeAllocList[0] = ( unsigned long ) pf; 		
-	};
-	
-//done:
-    //return;	
+	};	
 };
 
 
@@ -1732,8 +1775,8 @@ fail:
 
 
 unsigned long 
-virtual_to_physical( unsigned long virtual_address, 
-                     unsigned long dir_address ) 
+virtual_to_physical ( unsigned long virtual_address, 
+                      unsigned long dir_address ) 
 {
 	
 	unsigned long address;

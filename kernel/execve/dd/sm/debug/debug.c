@@ -20,7 +20,14 @@
  *
  * This is a spiritual quote.
  *
- * Versão: 1.0, 2015, 2016.
+ * #importante 
+ * #todo: Criar aqui nesse documento funções de exibição de texto 
+ *        próprias para debug, que classifiquem o erro por níveis.
+ *
+ *    ex: debug_print( int level, ...)
+ *
+ * 2015 - Created by Fred Nora.
+ *
  */
 
  
@@ -33,7 +40,7 @@
 //...
 
 //
-// # This is a spiritual quote.
+// # spiritual quote.
 // Estruturas para fases de inicialização.
 // De uso interno no debug.
 // Just for fun. (user's mental model)
@@ -61,56 +68,11 @@ struct Mind_d Mind;
 
 
 //Internas.
-void InitMind();
-void SetMind(int Type);
+//void InitMind();
+//void SetMind(int Type);
 
 
 
-/*
- teste de stress na criação de threads.
-int debug_test_threads();
-int debug_test_threads()
-{
-	//if( (void*) IdleThread == NULL ){
-		//
-	//};	
-};
-*/
-
-
-/*
-//Construtor.
-void InitMind()
-{
-	//if((void*) Mind == NULL)
-    //    return;     
-			
-    Mind.Mythic = 0;
-	Mind.Romantic = 0;
-	Mind.Realist = 0;
-	Mind.Naturalist = 0;	
-};
-*/
-
-/*
-void SetMind(int Type)
-{
-	//if((void*) Mind == NULL)
-    //    return;
-		 
-    switch(Type)
-    {
-    	case MYTHIC:     Mind.Mythic = 1;      break;
-    	case ROMANTIC:   Mind.Romantic = 1;    break;
-		case REALIST:    Mind.Realist = 1;     break;
-		case NATURALIST: Mind.Naturalist = 1;  break;
-    	
-		default:
-		    InitMind();
-    		break;
-	};
-};
-*/
 
 /*
  * debug_check_inicialization:
@@ -217,7 +179,6 @@ int debug_check_drivers (){
 	    //erro
 	};
 	
-//done:
 
     return (int) Status;
 };
@@ -237,13 +198,18 @@ void debug_breakpoint (){
 
 
 //retorna um checksum dado um buffer e um tamanho.
-unsigned long debug_compute_checksum( unsigned char *Buffer, unsigned long Lenght)
+
+unsigned long 
+debug_compute_checksum ( unsigned char *Buffer, 
+                         unsigned long Lenght )
 {
     unsigned long CheckSum = 0;
 
-    while(Lenght > 0){	
+    while (Lenght > 0)
+	{	
 		CheckSum = CheckSum + (unsigned long) *Buffer++;
-	    Lenght--;	
+	    
+		Lenght--;	
 	};
 	return (unsigned long) CheckSum;
 };
@@ -260,12 +226,7 @@ int debug (){
 		
 	//printf("debug: Starting..\n");
 	
-	//Contrutor.
-	//InitMind();
-	
-	//
 	// Checa inicialização. Fases, variáveis e estruturas.
-	//
 	
 	Status = (int) debug_check_inicialization();
 	if(Status == 1){
@@ -288,7 +249,6 @@ int debug (){
 	 * @todo: 
 	 *     Checar se existe componentes do sistema como mbr, root, fat 
 	 * e arquivos e programas básicos do sistema.
-	 *
 	 */
 	 
 	 
@@ -296,7 +256,6 @@ int debug (){
 	 * @todo: 
 	 *     Checar por falhas no sistema de arquivos.
 	 */
-	 
 	 
 	 
 	/*
@@ -315,16 +274,7 @@ int debug (){
 	//	while(1){}
 	//};
 	
-	
-
-	 
-	//
-    //
-    //
-	
 	//...
-
-//done:
 
     //printf("debug:OK!\n");
     //printf("debug: Done.\n");	
@@ -337,6 +287,7 @@ int debug (){
 int debugInit()
 {}
 */
+
 
 //
 // End.

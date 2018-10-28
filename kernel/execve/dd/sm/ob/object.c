@@ -50,8 +50,7 @@
  * Tendo em vista que o conceito de objetos para kernel mode em C e para 
  * User Mode com linguagem de alto nível é bem diferente.
  *
- * Versão: 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- * Versão: 1.0, 2018 - ?
+ * 2015 - Created by Fred Nora.
  */
  
  
@@ -68,11 +67,13 @@
  *     Inicializa o gerenciador de objetos.
  *
  */
-int init_object_manager()
-{
+int init_object_manager (){
+	
     int Status = 0;
 	
-	printf("Initializing Object Manager ...\n");
+#ifdef EXECVE_VERBOSE	
+	printf("Initializing Object Manager..\n");
+#endif	
     
 	g_current_object = 0;         //objeto numero 0
     g_current_list = OBJECTS_KM;  //lista de objetos em kernel mode.
@@ -91,12 +92,17 @@ int init_object_manager()
 	//@todo: initialize object List.
 	
 //Done.	
-done:
+//done:
+
     //Inicializado.
 	g_object_manager_status = 1;
 	g_module_objectmanager_initialized = 1;
-	printf("Done!\n");
-    return (int) Status;
+	
+#ifdef EXECVE_VERBOSE	
+	printf("Done\n");
+#endif	
+    
+	return (int) Status;
 };
 
 

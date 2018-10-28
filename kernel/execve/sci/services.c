@@ -705,7 +705,7 @@ void *services( unsigned long number,
 		case SYS_CREATEPROCESS:
             return (void *) create_process ( NULL, NULL, NULL, 
 			                    arg2, arg3, 0, (char *) a4, 
-								RING3, (unsigned long ) KERNEL_PAGEDIRECTORY ); 		
+								RING3, (unsigned long ) gKernelPageDirectoryAddress ); 		
             break;
 			
 		//80 Show current process info.

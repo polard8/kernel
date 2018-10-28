@@ -294,7 +294,7 @@ void *systemRam ( int number,
 			
 		//create page directory.	
 		case 5:
-		    return (void *) CreatePageDirectory((unsigned long) arg1);
+		    return (void *) CreatePageDirectory();
             break; 
 
 		//create page table.	
@@ -810,7 +810,7 @@ void *systemIoCpu( int number,
 	    							       (int) arg3, 
 	    							       (char *) arg4,
 										   (unsigned long) RING3,
-                                           (unsigned long ) KERNEL_PAGEDIRECTORY );
+                                           (unsigned long ) gKernelPageDirectoryAddress );
 		    break;
 
 	

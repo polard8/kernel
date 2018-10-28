@@ -117,6 +117,7 @@ int do_fork_process (){
 	
 	//
 	// ## Current ##
+	// Checando a validade do processo atual.
 	//
 	
 	Current = (struct process_d *) processList[current_process];
@@ -157,7 +158,7 @@ do_clone:
 		
 		goto fail;
 	
-	}else{
+	} else {
 		
 		
 		// Obtêm um índice para um slot vazio na lista de processos.
@@ -176,6 +177,11 @@ do_clone:
 		
 		Clone->used = 1;
 		Clone->magic = 1234;
+		
+		//#obs: Na hora de copiar o processo, a estrutura do clone 
+		//receberá os valores da estrutura do processo atual,
+		//até mesmo o endereço do diretório de páginas.
+		
 		//...
 		
 		//Salvando na lista.
@@ -368,17 +374,16 @@ fail:
  * processCopyProcess
  *     copiar um processo.
  *     isso será usado por fork.
- *
  */
-int 
-processCopyProcess( int p1, int p2 )
-{
+ 
+int processCopyProcess ( int p1, int p2 ){
+	
 	int Status = 0;
 	
     struct process_d *Process1;	
 	struct process_d *Process2;
 	
-	if( p1 == p2 ){
+	if ( p1 == p2 ){
 		goto fail;
 	}
 	
@@ -390,10 +395,11 @@ processCopyProcess( int p1, int p2 )
 	Process2 = (struct process_d *) processList[p2];
 	
 	
-	if( (void*) Process1 == NULL )
+	if ( (void *) Process1 == NULL )
 	{
 		printf("processCopyProcess: Process1\n");
 		goto fail;
+		
 	}else{
 		
 		if( Process1->used != 1 || Process1->magic != 1234 )
@@ -403,7 +409,7 @@ processCopyProcess( int p1, int p2 )
 		}	
 	};
 	
-	if( (void*) Process2 == NULL )
+	if ( (void *) Process2 == NULL )
 	{
 		printf("processCopyProcess: Process1\n");
 		goto fail;
@@ -418,7 +424,8 @@ processCopyProcess( int p1, int p2 )
 	
 	
 	//copy
-copy:	
+//copy:	
+
 	Process2->objectType = Process1->objectType;
 	Process2->objectClass = Process1->objectClass;	
 	
@@ -440,6 +447,10 @@ copy:
 	//Process->name_address = NULL;
 	
 	Process2->framepoolListHead = Process1->framepoolListHead;
+	
+	//
+	// * page directory address
+	//
 	
 	Process2->Directory = Process1->Directory;
 	

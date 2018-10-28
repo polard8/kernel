@@ -307,9 +307,6 @@ SetKernelHeap( unsigned long HeapStart,
 	//...
 	
 	//Contagem? ainda em zero.?!
-	
-//done:	
-	//return;
 };
 
 

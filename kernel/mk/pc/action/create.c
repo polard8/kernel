@@ -108,18 +108,20 @@ int KiFork()
  * Obs: Criar idle thread com prioridade alta. TID=0 Idle (RING 3).
  * @todo: Mudar o nome para createCreateIdleThread()
  */
-void *KiCreateIdle()
-{
+void *KiCreateIdle (){
+	
     void *idleStack;                    // Stack pointer.
 	char *ThreadName = "idlethread";    // Name.
 	
     //Aloca memória mara a estrutura.
-	IdleThread = (void *) malloc( sizeof(struct thread_d) );	
-	if( (void*) IdleThread == NULL )
+	IdleThread = (void *) malloc ( sizeof(struct thread_d) );	
+	
+	if ( (void*) IdleThread == NULL )
 	{
 	    printf("pc-action-create-KiCreateIdle: IdleThread\n");
 		die();
-	}else{
+		
+	} else {
 		
 	    //Ver se a estrutura do processo é válida.
 		if( (void *) InitProcess == NULL ){
@@ -177,7 +179,7 @@ void *KiCreateIdle()
 
 	IdleThread->process = (void*) InitProcess;
 	
-	IdleThread->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
+	IdleThread->Directory = (unsigned long ) gKernelPageDirectoryAddress;
 	
 	IdleThread->plane = BACKGROUND;
 
@@ -370,7 +372,7 @@ void *KiCreateShell()
 	
 	t->process = (void *) ShellProcess;  
 	
-	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
+	t->Directory = (unsigned long ) gKernelPageDirectoryAddress;
 	
 	//Procedimento de janela.
 	t->procedure = (unsigned long) &system_procedure;
@@ -547,7 +549,7 @@ void *KiCreateTaskManager()
 	
 	t->plane = BACKGROUND;
 	
-	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
+	t->Directory = (unsigned long ) gKernelPageDirectoryAddress;
 
 	//Procedimento de janela.
     t->procedure = (unsigned long) &system_procedure;	
@@ -739,7 +741,7 @@ void *KiCreateRing0Idle()
 	
 	t->plane = BACKGROUND;
 	
-	t->Directory = (unsigned long ) KERNEL_PAGEDIRECTORY;
+	t->Directory = (unsigned long ) gKernelPageDirectoryAddress;
 
 	//Procedimento de janela.
     t->procedure = (unsigned long) &system_procedure;	
