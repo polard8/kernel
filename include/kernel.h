@@ -190,8 +190,8 @@ extern void do_executa_new_task();
 #include <gramado/hal/cpu.h>                             //cpu
 
 
-//#todo:
-#include "../3rdparty/kernel/disk/disk1.h"           //disk1 - nelson
+//disk1 - nelson
+#include <gramado/3rdparty/kernel/disk/disk1.h>
 
 #include <gramado/execve/dd/sm/disk/disk.h>           //disk.
 
