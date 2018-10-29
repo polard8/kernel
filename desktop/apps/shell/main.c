@@ -784,9 +784,20 @@ noArgs:
 	//while(1){}
 	
 	
-	
+	struct window_d *pW;
 
-    //
+	pW = (struct window_d *) apiGetWSScreenWindow ();
+	
+	if ( (void *) pW == NULL )
+	{
+	    printf("Screen Window fail\n ");
+	    
+		while(1){
+			asm ("pause");
+		}
+	}	
+    
+	//
 	// Criando a janela WT_OVERLAPPED.
 	// 
 	

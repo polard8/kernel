@@ -857,7 +857,7 @@
 #define COLOR_TEST_46 0x400040 
  
 //outros teste
-#define COLOR_TEST_47 0x3366FF  //azul claro ESQUISITO
+#define COLOR_TEST_47 0x3366FF  //azul claro
 
     
 // # testes #
@@ -976,7 +976,7 @@
 #define COLOR_SEAGREEN            0x2E8B57
 #define COLOR_SEASHELL            0xFFF5EE  //branco sujinho
 #define COLOR_SIENNA              0xA0522D
-#define COLOR_SKYBLUE             0x87CEEB  //azul claro (BONITINHO)
+#define COLOR_SKYBLUE             0x87CEEB  //azul claro
 #define COLOR_SLATEBLUE           0x6A5ACD  //azul/violeta
 #define COLOR_SLATEGRAY           0x708090
 #define COLOR_SNOW                0xFFFAFA //branco
@@ -3246,7 +3246,7 @@ void apiInitBackground();
 
 //Message Box.
 int MessageBox ( int type, char *string1, char *string2 );
-
+int DialogBox ( int type, char *string1, char *string2 );
 
 /*
  * call_kernel:
@@ -3608,6 +3608,17 @@ unsigned long apiSendMessage ( struct window_d *window,
                                unsigned long long2 );
 
 
+
+							   
+int apiDrawText ( struct window_d *window, 
+                  unsigned long x, 
+				  unsigned long y, 
+				  unsigned long color, 
+				  char *string );
+				  
+				  
+struct window_d *apiGetWSScreenWindow ();
+struct window_d *apiGetWSMainWindow ();
 
 //
 //...

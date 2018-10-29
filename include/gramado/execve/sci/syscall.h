@@ -144,7 +144,9 @@
 
 // driver >> executive >> destino certo.
 
-//de65à69 é reservado para evento de usuário.
+//
+// de 65 à 69 é reservado para evento de usuário.
+
 //O driver do dispositivo envirá a mensagem pra cá para ser
 //enviada para o destino certo.
 #define	SYS_PUTCHAR 65
@@ -158,6 +160,8 @@
 //cabe ao executive receber essa mensagem do driver de teclado
 //e enviá-la para a janela com o foco de entrada.
 #define	SYS_69 69    
+
+
 //process and thread support.
 #define	SYS_EXIT    70    //Uma thread terminou.(terminate a current process)
 #define	SYS_FORK    71    //fork.
@@ -182,7 +186,8 @@
 #define	SYS_SEMAPHORE_DOWN 87
 #define	SYS_88 88  //sendo usada pra outra coisa.
 #define SYS_SEMAPHORE_UP 89
-//thread support
+
+//90~98 reservado para thread support
 #define	SYS_DEADTHREADCOLLECTOR    90
 #define	SYS_ALERTTHREAD 91
 #define	SYS_92 92
@@ -210,13 +215,18 @@
 #define	SYS_DESTROYCHANNEL 107     //destroy channel.
 #define	SYS_OPENCHANNEL    108     //open channel.
 #define	SYS_CLOSECHANNEL   109     //close channel.
+
+
 //Reboot.
 #define	SYS_REBOOT         110
+
 //Outros. @todo: mensagem  
 #define	SYS_111 111   //#mensagem.pega 4 elementos.
 #define	SYS_112 112
+
 //janela
-#define	SYS_113 113  //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+// 113 Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+#define	SYS_113 113  
 
 //  ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
 #define	SYS_SENDWINDOWMESSAGE 114  
@@ -225,6 +235,7 @@
 //#importante 
 //115 usado pelos servidores para se comunicarem com o kernel.
 #define	SYS_115 115  
+
 //116 testando servidor
 ////envia uma mensagem de teste para o servidor taskman
 #define	SYS_116 116
@@ -244,20 +255,25 @@
 #define	SYS_123 123
 #define	SYS_124 124
 #define	SYS_125 125
+
 //126~129 (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
 #define	SYS_126 126
 #define	SYS_127 127
 #define	SYS_128 128
 //Inicializando um driver:
 //Um driver enviou uma systemcall confirmando a inicialização de um driver.
-#define	SYS_DRIVERINITIALIZED 129   
+#define	SYS_DRIVERINITIALIZED 129  
+ 
 //130-139 manipulação de texto.
 #define	SYS_DRAWTEXT 130
 #define	SYS_BUFFER_DRAWCHAR_WWF 131
 #define	SYS_132 132
 #define	SYS_133 133
-#define	SYS_134 134  //pegar informações sobre a área de cliente de uma janela;
- //coloca caracteres na estrutura de terminal, para aplciativos pegarem
+
+//134 pegar informações sobre a área de cliente de uma janela;
+#define	SYS_134 134  
+
+//135 coloca caracteres na estrutura de terminal, para aplciativos pegarem
 #define	SYS_FEEDTERMINAL 135
 #define	SYS_136 136
 #define	SYS_GETCH 137  //SUPORTE a getch()
@@ -275,8 +291,12 @@
 //144-149 Recursos da area do Cliente.
 #define	SYS_GETCLIENTAREARECT 144
 #define	SYS_SETCLIENTAREARECT 145
-#define	SYS_146 146
-#define	SYS_147 147
+
+//janelas principais.
+//usadas pelo gws
+#define	SYS_146 146  //retorna o ponteiro para gui->screen 
+#define	SYS_147 147  //retorna o ponteiro para gui->main
+
 //grid
 #define	SYS_148 148 //create grid
 #define	SYS_149 149 //initialize grid.

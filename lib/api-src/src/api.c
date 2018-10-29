@@ -3035,6 +3035,23 @@ int apiDrawText ( struct window_d *window,
 					(unsigned long) &msg[0], 
 					(unsigned long) &msg[0] );		
 };
+
+
+
+struct window_d *apiGetWSScreenWindow (){
+	
+    return (struct window_d *) system_call ( 146 , 0, 0, 0 );
+};
+
+struct window_d *apiGetWSMainWindow (){
+	
+    return (struct window_d *) system_call ( 147 , 0, 0, 0 );
+};
+
+
+
+
+
 //
 // End.
 //

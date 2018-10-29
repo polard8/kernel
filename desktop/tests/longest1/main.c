@@ -116,4 +116,16 @@ void copy(char *to, char *from)
     };
 };
 
+/*
+// do a getc, but give error message if EOF encountered 
+int safegetc(f)
+    FILE *f;
+{
+    register int c = getc(f);
+    if (c == EOF)
+        fatal("Unexpected end of file");
+    return c;
+}
+*/
+
 

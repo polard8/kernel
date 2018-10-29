@@ -1131,6 +1131,22 @@ void *services( unsigned long number,
 		case SYS_SETCLIENTAREARECT:
 			setClientAreaRect ( arg2, arg3, arg4, 0);
             break;
+
+		//146	
+		//#bugbug: isso não parece seguro, precismos checar a validade da estrutura antes,
+        //mas vai ficar assim por enquanto.					
+		case 146:	
+		    //return (void *) gwsScreenWindow(); //#todo
+		    return (void *) gui->screen;
+			break;
+			
+		//147	
+		//#bugbug: isso não parece seguro, precismos checar a validade da estrutura antes,
+        //mas vai ficar assim por enquanto.		
+        case 147:
+		    //return (void *) gwsMainWindow(); //#todo
+			return (void *) gui->main;
+			break;
 			
 		//create grid and itens.
 		//n, view 

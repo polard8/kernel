@@ -3615,6 +3615,11 @@ int apiDrawText ( struct window_d *window,
 				  unsigned long y, 
 				  unsigned long color, 
 				  char *string );
+				  
+				  
+struct window_d *apiGetWSScreenWindow ();
+struct window_d *apiGetWSMainWindow ();
+
 //
 //...
 //
