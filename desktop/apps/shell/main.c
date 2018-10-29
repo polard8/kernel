@@ -458,10 +458,10 @@ static inline void rep_nop (void){
 
 // Procedimento de janela principal do aplicativo.
 unsigned long 
-shellProcedure( struct window_d *window, 
-                int msg, 
- 			    unsigned long long1, 
-				unsigned long long2 );
+shellProcedure ( struct window_d *window, 
+                 int msg, 
+ 			     unsigned long long1, 
+				 unsigned long long2 );
 				
 				
 //diálogo para alimentar o terminal usado pelos aplicativos.				
@@ -473,10 +473,10 @@ int feedterminalDialog( struct window_d *window,
 
 // Procedimento de janela da topbar.							  
 unsigned long 
-shellTopbarProcedure( struct window_d *window, 
-                      int msg, 
-			          unsigned long long1, 
-					  unsigned long long2 );
+shellTopbarProcedure ( struct window_d *window, 
+                       int msg, 
+			           unsigned long long1, 
+					   unsigned long long2 );
 					  
  
 void quit ( int status ){
@@ -676,17 +676,12 @@ noArgs:
 	
 	shellShell (); 	
 	
+	//Apenas inicialize. Continuaremos com o procedimento 
+	//do shell e não o da barra,	
 	
-	
-
-	    enterCriticalSection();    
-	    
-		//Apenas inicialize. Continuaremos com o procedimento 
-		//do shell e não o da barra,
-		shellCreateTaskBar (1);
-	    
-		exitCriticalSection();	
-	
+    enterCriticalSection ();    
+    shellCreateTaskBar (1);
+    exitCriticalSection ();
 	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
@@ -783,6 +778,9 @@ noArgs:
 	//	terminal_rect.width, terminal_rect.height );
 	//while(1){}
 	
+	//
+	// Pegando a janela principal para usarmos como janela mãe.
+	//
 	
 	struct window_d *pW;
 
@@ -792,10 +790,16 @@ noArgs:
 	{
 	    printf("Screen Window fail\n ");
 	    
-		while(1){
+		while (1){
 			asm ("pause");
+			//exit (1);
 		}
 	}	
+    
+    //
+    // #todo: Pegar o desktop atual.
+    //
+    
     
 	//
 	// Criando a janela WT_OVERLAPPED.
@@ -812,7 +816,7 @@ noArgs:
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    wpWindowLeft, wpWindowTop, 
 					    wsWindowWidth, wsWindowHeight,    
-                        0, 0, xCOLOR_GRAY3, xCOLOR_GRAY1 );	   
+                        pW, 0, xCOLOR_GRAY3, xCOLOR_GRAY1 );	   
 
 	if ( (void *) hWindow == NULL ){
 		
