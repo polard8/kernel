@@ -304,7 +304,8 @@ mboot_start:
     dd _data_end      ; end of kernel .data section
     dd _bss_end       ; end of kernel BSS
     dd _kernel_begin  ; kernel entry point (initial EIP)
- mboot_end:
+	
+mboot_end:
 
 
 
@@ -373,7 +374,11 @@ mboot_start:
 	cmp al, byte 'G'
     je .useGUI
 
+	;
+	; No GUI.
+	;
 
+.nogui:
 	mov byte [0xb8000], byte "t"	
     mov byte [0xb8001], byte 9	
     mov byte [0xb8002], byte "m"	
@@ -383,19 +388,16 @@ mboot_start:
     hlt
 	jmp .nogui_hang
 	
-	;imperativo
-	;mov al, byte 'T'
-
-    ;
-	; Salva o modo de vídeo.
 	;
-    ;mov byte [ke_video_mode], al
-
-    ;GUI ou text
-	cmp al, byte 'G'
-	jne .no_gui
+	; Use GUI.
+	;
 	
 .useGUI:
+
+    ;checar se chegamos aqui com a flag de gui acionada.
+	cmp al, byte 'G'
+	jne .nogui
+
 	mov dword [_g_useGUI], dword 1
 	mov dword [_SavedBootMode], dword 1
 	
@@ -444,7 +446,8 @@ mboot_start:
 	;;
 	
 	
-.no_gui:
+;.no_gui:
+
     mov dword [_g_useGUI], dword 0
 
     ;

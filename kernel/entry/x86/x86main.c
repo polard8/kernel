@@ -191,7 +191,7 @@ void startStartIdle (){
 
 /*
  *************************************************
- * kMain: 
+ * x86main: 
  *     The entry point for a C part of the Kernel.
  *
  * Function history:
@@ -211,6 +211,7 @@ int x86main ( int argc, char *argv[] ){
 
     // #test.
     // initializing zorder list.
+	// isso não deve ficar aqui.
     
     for ( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
         zorderList[zIndex] = (unsigned long) 0;

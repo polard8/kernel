@@ -204,9 +204,9 @@ or the ACPI ones to solve the mess. Good luck.
 #define PCI_DATA_PORT         0x0CFC
 
 //BDF.
-#define PCI_MAX_BUSES         0xFF  //?
-#define PCI_MAX_DEVICES       32    //Ok
-#define PCI_MAX_FUNCTIONS     8     //Ok.
+#define PCI_MAX_BUSES         0xFF  
+#define PCI_MAX_DEVICES       32    
+#define PCI_MAX_FUNCTIONS     8     
 
 //
 // BAR Support.
@@ -1077,8 +1077,8 @@ int pciShowDeviceInfo(int number)
  *     Obs: A estrutura está em pci.h.        
  *
  */
-int pci_setup_devices()
-{
+int pci_setup_devices (){
+	
     unsigned short Vendor;    //Offset 0.
 	unsigned short Device;    //Offset 2.
 	
@@ -1109,7 +1109,7 @@ int pci_setup_devices()
 	struct pci_driver_d *Dr;  //Driver.
 	
 	
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf("Detecting PCI Devices ...\n");
 #endif
 	
@@ -1123,7 +1123,14 @@ int pci_setup_devices()
 		//Device.
 	    for( j=0; j < PCI_MAX_DEVICES; j++)
         {
-		    //Checks.
+			//#todo:
+			//Functions
+		    //Devemos fazer mais um for para contemplar as funções,
+			//e chamar uma rotina que tenha as funções no argumento.
+			
+			//for ( k=0; k < PCI_MAX_FUNCTIONS ){}
+			
+			//Checks.
 		    Vendor = (unsigned short) pciCheckVendor(i,j);
 			
 			//if(Vendor == 0xffff) continue;
@@ -1131,8 +1138,9 @@ int pci_setup_devices()
 		    if( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
 			{   
                 //Colocar os dispositivos encontrados em estruturas.
-			    D = (void*) malloc( sizeof( struct pci_device_d  ) );
-	            if( (void*) D != NULL )
+			    D = (void *) malloc( sizeof( struct pci_device_d  ) );
+				
+	            if ( (void *) D != NULL )
 				{
 					//Identificador.
 					D->deviceId    = (int) listIndex;
@@ -1195,7 +1203,7 @@ int pci_setup_devices()
 // Done.
 done:
 
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf("Detecting PCI Devices completes ...\n");
 #endif
 
