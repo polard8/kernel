@@ -607,6 +607,7 @@ typedef enum {
 	//...
 }client_window_classes_t;
 
+//??bugbug: tá errado.
 //classes de janelas controladas exclusivamente pelo kernel.
 typedef enum {
 	WindowClassKernelWindow,    //janelas criadas pelo kernel ... coma a "tela azul da morte"

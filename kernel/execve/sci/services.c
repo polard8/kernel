@@ -839,17 +839,23 @@ void *services( unsigned long number,
 			systemReboot();
 			break;
 			
-		//...
 		
 		//
 		// #### Get Message ####
 		//
 		
-		//Esse é o get message usado pelos aplicativos.
-		//O aplicativo envia um endereço de array 
-		//e devemos colocar 4 longs como mensagens.
-		//Isso funcionou. 
-		//Esse será o padrão até usarmos ponteiro para estrutura.
+		// #importante:
+		// Esse é o get message usado pelos aplicativos.
+		// O aplicativo envia um endereço de array e devemos colocar 4 longs 
+		// como mensagem.
+		// Isso funcionou. 
+		// Esse será o padrão até usarmos ponteiro para estrutura.
+		
+		// #test
+		// A intenção agora é pegar a mensagem na estrutura de thread atual.
+		// Desse modo cada aplicativo, quando estiver rodando, pegará as 
+        // suas mensagens em sua própria fila.  		
+		
 		case 111:
 		    if ( &message_address[0] == 0 )
 			{
