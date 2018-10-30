@@ -211,6 +211,7 @@
 #define	SYS_SENDMESSAGE       104  //Envia uma mensagem para o PCB de um processo.
 
 #define	SYS_REGISTERPROCEDURE 105  //REGISTER PROCEDURE.
+
 #define	SYS_CREATECHANNEL  106     //create channel. 
 #define	SYS_DESTROYCHANNEL 107     //destroy channel.
 #define	SYS_OPENCHANNEL    108     //open channel.
@@ -311,11 +312,13 @@
 #define	SYS_GETCURRENTUSERSESSION   157 //user session
 #define	SYS_GETCURRENTWINDOWSTATION 158 //window station
 #define	SYS_GETCURRENTDESKTOP       159 //desktop
+
+
 //network support
-#define	SYS_160 160
-#define	SYS_161 161
-#define	SYS_162 162
-#define	SYS_163 163
+#define	SYS_160 160   //create socket (retorna o ponteiro para a estrutura)
+#define	SYS_161 161    //get socket IP	
+#define	SYS_162 162  //get socket port	
+#define	SYS_163 163  //update socket  
 #define	SYS_164 164
 #define	SYS_165 165
 #define	SYS_166 166

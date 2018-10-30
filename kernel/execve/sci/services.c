@@ -1249,6 +1249,34 @@ void *services( unsigned long number,
 		    return (void *) current_desktop; 
 			break;
 			
+		//160
+		//Criar um socket e retornar o ponteiro para a estrutura.
+		case 160:
+            return (void *) create_socket ( (unsigned long) arg2, (unsigned short) arg3 );
+			break;
+			
+		//161
+        //get socket IP		
+		case 161:
+		    return (void *) getSocketIP( (struct socket_d *) arg2 );
+            break;		
+
+		//162
+        //get socket port		
+		case 162:
+		    return (void *) getSocketPort( (struct socket_d *) arg2 );
+            break;		
+			
+		//163
+        //update socket  
+        //retorno 0=ok 1=fail		
+        case 163:
+            return (void *) update_socket ( (struct socket_d *) arg2, (unsigned long) arg3, (unsigned short) arg4 );
+			break;		
+
+        //case 164:
+        //    break;		
+			
 		//170
         //pwd ...
         //?? mostra p pathname gerenciado pelo kernel 

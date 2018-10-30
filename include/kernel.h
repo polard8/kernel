@@ -411,7 +411,7 @@ int current_user;    //gramado ?
 int current_group;   //gramado ?
 
 //#importante:
-//isso foi movido para gws.h
+//isso foi movido para gws\ws.h
 //int current_usersession;    //gws
 //int current_windowstation;  //gws
 //int current_desktop;        //gws 
