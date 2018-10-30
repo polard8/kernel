@@ -627,6 +627,12 @@ struct process_d
 	//struct thread_d *threadReadyListHead;
 	//...	
 	
+
+    //#importante:
+	//thread de input
+	
+    struct thread_d *InputThread;	
+	
 	//@todo: estatística de tempo de uso de cpi.
 	
 	//@todo: Tipo cpu-bound, i/o bound.

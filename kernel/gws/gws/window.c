@@ -1222,6 +1222,7 @@ int window_getch (){
 	}
 
  
+    //isso coloca a mensagem na fila da thread atual.
 	LINE_DISCIPLINE(SC, 0);	
 
 	
@@ -2592,8 +2593,16 @@ void SetFocus ( struct window_d *window ){
 			goto fail;
 		}
 		
-		//validade e estado da estrutura.
- 
+		
+		//#importante:
+		//se a estrutura de janel é válida, vamos associar 
+		//a janela com o foco de entrada à thread atual,
+		//pois é ela quem chamou essa rotina. Apesar que 
+		//o proprio kernel pode ter chamado isso na inicialização,
+		//nesse caso a thread será inválida.
+		
+		window->InputThread = (struct thread_d *) threadList[current_thread];
+		
 		
 		//Salvando id localmente.
 		WindowID = (int) window->id; 
@@ -2683,7 +2692,7 @@ void SetFocus ( struct window_d *window ){
 // Configurando a janela com o foco de entrada.
 //
 			
-setup_wwf:		
+        setup_wwf:		
 
 			//
 			// Temos que posicionar o cursor caso a janela seja um editbox.	

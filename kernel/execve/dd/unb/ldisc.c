@@ -419,7 +419,7 @@ int LINE_DISCIPLINE ( unsigned char SC, int type ){
     //...
 	
 	//Window.
-    struct window_d *wFocus;	
+    //struct window_d *wFocus;	
 
 
     //
@@ -788,8 +788,12 @@ done:
 		//como o aplicativo não trata esse tipo de mensagem ele apenas reecaminha 
 		//para o procedimentod e janelas do sistema.
 	
-	if( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) ){
-		services( SYS_REBOOT, 0, 0, 0);
+	if ( (ctrl_status == 1) && 
+	     (alt_status == 1) && 
+		 (ch == KEY_DELETE) )
+	{
+		services ( SYS_REBOOT, 0, 0, 0 );
+		
 		//system_procedure ...
 		// @todo: Chamar o aplicativo REBOOT.BIN.
 	};
@@ -820,20 +824,22 @@ done:
 		//
 	
 	
-    //
+  
 	// #importante
-	// Ok. A ideia agora é enviar a mensagem para a fila de mensagens do sistema.
-	//
+    // +Pegamos a janela com o foco de entrada, pois ela 
+    // será um elemento da mensagem.	
+	// Mas enviaremos a mensagem para a fila da thread atual.
 	
-	// Envia as mensagens para os aplicativos intercepta-las
-	// so mandamos mensagem para um aplicativo no estavo válido.	
+	struct window_d *w;  
+	w = (void *) windowList[window_with_focus];
+	
+	struct thread_d *t;	
+	//t = (void *) threadList[current_thread];
+	
 
 	
-	// Apenas checando a validade da janela com o foco de entrada.
-	// Janela com o foco de entrada. (first responder ??)
 	
-	struct window_d *w;    
-	w = (void *) windowList[window_with_focus];
+	// ## thread ##
 	
 	if ( (void *) w == NULL )
 	{
@@ -842,44 +848,65 @@ done:
 		
 	}else{
 		
+		
 		if ( w->used != 1 || w->magic != 1234 )
 		{
 			printf("LINE_DISCIPLINE: w magic");
 			die();
+		}		
+
+		//#importante:
+		//Pegamos a trhead de input associada com a janela que tem o foco de entrada.
+		
+		t = (void *) w->InputThread;
+		if ( (void *) t == NULL )
+		{
+		    printf("LINE_DISCIPLINE: t fail");
+		    die();			
 		}
 		
-		// Aqui temos uma janela válida.
-		// Vamos enviar a mensagem para ela.
+		if ( t->used != 1 || t->magic != 1234 )
+		{
+			printf("LINE_DISCIPLINE: thread w magic fail");
+			die();
+		}        
+			
+		//#importante:
+		//??
 		
-        windowSendMessage ( (unsigned long) w, (unsigned long) mensagem, 
-		    (unsigned long) ch, (unsigned long) ch );
-	};
-	
- 
-	//
-	// ## Test ##
-	//
- 
-    //Estamos chamado o procedimento de janelas do kernel 
-	//para todos os casos. Mas isso deve ser um procedimento chamado pelo 
-	//aplicativo depois que ele trata as mensagens que quer.
+		//a janela com o foco de entrada deve receber input de teclado.
+		//então a mensagem vai para a thrad associada com a janela com o foco de 
+		//entrada.
+		//#importante: a rotina que seta o foco deverá fazer essa associação,
+		//o aplicativo chama a rotina de setar o foco em uma janela, 
+		//o foco será setado nessa janela e a thread atual será associada 
+		//a essa janela que está recebendo o foco.
 		
-	//Chamando o procedimento de janelas do sistema.
-	//Talvez isso seja apenas por enquanto...
-	//O motivo disso é para no caso de erro do mecanismo de fila
-	//tenhamos ainda algum evento de teclado sendo tratado pelo 
-	//procedimento do sistema.
-	//O procedimento de janelas do sistema vai tratar poucas teclas.
-	//Obs: #importante. Isso talvez deva ser chamado depois do 
-	//procedimento de janelas do aplicativo. Ou seja, chamado em user mode.
-	
-	// sm\sys\proc.c
-	
-	
-	//o procedimento tratará as mensagens de sistema, colocará o cham no 
-	//stdin e imprimirá o char na tela.
-	system_procedure (  w, (int) mensagem, (unsigned long) ch, 
-	    (unsigned long) ch ); 
+		//??
+		//ja o input de mouse deve ir para a thread de qualquer janela.
+		
+		t->window = w;
+		t->msg = (int) mensagem;
+		t->long1 = ch;
+		t->long2 = ch;
+		
+		t->newmessageFlag = 1;
+		
+		
+		//#importante:
+		//Chamando o porcedimento de janela para que não fiquemos sem 
+		//mensagem alguma, mas o certo é chamar o procedimento do sistema 
+		//só depois que o aplicativo consumir a mensagem, e o aplicativo decide 
+		//se vai chamar o procedimento do sistema ou não.
+		//inclusive o procedimento do sistema poderá ficar em user mode na API.
+		//aqui poderá ficar um segundo procedimento do sistema, bem reduzido,
+		//apenas para emergência do desenvolvedor.
+		
+		// sm\sys\proc.c
+		
+	    system_procedure (  w, (int) mensagem, (unsigned long) ch, 
+	        (unsigned long) ch );
+	};	
  
 	//?? porque -1.
     return (int) -1;
@@ -1539,10 +1566,30 @@ int flagRefreshMouseOver;
 	
 void mouseHandler (){
 	
-    
-	struct window_d *mOver;
+    // #importante:
+	// Essa será a thread que receberá a mensagem
+	struct thread_d *t;
 	
+	//#bugbug:
+	//usaremos isso provisóriamente para evitar acessar estrutura 
+	//inválida.
+	//t = (struct thread_d *) threadList[current_thread];
+	//if ( (void *) t == NULL )
+	//{
+		//printf("mouseHandler: debug current thread fail\n")
+	//	return;
+	//}
+	
+	// #importante:
+	// Essa será a janela afetada por qualquer
+	// evento de mouse.
+	
+    struct window_d *Window;
 
+	// ID de janela.
+	
+	int wID; 	
+	
 	
 	// Coordenadas do mouse.
     // Obs: Isso pode ser global.
@@ -1753,7 +1800,7 @@ void mouseHandler (){
 	// (capture) - On mouse over. 
 	//
 
-	struct window_d *wScan;
+	
 	
 	// wID = ID da janela.
 	// Escaneamos para achar qual janela bate com os valores indicados.
@@ -1764,8 +1811,6 @@ void mouseHandler (){
 	// estamos dentro de uma janela.
 	// -1 significa que ouve algum problema no escaneamento.
 	
-	int wID; 
-	
 	wID = (int) windowScan ( mouse_x, mouse_y );	
 	
 	if ( wID == -1 )
@@ -1775,8 +1820,14 @@ void mouseHandler (){
 		//mas somente uma vez.
 		if ( flagRefreshMouseOver == 1 )
 		{
-		    mOver = (struct window_d *) windowList[mouseover_window];	
-		    refresh_rectangle ( mOver->left, mOver->top, 20, 20 );
+		    Window = (struct window_d *) windowList[mouseover_window];	
+		    
+			//#bugbug:
+			//precisamos checar a validade da estrutura antes de usa-la.
+			
+			if ( (void *) Window != NULL ){
+			    refresh_rectangle ( Window->left, Window->top, 20, 20 );
+			}
 			
 			//não podemos mais fazer refresh.
 			flagRefreshMouseOver = 0;
@@ -1786,11 +1837,37 @@ void mouseHandler (){
 			mouseover_window = 0;
 		}
 		
-		
+		//Nothing.
 		
     }else{
 		
-		wScan = (struct window_d *) windowList[wID];
+		Window = (struct window_d *) windowList[wID];
+		
+		if ( (void *) Window == NULL )
+		{
+			//fail
+			return;
+		}
+		
+		if ( Window->used != 1 || Window->magic != 1234)
+		{
+			//fail
+			return;
+		}
+			
+		//#importante:
+		//Nesse momento temos uma janela válida, então devemos 
+		//pegar a thread associada à essa janela, dessa forma 
+		//enviaremos a mensagem para a thread do aplicativo ao qual 
+		//a janela pertence.
+		
+		t = (void *) Window->InputThread;
+
+		if ( (void *) t == NULL )
+		{
+			//fail
+			return;
+		}
 		
 		//#bugbug 
 		//#todo:
@@ -1826,11 +1903,19 @@ void mouseHandler (){
 					//clicou
 					if ( old_mouse_buttom_1 == 0 ){
 						
-                        windowSendMessage ( (unsigned long) wScan, 
-					        (unsigned long) MSG_MOUSEKEYDOWN, 
-							(unsigned long) 1, 
-							(unsigned long) 0 );  						
-				    
+						//#importante 
+						//enviaremos a mensagem para a thread atual.
+						
+						if ( (void *) Window != NULL ){
+						
+                            t->window = Window;
+						    t->msg = MSG_MOUSEKEYDOWN;
+							t->long1 = 1;
+							t->long2 = 0;
+							
+							t->newmessageFlag = 1;
+						}
+										    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_1 = 1;
 					}
@@ -1838,10 +1923,20 @@ void mouseHandler (){
 				}else{
 					
 					//up
-			        windowSendMessage ( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYUP, 
-						(unsigned long) 1, 
-						(unsigned long) 0 );
+					
+					//#importante 
+					//enviaremos a mensagem para a thread atual.
+						
+					if ( (void *) Window != NULL ){
+						
+                        t->window = Window;
+					    t->msg = MSG_MOUSEKEYUP;
+						t->long1 = 1;
+						t->long2 = 0;
+							
+						t->newmessageFlag = 1;
+					}						
+						
 					old_mouse_buttom_1 = 0;	
 				}
 			}; 
@@ -1863,10 +1958,16 @@ void mouseHandler (){
 					//clicou
 					if( old_mouse_buttom_2 == 0 ){
 						
-                        windowSendMessage ( (unsigned long) wScan, 
-					        (unsigned long) MSG_MOUSEKEYDOWN, 
-							(unsigned long) 2, 
-							(unsigned long) 0 );  						
+						
+						if ( (void *) Window != NULL ){
+						
+                            t->window = Window;
+						    t->msg = MSG_MOUSEKEYDOWN;
+							t->long1 = 2;
+							t->long2 = 0;
+							
+							t->newmessageFlag = 1;
+						}						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_2 = 1;
@@ -1875,10 +1976,15 @@ void mouseHandler (){
                 }else{
 					
 					//up
-			        windowSendMessage ( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYUP, 
-						(unsigned long) 2, 
-						(unsigned long) 0 );
+					if ( (void *) Window != NULL ){
+						
+                        t->window = Window;
+					    t->msg = MSG_MOUSEKEYUP;
+						t->long1 = 2;
+						t->long2 = 0;
+							
+						t->newmessageFlag = 1;
+					}	
 						
 					old_mouse_buttom_2 = 0;
 				}
@@ -1901,10 +2007,16 @@ void mouseHandler (){
 					//clicou
 					if ( old_mouse_buttom_3 == 0 ){
                         
-						windowSendMessage( (unsigned long) wScan, 
-					        (unsigned long) MSG_MOUSEKEYDOWN, 
-							(unsigned long) 3, 
-							(unsigned long) 0 );  						
+						
+						if ( (void *) Window != NULL ){
+						
+                            t->window = Window;
+						    t->msg = MSG_MOUSEKEYDOWN;
+							t->long1 = 3;
+							t->long2 = 0;
+							
+							t->newmessageFlag = 1;
+						}	 						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_3 = 1;
@@ -1913,10 +2025,15 @@ void mouseHandler (){
                 }else{
 					
 					//up
-			        windowSendMessage( (unsigned long) wScan, 
-					    (unsigned long) MSG_MOUSEKEYUP, 
-						(unsigned long) 3, 
-						(unsigned long) 0 );
+					if ( (void *) Window != NULL ){
+						
+                        t->window = Window;
+					    t->msg = MSG_MOUSEKEYUP;
+						t->long1 = 3;
+						t->long2 = 0;
+							
+						t->newmessageFlag = 1;
+					}	
 						
 					old_mouse_buttom_3 = 0;
 				}
@@ -1941,66 +2058,78 @@ void mouseHandler (){
 			//que ele estava anteriormente, então precisamos enviar uma 
 			//mensagem pra essa nova janela.
 			
-			if ( wScan->id != mouseover_window )
+			//#bugbug:
+			//estamos acessando a estrutura, mas precisamos antes saber se ela é válida.
+			
+			if ( (void *) Window != NULL )
 			{
-				
-                if ( mouseover_window != 0 )
-				{
-			        windowSendMessage ( (unsigned long) windowList[mouseover_window], 
-		            (unsigned long) MSG_MOUSEEXITED, 
-			        (unsigned long) 0, 
-			        (unsigned long) 0 ); 
-				};
-				
-                //windowSendMessage ( (unsigned long) wScan, 
-		        //    (unsigned long) MSG_MOUSEENTERED, 
-			    //    (unsigned long) 0, 
-			    //    (unsigned long) 0 );				
-				
-				//Agora enviamos uma mensagem pra a nova janela que o mouse 
-				//está passando por cima.
-				
-                windowSendMessage ( (unsigned long) wScan, 
-		            (unsigned long) MSG_MOUSEOVER, 
-			        (unsigned long) 0, 
-			        (unsigned long) 0 );
-				
 			
-			    //ja que entramos em uma nova janela, vamos mostra isso.
+                //;;;
+			    if ( Window->id != mouseover_window )
+			    {
 				
-				//botão.
-			    if ( wScan->isButton == 1 )
-				{    
-			        bmpDisplayCursorBMP ( fileIconBuffer, wScan->left, wScan->top );	
+                    if ( mouseover_window != 0 )
+				    {
 					
-			    };
+					    //if ( (void *) Window != NULL ){
+						
+                        t->window = (struct window_d *) windowList[mouseover_window];
+					    t->msg = MSG_MOUSEEXITED;
+						t->long1 = 0;
+						t->long2 = 0;
+						
+						t->newmessageFlag = 1;
+					    //}	
+				    };
 				
-				//não botão.
-				if ( wScan->isButton == 0 )
-				{
-				    bmpDisplayCursorBMP ( folderIconBuffer, wScan->left, wScan->top );		
-				}
 				
-				//nova mouse over
-				mouseover_window = wScan->id;
+				    //Agora enviamos uma mensagem pra a nova janela que o mouse 
+				    //está passando por cima.
+						
+                    t->window = Window;
+					t->msg = MSG_MOUSEOVER;
+					t->long1 = 0;
+					t->long2 = 0;
+						
+					t->newmessageFlag = 1;
 				
-				//#importante:
-				//flag que ativa o refresh do mouseover somente uma vez.
-				flagRefreshMouseOver = 1;
 			
-			}else{ 
+			        //ja que entramos em uma nova janela, vamos mostra isso.
+				
+				    //botão.
+			        if ( Window->isButton == 1 )
+				    {    
+			            bmpDisplayCursorBMP ( fileIconBuffer, Window->left, Window->top );	
+			        };
+				
+				    //não botão.
+				    if ( Window->isButton == 0 )
+				    {
+				        bmpDisplayCursorBMP ( folderIconBuffer, Window->left, Window->top );		
+				    };
+				
+				    //nova mouse over
+				    mouseover_window = Window->id;
+				
+				    //#importante:
+				    //flag que ativa o refresh do mouseover somente uma vez.
+				    flagRefreshMouseOver = 1;
+			
+			    }else{ 
 			    
-				//nothing ...
-				//não precisamos reenviar a mensagem, pois o mouse 
-				//continua na mesma janela que antes.
+				    //nothing ...
+				    //não precisamos reenviar a mensagem, pois o mouse 
+				    //continua na mesma janela que antes.
                 
-				//windowSendMessage ( (unsigned long) wScan, 
-		        //    (unsigned long) MSG_MOUSEOVER, 
-			    //    (unsigned long) 0, 
-			    //    (unsigned long) 0 );				
+				    //windowSendMessage ( (unsigned long) wScan, 
+		            //    (unsigned long) MSG_MOUSEOVER, 
+			        //    (unsigned long) 0, 
+			        //    (unsigned long) 0 );				
 				
+			    };			
+			    
+				//;;;
 			};
-			
 			
 			//Ação concluída.
 			//Para o caso de um valor incostante na flag.

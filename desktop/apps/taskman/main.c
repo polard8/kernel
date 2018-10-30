@@ -253,8 +253,6 @@ int tmProc ( int junk,
 	};
 
 	//Nothing.
-	
-//done:
 
     return (int) 0;
 };
@@ -323,7 +321,6 @@ int tmDrawBar (int color){
 	//Cursor.
 	tmSetCursor(0,0);
 	
-//done:	
     return (int) 0; 
 };
 
@@ -346,8 +343,6 @@ void tmSetCursor (unsigned long x, unsigned long y){
 
     g_cursor_x = (unsigned long) x;
     g_cursor_y = (unsigned long) y;	
-	
-	//return;
 };
 
 
@@ -474,6 +469,7 @@ int appMain ( int argc, char *argv[] ){
 	//int Status;	
 	int Flag;
 	void *P;
+	
     struct window_d *hWindow;
 	
 	// #importante

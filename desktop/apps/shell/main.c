@@ -1113,14 +1113,20 @@ Mainloop:
 	
 	while (running)
 	{
+		//#obs: O retorno será 1 se tiver mensagem e 0 se não tiver.
 		enterCriticalSection(); 
 		system_call ( 111,
-		    (unsigned long)&message_buffer[0],
-			(unsigned long)&message_buffer[0],
-			(unsigned long)&message_buffer[0] );
+		    (unsigned long) &message_buffer[0],
+			(unsigned long) &message_buffer[0],
+			(unsigned long) &message_buffer[0] );
 		exitCriticalSection(); 
 			
-		if (	message_buffer[1] != 0 )
+		if ( message_buffer[1] != 0 )
+        {
+            //printf(".");			
+		}	
+		
+		if ( message_buffer[1] != 0 )
 		{
 	        shellProcedure ( (struct window_d *) message_buffer[0], 
 		        (int) message_buffer[1], 
@@ -4102,11 +4108,23 @@ int shellInit ( struct window_d *window ){
 	
 done:
     
+	/*
+	   #test 
+	   #bugbug 
+	   
+	   Estamos supendendo a rotina de password porque 
+	   estamos testando o inpot de mensagens.
+	   Sendo que o input do password é diferente do input 
+	   de mensagens.
+       em seguida trablharemos nesse input  também
+       Esse input é o input usado pela libc.
+     */
+	   
 	if ( shellCheckPassword() != 1 ){
 		
 	    printf("shellCheckPassword FAIL \n");		
 	}
-	
+
 
 	// @todo:
 	// Gerenciamento do heap do processo. ??
@@ -4173,13 +4191,19 @@ int shellCheckPassword (){
 		//hostname
         current_host_name = "??host??";		
 		
-		//username
+		//
+		//  ## username  ##
+		//
+		
 	    printf("username:\n");
 	    gets(username);
 		current_user_name = username;
 		
-		//password
-	    printf("password:\n");
+		//
+		//  ## password ##
+	    //
+		
+		printf("password:\n");
 	    gets(password);
 	
 #ifdef SHELL_VERBOSE	

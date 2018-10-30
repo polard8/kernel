@@ -1075,6 +1075,11 @@ struct window_d
 	int LineArrayPointerY;      //em qual coluna o ponteiro está.
 	//...
 	
+	
+    //#importante:
+	//thread de input
+	
+    struct thread_d *InputThread;	
 
     //
     //  Process support.

@@ -642,6 +642,141 @@ int init_threads (){
 };
 
 
+
+/*
+ **********************************************************
+ * thread_getchar:
+ *
+ * Esse é o serviço 137.
+ * Isso é usado pela biblioteca stdio em user mode na função getchar().
+ */
+ 
+
+int thread_getchar (){
+	
+	unsigned char SC;
+	int save;
+	
+	//pode ser que esse aplicativo não tenha janela,
+	//mas esteja rodando na janela do shell.
+	struct window_d *wFocus;
+	
+	struct thread_d *t;
+	
+	//
+	// Bloqueia pra que nenhum aplicativo pegue mensagens 
+	// na estrutura de janela até que window_getch termine.
+	//
+	
+	//window_getch_lock = 1;
+	
+	//
+	// Pegamos um scancode na fila do teclado,
+	// transformamos ela em mensagem e colocamos a 
+	// mensagem na estrutura da janela com o foco de entrada.
+	//
+	
+
+	SC = (unsigned char) keybuffer[keybuffer_head];
+	
+	//Limpa o offset na fila de teclado 
+	//onde pegamos o scancode.
+	
+	keybuffer[keybuffer_head] = 0;
+	
+	//Circulamos a fila de teclado.
+	keybuffer_head++;
+	if( keybuffer_head >= 128 ){
+	    keybuffer_head = 0;	
+	}
+
+ 
+    //isso coloca a mensagem na fila da thread atual.
+	LINE_DISCIPLINE ( SC, 0 );	
+
+	
+ 	
+	//
+	// Agora vamos pegar a somente a parte da mensagem 
+	// que nos interessa, que é o caractere armazenado em long1.
+	// Obs: Somente queremos o KEYDOWN. Vamos ignorar as outras 
+	// digitações.
+	//
+	
+	//fast way 
+	//@todo: melhorar isso
+	wFocus = (void *) windowList[window_with_focus];
+	
+	if ( (void *) wFocus == NULL )
+	{
+		//fail 
+		//free(wFocus);
+		goto fail;
+		
+	} else {
+		
+		if ( wFocus->used != 1 || wFocus->magic != 1234 )
+		{
+			goto fail;
+		}
+		
+		//#importante
+		//Essa é a thread de input da janela com o foco de entrada.
+		//ou seja, somente o aplicativo que tiver o foco de entrada vai pegar 
+		//mensagens aqui.
+		
+		t = (void *) wFocus->InputThread;
+		
+		if ( (void *) t == NULL  )
+		{
+		    goto fail;	
+		}
+		
+		
+		if ( t->used != 1 || t->magic != 1234 )
+		{
+			goto fail;
+		}
+		
+		
+		//Aqui temos uma thread válida e uma janela válida.
+		
+		// A mensagem precisa ser MSG_KEYDOWN, ou seja, é válida 
+        // apenas para teclas pressionadas.
+		
+		if ( t->msg != MSG_KEYDOWN )
+		{
+		    goto fail;	
+		}		
+		
+		save = (int) t->long1;
+		
+		//limpa
+		
+		t->window = 0;
+		t->msg = 0;
+		t->long1 = 0;
+		t->long2 = 0;
+					
+	    //sinaliza que a mensagem foi consumida, 
+		//e que não temos nova mensagem.
+	    
+		t->newmessageFlag = 0;
+	
+	    //window_getch_lock = 0;
+		return (int) save;
+	};
+
+	
+fail:
+done:
+   // window_getch_lock = 0;
+	return (int) -1; //erro	
+};
+
+
+
+
 /*
  *Constructor.
 int threadmanagerProcessmanager()

@@ -176,6 +176,7 @@ void *services( unsigned long number,
 	//...
 	
 	//Para identificarmos qual processo e qual thread está chamando.
+	//struct window_d *Thread;
 	struct process_d *p;
 	struct thread_d *t;
 	
@@ -216,9 +217,12 @@ void *services( unsigned long number,
 	unsigned long *message_address = (unsigned long *) arg2;
 	
 	unsigned char SC;
-	struct window_d *wFocus;
+	//struct window_d *wFocus;
 	
 	int desktopID;
+	
+	
+	
 	
 
 	// *Importante: 
@@ -861,47 +865,69 @@ void *services( unsigned long number,
 			{
 				printf("111: null pointer");
 				die();
+				
 			}else{
 				
-			    wFocus = (void *) windowList[window_with_focus];
+			    t = (void *) threadList[current_thread];
 			    
 				//#bugbug:
 				//temos que checar a validade da janela.
 				
-				//se não há mensagens.
-				if( wFocus->newmessageFlag == 0 )
+	            if ( (void *) t == NULL )
+	            {
+		           return NULL;
+	            }
+				
+				//se Não há mensagens.
+				if( t->newmessageFlag != 1 )
 				{
-                    //Se não há mensagens na estrutura da janela,
-					//então devemos alimentar a estrutura para
-					//que da próxima vez exista alguma mensagem.
-					//Nossas opções são o teclado, pois o próprio mouse 
-					//alimentará por si só a estrutura da janela.
+                    // Se não há mensagens na estrutura da janela,
+					// então devemos alimentar a estrutura para
+					// que da próxima vez exista alguma mensagem.
+					// Nossas opções são o teclado, pois o próprio mouse 
+					// alimentará por si só a estrutura da janela.
 					
 					//alimentando através de mensagens de teclado
-			        SC = (unsigned char) keybuffer[keybuffer_head];
-		            keybuffer[keybuffer_head] = 0;
-			        keybuffer_head++;
-			        if( keybuffer_head >= 128 ){ keybuffer_head = 0; };
-			        LINE_DISCIPLINE(SC, 0);
-                    
-					//sinalizando, mas acho que o ldisc já faz isso.
-                    wFocus->newmessageFlag = 1;  					
-			
-			        return NULL; 
-				}else{
+			        
+					//pega o sccancode.
+					SC = (unsigned char) keybuffer[keybuffer_head];
 					
+					//renova a fila do teclado
+		            keybuffer[keybuffer_head] = 0;
+					keybuffer_head++;
+					if ( keybuffer_head >= 128 ){ 
+				        keybuffer_head = 0; };
+			        
+					// envia a mensagem para a thread atual.
+					LINE_DISCIPLINE (SC, 0);
+                    
+					//LINE_DISCIPLINE chama uma função para colocar a mensagem 
+					// na estrutua da janela com foco de entrada. 
+					//#todo, mas agora deverá 
+					//colocar na estrutura da thread atual.
+					
+					//sinalizando, mas acho que o ldisc já faz isso.
+					//#importante: LINE_DISCIPLINE faz isso. 
+					//t->newmessageFlag = 1;  					
+			
+			        return NULL; //sinaliza que não há mensagem 
+				}
+				
+				if( t->newmessageFlag == 1 )
+				{
+	
 					//pegando a mensagem.
-			        message_address[0] = (unsigned long) wFocus->msg_window;
-			        message_address[1] = (unsigned long) wFocus->msg;
-			        message_address[2] = (unsigned long) wFocus->long1;
-			        message_address[3] = (unsigned long) wFocus->long2;
+			        message_address[0] = (unsigned long) t->window;
+			        message_address[1] = (unsigned long) t->msg;
+			        message_address[2] = (unsigned long) t->long1;
+			        message_address[3] = (unsigned long) t->long2;
                     
 					//sinalizamos que a mensagem foi consumida.
-                    wFocus->newmessageFlag = 0; 					
+                    t->newmessageFlag = 0; 					
+				    
+					return (void *) 1; //sinaliza que há mensagem
 				}
-			
-				
-			}
+			};
 		    break;
 		
 		//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
@@ -911,6 +937,9 @@ void *services( unsigned long number,
 			
 		// 114	
         // ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
+		
+		//enviar uma mensagem para a thread atual.
+		//
 		case SYS_SENDWINDOWMESSAGE:
 		    if ( &message_address[0] == 0 )
 			{
@@ -919,20 +948,24 @@ void *services( unsigned long number,
 			}else{
 				
 				//hWnd = (struct window_d *) message_address[0];
-				hWnd = (void *) windowList[window_with_focus];
-				
-				//temos que checar a validade da janela.
-				if ( (void *) hWnd != NULL )
+				//hWnd = (void *) windowList[window_with_focus];
+				t = (void *) threadList[current_thread];
+				//if ( (void *) == NULL )
+				//{
+				//	return NULL;
+				//}
+				//temos que checar a validade.
+				if ( (void *) t != NULL )
                 {
-                    if ( hWnd->used == 1 && hWnd->magic == 1234 ){					
+                    if ( t->used == 1 && t->magic == 1234 ){					
 				        
-						hWnd->msg_window = (struct window_d *) message_address[0];
-				        hWnd->msg = (int) message_address[1];
-				        hWnd->long1 = (unsigned long) message_address[2];
-				        hWnd->long2 = (unsigned long) message_address[3];
+						t->window = (struct window_d *) message_address[0];
+				        t->msg = (int) message_address[1];
+				        t->long1 = (unsigned long) message_address[2];
+				        t->long2 = (unsigned long) message_address[3];
 				
 				        //sinalizando que temos uma mensagem.
-				        hWnd->newmessageFlag = 1; 
+				        t->newmessageFlag = 1; 
 					};
 			    };
 			};
@@ -1085,12 +1118,16 @@ void *services( unsigned long number,
 			
 		//137
 		// Isso é usado pela biblioteca stdio em user mode
-		// na função getchar()
+		// na função 'getchar()'
 		// #bugbug: Não está pegando todos os caracteres digitados.
 		// window.c
 		
+		//#test
+		//#bugbug: a partir de agora isso deve pegar mensagem na thread 
+		//atual e não mais na janela com foco de entrada.
         case SYS_GETCH:  
-		    return (void *) window_getch();
+		    //return (void *) window_getch();
+			return (void *) thread_getchar();
             break;
 
 		//138 - get key state.	

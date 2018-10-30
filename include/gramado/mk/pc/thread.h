@@ -230,7 +230,9 @@ struct thread_d
 	unsigned long name_address;
 	unsigned long name_pointer;   	
 	char short_name[4];
-	char *cmd;	   
+	char *cmd;	
+
+
 	
     //
 	// ## CPU support ##
@@ -454,6 +456,8 @@ struct thread_d
 	unsigned long long1;        //arg3.
 	unsigned long long2;        //arg4.
 	
+	int newmessageFlag;         //flag avisando que tem nova mensagem.
+	
 	//?? mensagens pendentes.
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
 	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
@@ -627,6 +631,9 @@ void kill_thread (int tid);
 void dead_thread_collector ();
 
 void kill_all_threads ();
+
+
+int thread_getchar (); 
 
 //
 // End.

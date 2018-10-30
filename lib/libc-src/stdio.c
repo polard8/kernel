@@ -1173,6 +1173,7 @@ int fputs ( const char *str, FILE *stream ){
 char *gets (char *s){
 	
     int ch;
+	
     int t;
 	char *p;
 	

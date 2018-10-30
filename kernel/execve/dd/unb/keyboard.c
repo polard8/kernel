@@ -80,7 +80,7 @@ int _read_offset;
  */
 void abnt2_keyboard_handler (){
 	
-    unsigned char scancode = inportb(0x60);	
+    unsigned char scancode = inportb (0x60);	
 	
 	//#importante:
 	// Provavelmente uma interrupção irá fazer esse trabalho de 
