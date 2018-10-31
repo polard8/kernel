@@ -538,6 +538,8 @@ system_procedure ( struct window_d *window,
 				//Igual ao gerenciador de dispositivos.
 				case VK_F5:
 					
+					ps2 ();
+					
 					//if(AltStatus == 1){ window_with_focus = 5; break;};
 					//if(CtrlStatus == 1){ active_window = 5; break;};
 			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
@@ -545,7 +547,7 @@ system_procedure ( struct window_d *window,
 					//printf ("%x \n", CreatePageDirectory() );
 					
 					//mostrar informações sobre os processos criados.
-					show_process_information ();
+					//show_process_information ();
 					
 					//pci_info();     //PCI information.
 				    

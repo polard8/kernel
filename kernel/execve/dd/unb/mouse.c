@@ -23,6 +23,11 @@
  */
 void mouse_handler (){
 	
+	//#debug
+	printf(".");
+	refresh_screen();
+	return;
+	
 	//*importante:
 	// Estamos no driver de mouse.
 	// Chamaremos o mouse handler dentro do kernel base.

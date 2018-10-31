@@ -14,6 +14,52 @@
 
 #include <kernel.h>
 
+//#todo #test
+//nelson cole ps2 support (interna)
+//todo: essas coisas podem ir para ports.c
+
+//IO Delay
+//disk1.h tem isso.
+//#define io_delay() __asm__ __volatile__("out %%al,$0x80"::)
+
+inline void wait_ns(int count)
+{
+	count /=100;	 
+	while(--count)io_delay();
+
+};
+
+// Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
+int BAT_TEST ();
+int BAT_TEST (){
+    
+    	uint8_t val;
+
+    	while (1)
+		{
+        	val = mouse_read();
+
+			//se deu certo.
+        	if (val == 0xAA)
+			{
+				printf("BAT_TEST ok \n");
+				return 0;
+        	}else{
+		 	    
+				//se falhou
+				if(val == 0xFC) 
+				{
+					printf("BAT_TEST fail \n");
+       			    return -1; 
+       		    }				
+			} 
+				
+        	// Reenviar o comando. 
+        	// OBS: este comando não é colocado em buffer
+        	mouse_write(0xFE);       
+        };
+};
+
 
  
 //=======================================================
@@ -1142,6 +1188,9 @@ int get_shift_status (){
 // void keyboardInit()
 void init_keyboard (){
 	
+	
+	printf ("init_keyboard: initializing ...\n");
+	
 	//user.h
 	ioControl_keyboard = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
 	
@@ -1220,29 +1269,39 @@ void init_keyboard (){
 	numlock_status = 0;
 	//...
 
-	//AE    Enable Keyboard Interface: clears Bit 4 of command register
-	//      enabling keyboard interface.
-	kbdc_wait(1);
-	outportb(0x64,0xAE);   // Activar a primeira porta PS/2
+	// 0xAE
+	// Enable Keyboard Interface: 
+	// Clears Bit 4 of command register enabling keyboard interface.
+	// Isso ativa a primeira porta PS/2.
 	
-	//reset
-	kbdc_wait(1);
-	outportb(0x60,0xFF);
+	//#bugbug: isso habilita a porta, não vamos habilitar a porta por 
+	//enquando., deixando a rotina de inicialização de ps2 habilitar 
+	//as duas portas no final.
+	
+	kbdc_wait (1);
+	outportb ( 0x64, 0xAE );   
+	
+	// Reset
+	
+	kbdc_wait (1);
+	outportb ( 0x60, 0xFF );
 
 
 	//Leds.
 	//LED_SCROLLLOCK 
 	//LED_NUMLOCK 
-	//LED_CAPSLOCK  	
-	keyboard_set_leds(LED_NUMLOCK);
+	//LED_CAPSLOCK  
+	
+	keyboard_set_leds (LED_NUMLOCK);
 	
 	//...
-	
 	
 	//Debug support.
 	scStatus = 0;
 
     g_driver_keyboard_initialized = (int) 1;
+	
+    printf ("init_keyboard: done\n");		
 };
 
 
@@ -1282,6 +1341,9 @@ int keyboardInit(){
  */		
 int init_mouse (){
 	
+	printf("init_mouse: initializing ...\n");
+	refresh_screen();
+	
     unsigned char response = 0;
     unsigned char deviceId = 0;
     int i; 
@@ -1290,16 +1352,18 @@ int init_mouse (){
 	
 	
 	//user.h
-	ioControl_mouse = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
+	ioControl_mouse = (struct ioControl_d *) malloc ( sizeof(struct ioControl_d) );
 	
 	if ( (void *) ioControl_mouse == NULL )
 	{
 		printf("ldsic-init_mouse: ioControl_mouse fail");
 		die();
-	}else{
+		
+	} else {
 	    
 	    ioControl_mouse->id = 0;
-	    ioControl_mouse->used = 1;
+	    
+		ioControl_mouse->used = 1;
 	    ioControl_mouse->magic = 1234;
 	    
 		//Qual thread está usando o dispositivo.
@@ -1313,12 +1377,13 @@ int init_mouse (){
 
 		
 	//Inicializando as variáveis usadas na rotina em Assemly
-    //em hardwarelib.inc
+    //em hwlib.inc
     
 	//Coordenadas do cursor.
 	g_mousepointer_x = (unsigned long) 0;
     g_mousepointer_y = (unsigned long) 0;	
-    mouse_x = 0;
+    
+	mouse_x = 0;
     mouse_y = 0;
 	
 	//mouse_x = 0;
@@ -1343,7 +1408,7 @@ int init_mouse (){
 	//Mostraremos essa mensagem somente no ambiente de debug.
 	
 #ifdef KERNEL_VERBOSE	
-    MessageBox(gui->screen, 1, "init_mouse:","initializing!");
+    MessageBox (gui->screen, 1, "init_mouse:","initializing!");
 #endif   
 	
 	//
@@ -1351,62 +1416,7 @@ int init_mouse (){
 	// Obs: O modo bruto está funcionando. 
 	//
 	
-	
-//tryModoBruto:	
-	
-	//Modo bruto.
-	//Obs: Esse modo está funcionando.
-	/*
-	if(bruto == 1){
-	    mouse_write(0xFF);
-	    mouse_write(0xF6); 
-	    mouse_write(0xF4); 
-		//while(!0xFA)mouse_read();
-		while (mouse_read() != 0xfa);   // ACK
-	};
-	*/
-	
- // Reseta mouse (reset ? lento!)...
-  // Espero pelo byte 0xaa que encerra a sequ?ncia
-  // de reset!
-  kbdc_wait(1);
-  mouse_write(0xff);
-  while (mouse_read() != 0xaa);
 
-  // Restaura defaults do PS/2 mouse.
-  kbdc_wait(1);
-  mouse_write(0xf6);
-  while (mouse_read() != 0xfa);
-
-
-// TODO: Pode ser interessante diminuir a sensibilidade do mouse
-  // aqui!!!
-
-  // Habilita o mouse streaming
-  // Interessante notar que, no modo streaming,
-  // 1 byte recebido do PS/2 mouse gerar  uma IRQ...
-  // Talvez valha a pena DESABILITAR o modo streaming
-  // para colher os 3 dados de uma s¢ vez na IRQ!
-  kbdc_wait(1);
-  mouse_write(0xf4);
-  while (mouse_read() != 0xfa);         // ACK
-  
-	
-	//
-	// Aqui podemos tentar outros modos mais completos.
-	//
-	
-//done:
-
-    // Reabilitando as duas portas.
-	
-	// Ativar a primeira porta PS/2.
-	kbdc_wait(1);
-	outportb(0x64,0xAE);   
-
-	// Ativar a segunda porta PS/2.
-	kbdc_wait(1);
-	outportb(0x64,0xA8); 
 
 
 	//
@@ -1432,7 +1442,10 @@ int init_mouse (){
     MessageBox(gui->screen, 1, "init_mouse:","Mouse initialized!");   
 #endif  
 
-    //initialized = 1;
+    
+	printf("init_mouse: done\n");
+	
+	//initialized = 1;
     //return (kernelDriverRegister(mouseDriver, &defaultMouseDriver));	
 	return (int) 0;
 };
@@ -1466,18 +1479,49 @@ unsigned char mouse_read (){
 };
 
 
+
+ 
+// Esta função é usada para a calibragem do IBF e OBF
+// Se a entra é 0 = IBF, se entrada é 1 = OBF
+void kbdc_wait ( unsigned char type){
+	
+	int spin = 100000; 
+
+	if(type == 0) {
+		while(!(inb(0x64)&1)) { wait_ns(100); if(!(spin--))break; }
+       	}
+
+	else if(type == 1) {
+
+                 while((inb(0x64)&2)) { wait_ns(100); if(!(spin--))break; }
+
+      	}else wait_ns(200);
+
+}
+ 
+
+
 /*
  * kbdc_wait:
  *     Espera por flag de autorização para ler ou escrever.
  *     (Nelson Cole) 
  */
+/* 
 void kbdc_wait (unsigned char type){
+	
+	//#todo:
+	//Qual que é ler e qual que é escrever ?
+	//
 	
 	if (type==0)
 	{
 		//#bugbug rever
         while ( !inportb(0x64) & 1 )
 		{
+			//400ns
+			outanyb (0x80);
+			outanyb (0x80);
+			outanyb (0x80);
 			outanyb (0x80);
 		};
 		
@@ -1485,11 +1529,15 @@ void kbdc_wait (unsigned char type){
 		
         while ( inportb(0x64) & 2 )
 		{
+			//400ns
+			outanyb (0x80);
+			outanyb (0x80);
+			outanyb (0x80);
 			outanyb (0x80);
 		};
 	};
 };
-
+*/
 
 /*
 //rotina interna de suporta ao mouseHandler 
@@ -1565,6 +1613,12 @@ static char buffer_mouse[3];
 int flagRefreshMouseOver;
 	
 void mouseHandler (){
+	
+	//#debug
+	printf(".");
+    outportb ( 0xa0, 0x20 ); 
+    outportb ( 0x20, 0x20 );
+    return;	
 	
     // #importante:
 	// Essa será a thread que receberá a mensagem
@@ -1792,15 +1846,21 @@ void mouseHandler (){
 	// será usada para 'capturar' o mouse ... 
 	// e depois tem a mensagem para 'descapturar'.
 	
+	
+	printf(".");
+	
+	
+	//=======================================================================
+	//=======================================================================
+	
+/*
+
 	//
 	//  ## Scan ##
 	//
 	
 	//===========
 	// (capture) - On mouse over. 
-	//
-
-	
 	
 	// wID = ID da janela.
 	// Escaneamos para achar qual janela bate com os valores indicados.
@@ -2162,6 +2222,11 @@ void mouseHandler (){
 		
 	};
 
+*/	
+	//=======================================================================
+	//=======================================================================
+	
+
     // EOI.		
     outportb ( 0xa0, 0x20 ); 
     outportb ( 0x20, 0x20 );
@@ -2263,21 +2328,26 @@ void kernelPS2MouseDriverReadData (void){
  */
 void P8042_install (){
 	
+	printf ("P8042_install: initializing ...\n");
+	
 	unsigned char status;
-
+	
+	
     // Desativar dispositivos PS/2 , isto evita que os dispositivos PS/2 
 	// envie dados no momento da configuração.
+	
+	//asm ("cli");
 
 //desablePorts:
 	
 	// Desativar a primeira porta PS/2.
-  	kbdc_wait(1);
-	outportb(0x64,0xAD);  
+  	//kbdc_wait(1);
+	//outportb(0x64,0xAD);  
 	
 	// Desativar a segunda porta PS/2, 
 	// hahaha por default ela já vem desativada, só para constar
-	kbdc_wait(1);
-	outportb(0x64,0xA7); 
+	//kbdc_wait(1);
+	//outportb(0x64,0xA7); 
 
 //goAhead:
 	
@@ -2303,7 +2373,7 @@ void P8042_install (){
 	kbdc_wait(1);
 	outportb(0x60,status);  
 
-	// Obs:
+	// #importante:
 	// Agora temos dois dispositivos seriais teclado e mouse (PS/2).
 
     // Reabilitando portas.
@@ -2311,19 +2381,85 @@ void P8042_install (){
 //enablePorts:
 	
 	// Ativar a primeira porta PS/2.
-	kbdc_wait(1);
-	outportb(0x64,0xAE);   
+	//kbdc_wait(1);
+	//outportb(0x64,0xAE);   
 
 	// Ativar a segunda porta PS/2.
-	kbdc_wait(1);
-	outportb(0x64,0xA8);  
+	//kbdc_wait(1);
+	//outportb(0x64,0xA8);  
 
     // Done!
 	
 	// espera.
 	// ?? Pra que isso ??
-	kbdc_wait(1);  
+	//kbdc_wait(1); 
+
+
+ 
+	
+  // Reseta mouse (reset ? lento!)...
+  // esperando 0xFA??
+  // Espero pelo byte 0xaa que encerra a sequ?ncia de reset!
+  kbdc_wait(1);
+  mouse_write(0xff);
+  while (mouse_read() != 0xFA);
+
+   // printf("\n init_mouse: chamando BAT_TEST\n");
+   // refresh_screen();
+  
+  /*
+ 	// Basic Assurance Test (BAT)
+    	if( BAT_TEST() != 0) 
+		{	
+    		// Aqui! Precisaremos de fazer alguma coisa, em casos de erro
+    		printf("\n init_mouse: BAT_TEST Mouse error!");
+            refresh_screen();
+			
+			while (1){
+				asm ("cli");
+				asm ("hlt");
+			}
+    	};
+	*/
+
+  // Restaura defaults do PS/2 mouse.
+  kbdc_wait(1);
+  mouse_write(0xf6);
+  while (mouse_read() != 0xFA);
+
+
+   // TODO: Pode ser interessante diminuir a sensibilidade do mouse
+   // aqui!!!
+
+  // Habilita o mouse streaming
+  // Interessante notar que, no modo streaming,
+  // 1 byte recebido do PS/2 mouse gerar  uma IRQ...
+  // Talvez valha a pena DESABILITAR o modo streaming
+  // para colher os 3 dados de uma s¢ vez na IRQ!
+  kbdc_wait(1);
+  mouse_write(0xf4);
+  while (mouse_read() != 0xfa);         // ACK
+  
+	
+	//
+	// Aqui podemos tentar outros modos mais completos.
+	//
+	
+//done:
+
+    // Reabilitando as duas portas.
+	
+	// Ativar a primeira porta PS/2.
+	//kbdc_wait(1);
+	//outportb(0x64,0xAE);   
+
+	// Ativar a segunda porta PS/2.
+	//kbdc_wait(1);
+	//outportb(0x64,0xA8); 	
     
+	
+	printf ("P8042_install: done\n");
+	
     // NOTA. 
 	// Esta configuração discarta do teste do controlador PS/2 e de seus dispositivos. 
 	// Depois façamos a configuração decente e minuciosa do P8042.
@@ -2451,6 +2587,9 @@ done:
 /*
  ***************
  * ps2:
+ *
+ *     #ps2 
+ *
  *     Essa rotina de inicialização do controladro 
  * poderá ter seu próprio módulo.
  *     Inicializa o controlador ps2.
@@ -2463,15 +2602,84 @@ done:
 void ps2 (){
 	
 	//deverá ir para ps2.c @todo: criar arquivo.
-    
-	P8042_install();  
 	
-	//@todo: isso deveria se chamar init_ps2_mouse ...
-    //?? quem inicializará a porta do teclado ?? o driver ??
-	//?? quem inicializará a porta do mouse ?? o driver ??
-	 
+	asm ("cli");
+	
+	printf("ps2: Initializing ...\n");
+	
+	
+	//
+	// ## Mouse ##
+	//
+	
+	// configuração refinada do mouse.	
+    // Configurando o controlador PS/2, 
+    // e activar a segunda porta PS/2 (mouse).
+
+	// Desativar a primeira porta PS/2. (teclado)
+	//deixaremos para configurá lo depois,
+  	kbdc_wait(1);
+	outportb(0x64,0xAD);  
+
+	// Ativar a segunda porta PS/2.
+	kbdc_wait(1);
+	outportb(0x64,0xA8); 		
+
+	
+	//isso leva o controlador a um estado default para o mouse
+	P8042_install();  
+	refresh_screen();
+	
+
+	//inicializa as globais e faz uma 
+	// inicialização básica do controlador para mouse (mouse).
+	//aqui não mechemos mais no controlador.., só globais,
+	init_mouse();
+	refresh_screen();
+	
+	
+	//
+	// ## teclado ##
+	//	
+
+	// Ativar a segunda porta PS/2.
+	kbdc_wait(1);
+	outportb(0x64,0xA8); 	
+
 	init_keyboard();  
-	init_mouse();	 
+	refresh_screen();  	
+ 
+	
+
+    //
+	// ## habilitando as duas portas ##
+	//
+	
+
+    //#importante
+    // Reabilitando as duas portas.
+	
+	// Ativar a primeira porta PS/2.
+	//kbdc_wait(1);
+	//outportb(0x64,0xAE);   
+
+	// Ativar a segunda porta PS/2.
+	//kbdc_wait(1);
+	//outportb(0x64,0xA8); 	
+
+
+    //Configurando o controlador PS/2, 
+    //e activar a segunda porta PS/2 (mouse).	
+	
+
+	
+	printf("ps2: done\n");	
+	refresh_screen();
+	
+	//while (1){
+	//	asm ("cli");
+	//	asm ("hlt");
+	//}
 };
 
 
