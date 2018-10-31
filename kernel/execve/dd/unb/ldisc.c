@@ -1813,32 +1813,36 @@ void mouseHandler (){
 	
 	wID = (int) windowScan ( mouse_x, mouse_y );	
 	
+	//se falhamos na sondagem da janela que o mouse está passando por cima.
 	if ( wID == -1 )
 	{ 
         
-		//essa flag indica que podemos fazer o refresh da mouse ouver,
-		//mas somente uma vez.
+		// Essa flag indica que podemos fazer o refresh da mouse ouver,
+		// mas somente uma vez.
+		
 		if ( flagRefreshMouseOver == 1 )
 		{
 		    Window = (struct window_d *) windowList[mouseover_window];	
 		    
-			//#bugbug:
-			//precisamos checar a validade da estrutura antes de usa-la.
+			// #bugbug:
+			// Precisamos checar a validade da estrutura antes de usa-la.
 			
 			if ( (void *) Window != NULL ){
 			    refresh_rectangle ( Window->left, Window->top, 20, 20 );
 			}
 			
-			//não podemos mais fazer refresh.
+			// Não podemos mais fazer refresh da mouse over.
 			flagRefreshMouseOver = 0;
 			
-			//#importante
-			//inicializa.
+			// #importante
+			// Inicializa qual será a mouse over.
 			mouseover_window = 0;
 		}
 		
 		//Nothing.
 		
+		
+	//ok o mouse passou por cima de uma janela.	
     }else{
 		
 		Window = (struct window_d *) windowList[wID];
@@ -1846,20 +1850,22 @@ void mouseHandler (){
 		if ( (void *) Window == NULL )
 		{
 			//fail
+			printf ("mouseHandler: Window struct\n");
 			return;
 		}
 		
 		if ( Window->used != 1 || Window->magic != 1234)
 		{
 			//fail
+			printf ("mouseHandler: Window validation\n");
 			return;
 		}
 			
-		//#importante:
-		//Nesse momento temos uma janela válida, então devemos 
-		//pegar a thread associada à essa janela, dessa forma 
-		//enviaremos a mensagem para a thread do aplicativo ao qual 
-		//a janela pertence.
+		// #importante:
+		// Nesse momento temos uma janela válida, esse é a janela que o mouse,
+        // acabou de entrar.	Então devemos pegar a thread associada à essa janela, 
+		// dessa forma enviaremos a mensagem para a thread do aplicativo ao qual 
+		// a janela pertence.
 		
 		t = (void *) Window->InputThread;
 
@@ -1888,7 +1894,7 @@ void mouseHandler (){
 			//Checaremos um por um.
 			
 			//1
-			//Igual ao estado anterior
+			//se o botão 1 está igual ao estado anterior
 			if( mouse_buttom_1 == old_mouse_buttom_1 )
 			{
 				//...
@@ -1906,15 +1912,15 @@ void mouseHandler (){
 						//#importante 
 						//enviaremos a mensagem para a thread atual.
 						
-						if ( (void *) Window != NULL ){
+						//if ( (void *) Window != NULL ){
 						
-                            t->window = Window;
-						    t->msg = MSG_MOUSEKEYDOWN;
-							t->long1 = 1;
-							t->long2 = 0;
+                            //t->window = Window;
+						   // t->msg = MSG_MOUSEKEYDOWN;
+							//t->long1 = 1;
+							//t->long2 = 0;
 							
-							t->newmessageFlag = 1;
-						}
+							//t->newmessageFlag = 1;
+						//}
 										    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_1 = 1;
@@ -1927,15 +1933,15 @@ void mouseHandler (){
 					//#importante 
 					//enviaremos a mensagem para a thread atual.
 						
-					if ( (void *) Window != NULL ){
+					//if ( (void *) Window != NULL ){
 						
-                        t->window = Window;
-					    t->msg = MSG_MOUSEKEYUP;
-						t->long1 = 1;
-						t->long2 = 0;
+                        //t->window = Window;
+					    //t->msg = MSG_MOUSEKEYUP;
+						//t->long1 = 1;
+						//t->long2 = 0;
 							
-						t->newmessageFlag = 1;
-					}						
+						//t->newmessageFlag = 1;
+					//}						
 						
 					old_mouse_buttom_1 = 0;	
 				}
@@ -1943,7 +1949,7 @@ void mouseHandler (){
 			
 			
 			//2
-			//Igual ao estado anterior
+			//se o botão 2 está  Igual ao estado anterior
 			if ( mouse_buttom_2 == old_mouse_buttom_2 )
 			{
 				//...
@@ -1959,15 +1965,15 @@ void mouseHandler (){
 					if( old_mouse_buttom_2 == 0 ){
 						
 						
-						if ( (void *) Window != NULL ){
+						//if ( (void *) Window != NULL ){
 						
-                            t->window = Window;
-						    t->msg = MSG_MOUSEKEYDOWN;
-							t->long1 = 2;
-							t->long2 = 0;
+                           // t->window = Window;
+						   // t->msg = MSG_MOUSEKEYDOWN;
+							//t->long1 = 2;
+							//t->long2 = 0;
 							
-							t->newmessageFlag = 1;
-						}						
+							//t->newmessageFlag = 1;
+						//}						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_2 = 1;
@@ -1976,15 +1982,15 @@ void mouseHandler (){
                 }else{
 					
 					//up
-					if ( (void *) Window != NULL ){
+					//if ( (void *) Window != NULL ){
 						
-                        t->window = Window;
-					    t->msg = MSG_MOUSEKEYUP;
-						t->long1 = 2;
-						t->long2 = 0;
+                      //  t->window = Window;
+					  //  t->msg = MSG_MOUSEKEYUP;
+						//t->long1 = 2;
+						//t->long2 = 0;
 							
-						t->newmessageFlag = 1;
-					}	
+						//t->newmessageFlag = 1;
+					//}	
 						
 					old_mouse_buttom_2 = 0;
 				}
@@ -1992,7 +1998,7 @@ void mouseHandler (){
 			
 			
 			//3
-			//Igual ao estado anterior
+			//se o botão 3 está  Igual ao estado anterior
 			if ( mouse_buttom_3 == old_mouse_buttom_3 )
 			{
 				//...
@@ -2008,15 +2014,15 @@ void mouseHandler (){
 					if ( old_mouse_buttom_3 == 0 ){
                         
 						
-						if ( (void *) Window != NULL ){
+						//if ( (void *) Window != NULL ){
 						
-                            t->window = Window;
-						    t->msg = MSG_MOUSEKEYDOWN;
-							t->long1 = 3;
-							t->long2 = 0;
+                           // t->window = Window;
+						  //  t->msg = MSG_MOUSEKEYDOWN;
+							//t->long1 = 3;
+							//t->long2 = 0;
 							
-							t->newmessageFlag = 1;
-						}	 						
+							//t->newmessageFlag = 1;
+						//}	 						
 				    
 					    //atualiza o estado anterior.
 					    old_mouse_buttom_3 = 1;
@@ -2025,15 +2031,15 @@ void mouseHandler (){
                 }else{
 					
 					//up
-					if ( (void *) Window != NULL ){
+					//if ( (void *) Window != NULL ){
 						
-                        t->window = Window;
-					    t->msg = MSG_MOUSEKEYUP;
-						t->long1 = 3;
-						t->long2 = 0;
+                       // t->window = Window;
+					   // t->msg = MSG_MOUSEKEYUP;
+						//t->long1 = 3;
+						//t->long2 = 0;
 							
-						t->newmessageFlag = 1;
-					}	
+						//t->newmessageFlag = 1;
+					//}	
 						
 					old_mouse_buttom_3 = 0;
 				}
@@ -2046,6 +2052,7 @@ void mouseHandler (){
 		    // Se NÃO ouve alteração no estado dos botões, então apenas 
 		    // enviaremos a mensagem de movimento do mouse e sinalizamos 
 		    // qual é a janela que o mouse está em cima.
+			
 		}else{
 			
 			// #importante
@@ -2073,12 +2080,12 @@ void mouseHandler (){
 					
 					    //if ( (void *) Window != NULL ){
 						
-                        t->window = (struct window_d *) windowList[mouseover_window];
-					    t->msg = MSG_MOUSEEXITED;
-						t->long1 = 0;
-						t->long2 = 0;
+                       // t->window = (struct window_d *) windowList[mouseover_window];
+					   // t->msg = MSG_MOUSEEXITED;
+						//t->long1 = 0;
+						//t->long2 = 0;
 						
-						t->newmessageFlag = 1;
+						//t->newmessageFlag = 1;
 					    //}	
 				    };
 				
@@ -2086,12 +2093,12 @@ void mouseHandler (){
 				    //Agora enviamos uma mensagem pra a nova janela que o mouse 
 				    //está passando por cima.
 						
-                    t->window = Window;
-					t->msg = MSG_MOUSEOVER;
-					t->long1 = 0;
-					t->long2 = 0;
+                   // t->window = Window;
+					//t->msg = MSG_MOUSEOVER;
+					//t->long1 = 0;
+					//t->long2 = 0;
 						
-					t->newmessageFlag = 1;
+					//t->newmessageFlag = 1;
 				
 			
 			        //ja que entramos em uma nova janela, vamos mostra isso.

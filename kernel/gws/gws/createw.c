@@ -236,6 +236,10 @@ CreateWindow( unsigned long type,
 	unsigned long border_size = 0;
 	unsigned long border_color = COLOR_BORDER;
 	
+	//strings support
+	char buf[100];
+    int len;	
+	
 	
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
@@ -545,6 +549,14 @@ CreateWindow( unsigned long type,
 		//Offsets
 		window->sendOffset = 0;
 		window->receiveOffset = 0;
+		
+		
+		//#importante 
+		//associando a janela criada com uma thread.
+		//#bugbug: isso pode dar problemas para janelas criadas pelo 
+		//kernel base na hora da inicialização ??
+		//#bugbug: e se a current thread ainda não foi inicializada.
+		window->InputThread = (struct thread_d *) threadList[current_thread];
 		
 		//Buffers support.
 		
@@ -990,8 +1002,7 @@ drawBegin:
     // logo abaixo, pintaremos as bordas para as janelas onde esse for o caso. 
     // só falta criar elemento na estrutura para gerenciar as bordas.
 
-    char buf[100];
-    int len;	
+
 	
 	if ( TitleBar == 1 )
 	{ 
@@ -1424,11 +1435,42 @@ drawBegin:
 	
 	if ( (unsigned long) type == WT_STATUSBAR )
 	{
+		//bg
 		drawDataRectangle ( window->left, window->top, 
 			window->width -1, window->height, window->bg_color ); 	
 						   
-		draw_string ( window->left +8, window->top +8, COLOR_TEXT,  
-			window->name );  
+		
+		
+		//Se não tivermos um nome vamos usar o nome padrão a ser criado ou nenhum?
+        //if(!text)
+		//    ??    
+        
+		len = strlen (window->name);
+		
+	    if (len >= sizeof(buf))
+		    len = sizeof(buf) - 1;
+	    memcpy ( buf, window->name, len );
+	    buf[len] = 0;
+		
+		//quantidade de caracteres permitidos na barra de títulos.
+		//((window->width / 8)/2)
+		
+	    /* shorten text if necessary */
+        while ( len && len > ( window->width / 8 ) )
+		{
+			//finalizando a string dentro do buffer num
+			//offset aceitável.
+            buf[len--] = 0;  
+        }
+		
+		//algo deu errado.
+        //if (len > ((window->width / 8)/2))
+        //    ?? /* too long */			
+		
+		//draw_string ( window->left +8, window->top +8, COLOR_TEXT,  
+		//	window->name );  
+			
+		draw_string ( window->left +8, window->top +8, COLOR_TEXT, buf );  
 	};
 	
 	//JANELA DO TIPO BOTÃO.

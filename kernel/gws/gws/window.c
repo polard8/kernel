@@ -2595,10 +2595,10 @@ void SetFocus ( struct window_d *window ){
 		
 		
 		//#importante:
-		//se a estrutura de janel é válida, vamos associar 
+		//se a estrutura de janela é válida, vamos associar 
 		//a janela com o foco de entrada à thread atual,
 		//pois é ela quem chamou essa rotina. Apesar que 
-		//o proprio kernel pode ter chamado isso na inicialização,
+		//o próprio kernel pode ter chamado isso na inicialização,
 		//nesse caso a thread será inválida.
 		
 		window->InputThread = (struct thread_d *) threadList[current_thread];
