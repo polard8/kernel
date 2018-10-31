@@ -1188,7 +1188,7 @@ int get_shift_status (){
 void ps2_keyboard_initialize (){
 	
 	
-	printf ("init_keyboard: initializing ...\n");
+	printf ("ps2_keyboard_initialize: initializing ...\n");
 	
 	// ## Step1 ##
 	// Inicializa a estrutura de io control para o dispositivo teclado.
@@ -1198,7 +1198,7 @@ void ps2_keyboard_initialize (){
 	
 	if ( (void *) ioControl_keyboard == NULL )
 	{
-		printf("ldsic-init_keyboard: ioControl_keyboard fail");
+		printf("ps2_keyboard_initialize: ioControl_keyboard fail");
 		die();
 	}else{
 	    
@@ -1313,7 +1313,7 @@ void ps2_keyboard_initialize (){
 
     g_driver_keyboard_initialized = (int) 1;
 	
-    printf ("init_keyboard: done\n");		
+    printf ("ps2_keyboard_initialize: done\n");		
 };
 
 
@@ -1354,8 +1354,8 @@ int keyboardInit(){
  */		
 int ps2_mouse_globals_initialize (){
 	
-	printf("init_mouse: initializing ...\n");
-	refresh_screen();
+	printf("ps2_mouse_globals_initialize: initializing ...\n");
+	//refresh_screen();
 	
     unsigned char response = 0;
     unsigned char deviceId = 0;
@@ -1374,7 +1374,7 @@ int ps2_mouse_globals_initialize (){
 	
 	if ( (void *) ioControl_mouse == NULL )
 	{
-		printf("ldsic-init_mouse: ioControl_mouse fail");
+		printf("ps2_mouse_globals_initialize: ioControl_mouse fail");
 		die();
 		
 	} else {
@@ -1432,7 +1432,7 @@ int ps2_mouse_globals_initialize (){
 	//Mostraremos essa mensagem somente no ambiente de debug.
 	
 #ifdef KERNEL_VERBOSE	
-    MessageBox (gui->screen, 1, "init_mouse:","initializing!");
+    MessageBox (gui->screen, 1, "ps2_mouse_globals_initialize:","initializing!");
 #endif   
 	
  	//
@@ -1449,16 +1449,16 @@ int ps2_mouse_globals_initialize (){
 	mouse_ret = (int) load_mouse_bmp ();	
 	if (mouse_ret != 0)
 	{
-		printf("ldisc-init_mouse: load_mouse_bmp");
+		printf("ps2_mouse_globals_initialize: load_mouse_bmp");
 		die();
 	}
 	
 #ifdef KERNEL_VERBOSE		
-    MessageBox(gui->screen, 1, "init_mouse:","Mouse initialized!");   
+    MessageBox(gui->screen, 1, "ps2_mouse_globals_initialize:","Mouse initialized!");   
 #endif  
 
     
-	printf("init_mouse: done\n");
+	printf("ps2_mouse_globals_initialize: done\n");
 	
 	//initialized = 1;
     //return (kernelDriverRegister(mouseDriver, &defaultMouseDriver));	
@@ -2742,7 +2742,6 @@ void ps2 (){
 	
 	ps2_mouse_globals_initialize();
 	//refresh_screen();	
-	
 	
 	
 	
