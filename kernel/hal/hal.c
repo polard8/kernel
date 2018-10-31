@@ -750,10 +750,10 @@ int init_hal (){
     //P8042_install();	
 		
     //keyboard.
-#ifdef HAL_VERBOSE	
-	printf("init_hal: kd\n");
-#endif	
-	init_keyboard();
+//#ifdef HAL_VERBOSE	
+	//printf("init_hal: kd\n");
+//#endif	
+	//init_keyboard();
 	
 	//mouse
 	//printf("init_hal: mouse..\n");

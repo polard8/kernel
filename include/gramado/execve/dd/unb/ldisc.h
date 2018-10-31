@@ -274,11 +274,6 @@ int get_shift_status();
 
 
 
-
- 
-
-void init_keyboard();
-
 /*
  * Get window procedure parameters.
  */
@@ -307,7 +302,7 @@ unsigned long g_mousepointer_height;
 //buffer para o bmp
 void *mouseBMPBuffer; 
 
-int init_mouse();
+
 void mouse_write(unsigned char write);
 unsigned char mouse_read();
 void kbdc_wait(unsigned char type);
@@ -324,7 +319,11 @@ int load_mouse_bmp();
 // *****************  ps/2 ***********************
 //
 
-void P8042_install();
+
+void ps2_keyboard_initialize();
+int ps2_mouse_globals_initialize();
+void ps2_mouse_initialize();
+void ps2_initialize();
 void ps2();
 
 //
