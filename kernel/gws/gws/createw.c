@@ -988,7 +988,10 @@ drawBegin:
     // bordas para janelas de aplicativos. Ou seja,
     // as bordas não são pintadas individualmente nesse momento, mas 
     // logo abaixo, pintaremos as bordas para as janelas onde esse for o caso. 
-    // só falta criar elemento na estrutura para gerenciar as bordas.	
+    // só falta criar elemento na estrutura para gerenciar as bordas.
+
+    char buf[100];
+    int len;	
 	
 	if ( TitleBar == 1 )
 	{ 
@@ -1049,13 +1052,42 @@ drawBegin:
 		   */
 		};
 						   
-        // String		
-        // O texto não é tão claro quanto o texto dentro 
+						   
+        // ## String ##		
+		// O texto não é tão claro quanto o texto dentro 
         // da área de cliente, dando foco no conteúdo.
 		
+		//Se não tivermos um nome vamos usar o nome padrão a ser criado ou nenhum?
+        //if(!text)
+		//    ??    
+        
+		len = strlen (window->name);
+		
+	    if (len >= sizeof(buf))
+		    len = sizeof(buf) - 1;
+	    memcpy ( buf, window->name, len );
+	    buf[len] = 0;
+		
+		//quantidade de caracteres permitidos na barra de títulos.
+		//((window->width / 8)/2)
+		
+	    /* shorten text if necessary */
+        while ( len && len > ( (window->width / 8) / 2 ) )
+		{
+			//finalizando a string dentro do buffer num
+			//offset aceitável.
+            buf[len--] = 0;  
+        }
+		
+		//algo deu errado.
+        //if (len > ((window->width / 8)/2))
+        //    ?? /* too long */		
+		
+		//draw_string ( window->left +8 +16 +8, window->top +8 +4, 
+		//	COLOR_TERMINALTEXT2, window->name );  
+					
 		draw_string ( window->left +8 +16 +8, window->top +8 +4, 
-			COLOR_TERMINALTEXT2, window->name );  
-					 
+			COLOR_TERMINALTEXT2, buf );  					
 					 
 	    // #bugbug
 		// Isso é um teste.
