@@ -6735,45 +6735,40 @@ void updateVisibleArea( int direction )
 
 
 
-// rotina de testes de socket
-void shellSocketTest (){
-	
+//rotina de testes de socket
+void shellSocketTest()
+{
 	//#todo: isso precisa ser um porteiro de estrutura.
 	void *socketHandle;
 	
 	unsigned long iplong;
-	unsigned long port;     //short
+	unsigned long port; //short
 	
 	unsigned char ip[4];
 	
-    printf ("\n");
-    printf ("shellSocketTest: Testing socket stuff ...\n");
+    printf("\n");
+    printf("shellSocketTest: Testing socket stuff ...\n");
 
 	
 	//
 	// Creating socket
 	//
 	
-	printf ("Creating socket ...\n");
-	socketHandle = (void *) system_call ( 160, (unsigned long) 0xC0A80164, 
-	                            (unsigned long) 0, (unsigned long) 0x22C3 );
+	printf("Creating socket ...\n");
+	socketHandle = (void *) system_call ( 160, (unsigned long) 0xC0A80164, (unsigned long) 0, (unsigned long) 0x22C3 );
 	
 	printf("Updating socket ...\n");
-	system_call ( 163, (unsigned long) socketHandle, (unsigned long) 0xC0A80165, 
-	    (unsigned long) 0x22C2 );
+	system_call ( 163, (unsigned long) socketHandle, (unsigned long) 0xC0A80165, (unsigned long) 0x22C2 );
 	
 	printf("Getting ip from socket ...\n");
-	iplong = (unsigned long) system_call ( 161, (unsigned long) socketHandle, 
-	            (unsigned long) socketHandle, (unsigned long) socketHandle);
+	iplong = (unsigned long) system_call ( 161, (unsigned long) socketHandle, (unsigned long) socketHandle, (unsigned long) socketHandle);
 	
 	printf("Getting port from socket ...\n");
-	port = (unsigned long) system_call ( 162, (unsigned long) socketHandle, 
-	            (unsigned long) socketHandle, (unsigned long) socketHandle);
+	port = (unsigned long) system_call ( 162, (unsigned long) socketHandle, (unsigned long) socketHandle, (unsigned long) socketHandle);
 	
 	//
 	// output
 	//
-	
 	unsigned long tmp;
 	
 	tmp = iplong;
@@ -6792,12 +6787,9 @@ void shellSocketTest (){
 	ip[0] = (char) ( tmp & 0x000000FF );
 	
 	printf("\n");
-	
-	//#debug
 	//printf("iplong=%x\n",iplong);
-	
-	printf ("Socket: ( %d.%d.%d.%d:%d )\n", ip[0], ip[1], ip[2], ip[3], 
-	    port );
+	printf ("Socket: ( %d.%d.%d.%d:%d )\n", 
+		ip[0], ip[1], ip[2], ip[3], port );
 	
 	printf("done\n");
 };

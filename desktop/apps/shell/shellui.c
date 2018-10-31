@@ -584,7 +584,7 @@ int shellCreateTaskBar (int status){
 	unsigned long miWidth = (800/8); 
 	unsigned long miHeight = (600/16);
 
-	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "MENU",     
+	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
                             miLeft, miTop, miWidth, miHeight,    
                             0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
 							

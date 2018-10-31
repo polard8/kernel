@@ -95,13 +95,6 @@ void *draw_button ( struct window_d *window,
 	unsigned long border1;
     unsigned long border2;
 	
-	
-	//
-	// #todo:
-	// Limites mínimos.
-	// ??Limites máximos.
-	
-	
 	struct button_d *b;
 	
 	//validade da janela onde o botão está.
@@ -261,33 +254,8 @@ do_draw_button:
 //
 // Do draw label.
 //
-
-    char buf[100];
-    int len;	
 					   
 do_draw_label:
-
-
-		//Se não tivermos um nome vamos usar o nome padrão a ser criado ou nenhum?
-        //if(!text)
-		//    ??    
-        
-		len = strlen (string);
-		
-	    if (len >= sizeof(buf))
-		    len = sizeof(buf) - 1;
-	    memcpy ( buf, string, len );
-	    buf[len] = 0;
-		
-		//quantidade de caracteres permitidos no botão.
-		
-	    /* shorten text if necessary */
-        while ( len && len > ( width / 8 ) )
-		{
-			//finalizando a string dentro do buffer num
-			//offset aceitável.
-            buf[len--] = 0;  
-        }
 
 	
 	// Se vamos usar uma imagem ao invés de uma string.
@@ -296,19 +264,19 @@ do_draw_label:
 	//button label								   
     if (Selected == 1)
 	{
-	    //draw_string ( window->left +x +8, window->top +y +8, 
-		//	COLOR_WHITE, string );	
-
-	    draw_string ( window->left +x +( ( width - (len*8) )/2 ), window->top +y +((height/2)), 
-			COLOR_WHITE, buf );				
+	    draw_string ( window->left +x +8, window->top +y +8, 
+			COLOR_WHITE, string );	
+			
     }else{
 		
-	    //draw_string ( window->left +x +8, window->top +y +8, 
-		//	COLOR_TERMINALTEXT, string );	
-			
-	    draw_string ( window->left +x +( ( width - (len*8) )/2 ), window->top +y +((height/2)), 
-			COLOR_TERMINALTEXT, buf );	
+		
+	    //draw_string( window->left +x +8, 
+		//             window->top  +y +8, 
+		//			 COLOR_WINDOWTEXT, 
+		//			 string);	
 
+	    draw_string ( window->left +x +8, window->top +y +8, 
+			COLOR_TERMINALTEXT, string );	
 	};
 	
 	//

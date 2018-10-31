@@ -101,17 +101,19 @@ int str_cmp(unsigned char *str1, unsigned char *str2)
 
  
  
+ 
+ 
 /*
  * memcpy:
  *
+ *
  */
-void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
-	
+void *memcpy(void *v_dst, const void *v_src, unsigned long c)
+{
 	const char *src = v_src;
 	char *dst = v_dst;
 
 	/* Simple, byte oriented memcpy. */
-	
 	while (c--)
 		*dst++ = *src++;
 
