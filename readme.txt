@@ -2,7 +2,7 @@
 
 
 
-    Main folders for Gramado Operating System.
+    ~Main folders for Gramado Operating System.
 
 
 
