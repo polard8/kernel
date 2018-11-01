@@ -167,27 +167,29 @@ echo ~{ ux2 /execve
 	
 	gcc -c c:/gramado/kernel/execve/dd/device/device.c  -I c:/gramado/include -o device.o
 	
-	rem (unblocked) legados (K2).
-	gcc -c c:/gramado/kernel/execve/dd/unb/video.c     -I c:/gramado/include -o video.o  
-	gcc -c c:/gramado/kernel/execve/dd/unb/screen.c    -I c:/gramado/include -o screen.o 	
-	gcc -c c:/gramado/kernel/execve/dd/unb/keyboard.c  -I c:/gramado/include -o keyboard.o
-    gcc -c c:/gramado/kernel/execve/dd/unb/mouse.c     -I c:/gramado/include -o mouse.o  	
-	gcc -c c:/gramado/kernel/execve/dd/unb/ldisc.c     -I c:/gramado/include -o ldisc.o    	
-	gcc -c c:/gramado/kernel/execve/dd/unb/hdd.c       -I c:/gramado/include -o hdd.o	
-	gcc -c c:/gramado/kernel/execve/dd/unb/pic.c       -I c:/gramado/include -o pic.o 
-    gcc -c c:/gramado/kernel/execve/dd/unb/timer.c     -I c:/gramado/include -o timer.o	
-	gcc -c c:/gramado/kernel/execve/dd/unb/rtc.c       -I c:/gramado/include -o rtc.o
-	gcc -c c:/gramado/kernel/execve/dd/unb/vsync.c     -I c:/gramado/include -o vsync.o 
-	gcc -c c:/gramado/kernel/execve/dd/unb/arch/x86/syscall.c  -I c:/gramado/include -o syscall.o		
-	gcc -c c:/gramado/kernel/execve/dd/unb/arch/x86/cpux86.c   -I c:/gramado/include -o cpux86.o 
-    gcc -c c:/gramado/kernel/execve/dd/unb/arch/x86/x86.c      -I c:/gramado/include -o x86.o	
-	gcc -c c:/gramado/kernel/execve/dd/unb/arch/x86/ports.c    -I c:/gramado/include -o ports.o 	
-	gcc -c c:/gramado/kernel/execve/dd/unb/arch/amd/cpuamd.c   -I c:/gramado/include -o cpuamd.o 	    
+
+	gcc -c c:/gramado/kernel/execve/dd/hdd.c       -I c:/gramado/include -o hdd.o	
+	gcc -c c:/gramado/kernel/execve/dd/keyboard.c  -I c:/gramado/include -o keyboard.o
+	gcc -c c:/gramado/kernel/execve/dd/ldisc.c     -I c:/gramado/include -o ldisc.o    	
+    gcc -c c:/gramado/kernel/execve/dd/mouse.c     -I c:/gramado/include -o mouse.o  	
+	gcc -c c:/gramado/kernel/execve/dd/pic.c       -I c:/gramado/include -o pic.o 
+	gcc -c c:/gramado/kernel/execve/dd/rtc.c       -I c:/gramado/include -o rtc.o	
+	gcc -c c:/gramado/kernel/execve/dd/screen.c    -I c:/gramado/include -o screen.o 	
+    gcc -c c:/gramado/kernel/execve/dd/timer.c     -I c:/gramado/include -o timer.o		
+	gcc -c c:/gramado/kernel/execve/dd/video.c     -I c:/gramado/include -o video.o  
+	gcc -c c:/gramado/kernel/execve/dd/vsync.c     -I c:/gramado/include -o vsync.o 
 	
-	rem (blocked) (K1).
-	gcc -c c:/gramado/kernel/execve/dd/b/pci.c  -I c:/gramado/include -o pci.o
-	gcc -c c:/gramado/kernel/execve/dd/b/usb.c  -I c:/gramado/include -o usb.o
-	gcc -c c:/gramado/kernel/execve/dd/b/apic.c -I c:/gramado/include -o apic.o 
+	gcc -c c:/gramado/kernel/execve/dd/arch/x86/syscall.c  -I c:/gramado/include -o syscall.o		
+	gcc -c c:/gramado/kernel/execve/dd/arch/x86/cpux86.c   -I c:/gramado/include -o cpux86.o 
+    gcc -c c:/gramado/kernel/execve/dd/arch/x86/x86.c      -I c:/gramado/include -o x86.o	
+	gcc -c c:/gramado/kernel/execve/dd/arch/x86/ports.c    -I c:/gramado/include -o ports.o 	
+	gcc -c c:/gramado/kernel/execve/dd/arch/amd/cpuamd.c   -I c:/gramado/include -o cpuamd.o 	    
+	
+
+	gcc -c c:/gramado/kernel/execve/dd/apic.c -I c:/gramado/include -o apic.o 
+	gcc -c c:/gramado/kernel/execve/dd/pci.c  -I c:/gramado/include -o pci.o
+	gcc -c c:/gramado/kernel/execve/dd/usb.c  -I c:/gramado/include -o usb.o
+
 
 	rem File system
 	

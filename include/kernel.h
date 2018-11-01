@@ -207,27 +207,27 @@ extern void do_executa_new_task();
 
 //Unblocked.
 #include <gramado/execve/dd/sm/network/host.h>        //host info.
-#include <gramado/execve/dd/unb/ports.h>        //Portas para dispositivos
-#include <gramado/execve/dd/unb/ps2.h>          //ps/2 
-#include <gramado/execve/dd/unb/timer.h>        //PIT. irq0.
-#include <gramado/execve/dd/unb/pic.h>          //PIC.
-#include <gramado/execve/dd/unb/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
-#include <gramado/execve/dd/unb/rtc.h>          //clock    ( South bridge).
-#include <gramado/execve/dd/unb/floppy.h>       //floppy   ( South bridge).
-#include <gramado/execve/dd/unb/keyboard.h>     //irq1     ( South bridge).   //keyboard
 
-
-#include <gramado/execve/dd/unb/vk.h>         //virtual keys
-#include <gramado/execve/dd/unb/abnt2.h> 
-#include <gramado/execve/dd/unb/ldisc.h>        //ldisc
-
-#include <gramado/execve/dd/unb/ide.h>          //irq14/15 ( South bridge).
+//não mecher na ordem, pode dar problemas;
+#include <gramado/execve/dd/ports.h>        //Portas para dispositivos
+#include <gramado/execve/dd/ps2.h>          //ps/2 
+#include <gramado/execve/dd/timer.h>        //PIT. irq0.
+#include <gramado/execve/dd/pic.h>          //PIC.
+#include <gramado/execve/dd/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
+#include <gramado/execve/dd/rtc.h>          //clock    ( South bridge).
+#include <gramado/execve/dd/floppy.h>       //floppy   ( South bridge).
+#include <gramado/execve/dd/keyboard.h>     //irq1     ( South bridge).   //keyboard
+#include <gramado/execve/dd/vk.h>         //virtual keys
+#include <gramado/execve/dd/abnt2.h> 
+#include <gramado/execve/dd/ldisc.h>        //ldisc
+#include <gramado/execve/dd/ide.h>          //irq14/15 ( South bridge).
 //...
 
 //Blocked.
-#include <gramado/execve/dd/b/sata.h>           //(PCI BUS).
-#include <gramado/execve/dd/b/usb.h>            //usb.
-#include <gramado/execve/dd/b/pci.h>            //pci.
+#include <gramado/execve/dd/pci.h>            //pci.
+#include <gramado/execve/dd/sata.h>           //(PCI BUS).
+#include <gramado/execve/dd/usb.h>            //usb.
+
 //#include                                       //pcie.
 //...
 
