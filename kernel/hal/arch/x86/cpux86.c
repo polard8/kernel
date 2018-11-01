@@ -14,6 +14,7 @@
  *  + KeTestCPU
  *
  */
+ 
 
 /*
  * @todo: cria a função init_cpu.
@@ -38,6 +39,7 @@
 //habilita cache.
 void cpux86_enable_caches();
 
+
 /*
  * get_cpu_intel_parameters:
  *     Pega os parâmetros da cpu x86 através da instrução cpuid.
@@ -49,14 +51,15 @@ void cpux86_enable_caches();
  * Max feature id       = 0x80000000.
  * L2 cache information = 0x80000006.(Extended L2 Cache Features)
  * core per die         = 0x80000008.
- */
- 
+ */ 
 void get_cpu_intel_parameters (){
 	
-    int MASK_LSB_8 = 0xFF;  
 	unsigned long eax, ebx, ecx, edx;
+      	
 	unsigned long name[32];	
-		
+	
+    int MASK_LSB_8 = 0xFF;
+	
     //Vendor.
 	//eax = Maximum meaningful value for the InfoType parameter. @todo:
     //ebx = Identification String (part 1)
@@ -290,23 +293,14 @@ void get_cpu_intel_parameters (){
 	processor->Virtual_Address_Size  = (unsigned long) ((eax >> 8) & 0x00FF); //15-8	
 	//printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
 	//printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
-	
-//
-// Done.
-//	
-
-//done:
-    //printf("done\n");
-    //return;
 };
 
 
 
 /*
  * cpu_get_parameters:
- *   Sonda a CPU pra saber seus parâmetros.
- *   (OEM)
- *
+ *   Sonda a CPU pra saber seus parâmetros. (OEM)
+ *   ??header 
  */ 
 int cpu_get_parameters (){
 	
@@ -329,6 +323,7 @@ int cpu_get_parameters (){
  * @todo: 
  *     Mudar para scanCPUx86()
  *     Get info.
+ *     ??header
  */
 int KeTestCPU (){
 	
@@ -363,17 +358,17 @@ void show_cpu_intel_parameters (){
 	printf("             Cpu: {%s}\n", &processor->BrandName[0] );	
 	//printf("ApicSupport={%x}\n", processor->isApic);
 	printf("  Max feature id: {%d}\n", 
-	    (unsigned long) processor->MaxFeatureId);
+	    (unsigned long) processor->MaxFeatureId );
 	
 	//Bits 0-7: Cache Line Size.
 	printf("    L2 line size: {%d Byte}\n", 
-	    (unsigned long) processor->L2LineSize); 	
+	    (unsigned long) processor->L2LineSize ); 	
 	
 
 	// L2 Associativity. 	
 	
-	switch (processor->L2Associativity)
-	{
+	switch (processor->L2Associativity){
+		
 		//Bits 12-15: L2 Associativity.
 	    case 0x00:
             printf("L2 Associativity: {Disabled}\n");
@@ -423,12 +418,7 @@ void show_cpu_intel_parameters (){
 	//printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
 	
 	//Continua...
-	
-//
-// Done.
-//	
 
-//done:
     //como não usa janelas devemos dar refresh na tela todo por enquanto.
 	
 	refresh_screen();
@@ -452,6 +442,7 @@ void cpux86_enable_caches (){
 
 
 /*
+ ***********************************************
  * init_intel:
  *     Inicializa processador Intel.
  */

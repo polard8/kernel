@@ -36,7 +36,7 @@ inline unsigned char kinportb (int port){
 	
     unsigned char ret;
  
-    asm (" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+    asm ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
 	
 	return (unsigned char) ret;
 };
@@ -46,9 +46,9 @@ inline unsigned char kinportb (int port){
  * koutportb:
  * Escreve um byte em uma determina porta.
  */
-inline void koutportb (unsigned int port,unsigned int value){
+inline void koutportb ( unsigned int port, unsigned int value ){
     
-	asm volatile (" outb %%al, %%dx " :: "d" (port), "a" (value) );
+	asm volatile ("outb %%al, %%dx" :: "d" (port), "a" (value) );
 };
 
 
@@ -57,16 +57,16 @@ inline unsigned char inb (int port){
 	
     unsigned char ret;
  
-    asm (" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+    asm ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
 	
 	return (unsigned char) ret;
 };
 
 
 //outpot byte
-void outb (int port, int data){
+void outb ( int port, int data ){
     
-	asm (" outb %%al, %%dx " :: "a" (data), "d" (port) );
+	asm ("outb %%al, %%dx" :: "a" (data), "d" (port) );
 };
 
 
@@ -74,7 +74,7 @@ inline unsigned char inportb (int port){
 	
     unsigned char ret;
  
-    asm(" inb %%dx, %%al " : "=a"(ret): "d"(port) );
+    asm ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
 	
 	return (unsigned char) ret;
 };
@@ -82,7 +82,7 @@ inline unsigned char inportb (int port){
 
 void outportb ( int port, int data ){
 	
-    asm (" outb %%al, %%dx " :: "a" (data), "d" (port) );
+    asm ("outb %%al, %%dx" :: "a" (data), "d" (port) );
 };
 
 
@@ -128,7 +128,7 @@ int inport32 (int port){
 };
 
 
-void outport32 (int port,int data){ 
+void outport32 ( int port, int data ){ 
 
     __asm ("outl %%eax, %%dx" :: "a" (data), "d" (port) );
 };
@@ -152,10 +152,11 @@ inline unsigned long inportl (unsigned long port){
  * outportl:
  *     Escreve um dword em uma determinada porta.
  */
-inline void outportl (unsigned long port, unsigned long value){
+inline void outportl ( unsigned long port, unsigned long value ){
 	
 	asm volatile ("outl %%eax,%%dx" :: "d" (port), "a" (value) );
 };
+
 
 //
 //  End.
