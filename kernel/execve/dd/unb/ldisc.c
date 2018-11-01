@@ -1140,7 +1140,7 @@ int get_shift_status (){
  *         criar a variável keyboard_type ;;; ABNT2 
  */
 // void keyboardInit()
-void init_keyboard (){
+void ps2_keyboard_initialize (){
 	
 	//user.h
 	ioControl_keyboard = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
@@ -1280,7 +1280,7 @@ int keyboardInit(){
  *     Inicializando o mouse no controlador 8042.
  *     Carregando o bmp para o curso do mouse.
  */		
-int init_mouse (){
+int ps2_mouse_globals_initialize (){
 	
     unsigned char response = 0;
     unsigned char deviceId = 0;
@@ -2254,7 +2254,7 @@ void kernelPS2MouseDriverReadData (void){
  *     e activar a segunda porta PS/2 (mouse).
  *     (Nelson Cole)
  */
-void P8042_install (){
+void ps2_mouse_initialize (){
 	
 	unsigned char status;
 
@@ -2457,14 +2457,15 @@ void ps2 (){
 	
 	//deverá ir para ps2.c @todo: criar arquivo.
     
-	P8042_install();  
+	ps2_mouse_initialize();  
 	
 	//@todo: isso deveria se chamar init_ps2_mouse ...
     //?? quem inicializará a porta do teclado ?? o driver ??
 	//?? quem inicializará a porta do mouse ?? o driver ??
 	 
-	init_keyboard();  
-	init_mouse();	 
+	ps2_keyboard_initialize();
+	
+	ps2_mouse_globals_initialize();	 
 };
 
 
