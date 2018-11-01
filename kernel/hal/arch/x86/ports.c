@@ -19,6 +19,8 @@
  *    Obs: Por enquanto a unica arquitetura suportada aqui
  *         é a arquitetura PC x86.
  *
+ *   header em /hal/arch/x86/ports.h
+ *
  * Versão 1.0, 2015, 2016.
  */
 

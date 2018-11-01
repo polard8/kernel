@@ -234,37 +234,14 @@ processor_descriptor_t *processor;
  */
  
 
-//Ports and instructions.
-int enable();
-int disable();
-int stopCpu();      
-int intReturn();
-int farReturn();
-int getFlags(int variable);
-int setFlags(int variable);
-int kernelProcessorInPort8(int port,int data);
-int kernelProcessorOutPort8(int port,int data);
-int kernelProcessorInPort16(int port,int data);
-int kernelProcessorOutPort16(int port,int data);
-int kernelProcessorInPort32(int port,int data); 
-int kernelProcessorOutPort32(int port,int data);
-int Push(int value);
-int Pop(int variable);
-int pushRegs();
-int popRegs();
-int pushFlags();
-int popFlags();
-int getStackPointer(int addr);
-int setStackPointer(int addr);
+
 
 
 //Rotines.
 void init_cpu();
 int cpu_get_parameters();
-void get_cpu_intel_parameters();
-void get_cpu_amd_parameters();
 int KeTestCPU();   //@todo: Isso deve isr para include/ke.h.
-void show_cpu_intel_parameters();
+
 
 //
 //fim.

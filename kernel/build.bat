@@ -179,11 +179,11 @@ echo ~{ ux2 /execve
 	gcc -c c:/gramado/kernel/execve/dd/video.c     -I c:/gramado/include -o video.o  
 	gcc -c c:/gramado/kernel/execve/dd/vsync.c     -I c:/gramado/include -o vsync.o 
 	
-	gcc -c c:/gramado/kernel/execve/dd/arch/x86/syscall.c  -I c:/gramado/include -o syscall.o		
-	gcc -c c:/gramado/kernel/execve/dd/arch/x86/cpux86.c   -I c:/gramado/include -o cpux86.o 
-    gcc -c c:/gramado/kernel/execve/dd/arch/x86/x86.c      -I c:/gramado/include -o x86.o	
-	gcc -c c:/gramado/kernel/execve/dd/arch/x86/ports.c    -I c:/gramado/include -o ports.o 	
-	gcc -c c:/gramado/kernel/execve/dd/arch/amd/cpuamd.c   -I c:/gramado/include -o cpuamd.o 	    
+	gcc -c c:/gramado/kernel/hal/arch/x86/syscall.c  -I c:/gramado/include -o syscall.o		
+	gcc -c c:/gramado/kernel/hal/arch/x86/cpux86.c   -I c:/gramado/include -o cpux86.o 
+    gcc -c c:/gramado/kernel/hal/arch/x86/x86.c      -I c:/gramado/include -o x86.o	
+	gcc -c c:/gramado/kernel/hal/arch/x86/ports.c    -I c:/gramado/include -o ports.o 	
+	gcc -c c:/gramado/kernel/hal/arch/amd/cpuamd.c   -I c:/gramado/include -o cpuamd.o 	    
 	
 
 	gcc -c c:/gramado/kernel/execve/dd/apic.c -I c:/gramado/include -o apic.o 

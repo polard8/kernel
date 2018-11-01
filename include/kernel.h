@@ -179,20 +179,28 @@ extern void do_executa_new_task();
 #include <gramado/mk/pc/mm/memmap.h>            //Memory Map - address.
 
 
+
+//execve
+#include <gramado/execve/dd/sm/disk/diskmap.h>        //Disk Map - sectors.
+
+
 //
 // HAL (4)
 //
 
-#include <gramado/execve/dd/sm/disk/diskmap.h>        //Disk Map - sectors.
 #include <gramado/hal/screen.h> 
-#include <gramado/hal/video.h>                           //video.
-#include <gramado/hal/memory.h>                          //ram (hardware).
-#include <gramado/hal/cpu.h>                             //cpu
+#include <gramado/hal/video.h>                        //video.
+#include <gramado/hal/memory.h>                       //ram (hardware).
+#include <gramado/hal/cpu.h>  
+#include <gramado/hal/arch/x86/x86.h> 
+#include <gramado/hal/arch/amd/cpuamd.h>  
+#include <gramado/hal/arch/x86/cpux86.h>  
 
 
 //disk1 - nelson
 #include <gramado/3rdparty/kernel/disk/disk1.h>
 
+//execve
 #include <gramado/execve/dd/sm/disk/disk.h>           //disk.
 
 
@@ -209,7 +217,8 @@ extern void do_executa_new_task();
 #include <gramado/execve/dd/sm/network/host.h>        //host info.
 
 //não mecher na ordem, pode dar problemas;
-#include <gramado/execve/dd/ports.h>        //Portas para dispositivos
+#include <gramado/hal/arch/x86/ports.h>        //Portas para dispositivos
+
 #include <gramado/execve/dd/ps2.h>          //ps/2 
 #include <gramado/execve/dd/timer.h>        //PIT. irq0.
 #include <gramado/execve/dd/pic.h>          //PIC.
@@ -221,9 +230,6 @@ extern void do_executa_new_task();
 #include <gramado/execve/dd/abnt2.h> 
 #include <gramado/execve/dd/ldisc.h>        //ldisc
 #include <gramado/execve/dd/ide.h>          //irq14/15 ( South bridge).
-//...
-
-//Blocked.
 #include <gramado/execve/dd/pci.h>            //pci.
 #include <gramado/execve/dd/sata.h>           //(PCI BUS).
 #include <gramado/execve/dd/usb.h>            //usb.
