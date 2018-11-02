@@ -288,7 +288,13 @@ extern void do_executa_new_task();
 #include <gramado/gws/gws/usession.h>
 #include <gramado/gws/gws/wstation.h>
 #include <gramado/gws/gws/desktop.h>
+
 #include <gramado/gws/gws/window.h>
+
+//tentar mudar de lugar.
+#include <gramado/execve/dd/i8042/i8042.h>
+#include <gramado/execve/dd/i8042/dbox.h>
+
 #include <gramado/gws/gws/menu.h>
 #include <gramado/gws/gws/grid.h>
 #include <gramado/gws/gws/bmp.h>

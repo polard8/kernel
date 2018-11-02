@@ -1882,17 +1882,9 @@ void updateButton ( struct button_d *button,
                     unsigned long height, 
                     unsigned long color );
 				  
-void 
-MessageBox( struct window_d *parent_window, 
-            int type, 
-		    char *title, 
-			char *string );
+
 				 
-void 
-DialogBox( struct window_d *parent_window, 
-           int type, 
-		   char *title, 
-		   char *string );
+
 
 
 // Focus support.

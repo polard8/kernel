@@ -1,21 +1,9 @@
 /*
- * File: gws\mbox.c
+ * File: i8042.c
  *
- * Descrição:
- *     Mostra um Message Box na tela.
- *     Faz parte do módulo Window Manager do tipo MB.
+
  *
- * @Criar uma flag que indique que o message box deve considerar a métrica do navegador
- * para sosicionar o message box de acordo com as márgens da aba com foco de entrada.
- * como já temos o argumento 'type', ele pode servir para isso, é só criar um tipo que 
- * considere as estruturas da aba do navegador e incluir a rotina no switch.
- * O message box é uma janela dentro de outra janela, isso facilita as coisas..
- * é só criar um message box dentro da aba do navegador, 
- * que também é uma janela.
- *
- * History:
- *     2015 - Created by Fred Nora.
- *     2017 - Revision.
+
  */
 
  

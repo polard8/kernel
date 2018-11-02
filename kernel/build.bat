@@ -221,8 +221,8 @@ echo ~{ ux1 /gws \o/
     gcc -c c:/gramado/kernel/gws/gws/menu.c      -I c:/gramado/include -o menu.o 
     gcc -c c:/gramado/kernel/gws/gws/bmp.c       -I c:/gramado/include -o bmp.o 
     gcc -c c:/gramado/kernel/gws/gws/button.c    -I c:/gramado/include -o button.o 
-    gcc -c c:/gramado/kernel/gws/gws/mbox.c      -I c:/gramado/include -o mbox.o
-    gcc -c c:/gramado/kernel/gws/gws/dbox.c      -I c:/gramado/include -o dbox.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/i8042.c   -I c:/gramado/include -o i8042.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/dbox.c    -I c:/gramado/include -o dbox.o
     gcc -c c:/gramado/kernel/gws/gws/bg.c        -I c:/gramado/include -o bg.o  
     gcc -c c:/gramado/kernel/gws/gws/window.c    -I c:/gramado/include -o window.o    
     gcc -c c:/gramado/kernel/gws/gws/desktop.c   -I c:/gramado/include -o desktop.o  
@@ -324,7 +324,7 @@ grid.o ^
 sbar.o ^
 menubar.o ^
 menu.o ^
-mbox.o ^
+i8042.o ^
 dbox.o ^
 button.o ^
 char.o ^
