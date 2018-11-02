@@ -70,7 +70,9 @@ int mouse_pos_y;
 
 
 
-
+//
+unsigned long g_mousepointer_width;
+unsigned long g_mousepointer_height;
 
 
 
@@ -79,6 +81,31 @@ int mouse_pos_y;
 void mouse_write(unsigned char write);
 unsigned char mouse_read();
 
+
+
+static unsigned char getMouseData(void);
+
+
+void kernelPS2MouseDriverReadData(void);
+
+
+//bmp
+//buffer para o bmp
+void *mouseBMPBuffer; 
+int load_mouse_bmp();
+
+
+
+
+
+
+
+
+
+
+void mouseHandler(); 
+void ps2_mouse_initialize();
+int ps2_mouse_globals_initialize();
 
 
 

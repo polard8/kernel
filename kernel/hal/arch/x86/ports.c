@@ -158,6 +158,66 @@ inline void outportl ( unsigned long port, unsigned long value ){
 };
 
 
+
+// Input.
+// Input a value from the keyboard controller's data port, after checking
+// to make sure that there's some data there for us.
+static unsigned char inPort60 (void){
+	
+    unsigned char data = 0;
+
+    while (!(data & 0x01))
+        kernelProcessorInPort8(0x64, data);
+
+    kernelProcessorInPort8(0x60, data);
+	
+    return (data);
+};
+
+
+// Output.
+// Output a value to the keyboard controller's data port, after checking
+// to make sure it's ready for the data.
+static void outPort60 (unsigned char value){
+	
+    unsigned char data;
+  
+    // Wait for the controller to be ready
+    data = 0x02;
+    while (data & 0x02)
+        kernelProcessorInPort8(0x64, data);
+  
+    data = value;
+    kernelProcessorOutPort8(0x60, data);
+ 
+    return;
+};
+
+
+// Output.
+// Output a value to the keyboard controller's command port, after checking
+// to make sure it's ready for the command
+static void outPort64 (unsigned char value){
+	
+    unsigned char data;
+  
+    // Wait for the controller to be ready
+    data = 0x02;
+	
+    while (data & 0x02)
+        kernelProcessorInPort8(0x64, data);
+
+    data = value;
+    kernelProcessorOutPort8(0x64, data);
+	
+	return;
+};
+
+
+
+
+
+
 //
 //  End.
 //

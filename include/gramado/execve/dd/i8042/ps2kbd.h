@@ -110,12 +110,61 @@ uint8_t kybrd_ctrl_read_status () {
 
 
 //
+// Sobre charmaps:
+// ?? quem deve possuir o char map ??
+// Obviamente o kernel base precis de algum controle sobre isso.
+// sujerindo alterações conforme a conveniência do usuário.
+// Se a intenção é que o driver de teclado passe para a line discipline 
+// somente o scancode, então não há a necessidade de o driver de teclado 
+// ter um char map, ele apenas passa o scancode.
+//
+
+ //
 // Variáveis internas
 //
 //int keyboardStatus;
 //int keyboardError;
 //...
 
+// Enumerando os tipos de teclados.
+typedef enum {
+    KEYBOARD_VIRTUAL,
+    KEYBOARD_PS2,
+    KEYBOARD_USB,
+    //...
+}keyboard_type_t;
+
+
+//
+// structure for hardware keyboard info.
+//  As informações sobre o hardware de teclado devem ser mantidas 
+// pelo kernel base, mas não é aqui o lugagr dessa estrutura.
+//
+
+typedef struct keyboard_d keyboard_t;
+struct keyboard_d
+{
+	object_type_t objectType;
+	object_class_t objectClass;
+
+	keyboard_type_t type;
+	//...
+	int dummy;
+	//int VendorId;
+	//...
+
+    //unsigned long normal_charmap_address;
+    //unsigned long shift_charmap_address;
+    //unsigned long control_charmap_address;
+
+	//unsigned long keyboard_handler_address;
+
+};
+//keyboard_t *Keyboard;
+
+
+
+ 
 
 //
 // keyboardMessage
@@ -156,6 +205,13 @@ unsigned long numlock_status;
 unsigned long scrolllock_status;
 //...
 
+
+//
+// Driver handler support.
+//
+
+unsigned long keyboard_handler_address;
+
 void  ps2_keyboard_initialize();
 
 void ldisc_init_modifier_keys();
@@ -193,6 +249,9 @@ int get_shift_status();
 
 void kbdc_wait(unsigned char type);
 
+
+//Pega o status das teclas de modificação.
+unsigned long keyboardGetKeyState(unsigned char key);
 
 
 

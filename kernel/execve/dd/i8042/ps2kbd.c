@@ -546,6 +546,21 @@ void kbdc_wait (unsigned char type){
 };
 
 
+//?? isso tá sem protótipo ??
+void set_current_keyboard_responder ( int i ){
+	
+	current_keyboard_responder = i;
+};
+
+//?? isso tá sem protótipo ??
+int get_current_keyboard_responder (){
+	
+	return (int) current_keyboard_responder;
+};
+
+
+
+
 
 /*
  * Constructor.

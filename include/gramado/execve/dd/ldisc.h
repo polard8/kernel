@@ -80,6 +80,11 @@
  */ 
  
  
+//?? Não sei quem usa isso. 
+//size should always be a power of 2
+#define QUEUE_INITIAL_SIZE 32 //16 
+ 
+ 
 //keyboard support
 #define LDISC_KEY_RELEASED  0x80
 #define LDISC_KEY_MASK  0x7F
@@ -123,79 +128,23 @@
  
 
 
-
-/*
-Table 1.  Consumer Page audio controls supported in Windows 2000.
-Usage	Usage Name	Usage Type
-0xE0	Volume*	Linear Control (LC)
-0xE2	Mute*	On/Off Control (OOC)
-0xE3	Bass	Linear Control (LC)
-0xE4	Treble	Linear Control (LC)
-0xE5	Bass Boost*	On/Off Control (OOC)
-0xE7	Loudness	On/Off Control (OOC)
-0xE9	Volume Increment*	Re-trigger Control (RTC)
-0xEA	Volume Decrement*	Re-trigger Control (RTC)
-0x152	Bass Increment	Re-trigger Control (RTC)
-0x153	Bass Decrement	Re-trigger Control (RTC)
-0x154	Treble Increment	Re-trigger Control (RTC)
-0x155	Treble Decrement	Re-trigger Control (RTC)
-*/
+ 
 
 
-// Enumerando os tipos de teclados.
-typedef enum {
-    KEYBOARD_VIRTUAL,
-    KEYBOARD_PS2,
-    KEYBOARD_USB,
-    //...
-}keyboard_type_t;
-
-//
-// @todo: estrutura de dispositivo:
-//        nela tem informações sobre o driver.
-//
-
-
-//char keyboardString[] = "Generic keyboard";
-
-
-/*
- * Keyboard global variables.
- */
 
 
 //
 // @todo: Sondando scancode. (provisório.)
 //
+
+//ldisc
 int scStatus;
 
 
-//
-// Driver handler support.
-//
 
-unsigned long keyboard_handler_address;
  
-//@todo: Variável que identifique o driver. seu nome e pathname.
-
-//int KeyboardObjectNumber;
-//char *keyboard_driver_name;
-//char *keyboard_driver_pathname;
-
-
-/*
-* encapsulando em kernel.c
-//status
-unsigned long key_status;
-unsigned long escape_status;
-unsigned long tab_status;
-unsigned long winkey_status;
-unsigned long ctrl_status;
-unsigned long alt_status;
-unsigned long shift_status;
-*/
-
-
+ 
+//??ldisc
 unsigned long ambiente;
 unsigned long destroy_window;
 unsigned long quit_message;
@@ -203,110 +152,23 @@ unsigned long quit_message;
 
 
 //
-// Sobre charmaps:
-// ?? quem deve possuir o char map ??
-// Obviamente o kernel base precis de algum controle sobre isso.
-// sujerindo alterações conforme a conveniência do usuário.
-// Se a intenção é que o driver de teclado passe para a line discipline 
-// somente o scancode, então não há a necessidade de o driver de teclado 
-// ter um char map, ele apenas passa o scancode.
-//
-
- 
-
-//
-// structure for hardware keyboard info.
-//  As informações sobre o hardware de teclado devem ser mantidas 
-// pelo kernel base, mas não é aqui o lugagr dessa estrutura.
-//
-
-typedef struct keyboard_d keyboard_t;
-struct keyboard_d
-{
-	object_type_t objectType;
-	object_class_t objectClass;
-
-	keyboard_type_t type;
-	//...
-	int dummy;
-	//int VendorId;
-	//...
-
-    //unsigned long normal_charmap_address;
-    //unsigned long shift_charmap_address;
-    //unsigned long control_charmap_address;
-
-	//unsigned long keyboard_handler_address;
-
-};
-//keyboard_t *Keyboard;
-
-
-//
 // Prototypes.
 //
 
-//Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState(unsigned char key);
-
-//@todo: função para mudar o handler.
-//o kernel deve oferecer o serviço de trocar o handler
-//de todo driver.
-
-
+ 
 
  
 
-
-
-
-
- 
-
-
-
-
-
+//#bugbug
+//?? Onde está essa função ??
+//Não lembro onde está a função desse protótipo.
 //input pega caracteres digitados.
 unsigned long input(unsigned long ch);
 
 
 
-//
-// ********************** mouse ************************
-//
+ 
 
-unsigned long g_mousepointer_width;
-unsigned long g_mousepointer_height;
-
-
-//buffer para o bmp
-void *mouseBMPBuffer; 
-
-
-
-
-
-
-
-
-void mouseHandler(); 
-static unsigned char inPort60(void);
-static void outPort60(unsigned char value);
-static void outPort64(unsigned char value);
-static unsigned char getMouseData(void);
-void kernelPS2MouseDriverReadData(void);
-int load_mouse_bmp();
-
-
-//
-// *****************  ps/2 ***********************
-//
-
-
-
-void ps2_mouse_initialize();
-int ps2_mouse_globals_initialize();
 
 //
 //*************************** line discipline ***********************
@@ -320,8 +182,7 @@ int ps2_mouse_globals_initialize();
 int LINE_DISCIPLINE(unsigned char SC, int type);
 
 
-//size should always be a power of 2
-#define QUEUE_INITIAL_SIZE 32 //16
+
 
 
 
