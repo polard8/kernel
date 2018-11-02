@@ -221,9 +221,12 @@ echo ~{ ux1 /gws \o/
     gcc -c c:/gramado/kernel/gws/gws/menu.c      -I c:/gramado/include -o menu.o 
     gcc -c c:/gramado/kernel/gws/gws/bmp.c       -I c:/gramado/include -o bmp.o 
     gcc -c c:/gramado/kernel/gws/gws/button.c    -I c:/gramado/include -o button.o 
-    gcc -c c:/gramado/kernel/execve/dd/i8042/i8042.c   -I c:/gramado/include -o i8042.o
-    gcc -c c:/gramado/kernel/execve/dd/i8042/dbox.c    -I c:/gramado/include -o dbox.o
-    gcc -c c:/gramado/kernel/gws/gws/bg.c        -I c:/gramado/include -o bg.o  
+    
+	gcc -c c:/gramado/kernel/execve/dd/i8042/i8042.c     -I c:/gramado/include -o i8042.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/ps2mouse.c  -I c:/gramado/include -o ps2mouse.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/ps2kbd.c    -I c:/gramado/include -o ps2kbd.o    
+	
+	gcc -c c:/gramado/kernel/gws/gws/bg.c        -I c:/gramado/include -o bg.o  
     gcc -c c:/gramado/kernel/gws/gws/window.c    -I c:/gramado/include -o window.o    
     gcc -c c:/gramado/kernel/gws/gws/desktop.c   -I c:/gramado/include -o desktop.o  
     gcc -c c:/gramado/kernel/gws/gws/wstation.c  -I c:/gramado/include -o wstation.o    
@@ -325,7 +328,8 @@ sbar.o ^
 menubar.o ^
 menu.o ^
 i8042.o ^
-dbox.o ^
+ps2mouse.o ^
+ps2kbd.o ^
 button.o ^
 char.o ^
 pixel.o ^

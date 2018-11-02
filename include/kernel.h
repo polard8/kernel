@@ -293,7 +293,8 @@ extern void do_executa_new_task();
 
 //tentar mudar de lugar.
 #include <gramado/execve/dd/i8042/i8042.h>
-#include <gramado/execve/dd/i8042/dbox.h>
+#include <gramado/execve/dd/i8042/ps2mouse.h>
+#include <gramado/execve/dd/i8042/ps2kbd.h>
 
 #include <gramado/gws/gws/menu.h>
 #include <gramado/gws/gws/grid.h>
