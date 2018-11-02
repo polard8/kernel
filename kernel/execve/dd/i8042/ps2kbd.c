@@ -4,7 +4,33 @@
 
 #include <kernel.h>
 
-int dummyps2kbdkkk;
+ 
+
+
+
+
+
+// Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
+uint8_t keyboard_read(){
+ 
+    
+	kbdc_wait(0);
+	uint8_t val = inportb(0x60);
+    	wait_ns(200);
+    	return val;
+
+}
+
+
+// Esta função será usada para escrever dados do teclado na porta 0x60, fora do IRQ1
+void keyboard_write(uint8_t write){
+
+	kbdc_wait(1);
+	outb(0x60,write);
+    	wait_ns(200);
+
+}
+
 
 
 /*
@@ -95,15 +121,15 @@ void ps2_keyboard_initialize (){
 	scrolllock_status = 0;
 	numlock_status = 0;
 	//...
-
-	//AE    Enable Keyboard Interface: clears Bit 4 of command register
-	//      enabling keyboard interface.
-	kbdc_wait(1);
-	outportb(0x64,0xAE);   // Activar a primeira porta PS/2
 	
-	//reset
-	kbdc_wait(1);
-	outportb(0x60,0xFF);
+	//test
+	//0xAB	Test first PS/2 port
+	//0x00 test passed
+	//0x01 clock line stuck low 
+	//0x02 clock line stuck high
+	//0x03 data line stuck low
+	//0x04 data line stuck high
+	
 
 
 	//Leds.
@@ -112,11 +138,12 @@ void ps2_keyboard_initialize (){
 	//LED_CAPSLOCK  	
 	keyboard_set_leds(LED_NUMLOCK);
 	
-	//...
+ 
+    //#imporante:
+	//não habilitaremos e não resetaremos o dispositivo.
+    //habilitar e resetar fica para a inicialização do ps2.
 	
-	// Ativar a primeira porta PS/2.
-	//kbdc_wait(1);
-	//outportb(0x64,0xAE);   
+	
 	
 	//Debug support.
 	scStatus = 0;
@@ -534,12 +561,18 @@ void kbdc_wait (unsigned char type){
         while ( !inportb(0x64) & 1 )
 		{
 			outanyb (0x80);
+			outanyb (0x80);
+			outanyb (0x80);
+			outanyb (0x80);
 		};
 		
     }else{
 		
         while ( inportb(0x64) & 2 )
 		{
+			outanyb (0x80);
+			outanyb (0x80);
+			outanyb (0x80);
 			outanyb (0x80);
 		};
 	};

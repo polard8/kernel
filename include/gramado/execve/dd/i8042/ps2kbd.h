@@ -254,14 +254,8 @@ void kbdc_wait(unsigned char type);
 unsigned long keyboardGetKeyState(unsigned char key);
 
 
-
-
-
-
-
-
-
-
+uint8_t keyboard_read();
+void keyboard_write(uint8_t write);
 
 
 

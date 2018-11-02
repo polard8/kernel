@@ -184,7 +184,7 @@ static unsigned char inPort60(void);
 static void outPort60(unsigned char value);
 static void outPort64(unsigned char value);
 
-
+inline void wait_ns(int count);
 
 //
 // End.

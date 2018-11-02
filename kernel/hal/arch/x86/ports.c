@@ -214,7 +214,12 @@ static void outPort64 (unsigned char value){
 };
 
 
+inline void wait_ns(int count)
+{
+	count /=100;	 
+	while(--count)io_delay();
 
+}
 
 
 
