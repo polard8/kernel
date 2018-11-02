@@ -378,6 +378,7 @@ void mouseHandler (){
 			count_mouse++;
 		    break;
 			
+		//#importante.
 		// Essa foi a terceira interrupção.	
 		case 2:
 		    //Pegamos o terceiro char.
@@ -421,22 +422,26 @@ void mouseHandler (){
 		    if(	mouse_x > (800-16) ){ mouse_x = (800-16); }
 		    if(	mouse_y > (600-16) ){ mouse_y = (600-16); }
 
-		    // # Draw BMP #
-		    // Isso está funcionando bem.
-			// #todo: precisamos colocar no backbuffer o retãngulo salvo previamente.
-            // #todo: Precisamos salvar o conteúdo de um retângulo 
-			// que está no backbuffer, para depois pintarmos o mouse.
-						
+		    
 			
-			//  copiar para o lfb o antigo retângulo. Para apagar o ponteiro que está no lfb.
-			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );	
+			//
+			// # Draw BMP #
+		    //
 			
-			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
-
-
             //nova técnica.
+			// Isso está funcionando bem.			
             //+ copia no LFB um retângulo do backbuffer para apagar o ponteiro antigo.
-            //+ decodifica o mouse diretamente no LFB.			
+            //+ decodifica o mouse diretamente no LFB.				
+			//copiar para o lfb o antigo retângulo. 
+			//Para apagar o ponteiro que está no lfb.
+			
+			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );	
+			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
+          
+            //#debug		  
+		    //draw_text ( gui->main, saved_mouse_x, saved_mouse_y, COLOR_YELLOW, "+" );
+		    //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 8, 8 );		
+		
 			
             break;
 
@@ -536,6 +541,13 @@ void mouseHandler (){
 	// será usada para 'capturar' o mouse ... 
 	// e depois tem a mensagem para 'descapturar'.
 	
+	
+/*
+
+    ##### sem escaneamento de janelas por enquanto, apenas mostre e mova o ponteiro #####
+	
+	## então não enviaremos mensagens para a thread ###
+	
 	//
 	//  ## Scan ##
 	//
@@ -557,6 +569,8 @@ void mouseHandler (){
 	
 	wID = (int) windowScan ( mouse_x, mouse_y );	
 	
+	
+	//se houve problema no escaneamento de janela
 	if ( wID == -1 )
 	{ 
         
@@ -583,6 +597,7 @@ void mouseHandler (){
 		
 		//Nothing.
 		
+	//se não houve problema no escaneamento de janela
     }else{
 		
 		Window = (struct window_d *) windowList[wID];
@@ -898,6 +913,9 @@ void mouseHandler (){
 		//}			
 		
 	};
+	
+	
+*/	
 
     // EOI.		
     outportb ( 0xa0, 0x20 ); 
@@ -924,6 +942,21 @@ void ps2_mouse_initialize (){
 	
 	unsigned char status;
 	
+    // Flush the output buffer
+	while ((inportb(0x64) & 1)) {
+		inportb(0x60);
+	}
+	
+	
+	
+	// Ativar a segunda porta PS/2.
+	kbdc_wait(1);
+	outportb(0x64,0x60);    
+	kbdc_wait(1);
+	outportb(0x64,0xA8); 
+
+
+	
 	
 	// Activar o segundo despositivo PS/2, modificando o status de 
 	// configuração do controlador PS/2. 
@@ -937,7 +970,8 @@ void ps2_mouse_initialize (){
 	kbdc_wait(1);    
 	outportb(0x64,0x20);    
 	kbdc_wait(0);
-	status = inportb(0x60)|2;  
+	//status = inportb(0x60)|2;  
+	status = inportb(0x60)| 3;  
 	
 	// defina, a escrita  de byte de configuração do controlador PS/2.
 	kbdc_wait(1);
@@ -993,6 +1027,18 @@ void ps2_mouse_initialize (){
     kbdc_wait(1);
     mouse_write(0xf4);
     while (mouse_read() != 0xfa);         // ACK
+	
+	
+	
+	uint8_t tmp = inportb(0x61);
+	outportb(0x61, tmp | 0x80);
+	outportb(0x61, tmp & 0x7F);
+	inportb(0x60);	//mouse port
+	
+	 // Flush the output buffer
+    while ((inportb(0x64) & 1)) {
+		inportb(0x60);
+	}	
   
 	
     //#imporante:

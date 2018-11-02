@@ -39,7 +39,14 @@ void ps2 (){
 	printf("ps2: Desabilitando as duas portas...\n");
 	refresh_screen();
 
-    // Desativar dispositivos PS/2 , isto evita que os dispositivos PS/2 
+    
+	
+	//
+	// ## DESATIVANDO AS DUAS PORTAS ##
+	//
+	
+	
+	// Desativar dispositivos PS/2 , isto evita que os dispositivos PS/2 
 	// envie dados no momento da configuração.
 
 //desablePorts:
@@ -55,7 +62,12 @@ void ps2 (){
 	kbdc_wait(1);
 	outportb(0x64,0x60);  	
 	kbdc_wait(1);
-	outportb(0x64,0xA7); 	
+	outportb(0x64,0xA7); 
+
+
+    //
+	//======================================
+	//
 	
 
     //
@@ -63,45 +75,58 @@ void ps2 (){
     // mouse	 
     //
 	
+
+	
 //mouse_initialization:	
 	
 
 	//inicializa o controlador para habilitar abort
 	//segunda porta. O mouse.
-
+    
+	//2
 	printf("ps2: inicializando mouse ...\n");
 	refresh_screen();	
-	
 	ps2_mouse_initialize();  
 
 	printf("ps2: inicializando globais do mouse ...\n");
 	refresh_screen();	
-	
-
 	//Não afeta o controlador. 
 	//Apenas inicializa variáveis.
 	ps2_mouse_globals_initialize();	 	
 	 
+
+	
 	
     //
 	// ## step 2 ##
     // keyboard	 
 	//
-//keybaord_initialization:	
+//keybaord_initialization:
 
+
+	
+    //2
 	printf("ps2: inicializando teclado ...\n");
 	refresh_screen();	
-
-
-	//ps2kbd.c 
 	ps2_keyboard_initialize();
 	
-	
+ 
+    //
+	// ## REABILITANDO ##
 	//
-	// ## ENABLE DEVICES ##
-	//
+ 
+ 	//3
+	printf("ps2: reabilitando  porta do mouse; ...\n");
+	refresh_screen();	
 	
-	printf("ps2: reabilitando  as duas portas ...\n");
+	// Ativar a segunda porta PS/2.
+	kbdc_wait(1);
+	outportb(0x64,0x60);    
+	kbdc_wait(1);
+	outportb(0x64,0xA8); 
+ 
+	//3
+	printf("ps2: reabilitando  porta do teclado ...\n");
 	refresh_screen();		
 	
 	
@@ -112,19 +137,15 @@ void ps2 (){
 	kbdc_wait(1);
 	outportb(0x64,0xAE);   // Activar a primeira porta PS/2		
 	
-	// Ativar a segunda porta PS/2.
-	kbdc_wait(1);
-	outportb(0x64,0x60);    
-	kbdc_wait(1);
-	outportb(0x64,0xA8); 	
-	
+
 	//
-	// ## RESET DEVICES ##
-    //
+	// ## RESETANDO ##
+	//
 	
-	printf("ps2: resetando dispositivos. ...\n");
-	refresh_screen();	
 	
+	//1
+	printf("ps2: resetando mouse. ...\n");
+	refresh_screen();		
 	
 	//+devemos configurar o modo escrita
 	//+enviar o comando reset;
@@ -143,7 +164,11 @@ void ps2 (){
 	while ( mouse_read() != 0xaa )
 	{
 		//
-	};	
+	};			
+	
+    //1
+	printf("ps2: resetando teclado. ...\n");
+	refresh_screen();		
 
 	//+devemos configurar o modo escrita
 	//+enviar o comando reset;
@@ -158,7 +183,7 @@ void ps2 (){
 	//while ( kbd_read() != 0xaa )
 	//{
 		//
-	//};
+	//};			
 
 	printf("ps2: done\n");
 	refresh_screen();		
