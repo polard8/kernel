@@ -7,6 +7,9 @@ MessageBox( struct window_d *parent_window,
 			
 			
 
+
+void ps2();
+
 			
 //
 //

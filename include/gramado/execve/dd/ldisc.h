@@ -325,9 +325,8 @@ int load_mouse_bmp();
 //
 
 
-void ps2();
+
 void ps2_mouse_initialize();
-void  ps2_keyboard_initialize();
 int ps2_mouse_globals_initialize();
 
 //
@@ -346,8 +345,8 @@ int LINE_DISCIPLINE(unsigned char SC, int type);
 #define QUEUE_INITIAL_SIZE 32 //16
 
 
-void ldisc_init_modifier_keys();
-void ldisc_init_lock_keys();
+
+
 
 //
 // End.

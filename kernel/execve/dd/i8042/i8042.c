@@ -15,7 +15,46 @@ MessageBoxProcedure( struct window_d *window,
                      int msg, 
 				     unsigned long long1, 
 					 unsigned long long2 );
-								   
+					 
+					 
+					 
+	
+
+/*
+ ***************
+ * ps2:
+ *     Essa rotina de inicialização do controladro 
+ * poderá ter seu próprio módulo.
+ *     Inicializa o controlador ps2.
+ *     Inicializa a porta do teclado no controlador.
+ *     Inicializa a porta do mouse no controlador.
+ *     Obs: *importante: A ordem precisa ser respeitada.
+ *     As vezes os dois não funcionam ao mesmo tempo se a 
+ *     inicialização não for feita desse jeito. 
+ */
+void ps2 (){
+
+    //
+	// ## step 1 ##
+    // mouse	 
+    //
+	
+	//ldisc mudar para ps2mouse
+	ps2_mouse_initialize();  
+	
+	//ldisc mudar para ps2mouse
+	ps2_mouse_globals_initialize();	 	
+	 
+	
+    //
+	// ## step 2 ##
+    // keyboard	 
+	//
+	
+	//ps2kbd.c 
+	ps2_keyboard_initialize();
+};
+		
 	
 /*
 void messageboxIn(int type, char *title, char *string);
