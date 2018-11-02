@@ -225,6 +225,328 @@ void ldisc_init_lock_keys (){
 };
 
 
+
+
+/*
+ * keyboardEnable:
+ *     Enable keyboard.
+ */
+void keyboardEnable (){
+	
+	//Wait for bit 1 of status reg to be zero.
+    
+	while ( (inportb(0x64) & 2) != 0 )
+	{
+		//Nothing.
+	};
+	
+	//Send code for setting Enable command.
+    outportb(0x60,0xF4);
+    //sleep(100);
+};
+
+
+/*
+ * keyboardDisable:
+ *     Disable keyboard.
+ */
+void keyboardDisable (){
+	
+	//Wait for bit 1 of status reg to be zero.
+    
+	while ( (inportb(0x64) & 2) != 0 )
+	{
+		//Nothing.
+	};
+	
+	//Send code for setting disable command.
+    outportb(0x60,0xF5);
+    //sleep(100);
+};
+
+
+/*
+ * keyboard_set_leds:
+ *     Set keyboard flags.
+ *     ED = Set led.
+ */
+void keyboard_set_leds (char flag){
+	
+	//@todo: filtro.
+
+	//Wait for bit 1 of status reg to be zero.
+    while( (inportb(0x64) & 2) != 0 ){
+		//Nothing.
+	};
+	//Send code for setting the flag.
+    outportb(0x60,0xED);            
+    sleep(100);
+
+	//Wait for bit 1 of status reg to be zero.
+	while( (inportb(0x64) & 2) != 0 ){
+	    //Nothing.	
+	};
+    //Send flag. 
+	outportb(0x60,flag);
+	sleep(100);
+	
+	//@todo mudar o status.
+    //switch(flag)
+    //{
+		
+	//}	
+};
+
+
+
+
+
+/*
+ * KdGetWindowPointer:
+ *     Retorna o ponteiro da estrutura de janela que pertence a thread.
+ *     Dado o id de uma thread, retorna o ponteiro de estrutura da janela 
+ * à qual a thread pertence.
+ */
+void *KdGetWindowPointer (int tid){
+	
+	struct thread_d *t;
+
+	//@todo: filtrar argumento. 
+	
+	if ( tid < 0 )
+        return NULL;
+        
+		
+	// Structure.
+	t = (void *) threadList[tid];
+
+	if ( (void *) t == NULL )
+	{
+        return NULL;        
+	};
+	
+	return (void *) t->window;
+};
+
+
+/*
+ * KbGetMessage:
+ *     Pega a mensagem na fila de mensagens na estrutura da thread
+ * com foco de entrada.
+ *
+ * Na estrutura da thread com foco de entrada tem uma fila de mensagens.
+ * Pegar a mensagem.
+ * 
+ * Para falha, retorna -1.
+ *
+ * @todo: bugbug: A mensagem deve estar na fila do processo, na
+ *                estrutura do proceso. (Talvez não na thread e nem na janela.)
+ */
+int KbGetMessage (int tid){
+	
+	int ret_val;
+	struct thread_d *t;
+	
+	// Structure.
+	t = (void*) threadList[tid];
+
+	if ( (void *) t != NULL )
+	{
+        ret_val = (int) t->msg;
+	}else{
+	    ret_val = (int) -1;    //Fail.
+	};
+
+// Done.
+//done:
+
+	WindowProcedure->msgStatus = 0;    //Muda o status.
+	return (int) ret_val;              //Retorna a mensagem.
+};
+
+
+/*
+ * KbGetLongParam1:
+ *    Pega o parametro "long1" do procedimento de janela de uma thread.
+ */
+unsigned long KbGetLongParam1 (int tid){
+   	
+	struct thread_d *t;
+	
+	// Structure.
+	t = (void *) threadList[tid];
+
+	if ( (void *) t == NULL)
+	{
+        return (unsigned long) 0;    //@todo: fail;
+	};
+
+// Done.
+//done:
+    return (unsigned long) t->long1;
+};
+
+/*
+ * KbGetLongParam2:
+ *     Pega o parametro "long2" do procedimento de janela de uma thread.
+ */
+unsigned long KbGetLongParam2 (int tid){
+	
+	struct thread_d *t;
+	
+	// Structure.
+	t = (void *) threadList[tid];
+
+	if ( (void *) t == NULL)
+	{
+        return (unsigned long) 0;    //@todo: fail;
+	};
+
+// Done.
+//done:
+    return (unsigned long) t->long2;
+};
+
+
+
+/*
+ * reboot: 
+ *     @todo: essa rotina poderá ter seu próprio arquivo.
+ *     Reboot system via keyboard port.
+ *     ?? #bugbug Por que o reboot está aqui ??
+ *
+ * *IMPORTANTE: a interface fechou o que tinha qe fechar,
+ * hal chamou essa hotina para efetuar a parte de hardware reboot apenas.
+ * @todo: Atribuições.
+ *
+ * Atribuições: 
+ *     + Desabilitar as interrupções.
+ *     + Salvar registros.
+ *     + Salvar programas abertos e não salvos.
+ *     + Fechar todas tarefas antes.
+ *     + Efetuar o tipo de reboot especificado.
+ *    + Outras ...
+ */
+void reboot (){
+    
+    //@todo: 
+	// +criar uma variavel global que especifique o tipo de reboot.
+    // +criar um switch para efetuar os tipos de reboot.
+	// +criar rota de fuga para reboot abortado.
+	// +Identificar o uso da gui antes de apagar a tela.
+	//  modo grafico ou modo texto.
+	//
+	
+	//
+	// Video.
+	//
+	
+	/*
+	sleep(2000);
+	//kclear(9);
+    set_up_cursor(0,0);	
+    set_up_text_color(0x0f, 0x09);
+	printf("\n\n REBOOTING ...\n\n");
+
+
+	//
+	// Scheduler stuffs.
+	//
+	
+	sleep(1000);
+	printf("locking scheduler ...\n");
+	scheduler_lock();
+	
+	//
+	// Tasks.
+	//
+	
+	//@todo: fazer função com while. semelhante ao dead task collector.
+	
+	sleep(1000);
+	printf("killing tasks ...\n");
+	//kill_thread(current_task); 
+	
+	//
+	// Final message.
+	//
+	
+	sleep(1000);
+	printf("turning off ...\n");
+    
+	
+	refresh_screen();
+	
+	//
+	// Interruoções.
+	//
+	
+	sleep(7000);
+	asm("cli");
+	
+	*/
+	
+	
+	// @todo: disable();
+	
+//
+// Done.
+//
+
+//done:
+
+    hal_reboot ();
+	die ();
+};
+
+
+
+//Get alt Status.
+int get_alt_status (){
+	
+    return (int) alt_status;
+};
+
+
+//Get control status.
+int get_ctrl_status (){
+	
+    return (int) ctrl_status;
+};
+
+ 
+int get_shift_status (){
+	
+    return (int) shift_status;	
+};
+ 
+
+/*
+ * kbdc_wait:
+ *     Espera por flag de autorização para ler ou escrever.
+ *     (Nelson Cole) 
+ */
+void kbdc_wait (unsigned char type){
+	
+	if (type==0)
+	{
+		//#bugbug rever
+        while ( !inportb(0x64) & 1 )
+		{
+			outanyb (0x80);
+		};
+		
+    }else{
+		
+        while ( inportb(0x64) & 2 )
+		{
+			outanyb (0x80);
+		};
+	};
+};
+
+
+
 /*
  * Constructor.
 int keyboardKeyboard(){
@@ -240,5 +562,17 @@ int keyboardInit(){
 };
 */
 
+/*
+void keyboard();
+void keyboard()
+{
+	//@todo: Create global.
+	if(gKeyboardType == 1){
+		abnt2_keyboard_handler();
+	}
+	//...
+	return;
+}
+*/
 
 

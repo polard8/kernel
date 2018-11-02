@@ -254,23 +254,9 @@ unsigned long keyboardGetKeyState(unsigned char key);
 //de todo driver.
 
 
-//Enable and disable keyboard.
-void keyboardEnable();
-void keyboardDisable();
 
-/*
- * Prototypes for keyboard support.
- */
+ 
 
-//Set flags.
-void keyboard_set_leds(char flag); 
-
-
-//get status 
-int get_alt_status();
-int get_ctrl_status();
-int get_shift_status();
-//...
 
 
 
@@ -279,22 +265,12 @@ int get_shift_status();
 
 
 
-/*
- * Get window procedure parameters.
- */
-void *KdGetWindowPointer(int tid); 
-int KbGetMessage(int tid);
-unsigned long KbGetLongParam1(int tid);
-unsigned long KbGetLongParam2(int tid);
 
 
 //input pega caracteres digitados.
 unsigned long input(unsigned long ch);
 
-/*
- * Reboot via Keyboard port.
- */
-void reboot();
+
 
 //
 // ********************** mouse ************************
@@ -308,9 +284,12 @@ unsigned long g_mousepointer_height;
 void *mouseBMPBuffer; 
 
 
-void mouse_write(unsigned char write);
-unsigned char mouse_read();
-void kbdc_wait(unsigned char type);
+
+
+
+
+
+
 void mouseHandler(); 
 static unsigned char inPort60(void);
 static void outPort60(unsigned char value);

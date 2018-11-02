@@ -21,6 +21,101 @@ DialogBoxProcedure ( struct window_d *window,
                      int msg, 
 					 unsigned long long1, 
 					 unsigned long long2 );
+					 
+					 
+					 
+					 
+					 
+					 
+
+/*
+//rotina interna de suporta ao mouseHandler 
+#define _MOUSE_X_SIGN 0x10
+#define _MOUSE_Y_SIGN 0x20
+
+void
+update_mouse1()
+{
+
+char x = (mouse_packet_data & _MOUSE_X_SIGN);
+char y = ( mouse_packet_data & _MOUSE_Y_SIGN );
+
+
+//do_x:
+	    //x 
+		//checando o sinal para x.
+		//se for diferente de 0 então x é negativo
+		if(x != 0)
+		{
+			//complemento de 2.
+			mouse_packet_x = ~mouse_packet_x + 1;
+			mouse_x = mouse_x - mouse_packet_x;
+		}else{
+
+			mouse_x = mouse_x + mouse_packet_x;
+		}
+
+		
+//do_y:		
+		//y
+		//se for diferente de 0 então y é negativo
+		if(y != 0)
+		{
+			//complemento de 2.
+			mouse_packet_y = ~mouse_packet_y + 1;
+			mouse_y = mouse_y + mouse_packet_y;
+		}else{
+			mouse_y = mouse_y - mouse_packet_y;
+		};		
+		
+    return;		
+};
+*/
+
+
+
+
+
+/*
+ * mouse_write:
+ *     Envia um byte para a porta 0x60.
+ *     (Nelson Cole) 
+ */
+void mouse_write (unsigned char write){
+	
+	kbdc_wait(1);
+	outportb (0x64,0xD4);
+	
+	kbdc_wait(1);
+	outportb (0x60,write);
+};
+
+
+/*
+ * mouse_read:
+ *     Pega um byte na porta 0x60.
+ *     (Nelson Cole) 
+ */
+unsigned char mouse_read (){
+	
+	kbdc_wait(0);
+	
+	return inportb(0x60);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+					 
 								  
 								  
 /*
