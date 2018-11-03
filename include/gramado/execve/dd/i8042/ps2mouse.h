@@ -118,7 +118,7 @@ void ps2_mouse_initialize();
 int ps2_mouse_globals_initialize();
 
 
-
+void mouse_install();   
 
 
 //deletar

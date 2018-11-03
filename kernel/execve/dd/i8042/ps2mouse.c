@@ -104,6 +104,58 @@ unsigned char mouse_read (){
 
 
 
+// Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
+int MOUSE_BAT_TEST(){
+    
+    uint8_t val;
+
+    while (1)
+	{
+        val = mouse_read();
+
+        if(val == 0xAA)return (int) 0;
+        else if(val == 0xFC) {
+       		return (int) -1; 
+       	}
+    
+        	// Reenviar o comando. 
+        	// OBS: este comando não é colocado em buffer
+        	mouse_write(0xFE);       
+    };
+};
+
+
+void mouse_install()
+{
+	mouse_write(0xFF);
+    	//Espera o dados descer (ACK)
+    	while( mouse_read() != 0xFA);	
+		
+    	// Basic Assurance Test (BAT)
+    	if( MOUSE_BAT_TEST() != 0) 
+		{
+    		// Aqui! Precisaremos de fazer alguma coisa, em casos de erro
+    		printf("\n Mouse error!");
+    	}
+
+    	// Use mouse default
+	mouse_write(0xF6);
+   	//Espera o dados descer (ACK)
+    	while( mouse_read() != 0xFA);
+
+
+    	// habilita o mouse. (streaming)
+	mouse_write(0xF4);
+    	//Espera o dados descer (ACK)
+	while( mouse_read() != 0xFA);
+
+
+    	// espera nossa controladora terminar
+    	kbdc_wait(1);
+		
+};
+
+
 /*
  * getMouseData:
  *     Essa função é usada pela rotina kernelPS2MouseDriverReadData.
@@ -306,9 +358,6 @@ int flagRefreshMouseOver;
 	
 void mouseHandler (){
 	
-	//printf(".");
-	//return;
-	
     // #importante:
 	// Essa será a thread que receberá a mensagem
 	struct thread_d *t;
@@ -400,8 +449,8 @@ void mouseHandler (){
 			// #obs: Uma rotina interna aqui nesse arquivo está tentando isso.
 			
 		    //salvando antes de atualizar.
-			saved_mouse_x = mouse_x;
-		    saved_mouse_y = mouse_y;			
+			//saved_mouse_x = mouse_x;
+		    //saved_mouse_y = mouse_y;			
 			
 			update_mouse();			
 			
@@ -409,10 +458,13 @@ void mouseHandler (){
 			// Agora vamos manipular os valores obtidos através da 
 			// função de atualização dos valores.
 			
-			mouse_x = (mouse_x & 0x00000FFF ); 
-		    mouse_y = (mouse_y & 0x00000FFF );
-		
-		    // Checando limites.
+			//mouse_x = (mouse_x & 0x00000FFF ); 
+		    //mouse_y = (mouse_y & 0x00000FFF );
+			
+			mouse_x = (mouse_x & 0x000003FF ); 
+		    mouse_y = (mouse_y & 0x000003FF );		
+		    
+			// Checando limites.
             // #todo: Os valores foram determinados. 
 			// Precisamos usar variáveis.
 			
@@ -420,8 +472,6 @@ void mouseHandler (){
 		    if(	mouse_y < 1 ){ mouse_y = 1; }
 		    if(	mouse_x > (800-16) ){ mouse_x = (800-16); }
 		    if(	mouse_y > (600-16) ){ mouse_y = (600-16); }
-
-		    
 			
 			//
 			// # Draw BMP #
@@ -434,13 +484,19 @@ void mouseHandler (){
 			//copiar para o lfb o antigo retângulo. 
 			//Para apagar o ponteiro que está no lfb.
 			
-			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );	
+			refresh_rectangle ( mouse_x, mouse_y, 18, 18 );	
 			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
           
             //#debug		  
-		    //draw_text ( gui->main, saved_mouse_x, saved_mouse_y, COLOR_YELLOW, "+" );
-		    //refresh_rectangle ( saved_mouse_x, saved_mouse_y, 8, 8 );		
-		
+		    //draw_text ( gui->main, mouse_x, mouse_y, COLOR_YELLOW, "+" );
+		    //refresh_rectangle ( mouse_x, mouse_y, 8, 8 );		
+			
+			
+			//#bugbug:
+			//testando .... naõ vamos exibir o ponteiro ..
+			//se não falhar é porque o problema está na exibição do ponteiro.
+			//teste feito, falhou mesmo sem exibir o ponteiro, então o problema 
+			//naõ está na exibição do ponteiro.
 			
             break;
 
@@ -920,10 +976,6 @@ void mouseHandler (){
 	
 	
 */	
-
-    // EOI.		
-    outportb ( 0xa0, 0x20 ); 
-    outportb ( 0x20, 0x20 );
 };
 
 
@@ -949,9 +1001,9 @@ void ps2_mouse_initialize (){
 	unsigned char status;
 	
     // Flush the output buffer
-	while ((inportb(0x64) & 1)) {
-		inportb(0x60);
-	}
+	//while ((inportb(0x64) & 1)) {
+	//	inportb(0x60);
+	//}
 	
 	
 	printf("ps2_mouse_initialize: enable second port\n");
@@ -959,10 +1011,10 @@ void ps2_mouse_initialize (){
 	
 	
 	// Ativar a segunda porta PS/2.
-	kbdc_wait(1);
-	outportb(0x64,I8042_WRITE);    
-	kbdc_wait(1);
-	outportb(0x64,I8042_ENABLE_SECOND_PORT); //0xA8
+	//kbdc_wait(1);
+	//outportb(0x64,I8042_WRITE);    
+	//kbdc_wait(1);
+	//outportb(0x64,I8042_ENABLE_SECOND_PORT); //0xA8
 
 
 	
@@ -992,6 +1044,24 @@ void ps2_mouse_initialize (){
 	kbdc_wait(1);
 	outportb(0x60,status);  	
 	
+	
+	
+	
+
+    	//Agora temos dois dispositivos sereais teclado e mouse (PS/2).
+	
+
+    //Activar a primeira porta PS/2
+	kbdc_wait(1);
+	outportb(0x64,0xAE);  
+
+    	// activar a segunda porta PS/2
+	kbdc_wait(1);
+	outportb(0x64,0xA8);
+
+     	// espera   
+	kbdc_wait(1);	
+	
 
 
 	//## step 2 ##
@@ -1020,11 +1090,11 @@ void ps2_mouse_initialize (){
 	refresh_screen();
 
   // Restaura defaults do PS/2 mouse.
-	kbdc_wait(1);
-	outportb(0x64,I8042_WRITE);    
-    kbdc_wait(1);
-    mouse_write(MOUSE_SET_DEFAULTS);  //0xf6
-    while ( mouse_read() != I8042_ACKNOWLEDGE );
+	//kbdc_wait(1);
+	//outportb(0x64,I8042_WRITE);    
+    //kbdc_wait(1);
+    //mouse_write(MOUSE_SET_DEFAULTS);  //0xf6
+    //while ( mouse_read() != I8042_ACKNOWLEDGE );
 
 	
  	printf("ps2_mouse_initialize: enable transmission\n");
@@ -1038,23 +1108,23 @@ void ps2_mouse_initialize (){
   // 1 byte recebido do PS/2 mouse gerar  uma IRQ...
   // Talvez valha a pena DESABILITAR o modo streaming
   // para colher os 3 dados de uma s¢ vez na IRQ!
-	kbdc_wait(1);
-	outportb(0x64,I8042_WRITE);      
-    kbdc_wait(1);
-    mouse_write(MOUSE_ENABLE_DATA_REPORTING);  //0xf4
-    while ( mouse_read() != I8042_ACKNOWLEDGE );        
+	//kbdc_wait(1);
+	//outportb(0x64,I8042_WRITE);      
+    //kbdc_wait(1);
+    //mouse_write(MOUSE_ENABLE_DATA_REPORTING);  //0xf4
+    //while ( mouse_read() != I8042_ACKNOWLEDGE );        
 	
 	
 	
-	uint8_t tmp = inportb(0x61);
-	outportb(0x61, tmp | 0x80);
-	outportb(0x61, tmp & 0x7F);
-	inportb(0x60);	//mouse port
+	//uint8_t tmp = inportb(0x61);
+	//outportb(0x61, tmp | 0x80);
+	//outportb(0x61, tmp & 0x7F);
+	//inportb(0x60);	//mouse port
 	
 	 // Flush the output buffer
-    while ((inportb(0x64) & 1)) {
-		inportb(0x60);
-	}	
+    //while ((inportb(0x64) & 1)) {
+	//	inportb(0x60);
+	//}	
   
   
 init_mouse_exit:

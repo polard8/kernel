@@ -433,6 +433,11 @@ _irq1:
  
 	;; INTERRUPÇÕES DESABILITADAS. 
 	;; (O TIMER NÃO INTERROMPE.)
+	
+	;;; #bugbug
+	;;; salvando registradores.
+	;;; e se o handler bagunçar outros registradores.??
+	
 	cli	
 	
 	;pushad
@@ -653,12 +658,24 @@ _irq12:
 	cli	
 	pushad
 	
+	push ds
+	push es
+	push fs
+	push gs	
+	push ss 
+	
 	;unb/mouse.c
 	call _mouse_handler
 	
 	mov al, 0x20
     out 0x20, al
     out 0xA0, al  
+	
+	pop ss
+	pop gs 
+	pop fs 
+	pop es 
+	pop ds
 	
 	popad
 	sti
@@ -702,6 +719,7 @@ _irq14:
 	PUSH AX
 	
 	call _diskATAIRQHandler1
+	
 	MOV AL,020h
 	OUT 0A0h,AL
 	OUT 020h,AL
@@ -726,6 +744,7 @@ _irq15:
 	PUSH AX
 	
 	call _diskATAIRQHandler2
+	
 	MOV AL,020h
 	OUT 0A0h,AL
 	OUT 020h,AL

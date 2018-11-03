@@ -29,7 +29,30 @@ void keyboard_write(uint8_t write){
 	outb(0x60,write);
     	wait_ns(200);
 
-}
+};
+
+
+// Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
+int BAT_TEST (){
+	
+    uint8_t val;
+
+    while(1) 
+	{
+        val = keyboard_read();
+
+        if(val == 0xAA)return (int) 0;
+        else if(val == 0xFC) {
+        
+            return (int) -1; 
+        }
+    
+        // Reenviar o comando. 
+        // OBS: este comando não é colocado em buffer
+        keyboard_write(0xFE);       
+       
+    };
+};
 
 
 
@@ -136,7 +159,7 @@ void ps2_keyboard_initialize (){
 	//LED_SCROLLLOCK 
 	//LED_NUMLOCK 
 	//LED_CAPSLOCK  	
-	keyboard_set_leds(LED_NUMLOCK);
+	//keyboard_set_leds(LED_NUMLOCK);
 	
  
     //#imporante:
@@ -144,6 +167,25 @@ void ps2_keyboard_initialize (){
     //habilitar e resetar fica para a inicialização do ps2.
 	
 	
+	//Reseta o teclado
+	kbdc_wait(1);
+	outb(0x60,0xFF);
+	
+	wait_ns(200);
+	
+	// Espera os dados descer, ACK
+    while(keyboard_read() != 0xFA);
+	
+	
+    	// Basic Assurance Test (BAT)
+    	if( BAT_TEST() != 0) 
+		{
+            // Nelson aqui precisaremos de criar uma rotina de tratamento de erro do teclado
+            printf("\nkeyboard error!");
+    	}  
+
+    // espera nossa controladora termina
+	kbdc_wait(1);
 	
 	//Debug support.
 	scStatus = 0;
