@@ -449,8 +449,8 @@ void mouseHandler (){
 			// #obs: Uma rotina interna aqui nesse arquivo está tentando isso.
 			
 		    //salvando antes de atualizar.
-			//saved_mouse_x = mouse_x;
-		    //saved_mouse_y = mouse_y;			
+			saved_mouse_x = mouse_x;
+		    saved_mouse_y = mouse_y;			
 			
 			update_mouse();			
 			
@@ -484,8 +484,8 @@ void mouseHandler (){
 			//copiar para o lfb o antigo retângulo. 
 			//Para apagar o ponteiro que está no lfb.
 			
-			refresh_rectangle ( mouse_x, mouse_y, 18, 18 );	
-			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );
+			refresh_rectangle ( saved_mouse_x, saved_mouse_y, 20, 20 );	      //apaga o antigo
+			bmpDisplayMousePointerBMP ( mouseBMPBuffer, mouse_x, mouse_y );   //acende o novo.
           
             //#debug		  
 		    //draw_text ( gui->main, mouse_x, mouse_y, COLOR_YELLOW, "+" );

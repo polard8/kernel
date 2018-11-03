@@ -272,7 +272,7 @@ refresh_rectangle ( unsigned long x,
 	
 	for ( i=0; i < lines; i++ )
 	{
-		memcpy( p, q, (line_size * 3) );
+		memcpy ( p, q, (line_size * 3) );
 		q += (Width * 3);
 		p += (Width * 3);
 	};	
