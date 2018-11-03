@@ -1,11 +1,12 @@
 ;
-; File: head\x86\hardwarelib.inc
+; File: head\x86\hwlib.inc
 ;
 ; Descrição:
-;     Rotinas de apoio à hardware.inc.
+;     Hardware Lib.
+;     Rotinas de apoio à hw.inc.
 ;     Nome opcional para padrão 8.3 (hwlib.s)
 ;
-; Versão 1.0, 2015, 2016.
+; 2015 - Created by Fred Nora.
 ;
 
 ;1F0 (Read and Write): Data Register
@@ -101,53 +102,6 @@ _turn_task_switch_off:
 	;status do mecanismo de taskswitch.
 	mov dword [_task_switch_status], dword 0    ;LOCKED.	
 	ret
-	
-		
-	
-;;================================================
-;; 
-
-
-;; chanel 0, master, read sector
-;global _ide_channel0_master_readsector
-;_ide_channel0_master_readsector:
-;    ret
-
-;; channel 0, master write sector	
-;global _ide_channel0_master_writesector
-;_ide_channel0_master_writesector:
-;    ret
-	
-;; channel 0, slave, read sector	
-;global _ide_channel0_slave_readsector
-;_ide_channel0_slave_readsector:
-;    ret
-		
-;; channel 0, slave, write sector	
-;global _ide_channel0_slave_writesector
-;_ide_channel0_slave_writesector:
-;    ret
-
-;; chanel 1, master, read sector
-;global _ide_channel1_master_readsector
-;_ide_channel1_master_readsector:
-;    ret
-	
-;; channel 1, master write sector		
-;global _ide_channel1_master_writesector
-;_ide_channel1_master_writesector:
-;    ret
-
-;; channel 1, slave, read sector		
-;global _ide_channel1_slave_readsector
-;_ide_channel1_slave_readsector:
-;    ret
-		
-;; channel 1, slave, write sector		
-;global _ide_channel1_slave_writesector
-;_ide_channel1_slave_writesector:
-;    ret
-	
 
 	
 ;===================================	

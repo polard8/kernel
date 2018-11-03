@@ -24,6 +24,10 @@ echo ~{ ...
 echo ~{ Compiling KERNEL.BIN ...
 
 rem echo ~{ ...
+echo ~{ /3rdparty
+    gcc -c c:/gramado/kernel/3rdparty/kernel/disk/disk1.c   -I c:/gramado/include -o disk1.o
+	
+rem echo ~{ ...
 echo ~{ /entry
 
 	rem head.s
@@ -38,13 +42,17 @@ rem echo ~{ ...
 echo ~{ ux4 /hal	
 	gcc -c c:/gramado/kernel/hal/hal.c -I c:/gramado/include -o hal.o	
 	
+	gcc -c c:/gramado/kernel/hal/arch/x86/syscall.c  -I c:/gramado/include -o syscall.o		
+	gcc -c c:/gramado/kernel/hal/arch/x86/cpux86.c   -I c:/gramado/include -o cpux86.o 
+    gcc -c c:/gramado/kernel/hal/arch/x86/x86.c      -I c:/gramado/include -o x86.o	
+	gcc -c c:/gramado/kernel/hal/arch/x86/ports.c    -I c:/gramado/include -o ports.o 	
+	gcc -c c:/gramado/kernel/hal/arch/amd/cpuamd.c   -I c:/gramado/include -o cpuamd.o 	    	
 	
 	
 :Microkernel_Job2	
 rem echo ~{ ...
 echo ~{ ux3 /mk
-    
-
+	
     rem c. 
     gcc -c  c:/gramado/kernel/mk/mk.c -I c:/gramado/include  -o mk.o
 	
@@ -92,115 +100,84 @@ echo ~{ ux3 /mk
 :Executive_Job3	
 rem echo ~{ ...
 echo ~{ ux2 /execve
+	
 	rem /execve
 	gcc -c c:/gramado/kernel/execve/execve.c  -I c:/gramado/include -o execve.o	
 	
-	
-	rem crts
-	rem /execve/crts/libc
+	rem /crts
     gcc -c c:/gramado/kernel/execve/crts/libc/cedge.c  -I c:/gramado/include -o cedge.o	
 	gcc -c c:/gramado/kernel/execve/crts/libc/ctype.c  -I c:/gramado/include -o ctype.o	
 	gcc -c c:/gramado/kernel/execve/crts/libc/stdlib.c -I c:/gramado/include -o stdlib.o
 	gcc -c c:/gramado/kernel/execve/crts/libc/stdio.c  -I c:/gramado/include -o stdio.o
     gcc -c c:/gramado/kernel/execve/crts/libc/string.c -I c:/gramado/include -o string.o	
 	
-	rem services - System Call Interface.  
-    gcc -c c:/gramado/kernel/execve/sci/services.c  -I c:/gramado/include -o services.o		
-	
-    rem execve/dd
-		
-	rem sm
-	rem /execve/init
-    gcc -c c:/gramado/kernel/execve/dd/sm/init/init.c -I c:/gramado/include -o init.o
-	rem /execve/sm/ob
-	gcc -c c:/gramado/kernel/execve/dd/sm/ob/object.c -I c:/gramado/include -o object.o		
-	rem /execve/network
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/intel.c     -I c:/gramado/include -o nicintel.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/network.c -I c:/gramado/include -o network.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/socket.c  -I c:/gramado/include -o socket.o
-	rem System Management.
-	
-	rem /execve/sm/sys
-    rem system
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/modules.c  -I c:/gramado/include -o modules.o
-    rem procedure
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/proc.c     -I c:/gramado/include -o proc.o	
-    rem abort
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/abort.c    -I c:/gramado/include -o abort.o		
-    rem info
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/info.c     -I c:/gramado/include -o info.o	
-    rem server manager
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/sm.c       -I c:/gramado/include -o sm.o
-    rem channel
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/channel.c  -I c:/gramado/include -o channel.o	
-	rem signal
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/signal.c   -I c:/gramado/include -o signal.o	
-    rem system
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/system.c   -I c:/gramado/include -o system.o
-	rem io
-	gcc -c c:/gramado/kernel/execve/dd/sm/sys/io.c       -I c:/gramado/include -o io.o	
-	
-    rem sm
-	rem /execve/rt (runtime)
-	gcc -c c:/gramado/kernel/execve/dd/sm/rt/runtime.c   -I c:/gramado/include -o runtime.o
-	
-	rem tty
-    gcc -c c:/gramado/kernel/execve/dd/tty/tty.c         -I c:/gramado/include -o tty.o		
-		
-	rem sm
-	rem /execve/sm/disk
-    
-	rem colocando o código do nelson em 3rdparty
-	rem gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c   -I c:/gramado/include -o disk.o
-    gcc -c c:/gramado/kernel/3rdparty/kernel/disk/disk1.c   -I c:/gramado/include -o disk1.o
-	
-	rem o volume vira disk para absorver o código do fred que esta no código acima.
-    rem gcc -c c:/gramado/kernel/execve/dd/sm/disk/volume.c -I c:/gramado/include -o volume.o	
-	gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c -I c:/gramado/include -o disk.o
-	
-  	rem sm
-    gcc -c c:/gramado/kernel/execve/dd/sm/install/install.c -I c:/gramado/include -o install.o    
-	
-	rem sm
-	rem /execve/debug
-	gcc -c c:/gramado/kernel/execve/dd/sm/debug/debug.c -I c:/gramado/include -o debug.o	
-	
-	gcc -c c:/gramado/kernel/execve/dd/device/device.c  -I c:/gramado/include -o device.o
-	
-
+    rem /dd
+	gcc -c c:/gramado/kernel/execve/dd/apic.c      -I c:/gramado/include -o apic.o 	
 	gcc -c c:/gramado/kernel/execve/dd/hdd.c       -I c:/gramado/include -o hdd.o	
-	gcc -c c:/gramado/kernel/execve/dd/keyboard.c  -I c:/gramado/include -o keyboard.o
-	gcc -c c:/gramado/kernel/execve/dd/ldisc.c     -I c:/gramado/include -o ldisc.o    	
-    gcc -c c:/gramado/kernel/execve/dd/mouse.c     -I c:/gramado/include -o mouse.o  	
 	gcc -c c:/gramado/kernel/execve/dd/pic.c       -I c:/gramado/include -o pic.o 
 	gcc -c c:/gramado/kernel/execve/dd/rtc.c       -I c:/gramado/include -o rtc.o	
 	gcc -c c:/gramado/kernel/execve/dd/screen.c    -I c:/gramado/include -o screen.o 	
     gcc -c c:/gramado/kernel/execve/dd/timer.c     -I c:/gramado/include -o timer.o		
 	gcc -c c:/gramado/kernel/execve/dd/video.c     -I c:/gramado/include -o video.o  
 	gcc -c c:/gramado/kernel/execve/dd/vsync.c     -I c:/gramado/include -o vsync.o 
-	
-	gcc -c c:/gramado/kernel/hal/arch/x86/syscall.c  -I c:/gramado/include -o syscall.o		
-	gcc -c c:/gramado/kernel/hal/arch/x86/cpux86.c   -I c:/gramado/include -o cpux86.o 
-    gcc -c c:/gramado/kernel/hal/arch/x86/x86.c      -I c:/gramado/include -o x86.o	
-	gcc -c c:/gramado/kernel/hal/arch/x86/ports.c    -I c:/gramado/include -o ports.o 	
-	gcc -c c:/gramado/kernel/hal/arch/amd/cpuamd.c   -I c:/gramado/include -o cpuamd.o 	    
-	
-
-	gcc -c c:/gramado/kernel/execve/dd/apic.c -I c:/gramado/include -o apic.o 
-	gcc -c c:/gramado/kernel/execve/dd/pci.c  -I c:/gramado/include -o pci.o
-	gcc -c c:/gramado/kernel/execve/dd/usb.c  -I c:/gramado/include -o usb.o
 
 
-	rem File system
+    rem dd/devmgr
+	gcc -c c:/gramado/kernel/execve/dd/devmgr/devmgr.c  -I c:/gramado/include -o devmgr.o
+
+	rem dd/i8042
+	gcc -c c:/gramado/kernel/execve/dd/i8042/i8042.c     -I c:/gramado/include -o i8042.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/ps2mouse.c  -I c:/gramado/include -o ps2mouse.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/ps2kbd.c    -I c:/gramado/include -o ps2kbd.o  	
+	gcc -c c:/gramado/kernel/execve/dd/i8042/keyboard.c  -I c:/gramado/include -o keyboard.o
+    gcc -c c:/gramado/kernel/execve/dd/i8042/mouse.c     -I c:/gramado/include -o mouse.o  		
 	
-	rem /execve/fs
+	rem dd/ldisc
+	gcc -c c:/gramado/kernel/execve/dd/ldisc/ldisc.c     -I c:/gramado/include -o ldisc.o 
+		
+	rem dd/pci
+	gcc -c c:/gramado/kernel/execve/dd/pci/pci.c       -I c:/gramado/include -o pci.o  
+		
+	rem dd/sm
+    gcc -c c:/gramado/kernel/execve/dd/sm/init/init.c -I c:/gramado/include -o init.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/ob/object.c -I c:/gramado/include -o object.o		
+	gcc -c c:/gramado/kernel/execve/dd/sm/network/intel.c     -I c:/gramado/include -o nicintel.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/network/network.c -I c:/gramado/include -o network.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/network/socket.c  -I c:/gramado/include -o socket.o
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/modules.c  -I c:/gramado/include -o modules.o
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/proc.c     -I c:/gramado/include -o proc.o	
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/abort.c    -I c:/gramado/include -o abort.o		
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/info.c     -I c:/gramado/include -o info.o	
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/sm.c       -I c:/gramado/include -o sm.o
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/channel.c  -I c:/gramado/include -o channel.o	
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/signal.c   -I c:/gramado/include -o signal.o	
+    gcc -c c:/gramado/kernel/execve/dd/sm/sys/system.c   -I c:/gramado/include -o system.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/sys/io.c       -I c:/gramado/include -o io.o	
+	gcc -c c:/gramado/kernel/execve/dd/sm/rt/runtime.c   -I c:/gramado/include -o runtime.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c -I c:/gramado/include -o disk.o
+    gcc -c c:/gramado/kernel/execve/dd/sm/install/install.c -I c:/gramado/include -o install.o    
+	gcc -c c:/gramado/kernel/execve/dd/sm/debug/debug.c -I c:/gramado/include -o debug.o	
+	
+	rem dd/tty
+    gcc -c c:/gramado/kernel/execve/dd/tty/tty.c         -I c:/gramado/include -o tty.o		
+	
+	rem dd/usb
+	gcc -c c:/gramado/kernel/execve/dd/usb/usb.c       -I c:/gramado/include -o usb.o		
+	
+	rem /fs
     gcc -c c:/gramado/kernel/execve/fs/fs.c     -I c:/gramado/include -o fs.o						
     gcc -c c:/gramado/kernel/execve/fs/read.c   -I c:/gramado/include -o read.o			
     gcc -c c:/gramado/kernel/execve/fs/write.c  -I c:/gramado/include -o write.o			
     gcc -c c:/gramado/kernel/execve/fs/cf.c     -I c:/gramado/include -o cf.o			
     gcc -c c:/gramado/kernel/execve/fs/search.c -I c:/gramado/include -o search.o			
     gcc -c c:/gramado/kernel/execve/fs/format.c -I c:/gramado/include -o format.o	
-    gcc -c c:/gramado/kernel/execve/fs/vfs.c    -I c:/gramado/include -o vfs.o		
+    gcc -c c:/gramado/kernel/execve/fs/vfs.c    -I c:/gramado/include -o vfs.o			
+	
+	rem /sci
+    gcc -c c:/gramado/kernel/execve/sci/services.c  -I c:/gramado/include -o services.o			
+	
+ 
+
 	
 rem echo ~{ ...
 echo ~{ ux1 /gws \o/
@@ -221,11 +198,6 @@ echo ~{ ux1 /gws \o/
     gcc -c c:/gramado/kernel/gws/gws/menu.c      -I c:/gramado/include -o menu.o 
     gcc -c c:/gramado/kernel/gws/gws/bmp.c       -I c:/gramado/include -o bmp.o 
     gcc -c c:/gramado/kernel/gws/gws/button.c    -I c:/gramado/include -o button.o 
-    
-	gcc -c c:/gramado/kernel/execve/dd/i8042/i8042.c     -I c:/gramado/include -o i8042.o
-    gcc -c c:/gramado/kernel/execve/dd/i8042/ps2mouse.c  -I c:/gramado/include -o ps2mouse.o
-    gcc -c c:/gramado/kernel/execve/dd/i8042/ps2kbd.c    -I c:/gramado/include -o ps2kbd.o    
-	
 	gcc -c c:/gramado/kernel/gws/gws/bg.c        -I c:/gramado/include -o bg.o  
     gcc -c c:/gramado/kernel/gws/gws/window.c    -I c:/gramado/include -o window.o    
     gcc -c c:/gramado/kernel/gws/gws/desktop.c   -I c:/gramado/include -o desktop.o  
@@ -280,7 +252,7 @@ ldisc.o ^
 hdd.o ^
 pci.o ^
 usb.o ^
-device.o ^
+devmgr.o ^
 spawn.o ^
 callout.o ^
 callfar.o ^
