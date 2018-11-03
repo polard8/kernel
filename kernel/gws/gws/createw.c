@@ -1588,6 +1588,20 @@ done:
 	//{
 	//    RegisterWindow (window);	
 	//}
+	
+	//#teste
+	//Associando a janela criada a trhead atual, que chamou essa rotina.
+	//o problema é na hora da inicialização.
+	
+		window->InputThread = (struct thread_d *) threadList[current_thread];
+		
+		if( (void *) window->InputThread != NULL )
+        {
+			if ( window->used != 1 || window->magic != 1234 )
+			{
+			    window->InputThread = NULL;	
+			}
+		}	
 	    
 	
 	return (void *) window;

@@ -38,6 +38,12 @@
 #define MOUSE_Y_SIGN	0x20
 
 
+//usado pra exibir provisoriamente alguma imagem em cima da janela 
+//que o mouse passa por cima.
+unsigned long savedmouseoverwindowX;
+unsigned long savedmouseoverwindowY;
+
+//usado pelo ponteiro.
 int saved_mouse_x;
 int saved_mouse_y;
 

@@ -21,11 +21,7 @@ DialogBoxProcedure ( struct window_d *window,
                      int msg, 
 					 unsigned long long1, 
 					 unsigned long long2 );
-					 
-					 
-					 
-					 
-					 
+					 				 
 					 
 
 /*
@@ -320,17 +316,13 @@ int get_current_mouse_responder (){
 	
     return (int) current_mouse_responder;	
 };
-					 
 
 
-
-					 
-					 
-					 
 
 
 /*
- **************
+ ********************************************************
+ ********************************************************
  * mouseHandler:
  *     Handler de mouse. 
  *
@@ -341,7 +333,8 @@ int get_current_mouse_responder (){
  * @todo: Essa rotina não pertence ao line discipline.
  * Obs: Temos externs no início desse arquivo.
  * 
- */ 
+ */
+ 
 #define MOUSE_DATA_BIT 1
 #define MOUSE_SIG_BIT  2
 #define MOUSE_F_BIT  0x20
@@ -360,26 +353,15 @@ void mouseHandler (){
 	
     // #importante:
 	// Essa será a thread que receberá a mensagem
+	
 	struct thread_d *t;
 	
-	//#bugbug:
-	//usaremos isso provisóriamente para evitar acessar estrutura 
-	//inválida.
-	//t = (struct thread_d *) threadList[current_thread];
-	//if ( (void *) t == NULL )
-	//{
-		//printf("mouseHandler: debug current thread fail\n")
-	//	return;
-	//}
 	
 	// #importante:
-	// Essa será a janela afetada por qualquer
-	// evento de mouse.
-	
-    struct window_d *Window;
-
+	// Essa será a janela afetada por qualquer evento de mouse.
 	// ID de janela.
 	
+    struct window_d *Window;
 	int wID; 	
 	
 	
@@ -602,11 +584,11 @@ void mouseHandler (){
 	// e depois tem a mensagem para 'descapturar'.
 	
 	
-/*
 
-    ##### sem escaneamento de janelas por enquanto, apenas mostre e mova o ponteiro #####
+
+    //##### sem escaneamento de janelas por enquanto, apenas mostre e mova o ponteiro #####
 	
-	## então não enviaremos mensagens para a thread ###
+	//## então não enviaremos mensagens para a thread ###
 	
 	//
 	//  ## Scan ##
@@ -616,7 +598,7 @@ void mouseHandler (){
 	// (capture) - On mouse over. 
 	//
 
-	
+
 	
 	// wID = ID da janela.
 	// Escaneamos para achar qual janela bate com os valores indicados.
@@ -643,8 +625,13 @@ void mouseHandler (){
 			//#bugbug:
 			//precisamos checar a validade da estrutura antes de usa-la.
 			
+			//#importante:
+			//isso apaga o que pintamos na janela, o valou foi salvo logo abaixo.
+			
 			if ( (void *) Window != NULL ){
-			    refresh_rectangle ( Window->left, Window->top, 20, 20 );
+				
+				refresh_rectangle ( Window->left, Window->top, 20, 20 );
+			    //refresh_rectangle ( savedmouseoverwindowX, savedmouseoverwindowY, 20, 20 );
 			}
 			
 			//não podemos mais fazer refresh.
@@ -658,6 +645,9 @@ void mouseHandler (){
 		//Nothing.
 		
 	//se não houve problema no escaneamento de janela
+	//ou seja, se encontramos uma janela.
+	//então essa janela deve estar associada à uma thread para qual mandaremos a mensagem.
+	//caso a thread for null ... apenas não enviamos.
     }else{
 		
 		Window = (struct window_d *) windowList[wID];
@@ -682,11 +672,19 @@ void mouseHandler (){
 		
 		t = (void *) Window->InputThread;
 
+		//se a estrutura da thread for inválida.
 		if ( (void *) t == NULL )
 		{
 			//fail
 			return;
 		}
+		
+		//se a estrutura estiver corrompida.
+		if ( t->used != 1 || t->magic != 1234 )
+		{
+			//fail
+			return;
+		}		
 		
 		//#bugbug 
 		//#todo:
@@ -914,7 +912,11 @@ void mouseHandler (){
 				
 			
 			        //ja que entramos em uma nova janela, vamos mostra isso.
-				
+				    
+					//salvando para apagarmos corretamente.
+					//savedmouseoverwindowX = Window->left;
+					//savedmouseoverwindowY = Window->top;
+					
 				    //botão.
 			        if ( Window->isButton == 1 )
 				    {    
@@ -974,8 +976,6 @@ void mouseHandler (){
 		
 	};
 	
-	
-*/	
 };
 
 

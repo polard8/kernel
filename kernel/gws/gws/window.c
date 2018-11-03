@@ -2603,6 +2603,13 @@ void SetFocus ( struct window_d *window ){
 		
 		window->InputThread = (struct thread_d *) threadList[current_thread];
 		
+		if( (void *) window->InputThread != NULL )
+        {
+			if ( window->used != 1 || window->magic != 1234 )
+			{
+			    window->InputThread = NULL;	
+			}
+		}			
 		
 		//Salvando id localmente.
 		WindowID = (int) window->id; 
