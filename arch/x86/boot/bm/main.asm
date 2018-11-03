@@ -209,23 +209,18 @@ save_cylinder_numbers: dw 0  ;Número de cilindros do disco.
 bootmanagerSTART:
 
 ;;;setupRegisters:
+		
+    ;Code located at 0000:0x8000. 
+	;Adjust segment registers and stack.
 	
-    ;;
-    ;; Configuranso registradores
-    ;;
-	
-    ;Code located at 0000:0x8000, adjust segment registers.
     cli
 	mov ax, 0
     mov ds, ax
     mov es, ax
-     
-    ;Create stack.
     mov ax, 0x0000
     mov ss, ax
     mov sp, 0x6000   
     sti
-	
 	
     ;;
 	;; Argumento passado pelo MBR. 
@@ -1095,8 +1090,14 @@ HERE:
     ;;message: o arquivo não esta presente na memória.
 	mov si, stage2_msg_pe_sig
 	call DisplayMessage
+	
 ;.searchFile: ;;procurar e carregar.
 ;;tentaremos pela segunda vez carregar o arquivo.
+
+;
+; * Hang
+;
+
 .sigHalt:
     hlt	
 	jmp .sigHalt
@@ -1154,51 +1155,46 @@ HERE:
     mov al, 0 
     out dx, al
 	
-    ;Setup registers.
+   
 .setupRegisters:	
-    cli
+   
+    ;Setup registers.
 	
-	;Data.
-	mov  ax, 0       
-    mov  ds, ax
-    mov  es, ax
-	;mov  fs, ax    ;Unused       
-	;mov  gs, ax    ;Unused 
-
-	;Stack.
-	;STACK_POINTER (Colocamos no mesmo lugar de antes.)
-	XOR AX, AX
+    cli
+	mov ax, 0       
+    mov ds, ax
+    mov es, ax
+	;mov fs, ax           
+	;mov gs, ax     
+	xor ax, ax
     mov ss, ax
     mov sp, 0x6000 
-	
-	;General purpose.
-	xor ax, ax
-	xor bx, bx
-	xor cx, cx
 	xor dx, dx
+	xor cx, cx	
+	xor bx, bx
+	xor ax, ax
 	sti
 	
 .setupA20:
 	
 	;Enable a20 line.
-	pusha
-    call A20_enable
-	popa
 	
-	;Message
+	pusha
+	
+    call A20_enable
+
 	mov si, msg_a20
 	call DisplayMessage
-
-	;jmp $
 	
-    ;
+	popa
+	
+  
 	; Detect Hardware:
 	; ================
 	; Detecta hardware presente usando rotinas de 16 bits via BIOS.
 	; Obs: É possível detectar vários componente de hardware usando os 
 	; recursos oferecidos pelo BIOS. Esses parametros serão salvos no 
 	; META$FILE, passados para Boot Loader, que passara para o Kernel.
-	;
 
 .detectHardware:
 	
@@ -1228,31 +1224,38 @@ HERE:
 	;
 
 .setupBootMode:
+	
 	;Message
 	mov si, msg_selecting_videomode
 	call DisplayMessage
 	
 	;JMP $
-	;;
 	
 .preSelection:
+	
+	;;
+	;;   ## SET UP BOOT MODE ##
+	;;
+	
 	
 	mov al, byte BOOTMODE_SHELL
 	;mov al, byte BOOTMODE_GUI
 	call set_boot_mode	
 
-	;;
+
 	;; *Importante:
 	;;  A partir de agora sempre inicializaremos no modo shell,
 	;; pois temos um comando que inicializa o modo gráfico.
-	;;
 
-	;
+	
+	;;
+	;;   ## SET UP VIDEO MODE ##
+	;;
+	
 	; video:
 	; Faz a primeira seleção de modo de video. Salvando o modo no metafile.
 	; + 0x4115 is 800x600x24bit	(*gui) (3 bytes por pixel) (0xrrggbbrrggbb).
-	;
-		
+
 	mov word [META$FILE.VIDEO_MODE], 0x115   
 	;mov ax, 0x115
 	;call set_video_mode
@@ -1268,8 +1271,8 @@ HERE:
 	JMP $
 	
 	
-stage2_msg_pe_sig   db "BM:stage2Initializations: *PE SIG",0
-stage2_msg_pe_sigOK db "BM:stage2Initializations: SIG OK",13,10,0	
+stage2_msg_pe_sig db "BM:stage2Initializations: *PE SIG",0
+stage2_msg_pe_sigOK db "BM:stage2Initializations: SIG OK", 13, 10, 0	
 	
 	
 ;;
@@ -1310,14 +1313,10 @@ stage2Shutdown:
 ;
 ; End.
 ;
-
-
-	
-	
-	
 	
 	;pm
-	%include "pm.inc"	        ;Comuta para o modo protegido.
+	;Comuta para o modo protegido.
+	%include "pm.inc"	       
 
 ;--------------------------------------------------------
 ; 32 bits - (Boot Manager 32bit Asm.)

@@ -175,41 +175,30 @@ mGui:
 	popa
 	
 .setupVideoMode:
+	
 	;Registra o modo escolhido.
 	mov al, byte BOOTMODE_GUI
 	call set_boot_mode	
 	
+	;; Setup registers.
 	
-	;;
-	;; Ajustando registradores.
-	;;
-		
     cli
-	
-	;Data.
-	mov  ax, 0; 
-    mov  ds, ax
-    mov  es, ax
-	;mov  fs, ax    ;Unused       
-	;mov  gs, ax    ;Unused    
-	
-	;Stack.
-	XOR AX, AX
+	mov ax, 0 
+    mov ds, ax
+    mov es, ax
+	;mov fs, ax           
+	;mov gs, ax        
+    xor ax, ax
     mov ss, ax
-    mov sp, 0x6000 ;STACK_POINTER
-	
-	;General purpose.
-	xor ax, ax
-	xor bx, bx
-	xor cx, cx
+    mov sp, 0x6000 
 	xor dx, dx
+	xor cx, cx	
+	xor bx, bx
+	xor ax, ax
 	
-	
-	;;
 	;; #importante
 	;; Temos que entrar no modo protegido já estando 
 	;; no modo grafico.
-	;;
 
 	;;
 	;; GDTR
@@ -231,40 +220,36 @@ mGui:
     ;;
 	;; Flush pipeline
 	;;
-
-;@todo: Mudar nome para pmFlushPipeline 
 	
-	;CS.
-;flush_pipeline:
 s2modesFlushPipeline:
     jmp stage2_CODE_SEL:s2modespm32 
 	
 	;;
-	;; 32bit 
+	;; ## 32 bit ## 
 	;;
 	
 	[BITS 32]
-s2modespm32:	
+s2modespm32:
 
-	;Segmentos de dados e pilha.
+    ;setup registers.	
+
+
     mov ax, stage2_DATA_SEL        
 	mov ds, ax
 	mov es, ax
-	;mov fs, stage2_NULL_SEL    ;0.
-	;mov gs, stage2_NULL_SEL    ;0.
-	
+	;mov fs, stage2_NULL_SEL    
+	;mov gs, stage2_NULL_SEL    
 	mov ss, ax
 	mov esp, dword 0x0009FFFC
-	
-	;Zera os registradores.		
-    mov edx, dword 0    ;#Voice,8?!
+    mov edx, dword 0    
     mov ecx, dword 0
 	mov ebx, dword 0	
-    mov eax, dword 0    ;#Voice,14?!
+    mov eax, dword 0    
 	    
 	;;
-	;; Aqui estamos em modo protegido e no modo gráfico, vamos testar se as mensagens
-	;; para esse ambiente estão funcionando.
+	;; Aqui estamos em modo protegido e no modo gráfico, 
+	;; vamos testar se as mensagens para esse ambiente 
+	;; estão funcionando.
 	;;
 	
 	;;
@@ -272,29 +257,30 @@ s2modespm32:
 	;; apresentarmos essa mensagem.
 	;;
 	
-	;;testando mensagem.
+	;; #debug
+	;; Testando mensagem.
+	
     mov eax, 0x00ffff00 ;color
 	mov esi, s2modes_initmessageinGM
 	call lib32PrintString
     call _asm_refresh_screen	
 
-	;debug
+	;#debug
 	;jmp $
-	
-	
-	;;
-	;; GO!
-	;;
 	
     ; Opção é saltar para uma área de inicialização em 
 	; 32bit modo gráfico.
+	
+	;;
+	;; GO!
+	;;	
     
 	;msm/start.inc
 	jmp startGUI
 	jmp $
 	
 	
-s2modes_initmessageinGM db "s2modes: Initializing PM in GM.",13,10,0
+s2modes_initmessageinGM db "s2modes: Initializing PM in GM", 13, 10, 0
 
 ;;
 ;;#####################################################################
