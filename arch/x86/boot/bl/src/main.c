@@ -295,7 +295,6 @@ void BlAbort (){
 	//checks()
 	//
 	
-//Done:	
     abort(); 
     die();	
 };
@@ -326,14 +325,18 @@ void BlKernelModuleMain (){
 void die (){
 	
     // Final message !
-    printf("* System Halted!");    // Bullet, Message.
+	// Bullet, Message.
+    
+	printf("* System Halted!");    
 	refresh_screen();
 	   
-	// Wait forever.   
+	// Wait forever. 
+    // Halt system.	
+	
 	while (1){
 		
 	    asm("cli"); 	
-	    asm("hlt");    // Halt system.		
+	    asm("hlt");    		
 	};                        
     
 	//

@@ -79,16 +79,19 @@ KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endereço fisico.
 global _bootloader_entry_point
 _bootloader_entry_point:
 
-    ;;
+	;; sobre a flag.
 	;; * Se é o kernel que está chamando o Boot Loader na forma de 
 	;; módulo do kernel em kernel mode.
-	;;
 	
-	cmp eax, dword 0x12345678
-    je _BlKernelModuleMain	
+	;; #test
+	;; teste cancelado.
+	
+	;cmp eax, dword 0x12345678
+    ;je _BlKernelModuleMain	
 
-    ;Debug.
-    ;*IMPORTANTE para text mode.
+    ; #debug.
+    ; text mode.
+	
 	mov byte [0xb8000], byte "B"	
     mov byte [0xb8001], byte 9	
     mov byte [0xb8002], byte "L"	
@@ -97,7 +100,7 @@ _bootloader_entry_point:
     ;Debug.
     ;JMP $    
    
-    ;
+    
 	;Salva o modo de vídeo.
     mov byte [bl_video_mode], al
 	
@@ -114,10 +117,8 @@ _bootloader_entry_point:
 	;Global para endereço físico do LFB.
 	mov dword [_g_lbf_pa], ebx    
 	
-   ;
    ; @todo: 
    ;     Passar o bootblock em ebx e a flag em al.
-   ;
    
     mov byte [bl_video_mode], al
     mov dword [_g_lbf_pa], ebx         ;Endereço físico do LFB.
@@ -127,20 +128,24 @@ _bootloader_entry_point:
     mov dword [_SavedBootBlock], edx        
     ;mov dword [_SavedBootBlock], ecx
 	
-    xor eax, eax
-	mov eax, dword [edx +0]    ;LFB	
+    ;LFB
+	xor eax, eax
+	mov eax, dword [edx +0]    	
 	mov dword [_SavedLFB], eax
 	
+	;X
 	xor eax, eax
-    mov ax, word [edx +4]      ;X	
+    mov ax, word [edx +4]      	
     mov dword [_SavedX], eax
 	
+	;Y
 	xor eax, eax
-    mov ax, word [edx +8]      ;Y	
+    mov ax, word [edx +8]      	
     mov dword [_SavedY], eax
 	
+	;BPP
 	xor eax, eax
-    mov al, byte [edx +12]     ;BPP	
+    mov al, byte [edx +12]     	
     mov dword [_SavedBPP], eax
 	
 	;
@@ -157,46 +162,21 @@ _bootloader_entry_point:
 	lgdt [GDT_register]	
 	lidt [IDT_register]
 	
+	; Setup registers.
 	
-	;
-	; @todo: Pode-se zerar os registradores nesse momento ?
-	;
-	
-	;Segmentos.
 	mov ax, DATA_SEL 
 	mov ds, ax		 
 	mov es, ax 
-	
 	;mov ax, NULL_SEL
 	;mov fs, ax		 
 	;mov gs, ax 
-	
-	
-	;;
-	;; ## STACK ##
-	;;
-	
-	
-	;; Maravilhosa pilha intrna no fim do arquivo.
 	mov ss, ax
 	mov eax, _bootloader_stack_start 
 	mov esp, eax 
 	
-	;;
-	;; #teste
+	;; #importante
 	;; Vamos deixar o kernel inicializar o PIT.
-	;;
 	
-	;PIT.
-	;mov al, byte 0x36
-	;mov dx, word 0x43
-	;out dx, al	
-	;mov eax, dword 11930    ;Timer frequency 100 HZ. 
-	;mov dx, word 0x40
-	;out dx, al
-	;mov al, ah
-	;out dx, al
-
 	;PIC.
 	cli
 	mov al, 00010001b    ;Begin PIC 1 initialization.
@@ -215,57 +195,29 @@ _bootloader_entry_point:
 	out 0x21, al
 	out 0xA1, al
 
+	;disable interrupts.
 	cli
 	
-	;Mascara todas as interrupções.
-	;mov  al, 255					                  
-	;out  0xa1, al                                   
-	;out  0x21, al    
-	  
 	;unmask all interrupts	
-	mov  al, 0					                  
-	out  0xa1, al                                   
-	out  0x21, al    
-	
-	;Unmask the timer interrupt.
-	;mov dx, word 0x21
-	;in  al, dx
-	;and al, byte 0xfe
-	;out dx, byte al
-	
-	;
-	; Teste de LFB:
-	;     Testando se o Boot Loader está escrevendo no LFB.
-	;
+	mov al, 0					                  
+	out 0xa1, al                                   
+	out 0x21, al    
 
-	;verde ??
-	;mov eax, 0x0000ff00
-	;call _background
+    ;; Calling C part of the kernel base.
 	
-	;mov eax, 0x000000ff  ;;Color. (supostamente azul ??)
-	;call _background	
-	
-	
-	;call _refresh_screen
-	
-	;;
-	;; A rotina _background pinta diretamente no LFB.
-	;;
-	
-	;
-	; Chamamos a função principal da parte em C.
-	;
 .callBlMain:
-    ;;
-    ;; Obs: algum argumento poderia ser enviado para invocar alguma 
-	;; funcionalidade do Boot Loader.	
+
 	call _BlMain
 	
-	;Debug.
-	;;jmp $
+.getResponse:
+
+	;; Response in EAX.
 	
 	
-	;
+	; Debug.
+	; jmp $
+	
+	
 	; Obs:
 	; A rotina _BlMain configurou os diretórios e as pagetables.
 	; Configurou 4 diretórios e algumas pagetables.
@@ -289,23 +241,21 @@ dummy_flush:
 	nop
 	nop
 	nop
+    nop
 	nop
+	nop
+	nop	
 	mov CR3, EAX  
 
 setupCR0:
-	;
+	
 	; Configura CR0  #(PG).
+	
 	mov eax, cr0                    
 	or eax, dword 0x80000000        
 	mov cr0, eax   
 	
-	;Debug.
-    ;mov byte [0xb8000], byte "g"	
-    ;mov byte [0xb8001], byte 9	
-    ;mov byte [0xb8002], byte "o"	
-    ;mov byte [0xb8003], byte 9		
 	
-	;
 	; Meta-Object: @todo:
 	; ============
 	;     O Boot Loader passar para o kernel um Meta-Objeto na forma de vetor,
@@ -327,39 +277,43 @@ setupCR0:
     ; ebx = LFB address.
     ; ecx = BootBlock pointer.
     ; edx = LoaderBlock pointer.
-    ;
+    
 
 StartKernelEntry:
 	
 	;Prepara a tabela.
 	mov ebp, dword BootBlock
 	
+	;LFB address.
 	xor eax, eax
-	mov eax, dword [_SavedLFB]    ;LFB address.
+	mov eax, dword [_SavedLFB]    
 	mov dword [BootBlock.lfb], eax
 	
+	;Width in pixels.
 	xor eax, eax
-	mov ax, word [_SavedX]       ;Width in pixels.
+	mov ax, word [_SavedX]       
 	mov dword [BootBlock.x], eax 
 	
+	;Height in pixel.
 	xor eax, eax
-	mov ax, word [_SavedY]       ;Height in pixel.
+	mov ax, word [_SavedY]       
 	mov dword [BootBlock.y], eax 
 	
+	;bpp.
 	xor eax, eax
-	mov al, byte [_SavedBPP]     ;bpp.
+	mov al, byte [_SavedBPP]     
 	mov dword [BootBlock.bpp], eax 
-    ;Continua...
+    
+	;Continua...
 	
-	
-	;
 	; Argumentos passandos através dos registradores:
 	; al = Flag.
 	; ebx = LFB address.
 	; ecx = BootBlock.
 	; edx = BootBlock.
-	;
+	
 
+	;testes:
 	;mov al, byte [bl_video_mode]  ;utiliza o modo passado pelo boot manager.
 	;mov al, byte 'G'             ;Flag. (useing graphics).	
 	;mov al, byte 'T'             ;Flag. (useing textmode).	
@@ -376,8 +330,9 @@ StartKernelEntry:
 .nogui:
 	mov al, byte 'T'    ;Use text mode.
 	
-    ;Debug.
-    ;*IMPORTANTE para text mode.
+    ; Debug.
+    ; Text mode.
+	
 	mov byte [0xb8000], byte "g"	
     mov byte [0xb8001], byte 9	
     mov byte [0xb8002], byte "o"	
@@ -388,17 +343,27 @@ StartKernelEntry:
 	; Go ! (Passa o comando para o Kernel.)
 	;
 	
-	;Endereço lógico.
-	jmp CODE_SEL:0xC0001000    ; Sem o header do multiboot.     
+	; Sem o header do multiboot. 
+	
+	jmp CODE_SEL:0xC0001000        
 	jmp $
 	
-headStartBLShell:
+	
+	
+;;===============================================================	
+;;
+;;  # Boot loader Shell loop #
+;;
+
+blShellLoop:	
+
     ;Aqui está aberta a opção de chamar o shell do boot loader.
     ;call _shell_main	
-	jmp headStartBLShell
+	
+	jmp blShellLoop
 
 	
-;-------------------------------------------
+;========================================================
 ; BootBlock:
 ;     Bloco de configuração de inicialização.
 ;     * 

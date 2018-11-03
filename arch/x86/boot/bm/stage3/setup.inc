@@ -4,7 +4,7 @@
 ; Descrição:
 ;     Faz configurações de hardware para a arquitetura x86.
 ;
-; Versão 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
@@ -17,16 +17,17 @@ setup_machine:
 ;setupSetupMachine:
 
     ;;
-	;; Interrupt enabling: Começaremos configurando suporte a interrupções.
+	;; Interrupt enabling: 
+	;; Começaremos configurando suporte a interrupções.
 	;;
 
     pushad
+	
 	cli
 
     ;GDT and IDT. 	
     
 	lgdt [lgdt_opcode] 
-    
 	lidt [lidt_opcode]	
 	
 	;;
@@ -64,23 +65,8 @@ setup_machine:
 	out 0x21, al
 	out 0xA1, al
 	
-	
-	;;
-	;; Configurando os timers do sistema.
-	;; Nossa opção agora é o PIT.
-	;; @todo: Para o RTC podemos fazer uma pequena inicialização agora.
-	;; pois um módulo mais completo está no kernel base.
-	;;
-	
-	;TIMER.
-	mov al, byte 0x36
-	mov dx, word 0x43
-	out dx, al
-	mov eax, dword 11930    ;Timer frequency 100 HZ.
-	mov dx, word 0x40
-	out dx, al
-	mov al, ah
-	out dx, al
+	;; #importante
+	;; Vamos deixar o kernel inicializar o PIT.	
 	
 	;;@todo:
 	;;Init RTC.
@@ -89,30 +75,39 @@ setup_machine:
 	;;step 
     ;;@todo: memory caching control.	
 	
-	;;step 
-	;processor Discovery and initialization
-	;(cpuid threads and cores, start inter-processor interrupt sipi, ap wakeu pstate,
-	;wakeup vector alignment, caching consdarations,ap idle state)	
-	;apenas o básico para o boot manager.
+	; step 
+	; processor Discovery and initialization
+	; (cpuid threads and cores, start inter-processor interrupt sipi, 
+	; ap wakeu pstate, wakeup vector alignment, caching consdarations,
+	; ap idle state)	
+	; apenas o básico para o boot manager.
 	
 		
 	;;
 	;; Fazendo alguma inicialização de dispositivos de I/O suportados.
 	;;
 
-	;step
-	;i/o devices
-	;( embedded controller EC, super io SIO, legacy free systems, miscellaneous io devices)
-    ;Nesse momento os dispositivos de i/o suportados aqui são (keyboard, IDE, graphic card).
+	; step
+	; i/o devices
+	; ( embedded controller EC, super io SIO, legacy free systems, miscellaneous io devices)
+    ; Nesse momento os dispositivos de i/o suportados aqui são (keyboard, IDE, graphic card).
+	
+	;;
+	;; #bugbug
+	;; Cancelado.
+	;; Não precisamos disso, pois vamos configurar o teclado 
+	;; durante a inicialização do i8042 no kernel.
+	;;
 	
 	;KEYBOARD.
-	call keyboardInit
+	;call keyboardInit
 	
 	;IDE0.
 	call init_ide0_master
 	
 	;LFB.
-	call configura_lfb   ;;?? onde está essa rotina ??
+	;;?? onde está essa rotina ??
+	call configura_lfb   
 	
 	
 	;
@@ -131,9 +126,7 @@ setup_machine:
     mov dword [g_current_directory_lba],  FAT16_ROOTDIR_LBA   ;Diretório do volume atual.
 	mov dword [g_current_dataarea_lba],   FAT16_DATAAREA_LBA  ;?? ;lba do inicio da area de dados do volume atual.
 	;Continua...
-		
 	
-    ;;
     ;; Configurando PCI. (O básico suportado pelo Boot Manager.)
 	;; O boot manager está carregando o BL utilizando recursos 
 	;; do BIOS em modo real. Mas se o BM fosse carregar o BL 
@@ -141,28 +134,24 @@ setup_machine:
 	;; (Se possível deixaremos para o BL o penoso trabalho de lidar
 	;; com PCI, já que o BL é feito em C, isso deve ser mais fácil para
 	;; o BL do que para o BM.)
-    ;;
 	
 	;step
 	;;PCI device descovery.	
 
-	
-	
 
 	;CURSOR.
 	call reset_cursor 
-	
 
 	;
 	; Continua ...
 	;
 	
+	; mask all interrupts.
+	
 	cli 
-
-    ;Mascara todas as interrupções.	
-	mov  al, 255
-	out  0xA1, al
-	out  0x21, al
+	mov al, 255
+	out 0xA1, al
+	out 0x21, al
 	
 	popad
 	RET

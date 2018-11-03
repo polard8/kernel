@@ -14,7 +14,7 @@
 ;     + Rotinas de reboot, via teclado.
 ;     + Rotinas de shutdown (@todo: Retirar daqui.).
 ;
-; Versão: 1.0, 2015.
+; 2015 - Created by Fred Nora.
 ;
 
 
@@ -326,9 +326,10 @@ wait_key:
 ;     Keyboard interrupt handler.
 ;     Uma das opções de interrupt handler.
 ;     Esse deve ser o antigo.
-;
+;     #todo: deletar isso.
 key_int:
 	pusha
+	;cli
 	call clear_screen
 	call init_prompt	
 	;mov al, byte "k"	
@@ -343,27 +344,36 @@ key_int:
 ;============================================================
 ; keyboardInit:
 ;     Set keyboard repeat rate to max.
+;     
 ;
 keyboardInit:
-	push ax
+	
+	;;
+	;; #bugbug
+	;; Cancelado.
+	;; Não precisamos disso, pois vamos configurar o teclado 
+	;; durante a inicialização do i8042 no kernel.
+	;;
+	
+	;push ax
 	
 	;Set Typematic Rate/Delay.
-	mov al, 0xf3
-	out 0x60, al
+	;mov al, 0xf3
+	;out 0x60, al
 
 	;30 cps and .25 second delay.
-	xor al, al
-	out 0x60, al
+	;xor al, al
+	;out 0x60, al
 
 	;Set/Reset LEDs.
-	mov al, 0xed
-	out 0x60, al
+	;mov al, 0xed
+	;out 0x60, al
 
 	;All off.
-	xor al, al
-	out 0x60, al
+	;xor al, al
+	;out 0x60, al
 
-	pop ax
+	;pop ax
 	RET
 
 
@@ -386,6 +396,6 @@ keyboardReboot:
 
 
 ;
-;fim.
+; End.
 ;
 

@@ -23,7 +23,7 @@
 
 
  
- msg_BUGBUG DB 'pmInit: #BUGBUG ENTRANDO NO MODO PROTEGIDO.',0
+msg_BUGBUG DB 'bm:pmInit: #BUGBUG',0
  
 
 ;====================================================================
@@ -41,15 +41,15 @@ pmInit:
 	
 	;call save_metafile
 
-		
- 	;
 	; Pega o modo no metafile e poe em BL.
 	; retorno em 'AL'.
-	;
 	
 	call get_boot_mode  
+	
+	; #saving boot mode.
+	
 	xor bx, bx
-	mov bl, al    ;Salva em bl.
+	mov bl, al    
 	
 	
 	pusha
@@ -60,31 +60,19 @@ pmInit:
 	
 	;debug
 	;jmp $
-
-    ; Configurando segmentos.
+	
+	;setup registers 
 	
 	cli
-	
-	;Data.
-	mov  ax, 0        
-    mov  ds, ax
-    mov  es, ax
-	;mov  fs, ax    ;Unused       
-	;mov  gs, ax    ;Unused    
-	
-	;Stack.
-	;STACK_POINTER
-	;Reconfigurando no mesmo lugar de antes.
-	
-	XOR AX, AX
+	mov ax, 0        
+    mov ds, ax
+    mov es, ax
+	;mov fs, ax           
+	;mov gs, ax        
+	xor ax, ax
     mov ss, ax
     mov sp, 0x6000 
 	
-	;General purpose.
-	xor ax, ax
-	xor bx, bx ;; #bugbug Isso suja o boot mode salvo em bl.
-	xor cx, cx
-	xor dx, dx
 	 
 	;;
 	;; GDTR
@@ -149,47 +137,36 @@ pm32:
 	;     Directory = 9C000.  
 	;
 	
-	;;
-	;; Segmentos
-	;;
+    ; Set up registers.
 	
-	;Segmentos de dados e pilha.
     mov ax, stage2_DATA_SEL        
 	mov ds, ax
 	mov es, ax
-	;mov fs, stage2_NULL_SEL    ;0.
-	;mov gs, stage2_NULL_SEL    ;0.
-	
-	;;
-	;; Pilha
-	;;
-	
+	;mov fs, stage2_NULL_SEL    
+	;mov gs, stage2_NULL_SEL    
 	mov ss, ax
-	mov esp, dword 0x0009FFFC
-	
-	;;
-	;; Uso geral.
-	;;
-	
-	;Zera os registradores.		
-    mov edx, dword 0    ;#Voice,8?!
+	mov esp, dword 0x0009FFFC	
+    mov edx, dword 0    
     mov ecx, dword 0
 	mov ebx, dword 0	
-    mov eax, dword 0    ;#Voice,14?!
-	;
+    mov eax, dword 0    
+	
+	
 .GoToStart:
     nop
-	; Mostra Msg se estivermos em modo texto.
+
+	; debug message.
 .debug_textmode:    
     mov byte [0B8000h], byte 'P'
     mov byte [0B8001h], byte 7
 	mov byte [0B8002h], byte 'M'
 	mov byte [0B8003h], byte 7
+	;jmp $
 	
-	;jmp $
 .debug_graphicmode:	
-    nop    ;;Obs: Não testar aqui o modo gráfico.
+    nop    
 	;jmp $
+	
 .do_start:
     
 	; set IOPL to zero and reset all flags
@@ -211,18 +188,18 @@ pm32:
 	;; MAS NÃO SERÁ CHAMADA NESSE MOMENTO.
 	;;
 	
-	;
 	; start:
 	; Inicia o modo escolhido que foi salvo em 'BOOT.modo'.
 	; IN: AL = Boot mode.
 	; #bugbug podemos ter um proble nessa variável BOOT BOOT.modo.
-    ;	
+	; start.inc
+    	
 	mov al, byte [BOOT.modo]	
 	JMP start
 	JMP $
 	
 
-pmMsg1 db "[BM:] Starting PM in gm in Assembly..", 13,10,0	
+;pmMsg1 db "bm:pm: Starting PM and GM in Assembly..", 13, 10, 0	
 	
 ;
 ; Contexto dos registradores após o JMP para o start.

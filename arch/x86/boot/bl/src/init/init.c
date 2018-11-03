@@ -4,7 +4,7 @@
  * Descrição:
  *     Rotinas de inicialização do Boot Loader.
  *
- * HistorY:
+ * History:
  *     2015 - Created by Fred Nora.
  *     2016 - Revision.
  */
@@ -26,7 +26,6 @@ extern unsigned long SavedBootMode;
 void set_up_color (unsigned long color){   
 	
 	g_system_color = (unsigned long) color;	
-	//return;
 };
 
 
@@ -44,7 +43,6 @@ void set_up_color (unsigned long color){
 void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
 	
     g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);
-	//return;
 };
 
 
@@ -76,10 +74,6 @@ void init_globals (){
     
 	//?? @todo: Deletar.
 	proximo = 0;
-	
-//Done.
-done:
-    return;
 };
 
 

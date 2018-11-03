@@ -31,11 +31,11 @@
 ;    ECX = 0
 ;	 EDX = 0
 ;
-; Versão: 1.0, 2015, 2016.
+; 2015 - Created by Fred Nora.
 ;
 
 
-;---------------------------------------
+;=======================================================
 ; start:
 ;     Início do modo protegido.
 ; IN:
@@ -44,33 +44,41 @@
 ; Pega o modo de vídeo passado pelo stage 2 através de AL e salva no contexto 
 ; de 32 bits.
 ;
+
 start:	
     
-	;; #bugbug Esse valor pode estar errado durante 
+	;; #bugbug 
+	;; Esse valor pode estar errado durante 
 	;; a inicialização em modo texto.
+	
 	mov byte [BOOT.modo], al			    
     
-	xor eax, eax	
-    xor ebx, ebx	
-    xor ecx, ecx	
-    xor edx, edx    ;Voice,8.	
+	xor edx, edx
+	xor ecx, ecx
+	xor ebx, ebx
+	xor eax, eax
+	
 ;	
 ; ajusta_modo: 
 ;     Inicia um modo da configuração permanente.	
 ;     @todo: Trocar o nome.
 ;
+
 ajusta_modo:
     nop
+	
 startSetupMode:
 
-	;Pega o modo de inicialisação do Boot Manager. 
-	xor eax, eax
-
-	;; #bugbug Esse valor pode estar errado durante 
+	;; #bugbug 
+	;; Esse valor pode estar errado durante 
 	;; a inicialização em modo texto.
+
+	;Pega o modo de inicialisação do Boot Manager. 
+	
+	xor eax, eax
 	mov al, byte [BOOT.modo]  
 	
-	;
+	
 	; Escolhe o modo:
 	; ==============
 	;
@@ -79,7 +87,6 @@ startSetupMode:
 	; modo 3 - Inicia a prompt de comandos do bootmanager.
 	; modo 4 - (reservado)
 	; Default.
-	;
 	
 	cmp al, byte 1  
 	je startCLI
@@ -87,14 +94,7 @@ startSetupMode:
 	cmp al, byte 2  
 	je startGUI	
 	
-	
-	;;
-	;; ## Correção de problemas ##
-	;;
-	
-	
-	;; Se 'al' estiver zerado entraremos em modo texto.
-	;; O modo texto será o padrão.
+	; Default mode.
 	
 .default:	
 	jmp startCLI 
@@ -119,10 +119,12 @@ startCLI:
 	
 	;Configura volume.
 	;;?? onde ?? blconfig.inc
+	
 	mov al, byte 1
 	call set_fs_volume  
 	
 	;Configura fs type.
+	
 	mov al, byte 1
 	call set_fs_type
 	
@@ -131,9 +133,10 @@ startCLI:
 	
     ;Habilita todas interrupções.
 .enableInterrupts:	
-	mov  al, 0					                  
-	out  0xA1, al                                   
-	out  0x21, al    
+	
+	mov al, 0					                  
+	out 0xA1, al                                   
+	out 0x21, al    
 	sti 
 	
     ;;
@@ -142,9 +145,8 @@ startCLI:
 
 	;; #importante
 	;; O shell está em msm/shell
+	;; Esse é loop do shell do boot manager.
 	
-	
-;; Esse é loop do shell do boot manager.	
 startShellLoop:	
     
 	;;shell.inc
@@ -214,7 +216,6 @@ start_msg_rebooting        db 'start: Rebooting..',13,10,0
 ;
 startGUI:
 	
-	;;
 	;; *Importante:
 	;; Fazendo configurações aqui mesmo ao invés de chamarmos 
 	;; 'setup_machine' ou ainda não fazendo essas configurações, 
@@ -223,14 +224,14 @@ startGUI:
 	;; Podemos deixar que o boot loader faça suas inicializações. 
 	;; Obs: Isso está funcionando bem.
 	;; Mas o timer foi configurado várias vezes.
-	;;	
 	
 	;;===============
 	;;setup machine
 	
 	
-	;GDT and IDT. 
 	cli
+	
+	;GDT and IDT. 
 	lgdt [lgdt_opcode] 
 	lidt [lidt_opcode]	
 	
@@ -318,8 +319,15 @@ startGUI:
 	;( embedded controller EC, super io SIO, legacy free systems, miscellaneous io devices)
     ;Nesse momento os dispositivos de i/o suportados aqui são (keyboard, IDE, graphic card).
 	
+	;;
+	;; #bugbug
+	;; Cancelado.
+	;; Não precisamos disso, pois vamos configurar o teclado 
+	;; durante a inicialização do i8042 no kernel.
+	;;	
+	
 	;KEYBOARD.
-	call keyboardInit		
+	;call keyboardInit		
 	
 	
 	;IDE0.   #BUGUBG NO QEMU
@@ -367,8 +375,6 @@ startGUI:
 	;;PCI device descovery.	
 
 	
-	
-
 	;CURSOR.
 	call reset_cursor 
 	
@@ -377,40 +383,20 @@ startGUI:
 	; Continua ...
 	;
 	
+	;mask all interrupts.
+	
 	cli 
-
-    ;Mascara todas as interrupções.	
-	mov  al, 255
-	out  0xA1, al
-	out  0x21, al	
+	mov al, 255
+	out 0xA1, al
+	out 0x21, al		
 	
+	; setup registers.
 	
-	
-	;;=============================================================================
-	
-	
-	
-	
-	
-	
-	
-	cli
-	;Segmentos.
 	mov ax, word 0x10  
 	mov ds, ax		 
 	mov es, ax 
-	;Pilha.
 	mov eax, stack_ptr
 	mov esp, eax 
-			
-	;;
-    ;;  ### bugbug ##   Essa rotina carrega o MBR pera pegar informações da partição, possivelmente
-	;; carregando o mbr em algum lugar que não devia...
-    ;;
-	
-	;Pega parametros da partição ativa.		
-    ;;##bugbug supensa por sujar areas importantes.
-	;call pegar_parametros_da_particao_ativa	  ;;blconfig.inc
 	
 	;Configura volume.
 	mov al, byte 1
@@ -423,15 +409,16 @@ startGUI:
 	;;internas.
     ;Configura LFB e Buffer.
 	call configura_lfb
-    call configura_buffer
 	
 	
-	;; #bugbug
-	;; ?? Porque habilitar isso agora ??		
-	;mov  al, 0					                  
-	;out  0xA1, al                                   
-	;out  0x21, al    
-	;sti 
+    ;; #bugbug
+    ;; Cancelando isso.
+	;; Pois esses valores estão acima do limite de 16MB.
+	;; Qualquer coisa para sistemas acima de 16MB serão 
+	;; configuradas pelo kernel depois de detectar a 
+	;; quantidade de memória.
+	
+    ;call configura_buffer
 	
 	;
 	;se configurar o modo 3 não tem como 
@@ -473,9 +460,6 @@ startGUI:
     nop
 	;@todo: Testar rotina de mostrar uma string.
     
-	
-	
-
 
 	;debug break
 	;jmp $
@@ -492,21 +476,14 @@ startGUI:
 	;call _asm_refresh_screen
 	
   
-  
-  ;;
-  ;; ## BUG BUG
-  ;;
-  ;; O teste indicou que as rotinas de char e string estão
-  ;; com mal funcionamento, travando o sistema.
-  ;; a segunda janale não aparece que sinaliza prograsso não aparece.
-  ;;
+    ;; #BUGBUG
+    ;; O teste indicou que as rotinas de char e string estão
+    ;; com mal funcionamento, travando o sistema.
+    ;; a segunda janale não aparece que sinaliza prograsso não aparece.
   
   
-  ;;
-  ;; @todo: Fazer debug da função print char antes de tudo ...
-  ;;
-  ;; status: testando ...
-  ;;
+    ;; @todo: Fazer debug da função print char antes de tudo ...
+    ;; status: testando ...
   
 ;Char.
     ;
@@ -588,11 +565,10 @@ startGUI:
 	;String
 	;mov esi, msg_start_loading
 	;call lib32PrintString
-	;call _asm_refresh_screen
-	
+	;call _asm_refresh_screen	
 	
   	;;debug
-	mov esi, startMsgTest1   ;;crazy message
+	mov esi, startMsgTest1   
 	call lib32PrintString
     call _asm_refresh_screen
 	;;jmp $	
@@ -609,11 +585,10 @@ startGUI:
 	;
 
 	
-	;
 	; Carrega o Boot Loader.
 	; Carrega o arquivo  BL.BIN na memória e passa o comando para ele.
 	; Enviando argumento em AL, e EBX.
-	;
+	
 .LoadBootLoader:	
 	
     ;;;;
@@ -623,19 +598,11 @@ startGUI:
 	;;;;  *NÃO* DEVEMOS CARREGA-LO NOVAMENTE NESSE MOMENTO USANDO RECURSO DE 32BIT.
 	;;;;
 	
-	;####CANCELADO####
-	;call load_boot_loader
 	
-	;
 	; Obs: Não carrega mais pois ele está em assembly 
 	; e faz parte do System4Nora.
-	;
-	
-	;
 	; Obs: Estamos sinalizando o progresso desenhando janelas,
 	;      más haverá uma rotina de imprime caracteres.
-	;
-	
 	
 	;mov eax, 40  ;x.
 	;mov ebx, 0   ;y.
@@ -645,10 +612,9 @@ startGUI:
 	;call CreateWindow
 	;call _asm_refresh_screen
 
-	mov esi, msg_start_ok
-	call lib32PrintString	
-	call _asm_refresh_screen
-	
+	;mov esi, msg_start_ok
+	;call lib32PrintString	
+	;call _asm_refresh_screen
 	
 ;;
 ;;======================
@@ -660,21 +626,23 @@ startGUI:
 	call _asm_refresh_screen
     ;jmp $
 	
-    ;cabeçalho PE. no BL.BIN.
-	mov edx, dword 0x20000 ;IMAGE_ADDRESS
+	;;
+    ;; Check PE binary in BL.BIN.
+	;;
+	
+	mov edx, dword 0x20000    ;IMAGE_ADDRESS
 	mov eax, [edx]
     
-	;Primeiro byte 
+	;first byte.
 	cmp al, byte 'L'
 	jne .peFail	
 	
 	inc edx 
 	mov eax, [edx]
 
-	;segundo byte
+	;second byte.
 	cmp al, byte 0x01
 	jne .peFail	
-	
 	
 .preparandoArgumentos:
  
@@ -713,9 +681,7 @@ startGUI:
 	mov ecx, ebp                           ;tabela
 	mov edx, ebp                           ;tabela
 	
-	;
-    ; Go! ( Passa o comando para o entrypoint do Boot Loader. ) BL.BIN. 
-    ;	
+
 	
 	;call _background_teste
 	;call _background
@@ -740,12 +706,19 @@ startGUI:
 	;; para isso o MBR precisa passar argumentos ...isso tem que refazer.
 	;;
 .goBL:
+
+	;
+    ; Go!  
+    ;	
+	
+	;( Passa o comando para o entrypoint do Boot Loader. ) BL.BIN.
 	
 	jmp 8:IMAGE_ADDRESS_ENTRY_POINT
 	JMP $
 	
 ;O arquivo não está presente na memória.	
 .peFail:
+
     mov eax, 0x00ffff00 ;color
 	mov esi, msg_start_sig
 	call lib32PrintString
@@ -802,15 +775,24 @@ configura_lfb:
 ;startSetupBuffer:
 	
 configura_buffer:
+
+    ;; #bugbug
+    ;; Cancelando isso.
+	;; Pois esses valores estão acima do limite de 16MB.
+	;; Qualquer coisa para sistemas acima de 16MB serão 
+	;; configuradas pelo kernel depois de detectar a 
+	;; quantidade de memória.
+	
 	;buffer 1,2 e 3.
-	push edx
-   	mov edx, dword 0x01000000		
-	mov dword [VIDEO.buffer1], edx
-   	mov edx, dword 0x01500000		
-	mov dword [VIDEO.buffer2], edx
-   	mov edx, dword 0x01A00000		
-	mov dword [VIDEO.buffer3], edx 
-	pop edx
+	;push edx
+   	;mov edx, dword 0x01000000		
+	;mov dword [VIDEO.buffer1], edx
+   	;mov edx, dword 0x01500000		
+	;mov dword [VIDEO.buffer2], edx
+   	;mov edx, dword 0x01A00000		
+	;mov dword [VIDEO.buffer3], edx 
+	;pop edx
+	
 	ret
 ;--	
 	
@@ -820,10 +802,10 @@ configura_buffer:
 ;
 
 ;usando em start.
-startMsgTest1        db "BM:startGUI: startGUI: :)", 13,10,0
-msg_start_ok         db "BM:startGUI: OK", 13,10,0	
-msg_start_jumping    db "BM:startGUI: Jumping to BL.BIN..",13,10,0		
-msg_start_sig        db "BM:startGUI: PE sig fail!",13,10,0	
+startMsgTest1        db "BM:startGUI: startGUI:", 13, 10, 0
+msg_start_ok         db "BM:startGUI: OK", 13, 10, 0	
+msg_start_jumping    db "BM:startGUI: Jumping to BL.BIN", 13, 10, 0		
+msg_start_sig        db "BM:startGUI: PE sig fail", 13, 10, 0	
 
 ;filtrar.
 ;msg_start_debug_hang db "BM: *start: Debug hang!", 13,10,0	
@@ -835,8 +817,6 @@ msg_start_sig        db "BM:startGUI: PE sig fail!",13,10,0
 ;msg_no_new_mode_todo db "BM: @todo: save new mode in a file.", 13,10,0	
 ;msg_no_new_mode      db "BM error: video mode fail!", 13,10,0	
 ;msg_iniciando_shell  db "BM: Starting Boot Manager Shell..", 13,10,0
-
-
 ;...
 
 ;
