@@ -49,7 +49,7 @@ void ps2_keyboard_initialize (){
 	
 	if ( (void *) ioControl_keyboard == NULL )
 	{
-		printf("ldsic-init_keyboard: ioControl_keyboard fail");
+		printf("ps2_keyboard_initialize: ioControl_keyboard fail");
 		die();
 	}else{
 	    

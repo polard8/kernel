@@ -14,7 +14,7 @@
  
 #include <kernel.h>
 
-
+//deletar isso.
 //Protótipo do procedimento.
 unsigned long 
 DialogBoxProcedure ( struct window_d *window, 
@@ -30,8 +30,7 @@ DialogBoxProcedure ( struct window_d *window,
 
 /*
 //rotina interna de suporta ao mouseHandler 
-#define _MOUSE_X_SIGN 0x10
-#define _MOUSE_Y_SIGN 0x20
+
 
 void
 update_mouse1()
@@ -477,11 +476,13 @@ void mouseHandler (){
 	mouse_buttom_2 = 0;
 	mouse_buttom_3 = 0;
 	
-	if( ( mouse_packet_data & 0x01 ) == 0 )
+	
+	// ## LEFT ##
+	if( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) == 0 )
 	{
 		//liberada.
 		mouse_buttom_1 = 0;
-	}else if( ( mouse_packet_data & 0x01 ) != 0 )
+	}else if( ( mouse_packet_data & MOUSE_LEFT_BUTTON ) != 0 )
 	    {
 		    //pressionada.
 		    //Não tem como pressionar mais de um botão por vez.
@@ -490,12 +491,13 @@ void mouseHandler (){
 	        mouse_buttom_3 = 0;		  
 	    }
 			  
-
-	if( ( mouse_packet_data & 0x02 ) == 0 )
+    
+	// ## RIGHT ##
+	if( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) == 0 )
 	{
 	    //liberada.
 	    mouse_buttom_2 = 0;
-	}else if( ( mouse_packet_data & 0x02 ) != 0 )
+	}else if( ( mouse_packet_data & MOUSE_RIGHT_BUTTON ) != 0 )
 	    {
 		    //pressionada.
 		    //Não tem como pressionar mais de um botão por vez.
@@ -504,11 +506,13 @@ void mouseHandler (){
 	        mouse_buttom_3 = 0;		  			 
 	    }
 			  
-	if( ( mouse_packet_data & 0x04 ) == 0 )
+	
+	// ## MIDDLE ##
+	if( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) == 0 )
 	{
 	    //liberada.
 	    mouse_buttom_3 = 0;
-	}else if( ( mouse_packet_data & 0x04 ) != 0 )
+	}else if( ( mouse_packet_data & MOUSE_MIDDLE_BUTTON ) != 0 )
 	    {
 	        //pressionada.
 		    //Não tem como pressionar mais de um botão por vez.			 
@@ -940,6 +944,8 @@ void mouseHandler (){
  */
 void ps2_mouse_initialize (){
 	
+	int error_code = 0;
+	
 	unsigned char status;
 	
     // Flush the output buffer
@@ -948,14 +954,20 @@ void ps2_mouse_initialize (){
 	}
 	
 	
+	printf("ps2_mouse_initialize: enable second port\n");
+	refresh_screen();
+	
 	
 	// Ativar a segunda porta PS/2.
 	kbdc_wait(1);
-	outportb(0x64,0x60);    
+	outportb(0x64,I8042_WRITE);    
 	kbdc_wait(1);
-	outportb(0x64,0xA8); 
+	outportb(0x64,I8042_ENABLE_SECOND_PORT); //0xA8
 
 
+	
+	printf("ps2_mouse_initialize: enable second device\n");
+	refresh_screen();
 	
 	
 	// Activar o segundo despositivo PS/2, modificando o status de 
@@ -968,14 +980,14 @@ void ps2_mouse_initialize (){
 	 // Defina a leitura do byte actual de configuração do controlador PS/2.
 	 //0x20 Read "byte 0" from internal RAM
 	kbdc_wait(1);    
-	outportb(0x64,0x20);    
+	outportb(0x64,I8042_READ);    
 	kbdc_wait(0);
-	//status = inportb(0x60)|2;  
-	status = inportb(0x60)| 3;  
+	status = inportb(0x60)|2;  
+	//status = inportb(0x60)| 3;  
 	
 	// defina, a escrita  de byte de configuração do controlador PS/2.
 	kbdc_wait(1);
-	outportb(0x64,0x60);  
+	outportb(0x64,I8042_WRITE);  
 	// devolvemos o byte de configuração modificado.
 	kbdc_wait(1);
 	outportb(0x60,status);  	
@@ -1004,29 +1016,33 @@ void ps2_mouse_initialize (){
 	
 
 
- 
+ 	printf("ps2_mouse_initialize: restores defaults\n");
+	refresh_screen();
 
   // Restaura defaults do PS/2 mouse.
 	kbdc_wait(1);
-	outportb(0x64,0x60);    
+	outportb(0x64,I8042_WRITE);    
     kbdc_wait(1);
-    mouse_write(0xf6);
-    while (mouse_read() != 0xfa);
+    mouse_write(MOUSE_SET_DEFAULTS);  //0xf6
+    while ( mouse_read() != I8042_ACKNOWLEDGE );
 
+	
+ 	printf("ps2_mouse_initialize: enable transmission\n");
+	refresh_screen();	
 
    // TODO: Pode ser interessante diminuir a sensibilidade do mouse
    // aqui!!!
-
+  //( 0xF4 = Habilita o mouse streaming, Enable Data Reporting,ENABLE MOUSE TRANSMISSION )
   // Habilita o mouse streaming
   // Interessante notar que, no modo streaming,
   // 1 byte recebido do PS/2 mouse gerar  uma IRQ...
   // Talvez valha a pena DESABILITAR o modo streaming
   // para colher os 3 dados de uma s¢ vez na IRQ!
 	kbdc_wait(1);
-	outportb(0x64,0x60);      
+	outportb(0x64,I8042_WRITE);      
     kbdc_wait(1);
-    mouse_write(0xf4);
-    while (mouse_read() != 0xfa);         // ACK
+    mouse_write(MOUSE_ENABLE_DATA_REPORTING);  //0xf4
+    while ( mouse_read() != I8042_ACKNOWLEDGE );        
 	
 	
 	
@@ -1040,6 +1056,18 @@ void ps2_mouse_initialize (){
 		inportb(0x60);
 	}	
   
+  
+init_mouse_exit:
+    
+	// Se ouve um erro, então analisamos e exibimos mensagem sobre ele.
+	if (error_code != 0)
+    {
+	    //
+        		
+	}		
+	
+ 	printf("ps2_mouse_initialize: done\n");
+	refresh_screen();		
 	
     //#imporante:
 	//não habilitaremos e não resetaremos o dispositivo.

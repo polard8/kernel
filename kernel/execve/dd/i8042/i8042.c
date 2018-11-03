@@ -9,7 +9,7 @@
  
 #include <kernel.h>
 
-
+//deletar
 unsigned long 
 MessageBoxProcedure( struct window_d *window, 
                      int msg, 
@@ -50,6 +50,10 @@ void ps2 (){
 	// envie dados no momento da configuração.
 
 //desablePorts:
+
+    //##bugbug
+	//não sabemos o efeito colateral disso.
+	//isso pode dar problema.
 	
 	// Desativar a primeira porta PS/2.
 	kbdc_wait(1);
