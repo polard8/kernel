@@ -57,6 +57,7 @@ void crt0 (){
     
 	stdioInitialize ();	
 
+
 	Response = (int) shmain ( 3, argv ); 
 								
 									

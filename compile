@@ -3,6 +3,7 @@
 # This script is running very well,
 # but we need to fix something to have a 
 # fully working Linux experience.
+# todo: we need to remake all the compilation part.
 
 #!/bin/bash
 

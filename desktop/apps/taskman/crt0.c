@@ -33,6 +33,11 @@ void crt0 (){
 	//Inicializando o suporte ao fluxo padrão.
     stdioInitialize();	
 	
+	// #debug
+	// Testing output message.
+	// printf("crt0: TASKMAN.BIN is alive \n");
+    // refresh_screen();
+	
 	ExitCode = (int) appMain ( 0, 0 ); 
 	
 	// Chama kill ou exit de acordo com o problema ocorrido em main.

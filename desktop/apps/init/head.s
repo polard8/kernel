@@ -67,6 +67,9 @@ segment .head_x86
 global _idle_entry_point              
 _idle_entry_point:
     nop
+	
+
+	
 .checkFlag:	
 	
 	;Inicializa chamando main().
@@ -88,6 +91,10 @@ _idle_entry_point:
 	
 .default:
     nop
+	
+	; #debug
+	; Mostra uma mensagem para sabermos que estamos vivos.
+	jmp do_initMain	
 	
 	;;
 	;; *IDLE LOOP

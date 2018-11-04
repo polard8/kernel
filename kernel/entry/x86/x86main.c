@@ -133,12 +133,13 @@ void startStartIdle (){
 	//Current process.
 	current_process = IdleThread->process->pid;
 	
-//Done!
-//done:
-    //Debug:
- 
-    //printf("* Starting idle TID=%d \n", Thread->tid);
-    //refresh_screen(); //@todo:  
+    //
+	// Done!
+    //
+	
+    // #debug
+    printf("x86main-startStartIdle: Starting idle TID=%d \n", IdleThread->tid );
+    refresh_screen(); 
 
 
     for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
@@ -150,9 +151,9 @@ void startStartIdle (){
 
 
     //Set cr3 and flush TLB.
-    mainSetCr3( (unsigned long) IdleThread->Directory);
-    asm("movl %cr3, %eax");
-    asm("movl %eax, %cr3");
+    mainSetCr3 ( (unsigned long) IdleThread->Directory);
+    asm ("movl %cr3, %eax");
+    asm ("movl %eax, %cr3");
 
 
     /* turn_task_switch_on:

@@ -131,6 +131,16 @@ static char * envp[] = { "ROOT=root:/volume0", NULL };
 void initMain (void){
 	
 	//nothing for now.
+	
+	
+	//libcInitRT ();
+    
+	//stdioInitialize ();		
+	
+	// #debug
+	// Testing output message.
+	//printf("initMain: INIT.BIN is alive \n");
+    //refresh_screen();	
 };
 
 
