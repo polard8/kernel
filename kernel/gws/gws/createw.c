@@ -197,6 +197,7 @@ CreateWindow( unsigned long type,
 	
 	// Title bar buttons. [v] [X] 
 	int MinimizeButton = 0; 
+	int MaximizeButton = 0; 
 	int CloseButton = 0;    
     //..
 	
@@ -208,21 +209,23 @@ CreateWindow( unsigned long type,
 	int ButtonUp = 0;   //??
 	int ButtonSysMenu = 0;  //system menu na barra de títulos.	
     int Border = 0;         //New !!! usado no edit box.
-	
+	//int ScrollBar;
+	//...
 	
 	// Desktop support.
     int ParentWindowDesktopId;    //Id do desktop da parent window.
 	int WindowDesktopId;          //Id do desktop da janela a ser criada.
 
-	// ??
-	//struct window_d *internal_window;	
 	
-	struct window_d *windowButton1;	
-    struct window_d *windowButton2;
+	//controle de janela
+	struct window_d *windowButton1;  //minimize	
+    struct window_d *windowButton2;	 //maximize
+	struct window_d *windowButton3;  //close
 	
-	struct window_d *windowButton3;
+	//botões na barra de rolagem.
 	struct window_d *windowButton4;
 	struct window_d *windowButton5;
+	struct window_d *windowButton6;
 	
     // Structs.	
 	struct window_d *window;
@@ -740,7 +743,7 @@ CreateWindow( unsigned long type,
 		//6) scroll bar.
         //   // Cria uma scroll bar. Para ser usada como janela filha.
 		case WT_SCROLLBAR:
-	        //Background = 1;    //bg.
+			//Background = 1;    //bg.
 		    //window->backgroundUsed = 1;
             //bordas.
             //Border = 1;
@@ -1090,8 +1093,14 @@ drawBegin:
 			
 			// Registrar.
 			RegisterWindow (windowButton1);
+			window->minimize = windowButton1;
 	    };
 		
+		//if (MaximizeButton == 1)
+		//{
+			
+		//}
+	
 		//@todo: Se estivermos em full screen, não teremos botão.
 	    if (CloseButton == 1)
 		{
@@ -1101,13 +1110,14 @@ drawBegin:
 			// SERÁ ASSIM DAQUI PRA FRENTE.
 			
 			// Criar.
-			windowButton2 = CreateWindow ( WT_BUTTON, 1, 1, "X", 
+			windowButton3 = CreateWindow ( WT_BUTTON, 1, 1, "X", 
 	                            (window->width -40), 2, 40, 40,									  
 			                    window, 0, 
 								(unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
             
 			// Registrar.
-			RegisterWindow (windowButton2);
+			RegisterWindow (windowButton3);
+			window->close = windowButton3;
 	    };					 
 		
 		//...			 
@@ -1346,21 +1356,31 @@ drawBegin:
 	//se create window foi usada para criar uma janela filha do tipo scroll bar. 		
 	//completaremos 
 	if ( (unsigned long) type == WT_SCROLLBAR )
-	{ 
+	{
+
+		
         //bg
 		drawDataRectangle ( window->left, window->top, 
 			window->width, window->height, window->bg_color ); 
 						   
-	    //Botão de cima da scrollbar vertival
+	    
+		//#importante 
+		//#todo
+        Parent->scrollbarUsed = 1;
+		Parent->scrollbar = window;
+
+		
+		//Botão de cima da scrollbar vertival
 		
 		// Criar.
-		windowButton3 = CreateWindow ( WT_BUTTON, 1, 1, "^", 
+		windowButton4 = CreateWindow ( WT_BUTTON, 1, 1, "^", 
 	        1, 1, (window->width -2), 32,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
         
 		// Registrar.
-		RegisterWindow (windowButton3); 			
-			
+		RegisterWindow (windowButton4);  		
+        window->scrollbar_button1 = windowButton4; 
+		
 		//#test	
 	    //limits
 	    if ( window->height == 0 || window->height > 800 ){ 
@@ -1370,23 +1390,25 @@ drawBegin:
 	    //Botão do meio da scrollbar vertival
 		
 		// Criar.
-		windowButton4 = CreateWindow( WT_BUTTON, 1, 1, "=", 
+		windowButton5 = CreateWindow( WT_BUTTON, 1, 1, "=", 
 	        1, (window->height/2), (window->width -2), 32,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 		
 		// Registrar.
-		RegisterWindow (windowButton4);
-					
+		RegisterWindow (windowButton5);
+		window->scrollbar_button3 = windowButton5;
+		
 	    //botão 2 da barra horizontal.
         //Botão de baixo da scrollbar vertival
 	    
 		// Criar.
-		windowButton5 = CreateWindow( WT_BUTTON, 1, 1, "v", 
+		windowButton6 = CreateWindow( WT_BUTTON, 1, 1, "v", 
 	        1, (window->height -32 -1), (window->width -2), 32,									  
 		    window, 0, (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);			
 	    
 		// Registrar.
-		RegisterWindow (windowButton5);
+		RegisterWindow (windowButton6);
+		window->scrollbar_button2 = windowButton6;
 	};	
 
 	
@@ -1397,6 +1419,12 @@ drawBegin:
 						   
 		draw_string ( window->left +8, window->top +8, COLOR_TEXT,  
 			window->name );  
+			
+			
+		//#importante 
+		//#todo
+        Parent->statusbarUsed = 1;
+		Parent->statusbar = window;
 	};
 	
 	//JANELA DO TIPO BOTÃO.
@@ -1469,6 +1497,7 @@ drawBegin:
 		
 		// Registrar.
 		RegisterWindow (window->scrollbar);
+
         
 		//Se a scrollbar foi criada então a área de cliete deve ser atualizada, 
         //para isso a área de cliente deve ter sido configurada antes disso.		

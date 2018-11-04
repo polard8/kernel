@@ -632,6 +632,7 @@ void mouseHandler (){
 				
 				refresh_rectangle ( Window->left, Window->top, 20, 20 );
 			    //refresh_rectangle ( savedmouseoverwindowX, savedmouseoverwindowY, 20, 20 );
+				
 			}
 			
 			//não podemos mais fazer refresh.

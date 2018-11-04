@@ -840,7 +840,7 @@ struct window_d
 	int statusbarUsed;
 	int scrollbarUsed;
 	int minimizebuttonUsed;
-	int maxmizebuttonUsed;
+	int maximizebuttonUsed;
 	int closebuttonUsed;
 	int borderUsed;
 	
@@ -901,7 +901,15 @@ struct window_d
 	
 	// scroll bar
 	struct window_d *scrollbar;
+	struct window_d *scrollbar_button1;
+	struct window_d *scrollbar_button2;
+	struct window_d *scrollbar_button3;
 	
+	// scroll bar
+	//struct window_d *scrollbar;
+	//struct window_d *scrollbar_button1;
+	//struct window_d *scrollbar_button2;
+	//struct window_d *scrollbar_button3;
 	
 	// status bar
 	struct window_d *statusbar;	
@@ -1114,7 +1122,13 @@ struct window_d
 	int selected;     //seleção  de item de menu.
     const char *text; //@todo usar unsigned char.
 
-    //
+    struct window_d *minimize;
+	struct window_d *maximize;
+	struct window_d *close;
+	
+	
+	
+	//
     // Ações.
     //
 
@@ -1140,6 +1154,9 @@ struct window_d
 	
 	struct button_d *current_button;  //Botão atual.      
     struct button_d *buttonList;      //Lista encadeada de botões em uma janela.
+	
+	
+	
 	
 	//
 	// Mouse cursor support ???

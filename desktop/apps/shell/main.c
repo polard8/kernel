@@ -1406,6 +1406,7 @@ shellProcedure( struct window_d *window,
 						updateVisibleArea( 0 );
 						shellRefreshVisibleArea(); 
                         //shellScroll();
+						break;
 					}
 
 					//baixo
@@ -1413,7 +1414,11 @@ shellProcedure( struct window_d *window,
                     {
                         updateVisibleArea( 1 );
 						shellRefreshVisibleArea();
+					    break;
 					}
+					
+					APISetActiveWindow (window);
+					APIredraw_window ( window, 1 );
 					
 					//botão de close
 					//if ( window == close_button )

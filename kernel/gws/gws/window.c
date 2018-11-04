@@ -100,7 +100,7 @@ int show_saved_window (struct window_d *window){
 };
 
 
-//mostra o retãngulo de uma janela que está no backbuffer.
+//mostra o retângulo de uma janela que está no backbuffer.
 //tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
 int show_window_rect (struct window_d *window){
 	
@@ -1782,7 +1782,7 @@ redrawBegin:
 	if (window->backgroundUsed == 1)
 	{		
 		drawDataRectangle ( window->left, window->top, 
-			window->width, window->height, window->bg_color );      	
+			window->width, window->height, window->bg_color );  	
 	};
 	
 	
@@ -1792,8 +1792,13 @@ redrawBegin:
 	{
 		//#bugbug 
 		//a cor da borda e o size vão depender do status da janela.
-		border_color = COLOR_BLUE;
-		//border_color = COLOR_INACTIVEBORDER; 
+		
+		if (window->active == 1)
+		{ 
+	        border_color = COLOR_BLUE;
+		}else{
+			border_color = COLOR_INACTIVEBORDER; 
+		} 
 		
 		//border_size = 1;
 		border_size = 2;
@@ -1869,33 +1874,48 @@ redrawBegin:
 		
 		//@todo: Se estivermos em full screen, não teremos botão.	
 		if(window->minimizebuttonUsed == 1)
-		{
-			// #bugbug:
-			// Erro: Essa função é de redraw, então não podemos usar draw_button 
-			// ao invés, precisamos usar redraw_button, que será criada.
-			
-			//Quando passamos o handle da janela, a função draw_button
-			//obtem as margens que precisa. nos resta passarmos os 
-			//deslocamentos em relação às margens. (x=window->width-?) (y=2).
-			//A função draw_button vai somar a margem obtida pelo handle 'window'
-			//ao deslocamento obtido em (x=window->width-?).
-	        draw_button ( window, "V", 
-			    1, 0, 0, 
-			    (window->width -42 -1), 2, 21, 21, 
-				COLOR_TERMINAL2 );	
+		{        
+			if( window->minimize != NULL )
+			{
+				if ( window->minimize->used == 1 && window->minimize->magic == 1234 )
+				{
+			        draw_button ( window, "V", 
+			            1, 0, 0, 
+			            window->minimize->left, window->minimize->top, window->minimize->width, window->minimize->height, 
+				        window->minimize->bg_color );						
+				}
+				
+			}
 	    };
 		
+		if(window->maximizebuttonUsed == 1)
+		{
+			if( window->maximize != NULL )
+			{
+				if ( window->maximize->used == 1 && window->maximize->magic == 1234 )
+				{
+			        draw_button ( window, "^", 
+			            1, 0, 0, 
+			            window->maximize->left, window->maximize->top, window->maximize->width, window->maximize->height, 
+				        window->maximize->bg_color );						
+				}
+				
+			}					
+		}
 		//@todo: Se estivermos em full screen, não teremos botão.
 	    if (window->closebuttonUsed == 1)
 		{			
-			// #bugbug:
-			// Erro: Essa função é de redraw, então não podemos usar draw_button 
-			// ao invés, precisamos usar redraw_button, que será criada.
-			
-	        draw_button ( window, "X", 
-			    1, 0, 0, 
-			    (window->width -21), 2, 21, 21, 
-				COLOR_TERMINAL2 );				
+			if( window->close != NULL )
+			{
+				if ( window->close->used == 1 && window->close->magic == 1234 )
+				{
+			        draw_button ( window, "X", 
+			            1, 0, 0, 
+			            window->close->left, window->close->top, window->close->width, window->close->height, 
+				        window->close->bg_color );						
+				}
+				
+			}		
 	    };					 
 					
 		//More??...			 		 
@@ -1903,7 +1923,7 @@ redrawBegin:
 	
 	
 
-   // Client Area. 	
+    // Client Area. 	
 	if (window->clientAreaUsed == 1)
 	{
 		//
@@ -1950,16 +1970,113 @@ redrawBegin:
 		//Nothing.
 	};
 
+	
+    //#obs: Talvez isso pode ficar dentro do if de client window.
+    if (window->scrollbarUsed == 1)
+    {
+	    if ( window->scrollbar != NULL )
+		{
+			if ( window->scrollbar->used == 1 && 
+			     window->scrollbar->magic == 1234 )
+			{
+                drawDataRectangle ( (unsigned long) window->scrollbar->left, 
+		                          (unsigned long) window->scrollbar->top, 
+						          (unsigned long) window->scrollbar->width, 
+						          (unsigned long) window->scrollbar->height, 
+						          (unsigned long) window->scrollbar->bg_color );
+            
+			
+			    if ( window->scrollbar->scrollbar_button1 != NULL )
+				{
+					if ( window->scrollbar->scrollbar_button1->used == 1 &&
+					     window->scrollbar->scrollbar_button1->magic == 1234 )
+					{
 
-    //if( window->type == WT_SCROLLBAR )
-		
-	//if( window->type == WT_STATUSBAR )
-		
+			            draw_button ( window->scrollbar, "^", 
+			                1, 0, 0, 
+			                window->scrollbar->scrollbar_button1->left, 
+							window->scrollbar->scrollbar_button1->top, 
+							window->scrollbar->scrollbar_button1->width, 
+							window->scrollbar->scrollbar_button1->height, 
+				            window->scrollbar->scrollbar_button1->bg_color );											
+							 
+					}						 
+					
+				}
+				
+				
+			    if ( window->scrollbar->scrollbar_button2 != NULL )
+				{
+					if ( window->scrollbar->scrollbar_button2->used == 1 &&
+					     window->scrollbar->scrollbar_button2->magic == 1234 )
+					{
+
+			            draw_button ( window->scrollbar, "=", 
+			                1, 0, 0, 
+			                window->scrollbar->scrollbar_button2->left, 
+							window->scrollbar->scrollbar_button2->top, 
+							window->scrollbar->scrollbar_button2->width, 
+							window->scrollbar->scrollbar_button2->height, 
+				            window->scrollbar->scrollbar_button2->bg_color );											
+							 
+					}						 
+					
+				}
+				
+				
+			    if ( window->scrollbar->scrollbar_button3 != NULL )
+				{
+					if ( window->scrollbar->scrollbar_button3->used == 1 &&
+					     window->scrollbar->scrollbar_button3->magic == 1234 )
+					{
+
+			            draw_button ( window->scrollbar, "v", 
+			                1, 0, 0, 
+			                window->scrollbar->scrollbar_button3->left, 
+							window->scrollbar->scrollbar_button3->top, 
+							window->scrollbar->scrollbar_button3->width, 
+							window->scrollbar->scrollbar_button3->height, 
+				            window->scrollbar->scrollbar_button3->bg_color );											
+							 
+					}						 
+					
+				}
+			
+		        //outros botões...
+			
+			};								
+		};
+	};		
+	
+    
+	//status bar
+	if (window->statusbarUsed == 1)
+    {
+	    if ( window->statusbar != NULL )
+		{
+			if ( window->statusbar->used == 1 && 
+			     window->statusbar->magic == 1234 )
+			{
+		        drawDataRectangle ( window->statusbar->left, window->statusbar->top, 
+			        window->statusbar->width -1, window->statusbar->height, window->statusbar->bg_color ); 	
+						   
+		        draw_string ( window->statusbar->left +8, window->statusbar->top +8, COLOR_TEXT,  
+			        window->statusbar->name );  
+				
+			}
+		}
+	}
 	
 	//#bugbug: 
 	//Até agora repintamos a janela relativa ao botão. Provavelmente 
 	//referese à apenas seu background. Porém para redesenharmos o botão
 	//precisamos criar uma função redraw_button, semelhante a função draw_button.
+	
+	//#bugbug
+	//talvez isso não seja necessário. 
+	//poderemos apenas repintar a janela tipo botão do mesmo jeito que repintamos
+	//as outras e apenas atualizar a estrutura se for necessário.
+	
 	if ( window->type == WT_BUTTON )
 	{
 	    if ( window->isButton == 1 )
@@ -2044,7 +2161,7 @@ redrawBegin:
 		}			
 	};
 
-	//if( window->type == WT_OVERLAPPED)
+	 
 		
 	//
 	// Outros elementos ainda não implementados ...
@@ -2313,14 +2430,15 @@ fail:
  * signifcicar apenas sinalizar para o GC que ele 
  * pode atuar sobre a estrutura.
  */
-void CloseWindow( struct window_d *window )
-{
+void CloseWindow( struct window_d *window ){
+	
 	int Offset;
 	
 	//Check.
-	if( (void*) window == NULL )
+	if ( (void *) window == NULL )
 	{ 
 	    return; 
+		
 	}else{
 
 	    //Obs:
@@ -2336,9 +2454,8 @@ void CloseWindow( struct window_d *window )
 	    KillFocus(window);
 		
 		
-	
         //Se temos uma janela mãe válida. Ela herda o foco.
-	    if( (void*) window->parent != NULL )
+	    if ( (void *) window->parent != NULL )
 	    {
             if( window->parent->used == 1 && 
 			    window->parent->magic == 1234 )
@@ -2356,7 +2473,7 @@ void CloseWindow( struct window_d *window )
 	
 	    int z = (int) window->zIndex;
 	
-	    if( z >= 0 && z < ZORDER_COUNT_MAX )
+	    if ( z >= 0 && z < ZORDER_COUNT_MAX )
 	    {
 		    //retira da lista
 	        zorderList[z] = (unsigned long) 0;	
@@ -2364,7 +2481,7 @@ void CloseWindow( struct window_d *window )
 		    //atualiza o contador.
             zorderCounter--;
 	   
-	        if(zorderCounter < 0 ){
+	        if (zorderCounter < 0 ){
 		        zorderCounter = 0;
             }
 	    };
@@ -2397,20 +2514,19 @@ done:
  *          como janela principal de um processo.
  *   Obs: Apenas sinalizaremos para o GC.
  */
-void DestroyWindow( struct window_d *window )
-{	
-    CloseWindow(window);
+void DestroyWindow ( struct window_d *window ){
+	
+    CloseWindow (window);
 };
 
 
 /*
- ***************************************************
  * get_active_window:
  *     Obtem o id da janela ativa.
  *     @todo: Mudar para windowGetActiveWindowId().
  */
-int get_active_window()
-{
+int get_active_window (){
+	
     return (int) active_window;  
 };
 
@@ -2423,8 +2539,13 @@ int get_active_window()
  */
 void set_active_window (struct window_d *window){
 	
+	//devemos desativar a antiga janela ativa.
+	int save = active_window;
+	
+	
 	//Check window.
-	if ((void *) window == NULL )
+	
+	if ( (void *) window == NULL )
 	{ 
 	    return; 
 	
@@ -2432,18 +2553,68 @@ void set_active_window (struct window_d *window){
 
 	    if ( window->used == 1 && window->magic == 1234 )
 		{
-		    window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND;
+			
+			//#importante:
+			//se a janela já for a janela ativa, não precisamos ativa.
+			if( window->id == active_window )
+			{ 
+		        return;
+			}
+			
+			// Se não tem uma janela mãe ou 
+            // se ajanela mãe for uma das janelas básicas.			
+			if ( window->parent == NULL ||
+			     window->parent == gui->main ||
+				 window->parent == gui->screen )
+			{
+		        window->active = 1;
+				window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND;
 
-			//Estrutura global
-	        ActiveWindow = (void *) window;
+			    //Estrutura global
+	            ActiveWindow = (void *) window;
 
-		    //Variável global
-            active_window = (int) window->id;				
+		        //Variável global
+                active_window = (int) window->id;								
+                goto exit;				
+			}			
+			
+			//se tem janela mãe e a janela mãe 
+			//não for uma das janelas básicas.
+			//então a janela mão será ativada.
+			
+			if ( window->parent != NULL && 
+			     window->parent != gui->main && 
+			     window->parent != gui->screen )
+			{
+				
+	            set_active_window (window->parent);
+                goto exit;				
+			}
+
+            //??
+            //return; 			
 		}
 	};
 	//Nothing.
-//done:
-    //return;
+	
+    struct window_d *old;	
+	
+//desativar a antiga janela ativa.
+exit:
+
+    old = (void *) windowList[save];
+	
+	if ( (void *) old != NULL )
+	{
+		if ( old->used == 1 && old->magic == 1234 )
+		{
+            old->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;				
+		    old->active = 0;
+		}
+		
+	};
+
+    return;	
 };
 
 
@@ -2451,8 +2622,8 @@ void set_active_window (struct window_d *window){
  * change_active_window:
  *     @todo: Trocar a janela ativa
  */
-void change_active_window(int id)
-{
+void change_active_window (int id){
+	
 	// @todo: Limits. Max.
     if(id < 0){
 	    return;
@@ -2466,18 +2637,18 @@ void change_active_window(int id)
  *     Mostra o id da janela ativa.
  *     @todo: Mudar o nome para windowShowActiveWindowId() 
  */
-void show_active_window()
-{
-	printf("ActiveWindowId={%d}\n", (int) active_window);
+void show_active_window (){
+	
+	printf ("ActiveWindowId={%d}\n", (int) active_window);
 };
 
 /*
  * show_window_with_focus:
  *     Mostra o id da janela com o foco de entrada..
  */
-void show_window_with_focus()
-{
-	printf("wwfId={%d}\n", (int) window_with_focus);
+void show_window_with_focus (){
+	
+	printf ("wwf_Id={%d}\n", (int) window_with_focus );
 };
 
 
@@ -3438,8 +3609,8 @@ struct window_d *getTopWindow (struct window_d *window){
 }; 
 
 
-int get_top_window()
-{
+int get_top_window (){
+	
 	return (int) top_window;
 };
 
@@ -3467,8 +3638,8 @@ void closeActiveWindow (){
 
 //encontrando um slot livre na z-order global de 
 //overlapped windows.
-int z_order_get_free_slot()
-{
+int z_order_get_free_slot (){
+	
 	int response;
 	int z; 
 	struct window_d *zWindow;
