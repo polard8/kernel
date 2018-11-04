@@ -37,19 +37,29 @@
  *     2013 - Created by Fred Nora.
  *     2014~2018 - Resision.
  */
+ 
+
+//
+// ## Config section ##
+// 
+ 
 
 /* Configuração de produto */ 
-#include <gramado/gramado.h> 
+#include <config/gramado.h> 
  
 /* Configuração de compilação */ 
-#include <gramado/config.h> 
+#include <config/config.h> 
+
+
+//
+// ## Globals section ##
+// 
 
 // Global definitions.
 // This must be on top.
-#include <gramado/gdef.h>
-#include <gramado/gdevice.h>
+#include <globals/gdef.h>
+#include <globals/gdevice.h>
 //...
-
 
 
 
@@ -149,25 +159,25 @@ extern void do_executa_new_task();
 // ## hardware ## 
 //
 
-#include <sharedhw/intel.h>
-#include <sharedhw/memory.h>
-#include <sharedhw/pci.h>
-#include <sharedhw/cpuid.h>
-#include <sharedhw/screen.h>
-#include <sharedhw/video.h>
-#include <sharedhw/rtc.h>
+#include <gramado/intel.h>
+#include <gramado/memory.h>
+#include <gramado/pci.h>
+#include <gramado/cpuid.h>
+#include <gramado/screen.h>
+#include <gramado/video.h>
+#include <gramado/rtc.h>
 //...
 
 //
 // ## shared ## 
 //
 
-#include <sharedsw/brtypes.h>
-#include <sharedsw/fonts.h>
-#include <sharedsw/ascii.h>     //ascii table 
-#include <sharedsw/fs.h> 
-#include <sharedsw/prompt.h>
-#include <sharedsw/bmp.h>
+#include <gramado/brtypes.h>
+#include <gramado/fonts.h>
+#include <gramado/ascii.h>     //ascii table 
+#include <gramado/fs.h> 
+#include <gramado/prompt.h>
+#include <gramado/bmp.h>
 //...
 
 //

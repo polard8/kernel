@@ -83,6 +83,201 @@ static inline void mainSetCr3 ( unsigned long value ){
 
 /*
  *********************************************************
+ * x86mainStartFirstThread:
+ *      #interna
+ *      
+ *      Seleciona a primeira thread para rodar e salta para user mode.
+ *
+ */
+void x86mainStartFirstThread( int n ){
+	
+	struct thread_d *Thread;
+	int i;
+	 
+	if (n < 0)
+	{
+	    printf("x86mainStartFirstThread: thread number fail.");
+        die();
+	}
+	
+	
+	switch (n)
+	{
+		case 1:
+		    Thread = IdleThread; 
+		    break;
+			
+		
+		case 2:
+		    Thread = ShellThread;
+			break;
+		
+		case 3:
+		    Thread = TaskManThread;
+		    break;
+			
+		default:
+	        printf("x86mainStartFirstThread.default: thread number fail.");
+            die();		
+		    break;
+	};
+	
+	
+   
+ 
+    if ( (void *) Thread == NULL )
+    {
+        printf("x86mainStartFirstThread: Thread\n");
+        die();
+		
+    } else {
+
+        if ( Thread->saved != 0 )
+		{
+            printf("x86mainStartFirstThread: saved\n");
+            die();
+        };
+
+        if ( Thread->used != 1 || Thread->magic != 1234)
+		{
+            printf("x86mainStartFirstThread: tid={%d} magic \n", Thread->tid);
+            die();
+        };
+
+        set_current ( Thread->tid );       
+        //...
+    };
+
+    // State  
+    if ( Thread->state != STANDBY )
+	{
+        printf ("x86mainStartFirstThread: state tid={%d}\n", Thread->tid);
+        die();
+    }
+
+    // * MOVEMENT 2 ( Standby --> Running)
+    if ( Thread->state == STANDBY )
+	{
+        Thread->state = RUNNING;
+        queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
+    }
+
+
+	//Current process.
+	current_process = Thread->process->pid;
+	
+    //
+	// Done!
+    //
+	
+    // #debug
+    printf ("x86mainStartFirstThread: Starting idle TID=%d \n", Thread->tid );
+    refresh_screen(); 
+
+
+    for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ )
+	{
+        dispatcherReadyList[i] = (unsigned long) Thread;
+    }
+
+
+    IncrementDispatcherCount (SELECT_IDLE_COUNT);
+
+
+    //Set cr3 and flush TLB.
+    mainSetCr3 ( (unsigned long) Thread->Directory);
+    asm ("movl %cr3, %eax");
+    asm ("movl %eax, %cr3");
+
+
+    /* turn_task_switch_on:
+     * + Creates a vector for timer irq, IRQ0.
+     * + Enable taskswitch. */
+	 
+    turn_task_switch_on();
+
+    timerInit8253();
+	
+	//parece que isso é realmente preciso, libera o teclado.
+	//outb(0x20,0x20); 
+   
+	// # go!
+	// Nos configuramos a idle thread em user mode e agora vamos saltar 
+	// para ela via iret.
+	
+	// #todo:
+	// #importante:
+	// Podemos usr os endereços que estão salvos na estrutura.
+	
+	//#bugbug:
+	//temos a questão da tss:
+	//será que a tss está configurada apenas para a thread idle do INIT ??
+	//temos que conferir isso.
+	
+	//init
+    if (n == 1 )
+    {		
+	
+        asm volatile (" cli \n"
+                  " mov $0x23, %ax  \n"
+                  " mov %ax, %ds  \n"
+                  " mov %ax, %es  \n"
+                  " mov %ax, %fs  \n"
+                  " mov %ax, %gs  \n"
+                  " pushl $0x23  \n"              // ss.
+                  " movl $0x0044FFF0, %eax  \n"
+                  " pushl %eax  \n"               // esp.
+                  " pushl $0x3200  \n"            // eflags.
+                  " pushl $0x1B  \n"              // cs.
+                  " pushl $0x00401000  \n"        // eip.
+                  " iret \n" );
+	};
+	
+	//shell
+    if (n == 2 )
+    {		
+	
+        asm volatile (" cli \n"
+                  " mov $0x23, %ax  \n"
+                  " mov %ax, %ds  \n"
+                  " mov %ax, %es  \n"
+                  " mov %ax, %fs  \n"
+                  " mov %ax, %gs  \n"
+                  " pushl $0x23  \n"              // ss.
+                  " movl $0x0049FFF0, %eax  \n"
+                  " pushl %eax  \n"               // esp.
+                  " pushl $0x3200  \n"            // eflags.
+                  " pushl $0x1B  \n"              // cs.
+                  " pushl $0x00451000  \n"        // eip.
+                  " iret \n" );
+	};
+	
+    //taskman
+    if (n == 3 )
+    {		
+	
+        asm volatile (" cli \n"
+                  " mov $0x23, %ax  \n"
+                  " mov %ax, %ds  \n"
+                  " mov %ax, %es  \n"
+                  " mov %ax, %fs  \n"
+                  " mov %ax, %gs  \n"
+                  " pushl $0x23  \n"              // ss.
+                  " movl $0x004FFFF0, %eax  \n"
+                  " pushl %eax  \n"               // esp.
+                  " pushl $0x3200  \n"            // eflags.
+                  " pushl $0x1B  \n"              // cs.
+                  " pushl $0x004A1000  \n"        // eip.
+                  " iret \n" );
+	};
+	
+    panic ("x86mainStartFirstThread: FAIL");
+};
+
+
+
+/*
+ *********************************************************
  * startStartIdle:
  *     Initializes idle thread.
  *     # fake idle thread 
@@ -381,14 +576,14 @@ int x86main ( int argc, char *argv[] ){
 	//e retorna o endereço físico desse novo diretório.
 	//gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
 	
-    //Creating Idle process.
-    InitProcess = (void *) create_process( NULL, 
-	                                      NULL, 
-										  NULL, 
+	
+#ifdef ENTRY_INIT_INIT		
+    //Creating init process.
+    InitProcess = (void *) create_process ( NULL, NULL, NULL, 
 										  (unsigned long) 0x00401000, 
                                           PRIORITY_HIGH, 
 										  (int) KernelProcess->pid, 
-										  "IDLEPROCESS", 
+										  "INITPROCESS", 
 										  RING3, 
 										  (unsigned long ) gKernelPageDirectoryAddress );	
     if ( (void *) InitProcess == NULL )
@@ -398,11 +593,33 @@ int x86main ( int argc, char *argv[] ){
     }else{
         //processor->IdleProcess = (void*) IdleProcess;	
     };
+	
+    //====================================================
+    //Create Idle Thread. tid=0. ppid=0.
+    IdleThread = (void*) KiCreateIdle();
+    if ( (void *) IdleThread == NULL )
+	{
+        printf("x86main: IdleThread\n");
+        die();
+    }else{
+
+        IdleThread->ownerPID = (int) InitProcess->pid;
+
+        //Thread.
+        processor->CurrentThread = (void*) IdleThread;
+        processor->NextThread    = (void*) IdleThread;
+        processor->IdleThread    = (void*) IdleThread;
+        //...
+    };	
+	
+#endif
+
+
+
+#ifdef ENTRY_INIT_SHELL
 
     //Creating Shell process.
-    ShellProcess = (void *) create_process( NULL, 
-	                                       NULL, 
-										   NULL, 
+    ShellProcess = (void *) create_process ( NULL, NULL, NULL, 
 										   (unsigned long) 0x00401000, 
                                            PRIORITY_HIGH, 
 										   (int) KernelProcess->pid, 
@@ -416,7 +633,24 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 	
+    //=============================================
+    // Create shell Thread. tid=1. 
+    ShellThread = (void *) KiCreateShell();
+    if( (void *) ShellThread == NULL )
+	{
+        printf("x86main: ShellThread\n");
+        die();
+    }else{
+
+        ShellThread->ownerPID = (int) ShellProcess->pid;
+        //...
+    };	
 	
+#endif	
+
+
+
+#ifdef ENTRY_INIT_TASKMAN
 	
     //Creating Taskman process. 
     TaskManProcess = (void *) create_process( NULL, 
@@ -435,49 +669,6 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 	
-	
-	//  ## Threads  ##
-	
-    // Creating threads. 
-    // The threads are: Idle, Shell, Taskman.
-    // The Idle thread belong to Idle process.
-    // The Shell thread belongs to Shell process.
-    // The Taskman thread belongs to Taskman process.
-
-//createThreads:
-
-    //====================================================
-    //Create Idle Thread. tid=0. ppid=0.
-    IdleThread = (void*) KiCreateIdle();
-    if ( (void *) IdleThread == NULL )
-	{
-        printf("x86main: IdleThread\n");
-        die();
-    }else{
-
-        IdleThread->ownerPID = (int) InitProcess->pid;
-
-        //Thread.
-        processor->CurrentThread = (void*) IdleThread;
-        processor->NextThread    = (void*) IdleThread;
-        processor->IdleThread    = (void*) IdleThread;
-        //...
-    };
-
-
-    //=============================================
-    // Create shell Thread. tid=1. 
-    ShellThread = (void *) KiCreateShell();
-    if( (void *) ShellThread == NULL )
-	{
-        printf("x86main: ShellThread\n");
-        die();
-    }else{
-
-        ShellThread->ownerPID = (int) ShellProcess->pid;
-        //...
-    };
-
     //===================================
     //Create taskman Thread. tid=2.
     TaskManThread = (void *) KiCreateTaskManager();
@@ -491,7 +682,7 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 
-	
+
     //===================================
     // Cria uma thread em ring 0.
 	// Ok. isso funcionou bem.
@@ -504,11 +695,19 @@ int x86main ( int argc, char *argv[] ){
 
         RING0IDLEThread->ownerPID = (int) TaskManProcess->pid;
         //...
-    };
+    };	
 	
+	
+#endif	
+
+
+
+
+
 	
 	//
 	// ## importante ## 
+	// Temos aqui alguma configuração.
 	//
 	
 	next_thread = 0;
@@ -518,11 +717,15 @@ int x86main ( int argc, char *argv[] ){
 	// idle thread ... 
 	idle = 3;
 	
-    //...
+    
+	
+	//...
 
 
 //Kernel base Debugger.
 //doDebug:
+
+#ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
 
     Status = (int) debug ();
     
@@ -534,11 +737,13 @@ int x86main ( int argc, char *argv[] ){
     }else{
         KernelStatus = KERNEL_INITIALIZED;
     };
+	
+#endif		
 
-
-    // TESTS:
+    //
+    // ## TESTS ##
     // We can make some tests here.
-
+    //
 
     //Inicializando as variáveis do cursor piscante do terminal.
     //isso é um teste.
@@ -552,7 +757,7 @@ int x86main ( int argc, char *argv[] ){
    //...
 	
     // Initializing ps/2 controller.
-	//unblocked/ldisc.c
+	///ldisc.c
     ps2();
 	
 	
@@ -690,15 +895,17 @@ int x86main ( int argc, char *argv[] ){
 	// ## Criando a janela do servidor taskman ## 
 	// usada para comunicação.
 	
-	gui->taskmanWindow = (void *) CreateWindow( 1, 0, VIEW_MINIMIZED, "taskman-server-window", 
-	                             1, 1, 1, 1,           
-							     gui->main, 0, 0, COLOR_WINDOW  ); 
+	gui->taskmanWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, 
+	                                "taskman-server-window", 
+	                                1, 1, 1, 1,           
+							        gui->main, 0, 0, COLOR_WINDOW  ); 
 								 
 	if ( (void *) gui->taskmanWindow == NULL )
 	{
 		printf("x86main: falaha ao criar a janela do servidor taskman\n");
 		die();
-	}else{
+	
+	} else {
 		
 		//inicializando a primeira mensagem
 		////envia uma mensagem de teste para o servidor taskman
@@ -799,8 +1006,31 @@ done:
     refresh_screen();
 #endif
 
-        //This function do not return.
-        startStartIdle() ;
+
+// Isso só executa o INIT INIT se ele foi criado.        
+#ifdef ENTRY_INIT_INIT
+		printf("x86main: INIT_INIT\n");
+		x86mainStartFirstThread(1);
+		//startStartIdle() ;
+		goto fail;
+#endif		
+		
+// Isso só executa o INIT SHELL se ele foi criado.
+#ifdef ENTRY_INIT_SHELL
+        printf("x86main: INIT_SHELL\n");
+		x86mainStartFirstThread(2);
+	    goto fail;
+#endif
+
+// Isso só executa o INIT TASKMAN se ele foi criado.
+#ifdef ENTRY_INIT_TASKMAN
+    printf("x86main: INIT_TASKMAN\n");
+	x86mainStartFirstThread(3);	
+	goto fail;
+#endif
+
+        printf("x86main: No idle thread selected.\n");
+	    goto fail;	
     };
 
 fail:

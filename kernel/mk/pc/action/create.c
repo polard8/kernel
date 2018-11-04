@@ -308,8 +308,8 @@ done:
  *     Criando Thread Shell manualmente.
  * @todo: Mudar o nome para createCreateShellThread()
  */
-void *KiCreateShell()
-{
+void *KiCreateShell (){
+	
     void *shellStack;                    // Stack pointer. 
 	struct thread_d *t;
 	char *ThreadName = "shellthread";    // Name.
@@ -484,8 +484,8 @@ done:
  *     Criando thread task manager manualmente.
  * @todo: Mudar o nome para createCreateTaskmanThread()
  */
-void *KiCreateTaskManager()
-{
+void *KiCreateTaskManager (){
+	
     void *taskmanStack;                    // Stack pointer. 	
 	struct thread_d *t;
 	char *ThreadName = "taskmanthread";    // Name.
@@ -599,7 +599,7 @@ void *KiCreateTaskManager()
 	
 	//Context.
 	t->ss  = 0x23;                          //RING 3.
-	t->esp = (unsigned long) 0x004FFFF0;    //taskmanStack;//0x0045FFF0;  //pilha. 
+	t->esp = (unsigned long) 0x004FFFF0;     
 	t->eflags = 0x3200;
 	t->cs = 0x1B;                                
 	t->eip = (unsigned long) 0x004A1000;     	                                               
