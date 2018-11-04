@@ -1141,18 +1141,89 @@ drawBegin:
 		//flag.
 		window->borderUsed = 1;
 		
+		//#importante:
+		//devemos tratar a borda para cada tipo de janela individualmente.
+
+		//botão
+		if ( window->type == WT_BUTTON )
+		{
+			//se o botão tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_BLUE;
+			    border_size = 2;
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};
+		
+		//editbox
+		if ( window->type == WT_EDITBOX )
+		{
+			//se tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_BLUE;
+			    border_size = 2;
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};		
+		
+		//overlapped (app)
+		if ( window->type == WT_OVERLAPPED )
+		{
+			//se tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_BLUE;
+			    border_size = 2;
+				
+				if (window->active == 1){
+				    border_size = 3;	
+				}
+				
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};	
+
+		//simple.
+		if ( window->type == WT_SIMPLE )
+		{
+			//se tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_GRAY;
+			    border_size = 2;
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};		
+		
+
+
+
+		
+		
 		// A largura da borda pode sinalizar o status (ativo ou inativo) 
 		// de uma caixa de edição.
 		
-		if ( status == 0 ){ 
-		    border_size = 1;
-            border_color = COLOR_INACTIVEBORDER; 			
-		}
+		//#todo: a largura da borda deve ficr registrado na estrutura.
 		
-		if ( status == 1 ){ 
-		    border_size = 2; 
-		    border_color = COLOR_BLUE;
-		}
+		//if ( status == 0 ){ 
+		//    border_size = 1;
+        //    border_color = COLOR_INACTIVEBORDER; 			
+		//}
+		
+		//if ( status == 1 ){ 
+		//    border_size = 2; 
+		//    border_color = COLOR_BLUE;
+		//}
 		//if( status == 2 ){ border_size = 3; } //just for fun
 		
 	    //board1, borda de cima e esquerda.    
@@ -1480,6 +1551,12 @@ drawBegin:
 	// Overlapped.
 	if (window->type == WT_OVERLAPPED)
 	{
+		active_window = window->id;
+		window->active = 1;
+		
+		window_with_focus = window->id;
+		window->focus = 1;
+		
 		// ## scrollbar ##
 		//Esses valores precisam ser melhor declarados.
         

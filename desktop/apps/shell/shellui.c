@@ -498,8 +498,8 @@ done:
 // testando colocar o ponteiro no edit box. setar foco.
 void shellCreateEditBox (){
     
-	editboxWindow = (void *) APICreateWindow ( 2, 1, 1, "shell-editbox1",     
-                                100, 50, 200, 24,    
+	editboxWindow = (void *) APICreateWindow ( WT_EDITBOX, 1, 1, "shell-editbox1",     
+                                10, 600-100, 300, 24,    
                                 0, 0, COLOR_WINDOW, COLOR_WINDOW );
 									   
 									   
@@ -514,7 +514,6 @@ void shellCreateEditBox (){
 	
 	//Registrar.
     APIRegisterWindow (editboxWindow);
-
 
 	//shellSetCursor ( 8, 8 );								   
 };

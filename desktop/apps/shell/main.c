@@ -873,8 +873,8 @@ noArgs:
 	// a tela toda.
 	
     APIRegisterWindow (hWindow);
-    APISetActiveWindow (hWindow);	
-    APISetFocus (hWindow);
+    //APISetActiveWindow (hWindow);	
+    //APISetFocus (hWindow);
 
 	
 	
@@ -967,7 +967,7 @@ noArgs:
 	apiEndPaint();
 	
     APIRegisterWindow (hWindow2);
-    APISetActiveWindow (hWindow2);	
+    //APISetActiveWindow (hWindow2);	
     APISetFocus (hWindow2);	 
 	
 	//#importante
@@ -1417,8 +1417,15 @@ shellProcedure( struct window_d *window,
 					    break;
 					}
 					
+					if ( window == editboxWindow )
+					{
+					    APISetFocus (editboxWindow);
+					    //APIredraw_window (editboxWindow,1);
+						break;
+					}					
+					
 					APISetActiveWindow (window);
-					APIredraw_window ( window, 1 );
+					//APIredraw_window ( window, 1 );
 					
 					//botão de close
 					//if ( window == close_button )
@@ -1474,12 +1481,6 @@ shellProcedure( struct window_d *window,
 						running = 0;
                         ShellFlag = SHELLFLAG_EXIT;						
 					}  
-					
-					if ( window == editboxWindow )
-					{
-						APIredraw_window (editboxWindow,1);
-					    APISetFocus (editboxWindow);
-					}
 					
 					break;
 					

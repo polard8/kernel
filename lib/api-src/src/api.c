@@ -1797,6 +1797,8 @@ int APISetFocus (struct window_d *window){
     system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
 		
+	APIredraw_window (window,1);
+		
     return (int) 0;	
 };
 
@@ -1827,6 +1829,8 @@ int APIKillFocus (struct window_d *window){
     system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
 		
+	APIredraw_window ( window, 1 );
+		
     return (int) 0;	
 };
 
@@ -1847,6 +1851,8 @@ int APISetActiveWindow (struct window_d *window){
 	
     system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
+		
+	APIredraw_window ( window, 1 );
 		
     return (int) 0;	
 };

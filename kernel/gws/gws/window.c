@@ -1790,18 +1790,70 @@ redrawBegin:
 	//para os casos de editbox por exemplo.
 	if ( window->borderUsed == 1 )
 	{
-		//#bugbug 
-		//a cor da borda e o size vão depender do status da janela.
+		//#importante:
+		//devemos tratar a borda para cada tipo de janela individualmente.
 		
-		if (window->active == 1)
-		{ 
-	        border_color = COLOR_BLUE;
-		}else{
-			border_color = COLOR_INACTIVEBORDER; 
-		} 
+		//botão
+		if ( window->type == WT_BUTTON )
+		{
+			//se o botão tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_BLUE;
+			    border_size = 2;
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};
 		
-		//border_size = 1;
-		border_size = 2;
+		//editbox
+		if ( window->type == WT_EDITBOX )
+		{
+			//se tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_BLUE;
+			    border_size = 2;
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};		
+		
+		//overlapped (app)
+		if ( window->type == WT_OVERLAPPED )
+		{
+			//se tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_BLUE;
+			    border_size = 2;
+				
+				if (window->active == 1){
+				    border_size = 3;	
+				}
+				
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};	
+
+		//simple.
+		if ( window->type == WT_SIMPLE )
+		{
+			//se tiver o foco.
+			if ( window->focus == 1 )
+			{
+				border_color = COLOR_GRAY;
+			    border_size = 2;
+			}else{
+			    border_color = COLOR_INACTIVEBORDER;	
+			    border_size = 1;
+			}
+		};		
+		
 		
 	    //board1, borda de cima e esquerda.    
 		drawDataRectangle ( window->left, window->top, 
@@ -2787,6 +2839,9 @@ void SetFocus ( struct window_d *window ){
 			
 		//Se a janela já tem o foco não precisa fazer nada.
 		if ( window->id == window_with_focus ){
+			
+			window->focus = 1; 
+			
 			goto setup_wwf;
 		}
 			
@@ -2799,8 +2854,10 @@ void SetFocus ( struct window_d *window ){
 
 		    //set wwf pointer.
 		    WindowWithFocus = (void *) window;
-				
-		    //bugbug
+			
+			window->focus = 1; 	
+		    
+			//bugbug
 			//Procedure.
 		    //?? Não sei se é o ideal.
 		    SetProcedure((unsigned long) window->procedure);
@@ -2840,7 +2897,9 @@ void SetFocus ( struct window_d *window ){
 				// procedimento de janela.				
 
 	            //set wwf id.
-			window_with_focus = (int) window->id;				
+			window_with_focus = (int) window->id;
+            
+            window->focus = 1;   			
 		    
 			    //set wwf pointer.
 			WindowWithFocus = (void *) window;
