@@ -607,7 +607,7 @@ int x86main ( int argc, char *argv[] ){
 	
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
-    IdleThread = (void*) KiCreateIdle();
+    IdleThread = (void *) KiCreateIdle();
     if ( (void *) IdleThread == NULL )
 	{
         printf("x86main: IdleThread\n");
