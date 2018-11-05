@@ -718,6 +718,7 @@ get_next:
 			return NULL;
 		}			
 		
+		//endereço físico.
 		Process->Directory = (unsigned long ) directory_address; 
 		
         //cancelados. 
