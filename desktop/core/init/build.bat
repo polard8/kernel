@@ -8,13 +8,13 @@ echo -{ ...
 echo -{ Creating INIT.BIN ...
 echo -{ head
     rem head.s
-	nasm c:\gramado\desktop\apps\init\head.s -felf -o head.o
+	nasm c:\gramado\desktop\core\init\head.s -felf -o head.o
 
 	
 :Compiling	
 echo -{ ...
 echo -{ main
-	gcc  -c  c:\gramado\desktop\apps\init\main.c  -I c:\gramado\include\libc -o main.o  
+	gcc  -c  c:\gramado\desktop\core\init\main.c  -I c:\gramado\include\libc -o main.o  
  
  
     copy c:\gramado\lib\stdio.o c:\sdk\bin\stdio.o
@@ -38,7 +38,7 @@ api.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\desktop\apps\init\link.ld -o INIT.BIN %myObjects%  -Map  init_map.s
+   ld -T c:\gramado\desktop\core\init\link.ld -o INIT.BIN %myObjects%  -Map  init_map.s
    
    rem Não deletar os objetos.
  
