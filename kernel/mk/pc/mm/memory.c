@@ -1166,32 +1166,65 @@ int init_mm (){
 	//
 	
 	
-	//0MB
+//TEMOS UM ESPAÇO DE (0x8000000 - 0x1000000) = 0x7000000
+//128mb-16mb = 112MB 
+//112MB dá 28 heaps de 4mb cada.
+//#define HEAPMAX 28
+//a quantidad de heaps vai depender da quantidade dememória disponível.
+//o que determina a quantidade de processos que poderãoser criados.
+//já qu cada processo terá 4mb de heap ...
+//no futuro poderemos dividir melhor e termos heaps menores.	
+	
+	//#importante 
+	//#bugbug: A quantidade de heaps ainda é provisória..
+	//estamos trabalhando nisso.
+	
+    //inicializa o gerenciamento de heap.
+	gHeapMax = 0;
+    gHeapCount = 0;	
+	
+	
+	//0MB (inicializando)
 	if ( memorysizeTotal >= (0) )
 	{
 		g_mm_system_type = stNull;
-	    //#bugbug
-        //@todo: nesse caso devemos parar e avisão não ser possível prosseguir.		
+		gHeapMax = 0;
 	}	
 	
-	//32MB
-	if ( memorysizeTotal >= (32*1024) ){
+	//32MB (small)
+	if ( memorysizeTotal >= (32*1024) )
+	{
 		g_mm_system_type = stSmallSystem;
+		gHeapPoolStartAddress = SMALLSYSTEM_HEAPPOLL_START;
+		gHeapMax = 4; //(16 mb de heaps = 4 heaps)
+		//...
 	}
 	
 	
-	//64MB
-	if ( memorysizeTotal >= (64*1024) ){
+	//64MB (medium)
+	if ( memorysizeTotal >= (64*1024) )
+	{
 		g_mm_system_type = stMediumSystem;
+		gHeapPoolStartAddress = MEDIUMSYSTEM_HEAPPOLL_START;
+		gHeapMax = 8; //(32 mb de heaps = 8 heaps)
+		//...
 	}	
 	
-	//128MB
-	if ( memorysizeTotal >= (128*1024) ){
+	//128MB (large)
+	if ( memorysizeTotal >= (128*1024) )
+	{
 		g_mm_system_type = stLargeSystem;
+		gHeapPoolStartAddress = LARGESYSTEM_HEAPPOLL_START;
+		
+		//se tivermos mais que 128 mb de memória então poderemos ter 
+		//os 112mb de heaps.
+		gHeapMax = 16; //(64 mb de heaps = 16 heaps)
+		//...
 	}		
 	
-
-
+	//#importante:
+	//Nesse momento temos o endereço do início do pool de heaps.
+	//cada processo vai receber um heap de 4mb ao ser criado.
 	
 	//inicializando o framepool (paged pool)
 	initializeFramesAlloc();

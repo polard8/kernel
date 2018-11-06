@@ -686,9 +686,7 @@ get_next:
 		//Thread inicial.
 		//Process->thread =
 		
-		//Process->processImageMemory =
-		//Process->processHeapMemory =
-		//Process->processStackMemory =
+
 		
 	    //
 	    // ORDEM: O que segue é referenciado durante o processo de task switch.
@@ -760,6 +758,30 @@ get_next:
 		// Heap and Stack. 
 		// #importante: (Endereços virtuais).
 		// Por isso pode ser o mesmo para todos os processos.
+		
+		//#todo:
+		// esse traabho no heap tem que virar uma função.
+		
+		//se heap max não foi inicializado.
+		//ou maior que 24 heaps (112mb)
+		if ( gHeapMax <= 0 || gHeapMax > 112 )
+		{
+		    printf("create_process: heap max limits fail %d \n",gHeapMax);
+            die();			
+		}
+		
+		if ( gHeapCount< 0 || gHeapCount > gHeapMax )
+		{
+		    printf("create_process: heap count limits fail %d \n",gHeapCount);
+            die();						
+		}
+		
+		// #importante:
+		// O heap pool para todos os processos vai começar em 0x80000000 (va),
+		// ou seja, na entrada 512.
+		// base + (n * heapsize )
+		
+		CreatePageTable ( Process->Directory , 512, ( gHeapPoolStartAddress + (gHeapCount * 0x400000) ) );	
 		
 		// Endereço do início do Heap do processo.
 		// #bubug: Endereço do fim do heap.

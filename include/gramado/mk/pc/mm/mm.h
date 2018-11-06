@@ -190,6 +190,23 @@ unsigned long gShellPageDirectoryAddress;
 unsigned long gTaskmanPageDirectoryAddress; 
 
 
+
+//Endereço inicial do heap  pool que será usado para alocar 
+//heaps para os processos.
+unsigned long gHeapPoolStartAddress;
+
+//TEMOS UM ESPAÇO DE (0x8000000 - 0x1000000) = 0x7000000
+//128mb-16mb = 112MB 
+//112MB dá 28 heaps de 4mb cada.
+//#define HEAPMAX 28
+//a quantidad de heaps vai depender da quantidade dememória disponível.
+//o que determina a quantidade de processos que poderãoser criados.
+//já qu cada processo terá 4mb de heap ...
+//no futuro poderemos dividir melhor e termos heaps menores.
+int gHeapMax;
+int gHeapCount;
+
+
 /* 
  * As configurações de memória foram feitas pelo Boot Loader.
  * (aqui os endereços lógico e físicos são iguais.)

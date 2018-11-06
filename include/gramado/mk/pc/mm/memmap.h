@@ -166,6 +166,10 @@
 //#define SMALLSYSTEM_FRONTBUFFER      ?? 
 #define SMALLSYSTEM_BACKBUFFER       (0x01000000 - 0x800000)   
 #define SMALLSYSTEM_PAGEDPOLL_START  (0x01000000 - 0x400000) 
+//Vários heaps serão criados até chegarmos à 0x02000000
+//cada heap terá 4mb
+//cada processo receberá um heap
+#define SMALLSYSTEM_HEAPPOLL_START   (0x01000000) 
 //...
 
 //
@@ -177,6 +181,11 @@
 //#define MEDIUMSYSTEM_FRONTBUFFER      ?? 
 #define MEDIUMSYSTEM_BACKBUFFER       (0x01000000 - 0x800000)    
 #define MEDIUMSYSTEM_PAGEDPOLL_START  (0x01000000 - 0x400000) 
+
+//Vários heaps serão criados até chegarmos à 0x02000000
+//cada heap terá 4mb
+//cada processo receberá um heap
+#define MEDIUMSYSTEM_HEAPPOLL_START   (0x01000000)  
 //...
 
 //
@@ -188,6 +197,10 @@
 //#define LARGESYSTEM_FRONTBUFFER      ?? 
 #define LARGESYSTEM_BACKBUFFER       (0x01000000 - 0x800000)    
 #define LARGESYSTEM_PAGEDPOLL_START  (0x01000000 - 0x400000) 
+//Vários heaps serão criados até chegarmos à 0x02000000
+//cada heap terá 4mb
+//cada processo receberá um heap
+#define LARGESYSTEM_HEAPPOLL_START   (0x01000000) 
 //...
 
 

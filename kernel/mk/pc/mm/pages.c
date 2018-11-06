@@ -596,6 +596,7 @@ int SetUpPaging (){
 	unsigned long SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
 	unsigned long SMALL_backbuffer_address = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
 	unsigned long SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  
+
 	//...
 	
 	
@@ -609,7 +610,8 @@ int SetUpPaging (){
 	unsigned long MEDIUM_vga_address = MEDIUMSYSTEM_VGA ;
 	unsigned long MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
 	unsigned long MEDIUM_backbuffer_address = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
-	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
+	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 
+	
 
 	
 	//==============================================================
@@ -1079,8 +1081,10 @@ int SetUpPaging (){
     };
 
     page_directory[771] = (unsigned long) &pagedpool_page_table[0];      
-    page_directory[771] = (unsigned long) page_directory[771] | 7;  	
+    page_directory[771] = (unsigned long) page_directory[771] | 7;  
 
+
+	
 	
 	// @todo:  
 	// (sobre heaps para processos em user mode).
