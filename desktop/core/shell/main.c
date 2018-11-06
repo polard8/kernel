@@ -69,11 +69,11 @@
  less than console_loglevel. 
 */ 
 
-//# usado para teste 
-#define WINDOW_WIDTH     750 
-#define WINDOW_HEIGHT    400
-#define WINDOW_LEFT      10
+#define WINDOW_WIDTH     700 
+#define WINDOW_HEIGHT    340
+#define WINDOW_LEFT      ((800-WINDOW_WIDTH)/2)
 #define WINDOW_TOP       10
+
  
 //
 // Includes.
@@ -937,21 +937,12 @@ noArgs:
 
     apiBeginPaint();
 	
-	//mudando as dimensões a janela dentro da área de cliente.
-	terminal_rect.left = terminal_rect.left + 28;
-	terminal_rect.top = terminal_rect.top + 28;
+	//mudando as dimensões a janela dentro da área de cliente e criando uma nova janela.
+	terminal_rect.left = terminal_rect.left + 4;
+	terminal_rect.top = terminal_rect.top + 4;
 
 	terminal_rect.width = 8 * 80;
 	terminal_rect.height = 8 * 32;
-	
-	//terminal_rect.width = terminal_rect.width - 150;
-	//terminal_rect.height = terminal_rect.height - 150;
-	
-	
-	//hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
-	//                    terminal_rect.left, terminal_rect.top, 
-	//				    terminal_rect.width, terminal_rect.height,    
-    //                    0, 0, COLOR_RED, COLOR_RED );	   
 
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
 	                        terminal_rect.left, terminal_rect.top, 

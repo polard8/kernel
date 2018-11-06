@@ -11,6 +11,17 @@
  */
 
 
+//#define WINDOW_WIDTH     200 
+//#define WINDOW_HEIGHT    100
+//#define WINDOW_LEFT      ( (800-WINDOW_WIDTH)/2 )
+//#define WINDOW_TOP       320 
+
+#define WINDOW_WIDTH     200 
+#define WINDOW_HEIGHT    100
+#define WINDOW_LEFT      10 //( (800-WINDOW_WIDTH)/2 )
+#define WINDOW_TOP       358 
+ 
+
 #include <types.h>
 
 #include "heap.h"
@@ -28,11 +39,8 @@
 
 //#define TEDITOR_VERBOSE 1
 
-//# usado para teste 
-#define WINDOW_WIDTH     640 
-#define WINDOW_HEIGHT    480
-#define WINDOW_LEFT      10
-#define WINDOW_TOP       10
+
+
 
 
 
