@@ -254,8 +254,10 @@
 #define	SYS_CREATETASKBAR   121    
 #define	SYS_CREATESTATUSBAR 122
 #define	SYS_123 123
-#define	SYS_124 124
-#define	SYS_125 125
+
+//reservado para janela
+#define	SYS_124 124  //Show Window Rectangle.(coloca a janela no frontbuffer)
+#define	SYS_125 125  //refresh Rectangle.(coloca um retângulo no frontbuffer)
 
 //126~129 (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
 #define	SYS_126 126

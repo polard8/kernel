@@ -115,8 +115,9 @@ int show_window_rect (struct window_d *window){
 		}
 
 	    refresh_rectangle ( window->left, window->top, window->width, 
-		    window->height ); 		
-		
+		    window->height ); 
+
+        return 0;  			
 	};		
 };
 
@@ -969,9 +970,6 @@ void windowSendMessage( unsigned long arg1,
 		};
           		
 	};
-	
-//done:	
-	//return;
 };
 
 
@@ -1443,7 +1441,8 @@ get_next:
 		//...
 	};  		
 	
-done:
+//done:
+
     return (int) 0;
 };
 

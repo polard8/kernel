@@ -868,7 +868,10 @@ void *services( unsigned long number,
 				
 			}else{
 				
-			    t = (void *) threadList[current_thread];
+			    //#importante:
+				//Cada aplicativo está pegando mensagem na estrutura da sua própria thread.
+				
+				t = (void *) threadList[current_thread];
 			    
 				//#bugbug:
 				//temos que checar a validade da janela.
@@ -936,7 +939,7 @@ void *services( unsigned long number,
 			break;
 			
 		// 114	
-        // ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
+        // ## ENVIA UMA MENSAGEM ##
 		
 		//enviar uma mensagem para a thread atual.
 		//
@@ -1039,6 +1042,20 @@ void *services( unsigned long number,
 		case SYS_SELECTCOLORSCHEME:
 		    return (void *) windowSelectColorScheme ( (int) arg2 );
 			break;
+			
+		//124	
+		case 124:
+		    return (void *) show_window_rect ( (struct window_d *) arg2 );
+			break;		
+			
+		//124	
+		//coloca um retângulo no backbuffer.
+		case 125:
+		    //#todo  
+	        //precisamos de um buffer de mensagems ou ponteiro pra estrutura.
+			//refresh_rectangle ( window->left, window->top, window->width, 
+		    //    window->height );
+            break;	
 		
 		//
 		// 129, Um driver confirmando que foi inicializado.
@@ -1658,7 +1675,7 @@ do_create_window:
 	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
 	//com um endereço da área de memória do app.
-    NewWindow = (void *) CreateWindow( WindowType, WindowStatus, 
+    NewWindow = (void *) CreateWindow ( WindowType, WindowStatus, 
 	                        WindowView, WindowName, 
 	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
 							cwArg9, 

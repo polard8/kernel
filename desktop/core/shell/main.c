@@ -681,9 +681,9 @@ noArgs:
 	//Apenas inicialize. Continuaremos com o procedimento 
 	//do shell e não o da barra,	
 	
-    enterCriticalSection ();    
-    shellCreateTaskBar (1);
-    exitCriticalSection ();
+    //enterCriticalSection ();    
+    //shellCreateTaskBar (1);
+    //exitCriticalSection ();
 	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
@@ -876,13 +876,37 @@ noArgs:
     //APISetActiveWindow (hWindow);	
     //APISetFocus (hWindow);
 
+	//
+	// ## Create ##
+	// Isso fará o procedimento de janela terminar de criar os elementos gráficos 
+	// de dentro da área de cliente.
+	// #bugbug: Provavelemnte esse não é o momento certo de chamar essa rotina.
+	// Talvez seja lá no kernel, na função createwindow, somente para 
+	// janelas do tipo overlapped. ##oque daria problemas se uma janela overlepped 
+	// resolvesse criar outra janela ovelapped em wm_create
+	// 
 	
+	//#bugbug:
+	// nesse momento o while de mensagens nem está funcionando.
+	// essa mensagem seria perdida, talvez no momento do loin ela 
+	// se perda.
+	// Então vamos tentar um pouco antes do while(runing)
+	
+	//apiSendMessage ( (struct window_d *) hWindow, 
+	//                 (int) MSG_CREATE, 
+	//				 (unsigned long) 0, 
+	//				 (unsigned long) 0 );	
 	
 	//#importante
 	//VAMOS EFETUAR ESSE REFRESH DEPOIS DE CRIARMOS OUTRA JANELA.
 	//refresh_screen ();
 	
+	//
+	// ## refresh window ##
+	//
 	
+	system_call ( 124, (unsigned long) hWindow, (unsigned long) hWindow, (unsigned long) hWindow );	
+	  
 	//
 	// #importante:
 	// +pegamos o retângulo referente à area de cliente da janela registrada. 
@@ -958,13 +982,23 @@ noArgs:
 	apiEndPaint();
 	
     APIRegisterWindow (hWindow2);
-    //APISetActiveWindow (hWindow2);	
-    APISetFocus (hWindow2);	 
+
+
+	//
+	// ## refresh window ##
+	//
+	
+	system_call ( 124, (unsigned long) hWindow2, (unsigned long) hWindow2, (unsigned long) hWindow2 );		
 	
 	//#importante
-	refresh_screen ();	
-	
+	//refresh_screen ();
 
+
+	
+    //#importante:
+	//set focus repinta a janela.
+	
+	APISetFocus (hWindow2);	 
 	
 	//
 	// Habilitando o cursor de textos.
@@ -1069,6 +1103,11 @@ noArgs:
 	//@todo: 0,0 não está na área de cliente.
 	
  
+create_client_objects:
+	apiSendMessage ( (struct window_d *) hWindow, 
+	                 (int) MSG_CREATE, 
+					 (unsigned long) 0, 
+					 (unsigned long) 0 );	 
 	
 	//
 	// **** Mensagens  ****
@@ -1100,6 +1139,8 @@ noArgs:
 	unsigned long message_buffer[5];	
 		
 Mainloop:
+
+
     
 	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
 	   elementos da mensagem e depois zerar o buffer */
@@ -1191,10 +1232,10 @@ end:
  *     LOCAL
  */
 unsigned long 
-shellProcedure( struct window_d *window, 
-                int msg, 
-				unsigned long long1, 
-				unsigned long long2 )
+shellProcedure ( struct window_d *window, 
+                 int msg, 
+				 unsigned long long1, 
+				 unsigned long long2 )
 {
 	unsigned long input_ret;
     unsigned long compare_return;	
@@ -1204,8 +1245,53 @@ shellProcedure( struct window_d *window,
 		//...
 	//}
 	
+	
+	struct window_d *tbWindow;
+	unsigned long left;
+	unsigned long top;
+	unsigned long width;
+	unsigned long height;
+	
     switch (msg)
     {
+		case MSG_CREATE:	
+		    //#debug: tá aqui pra checarmos se tem recursividade.
+			printf("SHELL.BIN: MSG_CREATE\n");
+	        //todo: get system metrics.
+	        left = 0;
+	        top = (600 - (600/16));
+	        width = 800;
+	        height = (600/8);		    
+	        
+			enterCriticalSection (); 
+			tbWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-taskbar",     
+                                left, top, width, height,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+								
+	        if ( (void *) tbWindow == NULL )
+	        {	
+		        printf("shellProcedure: taskbar Window fail");
+		        while (1){
+			        asm("pause");
+		        }
+		        //exit(0);
+	        };
+	        
+			//Registrar.
+            APIRegisterWindow (tbWindow);								
+            
+			//Refresh Window
+			system_call ( 124, (unsigned long) tbWindow, (unsigned long) tbWindow, (unsigned long) tbWindow );								
+            exitCriticalSection (); 							
+			break;
+			
+		//isso pinta os elementos da área de cliente.
+        //essa mensagem é enviada para o aplicativo quando 
+        //a função 'update window'	é chamada.	
+        case MSG_PAINT:
+            printf("SHELL.BIN: MSG_PAINT\n");
+			break;
+			
 		//Faz algumas inicializações de posicionamento e dimensões.
         //case MSG_INITDIALOG:
         //    break;
@@ -1519,15 +1605,6 @@ shellProcedure( struct window_d *window,
 			    //printf("exited\n");
 		    }
             break;
-			
-		//Quando a aplicativo em user mode chama o kernel para 
-		//que o kernel crie uma janela, depois que o kernel criar a janela,
-		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
-        //MSG_CREATE, se o aplicativo retornar -1, então a rotina em kernel mode que 
-        //esta criando a janela, cancela a janela que está criando e retorn NULL.		
-		case MSG_CREATE:
-		    printf("SHELL.BIN: MSG_CREATE\n");
-		    break;
 		
 		case MSG_SETFOCUS:
 		    APISetFocus(window);
@@ -1536,12 +1613,7 @@ shellProcedure( struct window_d *window,
 		case MSG_KILLFOCUS:
             break;
 
-		//isso pinta os elementos da área de cliente.
-        //essa mensagem é enviada para o aplicativo quando 
-        //a função 'update window'	é chamada.	
-        case MSG_PAINT:
-            printf("SHELL.BIN: MSG_PAINT\n");
-			break;
+
 			
 
 		//@todo: isso ainda não existe na biblioteca. criar.	
@@ -3086,10 +3158,16 @@ do_compare:
 	if ( strncmp( prompt, "t11", 3 ) == 0 )
     {    
         //chama message box com mensagem about.
+        //apiSendMessage ( (struct window_d *) 0, 
+		//                 (int) MSG_COMMAND, 
+		//				 (unsigned long) CMD_ABOUT, 
+		//				 (unsigned long) 0 );
+
         apiSendMessage ( (struct window_d *) 0, 
-		                 (int) MSG_COMMAND, 
-						 (unsigned long) CMD_ABOUT, 
-						 (unsigned long) 0 );
+		                 (int) MSG_CREATE, 
+						 (unsigned long) 0, 
+						 (unsigned long) 0 );	
+        
 		
 		goto exit_cmp;
 	};
@@ -3497,7 +3575,13 @@ done:
 	//#bugbug:
 	//queremos dar refresh apenas da janela.
 	//Mostrando as strings da rotina de comparação.	
-	refresh_screen();
+	
+	//temos uma janela enviada por argumento, mas não sabemos se 
+	//ela realmente é a janela que queremos.
+	
+	//refresh_screen();
+	system_call ( 124, (unsigned long) window, (unsigned long) window, (unsigned long) window );		
+	
 	
     return (unsigned long) ret_value;
 };
@@ -4174,8 +4258,14 @@ done:
 	    shellPrompt ();
 	
 	
-    refresh_screen();
-    return (int) 0;
+    
+	//refresh_screen();
+    
+	//#test 
+	//tentando dar refresh somente na janela passada por argumento.
+	system_call ( 124, (unsigned long) window, (unsigned long) window, (unsigned long) window );
+	
+	return (int) 0;
 };
 
 

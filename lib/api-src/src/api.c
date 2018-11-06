@@ -1737,6 +1737,7 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 	
 	//Nothing.
 done:
+						 
 	return (void *) Window;    
 };
 
@@ -1972,6 +1973,7 @@ void kill (int exit_code){
 	
 	//#todo
     //return; //Não há uma chamada para isso ainda.
+	printf("api-kill: todo\n");
 };
 
 

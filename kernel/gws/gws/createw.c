@@ -1670,13 +1670,13 @@ drawBegin:
 	
     //z-order global de overlapped windows.
 	//@todo: Colocar essa definição no início da função.
-    int z;
-	z = (int) z_order_get_free_slot();	
+    //int z;
+	//z = (int) z_order_get_free_slot();	
     
-	if( z >= 0 && z < ZORDER_COUNT_MAX )
-	{
-	    zorderList[z] = (unsigned long) window;
-	};
+	//if( z >= 0 && z < ZORDER_COUNT_MAX )
+	//{
+	//    zorderList[z] = (unsigned long) window;
+	//};
 	
 	//@todo: z-order de elementos gráficos dentro da janela mãe.
  
@@ -1695,20 +1695,34 @@ done:
 	//    RegisterWindow (window);	
 	//}
 	
-	//#teste
+	//
+	//  ## Input Thread ##
+	//
+	
 	//Associando a janela criada a trhead atual, que chamou essa rotina.
 	//o problema é na hora da inicialização.
 	
-		window->InputThread = (struct thread_d *) threadList[current_thread];
+	window->InputThread = (struct thread_d *) threadList[current_thread];
+
+    //se a estrutura existe.	
+	if ( (void *) window->InputThread != NULL )
+    {
+		//mas se ela estiver corrompida.  
+		if ( window->used != 1 || window->magic != 1234 )
+		{
+		    window->InputThread = NULL;	
+		    return (void *) window;
+		}
 		
-		if( (void *) window->InputThread != NULL )
-        {
-			if ( window->used != 1 || window->magic != 1234 )
-			{
-			    window->InputThread = NULL;	
-			}
-		}	
-	    
+		//Caso exista mas não esteja corrompida.
+		
+		//window->InputThread->window = window;
+		//window->InputThread->msg = MSG_CREATE; //faz o procedimento criar os objetos dentro da área de cliente.
+		//window->InputThread->long1 = 0;
+		//window->InputThread->long2 = 0;
+		
+		//window->InputThread->newmessageFlag = 1;
+	};	    
 	
 	return (void *) window;
 };
