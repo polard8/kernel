@@ -781,15 +781,28 @@ get_next:
 		// ou seja, na entrada 512.
 		// base + (n * heapsize )
 		
+		Process->HeapNumber = gHeapCount;
+		Process->HeapPA = ( gHeapPoolStartAddress + (gHeapCount * 0x400000) );
+		
+		
+		//#todo #bugbug precis checar o retorno para 1 ou 0.
 		CreatePageTable ( Process->Directory , 512, ( gHeapPoolStartAddress + (gHeapCount * 0x400000) ) );	
+		
+		
 		
 		// Endereço do início do Heap do processo.
 		// #bubug: Endereço do fim do heap.
 		// Tamanho do heap, dado em KB.
-	    Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;    
-	    Process->HeapEnd = 0; // @todo: (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE);
-		Process->HeapSize = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    
+		//#importante: todo heap de usuário começa no mesmo endereço lógico.
+	    Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;   //(0x80000000) 
+	    Process->HeapEnd = (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE );  
+		Process->HeapSize = (Process->HeapEnd - Process->Heap );    //4mb
 
+		//#importante:
+		//próximo heap.
+		
+		gHeapCount++;
+		
 		//Process->HeapPointer
 		//Process->HeapLastValid
 		//Process->HeapLastSize
@@ -799,6 +812,10 @@ get_next:
 		// Tamanho da pilha, dada em KB.
 		// #importante: Deslocamento do endereço do início da pilha em relação 
 		// ao início do processo. 
+		
+		//#bugbug 
+		//#todo 
+		
 		Process->Stack = UPROCESS_DEFAULT_STACK_BASE;   
 	    Process->StackEnd = 0; // @todo: (UPROCESS_DEFAULT_STACK_BASE+UPROCESS_DEFAULT_STACK_SIZE);
 		Process->StackSize = (UPROCESS_DEFAULT_STACK_SIZE/1024);   	
@@ -1337,7 +1354,7 @@ void show_currentprocess_info (){
 	if( current_process < 0 || 
 	    current_process >= PROCESS_COUNT_MAX )
 	{
-		//printf("show_process_information: current_process fail\n");
+		//printf("show_currentprocess_info: current_process fail\n");
 		return;
 	};
 
@@ -1346,7 +1363,7 @@ void show_currentprocess_info (){
 	
 	if ( (void *) Current == NULL )
 	{
-	    printf("show_process_information: Struct fail\n");
+	    printf("show_currentprocess_info: Struct fail\n");
         return; 		
 	
 	} else {
@@ -1364,8 +1381,15 @@ void show_currentprocess_info (){
 		printf ("CurrentProcessDirectoryAddress={%x} \n", Current->Directory );		
 		
 		//Heap and stack.
-		printf("Heap={%x}  HeapSize={%d KB}  \n", Current->Heap, 
+		
+		printf("Heap={%x}  HeapEnd={%x} HeapSize={%x}  \n", 
+		    Current->Heap,
+            Current->HeapEnd,			
 		    Current->HeapSize );
+			
+		printf("HeapNumber={%d}  HeapPA={%x}  \n", 
+		    Current->HeapNumber, 
+		    Current->HeapPA );			
 												  
 		printf("Stack={%x} StackSize={%d KB} \n", Current->Stack, 
 		    Current->StackSize );
@@ -1399,7 +1423,7 @@ void show_process_information (){
 	// #test
 	// Mostrar informações sobre os processos da lista.
 	
-	printf("Process info:\n\n");
+	printf("show_process_information:\n\n");
 	
 	for ( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
@@ -1413,19 +1437,44 @@ void show_process_information (){
 		           p->used == 1 && 
 				   p->magic == 1234 )
 	    {
-			//@todo: Mostrar quem é o processo pai.
 		    
-			printf("PID={%d} Name={%s} Directory={%x} \n", p->pid, 
-			    p->name_address, p->Directory );
 
-	    }
+            printf("\n");
+		
+		    //Index.
+		    printf ("PID={%d} PPID={%d} UID={%d} GID={%d} \n",
+		        p->pid, p->ppid, p->uid, p->gid );
+	        
+			//Name
+		    printf("Name={%s} \n", p->name_address );
+		
+		    //Image Address.
+		    printf("ImageAddress={%x} \n", p->Image );
+		
+		    //Directory Address. *IMPORTANTE.
+		    printf ("CurrentProcessDirectoryAddress={%x} \n", p->Directory );		
+		
+		    //Heap and stack.
+		
+		    printf("Heap={%x}  HeapEnd={%x} HeapSize={%x}  \n", 
+		        p->Heap,
+                p->HeapEnd,			
+		        p->HeapSize );
+			
+		    printf("HeapNumber={%d}  HeapPA={%x}  \n", 
+		        p->HeapNumber, 
+		        p->HeapPA );			
+												  
+		    printf("Stack={%x} StackSize={%d KB} \n", p->Stack, 
+		        p->StackSize );			
+	    };
 		
 		//Nothing.
     };	
 
 	//...
 	
-    printf("show_process_information: done\n");
+    printf("done\n");
 	
 	refresh_screen();
 };
@@ -1523,8 +1572,8 @@ void init_tasks()
  * init_processes:
  *    Inicaliza o process manager.
  */
-void init_processes()
-{
+void init_processes (){
+	
     int i;	
 	
 	//
@@ -1551,8 +1600,8 @@ void init_processes()
 	// @todo: mais algo??
 	//
 	
-Done:	
-	return;
+//Done:	
+	//return;
 };
 
 
@@ -1592,8 +1641,8 @@ void dead_task_collector()
  * Fechar as threads seguindo a lista encadeada.
  *
  */
-void exit_process( int pid, int code )
-{
+void exit_process ( int pid, int code ){
+	
 	int i;
     struct process_d *Process;
     struct thread_d *Threads;
@@ -1745,16 +1794,16 @@ done:
 
 
 // ??
-int get_caller_process_id()
-{
+int get_caller_process_id (){
+	
 	return (int) caller_process_id;
 };
 
 
 
 // ??
-void set_caller_process_id(int pid)
-{
+void set_caller_process_id (int pid){
+	
 	caller_process_id = (int) pid;
 };
 
@@ -1765,8 +1814,8 @@ void set_caller_process_id(int pid)
  *     Initialize process manager.
  *     processInitializeProcessManager();
  */
-int init_process_manager()
-{
+int init_process_manager (){
+	
 	caller_process_id = (int) 0;
 	
 	processNewPID = (int) USER_BASE_PID;
@@ -1774,7 +1823,8 @@ int init_process_manager()
 	//...
 	
 	
-done:	
+//done:
+	
 	return (int) 0;
 };
 
@@ -1799,9 +1849,8 @@ int processmanagerInit(){
  *     Pega o endereço do heap do processo.
  *
  */
-unsigned long 
-GetProcessHeapStart( int pid )
-{
+unsigned long GetProcessHeapStart ( int pid ){
+	
 	struct process_d *process;
 	
 	//Limits.
@@ -1837,9 +1886,8 @@ fail:
  * GetProcessPageDirectoryAddress:
  *
  */
-unsigned long 
-GetProcessPageDirectoryAddress( int pid )
-{
+unsigned long GetProcessPageDirectoryAddress( int pid ){
+	
 	struct process_d *process;
 	
 	//Limits.

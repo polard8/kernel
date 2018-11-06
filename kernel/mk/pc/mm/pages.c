@@ -451,15 +451,6 @@ int CreatePageTable ( unsigned long directory_address, int offset, unsigned long
 	//Configurando os atributos.
 	PD[offset] = (unsigned long) &newPT[0];
     PD[offset] = (unsigned long) PD[offset] | 7;      
-
-	
-	// @todo: 
-	//     Registrar na lista de páginas.  
-	//     Salvar estruturas.
-	//
-	//unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
-
-    //return (void *) base;
 	
 	return 0;
 };
