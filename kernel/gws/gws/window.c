@@ -912,7 +912,7 @@ void windowSendMessage( unsigned long arg1,
 						unsigned long arg4 )
 {    
 	struct window_d *wFocus;
-	
+	struct thread_d *t;   //thread de input da janela.
     //
 	// lembrando: O arg1 por enquanto será ignorado ;;; ele deveria 
 	//conter a janela que devemos enviar a mensagem...
@@ -952,19 +952,29 @@ void windowSendMessage( unsigned long arg1,
 		//Valida a estrutura da janela com o foco de entrada.
 		if ( wFocus->used == 1 && wFocus->magic == 1234 )
 		{
+			// A janela tem que tem uma thread de input, senão falha.
+			
+			t = (struct thread_d *) wFocus->InputThread;
+			
+	        if( (void *) t == NULL )
+	        {
+		        printf("windowSendMessage: t fail\n");
+		        refresh_screen();
+	            return;
+	        }
 			
 			//ok funcionou
-			wFocus->msg_window = (struct window_d *) arg1;
-			wFocus->msg = (int) arg2;      
-			wFocus->long1 = (unsigned long) arg3;
-			wFocus->long2 = (unsigned long) arg4;
-			wFocus->newmessageFlag = 1;
-			
-			//#bugbug acho que isso não é usado.
-			//isso é um teste.
-			//Para facilitar vamos colocar a mensagem num lugar mais acessivel.
-			gNextKeyboardMessage = (int) 0;
-			
+			if ( t->used == 1 && t->magic == 1234 )
+			{
+			    t->window = (struct window_d *) arg1;
+		  	    t->msg = (int) arg2;      
+			    t->long1 = (unsigned long) arg3;
+			    t->long2 = (unsigned long) arg4;
+			    
+				t->newmessageFlag = 1;
+			};
+            //fail			
+						
 		}else{
 			//fail.
 		};

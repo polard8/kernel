@@ -1252,18 +1252,26 @@ shellProcedure ( struct window_d *window,
 	unsigned long width;
 	unsigned long height;
 	
+	//menu icon
+	struct window_d *miWindow;
+	unsigned long miLeft = 0;
+	unsigned long miTop = (600 - (600/16));
+	unsigned long miWidth = (800/8); 
+	unsigned long miHeight = (600/16);
+	
     switch (msg)
     {
 		case MSG_CREATE:	
 		    //#debug: tá aqui pra checarmos se tem recursividade.
 			printf("SHELL.BIN: MSG_CREATE\n");
+	    
+	        
+			enterCriticalSection (); 
 	        //todo: get system metrics.
 	        left = 0;
 	        top = (600 - (600/16));
 	        width = 800;
-	        height = (600/8);		    
-	        
-			enterCriticalSection (); 
+	        height = (600/8);	
 			tbWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-taskbar",     
                                 left, top, width, height,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
@@ -1282,7 +1290,29 @@ shellProcedure ( struct window_d *window,
             
 			//Refresh Window
 			system_call ( 124, (unsigned long) tbWindow, (unsigned long) tbWindow, (unsigned long) tbWindow );								
-            exitCriticalSection (); 							
+            exitCriticalSection ();
+            
+			enterCriticalSection ();
+	        miWindow = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
+                            miLeft, miTop, miWidth, miHeight,    
+                            0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
+							
+	        if ( (void *) miWindow == NULL )
+	        {	
+		        printf("shellProcedure: icon1 Window fail");
+		        //refresh_screen();
+		        while (1){
+			        asm("pause");
+		        }
+		        //exit(0);
+	        };
+	
+            //Registrar.
+            APIRegisterWindow(miWindow);
+			//Refresh Window
+			system_call ( 124, (unsigned long) miWindow, (unsigned long) miWindow, (unsigned long) miWindow );	
+				
+			exitCriticalSection ();
 			break;
 			
 		//isso pinta os elementos da área de cliente.
@@ -1475,7 +1505,13 @@ shellProcedure ( struct window_d *window,
 				    //#obs: No keydown a gente só abaixa o botão.
 					
 				    //#debug
-					//printf("button 1\n");     
+					//printf("button 1\n"); 
+                    
+                    if (window == tbWindow)
+                    {
+						printf("this is the taskbar\n");
+					    break;
+					}						
 					
                     //cima
 					if ( window == app1_button )
@@ -1534,7 +1570,7 @@ shellProcedure ( struct window_d *window,
 			{		
 				case 1:
 				    //printf("up button 1\n");
-					if (window == menu_button)
+					if (window == miWindow)
 					{
 	                    shellTestButtons ();	
 		                refresh_screen ();						
