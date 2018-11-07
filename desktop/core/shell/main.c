@@ -2723,6 +2723,42 @@ do_compare:
     };
 	
 	
+	//USADO NO TESTE ABAIXO.
+	int thisprocess_id = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0); 
+	unsigned char *heaptest = (unsigned char *) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, thisprocess_id, 0, 0 );
+    void *heapAllocP;
+	
+    //testes de heap
+    if ( strncmp( prompt, "heap", 4 ) == 0 )
+	{
+		//vamos tentar acessar o endereço do heap pra saber se teremos uma pagefault
+	    printf("~heap test\n");
+		heaptest[0] = 8;
+		heaptest[1] = 9;
+		heaptest[2] = 10;
+		heaptest[3] = 11;
+		printf("%d ",heaptest[0]);
+		printf("%d ",heaptest[1]);
+		printf("%d ",heaptest[2]);
+		printf("%d ",heaptest[3]);
+        
+		
+		//nosso heap é de 256kb.
+		//vamos tentar alocar 200kb como teste.
+		printf("traying to allocate 200kb \n");
+		
+		heapAllocP = (void *) malloc ( 200 * 1024 );
+		if ( (void *) heapAllocP == NULL )
+		{
+			printf("malloc fail\n");
+		}else{
+			printf("malloc ok\n");
+		}
+		
+		printf("~heap test done\n");
+		goto exit_cmp;
+    };	
+	
 	// help
 	// ?
 	// Mostra ajuda.

@@ -782,11 +782,21 @@ get_next:
 		// base + (n * heapsize )
 		
 		Process->HeapNumber = gHeapCount;
-		Process->HeapPA = ( gHeapPoolStartAddress + (gHeapCount * 0x400000) );
+		gHeapCount++;
 		
+		//#todo 
+		//#importante
+		//Como essa alocação funcionou, então podemos melhorar 
+		//essa rotina de alocação pra que ela tenha mais memória disponível.
+		
+		Process->Heap = (unsigned long) allocPageFrames (64); //(size=0x40000 256kb)
+		Process->HeapPA = (unsigned long)  virtual_to_physical ( Process->Heap, gKernelPageDirectoryAddress );
+		
+		//Process->HeapPA = ( gHeapPoolStartAddress + (gHeapCount * 0x400000) );
+
 		
 		//#todo #bugbug precis checar o retorno para 1 ou 0.
-		CreatePageTable ( Process->Directory , 512, ( gHeapPoolStartAddress + (gHeapCount * 0x400000) ) );	
+		//CreatePageTable ( Process->Directory , 512, ( gHeapPoolStartAddress + (gHeapCount * 0x400000) ) );	
 		
 		
 		
@@ -794,14 +804,14 @@ get_next:
 		// #bubug: Endereço do fim do heap.
 		// Tamanho do heap, dado em KB.
 		//#importante: todo heap de usuário começa no mesmo endereço lógico.
-	    Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;   //(0x80000000) 
-	    Process->HeapEnd = (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE );  
-		Process->HeapSize = (Process->HeapEnd - Process->Heap );    //4mb
+	    //Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;   //(0x80000000) 
+	    //Process->HeapEnd = (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE );  
+		//Process->HeapSize = (Process->HeapEnd - Process->Heap );    //4mb
 
 		//#importante:
 		//próximo heap.
 		
-		gHeapCount++;
+		
 		
 		//Process->HeapPointer
 		//Process->HeapLastValid

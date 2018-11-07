@@ -493,9 +493,35 @@ int heapInit (){
 	
 	unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
 	
+	//#importante 
+	//buffer de teste. É pequeno mas funciona.
 	
-	HEAP_START = (unsigned long) &HeapBuffer[0];
-	HEAP_END   = (unsigned long) &HeapBuffer[Max];
+	//HEAP_START = (unsigned long) &HeapBuffer[0];
+	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
+
+	//#define	SYSTEMCALL_GETPROCESSHEAPPOINTER 184
+	//#define	SYSTEMCALL_GETPID   85
+	
+	//#importante 
+	//Testando novo buffer.
+	
+	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
+	int thisprocess_id = (int) system_call( 85, 0, 0, 0); 
+	unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );	
+	
+	HEAP_START = (unsigned long) &heaptest[0];
+	//HEAP_END   = (unsigned long) &heaptest[Max];	
+	HEAP_END = (unsigned long) (HEAP_START + 0x40000 -1); //(256KB = 64 PÁGINAS DE 4KB) 
+	
+	//#importante 
+	//Testando novo buffer.
+	//Todos os processos terão heap em 0x80000000 de 4mb por enquanto.
+	//#bugbug: Esse endereço está dando pagefault, é preciso rever a rotina 
+	//que mapeou esse endereço.
+	
+	//HEAP_START = (unsigned long) 0x80000000;               //&HeapBuffer[0];
+	//HEAP_END   = (unsigned long) (0x80000000 + 0x400000);  //&HeapBuffer[Max];	
+	
 	HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
 	heap_start  = (unsigned long) HEAP_START;  
@@ -651,12 +677,11 @@ int libcInitRT (){
 	if ( Status != 0 )
 	{
 		//printf("stdlib-libcInitRT: error\n");
-		return (int) 1; //error
+		
+		return (int) 1;    //error
 	};
 	
 	//...
-	
-//done:	
 
 	return (int) 0;
 };
@@ -731,7 +756,8 @@ void *malloc ( size_t size ){
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
 	
 	//??? @todo:
-	ret = (void *) AllocateHeap(s);
+	
+	ret = (void *) AllocateHeap (s);
 	
 	if ( (void *) ret == NULL )
 	{
@@ -748,8 +774,6 @@ void *malloc ( size_t size ){
 		return NULL;		
 	};
 	*/
-	
-//done:
 
     return (void *) ret; 
 };

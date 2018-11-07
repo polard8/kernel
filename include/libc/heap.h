@@ -5,6 +5,7 @@
  *     O propósito desse header é dar suporte ao gerenciamento de
  * do heap que será usado para a alocação de memória para um programa
  * em user mode. 
+ *
  *     Um suporte oferecido pela biblioteca libC99.
  *     Obs: O kernel poderá usar tanto o heap do processo quanto o heap 
  * do desktop ao qual o processo pertence.

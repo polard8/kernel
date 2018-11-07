@@ -374,6 +374,8 @@ void *CreatePageDirectory (){
  */
 int CreatePageTable ( unsigned long directory_address, int offset, unsigned long region_address ){	
 	
+	
+	//endereço onde vai ficar a tabela.
 	unsigned long ptVA;  //virtual.
 	unsigned long ptPA;  //físico.
 	
@@ -400,7 +402,7 @@ int CreatePageTable ( unsigned long directory_address, int offset, unsigned long
 	
 	int i;
 	unsigned long *PD = (unsigned long *) directory_address;       //Diretório.
-	unsigned long *newPT = (unsigned long *) ptPA;    //Tabela de páginas.
+	unsigned long *newPT = (unsigned long *) ptPA;                 //Tabela de páginas.
 	
 	//unsigned long base = pagetable_address;
 	
