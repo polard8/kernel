@@ -5,8 +5,6 @@
 #include <kernel.h>
 
  
-
-
 // Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
 uint8_t keyboard_read(){
      
@@ -35,9 +33,9 @@ int BAT_TEST (){
 	
     uint8_t val;
 
-    while(1) 
+    while (1) 
 	{
-        val = keyboard_read();
+        val = keyboard_read ();
 
         if(val == 0xAA)return (int) 0;
         else if(val == 0xFC) {
@@ -66,7 +64,7 @@ int BAT_TEST (){
 void ps2_keyboard_initialize (){
 	
 	//user.h
-	ioControl_keyboard = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
+	ioControl_keyboard = (struct ioControl_d *) malloc ( sizeof(struct ioControl_d) );
 	
 	if ( (void *) ioControl_keyboard == NULL )
 	{

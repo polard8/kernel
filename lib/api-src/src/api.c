@@ -2623,6 +2623,15 @@ int api_getchar (){
 };
 
 
+//mostra um bmp mas ignora o bg branco 
+int 
+apiDisplayBMPNoWhiteBG ( char *address, 
+                         unsigned long x, 
+				         unsigned long y )
+{
+	return (int) system_call ( 43, (unsigned long) address, (unsigned long) x , (unsigned long) y );
+};
+
 /*
  * apiDisplayBMP:
  *

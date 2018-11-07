@@ -95,9 +95,11 @@
 //Shut down conputer.
 #define	SYS_SHUTDOWN        40
 #define	SYS_41              41
+
 //Load bitmap image, 
 #define	SYS_LOADBMP    42
-#define	SYS_43              43
+#define	SYS_LOADBMP_TRANSPARENCY_EFFECT    43
+
 // ?? Next app.
 #define	SYS_G_NEXTAPP       44
 //Message box.

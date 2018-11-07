@@ -121,34 +121,38 @@ int MOUSE_BAT_TEST(){
 };
 
 
-void mouse_install()
-{
+void mouse_install (){
+	
 	mouse_write(0xFF);
-    	//Espera o dados descer (ACK)
-    	while( mouse_read() != 0xFA);	
+    
+	//Espera o dados descer (ACK)
+    while( mouse_read() != 0xFA);	
 		
-    	// Basic Assurance Test (BAT)
-    	if( MOUSE_BAT_TEST() != 0) 
-		{
-    		// Aqui! Precisaremos de fazer alguma coisa, em casos de erro
-    		printf("\n Mouse error!");
-    	}
+    // Basic Assurance Test (BAT)
+    
+	if ( MOUSE_BAT_TEST() != 0) 
+	{
+    	// Aqui! Precisaremos de fazer alguma coisa, em casos de erro
+    	printf("\n Mouse error!");
+    }
 
-    	// Use mouse default
+    // Use mouse default
+	
 	mouse_write(0xF6);
-   	//Espera o dados descer (ACK)
-    	while( mouse_read() != 0xFA);
+   	
+	//Espera o dados descer (ACK)
+    while( mouse_read() != 0xFA);
 
 
-    	// habilita o mouse. (streaming)
+    // habilita o mouse. (streaming)
+	
 	mouse_write(0xF4);
-    	//Espera o dados descer (ACK)
+    
+	//Espera o dados descer (ACK)
 	while( mouse_read() != 0xFA);
 
-
-    	// espera nossa controladora terminar
-    	kbdc_wait(1);
-		
+   	// espera nossa controladora terminar
+   	kbdc_wait(1);		
 };
 
 
@@ -985,7 +989,7 @@ void mouseHandler (){
 
 /* 
  * **************
- * P8042_install:
+ * :
  *     Configurando o controlador PS/2, 
  *     e activar a segunda porta PS/2 (mouse).
  *     (Nelson Cole)(Fred Nora)
@@ -1006,9 +1010,8 @@ void ps2_mouse_initialize (){
 	//	inportb(0x60);
 	//}
 	
-	
-	printf("ps2_mouse_initialize: enable second port\n");
-	refresh_screen();
+	//printf("ps2_mouse_initialize: enable second port\n");
+	//refresh_screen();
 	
 	
 	// Ativar a segunda porta PS/2.
@@ -1019,8 +1022,8 @@ void ps2_mouse_initialize (){
 
 
 	
-	printf("ps2_mouse_initialize: enable second device\n");
-	refresh_screen();
+	//printf("ps2_mouse_initialize: enable second device\n");
+	//refresh_screen();
 	
 	
 	// Activar o segundo despositivo PS/2, modificando o status de 
@@ -1046,10 +1049,7 @@ void ps2_mouse_initialize (){
 	outportb(0x60,status);  	
 	
 	
-	
-	
-
-    	//Agora temos dois dispositivos sereais teclado e mouse (PS/2).
+    //Agora temos dois dispositivos sereais teclado e mouse (PS/2).
 	
 
     //Activar a primeira porta PS/2
@@ -1087,8 +1087,8 @@ void ps2_mouse_initialize (){
 	
 
 
- 	printf("ps2_mouse_initialize: restores defaults\n");
-	refresh_screen();
+ 	//printf("ps2_mouse_initialize: restores defaults\n");
+	//refresh_screen();
 
   // Restaura defaults do PS/2 mouse.
 	//kbdc_wait(1);
@@ -1098,8 +1098,8 @@ void ps2_mouse_initialize (){
     //while ( mouse_read() != I8042_ACKNOWLEDGE );
 
 	
- 	printf("ps2_mouse_initialize: enable transmission\n");
-	refresh_screen();	
+ 	//printf("ps2_mouse_initialize: enable transmission\n");
+	//refresh_screen();	
 
    // TODO: Pode ser interessante diminuir a sensibilidade do mouse
    // aqui!!!
@@ -1137,8 +1137,8 @@ init_mouse_exit:
         		
 	}		
 	
- 	printf("ps2_mouse_initialize: done\n");
-	refresh_screen();		
+ 	//printf("ps2_mouse_initialize: done\n");
+	//refresh_screen();		
 	
     //#imporante:
 	//não habilitaremos e não resetaremos o dispositivo.
@@ -1161,12 +1161,12 @@ int ps2_mouse_globals_initialize (){
 	int mouse_ret;
 	
 	
-	printf("ps2_mouse_globals_initialize: inicializando estrutura\n");
-	refresh_screen();		
+	//printf("ps2_mouse_globals_initialize: inicializando estrutura\n");
+	//refresh_screen();		
 	
 	
 	//user.h
-	ioControl_mouse = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
+	ioControl_mouse = (struct ioControl_d *) malloc ( sizeof(struct ioControl_d) );
 	
 	if ( (void *) ioControl_mouse == NULL )
 	{
@@ -1184,8 +1184,8 @@ int ps2_mouse_globals_initialize (){
 	};	
 	
 	
-	printf("ps2_mouse_globals_initialize: inicializando variaveis\n");
-	refresh_screen();		
+	//printf("ps2_mouse_globals_initialize: inicializando variaveis\n");
+	//refresh_screen();		
 	
 	//
 	// Estamos espaço para o buffer de mensagens de mouse.
@@ -1232,8 +1232,8 @@ int ps2_mouse_globals_initialize (){
 	// ## BMP ##
 	//
 	
-	printf("ps2_mouse_globals_initialize: carregando bmp\n");
-	refresh_screen();		
+	//printf("ps2_mouse_globals_initialize: carregando bmp\n");
+	//refresh_screen();		
 	
 	//
 	// Carregando o bmp do disco para a memória
@@ -1254,8 +1254,8 @@ int ps2_mouse_globals_initialize (){
 //    MessageBox(gui->screen, 1, "init_mouse:","Mouse initialized!");   
 //#endif  
 
-	printf("ps2_mouse_globals_initialize: done\n");
-	refresh_screen();	
+	//printf("ps2_mouse_globals_initialize: done\n");
+	//refresh_screen();	
 
     //initialized = 1;
     //return (kernelDriverRegister(mouseDriver, &defaultMouseDriver));	

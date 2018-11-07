@@ -1045,14 +1045,17 @@ noArgs:
 	
 	enterCriticalSection();
 
-    //#BUGBUG
-    //Estamos passando um ponteiro que é uma variável local.	
+    //#OOOPS
+    //Estamos passando um ponteiro que é uma variável local.
+	//ISSO FUNCIONA.
+	
 	//Status = (int) shellInit (hWindow); 
-	Status = (int) shellInit (hWindow2);  //#BUGBUG (ldisc error)
+	Status = (int) shellInit (hWindow2);  
 	
 	if ( Status != 0 ){
 		die ("SHELL.BIN: app_main: shellInit fail");
 	};
+	
 	exitCriticalSection();     		
 	
 
@@ -1064,11 +1067,10 @@ noArgs:
 	//mensagens de input de teclado.
 	//
 	
-	if ( interactive != 1 ){
-		
+	if ( interactive != 1 )
+	{	
 		//#debug
-        printf("shell is not interactive\n");
-		
+        printf("shell is not interactive\n");	
 		goto skip_input;
 	};
 	
@@ -1103,7 +1105,8 @@ noArgs:
 	//@todo: 0,0 não está na área de cliente.
 	
  
-create_client_objects:
+//create_client_objects:
+
 	apiSendMessage ( (struct window_d *) hWindow, 
 	                 (int) MSG_CREATE, 
 					 (unsigned long) 0, 
@@ -1266,7 +1269,7 @@ shellProcedure ( struct window_d *window,
     {
 		case MSG_CREATE:	
 		    //#debug: tá aqui pra checarmos se tem recursividade.
-			printf("SHELL.BIN: MSG_CREATE\n");
+			//printf("SHELL.BIN: MSG_CREATE\n");
 	    
 	        bmp = (void *) malloc (1024*5); 	// testando malloc.
             if ( (void *) bmp == NULL )
@@ -1337,6 +1340,7 @@ shellProcedure ( struct window_d *window,
 			//system_call ( 124, (unsigned long) miWindow, (unsigned long) miWindow, (unsigned long) miWindow );	
 				
 			//exitCriticalSection ();
+			goto done;
 			break;
 			
 		//isso pinta os elementos da área de cliente.
@@ -1409,7 +1413,7 @@ shellProcedure ( struct window_d *window,
 					goto done;
                     break;               
             };
-        break;
+            break;
 		
 		case MSG_KEYUP: 
 		    // printf("%c", (char) 'u');
@@ -3126,7 +3130,8 @@ do_compare:
 	// t2 - Test bmp
 	if ( strncmp( prompt, "t2", 2 ) == 0 )
 	{
-		shellTestDisplayBMP();
+		//shellTestDisplayBMP();
+		shellTestDisplayBMPNoWhiteBG ();
         goto exit_cmp;
     };	
 	
@@ -3941,11 +3946,6 @@ void shellShell (){
  * shellInit:
  *     Inicializa o Shell.  
  *
- *     #bugbug: 
- *     Essa rotina começa escrever na janela com o foco de entrada. 
- * Mas um outro aplicativo solicitou o foco de entrada e essa rotina 
- * esta terminando de escrever mas agora na janela do outro aplicativo.
- *
  * @todo: Inicializar globais e estruturas.
  *
  */
@@ -3953,7 +3953,7 @@ int shellInit ( struct window_d *window ){
 	
 	//#bugbug 
 	//o ponteiro do argumento pode ser inválido, pois 
-	//é uma variáveç local.
+	//é uma variável local.
 	
 	int PID;
 	int PPID;
@@ -3964,10 +3964,6 @@ int shellInit ( struct window_d *window ){
 		
 	char buffer[512];
 	
-	
-	// #bugbug:
-    //     Esse ponteiro de estrutura está em kernel mode. 
-	//     Não podemos usá-lo.
 	
 	//??
 	//stream status
@@ -4048,16 +4044,12 @@ int shellInit ( struct window_d *window ){
 	};
 	
 	
-	//
 	// Obtendo informações sobre a janela ativa.
-	//
 	
-	//Active window
 	ActiveWindowId = (int) APIGetActiveWindow ();
 	
-	//valor de erro
-	if ( ActiveWindowId == (-1) ){
-		
+	if ( ActiveWindowId == (-1) )
+	{	
 	    printf("shellInit: ERROR getting Active window ID\n");	
 	}	
 	
@@ -4067,11 +4059,10 @@ int shellInit ( struct window_d *window ){
 	
 	// Obtendo informações sobre a janela com o foco de entrada.
 
-	// Focus.
 	WindowWithFocusId = (int) APIGetFocus();
 	
-	//valor de erro
-	if ( WindowWithFocusId == (-1) ){
+	if ( WindowWithFocusId == (-1) )
+	{
 	    printf("shellInit: ERROR getting Window With Focus ID\n");	
 	}	
 	
@@ -4079,10 +4070,8 @@ int shellInit ( struct window_d *window ){
 	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
 #endif
 	
-	//
-	// Obetendo informações sobre linhas e colunas do shell.
-	//
 	
+	// Obtendo informações sobre linhas e colunas do shell.
 	
 #ifdef SHELL_VERBOSE		
 	//columns and rows
@@ -4119,12 +4108,12 @@ int shellInit ( struct window_d *window ){
 	
 	//PID = (int) APIGetPID();
 	
-    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0 );
+    PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
 	if ( PID == (-1) ){
 	    printf("ERROR getting PID\n");	
 	}
   
-    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0 );
+    PPID = (int) system_call ( SYSTEMCALL_GETPPID, 0, 0, 0 );
 	if ( PPID == (-1) ){
 	    printf("ERROR getting PPID\n");	
 	}
@@ -4298,19 +4287,9 @@ int shellInit ( struct window_d *window ){
 // Done.
 	
 done:
-    
-	/*
-	   #test 
-	   #bugbug 
-	   
-	   Estamos supendendo a rotina de password porque 
-	   estamos testando o inpot de mensagens.
-	   Sendo que o input do password é diferente do input 
-	   de mensagens.
-       em seguida trablharemos nesse input  também
-       Esse input é o input usado pela libc.
-     */
-	   
+
+    // login
+	
 	if ( shellCheckPassword() != 1 ){
 		
 	    printf("shellCheckPassword FAIL \n");		
@@ -4356,18 +4335,17 @@ done:
 	    shellPrompt ();
 	
 	
-    
-	//refresh_screen();
-    
 	//#test 
 	//tentando dar refresh somente na janela passada por argumento.
+	//refresh_screen();
+	
 	system_call ( 124, (unsigned long) window, (unsigned long) window, (unsigned long) window );
 	
 	return (int) 0;
 };
 
 
-
+//1 ok 0 fail 
 int shellCheckPassword (){
 	
     char buffer[512];	
@@ -4379,10 +4357,17 @@ int shellCheckPassword (){
 		
 		user_stream = (FILE *) fopen ("user.txt","w+");
 		
-		// Testing welcome message.
-	    printf("\n");
-	    printf("Welcome to Gramado!\n");
-	    printf("\n");
+		if( (void *) user_stream == NULL )
+		{
+			printf("shellCheckPassword: fopen fail\n");
+		    return 0;
+		};
+		
+		// Welcome message.
+	    
+		//printf("\n");
+	    printf("\n Welcome to Gramado! \n");
+	    //printf("\n");
 	
         
 		//hostname
@@ -4392,17 +4377,19 @@ int shellCheckPassword (){
 		//  ## username  ##
 		//
 		
-	    printf("username:\n");
-	    gets(username);
+	    printf("\n username: ");
+	    gets (username);
 		current_user_name = username;
 		
 		//
 		//  ## password ##
 	    //
 		
-		printf("password:\n");
-	    gets(password);
+		printf("\n password: ");
+	    gets (password);
 	
+	    printf("\n");
+		
 #ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s} \n", username, password );
@@ -4458,17 +4445,17 @@ int shellCheckPassword (){
             if( strncmp( username, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE				
-				printf("## USERNAME OK ##\n");
+				printf("# USERNAME OK #\n");
 #endif				
 				login_status = 1;
 			}else{
-				printf("## USERNAME FAIL ##\n");
+				printf("# USERNAME FAIL #\n");
 				login_status = 0;
 			};				
 
         }else{
 			
-			printf("## USERNAME FAIL ##\n");
+			printf("# USERNAME FAIL #\n");
 			login_status = 0;
 		};
 
@@ -4502,17 +4489,17 @@ int shellCheckPassword (){
             if ( strncmp( password, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE								
-				printf("## PASSWORD OK ##\n");
+				printf("# PASSWORD OK #\n");
 #endif
 				login_status = 1;
 			}else{
-				printf("## PASSWORD FAIL ##\n");
+				printf("# PASSWORD FAIL #\n");
 				login_status = 0;
 			};					
 			
 		}else{
 			
-		    printf("## PASSWORD FAIL ##\n");
+		    printf("# PASSWORD FAIL #\n");
             login_status = 0; 			
 		};
 		    

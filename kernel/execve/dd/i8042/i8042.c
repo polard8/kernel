@@ -36,8 +36,8 @@ void ps2 (){
 	
    // printf("");	
 	
-	printf("ps2: Desabilitando as duas portas...\n");
-	refresh_screen();
+	//printf("ps2: Desabilitando as duas portas...\n");
+	//refresh_screen();
 
     
 	
@@ -88,16 +88,18 @@ void ps2 (){
 	//segunda porta. O mouse.
     
 	//2
-	printf("ps2: inicializando mouse ...\n");
-	refresh_screen();	
+	//printf("ps2: inicializando mouse ...\n");
+	//refresh_screen();	
+	
 	ps2_mouse_initialize();  
 	
 	
 	
 	
 
-	printf("ps2: inicializando globais do mouse ...\n");
-	refresh_screen();	
+	//printf("ps2: inicializando globais do mouse ...\n");
+	//refresh_screen();	
+	
 	//Não afeta o controlador. 
 	//Apenas inicializa variáveis.
 	ps2_mouse_globals_initialize();	 	
@@ -114,8 +116,8 @@ void ps2 (){
 
 	
     //2
-	printf("ps2: inicializando teclado ...\n");
-	refresh_screen();	
+	//printf("ps2: inicializando teclado ...\n");
+	//refresh_screen();	
 	ps2_keyboard_initialize();
 	
 	
@@ -201,9 +203,8 @@ void ps2 (){
 		//
 	//};			
 
-	printf("ps2: done\n");
-	refresh_screen();		
-	
+	//printf("ps2: done\n");
+	//refresh_screen();		
 };
 		
 	

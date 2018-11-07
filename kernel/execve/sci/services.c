@@ -478,6 +478,26 @@ void *services( unsigned long number,
             return (void *) bmpDisplayBMP ( (char * ) arg2, 
                                 (unsigned long) arg3, (unsigned long) arg4 );			
             break;
+			
+			
+        //43 Load bitmap, ignoring a given color. (white) 
+		case SYS_LOADBMP_TRANSPARENCY_EFFECT:
+	        //flag para ignorarmos a cor selecionada.
+	        bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
+	
+	        //#importante:
+	        //Selecionamos a cor que será ignorada.
+            //background do bitmap é branco.
+	        bmp_selected_color = COLOR_WHITE;	
+    
+	        // Display !!
+		    //bmpDirectDisplayBMP ( address, x, y );
+	        bmpDisplayBMP ( (char *) arg2, (unsigned long) arg3, (unsigned long) arg4 ); 
+	        //clear flags.
+	        bmp_change_color_flag = 0;
+	        bmp_selected_color = 0;		
+            return NULL;                     			
+            break;
 
 
         //45 Message Box. 

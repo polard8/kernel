@@ -716,6 +716,38 @@ loadFile:
 
 
 /*
+ *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+ *     Devemos usar a função oferecida pela api.
+ *     >> ignora o bg branco dando um efeito de transparência.
+ */
+void shellTestDisplayBMPNoWhiteBG (){
+	
+	
+	// #bugbug @todo: Aumenta o tamanho do heap do processo.
+	// Esse heap é gerenciando nas bibliotecas ou na API.
+	// Obs: 32Kb é alem do limite.
+	
+	void *b = (void *) malloc (1024*32); 	// testando malloc.
+    
+	if ( (void *) b == NULL )
+	{
+		printf("shellTestDisplayBMP: allocation fail\n");
+		//while(1){}
+	}
+	
+	//Carregando o arquivo.
+//loadFile:
+    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+	// na verdade tem que fazer essas rotinas na API.
+	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) folder_file_name, 
+		(unsigned long) b, (unsigned long) b);	
+	
+
+	apiDisplayBMPNoWhiteBG ( (char *) b, 10, 10 );  
+};
+
+
+/*
  * shellTestDisplayBMP:
  *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
  *     Devemos usar a função oferecida pela api.
@@ -743,7 +775,7 @@ loadFile:
 		(unsigned long) b, (unsigned long) b);	
 	
 
-	apiDisplayBMP ( (char *) b, 10, 450 );  
+	apiDisplayBMP ( (char *) b, 10, 10 );  
 	 
     //
 	//Mostrando informações sobre o arquivo.
