@@ -828,7 +828,7 @@ void carrega_bitmap_16x16 ( unsigned long img_address,
                             unsigned long x, 
 						    unsigned long y )                           
 {
-    system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
+   // system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
 };
 
 
@@ -2637,13 +2637,17 @@ int api_getchar (){
  *	// @todo: Criar defines para esses deslocamentos.
  */
 
-static int nibble_count_16colors = 0;
+//static int nibble_count_16colors = 0;
  
 int 
 apiDisplayBMP ( char *address, 
                 unsigned long x, 
 				unsigned long y )
 {
+	
+	return (int) system_call ( 42, (unsigned long) address, (unsigned long) x , (unsigned long) y );
+	
+/*	
 	int i, j, base, offset;
 	
 	unsigned long left, top, bottom;
@@ -2754,7 +2758,7 @@ apiDisplayBMP ( char *address,
 	bi->bmpHeight = (unsigned long) Height;
 	
 	
-	/* Number of bits per pixel */
+	// Number of bits per pixel 
 	//1, 4, 8, 16, 24 and 32.
 	bi->bmpBitCount = *( unsigned short * ) &bmp[28];
 	
@@ -2987,7 +2991,9 @@ apiDisplayBMP ( char *address,
 	//};
 	
 fail:	
-    //printf("fail");	
+    //printf("fail");
+
+*/	
 done:	
 	//Debug
 	//printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );

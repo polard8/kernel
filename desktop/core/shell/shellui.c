@@ -658,7 +658,7 @@ int shellDisplayBMP (char *file_name){
 	//Obs: 32Kb é alem do limite.
 	
 	// testando malloc.
-	void *b = (void *) malloc (1024*30); 	
+	void *b = (void *) malloc (1024 * 128); 	
     
 	if ( (void *) b == NULL )
 	{
@@ -679,7 +679,7 @@ loadFile:
 		(unsigned long) b, (unsigned long) b);	
 	 
 	//Usando a API para exibir o bmp carregado. 
-	apiDisplayBMP ( (char *) b, 10, 400 ); 
+	apiDisplayBMP ( (char *) b, 10, 10 ); 
 	 
     //
 	//Mostrando informações sobre o arquivo.

@@ -95,8 +95,8 @@
 //Shut down conputer.
 #define	SYS_SHUTDOWN        40
 #define	SYS_41              41
-//Load bitmap image, size=16x16.
-#define	SYS_LOADBMP16X16    42
+//Load bitmap image, 
+#define	SYS_LOADBMP    42
 #define	SYS_43              43
 // ?? Next app.
 #define	SYS_G_NEXTAPP       44

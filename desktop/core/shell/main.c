@@ -1259,12 +1259,23 @@ shellProcedure ( struct window_d *window,
 	unsigned long miWidth = (800/8); 
 	unsigned long miHeight = (600/16);
 	
+	//bmp
+	void *bmp;
+	
     switch (msg)
     {
 		case MSG_CREATE:	
 		    //#debug: tá aqui pra checarmos se tem recursividade.
 			printf("SHELL.BIN: MSG_CREATE\n");
 	    
+	        bmp = (void *) malloc (1024*5); 	// testando malloc.
+            if ( (void *) bmp == NULL )
+	        {
+		        printf("MSG_CREATE: allocation fail\n");
+		        break;
+				//while(1){}
+	         }	
+		
 	        
 			enterCriticalSection (); 
 	        //todo: get system metrics.
@@ -1285,34 +1296,47 @@ shellProcedure ( struct window_d *window,
 		        //exit(0);
 	        };
 	        
+			 
+			
+			
 			//Registrar.
             APIRegisterWindow (tbWindow);								
             
+	
+
+	        //bmp
+			system_call ( SYSTEMCALL_READ_FILE, (unsigned long) bmp1_file_name, 
+		       (unsigned long) bmp, (unsigned long) bmp);	
+
+	        apiDisplayBMP ( (char *) bmp, left, top );  
+			//system_call ( 42, (unsigned long) bmp, (unsigned long) left , (unsigned long) top  );
+			
 			//Refresh Window
-			system_call ( 124, (unsigned long) tbWindow, (unsigned long) tbWindow, (unsigned long) tbWindow );								
+			system_call ( 124, (unsigned long) tbWindow, (unsigned long) tbWindow, (unsigned long) tbWindow );
+			
             exitCriticalSection ();
             
-			enterCriticalSection ();
-	        miWindow = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
-                            miLeft, miTop, miWidth, miHeight,    
-                            0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
+			//enterCriticalSection ();
+	        //miWindow = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
+            //                miLeft, miTop, miWidth, miHeight,    
+            //                0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
 							
-	        if ( (void *) miWindow == NULL )
-	        {	
-		        printf("shellProcedure: icon1 Window fail");
+	        //if ( (void *) miWindow == NULL )
+	        //{	
+		    //    printf("shellProcedure: icon1 Window fail");
 		        //refresh_screen();
-		        while (1){
-			        asm("pause");
-		        }
+		    //    while (1){
+			//        asm("pause");
+		    //    }
 		        //exit(0);
-	        };
+	        //};
 	
             //Registrar.
-            APIRegisterWindow(miWindow);
+            //APIRegisterWindow(miWindow);
 			//Refresh Window
-			system_call ( 124, (unsigned long) miWindow, (unsigned long) miWindow, (unsigned long) miWindow );	
+			//system_call ( 124, (unsigned long) miWindow, (unsigned long) miWindow, (unsigned long) miWindow );	
 				
-			exitCriticalSection ();
+			//exitCriticalSection ();
 			break;
 			
 		//isso pinta os elementos da área de cliente.

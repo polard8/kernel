@@ -402,7 +402,8 @@
 #define	SYSTEMCALL_41        41
 
 //Bitmap img: 
-#define	SYSTEMCALL_LOAD_BITMAP_16x16  42  //Load bitmap image, size=16x16.
+//#define	SYSTEMCALL_LOAD_BITMAP_16x16  42  //Load bitmap image, size=16x16.
+#define	SYSTEMCALL_LOAD_BITMAP  42
 #define	SYSTEMCALL_43                 43
 
 // ?? Next app.

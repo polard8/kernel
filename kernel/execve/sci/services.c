@@ -473,10 +473,10 @@ void *services( unsigned long number,
             break;    
         
 	
-	    // ## CANCELADA! ##
-        //42 Load bitmap 16x16.
-		case SYS_LOADBMP16X16 :       
-            return NULL;			
+        //42 Load bitmap 
+		case SYS_LOADBMP:       
+            return (void *) bmpDisplayBMP ( (char * ) arg2, 
+                                (unsigned long) arg3, (unsigned long) arg4 );			
             break;
 
 
