@@ -1,34 +1,32 @@
 
-
 //ps2kbd.c 
+
 
 #include <kernel.h>
 
  
 
 
-
-
-
 // Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
 uint8_t keyboard_read(){
- 
-    
-	kbdc_wait(0);
+     
+	kbdc_wait (0);
+	
 	uint8_t val = inportb(0x60);
-    	wait_ns(200);
-    	return val;
-
-}
+    	
+	wait_ns (200);
+    	
+	return val;
+};
 
 
 // Esta função será usada para escrever dados do teclado na porta 0x60, fora do IRQ1
-void keyboard_write(uint8_t write){
+void keyboard_write (uint8_t write){
 
 	kbdc_wait(1);
-	outb(0x60,write);
-    	wait_ns(200);
-
+	
+	outb (0x60,write);
+    wait_ns(200);
 };
 
 

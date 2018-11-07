@@ -1189,6 +1189,7 @@ char *gets (char *s){
             switch (ch) 
 		    {
 				/* termina a string */
+				case 96:    //#test: [Enter] do Numpad.
 			    case '\n':
 				case VK_RETURN: 
                     s[t] =  (char) '\0'; 

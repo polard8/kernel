@@ -461,10 +461,9 @@ done:
 	struct window_d *w;  
 	w = (void *) windowList[window_with_focus];
 	
-	struct thread_d *t;	
-	//t = (void *) threadList[current_thread];
 	
-
+	//pegaremos a thread associada com a janela que tem o foco.
+	struct thread_d *t;	
 	
 	
 	// ## thread ##

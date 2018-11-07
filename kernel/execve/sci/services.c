@@ -223,7 +223,6 @@ void *services( unsigned long number,
 	
 	
 	
-	
 
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
@@ -892,44 +891,39 @@ void *services( unsigned long number,
 					
 					//alimentando através de mensagens de teclado
 			        
+					
+					
 					//pega o sccancode.
 					SC = (unsigned char) keybuffer[keybuffer_head];
 					
 					//renova a fila do teclado
 		            keybuffer[keybuffer_head] = 0;
 					keybuffer_head++;
-					if ( keybuffer_head >= 128 ){ 
-				        keybuffer_head = 0; };
+					if ( keybuffer_head >= 128 )
+					{ keybuffer_head = 0; };
 			        
-					// envia a mensagem para a thread atual.
-					LINE_DISCIPLINE (SC, 0);
-                    
+					// envia a mensagem para a thread associada com a janela que tem o foco.
 					//LINE_DISCIPLINE chama uma função para colocar a mensagem 
 					// na estrutua da janela com foco de entrada. 
 					//#todo, mas agora deverá 
-					//colocar na estrutura da thread atual.
-					
-					//sinalizando, mas acho que o ldisc já faz isso.
-					//#importante: LINE_DISCIPLINE faz isso. 
-					//t->newmessageFlag = 1;  					
-			
+					//colocar na estrutura da thread atual.							
+					LINE_DISCIPLINE (SC, 0);
+					                    			
 			        return NULL; //sinaliza que não há mensagem 
 				}
 				
+				//pegando a mensagem.
+				//sinalizamos que a mensagem foi consumida.
 				if( t->newmessageFlag == 1 )
-				{
-	
-					//pegando a mensagem.
+				{						
+					//...
 			        message_address[0] = (unsigned long) t->window;
 			        message_address[1] = (unsigned long) t->msg;
 			        message_address[2] = (unsigned long) t->long1;
 			        message_address[3] = (unsigned long) t->long2;
-                    
-					//sinalizamos que a mensagem foi consumida.
                     t->newmessageFlag = 0; 					
-				    
 					return (void *) 1; //sinaliza que há mensagem
-				}
+				};
 			};
 		    break;
 		
@@ -1144,7 +1138,7 @@ void *services( unsigned long number,
 		//atual e não mais na janela com foco de entrada.
         case SYS_GETCH:  
 		    //return (void *) window_getch();
-			return (void *) thread_getchar();
+			return (void *) thread_getchar ();
             break;
 
 		//138 - get key state.	

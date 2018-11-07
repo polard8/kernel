@@ -651,7 +651,8 @@ int init_threads (){
  * Isso é usado pela biblioteca stdio em user mode na função getchar().
  */
  
-
+int extendedFlag; 
+ 
 int thread_getchar (){
 	
 	unsigned char SC;
@@ -670,12 +671,14 @@ int thread_getchar (){
 	
 	//window_getch_lock = 1;
 	
-	//
+	
 	// Pegamos um scancode na fila do teclado,
 	// transformamos ela em mensagem e colocamos a 
 	// mensagem na estrutura da janela com o foco de entrada.
-	//
 	
+	
+	
+next:	
 
 	SC = (unsigned char) keybuffer[keybuffer_head];
 	
@@ -691,17 +694,18 @@ int thread_getchar (){
 	}
 
  
-    //isso coloca a mensagem na fila da thread atual.
+	//#importante:
+	//isso coloca a mensagem na estrutura da trhead associada com a janela que tem 
+	//o foco de entrada.
+	//Em seguida pegamos a mensagem nessa thread.
+	
 	LINE_DISCIPLINE ( SC, 0 );	
 
 	
- 	
-	//
 	// Agora vamos pegar a somente a parte da mensagem 
 	// que nos interessa, que é o caractere armazenado em long1.
 	// Obs: Somente queremos o KEYDOWN. Vamos ignorar as outras 
 	// digitações.
-	//
 	
 	//fast way 
 	//@todo: melhorar isso
@@ -749,18 +753,49 @@ int thread_getchar (){
 		    goto fail;	
 		}		
 		
+		// #importante:
+		// Pegamos apenas a long1 que é o char.
+		
 		save = (int) t->long1;
 		
+		//#bugbug isso é válido somente para teclado abnt2 brasileiro.
+		
+		//#importante 
+		//mas se esse char for 'e0' ??
+		//#test: vamos tentar simplesmente pegar o próximo.
+		
+		if ( save == 0xe0 )
+		{
+			extendedFlag = 1;
+		    goto next;			
+		};
+		
+		if ( extendedFlag == 1)
+		{
+		    extendedFlag = 0;
+			
+			switch (save)
+			{
+				//enter
+				case 0x1c:
+				    save = 96;
+					break;
+					
+				// '/'
+				case 0x45:
+				    save = 98;
+					break;
+			}
+		};
+		
 		//limpa
+	    //sinaliza que a mensagem foi consumida, 
+		//e que não temos nova mensagem.
 		
 		t->window = 0;
 		t->msg = 0;
 		t->long1 = 0;
 		t->long2 = 0;
-					
-	    //sinaliza que a mensagem foi consumida, 
-		//e que não temos nova mensagem.
-	    
 		t->newmessageFlag = 0;
 	
 	    //window_getch_lock = 0;

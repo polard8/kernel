@@ -1345,6 +1345,8 @@ shellProcedure ( struct window_d *window,
 				
 				// Enter.
 				// Finaliza a string e compara.
+				//case '\n':
+				case 96:    //#test: [Enter] do Numpad.
 				case VK_RETURN:
 				    input('\0'); 
 					shellCompare (window);
@@ -2745,7 +2747,7 @@ do_compare:
 		
 		//nosso heap é de 256kb.
 		//vamos tentar alocar 200kb como teste.
-		printf("traying to allocate 200kb \n");
+		printf("trying to allocate 200kb \n");
 		
 		heapAllocP = (void *) malloc ( 200 * 1024 );
 		if ( (void *) heapAllocP == NULL )
