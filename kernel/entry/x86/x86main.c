@@ -655,7 +655,7 @@ int x86main ( int argc, char *argv[] ){
 	// e pelo diretório de páginas do processo init.
 	// estamos fazendo isso porque o programa já foi carregado em 0x400000 pelo boot loader.
 	
-	CreatePageTable ( InitProcess->Directory , 1, 0x400000 );	
+	CreatePageTable ( ShellProcess->Directory , 1, 0x400000 );	
 	
     //=============================================
     // Create shell Thread. tid=1. 
@@ -702,7 +702,7 @@ int x86main ( int argc, char *argv[] ){
 	// e pelo diretório de páginas do processo init.
 	// estamos fazendo isso porque o programa já foi carregado em 0x400000 pelo boot loader.
 	
-	CreatePageTable ( InitProcess->Directory , 1, 0x400000 );		
+	CreatePageTable ( TaskManProcess->Directory , 1, 0x400000 );		
 	
     //===================================
     //Create taskman Thread. tid=2.

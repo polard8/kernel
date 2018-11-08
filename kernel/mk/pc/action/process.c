@@ -782,22 +782,31 @@ get_next:
 		// base + (n * heapsize )
 		
 		Process->HeapNumber = gHeapCount;
-		gHeapCount++;
+		
 		
 		//#todo 
 		//#importante
 		//Como essa alocação funcionou, então podemos melhorar 
 		//essa rotina de alocação pra que ela tenha mais memória disponível.
+
+		//#todo #bugbug precis checar o retorno para 1 ou 0.
+		//aparentemente essa função está boa, mas nesse caso não tá dando certo.
+		//CreatePageTable ( Process->Directory , 512, ( gHeapPoolStartAddress + (gHeapCount * 0x400000) ) );	
 		
+		gHeapCount++;
+		
+		//Process->Heap = 0x80000000;   //(0x80000000)
+		
+		//Isso funciona.
 		Process->Heap = (unsigned long) allocPageFrames (64); //(size=0x40000 256kb)
-		Process->HeapPA = (unsigned long)  virtual_to_physical ( Process->Heap, gKernelPageDirectoryAddress );
+		
+		Process->HeapPA = (unsigned long)  virtual_to_physical ( Process->Heap, Process->Directory );
+		//Process->HeapPA = (unsigned long)  virtual_to_physical ( Process->Heap, gKernelPageDirectoryAddress );
 		
 		//Process->HeapPA = ( gHeapPoolStartAddress + (gHeapCount * 0x400000) );
 
-		
-		//#todo #bugbug precis checar o retorno para 1 ou 0.
-		//CreatePageTable ( Process->Directory , 512, ( gHeapPoolStartAddress + (gHeapCount * 0x400000) ) );	
-		
+	    Process->HeapEnd = Process->Heap + ( 0x40000 );
+		Process->HeapSize = (Process->HeapEnd - Process->Heap );
 		
 		
 		// Endereço do início do Heap do processo.
