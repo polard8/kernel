@@ -545,8 +545,6 @@ system_procedure ( struct window_d *window,
 					//printf ("%x \n", CreatePageDirectory() );
 					
 					//mostrar informações sobre os processos criados.
-					
-					//show_currentprocess_info ();
 					show_process_information ();
 					
 					//pci_info();     //PCI information.

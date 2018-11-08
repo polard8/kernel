@@ -740,7 +740,6 @@ static const char bmp1_file_name[] = "BMP1    BMP";
 static const char bmp2_file_name[] = "BMP2    BMP";
 static const char bmp3_file_name[] = "BMP3    BMP";
 static const char bmp4_file_name[] = "BMP4    BMP";	
-static const char folder_file_name[] = "FOLDER  BMP";	
 static const char init_file_name[] = "INIT    TXT";	
 //... 
  	
@@ -1160,9 +1159,6 @@ int shellCreateTaskBar( int status );
 
 
 int shellDisplayBMP( char *file_name );
-
-
-void shellTestDisplayBMPNoWhiteBG ();
 void shellTestDisplayBMP();
 
 

@@ -221,8 +221,6 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  ************************
  * CreatePageDirectory:
  *
- *     Copia o diretório de páginas do kernel.
- *
  *     Cria um page directory para um processo.
  *
  *     Obs:
@@ -252,8 +250,6 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  
 //deve retornar o endereço do diretório de páginas criado,
 //que é um clone do diretório de páginas do kernel.
-//isso funcionou.
-
 void *CreatePageDirectory (){
 	
 	int i;
@@ -261,13 +257,9 @@ void *CreatePageDirectory (){
 	unsigned long destAddressVA;  //virtual.
 	unsigned long destAddressPA;  //físico.
 	
-	// Endereço virtual 
-	// Alocaremos uma página apenas, pois tem 4KB.
-	
-	destAddressVA = (unsigned long) allocPageFrames (1);
-	
-	if ( destAddressVA == 0 )
-	{
+	//alocaremos uma página apenas, pois tem 4KB.
+	destAddressVA = (unsigned long) allocPageFrames(1);
+	if ( destAddressVA == 0 ){
 		return NULL;
 	}
 	
@@ -298,7 +290,6 @@ void *CreatePageDirectory (){
 	
 	// Criamos um diretório vazio com páginas não presentes.
 	// 0010 em binário.	
-	
 	for ( i=0; i < 1024; i++ )
 	{
 		dest[i] = (unsigned long) src[i];    
@@ -308,16 +299,11 @@ void *CreatePageDirectory (){
 	// Retornaremos o endereço físico do diretório clone.
 	//
 	
-	destAddressPA = (unsigned long) virtual_to_physical ( destAddressVA, 
-	                                    gKernelPageDirectoryAddress );
-	if ( destAddressPA == 0 )
-	{
+	destAddressPA = (unsigned long) virtual_to_physical ( destAddressVA, gKernelPageDirectoryAddress );
+	if ( destAddressPA == 0 ){
 		return NULL;
 	}
 	
-	
-	// #importante:
-	// Retorna um endereço físico.
 	
 	return (void *) destAddressPA;
 };
@@ -328,8 +314,6 @@ void *CreatePageDirectory (){
  *******************
  * CreatePageTable:
  *     Cria uma page table em um diretório.
- *     mapeia uma região de memória física (4mb) em uma pagetable a ser criada. 
- *
  *     Obs:
  *     + O endereço precisa ser alocado antes.
  *     + Precisa ser um endereço físico.
@@ -358,81 +342,34 @@ void *CreatePageDirectory (){
  * #importante:
  * O offset é um índice dentro do diretório de páginas.
  *
- *
- * IN:
- *     directory_address = Endereço l[ogico do diretório de páginas 
- *         onde incluiremos a pagetable.   
- *
- *    offset =  Em que posição do diretório de páginas a pegatable 
- *        deve se incluida.
- *
- *    pagetable_address = Endereço físico de onde ficará a pagetable.
- *         (podemos usar o olocador de páginas para obtermos esse endereço.)
- *
- *    region_address = endereço físico base de uma região de memória que será mapeada nessa pagetable.
- *         (essa região precisa ter 4MB)
  */
-int CreatePageTable ( unsigned long directory_address, int offset, unsigned long region_address ){	
-	
-	
-	//endereço onde vai ficar a tabela.
-	unsigned long ptVA;  //virtual.
-	unsigned long ptPA;  //físico.
-	
-	// Endereço virtual 
-	// Alocaremos uma página apenas, pois tem 4KB.
-	
-	ptVA = (unsigned long) allocPageFrames (1);
-	
-	if ( ptVA == 0 )
-	{
-		//return NULL;
-		return 1;
-	}
-
-
-	ptPA = (unsigned long) virtual_to_physical ( ptVA, 
-	                            gKernelPageDirectoryAddress );
-	if ( ptPA == 0 )
-	{
-		//return NULL;
-		return 1;
-	}	
-	
-	
+void *CreatePageTable( unsigned long directory_address, 
+                       int offset, 
+					   unsigned long pagetable_address )
+{
 	int i;
 	unsigned long *PD = (unsigned long *) directory_address;       //Diretório.
-	unsigned long *newPT = (unsigned long *) ptPA;                 //Tabela de páginas.
+	unsigned long *newPT = (unsigned long *) pagetable_address;    //Tabela de páginas.
 	
-	//unsigned long base = pagetable_address;
+	unsigned long base = pagetable_address;
 	
 	
 	//Limits.
 	if ( directory_address == 0 ){
 		
-		//return NULL;
-		return 1;
+		return NULL;
 	}
 	
 	//Limits.
 	if( offset < 0 )
 	{
-		//return NULL;
-		return 1;
+		return NULL;
 	}
-	
-	//Limits.
-	if ( region_address == 0 ){
-		
-		//return NULL;
-		return 1;
-	}	
 
 	//Limits.
-	if( ptPA == 0 )
+	if( pagetable_address == 0 )
 	{
-		//return NULL;
-		return 1;
+		return NULL;
 	}
 	
 
@@ -445,31 +382,24 @@ int CreatePageTable ( unsigned long directory_address, int offset, unsigned long
 	for ( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
-	    newPT[i] = (unsigned long) region_address | 7;             
-	    region_address = (unsigned long) region_address + 4096;  //+4KB.
+	    newPT[i] = (unsigned long) pagetable_address | 7;             
+	    pagetable_address = (unsigned long) pagetable_address + 4096;  //+4KB.
     };
 
 	//Aqui devemos incluir as flags também.
 	//Configurando os atributos.
 	PD[offset] = (unsigned long) &newPT[0];
     PD[offset] = (unsigned long) PD[offset] | 7;      
+
 	
-	return 0;
+	// @todo: 
+	//     Registrar na lista de páginas.  
+	//     Salvar estruturas.
+	//
+	//unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
+
+    return (void *) base;
 };
-
-
-// Criando as páginas para uma dada pagetable.
-// 
-// IN:
-//     offset = posição de uma pagetable válida dentro de um diretório válido.
-//     directory_address = endereço lógico de um diretório válido que contém a pagetable indicada.
-//     region_address = endereço físico base de uma região de memória que será mapeada nessa pagetable.
-//         (essa região precisa ter 4MB)
-//
-//int setup_pagetable (int offset, unsigned long directory_address, unsigned long region_address )
-//{	
-//};
-
 
 
 /*
@@ -589,7 +519,6 @@ int SetUpPaging (){
 	unsigned long SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
 	unsigned long SMALL_backbuffer_address = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
 	unsigned long SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  
-
 	//...
 	
 	
@@ -603,8 +532,7 @@ int SetUpPaging (){
 	unsigned long MEDIUM_vga_address = MEDIUMSYSTEM_VGA ;
 	unsigned long MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
 	unsigned long MEDIUM_backbuffer_address = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
-	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 
-	
+	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
 
 	
 	//==============================================================
@@ -877,6 +805,7 @@ int SetUpPaging (){
 	// SMALL_user_address = 0x00400000 = USER_BASE.
 	// Mapear 4MB da memória começando em 0x00400000fis. (user mode).
 	//
+	//
     // Aqui estamos pegando uma partição de memória física de 4MB que começa no
 	// endereço físico 0x00400000, no quarto mega da memória física. 
     //
@@ -890,19 +819,20 @@ int SetUpPaging (){
     // Obs: 
 	// HACK HACK. No momento, nessa pagetable do diretório do processo kernel, existem 
     // três imagens carregadas nessa mesma área de memória, compilados em endereços 
-    // absolutos diferentes. (Init, Taskman e Shell). Mas queremos que todos os 
+    // absolutos diferentes. (Idle, Taskman e Shell). Mas queremos que todos os 
     // processos de usuário utilizem o mesmo endereço lógico. 0x400000.	
 	//
-	// Criando uma pagetable.
-	// 4MB de memória física, começando do quarto mega.
+	
+	//Criando uma pagetable.
+	//4MB de memória física, começando do querto mega.
 	// user mode pages - (0x00400000fis = 0x00400000virt)
-	// será usado pelo processo em user mode. Note as flags.(7).
-	// 7 decimal é igual a 111 binário.
-    // kernel 	
+	//será usado pelo processo em user mode. Note as flags.(7).
+	//7 decimal é igual a 111 binário.
+    //kernel 	
     // Criando a entrada do diretório de páginas do processo kernel.
-	// o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
-	// Salva no diretório o endereço físico.
-	// Configurando os atributos.
+	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
+	//Salva no diretório o endereço físico.
+	//Configurando os atributos.
 	
 	for ( i=0; i < 1024; i++ ){
 		
@@ -1074,10 +1004,8 @@ int SetUpPaging (){
     };
 
     page_directory[771] = (unsigned long) &pagedpool_page_table[0];      
-    page_directory[771] = (unsigned long) page_directory[771] | 7;  
+    page_directory[771] = (unsigned long) page_directory[771] | 7;  	
 
-
-	
 	
 	// @todo:  
 	// (sobre heaps para processos em user mode).

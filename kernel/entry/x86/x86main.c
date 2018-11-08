@@ -585,7 +585,7 @@ int x86main ( int argc, char *argv[] ){
 										  (int) KernelProcess->pid, 
 										  "INITPROCESS", 
 										  RING3, 
-										  (unsigned long ) CreatePageDirectory() ); //(unsigned long ) gKernelPageDirectoryAddress );	
+										  (unsigned long ) gKernelPageDirectoryAddress );	
     if ( (void *) InitProcess == NULL )
 	{
         printf("x86main: InitProcess\n");
@@ -594,20 +594,9 @@ int x86main ( int argc, char *argv[] ){
         //processor->IdleProcess = (void*) IdleProcess;	
     };
 	
-	// #test
-	// Criando e editando uma tabela de páginas.
-	// essa pagetable srá usada pelo programa INIT, todas as outras pagetables são iguais 
-	// as do diretório de páginas do processo kernel
-	// Ou seja estamos remapeando a região de 4MB pra frente na memória física,
-	// ou seja essa mesma região será mapeada pelo diretório de páginas do kernel 
-	// e pelo diretório de páginas do processo init.
-	// estamos fazendo isso porque o programa já foi carregado em 0x400000 pelo boot loader.
-	
-	CreatePageTable ( InitProcess->Directory , 1, 0x400000 );
-	
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
-    IdleThread = (void *) KiCreateIdle();
+    IdleThread = (void*) KiCreateIdle();
     if ( (void *) IdleThread == NULL )
 	{
         printf("x86main: IdleThread\n");
@@ -617,9 +606,9 @@ int x86main ( int argc, char *argv[] ){
         IdleThread->ownerPID = (int) InitProcess->pid;
 
         //Thread.
-        processor->CurrentThread = (void *) IdleThread;
-        processor->NextThread    = (void *) IdleThread;
-        processor->IdleThread    = (void *) IdleThread;
+        processor->CurrentThread = (void*) IdleThread;
+        processor->NextThread    = (void*) IdleThread;
+        processor->IdleThread    = (void*) IdleThread;
         //...
     };	
 	
@@ -636,31 +625,18 @@ int x86main ( int argc, char *argv[] ){
 										   (int) KernelProcess->pid, 
 										   "SHELLPROCESS", 
 										   RING3, 
-										   (unsigned long ) CreatePageDirectory() );//(unsigned long ) gKernelPageDirectoryAddress );	
-    if ( (void *) ShellProcess == NULL )
-	{
+										   (unsigned long ) gKernelPageDirectoryAddress );	
+    if((void *) ShellProcess == NULL){
         printf("x86main: ShellProcess\n");
         die();
     }else{
         //...
     };
 	
-	
-	// #test
-	// Criando e editando uma tabela de páginas.
-	// essa pagetable srá usada pelo programa INIT, todas as outras pagetables são iguais 
-	// as do diretório de páginas do processo kernel
-	// Ou seja estamos remapeando a região de 4MB pra frente na memória física,
-	// ou seja essa mesma região será mapeada pelo diretório de páginas do kernel 
-	// e pelo diretório de páginas do processo init.
-	// estamos fazendo isso porque o programa já foi carregado em 0x400000 pelo boot loader.
-	
-	CreatePageTable ( ShellProcess->Directory , 1, 0x400000 );	
-	
     //=============================================
     // Create shell Thread. tid=1. 
     ShellThread = (void *) KiCreateShell();
-    if ( (void *) ShellThread == NULL )
+    if( (void *) ShellThread == NULL )
 	{
         printf("x86main: ShellThread\n");
         die();
@@ -677,37 +653,26 @@ int x86main ( int argc, char *argv[] ){
 #ifdef ENTRY_INIT_TASKMAN
 	
     //Creating Taskman process. 
-    TaskManProcess = (void *) create_process ( NULL, NULL, NULL, 
+    TaskManProcess = (void *) create_process( NULL, 
+	                                         NULL, 
+											 NULL, 
 											 (unsigned long) 0x00401000, 
                                              PRIORITY_LOW, 
 											 KernelProcess->pid, 
 											 "TASKMANPROCESS", 
 											 RING3, 
-											 (unsigned long ) CreatePageDirectory() );//(unsigned long ) gKernelPageDirectoryAddress );	
-    if ( (void *) TaskManProcess == NULL )
-	{
+											 (unsigned long ) gKernelPageDirectoryAddress );	
+    if ( (void *) TaskManProcess == NULL ){
         printf("x86main: TaskManProcess\n");
         die();
     }else{
         //...
     };
 	
-	
-	// #test
-	// Criando e editando uma tabela de páginas.
-	// essa pagetable srá usada pelo programa INIT, todas as outras pagetables são iguais 
-	// as do diretório de páginas do processo kernel
-	// Ou seja estamos remapeando a região de 4MB pra frente na memória física,
-	// ou seja essa mesma região será mapeada pelo diretório de páginas do kernel 
-	// e pelo diretório de páginas do processo init.
-	// estamos fazendo isso porque o programa já foi carregado em 0x400000 pelo boot loader.
-	
-	CreatePageTable ( TaskManProcess->Directory , 1, 0x400000 );		
-	
     //===================================
     //Create taskman Thread. tid=2.
     TaskManThread = (void *) KiCreateTaskManager();
-    if ( (void *) TaskManThread == NULL )
+    if( (void *) TaskManThread == NULL )
 	{
         printf("x86main: TaskManThread\n");
         die();

@@ -69,11 +69,11 @@
  less than console_loglevel. 
 */ 
 
-#define WINDOW_WIDTH     700 
-#define WINDOW_HEIGHT    340
-#define WINDOW_LEFT      ((800-WINDOW_WIDTH)/2)
+//# usado para teste 
+#define WINDOW_WIDTH     750 
+#define WINDOW_HEIGHT    400
+#define WINDOW_LEFT      10
 #define WINDOW_TOP       10
-
  
 //
 // Includes.
@@ -681,9 +681,9 @@ noArgs:
 	//Apenas inicialize. Continuaremos com o procedimento 
 	//do shell e não o da barra,	
 	
-    //enterCriticalSection ();    
-    //shellCreateTaskBar (1);
-    //exitCriticalSection ();
+    enterCriticalSection ();    
+    shellCreateTaskBar (1);
+    exitCriticalSection ();
 	
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
@@ -876,37 +876,13 @@ noArgs:
     //APISetActiveWindow (hWindow);	
     //APISetFocus (hWindow);
 
-	//
-	// ## Create ##
-	// Isso fará o procedimento de janela terminar de criar os elementos gráficos 
-	// de dentro da área de cliente.
-	// #bugbug: Provavelemnte esse não é o momento certo de chamar essa rotina.
-	// Talvez seja lá no kernel, na função createwindow, somente para 
-	// janelas do tipo overlapped. ##oque daria problemas se uma janela overlepped 
-	// resolvesse criar outra janela ovelapped em wm_create
-	// 
 	
-	//#bugbug:
-	// nesse momento o while de mensagens nem está funcionando.
-	// essa mensagem seria perdida, talvez no momento do loin ela 
-	// se perda.
-	// Então vamos tentar um pouco antes do while(runing)
-	
-	//apiSendMessage ( (struct window_d *) hWindow, 
-	//                 (int) MSG_CREATE, 
-	//				 (unsigned long) 0, 
-	//				 (unsigned long) 0 );	
 	
 	//#importante
 	//VAMOS EFETUAR ESSE REFRESH DEPOIS DE CRIARMOS OUTRA JANELA.
 	//refresh_screen ();
 	
-	//
-	// ## refresh window ##
-	//
 	
-	system_call ( 124, (unsigned long) hWindow, (unsigned long) hWindow, (unsigned long) hWindow );	
-	  
 	//
 	// #importante:
 	// +pegamos o retângulo referente à area de cliente da janela registrada. 
@@ -961,12 +937,21 @@ noArgs:
 
     apiBeginPaint();
 	
-	//mudando as dimensões a janela dentro da área de cliente e criando uma nova janela.
-	terminal_rect.left = terminal_rect.left + 4;
-	terminal_rect.top = terminal_rect.top + 4;
+	//mudando as dimensões a janela dentro da área de cliente.
+	terminal_rect.left = terminal_rect.left + 28;
+	terminal_rect.top = terminal_rect.top + 28;
 
 	terminal_rect.width = 8 * 80;
 	terminal_rect.height = 8 * 32;
+	
+	//terminal_rect.width = terminal_rect.width - 150;
+	//terminal_rect.height = terminal_rect.height - 150;
+	
+	
+	//hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
+	//                    terminal_rect.left, terminal_rect.top, 
+	//				    terminal_rect.width, terminal_rect.height,    
+    //                    0, 0, COLOR_RED, COLOR_RED );	   
 
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
 	                        terminal_rect.left, terminal_rect.top, 
@@ -982,23 +967,13 @@ noArgs:
 	apiEndPaint();
 	
     APIRegisterWindow (hWindow2);
-
-
-	//
-	// ## refresh window ##
-	//
-	
-	system_call ( 124, (unsigned long) hWindow2, (unsigned long) hWindow2, (unsigned long) hWindow2 );		
+    //APISetActiveWindow (hWindow2);	
+    APISetFocus (hWindow2);	 
 	
 	//#importante
-	//refresh_screen ();
-
-
+	refresh_screen ();	
 	
-    //#importante:
-	//set focus repinta a janela.
-	
-	APISetFocus (hWindow2);	 
+
 	
 	//
 	// Habilitando o cursor de textos.
@@ -1045,17 +1020,14 @@ noArgs:
 	
 	enterCriticalSection();
 
-    //#OOOPS
-    //Estamos passando um ponteiro que é uma variável local.
-	//ISSO FUNCIONA.
-	
+    //#BUGBUG
+    //Estamos passando um ponteiro que é uma variável local.	
 	//Status = (int) shellInit (hWindow); 
-	Status = (int) shellInit (hWindow2);  
+	Status = (int) shellInit (hWindow2);  //#BUGBUG (ldisc error)
 	
 	if ( Status != 0 ){
 		die ("SHELL.BIN: app_main: shellInit fail");
 	};
-	
 	exitCriticalSection();     		
 	
 
@@ -1067,10 +1039,11 @@ noArgs:
 	//mensagens de input de teclado.
 	//
 	
-	if ( interactive != 1 )
-	{	
+	if ( interactive != 1 ){
+		
 		//#debug
-        printf("shell is not interactive\n");	
+        printf("shell is not interactive\n");
+		
 		goto skip_input;
 	};
 	
@@ -1105,12 +1078,6 @@ noArgs:
 	//@todo: 0,0 não está na área de cliente.
 	
  
-//create_client_objects:
-
-	apiSendMessage ( (struct window_d *) hWindow, 
-	                 (int) MSG_CREATE, 
-					 (unsigned long) 0, 
-					 (unsigned long) 0 );	 
 	
 	//
 	// **** Mensagens  ****
@@ -1142,8 +1109,6 @@ noArgs:
 	unsigned long message_buffer[5];	
 		
 Mainloop:
-
-
     
 	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
 	   elementos da mensagem e depois zerar o buffer */
@@ -1235,10 +1200,10 @@ end:
  *     LOCAL
  */
 unsigned long 
-shellProcedure ( struct window_d *window, 
-                 int msg, 
-				 unsigned long long1, 
-				 unsigned long long2 )
+shellProcedure( struct window_d *window, 
+                int msg, 
+				unsigned long long1, 
+				unsigned long long2 )
 {
 	unsigned long input_ret;
     unsigned long compare_return;	
@@ -1248,108 +1213,8 @@ shellProcedure ( struct window_d *window,
 		//...
 	//}
 	
-	
-	struct window_d *tbWindow;
-	unsigned long left;
-	unsigned long top;
-	unsigned long width;
-	unsigned long height;
-	
-	//menu icon
-	struct window_d *miWindow;
-	unsigned long miLeft = 0;
-	unsigned long miTop = (600 - (600/16));
-	unsigned long miWidth = (800/8); 
-	unsigned long miHeight = (600/16);
-	
-	//bmp
-	void *bmp;
-	
     switch (msg)
     {
-		case MSG_CREATE:	
-		    //#debug: tá aqui pra checarmos se tem recursividade.
-			//printf("SHELL.BIN: MSG_CREATE\n");
-	    
-	        bmp = (void *) malloc (1024*5); 	// testando malloc.
-            if ( (void *) bmp == NULL )
-	        {
-		        printf("MSG_CREATE: allocation fail\n");
-		        break;
-				//while(1){}
-	         }	
-		
-	        
-			enterCriticalSection (); 
-	        //todo: get system metrics.
-	        left = 0;
-	        top = (600 - (600/16));
-	        width = 800;
-	        height = (600/8);	
-			tbWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-taskbar",     
-                                left, top, width, height,    
-                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
-								
-	        if ( (void *) tbWindow == NULL )
-	        {	
-		        printf("shellProcedure: taskbar Window fail");
-		        while (1){
-			        asm("pause");
-		        }
-		        //exit(0);
-	        };
-	        
-			 
-			
-			
-			//Registrar.
-            APIRegisterWindow (tbWindow);								
-            
-	
-
-	        //bmp
-			system_call ( SYSTEMCALL_READ_FILE, (unsigned long) bmp1_file_name, 
-		       (unsigned long) bmp, (unsigned long) bmp);	
-
-	        apiDisplayBMP ( (char *) bmp, left, top );  
-			//system_call ( 42, (unsigned long) bmp, (unsigned long) left , (unsigned long) top  );
-			
-			//Refresh Window
-			system_call ( 124, (unsigned long) tbWindow, (unsigned long) tbWindow, (unsigned long) tbWindow );
-			
-            exitCriticalSection ();
-            
-			//enterCriticalSection ();
-	        //miWindow = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
-            //                miLeft, miTop, miWidth, miHeight,    
-            //                0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
-							
-	        //if ( (void *) miWindow == NULL )
-	        //{	
-		    //    printf("shellProcedure: icon1 Window fail");
-		        //refresh_screen();
-		    //    while (1){
-			//        asm("pause");
-		    //    }
-		        //exit(0);
-	        //};
-	
-            //Registrar.
-            //APIRegisterWindow(miWindow);
-			//Refresh Window
-			//system_call ( 124, (unsigned long) miWindow, (unsigned long) miWindow, (unsigned long) miWindow );	
-				
-			//exitCriticalSection ();
-			goto done;
-			break;
-			
-		//isso pinta os elementos da área de cliente.
-        //essa mensagem é enviada para o aplicativo quando 
-        //a função 'update window'	é chamada.	
-        case MSG_PAINT:
-            printf("SHELL.BIN: MSG_PAINT\n");
-			break;
-			
 		//Faz algumas inicializações de posicionamento e dimensões.
         //case MSG_INITDIALOG:
         //    break;
@@ -1373,8 +1238,6 @@ shellProcedure ( struct window_d *window,
 				
 				// Enter.
 				// Finaliza a string e compara.
-				//case '\n':
-				case 96:    //#test: [Enter] do Numpad.
 				case VK_RETURN:
 				    input('\0'); 
 					shellCompare (window);
@@ -1413,7 +1276,7 @@ shellProcedure ( struct window_d *window,
 					goto done;
                     break;               
             };
-            break;
+        break;
 		
 		case MSG_KEYUP: 
 		    // printf("%c", (char) 'u');
@@ -1535,13 +1398,7 @@ shellProcedure ( struct window_d *window,
 				    //#obs: No keydown a gente só abaixa o botão.
 					
 				    //#debug
-					//printf("button 1\n"); 
-                    
-                    if (window == tbWindow)
-                    {
-						printf("this is the taskbar\n");
-					    break;
-					}						
+					//printf("button 1\n");     
 					
                     //cima
 					if ( window == app1_button )
@@ -1600,7 +1457,7 @@ shellProcedure ( struct window_d *window,
 			{		
 				case 1:
 				    //printf("up button 1\n");
-					if (window == miWindow)
+					if (window == menu_button)
 					{
 	                    shellTestButtons ();	
 		                refresh_screen ();						
@@ -1671,6 +1528,15 @@ shellProcedure ( struct window_d *window,
 			    //printf("exited\n");
 		    }
             break;
+			
+		//Quando a aplicativo em user mode chama o kernel para 
+		//que o kernel crie uma janela, depois que o kernel criar a janela,
+		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
+        //MSG_CREATE, se o aplicativo retornar -1, então a rotina em kernel mode que 
+        //esta criando a janela, cancela a janela que está criando e retorn NULL.		
+		case MSG_CREATE:
+		    printf("SHELL.BIN: MSG_CREATE\n");
+		    break;
 		
 		case MSG_SETFOCUS:
 		    APISetFocus(window);
@@ -1679,7 +1545,12 @@ shellProcedure ( struct window_d *window,
 		case MSG_KILLFOCUS:
             break;
 
-
+		//isso pinta os elementos da área de cliente.
+        //essa mensagem é enviada para o aplicativo quando 
+        //a função 'update window'	é chamada.	
+        case MSG_PAINT:
+            printf("SHELL.BIN: MSG_PAINT\n");
+			break;
 			
 
 		//@todo: isso ainda não existe na biblioteca. criar.	
@@ -2753,42 +2624,6 @@ do_compare:
     };
 	
 	
-	//USADO NO TESTE ABAIXO.
-	int thisprocess_id = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0); 
-	unsigned char *heaptest = (unsigned char *) system_call( SYSTEMCALL_GETPROCESSHEAPPOINTER, thisprocess_id, 0, 0 );
-    void *heapAllocP;
-	
-    //testes de heap
-    if ( strncmp( prompt, "heap", 4 ) == 0 )
-	{
-		//vamos tentar acessar o endereço do heap pra saber se teremos uma pagefault
-	    printf("~heap test\n");
-		heaptest[0] = 8;
-		heaptest[1] = 9;
-		heaptest[2] = 10;
-		heaptest[3] = 11;
-		printf("%d ",heaptest[0]);
-		printf("%d ",heaptest[1]);
-		printf("%d ",heaptest[2]);
-		printf("%d ",heaptest[3]);
-        
-		
-		//nosso heap é de 256kb.
-		//vamos tentar alocar 200kb como teste.
-		printf("trying to allocate 200kb \n");
-		
-		heapAllocP = (void *) malloc ( 200 * 1024 );
-		if ( (void *) heapAllocP == NULL )
-		{
-			printf("malloc fail\n");
-		}else{
-			printf("malloc ok\n");
-		}
-		
-		printf("~heap test done\n");
-		goto exit_cmp;
-    };	
-	
 	// help
 	// ?
 	// Mostra ajuda.
@@ -3130,8 +2965,7 @@ do_compare:
 	// t2 - Test bmp
 	if ( strncmp( prompt, "t2", 2 ) == 0 )
 	{
-		//shellTestDisplayBMP();
-		shellTestDisplayBMPNoWhiteBG ();
+		shellTestDisplayBMP();
         goto exit_cmp;
     };	
 	
@@ -3261,16 +3095,10 @@ do_compare:
 	if ( strncmp( prompt, "t11", 3 ) == 0 )
     {    
         //chama message box com mensagem about.
-        //apiSendMessage ( (struct window_d *) 0, 
-		//                 (int) MSG_COMMAND, 
-		//				 (unsigned long) CMD_ABOUT, 
-		//				 (unsigned long) 0 );
-
         apiSendMessage ( (struct window_d *) 0, 
-		                 (int) MSG_CREATE, 
-						 (unsigned long) 0, 
-						 (unsigned long) 0 );	
-        
+		                 (int) MSG_COMMAND, 
+						 (unsigned long) CMD_ABOUT, 
+						 (unsigned long) 0 );
 		
 		goto exit_cmp;
 	};
@@ -3678,13 +3506,7 @@ done:
 	//#bugbug:
 	//queremos dar refresh apenas da janela.
 	//Mostrando as strings da rotina de comparação.	
-	
-	//temos uma janela enviada por argumento, mas não sabemos se 
-	//ela realmente é a janela que queremos.
-	
-	//refresh_screen();
-	system_call ( 124, (unsigned long) window, (unsigned long) window, (unsigned long) window );		
-	
+	refresh_screen();
 	
     return (unsigned long) ret_value;
 };
@@ -3946,6 +3768,11 @@ void shellShell (){
  * shellInit:
  *     Inicializa o Shell.  
  *
+ *     #bugbug: 
+ *     Essa rotina começa escrever na janela com o foco de entrada. 
+ * Mas um outro aplicativo solicitou o foco de entrada e essa rotina 
+ * esta terminando de escrever mas agora na janela do outro aplicativo.
+ *
  * @todo: Inicializar globais e estruturas.
  *
  */
@@ -3953,7 +3780,7 @@ int shellInit ( struct window_d *window ){
 	
 	//#bugbug 
 	//o ponteiro do argumento pode ser inválido, pois 
-	//é uma variável local.
+	//é uma variáveç local.
 	
 	int PID;
 	int PPID;
@@ -3964,6 +3791,10 @@ int shellInit ( struct window_d *window ){
 		
 	char buffer[512];
 	
+	
+	// #bugbug:
+    //     Esse ponteiro de estrutura está em kernel mode. 
+	//     Não podemos usá-lo.
 	
 	//??
 	//stream status
@@ -4044,12 +3875,16 @@ int shellInit ( struct window_d *window ){
 	};
 	
 	
+	//
 	// Obtendo informações sobre a janela ativa.
+	//
 	
+	//Active window
 	ActiveWindowId = (int) APIGetActiveWindow ();
 	
-	if ( ActiveWindowId == (-1) )
-	{	
+	//valor de erro
+	if ( ActiveWindowId == (-1) ){
+		
 	    printf("shellInit: ERROR getting Active window ID\n");	
 	}	
 	
@@ -4059,10 +3894,11 @@ int shellInit ( struct window_d *window ){
 	
 	// Obtendo informações sobre a janela com o foco de entrada.
 
+	// Focus.
 	WindowWithFocusId = (int) APIGetFocus();
 	
-	if ( WindowWithFocusId == (-1) )
-	{
+	//valor de erro
+	if ( WindowWithFocusId == (-1) ){
 	    printf("shellInit: ERROR getting Window With Focus ID\n");	
 	}	
 	
@@ -4070,8 +3906,10 @@ int shellInit ( struct window_d *window ){
 	printf("WindowWithFocusId={%d}\n", WindowWithFocusId );	
 #endif
 	
+	//
+	// Obetendo informações sobre linhas e colunas do shell.
+	//
 	
-	// Obtendo informações sobre linhas e colunas do shell.
 	
 #ifdef SHELL_VERBOSE		
 	//columns and rows
@@ -4108,12 +3946,12 @@ int shellInit ( struct window_d *window ){
 	
 	//PID = (int) APIGetPID();
 	
-    PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
+    PID = (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0 );
 	if ( PID == (-1) ){
 	    printf("ERROR getting PID\n");	
 	}
   
-    PPID = (int) system_call ( SYSTEMCALL_GETPPID, 0, 0, 0 );
+    PPID = (int) system_call( SYSTEMCALL_GETPPID, 0, 0, 0 );
 	if ( PPID == (-1) ){
 	    printf("ERROR getting PPID\n");	
 	}
@@ -4287,9 +4125,19 @@ int shellInit ( struct window_d *window ){
 // Done.
 	
 done:
-
-    // login
-	
+    
+	/*
+	   #test 
+	   #bugbug 
+	   
+	   Estamos supendendo a rotina de password porque 
+	   estamos testando o inpot de mensagens.
+	   Sendo que o input do password é diferente do input 
+	   de mensagens.
+       em seguida trablharemos nesse input  também
+       Esse input é o input usado pela libc.
+     */
+	   
 	if ( shellCheckPassword() != 1 ){
 		
 	    printf("shellCheckPassword FAIL \n");		
@@ -4335,17 +4183,12 @@ done:
 	    shellPrompt ();
 	
 	
-	//#test 
-	//tentando dar refresh somente na janela passada por argumento.
-	//refresh_screen();
-	
-	system_call ( 124, (unsigned long) window, (unsigned long) window, (unsigned long) window );
-	
-	return (int) 0;
+    refresh_screen();
+    return (int) 0;
 };
 
 
-//1 ok 0 fail 
+
 int shellCheckPassword (){
 	
     char buffer[512];	
@@ -4357,17 +4200,10 @@ int shellCheckPassword (){
 		
 		user_stream = (FILE *) fopen ("user.txt","w+");
 		
-		if( (void *) user_stream == NULL )
-		{
-			printf("shellCheckPassword: fopen fail\n");
-		    return 0;
-		};
-		
-		// Welcome message.
-	    
-		//printf("\n");
-	    printf("\n Welcome to Gramado! \n");
-	    //printf("\n");
+		// Testing welcome message.
+	    printf("\n");
+	    printf("Welcome to Gramado!\n");
+	    printf("\n");
 	
         
 		//hostname
@@ -4377,19 +4213,17 @@ int shellCheckPassword (){
 		//  ## username  ##
 		//
 		
-	    printf("\n username: ");
-	    gets (username);
+	    printf("username:\n");
+	    gets(username);
 		current_user_name = username;
 		
 		//
 		//  ## password ##
 	    //
 		
-		printf("\n password: ");
-	    gets (password);
+		printf("password:\n");
+	    gets(password);
 	
-	    printf("\n");
-		
 #ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s} \n", username, password );
@@ -4445,17 +4279,17 @@ int shellCheckPassword (){
             if( strncmp( username, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE				
-				printf("# USERNAME OK #\n");
+				printf("## USERNAME OK ##\n");
 #endif				
 				login_status = 1;
 			}else{
-				printf("# USERNAME FAIL #\n");
+				printf("## USERNAME FAIL ##\n");
 				login_status = 0;
 			};				
 
         }else{
 			
-			printf("# USERNAME FAIL #\n");
+			printf("## USERNAME FAIL ##\n");
 			login_status = 0;
 		};
 
@@ -4489,17 +4323,17 @@ int shellCheckPassword (){
             if ( strncmp( password, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE								
-				printf("# PASSWORD OK #\n");
+				printf("## PASSWORD OK ##\n");
 #endif
 				login_status = 1;
 			}else{
-				printf("# PASSWORD FAIL #\n");
+				printf("## PASSWORD FAIL ##\n");
 				login_status = 0;
 			};					
 			
 		}else{
 			
-		    printf("# PASSWORD FAIL #\n");
+		    printf("## PASSWORD FAIL ##\n");
             login_status = 0; 			
 		};
 		    

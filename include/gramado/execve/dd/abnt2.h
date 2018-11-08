@@ -151,7 +151,7 @@ VK_SCROLL,     //70 abnt2(Scroll Lock) abnt2=break.
 '1',	//79       (1). abnt2=end  
 '2',    //80       (2). abnt2=down
 '3',    //81       (3). abnt2=pgdn (q).     
-'0',    //82       (0). abnt2=Ins  (numpad=ins)
+'0',    //82       (0). abnt2=Ins
 VK_DELETE_TECLADONUMERICO,    //83 abnt2=(,) abnt2=(Num DEL) (abnt).(´)
 VK_PRINT,   //84 abnt2=(SysRq) PRINT SCREEN E sys req (abnt).
 '.',        //85
@@ -165,9 +165,9 @@ VK_RWIN,    //92 abnt2=(Right Windows) (left WinKey) (\).
 VK_CONTROL_MENU,    //93 CONTROL MENU, abnt2=(Application). (]).
 VK_F18,    //94
 VK_F19,    //95
-'`',       //96 (0). (`)Acento grave.(numpad=enter) (e0 1c)
+'`',       //96 (0). (`)Acento grave.(enter)
 VK_LCONTROL,  //97 (1) (a) Minúscula. control
-'/',          //98 (2) (/) KP_Divide (e0 45)
+'/',          //98 (2) (/) KP_Divide
 VK_F23,       //99 (3) VoidSymbol  
 VK_ALTGR,     //100 (4) AltGr
 VK_BREAK,     //101 (5). 0xE9
@@ -190,7 +190,7 @@ VK_F6,   //117 (F6) F17
 VK_F7,   //118 (F7) (esc) KP_MinPlus
 VK_PAUSE,   //119 (F8) Pause 
 VK_F9,   //120 (F9)
-VK_F10,  //121 (F10) numpad='.'
+VK_F10,  //121 (F10)
 VK_F11,  //122 (F11)
 VK_F12,  //123 (F12)
 VK_F13,  //124 abnt2=F13 

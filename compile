@@ -1,28 +1,20 @@
-#
-# File: compile
-#     +Compile gramado kernel
-#     +Create VHD
-#     +move files to VHD.
-#
-# History:
-#     2018 - Created by Matheus Castello <matheus@castello.eng.br>
-#          - Ported from build.bat
-#     2018 - Revision.
-#     ...
-#
 
-
-#!/bin/bash
-# SPDX-License-Identifier: GPL-3.0+ 
-# BSD License
-
-# todo:
 # help me:
 # This script is running very well,
 # but we need to fix something to have a 
 # fully working Linux experience.
 # todo: we need to remake all the compilation part.
 
+#!/bin/bash
+
+#
+# SPDX-License-Identifier: GPL-3.0+ 
+#
+# Main compile gramado script
+#
+# (C) Copyright 2018
+# Matheus Castello <matheus@castello.eng.br>
+#
 
 # check dependencies this works only in debian based distros
 if [ $(dpkg-query -W -f='${Status}' nasm 2>/dev/null | grep -c "ok installed") -eq 0 ];

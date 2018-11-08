@@ -71,8 +71,7 @@
 //
 #define UPROCESS_DEFAULT_HEAP_BASE  0x80000000 
 //Tamanho default do heap do processo.  
-//#define UPROCESS_DEFAULT_HEAP_SIZE  0x2000     
-#define UPROCESS_DEFAULT_HEAP_SIZE  0x400000  //(4mb)     
+#define UPROCESS_DEFAULT_HEAP_SIZE  0x2000     
 
 //Stack.
 //Deslocamento default do início da pilha em relação ao início do kernel. #bugbug
@@ -463,11 +462,6 @@ struct process_d
 	unsigned long Heap;            //Endereço do início do Heap do processo.
 	unsigned long HeapEnd;
 	unsigned long HeapSize;        //Tamanho do heap.
-	
-	//#test
-	unsigned long HeapVA;
-	unsigned long HeapPA;
-	unsigned long HeapNumber;
 	
 	//?? Isso serve para manipulação do heap do processo.
 	unsigned long HeapPointer;     //Ponteiro do heap do processo para o próxima alocação.

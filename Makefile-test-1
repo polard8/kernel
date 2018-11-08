@@ -1,10 +1,10 @@
 
-# help me:
-# This script is running very well,
-# but we need to fix something to have a 
-# fully working Linux experience.
-
 # 
+# File: Makefile-fred  
+#     Nesse arquivo eu vou checar a rotina de compilação criada para 
+# ficar em conformidade com a compilação usada no .bat.
+# Use o original 'Makefile'
+
 # SPDX-License-Identifier: GPL-3.0+ 
 
 VERSION = 0
@@ -27,12 +27,132 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s
 	
+	
+	#
+	# objects
+	#
+	
+
+OBJECTS=head.o \
+x86main.o \
+io.o \
+hal.o \
+mk.o \
+execve.o \
+video.o \
+screen.o \
+runtime.o \
+ports.o \
+x86.o \
+stdio.o \
+stdlib.o \
+string.o \
+tty.o \
+init.o \
+logon.o \
+logoff.o \
+cpux86.o \
+cpuamd.o \
+memory.o \
+pages.o \
+apic.o \
+pic.o \
+timer.o \
+rtc.o \
+keyboard.o \
+mouse.o \
+ldisc.o \
+hdd.o \
+pci.o \
+usb.o \
+device.o \
+spawn.o \
+callout.o \
+callfar.o \
+process.o \
+pheap.o \
+thread.o \
+threadi.o \
+theap.o \
+tstack.o \
+create.o \
+start.o \
+context.o \
+tasks.o \
+ts.o \
+queue.o \
+sched.o \
+schedi.o \
+dispatch.o \
+sem.o \
+modules.o \
+nicintel.o \
+network.o \
+socket.o \
+sm.o \
+channel.o \
+ipc.o \
+read.o \
+write.o \
+cf.o \
+search.o \
+format.o \
+disk1.o \
+disk.o \
+fs.o \
+vfs.o \
+cedge.o \
+ctype.o \
+request.o \
+info.o \
+signal.o \
+system.o \
+bg.o \
+grid.o \
+sbar.o \
+menubar.o \
+menu.o \
+mbox.o \
+dbox.o \
+button.o \
+char.o \
+pixel.o \
+line.o \
+rect.o \
+dtext.o \
+font.o \
+vsync.o \
+bmp.o \
+createw.o \
+window.o \
+desktop.o \
+wstation.o \
+usession.o \
+gws.o \
+object.o \
+userenv.o \
+proc.o \
+syscall.o \
+install.o \
+debug.o \
+abort.o \
+faults.o \
+services.o  
+	
+	
+	#
+	# Compilando o kernel
+	#
+	
 x86:
 	# entry
 	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.s -f elf -o head.o
 	gcc -c kernel/entry/x86/x86main.c -I include/ $(CFLAGS) -o x86main.o
 
+	#
 	# hal
+	# 
+	
 	gcc -c kernel/hal/hal.c -I include/ $(CFLAGS) -o hal.o
 
 	# mk
@@ -71,10 +191,14 @@ x86:
 	
 	# /mk/pc/mm (memory manager)
 	gcc -c  kernel/mk/pc/mm/pages.c   -I include/ $(CFLAGS) -o pages.o 	
+	
 	gcc -c  kernel/mk/request.c -I include/ $(CFLAGS) -o request.o	
 	gcc -c  kernel/mk/faults.c  -I include/ $(CFLAGS) -o faults.o
 
+	#
 	# /execve
+	#
+	
 	gcc -c kernel/execve/execve.c  -I include/ $(CFLAGS) -o execve.o	
 
 	# crts
@@ -180,6 +304,10 @@ x86:
 	gcc -c kernel/execve/fs/format.c -I include/ $(CFLAGS) -o format.o	
 	gcc -c kernel/execve/fs/vfs.c    -I include/ $(CFLAGS) -o vfs.o
 
+	#
+	# gws
+	#
+	
 	# k\gws\gws	
 	# Gramado Window Server.
 	gcc -c kernel/gws/gws/char.c     -I include/ $(CFLAGS) -o char.o
@@ -212,10 +340,21 @@ x86:
 
 	# *gui (GRAMADO)
 	gcc -c kernel/gws/gws.c   -I include/ $(CFLAGS) -o gws.o
+	
+	
+	#
+	# LD  -  ( Ligando para criar o KERNEL.BIN )
+	#
 
 link-x86:
-	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
-
+	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(OBJECTS) -Map kernel/kmap.s
+	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
+    
+	
+	#
+	# VHD
+	#
+	
 vhd-x86:
 	nasm -I arch/x86/boot/vhd/stage1/ \
 	-I arch/x86/boot/vhd/stage2/ \

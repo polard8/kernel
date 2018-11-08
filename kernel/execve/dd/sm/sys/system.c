@@ -299,8 +299,7 @@ void *systemRam ( int number,
 
 		//create page table.	
         case 6:
-			//supendendo. mas está certo.
-			//return (void *) CreatePageTable ( (unsigned long) arg1, (int) arg2 );
+			return (void *) CreatePageTable( (unsigned long) arg1, (int) arg2, (unsigned long) arg3 );
             break;
 
 		//show memory structs.	
@@ -315,9 +314,9 @@ void *systemRam ( int number,
 
 		//create channel.	
         case 9:
-            return (void *) CreateChannel( (struct process_d *) arg1, 
-			                               (struct thread_d *) arg2, 
-										   (struct thread_d *) arg3 );
+            return (void *)CreateChannel( (struct process_d *) arg1, 
+			                              (struct thread_d *) arg2, 
+										  (struct thread_d *) arg3 );
             break;
 			
 		//Destroy channel.	

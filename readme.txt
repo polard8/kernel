@@ -6,7 +6,7 @@
 
 
 
-/3rdparty - Fred Nora does not have the copyright.
+//3rdparty - This Fred Nora does not have the copyright.
 
 
 //(super)
@@ -15,10 +15,10 @@
 
 
 //(realtions of production)
+/apps     - The main apps.
 /arch     - Archtechture stuff.
 /bin      - .bin compiled files.
 /docs     - Documentation.
-/desktop  - Apps running in user mode.
 /drivers  - Ring0 loadable drivers.
 /fs       - File systems support.
 /include  - Headers.
@@ -26,6 +26,8 @@
 /lib      - Libs.
 /scripts  - Scripts.
 /security - Security support.
+/tests    - Apps.
+
 
 
 //(material productive forces)

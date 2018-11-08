@@ -223,6 +223,7 @@ void *services( unsigned long number,
 	
 	
 	
+	
 
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
@@ -473,30 +474,10 @@ void *services( unsigned long number,
             break;    
         
 	
-        //42 Load bitmap 
-		case SYS_LOADBMP:       
-            return (void *) bmpDisplayBMP ( (char * ) arg2, 
-                                (unsigned long) arg3, (unsigned long) arg4 );			
-            break;
-			
-			
-        //43 Load bitmap, ignoring a given color. (white) 
-		case SYS_LOADBMP_TRANSPARENCY_EFFECT:
-	        //flag para ignorarmos a cor selecionada.
-	        bmp_change_color_flag = BMP_CHANGE_COLOR_TRANSPARENT;
-	
-	        //#importante:
-	        //Selecionamos a cor que será ignorada.
-            //background do bitmap é branco.
-	        bmp_selected_color = COLOR_WHITE;	
-    
-	        // Display !!
-		    //bmpDirectDisplayBMP ( address, x, y );
-	        bmpDisplayBMP ( (char *) arg2, (unsigned long) arg3, (unsigned long) arg4 ); 
-	        //clear flags.
-	        bmp_change_color_flag = 0;
-	        bmp_selected_color = 0;		
-            return NULL;                     			
+	    // ## CANCELADA! ##
+        //42 Load bitmap 16x16.
+		case SYS_LOADBMP16X16 :       
+            return NULL;			
             break;
 
 
@@ -887,10 +868,7 @@ void *services( unsigned long number,
 				
 			}else{
 				
-			    //#importante:
-				//Cada aplicativo está pegando mensagem na estrutura da sua própria thread.
-				
-				t = (void *) threadList[current_thread];
+			    t = (void *) threadList[current_thread];
 			    
 				//#bugbug:
 				//temos que checar a validade da janela.
@@ -911,39 +889,44 @@ void *services( unsigned long number,
 					
 					//alimentando através de mensagens de teclado
 			        
-					
-					
 					//pega o sccancode.
 					SC = (unsigned char) keybuffer[keybuffer_head];
 					
 					//renova a fila do teclado
 		            keybuffer[keybuffer_head] = 0;
 					keybuffer_head++;
-					if ( keybuffer_head >= 128 )
-					{ keybuffer_head = 0; };
+					if ( keybuffer_head >= 128 ){ 
+				        keybuffer_head = 0; };
 			        
-					// envia a mensagem para a thread associada com a janela que tem o foco.
+					// envia a mensagem para a thread atual.
+					LINE_DISCIPLINE (SC, 0);
+                    
 					//LINE_DISCIPLINE chama uma função para colocar a mensagem 
 					// na estrutua da janela com foco de entrada. 
 					//#todo, mas agora deverá 
-					//colocar na estrutura da thread atual.							
-					LINE_DISCIPLINE (SC, 0);
-					                    			
+					//colocar na estrutura da thread atual.
+					
+					//sinalizando, mas acho que o ldisc já faz isso.
+					//#importante: LINE_DISCIPLINE faz isso. 
+					//t->newmessageFlag = 1;  					
+			
 			        return NULL; //sinaliza que não há mensagem 
 				}
 				
-				//pegando a mensagem.
-				//sinalizamos que a mensagem foi consumida.
 				if( t->newmessageFlag == 1 )
-				{						
-					//...
+				{
+	
+					//pegando a mensagem.
 			        message_address[0] = (unsigned long) t->window;
 			        message_address[1] = (unsigned long) t->msg;
 			        message_address[2] = (unsigned long) t->long1;
 			        message_address[3] = (unsigned long) t->long2;
+                    
+					//sinalizamos que a mensagem foi consumida.
                     t->newmessageFlag = 0; 					
+				    
 					return (void *) 1; //sinaliza que há mensagem
-				};
+				}
 			};
 		    break;
 		
@@ -953,7 +936,7 @@ void *services( unsigned long number,
 			break;
 			
 		// 114	
-        // ## ENVIA UMA MENSAGEM ##
+        // ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
 		
 		//enviar uma mensagem para a thread atual.
 		//
@@ -1056,20 +1039,6 @@ void *services( unsigned long number,
 		case SYS_SELECTCOLORSCHEME:
 		    return (void *) windowSelectColorScheme ( (int) arg2 );
 			break;
-			
-		//124	
-		case 124:
-		    return (void *) show_window_rect ( (struct window_d *) arg2 );
-			break;		
-			
-		//124	
-		//coloca um retângulo no backbuffer.
-		case 125:
-		    //#todo  
-	        //precisamos de um buffer de mensagems ou ponteiro pra estrutura.
-			//refresh_rectangle ( window->left, window->top, window->width, 
-		    //    window->height );
-            break;	
 		
 		//
 		// 129, Um driver confirmando que foi inicializado.
@@ -1158,7 +1127,7 @@ void *services( unsigned long number,
 		//atual e não mais na janela com foco de entrada.
         case SYS_GETCH:  
 		    //return (void *) window_getch();
-			return (void *) thread_getchar ();
+			return (void *) thread_getchar();
             break;
 
 		//138 - get key state.	
@@ -1689,7 +1658,7 @@ do_create_window:
 	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
 	//com um endereço da área de memória do app.
-    NewWindow = (void *) CreateWindow ( WindowType, WindowStatus, 
+    NewWindow = (void *) CreateWindow( WindowType, WindowStatus, 
 	                        WindowView, WindowName, 
 	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
 							cwArg9, 
