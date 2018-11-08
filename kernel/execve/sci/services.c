@@ -709,7 +709,7 @@ void *services( unsigned long number,
 		case SYS_CREATEPROCESS:
             return (void *) create_process ( NULL, NULL, NULL, 
 			                    arg2, arg3, 0, (char *) a4, 
-								RING3, (unsigned long ) CreatePageDirectory() ); 		
+								RING3, (unsigned long ) KernelProcess->Directory ); //RING3, (unsigned long ) CreatePageDirectory() ); 		
             break;
 			
 		//80 Show current process info.

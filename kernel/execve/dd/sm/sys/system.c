@@ -294,12 +294,12 @@ void *systemRam ( int number,
 			
 		//create page directory.	
 		case 5:
-		    return (void *) CreatePageDirectory();
+		    //return (void *) CreatePageDirectory();
             break; 
 
 		//create page table.	
         case 6:
-			return (void *) CreatePageTable( (unsigned long) arg1, (int) arg2, (unsigned long) arg3 );
+			//return (void *) CreatePageTable( (unsigned long) arg1, (int) arg2, (unsigned long) arg3 );
             break;
 
 		//show memory structs.	

@@ -250,6 +250,8 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  
 //deve retornar o endereço do diretório de páginas criado,
 //que é um clone do diretório de páginas do kernel.
+
+/*
 void *CreatePageDirectory (){
 	
 	int i;
@@ -258,7 +260,7 @@ void *CreatePageDirectory (){
 	unsigned long destAddressPA;  //físico.
 	
 	//alocaremos uma página apenas, pois tem 4KB.
-	destAddressVA = (unsigned long) allocPageFrames(1);
+	destAddressVA = (unsigned long) malloc(4096);// ...
 	if ( destAddressVA == 0 ){
 		return NULL;
 	}
@@ -307,7 +309,7 @@ void *CreatePageDirectory (){
 	
 	return (void *) destAddressPA;
 };
-
+*/
 
 
 /*
@@ -343,6 +345,8 @@ void *CreatePageDirectory (){
  * O offset é um índice dentro do diretório de páginas.
  *
  */
+ 
+/* 
 void *CreatePageTable( unsigned long directory_address, 
                        int offset, 
 					   unsigned long pagetable_address )
@@ -400,7 +404,7 @@ void *CreatePageTable( unsigned long directory_address,
 
     return (void *) base;
 };
-
+*/
 
 /*
  * SetCR3:
@@ -1391,8 +1395,17 @@ void *allocPageFrames( int size ){
 	};
 			
     //Se é pra alocar apenas uma página.
-	if(size == 1){
-		return (void*) newPageFrame();
+	if(size == 1)
+	{
+		//
+		//   ## bugbug ##
+		//
+		
+		printf("allocPageFrames: alguem esta tentando alocar somente uma página ...\n");
+		refresh_screen();
+		while(1){ asm ("hlt");}
+		
+		//return (void*) newPageFrame();
 	}	
 	
 	//se o size for maior que o limite.
@@ -1603,8 +1616,6 @@ void *newPage (){
 			if( New->id > 0 && New->id < PAGEFRAME_COUNT_MAX )
             {
 				return (void *) ( base + (New->id * 4096) );
-				//base = (unsigned long) ( base + (New->id * 4096) );
-				//return (void *) base;
 			}				
 		};		
 	};

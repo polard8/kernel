@@ -1120,11 +1120,11 @@ unsigned long mapping_nic0_device_address( unsigned long address );
 
 //deve retornar o endereço do diretório de páginas criado,
 //que é um clone do diretório de páginas do kernel.
-void *CreatePageDirectory();
+//void *CreatePageDirectory();
 
-void *CreatePageTable( unsigned long directory_address, 
-                       int offset, 
-					   unsigned long pagetable_address );
+//void *CreatePageTable( unsigned long directory_address, 
+//                       int offset, 
+//					   unsigned long pagetable_address );
 
 
 					   
