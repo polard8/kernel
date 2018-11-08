@@ -1401,11 +1401,16 @@ void *allocPageFrames( int size ){
 		//   ## bugbug ##
 		//
 		
-		printf("allocPageFrames: alguem esta tentando alocar somente uma página ...\n");
-		refresh_screen();
-		while(1){ asm ("hlt");}
+		//printf("allocPageFrames: alguem esta tentando alocar somente uma página ...\n");
+		//refresh_screen();
+		//while(1){ asm ("hlt");}		
 		
-		//return (void*) newPageFrame();
+		//#importante
+		//Para corrigir podemos usar essa rotina de alocação de uma página 
+		//ela faz tudo certinho. 
+		
+		return (void *) newPage();
+		
 	}	
 	
 	//se o size for maior que o limite.
