@@ -1,12 +1,12 @@
 #
 # File: compile
-#     +Compile gramado kernel
-#     +Create VHD
+#     +Compile gramado kernel.
+#     +Create VHD.
 #     +move files to VHD.
 #
 # History:
-#     2018 - Created by Matheus Castello <matheus@castello.eng.br>
-#          - Ported from build.bat
+#     2018 - Created by Matheus Castello <matheus@castello.eng.br>.
+#          - Ported from build.bat.
 #     2018 - Revision.
 #     ...
 #
