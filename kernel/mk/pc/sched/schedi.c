@@ -841,13 +841,19 @@ done:
  * Não retorna se encontrar uma threa na lista.
  *
  */
+ 
 void check_for_standby (){
 	
-	int i = 0;
     int newId;
+	
 	struct thread_d *New;
 	
-	//@todo: Max variable.
+	
+	// #todo: 
+	// Max variable.
+	
+	int i = 0;
+	int Max = 32;
 	
 	do 
 	{
@@ -860,26 +866,40 @@ void check_for_standby (){
 			     New->magic == 1234 && 
 				 New->state == STANDBY )   
 			{
-			    current_thread = (int) New->tid;
+			    	
+				current_thread = (int) New->tid;
 			    goto do_spawn;
+			
 			};
 		};
 		
 		++i;
 		
-	}while(i < 32);    //@todo: Constante do tamanho da queue.  
+	} while (i < Max);  
+
+    // Done. 
+    // Nenhuma tarefa precisa ser inicializada.
+    // Podemos apenas retornar para o taskswitch.
 	
-//Done. Nenhuma tarefa precisa ser inicializada.
-done:
-    return;
+    //done:
+    
+	return;
 	
-	//  ## No return ##
 	
-//Do Spawn.
-//spawn.c
+	//
+	//  ## SPAWN ##
+	//
+	
+    // Do Spawn.
+    // spawn.c
+	
 do_spawn:
-    KiSpawnTask(current_thread);  
-    panic("check_for_initialized:");	
+
+    KiSpawnTask ( current_thread );
+	
+    //  ## No return ##	
+	
+    panic ("schedi-check_for_standby: ERROR");	
 };
 
 

@@ -20,33 +20,44 @@
 #include <kernel.h>
 
 
+static inline void spawnSetCr3 ( unsigned long value ){
+	
+	
+	//#todo:
+	//Podemos fazer alguma filtragem aqui ??
+	
+    __asm__ ( "mov %0, %%cr3" : : "r" (value) );
+};
+
+
 /*
  **********************************************************************
  * KiSpawnTask:
  *     Interface para chamada de módulo interno para rotina de spawn de 
  * thread.
  */
-void KiSpawnTask(int id)
-{
-    //
-	// @todo: Some checks.
-	//
+void KiSpawnTask (int id){
+	
+    
+	// @todo: 
+	// Some checks.
 
-	if(id<0)
+	if ( id < 0 )
 	{
-		printf("KiSpawnTask Error: Id={%d}.",id);
-	    //@todo: Talvez aqui devesse parar.
-		return;	
+		printf("spawn-KiSpawnTask: ERROR TID={%d}", id );
+		die();
 	};
 
 	//
 	// More ?!
 	//
 
-//Done.	
-done:
-	spawn_thread(id);
+    //Done.	
 
+	spawn_thread (id);
+
+	printf("spawn-KiSpawnTask: ERROR");
+	
 	//
 	// No return.
 	//
@@ -61,8 +72,9 @@ done:
  *     The thread needs to be in the state 'INITIALIZED'.
  *     @todo: Mudar para spawnThread(int tid).
  */ 
-void spawn_thread(int id)
-{
+ 
+void spawn_thread (int id){
+	
 	int Status;
 	struct thread_d *Current;
     struct thread_d *spawn_Pointer;
@@ -72,126 +84,147 @@ void spawn_thread(int id)
 	// @todo: Filtrar tid.
 	//
 
-	//if(tid < 0){}
+	if ( id < 0 )
+	{
+		//#todo
+	    return;	
+	}
 
 
 	//
 	// Pega na lista.
 	//
 
-	//Pega e salva a atual.
-	//Será usada no caso de falha.
+	// Pega e salva a atual.
+	// Será usada no caso de falha.
+	
 	Current = (void *) threadList[current_thread];
 
-
-	//
+	// #importante:
 	// Struct para a thread que será executada.
 	// O id foi passado via argumento.
-	//
 
 	spawn_Pointer = (void *) threadList[id]; 
-	if((void*) spawn_Pointer == NULL)
+	
+	if ( (void *) spawn_Pointer == NULL )
 	{
-	    printf("spawn_thread: Pointer TID={%d}",id);
+	    printf ("spawn_thread: Pointer TID={%d}", id );
 		die();
-	}
-    else
-    {
-	    // State ~ Checa o estado da tarefa.	 
-        if(spawn_Pointer->state != STANDBY){
-            printf("spawn_thread: State TID={%d}\n",id);
+		
+	} else {
+	    
+		// State ~ Checa o estado da thread.	 
+        
+		if ( spawn_Pointer->state != STANDBY )
+		{
+            printf ("spawn_thread: State TID={%d}\n", id );
 		    die();
         };
 
+		
 	    // Saved ~ Se o contexto está salvo, é porque não é a primeira vez.
-        if(spawn_Pointer->saved == 1){
-            printf("spawn_thread: Saved TID={%d}\n",id);
+		
+        if ( spawn_Pointer->saved == 1 )
+		{
+            printf ("spawn_thread: Saved TID={%d}\n", id );
 		    die();
-        };    
-	    //More checks ?!!...
+        };  
+		
+		
+	    // ??
+		// More checks ?
 	};	
-
-    //
-	// Check context.
-	//
-
-	/*  ## suspenso ##
-	   //tentando rodar uma thread em ring0
-	// Checar um contexto válido para threads em ring 3. 
-	Status = contextCheckThreadRing3Context(id);
-	if(Status != 0){
-	    printf("spawn_task error: Context TID={%d}",id);
-		refresh_screen();
-		while(1){}
-	};
-	*/
-
+	
+	
     //
     // Preparar a thread para executar.
     //
 
-threadSetUp:
-
-/*
- * Context:
- *     Se a thread NÃO está com contexto salvo, então pode ser que ela nunca 
- * tenha sido executada.
- */
 	
-	//
-	// @todo: if(spawn_Pointer->saved == 1){...}
-	// E se o contexto ja estivesse salvo ? Teríamos um problema ?
-	//
+	// Context:
+	// Se a thread NÃO está com contexto salvo, então pode ser que ela nunca 
+	// tenha sido executada.
 
-	if(spawn_Pointer->saved == 0)
+	if ( spawn_Pointer->saved == 0 )
 	{
-	    current_thread = (int) spawn_Pointer->tid;    //Set current.
 		
-		//Next thread. A next será a antiga current.
+		// Configura a variável global.
+		
+	    current_thread = (int) spawn_Pointer->tid;    
+		
+		// Configura a próxima.
+		// A next será a antiga current salva anteriormente.
+		
 		spawn_Pointer->Next = (void *) Current;        
 
+		
 		// * MOVEMENT 2 (Standby --> Running).
-        if(spawn_Pointer->state == STANDBY){
+		
+        if ( spawn_Pointer->state == STANDBY )
+		{
 			spawn_Pointer->state = RUNNING;    
-			queue_insert_data(queue, (unsigned long) spawn_Pointer, QUEUE_RUNNING);
+			
+			queue_insert_data ( queue, (unsigned long) spawn_Pointer, 
+			    QUEUE_RUNNING );
 		};	
 		
-		set_task_status(UNLOCKED);    //Destrava o mecanismo de taskswitch.
-	    scheduler_unlock();	          //Destrava o Scheduler. 
+		
+		// Destrava o mecanismo de taskswitch.
+		// Destrava o Scheduler.
+		
+		set_task_status(UNLOCKED);    
+	    scheduler_unlock();	           
 		
 	    //@todo: Continua ...
 	};
 
 
-	//Se o status estiver diferente de RUNNING, algo deu errado na preparação.
-	if(spawn_Pointer->state != RUNNING)
+	// #importante
+	// Se o status estiver diferente de RUNNING, então algo 
+	// deu errado na preparação.
+	
+	if ( spawn_Pointer->state != RUNNING )
 	{
-		//...
-        printf("* spawn_thread: State TID={%d}\n",id);
+        printf("* spawn_thread: State TID={%d}\n", id );
 		die();
 	};
 	
 	
-	//Current process.
+	// Configura a variável global.
+	
 	current_process = spawn_Pointer->process->pid;
 	
-
-	//Debug:
-	//printf("spawn_task: Spawn thread %d ... \n",id);
-	//refresh_screen();
 
 	IncrementDispatcherCount(SELECT_INITIALIZED_COUNT);
 	
 	
-    /* Corpo x Coisas */
+	// #todo
+	// setup cr3.
+	// flush pipeline
+	
+	// setup cr3.
+	spawnSetCr3 ( (unsigned long) spawn_Pointer->DirectoryPA );
+	
+	// flush pipeline
+	asm ("movl %cr3, %eax");
+	asm ("nop");
+	asm ("nop");
+	asm ("nop");
+	asm ("nop");
+    asm ("movl %eax, %cr3");			
+	
+	
+    // Spiritual quote:
+	// "Body and Things"
 
     //Segmentos.
-    asm volatile(" cli \n"
-                 " mov $0x23, %ax \n"
-                 " mov %ax, %ds \n"
-                 " mov %ax, %es \n"
-                 " mov %ax, %fs \n"
-                 " mov %ax, %gs \n");
+	
+    asm volatile (" cli \n"
+                  " mov $0x23, %ax \n"
+                  " mov %ax, %ds \n"
+                  " mov %ax, %es \n"
+                  " mov %ax, %fs \n"
+                  " mov %ax, %gs \n");
 				 
 				 
 	
@@ -206,30 +239,34 @@ threadSetUp:
 
 	//argc 
 	//Ok. isso funcionou ... main no aplicativo recebeu argc do crt0.
-	asm( " mov $0x1234, %ebx \n" );
+	asm (" mov $0x1234, %ebx \n");
 	  
 	//Pilha para iret.
-    asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->ss)     : "%esp");    //ss.
-    asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->esp)    : "%esp");    //esp.
-    asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eflags) : "%esp");    //eflags.
-    asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->cs)     : "%esp");    //cs.
-    asm("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip)    : "%esp");    //eip.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->ss)     : "%esp");    //ss.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->esp)    : "%esp");    //esp.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eflags) : "%esp");    //eflags.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->cs)     : "%esp");    //cs.
+    asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip)    : "%esp");    //eip.
 	// EOI and iret.
 	//Obs: Isso suja o registrador eax.
 	//parece que isso é realmente preciso, libera o teclado.
-	asm("movb $0x20, %al \n");
-	asm("outb %al, $0x20 \n");
+	asm ("movb $0x20, %al \n");
+	asm ("outb %al, $0x20 \n");
 	//asm(" movl $0, %eax \n");
-	asm("sti  \n"); 
-	asm("iret \n");    //Fly!
-    //Nothing.
-fail:
-	panic("*spawn_task: Return");
-	//die();
+	asm ("sti  \n"); 
+	
+	asm ("iret \n");    //Fly!
+    
+	//Nothing.
+	
+//fail:
+
+	panic ("*spawn_task: Return");
+	
 };
 
 
 //
-// Fim.
+// End.
 //
 

@@ -293,6 +293,10 @@ void restore_current_context (){
 		// pouco antes do iretd.
 	    
 		asm ("movl %cr3, %eax");
+	    // asm ("nop");
+	    // asm ("nop");
+	    // asm ("nop");
+	    // asm ("nop");
         asm ("movl %eax, %cr3");		
 	};
 	

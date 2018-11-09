@@ -4589,19 +4589,18 @@ fail:
  *     #bugbug ...já funcionou uma vez, mas agora está com problemas.
  *     @todo: na hora de criar a thread precisamos passar o PID desse processo.
  */
+ 
 void shellTestThreads (){
 	
     void *T;	
 	
-	//
 	// Obs: 
 	// As threads criadas aqui são atribuídas ao processo PID=0.
 	// @todo: 
 	// No kernel, quando criar uma thread ela deve ser atribuída
     // ao processo que chamou a rotina de criação.	
-	//
 	
-	printf("Creating threads..\n");
+	printf("shellTestThreads: Creating threads..\n");
 	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread1");
 	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread2");
 	//apiCreateThread((unsigned long)&shellThread, 0x004FFFF0,"TestShellThread3");
@@ -4639,6 +4638,9 @@ void shellTestThreads (){
 	unsigned long *threadstack1;
 	
 	
+	
+	
+	
 	enterCriticalSection();
 	// #importante:
 	// Como a torina de thread é bem pequena e o 
@@ -4654,44 +4656,33 @@ void shellTestThreads (){
 	// # Criando a thread #
 	//
 //creating:
-    printf("shell: Tentando executar um thread ...\n");	
+
+    printf("shellTestThreads: Tentando executar uma thread..\n");	
 	
 	ThreadTest1  = (void *) apiCreateThread ( (unsigned long) &shellThread, 
 	                        (unsigned long) (&threadstack1[0] + (2*1024) - 4), 
 							"ThreadTest1" );
 	
-	if ( (void *) ThreadTest1 == NULL ){
-		
-	    printf("shell-shellTestThreads: apiCreateThread fail \n");	
+	if ( (void *) ThreadTest1 == NULL )
+	{	
+	    printf("shellTestThreads: apiCreateThread fail \n");	
 	    die("ThreadTest1");
 	}
 	
 	// # executando #
 	
-	
-	//Obs:
-	//Lá no kernel, isso deve selecionar a thread para 
-	//execussão colocando ela no estado standby.
+	// #importante:
+	// Lá no kernel, isso deve selecionar a thread para 
+	// execussão colocando ela no estado standby.
+	// Logo em seguida a rotinad e taskswitch efetua o spawn.
 	
 	apiStartThread(ThreadTest1);
 	exitCriticalSection();
 	
-	//
-	// #bugbug:
-	// NÃO ESTÁ RETORNANDO !!
-	//
-	printf("shell: Tentando executar um thread [ok]..\n");
-	//while(1){
-	//	
-	//	asm( "pause" );
-	//}
-	//refresh_screen();
 	
-	//while(1){}
-	// **************************
+	printf("shell: Tentando executar um thread [ok]..\n");
 	
 	//permitir que o shell continue.
-	//return;	
 };
 
 
