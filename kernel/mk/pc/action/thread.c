@@ -334,7 +334,7 @@ get_next:
 		// Page Directory. (#CR3).
 		// Estamos usando o page directory do processo.
 		// Page directory do processo ao qual a thread pertence.
-		Thread->Directory = (unsigned long ) Process->Directory; 
+		Thread->Directory = (unsigned long ) Process->DirectoryPA; 
 
 
         //ServiceTable ..

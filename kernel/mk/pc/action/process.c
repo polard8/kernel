@@ -452,7 +452,7 @@ int processCopyProcess ( int p1, int p2 ){
 	// * page directory address
 	//
 	
-	Process2->Directory = Process1->Directory;
+	Process2->DirectoryPA = Process1->DirectoryPA;
 	
 	Process2->Image = Process1->Image;
 	
@@ -718,7 +718,10 @@ get_next:
 			return NULL;
 		}			
 		
-		Process->Directory = (unsigned long ) directory_address; 
+		//Process->Directory = (unsigned long ) directory_address; 
+		
+		Process->DirectoryVA = (unsigned long ) directory_address;
+		Process->DirectoryPA = (unsigned long) virtual_to_physical ( directory_address, gKernelPageDirectoryAddress );
 		
         //cancelados. 
 		//Process->mmBlocks[32]
@@ -1338,8 +1341,8 @@ void show_currentprocess_info (){
 		printf("ImageAddress={%x} \n", Current->Image );
 		
 		//Directory Address. *IMPORTANTE.
-		printf ("CurrentProcessDirectoryAddress={%x} \n", Current->Directory );		
-		
+		printf (">>DirectoryPA={%x} \n", Current->DirectoryPA );		
+		printf (">>DirectoryVA={%x} \n", Current->DirectoryVA );
 		//Heap and stack.
 		printf("Heap={%x}  HeapSize={%d KB}  \n", Current->Heap, 
 		    Current->HeapSize );
@@ -1393,7 +1396,7 @@ void show_process_information (){
 			//@todo: Mostrar quem é o processo pai.
 		    
 			printf("PID={%d} Name={%s} Directory={%x} \n", p->pid, 
-			    p->name_address, p->Directory );
+			    p->name_address, p->DirectoryPA );
 
 	    }
 		
@@ -1421,10 +1424,8 @@ SetProcessDirectory( struct process_d *process, unsigned long Address )
 {
     if ( (void *) process != NULL )
 	{
-        process->Directory = (unsigned long) Address;        
+        process->DirectoryPA = (unsigned long) Address;        
 	};
-	
-	//return;
 };
 
 
@@ -1441,7 +1442,7 @@ unsigned long GetProcessDirectory( struct process_d *process )
     if( (void*) process != NULL )
 	{
 		//@todo: checar used e magic.
-        return (unsigned long) process->Directory;
+        return (unsigned long) process->DirectoryPA;
 	};
 	return (unsigned long) 0;
 };
@@ -1840,8 +1841,7 @@ GetProcessPageDirectoryAddress( int pid )
 			goto fail;
 		}
 		
-		//Ok.
-		return (unsigned long) process->Directory;
+		return (unsigned long) process->DirectoryPA;
 	};
 fail:	
     return (int) -1;

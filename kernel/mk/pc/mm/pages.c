@@ -251,17 +251,23 @@ static inline void __native_flush_tlb_single(unsigned long addr)
 //deve retornar o endereço do diretório de páginas criado,
 //que é um clone do diretório de páginas do kernel.
 
-/*
+
+//#importante:
+//retornaremos o endereço virtual, para que a função create_process possa usar 
+//tanto o endereço virtual quanto o físico.
+
 void *CreatePageDirectory (){
 	
 	int i;
 	
 	unsigned long destAddressVA;  //virtual.
-	unsigned long destAddressPA;  //físico.
+	//unsigned long destAddressPA;  //físico.
 	
 	//alocaremos uma página apenas, pois tem 4KB.
-	destAddressVA = (unsigned long) malloc(4096);// ...
-	if ( destAddressVA == 0 ){
+	
+	destAddressVA = (unsigned long) newPage (); //malloc(4096);
+	if ( destAddressVA == 0 )
+	{
 		return NULL;
 	}
 	
@@ -301,15 +307,17 @@ void *CreatePageDirectory (){
 	// Retornaremos o endereço físico do diretório clone.
 	//
 	
-	destAddressPA = (unsigned long) virtual_to_physical ( destAddressVA, gKernelPageDirectoryAddress );
-	if ( destAddressPA == 0 ){
-		return NULL;
-	}
+	//destAddressPA = (unsigned long) virtual_to_physical ( destAddressVA, gKernelPageDirectoryAddress );
+	//if ( destAddressPA == 0 ){
+	//	return NULL;
+	//}
 	
 	
-	return (void *) destAddressPA;
+	//return (void *) destAddressPA;
+	
+	return (void *) destAddressVA;
 };
-*/
+
 
 
 /*
@@ -346,35 +354,89 @@ void *CreatePageDirectory (){
  *
  */
  
-/* 
+//retorna o endereço virtual. 
+ 
+/*
+ #suspensa
+ 
 void *CreatePageTable( unsigned long directory_address, 
                        int offset, 
-					   unsigned long pagetable_address )
+					   unsigned long region_address )
 {
-	int i;
-	unsigned long *PD = (unsigned long *) directory_address;       //Diretório.
-	unsigned long *newPT = (unsigned long *) pagetable_address;    //Tabela de páginas.
 	
-	unsigned long base = pagetable_address;
+	
+	//
+    // ### pd  ###
+    //	
+	
+	
+	//Diretório.
+	//precisamos do endereço virtual do diretório para editá-lo
+	unsigned long *PD = (unsigned long *) directory_address;       
 	
 	
 	//Limits.
 	if ( directory_address == 0 ){
 		
 		return NULL;
-	}
+	}	
+
+
+	//
+    // ### pt  ###
+    //	
+	
+	
+	
+	
+	//Tabela de páginas.
+	//Precisamos de um endereço virtual para manipularmos a tabela.
+	//pois o kernel trabalha com os endereços virtuais ...
+	//só depois converteremos e salvaremos na entrada do diretório 
+	//o ponteiro que é um endereço físico.
+	
+	unsigned long ptVA = (unsigned long) newPage(); 
+
+	//Limits.
+	if ( ptVA == 0 ){
+		
+		return NULL;
+	}	
+
+	unsigned long ptPA = (unsigned long) virtual_to_physical ( ptVA, gKernelPageDirectoryAddress ); 
+	
+
+	//o endereço virtual permite manipularmos a pagetable daqui do kernel.
+	unsigned long *newPT = (unsigned long *) ptVA;     
+	
+	
+	//
+    // ### Offset  ###
+    //	
+
 	
 	//Limits.
 	if( offset < 0 )
 	{
 		return NULL;
 	}
+	
+	
+	//
+    // ### region  ###
+    //		
 
 	//Limits.
-	if( pagetable_address == 0 )
+	if( region_address == 0 )
 	{
 		return NULL;
-	}
+	}	
+	
+	
+	
+	//
+    // ### pt  ###
+    //		
 	
 
 	// Criando uma pagetable.
@@ -382,29 +444,39 @@ void *CreatePageTable( unsigned long directory_address,
 	// user mode pages
 	// Será usado pelo processo em user mode. 
 	// Note as flags.(7).
-	
+	int i;
 	for ( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
-	    newPT[i] = (unsigned long) pagetable_address | 7;             
-	    pagetable_address = (unsigned long) pagetable_address + 4096;  //+4KB.
+	    newPT[i] = (unsigned long) region_address | 7;             
+	    region_address = (unsigned long) region_address + 4096;  //+4KB.
     };
+	
+	
+	//
+    // ### pd  ###
+    //		
 
 	//Aqui devemos incluir as flags também.
 	//Configurando os atributos.
-	PD[offset] = (unsigned long) &newPT[0];
+	
+	//#importante
+    //vamos usar o endereço virtual, assim como fizemos na 
+	//rotina de configuração das páginas.
+	
+	PD[offset] = (unsigned long) &newPT[0]; 
     PD[offset] = (unsigned long) PD[offset] | 7;      
 
 	
-	// @todo: 
-	//     Registrar na lista de páginas.  
-	//     Salvar estruturas.
+ 
+    //
+	// Retornaremos o endereço virtual para que a tabela possa ser manipulada pelo kernel.
 	//
-	//unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
 
-    return (void *) base;
+    return (void *) ptVA;
 };
-*/
+ 
+*/ 
 
 /*
  * SetCR3:

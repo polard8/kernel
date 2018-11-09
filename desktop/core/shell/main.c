@@ -2615,13 +2615,27 @@ do_compare:
     };
 
 	
+	//unsigned char *hBuffer = (unsigned char *) 0xC1000000;
+	
+    // heap
+	if ( strncmp( prompt, "heap", 4 ) == 0 )
+	{
+		printf("testando heap #suspensa\n");
+		//hBuffer[0] = 88;
+	    //hBuffer[1] = 99;
+		
+		//printf("%d %d \n",hBuffer[0],hBuffer[1]);
+		printf("done\n");
+        goto exit_cmp;
+    };		
+	
 	// hd ??
 	// hd info maybe.
     if ( strncmp( prompt, "hd", 2 ) == 0 )
 	{
 	    printf("~hd\n");
         goto exit_cmp;
-    };
+    };	
 	
 	
 	// help

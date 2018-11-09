@@ -570,8 +570,9 @@ int x86main ( int argc, char *argv[] ){
         processor->NextProcess = (void *) KernelProcess;
         //...
     };
-
-
+	
+	
+	
 	//Cria um diretório que é clone do diretório do kernel base 
 	//e retorna o endereço físico desse novo diretório.
 	//gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
@@ -585,7 +586,7 @@ int x86main ( int argc, char *argv[] ){
 										  (int) KernelProcess->pid, 
 										  "INITPROCESS", 
 										  RING3, 
-										  (unsigned long ) gKernelPageDirectoryAddress );	
+										  (unsigned long ) CreatePageDirectory () ); //gKernelPageDirectoryAddress );	
     if ( (void *) InitProcess == NULL )
 	{
         printf("x86main: InitProcess\n");
@@ -625,13 +626,14 @@ int x86main ( int argc, char *argv[] ){
 										   (int) KernelProcess->pid, 
 										   "SHELLPROCESS", 
 										   RING3, 
-										   (unsigned long ) gKernelPageDirectoryAddress );	
+										   (unsigned long )  CreatePageDirectory () ); //gKernelPageDirectoryAddress );	
     if((void *) ShellProcess == NULL){
         printf("x86main: ShellProcess\n");
         die();
     }else{
         //...
     };
+		
 	
     //=============================================
     // Create shell Thread. tid=1. 
@@ -661,7 +663,7 @@ int x86main ( int argc, char *argv[] ){
 											 KernelProcess->pid, 
 											 "TASKMANPROCESS", 
 											 RING3, 
-											 (unsigned long ) gKernelPageDirectoryAddress );	
+											 (unsigned long )  CreatePageDirectory () ); //gKernelPageDirectoryAddress );	
     if ( (void *) TaskManProcess == NULL ){
         printf("x86main: TaskManProcess\n");
         die();

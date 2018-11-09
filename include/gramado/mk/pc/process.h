@@ -436,7 +436,12 @@ struct process_d
 	 *     O endereço do diretório é carregado no CR3.
 	 *
 	 */
-	unsigned long Directory;                  //endereço do diretório do processo.
+	
+	
+	unsigned long DirectoryVA;                  
+	unsigned long DirectoryPA;
+	
+	
     struct page_directory_d *page_directory;  //ponteiro para a estrutura do diretório do processo.
 
 	//

@@ -629,7 +629,7 @@ done:
 			// Um endereço inválido pode ser colocado em cr3, 
 			// travando o sistema.
 			
-			if( (unsigned long) P->Directory == 0 )
+			if( (unsigned long) P->DirectoryPA == 0 )
 			{	
 			    //fail
 		        printf("taskswitch: Process %s directory fail\n", 
@@ -647,7 +647,7 @@ done:
 			// agora acessível pela rotina em assembly _irq0.
 			
 			//Obs: Essa é a opção usada por enquanto.
-			current_process_pagedirectory_address = (unsigned long) P->Directory;
+			current_process_pagedirectory_address = (unsigned long) P->DirectoryPA;
 			
 			//current_process_pagedirectory_address = (unsigned long) P->page_directory->Address;
 		    
