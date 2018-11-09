@@ -185,7 +185,7 @@ void x86mainStartFirstThread( int n ){
 
 
     //Set cr3 and flush TLB.
-    mainSetCr3 ( (unsigned long) Thread->Directory);
+    mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
     asm ("movl %cr3, %eax");
     asm ("movl %eax, %cr3");
 
@@ -346,7 +346,7 @@ void startStartIdle (){
 
 
     //Set cr3 and flush TLB.
-    mainSetCr3 ( (unsigned long) IdleThread->Directory);
+    mainSetCr3 ( (unsigned long) IdleThread->DirectoryPA );
     asm ("movl %cr3, %eax");
     asm ("movl %eax, %cr3");
 
@@ -550,6 +550,8 @@ int x86main ( int argc, char *argv[] ){
 
 //createProcesses:
 
+//#ifdef ENTRY_INIT_KERNEL		
+
     // Creating Kernel process. PID=0.
     KernelProcess = (void *) create_process( NULL, // Window station.
 	                                         NULL, // Desktop.
@@ -571,6 +573,7 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 	
+//#endif	
 	
 	
 	//Cria um diretório que é clone do diretório do kernel base 
@@ -597,19 +600,20 @@ int x86main ( int argc, char *argv[] ){
 	
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
-    IdleThread = (void*) KiCreateIdle();
+    IdleThread = (void *) KiCreateIdle ();
     if ( (void *) IdleThread == NULL )
 	{
         printf("x86main: IdleThread\n");
         die();
     }else{
 
-        IdleThread->ownerPID = (int) InitProcess->pid;
+        //IdleThread->ownerPID = (int) InitProcess->pid;
 
-        //Thread.
-        processor->CurrentThread = (void*) IdleThread;
-        processor->NextThread    = (void*) IdleThread;
-        processor->IdleThread    = (void*) IdleThread;
+        //#importante
+		//Thread.
+        processor->CurrentThread = (void *) IdleThread;
+        processor->NextThread    = (void *) IdleThread;
+        processor->IdleThread    = (void *) IdleThread;
         //...
     };	
 	
@@ -644,7 +648,7 @@ int x86main ( int argc, char *argv[] ){
         die();
     }else{
 
-        ShellThread->ownerPID = (int) ShellProcess->pid;
+        //ShellThread->ownerPID = (int) ShellProcess->pid;
         //...
     };	
 	
@@ -680,30 +684,36 @@ int x86main ( int argc, char *argv[] ){
         die();
     }else{
 
-        TaskManThread->ownerPID = (int) TaskManProcess->pid;
+        //TaskManThread->ownerPID = (int) TaskManProcess->pid;
         //...
     };
 
+#endif	
+
+
+
+#ifdef ENTRY_INIT_KERNELTHREAD_RING0
 
     //===================================
     // Cria uma thread em ring 0.
 	// Ok. isso funcionou bem.
-    RING0IDLEThread = (void *) KiCreateRing0Idle();
+    
+	// >>>>> Como essa thread pertence ao processo kernel, então mudaremos ela 
+	// um pouco pra cima, onde criamos o processo kernel.
+	// obs: Mesmo não sendo ela o primeiro TID.
+	
+	RING0IDLEThread = (void *) KiCreateRing0Idle();
     if( (void *) RING0IDLEThread == NULL )
 	{
         printf("x86main: RING0IDLEThread\n");
         die();
     }else{
 
-        RING0IDLEThread->ownerPID = (int) TaskManProcess->pid;
+        //RING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
         //...
     };	
 	
-	
-#endif	
-
-
-
+#endif		
 
 
 	

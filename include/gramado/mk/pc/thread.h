@@ -256,14 +256,19 @@ struct thread_d
 	// ORDEM: O que segue é referenciado durante o processo de task switch.
 	//
 	
-	/*
-	 * Page directory information:
-     *
-	 *   ** COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA
-	 *      AJUDA NA HORA DO TASKSWITCH **
-	 */
-	unsigned long Directory; 
+	
+	//
+	//  ## Directory ##
+	//	
+	
+    // COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA, ISSO AJUDA NA 
+	// HORA DO TASKSWITCH.
 
+	//unsigned long DirectoryVA;
+	unsigned long DirectoryPA;
+	
+	
+	
 
 	
 	//IOPL of the task. (ring).

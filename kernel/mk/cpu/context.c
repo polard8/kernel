@@ -33,9 +33,13 @@
 extern void set_page_dir();
 
 
-static inline void ckSetCr3 ( unsigned long value){
+static inline void ckSetCr3 ( unsigned long value ){
 	
-    __asm__ ( "mov %0, %%cr3" : : "r"(value) );
+	
+	//#todo:
+	//Podemos fazer alguma filtragem aqui ??
+	
+    __asm__ ( "mov %0, %%cr3" : : "r" (value) );
 };
 
 
@@ -223,11 +227,8 @@ void restore_current_context (){
 		show_process_information();    
 	
 		die ();
-		
-		//refresh_screen();
-		//while(1){}
 	
-	}else{
+	} else {
 	
 	    //
 	    // Check context ~ Não há porque salvar, se o contexto está corrompido.
@@ -269,18 +270,33 @@ void restore_current_context (){
         // Continua...
 		
 		
-	    //@todo: salvar o endereço do diretório de páginas da thread no CR3.		
+		//
+		// #### CR3 ####
+		//
 		
-		//asm (" movl %eax, %cr3" : "a" ((unsigned long) t->Directory) );
 		
-		//set_page_dir();
-		 
-		ckSetCr3 ( (unsigned long) t->Directory );
+		// #importante
+		// Esse é o grande momento.
+		// É nessa hora em que colocamos o endereço FÍSICO do 
+		// diretório de páginas usado pela thread no registrador CR3.
+		
+		
+		ckSetCr3 ( (unsigned long) t->DirectoryPA );
 
-	    //flush TLB
-	    asm("movl %cr3, %eax");
-        asm("movl %eax, %cr3");		
+		
+		//
+		//  ## flush TLB ##
+		//
+	    
+		// #bugbug
+		// Esse flush é desnecessário, pois o assembly faz isso 
+		// pouco antes do iretd.
+	    
+		asm ("movl %cr3, %eax");
+        asm ("movl %eax, %cr3");		
 	};
+	
+	
 
 	//
 	//flag ??...

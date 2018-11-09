@@ -545,7 +545,11 @@ system_procedure ( struct window_d *window,
 					//printf ("%x \n", CreatePageDirectory() );
 					
 					//mostrar informações sobre os processos criados.
-					show_process_information ();
+					//show_process_information ();
+					
+					//mostra informações sobre as threads.
+					mostra_slots ();
+					
 					
 					//pci_info();     //PCI information.
 				    

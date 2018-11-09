@@ -113,10 +113,12 @@ void *KiCreateIdle (){
     void *idleStack;                    // Stack pointer.
 	char *ThreadName = "idlethread";    // Name.
 	
-    //Aloca memória mara a estrutura.
+    
+	//struct.
+	
 	IdleThread = (void *) malloc ( sizeof(struct thread_d) );	
 	
-	if ( (void*) IdleThread == NULL )
+	if ( (void *) IdleThread == NULL )
 	{
 	    printf("pc-action-create-KiCreateIdle: IdleThread\n");
 		die();
@@ -129,7 +131,7 @@ void *KiCreateIdle (){
 		    die();
 	    }else{
 			//Indica à qual processo a thread pertence.
-	        IdleThread->process = (void*) InitProcess;
+	        IdleThread->process = (void *) InitProcess;
 		};		
 		
 	    //Continua...
@@ -155,8 +157,11 @@ void *KiCreateIdle (){
 	//#BugBug.
 	// Estamos alocando mas não etamos usando.
 	//# podemos usar o alocador de páginas e alocar uma página para isso.
-	idleStack = (void *) malloc(4*1024);
-	if( (void *) idleStack == NULL ){
+	
+	idleStack = (void *) malloc (4*1024);
+	
+	if ( (void *) idleStack == NULL )
+	{
 	    printf("pc-action-create-KiCreateIdle: idleStack\n");
 		die();
 	};
@@ -179,8 +184,20 @@ void *KiCreateIdle (){
 
 	IdleThread->process = (void*) InitProcess;
 	
-	//IdleThread->Directory = (unsigned long ) gKernelPageDirectoryAddress;
-	IdleThread->Directory = (unsigned long ) gKernelPageDirectoryAddress; //gInitPageDirectoryAddress;
+	
+	//
+	//  ## Directory ##
+	//
+	
+	IdleThread->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
+	
+	//IdleThread->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress; 
+	
+	//IdleThread->DirectoryVA = (unsigned long )  
+	//IdleThread->DirectoryPA = (unsigned long ) 	
+	
+	
+	
 	
 	IdleThread->plane = BACKGROUND;
 
@@ -373,7 +390,15 @@ void *KiCreateShell (){
 	
 	t->process = (void *) ShellProcess;  
 	
-	t->Directory = (unsigned long ) gKernelPageDirectoryAddress;
+	
+	// ## Directory  ## 
+	
+	
+	t->DirectoryPA = (unsigned long ) ShellProcess->DirectoryPA;
+	
+	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
+	
+	
 	
 	//Procedimento de janela.
 	t->procedure = (unsigned long) &system_procedure;
@@ -550,8 +575,16 @@ void *KiCreateTaskManager (){
 	
 	t->plane = BACKGROUND;
 	
-	t->Directory = (unsigned long ) gKernelPageDirectoryAddress;
+	
+	// # Directory #
+	
+	
+	t->DirectoryPA = (unsigned long ) TaskManProcess->DirectoryPA; 
+	
+	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 
+	
+	
 	//Procedimento de janela.
     t->procedure = (unsigned long) &system_procedure;	
 	t->window = NULL;  //window;  //arg1.
@@ -651,23 +684,20 @@ done:
 
 
 // Isso é uma thread em ring 0 que será usada como idle.
-void xxxRing0Idle()
-{
+void xxxRing0Idle (){
+	
 Loop:
 
     //#test
     //Ok, está funcionando. :)
 	//printf(".");
     
-	
-	//
 	// Esse negócio do cli e dead)thread_collector funcionou bem,
 	// mas precisamos atualizar o contador de threads rodando.
 	// Precisa decrementar o contador, e´o problema está aí,
 	// precisa checar se decrementar esse contador causa algum efeito 
 	// negativo.
 	// É necessário de decrementemos o contador.
-	//
 	
 	asm("cli");
 	dead_thread_collector();
@@ -675,6 +705,7 @@ Loop:
 	
 	asm("hlt");
     goto Loop;
+	
 };
 
 
@@ -685,14 +716,15 @@ Loop:
  *    Para o processador ficar em hlt quando não tiver outra 
  * thread rodando.
  */
-void *KiCreateRing0Idle()
-{
+void *KiCreateRing0Idle (){
+	
     void *ring0IdleStack;                    // Stack pointer. 	
+	
 	struct thread_d *t;
 	char *ThreadName = "ring0-idle-thread";    // Name.
 	
 
-	if( (void *) KernelProcess == NULL )
+	if ( (void *) KernelProcess == NULL )
 	{
 	    printf("pc-create-KiCreateRing0Idle: KernelProcess\n");
 		die();
@@ -701,7 +733,9 @@ void *KiCreateRing0Idle()
     //Thread.
 	//Alocando memória para a estrutura da thread.
 	t = (void *) malloc( sizeof(struct thread_d) );	
-	if( (void *) t == NULL ){
+	
+	if ( (void *) t == NULL )
+	{
 	    printf("pc-create-KiCreateRing0Idle: t \n");
 		die();
 	}else{  
@@ -714,7 +748,9 @@ void *KiCreateRing0Idle()
 	//estamos alocando uma stack dentro do heap do kernel.
 	//nesse caso serve para a thread idle em ring 0.
 	ring0IdleStack = (void *) malloc(8*1024);
-	if( (void *) ring0IdleStack == NULL ){
+	
+	if( (void *) ring0IdleStack == NULL )
+	{
 	    printf("pc-create-KiCreateRing0Idle: ring0IdleStack\n");
 		die();
 	};
@@ -742,8 +778,13 @@ void *KiCreateRing0Idle()
 	
 	t->plane = BACKGROUND;
 	
-	t->Directory = (unsigned long ) gKernelPageDirectoryAddress;
+	
+	
+	t->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
+	
+	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 
+	
 	//Procedimento de janela.
     t->procedure = (unsigned long) &system_procedure;	
 	t->window = NULL;  //window;  //arg1.

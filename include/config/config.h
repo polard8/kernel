@@ -20,10 +20,16 @@
 // Se a configuração não indicar nenhum processo então o kernel deve 
 // falhar na inicialização, por enquanto. 
 
+
+ 
+
+
 #define ENTRY_INIT_INIT    1
 #define ENTRY_INIT_SHELL   1
 #define ENTRY_INIT_TASKMAN 1
 
+//Cria uma thread para o processo kernel, que irá rodar em ring0.
+#define ENTRY_INIT_KERNELTHREAD_RING0  1  
 
 //Essa flag aciona a rotina que vai checar o máximo de 
 //configurações e inicializações válidas.

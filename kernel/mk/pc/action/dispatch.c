@@ -69,24 +69,26 @@ int dispatch_Default();
  * não estão habilitados, só um funciona.
  *
  */
-void 
-dispatcher( int type )
-{
+ 
+void dispatcher ( int type ){
+	
 	int Status;
+	
 	struct thread_d *dispatch_Pointer;
 	
-	//
+	
 	// Obs: 
 	// @todo:
 	// (Fase de teste). 
 	// Usando apenas um tipo de dispatcher. 	
 	// Deteminando o tipo de dispacher por enquanto
-	//
 	
-	if( type != DISPATCHER_CURRENT )
+	
+	if ( type != DISPATCHER_CURRENT )
 	{
 	    type = DISPATCHER_CURRENT;
 	};
+	
 	
 	//
 	// Seleciona o tipo.
@@ -94,11 +96,10 @@ dispatcher( int type )
 	
 //SelectDispatcherType:
 	
-	switch(type)
+	switch (type)
 	{
-	    //null.
 	    case DISPATCHER_NULL:
-		    goto dispatchCurrent;
+		    goto dispatchCurrent;     
 		    break;
 		
 		case DISPATCHER_SYSCOOP:
@@ -142,8 +143,14 @@ dispatcher( int type )
 		    goto dispatchRealtime;
 		    break;
 		
+		
+		//
 		// ## PRINCIPAL ##
+		//
+		
 		//Despacha a tarefa atual.
+		// >> (Usando esse!)
+		
 		case DISPATCHER_CURRENT:
 		    goto dispatchCurrent;
 		    break;
@@ -195,73 +202,89 @@ dispatchReady:
     current_thread = readyDispatcher();
     goto do_dispatch;	
 	
+
+//	
 // ## Principal ##	
+//
+
+
 //Dispatch current.
+
 dispatchCurrent:
     //current_thread = current_thread;
     goto do_dispatch;	
 
+	
+    //
+    //    ####  DO DISPATCH ####
+    //	
+	
+	
 //----------------------------------------	
 // Do Dispatch: Dispatch 'current_thread'.
 //----------------------------------------
 
 do_dispatch:		
 	
-	//Checa estrutura.
-	dispatch_Pointer = (void*) threadList[current_thread];
 	
-	if( (void*) dispatch_Pointer == NULL )
+	// Checa estrutura.
+	
+	dispatch_Pointer = (void *) threadList[current_thread];
+	
+	if ( (void*) dispatch_Pointer == NULL )
 	{
-	    printf("dispatcher fail: Struct.\n");
+	    printf("action-dispatch-dispatcher: Struct ERROR\n");
 		die();
 	};
 	
-	//Checa o 'state'.
-	if( dispatch_Pointer->state != READY )
+	// Checa o 'state'.
+	
+	if ( dispatch_Pointer->state != READY )
 	{
-	    printf("dispatcher fail: State.\n");
+	    printf("action-dispatch-dispatcher: State ERROR\n");
 		die();
 	};
 	
-	//A thread passa para o estado RUNNING.
+	
+	// #importante
 	// * MOVEMENT 4 (Ready --> Running).	
-	if( dispatch_Pointer->state == READY )
+	// A thread passa para o estado RUNNING.
+	// Reinicia a contagem.
+	
+	if ( dispatch_Pointer->state == READY )
 	{
 	    dispatch_Pointer->state = RUNNING;	
-		queue_insert_data( queue, 
-		                   (unsigned long) dispatch_Pointer, 
-						   QUEUE_RUNNING );
-	};	
+		
+		dispatch_Pointer->runningCount = 0;
+		
+		queue_insert_data ( queue, (unsigned long) dispatch_Pointer, 
+            QUEUE_RUNNING );
 			
-	
-	/*
-	//Check context.
-	Status = contextCheckThreadRing3Context(dispatch_Pointer->tid);
-	if(Status != 0)
-	{
-	    printf("dispatcher fail: Context.\n");
-		refresh_screen();
-		while(1){}
-	};	
-	*/
-	
-	//Reinicia a contagem.
-	dispatch_Pointer->runningCount = 0;	
+	};
 	
 	
 	//
 	// ## RESTORE CONTEXT ##
 	//
 	
-	// Flag sinalizando contexto salvo.
-	// Talvez devamos acionar essa flag depois 
-	// de salvarmos o contexto. 
+    // #importante	
+	// Flag sinalizando que o contexto não está mais salvo.
+	// Esse flag é acionada quando o contexto é salvo no início 
+	// da task switch.
 	
 	dispatch_Pointer->saved = 0;
 	
+	// #importante
+	// Chama a rotina que colocará as informações da estrutura de thread 
+	// nas variáveis usadas pelo assembly para configurar os registradores 
+	// antes do iretd.
+	
 	restore_current_context();
 	
-//Done.
+    //	
+    //  ## Done ##
+    //
+	
 done:
     return; 
 };

@@ -189,6 +189,7 @@ void KiShowThreadList (){
  * #bugbug: Não encontro o protótipo dessa função.
  */
 //void threadiShowSlots(){ 
+
 void mostra_slots(){
 	
     int i; 	
@@ -229,15 +230,19 @@ Scan:
 	    t = (void *) threadList[i];
 	    
 		//Mostra as tarefas válidas, mesmo que estejam com problemas.
-		if( (void*)t != NULL && 
-		        t->used == 1 && 
-				t->magic == 1234 )
+		if ( (void *)t != NULL && 
+		          t->used == 1 && 
+				 t->magic == 1234 )
 	    {
+			
+			
+			mostra_slot (t->tid);
+			
 			//@todo: Melhorar isso.
-		    printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d}" 
-			    "Handle={%x} Name={%s}\n\n",
-		        t->tid, t->step, t->ownerPID, t->process, 
-				t->state, (void*) t, t->name_address );
+		    //printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d}" 
+			//    "Handle={%x} Name={%s}\n\n",
+		    //    t->tid, t->step, t->ownerPID, t->process, 
+			//	t->state, (void*) t, t->name_address );
 	        //...
 		};
     };
@@ -286,14 +291,18 @@ void mostra_slot (int id){
 	
 	    // Show one slot.
 	    printf("\n");
-	    printf("TID  ownerPID pHandle  Prio  State   tName   \n");
-	    printf("===  ======== ======== ====  =====   ======= \n");
-        printf("%d   %d       %x       %d    %d      %s      \n" ,t->tid 
-	                                                             ,t->ownerPID
-                                                                 ,t->process															
-														         ,t->priority 
-														         ,t->state
-														         ,t->name_address);
+	    printf("TID   PID   pdPA  Prio  State Step  tName \n");
+	    printf("====  ====  ====  ====  ===== ====  ===== \n");
+		
+        printf("%d    %d    %x    %d    %d    %d    %s \n", 
+			t->tid, 
+			t->ownerPID,
+			t->DirectoryPA,
+			t->priority, 
+			t->state,
+			t->step,
+			t->name_address );
+			
 	};
 	
     goto done;
@@ -436,20 +445,24 @@ void SetThreadDirectory ( struct thread_d *thread, unsigned long Address ){
 	
     if ( (void *) thread == NULL )
 	{
-        goto fail;
+        return;
+		//goto fail;
         
 	}else{
 		
 		//@todo:
 		//Aqui podemos checar a validade da estrutura,
 		//antes de operarmos nela.
+		
+		thread->DirectoryPA = (unsigned long) Address;	
 	};
 	
 //Nothing.		
-done:
-	thread->Directory = (unsigned long) Address;	
-fail:
-	return;
+//done:
+	
+	
+//fail:
+	//return;
 };
 
 
@@ -462,18 +475,18 @@ unsigned long GetThreadDirectory ( struct thread_d *thread ){
 	
     if ( (void *) thread == NULL )
 	{
-        goto fail;        
+		return (unsigned long) 0;    
+		
 	}else{
 		
 		//@todo:
 		//Aqui podemos checar a validade da estrutura,
 		//antes de operarmos nela.
+		
+	    return (unsigned long) thread->DirectoryPA;		
 	};
-//Nothing.	
-done:
-	return (unsigned long) thread->Directory;
-fail:
-    return (unsigned long) 0;    
+	
+	return (unsigned long) 0;
 };
 
 
