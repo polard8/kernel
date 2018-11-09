@@ -2913,8 +2913,7 @@ do_compare:
 	//rotina de teste de soquetes.
 	if ( strncmp( prompt, "socket-test", 11 ) == 0 )
 	{
-		//printf("~shutdown \n");
-        
+		//printf("~socket \n");        
 		shellSocketTest();
 		goto exit_cmp;
     };		
@@ -3068,15 +3067,11 @@ do_compare:
          strncmp( prompt, "T7", 2 ) == 0 || 		 
 	     strncmp( prompt, "t7", 2 ) == 0 )	
 	{
-		printf("VK_CAPITAL %d \n", system_call ( 138, VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );
-				
+		printf("VK_CAPITAL %d \n", system_call ( 138, VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );				
 	    printf("VK_LSHIFT %d \n", system_call ( 138, VK_LSHIFT, VK_LSHIFT, VK_LSHIFT ) );
 		printf("VK_RSHIFT %d \n", system_call ( 138, VK_RSHIFT, VK_RSHIFT, VK_RSHIFT ) );
-		
 		printf("VK_CONTROL %d \n", system_call ( 138, VK_CONTROL, VK_CONTROL, VK_CONTROL ) );
-		
 		printf("VK_WINKEY %d \n", system_call ( 138, VK_WINKEY, VK_WINKEY, VK_WINKEY ) );
-		
 		printf("VK_LMENU %d \n", system_call ( 138, VK_LMENU, VK_LMENU, VK_LMENU ) );
 		//...
 		goto exit_cmp;

@@ -9,6 +9,7 @@
  
 #include <kernel.h>
 
+
 //deletar
 unsigned long 
 MessageBoxProcedure( struct window_d *window, 
@@ -17,9 +18,6 @@ MessageBoxProcedure( struct window_d *window,
 					 unsigned long long2 );
 					 
 					 
-					 
-	
-
 /*
  ***************
  * ps2:
@@ -32,15 +30,14 @@ MessageBoxProcedure( struct window_d *window,
  *     As vezes os dois não funcionam ao mesmo tempo se a 
  *     inicialização não for feita desse jeito. 
  */
+ 
 void ps2 (){
 	
-   // printf("");	
-	
-	printf("ps2: Desabilitando as duas portas...\n");
-	refresh_screen();
+    //printf("");	
+	//printf("ps2: Desabilitando as duas portas...\n");
+	//refresh_screen();
 
     
-	
 	//
 	// ## DESATIVANDO AS DUAS PORTAS ##
 	//
@@ -49,22 +46,27 @@ void ps2 (){
 	// Desativar dispositivos PS/2 , isto evita que os dispositivos PS/2 
 	// envie dados no momento da configuração.
 
+	
 //desablePorts:
+
 
     //##bugbug
 	//não sabemos o efeito colateral disso.
 	//isso pode dar problema.
+
 	
 	// Desativar a primeira porta PS/2.
 	//kbdc_wait(1);
 	//outportb(0x64,0x60);  	
-  	kbdc_wait(1);
+  	
+	kbdc_wait(1);
 	outportb(0x64,0xAD);  
 	
 	// Desativar a segunda porta PS/2, 
 	// hahaha por default ela já vem desativada, só para constar
 	//kbdc_wait(1);
 	//outportb(0x64,0x60);  	
+	
 	kbdc_wait(1);
 	outportb(0x64,0xA7); 
 
@@ -72,13 +74,11 @@ void ps2 (){
     //
 	//======================================
 	//
-	
 
     //
 	// ## step 1 ##
     // mouse	 
     //
-	
 
 	
 //mouse_initialization:	
@@ -88,20 +88,19 @@ void ps2 (){
 	//segunda porta. O mouse.
     
 	//2
-	printf("ps2: inicializando mouse ...\n");
-	refresh_screen();	
+	//printf("ps2: inicializando mouse ...\n");
+	//refresh_screen();	
+	
 	ps2_mouse_initialize();  
 	
 	
 	
-	
-
-	printf("ps2: inicializando globais do mouse ...\n");
-	refresh_screen();	
+	//printf("ps2: inicializando globais do mouse ...\n");
+	//refresh_screen();	
 	//Não afeta o controlador. 
 	//Apenas inicializa variáveis.
-	ps2_mouse_globals_initialize();	 	
-	 
+	
+	ps2_mouse_globals_initialize();	
 
 	
 	
@@ -112,10 +111,10 @@ void ps2 (){
 //keybaord_initialization:
 
 
-	
     //2
-	printf("ps2: inicializando teclado ...\n");
-	refresh_screen();	
+	//printf("ps2: inicializando teclado ...\n");
+	//refresh_screen();	
+	
 	ps2_keyboard_initialize();
 	
 	
@@ -123,7 +122,7 @@ void ps2 (){
 	//mouse install ...
 	//
 	
-	mouse_install();
+	mouse_install ();
 	
 	
  
@@ -201,12 +200,11 @@ void ps2 (){
 		//
 	//};			
 
-	printf("ps2: done\n");
-	refresh_screen();		
-	
+	//printf("ps2: done\n");
+	//refresh_screen();		
 };
-		
-	
+
+
 /*
 void messageboxIn(int type, char *title, char *string);
 void messageboxIn(int type, char *title, char *string)
@@ -220,6 +218,7 @@ void messageboxIn(int type, char *title, char *string)
     return;				 
 };
 */	
+
 
 /*
 void messageboxOut(struct window_d *parent_window, int type, char *title, char *string);
@@ -248,6 +247,7 @@ void messageboxOut(struct window_d *parent_window, int type, char *title, char *
  * Message string.
  *
  */
+ 
 void 
 MessageBox( struct window_d *parent_window,        
             int type,                        
@@ -582,11 +582,6 @@ done:
 	return (unsigned long) 0;
 };
 
-/*
-?? Pra quê ??
-int messageboxInit()
-{}
-*/
 
 //
 // End.

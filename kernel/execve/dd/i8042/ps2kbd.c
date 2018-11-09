@@ -1,34 +1,36 @@
+/*
+ * File: ps2kbd.c
+ *
+ * 2018 - Created by Fred Nora.
+ */
 
-
-//ps2kbd.c 
 
 #include <kernel.h>
 
  
 
-
-
-
-
 // Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
-uint8_t keyboard_read(){
+uint8_t keyboard_read (){
  
     
 	kbdc_wait(0);
+	
 	uint8_t val = inportb(0x60);
-    	wait_ns(200);
-    	return val;
-
-}
+    
+	wait_ns(200);
+    
+	return val;
+};
 
 
 // Esta função será usada para escrever dados do teclado na porta 0x60, fora do IRQ1
-void keyboard_write(uint8_t write){
+void keyboard_write (uint8_t write){
 
 	kbdc_wait(1);
-	outb(0x60,write);
-    	wait_ns(200);
-
+	
+	outb (0x60,write);
+    
+	wait_ns(200);
 };
 
 
@@ -37,7 +39,7 @@ int BAT_TEST (){
 	
     uint8_t val;
 
-    while(1) 
+    while (1) 
 	{
         val = keyboard_read();
 
@@ -49,7 +51,8 @@ int BAT_TEST (){
     
         // Reenviar o comando. 
         // OBS: este comando não é colocado em buffer
-        keyboard_write(0xFE);       
+        
+		keyboard_write (0xFE);       
        
     };
 };
@@ -73,8 +76,9 @@ void ps2_keyboard_initialize (){
 	if ( (void *) ioControl_keyboard == NULL )
 	{
 		printf("ps2_keyboard_initialize: ioControl_keyboard fail");
-		die();
-	}else{
+		die ();
+		
+	} else {
 	    
 	    ioControl_keyboard->id = 0;
 	    ioControl_keyboard->used = 1;
@@ -177,12 +181,13 @@ void ps2_keyboard_initialize (){
     while(keyboard_read() != 0xFA);
 	
 	
-    	// Basic Assurance Test (BAT)
-    	if( BAT_TEST() != 0) 
-		{
-            // Nelson aqui precisaremos de criar uma rotina de tratamento de erro do teclado
-            printf("\nkeyboard error!");
-    	}  
+    // Basic Assurance Test (BAT)
+    
+	if ( BAT_TEST() != 0) 
+	{
+        // Nelson aqui precisaremos de criar uma rotina de tratamento de erro do teclado
+        printf("\nkeyboard error!");
+    }  
 
     // espera nossa controladora termina
 	kbdc_wait(1);
@@ -193,8 +198,8 @@ void ps2_keyboard_initialize (){
     g_driver_keyboard_initialized = (int) 1;
 };
 
-//Pega o status das teclas de modificação.
 
+//Pega o status das teclas de modificação.
 unsigned long keyboardGetKeyState ( unsigned char key ){
 	
 	unsigned long State = 0;
@@ -249,6 +254,7 @@ unsigned long keyboardGetKeyState ( unsigned char key ){
     return (unsigned long) State;		
 };
 
+
 // Inicializa o status das teclas de modificação.
 // são usadas em comjunto com outras teclas para criar atalhos.
 // modificam temporariamente a função de outra tecla.
@@ -256,13 +262,8 @@ void ldisc_init_modifier_keys (){
 	
 	// Modifier keys.
 	
-	// Shift.
 	shift_status = 0;
-	
-	// Control.
 	ctrl_status = 0;
-	
-	// Win key.
 	winkey_status = 0;
     
 	// Alternate.
@@ -278,7 +279,6 @@ void ldisc_init_modifier_keys (){
 };
 
 
-
 // modificam permanentemente a função de outra tecla.
 //ativa as teclas extendidas.
 void ldisc_init_lock_keys (){
@@ -292,8 +292,6 @@ void ldisc_init_lock_keys (){
 	// Number Lock.
 	numlock_status = 0;	
 };
-
-
 
 
 /*
@@ -368,8 +366,6 @@ void keyboard_set_leds (char flag){
 
 
 
-
-
 /*
  * KdGetWindowPointer:
  *     Retorna o ponteiro da estrutura de janela que pertence a thread.
@@ -426,9 +422,6 @@ int KbGetMessage (int tid){
 	    ret_val = (int) -1;    //Fail.
 	};
 
-// Done.
-//done:
-
 	WindowProcedure->msgStatus = 0;    //Muda o status.
 	return (int) ret_val;              //Retorna a mensagem.
 };
@@ -450,10 +443,9 @@ unsigned long KbGetLongParam1 (int tid){
         return (unsigned long) 0;    //@todo: fail;
 	};
 
-// Done.
-//done:
     return (unsigned long) t->long1;
 };
+
 
 /*
  * KbGetLongParam2:
@@ -471,8 +463,6 @@ unsigned long KbGetLongParam2 (int tid){
         return (unsigned long) 0;    //@todo: fail;
 	};
 
-// Done.
-//done:
     return (unsigned long) t->long2;
 };
 
@@ -496,6 +486,7 @@ unsigned long KbGetLongParam2 (int tid){
  *     + Efetuar o tipo de reboot especificado.
  *    + Outras ...
  */
+ 
 void reboot (){
     
     //@todo: 
@@ -562,8 +553,6 @@ void reboot (){
 // Done.
 //
 
-//done:
-
     hal_reboot ();
 	die ();
 };
@@ -627,14 +616,12 @@ void set_current_keyboard_responder ( int i ){
 	current_keyboard_responder = i;
 };
 
+
 //?? isso tá sem protótipo ??
 int get_current_keyboard_responder (){
 	
 	return (int) current_keyboard_responder;
 };
-
-
-
 
 
 /*
@@ -651,6 +638,7 @@ int keyboardInit(){
 	;
 };
 */
+
 
 /*
 void keyboard();

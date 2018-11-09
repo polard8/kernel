@@ -52,6 +52,7 @@
 
 char _keyboard_queue[32];
 
+
 int _write_offset;
 int _read_offset;
 
@@ -78,7 +79,9 @@ int _read_offset;
  * por eventos desse tipo.
  *
  */
+ 
 void abnt2_keyboard_handler (){
+	
 	
     unsigned char scancode = inportb (0x60);	
 	
@@ -90,6 +93,7 @@ void abnt2_keyboard_handler (){
 	
 	
 	//#obs: Esse buffer está em user.h 
+	
 	keybuffer[keybuffer_tail++] = (char) scancode;
 	
 	if ( keybuffer_tail >= 128 )
@@ -97,17 +101,12 @@ void abnt2_keyboard_handler (){
 		keybuffer_tail = 0;
 	}
 	
-//callLineDiscipline:	
 	
 	// #DEBUG !!!
 	// Isso fica aqui para testes apenas,
 	// pois quem chama isso é o consumidor.
 	
-	//LINE_DISCIPLINE(scancode);
 	
-//eoi:
-    //EOI.
-    
 	outportb ( 0x20, 0x20 );    
 };
 
