@@ -763,10 +763,24 @@ get_next:
 		// #importante: (Endereços virtuais).
 		// Por isso pode ser o mesmo para todos os processos.
 		
+		
+		// #### HEAP ####
+		
+		//CreatePageTable ( Process->DirectoryVA, 512, 0 );
+		
+		
+		//Process->Heap = (unsigned long) 0x00400000; //funciona
+		//Process->Heap = (unsigned long) 0xC0C00000;//funciona
+		Process->Heap = (unsigned long) 0xC1000000;
+		
+		//Process->Heap = (unsigned long) allocPageFrames (64); 
+
+        //Process->Heap = (unsigned long) malloc (1024*32); //32kb		
+		
 		// Endereço do início do Heap do processo.
 		// #bubug: Endereço do fim do heap.
 		// Tamanho do heap, dado em KB.
-	    Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;    
+	    //Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;    
 	    Process->HeapEnd = 0; // @todo: (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE);
 		Process->HeapSize = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    
 
@@ -1777,9 +1791,8 @@ int processmanagerInit(){
  *     Pega o endereço do heap do processo.
  *
  */
-unsigned long 
-GetProcessHeapStart( int pid )
-{
+unsigned long GetProcessHeapStart ( int pid ){
+	
 	struct process_d *process;
 	
 	//Limits.
@@ -1788,17 +1801,17 @@ GetProcessHeapStart( int pid )
 		goto fail; 
 	};
 	
-	
 	process = (struct process_d *) processList[pid];
     
 	//Estrutura inválida.
-	if( (void*) process == NULL )
+	if( (void *) process == NULL )
 	{
 		goto fail;
 		 
 	}else{
 		
-		if( process->used != 1 || process->magic != 1234 ){
+		if ( process->used != 1 || process->magic != 1234 )
+		{
 			goto fail;
 		}
 		

@@ -498,6 +498,15 @@ int heapInit (){
 	HEAP_END   = (unsigned long) &HeapBuffer[Max];
 	HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
+	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
+	//int thisprocess_id = (int) system_call ( 85, 0, 0, 0); 
+	//unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );	
+	
+	//HEAP_START = (unsigned long) &heaptest[0];
+	//HEAP_END   = (unsigned long) (HEAP_START + (1024*32) );  //32kb 
+	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
+	
+	
 	heap_start  = (unsigned long) HEAP_START;  
     heap_end    = (unsigned long) HEAP_END;  
 	g_heap_pointer     = (unsigned long) heap_start;    //Heap Pointer.	
@@ -569,7 +578,7 @@ done:
 	return (int) 0;
 // Fail. Falha ao iniciar o heap do kernel.
 fail:
-    printf("heapInit: Fail!\n");
+    printf("heapInit: Fail\n");
 	
 	/*
 	printf("* Debug: %x %x %x %x \n", kernel_heap_start, 
@@ -608,7 +617,7 @@ int stdlibInitMM (){
 	
 	if ( Status != 0 )
 	{
-	    printf("stdlib-stdlibInitMM fail: heapInit.\n");
+	    printf("stdlib-stdlibInitMM fail: heapInit\n");
 	    return (int) 1;
 	};			
 	

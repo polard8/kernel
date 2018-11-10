@@ -356,8 +356,7 @@ void *CreatePageDirectory (){
  
 //retorna o endereço virtual. 
  
-/*
- #suspensa
+ 
  
 void *CreatePageTable( unsigned long directory_address, 
                        int offset, 
@@ -395,15 +394,15 @@ void *CreatePageTable( unsigned long directory_address,
 	//só depois converteremos e salvaremos na entrada do diretório 
 	//o ponteiro que é um endereço físico.
 	
-	unsigned long ptVA = (unsigned long) newPage(); 
-
+	//unsigned long ptVA = (unsigned long) newPage(); 
+    unsigned long ptVA = (unsigned long) malloc (4096);
 	//Limits.
 	if ( ptVA == 0 ){
 		
 		return NULL;
 	}	
 
-	unsigned long ptPA = (unsigned long) virtual_to_physical ( ptVA, gKernelPageDirectoryAddress ); 
+	//unsigned long ptPA = (unsigned long) virtual_to_physical ( ptVA, gKernelPageDirectoryAddress ); 
 	
 
 	//o endereço virtual permite manipularmos a pagetable daqui do kernel.
@@ -448,7 +447,7 @@ void *CreatePageTable( unsigned long directory_address,
 	for ( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
-	    newPT[i] = (unsigned long) region_address | 7;             
+	    newPT[i] = (unsigned long) region_address | 3;             
 	    region_address = (unsigned long) region_address + 4096;  //+4KB.
     };
 	
@@ -465,7 +464,7 @@ void *CreatePageTable( unsigned long directory_address,
 	//rotina de configuração das páginas.
 	
 	PD[offset] = (unsigned long) &newPT[0]; 
-    PD[offset] = (unsigned long) PD[offset] | 7;      
+    PD[offset] = (unsigned long) PD[offset] | 3;      
 
 	
  
@@ -476,7 +475,7 @@ void *CreatePageTable( unsigned long directory_address,
     return (void *) ptVA;
 };
  
-*/ 
+
 
 /*
  * SetCR3:
@@ -512,9 +511,7 @@ unsigned long mapping_nic0_device_address ( unsigned long address ){
 	//Esse endereço é improvisado. Parece que não tem nada nesse endereço.
 	//#todo: temos que alocar memória e converter o endereço lógico em físico.
 	
-    //unsigned long *nic0_page_table = (unsigned long *) 0x91000;   
-	//unsigned long *nic0_page_table = (unsigned long *) 0;   
-	unsigned long *nic0_page_table = (unsigned long *) 0x88000;
+	unsigned long *nic0_page_table = (unsigned long *) PAGETABLE_NIC1; //0x88000;
 	
 	
 	int i;
@@ -594,7 +591,8 @@ int SetUpPaging (){
 	unsigned long SMALL_vga_address = SMALLSYSTEM_VGA;
 	unsigned long SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
 	unsigned long SMALL_backbuffer_address = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
-	unsigned long SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  
+	unsigned long SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;   //PAGED POOL
+    unsigned long SMALL_heappool_address = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;	
 	//...
 	
 	
@@ -609,7 +607,7 @@ int SetUpPaging (){
 	unsigned long MEDIUM_frontbuffer_address = (unsigned long) SavedLFB;
 	unsigned long MEDIUM_backbuffer_address = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
 	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
-
+    unsigned long MEDIUM_heappool_address = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
 	
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
@@ -622,6 +620,7 @@ int SetUpPaging (){
 	unsigned long LARGE_frontbuffer_address = (unsigned long) SavedLFB;
 	unsigned long LARGE_backbuffer_address = (unsigned long) LARGESYSTEM_BACKBUFFER;
 	unsigned long LARGE_pagedpool_address = (unsigned long) LARGESYSTEM_PAGEDPOLL_START; 	
+    unsigned long LARGE_heappool_address = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
 	
 	// ** bank 1 ** //
 	// O primeiro banco representa o mínimo de memória RAM que o sistema 
@@ -748,6 +747,22 @@ int SetUpPaging (){
 	
     //pagetable para o pagedpool
 	unsigned long *pagedpool_page_table = (unsigned long *) PAGETABLE_PAGEDPOOL; //0x00089000;  
+	
+	//#test
+	//precisamos de um endereço físico para a pagetable que mapeará os buffers.
+	//#bugbug: o malloc não funciona ainda. Estamos inicializando o mapeamento.
+	//então isso deveria retornar 0 se o malloc não funcionar.???
+	//então mesmo que o malloc funcione a rotina de transformar v em f não funciona 
+	//porque o diretorio de páginas do kernel ainda está incompleto.
+	//unsigned long xxxhptVA = (unsigned long) malloc (4096); 
+	//if(xxxhptVA == 0)
+	//{
+	//    printf("pages.c xxxhptVA *fail");
+    //    refresh_screen();
+	//    while(1){}
+	//}	
+	//unsigned long *heappool_page_table = (unsigned long *) virtual_to_physical ( xxxhptVA, gKernelPageDirectoryAddress );  
+	unsigned long *heappool_page_table = (unsigned long *) PAGETABLE_HEAPPOOL; 
 	//...
 
 	//
@@ -1082,6 +1097,22 @@ int SetUpPaging (){
     page_directory[771] = (unsigned long) &pagedpool_page_table[0];      
     page_directory[771] = (unsigned long) page_directory[771] | 7;  	
 
+	
+	//heaps suppport
+	//preparando uma área de memória grando o bastante 
+	//para conter o heap de todos os processos.
+	//ex: podemos dar 128kb para cada processo inicialmente.
+
+	for ( i=0; i < 1024; i++ ){
+		
+	    heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7;     
+	    SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096;  
+    };
+
+    page_directory[772] = (unsigned long) &heappool_page_table[0];      
+    page_directory[772] = (unsigned long) page_directory[772] | 7;  	
+	
+	
 	
 	// @todo:  
 	// (sobre heaps para processos em user mode).

@@ -1122,14 +1122,13 @@ unsigned long mapping_nic0_device_address( unsigned long address );
 //que é um clone do diretório de páginas do kernel.
 void *CreatePageDirectory();
 
-//#suspensa
-//void *CreatePageTable( unsigned long directory_address, 
-//                       int offset, 
-//					   unsigned long region_address );
 
+void *CreatePageTable ( unsigned long directory_address, 
+                        int offset, 
+					    unsigned long region_address );
 
 					   
-					   
+				
 					   
 //
 // page frame support.

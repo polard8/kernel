@@ -166,6 +166,7 @@
 //#define SMALLSYSTEM_FRONTBUFFER      ?? 
 #define SMALLSYSTEM_BACKBUFFER       (0x01000000 - 0x800000)   
 #define SMALLSYSTEM_PAGEDPOLL_START  (0x01000000 - 0x400000) 
+#define SMALLSYSTEM_HEAPPOLL_START   (0x01000000) 
 //...
 
 //
@@ -177,6 +178,7 @@
 //#define MEDIUMSYSTEM_FRONTBUFFER      ?? 
 #define MEDIUMSYSTEM_BACKBUFFER       (0x01000000 - 0x800000)    
 #define MEDIUMSYSTEM_PAGEDPOLL_START  (0x01000000 - 0x400000) 
+#define MEDIUMSYSTEM_HEAPPOLL_START   (0x01000000)
 //...
 
 //
@@ -188,6 +190,7 @@
 //#define LARGESYSTEM_FRONTBUFFER      ?? 
 #define LARGESYSTEM_BACKBUFFER       (0x01000000 - 0x800000)    
 #define LARGESYSTEM_PAGEDPOLL_START  (0x01000000 - 0x400000) 
+#define LARGESYSTEM_HEAPPOLL_START   (0x01000000)
 //...
 
 
@@ -212,13 +215,27 @@
 // por isso ficarão aqui isoladas.
 // Já as outras pagetables ficarão concatenadas 
 // numa lista grande em um outro lugar de fácil acesso. 
+
+
 #define PAGETABLE_KERNELAREA   0x0008F000
 #define PAGETABLE_KERNELBASE   0x0008E000
 #define PAGETABLE_USERBASE     0x0008D000
 #define PAGETABLE_VGA          0x0008C000
 #define PAGETABLE_FRONTBUFFER  0x0008B000
 #define PAGETABLE_BACKBUFFER   0x0008A000
-#define PAGETABLE_PAGEDPOOL    0x00089000  //?? isso é um teste ... Cuidado. #bugbug
+#define PAGETABLE_PAGEDPOOL    0x00089000
+#define PAGETABLE_NIC1         0x00088000  //NIC
+#define PAGETABLE_HEAPPOOL     0x00087000  //POOL DE HEAPS;
+#define PAGETABLE_RES1         0x00086000
+#define PAGETABLE_RES2         0x00085000
+#define PAGETABLE_RES3         0x00084000
+#define PAGETABLE_RES4         0x00083000
+#define PAGETABLE_RES5         0x00082000
+#define PAGETABLE_RES6         0x00081000
+//??...
+
+
+//?? isso é um teste ... Cuidado. #bugbug
 //?? Obs: Não sei o quanto podemos ir escolhendo endereços nessa região sem sobrepor
 //o rootdir do volume2 que começa em 0x70000
 
