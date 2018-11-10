@@ -2,8 +2,6 @@
 //fs.h 
 
 
-
- 
 /*
  * partition_table_d:
  *     Structure for partition table.

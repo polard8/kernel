@@ -79,21 +79,6 @@
 //
 
 
-/*
- O Boot Loader criou alguns diretórios nesses endereços físicos, parece 
- conveniente usar esses endereços.
- @todo: Rever os endereços usados, tanto no kernel, quanto no Boot Loader.
-
-	unsigned long *page_directory         = (unsigned long *) 0x01F00000;
-	unsigned long *idle_page_directory    = (unsigned long *) 0x01E00000;
-	unsigned long *shell_page_directory   = (unsigned long *) 0x01D00000;
-	unsigned long *taskman_page_directory = (unsigned long *) 0x01C00000;
-	unsigned long *x_page_directory       = (unsigned long *) 0x01B00000;
-	unsigned long *xx_page_directory      = (unsigned long *) 0x01A00000;
-	unsigned long *xxx_page_directory     = (unsigned long *) 0x01900000;
-
- */
-
 
 #include <kernel.h>
 
@@ -122,26 +107,6 @@ extern unsigned long SavedBPP;          //Bits per pixel.
 extern void set_page_dir();
 //...
 
-
-
-//
-// Obs: Deixar aqui os endereços das páginas.
-//
-
-
-//
-// Pagetables:
-// ==========
-//     Endereços físicos de algumas pagetales.
-//
-
-#define KM1_PAGETABLE     0x8F000  // Pagetable para o kernel mode stuff.
-#define KM2_PAGETABLE     0x8E000  // Pagetable para 'O Kernel'. A 'imagem'.
-#define UM_PAGETABLE      0x8D000  // Pagetable para o aplicativos em user mode.
-#define VGA_PAGETABLE     0x8C000  // Pagetable para o VGA em user mode.
-#define LFB_PAGETABLE     0x8B000  // LFB.        FRONTBUFFER_PAGETABLE
-#define BUFFER_PAGETABLE  0x8A000  // BackBuffer. BACKBUFFER_PAGETABLE
-//...
 
 
 //Usar alguma rotina de hal_ pra isso;
@@ -522,14 +487,14 @@ unsigned long mapping_nic0_device_address ( unsigned long address ){
     };
 	
 
-	//0xC1000000    772  ##test
 	//f0000000      960
 	
-    page_directory[960] = (unsigned long) &nic0_page_table[0];      
-    page_directory[960] = (unsigned long) page_directory[960] | 3;   	
+    page_directory[ENTRY_NIC1_PAGES] = (unsigned long) &nic0_page_table[0];      
+    page_directory[ENTRY_NIC1_PAGES] = (unsigned long) page_directory[ENTRY_NIC1_PAGES] | 3;   	
 	
-	//endereço equivalente à entrada 772
-	return (unsigned long) 0xF0000000;
+	
+	//(virtual)
+	return (unsigned long) NIC1_VA;
 };
 
 
@@ -698,7 +663,7 @@ int SetUpPaging (){
 	//
 	
 	//inicializando o endereço.
-	gKernelPageDirectoryAddress = 0x0009C000;  
+	gKernelPageDirectoryAddress = XXXKERNEL_PAGEDIRECTORY;  //0x0009C000;  
 	
 	// 0x0009C000
 	//unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;         
@@ -847,8 +812,8 @@ int SetUpPaging (){
 	    SMALL_kernel_address = (unsigned long) SMALL_kernel_address + 4096;  
     };
 	
-    page_directory[0] = (unsigned long) &km_page_table[0];      
-    page_directory[0] = (unsigned long) page_directory[0] | 3;  
+    page_directory[ENTRY_KERNELMODE_PAGES] = (unsigned long) &km_page_table[0];      
+    page_directory[ENTRY_KERNELMODE_PAGES] = (unsigned long) page_directory[ENTRY_KERNELMODE_PAGES] | 3;  
 	
 	
 	//
@@ -883,8 +848,8 @@ int SetUpPaging (){
 	    SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096;  
     };
 	
-    page_directory[768] = (unsigned long) &km2_page_table[0];       
-    page_directory[768] = (unsigned long) page_directory[768] | 3;  
+    page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) &km2_page_table[0];       
+    page_directory[ENTRY_KERNELBASE_PAGES] = (unsigned long) page_directory[ENTRY_KERNELBASE_PAGES] | 3;  
 
 
     // Obs: Percebe-se que houve uma sobreposição. Os megas 0,1,2,3 para
@@ -936,8 +901,8 @@ int SetUpPaging (){
 	    SMALL_user_address = (unsigned long) SMALL_user_address + 4096; 
     };
 	
-    page_directory[1] = (unsigned long) &um_page_table[0];      
-    page_directory[1] = (unsigned long) page_directory[1] | 7; 
+    page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) &um_page_table[0];      
+    page_directory[ENTRY_USERMODE_PAGES] = (unsigned long) page_directory[ENTRY_USERMODE_PAGES] | 7; 
 	
 	
     // Obs: Novamente aqui há uma sobreposição. O primeiro mega
@@ -982,8 +947,8 @@ int SetUpPaging (){
 	    SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096;  
     };
 
-    page_directory[2] = (unsigned long) &vga_page_table[0];     
-    page_directory[2] = (unsigned long) page_directory[2] | 7;  
+    page_directory[ENTRY_VGA_PAGES] = (unsigned long) &vga_page_table[0];     
+    page_directory[ENTRY_VGA_PAGES] = (unsigned long) page_directory[ENTRY_VGA_PAGES] | 7;  
 
 	
 	// Obs: 4MB começando do endereço físico 0x000B8000, são acessíveis
@@ -993,7 +958,7 @@ int SetUpPaging (){
 	// ** PAGETABLE, FRONT BUFFER  **
 	//
 	
-	g_frontbuffer_va = (unsigned long) 0xC0400000;        
+	g_frontbuffer_va = (unsigned long) FRONTBUFFER_ADDRESS; //0xC0400000;        
 	
 	
     //==================================================================
@@ -1031,15 +996,15 @@ int SetUpPaging (){
 	    SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096;  
     };
 	
-    page_directory[769] = (unsigned long) &frontbuffer_page_table[0];       
-    page_directory[769] = (unsigned long) page_directory[769] | 7;  	
+    page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) &frontbuffer_page_table[0];       
+    page_directory[ENTRY_FRONTBUFFER_PAGES] = (unsigned long) page_directory[ENTRY_FRONTBUFFER_PAGES] | 7;  	
 	
 	
 	//
 	// ** PAGETABLE, BACKBUFFER **
 	//
 	
-	g_backbuffer_va = (unsigned long) 0xC0800000; 
+	g_backbuffer_va = (unsigned long) BACKBUFFER_ADDRESS; //0xC0800000; 
 	
     //===============================================================
 	// user mode BUFFER1 pages - (0x01000000 - 0x800000 fis) = 0xC0800000virt).
@@ -1070,8 +1035,8 @@ int SetUpPaging (){
 	    SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096;  
     };
 	
-    page_directory[770] = (unsigned long) &backbuff_page_table[0];      
-    page_directory[770] = (unsigned long) page_directory[770] | 7;  	
+    page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) &backbuff_page_table[0];      
+    page_directory[ENTRY_BACKBUFFER_PAGES] = (unsigned long) page_directory[ENTRY_BACKBUFFER_PAGES] | 7;  	
 
 
 	// Obs: 4MB da memória física à partir do endereço físico 0x01000000 (16MB)
@@ -1083,7 +1048,7 @@ int SetUpPaging (){
 	// ** PAGETABLE, PAGEDPOOL **
 	//	
 	
-	g_pagedpool_va = (unsigned long) 0xC0C00000;
+	g_pagedpool_va = (unsigned long) XXXPAGEDPOOL_VA;  //0xC0C00000;
 	
 	// (user mode)
 	// 7 decimal é igual a 111 binário.	
@@ -1099,13 +1064,13 @@ int SetUpPaging (){
 	    SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096;  
     };
 
-    page_directory[771] = (unsigned long) &pagedpool_page_table[0];      
-    page_directory[771] = (unsigned long) page_directory[771] | 7;  	
+    page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) &pagedpool_page_table[0];      
+    page_directory[ENTRY_PAGEDPOOL_PAGES] = (unsigned long) page_directory[ENTRY_PAGEDPOOL_PAGES] | 7;  	
 
 	
     // endereço virtual do pool de heaps.
     // os heaps nessa área serão dados para os processos.	
-	g_heappool_va = (unsigned long) 0xC1000000;
+	g_heappool_va = (unsigned long) XXXHEAPPOOL_VA; //0xC1000000;
 	g_heap_count = 0;
 	g_heap_count_max = G_DEFAULT_PROCESSHEAP_COUNTMAX;
 	g_heap_size = G_DEFAULT_PROCESSHEAP_SIZE;
@@ -1121,14 +1086,14 @@ int SetUpPaging (){
 	    SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096;  
     };
 
-    page_directory[772] = (unsigned long) &heappool_page_table[0];      
-    page_directory[772] = (unsigned long) page_directory[772] | 7;  	
+    page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) &heappool_page_table[0];      
+    page_directory[ENTRY_HEAPPOOL_PAGES] = (unsigned long) page_directory[ENTRY_HEAPPOOL_PAGES] | 7;  	
 	
 	
 	
 	//+++++++
 	//gramado core init heap 
-	g_gramadocore_init_heap_va = (unsigned long) 0xC1400000;
+	g_gramadocore_init_heap_va = (unsigned long) XXXGRAMADOCORE_INIT_HEAP_VA; //0xC1400000;
 	g_gramadocore_init_heap_size = G_DEFAULT_GRAMADOCORE_INIT_HEAP_SIZE;  //4MB
 
 	for ( i=0; i < 1024; i++ ){
@@ -1137,14 +1102,14 @@ int SetUpPaging (){
 	    SMALL_gramadocore_init_heap_address = (unsigned long) SMALL_gramadocore_init_heap_address + 4096;  
     };
 
-    page_directory[773] = (unsigned long) &gramadocore_init_page_table[0];      
-    page_directory[773] = (unsigned long) page_directory[773] | 7;  		
+    page_directory[ENTRY_GRAMADOCORE_INIT_PAGES] = (unsigned long) &gramadocore_init_page_table[0];      
+    page_directory[ENTRY_GRAMADOCORE_INIT_PAGES] = (unsigned long) page_directory[ENTRY_GRAMADOCORE_INIT_PAGES] | 7;  		
 	
 	
 	
 	//+++++++
 	//gramado core shell heap 
-	g_gramadocore_shell_heap_va = (unsigned long) 0xC1800000;
+	g_gramadocore_shell_heap_va = (unsigned long) XXXGRAMADOCORE_SHELL_HEAP_VA; //0xC1800000;
 	g_gramadocore_shell_heap_size = G_DEFAULT_GRAMADOCORE_SHELL_HEAP_SIZE;  //4MB
 
 	for ( i=0; i < 1024; i++ ){
@@ -1153,14 +1118,14 @@ int SetUpPaging (){
 	    SMALL_gramadocore_shell_heap_address = (unsigned long) SMALL_gramadocore_shell_heap_address + 4096;  
     };
 
-    page_directory[774] = (unsigned long) &gramadocore_shell_page_table[0];      
-    page_directory[774] = (unsigned long) page_directory[774] | 7;  		
+    page_directory[ENTRY_GRAMADOCORE_SHELL_PAGES] = (unsigned long) &gramadocore_shell_page_table[0];      
+    page_directory[ENTRY_GRAMADOCORE_SHELL_PAGES] = (unsigned long) page_directory[ENTRY_GRAMADOCORE_SHELL_PAGES] | 7;  		
 	
 
 
 	//+++++++
 	//gramado core taskman heap 
-	g_gramadocore_taskman_heap_va = (unsigned long) 0xC1C00000;
+	g_gramadocore_taskman_heap_va = (unsigned long) XXXGRAMADOCORE_TASKMAN_HEAP_VA; //0xC1C00000;
 	g_gramadocore_taskman_heap_size = G_DEFAULT_GRAMADOCORE_TASKMAN_HEAP_SIZE;  //4MB
 
 	for ( i=0; i < 1024; i++ ){
@@ -1169,11 +1134,12 @@ int SetUpPaging (){
 	    SMALL_gramadocore_taskman_heap_address = (unsigned long) SMALL_gramadocore_taskman_heap_address + 4096;  
     };
 
-    page_directory[775] = (unsigned long) &gramadocore_taskman_page_table[0];      
-    page_directory[775] = (unsigned long) page_directory[775] | 7;  		
+    page_directory[ENTRY_GRAMADOCORE_TASKMAN_PAGES] = (unsigned long) &gramadocore_taskman_page_table[0];      
+    page_directory[ENTRY_GRAMADOCORE_TASKMAN_PAGES] = (unsigned long) page_directory[ENTRY_GRAMADOCORE_TASKMAN_PAGES] | 7;  		
 
 	
 	
+    //...
 	
 	
 	

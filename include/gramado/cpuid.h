@@ -1,14 +1,11 @@
 //cpuid.h 
 
 
-
-
 //cpuid.
 #define cpuid( in, a, b, c, d)\
         asm("cpuid": "=a" (a), "=b" (b), "=c" (c), "=d" (d) : "a" (in));
-
-
-
+		
+		
 /* 
  * Vendor Strings. 
  */

@@ -2,12 +2,6 @@
 // memory.h
 
 
-
-
-
-
-
-
 //
 // Size support.
 //

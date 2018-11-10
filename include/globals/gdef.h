@@ -66,12 +66,6 @@ dessa conta.
 */
 
 
-#define FRONTBUFFER_ADDRESS 0xC0400000
-#define BACKBUFFER_ADDRESS  0xC0800000
-#define FRONTBUFFER_VA      0xC0400000
-#define BACKBUFFER_VA       0xC0800000
-
-
 //#define BIOS_FONT8X8 0x000FFA6E
 
 //using gui flags.

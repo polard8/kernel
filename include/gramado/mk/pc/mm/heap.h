@@ -16,14 +16,6 @@
 //Contagem de heap.
 #define HEAP_COUNT_MAX  8 //256  //32  16  (8)
 
-//kernel heap.(Endereço virtual do heap do processo Kernel).
-//O heap deve começa depois do kernel e antes da pilha..
-// heapstart = kernelstart + kernel size 
-//considerando o kernel de 1 mega
-
-#define KERNEL_HEAP_START  (0xC0000000 + 0x100000)   //kernel start + kernel size.
-#define KERNEL_HEAP_END    (0xC02FFFF0 - 0x8000)     //stack start - stack size
-#define KERNEL_HEAP_SIZE   (KERNEL_HEAP_END - KERNEL_HEAP_START)
 
 
 /*

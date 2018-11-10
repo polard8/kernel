@@ -448,31 +448,7 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 // memory:
 //
 
-//
-// ## KERNEL STACK ##
-//
 
-//@todo: Crir estrutura de pilha.
-//kernel stack. (Endereço virtual da pilha do processo Kernel).
-//Obs: O Heap e a Stack estão dentro dos limites de 4MB de
-//tamanho da imagem do kernel base.
-//32kb
-#define KERNEL_STACK_SIZE   0x8000                                      
-#define KERNEL_STACK_START  0xC02FFFF0                                        
-#define KERNEL_STACK_END    (KERNEL_STACK_START - KERNEL_STACK_SIZE)  
-
-
-
-//Default stack que será usado em outra configuração de pilha.
-//#define DEFAULT_STACK_SIZE           KERNEL_STACK_SIZE
-//#define DEFAULT_INITIAL_STACK_COMMIT ?
-
-//
-// ## KERNEL IMAGE ADDRESS ##
-//
-
-//Base da imagem do kernel.
-#define KERNEL_IMAGE_BASE  0xC0000000    
  
  
  

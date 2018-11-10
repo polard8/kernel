@@ -57,6 +57,12 @@
 
 // Global definitions.
 // This must be on top.
+
+#include <globals/gpa.h>
+#include <globals/gva.h>
+#include <globals/gentry.h>
+
+
 #include <globals/gdef.h>
 #include <globals/gdevice.h>
 //...
@@ -172,7 +178,7 @@ extern void do_executa_new_task();
 // ## shared ## 
 //
 
-#include <gramado/brtypes.h>
+
 #include <gramado/fonts.h>
 #include <gramado/ascii.h>     //ascii table 
 #include <gramado/fs.h> 

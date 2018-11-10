@@ -1,10 +1,8 @@
 
 //video.h 
 
-
  
 /*
-
     3C0-3CF  EGA/VGA
 	3C0 VGA attribute and sequencer register
 	3C1 Other video attributes

@@ -74,7 +74,7 @@ int pwd_initialized;
 //
 
 #define MBR_LBA               0           // mbr
-#define MBR_ADDRESS           0x00020000  //isso suja o bm? ou bl?
+
 
 //
 //  ## VBR SUPPORT  ##
@@ -82,8 +82,7 @@ int pwd_initialized;
        
 #define VOLUME1_VBR_LBA       63
 #define VOLUME2_VBR_LBA       32000
-#define VOLUME1_VBR_ADDRESS   (0x00020000 + 0x200) 
-#define VOLUME2_VBR_ADDRESS   (0x00020000 + 0x200) 
+
 
 //
 //  ## FAT1 SUPPORT  ##
@@ -91,8 +90,7 @@ int pwd_initialized;
 
 #define VOLUME1_FAT_LBA       67 
 #define VOLUME2_FAT_LBA       33000  
-#define VOLUME1_FAT_ADDRESS   0x00030000 
-#define VOLUME2_FAT_ADDRESS   0x00030000
+
 
 //
 //  ## FAT2 SUPPORT  ##
@@ -106,8 +104,7 @@ int pwd_initialized;
 
 #define VOLUME1_ROOTDIR_LBA     559
 #define VOLUME2_ROOTDIR_LBA     34000
-#define VOLUME1_ROOTDIR_ADDRESS 0x00070000 
-#define VOLUME2_ROOTDIR_ADDRESS 0x00070000 
+
  
 //
 //  ##  DATA AREA SUPPORT  ##

@@ -10,7 +10,6 @@
 //...
 
 
-
 /*
  * bmp_header_d:
  *     Header.
