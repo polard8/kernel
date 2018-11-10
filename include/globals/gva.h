@@ -12,16 +12,16 @@
 //Os endereços virtuais aqui serão usados pelas aplicações.
 
 
-//idle thread. (init process) ( SIZE = 0x4FFF0 )
+//idle thread. (init process) ( SIZE = 0x4FFF0 ) 319KB
 #define GRAMADOCORE_IDLETHREAD_STACK       0x0044FFF0  //pilha
 #define GRAMADOCORE_IDLETHREAD_ENTRYPOINT  0x00401000  //entrypoint
 
-//shell thread (shell process) ( SIZE = 0x4FFF0 )
+//shell thread (shell process) ( SIZE = 0x4FFF0 ) 319KB
 #define GRAMADOCORE_SHELLTHREAD_STACK       0x0049FFF0   //pilha
 #define GRAMADOCORE_SHELLTHREAD_ENTRYPOINT  0x00451000   //entry point
 
 
-//taskman thread (taskman process) ( SIZE = 0x5FFF0 )
+//taskman thread (taskman process) ( SIZE = 0x5FFF0 ) 383KB
 #define GRAMADOCORE_TASKMANTHREAD_STACK       0x004FFFF0   //pilha
 #define GRAMADOCORE_TASKMANTHREAD_ENTRYPOINT  0x004A1000   //entry point
 

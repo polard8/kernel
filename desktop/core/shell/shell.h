@@ -1158,7 +1158,14 @@ void shellCreateEditBox();
 int shellCreateTaskBar( int status );
 
 
+
+
+
 int shellDisplayBMP( char *file_name );
+
+
+
+int shellDisplayBMPEx (char *file_name, int size );
 void shellTestDisplayBMP();
 
 

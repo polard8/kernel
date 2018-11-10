@@ -308,7 +308,7 @@ void task_switch (){
 		// @todo: Talvez possa restaurar antes de retornar.
 		// Retorna sem restaurar, se ainda não venceu a cota.
 		
-		if( Current->runningCount < Current->quantum )
+		if ( Current->runningCount < Current->quantum )
 		{
 			
 			// Atualiza a contagem de tipo de seleção.

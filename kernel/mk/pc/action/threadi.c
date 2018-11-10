@@ -291,15 +291,16 @@ void mostra_slot (int id){
 	
 	    // Show one slot.
 	    printf("\n");
-	    printf("TID   PID   pdPA  Prio  State Step  tName \n");
-	    printf("====  ====  ====  ====  ===== ====  ===== \n");
+	    printf("TID   PID   pdPA  Prio  State Quan Step  tName \n");
+	    printf("====  ====  ====  ====  ===== ==== ====  ===== \n");
 		
-        printf("%d    %d    %x    %d    %d    %d    %s \n", 
+        printf("%d    %d    %x    %d    %d    %d    %d    %s \n", 
 			t->tid, 
 			t->ownerPID,
 			t->DirectoryPA,
 			t->priority, 
 			t->state,
+			t->quantum,
 			t->step,
 			t->name_address );
 			

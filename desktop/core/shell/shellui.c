@@ -648,6 +648,7 @@ loadFile:
 
 
 /*
+ *************************************
  * shellDisplayBMP:
  *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
  */
@@ -679,7 +680,7 @@ loadFile:
 		(unsigned long) b, (unsigned long) b);	
 	 
 	//Usando a API para exibir o bmp carregado. 
-	apiDisplayBMP ( (char *) b, 10, 400 ); 
+	apiDisplayBMP ( (char *) b, 10, 00 ); 
 	 
     //
 	//Mostrando informações sobre o arquivo.
@@ -713,6 +714,80 @@ loadFile:
 	
 	return 0;
 };
+
+
+/*
+ *************************************
+ * shellDisplayBMP:
+ *     Carrega um arquivo .bmp na memória e decodifica, mostrando na tela.
+ *  tamanho dado em kb
+ */
+int shellDisplayBMPEx (char *file_name, int size ){	
+	
+	
+    //naõ pode ser igual a zero, nem menor que zero, nem maior que 3mb.	
+	if ( size <= 0 || size > (1024*3) )
+	{
+	    return 1;	
+	}
+	
+	// testando malloc.
+	void *b = (void *) malloc (1024*size); 	
+    
+	if ( (void *) b == NULL )
+	{
+		printf("shellTestDisplayBMP: allocation fail\n");
+		//while(1){}
+		return -1;
+	}
+	
+	//Carregando o arquivo.
+loadFile:
+
+    shellui_fntos ( (char *) file_name );
+
+    //@todo: Usar alguma rotina da API específica para carregar arquivo.
+	// na verdade tem que fazer essas rotinas na API.
+	
+	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) file_name, 
+		(unsigned long) b, (unsigned long) b);	
+	 
+	//Usando a API para exibir o bmp carregado. 
+	apiDisplayBMP ( (char *) b, 0, 0 ); 
+	 
+    //
+	//Mostrando informações sobre o arquivo.
+	//
+	
+	//base do bmp carregado na memória
+	//unsigned char *bmp = (unsigned char *) b;
+	
+	
+	//@todo: encontrando o magic
+	
+	//if( bmp[0] != 0x42 )
+	//{
+	//	printf("~Sig fail\n");
+	//    printf("magic0 %c\n", bmp[0]);	
+	//    printf("magic1 %c\n", bmp[1]);			
+	//	printf("buffer %x\n",bmp); //Ok
+    //    printf("buffer %x\n",b);   //Ok
+		//printf("width %d \n", bmp[0x12]);
+		//printf("height %d \n", bmp[0x16]);
+	//}
+	
+	//
+	//Mostrando características do bmp.
+	
+	//printf("magic0 %c\n", bmp[0]);	
+	//printf("magic1 %c\n", bmp[1]);
+	//printf("data area begin %c %c %c \n",bmp[base] ,bmp[base+1] ,bmp[base+2]);	
+	//printf("buffer %x \n",bmp);
+	//printf("data area address %x \n",&bmp[base]);
+	
+	return 0;
+};
+
 
 
 /*

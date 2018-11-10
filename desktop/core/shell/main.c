@@ -2294,7 +2294,11 @@ do_compare:
 			
 			//@todo: podemos checar se o pathname é absoluto,
 			//e onde se encontra o arquivo que queremos.
-			shellDisplayBMP ( (char *) tokenList[i] );
+			//shellDisplayBMP ( (char *) tokenList[i] );
+		
+		   //test 2MB
+		   //o argumento tamanho é dado  em kb.
+		   shellDisplayBMPEx ( (char *) tokenList[i], (int) (1024*2) );
 		};
 		goto exit_cmp;
     };	

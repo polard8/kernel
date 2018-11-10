@@ -167,12 +167,10 @@ void *KiCreateIdle (){
 		die();
 	};
 	
-	//
 	// @todo: 
 	//     É possível usar a função create_thread nesse momento.
 	//     Mas é mais veloz fazer o máximo em uma função só.
 	//     Mas por enquanto serão feitas à mão essas primeiras threads. 
-	//
 	
 	//@todo: objectType, objectClass, appMode
 	
@@ -190,12 +188,7 @@ void *KiCreateIdle (){
 	//  ## Directory ##
 	//
 	
-	IdleThread->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
-	
-	//IdleThread->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress; 
-	
-	//IdleThread->DirectoryVA = (unsigned long )  
-	//IdleThread->DirectoryPA = (unsigned long ) 	
+	IdleThread->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;	
 	
 	
 	for ( r=0; r<8; r++ ){
@@ -225,7 +218,7 @@ void *KiCreateIdle (){
   	IdleThread->priority = IdleThread->base_priority;          //dinâmica.
 	
 	IdleThread->saved = 0; 
-	IdleThread->preempted = UNPREEMPTABLE;    // Não pode sofrer preempção.
+	IdleThread->preempted = UNPREEMPTABLE; 
 	
 	//Temporizadores.
 	IdleThread->step = 0;          
@@ -261,10 +254,10 @@ void *KiCreateIdle (){
 	//Context.
 	//@todo: Isso deve ser uma estrutura de contexto.
 	IdleThread->ss  = 0x23;                          //RING 3.
-	IdleThread->esp = (unsigned long) 0x0044FFF0;    //idleStack; (*** RING 3)
+	IdleThread->esp = (unsigned long) GRAMADOCORE_IDLETHREAD_STACK; //0x0044FFF0;    //idleStack; (*** RING 3)
 	IdleThread->eflags = 0x3200;  //0x3202, pois o bit 1 é reservado e está sempre ligado.
 	IdleThread->cs = 0x1B;                                
-	IdleThread->eip = (unsigned long) 0x00401000;     	                                               
+	IdleThread->eip = (unsigned long) GRAMADOCORE_IDLETHREAD_ENTRYPOINT; //0x00401000;     	                                               
 	IdleThread->ds = 0x23; 
 	IdleThread->es = 0x23; 
 	IdleThread->fs = 0x23; 
@@ -398,10 +391,7 @@ void *KiCreateShell (){
 	
 	// ## Directory  ## 
 	
-	
 	t->DirectoryPA = (unsigned long ) ShellProcess->DirectoryPA;
-	
-	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 	
 	for ( r=0; r<8; r++ ){
 		Thread->wait_reason[r] = (int) 0;
@@ -423,7 +413,7 @@ void *KiCreateShell (){
 	t->iopl = RING3;  
 	t->type = TYPE_SYSTEM;   
 	t->saved = 0;
-	t->preempted = PREEMPTABLE;    //PREEMPT_PODE; //pode.
+	t->preempted = PREEMPTABLE; 
 	//t->Heap;
 	//t->HeapSize;
 	//t->Stack;
@@ -458,10 +448,10 @@ void *KiCreateShell (){
 
 	//Context.
 	t->ss  = 0x23;                          //RING 3.
-	t->esp = (unsigned long) 0x0049FFF0;    //shellStack;//  //RING 3 (pilha do app2)(shell?). 
+	t->esp = (unsigned long) GRAMADOCORE_SHELLTHREAD_STACK; //0x0049FFF0;    //shellStack;//  //RING 3 (pilha do app2)(shell?). 
 	t->eflags = 0x3200;
 	t->cs = 0x1B;                                
-	t->eip = (unsigned long) 0x00451000;     	                                               
+	t->eip = (unsigned long) GRAMADOCORE_SHELLTHREAD_ENTRYPOINT; //0x00451000;     	                                               
 	t->ds = 0x23; 
 	t->es = 0x23; 
 	t->fs = 0x23; 
@@ -475,10 +465,6 @@ void *KiCreateShell (){
 	t->ebp = 0;	
 	//...
 	
-	//#bugbug
-	//Obs: As estruturas precisam já estar decidamente inicializadas.
-	//IdleThread->root = (struct _iobuf *) file_root;
-	//IdleThread->pwd  = (struct _iobuf *) file_pwd;	
 	
 	//CPU stuffs.
 	//t->cpuID = 0;              //Qual processador.
@@ -580,17 +566,14 @@ void *KiCreateTaskManager (){
 	t->magic = 1234;	
 	t->name_address = (unsigned long) ThreadName;   //Funciona.
 	
-	t->process = (void*) TaskManProcess;
+	t->process = (void *) TaskManProcess;
 	
 	t->plane = BACKGROUND;
 	
 	
 	// # Directory #
 	
-	
 	t->DirectoryPA = (unsigned long ) TaskManProcess->DirectoryPA; 
-	
-	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 
 	for ( r=0; r<8; r++ ){
 		Thread->wait_reason[r] = (int) 0;
@@ -612,7 +595,7 @@ void *KiCreateTaskManager (){
 	
 	t->iopl = RING3;   
 	t->saved = 0;
-	t->preempted = PREEMPTABLE;    //PREEMPT_NAOPODE; //nao pode.	
+	t->preempted = PREEMPTABLE; 
 	//t->Heap;
 	//t->HeapSize;
 	//t->Stack;
@@ -643,10 +626,10 @@ void *KiCreateTaskManager (){
 	
 	//Context.
 	t->ss  = 0x23;                          //RING 3.
-	t->esp = (unsigned long) 0x004FFFF0;     
+	t->esp = (unsigned long) GRAMADOCORE_TASKMANTHREAD_STACK; //0x004FFFF0;     
 	t->eflags = 0x3200;
 	t->cs = 0x1B;                                
-	t->eip = (unsigned long) 0x004A1000;     	                                               
+	t->eip = (unsigned long) GRAMADOCORE_TASKMANTHREAD_ENTRYPOINT; //0x004A1000;     	                                               
 	t->ds = 0x23; 
 	t->es = 0x23; 
 	t->fs = 0x23; 
