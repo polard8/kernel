@@ -320,6 +320,21 @@ unsigned long g_heap_size;
 #define G_DEFAULT_PROCESSHEAP_COUNTMAX 16     //16 PROCESSOS #BUGBUG
 
 
+//gramado core init heap
+unsigned long g_gramadocore_init_heap_va;
+unsigned long g_gramadocore_init_heap_size;
+#define G_DEFAULT_GRAMADOCORE_INIT_HEAP_SIZE 0x400000; //4MB
+
+//gramado core shell heap
+unsigned long g_gramadocore_shell_heap_va;
+unsigned long g_gramadocore_shell_heap_size;
+#define G_DEFAULT_GRAMADOCORE_SHELL_HEAP_SIZE 0x400000; //4MB
+
+//gramado core taskman heap
+unsigned long g_gramadocore_taskman_heap_va;
+unsigned long g_gramadocore_taskman_heap_size;
+#define G_DEFAULT_GRAMADOCORE_TASKMAN_HEAP_SIZE 0x400000; //4MB
+
 
 int gNextKeyboardMessage;
 

@@ -617,6 +617,8 @@ int x86main ( int argc, char *argv[] ){
         //...
     };	
 	
+	InitProcess->Heap = (unsigned long) g_gramadocore_init_heap_va;
+	
 #endif
 
 
@@ -651,6 +653,8 @@ int x86main ( int argc, char *argv[] ){
         //ShellThread->ownerPID = (int) ShellProcess->pid;
         //...
     };	
+	
+	ShellProcess->Heap = (unsigned long) g_gramadocore_shell_heap_va;
 	
 #endif	
 
@@ -687,6 +691,8 @@ int x86main ( int argc, char *argv[] ){
         //TaskManThread->ownerPID = (int) TaskManProcess->pid;
         //...
     };
+	
+	TaskManProcess->Heap = (unsigned long) g_gramadocore_taskman_heap_va;
 
 #endif	
 

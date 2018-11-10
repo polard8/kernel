@@ -2636,12 +2636,13 @@ do_compare:
 	    //hBuffer[1] = 99;
 		//printf("%d %d \n",hBuffer[0],hBuffer[1]);
 		
-		hBuffer = (void *) malloc ( 1024*100 ); //100kb 
+		//hBuffer = (void *) malloc ( 1024*100 ); //100kb
+        hBuffer = (void *) malloc ( 1024*1024*3 ); //3mb		
 		if ( (void *) hBuffer == NULL )
 		{
-			printf("malloc fail 100kb\n");
+			printf("malloc fail 3MB\n");
 		}else{
-			printf("malloc ok 100kb\n");
+			printf("malloc ok 3MB\n");
 		}
 		
 		printf("done\n");

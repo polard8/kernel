@@ -592,7 +592,11 @@ int SetUpPaging (){
 	unsigned long SMALL_frontbuffer_address = (unsigned long) SavedLFB;                    //frontbuffer
 	unsigned long SMALL_backbuffer_address = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
 	unsigned long SMALL_pagedpool_address = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;   //PAGED POOL
-    unsigned long SMALL_heappool_address = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;	
+    unsigned long SMALL_heappool_address = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;		
+	
+	unsigned long SMALL_gramadocore_init_heap_address = (unsigned long) SMALLSYSTEM_GRAMADOCORE_INIT_HEAP_START;
+    unsigned long SMALL_gramadocore_shell_heap_address = (unsigned long) SMALLSYSTEM_GRAMADOCORE_SHELL_HEAP_START;
+    unsigned long SMALL_gramadocore_taskman_heap_address = (unsigned long) SMALLSYSTEM_GRAMADOCORE_TASKMAN_HEAP_START;	
 	//...
 	
 	
@@ -609,6 +613,10 @@ int SetUpPaging (){
 	unsigned long MEDIUM_pagedpool_address = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START; 	
     unsigned long MEDIUM_heappool_address = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
 	
+	unsigned long MEDIUM_gramadocore_init_heap_address = (unsigned long) MEDIUMSYSTEM_GRAMADOCORE_INIT_HEAP_START;	
+    unsigned long MEDIUM_gramadocore_shell_heap_address = (unsigned long) MEDIUMSYSTEM_GRAMADOCORE_SHELL_HEAP_START;
+    unsigned long MEDIUM_gramadocore_taskman_heap_address = (unsigned long) MEDIUMSYSTEM_GRAMADOCORE_TASKMAN_HEAP_START;	
+	
 	//==============================================================
 	//                  ****    LARGE SYSTEMS    ****
 	//==============================================================	
@@ -621,6 +629,10 @@ int SetUpPaging (){
 	unsigned long LARGE_backbuffer_address = (unsigned long) LARGESYSTEM_BACKBUFFER;
 	unsigned long LARGE_pagedpool_address = (unsigned long) LARGESYSTEM_PAGEDPOLL_START; 	
     unsigned long LARGE_heappool_address = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
+	
+	unsigned long LARGE_gramadocore_init_heap_address = (unsigned long) LARGESYSTEM_GRAMADOCORE_INIT_HEAP_START;	
+    unsigned long LARGE_gramadocore_shell_heap_address = (unsigned long) LARGESYSTEM_GRAMADOCORE_SHELL_HEAP_START;
+    unsigned long LARGE_gramadocore_taskman_heap_address = (unsigned long) LARGESYSTEM_GRAMADOCORE_TASKMAN_HEAP_START;	
 	
 	// ** bank 1 ** //
 	// O primeiro banco representa o mínimo de memória RAM que o sistema 
@@ -750,6 +762,12 @@ int SetUpPaging (){
 	
 	//um endereço físico para a pagetable que mapeará os buffers.
 	unsigned long *heappool_page_table = (unsigned long *) PAGETABLE_HEAPPOOL; 
+	
+	
+	unsigned long *gramadocore_init_page_table = (unsigned long *) PAGETABLE_GRAMADOCORE_INIT_HEAP; 
+	unsigned long *gramadocore_shell_page_table = (unsigned long *) PAGETABLE_GRAMADOCORE_SHELL_HEAP; 
+	unsigned long *gramadocore_taskman_page_table = (unsigned long *) PAGETABLE_GRAMADOCORE_TASKMAN_HEAP; 
+	
 	//...
 
 	//
@@ -1105,6 +1123,57 @@ int SetUpPaging (){
 
     page_directory[772] = (unsigned long) &heappool_page_table[0];      
     page_directory[772] = (unsigned long) page_directory[772] | 7;  	
+	
+	
+	
+	//+++++++
+	//gramado core init heap 
+	g_gramadocore_init_heap_va = (unsigned long) 0xC1400000;
+	g_gramadocore_init_heap_size = G_DEFAULT_GRAMADOCORE_INIT_HEAP_SIZE;  //4MB
+
+	for ( i=0; i < 1024; i++ ){
+		
+	    gramadocore_init_page_table[i] = (unsigned long) SMALL_gramadocore_init_heap_address | 7;     
+	    SMALL_gramadocore_init_heap_address = (unsigned long) SMALL_gramadocore_init_heap_address + 4096;  
+    };
+
+    page_directory[773] = (unsigned long) &gramadocore_init_page_table[0];      
+    page_directory[773] = (unsigned long) page_directory[773] | 7;  		
+	
+	
+	
+	//+++++++
+	//gramado core shell heap 
+	g_gramadocore_shell_heap_va = (unsigned long) 0xC1800000;
+	g_gramadocore_shell_heap_size = G_DEFAULT_GRAMADOCORE_SHELL_HEAP_SIZE;  //4MB
+
+	for ( i=0; i < 1024; i++ ){
+		
+	    gramadocore_shell_page_table[i] = (unsigned long) SMALL_gramadocore_shell_heap_address | 7;     
+	    SMALL_gramadocore_shell_heap_address = (unsigned long) SMALL_gramadocore_shell_heap_address + 4096;  
+    };
+
+    page_directory[774] = (unsigned long) &gramadocore_shell_page_table[0];      
+    page_directory[774] = (unsigned long) page_directory[774] | 7;  		
+	
+
+
+	//+++++++
+	//gramado core taskman heap 
+	g_gramadocore_taskman_heap_va = (unsigned long) 0xC1C00000;
+	g_gramadocore_taskman_heap_size = G_DEFAULT_GRAMADOCORE_TASKMAN_HEAP_SIZE;  //4MB
+
+	for ( i=0; i < 1024; i++ ){
+		
+	    gramadocore_taskman_page_table[i] = (unsigned long) SMALL_gramadocore_taskman_heap_address | 7;     
+	    SMALL_gramadocore_taskman_heap_address = (unsigned long) SMALL_gramadocore_taskman_heap_address + 4096;  
+    };
+
+    page_directory[775] = (unsigned long) &gramadocore_taskman_page_table[0];      
+    page_directory[775] = (unsigned long) page_directory[775] | 7;  		
+
+	
+	
 	
 	
 	

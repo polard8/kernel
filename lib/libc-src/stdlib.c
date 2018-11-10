@@ -503,7 +503,7 @@ int heapInit (){
 	unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );	
 	
 	HEAP_START = (unsigned long) &heaptest[0];
-	HEAP_END   = (unsigned long) (HEAP_START + (1024*128) );  //128KB 
+	HEAP_END   = (unsigned long) (HEAP_START + (1024*1024*4) ); //(HEAP_START + (1024*128) );  //128KB 
 	HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
 	
