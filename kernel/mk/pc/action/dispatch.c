@@ -595,8 +595,8 @@ fail:
  * dispatch_Default:
  *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int dispatch_Default()
-{
+int dispatch_Default (){
+	
 	struct thread_d *New;
 	struct thread_d *Current;
 	
@@ -646,8 +646,10 @@ int dispatch_Default()
 	    //Só pode entrar se o estado é ready.
         if( Current->state == READY)
 		{
-		    //manda para o fim da fila de ready.
-		    Current->event = EVENT_PREMMPTED; //Motivo.   
+		    
+			//manda para o fim da fila de ready.
+		    //Current->event = EVENT_PREMMPTED; //Motivo.   
+			
 			Current->waitingCount = 0;             //Zera o tempo de espera.
 			queue_insert_data(queue, (unsigned long) Current, QUEUE_SYSCOOP);
 		};
@@ -865,9 +867,9 @@ fail:
  * @todo: Mudar o nome para dispachInit();.
  *
  */ 
-int 
-init_dispatcher()
-{
+ 
+int init_dispatcher (){
+	
 	int i;
 	
 	//
@@ -923,7 +925,8 @@ init_dispatcher()
 	Conductor2->Next = (void *) threadList[0]; 
 	
 //Done.	
-done:
+//done:
+
     return (int) 0;
 };
 
@@ -939,9 +942,9 @@ done:
  * Obs: Esse modelo apresentou bons resultados por muito 
  * tempo. Vamos preserva-lo. 
  */
-void 
-IncrementDispatcherCount( int type )
-{	
+
+void IncrementDispatcherCount ( int type ){
+	
 	// Testing struct.
 	if( (void*) DispatchCountBlock == NULL )
 	{
@@ -955,7 +958,7 @@ IncrementDispatcherCount( int type )
 	};
 	
 	// Activating the selected type.
-	switch(type)
+	switch (type)
 	{
 		case SELECT_IDLE_COUNT:
 	        DispatchCountBlock->SelectIdleCount++;
@@ -998,8 +1001,8 @@ IncrementDispatcherCount( int type )
 	//     Obs: @todo: O laço acima pode não selecionar nada.
 	//
 	
-done:
-	return;
+//done:
+	//return;
 };
 
 

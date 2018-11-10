@@ -84,6 +84,8 @@ void scheduler_lock();
 void scheduler_unlock();
 void preempt();
 
+//bloqueia por um motivo
+void block_for_a_reason (int tid, int reason);
 
 //acordar uma determinada thread se ela estiver 
 //esperando por um evento desse tipo.

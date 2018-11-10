@@ -56,8 +56,8 @@ extern unsigned long get_page_dir();
  * rotina dofork() e outras se necessário.
  *
  */
-int fork()
-{  
+int fork (){
+	
     //struct process_t *p;
 	
 	//p = (void *) processList[current_process];
@@ -66,7 +66,8 @@ int fork()
 	
 	//dofork();
 	
-done:	
+//done:	
+
 	//return (int) p->pid;
 	return (int) 0;    //Ainda não implementada. 
 };
@@ -83,8 +84,7 @@ done:
  *           podem ir para um arquivo que será compilado junto com o kernel.
  *           ex: fork.c
  */
-int KiFork()
-{
+int KiFork (){
 	
 	//@todo Criar interface
 	
@@ -113,7 +113,8 @@ void *KiCreateIdle (){
     void *idleStack;                    // Stack pointer.
 	char *ThreadName = "idlethread";    // Name.
 	
-    
+    int r;
+	
 	//struct.
 	
 	IdleThread = (void *) malloc ( sizeof(struct thread_d) );	
@@ -197,6 +198,9 @@ void *KiCreateIdle (){
 	//IdleThread->DirectoryPA = (unsigned long ) 	
 	
 	
+	for ( r=0; r<8; r++ ){
+		Thread->wait_reason[r] = (int) 0;
+	}	
 	
 	
 	IdleThread->plane = BACKGROUND;
@@ -331,7 +335,8 @@ void *KiCreateShell (){
 	struct thread_d *t;
 	char *ThreadName = "shellthread";    // Name.
 
-
+    int r;
+	
    /*
     *@todo: checar o tipo de processador antes de configurar o contexto.
 	*
@@ -398,7 +403,9 @@ void *KiCreateShell (){
 	
 	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 	
-	
+	for ( r=0; r<8; r++ ){
+		Thread->wait_reason[r] = (int) 0;
+	}	
 	
 	//Procedimento de janela.
 	t->procedure = (unsigned long) &system_procedure;
@@ -515,6 +522,8 @@ void *KiCreateTaskManager (){
 	struct thread_d *t;
 	char *ThreadName = "taskmanthread";    // Name.
 	
+	int r;
+	
    /*
     * @todo: 
 	*     Checar o tipo de processador antes de configurar o contexto.
@@ -583,7 +592,9 @@ void *KiCreateTaskManager (){
 	
 	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 
-	
+	for ( r=0; r<8; r++ ){
+		Thread->wait_reason[r] = (int) 0;
+	}	
 	
 	//Procedimento de janela.
     t->procedure = (unsigned long) &system_procedure;	
@@ -723,6 +734,8 @@ void *KiCreateRing0Idle (){
 	struct thread_d *t;
 	char *ThreadName = "ring0-idle-thread";    // Name.
 	
+	int r;
+	
 
 	if ( (void *) KernelProcess == NULL )
 	{
@@ -783,6 +796,11 @@ void *KiCreateRing0Idle (){
 	t->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
 	
 	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
+	
+	
+	for ( r=0; r<8; r++ ){
+		Thread->wait_reason[r] = (int) 0;
+	}	
 
 	
 	//Procedimento de janela.
@@ -887,9 +905,6 @@ done:
     SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
     return (void *) t;
 };
-
-
-
 
 
 //

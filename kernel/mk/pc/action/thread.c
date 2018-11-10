@@ -367,7 +367,7 @@ get_next:
 		//Thread->wait4pid =
 
 		//razões para esperar.
-		for ( w=0; w<8; w++){
+		for ( w=0; w<8; w++ ){
 			Thread->wait_reason[w] = (int) 0;
 		}
 		

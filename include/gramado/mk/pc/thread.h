@@ -59,21 +59,21 @@
 /*
  **********************************************************
  * thread_event_type_t:
+ *
  *     Enumerando os tipos de eventos que fazem a tarefa 
  * entrar em modo de espera:
  *
  *  EVENT_NULL       - Nulo. 
- *	EVENT_PREMMPTED  - Preempção
+ *	EVENT_PREMMPTED  - Preempção.
  *  EVENT_SEMAPHORE  - Semáforo.
  *  //...
-  ## tavez usar o descritor de objetos que está em gdef. ##
  */
 typedef enum {
 	EVENT_NULL,           // Nulo. 
-	EVENT_PREMMPTED,      // Preempção.
-	EVENT_SEMAPHORE,      // Semáforo.
+	EVENT_PREMMPTED,      // ?? Esperando a preempção de thread de menor prio.
+	EVENT_SEMAPHORE,      // ?? Semáforo.
 	EVENT_WAIT4PID,       // Esperando o processo filho morrer.
-	EVENT_WAIT4TID,       // Esperando uma thread morrer.
+	EVENT_WAIT4TID        // Esperando uma thread morrer.
 	
 	//continua... @todo
 }thread_event_type_t;
@@ -472,22 +472,19 @@ struct thread_d
 	//  ## EVENT SUPPORT ##
 	//
 
-    // Tipo de evento pelo qual a threa está esperando.	
-    thread_event_type_t event;
+	//#bugbug: 
+	//agora temos um array e a threa pode esperar por mais de um evento.
+    // Tipo de evento pelo qual a thread está esperando.	
+    //thread_event_type_t event;
 
 	// Objeto pelo qual a threa está esperando.
 	object_type_t obType;
 	object_class_t obClass;	
-	
-	// wait4pid: 
-	// Uma thread pode estar esperando um processo 
-    // fechar para que ela prossiga.
-	//int wait4pid;
-	//int wait4tid;
-	
-	
+		
 	//#importante
 	//razões para esperar
+	//1=esperando; 0=não esperando.
+	//#todo: isso precisa ser inicializado.
 	//@todo: tem que fazer um enum para enumerar as razões.
 	//o índice é o selecionador da razão pela 
 	//qual a thread está esperando.
@@ -497,7 +494,11 @@ struct thread_d
 	// 2 - esperando um processo finalizar. wait4pid
 	// 3 - esperando um objeto. (espera genérica)
 	// ...
+	
 	int wait_reason[8];
+	
+	int wait4pid;   //id do processo que a thread está esperando moorrer.
+	int wait4tid;   //id da thread que a thread está esperando moorrer.
 	
 	//
 	// ## Exit support ##

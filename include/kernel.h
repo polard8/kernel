@@ -460,6 +460,8 @@ int current_volume;
 int current_directory;   
 int current_file;        
 int current_terminal;
+int current_dead_process;  //qual processo acabou de morrer.
+int current_dead_thread;   //qual thread acabou de morrer.
 //...
 
 
