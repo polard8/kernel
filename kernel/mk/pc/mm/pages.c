@@ -748,20 +748,7 @@ int SetUpPaging (){
     //pagetable para o pagedpool
 	unsigned long *pagedpool_page_table = (unsigned long *) PAGETABLE_PAGEDPOOL; //0x00089000;  
 	
-	//#test
-	//precisamos de um endereço físico para a pagetable que mapeará os buffers.
-	//#bugbug: o malloc não funciona ainda. Estamos inicializando o mapeamento.
-	//então isso deveria retornar 0 se o malloc não funcionar.???
-	//então mesmo que o malloc funcione a rotina de transformar v em f não funciona 
-	//porque o diretorio de páginas do kernel ainda está incompleto.
-	//unsigned long xxxhptVA = (unsigned long) malloc (4096); 
-	//if(xxxhptVA == 0)
-	//{
-	//    printf("pages.c xxxhptVA *fail");
-    //    refresh_screen();
-	//    while(1){}
-	//}	
-	//unsigned long *heappool_page_table = (unsigned long *) virtual_to_physical ( xxxhptVA, gKernelPageDirectoryAddress );  
+	//um endereço físico para a pagetable que mapeará os buffers.
 	unsigned long *heappool_page_table = (unsigned long *) PAGETABLE_HEAPPOOL; 
 	//...
 
@@ -1097,6 +1084,13 @@ int SetUpPaging (){
     page_directory[771] = (unsigned long) &pagedpool_page_table[0];      
     page_directory[771] = (unsigned long) page_directory[771] | 7;  	
 
+	
+    // endereço virtual do pool de heaps.
+    // os heaps nessa área serão dados para os processos.	
+	g_heappool_va = (unsigned long) 0xC1000000;
+	g_heap_count = 0;
+	g_heap_count_max = G_DEFAULT_PROCESSHEAP_COUNTMAX;
+	g_heap_size = G_DEFAULT_PROCESSHEAP_SIZE;
 	
 	//heaps suppport
 	//preparando uma área de memória grando o bastante 

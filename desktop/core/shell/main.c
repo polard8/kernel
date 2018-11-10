@@ -2618,8 +2618,8 @@ do_compare:
 	//unsigned char *hBuffer = (unsigned char *) 0xC1000000;
 	void *hBuffer;
 	
-	int thisprocess_id = (int) system_call ( 85, 0, 0, 0); 
-	unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );		
+	//int thisprocess_id = (int) system_call ( 85, 0, 0, 0); 
+	//unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );		
 	
     // heap
 	if ( strncmp( prompt, "heap", 4 ) == 0 )
@@ -2627,22 +2627,22 @@ do_compare:
 		
 		printf("testando heap\n");
 		
-		printf("%x\n", &heaptest[0]);
+		//printf("%x\n", &heaptest[0]);
 		
-		heaptest[0] = 'x';
+		//heaptest[0] = 'x';
 		
-		printf("%c\n", heaptest[0]);
+		//printf("%c\n", heaptest[0]);
 		//hBuffer[0] = 88;
 	    //hBuffer[1] = 99;
 		//printf("%d %d \n",hBuffer[0],hBuffer[1]);
 		
-		//hBuffer = (void *) malloc ( 1024*20 ); 
-		//if ( (void *) hBuffer == NULL )
-		//{
-		//	printf("malloc fail\n");
-		//}else{
-		//	printf("malloc ok\n");
-		//}
+		hBuffer = (void *) malloc ( 1024*100 ); //100kb 
+		if ( (void *) hBuffer == NULL )
+		{
+			printf("malloc fail 100kb\n");
+		}else{
+			printf("malloc ok 100kb\n");
+		}
 		
 		printf("done\n");
         goto exit_cmp;

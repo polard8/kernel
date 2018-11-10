@@ -494,17 +494,17 @@ int heapInit (){
 	unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
 	
 	
-	HEAP_START = (unsigned long) &HeapBuffer[0];
-	HEAP_END   = (unsigned long) &HeapBuffer[Max];
-	HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
+	//HEAP_START = (unsigned long) &HeapBuffer[0];
+	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
+	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
 	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
-	//int thisprocess_id = (int) system_call ( 85, 0, 0, 0); 
-	//unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );	
+	int thisprocess_id = (int) system_call ( 85, 0, 0, 0); 
+	unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );	
 	
-	//HEAP_START = (unsigned long) &heaptest[0];
-	//HEAP_END   = (unsigned long) (HEAP_START + (1024*32) );  //32kb 
-	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
+	HEAP_START = (unsigned long) &heaptest[0];
+	HEAP_END   = (unsigned long) (HEAP_START + (1024*128) );  //128KB 
+	HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
 	
 	heap_start  = (unsigned long) HEAP_START;  

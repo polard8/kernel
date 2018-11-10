@@ -310,6 +310,17 @@ unsigned long g_backbuffer_pa;
 //pagedpool virtual address
 unsigned long g_pagedpool_va;
 
+// endereço virtual do pool de heaps.
+// os heaps nessa área serão dados para os processos.
+unsigned long g_heappool_va;
+int g_heap_count;
+int g_heap_count_max;
+unsigned long g_heap_size;
+#define G_DEFAULT_PROCESSHEAP_SIZE (1024*128)
+#define G_DEFAULT_PROCESSHEAP_COUNTMAX 16     //16 PROCESSOS #BUGBUG
+
+
+
 int gNextKeyboardMessage;
 
 //

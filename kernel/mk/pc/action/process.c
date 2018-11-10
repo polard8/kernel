@@ -771,7 +771,22 @@ get_next:
 		
 		//Process->Heap = (unsigned long) 0x00400000; //funciona
 		//Process->Heap = (unsigned long) 0xC0C00000;//funciona
-		Process->Heap = (unsigned long) 0xC1000000;
+		
+		// g_heappool_va
+        // endereço virtual do pool de heaps.
+        // os heaps nessa área serão dados para os processos.
+		// base + (n*size)
+		if(g_heap_count < 0 || g_heap_count >= g_heap_count_max)
+		{
+			//erro 
+			printf("create_process: g_heap_count limits");
+			refresh_screen();
+			while(1){ asm ("hlt"); };
+		}
+		
+		Process->Heap = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
+		
+		g_heap_count++;
 		
 		//Process->Heap = (unsigned long) allocPageFrames (64); 
 
