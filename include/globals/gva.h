@@ -1,5 +1,6 @@
 
 //gva.h 
+//Endereços virtuais usados pelo kernel base.
 
 
 //Base da imagem do kernel.

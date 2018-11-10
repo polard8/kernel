@@ -1,14 +1,40 @@
 
+//gentry.h
 // números de entradas em diretórios de páginas e tabelas de páginas.
 
 
 
-#define ENTRY_KERNELMODE_PAGES 0
-#define ENTRY_USERMODE_PAGES   1
+//
+//  ## User Area ##
+//
 
-#define ENTRY_VGA_PAGES        2
+//Os dois primeiros gigas.
+//
 
-//...
+
+#define ENTRY_KERNELMODE_PAGES  0
+#define ENTRY_USERMODE_PAGES    1
+#define ENTRY_VGA_PAGES         2
+
+
+
+//256
+//Se o programa do processo for carregado aqui, então ele pode 
+//ter até 2GB de tamanho.
+
+
+//512
+//Se o programa do processo for carregado aqui, então ele pode 
+//ter até 1GB de tamanho.
+
+
+//
+//  ## System Area ##
+//
+
+// À partir do terceiro giga.
+// O sistema deve gerenciar tudas as suas coisas 
+// nesse giga superior da memoria virtual.
 
 #define ENTRY_KERNELBASE_PAGES 768
 

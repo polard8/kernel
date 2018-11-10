@@ -1,7 +1,6 @@
 
 //gpa.h 
-
-
+//Endereços físicos usados pelo kernel base.
 
 
 #define SMALLSYSTEM_KERNELADDRESS   0
