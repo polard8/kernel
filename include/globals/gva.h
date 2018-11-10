@@ -3,6 +3,41 @@
 //Endereços virtuais usados pelo kernel base.
 
 
+//############################################################################
+//
+//  ## User Area ##
+//
+
+// Os três primeiros gigas da memória virtual.
+//Os endereços virtuais aqui serão usados pelas aplicações.
+
+
+//idle thread. (init process) ( SIZE = 0x4FFF0 )
+#define GRAMADOCORE_IDLETHREAD_STACK       0x0044FFF0  //pilha
+#define GRAMADOCORE_IDLETHREAD_ENTRYPOINT  0x00401000  //entrypoint
+
+//shell thread (shell process) ( SIZE = 0x4FFF0 )
+#define GRAMADOCORE_SHELLTHREAD_STACK       0x0049FFF0   //pilha
+#define GRAMADOCORE_SHELLTHREAD_ENTRYPOINT  0x00451000   //entry point
+
+
+//taskman thread (taskman process) ( SIZE = 0x5FFF0 )
+#define GRAMADOCORE_TASKMANTHREAD_STACK       0x004FFFF0   //pilha
+#define GRAMADOCORE_TASKMANTHREAD_ENTRYPOINT  0x004A1000   //entry point
+
+
+//...
+
+
+
+//############################################################################
+//
+//  ## System Area ##
+//
+
+// O útimo giga da memória virtual.
+//Os endereços virtuais aqui serão usados por componentes do sistema.
+
 //Base da imagem do kernel.
 #define KERNEL_IMAGE_BASE  0xC0000000  
 
