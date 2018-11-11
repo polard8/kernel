@@ -1658,17 +1658,13 @@ do_create_window:
 	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
 	//com um endereço da área de memória do app.
-    NewWindow = (void *) CreateWindow( WindowType, WindowStatus, 
+	
+    NewWindow = (void *) CreateWindow ( WindowType, WindowStatus, 
 	                        WindowView, WindowName, 
 	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
-							cwArg9, 
-							desktopID, 
+							cwArg9, desktopID, 
 							(unsigned long) WindowClientAreaColor, 
 							(unsigned long) WindowColor );
-
-	
-	
-	
 	
 	if ( (void *) NewWindow == NULL )
 	{ 

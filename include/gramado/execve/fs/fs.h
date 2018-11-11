@@ -571,22 +571,31 @@ struct dir_d *volume1RootDir;  //boot volume.
 struct dir_d *volume2RootDir;  //system volume.
 //...
 
+// \DEV
+// \SECURITY
+// \TOOLS
+// \USERS
+
 
 //Diretório raiz.
-struct dir_d *rootDir;      // 
+//struct dir_d *rootDir;      // 
 
-//Principais.
-struct dir_d *gbuildDir;    // "/gbuild"
-struct dir_d *gdocsDir;     // "/gdocs"
-struct dir_d *gramadoDir;   // "/gramado"
-struct dir_d *gsdkDir;      // "/gsdk"
-struct dir_d *gsrcDir;      // "/gsrc"
+//#bugbug
+//Rever esses diretórios.
+//agora temos alguns poucos.
 
-//Secundários.
-struct dir_d *usersDir;     // "/users"
-struct dir_d *cmdDir;       // "/cmd"
-struct dir_d *tmpDir;       // "/tmp"
-struct dir_d *downloadDir;  // "/download"
+
+//struct dir_d *tmpDir;       // "/tmp"
+
+//struct dir_d *gbuildDir;    // "/gbuild"
+//struct dir_d *gdocsDir;     // "/gdocs"
+//struct dir_d *gramadoDir;   // "/gramado"
+//struct dir_d *gsdkDir;      // "/gsdk"
+//struct dir_d *gsrcDir;      // "/gsrc"
+//struct dir_d *usersDir;     // "/users"
+//struct dir_d *cmdDir;       // "/cmd"
+//struct dir_d *tmpDir;       // "/tmp"
+//struct dir_d *downloadDir;  // "/download"
 //...
 
 //Diretório atual.

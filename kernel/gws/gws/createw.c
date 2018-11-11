@@ -408,7 +408,7 @@ CreateWindow( unsigned long type,
 		window->view = (int) view;
 		
 		// Se não estivermos no modo gráfico, não há o que pintar.
-		if( g_useGUI == 0 )
+		if ( g_useGUI == 0 )
 		{ 
 		    window->view = (int) VIEW_MINIMIZED;
             //#bugbug: Abortar.			
@@ -479,6 +479,10 @@ CreateWindow( unsigned long type,
 		// ?? saving.
 		//saveLeft = window->left;
 		//saveTop  = window->top;
+		
+		//
+		//  ## color ##
+		//
 		
 		// Background support.
 		window->bg_color = (unsigned long) color; 
@@ -1602,7 +1606,7 @@ drawBegin:
 								window->width, 25,									  
 					            window, 0, 
 								(unsigned long) CurrentColorScheme->elements[csiStatusBar], 
-								(unsigned long) CurrentColorScheme->elements[csiStatusBar]);
+								(unsigned long) CurrentColorScheme->elements[csiStatusBar] );
         
 		// Registrar.
 		RegisterWindow (window->statusbar);

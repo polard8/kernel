@@ -738,7 +738,7 @@ void windowSetUpColorScheme (int type){
         pride->elements[csiInactiveWindowTitleBar] = 0x0080FFFF;		
 		pride->elements[csiMenuBar] = COLOR_GRAY;
         pride->elements[csiScrollBar] = COLOR_SEASHELL; //COLOR_GRAY;		
-		pride->elements[csiStatusBar] = COLOR_STATUSBAR3;   
+		pride->elements[csiStatusBar] = 0x2EB982;//COLOR_STATUSBAR3;   
         pride->elements[csiMessageBox] = COLOR_GRAY;
 		pride->elements[csiSystemFontColor] = COLOR_BLACK;    //12
 		pride->elements[csiTerminalFontColor] = COLOR_WHITE;  //13		

@@ -818,7 +818,7 @@ noArgs:
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    wpWindowLeft, wpWindowTop, 
 					    wsWindowWidth, wsWindowHeight,    
-                        pW, 0, xCOLOR_GRAY3, xCOLOR_GRAY1 );	   
+                        pW, 0, 0x35475F, xCOLOR_GRAY1 ); //pW, 0, xCOLOR_GRAY3, xCOLOR_GRAY1 ); //#35475F	   
 
 	if ( (void *) hWindow == NULL ){
 		
@@ -938,29 +938,25 @@ noArgs:
     apiBeginPaint();
 	
 	//mudando as dimensões a janela dentro da área de cliente.
-	terminal_rect.left = terminal_rect.left + 28;
-	terminal_rect.top = terminal_rect.top + 28;
-
-	terminal_rect.width = 8 * 80;
-	terminal_rect.height = 8 * 32;
 	
-	//terminal_rect.width = terminal_rect.width - 150;
-	//terminal_rect.height = terminal_rect.height - 150;
+	terminal_rect.left = terminal_rect.left +2;
+	terminal_rect.top = terminal_rect.top +2;
+	
+	terminal_rect.width = terminal_rect.width -4 -40; //8 * 80;
+	terminal_rect.height = terminal_rect.height -4; //8 * 32;
+	
+	//terminal_rect.width = 8 * 80;
+	//terminal_rect.height = 8 * 32;
 	
 	
-	//hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
-	//                    terminal_rect.left, terminal_rect.top, 
-	//				    terminal_rect.width, terminal_rect.height,    
-    //                    0, 0, COLOR_RED, COLOR_RED );	   
-
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
 	                        terminal_rect.left, terminal_rect.top, 
 					        terminal_rect.width, terminal_rect.height,    
                             0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
 
 						
-	if ( (void *) hWindow2 == NULL ){
-		
+	if ( (void *) hWindow2 == NULL )
+	{	
 		die ("shell.bin: hWindow2 fail");
 	}	
 	
@@ -4227,26 +4223,32 @@ int shellCheckPassword (){
     char buffer[512];	
 	
 	// Se o shell não for interativo não tem login.
+	
 	if (interactive == 1)
 	{
+		//hostname
+        current_host_name = "??host??";		
+		
+		
+		//file 
+		
 		FILE *user_stream;
 		
 		user_stream = (FILE *) fopen ("user.txt","w+");
 		
-		// Testing welcome message.
-	    printf("\n");
-	    printf("Welcome to Gramado!\n");
-	    printf("\n");
-	
-        
-		//hostname
-        current_host_name = "??host??";		
+		//#todo check.
 		
+		// Testing welcome message.
+	    //printf("\n");
+	    printf("\n Welcome to Gramado! \n");
+	    //printf("\n");
+	
+        		
 		//
 		//  ## username  ##
 		//
 		
-	    printf("username:\n");
+	    printf("\n username: ");
 	    gets(username);
 		current_user_name = username;
 		
@@ -4254,7 +4256,7 @@ int shellCheckPassword (){
 		//  ## password ##
 	    //
 		
-		printf("password:\n");
+		printf("\n password: \n");
 	    gets(password);
 	
 #ifdef SHELL_VERBOSE	
@@ -4312,17 +4314,17 @@ int shellCheckPassword (){
             if( strncmp( username, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE				
-				printf("## USERNAME OK ##\n");
+				printf("# USERNAME OK #\n");
 #endif				
 				login_status = 1;
 			}else{
-				printf("## USERNAME FAIL ##\n");
+				printf("# USERNAME FAIL #\n");
 				login_status = 0;
 			};				
 
         }else{
 			
-			printf("## USERNAME FAIL ##\n");
+			printf("# USERNAME FAIL #\n");
 			login_status = 0;
 		};
 
@@ -4356,17 +4358,17 @@ int shellCheckPassword (){
             if ( strncmp( password, buffer, 4 ) == 0 )
             {
 #ifdef SHELL_VERBOSE								
-				printf("## PASSWORD OK ##\n");
+				printf("# PASSWORD OK #\n");
 #endif
 				login_status = 1;
 			}else{
-				printf("## PASSWORD FAIL ##\n");
+				printf("# PASSWORD FAIL #\n");
 				login_status = 0;
 			};					
 			
 		}else{
 			
-		    printf("## PASSWORD FAIL ##\n");
+		    printf("# PASSWORD FAIL #\n");
             login_status = 0; 			
 		};
 		    

@@ -269,14 +269,17 @@ do_draw_label:
 			
     }else{
 		
+		//b->width
+		//b->height
 		
-	    //draw_string( window->left +x +8, 
-		//             window->top  +y +8, 
-		//			 COLOR_WINDOWTEXT, 
-		//			 string);	
+		// (window->left +x) left 
+		// (largura do botão, menos a largura da string)/2
 
 	    draw_string ( window->left +x +8, window->top +y +8, 
 			COLOR_TERMINALTEXT, string );	
+			
+	    //draw_string ( window->left +x +8, window->top +y +8, 
+		//	COLOR_TERMINALTEXT, string );	
 	};
 	
 	//
