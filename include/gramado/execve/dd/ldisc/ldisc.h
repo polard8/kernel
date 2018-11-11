@@ -196,8 +196,15 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC );
 
 
 
+// Mouse 
+// A entrada é um ponteiro para um buffer que contenha os 
+// 3 chars usados pelo mouse.
+
+int MOUSE_LINE_DISCIPLINE ( void *buffer );
 
 
+// #todo
+// Outros esquemas de input podem ser criados aqui.
 
 //
 // End.

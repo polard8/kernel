@@ -643,6 +643,29 @@ done:
 
 
  
+// Mouse 
+// A entrada é um ponteiro para um buffer que contenha os 
+// 3 chars usados pelo mouse.
+
+int MOUSE_LINE_DISCIPLINE ( void *buffer ) {
+	
+	if ( (void *) buffer == NULL )
+	    return (int) -1;
+    
+	unsigned char *chars = (unsigned char *) buffer;
+
+	char char0 = (char) chars[0];
+	char char1 = (char) chars[1];
+	char char2 = (char) chars[2];
+	char char3 = (char) chars[3];
+	//...
+	
+	//
+	// #todo
+	//
+	
+    return (int) -1;   
+};	
 
 
 //ldisc
