@@ -153,11 +153,11 @@ void KiInformation (){
 	//printf("[System Info:]\n");
 	
 	// OS info.
-	printf("%s ",OS_NAME);
-	printf("Version: %d.%d.%d\n\n",
-	    SYSTEM_VERSIONMAJOR,
-		SYSTEM_VERSIONMINOR,
-		SYSTEM_VERSIONREVISION );
+	printf("%s ", OS_NAME );
+	printf("Version: %d.%d.%d \n",
+	    SYSTEM_VERSION_MAJOR,
+		SYSTEM_VERSION_MINOR,
+		SYSTEM_VERSION_REVISION );
 	
 	// Screen resolution. (first of all)    
 	printf("[Screen Resolution:]\n");
@@ -167,8 +167,8 @@ void KiInformation (){
 	// Kernel info.
 	// Version and time running.	
 	printf("[Kernel Info:]\n");
-	printf("Kernel version: %s\n",KERNEL_VERSION );
-	printf("Ticks running: %d\n",kernel_tick_total );
+	printf("Kernel version: %s %s\n", SYSTEM_VERSION_STRING, SYSTEM_VERSION_NAME_STRING );
+	printf("Ticks running: %d\n", kernel_tick_total );
 
 												   
     //ShowUserInfo(int user_id);	

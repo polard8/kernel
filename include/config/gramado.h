@@ -12,62 +12,59 @@
 #ifndef GRAMADO_H
 #define GRAMADO_H 1
 
+
 //
-// Set up what kind of debug message we wanna see.
+// #### Name ####
 //
 
-//Esse é usado para exibir somente os marcadores pprincipais,
-//que são mesnagens escritas em maiúculas.
-//fnciona como uma visão panorâmica, usa espinha dorsal, um esqueleto.
-//#define KERNEL_VERBOSE 1
-
-//Esse é usado para trabalhar a rotina de entrypoint da arquitetura alvo.
-//#define ENTRY_VERBOSE 1
-
-
-//Esses quatro são as camadas principais.
-//#define HAL_VERBOSE 1
-//#define MK_VERBOSE 1
-//#define EXECVE_VERBOSE 1
-//#define GWS_VERBOSE 1
+#define OS_NAME "Gramado"
+#define OS_LONGNAME "Gramado Operating System"
 
 
 //
-// ## breack points ##
-// Set up what what is the breakpoint.
+// #### Version ####
 //
 
-//Seriam inicializações parciais programadas. 
+
+//Kernel version
+//Esse é padrão de versão. 
+//Não mudar, apenas fazer as atualizações. 
+#define SYSTEM_VERSION_MAJOR 0 
+#define SYSTEM_VERSION_MINOR 4
+#define SYSTEM_VERSION_REVISION 0   //++ inc.
+
+//Kernel version strings.
+#define SYSTEM_VERSION_STRING "0.4"
+#define SYSTEM_VERSION_NAME_STRING "Love and Forgiveness"
+
+
+//
+// #### Product ####
+//
+
+
+// Seleciona o tipo de produto.
+// #Define a edição atuala do sistema.
+// 1,2,3,4 ... 
+#define SYSTEM_EDITION 1               
+
+#define SYSTEM_DEVELOPER_EDITION    1  //Contém ferramentas do desenvolvedor.
+#define SYSTEM_WORKSTATION_EDITION  2  //Contém ferramentas de escritório.
+#define SYSTEM_SERVER_EDITION       3  //Contém ferramentas de comunicação em rede.
+#define SYSTEM_IOT_EDITION          4  //Contém ferramentas de suporte á dispositivos externos.
+
+#define SYSTEM_DEVELOPER_EDITION_STRING    "Gramado Developer Edition"    
+#define SYSTEM_WORKSTATION_EDITION_STRING  "Gramado Workstation Edition"  
+#define SYSTEM_SERVER_EDITION_STRING       "Gramado Server Edition"       
+#define SYSTEM_IOT_EDITION_STRING          "Gramado IOT Edition"       
+
+
+//
+// #### User ####
+//
  
-//#define BREAKPOINT_TARGET_AFTER_ENTRY 1
-//#define BREAKPOINT_TARGET_AFTER_VIDEO 1
-//#define BREAKPOINT_TARGET_AFTER_SYSTEM 1
-//#define BREAKPOINT_TARGET_AFTER_RUNTIME 1
-//#define BREAKPOINT_TARGET_AFTER_INIT 1
-//#define BREAKPOINT_TARGET_AFTER_LOGON 1
-//#define BREAKPOINT_TARGET_AFTER_LOGOFF 1
-//#define BREAKPOINT_TARGET_AFTER_HAL 1
-//#define BREAKPOINT_TARGET_AFTER_MK 1
+#define DEFAULT_USERNAME "default-[USER]"
 
-//
-// ## targets ##
-//
-
-//Também pretendo fazer a inicialização mudar de direção dependendo do alvo programado.
-
-//Isso inicializa os três aplicativos do gramado core.
-//#define TARGET_GRAMADOCORE_APPS 1
-
-//Isso inicializa apenas o app init do gramado core.
-//#define TARGET_GRAMADOCORE_INIT 1
-
-// CONTINUA
-//...
-
-
-// ## Kernel version. ##
-#define KERNEL_VERSION "0.4"
-#define KERNEL_VERSION_NAME "Love and Forgiveness"
 
 #endif
 

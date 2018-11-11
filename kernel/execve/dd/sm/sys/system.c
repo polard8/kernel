@@ -1719,8 +1719,8 @@ done:
  *      Essas informações devem ser repassadas para "struct system_d".
  *      #bugbug: A parent window deve ser gui->main e não gui->screen.
  */  
-void *systemCreateSystemMenuBar()
-{
+void *systemCreateSystemMenuBar (){
+	
 	struct window_d * hwBar;                //Barra.
 	//Left: (Software).
 	struct window_d * hwItemSystem;         //Item (System).
@@ -1764,7 +1764,8 @@ void *systemCreateSystemMenuBar()
 	};	
 	
 	
-done:
+//done:
+
 	return (void *) hwBar;
 }; 
  
@@ -1774,7 +1775,8 @@ done:
  * Checa o status dos serviços oferecidos nas 3 camadas.
  */
 void systemCheck3TierArchitecture(){
-    return; //@todo: Nothing for now.
+	
+    //return; //@todo: Nothing for now.
 };
 
 
@@ -1796,15 +1798,16 @@ void systemSetupVersion (){
         //para funcionarem corretamente.. 		
 	    panic("sm-sys-system-systemSetupVersion: Version");
           
-	}else{	
-        Version->Major = SYSTEM_VERSIONMAJOR;
-		Version->Minor = SYSTEM_VERSIONMINOR;
-		Version->Built = SYSTEM_VERSIONBUILT;
-		Version->Revision = SYSTEM_VERSIONREVISION;
+	} else {
+		
+        Version->Major = SYSTEM_VERSION_MAJOR;
+		Version->Minor = SYSTEM_VERSION_MINOR;
+		Version->Revision = SYSTEM_VERSION_REVISION;
+		
 	};
 	
 	//VersionInfo.
-    VersionInfo = (void *) malloc( sizeof(struct version_info_d) );
+    VersionInfo = (void *) malloc ( sizeof(struct version_info_d) );
 	
     if ( (void*) VersionInfo == NULL )
 	{	

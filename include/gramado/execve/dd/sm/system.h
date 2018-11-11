@@ -80,45 +80,12 @@ void systemSetTerminalRectangle( unsigned long left,
 								 unsigned long width,
 								 unsigned long height );
 
-//
-// #### Aqui devemos configurar manualmente a destinação do sistema. ####
-// 
-#define SYSTEM_EDITION 1               //1,2,3,4 ... #Define a edição atuala do sistema. 
-
-#define SYSTEM_DEVELOPER_EDITION    1  //Contém ferramentas do desnvolvedor.
-#define SYSTEM_WORKSTATION_EDITION  2  //Contém ferramentas de escritório.
-#define SYSTEM_SERVER_EDITION       3  //Contém ferramentas de comunicação em rede.
-#define SYSTEM_IOT_EDITION          4  //Contém ferramentas de suporte á dispositivos externos.
-//...
-
-#define developer_edition_string    "Gramado Developer Edition" 
-#define workstation_edition_string  "Gramado Workstation Edition" 
-#define server_edition_string       "Gramado Server Edition" 
-#define iot_edition_string          "Gramado IOT edition" 
-//...
 
 
-#define OS_NAME "Gramado"
 
 
-//
-//    #### Aqui devemos configurar manualmente a versão do sistema.
-//
-
-//@todo:
-//Esse é padrão de versão. 
-//Não mudar, apenas fazer as atualizações. 
-#define SYSTEM_VERSIONMAJOR 0 
-#define SYSTEM_VERSIONMINOR 2
-#define SYSTEM_VERSIONBUILT 0
-#define SYSTEM_VERSIONREVISION 0   //++ inc.
 
 
-/*
- * default user name.
- */
- 
-#define DEFAULT_USERNAME "default-[USER]"
 
 
 /*
@@ -367,7 +334,6 @@ struct version_d
 {
     unsigned long Major;
     unsigned long Minor;	
-	unsigned long Built;
 	unsigned long Revision;
 };
 struct version_d *Version;
