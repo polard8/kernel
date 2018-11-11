@@ -78,6 +78,7 @@ int save_window (struct window_d *window){
 	};		
 };
 
+
 //mostrar uma janela que tem seu retãngulo salvo no buffer de salvamento.
 //#obs: antes de chamarmos essa função podemos chamar a função replace_window
 //para mudar a janela de lugar.
@@ -319,14 +320,16 @@ void printQueue(circularQueue_t *theQueue)
 //retorna o id de uma janela.
 int windowGetWindowID ( struct window_d *window ){
 	
-	if( (void *) window != NULL )
+	if ( (void *) window != NULL )
 	{
-		if( window->used == 1 && window->magic == 1234 ){
+		if ( window->used == 1 && window->magic == 1234 ){
+			
 		    return (int) window->id; 	
 		}
 	};
 	
-fail:
+//fail:
+
 	return (int) -1;
 };
 
@@ -1090,12 +1093,9 @@ void *windowGetMessage(struct window_d *window)
 	//Talvez o próprio aplicativo esteja imprimeiro também.
 	//
 	
-	//Obs: isso alimenta a estrutura da janela com o foco de entrada.
-   	//#importante: Não pode ser tipo 2 pois retornaria um caractere.
-	//O tipo 0 coloca a mensgem completa na estrutura do 
-	//janela com o foco de entrada.
-	//como é tipo 0, ignoraremos o retorno.
-	LINE_DISCIPLINE(SC, 0);	
+    //isso coloca a mensagem na fila da thread atual.
+	
+	KEYBOARD_LINE_DISCIPLINE ( SC );	
 	
 
 	
@@ -1105,11 +1105,12 @@ void *windowGetMessage(struct window_d *window)
 		return NULL;
 	}
 	
-	return (void*) wFocus->msg;	
+	return (void *) wFocus->msg;	
 	
 	
 	//Nothing.
-fail:	
+//fail:
+	
 	return NULL;
 };
 
@@ -1223,7 +1224,8 @@ int window_getch (){
 
  
     //isso coloca a mensagem na fila da thread atual.
-	LINE_DISCIPLINE(SC, 0);	
+	
+	KEYBOARD_LINE_DISCIPLINE ( SC );	
 
 	
  	

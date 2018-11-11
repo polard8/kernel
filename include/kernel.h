@@ -244,7 +244,9 @@ extern void do_executa_new_task();
 #include <gramado/execve/dd/keyboard.h>     //irq1     ( South bridge).   //keyboard
 #include <gramado/execve/dd/vk.h>         //virtual keys
 #include <gramado/execve/dd/abnt2.h> 
-#include <gramado/execve/dd/ldisc.h>        //ldisc
+
+#include <gramado/execve/dd/ldisc/ldisc.h>        //ldisc
+
 #include <gramado/execve/dd/ide.h>          //irq14/15 ( South bridge).
 #include <gramado/execve/dd/pci.h>            //pci.
 #include <gramado/execve/dd/sata.h>           //(PCI BUS).

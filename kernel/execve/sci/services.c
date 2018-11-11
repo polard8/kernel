@@ -898,8 +898,9 @@ void *services( unsigned long number,
 					if ( keybuffer_head >= 128 ){ 
 				        keybuffer_head = 0; };
 			        
-					// envia a mensagem para a thread atual.
-					LINE_DISCIPLINE (SC, 0);
+                    //isso coloca a mensagem na fila da thread atual.
+	
+	                KEYBOARD_LINE_DISCIPLINE ( SC );	
                     
 					//LINE_DISCIPLINE chama uma função para colocar a mensagem 
 					// na estrutua da janela com foco de entrada. 

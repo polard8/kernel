@@ -693,7 +693,8 @@ int thread_getchar (){
 
  
     //isso coloca a mensagem na fila da thread atual.
-	LINE_DISCIPLINE ( SC, 0 );	
+	
+	KEYBOARD_LINE_DISCIPLINE ( SC );	
 
 	
  	

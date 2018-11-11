@@ -174,14 +174,25 @@ unsigned long input(unsigned long ch);
 //*************************** line discipline ***********************
 //
 
-//LINE DISCIPLINE ...@TODO: ISSO DEVE FICAR DENTRO DO KERNEL BASE.
-//Esse será o ponto de entrada do line discipline no kernel base,
-//o kernelbase receberá uma mensagem do driver de teclado enviando o scancode
-//esse scacode passará por essa rotina, então o kernel base deve chamar essa rotina
-//apos ter recebido o scacode do driver de teclado.
-int LINE_DISCIPLINE(unsigned char SC, int type);
+
+// #importante:
+// Essa é a rotina genérica do line discipline
+// Qualquer input pode chama-la e enviar mensagem para 
+// a thread de input da janela com foco de entrada.
+
+int 
+LINE_DISCIPLINE ( struct window_d *window, 
+                  int msg, 
+				  unsigned long long1, 
+				  unsigned long long2 );
 
 
+
+// Keyboard.				  
+// Usada para receber input do dispositivo teclado,
+// a único argumento aceito é o 'Scan Code'.
+				  
+int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC );
 
 
 

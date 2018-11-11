@@ -15,7 +15,109 @@
 #include <kernel.h>
 
 
+int 
+LINE_DISCIPLINE ( struct window_d *window, 
+                  int msg, 
+				  unsigned long long1, 
+				  unsigned long long2 )
+{
+	
+	
+	//#todo mensagem de erro.
+	
+	if (window_with_focus < 0)
+		return -1;
+	
+	
+	// #importante
+    // +Pegamos a janela com o foco de entrada, pois ela 
+    // será um elemento da mensagem.	
+	// Mas enviaremos a mensagem para a fila da thread atual.
+	
+	struct window_d *w;  
+	w = (void *) windowList[window_with_focus];
+	
+	struct thread_d *t;	
 
+	//
+	// ## window ##
+	//
+	
+	if ( (void *) w == NULL )
+	{
+		printf("LINE_DISCIPLINE: w");
+		die();
+		
+	}else{
+		
+		
+		if ( w->used != 1 || w->magic != 1234 )
+		{
+			printf("LINE_DISCIPLINE: w validation");
+			die();
+		}		
+
+		//
+		// ## thread ##
+		//
+		
+		//#importante:
+		//Pegamos a thRead de input associada com a janela 
+		//que tem o foco de entrada.
+		
+		t = (void *) w->InputThread;
+		
+		if ( (void *) t == NULL )
+		{
+		    printf("LINE_DISCIPLINE: t fail");
+		    die();			
+		}
+		
+		if ( t->used != 1 || t->magic != 1234 )
+		{
+			printf("LINE_DISCIPLINE: thread t validation");
+			die();
+		}        
+			
+		//#importante:
+		//??
+		
+		//a janela com o foco de entrada deve receber input de teclado.
+		//então a mensagem vai para a thrad associada com a janela com o foco de 
+		//entrada.
+		//#importante: a rotina que seta o foco deverá fazer essa associação,
+		//o aplicativo chama a rotina de setar o foco em uma janela, 
+		//o foco será setado nessa janela e a thread atual será associada 
+		//a essa janela que está recebendo o foco.
+		
+		//??
+		//ja o input de mouse deve ir para a thread de qualquer janela.
+		
+		t->window = window;
+		t->msg = (int) msg;
+		t->long1 = long1;
+		t->long2 = long2;
+		
+		t->newmessageFlag = 1;
+		
+		
+		//#importante:
+		//Chamando o porcedimento de janela para que não fiquemos sem 
+		//mensagem alguma, mas o certo é chamar o procedimento do sistema 
+		//só depois que o aplicativo consumir a mensagem, e o aplicativo decide 
+		//se vai chamar o procedimento do sistema ou não.
+		//inclusive o procedimento do sistema poderá ficar em user mode na API.
+		//aqui poderá ficar um segundo procedimento do sistema, bem reduzido,
+		//apenas para emergência do desenvolvedor.
+		
+		// sm\sys\proc.c
+		
+	    system_procedure (  window, (int) msg, (unsigned long) long1, 
+	        (unsigned long) long2 );
+	};	
+ 	
+    return 0;	
+};
 
 
 /*
@@ -26,8 +128,8 @@
  * todo o resto poderá encontrar um lugar melhor.
  *
  */
- 
-int LINE_DISCIPLINE ( unsigned char SC, int type ){
+	
+int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 	
     //
     // Step 0 - Declarações de variáveis.
@@ -462,16 +564,13 @@ done:
 	w = (void *) windowList[window_with_focus];
 	
 	struct thread_d *t;	
-	//t = (void *) threadList[current_thread];
-	
 
 	
-	
-	// ## thread ##
+	// ## window ##
 	
 	if ( (void *) w == NULL )
 	{
-		printf("LINE_DISCIPLINE: w");
+		printf("KEYBOARD_LINE_DISCIPLINE: w");
 		die();
 		
 	}else{
@@ -479,23 +578,26 @@ done:
 		
 		if ( w->used != 1 || w->magic != 1234 )
 		{
-			printf("LINE_DISCIPLINE: w magic");
+			printf("KEYBOARD_LINE_DISCIPLINE: w validation");
 			die();
 		}		
 
+		// ## thread ##
+		
 		//#importante:
-		//Pegamos a trhead de input associada com a janela que tem o foco de entrada.
+		//Pegamos a thRead de input associada com a janela 
+		//que tem o foco de entrada.
 		
 		t = (void *) w->InputThread;
 		if ( (void *) t == NULL )
 		{
-		    printf("LINE_DISCIPLINE: t fail");
+		    printf("KEYBOARD_LINE_DISCIPLINE: t");
 		    die();			
 		}
 		
 		if ( t->used != 1 || t->magic != 1234 )
 		{
-			printf("LINE_DISCIPLINE: thread w magic fail");
+			printf("KEYBOARD_LINE_DISCIPLINE: t validation");
 			die();
 		}        
 			
@@ -536,8 +638,7 @@ done:
 	        (unsigned long) ch );
 	};	
  
-	//?? porque -1.
-    return (int) -1;
+    return (int) 0;
 };
 
 
