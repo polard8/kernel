@@ -471,10 +471,8 @@ void fs_get_entry ( unsigned long id, unsigned long eid ){
 };
 
 
-void 
-fs_show_dir_entry( unsigned long id,
-                   unsigned long eid )
-{
+void fs_show_dir_entry ( unsigned long id, unsigned long eid ){
+	
     //Ainda não implementada.	
 	//return; 
 };
@@ -482,6 +480,7 @@ fs_show_dir_entry( unsigned long id,
 
 
 void fs_show_dir (unsigned long id){
+	
 	//Ainda não implementada.
 };
 
@@ -507,10 +506,8 @@ unsigned long fs_check_fat (){
 
 
 
-void 
-fs_show_entry( unsigned long id, 
-               unsigned long eid )
-{
+void fs_show_entry ( unsigned long id, unsigned long eid ){
+	
 	//Ainda não implementada.
 	//return; 
 };
@@ -677,13 +674,15 @@ void fs_check_disk (){
  **************************************************
  * MountShortFileName:
  *     This function parses a directory entry name 
- * which is in the form 
- * of "FILE   EXT" and puts it in Buffer in the form of "FILE.TXT".
+ * which is in the form of "FILE   EXT" and puts it in Buffer 
+ * in the form of "FILE.TXT".
+ *
  * @todo fsMountShortFileName(...)
  */
+ 
 void 
-MountShortFileName( char *buffer, 
-                    struct dir_entry_d *entry )
+MountShortFileName ( char *buffer, 
+                     struct dir_entry_d *entry )
 {
     int i = 0;
     
@@ -714,9 +713,11 @@ MountShortFileName( char *buffer,
 /*
  * set_spc:
  *     Configura spc, 'Sector Per Cluster' em variável global.
+ *     ?? #bugbug: De qual disco ??
  */
-void set_spc(int spc)
-{
+ 
+void set_spc (int spc){
+	
     g_spc = (int) spc;
 };
 
@@ -724,9 +725,10 @@ void set_spc(int spc)
 /*
  * get_spc:
  *     Pega spc, Sector Per Cluster.
+ *     ?? #bugbug: De qual disco ??
  */
-int get_spc()
-{
+int get_spc (){
+	
     return (int) g_spc;
 };
 
@@ -734,9 +736,10 @@ int get_spc()
 /*
  * get_filesystem_type:
  *     Pega o tipo de sistema de arquivos.
+ *     ?? #bugbug: De qual volume ?? 
  */
-int get_filesystem_type()
-{
+int get_filesystem_type (){
+	
     return (int) g_filesystem_type;
 };
 
@@ -744,45 +747,54 @@ int get_filesystem_type()
 /*
  * set_filesystem_type:
  *     Configura o tipo de sistema de arquivo.
+ *     ?? #bugbug: De qual volume ??  
  */
-void set_filesystem_type(int type)
-{
+void set_filesystem_type (int type){
+		
     g_filesystem_type = (int) type;
 };
-
 
 
 /*
  ***********************************************
  * fs_init_fat:
- *     Inicializa a estrutura usada no sistema 
- * de arquivos.
+ *     Inicializa a estrutura usada no sistema de arquivos.
  *     fsInitFat()
+ *     ?? #bugbug: De qual volume ?? 
  */
 void fs_init_fat (){
 	
 	// File system structure.
-	if ( (void *) filesystem == NULL ){
-	    printf("fs_init_fat error: fs\n");
+	
+	if ( (void *) filesystem == NULL )
+	{
+	    printf("fs_init_fat error: filesystem\n");
 	    return;
 	}
 
 	// FAT structure.
-	fat = (void *) malloc( sizeof(struct fat_d) );
-	if ((void *) fat == NULL ){
+	
+	fat = (void *) malloc ( sizeof(struct fat_d) );
+	
+	if ((void *) fat == NULL )
+	{
 	    printf("fs_init_fat error: fat\n");
 	    return;
-	}
+	}else{
+		
+	    // Info.
+	    
+		fat->address = filesystem->fat_address; 
+	    fat->type = filesystem->type;
+	    
+		//Continua ...
+	};
 	
-	// Info.
-	fat->address = filesystem->fat_address; 
-	fat->type = filesystem->type;
-	//Continua ...
+	// #bugbug
+	// Não fizemos nada com a estrutura 'fat'
+	// tem que passar esse ponteiro para algum lugar.
 	
 	// Continua a inicialização da fat.
-	
-//done:
-//	return;
 };	
 	
 
@@ -797,21 +809,29 @@ void fs_init_structures (){
     int Type;
 	
 	// Structure.
+	
     filesystem = (void *) malloc( sizeof(struct filesystem_d) );
 	
-	if ( (void *) filesystem == NULL ){
+	if ( (void *) filesystem == NULL )
+	{
 	    printf("fs_init_structures:");
         die();
 	}
 	
 	//Type.
-	Type = (int) get_filesystem_type();   
-	if ( Type == 0 ){
+	
+	Type = (int) get_filesystem_type ();   
+	
+	if ( Type == 0 )
+	{
 	    printf("fs_init_structures error: Type");
         die();
-	}
+	}else{
+		
+	    filesystem->type = (int) Type;	
+	};
 	
-	filesystem->type = (int) Type;
+	
 	
     switch (Type)
 	{
@@ -833,6 +853,7 @@ void fs_init_structures (){
 			filesystem->spc = (int) get_spc(); //variável
 	        filesystem->rootdir_entries = FAT16_ROOT_ENTRIES;
 	        filesystem->entry_size = FAT16_ENTRY_SIZE;
+			
 		    break;
 			
 	    case FS_TYPE_EXT2:
@@ -845,9 +866,6 @@ void fs_init_structures (){
 		    //nothing for now.
             break;		
 	};
-
-//done:	
-//	return;
 };
 
 
@@ -859,8 +877,8 @@ void fs_init_structures (){
  */
 int fsInit (){
 	
-#ifdef KERNEL_VERBOSE
-    printf("fsInit: Initializing FS support..\n");
+#ifdef EXECVE_VERBOSE
+    printf("fsInit: Initializing..\n");
 #endif 
  
 	// Type - Configura o tipo de sistema de arquivos usado. 
@@ -872,11 +890,12 @@ int fsInit (){
 	//        apenas checar se ouve alterações nas configurações de sistema de arquivos.
 	//        O registro de configurações de disco pode ser armazenado em arquivos de metadados.
 	
-	set_filesystem_type(FS_TYPE_FAT16);
+	set_filesystem_type (FS_TYPE_FAT16);
 	
 	
-	// SPC ~ Configura o número de setores por cluster.
-	//       Nesse caso, são(512 bytes por setor, um setor por cluster).
+	// SPC 
+	// Configura o número de setores por cluster.
+	// Nesse caso, são (512 bytes por setor, um setor por cluster).
 	
 	set_spc(1);
 	
@@ -893,135 +912,147 @@ int fsInit (){
     //#bugbug: isso deveria se passado pelo boot ??	
 	
 	
-	//#bugbug: Deixaremos cada módulo inicializar sua variável.
-	//current_disk = 0;
-	//current_volume = 0;
-	//current_directory = 0;
+	//#bugbug: 
+	//Deixaremos cada módulo inicializar sua variável.
+	//Mas aqui podemos zerar esses valores.
 	
+	current_disk = 0;
+	current_volume = 0;
+	current_directory = 0;
 
 	// Structures and fat.
     
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE
 	printf("fsInit: Structures..\n");
 #endif
 	
 	fs_init_structures();
+	
 
-#ifdef KERNEL_VERBOSE	
+#ifdef EXECVE_VERBOSE
 	printf("fsInit: FAT..\n");
 #endif
 	
 	fs_init_fat();
 	
+	//
+	// ## Streams ##
+	//
 
-	//Agora inicialzamos as stream 4 e 5.
-	//As anteriores foram inicializadas em stdio,
-	//pois são o fluxo padrão.	
+	// Agora inicialzamos as stream 4 e 5.
+	// As anteriores foram inicializadas em stdio,
+	// pois são o fluxo padrão.	
 	
+	
+	//
     //  ## volume 1 root dir  ##
+	//
+	
 	
 	//foi definido em stdio.h
 	//FILE *volume1_rootdir;
 	
-	volume1_rootdir = (FILE *) malloc( sizeof(FILE) );
+	volume1_rootdir = (FILE *) malloc ( sizeof(FILE) );
 	
-	volume1_rootdir->_base = (char *) VOLUME1_ROOTDIR_ADDRESS;
-	volume1_rootdir->_ptr = (char *) VOLUME1_ROOTDIR_ADDRESS;
-	volume1_rootdir->_cnt = (32 * 512) ;
-	volume1_rootdir->_file = 0; //?
-	volume1_rootdir->_tmpfname = "volume1-stream";
+	if ( (void *) volume1_rootdir == NULL )
+	{
+		printf("fsInit: volume1_rootdir");
+		die ();
+	} else {
+		
+	    volume1_rootdir->_base = (char *) VOLUME1_ROOTDIR_ADDRESS;
+	    volume1_rootdir->_ptr = (char *) VOLUME1_ROOTDIR_ADDRESS;
+	    volume1_rootdir->_cnt = (32 * 512) ;
+	    volume1_rootdir->_file = 0; //?
+	    volume1_rootdir->_tmpfname = "volume1-stream";
 	
-	Streams[4] = (unsigned long) volume1_rootdir;
+	    Streams[4] = (unsigned long) volume1_rootdir;		
+	};
 	
 	
+
+	
+	
+	//
     //  ## volume 2 root dir  ##
+	//
+	
 	
 	//foi definido em stdio.h
 	//FILE *volume2_rootdir;
 	
-	volume2_rootdir = (FILE *) malloc( sizeof(FILE) );
+	volume2_rootdir = (FILE *) malloc ( sizeof(FILE) );
 	
-	volume2_rootdir->_base = (char *) VOLUME2_ROOTDIR_ADDRESS;
-	volume2_rootdir->_ptr = (char *) VOLUME2_ROOTDIR_ADDRESS;
-	volume2_rootdir->_cnt = (32 * 512) ;
-	volume2_rootdir->_file = 0; //?
-	volume2_rootdir->_tmpfname = "volume2-stream";
+	if ( (void *) volume2_rootdir == NULL )
+	{
+		printf("fsInit: volume2_rootdir");
+		die ();
+	} else {
+		
+	    volume2_rootdir->_base = (char *) VOLUME2_ROOTDIR_ADDRESS;
+	    volume2_rootdir->_ptr = (char *) VOLUME2_ROOTDIR_ADDRESS;
+	    volume2_rootdir->_cnt = (32 * 512) ;
+	    volume2_rootdir->_file = 0; //?
+	    volume2_rootdir->_tmpfname = "volume2-stream";
 	
-	Streams[5] = (unsigned long) volume2_rootdir;
+	    Streams[5] = (unsigned long) volume2_rootdir;
+	};
+	
+
 	
 	
+	
+    //
 	// ## Inicializando os pipes usados em execve ## 
+	//
+	
 	
 	//gramado core init execve 
 	
 	//aloca memória para a estrutura.
-	pipe_gramadocore_init_execve = (FILE *) malloc( sizeof(FILE) );
+	pipe_gramadocore_init_execve = (FILE *) malloc ( sizeof(FILE) );
 	
+	if ( (void *) pipe_gramadocore_init_execve == NULL )
+	{
+		printf("fsInit: pipe_gramadocore_init_execve");
+		die ();
+	}else{
+		
 	
-	//aloca memória para o buffer.
-	unsigned long pipe0base = (unsigned long) malloc(512);
+    	//aloca memória para o buffer.
+	    unsigned long pipe0base = (unsigned long) malloc(512);
+	    
+		if ( (void *) pipe0base == NULL )
+	    {
+		    printf("fsInit: pipe0base");
+		    die ();
+	    }
 	
-	pipe_gramadocore_init_execve->_base = (char *) pipe0base;
-	pipe_gramadocore_init_execve->_ptr  = (char *) pipe0base;
-	pipe_gramadocore_init_execve->_cnt  = 512;
-	pipe_gramadocore_init_execve->_file = 0; //??
-	pipe_gramadocore_init_execve->_tmpfname = "pipe0";
+	    pipe_gramadocore_init_execve->_base = (char *) pipe0base;
+	    pipe_gramadocore_init_execve->_ptr  = (char *) pipe0base;
+	    pipe_gramadocore_init_execve->_cnt  = 512;
+	    pipe_gramadocore_init_execve->_file = 0; //??
+	    pipe_gramadocore_init_execve->_tmpfname = "pipe0";
 	
-	//0
-	Pipes[0] = (unsigned long) pipe_gramadocore_init_execve;	
+	    //0
+	    Pipes[0] = (unsigned long) pipe_gramadocore_init_execve;			
+	};	
+	
 	
 	//
 	// ## PWD ##
 	//
 	
-	// Inicializando o diretório de trabalho.
-	
-	/*
-	struct dir_d *d;
-	
-	d = (void*) kmalloc( sizeof( struct dir_d ) );
-	if( (void*) d == NULL )
-	{
-		//fail
-		printf("fsInit: d");
-		die();
-	}else{
-		
-		//@todo: object
-		
-		d->id = 0;   //??
-		d->used = 1;
-		d->magic = 1234;
-		
-		d->stream = NULL; //@todo
-		
-		
-		
-		//d->entry_size_in_bytes
-		//d->totalentries_size_in_bytes
-		//d->fileMax
-		//d->fileTotal
-		//d->address
-		//d->inMemory
-		
-		d->current = NULL;
-		
-		current_directory = 0;
-		volume0RootDir = (struct dir_d *) d;
-	};
-	
-	*/
-	
 	//inicializa p pwd support.
-	fsInitializeWorkingDiretoryString();
+	fsInitializeWorkingDiretoryString ();
 	
 	//
 	// @todo: Continua ...
 	//
 	
-done:
+//done:
 
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf("Done\n");
 #endif 
 
@@ -1038,6 +1069,7 @@ done:
  * ?? isso deve sser todo o pathname do pwd ?? 
  * ex: root:/volume0>
  */
+ 
 void fsInitializeWorkingDiretoryString (){
 	
 	//get info
@@ -1064,7 +1096,6 @@ void fsInitializeWorkingDiretoryString (){
 
 	//More ?...
     pwd_initialized = 1;
-    //return;
 };
 
 
@@ -1078,6 +1109,7 @@ void fsInitializeWorkingDiretoryString (){
  * ex: root:/volume0>
  * #bugbug o protótipo deveria estar em fs.h;
  */ 
+ 
 void fsUpdateWorkingDiretoryString ( char *string ){
 	
 	if ( pwd_initialized == 0 )

@@ -15,20 +15,22 @@
 #define LARGESYSTEM_VGA        0x000B8000  //VM_BASE
 
 
-
 #define KERNEL_GRAPHIC_MODE_BASE  0x000A0000
 #define MEM_BASE                  0x000A0000  //KERNEL_GRAPHIC_MODE_BASE
 
 
-//isso suja o bm? ou bl?
+//Podemos alocar memória para isso, liberando esse espaço?
 #define MBR_ADDRESS            0x00020000  
+
+//Podemos alocar memória para isso, liberando esse espaço?
 #define VOLUME1_VBR_ADDRESS   (0x00020000 + 0x200) 
 #define VOLUME2_VBR_ADDRESS   (0x00020000 + 0x200) 
 
-
+//Podemos alocar memória para isso, liberando esse espaço?
 #define VOLUME1_FAT_ADDRESS   0x00030000 
 #define VOLUME2_FAT_ADDRESS   0x00030000
 
+//Podemos alocar memória para isso, liberando esse espaço?
 #define VOLUME1_ROOTDIR_ADDRESS 0x00070000 
 #define VOLUME2_ROOTDIR_ADDRESS 0x00070000 
 
