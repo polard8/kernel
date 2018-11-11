@@ -814,13 +814,7 @@ void show_memory_structs (){
 	
 	//More?!
 	
-//
 // Done.
-//	
-
-//done:
-    //printf("Done\n");
-	//return;
 };
 
 
@@ -838,6 +832,7 @@ void show_memory_structs (){
  * @todo: Rotinas de automação da criação de heaps para processos.
  */
 //int memoryInitializeHeapManager() 
+
 int init_heap (){
 	
 	int i = 0;
@@ -857,8 +852,8 @@ int init_heap (){
 	last_size = 0;
 	
 	//Check Heap Pointer.
-	if ( g_heap_pointer == 0 ){
-		
+	if ( g_heap_pointer == 0 )
+	{	
 	    printf("init_heap fail: Heap pointer\n");
 		goto fail;
 	}
@@ -873,14 +868,14 @@ int init_heap (){
     //Heap Start.
 	if( kernel_heap_start == 0 )
 	{
-	    printf("init_heap fail: HeapStart={%x}\n",kernel_heap_start);
+	    printf("init_heap fail: HeapStart={%x}\n", kernel_heap_start );
 	    goto fail;
 	}
 	
 	//Heap End.
 	if( kernel_heap_end == 0 )
 	{
-	    printf("init_heap fail: HeapEnd={%x}\n",kernel_heap_end);
+	    printf("init_heap fail: HeapEnd={%x}\n", kernel_heap_end );
 	    goto fail;
 	}
 	
@@ -896,9 +891,10 @@ int init_heap (){
 	// Heap list:
 	// Inicializa a lista de heaps.
 	
-	while ( i < HEAP_COUNT_MAX ){
+	while ( i < HEAP_COUNT_MAX )
+	{
         heapList[i] = (unsigned long) 0;
-		++i;
+		i++;
     };
 	
 	//KernelHeap = (void*) x??;
@@ -906,7 +902,7 @@ int init_heap (){
 	//More?!
 	
 // Done.
-done:
+//done:
 
 #ifdef MK_VERBOSE
     printf("Done\n");
@@ -914,7 +910,10 @@ done:
 	
 	return (int) 0;
 	
-// Fail. Falha ao iniciar o heap do kernel.
+    
+	// Fail. 
+	// Falha ao iniciar o heap do kernel.
+
 fail:
     printf("init_heap: Fail\n");
 	refresh_screen();
@@ -938,31 +937,33 @@ fail:
  * init_stack:
  *     Iniciar a gerência de Stack do kernel. 
  *     @todo Usar stackInit(). 
- *
  */
+ 
 int init_stack (){
 	
     //Globals.
 	//#bugbug
+	
 	kernel_stack_end = (unsigned long) KERNEL_STACK_END; 
 	kernel_stack_start = (unsigned long) KERNEL_STACK_START; 
 	
     //End.
 	if ( kernel_stack_end == 0 )
 	{
-	    printf("init_stack fail: StackEnd={%x}\n",kernel_stack_end);
+	    printf("init_stack fail: StackEnd={%x}\n", kernel_stack_end );
 	    goto fail;
 	};
 	
 	//Start.
 	if ( kernel_stack_start == 0 )
 	{
-	    printf("init_stack fail: StackStart={%x}\n",kernel_stack_start);
+	    printf("init_stack fail: StackStart={%x}\n", kernel_stack_start );
 	    goto fail;
 	};
 	
 	//Nothing.
-done:
+//done:
+
     return (int) 0;
 fail:
     return (int) 1;
@@ -979,14 +980,14 @@ void memoryShowMemoryInfo (){
 	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
 	
-	printf("Memory info:\n");
-	printf("============\n");
+	printf(" Memory info:\n");
+	printf(" ============\n");
 	
 	//sizes
-	printf("BaseMemory     = (%d KB)\n", memorysizeBaseMemory);
-	printf("OtherMemory    = (%d KB)\n", memorysizeOtherMemory);
-	printf("ExtendedMemory = (%d KB)\n", memorysizeExtendedMemory);
-	printf("TotalMemory    = (%d KB)\n", memorysizeTotal);
+	printf(" BaseMemory     = (%d KB)\n", memorysizeBaseMemory );
+	printf(" OtherMemory    = (%d KB)\n", memorysizeOtherMemory );
+	printf(" ExtendedMemory = (%d KB)\n", memorysizeExtendedMemory );
+	printf(" TotalMemory    = (%d KB)\n", memorysizeTotal );
 	
 	//system zone
 	//printf("systemzoneStart  = 0x%x\n", systemzoneStart);
@@ -998,55 +999,44 @@ void memoryShowMemoryInfo (){
 	//printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
+	
 	// System type
-	switch (g_mm_system_type)
-	{
+	
+	switch (g_mm_system_type){
+		
 		case stSmallSystem:
-		    printf("stSmallSystem={%d KB}\n",memorysizeTotal);
+		    printf(" stSmallSystem={%d KB}\n", memorysizeTotal );
 		    break;
 			
 		case stMediumSystem:
-		    printf("stMediumSystem={%d KB}\n",memorysizeTotal);
+		    printf(" stMediumSystem={%d KB}\n", memorysizeTotal );
 			break;
 			
 		case stLargeSystem:
-		    printf("stLargeSystem={%d KB}\n",memorysizeTotal);
+		    printf(" stLargeSystem={%d KB}\n", memorysizeTotal );
 			break;
 			
 		case stNull:
 		default:
-		    printf("stNull={%d KB}\n",memorysizeTotal);
+		    printf(" stNull={%d KB}\n", memorysizeTotal );
 			break;
 	};
 	
 	// ## code data bss ##
 	
-	//#debug
 	extern unsigned long code_begin;
 	extern unsigned long code_end;
+	
 	extern unsigned long data_begin;
 	extern unsigned long data_end;
+	
 	extern unsigned long bss_begin;
 	extern unsigned long bss_end;
 	
-	//printf("\n");
-	//printf("\n");
-	//printf("#debug\n");
-	//printf("======\n");
-	
 	printf("\n");
-	printf("code_begin={%x}\n", &code_begin );
-	printf("  code_end={%x}\n", &code_end );
-
-	printf("\n");
-	printf("data_begin={%x}\n", &data_begin );
-	printf("  data_end={%x}\n", &data_end );
-
-	printf("\n");
-	printf(" bss_begin={%x}\n", &bss_begin );
-	printf("   bss_end={%x}\n", &bss_end );
-	
-	//printf("\n");	
+	printf("code_begin={%x} code_end={%x} \n", &code_begin, &code_end );
+	printf("data_begin={%x} data_end={%x} \n", &data_begin, &data_end );
+	printf("bss_begin={%x}  bss_end={%x}\n", &bss_begin, &bss_end );
 	
 	
 	//  ## heap e stack ##
@@ -1057,7 +1047,7 @@ void memoryShowMemoryInfo (){
 	printf("HEAP: [%x...%x] Total={%d KB} \n",
 	    kernel_heap_start, kernel_heap_end, HeapTotal );
 			
-    printf("AvailableHeap={%d KB}\n",g_available_heap/1024);
+    printf("AvailableHeap={%d KB}\n", (g_available_heap/1024) );
 	    
 		// @todo:
 		// Mostrar o tamanho da pilha..
@@ -1071,7 +1061,7 @@ void memoryShowMemoryInfo (){
     printf("STACK: [%x...%x] Total={%d KB} \n", 
         kernel_stack_start, kernel_stack_end, StackTotal );
 			
-    printf("STACK: StartPhysicalAddress={%x} \n",kernel_stack_start_pa);
+    printf("STACK: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );
 	
 	
 	    // Video info
@@ -1086,9 +1076,6 @@ void memoryShowMemoryInfo (){
 	printf ("\n BackbufferVA={%x} \n", g_backbuffer_va );
 	
 	//...
-
-//done:	
-	//return;
 };
 
 
@@ -1098,24 +1085,21 @@ void memoryShowMemoryInfo (){
  *   Inicializa o memory manager.
  *    @todo: Usar mmInit().
  */
+ 
 int init_mm (){
 	
     int Status = 0;
 	int i = 0;	
 	
-	//
+	
 	// @todo: 
 	// Inicializar algumas variáveis globais.
 	// Chamar os construtores para inicializar o básico.
-	//
 	
-	//
+
 	// @todo: 
 	// Clear BSS.
 	// Criar mmClearBSS()
-	//
-	//
-
 	
 	//
 	// Chamando uma rotina que cria e inicializa o heap do kernel manualmente.
@@ -1125,7 +1109,7 @@ int init_mm (){
 	Status = (int) init_heap();
 	if(Status != 0)
 	{
-	    printf("init_mm fail: Heap.\n");
+	    printf("init_mm fail: Heap\n");
 	    return (int) 1;
 	};	
 	
@@ -1133,12 +1117,16 @@ int init_mm (){
 	Status = (int) init_stack();
 	if(Status != 0)
 	{
-	    printf("init_mm fail: Stack.\n");
+	    printf("init_mm fail: Stack\n");
 	    return (int) 1;
 	};		
 	
-	//Lista de blocos de memória dentro do heap do kernel.
-	while(i < MMBLOCK_COUNT_MAX){
+	
+	// Zerar a lista.
+	// Lista de blocos de memória dentro do heap do kernel.
+	
+	while ( i < MMBLOCK_COUNT_MAX )
+	{
         mmblockList[i] = (unsigned long) 0;
 		++i;
     };
@@ -1151,56 +1139,66 @@ int init_mm (){
 	// MEMORY SIZES
 	//
 	
-	// Get memory sizes via RTC.
+	// Get memory sizes via RTC. (KB)
+	// base, other, extended.
+	// RTC só consegue perceber 64MB de memória.
 	
-	//Get extended Memory. (KB)
-	memorysizeBaseMemory     = (unsigned long)  rtcGetBaseMemory(); //@todo 
-	memorysizeOtherMemory    = (unsigned long) (1024 - memorysizeBaseMemory);
-	memorysizeExtendedMemory = (unsigned long) rtcGetExtendedMemory();  //KB
-    memorysizeTotal          = (unsigned long) (memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory);
+	memorysizeBaseMemory = (unsigned long) rtcGetBaseMemory();  
+	memorysizeOtherMemory = (unsigned long) (1024 - memorysizeBaseMemory);
+	memorysizeExtendedMemory = (unsigned long) rtcGetExtendedMemory(); 
+    
+	memorysizeTotal = (unsigned long) ( memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory );
 	
 	
-	//
+	// #IMPORTANTE 
 	// Determinar o tipo de sistema de memória.
-	// small, medium, large
 	//
+	// small   pelo menos 32mb
+	// medium  pelo menos 64mb
+	// large   pelo menos 128mb
 	
 	
 	//0MB
 	if ( memorysizeTotal >= (0) )
 	{
 		g_mm_system_type = stNull;
-	    //#bugbug
-        //@todo: nesse caso devemos parar e avisão não ser possível prosseguir.		
+	    
+		// #atenção 
+		// Nesse caso devemos prosseguir e testar as outras opções.		
 	}	
 	
+	
 	//32MB
-	if ( memorysizeTotal >= (32*1024) ){
+	//(32*1024)
+	if ( memorysizeTotal >= SMALLSYSTEM_SIZE_KB )   
+	{
 		g_mm_system_type = stSmallSystem;
 	}
 	
 	
 	//64MB
-	if ( memorysizeTotal >= (64*1024) ){
+	//(64*1024)
+	if ( memorysizeTotal >= MEDIUMSYSTEM_SIZE_KB )  
+	{
 		g_mm_system_type = stMediumSystem;
 	}	
 	
+	
 	//128MB
-	if ( memorysizeTotal >= (128*1024) ){
+	//(128*1024)
+	if ( memorysizeTotal >= LARGESYSTEM_SIZE_KB )  
+	{
 		g_mm_system_type = stLargeSystem;
 	}		
 	
 
-
 	
 	//inicializando o framepool (paged pool)
+	
 	initializeFramesAlloc();
 	
-	//
-	// Continua...
-	//
 	
-//done:	
+	// Continua...
 
     return (int) Status;	
 }; 

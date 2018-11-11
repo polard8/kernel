@@ -260,7 +260,8 @@ typedef enum {
 }system_size_t;
 
 
-//Aqui salvaremos o número que identifica o tipo de sistema dado o tamanho.
+//?? rever esse comentário.
+// Aqui salvaremos o número que identifica o tipo de sistema dado o tamanho.
 // Se o sistema tiver 288 MB ou mais então ele será do tipo Full
 // e conterá 8 bancos de memória de 32Mb mais uma user session de tamnaho variado.
 int systemSize;
@@ -289,7 +290,7 @@ int gSystemStatus; //?? Usado pelo construtor.
 //O endereço e a rotina são de 32bit.
 unsigned long shutdown_address;
 
-static char *default_user_name     = "default-[USER]";
+static char *default_user_name = "default-[USER]";
 static char *systemDefaultUserName = "default-[USER]";
 //...
 

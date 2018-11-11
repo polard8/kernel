@@ -89,6 +89,7 @@
 
 
 
+//O endereço físico e virtual são iguais.
 #define XXXKERNEL_PAGEDIRECTORY 0x0009C000
 
 

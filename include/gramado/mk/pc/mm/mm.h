@@ -183,6 +183,15 @@ kernel fica com o 1GB superior."
 //#define TASKMAN_PAGEDIRECTORY (0x0009C000 + 4096 + 4096 + 4096)  
 //...
 
+
+//Quantas entradas de diretório de páginas cabem em uma página.
+#define PDE_PER_PAGE (1024)
+
+//Quantas entradas de tabela de páginas cabem em uma página.
+#define PTE_PER_PAGE (1024)
+
+
+
 unsigned long gKernelPageDirectoryAddress; 
 
 unsigned long gInitPageDirectoryAddress; 
@@ -544,18 +553,6 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //
 //
 
-//
-// ## PAGE DIRECTORY ENTRIES ##
-//
-
-#define KERNEL_PAGE_DIRECTORY_ENTRY        0    // 4 primeiros megas em kernel mode.
-#define USERMODE_PAGE_DIRECTORY_ENTRY      1    // 4 megas em user mode.
-#define VGA_PAGE_DIRECTORY_ENTRY           2    // VGA
-
-#define KERNEL_IMAGE_PAGE_DIRECTORY_ENTRY  768  // A imagem do kernel.
-#define LFB_PAGE_DIRECTORY_ENTRY           769  // Frontbuffer.
-#define BACKBUFFER_PAGE_DIRECTORY_ENTRY    770  // Backbuffer.
-//...
 
 
 /*
@@ -1070,6 +1067,23 @@ unsigned long memorysizeBaseMemory;
 unsigned long memorysizeOtherMemory;
 unsigned long memorysizeExtendedMemory;
 unsigned long memorysizeTotal;
+
+
+// Tamanho dado em MB.
+#define SMALLSYSTEM_SIZE  (32*1024*1024)
+#define MEDIUMSYSTEM_SIZE (64*1024*1024)
+#define LARGESYSTEM_SIZE  (128*1024*1024)
+
+// Tamanho dado em quantidade de páginas de 4KB.
+#define SMALLSYSTEM_SIZE_PAGES  ( (32*1024*1024) / 4096 )
+#define MEDIUMSYSTEM_SIZE_PAGES ( (64*1024*1024) / 4096 )
+#define LARGESYSTEM_SIZE_PAGES  ( (128*1024*1024) / 4096 )
+
+// Tamanho dado em KB.
+#define SMALLSYSTEM_SIZE_KB  (32*1024)
+#define MEDIUMSYSTEM_SIZE_KB (64*1024)
+#define LARGESYSTEM_SIZE_KB  (128*1024)
+
 
 //
 // Protótipos.

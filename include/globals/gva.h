@@ -8,6 +8,16 @@
 //  ## User Area ##
 //
 
+
+//Endereço virtual do diretório de páginas do processo kernel.
+//Como aqui ficam as coisas de usuário,
+//termos que mapear o diretório de páginas do kernel em outro lugar.
+#define PD_BASE 0x0009C000
+
+//Aqui é onde fica a primeira entrada.
+#define PTE_BASE 0x0009C000
+
+
 // Os três primeiros gigas da memória virtual.
 //Os endereços virtuais aqui serão usados pelas aplicações.
 
@@ -28,7 +38,7 @@
 
 //...
 
-
+//0x80000000 ??
 
 //############################################################################
 //
@@ -41,7 +51,13 @@
 //Base da imagem do kernel.
 #define KERNEL_IMAGE_BASE  0xC0000000  
 
-
+//Essa é a área onde a imagem do kernel está,
+//Ela pode ter no máximo 1 MB.
+//O código do kernel tem 1MB de tamanho,
+//logo em seguida começa o heap;
+#define CODE_START  0xC0000000   //0x100000pys  
+#define CODE_END    0xC00FFFFF   //0x1FFFFFpys  
+#define CODE_SIZE (CODE_END-CODE_START)
 
 //
 // ## KERNEL HEAP ##
@@ -93,7 +109,11 @@
 #define XXXGRAMADOCORE_SHELL_HEAP_VA     0xC1800000
 #define XXXGRAMADOCORE_TASKMAN_HEAP_VA   0xC1C00000
 
-//0x80000000 ??
+
+//Cache do sistema.
+#define SYSTEM_CACHE_START (0xCA000000)
+#define SYSTEM_CACHE_END   (0xCAFFFFF0)
+
 
 #define NIC1_VA 0xF0000000  //
 
