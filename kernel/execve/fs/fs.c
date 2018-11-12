@@ -1072,28 +1072,73 @@ int fsInit (){
  
 void fsInitializeWorkingDiretoryString (){
 	
-	//get info
-	
-	//test: get current volume id.
-	//current_volume_id = (int) system_call(171,0,0,0);
-	//current_volume = (int) 
-	
-	//global usada para string do nome do volume.
-	current_volume_string = (char *) FS_VOLUME1_STRING;
-	
+		
+	//'root:'
     //  ## volume list ##
-    //primeiro colocamos a string que indica a lista de volumes.
+    //primeiro colocamos a string que indica a lista de volumes. 
     sprintf ( current_workingdiretory_string, FS_VOLUMELIST_STRING ); 
 	
+	
+	//'/'
 	// ## separador ##
 	strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );
+
+
+	//
+	//  ## volume root dir ##	
+	//
+
+
+	struct volume_d *v;
 	
-	//  ## volume root dir ##
-	strcat ( current_workingdiretory_string, current_volume_string );
+	v = (struct volume_d *) volumeList[current_volume];
+	
+	if ( (void *) v == NULL )
+	{
+		//fail.
+		printf("fsInitializeWorkingDiretoryString: v\n");
+		die();
 		
+	}else{
+		
+		if ( v->used != 1 || v->magic != 1234 )
+		{
+		    //fail.
+		    printf("fsInitializeWorkingDiretoryString: validation\n");
+		    die();
+		}
+
+	    switch (v->id)
+		{
+			case 0:
+		        //global usada para string do nome do volume.
+	            current_volume_string = (char *) FS_VOLUME0_STRING;
+		 	    break;
+				
+			case 1:
+		        //global usada para string do nome do volume.
+	            current_volume_string = (char *) FS_VOLUME1_STRING;
+		 	    break;
+			
+			default:
+		        //fail.
+		        printf("fsInitializeWorkingDiretoryString: default volume #todo\n");
+		        die();			    
+			    break;
+		}
+		
+		
+		//path string na estrutura do volume.
+        sprintf ( v->path_string, current_volume_string ); 	
+
+	    //'volumeX'
+	    strcat ( current_workingdiretory_string, v->path_string );
+	    //strcat ( current_workingdiretory_string, current_volume_string );		
+	}
+	
+
 	// ## separador ##
 	strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );	
-
 
 	//More ?...
     pwd_initialized = 1;

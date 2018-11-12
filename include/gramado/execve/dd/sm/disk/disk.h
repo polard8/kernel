@@ -1,5 +1,5 @@
 /*
- * File: include\executive\dd\sm\disk\disk.h 
+ * File: include\execve\dd\sm\disk\disk.h 
  *
  * Descrição:
  *     Gerenciador de discos. 
@@ -143,8 +143,12 @@ struct disk_d
 	int used;
 	int magic;
 	
+	//Ponteiro para o nome do disco,
+	//talvez não precise ser um ponteiro, pode ser um array.
 	char *name;  
+	
 
+	
     struct diskinfo_d *disk_info;	
 };
 disk_t *disk_conductor;  // O disco 0.

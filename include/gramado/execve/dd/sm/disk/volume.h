@@ -77,6 +77,8 @@ struct volumeinfo_d
 	
 	char *name; 
 	
+
+	
 	int flag;
 	int error;
 	
@@ -174,6 +176,10 @@ struct volume_d
 	
 	//pathname
 	char *cmd;
+	
+	//string usada no path para identificar o disco.
+	//isso não existe.
+    char path_string[32];  
 
     struct volumeinfo_d *volume_info;	
 	

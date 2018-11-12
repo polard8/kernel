@@ -160,7 +160,7 @@ echo ~{ ux2 /execve
     gcc -c c:/gramado/kernel/execve/dd/sm/sys/system.c   -I c:/gramado/include -o system.o
 	gcc -c c:/gramado/kernel/execve/dd/sm/sys/io.c       -I c:/gramado/include -o io.o	
 	gcc -c c:/gramado/kernel/execve/dd/sm/rt/runtime.c   -I c:/gramado/include -o runtime.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/disk/disk.c -I c:/gramado/include -o disk.o
+	gcc -c c:/gramado/kernel/execve/dd/sm/disk/diskvol.c -I c:/gramado/include -o diskvol.o
     gcc -c c:/gramado/kernel/execve/dd/sm/install/install.c -I c:/gramado/include -o install.o    
 	gcc -c c:/gramado/kernel/execve/dd/sm/debug/debug.c -I c:/gramado/include -o debug.o	
 	
@@ -291,7 +291,7 @@ cf.o ^
 search.o ^
 format.o ^
 disk1.o ^
-disk.o ^
+diskvol.o ^
 fs.o ^
 vfs.o ^
 cedge.o ^

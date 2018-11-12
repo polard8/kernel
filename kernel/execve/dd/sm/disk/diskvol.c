@@ -323,11 +323,12 @@ int init_disk_manager()
 //
 
 //Mostra informações sobre o volume atual.
-void volumeShowCurrentVolumeInfo()
-{
+void volumeShowCurrentVolumeInfo (){
+	
 	printf("The current volume is %d\n",current_volume);
-    volumeShowVolumeInfo(current_volume);	
+    volumeShowVolumeInfo (current_volume);	
 };
+
 
 /*
  ************************************************
@@ -372,7 +373,11 @@ int volumeShowVolumeInfo ( int descriptor ){
 		
 		//#bugbug
 		//@todo: Esse nome temos que pegar no diretório raiz.
+		
 		printf("name={%s}\n",v->name);
+		
+		printf("path_string={%s}\n",v->path_string);
+		
 		//printf("");
 		//printf("");
 		//printf("");
@@ -425,8 +430,9 @@ void *volume_get_current_volume_info()
  *     Inicializa o volume manager.
  */
 //int volumeInit()
-int volume_init()
-{
+
+int volume_init (){
+	
 	
 #ifdef KERNEL_VERBOSE
     printf("volume_init: Initializing..\n");
@@ -439,6 +445,14 @@ int volume_init()
 		volumeList[i] = 0;
 	};
 
+	
+	
+	//
+	//  selecionando o volume atual.
+	//  a partição de boot.
+	//  
+	
+	current_volume = 1;	
 
     //
 	// Inicializando a estrutura do volume 0,
@@ -529,7 +543,7 @@ int volume_init()
 	
 	
 	// Volume.
-	volume_systempartition = (void*) malloc( sizeof(struct volume_d) );
+	volume_systempartition = (void *) malloc( sizeof(struct volume_d) );
 	
 	if( (void*) volume_systempartition == NULL )
 	{
@@ -561,12 +575,7 @@ int volume_init()
 	};
 	
 	
-	//
-	//  selecionando o volume atual.
-	//  a partição de boot.
-	//  
-	//
-	current_volume = 1;
+
 	
 	
 	//
