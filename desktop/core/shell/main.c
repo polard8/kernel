@@ -4256,8 +4256,10 @@ int shellCheckPassword (){
 		//  ## password ##
 	    //
 		
-		printf("\n password: \n");
+		printf("\n password: ");
 	    gets(password);
+		
+		printf("\n");
 	
 #ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
