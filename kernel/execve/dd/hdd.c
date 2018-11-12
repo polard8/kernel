@@ -89,64 +89,72 @@ void hdd_ata_pio_write ( int p, void *buffer, int bytes ){
 };
 
 
-uint8_t hdd_ata_status_read(int p)
-{
+uint8_t hdd_ata_status_read (int p){
+	
     //#bugbug: 
 	//rever o offset
    	
 	//return inb(ata[p].cmd_block_base_addr + ATA_REG_STATUS);
     return (uint8_t) inportb ( (int) ide_ports[p].base_port + 7);
-
-}
+};
  
- int hdd_ata_wait_not_busy(int p)
-{
+
+int hdd_ata_wait_not_busy (int p){
+	
     while( hdd_ata_status_read(p) & ATA_SR_BSY )
     if ( hdd_ata_status_read(p) & ATA_SR_ERR )
         return 1;
 
-    return 0;
-}
+    return (int) 0;
+};
 
-void hdd_ata_cmd_write( int port, int cmd_val)
-{
-           
-    	// no_busy      	
+
+void hdd_ata_cmd_write ( int port, int cmd_val ){
+
+    // no_busy      	
 	hdd_ata_wait_not_busy(port);
 	
 	//outb(ata.cmd_block_base_address + ATA_REG_CMD,cmd_val);
 	
 	outportb ( (int) ide_ports[port].base_port + 7 , (int) cmd_val );
 	
-	ata_wait(400);  // Esperamos 400ns
-}
+	// Esperamos 400ns
+	ata_wait (400);  
+};
 
 
-int hdd_ata_wait_no_drq(int p)
-{
+int hdd_ata_wait_no_drq (int p){
+	
     while( hdd_ata_status_read(p) &ATA_SR_DRQ)
     if(hdd_ata_status_read(p) &ATA_SR_ERR)
     return 1;
 
     return 0;
-}
+};
+
 
 /*
- rw_sector
- 
- IN:
-    buffer - Buffer address
-	lba - LBA number 
-    rw - Flag read or write.	
-
-    //inline unsigned char inportb (int port)
-    //outportb ( int port, int data )
-	
+ ******************************************************************
+ * rw_sector
+ * 
+ * IN:
+ *   buffer - Buffer address
+ *	lba - LBA number 
+ *   rw - Flag read or write.	
+ *
+ *   //inline unsigned char inportb (int port)
+ *   //outportb ( int port, int data )
+ *   (IDE PIO)	
  */
-int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port ) 
+ 
+int 
+pio_rw_sector ( unsigned long buffer, 
+                unsigned long lba, 
+				int rw, 
+				int port )
 {
-	
-	unsigned long tmplba = (unsigned long) lba;
+
+    unsigned long tmplba = (unsigned long) lba;
 	
 	
 	if ( port < 0 || port >= 4 )
@@ -237,9 +245,7 @@ again:
 	};
 	
 	
-  
-		
-    return 0;	
+    return (int) 0;	
 } ;
  
 
@@ -270,6 +276,7 @@ void my_read_hd_sector ( unsigned long ax,
  
 	
 	/*
+	 //antigo.
 	
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
@@ -315,7 +322,7 @@ void my_write_hd_sector ( unsigned long ax,
     pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );		
 	
 /*
-	
+	//antigo.
     // Passando os argumentos.	
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba = (unsigned long) bx;       //arg2 = lba.
