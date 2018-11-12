@@ -1092,12 +1092,101 @@ void fsInitializeWorkingDiretoryString (){
 	strcat ( current_workingdiretory_string, current_volume_string );
 		
 	// ## separador ##
-	strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );		
+	strcat ( current_workingdiretory_string, FS_PATHNAME_SEPARATOR );	
+
 
 	//More ?...
     pwd_initialized = 1;
 };
 
+
+int fs_initialize_process_pwd ( int pid, char *string ){
+	
+	struct process_d *p;
+	int i;
+	
+	
+	//#todo limits
+	if (pid<0)
+		return 1;
+	
+	if ( pwd_initialized == 0 )
+	{
+		printf("fs_initialize_process_pwd: pwd not initialized\n"); 
+		die();
+	} 
+		
+    if ( (void *) string == NULL )
+	{
+	    return (int) 1;    
+	} 
+			
+
+    //#importante
+	//Vamos copiar a string para a estrutura do processo atual.
+	
+	p = (struct process_d *) processList[pid];
+	
+	if ( (void *) p == NULL )
+	{
+	    printf("fs_initialize_process_pwd: p\n");
+	    die ();
+		
+	}else{
+		
+	    if ( p->used != 1 || p->magic != 1234 )
+	    {
+	        printf("fs_initialize_process_pwd: validation\n");
+	        die ();
+	    }
+		
+	    for ( i=0; i<32; i++ )
+	    {
+	        p->pwd_string[i] = string[i];	
+	    }
+	};
+	
+    return (int) 0;
+};
+
+int fs_print_process_pwd ( int pid ){
+	
+	
+	struct process_d *p;
+
+	//#todo limits
+	if (pid<0)
+		return 1;
+	
+	if ( pwd_initialized == 0 )
+	{
+		printf("fs_print_process_pwd: pwd not initialized\n"); 
+		die();
+	} 	
+	
+	
+	p = (struct process_d *) processList[pid];
+	
+	if ( (void *) p == NULL )
+	{
+	    printf("fs_print_process_pwd: p\n");
+	    die ();
+		
+	}else{
+		
+	    if ( p->used != 1 || p->magic != 1234 )
+	    {
+	        printf("fs_print_process_pwd: validation\n");
+	        die ();
+	    }
+		
+ 		printf("\n process=%d %s \n\n", p->pid, p->pwd_string );
+		refresh_screen();
+	};
+	
+    return (int) 0;
+	
+};
 
 /*
  *****************************************
@@ -1112,33 +1201,54 @@ void fsInitializeWorkingDiretoryString (){
  
 void fsUpdateWorkingDiretoryString ( char *string ){
 	
+	
+    struct process_d *p;
+	int i;
+	
+	
 	if ( pwd_initialized == 0 )
 	{
-		goto fail;
+		printf("fsUpdateWorkingDiretoryString: pwd not initialized\n"); 
+		return;
+	}  	
+	
+	p = (struct process_d *) processList[current_process];
+	
+	if ( (void *) p == NULL )
+	{
+	    printf("fsUpdateWorkingDiretoryString: p\n");
+	    die ();
+		
 	}else{
 		
-        if( (void *) string == NULL )
+	    if ( p->used != 1 || p->magic != 1234 )
 	    {
-		    goto fail;
-	    }else{
-	    
-	        // ## separador ##
-		    //strcat( current_workingdiretory_string, 
-			//    FS_PATHNAME_SEPARATOR );		
+	        printf("fsUpdateWorkingDiretoryString: validation\n");
+	        die ();
+	    }
 		
-	        // ## separador ##		
-		    strcat( current_workingdiretory_string, 
-			    string );	
+
+        if ( (void *) string == NULL )
+	    {
+		    return;
+	    
+		} else {
+			
+			//atualiza a string do processo atual.
+			
+		    strcat ( p->pwd_string, string );	
 
 	        // ## separador ##
-		    strcat( current_workingdiretory_string, 
-			    FS_PATHNAME_SEPARATOR );				
-		};
-	};
-	//...
-fail:	
-done:
-    return;	
+		    strcat ( p->pwd_string, FS_PATHNAME_SEPARATOR );				
+		
+	        //atualiza a string global.
+			//usando a string do processo atual.
+			for ( i=0; i<32; i++ )
+	        {
+	            current_workingdiretory_string[i] = p->pwd_string[i];	
+	        }
+		};		
+	};	
 };
 
 
@@ -1150,23 +1260,60 @@ done:
  * PATH must contain enough space for MAXPATHLEN characters. 
  * Credits: bash 1.05
  */
-void fs_pathname_backup ( char *path, int n ){
+void fs_pathname_backup ( int pid, int n ){
 	
-    register char *p = path + strlen(path);
+	struct process_d *p;
+	
+	
+	
+	if ( pwd_initialized == 0 )
+	{
+		printf("fs_pathname_backup: pwd not initialized\n"); 
+		return;
+	}  
 
-    if (*path)
-        p--;
+	if (pid<0)
+		return;
+	
+	
 
-    while (n--)
-    {
-        while (*p == '/')
-	        p--;
 
-        while (*p != '/')
-	        p--;
+	p = (struct process_d *) processList[pid];
+	
+	if ( (void *) p == NULL )
+	{
+	    printf("fsUpdateWorkingDiretoryString: p\n");
+	    die ();
+		
+	}else{
+		
+	    if ( p->used != 1 || p->magic != 1234 )
+	    {
+	        printf("fsUpdateWorkingDiretoryString: validation\n");
+	        die ();
+	    }
+		
+ 
+        char *path = (char *) p->pwd_string;
+	
+        register char *s = path + strlen( path );
 
-        *++p = '\0';
-    };	
+ 
+        if (*path)
+            s--;
+
+        while (n--)
+        {
+            while (*s == '/')
+	            s--;
+
+            while (*s != '/')
+	            s--;
+
+            *++s = '\0';
+        };	
+
+	};		
 };
 
 

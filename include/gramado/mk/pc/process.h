@@ -672,6 +672,7 @@ struct process_d
 	/*
 	 * Contexto.
 	 *  @todo: Usar uma estrutura de contexto.
+	 #bugbug deletar isso, deixe somente a thread lidar com contexto.
 	 */
 	unsigned short ss;
     unsigned long esp;
@@ -726,6 +727,9 @@ struct process_d
 	struct _iobuf *pwd;	    // 5 (print working directory) 
 	//...
 		
+		
+	//#todo: esse tamanho deve ser igual ao encontrado no módulo /fs.	
+	char pwd_string[32];	
 	
 	// @todo:
 	// Outros:

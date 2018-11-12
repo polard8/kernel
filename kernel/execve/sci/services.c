@@ -1283,8 +1283,9 @@ void *services( unsigned long number,
         //?? mostra p pathname gerenciado pelo kernel 
         //para o diretório de trabalho.		
 		case SYS_PWD:
-			printf("\n %s \n\n", current_workingdiretory_string );
-			refresh_screen();
+			fs_print_process_pwd (current_process);
+			//printf("\n %s \n\n", current_workingdiretory_string );
+			//refresh_screen();
 			break;	
 		
 		//171 - retorna o id do volume atual.
@@ -1324,10 +1325,8 @@ void *services( unsigned long number,
         //em argumento veio a quantidade de diretórios a se retirar.		
 		//apaga n quantidade de nomes de diretórios 
 		//começando do último.
-		
 		case 176:	
-		    fs_pathname_backup ( (char *) current_workingdiretory_string, 
-			    (int) arg3 );
+		    fs_pathname_backup ( current_process, (int) arg3 );
 			break;
 			
 		//177

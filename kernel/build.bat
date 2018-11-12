@@ -13,8 +13,14 @@ rem  ld 2.19
 rem
 rem (c) Copyright 2005-2018 Fred Nora.
 rem
-    cd c:\sdk\bin
 
+    set GramadoDrive=c:
+   
+    set GramadoRoot=%GramadoDrive%\gramado
+
+    rem cd c:\sdk\bin
+    cd %GramadoDrive%\sdk\bin
+	
 echo ~{ ...
 echo ~{ Gramado 0.4 Love and Forgiveness
 

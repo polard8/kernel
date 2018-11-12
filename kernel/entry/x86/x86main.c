@@ -570,6 +570,11 @@ int x86main ( int argc, char *argv[] ){
  
         processor->CurrentProcess = (void *) KernelProcess;
         processor->NextProcess = (void *) KernelProcess;
+		
+		
+		fs_initialize_process_pwd ( KernelProcess->pid, "no-directory" ); 
+		
+		
         //...
     };
 	
@@ -595,6 +600,9 @@ int x86main ( int argc, char *argv[] ){
         printf("x86main: InitProcess\n");
         die();
     }else{
+		
+		fs_initialize_process_pwd ( InitProcess->pid, "no-directory" );
+		
         //processor->IdleProcess = (void*) IdleProcess;	
     };
 	
@@ -637,6 +645,9 @@ int x86main ( int argc, char *argv[] ){
         printf("x86main: ShellProcess\n");
         die();
     }else{
+		
+		fs_initialize_process_pwd ( ShellProcess->pid, current_workingdiretory_string );
+		
         //...
     };
 		
@@ -676,6 +687,9 @@ int x86main ( int argc, char *argv[] ){
         printf("x86main: TaskManProcess\n");
         die();
     }else{
+		
+		fs_initialize_process_pwd ( TaskManProcess->pid, "no-directory" );
+		
         //...
     };
 	

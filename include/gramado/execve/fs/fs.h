@@ -62,6 +62,48 @@ char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
 int pwd_initialized;
 
  
+//atualiza a string do pwd na estrutura do processo. 
+int fs_initialize_process_pwd ( int pid, char *string ); 
+int fs_print_process_pwd ( int pid );
+
+
+
+
+
+/*
+ *****************************************
+ * fsInitializeWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */
+void fsInitializeWorkingDiretoryString(); 
+
+/*
+ *****************************************
+ * fsUpdateWorkingDiretoryString:
+ *     Atualiza a string do diretório de trabalho.
+ * Essa é a string que será mostrada antes do prompt.
+ * 'pwd'> 
+ * ?? isso deve sser todo o pathname do pwd ?? 
+ * ex: root:/volume0>
+ */ 
+void fsUpdateWorkingDiretoryString( char *string );
+
+/* 
+ Remove the last N directories from PATH.  
+ Do not leave a blank path.
+ PATH must contain enough space for MAXPATHLEN characters. 
+ Credits: bash 1.05
+ */
+void fs_pathname_backup ( int pid, int n ); 		
+
+
+
+
+ 
 //
 // #BUGBUG
 // #importante:
@@ -906,40 +948,7 @@ void read_fntos(char *name);
 int fsCheckPEFile( unsigned long address );	
 
 
-
-
-
-/*
- *****************************************
- * fsInitializeWorkingDiretoryString:
- *     Atualiza a string do diretório de trabalho.
- * Essa é a string que será mostrada antes do prompt.
- * 'pwd'> 
- * ?? isso deve sser todo o pathname do pwd ?? 
- * ex: root:/volume0>
- */
-void 
-fsInitializeWorkingDiretoryString(); 
-
-/*
- *****************************************
- * fsUpdateWorkingDiretoryString:
- *     Atualiza a string do diretório de trabalho.
- * Essa é a string que será mostrada antes do prompt.
- * 'pwd'> 
- * ?? isso deve sser todo o pathname do pwd ?? 
- * ex: root:/volume0>
- */ 
-void 
-fsUpdateWorkingDiretoryString( char *string );
-
-/* 
- Remove the last N directories from PATH.  
- Do not leave a blank path.
- PATH must contain enough space for MAXPATHLEN characters. 
- Credits: bash 1.05
- */
-void fs_pathname_backup ( char *path, int n ); 			  
+	  
 				  
 //
 // End.
