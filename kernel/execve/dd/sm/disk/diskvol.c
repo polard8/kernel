@@ -531,7 +531,7 @@ int volume_init (){
 		volume_bootpartition->used = (int) 1;
 	    volume_bootpartition->magic = (int) 1234;
 	    
-		volume_bootpartition->name = "VOLUME 1";  
+		volume_bootpartition->name = "VOLUME 1 - BOOT";  
         
 		volume_bootpartition->cmd = "root:/volume1";
 		

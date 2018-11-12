@@ -744,7 +744,7 @@ int dirCount;
  
  
 //Id da partição atual.(volume atual) 
-int current_volume; 
+//int current_volume; 
 
 /*
  * Tipo de sistema de arquivos, fat16, ext2 ...

@@ -916,9 +916,9 @@ int fsInit (){
 	//Deixaremos cada módulo inicializar sua variável.
 	//Mas aqui podemos zerar esses valores.
 	
-	current_disk = 0;
-	current_volume = 0;
-	current_directory = 0;
+	//current_disk = 0;
+	//current_volume = 0;   
+	//current_directory = 0;
 
 	// Structures and fat.
     
