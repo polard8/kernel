@@ -222,9 +222,10 @@ void mostra_slots(){
 	//
 	// Testando o for para threads.
 	//
-	printf("\n ## Thread info ## \n");
+	printf("\n # Thread info #\n");
 	
-Scan:	
+//Scan:	
+
 	for( i=0; i<THREAD_COUNT_MAX; i++)
     {
 	    t = (void *) threadList[i];
@@ -237,25 +238,8 @@ Scan:
 			
 			
 			mostra_slot (t->tid);
-			
-			//@todo: Melhorar isso.
-		    //printf("TID={%d} Step={%d} ownerPID={%d} pHandle={%x} State={%d}" 
-			//    "Handle={%x} Name={%s}\n\n",
-		    //    t->tid, t->step, t->ownerPID, t->process, 
-			//	t->state, (void*) t, t->name_address );
-	        //...
 		};
     };
-    
-	
-	
-done:	
-    printf("Done\n");
-	
-	//#debug
-	//refresh_screen();
-	//while(1){}
-    return;
 };
 
 
@@ -291,7 +275,7 @@ void mostra_slot (int id){
 	
 	    // Show one slot.
 	    printf("\n");
-	    printf("TID   PID   pdPA  Prio  State Quan Step  tName \n");
+	    printf("TID   PID   pdPA  Prio  State Quan ms    tName \n");
 	    printf("====  ====  ====  ====  ===== ==== ====  ===== \n");
 		
         printf("%d    %d    %x    %d    %d    %d    %d    %s \n", 
@@ -301,7 +285,7 @@ void mostra_slot (int id){
 			t->priority, 
 			t->state,
 			t->quantum,
-			t->step,
+			t->total_time_ms,
 			t->name_address );
 			
 	};

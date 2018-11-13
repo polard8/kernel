@@ -87,8 +87,8 @@
  *    @todo: Aqui deve ficar apenas as intefaces que 
  * chamam as rotinas de tratamento dos requests.
  */
-void KiRequest()
-{
+void KiRequest (){
+	
 	//#todo: #bugbug: limite imposto
 	int Max = 11;
 	
@@ -104,9 +104,10 @@ void KiRequest()
         printf("KiRequest: %d", kernel_request );
 		die();
 	};
+	
 	//...
-//done:
-    request();
+    
+	request ();
 };
 
 
@@ -121,8 +122,8 @@ void KiRequest()
  *     2016 (FN) - Revisão.
  *     ...
  */
-void request()
-{  
+void request (){
+	
     struct process_d *Process; 
     struct thread_d *Thread;	
 
@@ -142,18 +143,22 @@ void request()
 	//if(Current ...){}
 	
 	Thread = (void *) threadList[Current];
-	if( (void *) Thread == NULL )
+	
+	if ( (void *) Thread == NULL )
 	{
 		//kernel_request = 0;
 		//...
 		return;    //fail.
-	}
-	else
-	{
+	
+	} else {
+		
 	    r = (unsigned long) kernel_request;
-	    t = (unsigned long) Thread->type; 
+	    
+		t = (unsigned long) Thread->type; 
+		
 		Process = (void *) Thread->process;
-	    //...
+	    
+		//...
 	};
 	
 	//Number limits.
@@ -180,8 +185,9 @@ void request()
 	    break;
 
 	    //1 - Tratar o tempo das threads de acordo com o tipo.  
+		//#importante: De acordo com o tipo de thread.
 	    case KR_TIME:		    
-			switch(t)
+			switch (t)
             {
                 case TYPE_IDLE:   
                 case TYPE_SYSTEM:
@@ -197,8 +203,7 @@ void request()
 				    Thread->ticks_remaining--;
 					if( Thread->ticks_remaining == 0 )
 					{
-		                panic("request: Time out TIP={%d}", Thread->tid );
-                        //die();						
+		                panic("request: Time out TIP={%d}", Thread->tid );					
 	                };
                     break;
 					

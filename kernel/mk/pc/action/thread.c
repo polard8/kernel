@@ -257,7 +257,16 @@ get_next:
 		// readyCount - Tempo de espera para retomar a execução.
 		// blockedCount - Tempo bloqueada.
         Thread->standbyCount = 0;
-	    Thread->runningCount = 0;    
+	    
+		Thread->runningCount = 0;   
+		
+		Thread->initial_time_ms = get_systime_ms();
+		Thread->total_time_ms = 0;
+		
+		
+	    //quantidade de tempo rodadndo dado em ms.
+	    Thread->runningCount_ms = 0;
+		
 	    Thread->readyCount = 0;      
 	    Thread->ready_limit = READY_LIMIT;
 	    Thread->waitingCount = 0;

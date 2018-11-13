@@ -235,7 +235,15 @@ void task_switch (){
 	//            step: Quantas vezes ela já rodou no total.
 	//    runningCount: Quanto tempo ela está rodando antes de parar.
 
-	Current->step++;          
+	Current->step++; 
+	
+	//quanto tempo em ms ele rodou no total.
+	Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);	
+	
+	//incrementa a quantidade de ms que ela está rodando antes de parar.
+	//isso precisa ser zerado quando ela reiniciar no próximo round.
+	Current->runningCount_ms = (unsigned long) Current->runningCount_ms + (1000/sys_time_hz);	
+
 	Current->runningCount++;
 	
 	// @todo: Agora a estrutura de processo tem uma 
@@ -244,7 +252,6 @@ void task_switch (){
 	// do processo também.      
 
     //Outras configurações iniciais.
-	
 	
 	
 	//
@@ -853,7 +860,7 @@ void taskswitchRR()
 		}while(i < Max);
 			
         panic("taskswitchRR error: *HANG");
-        //die();   			
+  			
 		//Use idle. Não havendo outra alem da idle usa ela.
 		//current_idle_thread.
 		//current_thread = (int) 0;

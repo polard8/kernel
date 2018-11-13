@@ -153,6 +153,8 @@ unsigned long get_systime_totalticks();
 void timerEnableTextCursor ();
 void timerDisableTextCursor ();
 
+unsigned long get_systime_info (int n);
+
 //
 // End.
 //

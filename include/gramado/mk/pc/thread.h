@@ -360,7 +360,16 @@ struct thread_d
     //unsigned long DeadLine.
 	
 	//Steps.
-	unsigned long step;            //Quantas vezes a tarefa usou o processador. 		
+	//Quantas vezes a tarefa usou o processador. 
+	unsigned long step; 
+
+	// sys time inicial da thread.
+	// quando ela foi criada.
+	unsigned long initial_time_ms;	
+	
+	//ms total..
+	unsigned long total_time_ms; 
+	
 	
 	//Quantum. (time-slice, igual cota) 
 	unsigned long quantum;         //tempo que a thread tem.
@@ -370,8 +379,12 @@ struct thread_d
 	
 	unsigned long standbyCount;
 	
-	//Contando tempo rodadndo.
-	unsigned long runningCount; //Tempo rodando antes de parar.
+	//Contando tempo rodando.
+	//ticks rodando antes de parar.
+	unsigned long runningCount; 
+	
+	//ms rodando antes de parar.
+	unsigned long runningCount_ms; 
 
 	//Obs: A soma das 3 esperas é a soma do tempo de espera
 	//depois que ela rodou pela primeira vez.

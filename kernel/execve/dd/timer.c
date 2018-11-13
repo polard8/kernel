@@ -405,6 +405,33 @@ unsigned long get_systime_totalticks(){
 };
 
 
+
+unsigned long get_systime_info (int n){
+	
+    switch (n)
+    {
+		//#todo criar um enum para isso.
+		
+		case 1:
+		    return (unsigned long) get_systime_hz();
+            break;
+			
+		case 2:
+		    return (unsigned long) get_systime_ms();
+            break;
+			
+		case 3:
+		    return (unsigned long) get_systime_totalticks();
+			break;
+		
+		//...
+		
+		default:
+		    return (unsigned long) 0;
+		    break;
+	}	
+};
+
 /*
  ***************************************
  * sleep:
@@ -440,9 +467,8 @@ unsigned long timerGetTicks()
  *
  *
  */
-void set_timeout( unsigned long ticks )
-{
-	//??
+void set_timeout( unsigned long ticks ){
+
 	time_out = (unsigned long) ticks;
 };
 

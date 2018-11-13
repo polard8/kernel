@@ -1421,8 +1421,14 @@ void *services( unsigned long number,
 			
 		//219
         case SYS_DESTROYTERMINAL:
-            break; 		
-			
+            break; 	
+
+
+        //223 - get sys time info.
+        // informações variadas sobre o sys time.		
+		case 223:
+		    return (void *) get_systime_info ( (int) arg2 );
+            break;		
 			
 		//224 - get time	
 		case SYS_GETTIME:	

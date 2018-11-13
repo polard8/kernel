@@ -227,7 +227,15 @@ void *KiCreateIdle (){
 
 	IdleThread->standbyCount = 0;
 	IdleThread->runningCount = 0;    //Tempo rodando antes de parar.
+	
 	IdleThread->readyCount = 0;      //Tempo de espera para retomar a execução.
+	
+	IdleThread->initial_time_ms = get_systime_ms();
+	IdleThread->total_time_ms = 0;
+	
+	//quantidade de tempo rodando dado em ms.
+	IdleThread->runningCount_ms = 0;
+	
 	IdleThread->ready_limit = READY_LIMIT;
 	IdleThread->waitingCount  = 0;
 	IdleThread->waiting_limit = WAITING_LIMIT;
@@ -430,7 +438,15 @@ void *KiCreateShell (){
 	
 	t->standbyCount = 0;
 	t->runningCount = 0;    //Tempo rodando antes de parar.
+	
 	t->readyCount = 0;      //Tempo de espera para retomar a execução.
+	
+	t->initial_time_ms = get_systime_ms();
+	t->total_time_ms = 0;
+	
+	//quantidade de tempo rodadndo dado em ms.
+	t->runningCount_ms = 0;
+	
 	t->ready_limit = READY_LIMIT;
 	t->waitingCount  = 0;
 	t->waiting_limit = WAITING_LIMIT;
@@ -609,7 +625,15 @@ void *KiCreateTaskManager (){
 
 	t->standbyCount = 0;
 	t->runningCount = 0;    //Tempo rodando antes de parar.
+	
 	t->readyCount = 0;      //Tempo de espera para retomar a execução.
+	
+	t->initial_time_ms = get_systime_ms();
+	t->total_time_ms = 0;
+	
+	//quantidade de tempo rodadndo dado em ms.
+	t->runningCount_ms = 0;
+	
 	t->ready_limit = READY_LIMIT;
 	t->waitingCount  = 0;
 	t->waiting_limit = WAITING_LIMIT;
@@ -816,7 +840,15 @@ void *KiCreateRing0Idle (){
 
 	t->standbyCount = 0;
 	t->runningCount = 0;    //Tempo rodando antes de parar.
+	
 	t->readyCount = 0;      //Tempo de espera para retomar a execução.
+	
+	t->initial_time_ms = get_systime_ms();
+	t->total_time_ms = 0;
+	
+	//quantidade de tempo rodadndo dado em ms.
+	t->runningCount_ms = 0;
+	
 	t->ready_limit = READY_LIMIT;
 	t->waitingCount  = 0;
 	t->waiting_limit = WAITING_LIMIT;
