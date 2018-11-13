@@ -143,28 +143,13 @@ echo ~{ ux2 /execve
 		
 	rem dd/pci
 	gcc -c c:/gramado/kernel/execve/dd/pci/pci.c       -I c:/gramado/include -o pci.o  
-		
-	rem dd/sm
-    gcc -c c:/gramado/kernel/execve/dd/sm/init/init.c -I c:/gramado/include -o init.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/ob/object.c -I c:/gramado/include -o object.o		
-	
+
+	rem dd/network
 	gcc -c c:/gramado/kernel/execve/dd/network/intel.c    -I c:/gramado/include -o nicintel.o
 	gcc -c c:/gramado/kernel/execve/dd/network/network.c  -I c:/gramado/include -o network.o
 	gcc -c c:/gramado/kernel/execve/dd/network/socket.c   -I c:/gramado/include -o socket.o
-    
-	gcc -c c:/gramado/kernel/execve/dd/sm/sys/modules.c  -I c:/gramado/include -o modules.o
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/proc.c     -I c:/gramado/include -o proc.o	
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/abort.c    -I c:/gramado/include -o abort.o		
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/info.c     -I c:/gramado/include -o info.o	
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/sm.c       -I c:/gramado/include -o sm.o
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/channel.c  -I c:/gramado/include -o channel.o	
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/signal.c   -I c:/gramado/include -o signal.o	
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/system.c   -I c:/gramado/include -o system.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/sys/io.c       -I c:/gramado/include -o io.o	
-	gcc -c c:/gramado/kernel/execve/dd/sm/rt/runtime.c   -I c:/gramado/include -o runtime.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/disk/diskvol.c -I c:/gramado/include -o diskvol.o
-    gcc -c c:/gramado/kernel/execve/dd/sm/install/install.c -I c:/gramado/include -o install.o    
-	gcc -c c:/gramado/kernel/execve/dd/sm/debug/debug.c -I c:/gramado/include -o debug.o	
+	
+
 	
 	rem dd/tty
     gcc -c c:/gramado/kernel/execve/dd/tty/tty.c         -I c:/gramado/include -o tty.o		
@@ -172,7 +157,7 @@ echo ~{ ux2 /execve
 	rem dd/usb
 	gcc -c c:/gramado/kernel/execve/dd/usb/usb.c       -I c:/gramado/include -o usb.o		
 	
-	rem /fs
+	rem execve/fs
     gcc -c c:/gramado/kernel/execve/fs/fs.c     -I c:/gramado/include -o fs.o						
     gcc -c c:/gramado/kernel/execve/fs/read.c   -I c:/gramado/include -o read.o			
     gcc -c c:/gramado/kernel/execve/fs/write.c  -I c:/gramado/include -o write.o			
@@ -181,10 +166,26 @@ echo ~{ ux2 /execve
     gcc -c c:/gramado/kernel/execve/fs/format.c -I c:/gramado/include -o format.o	
     gcc -c c:/gramado/kernel/execve/fs/vfs.c    -I c:/gramado/include -o vfs.o			
 	
-	rem /sci
+	rem execve/sci
     gcc -c c:/gramado/kernel/execve/sci/services.c  -I c:/gramado/include -o services.o			
 	
  
+ 	rem execve/sm
+    gcc -c c:/gramado/kernel/execve/sm/init/init.c -I c:/gramado/include -o init.o
+	gcc -c c:/gramado/kernel/execve/sm/ob/object.c -I c:/gramado/include -o object.o		    
+	gcc -c c:/gramado/kernel/execve/sm/sys/modules.c  -I c:/gramado/include -o modules.o
+    gcc -c c:/gramado/kernel/execve/sm/sys/proc.c     -I c:/gramado/include -o proc.o	
+    gcc -c c:/gramado/kernel/execve/sm/sys/abort.c    -I c:/gramado/include -o abort.o		
+    gcc -c c:/gramado/kernel/execve/sm/sys/info.c     -I c:/gramado/include -o info.o	
+    gcc -c c:/gramado/kernel/execve/sm/sys/sm.c       -I c:/gramado/include -o sm.o
+    gcc -c c:/gramado/kernel/execve/sm/sys/channel.c  -I c:/gramado/include -o channel.o	
+    gcc -c c:/gramado/kernel/execve/sm/sys/signal.c   -I c:/gramado/include -o signal.o	
+    gcc -c c:/gramado/kernel/execve/sm/sys/system.c   -I c:/gramado/include -o system.o
+	gcc -c c:/gramado/kernel/execve/sm/sys/io.c       -I c:/gramado/include -o io.o	
+	gcc -c c:/gramado/kernel/execve/sm/rt/runtime.c   -I c:/gramado/include -o runtime.o
+	gcc -c c:/gramado/kernel/execve/sm/disk/diskvol.c -I c:/gramado/include -o diskvol.o
+    gcc -c c:/gramado/kernel/execve/sm/install/install.c -I c:/gramado/include -o install.o    
+	gcc -c c:/gramado/kernel/execve/sm/debug/debug.c -I c:/gramado/include -o debug.o	
 
 	
 rem echo ~{ ...

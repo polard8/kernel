@@ -197,7 +197,7 @@ extern void do_executa_new_task();
 
 
 //execve
-#include <gramado/execve/dd/sm/disk/diskmap.h>        //Disk Map - sectors.
+#include <gramado/execve/sm/disk/diskmap.h>        //Disk Map - sectors.
 
 
 //
@@ -217,10 +217,10 @@ extern void do_executa_new_task();
 #include <gramado/3rdparty/kernel/disk/disk1.h>
 
 //execve
-#include <gramado/execve/dd/sm/disk/disk.h>           //disk.
+#include <gramado/execve/sm/disk/disk.h>           //disk.
 
 
-#include <gramado/execve/dd/sm/disk/volume.h>         //volume.
+#include <gramado/execve/sm/disk/volume.h>         //volume.
 #include <gramado/hal/serial.h>        
 #include <gramado/hal/mac.h>                             //mac address info. (hw)
 //...
@@ -340,8 +340,8 @@ extern void do_executa_new_task();
 #include <gramado/gws/terminal/console.h>           //Console. Monitor support.
 
 //sm - System Management.  
-#include <gramado/execve/dd/sm/install.h>  
-#include <gramado/execve/dd/sm/init.h>
+#include <gramado/execve/sm/install.h>  
+#include <gramado/execve/sm/init.h>
 
 #include <gramado/execve/dd/network/host.h>        //host info.
 #include <gramado/execve/dd/network/intel.h>         //intel nic - network interface controller.
@@ -355,12 +355,12 @@ extern void do_executa_new_task();
 
 #include <gramado/execve/fs/fs.h>                     //fs.
 #include <gramado/execve/fs/vfs.h>                     //vfs.
-#include <gramado/execve/dd/sm/io.h>                  //io.
+#include <gramado/execve/sm/io.h>                  //io.
 #include <gramado/execve/sci/syscall.h>            //system calls.
-#include <gramado/execve/dd/sm/modules.h>             //module manager.
-#include <gramado/execve/dd/sm/debug.h>
-#include <gramado/execve/dd/sm/sys.h>                 //system calls 2.
-#include <gramado/execve/dd/sm/system.h>              //system manager.
+#include <gramado/execve/sm/modules.h>             //module manager.
+#include <gramado/execve/sm/debug.h>
+#include <gramado/execve/sm/sys.h>                 //system calls 2.
+#include <gramado/execve/sm/system.h>              //system manager.
 #include <gramado/execve/dd/dd.h>
 
 //
