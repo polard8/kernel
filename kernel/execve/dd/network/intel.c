@@ -236,7 +236,7 @@ int init_nic (){
 		//
 		
 		//device status
-		currentNIC->DeviceStatus = base_address[ 0x8];
+		currentNIC->DeviceStatus = base_address[0x8];
 		
 		
 		//mac
@@ -662,25 +662,100 @@ void show_current_nic_info (){
 		printf("BAR4 %x\n",currentNIC->pci->BAR4);
 		printf("BAR5 %x\n \n",currentNIC->pci->BAR5);
 		
+		//
+		// ## Device status ##
+		//
 		
+		
+        //To test your mapping, try printing out the device status register 
+		//(section 13.4.2). This is a 4 byte register that starts at byte 8 
+		//of the register space. You should get 0x80080783, which indicates 
+		//a full duplex link is up at 1000 MB/s, among other things.		
+		
+		
+/* 
+    #todo: Device Status 
+	
+#define E1000_STATUS_FD         0x00000001	// Full duplex.0=half,1=full 
+#define E1000_STATUS_LU         0x00000002	// Link up.0=no,1=link 
+#define E1000_STATUS_FUNC_MASK  0x0000000C	// PCI Function Mask 
+#define E1000_STATUS_FUNC_SHIFT 2
+#define E1000_STATUS_FUNC_0     0x00000000	// Function 0 
+#define E1000_STATUS_FUNC_1     0x00000004	// Function 1 
+#define E1000_STATUS_TXOFF      0x00000010	// transmission paused 
+#define E1000_STATUS_TBIMODE    0x00000020	// TBI mode 
+#define E1000_STATUS_SPEED_MASK 0x000000C0
+#define E1000_STATUS_SPEED_10   0x00000000	//Speed 10Mb/s 
+#define E1000_STATUS_SPEED_100  0x00000040	// Speed 100Mb/s 
+#define E1000_STATUS_SPEED_1000 0x00000080	// Speed 1000Mb/s 
+#define E1000_STATUS_LAN_INIT_DONE 0x00000200	// Lan Init Completion  by EEPROM/Flash 
+#define E1000_STATUS_ASDV       0x00000300	// Auto speed detect value 
+#define E1000_STATUS_DOCK_CI    0x00000800	// Change in Dock/Undock state. Clear on write '0'. 
+#define E1000_STATUS_GIO_MASTER_ENABLE 0x00080000	// Status of Master requests. 
+#define E1000_STATUS_MTXCKOK    0x00000400	// MTX clock running OK 
+#define E1000_STATUS_PCI66      0x00000800	// In 66Mhz slot 
+#define E1000_STATUS_BUS64      0x00001000	// In 64 bit slot 
+#define E1000_STATUS_PCIX_MODE  0x00002000	// PCI-X mode 
+#define E1000_STATUS_PCIX_SPEED 0x0000C000	// PCI-X bus speed 
+#define E1000_STATUS_BMC_SKU_0  0x00100000	// BMC USB redirect disabled 
+#define E1000_STATUS_BMC_SKU_1  0x00200000	// BMC SRAM disabled 
+#define E1000_STATUS_BMC_SKU_2  0x00400000	// BMC SDRAM disabled 
+#define E1000_STATUS_BMC_CRYPTO 0x00800000	// BMC crypto disabled 
+#define E1000_STATUS_BMC_LITE   0x01000000	// BMC external code execution disabled 
+#define E1000_STATUS_RGMII_ENABLE 0x02000000	// RGMII disabled 
+#define E1000_STATUS_FUSE_8       0x04000000
+#define E1000_STATUS_FUSE_9       0x08000000
+#define E1000_STATUS_SERDES0_DIS  0x10000000	// SERDES disabled on port 0 
+#define E1000_STATUS_SERDES1_DIS  0x20000000	// SERDES disabled on port 1 
+
+// Constants used to interpret the masked PCI-X bus speed. 
+#define E1000_STATUS_PCIX_SPEED_66  0x00000000	// PCI-X bus speed  50-66 MHz 
+#define E1000_STATUS_PCIX_SPEED_100 0x00004000	// PCI-X bus speed  66-100 MHz 
+#define E1000_STATUS_PCIX_SPEED_133 0x00008000	// PCI-X bus speed 100-133 MHz 
+
+*/		
 		
 		printf("Device status %x \n", currentNIC->DeviceStatus );
 		
-		if (currentNIC->DeviceStatus & 1){
+		// Full duplex.0=half,1=full 
+		if (currentNIC->DeviceStatus & 1)
+		{
 			printf("Full duplex \n");
-		}	
+		}
+
+        // Link up.0=no,1=link  		
+		if (currentNIC->DeviceStatus & 2)
+		{
+			printf("link up \n");
+		}
+		
+		// transmission paused
+		if (currentNIC->DeviceStatus & 0x10)
+		{
+			printf("transmission paused\n");
+		}
+		
+		// TBI mode 
+		if (currentNIC->DeviceStatus & 0x20)
+		{
+			printf("TBI mode\n");
+		}
 		
 		
-		if (currentNIC->DeviceStatus & 0x80){
+		// Speed 1000Mb/s 
+		if (currentNIC->DeviceStatus & 0x80)
+		{
+			//currentNIC->speed #todo
 			printf("1000Mbs\n");
 		}	
+
+		//
+		// ## MAC ##
+		//
 		
-		printf("MAC %x ", currentNIC->mac0 );
-		printf("%x ", currentNIC->mac1 );
-		printf("%x ", currentNIC->mac2 );
-		printf("%x ", currentNIC->mac3 );
-		printf("%x ", currentNIC->mac4 );
-		printf("%x \n", currentNIC->mac5 );
+		printf ("MAC %x %x %x %x %x %x \n", 
+		    currentNIC->mac0, currentNIC->mac1, currentNIC->mac2,
+            currentNIC->mac3, currentNIC->mac4, currentNIC->mac5 );
 		
 		//...
 		
