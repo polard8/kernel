@@ -9,10 +9,37 @@
  */
  
  
+//
+// Count support variables.
+//
+
+#define	HZ 100	
+
 //Usado no Linux. 
 //#define CT_TO_SECS(x)	((x) / HZ)
 //#define CT_TO_USECS(x)	(((x) % HZ) * 1000000/HZ) 
 //... 
+
+
+//
+//  ## sys time ##
+//
+
+unsigned long sys_time_hz;
+
+unsigned long sys_time_ms;
+
+//Saving the total ticks the kernel is running.
+//unsigned long kernel_tick_total;
+unsigned long sys_time_ticks_total;
+
+
+//Counting how much ticks the kernel is running.
+//unsigned long kernel_tick;
+ 
+
+ 
+
  
  
 //PIT. 
@@ -108,7 +135,9 @@ void KiTimer();
 //Global para inicialização do módulo interno.
 int timerInit();
 int timerTimer();
-void timerInit8253(); 
+
+void timerInit8253 ( unsigned long hz ); 
+
 //...
 
 //Global para acesso ao tempo imediatamente agora.
@@ -116,6 +145,10 @@ unsigned long now();
 
 unsigned long get_timeout();
 void set_timeout(unsigned long ticks);
+
+unsigned long get_systime_hz();
+unsigned long get_systime_ms();
+unsigned long get_systime_totalticks();
 
 void timerEnableTextCursor ();
 void timerDisableTextCursor ();

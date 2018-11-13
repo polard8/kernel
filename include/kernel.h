@@ -586,16 +586,6 @@ unsigned long KernelStatus;
 unsigned long kernel_switch;
 
 
-//
-// Count support variables.
-//
-
-
-//Counting how much ticks the kernel is running.
-unsigned long kernel_tick;
-
-//Saving the total ticks the kernel is running.
-unsigned long kernel_tick_total;
 
 
 //error support.

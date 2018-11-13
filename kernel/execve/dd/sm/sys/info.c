@@ -166,11 +166,12 @@ void KiInformation (){
 		
 	// Kernel info.
 	// Version and time running.	
-	printf("[Kernel Info:]\n");
+	//printf("[Kernel Info:]\n");
 	printf("Kernel version: %s %s\n", SYSTEM_VERSION_STRING, SYSTEM_VERSION_NAME_STRING );
-	printf("Ticks running: %d\n", kernel_tick_total );
-
-												   
+	printf("%d Hz | sys time %d ms | ticks %d \n", 
+	    sys_time_hz, sys_time_ms, sys_time_ticks_total );
+		
+		
     //ShowUserInfo(int user_id);	
 
     // ## Status ##

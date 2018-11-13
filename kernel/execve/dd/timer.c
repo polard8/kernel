@@ -68,12 +68,6 @@ Bits         Usage
 #include <kernel.h>
 
 
-//
-// Constantes internas.
-//
-
-#define	HZ 100	
-
 
 //
 // Variáveis internas.
@@ -83,7 +77,7 @@ Bits         Usage
 int timerStatus;
 
 //Contador de ticks.
-unsigned long timerTicks;
+//unsigned long timerTicks;
 
 //??  
 int timerColor;
@@ -100,6 +94,10 @@ int timerLock;
 //??
 int timerError;
 
+
+
+int timerShowTextCursor;     //se tá habilitado ou não
+int timerTextCursorStatus;   //0=apaga 1=acende 
 
 //??
 //unsigned long timerCountSeconds;  //Count Seconds.
@@ -151,8 +149,7 @@ void KiTimer (){
 };
 
 
-int timerShowTextCursor;     //se tá habilitado ou não
-int timerTextCursorStatus;   //0=apaga 1=acende 
+
     
 	
 void timerEnableTextCursor (){
@@ -167,6 +164,7 @@ void timerDisableTextCursor (){
 	
 
 /*
+ *****************************************************
  * timer: 
  *     Handler chamado pelo ISR do timer (IRQ 0).
  *     (Contagem de tempo, tempo das tarefas, 
@@ -175,29 +173,47 @@ void timerDisableTextCursor (){
  */
 void timer (){
 	
+	
+	//
+	// ## ticks total ##
+	//
+
+	
     //Contador de ticks.
-	timerTicks++;    
+	//Incrementa o Tempo total de funcionamento do kernel.
+	
+	//timerTicks++; 
+    sys_time_ticks_total++;	
+
+	//
+	// ## sys time ##
+	//
+	
+	//Mais 10ms para um sistema funcionando a 100HZ
+    //sys_time_ms = sys_time_ms + 10;
+	
+	sys_time_ms = (unsigned long) sys_time_ms + (1000/sys_time_hz);	
+
+	
+	//
+	// ## threads time ##
+	//
 
 	//Atribui um número de request a ser atendido futuramente.
 	//Tratará o tempo das tarefas de acordo com o tipo.
+	//#obs: Isso poderia ser usado para atualizar o time dos processos.
+	
 	kernel_request = KR_TIME;  
 
-	
-	//if(time_out > 0){
-	//	time_out--;
-	//};
-	
-	//
-	// @todo: Tentando clacular os segundos.
-	//
 
-    //sempre apaga o cursor.
-	//printf("%c", (char) 219 );   	
-	//refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
-	//g_cursor_x--;			
+
+	//
+	// ## mouse blink ##
+	//
+	
 	
 	//de tempos em tempos atualiza o cursor
-	if ( timerTicks % 64 == 0 )	
+	if ( sys_time_ticks_total % 64 == 0 )	
 	{
 		//Se o cursor piscante está habilitado.
 		//Essa flag é acionada pelo aplicativo.
@@ -208,7 +224,7 @@ void timer (){
 	            //apaga
 	            refresh_rectangle ( (g_cursor_x + 1)  *8, g_cursor_y*8, 16, 16 );	
                 timerTextCursorStatus = 1;
-		        goto goAhead;
+		        goto mouseExit;
 		    }
 	
 		    if ( timerTextCursorStatus == 1 )
@@ -216,70 +232,22 @@ void timer (){
 		        //acende
                 bmpDisplayCursorBMP ( cursorIconBuffer, (g_cursor_x + 1) * 8, g_cursor_y*8 );		
 		        timerTextCursorStatus = 0;
-			    goto goAhead;
+			    goto mouseExit;
 		    }
 		};
 	};
-	
+mouseExit:	
 
-goAhead:	
-	
-	
-	// De tempos em tempos. 
-	if ( timerTicks % 9 == 0 )	 
-    {   
-        //Incrementa a contagem de tempo de funcionamento do kernel.	
-		kernel_tick++;   
-			
-		//REALTIME: Limite para funcionamento do kernel.		
-		if( kernel_tick > 0xffff0000 ){
-			kernel_request = KR_TIMER_LIMIT;
-		};
-		
-		//cursor ativado
-		//if( timer_cursor_used == 1 )
-		//{	
-		    //acende a cada múltiplo de 9
-		//    printf("%c", (char) '_');   	
-		//	refresh_rectangle( g_cursor_x*8, g_cursor_y*8, 8, 8 );
-		//	g_cursor_x--;			
-        //};
-		
-		
-		//printf("One second ...\n");
-		//refresh_screen();
-		
-		//timerCountSeconds++;
-		
-		
-		goto done;    
-    };
-	
-	/*
-	 * @todo: Isso pode ir para task switch, para que o timer nao tenha nenhuma operação com threads.
-	struct thread_d *t;
-	int i;
-	
-	for(i = 0; i < 256; i++)
-	{
-	    t = (void*) threadList[i];
-		if ((void*) t != NULL)
-		{
-		    if(t->Used == 1 && t->Magic == 1234)
-			{
-				t->Ticks++;
-				//analizar qual tarefa esta mais perto da sua deadline.
-			};	
-			
-		};
-	};
-    */
-     
+    //Nothing for now ...	
 	 
-// Done.
+
 done:
-    //Incrementa o Tempo total de funcionamento do kernel.
-    kernel_tick_total++; 			
+    	
+	//#todo
+	//if(time_out > 0){
+	//	time_out--;
+	//};
+	
 	return;
 };
 
@@ -298,18 +266,36 @@ done:
  * à uma frequencia de "HZ".
  * Obs: Essa rotina substitui a rotina init_8253.
  */
-void timerInit8253()
-{
-	static const unsigned short period = (3579545L/3)/HZ;
+ 
+//#importante 
+//Essa rotina poderá ser chamada de user mode,
+//talvez precisaremos de mais argumentos. 
+ 
+void timerInit8253 ( unsigned long hz ){
+	
+	//#todo:
+	//podemos fazer filtros.
+	
+	unsigned short periodHZ = (unsigned short) hz;
+	
+	unsigned short period =  ( (3579545L/3) / periodHZ );
+	//static const unsigned short period = (3579545L/3)/HZ;
+	//static const unsigned short period = (3579545L/3)/hz;
 	
 	outportb(0x43, 0x36);			  //Canal 0, LSB/MSB, modo 3, contar em binário.
 	outportb(0x40, period & 0xFF);    //LSB.
 	outportb(0x40, period >> 8);	  //MSB.
-	//irq_enable(0x00); // Timer
-    
-    //More?!
 	
-	//return;
+	//#BUGBUG Não faremos isso aqui,
+	//faremos quando ermos spawn da idle thread.
+	//irq_enable(0x00); // Timer
+	
+	// #importante
+	// Isso será uma variável para fazermos testes de desempenho. 
+	//
+	//sys_time_hz = HZ;
+	
+	sys_time_hz = (unsigned long) hz;
 };
 
 
@@ -387,21 +373,35 @@ unsigned long get_next_quantum()
 /*
  ******************************************
  * now   
- * ?? Obs: Estou reavaliando isso.
  */
-unsigned long now()
-{
-	//??
-    return (unsigned long) get_tick_count(); 
+unsigned long now (){
+	
+    return (unsigned long) get_systime_ms ();
+};
+
+
+
+unsigned long get_systime_hz(){
+	
+    return (unsigned long) sys_time_hz;
 };
 
 
 /*
- * get_tick_count:
+ * get_systime_ms:
  */
-unsigned long get_tick_count()
-{
-    return (unsigned long) timerTicks;
+unsigned long get_systime_ms(){
+	
+    return (unsigned long) sys_time_ms;
+};
+
+
+/*
+ * get_systime_totalticks:
+ */
+unsigned long get_systime_totalticks(){
+	
+    return (unsigned long) sys_time_ticks_total;
 };
 
 
@@ -411,8 +411,9 @@ unsigned long get_tick_count()
  *     Apenas uma espera, um delay.
  *     Essa não é a função que coloca uma 
  * tarefa pra dormir no caso de evento.
+ *   #todo: Usar o ms do contador do sys_time
  */
-void sleep(unsigned long ms) 
+void sleep (unsigned long ms) 
 {
     unsigned long t = (unsigned long) ( ms * 512 );
 	
@@ -450,8 +451,8 @@ void set_timeout( unsigned long ticks )
  ****************************************
  * get_timeout
  */
-unsigned long get_timeout()
-{
+unsigned long get_timeout (){
+	
 	return (unsigned long) time_out;
 };
 
@@ -462,15 +463,19 @@ unsigned long get_timeout()
  *     Constructor.
  *     Inciaialização de variáveis do módulo.
  */
-int timerTimer()
-{
-	//Inicializa ticks.
-    timerTicks = 0;
-    kernel_tick = 0;
-    kernel_tick_total = 0;	
+int timerTimer (){
 	
+	//apenas inicializando, isso será atualizado.   
+	sys_time_hz = 0;
+
+	//ms
+    sys_time_ms = 0;	
 	
-done:
+	//Inicializa ticks.    
+	sys_time_ticks_total = 0;	
+    
+    //...
+	
 	return (int) 0;
 };
 
@@ -483,8 +488,13 @@ done:
  *     @todo: KiTimerInit 
  * (unsigned long CallBackExemplo); 
  */
-int timerInit()
-{
+int timerInit (){
+	
+	
+	//Constructor.
+	timerTimer();
+	
+	
    // timerLock = 0;
 
    //set handler.
@@ -497,7 +507,16 @@ int timerInit()
    //@todo: Isso poderia ser por último.
    //?? Isso pertence a i386 ??
    //?? Quais máquinas possuem esse controlador ??
-    timerInit8253();
+    
+	// #importante
+	// Começaremos com 100 HZ
+	// Mas o timer poderá ser atualizado por chamada.
+	// e isso irá atualizar a variável que inicializamos agora.
+	
+	sys_time_hz = (unsigned long) HZ;
+	
+	timerInit8253 ( sys_time_hz );
+   
    
    /*
     * @todo: criar a estrutura do timer.
@@ -513,8 +532,7 @@ int timerInit()
 	//
 	
 	
-	//Constructor.
-	timerTimer();
+
 	
 	//timerCountSeconds = 0;
 	
@@ -532,7 +550,7 @@ int timerInit()
 done:
     g_driver_timer_initialized = (int) 1;
 	
-#ifdef KERNEL_VERBOSE
+#ifdef EXECVE_VERBOSE
     printf("timerInit: Done\n");
 #endif
 	

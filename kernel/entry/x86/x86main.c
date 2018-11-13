@@ -196,7 +196,14 @@ void x86mainStartFirstThread( int n ){
 	 
     turn_task_switch_on();
 
-    timerInit8253();
+	//#bugbug:
+	//Não podemos inicialziar o timer novamente,
+	//temos que aceitar a configuração que o kernel fez.
+	//mas essa rotina será a mesma usada como serviço 
+	//oferecido pelo kernel, para atualização do HZ.
+	//então vamos testá-la.
+	
+    timerInit8253 ( HZ );
 	
 	//parece que isso é realmente preciso, libera o teclado.
 	//outb(0x20,0x20); 
@@ -357,7 +364,15 @@ void startStartIdle (){
 	 
     turn_task_switch_on();
 
-    timerInit8253();
+	
+	//#bugbug:
+	//Não podemos inicialziar o timer novamente,
+	//temos que aceitar a configuração que o kernel fez.
+	//mas essa rotina será a mesma usada como serviço 
+	//oferecido pelo kernel, para atualização do HZ.
+	//então vamos testá-la.
+	
+    timerInit8253 ( HZ );
 	
 	//parece que isso é realmente preciso, libera o teclado.
 	//outb(0x20,0x20); 

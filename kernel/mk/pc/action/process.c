@@ -1529,9 +1529,12 @@ void init_tasks()
  ***********************************************************
  * init_processes:
  *    Inicaliza o process manager.
+ *   #todo: rever esse nome, pois na verdade estamos inicializando variaveis 
+ * usadas no gerenciamento de processo.
  */
-void init_processes()
-{
+ 
+void init_processes (){
+	
     int i;	
 	
 	//
@@ -1539,9 +1542,15 @@ void init_processes()
 	//
 	
 	kernel_request = 0;    // O que fazer com a tarefa atual.
-	kernel_tick = 0;       // ?? Contagem de tempo de execução da tarefa atual.	                          
+	
+	
+	// ?? Contagem de tempo de execução da tarefa atual.	
+	//não precisa, isso é atualizado pelo request()
+	//kernel_tick = 0;                                 
+	
 	kernel_switch = 0;     // ?? Ativa o kernel switch do scheduler.
-    current_process = 0;
+    
+	current_process = 0;
 	
 	//
 	// Inicializando a lista de processos.
