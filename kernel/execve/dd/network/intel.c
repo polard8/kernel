@@ -78,33 +78,41 @@ int init_nic (){
 
 
 	printf("\n");
-	printf("probing pci ...\n");
-					
+	printf("init_nic: Probing PCI ...\n");
+	
+	// #test 
+	// Encontrar placa de rede.
+	
 	data = (uint32_t) diskPCIScanDevice (PCI_CLASSCODE_NETWORK);
 	
-	//#test: testando encontrar placa de rede.
-	if( data == -1 )
+	if ( data == -1 )
 	{
-		printf("**fail**\n");
+		printf("init_nic: Controller not found\n");
+		//refresh_screen();
 		
 		return (int) 1;
-		//refresh_screen();
-	}
-					
-	bus = ( data >> 8 &0xff );
-    dev = ( data >> 3 &31 );
-    fun = ( data &7 );
-					
-	data = (uint32_t) diskReadPCIConfigAddr( bus, dev, fun, 0 );
-					
-					
-	//#todo: salvar na estrutura de pci device.
-	//printf("Vendor=%x \n", (data & 0xffff) );
-	//printf("Device=%x \n", (data >> 16 &0xffff) );
 	
-    //
-	//  PCI
-	//	
+	} else {
+	    
+		bus = ( data >> 8 & 0xff );
+        dev = ( data >> 3 & 31 );
+        fun = ( data & 7 );
+	};
+
+	
+	// # get info
+	// #pci
+	// Pegaremos mais informações e colocaremos na estrutura de 
+	// dispositivo pci.
+	
+	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
+
+	//#debug
+	printf("Vendor=%x \n", (data & 0xffff) );
+	printf("Device=%x \n", (data >> 16 &0xffff) );
+	
+	// 8086:100e
+	// 82540EM Gigabit Ethernet Controller
 	
 	struct pci_device_d *pci_device;
 	
@@ -112,7 +120,10 @@ int init_nic (){
 	
 	if ( (void *) pci_device ==  NULL )
     {
+		
+		printf("init_nic: pci_device struct\n");
 		return (int) 1;
+	
 	}else{
 		
 		pci_device->deviceUsed = 1;
@@ -123,7 +134,7 @@ int init_nic (){
 		pci_device->func = (unsigned char) fun;
 		
 		pci_device->Vendor = (unsigned short) (data & 0xffff);
-		pci_device->Device = (unsigned short) (data >> 16 &0xffff);
+		pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
 		
 		//if ( pci_device->Vendor != 0x8086 ){
 		//	printf("init_nic: fail \n");
@@ -132,13 +143,12 @@ int init_nic (){
 		//	return (int) 1;
 		//}
 		
-		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
-		pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x14 ); 
-		pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
-		pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
-		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
-		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
-		
+		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x10 );
+		pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x14 ); 
+		pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x18 );
+		pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x1C );
+		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x20 );
+		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x24 );
 		
 		//#todo:
 		//Temos que pegar o número da interrupção.
@@ -146,18 +156,20 @@ int init_nic (){
 		//...
 	};
 	
+	//
+	// ## Base address ##
+	//
 	
-
-    //##importante:
-	//##todo tem que mapear esse endereço.
-	
-	//########### todo
-	//## bugbug: problemas no mapeamento do endereço encontrado em BAR0
+    // ##importante:
+	// Grab the Base I/O Address of the device
+	// Aqui nós pegamos o endereço dos registadores na BAR0,
+    // Então mapeamos esse endereço físico para termos um endereço virtual 
+	// para manipularmos os registradores. 	
 	
 	unsigned long phy_address = (pci_device->BAR0 & 0xFFFFFFF0);
 	
 	//mapeando para obter o endereço virtual que o kernel pode manipular.
-	unsigned long virt_address = mapping_nic0_device_address( phy_address );
+	unsigned long virt_address = mapping_nic0_device_address ( phy_address );
 	
 	//endereço base.
 	unsigned char *base_address = (unsigned char *) virt_address;
@@ -205,8 +217,10 @@ int init_nic (){
 	
 	if ( (void *) currentNIC ==  NULL )
 	{
+		printf("init_nic: currentNIC struct\n");
 	    return (int) 1;	
-	}else{
+		
+	} else {
 		
 		currentNIC->used = 1;
 		currentNIC->magic = 1234;
@@ -261,10 +275,9 @@ int init_nic (){
 	
 	
 	//reset
-	nic_i8254x_reset();
+	nic_i8254x_reset ();
 	
-	printf("done\n");		
-	
+	printf("init_nic: done\n");		
 
     return (int) 0;	
 };
@@ -312,7 +325,7 @@ void nic_i8254x_reset (){
 	
 	//unsigned long tmp;
 	
-	printf("nic_i8254x_reset: \n");
+	printf("nic_i8254x_reset: Reseting controller ... \n");
 
 	//#todo: precisamos checar a validade dessa estrutura e do endereço.
 	
@@ -518,8 +531,8 @@ void nic_i8254x_reset (){
 	base_address[0x00D0 + 2] = 0x01;
 	base_address[0x00D0 + 3] = 0;
 	
-	printf("nic_i8254x_reset: done\n");
-	refresh_screen();
+	printf("nic_i8254x_reset: Done\n");
+	//refresh_screen();
 };
 
 
@@ -529,7 +542,7 @@ void nic_i8254x_reset (){
 // base address, lenght, head, tail
 void nic_i8254x_transmit(){
 	
-	printf("nic_i8254x_transmit: \n");
+	printf("nic_i8254x_transmit: Transmitting ... \n");
 
 	//#todo: precisamos checar a validade dessa estrutura e do endereço.
 	
@@ -591,8 +604,8 @@ void nic_i8254x_transmit(){
 	base_address[0x3818 + 7] = 0;	
 	
 	
-	printf("nic_i8254x_transmit: done\n");
-	refresh_screen();
+	printf("nic_i8254x_transmit: Done\n");
+	//refresh_screen();
 };
 
 

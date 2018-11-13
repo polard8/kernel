@@ -590,28 +590,26 @@ system_procedure ( struct window_d *window,
 				case VK_F6:
 										
 					//1 = initialize.
-					diskATADialog ( 1, FORCEPIO, FORCEPIO );
-					show_ide_info ();
+					//diskATADialog ( 1, FORCEPIO, FORCEPIO );
+					//show_ide_info ();
                     //rotina provisória de teste de read.
-					procTestF6();
+					//procTestF6();
                     					
 					
 					//
 					// NIC test
 					//
 					
-					//init_nic ();
-					//inicializando o controlador.
-					//nic_i8254x_reset();
+					init_nic ();  //intel.c (obs: essa rotina tambem reseta o controlador.)
+					refresh_screen();
+					
 					//vamos testar a rotina de configuração da transmissão.
-					//nic_i8254x_transmit();
+					nic_i8254x_transmit();
+					refresh_screen(); 
+					
 					//vamos mostrar informações antes obtidas pelo sistema.
-					//show_network_info ();
-					
-					//show_current_nic_info ();
-					
-					//#test
-					//nic_test1();
+					show_network_info ();
+					refresh_screen();
 					
 					//#test
 					//fsList("volume1");

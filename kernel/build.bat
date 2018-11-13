@@ -147,10 +147,12 @@ echo ~{ ux2 /execve
 	rem dd/sm
     gcc -c c:/gramado/kernel/execve/dd/sm/init/init.c -I c:/gramado/include -o init.o
 	gcc -c c:/gramado/kernel/execve/dd/sm/ob/object.c -I c:/gramado/include -o object.o		
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/intel.c     -I c:/gramado/include -o nicintel.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/network.c -I c:/gramado/include -o network.o
-	gcc -c c:/gramado/kernel/execve/dd/sm/network/socket.c  -I c:/gramado/include -o socket.o
-    gcc -c c:/gramado/kernel/execve/dd/sm/sys/modules.c  -I c:/gramado/include -o modules.o
+	
+	gcc -c c:/gramado/kernel/execve/dd/network/intel.c    -I c:/gramado/include -o nicintel.o
+	gcc -c c:/gramado/kernel/execve/dd/network/network.c  -I c:/gramado/include -o network.o
+	gcc -c c:/gramado/kernel/execve/dd/network/socket.c   -I c:/gramado/include -o socket.o
+    
+	gcc -c c:/gramado/kernel/execve/dd/sm/sys/modules.c  -I c:/gramado/include -o modules.o
     gcc -c c:/gramado/kernel/execve/dd/sm/sys/proc.c     -I c:/gramado/include -o proc.o	
     gcc -c c:/gramado/kernel/execve/dd/sm/sys/abort.c    -I c:/gramado/include -o abort.o		
     gcc -c c:/gramado/kernel/execve/dd/sm/sys/info.c     -I c:/gramado/include -o info.o	

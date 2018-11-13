@@ -229,8 +229,10 @@ extern void do_executa_new_task();
 // EXECUTIVE (2)
 //
 
-//Unblocked.
-#include <gramado/execve/dd/sm/network/host.h>        //host info.
+
+
+
+
 
 //não mecher na ordem, pode dar problemas;
 #include <gramado/hal/arch/x86/ports.h>        //Portas para dispositivos
@@ -340,14 +342,17 @@ extern void do_executa_new_task();
 //sm - System Management.  
 #include <gramado/execve/dd/sm/install.h>  
 #include <gramado/execve/dd/sm/init.h>
-#include <gramado/execve/dd/sm/network/intel.h>         //intel nic - network interface controller.
-#include <gramado/execve/dd/sm/network/nports.h>      //(network) Network Ports  (sw)
-#include <gramado/execve/dd/sm/network/socket.h>      //(network) Sockets info. (sw)
-#include <gramado/execve/dd/sm/network/ip.h>          //(network) IP info.      (sw)
-#include <gramado/execve/dd/sm/network/channel.h>     //(network) Channel       (sw)
-#include <gramado/execve/dd/sm/network/client.h>      //(network) Client process support. 
-#include <gramado/execve/dd/sm/network/ns.h>          //(network) Network Server.
-#include <gramado/execve/dd/sm/network/network.h>     //(network) Gerenciamento de rede. 
+
+#include <gramado/execve/dd/network/host.h>        //host info.
+#include <gramado/execve/dd/network/intel.h>         //intel nic - network interface controller.
+#include <gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
+#include <gramado/execve/dd/network/socket.h>      //(network) Sockets info. (sw)
+#include <gramado/execve/dd/network/ip.h>          //(network) IP info.      (sw)
+#include <gramado/execve/dd/network/channel.h>     //(network) Channel       (sw)
+#include <gramado/execve/dd/network/client.h>      //(network) Client process support. 
+#include <gramado/execve/dd/network/ns.h>          //(network) Network Server.
+#include <gramado/execve/dd/network/network.h>     //(network) Gerenciamento de rede. 
+
 #include <gramado/execve/fs/fs.h>                     //fs.
 #include <gramado/execve/fs/vfs.h>                     //vfs.
 #include <gramado/execve/dd/sm/io.h>                  //io.
