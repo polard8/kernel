@@ -483,7 +483,7 @@ void *services( unsigned long number,
 
         //45 Message Box. 
         case SYS_MESSAGEBOX:		
-            MessageBox(gui->screen, 1, (char *) a3, (char *) a4 );        
+            //MessageBox(gui->screen, 1, (char *) a3, (char *) a4 );        
             return NULL;
 			break;
 		

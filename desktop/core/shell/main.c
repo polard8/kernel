@@ -161,6 +161,7 @@ struct command cmd_table[] = {
 */
 
  
+ 
 
 //#define MIN(x,y) ((x < y) ? x : y)
 
@@ -297,6 +298,67 @@ int quiet = 0;
 int make_login_shell = 0;	/* Make this shell be a `-bash' shell. */
 int no_line_editing = 0;	/* Don't do fancy line editing. */
 int no_brace_expansion = 0;	/* Non-zero means no foo{a,b} -> fooa fooa. */
+
+
+
+//
+// ## timer ##
+//
+
+int objectX;
+int objectY;
+int deltaX;
+int deltaY;
+int deltaValue = 4;
+
+//usdo para testar o timer.
+void updateObject ()
+{
+   //RECT rc;
+   //GetClientRect(hwnd, &rc);
+
+   objectX += deltaX;
+   objectY += deltaY;
+
+   if ( objectX < 2 )
+   {
+      objectX = 2;
+      deltaX = deltaValue;
+   }
+   else if ( objectX > 74 ) {
+	   
+      objectX = 74; 
+      deltaX = -deltaValue;  //muda a direção.
+   }
+   
+   
+   if (objectY < 2){
+      objectY = 2;
+      deltaY = deltaValue;
+   }
+   else if ( objectY > 24 ){
+      objectY = 24; 
+      deltaY = -deltaValue;
+   }
+
+    
+	//
+	// ## test ##
+	//
+	
+	//update.
+	//textCurrentRow = objectX;
+    //textCurrentCol = objectY;
+   
+    //putchar.
+	//shellInsertNextChar ( (char) 'T' );  
+	
+	shellSetCursor ( objectX, objectY );	
+	
+	printf("%c",(char) 'X');
+	
+};
+
 
 
 //
@@ -1548,7 +1610,8 @@ shellProcedure( struct window_d *window,
 			
 		//MSG_TIMER ;;#TODO INCLUIR ISS NA API.	
 		case 53:
-		    printf("shell tick\n");
+		    //printf("shell tick\n");
+			updateObject(); //interna
             break; 		
 		
 		case MSG_SETFOCUS:
@@ -3184,6 +3247,12 @@ do_compare:
 					
 		//janela, 100 ms, tipo 2= intermitente.
 		system_call ( 222, (unsigned long) window, 100, 2);	
+		
+		//inicializando.
+        objectX = 0;
+        objectY = 0;
+        deltaX = deltaValue;
+        deltaY = deltaValue;		
 					
         goto exit_cmp;
     };
@@ -5052,34 +5121,7 @@ void testScrollChar ( int c ){
  *     Memória de vídeo virtual, semelhante a vga.
  */
 void shellInsertNextChar (char c){
-	
-	//#importante:
-	//Se fosse endereço deslocamento absolute 
-	//teríamos que incrementar duas vezes.
-	//Ou deveríamos ter um buffer de shorts ...
-	//Nos temos um buffer de chars ...
-	//o máximo será 80*25
-	
-	//screen_buffer_pos++;
-	
-	//if ( screen_buffer_pos >= (wlMaxColumns * wlMaxRows) )
-	//{
-	    //#fim do buffer
-    //    shellScroll ();	
 		
-		//#bugbug
-		//#todo: isso precisa ser calculado ainda.
-		//início da última linha.
-	//	screen_buffer_pos = (wlMaxColumns * (wlMaxRows-2) ) + 1;
-	//}
-	
-	//screen_buffer[ screen_buffer_pos * 2] = (char) c;
-	//screen_buffer[ (screen_buffer_pos * 2) +1 ] = 7;
-	
-	
-	//mostra o char.
-	//shellRefreshCurrentChar();
-	
 	//cursor da linha
 	
 	LINES[textCurrentRow].CHARS[textCurrentCol] = (char) c;
@@ -5099,7 +5141,6 @@ void shellInsertNextChar (char c){
 		if ( textCurrentRow >= 25 )
 		{
 			shellScroll ();
-			//printf("shellInsertNextChar: *SCROLL");
 			while(1){}
 		}
 	}
