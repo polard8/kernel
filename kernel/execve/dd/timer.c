@@ -400,18 +400,23 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 		}else{
 			
 			t->id = ID; 	
+		
+		    t->used = 1;
+		    t->magic = 1234;
+		
+		    // ms/(ms por tick)
+		    t->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
+	 	    t->count_down = t->initial_count_down;
+		
+	        //1 = one shot 
+	        //2 = intermitent
+		    t->type = (int) type;
+		
+		
+		    //colca na lista.
+		    timerList[ID] = (unsigned long) t;
 		};
 		
-		t->used = 1;
-		t->magic = 1234;
-		
-		// ms/(ms por tick)
-		t->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
-		t->count_down = t->initial_count_down;
-		
-	    //1 = one shot 
-	    //2 = intermitent
-		t->type = (int) type;
 		
 	    //thread.
 		
