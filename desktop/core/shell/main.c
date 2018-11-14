@@ -875,6 +875,16 @@ noArgs:
     APIRegisterWindow (hWindow);
     //APISetActiveWindow (hWindow);	
     //APISetFocus (hWindow);
+	
+	
+	
+	//#test 
+	//Criando um timer.
+	
+	//printf("shmain: Creating timer\n");
+					
+		//janela, 100 ms, tipo 2= intermitente.
+	//system_call ( 222, (unsigned long) hWindow, 100, 2);		
 
 	
 	
@@ -3170,7 +3180,7 @@ do_compare:
 	// timer-test
 	if ( strncmp( prompt, "timer-test", 10 ) == 0 ){
 
-		printf("timer-test: Creating timer");
+		printf("timer-test: Creating timer\n");
 					
 		//janela, 100 ms, tipo 2= intermitente.
 		system_call ( 222, (unsigned long) window, 100, 2);	

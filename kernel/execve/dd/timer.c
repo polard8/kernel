@@ -356,12 +356,17 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 	//limite de 1 tick.
 	if (ms < (1000/sys_time_hz) )
 	{
+		printf("create_timer: ajust ms\n");
 		ms = (1000/sys_time_hz);
 	}
 	
 	if ( type < 1 || type > 10 )
 	{
 		printf("create_timer: type fail\n");
+		
+		//#debug
+		refresh_screen();
+		
 		return NULL;
 	}
 	
@@ -371,6 +376,11 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 	
 	if ( (void *) t == NULL )
 	{
+		
+		printf("create_timer: t fail \n");
+		//#debug
+		refresh_screen();
+		
 		return NULL; 
 	}else{
 		
@@ -380,6 +390,12 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 		//erro ao obter um novo id.
 		if (  ID < 0 || ID > 32 )
 		{
+
+		    printf("create_timer: ID fail \n");
+		    //#debug
+		    refresh_screen();
+	
+			
 		    return NULL;	
 		}else{
 			
@@ -401,11 +417,22 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 		
 		if ( (void *) window == NULL)
 		{
+			
+		    printf("create_timer: window fail \n");
+		    //#debug
+		    refresh_screen();
+			
+			
 		   return NULL;	
 		}else{
 			
 			if ( window->used != 1 || window->magic != 1234 )
 			{
+				
+		        printf("create_timer: window validation fail \n");
+		        //#debug
+		        refresh_screen();
+				
 			    return NULL;	
 			}
 			
@@ -414,11 +441,20 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 			
 			if ( (void *) window->InputThread == NULL )
 			{
+		        printf("create_timer: thread fail \n");
+		        //#debug
+		        refresh_screen();
+				
 				return NULL;
 			}
 			
 			if ( window->InputThread->used != 1 || window->InputThread->magic != 1234 )
 			{
+				
+		        printf("create_timer: thread validation fail \n");
+		        //#debug
+		        refresh_screen();
+				
 			    return NULL;	
 			}
 			
@@ -431,6 +467,11 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 		};
 		
 	}
+	
+	
+    printf("create_timer: done \n");
+	//#debug
+	refresh_screen();	
 	
     return (struct timer_d *) t;	
 };
