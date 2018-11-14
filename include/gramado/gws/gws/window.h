@@ -168,6 +168,11 @@ int window_getch();
 #define MSG_CONSOLE_SHUTDOWN 50
 #define MSG_CONSOLE_REBOOT   51
 #define MSG_DEVELOPER 52
+
+
+//UM TIMER SE ESGOTOU,
+//#todo>: incluir isso na api.
+#define MSG_TIMER 53   
 //...
 
  

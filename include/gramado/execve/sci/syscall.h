@@ -385,9 +385,13 @@
 #define	SYS_WAIT4DEVICE 203  //ESPERA POR UM DISPOSITIVO.
 #define	SYS_WAIT4SIGNAL 204  //
 #define	SYS_GENERICWAIT 205
+
+//?? rever
+//agora temos rotinas de systime.
 #define	SYS_TIMERGETTICKCOUNT 206
 #define	SYS_TIMERGETTIMEOUT 207
 #define	SYS_TIMERSETTIMEOUT 208
+
 #define	SYS_CALLIOSERVICES 209  //call i/o services. (io.c)
 //terminal emulator support.
 #define	SYS_CREATETERMINAL 210
@@ -404,8 +408,8 @@
 #define	SYS_REBOOT2   220
 #define	SYS_EXECUTEPROGRAM 221
 
-#define	SYS_222 222
-#define	SYS_223 223
+#define	SYS_222 222   //create timer. 
+#define	SYS_223 223   //get sys time info.
 
 //time date
 #define	SYS_GETTIME 224

@@ -174,6 +174,9 @@ void timerDisableTextCursor (){
 void timer (){
 	
 	
+	int i; //timers.
+	struct timer_d *t;
+	
 	//
 	// ## ticks total ##
 	//
@@ -238,8 +241,74 @@ void timer (){
 	};
 mouseExit:	
 
-    //Nothing for now ...	
-	 
+    //podemos percorrer a lista de timer e decrementar,
+	//quando um timer chegar a 0, mandamos uma mensagem
+	//para a thread de input da janela à qual ele pertence.
+	
+	for ( i=0; i<32; i++ )
+	{
+		//pega um da lista
+	    t = (struct timer_d *) timerList[i];
+
+        //checa
+        if ( (void *) t != NULL )
+        {
+			//validação.
+			if ( t->used == 1 && t->magic == 1234 )
+			{
+				if ( t->count_down > 0 )
+				{
+				    t->count_down--;
+                    
+                    //Chegamos ao 0.
+                    if ( t->count_down == 0 )
+                    {
+						//enviamos a mensagem para a thread que é dona do timer.
+						//#todo: podemos usar uma função para isso.
+						
+						//se a thread for válida.
+						if ( (void *) t->thread != NULL )
+						{
+							if ( t->thread->used == 1 && t->thread->magic == 1234 )
+							{
+								
+		                        t->thread->window = t->window;
+		                        t->thread->msg = (int) MSG_TIMER;    
+		                        t->thread->long1 = t->times;   //quantas vezes esse timer se esgotou.      
+		                        t->thread->long2 = t->status;  //?/status.     
+		
+		                        t->thread->newmessageFlag = 1;													
+								
+							}
+							
+						}
+						
+						//analisando o tipo.
+						//dependendo do tipo, devemos parar ou recomeçar.
+						
+						//one shot
+						if ( t->type == 1 )
+						{
+						   t->count_down = 0;	
+						}
+						
+						//intermitente
+						if ( t->type == 2 )
+						{
+						   t->count_down = t->initial_count_down;	
+						}
+						
+                        //...						
+					}						
+				}
+			    
+			};
+		};			
+		
+		//nothing
+	};
+	
+	
 
 done:
     	
@@ -251,6 +320,120 @@ done:
 	return;
 };
 
+
+
+int new_timer_id (){
+	
+    int i;
+    unsigned long new;
+	
+    for ( i=0; i<32; i++ )
+    {
+		new = (unsigned long) timerList[i];
+		
+		if ( new == 0 )
+		{
+			return (int) i;
+		}
+	}		
+	
+	//fail
+	return (int) -1;
+};
+
+//#todo 
+//precisamos pegar um slot na lista de timers.
+
+struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int type  ){
+
+
+    int ID = -1; //erro;
+	
+    struct timer_d *t;	
+	
+	
+	//limits
+	//limite de 1 tick.
+	if (ms < (1000/sys_time_hz) )
+	{
+		ms = (1000/sys_time_hz);
+	}
+	
+	if ( type < 1 || type > 10 )
+	{
+		printf("create_timer: type fail\n");
+		return NULL;
+	}
+	
+	
+	
+	t = (void *) malloc ( sizeof(struct timer_d) );
+	
+	if ( (void *) t == NULL )
+	{
+		return NULL; 
+	}else{
+		
+		
+		ID = (int) new_timer_id();
+		
+		//erro ao obter um novo id.
+		if (  ID < 0 || ID > 32 )
+		{
+		    return NULL;	
+		}else{
+			
+			t->id = ID; 	
+		};
+		
+		t->used = 1;
+		t->magic = 1234;
+		
+		// ms/(ms por tick)
+		t->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
+		t->count_down = t->initial_count_down;
+		
+	    //1 = one shot 
+	    //2 = intermitent
+		t->type = (int) type;
+		
+	    //thread.
+		
+		if ( (void *) window == NULL)
+		{
+		   return NULL;	
+		}else{
+			
+			if ( window->used != 1 || window->magic != 1234 )
+			{
+			    return NULL;	
+			}
+			
+			//temos uma janela válida 
+			t->window = window;
+			
+			if ( (void *) window->InputThread == NULL )
+			{
+				return NULL;
+			}
+			
+			if ( window->InputThread->used != 1 || window->InputThread->magic != 1234 )
+			{
+			    return NULL;	
+			}
+			
+			//#importante 
+			//agora o timer tem uma thread para enviar mensagens.
+			//quancdo o tempo se esgotar.
+			
+		    t->thread = (struct thread_d *) window->InputThread;	
+		 	
+		};
+		
+	}
+	
+    return (struct timer_d *) t;	
+};
 
 /*
  ******************************************
@@ -276,11 +459,9 @@ void timerInit8253 ( unsigned long hz ){
 	//#todo:
 	//podemos fazer filtros.
 	
-	unsigned short periodHZ = (unsigned short) hz;
+	unsigned short clocks_per_sec = (unsigned short) hz;
 	
-	unsigned short period =  ( (3579545L/3) / periodHZ );
-	//static const unsigned short period = (3579545L/3)/HZ;
-	//static const unsigned short period = (3579545L/3)/hz;
+	unsigned short period =  ( (3579545L/3) / clocks_per_sec );
 	
 	outportb(0x43, 0x36);			  //Canal 0, LSB/MSB, modo 3, contar em binário.
 	outportb(0x40, period & 0xFF);    //LSB.
@@ -292,8 +473,6 @@ void timerInit8253 ( unsigned long hz ){
 	
 	// #importante
 	// Isso será uma variável para fazermos testes de desempenho. 
-	//
-	//sys_time_hz = HZ;
 	
 	sys_time_hz = (unsigned long) hz;
 };
@@ -516,9 +695,15 @@ int timerTimer (){
  */
 int timerInit (){
 	
+	int i;
 	
 	//Constructor.
 	timerTimer();
+	
+	
+	for ( i=0; i<32; i++ ){
+		timerList[i] = (unsigned long) 0;
+	}
 	
 	
    // timerLock = 0;

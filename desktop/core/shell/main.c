@@ -1288,7 +1288,9 @@ shellProcedure( struct window_d *window,
 			{
 		        
 				case VK_F1:
-                    shellTestLoadFile ();
+                    
+
+					//shellTestLoadFile ();
 					
 					//inicializa a área visível.
 					//textTopRow = 0;
@@ -1533,6 +1535,11 @@ shellProcedure( struct window_d *window,
 		case MSG_CREATE:
 		    printf("SHELL.BIN: MSG_CREATE\n");
 		    break;
+			
+		//MSG_TIMER ;;#TODO INCLUIR ISS NA API.	
+		case 53:
+		    printf("shell tick\n");
+            break; 		
 		
 		case MSG_SETFOCUS:
 		    APISetFocus(window);
@@ -3158,7 +3165,21 @@ do_compare:
 	// time
 	if ( strncmp( prompt, "time", 4 ) == 0 ){
         goto exit_cmp;
-    };	
+    };
+	
+	// timer-test
+	if ( strncmp( prompt, "timer-test", 10 ) == 0 ){
+
+		printf("timer-test: Creating timer");
+					
+		//janela, 100 ms, tipo 2= intermitente.
+		system_call ( 222, (unsigned long) window, 100, 2);	
+					
+        goto exit_cmp;
+    };
+	
+
+
 	
 	
 	// taskbar

@@ -1424,6 +1424,13 @@ void *services( unsigned long number,
             break; 	
 
 
+		// 222 - create timer.
+		//args: window e ms e tipo
+        case 222:
+		    return (void *) create_timer ( (struct window_d *) arg2, (unsigned long) arg3, (int) arg4 );
+		    break;
+
+		
         //223 - get sys time info.
         // informações variadas sobre o sys time.		
 		case 223:

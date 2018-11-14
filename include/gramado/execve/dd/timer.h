@@ -86,7 +86,8 @@ unsigned long timer_handler_address;    //global _irq0:
  * mensagem para quem possui o timer.
  *
  */
-typedef struct timer_d timer_t; 
+
+//typedef struct timer_d timer_t; 
 struct timer_d 
 {
 	//Object.
@@ -94,27 +95,33 @@ struct timer_d
 	object_class_t objectClass;
 	
 	
+	int id;
+	
 	int used;
 	int magic;
+	
+	//1 = one shot 
+	//2 = intermitent
+	
+	int type;
 	
 	//owner.
     struct process_d *process;
 	struct thread_d *thread;
 	struct window_d *window;
-	
-	int counter;
-	
-	int status;
-	
-	
-	//cal back ;d
-	
-	
-	//deletar
-	//int dummy;    //c
-    //...
 
-    //unsigned long timer_handler_address; 	
+	
+	int count_down;     //--
+	int initial_count_down; //base fixa
+	
+	//quantas vezes o timer se esgotou.
+	unsigned long times;
+	
+	int status;  //??
+	
+ 
+
+ 
 	
 	unsigned long flag; //f
 	unsigned long error; //e
@@ -123,6 +130,10 @@ struct timer_d
 	struct timer_d *next;
 };
 //timer_t *Timer;
+
+
+//lista de timers.
+unsigned long timerList[32];
 
 
 /*
@@ -154,6 +165,11 @@ void timerEnableTextCursor ();
 void timerDisableTextCursor ();
 
 unsigned long get_systime_info (int n);
+
+struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int type  );
+//#todo destroy timer.
+
+int new_timer_id ();
 
 //
 // End.
