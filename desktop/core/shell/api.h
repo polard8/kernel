@@ -3075,6 +3075,60 @@ struct bmp_infoheader_d
 };
  
 
+ 
+ /*
+ *******************************************************
+ * timer_d:
+ * Estrutura do objeto timer que será usado pelos aplicativos.
+ * 
+ * Precisamos identificar quem está usando para podermos enviar 
+ * mensagem para quem possui o timer.
+ *
+ */
+
+//typedef struct timer_d timer_t; 
+struct timer_d 
+{
+	//Object.
+	object_type_t objectType;
+	object_class_t objectClass;
+	
+	
+	int id;
+	
+	int used;
+	int magic;
+	
+	//1 = one shot 
+	//2 = intermitent
+	
+	int type;
+	
+	//owner.
+    struct process_d *process;
+	struct thread_d *thread;
+	struct window_d *window;
+
+	
+	int count_down;     //--
+	int initial_count_down; //base fixa
+	
+	//quantas vezes o timer se esgotou.
+	unsigned long times;
+	
+	int status;  //??
+	
+ 
+
+ 
+	
+	unsigned long flag; //f
+	unsigned long error; //e
+	
+	//Navegação.
+	struct timer_d *next;
+};
+
 
 //
 // ## Principais chamadas ao sistema ##
@@ -3619,6 +3673,15 @@ int apiDrawText ( struct window_d *window,
 				  
 struct window_d *apiGetWSScreenWindow ();
 struct window_d *apiGetWSMainWindow ();
+
+
+//create timer;
+struct timer_d *apiCreateTimer ( struct window_d *window, 
+                                 unsigned long ms, 
+								 int type );
+
+// pega informações varidas sobre o sys time.
+unsigned long apiGetSysTimeInfo ( int n );
 
 //
 //...

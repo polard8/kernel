@@ -3057,6 +3057,21 @@ struct window_d *apiGetWSMainWindow (){
 
 
 
+//create timer;
+struct timer_d *apiCreateTimer ( struct window_d *window, 
+                                 unsigned long ms, 
+								 int type )
+{
+	return (struct timer_d *) system_call ( 222, 
+	    (unsigned long) window, (unsigned long) ms, (unsigned long) type );
+};
+
+// pega informações varidas sobre o sys time.
+unsigned long apiGetSysTimeInfo ( int n ){
+	
+	return (unsigned long) system_call ( 223, 
+	    (unsigned long) n, (unsigned long) n, (unsigned long) n );
+};
 
 //
 // End.
