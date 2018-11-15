@@ -1774,11 +1774,12 @@ void *systemCreateSystemMenuBar (){
  * systemCheck3TierArchitecture:
  * Checa o status dos serviços oferecidos nas 3 camadas.
  */
+/* 
 void systemCheck3TierArchitecture(){
 	
     //return; //@todo: Nothing for now.
 };
-
+*/
 
 /*
  ***************************************

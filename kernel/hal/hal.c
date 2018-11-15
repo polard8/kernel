@@ -191,15 +191,8 @@ hal_lfb_putpixel ( unsigned long ax,
 	// IN: cor, x, y, 0
 	
 	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
-
-    //? Questionamentos: 	
-	//Coloca um pixel no backbuffer. 
-	// ?? De onde vem essa rotina ??
-	// @todo: Devemos chamar o módulo hal.
 	
-	//gui_buffer_putpixel (); 	
-	swlib_lfb_putpixel();
+	swlib_lfb_putpixel ();
 };
 
 
@@ -232,8 +225,8 @@ int sys_showpciinfo (){
  */
 void sys_reboot (){
 	
-    KiReboot();
-    panic("sys_reboot:");
+    KiReboot ();
+    panic ("sys_reboot:");
 };
 
 
@@ -243,8 +236,8 @@ void sys_reboot (){
  */
 void sys_shutdown (){
 	
-    KiShutDown();
-    panic("sys_shutdown:");
+    KiShutDown ();
+    panic ("sys_shutdown:");
 };
 
 
@@ -261,58 +254,14 @@ void sys_shutdown (){
  * //...
  *
  */
+
+// Consumer Chipsets (Z87, H87, H81) Haswell LGA1150. 
+// Business Chipsets (Q87, Q85, B85) Haswell LGA1150.
+ 
+ 
 int hal_hardware_detect (){
 	
-    //int Status;
-	
-	// Check system struct.	
-	
-	if ( (void *) System == NULL)
-	{
-		//@todo: goto fail.
-	    return (int) 1;    //Fail.	
-	}else{
-		
-		//
-		// @todo: Talvez essa estrutura deva ser inicializada em outra rotina.
-		//        Checar a validade da estrutura system. 
-		//
-		
-		//Initialize.
-		System->NorthBridge = (unsigned long) 0;
-	    System->SouthBridge = (unsigned long) 0;
-		//...
-	};
-	
-	
-	//
-	// 
-	// Consumer Chipsets (Z87, H87, H81) Haswell LGA1150. 
-	// Business Chipsets (Q87, Q85, B85) Haswell LGA1150.
-	//
-	//
-	
-	
-	//
-	// Check North Bridge. (@todo)
-	//
-	
-	
-	//
-	// OBS: As CPUs modernas fazem o papel da north bridge.
-	//
-	
-	
-	
-	//
-	// Check South Bridge.
-	//
-
-    //Continua...
-	
-//done:
-
-    return (int) 0;	
+    return (int) 0;    //#todo	
 };
 
 
@@ -320,6 +269,7 @@ int hal_hardware_detect (){
 //hal_showpciinfo deveria ser a rotina que pci.c chama 
 //para obter acesso as informações em baixo nível.
 //@todo: rever os nomes das funções.
+
 int hal_showpciinfo (){
 	
 	return (int) pciInfo();
@@ -330,6 +280,7 @@ int hal_showpciinfo (){
  * hal_probe_processor_type:
  *     Sonda pra ver apenas qual é a empresa do processador.
  */
+ 
 int hal_probe_processor_type (){
 	
     int MASK_LSB_8 = 0xFF;  
@@ -357,7 +308,7 @@ int hal_probe_processor_type (){
 	    edx == CPUID_VENDOR_INTEL_2 && 
 		ecx == CPUID_VENDOR_INTEL_3 )
 	{
-	    return (int) Processor_INTEL;    //Intel.
+	    return (int) Processor_INTEL;    
 	};
 	
 	// Confere se é AMD
@@ -365,12 +316,11 @@ int hal_probe_processor_type (){
 	    edx == CPUID_VENDOR_AMD_2 && 
 		ecx == CPUID_VENDOR_AMD_3 )
 	{
-	    return (int) Processor_AMD;    //AMD.
+	    return (int) Processor_AMD;    
 	};		
 	
-	//Continua...
+	// Continua...
 	
-fail:		
 	return (int) Processor_NULL;	
 };
 
@@ -382,52 +332,58 @@ fail:
  *     Inicializa apenas o que for independente da arquitetura.
  *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
  */
+ 
 void init_cpu (){
 	
     int Status = 0;
 	
+	//
+	//  ## Processor struct ##
+	//
+	
 	processor = (void *) malloc ( sizeof(struct tagProcessor) );
 	
-	if( (void *) processor == NULL )
+	if ( (void *) processor == NULL )
 	{
-	    printf("init_cpu: processor");
-	    die();
+	    panic ("hal-init_cpu: processor");
 		
-	}else{
+	} else {
 	    
 		//@todo: set processor id: escolhe o processador atual. ??
 	
 	    //Inicializa alguns valores da estrurura.
+		
 	    processor->Gdt = (unsigned long) getGdt();
 	    processor->Idt = (unsigned long) getIdt();
 	    processor->Tss = 0;  //processor->Id=getTss();
         
 		//...
         
-		if( (void *) Hardware != NULL ){
+		if ( (void *) Hardware != NULL ){
 			Hardware->Processor = processor;
 		}
+		
         //Nothing.		
     };	
 	
 	//sonda.
-	//Checa qual cpu é e inicializa mais variaveis.
-	Status = (int) hal_probe_cpu(); 
+	//Checa qual cpu é, e inicializa mais variáveis.
+	
+	Status = (int) hal_probe_cpu (); 
 	
 	if( Status != 0 )
 	{
-	    printf("init_cpu: hal_probe_cpu");
-        die();  		
+	    panic ("init_cpu: hal_probe_cpu Status \n");  		
 	};
 	
     //More?!	
-	
-done:
+
 
 #ifdef HAL_VERBOSE
     printf("Done\n");
 #endif	
 
+    //#todo, o retorno deve ser int, para refletir o status.
     return;
 };
 
@@ -450,18 +406,20 @@ unsigned long hal_get_machine_type (){
  *      Faz inicializações dado o tipo de máquina.
  *      @todo: Trocar o nome para hal_init_current_machine. 
  */
+ 
 int hal_init_machine (){
 	
 	// Limits for machine type.
-	if( g_machine_type < 0 || g_machine_type > 4)
-	{
-	    //#bugbug: Devemos parar aqui.
-		printf("hal_init_machine:\n");
-        return (int) 0;    
+	
+	if ( g_machine_type < 0 || g_machine_type > 4)
+	{   
+		panic ("hal-hal_init_machine:");  
 	};
 	
+	
 	// Type.
-	switch(g_machine_type)    
+	
+	switch (g_machine_type)    
 	{
 		//Unknow.
 	    case 0:
@@ -492,8 +450,7 @@ int hal_init_machine (){
 	};
 
 	//More?!
-	
-done:
+
     return (int) 0;
 };
 
@@ -516,52 +473,55 @@ int hal_probe_cpu (){
 #endif
 	
 	// Check structure.	
-	if((void*) processor == NULL )
+	if ( (void *) processor == NULL )
 	{
-	    printf("hal_probe_cpu: struct\n");
-		//@todo: Aqui não deveria parar.
-		return (int) 1;    //Fail.
+	    panic("hal_probe_cpu: struct\n");
 	};
 	
     //Check vendor.
-    cpuid( 0, eax, ebx, ecx, edx); 
+    cpuid ( 0, eax, ebx, ecx, edx ); 
 
-//Confere se é intel.	
-TestIntel:
-	if( ebx == CPUID_VENDOR_INTEL_1 && 
-	    edx == CPUID_VENDOR_INTEL_2 && 
-		ecx == CPUID_VENDOR_INTEL_3 )
+    //Confere se é intel.	
+    //TestIntel:
+
+	if ( ebx == CPUID_VENDOR_INTEL_1 && 
+	     edx == CPUID_VENDOR_INTEL_2 && 
+		 ecx == CPUID_VENDOR_INTEL_3 )
 	{
 	    processor->Type = Processor_INTEL;
 		return (int) 0;
 	};
 
-//Confere se é Amd.	
-TestAmd:
-	if( ebx == CPUID_VENDOR_AMD_1 && 
-	    edx == CPUID_VENDOR_AMD_2 && 
-		ecx == CPUID_VENDOR_AMD_3 )
+    //Confere se é Amd.	
+    //TestAmd:
+	
+	if ( ebx == CPUID_VENDOR_AMD_1 && 
+	     edx == CPUID_VENDOR_AMD_2 && 
+		 ecx == CPUID_VENDOR_AMD_3 )
 	{
 	    processor->Type = Processor_AMD;
 		return (int) 0;
 	};
 
-//Desconhecido.	
-//@todo: Aqui é um erro fatal.
-Fail:
+    //Desconhecido.	
+    //@todo: Aqui é um erro fatal.
+    //Fail:
+	
 	processor->Type = Processor_NULL;	
-    return (int) 1;
+    //return (int) 1;
+	
+	panic ("hal_probe_cpu: Processor not supported");
 };
 
 
-unsigned long getGdt()
-{
+unsigned long getGdt (){
+	
     return (unsigned long) &gdt; 
 };
 
 
-unsigned long getIdt()
-{
+unsigned long getIdt (){
+	
     return (unsigned long) &idt; 
 };
 
@@ -578,8 +538,8 @@ void hal_vsync (){
  */
 void hal_shutdown (){
 	
-    shutdown();
-    panic("hal_shutdown:");
+    shutdown ();
+    panic ("hal_shutdown:");
 };
 
 
@@ -615,31 +575,21 @@ void hal_shutdown (){
  */
 void shutdown (){
 	
-	
-	// @todo: Background.
-	
-	
-    MessageBox ( gui->screen, 1, "shutdown:", "@todo:" );
-	
-	//
 	// @todo: switch APM, ACPI. modo smm	
 	//        Obs: Aqui, temporariamente, poderia desabilitar todo o
 	//             sistema e permitir que o usuário desligue a energia
 	//             manualmente. 
 	//            (Ex: O computador pode ser desligado com segurança).  
-	//
 	
-//fail:	
-    printf("hal-shutdown: fail");
-    die();
+    panic ("hal-shutdown: fail");
 };
 
 
 /*
- *****************************
  * KiReboot:
  *     Inicialização da parte de hardware do processo de reboot.   
  */
+ 
 void KiReboot (){
 	
 	// @todo: fechar as coisas aqui antes de chamar hal_reboot()
@@ -648,34 +598,23 @@ void KiReboot (){
 	// ficará aqui somente o que prescede o shamamento de hal.
 	// em hal ficarão as rotinas de reiniamento de hardware.
     
-
-    //
     // hal	
     // Reboot via keyboard.	
-	//
 	
-//do_reboot:
-
-    StatusBar( gui->screen, "StatusBar:", "Rebooting...");	
-	
-	refresh_screen();
-	
-	hal_reboot();
-    
-	die();	 
+	hal_reboot ();
+	panic ("KiReboot");
 };
 
 
-
 /*
- **************************************
  * KiShutDown:
  *    @todo: Isso será uma interface para chamar o deligamanto.
  */
+ 
 void KiShutDown (){
 	
-    hal_shutdown();
-    panic("KiShutDown");
+    hal_shutdown ();
+    panic ("KiShutDown");
 };
 
 
@@ -686,8 +625,8 @@ void KiShutDown (){
  */
 void hal_reboot (){
 	
-    asm_reboot(); 
-	panic("hal_reboot:");
+    asm_reboot (); 
+	panic("hal_reboot");
 };
 
 

@@ -20,6 +20,14 @@
  *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
  *     //...
  */
+ 
+ 
+//
+// ## sys storage support ##
+//
+ 
+int system_disk;
+int system_volume; 
 
  
 //======================================== 
@@ -373,11 +381,9 @@ struct version_info_d *VersionInfo;
  * desde informações de boot, até informações seções de usuários.
  * 
  */
-typedef struct system_d system_t;
+
 struct system_d
 {
-	//Segurança, pra sertificar que a estrutura
-	//alocada e esta em uso. e que não esta corrompida.
 	int used;
 	int magic;
 	
@@ -387,26 +393,11 @@ struct system_d
 	
 	
 	//
-	// System Main Bar:
-	//     Barra no topo da tela.    
-	//     Essa é a ferramenta mais importante para ter acesso aos recursos do sistema.
-	//     System | Applications | Window
+	// ## storage ##
 	//
-	//System Window (sw).
-	//
-	struct window_d * swBar;                //Barra.
-	//Left: (Software).
-	struct window_d * swItemSystem;         //Item (System).
-	struct window_d * swItemApplications;   //Item (Applications).  
-	struct window_d * swItemWindow;         //Item (Window).
-	//Right: (Hardware)
-	struct window_d * swItemMore;    //Abre uma bandeija ou menu com mais opções.(V).
-	struct window_d * swItemClock;   //relógio.	
 	
-	//
-	// @todo: Version info.
-	//
-	//struct version_d *version;
+	int disk;
+	int volume;
 	
     //
     // System  info.
@@ -415,146 +406,15 @@ struct system_d
 	int NumberOfProcessors;
 	int PageSize;
 	
-	
-	//
-	// Observação: Recentemente a CPU assumiu funcionalidades que 
-	//              antes eram da Ponte Norte.
-	//
-	
-	//
-	// North Bridge (Device number) word.
-	//
-	unsigned long NorthBridge;
-	
-	//
-	// South Bridge (Device number) word.
-	//
-	unsigned long SouthBridge;
-	
-	//
-	// Estruturas fundamentais do sistema.
-	//
-	
-	//Ponteiro para 3 estruturas básicas de arquivos.
-	struct bootmanager_d  *Boot;      //Boot Manager.
-	struct bootloader_d   *Loader;    //Loader Manager.
-	struct kernel_d       *Kernel;    //Kernel Manager.
-	
-	//Módulos e serviços.
-	//struct bootmanager_d  *systemBoot;      //Boot Manager.
-	//struct bootloader_d   *systemLoader;    //Loader Manager.
-	//struct kernel_d       *systemKernel;    //Kernel Manager.
-	
-	//Recursos.
-	//struct memory_info_d *systemMemoryInfo;
-	//struct gui_d *systemGui;
-	//struct usession_d *systemUserSession; //Essa estrutura tem muitas informações.
-	//...
-	
-	//
-	// Obs: A estrutura de user session terá muitas informações sobre recursos do sistema
-	//      tem pool de diretórios de páginas, pool de objetos, pool de desktops(wstation).
-	//
-	
-	//
-	//Lista de ponteiros de estrutura usadas para gerenciamento do sistema.
-	//
-	//@todo: Isso nao precisa ser assim, pode ser um ponteiro para lista de estruturas
-	// de dispositivos.
-    unsigned long handleList[256];
-	struct devices_d *deviceList;
-	
-    //@todo: criar uma lista de definições de indices para esses handles.	
-	
-	/*
-     * ring0_exported_d:
-     *     Ponteiros para tabelas de funções exportadas pelos
-     *     programas do sistema em ring 0.
-     *     São 3 processos: BM.BIN, BL.BIN. KERNEL.BIN.
-     *
-     */
-	struct ring0_exported_d *ring0_exported;    //Funções exportadas.
-	
-	//...
-};
-system_t *System;
-
-
-//Boot Loader.
-// Estrutura para guardar informações sobre o Boot Loader (BL.BIN).
-typedef struct bootloader_d bootloader_t;
-struct bootloader_d
-{
-    //
-	// Informações básicas (nome do arquivo e endereço na memória).
-    //
-	
-    char *name;               //File name BL.BIN
-	unsigned long address;    //Endereço.
-	
-
-	//
-	// Ponteiro para bloco de informações.
-	//
-	
-    //struct loader_block_d *LoaderBlock;  
-	
-	//
-	// Outras informações
-	//
-	
-	
-	//...	
-};
-bootloader_t *BootLoader; 
-
-
-
-//Boot Manager.
-// Estrutura para guardar informações sobre o Boot Manager (BM.BIN).
-typedef struct bootmanager_d bootmanager_t;
-struct bootmanager_d
-{
-    //
-	// Informações básicas (nome do arquivo e endereço na memória).
-    //
-	
-	char *name;               //File name. (BM.BIN).
-	unsigned long address;    //Endereço.
-	
-	//
-	// Ponteiro para bloco de informações.
-	//
-	
-	//struct boot_block_d *BootBlock;  
-	
-	//
-	// Outras informações
-	//
+	struct devices_d *deviceList;	
 	
 	
 	//...
 };
-bootmanager_t *BootManager;
-
-
-//
-// Variáveis do sistema.
-//
+struct system_d *System;
 
 
 
-//
-// Listas de cores para elemetos gráficos do sistema.
-//
-
-//@todo: Criar índices de cores.
-//unsigned long system_colors[32];
-//unsigned long kernel_colors[32];
-//unsigned long window_colors[32];
-//...
- 
- 
 //
 // Prototypes.
 //
@@ -567,10 +427,10 @@ bootmanager_t *BootManager;
  *    É a int 200.
  *    Obs: Essa rotina está em service.c
  */
-void *services( unsigned long number, 
-                unsigned long arg2, 
-			 	unsigned long arg3, 
-				unsigned long arg4 );
+void *services ( unsigned long number, 
+                 unsigned long arg2, 
+			 	 unsigned long arg3, 
+				 unsigned long arg4 );
 				
 
 				
@@ -584,31 +444,38 @@ void *services( unsigned long number,
  * ou algum processo deseja interagir com o driver de teclado 
  *  ?? planejando a funcionalidade desse diálogo ??
  */
-unsigned long ldisc_dialog( struct window_d *window, 
-                            int msg, 
-							unsigned long long1, 
-							unsigned long long2 ); 
+ 
+unsigned long 
+ldisc_dialog ( struct window_d *window, 
+               int msg, 
+			   unsigned long long1, 
+			   unsigned long long2 ); 
+			   
 							
 /*
  procedimento de janleas do terminal.
-*/				
-unsigned long terminal_dialog( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2); 
+*/
+				
+unsigned long 
+terminal_dialog ( struct window_d *window, 
+                  int msg, 
+				  unsigned long long1, 
+				  unsigned long long2 ); 
 
 								
 /*
  * system_procedure:
  *     O procedimento default do sistema.
  *     Obs: Essa rotina está em procedure.c.  
- */				
-unsigned long system_procedure( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2); 
-													   
+ */			
+ 
+unsigned long 
+system_procedure ( struct window_d *window, 
+                   int msg, 
+				   unsigned long long1, 
+				   unsigned long long2 );
 
+													  
 /*
  * systemcall:
  *     @todo: Essa função deve ser chamada via kernel request quando em kernel mode.
@@ -616,33 +483,37 @@ unsigned long system_procedure( struct window_d *window,
  *     As chamadas ao sistema são feitas via interrupção, ou via kernel request.
  *     ??? @todo: Onde está essa rotina ???
  */
-int systemcall( unsigned long number, 
-                unsigned long ax, 
-				unsigned long bx, 
-				unsigned long cx, 
-				unsigned long dx ); 
+ 
+int 
+systemcall ( unsigned long number, 
+             unsigned long ax, 
+			 unsigned long bx, 
+			 unsigned long cx, 
+			 unsigned long dx ); 
 
 
 /*
  * registra_procedimento:
  *     Registra um procedimento de janela.
  *
- */				
-unsigned long registra_procedimento( unsigned long arg1, 
-                                     unsigned long arg2, 
-									 unsigned long arg3, 
-									 unsigned long arg4);
+ */			
+ 
+unsigned long 
+registra_procedimento ( unsigned long arg1, 
+                        unsigned long arg2, 
+						unsigned long arg3, 
+						unsigned long arg4 );
 									 
-									 
-
 /*
  * SendMessage:
  *     Envia mensagem para um procedimento de janela.
- */									 
-unsigned long SendMessage( struct window_d *window, 
-                  int msg, 
-				  unsigned long long1, 
-				  unsigned long long2 );
+ */	
+ 
+unsigned long 
+SendMessage ( struct window_d *window, 
+              int msg, 
+			  unsigned long long1, 
+			  unsigned long long2 );
 
 
 /*
@@ -650,13 +521,15 @@ unsigned long SendMessage( struct window_d *window,
  *     Help messages.
  *     Obs: Essa rotina está em procedure.c
  */
-void procedureHelp();
+void procedureHelp ();
+
 
 /*
  * systemAbort:
  *     Abort system.
  */
-void systemAbort();
+void systemAbort ();
+
 
 /*
  * SetProcedure:
@@ -664,21 +537,21 @@ void systemAbort();
  */
 void SetProcedure(unsigned long proc);
 
-//
+
 // System Server support.
-//
-int init_systemserver();
+int init_systemserver ();
 
 
 
 
 /*
+ *************************************************************
  * Classes:
- *     O que segue são as funções principais do Kernel. São seis rotinas 
- * chamadoras de serviços.
- * 
- * @todo: Esse esquema de rotians de serviços organizadas em classe precisa 
- * ser replicado para outros sistemas, mesmo em user mode.
+ *
+ * Isso é uma organização que serve de guia para o desenvolvedor. 
+ * O propósito é ajudar na organização do sistema.
+ * Não leve a sério.
+ * É provisório.
  *
  * 1) systemRam
  * 2) systemIoCpu
@@ -689,55 +562,73 @@ int init_systemserver();
  *
  */
 
-void *systemRam( int number, 
-                 unsigned long arg1,  
-		         unsigned long arg2,  
-		         unsigned long arg3,  
-		         unsigned long arg4 );
-void *systemIoCpu( int number, 
-                   unsigned long arg1,  
-		           unsigned long arg2,  
-		           unsigned long arg3,  
-		           unsigned long arg4 );
-void *systemIoDma( int number, 
+void *systemRam ( int number, 
                   unsigned long arg1,  
 		          unsigned long arg2,  
 		          unsigned long arg3,  
 		          unsigned long arg4 );
-void *systemDevicesUnblocked( int number, 
-                              unsigned long arg1,  
-		                      unsigned long arg2,  
-		                      unsigned long arg3,  
-		                      unsigned long arg4 );
-void *systemDevicesBlocked( int number, 
-                            unsigned long arg1,  
-		                    unsigned long arg2,  
-		                    unsigned long arg3,  
-		                    unsigned long arg4 ); 
-void *systemThings( int number, 
+				  
+void *systemIoCpu ( int number, 
                     unsigned long arg1,  
 		            unsigned long arg2,  
 		            unsigned long arg3,  
 		            unsigned long arg4 );
 					
-void *systemNull();  //Metodo nulo.
+void *systemIoDma ( int number, 
+                    unsigned long arg1,  
+		            unsigned long arg2,  
+		            unsigned long arg3,  
+		            unsigned long arg4 );
+					
+void *systemDevicesUnblocked ( int number, 
+                               unsigned long arg1,  
+		                       unsigned long arg2,  
+		                       unsigned long arg3,  
+		                       unsigned long arg4 );
+							   
+void *systemDevicesBlocked ( int number, 
+                             unsigned long arg1,  
+		                     unsigned long arg2,  
+		                     unsigned long arg3,  
+		                     unsigned long arg4 );
+							 
+void *systemThings ( int number, 
+                     unsigned long arg1,  
+		             unsigned long arg2,  
+		             unsigned long arg3,  
+		             unsigned long arg4 );
+					
+
+//Metodo nulo.
+//Pode ser usado em diálogos.
+void *systemNull ();  
+
 	
 /*
+ *******************************************************
  * systemLinkDriver:
  *     Linkando um driver ao sistema operacional
  */
-void *systemLinkDriver(unsigned long arg1, unsigned long arg2, unsigned long arg3);
-
+ 
+void *systemLinkDriver ( unsigned long arg1, 
+                         unsigned long arg2, 
+						 unsigned long arg3 );
+						 
+						 
 /*
+ **********************************************************
  * systemShowDevicesInfo:
  *     Mostrar informações sobre o sistema, seguindo a ordem de
  *     velocidade dos dispositivos e barramentos.
  *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
  *     Apresentar em ordem alfabética.
  */
-void systemShowDevicesInfo();
  
-void *systemCreateSystemMenuBar();  //Cria a barra de menu do sistema.
+void systemShowDevicesInfo ();
+ 
+ 
+//Cria a barra de menu do sistema. 
+void *systemCreateSystemMenuBar ();  
 
 
 
@@ -745,8 +636,10 @@ void *systemCreateSystemMenuBar();  //Cria a barra de menu do sistema.
  * systemCheck3TierArchitecture:
  *     ?? Checa as serviços oferecids nas 3 camadas.
  */
-void systemCheck3TierArchitecture();
-void systemSetupVersion();  //version
+//void systemCheck3TierArchitecture();
+
+
+void systemSetupVersion(); 
 
 /*
  * system_dispatch_to_procedure:

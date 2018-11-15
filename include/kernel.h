@@ -619,19 +619,7 @@ char KernelLogBuffer[512];
 //...
 
 
-/*
- * ring0_exported_d:
- *  Pointers to export tables.
- */
-struct ring0_exported_d
-{
-    unsigned long bm_exported;    //Boot Manager exported functions.
-    unsigned long bl_exported;    //Boot Loader exported functions.
-    unsigned long bk_exported;    //Kernel exported functions.
-    //... 
-};
-struct ring0_exported_d *ring0_exported;
-
+ 
 
 //node od a linked list.
 struct node_d
@@ -687,7 +675,7 @@ struct kernel_classes_d
 struct kernel_classes_d KernelClasses;
 //...
 
-
+/*
 //Kernel Manager.
 struct kernel_d
 {
@@ -707,18 +695,19 @@ struct kernel_d
     // Structs.
     //
 
-    struct bootmanager_d     *BootManagerBlock;  //Boot Manager.
-    struct bootloader_d      *BootLoaderBlock;   //Boot Loader.
-    struct system_d          *SystemBlock;       //System.
-    struct ProcessorBlock_d  *ProcessorBlock;    //Processor info.
+    //struct bootmanager_d     *BootManagerBlock;  //Boot Manager.
+    //struct bootloader_d      *BootLoaderBlock;   //Boot Loader.
+	
+    //struct system_d          *SystemBlock;       //System.
+    //struct ProcessorBlock_d  *ProcessorBlock;    //Processor info.
     //...
 
     //
     // CPUs.
     //
 
-    int processorCount;
-    struct processor_descriptor_t *processorListHead;
+    //int processorCount;
+    //struct processor_descriptor_t *processorListHead;
 
     //kernel_args_t
     //kernel_classes_t
@@ -726,6 +715,7 @@ struct kernel_d
     //...
 };
 struct kernel_d *KernelInfo; 
+*/
 //...
 
 

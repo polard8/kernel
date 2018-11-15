@@ -59,10 +59,10 @@ void teditorRefreshCurrentChar ();
 
 
 unsigned long 
-teditorProcedure( struct window_d *window, 
-                int msg, 
-				unsigned long long1, 
-				unsigned long long2 );
+teditorProcedure ( struct window_d *window, 
+                   int msg, 
+				   unsigned long long1, 
+				   unsigned long long2 );
 
 
 /*
@@ -262,12 +262,10 @@ int mainTextEditor ( int argc, char *argv[] ){
 	// ## Window ##
 	//
     
+	//frame
 	//Criando uma janela para meu editor de textos.
-	apiBeginPaint(); 
 	
-	//hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1,"TEDITOR",
-	//                    20, 20, 800-40, 600-40,    
-    //                    0, 0, 0x303030, 0x303030 );
+	apiBeginPaint(); 
 
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, argv[1],
 	                    wpWindowLeft, wpWindowTop, wsWindowWidth, wsWindowHeight,    

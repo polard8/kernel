@@ -667,30 +667,6 @@ struct process_d
 	
 	//??
 	unsigned long PreviousMode;	
-
-	
-	/*
-	 * Contexto.
-	 *  @todo: Usar uma estrutura de contexto.
-	 #bugbug deletar isso, deixe somente a thread lidar com contexto.
-	 */
-	unsigned short ss;
-    unsigned long esp;
-    unsigned long eflags;
-    unsigned short cs;
-    unsigned long eip;	
-    unsigned short ds;
-    unsigned short es;
-    unsigned short fs;
-    unsigned short gs;
-    unsigned long eax;	
-    unsigned long ebx;
-    unsigned long ecx;
-    unsigned long edx;
-    unsigned long esi;
-    unsigned long edi;
-    unsigned long ebp;
-	//Continua o contexto ...
 	
 	
 	/*

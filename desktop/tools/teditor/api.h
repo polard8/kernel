@@ -523,7 +523,7 @@
 //@todo: Reservar para gerenciamento de energia. 111- 119
 #define	SYSTEMCALL_111  111
 #define	SYSTEMCALL_112  112
-#define	SYSTEMCALL_113  113
+#define	SYSTEMCALL_113  113 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 #define	SYSTEMCALL_114  114
 #define	SYSTEMCALL_115  115
 #define	SYSTEMCALL_116  116
@@ -603,10 +603,10 @@
 #define	SYSTEMCALL_169 169
 
 //170-179 network support
-#define	SYSTEMCALL_170 170
-#define	SYSTEMCALL_171 171
-#define	SYSTEMCALL_172 172
-#define	SYSTEMCALL_173 173
+#define	SYSTEMCALL_170 170  // Print Working Directory. (pwd)
+#define	SYSTEMCALL_171 171  // Get current volume id.
+#define	SYSTEMCALL_172 172  // Listar os arquivos do diretório atual.
+#define	SYSTEMCALL_173 173  // Procurar arquivo. 
 #define	SYSTEMCALL_174 174
 #define	SYSTEMCALL_175 175
 #define	SYSTEMCALL_176 176
@@ -750,326 +750,756 @@
 #define PRIORITY_REALTIME  10    
 
 
+ 
+//
+//  ## COLOR DEFINES ##
+// 
+ 
+ 
+//CORES BÁSICAS.
+#define rgbBlack   0x000000
+#define rgbBlue    0x0000FF
+#define rgbCyan    0x00FFFF
+#define rgbGreen   0x00FF00
+#define rgbMagenta 0xFF00FF
+#define rgbRed     0xFF0000
+#define rgbYellow  0xFFFF00
+#define rgbWhite   0xFFFFFF 
 
- 
- 
+// ## blue support ##
+#define COLOR_BLUE1 0x067AB5
+#define COLOR_BLUE2CYAN   0x1BA1E2
+#define COLOR_BLUE3COBALT 0x0050EF
+#define COLOR_BLUE4INDIGO 0x6A00FF
+
+// ## gray support ## 
 //cinza para pintar janela
 //a janela tem camadas que vai do mais escuro para o mais claro.
-#define xCOLOR_BLACK 0x00000000  //preto
-#define xCOLOR_GRAY1 0x20202000  //cinza mais escuro
-#define xCOLOR_GRAY2 0x40404000  //cinza
-#define xCOLOR_GRAY3 0x60606000  //cinza
-#define xCOLOR_GRAY4 0x80808000  //cinza
-#define xCOLOR_GRAY5 0xa0a0a000  //cinza
-#define xCOLOR_GRAY6 0xc0c0c000  //cinza
-#define xCOLOR_GRAY7 0xe0e0e000  //cinza mais clarinho
-#define xCOLOR_WHITE 0xffffff00  //branco 
-
-
-//WIN23
-//TRÊS TIPOS DE CINZA.
-#define COLOR_LITBUTTON  0xE0E0E000
-#define COLOR_LTGRAY     0xC0C0C000
-#define COLOR_GRAY       0x80808000
-
-//CORES BÁSICAS.
-#define rgbBlack   0x00000000
-#define rgbBlue    0x0000FF00
-#define rgbCyan    0x00FFFF00
-#define rgbGreen   0x00FF0000
-#define rgbMagenta 0xFF00FF00
-#define rgbRed     0xFF000000
-#define rgbYellow  0xFFFF0000
-#define rgbWhite   0xFFFFFF00
-
-
-
-//windows2k system colors
-#define COLOR_TEST_0  0x8080FF00  // COLOR_BACKGROUND(verde claro) ??
-#define COLOR_TEST_1  0x80FFFF00  // COLOR_APPWORKSPACE, MDIWINDOW 
-#define COLOR_TEST_2  0x80FF8000  // COLOR_WINDOW, CLIENT
-#define COLOR_TEST_3  0x80FF0000  // COLOR_WINDOWTEXT, CLIENTTEXT 
-#define COLOR_TEST_4  0xFFFF8000  // COLOR_MENU, MENUBAR
-#define COLOR_TEST_5  0xFF800000  // COLOR_MENUTEXT (laranjado+-)
-#define COLOR_TEST_6  0xC080FF00  // COLOR_ACTIVECAPTION, MYCAPTION
-#define COLOR_TEST_7  0xFF80FF00  // COLOR_INACTIVECAPTION, CAPTION2
-#define COLOR_TEST_8  0x0000FF00  // COLOR_CAPTIONTEXT, CAPTIONTEXT(azul)highlight
-#define COLOR_TEST_9  0x00FFFF00  // COLOR_ACTIVEBORDER, BORDER
-#define COLOR_TEST_10 0x00FF8000  // COLOR_INACTIVEBORDER, BORDER2
-#define COLOR_TEST_11 0x40FF0000  // COLOR_WINDOWFRAME
-#define COLOR_TEST_12 0xFFFF0000  // COLOR_SCROLLBAR (amarelo)
-#define COLOR_TEST_13 0xC0800000  // COLOR_BTNFACE
-#define COLOR_TEST_14 0xC0808000  // COLOR_BTNSHADOW (vinho)
-#define COLOR_TEST_15 0xFF00FF00  // COLOR_BTNTEXT (rosa)
-#define COLOR_TEST_16 0x40408000  // COLOR_HIGHLIGHT ~ COLOR_GRAYTEXT (azul escuro)
-#define COLOR_TEST_17 0x4080FF00  // COLOR_HIGHLIGHT
-#define COLOR_TEST_18 0x00FF0000  // COLOR_HIGHLIGHTTEXT (verde)
-#define COLOR_TEST_19 0x80800000  // COLOR_INACTIVECAPTIONTEXT
-#define COLOR_TEST_20 0x80400000  // COLOR_BTNHIGHLIGHT
-#define COLOR_TEST_21 0xFF808000 
-#define COLOR_TEST_22 0x40008000 
-#define COLOR_TEST_23 0x8000FF00
-#define COLOR_TEST_24 0x00008000  //COLOR_HIGHLIGHT ~ hot track (azul)
-#define COLOR_TEST_25 0x0080FF00 
-#define COLOR_TEST_26 0x00800000 
-#define COLOR_TEST_27 0x40800000 
-#define COLOR_TEST_28 0xFF000000  //red
-#define COLOR_TEST_29 0xA0000000 
-#define COLOR_TEST_30 0x80008000 
-#define COLOR_TEST_31 0xFF008000
-#define COLOR_TEST_32 0x00004000
-#define COLOR_TEST_33 0x00408000 
-#define COLOR_TEST_34 0x00400000 
-#define COLOR_TEST_35 0x40400000 
-#define COLOR_TEST_36 0x80000000 
-#define COLOR_TEST_37 0x40000000 
-#define COLOR_TEST_38 0x40004000
-#define COLOR_TEST_39 0x80004000
-#define COLOR_TEST_40 0x00000000 //COLOR_BTNSHADOW ~ preto text
-#define COLOR_TEST_41 0x00808000  //vrde escuro
-#define COLOR_TEST_42 0x40808000  //vrde escuro
-#define COLOR_TEST_43 0x80808000  //COLOR_APPWORKSPACE (cinza)
-#define COLOR_TEST_44 0x80804000 
-#define COLOR_TEST_45 0xC0C0C000  //silver
-#define COLOR_TEST_46 0x40004000
+#define xCOLOR_BLACK 0x000000  //preto
+#define xCOLOR_GRAY1 0x202020  //cinza mais escuro
+#define xCOLOR_GRAY2 0x404040  //cinza
+#define xCOLOR_GRAY3 0x606060  //cinza
+#define xCOLOR_GRAY4 0x808080  //cinza
+#define xCOLOR_GRAY5 0xa0a0a0  //cinza
+#define xCOLOR_GRAY6 0xc0c0c0  //cinza
+#define xCOLOR_GRAY7 0xe0e0e0  //cinza mais clarinho
+#define xCOLOR_WHITE 0xffffff  //branco  
  
+
+//WIN23 - TRÊS TIPOS DE CINZA.
+#define COLOR_LITBUTTON  0xE0E0E0
+#define COLOR_LTGRAY     0xC0C0C0
+#define COLOR_GRAY       0x808080 
+
+
+// ## black support ##
+// Preto. 
+//50% 	#808080
+//45% 	#737373
+//40% 	#666666
+//35% 	#595959
+//30% 	#4d4d4d
+//25% 	#404040
+//20% 	#333333
+//15% 	#262626
+//10%   #1a1a1a
+//5%    #0d0d0d
+//0%    #000000
+
+//w2k - system colors
+//#bugbug delete;
+#define COLOR_TEST_0  0x8080FF  // COLOR_BACKGROUND(verde claro) ??
+#define COLOR_TEST_1  0x80FFFF  // COLOR_APPWORKSPACE, MDIWINDOW 
+#define COLOR_TEST_2  0x80FF80  // COLOR_WINDOW, CLIENT
+#define COLOR_TEST_3  0x80FF00  // COLOR_WINDOWTEXT, CLIENTTEXT 
+#define COLOR_TEST_4  0xFFFF80  // COLOR_MENU, MENUBAR
+#define COLOR_TEST_5  0xFF8000  // COLOR_MENUTEXT (laranjado+-)
+#define COLOR_TEST_6  0xC080FF  // COLOR_ACTIVECAPTION, MYCAPTION
+#define COLOR_TEST_7  0xFF80FF  // COLOR_INACTIVECAPTION, CAPTION2
+#define COLOR_TEST_8  0x0000FF  // COLOR_CAPTIONTEXT, CAPTIONTEXT(azul)highlight
+#define COLOR_TEST_9  0x00FFFF  // COLOR_ACTIVEBORDER, BORDER
+#define COLOR_TEST_10 0x00FF80  // COLOR_INACTIVEBORDER, BORDER2
+#define COLOR_TEST_11 0x40FF00  // COLOR_WINDOWFRAME
+#define COLOR_TEST_12 0xFFFF00  // COLOR_SCROLLBAR (amarelo)
+#define COLOR_TEST_13 0xC08000  // COLOR_BTNFACE
+#define COLOR_TEST_14 0xC08080  // COLOR_BTNSHADOW (vinho)
+#define COLOR_TEST_15 0xFF00FF  // COLOR_BTNTEXT (rosa)
+#define COLOR_TEST_16 0x404080  // COLOR_HIGHLIGHT ~ COLOR_GRAYTEXT (azul escuro)
+#define COLOR_TEST_17 0x4080FF  // COLOR_HIGHLIGHT
+#define COLOR_TEST_18 0x00FF00  // COLOR_HIGHLIGHTTEXT (verde)
+#define COLOR_TEST_19 0x808000  // COLOR_INACTIVECAPTIONTEXT
+#define COLOR_TEST_20 0x804000  // COLOR_BTNHIGHLIGHT
+#define COLOR_TEST_21 0xFF8080 
+#define COLOR_TEST_22 0x400080 
+#define COLOR_TEST_23 0x8000FF
+#define COLOR_TEST_24 0x000080  //COLOR_HIGHLIGHT ~ hot track (azul)
+#define COLOR_TEST_25 0x0080FF 
+#define COLOR_TEST_26 0x008000 
+#define COLOR_TEST_27 0x408000 
+#define COLOR_TEST_28 0xFF0000  //red
+#define COLOR_TEST_29 0xA00000 
+#define COLOR_TEST_30 0x800080 
+#define COLOR_TEST_31 0xFF0080
+#define COLOR_TEST_32 0x000040
+#define COLOR_TEST_33 0x004080 
+#define COLOR_TEST_34 0x004000 
+#define COLOR_TEST_35 0x404000 
+#define COLOR_TEST_36 0x800000 
+#define COLOR_TEST_37 0x400000 
+#define COLOR_TEST_38 0x400040
+#define COLOR_TEST_39 0x800040
+#define COLOR_TEST_40 0x000000  //COLOR_BTNSHADOW ~ preto text
+#define COLOR_TEST_41 0x008080  //vrde escuro
+#define COLOR_TEST_42 0x408080  //vrde escuro
+#define COLOR_TEST_43 0x808080  //COLOR_APPWORKSPACE (cinza)
+#define COLOR_TEST_44 0x808040 
+#define COLOR_TEST_45 0xC0C0C0  //silver
+#define COLOR_TEST_46 0x400040 
  
 //outros teste
-#define COLOR_TEST_47 0x3366FF00  //azul claro
+#define COLOR_TEST_47 0x3366FF  //azul claro
+
     
+// # testes #
+#define COLOR_ALICEBLUE           0xF0F8FF
+#define COLOR_ANTIQUEWHITE        0xFAEBD7
+#define COLOR_AQUA                0x00FFFF
+#define COLOR_AQUAMARINE          0x7FFFD4 //verde claro.
+#define COLOR_AZURE               0xF0FFFF //azul, quase branco. 
+#define COLOR_BEIGE               0xF5F5DC
+#define COLOR_BISQUE              0xFFE4C4
+#define COLOR_BLANCHEDALMOND      0xFFEBCD
+#define COLOR_BLUEVIOLET          0x8A2BE2
+#define COLOR_BROWN               0xA52A2A
+#define COLOR_BURLYWOOD           0xDEB887
+#define COLOR_CADETBLUE           0x5F9EA0
+#define COLOR_CHARTREUSE          0x7FFF00
+#define COLOR_CHOCOLATE           0xD2691E
+#define COLOR_CORAL               0xFF7F50
+#define COLOR_CORNFLOWERBLUE      0x6495ED
+#define COLOR_CORNSILK            0xFFF8DC
+#define COLOR_CRIMSON             0xDC143C
+#define COLOR_CYAN                0x00FFFF
+#define COLOR_DARKCYAN            0x008B8B
+#define COLOR_DARKGOLDENROD       0xB8860B
+#define COLOR_DARKGRAY            0xA9A9A9
+#define COLOR_DARKKHAKI           0xBDB76B
+#define COLOR_DARKMAGENTA         0x8B008B
+#define COLOR_DARKOLIVEGREEN      0x556B2F
+#define COLOR_DARKORANGE          0xFF8C00
+#define COLOR_DARKORCHID          0x9932CC
+#define COLOR_DARKSALMON          0xE9967A
+#define COLOR_DARKSEAGREEN        0x8FBC8B
+#define COLOR_DARKSLATEBLUE       0x483D8B
+#define COLOR_DARKSLATEGRAY       0x2F4F4F
+#define COLOR_DARKTURQUOISE       0x00CED1
+#define COLOR_DARKVIOLET          0x9400D3
+#define COLOR_DEEPPINK            0xFF1493
+#define COLOR_DEEPSKYBLUE         0x00BFFF
+#define COLOR_DIMGRAY             0x696969
+#define COLOR_DODGERBLUE          0x1E90FF
+#define COLOR_FIREBRICK           0xB22222
+#define COLOR_FLORALWHITE         0xFFFAF0
+#define COLOR_FORESTGREEN         0x228B22
+#define COLOR_FUCHSIA             0xFF00FF
+#define COLOR_GAINSBORO           0xDCDCDC
+#define COLOR_GHOSTWHITE          0xF8F8FF
+#define COLOR_GOLD                0xFFD700
+#define COLOR_GOLDENROD           0xDAA520
+#define COLOR_GRADIENTACTIVECAPTION   0xB9D1EA
+#define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2
+#define COLOR_GREENYELLOW         0xADFF2F
+#define COLOR_HONEYDEW            0xF0FFF0
+#define COLOR_HOTPINK             0xFF69B4 //rosa chiclete.
+#define COLOR_HOTTRACK            0x0066CC //azul legal.
+#define COLOR_INDIANRED           0xCD5C5C
+#define COLOR_INDIGO              0x4B0082 //violeta
+#define COLOR_IVORY               0xFFFFF0
+#define COLOR_KHAKI               0xF0E68C
+#define COLOR_LAVENDER            0xE6E6FA
+#define COLOR_LAVENDERBLUSH       0xFFF0F5
+#define COLOR_LAWNGREEN           0x7CFC00
+#define COLOR_LEMONCHIFFON        0xFFFACD
+#define COLOR_LIGHTCORAL          0xF08080
+#define COLOR_LIGHTCYAN           0xE0FFFF
+#define COLOR_LIGHTGOLDENRODYELLOW 0xFAFAD2
+#define COLOR_LIGHTPINK           0xFFB6C1
+#define COLOR_LIGHTSALMON         0xFFA07A
+#define COLOR_LIGHTSEAGREEN       0x20B2AA
+#define COLOR_LIGHTSKYBLUE        0x87CEFA  //azul clarinho
+#define COLOR_LIGHTSLATEGRAY      0x778899
+#define COLOR_LIGHTSTEELBLUE      0xB0C4DE
+#define COLOR_LIGHTYELLOW         0xFFFFE0
+#define COLOR_LIME                0x00FF00
+#define COLOR_LIMEGREEN           0x32CD32
+#define COLOR_LINEN               0xFAF0E6
+#define COLOR_MAGENTA             0xFF00FF
+#define COLOR_MAROON              0x800000
+#define COLOR_MEDIUMAQUAMARINE    0x66CDAA
+#define COLOR_MEDIUMBLUE          0x0000CD
+#define COLOR_MEDIUMORCHID        0xBA55D3
+#define COLOR_MEDIUMPURPLE        0x9370DB
+#define COLOR_MEDIUMSEAGREEN      0x3CB371
+#define COLOR_MEDIUMSLATEBLUE     0x7B68EE
+#define COLOR_MEDIUMSPRINGGREEN   0x00FA9A
+#define COLOR_MEDIUMTURQUOISE     0x48D1CC
+#define COLOR_MEDIUMVIOLETRED     0xC71585
+#define COLOR_MIDNIGHTBLUE        0x191970
+#define COLOR_MINTCREAM           0xF5FFFA
+#define COLOR_MISTYROSE           0xFFE4E1
+#define COLOR_MOCCASIN            0xFFE4B5
+#define COLOR_NAVAJOWHITE         0xFFDEAD //branco areioso.
+#define COLOR_NAVY                0x000080
+#define COLOR_OLDLACE             0xFDF5E6
+#define COLOR_OLIVE               0x808000
+#define COLOR_OLIVEDRAB           0x6B8E23
+#define COLOR_ORANGE              0xFFA500
+#define COLOR_ORANGERED           0xFF4500
+#define COLOR_ORCHID              0xDA70D6
+#define COLOR_PALEGOLDENROD       0xEEE8AA
+#define COLOR_PALEGREEN           0x98FB98
+#define COLOR_PALETURQUOISE       0xAFEEEE
+#define COLOR_PALEVIOLETRED       0xDB7093
+#define COLOR_PAPAYAWHIP          0xFFEFD5
+#define COLOR_PEACHPUFF           0xFFDAB9
+#define COLOR_PERU                0xCD853F
+#define COLOR_PINK                0xFFC0CB
+#define COLOR_PLUM                0xDDA0DD
+#define COLOR_POWDERBLUE          0xB0E0E6
+#define COLOR_PURPLE              0x800080
+#define COLOR_ROSYBROWN           0xBC8F8F
+#define COLOR_ROYALBLUE           0x4169E1
+#define COLOR_SADDLEBROWN         0x8B4513
+#define COLOR_SALMON              0xFA8072
+#define COLOR_SANDYBROWN          0xF4A460
+#define COLOR_SCROLLBAR           0xC8C8C8
+#define COLOR_SEAGREEN            0x2E8B57
+#define COLOR_SEASHELL            0xFFF5EE  //branco sujinho
+#define COLOR_SIENNA              0xA0522D
+#define COLOR_SKYBLUE             0x87CEEB  //azul claro
+#define COLOR_SLATEBLUE           0x6A5ACD  //azul/violeta
+#define COLOR_SLATEGRAY           0x708090
+#define COLOR_SNOW                0xFFFAFA //branco
+#define COLOR_SPRINGGREEN         0x00FF7F
+#define COLOR_STEELBLUE           0x4682B4 //azul legal.
+#define COLOR_TAN                 0xD2B48C
+#define COLOR_TEAL                0x008080
+#define COLOR_THISTLE             0xD8BFD8
+#define COLOR_TOMATO              0xFF6347
+#define COLOR_TRANSPARENT         0xFFFFFF
+#define COLOR_TURQUOISE           0x40E0D0
+#define COLOR_VIOLET              0xEE82EE
+#define COLOR_WHEAT               0xF5DEB3
+#define COLOR_WHITESMOKE          0xF5F5F5 //branco enfumaçado.
+#define COLOR_YELLOW              0xFFFF00
+#define COLOR_YELLOWGREEN         0x9ACD32
+#define STEALTH_ORANGE            0xFF8800
+#define STEALTH_OLIVE             0x666600
+#define STEALTH_GREEN             0x33DD11
+#define STEALTH_PINK              0xFF22EE
+#define STEALTH_BLUE              0x0077BB
+ 
+// ## text support ##
+#define COLOR_TEXT2  0x00404040   //25%
+#define COLOR_TEXT1  0x00333333   //20% 
+#define COLOR_TEXT   COLOR_TEXT1 
+//#define COLOR_TEXT  0x00000000  
 
-/*
- * Cores usadas nessa sistema.
- */
+ 
+#define COLOR_WINDOW              0x00FFFFFF
+#define COLOR_BLACK               0x000000
+#define COLOR_WHITE               0xFFFFFF 
+#define COLOR_RED                 0xFF0000 
+#define COLOR_GREEN               0x00FF00
+#define COLOR_BLUE                0x0000FF
+#define COLOR_DARKRED             0x8B0000
+#define COLOR_DARKGREEN           0x006400
+#define COLOR_DARKBLUE            0x00008B
+//#define COLOR_GRAY                0x808080
+#define COLOR_GREY                0xAFAFAF
+#define COLOR_LIGHTGRAY           0xD3D3D3
+#define COLOR_LIGHTGREEN          0x90EE90
+#define COLOR_LIGHTBLUE           0xADD8E6
+#define COLOR_SILVER              0xC0C0C0
+ 
 
-#define COLOR_BLACK               0x00000000
-#define COLOR_WHITE               0xFFFFFF00 
-#define COLOR_RED                 0xFF000000 
-#define COLOR_GREEN               0x00FF0000
-#define COLOR_BLUE                0x0000FF00
-#define COLOR_DARKRED             0x8B000000
-#define COLOR_DARKGREEN           0x00640000
-#define COLOR_DARKBLUE            0x00008B00
-//#define COLOR_GRAY                0x80808000
-#define COLOR_GREY                0xAFAFAF00
-#define COLOR_LIGHTGRAY           0xD3D3D300
-#define COLOR_LIGHTGREEN          0x90EE9000
-#define COLOR_LIGHTBLUE           0xADD8E600
-#define COLOR_SILVER              0xC0C0C000
 
-//window colors
-#define COLOR_ACTIVEBORDER        0xB4B4B400
-#define COLOR_ACTIVECAPTION       0x99B4D100
-#define COLOR_ACTIVECAPTIONTEXT   0x00000000
-#define COLOR_APPWORKSPACE        COLOR_SILVER 
+//
+// ## WINDOW COLORS ##
+//   
+ 
+#define COLOR_ACTIVEBORDER        0xB4B4B4
+
+#define COLOR_ACTIVECAPTION       0x99B4D1
+#define COLOR_ACTIVECAPTION_TEXT   0x000000
+
+#define COLOR_APPWORKSPACE  COLOR_SILVER 
+
 // A cor padrão para o Bg é azul quase escuro,
 // o azul escuro é usado em seleção de item.
-#define COLOR_BACKGROUND          0x00808000  
-#define COLOR_BORDER              COLOR_SILVER 
-#define COLOR_BUTTONFACE          0xF0F0F000
-#define COLOR_BUTTONHIGHLIGHT     0xFFFFFF00
-#define COLOR_BUTTONSHADOW        0xA0A0A000  //COLOR_BLACK
-#define COLOR_BUTTONTEXT          COLOR_WINDOWTEXT
-#define COLOR_CONTROL             0xF0F0F000
-#define COLOR_CONTROLDARK         0xA0A0A000
-#define COLOR_CONTROLDARKDARK     0x69696900
-#define COLOR_CONTROLLIGHT        0xE3E3E300
-#define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF00
-#define COLOR_CONTROLTEXT         0x00000000
-#define COLOR_DESKTOP             0x00000000
-#define COLOR_FOCUS_TOPBAR        0x7FFF0000
-#define COLOR_GRAYTEXT            0x80808000
-#define COLOR_HIGHLIGHT           0x3399FF00
-#define COLOR_HIGHLIGHTTEXT       0xFFFFFF00
-#define COLOR_INACTIVEBORDER      0xF4F7FC00
-#define COLOR_INACTIVECAPTION     0xBFCDDB00
-#define COLOR_INACTIVECAPTIONTEXT 0x434E5400
-#define COLOR_INFO                0xFFFFE100
-#define COLOR_INFOTEXT            0x00000000
 
-#define COLOR_MENU                  COLOR_GRAY
-#define COLOR_MENUTEXT              COLOR_BLACK
-#define COLOR_MENUITEM              COLOR_WHITE
-#define COLOR_MENUITEMTEXT          COLOR_BLACK
-#define COLOR_MENUITEM_SELECTED     COLOR_BLUE
-#define COLOR_MENUITEMTEXT_SELECTED COLOR_WHITE
-#define COLOR_MENUBAR               COLOR_GRAY
-#define COLOR_MENUHIGHLIGHT         0x3399FF00
+#define COLOR_BACKGROUND  0x008080  
+#define COLOR_BACKGROUNDTEXT  COLOR_TEXT  
+
+#define COLOR_BORDER  COLOR_SILVER 
+
+
+
+// ## button support ##
+#define COLOR_BUTTONFACE 0xF0F0F0
+#define COLOR_BUTTONFACE2 0xE0E0E0
+#define COLOR_BUTTONFACE3 0xD0D0D0
+#define COLOR_BUTTONHIGHLIGHT 0xFFFFFF
+#define COLOR_BUTTONHIGHLIGHT2 0x404040
+#define COLOR_BUTTONHIGHLIGHTTEXT COLOR_WHITE
+#define COLOR_BUTTONHIGHLIGHTTEXT2 COLOR_WHITE //@todo: branco menos intenso.
+#define COLOR_BUTTONSHADOW 0xA0A0A0
+#define COLOR_BUTTONSHADOW2 0x303030  
+#define COLOR_BUTTONTEXT COLOR_TEXT
+
+
+// # control support #
+#define COLOR_CONTROL             0xF0F0F0
+#define COLOR_CONTROLTEXT COLOR_TEXT
+#define COLOR_CONTROLDARK         0xA0A0A0
+#define COLOR_CONTROLDARKDARK     0x696969
+#define COLOR_CONTROLLIGHT        0xE3E3E3
+#define COLOR_CONTROLLIGHTLIGHT   0xFFFFFF
+#define COLOR_CONTROLLIGHTLIGHTTEXT COLOR_WHITE
+
+#define COLOR_DESKTOP  0x000000
+
+#define COLOR_FOCUS_TOPBAR  0x7FFF00
+
+
+
+//TEXT SUPPORT
+#define COLOR_GRAYTEXT  0x808080
+#define COLOR_HIGHLIGHT           0x3399FF
+#define COLOR_HIGHLIGHTTEXT       0xFFFFFF
+
+
+#define COLOR_INACTIVEBORDER      0xF4F7FC
+#define COLOR_INACTIVECAPTION     0xBFCDDB
+#define COLOR_INACTIVECAPTIONTEXT 0x434E54
+
+#define COLOR_INFO  0xFFFFE1
+#define COLOR_INFOTEXT  TEXT_COLOR
+
+#define COLOR_MENU  COLOR_GRAY
+#define COLOR_MENUTEXT  COLOR_TEXT
+
+#define COLOR_MENUITEM  COLOR_WHITE
+#define COLOR_MENUITEMTEXT  COLOR_TEXT
+
+#define COLOR_MENUITEMSELECTED  COLOR_BLUE
+#define COLOR_MENUITEMSELECTEDTEXT  COLOR_WHITE
+
+#define COLOR_MENUBAR  COLOR_GRAY
+#define COLOR_MENUBARTEXT  COLOR_TEXT
+
+#define COLOR_MENUHIGHLIGHT  0x003399FF
+#define COLOR_MENUHIGHLIGHTTEXT  COLOR_WHITE
 
 #define COLOR_NAVIGATIONBAR       COLOR_BLACK
-#define COLOR_NAVIGATIONBAR_TEXT  COLOR_WHITE
-#define COLOR_STATUSBAR           COLOR_WINDOW
+#define COLOR_NAVIGATIONBARTEXT  COLOR_WHITE
+
+//status bar
+#define COLOR_STATUSBAR  COLOR_WINDOW   //branca
+#define COLOR_STATUSBAR2 xCOLOR_GRAY6   //cinza
+#define COLOR_STATUSBAR3 0x83FCFF       //verde
+//...
+#define COLOR_STATUSBARTEXT      COLOR_TEXT
+
 #define COLOR_TASKBAR             COLOR_WINDOW
-#define COLOR_TASKBAR_TEXT        COLOR_TEXT
-#define COLOR_TEXT                0x00000000
+#define COLOR_TASKBARTEXT        COLOR_TEXT
+
 #define COLOR_TITLEBAR            COLOR_BLUE
-#define COLOR_TITLEBAR_TEXT       COLOR_WHITE
-#define COLOR_TOPBAR              0x83F52C00
-#define COLOR_TOPBAR_TEXT         0x397D0200
-#define COLOR_WINDOW              0xFFFFFF00
-#define COLOR_WINDOWFRAME         COLOR_GRAY
-//(debug: Pink para contraste com quaquer cor de janela)
-#define COLOR_WINDOWTEXT          COLOR_PINK //COLOR_BLACK 
-#define COLOR_WORKSPACE           0x0000FF00 //area de trabalho
+#define COLOR_TITLEBARTEXT       COLOR_TEXT
 
-//Tipos de azul
-#define COLOR_BLUE1 0x067AB500
-#define COLOR_BLUE2CYAN   0x1BA1E200
-#define COLOR_BLUE3COBALT 0x0050EF00
-#define COLOR_BLUE4INDIGO 0x6A00FF00
+#define COLOR_TOPBAR  0x83F52C
+#define COLOR_TOPBARTEXT  COLOR_TEXT
 
-/*
- *  Lista de cores de 32 bit usando Alpha.
- */
+#define COLOR_WINDOWFRAME  COLOR_GRAY
 
-#define COLOR_ALICEBLUE           0xF0F8FFFF
-#define COLOR_ANTIQUEWHITE        0xFAEBD7FF
-#define COLOR_AQUA                0x00FFFFFF
-#define COLOR_AQUAMARINE          0x7FFFD4FF
-#define COLOR_AZURE               0xF0FFFFFF
-#define COLOR_BEIGE               0xF5F5DCFF
-#define COLOR_BISQUE              0xFFE4C4FF
-#define COLOR_BLANCHEDALMOND      0xFFEBCDFF
-#define COLOR_BLUEVIOLET          0x8A2BE2FF
-#define COLOR_BROWN               0xA52A2AFF
-#define COLOR_BURLYWOOD           0xDEB887FF
-#define COLOR_CADETBLUE           0x5F9EA0FF
-#define COLOR_CHARTREUSE          0x7FFF00FF
-#define COLOR_CHOCOLATE           0xD2691EFF
-#define COLOR_CORAL               0xFF7F50FF
-#define COLOR_CORNFLOWERBLUE      0x6495EDFF
-#define COLOR_CORNSILK            0xFFF8DCFF
-#define COLOR_CRIMSON             0xDC143CFF
-#define COLOR_CYAN                0x00FFFFFF
-#define COLOR_DARKCYAN            0x008B8BFF
-#define COLOR_DARKGOLDENROD       0xB8860BFF
-#define COLOR_DARKGRAY            0xA9A9A9FF
-#define COLOR_DARKKHAKI           0xBDB76BFF
-#define COLOR_DARKMAGENTA         0x8B008BFF
-#define COLOR_DARKOLIVEGREEN      0x556B2FFF
-#define COLOR_DARKORANGE          0xFF8C00FF
-#define COLOR_DARKORCHID          0x9932CCFF
-#define COLOR_DARKSALMON          0xE9967AFF
-#define COLOR_DARKSEAGREEN        0x8FBC8BFF
-#define COLOR_DARKSLATEBLUE       0x483D8BFF
-#define COLOR_DARKSLATEGRAY       0x2F4F4FFF
-#define COLOR_DARKTURQUOISE       0x00CED1FF
-#define COLOR_DARKVIOLET          0x9400D3FF
-#define COLOR_DEEPPINK            0xFF1493FF
-#define COLOR_DEEPSKYBLUE         0x00BFFFFF
-#define COLOR_DIMGRAY             0x696969FF
-#define COLOR_DODGERBLUE          0x1E90FFFF
-#define COLOR_FIREBRICK           0xB22222FF
-#define COLOR_FLORALWHITE         0xFFFAF0FF
-#define COLOR_FORESTGREEN         0x228B22FF
-#define COLOR_FUCHSIA             0xFF00FFFF
-#define COLOR_GAINSBORO           0xDCDCDCFF
-#define COLOR_GHOSTWHITE          0xF8F8FFFF
-#define COLOR_GOLD                0xFFD700FF
-#define COLOR_GOLDENROD           0xDAA520FF
-#define COLOR_GRADIENTACTIVECAPTION   0xB9D1EAFF
-#define COLOR_GRADIENTINACTIVECAPTION 0xD7E4F2FF
-#define COLOR_GREENYELLOW         0xADFF2FFF
-#define COLOR_HONEYDEW            0xF0FFF0FF
-#define COLOR_HOTPINK             0xFF69B4FF
-#define COLOR_HOTTRACK            0x0066CCFF
-#define COLOR_INDIANRED           0xCD5C5CFF
-#define COLOR_INDIGO              0x4B0082FF
-#define COLOR_IVORY               0xFFFFF0FF
-#define COLOR_KHAKI               0xF0E68CFF
-#define COLOR_LAVENDER            0xE6E6FAFF
-#define COLOR_LAVENDERBLUSH       0xFFF0F5FF
-#define COLOR_LAWNGREEN           0x7CFC00FF
-#define COLOR_LEMONCHIFFON        0xFFFACDFF
-#define COLOR_LIGHTCORAL          0xF08080FF
-#define COLOR_LIGHTCYAN           0xE0FFFFFF
-#define COLOR_LIGHTGOLDENRODYELLOW 0xFAFAD2FF
-#define COLOR_LIGHTPINK           0xFFB6C1FF
-#define COLOR_LIGHTSALMON         0xFFA07AFF
-#define COLOR_LIGHTSEAGREEN       0x20B2AAFF
-#define COLOR_LIGHTSKYBLUE        0x87CEFAFF
-#define COLOR_LIGHTSLATEGRAY      0x778899FF
-#define COLOR_LIGHTSTEELBLUE      0xB0C4DEFF
-#define COLOR_LIGHTYELLOW         0xFFFFE0FF
-#define COLOR_LIME                0x00FF00FF
-#define COLOR_LIMEGREEN           0x32CD32FF
-#define COLOR_LINEN               0xFAF0E6FF
-#define COLOR_MAGENTA             0xFF00FFFF
-#define COLOR_MAROON              0x800000FF
-#define COLOR_MEDIUMAQUAMARINE    0x66CDAAFF
-#define COLOR_MEDIUMBLUE          0x0000CDFF
-#define COLOR_MEDIUMORCHID        0xBA55D3FF
-#define COLOR_MEDIUMPURPLE        0x9370DBFF
-#define COLOR_MEDIUMSEAGREEN      0x3CB371FF
-#define COLOR_MEDIUMSLATEBLUE     0x7B68EEFF
-#define COLOR_MEDIUMSPRINGGREEN   0x00FA9AFF
-#define COLOR_MEDIUMTURQUOISE     0x48D1CCFF
-#define COLOR_MEDIUMVIOLETRED     0xC71585FF
-#define COLOR_MIDNIGHTBLUE        0x191970FF
-#define COLOR_MINTCREAM           0xF5FFFAFF
-#define COLOR_MISTYROSE           0xFFE4E1FF
-#define COLOR_MOCCASIN            0xFFE4B5FF
-#define COLOR_NAVAJOWHITE         0xFFDEADFF
-#define COLOR_NAVY                0x000080FF
-#define COLOR_OLDLACE             0xFDF5E6FF
-#define COLOR_OLIVE               0x808000FF
-#define COLOR_OLIVEDRAB           0x6B8E23FF
-#define COLOR_ORANGE              0xFFA500FF
-#define COLOR_ORANGERED           0xFF4500FF
-#define COLOR_ORCHID              0xDA70D6FF
-#define COLOR_PALEGOLDENROD       0xEEE8AAFF
-#define COLOR_PALEGREEN           0x98FB98FF
-#define COLOR_PALETURQUOISE       0xAFEEEEFF
-#define COLOR_PALEVIOLETRED       0xDB7093FF
-#define COLOR_PAPAYAWHIP          0xFFEFD5FF
-#define COLOR_PEACHPUFF           0xFFDAB9FF
-#define COLOR_PERU                0xCD853FFF
-#define COLOR_PINK                0xFFC0CBFF
-#define COLOR_PLUM                0xDDA0DDFF
-#define COLOR_POWDERBLUE          0xB0E0E6FF
-#define COLOR_PURPLE              0x800080FF
-#define COLOR_ROSYBROWN           0xBC8F8FFF
-#define COLOR_ROYALBLUE           0x4169E1FF
-#define COLOR_SADDLEBROWN         0x8B4513FF
-#define COLOR_SALMON              0xFA8072FF
-#define COLOR_SANDYBROWN          0xF4A460FF
-#define COLOR_SCROLLBAR           0xC8C8C8FF
-#define COLOR_SEAGREEN            0x2E8B57FF
-#define COLOR_SEASHELL            0xFFF5EEFF
-#define COLOR_SIENNA              0xA0522DFF
-#define COLOR_SKYBLUE             0x87CEEBFF
-#define COLOR_SLATEBLUE           0x6A5ACDFF
-#define COLOR_SLATEGRAY           0x708090FF
-#define COLOR_SNOW                0xFFFAFAFF
-#define COLOR_SPRINGGREEN         0x00FF7FFF
-#define COLOR_STEELBLUE           0x4682B4FF
-#define COLOR_TAN                 0xD2B48CFF
-#define COLOR_TEAL                0x008080FF
-#define COLOR_THISTLE             0xD8BFD8FF
-#define COLOR_TOMATO              0xFF6347FF
-#define COLOR_TRANSPARENT         0xFFFFFF00
-#define COLOR_TURQUOISE           0x40E0D0FF
-#define COLOR_VIOLET              0xEE82EEFF
-#define COLOR_WHEAT               0xF5DEB3FF
-#define COLOR_WHITESMOKE          0xF5F5F5FF
-#define COLOR_YELLOW              0xFFFF00FF
-#define COLOR_YELLOWGREEN         0x9ACD32FF
-#define STEALTH_ORANGE            0xFF880000
-#define STEALTH_OLIVE             0x66660000
-#define STEALTH_GREEN             0x33DD1100
-#define STEALTH_PINK              0xFF22EE00
-#define STEALTH_BLUE              0x0077BB00
+
+// NÃO FAREMOS JANELAS PRETAS
+// PRETO É O BACKGROUND
+#define COLOR_WINDOWTEXT COLOR_TEXT  
+
+//area de trabalho
+#define COLOR_WORKSPACE 0x0000FF00 
+#define COLOR_WORKSPACETEXT COLOR_TEXT
+
+
+// ## virtual terminal support ##
+#define COLOR_TERMINAL  COLOR_BLACK
+#define COLOR_TERMINAL2 0x303030
+//...
+
+#define COLOR_TERMINALTEXT COLOR_WHITE
+#define COLOR_TERMINALTEXT2 xCOLOR_GRAY7
+//...
+
+//
+// ========
+//  
  
  
 /*
  * (w) Colors, futuristic GUI. (Dark blu and Black)
  */ 
+ 
 //#define COLOR_DARKBLUE   0x00008B00 
 //#define COLOR_BLACK      0x00000000 
  
  
- 
-#define COLOR_KERNEL_BACKGROUND COLOR_BLUE     
+#define COLOR_KERNEL_BACKGROUND COLOR_BLUE   
+
+
+
+
+static unsigned long cga_16colors_palette[16] = {
+	
+	//Paleta do paint para 4bpp
+	0x00000000, // 
+	0x80000000, // 
+	0x00800000, // 
+	0x80800000, // 
+	0x00008000, // 
+	0x80008000, // 
+	0x00808000, // 
+	0x80808000, // 
+	
+	0xC0C0C000, // 
+	0xFF000000, // 
+	0x00FF0000, // 
+	0xFFFF0000, // 
+	0x0000FF00, // 
+	0xFF00FF00, // 
+	0x00FFFF00, // 
+	0xFFFFFF00  // 
+};
+
+
+
+static unsigned long vga_256colors_palette[256] = {
+	
+//black
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+0x00000000, 
+	
+	
+//blue	
+0x0000CC00, 
+0x0000CD00,	
+0x0000D000,	
+0x0000D100,	
+0x0000D200,	
+0x0000D300,	
+0x0000D400,	
+0x0000D500,	
+0x0000D600,
+0x0000D700,
+0x0000D800,
+0x0000D900,
+0x0000DA00,
+0x0000DB00,
+0x0000DC00,
+0x0000DD00,	
+	
+	
+	
+ //green
+0x00CC0000, 
+0x00CD0000,	
+0x00D00000,	
+0x00D10000,	
+0x00D20000,	
+0x00D30000,	
+0x00D40000,	
+0x00D50000,	
+0x00D60000,
+0x00D70000,
+0x00D80000,
+0x00D90000,
+0x00DA0000,
+0x00DB0000,
+0x00DC0000,
+0x00DD0000,	
+
+
+
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 	
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 	
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 	
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 
+0x00AAAA00, //cyan 	
+
+
+	
+//red	
+0xCC000000, 
+0xCD000000,	
+0xD0000000,	
+0xD1000000,	
+0xD2000000,	
+0xD3000000,	
+0xD4000000,	
+0xD5000000,	
+0xD6000000,
+0xD7000000,
+0xD8000000,
+0xD9000000,
+0xDA000000,
+0xDB000000,
+0xDC000000,
+0xDD000000,	
+	
+	
+	
+	
+	
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+0xAA00AA00, //magenta
+
+
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+0xAA550000,  //brown
+
+
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+0xAAAAAA00,  //light gray
+
+	
+	//gray
+0x00000000, //#define xCOLOR_BLACK   //preto
+0x20202000, //#define xCOLOR_GRAY1   //cinza mais escuro
+0x40404000, //#define xCOLOR_GRAY2   //cinza
+0x60606000, //#define xCOLOR_GRAY3   //cinza
+0x80808000, //#define xCOLOR_GRAY4   //cinza
+0xa0a0a000, //#define xCOLOR_GRAY5   //cinza
+0xb0b0b000,
+0xc0c0c000, //#define xCOLOR_GRAY6   //cinza
+0xd8d8d800,
+0xd9d9d900,
+0xdadada00,
+0xdbdbdb00,
+0xdcdcdc00,
+0xdddddd00,
+0xe0e0e000, //#define xCOLOR_GRAY7   //cinza mais clarinho
+0xffffff00, //#define xCOLOR_WHITE   //branco 	
+	
+
+	
+//light blue
+0x5555CB00, 
+0x5555CC00,
+0x5555D000,
+0x5555D100,
+0x5555D200,
+0x5555D300,
+0x5555D400,
+0x5555D500,
+0x5555D600,
+0x5555D700,
+0x5555D800,
+0x5555D900,
+0x5555DA00,	
+0x5555DB00,
+0x5555DC00,
+0x5555DD00,	
+	
+	
+//light green	
+0x55CB5500, 
+0x55CC5500,
+0x55D05500,
+0x55D15500,
+0x55D25500,
+0x55D35500,
+0x55D45500,
+0x55D55500,
+0x55D65500,
+0x55D75500,
+0x55D85500,
+0x55D95500,
+0x55DA5500,	
+0x55DB5500,
+0x55DC5500,
+0x55DD5500,	
+	
+	
+	
+		
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	0x55FFFF00, //light cyan
+	
+	
+//light red
+0xCB555500, 
+0xCC555500,
+0xD0555500,
+0xD1555500,
+0xD2555500,
+0xD3555500,
+0xD4555500,
+0xD5555500,
+0xD6555500,
+0xD7555500,
+0xD8555500,
+0xD9555500,
+0xDA555500,	
+0xDB555500,
+0xDC555500,
+0xDD555500,	
+	
+	
+	
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+0xFF55FF00, //light magenta
+
+
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+0xFFFF5500, //yellow
+
+
+
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00, //white
+0xFFFFFF00 //white
+
+};
+
+
+
+
+
+
+
+
 
 
 
@@ -1471,15 +1901,26 @@
 //****
 
 
+
 /*
+ ***********************************************
  * Messages.
- *     Lista de mensagens suportadas pelo sistema.
- *     ...
+ * mensagens para procedimentos de janelas e 
+ * para diálogos dentro do gws.
+ * Obs: Isso refere-se principalmente à janelas.
  */
+
  
-//window (0-19) 
-#define MSG_NULL          0  //@todo: Criar pequeno comentário descritivo.  
-#define MSG_CREATE        1  //...
+ //??tipos de mensagens ??
+#define MSG_NULL          0 
+#define SIGNAL_NULL       0 
+#define STREAM_MSG_NULL   0 
+#define BUFFER_MSG_NULL   0 
+#define CAT_MSG_NULL      0  
+
+ 
+//window (1-19)  
+#define MSG_CREATE        1
 #define MSG_DESTROY       2
 #define MSG_MOVE          3 
 #define MSG_SIZE          4
@@ -1492,17 +1933,36 @@
 #define MSG_ACTIVATE      11
 #define MSG_SHOWWINDOW    12 
 #define MSG_SETCURSOR     13
+#define MSG_HIDE          14
+#define MSG_MAXIMIZE      15
+#define MSG_RESTORE       16
+#define MSG_SHOWDEFAULT   17
+
 //keyboard (20-29)
 #define MSG_KEYDOWN       20
 #define MSG_KEYUP         21
 #define MSG_SYSKEYDOWN    22
 #define MSG_SYSKEYUP      23
+
 //mouse (30 - 39)
+//tem uma lista de eventos de mouse em events.h
 #define MSG_MOUSEKEYDOWN  30
 #define MSG_MOUSEKEYUP    31
+#define MSG_MOUSEBUTTONDOWN	30
+#define MSG_MOUSEBUTTONUP	31 
+#define MSG_MOUSEMOVE	    32
+#define MSG_MOUSEOVER	    33
+#define MSG_MOUSEWHEEL	    34
+#define MSG_MOUSEPRESSED	  35
+#define MSG_MOUSERELEASED	  36
+#define MSG_MOUSECLICKED	  37
+#define MSG_MOUSEENTERED	  38
+#define MSG_MOUSEEXITED	       39
+//#define MSG_MOUSEMOVEBYOFFSET
+//#define MSG_MOUSEMOVETOELEMENT
+
 //outros (40 - ...)
 #define MSG_COMMAND       40
-
 #define MSG_CUT           41
 #define MSG_COPY          42
 #define MSG_PASTE         43
@@ -1511,23 +1971,34 @@
 #define MSG_INSERT        46
 #define MSG_RUN_PROCESS   47
 #define MSG_RUN_THREAD    48
-// Continua ...
-// Muitas outras mensagens podem ser criadas,
-// A variável é do tipo int.
+//Quando um comando é enviado para o console. ele será atendido pelo
+//módulo /sm no procedimento de janela do sistema.
+//Todas as mensagens de console serão atencidas pelo procedimento de janela 
+//nessa mensagem.
+#define MSG_CONSOLE_COMMAND 49
+#define MSG_CONSOLE_SHUTDOWN 50
+#define MSG_CONSOLE_REBOOT   51
+#define MSG_DEVELOPER 52
 //...
 
  
-/*
- * Window Type - Tipos de janela.
- */
+ 
+// # Window Type #
 #define WT_NULL          0 
 #define WT_SIMPLE        1
-#define WT_EDITBOX       2 // igual simples, mais uma bordinha preta.
-#define WT_OVERLAPPED    3 //sobreposta(completa)(barra de titulo + borda +client area)
-#define WT_POPUP         4 //um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
-#define WT_BUTTON_DOWN   5 //rever
-#define WT_BUTTON_UP     6 //rever
-//...
+// igual simples, mais uma bordinha preta.
+#define WT_EDITBOX       2
+// sobreposta(completa)(barra de titulo + borda +client area)  
+#define WT_OVERLAPPED    3  
+// um tipo especial de sobreposta,
+//usada em dialog ou message box. (com ou sem barra de titulo ou borda)
+#define WT_POPUP         4    					   
+#define WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
+#define WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
+#define WT_EDITBOX_MULTIPLE_LINES 7
+#define WT_BUTTON     8   
+#define WT_STATUSBAR  9
+//... 
 
 //apresentação.
 #define VIEW_NULL      0
@@ -1771,17 +2242,498 @@ rect_t *rect;
 
 
 /*
+ *******************************************************
  * window_d:
  *     Window Structure.
  *     @todo: *Deve ficar igual a do kernel.
  *     Obs: Não sei se essa estrutura pode ser pública.
+ *     #bugbug: isso ainda não está igual a do kernel, 
+ * pois ainda está em transformação e não temos nenhuma 
+ * versão definida.
  *
- * Histórico:
- *     2015 - Created.
+ * History:
+ *     2015 - Created by Fred Nora.
  *     Oct 2016 - Revision.
  *     ...
  */
 typedef struct window_d window_t;
+
+ 
+struct window_d
+{
+	
+//  
+// Deve estar em conformidade com a estrutura em user mode.	
+//==================================================		
+
+    // Identificadores.
+	object_type_t objectType;
+	object_class_t objectClass;
+
+	//object control
+	struct object_d *object;	
+
+	
+    unsigned long id;    //Window Id. 
+	char *name;          //Window name.
+	unsigned long type;  //tipo ... (editbox, normal, ...)  style???
+	
+	//Segurança.
+	int used;
+	int magic;	
+	
+	// Características dessa janela..
+	
+	//Estado: (Full,Maximized,Minimized...)
+	int view;      	
+	
+	//dimensões e margens.
+	
+	//#bugbug 
+	//Esses conceitos estão sob revisão.
+	//Estou aprendendo ...
+    
+	//+margem é o deslocamento até encontrar a borda.
+	//+padding é o deslocamento entre a borda e a janela.
+
+    unsigned long left;        //margem esquerda 
+    unsigned long top;         //margem superior
+    unsigned long right;       //margem direita  
+    unsigned long bottom;      //margem inferior  
+	
+    unsigned long width;       //largura
+    unsigned long height;      //altura   
+	
+	//deslocamento dentro da janela ??
+	unsigned long x;           //deslocamento x
+    unsigned long y;           //deslocamento y 
+
+
+    unsigned long color_bg;    //cor  	
+ 	
+// 
+//==================================================
+
+	
+	int msgAlert;  //um alerta de que exite uma mensagem para essa janela.
+	
+	int sendOffset;
+	int receiveOffset;
+	
+	//Filas para uma janela receber mensagens.
+	//São os quatro argumentos de um procedimento de janela padrão.
+	
+
+
+	//
+	// CURRENT MESSAGE !!!
+	// 
+	
+	/* shared by producer and consumer */
+	struct window_d *msg_window;  //arg1.
+	int msg;                      //arg2.
+	unsigned long long1;          //arg3.
+	unsigned long long2;          //arg4.		
+
+    //O aplicativo depois de pegar os 4 elementos, autoriza o 
+    //kernel a colocar uma nova mensagem.
+    //'0' indica que não temos uma mensagem válida.
+    //'1' indica que temos uma nova mensagem.	
+	int newmessageFlag;	
+	
+	//
+	// MESSAGE QUEUE !!!
+	//
+	
+	/* shared by producer and consumer */
+	unsigned long hwndList[32];
+	unsigned long msgList[32];
+	unsigned long long1List[32];
+	unsigned long long2List[32];
+	
+	
+	
+	//procedure support. (poderia ser um argumento ou elemento da classe.)
+	unsigned long procedure;               //procedimento da janela
+    struct window_procedure_d *wProcedure; //procedure struct	
+	
+    int active;    //FAST FLAG. Essa será a flag de ativa ou não. (decidindo isso)
+    int focus;     //Se tem o foco de entrada ou não.
+
+// 
+//==================================================
+
+	// Parent support
+	unsigned long parentid;       //(Número da janela mãe).
+	struct window_d *parent;	  //Parent window.	
+	
+	// Child support.
+	struct window_d *childListHead;  //Lista encadeada de janelas filhas.
+    int childCount;                  //Tamanho da lista.
+    
+	
+// 
+//==================================================
+
+	// Client window support.
+    
+    // É a janela propriamente dita, 
+	// excluindo a moldura e a barra de rolagem.
+	// Tudo o que há dentro da janela menos o frame.
+	// É a parte que é exibida quando a janela está em full screen.
+	struct window_d *client_window;   	
+	struct rect_d *rcClient;     
+	
+	//cor do retângulo da área do cliente.
+    unsigned long clientrect_color_bg;    
+		
+// 
+//==================================================
+		
+	unsigned long CursorX;
+	unsigned long CursorY;
+	unsigned long CursorColor;	
+
+// 
+//==================================================	
+
+
+	// Bars support.
+	// Cada tipo de janela tem seus itens específicos.
+	// Esses são os status dos ítens. Se eles estão presentes ou não.
+	
+	int backgroundUsed;
+	int shadowUsed;
+	int titlebarUsed;
+    int menubarUsed; 
+	int toolbarUsed;
+	int clientAreaUsed;
+	int statusbarUsed;
+	int scrollbarUsed;
+	int minimizebuttonUsed;
+	int maxmizebuttonUsed;
+	int closebuttonUsed;
+	int borderUsed;
+	
+// 
+//==================================================	
+
+	
+	// Buffer.
+	// DedicatedBuffer
+	// DedicatedBuffer --> LFB.
+	// Endereço de memória onde a janela foi pintada.
+	// Obs: Toda janela deve ter seu próprio buffer de pintura para poder 
+	// passar a janela direto de seu próprio buffer para o LFB, sem passar 
+	// pelo Backbuffer.
+	void *DedicatedBuffer;        //Qual buffer dedicado a janela usa.
+	void *BackBuffer;    //Qual backbuffer a janela usa.
+	void *FrontBuffer;   //Qual frontbuffer a janela usa. (LFB).	
+
+
+// 
+//==================================================
+
+	// Desktop support.
+	// A que desktop a janela pertence??
+	
+    int desktop_id;
+	struct desktop_d *desktop; 
+
+// 
+//==================================================
+
+	// Navegation.
+	struct window_d *prev;     
+	struct window_d *next;     //Next window.
+
+	// Trava. Se travada, não pode mudar nada.
+	// Enables or disables mouse and keyboard input to the specified window 
+	// or control.
+	int locked; 	
+	
+// Gramado v 0.1 usa essa estrutura somente até aqui.
+//==================================================
+
+// Update !!
+// ## A partir daqui estamos incluindo novos elementos 
+//    que farão parte da noca versão do Gramado.
+    
+// 
+//==================================================	
+	
+	// Recomeçaremos com a relação entre janelas.
+	struct window_d *owner;
+	struct window_d *child; 
+ 
+ 
+// 
+//==================================================
+	
+	// scroll bar
+	struct window_d *scrollbar;
+	
+	
+	// status bar
+	struct window_d *statusbar;	
+	
+	// Buffer para mensagens pequenas.
+    // Será usado pelo produtor e pelo consumidor.
+    // char read_buf[WINDOW_MSG_BUFFER_SIZE];
+    //
+	//
+	
+	
+    //
+	//@todo: rever esse cursor, pois ja existe na versão 0.1 acima.
+	
+	//Posição do cursor para texto dentro da janela.
+	//Obs: Deve ser multiplo da altura e largura do caractere.
+	//Obs: Para cada janela o cursor pode estar em uma posição diferente.
+	//@todo: Deletar isso e começar usar a estrutura.
+	unsigned long cursor_x;
+	unsigned long cursor_y;
+
+	
+	//unsigned long Icon;
+	//unsigned long Cursor;    //@todo: Criar cursorx e cursory.	
+	
+	
+	//
+	// Window Class support.
+	//
+	
+	struct window_class_d *window_class;
+	
+//unsigned long scancodeList[32];	
+	
+	//
+	// TERMINAL SUPPORT
+	//
+	
+	// Obs: 
+	// Essas variáveis só serão inicializadas se o 
+	// aplicativo decidir que conterá um terminal em sua 
+	// janela.
+	// Um aplicativo só poderá ter um terminal dentro de cada janela.
+	// Ou seja, se um aplicativo quiser ter mais de um terminal virtual, 
+	// vai precisar de uma janela para cada terminal dentro do aplicativo.
+    // isso permite facilmente que um mesmo aplicativo rode vários
+    // programas, um em cada aba.
+    // Ao invés de criar um frame para cada aplicativo que rode em terminal,
+    // é só criar uma nova aba no gerenciador de terminais virtuais ...
+    // esse gerenciador de terminais virtuais poderia ser o shell.bin	
+	//
+	
+	//flags
+	
+	//configura o status do terminal dentro da janela
+	int terminal_used;     //Se é um terminal ou não.
+	
+	//validade e reusabilidade das variáveis de terminal 
+	//dentro da estrutura de janela.	
+	int terminal_magic;
+	
+	//tab
+	//número da tab.
+	//indica qual tab o terminal está usando.
+	//@todo:
+	// Criar uma forma de contar as tabs de terminal 
+	// dentro do gerenciador de terminais.
+	int terminal_tab; // em qual tab do gerenciador de terminais está o terminal.
+	
+	//rect
+	unsigned long teminal_left;
+	unsigned long teminal_top;
+	unsigned long teminal_width;
+	unsigned long teminal_height;
+	
+	unsigned long teminal_right;
+	unsigned long teminal_bottom;		
+	
+	//...
+	
+	//@todo: isso deve pertencer a uma janela.
+	//se uma janela tiver o foco de entrada e for um terminal 
+	//a disciplica de linhas poderá usar essas carcterística do terminal.
+	struct terminal_d *wTerminal; //dd\uitm\terminal.h
+	struct console_d *console;   //dd\uitm\console.h	
+	
+	/*
+     Número da aba do navegador que a janela está.
+     Se for 0, então a janela está no desktop.
+    */
+	int tab;
+	
+	
+	
+    //
+	// style: isso poderia ser estilo de design ...
+	//        Qualquer janela pode ter vários estilos de design 
+    //        ex: um editbox poderá ser de vários estilos.	
+	
+	//window style:
+	//WINDOW_STYLE_FLOATING (flutuante) 
+	//WINDOW_STYLE_DOCKING   (atracada em algum canto)
+	int style;   
+	
+	
+//struct msg_d *msg;
+
+	
+	//unsigned long Background;
+	//int instance; //???	
+	
+	
+    //
+	// Características dessa janela..
+	//
+
+	//*full screen mode = modo tela cheia. 
+	//( utiliza a resolução atual do dispositivo )
+	// deve ser a janela em primeiro plano. acima de todas as outras.
+	//mas podemos configurar para que uma jenela esteja em full screen 
+	//enquanto outra janela é a janela ativa e ainda outra tenha o foco de entrada.
+	//uma janela em modo full screen pode conter barras de rolagem.
+	//*embedded mode = dentro de uma janela ou de um navegador. 
+
+
+    
+    //unsigned long status;                //ATIVA OU NÃO.
+    unsigned long relationship_status;   //seu estatus de relacionamento com outras janelas.
+	
+	//ordem na pilha de janelas do eixo z.
+	//A janela mais ao topo é a janela foreground.
+	
+	int zIndex;    
+
+	//z-order global.
+	//Sua ordem em relação a janela gui->main.    
+	struct zorder_d *zorder;
+
+     
+    //void *buffer;        //Qual buffer dedicado a janela usa.
+
+
+    //...definir mais cores.
+
+
+	//?? Se mudar para Rect pode deletar alguns elementos acima
+	//como x, y, width ...
+	struct rect_d *rcWindow;
+	
+	//Lista encadeada dos retângulos que pertencem a essa janela.
+	//Quando uma janela for deletada, devemos desalocar toda a memória 
+	//uada por esses recursos.
+	struct rect_d *rectList;
+
+
+	//
+	// Buffers support.
+	//
+
+	// Um ponteiro para um array de ponteiros de estruturas de linhas
+	// Explicando: Nesse endereço teremos um array. Cada ponteiro armazenado
+	// nesse array é um ponteiro para uma estrutura de linha.
+	//Obs: @todo: Todos esses elementos podem formar uma estrutura e ficaria aqui 
+	//apenas um ponteiro para ela.
+	void *LineArray;
+	int LineArrayIndexTotal;    //Total de índices presentes nesse array.
+    int LineArrayIndexMax;      //Número máximo de índices permitidos no array de linhas.
+    int LineArrayTopLineIndex;  //Indice para a linha que ficará no topo da página.
+    int LineArrayPointerX;      //Em qual linha o ponteiro está. 	
+	int LineArrayPointerY;      //em qual coluna o ponteiro está.
+	//...
+	
+
+    //
+    //  Process support.
+    //  A que processo a janela pertence??
+    //
+    struct process_d *process;	
+	
+	//
+	// Menus support.
+	//
+	
+	//?? Qual janela o menu usará.
+	struct window_d *menu_window;   //Menu Window.
+	
+	struct menu_d *sysMenu;         //menu de sistema.(control menu)
+	struct menu_d *barMenu;         //menu da barra de menu.
+	struct menu_d *defaultMenu;     //menu da janela (*importante)
+	//...
+	
+    // Flag par indicar se a janela é um item de menu.	
+	//ou um botão.
+	int isMenu;   
+	int isButton;  //#importante: Indica que a janela é um botão.
+	int isEditBox; //#importante: Indica que a janela é um editbox.
+	//int isIcon; 
+	//...
+	
+	// Se a flag indicar que a janela é um botão, então 
+	// essa será a estrutura para o botão.
+	struct button_d *button;
+	
+	int selected;     //seleção  de item de menu.
+    const char *text; //@todo usar unsigned char.
+
+    //
+    // Ações.
+    //
+
+    int draw;     	
+    int redraw;
+    int show;   //se precisa ou não mostrar a janela.	
+    // Continua ...
+	
+	
+	//Continua...
+	
+ 	
+	//
+	// Text Cursor support.
+	//
+
+	//fica para uma versão estendida da estrutura.
+	//Estrutura de cursor para a janela.
+    struct cursor_d	*cursor;
+	
+	//unsigned long bgcolor;		// Background color.
+	//unsigned long fgcolor;		// Foreground color. 
+	
+	struct button_d *current_button;  //Botão atual.      
+    struct button_d *buttonList;      //Lista encadeada de botões em uma janela.
+	
+	//
+	// Mouse cursor support ???
+	//
+	
+	//
+	// Abaixo ficam os elementos referenciados com menor frequência.
+	//
+	
+    //
+	// ?? rever isso 
+	// Status do puxador da janela.
+	// Se está aberta ou não.
+	// HANDLE_STATUS_OPEN ou HANDLE_STATUS_CLOSE
+	//
+	
+	int handle_status;
+	
+	//linked list. ( a linked list da janela)
+	// #bugbug: Não vejo motiva para isso.
+	// #suspenso.
+	//struct linkedlist_d *linkedlist;	
+	
+
+};
+
+
+
+/*
 struct window_d
 {	
 
@@ -1804,15 +2756,26 @@ struct window_d
 	// Características dessa janela..
 	int view;                  //Estado: (Full,Maximized,Minimized...)	
 	 
-    unsigned long x;           //deslocamento x
-    unsigned long y;           //deslocamento y 
-    unsigned long width;       //largura
-    unsigned long height;      //altura
+	//dimensões e margens.
 	
+	//#bugbug 
+	//Esses conceitos estão sob revisão.
+	//Estou aprendendo ...
+    
+	//+margem é o deslocamento até encontrar a borda.
+	//+padding é o deslocamento entre a borda e a janela.
+
     unsigned long left;        //margem esquerda 
     unsigned long top;         //margem superior
     unsigned long right;       //margem direita  
-    unsigned long bottom;      //margem inferior 
+    unsigned long bottom;      //margem inferior  
+	
+    unsigned long width;       //largura
+    unsigned long height;      //altura   
+	
+	//deslocamento dentro da janela ??
+	unsigned long x;           //deslocamento x
+    unsigned long y;           //deslocamento y 
 
     unsigned long color_bg;    //cor 	
 	
@@ -2015,6 +2978,7 @@ struct window_d
 	
 	
 };
+*/
 window_t *CurrentWindow;
 //window_t *Window;
 // As principais janelas usadas pelos utilitários
@@ -2071,21 +3035,115 @@ struct api_receive_message_d
 */
 
 
+//
+// ## BMP support ##
+//
 
+#define BMP_TYPE 0x4D42             /* "MB" */
+
+//OFFSETS
+#define BMP_OFFSET_WIDTH 18
+#define BMP_OFFSET_HEIGHT 22
+#define BMP_OFFSET_BITPLANES 26
+#define BMP_OFFSET_BITCOUNT 28
+//...
+
+typedef struct bmp_header_d bmp_header_t;   
+struct bmp_header_d                     
+{
+    unsigned short bmpType;           /* Magic number for file */
+    unsigned long  bmpSize;           /* Size of file */
+    unsigned short bmpReserved1;      /* Reserved */
+    unsigned short bmpReserved2;      /* ... */
+    unsigned long  bmpOffBits;        /* Offset to bitmap data */
+};
+
+typedef struct bmp_infoheader_d bmp_infoheader_t;   
+struct bmp_infoheader_d                     
+{
+    unsigned long  bmpSize;           /* Size of info header */
+    unsigned long  bmpWidth;          /* Width of image */
+    unsigned long  bmpHeight;         /* Height of image */
+    unsigned short bmpPlanes;         /* Number of color planes */
+    unsigned short bmpBitCount;       /* Number of bits per pixel */
+    unsigned long  bmpCompression;    /* Type of compression to use */
+    unsigned long  bmpSizeImage;      /* Size of image data */
+    unsigned long  bmpXPelsPerMeter;  /* X pixels per meter */
+    unsigned long  bmpYPelsPerMeter;  /* Y pixels per meter */
+    unsigned long  bmpClrUsed;        /* Number of colors used */
+    unsigned long  bmpClrImportant;   /* Number of important colors */
+};
+ 
+
+ 
+ /*
+ *******************************************************
+ * timer_d:
+ * Estrutura do objeto timer que será usado pelos aplicativos.
+ * 
+ * Precisamos identificar quem está usando para podermos enviar 
+ * mensagem para quem possui o timer.
+ *
+ */
+
+//typedef struct timer_d timer_t; 
+struct timer_d 
+{
+	//Object.
+	object_type_t objectType;
+	object_class_t objectClass;
+	
+	
+	int id;
+	
+	int used;
+	int magic;
+	
+	//1 = one shot 
+	//2 = intermitent
+	
+	int type;
+	
+	//owner.
+    struct process_d *process;
+	struct thread_d *thread;
+	struct window_d *window;
+
+	
+	int count_down;     //--
+	int initial_count_down; //base fixa
+	
+	//quantas vezes o timer se esgotou.
+	unsigned long times;
+	
+	int status;  //??
+	
+ 
+
+ 
+	
+	unsigned long flag; //f
+	unsigned long error; //e
+	
+	//Navegação.
+	struct timer_d *next;
+};
 
 
 //
-// Principais chamadas ao sistema.
+// ## Principais chamadas ao sistema ##
 //
 
  
 /*
+ ******************************************************
  * apiSystem: 
- *     Interpreta um comando e envia uma systemcall para o Kernel.
+ *     Interpreta um comando e envia uma systemcall 
+ * para o Kernel.
  *
- * Obs: Há comandos predefinidos, porém um comando pode ser o nome
- * abreviado de um programa ou uma variável de ambiante representando
- * um diretório.
+ * Obs: Há comandos predefinidos, porém um comando 
+ * pode ser o nome abreviado de um programa ou uma 
+ * variável de ambiante representando um diretório.
  *
  * Argumento:
  *     String de comando.
@@ -2097,9 +3155,11 @@ int apiSystem(const char *command);
 
 
 /*
+ ******************************************************
  * system_call: 
- *     Interrupção de sistema, número 200, pode chamar vários serviços do 
- * Kernel com a mesma interrupção. O número do serviço é passado via 
+ *     Interrupção de sistema, número 200, 
+ * pode chamar vários serviços do kernel com a 
+ * mesma interrupção. O número do serviço é passado via 
  * argumento.
  *     Essa é a chamada mais simples.
  *
@@ -2221,8 +3281,13 @@ int edit_box( unsigned long x,
 // 
 
 //int 200 - serviço 17.
+//??rever isso
 int SetNextWindowProcedure(unsigned long next_procedure);
-int chama_procedimento(unsigned long proximo_procedure);  //@todo: traduzir para inglês.
+
+
+//??rever isso
+//@todo: traduzir para inglês.
+int chama_procedimento(unsigned long proximo_procedure);  
  
  
 //Carrega bitmap 16x16.
@@ -2234,8 +3299,8 @@ void carrega_bitmap_16x16( unsigned long img_address,
 void apiInitBackground();
 
 //Message Box.
-void MessageBox(int type, char *string1, char *string2);
-
+int MessageBox ( int type, char *string1, char *string2 );
+int DialogBox ( int type, char *string1, char *string2 );
 
 /*
  * call_kernel:
@@ -2281,11 +3346,12 @@ int call_gui( unsigned long int_number,
 
 
 //
-// Window support.
+// ## Window support ##
 //
 
 					   
 /*
+ **********************************************************
  * APICreateWindow: 
  *     Cria uma janela com base em uma struct.
  *     Retorna o endereço da estrutura da janela criada. 
@@ -2343,13 +3409,29 @@ int APIGetActiveWindow();
 void *apiGetClientAreaRect();
 void apiSetClientAreaRect(struct rect_d *r);
 
+//resize
+void APIresize_window( struct window_d *window, 
+                       unsigned long x, 
+					   unsigned long y );
+					   
+//redraw					   
+void APIredraw_window( struct window_d *window, 
+                       unsigned long flags );
 
-/*window support.*/
-void APIresize_window(struct window_d *window, unsigned long x, unsigned long y);
-void APIredraw_window(struct window_d *window);
-void APIreplace_window(struct window_d *window, unsigned long x, unsigned long y);
+//replace
+void APIreplace_window( struct window_d *window, 
+                        unsigned long x, 
+						unsigned long y );
+						
+//max
 void APImaximize_window(struct window_d *window);
+
+//min
 void APIminimize_window(struct window_d *window);
+
+//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
+void APIupdate_window(struct window_d *window);
+
 void *APIget_foregroung_window();
 void APIset_foregroung_window(struct window_d *window);
 	
@@ -2366,17 +3448,23 @@ void put_char( unsigned long x,
 	
 
 //
-// String support.
+// ## String support ##
 //
 
+//compare
 int api_strncmp(char *s1, char *s2, int len);
 
-//int 200 - serviço 10.
-void print_string( unsigned long x,  
-                   unsigned long y,  
-				   unsigned long color, 
-				   unsigned char *string );
-			  
+
+/*
+ ***************************************
+ * print_string:
+ *     int 200 - serviço 10.
+ */
+void 
+print_string( unsigned long x,  
+              unsigned long y,  
+		      unsigned long color, 
+			  unsigned char *string );
 
 
 //
@@ -2424,11 +3512,13 @@ void apiSetCursor( unsigned long x, unsigned long y);
 
 
 //
-// Process support.
+// ## Process support ##
 //
 
 //Create process.
-void *apiCreateProcess(unsigned long process_eip, unsigned long process_priority, char *name);
+void *apiCreateProcess( unsigned long process_eip, 
+                        unsigned long process_priority, 
+						char *name );
 
 //Mostra informações sobre o processo atual.	
 void APIShowCurrentProcessInfo();
@@ -2436,19 +3526,26 @@ void APIShowCurrentProcessInfo();
 //Torna zombie a thread atual.
 //Obs: Um processo fecha quando fecha a thread principal.
 //@todo: Isso não deveria fechar um processo.
-void exit(int exit_code);	
+//#bugbug: O lugar dessa função é na stdlib, então mudaremos de nome aqui.
+//void exit(int exit_code);
+void apiExit(int exit_code);	
+
 
 //Destrói a thread atual.
 void kill(int exit_code);	
 	
 
 //
-// Thread support.
+// ## Thread support ##
 //
 
 //Create thread.
-void *apiCreateThread(unsigned long thread_eip, unsigned long thread_priority, char *name);
-void apiStartThread(void *Thread); //coloca no estado standby para executar pela primeira vez
+void *apiCreateThread( unsigned long thread_eip, 
+                       unsigned long thread_priority, 
+					   char *name );
+
+//coloca no estado standby para executar pela primeira vez.					   
+void apiStartThread(void *Thread); 
 
 //
 // File support.
@@ -2456,6 +3553,22 @@ void apiStartThread(void *Thread); //coloca no estado standby para executar pela
 
 //Open file.
 void *apiFOpen(const char *filename, const char *mode);
+
+
+/*
+ **********************************************
+ * apiSaveFile:
+ *     Salva um arquivo no diretório raiz 
+ * do volume de boot.
+ *
+ */
+int
+apiSaveFile ( char *file_name, 
+              unsigned long file_size, //size in sectors 
+              unsigned long size_in_bytes,			
+              char *file_address,
+              char flag );  
+
 
 //Operação down em um semáforo indicado no argumento.
 void apiDown(struct semaphore_d *s);
@@ -2485,7 +3598,8 @@ int getpid();
  ***********************************************
  * apiDefDialog:
  *     Procedimento de janela adiado. 
- *     Usado pelos aplicativos ao fim dos seus procedimentos de janela.
+ *     Usado pelos aplicativos ao fim dos seus 
+ * procedimentos de janela.
  */
 unsigned long 
 apiDefDialog( struct window_d *window, 
@@ -2506,26 +3620,68 @@ void api_set_window_with_text_input( struct window_d *window );
 int api_get_window_with_text_input();
 
 
-
+/*
+ ******************************************************
+ * gramadocore_init_execve:
+ *     Um execve apenas para o ambiente gramado core.
+ *     Roda usando o processo init.
+ *
+ */
 int gramadocore_init_execve( const char *filename, 
             const char *argv[], 
             const char *envp[] ); 
+			
 							 
 /* UNIX style */
 int fork();
-
-int execve( const char *filename, 
-            const char *argv[], 
-            const char *envp[] ); 
+int execve ( const char *filename, 
+             const char *argv[], 
+             const char *envp[] ); 
 			
 			
 			
 
 int apiDialog( const char *string );
 
-
-
 int api_getchar();
+
+
+/*
+ * apiDisplayBMP:
+ */
+int apiDisplayBMP ( char *address, 
+                    unsigned long x, 
+				    unsigned long y );
+				   
+				   
+			     
+//Coloca uma mensagem na estrutura de uma janela.				   
+unsigned long apiSendMessage ( struct window_d *window, 
+                               int message,
+                               unsigned long long1,
+                               unsigned long long2 );
+
+
+
+							   
+int apiDrawText ( struct window_d *window, 
+                  unsigned long x, 
+				  unsigned long y, 
+				  unsigned long color, 
+				  char *string );
+				  
+				  
+struct window_d *apiGetWSScreenWindow ();
+struct window_d *apiGetWSMainWindow ();
+
+
+//create timer;
+struct timer_d *apiCreateTimer ( struct window_d *window, 
+                                 unsigned long ms, 
+								 int type );
+
+// pega informações varidas sobre o sys time.
+unsigned long apiGetSysTimeInfo ( int n );
 
 //
 //...
