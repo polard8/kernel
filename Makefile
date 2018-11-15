@@ -23,6 +23,7 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
+	-no-pie \
 	-fleading-underscore \
 	-fno-stack-protector \
 	-s
@@ -321,6 +322,9 @@ x86:
 link-x86:
 	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map kernel/kmap.s
 	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
+	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects)
+	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Xlinker -Map kernel/kmap.s -lgcc
+	
 	
 vhd-x86:
 	nasm -I c:/gramado/arch/x86/boot/vhd/stage1/ \
