@@ -96,7 +96,6 @@ echo ~{ ux3 /mk
 	
 	rem /mk/pc/mm (memory manager)
     gcc -c  c:/gramado/kernel/mk/pc/mm/memory.c  -I c:/gramado/include -o memory.o    
-	rem /mk/pc/mm (memory manager)
     gcc -c  c:/gramado/kernel/mk/pc/mm/pages.c   -I c:/gramado/include -o pages.o 	
 	
 	gcc -c  c:/gramado/kernel/mk/request.c -I c:/gramado/include -o request.o	
@@ -144,12 +143,12 @@ echo ~{ ux2 /execve
 	rem dd/pci
 	gcc -c c:/gramado/kernel/execve/dd/pci/pci.c       -I c:/gramado/include -o pci.o  
 
+	
+	
 	rem dd/network
 	gcc -c c:/gramado/kernel/execve/dd/network/intel.c    -I c:/gramado/include -o nicintel.o
 	gcc -c c:/gramado/kernel/execve/dd/network/network.c  -I c:/gramado/include -o network.o
 	gcc -c c:/gramado/kernel/execve/dd/network/socket.c   -I c:/gramado/include -o socket.o
-	
-
 	
 	rem dd/tty
     gcc -c c:/gramado/kernel/execve/dd/tty/tty.c         -I c:/gramado/include -o tty.o		

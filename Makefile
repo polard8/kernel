@@ -26,13 +26,12 @@ CFLAGS = -m32 \
 	-fleading-underscore \
 	-fno-stack-protector \
 	-s
-	
-	
-	
+
+
 	## 
-    ## Objects 
-    ##
-	
+	## Objects 
+	##
+
 myObjects = head.o \
 x86main.o \
 io.o \
@@ -98,7 +97,7 @@ cf.o \
 search.o \
 format.o \
 disk1.o \
-disk.o \
+diskvol.o \
 fs.o \
 vfs.o \
 cedge.o \
@@ -141,7 +140,9 @@ faults.o \
 services.o  
 
 
-	
+
+
+
 x86:
 	gcc -c kernel/3rdparty/kernel/disk/disk1.c   -I include/ $(CFLAGS) -o disk1.o
 
@@ -151,7 +152,14 @@ x86:
 
 	# /hal
 	gcc -c kernel/hal/hal.c -I include/ $(CFLAGS) -o hal.o
-
+	
+	
+	gcc -c kernel/hal/arch/x86/syscall.c   -I include/ $(CFLAGS) -o syscall.o		
+	gcc -c kernel/hal/arch/x86/cpux86.c    -I include/ $(CFLAGS) -o cpux86.o 
+    gcc -c kernel/hal/arch/x86/x86.c       -I include/ $(CFLAGS) -o x86.o	
+	gcc -c kernel/hal/arch/x86/ports.c     -I include/ $(CFLAGS) -o ports.o 	
+	gcc -c kernel/hal/arch/amd/cpuamd.c    -I include/ $(CFLAGS) -o cpuamd.o 		
+	
 	# /mk
 	gcc -c  kernel/mk/mk.c -I include/  $(CFLAGS) -o mk.o
 
@@ -185,9 +193,8 @@ x86:
 
 	# /mk/pc/mm (memory manager)
 	gcc -c  kernel/mk/pc/mm/memory.c  -I include/ $(CFLAGS) -o memory.o    
+	gcc -c  kernel/mk/pc/mm/pages.c   -I include/ $(CFLAGS) -o pages.o 	
 	
-	# /mk/pc/mm (memory manager)
-	gcc -c  kernel/mk/pc/mm/pages.c  -I include/ $(CFLAGS) -o pages.o 	
 	gcc -c  kernel/mk/request.c      -I include/ $(CFLAGS) -o request.o	
 	gcc -c  kernel/mk/faults.c       -I include/ $(CFLAGS) -o faults.o
 
@@ -231,33 +238,19 @@ x86:
 		
 	#dd/pci
 	gcc -c kernel/execve/dd/pci/pci.c      -I include/ $(CFLAGS) -o pci.o  
-		
-	#dd/sm
-	gcc -c kernel/execve/dd/sm/init/init.c        -I include/ $(CFLAGS) -o init.o
-	gcc -c kernel/execve/dd/sm/ob/object.c        -I include/ $(CFLAGS) -o object.o		
-	gcc -c kernel/execve/dd/sm/network/intel.c    -I include/ $(CFLAGS) -o nicintel.o
-	gcc -c kernel/execve/dd/sm/network/network.c  -I include/ $(CFLAGS) -o network.o
-	gcc -c kernel/execve/dd/sm/network/socket.c   -I include/ $(CFLAGS) -o socket.o
-	gcc -c kernel/execve/dd/sm/sys/modules.c  -I include/ $(CFLAGS) -o modules.o
-	gcc -c kernel/execve/dd/sm/sys/proc.c     -I include/ $(CFLAGS) -o proc.o	
-	gcc -c kernel/execve/dd/sm/sys/abort.c    -I include/ $(CFLAGS) -o abort.o	
-	gcc -c kernel/execve/dd/sm/sys/info.c     -I include/ $(CFLAGS) -o info.o	
-	gcc -c kernel/execve/dd/sm/sys/sm.c       -I include/ $(CFLAGS) -o sm.o
-	gcc -c kernel/execve/dd/sm/sys/channel.c  -I include/ $(CFLAGS) -o channel.o	
-	gcc -c kernel/execve/dd/sm/sys/signal.c   -I include/ $(CFLAGS) -o signal.o	
-	gcc -c kernel/execve/dd/sm/sys/system.c   -I include/ $(CFLAGS) -o system.o
-	gcc -c kernel/execve/dd/sm/sys/io.c       -I  include/ $(CFLAGS) -o io.o	
-	gcc -c kernel/execve/dd/sm/rt/runtime.c   -I include/ $(CFLAGS) -o runtime.o
-	gcc -c kernel/execve/dd/sm/disk/disk.c    -I include/ $(CFLAGS) -o disk.o
-	gcc -c kernel/execve/dd/sm/install/install.c  -I include/ $(CFLAGS) -o install.o    
-	gcc -c kernel/execve/dd/sm/debug/debug.c      -I include/ $(CFLAGS) -o debug.o	
+	
+	
+	gcc -c kernel/execve/dd/network/intel.c    -I include/ $(CFLAGS) -o nicintel.o
+	gcc -c kernel/execve/dd/network/network.c  -I include/ $(CFLAGS) -o network.o
+	gcc -c kernel/execve/dd/network/socket.c   -I include/ $(CFLAGS) -o socket.o
 	
 	# dd/tty
 	gcc -c kernel/execve/dd/tty/tty.c     -I include/ $(CFLAGS) -o tty.o		
-	
+
 	# dd/usb
 	gcc -c kernel/execve/dd/usb/usb.c   -I include/ $(CFLAGS) -o usb.o		
-	
+
+
 	# /fs
 	gcc -c kernel/execve/fs/fs.c      -I include/ $(CFLAGS) -o fs.o	
 	gcc -c kernel/execve/fs/read.c    -I include/ $(CFLAGS) -o read.o	
@@ -266,9 +259,27 @@ x86:
 	gcc -c kernel/execve/fs/search.c  -I include/ $(CFLAGS) -o search.o	
 	gcc -c kernel/execve/fs/format.c  -I include/ $(CFLAGS) -o format.o	
 	gcc -c kernel/execve/fs/vfs.c     -I include/ $(CFLAGS) -o vfs.o	
-	
+
 	# /sci
 	gcc -c kernel/execve/sci/services.c  -I include/ $(CFLAGS) -o services.o	
+	
+	#/sm
+	gcc -c kernel/execve/sm/init/init.c        -I include/ $(CFLAGS) -o init.o
+	gcc -c kernel/execve/sm/ob/object.c        -I include/ $(CFLAGS) -o object.o		
+	gcc -c kernel/execve/sm/sys/modules.c  -I include/ $(CFLAGS) -o modules.o
+	gcc -c kernel/execve/sm/sys/proc.c     -I include/ $(CFLAGS) -o proc.o	
+	gcc -c kernel/execve/sm/sys/abort.c    -I include/ $(CFLAGS) -o abort.o	
+	gcc -c kernel/execve/sm/sys/info.c     -I include/ $(CFLAGS) -o info.o	
+	gcc -c kernel/execve/sm/sys/sm.c       -I include/ $(CFLAGS) -o sm.o
+	gcc -c kernel/execve/sm/sys/channel.c  -I include/ $(CFLAGS) -o channel.o	
+	gcc -c kernel/execve/sm/sys/signal.c   -I include/ $(CFLAGS) -o signal.o	
+	gcc -c kernel/execve/sm/sys/system.c   -I include/ $(CFLAGS) -o system.o
+	gcc -c kernel/execve/sm/sys/io.c       -I  include/ $(CFLAGS) -o io.o	
+	gcc -c kernel/execve/dd/sm/rt/runtime.c   -I include/ $(CFLAGS) -o runtime.o
+	gcc -c kernel/execve/dd/sm/disk/diskvol.c    -I include/ $(CFLAGS) -o diskvol.o
+	gcc -c kernel/execve/dd/sm/install/install.c  -I include/ $(CFLAGS) -o install.o    
+	gcc -c kernel/execve/dd/sm/debug/debug.c      -I include/ $(CFLAGS) -o debug.o	
+	
 	
 	#rem echo ~{ ...
 	#echo ~{ ux1 /gws \o/	
