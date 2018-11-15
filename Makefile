@@ -323,7 +323,7 @@ link-x86:
 	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map kernel/kmap.s
 	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
 	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects)
-	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Xlinker -Map kernel/kmap.s -lgcc
+    # gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Wl,-Map=kernel/kmap.s -lgcc"
 	
 	
 vhd-x86:
