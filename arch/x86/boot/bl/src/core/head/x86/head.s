@@ -79,16 +79,6 @@ KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endereço fisico.
 global _bootloader_entry_point
 _bootloader_entry_point:
 
-	;; sobre a flag.
-	;; * Se é o kernel que está chamando o Boot Loader na forma de 
-	;; módulo do kernel em kernel mode.
-	
-	;; #test
-	;; teste cancelado.
-	
-	;cmp eax, dword 0x12345678
-    ;je _BlKernelModuleMain	
-
     ; #debug.
     ; text mode.
 	
@@ -99,7 +89,6 @@ _bootloader_entry_point:
    
     ;Debug.
     ;JMP $    
-   
     
 	;Salva o modo de vídeo.
     mov byte [bl_video_mode], al
@@ -123,10 +112,14 @@ _bootloader_entry_point:
     mov byte [bl_video_mode], al
     mov dword [_g_lbf_pa], ebx         ;Endereço físico do LFB.
    
-    ;BootBlock pointer.
+    ;;
+	;; ## Boot Block ##
+	;;
+	
+	;BootBlock pointer.
 	;Ponteiro para o bootblock passado pelo boot manager.
+	
     mov dword [_SavedBootBlock], edx        
-    ;mov dword [_SavedBootBlock], ecx
 	
     ;LFB
 	xor eax, eax

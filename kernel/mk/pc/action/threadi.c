@@ -64,9 +64,9 @@ unsigned long KiGetTaskStatus ()
  *
  * ?? isso está muito estranho !!
  */
-void 
-KiSaveContextOfNewTask( int id, unsigned long *task_address )
-{
+ 
+void KiSaveContextOfNewTask ( int id, unsigned long *task_address ){
+	
     //return;
 };
 
@@ -158,7 +158,6 @@ void KiMostraSlot (int id){
 void KiMostraReg (int id){
 	
 	//mostra_reg(id);
-    //return;
 };
 
 
@@ -321,36 +320,39 @@ void mostra_reg (int id){
 	// Limits.
     if ( id < 0 || id >= THREAD_COUNT_MAX ){
 		
-	    goto fail;
+	    printf ("fail\n");	
+		return;
 	}
 	
 	// Structure.
     t = (void *) threadList[id];
 	
-	if ( (void *) t == NULL ){
+	if ( (void *) t == NULL )
+	{	
+	    
+		printf ("fail\n");	
+		return;
 		
-	    goto fail;
-	}
-    	
-	// Show registers.	
-    printf("\n");
-	printf("eflags=[%x]\n", t->eflags);
-	printf("cs:eip=[%x:%x]\n", t->cs, t->eip );
-	printf("ss:esp=[%x:%x]\n", t->ss, t->esp ); 
-    
-	printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
-	    t->ds, t->es, t->fs, t->gs );
+	} else {
+		
+		
+	    // Show registers.	
+        
+	    printf("\n eflags=[%x]", t->eflags);
+	    printf("\n cs:eip=[%x:%x] ss:esp=[%x:%x]", 
+		    t->cs, t->eip, t->ss, t->esp );
+			
+	    printf("\n ds=[%x] es=[%x] fs=[%x] gs=[%x]",
+	        t->ds, t->es, t->fs, t->gs );
 	
-	printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",
-	    t->eax, t->ebx, t->ecx, t->edx ); 
-    
-	goto done;
-
+	    printf("\n a=[%x] b=[%x] c=[%x] d=[%x]\n",
+	        t->eax, t->ebx, t->ecx, t->edx );
+			
+			
+		//...	
+	};
 	
-fail:	
-    printf("fail\n");	
-done:
-    return; 
+    //return; 
 };
 
 
@@ -382,7 +384,7 @@ void set_thread_priority ( struct thread_d *t, unsigned long priority ){
 		return;
 	}
 	
-do_change:
+//do_change:
 	
 	// se aprioridade solicitada for diferente da prioridade atual.
 	if ( priority != ThreadPriority )
@@ -414,9 +416,10 @@ do_change:
 		*/
 		
     };
+	
 //Done.
-done:
-    return;	
+//done:
+    //return;	
 };
 
 
@@ -426,12 +429,12 @@ done:
  *     Altera o endereço do diretório de páginas de uma thread.
  *     Apenas a variável. Não altera o CR3.
  */
+ 
 void SetThreadDirectory ( struct thread_d *thread, unsigned long Address ){
 	
     if ( (void *) thread == NULL )
 	{
         return;
-		//goto fail;
         
 	}else{
 		
@@ -441,13 +444,6 @@ void SetThreadDirectory ( struct thread_d *thread, unsigned long Address ){
 		
 		thread->DirectoryPA = (unsigned long) Address;	
 	};
-	
-//Nothing.		
-//done:
-	
-	
-//fail:
-	//return;
 };
 
 
@@ -456,6 +452,7 @@ void SetThreadDirectory ( struct thread_d *thread, unsigned long Address ){
  * GetThreadDirectory:
  *     Pega o endereço do diretório de páginas de uma thread.
  */
+ 
 unsigned long GetThreadDirectory ( struct thread_d *thread ){
 	
     if ( (void *) thread == NULL )
@@ -509,6 +506,7 @@ void show_tasks_parameters(){
  * liberada, apenas alteramos se estado.
  *
  */
+ 
 void release ( int tid ){
 	
     struct thread_d *Thread;
@@ -684,23 +682,24 @@ done:
  * @todo
  *     Alerta o processo que a thread morreu.
  */
+ 
 void dead_thread_collector (){
 	
 	int i;
     struct thread_d *Thread;   	  
     struct process_d *p;         
 	
-Scan:
+//Scan:
 	
 	for ( i=0; i < THREAD_COUNT_MAX; i++ )
 	{
 	    Thread = (void *) threadList[i];
 		
-		if( (void *) Thread != NULL )
+		if ( (void *) Thread != NULL )
 		{
-		    if( Thread->state == ZOMBIE && 
-			    Thread->used == 1 && 
-				Thread->magic == 1234 )
+		    if ( Thread->state == ZOMBIE && 
+			     Thread->used == 1 && 
+				 Thread->magic == 1234 )
 			{
 				
 				if( Thread->tid == idle )
@@ -744,8 +743,9 @@ Scan:
 	// * MOVEMENT 10 (zombie --> Dead)
 	// * MOVEMENT 11 (zombie --> Initialized) .. reinicializar.
 	
-done: 	
-	return;
+//done: 
+	//return;
+	
 };
 
 
@@ -754,6 +754,7 @@ void kill_all_threads (){
 	int i;
     
 	for ( i=0; i < THREAD_COUNT_MAX; i++ ){
+		
 	    kill_thread (i);	
 	}
 };

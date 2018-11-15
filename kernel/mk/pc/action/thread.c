@@ -438,7 +438,6 @@ void *GetCurrentThread (){
 	
     struct thread_d *Current;
 	
-	//Limits.
 	if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
 		return NULL;
 	}
@@ -449,8 +448,6 @@ void *GetCurrentThread (){
         return NULL;
 	}
 	
-//Done.
-//done:
 	return (void *) Current;
 };
 
@@ -483,34 +480,33 @@ void *FindReadyThread (){
 	    };
         //Nothing.		
 	};
+	
 //Nenhuma foi encontrada.   
 //fail:
     return NULL;
 };
 
 
-
 /*
  ********************************************************
  * SelectForExecution:
- *     Um thread entra em standby, sinalizando que está 
- * pronto para entrar em execução.
- *     Nesse caso, durante a rotina de taskswitch, 
- * checar-se-a se existe um thread em estado standby, 
- * caso haja, a thread é colocada pra executar pelo 
- * método spawn. Esse método de spawn já foi testado, 
- * segundo a contagem, duas thread começaram a rodas 
- * através desse método de spawn. 
- * Provavelmente as threads 'shell' e 'taskman', 
- * pois a thread 'idle' é chamada com um spawn 
- * exclusivo para ela, o que é desnecessário e 
+ *     Um thread entra em standby, sinalizando que está pronto para entrar 
+ * em execução.
+ *     Nesse caso, durante a rotina de taskswitch, checar-se-a se existe um 
+ * thread em estado standby, caso haja, a thread é colocada pra executar pelo 
+ * método spawn. 
+ * Esse método de spawn já foi testado, segundo a contagem, duas thread 
+ * começaram a rodas através desse método de spawn. 
+ * Provavelmente as threads 'shell' e 'taskman', pois a thread 'idle' é 
+ * chamada com um spawn exclusivo para ela, o que é desnecessário e 
  * poderá ser revisto. @todo
  *     
  *  *** MOVIMENTO 1, (Initialized --> Standby).
  */
 void SelectForExecution ( struct thread_d *Thread ){
 	
-	if ( (void *) Thread == NULL){
+	if ( (void *) Thread == NULL)
+	{
         return;
 	} 
 
@@ -525,10 +521,11 @@ void SelectForExecution ( struct thread_d *Thread ){
 	// não pode entrar em stadby.
 	
 //setState:
-    //*MOVIMENTO 1, (Initialized --> Standby).
-    Thread->state = (int) STANDBY;
+    
+	//*MOVIMENTO 1, (Initialized --> Standby).
+    
+	Thread->state = (int) STANDBY;
 	queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );	
-	//return;
 };
 
 
@@ -540,6 +537,7 @@ int GetThreadState (struct thread_d *Thread){
 	}
 	return (int) Thread->state;
 };
+
 
 //Get Type. (Zero é tipo NULL?).
 int GetThreadType (struct thread_d *Thread){
@@ -561,10 +559,11 @@ void show_thread_information (){
 	
 	struct thread_d *Current;	
 	
-	printf("Threads info:\n");		
+	printf("show_thread_information:\n");		
 	
 	//Limits.
 	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+		
 		return;
 	}
 	
@@ -574,7 +573,8 @@ void show_thread_information (){
 	{
 	    printf("pc-thread-show_thread_information:\n");	
 	    return;
-	}else{
+		
+	} else {
 	    
 		printf("currentTID={%d}\n",current_thread);
 		//...
@@ -584,7 +584,7 @@ void show_thread_information (){
 
 	//Mostra Slots. 
 	//threadi.c
-    mostra_slots();    
+    mostra_slots ();    
 	
 	/*
 	 * @todo: 
@@ -596,11 +596,11 @@ void show_thread_information (){
 	
 	//Nothing for now!
 	
-//Done.	
-done:	
+
     printf("Done\n");
 	refresh_screen();
-	return;
+	
+	//return;
 };
 
 
@@ -644,9 +644,6 @@ int init_threads (){
 	//
 	// @todo: Nada mais?
 	//
-	
-//Done.	
-//done:
 
 	return (int) 0;
 };
@@ -660,7 +657,6 @@ int init_threads (){
  * Esse é o serviço 137.
  * Isso é usado pela biblioteca stdio em user mode na função getchar().
  */
- 
 
 int thread_getchar (){
 	

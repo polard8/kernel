@@ -165,7 +165,7 @@ void ata_cmd_write (_i32 cmd_val){
 _u8 ata_assert_dever (_i8 nport){
 
     switch (nport){
-		
+
     case 0:
         ata.channel = 0;
         ata.dev_num = 0;
@@ -183,7 +183,7 @@ _u8 ata_assert_dever (_i8 nport){
         ata.dev_num = 1;
     break;
     
-	default:
+    default:
         kprintf ("Port %d, volue not used\n", nport );
         return -1;
      break;
@@ -201,26 +201,26 @@ _u8 ata_assert_dever (_i8 nport){
  * 
  */
 int ide_identify_device ( uint8_t nport ){
-	
+
     _u8 status;
     _u8 lba1, lba2;
 
-    ata_assert_dever(nport);
+    ata_assert_dever (nport);
 
-    // Ponto flutuante
+	// Ponto flutuante
 	//Sem unidade conectada ao barramento
     
-	if ( ata_status_read() == 0xff )
-	{
+    if ( ata_status_read() == 0xff )
+    {
         return (int) -1;
-	}
+    }
 
     outb ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-	outb ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0   
-	outb ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
-	outb ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
+    outb ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0
+    outb ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
+    outb ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
 
-    
+
     // Select device,
     outb ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 0xE0 | ata.dev_num << 4 );
     ata_wait(400);
@@ -228,24 +228,122 @@ int ide_identify_device ( uint8_t nport ){
     // cmd
     ata_cmd_write (ATA_CMD_IDENTIFY_DEVICE); 
     
-	// ata_wait_irq();
+    // ata_wait_irq();
     // Nunca espere por um IRQ aqui
     // Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
     // Melhor seria fazermos polling
-     
+
     ata_wait(400);
 
 
 	//Sem unidade no canal
-    
-	if ( ata_status_read() == 0 )
-	{  
-        return (int) -1;
-	}
 
-	
-   lba1 = inb ( ata.cmd_block_base_address + ATA_REG_LBA1 );
-   lba2 = inb ( ata.cmd_block_base_address + ATA_REG_LBA2 );
+    if ( ata_status_read() == 0 )
+    {  
+        return (int) -1;
+    }
+
+
+    lba1 = inb ( ata.cmd_block_base_address + ATA_REG_LBA1 );
+    lba2 = inb ( ata.cmd_block_base_address + ATA_REG_LBA2 );
+
+    //
+    //    ## type ## 
+    //
+
+
+	//PATA
+    if ( lba1 == 0 && lba2 == 0 )
+    {
+        // kputs("Unidade PATA\n");
+        // aqui esperamos pelo DRQ
+        // e eviamoos 256 word de dados PIO
+
+        ata_wait_drq();
+        ata_pio_read ( ata_identify_dev_buf, 512 );
+
+        ata_wait_not_busy();
+        ata_wait_no_drq();
+
+        //salvando o tipo em estrutura de porta.
+        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].magic = (int) 1234;
+        ide_ports[nport].name = "PATA";	
+        ide_ports[nport].type = (int) idedevicetypesPATA;
+
+        return (int) 0;
+
+
+	//SATA
+    }
+    else if ( lba1 == 0x3C && lba2 == 0xC3 ){
+
+        //kputs("Unidade SATA\n");   
+        // O dispositivo responde imediatamente um erro ao cmd Identify device
+        // entao devemos esperar pelo DRQ ao invez de um BUSY
+        // em seguida enviar 256 word de dados PIO.
+
+        ata_wait_drq(); 
+        ata_pio_read ( ata_identify_dev_buf, 512 );
+        ata_wait_not_busy();
+        ata_wait_no_drq();
+
+        //salvando o tipo em estrutura de porta.
+        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].magic = (int) 1234;
+        ide_ports[nport].name = "SATA";	
+        ide_ports[nport].type = (int) idedevicetypesSATA;
+
+        return (int) 0;
+
+    //PATAPI
+    }
+    else if ( lba1 == 0x14 && lba2 == 0xEB )
+    {
+        //kputs("Unidade PATAPI\n");   
+        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_wait(400);
+        ata_wait_drq(); 
+        ata_pio_read ( ata_identify_dev_buf, 512 );
+        ata_wait_not_busy();
+        ata_wait_no_drq();
+
+        //salvando o tipo em estrutura de porta.
+        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].magic = (int) 1234;
+        ide_ports[nport].name = "PATAPI";
+        ide_ports[nport].type = (int) idedevicetypesPATAPI;
+
+        return (int) 0x80;
+
+    //SATAPI
+    }
+    else if (lba1 == 0x69  && lba2 == 0x96){
+
+        //kputs("Unidade SATAPI\n");   
+        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_wait(400);
+        ata_wait_drq(); 
+        ata_pio_read(ata_identify_dev_buf,512);
+        ata_wait_not_busy();
+        ata_wait_no_drq();
+
+        //salvando o tipo em estrutura de porta.
+        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].magic = (int) 1234;
+        ide_ports[nport].name = "SATAPI";
+        ide_ports[nport].type = (int) idedevicetypesSATAPI;
+
+        return (int) 0x80;
+
+    }
+
+
+   /*
 
    if ( lba1 == 0x14 && lba2 == 0xEB )
    {
@@ -256,16 +354,16 @@ int ide_identify_device ( uint8_t nport ){
         ata_pio_read ( ata_identify_dev_buf, 512 );
         ata_wait_not_busy();
         ata_wait_no_drq();
-		
+
         //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
-		ide_ports[nport].used = (int) 1;
-		ide_ports[nport].magic = (int) 1234;
-		ide_ports[nport].name = "PATAPI";			
-		ide_ports[nport].type = (int) idedevicetypesPATAPI;
-        
+        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].used = (int) 1;
+        ide_ports[nport].magic = (int) 1234;
+        ide_ports[nport].name = "PATAPI";
+        ide_ports[nport].type = (int) idedevicetypesPATAPI;
+
         return (int) 0x80;
-		
+
    }
    else if (lba1 == 0x69  && lba2 == 0x96){
 
@@ -288,7 +386,7 @@ int ide_identify_device ( uint8_t nport ){
 
    }
    else if (lba1 == 0x3C && lba2 == 0xC3){
-	   
+
         //kputs("Unidade SATA\n");   
         // O dispositivo responde imediatamente um erro ao cmd Identify device
         // entao devemos esperar pelo DRQ ao invez de um BUSY
@@ -328,6 +426,8 @@ int ide_identify_device ( uint8_t nport ){
 		
         return (int) 0;
     };
+	
+	*/
 
 	
 	return (int) 0;   

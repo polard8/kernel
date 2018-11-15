@@ -1372,11 +1372,11 @@ shellProcedure( struct window_d *window,
 					break;
 					
 				case VK_F2:
-				    testChangeVisibleArea();
+				    //testChangeVisibleArea();
 					break;
 					
 				case VK_F3:
-				    shellRefreshVisibleArea();
+				    //shellRefreshVisibleArea();
 					break;
 					
 				//...

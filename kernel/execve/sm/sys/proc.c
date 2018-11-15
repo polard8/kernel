@@ -507,6 +507,14 @@ system_procedure ( struct window_d *window,
 				case VK_F1:	
 					// #importante 
 					// Mostraremos a ajuda do aplicativo.
+					
+					
+					//1 = initialize.
+					diskATADialog ( 1, FORCEPIO, FORCEPIO );
+					show_ide_info ();
+                    //rotina provisória de teste de read.
+					//procTestF6();
+					
 					break;
 					
 				
@@ -519,6 +527,7 @@ system_procedure ( struct window_d *window,
                 //CPU info.
                 //intel? deveria ser independente. 				
                 case VK_F3: 
+					
 					//show_cpu_intel_parameters();
 					break;
 					
@@ -589,11 +598,7 @@ system_procedure ( struct window_d *window,
                 //testes				
 				case VK_F6:
 										
-					//1 = initialize.
-					//diskATADialog ( 1, FORCEPIO, FORCEPIO );
-					//show_ide_info ();
-                    //rotina provisória de teste de read.
-					//procTestF6();
+
                     					
 					
 					//

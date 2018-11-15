@@ -1,5 +1,5 @@
 ;-----------------------------------------------------
-; File: msm\start.inc 
+; File: stage3\start.inc 
 ;
 ; Descrição: 
 ;     Início do modo protegido. 
@@ -235,22 +235,13 @@ startGUI:
 	lgdt [lgdt_opcode] 
 	lidt [lidt_opcode]	
 	
-	
-	;;
 	;; @todo: Nessa hora alguns vetores podem ser configurados.
 	;;        primeiro as excessões e depois as ISRs.
-	;;
-
-	;;
 	;; Selecting the 'Processor Interrup Mode'.
 	;; * PIC MODE *
-	;;
-		
-	;;
     ;; Todos os componentes APIC são ignorados e o sistema opera
     ;; no modo single-thread usando LINT0.
-    ;;	
-		
+
 ;.setupPICMODE:	
 
 	;PIC.
@@ -271,30 +262,6 @@ startGUI:
 	out 0x21, al
 	out 0xA1, al
 	
-	
-	;;
-	;; Configurando os timers do sistema.
-	;; Nossa opção agora é o PIT.
-	;; @todo: Para o RTC podemos fazer uma pequena inicialização agora.
-	;; pois um módulo mais completo está no kernel base.
-	;; #importante: #bugbug
-	;; Talvez seja um erro configurarmos o PIT agora,
-	;; Pois todas essas interrupções podem 
-	;; prejudicar o carregamento no boot loader.
-	;; Obs: Testando sem essa configuração.
-	;;
-	
-	;TIMER.
-	;mov al, byte 0x36
-	;mov dx, word 0x43
-	;out dx, al
-	;mov eax, dword 11930    ;Timer frequency 100 HZ.
-	;mov dx, word 0x40
-	;out dx, al
-	;mov al, ah
-	;out dx, al
-	
-		
 	
 	;;@todo:
 	;;Init RTC.
@@ -356,12 +323,10 @@ startGUI:
     mov dword [g_current_fat_lba],        FAT16_FAT_LBA       ;Fat do volume atual
     mov dword [g_current_directory_lba],  FAT16_ROOTDIR_LBA   ;Diretório do volume atual.
 	mov dword [g_current_dataarea_lba],   FAT16_DATAAREA_LBA  ;?? ;lba do inicio da area de dados do volume atual.
-	;Continua...
-		
+	;Continua...	
 	
 
 	
-    ;;
     ;; Configurando PCI. (O básico suportado pelo Boot Manager.)
 	;; O boot manager está carregando o BL utilizando recursos 
 	;; do BIOS em modo real. Mas se o BM fosse carregar o BL 
@@ -369,7 +334,6 @@ startGUI:
 	;; (Se possível deixaremos para o BL o penoso trabalho de lidar
 	;; com PCI, já que o BL é feito em C, isso deve ser mais fácil para
 	;; o BL do que para o BM.)
-    ;;
 	
 	;step
 	;;PCI device descovery.	
@@ -443,11 +407,9 @@ startGUI:
 	;; **** TESTING STRINGS ****
 	;;
 	
-	;;
 	;; bug bug as rotinas de 'char' 'string' e 'load' aparentemente
 	;; estão travando o sistema, as duas janelas de status estão funcionando
 	;; quando não chamamos essas funções.
-	;;
 	
 	
 	;
@@ -621,16 +583,27 @@ startGUI:
 ;;
 ;.StartBootLoader:
 
-	mov esi, msg_start_jumping
-	call lib32PrintString
-	call _asm_refresh_screen
+    ;; #bugbug
+	;; Essa mensagem atraza muito.
+	;; Por causa do refresh screen
+
+	;mov esi, msg_start_jumping
+	;call lib32PrintString
+	;call _asm_refresh_screen
     ;jmp $
+	
+	
+	
+	;; #bugbug
+	;; Temos que permitir o formato elf.
 	
 	;;
     ;; Check PE binary in BL.BIN.
 	;;
 	
-	mov edx, dword 0x20000    ;IMAGE_ADDRESS
+	;IMAGE_ADDRESS
+	
+	mov edx, dword 0x20000   
 	mov eax, [edx]
     
 	;first byte.
@@ -647,30 +620,40 @@ startGUI:
 .preparandoArgumentos:
  
     ;;
-	;; *Boot Block - A tabela está sendo preparada.
+	;;  ## Boot Block ## 
 	;;
 	
-	;Prepara a tabela.
-	mov ebp, dword BootBlock
+	;; Prepara a tabela.
+	;; Estamos preparando a tabela para enviarmos para o Boot Loader.
+	
+	;; #todo
+	;; Precismos passar mais informações sobre o disco.
+	
+	; LFB address.
+	; Width in pixels.
+	; Height in pixel.
+	; BPP.
+	; metafile address
+	; ...
 	
 	xor eax, eax
-	mov eax, dword [ModeInfo_PhysBasePtr]  ;LFB address.	
+	mov eax, dword [ModeInfo_PhysBasePtr]  	
 	mov dword [BootBlock.lfb], eax	
 	
 	xor eax, eax
-	mov ax, word [ModeInfo_XResolution]    ;Width in pixels.
+	mov ax, word [ModeInfo_XResolution]    
 	mov dword [BootBlock.x], eax 	
 	
 	xor eax, eax
-	mov ax, word [ModeInfo_YResolution]    ;Height in pixel.
+	mov ax, word [ModeInfo_YResolution]    
 	mov dword [BootBlock.y], eax 	
 	
 	xor eax, eax
-	mov al, byte [ModeInfo_BitsPerPixel]   ;BPP.
+	mov al, byte [ModeInfo_BitsPerPixel]   
 	mov dword [BootBlock.bpp], eax 
 
 	xor eax, eax
-	mov eax, dword META$FILE                 ;metafile address	
+	mov eax, dword META$FILE                 	
 	mov dword [BootBlock.metafile_address], eax	
     
 	;Continua...
@@ -678,33 +661,11 @@ startGUI:
 	;xor eax, eax
 	mov al, byte 'G'                       ;Flag. (useing graphics)	
 	mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endereço físico)
+	
+	mov ebp, dword BootBlock
 	mov ecx, ebp                           ;tabela
 	mov edx, ebp                           ;tabela
 	
-
-	
-	;call _background_teste
-	;call _background
-	;call _fade_screen
-	;jmp $
-	
-	
-	;;
-	;; A ASSINATURA FALHO ... É SINAL QUE O BOOTOLADER NÃO FOI CARREGADO CORRETAMENTE,
-	;; OU NÃO FOI CARREGADO NO LOCAL CERTO...
-	;; DEREPENTE UM PEQUENO AJUSTE DE ENDEREÇO NO MBR RESOLVE O PROBLEMA.
-	;;
-	;;
-	
-
-	
-	;debug
-	;jmp $
-	
-	;;
-	;; @todo: refazer os argumentos ... o boot block percisa ser preexido corretamente
-	;; para isso o MBR precisa passar argumentos ...isso tem que refazer.
-	;;
 .goBL:
 
 	;
@@ -716,25 +677,33 @@ startGUI:
 	jmp 8:IMAGE_ADDRESS_ENTRY_POINT
 	JMP $
 	
+	;;
+	;;  ## fail ##
+	;;
+	
 ;O arquivo não está presente na memória.	
 .peFail:
 
     mov eax, 0x00ffff00 ;color
 	mov esi, msg_start_sig
 	call lib32PrintString
-    call _asm_refresh_screen
+	
 	
     mov eax, 0x00ffff00 ;color
 	mov esi, 0x20000
 	call lib32PrintString
-    call _asm_refresh_screen
 	
+    call _asm_refresh_screen
     jmp $
 
 		
 	;
-	; @fim, Começam as rotinas internas do arquivo.
+	; @fim, 
+	; Começam as rotinas internas do arquivo.
 	;
+	
+;;=======================================================================
+;;=======================================================================
 	
 ;
 ; Libs --------------------------------------------
