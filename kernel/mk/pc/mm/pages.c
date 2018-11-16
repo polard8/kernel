@@ -146,48 +146,6 @@ enum PAGE_PTE_FLAGS {
 */
 
 
-/*
-void map_page(void * physaddr, void * virtualaddr, unsigned int flags)
-{
-    // Make sure that both addresses are page-aligned.
- 
-    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
-    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
- 
-    unsigned long * pd = (unsigned long *)0xFFFFF000;
-    // Here you need to check whether the PD entry is present.
-    // When it is not present, you need to create a new empty PT and
-    // adjust the PDE accordingly.
- 
-    unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
-    // Here you need to check whether the PT entry is present.
-    // When it is, then there is already a mapping present. What do you do now?
- 
-    pt[ptindex] = ((unsigned long)physaddr) | (flags & 0xFFF) | 0x01; // Present
- 
-    // Now you need to flush the entry in the TLB
-    // or you might not notice the change.
-}
-*/
-
-
-/*
-void * get_physaddr(void * virtualaddr);
-void * get_physaddr(void * virtualaddr)
-{
-    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
-    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
- 
-    unsigned long * pd = (unsigned long *)0xFFFFF000;
-    // Here you need to check whether the PD entry is present.
- 
-    unsigned long * pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
-    // Here you need to check whether the PT entry is present.
- 
-    return (void *)((pt[ptindex] & ~0xFFF) + ((unsigned long)virtualaddr & 0xFFF));
-}
-*/
-
 
 /*
 static inline void __native_flush_tlb_single(unsigned long addr)
@@ -240,12 +198,11 @@ void *CreatePageDirectory (){
 	
 	int i;
 	
-	unsigned long destAddressVA;  //virtual.
-	//unsigned long destAddressPA;  //físico.
+	//virtual.
+	unsigned long destAddressVA;  
 	
 	//alocaremos uma página apenas, pois tem 4KB.
-	
-	destAddressVA = (unsigned long) newPage (); //malloc(4096);
+	destAddressVA = (unsigned long) newPage (); 
 	if ( destAddressVA == 0 )
 	{
 		return NULL;
@@ -257,6 +214,7 @@ void *CreatePageDirectory (){
 	unsigned long *dest = (unsigned long *) destAddressVA;  
 	
 	//o endereço do diretório de páginas do kernel.
+	// #importante: O endereço dessa físico e virtual dessa tabela são iguais.
 	unsigned long *src = (unsigned long *) gKernelPageDirectoryAddress;  
 	
 	
@@ -281,19 +239,11 @@ void *CreatePageDirectory (){
 	for ( i=0; i < 1024; i++ )
 	{
 		dest[i] = (unsigned long) src[i];    
-	};
+	};	
 	
-	//
-	// Retornaremos o endereço físico do diretório clone.
-	//
-	
-	//destAddressPA = (unsigned long) virtual_to_physical ( destAddressVA, gKernelPageDirectoryAddress );
-	//if ( destAddressPA == 0 ){
-	//	return NULL;
-	//}
-	
-	
-	//return (void *) destAddressPA;
+	// #importante
+	// Retornamos um endereço lógico, que será transformado em físico
+	// para colocarmos no cr3.
 	
 	return (void *) destAddressVA;
 };
@@ -338,7 +288,7 @@ void *CreatePageDirectory (){
  
  
  
-void *CreatePageTable( unsigned long directory_address, 
+void *CreatePageTable ( unsigned long directory_address, 
                        int offset, 
 					   unsigned long region_address )
 {
@@ -348,9 +298,9 @@ void *CreatePageTable( unsigned long directory_address,
     // ### pd  ###
     //	
 	
-	
-	//Diretório.
-	//precisamos do endereço virtual do diretório para editá-lo
+	//#importante:
+	//Endereço virtual do diretório de páginas.
+	//Precisamos do endereço virtual do diretório para editá-lo
 	unsigned long *PD = (unsigned long *) directory_address;       
 	
 	
@@ -365,24 +315,22 @@ void *CreatePageTable( unsigned long directory_address,
     // ### pt  ###
     //	
 	
-	
-	
-	
-	//Tabela de páginas.
+	//#importante:
+	//Endereço virtual da tabela de páginas.
 	//Precisamos de um endereço virtual para manipularmos a tabela.
 	//pois o kernel trabalha com os endereços virtuais ...
 	//só depois converteremos e salvaremos na entrada do diretório 
 	//o ponteiro que é um endereço físico.
 	
-	//unsigned long ptVA = (unsigned long) newPage(); 
+
     unsigned long ptVA = (unsigned long) malloc (4096);
+	//unsigned long ptVA = (unsigned long) newPage(); 
+	
 	//Limits.
 	if ( ptVA == 0 ){
 		
 		return NULL;
 	}	
-
-	//unsigned long ptPA = (unsigned long) virtual_to_physical ( ptVA, gKernelPageDirectoryAddress ); 
 	
 
 	//o endereço virtual permite manipularmos a pagetable daqui do kernel.
@@ -427,7 +375,7 @@ void *CreatePageTable( unsigned long directory_address,
 	for ( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
-	    newPT[i] = (unsigned long) region_address | 3;             
+	    newPT[i] = (unsigned long) region_address | 7;             
 	    region_address = (unsigned long) region_address + 4096;  //+4KB.
     };
 	
@@ -440,13 +388,16 @@ void *CreatePageTable( unsigned long directory_address,
 	//Configurando os atributos.
 	
 	//#importante
-    //vamos usar o endereço virtual, assim como fizemos na 
-	//rotina de configuração das páginas.
+    //precisamos colocar um endereço físico na entrada do diretório.
 	
-	PD[offset] = (unsigned long) &newPT[0]; 
-    PD[offset] = (unsigned long) PD[offset] | 3;      
+	//#importante:
+	//Para chamarmos essa rotina temos que ter o diretório do kernel configurado.
+	
+	unsigned long ptPA = (unsigned long) virtual_to_physical ( ptVA, gKernelPageDirectoryAddress ); 	
+	
+	PD[offset] = (unsigned long) ptPA; //&newPT[0]; 
+    PD[offset] = (unsigned long) PD[offset] | 7;      
 
-	
  
     //
 	// Retornaremos o endereço virtual para que a tabela possa ser manipulada pelo kernel.
@@ -795,6 +746,8 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 
+		
+		// O endereço físico e virtual são iguais para essa tabela.
 		page_directory[i] = (unsigned long) 0 | 2;    
 		
 	};
@@ -838,6 +791,8 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
+		
+		// O endereço físico e virtual são iguais para essa tabela.
 		km_page_table[i] = (unsigned long) SMALL_kernel_address | 3;     
 	    SMALL_kernel_address = (unsigned long) SMALL_kernel_address + 4096;  
     };
@@ -874,7 +829,9 @@ int SetUpPaging (){
 	
     for ( i=0; i < 1024; i++ ){
 
-	    km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     
+	    
+		// O endereço físico e virtual são iguais para essa tabela.
+		km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     
 	    SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096;  
     };
 	
@@ -927,6 +884,8 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
+		
+		// O endereço físico e virtual são iguais para essa tabela.
 		um_page_table[i] = (unsigned long) SMALL_user_address | 7;     
 	    SMALL_user_address = (unsigned long) SMALL_user_address + 4096; 
     };
@@ -973,7 +932,9 @@ int SetUpPaging (){
 	
     for ( i=0; i < 1024; i++ ){
 		
-	    vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     
+	    
+		// O endereço físico e virtual são iguais para essa tabela.
+		vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     
 	    SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096;  
     };
 
@@ -1022,6 +983,8 @@ int SetUpPaging (){
 	
     for ( i=0; i < 1024; i++ ){
 
+		
+		// O endereço físico e virtual são iguais para essa tabela.
 		frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7;     
 	    SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096;  
     };
@@ -1061,7 +1024,8 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
-	    backbuff_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     
+	    // O endereço físico e virtual são iguais para essa tabela.
+		backbuff_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     
 	    SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096;  
     };
 	
@@ -1090,7 +1054,9 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
-	    pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;     
+	    
+		// O endereço físico e virtual são iguais para essa tabela.
+		pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;     
 	    SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096;  
     };
 
@@ -1112,7 +1078,8 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7;     
+	    // O endereço físico e virtual são iguais para essa tabela.
+		heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7;     
 	    SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096;  
     };
 
@@ -1128,7 +1095,8 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    gramadocore_init_page_table[i] = (unsigned long) SMALL_gramadocore_init_heap_address | 7;     
+	    // O endereço físico e virtual são iguais para essa tabela.
+		gramadocore_init_page_table[i] = (unsigned long) SMALL_gramadocore_init_heap_address | 7;     
 	    SMALL_gramadocore_init_heap_address = (unsigned long) SMALL_gramadocore_init_heap_address + 4096;  
     };
 
@@ -1144,7 +1112,8 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    gramadocore_shell_page_table[i] = (unsigned long) SMALL_gramadocore_shell_heap_address | 7;     
+	    // O endereço físico e virtual são iguais para essa tabela.
+		gramadocore_shell_page_table[i] = (unsigned long) SMALL_gramadocore_shell_heap_address | 7;     
 	    SMALL_gramadocore_shell_heap_address = (unsigned long) SMALL_gramadocore_shell_heap_address + 4096;  
     };
 
@@ -1160,7 +1129,9 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    gramadocore_taskman_page_table[i] = (unsigned long) SMALL_gramadocore_taskman_heap_address | 7;     
+	    
+		// O endereço físico e virtual são iguais para essa tabela.
+		gramadocore_taskman_page_table[i] = (unsigned long) SMALL_gramadocore_taskman_heap_address | 7;     
 	    SMALL_gramadocore_taskman_heap_address = (unsigned long) SMALL_gramadocore_taskman_heap_address + 4096;  
     };
 

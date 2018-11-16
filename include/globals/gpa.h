@@ -55,9 +55,10 @@
 // numa lista grande em um outro lugar de fácil acesso. 
 
 
-//...
-//?? Podemos usar esses valores??
-//Pois antes temos o root dir.
+
+// #importante 
+// Essas pagetable possuem endereço físico e lógico iguais.
+
 //#define PAGETABLE_RES7         0x00080000
 #define PAGETABLE_RES6         0x00081000
 #define PAGETABLE_RES5         0x00082000
