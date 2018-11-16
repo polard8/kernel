@@ -3500,13 +3500,14 @@ int init_windows (){
 	*/
 	
 	//Inicializando variáveis.
-	current_windowstation = 0;
+	current_room = 0;
 	current_desktop = 0;
+	
 	current_window = 0;
 	current_menu = 0;
 	
 	// ## Contagens ##
-    windowstations_count = 0;  
+    windowstations_count = 0;  //room counts
     desktops_count = 0;
 	windows_count = 0;
 	

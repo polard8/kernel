@@ -195,7 +195,7 @@ void *CreateUser ( char *name, int type ){
         //Desktop.		 
 	
 	    New->sessionId = current_usersession;           
-	    New->windowstationId = current_windowstation;   
+	    New->windowstationId = current_room;  //->roomID  
 	    New->desktopId = current_desktop;          
 
 	    //Inicializa tokens. (rever)

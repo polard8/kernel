@@ -1,5 +1,5 @@
 /*
- * File: desktop.c
+ * File: kernel\gws\user\desktop.c
  *
  * Descrição:
  *     Gerência a criação de desktops.

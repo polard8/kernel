@@ -114,9 +114,12 @@ void create_logon (){
 	} else {
 	    
         //Set session ,window station, desktop, window and menu.
-	    current_usersession = 0;       // User Session.
-	    current_windowstation = 0; // Window Station.
-	    current_desktop = 0;       // Desktop.
+	    
+		current_usersession = 0;    // User Session.
+	    current_room = 0;           // room (Window Station).
+	    current_desktop = 0;        // Desktop.
+		
+		
 	    current_window = 0;        // Window.
 	    current_menu = 0;          // Menu.
 		
@@ -132,7 +135,7 @@ void create_logon (){
 #ifdef KERNEL_VERBOSE			    
 		printf("create_logon: Station..\n");   
 #endif	    
-		init_window_station();  	
+		init_room_manager();	
 	
 	    //initialize desktop default.
 #ifdef KERNEL_VERBOSE			    

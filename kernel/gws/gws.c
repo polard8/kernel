@@ -151,8 +151,10 @@ void create_gui (){
 		// Set user session, window station, desktop, window and menu.
 		
 		current_usersession = 0;        //User Session.
-	    current_windowstation = 0;  //Window Station.
+	    current_room = 0;             //room (Window Station).
 	    current_desktop = 0;        //Desktop.
+		
+		
 	    current_window = 0;         //Window.
 	    current_menu = 0;           //Menu.
 		
@@ -175,7 +177,7 @@ void create_gui (){
 #ifdef KERNEL_VERBOSE				
 		printf("create_gui: Window Station..\n");
 #endif
-		init_window_station ();
+		init_room_manager();
 	 
 #ifdef KERNEL_VERBOSE			 
 		printf("create_gui: Desk..\n");

@@ -1242,7 +1242,7 @@ void *services( unsigned long number,
 			
         //158 - get window station id		
 		case SYS_GETCURRENTWINDOWSTATION:	
-		    return (void *) current_windowstation; 
+		    return (void *) current_room; 
 			break;	
 			
 		//159 - get desktop id

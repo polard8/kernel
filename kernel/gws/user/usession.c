@@ -1,5 +1,5 @@
 /*
- * File: gramado\gui\usession.c
+ * File: kernel\gws\user\usession.c
  *
  * Descrição:
  *     User Session.

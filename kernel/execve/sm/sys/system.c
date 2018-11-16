@@ -700,20 +700,19 @@ void *systemRam ( int number,
         //Window station support: (desktop pools.)
 
 	    case 81:
-            //int RegisterWindowStation(struct wstation_d *ws);
-            return (void*) RegisterWindowStation( (struct wstation_d *) arg1);
+            return (void*) RegisterRoom( (struct room_d *) arg1 );
             break;
 			
         case 82:
-            set_current_windowstation( (struct wstation_d *) arg1);
+            set_current_room( (struct room_d *) arg1 );
             break;
 			
         case 83:
-            return (void *) get_current_windowstation();
+            return (void *) get_current_room();
 		    break;
 			
         case 84:
-            return (void *) CreateWindowStation( (struct usession_d *) arg1);
+            return (void *) CreateRoom( (struct room_d *) arg1 );
 		    break;
 
         //mini-shell support: (minishel do kernel base.)

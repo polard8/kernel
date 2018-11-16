@@ -25,9 +25,12 @@
  
  
 // ## Contagens ##
-#define USER_SESSION_COUNT_MAX    32  //16 
-#define WINDOW_STATION_COUNT_MAX  32  //16 
-#define DESKTOP_COUNT_MAX         32  //16
+
+#define USER_SESSION_COUNT_MAX  16 
+#define ROOM_COUNT_MAX          16 
+#define DESKTOP_COUNT_MAX       16
+
+
 #define WINDOW_COUNT_MAX          1024 //512 //256
 #define MAX_WINDOWS WINDOW_COUNT_MAX 
  
@@ -665,10 +668,13 @@ int windowstations_count;
 int desktops_count;
 int windows_count;  
 
- 
-int current_usersession;    //gws
-int current_windowstation;  //gws
-int current_desktop;        //gws 
+
+//user 
+int current_usersession;    //gws/user
+int current_room;           //gws/user
+int current_desktop;        //gws/user
+
+
 int current_window;         //gws
 int current_menu;           //gws
 

@@ -127,7 +127,7 @@ bmp.o \
 createw.o \
 window.o \
 desktop.o \
-wstation.o \
+room.o \
 usession.o \
 gws.o \
 object.o \
@@ -302,9 +302,7 @@ x86:
 	gcc -c kernel/gws/gws/button.c    -I include/ $(CFLAGS) -o button.o 
 	gcc -c kernel/gws/gws/bg.c        -I include/ $(CFLAGS) -o bg.o  
 	gcc -c kernel/gws/gws/window.c    -I include/ $(CFLAGS) -o window.o    
-	gcc -c kernel/gws/gws/desktop.c   -I include/ $(CFLAGS) -o desktop.o  
-	gcc -c kernel/gws/gws/wstation.c  -I include/ $(CFLAGS) -o wstation.o 
-	gcc -c kernel/gws/gws/usession.c  -I include/ $(CFLAGS) -o usession.o 
+	
 
 	# gramado logon e logoff
 	gcc -c kernel/gws/logon/logon.c    -I include/ $(CFLAGS) -o logon.o 
@@ -312,6 +310,9 @@ x86:
 
 	# gramado/user
 	gcc -c kernel/gws/user/userenv.c   -I include/ $(CFLAGS) -o userenv.o 	
+	gcc -c kernel/gws/user/desktop.c   -I include/ $(CFLAGS) -o desktop.o  
+	gcc -c kernel/gws/user/room.c      -I include/ $(CFLAGS) -o room.o 
+	gcc -c kernel/gws/user/usession.c  -I include/ $(CFLAGS) -o usession.o 
 
 	# *gui (GRAMADO)
 	gcc -c kernel/gws/gws.c   -I include/ $(CFLAGS) -o gws.o 

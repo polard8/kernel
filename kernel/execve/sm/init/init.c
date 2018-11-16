@@ -275,7 +275,7 @@ WindowStation:
 #ifdef EXECVE_VERBOSE
     printf("sm-init-init_arquitecture_independent: init_window_station\n");   
 #endif    
-	init_window_station();
+	init_room_manager();
 
 Desktop:
 #ifdef EXECVE_VERBOSE
@@ -353,7 +353,7 @@ void init_globals (){
 	
 	//User Session, Window Station, Dasktop.
 	current_usersession = 0;
-	current_windowstation = 0;
+	current_room = 0;
 	current_desktop = 0;
 	
 	//Process, Thread.
@@ -375,7 +375,7 @@ void init_globals (){
 		
 		//Windows globals.
 		current_usersession = (int) 0;    //>Current User Session.
-		current_windowstation = (int) 0;  //>>Current Window Station.
+		current_room = (int) 0;  //>>Current Window Station.
 	    current_desktop = (int) 0;        //>>>Current Desktop.
 		current_window = (int) 0;         //>>>>Current Window.
 	    windows_count = (int) 0;          //Window count.

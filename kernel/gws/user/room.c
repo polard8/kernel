@@ -1,5 +1,5 @@
 /*
- * File: wstation.c
+ * File: kernel\gws\user\room.c
  *
  * Descrição:
  *     Window Station Manager. (WSM).
@@ -22,14 +22,14 @@
  * get_current_windowstation:
  *
  */
-void *get_current_windowstation (){
+void *get_current_room (){
 	
-    if ( current_windowstation < 0 )
+    if ( current_room < 0 )
 	{
 	    return NULL;
 	};
 	
-    return (void *) windowstationList[current_windowstation];
+    return (void *) roomList[current_room];
 };
 
 
@@ -37,16 +37,16 @@ void *get_current_windowstation (){
  * set_current_windowstation:
  *
  */
-void set_current_windowstation (struct wstation_d *ws){
+void set_current_room (struct room_d *room){
 	
     //Check.
 	
-	if ( (void *) ws == NULL )
+	if ( (void *) room == NULL )
 	{
 	    return;
     };  
     
-	current_windowstation = (int) ws->wsId;
+	current_room = (int) room->id;
 };
 
 
@@ -54,23 +54,23 @@ void set_current_windowstation (struct wstation_d *ws){
  * CreateWindowStation:
  *     Cria uma window station em uma seção de usuário.
  */
-void *CreateWindowStation (struct usession_d *s){
+void *CreateRoom (struct room_d *room){
 	
 	int i=0;
 	
-	struct wstation_d *Current;    
-    struct wstation_d *Empty;	
+	struct room_d *Current;    
+    struct room_d *Empty;	
 	
 	//User Session Struct.
     
-	if ( (void *) s == NULL )
+	if ( (void *) room == NULL )
 	{
 	    return NULL;
 	};
 	
 	//Window Station Struct.
     
-	Current = (void *) malloc ( sizeof(struct wstation_d) );
+	Current = (void *) malloc ( sizeof(struct room_d) );
 	
 	if ( (void *) Current == NULL )
 	{
@@ -82,23 +82,23 @@ void *CreateWindowStation (struct usession_d *s){
 		
 	} else {
 		
-	    //session.
-	    Current->usession = s;
+	    //room.
+	    Current->room = (struct room_d *) room;
 		
 		//continua...
 	};
 	
 	
-	while ( i < WINDOW_STATION_COUNT_MAX )
+	while ( i < ROOM_COUNT_MAX )
 	{	
-        Empty = (void *) windowstationList[i]; 			
+        Empty = (void *) roomList[i]; 			
         
 		if ( (void *) Empty == NULL )
 		{
-		    windowstationList[i] = (unsigned long) Current;
-		    Current->wsId = i;    	
+		    roomList[i] = (unsigned long) Current;
+		    Current->id = i;    	
 		    
-			//set_current_windowstation(Current);	
+			//set_current_room(Current);	
 			
 			return (void *) Current;
 		};	
@@ -114,22 +114,22 @@ void *CreateWindowStation (struct usession_d *s){
  * RegisterWindowStation:
  *     Registrando uma windowstation numa lista de window stations.
  */
-int RegisterWindowStation (struct wstation_d *ws){
+int RegisterRoom (struct room_d *room){
 	
     int i=0;
 		
 	//Struct.
     
-	if ( (void *) ws == NULL )
+	if ( (void *) room == NULL )
 	{
         return (int) 1;    
     };
 	
-	while (i < WINDOW_STATION_COUNT_MAX)
+	while (i < ROOM_COUNT_MAX)
 	{
-        if ( (void *) windowstationList[i] == NULL )
+        if ( (void *) roomList[i] == NULL )
 		{
-       	    windowstationList[i] = (unsigned long) ws; 
+       	    roomList[i] = (unsigned long) room; 
             
 			return (int) 0;			
 	    };
@@ -144,13 +144,13 @@ int RegisterWindowStation (struct wstation_d *ws){
 /*
  * init_windowstation_list:
  */
-void init_windowstation_list (){
+void init_room_list (){
 	
     int i=0;
 	
-    while ( i < WINDOW_STATION_COUNT_MAX )
+    while ( i < ROOM_COUNT_MAX )
 	{
-        windowstationList[i] = 0;
+        roomList[i] = 0;
 		
 		i++; 
 	};
@@ -161,26 +161,23 @@ void init_windowstation_list (){
  * init_window_station:
  *     Inicializa o gerenciamento de window stations.
  */
-void init_window_station (){
+void init_room_manager (){
 	
     //printf("init_window_station: Initializing ...\n");
 	
 	windowstations_count = 0;
 	
 	//List.
-	init_windowstation_list();
+	init_room_list();
 	
-	// Struct 'ws0' 
+	// Struct 'room0' 
     
-	ws0 = (void *) malloc ( sizeof(struct wstation_d) );
+	room0 = (void *) malloc ( sizeof(struct room_d) );
 	
-	if ( (void *) ws0 == NULL )
+	if ( (void *) room0 == NULL )
 	{
-	    printf("init_window_station fail: ws0 Struct");
+	    printf("init_window_station fail: room0 Struct");
 		die ();
-		
-		//refresh_screen();
-		//while(1){}	
 	};
 	
 	
@@ -196,8 +193,8 @@ void init_window_station (){
 	
 	//...
 
-    RegisterWindowStation (ws0);
-	set_current_windowstation (ws0);   
+    RegisterRoom (room0);
+	set_current_room (room0);   
 	
 	//printf("done\n");
 };

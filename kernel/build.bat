@@ -207,10 +207,7 @@ echo ~{ ux1 /gws \o/
     gcc -c c:/gramado/kernel/gws/gws/bmp.c       -I c:/gramado/include -o bmp.o 
     gcc -c c:/gramado/kernel/gws/gws/button.c    -I c:/gramado/include -o button.o 
 	gcc -c c:/gramado/kernel/gws/gws/bg.c        -I c:/gramado/include -o bg.o  
-    gcc -c c:/gramado/kernel/gws/gws/window.c    -I c:/gramado/include -o window.o    
-    gcc -c c:/gramado/kernel/gws/gws/desktop.c   -I c:/gramado/include -o desktop.o  
-    gcc -c c:/gramado/kernel/gws/gws/wstation.c  -I c:/gramado/include -o wstation.o    
-    gcc -c c:/gramado/kernel/gws/gws/usession.c  -I c:/gramado/include -o usession.o        
+    gcc -c c:/gramado/kernel/gws/gws/window.c    -I c:/gramado/include -o window.o  
     
 	rem gramado logon e logoff
     gcc -c c:/gramado/kernel/gws/logon/logon.c    -I c:/gramado/include -o logon.o 
@@ -218,7 +215,10 @@ echo ~{ ux1 /gws \o/
 
 	rem gramado/user
 	gcc -c c:/gramado/kernel/gws/user/userenv.c   -I c:/gramado/include -o userenv.o 	
-
+    gcc -c c:/gramado/kernel/gws/user/desktop.c   -I c:/gramado/include -o desktop.o  
+    gcc -c c:/gramado/kernel/gws/user/room.c      -I c:/gramado/include -o room.o    
+    gcc -c c:/gramado/kernel/gws/user/usession.c  -I c:/gramado/include -o usession.o   
+	
 	rem *gui (GRAMADO)
     gcc -c c:/gramado/kernel/gws/gws.c   -I c:/gramado/include -o gws.o    	
 	
@@ -322,7 +322,7 @@ bmp.o ^
 createw.o ^
 window.o ^
 desktop.o ^
-wstation.o ^
+room.o ^
 usession.o ^
 gws.o ^
 object.o ^

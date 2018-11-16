@@ -73,17 +73,19 @@ void KiInformation (){
 	//unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	//unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);	
 	
-	if( VideoBlock.useGui != 1 ){
+	if ( VideoBlock.useGui != 1 )
+	{
 		printf("KiInformation: No GUI\n");
 		goto fail;
 	}	
 	
 	//Parent window.
-	if( (void *) gui->main == NULL )
+	if ( (void *) gui->main == NULL )
 	{
 		printf("KiInformation: parent window fail\n");
 		goto fail;
-	}else{
+		
+	} else {
 		
 	    left = gui->main->left;
 	    top = gui->main->top;
@@ -109,7 +111,7 @@ void KiInformation (){
 						KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, 
 						KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
 
-	if( (void *) hWindow == NULL)
+	if ( (void *) hWindow == NULL)
 	{
 	    printf("KiInformation: hWindow\n");
 	    goto fail;
@@ -217,9 +219,8 @@ void KiInformation (){
 		DispatchCountBlock->SelectIdealCount,
 		DispatchCountBlock->SelectDispatcherQueueCount );
 		
-	printf("## thread info ## \n");	
-	printf("\n{ %d } threads_counter\n\n",
-	    ProcessorBlock.threads_counter );	
+	printf("# thread info #\n");	
+	printf("{ %d } threads_counter\n\n", ProcessorBlock.threads_counter );	
     
 	show_thread_information();		
 		
@@ -267,9 +268,9 @@ void KiInformation (){
 	printf("Group={%d} User={%d}\n", 
 	    current_group, current_user );
 	
-	//user session, window station, desktop.
-	printf("UserSession={%d} DesktopPool={%d} Desktop={%d}\n",
-		current_usersession, current_windowstation, current_desktop );
+	//user session, room, desktop.
+	printf("UserSession={%d} Room={%d} Desktop={%d}\n",
+		current_usersession, current_room, current_desktop );
 															
 	
 	//#bugbug

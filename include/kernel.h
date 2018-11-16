@@ -305,9 +305,11 @@ extern void do_executa_new_task();
 //gramado - GUI. (presentation layer)
 //Gramado Window Server
 #include <gramado/gws/gws/ws.h>
-#include <gramado/gws/gws/usession.h>
-#include <gramado/gws/gws/wstation.h>
-#include <gramado/gws/gws/desktop.h>
+
+//user
+#include <gramado/gws/user/usession.h>
+#include <gramado/gws/user/room.h>
+#include <gramado/gws/user/desktop.h>
 
 #include <gramado/gws/gws/window.h>
 
