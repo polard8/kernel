@@ -1,8 +1,7 @@
-  Gramado layer:
+  gws folder:
 
 
- /device
- /gui
+ /gws
  /logoff
  /logon
  /terminal
