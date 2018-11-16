@@ -292,17 +292,17 @@ db 0x55, 0xAA
 
 
 ;;
-;;  ## RESERVED SECTORS ##
+;;  ## HIDDEN SECTORS ##
 ;;
 
 ;;========================================================
-;; fs_reserved_sectors:
-;;     Setores reservados. (3 setores)
+;; fs_hidden_sectors:
+;;     Setores ocultos. (3 setores)
 ;;
-fs_reserved_sectors:
-    times (512) db 'r' ;64
-    times (512) db 'r' ;65
-    times (512) db 'r' ;66
+fs_hidden_sectors:
+    times (512) db 'h' ;64
+    times (512) db 'h' ;65
+    times (512) db 'h' ;66
 
 	
 ;;

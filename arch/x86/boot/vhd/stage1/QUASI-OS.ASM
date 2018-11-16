@@ -34,19 +34,19 @@ BUFFER_NAME           db "MSDOS5.0"    ;GRAMADO.
 BPB:
 BytesPerSector        dw 0x0200
 SectorsPerCluster     db 1
-ReservedSectors       dw 62      ;;62   
+ReservedSectors       dw 62      ;; 62   
 TotalFATs             db 0x02
 MaxRootEntries        dw 0x0200
-TotalSectorsSmall     dw 0x0000
+TotalSectorsSmall     dw 0x0000  ;; (CHS=963/4/17-5)(Number of sectors - number of hidden sectors)
 MediaDescriptor       db 0xF8
 SectorsPerFAT         dw 246    
 SectorsPerTrack       dw 0x11    ;; 17 SPT.    
-NumHeads              dw 4       ;; 4 HEADS.
-HiddenSectors         dd 5       ;; 1+1+3 (mbr+vbr+reserved sectors depois do vbr)
-TotalSectorsLarge     dd 0
-DriveNumber           db 0x80
-Flags                 db 0x00
-Signature             db 0x29
+NumHeads              dw 4       ;; 4 HEADS. Number of surfaces
+HiddenSectors         dd 5       ;; 1+1+3 ( mbr + vbr + reserved sectors depois do vbr)
+TotalSectorsLarge     dd 0       ;; Number of sectors if 'TotalSectorsSmall = 0'.
+DriveNumber           db 0x80    
+Flags                 db 0x00    ;; ?? Current Head ??
+Signature             db 0x29    ;; 41
 BUFFER_VOLUME_ID      dd 0x980E63F5
 VolumeLabel           db "GRAMADO MBR"
 SystemID              db "FAT16   "
@@ -150,11 +150,29 @@ Step3:
 LOAD_ROOT:
 
 
-    ; Calcula o início da área de dados.
-    ; Compute size of root directory and store in "cx".
-    xor  cx, cx
+    ;;	559 (root)
+	;; ( MBR + Reserved Sectors + VBR + Hidden Sectors + TotalFATs * SectorsPerFAT )
+	;; (  1  +      62          +  1  +    3           +    2      *     246)
+	;;==============================
+	;;   1 - mbr (*hidden) 
+	;;  62 - Reserved sectors.
+	;;   1 - vbr (*hidden) (VBR da primeira partição)  	
+	;; 246 - fat1
+	;; 246 - fat2
+	;;   3 - Hidden sectors. (*hidden)
+	;;  32 - root. (512 entradas)
+	;; xxx - data area.
+
+
+	;;
+	;; ## data area location ## 	
+    ;; Calcula o início da área de dados.
+    ;; Compute size of root directory and store in "cx".
+    ;;
+	
+	xor  cx, cx
     ;xor  dx, dx
-    mov  ax, 32                 ; 32 byte. Tamanho de uma entrada de diretório.
+    mov  ax, 32                     ; 32 byte. Tamanho de uma entrada de diretório.
     mul  WORD [MaxRootEntries]      ; 512. Tamanho total do diretório dado em bytes. (32*512) bytes.
     div  WORD [BytesPerSector]      ; ((32*512)/512) O número total de bytes no diretório, dividido pela quantidade de bytes por setor.
 	mov word [ROOTDIRSIZE], ax
@@ -162,20 +180,40 @@ LOAD_ROOT:
     ;xchg  ax, cx                    ; Coloca o resultado em cx. (Quantidade de setores no diretório raiz.)	
 
 
-	; Compute location(LBA) of root directory and store in "ax".
+	;;
+	;; ## root location ## 
+	;; Compute location(LBA) of root directory and store in "ax".
+	;;
+	
     xor ax, ax
 	mov  al, BYTE [TotalFATs]        ; 2. Number of FATs.
     mul  WORD [SectorsPerFAT]        ; 246. Sectors used by FATs.
-    add  ax, WORD [ReservedSectors]  ; +62. Adiciona os setores reservados. 
-	add  ax, WORD [HiddenSectors]    ; +5. Adiciona os setores escondidos.
     
-	mov word [ROOTDIRSTART], ax      ; *** Nesse momento ax contem o setor inicial do root dir ***
-	add  ax, cx
-	 
-	mov  WORD [datasector], ax       ; 
-    ;mov  WORD [datasector], 591             ;; SIMULANDO.
+	
+	; +62. Adiciona os setores reservados. 
+	; +5.  Adiciona os setores escondidos. (1+1+3) 
+	; 5 = ( 1 MBR + 1 VBR + 3 hidden sectors )
+	
+	add  ax, WORD [ReservedSectors]  
+	add  ax, WORD [HiddenSectors]    
+    
+	; *** Nesse momento ax contém o setor inicial do root dir ***
+	; vamos adicionar o tamanho do diretório raiz dado em setores. 
+	; [ROOTDIRSIZE]
+	; Dessa forma ex contém o setor onde inicia a área de dados.
+	
+	mov word [ROOTDIRSTART], ax      
+	add  ax, cx                      
 
-	;;Obs: A variável 'datasector' precisa ser inicializada aqui, pois é usada mais à frente na rotina de conversão.
+	mov  WORD [datasector], ax       
+
+	
+	;; SIMULANDO o data area para testes.
+    ;; mov  WORD [datasector], 591             
+
+	;; Obs: 
+	;; A variável 'datasector' precisa ser inicializada aqui, 
+	;; pois é usada mais à frente na rotina de conversão.
 
 	;;
 	;; Obtivemos com o cálculo:
@@ -191,20 +229,41 @@ LOAD_ROOT:
 	;; Obs: Me parece seguro permitirmos que carregue o diretório raiz inteiro,
 	;;      Porém desnecessário ainda.
 	;;
+	
+
+    ;;	559 (root)
+	;; ( MBR + Reserved Sectors + VBR + Hidden Sectors + TotalFATs * SectorsPerFAT )
+	;; (  1  +      62          +  1  +    3           +    2      *     246)
+	;;==============================
+	;;   1 - mbr (*hidden) 
+	;;  62 - Reserved sectors.
+	;;   1 - vbr (*hidden) (VBR da primeira partição)  	
+	;; 246 - fat1
+	;; 246 - fat2
+	;;   3 - Hidden sectors. (*hidden)
+	;;  32 - root. (512 entradas)
+	;; xxx - data area.
+	
 
 .loadRoot:
-	mov  ax, word [ROOTDIRSTART] ; 559                        ;; Determinando o início do diretório raiz.
-	mov  cx, word [ROOTDIRSIZE]  ;32;1                          ;; Determinando o quantos setores carregar apezar de termos calculado o seu tamanho.
-    mov  bx, 0x0200                     ;; Determinando o offset do buffer do diretório raiz. 
+
+    ; 559 - Início do diretório raiz.
+    ; 32  - Quantos setores carregar. Tamanho do diretório raiz.
+    ; 0x0200 - Offset para encontrarmos o endereço onde devemos 
+	; carregar o root na memória. (seg:off) 
+	
+	mov  ax, word [ROOTDIRSTART] 
+	mov  cx, word [ROOTDIRSIZE]  
+    mov  bx, 0x0200                     
     call  ReadSectors
 
-.msg:
+;.msg:
+
 	;Uma mensagem de espaçamento.
     ;pusha
     ;mov  si, msgCRLF
     ;call  DisplayMessage
     ;popa
-
 
     ;;
 	;; Procurando o arquivo BM.BIN no diretório raiz.    
@@ -238,28 +297,37 @@ LOAD_ROOT:
 LOAD_FAT:
     ;nop
 	
-.msg:	
+;.msg:	
+
     ;pusha
     ;mov  si, msgFAT
     ;call  DisplayMessage
     ;popa
 
-    ; Save starting cluster of boot image.
-	; Salvamos o número do cluster inicial da Imagem, que foi obtido
-	; na entrada do diretório.
-    mov  dx, WORD [di + 0x001A]
-    mov  WORD [cluster], dx                  ; File's first cluster.
+    ; dx = Cluster inicial do arquivo a ser carregado.
+	; Save starting cluster of boot image.
+	; Salvamos o número do cluster inicial da Imagem. 
+	; Isso foi obtido na entrada do diretório.
+    ; File's first cluster.
 	
-			
-    ;;
-    ;; Efetuando o carregamento da fat no buffer es:bx, 0x17C0:0200.
-    ;;	
+	mov  dx, WORD [di + 0x001A]
+    mov  WORD [cluster], dx                  
+	
+
+    ;; Efetuando o carregamento da fat no buffer es:bx. 
+	;; 0x17C0:0200.
+	
 	
 	;;===================================
-	;; #bugbug: SE CARREGAR A FAT INTEIRA DÁ PROBLEMA. !!!! (246/2)
-	;;=================================
+	;; #bugbug: 
+	;; SE CARREGAR A FAT INTEIRA DÁ PROBLEMA. !!!! 
+	;; (246/2)
+	;; Estamos carregando apenas metade da fat.
+	;; ?? Por que ?? Qual é o problema ??
+	;;===================================
 	
 .loadFAT:
+
 	;Configurando o segmento 'es'. 
 	mov ax, 0x17C0
     mov es, ax   
@@ -274,25 +342,37 @@ LOAD_FAT:
     
 	; Compute location of FAT and store in "ax".
 	; Calculado qual é a LBA inicial da FAT e salvando em 'ax'.
+	
     mov  ax, WORD [HiddenSectors]         	  ; 5 setores escondidos.
 	add  ax, WORD [ReservedSectors]           ; 62 setores reservados.
-	;mov  ax, 67                              ;* SIMULANDO Determinando a LBA inicial da FAT, apezar de termos calculado.
-	mov  cx,  (246/2) ; WORD [SectorsPerFAT]  ;     ;  Metade da fat.
-	mov  bx, 0x0200                           ;* Determinando o offset da FAT.
+	
+	; #debug
+	; mov  ax, 67                              
+	; SIMULANDO Determinando a LBA inicial da FAT, apezar de termos calculado.
+	
+	; #bugbug
+	; Estamos carregando apenas metade da fat.
+	; Falha se tentarmos carregar ela inteira.
+	
+	mov  cx,  (246/2) ; WORD [SectorsPerFAT]  ;  Metade da fat.
+	mov  bx, 0x0200                           ;  Determinando o offset da FAT.
     call  ReadSectors	
 
     ;;
-    ;; Carregar o arquivo BM.BIN na memória em es:bx, 0:8000h.
+    ;; Carregar o arquivo BM.BIN na memória em es:bx, 
+	;; 0:8000h.
     ;;
 	
 	
-.msgSpace:    
+;.msgSpace:
+    
 	;Mensagem de espaçamento.
 	;mov  si, msgCRLF
     ;call  DisplayMessage
 	
 	
-.msgImage:	
+;.msgImage:	
+	
 	;Mensagem avisando que vamos carregar.
 	;mov  si, msgImg
     ;call  DisplayMessage
@@ -385,26 +465,36 @@ DONE:
     ; di = cylinder numbers    (*IMPORTANTE) *Exige a rotina de pegar parâmetros do disco.
 	; si = offet do ponteiro para o BPB.
     ;....
-		
+	
+	;; #bugbug 
+	;; Estamos passando apenas um argumento.
+	;; O Número do disco.  
+	
 	;Magic.
 	;mov bx, word 0xF0ED               ;MAGIC_NUMBER	
 
     ;Disk parameters.
 	;mov ax, word [NumHeads]           ;Heads.
-    mov dl, byte [DriveNumber]	      ;*Disk Number.	
+    mov dl, byte [DriveNumber]	       ;*Disk Number.	
 	;mov cl, byte [SectorsPerTrack]    ;Sectors Per Track.
-	;mov ch, byte 0                   ;Nothing. 
+	;mov ch, byte 0                    ;Nothing. 
 	;mov di, word [CylinderNumbers]    ;Cylinders.
 	;BPB.
 	;mov si, word BPB                  ;BPB OFFSET. ;ds:si = 0:si 
-     
-	 ;;
-	 ;; @Não há mais espaço no mbr, mas precisamos enviar argumentos....
-	 ;; sem alterar o mecanismo de carregamento , temos que captar informações sobre o disco
-	 ;;e passar par o BM.BIN na forma de argumentos... mas nada impede que o BM.BIN. faça isso tambem.
-	 ;;
 	
 
+	;; 
+	;;#importante
+	;;Se o BM.BIN pode pegr informações sobre o disco,
+	;;Então não vamos passar essas informações para ele.
+    ;;	
+	;; @Não há mais espaço no mbr, mas precisamos enviar argumentos ...
+	;; Sem alterar o mecanismo de carregamento , 
+	;; temos que captar informações sobre o disco
+	;; e passar par o BM.BIN na forma de argumentos ... 
+	;; mas nada impede que o BM.BIN. faça isso também.
+	;;
+	
 ;Step9:
     ;;Passando o comando para o BM.BIN em 0:8000h.	
 .GO:	 
