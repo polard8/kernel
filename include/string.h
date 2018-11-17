@@ -9,6 +9,7 @@
 
 //@todo: void *memcpy(void *dst, const void *src, size_t c);  
 void *memcpy(void *v_dst, const void *v_src, unsigned long c);
+void *memcpy32(void *v_dst, const void *v_src, unsigned long c);
 
 //@todo: Deve ser const char.
 int strcmp(char *s1, char *s2);

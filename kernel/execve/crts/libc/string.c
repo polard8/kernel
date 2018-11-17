@@ -121,6 +121,22 @@ void *memcpy(void *v_dst, const void *v_src, unsigned long c)
 };
 
 
+void *memcpy32(void *v_dst, const void *v_src, unsigned long c)
+{
+	//const char *src = v_src;
+	//char *dst = v_dst;
+
+	long *src = (long *) v_src;
+	long *dst = (long *) v_dst;
+	
+	/* Simple, byte oriented memcpy. */
+	while (c--)
+		*dst++ = *src++;
+
+	return v_dst;
+};
+
+
 /*
  * strcpy - copia uma string
  *

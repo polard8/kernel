@@ -2143,6 +2143,10 @@ void drawDataRectangle( unsigned long x,
 						unsigned long width, 
 						unsigned long height, 
 						unsigned long color );
+						
+						
+						
+void * rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ); 
  
 //
 // Window support.

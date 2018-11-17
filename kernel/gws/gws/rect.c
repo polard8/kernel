@@ -26,6 +26,33 @@ extern unsigned long SavedBPP;
 
 
 
+void * rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ) 
+{
+	// Destination is an Null pointer? Source is an Null pointer? Zero-sized copy? Destination is Source?
+	
+	if ( (dest == NULL) || 
+	     (src == NULL)  || 
+		 (count == 0) || 
+		 (src == dest) ) 
+	{
+        // Yes		
+		return dest;																
+	}
+	
+	// GCC should optimize this for us :)
+	
+	int i;
+	for ( i=0; i < count; i++ ) 
+	{											
+		dest[i] = src[i];
+	}
+	
+	return dest;
+};
+
+
+
+
 //
 //===============================================================
 // refresh rect - Fred. P.
@@ -256,7 +283,9 @@ void setClientAreaRect( unsigned long x,
  * Histórico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
- */					
+ */	
+
+/* #backup
 void 
 refresh_rectangle ( unsigned long x, 
                     unsigned long y, 
@@ -308,6 +337,89 @@ refresh_rectangle ( unsigned long x,
 		q += (Width * 3);
 		p += (Width * 3);
 	};	
+};
+*/
+
+
+void 
+refresh_rectangle ( unsigned long x, 
+                    unsigned long y, 
+				    unsigned long width, 
+				    unsigned long height )
+{    
+	void *p = (void *) FRONTBUFFER_ADDRESS;		
+	const void *q = (const void*) BACKBUFFER_ADDRESS;
+
+	//register unsigned int i;
+	unsigned int i;
+	
+	unsigned int line_size, lines;
+	unsigned int offset;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();	
+
+	line_size = (unsigned int) width; 
+	lines = (unsigned int) height;
+	
+	
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+	
+	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
+	
+	p = (void *) (p + offset);    
+	q = (const void *) (q + offset);    
+	 
+    vsync ();	
+	
+	//rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ); 
+	
+	//(line_size * 3) é o número de bytes por linha. 
+	
+	int count; 
+	
+	//se for divisível por 4.
+	if( ((line_size * 3) % 4) == 0 )
+	{
+        count = ((line_size * 3) / 4);  	
+
+	    for ( i=0; i < lines; i++ )
+	    {
+		    //copia uma linha ou um pouco mais caso não seja divisível por 
+		    memcpy32 ( p, q, count );
+		    
+			q += (Width * 3);
+	 	    p += (Width * 3);
+	    };
+	}
+
+	//se não for divisível por 4.
+	if( ((line_size * 3) % 4) != 0 )
+	{
+
+        //count = (line_size * 3);  		
+	
+	    for ( i=0; i < lines; i++ )
+	    {
+		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
+		    q += (Width * 3);
+		    p += (Width * 3);
+	    };	
+	}  	
 };
 
 
