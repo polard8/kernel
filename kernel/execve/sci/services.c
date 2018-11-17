@@ -379,7 +379,9 @@ void *services( unsigned long number,
         //Isso pode ser usado por um driver. 
         //cor,x,y,0		
         case SYS_BUFFER_PUTPIXEL:
-            my_buffer_put_pixel ( (unsigned long) a2, 
+            //my_buffer_put_pixel ( (unsigned long) a2, 
+			//    (unsigned long) a3, (unsigned long) a4, 0 );   		
+            backbuffer_putpixel ( (unsigned long) a2, 
 			    (unsigned long) a3, (unsigned long) a4, 0 );   		
 			break;
 

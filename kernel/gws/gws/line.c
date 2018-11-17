@@ -13,6 +13,15 @@
 #include <kernel.h>
 
 
+//Herdadas do Boot Loader.
+// De onde vem isso ?? head.s
+// @todo: Devemos chamar o módulo hal para obtermos esses valores.
+//depois salvamos em variáveis internas usadas pela gui.
+extern unsigned long SavedBootBlock;
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP; 
 
 /*
  * lineDrawHorizontalLineWindowBuffer:
@@ -53,7 +62,10 @@ my_buffer_horizontal_line( unsigned long x1,
 {
 	while (x1 < x2){
 		
-        my_buffer_put_pixel( color, x1, y, 0 );
+        
+		//my_buffer_put_pixel( color, x1, y, 0 );
+		backbuffer_putpixel( color, x1, y, 0 );
+		
         x1++;  
     }
 };
@@ -65,8 +77,28 @@ refresh_horizontal_line( unsigned long x1,
                          unsigned long y, 
 	  				     unsigned long x2 )
 {
-	void *s = (void *) (BACKBUFFER_ADDRESS)  + (y*3*800) + (x1*3);
-    void *d = (void *) (FRONTBUFFER_ADDRESS) + (y*3*800) + (x2*3);
+	
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+	int width = (int) SavedX; //800; 	
+	
+	
+	
+	void *s = (void *) (BACKBUFFER_ADDRESS)  + (y * bytes_count * width) + (x1 * bytes_count);
+    void *d = (void *) (FRONTBUFFER_ADDRESS) + (y * bytes_count * width) + (x2 * bytes_count);
 	
 	// ??
 	// Não pode ser isso. Tem que ser uma string de tamanho definido.

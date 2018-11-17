@@ -71,6 +71,16 @@ que é formada pela barra de títulos, pela borda, pela sombra...
  
 #include <kernel.h>
 
+//Herdadas do Boot Loader.
+// De onde vem isso ?? head.s
+// @todo: Devemos chamar o módulo hal para obtermos esses valores.
+//depois salvamos em variáveis internas usadas pela gui.
+extern unsigned long SavedBootBlock;
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP; 
+
 //
 // Identificação do processo chamador e da janela a ser criada.
 //
@@ -1458,7 +1468,7 @@ drawBegin:
 		
 		//#test	
 	    //limits
-	    if ( window->height == 0 || window->height > 800 ){ 
+	    if ( window->height == 0 || window->height > SavedX ){ 
 		    window->height = 2; 
 		}
 

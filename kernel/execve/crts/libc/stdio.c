@@ -25,6 +25,17 @@
 #include <kernel.h>
 
 
+//Herdadas do Boot Loader.
+// De onde vem isso ?? head.s
+// @todo: Devemos chamar o módulo hal para obtermos esses valores.
+//depois salvamos em variáveis internas usadas pela gui.
+extern unsigned long SavedBootBlock;
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP; 
+
+
 //
 // Funções importadas.
 //
@@ -1182,8 +1193,9 @@ int stdioInitialize (){
 	//precisamos saber as dimensões da tela e do char.
 	//g_cursor_right = (800/8);
 	//g_cursor_bottom = (600/8);
-	g_cursor_right = (800/cWidth);
-	g_cursor_bottom = (600/cHeight);
+	
+	g_cursor_right = (SavedX/cWidth);
+	g_cursor_bottom = (SavedY/cHeight);
 	
 	
 	

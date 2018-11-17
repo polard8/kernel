@@ -16,6 +16,18 @@
 
 #include <kernel.h>
 
+
+
+//Herdadas do Boot Loader.
+// De onde vem isso ?? head.s
+// @todo: Devemos chamar o módulo hal para obtermos esses valores.
+//depois salvamos em variáveis internas usadas pela gui.
+extern unsigned long SavedBootBlock;
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP; 
+
  
 /*
  * backgroundDraw:
@@ -60,9 +72,9 @@ void backgroundDraw (unsigned long color){
 		
 		//backgroundSetColor( (unsigned long) color);
 		
-		for ( i=0; i<600; i++ ){
+		for ( i=0; i<SavedY; i++ ){
 			
-			my_buffer_horizontal_line ( 0, i, 800, color );
+			my_buffer_horizontal_line ( 0, i, SavedX, color );
 		};
 
 		//for(i=0; i<Height; i++){
@@ -102,8 +114,8 @@ done:
 	//g_cursor_right  = (Width/gcharWidth);
 	//g_cursor_bottom = (Height/gcharHeight);
 
-	g_cursor_right  = (800/8);
-	g_cursor_bottom = (600/8);
+	g_cursor_right  = (SavedX/8);
+	g_cursor_bottom = (SavedY/8);
 	
     return;
 };

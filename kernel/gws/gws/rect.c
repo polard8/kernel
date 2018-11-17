@@ -13,6 +13,19 @@
 #include <kernel.h>
 
 
+
+//Herdadas do Boot Loader.
+// De onde vem isso ?? head.s
+// @todo: Devemos chamar o módulo hal para obtermos esses valores.
+//depois salvamos em variáveis internas usadas pela gui.
+extern unsigned long SavedBootBlock;
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP; 
+
+
+
 //
 //===============================================================
 // refresh rect - Fred. P.
@@ -43,8 +56,8 @@
 //#todo: precisamos de uma variável para a lergura 
 //da tela e para bytes per pixel.
 //#todo: isso deve virar uma função.
-#define BUFFER_PIXEL_OFFSET(x,y) \
-( (3*800*(y)) + (3*(x)) )
+//#define BUFFER_PIXEL_OFFSET(x,y) \
+//( (3*800*(y)) + (3*(x)) )
 
 /*
  
@@ -168,14 +181,14 @@ drawDataRectangle( unsigned long x,
 	
 	//#todo: Usar variável para largura.
 	
-    if ( rect->right > 800 )
+    if ( rect->right > SavedX )
 	{
-        rect->right = 800;
+        rect->right = SavedX;
 	}	
 
 	/* @todo:
-    if( rect->bottom > 600 ){
-        rect->bottom = 600;
+    if( rect->bottom > SavedY ){
+        rect->bottom = SavedY;
 	};
     */	
   	
@@ -263,7 +276,26 @@ refresh_rectangle ( unsigned long x,
 
 	line_size = (unsigned int) width; 
 	lines = (unsigned int) height;
-	offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	
+	
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+	
+	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
 	
 	p = (void *) (p + offset);    
 	q = (void *) (q + offset);    
@@ -301,7 +333,25 @@ refresh_rectangle2 ( unsigned long x,
 
 	line_size = (unsigned int) width; 
 	lines = (unsigned int) height;
-	offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+	
+	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );	
+
 	
 	p = (void *) (p + offset);    
 	q = (void *) (q + offset);    
@@ -414,8 +464,26 @@ int save_rect ( unsigned long x,
 	line_size = (unsigned int) width; //passado por argumento
 	lines = (unsigned int) height;    //passado por argumento
 	
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+
+	offset1 = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );	
+	
 	//atualizando o offset do backbuffer
-	offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	//offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 	
 	//configurando o offset do buffer de salvamento.
 	offset2 = 0;
@@ -479,9 +547,27 @@ int show_saved_rect ( unsigned long x,
 
 	line_size = (unsigned int) width; //passado por argumento
 	lines = (unsigned int) height;    //passado por argumento
+	
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
 		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
 
-	offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	offset1 = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );		
+		
+	//offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	
 	offset2 = 0;
 	
 	p = (void *) (p + offset1);    

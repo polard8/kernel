@@ -2108,10 +2108,12 @@ void pixelPutPixelDedicatedWindowBuffer( struct window_d *window,
 										 unsigned long y, 
 										 unsigned long color ); 	
 						 
+/*
 void my_buffer_put_pixel( unsigned long ax, 
                           unsigned long bx, 
 						  unsigned long cx, 
 						  unsigned long dx );
+*/
 						  
 						  
 //

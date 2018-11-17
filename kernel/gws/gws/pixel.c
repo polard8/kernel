@@ -196,6 +196,7 @@ useDedicatedBuffer:
  * a /gui e o hardware.
  */
 //void pixelPutPixelBackBuffer( unsigned long ax, unsigned long bx, unsigned long cx, unsigned long dx )
+/*
 void 
 my_buffer_put_pixel( unsigned long ax, 
                      unsigned long bx, 
@@ -210,7 +211,7 @@ my_buffer_put_pixel( unsigned long ax,
 	//estamos testando essa para deletar a função my_buffer_put_pixel
 	backbuffer_putpixel ( ax, bx, cx, dx );
 };
-
+*/
 
 
 //
@@ -241,7 +242,7 @@ backbuffer_putpixel( unsigned long ax,
 	b = (color & 0xFF);	
 	g = (color & 0xFF00) >> 8;
 	r = (color & 0xFF0000) >> 16;
-	//a = (color >> 24) + 1;
+	a = (color >> 24) + 1;
 	
 	int x = (int) bx;
 	int y = (int) cx;
@@ -267,7 +268,13 @@ backbuffer_putpixel( unsigned long ax,
 	where[offset]    = b;
 	where[offset +1] = g;
 	where[offset +2] = r;
-	//where[offset +3] =
+	
+	//teste
+	if ( SavedBPP == 32 )
+	{
+	    where[offset +3] = a;	
+	}
+	
 };
 
 
@@ -295,7 +302,7 @@ lfb_putpixel( unsigned long ax,
 	b = (color & 0xFF);	
 	g = (color & 0xFF00) >> 8;
 	r = (color & 0xFF0000) >> 16;
-	//a = (color >> 24) + 1;
+	a = (color >> 24) + 1;
 	
 	int x = (int) bx;
 	int y = (int) cx;
@@ -320,7 +327,12 @@ lfb_putpixel( unsigned long ax,
 	where[offset]    = b;
 	where[offset +1] = g;
 	where[offset +2] = r;
-	//where[offset +3] =
+
+	//teste
+	if ( SavedBPP == 32 )
+	{
+	    where[offset +3] = a;	
+	}
 	
 };
 
@@ -339,16 +351,29 @@ unsigned long get_pixel ( unsigned long x,  unsigned long y ){
 	
 	unsigned char *rgba = (unsigned char *) &COLOR;
 	
-    unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;	
-	unsigned long pos = (unsigned long) (y*3*800)+(x*3);
+    unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;
+
+
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}	
+
+	int width = (int) SavedX; //800;
+		
+	//unsigned long pos = (unsigned long) (y*3*800)+(x*3);
+	unsigned long pos = (unsigned long) (y* bytes_count * width)+(x * bytes_count);	
 	
 	COLOR  = *( unsigned long * ) &backbuffer[pos];
 	
-	//talvez isso seja invertido
-	//rgba[3] = backbuffer[pos];
-	//rgba[2] = backbuffer[pos+3];
-	//rgba[1] = backbuffer[pos+3+3];
-	//rgba[0] = backbuffer[pos+3+3+3];
 
     return (unsigned long) COLOR;	
 };
@@ -365,9 +390,26 @@ void refresh_pixel ( unsigned long x,  unsigned long y ){
 	unsigned char *rgba = (unsigned char *) &COLOR;
 	
     unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_ADDRESS;	
-	//unsigned long pos = (unsigned long) ( 3 * x * y );
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}	
 
-	unsigned long pos = (unsigned long) (y*3*800)+(x*3);
+	int width = (int) SavedX; //800;	
+	
+
+	//unsigned long pos = (unsigned long) (y*3*800)+(x*3);
+	unsigned long pos = (unsigned long) (y* bytes_count * width)+(x * bytes_count);	
 	
 	//pego o pixel no backbuffer
 	COLOR = get_pixel( x, y );
@@ -375,12 +417,6 @@ void refresh_pixel ( unsigned long x,  unsigned long y ){
 	*( unsigned long * ) &frontbuffer[pos] = COLOR;
 	//*( unsigned long* )&frontbuffer[pos] = get_pixel( x, y );
 
-	
-	//talvez isso seja invertido
-	//frontbuffer[pos]   = rgba[0];
-	//frontbuffer[pos+1] = rgba[1];
-	//frontbuffer[pos+2] = rgba[2];
-	//frontbuffer[pos+3] = rgba[3];
 };
 
 
