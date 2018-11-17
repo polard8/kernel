@@ -247,7 +247,9 @@ done:
 
 
 /*
+ ************************************************************************
  * parse:
+ *     Função principal.
  *     Pegando tokens com o lexer e fazendo coisas ...
  */
 int parse (){
@@ -272,16 +274,22 @@ int parse (){
 		switch (c)
 		{
 			case TOKENKEYWORD:
-			    //printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
+			    
+				//printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
 			    
 				//se a kw for 'def' chamamo parse_def() que retorna só quando 
 				//encontrar um '(', onde começará os argumentos.
-				if( keyword_found == KWDEF )
+				
+				if ( keyword_found == KWDEF )
 				{
 					printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
+					
 					// parse deve retornar o '(' quando encontrá-lo.
+					
 					c = parse_def();
-					if ( c == TOKENSEPARATOR){
+					
+					if ( c == TOKENSEPARATOR )
+					{
 						goto next;
 					}
 					printf("case TOKENKEYWORD KWDEF fail;");
@@ -291,12 +299,14 @@ int parse (){
 				
 				//e a kw var foi encontrada, chamaremos parse_var(),
 				//que retornará quando encontrar ';'.
+				
 				if( keyword_found == KWVAR )
 				{
 					printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
 					// parse deve retornar o ';' quando encontrá-lo.
 					c = parse_var();
-					if( c == TOKENSEPARATOR){
+					if ( c == TOKENSEPARATOR )
+					{
 						goto next;
 					}
 					printf("case TOKENKEYWORD KWVAR fail;");
@@ -310,7 +320,8 @@ int parse (){
 					printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
 					// parse deve retornar o '(' quando encontrá-lo.
 					c = parse_return();
-					if( c == TOKENSEPARATOR){
+					if ( c == TOKENSEPARATOR )
+					{
 						goto next;
 					}
 					printf("case TOKENKEYWORD KWRETURN fail;");
@@ -375,14 +386,16 @@ int parse (){
 	//...
 	
 hang:	
-	printf("parse hang");
-	    while (1){
+
+	printf("parse: *hang");
+	    
+		while (1){
 			
 			asm ("pause");
 		}
 		
 	return 0;
-} 
+}; 
 
 
 /*

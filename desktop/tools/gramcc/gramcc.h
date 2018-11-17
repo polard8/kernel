@@ -1,6 +1,6 @@
 
 
-//fncc.h
+// gramcc.h
 
 
 
@@ -190,5 +190,6 @@ struct type_d
 
 unsigned long functionList[FUNCTION_COUNT_MAX];
 
-int fnccmain( int argc, char *argv[] );
+int gramcc_main ( int argc, char *argv[] );
+
 

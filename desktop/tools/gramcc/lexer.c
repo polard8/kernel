@@ -260,7 +260,7 @@ again:
 		
 		case EOF:
 		    //    value = ENDFILE; 
-		    printf("yylex EOF\n");
+		    printf ("yylex: EOF\n");
 		    break;
 			
         case 'A':
@@ -350,21 +350,21 @@ again:
 			//e se esse ideitificador fou uma palavra reservada ??
 			
 			//temos um tipo
-			if( strncmp( real_token_buffer, "int", 3 ) == 0  )
+			if ( strncmp( real_token_buffer, "int", 3 ) == 0 )
 			{
 				value = TOKENTYPE;
 				type_found = TINT;
 			}
 			
 			//temos um tipo
-			if( strncmp( real_token_buffer, "void", 4 ) == 0  )
+			if ( strncmp( real_token_buffer, "void", 4 ) == 0 )
 			{
 				value = TOKENTYPE;
 				type_found = TVOID;
 			}				
 			
 			//temos um tipo
-			if( strncmp( real_token_buffer, "char", 4 ) == 0  )
+			if ( strncmp( real_token_buffer, "char", 4 ) == 0 )
 			{
 				value = TOKENTYPE;
 				type_found = TCHAR;
@@ -372,7 +372,7 @@ again:
 			
 			
 			//temos um tipo
-			if( strncmp( real_token_buffer, "short", 5 ) == 0  )
+			if ( strncmp( real_token_buffer, "short", 5 ) == 0 )
 			{
 				value = TOKENTYPE;
 				type_found = TSHORT;
@@ -380,7 +380,7 @@ again:
 
 
 			//temos um tipo
-			if( strncmp( real_token_buffer, "long", 4 ) == 0  )
+			if ( strncmp( real_token_buffer, "long", 4 ) == 0 )
 			{
 				value = TOKENTYPE;
 				type_found = TLONG;
@@ -388,98 +388,114 @@ again:
 			
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "asm", 3 ) == 0  ){
+			if ( strncmp( real_token_buffer, "asm", 3 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWASM;
 			}		
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "goto", 4 ) == 0  ){
+			if ( strncmp( real_token_buffer, "goto", 4 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWGOTO;
 			}			
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "return", 6 ) == 0  ){
+			if ( strncmp( real_token_buffer, "return", 6 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWRETURN;
 			}
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "continue", 8 ) == 0  ){
+			if ( strncmp( real_token_buffer, "continue", 8 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWCONTINUE;
 			}
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "default", 7 ) == 0  ){
+			if ( strncmp( real_token_buffer, "default", 7 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWDEFAULT;
 			}			
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "case", 4 ) == 0  ){
+			if ( strncmp( real_token_buffer, "case", 4 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWCASE;
 			}
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "switch", 6 ) == 0  ){
+			if ( strncmp( real_token_buffer, "switch", 6 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWSWITCH;
 			}			
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "for", 3 ) == 0  ){
+			if ( strncmp( real_token_buffer, "for", 3 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWFOR;
 			}
 
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "do", 2 ) == 0  ){
+			if ( strncmp( real_token_buffer, "do", 2 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWDO;
 			}			
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "while", 5 ) == 0  ){
+			if ( strncmp( real_token_buffer, "while", 5 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWWHILE;
 			}		
 
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "else", 4 ) == 0  ){
+			if ( strncmp( real_token_buffer, "else", 4 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWELSE;
 			}	
 
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "if", 2 ) == 0  ){
+			if ( strncmp( real_token_buffer, "if", 2 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWIF;
 			}		
 
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "union", 5 ) == 0  ){
+			if ( strncmp( real_token_buffer, "union", 5 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWUNION;
 			}				
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "struct", 6 ) == 0  ){
+			if ( strncmp( real_token_buffer, "struct", 6 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWSTRUCT;
 			}				
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "enum", 4 ) == 0  ){
+			if ( strncmp( real_token_buffer, "enum", 4 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWENUM;
 			}			
 			
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "sizeof", 6 ) == 0  ){
+			if ( strncmp( real_token_buffer, "sizeof", 6 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWSIZEOF;
 			}		
@@ -491,25 +507,29 @@ again:
 			}				
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "inline", 6 ) == 0  ){
+			if ( strncmp( real_token_buffer, "inline", 6 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWINLINE;
 			}				
 			
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "def", 3 ) == 0  ){
+			if ( strncmp( real_token_buffer, "def", 3 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWDEF;
 			}	
 
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "static", 6 ) == 0  ){
+			if ( strncmp( real_token_buffer, "static", 6 ) == 0 )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWSTATIC;
 			}	
 
 			//temos uma palavra reservada.
-			if( strncmp( real_token_buffer, "var", 3 ) == 0  ){
+			if ( strncmp( real_token_buffer, "var", 3 ) == 0  )
+			{
 				value = TOKENKEYWORD;
 				keyword_found = KWVAR;
 			}
@@ -547,12 +567,12 @@ again:
 					*p = c;
 			         p++;
 
-					while(1)
+					while (1)
 					{
 						c = getc (finput);
 
-						// Se o próximo não for um digito heaxadecimal. 
-						if( isxdigit(c) == 0 )
+						// Se o próximo não for um digito hexadecimal. 
+						if ( isxdigit(c) == 0 )
 						{
 							*p = 0;
 
@@ -563,15 +583,14 @@ again:
                             goto constant_done;
 						}
 
-						//coloca se é heaxa.
-						//*p++ = c;
+						//coloca se é hexa.
 					    *p = c;
 			            p++;
 					};
 				}
 
-				printf("yylex: expected x");
-				exit(1);
+				printf ("yylex: FAIL expected x");
+				exit (1);
 			    
 			}else{
 				//base = 10.
@@ -677,7 +696,6 @@ again:
         case '!':
         case '=':
         {
-
             combine:
 
 	        switch (c)
@@ -757,7 +775,9 @@ again:
 				
 	            value = ASSIGN; 
 				goto done;
+				
 	        }else if (c == c1){
+				
 	                switch (c)
 	                {
 	                    case '+':
@@ -779,7 +799,9 @@ again:
 	                        c = RSHIFT;
 	                        goto combine;
 	                }
-            }else if ((c == '-') && (c1 == '>')){ 
+					
+            }else if ((c == '-') && (c1 == '>')) {
+				
 		         value = POINTSAT; 
 				 goto done; 
 		    }
@@ -793,7 +815,6 @@ again:
         };
 
 
-  
         default:
             value = c;
     
@@ -830,11 +851,11 @@ int lexerInit (){
 	//token_buffer = malloc( 128 );
 	token_buffer = &real_token_buffer[0]; 
 
-	sprintf(real_token_buffer,"suja");
+	sprintf ( real_token_buffer, "suja" );
 
 	//...
 
-    return 0;
+    return (int) 0;
 };
 
 

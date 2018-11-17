@@ -38,7 +38,7 @@ char copyright[] = "Copyright (c) 2018 Fred Nora.\n\
 //default name.
 char program_name[] = "[Default program name]";
 
-// Specification for fncc.
+// Specification for gramcc.
 char *standard_spec = "%{%{CC} -c %{I} -o %{O}}";
 
 
@@ -55,7 +55,7 @@ char **create_tokenlist( char *s );
 void fncc_print_tokenList ( char *token_list[], char *separator );
 
 //inicializando as variáveis e buffers.
-int fnccInitialize();
+int gramccInitialize();
 
 //testando suporte à ctype.
 //void mainTestingCTYPE();
@@ -109,7 +109,7 @@ int mainGetMessage (){
 	char *shared_memory = (char *) (0xC0800000 -0x100);
 	
 	
-#ifdef FNCC_VERBOSE
+#ifdef GRAMCC_VERBOSE
 	printf("\n");
 	printf(" mainGetMessage: Initializing fncc ...\n");
 	printf("\n");
@@ -150,7 +150,7 @@ int mainGetMessage (){
 	
 	// #debug 
 	// Mostra argumentos.
-#ifdef FNCC_VERBOSE	
+#ifdef GRAMCC_VERBOSE	
 	// Mostra a quantidade de argumentos. 	
 	printf("\n");
 	printf("token_count={%d}\n", token_count );
@@ -172,14 +172,15 @@ int mainGetMessage (){
 	// ## Main ##	
     //
 	
-	Ret = (int) fnccmain ( token_count, tokenList );	
+	Ret = (int) gramcc_main ( token_count, tokenList );	
 	
-	if (Ret == 1){
-//#ifdef FNCC_VERBOSE				
+	if (Ret == 1)
+	{
+//#ifdef GRAMCC_VERBOSE				
 		printf("mainGetMessage: main returned 1.\n");
 //#endif 
 	}else{
-//#ifdef FNCC_VERBOSE		
+//#ifdef GRAMCC_VERBOSE		
 		printf("mainGetMessage: main returned 0.\n");
 //#endif
 	};
@@ -198,11 +199,11 @@ int mainGetMessage (){
 
 /*
  ********************************
- * fnccmain:
+ * gramcc_main:
  *     Função principal do fncc.
  *     Essa função é chamada por mainGetMessage.
  */
-int fnccmain ( int argc, char *argv[] ){
+int gramcc_main ( int argc, char *argv[] ){
 	
 	FILE *fp;       //file pointer.
 	register int i;
@@ -235,15 +236,15 @@ int fnccmain ( int argc, char *argv[] ){
 	// Initializing.
 init:
     
-#ifdef FNCC_VERBOSE		
+#ifdef GRAMCC_VERBOSE		
     printf("\n");
-	printf("fnccmain: Initializing fncc ...\n");
+	printf("gramcc_main: Initializing fncc ...\n");
 #endif 
 
     libcInitRT();
     stdioInitialize();
 	
-	fnccInitialize();
+	gramccInitialize ();
 	
 	// O nome do programa é o primeiro comando da linha.
 	// compiler_name = argv[0];
@@ -252,7 +253,7 @@ init:
     // #debug 
     // Mostrando os argumentos. 
 	
-#ifdef FNCC_VERBOSE		
+#ifdef GRAMCC_VERBOSE		
 	printf("argc={%d} ...\n",argc);
 	for( i=0; i < argc; i++ )
 	    printf(" ## argv{%d}={%s} ##  \n", i, argv[i] );
@@ -287,18 +288,21 @@ init:
 	    //...	
 	};
 	
-
+    //
 	// # arquivo de entrada #
+	//
 	
     fp = fopen ( (char *) argv[2], "rb" );	
 	
 	if ( fp == NULL )
     {
-        printf("fopen fail\n");
-        //exit (1);
-		while (1){
-			asm ("pause");
-		}	
+        printf ("fopen fail\n");
+        exit (1);
+		
+		//while (1){
+		//	asm ("pause");
+		//}	
+		
     }else{
 
 		// Exibe o arquivo.
@@ -368,7 +372,7 @@ int mainTextEditor( int argc, char *argv[] )
     int char_count = 0;	
 	
 	
-#ifdef FNCC_VERBOSE			
+#ifdef GRAMCC_VERBOSE			
 	printf("\n");
 	printf("Initializing Text Editor:\n");
 	printf("mainTextEditor:  ## argv={%s} ##  \n",
@@ -419,7 +423,7 @@ int mainTextEditor( int argc, char *argv[] )
 	
 file:
 
-#ifdef FNCC_VERBOSE	
+#ifdef GRAMCC_VERBOSE	
 	printf("\n");
 	printf("\n");
     printf("Loading file ...\n");
@@ -439,7 +443,7 @@ file:
         goto fail;		
     }else{
 		
-#ifdef FNCC_VERBOSE			
+#ifdef GRAMCC_VERBOSE			
         printf(".\n");		
         printf("..\n");		
         printf("...\n");
@@ -447,14 +451,14 @@ file:
 		// Exibe o arquivo.
         printf("%s",fp->_base);	
 
-#ifdef FNCC_VERBOSE	        
+#ifdef GRAMCC_VERBOSE	        
 		printf("...\n");
         printf("..\n");		
         printf(".\n");		
 #endif
 
 
-#ifdef FNCC_VERBOSE	
+#ifdef GRAMCC_VERBOSE	
 		printf("\n");
 		printf("Typing a text ...\n");
 #endif
@@ -662,25 +666,35 @@ int is_letter(char c)
 
 /*
  **************************************
- * fnccInitialize:
- *
+ * gramccInitialize:
+ *     Função interna.
  */
-int fnccInitialize()
-{
+int gramccInitialize (){
+	
     int Status = 0;	
 	
 	int i;
 	
-	for( i=0; i<INFILE_SIZE; ++i ){
+	
+	// Clear buffers
+	
+	for ( i=0; i<INFILE_SIZE; i++ )
+	{
 		infile[i] = '\0';
 	}
 
-	for( i=0; i<OUTFILE_SIZE; ++i ){
+	for ( i=0; i<OUTFILE_SIZE; i++ )
+	{
 		outfile[i] = '\0';
 	}
 	
-    sprintf(infile, STRING_CFILE );
-    //strcat(infile,"");	
+	
+	// Inicializamos o buffer do arquivo sujando ele.
+    // Mas depois carregaremos um arquivo.	
+	
+    //sprintf ( infile, STRING_CFILE );
+	sprintf ( infile, "initializing infile " );
+    strcat(infile,"buffer");	
 	
     sprintf(outfile, "initializing outfile " );
     strcat(outfile,"buffer");	
@@ -708,7 +722,8 @@ int fnccInitialize()
     current_separator = 0; 
     current_special = 0;	
 	
-	
+	//#imporante
+	//Inicializando lexer e parser.
 	
 	Status = (int) lexerInit();
 	Status = (int) parserInit();
@@ -724,7 +739,6 @@ int fnccInitialize()
 	
 	//...
 
-done:
     return (int) Status;	
 };
 
@@ -756,28 +770,33 @@ void mainTestingCTYPE()
 };
 */
 
+
+
 //mostra as estatísticas para o desenvolvedor.
-void debugShowStat()
-{
+void debugShowStat (){
+	
 	printf("debugShowStat:\n\n");
 	
-	
-	printf("name: %s\n",program.name);
-	printf("function count : %d\n",program.function_count);
-	printf("list handle : %x\n",program.function_list);
+	printf("name: %s\n", program.name );
+	printf("function count : %d\n", program.function_count );
+	printf("list handle : %x\n", program.function_list );
 	
 	
 	if( (void *) function_main == NULL )
 	{
-		printf("function_main: struct \n");
-	}else{
+		printf("debugShowStat: function_main struct \n");
+		return;
+	
+	} else {
 		
-        if( function_main->used != 1 || function_main->magic != 1234 )
+        if ( function_main->used != 1 || function_main->magic != 1234 )
         {
 		    printf("function_main: validation \n");
-		}else{
+		    return;
 			
-			printf("main id: %d \n",function_main->id);
+		} else {
+			
+			printf("main id: %d \n", function_main->id );
 		    
 			//...
 			

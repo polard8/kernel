@@ -1254,9 +1254,9 @@ end:
 	
     system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);
 
-//#ifdef SHELL_VERBOSE		
+#ifdef SHELL_VERBOSE		
     printf("SHELL.BIN: exiting code '0' ...\n");
-//#endif 
+#endif 
 	
 	return (int) 0;
 };
@@ -2375,7 +2375,12 @@ do_compare:
 		
 		   //test 2MB
 		   //o argumento tamanho é dado  em kb.
-		   shellDisplayBMPEx ( (char *) tokenList[i], (int) (1024*2) );
+		   //printf("test 2mb\n");
+		   //shellDisplayBMPEx ( (char *) tokenList[i], (int) (1024*2) );
+		   
+		   //test 200kb
+		   printf("test 200kb\n");
+		   shellDisplayBMPEx ( (char *) tokenList[i], (int) (200) );
 		};
 		goto exit_cmp;
     };	
@@ -2717,13 +2722,13 @@ do_compare:
 	    //hBuffer[1] = 99;
 		//printf("%d %d \n",hBuffer[0],hBuffer[1]);
 		
-		//hBuffer = (void *) malloc ( 1024*100 ); //100kb
-        hBuffer = (void *) malloc ( 1024*1024*3 ); //3mb		
+		hBuffer = (void *) malloc ( 1024*100 ); //100kb
+        //hBuffer = (void *) malloc ( 1024*1024*3 ); //3mb		
 		if ( (void *) hBuffer == NULL )
 		{
-			printf("malloc fail 3MB\n");
+			printf("malloc fail 100kb\n");
 		}else{
-			printf("malloc ok 3MB\n");
+			printf("malloc ok 100kb\n");
 		}
 		
 		printf("done\n");
