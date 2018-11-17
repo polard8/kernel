@@ -220,61 +220,75 @@ backbuffer_putpixel( unsigned long ax,
 {
     //#importante
 	//Esse é o origina. Isso funciona.
-	hal_backbuffer_putpixel ( ax, bx, cx, dx );
+	//hal_backbuffer_putpixel ( ax, bx, cx, dx );
 	
 	//#test
 	//tentando um novo método.
 	
-	/*
+	unsigned char *where = (unsigned char *) 0xC0800000;
 	
-	unsigned short DispWidth = 800;
 	
-	unsigned short *
-	target_address = (unsigned short *) ( 0xC0800000 + ( (unsigned short) cx * ( (unsigned short) DispWidth * 3) ) + ( (unsigned short) bx * 3) );
+	unsigned long color = (unsigned long) ax;
 	
-	//rgba 	
-	*(unsigned char *) ( &target_address[0] ) = (unsigned char) ax;
-	*(unsigned char *) ( &target_address[1] ) = (unsigned char) (ax >> 8);
-	*(unsigned char *) ( &target_address[2] ) = (unsigned char) (ax >> 16);
-		
-	//if ( bpp == 32 )
-	//{
-	    //*(unsigned char *) ( &target_address[3] ) = (unsigned char) (ax >> 24);		
-	//}
+	char b, g, r, a;
 	
-	*/
+	b = (color & 0xFF);	
+	g = (color & 0xFF00) >> 8;
+	r = (color & 0xFF0000) >> 16;
+	//a = (color >> 24) + 1;
+	
+	int x = (int) bx;
+	int y = (int) cx;
+	int bytes_count = 3; //24bpp
+	int width = (int) 800; 
+	
+	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
+	
+	where[offset]    = b;
+	where[offset +1] = g;
+	where[offset +2] = r;
+	//where[offset +3] =
 };
 
 
+
+// IN: cor, x, y, 0
 void 
 lfb_putpixel( unsigned long ax, 
               unsigned long bx, 
 		      unsigned long cx, 
 		      unsigned long dx )
 {
-    hal_lfb_putpixel ( ax, bx, cx, dx );
+    
+	//hal_lfb_putpixel ( ax, bx, cx, dx );
 	
 	//#test
 	//tentando um novo método.
 	
-    /*	
+	unsigned char *where = (unsigned char *) 0xC0400000;
 	
-	unsigned short DispWidth = 800;
 	
-	unsigned short *
-	target_address = (unsigned short *) ( 0xC0400000 + ( (unsigned short) cx * ( (unsigned short) DispWidth * 3) ) + ( (unsigned short) bx * 3) );
+	unsigned long color = (unsigned long) ax;
 	
-	//rgba 	
-	*(unsigned char *) ( &target_address[0] ) = (unsigned char) ax;
-	*(unsigned char *) ( &target_address[1] ) = (unsigned char) (ax >> 8);
-	*(unsigned char *) ( &target_address[2] ) = (unsigned char) (ax >> 16);
-		
-	//if ( bpp == 32 )
-	//{
-	    //*(unsigned char *) ( &target_address[3] ) = (unsigned char) (ax >> 24);		
-	//}
-
-    */	
+	char b, g, r, a;
+	
+	b = (color & 0xFF);	
+	g = (color & 0xFF00) >> 8;
+	r = (color & 0xFF0000) >> 16;
+	//a = (color >> 24) + 1;
+	
+	int x = (int) bx;
+	int y = (int) cx;
+	int bytes_count = 3; //24bpp
+	int width = (int) 800; 
+	
+	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
+	
+	where[offset]    = b;
+	where[offset +1] = g;
+	where[offset +2] = r;
+	//where[offset +3] =
+	
 };
 
 
