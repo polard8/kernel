@@ -89,8 +89,12 @@ void screenSetSize( unsigned long width, unsigned long height )
  */
 void refresh_screen()
 {
-    screenRefresh();
-	//return;
+    //antigo.
+	//isso funciona.
+	//screenRefresh();
+
+	//teste
+    refresh_rectangle ( 0, 0, SavedX, SavedY );
 };
 
 

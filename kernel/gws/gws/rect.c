@@ -386,7 +386,7 @@ refresh_rectangle ( unsigned long x,
 	 
     vsync ();	
 	
-	//rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ); 
+ 
 	
 	//(line_size * 3) é o número de bytes por linha. 
 	
@@ -433,7 +433,7 @@ refresh_rectangle2 ( unsigned long x,
                      unsigned long buffer2 )
 {    
 	void *p = (void *) buffer1;		
-	void *q = (void *) buffer2;
+	const void *q = (const void *) buffer2;
 
 	//register unsigned int i;
 	unsigned int i;
@@ -466,9 +466,45 @@ refresh_rectangle2 ( unsigned long x,
 
 	
 	p = (void *) (p + offset);    
-	q = (void *) (q + offset);    
+	q = (const void *) (q + offset);    
 	 
     vsync ();	
+	
+	
+	//(line_size * 3) é o número de bytes por linha. 
+	
+	int count; 
+	
+	//se for divisível por 4.
+	if( ((line_size * 3) % 4) == 0 )
+	{
+        count = ((line_size * 3) / 4);  	
+
+	    for ( i=0; i < lines; i++ )
+	    {
+		    //copia uma linha ou um pouco mais caso não seja divisível por 
+		    memcpy32 ( p, q, count );
+		    
+			q += (Width * 3);
+	 	    p += (Width * 3);
+	    };
+	}
+
+	//se não for divisível por 4.
+	if( ((line_size * 3) % 4) != 0 )
+	{
+
+        //count = (line_size * 3);  		
+	
+	    for ( i=0; i < lines; i++ )
+	    {
+		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
+		    q += (Width * 3);
+		    p += (Width * 3);
+	    };	
+	}  		
+	
+	/*
 	
 	for ( i=0; i < lines; i++ )
 	{
@@ -476,6 +512,7 @@ refresh_rectangle2 ( unsigned long x,
 		q += (Width * 3);
 		p += (Width * 3);
 	};	
+	*/
 };
 
 
@@ -560,7 +597,7 @@ int save_rect ( unsigned long x,
     //do backbuffer para o buffer de salvamento.
 	
 	void *p = (void *) SavedRect->buffer_address; //(buffer para salvar)		
-	void *q = (void *) BACKBUFFER_ADDRESS;
+	const void *q = (const void *) BACKBUFFER_ADDRESS;
 
 	//register unsigned int i;
 	unsigned int i;
@@ -601,18 +638,55 @@ int save_rect ( unsigned long x,
 	offset2 = 0;
 	
 	p = (void *) (p + offset2);    
-	q = (void *) (q + offset1);    
+	q = (const void *) (q + offset1);    
 	 
     
 	//não precisa de sincronização pois não estamos enviando para o LFB.
 	//vsync ();	
 	
+	
+	//(line_size * 3) é o número de bytes por linha. 
+	
+	int count; 
+	
+	//se for divisível por 4.
+	if( ((line_size * 3) % 4) == 0 )
+	{
+        count = ((line_size * 3) / 4);  	
+
+	    for ( i=0; i < lines; i++ )
+	    {
+		    //copia uma linha ou um pouco mais caso não seja divisível por 
+		    memcpy32 ( p, q, count );
+		    
+			q += (Width * 3);
+	 	    p += (Width * 3);
+	    };
+	}
+
+	//se não for divisível por 4.
+	if( ((line_size * 3) % 4) != 0 )
+	{
+
+        //count = (line_size * 3);  		
+	
+	    for ( i=0; i < lines; i++ )
+	    {
+		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
+		    q += (Width * 3);
+		    p += (Width * 3);
+	    };	
+	}  			
+	
+	/*
 	for ( i=0; i < lines; i++ )
 	{
 		memcpy( p, q, (line_size * 3) );
 		q += (Width * 3);
 		p += (Width * 3);
 	};	 
+    */
+
 
     return (int) 0;		
 };
@@ -644,7 +718,7 @@ int show_saved_rect ( unsigned long x,
    //======================
 	
 	void *p = (void *) BACKBUFFER_ADDRESS;   	
-	void *q = (void *) SavedRect->buffer_address;         
+	const void *q = (const void *) SavedRect->buffer_address;         
 
 	//register unsigned int i;
 	unsigned int i;
@@ -683,19 +757,57 @@ int show_saved_rect ( unsigned long x,
 	offset2 = 0;
 	
 	p = (void *) (p + offset1);    
-	q = (void *) (q + offset2);    
+	q = (const void *) (q + offset2);    
 	 
     
 	//não precisa de sincronização pois não estamos enviando para o LFB.
 	//vsync ();	
 	
+	
+	//(line_size * 3) é o número de bytes por linha. 
+	
+	int count; 
+	
+	//se for divisível por 4.
+	if( ((line_size * 3) % 4) == 0 )
+	{
+        count = ((line_size * 3) / 4);  	
+
+	    for ( i=0; i < lines; i++ )
+	    {
+		    //copia uma linha ou um pouco mais caso não seja divisível por 
+		    memcpy32 ( p, q, count );
+		    
+			q += (Width * 3);
+	 	    p += (Width * 3);
+	    };
+	}
+
+	//se não for divisível por 4.
+	if( ((line_size * 3) % 4) != 0 )
+	{
+
+        //count = (line_size * 3);  		
+	
+	    for ( i=0; i < lines; i++ )
+	    {
+		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
+		    q += (Width * 3);
+		    p += (Width * 3);
+	    };	
+	}  			
+	
+	
+	
+	/*
 	for ( i=0; i < lines; i++ )
 	{
 		memcpy( p, q, (line_size * 3) );
 		q += (Width * 3);
 		p += (Width * 3);
 	};	 
-
+    */
+	
     return (int) 0;	
 };
 
