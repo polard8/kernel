@@ -32,14 +32,15 @@ char vsync_inb(int port);
  * vsync:
  *     Sincroniza a pintura com o retraço vertical. 
  */
+/* 
 void vsync()
 {
-    /* wait until any previous retrace has ended */
+    //wait until any previous retrace has ended 
     do{
 	//nothing
     }while( vsync_inb(VSYNC_INPORT) & 8 );
 
-    /* wait until a new retrace has just begun */
+    //wait until a new retrace has just begun 
     do{
 	//nothing
     }while( !(vsync_inb(VSYNC_INPORT) & 8) );
@@ -47,6 +48,17 @@ void vsync()
 done:
     return;
 };
+*/
+
+
+void vsync(){
+	
+	while ( ( vsync_inb (0x3DA) & 8 ) != 8 );
+	
+	while ( ( vsync_inb (0x3DA) & 8 ) == 8 );
+};
+
+
 
 
 /*

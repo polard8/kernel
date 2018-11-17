@@ -210,6 +210,7 @@ my_buffer_put_pixel( unsigned long ax,
 //
 // ## putpixel: backbuffer e lfb ##
 //
+// IN: cor, x, y, 0
 
 void 
 backbuffer_putpixel( unsigned long ax, 
@@ -217,7 +218,31 @@ backbuffer_putpixel( unsigned long ax,
 				     unsigned long cx, 
 				     unsigned long dx )
 {
-    hal_backbuffer_putpixel ( ax, bx, cx, dx );
+    //#importante
+	//Esse é o origina. Isso funciona.
+	hal_backbuffer_putpixel ( ax, bx, cx, dx );
+	
+	//#test
+	//tentando um novo método.
+	
+	/*
+	
+	unsigned short DispWidth = 800;
+	
+	unsigned short *
+	target_address = (unsigned short *) ( 0xC0800000 + ( (unsigned short) cx * ( (unsigned short) DispWidth * 3) ) + ( (unsigned short) bx * 3) );
+	
+	//rgba 	
+	*(unsigned char *) ( &target_address[0] ) = (unsigned char) ax;
+	*(unsigned char *) ( &target_address[1] ) = (unsigned char) (ax >> 8);
+	*(unsigned char *) ( &target_address[2] ) = (unsigned char) (ax >> 16);
+		
+	//if ( bpp == 32 )
+	//{
+	    //*(unsigned char *) ( &target_address[3] ) = (unsigned char) (ax >> 24);		
+	//}
+	
+	*/
 };
 
 
@@ -228,6 +253,28 @@ lfb_putpixel( unsigned long ax,
 		      unsigned long dx )
 {
     hal_lfb_putpixel ( ax, bx, cx, dx );
+	
+	//#test
+	//tentando um novo método.
+	
+    /*	
+	
+	unsigned short DispWidth = 800;
+	
+	unsigned short *
+	target_address = (unsigned short *) ( 0xC0400000 + ( (unsigned short) cx * ( (unsigned short) DispWidth * 3) ) + ( (unsigned short) bx * 3) );
+	
+	//rgba 	
+	*(unsigned char *) ( &target_address[0] ) = (unsigned char) ax;
+	*(unsigned char *) ( &target_address[1] ) = (unsigned char) (ax >> 8);
+	*(unsigned char *) ( &target_address[2] ) = (unsigned char) (ax >> 16);
+		
+	//if ( bpp == 32 )
+	//{
+	    //*(unsigned char *) ( &target_address[3] ) = (unsigned char) (ax >> 24);		
+	//}
+
+    */	
 };
 
 

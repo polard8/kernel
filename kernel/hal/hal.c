@@ -163,15 +163,8 @@ hal_backbuffer_putpixel ( unsigned long ax,
 	// IN: cor, x, y, 0
 	
 	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
-
-    //? Questionamentos: 	
-	//Coloca um pixel no backbuffer. 
-	// ?? De onde vem essa rotina ??
-	// @todo: Devemos chamar o módulo hal.
 	
-	//gui_buffer_putpixel (); 
-    swlib_backbuffer_putpixel();	
+    swlib_backbuffer_putpixel ();	
 };
 
 
