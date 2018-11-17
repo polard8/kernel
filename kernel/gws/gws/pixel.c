@@ -202,7 +202,13 @@ my_buffer_put_pixel( unsigned long ax,
 				     unsigned long cx, 
 					 unsigned long dx )
 {
-    hal_backbuffer_putpixel ( ax, bx, cx, dx );
+    
+	//antigo. isso funciona.
+	//hal_backbuffer_putpixel ( ax, bx, cx, dx );
+
+	
+	//estamos testando essa para deletar a função my_buffer_put_pixel
+	backbuffer_putpixel ( ax, bx, cx, dx );
 };
 
 
@@ -239,8 +245,22 @@ backbuffer_putpixel( unsigned long ax,
 	
 	int x = (int) bx;
 	int y = (int) cx;
-	int bytes_count = 3; //24bpp
-	int width = (int) 800; 
+	
+	
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+	int width = (int) SavedX; //800; 
 	
 	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 	
@@ -279,8 +299,21 @@ lfb_putpixel( unsigned long ax,
 	
 	int x = (int) bx;
 	int y = (int) cx;
-	int bytes_count = 3; //24bpp
-	int width = (int) 800; 
+
+	int bytes_count;// = 3; //24bpp
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}	
+	
+	int width = (int) SavedX; //800;
 	
 	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 	
