@@ -53,9 +53,16 @@ void stdio_fntos (char *name){
 	
     int  i, ns = 0;
     char ext[4];
+	
+	ext[0] = 0;
+	ext[1] = 0;
+	ext[2] = 0;
+	ext[3] = 0;
+	
     //const char ext[4];
 	
-    //transforma em maiúscula
+    //Transforma em maiúscula enquanto não achar um ponto.
+	
 	while ( *name && *name != '.' )
 	{
         if ( *name >= 'a' && *name <= 'z' )
@@ -65,22 +72,38 @@ void stdio_fntos (char *name){
         ns++;
     };
 
-    // aqui name[0] é o ponto.
-	// então constroi a extensão.
+    // Aqui name[0] é o ponto.
+	// Então constrói a extensão.
+	
 	for ( i=0; i < 3 && name[i+1]; i++ )
 	{
-        if(name[i+1] >= 'a' && name[i+1] <= 'z')
-            name[i+1] -= 0x20;
+		//Transforma uma letra da extensão em maiúscula.
+        
+		//if (name[i+1] >= 'a' && name[i+1] <= 'z')
+        //    name[i+1] -= 0x20;
 
-        ext[i] = name[i+1];
-    };
+        //ext[i] = name[i+1];
+    
+	
+	    //#testando
+	    //Se não for letra então não colocamos no buffer de extensão;
+		if (name[i+1] >= 'a' && name[i+1] <= 'z')
+		{
+			name[i+1] -= 0x20;
+		    ext[i] = name[i+1];
+		}
+	};
 
-    while (ns < 8){
-		
+	//Acrescentamos ' ' até completarmos as oito letras do nome.
+	
+    while (ns < 8)
+	{	
         *name++ = ' ';
         ns++;
     };
 
+	//Acrescentamos a extensão
+	
     for (i=0; i < 3; i++)
         *name++ = ext[i];
 
@@ -177,9 +200,17 @@ FILE *fopen ( const char *filename, const char *mode ){
 	size_t size;
 	
 	
+	//#test
+	if ( (char *) filename == NULL )
+	{
+	    printf("stdio-fopen: no filename\n");
+		return NULL;
+	}	
+	
 	//transformando a string do nome de file.txt em 'FILE    TXT'
 	stdio_fntos ( (char *) filename );	
 	
+
 
 	//Criando as estruturas.
 	//struct _iobuf *stream;
@@ -194,7 +225,20 @@ FILE *fopen ( const char *filename, const char *mode ){
 	}else{
 		
 		
-
+		
+	    //printf("%x ",(char) filename[0]);
+	    //printf("%x ",(char) filename[1]);
+	    //printf("%x ",(char) filename[2]);
+	    //printf("%x ",(char) filename[3]);
+	
+	    //printf("%x ",(char) filename[4]);
+	    //printf("%x ",(char) filename[5]);
+	    //printf("%x ",(char) filename[6]);
+	    //printf("%x ",(char) filename[7]);
+	
+	    //printf(". %x ",(char) filename[8]);
+        //printf("%x ",(char) filename[9]);
+        //printf("%x \n ",(char) filename[10]);		
 		
 		//Não faremos mais assim. Vamos alocar.
 	    //Colocamos aqui o endereço onde o arquivo foi carregado.  
@@ -207,8 +251,8 @@ FILE *fopen ( const char *filename, const char *mode ){
 		                    (unsigned long) 0, 
 							(unsigned long) 0 );			
 		
-		
-		if (size < 512){  
+		if (size < 512)
+		{  
 	        size = 512; 
 		}
 	
@@ -252,12 +296,7 @@ FILE *fopen ( const char *filename, const char *mode ){
 	// @todo: Criar filtros para os argumentos. Retornar NULL
 	// se os argumentos forem inválidos.
 	
-	//#test
-	if ( (char *) filename == NULL )
-	{
-	    printf("stdio-fopen: no filename\n");
-		return NULL;
-	}	
+
 	
 	//transformando a string do nome de file.txt em 'FILE    TXT'
 	//stdio_fntos( (char *) filename );
@@ -266,6 +305,20 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//
 	//  ## Load file ##
 	//
+	
+	//printf("%x ",(char) filename[0]);
+	//printf("%x ",(char) filename[1]);
+	//printf("%x ",(char) filename[2]);
+	//printf("%x ",(char) filename[3]);
+	
+	//printf("%x ",(char) filename[4]);
+	//printf("%x ",(char) filename[5]);
+	//printf("%x ",(char) filename[6]);
+	//printf("%x ",(char) filename[7]);
+	
+	//printf(". %x ",(char) filename[8]);
+    //printf("%x ",(char) filename[9]);
+    //printf("%x \n ",(char) filename[10]);
 	
 	// Chamar uma  rotina que carregue um arquivo ...
 	// usar a mesma chamada pela api.

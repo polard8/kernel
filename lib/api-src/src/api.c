@@ -875,10 +875,8 @@ void apiInitBackground (){
  */
 int MessageBox ( int type, char *string1, char *string2 ){
     
-    //
     // Antes nós chamávamos o kernel, agora tentaremos 
     // implantar na api.
-	//
 	
 	//system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
 	//	(unsigned long) string1, (unsigned long) string2 );
@@ -887,8 +885,8 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	//#debug
 	printf ("Testing new Message Box type=%d \n", type);
 
-int Response = 0;	
-int running = 1;
+    int Response = 0;	
+    int running = 1;
 
     //
     // Draw !
@@ -1023,12 +1021,12 @@ int running = 1;
 	//
 	
     apiDrawText ( (struct window_d *) hWnd,
-        1*(cx/16),
-        1*(cy/3),
-        COLOR_WINDOWTEXT,
-        string1	);	
+        1*(cx/16), 1*(cy/3),
+        COLOR_WINDOWTEXT, string1 );	
 	
-	//#importante
+	
+	//#bugbug
+	//#importante devemos fazer o refres só da janela.
 	refresh_screen ();		 
 	
 	//
@@ -1037,10 +1035,10 @@ int running = 1;
 	
 	unsigned long message_buffer[5];	
 	
-			message_buffer[0] = 0;
-            message_buffer[1] = 0;
-            message_buffer[3] = 0;
-            message_buffer[4] = 0;	
+	message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[3] = 0;
+    message_buffer[4] = 0;	
 		
 Mainloop:
 	
@@ -1176,8 +1174,8 @@ int DialogBox ( int type, char *string1, char *string2 ){
 	//#debug
 	printf ("Testing dialog Box type=%d \n", type);
 
-int Response = 0;	
-int running = 1;
+    int Response = 0;	
+    int running = 1;
 
     //
     // Draw !
@@ -1312,12 +1310,11 @@ int running = 1;
 	//
 	
     apiDrawText ( (struct window_d *) hWnd,
-        1*(cx/16),
-        1*(cy/3),
-        COLOR_WINDOWTEXT,
-        string1	);	
+        1*(cx/16), 1*(cy/3),
+        COLOR_WINDOWTEXT, string1 );	
 	
 	//#importante
+	//#bugbug devemos fazer refresh só da janela.
 	refresh_screen ();		 
 	
 	//
@@ -1326,10 +1323,10 @@ int running = 1;
 	
 	unsigned long message_buffer[5];	
 	
-			message_buffer[0] = 0;
-            message_buffer[1] = 0;
-            message_buffer[3] = 0;
-            message_buffer[4] = 0;	
+	message_buffer[0] = 0;
+    message_buffer[1] = 0;
+    message_buffer[3] = 0;
+    message_buffer[4] = 0;	
 		
 Mainloop:
 	
@@ -2698,7 +2695,7 @@ apiDisplayBMP ( char *address,
 	// struct for Info header
 	//
 	
-	bh = (struct bmp_header_d *) malloc( sizeof(struct bmp_header_d) );
+	bh = (struct bmp_header_d *) malloc ( sizeof(struct bmp_header_d) );
 	
     if ( (void *) bh == NULL )
 	{
@@ -2731,7 +2728,7 @@ apiDisplayBMP ( char *address,
 	//
 	
 	//Windows bmp.
-	bi = (struct bmp_infoheader_d *) malloc( sizeof(struct bmp_infoheader_d) );
+	bi = (struct bmp_infoheader_d *) malloc ( sizeof(struct bmp_infoheader_d) );
 	
     if ( (void *) bi == NULL )
 	{
@@ -3049,12 +3046,11 @@ struct window_d *apiGetWSScreenWindow (){
     return (struct window_d *) system_call ( 146 , 0, 0, 0 );
 };
 
+
 struct window_d *apiGetWSMainWindow (){
 	
     return (struct window_d *) system_call ( 147 , 0, 0, 0 );
 };
-
-
 
 
 //create timer;
@@ -3066,12 +3062,14 @@ struct timer_d *apiCreateTimer ( struct window_d *window,
 	    (unsigned long) window, (unsigned long) ms, (unsigned long) type );
 };
 
+
 // pega informações varidas sobre o sys time.
 unsigned long apiGetSysTimeInfo ( int n ){
 	
 	return (unsigned long) system_call ( 223, 
 	    (unsigned long) n, (unsigned long) n, (unsigned long) n );
 };
+
 
 //
 // End.

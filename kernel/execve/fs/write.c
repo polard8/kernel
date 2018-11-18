@@ -31,37 +31,61 @@ void write_fntos (char *name){
     int  i, ns = 0;
     char ext[4];
 	
-    //Transforma em maiúscula
+	ext[0] = 0;
+	ext[1] = 0;
+	ext[2] = 0;
+	ext[3] = 0;
+	
+    //const char ext[4];
+	
+    //Transforma em maiúscula enquanto não achar um ponto.
+	
 	while ( *name && *name != '.' )
 	{
-        if (*name >= 'a' && *name <= 'z')
+        if ( *name >= 'a' && *name <= 'z' )
             *name -= 0x20;
 
         name++;
         ns++;
-		
-		// ##bugbug: E se não encontrarmos o ponto??
     };
 
-    // aqui name[0] é o ponto.
-	// então constroi a extensão.
+    // Aqui name[0] é o ponto.
+	// Então constrói a extensão.
+	
 	for ( i=0; i < 3 && name[i+1]; i++ )
 	{
-        if( name[i+1] >= 'a' && name[i+1] <= 'z' )
-            name[i+1] -= 0x20;
+		//Transforma uma letra da extensão em maiúscula.
+        
+		//if (name[i+1] >= 'a' && name[i+1] <= 'z')
+        //    name[i+1] -= 0x20;
 
-        ext[i] = name[i+1];
-    };
+        //ext[i] = name[i+1];
+    
+	
+	    //#testando
+	    //Se não for letra então não colocamos no buffer de extensão;
+		if (name[i+1] >= 'a' && name[i+1] <= 'z')
+		{
+			name[i+1] -= 0x20;
+		    ext[i] = name[i+1];
+		}
+	};
 
-    while (ns < 8){
+	//Acrescentamos ' ' até completarmos as oito letras do nome.
+	
+    while (ns < 8)
+	{	
         *name++ = ' ';
         ns++;
-    }
+    };
 
-    for ( i=0; i < 3; i++ )
+	//Acrescentamos a extensão
+	
+    for (i=0; i < 3; i++)
         *name++ = ext[i];
 
     *name = '\0';
+ 
 };
 
 
@@ -473,7 +497,8 @@ save_file:
 			
             //grava - aqui next esta certo!!!			
             //write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
-            my_write_hd_sector ( (unsigned long) address, (unsigned long) ( VOLUME1_DATAAREA_LBA + next -2), 0, 0  );
+            my_write_hd_sector ( (unsigned long) address, 
+			    (unsigned long) ( VOLUME1_DATAAREA_LBA + next -2), 0, 0  );
 			
             address += 512; 
         }; 
@@ -506,8 +531,6 @@ done:
     refresh_screen();
 	
 	
-	
-	
 	int r;
     int roff = 0;
     int rlbaoff = 0;	
@@ -536,7 +559,8 @@ done:
 		//write_lba ( VOLUME1_ROOTDIR_ADDRESS + roff, 
 	    //            VOLUME1_ROOTDIR_LBA     + rlbaoff );
 					
-		my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 0, 0  );			
+		my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, 
+		    (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 0, 0  );			
 				  
         roff = roff + 0x200;
         rlbaoff = rlbaoff + 1;	  		
@@ -587,7 +611,8 @@ done:
 	    //write_lba ( VOLUME1_FAT_ADDRESS + off, 
 	    //            VOLUME1_FAT_LBA     + lbaoff );
 		
-        my_write_hd_sector ( (unsigned long) VOLUME1_FAT_ADDRESS + off, (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 0, 0  );		
+        my_write_hd_sector ( (unsigned long) VOLUME1_FAT_ADDRESS + off, 
+		    (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 0, 0  );		
 				  
        off = off + 0x200;
        lbaoff = lbaoff + 1;	   

@@ -873,8 +873,8 @@ void fs_init_structures (){
  ********************************************************
  * fsInit:
  *     Inicializa o file system manager.
- *
  */
+ 
 int fsInit (){
 	
 #ifdef EXECVE_VERBOSE
@@ -1232,6 +1232,7 @@ int fs_print_process_pwd ( int pid ){
     return (int) 0;
 	
 };
+
 
 /*
  *****************************************

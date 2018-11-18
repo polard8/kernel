@@ -52,42 +52,61 @@ void read_fntos ( char *name ){
     int  i, ns = 0;
     char ext[4];
 	
-    // Transforma em maiúscula.
+	ext[0] = 0;
+	ext[1] = 0;
+	ext[2] = 0;
+	ext[3] = 0;
+	
+    //const char ext[4];
+	
+    //Transforma em maiúscula enquanto não achar um ponto.
+	
 	while ( *name && *name != '.' )
 	{
-        if( *name >= 'a' && *name <= 'z' )
+        if ( *name >= 'a' && *name <= 'z' )
             *name -= 0x20;
 
         name++;
         ns++;
-		
-		// ##bugbug: 
-		// ?? E se não encontrarmos o ponto??
     };
 
-    // Aqui name[0] é o ponto. 
+    // Aqui name[0] é o ponto.
 	// Então constrói a extensão.
 	
 	for ( i=0; i < 3 && name[i+1]; i++ )
 	{
-		// Transforma em maiúscula.
-        if( name[i+1] >= 'a' && name[i+1] <= 'z' )
-            name[i+1] -= 0x20;
+		//Transforma uma letra da extensão em maiúscula.
+        
+		//if (name[i+1] >= 'a' && name[i+1] <= 'z')
+        //    name[i+1] -= 0x20;
 
-        ext[i] = name[i+1];
-    };
+        //ext[i] = name[i+1];
+    
+	
+	    //#testando
+	    //Se não for letra então não colocamos no buffer de extensão;
+		if (name[i+1] >= 'a' && name[i+1] <= 'z')
+		{
+			name[i+1] -= 0x20;
+		    ext[i] = name[i+1];
+		}
+	};
 
-    //preenche com espaço até o limite de 8, onde deve começar a extensão.
-	while ( ns < 8 )
-	{
+	//Acrescentamos ' ' até completarmos as oito letras do nome.
+	
+    while (ns < 8)
+	{	
         *name++ = ' ';
         ns++;
     };
 
-    for ( i=0; i < 3; i++ )
+	//Acrescentamos a extensão
+	
+    for (i=0; i < 3; i++)
         *name++ = ext[i];
 
     *name = '\0';
+ 
 };
 	
 	

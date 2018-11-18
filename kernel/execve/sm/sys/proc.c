@@ -1004,23 +1004,22 @@ unsigned long registra_procedimento( unsigned long arg1,
  *     Mas as mensagens enviada para ícones são diferentes das mensagens
  *     enviadas para janelas.
  */
-void SetProcedure(unsigned long proc)
-{
+void SetProcedure (unsigned long proc){
+	
 	//@todo: Checar limites.
 	if( (unsigned long) proc == 0 ){
 		return; 
 	};
 	
-	//
+
 	// A estrutura da janela com o foco de entrada pode ser
 	// atualizada nesse momento. Ou ao menos conferir
 	// se o endereço enviado por argumento corresponde
 	// com o endereço do procedimento da janela com o foco de entrada.
-	//
-	
 	
     g_next_proc = (unsigned long) proc;	
-	return;
+	
+	//return;
 };
 
 
@@ -1052,8 +1051,8 @@ unsigned long SendMessage( struct window_d *window,
  * procedureHelp:
  *     Mensagem de ajuda ao usuário.
  */
-void procedureHelp()
-{ 
+void procedureHelp (){
+	
 	struct window_d *hWindow; 		
 	
 	unsigned long left;
@@ -1141,11 +1140,6 @@ void procedureHelp()
 	
 	    //...
 	};
-	
-
-
-			   
-			   
 
 		
     //#bugbug:
@@ -1416,15 +1410,17 @@ void procedureWindowWithFocusTest()
 /* @todo; Criar um grid parecido com o outro, mas que será gerenciado pelo
  procedimento de janelas do sistema.
 */ 
-void procedureGrid()
-{
+void procedureGrid (){
+	
 	int Status;
 	
 	Status = grid( (struct window_d*) gui->main ,(int) 4, (int) GRID_HORIZONTAL ); 
+	
 	if(Status == 1){
 		printf("sm-sys-procedureGrid: grid\n");
 	}
-	return;
+	
+	//return;
 };
 
 

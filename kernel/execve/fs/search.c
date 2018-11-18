@@ -79,7 +79,10 @@ int KiSearchFile ( unsigned char *file_name, unsigned long address ){
 			
 		    j += 0x20;
             continue;			
-		}	
+		}
+
+        //#TODO
+        //pegar o tamanho da string para determinar o quanto comparar.		
 		
 		// Entrada normal. Diferente de zero.
         if ( dir[j] != 0 )
@@ -163,6 +166,9 @@ int fsSearchFile (unsigned char *file_name){
 		    j += 0x20;
             continue;			
 		}	
+		
+        //#TODO
+        //pegar o tamanho da string para determinar o quanto comparar.			
 		
 		// Entrada normal. Diferente de zero.
         if ( dir[j] != 0 )

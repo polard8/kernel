@@ -34,10 +34,10 @@
  * pode desviar as chamadas para serem atendidas por essa rotina.
  *
  */				  
-void *ioServices( unsigned long number, 
-                  unsigned long arg2, 
-		    	  unsigned long arg3, 
-				  unsigned long arg4 )
+void *ioServices ( unsigned long number, 
+                   unsigned long arg2, 
+		    	   unsigned long arg3, 
+				   unsigned long arg4 )
 {
     int Caller_Process_ID;
 	struct process_d *P;
@@ -64,14 +64,15 @@ void *ioServices( unsigned long number,
 	
 	
 	Caller_Process_ID = (int) get_caller_process_id();
-	if(Caller_Process_ID <0 || Caller_Process_ID >= PROCESS_COUNT_MAX)
+	
+	if ( Caller_Process_ID <0 || Caller_Process_ID >= PROCESS_COUNT_MAX )
 	{
 		//@todo: Mensagem de erro.
 		return NULL;
 	};
 	
 	
-	P = (void*) processList[Caller_Process_ID];
+	P = (void *) processList[Caller_Process_ID];
 	//if( (void*) P == NULL )
 	//{
 	    //@todo: Mensagem de erro.	
@@ -99,7 +100,8 @@ void *ioServices( unsigned long number,
 	
 	//...
 	
-done:
+//done:
+
     return NULL;	
 };
 					   
@@ -109,13 +111,15 @@ done:
  * ioInit:
  *     Initialize i/o manager.
  */	
-int ioInit()
-{
+ 
+int ioInit (){
+	
 	int Status = 0;
 	
 	//...
 
-done:	
+//done:
+	
 	return (int) Status;
 };
 

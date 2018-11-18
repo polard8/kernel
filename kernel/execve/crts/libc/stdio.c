@@ -334,7 +334,8 @@ int kclear(int color) {
 	g_cursor_y = 0;
 	
 //done.
-done: 
+//done: 
+
     return (int) 0; 
 }; 
 
@@ -345,8 +346,8 @@ done:
  *     Limpa 24 das 25 linhas.
  *     Não limpa a primeira de cima.
  */
-int kclearClientArea(int color)
-{
+int kclearClientArea (int color){
+	
 	char *vm = (char *) g_current_vm;    //fis=0x000B8000; 	
     unsigned int i = (SCREEN_WIDTH*2);
       
@@ -363,7 +364,8 @@ int kclearClientArea(int color)
 	g_cursor_x = 0;
 	g_cursor_y = 0;
     
-done:
+//done:
+
     return (int) 0; 
 }; 
 
@@ -374,8 +376,8 @@ done:
  *     Rotina simples de escrita em kernel mode.
  *     @todo: isso deve ir para outro lugar. uitm/libk 
  */
-int kprint( char *message, unsigned int line, int color )
-{ 
+int kprint ( char *message, unsigned int line, int color ){
+	
     char *vm = (char *) g_current_vm;    //fis=0xb8000, vir=0x800000; 
     unsigned int i; 
 
@@ -638,7 +640,8 @@ int printf ( const char *format, ... ){
  *     Essa rotina deveria ir para outro lugar.
  *     provavelmente em /sm
  */
-void panic( const char *format, ... ){
+ 
+void panic ( const char *format, ... ){
 	
 	register int *varg = (int *)(&format);
 	
