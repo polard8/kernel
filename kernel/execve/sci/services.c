@@ -344,8 +344,6 @@ void *services( unsigned long number,
 			//name , address.
             Ret = (void *) fsLoadFile ( (unsigned char *) a2, 
 			                (unsigned long) arg3 );      
-		    //fopen( const char *filename, const char *mode );
-		    //??retorno ??? 1 = fail ; 0=ok.
 			scheduler_unlock();
 	        taskswitch_unlock();
 			return (void *) Ret;
@@ -1336,6 +1334,12 @@ void *services( unsigned long number,
 		//Listando arquivos em um diretório dado o nome.	
 		case 177:
 		    fsList ( (const char *) arg2 );
+            break;
+
+        case 178:
+		    //#test
+			//implementando esse serviço.
+		    return (void *) fsGetFileSize ( (unsigned char *) arg2 );
             break;		
 			
 		// # test #	

@@ -466,21 +466,17 @@ next_entry:
 	    goto done; 
 	}
 
-	//
-	// Loop: 
+	// ## Loop ## 
 	// Vai para próxima entrada na FAT.
-	//
 	
-	//goto proxima_entrada;
 	goto next_entry;
 	
 	//Nothing.
 	
 //Falha ao carregar o arquivo.
 fail:
-    printf("fs-read-fsLoadFile fail: file={%s}\n", 
-	    file_name );	
-    refresh_screen();
+    printf ("fs-read-fsLoadFile fail: file={%s}\n", file_name );	
+    refresh_screen ();
 	return (unsigned long) 1;
 //Done. 	
 done:

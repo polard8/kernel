@@ -841,10 +841,11 @@ unsigned long
 fsLoadFile( unsigned char *file_name, 
             unsigned long file_address ); 
 
-//vai ficar assim.			
-//int
-//fsLoadFile( char *file_name, 
-//            char *file_address ); 
+
+			
+			
+//get file size.
+unsigned long fsGetFileSize ( unsigned char *file_name );
 			
 			
 //

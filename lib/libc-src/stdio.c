@@ -238,8 +238,15 @@ FILE *fopen ( const char *filename, const char *mode ){
     //stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
 	//	(unsigned long) &buffer[0], (unsigned long) &buffer[0] );		
 	
+	//#obs: isso funciona.
     stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
-		(unsigned long) stream->_base, (unsigned long) stream->_base );			
+		(unsigned long) stream->_base, (unsigned long) stream->_base );	
+
+	//#test
+	//enviando para o kernel o ponteiro da estrutura, para o kernel 
+	//preenchar o elemento size. stream->_cnt
+    //stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
+	//	(unsigned long) stream->_base, (unsigned long) stream->_base );			
 	
 	//if( (void*) a == NULL ){
 	//    printf("Error: Invalid name.");

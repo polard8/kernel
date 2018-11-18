@@ -346,6 +346,8 @@
 //listando arquivos em um diretório dado o nome.
 #define	SYS_177 177  
 
+//pegando o tamanho de um arquivo.
+//bufbug: isso gasta memória carregando o diretório raiz.
 #define	SYS_178 178
 
 // # test #
