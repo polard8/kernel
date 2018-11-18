@@ -348,6 +348,7 @@ int parse (){
 
                     default:
 					    printf("State1: default error\n");
+						printf("State1: keyword expected on line %\n", lineno);
 						exit(1);
                         break;					
 				}
@@ -371,6 +372,7 @@ int parse (){
                 
 				    default:
 					    printf("State2: default Error.\n");
+						printf("State2: expected identifier on line %.\n", lineno);
 						exit(1);
 					    break;
 				};
@@ -397,6 +399,7 @@ int parse (){
 					
 					default:
 					    printf("State3: default. Error \n");
+						printf("State3: expected separator or operator on line %.\n", lineno);
 						exit(1);
 					    break;
 				}
@@ -443,6 +446,7 @@ int parse (){
 					
 					default:
 					    printf("State5: default. Error \n");
+						printf("State5: Separator '{' expected on line %d \n", lineno);
 						exit(1);
 					    break;					
 				}
@@ -494,7 +498,9 @@ int parse (){
 				}
 			    break;
 				
-				
+			//################################
+			// #State 7
+			//esperamos um ';' para terminar a função.
             case 7:
 			    switch (c)				
 				{
@@ -515,6 +521,7 @@ int parse (){
 
 					default:
 					    printf("State7: default. Error \n");
+						printf("State2: warning expected ';' on line %.\n", lineno);
 						exit(1);
 					    break;										
 				}
