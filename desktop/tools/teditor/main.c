@@ -29,10 +29,10 @@
 //#define TEDITOR_VERBOSE 1
 
 //# usado para teste 
-#define WINDOW_WIDTH     640 
-#define WINDOW_HEIGHT    480
-#define WINDOW_LEFT      10
-#define WINDOW_TOP       10
+#define WINDOW_WIDTH     750 //640 
+#define WINDOW_HEIGHT    550 //480
+#define WINDOW_LEFT      4   //10
+#define WINDOW_TOP       4   //10
 
 
 
@@ -253,7 +253,6 @@ int mainTextEditor ( int argc, char *argv[] ){
 	
 	//#importante
 	//inicializa as variáveis antes de pintar.
-	//
 	
     teditorTeditor ();	
 	
@@ -305,28 +304,37 @@ int mainTextEditor ( int argc, char *argv[] ){
 //file:
 
 #ifdef TEDITOR_VERBOSE		
-	printf("\n");
+	//printf("\n");
 	printf("\n");
     printf("Loading file ...\n");
 #endif	
 	
-	//Page fault:
-    
+	// Page fault:    
 	// Pegando o argumento 1, porque o argumento 0 é o nome do editor.
 	
-	//#test
+    // ## No file ## 
 	//Se nenhum nome de arquivo foi especificado, então começamos a digitar.
+	
 	if ( (char *) argv[1] == NULL )
 	{	
 	    goto startTyping;	
 	};
 	
-	//Carregando arquivo.
+	
+#ifdef TEDITOR_VERBOSE		
+	//printf("\n");
+	printf("\n");
+    printf("Loading file fopen ...\n");
+#endif		
+	
+	// ## Carregando arquivo. ##
+	//
+	
 	fp = fopen ( (char *) argv[1], "rb" );	
 	
 	if ( fp == NULL )
     {
-        printf("fopen fail\n");
+        printf("fopen fail start typing ...\n");
         goto startTyping;
 		
     }else{
@@ -339,8 +347,10 @@ int mainTextEditor ( int argc, char *argv[] ){
         //printf("...\n");
 #endif 
 	
-        printf ( "%s", fp->_base );	
-
+       // printf("Show file\n");
+		printf ( "%s", fp->_base );	
+       // printf("Show file done\n");
+		
 #ifdef TEDITOR_VERBOSE	        
 		//printf("...\n");
         printf("..\n");		

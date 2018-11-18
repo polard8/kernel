@@ -161,10 +161,13 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//#todo: Repare que não tem alocação nesse caso.
 	//precisamos de alocadores.
 	
+	//#todo:
+	//temos que criar uma função get_file_size()
+	
 	//buffer para a estrutura de stream.
 	
-	unsigned char struct_buffer[BUFSIZ];  //struct
-	unsigned char buffer[BUFSIZ];         //file.
+	//unsigned char struct_buffer[BUFSIZ];  //struct
+	//unsigned char buffer[BUFSIZ];         //file.
 	
 	
 	//unsigned char *a = (unsigned char *) filename;
@@ -175,20 +178,39 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//struct _iobuf *stream;
 	FILE *stream;
 
-	stream = (FILE *) &struct_buffer[0];
-	  
-	//Colocamos aqui o endereço onde o arquivo foi carregado.  
-	stream->_base = &buffer[0];
-	
-	stream->_ptr = &buffer[0];
-	
-	
-	//Podemos medir o tamanho do arquivo antes e colocarmos
-	//o valor aqui ... pode ser checando na entrada de diretório.
-	stream->_cnt = PROMPT_MAX_DEFAULT;
-	
-	stream->_file = 0;
-	stream->_tmpfname = (char *) filename;	
+	//stream = (FILE *) &struct_buffer[0];
+	stream = (FILE *) malloc ( sizeof(FILE) );
+    if ( (void *) stream == NULL )
+    {
+		printf("stdio-fopen: stream fail\n");
+		return NULL;
+	}else{
+		
+	    //Colocamos aqui o endereço onde o arquivo foi carregado.  
+	    //stream->_base = &buffer[0];
+	    //stream->_ptr = &buffer[0];		
+
+		//8kb
+	    stream->_base = (char *) malloc (8*1024);		
+        if ( (void *) stream->_base == NULL )
+        {
+		    printf("stdio-fopen: _base fail\n");
+	        return NULL;
+	    }else{
+			
+			stream->_ptr = stream->_base;
+			
+	        //Podemos medir o tamanho do arquivo antes e colocarmos
+	        //o valor aqui ... pode ser checando na entrada de diretório.
+	        stream->_cnt = PROMPT_MAX_DEFAULT;			
+	        stream->_file = 0;
+  			
+	        stream->_tmpfname = (char *) filename;	
+			
+			//...
+		};		
+	};		
+
 	
 
 	// @todo: Criar filtros para os argumentos. Retornar NULL
@@ -196,19 +218,28 @@ FILE *fopen ( const char *filename, const char *mode ){
 	
 	//#test
 	if ( (char *) filename == NULL )
-	    return NULL;
+	{
+	    printf("stdio-fopen: no filename\n");
+		return NULL;
+	}	
 	
 	//transformando a string do nome de file.txt em 'FILE    TXT'
 	stdio_fntos( (char *) filename );
 	
-	//@todo: 
+
+	//
+	//  ## Load file ##
+	//
+	
 	// Chamar uma  rotina que carregue um arquivo ...
 	// usar a mesma chamada pela api.
 	
 	
-    stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
-		(unsigned long) &buffer[0], (unsigned long) &buffer[0] );		
+    //stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
+	//	(unsigned long) &buffer[0], (unsigned long) &buffer[0] );		
 	
+    stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
+		(unsigned long) stream->_base, (unsigned long) stream->_base );			
 	
 	//if( (void*) a == NULL ){
 	//    printf("Error: Invalid name.");

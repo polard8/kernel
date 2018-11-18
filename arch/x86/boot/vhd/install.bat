@@ -17,7 +17,7 @@
 	
 :readNotification:	
 echo -{ ...
-echo -{ Warning: This script will create a VHD and install Gramado on it.
+echo -{ Warning: This script will install files on Gramado 0.4.
 echo -{ Warning: You need to run this script as administrator.
 	pause
 
@@ -25,34 +25,6 @@ echo -{ Warning: You need to run this script as administrator.
 	rem Ordem de montagem:
 	rem stage1, stage2, msm, bl, kernel, browser, fat16 stuff and vhd footer.
 	rem
-	
-	
-	cd c:\sdk\bin
-
-:Start 
-echo -{ ... 	
-echo -{ Creating a formated VHD. 
-
-    rem Obs: O disco é criado já com a primeira partição formatada.
-	
-    rem SET ROOT=C:\gramado\g03\branch\boot\vhd\v8.9
-	rem cd %ROOT%
-	
-	nasm -I c:/gramado/arch/x86/boot/vhd/stage1/ ^
-	-I c:/gramado/arch/x86/boot/vhd/stage2/ ^
-	-I c:/gramado/arch/x86/boot/vhd/stage2/lib16/ ^
-	-I c:/gramado/arch/x86/boot/vhd/stage2/include/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/lib32/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/include/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/kernel/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/fs/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/shell/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/drivers/ ^
-	-I c:/gramado/arch/x86/boot/vhd/bl/ ^
-	-I c:/gramado/arch/x86/boot/vhd/kernel/ ^
-	-I c:/gramado/arch/x86/boot/vhd/browser/  c:/gramado/arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
-
 
 echo -{ ...
 echo -{ Size={31MB}
@@ -62,7 +34,7 @@ echo -{ Partition starts on sector 63.
 
 :attachingVHD
 	rem Montando um disco já formatado.
-	imdisk -a -f GRAMADO.VHD -s 31M -m F: -b 63b
+	imdisk -a -f c:\gramado\GRAMADO.VHD -s 31M -m F: -b 63b
 		
 :Copying
 echo -{ ...
@@ -117,8 +89,9 @@ echo -{ ...
 
 		
 	rem arquivos de texto.
-	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 
+	copy c:\gramado\arch\x86\boot\vhd\tests\*.C    F:\*.C 
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.TXT  F:\*.TXT
+	
 	REM copy c:\gramado\arch\x86\boot\vhd\tests\TEST.C F:\
 	rem copy tests\TEST2.C  F:\
 	rem copy tests\REGRAS.TXT   F:\
@@ -187,8 +160,8 @@ echo -{ ...
 	
 :vhd	
 echo -{ ...
-    echo -{ copying vhd
-	copy GRAMADO.VHD c:\gramado\GRAMADO.VHD	
+    rem echo -{ copying vhd
+	rem copy GRAMADO.VHD c:\gramado\GRAMADO.VHD	
     goto End
 
 :HowItWorks	

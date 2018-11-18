@@ -780,11 +780,15 @@ get_next:
 		{
 			//erro 
 			printf("create_process: g_heap_count limits");
-			refresh_screen();
-			while(1){ asm ("hlt"); };
+			die();
+			//refresh_screen();
+			//while(1){ asm ("hlt"); };
 		}
 		
 		Process->Heap = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
+		Process->HeapSize = (unsigned long) g_heap_size;
+		Process->HeapEnd = (unsigned long) (Process->Heap + Process->HeapSize); 
+		
 		
 		g_heap_count++;
 		
@@ -796,8 +800,8 @@ get_next:
 		// #bubug: Endereço do fim do heap.
 		// Tamanho do heap, dado em KB.
 	    //Process->Heap = UPROCESS_DEFAULT_HEAP_BASE;    
-	    Process->HeapEnd = 0; // @todo: (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE);
-		Process->HeapSize = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    
+	    //Process->HeapEnd = 0; // @todo: (UPROCESS_DEFAULT_HEAP_BASE + UPROCESS_DEFAULT_HEAP_SIZE);
+		//Process->HeapSize = (UPROCESS_DEFAULT_HEAP_SIZE/1024);    
 
 		//Process->HeapPointer
 		//Process->HeapLastValid
