@@ -1339,7 +1339,13 @@ void *services( unsigned long number,
         case 178:
 		    //#test
 			//implementando esse serviço.
-		    return (void *) fsGetFileSize ( (unsigned char *) arg2 );
+		    taskswitch_lock();
+	        scheduler_lock();	
+			//name , address.
+            Ret = (void *) fsGetFileSize ( (unsigned char *) arg2 ); 
+			scheduler_unlock();
+	        taskswitch_unlock();
+			return (void *) Ret;		    
             break;		
 			
 		// # test #	

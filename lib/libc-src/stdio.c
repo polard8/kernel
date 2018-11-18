@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <types.h> 
 #include <stdarg.h> 
+#include <stddef.h>
 #include <ctype.h>
 
 
@@ -104,10 +105,11 @@ void stdio_fntos (char *name){
  *    ecx = arg3.
  *    edx = arg4.
  */
-void *stdio_system_call( unsigned long ax, 
-                         unsigned long bx, 
-				         unsigned long cx, 
-				         unsigned long dx );
+ 
+void *stdio_system_call ( unsigned long ax, 
+                          unsigned long bx, 
+				          unsigned long cx, 
+				          unsigned long dx );
 
 						 
 /*
@@ -172,6 +174,11 @@ FILE *fopen ( const char *filename, const char *mode ){
 	
 	//unsigned char *a = (unsigned char *) filename;
 	unsigned long m = (unsigned long) mode;
+	size_t size;
+	
+	
+	//transformando a string do nome de file.txt em 'FILE    TXT'
+	stdio_fntos ( (char *) filename );	
 	
 
 	//Criando as estruturas.
@@ -186,13 +193,42 @@ FILE *fopen ( const char *filename, const char *mode ){
 		return NULL;
 	}else{
 		
+		
+
+		
+		//Não faremos mais assim. Vamos alocar.
 	    //Colocamos aqui o endereço onde o arquivo foi carregado.  
 	    //stream->_base = &buffer[0];
 	    //stream->_ptr = &buffer[0];		
-
-		//8kb
-	    stream->_base = (char *) malloc (8*1024);		
-        if ( (void *) stream->_base == NULL )
+		
+		//get file size
+        size = (size_t) stdio_system_call ( 178, 
+		                    (unsigned long) filename, 
+		                    (unsigned long) 0, 
+							(unsigned long) 0 );			
+		
+		
+		if (size < 512){  
+	        size = 512; 
+		}
+	
+	    // #bugbug 
+		// O tamnho do heap dos processos varia, então temos que  
+		// comparar o tamanho do buffer para o arquivo com o heap 
+		// disponível do processo atual.
+		// #obs: O próprio malloc fará essa comparação,
+		// passaremos o tamanho do arquivo para o malloc,
+		// sem se importar com o tamanho.
+		
+		//if (size > (??) )
+			
+		
+		//#debug
+		printf ("fopen: file size %d\n", size);
+	   
+	    stream->_base = (char *) malloc ( (size_t) size );		
+        
+		if ( (void *) stream->_base == NULL )
         {
 		    printf("stdio-fopen: _base fail\n");
 	        return NULL;
@@ -224,7 +260,7 @@ FILE *fopen ( const char *filename, const char *mode ){
 	}	
 	
 	//transformando a string do nome de file.txt em 'FILE    TXT'
-	stdio_fntos( (char *) filename );
+	//stdio_fntos( (char *) filename );
 	
 
 	//
