@@ -142,8 +142,6 @@ services.o
 
 
 
-
-
 x86:
 	gcc -c kernel/3rdparty/kernel/disk/disk1.c   -I include/ $(CFLAGS) -o disk1.o
 
@@ -155,11 +153,11 @@ x86:
 	gcc -c kernel/hal/hal.c -I include/ $(CFLAGS) -o hal.o
 	
 	
-	gcc -c kernel/hal/arch/x86/syscall.c   -I include/ $(CFLAGS) -o syscall.o		
-	gcc -c kernel/hal/arch/x86/cpux86.c    -I include/ $(CFLAGS) -o cpux86.o 
-    gcc -c kernel/hal/arch/x86/x86.c       -I include/ $(CFLAGS) -o x86.o	
-	gcc -c kernel/hal/arch/x86/ports.c     -I include/ $(CFLAGS) -o ports.o 	
-	gcc -c kernel/hal/arch/amd/cpuamd.c    -I include/ $(CFLAGS) -o cpuamd.o 		
+	gcc -c kernel/hal/arch/x86/syscall.c  -I include/ $(CFLAGS) -o syscall.o		
+	gcc -c kernel/hal/arch/x86/cpux86.c   -I include/ $(CFLAGS) -o cpux86.o 
+    gcc -c kernel/hal/arch/x86/x86.c      -I include/ $(CFLAGS) -o x86.o	
+	gcc -c kernel/hal/arch/x86/ports.c    -I include/ $(CFLAGS) -o ports.o 	
+	gcc -c kernel/hal/arch/amd/cpuamd.c   -I include/ $(CFLAGS) -o cpuamd.o 		
 	
 	# /mk
 	gcc -c  kernel/mk/mk.c -I include/  $(CFLAGS) -o mk.o
@@ -196,8 +194,8 @@ x86:
 	gcc -c  kernel/mk/pc/mm/memory.c  -I include/ $(CFLAGS) -o memory.o    
 	gcc -c  kernel/mk/pc/mm/pages.c   -I include/ $(CFLAGS) -o pages.o 	
 	
-	gcc -c  kernel/mk/request.c      -I include/ $(CFLAGS) -o request.o	
-	gcc -c  kernel/mk/faults.c       -I include/ $(CFLAGS) -o faults.o
+	gcc -c  kernel/mk/request.c  -I include/ $(CFLAGS) -o request.o	
+	gcc -c  kernel/mk/faults.c   -I include/ $(CFLAGS) -o faults.o
 
 	# /execve
 	gcc -c kernel/execve/execve.c  -I include/ $(CFLAGS) -o execve.o	
@@ -235,10 +233,10 @@ x86:
 	gcc -c kernel/execve/dd/i8042/mouse.c     -I include/ $(CFLAGS) -o mouse.o  		
 	
 	#dd/ldisc
-	gcc -c kernel/execve/dd/ldisc/ldisc.c     -I include/ $(CFLAGS) -o ldisc.o 
+	gcc -c kernel/execve/dd/ldisc/ldisc.c  -I include/ $(CFLAGS) -o ldisc.o 
 		
 	#dd/pci
-	gcc -c kernel/execve/dd/pci/pci.c      -I include/ $(CFLAGS) -o pci.o  
+	gcc -c kernel/execve/dd/pci/pci.c  -I include/ $(CFLAGS) -o pci.o  
 	
 	
 	gcc -c kernel/execve/dd/network/intel.c    -I include/ $(CFLAGS) -o nicintel.o
@@ -246,10 +244,10 @@ x86:
 	gcc -c kernel/execve/dd/network/socket.c   -I include/ $(CFLAGS) -o socket.o
 	
 	# dd/tty
-	gcc -c kernel/execve/dd/tty/tty.c     -I include/ $(CFLAGS) -o tty.o		
+	gcc -c kernel/execve/dd/tty/tty.c  -I include/ $(CFLAGS) -o tty.o		
 
 	# dd/usb
-	gcc -c kernel/execve/dd/usb/usb.c   -I include/ $(CFLAGS) -o usb.o		
+	gcc -c kernel/execve/dd/usb/usb.c  -I include/ $(CFLAGS) -o usb.o		
 
 
 	# /fs
@@ -265,8 +263,8 @@ x86:
 	gcc -c kernel/execve/sci/services.c  -I include/ $(CFLAGS) -o services.o	
 	
 	#/sm
-	gcc -c kernel/execve/sm/init/init.c        -I include/ $(CFLAGS) -o init.o
-	gcc -c kernel/execve/sm/ob/object.c        -I include/ $(CFLAGS) -o object.o		
+	gcc -c kernel/execve/sm/init/init.c    -I include/ $(CFLAGS) -o init.o
+	gcc -c kernel/execve/sm/ob/object.c    -I include/ $(CFLAGS) -o object.o		
 	gcc -c kernel/execve/sm/sys/modules.c  -I include/ $(CFLAGS) -o modules.o
 	gcc -c kernel/execve/sm/sys/proc.c     -I include/ $(CFLAGS) -o proc.o	
 	gcc -c kernel/execve/sm/sys/abort.c    -I include/ $(CFLAGS) -o abort.o	
@@ -276,8 +274,8 @@ x86:
 	gcc -c kernel/execve/sm/sys/signal.c   -I include/ $(CFLAGS) -o signal.o	
 	gcc -c kernel/execve/sm/sys/system.c   -I include/ $(CFLAGS) -o system.o
 	gcc -c kernel/execve/sm/sys/io.c       -I  include/ $(CFLAGS) -o io.o	
-	gcc -c kernel/execve/dd/sm/rt/runtime.c   -I include/ $(CFLAGS) -o runtime.o
-	gcc -c kernel/execve/dd/sm/disk/diskvol.c    -I include/ $(CFLAGS) -o diskvol.o
+	gcc -c kernel/execve/dd/sm/rt/runtime.c       -I include/ $(CFLAGS) -o runtime.o
+	gcc -c kernel/execve/dd/sm/disk/diskvol.c     -I include/ $(CFLAGS) -o diskvol.o
 	gcc -c kernel/execve/dd/sm/install/install.c  -I include/ $(CFLAGS) -o install.o    
 	gcc -c kernel/execve/dd/sm/debug/debug.c      -I include/ $(CFLAGS) -o debug.o	
 	
