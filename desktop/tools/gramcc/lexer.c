@@ -21,10 +21,13 @@
 
 
 
-void check_newline (){
-
+int check_newline ()
+{
     register int c;
     //register int token;	
+	
+	//obs
+	//entramos aqui porque encontramos um '\n'
 
     while (1)
     {
@@ -64,20 +67,21 @@ void check_newline (){
             while ((c = getc (finput)) != '\n');		
 
 		}else{
-			
-	        /* 
-		     If no #, unread the character,
-	         except don't bother if it is whitespace.  
-		    */		
+			 
+		    // If no #, unread the character,
+	        // except don't bother if it is whitespace.  		
 			
 			//se não é #, retorna ao encontrar espaço e
 			//devolve se encontrar outra coisa. depois retorne também.
 			
-	        if (c == ' ' || c == '\t'){
-				return;
-			}else{
-			    ungetc (c, finput);	
-			    return;
+	        if (c == ' ' || c == '\t')
+			{
+				return (int) c;
+				
+			} else {
+				
+			    ungetc ( c, finput );	
+			    return (int) -1;
 			};
 		};
 	};//while
@@ -110,8 +114,10 @@ int skip_white_space (){
 						
 						//quando alinha acabar,
 						//apenas saímos do switch
-				        if( c == '\n'){
-					        break;;
+				        //sairemos com '\n'
+						if( c == '\n')
+						{
+					        break;
 				        }
 				    };
 				};
@@ -156,14 +162,25 @@ int skip_white_space (){
 					}else if (c == EOF)
 		                    printf("unterminated comment");
 	                 else
-		                 c = getc(finput);
+		                c = getc(finput);
 	            };
 	            break;
 
 			// ## new lines ##	
 	        case '\n':
-	            check_newline(); //todo
-				//break;
+	            c = check_newline(); //todo
+				if (c == ' ' || c == '\t' || c == '\f' || c == '\r' || c == '\b')
+				{
+					c = getc (finput);
+				    break;
+				}
+				//sinal que teve um unget.
+				if ( c == -1 )
+				{
+					c = getc (finput);
+					break;
+				}
+				break;
 
 			// ## spaces ##	
             case ' ':

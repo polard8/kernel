@@ -115,7 +115,7 @@ static char *token_buffer;	/* Pointer to token buffer */
 char real_token_buffer[256];
 
 //gcc 0.9
-void check_newline ();
+int check_newline ();
 int skip_white_space ();
 int yylex ();
 

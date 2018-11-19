@@ -21,8 +21,20 @@
 #include "gramcc.h"
 
 
+int parse_function ( int token );
+int parse_return ( int token );
+int parse_def (int token );    //não pertence a linguagem C.
+int parse_var ( int token );   //não pertence a linguagem C.
+//...
+
+
+
+//#test 
+//não pertence a linguagem C.
 //interna 
-int parse_def (){
+
+int parse_def (int token )
+{
 	
 	int c;
 	
@@ -99,9 +111,11 @@ done:
 };
 
 
-
+//#test 
+//não pertence a linguagem C.
 //interna 
-int parse_var (){
+
+int parse_var ( int token ){
 	
 	int c;
 	
@@ -191,10 +205,274 @@ done:
 };
 
 
+
+int parse_function ( int token )
+{
+	int c;
+	
+	int running = 1;
+	int State = 1;
+	
+	
+	//debug
+	printf("parse_function: Initializing ...\n");	
+	
+	//se entramos errado.
+	if ( token != TOKENIDENTIFIER )
+	{
+		printf("parse_function: Can't initialize function statement\n");
+		exit(1);
+	}
+	
+    if ( token == TOKENIDENTIFIER )	
+	{
+	
+		id[ID_TOKEN] = TOKENIDENTIFIER;
+		id[ID_STACK_OFFSET] = stack_index;
+		
+		printf("parse_function: TOKENIDENTIFIER={%s} in line %d\n", real_token_buffer, lineno );    			
+	}
+
+	while (running)
+	{
+		c = yylex ();
+		
+		switch ( State )
+		{
+			//state1 
+			//esperamos um separador '('
+			//pois isso é uma função e não uma definação de variável.
+			case 1:
+			    switch (c)
+				{
+					case TOKENSEPARATOR:
+	                    if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+						{
+						    printf("parse_function: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+							State = 2;	
+						}
+					    break;
+						
+                    default:
+                        printf("parse_function: State1 Missed '(' separator in line %d ", lineno );
+						exit(1);
+						break;					
+				}
+			    break;
+				
+			//esperamos aqui tipos, simbolos , separador ',' ou o separador ')'	
+			case 2:
+			    switch (c)
+				{
+					//')'
+					case TOKENSEPARATOR:
+	                    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+						{
+						    printf("parse_function: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+							State = 3;	
+						}
+					    break;
+						
+					//case type 
+					//case symbol 
+					//case ','
+					//...
+					
+                    default:
+                        printf("parse_function: State2 something wrong in line %d ", lineno );
+						exit(1);
+						break;					
+				}
+			    break;
+				
+			//esperamos aqui o separador final ';'
+            //isso finaliza o statement 'function'			
+			case 3:
+			    switch (c)
+				{
+					//';'
+					//terminamos o statement function.
+					case TOKENSEPARATOR:
+	                    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+						{
+						    printf("parse_function: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+							return (int) TOKENSEPARATOR;	
+						}
+					    break;
+						
+                    default:
+                        printf("parse_function: State3 Expected separator ';' in line %d ", lineno );
+						exit(1);
+						break;										
+				}
+			    break;
+			
+			default:
+				printf("parse_function: default statement\n");
+				exit(1);				    
+			    break;
+		};
+	};	
+};
+
+// #return statement
+// >> termina com  ';'
+// return 0;
+// return (int) 1;
+// return 1+2;
+// return (1+2);
+// return (int) (1+2);
+// return function();
+// return (int) function();
 //interna 
-int parse_return (){
+int parse_return ( int token ){
+	
 	
 	int c;
+	
+	int running = 1;
+	int State = 1;
+	
+	int open = 0;
+	
+	
+	//debug
+	printf("parse_return: Initializing ...\n");	
+	
+	//se entramos errado.
+	if ( token != TOKENKEYWORD || keyword_found != KWRETURN )
+	{
+		printf("parse_return: Can't initialize return statement\n");
+		exit(1);
+	}
+	
+
+	
+	while (running)
+	{
+		c = yylex ();
+		
+		switch ( State )
+		{
+			
+			//#state1
+		    //esperamos constante, expressão, tipo ou função.
+			case 1:
+			    switch(c)
+				{
+					//se encontramos a constante, o que segue é o separador ';' ou o separador ')'
+					case TOKENCONSTANT:
+						//ok;
+						printf("parse_return: State1 TOKENCONSTANT={%s} line %d\n", real_token_buffer, lineno );	
+						
+						//Se não temos um parêntese aberto então vamos para o proximo
+						//que deverá ser um ';'
+						if ( open == 0 )
+						{
+						    State = 2;	
+						}
+						//mas se ainda temos um parentese aberto então
+						//encontramos uma constante dentro do parêntese,
+						//indicando que estamos um uma expressão.
+						break;
+					
+					
+
+					case TOKENSEPARATOR:
+	                    if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+                        {
+						    open = 1;
+						}
+						
+						//se fecharmos, o que segue pode ser um separador ';',
+						//uma função, uma constante ou uma expressão.
+	                    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+						{
+						    open = 0;							
+						}
+						
+						//se o separador for ';' é porque estamos num retorno do tipo void.
+						//se o retorno não for do tipo void então foi erro de sintaxe..
+						if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+						{
+						    if (open == 1)
+                            {
+								printf("parse_return: State1 wrong separator ';' in line %d\n", lineno);
+								exit(1);
+							}
+							
+                            //retorno do tipo void.
+							if (open == 0)
+                            {
+								return (int) TOKENSEPARATOR;
+                            }								
+						}
+						break;
+					
+				    //case identificador. (símbolo)
+					//significa que o return foi seguido de uma função.
+					case TOKENIDENTIFIER:
+					    //#todo Nesse momento podemos chamar a rotian qu trata uma função 
+						//function statement. function_parser
+						
+						// ';' foi encontrado.
+						//finalizado o statement de função então vamos sair do statemente de return.
+						//pois o ';' da função é o mesmo do return.
+						//se estivermos após a keyword 'return' ou após o tipo '(int)'.
+						if ( open == 0 )
+						{
+						    return (int) parse_function ( TOKENIDENTIFIER );
+						}
+						
+						//#importante
+						//temos um identificador dentro do parênteses.
+						//Se uma função foi chamada dentro do parênteses não devemos esperar 
+						//por um separador ';'
+						if ( open == 1 )
+						{
+						    //todo	
+						}
+						break;		
+						
+					default:
+				        printf("parse_return: State1 default\n");
+				        exit(1);
+					    break;
+				}
+                break;
+
+			
+			//#state2
+			// separador ';'
+			case 2:
+			    switch(c)
+				{
+					case TOKENSEPARATOR:
+	                    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+                        {
+			                //deu certo.
+			                printf("parse_return: State2 do_separator TOKENSEPARATOR={%s} line %d \n", real_token_buffer, lineno );
+		                    
+							//Se encontramos o separador que finaliza o statement
+							//então podemos retornar.
+							return (int) TOKENSEPARATOR;
+		                }	
+					    break;
+						
+					default:
+				        printf("parse_return: State2 default\n");
+				        exit(1);
+					    break;
+				}
+			    break;
+				
+			//Statemente não enumerado.
+			default:
+				printf("parse_return: default statement\n");
+				exit(1);			
+			    break;
+		};
+	};
 	
 	//printf("parse_var:\n");
 	
@@ -204,7 +482,7 @@ do_constant:
 
 	c = yylex ();
 	
-	//identifier para a variável.
+
 	if( c == TOKENCONSTANT)
 	{
 	    printf("parse_return: do_constant TOKENCONSTANT={%s} line %d\n", real_token_buffer, lineno );	
@@ -223,6 +501,7 @@ do_separator:
     c = yylex ();
     
 	//separador ';'
+	//isso finaliza o statement.
 	if( c == TOKENSEPARATOR )
     {
 	    if( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
@@ -286,7 +565,7 @@ int parse (){
 	    
 		switch (State)
 		{
-			next:
+			//next:
 			
 			//################################
 			// #State 1
@@ -317,7 +596,7 @@ int parse (){
 					         printf("State1: TOKENKEYWORD={%s} KWDEF line %d  \n", real_token_buffer, lineno );
 					
 					        // parse deve retornar o '(' quando encontrá-lo.
-					        c = parse_def();
+					        c = parse_def (TOKENKEYWORD);
 					        if ( c == TOKENSEPARATOR )
 					        {
 						        //goto next;
@@ -335,7 +614,7 @@ int parse (){
 				        {
 					        printf("State1: TOKENKEYWORD={%s} KWVAR line %d \n", real_token_buffer, lineno );
 					        // parse deve retornar o ';' quando encontrá-lo.
-					        c = parse_var();
+					        c = parse_var (TOKENKEYWORD);
 				       	    if ( c == TOKENSEPARATOR )
 					        {
 						        //goto next;
@@ -459,8 +738,7 @@ int parse (){
 			    switch (c)
 			    {
 					//esperamos uma keyword return.
-					case TOKENKEYWORD:
-                        
+					case TOKENKEYWORD:         
 						//return. Chamaremos o tratador do stmt parse_return() 
 				        if( keyword_found == KWRETURN )
 				        {
@@ -470,7 +748,7 @@ int parse (){
 				            //indicando que tudo deu certo no parser.
 						    //continuaremos nesse state até pegarmos o separador '}'.
 							printf ("\n");
-					        c = parse_return ();
+					        c = parse_return ( TOKENKEYWORD );
 					        printf ("\n");
 							
 							//esperávamos o separador ';', se não veio então falhou o parser.
@@ -479,9 +757,11 @@ int parse (){
 							    printf("State6: TOKENKEYWORD TOKENSEPARATOR fail");
                                 exit(1);								
 					        }
+							//State = 7;
 				        }		
 					    break;
 
+			        // Aqui esperamos o separador '}' para fechar a função.
 					// separadores (){}[],.;:? ...
 			        case TOKENSEPARATOR:
 			            printf("State6: TOKENSEPARATOR={%s} line %d \n", real_token_buffer, lineno );                        
@@ -552,8 +832,8 @@ int parse (){
 	//
 	
 	//#debug
-	printf("\n");
-	printf("stdin_base: %s\n",stdin->_base);
+	printf("\n INPUT: \n");
+	printf("%s\n",stdin->_base);
 	printf("number of lines: %d \n",lineno);
 	//...
 	
