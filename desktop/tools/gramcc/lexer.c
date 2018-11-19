@@ -20,7 +20,7 @@
 #include "gramcc.h"
 
 
-
+//#### supensa ###
 int check_newline ()
 {
     register int c;
@@ -35,11 +35,22 @@ int check_newline ()
         lineno++;
 		//printf(" [LF1] ");
 		
+		//pega mais um depois do '\n'
 		c = getc (finput);
+		
+		//se o que segue o '\n' for um espaço, deixaremos o skip_white_space tratar o espaço.
+		if (c == ' ' || c == '\t')
+		{
+			return (int) c;
+		}
+		
+		//se for quanquer outra coisa também deixaremos o skip_white_space tratar
+		return (int) c;
         
+		/*
 		if ( c == '#' )
 		{
-            /* Skip whitespace after the #.  */
+            //Skip whitespace after the #.  
             while (1)
 	        {
 	            c = getc (finput);
@@ -47,23 +58,23 @@ int check_newline ()
 	                break;
 	        }
 			
-            /* 
-		     If the # is the only nonwhite char on the line,
-	         just ignore it.  Check the new newline.  
-		    */
+             
+		     //If the # is the only nonwhite char on the line,
+	         //just ignore it.  Check the new newline.  
+		    
             if (c == '\n')
 	            continue;
 
 
             //encontramos algum char válido após #.
-			/* Something follows the #; read a token.  */
+			//Something follows the #; read a token.  
             ungetc (c, finput);
             //token = yylex ();		
 		
 		    //#bugbug:
 			// ?? O que fizemos com esse token ??
 			
-		    /* skip the rest of this line.  */
+		    //skip the rest of this line.  
             while ((c = getc (finput)) != '\n');		
 
 		}else{
@@ -74,16 +85,21 @@ int check_newline ()
 			//se não é #, retorna ao encontrar espaço e
 			//devolve se encontrar outra coisa. depois retorne também.
 			
-	        if (c == ' ' || c == '\t')
-			{
-				return (int) c;
-				
-			} else {
-				
-			    ungetc ( c, finput );	
-			    return (int) -1;
-			};
+			//return (int) c;
+			
+	        //if (c == ' ' || c == '\t')
+			//{
+			//	return (int) c;
+			//	
+			//} else {
+			//	
+			//    ungetc ( c, finput );	
+			//    return (int) -1;
+			//};
 		};
+		*/
+		
+		
 	};//while
 	
 };
@@ -100,13 +116,34 @@ int skip_white_space (){
     {
         switch (c)
 	    {
+			// ## spaces ##	
+			//se encontramos um espaço, pegamos o próximo e saímos do switch 
+			//para reentrarmos no switch
+            case ' ':
+            case '\t':
+            case '\f':
+            case '\r':
+            case '\b':
+                c = getc(finput);
+                break;
+
+			// ## new lines ##	
+	        case '\n':
+			    lineno++;
+				//próximo.
+				c = getc (finput);
+				break;				
+			
 			// ## comments ##
+			// '/' 
+			//(#importante: Isso pode ser a primeira barra do comentário ou uma divisão.)
 	        case '/':
 			
 			    c = getc(finput);
 				
+				//Aqui encontramos a segunda barra de dias consecutivas.
 				//single line comments.
-				if ( c == '/')
+				if ( c == '/' )
 				{	
 			        while (1)
 					{
@@ -115,13 +152,35 @@ int skip_white_space (){
 						//quando alinha acabar,
 						//apenas saímos do switch
 				        //sairemos com '\n'
+						//??? e se chegarmos ao fim do arquivo ??? #todo
+						
 						if( c == '\n')
 						{
+							//acho que isso só sai do while.
 					        break;
 				        }
 				    };
+					//isso sai do switch
+					break;
 				};
-			
+			    
+				//aqui encontramos o * depois da barra, indicando que temos 
+				//comentário com multiplas linhas 
+				if (c != '*')
+				{
+					//todo
+					//tem um propótipo logo abaixo.
+				}
+				
+				//#importante 
+				//excluindo os casos acima, então significa que nossa barra não tinha nada a ver com comentário 
+				//lembrando que a barra aparecei depois de um espaço em branco.
+				//por enquanto vamos dizer que algo está errado com essa barra,
+				printf("skip_white_space: todo: depois da barra / .");
+				exit(1);
+				
+					
+				/*
 	            //multiple lines comments.
 	            if (c != '*')
 	            {
@@ -129,7 +188,7 @@ int skip_white_space (){
 	                return '/';
 	            };
 
-	            // é * ... para completar o /*
+	            // é * ... para completar o 
 				c = getc(finput);
 
 	            //dentro do comentário.
@@ -145,7 +204,7 @@ int skip_white_space (){
 
 		                if (c == '/')
 		                {
-							//fim do comentário  */
+							//fim do comentário  
 							//sai do while ... com alguma coisa em c.
 		                    inside = 0;
 		                    c = getc(finput);
@@ -164,36 +223,17 @@ int skip_white_space (){
 	                 else
 		                c = getc(finput);
 	            };
+				*/
 	            break;
 
-			// ## new lines ##	
-	        case '\n':
-	            c = check_newline(); //todo
-				if (c == ' ' || c == '\t' || c == '\f' || c == '\r' || c == '\b')
-				{
-					c = getc (finput);
-				    break;
-				}
-				//sinal que teve um unget.
-				if ( c == -1 )
-				{
-					c = getc (finput);
-					break;
-				}
-				break;
 
-			// ## spaces ##	
-            case ' ':
-            case '\t':
-            case '\f':
-            case '\r':
-            case '\b':
-                c = getc(finput);
-                break;
+
+
 
             //#test 
             // ## ignorando diretivas do preprocessdor '#' ##
-            case '#':
+            /*
+			case '#':
                 while(1)
 				{
 					c = getc(finput);
@@ -209,7 +249,9 @@ int skip_white_space (){
 					}
 				};
                 break;
+            */
 
+            /* 			
 			// ## \ ##	
             case '\\':
 	            c = getc(finput);
@@ -221,11 +263,11 @@ int skip_white_space (){
 				} 
 	            c = getc(finput);    
 	            break;
-				
+			*/	
 				
 
             default:
-                return (c);
+                return (int) (c);
 
         };//switch
 
