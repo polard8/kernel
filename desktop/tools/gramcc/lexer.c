@@ -318,6 +318,7 @@ again:
   
     switch (c)
     {
+		
         //case EOF:
         //    value = ENDFILE; 
 		//	break; 

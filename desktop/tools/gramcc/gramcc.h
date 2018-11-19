@@ -60,6 +60,11 @@ int stack_count;
 int stack_index;   //current index.
 int stack_flag;    //aciona para sinalizar que devemos colocar o próximo elemento na pilha.
  
+ 
+ 
+//
+// ## identifier support ##
+// 
 
 //#testando 
 //informações sobre o identificador atual. Encontrado no momento.
@@ -80,7 +85,36 @@ int stack_flag;    //aciona para sinalizar que devemos colocar o próximo elemen
 //8 elementos que explicam o identificador.
 int id[8];
 
+//#obs lembrabdo que o identificador fica em outro buffer.
 
+//
+// ## constant support ##
+// 
+
+#define CONSTANT_TYPE 0  //1=byte 2=word 4=dword
+#define CONSTANT_BASE 1  //2=binário 8=octal 10=decimal 16=heaxadecimal
+//...
+
+//elementos que explicam a constante.
+int constant[4];
+
+//salvando a string das constantes,
+//onde a constante será armazenada dependendo do tipo.
+char constant_byte[2];   //0xFF
+char constant_word[4];   //0xFFFF
+char constant_dword[8];  //0xFFFFFFFF
+
+//o que colocar antes dessa constante.
+//isso varia com a base
+char constant_before[2];
+
+//o que colocar depois dessa constante.
+//isso varia com a base
+char constant_aftes[2];
+
+
+
+//
 unsigned long program_header_address;
 unsigned long program_text_address;
 unsigned long program_data_address;

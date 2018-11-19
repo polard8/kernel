@@ -363,7 +363,12 @@ int parse_return ( int token ){
 					//se encontramos a constante, o que segue é o separador ';' ou o separador ')'
 					case TOKENCONSTANT:
 						//ok;
-						printf("parse_return: State1 TOKENCONSTANT={%s} line %d\n", real_token_buffer, lineno );	
+						printf("parse_return: State1 TOKENCONSTANT={%s} line %d\n", real_token_buffer, lineno );
+
+						strcat( outfile,"  mov eax, 0x");
+						strcat( outfile,real_token_buffer);
+						strcat( outfile,"\n  ret \n\n");
+                        //strcat( outfile,"");							
 						
 						//Se não temos um parêntese aberto então vamos para o proximo
 						//que deverá ser um ';'
@@ -645,6 +650,14 @@ int parse (){
 			            id[ID_TOKEN] = TOKENIDENTIFIER;
 				        id[ID_STACK_OFFSET] = stack_index;
 				        printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
+						
+                        //tentando mandar alguma coisa para o arquivo de output 
+						//pra ter o que salvar, pra construir o assembly file;	
+						strcat( outfile,"\n");
+						strcat( outfile,"_");
+						strcat( outfile,real_token_buffer);
+						strcat( outfile,":\n");
+						
 						//depois do identificador deve vir um '(' ou um '=';
 						State = 3;
 						break;		
@@ -832,10 +845,14 @@ int parse (){
 	//
 	
 	//#debug
-	printf("\n INPUT: \n");
-	printf("%s\n",stdin->_base);
-	printf("number of lines: %d \n",lineno);
+	//printf("\n INPUT: \n");
+	//printf("%s\n",stdin->_base);
+	//printf("number of lines: %d \n",lineno);
 	//...
+
+	printf("\n OUTPUT: \n");
+	printf("%s\n",outfile);
+	printf("number of lines: %d \n",lineno);
 	
 hang:	
 

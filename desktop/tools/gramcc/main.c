@@ -696,8 +696,8 @@ int gramccInitialize (){
 	sprintf ( infile, "initializing infile " );
     strcat(infile,"buffer");	
 	
-    sprintf(outfile, "initializing outfile " );
-    strcat(outfile,"buffer");	
+    sprintf(outfile, "\n;; initializing outfile buffer \n" );
+    strcat(outfile,";; its an assembly file \n\n");	
 	
 	
 	//table.
