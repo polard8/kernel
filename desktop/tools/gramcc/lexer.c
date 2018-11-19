@@ -21,6 +21,7 @@
 
 
 //#### supensa ###
+/*
 int check_newline ()
 {
     register int c;
@@ -47,7 +48,6 @@ int check_newline ()
 		//se for quanquer outra coisa também deixaremos o skip_white_space tratar
 		return (int) c;
         
-		/*
 		if ( c == '#' )
 		{
             //Skip whitespace after the #.  
@@ -97,23 +97,28 @@ int check_newline ()
 			//    return (int) -1;
 			//};
 		};
-		*/
+		
 		
 		
 	};//while
 	
 };
+*/
 
 
 int skip_white_space (){
     
 	register int c;
     register int inside;
+	
+	
+	
+begin:		
 
     c = getc(finput);
 
     for (;;)
-    {
+    {		
         switch (c)
 	    {
 			// ## spaces ##	
@@ -141,6 +146,7 @@ int skip_white_space (){
 			
 			    c = getc(finput);
 				
+				//#### inicia um comentário de uma linha ####
 				//Aqui encontramos a segunda barra de dias consecutivas.
 				//single line comments.
 				if ( c == '/' )
@@ -163,68 +169,81 @@ int skip_white_space (){
 					//isso sai do switch
 					break;
 				};
-			    
-				//aqui encontramos o * depois da barra, indicando que temos 
-				//comentário com multiplas linhas 
-				if (c != '*')
-				{
-					//todo
-					//tem um propótipo logo abaixo.
-				}
 				
+				//#### inicia um comentário de múltiplas linhas ####
 				//#importante 
 				//excluindo os casos acima, então significa que nossa barra não tinha nada a ver com comentário 
 				//lembrando que a barra aparecei depois de um espaço em branco.
 				//por enquanto vamos dizer que algo está errado com essa barra,
-				printf("skip_white_space: todo: depois da barra / .");
-				exit(1);
-				
-					
-				/*
-	            //multiple lines comments.
-	            if (c != '*')
-	            {
-	                ungetc(c, finput);
-	                return '/';
-	            };
-
-	            // é * ... para completar o 
-				c = getc(finput);
-
-	            //dentro do comentário.
-				inside = 1;
-	            
-				while (inside)
-	            {
-	                if (c == '*'){
+				//printf("skip_white_space: todo: depois da barra / .");
+				//exit(1);		
+				if (c == '*')
+				{
+				    c = getc(finput);	
+					inside = 1; 
+				  	
+				    while (inside)
+	                {
+	                    if (c == '*')
+					    {
 						
-						//sequencia de **************
-		                while (c == '*')
-		                    c = getc(finput);
+						    //sequência de **************
+		                    while (c == '*')
+		                        c = getc(finput);
 
-		                if (c == '/')
-		                {
-							//fim do comentário  
-							//sai do while ... com alguma coisa em c.
-		                    inside = 0;
-		                    c = getc(finput);
-		                }
-		            }else if (c == '\n'){
+		                    //se logo em seguida do * tiver uma barra /.
+						    if (c == '/')
+		                    {
+							    //fim do comentário  
+							    //sai do while ... com alguma coisa em c.
+		                        inside = 0;
+								
+		                        //c = getc(finput);							     
+							    //break; //sai do while.
+								
+								//begin: ??
+								//Ao fim de um comentário /* ... */
+								//podemos ter espaços tabs e talvez outros comentários.
+		                        
+								goto begin;
+							}
 						
-						      //precisamos contar.
-		                      lineno++;
-							  //printf(" [LF2] ");
-		                      c = getc(finput);
+						// se vamos pular mudar de linha dentro do comentário.
+		                }else if (c == '\n'){
+						
+						        //precisamos contar.
+		                        lineno++;
 							  
-					//}else if (c == EOF || c == '\0')  //isso também é uma opção de comentário não terminado.		  
-		            
-					}else if (c == EOF)
-		                    printf("unterminated comment");
-	                 else
-		                c = getc(finput);
-	            };
-				*/
-	            break;
+							    //printf(" [LF2] ");
+		                        c = getc(finput);
+							  
+					            //?? para onde vamos??
+								//precisamos continuar no while até encontrarmos a barra /. ou o *.
+								
+					    //}else if (c == EOF || c == '\0')  //isso também é uma opção de comentário não terminado.		  
+					    }else if (c == EOF){
+		                    printf("skip_white_space: unterminated comment in line %d",lineno);
+	                        exit(1);
+						//default
+						}else{
+		                    
+							//isso são letras do comentário.
+							//continuaremos dentro do while(inside)
+							//??#bugbug: mas até quando ??
+                            //temos que contar ou confiar no EOF.						
+							c = getc(finput);
+						};
+						//nothing;
+	                };					
+				};
+				
+				// aqui depois da barra não emcontramos nem o '*' nem o '/'
+	            // isso significa que estamos eliminando espaços dentro de uma expressão.
+				// então vamos retornar a barra para que a rotina continue tratando a 
+				// expressão.
+				ungetc ( c, finput );	
+				//return (int) '/';
+				break;
 
 
 
@@ -250,20 +269,6 @@ int skip_white_space (){
 				};
                 break;
             */
-
-            /* 			
-			// ## \ ##	
-            case '\\':
-	            c = getc(finput);
-	            if (c == '\n'){
-	                lineno++;
-				    //printf(" [LF4] ");
-				}else{
-				    printf("stray '\\' in program"); 
-				} 
-	            c = getc(finput);    
-	            break;
-			*/	
 				
 
             default:
