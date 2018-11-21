@@ -48,6 +48,13 @@ unsigned long infile_size;
 unsigned long outfile_size;
 
 
+
+//#importante
+//esses dois buffers serão copiados no final do buffer outfile
+char DATA[512];
+char BSS[512];
+
+
 // ## stack support ##
 
 

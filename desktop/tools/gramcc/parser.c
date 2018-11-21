@@ -733,7 +733,7 @@ int parse (){
                             {
 						        //tentando mandar alguma coisa para o arquivo de output 
 						        //pra ter o que salvar, pra construir o assembly file;	
-						        strcat( outfile,"\n segment .text \n");
+						       // strcat( outfile,"\n segment .text \n");
 						        strcat( outfile,"_");
 						        strcat( outfile,save_symbol);
 						        strcat( outfile,":\n");
@@ -756,7 +756,7 @@ int parse (){
 								
 						        //tentando mandar alguma coisa para o arquivo de output 
 						        //pra ter o que salvar, pra construir o assembly file;	
-						        strcat( outfile,"\n segment .text \n");
+						       // strcat( outfile,"\n segment .text \n");
 						        strcat( outfile,"_");
 						        strcat( outfile,save_symbol);
 						        strcat( outfile,":\n");
@@ -784,10 +784,10 @@ int parse (){
 								printf ("\n[/PAR]\n");  //debug par close
 								
 							    //é bss porque não foi inicializada.
-								strcat( outfile,"\n segment .bss \n");
-						        strcat( outfile,"_");
-						        strcat( outfile,save_symbol);
-						        strcat( outfile,":\n");								
+								//strcat( BSS,"\n segment .bss \n");
+						        strcat( BSS,"_");
+						        strcat( BSS,save_symbol);
+						        strcat( BSS,": dd 0 \n");								
 						        
 								//?? depois de ) podemos ter o corpo da função.
 								//ou outra coisa caso estivermos parentese aberto.
@@ -817,10 +817,10 @@ int parse (){
 						        //pra ter o que salvar, pra construir o assembly file;	
 						        
 								//é bss porque não foi inicializada.
-								strcat( outfile,"\n segment .bss \n");
-						        strcat( outfile,"_");
-						        strcat( outfile,save_symbol);
-						        strcat( outfile,":\n");
+								//strcat( BSS,"\n segment .bss \n");
+						        strcat( BSS,"_");
+						        strcat( BSS,save_symbol);
+						        strcat( BSS,": dd 0 \n");
 								
 								//recomeçar, vai que tem mais variável...
 								State = 1;
@@ -835,10 +835,10 @@ int parse (){
 						        //pra ter o que salvar, pra construir o assembly file;	
 						        
 								//é bss porque não foi inicializada.
-								strcat( outfile,"\n segment .bss \n");
-						        strcat( outfile,"_");
-						        strcat( outfile,save_symbol);
-						        strcat( outfile,":\n");
+								//strcat( BSS,"\n segment .bss \n");
+						        strcat( BSS,"_");
+						        strcat( BSS,save_symbol);
+						        strcat( BSS,": dd 0 \n");
 								
 								//recomeçar, vai que tem mais variável...
 								State = 1;
@@ -1221,6 +1221,11 @@ int parse (){
 	//...
 debug_output:
 
+    //incluimos no arquivo de output os segmentos de dados,
+	strcat( outfile,DATA);
+    strcat( outfile,BSS);
+	
+	//exibimos o arquivo de output.
 	printf("\n OUTPUT: \n");
 	printf("%s\n",outfile);
 	printf("number of lines: %d \n",lineno);

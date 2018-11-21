@@ -698,7 +698,15 @@ int gramccInitialize (){
 	
     sprintf(outfile, "\n;; initializing outfile buffer \n" );
     strcat(outfile,";; its an assembly file \n\n");	
+    strcat( outfile,"\n segment .text \n");
 	
+    sprintf(DATA, "\n;; initializing DATA buffer \n" );
+    strcat(DATA,";; its an assembly DATA \n\n");	
+    strcat( DATA,"\n segment .data \n");
+	
+    sprintf(BSS, "\n;; initializing BSS buffer \n" );
+    strcat(BSS,";; its an assembly BSS \n\n");	
+	strcat( BSS,"\n segment .bss \n");
 	
 	//table.
 //contador para não estourar a lista. 
