@@ -323,8 +323,13 @@ again:
         //    value = ENDFILE; 
 		//	break; 
 		
+		//test 
+		//(E quando chegarmos ao fim do arquivo)
+		//
+		case 0:
 		case EOF:
-		    //    value = ENDFILE; 
+		    //value = ENDFILE;
+            value = TOKENEOF;			
 		    printf ("yylex: EOF\n");
 		    break;
 			
@@ -413,6 +418,19 @@ again:
 			value = TOKENIDENTIFIER;
 			
 			//e se esse ideitificador fou uma palavra reservada ??
+
+			if ( strncmp( real_token_buffer, "signed", 6 ) == 0 )
+			{
+				value = TOKENMODIFIER;
+				modifier_found = MSIGNED;
+			}							
+
+			if ( strncmp( real_token_buffer, "unsigned", 8 ) == 0 )
+			{
+				value = TOKENMODIFIER;
+			    modifier_found = MUNSIGNED;
+			}				
+			
 			
 			//temos um tipo
 			if ( strncmp( real_token_buffer, "int", 3 ) == 0 )

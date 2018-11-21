@@ -22,6 +22,8 @@ int current_index;
 //esperamos por uma função ou uma variável.
 int type_found;
 
+int modifier_found;
+int qualifier_found;
 
 //palavra reservada encontrada.
 int keyword_found;

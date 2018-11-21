@@ -23,8 +23,9 @@
 
 int parse_function ( int token );
 int parse_return ( int token );
-int parse_def (int token );    //não pertence a linguagem C.
-int parse_var ( int token );   //não pertence a linguagem C.
+
+//int parse_def (int token );    //não pertence a linguagem C.
+//int parse_var ( int token );   //não pertence a linguagem C.
 //...
 
 
@@ -33,6 +34,7 @@ int parse_var ( int token );   //não pertence a linguagem C.
 //não pertence a linguagem C.
 //interna 
 
+/*
 int parse_def (int token )
 {
 	
@@ -109,12 +111,14 @@ done:
     //printf("parse_def: done \n");
 	return (int) c;
 };
+*/
+
 
 
 //#test 
 //não pertence a linguagem C.
 //interna 
-
+/*
 int parse_var ( int token ){
 	
 	int c;
@@ -203,7 +207,7 @@ done:
     //printf("parse_var: done \n");
     return c;	
 };
-
+*/
 
 
 int parse_function ( int token )
@@ -550,6 +554,13 @@ int parse (){
 	int running = 1;
 	size_t size = (size_t) strlen ( (const char *) stdin->_base );
 	
+	
+	//{([
+	//se entramos em um desses corpos.
+	int braces_inside = 0;
+	int parentheses_inside = 0;
+	int square_brackets_inside = 0;
+	
 	//steps;
 	int State = 1;
 	
@@ -558,99 +569,131 @@ int parse (){
 	//#obs
 	//Aqui podemos usar um while(running) até que se encontre o fim do arquivo.
 	
-	//for ( i=0; i<size; i++ )
+
 	while (running == 1)
 	{
 	    //pega o char.
 		//#todo: trocar c por TOKEN.
+		
 	    c = yylex ();
+		
+		again:
 		
 		//#debug
 	    //printf("%c", c );
 		
-	    
+	    //statement classes
+		
 		switch (State)
 		{
-			//next:
-			
+            //
+			//  ## MODIFIER,  TYPE and SEPARATOR ##
+			//
+						
 			//################################
 			// #State 1
-			// Esperamos uma TOKENKEYWORD. (KWDEF KWVAR KWRETURN )
 			// Esperamos um TOKENTYPE.
-			//return não.
-			// (var def ou int void ...)
 			case 1:
+			    printf("<1> ");
 				switch (c)
 				{
-	 
+	                case TOKENMODIFIER:
+						//continua pois precisamos pegar um tipo.
+						//#bugbug ??mas e se o modificar vir seguido de um simbolo ???
+						printf("State1: TOKENMODIFIER={%s} line %d\n", real_token_buffer, lineno );
+						State = 1;
+						//goto again;
+						break;
 					
 					//TYPE
 					// >>> peekChar=) significa marcação de tipagem.
 					// >>> peekSymbol=symbol  significa declaração de variável ou função.
 			        case TOKENTYPE:
-			            id[ID_TYPE] = type_found;
-				        printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
+			            printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
+						id[ID_TYPE] = type_found;
+				        
 						//depois de um type vem um identificador.
 						State = 2;
 			            break;
 						
-					//KEYWORD.
-                    //peekChar=; depois do break, ou continue.(obrigatório)
-                    //peekChar=: depois do default.(obrigatório)
-                    //peekChar=( depois do switch, if, while ...					
-				    case TOKENKEYWORD:
-					    //printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
-			    
-				        //se a kw for 'def' chamamo parse_def() que retorna só quando 
-				        //encontrar um '(', onde começará os argumentos.
-				
-				        if ( keyword_found == KWDEF )
-				        {
-					         printf("State1: TOKENKEYWORD={%s} KWDEF line %d  \n", real_token_buffer, lineno );
+					case TOKENSEPARATOR:
+					     printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
+						 
+					    //fechando UM parênteses, provavelmente sem nada dentro.
+					    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+						{
+						    if ( parentheses_inside > 0 )
+							{
+								printf("\n[/PAR]\n");
+                                parentheses_inside--;
+                                State = 1;
+								break;
+								//State++;
+                                //goto again; 								
+							};
+						}
+                        //fechando UM corpo de função. 					
+				        if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
+                        {
+						    if ( braces_inside > 0 )
+							{
+								printf("\n[/BRACE]\n");
+                                braces_inside--;
+                                State = 1;
+								break;
+								//State++;
+                                //goto again; 								
+							};							
+						}
+					    break;					
+						
+                    //Se o corpo da função estiver aberto podemos ter identificadores sem tipo,
+					//que são label: ou chamada de função (call). ou ainda keywords.
 					
-					        // parse deve retornar o '(' quando encontrá-lo.
-					        c = parse_def (TOKENKEYWORD);
-					        if ( c == TOKENSEPARATOR )
-					        {
-						        //goto next;
-					        }
-					        printf("State1: TOKENKEYWORD KWDEF fail;");
-					        exit(1); //while(1){}
-					        break;
-				        }
-						
-						
-				        //e a kw var foi encontrada, chamaremos parse_var(),
-				        //que retornará quando encontrar ';'.
-				
-				        if( keyword_found == KWVAR )
-				        {
-					        printf("State1: TOKENKEYWORD={%s} KWVAR line %d \n", real_token_buffer, lineno );
-					        // parse deve retornar o ';' quando encontrá-lo.
-					        c = parse_var (TOKENKEYWORD);
-				       	    if ( c == TOKENSEPARATOR )
-					        {
-						        //goto next;
-					        }
-					        printf("State1: TOKENKEYWORD KWVAR fail");
-					        exit(1);//while(1){}
-					        break;
-				        }							
-						break;
-
-                    default:
+					//significa que dentro do um corpo de função não encontramos um tipo,
+					//então vamos ver do que se trata o token e configurar a variável c.
+					//loga após vamos reiniciar o running mas sem pegarmos o próximo token.
+					//poderíamos realizar um ungetchar, mas não testamos isso direito.
+	
+					default:
+					    //se estamos dentro do parênteses e não encontramos nenhum case acima.
+					    if ( parentheses_inside > 0 )
+					    {
+						    State++;
+						    goto again;
+					    }	
+					    //se estamos dentro de uma chave e não encontramos nenhum case acima.
+				        if ( braces_inside > 0 )
+					    {
+						    State++;
+						    goto again;
+					    }
+                         
+						//EOF 
+						if( c = TOKENEOF )
+						{
+						    printf("State1: eof\n");
+                            goto debug_output; 							
+						}
 					    printf("State1: default error\n");
-						printf("State1: keyword expected on line %\n", lineno);
+						printf("State1: modifier or type expected on line %d \n", lineno);
 						exit(1);
-                        break;					
+                        break;
+						
 				}
 		        break;
+				
+				
+            //
+			//  ## IDENTIFIER ##
+			//				
 				
 			//################################
 			// #State 2	
 			// Esperamos um identificador, pos estamos logo após um tipo.
 			// Pode ser uma função ou uma declaração de variável, isso depende do peekChar.
 			case 2:
+			    printf("<2> ");
 			    switch (c)
 				{
 				    //identificador. (símbolo)
@@ -670,6 +713,7 @@ int parse (){
 						sprintf ( save_symbol, real_token_buffer );
 						
 						//?? não sabemos se real_token_buffer é código ou dados ?? 
+						
 						
                         c = yylex ();
 						
@@ -702,8 +746,13 @@ int parse (){
 						    //; função
 							if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                             {
+								//incrementamos
+								//pois podemos estar no primeiro, no segundo etc ...
+								parentheses_inside++;
+								printf ("\n[PAR]\n");  //debug par open
+								
 								//#test
-								peekChar = c;
+								//peekChar = c;
 								
 						        //tentando mandar alguma coisa para o arquivo de output 
 						        //pra ter o que salvar, pra construir o assembly file;	
@@ -711,9 +760,55 @@ int parse (){
 						        strcat( outfile,"_");
 						        strcat( outfile,save_symbol);
 						        strcat( outfile,":\n");
-								State = 4;
+								
+								//recomeçar a lista. 
+								//#bugbug desconsiderando o modificador.
+								State = 1;
+								
 								break;
-							}							
+							}	
+
+						    //Se encontramos um separador ')' 
+						    //entao esperaremos um separador '{'.
+						    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+					 	    {
+								//se não tem parênteses aberto.
+								if ( parentheses_inside < 1 )
+								{
+									printf("state2: Error closing parentheses in line %d ", lineno);
+									exit(1);
+								}
+								
+								//fechamos um dos parênteses.
+								parentheses_inside--;
+								printf ("\n[/PAR]\n");  //debug par close
+								
+							    //é bss porque não foi inicializada.
+								strcat( outfile,"\n segment .bss \n");
+						        strcat( outfile,"_");
+						        strcat( outfile,save_symbol);
+						        strcat( outfile,":\n");								
+						        
+								//?? depois de ) podemos ter o corpo da função.
+								//ou outra coisa caso estivermos parentese aberto.
+								
+								//peek next
+								c = yylex ();
+								
+								//entramos no corpo da função.
+								if ( strncmp( (char *) real_token_buffer, "{", 1 ) == 0  )
+								{
+									printf("State2: separator={%s} line %d\n", real_token_buffer, lineno );  
+									 
+									braces_inside++;
+								    printf ("\n[BRACE]\n");  //debug par close
+									//isso vai para o 1 onde procura-se por modificadores e tipos,
+									//mas se estivermos com o corpo da função aberto ele avançará para o próximo state.
+									State = 1;
+								}	
+									
+							    break;
+						    }									
 
 						    //; var
 							if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
@@ -748,21 +843,7 @@ int parse (){
 								//recomeçar, vai que tem mais variável...
 								State = 1;
 								break;
-							}	
-
-
-						    //Se encontramos um separador ')' 
-						    //entao esperaremos um separador '{'.
-						    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
-					 	    {
-							    //é bss porque não foi inicializada.
-								strcat( outfile,"\n segment .bss \n");
-						        strcat( outfile,"_");
-						        strcat( outfile,save_symbol);
-						        strcat( outfile,":\n");								
-						        State = 5;	
-							    break;
-						    }								
+							}							
 							
 							//printf("...");
 							//goto debug_output;
@@ -772,7 +853,7 @@ int parse (){
 						//}
 						
 						printf("state2: TOKENIDENTIFIER fail");
-						
+						exit(1);
 						//tentando mandar alguma coisa para o arquivo de output 
 						//pra ter o que salvar, pra construir o assembly file;	
 						//strcat( outfile,"\n");
@@ -782,13 +863,138 @@ int parse (){
 						
 						//depois do identificador deve vir um '(' ou um '=';
 						//State = 3;
-						break;		
+						break;	
+
+                    //Se o corpo da função estiver aberto podemos ter identificadores sem tipo,
+					//que são label: ou chamada de função (call). ou ainda keywords.
+					
+					//significa que dentro do um corpo de função não encontramos um tipo,
+					//então vamos ver do que se trata o token e configurar a variável c.
+					//loga após vamos reiniciar o running mas sem pegarmos o próximo token.
+					//poderíamos realizar um ungetchar, mas não testamos isso direito.
+					
+
+ 				
                 
 				    default:
+					    //se estamos dentro do parênteses e não encontramos nenhum case acima.
+					    if ( parentheses_inside > 0 )
+					    {
+						    State++;
+						    goto again;
+					    }	
+					    //se estamos dentro de uma chave e não encontramos nenhum case acima.
+				        if ( braces_inside > 0 )
+					    {
+						    State++;
+						    goto again;
+					    }						
 					    printf("State2: default Error.\n");
 						printf("State2: expected identifier on line %.\n", lineno);
 						exit(1);
 					    break;
+				};
+                break;	
+
+
+            //
+			//  ## KEYWORD ##
+			//			
+            
+            case 3:
+			    printf("<3> ");
+			    switch(c)
+				{
+					//KEYWORD.
+                    //peekChar=; depois do break, ou continue.(obrigatório)
+                    //peekChar=: depois do default.(obrigatório)
+                    //peekChar=( depois do switch, if, while ...					
+				    case TOKENKEYWORD:
+					    printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
+						
+						// # return #
+						//return. Chamaremos o tratador do stmt parse_return() 
+				        if( keyword_found == KWRETURN )
+				        {
+					        printf("State3: TOKENKEYWORD={%s} KWRETURN line %d  \n", real_token_buffer, lineno );
+					        // parse deve retornar o '(', quando encontrá-lo faz o tratamento até chegar  no ';'
+						    // a função deve retornar o separador ';'
+				            //indicando que tudo deu certo no parser.
+						    //continuaremos nesse state até pegarmos o separador '}'.
+							printf ("\n");
+					        c = parse_return ( TOKENKEYWORD );
+					        printf ("\n");
+							
+							//esperávamos o separador ';', se não veio então falhou o parser.
+							if ( c != TOKENSEPARATOR )
+					        {
+							    printf("State3: TOKENKEYWORD TOKENSEPARATOR fail");
+                                exit(1);								
+					        }
+							
+							//reinicia
+							//porque depois de um return podemos ter várias outras coisas.
+							//inclusive apenas terminarmos um corpo.
+							State = 1;
+							break;
+				        }	
+
+						
+				        //se a kw for 'def' chamamo parse_def() que retorna só quando 
+				        //encontrar um '(', onde começará os argumentos.
+                        /*						
+				        if ( keyword_found == KWDEF )
+				        {
+					         printf("State1: TOKENKEYWORD={%s} KWDEF line %d  \n", real_token_buffer, lineno );
+					
+					        // parse deve retornar o '(' quando encontrá-lo.
+					        c = parse_def (TOKENKEYWORD);
+					        if ( c == TOKENSEPARATOR )
+					        {
+						        //goto next;
+					        }
+					        printf("State1: TOKENKEYWORD KWDEF fail;");
+					        exit(1); //while(1){}
+					        break;
+				        }
+						*/
+						
+				        //e a kw var foi encontrada, chamaremos parse_var(),
+				        //que retornará quando encontrar ';'.
+				        /* 
+				        if( keyword_found == KWVAR )
+				        {
+					        printf("State1: TOKENKEYWORD={%s} KWVAR line %d \n", real_token_buffer, lineno );
+					        // parse deve retornar o ';' quando encontrá-lo.
+					        c = parse_var (TOKENKEYWORD);
+				       	    if ( c == TOKENSEPARATOR )
+					        {
+						        //goto next;
+					        }
+					        printf("State1: TOKENKEYWORD KWVAR fail");
+					        exit(1);//while(1){}
+					        break;
+				        }
+                        */						
+						break;
+						
+					
+					//estamos dentro do corpo da função e não encontramos uma keyword.	
+						
+					default:
+					    if ( parentheses_inside > 0 )
+					    {
+						    printf("State3: bugbug searching for keyword inside parentheses");
+						    exit(1);
+					    }
+					    if ( braces_inside > 0 )
+					    {
+						    printf("State3: bugbug searching for keyword inside braces");
+						    exit(1);
+					    }
+					    printf("State3: keyword default");
+						exit(1);
+						break;
 				};
                 break;			
 			
@@ -796,6 +1002,7 @@ int parse (){
 			// #State 3	
             //	esperamos '(' ou '='
             //pois estamos após o identificador.			
+			/*
 			case 3:
 			    switch (c)
 				{
@@ -818,6 +1025,7 @@ int parse (){
 					    break;
 				}
 			    break;
+			*/
         		
 			//################################
 			// #State 4	
@@ -825,7 +1033,8 @@ int parse (){
             // como um tipo e um simbolo e uma virgula.	
             //#importante: estamos dentro do parênteses, e aqui dentro pode ter uma sequencia de 
             //variáveis separadas por vírgula. Vamos voltar se encontrarmos um tipo. 		
-            case 4:
+            /*
+			case 4:
 			    switch (c)
 			    {
 	                // #importante.  
@@ -863,10 +1072,13 @@ int parse (){
 					    break;					
 				}
 			    break;
+			*/
 				
 			//################################
 			// #State 5	
 			// esperamos um '{'
+			
+			/*
             case 5:
 			    switch (c)
 			    {
@@ -886,10 +1098,12 @@ int parse (){
 					    break;					
 				}
 			    break;
+			*/
 				
 			//################################
 			// #State 6	
-			// esperamos um '}' ou return 0; ou coisa assim.		
+			// esperamos um '}' ou return 0; ou coisa assim.
+            /*			
             case 6:
 			    switch (c)
 			    {
@@ -933,10 +1147,12 @@ int parse (){
 					    break;					
 				}
 			    break;
+			*/
 				
 			//################################
 			// #State 7
 			//esperamos um ';' para terminar a função.
+			/*
             case 7:
 			    switch (c)				
 				{
@@ -961,12 +1177,23 @@ int parse (){
 						exit(1);
 					    break;										
 				}
-			    break;	
+			    break;
+            */ 				
 				
  
 		    default:
-			    printf("State default: Error.");
-				exit(1); 
+			    printf("<default>State default: Error.\n");
+				if ( parentheses_inside > 0 )
+				{
+				    printf("default: expected ) in line %d \n", lineno);
+                }
+				if ( braces_inside > 0 )
+				{
+				    printf("default: expected } in line %d \n", lineno);
+			    }				
+				goto debug_output;
+				//exit(1);
+                break;				
  
 	
 

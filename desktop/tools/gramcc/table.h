@@ -4,6 +4,7 @@
 //Enumeração dos tipos de tokens.
 typedef enum {
 	TOKENNULL,
+	TOKENEOF,
     TOKENKEYWORD,      // int while void. (reserveds)
 	TOKENIDENTIFIER,   // var1, total ...
 	TOKENCONSTANT,     // 10 20 0x1234 ...
@@ -13,6 +14,8 @@ typedef enum {
 	TOKENSPECIAL,       // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
 	//...
 	TOKENSTRING,
+	TOKENQUALIFIER,  // static volatile ...
+	TOKENMODIFIER,   // signed unsigned ...
     TOKENTYPE,
     ARITHCOMPARE,
 	EQCOMPARE,
@@ -40,8 +43,21 @@ typedef enum {
 	//...
 }types_t;
 
+//Enumeração dos modificadores.
+typedef enum {
+	MNULL,
+    MSIGNED,
+	MUNSIGNED
+	//...
+}modifiers_t;
 
-
+//Enumeração dos qualificadores.
+typedef enum {
+	QNULL,
+    QVOLATILE,
+	QSTATIC
+	//...
+}qualifiers_t;
  
 
 typedef enum {
