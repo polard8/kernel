@@ -409,6 +409,7 @@ int parse_return ( int token ){
                             //retorno do tipo void.
 							if (open == 0)
                             {
+								strcat( outfile,"\n  ret \n\n");
 								return (int) TOKENSEPARATOR;
                             }								
 						}
@@ -544,7 +545,7 @@ int parse (){
 	register int c;
 	int i;
 	
-	
+	char save_symbol[32];
 	
 	int running = 1;
 	size_t size = (size_t) strlen ( (const char *) stdin->_base );
@@ -581,7 +582,11 @@ int parse (){
 			case 1:
 				switch (c)
 				{
+	 
+					
 					//TYPE
+					// >>> peekChar=) significa marcação de tipagem.
+					// >>> peekSymbol=symbol  significa declaração de variável ou função.
 			        case TOKENTYPE:
 			            id[ID_TYPE] = type_found;
 				        printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
@@ -589,7 +594,10 @@ int parse (){
 						State = 2;
 			            break;
 						
-					//KEYWORD.	
+					//KEYWORD.
+                    //peekChar=; depois do break, ou continue.(obrigatório)
+                    //peekChar=: depois do default.(obrigatório)
+                    //peekChar=( depois do switch, if, while ...					
 				    case TOKENKEYWORD:
 					    //printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
 			    
@@ -641,25 +649,139 @@ int parse (){
 			//################################
 			// #State 2	
 			// Esperamos um identificador, pos estamos logo após um tipo.
-			//
+			// Pode ser uma função ou uma declaração de variável, isso depende do peekChar.
 			case 2:
 			    switch (c)
 				{
 				    //identificador. (símbolo)
+					//peekChar=: significa que o identificador é uma label. acontece no case.
+					//peekChar=( estamos chamando uma função
+					//peekChar=; estamos finalizando um goto ou um return.
+					//peekChar=, estamos listando variáveis.
+					//
 					case TOKENIDENTIFIER:
-			            id[ID_TOKEN] = TOKENIDENTIFIER;
+			            
+						id[ID_TOKEN] = TOKENIDENTIFIER;
 				        id[ID_STACK_OFFSET] = stack_index;
 				        printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
 						
-                        //tentando mandar alguma coisa para o arquivo de output 
+						
+                        //salva o símbolo. #isso funciona.						
+						sprintf ( save_symbol, real_token_buffer );
+						
+						//?? não sabemos se real_token_buffer é código ou dados ?? 
+						
+                        c = yylex ();
+						
+						//printf("test={%s} line %d\n", real_token_buffer, lineno ); 
+						
+						//: para label 
+                        //( para função 
+                        //; para declaração de variável.
+                        //, para sequencia de variável.
+                        //... 						
+						if ( c == TOKENSEPARATOR )
+						{
+							//printf("sep \n");
+							
+						    //: label
+							if( strncmp ( (char *) real_token_buffer, ":", 1 ) == 0  )
+                            {
+						        //tentando mandar alguma coisa para o arquivo de output 
+						        //pra ter o que salvar, pra construir o assembly file;	
+						        strcat( outfile,"\n segment .text \n");
+						        strcat( outfile,"_");
+						        strcat( outfile,save_symbol);
+						        strcat( outfile,":\n");
+								
+								//recomeçar.
+								State = 1;
+								break;
+							}
+							
+						    //; função
+							if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+                            {
+								//#test
+								peekChar = c;
+								
+						        //tentando mandar alguma coisa para o arquivo de output 
+						        //pra ter o que salvar, pra construir o assembly file;	
+						        strcat( outfile,"\n segment .text \n");
+						        strcat( outfile,"_");
+						        strcat( outfile,save_symbol);
+						        strcat( outfile,":\n");
+								State = 4;
+								break;
+							}							
+
+						    //; var
+							if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+                            {
+						        //tentando mandar alguma coisa para o arquivo de output 
+						        //pra ter o que salvar, pra construir o assembly file;	
+						        
+								//é bss porque não foi inicializada.
+								strcat( outfile,"\n segment .bss \n");
+						        strcat( outfile,"_");
+						        strcat( outfile,save_symbol);
+						        strcat( outfile,":\n");
+								
+								//recomeçar, vai que tem mais variável...
+								State = 1;
+								break;
+							}
+							
+							
+						    //, var (listando) tirando da pilha
+							if ( strncmp( (char *) real_token_buffer, ",", 1 ) == 0  )
+                            {
+						        //tentando mandar alguma coisa para o arquivo de output 
+						        //pra ter o que salvar, pra construir o assembly file;	
+						        
+								//é bss porque não foi inicializada.
+								strcat( outfile,"\n segment .bss \n");
+						        strcat( outfile,"_");
+						        strcat( outfile,save_symbol);
+						        strcat( outfile,":\n");
+								
+								//recomeçar, vai que tem mais variável...
+								State = 1;
+								break;
+							}	
+
+
+						    //Se encontramos um separador ')' 
+						    //entao esperaremos um separador '{'.
+						    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+					 	    {
+							    //é bss porque não foi inicializada.
+								strcat( outfile,"\n segment .bss \n");
+						        strcat( outfile,"_");
+						        strcat( outfile,save_symbol);
+						        strcat( outfile,":\n");								
+						        State = 5;	
+							    break;
+						    }								
+							
+							//printf("...");
+							//goto debug_output;
+							
+						}//else{
+							//printf("sep fail");
+						//}
+						
+						printf("state2: TOKENIDENTIFIER fail");
+						
+						//tentando mandar alguma coisa para o arquivo de output 
 						//pra ter o que salvar, pra construir o assembly file;	
-						strcat( outfile,"\n");
-						strcat( outfile,"_");
-						strcat( outfile,real_token_buffer);
-						strcat( outfile,":\n");
+						//strcat( outfile,"\n");
+						//strcat( outfile,"_");
+						//strcat( outfile,real_token_buffer);
+						//strcat( outfile,":\n");
 						
 						//depois do identificador deve vir um '(' ou um '=';
-						State = 3;
+						//State = 3;
 						break;		
                 
 				    default:
@@ -700,18 +822,39 @@ int parse (){
 			//################################
 			// #State 4	
 			// esperamos um separador ')' para fechar ... ou algum conteúdo 
-            // como um tipo e um simbolo e uma virgula.			
+            // como um tipo e um simbolo e uma virgula.	
+            //#importante: estamos dentro do parênteses, e aqui dentro pode ter uma sequencia de 
+            //variáveis separadas por vírgula. Vamos voltar se encontrarmos um tipo. 		
             case 4:
 			    switch (c)
 			    {
-	
+	                // #importante.  
+	                // se encontrarmos o separador ')' então completamos os argumentos.
+                    // se encontrarmos um tipo, então temos mais argumentos. 
+					
 					// separadores (){}[],.;:? ...
 			        case TOKENSEPARATOR:
 			            printf("State4: TOKENSEPARATOR={%s} line %d \n", real_token_buffer, lineno );   
 						//Se encontramos um separador ')' 
-						//ent]ao esperaremos um separador '{'.
-						State = 5;
+						//entao esperaremos um separador '{'.
+						if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+						{
+						    State = 5;	
+							break;
+						}						
+						
+						printf("state4: fail");
 						break;
+						
+					//encontramos um tipo então temos que voltar.
+					
+			        case TOKENTYPE:
+			            id[ID_TYPE] = type_found;
+				        printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
+						//depois de um type vem um identificador.
+						State = 2;
+			            break;						
+						
 						
 					default:
 					    printf("State4: default. Error \n");
@@ -849,6 +992,7 @@ int parse (){
 	//printf("%s\n",stdin->_base);
 	//printf("number of lines: %d \n",lineno);
 	//...
+debug_output:
 
 	printf("\n OUTPUT: \n");
 	printf("%s\n",outfile);

@@ -113,3 +113,4 @@ int textMaxWheelDelta;  //máximo que se pode rolar o texto
 
 
 
+

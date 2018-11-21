@@ -1,7 +1,20 @@
 /*
  * File: parser.h
  */
+ 
+//#test 
 
+//Espiada, olhadinha.
+int peekSymbol;
+int peekChar; 
+
+//
+// #importante
+// esquema
+// Um símbolo vam seguido de um char.
+// a ação depende dessa combinação.
+// peekSymbol >>> peekChar
+//
  
 char function_main_buffer[512];
 
