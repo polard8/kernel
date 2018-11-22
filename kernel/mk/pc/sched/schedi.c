@@ -19,7 +19,6 @@
 
 
 //bloqueia por um motivo
-
 void block_for_a_reason (int tid, int reason)
 {
 	struct thread_d *t;
@@ -197,10 +196,10 @@ fail:
 /*
  * KiIncreasePriority:
  *     Aumenta a prioridade de uma processo
- *     @todo:
+ *     
  */
-int KiIncreasePriority(int pid)
-{  
+int KiIncreasePriority (int pid){
+	
 	return (int) 0;    //Nothing for now. 
 };
 
@@ -225,18 +224,16 @@ int KiIncreasePriority(int pid)
  * @todo: 
  *     Essa rotina deve ter retorno do tipo 'int'.
  */
-int KiScheduler()
-{
-    //
+int KiScheduler (){
+    
 	// ?? Quem está chamando ? Filtros ?
-    // 
     // @todo: Talvez haja mais casos onde não se deva trocar a tarefa.
-    //
 
 	//#bugbug 
 	//Porque retornamos 0 ???
 	//Scheduler Status. (LOCKED, UNLOCKED).
-	if(g_scheduler_status == LOCKED)
+	
+	if (g_scheduler_status == LOCKED)
 	{
         return (int) 0;
     };
@@ -249,9 +246,11 @@ int KiScheduler()
 		current_thread = idle;
 		return (int) idle;
 	};
+	
     //Chama o Scheduler.
-done:
-	return (int) scheduler();
+//done:
+
+	return (int) scheduler ();
 }; 
 
 
@@ -267,37 +266,41 @@ done:
  * Essa rotina é usada após a preempçao, onde uma thread 
  * de baixa prioridade para de executar para que rode 
  * uma de maior prioridade.
- * 
  */ 
-int KiFindHigherPriority()
-{ 
-    return (int) find_higher_priority(); 
+ 
+int KiFindHigherPriority (){
+	
+	// #todo:
+	// Algo pode ser feito aqui.
+	
+    return (int) find_higher_priority (); 
 }; 
  
 
  
-/*
- * KiSelectNextThread:
- *
- */ 
-int KiSelectNextThread(int current)
-{
+/* KiSelectNextThread: */ 
+/* #todo: rever isso */
+int KiSelectNextThread (int current ){
+	
 	//
     // @todo: Fazer filtros.
 	//
 	
 	//@todo: Max.
-	if(current < 0){
+	
+	if (current < 0)
+	{
 		current = next_thread;
 	}
 	
-done:
-    return (int) SelectNextThread(current);
+//done:
+
+    return (int) SelectNextThread (current);
 };
 
 
-void KiDoThreadReady(int id)
-{
+void KiDoThreadReady (int id){
+	
     do_thread_ready(id);
 };
 
@@ -307,28 +310,25 @@ void KiDoThreadRunning (int id){
     do_thread_running(id);
 };
 
-void KiDoThreadSleeping(int id)
-{
+
+void KiDoThreadSleeping (int id){
+	
     do_thread_sleeping(id);
 };
 
-void KiDoThreadZombie(int id)
-{
+
+void KiDoThreadZombie (int id){
+	
 	do_thread_zombie(id);
 };
 
-void KiDoThreadDead(int id)
-{
+
+void KiDoThreadDead (int id){
+	
     do_thread_dead(id);
 };
 
  
-
-
- 
- 
-
-
 /*
  * KiNewTaskScheduler:
  *     ??
@@ -336,7 +336,7 @@ void KiDoThreadDead(int id)
  */
 void KiNewTaskScheduler()
 {
-    return;    //Cancelada.
+    //return;    //Cancelada.
 };
 
 
@@ -349,18 +349,22 @@ void KiNewTaskScheduler()
 void KiDispatchTask()
 {
 	//...
-done:
-    return;
+//done:
+    //return;
 };
 
 
 /*
  * KiSetPriority:
- *     Interface. Faz alterações na prioridade de acordo com o status.
+ *     Interface. 
+ *     Faz alterações na prioridade de acordo com o status.
  */
-int KiSetPriority()
-{
-	return (int) set_priority();
+ 
+int KiSetPriority (){
+	
+	//#todo: Fazer alguma coisa aqui.
+	
+	return (int) set_priority ();
 };
 
 
@@ -374,9 +378,7 @@ void KiSetCurrent (int id){
 	
 	//@todo: Filtro.
 	
-//done:
     set_current (id);
-//    return;
 };
 
 
@@ -384,18 +386,21 @@ void KiSetCurrent (int id){
  * KiGetCurrent:
  *     Pega o tid da thread atual.
  */
-int KiGetCurrent()
-{
-    return (int) get_current();
+ 
+int KiGetCurrent (){
+	
+    return (int) get_current ();
 };
 
 
 /*
  * KiGetCurrentTask:
  *     @todo: Modar para KiGetCurrentProcess.
+ *     #bugbug: Esse nome é inapropriado.
  */
-int KiGetCurrentTask()
-{ 
+ 
+int KiGetCurrentTask (){
+	
     return (int) get_current_task(); 
 };
 
@@ -409,9 +414,8 @@ int KiGetCurrentTask()
  * baixa prioridade para de executar, para que rode uma de maior 
  * prioridade.
  *
- * @todo: Mudar para scheduleriFindHigherPriorityThread();.
- *
  */
+ 
 int find_higher_priority (){
 	
 	int i;              //Contador.
@@ -420,36 +424,42 @@ int find_higher_priority (){
     struct thread_d *t;  	
 	
 	//Only Idle? return.
+	
 	if ( ProcessorBlock.threads_counter == 1 )
 	{
 		//#bugbug, Nã devemos determinar o valor da thread idle dessa forma.
 		//tempos um ponteiro para a estrutura da thread idle.
-	    if (current_thread == 0){
+		
+	    if (current_thread == 0)
+		{
 			return (int) next_thread;
 		}
 		
 		//@todo: E caso a única thread que está rodando não seja a thread idle??
 	};	
 	
-	//
+	
+	
 	// Find: Procura uma thread de maior prioridade, que o estado seja READY e 
 	// que o contexto esteja salvo.
-	//
 	
 	for ( i=0; i < THREAD_COUNT_MAX; i++ )
-	{		 
-       	t = (void *) threadList[i];    //Pega na lista. 		
+	{
+        //Pega na lista.		
+       	t = (void *) threadList[i];     		
         
-		if ( (void*) t != NULL )
+		if ( (void *) t != NULL )
 		{ 
-		    if(t->used  != 1    ){ continue; };
-		    if(t->magic != 1234 ){ continue; };
-		    if(t->state != READY){ continue; };		
+		    if (t->used  != 1){ continue; };
+		    if (t->magic != 1234){ continue; };
+		    if (t->state != READY){ continue; };		
 		    
 			//Pega a de maior prioridade.
-			if (t->priority > p){ 
+			if (t->priority > p)
+			{ 
 			    p = t->priority; 
 			};
+			
             //Nothing.			
 		};
 		//Nothing.
@@ -481,7 +491,8 @@ int find_higher_priority (){
 	};
 
 	
-	// Limites, overflow. Não encontrando nenhuma tarefa retorna o id da Idle. 
+	// Limites, overflow. 
+	// Não encontrando nenhuma tarefa retorna o id da Idle. 
 	
 	if ( i >= (2*THREAD_COUNT_MAX) ){
         return (int) next_thread;			
@@ -489,8 +500,9 @@ int find_higher_priority (){
 	
 	// Nothing ?!
 	
-//Done! Encontramos uma tarefa de prioridade maior.
-//done:
+	// Done! 
+	// Encontramos uma tarefa de prioridade maior.
+
     return (int) Current;
 };
 
@@ -524,7 +536,9 @@ void preempt (){
 
     if ( (void *) t == NULL )
     {
-		//#bugbug: Rever isso.
+		// #bugbug: 
+		// Rever isso.
+		
 		current_thread = (int) next_thread;
 	    return;
 	
@@ -532,8 +546,10 @@ void preempt (){
 		
 		if ( t->used != 1 || t->magic != 1234 )
 		{
-			//#bugbug: Rever isso.
-		    current_thread = (int) next_thread;
+			// #bugbug: 
+			// Rever isso.
+		    
+			current_thread = (int) next_thread;
 	        return;
 		}
 	    
@@ -586,20 +602,14 @@ void preempt (){
 
 
 
-/*
- ********************************************
- * get_current:
- *    Obtendo o TID da thread atual.
- *    @todo: Criar scheduleriGetCurrentTID();
- */
+/* Obtendo o TID da thread atual. */
 int get_current (){
 	
 	return (int) current_thread;
 };
 
 
-
-/*
+/* #deletar
  * get_current_task:
  *     Pega o id da thread atual.
  *    @todo: Criar scheduleriGetCurrentTID();
@@ -610,15 +620,7 @@ int get_current_task (){
 };
 
 
-
-/*
- ********************************************
- * set_current:  
- *    Indicando qual será a thread atual.
- * @todo: 
- *     Criar scheduleriSetCurrentTID(int tid);
- *  
- */
+/* #todo: mudar para set_current_thread ( int tid ). */
 void set_current (int id){
 	
 	if ( id == current_thread ){
@@ -632,10 +634,9 @@ void set_current (int id){
 	
 	// Nothing ?!
 	
-//Done.	
-//done:
-	current_thread = (int) id;    	
-//	return;
+	// Done.	
+
+	current_thread = (int) id; 	
 };
 
 
@@ -659,18 +660,12 @@ int set_priority (){
 	
 	// Nothing ?!
 	
-//done:
     set_thread_priority ( Current, PRIORITY_NORMAL);
     return (int) 0; 
 };
 
 
-/*
- ****************************************************
- * do_thread_ready:
- *     Muda o state de uma thread.
- *     @todo: mudar o nome da função pra do_thread_ready
- */ 
+/* do_thread_ready: #todo: mudar o argumento para tid */ 
 void do_thread_ready (int id){
 	
     struct thread_d *t; 
@@ -679,32 +674,26 @@ void do_thread_ready (int id){
 	    return;
 	}
 	
-    //Struct.
 	t = (void *) threadList[id]; 	
 	
-	if ( (void *) t != NULL ){
+	if ( (void *) t != NULL )
+	{
+		//if ( t->used == 1 && t->magic == 1234 )
+			
 	    t->state = READY;
 	}
 };
 
 
-
-/*
- ************************************************************
- * do_thread_running:
- *     Muda o state de uma thread pra running.
- *     @todo: mudar o nome da função para do_thread_running
- */
+/* do_thread_running: #todo: mudar o argumento para tid */
 void do_thread_running (int id){
 	
     struct thread_d *t; 
 	
-	if (id < 0 || id >= THREAD_COUNT_MAX)
-	{
+	if (id < 0 || id >= THREAD_COUNT_MAX){
 	    return;
 	}
-	   
-    // Struct.
+	
 	t = (void *) threadList[id]; 	
 	
 	if ( (void *) t != NULL )
@@ -713,7 +702,7 @@ void do_thread_running (int id){
 		{
 		    t->state = RUNNING;	
 		}
-	}
+	};
 };
 
 
@@ -740,13 +729,7 @@ void do_thread_sleeping (int id){
 };
 
 
-
-/*
- ******************************************************
- * do_thread_zombie:
- * Muda o state da thread para zombie.
- * @todo: Mudar o nome da função para do_thread_zombie.
- */
+/* do_thread_zombie: #todo: mudar o argumento para tid */
 void do_thread_zombie (int id){
 	
     struct thread_d *t; 
@@ -755,7 +738,6 @@ void do_thread_zombie (int id){
 	    return;
 	}
 	
-    //Struct.
 	t = (void *) threadList[id]; 
 	
 	if( (void *) t == NULL )
@@ -763,19 +745,15 @@ void do_thread_zombie (int id){
 	    return;
 	}else{
         
-		if ( id != IDLE ){
+		if ( id != IDLE )
+		{
             t->state = ZOMBIE;
         }
     };
 };
 
 
-/*
- ****************************************************
- * do_thread_dead:
- * Muda o state da thread para dead.
- * @todo: Mudar o nome da função para do_thread_dead.
- */
+/* do_thread_dead: #todo: mudar o argumento para tid */
 void do_thread_dead (int id){
 	
     struct thread_d *t; 
@@ -784,10 +762,10 @@ void do_thread_dead (int id){
 	    return;
 	}
 
-    // Struct.	
 	t = (void *) threadList[id]; 	
 	
-	if ( (void *) t != NULL ){
+	if ( (void *) t != NULL )
+	{
 	    t->state = DEAD;
 	}
 };

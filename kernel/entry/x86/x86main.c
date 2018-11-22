@@ -289,29 +289,33 @@ void x86mainStartFirstThread( int n ){
  *     Initializes idle thread.
  *     # fake idle thread 
  *     idle thread em ring3.
+ *     Isso fica em thread.h
  *
  *     @todo: 
  *         + Initializes idle thread.
  *           startIdleThread().
- *
  */
+ 
 void startStartIdle (){
 	
     int i;
  
     if ( (void *) IdleThread == NULL )
     {
-        printf("main-startStartIdle: IdleThread\n");
-        die();
+        panic ("x86main-startStartIdle: IdleThread\n");
+        //die();
+		
     }else{
 
-        if(IdleThread->saved != 0){
-            printf("main-startStartIdle: saved\n");
-            die();
+        if (IdleThread->saved != 0){
+            
+			panic ("x86main-startStartIdle: saved\n");
+            //die();
         };
 
-        if(IdleThread->used != 1 || IdleThread->magic != 1234){
-            printf("main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
+        if (IdleThread->used != 1 || IdleThread->magic != 1234){
+			
+            printf ("x86main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
             die();
         };
 
@@ -321,14 +325,16 @@ void startStartIdle (){
 
     // State  
     if ( IdleThread->state != STANDBY ){
-        printf("main-startStartIdle: state tid={%d}\n",IdleThread->tid);
+        printf("x86main-startStartIdle: state tid={%d}\n",IdleThread->tid);
         die();
     }
 
     // * MOVEMENT 2 ( Standby --> Running)
-    if ( IdleThread->state == STANDBY ){
+    if ( IdleThread->state == STANDBY )
+	{
         IdleThread->state = RUNNING;
-        queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_RUNNING);
+        
+		queue_insert_data( queue, (unsigned long) IdleThread, QUEUE_RUNNING );
     }
 
 
@@ -339,10 +345,11 @@ void startStartIdle (){
 	// Done!
     //
 	
+//#ifdef ENTRY_VERBOSE		
     // #debug
     printf("x86main-startStartIdle: Starting idle TID=%d \n", IdleThread->tid );
     refresh_screen(); 
-
+//#endif
 
     for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) IdleThread;
@@ -395,7 +402,7 @@ void startStartIdle (){
                   " pushl $0x00401000  \n"        // eip.
                   " iret \n" );
 
-    panic ("main-startStartIdle:");
+    panic ("x86main-startStartIdle");
 };
 
 
@@ -431,8 +438,9 @@ int x86main ( int argc, char *argv[] ){
     //initializing zorder counter.
     zorderCounter = 0;
 
-    // set system window procedure.
-    SetProcedure( (unsigned long) &system_procedure);
+    // #deletar
+	// set system window procedure.
+    SetProcedure ( (unsigned long) &system_procedure);
 
     //
     // ## Video support ##

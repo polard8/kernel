@@ -37,8 +37,11 @@ unsigned long sys_time_ticks_total;
 //Counting how much ticks the kernel is running.
 //unsigned long kernel_tick;
  
-
- 
+// #extra
+// Aciona uma flag para que o ts.c realize atividades extras,
+// como gc, dead thread collector, request.
+	
+int extra; 
 
  
  
@@ -94,7 +97,6 @@ struct timer_d
 	object_type_t objectType;
 	object_class_t objectClass;
 	
-	
 	int id;
 	
 	int used;
@@ -118,10 +120,6 @@ struct timer_d
 	unsigned long times;
 	
 	int status;  //??
-	
- 
-
- 
 	
 	unsigned long flag; //f
 	unsigned long error; //e

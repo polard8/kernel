@@ -1,5 +1,5 @@
 /*
- * File: threadi.c 
+ * File: action\threadi.c 
  *
  * Descrição:
  *      Thread internal.    
@@ -35,7 +35,7 @@ void KiShowPreemptedTask()
 
  
 /*
- * KiSetTaskStatus:
+ * KiSetTaskStatus: #deletar
  *     @todo: Substituir a palavra task por thread. KiSetThreadStatus
  */ 
 void KiSetTaskStatus(unsigned long status)
@@ -47,7 +47,7 @@ void KiSetTaskStatus(unsigned long status)
 
 
 /*
- * KiGetTaskStatus
+ * KiGetTaskStatus #deletar
  * @todo: Substituir a palavra task por thread. KiGetThreadStatus
  * #bugbgu task não é um termo usado.
  */
@@ -59,6 +59,7 @@ unsigned long KiGetTaskStatus ()
 
 
 /*
+ #deletar
  * KiSaveContextOfNewTask
  * @todo: Substituir a palavra task por thread. KiSaveContextOfNewThread
  *
@@ -72,7 +73,7 @@ void KiSaveContextOfNewTask ( int id, unsigned long *task_address ){
 
 
 /*
- * KiReloadCurrentTask
+ * KiReloadCurrentTask #deletar
  *  @todo: Substituir a palavra task por thread. KiReloadCurrentThread.
  *
  */
@@ -82,6 +83,7 @@ void KiReloadCurrentTask (){
 };
 
 
+/* #todo: ?? de quem ?? processo ou thread */
 void KiSetQuantum (unsigned long q){
     
     //return;
@@ -94,67 +96,76 @@ unsigned long KiGetQuantum (){
 };
 
 
+/* #todo: ?? de quem ?? processo ou thread */
 void KiSetCurrentQuantum (unsigned long q){
 	
     //return;
 };
 
 
+/* #todo: ?? de quem ?? processo ou thread */
 unsigned long KiGetCurrentQuantum (){
 	
     return (unsigned long) 0; 
 };
 
 
+/* #todo: ?? de quem ?? processo ou thread */
 void KiSetNextQuantum ( unsigned long q ){
 	
     //return;
 };
 
 
+/* #todo: ?? de quem ?? processo ou thread */
 unsigned long KiGetNextQuantum (){
 	
     return (unsigned long) 0; 
 };
 
 
+/* #todo: ?? de quem ?? processo ou thread */
 void KiSetFocus (int pid){
 	
 	//return;
 };
 
 
-//Pegar o foco do que? thread?!
+/* #todo: ?? de quem ?? processo ou thread */
 int KiGetFocus (){
 	
     return (int) 0; 
 };
 
 
+/* #todo: chamar função em debug.c */
 void KiDebugBreakpoint (){
 	
-    //return;
 };
 
 
+/* #deletar */
 void KiShowTasksParameters (){
 	
     //return;
 };
 
 
+/* #todo: mudar nomes */
 void KiMostraSlots (){
 	
 	mostra_slots();
 };
 
 
+/* #todo: mudar nomes */
 void KiMostraSlot (int id){
 	
 	mostra_slot(id);
 };
 
 
+/* #todo: mudar nomes */
 void KiMostraReg (int id){
 	
 	//mostra_reg(id);
@@ -352,15 +363,10 @@ void mostra_reg (int id){
 		//...	
 	};
 	
-    //return; 
 };
 
 
-/*
- *******************************************************
- * set_thread_priority:
- *     Muda a prioridade de uma thread específica.
- */
+/* set_thread_priority: */
 void set_thread_priority ( struct thread_d *t, unsigned long priority ){
 	
     unsigned long ThreadPriority;
@@ -416,10 +422,6 @@ void set_thread_priority ( struct thread_d *t, unsigned long priority ){
 		*/
 		
     };
-	
-//Done.
-//done:
-    //return;	
 };
 
 
@@ -473,7 +475,7 @@ unsigned long GetThreadDirectory ( struct thread_d *thread ){
 
 
 /*
- * show_preempted_task: 
+ * show_preempted_task: #deletar
  *
  *    Mostrar informações sobre a tarefa de baixa prioridade
  *    que teve seu contexto salvo e deu a vez pra outra de
@@ -489,6 +491,7 @@ void show_preempted_task(){
 };
 
 
+/* #deletar */
 void show_tasks_parameters(){  
 	
 	//return; 
@@ -512,35 +515,36 @@ void release ( int tid ){
     struct thread_d *Thread;
 	
 	//Limits. 
+	
 	if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
 	    
-		goto fail;
+		return; //goto fail;
 	}
 	
 	Thread = (void *) threadList[tid];
 	
 	if ( (void *) Thread == NULL )
 	{
-		goto fail;
+		return; //goto fail;
 		
 	}else{
 		
-        //Se estiver corrompida.
         if ( Thread->magic != THREAD_MAGIC ){
 			
-			goto fail;
+			return; //goto fail;
 		}
 		
 		//#importante:
 		//Não estamos selecionando ela para execução
 		//Apenas estamos dizendo que ela está pronta para 
 		//executar.
+		
 		Thread->state = READY; 
 	};	
 	
-fail:
-done:
-    return;
+//done:
+//fail:
+    //return;
 };
 
 
@@ -741,11 +745,7 @@ void dead_thread_collector (){
 	
 	//@todo:
 	// * MOVEMENT 10 (zombie --> Dead)
-	// * MOVEMENT 11 (zombie --> Initialized) .. reinicializar.
-	
-//done: 
-	//return;
-	
+	// * MOVEMENT 11 (zombie --> Initialized) .. reinicializar.	
 };
 
 

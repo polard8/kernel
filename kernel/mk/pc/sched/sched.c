@@ -85,20 +85,17 @@ int scheduler (){
 	struct thread_d *Thread;
 
 	// spiritual quote:
-	// Constrói um caminho de vagões para o condutor andar.
+	// "Constrói um caminho de vagões para o condutor andar".
 
 	//Usado para task switch.
 	Conductor = (void *) rootConductor;
 
 	//Inicia a lista.
  	Conductor2 = (void *) rootConductor;
-
-	//#bugbug
-	//Conductor2->Next = (void *) threadList[idle];  	
-    
-	// ?? por que ??
-	//Thread idle em ring 0.
+ 	
+	//Next thread.
 	Conductor2->Next = (void *) threadList[next_thread];  
+	
 	
 	// Obs: 
 	// ## IMPORTANTE  ##
@@ -236,6 +233,7 @@ int scheduler (){
 	Conductor2->Next = NULL;
 
 //done:
+
     return (int) Conductor2->tid;
 };
 
@@ -250,38 +248,33 @@ int scheduler (){
  *
  *     @todo: nao seria init_scheduler
  *     @todo: Mudar para schedulerInit,ou schedulerStart. ??
- *
  */
-//void schedulerStart()
+
 void scheduler_start (){
 	
-    scheduler_lock();     //Lock Scheduler.
-	set_current(IDLE);    //Set current.
+	//Lock Scheduler.
+	//Set current.
+	
+    scheduler_lock ();  
+
+    // #bugbug 
+	// Esse negócio de selecionar pelo impondo um ID dá problemas.
+	// Temos que saber qual é o ID da thread que queremos.
+	
+	set_current (IDLE);     
 	
 	//...
-
-//done:
-//	return;
 };
 
 
-/*
- ****************************************
- * scheduler_lock:
- *     Trava o scheduler.
- */
+/* scheduler_lock: */
 void scheduler_lock (){
 	
     g_scheduler_status = (unsigned long) LOCKED;
 };
 
 
-/*
- ********************************************
- * scheduler_unlock:
- *     Destrava o scheduler.
- */  
-//void schedulerUnlock() 
+/* scheduler_unlock: */  
 void scheduler_unlock (){
 	
     g_scheduler_status = (unsigned long) UNLOCKED;
@@ -291,10 +284,7 @@ void scheduler_unlock (){
 /*
  * scheduler_get_status:
  *     Pega o status do scheduler, se ele está travado ou não.
- *     @todo: Mudar para schedulerGetStatus().
- *
  */
-//unsigned long schedulerGetStatus() 
  
 unsigned long scheduler_get_status()
 {
@@ -304,7 +294,7 @@ unsigned long scheduler_get_status()
 
 /*
  * new_task_scheduler: 
- *     ?? 
+ *     ?? #deletar
  */
 void new_task_scheduler()
 {   
@@ -344,6 +334,6 @@ int schedulerInit(){
 
 
 //
-// Fim.
+// End.
 //
 

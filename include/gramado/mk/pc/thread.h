@@ -231,8 +231,6 @@ struct thread_d
 	unsigned long name_pointer;   	
 	char short_name[4];
 	char *cmd;	
-
-
 	
     //
 	// ## CPU support ##
@@ -267,9 +265,6 @@ struct thread_d
 	//unsigned long DirectoryVA;
 	unsigned long DirectoryPA;
 	
-	
-	
-
 	
 	//IOPL of the task. (ring).
 	//@todo: isso pode ser um char.
@@ -331,8 +326,7 @@ struct thread_d
 	
 	/*
 	 * HEAP and STACK:
-     * @todo: Usar a estrutura.
-     *	 
+     * @todo: Usar a estrutura. 
 	 */
 	//struct heap_d *heap;
 	
@@ -415,8 +409,6 @@ struct thread_d
      * @todo: afinidade e ligação entre tarefas.
 	 */
     //int idealprocessornumber;
-	
-	
 		
 		
 	//
@@ -444,7 +436,6 @@ struct thread_d
 	struct _iobuf *pwd;	    // 5 (print working directory) 
 	//...
 		
-	
 	
 	//@todo: Uma thread pode estar esperando varias outras por motivos diferenes.
 	//struct wait_d WaitBlock;
@@ -486,13 +477,15 @@ struct thread_d
 	//
 
 	//#bugbug: 
-	//agora temos um array e a threa pode esperar por mais de um evento.
+	//agora temos um array e a thread pode esperar por mais de um evento.
     // Tipo de evento pelo qual a thread está esperando.	
     //thread_event_type_t event;
 
-	// Objeto pelo qual a threa está esperando.
-	object_type_t obType;
-	object_class_t obClass;	
+	// Objeto pelo qual a thread está esperando.
+	// #todo: mudar esses nomes, pode confundir com o header no início da 
+	// estrutura. (waiting_object_type ... woType woClass )
+	object_type_t woType;   //obType;      //woType
+	object_class_t woClass; //obClass;	   //woClass
 		
 	//#importante
 	//razões para esperar
@@ -529,41 +522,44 @@ struct thread_d
     //Um ponteiro para a próxima thread da lista linkada. 
 	struct thread_d *Next;
 };
-struct thread_d *IdleThread;       // Idle Thread. TID=0
-struct thread_d *ShellThread;      // Shell Thread. TID=1
-struct thread_d *TaskManThread;    // TaskMan Thread. TID=2
+
+/* Threads usadas na inicialização do kernel */
+struct thread_d *IdleThread;         // Idle Thread. TID=0
+struct thread_d *ShellThread;        // Shell Thread. TID=1
+struct thread_d *TaskManThread;      // TaskMan Thread. TID=2
 struct thread_d *RING0IDLEThread;    // RING0 IDLE Thread. TID=3
 
-struct thread_d *Thread;           // Current.
-//outros.
+/* Listas encadeadas de threads.
+   Usadas no gerenciamento de rounds */
+
+struct thread_d *Conductor;
+struct thread_d *Conductor2;
+struct thread_d *rootConductor;
+
+int conductorIndex;
+
+/* Current */
+struct thread_d *Thread;             // Current.
+
+/* outros */
 //struct thread_d *CurrentThread;  
 struct thread_d *idle_thread;    // Iddle.
 struct thread_d *cur_thread;     // Current.
 struct thread_d *blocked_list_head;
 struct thread_d *waiting_list_head;
 struct thread_d *ready_list_head;
-//Lista linkada de threads.
-struct thread_d *Conductor2;
-struct thread_d *Conductor;
-struct thread_d *rootConductor;
 
 
-int conductorIndex;
 
 /*
  * threadList:
  *   
  *   **** LONG-TERM SCHEDULER FOR THREADS ****
- *
  */
 unsigned long threadList[THREAD_COUNT_MAX];
 
 
-
-/*
- * thread_list_d:
- *
- */ 
+/* thread_list_d: */ 
 typedef struct thread_list_d thread_list_t; 
 struct thread_list_d 
 {   
@@ -578,19 +574,14 @@ struct thread_list_d
 //DispatcherList[2].Threads[4].tid
 
 
-
-
-/*
- * create_thread:
- *
- */ 
-struct thread_d *create_thread( struct wstation_d *window_station,
-                                    struct desktop_d  *desktop,
-                                    struct window_d *window,
-                                    unsigned long init_eip, 
-                                    unsigned long init_stack, 
-									int pid, 
-									char *name);
+/* create_thread: */ 
+struct thread_d *create_thread ( struct wstation_d *window_station,
+                                 struct desktop_d  *desktop,
+                                 struct window_d *window,
+                                 unsigned long init_eip, 
+                                 unsigned long init_stack, 
+								 int pid, 
+								 char *name );
 void *GetCurrentThread();
 void *FindReadyThread();
 int GetThreadState(struct thread_d *Thread);
@@ -605,14 +596,10 @@ void set_thread_priority(struct thread_d *t, unsigned long priority);
 unsigned long GetThreadDirectory( struct thread_d *thread );
 
 // Altera o endereço do diretório de páginas de uma thread.
-void 
-SetThreadDirectory( struct thread_d *thread, unsigned long Address );
+void SetThreadDirectory ( struct thread_d *thread, unsigned long Address );
 
-
-/*
- * Thread heap support.
- */
-unsigned long GetThreadHeapStart(struct thread_d *thread);
+/* Thread heap support. */
+unsigned long GetThreadHeapStart (struct thread_d *thread);
 //...
 
 /*
@@ -621,7 +608,7 @@ unsigned long GetThreadHeapStart(struct thread_d *thread);
 unsigned long GetThreadStackStart(struct thread_d *thread);
 //...
 
-void SelectForExecution(struct thread_d *Thread);
+void SelectForExecution (struct thread_d *Thread);
 
 
 void KiShowThreadList();
@@ -653,6 +640,11 @@ void kill_all_threads ();
 
 
 int thread_getchar (); 
+
+/* Passando o comando para a thread idle no processo init.
+   Isso é usado em x86main.c */
+void startStartIdle ();  
+
 
 //
 // End.

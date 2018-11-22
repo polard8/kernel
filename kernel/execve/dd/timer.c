@@ -1,5 +1,5 @@
 /*
- * File: unb\timer.c 
+ * File: dd\timer.c 
  *  
  * Descrição:
  *     Arquivo principal do driver do PIT. 
@@ -114,48 +114,23 @@ void timer();
 //...
 
 
-
-/*
- * KeTimer:
- *     Chama o handler do kernel que está no modulo externo.
- *     @todo Isso deve sair daqui.
- *           Com essa função o kernel chamará o handler do modulo externo.
- * Obs:
- *     Apenas a ISR0, _irq0, pode chamar essa rotina.
- *     #bugbug deletar essa rotina.
- */
-void KeTimer (){
-    
-	// A estrutura para o dispositivo
-	// tem informações sobre o driver.
-	// parte das rotinas de timer podem
-	// ser implementadas em user mode
-	// ou módulo externo do kernel.
-	
-	KiTimer ();	//#suspensa. (usando o handler do kernel base.)
-};
-
-
-
 /*
  * KiTimer:
  *     Chama o handler do kernel que está no kernel base.
+ * #todo: Observar alguns procedimentos antes de chamar a rotina.
  */
+ 
 void KiTimer (){
-
-	// Observar alguns procedimentos antes de chamar a rotina.
-
+	
 	timer ();
 };
 
 
-
-    
-	
 void timerEnableTextCursor (){
 	
     timerShowTextCursor = 1;	
 };
+
 
 void timerDisableTextCursor (){
 	
@@ -207,6 +182,19 @@ void timer (){
 	//#obs: Isso poderia ser usado para atualizar o time dos processos.
 	
 	kernel_request = KR_TIME;  
+	
+	
+	//
+	//  ## extra ## 
+	//
+	
+	// Aciona uma flag para que o ts.c realize atividades extras,
+	// como gc, dead thread collector, request.
+	
+	if ( sys_time_ticks_total % 100 == 0 )
+	{
+		extra = 1;
+	}
 
 
 
@@ -341,16 +329,17 @@ int new_timer_id (){
 	return (int) -1;
 };
 
+
 //#todo 
 //precisamos pegar um slot na lista de timers.
 
-struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int type  ){
-
-
-    int ID = -1; //erro;
-	
+struct timer_d *create_timer ( struct window_d *window, 
+                               unsigned long ms, 
+							   int type  )
+{
     struct timer_d *t;	
 	
+	int ID = -1;  //erro;
 	
 	//limits
 	//limite de 1 tick.
@@ -369,7 +358,6 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
 		
 		return NULL;
 	}
-	
 	
 	
 	t = (void *) malloc ( sizeof(struct timer_d) );
@@ -481,6 +469,7 @@ struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int ty
     return (struct timer_d *) t;	
 };
 
+
 /*
  ******************************************
  * timerInit8253:
@@ -524,129 +513,92 @@ void timerInit8253 ( unsigned long hz ){
 };
 
 
-/*
- * set_quantum:
- * ?? Provavelmente alguma configuração de quantum 
- * padrão para o sistema. 
- * Isso poderá ser usado por rotinas que lidam 
- * com tempo.
- */
-void set_quantum( unsigned long q)
-{
+/* set_quantum: */
+void set_quantum ( unsigned long q){
+	
     quantum = (unsigned long) q;
-	//return;
 };
 
 
-/*
- **************************************
- * get_quantum
- * ??
- */
-unsigned long get_quantum()
-{
+/* get_quantum: */
+unsigned long get_quantum (){
+	
     return (unsigned long ) quantum;
 }; 
 
 
-/*
- *******************************************
- * set_current_quantum
- * ??
- */
-void set_current_quantum( unsigned long q)
-{
+/* set_current_quantum: */
+void set_current_quantum (unsigned long q){
+	
     current_quantum = (unsigned long) q;
-	//return;
 };
 
 
-/*
- **********************************************
- * get_current_quantum  
- * ??
- */
-unsigned long get_current_quantum()
-{
+/* get_current_quantum: */
+unsigned long get_current_quantum (){
+	
     return (unsigned long ) current_quantum;
 }; 
 
 
-/*
- *************************************
- * set_next_quantum   
- * ??
- */
-void set_next_quantum( unsigned long q)
-{
+/* set_next_quantum: */
+void set_next_quantum (unsigned long q){
+	
     next_quantum = (unsigned long) q;
-	//return;
 };
 
 
-/*
- **********************************
- * get_next_quantum   
- * ??
- */
-unsigned long get_next_quantum()
-{
+/* get_next_quantum: */
+unsigned long get_next_quantum (){
+	
     return (unsigned long ) next_quantum;
 }; 
 
 
-/*
- ******************************************
- * now   
- */
+/* systime in ms */
 unsigned long now (){
 	
     return (unsigned long) get_systime_ms ();
 };
 
 
-
-unsigned long get_systime_hz(){
+/* systime hz */
+unsigned long get_systime_hz (){
 	
     return (unsigned long) sys_time_hz;
 };
 
 
-/*
- * get_systime_ms:
- */
-unsigned long get_systime_ms(){
+/* systime in ms */
+unsigned long get_systime_ms (){
 	
     return (unsigned long) sys_time_ms;
 };
 
 
-/*
- * get_systime_totalticks:
- */
-unsigned long get_systime_totalticks(){
+/* get_systime_totalticks: */
+unsigned long get_systime_totalticks (){
 	
     return (unsigned long) sys_time_ticks_total;
 };
 
 
-
 unsigned long get_systime_info (int n){
 	
-    switch (n)
-    {
-		//#todo criar um enum para isso.
+	//#todo criar um enum para isso.
+	
+    switch (n){
 		
 		case 1:
-		    return (unsigned long) get_systime_hz();
+		    return (unsigned long) get_systime_hz ();
             break;
 			
 		case 2:
-		    return (unsigned long) get_systime_ms();
+		    return (unsigned long) get_systime_ms ();
             break;
 			
 		case 3:
-		    return (unsigned long) get_systime_totalticks();
+		    return (unsigned long) get_systime_totalticks ();
 			break;
 		
 		//...
@@ -654,54 +606,36 @@ unsigned long get_systime_info (int n){
 		default:
 		    return (unsigned long) 0;
 		    break;
-	}	
+	};	
 };
+
 
 /*
  ***************************************
- * sleep:
+ * sleep: #todo
  *     Apenas uma espera, um delay.
  *     Essa não é a função que coloca uma 
  * tarefa pra dormir no caso de evento.
  *   #todo: Usar o ms do contador do sys_time
  */
-void sleep (unsigned long ms) 
-{
+void sleep (unsigned long ms){
+	
     unsigned long t = (unsigned long) ( ms * 512 );
 	
 	while(t > 0){
 		t--;
 	}
-//done:	
-//	return;
 };
 
 
-/*
-unsigned long timerGetTicks();
-unsigned long timerGetTicks()
-{
-    return (unsigned long) timerTicks;	
-};
-*/
-
-
-/*
- ****************************************
- * set_timeout:
- *
- *
- */
-void set_timeout( unsigned long ticks ){
+/* set_timeout: #todo */
+void set_timeout ( unsigned long ticks ){
 
 	time_out = (unsigned long) ticks;
 };
 
 
-/*
- ****************************************
- * get_timeout
- */
+/* get_timeout: #todo */
 unsigned long get_timeout (){
 	
 	return (unsigned long) time_out;
@@ -716,13 +650,15 @@ unsigned long get_timeout (){
  */
 int timerTimer (){
 	
-	//apenas inicializando, isso será atualizado.   
-	sys_time_hz = 0;
-
+	//Apenas inicializando, isso será atualizado.  
 	//ms
+	//Inicializa ticks.
+	
+	
+	sys_time_hz = 0;
+	
     sys_time_ms = 0;	
 	
-	//Inicializa ticks.    
 	sys_time_ticks_total = 0;	
     
     //...
@@ -752,18 +688,18 @@ int timerInit (){
 	}
 	
 	
-   // timerLock = 0;
+    // timerLock = 0;
 
-   //set handler.
+    //set handler.
    
-   //
-   // @todo: Habilitar esse configuração pois é mais precisa.
-   //
+    //
+    // @todo: Habilitar esse configuração pois é mais precisa.
+    //
    
-   //config frequências...
-   //@todo: Isso poderia ser por último.
-   //?? Isso pertence a i386 ??
-   //?? Quais máquinas possuem esse controlador ??
+    //config frequências...
+    //@todo: Isso poderia ser por último.
+    //?? Isso pertence a i386 ??
+    //?? Quais máquinas possuem esse controlador ??
     
 	// #importante
 	// Começaremos com 100 HZ
@@ -775,9 +711,9 @@ int timerInit (){
 	timerInit8253 ( sys_time_hz );
    
    
-   /*
-    * @todo: criar a estrutura do timer.
-	*/
+    /*
+     * @todo: criar a estrutura do timer.
+	 */
 
 	//
 	//@todo:
@@ -794,17 +730,21 @@ int timerInit (){
 	//timerCountSeconds = 0;
 	
 	//Configura quantum.
-	set_current_quantum(QUANTUM_BASE);
-	set_next_quantum(QUANTUM_BASE);
-    set_quantum(QUANTUM_BASE);
-
 	
-	set_timeout(0);
+	set_current_quantum (QUANTUM_BASE);
+	
+	set_next_quantum (QUANTUM_BASE);
+    
+	set_quantum (QUANTUM_BASE);
+
+    //timeout 
+	 
+	set_timeout (0);
 	
 	//Continua...
 	
-//Done.
-done:
+    //Done.
+
     g_driver_timer_initialized = (int) 1;
 	
 #ifdef EXECVE_VERBOSE
@@ -823,8 +763,6 @@ struct timer_d *timerObject()
 	return (struct timer_d *) x;
 }
 */
-
-
 
 
 //

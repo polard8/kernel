@@ -192,8 +192,8 @@ int debug_check_drivers (){
  */
 void debug_breakpoint (){
 	
-    printf("sm-debug-debug_breakpoint:\n");
-	die();
+    printf ("sm-debug-debug_breakpoint:\n");
+	die ();
 };
 
 
@@ -220,6 +220,7 @@ debug_compute_checksum ( unsigned char *Buffer,
  * debug:
  *     Checa por falhas depois de cumpridas as três fases de inicialização.
  */
+ 
 int debug (){
 	
 	int Status;

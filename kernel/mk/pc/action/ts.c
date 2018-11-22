@@ -73,8 +73,8 @@ void taskswitchFlushTLB(){
  * faz tudo isso.
  * 
  */
-void KiTaskSwitch (){
-	
+ 
+/*
 	// @todo: Fazer alguma rotina antes aqui ?!
 	
 	// Obs: A qui poderemos criar rotinas que não lidem com a troca de 
@@ -86,9 +86,12 @@ void KiTaskSwitch (){
 	// >> ?? Na saída ??
 	
 	// ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
-	
+*/ 
+ 
+void KiTaskSwitch (){
 	
 	//Limits.
+	
 	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
 	{	
 	    printf("KiTaskSwitch error: current_thread TID={%d}", 
@@ -96,8 +99,6 @@ void KiTaskSwitch (){
         die();
 	}
 	
-
-	//Limits.
 	if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
 	{
 		
@@ -111,7 +112,8 @@ void KiTaskSwitch (){
 	
 	task_switch ();
 	
-    // obs: Nessa hora ja temos um thread atual e um processo atual selecionados.
+    // obs: 
+	// Nessa hora ja temos um thread atual e um processo atual selecionados.
     // podemos checar as variáveis para conferir se não está fora dos limites.
     // Se estiverem fora dos limites, podemos usar algum etodo para selecioanrmos 
     // outro processo ou outra thread com limites válidos.
@@ -133,12 +135,12 @@ void KiTaskSwitch (){
  * Obs:
  *     Apenas a interface KiTaskSwitch chama essa rotina.
  */
+ 
 void task_switch (){
 	
 	//#importante
 	//Vamos lidar com a thread atual, que é a thread
 	//que foi interrompida pelo timer.
-	
 	
 	int New;
 	int Max;    
@@ -170,7 +172,7 @@ void task_switch (){
 	
 	if ( (void *) Current == NULL )
 	{
-	    printf("task_switch error: Struct={%x}", (void *) Current );										   
+	    printf("ts-task_switch: Struct={%x}", (void *) Current );										   
         die();
 	}
 
@@ -223,8 +225,6 @@ void task_switch (){
 		
 	};
 	//...	
-	
-	
 	
 	
 	//
@@ -299,7 +299,6 @@ void task_switch (){
 	//   Se ouver essa rotina é desviada para um spawn e não prossegue.
 	// > Checamos se existem 'requests': Pedidos pendentes.
 	
-	 
 	if ( task_switch_status == UNLOCKED )
 	{   
 		//
@@ -317,9 +316,8 @@ void task_switch (){
 		
 		if ( Current->runningCount < Current->quantum )
 		{
-			
 			// Atualiza a contagem de tipo de seleção.
-			IncrementDispatcherCount(SELECT_CURRENT_COUNT);
+			IncrementDispatcherCount (SELECT_CURRENT_COUNT);
 			return; 
 		
 		}else{
@@ -358,41 +356,62 @@ void task_switch (){
 			    //Nothing.
 		    };
 		    
+			
 			//
+			// ## EXTRA ##
+			//
+			
+			
+			// #IMPORTANTE
+			// O RECORRENTE É ESCOLHERMOS UMA THREAD DA FILA DO DISPATCHER 
+			// NESSE MOMENTO. MAS DE TEMPOS EM TEMPOS VAMOS FAZER ALGUMA 
+			// ATIVIDADE EXTRA QUE EXIGEM BASTANTE TEMPO DE PROCESSAMENTO.
+			// Obs: A flag 'extra' é acionada pelo dd\timer.c de tempos 
+			// em tempos.
+			
 			// @todo:
 			// A tarefa mais próxima de sua Dead Line é a tarefa de maior 
 			// prioridade.
-			// check_for_ ... (mais próxima da deadline)
-			//
-			
-			//
+			// check_for_ ... (mais próxima da deadline)	
+
 			// *IMPORTANTE:
-			// Checando se tem threads em standby que 
-			// estão esperando pra rodar pela primeira vez.
-		    // Obs: Essa chamada não retorna se encontrar 
-			// uma thread assim. 
-			//
-			
 			// schedi.c
-			check_for_standby(); 
-            
-            //
+			// Checando se tem threads em standby que estão esperando pra 
+			// rodar pela primeira vez.
+		    // Obs: Essa chamada não retorna se encontrar uma thread assim. 
+
             // Request:
             // Esse é o momento ideal para atender os requests. 
 			// Pois a thread que estava utilizando o processador, 
 			// utilizou toda a sua cota. 			 
 			// Então agora atendemos o request, (Internal Signal), 
 			// somente depois de a thread ter utilizado o processador 
-			// durante todo o tempo que lhe foi concedido. :)
-            //			
+			// durante todo o tempo que lhe foi concedido. :)			
 			
-			KiRequest();
+			if (extra == 1)
+			{
+				KiRequest ();
+				
+				extra = 0;
+			}	
 			
-           
+			// sempre
+			// Isso precisa ser sempre ou então o processo init não 
+			// vai rodar, pois é essa rotina que muda todos os processos 
+			// para running.
+			// #obs: poderíamos especialmente mudar manualmente 
+			// os primeiros processos para running, deixando assim essa 
+			// rotina para rodar de tempos em tempos.
+			
+            check_for_standby (); 
+			
+		    // #importante
             // Não havendo thread para ser inicializada, nem request, 
-			// roda uma thread da fila do dispatcher.
+			// então roda uma thread da fila do dispatcher.
 			
 		    goto try_next;
+			
+			//Nothing.
 		};
 	    //Nothing.
 	};

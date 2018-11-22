@@ -23,15 +23,11 @@
  *
  * @todo: Definir melhor o que deve ir para user modr e organizar.
  * por servidor por exemplo.
- *
  */
  
  
 //Informações sobre o kernel. módulo externo.
 void KeInformation();   
-
-//Timer support.
-void KeTimer();         //Timer. (Driver em user mode).
 
 //Faults support.
 void KeCpuFaults(unsigned long fault_number);
@@ -42,7 +38,10 @@ int KeGetFocus();
 
 //File support.
 //carrega um arquivo. 
-int KeLoadFile( struct channel_d *channel, unsigned char *file_name, unsigned long file_address);
+int 
+KeLoadFile ( struct channel_d *channel, 
+             unsigned char *file_name, 
+			 unsigned long file_address );
 
 //Scheduler support.
 void KeNewProcessScheduler();
@@ -77,8 +76,7 @@ int KeIncreasePriority(int pid);
 //
 // passando o comando para os processos.
 //
-//void KeStartIdle(); 
-void startStartIdle(); 
+
 void KeStartShell();
 void KeStartTaskManager();
 

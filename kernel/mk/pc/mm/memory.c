@@ -1433,11 +1433,12 @@ int gcHAL (){
 
 
 /*
+ ******************************
  * gc:
  *     Garbage Collector.     
  *	   
  * Call all Garbage Collections rotines.
- * Clear all layers.
+ * Clear all main layers.
  *	
  * +GRAMADO 
  * +EXECUTIVE 
@@ -1445,16 +1446,22 @@ int gcHAL (){
  * +HAL
  *
  * #importante:
- *    Em duas condições as estruturas poderão ser destruidas ou
- * reaproveitadas: Quando a estrutura usada pelo malloc estiver sinalizada com Free=1
- * e quando as outras estruturas estiverem com a flag igual a used=216 e magic=4321.
+ * Em duas condições as estruturas poderão ser destruidas ou reaproveitadas: 
+ * +Quando a estrutura usada pelo malloc estiver sinalizada com Free=1 e 
+ * +quando as outras estruturas estiverem com a flag igual a used=216 e 
+ * magic=4321.
+ * obs: Outros tratamentos de flags serão introduzidos com o tempo,
+ * #todo: criaremos um enum de flags para serem utilizadas.
  *
- *   #importante:
- *   Para não perdermos muito tempo com a rotina de limpeza devemos limpar
- *   apenas uma estrutura e saírmos.
+ * #importante:
+ * Para não perdermos muito tempo com a rotina de limpeza devemos limpar
+ * apenas uma estrutura e saírmos.
+ * #importante: ?? Quando essa rotina é chamada, pois ela só deve ser 
+ * chamada de tempos em tempos, provavelmente usando a flag 'extra' que 
+ * está em ts.c.
+ * #por enquanto ainda não chamamos isso, apenas temos o serviço para 
+ * utilitários usarem.
  */
-
-
  
 int gc (){
 	
@@ -1474,7 +1481,7 @@ int gc (){
 	
 //clearExecutiveLayer:
 
-    Status = (int) gcEXECUTIVE();
+    Status = (int) gcEXECUTIVE ();
     if ( Status == 1 )
 	{
 		//#debug
@@ -1486,8 +1493,8 @@ int gc (){
 	
 //clearMicrokernelLayer:
 
-    Status = (int) gcMICROKERNEL();
-    if( Status == 1 )
+    Status = (int) gcMICROKERNEL ();
+    if ( Status == 1 )
 	{
 		//#debug
 		//printf("gc: clearMicrokernelLayer:\n");
@@ -1498,8 +1505,8 @@ int gc (){
 	
 //clearHalLayer:
 
-    Status = (int) gcHAL();
-    if( Status == 1 )
+    Status = (int) gcHAL ();
+    if ( Status == 1 )
 	{
 		//#debug
 		//printf("gc: clearHalLayer:\n");
@@ -1510,11 +1517,6 @@ int gc (){
 
 //done:
     return (int) 0;	
-	
-//fail:
-    //printf("# FAIL #\n");	
-	//refresh_screen();
-	//return (int) 1;
 };
 
 
