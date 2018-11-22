@@ -368,10 +368,14 @@ system_procedure ( struct window_d *window,
             {	
 				// [ ENTER ]
 				case VK_RETURN:
-				    printf("\r");
-					printf("\n");
+				    
+					//#test
+					//printf("\r");
+					//printf("\n");
+					
 					//input esta em stdio.c
-					input( (unsigned long) long1);  
+					//#test
+					//input( (unsigned long) long1);  
 					goto done;
 					break;
 					
@@ -420,23 +424,31 @@ system_procedure ( struct window_d *window,
 					//	break;
 					//};
 					
-					printf("\t");
-					input( (unsigned long) long1);  
+					//#test
+					//printf("\t");
+					
+					//#test
+					//input( (unsigned long) long1);  
 					goto done;
 				    break;
                 
 				//??quem deve tratar essa tecla ??
 				case VK_BACK:
-				    g_cursor_x--;
-					printf(" ");
-					input( (unsigned long) long1);  
+				    
+					//#test
+					//g_cursor_x--;
+					//printf(" ");
+					
+					//#test
+					//input( (unsigned long) long1);  
 					goto done;
                     break;
 					
 				case VK_PAUSE:
-                    if(CtrlStatus == 1){
-					    KiInformation();	
-					}
+                    //#test
+					//if(CtrlStatus == 1){
+					//    KiInformation();	
+					//}
 					goto done;
 					break;				
 				   					
@@ -483,7 +495,8 @@ system_procedure ( struct window_d *window,
 								//teclas de digitação para o editbox.   
                 
 				default:	
-					input( (unsigned long) long1);      //Coloca no stdin
+					//#test
+					//input( (unsigned long) long1);      //Coloca no stdin
 					goto done;
                     break; 
             };		

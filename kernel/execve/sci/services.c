@@ -1040,6 +1040,20 @@ void *services( unsigned long number,
 		case SYS_SELECTCOLORSCHEME:
 		    return (void *) windowSelectColorScheme ( (int) arg2 );
 			break;
+			
+			
+		//124	
+		// defered system procedure call.
+		// #todo: precisamos armazenasr os argumentos em algum lugar.
+		case 124:
+		    kernel_request = KR_DEFERED_SYSTEMPROCEDURE;
+			break;
+			
+		//125	
+		// system procedure call.
+        case 125:
+            return (void *) system_procedure ( NULL, arg2, arg3, arg4 );
+			break;		
 		
 		//
 		// 129, Um driver confirmando que foi inicializado.

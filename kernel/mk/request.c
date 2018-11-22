@@ -122,6 +122,7 @@ void KiRequest (){
  *     2016 (FN) - Revisão.
  *     ...
  */
+ 
 void request (){
 	
     struct process_d *Process; 
@@ -222,7 +223,7 @@ void request (){
 		
 	    //2 - faz a current_thread dormir. 
    	    case KR_SLEEP:   
-		    do_thread_sleeping(Current);
+		    do_thread_sleeping (Current);
 	        break;
          
 	    //3 - acorda a current_thread.
@@ -232,7 +233,7 @@ void request (){
 
 	    //4 - torna a current_thread zombie.
 	    case KR_ZOMBIE:
-	        do_thread_zombie(Current);
+	        do_thread_zombie (Current);
 		    break;
 			
 		//5 - start new task.
@@ -267,6 +268,14 @@ void request (){
 		case KR_CHECK_INITIALIZED:
             check_for_standby();		
 		    break;
+			
+		//#todo
+		//Chama o procedimento do sistema.
+        // ?? args ??	
+        // o serviço 124 aciona esse request.		
+		case KR_DEFERED_SYSTEMPROCEDURE:
+		    system_procedure ( 0, 0, 0, 0 );
+			break;
 			
 		
 		//@todo: Tratar mais tipos.	

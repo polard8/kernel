@@ -1308,10 +1308,33 @@ shellProcedure( struct window_d *window,
 				// Enter.
 				// Finaliza a string e compara.
 				case VK_RETURN:
+				    
+					//#test
+					printf("\r");
+					printf("\n");
+				
 				    input('\0'); 
 					shellCompare (window);
 					goto done;
-                    break; 					
+                    break; 
+
+				//#test	
+                case VK_TAB:					
+					printf("\t");
+					goto done;
+				    break;	
+
+				//#todo
+				case VK_BACK:
+				    
+					//#test
+					//o cursor do ldisc no kernel precisa ser atualizado tambem.
+					//textCurrentCol--;
+					//apiSetCursor (textCurrentCol,textCurrentRow);
+					//shellSetCursor (textCurrentCol,textCurrentRow);
+					//shellInsertNextChar ( (char) ' ' ); 
+					goto done;
+                    break;					
                               
                 // Mensagens de digitação.
 				// Texto. Envia o caractere.

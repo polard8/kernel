@@ -590,6 +590,31 @@ teditorProcedure( struct window_d *window,
 				case 0:
 				break;
 				
+				case VK_RETURN:
+				    
+					//#test
+					printf("\r");
+					printf("\n");
+					
+                    break; 
+
+				//#test	
+                case VK_TAB:					
+					printf("\t");
+				    break;
+
+				//#todo	
+				case VK_BACK:
+				    
+					//#test
+					//o cursor do ldisc no kernel precisa ser atualizado tambem.
+					//textCurrentCol--;
+					//apiSetCursor (textCurrentCol,textCurrentRow);
+					//teditorInsertNextChar ( (char) ' ' ); 					
+					
+                    break;					
+				
+				
 				//teclas de digitação.
 				default:
 				    teditorInsertNextChar ( (char) long1 );  

@@ -1,5 +1,5 @@
 /*
- * File: request.h 
+ * File: gramado\request.h 
  *
  * Descrição:
  *     ( Deferred Kernel Service )
@@ -39,6 +39,11 @@
 // + eventos com threads, ( dormir , acordar, iniciar, fechar ... )
 // ###importante: Esses eventos com threads permitirão muitas melhorias no estado 
 // atual do sistema.
+
+// #bugbug
+// Lembrando que no momento em que o kernel request é atendido
+// é o momento em que uma thread termina seu quantum,
+// então não podemos ter referências a ela como thread atual.
  
 //Enumerando. 
 #define  KR_NULL        0 
@@ -52,6 +57,13 @@
 #define  KR_TIMER_TICK  7        // O tick do timer.
 #define  KR_TIMER_LIMIT 8        // Um limite de contagem.
 #define  KR_CHECK_INITIALIZED 9  // Um limite de contagem.
+
+// Chama o procedimento do sistema depois
+// do procedimento de janela do sistema.
+// sento assim a thread atual talvez seja outra.
+// Então a thread atual no momento da chamada não será 
+// a mesma da thread que chamou.
+#define  KR_DEFERED_SYSTEMPROCEDURE 10
 // ...
 
 

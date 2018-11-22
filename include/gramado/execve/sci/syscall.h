@@ -254,8 +254,10 @@
 #define	SYS_CREATETASKBAR   121    
 #define	SYS_CREATESTATUSBAR 122
 #define	SYS_123 123
-#define	SYS_124 124
-#define	SYS_125 125
+
+// system procedure support.
+#define	SYS_124 124   // defered system procedure call.
+#define	SYS_125 125   // system procedure call.
 
 //126~129 (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
 #define	SYS_126 126

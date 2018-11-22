@@ -112,8 +112,37 @@ LINE_DISCIPLINE ( struct window_d *window,
 		
 		// sm\sys\proc.c
 		
-	    system_procedure (  window, (int) msg, (unsigned long) long1, 
+		
+		// #importante
+		// Vamos cancelar essa chamada para efeito de desempenho.
+		// Então o procedimentod e janela do sistema só será chamado 
+		// pelo aplicativo, ou pelo kernel 
+		// Para teste e debug a digitação de teclado 
+		// atenderá somente duas mensagens de emergência,
+		// uma para testes de novas funções sendo implementadas e 
+		// outra para refresh e inicialização do caso de problemas.
+		// serão F6 e F8.
+		
+		/*
+	    switch (msg)
+		{
+			case MSG_SYSKEYDOWN:  
+			    switch (long1)
+				{
+					case VK_F6:  //tests
+					case VK_F8:  //refresh screen and reset.
+		               system_procedure (  window, (int) msg, 
+					       (unsigned long) long1, (unsigned long) long2 );					
+					    break;
+				}
+			break;
+		};
+        */ 		
+		
+
+		system_procedure (  window, (int) msg, (unsigned long) long1, 
 	        (unsigned long) long2 );
+		
 	};	
  	
     return 0;	
@@ -122,7 +151,7 @@ LINE_DISCIPLINE ( struct window_d *window,
 
 /*
  ***************
- * LINE DISCIPLINE
+ * KEYBOARD_LINE_DISCIPLINE
  * Funciona como um filtro.
  * Obs: Essa é a rotina principal desse arquivo, 
  * todo o resto poderá encontrar um lugar melhor.
@@ -634,8 +663,35 @@ done:
 		
 		// sm\sys\proc.c
 		
-	    system_procedure (  w, (int) mensagem, (unsigned long) ch, 
-	        (unsigned long) ch );
+		// #importante
+		// Vamos cancelar essa chamada para efeito de desempenho.
+		// Então o procedimentod e janela do sistema só será chamado 
+		// pelo aplicativo, ou pelo kernel 
+		// Para teste e debug a digitação de teclado 
+		// atenderá somente duas mensagens de emergência,
+		// uma para testes de novas funções sendo implementadas e 
+		// outra para refresh e inicialização do caso de problemas.
+		// serão F6 e F8.
+		
+		
+	    switch (mensagem)
+		{
+			case MSG_SYSKEYDOWN:  
+			    switch (ch)
+				{
+					case VK_F6:  //tests
+					case VK_F8:  //refresh screen and reset.
+		               system_procedure (  w, (int) mensagem, 
+					       (unsigned long) ch, (unsigned long) ch );					
+					    break;
+				}
+			break;
+		};
+        		
+		
+		//#deletar
+		//system_procedure (  w, (int) mensagem, (unsigned long) ch, 
+	    //    (unsigned long) ch );
 	};	
  
     return (int) 0;
