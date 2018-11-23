@@ -2,7 +2,9 @@
  * File: lexer.c
  */
 
-
+#include "config.h"
+#include "debug.h"
+ 
 #include <types.h>
 
 #include "heap.h"
@@ -220,10 +222,14 @@ begin:
 					            //?? para onde vamos??
 								//precisamos continuar no while até encontrarmos a barra /. ou o *.
 								
-					    //}else if (c == EOF || c == '\0')  //isso também é uma opção de comentário não terminado.		  
-					    }else if (c == EOF){
+					    }else if (c == EOF || c == '\0'){  		  
+					    //}else if (c == EOF){
+							
+							eofno++;
+							
 		                    printf("skip_white_space: unterminated comment in line %d",lineno);
 	                        exit(1);
+							
 						//default
 						}else{
 		                    
@@ -286,6 +292,7 @@ begin:
  *     Pega o próximo token.
  *     copiando do gcc 0.9
  */
+ 
 int yylex (){
 
     register int c;
@@ -309,7 +316,7 @@ again:
 	
     c = skip_white_space();
 
-  //yylloc.first_line = lineno;
+    //yylloc.first_line = lineno;
     //lexer_firstline = lineno;
 	
 	//#debug
@@ -318,17 +325,9 @@ again:
   
     switch (c)
     {
-		
-        //case EOF:
-        //    value = ENDFILE; 
-		//	break; 
-		
-		//test 
-		//(E quando chegarmos ao fim do arquivo)
-		//
 		case 0:
 		case EOF:
-		    //value = ENDFILE;
+            eofno++;  
             value = TOKENEOF;			
 		    printf ("yylex: EOF\n");
 		    break;
@@ -663,6 +662,8 @@ again:
 							
 						   //fim.
 						    value = TOKENCONSTANT;
+							//constant_type_found = //#todo tem que contar. 
+							constant_base_found = CONSTANT_BASE_HEX;
                             goto constant_done;
 						}
 
@@ -672,7 +673,7 @@ again:
 					};
 				}
 
-				printf ("yylex: FAIL expected x");
+				printf ("yylex: FAIL expected x in constant in line %", lineno );
 				exit (1);
 			    
 			}else{
@@ -692,6 +693,8 @@ again:
 						ungetc(c, finput);
 							
 						value = TOKENCONSTANT;
+						//constant_type_found = //#todo tem que contar. 
+						constant_base_found = CONSTANT_BASE_DEC;
                         goto constant_done;
 					}
 
@@ -910,7 +913,14 @@ done:
 };
 
 
-// Vamos inicializar o lexer.
+
+/*
+ **************************************************
+ * lexerInit:
+ *     Inicializando o lexer.
+ * 
+ */
+
 int lexerInit (){
 
 	//number_of_tokens = 0;
@@ -925,6 +935,8 @@ int lexerInit (){
 	lexer_firstline = 1;
 	//lexer_lastline = 0;
 
+	//eof++
+	eofno = 0;
 
     lexer_code = 0;
 
@@ -941,6 +953,27 @@ int lexerInit (){
     return (int) 0;
 };
 
+
+/*
+//check subsequent
+int check_subseq ( int c, int a, int b )
+{
+	//extern getchar, peekc;
+
+	if (!peekc)
+		peekc = getchar();
+	
+	//se for diferente de c, retorna a.
+	//se for igual a c, retorn b.
+	
+	if (peekc != c)
+		return (a);
+	
+	peekc = 0;
+	
+	return (b);
+};
+*/
 
 void error ( char *msg ){
 

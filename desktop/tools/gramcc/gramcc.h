@@ -62,6 +62,9 @@ char BSS[512];
 //Isso será a pilha para os argumentos ou expressões matemáticas.
 char stack[512];
 
+//#bugbug: Não deveria ser assim???
+//unsigned long stack[128];
+
 //xxx() if(((( ))))       ... tem que dar zero no final. 
 int stack_count;
 int stack_index;   //current index.
@@ -98,12 +101,24 @@ int id[8];
 // ## constant support ##
 // 
 
+#define CONSTANT_TOKEN 0
 #define CONSTANT_TYPE 0  //1=byte 2=word 4=dword
-#define CONSTANT_BASE 1  //2=binário 8=octal 10=decimal 16=heaxadecimal
+#define CONSTANT_BASE 1  //2=binário 8=octal 10=decimal 16=hexadecimal
 //...
 
+#define CONSTANT_TYPE_BYTE 1
+#define CONSTANT_TYPE_WORD 2
+#define CONSTANT_TYPE_DWORD 4
+//...
+
+#define CONSTANT_BASE_BIN 2
+#define CONSTANT_BASE_OCT 8
+#define CONSTANT_BASE_DEC 10
+#define CONSTANT_BASE_HEX 16
+
 //elementos que explicam a constante.
-int constant[4];
+int constant[8];
+
 
 //salvando a string das constantes,
 //onde a constante será armazenada dependendo do tipo.
@@ -119,6 +134,13 @@ char constant_before[2];
 //isso varia com a base
 char constant_aftes[2];
 
+
+//#TODO RETURN SUPPORT;
+
+#define RETURN_TOKEN 0
+#define RETURN_TYPE 1
+
+int return_info[8];
 
 
 //

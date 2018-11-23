@@ -23,6 +23,7 @@ int current_index;
 int type_found;
 
 int modifier_found;
+
 int qualifier_found;
 
 //palavra reservada encontrada.
@@ -31,8 +32,14 @@ int keyword_found;
 //tipo que foi encontrado.
 int current_type;
 
-//se a constant é hexa.
-int constant_is_hexa;
+
+int constant_type_found;
+
+int constant_base_found;
+
+
+//se a constant é hexa. deletar
+//int constant_is_hexa;
 
 //um retorno foi encontrado.
 int return_found;
@@ -109,6 +116,9 @@ int lexer_token_count;
 
 //gcc 0.9
 int lineno;
+
+//eof++
+int eofno;
 
 //gcc 0.9
 static int maxtoken;		/* Current length of token buffer */

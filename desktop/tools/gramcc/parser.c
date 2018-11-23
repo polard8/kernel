@@ -4,7 +4,9 @@
  * 2018 - Created by Fred Nora.
  */
  
- 
+#include "config.h"
+#include "debug.h"
+
 #include <types.h>
 
 #include "heap.h"
@@ -23,6 +25,12 @@
 
 int parse_function ( int token );
 int parse_return ( int token );
+
+
+int parse_if ( int token );
+int parse_do ( int token );
+int parse_while ( int token );
+int parse_for ( int token );
 
 //int parse_def (int token );    //não pertence a linguagem C.
 //int parse_var ( int token );   //não pertence a linguagem C.
@@ -217,9 +225,10 @@ int parse_function ( int token )
 	int running = 1;
 	int State = 1;
 	
-	
+#ifdef PARSER_VERBOSE	
 	//debug
 	printf("parse_function: Initializing ...\n");	
+#endif	
 	
 	//se entramos errado.
 	if ( token != TOKENIDENTIFIER )
@@ -339,9 +348,11 @@ int parse_return ( int token ){
 	
 	int open = 0;
 	
-	
+
+#ifdef PARSER_VERBOSE	
 	//debug
 	printf("parse_return: Initializing ...\n");	
+#endif	
 	
 	//se entramos errado.
 	if ( token != TOKENKEYWORD || keyword_found != KWRETURN )
@@ -365,21 +376,31 @@ int parse_return ( int token ){
 			    switch(c)
 				{
 					//se encontramos a constante, o que segue é o separador ';' ou o separador ')'
-					case TOKENCONSTANT:
+					case TOKENCONSTANT:					
+#ifdef PARSER_VERBOSE							
 						//ok;
-						printf("parse_return: State1 TOKENCONSTANT={%s} line %d\n", real_token_buffer, lineno );
+						printf ("parse_return: State1 TOKENCONSTANT={%s} line %d\n", 
+						    real_token_buffer, lineno );
+#endif
 
-						strcat( outfile,"  mov eax, 0x");
-						strcat( outfile,real_token_buffer);
+					    constant[CONSTANT_TOKEN] = TOKENCONSTANT;
+						constant[CONSTANT_TYPE] = constant_type_found;
+						constant[CONSTANT_BASE] = constant_base_found;
+
+						//#todo: fazer um switch para tipos válidos.
+						strcat( outfile,"  mov eax, ");
+						strcat( outfile, real_token_buffer );
 						strcat( outfile,"\n  ret \n\n");
                         //strcat( outfile,"");							
 						
-						//Se não temos um parêntese aberto então vamos para o proximo
+						//Se não temos um parêntese aberto então vamos para o próximo
 						//que deverá ser um ';'
+						
 						if ( open == 0 )
 						{
 						    State = 2;	
 						}
+						
 						//mas se ainda temos um parentese aberto então
 						//encontramos uma constante dentro do parêntese,
 						//indicando que estamos um uma expressão.
@@ -431,6 +452,7 @@ int parse_return ( int token ){
 						//se estivermos após a keyword 'return' ou após o tipo '(int)'.
 						if ( open == 0 )
 						{
+                            //vamos analizar uma chamada de função dentro de um statement de return.							
 						    return (int) parse_function ( TOKENIDENTIFIER );
 						}
 						
@@ -460,9 +482,11 @@ int parse_return ( int token ){
 					case TOKENSEPARATOR:
 	                    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
                         {
+#ifdef PARSER_VERBOSE								
 			                //deu certo.
-			                printf("parse_return: State2 do_separator TOKENSEPARATOR={%s} line %d \n", real_token_buffer, lineno );
-		                    
+			                printf ("parse_return: State2 do_separator TOKENSEPARATOR={%s} line %d \n", 
+							    real_token_buffer, lineno );
+#endif		                    
 							//Se encontramos o separador que finaliza o statement
 							//então podemos retornar.
 							return (int) TOKENSEPARATOR;
@@ -493,9 +517,16 @@ do_constant:
 	c = yylex ();
 	
 
-	if( c == TOKENCONSTANT)
+	if ( c == TOKENCONSTANT)
 	{
-	    printf("parse_return: do_constant TOKENCONSTANT={%s} line %d\n", real_token_buffer, lineno );	
+		
+#ifdef PARSER_VERBOSE			
+	    printf ("parse_return: do_constant TOKENCONSTANT={%s} line %d\n", 
+		    real_token_buffer, lineno );	
+#endif
+		constant[CONSTANT_TOKEN] = TOKENCONSTANT;
+		constant[CONSTANT_TYPE] = constant_type_found;
+		constant[CONSTANT_BASE] = constant_base_found;	
 	
 	} else {
 			//falhou.
@@ -516,9 +547,14 @@ do_separator:
     {
 	    if( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
         {
+
+#ifdef PARSER_VERBOSE	
 			//deu certo.
-			printf("parse_return: do_separator TOKENSEPARATOR={%s} line %d \n", real_token_buffer, lineno );
-		    goto done;
+			printf("parse_return: do_separator TOKENSEPARATOR={%s} line %d \n", 
+			    real_token_buffer, lineno );
+#endif		  
+		  
+			goto done;
 		}else{
 			//falhou.
 			printf("parse_return: do_separator: fail");
@@ -535,6 +571,34 @@ do_separator:
 	
 done:		
    return c;
+};
+
+int parse_if ( int token )
+{
+	printf("todo: parse_if in line %d ", lineno );
+	exit(1);
+    return -1;	
+};
+
+int parse_do ( int token )
+{
+	printf("todo: parse_do in line %d ", lineno );
+	exit(1);
+    return -1;	
+};
+
+int parse_while ( int token )
+{
+	printf("todo: parse_while in line %d ", lineno );
+	exit(1);
+    return -1;	
+};
+
+int parse_for ( int token )
+{
+	printf("todo: parse_while in line %d ", lineno );
+	exit(1);
+    return -1;	
 };
 
 
@@ -582,7 +646,14 @@ int parse (){
 		//#debug
 	    //printf("%c", c );
 		
-	    //statement classes
+		
+        //#importante		
+        //Estamos começando um arquivo. No começo do arquivo 
+		//apenas alguns tokens são válidos, são eles:
+        // >>'#' do preprocessador
+        // >>modificadores 
+        // >>qualificadores 
+        // >>tipos   		
 		
 		switch (State)
 		{
@@ -592,15 +663,20 @@ int parse (){
 						
 			//################################
 			// #State 1
-			// Esperamos um TOKENTYPE.
+			// Esperamos um TOKENMODIFIER, TOKENTYPE.
+			//
 			case 1:
 			    printf("<1> ");
 				switch (c)
 				{
 	                case TOKENMODIFIER:
+					
+#ifdef PARSER_VERBOSE							
 						//continua pois precisamos pegar um tipo.
 						//#bugbug ??mas e se o modificar vir seguido de um simbolo ???
 						printf("State1: TOKENMODIFIER={%s} line %d\n", real_token_buffer, lineno );
+#endif
+						
 						State = 1;
 						//goto again;
 						break;
@@ -609,16 +685,27 @@ int parse (){
 					// >>> peekChar=) significa marcação de tipagem.
 					// >>> peekSymbol=symbol  significa declaração de variável ou função.
 			        case TOKENTYPE:
+					
+#ifdef PARSER_VERBOSE						
 			            printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
+#endif						
+						
 						id[ID_TYPE] = type_found;
 				        
 						//depois de um type vem um identificador.
 						State = 2;
 			            break;
 						
+						
+					// #bugbug	
+					// e se o arquivo começar com um separador, então teremos problema.	
+					
 					case TOKENSEPARATOR:
+					
+#ifdef PARSER_VERBOSE						
 					     printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
-						 
+#endif						 
+
 					    //fechando UM parênteses, provavelmente sem nada dentro.
 					    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
 						{
@@ -645,8 +732,13 @@ int parse (){
                                 //goto again; 								
 							};							
 						}
-					    break;					
-						
+					    break;	
+
+                    //#bugbug						
+					//Não devemos aceitar diretivas do preprocessador nesse momento,
+					//pois antes de tudo devemos rodar um preprocessador para expandir as 
+					//diretivas.
+					
                     //Se o corpo da função estiver aberto podemos ter identificadores sem tipo,
 					//que são label: ou chamada de função (call). ou ainda keywords.
 					
@@ -654,6 +746,8 @@ int parse (){
 					//então vamos ver do que se trata o token e configurar a variável c.
 					//loga após vamos reiniciar o running mas sem pegarmos o próximo token.
 					//poderíamos realizar um ungetchar, mas não testamos isso direito.
+					
+					//Pode ser que não encontramos um token válido no início do documento.
 	
 					default:
 					    //se estamos dentro do parênteses e não encontramos nenhum case acima.
@@ -668,7 +762,6 @@ int parse (){
 						    State++;
 						    goto again;
 					    }
-                         
 						//EOF 
 						if( c = TOKENEOF )
 						{
@@ -704,10 +797,12 @@ int parse (){
 					//
 					case TOKENIDENTIFIER:
 			            
+#ifdef PARSER_VERBOSE							
+				        printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
+#endif 
+						
 						id[ID_TOKEN] = TOKENIDENTIFIER;
 				        id[ID_STACK_OFFSET] = stack_index;
-				        printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
-						
 						
                         //salva o símbolo. #isso funciona.						
 						sprintf ( save_symbol, real_token_buffer );
@@ -910,14 +1005,20 @@ int parse (){
                     //peekChar=: depois do default.(obrigatório)
                     //peekChar=( depois do switch, if, while ...					
 				    case TOKENKEYWORD:
+					
+#ifdef PARSER_VERBOSE						
 					    printf("line %d TOKENKEYWORD={%s} \n", lineno, real_token_buffer );
+#endif 
 						
 						// # return #
 						//return. Chamaremos o tratador do stmt parse_return() 
 				        if( keyword_found == KWRETURN )
 				        {
+							
+#ifdef PARSER_VERBOSE								
 					        printf("State3: TOKENKEYWORD={%s} KWRETURN line %d  \n", real_token_buffer, lineno );
-					        // parse deve retornar o '(', quando encontrá-lo faz o tratamento até chegar  no ';'
+#endif					        
+							// parse deve retornar o '(', quando encontrá-lo faz o tratamento até chegar  no ';'
 						    // a função deve retornar o separador ';'
 				            //indicando que tudo deu certo no parser.
 						    //continuaremos nesse state até pegarmos o separador '}'.
@@ -1182,7 +1283,9 @@ int parse (){
 				
  
 		    default:
+#ifdef PARSER_VERBOSE				
 			    printf("<default>State default: Error.\n");
+#endif				
 				if ( parentheses_inside > 0 )
 				{
 				    printf("default: expected ) in line %d \n", lineno);
@@ -1260,16 +1363,21 @@ int parserInit (){
 	stack_count = 0;
 	stack_index = 0;
 	
-	//id support
+
+	    
+	for ( i=0; i<8; i++ )
+		id[i] = 0;
 	
+	for ( i=0; i<8; i++ )
+		constant[i] = 0;
 	
+	for ( i=0; i<8; i++ )
+		return_info[i] = 0;
+
 	for ( i=0; i<512; i++ )
 		stack[i] = 0;
 	
-    
-	for ( i=0; i<8; i++ )
-		id[i] = 0;
-
+	//...
 	
 	//esses endereços vão depender do arquivo de configuração do 
 	//linker ...

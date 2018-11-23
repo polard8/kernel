@@ -2,10 +2,11 @@
  * File: main.c
  *     Main file for 32bit app.
  *
- * env: gramado 0.3
+ * env: gramado 0.4
  */
 
  
+#include "config.h"
 #include "debug.h"
 
 
