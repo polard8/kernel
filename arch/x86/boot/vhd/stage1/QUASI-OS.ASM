@@ -40,7 +40,7 @@ MaxRootEntries        dw 0x0200
 TotalSectorsSmall     dw 0x0000  ;; (CHS=963/4/17-5)(Number of sectors - number of hidden sectors)
 MediaDescriptor       db 0xF8
 SectorsPerFAT         dw 246    
-SectorsPerTrack       dw 0x11    ;; 17 SPT.    
+SectorsPerTrack       dw 19 ;;0x11    ;; 17 SPT.    
 NumHeads              dw 4       ;; 4 HEADS. Number of surfaces
 HiddenSectors         dd 5       ;; 1+1+3 ( mbr + vbr + reserved sectors depois do vbr)
 TotalSectorsLarge     dd 0       ;; Number of sectors if 'TotalSectorsSmall = 0'.

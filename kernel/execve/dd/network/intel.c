@@ -432,32 +432,50 @@ void nic_i8254x_reset (){
 	// TXCW: set ANE, TxConfigWord (Half/Full duplex, Next Page Request)
 	//0x80008060
 	
-	// TDBAL
-	//; Transmit Descriptor Base Address Low
+	
+	//; Transmit Descriptor Base Address Low  
 	//0x0080000;  //low
+	
+	//o buffer
+	e1000_tx_struct1.buffer_addr1 = virtual_to_physical ( (unsigned long) &e1000_tx_buffer1[0], gKernelPageDirectoryAddress ); 
+	e1000_tx_struct1.buffer_addr2 = 0;
+	e1000_tx_struct1.lower.flags.length = 48; //256
+	
+	// TDBAL
+	//32bit
+	//a estrutura
+	*(unsigned long *) &base_address[0x3800 + 0] =  virtual_to_physical ( (unsigned long) &e1000_tx_struct1, gKernelPageDirectoryAddress );
 	base_address[0x3800 + 0] = 0;     //low
 	base_address[0x3800 + 1] = 0;
 	base_address[0x3800 + 2] = 0x80;
 	base_address[0x3800 + 3] = 0;
+	
+	// TDBAH
+	//32bit
+	//*(unsigned long *) &base_address[0x3800 + 4] = 0;
     base_address[0x3800 + 4] = 0;     //high
     base_address[0x3800 + 5] = 0;
     base_address[0x3800 + 6] = 0;
     base_address[0x3800 + 7] = 0;	
 	
+	//32bit
 	//TX Descriptor Length 256 = 0x0100
 	//(32 * 8);	
-	base_address[0x3808 + 0] = 0; 
-	base_address[0x3808 + 1] = 0x01; 
-	base_address[0x3808 + 2] = 0; 
-	base_address[0x3808 + 3] = 0; 
+	//count * sizeof(struct e1000_tx_desc)
+	*(unsigned long *) &base_address[0x3808 + 0] = ( 1 * sizeof(struct e1000_tx_desc) ); 
+	//base_address[0x3808 + 0] = 0; 
+	//base_address[0x3808 + 1] = 0x01; 
+	//base_address[0x3808 + 2] = 0; 
+	//base_address[0x3808 + 3] = 0; 
 	base_address[0x3808 + 4] = 0; 
 	base_address[0x3808 + 5] = 0; 
 	base_address[0x3808 + 6] = 0; 
 	base_address[0x3808 + 7] = 0; 
 	
 	
-	//TDH - Transmit Descriptor Head
+	//TDH - Transmit Descriptor (Head)
 	//0;
+	//*(unsigned long *) &base_address[0x3810 + 0] = 0;
 	base_address[0x3810 + 0] = 0;
 	base_address[0x3810 + 1] = 0;
 	base_address[0x3810 + 2] = 0;
@@ -467,9 +485,10 @@ void nic_i8254x_reset (){
 	base_address[0x3810 + 6] = 0;
 	base_address[0x3810 + 7] = 0;
 	
-	//TDL - Transmit Descriptor Tail
+	//TDL - Transmit Descriptor (Tail)
     //1;
-	base_address[0x3818 + 0] = 1;
+	//*(unsigned long *) &base_address[0x3818 + 0] = 1;
+	base_address[0x3818 + 0] = 0;
 	base_address[0x3818 + 1] = 0;
 	base_address[0x3818 + 2] = 0;
 	base_address[0x3818 + 3] = 0;

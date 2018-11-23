@@ -66,11 +66,9 @@ struct legacy_tx_desc
 
 //==========
 
-/* Transmit Descriptor */
-/*
-   
-   esse tipo não é o legado.
- 
+/* Transmit Descriptor */   
+//esse tipo não é o legado.
+
 struct e1000_tx_desc {
 	
     //uint64_t buffer_addr;       // Address of the descriptor's data buffer 
@@ -80,7 +78,7 @@ struct e1000_tx_desc {
 	union {
         uint32_t data;
         struct {
-            uint16_t length;    // Data buffer length 
+            uint16_t length;    // Data buffer length ???
             uint8_t cso;        // Checksum offset 
             uint8_t cmd;        // Descriptor control 
         } flags;
@@ -95,12 +93,19 @@ struct e1000_tx_desc {
         } fields;
     } upper;
 };
-*/
+
+struct e1000_tx_desc e1000_tx_struct1;
+
+//#test
+struct e1000_tx_desc e1000_tx_structs[4];
+
+unsigned char e1000_tx_buffer1[512];
+unsigned char e1000_tx_buffer2[512];
 //==========
 
 
 /* Receive Descriptor */
-/*
+
 struct e1000_rx_desc {
 	
     //uint64_t buffer_addr; // Address of the descriptor's data buffer 
@@ -115,8 +120,10 @@ struct e1000_rx_desc {
     uint16_t special;
 	
 };
-*/
+
 //===============
+
+
 
 
 typedef struct nic_info_d nic_info_t; 
