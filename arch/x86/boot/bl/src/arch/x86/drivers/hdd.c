@@ -45,10 +45,12 @@ extern unsigned long hd_lba;
  * edx - null
  *
  */
-void my_read_hd_sector( unsigned long ax, 
-                        unsigned long bx, 
-						unsigned long cx, 
-						unsigned long dx )
+ 
+void 
+my_read_hd_sector ( unsigned long ax, 
+                    unsigned long bx, 
+					unsigned long cx, 
+					unsigned long dx )
 {	
     hd_buffer = (unsigned long) ax;    //arg1 (buffer).
     hd_lba    = (unsigned long) bx;    //arg2 (lba).		
@@ -70,10 +72,12 @@ void my_read_hd_sector( unsigned long ax,
  * edx - null
  *
  */
-void my_write_hd_sector( unsigned long ax, 
-                         unsigned long bx, 
-						 unsigned long cx, 
-						 unsigned long dx )
+ 
+void 
+my_write_hd_sector ( unsigned long ax, 
+                     unsigned long bx, 
+					 unsigned long cx, 
+					 unsigned long dx )
 {	
     hd_buffer = (unsigned long) ax;    //arg1 (buffer).
     hd_lba    = (unsigned long) bx;    //arg2 (lba).
@@ -90,8 +94,10 @@ void my_write_hd_sector( unsigned long ax,
  ******************************************************
  * limpa_root: 
  *     Zera o buffer e grava zeros no hd.
- *     @todo: Rever a validade dessas posições de memória.
+ *     #todo: Rever a validade dessas posições de memória.
+ *     #todo isso deve ir para /fs
  */
+ 
 void limpa_root (){
 	
 	
@@ -127,6 +133,7 @@ done:
  * limpa_fat: 
  *     Zera o buffer e grava zeros no hd.
  *     @todo: Rever a validade dessas posições de memória.
+ *     #todo isso deve ir para /fs
  */
 void limpa_fat (){
 	

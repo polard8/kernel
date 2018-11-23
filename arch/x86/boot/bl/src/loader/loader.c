@@ -22,12 +22,11 @@
 #include <bootloader.h>
 
 
-//
 // PE file header support.
-//
-#define IMAGE_FILE_MACHINE_I386     0x014C  // x86
-#define IMAGE_FILE_MACHINE_IA64     0x0200  // Intel Itanium
-#define IMAGE_FILE_MACHINE_AMD64    0x8664  // x64
+
+#define IMAGE_FILE_MACHINE_I386   0x014C  // x86
+#define IMAGE_FILE_MACHINE_IA64   0x0200  // Intel Itanium
+#define IMAGE_FILE_MACHINE_AMD64  0x8664  // x64
 //Continua...
 
 
@@ -48,13 +47,7 @@ void updateProgressBar();
 */
 
 
-/*
- * load_kernel:
- *     Carrega o KERNEL.BIN na memória.
- *
- * @todo: Mudar para BlLoadKernel(); ou loaderLoadKernelImage();
- */
-//int loaderLoadKernelImage() 
+/* load_kernel: Carrega o KERNEL.BIN na memória. */
  
 int load_kernel (){
 	
@@ -66,13 +59,13 @@ int load_kernel (){
 	unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;    //0x00100000.  
 	
 	//Name.
-	
 	char *kernel_name = "KERNEL.BIN";
 	
 	//Message.
+	
 #ifdef BL_VERBOSE	
-	printf ("load_kernel: Loading %s .. PA=%x | VA=%x \n", kernel_name,
-	    kernel_pa, kernel_va );
+	printf ("load_kernel: Loading %s .. PA=%x | VA=%x \n", 
+	    kernel_name, kernel_pa, kernel_va );
 #endif
 														
     //Carregando KERNEL.BIN no endereço físico.
@@ -86,7 +79,7 @@ int load_kernel (){
 	};
 	
     // Update progress bar
-	//updateProgressBar();
+	// updateProgressBar();
 	
 	/*
 	 * Checando arquivo na memória. 
@@ -112,10 +105,10 @@ int load_kernel (){
 	 */ 
 	 
 	//Check for intel i386. 0x014C. 
-	if ( kernel[0] != 0x4C || kernel[1] != 0x01 ){	
-    
-	    printf ("load_kernel fail: %s Validation\n", kernel_name );
-	    
+	
+	if ( kernel[0] != 0x4C || kernel[1] != 0x01 )
+	{	
+	    printf ("load_kernel fail: %s Validation\n", kernel_name );  
 		goto fail;	
 	};
 	
@@ -124,7 +117,6 @@ int load_kernel (){
 	//WORD NumberOfSections.
 	
 	
-	//
 	// #importante:
 	// Checando se o kernel base contém o header 
 	// do multiboot.
@@ -136,7 +128,7 @@ int load_kernel (){
 	// não passará os mesmos argumentos que o Gramado Boot,
 	// então o kernel inicializará de forma diferente,
 	// provavelmente apenas em modo texto.
-	//
+
 	
 	// Multiboot magic signature.
     // O header está em 0xC0001000.	
@@ -152,11 +144,9 @@ int load_kernel (){
 	};	
 	
 	//Continua ...
-	
-//Kernel carregado.	
-//Done.
 
-//done:	
+//Done.	
+//Kernel carregado.	
 
 #ifdef BL_VERBOSE
 	printf("Done\n");
@@ -167,14 +157,14 @@ int load_kernel (){
 	
     return (int) 0;  
 	
-//
+
 // Fail 
 // O Kernel não pôde ser carregado.	
-//
 
 fail:
     printf("load_kernel: Fail\n");
-    die();	
+    abort ();
+	//die();	
 };
 
 
@@ -196,7 +186,6 @@ fail:
  *     Mudar para loaderLoadFiles()
  */ 
  
-//int loaderLoadFiles()
 int load_files (){
 	
     int Status;   
@@ -239,9 +228,7 @@ int load_files (){
 	// Então eles serão carregados em endereços físicos 
 	// mas serão mapedos depois pelo kernel.
 	
-	// 0x00400000; 
-	// 0x00450000; 
-	// 0x004A0000;
+	// 0x00400000, 0x00450000, 0x004A0000; 
 	
 	unsigned char *init = (unsigned char *) INIT_ADDRESS;                   	 
 	unsigned char *shell = (unsigned char *) SHELL_ADDRESS;                 	 
@@ -249,9 +236,9 @@ int load_files (){
 	//...
 	
 	
-	// Limites: O endereço base deve estar acima do limite mínimo
-	//          estabelecido para um processo de usuário.
-
+	// Limites: 
+	// O endereço base deve estar acima do limite mínimo estabelecido 
+	// para um processo de usuário.
 	
 	if ( INIT_ADDRESS < USER_BASE || 
 	     SHELL_ADDRESS < USER_BASE || 
@@ -323,45 +310,55 @@ int load_files (){
 	// Pode também carregar imagens para a interface gráfica. Além de fontes e
 	// drivers. 
 	
-	// Validação: 
-	//     Checando os arquivos carregados na memória se são realmente do tipo 
-	// PE, 386. 
-	// @todo: Aqui pode haver opções, como ELF.  
 	
+	//
+	//  ## Validation ##
+	//
+	
+	// Checando os arquivos carregados na memória se são realmente do tipo 
+	// PE, 386. 
+	// #todo: 
+	// Aqui pode haver opções, como ELF.  
 	
 	// Init. 
-	if ( init[0] != 0x4C || init[1] != 0x01 ){
-	    printf("load_files: %s Validation ",init_name);
+	// Shell.
+	// TaskManager.
+	
+	if ( init[0] != 0x4C || init[1] != 0x01 )
+	{
+	    printf ("load_files: %s Validation", init_name );
 	    goto fail;	
 	};
 	
-	// Shell.
-	if ( shell[0] != 0x4C || shell[1] != 0x01 ){
-	    printf("load_files: %s Validation ",shell_name);
+	
+	if ( shell[0] != 0x4C || shell[1] != 0x01 )
+	{
+	    printf ("load_files: %s Validation", shell_name );
 	    goto fail;	
 	};
 
-	// TaskManager. 
-	if ( taskmanager[0] != 0x4C || taskmanager[1] != 0x01 ){
-	    printf("load_files: %s Validation ",taskmanager_name);
+	 
+	if ( taskmanager[0] != 0x4C || taskmanager[1] != 0x01 )
+	{
+	    printf ("load_files: %s Validation", taskmanager_name );
 	    goto fail;	
 	};
 
 	// Continua ...
 	
-// Done!
-done:	
-	//Arquivos carregados.
+    // Done!
+
 #ifdef BL_VERBOSE
 	printf("Done\n");
 	refresh_screen();
 #endif
     return (int) 0;  //Status.   
 	
-// Fail!
+    // Fail!
+	
 fail:
 	printf(" Fail\n");    
-	die();
+	abort ();
 };
 
 

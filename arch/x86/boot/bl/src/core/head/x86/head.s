@@ -29,24 +29,25 @@
 ;
 
 
-;
 ; Segmento onde inicia a parte em Assembly.
-;
+
 segment .head_x86
 
  
 [bits 32]
 
 
-;
+
 ; Variáveis importadas.
-;
-extern _g_lbf_pa      ;Endereço físico do Linear Frame Buffer, LFB.
+
+
+;Endereço físico do Linear Frame Buffer, LFB.
+extern _g_lbf_pa      
 ;...
  
-;
+
 ; Funções importadas.
-;
+
 extern _BlMain                ; * Entrada da parte em C.
 extern _BlKernelModuleMain    ; * Reentrada do bl, agora na forma de módulo.
 ;extern _shell_main    ;Entrada do Shell do Boot Loader.
@@ -55,8 +56,7 @@ extern _BlKernelModuleMain    ; * Reentrada do bl, agora na forma de módulo.
 
 
 
-
-; Onde carregar o Kernel.
+; Endereços físicos do kernel base.
 KRN_BASE        equ  0x00100000    ;1MB.
 KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endereço fisico.
 
@@ -121,37 +121,41 @@ _bootloader_entry_point:
 	
     mov dword [_SavedBootBlock], edx        
 	
-    ;LFB
+    ;LFB, X, Y, BPP
+	
 	xor eax, eax
 	mov eax, dword [edx +0]    	
 	mov dword [_SavedLFB], eax
 	
-	;X
 	xor eax, eax
     mov ax, word [edx +4]      	
     mov dword [_SavedX], eax
 	
-	;Y
 	xor eax, eax
     mov ax, word [edx +8]      	
     mov dword [_SavedY], eax
 	
-	;BPP
 	xor eax, eax
     mov al, byte [edx +12]     	
     mov dword [_SavedBPP], eax
 	
-	;
-	; @todo: Pode-se zerar os registradores nesse momento ?
-	;
+	
+	; #todo: 
+	; Pode-se zerar os registradores nesse momento ?
+	
 	
 	;Configura IDT. 
+	;Aponta tudo para 'unhandled_int'.
+	;Configura vetores de faults e exception.
+	;Outros vetores.
+	
     cli    
-	call setup_idt 	      ;Aponta tudo para 'unhandled_int'.
-	call setup_faults     ;Configura vetores de faults e exception.
-	call setup_vectors    ;Outros vetores.
+	call setup_idt 	      
+	call setup_faults     
+	call setup_vectors    
 
 	;Carrega GDT e IDT.
+	
 	lgdt [GDT_register]	
 	lidt [IDT_register]
 	
@@ -167,6 +171,7 @@ _bootloader_entry_point:
 	mov eax, _bootloader_stack_start 
 	mov esp, eax 
 	
+	;; PIT
 	;; #importante
 	;; Vamos deixar o kernel inicializar o PIT.
 	
@@ -187,8 +192,6 @@ _bootloader_entry_point:
 	mov al, 1
 	out 0x21, al
 	out 0xA1, al
-
-	;disable interrupts.
 	cli
 	
 	;unmask all interrupts	
@@ -198,11 +201,15 @@ _bootloader_entry_point:
 
     ;; Calling C part of the kernel base.
 	
-.callBlMain:
+;.callBlMain:
+
+    ;;
+	;;  ## Call ##
+	;;
 
 	call _BlMain
 	
-.getResponse:
+;.getResponse:
 
 	;; Response in EAX.
 	
@@ -216,11 +223,15 @@ _bootloader_entry_point:
 	; Configurou 4 diretórios e algumas pagetables.
     ; Agora registramos o diretório do processo kernel em cr3.
 	; Colocando no CR3 o endereço do diretório de páginas que o Kernel usará.
-	;
+
 	
 setupCR3:	
-	; @todo: Usar variável global.
-	;Obs:  Para sistemas pequenos.             	
+
+	; @todo: 
+	; Usar variável global.
+	; Obs:  
+	; Para sistemas pequenos.             	
+	
 	mov eax, dword (0x01000000 - 0x900000)           
 	mov cr3, eax                  	
   
@@ -258,9 +269,7 @@ setupCR0:
 	; pode atuar como um módulo do kernel em kernel mode. Outro método
 	; que o Boot Loader deve passar para o kernel base é o método _bmServices
 	; herdado do Boot Manager.
-	;
 	
-    ;
 	; Preparando para passa o comando para o Kernel.
 	;
 	; @todo: 
@@ -274,25 +283,23 @@ setupCR0:
 
 StartKernelEntry:
 	
-	;Prepara a tabela.
-	mov ebp, dword BootBlock
-	
 	;LFB address.
+	;Width in pixels.
+	;Height in pixel.
+	;bpp.
+	
 	xor eax, eax
 	mov eax, dword [_SavedLFB]    
 	mov dword [BootBlock.lfb], eax
 	
-	;Width in pixels.
 	xor eax, eax
 	mov ax, word [_SavedX]       
 	mov dword [BootBlock.x], eax 
 	
-	;Height in pixel.
 	xor eax, eax
 	mov ax, word [_SavedY]       
 	mov dword [BootBlock.y], eax 
 	
-	;bpp.
 	xor eax, eax
 	mov al, byte [_SavedBPP]     
 	mov dword [BootBlock.bpp], eax 
@@ -304,12 +311,14 @@ StartKernelEntry:
 	; ebx = LFB address.
 	; ecx = BootBlock.
 	; edx = BootBlock.
-	
 
 	;testes:
 	;mov al, byte [bl_video_mode]  ;utiliza o modo passado pelo boot manager.
 	;mov al, byte 'G'             ;Flag. (useing graphics).	
 	;mov al, byte 'T'             ;Flag. (useing textmode).	
+	
+	;Prepara a tabela.
+	mov ebp, dword BootBlock	
 
 	mov edx, ebp                 ;Tabela.	
 	mov ecx, ebp                 ;Tabela.
@@ -332,10 +341,12 @@ StartKernelEntry:
     mov byte [0xb8003], byte 9		
 .gui:		
     
-	;
-	; Go ! (Passa o comando para o Kernel.)
-	;
+	;;
+	;; Go ! 
+	;; (Passa o comando para o Kernel.)
+	;;
 	
+	; #obs:
 	; Sem o header do multiboot. 
 	
 	jmp CODE_SEL:0xC0001000        

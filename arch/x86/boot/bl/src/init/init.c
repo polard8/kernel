@@ -82,6 +82,7 @@ void init_globals (){
  * init:
  *     Função principal do arquivo init.c.
  */
+ 
 int init (){
 	
 	g_cursor_x = 0;
@@ -92,7 +93,9 @@ int init (){
 	//@todo: Inicializar estruturas de vídeo.
 	
     //Selecionando modo de vídeo.	
-	if(SavedBootMode == 1){
+	
+	if (SavedBootMode == 1)
+	{
 	    VideoBlock.useGui = 1;	
 	}else{
 		VideoBlock.useGui = 0;
@@ -101,16 +104,22 @@ int init (){
 #ifdef BL_VERBOSE	
 	//Debug Message.
     //Se estivermos usando modo gráfico (GUI.)	
-	if(VideoBlock.useGui == 1){
-        printf("init: Using GUI!\n");
+	if (VideoBlock.useGui == 1)
+	{
+        printf("init: Using GUI\n");
 	};
 #endif
 
 	//Se não estivermos usando GUI.(text mode).
-	if(VideoBlock.useGui != 1){	
-        kclear(0);	                      //Limpa a tela.
-	    set_up_text_color(0x0F, 0x00);    //Branco em preto.
-		printf("init: Text Mode!\n");
+	//Limpa a tela.
+	//Branco em preto.
+	
+	if (VideoBlock.useGui != 1)
+	{	
+        bl_clear (0);	                      
+	    set_up_text_color (0x0F, 0x00);
+		
+		printf("init: Text Mode\n");
 	};
 	
 	//
@@ -119,7 +128,7 @@ int init (){
 		
 	//Título.
 #ifdef BL_VERBOSE
-	printf("init: Boot Loader Version %s\n\n",BL_VERSION);	
+	printf ("init: Boot Loader Version %s \n", BL_VERSION );	
 #endif
 
     //globais.	

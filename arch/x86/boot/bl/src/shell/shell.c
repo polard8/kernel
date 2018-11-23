@@ -24,15 +24,13 @@
  
 #include <bootloader.h>
 
-//
+
 // Funções importadas.
-//
 
 extern void asm_shut_down();
 
-//
+
 // Variáveis internas.
-//
 
 unsigned long deslocamento;
 int ret_string;
@@ -43,191 +41,54 @@ int shell_status;
 //...
 
 
-//@todo: Diminuir o tamanho do buffer.
-//       Usar static
+// #todo: 
+// Diminuir o tamanho do buffer.
+// ?? Usar static
+
 unsigned char *shell_string_buffer[256];    
 
-//String para mensagem de ajuda.
-// @todo: Usar static.		 
+// String para mensagem de ajuda.
+// #todo: 
+// ?? Usar static.		 
+
 char help_string[] = "\n help, format, install, makeboot, reboot \n";
 
 
-//
 // Protótipos de funções internas.
-//
+
+// Protótipo do procedimento de janela do shell do Boot Loader.
+
+int 
+shellProcedure ( unsigned long window, 
+                 unsigned long msg, 
+			     unsigned long long1, 
+			     unsigned long long2 );
+				 
+void testa_mbr ();
+void testa_root ();
+void debug ();
 
 
-
-//Protótipo do procedimento de janela do shell do Boot Loader.
-int shellProcedure( unsigned long window, 
-                    unsigned long msg, 
-			        unsigned long long1, 
-			        unsigned long long2 );
-void testa_mbr();
-void testa_root();
-void debug();
-			   
-			   
 /*
-char prompt_arg0[20];
-char prompt_arg1[20];
-char prompt_arg2[20];
-char prompt_arg3[20];
-char prompt_arg4[20];
-char prompt_arg5[20];
-char prompt_arg6[20];
-char prompt_arg7[20];
-char prompt_arg8[20];
-char prompt_arg9[20];
-
-int separa_strings_do_prompt(char* prompt)
-{
-    
-	char *Argv[10];
-	int i;
-	int n;
-	int limit = 10;
-    
-	i = 0;
-	
-	//arg 0
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-		prompt_arg0[n] = prompt[i];
-	}
-	
-	//arg 1
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg1[n] = prompt[i];
-	}
-
-	
-	//arg 2
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg2[n] = prompt[i];
-	}
-
-	
-	//arg 3
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg3[n] = prompt[i];
-	}
-
-	
-	//arg 4
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg4[n] = prompt[i];
-	}
-
-	
-	//arg 5
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg5[n] = prompt[i];
-	}
-
-	
-	//arg 6
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg6[n] = prompt[i];
-	}
-
-	
-	//arg 7
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg7[n] = prompt[i];
-	}
-
-	
-	//arg 8
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg8[n] = prompt[i];
-	}
-
-	
-	//arg 9
-	n = 0;
-    while( prompt[i] != ' ' )
-	{
-	    if( prompt[i] == '\0' || prompt[i] == 0 )
-		{
-		    goto done;
-		}
-	    prompt_arg9[n] = prompt[i];
-	}
-	
-	
-done:
-    return 0;
-}
-*/
-			   
-			   
-			   
-/*
+ *************************************************
  * shellMain:
  *     Função principal do Shell do Boot Loader.
- *     @todo: Usar argumentos padrão argc, argv.
+ *
+ *     #todo: Usar argumentos padrão argc, argv.
+ *     #todo: usar delimtador e separador de tokens igual no app shell.
  */
-int shellMain( int argc, char* argv )
-{ 
+ 
+// #todo: int shellMain ( int argc, char **argv )
+// #todo: int shellMain ( int argc, char *argv[] )
+ 
+int shellMain ( int argc, char *argv ){
+	
     unsigned long ret_proc;
 	
 	// Title.	
-    kclear(0);
-    printf("[BL-SHELL:] Auxilia a instalacao do sistema.\n");
+	
+    bl_clear (0);
+    printf("[BL-SHELL:] Auxilia a instalacao do sistema\n");
 	
 	//
     // Ativa o procedimento do shell.      
@@ -269,7 +130,7 @@ sh_loop:
 	};
 
 fail_shell:
-  	printf("shell_main: Fail!\n"); 
+  	printf("shell_main: Fail\n"); 
 	return (int) 1;
 	
 exit_shell:	    
@@ -278,30 +139,31 @@ exit_shell:
 
 
 /*
+ ************************************************
  * shellProcedure: 
  *     Procedimento de janela do Shell do Boot Loader. 
- *
  */
-int shellProcedure( unsigned long window, 
-                    unsigned long msg, 
-				    unsigned long long1, 
-				    unsigned long long2 )
+ 
+int 
+shellProcedure ( unsigned long window, 
+                 unsigned long msg, 
+				 unsigned long long1, 
+				 unsigned long long2 )
 {
     unsigned long input_ret;    
+	
 	//Tela para debug em text mode.
    	unsigned char *screen = (unsigned char *) 0x000B8000;      
 
-	//
 	// @todo: 
 	// Esse debug só deve aparecer se estivermos em Text Mode.
-	//
 	
 	//Debug:
 	//if useGUI == 0 (){...}
 	//screen[78] = (char) long1;
 	//screen[79] = (char) 0x09; //blue    
 	
-    switch(msg)
+    switch (msg)
     {      
         case MSG_KEYDOWN:
             switch(long1)
@@ -324,18 +186,18 @@ int shellProcedure( unsigned long window,
 				   };				   
                    break;               
             };
-        break;
+            break;
 		
 		default:
 		    //@todo: Bug Bug, isso pode ser problema.
-			bl_procedure(window, msg, long1, long2);
+			bl_procedure ( window, msg, long1, long2 );
 		    break;	         
     };	
 
-done:	
+//done:
+	
     return (int) 0;	
 };  
-
 
 
 
@@ -344,12 +206,15 @@ done:
  *     Inicializa o prompt do shell.
  *     Limpa o buffer de string.
  */ 
-int shellInitializePrompt()
-{
+ 
+int shellInitializePrompt (){
+	
     int i;
     
 	//@todo: Usar 128.
-	for( i=0; i<250; i++){
+	
+	for ( i=0; i<250; i++){
+		
         prompt[i] = (char) '\0';
     };
     
@@ -365,7 +230,8 @@ int shellInitializePrompt()
 	printf("%c",'_');
 	g_cursor_x--;
  
-done: 
+//done: 
+
     return (int) 0;
 };
 
@@ -375,13 +241,17 @@ done:
  *     Espera completar o comando com um [ENTER].
  *     @todo: Isso pode travar o Boot Loader?!
  */
-void shellWaitCmd()
-{
+ 
+void shellWaitCmd (){
+	
 wcLoop:  
-    if(g_cmd_status == 1){
+    
+	if (g_cmd_status == 1)
+	{
        g_cmd_status = 0;
        return;
     };	
+	
 	goto wcLoop;
 };
 
@@ -392,21 +262,22 @@ wcLoop:
  *     Compara comandos.
  *     Obs: O mini-shell do Boot Loader NÃO deve oferece muitos comandos.
  */
-unsigned long shellCompare()
-{
+ 
+unsigned long shellCompare (){
+	
     unsigned long ret_value;
 	
-	//
+	
 	// Espera o comando terminar.
-	//
 	
 	shellWaitCmd();	
 
 palavra_reservada:
 
     //Cls.
-    if( strncmp( prompt, "cls", 3 ) == 0 ){ 
-	    kclear(0);    //Black.
+    if ( strncmp( prompt, "cls", 3 ) == 0 )
+	{ 
+	    bl_clear(0);    
         goto exit_cmp;
 	};
 	
@@ -438,7 +309,7 @@ palavra_reservada:
 		
 		ret_value = fs_makeboot();
 		if(ret_value != 0){
-		    printf("shell: makeboot fail!");
+		    printf("shell: makeboot fail");
 		};
         goto exit_cmp;
     };
@@ -451,14 +322,14 @@ palavra_reservada:
 	
 	// newfile
 	if( strncmp( prompt, "newfile", 7 ) == 0 ){
-	    printf("~newfile - create empty file.\n");
+	    printf("~newfile - create empty file\n");
 		fsCreateFile( "novo    txt", 0);
         goto exit_cmp;
     };
 	
 	// newdir
 	if( strncmp( prompt, "newdir", 7 ) == 0 ){
-	    printf("~newdir - create empty folder.\n");
+	    printf("~newdir - create empty folder\n");
 		fsCreateDir( "novo    dir", 0);
         goto exit_cmp;
     };
@@ -538,25 +409,23 @@ exit_cmp:
 };
 
 
-
-void shellHelp(){
-	printf("\n help, format, install, makeboot, reboot.\n");
-    return;
+void shellHelp (){
+	
+	printf("\n help, format, install, makeboot, reboot\n");
+    //return;
 };
 
 
-/*
- * boot:
- *    Realiza o boot do sistema.
- */
-void boot()
-{    
+/* boot: Realiza o boot do sistema. */
+
+void boot (){
+    
     /*
 	 * @todo: Chama a re-inicialização do bootloader.
 	 *
 	 */ 
 
-	return;
+	//return;
 };
 
 			 
@@ -571,13 +440,14 @@ void boot()
  *    de arquivos, a falha pode ser reportada ou corrigida.
  *
  */
-void debug()
-{
+ 
+void debug (){
+	
     //procura arquivos corrompidos
+	
 	fs_check_cluster(0);
     
 	fsCheckFat();
-	
 	
 	//fs_test_fat_vector();
 	
@@ -586,46 +456,53 @@ void debug()
     //fs_show_dir(0);	
 	
 	
-done:
+//done:
+
 #ifdef BL_VERBOSE	
-	printf("debug: Done.\n");
+	printf ("debug: Done \n");
 #endif
-	return;
+	
+	//return;
 };
 
 
-void testa_mbr()
-{
-    my_read_hd_sector( MBR_ADDRESS, MBR_LBA, 0, 0);
-    printf("%s",MBR_ADDRESS);	
-    return;   
-}
-
-
-void testa_root()
-{
-    my_read_hd_sector( FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA, 0, 0);
-    printf("%s",FAT16_ROOTDIR_ADDRESS);		
-	return;   
+void testa_mbr (){
+	
+    my_read_hd_sector ( MBR_ADDRESS, MBR_LBA, 0, 0 );
+	
+    printf ("%s", MBR_ADDRESS );
+	
+    //return;   
 };
 
 
-/*
- * reboot:
- *     Reboot.
- */
-void reboot(){
+// Mudar nome.
+void testa_root (){
+	
+    my_read_hd_sector ( FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA, 0, 0 );
+	
+    printf ("%s", FAT16_ROOTDIR_ADDRESS );
+	
+	//return;   
+};
+
+
+/* reboot: Reboot. */
+
+void reboot (){
+	
+	// #bugbug
+	// Devemos chamar asm_reboot()
+	
     asm_shut_down();
 };
 
 
-/*
- * init_shell:
- *    Inicializa o shell do Boot Loader.
- */
-void shellInit()
-{
-    //Checa quem esta tentando inicializar o shell.
+/* init_shell: Inicializa o shell do Boot Loader. */
+
+void shellInit (){
+	
+    // Checa quem esta tentando inicializar o shell.
 	
 	//Prompt
 	prompt[0] = (char) '\0';
@@ -635,12 +512,14 @@ void shellInit()
 	//g_cursor_y = 0;
 	//g_cursor_x = 0;
 	
-done:
+//done:
+
     ShellInitialized = 1;
-    return;
+    
+	//return;
 };
 
 
 //
-// Fim.
+// End.
 //

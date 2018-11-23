@@ -48,7 +48,8 @@ void _outbyte(int c);
 int printf_main(void); //teste ...
 
 void scroll(void);
-int kclear(int color);
+
+int bl_clear(int color);
 int kprintf(char *message, unsigned int line, int color);
 
 //@todo: Não faz parte da libc.

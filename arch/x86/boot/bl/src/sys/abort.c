@@ -12,25 +12,19 @@
  
  
 extern void refresh_screen(); 
+
  
-/*
- * abort:
- *     Função principal para abortar o Boot Loader.
- */ 
- 
+/* abort: Função principal para abortar o Boot Loader. */ 
+
 void abort (){
 	
-	//clear screen
-	//... 
+    printf ("BL.BIN abort");
 	
-//done:
-
-    printf("BL.BIN abort");
-	
-	refresh_screen();
+	refresh_screen ();
 	
 	while (1){
 		
+		asm ("cli");
 		asm ("hlt");
 	};
 };

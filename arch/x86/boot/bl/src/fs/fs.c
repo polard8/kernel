@@ -88,19 +88,19 @@ fatClustToSect ( unsigned short cluster,
 {
     unsigned long C = (unsigned long) cluster;
 
-	//done:	
-
     return (unsigned long) ( ( C - 2 ) * spc) + first_data_sector;
 };
 
 
 /*
  * fatLoadCluster:
- *     Load a clusterfull of data
+ *     Load a cluster full of data
  */
-void fatLoadCluster ( unsigned long sector, 
-                      unsigned long address, 
-					  unsigned long spc )
+ 
+void 
+fatLoadCluster ( unsigned long sector, 
+                 unsigned long address, 
+				 unsigned long spc )
 {
 	unsigned long i;
 
@@ -111,8 +111,6 @@ void fatLoadCluster ( unsigned long sector,
 		
 		address = (unsigned long) address + SECTOR_SIZE;    //+512;
 	};
-	
-	//return;
 };
 
 
@@ -125,6 +123,7 @@ void fatLoadCluster ( unsigned long sector,
  *     Deve ficar em aplicativo de formatação.
  *     Mudar para fsFormat();.
  */
+ 
 void fs_format (){
 	
 	printf ("fs_format:\n");
@@ -154,18 +153,13 @@ unsigned long fs_find_not_empty_entry (){
 };
 
 
-/*
- *
- */
+/* */
 void fs_test_fat_vector (){
-	
-    //return;
+
 };
 
 
-/*
- *
- */
+/* */
 unsigned long fs_get_fat_entry (unsigned long n){
 	
     return (unsigned long) 0;
@@ -184,11 +178,13 @@ unsigned long fs_get_fat_entry (unsigned long n){
  *     +Tamanho do arquivo.
  *
  */
-void fs_create_entry( char *name,  
-                      unsigned long id,
-					  unsigned long eid,
-					  unsigned long cluster,
-					  unsigned long size )
+ 
+void 
+fs_create_entry ( char *name,  
+                  unsigned long id,
+				  unsigned long eid,
+				  unsigned long cluster,
+				  unsigned long size )
 {
     //return;    //Nothing for now.
 };
@@ -211,10 +207,12 @@ fsCreateFileName ( char *name,
  * fsSaveFileName: 
  *     Salva um nome no diretório dado o cluster inicial.
  */
-void fsSaveFileName ( unsigned char *name, 
-                      unsigned long id, 
-				      unsigned long eid, 
-				      unsigned long initial_cluster )
+ 
+void 
+fsSaveFileName ( unsigned char *name, 
+                 unsigned long id, 
+				 unsigned long eid, 
+				 unsigned long initial_cluster )
 {        
 	//return;    //Nothing for now.
 };
@@ -226,54 +224,41 @@ void fsSaveFileName ( unsigned char *name,
  */
 void fs_save_entry_on_disc ( unsigned long id, unsigned long eid ){
 	
-	//return;
 };
 
 
-/*
- *
- */
+/* */
  
 void fs_set_structures (){
 	
-   //return;
 };
 
 
-/*
- *
- */
+/* */
 
 void fs_set_entry ( unsigned long id, unsigned long eid ){
 	
-    //return;
 };
 
 
-/*
- *
- */
+/* */
+
 void fs_get_entry ( unsigned long id, unsigned long eid ){
- 	
-    //return; 
+ 	 
 };
 
   
-/*
- *
- */
+/* */
+
 void fs_show_dir_entry ( unsigned long id, unsigned long eid ){
-	
-	//return; 
+	 
 };
 
 
-/*
- *
- */
+/* */
+
 void fs_show_dir (unsigned long id){
-	
-    //return; 
+	 
 };
 
 
@@ -287,6 +272,7 @@ void fs_show_dir (unsigned long id){
  *
  *     Obs: Pertence ao Boot Loader.
  */
+ 
 unsigned long fs_check_cluster (unsigned long id){
 	
 	return 0;    // Ainda não implementada.
@@ -314,9 +300,9 @@ unsigned long fs_check_cluster (unsigned long id){
  *          carregar arquivos e não salvar arquivos.
  *          
  */
+ 
 void fsSaveRootDir (){
 	
-	//return;    //Ainda não implementada.
 };
 
 
@@ -327,7 +313,6 @@ void fsSaveRootDir (){
  */
 void fs_load_dir (unsigned long id){
     
-	//return;    //Ainda não implementada.
 };
 
 
@@ -342,12 +327,10 @@ void fs_save_dir (unsigned long id){
 };
 
 
-/*
- *
- */
+/* */
+
 void fs_save_structure (){
 	
-	//return;    //Ainda não implementada.
 };
 
 
@@ -383,28 +366,23 @@ void fs_delete_entry (unsigned long id, unsigned long eid){
 };
 
 
-/*
- *
- */
+/* */
+
 void fs_init_bootfile_struct (){
 	
-	//return;    //Ainda não implementada.
 };
 
 
-/*
- *
- */
-unsigned long 
-fs_get_entry_status (unsigned long id, unsigned long eid)
-{
+/* */
+
+unsigned long fs_get_entry_status (unsigned long id, unsigned long eid){
+	
     return 0;    //Ainda não implementada.
 };
 
 
-/*
- *
- */
+/* */
+
 void 
 fs_set_entry_status ( unsigned long id, 
                       unsigned long eid, 
@@ -424,12 +402,10 @@ unsigned long fs_makeboot (){
 };
 
 
-/*
- *
- */											 
+/* */
+											 
 void fs_set_fat_entry (unsigned long n, unsigned long value){
 	
-    //return;
 };
 
 
@@ -464,7 +440,6 @@ void fs_relood_dir (unsigned long id){
 };
 
 
-
 /*
  *****************************************************************
  * fsLoadFile:
@@ -477,9 +452,10 @@ void fs_relood_dir (unsigned long id){
  *     +Mudar o tipo de retorno para 'int'.
  *     +...
  */
+ 
 unsigned long 
-fsLoadFile( unsigned char *name, 
-            unsigned long address )
+fsLoadFile ( unsigned char *name, 
+             unsigned long address )
 {
 	int Status;
 	
@@ -596,7 +572,7 @@ found:
 	//fs_load_fatEx();
 	
 	
-	if( g_fat16_fat_status != 1 )
+	if ( g_fat16_fat_status != 1 )
 	{
         printf("fsLoadFile: FAT Status \n");     
         goto fail;
@@ -643,10 +619,11 @@ while(1)
  *	
  */
  
-	//Ler um setor. 
-	//(data_area_base + next_cluster - 2)
-	//512 bytes por cluster.
-	read_lba( address, FAT16_DATAAREA_LBA + cluster -2 ); 
+	// Ler um setor. 
+	// (data_area_base + next_cluster - 2)
+	// 512 bytes por cluster.
+	
+	read_lba ( address, FAT16_DATAAREA_LBA + cluster -2 ); 
 	
 	//Incrementa o buffer. +512;
 	address = (unsigned long) address + SECTOR_SIZE;    
@@ -658,9 +635,9 @@ while(1)
 	cluster = (unsigned short) next;
 	
 	//Ver se o cluster carregado era o último cluster do arquivo.
-	if( cluster == 0xFFFF || 
-	    cluster == 0xFFF8)
-	{ 
+	
+	if ( cluster == 0xFFFF || cluster == 0xFFF8 ){
+		
 	    goto done; 
 	};
 	
@@ -672,20 +649,25 @@ while(1)
 	goto next_entry;
 	
 	
-//
-// Fail: O arquivo não pode ser carregado.
-//		
+   //
+   // Fail: O arquivo não pode ser carregado.
+   //		
+
 fail:
 	printf("fsLoadFile: Fail\n");
     refresh_screen();	
     return (unsigned long) 1;
 	
-// Done: Arquivo carregado com sucesso.
+    // Done: 
+	// Arquivo carregado com sucesso.
+	
 done:
+
 #ifdef BL_VERBOSE
     printf("fsLoadFile: Done\n");
 	refresh_screen(); 
 #endif
+
     return (unsigned long) 0;
 };
 
@@ -695,6 +677,7 @@ done:
  * fsSearchFile: 
  *    Procura um arquivo no diretório raiz.
  */
+ 
 unsigned long fsSearchFile (unsigned char *name){
 	
     int Status;
@@ -789,6 +772,7 @@ unsigned long fsSearchFileName ( unsigned char *name ){
  *    512 entradas de 32 bytes cada.
  *
  */
+ 
 void fs_load_rootdirEx (){
 	
 	unsigned long i;
@@ -810,8 +794,8 @@ void fs_load_rootdirEx (){
 	
 	//@todo: test ??
 
-done:	
-    return;
+//done:	
+    //return;
 };
 
 
@@ -820,6 +804,7 @@ done:
  *     Carrega a FAT na memória. (size = 64 setores).
  *
  */
+ 
 void fs_load_fatEx (){
 	
 	unsigned long i;
@@ -853,29 +838,33 @@ void fs_load_fatEx (){
  *     Grava na fat uma lista de clusters.
  *     Uma lista de clusters, forma um arquivo.
  */
-void fs_put_list_on_fat()
-{
+ 
+void fs_put_list_on_fat (){
+	
     unsigned short i;
     unsigned short lista_size = 1024;
 	
-    for( i = 0; i < lista_size; i++)
+    for ( i=0; i < lista_size; i++ )
 	{
         //último elemento da lista.
-		if( file_cluster_list[i] == 0xFFFF || file_cluster_list[i] == 0xFFF8 )
+		if ( file_cluster_list[i] == 0xFFFF || 
+		     file_cluster_list[i] == 0xFFF8 )
         {
-	        fs_set_fat_entry( file_cluster_list[i], 0xFFFF);
-			goto done;
+	        fs_set_fat_entry ( file_cluster_list[i], 0xFFFF );
+			return;
+			//goto done;
         };
 		
 		//um elemento qualquer da lista.
-   	    if(file_cluster_list[i] > 0 && file_cluster_list[i] < lista_size )
+   	    if ( file_cluster_list[i] > 0 && 
+		     file_cluster_list[i] < lista_size )
         {	
-	        fs_set_fat_entry( file_cluster_list[i], file_cluster_list[i+1]);
+	        fs_set_fat_entry ( file_cluster_list[i], file_cluster_list[i+1] );
         };
     };
 	
-done:
-    return;
+//done:
+    //return;
 };
 
 
@@ -883,18 +872,22 @@ done:
  * fs_find_n_empty_entries:
  *
  */
-unsigned long fs_find_n_empty_entries(unsigned long n)
-{
+ 
+unsigned long fs_find_n_empty_entries (unsigned long n){
+	
     unsigned long i;
 	unsigned long l;
 	unsigned short empty;
 	unsigned short lista_size = 1024;
 	
 	//@todo: Pegar de estrutura.
-	unsigned short fat_max = (64*512/2);    //Número max de entradas na FAT.
+	//Número max de entradas na FAT.
+	unsigned short fat_max = (64*512/2);    
 	
 	// Limits.
-	if(n < 0 || n > lista_size){
+	
+	if ( n < 0 || n > lista_size )
+	{
 	    goto fail;
 	};
 	
@@ -929,14 +922,11 @@ fail:
 };
 
  
-/*
- * fs_load_rootdir: 
- *     Carrega o diretório raiz na memória.
- */ 
-void fs_load_rootdir(){
+/* fs_load_rootdir: Carrega o diretório raiz na memória. */ 
+ 
+void fs_load_rootdir (){
 	
-    fs_load_rootdirEx();
-	//return;
+    fs_load_rootdirEx ();
 };
 
 
@@ -945,11 +935,10 @@ void fs_load_rootdir(){
  *     Lê uma lba no hd. (um setor)
  *     Operação de hardware.
  */
-void read_lba( unsigned long address, unsigned long lba){   
+ 
+void read_lba ( unsigned long address, unsigned long lba){   
     
-    my_read_hd_sector( address, lba, 0, 0);
-    
-	//return;
+    my_read_hd_sector ( address, lba, 0, 0 );
 };
 
 
@@ -957,11 +946,10 @@ void read_lba( unsigned long address, unsigned long lba){
  * write_lba: 
  *     Grava uma lba no HD. (um setor).
  */
-void write_lba( unsigned long address, unsigned long lba){    
  
-    my_write_hd_sector( address, lba, 0, 0);     
-    
-	//return;
+void write_lba ( unsigned long address, unsigned long lba ){    
+ 
+    my_write_hd_sector ( address, lba, 0, 0 );     
 };
 
 
@@ -970,11 +958,21 @@ void write_lba( unsigned long address, unsigned long lba){
  * Salvando um arquivo.
  * @todo: Manter a estrutura dessa função mas mudar as rotinas chamadas.
  *           A lib C chama essa função.
+ * #todo: A rotina do kernel funciona bem.
  */
-unsigned long fsSaveFile( unsigned char *file_name, 
-                          unsigned long file_size, 
-						  unsigned long file_address )  
+ 
+unsigned long 
+fsSaveFile ( unsigned char *file_name, 
+             unsigned long file_size, 
+			 unsigned long file_address )  
 {
+	
+	//#suspensa.
+	
+	return 0;
+	
+	/*
+	
     unsigned long i;  //Deslocamento. Procurando espaço livre.
     unsigned long j;  //Deslocamento. Salvando cluster number.
     unsigned long c;
@@ -986,7 +984,12 @@ unsigned long fsSaveFile( unsigned char *file_name,
     unsigned long endereco;  //File address.    	
 	unsigned long *fat_base = (unsigned long *) FAT16_FAT_ADDRESS; 
 	//Obs: Endereço imposto.
-    //@todo: Alocar dinâmicamente.
+    
+	//
+	// #### BUGBUG ####
+	// ENDEREÇO.
+	
+	//@todo: Alocar dinâmicamente.
     unsigned long *list = (unsigned long *) 0x04600000;  //@todo: Rever esse endereço.    
 	
 	//@todo: Check file address limits.
@@ -1106,25 +1109,24 @@ done:
     write_lba(FAT16_FAT_ADDRESS + 0x200, FAT16_FAT_LBA + 1);
     
 	return (unsigned long) 0;
+	*/
 };
 
 
-/*
- * fsCreateDir:
- *     Cria um diretório.
- */	
-unsigned long fsCreateDir( char *name , unsigned long id)
-{
-	return fsCreateFile(name,id);  //Provisório. 
+/* fsCreateDir: Cria um diretório. */
+	
+unsigned long fsCreateDir ( char *name , unsigned long id ){
+	
+	//#bugbug 
+	
+	return fsCreateFile ( name, id );   
 };
 
 
-/*
- * fsCreateFile:
- *     Cria um arquivo.
- */
-unsigned long fsCreateFile( char *name, unsigned long id)
-{
+/* fsCreateFile: Cria um arquivo. */
+
+unsigned long fsCreateFile ( char *name, unsigned long id ){
+	
     unsigned long fat_entry;
     unsigned long dir_entry;
 	unsigned long size = 1;
@@ -1141,7 +1143,7 @@ unsigned long fsCreateFile( char *name, unsigned long id)
 			
 	//erro 2 - nao ha mais entradas vazias
 	if( fat_entry == FAT_ERRO_1 ){
-		printf("FAT_ERRO_1 nao ha mais entradas vazias!\n" );
+		printf("FAT_ERRO_1 nao ha mais entradas vazias\n" );
 		goto fail;
 	};
 		
@@ -1163,7 +1165,8 @@ unsigned long fsCreateFile( char *name, unsigned long id)
         goto fail;		
 	};	
   		 
-	if(dir_entry < 0 || dir_entry > 64){
+	if ( dir_entry < 0 || dir_entry > 64 )
+	{
         printf("fs_create_file: entrada fora dos limites\n");
         goto fail;		
 	};	
@@ -1188,10 +1191,9 @@ fail:
  * fsClearFat:
  *     Apaga a fat, colocando zero em tudo.
  */
-void fsClearFat()
-{
+void fsClearFat (){
+	
     fsInitFat();  //Provisório.	 
-    //return;
 };
 
 
@@ -1257,10 +1259,12 @@ void fsInitStructures(){
 
 
 /*
+ ***************************************************************
  * fsInit:
  *     Inicializa o sistema de arquivos da partição do sistema.
  *     Obs: Isso deve ficar no fim do arquivo.
  */
+ 
 int fsInit (){
 	
 
@@ -1275,8 +1279,6 @@ int fsInit (){
 	fsInitFat();
 
 	//More?!
-
-//done:
 
     return (int) 0;
 };

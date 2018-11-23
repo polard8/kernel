@@ -8,7 +8,7 @@
  *     Inclui vsync.
  *     @todo: Seguir o padrão C99 de headers.
  *
- * Versão 1.0, 2015.
+ * 2015 - Created by Fred Nora.
  */
 
  
@@ -23,22 +23,23 @@ extern void my_buffer_load_bitmap_16x16();
  *     Mensagem para erro fatal.
  *     @todo: Change system color to red.
  */
-void panic(const char *msg) 
-{
-    printf("panic: %s\n",msg);
-    die();
-	//refresh_screen();
-    //while(1){};
+ 
+void panic (const char *msg){
+	
+    printf ("panic: %s", msg );
+    die ();
 };
 
 
 /*
  * scroll:
  *     Scroll the screen in text mode.
+ *     #bugbug: Na verdade só usmos modo gráfico ainda.
  */
-void scroll(void)
-{
-    unsigned short i,j;
+ 
+void scroll (void){
+	
+    unsigned short i, j;
     
 	//inicio da tela
 	unsigned short *p1 = (unsigned short *) ScreenStart;
@@ -62,18 +63,15 @@ void scroll(void)
 	};
 
 //Done.
-done:	
-	return;
+//done:	
+	//return;
 };
 
 
-/*
- * kclear:
- *    Limpa a tela em text mode.
- *    @todo: mudar para bl_clear().
- */
-int kclear(int color)
-{ 
+/* bl_clear: Limpa a tela em text mode. */
+ 
+int bl_clear (int color){
+	
     unsigned int i = 0;
     char *vidmemz = (char *) 0x000B8000; 
 

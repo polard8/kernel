@@ -74,7 +74,9 @@ void BlSetupPaging();
  *     + Retorna para head.s, o código em 
  *       assembly que chamou essa rotina.
  */
+ 
 //void BlMain( int argc, char *argv[], char *envp[] ) 
+
 void BlMain (){
 	
     //Set GUI.
@@ -83,7 +85,7 @@ void BlMain (){
 	//VideoBlock.useGui = 0;				
 	
 	//INIT ~ Faz inicializações básicas.
-	init(); 
+	init (); 
 	
 	
 	//
@@ -93,15 +95,16 @@ void BlMain (){
 	//Welcome Message.
 	//banner
 #ifdef BL_VERBOSE		
-	printf("BL.BIN: Starting Boot Loader..\n");	
+	printf("BlMain: Starting Boot Loader..\n");	
 #endif    
 	
 	//Debug:
 	//kprintf( "BlMain: Boot Loader 32 bits em C (TEXT Mode) #test. #hang", 9, 9 );
 	//while(1){}
 
-    if(g_initialized != 1){
-		printf("BlMain:");
+    if (g_initialized != 1)
+	{
+		printf ("BlMain:");
 		die();
 	}
 
@@ -112,12 +115,11 @@ void BlMain (){
 	//refresh_screen();
 	//while(1){}
 	
-	//
+
 	//*Importante:
     // ===========
     //     Daqui pra frente vamos carregar os arquivos. Lembrando que
     // o Boot Loader ainda não sabe carregar de outro dispositivo se não IDE. 
-	//
     
     //
 	// Inicia os carregamentos.
@@ -125,15 +127,15 @@ void BlMain (){
 	
 	//Carrega arquivos.	
 #ifdef BL_VERBOSE	
-    printf("BlMain: LOADING FILES ...\n");
+    printf("BlMain: Loading files..\n");
     refresh_screen();
 #endif
 
-    //
+    
 	// #importante:
 	// Carregando o diretório raiz e a fat na memória.
 	// Evitando repetição de carregamento.
-	//
+	
 	
 	// Ok isso deu certo.
 	fs_load_rootdirEx();
@@ -143,21 +145,27 @@ void BlMain (){
     g_fat16_fat_status = 1;	
 
 	
-	//printf("Loading kernel base ...\n");
-    BlLoadKernel();
-	
 	//
+	//  ## Loading files ... ##
+	//
+	
+	//loading kernel base.
+	
+    BlLoadKernel ();
+	
+	
 	// @Todo: (Pensando na possibilidade)
 	// Aqui podemos ter acondição de carregarmos apenas o krnel base.
 	// Essa opção deverá ser habilitada através de um arquivo de configuração.
 	// Ou no header do kernel base poderá ter a indicação de quais módulos 
 	// deve-se carregar.
-	//
 	
-	//printf("Loading files ...\n");
-	BlLoadFiles();
+	
+	//Loading files.
+	
+	BlLoadFiles ();
 
-    //
+    
     // Paging:
     //     Depois carregar o kernel e os módulos 
 	//     nos seus endereços físicos, 
@@ -169,7 +177,7 @@ void BlMain (){
 	// Obs:
 	//     Essa configuração básica não impede
 	//     que o kernel faça uma reconfiguração completa.
-    //
+    
 #ifdef BL_VERBOSE	
 	printf("BlMain: Initializing pages..\n");
 	//refresh_screen();
@@ -179,25 +187,26 @@ void BlMain (){
     
 	//@todo: Atualizar status.
  	
+	
+  // Done:
+  //     Ao retornar, head.s configura CR0 e CR3.	
 
-//	
-// Done:
-//     Ao retornar, head.s configura CR0 e CR3.	
-//
-done:
+//done:
 	
     //Debug message.
+	
 //#ifdef BL_VERBOSE	
 //	printf("BlMain: LFB={%x} \n",g_lbf_pa);	
 //#endif
 
 #ifdef BL_VERBOSE	
-    printf("BlMain: Done.\n");
+    printf("BlMain: Done\n");
     //printf("#DEBUG: *HANG\n");		
 	refresh_screen();
     //while(1){};	
 #endif	
-	return;
+
+	//return;
 };
 
 
@@ -211,11 +220,11 @@ void BlLoadKernel (){
 	
     int Status;
 	
-	Status = (int) load_kernel();	
+	Status = (int) load_kernel ();	
 	
 	if ( Status != 0 )
 	{
-		printf("BlLoadKernel:\n");
+		printf ("BlLoadKernel:\n");
 	    die();		
 	};
 };
@@ -234,12 +243,12 @@ void BlLoadFiles (){
 	int Status;
 	
 	// Está em loader.c
-	Status = (int) load_files();
+	Status = (int) load_files ();
 	
 	if ( Status != 0 )
 	{
 	    //Erro fatal.
-		printf("BlLoadFiles:\n");
+		printf ("BlLoadFiles:\n");
 	    die();	
 	};
 };
@@ -277,7 +286,7 @@ void BlLoadFiles (){
  */ 
 void BlSetupPaging (){
 	
-    SetUpPaging();
+    SetUpPaging ();
 };
 
 
@@ -287,16 +296,16 @@ void BlSetupPaging (){
  *     Rotina para abortar o bootloader em caso de erro grave.
  */
 void BlAbort (){
-	//
+	
+	
 	//@todo: 
 	//    Talvez poderia ter uma interface antes de chamar a rotina abort().
 	//
 	//ex:
 	//checks()
-	//
 	
-    abort(); 
-    die();	
+    abort (); 
+    //die ();	
 };
 
 
@@ -307,6 +316,7 @@ void BlAbort (){
  * módulo do kernel em kernel mode.
  *
  */
+ 
 void BlKernelModuleMain (){
 	
     printf("BlKernelModuleMain: Boot Loader\n");
@@ -322,13 +332,14 @@ void BlKernelModuleMain (){
  * estado hlt durante um erro fatal. Para que ele não fique 
  * funcionando a 100% num loop infinito.
  */
+ 
 void die (){
 	
     // Final message !
 	// Bullet, Message.
     
-	printf("* System Halted!");    
-	refresh_screen();
+	printf ("* System Halted");    
+	refresh_screen ();
 	   
 	// Wait forever. 
     // Halt system.	
