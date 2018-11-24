@@ -5,4 +5,4 @@
 	+ testing return constant.
 	+ testing spaces.*/
 
-int main(){/*comment 2*/return 0x4321;};
+int main (){/*comment 2*/return 0x4321;};

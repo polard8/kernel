@@ -22,6 +22,8 @@
 #include "parser.h"
 #include "gramcc.h"
 
+#include "tree.h"
+
 
 int parse_function ( int token );
 int parse_return ( int token );
@@ -393,6 +395,12 @@ int parse_return ( int token ){
 						strcat( outfile,"\n  ret \n\n");
                         //strcat( outfile,"");							
 						
+						// se parênteses aberto.
+						//if ( open == 1 )
+						//{
+						//    struct tree_node *n = (struct tree_node *) create_tree_node ( ?, NULL, NULL );	
+						//}
+						
 						//Se não temos um parêntese aberto então vamos para o próximo
 						//que deverá ser um ';'
 						
@@ -407,9 +415,12 @@ int parse_return ( int token ){
 						break;
 					
 					
-
+                     
 					case TOKENSEPARATOR:
-	                    if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+	                    
+						//iniciamos uma expressão ou condicional.
+						//uma árvore.
+						if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
 						    open = 1;
 						}
@@ -763,7 +774,7 @@ int parse (){
 						    goto again;
 					    }
 						//EOF 
-						if( c = TOKENEOF )
+						if( c == TOKENEOF )
 						{
 						    printf("State1: eof\n");
                             goto debug_output; 							

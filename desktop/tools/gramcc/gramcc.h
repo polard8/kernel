@@ -84,6 +84,8 @@ int stack_flag;    //aciona para sinalizar que devemos colocar o próximo elemen
 #define ID_VALUE 3   // o valor armazenado na variável. 
 #define ID_ADDRESS 4 //o endereço de memória referente ao ideitificador.Com base no endereço inicial da compilação.
 #define ID_TYPE 5    // qual é o tipo de dado armazenado na variável, caso seja uma variável. Ou qual é o tipo de retorno da função.
+#define ID_INDEX 6   //qual é o indice desse identificador pra gente usar nas expressões matemáticas.
+
 //...
 #define ID_CLASS_VAR       100
 #define ID_CLASS_STRING    101
@@ -102,8 +104,9 @@ int id[8];
 // 
 
 #define CONSTANT_TOKEN 0
-#define CONSTANT_TYPE 0  //1=byte 2=word 4=dword
-#define CONSTANT_BASE 1  //2=binário 8=octal 10=decimal 16=hexadecimal
+#define CONSTANT_TYPE 1  //1=byte 2=word 4=dword
+#define CONSTANT_BASE 2  //2=binário 8=octal 10=decimal 16=hexadecimal
+#define CONSTANT_INDEX 3 //qual é o índice dessa constante pra gente usar nas expressões.
 //...
 
 #define CONSTANT_TYPE_BYTE 1
@@ -133,6 +136,8 @@ char constant_before[2];
 //o que colocar depois dessa constante.
 //isso varia com a base
 char constant_aftes[2];
+
+
 
 
 //#TODO RETURN SUPPORT;
