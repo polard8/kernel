@@ -706,7 +706,7 @@ again:
 			constant_done:
             break;
 			
-
+        //String
         case '\"':
         {
 	        c = getc(finput);

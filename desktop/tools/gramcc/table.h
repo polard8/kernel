@@ -81,8 +81,8 @@ typedef enum {
 	KWVOLATILE,
 	KWINLINE,
 	KWSTATIC,
-	KWDEF,
-	KWVAR
+	KWDEF,          //não faz parte da linguagem c
+	KWVAR           //não faz parte da linguagem c 
 	
 	//...
 }keywords_t;

@@ -12,6 +12,8 @@ int test_function ( int x, int y ){
     //return function1();
     //test_label_inside:
 	
-    return (1111 + 2222);
+    //return (1111 + 2222);
+	
+	return  functionfake(); 
 };
 
