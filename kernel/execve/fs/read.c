@@ -47,6 +47,7 @@
  *     não tem protótipo ainda.
  * Credits: Luiz Felipe
  */
+ 
 void read_fntos ( char *name ){
 	
     int  i, ns = 0;
@@ -236,20 +237,11 @@ fsLoadFile ( unsigned char *file_name,
     int Status;		
 	int i;
     unsigned short next;
-
 	
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 	char NameX[13];	           //??Nome. 
-
-	// #importante:
-	// Poderíamos usar malloc ou alocador de páginas ??	
-    // A FAT permanece a mesma para a situaçãod e termos apenas uma partição.
-	//mas se tivermos mai de uma partição também precisamos carregar a FAT 
-	//da partição atual.
-	unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
-	unsigned short cluster;    //Cluster inicial
 
     //??	
 	unsigned long S;  //Primeiro setor do cluster.
@@ -258,20 +250,68 @@ fsLoadFile ( unsigned char *file_name,
 	// #importante:
 	// Poderíamos usar malloc ou alocador de páginas ??
 	// #todo: Devemos carregar o diretório atual.
-    unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
+    //unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
 
-	// #todo: Devemos carregar o diretório atual.
-	//unsigned long current_dir_address = (unsigned long) Newpage();
-    //#todo: devemos checar se o endereço é válido.
-	//unsigned short *current_dir = (unsigned short *) current_dir_address;	
-	// #todo: devemos chamar uma função que carregue um diretório no endereço passado 
-	//via argumento.
-    //...
+	//
+	// ## Current directory ##
+	//
+	
+	// #todo: 
+	// Devemos carregar o diretório atual.
+	// Podemos ter um buffer alocado anteriormente, onde sempre 
+	// carregaremos o diretório atual no mesmo endereço.
+	// #obs: Devemos levar em consideração o tamanho do diretório.
+	// #obs: Já temos uma função que nos retorna o tamanho de um arquivo.
+	
+	// #importante:
+	// #todo:
+	// Devemos configurar esse endereço global e alocar algum buffer pra ele.
+    // Isso deve ser feito na inicialização do /fs 
+	// #todo: essa variável ainda precisa ser criada. (deletar current_dir_address)
+	
+	if ( g_current_dir_address == 0 )
+	{
+		printf ("fsLoadFile: dir buffer fail");
+		die();
+	}
+	
+	//VOLUME1_ROOTDIR_ADDRESS;
+	unsigned short *current_dir = (unsigned short *) g_current_dir_address;  
+	
+	
+	// #importante:
+	// Poderíamos usar malloc ou alocador de páginas ??	
+    // A FAT permanece a mesma para a situaçãod e termos apenas uma partição.
+	//mas se tivermos mai de uma partição também precisamos carregar a FAT 
+	//da partição atual.
+	unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
+	unsigned short cluster;    //Cluster inicial
+	
+	
 	
 	// Lock ??.
 	
 	//taskswitch_lock();
 	//scheduler_lock();	
+	
+	
+	//
+	// ## Load current directory ##
+	//
+	
+	// Aqui estamos carregando o diretório raiz em seu endereço padrão.
+	// Mas a intenção é carregarmos um diretório qualquer no endereço padrão 
+	// do buffer do diretório atual ...
+	// Se alocarmos um novo endereço para o novo diretório devemos 
+	// então atualizarmos o penteiro para o buffer do diretório atual,
+	// apontando então para esse novo buffer.
+	
+	
+	//#todo:
+	//Carregaremos o diretório atula, de onde a função procurará 
+	//o nome do arquivo a ser carregado.
+	//fs_load_current_directory()
+	
 	
 	// Root dir.
 
@@ -283,8 +323,40 @@ fsLoadFile ( unsigned char *file_name,
 	printf("fsLoadFile: Loading root..\n"); 
 #endif	
 	
-	//carregando o diretório raiz.
-	fs_load_rootdirEx ();
+	//carregando o diretório raiz em VOLUME1_ROOTDIR_ADDRESS.
+	//que é o endereço do diretório atual no momento. 
+	// mas a intenção aqui é carregarmos o diretório atual no endereço do diretório atual.
+	//?? onde fica o nome do diretório atual ?? g_current_dir_name[32].
+	//esse não será o path name e sim apenas o nome. pois o pathname fica em outro lugar.
+	
+	
+	//#importante 
+	//se temos um diretório atual, carregaremos ele, senão usaremos o diretório raiz.
+	if (current_dir_initialized == 1)
+	{
+		//#importante 
+		//se está inicializado, significa que temo um nome no buffer de nome
+		//e um buffer para carregar o diretório.
+		
+	    // load dir by name	
+		
+		//bugbug: não podemos reentrar na funçao.	
+		
+		fs_load_rootdirEx ();	
+		
+	}else{
+		
+		//o endereço do diretório raiz é sempre o mesmo.
+	    fs_load_rootdirEx ();	
+	}
+	
+	//
+	// ## Struct ##
+	//
+	
+	// #importante:
+	// Essa estrutura pode gerencial qual será o endereço do diretório atual.
+	// então podemos carregar o diretório com base em informações dessa estrutura.
 	
 	//#todo:
 	//precisamos na verdade carregarmos o diretório corrente.
@@ -316,6 +388,10 @@ fsLoadFile ( unsigned char *file_name,
 	        printf("fs-read-fsLoadFile: max\n");
 			goto fail;
 	    };
+		
+		
+		//Current dir address.
+		//filesystem->current_dir_address = (unsigned long) g_current_dir_address;
 		
 	    // More?! 
 		// ...
@@ -354,10 +430,10 @@ fsLoadFile ( unsigned char *file_name,
 	while ( i < max )
 	{
 		//Se a entrada não for vazia.
-		if ( root[z] != 0 )
+		if ( current_dir[z] != 0 )
         {
 			// Copia o nome e termina incluindo o char 0.
-			memcpy( NameX, &root[z], size );
+			memcpy( NameX, &current_dir[z], size );
 			NameX[size] = 0;
 			
             // Compara 11 caracteres do nome desejado, 
@@ -393,7 +469,7 @@ found:
 	// while(1){}
 	
     //Pega o cluster inicial. (word)
-	cluster = root[ z+13 ];    //(0x1A/2) = 13.	
+	cluster = current_dir[ z+13 ];    //(0x1A/2) = 13.	
 	
 	
 	// Cluster Limits.
@@ -521,6 +597,10 @@ load_directory( unsigned long address,
                 unsigned long lba, 
 				unsigned sectors )
 {
+	
+	//#bugbug ;;; isso carrega setores sequenciais.
+	
+	
 	unsigned long i;
 	unsigned long b = 0;
 	

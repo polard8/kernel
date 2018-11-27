@@ -56,10 +56,23 @@ char *current_volume_string;
 #define FS_SYSTEMWORKINGDIRECTORY_STRING  "volume2"
 #define FS_UNKNOWNWORKINGDIRECTORY_STRING "unknown-directory"
 
+
+// a string do diretório de trabalho.(pathname)
 #define WORKINGDIRECTORY_STRING_MAX 32
-// a stringo do diretório de trabalho.
 char current_workingdiretory_string[WORKINGDIRECTORY_STRING_MAX];
 int pwd_initialized;
+
+
+//
+// ## current dir ##
+//
+
+unsigned long g_current_dir_address;
+
+// a string do diretório atual. Só o nome. isso não é o pathname.
+#define CURRENTDIR_STRING_MAX 32
+char current_dir_string[CURRENTDIR_STRING_MAX];
+int current_dir_initialized;
 
  
 //atualiza a string do pwd na estrutura do processo. 
@@ -67,7 +80,8 @@ int fs_initialize_process_pwd ( int pid, char *string );
 int fs_print_process_pwd ( int pid );
 
 
-
+//só o nome, não é um pathname.
+void setup_current_dir_string ( char *name );
 
 
 /*
@@ -673,11 +687,15 @@ struct filesystem_d
 	unsigned long fat_lba;      //lba
 	
     unsigned long dataarea_address; //endereço do inicio da area de dados.
-    unsigned long dataarea_lba;   //lba
+    unsigned long dataarea_lba;   //lba	
 	
 	int spc; //Sectors per cluster.
     int rootdir_entries; //numero de entradas no rootdir.
 	int entry_size;      //tamanho da entrada em bytes.
+	
+	
+	unsigned long current_dir_address; //endereço do diretório atual.
+    unsigned long current_dir_lba;     //lba
 	
 	//...
 };

@@ -144,11 +144,22 @@ echo -{ ...
 	rem o Windows como host.
 	rem 
 	
+	
+	REM mkdir F:\BOOT
     mkdir F:\DEV
     mkdir F:\SECURITY
+	REM mkdir F:\SYSTEM
 	mkdir F:\TOOLS
 	mkdir F:\USERS
 	
+	
+	REM USERS TEST
+	REM VAMOS TENTAR LER ALGUM DESSES ARQUIVOS DE TEXTO.
+	copy c:\gramado\arch\x86\boot\vhd\*.TXT  F:\USERS\*.TXT
+	
+	
+	REM SYSTEM 
+	REM copy c:\gramado\bin\*.BIN   F:\SYSTEM\*.BIN
 	
 	REM 
 	REM  /DB

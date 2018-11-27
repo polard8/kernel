@@ -1,4 +1,6 @@
 
-# todo
-
-& "./gcc.exe" "./k/main.c"
+    # todo
+    echo Building x86 kernel on Windows host.
+	
+    ./build-x86-win
+	
