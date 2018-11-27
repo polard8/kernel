@@ -526,8 +526,8 @@ system_procedure ( struct window_d *window,
 					
 					
 					//1 = initialize.
-					diskATADialog ( 1, FORCEPIO, FORCEPIO );
-					show_ide_info ();
+					diskATADialog ( 1, FORCEPIO, FORCEPIO ); //disk1.c
+					show_ide_info ();   //disk1.c
                     //rotina provisória de teste de read.
 					//procTestF6();
 					

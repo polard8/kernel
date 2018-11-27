@@ -33,10 +33,8 @@ void diskShowCurrentDiskInfo (){
 //Mostra informações sobre um disco dado seu descritor.
 int diskShowDiskInfo ( int descriptor ){
 	
-	/*
-	
-	struct disk_d *d;
-	
+ 
+
 	//#debug
 	printf("diskShowDiskInfo:\n\n");
 	
@@ -47,31 +45,35 @@ int diskShowDiskInfo ( int descriptor ){
 		goto fail;
 	}		
 	
-	d = (struct disk_d *) diskList[descriptor];
+	//d = (struct disk_d *) diskList[descriptor];
 	
-	if ( (void *) d == NULL )
+	if ( descriptor < 0  )
 	{
 		printf("struct fail\n");
 		goto fail;
 		
 	} else {
 		
-		if ( d->used != 1 || d->magic != 1234 ){
-			
+		if ( DISKS[descriptor].used != 1 || 
+		     DISKS[descriptor].magic != 1234 )
+	    {	
 			printf("flags fail\n");
 			goto fail;
 		}		
 		
-		printf ("id={%d} used={%d} magic={%d} \n", d->id, d->used, d->magic );
+		printf ("id={%d} used={%d} magic={%d} \n", 
+		    DISKS[descriptor].id, 
+			DISKS[descriptor].used, 
+			DISKS[descriptor].magic );
 		
-		printf ("diskType={%d}\n", d->diskType );
-		printf("name={%s}\n", d->name );		
+		printf ("diskType={%d}\n", DISKS[descriptor].diskType );
+		printf("name={%s}\n", DISKS[descriptor].name );		
 		//...
 		goto done;
 	};
 	
 	
-	*/
+	 
 	goto done;
 	
 	
@@ -357,9 +359,7 @@ void volumeShowCurrentVolumeInfo (){
 int volumeShowVolumeInfo ( int descriptor ){
 	
 	
-	/*
-	
-	struct volume_d *v;
+	//struct volume_d *v;
 	
 	printf("volumeShowVolumeInfo:\n");
 	
@@ -370,9 +370,9 @@ int volumeShowVolumeInfo ( int descriptor ){
 	}	
 	
 	
-	v = (struct volume_d *) volumeList[descriptor];
+	//v = (struct volume_d *) volumeList[descriptor];
 	
-	if( (void *) v == NULL )
+	if( descriptor < 0 )
 	{
 		printf("struct fail\n");
 		goto fail;
@@ -380,25 +380,26 @@ int volumeShowVolumeInfo ( int descriptor ){
 	}else{
 		
 		
-		if( v->used != 1 || v->magic != 1234 )
+		if ( VOLUMES[descriptor].used != 1 || 
+		     VOLUMES[descriptor].magic != 1234 )
 		{
 			printf("flags fail\n");
 			goto fail;
 		}
 		
-		printf("id={%d}\n",v->id);
+		printf("id={%d}\n", VOLUMES[descriptor].id);
 		
-		printf("used={%d}\n",v->used);
-		printf("magic={%d}\n",v->magic);
+		printf("used={%d}\n",  VOLUMES[descriptor].used);
+		printf("magic={%d}\n", VOLUMES[descriptor].magic);
 		
-		printf("volumeType={%d}\n",v->volumeType);
+		printf("volumeType={%d}\n", VOLUMES[descriptor].volumeType);
 		
 		//#bugbug
 		//@todo: Esse nome temos que pegar no diretório raiz.
 		
-		printf("name={%s}\n",v->name);
+		printf("name={%s}\n", VOLUMES[descriptor].name);
 		
-		printf("path_string={%s}\n",v->path_string);
+		printf("path_string={%s}\n", VOLUMES[descriptor].path_string);
 		
 		//printf("");
 		//printf("");
@@ -412,7 +413,7 @@ int volumeShowVolumeInfo ( int descriptor ){
 	
 	goto done;
 	
-	*/
+ 
 	
 fail:
     printf("fail\n");
