@@ -15,7 +15,10 @@
  
  
  
-#define DISK_COUNT_MAX 8
+#define DISK_COUNT_MAX 1024 //8
+
+
+
 #define DISK_BYTES_PER_SECTOR 512 
 //#define DISK_BYTES_PER_SECTOR 4096 
  
@@ -35,24 +38,13 @@ typedef enum {
 	
 	DISK_TYPE_NULL,            // Null. 
 	
-	// Partição em disco físico.
-	//VOLUME_TYPE_DISK_PARTITION,  
-
-	// Partição em disco físico.
-	//VOLUME_TYPE_VIRTUAL_DISK_PARTITION,  
-
-    // Arquivo.
-	// Um pequeno arquivo qualquer. Não tem MBR.
-	// Esse foi carregado de algum disco.
-	//VOLUME_TYPE_FILE,           
+	DISK_TYPE_PATA,
 	
-	// Buffer.
-	// Um pequeno buffer qualquer. Não tem MBR.
-	// Obs: Esse não foi carregado de disco nenhum.
-	// O volume 0, será desse tipo. (conductor://)
-	//VOLUME_TYPE_BUFFER
+	DISK_TYPE_PATAPI,
 	
-	//...
+	DISK_TYPE_SATA,
+	
+	DISK_TYPE_SATAPI
 	
 }disk_type_t;
 
@@ -114,7 +106,7 @@ struct diskinfo_d
 	struct volumeinfo_d *Volumes; 
 	
 	//Navigation.
-    struct diskinfo_d *next;	
+    //struct diskinfo_d *next;	
 };
 diskinfo_t *diskinfo_conductor;
 
@@ -149,7 +141,10 @@ struct disk_d
 	
 
 	
-    struct diskinfo_d *disk_info;	
+    struct diskinfo_d *disk_info;
+    
+	struct disk_d *next;
+	
 };
 disk_t *disk_conductor;  // O disco 0.
 

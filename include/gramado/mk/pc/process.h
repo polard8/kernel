@@ -37,6 +37,10 @@
 
 
 #define gramado_pid_t pid_t
+
+
+//Limite para criação de processos. 
+#define PROCESS_COUNT_MAX 1024   //256 
  
 //
 //#define FIRST_PROCESS processList[0]
@@ -82,8 +86,7 @@
 #define UPROCESS_DEFAULT_STACK_SIZE 0x2000    
  
  
-//Limite para criação de processos. 
-#define PROCESS_COUNT_MAX 256 
+
  
 //
 // Bases para a contagem de processos, do sistema e de usuários.

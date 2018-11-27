@@ -16,7 +16,7 @@
  
  
 // Número máximo de threads.
-#define THREAD_COUNT_MAX 256 
+#define THREAD_COUNT_MAX 1024  //256 
 
 //O primeiro índice na contagem das threads do sistema e o
 //primeiro índice na contagem das threads dos usuários.

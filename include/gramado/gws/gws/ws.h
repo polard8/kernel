@@ -31,7 +31,8 @@
 #define DESKTOP_COUNT_MAX       16
 
 
-#define WINDOW_COUNT_MAX          1024 //512 //256
+#define WINDOW_COUNT_MAX          1024 
+
 #define MAX_WINDOWS WINDOW_COUNT_MAX 
  
  

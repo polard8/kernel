@@ -204,6 +204,10 @@ int ide_identify_device ( uint8_t nport ){
 
     _u8 status;
     _u8 lba1, lba2;
+	
+	
+	struct disk_d *disk;
+	
 
     ata_assert_dever (nport);
 
@@ -271,6 +275,18 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATA";	
         ide_ports[nport].type = (int) idedevicetypesPATA;
+		
+		
+		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
+		if ((void *) disk != NULL )
+		{
+			disk->id = nport;  
+			disk->used = 1;
+			disk->magic = 1234;
+			disk->name = "PATA-TEST";
+			disk->diskType = DISK_TYPE_PATA;
+			diskList[nport] = (unsigned long) disk;
+		}
 
         return (int) 0;
 
@@ -295,6 +311,17 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATA";	
         ide_ports[nport].type = (int) idedevicetypesSATA;
+		
+		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
+		if ((void *) disk != NULL )
+		{
+			disk->id = nport;  
+			disk->used = 1;
+			disk->magic = 1234;
+			disk->name = "SATA-TEST";
+			disk->diskType = DISK_TYPE_SATA;
+			diskList[nport] = (unsigned long) disk;
+		}
 
         return (int) 0;
 
@@ -316,6 +343,18 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATAPI";
         ide_ports[nport].type = (int) idedevicetypesPATAPI;
+		
+		
+		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
+		if ((void *) disk != NULL )
+		{
+			disk->id = nport;  
+			disk->used = 1;
+			disk->magic = 1234;
+			disk->name = "PATAPI-TEST";
+			disk->diskType = DISK_TYPE_PATAPI;
+			diskList[nport] = (unsigned long) disk;
+		}
 
         return (int) 0x80;
 
@@ -337,6 +376,17 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATAPI";
         ide_ports[nport].type = (int) idedevicetypesSATAPI;
+		
+		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
+		if ((void *) disk != NULL )
+		{
+			disk->id = nport;  
+			disk->used = 1;
+			disk->magic = 1234;
+			disk->name = "SATAPI-TEST";
+			disk->diskType = DISK_TYPE_SATAPI;
+			diskList[nport] = (unsigned long) disk;
+		}
 
         return (int) 0x80;
 
