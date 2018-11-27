@@ -108,8 +108,7 @@ void *system_call ( unsigned long ax,
 				    unsigned long dx )
 {
     
-	//#BugBug: 
-	// Aqui 0 retorno não pode ser inteiro.
+	//##BugBug: Aqui 0 retorno não pode ser inteiro.
 	//Temos que pegar unsigned long?? void*. ??
 	int RET = 0;	
 	//unsigned long RET = 0;
@@ -796,8 +795,10 @@ int set_cursor (unsigned long x, unsigned long y){
 };
 
 
-/* put_char: Put char.  (rever) */
-
+/*
+ * put_char:
+ *     Put char.  (rever)
+ */
 void put_char ( unsigned long x,  
                 unsigned long y,  
 			    unsigned long color, 
@@ -1737,8 +1738,10 @@ done:
 };
 
 
-/* APIRegisterWindow: Register Window. */
-
+/*
+ * APIRegisterWindow:
+ *     Register Window.
+ */
 int APIRegisterWindow (struct window_d *window){
     
     // @todo: Filtrar argumento.	
@@ -1755,8 +1758,10 @@ int APIRegisterWindow (struct window_d *window){
 };
 
 
-/* APICloseWindow: Close Window. */
-
+/*
+ * APICloseWindow:
+ *     Close Window. 
+ */
 int APICloseWindow (struct window_d *window){
 	
     // @todo: Filtrar argumento.	
@@ -1773,8 +1778,10 @@ int APICloseWindow (struct window_d *window){
 };
 
 
-/* APISetFocus: Set Focus. */
-
+/*
+ * APISetFocus:
+ *     Set Focus.
+ */
 int APISetFocus (struct window_d *window){
 	
     // @todo: Filtrar argumento.
@@ -1793,16 +1800,20 @@ int APISetFocus (struct window_d *window){
 };
 
 
-/* APIGetFocus: Get Focus. */
-
+/*
+ * APIGetFocus:
+ *     Get Focus.
+ */
 int APIGetFocus (){
 	
     return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
 };
 
 
-/* APIKillFocus: Kill Focus. */
-
+/*
+ * APIKillFocus:
+ *     Kill Focus.
+ */
 int APIKillFocus (struct window_d *window){
 
     // @todo: Filtrar argumento.
@@ -1844,8 +1855,10 @@ int APISetActiveWindow (struct window_d *window){
 };
 
 
-/* APIGetActiveWindow: Get Active Window Id. */
-
+/*
+ * APIGetActiveWindow:
+ *     Get Active Window Id.
+ */
 int APIGetActiveWindow (){
 	
     return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );	
@@ -1876,8 +1889,9 @@ void APIresize_window ( struct window_d *window,
 };
 
 
-/* APIredraw_window: */
-
+/*
+ * APIredraw_window:
+ */
 void APIredraw_window( struct window_d *window, unsigned long flags ){
 	
 	system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
@@ -2012,7 +2026,6 @@ int api_strncmp (char *s1, char *s2, int len){
  *     Refresh Screen.
  *     Passa o conteúdo do backbuffer para o lfb.
  */
- 
 void refresh_screen (){
 	
 	system_call ( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
@@ -2030,8 +2043,10 @@ void api_refresh_screen (){
 };
 
 
-/* apiReboot: Reboot. */
-
+/*
+ * apiReboot:
+ *     Reboot.
+ */
 void apiReboot (){
 	
 	// @todo: Fazer outras chamadas para
@@ -2042,24 +2057,30 @@ void apiReboot (){
 };
 
 
-/* apiSetCursor: Set cursor. */
-
+/*
+ * apiSetCursor: 
+ *     Set cursor.
+ */
 void apiSetCursor ( unsigned long x, unsigned long y ){
 	
     system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );	
 };
 
 
-/* apiGetCursorX: Get cursor x. */
-
+/*
+ * apiGetCursorX:
+ *     Get cursor x. 
+ */
 unsigned long apiGetCursorX (){
 	
     return (unsigned long) system_call ( SYSTEMCALL_GETCURSORX, 0, 0, 0 );
 };
 
 
-/* apiGetCursorY: Get cursor y. */
-
+/*
+ * apiGetCursorY:
+ *     Get cursor y.
+ */
 unsigned long apiGetCursorY (){
 	
     return (unsigned long) system_call (SYSTEMCALL_GETCURSORY, 0, 0, 0 );
@@ -2087,8 +2108,10 @@ void apiSetClientAreaRect (struct rect_d *r){
 };
 
 
-/* apiCreateProcess: Create a process. */
-
+/*
+ * apiCreateProcess:
+ *     Create a process.
+ */
 void *apiCreateProcess( unsigned long process_eip, 
                         unsigned long process_priority, 
 						char *name )
@@ -2098,8 +2121,10 @@ void *apiCreateProcess( unsigned long process_eip,
 };
 
 
-/* apiCreateThread: Create a thread. */
-
+/*
+ * apiCreateThread:
+ *     Create a thread.
+ */
 void *apiCreateThread( unsigned long thread_eip, 
                        unsigned long thread_priority, 
 					   char *name )
@@ -2334,14 +2359,12 @@ done:
 	return;
 };
 
-
 //V (Verhogen)incrementar.
 void exitCriticalSection (){
 	
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
-
 
 void initializeCriticalSection (){
 	
@@ -2504,6 +2527,8 @@ gramadocore_init_execve ( const char *filename,
 };
 
 
+
+
 /* UNIX style */
 /* Ainda estamos testando isso. A rotina no kernel está 
 clonando o a estrutura do processo mas ainda há outras coisas pra 
@@ -2595,7 +2620,8 @@ int api_getchar (){
 
 /*
  * apiDisplayBMP:
- *     Mostra na tela uma imagem bmp carregada na memória.
+ *
+ * Mostra na tela uma imagem bmp carregada na memória.
  * 
  * IN:
  *     address = endereço base
@@ -2745,7 +2771,7 @@ apiDisplayBMP ( char *address,
 	// Draw !
 	//
 	
-	left = x;    
+	left = x;    //
 	top  = y; 
 	
 	
@@ -2756,6 +2782,7 @@ apiDisplayBMP ( char *address,
 	
 	//#importante:
 	//a base é diferente para os tipos.
+	 
 
 	switch (bi->bmpBitCount){
 		
@@ -2782,15 +2809,18 @@ apiDisplayBMP ( char *address,
 			break;
 	};	
 	
-    //1 - 1 bpp (Mono)
-    //4 - 4 bpp (Indexed)
-    //8 - 8 bpp (Indexed) bbgggrrr
-    //16565 - 16 bpp (5:6:5, RGB Hi color)
-    //16    - 16 bpp (5:5:5:1, RGB Hi color)
-    //160   - 16 bpp (5:5:5:1, RGBA Hi color)
-    //24 - 24 bpp (True color)
-    //32 - 32 bpp (True color, RGB)
-    //320 - 32 bpp (True color, RGBA)	
+
+//1 - 1 bpp (Mono)
+//4 - 4 bpp (Indexed)
+//8 - 8 bpp (Indexed) bbgggrrr
+//16565 - 16 bpp (5:6:5, RGB Hi color)
+//16    - 16 bpp (5:5:5:1, RGB Hi color)
+//160   - 16 bpp (5:5:5:1, RGBA Hi color)
+//24 - 24 bpp (True color)
+//32 - 32 bpp (True color, RGB)
+//320 - 32 bpp (True color, RGBA)	
+
+
   
 	// ## ABGR8888 ##
 	// Little-endian
@@ -2807,6 +2837,7 @@ apiDisplayBMP ( char *address,
     //#define COLOR_RED   0xFF000000 
     //#define COLOR_GREEN 0x00FF0000
     //#define COLOR_BLUE  0x0000FF00
+
 	
 	for ( i=0; i < bi->bmpHeight; i++ )	
 	{		
@@ -2963,25 +2994,27 @@ done:
 //Coloca uma mensagem na estrutura de uma janela.
 //ainda não temos filas de mensagem, então mensagens podem se perder 
 //sendo sobrepostas.
-
-unsigned long 
-apiSendMessage ( struct window_d *window, 
-                 int message,
-                 unsigned long long1,
-                 unsigned long long2 )
+unsigned long apiSendMessage ( struct window_d *window, 
+                               int message,
+                               unsigned long long1,
+                               unsigned long long2 )
 {	
+	
 	unsigned long message_buffer[5];
 	
+	//enterCriticalSection();
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
 	message_buffer[3] = (unsigned long) long2;  	
 	
+	
 	return (unsigned long) system_call ( 114 , 
-	                        (unsigned long) &message_buffer[0], 
-							(unsigned long) &message_buffer[0], 
-							(unsigned long) &message_buffer[0] );	
+	                                     (unsigned long) &message_buffer[0], 
+										 (unsigned long) &message_buffer[0], 
+										 (unsigned long) &message_buffer[0] );	
 };	
+
 
 
 int apiDrawText ( struct window_d *window, 
@@ -2989,7 +3022,8 @@ int apiDrawText ( struct window_d *window,
 				  unsigned long y, 
 				  unsigned long color, 
 				  char *string )
-{	
+{
+	
 	unsigned long msg[8];
 	
     msg[0] = (unsigned long) window;

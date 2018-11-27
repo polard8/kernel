@@ -265,28 +265,13 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_not_busy();
         ata_wait_no_drq();
 
-        
-		//#importante 
-		//salvando o tipo em estrutura de porta.
-		// É nessa hora que devemos configurar a esturtura de disco.
-		// Com base no disco encontrado e seu tipo.
-		
+        //salvando o tipo em estrutura de porta.
         ide_ports[nport].id = (int) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATA";	
         ide_ports[nport].type = (int) idedevicetypesPATA;
 
-		//#test
-		//as 4 primeiras estruturas de disco serão usadas 
-		//pelas 4 portas ide.
-		
-		DISKS[nport].id = nport;  
-		DISKS[nport].used = 1;
-		DISKS[nport].magic = 1234;
-		DISKS[nport].name = "PATA-TEST";
-		DISKS[nport].diskType = DISK_TYPE_PATA;
-		
         return (int) 0;
 
 
@@ -310,13 +295,6 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATA";	
         ide_ports[nport].type = (int) idedevicetypesSATA;
-		
-		
-		DISKS[nport].id = nport;  
-		DISKS[nport].used = 1;
-		DISKS[nport].magic = 1234;
-		DISKS[nport].name = "SATA-TEST";
-		DISKS[nport].diskType = DISK_TYPE_SATA;		
 
         return (int) 0;
 
@@ -338,13 +316,6 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATAPI";
         ide_ports[nport].type = (int) idedevicetypesPATAPI;
-		
-		
-		DISKS[nport].id = nport;  
-		DISKS[nport].used = 1;
-		DISKS[nport].magic = 1234;
-		DISKS[nport].name = "PATAPI-TEST";
-		DISKS[nport].diskType = DISK_TYPE_PATAPI;
 
         return (int) 0x80;
 
@@ -366,13 +337,6 @@ int ide_identify_device ( uint8_t nport ){
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATAPI";
         ide_ports[nport].type = (int) idedevicetypesSATAPI;
-		
-		
-		DISKS[nport].id = nport;  
-		DISKS[nport].used = 1;
-		DISKS[nport].magic = 1234;
-		DISKS[nport].name = "SATAPI-TEST";
-		DISKS[nport].diskType = DISK_TYPE_SATAPI;
 
         return (int) 0x80;
 
@@ -1557,7 +1521,7 @@ int diskATAInitialize ( int ataflag ){
 	//refresh_screen();
 #endif
 
-    // Sondando a interface PCI para encontrarmos (UM) dispositivo
+    // Sondando a interface PCI para encontrarmos um dispositivo
     // que seja de armazenamento de dados.
 	
 	//PCI_CLASSCODE_MASS
@@ -1567,8 +1531,7 @@ int diskATAInitialize ( int ataflag ){
 	// Error.	
 	if( data == -1 )
 	{
-		kprintf("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", 
-		    (_u32) data );
+		kprintf("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", (_u32) data );
 		
 	    // Abortar.
 		Status = (int) (PCI_MSG_ERROR);
@@ -1622,10 +1585,6 @@ int diskATAInitialize ( int ataflag ){
 	// Colocando nas estruturas.
 	//
 	
-    // #isso é o 'BASE PORT'
-	// ATA_BARx É UM NOME INAPROPRIADO. #BUGBUG
-	//mas agora temos a porta base de todos os 4 dispositivos IDE.
-    	
 	ide_ports[0].base_port = (unsigned short) ATA_BAR0;
 	ide_ports[1].base_port = (unsigned short) ATA_BAR1;
 	ide_ports[2].base_port = (unsigned short) ATA_BAR2;
@@ -1668,42 +1627,41 @@ int diskATAInitialize ( int ataflag ){
 	    //ide_mass_storage_initialize();
 		
 	
-	    //#bugbug : isso é a lista de dispositivos pci do nelso, temos que usar 
-		//a lista de dispositivos pci do gramado.
+	
 
-       //
-       // Vamos trabalhar na lista de dispositivos.
-       //	
+    //
+    // Vamos trabalhar na lista de dispositivos.
+    //	
 	
-	   // Iniciando a lista.
-	   ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
+	// Iniciando a lista.
+	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
 	
-	   //#todo:
-	   //Checar a validade da estrutura.
+	//#todo:
+	//Checar a validade da estrutura.
 	
-	   current_dev = ( struct st_dev * ) ready_queue_dev;
+	current_dev = ( struct st_dev * ) ready_queue_dev;
     
-	   current_dev->dev_id = dev_next_pid++;
+	current_dev->dev_id = dev_next_pid++;
     
-	   current_dev->dev_type = -1;
-       current_dev->dev_num = -1;
-       current_dev->dev_channel = -1;
-       current_dev->dev_nport = -1;
-       current_dev->next = NULL;
+	current_dev->dev_type = -1;
+    current_dev->dev_num = -1;
+    current_dev->dev_channel = -1;
+    current_dev->dev_nport = -1;
+    current_dev->next = NULL;
 
-        // ??
-	    ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
+    // ??
+	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
 
-	    //
-	    // Sondando dispositivos e imprimindo na tela.
-	    //
+	//
+	// Sondando dispositivos e imprimindo na tela.
+	//
 	
-        // As primeiras quatro portas do controlador IDE.    
-	    for ( port=0; port < 4; port++ )
-	    {
-            ide_dev_init (port);
-	    };		
+    // As primeiras quatro portas do controlador IDE.    
+	for ( port=0; port < 4; port++ )
+	{
+        ide_dev_init(port);
+	};		
 		
 		
 		

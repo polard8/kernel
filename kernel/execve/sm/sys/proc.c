@@ -250,9 +250,6 @@ system_procedure ( struct window_d *window,
 	//debug!
 	//printf("system_procedure: msg={%d} long1={%d}\n", msg, long1);  
 	
-	
-	unsigned long address;
-	
 	void *buff;
 	
 	int AltStatus;
@@ -526,8 +523,8 @@ system_procedure ( struct window_d *window,
 					
 					
 					//1 = initialize.
-					diskATADialog ( 1, FORCEPIO, FORCEPIO ); //disk1.c
-					show_ide_info ();   //disk1.c
+					diskATADialog ( 1, FORCEPIO, FORCEPIO );
+					show_ide_info ();
                     //rotina provisória de teste de read.
 					//procTestF6();
 					
@@ -613,35 +610,9 @@ system_procedure ( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-				
-				    //tamvez esse teste de diretório fique melhor do shell.
 										
-                    //vamos atualizar o adiretório atual.
-					// seleciona  /USERS como diretório atual.
-                    //setup_current_dir_string ("USERS      ");					
-					
-					//novo buffer sem teste
-                    //address = (unsigned long) malloc(512*32);
-					
-					//determinamos que devemos usar o diretório raiz para carregarmos um diretório.
-					//current_dir_initialized = 0;
-              		//g_current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-					
-					//usando o diretório raiz, carregaremos o diretório '/users' em 'address'. 			
-					//fsLoadFile ( (unsigned char *) current_dir_string, 
-                    //             (unsigned long) address );	
-		
-		            //agora usando o novo endereço de diretório, vamos carregar um arquivo de texto.
-					//isso diz pra não carregar o diretório raiz.
-					//current_dir_initialized = 1;
-					//g_current_dir_address = address; //vamos carregar aqui.
-					
-					//fsLoadFile ( (unsigned char *) "INIT    TXT", 
-                     //            (unsigned long) address );						
-					
-					//printf("show file: %s \n", address );
-					
-					//current_dir_initialized = 0;
+
+                    					
 					
 					//
 					// NIC test

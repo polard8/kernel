@@ -764,35 +764,28 @@ void set_filesystem_type (int type){
  */
 void fs_init_fat (){
 	
+	// File system structure.
+	
+	if ( (void *) filesystem == NULL )
+	{
+	    printf("fs_init_fat error: filesystem\n");
+	    return;
+	}
 
 	// FAT structure.
 	
 	fat = (void *) malloc ( sizeof(struct fat_d) );
 	
-	if ( (void *) fat == NULL )
+	if ((void *) fat == NULL )
 	{
-	    printf("fs_init_fat: fat struct\n");
-	    die();
-		//return;
+	    printf("fs_init_fat error: fat\n");
+	    return;
 	}else{
 		
-		
-	    if ( (void *) filesystem == NULL )
-	    {
-	        printf("fs_init_fat: filesystem struct\n");
-	        die();
-			//return;
-	    }else{
-			
-	        // Info.
-		    fat->address = filesystem->fat_address; 
-	        fat->type = filesystem->type;
-			//...
-			
-		};		
-		
-		
-		
+	    // Info.
+	    
+		fat->address = filesystem->fat_address; 
+	    fat->type = filesystem->type;
 	    
 		//Continua ...
 	};
@@ -821,33 +814,33 @@ void fs_init_structures (){
 	
 	if ( (void *) filesystem == NULL )
 	{
-	    printf ("fs_init_structures:");
+	    printf("fs_init_structures:");
+        die();
+	}
+	
+	//Type.
+	
+	Type = (int) get_filesystem_type ();   
+	
+	if ( Type == 0 )
+	{
+	    printf("fs_init_structures error: Type");
         die();
 	}else{
 		
-		
-	    //Type.
-	    Type = (int) get_filesystem_type ();   		
-		
-	    if ( Type == 0 )
-	    {
-	        printf("fs_init_structures error: Type");
-            die();
-	    }else{
-		
-	        filesystem->type = (int) Type;	
-	    };
-		
-		
-		
-        switch (Type)
-	    {
-	        case FS_TYPE_FAT16:
+	    filesystem->type = (int) Type;	
+	};
+	
+	
+	
+    switch (Type)
+	{
+	    case FS_TYPE_FAT16:
 	        
 			//Rootdir.
 			filesystem->rootdir_address = VOLUME1_ROOTDIR_ADDRESS;
 	        filesystem->rootdir_lba = VOLUME1_ROOTDIR_LBA;
-				        
+	        
 			//Fat.
 			filesystem->fat_address = VOLUME1_FAT_ADDRESS;
 	        filesystem->fat_lba = VOLUME1_FAT_LBA;
@@ -856,10 +849,6 @@ void fs_init_structures (){
 			//filesystem->dataarea_address = ??;
 	        filesystem->dataarea_lba = VOLUME1_DATAAREA_LBA;
 	        
-		    //current dir 
-		    filesystem->current_dir_address = (unsigned long) filesystem->rootdir_address;
-			filesystem->current_dir_lba =  (unsigned long) filesystem->rootdir_lba;
-			
 			//sectors per cluster.
 			filesystem->spc = (int) get_spc(); //variável
 	        filesystem->rootdir_entries = FAT16_ROOT_ENTRIES;
@@ -867,22 +856,15 @@ void fs_init_structures (){
 			
 		    break;
 			
-	        //case FS_TYPE_EXT2:
+	    case FS_TYPE_EXT2:
 		    //nothing for now.
-		    //break;
+		break;
 		
-		    //case FS_TYPE_EXT3: break;
+		//case FS_TYPE_EXT3: break;
 		
-            default:
+        default:
 		    //nothing for now.
             break;		
-	    };		
-		
-		
-		
-		
-		//...
-		
 	};
 };
 
@@ -1057,19 +1039,6 @@ int fsInit (){
 	};	
 	
 	
-	
-	//
-	// ## Current directory ##
-	//
-	
-	// Inicializamos com o endereço virtual do diretório raiz.
-	// #todo: podemos alocar memória.
-	// precisamos de estrutura que gerencie esse buffer, pois vai mudar 
-	// dependendo do tamanho do diretório.
-	// por enquanto vamos usar esse.
-	g_current_dir_address = (unsigned long) VOLUME1_ROOTDIR_ADDRESS;
-	
-	
 	//
 	// ## PWD ##
 	//
@@ -1090,12 +1059,6 @@ int fsInit (){
     return (int) 0;    	
 };
 
-
-//só o nome, não é um pathname.
-void setup_current_dir_string ( char *name )
-{
-    sprintf ( current_dir_string, name ); 	
-};
 
 /*
  *****************************************
@@ -1126,11 +1089,11 @@ void fsInitializeWorkingDiretoryString (){
 	//
 
 
-	//struct volume_d *v;
+	struct volume_d *v;
 	
-	//v = (struct volume_d *) volumeList[current_volume];
+	v = (struct volume_d *) volumeList[current_volume];
 	
-	if ( current_volume < 0 )
+	if ( (void *) v == NULL )
 	{
 		//fail.
 		printf("fsInitializeWorkingDiretoryString: v\n");
@@ -1138,14 +1101,14 @@ void fsInitializeWorkingDiretoryString (){
 		
 	}else{
 		
-		if ( VOLUMES[current_volume].used != 1 || VOLUMES[current_volume].magic != 1234 )
+		if ( v->used != 1 || v->magic != 1234 )
 		{
 		    //fail.
 		    printf("fsInitializeWorkingDiretoryString: validation\n");
 		    die();
 		}
 
-	    switch (VOLUMES[current_volume].id)
+	    switch (v->id)
 		{
 			case 0:
 		        //global usada para string do nome do volume.
@@ -1166,10 +1129,10 @@ void fsInitializeWorkingDiretoryString (){
 		
 		
 		//path string na estrutura do volume.
-        sprintf ( VOLUMES[current_volume].path_string, current_volume_string ); 	
+        sprintf ( v->path_string, current_volume_string ); 	
 
 	    //'volumeX'
-	    strcat ( current_workingdiretory_string, VOLUMES[current_volume].path_string );
+	    strcat ( current_workingdiretory_string, v->path_string );
 	    //strcat ( current_workingdiretory_string, current_volume_string );		
 	}
 	

@@ -33,8 +33,8 @@ void diskShowCurrentDiskInfo (){
 //Mostra informações sobre um disco dado seu descritor.
 int diskShowDiskInfo ( int descriptor ){
 	
- 
-
+	struct disk_d *d;
+	
 	//#debug
 	printf("diskShowDiskInfo:\n\n");
 	
@@ -45,35 +45,30 @@ int diskShowDiskInfo ( int descriptor ){
 		goto fail;
 	}		
 	
-	//d = (struct disk_d *) diskList[descriptor];
+	d = (struct disk_d *) diskList[descriptor];
 	
-	if ( descriptor < 0  )
+	if ( (void *) d == NULL )
 	{
 		printf("struct fail\n");
 		goto fail;
 		
 	} else {
 		
-		if ( DISKS[descriptor].used != 1 || 
-		     DISKS[descriptor].magic != 1234 )
-	    {	
+		if ( d->used != 1 || d->magic != 1234 ){
+			
 			printf("flags fail\n");
 			goto fail;
 		}		
 		
-		printf ("id={%d} used={%d} magic={%d} \n", 
-		    DISKS[descriptor].id, 
-			DISKS[descriptor].used, 
-			DISKS[descriptor].magic );
+		printf ("id={%d} used={%d} magic={%d} \n", d->id, d->used, d->magic );
 		
-		printf ("diskType={%d}\n", DISKS[descriptor].diskType );
-		printf("name={%s}\n", DISKS[descriptor].name );		
+		printf ("diskType={%d}\n", d->diskType );
+		printf("name={%s}\n", d->name );		
 		//...
 		goto done;
 	};
 	
 	
-	 
 	goto done;
 	
 	
@@ -98,8 +93,7 @@ void *disk_get_disk_handle ( int number ){
 		return NULL;
 	}
 	
-	return NULL;
-	//return (void *) diskList[number];
+	return (void *) diskList[number];
 };
 
 
@@ -110,10 +104,7 @@ void *disk_get_disk_handle ( int number ){
  */
 void *disk_get_current_disk_info (){
 	
-	//#bugbug  
-	
-	return NULL;
-	//return (void *) CurrentDiskInfo; 
+	return (void *) CurrentDiskInfo; 
 };
 
 
@@ -130,26 +121,21 @@ int disk_init (){
 
 	int i;
 
-
 	
 #ifdef KERNEL_VERBOSE	
     printf("disk_init: Initializing..\n");
 #endif	
 
     //@todo: Tem que limpara a lista de discos.	
-	for ( i=0; i<32; i++ )
-	{
-	    DISKS[i].used = 0;	
-		DISKS[i].magic = 0;
-		//diskList[i] = 0;
+	for ( i=0; i<DISK_COUNT_MAX; i++ ){
+		
+		diskList[i] = 0;
 	};
 	
 	
 	// Inicializando uma estrutura global de informações sobre o 
 	// disco do sistema.
 	// ?? Em que arquivo está essa estrutura.
-	
-	struct diskinfo_d *diskinfo_conductor;
 
 	// disk info
     diskinfo_conductor = (void*) malloc( sizeof(struct diskinfo_d) );
@@ -171,10 +157,8 @@ int disk_init (){
         //...		
 	};
 	
-	/*
-	// disk.
-	struct disk_d *disk_conductor;
 	
+	// disk.
     disk_conductor = (void *) malloc( sizeof(struct disk_d) );
 	if( (void *) disk_conductor == NULL )
 	{
@@ -200,12 +184,7 @@ int disk_init (){
 		//atualiza a lista
 		diskList[0] = (unsigned long) disk_conductor;
 	};	
-	*/
-
-    DISKS[0].id = 0;     
-	DISKS[0].used = 0;
-    DISKS[0].magic = 0;
-	DISKS[0].name = "DISK 0";
+	
 	
 	//
 	//  selecionando o primeiro disco,
@@ -358,8 +337,7 @@ void volumeShowCurrentVolumeInfo (){
  */
 int volumeShowVolumeInfo ( int descriptor ){
 	
-	
-	//struct volume_d *v;
+	struct volume_d *v;
 	
 	printf("volumeShowVolumeInfo:\n");
 	
@@ -370,9 +348,9 @@ int volumeShowVolumeInfo ( int descriptor ){
 	}	
 	
 	
-	//v = (struct volume_d *) volumeList[descriptor];
+	v = (struct volume_d *) volumeList[descriptor];
 	
-	if( descriptor < 0 )
+	if( (void *) v == NULL )
 	{
 		printf("struct fail\n");
 		goto fail;
@@ -380,26 +358,25 @@ int volumeShowVolumeInfo ( int descriptor ){
 	}else{
 		
 		
-		if ( VOLUMES[descriptor].used != 1 || 
-		     VOLUMES[descriptor].magic != 1234 )
+		if( v->used != 1 || v->magic != 1234 )
 		{
 			printf("flags fail\n");
 			goto fail;
 		}
 		
-		printf("id={%d}\n", VOLUMES[descriptor].id);
+		printf("id={%d}\n",v->id);
 		
-		printf("used={%d}\n",  VOLUMES[descriptor].used);
-		printf("magic={%d}\n", VOLUMES[descriptor].magic);
+		printf("used={%d}\n",v->used);
+		printf("magic={%d}\n",v->magic);
 		
-		printf("volumeType={%d}\n", VOLUMES[descriptor].volumeType);
+		printf("volumeType={%d}\n",v->volumeType);
 		
 		//#bugbug
 		//@todo: Esse nome temos que pegar no diretório raiz.
 		
-		printf("name={%s}\n", VOLUMES[descriptor].name);
+		printf("name={%s}\n",v->name);
 		
-		printf("path_string={%s}\n", VOLUMES[descriptor].path_string);
+		printf("path_string={%s}\n",v->path_string);
 		
 		//printf("");
 		//printf("");
@@ -413,7 +390,6 @@ int volumeShowVolumeInfo ( int descriptor ){
 	
 	goto done;
 	
- 
 	
 fail:
     printf("fail\n");
@@ -432,10 +408,7 @@ void *volume_get_volume_handle( int number )
 	if( number < 0 || number >= VOLUME_COUNT_MAX ){
 		return NULL;
 	}
-	
-	return NULL;
-	
-	//return (void *) volumeList[number];
+	return (void *) volumeList[number];
 };
 
 
@@ -445,8 +418,7 @@ void *volume_get_current_volume_info()
 	    return NULL;
 	}
 	
-	return NULL;
-    //return (void*) volumeList[VOLUME_COUNT_MAX];	
+    return (void*) volumeList[VOLUME_COUNT_MAX];	
 };
 
 
@@ -461,7 +433,6 @@ void *volume_get_current_volume_info()
 
 int volume_init (){
 	
-
 	
 #ifdef KERNEL_VERBOSE
     printf("volume_init: Initializing..\n");
@@ -469,13 +440,9 @@ int volume_init (){
 
     //@todo: tem que limpara a lista de volumes.
 	int i;
-	for( i=0; i<32; i++)
+	for( i=0; i<VOLUME_COUNT_MAX; i++)
 	{
-		
-		VOLUMES[i].used = 0;
-		VOLUMES[i].magic = 0;
-		
-		//volumeList[i] = 0;
+		volumeList[i] = 0;
 	};
 
 	
@@ -486,13 +453,6 @@ int volume_init (){
 	//  
 	
 	current_volume = 1;	
-	
-	
-	VOLUMES[current_volume].used = 1;
-	VOLUMES[current_volume].magic = 1234;
-	VOLUMES[current_volume].name = "VOLUME 1 - BOOT";  
-	//VOLUMES[current_volume].
-	
 
     //
 	// Inicializando a estrutura do volume 0,
@@ -515,12 +475,6 @@ int volume_init (){
 	// root:/volume1 - volume da partição de boot.
 	// root:/volume2 - volume da partição de sistema.
 	//
-	
-	/*
-	
-    struct volume_d *volume_vfs;             // volume 0
-    struct volume_d *volume_bootpartition;   // volume 1
-    struct volume_d *volume_systempartition; // volume 2	
 	
 	// Volume.
 	volume_vfs = (void*) malloc( sizeof(struct volume_d) );
@@ -621,7 +575,7 @@ int volume_init (){
 	};
 	
 	
-   */
+
 	
 	
 	//

@@ -26,6 +26,9 @@
 <br>The kernel starts in Graphics Mode, resolution 800x600x24.
 
 <br>
+<br><b>// Folders:</b>
+<br>/include  = Headers.
+<br>/k        = Source.
 
 <br>
 <br>@frednora
