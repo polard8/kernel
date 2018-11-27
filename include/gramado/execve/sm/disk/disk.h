@@ -64,7 +64,6 @@ typedef enum {
  * Disk info struct.
  *
  */ 
-typedef struct diskinfo_d diskinfo_t; 
 struct diskinfo_d
 { 
 	object_type_t objectType;
@@ -114,14 +113,14 @@ struct diskinfo_d
 	struct volumeinfo_d *Volumes; 
 	
 	//Navigation.
-    struct diskinfo_d *next;	
+    //struct diskinfo_d *next;	
 };
-diskinfo_t *diskinfo_conductor;
 
-diskinfo_t *CurrentDiskInfo; 
-diskinfo_t *CurrentDisk;
-diskinfo_t *diskinfo;
-diskinfo_t *SystemDiskInfo;
+//diskinfo_t *diskinfo_conductor;
+//diskinfo_t *CurrentDiskInfo; 
+//diskinfo_t *CurrentDisk;
+//diskinfo_t *diskinfo;
+//diskinfo_t *SystemDiskInfo;
 //...
 
 
@@ -130,7 +129,6 @@ diskinfo_t *SystemDiskInfo;
  *     Estrutura para acesso rápido a discos.
  *     Deve ser simples e com poucos elementos.
  */
-typedef struct disk_d disk_t; 
 struct disk_d
 { 
 	object_type_t objectType;
@@ -150,15 +148,9 @@ struct disk_d
 
 	
     struct diskinfo_d *disk_info;	
+	struct disk_d *next;
 };
-disk_t *disk_conductor;  // O disco 0.
-
-//
-// Lita de discos
-//
-
-unsigned long diskList[DISK_COUNT_MAX];
-
+struct disk_d DISKS[32];
 
 
 void diskShowCurrentDiskInfo();

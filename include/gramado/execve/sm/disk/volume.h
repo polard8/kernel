@@ -60,7 +60,6 @@ typedef enum {
  * Volume info struct.
  * @todo: deve existir algum padrão para isso.
  */
-typedef struct volumeinfo_d volumeinfo_t; 
 struct volumeinfo_d
 {
 	object_type_t objectType;
@@ -146,11 +145,6 @@ struct volumeinfo_d
 	//unsigned long DataSectorStart;      //Starting sector of the data area.
 	
 };
-volumeinfo_t *volumeinfo_vfs;
-volumeinfo_t *volumeinfo_bootpartition;
-volumeinfo_t *volumeinfo_systempartition;
-//...
-
 
 
 /*
@@ -158,7 +152,6 @@ volumeinfo_t *volumeinfo_systempartition;
  *     Estrutura para acesso rápido a volumes.
  *     Deve ser simples e com poucos elementos.
  */
-typedef struct volume_d volume_t; 
 struct volume_d
 { 
 	object_type_t objectType;
@@ -187,21 +180,7 @@ struct volume_d
 	
 	struct volume_d *next;
 };
-//@todo: Isso está bom, não mexer.
-volume_t *volume_vfs;             // volume 0
-volume_t *volume_bootpartition;   // volume 1
-volume_t *volume_systempartition; // volume 2
-
-// Observação o volume atual será uma variável global.  
-
-
-//
-// Lista de volumes.
-//
-
-unsigned long volumeList[VOLUME_COUNT_MAX];
-
-
+struct volume_d VOLUMES[32];
 
 
 

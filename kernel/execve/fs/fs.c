@@ -1126,11 +1126,11 @@ void fsInitializeWorkingDiretoryString (){
 	//
 
 
-	struct volume_d *v;
+	//struct volume_d *v;
 	
-	v = (struct volume_d *) volumeList[current_volume];
+	//v = (struct volume_d *) volumeList[current_volume];
 	
-	if ( (void *) v == NULL )
+	if ( current_volume < 0 )
 	{
 		//fail.
 		printf("fsInitializeWorkingDiretoryString: v\n");
@@ -1138,14 +1138,14 @@ void fsInitializeWorkingDiretoryString (){
 		
 	}else{
 		
-		if ( v->used != 1 || v->magic != 1234 )
+		if ( VOLUMES[current_volume].used != 1 || VOLUMES[current_volume].magic != 1234 )
 		{
 		    //fail.
 		    printf("fsInitializeWorkingDiretoryString: validation\n");
 		    die();
 		}
 
-	    switch (v->id)
+	    switch (VOLUMES[current_volume].id)
 		{
 			case 0:
 		        //global usada para string do nome do volume.
@@ -1166,10 +1166,10 @@ void fsInitializeWorkingDiretoryString (){
 		
 		
 		//path string na estrutura do volume.
-        sprintf ( v->path_string, current_volume_string ); 	
+        sprintf ( VOLUMES[current_volume].path_string, current_volume_string ); 	
 
 	    //'volumeX'
-	    strcat ( current_workingdiretory_string, v->path_string );
+	    strcat ( current_workingdiretory_string, VOLUMES[current_volume].path_string );
 	    //strcat ( current_workingdiretory_string, current_volume_string );		
 	}
 	
