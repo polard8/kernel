@@ -423,7 +423,6 @@ void *volume_get_current_volume_info()
 
 
 
-
 /*
  ***************************************************
  * volume_init:
@@ -586,6 +585,86 @@ done:
     return (int) 0;
 };
 
+
+
+//pegaremos informações sobre um disco ide checando o mbr.
+//o índice determina qual informações pegaremos.
+// -1 = sem assinatura.
+// -2 = nenhuma partição ativa. (80)
+// ...
+//
+//checar o mbr de uma das quatro portas do controlador ide.
+//#obs: o mbr pertence ao disco todo na interface ide, 
+//mas pode dizer alguma coisa sobre as partições,
+// se olharmos na tabela de partições.
+
+int get_ide_disk_info ( int port, unsigned long buffer )
+{
+    unsigned char *mbr = (unsigned char *) buffer; 
+	
+	// read test (buffer, lba, rw flag, port number )
+    
+	pio_rw_sector ( (unsigned long) &mbr[0], // buffer
+	                 (unsigned long) 0,      // 0 = mbr
+					 (int) 0x20,             // 20 = ler
+					 (int) port );	         // port 0-3
+	
+	
+	
+	// Check signature.
+	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
+	{
+		
+	    //printf("get_ide_disk_info: Sig FAIL \n" );
+        return -1;	
+	};	
+	
+	
+	//name
+	int i;
+	
+	printf("OS name: [ ");
+	for ( i=0; i<8; i++ )
+	{
+	    printf("%c", mbr[ BS_OEMName + i ] );
+	};
+	printf(" ]\n");	
+	
+    return 0;	
+};
+
+
+void show_ideports_info()
+{
+	
+ 
+    printf("\nTesting ports. Looking for signature ...\n");  
+  
+	int i;
+	
+	for ( i=0; i<4; i++ )
+	{
+		//só se a porta for válida.
+    	if ( ide_ports[i].used ==  1 )
+		{
+
+	        if ( get_ide_disk_info ( (int) i, (unsigned long) malloc(512) ) == -1 )
+            {
+		            printf("signature FAIL in port %d\n", i);	
+		    }else{
+		            printf("signature OK in port %d\n", i);
+		    };				
+			
+		} else {
+			printf("No disk in port %d\n", i);
+		};
+		
+		refresh_screen();
+	};
+	
+ 
+	printf("done\n");
+};
 
 /*
 int init_volume_manager();

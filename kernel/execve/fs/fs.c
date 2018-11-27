@@ -534,7 +534,7 @@ fs_set_entry_status( unsigned long id,
 
 /*
  *************
- * fsCheckMbrFile:
+ * fsCheckMbrFile: (Essa rotina pode ser usada pra checar se o volume é fat.)
  *     Checamos um mbr carregado em algum endereço de memória.
  *
  *     Checa o registro do disco. (MBR). (disco do sistema).
@@ -554,10 +554,17 @@ fs_set_entry_status( unsigned long id,
 //void fsCheckMBR(unsigned char* buffer)  //@todo
 void fsCheckMbrFile ( unsigned char *buffer ){
 	
+	
+	//#todo
+	//mudar os argumentos para chamarmos as portas ide.
+	
 	unsigned char *mbr = (unsigned char *) buffer; 
 
+	//setor 0.
+	my_read_hd_sector( (unsigned long) &mbr[0] , 0, 0 , 0 );  
 	
-	my_read_hd_sector( (unsigned long) &mbr[0] , 0, 0 , 0 );  //setor 0.
+	// read test (buffer, lba, rw flag, port number )
+    //pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
 	
 	
 	//message:

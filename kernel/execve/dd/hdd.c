@@ -197,10 +197,12 @@ pio_rw_sector ( unsigned long buffer,
 	
 	
 	//
-	//
+	// #timeout sim, não podemos esperar para sempre.
 	//
 	
 	unsigned char c; 
+	
+	unsigned long timeout = 4444*512;
 	
 again:
 	
@@ -210,9 +212,15 @@ again:
 	
 	if ( c == 0 )
 	{
+		timeout--;
+		if ( timeout == 0 )
+		{
+			printf("rw sector timeout fail;\n");
+			return -3;
+		}
+	   //#bugbug: isso pode enrroscar aqui.	
 	   goto again;	
 	}
-    
 	
 	
 	switch (rw)
@@ -272,7 +280,7 @@ void my_read_hd_sector ( unsigned long ax,
 	
  
 	// read test (buffer, lba, rw flag, port number )
-     pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
+    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
  
 	
 	/*

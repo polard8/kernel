@@ -610,24 +610,58 @@ system_procedure ( struct window_d *window,
 				
                 //testes				
 				case VK_F6:
-										
-
-                    					
+						
+                    show_ide_info ();
+					
+                    printf("\n\n"); 
+	                show_ideports_info();
+					
+					/*
+					// funciona 0 - primary master
+					if ( get_ide_disk_info ( (int) 0, (unsigned long) malloc(512) ) == -1 )
+                    {
+		                printf("signature FAIL in port 0\n", 0);	
+		            }else{
+		                printf("signature OK in port 0\n", 0);
+		            };							
+                    refresh_screen();
+					 
+					//funciona 2 - secondary master 
+	                if ( get_ide_disk_info ( (int) 2, (unsigned long) malloc(512) ) == -1 )
+                    {
+		                printf("signature FAIL in port 2\n", 2);	
+		            }else{
+		                printf("signature OK in port 2\n", 2);
+		            };							
+					refresh_screen();
+					
+					
+					// falha 1 - primary slave
+					if ( get_ide_disk_info ( (int) 1, (unsigned long) malloc(512) ) == -1 )
+                    {
+		                printf("signature FAIL in port 1\n", 1);	
+		            }else{
+		                printf("signature OK in port 1\n", 1);
+		            };							
+                    refresh_screen();
+					*/
+					
 					
 					//
 					// NIC test
 					//
 					
-					init_nic ();  //intel.c (obs: essa rotina tambem reseta o controlador.)
-					refresh_screen();
-					
+					//init_nic ();  //intel.c (obs: essa rotina tambem reseta o controlador.)
+					//refresh_screen();
 					//vamos testar a rotina de configuração da transmissão.
-					nic_i8254x_transmit();
-					refresh_screen(); 
-					
+					//nic_i8254x_transmit();
+					//refresh_screen(); 
 					//vamos mostrar informações antes obtidas pelo sistema.
-					show_network_info ();
-					refresh_screen();
+					//show_network_info ();
+					//refresh_screen();
+					
+					
+					
 					
 					//#test
 					//fsList("volume1");
