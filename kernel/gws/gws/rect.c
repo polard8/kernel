@@ -385,7 +385,6 @@ refresh_rectangle ( unsigned long x,
 	q = (const void *) (q + offset);    
 	 
     vsync ();	
-	
  
 	
 	//(line_size * 3) é o número de bytes por linha. 
@@ -692,16 +691,29 @@ int save_rect ( unsigned long x,
 };
 
 
-//pintar no backbuffer o retângulo salvo vai ser semelhante ao processo 
-//de decodificar um bmp, copiando do arquivo para o backbuffer.
-// esses argumentos devem representar o posicionamentod esejado do 
-//retângulo no backbuffer.
-int show_saved_rect ( unsigned long x, 
-                      unsigned long y, 
-				      unsigned long width, 
-				      unsigned long height )
+/*
+ * show_saved_rect:
+ *      Pintar no backbuffer o retângulo salvo.
+ *      Semelhante ao processo de decodificar um bmp, copiando 
+ * do arquivo para o backbuffer.
+ * Esses argumentos representam o posicionamento desejado do 
+ * retângulo no backbuffer. 
+ */
+
+int 
+show_saved_rect ( unsigned long x, 
+                  unsigned long y, 
+				  unsigned long width, 
+				  unsigned long height )
 {		
-    if ( (void *) SavedRect ==  NULL )
+    
+	
+	
+	
+	// Checando a estrutura que tem informações 
+	// sobre o retângulo salvo.
+	
+	if ( (void *) SavedRect ==  NULL )
     {
 	    return (int) 1;
 		
@@ -714,8 +726,10 @@ int show_saved_rect ( unsigned long x,
 	    }
     };
 
-   // ## transferindo ... ##
-   //======================
+	
+    //
+    // ## Transferindo ... ##
+    //
 	
 	void *p = (void *) BACKBUFFER_ADDRESS;   	
 	const void *q = (const void *) SavedRect->buffer_address;         
@@ -723,7 +737,10 @@ int show_saved_rect ( unsigned long x,
 	//register unsigned int i;
 	unsigned int i;
 	
-	unsigned int line_size, lines;
+	int count; 
+	
+	int bytes_count;  // = 3; //24bpp	
+	
 	
 	unsigned int offset1;  //offset dentro do buffer de salvamento.
 	unsigned int offset2;  //offset dentro do backbuffer
@@ -731,12 +748,11 @@ int show_saved_rect ( unsigned long x,
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
 
+	unsigned int line_size, lines;
+	
 	line_size = (unsigned int) width; //passado por argumento
 	lines = (unsigned int) height;    //passado por argumento
 	
-	
-	
-	int bytes_count;// = 3; //24bpp
 	
 	switch (SavedBPP)
 	{
@@ -747,29 +763,26 @@ int show_saved_rect ( unsigned long x,
 		case 24:
 		    bytes_count = 3;
 			break;
-	}
+	};
 	
 
-	offset1 = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );		
-		
-	//offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	offset1 = (unsigned int) ( ( bytes_count * SavedX * (y) ) + ( bytes_count * (x) ) );		
 	
 	offset2 = 0;
 	
+	
 	p = (void *) (p + offset1);    
+	
 	q = (const void *) (q + offset2);    
 	 
-    
-	//não precisa de sincronização pois não estamos enviando para o LFB.
-	//vsync ();	
-	
+    // #importante:
+	// Não precisa de sincronização pois não estamos enviando para o LFB.
+	// vsync ();		
 	
 	//(line_size * 3) é o número de bytes por linha. 
 	
-	int count; 
-	
 	//se for divisível por 4.
-	if( ((line_size * 3) % 4) == 0 )
+	if ( ((line_size * 3) % 4) == 0 )
 	{
         count = ((line_size * 3) / 4);  	
 
@@ -784,7 +797,7 @@ int show_saved_rect ( unsigned long x,
 	}
 
 	//se não for divisível por 4.
-	if( ((line_size * 3) % 4) != 0 )
+	if ( ((line_size * 3) % 4) != 0 )
 	{
 
         //count = (line_size * 3);  		
@@ -796,17 +809,6 @@ int show_saved_rect ( unsigned long x,
 		    p += (Width * 3);
 	    };	
 	}  			
-	
-	
-	
-	/*
-	for ( i=0; i < lines; i++ )
-	{
-		memcpy( p, q, (line_size * 3) );
-		q += (Width * 3);
-		p += (Width * 3);
-	};	 
-    */
 	
     return (int) 0;	
 };

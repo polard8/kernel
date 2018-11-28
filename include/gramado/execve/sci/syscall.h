@@ -270,6 +270,10 @@
 //130-139 manipulação de texto.
 #define	SYS_DRAWTEXT 130
 #define	SYS_BUFFER_DRAWCHAR_WWF 131
+
+//132-133 manipulação do retângulo onde fica o texto.
+//será usado na rolagem do texto em modo gráfico; scroll
+//inclusive o scroll de um terãngulo pode ficar em kernel mode.
 #define	SYS_132 132
 #define	SYS_133 133
 

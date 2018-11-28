@@ -3240,6 +3240,39 @@ do_compare:
 		
 		goto exit_cmp;
 	};
+	
+	//buffer de test;
+	unsigned long message_buffer[11];
+	
+	// t12
+	// testando mudar um retângulo de lugar.
+	// + salva o retângulo num buffer 
+	// + copia do buffer para o backbuffer 
+	if ( strncmp( prompt, "t12", 3 ) == 0 )	
+	{
+        printf("t12: test rect \n");
+		
+		enterCriticalSection(); 
+		message_buffer[0] = 100;
+		message_buffer[1] = 100;
+		message_buffer[2] = 100;
+		message_buffer[3] = 100;
+		system_call ( 132,
+		    (unsigned long) &message_buffer[0],
+			(unsigned long) &message_buffer[0],
+			(unsigned long) &message_buffer[0] );
+		message_buffer[0] = 50;
+		message_buffer[1] = 50;
+		message_buffer[2] = 100;
+		message_buffer[3] = 100;			
+		system_call ( 133,
+		    (unsigned long) &message_buffer[0],
+			(unsigned long) &message_buffer[0],
+			(unsigned long) &message_buffer[0] );
+		exitCriticalSection(); 
+		
+        goto exit_cmp;					 
+	};	
 
 	
 	// tasklist - Lista informações sobre os processos.
@@ -4857,13 +4890,15 @@ void shellTestThreads (){
  *     Limpar a tela do shell.
  *     usada pelo comando 'cls'.
  */
+ 
 void shellClearScreen (){
+
 	
 	struct window_d *w;
+	unsigned long left, top, right, bottom;
 	
     //desabilita o cursor
 	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
-	
 	
 	
 	shellClearBuffer ();
@@ -4873,24 +4908,19 @@ void shellClearScreen (){
 	
 	if ( (void *) w != NULL )
 	{
-		APIredraw_window(w,1);
-	}
+		APIredraw_window ( w, 1 );
+	};
 
 	
-	
-	unsigned long left, top, right, bottom;
- 
     left = (terminal_rect.left/8);
     top = (terminal_rect.top/8);
 	
     shellSetCursor ( left, top );
 
 
-	//
 	// Copiamos o conteúdo do screenbuffer para 
 	// a área de cliente do shell.
 	// obs: A outra opção seria repintarmos a janela.
-	//
 
     //shellRefreshScreen ();	
 	
@@ -5011,6 +5041,7 @@ void shellRefreshCurrentChar (){
  * deve ser uma rotina de automação, presente 
  * em alguma biblioteca, servidor ou kernel.
  */
+
 void shellScroll (){
 	
 	//reajustando a área visível do buffer 
@@ -5027,7 +5058,6 @@ void shellScroll (){
 	//reabilita o cursor
 	//system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
-
 
 
 static void save_cur (void){

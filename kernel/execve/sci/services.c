@@ -1093,6 +1093,15 @@ void *services( unsigned long number,
 								(unsigned long) arg4);                   //char.
     		break;
 			
+		case 132:
+		    //#bugbug: pagefault
+			//save_rect (  message_address[0],  message_address[1],  message_address[2],  message_address[3] );
+			return;
+			
+        case 133: 		
+		    //#bugbug: pagefault
+			//show_saved_rect (  message_address[0],  message_address[1],  message_address[2],  message_address[3] );
+			return; 
 			
 		//134
 		//pegar informações sobre a área de cliente de uma janela;
