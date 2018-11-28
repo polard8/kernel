@@ -4,8 +4,9 @@
  * Arquivo principal do aplicativo teditor.bin 
  * O aplicativo é usado para testes do sistema operacional Gramado 0.4
  *
-    ## todo: pegar algumas funções do shell e usar aqui.
-	         agora eles usam o mesmo esquema de strutura de linhas para o texto.
+    ## todo: 
+	pegar algumas funções do shell e usar aqui.
+	agora eles usam o mesmo esquema de strutura de linhas para o texto.
  
  * 2018 - Created by Fred Nora.
  */
@@ -29,8 +30,8 @@
 //#define TEDITOR_VERBOSE 1
 
 //# usado para teste 
-#define WINDOW_WIDTH     750 //640 
-#define WINDOW_HEIGHT    550 //480
+#define WINDOW_WIDTH     640 
+#define WINDOW_HEIGHT    480
 #define WINDOW_LEFT      4   //10
 #define WINDOW_TOP       4   //10
 
@@ -169,17 +170,28 @@ int mainGetMessage (){
 	printf("Calling mainTextEditor ... \n"); 
 #endif	
 	
-	if ( mainTextEditor( token_count, tokenList ) == 1 )
-	{
-#ifdef TEDITOR_VERBOSE				
-		printf("mainGetMessage: mainTextEditor returned 1.\n");
-#endif 
-	}else{
-//#ifdef TEDITOR_VERBOSE				
-		//printf("mainGetMessage: mainTextEditor returned 0.\n");
-//#endif
-	};
 	
+	int retval;
+
+    retval = (int) mainTextEditor ( token_count, tokenList );
+	
+	switch (retval)
+	{
+		case 0:
+		    printf("mainGetMessage: mainTextEditor returned 0.\n");
+			break;
+			
+		case 1:
+		    printf("mainGetMessage: mainTextEditor returned 1.\n");
+		    break;
+			
+		//...
+		
+	    default:
+		    printf("mainGetMessage: mainTextEditor returned defaul\n");
+            break; 		
+	};
+		
     printf("*HANG\n");
 	
     while (1){
@@ -253,7 +265,6 @@ int mainTextEditor ( int argc, char *argv[] ){
 	
 	//#importante
 	//inicializa as variáveis antes de pintar.
-	
     teditorTeditor ();	
 	
 
@@ -280,8 +291,20 @@ int mainTextEditor ( int argc, char *argv[] ){
     apiEndPaint();
 	
     APIRegisterWindow(hWindow);
+	
+	
+	//set active efetua um redraw ...
+	//isso parece ser redundante na inicialização do 
+	//programa. Talvez o certo seria desenhar a janela 
+	//ja setando ativando.	
     APISetActiveWindow(hWindow);	
-    APISetFocus(hWindow);	
+    
+	//set focus efetua um redraw ...
+	//isso parece ser redundante na inicialização do 
+	//programa. Talvez o certo seria desenhar a janela 
+	//ja setando o foco.
+	APISetFocus(hWindow);	
+	
 	refresh_screen ();	
 
 
