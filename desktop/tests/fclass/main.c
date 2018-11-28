@@ -1,3 +1,5 @@
+
+
 // testar a implementação de funções com classes em C.
 // Ambiente: Gramado 0.1, user mode.
 
@@ -7,6 +9,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "api.h"
 
 
 // ?? O que é isso ??
@@ -70,6 +73,7 @@ int Multi ( int a , int b ){
  * app_main
  *     Função principal.
  */
+ 
 int app_main ( int argc, char *argv[] ){ 
     
     //

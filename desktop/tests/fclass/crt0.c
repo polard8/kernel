@@ -51,7 +51,7 @@ void _main (){
     stdioInitialize();	
 	
 	//chamando o teste...
-	app_main(0,0);
+	app_main (0,0);
 	
 	printf("done.\n");
 	
@@ -60,6 +60,6 @@ void _main (){
 	//}
     
     //return 0;
-    exit(0);
+    exit (0);
 };
 

@@ -2226,12 +2226,10 @@ redrawBegin:
 	//etc ...
 
 
-	//
 	// A rotina de repintura deve estar em sintonia com a rotina de pintura, elas 
 	// devem ser semelhantes, porem a rotina de repintura deve levar em consideração 
 	// os elementos incluídos depois da criação da janela e que ficam gravados na 
 	// estrutura. como por exemplo: arquivos abertos.
-	//
 
 	
 	//poderemos ter mais valores em flags no futuro.

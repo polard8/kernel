@@ -114,7 +114,7 @@ echo -{ ...
 	copy c:\gramado\bin\TASCII.BIN    F:\
 	copy c:\gramado\bin\TEDITOR.BIN   F:\	
 	copy c:\gramado\bin\TGFE.BIN      F:\
-
+    copy c:\gramado\bin\TPRINTF.BIN    F:\
 		
 	rem arquivos de texto.
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 

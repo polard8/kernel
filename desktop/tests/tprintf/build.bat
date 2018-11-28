@@ -2,7 +2,6 @@
 @echo off  
 
 
-
     cd c:\sdk\bin
 	
 :Monting
@@ -25,6 +24,8 @@ echo -{ app1 (init task)
     copy c:\gramado\lib\stdlib.o  c:\sdk\bin\stdlib.o
 	copy c:\gramado\lib\string.o  c:\sdk\bin\string.o
     copy c:\gramado\lib\time.o	  c:\sdk\bin\time.o
+	
+	copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o	
  
  
 :Objects	
@@ -35,7 +36,6 @@ stdlib.o ^
 ctype.o ^
 string.o ^
 api.o  
-
 
 :Linking  
 echo -{ ...

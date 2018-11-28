@@ -33,14 +33,6 @@
 ;;
 
 
-segment .head_x86
-
-
- 
-[bits 32]
-
-
- 
 ;
 ; Função importadas.
 ;
@@ -49,6 +41,17 @@ extern _idleServices
 extern _driverInitialize  ;Envia um sinal pro kernel inicializar esse driver.
 extern _driverUninitialize
 extern _testtest_main
+
+
+segment .head_x86
+
+
+ 
+[bits 32]
+
+
+ 
+
 
 	;
 	; Atuando como driver:

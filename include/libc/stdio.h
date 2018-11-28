@@ -265,7 +265,17 @@ void _outbyte(int c);
  */ 
  
 int fprintf(FILE *stream, const char *format, ...); 
+
+//esse funciona mas não é tradicional,
+//é essa que estamos usando.
+//ela se chamará printf2.
 int printf(const char *format, ...); 
+
+
+//esse é o jeito tradicional.
+//trocaremos o nome com a função que estávamos usando quando essa ficar pronta.
+int printf2(const char *format, ...); 
+
 int sprintf(char *out, const char *format, ...);
 
 

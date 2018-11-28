@@ -23,8 +23,6 @@
 #include <stdio.h>
 
 #include "status.h"
-#include "topbar.h"
-
 #include "teditor.h"
 
 //#define TEDITOR_VERBOSE 1
@@ -455,8 +453,7 @@ done:
     running = 0;
     printf("Exiting editor ...\n");
     printf("done.\n");
-	while (1)
-	{
+	while (1){
 		asm("pause");
 		exit(0);
 	};
@@ -466,8 +463,8 @@ done:
 
 
 /*
- *  
- *     Limpar a tela 
+ * Limpar a tela 
+ * #todo: poderemos limpara a tela do mesmo modo que o shell faz.    
  */
 
 void editorClearScreen (){
@@ -506,10 +503,9 @@ void editorClearScreen (){
 //estamos usando a API.
 int editor_save_file (){
 	
-	//
+
 	// #importante:
 	// Não podemos chamar a API sem que todos os argumentos estejam corretos.
-	//
 	
 	// #obs:
 	// Vamos impor o limite de 4 setores por enquanto. 
@@ -685,7 +681,10 @@ teditorProcedure( struct window_d *window,
 };
 
 
-
+/*
+ * teditorTeditor:
+ *     Contrutor e inicialização.
+ */
 void teditorTeditor (){
 	
 	int i=0;
@@ -724,25 +723,28 @@ void teditorTeditor (){
 
 
 
-void shellInitSystemMetrics()
-{
+void shellInitSystemMetrics (){
+	
 	//pegaremos todas as metricas de uma vez só,
 	//se uma falhar, então pegaremos tudo novamente.
 	
 	// Tamanho da tela.	
-	smScreenWidth = apiGetSystemMetrics(1);
+	smScreenWidth =  apiGetSystemMetrics(1);
     smScreenHeight = apiGetSystemMetrics(2); 
-	smCursorWidth = apiGetSystemMetrics(3);
+	
+	smCursorWidth =  apiGetSystemMetrics(3);
 	smCursorHeight = apiGetSystemMetrics(4);
-	smMousePointerWidth = apiGetSystemMetrics(5);
+	
+	smMousePointerWidth =  apiGetSystemMetrics(5);
 	smMousePointerHeight = apiGetSystemMetrics(6);
-	smCharWidth = apiGetSystemMetrics(7);
+	
+	smCharWidth =  apiGetSystemMetrics(7);
 	smCharHeight = apiGetSystemMetrics(8);	
 	//...
-} 
+}; 
 
 
-void shellInitWindowLimits(){
+void shellInitWindowLimits (){
 	
     //
     // ## Window limits ##
@@ -775,13 +777,11 @@ void shellInitWindowLimits(){
 
 
 
-
-void shellInitWindowSizes()
-{
+void shellInitWindowSizes (){
 	
-//
-//  ## Window size ##
-//
+    //
+    //  ## Window size ##
+    //
 
     //wsWindowWidth = wlMinWindowWidth;
     //wsWindowHeight = wlMinWindowHeight;	
@@ -802,13 +802,10 @@ void shellInitWindowSizes()
 	{
 	    wsWindowHeight = wlMinWindowHeight;	
 	}
-
-
 };
 
 
-void shellInitWindowPosition()
-{
+void shellInitWindowPosition (){
 	
 	//window position
 	wpWindowLeft = WINDOW_LEFT;
@@ -816,7 +813,7 @@ void shellInitWindowPosition()
 	
 	//wpWindowLeft = (unsigned long) ( (smScreenWidth - wsWindowWidth)/2 );
 	//wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
-}
+};
 
 
 
@@ -850,7 +847,7 @@ void teditorInsertNextChar (char c){
 		{
 			//shellScroll ();
 			printf(" *SCROLL");
-			while(1){}
+			while(1){ asm("pause"); }
 		}
 	}
 	

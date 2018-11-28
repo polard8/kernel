@@ -37,13 +37,17 @@
 // Includes.
 // 
  
+#include <types.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 #include <stdio.h>   //libC em user mode.
-#include <stdlib.h>  
-#include <stddef.h>   //libC em user mode. 
+
 #include <ctype.h>
 
 #include "api.h"      //api.
+
+#include "tprintf.h" 
 
 //
 // Variáveis internas.
@@ -71,6 +75,7 @@ struct idle
 // Protótipos.
 //
 int TEST_PRINTF(void);
+int TEST_PRINTF2(void);
 
 void idleLoop();
 void driverInitialize();      // processo sendo considerado um driver servidor.
@@ -223,8 +228,15 @@ int testtest_main()
 {
 	printf("\nInitilizing PRINTF1.BIN ...\n\n");
 	
-	TEST_PRINTF();
+	//TEST_PRINTF();
     	
+	
+	printf("\n\n testando printf2 \n\n");
+	TEST_PRINTF2();
+	//int dois = 2;
+	
+	//printf2("PRINTF2 int %d \n ",dois );
+	 
 	
 	printf("DONE.");	
 	refresh_screen();
@@ -330,6 +342,103 @@ done:
 	return (int) 0;
 };
 
+
+
+/*
+ * TEST_PRINTF2:
+ *     Essa função testa a função printf() e seus recursos.
+ *     Obs: We can implement this test in user mode.
+ * Obs:
+ *     If you compile this file with
+ *     gcc -Wall $(YOUR_C_OPTIONS) -DTEST_PRINTF -c printf.c
+ * you will get a normal warning:
+ *   printf.c:214: warning: spurious trailing `%' in format
+ * this line is testing an invalid % at the end of the format string.
+ *
+ * this should display (on 32bit int machine) :
+ *
+ * Hello world!
+ * printf test
+ * (null) is null pointer
+ * 5 = 5
+ * -2147483647 = - max int
+ * char a = 'a'
+ * hex ff = ff
+ * hex 00 = 00
+ * signed -3 = unsigned 4294967293 = hex fffffffd
+ * 0 message(s)
+ * 0 message(s) with %
+ * justif: "left      "
+ * justif: "     right"
+ *  3: 0003 zero padded
+ *  3: 3    left justif.
+ *  3:    3 right justif.
+ * -3: -003 zero padded
+ * -3: -3   left justif.
+ * -3:   -3 right justif.
+ *
+ */
+	 
+int TEST_PRINTF2(void)
+{
+
+
+	
+	int mi;
+	int i = 5;
+	unsigned int bs = sizeof(int)*8;
+
+	char *np = 0;	
+	char *ptr = "Hello world!";
+	char buf[80];
+	
+	
+
+	mi = (1 << (bs-1)) + 1;
+	
+//	vsync();
+	
+	printf2("%s\n", ptr);
+	printf2("printf test\n");
+	printf2("%s is null pointer\n", np);
+	printf2("%d = 5\n", i);
+	printf2("%d = - max int\n", mi);
+	printf2("char %c = 'a'\n", 'a');
+	printf2("hex %x = ff\n", 0xff);
+	printf2("hex %02x = 00\n", 0);
+	printf2("signed %d = unsigned %u = hex %x\n", -3, -3, -3);
+	printf2("%d %s(s)%", 0, "message");
+	printf2("\n");
+	printf2("%d %s(s) with %%\n", 0, "message");
+	
+    sprintf(buf, "justif: \"%-10s\"\n", "left"); 
+    printf2("%s", buf);
+	
+    sprintf(buf, "justif: \"%10s\"\n", "right"); 
+    printf2("%s", buf);
+	
+    sprintf(buf, " 3: %04d zero padded\n", 3); 
+    printf2("%s", buf);
+	
+    sprintf(buf, " 3: %-4d left justif.\n", 3); 
+    printf2("%s", buf);
+	
+    sprintf(buf, " 3: %4d right justif.\n", 3); 
+    printf2("%s", buf);
+	
+    sprintf(buf, "-3: %04d zero padded\n", -3); 
+    printf2("%s", buf);
+	
+    sprintf(buf, "-3: %-4d left justif.\n", -3); 
+    printf2("%s", buf);
+	
+    sprintf(buf, "-3: %4d right justif.\n", -3); 
+    printf2("%s", buf);
+
+
+done:
+	return (int) 0;
+};
 
 
 //

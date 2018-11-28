@@ -14,6 +14,7 @@
  *     2015~2018 - Revision. 
  */
 
+#include <limits.h> //testando no printf do nelson
 
 #include <stdio.h>
 #include <types.h> 
@@ -723,6 +724,149 @@ int printf ( const char *format, ... ){
 	
 	return (int) print ( 0, varg );
 };
+
+
+//
+//=============================================================
+//
+
+void printf_atoi(int value, char* valuestring)
+{
+  int min_flag;
+  char swap, *p;
+  min_flag = 0;
+
+  if (0 > value)
+  {
+    *valuestring++ = '-';
+    value = -INT_MAX> value ? min_flag = INT_MAX : -value;
+  }
+
+  p = valuestring;
+
+  do
+  {
+    *p++ = (char)(value % 10) + '0';
+    value /= 10;
+  } while (value);
+
+  if (min_flag != 0)
+  {
+    ++*valuestring;
+  }
+  *p-- = '\0';
+
+  while (p > valuestring)
+  {
+    swap = *valuestring;
+    *valuestring++ = *p;
+    *p-- = swap;
+  }
+}
+
+void printf_i2hex(uint32_t val, char* dest, int len)
+{
+	char* cp;
+	char x;
+	uint32_t n;
+	n = val;
+	cp = &dest[len];
+	while (cp > dest)
+	{
+		x = n & 0xF;
+		n >>= 4;
+		*--cp = x + ((x > 9) ? 'A' - 10 : '0');
+	}
+    dest[len+1]='\0';
+}
+
+
+
+//#test 
+//tentando implementar a printf do nelson cole.
+
+//void printf(const char *format,...)
+int printf2 ( const char *format, ...)
+{
+    char *ap;
+	va_start (ap,format);
+	
+	int index = 0;
+	uint8_t u;	
+	int d;
+	char c, *s;
+	
+	char buffer[256];
+
+	while ( format[index] )
+	{
+		switch (format[index])
+		{
+		    case '%':
+			    ++index;
+			    switch (format[index])
+			    {
+			
+                    case 'C':
+			        case 'c':
+				        c = (int8_t) va_arg (ap, int32_t);
+				        putchar(c);
+				        break;
+     
+                    case 'S':
+			        case 's':
+				        s = va_arg (ap, int8_t*);
+				        puts(s);
+				        break;
+
+			        case 'd':
+			        case 'i':
+				        d = va_arg (ap, int32_t);
+				        //atoi(d, buffer);
+				        printf_atoi(d, buffer);
+						puts(buffer);
+				        break;
+
+			        case 'U':
+			        case 'u':
+				        u = va_arg (ap, uint32_t);
+				        //atoi(u, buffer);
+				        printf_atoi(u, buffer);
+						puts(buffer);
+				        break;
+
+			        case 'X':
+			        case 'x':
+				        d = va_arg (ap, int32_t);
+				        //i2hex(d, buffer,8);
+						printf_i2hex(d, buffer,8);
+				        puts(buffer);
+				        break;
+			
+			        default:
+				        putchar('%');
+				        putchar('%');
+				        break;
+				
+			    }
+			    break;
+
+		    default:
+			    putchar ( format[index] );
+			    break;
+		};
+		
+		++index;
+    };
+	
+    return 0;
+};
+
+
+
+//
+//=============================================================
+//
 
 
 /*
@@ -1572,7 +1716,7 @@ unsigned long stdioGetCursorY (){
 
 //atoi. # talvez isso possa ir para o topo do 
 //arquivo para servir mais funções.
-int stdio_atoi (char * s){
+int stdio_atoi (char *s){
 	
     int rv=0; 
     char sign = 0;
