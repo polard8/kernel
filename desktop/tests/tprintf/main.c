@@ -76,6 +76,7 @@ struct idle
 //
 int TEST_PRINTF(void);
 int TEST_PRINTF2(void);
+int TEST_PRINTF3(void);
 
 void idleLoop();
 void driverInitialize();      // processo sendo considerado um driver servidor.
@@ -224,19 +225,25 @@ done:
  * iNICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
  */
 
-int testtest_main()
-{
-	printf("\nInitilizing PRINTF1.BIN ...\n\n");
+int testtest_main (){
 	
-	//TEST_PRINTF();
+	printf("\n");
+	printf("Initilizing ...\n\n");
+
+	printf("\n");
+	printf("===============\n");
+	printf("Testando printf, printf nao tradicional\n");	
+	TEST_PRINTF();
     	
+	//printf("\n");	
+	//printf("===============\n");
+	//printf("Testando printf2, printf tradicional\n");	
+	//TEST_PRINTF2();	 
 	
-	printf("\n\n testando printf2 \n\n");
-	TEST_PRINTF2();
-	//int dois = 2;
-	
-	//printf2("PRINTF2 int %d \n ",dois );
-	 
+	printf("\n");	
+	printf("===============\n");
+	printf("Testando printf3, printf tradicional \n");	
+	TEST_PRINTF3();	 	
 	
 	printf("DONE.");	
 	refresh_screen();
@@ -247,7 +254,7 @@ int testtest_main()
 
 
 /*
- * TEST_PRINTF:
+ * TEST_PRINTF2:
  *     Essa função testa a função printf() e seus recursos.
  *     Obs: We can implement this test in user mode.
  * Obs:
@@ -280,7 +287,12 @@ int testtest_main()
  * -3:   -3 right justif.
  *
  */
-	 
+	
+	
+	
+//testando 
+//não tradicional, mas funciona.
+
 int TEST_PRINTF(void)
 {
 
@@ -345,7 +357,7 @@ done:
 
 
 /*
- * TEST_PRINTF2:
+ * TEST_PRINTF:
  *     Essa função testa a função printf() e seus recursos.
  *     Obs: We can implement this test in user mode.
  * Obs:
@@ -378,7 +390,9 @@ done:
  * -3:   -3 right justif.
  *
  */
-	 
+	
+ //testando a tradicional, incompleta
+//não funciona, estamos implementando. 
 int TEST_PRINTF2(void)
 {
 
@@ -405,7 +419,11 @@ int TEST_PRINTF2(void)
 	printf2("%d = - max int\n", mi);
 	printf2("char %c = 'a'\n", 'a');
 	printf2("hex %x = ff\n", 0xff);
+	
+	/*
+	//podemos cancelar esse teste
 	printf2("hex %02x = 00\n", 0);
+	
 	printf2("signed %d = unsigned %u = hex %x\n", -3, -3, -3);
 	printf2("%d %s(s)%", 0, "message");
 	printf2("\n");
@@ -434,7 +452,71 @@ int TEST_PRINTF2(void)
 	
     sprintf(buf, "-3: %4d right justif.\n", -3); 
     printf2("%s", buf);
+    */
 
+done:
+	return (int) 0;
+};
+
+
+
+int TEST_PRINTF3(void)
+{
+
+
+	
+	int mi;
+	int i = 5;
+	unsigned int bs = sizeof(int)*8;
+
+	char *np = 0;	
+	char *ptr = "Hello world!";
+	char buf[80];
+	
+	
+
+	mi = (1 << (bs-1)) + 1;
+	
+//	vsync();
+	
+	printf3("%s\n", ptr);
+	printf3(" _(string 1 2 3 4)_ \n");
+	printf3("%s is null pointer\n", np);
+	
+	
+	printf3("%d = 5\n", i);
+	printf3("%d = - max int\n", mi);
+	printf3("char %c = 'a'\n", 'a');
+	printf3("hex %x = ff\n", 0xff);
+	printf3("hex %02x = 00\n", 0);
+	printf3("signed %d = unsigned %u = hex %x\n", -3, -3, -3);
+	printf3("%d %s(s)%", 0, "message");
+	printf3("\n");
+	printf3("%d %s(s) with %%\n", 0, "message");
+	
+    sprintf(buf, "justif: \"%-10s\"\n", "left"); 
+    printf3("%s", buf);
+	
+    sprintf(buf, "justif: \"%10s\"\n", "right"); 
+    printf3("%s", buf);
+	
+    sprintf(buf, " 3: %04d zero padded\n", 3); 
+    printf3("%s", buf);
+	
+    sprintf(buf, " 3: %-4d left justif.\n", 3); 
+    printf3("%s", buf);
+	
+    sprintf(buf, " 3: %4d right justif.\n", 3); 
+    printf3("%s", buf);
+	
+    sprintf(buf, "-3: %04d zero padded\n", -3); 
+    printf3("%s", buf);
+	
+    sprintf(buf, "-3: %-4d left justif.\n", -3); 
+    printf3("%s", buf);
+	
+    sprintf(buf, "-3: %4d right justif.\n", -3); 
+    printf3("%s", buf);
 
 done:
 	return (int) 0;

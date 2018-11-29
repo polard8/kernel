@@ -242,6 +242,22 @@ size_t strlen ( const char *s ){
 	return (size_t) i;
 };
 
+/* Find the length of S, but scan at most MAXLEN characters.  If no '\0'
+   terminator is found within the first MAXLEN characters, return MAXLEN. */
+/*
+size_t
+strnlen (s, maxlen)
+     register const char *s;
+     size_t maxlen;
+{
+  register const char *e;
+  size_t n;
+
+  for (e = s, n = 0; *e && n < maxlen; e++, n++)
+    ;
+  return n;
+}
+*/
 
 /*
 // Compares two strings. 

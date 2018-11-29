@@ -18,6 +18,8 @@ echo -{ Compiling ...
     copy c:\gramado\lib\stdlib.o  c:\sdk\bin\stdlib.o
 	copy c:\gramado\lib\string.o  c:\sdk\bin\string.o
     copy c:\gramado\lib\time.o	  c:\sdk\bin\time.o
+	
+	copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o	
  
 :Objects	
 set myObjects=main.o ^
@@ -25,7 +27,11 @@ ctype.o ^
 stdio.o ^
 stdlib.o ^
 string.o ^
-time.o    
+time.o ^
+api.o   
+
+
+    
 
 
 

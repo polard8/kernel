@@ -44,7 +44,7 @@ Linker script and memory map
                 0x00001000                __size_of_heap_commit__ = 0x1000
                 0x00000000                __loader_flags__ = 0x0
 
-.text           0x00401000     0x2000
+.text           0x00401000     0x3000
                 0x00401000                code = .
                 0x00401000                _code = .
                 0x00401000                __code = .
@@ -52,113 +52,119 @@ Linker script and memory map
  *(.text)
  .text          0x00401000      0x140 main.o
                 0x00401000                app_test
- .text          0x00401140     0x1360 stdio.o
-                0x00401956                putchar
-                0x00401140                stdio_fntos
-                0x00401912                sprintf
-                0x00402084                feof
-                0x004021aa                stdioSetCursor
-                0x00401fe6                ungetc
-                0x00401410                puts
-                0x00402162                fputc
-                0x00402200                stdioGetCursorY
-                0x004022e1                scanf
-                0x00401efc                fputs
-                0x004020c2                ferror
-                0x00401b38                input
-                0x0040134e                scroll
-                0x00401f71                gets
-                0x00401982                outbyte
-                0x00401e18                fflush
-                0x00401e87                fprintf
-                0x00401ca0                stdio_system_call
-                0x00401295                fopen
-                0x004021d4                stdioGetCursorX
-                0x00401cc8                getchar
-                0x0040222c                stdio_atoi
-                0x00401cf4                stdioInitialize
-                0x00402023                fgetc
-                0x0040122f                fclose
-                0x004020e8                fseek
-                0x00401b05                _outbyte
-                0x004018f7                printf
- .text          0x004024a0       0xe0 ctype.o
-                0x0040253a                isspace
-                0x00402560                isxdigit
-                0x0040254d                isupper
-                0x004024b3                isalpha
-                0x004024ff                islower
-                0x004024a0                isalnum
-                0x00402512                isprint
-                0x004024ec                isgraph
-                0x004024d9                isdigit
-                0x004024c6                iscntrl
-                0x00402527                ispunct
- .text          0x00402580      0x430 string.o
-                0x0040276c                strcspn
-                0x004026cf                strcat
-                0x00402580                strcmp
-                0x00402726                bzero
-                0x004028ac                strtok_r
-                0x00402662                memcpy
-                0x00402639                memoryZeroMemory
-                0x004026ff                bcopy
-                0x0040269f                strcpy
-                0x0040280c                strspn
-                0x00402981                strtok
-                0x004025db                strncmp
-                0x00402741                strlen
-                0x00403000                . = ALIGN (0x1000)
- *fill*         0x004029b0      0x650 00
-
-.rdata          0x00403000      0x130
- .rdata         0x00403000       0x70 stdio.o
- .rdata         0x00403070       0xc0 main.o
-
-.data           0x00403130      0xed0
-                0x00403130                data = .
-                0x00403130                _data = .
-                0x00403130                __data = .
- *(.data)
- .data          0x00403130        0x0 main.o
- .data          0x00403130        0x0 stdio.o
- .data          0x00403130      0x120 ctype.o
-                0x00403130                _ctype_
- .data          0x00403250        0x0 string.o
+ .text          0x00401140     0x2770 stdio.o
+                0x00401b44                printf_i2hex
+                0x00401d76                putchar
+                0x004011f5                stdio_fntos
+                0x00401d32                sprintf
+                0x004024a4                feof
+                0x00401bb2                printf2
+                0x004025ca                stdioSetCursor
+                0x00402406                ungetc
+                0x00401555                puts
+                0x00402582                fputc
+                0x00402620                stdioGetCursorY
+                0x0040264c                scanf
+                0x0040231c                fputs
+                0x004024e2                ferror
+                0x00401f58                input
+                0x00401493                scroll
+                0x00402391                gets
+                0x00401da2                outbyte
+                0x00402238                fflush
+                0x004022a7                fprintf
+                0x004020c0                stdio_system_call
+                0x0040135a                fopen
+                0x004025f4                stdioGetCursorX
+                0x004020e8                getchar
+                0x00401a57                printf_atoi
+                0x00401140                stdio_atoi
+                0x004028e2                kvprintf
+                0x00402114                stdioInitialize
+                0x00402443                fgetc
+                0x004012f4                fclose
+                0x00402508                fseek
+                0x00401f25                _outbyte
+                0x00403871                printf
+                0x00401a3c                printf3
+ .text          0x004038b0       0xe0 ctype.o
+                0x0040394a                isspace
+                0x00403970                isxdigit
+                0x0040395d                isupper
+                0x004038c3                isalpha
+                0x0040390f                islower
+                0x004038b0                isalnum
+                0x00403922                isprint
+                0x004038fc                isgraph
+                0x004038e9                isdigit
+                0x004038d6                iscntrl
+                0x00403937                ispunct
+ .text          0x00403990      0x430 string.o
+                0x00403b7c                strcspn
+                0x00403adf                strcat
+                0x00403990                strcmp
+                0x00403b36                bzero
+                0x00403cbc                strtok_r
+                0x00403a72                memcpy
+                0x00403a49                memoryZeroMemory
+                0x00403b0f                bcopy
+                0x00403aaf                strcpy
+                0x00403c1c                strspn
+                0x00403d91                strtok
+                0x004039eb                strncmp
+                0x00403b51                strlen
                 0x00404000                . = ALIGN (0x1000)
- *fill*         0x00403250      0xdb0 00
+ *fill*         0x00403dc0      0x240 00
 
-.bss            0x00404000     0x1d40
-                0x00404000                bss = .
-                0x00404000                _bss = .
-                0x00404000                __bss = .
- *(.bss)
- .bss           0x00404000        0x0 main.o
- .bss           0x00404000       0x10 stdio.o
- .bss           0x00404010        0x0 ctype.o
- .bss           0x00404010       0x10 string.o
+.rdata          0x00404000      0x400
+ .rdata         0x00404000      0x340 stdio.o
+                0x004041a0                hex2ascii_data
+ .rdata         0x00404340       0xc0 main.o
+
+.data           0x00404400      0xc00
+                0x00404400                data = .
+                0x00404400                _data = .
+                0x00404400                __data = .
+ *(.data)
+ .data          0x00404400        0x0 main.o
+ .data          0x00404400        0x0 stdio.o
+ .data          0x00404400      0x120 ctype.o
+                0x00404400                _ctype_
+ .data          0x00404520        0x0 string.o
                 0x00405000                . = ALIGN (0x1000)
- *fill*         0x00404020      0xfe0 00
- COMMON         0x00405000      0xd40 main.o
-                0x00405000                prompt
-                0x00405400                stderr
-                0x00405410                prompt_pos
-                0x00405420                g_using_gui
-                0x00405430                stdin
-                0x00405440                prompt_max
-                0x00405450                prompt_err
-                0x00405850                g_columns
-                0x00405860                stdout
-                0x00405870                Streams
-                0x004058f0                g_rows
-                0x00405900                prompt_out
-                0x00405d00                g_cursor_y
-                0x00405d10                prompt_status
-                0x00405d20                g_char_attrib
-                0x00405d30                g_cursor_x
-                0x00405d40                end = .
-                0x00405d40                _end = .
-                0x00405d40                __end = .
+ *fill*         0x00404520      0xae0 00
+
+.bss            0x00405000     0x1d40
+                0x00405000                bss = .
+                0x00405000                _bss = .
+                0x00405000                __bss = .
+ *(.bss)
+ .bss           0x00405000        0x0 main.o
+ .bss           0x00405000       0x10 stdio.o
+ .bss           0x00405010        0x0 ctype.o
+ .bss           0x00405010       0x10 string.o
+                0x00406000                . = ALIGN (0x1000)
+ *fill*         0x00405020      0xfe0 00
+ COMMON         0x00406000      0xd40 main.o
+                0x00406000                prompt
+                0x00406400                stderr
+                0x00406410                prompt_pos
+                0x00406420                g_using_gui
+                0x00406430                stdin
+                0x00406440                prompt_max
+                0x00406450                prompt_err
+                0x00406850                g_columns
+                0x00406860                stdout
+                0x00406870                Streams
+                0x004068f0                g_rows
+                0x00406900                prompt_out
+                0x00406d00                g_cursor_y
+                0x00406d10                prompt_status
+                0x00406d20                g_char_attrib
+                0x00406d30                g_cursor_x
+                0x00406d40                end = .
+                0x00406d40                _end = .
+                0x00406d40                __end = .
 LOAD main.o
 LOAD stdio.o
 LOAD ctype.o
