@@ -1893,8 +1893,8 @@ int scanf ( const char *fmt, ... ){
 //======================================================================
 
 
-//===================================================================
-// printf3 start
+//=============================================================
+// printf (start)
 //=============================================================
 /*-
  * Copyright (c) 1986, 1988, 1991, 1993
@@ -1957,17 +1957,19 @@ char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 //#define va_start __builtin_va_start
 //#define va_arg __builtin_va_arg
 //#define va_end __builtin_va_end
-#define toupper(c)      ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
-static size_t
-strlen(const char *s)
-{
+#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
+
+static size_t strlen (const char *s){
+	
 	size_t l = 0;
 	while (*s++)
 		l++;
 	return l;
-}
+};
 
-/* Max number conversion buffer length: a u_quad_t in base 2, plus NUL byte. */
+
+/* Max number conversion buffer length: 
+ a u_quad_t in base 2, plus NUL byte. */
 #define MAXNBUF	(sizeof(intmax_t) * NBBY + 1)
 
 /*
@@ -1976,33 +1978,40 @@ strlen(const char *s)
  * written in the buffer (i.e., the first character of the string).
  * The buffer pointed to by `nbuf' must have length >= MAXNBUF.
  */
-static char *
-ksprintn(char *nbuf, uintmax_t num, int base, int *lenp, int upper)
+ 
+static char *ksprintn ( char *nbuf, 
+                        uintmax_t num, 
+						int base, 
+						int *lenp, 
+						int upper )
 {
 	char *p, c;
 
 	p = nbuf;
 	
 	//*p = ' ';
-	
 	*p = 0;
 	
 	do {
-		c = hex2ascii(num % base);
+		
+		c = hex2ascii (num % base);
+		
 		*++p = upper ? toupper(c) : c;
+		
 	} while (num /= base);
+	
 	if (lenp)
 		*lenp = p - nbuf;
 	return (p);
-}
+};
+
 
 /*
  * Scaled down version of printf(3).
  *
  * Two additional formats:
- *
- * The format %b is supported to decode error registers.
- * Its usage is:
+ *     The format %b is supported to decode error registers.
+ *     Its usage is:
  *
  *	printf("reg=%bn", regval, "*");
  *
@@ -2022,17 +2031,23 @@ ksprintn(char *nbuf, uintmax_t num, int base, int *lenp, int upper)
  *		("%6D", ptr, ":")   -> XX:XX:XX:XX:XX:XX
  *		("%*D", len, ptr, " " -> XX XX XX XX ...
  */
-int
-kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap)
+ 
+int 
+kvprintf ( char const *fmt, 
+           void (*func)( int, void* ), 
+		   void *arg, 
+		   int radix, 
+		   va_list ap )
 {
-	
-    //#define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
+    
+	//#define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
     #define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
 	
 	char nbuf[MAXNBUF];
 	char *d;
 	const char *p, *percent, *q;
 	u_char *up;
+	
 	int ch, n;
 	uintmax_t num;
 	int base, lflag, qflag, tmp, width, ladjust, sharpflag, neg, sign, dot;
@@ -2042,14 +2057,17 @@ kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_lis
 	int stop = 0, retval = 0;
 
 	num = 0;
+	
 	if (!func)
 		d = (char *) arg;
 	else
 		d = NULL;
 
+	
 	if (fmt == NULL)
 		fmt = "(fmt null)n";
 
+	
 	if (radix < 2 || radix > 36)
 		radix = 10;
 
@@ -2057,7 +2075,8 @@ kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_lis
 		
 		padc = ' ';
 		width = 0;
-		while ((ch = (u_char)*fmt++) != '%' || stop) 
+		
+		while ( ( ch = (u_char) *fmt++ ) != '%' || stop ) 
 		{
 			//if (ch == '')
 			//	return (retval);
@@ -2067,117 +2086,178 @@ kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_lis
 			
 			PCHAR (ch);
 		}
+		
 		percent = fmt - 1;
-		qflag = 0; lflag = 0; ladjust = 0; sharpflag = 0; neg = 0;
-		sign = 0; dot = 0; dwidth = 0; upper = 0;
-		cflag = 0; hflag = 0; jflag = 0; tflag = 0; zflag = 0;
-reswitch:	switch (ch = (u_char)*fmt++) {
+		
+		qflag = 0; 
+		lflag = 0; 
+		ladjust = 0; 
+		sharpflag = 0; 
+		neg = 0;
+		
+		sign = 0; 
+		dot = 0; 
+		dwidth = 0; 
+		upper = 0;
+		
+		cflag = 0; 
+		hflag = 0; 
+		jflag = 0; 
+		tflag = 0; 
+		zflag = 0;
+		
+        reswitch:  
+    
+	    switch ( ch = (u_char) *fmt++ ){
+			
 		case '.':
 			dot = 1;
 			goto reswitch;
+			
 		case '#':
 			sharpflag = 1;
 			goto reswitch;
+			
 		case '+':
 			sign = 1;
 			goto reswitch;
+			
 		case '-':
 			ladjust = 1;
 			goto reswitch;
+			
 		case '%':
 			PCHAR(ch);
 			break;
+			
 		case '*':
-			if (!dot) {
+			if (!dot) 
+			{
 				width = va_arg(ap, int);
-				if (width < 0) {
+				
+				if (width < 0)
+				{
 					ladjust = !ladjust;
 					width = -width;
-				}
+				};
+				
 			} else {
+				
 				dwidth = va_arg(ap, int);
-			}
+			};
 			goto reswitch;
+			
 		case '0':
-			if (!dot) {
+			if (!dot) 
+			{
 				padc = '0';
 				goto reswitch;
 			}
-		case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
-				for (n = 0;; ++fmt) {
-					n = n * 10 + ch - '0';
-					ch = *fmt;
-					if (ch < '0' || ch > '9')
-						break;
-				}
+			
+		case '1': 
+		case '2': 
+		case '3': 
+		case '4':
+		case '5': 
+		case '6': 
+		case '7': 
+		case '8': 
+		case '9':
+			for ( n = 0;; ++fmt ) 
+			{
+				n = n * 10 + ch - '0';
+				ch = *fmt;
+				
+				if (ch < '0' || ch > '9')
+					break;
+			}
+			
 			if (dot)
 				dwidth = n;
 			else
 				width = n;
 			goto reswitch;
+			
 		case 'b':
 			num = (u_int)va_arg(ap, int);
 			p = va_arg(ap, char *);
+			
 			for (q = ksprintn(nbuf, num, *p++, NULL, 0); *q;)
 				PCHAR(*q--);
 
 			if (num == 0)
 				break;
 
-			for (tmp = 0; *p;) {
+			for (tmp = 0; *p;) 
+			{
 				n = *p++;
-				if (num & (1 << (n - 1))) {
+				
+				if (num & (1 << (n - 1))) 
+				{
 					PCHAR(tmp ? ',' : '<');
+					
 					for (; (n = *p) > ' '; ++p)
 						PCHAR(n);
 					tmp = 1;
 				} else
 					for (; *p > ' '; ++p)
 						continue;
-			}
+			};
+			
 			if (tmp)
 				PCHAR('>');
 			break;
+			
 		case 'c':
 			PCHAR(va_arg(ap, int));
 			break;
+			
 		case 'D':
 			up = va_arg(ap, u_char *);
 			p = va_arg(ap, char *);
+			
 			if (!width)
 				width = 16;
-			while(width--) {
+			while(width--) 
+			{
 				PCHAR(hex2ascii(*up >> 4));
 				PCHAR(hex2ascii(*up & 0x0f));
 				up++;
+				
 				if (width)
 					for (q=p;*q;q++)
 						PCHAR(*q);
-			}
+			};
 			break;
+			
 		case 'd':
 		case 'i':
 			base = 10;
 			sign = 1;
 			goto handle_sign;
+			
 		case 'h':
-			if (hflag) {
+			if (hflag) 
+			{
 				hflag = 0;
 				cflag = 1;
 			} else
 				hflag = 1;
 			goto reswitch;
+			
 		case 'j':
 			jflag = 1;
 			goto reswitch;
+			
 		case 'l':
-			if (lflag) {
+			if (lflag) 
+			{
 				lflag = 0;
 				qflag = 1;
 			} else
 				lflag = 1;
 			goto reswitch;
+			
 		case 'n':
 			if (jflag)
 				*(va_arg(ap, intmax_t *)) = retval;
@@ -2194,23 +2274,28 @@ reswitch:	switch (ch = (u_char)*fmt++) {
 			else
 				*(va_arg(ap, int *)) = retval;
 			break;
+			
 		case 'o':
 			base = 8;
 			goto handle_nosign;
+			
 		case 'p':
 			base = 16;
 			sharpflag = (width == 0);
 			sign = 0;
 			num = (uintptr_t)va_arg(ap, void *);
 			goto number;
+			
 		case 'q':
 			qflag = 1;
 			goto reswitch;
+			
 		case 'r':
 			base = radix;
 			if (sign)
 				goto handle_sign;
 			goto handle_nosign;
+			
 		case 's':
 			p = va_arg(ap, char *);
 			if (p == NULL)
@@ -2232,25 +2317,32 @@ reswitch:	switch (ch = (u_char)*fmt++) {
 				while (width--)
 					PCHAR(padc);
 			break;
+			
 		case 't':
 			tflag = 1;
 			goto reswitch;
+			
+		// ?? case 'U': ??
 		case 'u':
 			base = 10;
 			goto handle_nosign;
+			
 		case 'X':
 			upper = 1;
 		case 'x':
 			base = 16;
 			goto handle_nosign;
+			
 		case 'y':
 			base = 16;
 			sign = 1;
 			goto handle_sign;
+			
 		case 'z':
 			zflag = 1;
 			goto reswitch;
-handle_nosign:
+			
+        handle_nosign:
 			sign = 0;
 			if (jflag)
 				num = va_arg(ap, uintmax_t);
@@ -2269,7 +2361,8 @@ handle_nosign:
 			else
 				num = va_arg(ap, u_int);
 			goto number;
-handle_sign:
+			
+        handle_sign:
 			if (jflag)
 				num = va_arg(ap, intmax_t);
 			else if (qflag)
@@ -2286,7 +2379,8 @@ handle_sign:
 				num = (char)va_arg(ap, int);
 			else
 				num = va_arg(ap, int);
-number:
+			
+        number:
 			if (sign && (intmax_t)num < 0) {
 				neg = 1;
 				num = -(intmax_t)num;
@@ -2327,46 +2421,55 @@ number:
 					PCHAR(padc);
 
 			break;
+			
 		default:
+			
 			while (percent < fmt)
 				PCHAR(*percent++);
-			/*
-			 * Since we ignore an formatting argument it is no
+			
+			/* Since we ignore an formatting argument it is no
 			 * longer safe to obey the remaining formatting
 			 * arguments as the arguments will no longer match
-			 * the format specs.
-			 */
+			 * the format specs. */
+			 
 			stop = 1;
 			break;
-		}
-	}
+		};
+	};
 #undef PCHAR
-}
+};
 
 
-static void xxxputchar( int c, void *arg)
-{
+static void xxxputchar ( int c, void *arg ){
+	
 	/* add your putchar here */
-	putchar ( (int) c );
+	
 	//printf("%c",c);
-}
+	putchar ( (int) c );
+};
 
-//int printf3(const char *fmt, ...){
-int printf(const char *fmt, ...){	
-	/* http://www.pagetable.com/?p=298 */
+
+/*
+ *===========================================
+ * printf:
+ *     http://www.pagetable.com/?p=298
+ */
+
+int printf ( const char *fmt, ... ){	
 	
 	va_list ap;
-
 	va_start(ap, fmt);
 	
-	kvprintf( fmt, xxxputchar, NULL, 10, ap );
+	kvprintf ( fmt, xxxputchar, NULL, 10, ap );
 	
+	//#todo.
 	//va_end(ap);
-} 
+}; 
     
-//===================================================================
-// printf3 end
 //=============================================================
+// printf end
+//=============================================================
+
 
 /*
 int __printf (const char *format, ...)

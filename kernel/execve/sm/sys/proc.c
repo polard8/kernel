@@ -83,7 +83,7 @@ void procTestF6()
 	*/
 	
 	
-	pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x30, (int) 0 );	
+	pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x30, (int) 0, (int) 1 );	
 	 
 	//printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
 };
@@ -611,7 +611,7 @@ system_procedure ( struct window_d *window,
                 //testes				
 				case VK_F6:
 						
-                    show_ide_info ();
+                    //show_ide_info ();
 					
                     printf("\n\n"); 
 	                show_ideports_info();

@@ -147,11 +147,18 @@ int hdd_ata_wait_no_drq (int p){
  *   (IDE PIO)	
  */
  
+//int 
+//pio_rw_sector ( unsigned long buffer, 
+//                unsigned long lba, 
+//				int rw, 
+//				int port )
+				
 int 
 pio_rw_sector ( unsigned long buffer, 
                 unsigned long lba, 
 				int rw, 
-				int port )
+				int port,
+                int master )
 {
 
     unsigned long tmplba = (unsigned long) lba;
@@ -161,10 +168,36 @@ pio_rw_sector ( unsigned long buffer,
 		return -1;
 	
 	
+	//Selecionar se é master ou slave.
+	//outb (0x1F6, slavebit<<4)
+	//0 - 3		In CHS addressing, bits 0 to 3 of the head. 
+	//          In LBA addressing, bits 24 to 27 of the block number
+	//4	DRV	Selects the drive number.
+	//5	1	Always set.
+	//6	LBA	Uses CHS addressing if clear or LBA addressing if set.
+	//7	1	Always set.
+	
 	//0x01F6 ; Port to send drive and bit 24 - 27 of LBA
 	tmplba = tmplba >> 24;	
-	tmplba = tmplba | 0x000000E0; //1110 0000b;
+	
+	// no bit 4.
+	// 0 = master 
+	// 1 = slave
+	
+	//master. bit 4 = 0
+	if (master == 1)
+	{
+	    tmplba = tmplba | 0x000000E0; //1110 0000b;
+	}
+	
+	//slave. bit 4 = 1
+	if (master == 0)
+	{
+		tmplba = tmplba | 0x000000F0; //1111 0000b;
+	};
+	
 	outportb ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
+	
 	
 	//0x01F2 ; Port to send number of sectors
 	outportb ( (int) ide_ports[port].base_port + 2 , (int) 1 );
@@ -194,6 +227,12 @@ pio_rw_sector ( unsigned long buffer,
 	//rw
 	rw = rw & 0x000000FF;	
 	outportb ( (int) ide_ports[port].base_port + 7 , (int) rw );
+	
+	
+	
+	//PIO or DMA ??
+	//If the command is going to use DMA, set the Features Register to 1, otherwise 0 for PIO.
+	//outb (0x1F1, isDMA)
 	
 	
 	//
@@ -280,8 +319,10 @@ void my_read_hd_sector ( unsigned long ax,
 	
  
 	// read test (buffer, lba, rw flag, port number )
-    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
- 
+    //pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
+
+	// read test (buffer, lba, rw flag, port number, master )
+    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0, (int) 1 );		
 	
 	/*
 	 //antigo.
@@ -327,7 +368,11 @@ void my_write_hd_sector ( unsigned long ax,
 	//apresentou problemas. Estamos testando ...
  
 	// read test (buffer, lba, rw flag, port number )
-    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );		
+    // pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );		
+	
+	// read test (buffer, lba, rw flag, port number, master )
+    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0, (int) 1 );			
+	
 	
 /*
 	//antigo.

@@ -165,7 +165,7 @@ void *disk_get_current_disk_info();
 int disk_init();
 void init_test_disk();  //*teste de operação com disco. 
 
-int get_ide_disk_info ( int port, unsigned long buffer );
+int get_ide_disk_info ( int port, unsigned long buffer, int master );
 void show_ideports_info();
 //
 // End.

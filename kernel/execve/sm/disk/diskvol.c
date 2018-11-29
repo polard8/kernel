@@ -598,17 +598,20 @@ done:
 //mas pode dizer alguma coisa sobre as partições,
 // se olharmos na tabela de partições.
 
-int get_ide_disk_info ( int port, unsigned long buffer )
+int get_ide_disk_info ( int port, unsigned long buffer, int master )
 {
     unsigned char *mbr = (unsigned char *) buffer; 
 	
 	// read test (buffer, lba, rw flag, port number )
     
+
+	
+	
 	pio_rw_sector ( (unsigned long) &mbr[0], // buffer
 	                 (unsigned long) 0,      // 0 = mbr
 					 (int) 0x20,             // 20 = ler
-					 (int) port );	         // port 0-3
-	
+					 (int) port,             // port 0-3
+                     (int) master );         // 1 = master  0 = slave
 	
 	
 	// Check signature.
@@ -640,27 +643,79 @@ void show_ideports_info()
  
     printf("\nTesting ports. Looking for signature ...\n");  
   
-	int i;
 	
-	for ( i=0; i<4; i++ )
+	//primary master 
+	printf("\n Testing primary master \n");
+    if ( ide_ports[0].used ==  1 )
 	{
-		//só se a porta for válida.
-    	if ( ide_ports[i].used ==  1 )
-		{
-
-	        if ( get_ide_disk_info ( (int) i, (unsigned long) malloc(512) ) == -1 )
-            {
-		            printf("signature FAIL in port %d\n", i);	
-		    }else{
-		            printf("signature OK in port %d\n", i);
-		    };				
+	    if ( get_ide_disk_info ( (int) 0, (unsigned long) malloc(512), 1 ) == -1 )
+        {
+	        printf("primary master signature FAIL\n");	
+	    }else{
+	        printf("primary master signature OK\n");
+	    };				
 			
-		} else {
-			printf("No disk in port %d\n", i);
-		};
+	} else {
+		printf("No disk in primary master\n");
+	};
+	
+	
+	//primary slave 
+    printf("\n Testing primary slave \n");
+	if ( ide_ports[0].used ==  1 )
+	{
+	    if ( get_ide_disk_info ( (int) 0, (unsigned long) malloc(512), 0 ) == -1 )
+        {
+	        printf("primary slave signature FAIL\n");	
+	    }else{
+	        printf("primary slave signature OK\n");
+	    };				
+			
+	} else {
+		printf("No disk in primary slave\n");
+	};
+	
+	
+	//secondary master 
+	printf("\n Testing secondary master \n");
+    if ( ide_ports[2].used ==  1 )
+	{
+	    if ( get_ide_disk_info ( (int) 2, (unsigned long) malloc(512), 1 ) == -1 )
+        {
+	        printf("secondary master signature FAIL\n");	
+	    }else{
+	        printf("secondary master signature OK\n");
+	    };				
+			
+	} else {
+		printf("No disk in secondary master\n");
+	};
+	
+	//#bugbug
+	//como aqui o que temos é um disco (CD) a interface é ATAPI 
+	//e possivelmente SCSI, Então as regras são diferentes,
+	//vamos testar isso depois.
+	//secondary slave (.ISO) (1024 bytes)
+	//Para teste vamos colocar outro disco HD aqui.
+	//ok, está funcionando com os 4 discos hd
+    printf("\n Testing secondary slave \n");
+	if ( ide_ports[2].used ==  1 )
+	{
+	    if ( get_ide_disk_info ( (int) 2, (unsigned long) malloc(1024), 0 ) == -1 )
+        {
+	        printf("secondary slave signature FAIL\n");	
+	    }else{
+	        printf("secondary slave signature OK\n");
+	    };				
+			
+	} else {
+		printf("No disk in secondary slave\n");
+	};
+	
+	
+	
 		
 		refresh_screen();
-	};
 	
  
 	printf("done\n");
