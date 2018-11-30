@@ -447,8 +447,15 @@ void *services( unsigned long number,
 			
         //rede: 12,13,14,15			
 		//i/o:  16,17,18,19	
-        //Outros: 20 até o fim.		
+        
 
+        //24-28 WINDOW SUPPORT		
+        
+		//24
+		case 24:
+		    show_window_rect ( (struct window_d *) arg2 );
+		    break;
+	 
 		//34	
         case SYS_VIDEO_SETCURSOR: 
 		    systemRam(86,arg2,arg3,0,0); 

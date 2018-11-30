@@ -571,6 +571,8 @@ int shellCreateTaskBar (int status){
 	//Registrar.
     APIRegisterWindow (taskbarWindow);
 	
+	apiShowWindow (taskbarWindow);
+	
 	//
 	// menu icon window
 	//
@@ -600,6 +602,7 @@ int shellCreateTaskBar (int status){
 	
     //Registrar.
     APIRegisterWindow(menu_button);
+	apiShowWindow (menu_button);
 	
  
 	

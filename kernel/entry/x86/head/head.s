@@ -741,8 +741,10 @@ dummyJmpAfterLTR:
 ;;
 ;; HANG
 ;;	
-	
-_hang: 
+
+;global _hang	
+_hang:
+    ;cli 
     hlt	
 	jmp _hang	
 		
@@ -753,7 +755,12 @@ _hang:
 global __die
 __die:
 	hlt
-    jmp __die	
+    jmp __die
+
+	
+;hlt_loop:
+;	hlt
+;	jmp hlt_loop		
 	
 	;
 	; ***

@@ -101,24 +101,47 @@ int show_saved_window (struct window_d *window){
 };
 
 
-//mostra o retângulo de uma janela que está no backbuffer.
-//tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
+
+/*
+ ***********************************************
+ * show_window_rect:
+ *     Mostra o retângulo de uma janela que está no backbuffer.
+ *     Tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
+ *     A rotina de refresh rectangle tem que ter o vsync
+ */
+
 int show_window_rect (struct window_d *window){
 	
-    if( (void *) window == NULL )
+    if ( (void *) window == NULL )
     {
-		return 1;
+		return (int) 1;
+		
 	} else {
 	
-        if ( window->used != 1 || window->magic != 1234 )
+        if ( window->used == 1 || window->magic == 1234 )
         {
-			return 1;
-		}
+			
+			//#shadow 
+			// ?? E se a janela tiver uma sombra, 
+			// então precisamos mostrar a sombra também. 
+			
+			if ( window->shadowUsed == 1 )
+			{
+			    refresh_rectangle ( window->left, window->top, 
+				    window->width +2, window->height +2 ); 					
+			    
+				return (int) 0;	
+			}
+			
+	        refresh_rectangle ( window->left, window->top, window->width, 
+		        window->height ); 		
+			
+			return (int) 0;
+		}		
+	};
 
-	    refresh_rectangle ( window->left, window->top, window->width, 
-		    window->height ); 		
-		
-	};		
+	//fail.
+    return (int) 1;	
 };
 
 
@@ -157,6 +180,7 @@ fail:
 // +Essa rotina deve utilizar o driver de timer 
 // para conseguir a contagem que precisa.
 // #teste, começaremos contagem simples para teste.
+
 int
 windowSetTimer( struct window_d *window, //janela
                 int id,                  //id do timer
@@ -172,8 +196,8 @@ windowSetTimer( struct window_d *window, //janela
 		goto fail;
 	}else{
 		
-		if( window->used != 1 ||
-		    window->magic != 1234 )
+		if ( window->used != 1 ||
+		     window->magic != 1234 )
 		{
 			Status = 1;
 		    goto fail;
@@ -370,6 +394,9 @@ fail:
  * para a thread idle.
  *
  */
+
+//#obs: podemos suspender isso. 
+ 
 int windowInitializeBrowserSupport (){
 	
 	int i;
@@ -377,7 +404,7 @@ int windowInitializeBrowserSupport (){
 	//#debug
 	//printf("Initializing browser support\n");
 	
-	for(i=0; i< TABWINDOW_COUNT_MAX; i++){
+	for (i=0; i< TABWINDOW_COUNT_MAX; i++){
 		browsertabList[i] = (unsigned long) 0;
 	}
 	
@@ -393,10 +420,11 @@ int windowInitializeBrowserSupport (){
 	/*Criando a janela do navegador ... isso requer uma ponteiro exclusivo*/
 	/*Esse é a janela com moldura onde as abas serão criadas.
 	Essas abas serão janelas filhas da janela do navegador KSOC.*/
+	
 	struct window_d *w;
 	
-
-    w = (void*) CreateWindow( 3, 0, 0,"KSOC - Kernel Standard Output Container", 
+    //KSOC - Kernel Standard Output Container
+    w = (void *) CreateWindow( 3, 0, 0,"KSOC", 
 			        0, 0, 800, 600, 
 					gui->screen, 0, COLOR_WINDOW, 0xC0C0C0 );
 
@@ -427,11 +455,15 @@ int windowInitializeBrowserSupport (){
 	struct browser_tab_d *bt; //browser tabs.
 	
 	
-	/*Importante: Começaremos de 1 pois a aba 0 é a janela gui->screen*/
-	for(i=1; i<4; i++)
+	/* Importante: 
+	   Começaremos de 1 pois a aba 0 é a janela gui->screen */
+	
+	for ( i=1; i<4; i++ )
 	{
-		bt = (void*) malloc( sizeof(struct browser_tab_d) );
-	    if((void *) bt == NULL){
+		bt = (void *) malloc( sizeof(struct browser_tab_d) );
+	    
+		if ( (void *) bt == NULL )
+		{
 	        printf("erro tab struct");
 		    die();
 	    }		
@@ -449,8 +481,8 @@ int windowInitializeBrowserSupport (){
 		//
 		// *Importante: Pintar todas essas janelas sobrepostas demanda tempo 
         // podemos criar janelas minimizadas, que não precisam pintar. 		
-		//
-        w = (void*) CreateWindow( 1, 0, 0,"TAB", 
+		
+        w = (void *) CreateWindow ( 1, 0, 0,"TAB", 
 			            0, 24, 800, 600-24, 
 						gui->screen, 0, COLOR_WINDOW, COLOR_WINDOW );		
 		
@@ -481,12 +513,14 @@ int windowInitializeBrowserSupport (){
     //testando a aba 1.
     bt = (void *) browsertabList[1];
     
-	if( (void *) bt == NULL ){
+	if ( (void *) bt == NULL )
+	{
 	    printf("~erro tab struct");
 		die();
 	}	   
    
-    if( bt->used != 1 || bt->magic != 1234 ){
+    if ( bt->used != 1 || bt->magic != 1234 )
+	{
 	    printf("windowInitializeBrowserSupport: bt fail");
 		die();		
 	}
@@ -498,13 +532,15 @@ int windowInitializeBrowserSupport (){
 	//janela da aba. (a aba propriamente dita.
     w = (void *) bt->window;	
 
-    if( (void *) w == NULL )
+    if ( (void *) w == NULL )
 	{
 	    printf("windowInitializeBrowserSupport:~fail");
 		die();
+		
 	}else{
 		
-	    if( w->used != 1 || w->magic != 1234 ){
+	    if ( w->used != 1 || w->magic != 1234 )
+		{
 	        printf("windowInitializeBrowserSupport: ~fail");
 	        die();			
 	    }
@@ -532,7 +568,7 @@ int windowInitializeBrowserSupport (){
    // Deve haver muito o que fazer ainda  ...
    //
    
-    printf("done.\n");	
+    printf("done\n");	
 	return (int) 0;
 }
 
@@ -873,9 +909,7 @@ void windowShowWWFMessageBuffers (){
 	for ( i=0; i<32; i++ )
 	{
 	    printf("%d ", wFocus->msgList[i]);
-    };
-	
-    //return;	
+    };	
 };
 
 
@@ -972,9 +1006,6 @@ void windowSendMessage( unsigned long arg1,
 		};
           		
 	};
-	
-//done:	
-	//return;
 };
 
 
@@ -1165,7 +1196,7 @@ void *windowGetLong2(struct window_d *window)
 	//sinaliza que a mensagem foi lida, e que não temos nova mensagem.
 	wFocus->newmessageFlag = 0;
 	
-	return (void*) wFocus->long2;
+	return (void *) wFocus->long2;
 	
 
 	//Nothing.
@@ -1186,6 +1217,7 @@ fail:
  * um aplicativo que roda no shell pode estar chamando isso.
  *
  */
+ 
 int window_getch (){
 	
 	unsigned char SC;
@@ -1217,8 +1249,11 @@ int window_getch (){
 	keybuffer[keybuffer_head] = 0;
 	
 	//Circulamos a fila de teclado.
+	
 	keybuffer_head++;
-	if( keybuffer_head >= 128 ){
+	
+	if ( keybuffer_head >= 128 )
+	{
 	    keybuffer_head = 0;	
 	}
 
@@ -1238,14 +1273,18 @@ int window_getch (){
 	
 	//fast way 
 	//@todo: melhorar isso
+	
 	wFocus = (void *) windowList[window_with_focus];
-	if( (void*) wFocus == NULL ){
+	
+	if ( (void *) wFocus == NULL )
+	{
 		//fail 
 		//free(wFocus);
 		goto fail;
-	}else{
+	
+	} else {
 		
-		if( wFocus->msg != MSG_KEYDOWN ){
+		if ( wFocus->msg != MSG_KEYDOWN ){
 		    goto fail;	
 		}
 		
@@ -1318,17 +1357,15 @@ done:
  *     Bloqueia uma janela.
  *     @todo: Quem pode realizar essa operação??
  */
+ 
 void windowLock (struct window_d *window){
 	
-    //Check.
 	if ( (void *) window == NULL )
 	{
 	    return;
     };
 	
     window->locked = (int) WINDOW_LOCKED;  //1.
-    
-	//return;
 };
 
 
@@ -1337,17 +1374,15 @@ void windowLock (struct window_d *window){
  *     Desbloqueia uma janela.
  *     @todo: Quem pode realizar essa operação??
  */
+ 
 void windowUnlock (struct window_d *window){
 	
-    //Check.
 	if ( (void *) window == NULL )
 	{
 	    return;
     };  
     
 	window->locked = (int) WINDOW_UNLOCKED;  //0.
-    
-	//return;
 };
 
 
@@ -1355,9 +1390,9 @@ void windowUnlock (struct window_d *window){
  * set_current_window:
  *     @todo: Mudar para windowSetCurrentWindow
  */
+ 
 void set_current_window (struct window_d *window){
 	
-    //Check.
 	if ( (void *) window == NULL )
 	{ 
 	    return; 
@@ -1365,8 +1400,6 @@ void set_current_window (struct window_d *window){
     
 	CurrentWindow = (void *) window;
 	current_window = (int) window->id;
-    
-	//return;
 };
 
 
@@ -1394,26 +1427,26 @@ int get_current_window_id()
  * RegisterWindow: 
  *     Registrando uma janela numa lista de janelas.
  */
+ 
 int RegisterWindow (struct window_d *window){
 	
 	int Offset = 0; 
     struct window_d *Empty; 
 	
-    if( (void*) window == NULL ){
+    if ( (void *) window == NULL )
+	{
         return (int) 1;    //Erro, estrutura inválida.
     };
    
-	//
 	// Contagem de janelas e limites.
 	// (é diferente de id, pois id representa a posição
 	// da janela na lista de janelas).
-	//
 	
 	windows_count++;
 	
-	if( windows_count >= WINDOW_COUNT_MAX )
+	if ( windows_count >= WINDOW_COUNT_MAX )
 	{
-	    printf("RegisterWindow: Limits.");
+	    printf("RegisterWindow: Limits");
 		die();
 	};
     
@@ -1425,14 +1458,18 @@ get_next:
 	Offset++;
 	
 	//Limite da lista, volta ao início da lista.
-	if(Offset >= WINDOW_COUNT_MAX){
+	
+	if (Offset >= WINDOW_COUNT_MAX){
 	   Offset = 0;
 	};	
     
 	//Get empty.
- 	Empty = (void*) windowList[Offset]; 	
-    if( (void*) Empty != NULL ){
+ 	Empty = (void *) windowList[Offset]; 
+	
+    if ( (void *) Empty != NULL )
+	{
         goto get_next;
+		
     }else{
 	    
 		//coloca na lista.
@@ -1445,7 +1482,8 @@ get_next:
 		//...
 	};  		
 	
-done:
+//done:
+
     return (int) 0;
 };
 
@@ -1455,8 +1493,12 @@ done:
  *     Show Window List
  *     Mostra a lista de janelas registradas. 
  */
-void windowShowWindowList()
-{
+ 
+//#debug
+//usado para debug.
+ 
+void windowShowWindowList (){
+	
 	int i = 0;
 	struct window_d *hWnd;
 	struct window_d *hWindow;
@@ -1639,6 +1681,7 @@ done:
  *    usar redraw_window para repintar uma janela do tipo botão. 
  *    assim poderemos setar o foco em janela e em botão.
  */
+ 
 //int windowRedrawWindow(struct window_d *window) 
 int redraw_window (struct window_d *window, unsigned long flags ){
 	
@@ -2340,7 +2383,8 @@ fail:
  *********************************************
  * resize_window:
  *     Muda as dimensões da janela.
- */				  
+ */	
+ 
 int 
 resize_window( struct window_d *window, 
                unsigned long cx, 
@@ -2370,7 +2414,8 @@ resize_window( struct window_d *window,
  ****************************************************
  * replace_window:
  *     Muda os valores do posicionamento da janela.
- */				  
+ */	
+ 
 int replace_window ( struct window_d *window, 
                      unsigned long x, 
 				     unsigned long y )
@@ -2401,23 +2446,25 @@ int replace_window ( struct window_d *window,
  *     retorno 1, modo tela cheia.
  * @todo: Rever o retorno.
  */
-int is_window_full( struct window_d *window )
-{
-    //Checa estrutura.
-    if( (void*) window == NULL )
+ 
+int is_window_full ( struct window_d *window ){
+	
+    if ( (void *) window == NULL )
 	{
 	    return (int) 0;    //FALSE.
-	}else{
+	
+	} else {
 		
 	    //Checa modo tela cheia.
-        if( window->view == VIEW_FULL ){
+        if ( window->view == VIEW_FULL ){
 	        return (int) 1;    //TRUE.
 	    }
 		
 		//...
 	};
 	
-fail:
+//fail:
+
 	return (int) 0;
 };
 
@@ -2430,42 +2477,47 @@ fail:
  *     retorno 1, modo maximizada.
  * @todo: Rever o retorno.
  */
-int is_window_maximized(struct window_d *window)
-{
-    //Checa estrutura.
-    if( (void*) window == NULL)
+ 
+int is_window_maximized (struct window_d *window){
+	
+    if ( (void *) window == NULL )
 	{
 	    return (int) 0;    //FALSE.
-	}else{
+		
+	} else {
 	    
 		//Checa se está maximizada.
-        if( window->view == VIEW_MAXIMIZED ){
+        if ( window->view == VIEW_MAXIMIZED ){
 	        return (int) 1;    //TRUE.
 	    };		
 		//...
 	};
 	
-fail:
+//fail:
+
 	return (int) 0;    //FALSE.
 };
 
 
 //todo: rever o retorno
-int is_window_minimized(struct window_d *window)
-{
-    //Checa estrutura.
-	if( (void*) window == NULL){
+int is_window_minimized (struct window_d *window){
+	
+    
+	if ( (void *) window == NULL)
+	{
 	    return (int) 0;    //FALSE.
-	}else{
+	
+	} else {
 		
 	    //Checa se está minimizada.
-        if( window->view == VIEW_MINIMIZED ){
+        if ( window->view == VIEW_MINIMIZED ){
 	        return (int) 1;    //TRUE.
 	    }		
 		//...
 	};
 	
-fail:
+//fail:
+
 	return (int) 0;    //FALSE.
 };
 
@@ -2482,11 +2534,11 @@ fail:
  * signifcicar apenas sinalizar para o GC que ele 
  * pode atuar sobre a estrutura.
  */
-void CloseWindow( struct window_d *window ){
+ 
+void CloseWindow ( struct window_d *window ){
 	
 	int Offset;
 	
-	//Check.
 	if ( (void *) window == NULL )
 	{ 
 	    return; 

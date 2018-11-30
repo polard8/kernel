@@ -70,8 +70,9 @@
 */ 
 
 //# usado para teste 
+//divisível por 4 é mais lento.
 #define WINDOW_WIDTH     750 
-#define WINDOW_HEIGHT    400
+#define WINDOW_HEIGHT    400 //400
 #define WINDOW_LEFT      10
 #define WINDOW_TOP       10
  
@@ -843,9 +844,10 @@ noArgs:
 	//	terminal_rect.width, terminal_rect.height );
 	//while(1){}
 	
-	//
+	
+	
+	// # ??
 	// Pegando a janela principal para usarmos como janela mãe.
-	//
 	
 	struct window_d *pW;
 
@@ -876,7 +878,7 @@ noArgs:
 						
     //para flat os dois poem ser a mesma cor.
     //não completamente preto.	
-	apiBeginPaint();
+	apiBeginPaint ();
 	
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "SHELL",
 	                    wpWindowLeft, wpWindowTop, 
@@ -939,7 +941,10 @@ noArgs:
     //APISetActiveWindow (hWindow);	
     //APISetFocus (hWindow);
 	
-	
+	//#test
+	//vamos mostrar a janela do shell antes de criarmos a janela 
+	//da área de cliente
+	apiShowWindow (hWindow);
 	
 	//#test 
 	//Criando um timer.
@@ -968,7 +973,9 @@ noArgs:
 	unsigned long xbuffer[8];
 	
 	// +pegamos o retângulo referente à area de cliente da janela registrada. 
-	system_call ( 134, (unsigned long) hWindow, (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );
+	
+	system_call ( 134, (unsigned long) hWindow, 
+	    (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );
 
 	
 	//struct rect_d *r;
@@ -1000,7 +1007,9 @@ noArgs:
         printf("l={%d} t={%d} w={%d} h={%d}\n", 
 	        terminal_rect.left, terminal_rect.top,
 		    terminal_rect.width, terminal_rect.height );
-        while(1){}			
+        while (1){
+			asm ("pause");
+		}			
 	}
 	
     //
@@ -1040,8 +1049,13 @@ noArgs:
     APISetFocus (hWindow2);	 
 	
 	//#importante
-	refresh_screen ();	
+	//refresh_screen ();	
 	
+	//#test 
+	//substituindo refresh screen por show window.
+	//vamos mostrar a janela da área do cliente, depois de 
+	//termos mostrado a janela mãe.
+	apiShowWindow (hWindow2);
 
 	
 	//
@@ -1314,6 +1328,13 @@ shellProcedure( struct window_d *window,
 					printf("\n");
 				
 				    input('\0'); 
+					
+					//#obs: 
+					//#importante 
+					//Se essa janela for a janela do shell, 
+					//então a rotina de comparação poderá fazer um refresh dessa janela. 
+					//#obs: talvez esse refresh nem seja necessário.
+					//cada rotina chamada que faça seu próprio refresh se conseguir.
 					shellCompare (window);
 					goto done;
                     break; 
@@ -3690,13 +3711,17 @@ fail:
     ret_value=1;
 	goto done;
 	
-//
-// ## EXIT CMP ##
-//	
+	
+   //====================
+   //    ## EXIT CMP ##
+   //====================	
 
 exit_cmp:
-    ret_value=0;	
+
+    ret_value = 0;	
+	
 done:
+
 	// Limpando a lista de argumentos.
 	// Um array de ponteiros.
 	
@@ -3704,13 +3729,14 @@ done:
 		tokenList[i] = NULL;
 	};
 	
-	shellPrompt();
+	shellPrompt ();
 	
 	
 	//#bugbug:
 	//queremos dar refresh apenas da janela.
 	//Mostrando as strings da rotina de comparação.	
-	refresh_screen();
+	
+	//refresh_screen();
 	
     return (unsigned long) ret_value;
 };
@@ -3978,8 +4004,8 @@ void shellShell (){
  * esta terminando de escrever mas agora na janela do outro aplicativo.
  *
  * @todo: Inicializar globais e estruturas.
- *
  */
+ 
 int shellInit ( struct window_d *window ){
 	
 	//#bugbug 
@@ -4387,7 +4413,20 @@ done:
 	    shellPrompt ();
 	
 	
-    refresh_screen();
+	
+	// #bugbug 
+	// Vamos retornar sem mostrarmos a janela 
+	// ou podemos confiar no ponteiro passado via argumento 
+	// e efetuarmos o refresh da janela.
+	
+    //refresh_screen ();
+	
+	//isso deve mostrar as string
+	//Se é que isso é preciso, pois 
+	//a rotina de printf mostra as strings.
+	//>>vamos tentar sem isso e confiarmos na função printf.
+	//apiShowWindow(window);
+	
     return (int) 0;
 };
 

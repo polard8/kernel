@@ -68,12 +68,14 @@
 #define	SYS_REFRESH_BUFFER3      22
 //screen.
 #define	SYS_REFRESHSCREEN2       23
-//bars.
-#define	SYS_REFRESH_TITLEBAR     24
-#define	SYS_REFRESH_MENUBAR      25
-#define	SYS_REFRESH_TOOLBAR      26
-#define	SYS_REFRESH_STATUSBAR    27
-#define	SYS_REFRESH_TASKBAR      28
+
+//24-28 WINDOW SUPPORT	
+#define	SYS_24    24  //show window.
+#define	SYS_25    25
+#define	SYS_26    26
+#define	SYS_27    27
+#define	SYS_28    28
+
 //buffer.
 #define	SYS_MY_BUFFER_PRINTSTRING    29
 //pixel.
@@ -152,6 +154,7 @@
 #define	SYS_PUTCHAR 65
 #define	SYS_66 66  
 #define	SYS_67 67
+
 //68-Um evento de mouse ocorreu e o driver de mouse enviou a mensagem pra cá.
 //cabe ao executive receber essa mensagem do driver de mouse
 //e processa-la da melhor forma..

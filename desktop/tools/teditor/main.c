@@ -28,8 +28,8 @@
 //#define TEDITOR_VERBOSE 1
 
 //# usado para teste 
-#define WINDOW_WIDTH     640 
-#define WINDOW_HEIGHT    480
+#define WINDOW_WIDTH     430//400 //640 
+#define WINDOW_HEIGHT    400 //480
 #define WINDOW_LEFT      4   //10
 #define WINDOW_TOP       4   //10
 
@@ -288,22 +288,26 @@ int mainTextEditor ( int argc, char *argv[] ){
 	}
     apiEndPaint();
 	
-    APIRegisterWindow(hWindow);
+    APIRegisterWindow (hWindow);
 	
 	
 	//set active efetua um redraw ...
 	//isso parece ser redundante na inicialização do 
 	//programa. Talvez o certo seria desenhar a janela 
 	//ja setando ativando.	
-    APISetActiveWindow(hWindow);	
+    APISetActiveWindow (hWindow);	
     
 	//set focus efetua um redraw ...
 	//isso parece ser redundante na inicialização do 
 	//programa. Talvez o certo seria desenhar a janela 
 	//ja setando o foco.
-	APISetFocus(hWindow);	
+	APISetFocus (hWindow);	
 	
-	refresh_screen ();	
+	//#suspenso 
+	//vamos tentar refresh só da janela.
+	//refresh_screen ();	
+	
+	apiShowWindow (hWindow);
 
 
 	//apiBeginPaint();    

@@ -284,63 +284,7 @@ void setClientAreaRect( unsigned long x,
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
  */	
-
-/* #backup
-void 
-refresh_rectangle ( unsigned long x, 
-                    unsigned long y, 
-				    unsigned long width, 
-				    unsigned long height )
-{    
-	void *p = (void *) FRONTBUFFER_ADDRESS;		
-	void *q = (void *) BACKBUFFER_ADDRESS;
-
-	//register unsigned int i;
-	unsigned int i;
-	
-	unsigned int line_size, lines;
-	unsigned int offset;
-	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();	
-
-	line_size = (unsigned int) width; 
-	lines = (unsigned int) height;
-	
-	
-	
-	
-	int bytes_count;// = 3; //24bpp
-	
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-	}
-	
-	
-	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
-	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
-	
-	p = (void *) (p + offset);    
-	q = (void *) (q + offset);    
-	 
-    vsync ();	
-	
-	for ( i=0; i < lines; i++ )
-	{
-		memcpy ( p, q, (line_size * 3) );
-		q += (Width * 3);
-		p += (Width * 3);
-	};	
-};
-*/
-
-
+ 
 void 
 refresh_rectangle ( unsigned long x, 
                     unsigned long y, 
@@ -350,8 +294,9 @@ refresh_rectangle ( unsigned long x,
 	void *p = (void *) FRONTBUFFER_ADDRESS;		
 	const void *q = (const void*) BACKBUFFER_ADDRESS;
 
-	//register unsigned int i;
-	unsigned int i;
+	//#TEST
+	register unsigned int i;
+	//unsigned int i;
 	
 	unsigned int line_size, lines;
 	unsigned int offset;
@@ -375,6 +320,8 @@ refresh_rectangle ( unsigned long x,
 		case 24:
 		    bytes_count = 3;
 			break;
+			
+		//...
 	}
 	
 	
@@ -385,11 +332,28 @@ refresh_rectangle ( unsigned long x,
 	q = (const void *) (q + offset);    
 	 
     vsync ();	
- 
+	
+	
+	/*
+	 //#isso roda mais lento que as rotinas abaixo.
+	for ( i=0; i < lines; i++ ){
+		
+		memcpy ( (void *) p, (const void *) q, (line_size * 3) );
+		
+		q += (Width * 3);
+		p += (Width * 3);
+	};		
+    */
+	
 	
 	//(line_size * 3) é o número de bytes por linha. 
 	
 	int count; 
+	
+	//#bugbug:
+	//NA PRÁTICA, ESSA ROTINA É MAIS LENTA QUE A QUE MOVO DE BYTE EM BYTE.
+	//FAREMOS TENTATIVAS, MAS POR ENQUANTO ESTÁ SUSPENSA ESSA QUE MOVE DE 
+	//4 EM 4 BYTES.
 	
 	//se for divisível por 4.
 	if( ((line_size * 3) % 4) == 0 )
@@ -418,7 +382,8 @@ refresh_rectangle ( unsigned long x,
 		    q += (Width * 3);
 		    p += (Width * 3);
 	    };	
-	}  	
+	} 
+    
 };
 
 

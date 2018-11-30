@@ -365,12 +365,12 @@
 //Screen.
 #define	SYSTEMCALL_REFRESH_SCREEN2  23
 
-//Refresh Bars.
-#define	SYSTEMCALL_REFRESH_TITLEBAR   24
-#define	SYSTEMCALL_REFRESH_MENUBAR    25
-#define	SYSTEMCALL_REFRESH_TOOLBAR    26
-#define	SYSTEMCALL_REFRESH_STATUSBAR  27
-#define	SYSTEMCALL_REFRESH_TASKBAR    28
+//24-28 WINDOW SUPPORT	
+#define	SYSTEMCALL_SHOWWINDOW   24
+#define	SYSTEMCALL_25   25
+#define	SYSTEMCALL_26    26
+#define	SYSTEMCALL_27    27
+#define	SYSTEMCALL_28    28
 
 //Buffer: Print string.
 #define	SYSTEMCALL_BUFFER_PRINTSTRING  29
@@ -453,6 +453,7 @@
 #define	SYSTEMCALL_SYS_PUTCHAR  65
 #define	SYSTEMCALL_66  66
 #define	SYSTEMCALL_67  67
+
 #define	SYSTEMCALL_68  68
 #define	SYSTEMCALL_69  69
 
@@ -3422,6 +3423,11 @@ void APIredraw_window( struct window_d *window,
 void APIreplace_window( struct window_d *window, 
                         unsigned long x, 
 						unsigned long y );
+
+	
+//torna visível uma janela.
+//refresh	
+void apiShowWindow (struct window_d *window);
 						
 //max
 void APImaximize_window(struct window_d *window);

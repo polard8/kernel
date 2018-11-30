@@ -487,27 +487,37 @@ do_rm_startgui:
 	
 	;Mask off all interrupts for now. 
 	;PERMITE TODAS AS INTS.
+	;enable interrupts
+	
 	mov	al, 0		
 	out	0x21, al
 	out	0xA1, al
 	
-    sti    ;enable interrupts
+    sti    
 
 .enableTextMode:	
-	;set text mode
-    mov   ax,0x0003      ; set text mode for screen
-    int   0x10
-
-	 ;*Importante:
-	 ;Mensagem em modo real.
- 	
-	mov si, rm_startgui_msg1
-	call DisplayMessage	
 	
-.stop:
-    ; wait for a key	
-    xor AX, AX    
-    int 16h
+    ; #importante:
+	; Entraremos no modo texto para exibimos mensagens em modo real.
+	; set text mode for screen
+	
+	mov ax, 0x0003      
+    int 0x10
+	
+	;; #Importante:
+	;; Mensagem em modo real.
+ 	;; Suspenderemos essa mensagem porque está degradando o desempenho.
+	;; Ela será uma opção de debug.
+	
+	;; #debug
+	;; mov si, rm_startgui_msg1
+	;; call DisplayMessage	
+	
+;.stop:
+
+    ;; wait for a key	
+    ;; xor AX, AX    
+    ;; int 16h
 
 .doStartGUI:
 	;Set mode.

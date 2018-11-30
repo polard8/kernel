@@ -883,7 +883,7 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	
 
 	//#debug
-	printf ("Testing new Message Box type=%d \n", type);
+	//printf ("Testing new Message Box type=%d \n", type);
 
     int Response = 0;	
     int running = 1;
@@ -1026,8 +1026,10 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	
 	
 	//#bugbug
-	//#importante devemos fazer o refres só da janela.
-	refresh_screen ();		 
+	//#importante devemos fazer o refresh só da janela.
+	//refresh_screen ();
+
+    apiShowWindow (hWnd);	
 	
 	//
 	// loop
@@ -1172,7 +1174,7 @@ int DialogBox ( int type, char *string1, char *string2 ){
 	
 
 	//#debug
-	printf ("Testing dialog Box type=%d \n", type);
+	//printf ("Testing dialog Box type=%d \n", type);
 
     int Response = 0;	
     int running = 1;
@@ -1313,9 +1315,11 @@ int DialogBox ( int type, char *string1, char *string2 ){
         1*(cx/16), 1*(cy/3),
         COLOR_WINDOWTEXT, string1 );	
 	
-	//#importante
-	//#bugbug devemos fazer refresh só da janela.
-	refresh_screen ();		 
+	//#bugbug
+	//#importante devemos fazer o refresh só da janela.
+	//refresh_screen ();
+
+    apiShowWindow (hWnd);		 
 	
 	//
 	// loop
@@ -3073,6 +3077,13 @@ unsigned long apiGetSysTimeInfo ( int n ){
 	
 	return (unsigned long) system_call ( 223, 
 	    (unsigned long) n, (unsigned long) n, (unsigned long) n );
+};
+
+//mostra uma janela na tela. backbuffer ---> frontbuffer
+void apiShowWindow (struct window_d *window){
+	
+    system_call ( 24, (unsigned long) window, 
+	    (unsigned long) window, (unsigned long) window );	
 };
 
 
