@@ -66,6 +66,13 @@ void exit(int status);
 char *
 getenv(const char *name);
 
+
+
+
+//exit de mallox não der certo.
+void *xmalloc( int size);
+void stdlib_die (char *str);
+
 /*
  * malloc:
  *    Allocates the requested memory and returns a pointer to it.

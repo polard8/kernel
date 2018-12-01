@@ -10,6 +10,9 @@
  *
  * Versão 1.0, 2016 - Created.
  */
+ 
+ 
+typedef char *stdio_va_list; 
 
  
 #ifndef NULL
@@ -209,7 +212,8 @@ int g_using_gui; //modo gráfico?
 
 //Buffer para o buffer usado para input de comandos.
 //prompt[] 
-#define PROMPT_MAX_DEFAULT 1024
+
+#define PROMPT_MAX_DEFAULT BUFSIZ //1024
 
 
 
@@ -218,6 +222,7 @@ int g_using_gui; //modo gráfico?
 // que cria o processo.
 
 // Fluxo padrão.
+//O alocador pode ignorar isso e criar outros buffers.
 char prompt[PROMPT_MAX_DEFAULT];      //stdin
 char prompt_out[PROMPT_MAX_DEFAULT];  //stdout 
 char prompt_err[PROMPT_MAX_DEFAULT];  //stderr 
@@ -234,7 +239,8 @@ int prompt_status;
 // ## Protótipos do padrão C. ##
 //===========================================
 
- 
+
+int fileno ( FILE *stream );
  
 /*
  * File Operations
@@ -268,14 +274,17 @@ int fprintf(FILE *stream, const char *format, ...);
 
 
 
-typedef char *stdio_va_list;
+
 
 
 
 //#testes
+//ok isso funcionou.
 int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr );
 int stdout_printf (const char *format, ...);
+int stderr_printf (const char *format, ...);
 
+void perror(const char *str);
 
 
 int printf(const char *format, ...); 
@@ -289,6 +298,9 @@ int printf3(const char *fmt, ...);
 int sprintf(char *out, const char *format, ...);
 
 
+//#test 
+//?? coisa do c++ 
+void rewind ( FILE * stream );
 
 /*
  * Normal input.
@@ -312,6 +324,8 @@ int scanf( const char *fmt, ... );
 int fgetc( FILE *stream );;
 #define getc fgetc
 int ungetc( int c, FILE *stream );
+
+long ftell (FILE *stream);
 
 int fputc(int ch, FILE *stream);
 char *gets(char *s);

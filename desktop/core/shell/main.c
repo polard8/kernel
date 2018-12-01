@@ -463,7 +463,10 @@ int argbuf_index;
 void die (char * str);
 void error( char *msg, char *arg1, char *arg2 );
 void fatal( char *msg, char *arg1, char *arg2 );
-void *xmalloc( int size);
+
+//isso foi para stdlib.c
+//void *xmalloc( int size);
+
 char *concat( char *s1, char *s2, char *s3 );
 char *save_string ( char *s, int len );
 
@@ -3309,6 +3312,13 @@ do_compare:
 
 		goto exit_cmp;
 	};	
+	
+	//flush stdout
+	if ( strncmp( prompt, "flush-stdout", 12 ) == 0 )
+	{
+		fflush(stdout);
+		goto exit_cmp;
+	}
 
 	
 	// tasklist - Lista informações sobre os processos.
@@ -6118,15 +6128,18 @@ void die (char *str){
 };
 
 
+
+/*
+//isso foi para stdlib.c
 void *xmalloc( int size){
 	
     register int value = (int) malloc(size);
     if(value == 0)
-        die("xmalloc fail.\n");
+        die ("xmalloc fail.\n");
 //done:  
     return (void *) value;
 };
-
+*/
 
 char *concat( char *s1, char *s2, char *s3 ){
 	

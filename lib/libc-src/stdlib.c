@@ -15,6 +15,9 @@
 #include <stddef.h>
 #include <mm.h>
 #include <heap.h>
+
+#include <stdio.h> //test
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -694,6 +697,23 @@ void srand (unsigned int seed){
 };
 
 
+void *xmalloc( int size){
+	
+    register int value = (int) malloc(size);
+    if(value == 0)
+        stdlib_die ("xmalloc fail\n");
+//done:  
+    return (void *) value;
+};
+
+void stdlib_die (char *str){
+	
+	printf("stdlib_die: %s",str);
+	//@todo
+	fprintf(stderr,"%s\n",str);
+	exit(1);
+};
+
 /*
  *****************
  * malloc:
@@ -1275,7 +1295,6 @@ void exit (int status){
 	//Nothing.
 //wait_forever:
 	
-    //die();
     while (1){
 		
 		asm ("pause");

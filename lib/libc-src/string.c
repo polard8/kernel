@@ -194,10 +194,8 @@ char *strcat ( char *to, const char *from ){
 };
 
 
-/*
- *  bcopy:
- *      Copia.
- */
+/* bcopy: Copia. */
+
 void bcopy ( char *from, char *to, int len ){
 	
 	//if ( len < 0 )

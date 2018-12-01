@@ -1298,7 +1298,8 @@ void stdioInitialize (){
 	//stdin - Usando o buffer 'prompt[.]' como arquivo.
 	stdin->_base = &prompt[0];
 	stdin->_ptr = stdin->_base;
-	stdin->_cnt = PROMPT_MAX_DEFAULT;
+	stdin->_bufsiz = PROMPT_MAX_DEFAULT; 
+	stdin->_cnt = stdin->_bufsiz;
 	stdin->_file = 0;
 	stdin->_tmpfname = "stdin";
 	//...
@@ -1306,7 +1307,8 @@ void stdioInitialize (){
 	//stdout - Usando o buffer 'prompt_out[.]' como arquivo.
 	stdout->_base = &prompt_out[0];
 	stdout->_ptr = stdout->_base;
-	stdout->_cnt = PROMPT_MAX_DEFAULT;
+	stdout->_bufsiz = PROMPT_MAX_DEFAULT; 
+	stdin->_cnt = stdout->_bufsiz;
 	stdout->_file = 1;
 	stdout->_tmpfname = "stdout";
 	//...
@@ -1314,7 +1316,8 @@ void stdioInitialize (){
 	//stderr - Usando o buffer 'prompt_err[.]' como arquivo.
 	stderr->_base = &prompt_err[0];
 	stderr->_ptr = stderr->_base;
-	stderr->_cnt = PROMPT_MAX_DEFAULT;
+	stderr->_bufsiz = PROMPT_MAX_DEFAULT; 
+	stdin->_cnt = stderr->_bufsiz;
 	stderr->_file = 2;
 	stderr->_tmpfname = "stderr";	
 	//...
@@ -1322,33 +1325,61 @@ void stdioInitialize (){
 	// Limpando os buffers.
 	
 	//#bugbug: Cuidado com o tamanho.
-	
+	/*
 	for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
 		
 		prompt[i] = (char) '\0';
 		prompt_out[i] = (char) '\0';
 		prompt_err[i] = (char) '\0';
 	}
+	*/
+    
+	for ( i=0; i < BUFSIZ; i++ )
+	{
+	    stdin->_base[i] = (char) '\0';			
+	    stdout->_base[i] = (char) '\0';	
+	    stderr->_base[i] = (char) '\0';	
+	}			
+	
+    stdin->_ptr = stdin->_base;	
+    stdin->_bufsiz = BUFSIZ; 		
+	stdin->_cnt = stdin->_bufsiz;
+	
+    stdout->_ptr = stdout->_base;	
+    stdout->_bufsiz = BUFSIZ; 		
+	stdout->_cnt = stdout->_bufsiz;
+
+    stderr->_ptr = stderr->_base;	
+    stderr->_bufsiz = BUFSIZ; 		
+	stderr->_cnt = stderr->_bufsiz;			
 };
 
 
-/*
- ********************************
- * fflush:
- *     Limpa uma stream.
+/* 
+ * fflush: 
+ * Salva o buffer no arquivo associado a ele.
+ * e limpa o buffer. 
+ * Se for NULL então faz isso para todas stream abertas.
+ * retorna 0 se funcionar e retorna EOF se falhar.
  */
+
 int fflush ( FILE *stream ){
 	
 	register int i = 0;
 	
 	if ( (void *) stream == NULL )
 	{
+		//#todo: 
+		//limpa todas as streams abertas.
 		return (int) (-1);
 	}
 		
-	// Limits.	
-	if ( stream->_bufsiz == 0 || stream->_bufsiz > BUFSIZ ){
+	// Limits.
+    // Se o buffer tiver vazizo ou for maior que o limite.	
+	if ( stream->_bufsiz == 0 || stream->_bufsiz > BUFSIZ )
+	{
 		
+		printf("fflush: buffer size limits\n");
 		return (int) (-1);
 	}
     
@@ -1362,11 +1393,14 @@ int fflush ( FILE *stream ){
 	
     for ( i=0; i < stream->_bufsiz; i++ )
 	{
-	    stream->_base[i] = (char) '\0';		
-	}		
-		
-	//@todo: atualizar os contadores de tamanho.	
-	stream->_bufsiz = 0;
+	    //limpa
+		stream->_base[i] = (char) '\0';	
+	}
+    
+	stream->_ptr = stream->_base;     //walk	
+    stream->_bufsiz = BUFSIZ; 		  //tamanho
+	stream->_cnt = stream->_bufsiz;   //quanto falta é igual ao tamanho.
+	
 	
 	return (int) 0;
 };
@@ -1520,6 +1554,27 @@ int ungetc ( int c, FILE *stream ){
 	stream->_ptr[0] = (char) c;
 	
     return (int) c;	
+};
+
+
+long ftell (FILE *stream)
+{
+	if ( (void *) stream == NULL )
+	{
+		return (long) 0; //-1
+	}	
+	
+    return (long) (stream->_ptr - stream->_base);	
+};
+
+
+int fileno ( FILE *stream ){
+
+	if ( (void *) stream == NULL )
+	{
+		return (long) -1; 
+	}	
+	return (int) stream->_file;  //fd
 };
 
 
@@ -2491,7 +2546,43 @@ int stdout_printf (const char *format, ...)
 
     return done;
 };
+
+//printf que escreve no stderr. 
+int stderr_printf (const char *format, ...)
+{
+    va_list arg;
+    int done;
+
+    va_start (arg, format);
+    done = vfprintf (stderr, format, arg);
+    va_end (arg);
+
+    return done;
+};
+
  
+void perror (const char *str){
+	
+    stderr_printf (str);	
+};
+ 
+ 
+//#test 
+//?? coisa do c++ 
+void rewind ( FILE * stream )
+{
+	if ( (void *) stream == NULL )
+		return;
+	
+    //apota par o início do arquivo.
+	//#bugbug: isso vai sobrescrever
+	//as coisas que ainda estão no arquivo;
+	
+	stdin->_ptr = stdin->_base;
+    stdin->_bufsiz = BUFSIZ; 		
+	stdin->_cnt = stdin->_bufsiz;		
+};
+
 
 //
 // End.
