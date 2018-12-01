@@ -1,26 +1,30 @@
 /*
  * File: lexer.c
  */
-
-#include "config.h"
-#include "debug.h"
  
-#include <types.h>
+#include  "c.h" 
 
-#include "heap.h"
-#include "api.h"
+ 
+/*
+//#include "config.h"
+//#include "debug.h"
+ 
+//#include <types.h>
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+//#include "heap.h"
+//#include "api.h"
+
+//#include <stddef.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdio.h>
 
 
-#include "table.h"
-#include "lexer.h"
-#include "parser.h"
-#include "gramcc.h"
-
+//#include "table.h"
+//#include "lexer.h"
+//#include "parser.h"
+//#include "gramcc.h"
+ */
 
 //#### supensa ###
 /*

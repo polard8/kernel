@@ -4,26 +4,31 @@
  * 2018 - Created by Fred Nora.
  */
  
-#include "config.h"
-#include "debug.h"
 
-#include <types.h>
+#include  "c.h"  
+ 
+ 
+ /*
+//#include "config.h"
+//#include "debug.h"
 
-#include "heap.h"
-#include "api.h"
+//#include <types.h>
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+//#include "heap.h"
+//#include "api.h"
 
-#include "table.h"
-#include "lexer.h"
-#include "parser.h"
-#include "gramcc.h"
+//#include <stddef.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdio.h>
+
+//#include "table.h"
+//#include "lexer.h"
+//#include "parser.h"
+//#include "gramcc.h"
 
 //#include "tree.h"
-
+*/ 
 
 int parse_function ( int token );
 int parse_return ( int token );

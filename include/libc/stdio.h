@@ -268,6 +268,16 @@ int fprintf(FILE *stream, const char *format, ...);
 
 
 
+typedef char *stdio_va_list;
+
+
+
+//#testes
+int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr );
+int stdout_printf (const char *format, ...);
+
+
+
 int printf(const char *format, ...); 
 
 //tradicional, incompleta; não funciona,

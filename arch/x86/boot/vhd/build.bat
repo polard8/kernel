@@ -116,9 +116,6 @@ echo -{ ...
 	copy c:\gramado\bin\TGFE.BIN      F:\
     copy c:\gramado\bin\TPRINTF.BIN    F:\
 	
-	rem cc500 test.
-	copy c:\gramado\bin\CC500.BIN    F:\
-		
 	rem arquivos de texto.
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.TXT  F:\*.TXT

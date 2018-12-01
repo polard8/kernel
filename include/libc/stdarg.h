@@ -5,19 +5,44 @@
 // Fred Nora
 
 
-//cria um tipo 'char *', usado em strings.
-typedef char * va_list;
-typedef char * gramado_va_list;
-
-//typedef char *__gnuc_va_list;
-//typedef va_list __gnuc_va_list;
-//typedef __gnuc_va_list __builtin_va_list ;
-
 //todo:
-//va_start	Start iterating arguments with a va_list	C89
-//va_arg	Retrieve an argument	C89
-//va_end	Free a va_list	C89
-//va_copy	Copy contents of one va_list to another	C99
+//va_start	Start iterating arguments with a va_list C89
+//va_arg	Retrieve an argument C89 (recuperar argumento)
+//va_end	Free a va_list C89
+//va_copy	Copy contents of one va_list to another C99
+
+
+//cria um tipo 'char *', usado em strings.
+
+
+typedef char *va_list;
+
+/*
+#define va_list   VA_LIST
+#define va_start    VA_START
+#define va_arg        VA_ARG
+#define va_end              VA_END
+#define va_copy(s,d)      (s) = (d)
+#define __va_copy       va_copy
+*/
+
+#ifdef __GRAMADOC__
+typedef char *gramado_va_list;
+#endif
+
+
+/*
+//#test
+#ifndef __GNUC__
+typedef va_list __gnuc_va_list;
+#define va_start    __builtin_va_start
+#define va_arg        __builtin_va_arg
+typedef __gnuc_va_list __builtin_va_list;
+#define va_end              __builtin_va_end
+#define va_copy         __builtin_va_copy
+#endif
+*/
+
 
 /*
 Data Type: 
@@ -51,39 +76,25 @@ function in which va_start was invoked with the same ap argument.
 
 
 
-
 //rotina de suporte.
 #define __va_rounded_size(TYPE)  \
     ( ( ( sizeof(TYPE) + sizeof(int) - 1) / sizeof(int) ) * sizeof(int) )
+
 	
-/*
- * rotina de suporte. (obs: igual a anterior)
+/* rotina de suporte. (obs: igual a anterior)
  * Amount of space required in an argument list (ie. the stack) for an
- * argument of type t.
- */
+ * argument of type t. */
+ 
 #define __va_argsiz(t)	\
 	(((sizeof(t) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
 	
 
-
-/*
- *****************************************************************
- *  ## va_start ##
- *
- * For a simple minded compiler this should work 
- * (it works in GNU too for vararg lists that don't follow shorts and such).
- */
+/* For a simple minded compiler this should work 
+ * (it works in GNU too for vararg lists that don't follow shorts and such). */
+ 
 #define va_start(ap, pN)  \
 	( (ap) = ( (va_list) (&pN) + __va_argsiz(pN) ) )
-
 	
-//#bugbug (dependência)	
-//@todo
-//#define va_start(AP, LASTARG)  \
-//    (__builtin_saveregs (),       \
-//    AP = ((char *) &(LASTARG) + __va_rounded_size (LASTARG)))
-
-
 
 //#bugbug 
 //@todo:
@@ -93,9 +104,10 @@ function in which va_start was invoked with the same ap argument.
 
 /*
  * #bugbug
- * End processing of variable argument list. In this case we do nothing.
+ * End processing of variable argument list. 
+ * In this case we do nothing.
  */
-//#define va_end(ap)	( (void) 0 )
+#define va_end(ap)	( (void) 0 )
 
 
 /*
@@ -124,10 +136,13 @@ function in which va_start was invoked with the same ap argument.
   
   
   
+/*
+typedef char *va_list;
+#define va_start(ap,parmn) (void)((ap) = (char*)(&(parmn) + 1))
+#define va_end(ap) (void)((ap) = 0)
+#define va_arg(ap, type) \
+    (((type*)((ap) = ((ap) + sizeof(type))))[-1])
+ */ 
   
-  
-  
-  
-  
-  
+
 

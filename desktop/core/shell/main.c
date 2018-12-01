@@ -3294,6 +3294,21 @@ do_compare:
 		
         goto exit_cmp;					 
 	};	
+	
+	
+	if ( strncmp( prompt, "t13", 3 ) == 0 )
+    {    
+        //#obs 
+        //#lembrando: podemos ter problemas com o buffer do arquivo.		
+
+	    //coloca no stdout.
+		stdout_printf("Escrevendo no stdout com stdout_printf \n");
+		
+		//mostra o arquivo desde o começo.
+		printf(stdout->_base);
+
+		goto exit_cmp;
+	};	
 
 	
 	// tasklist - Lista informações sobre os processos.

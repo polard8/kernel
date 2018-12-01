@@ -304,11 +304,14 @@ FILE *fopen ( const char *filename, const char *mode ){
 		// passaremos o tamanho do arquivo para o malloc,
 		// sem se importar com o tamanho.
 		
-		//if (size > (??) )
-			
-		
 		//#debug
-		printf ("fopen: file size %d\n", size);
+		//aviso.
+		// > 3MB
+		if (size > (3*1024*1024) )
+		{
+		    printf ("fopen: Oops,  file size %d\n", size);	
+		}
+		
 	   
 	    stream->_base = (char *) malloc ( (size_t) size );		
         
@@ -467,53 +470,6 @@ void scroll (void){
 };
 
 
-/*
- * app_clear:
- *    (#bugbug: Isso não faz mais sentido, deletar.) 
- *     Limpa a tela.
- *     0x800000 = Endereço virtual da memoria de vídeo.
- *     g_current_vm; 0x000B8000fis = 0x800000vir
- * @todo: Mudar para tmClearScreen(int color);
- */
-
-//#bugbug: deletando isso... 
- /*
-int app_clear (int color)
-{
-    unsigned int i = 0;	
-	char *vm = (char *) 0x00800000;  //Endereço virtual da VGA. b8000Fis.    
-
-	//modo texto
-	//if(g_using_gui == 0)
-	//{	
-	//    while(i < (SCREEN_WIDTH*SCREEN_HEIGHT*2)) 
-    //    { 
-    //        vm[i] = 219; 
-    //        i++; 
-    //    
-    //        vm[i] = color; 
-    //        i++; 
-    //    };
-	//};
-	
-	//modo gráfico.
-	if(g_using_gui == 1)
-	{
-	    g_cursor_x = 0;
-	    g_cursor_y = 0;
-		
-		//@todo:
-		//Limpar a tela do terminal.
-		
-		//...
-	};
-	    
-done:
-    return (int) 0; 
-};
-*/ 
- 
- 
 /*
  ***********************
  * puts:
@@ -2460,10 +2416,19 @@ int printf ( const char *fmt, ... ){
 	va_list ap;
 	va_start(ap, fmt);
 	
+
+	
+	//int 
+	//kvprintf ( char const *fmt, 
+    //       void (*func)( int, void* ), 
+	//	   void *arg, 
+	//	   int radix, //??10 gives octal; 20 gives hex.
+	//	   va_list ap );	
+	
 	kvprintf ( fmt, xxxputchar, NULL, 10, ap );
 	
 	//#todo.
-	//va_end(ap);
+	va_end(ap);
 }; 
     
 //=============================================================
@@ -2471,8 +2436,51 @@ int printf ( const char *fmt, ... ){
 //=============================================================
 
 
-/*
-int __printf (const char *format, ...)
+
+int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr )
+{
+ 	
+	//#suspenso.
+	//return (int) kvprintf ( format, NULL, stream->_ptr, 10, argptr );
+	
+	int size;
+	
+	if ( (void *) stream == NULL )
+	{
+		return (int) (-1);
+		
+	} else {
+		
+		size = (int) strlen (format);
+		
+		//Se a string for maior que o tanto de bytes
+		//disponíveis no arquivo
+		if ( size > stream->_cnt )
+		{
+			return (int) (-1);
+		}
+		
+		//recalcula o tanto de bytes disponíveis
+		stream->_cnt = (int) (stream->_cnt - size);
+		
+		//coloca no buffer, usando o ponteiro atual.
+		//#obs: isso provavelmente funcione, 
+		//mas vamos tentar o segundo método.
+		//sprintf ( stream->_ptr, format );
+		kvprintf ( format, NULL, stream->_ptr, 10, argptr );
+		
+		//atualiza o ponteiro atual.
+		stream->_ptr = stream->_ptr + size;
+        
+		return (int) 0;		
+	};
+ 
+	return (int) (-1);	
+};  
+
+
+//printf que escreve no stdout. 
+int stdout_printf (const char *format, ...)
 {
     va_list arg;
     int done;
@@ -2482,8 +2490,8 @@ int __printf (const char *format, ...)
     va_end (arg);
 
     return done;
-}
-*/
+};
+ 
 
 //
 // End.

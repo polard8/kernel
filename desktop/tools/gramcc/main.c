@@ -6,6 +6,10 @@
  */
 
  
+ 
+#include  "c.h"
+ 
+/* 
 #include "config.h"
 #include "debug.h"
 
@@ -26,7 +30,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "gramcc.h"
-
+*/
 
 #ifndef __COPYRIGHT__
 char copyright[] = "Copyright (c) 2018 Fred Nora.\n\
