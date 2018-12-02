@@ -30,6 +30,11 @@
 //#include "tree.h"
 */ 
 
+
+
+//expression
+int parse_expression ( int token );
+
 int parse_function ( int token );
 int parse_return ( int token );
 
@@ -40,7 +45,292 @@ int parse_while ( int token );
 int parse_for ( int token );
 
 int parse_asm ( int token );
+
 //...
+
+
+
+
+//#test
+/*
+int parse_number (int olen){
+	
+    //pointer #todo	
+    //register char *p = lexptr;
+    register char *p = token_buffer;
+  
+  register long n = 0;
+  register int c;
+  register int base = 10;
+  register len = olen;
+  char *err_copy;
+
+    //#todo função importada.
+	extern double atof ();
+
+    for (c = 0; c < len; c++)
+	{
+        //se encontrarmos um ponto no meio dos números.
+		//pois não tem ponto no meio de uma expressões no  
+		//#if (ainda não sei se gcc está falando de diretivas ou statement)
+		if ( p[c] == '.' )
+		{
+            // It's a float since it contains a point.  
+            //yyerror ("floating point numbers not allowed in #if expressions");
+			printf ("floating point numbers not allowed in #if expressions");
+            return ERROR;
+      
+            // ****************
+	        //yylval.dval = atof (p);
+	       // lexptr += len;
+	       // return FLOAT;
+		   // ****************  
+        }		
+	}
+  
+    //se o comprimeiro for mior que 3.
+	//se começar com '0x', ou '0X', indicando se um número heaxadecimal.
+	//então a base será 16.
+	if ( len >= 3 && 
+	     ( !strncmp (p, "0x", 2) || !strncmp (p, "0X", 2)) ) 
+	{
+		//baes hexa.
+		base = 16;
+        
+		//pegaremos depois do x.
+		p += 2;
+		
+		//atualiza o comprimeito.
+		len -= 2;
+    
+	
+	//Se o número começar com '0', então temos octal.
+	
+	}else if ( *p == '0' )
+	      {
+			base = 8;  
+		  };
+            
+  
+   
+	while (len-- > 0) 
+	{
+        c = *p++;
+        n *= base;
+        
+		//se o caractere for um dígito decimal.
+		if (c >= '0' && c <= '9')
+		{
+            n += c - '0';
+        
+		}else{
+			
+            if (c >= 'A' && c <= 'Z') 
+				c += 'a' - 'A';
+            
+			if (base == 16 && c >= 'a' && c <= 'f'){
+				
+	            n += c - 'a' + 10;
+				
+            }else if (len == 0 && c == 'l'){
+				
+	            ; //nothing
+				
+            }else{
+	            //yyerror ("Invalid number in #if expression");
+				printf ("Invalid number in #if expression");
+	            return ERROR;
+            }
+        };
+    };
+
+    lexptr = p;
+    yylval.lval = n;
+    return INT;
+};
+*/
+
+
+
+//analizando uma expressão.
+//temos a questão de predecessores para os operadores.
+
+int parse_expression ( int token )
+{
+	int c;
+	
+	c = token;
+    
+	//primeiro analizamos o que veio via argumento 
+	//assim checaremos a validade da expressão e
+	//abortaremos logo cedo.
+	
+	//uma expressão pode começar com (, operador, número ...
+	//então vamos ver qual é o primeiro token da expressão.
+	
+	
+	int running = 1;
+	int State = 1;
+	
+	//agora pegaremos os outros elementos da expressão.
+	
+	while (running == 1)
+	{
+	    c = yylex ();
+	    
+		switch (State)   
+	    {
+			
+			//State 1
+			//não vamos começar com operadores e sim com operandos,
+			//que pdoem ser números ou identificadores.
+			case 1:
+			    switch(c)
+				{
+					//se for operando falhou 
+	                case TOKENOPERATOR:
+					    printf("parse_expression: invalid operator in the beggining of expression");
+						exit(1); //die();
+                        break;					
+					
+					//...
+					
+					default:
+					    printf("parse_expression: default case in State 1");
+						exit(1); //die();
+					    break;
+				}
+			   break;
+			   
+			//State 2
+            //operadores			
+			case 2:
+			    switch (c)
+			    {
+					//#importante
+					//o lexer lida com alguns tokens usados por expressões 
+					//usar esse tokens. 
+					//lexer_code = o operador encontrado, que pode ser simples ou duplo. 
+					
+                    case '+':
+                    case '-':
+                    case '*':
+					case '/':
+					case '&':
+                    case '|':
+                    case '<':
+                    case '>':
+                    case '%':
+                    case '^':
+                    case '!':
+                    case '=':
+					    printf("parse_expression: State 2 simple operator lexer_code=%d", lexer_code );
+        			    //die();
+						break;		
+					
+					case ARITHCOMPARE:
+					    printf("parse_expression: State 2 ARITHCOMPARE lexer_code=%d", lexer_code );
+						switch (lexer_code)
+						{
+							case LE_EXPR:
+							    printf("LE_EXPR lexer_code=%d", lexer_code );
+							    break;
+								
+							case GE_EXPR:
+							    printf("GE_EXPR lexer_code=%d", lexer_code );
+							    break;
+	
+								
+							///...	
+								
+							default:
+							    printf("parse_expression: State 2 error ARITHCOMPARE default lexer_code=%d in line %d", 
+								    lexer_code, lineno );
+							    exit(1); //die();
+								break;
+						}
+						break;
+					   
+				    
+					case EQCOMPARE:
+					    printf("parse_expression: State 2 EQCOMPARE lexer_code=%d", lexer_code );
+						switch (lexer_code)
+						{
+							
+							case NE_EXPR:
+							    printf("NE_EXPR lexer_code=%d", lexer_code );
+							    break;
+								
+							case EQ_EXPR:
+							    printf("EQ_EXPR lexer_code=%d", lexer_code );
+							    break;							
+							
+							default:
+							    printf("parse_expression: State 2 error EQCOMPARE default lexer_code=%d in line %d", 
+								    lexer_code, lineno );
+							    exit(1); //die();
+								break;
+                        };						
+					    break;
+					   
+					case ASSIGN:
+                        printf("parse_expression: State 2 ASSIGN lexer_code=%d", lexer_code );
+						break;					
+					   
+					case PLUSPLUS:
+					   printf("parse_expression: State 2 PLUSPLUS lexer_code=%d", lexer_code );
+					   break;
+					   
+					case MINUSMINUS:
+					   printf("parse_expression: State 2 MINUSMINUS lexer_code=%d", lexer_code );
+					   break;
+					   
+					case ANDAND:
+					   printf("parse_expression: State 2 ANDAND lexer_code=%d", lexer_code );
+					   break;
+					   
+					case OROR:
+					   printf("parse_expression: State 2 OROR lexer_code=%d", lexer_code );
+					   break;
+					   
+					   
+					case POINTSAT:
+					   printf("parse_expression: State 2 POINTSAT lexer_code=%d", lexer_code );
+					   break;
+					   
+					case LSHIFT:
+					   printf("parse_expression: State 2 LSHIFT lexer_code=%d", lexer_code );
+					   break;
+					   
+					   
+					case RSHIFT:
+					   printf("parse_expression: State 2 RSHIFT lexer_code=%d", lexer_code );
+					   break;
+					   
+					//...
+					
+					default:
+					    printf("parse_expression: default case in State 2");
+						break;
+					    break;
+				};
+           	    break;		 
+            
+            //...
+			
+			//State default
+            default:	
+                printf("parse_expression: default State");
+                exit(1); //die();				
+		        break;
+	    };
+	};
+	
+	return 0;
+};
+
+
+
 
 
 
@@ -585,6 +875,10 @@ done:
 int parse_if ( int token )
 {
 	printf("todo: parse_if in line %d ", lineno );
+	
+	//testando chamar uma análise de expressão dentro do statement de if.
+	parse_expression ( token );
+	
 	exit(1);
     return -1;	
 };
@@ -599,6 +893,10 @@ int parse_do ( int token )
 int parse_while ( int token )
 {
 	printf("todo: parse_while in line %d ", lineno );
+	
+	//testando chamar uma análise de expressão dentro do statement de while.
+	parse_expression ( token );
+	
 	exit(1);
     return -1;	
 };

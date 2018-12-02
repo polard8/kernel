@@ -944,18 +944,23 @@ int lexerInit (){
 
     lexer_code = 0;
 
+    int i;
+	maxtoken = MAXTOKEN;
+	
+	for ( i=0; i<MAXTOKEN; i++ )
+	{
+	    real_token_buffer[i] = (char) '\0';	
+	}
 
-	//#todo: size
-	//token_buffer = malloc((unsigned)(maxtoken+1));
-	//token_buffer = malloc( 128 );
 	token_buffer = &real_token_buffer[0]; 
 
-	sprintf ( real_token_buffer, "suja" );
+	sprintf ( real_token_buffer, "uninitialized-token-string" );
 
 	//...
 
     return (int) 0;
 };
+
 
 
 /*

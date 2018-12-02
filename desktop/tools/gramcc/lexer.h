@@ -70,6 +70,7 @@ int directive_fould;
 //  ### segue suporte a lexer code ###
 int lexer_code;
 
+//lexer codes.
 typedef enum {
 	
     LEXERCODE_NULL,
@@ -124,7 +125,10 @@ int eofno;
 static int maxtoken;		/* Current length of token buffer */
 static char *token_buffer;	/* Pointer to token buffer */
 
-char real_token_buffer[256];
+#define MAXTOKEN 256 
+
+char real_token_buffer[MAXTOKEN];
+
 
 //gcc 0.9
 //int check_newline ();
