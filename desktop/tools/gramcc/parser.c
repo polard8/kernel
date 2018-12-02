@@ -169,6 +169,23 @@ int parse_expression ( int token )
 	//então vamos ver qual é o primeiro token da expressão.
 	
 	
+    switch (c)
+	{
+		case TOKENSEPARATOR:
+	        if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+			{
+			    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+				//State = 2;	
+			}
+		    break;
+	    default:
+            printf("parse_expression: State1 Missed '(' separator in line %d \n", lineno );
+			exit(1);
+			break;					
+	}	
+	
+	
+	
 	int running = 1;
 	int State = 1;
 	
@@ -177,28 +194,81 @@ int parse_expression ( int token )
 	while (running == 1)
 	{
 	    c = yylex ();
+		
+		//voltando sem pegar.
+		again:
+		
+		
+		if( c == TOKENEOF )
+		{
+            printf("parse_expression: #error EOF \n");
+            exit(1);			
+		}		
 	    
 		switch (State)   
 	    {
 			
 			//State 1
+			//Aceitamos constantes ou identificadores.
 			//não vamos começar com operadores e sim com operandos,
 			//que pdoem ser números ou identificadores.
 			case 1:
 			    switch(c)
 				{
-					//se for operando falhou 
-	                case TOKENOPERATOR:
-					    printf("parse_expression: invalid operator in the beggining of expression");
-						exit(1); //die();
-                        break;					
 					
+					case TOKENSEPARATOR:
+	                    if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+						{
+						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+							//State = 1;	
+						    break;
+						}
+	                    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+						{
+						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+							//State = 1;
+                            //provisório
+							//retornaremos, mas falta o corpo {...};
+							goto expression_exit;
+							break;							
+						}						
+					    break;
+					
+					
+					
+					case TOKENCONSTANT:					
+						//ok;
+						printf ("parse_expression: State1 TOKENCONSTANT={%s} line %d\n", 
+						    real_token_buffer, lineno );
+
+					    //constant[CONSTANT_TOKEN] = TOKENCONSTANT;
+						//constant[CONSTANT_TYPE] = constant_type_found;
+						//constant[CONSTANT_BASE] = constant_base_found;
+
+						//#todo: fazer um switch para tipos válidos.
+						//strcat( outfile,"  mov eax, ");
+						//strcat( outfile, real_token_buffer );
+						//strcat( outfile,"\n  ret \n\n");			
+				        State = 2;
+						break;
+						
+					case TOKENIDENTIFIER:
+						printf ("parse_expression: State1 TOKENIDENTIFIER={%s} line %d\n", 
+						    real_token_buffer, lineno );					
+					    State = 2;
+						break;
+						
+						
 					//...
 					
 					default:
-					    printf("parse_expression: default case in State 1");
-						exit(1); //die();
-					    break;
+					    //printf("parse_expression: default case in State 1");
+						//exit(1); //die();
+					    //vamos permitir operadores, indo para o state2, 
+						//ele voltará par o state 1 se for um número ou identificador.
+						State = 2;
+						goto again;
+						break;
 				}
 			   break;
 			   
@@ -224,94 +294,111 @@ int parse_expression ( int token )
                     case '^':
                     case '!':
                     case '=':
-					    printf("parse_expression: State 2 simple operator lexer_code=%d", lexer_code );
+					     
+					    printf("parse_expression: State 2 simple operator{%s} lexer_code=%d \n", real_token_buffer, lexer_code );
         			    //die();
+						State = 1;
 						break;		
 					
 					case ARITHCOMPARE:
-					    printf("parse_expression: State 2 ARITHCOMPARE lexer_code=%d", lexer_code );
+					    printf("parse_expression: State 2 ARITHCOMPARE{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
 						switch (lexer_code)
 						{
 							case LE_EXPR:
-							    printf("LE_EXPR lexer_code=%d", lexer_code );
-							    break;
+							    printf("parse_expression: LE_EXPR lexer_code=%d \n", lexer_code );
+							    State = 1;
+								break;
 								
 							case GE_EXPR:
-							    printf("GE_EXPR lexer_code=%d", lexer_code );
-							    break;
+							    printf("parse_expression: GE_EXPR lexer_code=%d \n", lexer_code );
+							    State = 1;
+								break;
 	
 								
 							///...	
 								
 							default:
-							    printf("parse_expression: State 2 error ARITHCOMPARE default lexer_code=%d in line %d", 
+							    printf("parse_expression: State 2 error ARITHCOMPARE default lexer_code=%d in line %d \n", 
 								    lexer_code, lineno );
-							    exit(1); //die();
+							    //exit(1); //die();
+								State = 1;
 								break;
 						}
 						break;
 					   
 				    
 					case EQCOMPARE:
-					    printf("parse_expression: State 2 EQCOMPARE lexer_code=%d", lexer_code );
+					    printf("parse_expression: State 2 EQCOMPARE{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
 						switch (lexer_code)
 						{
 							
 							case NE_EXPR:
-							    printf("NE_EXPR lexer_code=%d", lexer_code );
-							    break;
+							    printf("parse_expression: NE_EXPR lexer_code=%d \n", lexer_code );
+							    State = 1;
+								break;
 								
 							case EQ_EXPR:
-							    printf("EQ_EXPR lexer_code=%d", lexer_code );
-							    break;							
+							    printf("parse_expression: EQ_EXPR lexer_code=%d \n", lexer_code );
+							    State = 1;
+								break;							
 							
 							default:
-							    printf("parse_expression: State 2 error EQCOMPARE default lexer_code=%d in line %d", 
+							    printf("parse_expression: State 2 error EQCOMPARE default lexer_code=%d in line %d \n", 
 								    lexer_code, lineno );
-							    exit(1); //die();
+							    //exit(1); //die();
+								State = 1;
 								break;
                         };						
 					    break;
 					   
 					case ASSIGN:
-                        printf("parse_expression: State 2 ASSIGN lexer_code=%d", lexer_code );
+                        printf("parse_expression: State 2 ASSIGN{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+						State = 1;
 						break;					
 					   
 					case PLUSPLUS:
-					   printf("parse_expression: State 2 PLUSPLUS lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 PLUSPLUS{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+					   State = 1;
 					   break;
 					   
 					case MINUSMINUS:
-					   printf("parse_expression: State 2 MINUSMINUS lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 MINUSMINUS{%s} lexer_code=%d \n", real_token_buffer, lexer_code );
+					   State = 1;
 					   break;
 					   
 					case ANDAND:
-					   printf("parse_expression: State 2 ANDAND lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 ANDAND{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+					   State = 1;
 					   break;
 					   
 					case OROR:
-					   printf("parse_expression: State 2 OROR lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 OROR{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+					   State = 1;
 					   break;
 					   
 					   
 					case POINTSAT:
-					   printf("parse_expression: State 2 POINTSAT lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 POINTSAT{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+					   State = 1;
 					   break;
 					   
 					case LSHIFT:
-					   printf("parse_expression: State 2 LSHIFT lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 LSHIFT{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+					   State = 1;
 					   break;
 					   
 					   
 					case RSHIFT:
-					   printf("parse_expression: State 2 RSHIFT lexer_code=%d", lexer_code );
+					   printf("parse_expression: State 2 RSHIFT{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+					   State = 1;
 					   break;
 					   
 					//...
 					
 					default:
-					    printf("parse_expression: default case in State 2");
-						break;
+					    printf("parse_expression: default case in State 2 {%s} lexer_code=%d \n",real_token_buffer, lexer_code );
+						State = 1;
+						goto again;
 					    break;
 				};
            	    break;		 
@@ -320,12 +407,14 @@ int parse_expression ( int token )
 			
 			//State default
             default:	
-                printf("parse_expression: default State");
+                printf("parse_expression: default State {%s} lexer_code=%d \n",real_token_buffer, lexer_code );
                 exit(1); //die();				
 		        break;
 	    };
 	};
 	
+expression_exit:
+    
 	return 0;
 };
 
@@ -874,36 +963,62 @@ done:
 
 int parse_if ( int token )
 {
-	printf("todo: parse_if in line %d ", lineno );
+	printf("todo: parse_if in line %d \n", lineno );
 	
+	//#todo
+	//conferir se o token do argumento é um if 
+	
+	//pega o próximo que deve ser um (
+	int c = yylex();
+	
+	
+	if ( c != TOKENSEPARATOR )
+	{
+		printf ("parse_if separator missed\n");
+		exit(1);
+	}
 	//testando chamar uma análise de expressão dentro do statement de if.
-	parse_expression ( token );
+	parse_expression ( c );
 	
-	exit(1);
+	//exit(1);
+    return -1;	
+};
+
+
+
+int parse_while ( int token )
+{
+	printf("todo: parse_while in line %d\n ", lineno );
+	
+	//#todo
+	//conferir se o token do argumento é um while
+
+	//pega o próximo que deve ser um (
+	int c = yylex();
+
+	if ( c != TOKENSEPARATOR )
+	{
+		printf ("parse_while separator missed\n");
+		exit(1);
+	}
+	
+	//testando chamar uma análise de expressão dentro do statement de while.
+	parse_expression ( c );
+	
+	//exit(1);
     return -1;	
 };
 
 int parse_do ( int token )
 {
-	printf("todo: parse_do in line %d ", lineno );
-	exit(1);
-    return -1;	
-};
-
-int parse_while ( int token )
-{
-	printf("todo: parse_while in line %d ", lineno );
-	
-	//testando chamar uma análise de expressão dentro do statement de while.
-	parse_expression ( token );
-	
+	printf("todo: parse_do in line %d\n ", lineno );
 	exit(1);
     return -1;	
 };
 
 int parse_for ( int token )
 {
-	printf("todo: parse_while in line %d ", lineno );
+	printf("todo: parse_while in line %d \n", lineno );
 	exit(1);
     return -1;	
 };
@@ -1416,7 +1531,7 @@ int parse (){
 					        printf("State3: TOKENKEYWORD={%s} KWIF in line %d \n", real_token_buffer, lineno );
 #endif								
 						    //parse_if??
-							parse_if (TOKENSEPARATOR);
+							parse_if  (TOKENKEYWORD);
 							//recomeçamos
 							State = 1;
 							break;
@@ -1433,7 +1548,14 @@ int parse (){
 							//recomeçamos
 							State = 1;
 							break;
-						}						
+						}	
+
+                        if( keyword_found == KWWHILE )
+						{
+						    parse_while (TOKENKEYWORD);
+							State = 1;
+							break;
+						}							 
 
                         //...							
 						
