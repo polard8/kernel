@@ -161,15 +161,16 @@ int mainGetMessage (){
 	printf("token_count={%d}\n", token_count );
 	
 	//Mostra os primeiros argumentos.
-	for( index=0; index < token_count; index++ )
+	for ( index=0; index < token_count; index++ )
 	{
 		token = (char *) tokenList[index];
 	    if( token == NULL )
 		{
-			printf("mainGetMessage: for fail!\n")
-			goto hang;
-		}
-	    printf (" # argv{%d}={%s} # \n", index, tokenList[index] );		
+			printf ("mainGetMessage: for fail!\n");
+			exit (1);
+			//goto hang;
+		};
+	    printf ("# argv{%d}={%s} #\n", index, tokenList[index] );		
 	};
 #endif
  
@@ -179,26 +180,35 @@ int mainGetMessage (){
 	
 	Ret = (int) gramcc_main ( token_count, tokenList );	
 	
-	if (Ret == 1)
+	//#bugbug
+	//precisamos trocar o cr0, ele não tem tratamento algum 
+	//de retorno e exit.
+	//então vamos sair aqui mesmo.
+	
+	switch (Ret)
 	{
-//#ifdef GRAMCC_VERBOSE				
-		printf("mainGetMessage: main returned 1.\n");
-//#endif 
-	}else{
-//#ifdef GRAMCC_VERBOSE		
-		printf("mainGetMessage: main returned 0.\n");
-//#endif
-	};
+		case 0:
+		    printf("mainGetMessage: main returned 0\n");
+            exit(0);
+		    break;
+			
+		case 1:
+            printf("mainGetMessage: main returned 1\n");
+			exit(1); 
+		    break;
+			
+		default:
+		    printf("mainGetMessage: default exit code %d\n", Ret );
+            exit(Ret);
+		    break;
+	};	
 	
-	// # hang #
-	//#debug
-	//@todo: Call exit
-    printf("*HANG\n");
-    while (1){
-        asm("pause");
-    };
+	//
+	// End
+	//
 	
-	return 0;
+	printf("mainGetMessage: unexpected exit code %d\n", Ret );
+	exit(1);
 };
 
 
@@ -243,7 +253,7 @@ init:
     
 #ifdef GRAMCC_VERBOSE		
     printf("\n");
-	printf("gramcc_main: Initializing fncc ...\n");
+	printf("gramcc_main: Initializing gramcc ...\n");
 #endif 
 
     libcInitRT();
@@ -331,9 +341,29 @@ init:
 	// ## Parse ##
 	//
 
+	int parse_ret;
 	//Testando funções do compilador.
-	parse();
+	parse_ret = (int) parse ();
 
+	switch (parse_ret)
+	{
+		case 0:
+		    return 0;
+			//goto exit_success;
+		    break;
+			
+		case 1:
+		    return 1;
+			//goto exit_error;
+		    break;
+			
+		default:
+		    goto exit_default;
+		    break;
+	};
+	
+	
+exit_default:	
 	
 	//#importante
 	//mostra o asm
@@ -357,7 +387,14 @@ out:
 	while (1){
 		asm("pause");
 	}
-    exit (0);	
+
+exit_success:	
+
+#ifdef GRAMCC_VERBOSE		
+	printf("gramcc_main: exit success\n");
+#endif 
+    return 0;
+	//exit (0);	
 };
 
 
@@ -681,6 +718,11 @@ int gramccInitialize (){
 	int i;
 	
 	
+#ifdef GRAMCC_VERBOSE	
+    printf("gramccInitialize: Initializing ...\n");
+#endif	
+	
+	
 	// Clear buffers
 	
 	for ( i=0; i<INFILE_SIZE; i++ )
@@ -751,6 +793,10 @@ int gramccInitialize (){
 	
 	
 	//...
+	
+#ifdef GRAMCC_VERBOSE	
+    printf("gramccInitialize: done\n");
+#endif		
 
     return (int) Status;	
 };

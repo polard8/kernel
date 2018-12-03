@@ -905,6 +905,11 @@ done:
  */
 
 int lexerInit (){
+	
+	
+#ifdef GRAMCC_VERBOSE	
+    printf("lexerInit: Initializing ...\n");
+#endif		
 
 	//number_of_tokens = 0;
 	//current_token = 0;
