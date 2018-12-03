@@ -1,7 +1,7 @@
 
-//gramado C preprocessor test.
+//gramado C Compiler. 
 
-Esse é um aplicativo para rodar no sistema operacional gramado.
+Esse é um aplicativo para rodar no sistema operacional Gramado 0.4.
 Roda apenas no ambiente gramado core, no processo init.
 
 É um editor de testes para testar funcionalidades do sistema.

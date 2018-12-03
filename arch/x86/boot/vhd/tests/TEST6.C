@@ -19,8 +19,8 @@ void main()
     //{};
 
 	//sizeof(int);
-    //if ( 1 + sizeof (int) ) 
-    //{};		
+    if ( 1 + sizeof (int) ) 
+    {};		
 
     //while ( 10 + 11 )
 	//{};

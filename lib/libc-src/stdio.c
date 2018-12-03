@@ -1968,7 +1968,10 @@ char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 //#define va_start __builtin_va_start
 //#define va_arg __builtin_va_arg
 //#define va_end __builtin_va_end
-#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
+
+//#obs:
+//vamos usar o que está em ctype.h
+//#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
 
 static size_t strlen (const char *s){
 	

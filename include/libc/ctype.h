@@ -1,20 +1,26 @@
+/*
+ * File: ctype.h
+ *
+ * User mode C library for Gramado.
+ *
+ * History:
+ *     2018 - Created by Fred Nora.
+ *     2018 - Linux stuff
+ */
+ 
+ 
+//linux
+#define _U	0x01	// upper 
+#define _L	0x02	// lower 
+#define _D	0x04	// digit 
+#define _C	0x08	// cntrl 
+#define _P	0x10	// punct 
+#define _S	0x20	// white space (space/lf/tab) 
+#define _X	0x40	// hex digit 
+#define _SP	0x80	// hard space (0x20) 
 
 
-// ctype.h
-
-/*gramado */
-#define _C	0x01   /* Control */
-#define	_U	0x02   /* Upper */
-#define	_L	0x04   /* Lower */
-#define	_D	0x08   /* Digit */
-#define _X	0x10   /* X digit */
-#define _P	0x20   /* Punct */
-#define	_S	0x40   /* Space  white space (space/lf/tab) */
-#define	_B	0x80   /* Blank  hard space (0x20) */
-
-
-
-
+//gramado
 //Apelidos para as letras.
 #define _UPPER   _U  //letra maiúscula
 #define _LOWER   _L  //letra minúscula.
@@ -27,12 +33,12 @@
 //.
 
 
+//linux
+//in lib/libc-src/ctype.c
 
+extern const unsigned char _ctype[];
+#define __ismask(x) (_ctype[(int)(unsigned char)(x)])
 
-
-
-//in misc.c
-extern char _ctype_[];
 
 
 //partes: básico, intermediário e definitivo.
@@ -41,45 +47,73 @@ extern char _ctype_[];
 // # básico #
 //
 
-#define	__isalpha(c)   ((_ctype_+1)[c]&(_U|_L))
-#define	__isupper(c)   ((_ctype_+1)[c]&_D)
-#define	__islower(c)   ((_ctype_+1)[c]&_L)
-#define	__isdigit(c)   ((_ctype_+1)[c]&_D)
-#define	__isxdigit(c)  ((_ctype_+1)[c]&(_D|_X))
-#define	__isspace(c)   ((_ctype_+1)[c]&_S)
-#define __ispunct(c)   ((_ctype_+1)[c]&_P)
-#define __isalnum(c)   ((_ctype_+1)[c]&(_U|_L|_D))
-#define __isprint(c)   ((_ctype_+1)[c]&(_P|_U|_L|_D|_B))
-#define __isgraph(c)   ((_ctype_+1)[c]&(_P|_U|_L|_D))
-#define __iscntrl(c)   ((_ctype_+1)[c]&_C)
-#define __isascii(c)   ((unsigned)(c)<=0177)
-#define __toupper(c)   ((c)-'a'+'A')
-#define __tolower(c)   ((c)-'A'+'a')
-#define __toascii(c)   ((c)&0177)
+//#obs
+//estamos usando esse porque a 
+//função que criamos não está funcionando.
+//#obs: então outras funções aqui podem estar falahndo ... tem que testar todo o ctype.
+
+//#define isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
+
+//linux 
+#define isalpha(c)	((__ismask(c)&(_U|_L)) != 0)
+#define isupper(c)	((__ismask(c)&(_U)) != 0)
+#define islower(c)	((__ismask(c)&(_L)) != 0)
+static inline int isdigit(int c)
+{
+	return '0' <= c && c <= '9';
+}
+#define isxdigit(c)	((__ismask(c)&(_D|_X)) != 0)
+#define isspace(c)	((__ismask(c)&(_S)) != 0)
+#define ispunct(c)	((__ismask(c)&(_P)) != 0)
+#define isalnum(c)	((__ismask(c)&(_U|_L|_D)) != 0)
+#define isprint(c)	((__ismask(c)&(_P|_U|_L|_D|_SP)) != 0)
+#define isgraph(c)	((__ismask(c)&(_P|_U|_L|_D)) != 0)
+#define iscntrl(c)	((__ismask(c)&(_C)) != 0)
  
+
+//linux 
+#define isascii(c) (((unsigned char)(c))<=0x7f)
+#define toascii(c) (((unsigned char)(c))&0x7f)
+
+
+//linux
+static inline unsigned char __tolower(unsigned char c)
+{
+	if (isupper(c))
+		c -= 'A'-'a';
+	return c;
+}
+static inline unsigned char __toupper(unsigned char c)
+{
+	if (islower(c))
+		c -= 'a'-'A';
+	return c;
+}
+#define tolower(c) __tolower(c)
+#define toupper(c) __toupper(c) //#bugbug: isso está redefinido em stdio.c vamos tirar de lá.
+//#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
+
+/* Fast implementation of tolower() for internal usage. 
+   Do not use in your code. */
+static inline char _tolower(const char c)
+{
+	return c | 0x20;
+};
+/* Fast check for octal digit */
+static inline int isodigit(const char c)
+{
+	return c >= '0' && c <= '7';
+};
 
 
 //
 // # intermediário #
 //
 
-//#define _isdigit(c) ((_ctype_+1)[c]&_D)
-#define _isdigit(c) ((c) >= '0' && (c) <= '9') 
-#define _isascii(c) (((unsigned) c)<=0x7f)
-#define _toascii(c) (((unsigned) c)&0x7f)
-//#define _isascii(c)	( (unsigned)(c) < 0x80 )
-//#define _toascii(c)	((c) & 0x7f )
-//#define _isascii(c)	(((c) & ~0x7f) == 0)	/* If C is a 7 bit value.  */
-//#define _toascii(c)	((c) & 0x7f)		/* Mask off high bits.  */
 
-//letter in ascci
-//if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'))
- 
-//#obs
-//estamos usando esse porque a 
-//função que criamos não está funcionando.
-//#obs: então outras funções aqui podem estar falahndo ... tem que testar todo o ctype.
-#define isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
+#define _isdigit(c) ((c) >= '0' && (c) <= '9') 
+#define _isascii(c) (((unsigned) c) <= 0x7f)
+#define _toascii(c) (((unsigned) c) &  0x7f)
 
 //
 // # definitivo #
@@ -95,51 +129,51 @@ extern char _ctype_[];
 
 //2	
 //This function checks whether the passed character is alphabetic.
-int isalpha(int c);
+//int isalpha(int c);
 
 
 //3	
 //This function checks whether the passed character is control character.
-int iscntrl(int c);
+//int iscntrl(int c);
 
 
 //4	
 //This function checks whether the passed character is decimal digit.
-int isdigit(int c);
+//int isdigit(int c);
 
 
 //5	
 //This function checks whether the passed character has graphical representation using locale.
-int isgraph(int c);
+//int isgraph(int c);
 
 
 //6	
 //This function checks whether the passed character is lowercase letter.
-int islower(int c);
+//int islower(int c);
 
 //7	
 //This function checks whether the passed character is printable.
-int isprint(int c);
+//int isprint(int c);
 
 
 //8	
 //This function checks whether the passed character is a punctuation character.
-int ispunct(int c);
+//int ispunct(int c);
 
 
 //9	
 //This function checks whether the passed character is white-space.
-int isspace(int c);
+//int isspace(int c);
 
 
 //10	
 //This function checks whether the passed character is an uppercase letter.
-int isupper(int c);
+//int isupper(int c);
 
 
 //11	
 //This function checks whether the passed character is a hexadecimal digit.
-int isxdigit(int c);
+//int isxdigit(int c);
 
 
 
