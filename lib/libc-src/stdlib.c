@@ -1361,6 +1361,45 @@ done:
 };
 
 
+//atoi. # talvez isso possa ir para o topo do 
+//arquivo para servir mais funções.
+int atoi(const char *str){
+	
+    int rv=0; 
+    char sign = 0;
+
+    /* skip till we find either a digit or '+' or '-' */
+    while (*str) 
+	{
+	    if (*str <= '9' && *str >= '0')
+		    break;
+		
+	    if (*str == '-' || *str == '+') 
+		    break;
+		
+	    str++;
+    }; 	  
+
+    if (*str == '-')
+	    sign=1;
+
+    //     sign = (*s == '-');
+    if (*str == '-' || *str == '+') 
+	    str++;
+
+    while (*str && *str >= '0' && *str <= '9') 
+	{
+	    rv = (rv * 10) + (*str - '0');
+        str++;
+    };
+
+    if (sign) return (-rv);
+        else return (rv);
+     
+    //     return (sign ? -rv : rv);
+};
+
+
 
 //
 // End.

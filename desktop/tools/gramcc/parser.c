@@ -6,34 +6,12 @@
  
 
 #include  "c.h"  
- 
- 
- /*
-//#include "config.h"
-//#include "debug.h"
-
-//#include <types.h>
-
-//#include "heap.h"
-//#include "api.h"
-
-//#include <stddef.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <stdio.h>
-
-//#include "table.h"
-//#include "lexer.h"
-//#include "parser.h"
-//#include "gramcc.h"
-
-//#include "tree.h"
-*/ 
 
 
 
 //expression
-int parse_expression ( int token );
+unsigned long parse_expression ( int token );
+unsigned long parse_sizeof( int token );
 
 int parse_function ( int token );
 int parse_return ( int token );
@@ -152,14 +130,138 @@ int parse_number (int olen){
 
 
 
+unsigned long parse_sizeof( int token ){
+	
+	unsigned long Result = 0;
+	
+    int c = token;	
+	
+	if ( c != TOKENKEYWORD )
+	{
+		printf("parse_sizeof: fail");
+		exit(1);
+	}
+ 
+    int State;
+	int running = 1;
+	
+	while (running)
+	{
+		c = yylex (); 
+		
+		again:
+		
+	    switch (State)
+        {
+		    //#todo
+			//(	
+		    case 1:
+			    if ( c == TOKENSEPARATOR )
+				{
+					State = 2;
+				    break;	
+				}
+				printf("parse_sizeof: State 1 fail");
+		        exit(1);
+				break;
+			   
+			//#todo   
+		    //tipo, símbolo, etc ...	
+		    case 2:
+				//#todo modifier 
+				//if ...
+			    if ( c == TOKENTYPE )
+				{
+					switch (type_found)
+					{
+						case TNULL:
+						    Result = sizeof(0);
+						    break;
+							
+						case TINT:
+						    Result = sizeof(int);
+							break;
+
+						case TVOID:
+						    Result = sizeof(void);
+						    break;
+
+						case TCHAR:
+						    Result = sizeof(char);
+						    break;
+
+						case TSHORT:
+						    Result = sizeof(short);
+						    break;
+							
+						case TLONG:
+						    Result = sizeof(long);
+                            break;						
+
+							
+						default:
+				        printf("parse_sizeof: State 2 unexpected type found in line %d", 
+				           lineno);						
+						   break;
+					}
+					State = 3;
+					break;
+				};
+				printf("parse_sizeof: #TODO State 2 unexpected element on sizeof in line %d", 
+				    lineno);
+		        exit(1);
+                exit(1);				
+		        break;
+
+		    //#todo
+			//)	
+		    case 3:
+			    if ( c == TOKENSEPARATOR )
+				{
+					State = 2;
+				    break;	
+				}
+				printf("parse_sizeof: State 3 fail");
+		        exit(1);		        
+				goto done;
+				break;
+
+			default:
+		        printf("parse_sizeof: default State");
+		        exit(1);                
+				break;			
+		};		
+	};
+	
+	
+done:	
+    return (unsigned long) Result;	
+};
+
+
+
 //analizando uma expressão.
 //temos a questão de predecessores para os operadores.
 
-int parse_expression ( int token )
-{
+unsigned long parse_expression ( int token ){
+
+    //#todo tree
+
+	int eCount = 0;
+	
+	//operator
+	int Op;
+	// e1=x  e2=y
+	unsigned long e[2];	
+	unsigned long Result = 0;
+	
+	
+	
 	int c;
 	
 	c = token;
+	
+	
     
 	//primeiro analizamos o que veio via argumento 
 	//assim checaremos a validade da expressão e
@@ -208,6 +310,7 @@ int parse_expression ( int token )
 		switch (State)   
 	    {
 			
+			//===================
 			//State 1
 			//Aceitamos constantes ou identificadores.
 			//não vamos começar com operadores e sim com operandos,
@@ -240,25 +343,147 @@ int parse_expression ( int token )
 						//ok;
 						printf ("parse_expression: State1 TOKENCONSTANT={%s} line %d\n", 
 						    real_token_buffer, lineno );
+						
+						switch(eCount)
+						{
+							//primeiro elemento
+							//esperamos uma constante
+							case 0:
+							    printf("eCount-case-0:\n");
+								e[0] = (unsigned long) atoi (real_token_buffer);
+								eCount++;
+								//vamos para o tratador de operadores.
+								State = 2;
+								break;
+								
+							//segundo elemento	
+							//error: o operador é tratado em outro case.
+							case 1:
+						        printf("eCount-case-1:\n");
+								printf ("parse_expression: State1 error unexpected operator element TOKENCONSTANT={%s} line %d\n", 
+						            real_token_buffer, lineno );
+                                exit(1); 									
+							    break;
+								
+							//terceito elemento	
+							//esperamos uma constante
+							case 2:
+							    printf("eCount-case-2:\n");
+							    e[1] = (unsigned long) atoi (real_token_buffer);
+								eCount = 0;
+								switch (Op)
+								{
+								    case PLUS_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] + (unsigned long) e[1] ); 									
+								        break;
+										
+								    case MINUS_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] - (unsigned long) e[1] ); 									
+								        break;
 
-					    //constant[CONSTANT_TOKEN] = TOKENCONSTANT;
-						//constant[CONSTANT_TYPE] = constant_type_found;
-						//constant[CONSTANT_BASE] = constant_base_found;
+								    case BIT_AND_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] & (unsigned long) e[1] ); 									
+								        break;
 
-						//#todo: fazer um switch para tipos válidos.
-						//strcat( outfile,"  mov eax, ");
-						//strcat( outfile, real_token_buffer );
-						//strcat( outfile,"\n  ret \n\n");			
-				        State = 2;
+								    case BIT_IOR_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] | (unsigned long) e[1] ); 									
+								        break;	
+
+								    case MULT_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] * (unsigned long) e[1] ); 									
+								        break;
+										
+								    case TRUNC_DIV_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] / (unsigned long) e[1] ); 									
+								        break;
+										
+								    case TRUNC_MOD_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] % (unsigned long) e[1] ); 									
+								        break;
+										
+								    case BIT_XOR_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] ^ (unsigned long) e[1] ); 									
+								        break;
+										
+								    case LSHIFT_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] << (unsigned long) e[1] ); 									
+								        break;
+										
+										
+								    case RSHIFT_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] >> (unsigned long) e[1] ); 									
+								        break;
+										
+								    case LE_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] <= (unsigned long) e[1] ); 									
+								        break;
+										
+								    case GE_EXPR:
+                                        Result = (unsigned long) ( (unsigned long) e[0] >= (unsigned long) e[1] ); 									
+								        break;
+										
+									//...	
+									
+									default:
+                                        printf("parse_expression: State1 default Op={%d}",Op);
+										exit(1);             
+										break;									
+								};
+								
+								// ( 1 + 2 ')'
+								//vamos ver se o que vem depois da segunda constante é um esperado separador 
+								//ou outracoisa.
+								c = yylex ();
+								
+								//Ok temos um sepador
+								//vamos tratá-lo
+								if ( c == TOKENSEPARATOR )
+								{
+									State = 1;
+								    goto again;	
+								}else{
+									printf("expected separator in line %d", lineno);
+									exit(1);
+								}
+								
+								
+								//vamos ver se tem um separador ou não
+								//que finalize a expressão.
+								//então continuaremos no State 1.
+								//State = 1;							
+							    break;
+								
+							default:
+						        printf ("parse_expression: State1 error #default TOKENCONSTANT={%s} line %d\n", 
+						            real_token_buffer, lineno );
+								exit(1);
+							    break;
+						};
 						break;
 						
 					case TOKENIDENTIFIER:
-						printf ("parse_expression: State1 TOKENIDENTIFIER={%s} line %d\n", 
+						printf ("parse_expression: State1 #todo TOKENIDENTIFIER={%s} line %d\n", 
 						    real_token_buffer, lineno );					
-					    State = 2;
+					    //State = 2;
+						exit(1);
 						break;
 						
-						
+					//sizeof	
+					case TOKENKEYWORD:
+					    if (keyword_found == KWSIZEOF)
+						{
+						   printf("parse_expression: State1 sizeof found in line %d\n", lineno); 	
+						   
+						    //#bugbug
+							//não sabemos se é a primeira ou a segunda constante.
+							e[eCount] = (unsigned long) parse_sizeof(TOKENKEYWORD);
+							eCount++;
+							//vamos para o tratador de operadores.
+							State = 1;						   
+						   
+						    //exit(1);	
+						};
+					    break;	
 					//...
 					
 					default:
@@ -272,6 +497,7 @@ int parse_expression ( int token )
 				}
 			   break;
 			   
+			//=================
 			//State 2
             //operadores			
 			case 2:
@@ -294,24 +520,91 @@ int parse_expression ( int token )
                     case '^':
                     case '!':
                     case '=':
-					     
 					    printf("parse_expression: State 2 simple operator{%s} lexer_code=%d \n", real_token_buffer, lexer_code );
-        			    //die();
+					    if ( eCount != 1 )
+						{
+							printf ("parse_expression: State 2 eCount error %d", eCount);
+							exit(1);
+						}
+						//avançamos para pegarmos constantes.
+						eCount++; 
+						
+						switch (lexer_code)
+						{
+                            case PLUS_EXPR:
+							    Op = PLUS_EXPR;
+                                break;
+								
+							case MINUS_EXPR:
+							    Op = MINUS_EXPR;
+								break;
+								
+                            case BIT_AND_EXPR:
+							    Op = BIT_AND_EXPR;
+								break;
+								
+                            case BIT_IOR_EXPR:
+							    Op = BIT_IOR_EXPR;
+								break;
+								
+                            case MULT_EXPR:
+							    Op = MULT_EXPR;
+								break;
+								
+                            case TRUNC_DIV_EXPR:
+                                Op = TRUNC_DIV_EXPR;
+								break;
+								
+							case TRUNC_MOD_EXPR:
+                                Op = TRUNC_MOD_EXPR;
+								break;
+								
+							case BIT_XOR_EXPR:
+                                Op = BIT_XOR_EXPR;
+								break;
+								
+							case LSHIFT_EXPR:
+                                Op = LSHIFT_EXPR;
+								break;
+								
+							case RSHIFT_EXPR:							
+							    Op = RSHIFT_EXPR;
+								break;
+								
+							//...	
+								
+							default:
+                                printf ("parse_expression: State 2 default lexer code %d", lexer_code );
+								exit (1); 
+								break;							
+							//...
+						}
+						//voltamos para pegarmos constantes.
 						State = 1;
 						break;		
 					
 					case ARITHCOMPARE:
 					    printf("parse_expression: State 2 ARITHCOMPARE{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+					    if ( eCount != 1 )
+						{
+							printf ("parse_expression: State 2 eCount error %d", eCount);
+							exit(1);
+						}
+						//avançamos para pegarmos constantes.
+						eCount++; 						
+						
 						switch (lexer_code)
 						{
 							case LE_EXPR:
-							    printf("parse_expression: LE_EXPR lexer_code=%d \n", lexer_code );
-							    State = 1;
+							    Op = LE_EXPR; 
+								printf("parse_expression: LE_EXPR lexer_code=%d \n", lexer_code );
+							    //State = 1;
 								break;
 								
 							case GE_EXPR:
-							    printf("parse_expression: GE_EXPR lexer_code=%d \n", lexer_code );
-							    State = 1;
+							    Op = GE_EXPR;
+								printf("parse_expression: GE_EXPR lexer_code=%d \n", lexer_code );
+							    //State = 1;
 								break;
 	
 								
@@ -320,10 +613,11 @@ int parse_expression ( int token )
 							default:
 							    printf("parse_expression: State 2 error ARITHCOMPARE default lexer_code=%d in line %d \n", 
 								    lexer_code, lineno );
-							    //exit(1); //die();
-								State = 1;
+							    exit(1); //die();
+								//State = 1;
 								break;
-						}
+						};
+						State = 1;
 						break;
 					   
 				    
@@ -415,7 +709,7 @@ int parse_expression ( int token )
 	
 expression_exit:
     
-	return 0;
+	return (unsigned long) Result;
 };
 
 
@@ -963,6 +1257,8 @@ done:
 
 int parse_if ( int token )
 {
+	unsigned long Exp_Result = 0;
+	
 	printf("todo: parse_if in line %d \n", lineno );
 	
 	//#todo
@@ -978,8 +1274,9 @@ int parse_if ( int token )
 		exit(1);
 	}
 	//testando chamar uma análise de expressão dentro do statement de if.
-	parse_expression ( c );
+	Exp_Result = parse_expression ( c );
 	
+	printf ("EXP={%d}\n",Exp_Result);
 	//exit(1);
     return -1;	
 };
@@ -988,6 +1285,8 @@ int parse_if ( int token )
 
 int parse_while ( int token )
 {
+	unsigned long Exp_Result = 0;
+	
 	printf("todo: parse_while in line %d\n ", lineno );
 	
 	//#todo
@@ -1003,8 +1302,9 @@ int parse_while ( int token )
 	}
 	
 	//testando chamar uma análise de expressão dentro do statement de while.
-	parse_expression ( c );
+	Exp_Result = parse_expression ( c );
 	
+	printf ("EXP={%d}\n",Exp_Result);
 	//exit(1);
     return -1;	
 };

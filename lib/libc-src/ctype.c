@@ -298,12 +298,13 @@ unsigned char __toupper(unsigned char c) {
 }
 */
 
-
+/*
+#bugbug: isso não funciona.
 int isalnum(int c)
 {
-	return (int) __isalnum(c);
+	return (int) __isalnum (c);
 }
-
+*/
 
 int isalpha(int c)
 {

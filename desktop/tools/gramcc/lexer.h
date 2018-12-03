@@ -1,6 +1,9 @@
 
 //gcc 0.9
-//#define isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
+
+//#bugbug: 
+//olexer vai usar esse porque a rotina no ctype pode estar com problema #todo 
+#define lexer_isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
 //#define isdigit(char) (char >= '0' && char <= '9')
 #define ENDFILE -1  /* token that represents end-of-file */
 

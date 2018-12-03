@@ -4,27 +4,6 @@
  
 #include  "c.h" 
 
- 
-/*
-//#include "config.h"
-//#include "debug.h"
- 
-//#include <types.h>
-
-//#include "heap.h"
-//#include "api.h"
-
-//#include <stddef.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <stdio.h>
-
-
-//#include "table.h"
-//#include "lexer.h"
-//#include "parser.h"
-//#include "gramcc.h"
- */
 
 //#### supensa ###
 /*
@@ -116,7 +95,6 @@ int skip_white_space (){
     
 	register int c;
     register int inside;
-	
 	
 	
 begin:		
@@ -403,7 +381,8 @@ again:
 				c = getc(finput);	
 				
 				//se não for
-				if( ( isalnum(c) == 0 ) && (c != '_') )
+				//if( ( lexer_isalnum(c) == 0 ) && (c != '_') )
+				if( ( isalnum(c) == 0 ) && (c != '_') )	
 				{
 			        //finaliza
                     *p = 0;

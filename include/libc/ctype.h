@@ -75,6 +75,12 @@ extern char _ctype_[];
 //letter in ascci
 //if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z'))
  
+//#obs
+//estamos usando esse porque a 
+//função que criamos não está funcionando.
+//#obs: então outras funções aqui podem estar falahndo ... tem que testar todo o ctype.
+#define isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
+
 //
 // # definitivo #
 //
@@ -83,7 +89,8 @@ extern char _ctype_[];
 //Sr.No.	Function & Description
 //1	
 //This function checks whether the passed character is alphanumeric.
-int isalnum(int c);
+//#bugbug: isso não funciona.
+//int isalnum(int c);
 
 
 //2	

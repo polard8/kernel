@@ -58,6 +58,11 @@ void *stdlib_system_call( unsigned long ax,
                    unsigned long bx, 
 				   unsigned long cx, 
 				   unsigned long dx );
+				   
+				   
+				   
+				   
+int atoi(const char *str);				   
 
 void exit(int status);
 
