@@ -14,12 +14,10 @@
 //#define LEXER_
 //#define LEXER_
 
-#define PARSER_VERBOSE 1   //verbose genérido do parser
-//#define PARSER_
-//#define PARSER_
-//#define PARSER_
-
-
-
-#define PARSER_OUTPUT_VERBOSE 1
+//#define PARSER_VERBOSE 1   //verbose genérido do parser
+#define PARSER_EXPRESSION_VERBOSE 1
+//#define PARSER_IF_VERBOSE 1
+//#define PARSER_WHILE_VERBOSE 1
+//#define PARSER_SIZEOF_VERBOSE 1
+//#define PARSER_OUTPUT_VERBOSE 1
 

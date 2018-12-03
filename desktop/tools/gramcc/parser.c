@@ -130,7 +130,7 @@ int parse_number (int olen){
 
 
 
-unsigned long parse_sizeof( int token ){
+unsigned long parse_sizeof ( int token ){
 	
 	unsigned long Result = 0;
 	
@@ -142,7 +142,7 @@ unsigned long parse_sizeof( int token ){
 		exit(1);
 	}
  
-    int State;
+    int State = 1;
 	int running = 1;
 	
 	while (running)
@@ -156,6 +156,7 @@ unsigned long parse_sizeof( int token ){
 		    //#todo
 			//(	
 		    case 1:
+			    printf("parse_sizeof: State 1\n");
 			    if ( c == TOKENSEPARATOR )
 				{
 					State = 2;
@@ -168,6 +169,7 @@ unsigned long parse_sizeof( int token ){
 			//#todo   
 		    //tipo, símbolo, etc ...	
 		    case 2:
+				printf("parse_sizeof: State 2\n");
 				//#todo modifier 
 				//if ...
 			    if ( c == TOKENTYPE )
@@ -207,18 +209,20 @@ unsigned long parse_sizeof( int token ){
 					State = 3;
 					break;
 				};
+				    
 				printf("parse_sizeof: #TODO State 2 unexpected element on sizeof in line %d", 
 				    lineno);
-		        exit(1);
-                exit(1);				
+		        exit(1);				              					
 		        break;
 
 		    //#todo
 			//)	
 		    case 3:
+			    printf("parse_sizeof: State 3\n");
 			    if ( c == TOKENSEPARATOR )
 				{
-					State = 2;
+					goto done;
+					//State = 2;
 				    break;	
 				}
 				printf("parse_sizeof: State 3 fail");
@@ -251,6 +255,9 @@ unsigned long parse_expression ( int token ){
 	
 	//operator
 	int Op;
+	unsigned long sizeof_constant;
+	int sizeof_flag = 0;
+	
 	// e1=x  e2=y
 	unsigned long e[2];	
 	unsigned long Result = 0;
@@ -276,12 +283,22 @@ unsigned long parse_expression ( int token ){
 		case TOKENSEPARATOR:
 	        if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
 			{
-			    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+				
+				
+#ifdef PARSER_EXPRESSION_VERBOSE				
+			    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+				    real_token_buffer, lineno ); 
+#endif 
+
 				//State = 2;	
 			}
 		    break;
 	    default:
-            printf("parse_expression: State1 Missed '(' separator in line %d \n", lineno );
+
+#ifdef PARSER_EXPRESSION_VERBOSE		
+            printf ("parse_expression: State 1 Missed '(' separator in line %d \n", 
+			    lineno );
+#endif			
 			exit(1);
 			break;					
 	}	
@@ -322,13 +339,20 @@ unsigned long parse_expression ( int token ){
 					case TOKENSEPARATOR:
 	                    if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
 						{
-						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+#ifdef PARSER_EXPRESSION_VERBOSE								
+						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+							    real_token_buffer, lineno ); 
+#endif							
 							//State = 1;	
 						    break;
 						}
 	                    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
 						{
-						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", real_token_buffer, lineno ); 
+							
+#ifdef PARSER_EXPRESSION_VERBOSE								
+						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+							    real_token_buffer, lineno );
+#endif								
 							//State = 1;
                             //provisório
 							//retornaremos, mas falta o corpo {...};
@@ -341,16 +365,30 @@ unsigned long parse_expression ( int token ){
 					
 					case TOKENCONSTANT:					
 						//ok;
+#ifdef PARSER_EXPRESSION_VERBOSE							
 						printf ("parse_expression: State1 TOKENCONSTANT={%s} line %d\n", 
 						    real_token_buffer, lineno );
+#endif
 						
 						switch(eCount)
 						{
 							//primeiro elemento
 							//esperamos uma constante
 							case 0:
+							
+#ifdef PARSER_EXPRESSION_VERBOSE								
 							    printf("eCount-case-0:\n");
-								e[0] = (unsigned long) atoi (real_token_buffer);
+#endif								
+								//se estamos lidando com a contante gerada pelo sizeof.
+								if( sizeof_flag == 1 )
+								{
+									e[0] = sizeof_constant;
+									sizeof_flag = 0;
+									
+								}else{
+									e[0] = (unsigned long) atoi (real_token_buffer);
+								};								
+								
 								eCount++;
 								//vamos para o tratador de operadores.
 								State = 2;
@@ -359,17 +397,29 @@ unsigned long parse_expression ( int token ){
 							//segundo elemento	
 							//error: o operador é tratado em outro case.
 							case 1:
+#ifdef PARSER_EXPRESSION_VERBOSE								
 						        printf("eCount-case-1:\n");
 								printf ("parse_expression: State1 error unexpected operator element TOKENCONSTANT={%s} line %d\n", 
 						            real_token_buffer, lineno );
-                                exit(1); 									
+#endif                                
+								exit(1); 									
 							    break;
 								
 							//terceito elemento	
 							//esperamos uma constante
 							case 2:
+#ifdef PARSER_EXPRESSION_VERBOSE								
 							    printf("eCount-case-2:\n");
-							    e[1] = (unsigned long) atoi (real_token_buffer);
+#endif							    
+								//se estamos lidando com a contante gerada pelo sizeof.
+								if( sizeof_flag == 1 )
+								{
+									e[1] = sizeof_constant;
+									sizeof_flag = 0;
+									
+								}else{
+									e[1] = (unsigned long) atoi (real_token_buffer);
+								};
 								eCount = 0;
 								switch (Op)
 								{
@@ -472,15 +522,37 @@ unsigned long parse_expression ( int token ){
 					case TOKENKEYWORD:
 					    if (keyword_found == KWSIZEOF)
 						{
+							
+#ifdef PARSER_EXPRESSION_VERBOSE								
 						   printf("parse_expression: State1 sizeof found in line %d\n", lineno); 	
-						   
+#endif						   
 						    //#bugbug
 							//não sabemos se é a primeira ou a segunda constante.
-							e[eCount] = (unsigned long) parse_sizeof(TOKENKEYWORD);
-							eCount++;
-							//vamos para o tratador de operadores.
-							State = 1;						   
-						   
+							sizeof_constant = (unsigned long) parse_sizeof (TOKENKEYWORD);
+							sizeof_flag = 1;
+							
+#ifdef PARSER_EXPRESSION_VERBOSE								
+							printf("SIZEOF={%d}\n", sizeof_constant );
+#endif 
+							
+							c = TOKENCONSTANT; //transformamos a keyword em constant.
+							State = 1;
+							goto again;
+							//eCount++;
+							
+							//c = yylex();
+							//if ( c == TOKENSEPARATOR )
+							//{
+							//	State = 1;
+							//    goto again;
+							//}
+							
+							//se o próximo não for um separador então temos mais operadores e 
+							//constantes.
+							//depois de um sizeof tem operadores ou separador.
+							//vamos para o 2 porque esperamos por operador.
+							State = 2;						   
+						    break;
 						    //exit(1);	
 						};
 					    break;	
@@ -520,8 +592,13 @@ unsigned long parse_expression ( int token ){
                     case '^':
                     case '!':
                     case '=':
-					    printf("parse_expression: State 2 simple operator{%s} lexer_code=%d \n", real_token_buffer, lexer_code );
-					    if ( eCount != 1 )
+					
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					    printf("parse_expression: State 2 simple operator{%s} lexer_code=%d \n", 
+						    real_token_buffer, lexer_code );
+#endif					    
+						
+						if ( eCount != 1 )
 						{
 							printf ("parse_expression: State 2 eCount error %d", eCount);
 							exit(1);
@@ -584,8 +661,12 @@ unsigned long parse_expression ( int token ){
 						break;		
 					
 					case ARITHCOMPARE:
-					    printf("parse_expression: State 2 ARITHCOMPARE{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
-					    if ( eCount != 1 )
+					
+#ifdef PARSER_EXPRESSION_VERBOSE	
+					    printf("parse_expression: State 2 ARITHCOMPARE{%s} lexer_code=%d \n", 
+						    real_token_buffer, lexer_code );
+#endif					    
+						if ( eCount != 1 )
 						{
 							printf ("parse_expression: State 2 eCount error %d", eCount);
 							exit(1);
@@ -596,15 +677,20 @@ unsigned long parse_expression ( int token ){
 						switch (lexer_code)
 						{
 							case LE_EXPR:
-							    Op = LE_EXPR; 
+							    Op = LE_EXPR;
+
+#ifdef PARSER_EXPRESSION_VERBOSE									
 								printf("parse_expression: LE_EXPR lexer_code=%d \n", lexer_code );
-							    //State = 1;
+#endif							    
+								//State = 1;
 								break;
 								
 							case GE_EXPR:
 							    Op = GE_EXPR;
+#ifdef PARSER_EXPRESSION_VERBOSE									
 								printf("parse_expression: GE_EXPR lexer_code=%d \n", lexer_code );
-							    //State = 1;
+#endif							    
+								//State = 1;
 								break;
 	
 								
@@ -622,18 +708,25 @@ unsigned long parse_expression ( int token ){
 					   
 				    
 					case EQCOMPARE:
-					    printf("parse_expression: State 2 EQCOMPARE{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					    printf("parse_expression: State 2 EQCOMPARE{%s} lexer_code=%d \n", 
+						    real_token_buffer, lexer_code );
+#endif						
 						switch (lexer_code)
 						{
 							
 							case NE_EXPR:
+#ifdef PARSER_EXPRESSION_VERBOSE								
 							    printf("parse_expression: NE_EXPR lexer_code=%d \n", lexer_code );
-							    State = 1;
+#endif							    
+								State = 1;
 								break;
 								
 							case EQ_EXPR:
+#ifdef PARSER_EXPRESSION_VERBOSE								
 							    printf("parse_expression: EQ_EXPR lexer_code=%d \n", lexer_code );
-							    State = 1;
+#endif							    
+								State = 1;
 								break;							
 							
 							default:
@@ -641,49 +734,74 @@ unsigned long parse_expression ( int token ){
 								    lexer_code, lineno );
 							    //exit(1); //die();
 								State = 1;
+								exit(1);
 								break;
                         };						
 					    break;
 					   
 					case ASSIGN:
-                        printf("parse_expression: State 2 ASSIGN{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+                        printf("parse_expression: State 2 ASSIGN{%s} lexer_code=%d \n",  
+						    real_token_buffer, lexer_code );
+#endif						
 						State = 1;
 						break;					
 					   
 					case PLUSPLUS:
-					   printf("parse_expression: State 2 PLUSPLUS{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf("parse_expression: State 2 PLUSPLUS{%s} lexer_code=%d \n",  
+					       real_token_buffer, lexer_code );
+#endif					   
 					   State = 1;
 					   break;
 					   
 					case MINUSMINUS:
-					   printf("parse_expression: State 2 MINUSMINUS{%s} lexer_code=%d \n", real_token_buffer, lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf("parse_expression: State 2 MINUSMINUS{%s} lexer_code=%d \n", 
+					       real_token_buffer, lexer_code );
+#endif					   
 					   State = 1;
 					   break;
 					   
 					case ANDAND:
-					   printf("parse_expression: State 2 ANDAND{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf("parse_expression: State 2 ANDAND{%s} lexer_code=%d \n",  
+					       real_token_buffer, lexer_code );
+#endif					   
 					   State = 1;
 					   break;
 					   
 					case OROR:
-					   printf("parse_expression: State 2 OROR{%s} lexer_code=%d \n",  real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf("parse_expression: State 2 OROR{%s} lexer_code=%d \n",  
+					       real_token_buffer, lexer_code );
+#endif					   
 					   State = 1;
 					   break;
 					   
 					   
 					case POINTSAT:
-					   printf("parse_expression: State 2 POINTSAT{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf("parse_expression: State 2 POINTSAT{%s} lexer_code=%d \n", 
+					       real_token_buffer, lexer_code );
+#endif
 					   State = 1;
 					   break;
 					   
 					case LSHIFT:
-					   printf("parse_expression: State 2 LSHIFT{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf("parse_expression: State 2 LSHIFT{%s} lexer_code=%d \n", 
+					       real_token_buffer, lexer_code );
+#endif
 					   State = 1;
 					   break;
 					   
 					   
 					case RSHIFT:
-					   printf("parse_expression: State 2 RSHIFT{%s} lexer_code=%d \n", real_token_buffer,lexer_code );
+#ifdef PARSER_EXPRESSION_VERBOSE						
+					   printf ("parse_expression: State 2 RSHIFT{%s} lexer_code=%d \n", 
+					       real_token_buffer, lexer_code );
+#endif					   
 					   State = 1;
 					   break;
 					   
@@ -1255,14 +1373,21 @@ done:
    return c;
 };
 
+
+//## if ##
 int parse_if ( int token )
 {
+	int If_Result = -1;
+	
 	unsigned long Exp_Result = 0;
 	
 	printf("todo: parse_if in line %d \n", lineno );
 	
 	//#todo
 	//conferir se o token do argumento é um if 
+	
+	//#todo 
+	//temos que criar State para if.
 	
 	//pega o próximo que deve ser um (
 	int c = yylex();
@@ -1276,15 +1401,44 @@ int parse_if ( int token )
 	//testando chamar uma análise de expressão dentro do statement de if.
 	Exp_Result = parse_expression ( c );
 	
+	//#importante 
+	//retornamos 1 ou 0 da análise da expressão,
+	//quem chamou o if vai armazenar esse valor para 
+	//chamar o else.
+	If_Result = (int) Exp_Result;
+	
 	printf ("EXP={%d}\n",Exp_Result);
+	
+	c = yylex();
+	if ( c != TOKENSEPARATOR )
+	{
+		printf ("parse_if separator { missed\n");
+		exit(1);
+	}
+	
+	c = yylex();
+	if ( c != TOKENSEPARATOR )
+	{
+	printf ("parse_if separator } missed\n");
+		exit(1);
+	}
+	
+	c = yylex();
+	if ( c != TOKENSEPARATOR )
+	{
+		printf ("parse_if separator ; missed\n");
+		exit(1);
+	}
+	
 	//exit(1);
-    return -1;	
+    return (int) If_Result;	
 };
 
 
 
 int parse_while ( int token )
 {
+	int While_Result = -1;
 	unsigned long Exp_Result = 0;
 	
 	printf("todo: parse_while in line %d\n ", lineno );
@@ -1303,10 +1457,32 @@ int parse_while ( int token )
 	
 	//testando chamar uma análise de expressão dentro do statement de while.
 	Exp_Result = parse_expression ( c );
+	While_Result = (int) Exp_Result;
+	
+	c = yylex();
+	if ( c != TOKENSEPARATOR )
+	{
+		printf ("parse_if separator { missed\n");
+		exit(1);
+	}
+	
+	c = yylex();
+	if ( c != TOKENSEPARATOR )
+	{
+	printf ("parse_if separator } missed\n");
+		exit(1);
+	}
+	
+	c = yylex();
+	if ( c != TOKENSEPARATOR )
+	{
+		printf ("parse_if separator ; missed\n");
+		exit(1);
+	}
 	
 	printf ("EXP={%d}\n",Exp_Result);
 	//exit(1);
-    return -1;	
+    return (int) While_Result;	
 };
 
 int parse_do ( int token )
@@ -1347,6 +1523,11 @@ int parse (){
 	int braces_inside = 0;
 	int parentheses_inside = 0;
 	int square_brackets_inside = 0;
+	
+	
+	int If_Result = -1;
+	int While_Result = -1;
+	//...
 	
 	//steps;
 	int State = 1;
@@ -1831,11 +2012,20 @@ int parse (){
 					        printf("State3: TOKENKEYWORD={%s} KWIF in line %d \n", real_token_buffer, lineno );
 #endif								
 						    //parse_if??
-							parse_if  (TOKENKEYWORD);
+							If_Result = (int) parse_if  (TOKENKEYWORD);
+							printf("IF-RESULT={%d}\n",If_Result);
 							//recomeçamos
 							State = 1;
 							break;
 						}
+						
+                        if( keyword_found == KWWHILE )
+						{
+						    While_Result = (int) parse_while (TOKENKEYWORD);
+							printf("WHILE-RESULT={%d}\n",While_Result);
+							State = 1;
+							break;
+						}	
 						
 						// asm (" ... ");
                         if( keyword_found == KWASM )
@@ -1850,12 +2040,7 @@ int parse (){
 							break;
 						}	
 
-                        if( keyword_found == KWWHILE )
-						{
-						    parse_while (TOKENKEYWORD);
-							State = 1;
-							break;
-						}							 
+						 
 
                         //...							
 						

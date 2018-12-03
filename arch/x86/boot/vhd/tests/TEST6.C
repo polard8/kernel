@@ -19,7 +19,7 @@ void main()
     //{};
 
 	//sizeof(int);
-    if ( 1 + sizeof (int) ) 
+    //if ( 1 + sizeof (int) ) 
     //{};		
 
     //while ( 10 + 11 )
@@ -28,14 +28,14 @@ void main()
 	//while ( 12 - 13 )
 	//{};
 
-	//while ( 14 <= 15 )
+	//while ( 14 <= 33 )
 	//{};
 
    // while ( 16 >= 17 )
     //{};
 
 	//sizeof(int);
-   // while ( 1 + sizeof(long) )
+   //while ( 10 + sizeof(long) )
 	//{};
 		
 };
