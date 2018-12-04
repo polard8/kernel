@@ -7,14 +7,14 @@
 echo -{ ...
 echo -{ head
 	
-	nasm c:\gramado\desktop\core\taskman\head.s -felf -o head.o
+	nasm c:\gramado\init\core\taskman\head.s -felf -o head.o
 
 :Compiling	
 echo -{ ...
 echo -{ Compiling TASKMAN.BIN.
     
-	gcc -c c:\gramado\desktop\core\taskman\crt0.c -I c:\gramado\include\libc -o crt0.o  
-	gcc -c c:\gramado\desktop\core\taskman\main.c -I c:\gramado\include\libc -o main.o  
+	gcc -c c:\gramado\init\core\taskman\crt0.c -I c:\gramado\include\libc -o crt0.o  
+	gcc -c c:\gramado\init\core\taskman\main.c -I c:\gramado\include\libc -o main.o  
 	
 	
 	copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o
@@ -41,7 +41,7 @@ string.o
 :Linking
 echo -{ ...
 echo -{ Linking objects ... 
-    ld -T c:\gramado\desktop\core\taskman\link.ld -o TASKMAN.BIN %myObjects% -Map tm_map.s
+    ld -T c:\gramado\init\core\taskman\link.ld -o TASKMAN.BIN %myObjects% -Map tm_map.s
    
     rem
     rem :Cleaning   
