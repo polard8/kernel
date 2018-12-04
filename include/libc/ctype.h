@@ -70,28 +70,33 @@ static inline int isdigit(int c)
 #define isgraph(c)	((__ismask(c)&(_P|_U|_L|_D)) != 0)
 #define iscntrl(c)	((__ismask(c)&(_C)) != 0)
  
-
 //linux 
 #define isascii(c) (((unsigned char)(c))<=0x7f)
 #define toascii(c) (((unsigned char)(c))&0x7f)
 
 
 //linux
+
 static inline unsigned char __tolower(unsigned char c)
 {
 	if (isupper(c))
 		c -= 'A'-'a';
 	return c;
-}
+};
+
+
 static inline unsigned char __toupper(unsigned char c)
 {
 	if (islower(c))
 		c -= 'a'-'A';
 	return c;
 }
+
+
 #define tolower(c) __tolower(c)
 #define toupper(c) __toupper(c) //#bugbug: isso está redefinido em stdio.c vamos tirar de lá.
 //#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
+
 
 /* Fast implementation of tolower() for internal usage. 
    Do not use in your code. */
@@ -99,6 +104,8 @@ static inline char _tolower(const char c)
 {
 	return c | 0x20;
 };
+
+
 /* Fast check for octal digit */
 static inline int isodigit(const char c)
 {
@@ -114,6 +121,7 @@ static inline int isodigit(const char c)
 #define _isdigit(c) ((c) >= '0' && (c) <= '9') 
 #define _isascii(c) (((unsigned) c) <= 0x7f)
 #define _toascii(c) (((unsigned) c) &  0x7f)
+
 
 //
 // # definitivo #
