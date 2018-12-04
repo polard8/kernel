@@ -8,23 +8,9 @@
  *                  Aqui é um campo de testes. 
  * @frednora
  */
-
-
-//
-// Includes.
-// 
-
-
-#include "api.h"
-
-#include <types.h>
-#include <stddef.h>   
-#include <stdio.h>  
-#include <stdlib.h>  
-#include <string.h>
-
-#include "shell.h"
-#include "globals.h"
+ 
+ 
+#include "sh.h"
 
 
 extern int ShellFlag;

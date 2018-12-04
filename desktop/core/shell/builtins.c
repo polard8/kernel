@@ -5,19 +5,9 @@
  * History:
  *     2018 - Created by Fred Nora.
  */
+
  
-
-#include "api.h"
-
-#include <types.h>
-#include <stddef.h>   
-#include <stdio.h>  
-#include <stdlib.h>  
-#include <string.h>
-
-#include "shell.h"
-#include "globals.h"
-#include "builtins.h"
+#include "sh.h"
 
 
 void cd_buitins (){

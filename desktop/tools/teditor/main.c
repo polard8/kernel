@@ -12,19 +12,6 @@
  */
 
 
-#include <types.h>
-
-#include "heap.h"
-#include "api.h"
-
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "status.h"
-#include "teditor.h"
-
 //#define TEDITOR_VERBOSE 1
 
 //# usado para teste 
@@ -33,6 +20,9 @@
 #define WINDOW_LEFT      4   //10
 #define WINDOW_TOP       4   //10
 
+
+
+#include "ed.h"
 
 
 //static int running = 1;
@@ -360,6 +350,7 @@ int mainTextEditor ( int argc, char *argv[] ){
 	if ( fp == NULL )
     {
         printf("fopen fail start typing ...\n");
+				
         goto startTyping;
 		
     }else{
@@ -376,6 +367,11 @@ int mainTextEditor ( int argc, char *argv[] ){
 		printf ( "%s", fp->_base );	
        // printf("Show file done\n");
 		
+		//#test 
+		//configurando o endereço do buffer do arquivo carregado.
+		//file_buffer = fp->_base;
+		
+		
 #ifdef TEDITOR_VERBOSE	        
 		//printf("...\n");
         printf("..\n");		
@@ -383,6 +379,9 @@ int mainTextEditor ( int argc, char *argv[] ){
 #endif
 
 startTyping:
+
+    //É aqui que fica o arquivo que vamos salvar.
+    //file_buffer = &RAW_TEXT[0];
 
 #ifdef TEDITOR_VERBOSE	
 		printf("\n");
@@ -502,9 +501,15 @@ void editorClearScreen (){
 
 
 
+/*
+ *====================================
+ * editor_save_file:
+ * Testando a rotina de salvar um arquivo.
+ * Estamos usando a API.
+ *
+ *
+ */
 
-//testando a rotina de salvar um arquivo.
-//estamos usando a API.
 int editor_save_file (){
 	
 
@@ -516,34 +521,61 @@ int editor_save_file (){
 	// 512*4 = 2048  (4 setores) 2KB
 	// Se a quantidade de bytes for '0'. ???
 	
+	
+	//preparando o arquivo para salvar.
+	//precisamos colocar no buffer
+	
+	//isso é um teste.
+	/*
+	
+	strcat( RAW_TEXT, "initializing file ...");
+	
+	int l; //linha
+	int c; //coluna
+	int p = 0; //posição dentro do buffer.
+	
+	for ( l=0; l<16; l++ )
+	{
+		for ( c=0; c<80; c++ )
+		{
+			//pega um char.
+			RAW_TEXT[p] = (char) LINES[l].CHARS[c];
+			p++;
+		}
+	};
+	*/
+	
 	int Ret;
 	
 	char file_1[] = "Arquivo \n escrito \n em \n user mode no editor de textos teditor.bin :) \n";
-	char file_1_name[] = "FILE2UM TXT";
-	
-	printf("editor_save_file: Salvando um arquivo ...\n");
+	char file_1_name[] = "FILE1234TXT";
 	
 	unsigned long number_of_sectors = 0;
     size_t len = 0;
 	
+    
+	//Initializing ...
 	
-	//
+	printf("editor_save_file: Salvando um arquivo ...\n");
+	
+	
 	// Lenght in bytes.
-	//
 	
 	len = (size_t) strlen (file_1);
-
-	if (len <= 0)
-	{
+	//len = (size_t) strlen ( RAW_TEXT );
+	
+	if (len <= 0){
+		
 	    printf ("editor_save_file:  Fail. Empty file.\n");
         return (int) 1;		
 	}
 	
-	if (len > 2048)
-	{
+	if (len > 2048){
+		
 	    printf ("editor_save_file:  Limit Fail. The  file is too long.\n");
         return (int) 1;		
 	}
+	
 	
     //
     // Number os sectors.
@@ -552,34 +584,42 @@ int editor_save_file (){
 	number_of_sectors = (unsigned long) ( len / 512 );
 	
 	if ( len > 0 && len < 512 ){
+		
 	    number_of_sectors = 1; 
     }		
 	
-	if ( number_of_sectors == 0 )
-	{
-	    printf ("editor_save_file:  Limit Fail. (0) sectors so save.\n");
+	if ( number_of_sectors == 0 ){
+		
+	    printf ("editor_save_file:  Limit Fail. (0) sectors to save.\n");
         return (int) 1;				
 	}
+	
 	
 	//limite de teste.
 	//Se tivermos que salvar mais que 4 setores.
 	if ( number_of_sectors > 4 )
 	{
-	    printf ("editor_save_file:  Limit Fail. (%d) sectors so save.\n",
+	    printf ("editor_save_file:  Limit Fail. (%d) sectors to save.\n",
 		    number_of_sectors );
         return (int) 1;				
 	}
 	
 	
-    Ret = (int) apiSaveFile ( file_1_name,  //name 
-                              number_of_sectors,            //number of sectors.
-                              len,            //size in bytes			
-                              file_1,       //address
-                              0x20 );       //flag		
-				
+	//
+	// ## save ##
+	//
+	
+	//name, number of sectors, size in bytes, address, flag.
+	
+    Ret = (int) apiSaveFile ( file_1_name, number_of_sectors, len,            
+                    file_1, 0x20 );       		
+
+    //Ret = (int) apiSaveFile ( file_1_name, number_of_sectors, len,            
+    //                &RAW_TEXT[0], 0x20 );       		
+					
 	//if (Ret == 0)
 	
-	printf("t5: done.\n");	
+	printf("done\n");	
 	
 	return (int) Ret;
 };
@@ -595,6 +635,7 @@ teditorProcedure( struct window_d *window,
     unsigned long compare_return;	
     int q;	
 	
+	int key_state = -1;
 	
     switch (msg)
     {
@@ -640,6 +681,22 @@ teditorProcedure( struct window_d *window,
 				
 				//teclas de digitação.
 				default:
+				    if ( long1 == 's' )
+					{
+					    //#todo
+						//pegar o status de control.
+						//#todo: isso precisa ir para a API.(138)
+						key_state = (int) system_call ( 138, (unsigned long) VK_CONTROL , 
+						                    (unsigned long) VK_CONTROL , (unsigned long) VK_CONTROL  );	
+                        						
+					    // pressionada
+						if ( key_state == 1 )
+					    {
+						    editor_save_file ();	
+							key_state = -1;
+							break;
+						}
+					}
 				    teditorInsertNextChar ( (char) long1 );  
 				    break;
 			};
@@ -777,7 +834,7 @@ void shellInitWindowLimits (){
     textMaxWheelDelta = 4;  //máximo que se pode rolar o texto	
 	textWheelDelta = textMinWheelDelta;
 	//...
-}
+};
 
 
 
@@ -849,11 +906,11 @@ void teditorInsertNextChar (char c){
 		
 		if ( textCurrentRow >= 25 )
 		{
-			//shellScroll ();
+			//teditorScroll ();
 			printf(" *SCROLL");
 			while(1){ asm("pause"); }
 		}
-	}
+	};
 	
 	LINES[textCurrentRow].pos = textCurrentCol;
 	LINES[textCurrentRow].right = textCurrentCol;

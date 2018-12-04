@@ -1162,6 +1162,8 @@ void *services( unsigned long number,
             break;
 
 		//138 - get key state.	
+		//#importante: 
+		//#todo: isso precisa ir para a API.
         case 138:
 		    return (void *) keyboardGetKeyState ( (unsigned char) arg2 );
             break;		

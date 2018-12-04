@@ -75,40 +75,9 @@
 #define WINDOW_HEIGHT    400 //400
 #define WINDOW_LEFT      10
 #define WINDOW_TOP       10
+
  
-//
-// Includes.
-// 
-
-/* Setup current compiler */
-#include "compiler.h"
-
-//lib C
-//Isso deveria estar em um mesmo lugar para todos os aplicativos.
-//ex: c:\gramado\g02\branch\libc
-#include <types.h>
-#include <stddef.h>
-#include <stdarg.h>   
-#include <stdio.h>  
-#include <stdlib.h>  
-#include <string.h>
-
-/* shell stuff */
-#include "shell.h"
-#include "globals.h"
-#include "builtins.h"
-#include "api.h"
-#include "desktop.h"
-
-/* # bash 1.05 stuff #*/
-#include "variables.h"
-#include "general.h"
-#include "flags.h"
-#include "alias.h"
-#include "ndir.h"
-#include "version.h"
-//...
-
+#include "sh.h"
 
 
 // Input flags.
@@ -1656,7 +1625,7 @@ shellProcedure( struct window_d *window,
 		    printf("SHELL.BIN: MSG_CREATE\n");
 		    break;
 			
-		//MSG_TIMER ;;#TODO INCLUIR ISS NA API.	
+		//MSG_TIMER ;;#TODO INCLUIR ISS0 NA API.	
 		case 53:
 		    //printf("shell tick\n");
 			updateObject(); //interna
@@ -3349,6 +3318,8 @@ do_compare:
     };
 	
 	// timer-test
+	// Essa rotina cria um objeto timer que gera um interrupção 
+	// de tempos em tempos e é tratado pelo procedimento de janelas.
 	if ( strncmp( prompt, "timer-test", 10 ) == 0 ){
 
 		printf("timer-test: Creating timer\n");
@@ -3360,9 +3331,6 @@ do_compare:
 					
 		//janela, 100 ms, tipo 2= intermitente.
 		//system_call ( 222, (unsigned long) window, 100, 2);	
-		
-        //apiCreateTimer ( (struct window_d *) window, 
-        //    (unsigned long) 100, (int) 2 );
 			
         apiCreateTimer ( (struct window_d *) window, 
             (unsigned long) 50, (int) 2 );			

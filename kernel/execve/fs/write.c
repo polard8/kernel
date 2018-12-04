@@ -179,8 +179,13 @@ done:
  * @todo: A biblioteca C pode chamar essa funçao.
  */
  
-//@todo: Número máximo de entradas na lista de clusters. Quantas?
-#define  fat_range_max 4096  
+//#todo: 
+//#test
+//Número máximo de entradas na lista de clusters. Quantas?
+// A FAT tem 246 setores, 123 KB
+//#define  fat_range_max (1024*4)  
+//#define  fat_range_max (1024*8)  
+#define  fat_range_max (1024*32)  
 
 //lista de clusters
 unsigned short list[fat_range_max];
@@ -193,7 +198,7 @@ fsSaveFile ( char *file_name,
              char flag )  
 {
 	
-	printf ("ds-fsSaveFile:  \n");
+	printf ("write-fsSaveFile: \n");
 	
 	
 	//info
@@ -201,7 +206,8 @@ fsSaveFile ( char *file_name,
 	//
 	
 	//#debug:
-	printf ("name=%s  \n", file_name ); //o nome está salvando corretamente;
+	//o nome está salvando corretamente;
+	printf ("name=%s  \n", file_name ); 
 	printf ("size=%d  \n", file_size );
 	printf ("nbytes=%d  \n",size_in_bytes);
 	printf ("address=%x  \n",file_address);
@@ -264,6 +270,7 @@ fsSaveFile ( char *file_name,
     
 	// #bugbug
 	// Obs: Esse limite é improvisado.
+	
     while ( i < fat_range_max )
     {
         //procurando cluster livre na fat.
@@ -305,7 +312,7 @@ fsSaveFile ( char *file_name,
 	
 out_of_range:  
 
-    printf("fsSaveFile: out_of_range");
+    printf("fsSaveFile: No free cluster \n");
     goto fail;
 	
 	//#debug
@@ -527,6 +534,8 @@ done:
 	
     //#debug
     printf("fsSaveFile: clusters saved\n");
+	
+	
     printf("Saving root..\n");	
     refresh_screen();
 	
@@ -539,7 +548,9 @@ done:
 	
 	
     //
-    //#bugbug: precisamos saber o tamanho do root ... precismos de estrututra de root	
+    // #bugbug: 
+	// Precisamos saber o tamanho do root ... 
+	// Precismos de estrututra de root	
 	//	
 	
 	for ( r=0; r<32; r++ )
@@ -555,9 +566,6 @@ done:
 		
 		//#bugbug: Não podemos determinar os valores. 
 		// Precisamos de estruturas.
-		
-		//write_lba ( VOLUME1_ROOTDIR_ADDRESS + roff, 
-	    //            VOLUME1_ROOTDIR_LBA     + rlbaoff );
 					
 		my_write_hd_sector ( (unsigned long) VOLUME1_ROOTDIR_ADDRESS + roff, 
 		    (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 0, 0  );			
@@ -586,18 +594,27 @@ done:
     //#bugbug: Devemos salvar ela toda.	
     //salva 4 setores da fat!       
     
-    //printf("write_lba  ... tentando salvar fat\n");      
-    //refresh_screen();		
+    printf("Saving fat..\n");	
+    refresh_screen();	
 
 	int f;
     int off = 0;
     int lbaoff = 0;
 
     //
-    //#bugbug: precisamos saber o tamanho da fat ... precismos de estrututra de fat	
+    // #bugbug: 
+	// Precisamos saber o tamanho da fat ... 
+	// Precismos de estrututra de fat	
 	//
 	
-	for ( f=0; f<32; f++ )
+	//#obs: 
+	// Estamos salvando 32 setores da FAT,
+	// mas FAT na verdade tem 246 setores.
+    // #test: Vamos salvar todos os setores da FAT como teste.
+   	
+	
+	//for ( f=0; f<32; f++ )
+	for ( f=0; f<246; f++ )
 	{
 	   //#bugbug:
        //pelo jeito a rotina de salvamento precisa de 

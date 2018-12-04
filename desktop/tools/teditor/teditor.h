@@ -6,7 +6,13 @@
 //#todo: Usr as mesmas variáveis do shell.
 
 
+//
+// # file support #
+//
 
+char *file_name;
+char *file_buffer;
+size_t file_size;
 
 
 //
@@ -89,6 +95,11 @@ struct teditor_line
 //O RESTO DO TEXTO DEVERÁ FICAR ESPERANDO NO BUFFER.
 //#IMPORTANTE: 25 DESSAS 32 LINHAS SERÃO VISÍVEIS.
 struct teditor_line LINES[32]; 
+
+//precisamos colocar os caracteres aqui na hora de salvar o arquivo.
+//80 chars * 32 lines.
+char RAW_TEXT[80*32+1];
+
 
 
 //#importante:

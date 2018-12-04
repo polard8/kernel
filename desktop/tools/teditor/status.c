@@ -1,26 +1,13 @@
 // Suporte a status bar.
 
 
-#include <types.h>
-
-#include "heap.h"
-#include "api.h"
-
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "status.h"
+#include "ed.h"
 
 
+/* statusInitializeStatusBar: */
 
-/*
- * statusInitializeStatusBar:
- *
- */
-void statusInitializeStatusBar()
-{
+void statusInitializeStatusBar (){
+	
 	int i;
 	unsigned long OldX, OldY;
 
@@ -31,10 +18,11 @@ void statusInitializeStatusBar()
 	//posiciona.#teste
 	apiSetCursor( 0, (600/8) -1 );
 	
-	for( i=0; i < ((800/8)-1); i++)
-	{
+	for ( i=0; i < ((800/8)-1); i++ ){
+		
 		printf(" ");
 	};
+	
 	
 	apiSetCursor( 8, (600/8) -1 );	
 	printf("|# Status Bar offset 8.");
@@ -42,14 +30,15 @@ void statusInitializeStatusBar()
 	apiSetCursor( 44, (600/8) -1 );	
 	printf("|# Status Bar  offset 44.");
 	
-done:
+//done:
+
     apiSetCursor(OldX,OldY);
-    return;	
+    //return;	
 };
 
 
-void update_statuts_bar( char *string1, char *string2 )
-{
+void update_statuts_bar ( char *string1, char *string2 ){
+	
 	int i;
 	unsigned long OldX, OldY;
 
@@ -60,8 +49,8 @@ void update_statuts_bar( char *string1, char *string2 )
 	//posiciona.#teste
 	apiSetCursor( 0, (600/8) -1 );
 	
-	for( i=0; i < ((800/8)-1); i++)
-	{
+	for ( i=0; i < ((800/8)-1); i++ ){
+		
 		printf(" ");
 	};
 	
@@ -71,7 +60,8 @@ void update_statuts_bar( char *string1, char *string2 )
 	apiSetCursor( 44, (600/8) -1 );	
 	printf(string2);
 	
-done:
+//done:
+
     apiSetCursor(OldX,OldY);	
 };
 

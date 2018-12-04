@@ -10,10 +10,7 @@
  */
 
 
-#include <types.h>
-#include <stdio.h>   
-#include <stddef.h>   
-#include <stdlib.h>
+#include "sh.h" 
 
 
 static char *argv[] = { 

@@ -5,19 +5,7 @@
 //
 
 
-
-#include "api.h"
-
-#include <types.h>
-#include <stddef.h>   
-#include <stdio.h>  
-#include <stdlib.h>  
-#include <string.h>
-
-#include "shell.h"
-#include "globals.h"
-#include "builtins.h"
-#include "desktop.h"
+#include "sh.h"
 
 
 //desktop folders.
