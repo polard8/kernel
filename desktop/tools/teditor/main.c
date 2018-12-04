@@ -316,6 +316,18 @@ int mainTextEditor ( int argc, char *argv[] ){
 	//  ## Testing file support. ##
 	//
 	
+	
+    //
+	//  ## buffer ##
+	//
+	
+	
+    //Inicializando buffer.
+	//É nesse buffer que ficará o arquivo de texto que será salvo no disco.
+
+    //strcat( RAW_TEXT, "initializing file ...");		
+	
+	
 //file:
 
 #ifdef TEDITOR_VERBOSE		
@@ -340,10 +352,12 @@ int mainTextEditor ( int argc, char *argv[] ){
 	//printf("\n");
 	printf("\n");
     printf("Loading file fopen ...\n");
-#endif		
+#endif	
+
+
 	
 	// ## Carregando arquivo. ##
-	//
+
 	
 	fp = fopen ( (char *) argv[1], "rb" );	
 	
@@ -526,10 +540,11 @@ int editor_save_file (){
 	//precisamos colocar no buffer
 	
 	//isso é um teste.
+	
+	
+	//strcat( RAW_TEXT, "initializing file ...");
+	
 	/*
-	
-	strcat( RAW_TEXT, "initializing file ...");
-	
 	int l; //linha
 	int c; //coluna
 	int p = 0; //posição dentro do buffer.
@@ -547,7 +562,7 @@ int editor_save_file (){
 	
 	int Ret;
 	
-	char file_1[] = "Arquivo \n escrito \n em \n user mode no editor de textos teditor.bin :) \n";
+	//char file_1[] = "Arquivo \n escrito \n em \n user mode no editor de textos teditor.bin :) \n";
 	char file_1_name[] = "FILE1234TXT";
 	
 	unsigned long number_of_sectors = 0;
@@ -561,8 +576,8 @@ int editor_save_file (){
 	
 	// Lenght in bytes.
 	
-	len = (size_t) strlen (file_1);
-	//len = (size_t) strlen ( RAW_TEXT );
+	//len = (size_t) strlen (file_1);
+	len = (size_t) strlen ( RAW_TEXT );
 	
 	if (len <= 0){
 		
@@ -611,11 +626,11 @@ int editor_save_file (){
 	
 	//name, number of sectors, size in bytes, address, flag.
 	
-    Ret = (int) apiSaveFile ( file_1_name, number_of_sectors, len,            
-                    file_1, 0x20 );       		
-
     //Ret = (int) apiSaveFile ( file_1_name, number_of_sectors, len,            
-    //                &RAW_TEXT[0], 0x20 );       		
+    //                file_1, 0x20 );       		
+
+    Ret = (int) apiSaveFile ( file_1_name, number_of_sectors, len,            
+                    &RAW_TEXT[0], 0x20 );       		
 					
 	//if (Ret == 0)
 	
@@ -887,6 +902,16 @@ void shellInitWindowPosition (){
 
 void teditorInsertNextChar (char c){
 	
+
+    //isso funcionou.
+	char buff[2];
+	buff[0] = (char) c;
+	buff[1] = (char) '\0';
+	//buff[2] = (char) '\0';
+	//const char *current_char = (const char *) &buff[0];
+	strcat ( RAW_TEXT, (const char *) &buff[0] );
+
+    //sprintf ( RAW_TEXT, "%c", (char) c );
 	
 	//cursor da linha
 	
