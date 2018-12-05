@@ -36,6 +36,7 @@ static inline void spawnSetCr3 ( unsigned long value ){
  *     Interface para chamada de módulo interno para rotina de spawn de 
  * thread.
  */
+ 
 void KiSpawnTask (int id){
 	
     
@@ -68,8 +69,8 @@ void KiSpawnTask (int id){
 /*
  *********************************************************
  * spawn_thread: 
- *     Execute a  thread for the first time.
- *     The thread needs to be in the state 'INITIALIZED'.
+ *     Execute a thread for the first time.
+ *     The thread needs to be in the state 'STANDBY'.
  *     @todo: Mudar para spawnThread(int tid).
  */ 
  
@@ -195,7 +196,7 @@ void spawn_thread (int id){
 	current_process = spawn_Pointer->process->pid;
 	
 
-	IncrementDispatcherCount(SELECT_INITIALIZED_COUNT);
+	IncrementDispatcherCount (SELECT_INITIALIZED_COUNT);
 	
 	
 	// #todo

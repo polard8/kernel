@@ -80,7 +80,8 @@ done:
  *
  * 2015, Created - Fred Nora.
  * 2016, Revisão - FN.
- */								 
+ */		
+ 
 struct thread_d *create_thread( struct wstation_d *window_station,
                                     struct desktop_d  *desktop,
                                     struct window_d *window,
@@ -401,11 +402,23 @@ get_next:
 		threadList[i] = (unsigned long) Thread;	
 	};
 
-	// Running tasks.
+ 
+	// #importante
+    // Contador de threads
+    // Vamos atualizar o contador de threads, 
+	// pois mais uma thread existe, mesmo que não esteja rodando ainda.
 	
-	//ProcessorBlock.running_tasks = 2;
-    //@todo: isso deve ir pra outro lugar.
-	//talvez dentro de SelectForExecution.
+	ProcessorBlock.threads_counter++;
+	
+	//limits 
+	
+	if ( ProcessorBlock.threads_counter >= THREAD_COUNT_MAX )
+	{
+	    printf ("create_thread: counter fail, cant create thread\n");
+        die();
+		//return NULL; 		
+	};
+
 		
 // Done.
 done:
@@ -506,6 +519,7 @@ void *FindReadyThread (){
  *     
  *  *** MOVIMENTO 1, (Initialized --> Standby).
  */
+ 
 void SelectForExecution ( struct thread_d *Thread ){
 	
 	if ( (void *) Thread == NULL)

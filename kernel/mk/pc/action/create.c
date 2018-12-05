@@ -305,16 +305,22 @@ void *KiCreateIdle (){
 	IdleThread->Next = NULL;
 	//IdleThread->Next = (void*) IdleThread;    //Opção.
 	
-	// Running tasks. (Quantas threads estão rodando).
+	// #importante
+    // Contador de threads
+    // Vamos atualizar o contador de threads, 
+	// pois mais uma thread existe, mesmo que não esteja rodando ainda.
+	
+	//#importante 
+	//nesse caso o contador foi configurado manualmente. 
+	//isso acontece com as threads do gramado core.
+
     ProcessorBlock.threads_counter = (int) 1;
 	
-	//@todo: setar a idle como current.
-	
-	//if( ProcessorBlock.running_tasks == 1 ){
-	//	current_thread = IdleThread->tid;
-	//};
+    
+
 	
 // Done.	
+
 done:
     //#bugbug
 	//Não há a necessidade de colocar na fila de inicializadas

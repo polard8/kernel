@@ -403,6 +403,8 @@ void task_switch (){
 			// os primeiros processos para running, deixando assim essa 
 			// rotina para rodar de tempos em tempos.
 			
+			// fica em schedi.c
+			
             check_for_standby (); 
 			
 		    // #importante
