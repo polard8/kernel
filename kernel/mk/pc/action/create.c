@@ -279,6 +279,9 @@ void *KiCreateIdle (){
 	IdleThread->ebp = 0;
 	//...
 	
+	//O endereço incial, para controle.
+	IdleThread->initial_eip = (unsigned long) IdleThread->eip; 	
+	
 	//#bugbug
 	//Obs: As estruturas precisam já estar devidamente inicializadas.
 	//IdleThread->root = (struct _iobuf *) file_root;
@@ -481,6 +484,9 @@ void *KiCreateShell (){
 	t->ebp = 0;	
 	//...
 	
+	//O endereço incial, para controle.
+	t->initial_eip = (unsigned long) t->eip; 		
+	
 	
 	//CPU stuffs.
 	//t->cpuID = 0;              //Qual processador.
@@ -666,6 +672,9 @@ void *KiCreateTaskManager (){
 	t->edi = 0;
 	t->ebp = 0;	
 	//...
+	
+	//O endereço incial, para controle.
+	t->initial_eip = (unsigned long) t->eip; 		
 	
 	//#bugbug
 	//Obs: As estruturas precisam já estar decidamente inicializadas.
@@ -891,6 +900,9 @@ void *KiCreateRing0Idle (){
 	t->edi = 0;
 	t->ebp = 0;	
 	//...
+	
+	//O endereço incial, para controle.
+	t->initial_eip = (unsigned long) t->eip; 		
 	
 	//#bugbug
 	//Obs: As estruturas precisam já estar decidamente inicializadas.

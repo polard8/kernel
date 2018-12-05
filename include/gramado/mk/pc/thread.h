@@ -292,6 +292,8 @@ struct thread_d
     unsigned long ebp;
 	//continua o contexto ...	
 	
+	//O endereço incial, para controle.
+	unsigned long initial_eip;	
 	
 	//
 	// ORDEM: O que segue é referenciado durante o processo de scheduler.

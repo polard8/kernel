@@ -3,7 +3,7 @@
  * Gramado Operating System - The main file for the kernel.
  * (c) Copyright 2015~2018 - Fred Nora.
  *
- * File: k\entry\x86\x86main.c 
+ * File: kernel\entry\x86\x86main.c 
  * 
  * Description:
  *     This is the Kernel Base. 
@@ -96,7 +96,7 @@ void x86mainStartFirstThread( int n ){
 	 
 	if (n < 0)
 	{
-	    printf("x86mainStartFirstThread: thread number fail.");
+	    printf("x86mainStartFirstThread: thread number fail");
         die();
 	}
 	
@@ -117,7 +117,7 @@ void x86mainStartFirstThread( int n ){
 		    break;
 			
 		default:
-	        printf("x86mainStartFirstThread.default: thread number fail.");
+	        printf("x86mainStartFirstThread.default: thread number fail");
             die();		
 		    break;
 	};
@@ -417,6 +417,7 @@ void startStartIdle (){
  *     2016~2018 - Revision.
  *     ...
  */
+ 
 int x86main ( int argc, char *argv[] ){
 	
     int Status = 0;
@@ -718,8 +719,11 @@ int x86main ( int argc, char *argv[] ){
 	
     //===================================
     //Create taskman Thread. tid=2.
-    TaskManThread = (void *) KiCreateTaskManager();
-    if( (void *) TaskManThread == NULL )
+    
+	
+	TaskManThread = (void *) KiCreateTaskManager();
+    	
+	if( (void *) TaskManThread == NULL )
 	{
         printf("x86main: TaskManThread\n");
         die();
@@ -730,7 +734,6 @@ int x86main ( int argc, char *argv[] ){
     };
 	
 	TaskManProcess->Heap = (unsigned long) g_gramadocore_taskman_heap_va;
-
 #endif	
 
 
@@ -758,6 +761,28 @@ int x86main ( int argc, char *argv[] ){
 	
 #endif		
 
+
+    //#testando 
+	//que vários processo tenham threads em 0x400000
+
+	//Ok a thread foi criada,
+	//para ela rodar nessa fase de inicialização 
+	//precisamos deixa-la no mesmo estado que as outras.
+	
+    struct thread_d *xxx;
+	xxx = (void *) create_thread( 
+			                NULL,             // w. station 
+							NULL,             // desktop
+							NULL,             // w.
+							IdleThread->eip,             // init eip
+							IdleThread->esp,             // init stack
+							TaskManProcess->pid,  // pid (determinado)(provisório).
+							(char *) "XXX-thread" );    // name	
+							
+							
+    queue_insert_data ( queue, (unsigned long) xxx, QUEUE_INITIALIZED);
+    SelectForExecution (xxx);    // * MOVEMENT 1 (Initialized --> Standby).							
+	
 
 	
 	//

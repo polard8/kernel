@@ -266,7 +266,6 @@ void mostra_slot (int id){
 	
     struct thread_d *t;
 
-	// Limits.
     if ( id < 0 || id >= THREAD_COUNT_MAX ){
 		
 	    printf("pc-threadi-mostra_slot: id\n");
@@ -285,10 +284,10 @@ void mostra_slot (int id){
 	
 	    // Show one slot.
 	    printf("\n");
-	    printf("TID   PID   pdPA  Prio  State Quan ms    tName \n");
-	    printf("====  ====  ====  ====  ===== ==== ====  ===== \n");
+	    printf("TID   PID   pdPA  Prio  State Quan ms    initial_eip   tName \n");
+	    printf("====  ====  ====  ====  ===== ==== ====  ==========    ===== \n");
 		
-        printf("%d    %d    %x    %d    %d    %d    %d    %s \n", 
+        printf("%d    %d    %x    %d    %d    %d    %d    %x           %s \n", 
 			t->tid, 
 			t->ownerPID,
 			t->DirectoryPA,
@@ -296,6 +295,7 @@ void mostra_slot (int id){
 			t->state,
 			t->quantum,
 			t->total_time_ms,
+			t->initial_eip,
 			t->name_address );
 			
 	};

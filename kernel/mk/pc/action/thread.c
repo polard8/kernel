@@ -315,6 +315,9 @@ get_next:
 	    Thread->cs = 0x1B;                                
 	    Thread->eip = (unsigned long) init_eip; 
 		
+		//O endereço incial, para controle.
+		Thread->initial_eip = (unsigned long) init_eip; 
+		
 		// (0x20 | 3)
 	    Thread->ds = 0x23; 
 	    Thread->es = 0x23; 
@@ -598,9 +601,7 @@ void show_thread_information (){
 	
 
     printf("Done\n");
-	refresh_screen();
-	
-	//return;
+	refresh_screen ();
 };
 
 

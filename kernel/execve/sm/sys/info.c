@@ -117,6 +117,7 @@ void KiInformation (){
 	    goto fail;
 		
     }else{
+		
 		RegisterWindow(hWindow);
 		set_active_window(hWindow);
 		SetFocus(hWindow);
@@ -222,7 +223,7 @@ void KiInformation (){
 	printf("# thread info #\n");	
 	printf("{ %d } threads_counter\n\n", ProcessorBlock.threads_counter );	
     
-	show_thread_information();		
+	show_thread_information ();		
 		
     //
 	// ## Heap and Stack ##

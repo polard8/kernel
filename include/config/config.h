@@ -26,7 +26,11 @@
 
 #define ENTRY_INIT_INIT    1
 #define ENTRY_INIT_SHELL   1
+
+//desabilitar isso funcionou.
 #define ENTRY_INIT_TASKMAN 1
+
+
 
 //Cria uma thread para o processo kernel, que irá rodar em ring0.
 #define ENTRY_INIT_KERNELTHREAD_RING0  1  
