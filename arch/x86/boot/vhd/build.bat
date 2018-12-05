@@ -119,6 +119,7 @@ echo -{ ...
 	copy c:\gramado\bin\TCTYPE.BIN    F:\
 	
 	copy c:\gramado\bin\TBST.BIN    F:\
+	copy c:\gramado\bin\TBST2.BIN    F:\
 
 	
 	rem arquivos de texto.
