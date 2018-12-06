@@ -26,9 +26,18 @@
 <br>The kernel starts in Graphics Mode, resolution 800x600x24.
 
 <br>
-<br><b>// Folders:</b>
-<br>/include  = Headers.
-<br>/k        = Source.
+<br>Gramado Community
+<br>
+<br>[gramado ]
+<br>https://github.com/frednora/gramado
+<br>
+<br>[norax ]
+<br>https://github.com/frednora/norax
+<br>
+<br>[bergen]
+<br>https://github.com/frednora/bergen 
+<br> 
+<br> 
 
 <br>
 <br>@frednora
