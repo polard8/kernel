@@ -330,7 +330,32 @@ void updateObject ()
 	
 };
 
-
+/*
+struct {
+	
+  char *word;
+  int token;
+  
+} token_word_alist[] = {
+  {"if", IF},
+  {"then", THEN},
+  {"else", ELSE},
+  {"elif", ELIF},
+  {"fi", FI},
+  {"case", CASE},
+  {"esac", ESAC},
+  {"for", FOR},
+  {"while", WHILE},
+  {"until", UNTIL},
+  {"do", DO},
+  {"done", DONE},
+  {"in", IN},
+  {"function", FUNCTION},
+  {"{", '{'},
+  {"}", '}'},
+  { (char *) NULL, 0 }
+};
+*/
 
 //
 // ## Arguments support ##
@@ -1281,6 +1306,11 @@ shellProcedure( struct window_d *window,
 		case MSG_KEYDOWN:
             switch (long1)
             {
+				//EOF
+				//case -1:
+				//    #todo
+				//    break;
+				
 				// Null key.
 				case 0:
 				    pause();
@@ -3675,6 +3705,7 @@ dotry:
 	
 	//Um comando no shell invoca a execussão de um script 
 	//dado o nome via tokenList.
+	
 dosh:
 
     //
@@ -3691,7 +3722,17 @@ dosh:
 		printf("dosh: fail\n");
 	};
 
-    shellExecuteThisScript( tokenList[1] );	
+    // #ok
+	// Estamos passando o nome do arquivo.
+	
+	//#todo:
+	//Essa função deve chamar o interpretador de script
+	shellExecuteThisScript ( tokenList[1] );	
+	
+	//#todo 
+	//Podemos apenas sair já a função acima executou o script
+	//goto exit_cmp;
+	
 	goto NewCmdLine;
 	
 	
@@ -6180,10 +6221,20 @@ reader_loop()
  * Apenas colocaremos o arquivo em stdin, que é o pormpt[]
  * e retornaremos ao incio da função que compara, para 
  * comparar agora o que estava escrito no arquivo de script.
+ * 
+ * 	#todo:
+ *	Essa função deve chamar o interpretador de script
+ *
+ * IN: Nome do arquivo.
  */
+ 
 int shellExecuteThisScript ( char *script_name ){
 	
-    FILE *script_file;	
+    
+ 	//#todo:
+	//Essa função deve chamar o interpretador de script	
+	
+	FILE *script_file;	
 	int i;
 	
 	// Aqui temos que carregar o arquivo de script indicado 
@@ -6192,23 +6243,44 @@ int shellExecuteThisScript ( char *script_name ){
 	printf("shellExecuteThisScript:\n");	
 	printf("Initializing script ...\n");
     printf("CurrentFile={%s}\n",script_name);
-
+	
+	
+	// #ok 
+    // Carregaremos o arquivo com o nome passado por argumento.	
+	
     script_file = fopen (script_name,"rw");
 	
-	if ( (void *) script_file == NULL ){
-		
-		printf("shellExecuteThisScript: Can't open script file!\n");
+	if ( (void *) script_file == NULL )
+	{	
+		printf ("shellExecuteThisScript: Can't open script file!\n");
 		die("*");
-	}
+	};
 	
-	
+	//#Ok
 	//atualizando a linha de comandos no prompt[], stdin.
 	
-
-	for ( i=0; i< 128; i++ ){
-		
+	//#obs 
+	//Talvez não precise copiar o conteúdo, e sim apenas 
+    //mudar os ponteiros.
+    
+    //#todo 	
+	//Fazer isso ao invés de copiar.
+	//stdin = script_file;
+	
+	for ( i=0; i< 128; i++ )
+	{	
 		stdin->_base[i] = script_file->_base[i];
 	}
+	
+	
+	//
+	// ## parser ##
+	//
+	
+	//#todo
+	//Chamaremos o parser, que num loop chamará o lexer yylex()
+	
+	//parser();
 	
 	
 	//EOF_Reached = EOF;

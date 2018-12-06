@@ -132,7 +132,12 @@ struct node* insert(struct node* node, int key, int pre, struct node *parent)
 	
 	//#test
     //while ( node->pre > pre )
-	//        node = parent;
+	//        node = node->parent;
+
+    //if(key == '=')
+    //{
+	//    node = node->parent;	
+	//}		
 
     //#test
 	//right - como se fosse maior
@@ -142,8 +147,10 @@ struct node* insert(struct node* node, int key, int pre, struct node *parent)
         //while ( node->pre > pre )
 	    //    node = node->parent;	
 		
-		//node->right = insert( node->right, key, pre, parent );
-	    //return node;
+		//node = node->parent;
+		
+	//	node->right = insert( node->right, key, pre, parent );
+	//    return node;
 	//}
 	
 	//#test
@@ -170,6 +177,85 @@ struct node* insert(struct node* node, int key, int pre, struct node *parent)
 } 
 
 
+// Devolve o altura de um nóh em uma árvore binária.
+
+int height(struct node *h) {
+
+    int u, v;
+	
+    if (h == NULL) 
+		return -1;
+    
+	u = height(h->left);
+    v = height(h->right);
+    
+	if (u > v)
+    {		
+	    return u+1;
+	}else{ 
+		return v+1;
+	};
+};
+
+/*
+void printnode(char c, int b) {
+    int i;
+    for (i = 0; i < b; i++) printf("   ");
+    printf("%c\n", c);
+}
+void show (struct node *x, int b){
+    
+	if (x == NULL) 
+	{
+        printnode('*', b);
+        return;
+    }
+    
+	show ( x->right, b+1);    
+    printnode(x->key, b);
+    show (x->left, b+1);    
+};
+*/
+
+//mov eax, 0
+//add a, b
+//add b, a 
+
+
+unsigned long resolve_expressao(struct node *root)
+{
+	unsigned long resultado;
+	
+	if(root == NULL )
+		return 0;
+	
+	switch(root->key)
+	{
+		case '*':
+		    resultado = (unsigned long) ( resolve_expressao(root->left) * resolve_expressao(root->left) ); 
+	        break;
+			
+		case '/':
+		    resultado = (unsigned long) ( resolve_expressao(root->left) / resolve_expressao(root->left) ); 
+	        break;
+			
+		case '+':
+		    resultado = (unsigned long) ( resolve_expressao(root->left) + resolve_expressao(root->left) ); 
+	        break;
+			
+		case '-':
+		    resultado = (unsigned long) ( resolve_expressao(root->left) - resolve_expressao(root->left) ); 
+	        break;
+			
+		default:
+		    resultado = (unsigned long) root->key;
+		    break;
+	};   
+	
+	return resultado;
+};
+ 
+
 // Driver Program to test above functions 
 // C program to demonstrate insert operation in binary search tree 
 int bst_main() 
@@ -182,16 +268,22 @@ int bst_main()
        20 40 60 80 */
 	
 	struct node *root = NULL; 
+	struct node *rootsave;
 	struct node *current = NULL; 	
 	
-	root    = insert(root, (int) 'a', 2, NULL ); 
-	current = insert(root, (int) '/', 4, root->parent);
-	current = insert(root, (int) 'b', 2, current->parent); 
-	current = insert(root, (int) '+', 2, current->parent); 
-	current = insert(root, (int) 'c', 2, current->parent); 
-	current = insert(root, (int) '+', 2, current->parent); 
-	current = insert(root, (int) 'd', 2, current->parent); 
-
+	root    = insert(root, (int) '1', 2, NULL ); 
+	current = insert(root, (int) '+', 2, root->parent);
+	current = insert(root, (int) '2', 2, current->parent); 
+	current = insert(root, (int) '-', 2, current->parent); 
+	current = insert(root, (int) '3', 2, current->parent); 
+	current = insert(root, (int) '*', 4, current->parent); 
+	current = insert(root, (int) '4', 2, current->parent); 
+    current = insert(root, (int) '/', 4, current->parent);
+	current = insert(root, (int) '5', 2, current->parent);
+	//current = insert(root, (int) 'f', 2, current->parent);
+	
+	int Height = (int) height(current);
+	
 	// print inoder traversal of the BST 
 	//inorder(root); 
 	
@@ -211,6 +303,11 @@ int bst_main()
 
 	printf("\n\n");
 	
+	//#test
+	//printf("last item height %d \n",Height);
+	unsigned long r =  resolve_expressao(root);
+	printf("EXP={%d}",r );
+	printf("\n\n");
 	return 0; 
 }; 
 
