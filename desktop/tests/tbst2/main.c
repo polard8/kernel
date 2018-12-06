@@ -53,6 +53,15 @@
 
 
 
+int STACK_OPERATOR[32];
+int STACK_OPERAND[32];
+int STACK_PRE[32];
+//...
+
+int operator_offset;
+int operand_offset;
+int pre_offset;
+
 //===============================================================================
 
 struct node 
@@ -87,11 +96,35 @@ void inorder(struct node *root)
 
 
 //Em ordem
-void exibirEmOrdem(struct node *root){
-    if(root != NULL){
+void exibirEmOrdem (struct node *root){
+    
+	
+	if (root != NULL)
+	{
         exibirEmOrdem(root->left);
-        printf("%c{%d} ", root->key, root->pre );
-        exibirEmOrdem(root->right);
+        
+		/*
+		//push
+		
+		if (root->key == '+' || root->key == '-' || root->key == '*' || root->key == '/')
+		{
+		    STACK_OPERATOR[operator_offset] = (int) root->key;
+            operator_offset++;			
+		}	
+		
+		if( root->key >= '0' && root->key <= '9')
+		{
+		    STACK_OPERAND[operand_offset] = (int) root->key;
+            operand_offset++;						
+		}
+		
+		STACK_PRE[pre_offset] = (int) root->pre;
+        pre_offset++;	
+        */		
+		
+		printf("%c{%d} ", root->key, root->pre );
+        
+		exibirEmOrdem(root->right);
     }
 }
 
@@ -99,12 +132,38 @@ void exibirEmOrdem(struct node *root){
 
 //Pré-ordem
 void exibirPreOrdem(struct node *root){
-    if(root != NULL){
-        printf("%c{%d} ", root->key, root->pre );
-        exibirPreOrdem(root->left);
+	
+    if (root != NULL)
+	{
+		
+		//push
+		
+		if (root->key == '+' || root->key == '-' || root->key == '*' || root->key == '/')
+		{
+		    STACK_OPERATOR[operator_offset] = (int) root->key;
+            operator_offset++;	
+
+		    STACK_PRE[pre_offset] = (int) root->pre;
+            pre_offset++;
+		}	
+		
+		if( root->key >= '0' && root->key <= '9')
+		{
+		    STACK_OPERAND[operand_offset] = (int) root->key;
+            operand_offset++;						
+		}
+		
+			
+		
+        
+		
+		
+		printf("%c{%d} ", root->key, root->pre );
+        
+		exibirPreOrdem(root->left);
         exibirPreOrdem(root->right);
-    }
-}
+    };
+};
 
 
 //Pós-ordem
@@ -115,6 +174,37 @@ void exibirPosOrdem(struct node *root){
         printf("%c{%d} ", root->key, root->pre );
     }
 }
+
+/*
+ #fail
+void parentiza( struct node *raiz )
+{
+    if(raiz->left != NULL)
+    {
+        printf("(");
+        parentiza( raiz->left );
+    }
+
+    printf("%c", raiz->key);
+
+    if( raiz->right != NULL)
+    {
+        parentiza( raiz->right );
+        printf(")");
+    }
+};
+*/
+
+void imprimeEmNotacaoPolonesa(struct node *raiz)
+{
+    printf("%c ",raiz->key);
+    
+	if ( raiz->left != NULL )
+        imprimeEmNotacaoPolonesa( raiz->left );
+    
+	if ( raiz->right != NULL )        
+        imprimeEmNotacaoPolonesa( raiz->right );
+};
 
 
 //stack
@@ -186,8 +276,11 @@ int height(struct node *h) {
     if (h == NULL) 
 		return -1;
     
-	u = height(h->left);
-    v = height(h->right);
+	if (h->left != NULL)
+	    u = height(h->left);
+    
+	if (h->right != NULL)
+	   v = height(h->right);
     
 	if (u > v)
     {		
@@ -196,6 +289,7 @@ int height(struct node *h) {
 		return v+1;
 	};
 };
+
 
 /*
 void printnode(char c, int b) {
@@ -221,8 +315,8 @@ void show (struct node *x, int b){
 //add a, b
 //add b, a 
 
-
-unsigned long resolve_expressao(struct node *root)
+/*
+unsigned long resolve_expressao (struct node *root)
 {
 	unsigned long resultado;
 	
@@ -254,59 +348,258 @@ unsigned long resolve_expressao(struct node *root)
 	
 	return resultado;
 };
+*/
  
+ 
+unsigned long resolve_expressao (struct node *root)
+{
+	unsigned long resultado, tmp;
+	
+	int p, p2;
+	
+	
+	if(root == NULL )
+		return 0;
+
+	
+	int i;
+	int i_higher;
+	
+	//pegar o maior predecessor(mudr para -1 pra não pegar novamente.);
+	//pegar operador e operando respectivos ao predecessor atual.
+	//realizar a operação usando switch 
+	//voltar no loop, quando no loop tudo tiver -1 é porque acabou.
+
+    p = 0;
+	p2 = 0;
+	i_higher = 1;
+	
+	int times = 0;
+	
+Loop:
+
+    times++;
+	if( times  > 32 )
+	{
+		printf("resolve_expressao Loop: times fail");
+		exit(1);
+    }
+	
+    //IGNORA O 0 PORQUE PE O ROOT.
+	
+	for ( i=1; i < 32; i++ )
+	{
+        //Pega na lista.		
+       	p2 = (int) STACK_PRE[i];     		
+        
+		if ( p2 == (-1) )
+			{ continue; };
+				    
+		//Pega a de maior prioridade.
+		if ( p2 > p)
+		{ 
+		    p = p2; 
+		    i_higher = i;
+			STACK_PRE[i] = (int) -1;
+		};
+	}; 
+
+    if ( p == 0 || p == (-1) )
+        goto done;		
+    
+	//p tem a maior prioridade.
+	//i_higher contém o índice onde encontramos p.
+	
+	int off;
+	
+	off = i_higher;
+	int operator = STACK_OPERATOR[ off ];
+	
+	off =  (i_higher * 2);
+	int operand1 = STACK_OPERAND[ off ];
+	
+	off =  (i_higher * 2) - 1;
+	int operand2 = STACK_OPERAND[ off ];
+	
+	
+	unsigned long RES[32];
+	
+	
+	printf ("i_higher %d \n",i_higher);
+	printf ("pre %c \n",p);
+	printf ("operator %c \n",operator);
+	
+	switch (operator)
+	{
+		case '*':
+		    tmp = (unsigned long) ( operand1 * operand2 ); 
+			RES[i_higher] = (unsigned long) tmp; //resultado da operação de maior prioridade.
+			break;
+			
+		case '/':
+		    tmp = (unsigned long)  ( operand1 / operand2 ); 
+	        RES[i_higher] = (unsigned long) tmp; //resultado da operação de maior prioridade.
+			break;
+			
+		case '+':
+		    tmp = (unsigned long)  ( operand1 + operand2 ); 
+			RES[i_higher] = (unsigned long) tmp; //resultado da operação de maior prioridade.
+	        break;
+			
+		case '-':
+		    tmp = (unsigned long)  ( operand1 - operand2 ); 
+			RES[i_higher] = (unsigned long) tmp; //resultado da operação de maior prioridade.
+	        break;
+			
+		default:
+		    printf("resolve_expressao: invalid operator\n");
+			exit(1);
+			//die();
+		    //resultado = (unsigned long) root->key;
+		    break;
+	}; 	
+	
+    goto Loop;	
+	
+done:		
+
+	//#bugbug
+	//estamos testando para somente 2 níveis.
+	
+	//root
+	operator = STACK_OPERATOR[0];
+	
+	switch(operator)
+	{
+		case '*':
+		    tmp = (unsigned long) ( RES[1] * RES[2] ); 
+			break;
+			
+		case '/':
+		    tmp = (unsigned long) ( RES[1] / RES[2] );
+			break;
+			
+		case '+':
+		    tmp = (unsigned long)  ( RES[1] + RES[2] ); 
+	        break;
+			
+		case '-':
+		    tmp = (unsigned long)  ( RES[1] - RES[2] ); 
+	        break;
+			
+		default:
+		    printf("resolve_expressao: invalid operator #2\n");
+			exit(1);
+			//die();
+		    //resultado = (unsigned long) root->key;
+		    break;
+	}; 		
+	
+	resultado = tmp;
+	
+
+
+    return resultado;	
+};
+
 
 // Driver Program to test above functions 
 // C program to demonstrate insert operation in binary search tree 
 int bst_main() 
 { 
-	/* Let us create following BST 
-           50 
-          /  \ 
-        30    70 
+	/* 
+	 Let us create following BST 
+	 
+            + 
+           / \ 
+         +     * 
         / \   / \ 
-       20 40 60 80 */
-	
+       1   2 3   4 
+	   
+	 */
+	 
 	struct node *root = NULL; 
 	struct node *rootsave;
 	struct node *current = NULL; 	
 	
-	root    = insert(root, (int) '1', 2, NULL ); 
+	root    = insert(root, (int) '+', 2, NULL ); 
 	current = insert(root, (int) '+', 2, root->parent);
+	current = insert(root, (int) '1', 2, current->parent); 
 	current = insert(root, (int) '2', 2, current->parent); 
-	current = insert(root, (int) '-', 2, current->parent); 
-	current = insert(root, (int) '3', 2, current->parent); 
-	current = insert(root, (int) '*', 4, current->parent); 
+	current = insert(root, (int) '*', 2, current->parent); 
+	current = insert(root, (int) '3', 4, current->parent); 
 	current = insert(root, (int) '4', 2, current->parent); 
-    current = insert(root, (int) '/', 4, current->parent);
-	current = insert(root, (int) '5', 2, current->parent);
+    
+	//current = insert(root, (int) '/', 4, current->parent);
+	//current = insert(root, (int) '5', 2, current->parent);
 	//current = insert(root, (int) 'f', 2, current->parent);
+	
+	
+	
+	STACK_OPERATOR[0] = root->key;
+	STACK_OPERAND[0] = 0;
+	STACK_PRE[0] = root->pre;
+	
+	operator_offset = 1;
+    operand_offset = 1;
+    pre_offset = 1;
+	
 	
 	int Height = (int) height(current);
 	
 	// print inoder traversal of the BST 
 	//inorder(root); 
 	
-	printf("\n\n");
-	//printf("[1 + 2 * 3 + 4]");
+	//printf("\n numero de niveis = %d\n", (int) Height );
+	
+	//printf("[1 + 2 + 3 * 4]");
 	//printf("[a / b]");
 	printf("\n\n");
 	
-	printf("\n\n em ordem: \n");
+	//printf("\n\n parentiza: ");	
+	//parentiza(root);
+	
+	printf("\n\n polonesa: root={%c} ", root->key);
+	imprimeEmNotacaoPolonesa (root);
+	
+	printf("\n\n em ordem: root={%c} ", root->key);
 	exibirEmOrdem(root);
 	
-	printf("\n\n pre ordem: \n");
+	printf("\n\n pre ordem: root={%c} ", root->key);
 	exibirPreOrdem(root);
 	
-	printf("\n\n pos ordem: \n");
+	printf("\n\n pos ordem: root={%c} ", root->key);
 	exibirPosOrdem(root);
 
+	
+	
+	int i;
+	
+	printf("\n\n show stack operator: \n");
+	for(i=0; i<32; i++)
+	{
+		printf("%c ", (int) STACK_OPERATOR[i]);
+	}
+	
+	printf("\n\n show stack operand: \n");
+	for(i=0; i<32; i++)
+	{
+		printf("%c ", (int) STACK_OPERAND[i]);
+	}
+
+	printf("\n\n show stack pre: \n");
+	for(i=0; i<32; i++)
+	{
+		printf("%d ", (int) STACK_PRE[i]);
+	}
+	
 	printf("\n\n");
 	
 	//#test
 	//printf("last item height %d \n",Height);
 	unsigned long r =  resolve_expressao(root);
 	printf("EXP={%d}",r );
+	
 	printf("\n\n");
 	return 0; 
 }; 
