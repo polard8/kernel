@@ -1,4 +1,10 @@
 
+   /gramado/init
+
+   os programas aqui poderão ser usados para inicializar
+   o gramado, já que todos estão em user mode.
+
+
 
     ===================================
    /init

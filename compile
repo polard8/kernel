@@ -1,4 +1,11 @@
 #
+# todo: 
+# Não tem amsi kernel nesse projeto, apenas programas em user mode.
+# o kernel está em outro projeto.
+#
+
+
+#
 # File: compile
 #     +Compile gramado kernel.
 #     +Create VHD.

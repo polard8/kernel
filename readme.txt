@@ -1,5 +1,16 @@
 
+Isso será um conjunto de aplicativos em user mode.
 
++Não haverá código em ring0 em /gramado.
+O Norax kernel poderá ser incluido no projeto em sua forma binária,
+compilada em outro projeto.
+
++Não há bootloader pra esse projeto, ele rodará sobre o 
+ kernel Norax e poderá ser instalado nele.
+ os binários do Gramado podem ser instalados em Norax.
+ 
+
+=========================================
 
 
     ~Main folders for Gramado Operating System.
