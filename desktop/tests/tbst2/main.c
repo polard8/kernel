@@ -350,7 +350,7 @@ unsigned long resolve_expressao (struct node *root)
 };
 */
  
- 
+/*
 unsigned long resolve_expressao (struct node *root)
 {
 	unsigned long resultado, tmp;
@@ -410,6 +410,9 @@ Loop:
 	//p tem a maior prioridade.
 	//i_higher contém o índice onde encontramos p.
 	
+	
+	
+ 
 	int off;
 	
 	off = i_higher;
@@ -420,7 +423,6 @@ Loop:
 	
 	off =  (i_higher * 2) - 1;
 	int operand2 = STACK_OPERAND[ off ];
-	
 	
 	unsigned long RES[32];
 	
@@ -459,9 +461,13 @@ Loop:
 		    break;
 	}; 	
 	
+ 
+	
     goto Loop;	
 	
-done:		
+done:
+
+ 
 
 	//#bugbug
 	//estamos testando para somente 2 níveis.
@@ -496,12 +502,61 @@ done:
 	}; 		
 	
 	resultado = tmp;
-	
+ 
 
 
     return resultado;	
 };
+*/
 
+
+unsigned long resolve_expressao( struct node *root )
+{
+	unsigned long resultado;
+	
+	int p;
+	int i;
+	int j = 0;
+	int value = 4;
+    int ORDEM[32];
+	int xPRE[32];
+	
+again:
+	
+	for(i=1; i<4; i++)
+	{
+		p = STACK_PRE[i];
+		
+	    if(p == value)
+		{
+			
+			ORDEM[j] = i;
+			xPRE[j] = p;
+            j++;
+			
+			STACK_PRE[i] = -1; //anula.
+		};
+		
+		value--;
+		
+        if(value<0)
+			goto done;		
+	};
+	
+	goto again;
+	
+done:
+
+    printf("\n ordem: ");
+    for (i=0; i<4; i++)
+        printf("%d ", ORDEM[i]);
+
+    printf("\n ordem pre: ");
+	for (i=0; i<4; i++)
+        printf("%d ", ORDEM[i]);
+	
+	return resultado;
+};
 
 // Driver Program to test above functions 
 // C program to demonstrate insert operation in binary search tree 

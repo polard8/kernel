@@ -4484,6 +4484,11 @@ int shellCheckPassword (){
 		
 		user_stream = (FILE *) fopen ("user.txt","w+");
 		
+		if ( (void *) user_stream == NULL )
+		{
+			printf ("shellCheckPassword: Can't open password file\n");
+		}
+		
 		//#todo check.
 		
 		// Testing welcome message.
@@ -4509,11 +4514,11 @@ int shellCheckPassword (){
 		
 		printf("\n");
 	
-#ifdef SHELL_VERBOSE	
+//#ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s} \n", username, password );
 		//printf("\n");
-#endif
+//#endif
 		
 		char *c = (char *) &user_stream->_base[0];		
 		

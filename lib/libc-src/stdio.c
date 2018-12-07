@@ -1480,14 +1480,18 @@ int fputs ( const char *str, FILE *stream ){
  *********************************
  * gets:
  *
- * os: gets() devolve um ponteiro para s
+ * obs: gets() devolve um ponteiro para string
  */
+ 
 char *gets (char *s){
 	
     int ch;
 	
-    int t;
+    int t = 0;
 	char *p;
+	
+	
+	//printf("gets:\n");
 	
     //salva
 	p = s; 	
@@ -1498,7 +1502,8 @@ char *gets (char *s){
 		
         if ( ch != -1 )
 		{
-            switch (ch) 
+            			
+			switch (ch) 
 		    {
 				/* termina a string */
 			    case '\n':
@@ -1515,19 +1520,27 @@ char *gets (char *s){
                     break;
             
 			    default:
-                    s[t] = (char) ch;
-					++t;
+                    //s[t] = (char) ch;
+					//t++;
 					break;
-           };
+            };
+			
+			printf("%c",ch);
+			s[t] = (char) ch;
+			t++;			
+			
 		};
 		
 		asm ("pause");
     };
 	
-    s[t] = (char) '\0';
+    
 	
 done:	
-    return (char *) p;
+
+    //s[t] = (char) '\0';
+	
+	return (char *) p;
 };
 
 

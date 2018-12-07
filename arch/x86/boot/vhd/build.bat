@@ -68,8 +68,11 @@ echo -{ Partition starts on sector 63.
 echo -{ ...
 
     rem copiando todos os binários do norax para o gramado. 
-	copy c:\norax\bin\*.BIN c:\gramado\bin\*.BIN
-	copy c:\norax\bin\*.FON c:\gramado\bin\*.FON
+	rem copy c:\norax\bin\*.BIN c:\gramado\bin\*.BIN
+	copy c:\norax\bin\BM.BIN      c:\gramado\bin\BM.BIN
+	copy c:\norax\bin\BL.BIN      c:\gramado\bin\BL.BIN
+	copy c:\norax\bin\KERNEL.BIN  c:\gramado\bin\KERNEL.BIN
+	copy c:\norax\bin\*.FON       c:\gramado\bin\*.FON
 	REM continua ...
 
     rem Gramado Boot
@@ -78,9 +81,9 @@ echo -{ ...
 	
 	rem Gramado Core
 	copy c:\gramado\bin\KERNEL.BIN   F:\
-    copy c:\gramado\bin\INIT.BIN     F:\
-    copy c:\gramado\bin\SHELL.BIN    F:\
-    copy c:\gramado\bin\TASKMAN.BIN  F:\
+    copy c:\gramado\bin\INIT.BIN     F:\   
+    copy c:\gramado\bin\SHELL.BIN    F:\  
+    copy c:\gramado\bin\TASKMAN.BIN  F:\   
 
     rem Gramado Cali
 
@@ -155,10 +158,30 @@ echo -{ ...
 	rem o Windows como host.
 	rem 
 	
-    mkdir F:\DEV
-    mkdir F:\SECURITY
-	mkdir F:\TOOLS
-	mkdir F:\USERS
+    rem unix-like
+	
+	mkdir F:\BIN
+	mkdir F:\DEV
+	mkdir F:\LIB
+    mkdir F:\USR
+	mkdir F:\SBIN  
+	mkdir F:\TMP
+	mkdir F:\ETC 
+	REM ...
+	
+	
+	mkdir F:\USR\BIN
+	mkdir F:\USR\INCLUDE
+	mkdir F:\USR\LIB 
+	
+	REM TEST
+	copy c:\gramado\bin\*.BIN    F:\BIN\*.BIN
+	
+	
+    REM mkdir F:\DEV
+    REM mkdir F:\SECURITY
+	REM mkdir F:\TOOLS
+	REM mkdir F:\USERS
 	
 	
 	REM 
@@ -170,11 +193,11 @@ echo -{ ...
 	REM ARMAZENAS ARQUIVOS 'SISTEMICAMENTE IMPORTANTES' E 
 	REM ARQUIVOS DE TESTE DE NOVOS RECURSOS.
 
-	mkdir F:\TOOLS\DB	
-	copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\TOOLS\DB\*.BMP
- 	copy c:\gramado\arch\x86\boot\vhd\*.TXT         F:\TOOLS\DB\*.TXT
-	copy c:\gramado\bin\*.BIN                       F:\TOOLS\DB\*.BIN
-	copy c:\gramado\bin\*.FON                       F:\TOOLS\DB\*.FON
+	REM mkdir F:\TOOLS\DB	
+	REM copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\TOOLS\DB\*.BMP
+ 	REM copy c:\gramado\arch\x86\boot\vhd\*.TXT         F:\TOOLS\DB\*.TXT
+	REM copy c:\gramado\bin\*.BIN                       F:\TOOLS\DB\*.BIN
+	REM copy c:\gramado\bin\*.FON                       F:\TOOLS\DB\*.FON
 	rem  ...
 
 
@@ -183,9 +206,9 @@ echo -{ ...
 	REM  /BOOT
 	REM 
 	
-	mkdir F:\TOOLS\BOOT
-	copy c:\gramado\bin\BM.BIN    F:\TOOLS\BOOT\BM.BIN
-	copy c:\gramado\bin\BL.BIN    F:\TOOLS\BOOT\BL.BIN
+	REM mkdir F:\TOOLS\BOOT
+	REM copy c:\gramado\bin\BM.BIN    F:\TOOLS\BOOT\BM.BIN
+	REM copy c:\gramado\bin\BL.BIN    F:\TOOLS\BOOT\BL.BIN
 	
 	
     mkdir F:\USERS\DEFAULT
