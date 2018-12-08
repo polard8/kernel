@@ -8,14 +8,16 @@
 [bits 32]
 
 
-extern _mainGetMessage
+extern _gramcode_main
+;;extern _mainGetMessage
 ;;extern _mainTextEditor
 
 
 global __crt0Main
 __crt0Main:
 
-	call _mainGetMessage
+	call _gramcode_main
+	;call _mainGetMessage
 	;call _mainTextEditor
 	
 hang:

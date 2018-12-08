@@ -1,7 +1,7 @@
 // Suporte a status bar.
 
 
-#include "ed.h"
+#include "gramcode.h"
 
 
 /* statusInitializeStatusBar: */

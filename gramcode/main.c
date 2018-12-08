@@ -10,6 +10,9 @@
  
  * 2018 - Created by Fred Nora.
  */
+ 
+ 
+#include "gramcode.h"
 
 
 //#define TEDITOR_VERBOSE 1
@@ -22,7 +25,7 @@
 
 
 
-#include "ed.h"
+ 
 
 
 //static int running = 1;
@@ -52,11 +55,14 @@ teditorProcedure ( struct window_d *window,
                    int msg, 
 				   unsigned long long1, 
 				   unsigned long long2 );
+				   
+int main2 ( int argc, char *argv[] );
 
 
 /*
  ************************************************************
- * mainGetMessage:
+ * gramcode_main:
+ *
  *     Função principla chamada pelo crt0.asm.
  *     Testando o recebimento de mensagens enviadas pelo shell.
  */
@@ -65,7 +71,7 @@ teditorProcedure ( struct window_d *window,
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
  
-int mainGetMessage (){
+int gramcode_main (){
 	
 	char *tokenList[TOKENLIST_MAX_DEFAULT];
 	char *token;
@@ -161,7 +167,7 @@ int mainGetMessage (){
 	
 	int retval;
 
-    retval = (int) mainTextEditor ( token_count, tokenList );
+    retval = (int) main2 ( token_count, tokenList );
 	
 	switch (retval)
 	{
@@ -189,15 +195,13 @@ int mainGetMessage (){
 
 
 /*
- ********************************************
- * mainTextEditor:
+ * main2:
  *     O editor de textos.
- * In this fuction:
  *     Initializes crt.
  *     Initializes stdio.
- *
  */
-int mainTextEditor ( int argc, char *argv[] ){
+ 
+int main2 ( int argc, char *argv[] ){
 	
 	int ch;
 	FILE *fp;
@@ -491,7 +495,6 @@ void editorClearScreen (){
 	// @todo:
 	//system( "cls" ); // calls the cls command.
 	
-	//cursor.
 	apiSetCursor ( 0, 0 );
 	
 	// Tamanho da tela. 80x25
@@ -520,8 +523,6 @@ void editorClearScreen (){
  * editor_save_file:
  * Testando a rotina de salvar um arquivo.
  * Estamos usando a API.
- *
- *
  */
 
 int editor_save_file (){
