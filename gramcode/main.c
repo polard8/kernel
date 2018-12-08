@@ -78,6 +78,7 @@ int gramcode_main (){
 	int token_count;
 	int index;	
 	
+	int retval;
 	
 	// #importante
 	// Linha de comandos passada pelo shell.
@@ -87,7 +88,7 @@ int gramcode_main (){
 #ifdef TEDITOR_VERBOSE	
 	
 	printf("\n");
-	printf("mainGetMessage:\n");
+	printf("gramcode_main:\n");
 	printf("Initializing teditor.bin ...\n\n");	
 	//printf("\n");
 	//printf(".\n");
@@ -149,7 +150,7 @@ int gramcode_main (){
 		token = (char *) tokenList[index];
 	    if ( token == NULL )
 		{
-			printf("mainGetMessage: for fail!\n")
+			printf("gramcode_main: for fail!\n")
 			goto hang;
 		}
 	    printf("# argv{%d}={%s} #\n", index, tokenList[index] );		
@@ -161,36 +162,37 @@ int gramcode_main (){
 	
 #ifdef TEDITOR_VERBOSE		
     //Inicializando o editor propriamente dito.	
-	printf("Calling mainTextEditor ... \n"); 
+	printf("Calling main2 ... \n"); 
 #endif	
-	
-	
-	int retval;
 
     retval = (int) main2 ( token_count, tokenList );
 	
 	switch (retval)
 	{
 		case 0:
-		    printf("mainGetMessage: mainTextEditor returned 0.\n");
+		    printf("gramcode_main: main2 returned 0.\n");
+			exit (0);
 			break;
 			
 		case 1:
-		    printf("mainGetMessage: mainTextEditor returned 1.\n");
-		    break;
+		    printf("gramcode_main: main2 returned 1.\n");
+		    exit (1);
+			break;
 			
 		//...
 		
 	    default:
-		    printf("mainGetMessage: mainTextEditor returned defaul\n");
-            break; 		
+		    printf("gramcode_main: main2 returned default\n");
+            exit (-1);
+			break; 		
 	};
 		
-    printf("*HANG\n");
+	//
+    // Não retornaremos para crt0.asm
+    //
 	
-    while (1){
-        asm("pause");
-    };
+    printf("*HANG\n");
+	exit (-1);
 };
 
 
