@@ -116,11 +116,16 @@ echo -{ ...
 	copy c:\gramado\bin\NC2.FON F:\
 	
 	
+	
+	rem copy c:\gramado\bin\GRAMCC.BIN    F:\
+	copy c:\gramado\bin\GRAMC.BIN    F:\
+	
+	copy c:\gramado\bin\GRAMCODE.BIN   F:\
+	
 	copy c:\gramado\bin\FCLASS.BIN    F:\
-	copy c:\gramado\bin\GRAMCC.BIN    F:\
     copy c:\gramado\bin\JACKPOT.BIN   F:\	
 	copy c:\gramado\bin\TASCII.BIN    F:\
-	copy c:\gramado\bin\TEDITOR.BIN   F:\	
+		
 	copy c:\gramado\bin\TGFE.BIN      F:\
     copy c:\gramado\bin\TPRINTF.BIN    F:\
 	
@@ -128,7 +133,8 @@ echo -{ ...
 	
 	copy c:\gramado\bin\TBST.BIN    F:\
 	copy c:\gramado\bin\TBST2.BIN    F:\
-
+    copy c:\gramado\bin\TBST3.BIN    F:\
+	
 	
 	rem arquivos de texto.
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 
@@ -139,7 +145,7 @@ echo -{ ...
 	rem copy tests\REGRA1.TXT   F:\
 	
 	rem scripts
-	rem copy tests\TEST1.SH1   F:\
+	copy c:\gramado\arch\x86\boot\vhd\tests\TEST1.SH1   F:\
 	
 	
 	rem ...

@@ -185,6 +185,12 @@ char *current_user_name = (char *) NULL;
 char *current_host_name = (char *) NULL;
 
 
+int cmd_flag = 0;
+
+int file_flag = 0;
+
+//headless
+int hl_flag = 0;
 
 
 /* Non-zero means that this shell is a login shell.
@@ -582,6 +588,9 @@ int shmain ( int argc, char **argv ){
 	//char **internal;
 	char *filename;
 	register int i;
+	
+	int scriptReturn = -1;
+		
 	//
 	// Obs: Esse não é um programa que roda em modo terminal,
 	// ele na verdade cria um terminal dentro de uma janela filha.
@@ -657,64 +666,101 @@ int shmain ( int argc, char **argv ){
 	// Filtra a quantidade de argumentos.
 	//
 	
-	//goto noArgs; 
-	
 	//Não usar verbose nessa fase de tratar os argumentos
 	//pois a janela ainda não foi inicializada.
 	
 	// Se não há argumentos.
-	if (argc < 1)
+	if (argc < 5)
 	{
-		//printf("No args !\n");
-		//#Test.
-        //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
+		// #test
+        // fprintf( stderr,"Starting Shell with no arguments...\n");	 	
+		
 		die("No args");
 		
-		goto noArgs; 
+		goto afterArgs; 
+		
 	}else{
 		
-		//argv[0] = Tipo de shell: interativo ou não
-		//argv[1] = Tipo de uso: login ... outros ?? 
+	    //#arguments	
+	    //argv[0] = -cmd comandos; -f use file; -hl headless; -gui use gui; ...  
+	    //argv[1] = -interative
+	    //argv[2] = -login
+	    //argv[3] = Nome do arquivo de script.
+	    //argv[4] = Nome do shell.	
+
+		// -cmd
+        if( strncmp ( (char *) argv[0], "-cmd", 4 ) == 0 )
+        {
+			cmd_flag = 1;
+			//goto ??;
+		}			
+
+		// -f
+        if( strncmp ( (char *) argv[0], "-f", 2 ) == 0 )
+        {
+			file_flag = 1;
+			//goto dosh2;
+		}			
+
+		// -hl
+        if( strncmp ( (char *) argv[0], "-hl", 3 ) == 0 )
+        {
+			hl_flag = 1;
+			//goto ??;
+		}			
 		
-		//printf("Testing args ...\n");
-		
-		//#todo: (possibilidades)
-		//As flags poderia começar com f. Ex: fInteractive, fLoginShell,
-		
-	    if ( strncmp ( (char *) argv[0], "-interactive", 12 ) == 0 ){
+		// -gui
+        if( strncmp ( (char *) argv[0], "-gui", 4 ) == 0 )
+        {
+			//Só pintaremos a gui se essa flag estiver acionada.
+			//gui_flag = 1;
+			//goto ??;
+		}			
+	    
+		// -interactive
+		if ( strncmp ( (char *) argv[1], "-interactive", 12 ) == 0 ){
 			
 			interactive = 1;
             
             //printf("Initializing an interactive shell ...\n");
             //printf("arg[0]={%s}\n",argv[0]);			
         };
-
-        //Se o shell foi iniciado com um arquivo de script para ser 
-        //executado.
-		//a Flag -f indica que o que segue é um arquivo de script.
-        //if( strncmp( (char *) argv[0], "-f", 2 ) == 0 )
-        //{
-		//	goto dosh2;
-		//}			
-		
-	    if ( strncmp ( (char *) argv[1], "-login", 6 ) == 0 ){
+				
+		// -login		
+	    if ( strncmp ( (char *) argv[2], "-login", 6 ) == 0 ){
 			
 			login_shell = 1;
 			
 			//printf("Initializing login ...\n");
             //printf("arg[1]={%s}\n",argv[1]);    
-        };	
-		
-		//Nome passado viar argumento.
-		//shell_name = (char*) argv[2];
+        };
+
+        // #obs
+        // Não ha mais o que comparar.
+        // Se for arquivo então o pega-se o nome do arquivo. 
+        // O nome do shell estára disponível em argumento também. 		
 
         //...		
 	};
 	
 	//Nothing.
 	
-noArgs:		
+afterArgs:		
 	
+	// #hl
+	// Podemos executar um programa no modo headless.
+	// Mas para outros programas vamos precisar construir a janela.   	
+	
+	if ( hl_flag == 1 )
+	{
+	    printf ("#todo: headless flag\n");
+		exit(-1);
+	};
+	
+	
+	//
+	// # inicializações ... #
+	//
 	
 	//...
 	
@@ -1057,7 +1103,7 @@ noArgs:
 	
 	//
 	// Habilitando o cursor de textos.
-	//
+	// #obs: se for interativo.
 	
 	shellSetCursor ( (terminal_rect.left / 8) , ( terminal_rect.top/8) );	
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
@@ -1112,19 +1158,64 @@ noArgs:
 	
 
 	
+	
+	//#se o shell não for interativo então podemos ver se tem um arquivo 
+	// de script olhando a flag.
+	
 	//
-	//#importante:
-	//Agora é a hora de pegar mensagens de input de teclado.
-	//Mas se o shell não for interativo, então não pegaremos 
-	//mensagens de input de teclado.
+	// #importante:
+	// Agora é a hora de pegar mensagens de input de teclado.
+	// Mas se o shell não for interativo, então não pegaremos 
+	// mensagens de input de teclado.
 	//
 	
-	if ( interactive != 1 ){
+	if ( interactive != 1 )
+	{
 		
 		//#debug
         printf("shell is not interactive\n");
 		
-		goto skip_input;
+	    //
+	    // # file #
+	    //
+	
+	    // Se um nome de arquivo foi enviado via argumento.
+	    // Vamos carregar agora e usar depois.
+	
+	    // #obs:
+	    // Ele não se torna interativo depois de executar o script,
+	    // ele apenas fecha.
+	    // No script poderá te uma pausa, se não tiver o shell fecha 
+	    // quando o script acabar. 
+		
+	    // #exit 
+	    // Saída com sucesso. 
+	
+	    // #importante 
+	    // script não é linha de comando.
+	    // Para executarmos o script temos que chamar carregar o arquivo e 
+	    // chamar o parser.
+	
+	    // Carrega, executa o programa e sai ao retornar.
+	
+	    if ( file_flag == 1 )
+	    {
+	        scriptReturn = (int) shellExecuteThisScript ( argv[3] );	
+		    switch (scriptReturn)
+		    {
+			    case 0: 
+			       printf ("Script exit ok\n");
+				   exit (0);
+				   break;
+				
+			    default:
+			        printf ("Script exit error\n");
+			        exit (-1);
+			        break;
+		    };	
+	    }; 
+		
+		//goto skip_input;
 	};
 	
 	
@@ -1243,10 +1334,8 @@ Mainloop:
 	};
 
 	
-	//
-	// Pulamos a parte que pega mensgens de input de teclado 
+	// Pulamos a parte que pega menasgens de input de teclado 
 	// porque esse shell não está configurado como interativo.
-	//
 	
 //	
 // # RunScript #	
@@ -6235,6 +6324,10 @@ reader_loop()
  
 int shellExecuteThisScript ( char *script_name ){
 	
+	// #importante 
+	// script não é linha de comando.
+	// Para executarmos o script temos que chamar carregar o arquivo e 
+	// chamar o parser.	
     
  	//#todo:
 	//Essa função deve chamar o interpretador de script	
@@ -6247,20 +6340,28 @@ int shellExecuteThisScript ( char *script_name ){
 	
 	printf("shellExecuteThisScript:\n");	
 	printf("Initializing script ...\n");
-    printf("CurrentFile={%s}\n",script_name);
 	
+    printf("Open file  {%s}\n",script_name);
+
+	
+ 
 	
 	// #ok 
     // Carregaremos o arquivo com o nome passado por argumento.	
+	
 	
     script_file = fopen (script_name,"rw");
 	
 	if ( (void *) script_file == NULL )
 	{	
 		printf ("shellExecuteThisScript: Can't open script file!\n");
-		die("*");
+		exit (-1);
+	}else{
+		
+		printf("arquivo carregado com sucesso! ");
 	};
 	
+	/*
 	//#Ok
 	//atualizando a linha de comandos no prompt[], stdin.
 	
@@ -6268,25 +6369,43 @@ int shellExecuteThisScript ( char *script_name ){
 	//Talvez não precise copiar o conteúdo, e sim apenas 
     //mudar os ponteiros.
     
-    //#todo 	
-	//Fazer isso ao invés de copiar.
-	//stdin = script_file;
 	
 	for ( i=0; i< 128; i++ )
 	{	
+        //#bugbug 
+        // isso aqui deu problema.		
 		stdin->_base[i] = script_file->_base[i];
 	}
+	*/
+
+    //#todo 	
+	//Fazer isso ao invés de copiar.
+	stdin = script_file;
+	
+	
+	// lexer 
+	// #todo: Temos que inicializar o lexer antes do parser usar.
+	// lexerInit();
 	
 	
 	//
 	// ## parser ##
 	//
 	
+	// Antes de usarmos temos que inicializar.
+	// parserInit ();
+	 
 	//#todo
 	//Chamaremos o parser, que num loop chamará o lexer yylex()
 	
-	//parser();
+	printf("Calling parser ...\n");
 	
+	parse ();
+	
+	printf("Parser return ...\n");
+	
+	// #importante 
+	// Aqui vamos analisar o reorno do parser.
 	
 	//EOF_Reached = EOF;
 

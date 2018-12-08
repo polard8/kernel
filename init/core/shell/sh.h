@@ -35,5 +35,8 @@
 #include "version.h"
 //...
 
+#include "lexer.h"
+#include "parser.h"
+
 
 

@@ -247,9 +247,11 @@ done:
 
 
 /*
+ **************************************************************
  * parse:
  *     Pegando tokens com o lexer e fazendo coisas ...
  */
+ 
 int parse (){
 	
 	register int c;
