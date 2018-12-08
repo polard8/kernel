@@ -10,7 +10,7 @@ echo -{ Creating application TASCII.BIN ...
 :Compiling	
 echo -{ ...
 echo -{ Compiling ...
-	gcc  -c c:\gramado\desktop\tests\tascii\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\cmd\tascii\main.c -I c:\gramado\include\libc -o main.o  
  
 
     copy c:\gramado\lib\ctype.o c:\sdk\bin\ctype.o	 
@@ -32,7 +32,7 @@ string.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\desktop\tests\tascii\link.ld -o TASCII.BIN %myObjects% -Map  c:\gramado\desktop\tests\tascii\map.s
+   ld -T c:\gramado\cmd\tascii\link.ld -o TASCII.BIN %myObjects% -Map  c:\gramado\cmd\tascii\map.s
    
    rem Não deletar os objetos.
  

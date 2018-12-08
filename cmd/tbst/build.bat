@@ -9,14 +9,14 @@ echo -{ Creating application TBST.BIN ...
 echo -{ head
     
 	rem head.s
-	nasm c:\gramado\desktop\tests\tbst\head.s -felf -o head.o
+	nasm c:\gramado\cmd\tbst\head.s -felf -o head.o
 
 	
 :Compiling	
 echo -{ ...
 echo -{ app1 (init task)
 
-	gcc  -c c:\gramado\desktop\tests\tbst\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\cmd\tbst\main.c -I c:\gramado\include\libc -o main.o  
  
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -39,7 +39,7 @@ api.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T  c:\gramado\desktop\tests\tbst\link.ld -o TBST.BIN %myObjects%  -Map   c:\gramado\desktop\tests\tbst\map.s
+   ld -T  c:\gramado\cmd\tbst\link.ld -o TBST.BIN %myObjects%  -Map   c:\gramado\cmd\tbst\map.s
    
    rem Não deletar os objetos.
  

@@ -62,7 +62,7 @@ Linker script and memory map
                 0x00001000                __size_of_heap_commit__ = 0x1000
                 0x00000000                __loader_flags__ = 0x0
 
-.text           0x00401000     0x3000
+.text           0x00401000     0x4000
                 0x00401000                code = .
                 0x00401000                _code = .
                 0x00401000                __code = .
@@ -70,158 +70,164 @@ Linker script and memory map
  *(.text)
  .text          0x00401000       0xa0 main.o
                 0x00401000                _main
- .text          0x004010a0       0xe0 ctype.o
-                0x0040113a                isspace
-                0x00401160                isxdigit
-                0x0040114d                isupper
-                0x004010b3                isalpha
-                0x004010ff                islower
-                0x004010a0                isalnum
-                0x00401112                isprint
-                0x004010ec                isgraph
-                0x004010d9                isdigit
-                0x004010c6                iscntrl
-                0x00401127                ispunct
- .text          0x00401180     0x1360 stdio.o
-                0x00401996                putchar
-                0x00401180                stdio_fntos
-                0x00401952                sprintf
-                0x004020c4                feof
-                0x004021ea                stdioSetCursor
-                0x00402026                ungetc
-                0x00401450                puts
-                0x004021a2                fputc
-                0x00402240                stdioGetCursorY
-                0x00402321                scanf
-                0x00401f3c                fputs
-                0x00402102                ferror
-                0x00401b78                input
-                0x0040138e                scroll
-                0x00401fb1                gets
-                0x004019c2                outbyte
-                0x00401e58                fflush
-                0x00401ec7                fprintf
-                0x00401ce0                stdio_system_call
-                0x004012d5                fopen
-                0x00402214                stdioGetCursorX
-                0x00401d08                getchar
-                0x0040226c                stdio_atoi
-                0x00401d34                stdioInitialize
-                0x00402063                fgetc
-                0x0040126f                fclose
-                0x00402128                fseek
-                0x00401b45                _outbyte
-                0x00401937                printf
- .text          0x004024e0      0xaf0 stdlib.o
-                0x004027d6                FreeHeap
-                0x00402508                rtGetHeapStart
-                0x00402a2a                free
-                0x004024e0                stdlib_system_call
-                0x004029bf                rand
-                0x00402936                stdlibInitMM
-                0x004027e0                heapInit
-                0x00402ec4                __findenv
-                0x0040251c                rtGetHeapPointer
-                0x00402526                rtGetAvailableHeap
-                0x004029dc                srand
-                0x00402996                libcInitRT
-                0x00402530                heapSetLibcHeap
-                0x00402f8f                getenv
-                0x004029e9                malloc
-                0x004027c3                AllocateHeapEx
-                0x004025d7                AllocateHeap
-                0x00402e3b                stdlib_strncmp
-                0x00402e99                exit
-                0x00402512                rtGetHeapEnd
-                0x00402a2f                system
- .text          0x00402fd0      0x430 string.o
-                0x004031bc                strcspn
-                0x0040311f                strcat
-                0x00402fd0                strcmp
-                0x00403176                bzero
-                0x004032fc                strtok_r
-                0x004030b2                memcpy
-                0x00403089                memoryZeroMemory
-                0x0040314f                bcopy
-                0x004030ef                strcpy
-                0x0040325c                strspn
-                0x004033d1                strtok
-                0x0040302b                strncmp
-                0x00403191                strlen
-                0x00404000                . = ALIGN (0x1000)
- *fill*         0x00403400      0xc00 00
-
-.rdata          0x00404000      0x510
- .rdata         0x00404000      0x460 stdlib.o
- .rdata         0x00404460       0x70 stdio.o
- .rdata         0x004044d0       0x40 main.o
-
-.data           0x00404510      0xaf0
-                0x00404510                data = .
-                0x00404510                _data = .
-                0x00404510                __data = .
- *(.data)
- .data          0x00404510        0x0 main.o
- .data          0x00404510      0x120 ctype.o
-                0x00404510                _ctype_
- .data          0x00404630        0x0 stdio.o
- .data          0x00404630        0x0 stdlib.o
- .data          0x00404630        0x0 string.o
+ .text          0x004010a0        0x0 ctype.o
+ .text          0x004010a0     0x2a10 stdio.o
+                0x00401aad                printf_i2hex
+                0x00401cdf                putchar
+                0x00401155                stdio_fntos
+                0x00401c9b                sprintf
+                0x00402558                feof
+                0x00401b1b                printf2
+                0x0040267e                stdioSetCursor
+                0x0040246d                ungetc
+                0x00403a74                rewind
+                0x004014be                puts
+                0x00402636                fputc
+                0x004026d4                stdioGetCursorY
+                0x00402700                scanf
+                0x0040236b                fputs
+                0x00402596                ferror
+                0x00401ec1                input
+                0x004013fc                scroll
+                0x004023e0                gets
+                0x00401d0b                outbyte
+                0x004024d4                fileno
+                0x00402264                fflush
+                0x004022f6                fprintf
+                0x00403a32                stderr_printf
+                0x00402029                stdio_system_call
+                0x004012ba                fopen
+                0x004026a8                stdioGetCursorX
+                0x00402051                getchar
+                0x004019c0                printf_atoi
+                0x004010a0                stdio_atoi
+                0x004029b0                kvprintf
+                0x00403a03                stdout_printf
+                0x0040207d                stdioInitialize
+                0x004024f7                fgetc
+                0x00401254                fclose
+                0x004025bc                fseek
+                0x00403a61                perror
+                0x00401e8e                _outbyte
+                0x004024aa                ftell
+                0x0040393f                printf
+                0x004019a5                printf3
+                0x00403977                vfprintf
+ .text          0x00403ab0      0xc60 stdlib.o
+                0x00403da6                FreeHeap
+                0x00403ad8                rtGetHeapStart
+                0x004040b3                free
+                0x00403ab0                stdlib_system_call
+                0x00403fdc                rand
+                0x00403f53                stdlibInitMM
+                0x00403db0                heapInit
+                0x0040454d                __findenv
+                0x00403aec                rtGetHeapPointer
+                0x00403af6                rtGetAvailableHeap
+                0x00403ff9                srand
+                0x0040464d                atoi
+                0x00403fb3                libcInitRT
+                0x00403b00                heapSetLibcHeap
+                0x00404031                stdlib_die
+                0x00404618                getenv
+                0x00404072                malloc
+                0x00403d93                AllocateHeapEx
+                0x00403ba7                AllocateHeap
+                0x004044c4                stdlib_strncmp
+                0x00404006                xmalloc
+                0x00404522                exit
+                0x00403ae2                rtGetHeapEnd
+                0x004040b8                system
+ .text          0x00404710      0x430 string.o
+                0x004048fc                strcspn
+                0x0040485f                strcat
+                0x00404710                strcmp
+                0x004048b6                bzero
+                0x00404a3c                strtok_r
+                0x004047f2                memcpy
+                0x004047c9                memoryZeroMemory
+                0x0040488f                bcopy
+                0x0040482f                strcpy
+                0x0040499c                strspn
+                0x00404b11                strtok
+                0x0040476b                strncmp
+                0x004048d1                strlen
                 0x00405000                . = ALIGN (0x1000)
- *fill*         0x00404630      0x9d0 00
+ *fill*         0x00404b40      0x4c0 00
 
-.bss            0x00405000     0xa640
-                0x00405000                bss = .
-                0x00405000                _bss = .
-                0x00405000                __bss = .
+.rdata          0x00405000      0x940
+ .rdata         0x00405000      0x480 stdlib.o
+ .rdata         0x00405480      0x380 stdio.o
+                0x00405660                hex2ascii_data
+ .rdata         0x00405800      0x100 ctype.o
+                0x00405800                _ctype
+ .rdata         0x00405900       0x40 main.o
+
+.data           0x00405940      0x6c0
+                0x00405940                data = .
+                0x00405940                _data = .
+                0x00405940                __data = .
+ *(.data)
+ .data          0x00405940        0x0 main.o
+ .data          0x00405940        0x0 ctype.o
+ .data          0x00405940        0x0 stdio.o
+ .data          0x00405940        0x0 stdlib.o
+ .data          0x00405940        0x0 string.o
+                0x00406000                . = ALIGN (0x1000)
+ *fill*         0x00405940      0x6c0 00
+
+.bss            0x00406000     0xa640
+                0x00406000                bss = .
+                0x00406000                _bss = .
+                0x00406000                __bss = .
  *(.bss)
- .bss           0x00405000        0x0 main.o
- .bss           0x00405000        0x0 ctype.o
- .bss           0x00405000       0x10 stdio.o
- .bss           0x00405010     0x8010 stdlib.o
-                0x00405010                environ
- .bss           0x0040d020       0x10 string.o
-                0x0040e000                . = ALIGN (0x1000)
- *fill*         0x0040d030      0xfd0 00
- COMMON         0x0040e000      0xd40 main.o
-                0x0040e000                prompt
-                0x0040e400                stderr
-                0x0040e410                prompt_pos
-                0x0040e420                g_using_gui
-                0x0040e430                stdin
-                0x0040e440                prompt_max
-                0x0040e450                prompt_err
-                0x0040e850                g_columns
-                0x0040e860                stdout
-                0x0040e870                Streams
-                0x0040e8f0                g_rows
-                0x0040e900                prompt_out
-                0x0040ed00                g_cursor_y
-                0x0040ed10                prompt_status
-                0x0040ed20                g_char_attrib
-                0x0040ed30                g_cursor_x
- COMMON         0x0040ed40      0x900 stdlib.o
-                0x0040ed40                current_mmblock
-                0x0040ed50                mm_prev_pointer
-                0x0040ed60                heap_end
-                0x0040ed70                g_available_heap
-                0x0040ed80                heap_start
-                0x0040ed90                heapCount
-                0x0040eda0                HEAP_START
-                0x0040edb0                g_heap_pointer
-                0x0040edc0                heapList
-                0x0040f1c0                randseed
-                0x0040f1d0                HEAP_SIZE
-                0x0040f1e0                last_size
-                0x0040f1f0                last_valid
-                0x0040f200                mmblockList
-                0x0040f600                libcHeap
-                0x0040f610                Heap
-                0x0040f620                mmblockCount
-                0x0040f630                HEAP_END
-                0x0040f640                end = .
-                0x0040f640                _end = .
-                0x0040f640                __end = .
+ .bss           0x00406000        0x0 main.o
+ .bss           0x00406000        0x0 ctype.o
+ .bss           0x00406000       0x10 stdio.o
+ .bss           0x00406010     0x8010 stdlib.o
+                0x00406010                environ
+ .bss           0x0040e020       0x10 string.o
+                0x0040f000                . = ALIGN (0x1000)
+ *fill*         0x0040e030      0xfd0 00
+ COMMON         0x0040f000      0xd40 main.o
+                0x0040f000                prompt
+                0x0040f400                stderr
+                0x0040f410                prompt_pos
+                0x0040f420                g_using_gui
+                0x0040f430                stdin
+                0x0040f440                prompt_max
+                0x0040f450                prompt_err
+                0x0040f850                g_columns
+                0x0040f860                stdout
+                0x0040f870                Streams
+                0x0040f8f0                g_rows
+                0x0040f900                prompt_out
+                0x0040fd00                g_cursor_y
+                0x0040fd10                prompt_status
+                0x0040fd20                g_char_attrib
+                0x0040fd30                g_cursor_x
+ COMMON         0x0040fd40      0x900 stdlib.o
+                0x0040fd40                current_mmblock
+                0x0040fd50                mm_prev_pointer
+                0x0040fd60                heap_end
+                0x0040fd70                g_available_heap
+                0x0040fd80                heap_start
+                0x0040fd90                heapCount
+                0x0040fda0                HEAP_START
+                0x0040fdb0                g_heap_pointer
+                0x0040fdc0                heapList
+                0x004101c0                randseed
+                0x004101d0                HEAP_SIZE
+                0x004101e0                last_size
+                0x004101f0                last_valid
+                0x00410200                mmblockList
+                0x00410600                libcHeap
+                0x00410610                Heap
+                0x00410620                mmblockCount
+                0x00410630                HEAP_END
+                0x00410640                end = .
+                0x00410640                _end = .
+                0x00410640                __end = .
 LOAD main.o
 LOAD ctype.o
 LOAD stdio.o
