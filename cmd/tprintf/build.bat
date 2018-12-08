@@ -10,14 +10,14 @@ echo -{ Creating application TPRINTF.BIN ...
 echo -{ head
     
 	rem head.s
-	nasm c:\gramado\desktop\tests\tprintf\head.s -felf -o head.o
+	nasm c:\gramado\cmd\tprintf\head.s -felf -o head.o
 
 	
 :Compiling	
 echo -{ ...
 echo -{ app1 (init task)
 
-	gcc  -c c:\gramado\desktop\tests\tprintf\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\cmd\tprintf\main.c -I c:\gramado\include\libc -o main.o  
  
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -40,7 +40,7 @@ api.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T  c:\gramado\desktop\tests\tprintf\link.ld -o TPRINTF.BIN %myObjects%  -Map   c:\gramado\desktop\tests\tprintf\map.s
+   ld -T  c:\gramado\cmd\tprintf\link.ld -o TPRINTF.BIN %myObjects%  -Map   c:\gramado\cmd\tprintf\map.s
    
    rem Não deletar os objetos.
  

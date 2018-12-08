@@ -11,7 +11,7 @@ echo -{ Creating application TMETRICS.BIN ...
 echo -{ ...
 echo -{ Compiling ...
 
-	gcc  -c c:\gramado\desktop\tests\tmetrics\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\cmd\tmetrics\main.c -I c:\gramado\include\libc -o main.o  
 	
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -31,7 +31,7 @@ ctype.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\desktop\tests\tmetrics\link.ld -o TMETRICS.BIN %myObjects% -Map c:\gramado\desktop\tests\tmetrics\map.s
+   ld -T c:\gramado\cmd\tmetrics\link.ld -o TMETRICS.BIN %myObjects% -Map c:\gramado\cmd\tmetrics\map.s
    
    rem Não deletar os objetos.
  

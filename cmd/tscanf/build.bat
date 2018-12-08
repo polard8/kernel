@@ -11,7 +11,7 @@ echo -{ Creating application TSCANF.BIN ...
 echo -{ ...
 echo -{ Compiling ...
 
-	gcc  -c c:\gramado\desktop\tests\tscanf\main.c -I c:\gramado\include\libc -o main.o  
+	gcc  -c c:\gramado\cmd\tscanf\main.c -I c:\gramado\include\libc -o main.o  
  
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -34,7 +34,7 @@ ctype.o
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\desktop\tests\tscanf\link.ld -o TSCANF.BIN %myObjects% -Map c:\gramado\desktop\tests\tscanf\map.s
+   ld -T c:\gramado\cmd\tscanf\link.ld -o TSCANF.BIN %myObjects% -Map c:\gramado\cmd\tscanf\map.s
    
    rem Não deletar os objetos.
  
