@@ -115,7 +115,8 @@ echo -{ ...
 	rem font
 	copy c:\gramado\bin\NC2.FON F:\
 	
-	
+	rem testando programa em assembly
+	copy c:\gramado\bin\APPASM.BIN    F:\
 	
 	rem copy c:\gramado\bin\GRAMCC.BIN    F:\
 	copy c:\gramado\bin\GRAMC.BIN    F:\

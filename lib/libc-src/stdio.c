@@ -917,7 +917,9 @@ static void printchar ( char **str, int c ){
  *
  *     #importante: O kernel pinta o char no backbuffer e
  *     em seguida efetua um refresh do char para mostra-lo na tela.
+ *     #bugbug: Não precisamos desse retorno. Pode ser void ? libc?
  */
+ 
 int putchar (int ch){
     
 	// Opções:
