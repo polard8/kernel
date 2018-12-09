@@ -61,7 +61,13 @@ boot_main:
 
 	;*Esse é o MBR, a rotina nela carrega o stage 2.
 	;; ** PRIMEIRO SETOR ** ;;
-    %include "QUASI-OS.ASM"
+    
+	;;#test 
+	;;podemos fazer testes aqui.
+	
+	;; original. Funciona.
+	%include "QUASI-OS.ASM"
+    
 
 
 ;;
