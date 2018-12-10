@@ -115,6 +115,9 @@ echo -{ ...
 	rem font
 	copy c:\gramado\bin\NC2.FON F:\
 	
+	rem test  ... fasm
+	copy c:\gramado\bin\FASM.EXE    F:\
+	
 	rem testando programa em assembly
 	copy c:\gramado\bin\APPASM.BIN    F:\
 	

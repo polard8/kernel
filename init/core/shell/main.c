@@ -3638,7 +3638,28 @@ doexec_first_command:
 	// Colocamos todos os ponteiros no array.
 	for ( z=0; z<token_count; z++ ){
 	    buffer[z] = (unsigned long) tokenList[z];	
-	}						 
+	}	
+
+
+    // #imporante
+	// Chamaremos uma rotina de execve para cada extensão por enquanto.
+	// pois podem ter entrypoint diferentes.
+	// O kernel adapta o entrypoint dependendo da systemcall.
+
+
+    if( is_bin( (char *) tokenList[0] ) != 1 )
+	{
+		printf("it's not a .bin filename.\n");
+		printf("trying to execute a .exe file\n");
+		//while(1){ asm ("pause");}
+		
+        Execve_Ret = (int) shell_gramado_core_init_execve_exe ( 
+	                       (const char *) tokenList[0], //nome
+	                       (const char *) 0,            //NULL
+						   (const char *) 0); 	       //NULL
+		
+		goto chech_return;
+	};
 
 	// ## ISSO DEU CERTO ## 	
     // Passamos anteriormente a linha de comandos via memória compartilhada,
@@ -3647,6 +3668,9 @@ doexec_first_command:
 	                       (const char *) tokenList[0], //nome
 	                       (const char *) 0,            //NULL
 						   (const char *) 0);           //NULL
+						   
+						   
+chech_return:
 						 
 	
 	
@@ -6147,6 +6171,188 @@ fail:
 done:
     return (int) Status;						  
 };
+
+
+//===========================
+//tentando executar .exe com entry em 0x400 
+int shell_gramado_core_init_execve_exe( const char *arg1,  //nome
+                                    const char *arg2,  //arg(endereço da linha de comando)
+                                    const char *arg3 ) //env
+{
+	//erro.
+	int Status = 1;
+	
+	//unsigned long arg_address = (unsigned long) &argv[0];
+
+	// suprimindo dot-slash
+	// The dot is the current directory and the 
+	// slash is a path delimiter.
+	//if( filename[0] == '.' && filename[1] == '/' )
+	//{ 
+	//    filename++;
+    //    filename++; 
+    //    goto translate;	
+	//};
+	
+	
+	//suprimindo a barra.
+	//if( *arg1 == '/' || 
+	//    *arg1 == '\\' )
+	//{ 
+	//    arg1++; 
+	//};
+	
+	
+	printf("shell_gramado_core_init_execve_exe: initializing ...\n");
+	
+	
+	
+translate:	
+	
+	//
+	// ## BUG BUG
+	//
+	// Talvez nesse momento, ao transformar a string ele 
+	// corrompa o espaço reservado para o argumento seguinte.
+	// vamos fazer um teste no quan a rotina não precise 
+	// acrescentar zeros.
+	//
+	
+	//
+	// correto é isso mesmo,
+	// para não corromper o espaço dos argumentos no vetor,
+	// teremos que transformar somente lá no kernel, pouco antes 
+	// de carregarmos o arquivo.
+	//
+	
+	//Isso faz uma conversão de 'test.bin' em 'TEST    BIN'.
+	//Ok funcionou.
+	//shell_fntos( (char *) arg1);
+	
+	//const char* isso não foi testado.
+	//shell_fntos(filename);
+
+
+	// #importante:
+	// Isso deve chamar gramado_core_init_execve() na api.
+								
+								
+
+
+   	
+ //isso chamará uma rotina especial de execve, somente 
+//usada no ambiente gramado core. 
+execve:
+
+//
+// #importante
+// Nesse momento o shell pode atuar com outro procedimento de janela 
+// que ficaria responsável por conduzir essas mensgens ató o processo 
+// filho, que ate mesmo ser um aplicativo que não use  recursos gráficos.
+// Esse processo filho a janela do shell como output e o shell como input.
+// Ex: um aplicativo chamado pelo shell pode chamar a função getch() para 
+// obter input ... como o shell tem a janela com o foco de entrada, então 
+// o shell precisa enviar a mensagem para esse aplicativo. Como ?
+// Uma opção seria fazer uma chamada ao kernel enviando essa mensagem 
+// para o lugar padrão onde os aplicativos pegam mensagens do tipo caractere.
+// Ou seja, getch() solicita um caractere ao kernel, e quem enviou esse caractere 
+// ao kernel foi o shell no qual o aplicativo está rodando.
+// Se esse aplicativo pertence a um terminal específico, então o caractere 
+// pode ser enviado para a estrutura desse terminal específico. Pode uasr 
+// descritores de terminal.
+// teminalFeed(teminal_id,ch) poderia enviar o caratere para um terminal específico,
+// de onde o aplicativo pegará o caractere.
+//	
+
+    //
+    // O retorno significa que o aplicativo foi colocado
+	// para rodar e em breve receberá tempo de processamento.
+	// '0' significa que funcionou e '1' que falhou.
+    //	
+	
+	//
+	// Obs: Se retornar o número do processo então podemos esperar por ele 
+	// chamadno wait(ret);
+	//
+	
+	printf("shell_gramado_core_init_execve_exe: calling system call 168 ...\n");
+	//168 para aquivos .exe 
+	Status = (int) system_call( 168, 
+	                          (unsigned long) arg1,    //Nome
+				              (unsigned long) arg2,    //arg(endereço da linha de comando)
+				              (unsigned long) arg3 );  //env
+							  
+							  
+    if( Status == 0 )
+	{
+		//Não houve erro. O aplicativo irá executar.
+		
+		//
+		// Nesse momento devemos usar um novo procedimento de janela.
+		// Que vai enviar as mensagens de caractere para um terminal 
+		// específico, para que aplicativos que user aquele terminal 
+		// possam pegar essas mensgens de caractere.
+		//
+		
+//#ifdef SHELL_VERBOSE		
+		printf("shell: return ok, aplicativo inicializado.\n"); 
+//#endif
+		
+		//
+		// ## teste ##
+		//
+		// saindo do shell.
+		//
+		
+		// getpid...
+		// waitforpid(?);
+		
+		//die("Exiting shell.bin\n");
+		
+		//Saindo sem erro.
+		//exit(0);
+		
+		//Saída elegante, retornando para o crt0.
+		ShellFlag = SHELLFLAG_EXIT;
+		
+		//ShellFlag = SHELLFLAG_FEEDTERMINAL;		
+		goto done;
+	}else{
+		
+		// Se estamos aqui é porque ouve erro 
+		// ainda não sabemos o tipo de erro. 
+		// Status indica o tipo de erro.
+		// Se falhou significa que o aplicativo não vai executar,
+		// então não mais o que fazer.
+		
+		//#importante: Error message.
+		printf("shell: aplicativo nao foi inicializado.\n");
+		
+		ShellFlag = SHELLFLAG_COMMANDLINE;
+		goto fail;
+	};
+	
+	
+	//fail.
+	
+	//
+    // Retornaremos. 
+	// Quem chamou essa rotina que tome a decisão 
+	// se entra em wait ou não.
+    //
+
+	
+fail:
+    //#importante: Error message.
+    //status = 1.
+    printf("shell_gramado_core_init_execve: \n fail retornando ao interpretador\n");
+done:
+    return (int) Status;						  
+};
+
+
+
+
 
 
 
