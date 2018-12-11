@@ -62,9 +62,9 @@ init_memory:
 	shr	eax,2
 	add	eax,edx
 	jmp	allocate_memory
-    large_memory:
+large_memory:
 	mov	eax,80000000h
-    allocate_memory:
+allocate_memory:
 	mov	edx,eax
 	shr	edx,2
 	mov	ecx,eax
@@ -84,7 +84,7 @@ init_memory:
 	mov	[additional_memory],eax
 	add	[additional_memory_end],eax
 	ret
-    not_enough_memory:
+not_enough_memory:
 	mov	eax,[additional_memory_end]
 	shl	eax,1
 	cmp	eax,4000h
@@ -110,7 +110,7 @@ get_environment_variable:
 	cmp	ecx,4000h
 	jbe	buffer_for_variable_ok
 	mov	ecx,4000h
-    buffer_for_variable_ok:
+buffer_for_variable_ok:
 	push	ecx
 	push	edi
 	push	esi
@@ -119,6 +119,13 @@ get_environment_variable:
 	cmp	edi,[memory_end]
 	jae	out_of_memory
 	ret
+	
+	;;========================================
+	
+;;
+;; open
+;;	
+	
 
 open:
 	push	0
@@ -198,6 +205,11 @@ lseek:
 ;;	
 
 display_string:
+    ;chamando rotina na lib asm.inc
+    ;call DisplayMessage
+	;ret
+;preservando o código original
+;.original:
 	push	[con_handle]
 	call	[GetStdHandle]
 	mov	ebp,eax
