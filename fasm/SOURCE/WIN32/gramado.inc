@@ -2,12 +2,49 @@
 ;usado para portar fasm para gramado 0.4 
 
 
+gramado_create_fake:
+	mov esi, gramado_string_create_fake
+	call DisplayMessage
+    ret
+
+gramado_open_fake:
+	mov esi, gramado_string_open_fake
+	call DisplayMessage
+    ret
+	
+gramado_close_fake:
+	mov esi, gramado_string_close_fake
+	call DisplayMessage
+    ret
+
+gramado_read_fake:
+	mov esi, gramado_string_read_fake
+	call DisplayMessage
+    ret
+
+gramado_write_fake:
+	mov esi, gramado_string_write_fake
+	call DisplayMessage
+    ret
+	
+gramado_lseek_fake:
+	mov esi, gramado_string_lseek_fake
+	call DisplayMessage
+    ret
+
 
 gramado_init_memory_fake:
+	
 	mov esi, gramado_string_initmemory
 	call DisplayMessage
 
     ret
+	
+	
+gramado_assembler_error:
+	mov esi, gramado_string_assembler_error
+	call DisplayMessage
+    ret	
 
 	
 ;;#todo	
@@ -351,9 +388,57 @@ gramado_string_passes_suffix db ' passes, ',0
 gramado_string_seconds_suffix db ' seconds, ',0
 gramado_string_bytes_suffix db ' bytes.',0Dh,0Ah,0
 
+gramado_string_fim_do_programa db '*FIM DO PROGRAMA! :)',0Dh,0Ah,0
 
 
+gramado_string_create_fake: db 'create_fake', 0Dh, 0Ah,0
+gramado_string_read_fake: db 'read_fake', 0Dh, 0Ah,0
+gramado_string_write_fake: db 'write_fake', 0Dh, 0Ah,0
+gramado_string_open_fake: db 'open_fake', 0Dh, 0Ah,0
+gramado_string_close_fake: db 'close_fake', 0Dh, 0Ah,0
+gramado_string_lseek_fake: db 'lseek_fake', 0Dh, 0Ah,0
+
+gramado_string_out_of_memory: db 'out_of_memory', 0Dh, 0Ah,0
+
+
+
+gramado_string_error_with_source: db 'error_with_source', 0Dh, 0Ah,0
+gramado_string_assembler_error: db 'assembler error', 0Dh, 0Ah,0
+gramado_string_fatalerror: db 'fatal error', 0Dh, 0Ah,0
 gramado_string_hang: db '*HANG', 0Dh, 0Ah,0
+gramado_string_breakpoint: db '*BREAKPOINT', 0Dh, 0Ah,0
+
+
+;;======================
+;; mensagens do preprocessador
+;gramado_string_preprocessor_init db 'Initializing preprocessor ...', 0Dh, 0Ah,0
+;gramado_string_preprocessor_done db 'preprocessor done', 0Dh, 0Ah,0
+
+gramado_string_preprocessor_characteres db 'preprocessor characteres', 0Dh, 0Ah,0
+gramado_string_preprocessor_locals_counter db 'preprocessor locals_counter', 0Dh, 0Ah,0
+gramado_string_preprocessor_environment_variable_support db 'preprocessor environment_variable_support', 0Dh, 0Ah,0
+
+
+
+gramado_string_preprocessor_openfound db 'preprocessor openfound *hang', 0Dh, 0Ah,0
+gramado_string_preprocessor_lseekfound db 'preprocessor lseekfound *hang', 0Dh, 0Ah,0
+
+;;======================
+;; mensagens do parser
+;gramado_string_parser_init db 'Initializing parser ...', 0Dh, 0Ah,0
+;gramado_string_parser_done db 'parser done', 0Dh, 0Ah,0
+
+;;======================
+;; mensagens do assembler
+
+;gramado_string_assembler_init db 'Initializing assembler ...', 0Dh, 0Ah,0
+;gramado_string_assembler_done db 'assembler done', 0Dh, 0Ah,0
+
+
+
+;;...
+
+
 
 
 ;;
@@ -366,26 +451,28 @@ gramado_string_hang: db '*HANG', 0Dh, 0Ah,0
 
 
 BUFFER1:
-    ;;4KB
+    ;;8KB
     times 4096 DB 0  
+	times 4096 DB 0  
 BUFFER1_END:
     DB 0
 	
 BUFFER2:
-    ;;4KB
+    ;;8KB
     times 4096 DB 0  
+	times 4096 DB 0  
 BUFFER2_END:
     DB 0
 
 BUFFER3:
     ;;4KB
-    times 4096 DB 0  
+    ;times 4096 DB 0  
 BUFFER3_END:
     DB 0
 	
 BUFFER4:
     ;;4KB
-    times 4096 DB 0  
+    ;times 4096 DB 0  
 BUFFER4_END:
     DB 0
 	

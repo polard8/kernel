@@ -104,7 +104,12 @@ after_my_awesome_stuff:
 	
 	
  	mov esi, gramado_string_step2
-    call DisplayMessage		
+    call DisplayMessage
+
+ 
+    ;;#todo 
+    ;;temos que chamar uma rotina quye inicialize a memória 
+    ;;são vários elementos.	
 	
 	;call	init_memory
     call gramado_init_memory_fake
@@ -158,8 +163,7 @@ after_my_awesome_stuff:
 	
 	
 	
-   ;;#debug
-	jmp $	
+
 
 	
 	;;==============================================
@@ -168,74 +172,152 @@ after_my_awesome_stuff:
 	;; ## preprocessor ##
 	;;
 	
+ 	mov esi, gramado_string_step3
+    call DisplayMessage			
+	
 	
 	and	[preprocessing_done],0
+	
+	;#supendendo o preprocessador.
+	;faremos debug de cada uma das partes suspensas, individualmente 
 	call	preprocessor
+	;call preprocessor_interface
+	
 	or	[preprocessing_done],-1
 	
+	
+   ;;#debug
+	;jmp $		
 	
 	;;
 	;; ## parser ##
 	;;
-	
+ 	mov esi, gramado_string_step4
+    call DisplayMessage			
+
+	;;#debug
+	;mov esi, gramado_string_breakpoint
+	;call DisplayMessage			
+	;;#debug 
+	;jmp $		
 	
 	call	parser
+	;call parser_interface
 	
 	;;
 	;; ## assembler ##
 	;;
+ 	mov esi, gramado_string_step5
+    call DisplayMessage	
+
+	;;#debug
+	;mov esi, gramado_string_breakpoint
+	;call DisplayMessage			
+	;;#debug 
+	;jmp $		
 	
+	;;#suspensa a chamada ao assembler ... dá loop
+	;faremos debug de cada uma das partes suspensas, individualmente 	
+	;call	assembler
+	;call assembler_interface
 	
-	call	assembler
 	
 	
 	;;
 	;; ## formatter ##
 	;;
 	
-	
-	call	formatter
+ 	;mov esi, gramado_string_step6
+    ;call DisplayMessage	
 
-	call	display_user_messages
+	;;#debug
+	;mov esi, gramado_string_breakpoint
+	;call DisplayMessage			
+	;;#debug 
+	;jmp $			
 	
-	movzx	eax,[current_pass]
-	inc	eax
-	call	display_number
+	;;#suspenso pois vai lidar muito com arquivo e 
+	;;salvamento de arquivo.
+	;faremos debug de cada uma das partes suspensas, individualmente 	
+	;;call	formatter
 	
-	mov	esi,_passes_suffix
-	call	display_string
 	
-	call	[GetTickCount]
-	sub	eax,[start_time]
-	xor	edx,edx
-	mov	ebx,100
-	div	ebx
-	or	eax,eax
-	jz	display_bytes_count
-	xor	edx,edx
-	mov	ebx,10
-	div	ebx
+ 	mov esi, gramado_string_step7
+    call DisplayMessage	
 	
-	push	edx
-	call	display_number
+	;;#debug
+	;mov esi, gramado_string_breakpoint
+	;call DisplayMessage			
+	;#debug 
+	;jmp $		
+
+	;;supende: isso é firula.
+	;;mostra alguma estatísitica ..
+	;;manipula funções do windows
+	;;call	display_user_messages
 	
-	mov	dl,'.'
-	call	display_character
 	
-	pop	eax
-	call	display_number
+	;;#suspendendo várias coisas com timer.
 	
-	mov	esi,_seconds_suffix
-	call	display_string
+	;movzx	eax, [current_pass]
+	;inc	eax
+	;call	display_number
+	;call printf_hex
 	
-display_bytes_count:
+	;mov	esi, _passes_suffix
+	;call	display_string
 	
-	mov	eax,[written_size]
-	call	display_number
+	;call	[GetTickCount]
+	;sub	eax,[start_time]
+	;xor	edx,edx
+	;mov	ebx,100
+	;div	ebx
+	;or	eax,eax
+	;jz	display_bytes_count
+	;xor	edx,edx
+	;mov	ebx,10
+	;div	ebx
 	
-	mov	esi,_bytes_suffix
-	call	display_string
+	;push	edx
+	;call	display_number
 	
+	;mov	dl,'.'
+	;call	display_character
+	
+	;pop	eax
+	;call	display_number
+	
+	;mov	esi,_seconds_suffix
+	;call	display_string
+	
+	;mostrar estatísticas,
+	
+;display_bytes_count:
+
+ 	;mov esi, gramado_string_step8
+    ;call DisplayMessage		
+	
+	;;#debug
+	;mov esi, gramado_string_breakpoint
+	;call DisplayMessage			
+	;;#debug 
+	;jmp $	
+	
+	;mov	eax, [written_size]
+	;call display_number
+	;call print_hex
+	
+	
+	;mov	esi, gramado_string_bytes_suffix ;_bytes_suffix
+	;call	display_string
+	;call DisplayMessage 
+	
+	
+	mov esi, gramado_string_fim_do_programa
+	call DisplayMessage			
+	
+	
+	;;return 0. OK
 	xor	al,al
 	jmp	exit_program
 	

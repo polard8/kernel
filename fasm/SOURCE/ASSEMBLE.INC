@@ -3,6 +3,24 @@
 ; Copyright (c) 1999-2018, Tomasz Grysztar.
 ; All rights reserved.
 
+
+;;===============================================================
+;;
+;; ## assembler ##
+;;
+
+;assembler_interface:
+;	mov esi, gramado_string_assembler_init
+;	call DisplayMessage
+	
+;	call assembler
+	
+;	mov esi, gramado_string_assembler_done
+;	call DisplayMessage
+;	ret
+
+
+
 assembler:
 	xor	eax,eax
 	mov	[stub_size],eax
