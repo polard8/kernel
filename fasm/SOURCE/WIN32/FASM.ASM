@@ -33,13 +33,10 @@ section '.text' code readable executable
 
 start:
 
-    jmp after_my_awewsome_strings
-
-_fred_string2: db 'Running fasm on Gramado 0.4', 0Dh, 0Ah,0
-	
-	;include "c:\gramado\lib\asm\asm.inc"
-	
-after_my_awewsome_strings:
+    jmp after_my_awesome_stuff
+	include 'c:\gramado\lib\asm\asm.inc'
+	include 'gramado.inc'
+after_my_awesome_stuff:
 
    	xor eax, eax
 	mov al, 0xfA
@@ -416,8 +413,8 @@ include '..\avx.inc'
 include '..\tables.inc'
 include '..\messages.inc'
 
-
-include 'c:\gramado\lib\asm\asm.inc'
+;deletar
+;include 'c:\gramado\lib\asm\asm.inc'
 
 
 
@@ -428,8 +425,8 @@ include '..\version.inc'
 _copyright db 'Copyright (c) 1999-2018, Tomasz Grysztar',0Dh,0Ah,0
 
  
-
-_fred_string db 'Running fasm on Gramado 0.4', 0Dh, 0Ah,0
+;deletar
+;_fred_string db 'Running fasm on Gramado 0.4', 0Dh, 0Ah,0
 
 _logo db 'flat assembler  version ',VERSION_STRING,0
 _usage db 0Dh,0Ah
