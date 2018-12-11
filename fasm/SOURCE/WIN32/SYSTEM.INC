@@ -192,6 +192,11 @@ lseek:
 	clc
 	ret
 
+	
+;;
+;; Display string
+;;	
+
 display_string:
 	push	[con_handle]
 	call	[GetStdHandle]

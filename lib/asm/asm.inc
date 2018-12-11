@@ -151,7 +151,7 @@ print_char:
     ret		
 	
 
-	
+
 ;;=====================================
 ;; DisplayMessage
 ;; IN: esi =  ponteiro para string	
@@ -175,6 +175,13 @@ DisplayMessage:
 .DONE:
     ret
 	
+	
+;testDisplayMessage:
+;    mov esi,  _fred_string3
+;	call DisplayMessage
+;    ret 
+;_fred_string3: db 'xxx Running fasm on Gramado 0.4', 0Dh, 0Ah,0	
+
 	
 ;------------------------------------------------------------------
 ; print_spaces:

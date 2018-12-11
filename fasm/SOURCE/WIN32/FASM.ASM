@@ -20,33 +20,71 @@
 ; Copyright (c) 1999-2018, Tomasz Grysztar.
 ; All rights reserved.
 
-	format	PE console
+
+	format PE console	
+		
+	;; #bugbug 
+	;; no código start está começando em 0x400 .
+	;; mas o assembler cria o símbolo start em 0x1000, que é o alinhamento padrão para PE.
 
 section '.text' code readable executable
 
 start:
 
-    jmp after_my_awewsome_lib
+    jmp after_my_awewsome_strings
 
-	include "c:\gramado\lib\asm\asm.inc"
+_fred_string2: db 'Running fasm on Gramado 0.4', 0Dh, 0Ah,0
 	
-after_my_awewsome_lib:
+	;include "c:\gramado\lib\asm\asm.inc"
+	
+after_my_awewsome_strings:
 
    	xor eax, eax
 	mov al, 0xfA
     call print_hex 
 
+	mov al, 4
+	call print_spaces
+	
    	xor eax, eax
 	mov al, 0xed
     call print_hex 
 
+	mov al, 4
+	call print_spaces
 	
-    mov esi, fred_string1
+	mov al, 'F'
+	call putchar
+
+	mov al, 'R'
+	call putchar
+
+	mov al, 'E'
+	call putchar
+
+	mov al, 'D'
+	call putchar
+	
+	mov al, 4
+	call print_spaces
+	
+	;; #importante
+	;; Isso funciona. É o começo do arquivo. MZ.
+    mov esi, 0x400000 
     call DisplayMessage	
-
+	
+	;; #importante
+	;;esse endereço aparentemente está certo.
+	mov eax, _fred_string2
+	sub eax, 0xc00
+    mov esi, eax
+    call DisplayMessage	
+	
+	;;mov esi, _fred_string2
+    ;;call DisplayMessage	
+	
     jmp $
-
-
+	
 	mov	[con_handle],STD_OUTPUT_HANDLE
 	mov	esi,_logo
 	call	display_string
@@ -376,13 +414,20 @@ include '..\avx.inc'
 include '..\tables.inc'
 include '..\messages.inc'
 
+
+include 'c:\gramado\lib\asm\asm.inc'
+
+
+
 section '.data' data readable writeable
 
 include '..\version.inc'
 
 _copyright db 'Copyright (c) 1999-2018, Tomasz Grysztar',0Dh,0Ah,0
 
-fred_string1 db "running fasm on gramado 0.4", 13, 10, 0
+ 
+
+_fred_string db 'Running fasm on Gramado 0.4', 0Dh, 0Ah,0
 
 _logo db 'flat assembler  version ',VERSION_STRING,0
 _usage db 0Dh,0Ah
