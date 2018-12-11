@@ -26,6 +26,8 @@
 	;; #bugbug 
 	;; no código start está começando em 0x400 .
 	;; mas o assembler cria o símbolo start em 0x1000, que é o alinhamento padrão para PE.
+	
+    ;COMO A COMPILAÇÃO ATRAVÉS DA GUI TÁ DANDO PROBLEMA, PODEMOS TENTAR COMPILAR COM LINHA DE COMANDOS O 'FASM'	
 
 section '.text' code readable executable
 
@@ -75,13 +77,13 @@ after_my_awewsome_strings:
 	
 	;; #importante
 	;;esse endereço aparentemente está certo.
-	mov eax, _fred_string2
-	sub eax, 0xc00
-    mov esi, eax
-    call DisplayMessage	
+	;mov eax, _fred_string2
+	;sub eax, 0xc00
+    ;mov esi, eax
+    ;call DisplayMessage	
 	
-	;;mov esi, _fred_string2
-    ;;call DisplayMessage	
+	mov esi, _fred_string2
+    call DisplayMessage	
 	
     jmp $
 	
