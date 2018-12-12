@@ -67,7 +67,8 @@ init_memory:
 	
 	mov	eax, esp
 	
-	;;#bugbug suspendendo.
+	;;#bugbug 
+	;;suspendendo.
 	;;and	eax, not 0FFFh
 	;;add	eax, 1000h-10000h   
 	
@@ -87,6 +88,8 @@ init_memory:
 	shl	eax, 10
 	jnz	allocate_memory
 	
+	
+	
 	;; #importante:
 	;; 'buffer' Isso é um ponteiro para uma estrutura
 	;; onde o sistema deve colocar informações sobre memória.
@@ -100,9 +103,10 @@ init_memory:
     ;SIZE_T dwTotalVirtual;
     ;SIZE_T dwAvailVirtual;	
 	
-	push	buffer 
+	;;#IMPORTANTE: CANCELAMOS A CHAMADA QUE DÁ INFORMAÇÕES SOBRE A MEMÓRIA
+	;push	buffer 
 	;call	[GlobalMemoryStatus]
-	call gramado_GlobalMemoryStatus
+	;call gramado_GlobalMemoryStatus
 	
 	mov	eax, dword [buffer+20]
 	mov	edx, dword [buffer+12]
@@ -135,6 +139,12 @@ large_memory:
 ;;alocar memória	
 ;; o valor está em eax
 allocate_memory:
+
+	;;#debug
+	;mov esi, gramado_string_breakpoint
+	;call DisplayMessage			
+	;;#debug 
+	;jmp $	
 	
 	mov	edx, eax
 	shr	edx, 2
@@ -148,15 +158,19 @@ allocate_memory:
 	;; # alocar memória #
 	;;
 	
+	;;#BUGBUG VAMOS CANCELAR ESSSA CHAMADA POR ENQUANTO E DETERMINAR UM ENDEREÇO.
+	mov eax, BUFFER1
+	;mov eax, BUFFER2
+	
 	;; Chamando o Windows para alocar memória.
 	
-	push PAGE_READWRITE
-	push MEM_COMMIT
-	push eax
-	push 0
+	;push PAGE_READWRITE
+	;push MEM_COMMIT
+	;push eax
+	;push 0
 	
 	;call [VirtualAlloc]
-	call gramado_VirtualAlloc
+	;call gramado_VirtualAlloc
 	
 	;; se der problemas, então não temos a memória que precisamos 
 	;; vamos tentar de outro jeito, se não der certo, abortaremos. 
@@ -173,8 +187,11 @@ allocate_memory:
 	;;o valor do fim não foi inicializado ainda, porque estamos usando.
 	;;e usando desse jeito estranho.
 	
+	;;#BUGBUG 
+	;;ESTAMOS DETERMINANDO O TAMANHO DA MEMÓRIA. 
+	
 	mov	[memory_start], eax
-	add	eax, [memory_end]
+	add	eax, 4096  ;;[memory_end]   ;;4kb
 	mov	[memory_end], eax
 	
 	;;configurando memória adicional.

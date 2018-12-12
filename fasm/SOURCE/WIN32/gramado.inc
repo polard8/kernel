@@ -42,13 +42,21 @@
 ;;alocando memoria virtual.
 ;;Reserves, commits, or changes the state of a region of pages 
 ;;in the virtual address space of the calling process. 
-;;Memory allocated by this function is automatically initialized to zero.	
+;;Memory allocated by this function is automatically initialized to zero.
+;If the function succeeds, the return value is the base address of the allocated region of pages.	
 ;; LPVOID lpAddress,
 ;; SIZE_T dwSize,
 ;; DWORD  flAllocationType,
 ;; DWORD  flProtect	
 gramado_VirtualAlloc:
-
+    
+	;;#todo: args
+	pop eax
+	pop eax
+	pop eax
+	pop eax
+	
+	mov eax, BUFFER1
     ret 
 		 
     gramado_VirtualFree:
@@ -77,13 +85,13 @@ gramado_GlobalMemoryStatus:
 	;;vamos usar ebp para manipular o buffer.
 	mov ebp, eax	
 	
-	mov [ebp +0],0
-	mov [ebp +4],0
-	mov [ebp +8],0
-	mov [ebp +12],0
-	mov [ebp +16],0
-	mov [ebp +20],0
-	mov [ebp +24],0
+	mov dword [ebp +0],0
+	mov dword [ebp +4],0
+	mov dword [ebp +8],0
+	mov dword [ebp +12],0
+	mov dword [ebp +16],0
+	mov dword [ebp +20],0
+	mov dword [ebp +24],0
 	ret	
  
 

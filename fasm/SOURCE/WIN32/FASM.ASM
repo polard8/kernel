@@ -116,8 +116,8 @@ after_my_awesome_stuff:
     ;;temos que chamar uma rotina quye inicialize a memória 
     ;;são vários elementos.	
 	
-	;call	init_memory
-    call gramado_init_memory_fake
+	
+	;;#TEST  ... ESTAMOS TENTANDO INICIALIZAR A MEMÓRIA.
 	
 	
 	;;
@@ -127,7 +127,11 @@ after_my_awesome_stuff:
 	mov dword [memory_start], BUFFER1
 	mov dword [memory_end],  BUFFER1_END
 	mov dword [additional_memory], BUFFER2
-	mov dword [additional_memory_end], BUFFER2_END
+	mov dword [additional_memory_end], BUFFER2_END	
+	
+	;call gramado_init_memory_fake
+	call init_memory
+    
 	
 	;mov	esi,_memory_prefix
 	;call	display_string
