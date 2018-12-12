@@ -124,6 +124,10 @@ echo -{ ...
 	rem copy c:\gramado\bin\GRAMCC.BIN    F:\
 	copy c:\gramado\bin\GRAMC.BIN    F:\
 	
+	
+	rem test
+	copy c:\gramado\bin\GRAMAC.BIN    F:\
+	
 	copy c:\gramado\bin\GRAMCODE.BIN   F:\
 	
 	copy c:\gramado\bin\FCLASS.BIN    F:\

@@ -150,23 +150,6 @@ decorator_symbols_allowed db ?
 free_address_range db ?
 
 
-
-
-
-;;================================================
-;; characters
-;;
-
 characters rb 100h
-
-;;================================================
-;; converted
-;;
-
 converted rb 100h
-
-;;================================================
-;; message
-;;
-
 message rb 200h

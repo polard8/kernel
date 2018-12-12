@@ -3,83 +3,36 @@
 ; Copyright (c) 1999-2018, Tomasz Grysztar.
 ; All rights reserved.
 
-
-
-;;===============================================================
-;;
-;; ## PARSER ##
-;;
-
-;parser_interface:
-;	mov esi, gramado_string_parser_init
-;	call DisplayMessage
-	
-;	call parser
-	
-;	mov esi, gramado_string_parser_done
-;	call DisplayMessage
-;	ret
-
 parser:
-
-	;label list fica no fim da memória.
-	mov	eax, [memory_end]
-	mov	[labels_list], eax
-	
-	;;#bugbug
-	;;se a memória adicional estiver configurada corretamente, 
-	;;configuraremos a free addictional memory 
-	
-	mov	eax, [additional_memory]
-	mov	[free_additional_memory], eax
-	
-	
-	;; buffer comum.
-	;; Aditional memory servirá para outroas coisas.
-	
-	
-	xor	eax, eax
-	mov	[current_locals_prefix], eax
-	mov	[anonymous_reverse], eax
-	mov	[anonymous_forward], eax
-	mov	[hash_tree], eax
-	mov	[blocks_stack], eax
-	mov	[parsed_lines], eax
-	
-	;; #IMPORTANTE
-	;; A origem é o início da memória 
-	;; e o destino é o início do código.
-	;; ??
-	
-	mov	esi, [memory_start]
-	mov	edi, [source_start]   ;; #importante: Isso é definido pelo preprocessador.
-	
-	
-parser_loop:
-	
-	;; a origem 
-	mov	[current_line], esi
-	lea	eax, [edi+100h]
-	
-	cmp	eax, [labels_list]
+	mov	eax,[memory_end]
+	mov	[labels_list],eax
+	mov	eax,[additional_memory]
+	mov	[free_additional_memory],eax
+	xor	eax,eax
+	mov	[current_locals_prefix],eax
+	mov	[anonymous_reverse],eax
+	mov	[anonymous_forward],eax
+	mov	[hash_tree],eax
+	mov	[blocks_stack],eax
+	mov	[parsed_lines],eax
+	mov	esi,[memory_start]
+	mov	edi,[source_start]
+      parser_loop:
+	mov	[current_line],esi
+	lea	eax,[edi+100h]
+	cmp	eax,[labels_list]
 	jae	out_of_memory
-	
 	cmp	byte [esi+16],0
 	je	empty_line
-	
 	cmp	byte [esi+16],3Bh
 	je	empty_line
-	
 	mov	al,0Fh
 	stos	byte [edi]
-	
 	mov	eax,esi
 	stos	dword [edi]
-	
 	inc	[parsed_lines]
 	add	esi,16
-	
-parse_line:
+      parse_line:
 	mov	[formatter_symbols_allowed],0
 	mov	[decorator_symbols_allowed],0
 	cmp	byte [esi],1Ah
@@ -101,8 +54,7 @@ parse_line:
 	call	get_data_directive
 	jnc	data_label
 	pop	ecx esi
-	
-no_data_label:
+      no_data_label:
 	call	get_data_directive
 	jnc	main_instruction_identified
 	pop	edi
@@ -110,8 +62,7 @@ no_data_label:
 	xor	bx,bx
 	call	parse_line_contents
 	jmp	parse_next_line
-	
-simple_label:
+      simple_label:
 	pop	edi
 	call	identify_label
 	cmp	byte [esi+1],':'
@@ -129,8 +80,7 @@ simple_label:
 	stos	dword [edi]
 	add	esi,2
 	jmp	parse_line
-	
-constant_label:
+      constant_label:
 	pop	edi
 	call	get_label_id
 	mov	byte [edi],3
@@ -142,8 +92,7 @@ constant_label:
 	xor	bx,bx
 	call	parse_line_contents
 	jmp	parse_next_line
-	
-data_label:
+      data_label:
 	pop	ecx edx
 	pop	edi
 	push	eax ebx esi
@@ -156,8 +105,7 @@ data_label:
 	pop	esi ebx eax
 	stos	byte [edi]
 	push	edi
-	
-main_instruction_identified:
+      main_instruction_identified:
 	pop	edi
 	mov	dl,al
 	mov	al,1
@@ -181,8 +129,7 @@ main_instruction_identified:
       common_parse:
 	call	parse_line_contents
 	jmp	parse_next_line
-	
-empty_instruction:
+      empty_instruction:
 	lods	byte [esi]
 	or	al,al
 	jz	parse_next_line
@@ -192,33 +139,27 @@ empty_instruction:
 	mov	[parenthesis_stack],0
 	call	parse_argument
 	jmp	parse_next_line
-	
-empty_line:
+      empty_line:
 	add	esi,16
-	
-skip_rest_of_line:
+      skip_rest_of_line:
 	call	skip_foreign_line
-	
-parse_next_line:
+      parse_next_line:
 	cmp	esi,[source_start]
 	jb	parser_loop
-	
-source_parsed:
+      source_parsed:
 	cmp	[blocks_stack],0
 	je	blocks_stack_ok
 	pop	eax
 	pop	[current_line]
 	jmp	missing_end_directive
-	
-blocks_stack_ok:
+      blocks_stack_ok:
 	xor	al,al
 	stos	byte [edi]
 	add	edi,0Fh
 	and	edi,not 0Fh
 	mov	[code_start],edi
 	ret
-	
-parse_block:
+      parse_block:
 	mov	eax,esp
 	sub	eax,[stack_limit]
 	cmp	eax,100h
@@ -234,8 +175,7 @@ parse_block:
 	je	parse_while
 	call	parse_line_contents
 	jmp	parse_next_line
-	
-parse_end_directive:
+      parse_end_directive:
 	cmp	byte [esi],1Ah
 	jne	common_parse
 	push	edi
@@ -247,8 +187,7 @@ parse_end_directive:
 	jnc	parse_end_block
 	sub	esi,2
 	jmp	common_parse
-	
-parse_end_block:
+      parse_end_block:
 	mov	dl,al
 	mov	al,1
 	stos	byte [edi]
@@ -296,8 +235,7 @@ parse_end_block:
 	je	parse_true_condition_block
 	or	byte [esp],10000b
 	jmp	parse_next_line
-	
-parse_while:
+      parse_while:
 	push	edi
 	call	parse_line_contents
 	xor	al,al
@@ -320,8 +258,7 @@ parse_while:
 	or	byte [esp],100b
 	sub	edi,4
 	jmp	parse_next_line
-	
-parse_else:
+      parse_else:
 	cmp	[blocks_stack],0
 	je	unexpected_instruction
 	cmp	word [esp+2],if_directive-instruction_handler
@@ -349,8 +286,7 @@ parse_else:
 	mov	al,dl
 	stos	byte [edi]
 	jmp	parse_if
-	
-parse_assert:
+      parse_assert:
 	push	edi
 	call	parse_line_contents
 	xor	al,al
@@ -367,8 +303,7 @@ parse_assert:
 	sub	edi,4
 	or	byte [esp],1
 	jmp	skip_parsing_contents
-	
-parse_pure_else:
+      parse_pure_else:
 	bts	dword [esp],1
 	jc	unexpected_instruction
 	test	byte [esp],100b
@@ -376,14 +311,12 @@ parse_pure_else:
 	sub	edi,4
 	or	byte [esp],1
 	jmp	skip_parsing
-	
-skip_parsing:
+      skip_parsing:
 	cmp	esi,[source_start]
 	jae	source_parsed
 	mov	[current_line],esi
 	add	esi,16
-	
-skip_parsing_line:
+      skip_parsing_line:
 	cmp	byte [esi],1Ah
 	jne	skip_parsing_contents
 	inc	esi
@@ -397,12 +330,10 @@ skip_parsing_line:
 	jnc	skip_parsing_instruction
 	add	esi,ecx
 	jmp	skip_parsing_contents
-	
-skip_parsing_label:
+      skip_parsing_label:
 	lea	esi,[esi+ecx+1]
 	jmp	skip_parsing_line
-	
-skip_parsing_instruction:
+      skip_parsing_instruction:
 	cmp	bx,if_directive-instruction_handler
 	je	skip_parsing_block
 	cmp	bx,repeat_directive-instruction_handler
@@ -413,8 +344,7 @@ skip_parsing_instruction:
 	je	skip_parsing_end_directive
 	cmp	bx,else_directive-instruction_handler
 	je	skip_parsing_else
-	
-skip_parsing_contents:
+      skip_parsing_contents:
 	lods	byte [esi]
 	or	al,al
 	jz	skip_parsing
@@ -425,8 +355,7 @@ skip_parsing_contents:
 	cmp	al,22h
 	je	skip_parsing_string
 	jmp	skip_parsing_contents
-	
-skip_parsing_symbol:
+      skip_parsing_symbol:
 	lods	byte [esi]
 	movzx	eax,al
 	add	esi,eax
@@ -435,8 +364,7 @@ skip_parsing_symbol:
 	lods	dword [esi]
 	add	esi,eax
 	jmp	skip_parsing_contents
-	
-skip_parsing_block:
+      skip_parsing_block:
 	mov	eax,esp
 	sub	eax,[stack_limit]
 	cmp	eax,100h
@@ -447,8 +375,7 @@ skip_parsing_block:
 	push	eax
 	inc	[blocks_stack]
 	jmp	skip_parsing_contents
-	
-skip_parsing_end_directive:
+      skip_parsing_end_directive:
 	cmp	byte [esi],1Ah
 	jne	skip_parsing_contents
 	push	edi
@@ -460,8 +387,7 @@ skip_parsing_end_directive:
 	jnc	skip_parsing_end_block
 	add	esi,ecx
 	jmp	skip_parsing_contents
-	
-skip_parsing_end_block:
+      skip_parsing_end_block:
 	lods	byte [esi]
 	or	al,al
 	jnz	extra_characters_on_line
@@ -472,8 +398,7 @@ skip_parsing_end_block:
 	cmp	bx,while_directive-instruction_handler
 	je	close_skip_parsing_block
 	jmp	skip_parsing
-	
-close_skip_parsing_block:
+      close_skip_parsing_block:
 	cmp	[blocks_stack],0
 	je	unexpected_instruction
 	cmp	bx,[esp+2]
@@ -496,8 +421,7 @@ close_skip_parsing_block:
 	mov	eax,1 + (if_directive-instruction_handler) shl 8
 	stos	dword [edi]
 	jmp	parse_next_line
-	
-skip_parsing_else:
+      skip_parsing_else:
 	cmp	[blocks_stack],0
 	je	unexpected_instruction
 	cmp	word [esp+2],if_directive-instruction_handler
@@ -529,13 +453,11 @@ skip_parsing_else:
 	mov	eax,[current_line]
 	stos	dword [edi]
 	inc	[parsed_lines]
-	
-parse_else_if:
+      parse_else_if:
 	mov	eax,1 + (if_directive-instruction_handler) shl 8
 	stos	dword [edi]
 	jmp	parse_if
-	
-skip_parsing_pure_else:
+      skip_parsing_pure_else:
 	bts	dword [esp],1
 	jc	unexpected_instruction
 	mov	al,[esp]
@@ -550,8 +472,7 @@ skip_parsing_pure_else:
 
 parse_line_contents:
 	mov	[parenthesis_stack],0
-	
-parse_instruction_arguments:
+      parse_instruction_arguments:
 	cmp	bx,prefix_instruction-instruction_handler
 	je	allow_embedded_instruction
 	cmp	bx,times_directive-instruction_handler
@@ -575,11 +496,9 @@ parse_instruction_arguments:
 	cmp	bx,data_directive-instruction_handler
 	je	parse_formatter_argument
 	jmp	parse_argument
-	
-parse_formatter_argument:
+      parse_formatter_argument:
 	or	[formatter_symbols_allowed],-1
-	
-parse_argument:
+      parse_argument:
 	lea	eax,[edi+100h]
 	cmp	eax,[labels_list]
 	jae	out_of_memory
@@ -643,18 +562,15 @@ parse_argument:
 	pop	edi
 	movs	byte [edi],[esi]
 	jmp	argument_parsed
-	
-foreign_argument:
+      foreign_argument:
 	dec	esi
 	call	skip_foreign_line
 	jmp	contents_parsed
-	
-symbol_argument:
+      symbol_argument:
 	pop	edi
 	stos	word [edi]
 	jmp	argument_parsed
-	
-operator_argument:
+      operator_argument:
 	pop	edi
 	cmp	al,85h
 	je	ptr_argument
@@ -672,11 +588,9 @@ operator_argument:
 	cmp	al,0F8h
 	je	forced_expression
 	jmp	argument_parsed
-	
-instruction_separator:
+      instruction_separator:
 	stos	byte [edi]
-	
-allow_embedded_instruction:
+      allow_embedded_instruction:
 	cmp	byte [esi],1Ah
 	jne	parse_argument
 	push	edi
@@ -690,8 +604,7 @@ allow_embedded_instruction:
 	pop	edi
 	sub	esi,2
 	jmp	parse_argument
-	
-embedded_instruction:
+      embedded_instruction:
 	pop	edi
 	mov	dl,al
 	mov	al,1
@@ -701,8 +614,7 @@ embedded_instruction:
 	mov	al,dl
 	stos	byte [edi]
 	jmp	parse_instruction_arguments
-	
-parse_times_directive:
+      parse_times_directive:
 	mov	al,'('
 	stos	byte [edi]
 	call	convert_expression
@@ -1061,11 +973,9 @@ parse_times_directive:
 	dec	[parenthesis_stack]
 	add	esp,8
 	jmp	contents_parsed
-contents_ok:
+      contents_ok:
 	ret
 
-	
-	
 identify_label:
 	cmp	byte [esi],'.'
 	je	local_label_name

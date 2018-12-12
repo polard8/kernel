@@ -153,8 +153,8 @@ display_string:
       string_displayed:
 	ret
 display_character:
-	mov	[character],dl
-	ccall	libc_write,[con_handle],character,1
+	mov	[character], dl
+	ccall libc_write, [con_handle], character, 1
 	ret
 display_number:
 	push	ebx

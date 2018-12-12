@@ -3,50 +3,28 @@
 ; Copyright (c) 1999-2018, Tomasz Grysztar.
 ; All rights reserved.
 
-
-
-;;
-;; out of memory
-;;
-
 out_of_memory:
-
-	;;#debug
-	mov esi, gramado_string_out_of_memory
-	call DisplayMessage	
-
-    ;#suspenso. ??
-	;push _out_of_memory
+	push	_out_of_memory
 	jmp	fatal_error
-	
-	
-	
 stack_overflow:
-	;push	_stack_overflow
+	push	_stack_overflow
 	jmp	fatal_error
-	
-	
 main_file_not_found:
-	;push	_main_file_not_found
+	push	_main_file_not_found
 	jmp	fatal_error
-	
-	
 write_failed:
-	;push	_write_failed
+	push	_write_failed
 	jmp	fatal_error
 
 unexpected_end_of_file:
-	;push	_unexpected_end_of_file
+	push	_unexpected_end_of_file
 	jmp	general_error
-	
 code_cannot_be_generated:
-	;push	_code_cannot_be_generated
+	push	_code_cannot_be_generated
 	jmp	general_error
-	
 format_limitations_exceeded:
-	;push	_format_limitations_exceeded
+	push	_format_limitations_exceeded
 	jmp	general_error
-	
 invalid_definition:
 	push	_invalid_definition
     general_error:
@@ -56,92 +34,68 @@ invalid_definition:
 	jmp	fatal_error
 
 file_not_found:
-	;push	_file_not_found
+	push	_file_not_found
 	jmp	error_with_source
-	
 error_reading_file:
-	;push	_error_reading_file
+	push	_error_reading_file
 	jmp	error_with_source
-	
 invalid_file_format:
-	;push	_invalid_file_format
+	push	_invalid_file_format
 	jmp	error_with_source
-	
 invalid_macro_arguments:
-	;push	_invalid_macro_arguments
+	push	_invalid_macro_arguments
 	jmp	error_with_source
-	
 incomplete_macro:
-	;push	_incomplete_macro
+	push	_incomplete_macro
 	jmp	error_with_source
-	
 unexpected_characters:
-	;push	_unexpected_characters
+	push	_unexpected_characters
 	jmp	error_with_source
-	
 invalid_argument:
-	;push	_invalid_argument
+	push	_invalid_argument
 	jmp	error_with_source
-	
 illegal_instruction:
-	;push	_illegal_instruction
+	push	_illegal_instruction
 	jmp	error_with_source
-	
 invalid_operand:
-	;push	_invalid_operand
+	push	_invalid_operand
 	jmp	error_with_source
-	
 invalid_operand_size:
-	;push	_invalid_operand_size
+	push	_invalid_operand_size
 	jmp	error_with_source
-	
 operand_size_not_specified:
-	;push	_operand_size_not_specified
+	push	_operand_size_not_specified
 	jmp	error_with_source
-	
 operand_sizes_do_not_match:
-	;push	_operand_sizes_do_not_match
+	push	_operand_sizes_do_not_match
 	jmp	error_with_source
-	
 invalid_address_size:
-	;push	_invalid_address_size
+	push	_invalid_address_size
 	jmp	error_with_source
-	
 address_sizes_do_not_agree:
-	;push	_address_sizes_do_not_agree
+	push	_address_sizes_do_not_agree
 	jmp	error_with_source
-	
 disallowed_combination_of_registers:
-	;push	_disallowed_combination_of_registers
+	push	_disallowed_combination_of_registers
 	jmp	error_with_source
-	
 long_immediate_not_encodable:
-	;push	_long_immediate_not_encodable
+	push	_long_immediate_not_encodable
 	jmp	error_with_source
-	
 relative_jump_out_of_range:
-	;push	_relative_jump_out_of_range
+	push	_relative_jump_out_of_range
 	jmp	error_with_source
-	
 invalid_expression:
-	;push	_invalid_expression
+	push	_invalid_expression
 	jmp	error_with_source
-	
 invalid_address:
-	;push	_invalid_address
+	push	_invalid_address
 	jmp	error_with_source
-	
 invalid_value:
-	;push	_invalid_value
+	push	_invalid_value
 	jmp	error_with_source
-	
 value_out_of_range:
-	;push	_value_out_of_range
+	push	_value_out_of_range
 	jmp	error_with_source
-	
-	
-	
-	
 undefined_symbol:
 	mov	edi,message
 	mov	esi,_undefined_symbol
@@ -230,15 +184,11 @@ too_many_repeats:
 assertion_failed:
 	push	_assertion_failed
 	jmp	error_with_source
-	
 invoked_error:
 	push	_invoked_error
-error_with_source:
-
-    mov esi, gramado_string_error_with_source
-	call DisplayMessage 
-	;cmp	[symbols_file],0
-	;je	assembler_error
-	;call	dump_preprocessed_source
-	;call	restore_preprocessed_source
+    error_with_source:
+	cmp	[symbols_file],0
+	je	assembler_error
+	call	dump_preprocessed_source
+	call	restore_preprocessed_source
 	jmp	assembler_error

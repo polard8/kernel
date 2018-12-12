@@ -3,166 +3,38 @@
 ; Copyright (c) 1999-2018, Tomasz Grysztar.
 ; All rights reserved.
 
-
-
-
-;;===============================================================
-;;
-;; ## preprocessor ##
-;;
-
-;preprocessor_interface:
-;	mov esi, gramado_string_preprocessor_init
-;	call DisplayMessage
-	
-;	call preprocessor
-	
-;	mov esi, gramado_string_preprocessor_done
-;	call DisplayMessage
-;	ret
-	
-	
-	
-
 preprocessor:
-
-    ;;
-	;; Vamos contruir uma tabela.
-	;; Ela ficará em 'characteres:'
-	;; 
-	
-	;;#debug
-	;pushad
-	;mov esi, gramado_string_preprocessor_characteres
-	;call DisplayMessage	
-    ;popad 
-	
-    ;em VARIABLE.INC
-	mov	edi, characters
-	
-	
-	;;Começando do 0, vamos incrementar os caracteres
-	;;e colocá-los na tabela.
-	
-	xor	al, al
-make_characters_table:
+	mov	edi,characters
+	xor	al,al
+      make_characters_table:
 	stosb
 	inc	al
 	jnz	make_characters_table
-	
-	;; Movimentando dados dentro da tabela. 
-	
-	mov	esi, characters+'a'
-	mov	edi, characters+'A'
-	mov	ecx, 26
+	mov	esi,characters+'a'
+	mov	edi,characters+'A'
+	mov	ecx,26
 	rep	movsb
-	
-	
-	;Movendo dados para dentro da tabela.
-	;'symbol_characters:' é uma tabela que está em TABLES.INC.
-	
-	mov	edi, characters
-	mov	esi, symbol_characters+1
-	movzx ecx, byte [esi-1]
-	
-    ;;movendo mais coisas para a tabela que estamos construindo.	
-	
-	xor	eax, eax
-mark_symbol_characters:
+	mov	edi,characters
+	mov	esi,symbol_characters+1
+	movzx	ecx,byte [esi-1]
+	xor	eax,eax
+      mark_symbol_characters:
 	lodsb
 	mov	byte [edi+eax],0
 	loop	mark_symbol_characters
-	
-	
-	;;#debug
-	;pushad
-	;mov esi, gramado_string_preprocessor_locals_counter
-	;call DisplayMessage		
-	;popad 
-	
-	;;
-	;; destino:  locals_counter
-	;; Movendo alguma coisa pra esse destino.
-	;; 
-	
-	mov	edi, locals_counter
+	mov	edi,locals_counter
 	mov	ax,1 + '0' shl 8
 	stos	word [edi]
-	
-	
-	;;
-	;; ===============================
-	;; ## variáveis de ambiente ##
-	;;	
-	
-	;;#debug
-	pushad
-	mov esi, gramado_string_preprocessor_environment_variable_support
-	call DisplayMessage			
-	popad 
-	
-	;;#debug 
-	;jmp $
-
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $		
-	
-	
-	;; destino: [include_paths]
-	
-	mov	edi, [memory_start]
-	mov	[include_paths], edi
-	
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $		
-	
-	;;obs: include_variable é só uma string.
-	;;obs: get_environment_variable está em SYSTEM.INC
-	
-	mov	esi, include_variable
-	call get_environment_variable
-	
-	
-	;;=============== ??
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $	
-	
-	;;??
-	;;manda alguma coisinha para algum lugar.
-	;;#bugbug ?? page fault.
-	
-	xor	al, al
-	stos byte [edi]
-	
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $		
-	
-	;; Atualizando o 'memory start'.
-	
-	mov	[memory_start], edi
-	
-	;;atualizando a memória adicional.
-	
-	mov	eax, [additional_memory]
-	mov	[free_additional_memory], eax
-	mov	eax, [additional_memory_end]
-	
+	mov	edi,[memory_start]
+	mov	[include_paths],edi
+	mov	esi,include_variable
+	call	get_environment_variable
+	xor	al,al
+	stos	byte [edi]
+	mov	[memory_start],edi
+	mov	eax,[additional_memory]
+	mov	[free_additional_memory],eax
+	mov	eax,[additional_memory_end]
 	mov	[labels_list],eax
 	xor	eax,eax
 	mov	[source_start],eax
@@ -174,33 +46,10 @@ mark_symbol_characters:
 	mov	esi,[initial_definitions]
 	test	esi,esi
 	jz	predefinitions_ok
-	
-	
-	;;aqui teremos que tratar as predefinições.
-	
-	;;#bugbug 
-	;;#importante
-	;;COMO TEMOS ALGUM PROBLEMA EM TRATARMOS AS PREDEFINIÇÕES NO MOMENTO
-	;;ENTÃO VAMOS SUSPENDER ISSO E ESTABELECERMOS QUE NÃO HÁ PREDEFINIÇÕES.
-	
-	;;#BUGBUG  (############# IMPORTANTE ##########)
-	;;#ESSE CÓDIGO FOI ACRESCENTADO.
-	JMP predefinitions_ok
-	
-	;;#debug
-	mov esi, gramado_string_breakpoint
-	call DisplayMessage			
-	;;#debug 
-	jmp $		
-	
-process_predefinitions:
-
-
-	movzx	ecx, byte [esi]
-	
+      process_predefinitions:
+	movzx	ecx,byte [esi]
 	test	ecx,ecx
 	jz	predefinitions_ok
-	
 	inc	esi
 	lea	eax,[esi+ecx]
 	push	eax
@@ -209,9 +58,8 @@ process_predefinitions:
 	pop	esi
 	mov	edi,[memory_start]
 	mov	[edx+8],edi
-	
-convert_predefinition:
-	cmp	edi, [memory_end]
+      convert_predefinition:
+	cmp	edi,[memory_end]
 	jae	out_of_memory
 	lods	byte [esi]
 	or	al,al
@@ -232,8 +80,8 @@ convert_predefinition:
 	xchg	al,ah
 	stos	byte [edi]
 	mov	ebx,characters
-	xor	ecx, ecx
-predefinition_symbol:
+	xor	ecx,ecx
+      predefinition_symbol:
 	lods	byte [esi]
 	stos	byte [edi]
 	xlat	byte [ebx]
@@ -245,10 +93,10 @@ predefinition_symbol:
 	mov	ebx,edi
 	sub	ebx,ecx
 	mov	byte [ebx-2],cl
-found_predefinition_separator:
+      found_predefinition_separator:
 	dec	edi
 	mov	ah,[esi-1]
-predefinition_separator:
+      predefinition_separator:
 	xchg	al,ah
 	or	al,al
 	jz	predefinition_converted
@@ -260,13 +108,12 @@ predefinition_separator:
 	je	predefinition_backslash
 	stos	byte [edi]
 	jmp	convert_predefinition
-	
-predefinition_string:
+      predefinition_string:
 	mov	al,22h
 	stos	byte [edi]
 	scas	dword [edi]
 	mov	ebx,edi
-copy_predefinition_string:
+      copy_predefinition_string:
 	lods	byte [esi]
 	stos	byte [edi]
 	or	al,al
@@ -282,8 +129,7 @@ copy_predefinition_string:
 	sub	eax,ebx
 	mov	[ebx-4],eax
 	jmp	convert_predefinition
-	
-predefinition_backslash:
+      predefinition_backslash:
 	mov	byte [edi],0
 	lods	byte [esi]
 	or	al,al
@@ -298,14 +144,14 @@ predefinition_backslash:
 	mov	ax,5C01h
 	stos	word [edi]
 	dec	esi
-group_predefinition_backslashes:
+      group_predefinition_backslashes:
 	lods	byte [esi]
 	cmp	al,5Ch
 	jne	predefinition_backslashed_symbol
 	stos	byte [edi]
 	inc	byte [ecx]
 	jmp	group_predefinition_backslashes
-predefinition_backslashed_symbol:
+      predefinition_backslashed_symbol:
 	cmp	al,20h
 	je	invalid_definition
 	cmp	al,22h
@@ -320,7 +166,7 @@ predefinition_backslashed_symbol:
 	or	al,al
 	jz	predefinition_backslashed_symbol_character
 	mov	al,ah
-convert_predefinition_backslashed_symbol:
+      convert_predefinition_backslashed_symbol:
 	stos	byte [edi]
 	xlat	byte [ebx]
 	or	al,al
@@ -329,93 +175,50 @@ convert_predefinition_backslashed_symbol:
 	jz	invalid_definition
 	lods	byte [esi]
 	jmp	convert_predefinition_backslashed_symbol
-predefinition_backslashed_symbol_character:
+      predefinition_backslashed_symbol_character:
 	mov	al,ah
 	stos	byte [edi]
 	inc	byte [ecx]
 	jmp	convert_predefinition
-predefinition_converted:
+      predefinition_converted:
 	mov	[memory_start],edi
 	sub	edi,[edx+8]
 	mov	[edx+12],edi
 	jmp	process_predefinitions
-	
-	
-predefinitions_ok:
-	
-	;;
-	;; open found
-	;;
-	
-	;;#bugbug
-	;;como não temos essa função ainda, então aqui precisa de um hang.
-	
-    mov esi, gramado_string_preprocessor_openfound
-	call DisplayMessage 
-	
-	;;#debug
-	;jmp $	
-	
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $	
-	
-	
+      predefinitions_ok:
 	mov	esi,[input_file]
 	mov	edx,esi
 	call	open
 	jc	main_file_not_found
-	
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $		
-	
-	mov	edi, [memory_start]
+	mov	edi,[memory_start]
 	call	preprocess_file
-	
-	;;#debug
-	;mov esi, gramado_string_breakpoint
-	;call DisplayMessage			
-	;;#debug 
-	;jmp $		
-	
 	cmp	[macro_status],0
 	je	process_postponed
-	
 	mov	eax,[error_line]
 	mov	[current_line],eax
 	jmp	incomplete_macro
-	
-process_postponed:
+      process_postponed:
 	mov	edx,hash_tree
 	mov	ecx,32
-find_postponed_list:
+      find_postponed_list:
 	mov	edx,[edx]
 	or	edx,edx
 	loopnz	find_postponed_list
 	jz	preprocessing_finished
-
-process_postponed_list:
+      process_postponed_list:
 	mov	eax,[edx]
 	or	eax,eax
 	jz	preprocessing_finished
 	push	edx
 	mov	ebx,edx
-find_earliest_postponed:
+      find_earliest_postponed:
 	mov	eax,[edx]
 	or	eax,eax
 	jz	earliest_postponed_found
 	mov	ebx,edx
 	mov	edx,eax
 	jmp	find_earliest_postponed
-	
-earliest_postponed_found:
+      earliest_postponed_found:
 	mov	[ebx],eax
 	call	use_postponed_macro
 	pop	edx
@@ -424,18 +227,10 @@ earliest_postponed_found:
 	mov	eax,[error_line]
 	mov	[current_line],eax
 	jmp	incomplete_macro
-	
-preprocessing_finished:
-	mov	[source_start], edi
+      preprocessing_finished:
+	mov	[source_start],edi
 	ret
-	
-	
-	
-	
-	
-	
-	
-use_postponed_macro:
+      use_postponed_macro:
 	lea	esi,[edi-1]
 	push	ecx esi
 	mov	[struc_name],0
@@ -444,33 +239,13 @@ use_postponed_macro:
 preprocess_file:
 	push	[memory_end]
 	push	esi
-	
-	;;#bugbug
-	;;como não temos essa função ainda, então aqui precisa de um hang.
-	
-	;mov esi, gramado_string_preprocessor_lseekfound
-	;call DisplayMessage 
-	
-	;;#debug
-	;jmp $
-	
-	
-	;juste de ponteiro
 	mov	al,2
-	xor	edx,edx 
-	
-	call gramado_lseek_fake
-	;call lseek
-	
+	xor	edx,edx
+	call	lseek
 	push	eax
-	
-	;juste de ponteiro
 	xor	al,al
 	xor	edx,edx
-	
-	call gramado_lseek_fake
-	;call lseek
-	
+	call	lseek
 	pop	ecx
 	mov	edx,[memory_end]
 	dec	edx
@@ -481,19 +256,12 @@ preprocess_file:
 	cmp	edx,edi
 	jbe	out_of_memory
 	mov	[memory_end],edx
-	
-	
-	call gramado_read_fake
-	;call	read
-	
-	call gramado_close_fake
-	;call	close
-	
+	call	read
+	call	close
 	pop	edx
 	xor	ecx,ecx
 	mov	ebx,esi
-	
-preprocess_source:
+      preprocess_source:
 	inc	ecx
 	mov	[current_line],edi
 	mov	eax,edx
@@ -509,16 +277,12 @@ preprocess_source:
 	call	convert_line
 	call	preprocess_line
 	pop	edx ebx
-	
-next_line:
-	
+      next_line:
 	cmp	byte [esi-1],0
 	je	file_end
-	
 	cmp	byte [esi-1],1Ah
 	jne	preprocess_source
-	
-file_end:
+      file_end:
 	pop	[memory_end]
 	clc
 	ret
@@ -542,20 +306,17 @@ convert_line:
 	xlat	byte [ebx]
 	or	al,al
 	jz	convert_separator
-	
 	cmp	ah,27h
 	je	convert_string
-	
 	cmp	ah,22h
 	je	convert_string
-	
 	mov	byte [edi],1Ah
 	scas	word [edi]
 	xchg	al,ah
 	stos	byte [edi]
 	mov	ebx,characters
 	xor	ecx,ecx
-convert_symbol:
+      convert_symbol:
 	lods	byte [esi]
 	stos	byte [edi]
 	xlat	byte [ebx]
@@ -567,85 +328,64 @@ convert_symbol:
 	mov	ebx,edi
 	sub	ebx,ecx
 	mov	byte [ebx-2],cl
-	
-found_separator:
+      found_separator:
 	dec	edi
 	mov	ah,[esi-1]
-convert_separator:
+      convert_separator:
 	xchg	al,ah
-	
 	cmp	al,20h
 	jb	control_character
 	je	convert_line_data
-	
-symbol_character:
+      symbol_character:
 	cmp	al,3Bh
 	je	ignore_comment
-	
 	cmp	al,5Ch
 	je	backslash_character
-	
 	stos	byte [edi]
 	jmp	convert_line_data
-	
-	
-control_character:
+      control_character:
 	cmp	al,1Ah
 	je	line_end
-	
 	cmp	al,0Dh
 	je	cr_character
-	
 	cmp	al,0Ah
 	je	lf_character
-	
 	cmp	al,9
 	je	convert_line_data
 	or	al,al
 	jnz	symbol_character
 	jmp	line_end
-	
-lf_character:
+      lf_character:
 	lods	byte [esi]
-	
 	cmp	al,0Dh
 	je	line_end
-	
 	dec	esi
 	jmp	line_end
-	
-cr_character:
+      cr_character:
 	lods	byte [esi]
 	cmp	al,0Ah
 	je	line_end
 	dec	esi
 	jmp	line_end
-	
-convert_string:
+      convert_string:
 	mov	al,22h
 	stos	byte [edi]
 	scas	dword [edi]
 	mov	ebx,edi
-	
-copy_string:
+      copy_string:
 	lods	byte [esi]
 	stos	byte [edi]
-	
 	cmp	al,0Ah
 	je	no_end_quote
-	
 	cmp	al,0Dh
 	je	no_end_quote
 	or	al,al
 	jz	no_end_quote
-	
 	cmp	al,1Ah
 	je	no_end_quote
-	
 	cmp	al,ah
 	jne	copy_string
 	lods	byte [esi]
-	
 	cmp	al,ah
 	je	copy_string
 	dec	esi
@@ -654,28 +394,21 @@ copy_string:
 	sub	eax,ebx
 	mov	[ebx-4],eax
 	jmp	convert_line_data
-	
-backslash_character:
+      backslash_character:
 	mov	byte [edi],0
 	lods	byte [esi]
-	
 	cmp	al,20h
 	je	concatenate_lines
-	
 	cmp	al,9
 	je	concatenate_lines
-	
 	cmp	al,1Ah
 	je	unexpected_end_of_file
 	or	al,al
 	jz	unexpected_end_of_file
-	
 	cmp	al,0Ah
 	je	concatenate_lf
-	
 	cmp	al,0Dh
 	je	concatenate_cr
-	
 	cmp	al,3Bh
 	je	find_concatenated_line
 	mov	al,1Ah
@@ -684,57 +417,43 @@ backslash_character:
 	mov	ax,5C01h
 	stos	word [edi]
 	dec	esi
-group_backslashes:
+      group_backslashes:
 	lods	byte [esi]
-	
 	cmp	al,5Ch
 	jne	backslashed_symbol
-	
 	stos	byte [edi]
 	inc	byte [ecx]
 	jz	name_too_long
 	jmp	group_backslashes
-	
-no_end_quote:
+      no_end_quote:
 	mov	byte [ebx-5],0
 	jmp	missing_end_quote
-	
-backslashed_symbol:
-	
+      backslashed_symbol:
 	cmp	al,1Ah
 	je	unexpected_end_of_file
 	or	al,al
 	jz	unexpected_end_of_file
-	
 	cmp	al,0Ah
 	je	extra_characters_on_line
-	
 	cmp	al,0Dh
 	je	extra_characters_on_line
-	
 	cmp	al,20h
 	je	extra_characters_on_line
-	
 	cmp	al,9
 	je	extra_characters_on_line
-	
 	cmp	al,22h
 	je	extra_characters_on_line
-	
 	cmp	al,27h
 	je	extra_characters_on_line
-	
 	cmp	al,3Bh
 	je	extra_characters_on_line
-	
 	mov	ah,al
 	mov	ebx,characters
 	xlat	byte [ebx]
 	or	al,al
 	jz	backslashed_symbol_character
 	mov	al,ah
-	
-convert_backslashed_symbol:
+      convert_backslashed_symbol:
 	stos	byte [edi]
 	xlat	byte [ebx]
 	or	al,al
@@ -743,86 +462,63 @@ convert_backslashed_symbol:
 	jz	name_too_long
 	lods	byte [esi]
 	jmp	convert_backslashed_symbol
-	
-backslashed_symbol_character:
+      backslashed_symbol_character:
 	mov	al,ah
 	stos	byte [edi]
 	inc	byte [ecx]
 	jmp	convert_line_data
-	
-concatenate_lines:
+      concatenate_lines:
 	lods	byte [esi]
-	
 	cmp	al,20h
 	je	concatenate_lines
-	
 	cmp	al,9
 	je	concatenate_lines
-	
 	cmp	al,1Ah
 	je	unexpected_end_of_file
 	or	al,al
 	jz	unexpected_end_of_file
-	
 	cmp	al,0Ah
 	je	concatenate_lf
-	
 	cmp	al,0Dh
 	je	concatenate_cr
-	
 	cmp	al,3Bh
 	jne	extra_characters_on_line
-	
-find_concatenated_line:
+      find_concatenated_line:
 	lods	byte [esi]
-	
 	cmp	al,0Ah
 	je	concatenate_lf
-	
 	cmp	al,0Dh
 	je	concatenate_cr
 	or	al,al
 	jz	concatenate_ok
-	
 	cmp	al,1Ah
 	jne	find_concatenated_line
 	jmp	unexpected_end_of_file
-	
-concatenate_lf:
+      concatenate_lf:
 	lods	byte [esi]
-	
 	cmp	al,0Dh
 	je	concatenate_ok
 	dec	esi
 	jmp	concatenate_ok
-	
-concatenate_cr:
+      concatenate_cr:
 	lods	byte [esi]
-	
 	cmp	al,0Ah
 	je	concatenate_ok
-	
 	dec	esi
-	
-concatenate_ok:
+      concatenate_ok:
 	inc	dword [esp]
 	jmp	convert_line_data
-	
-ignore_comment:
+      ignore_comment:
 	lods	byte [esi]
-	
 	cmp	al,0Ah
 	je	lf_character
-	
 	cmp	al,0Dh
 	je	cr_character
 	or	al,al
 	jz	line_end
-	
 	cmp	al,1Ah
 	jne	ignore_comment
-	
-line_end:
+      line_end:
 	xor	al,al
 	stos	byte [edi]
 	pop	ecx
@@ -831,28 +527,21 @@ line_end:
 lower_case:
 	mov	edi,converted
 	mov	ebx,characters
-	
-convert_case:
+      convert_case:
 	lods	byte [esi]
 	xlat	byte [ebx]
 	stos	byte [edi]
 	loop	convert_case
-case_ok:
+      case_ok:
 	ret
 
-	
-;;
-;; ## directives ##
-;;	
-	
 get_directive:
 	push	edi
 	mov	edx,esi
 	mov	ebp,ecx
 	call	lower_case
 	pop	edi
-	
-scan_directives:
+      scan_directives:
 	mov	esi,converted
 	movzx	eax,byte [edi]
 	or	al,al
@@ -862,39 +551,32 @@ scan_directives:
 	mov	ebx,edi
 	add	ebx,eax
 	mov	ah,[esi]
-	
 	cmp	ah,[edi]
 	jb	no_directive
 	ja	next_directive
-	
 	cmp	cl,al
 	jne	next_directive
 	repe	cmps byte [esi],[edi]
 	jb	no_directive
 	je	directive_found
-	
-next_directive:
+      next_directive:
 	mov	edi,ebx
 	add	edi,2
 	jmp	scan_directives
-	
-no_directive:
+      no_directive:
 	mov	esi,edx
 	mov	ecx,ebp
 	stc
 	ret
-	
-directive_found:
+      directive_found:
 	call	get_directive_handler_base
-	
-directive_handler:
+      directive_handler:
 	lea	esi,[edx+ebp]
 	movzx	ecx,word [ebx]
 	add	eax,ecx
 	clc
 	ret
-	
-get_directive_handler_base:
+      get_directive_handler_base:
 	mov	eax,[esp]
 	ret
 

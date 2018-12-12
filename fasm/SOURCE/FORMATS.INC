@@ -3,9 +3,6 @@
 ; Copyright (c) 1999-2018, Tomasz Grysztar.
 ; All rights reserved.
 
-
-
-
 formatter:
 	mov	[current_offset],edi
 	cmp	[output_file],0

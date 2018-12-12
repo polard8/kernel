@@ -4,7 +4,7 @@
 ; All rights reserved.
 
 	format	ELF
-	public	main
+	public	fasm_main
 
 macro ccall proc,[arg]
   { common
@@ -31,7 +31,16 @@ extrn gettimeofday
 
 section '.text' executable align 16
 
-main:
+fasm_main:
+
+	mov	dl, '.'
+	call display_character
+	
+	mov	esi,_logo
+	call	display_string	
+	
+	jmp $ 
+	
 	mov	ecx,[esp+4]
 	mov	[argc],ecx
 	mov	ebx,[esp+8]

@@ -19,5 +19,12 @@ __crt0Main:
 hang:
     pause
     jmp hang
+	
+	
+	
+
+	
+	
+	
 
 

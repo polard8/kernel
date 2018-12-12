@@ -5,22 +5,12 @@
 
 include_variable db 'INCLUDE',0
 
-
-;;
-;; ===================================================
-;; ## sysmbol characteres ##
-;;
-
 symbol_characters db 27
-    db 9, 0Ah, 0Dh, 1Ah, 20h, '+-/*=<>()[]{}:,|&~#`;\'
+ db 9,0Ah,0Dh,1Ah,20h,'+-/*=<>()[]{}:,|&~#`;\'
 
-	
-	
-;; Tabela de diretivas do preprocessador.	
-	
 preprocessor_directives:
-    db 6,'define'
-    dw define_symbolic_constant-directive_handler
+ db 6,'define'
+ dw define_symbolic_constant-directive_handler
  db 7,'include'
  dw include_file-directive_handler
  db 3,'irp'

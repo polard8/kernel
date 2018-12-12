@@ -23,6 +23,7 @@ echo -{ Compiling gramcode ...
 
 
     copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o	
+	
  
 :Objects	
 set myObjects=crt0.o ^
@@ -32,7 +33,8 @@ stdlib.o ^
 stdio.o ^
 string.o ^
 api.o ^
-status.o  
+status.o   
+
 
 
 
