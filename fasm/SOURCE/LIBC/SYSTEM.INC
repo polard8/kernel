@@ -27,8 +27,8 @@ init_memory:
 	jnz	allocate_memory
 	mov	ecx,1000000h
       allocate_memory:
-	mov	[memory_setting],ecx
-	ccall	malloc,ecx
+	mov	[memory_setting], ecx
+	ccall	malloc, ecx
 	or	eax,eax
 	jz	out_of_memory
 	mov	[additional_memory],eax
@@ -46,13 +46,13 @@ exit_program:
 	push	eax
 	ccall	free,[additional_memory]
 	pop	eax
-	ccall	exit,eax
+	ccall	exit, eax
 	mov	esp,[stack_frame]
 	pop	ebp
 	ret
 
 get_environment_variable:
-	ccall	getenv,esi
+	ccall	getenv, esi
 	mov	esi,eax
 	or	eax,eax
 	jz	no_environment_variable
@@ -106,11 +106,11 @@ create:
 	clc
 	ret
 close:
-	ccall	fclose,ebx
+	ccall	fclose, ebx
 	ret
 read:
 	push	ebx ecx edx esi edi ebp
-	ccall	fread,edx,1,ecx,ebx
+	ccall	fread, edx, 1, ecx, ebx
 	pop	ebp edi esi edx ecx ebx
 	cmp	eax,ecx
 	jne	file_error
@@ -121,7 +121,7 @@ read:
 	ret
 write:
 	push	ebx ecx edx esi edi ebp
-	ccall	fwrite,edx,1,ecx,ebx
+	ccall	fwrite, edx, 1, ecx, ebx
 	pop	ebp edi esi edx ecx ebx
 	cmp	eax,ecx
 	jne	file_error
@@ -130,11 +130,11 @@ write:
 lseek:
 	push	ebx
 	movzx	eax,al
-	ccall	fseek,ebx,edx,eax
+	ccall	fseek, ebx, edx, eax
 	test	eax,eax
 	jnz	lseek_error
 	mov	ebx,[esp]
-	ccall	ftell,ebx
+	ccall	ftell, ebx
 	pop	ebx
 	clc
 	ret

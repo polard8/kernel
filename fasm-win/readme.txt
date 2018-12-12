@@ -1,5 +1,10 @@
+ 
+   /SOURCE/WIN32
+   We are usying the win32 interface tio create fasm.exe 
+   its running on gramado.
 
-   sobre /gramado/fasm:
+
+   sobre /gramado/fasm-win:
 
 
    Ok eu peguei a versão do código do fasm destinada ao host Windows,

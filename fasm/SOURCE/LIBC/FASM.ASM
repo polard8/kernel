@@ -33,13 +33,16 @@ section '.text' executable align 16
 
 fasm_main:
 
-	mov	dl, '.'
-	call display_character
+	;;ok funcionou.
+	;mov	dl, '.'
+	;call display_character
 	
-	mov	esi,_logo
-	call	display_string	
+	;;ok funcionou.
+	;mov	esi,_logo
+	;call	display_string	
 	
-	jmp $ 
+	;#debug
+	;jmp $ 
 	
 	mov	ecx,[esp+4]
 	mov	[argc],ecx
@@ -51,6 +54,9 @@ fasm_main:
 	mov	[con_handle],1
 	mov	esi,_logo
 	call	display_string
+	
+	;#debug
+	;jmp $ 	
 
 	call	get_params
 	jc	information
@@ -91,7 +97,7 @@ fasm_main:
 	call	display_number
 	mov	esi,_passes_suffix
 	call	display_string
-	ccall	gettimeofday,buffer,0
+	ccall	gettimeofday, buffer, 0
 	mov	eax,dword [buffer]
 	mov	ecx,1000
 	mul	ecx
