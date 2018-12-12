@@ -38,43 +38,43 @@ start:
 	include 'gramado.inc'
 after_my_awesome_stuff:
 
-   	xor eax, eax
-	mov al, 0xfA
-    call print_hex 
+   	;xor eax, eax
+	;mov al, 0xfA
+    ;call print_hex 
 
-	mov al, 4
-	call print_spaces
+	;mov al, 4
+	;call print_spaces
 	
-   	xor eax, eax
-	mov al, 0xed
-    call print_hex 
+   	;xor eax, eax
+	;mov al, 0xed
+    ;call print_hex 
 
-	mov al, 4
-	call print_spaces
+	;mov al, 4
+	;call print_spaces
 	
-	mov al, 'F'
-	call putchar
+	;mov al, 'F'
+	;call putchar
 
-	mov al, 'R'
-	call putchar
+	;mov al, 'R'
+	;call putchar
 
-	mov al, 'E'
-	call putchar
+	;mov al, 'E'
+	;call putchar
 
-	mov al, 'D'
-	call putchar
+	;mov al, 'D'
+	;call putchar
 	
-	mov al, 4
-	call print_spaces
+	;mov al, 4
+	;call print_spaces
 	
 	;; #importante
 	;; Isso funciona. É o começo do arquivo. MZ.
-    mov esi, 0x400000 
-    call DisplayMessage	
+    ;mov esi, 0x400000 
+    ;call DisplayMessage	
 	
 	
-	mov esi, gramado_string_welcome
-    call DisplayMessage	
+	;mov esi, gramado_string_welcome
+    ;call DisplayMessage	
 	
     ;; #debug
 	;; jmp $
@@ -85,9 +85,10 @@ after_my_awesome_stuff:
 	
 	;; #suspenso 
 	;;não funciona.
-	;mov	esi,_logo
-	;call	display_string
- 
+	mov	esi, _logo
+    call DisplayMessage
+	;call display_string
+	
     ;;
 	;; ## Step 1 ##
 	;;
@@ -96,12 +97,16 @@ after_my_awesome_stuff:
     call DisplayMessage	
 	
 	;;#importante
-	;;pega os argumentos passados via linha de ocmandos.
-
-	;call gramado_get_params ;;get_params
-	call gramado_get_params_fake
-	jc	information
+	;;pega os argumentos passados via linha de comandos.
+    ;;ok isso funcionou. 
 	
+	;;call gramado_get_params_fake
+	call get_params
+	jc	information
+
+    ;;
+	;; ## Step 2 ##
+	;;
 	
  	mov esi, gramado_string_step2
     call DisplayMessage
@@ -172,6 +177,10 @@ after_my_awesome_stuff:
 	;; ## preprocessor ##
 	;;
 	
+    ;;
+	;; ## Step 3 ##
+	;;	
+	
  	mov esi, gramado_string_step3
     call DisplayMessage			
 	
@@ -192,6 +201,11 @@ after_my_awesome_stuff:
 	;;
 	;; ## parser ##
 	;;
+	
+    ;;
+	;; ## Step 4 ##
+	;;
+	
  	mov esi, gramado_string_step4
     call DisplayMessage			
 
@@ -227,6 +241,10 @@ after_my_awesome_stuff:
 	;; ## formatter ##
 	;;
 	
+    ;;
+	;; ## Step 6 ##
+	;;	
+	
  	;mov esi, gramado_string_step6
     ;call DisplayMessage	
 
@@ -241,6 +259,10 @@ after_my_awesome_stuff:
 	;faremos debug de cada uma das partes suspensas, individualmente 	
 	;;call	formatter
 	
+	
+    ;;
+	;; ## Step 7 ##
+	;;	
 	
  	mov esi, gramado_string_step7
     call DisplayMessage	
@@ -294,6 +316,10 @@ after_my_awesome_stuff:
 	
 ;display_bytes_count:
 
+    ;;
+	;; ## Step 8 ##
+	;;
+
  	;mov esi, gramado_string_step8
     ;call DisplayMessage		
 	
@@ -341,7 +367,7 @@ information:
 ;;
 ;; ==========================================================
 ;; get_params
-;; >>> Pegando os parâmtros da função.
+;; >>> Pegando os parâmetros da função.
 ;; ou seja a linha de comandos com os tokens usados.	
 ;; #todo: Isso será feito atravez de um endereço de memória compartilhado.
 ;; Essa rotina servirá de inspiração para pegar os argumentos da linha de comandos 
@@ -350,255 +376,420 @@ information:
 
 get_params:
     ;redirecionando.
-	jmp gramado_get_params
-	jmp $
+	;jmp gramado_get_params
+	;jmp $
 	
 	;;#suspendendo
-	;mov	[input_file],0
-	;mov	[output_file],0
-	;mov	[symbols_file],0
-	;mov	[memory_setting],0
-	;mov	[passes_limit],100
-	;call	[GetCommandLine]
-	;mov	[definitions_pointer],predefinitions
-	;mov	esi,eax
-	;mov	edi,params
-    ;find_command_start:
-	;lodsb
-	;cmp	al,20h
-	;je	find_command_start
-	;cmp	al,22h
-	;je	skip_quoted_name
-    ;skip_name:
-	;lodsb
-	;cmp	al,20h
-	;je	find_param
-	;or	al,al
-	;jz	all_params
-	;jmp	skip_name
-    ;skip_quoted_name:
-	;lodsb
-	;cmp	al,22h
-	;je	find_param
-	;or	al,al
-	;jz	all_params
-	;jmp	skip_quoted_name
-    ;find_param:
-	;lodsb
-	;cmp	al,20h
-	;je	find_param
-	;cmp	al,'-'
-	;je	option_param
-	;cmp	al,0Dh
-	;je	all_params
-	;or	al,al
-	;jz	all_params
-	;cmp	[input_file],0
-	;jne	get_output_file
-	;mov	[input_file],edi
-	;jmp	process_param
-    ;  get_output_file:
-	;cmp	[output_file],0
-	;jne	bad_params
-	;mov	[output_file],edi
-    ;process_param:
-	;cmp	al,22h
-	;je	string_param
-    ;copy_param:
-	;cmp	edi,params+1000h
-	;jae	bad_params
-	;stosb
-	;lodsb
-	;cmp	al,20h
-	;je	param_end
-	;cmp	al,0Dh
-	;je	param_end
-	;or	al,al
-	;jz	param_end
-	;jmp	copy_param
-    ;string_param:
-	;lodsb
-	;cmp	al,22h
-	;je	string_param_end
-	;cmp	al,0Dh
-	;je	param_end
-	;or	al,al
-	;jz	param_end
-	;cmp	edi,params+1000h
-	;jae	bad_params
-	;stosb
-	;jmp	string_param
-    ;option_param:
-	;lodsb
-	;cmp	al,'m'
-	;je	memory_option
-	;cmp	al,'M'
-	;je	memory_option
-	;cmp	al,'p'
-	;je	passes_option
-	;cmp	al,'P'
-	;je	passes_option
-	;cmp	al,'d'
-	;je	definition_option
-	;cmp	al,'D'
-	;je	definition_option
-	;cmp	al,'s'
-	;je	symbols_option
-	;cmp	al,'S'
-	;je	symbols_option
-    ;bad_params:
-	;stc
-	;ret
-    ;get_option_value:
-	;xor	eax,eax
-	;mov	edx,eax
-    ;get_option_digit:
-	;lodsb
-	;cmp	al,20h
-	;je	option_value_ok
-	;cmp	al,0Dh
-	;je	option_value_ok
-	;or	al,al
-	;jz	option_value_ok
-	;sub	al,30h
-	;jc	invalid_option_value
-	;cmp	al,9
-	;ja	invalid_option_value
-	;imul	edx,10
-	;jo	invalid_option_value
-	;add	edx,eax
-	;jc	invalid_option_value
-	;jmp	get_option_digit
-    ;option_value_ok:
-	;dec	esi
-	;clc
-	;ret
-    ;invalid_option_value:
-	;stc
-	;ret
-    ;memory_option:
-	;lodsb
-	;cmp	al,20h
-	;je	memory_option
-	;cmp	al,0Dh
-	;je	bad_params
-	;or	al,al
-	;jz	bad_params
-	;dec	esi
-	;call	get_option_value
-	;or	edx,edx
-	;jz	bad_params
-	;cmp	edx,1 shl (32-10)
-	;jae	bad_params
-	;mov	[memory_setting],edx
-	;jmp	find_param
-    ;passes_option:
-	;lodsb
-	;cmp	al,20h
-	;je	passes_option
-	;cmp	al,0Dh
-	;je	bad_params
-	;or	al,al
-	;jz	bad_params
-	;dec	esi
-	;call	get_option_value
-	;or	edx,edx
-	;jz	bad_params
-	;cmp	edx,10000h
-	;ja	bad_params
-	;mov	[passes_limit],dx
-	;jmp	find_param
-    ;definition_option:
-	;lodsb
-	;cmp	al,20h
-	;je	definition_option
-	;cmp	al,0Dh
-	;je	bad_params
-	;or	al,al
-	;jz	bad_params
-	;dec	esi
-	;push	edi
-	;mov	edi,[definitions_pointer]
-	;call	convert_definition_option
-	;mov	[definitions_pointer],edi
-	;pop	edi
-	;jc	bad_params
-	;jmp	find_param
-    ;symbols_option:
-	;mov	[symbols_file],edi
-    ;  find_symbols_file_name:
-	;lodsb
-	;cmp	al,20h
-	;jne	process_param
-	;jmp	find_symbols_file_name
-    ;param_end:
-	;dec	esi
-    ;string_param_end:
-	;cmp	edi,params+1000h
-	;jae	bad_params
-	;xor	al,al
-	;stosb
-	;jmp	find_param
-    ;all_params:
-	;cmp	[input_file],0
-	;je	bad_params
-	;mov	eax,[definitions_pointer]
-	;mov	byte [eax],0
-	;mov	[initial_definitions],predefinitions
-	;clc
-	;ret
-    ;convert_definition_option:
-	;mov	ecx,edi
-	;cmp	edi,predefinitions+1000h
-	;jae	bad_definition_option
-	;xor	al,al
-	;stosb
-    ;  copy_definition_name:
-	;lodsb
-	;cmp	al,'='
-	;je	copy_definition_value
-	;cmp	al,20h
-	;je	bad_definition_option
-	;cmp	al,0Dh
-	;je	bad_definition_option
-	;or	al,al
-	;jz	bad_definition_option
-	;cmp	edi,predefinitions+1000h
-	;jae	bad_definition_option
-	;stosb
-	;inc	byte [ecx]
-	;jnz	copy_definition_name
-    ;  bad_definition_option:
-	;stc
-	;ret
-    ;  copy_definition_value:
-	;lodsb
-	;cmp	al,20h
-	;je	definition_value_end
-	;cmp	al,0Dh
-	;je	definition_value_end
-	;or	al,al
-	;jz	definition_value_end
-	;cmp	al,'\'
-	;jne	definition_value_character
-	;cmp	byte [esi],20h
-	;jne	definition_value_character
-	;lodsb
-    ;  definition_value_character:
-	;cmp	edi,predefinitions+1000h
-	;jae	bad_definition_option
-	;stosb
-	;jmp	copy_definition_value
-    ;  definition_value_end:
-	;dec	esi
-	;cmp	edi,predefinitions+1000h
-	;jae	bad_definition_option
-	;xor	al,al
-	;stosb
-	;clc
-	;ret
+	;;tentando habilitar essa função. 
+	
+	;; ??
+	;;inicializando variáveis. ??
+	
+	mov	[input_file], 0
+	mov	[output_file], 0
+	mov	[symbols_file], 0
+	mov	[memory_setting], 0
+	mov	[passes_limit], 100
+	
+	;The return value is a pointer to the command-line string for the current process.
+	;presumo que o ponteiro retorne em eax. 
+	
+	;call	[GetCommandLine] 
+	call gramado_GetCommandLine 
+
+	;sendo eax a command line 
+	;torna-se a origem. 
+	;param é o destino.
+	
+	mov	esi, eax
+	mov	edi, params
+	
+	mov	[definitions_pointer], predefinitions
+	
+find_command_start:
+	
+	;pega al.
+	lodsb
+	
+	;suprime espaços.
+	cmp	al, 20h
+	je find_command_start
+	
+	;;quote stuff
+	cmp	al, 22h
+	je	skip_quoted_name
+	
+skip_name:
+	
+	lodsb
+	
+	;se for espaço vamos procurar o parametro, antes suprimindo os espaços.
+	cmp	al, 20h
+	je	find_param
+	
+	;;ok não é espaço.
+	or	al, al
+	jz all_params  ;;#sensível.
+	
+	jmp	skip_name
+	
+skip_quoted_name:
+	lodsb
+	
+	;suprime coisas do tipo.
+	cmp al, 22h
+	je find_param
+	
+	or al, al
+	jz all_params   ;#sensível.
+	jmp	skip_quoted_name
+	
+find_param:
+	lodsb
+	
+	;suprime espaços.
+	cmp	al, 20h
+	je find_param
+	
+	;;se encontramos o '-'
+	;;parametro de operação. 
+	
+	cmp	al, '-'
+	je option_param
+	
+	;cr ou lf. ??
+	cmp	al, 0Dh
+	je all_params ;#sensível.
+	
+	or	al, al
+	jz	all_params ;#sensível.
+	
+	;;??
+	;;se já temos um ponteiro para o arquivo de entrada então 
+	;;presizamos do arquivo de saída.
+	;;acho que estamos falando da string do nome.
+	
+	cmp	[input_file], 0
+	jne	get_output_file
+	
+	;;#bugbug
+	;; De forma determinística o fasm assume que agora temos um nome.
+	
+	mov	[input_file], edi
+	jmp	process_param
+
+
+;;vamos pegar o arquivo de saída pois já temos o de entrada.    
+get_output_file:
+	cmp	[output_file],0
+	jne	bad_params
+	mov	[output_file],edi
+ 
+;;vamos processar parâmtro. Mas qual ? 
+process_param:
+	
+	;??
+	cmp al, 22h
+	je string_param
+    
+	;;copiar o parâmetro.
+copy_param:
+	
+	;;comparamos o destino com um endereço da tabela.
+	;;se der errado falhamos.
+	cmp	edi, params+1000h
+	jae	bad_params
+	
+	stosb
+	lodsb
+	
+	;é um espaço. ??
+	cmp	al, 20h
+	je param_end
+	
+	cmp	al, 0Dh
+	je param_end
+	
+	or	al,al
+	jz	param_end
+	
+	jmp	copy_param
+	
+string_param:
+	lodsb
+	cmp	al,22h
+	je	string_param_end
+	cmp	al,0Dh
+	je	param_end
+	or	al,al
+	jz	param_end
+	cmp	edi,params+1000h
+	jae	bad_params
+	stosb
+	jmp	string_param
+
+   ;; estamos aqui porque encontramos o '-'.	
+option_param:
+	lodsb
+	
+	;;flag memória.
+	cmp al, 'm'
+	je	memory_option
+	cmp	al,'M'
+	je memory_option
+	
+	;flag passes
+	cmp	al, 'p'
+	je	passes_option
+	cmp	al, 'P'
+	je	passes_option
+	
+	;flag definition
+	cmp	al,'d'
+	je	definition_option
+	cmp	al,'D'
+	je	definition_option
+	
+	;flag symbol
+	cmp	al,'s'
+	je	symbols_option
+	cmp	al,'S'
+	je	symbols_option
+
+   ;;
+   ;; #error: Nenhuma switch válida.
+   ;;
+	
+bad_params:
+	stc
+	ret
+    
+get_option_value:
+	xor	eax, eax
+	mov	edx, eax
+	
+get_option_digit:
+	
+	lodsb
+	
+	cmp	al, 20h
+	je	option_value_ok
+	
+	cmp	al,0Dh
+	je	option_value_ok
+	
+	or	al,al
+	jz	option_value_ok
+	
+	sub	al,30h
+	jc	invalid_option_value
+	
+	cmp	al,9
+	ja	invalid_option_value
+	
+	imul	edx,10
+	jo	invalid_option_value
+	
+	add	edx,eax
+	jc	invalid_option_value
+	
+	jmp	get_option_digit
+	
+option_value_ok:
+	dec	esi
+	clc
+	ret
+	
+invalid_option_value:
+	stc
+	ret
+    
+;;flag m selecionada.
+memory_option:
+	lodsb
+	
+	;;suprime espaços.
+	cmp	al, 20h
+	je	memory_option
+	
+	cmp	al,0Dh
+	je	bad_params
+	
+	or	al,al
+	jz	bad_params
+	dec	esi
+	
+	call	get_option_value
+	
+	or	edx,edx
+	jz	bad_params
+	
+	cmp	edx, 1 shl (32-10)
+	jae	bad_params
+	
+	mov	[memory_setting], edx
+	jmp	find_param
+
+;;flag p selecionada.    
+passes_option:
+	
+	lodsb
+	
+	;;suprimir espaços.
+	cmp	al,20h
+	je	passes_option
+	
+	cmp	al,0Dh
+	je	bad_params
+	
+	or	al,al
+	jz	bad_params
+	
+	dec	esi
+	
+	call	get_option_value
+	
+	or	edx, edx
+	jz	bad_params
+	
+	cmp	edx, 10000h
+	ja	bad_params
+	
+	mov	[passes_limit], dx
+	jmp	find_param
+
+;;flag d selecionada.    
+definition_option:
+	lodsb
+	cmp	al, 20h
+	je	definition_option
+	
+	cmp	al, 0Dh
+	je	bad_params
+	
+	or	al,al
+	jz	bad_params
+	
+	dec	esi
+	push	edi
+	mov	edi,[definitions_pointer]
+	
+	call	convert_definition_option
+	
+	mov	[definitions_pointer],edi
+	pop	edi
+	
+	jc	bad_params
+	jmp	find_param
+
+;;flag s selecionada.    
+symbols_option:
+	mov	[symbols_file],edi
+    
+find_symbols_file_name:
+	
+	lodsb
+	
+	cmp	al,20h
+	jne	process_param
+	
+	jmp	find_symbols_file_name
 	
 	
+param_end:
+	dec	esi
+string_param_end:
+	cmp	edi, params+1000h
+	jae	bad_params
+	xor	al,al
+	stosb
+	jmp	find_param
+
+   ;; ??	
+all_params:
+	
+	;;falhou nosso arquivo de entrada.
+	cmp	[input_file], 0
+	je	bad_params
+	
+	mov eax, [definitions_pointer]
+	mov	byte [eax], 0
+	mov	[initial_definitions], predefinitions
+	clc
+	ret
+	
+convert_definition_option:
+	mov	ecx, edi
+	
+	cmp	edi, predefinitions+1000h
+	jae	bad_definition_option
+	
+	xor	al,al
+	stosb
+	
+copy_definition_name:
+	
+	lodsb
+	
+	cmp	al,'='
+	je	copy_definition_value
+	
+	cmp	al,20h
+	je	bad_definition_option
+	
+	cmp	al,0Dh
+	je	bad_definition_option
+	
+	or	al,al
+	jz	bad_definition_option
+	
+	cmp	edi, predefinitions+1000h
+	jae	bad_definition_option
+	
+	stosb
+	inc	byte [ecx]
+	jnz	copy_definition_name
+	
+bad_definition_option:
+	stc
+	ret
+	
+copy_definition_value:
+	lodsb
+	
+	cmp	al, 20h
+	je	definition_value_end
+	
+	cmp	al, 0Dh
+	je	definition_value_end
+	
+	or	al, al
+	jz	definition_value_end
+	
+	cmp	al, '\'
+	jne	definition_value_character
+	
+	cmp	byte [esi], 20h
+	jne	definition_value_character
+	
+	lodsb
+	
+definition_value_character:
+	cmp	edi, predefinitions+1000h
+	jae	bad_definition_option
+	stosb
+	jmp	copy_definition_value
+	
+definition_value_end:
+	dec	esi
+	cmp	edi, predefinitions+1000h
+	jae	bad_definition_option
+	xor	al,al
+	stosb
+	clc
+	ret
+	
+;;=========================================	
 
 include 'system.inc'
 
@@ -617,29 +808,31 @@ include '..\tables.inc'
 include '..\messages.inc'
 
 
-
-section '.data' data readable writeable
+;;#bugbug 
+;;mudando isso de lugar para deixar as mensagems na sessão de código.
+;;section '.data' data readable writeable
 
 include '..\version.inc'
 
-_copyright db 'Copyright (c) 1999-2018, Tomasz Grysztar',0Dh,0Ah,0
-
-_logo db 'flat assembler  version ',VERSION_STRING,0
-_usage db 0Dh,0Ah
-       db 'usage: fasm <source> [output]',0Dh,0Ah
-       db 'optional settings:',0Dh,0Ah
+_copyright db 'Copyright (c) 1999-2018, Tomasz Grysztar', 0Dh, 0Ah, 0
+_logo      db 'flat assembler  version ', VERSION_STRING, 0Dh, 0Ah,0
+_memory_prefix   db '  (',0
+_memory_suffix   db ' kilobytes memory)', 0Dh, 0Ah,0
+_passes_suffix   db ' passes, ',0
+_seconds_suffix  db ' seconds, ',0
+_bytes_suffix    db ' bytes.', 0Dh, 0Ah,0
+_usage db 0Dh, 0Ah
+       db 'usage: fasm <source> [output]', 0Dh, 0Ah
+       db 'optional settings:', 0Dh, 0Ah
        db ' -m <limit>         set the limit in kilobytes for the available memory',0Dh,0Ah
        db ' -p <limit>         set the maximum allowed number of passes',0Dh,0Ah
        db ' -d <name>=<value>  define symbolic variable',0Dh,0Ah
        db ' -s <file>          dump symbolic information for debugging',0Dh,0Ah
        db 0
-_memory_prefix db '  (',0
-_memory_suffix db ' kilobytes memory)',0Dh,0Ah,0
-_passes_suffix db ' passes, ',0
-_seconds_suffix db ' seconds, ',0
-_bytes_suffix db ' bytes.',0Dh,0Ah,0
 
 align 4
+
+section '.data' data readable writeable
 
 include '..\variable.inc'
 
@@ -665,21 +858,24 @@ section '.idata' import data readable writeable
   dd 0,0,0,rva kernel_name,rva kernel_table
   dd 0,0,0,0,0
 
-  kernel_table:
-    ExitProcess dd rva _ExitProcess
-    CreateFile dd rva _CreateFileA
-    ReadFile dd rva _ReadFile
-    WriteFile dd rva _WriteFile
-    CloseHandle dd rva _CloseHandle
-    SetFilePointer dd rva _SetFilePointer
-    GetCommandLine dd rva _GetCommandLineA
-    GetEnvironmentVariable dd rva _GetEnvironmentVariable
-    GetStdHandle dd rva _GetStdHandle
-    VirtualAlloc dd rva _VirtualAlloc
-    VirtualFree dd rva _VirtualFree
-    GetTickCount dd rva _GetTickCount
-    GetSystemTime dd rva _GetSystemTime
-    GlobalMemoryStatus dd rva _GlobalMemoryStatus
+;Funções do windows chamada pelo fasm. 
+;isso não será mais usado, chmaremos funções similares 
+;feitas em gramado.inc 
+kernel_table:
+    ExitProcess             dd rva _ExitProcess
+    CreateFile              dd rva _CreateFileA
+    ReadFile                dd rva _ReadFile
+    WriteFile               dd rva _WriteFile
+    CloseHandle             dd rva _CloseHandle
+    SetFilePointer          dd rva _SetFilePointer
+    GetCommandLine          dd rva _GetCommandLineA
+    GetEnvironmentVariable  dd rva _GetEnvironmentVariable
+    GetStdHandle            dd rva _GetStdHandle
+    VirtualAlloc            dd rva _VirtualAlloc
+    VirtualFree             dd rva _VirtualFree
+    GetTickCount            dd rva _GetTickCount
+    GetSystemTime           dd rva _GetSystemTime
+    GlobalMemoryStatus      dd rva _GlobalMemoryStatus
     dd 0
 
   kernel_name db 'KERNEL32.DLL',0

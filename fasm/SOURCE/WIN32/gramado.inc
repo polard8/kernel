@@ -1,6 +1,91 @@
-;gramado.inc 
-;usado para portar fasm para gramado 0.4 
 
+ ; gramado.inc 
+ ; Usado para portar fasm para gramado 0.4 
+ 
+    
+	gramado_command_line: db 'fasm test.asm test.exe'
+ 
+    
+	;Funções do windows chamada pelo fasm. 
+ 
+    gramado_ExitProcess:
+        ret 
+		
+    gramado_CreateFile:
+        ret 
+		
+    gramado_ReadFile:
+        ret 
+		
+    gramado_WriteFile:
+        ret 
+		
+    gramado_CloseHandle:
+        ret 
+		
+    gramado_SetFilePointer:
+        ret 
+		
+	;;#todo
+	;;estamos usando o endereço fake, mas já temos um endereço 
+    ;;no qual o shell passa a command line para o aplicativo.	
+    gramado_GetCommandLine:
+	    mov eax, gramado_command_line
+        ret
+		
+    gramado_GetEnvironmentVariable:
+        ret 
+		
+    gramado_GetStdHandle:
+        ret 
+
+;;alocando memoria virtual.
+;;Reserves, commits, or changes the state of a region of pages 
+;;in the virtual address space of the calling process. 
+;;Memory allocated by this function is automatically initialized to zero.	
+;; LPVOID lpAddress,
+;; SIZE_T dwSize,
+;; DWORD  flAllocationType,
+;; DWORD  flProtect	
+gramado_VirtualAlloc:
+
+    ret 
+		 
+    gramado_VirtualFree:
+        ret 
+		
+    gramado_GetTickCount:
+        ret 
+		
+    gramado_GetSystemTime:
+        ret 
+
+
+    ;;Isso pega informações sobre a memória e coloca no buffer 
+	;;cujo ponteiro está na pilha.
+    ;DWORD  dwLength;
+    ;DWORD  dwMemoryLoad;
+    ;SIZE_T dwTotalPhys;
+    ;SIZE_T dwAvailPhys;
+    ;SIZE_T dwTotalPageFile;
+    ;SIZE_T dwAvailPageFile;
+    ;SIZE_T dwTotalVirtual;
+    ;SIZE_T dwAvailVirtual;			
+gramado_GlobalMemoryStatus:
+    pop eax ;;pega o ponteiro para o buffer
+    
+	;;vamos usar ebp para manipular o buffer.
+	mov ebp, eax	
+	
+	mov [ebp +0],0
+	mov [ebp +4],0
+	mov [ebp +8],0
+	mov [ebp +12],0
+	mov [ebp +16],0
+	mov [ebp +20],0
+	mov [ebp +24],0
+	ret	
+ 
 
 gramado_create_fake:
 	mov esi, gramado_string_create_fake
@@ -74,257 +159,7 @@ gramado_get_params_fake:
 	mov	[memory_setting],0
 	mov	[passes_limit],100
     ret
-
-gramado_get_params:
-
-	mov esi, gramado_string_getparam
-	call DisplayMessage
-
-	mov	[input_file],0
-	mov	[output_file],0
-	mov	[symbols_file],0
-	mov	[memory_setting],0
-	mov	[passes_limit],100
-	call	[GetCommandLine]
-	mov	[definitions_pointer],predefinitions
-	mov	esi,eax
-	mov	edi,params
-find_command_start:
-	lodsb
-	cmp	al,20h
-	je	find_command_start
-	cmp	al,22h
-	je	skip_quoted_name
-skip_name:
-	lodsb
-	cmp	al,20h
-	je	find_param
-	or	al,al
-	jz	all_params
-	jmp	skip_name
-skip_quoted_name:
-	lodsb
-	cmp	al,22h
-	je	find_param
-	or	al,al
-	jz	all_params
-	jmp	skip_quoted_name
-find_param:
-	lodsb
-	cmp	al,20h
-	je	find_param
-	cmp	al,'-'
-	je	option_param
-	cmp	al,0Dh
-	je	all_params
-	or	al,al
-	jz	all_params
-	cmp	[input_file],0
-	jne	get_output_file
-	mov	[input_file],edi
-	jmp	process_param
-get_output_file:
-	cmp	[output_file],0
-	jne	bad_params
-	mov	[output_file],edi
-process_param:
-	cmp	al,22h
-	je	string_param
-    copy_param:
-	cmp	edi,params+1000h
-	jae	bad_params
-	stosb
-	lodsb
-	cmp	al,20h
-	je	param_end
-	cmp	al,0Dh
-	je	param_end
-	or	al,al
-	jz	param_end
-	jmp	copy_param
-string_param:
-	lodsb
-	cmp	al,22h
-	je	string_param_end
-	cmp	al,0Dh
-	je	param_end
-	or	al,al
-	jz	param_end
-	cmp	edi,params+1000h
-	jae	bad_params
-	stosb
-	jmp	string_param
-option_param:
-	lodsb
-	cmp	al,'m'
-	je	memory_option
-	cmp	al,'M'
-	je	memory_option
-	cmp	al,'p'
-	je	passes_option
-	cmp	al,'P'
-	je	passes_option
-	cmp	al,'d'
-	je	definition_option
-	cmp	al,'D'
-	je	definition_option
-	cmp	al,'s'
-	je	symbols_option
-	cmp	al,'S'
-	je	symbols_option
-bad_params:
-	stc
-	ret
-    get_option_value:
-	xor	eax,eax
-	mov	edx,eax
-get_option_digit:
-	lodsb
-	cmp	al,20h
-	je	option_value_ok
-	cmp	al,0Dh
-	je	option_value_ok
-	or	al,al
-	jz	option_value_ok
-	sub	al,30h
-	jc	invalid_option_value
-	cmp	al,9
-	ja	invalid_option_value
-	imul	edx,10
-	jo	invalid_option_value
-	add	edx,eax
-	jc	invalid_option_value
-	jmp	get_option_digit
-option_value_ok:
-	dec	esi
-	clc
-	ret
-invalid_option_value:
-	stc
-	ret
-memory_option:
-	lodsb
-	cmp	al,20h
-	je	memory_option
-	cmp	al,0Dh
-	je	bad_params
-	or	al,al
-	jz	bad_params
-	dec	esi
-	call	get_option_value
-	or	edx,edx
-	jz	bad_params
-	cmp	edx,1 shl (32-10)
-	jae	bad_params
-	mov	[memory_setting],edx
-	jmp	find_param
-passes_option:
-	lodsb
-	cmp	al,20h
-	je	passes_option
-	cmp	al,0Dh
-	je	bad_params
-	or	al,al
-	jz	bad_params
-	dec	esi
-	call	get_option_value
-	or	edx,edx
-	jz	bad_params
-	cmp	edx,10000h
-	ja	bad_params
-	mov	[passes_limit],dx
-	jmp	find_param
-definition_option:
-	lodsb
-	cmp	al,20h
-	je	definition_option
-	cmp	al,0Dh
-	je	bad_params
-	or	al,al
-	jz	bad_params
-	dec	esi
-	push	edi
-	mov	edi,[definitions_pointer]
-	call	convert_definition_option
-	mov	[definitions_pointer],edi
-	pop	edi
-	jc	bad_params
-	jmp	find_param
-symbols_option:
-	mov	[symbols_file],edi
-find_symbols_file_name:
-	lodsb
-	cmp	al,20h
-	jne	process_param
-	jmp	find_symbols_file_name
-param_end:
-	dec	esi
-string_param_end:
-	cmp	edi,params+1000h
-	jae	bad_params
-	xor	al,al
-	stosb
-	jmp	find_param
-all_params:
-	cmp	[input_file],0
-	je	bad_params
-	mov	eax,[definitions_pointer]
-	mov	byte [eax],0
-	mov	[initial_definitions],predefinitions
-	clc
-	ret
-convert_definition_option:
-	mov	ecx,edi
-	cmp	edi,predefinitions+1000h
-	jae	bad_definition_option
-	xor	al,al
-	stosb
-copy_definition_name:
-	lodsb
-	cmp	al,'='
-	je	copy_definition_value
-	cmp	al,20h
-	je	bad_definition_option
-	cmp	al,0Dh
-	je	bad_definition_option
-	or	al,al
-	jz	bad_definition_option
-	cmp	edi,predefinitions+1000h
-	jae	bad_definition_option
-	stosb
-	inc	byte [ecx]
-	jnz	copy_definition_name
-bad_definition_option:
-	stc
-	ret
-copy_definition_value:
-	lodsb
-	cmp	al,20h
-	je	definition_value_end
-	cmp	al,0Dh
-	je	definition_value_end
-	or	al,al
-	jz	definition_value_end
-	cmp	al,'\'
-	jne	definition_value_character
-	cmp	byte [esi],20h
-	jne	definition_value_character
-	lodsb
-definition_value_character:
-	cmp	edi,predefinitions+1000h
-	jae	bad_definition_option
-	stosb
-	jmp	copy_definition_value
-definition_value_end:
-	dec	esi
-	cmp	edi,predefinitions+1000h
-	jae	bad_definition_option
-	xor	al,al
-	stosb
-	clc
-	ret
-
-
+ 
 
 
 ;;

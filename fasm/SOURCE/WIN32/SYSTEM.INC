@@ -87,17 +87,37 @@ init_memory:
 	shl	eax, 10
 	jnz	allocate_memory
 	
-	push	buffer
-	call	[GlobalMemoryStatus]
+	;; #importante:
+	;; 'buffer' Isso é um ponteiro para uma estrutura
+	;; onde o sistema deve colocar informações sobre memória.
 	
-	mov	eax,dword [buffer+20]
-	mov	edx,dword [buffer+12]
-	cmp	eax,0
+    ;DWORD  dwLength;
+    ;DWORD  dwMemoryLoad;
+    ;SIZE_T dwTotalPhys;
+    ;SIZE_T dwAvailPhys;
+    ;SIZE_T dwTotalPageFile;
+    ;SIZE_T dwAvailPageFile;
+    ;SIZE_T dwTotalVirtual;
+    ;SIZE_T dwAvailVirtual;	
+	
+	push	buffer 
+	;call	[GlobalMemoryStatus]
+	call gramado_GlobalMemoryStatus
+	
+	mov	eax, dword [buffer+20]
+	mov	edx, dword [buffer+12]
+	
+	;;offset 20
+	cmp	eax, 0
 	jl	large_memory
-	cmp	edx,0
+	
+	;;offset 12
+	cmp	edx, 0
 	jl	large_memory
-	shr	eax,2
-	add	eax,edx
+	
+	shr	eax, 2
+	add	eax, edx
+	
 	jmp	allocate_memory
 	
 
@@ -111,12 +131,16 @@ init_memory:
 ;;alocar.
 large_memory:
 	mov	eax, 80000000h
+	
 ;;alocar memória	
+;; o valor está em eax
 allocate_memory:
+	
 	mov	edx, eax
 	shr	edx, 2
 	mov	ecx, eax
 	sub	ecx, edx
+	
 	mov	[memory_end], ecx
 	mov	[additional_memory_end], edx
 	
@@ -124,13 +148,15 @@ allocate_memory:
 	;; # alocar memória #
 	;;
 	
-	;; chamando o Windows para alocar memória.
+	;; Chamando o Windows para alocar memória.
 	
 	push PAGE_READWRITE
 	push MEM_COMMIT
 	push eax
 	push 0
-	call [VirtualAlloc]
+	
+	;call [VirtualAlloc]
+	call gramado_VirtualAlloc
 	
 	;; se der problemas, então não temos a memória que precisamos 
 	;; vamos tentar de outro jeito, se não der certo, abortaremos. 
