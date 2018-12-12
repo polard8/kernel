@@ -272,10 +272,23 @@ buffer_for_variable_ok:
 	;;variáveis de ambiente 
 	;;se elas relmente forem necessárias só saberemos no futuro. 
 	
+	;;Retrieves the contents of the specified variable from the environment block of the calling process.
+    ;LPCTSTR lpName,
+    ;LPTSTR  lpBuffer,
+    ;DWORD   nSize	
+	
 	;push	ecx
 	;push	edi
 	;push	esi
 	;call	[GetEnvironmentVariable]
+	CALL gramado_GetEnvironmentVariable
+	
+    ;;If the function succeeds, the return value is the number of characters stored in the buffer pointed to by lpBuffer, not including the terminating null ;;character.
+
+    ;;If lpBuffer is not large enough to hold the data, the return value is the buffer size, in characters, required to hold the string and its terminating ;;null character and the contents of lpBuffer are undefined.
+
+    ;;If the function fails, the return value is zero. If the specified environment variable was not found in the environment block, GetLastError returns ;;ERROR_ENVVAR_NOT_FOUND.	
+	
 	
 	;;#bugbug:
 	;;#hackhack
@@ -284,8 +297,20 @@ buffer_for_variable_ok:
 	;; em seguida compar com o fim da memória disponível ...
 	;;; se naõ tem mais memória, acabou a brincadeira. 
 	
-	;;suspendendo essa adição pois não temos o valor de eax .
-	;add	edi, eax
+
+	;; #importante:
+	;; 'eax' é uma quantidade de caracteres em um buffer. 
+	;; vamos adicionar essa quantidade ao próprio endereço do buffer 
+	;; para chegarmos no fim dele.
+	
+	;;#BUGBUG: ESTAMOS DETERMIANDO 4K ATÉ QUE A FUNÇÃO ACIMA FUNCIONE.
+	;mov eax, 4096 ;;4K
+	
+	;;#BUGBUG SUSPENDENDO ISSO.  TEM QUE USAR.
+	;;add	edi, eax
+	
+	
+	;; comparamos com o fim da memória disponível. 
 	
 	cmp	edi, [memory_end]
 	jae	out_of_memory

@@ -217,7 +217,12 @@ after_my_awesome_stuff:
 	;mov esi, gramado_string_breakpoint
 	;call DisplayMessage			
 	;;#debug 
-	;jmp $		
+	;jmp $	
+
+    ;;#bugbug 
+    ;;o parser lida com alguns endereços de memória 
+    ;;precisa ajustá-los para ficar do jeito que ele quer.
+    ;;por isso a inicialização acima tem que funcionar corretamente.	
 	
 	call	parser
 	;call parser_interface
@@ -324,8 +329,8 @@ after_my_awesome_stuff:
 	;; ## Step 8 ##
 	;;
 
- 	;mov esi, gramado_string_step8
-    ;call DisplayMessage		
+ 	mov esi, gramado_string_step8
+    call DisplayMessage		
 	
 	;;#debug
 	;mov esi, gramado_string_breakpoint
@@ -333,9 +338,9 @@ after_my_awesome_stuff:
 	;;#debug 
 	;jmp $	
 	
-	;mov	eax, [written_size]
+	mov	eax, [written_size]
 	;call display_number
-	;call print_hex
+	call print_hex
 	
 	
 	;mov	esi, gramado_string_bytes_suffix ;_bytes_suffix

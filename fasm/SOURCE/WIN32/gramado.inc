@@ -33,7 +33,11 @@
 	    mov eax, gramado_command_line
         ret
 		
+		
+	;;#todo:
+    ;;fazer essa função	
     gramado_GetEnvironmentVariable:
+	    mov eax, 4096 ;;4K o retorno é uma quantidade de bytes num buffer.
         ret 
 		
     gramado_GetStdHandle:

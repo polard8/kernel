@@ -7,7 +7,7 @@
 
 ;;===============================================================
 ;;
-;; ## preprocessor ##
+;; ## PARSER ##
 ;;
 
 ;parser_interface:
@@ -21,33 +21,61 @@
 ;	ret
 
 parser:
-	mov	eax,[memory_end]
-	mov	[labels_list],eax
-	mov	eax,[additional_memory]
-	mov	[free_additional_memory],eax
-	xor	eax,eax
-	mov	[current_locals_prefix],eax
-	mov	[anonymous_reverse],eax
-	mov	[anonymous_forward],eax
-	mov	[hash_tree],eax
-	mov	[blocks_stack],eax
-	mov	[parsed_lines],eax
-	mov	esi,[memory_start]
-	mov	edi,[source_start]
+
+	;label list fica no fim da memória.
+	mov	eax, [memory_end]
+	mov	[labels_list], eax
+	
+	;;#bugbug
+	;;se a memória adicional estiver configurada corretamente, 
+	;;configuraremos a free addictional memory 
+	
+	mov	eax, [additional_memory]
+	mov	[free_additional_memory], eax
+	
+	
+	;; buffer comum.
+	;; Aditional memory servirá para outroas coisas.
+	
+	
+	xor	eax, eax
+	mov	[current_locals_prefix], eax
+	mov	[anonymous_reverse], eax
+	mov	[anonymous_forward], eax
+	mov	[hash_tree], eax
+	mov	[blocks_stack], eax
+	mov	[parsed_lines], eax
+	
+	;; #IMPORTANTE
+	;; A origem é o início da memória 
+	;; e o destino é o início do código.
+	;; ??
+	
+	mov	esi, [memory_start]
+	mov	edi, [source_start]   ;; #importante: Isso é definido pelo preprocessador.
+	
 	
 parser_loop:
-	mov	[current_line],esi
-	lea	eax,[edi+100h]
-	cmp	eax,[labels_list]
+	
+	;; a origem 
+	mov	[current_line], esi
+	lea	eax, [edi+100h]
+	
+	cmp	eax, [labels_list]
 	jae	out_of_memory
+	
 	cmp	byte [esi+16],0
 	je	empty_line
+	
 	cmp	byte [esi+16],3Bh
 	je	empty_line
+	
 	mov	al,0Fh
 	stos	byte [edi]
+	
 	mov	eax,esi
 	stos	dword [edi]
+	
 	inc	[parsed_lines]
 	add	esi,16
 	

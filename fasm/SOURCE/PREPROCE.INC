@@ -426,7 +426,7 @@ earliest_postponed_found:
 	jmp	incomplete_macro
 	
 preprocessing_finished:
-	mov	[source_start],edi
+	mov	[source_start], edi
 	ret
 	
 	
