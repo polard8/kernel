@@ -19,17 +19,21 @@ global __crt0Main
 __crt0Main:
 
     ;;
-	;; #bugbug: 
 	;; devemos chamar o assembler depois de termos 
 	;; chamado o código em C, que inicializará a 'runtime', pegará a linha de comando,
 	;; providenciará todos os arquivos e buffers necessários e passará tudo 
 	;; para o assembler.
 	;;
-
-    call fasm_main
 	
     ;main.c
-	call _gramc_main
+	call _gramc_main	
+
+	;;#todo: o retorno da função acima deve ser um ponteiro 
+	;;par aum array com um monte de informações.
+	
+    call fasm_main
+	
+
 	
 hang:
     pause
@@ -145,12 +149,14 @@ time:
     ret 
 	
 extern _exit	
+extern _fasm_exit	
 global exit
 exit:
 
     ;;isso provavelmente não retorne.
     push eax 
-	call _exit
+	call _fasm_exit
+	;call _exit
 	pop eax
     ret
 

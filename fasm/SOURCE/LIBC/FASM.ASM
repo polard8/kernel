@@ -85,8 +85,13 @@ fasm_main:
 	mov al, 2
 	call gramado_print_spaces
     
+	
 	mov esi, gramado_string_step2
 	call DisplayMessage
+	
+	;chamado o exit especial que está em C.
+	xor eax, eax
+	ccall exit, eax
 	
 	;#debug
 	jmp $

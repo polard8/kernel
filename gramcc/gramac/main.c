@@ -92,12 +92,12 @@ int gramc_main (){
 	char *shared_memory = (char *) (0xC0800000 -0x100);
 	
 	
-#ifdef GRAMCC_VERBOSE
-	printf("\n");
-	printf(" gramc_main: Initializing gramc ...\n");
-	printf("\n");
+//#ifdef GRAMCC_VERBOSE
+	//printf("\n");
+	printf("Initializing gramac ...\n");
+	printf("Its an inteface for fasm\n");
 	printf ("# cmdline={%s} #\n", shared_memory );
-#endif
+//#endif
 	
     
 	// Criando o ambiente.
@@ -166,17 +166,29 @@ int gramc_main (){
 	switch (Ret)
 	{
 		case 0:
-		    printf("mainGetMessage: main returned 0\n");
+		    printf("returned 0\n");
             exit(0);
 		    break;
 			
 		case 1:
-            printf("mainGetMessage: main returned 1\n");
+            printf("returned 1\n");
 			exit(1); 
 		    break;
 			
+		//#IMPORTANTE #IMPORTANTE #IMPORTANTE
+	    //
+	    // Retorno especial, indicando que podemos voltar para crt0 e 
+	    // chamarmos o fasm.
+	    //
+		case 216:
+		    //nesse momento podemos retornar o endereço de um array 
+			//com as informações que o fasm vai precisasr.
+		    printf("returned 216\n");
+			return 217;
+		    break;
+			
 		default:
-		    printf("mainGetMessage: default exit code %d\n", Ret );
+		    printf("default exit code %d\n", Ret );
             exit(Ret);
 		    break;
 	};	
@@ -238,6 +250,17 @@ init:
     stdioInitialize();
 	
 	gramccInitialize ();
+	
+	//
+	// ############################################################
+	//
+	
+	//#provisório 
+	//vamos retornar antes de carregarmos os arquivos ...
+	//pois para carregarmos os arquivos temos que digitar linha de comando.
+	
+	return 216;
+	
 	
 	// O nome do programa é o primeiro comando da linha.
 	// compiler_name = argv[0];
@@ -314,6 +337,32 @@ init:
 	//#importante.
 	stdin = fp;
 	finput = fp;
+	
+	
+	
+	//
+	// #######################################################################
+	//
+	
+	
+	
+	//#IMPORTANTE #IMPORTANTE #IMPORTANTE #IMPORTANTE #IMPORTANTE 
+	
+	//Nesse momento inicializamos várias funcionalidades 
+	//do programa em C. então vamos retornar 
+	//para que crt0.asm chame o fasm ... 
+	//as informações obtida aqui deverão ser passadas 
+	//para o fasm.
+	
+	//
+	// Retorno especial, indicando que podemos voltar para crt0 e 
+	// chamarmos o fasm.
+	//
+	
+	return 216;
+	
+	
+	
 	
 	//
 	// ## Parse ##
@@ -866,6 +915,12 @@ void debugShowStat (){
 };
 
 
+
+void fasm_exit(int code)
+{
+	printf("fasm special exit");
+	exit (code);
+}
 
 void testWrite()
 {

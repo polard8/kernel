@@ -24,7 +24,7 @@
 
 
 
-
+void fasm_exit(int code);
 void testWrite();
 size_t write (int fd, char *buf, size_t cnt);
 

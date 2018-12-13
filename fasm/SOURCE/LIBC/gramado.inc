@@ -3,6 +3,10 @@
 ;;  ## gramado extern ##
 ;;
 
+;;#importante:
+;;aqui chamaremos várias funções em C disponíveis na libc do gramado 
+;;e na api, além das outras que podemos criar exclusivamente para isso.
+;;
 
 ;extrn 
 ;extrn
