@@ -9,9 +9,10 @@ section '.text' code readable executable
 
 start:
 
-	mov	[con_handle],STD_OUTPUT_HANDLE
-	mov	esi,_logo
-	call	display_string
+	mov	[con_handle], STD_OUTPUT_HANDLE
+	
+	mov	esi, _logo
+	call display_string
 
 	call	get_params
 	jc	information
@@ -341,6 +342,9 @@ include '..\messages.inc'
 section '.data' data readable writeable
 
 include '..\version.inc'
+
+
+
 
 _copyright db 'Copyright (c) 1999-2018, Tomasz Grysztar',0Dh,0Ah,0
 

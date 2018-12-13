@@ -31,7 +31,71 @@ extrn gettimeofday
 
 section '.text' executable align 16
 
+
+
+;;=============================================
+;; main
+;;
+
+;; #importante
+;; O programa em C chamará essa rotina depois de ter inicializado 
+;; a runtime do programa. Então ele passará algumas informações 
+;; para tudo fique mais fácil para nós.
+
 fasm_main:
+    
+	;;
+	;; ## Testing functionalities ... ##
+	;;
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+	
+	;Ok
+	mov	dl, '.'
+	call display_character	
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+	
+	;fail
+	mov eax, 0x12345678
+    call	gramado_print_hex
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+	
+	;Ok
+	;mais essa rotina imprime em 'decial'.
+	mov eax, 0x12345678
+    call	display_number	
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+	
+	;Ok
+    mov esi, gramado_string_step1
+    call display_string
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+    
+	mov esi, gramado_string_step2
+	call DisplayMessage
+	
+	;#debug
+	jmp $
+	
+    ;my lib
+	
+    jmp after_my_awesome_lib
+	include 'gramado.inc'
+after_my_awesome_lib:
 
 	;;ok funcionou.
 	;mov	dl, '.'
@@ -324,6 +388,8 @@ get_params:
 include 'system.inc'
 
 include '..\version.inc'
+
+include 'gram_msg.inc'
 
 _copyright db 'Copyright (c) 1999-2018, Tomasz Grysztar',0xA,0
 

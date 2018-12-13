@@ -18,6 +18,14 @@ extern fasm_main
 global __crt0Main
 __crt0Main:
 
+    ;;
+	;; #bugbug: 
+	;; devemos chamar o assembler depois de termos 
+	;; chamado o código em C, que inicializará a 'runtime', pegará a linha de comando,
+	;; providenciará todos os arquivos e buffers necessários e passará tudo 
+	;; para o assembler.
+	;;
+
     call fasm_main
 	
     ;main.c

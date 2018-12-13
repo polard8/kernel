@@ -3646,24 +3646,28 @@ doexec_first_command:
 	// pois podem ter entrypoint diferentes.
 	// O kernel adapta o entrypoint dependendo da systemcall.
 
-
-    if( is_bin( (char *) tokenList[0] ) != 1 )
+    // If the file is .bin (lower case) 
+    if ( is_exe( (char *) tokenList[0] ) == 1 )
 	{
-		printf("it's not a .bin filename.\n");
-		printf("trying to execute a .exe file\n");
-		//while(1){ asm ("pause");}
+		printf("Trying to execute a .exe file\n");
 		
         Execve_Ret = (int) shell_gramado_core_init_execve_exe ( 
 	                       (const char *) tokenList[0], //nome
 	                       (const char *) 0,            //NULL
-						   (const char *) 0); 	       //NULL
+						   (const char *) 0); 	        //NULL
 		
 		goto chech_return;
 	};
 
+	//#importante
+	//Não sendo nenhuma das extensões acima tentaremos executar como 
+	//.bin, mesmo que não tenha extensão, pois é nossa extensão padrão 
+	//para plicativos.
+	
 	// ## ISSO DEU CERTO ## 	
     // Passamos anteriormente a linha de comandos via memória compartilhada,
     // agora então precisamos passar somente o nome do arquivo.	
+	
     Execve_Ret = (int) shell_gramado_core_init_execve ( 
 	                       (const char *) tokenList[0], //nome
 	                       (const char *) 0,            //NULL
@@ -6996,6 +7000,31 @@ int is_bin ( char *cmd ){
 
     return 0;
 };
+
+/* Check if it's a .exe file */
+int is_exe ( char *cmd ){
+	
+    char *p;
+	
+	p = cmd;
+	
+	int len = strlen (p);
+    
+	if( len <= 4 ) 
+		return 0;
+	
+    p += len - 4;
+    
+	if ( *p++ != '.' ) 
+		return 0;
+	
+    if ( strncmp ( (char *) p, "exe", 3 ) == 0 ){
+	    return 1;	
+	}
+
+    return 0;
+};
+
 
 
 /* Check if it's a .sh1 file */

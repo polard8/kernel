@@ -147,7 +147,7 @@ display_string:
 	lodsb
 	or	al,al
 	jz	string_displayed
-	mov	dl,al
+	mov	dl, al
 	call	display_character
 	jmp	display_string
       string_displayed:
