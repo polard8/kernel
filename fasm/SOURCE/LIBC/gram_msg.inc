@@ -1,5 +1,10 @@
 
 
+;;USADAS EM FOPEN DE TEST
+gramado_string_file1: db 'TEST.ASM', 0
+;gramado_string_file2: db 'TEST.ASM', 0
+gramado_string_fopen_code: db 'rw', 0
+
 ;; debug messages
 gramado_string_step1: db 'Step1', 0Dh, 0Ah,0
 gramado_string_step2: db 'Step2', 0Dh, 0Ah,0

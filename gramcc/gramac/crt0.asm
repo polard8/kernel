@@ -42,7 +42,11 @@ hang:
 	
 ;;
 ;; ## as chamada daqui pra baixo vem do fasm ligado como objeto ##
-;;	
+;;
+
+
+
+;;isso funciona.	
 extern _malloc	
 global malloc
 malloc:
@@ -67,11 +71,37 @@ getenv:
     ret 
 	
 	
+	
+extern _fasm_fopen	
 extern _fopen	
 global fopen
 fopen:
     ;;#todo FALTA PEGAR O ARGUMENTO.
-    call _fopen
+	mov ebp, esp
+	
+	;mov ebx, dword [ebp+0]
+	mov ecx, dword [ebp+4]
+	mov edx, dword [ebp+8]
+	
+	;push ebx 
+	;push ecx 
+	;push edx
+	
+	push edx 
+	push ecx
+	
+	call _fasm_fopen  ;;especial usado para checar os argumentos.
+    ;call _fopen
+	
+	;eax é o retorno.
+	
+	pop ecx 
+	pop edx
+	
+	;pop edx
+	;pop ecx 
+	;pop ebx
+	
 	ret 
 	
 	
@@ -160,8 +190,9 @@ exit:
 	pop eax
     ret
 
+;;#importante: isso funciona.	
 ;;#bugbug esse é diferente
-extern _write
+extern _fasm_write
 extern _testWrite
 global write
 write:
@@ -187,7 +218,7 @@ write:
 
 	
 	; fd, buffer, count
-	call _write
+	call _fasm_write
 	
 	pop ebx 
 	pop ebx 

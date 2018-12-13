@@ -98,7 +98,7 @@ open:
 create:
 	push	esi edi ebp
 	call	adapt_path
-	ccall	fopen,buffer,create_mode
+	ccall	fopen, buffer, create_mode
 	pop	ebp edi esi
 	or	eax,eax
 	jz	file_error

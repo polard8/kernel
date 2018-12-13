@@ -147,6 +147,7 @@ echo -{ ...
 	rem arquivos de texto.
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.TXT  F:\*.TXT
+	copy c:\gramado\arch\x86\boot\vhd\tests\*.ASM  F:\*.ASM
 	REM copy c:\gramado\arch\x86\boot\vhd\tests\TEST.C F:\
 	rem copy tests\TEST2.C  F:\
 	rem copy tests\REGRAS.TXT   F:\

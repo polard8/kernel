@@ -209,6 +209,7 @@ gramado_print_hex:
     ;nop
 ;screen32PrintHex:	
     pushad
+	XOR ECX, ECX 
     mov     cx, WORD 4
     bswap   eax
 .looph:

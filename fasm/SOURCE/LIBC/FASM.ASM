@@ -88,11 +88,47 @@ fasm_main:
 	
 	mov esi, gramado_string_step2
 	call DisplayMessage
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
 	
+	mov eax, 4096
+	ccall	malloc, ecx
+	;imprimindo o endereço retornado por malloc.
+	call gramado_print_hex
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces	
+	
+	;ok funcionou
 	;chamado o exit especial que está em C.
-	xor eax, eax
-	ccall exit, eax
+	;xor eax, eax
+	;ccall exit, eax
 	
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+	
+	;testando fopen
+	ccall	fopen, gramado_string_file1, gramado_string_fopen_code
+	mov ebp, eax ;save
+	;imprimindo o edereço retornado por fopen
+	call gramado_print_hex
+	
+	;;#bugbug: page fault.
+	;mov eax, ebp ;recupera
+    ;testando fclose
+	;ccall fclose, ebx
+
+	;Ok
+	mov al, 2
+	call gramado_print_spaces
+	
+	mov esi, gramado_string_step3
+	call DisplayMessage	
+
 	;#debug
 	jmp $
 	

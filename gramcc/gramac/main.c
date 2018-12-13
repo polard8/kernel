@@ -927,7 +927,7 @@ void testWrite()
 	printf("WRITE");
 }
 
-size_t write (int fd, char *buf, size_t cnt) 
+size_t fasm_write (int fd, char *buf, size_t cnt) 
 {
 	//#debug
 	//printf("write");
@@ -942,6 +942,19 @@ size_t write (int fd, char *buf, size_t cnt)
 	return cnt;
 }
 
-
+//test: vamos checar os argumentos antes de chamarmos a libc
+FILE *fasm_fopen( const char *filename, const char *mode )
+{
+	
+	//printf("fasm_fopen: ");
+	//printf("%s", filename);
+	//printf("%s", mode);
+	//printf("");
+	
+	return fopen(filename,mode);
+	
+	
+	return NULL;
+}
 
 
