@@ -1011,6 +1011,7 @@ void shellRefreshCurrentChar(); //refresh do char que está na posição usada pelo
 
 //scroll dentro da screen_buffer. (VGA emulada)
 void shellScroll();
+void scroll2 ();
 //...
 
 

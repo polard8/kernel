@@ -137,6 +137,10 @@ struct command cmd_table[] = {
 
 int ShellFlag = 0;
 
+//flag que indica se o aplciativo vai rodar em segundo plano ou não.
+//1 = segundo plano
+int background_flag = 0;
+
 
 //O shell está rodadndo.
 int running = 1;
@@ -1016,7 +1020,6 @@ afterArgs:
 	unsigned long xbuffer[8];
 	
 	// +pegamos o retângulo referente à area de cliente da janela registrada. 
-	
 	system_call ( 134, (unsigned long) hWindow, 
 	    (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );
 
@@ -2031,6 +2034,8 @@ void shellWaitCmd (){
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
  
+// ?? quem é essa janela exatamente;?? 
+ 
 unsigned long shellCompare (struct window_d *window){
 	
     //char **stringarray1;
@@ -2264,11 +2269,30 @@ this_directory:
     tokenList[i] = NULL;
 	
 	
-	//
 	//#importante:
 	//nesse momento todos os argumentos estão certinhos no vetor.
 	//já conferimos.
-	//
+	
+	//#importante:
+	// 'i' contém o último token que é NULL,
+	//então devemos checar se 'i-1' é '-b' ou '-background'
+	//para acionarmos a flag de backgroud, que indica se 
+	//o aplicativo vai rodar em segundo plano ou não.
+	
+	int b_index = (i-1);
+	
+	//À priori, determinamos que o app vai rodar em primeiro plano.
+	background_flag = 0;
+    
+	if ( strncmp( (char *) tokenList[b_index], "-b", 2 ) == 0 ){
+	    //vai rodar em segundo plano
+		background_flag = 1;
+	}
+	
+	if ( strncmp( (char *) tokenList[b_index], "-background", 11 ) == 0 ){
+	    //vai rodar em segundo plano
+		background_flag = 1;	
+	}
 
 	//#debug
     //printf("shellCompare: %s \n", tokenList[i] );
@@ -2278,9 +2302,12 @@ this_directory:
     //printf("shellCompare: Test done!\n");
     //refresh_screen();	
 
-
+    //
+	// #importante:
 	// Zerando o índice do tokenList
-    i=0;	
+    //
+	
+	i=0;	
    
     //printf("shellCompare: Testing ...\n");
     //refresh_screen();
@@ -3113,7 +3140,14 @@ do_compare:
 	//scroll2
 	if ( strncmp( prompt, "scroll2", 7 ) == 0 )
 	{
-	     testScrollChar((int) '2');
+	    scroll2();
+		
+		//tentando o scroll da área de cliente de uma janela.
+		//bugbug: mas essa ja é a área de cliente da janela??
+		//page fault. mas é uma boa rotina.
+		//system_call ( 197, (unsigned long) window, 0, 0 );
+	     
+		//testScrollChar((int) '2');
         goto exit_cmp;		
 	}	
 	
@@ -3519,7 +3553,7 @@ do_compare:
     };
 
 
-    // Se apertamos o enter e não encontramos um comando válido
+    // Se apertamos o [enter] e não encontramos um comando válido
     // então damos um aviso de comando inválido e reiniciamos o prompt 
     // na próxima linha.
 	
@@ -3531,17 +3565,28 @@ do_compare:
 	//char *a1 = tokenList[1];
 	//char *a1 = tokenList[2];
 	
+
+    //
+	// ## Execute ##
+	//
+
 	
 doexec_first_command:
 
-    //
-	// ## TEST ##
-	//
-
 	// #importante:
+	
 	// Se estamos aqui é porque o comando não corresponde a nenhuma das 
-	// palavras reservadas acima, então executaremos, presumindo ser um nome 
-	// de aplicativo no formato 'test.bin'. 
+	// palavras reservadas acima, então executaremos.
+	// A extensão padrão para aplicativos é .bin
+    // A extensão padrão para o shell é .sh1 
+
+    //#todo:
+    //devemos checar quandos argumentos tem a linha de comando,
+    //e se o último argumento é um -b ou -background.
+    //caso seja, então isso significa que o shell não ficará esperando 
+    //pela conclusão do aplicativo e o aplicativo vai rodar em segundo plano.
+    //>>acho que podemos verificar isso lá em cima quando pegamos os tokens 
+    //e apenas acionarmos uma flag que usamos agora.	
 	
 	// #importante:
 	// Vamos checar se o pathname é absoluto ou relativo.
@@ -3552,6 +3597,8 @@ doexec_first_command:
 	// +Pathname relativo é somente aquele que é apenas um nome 
 	// de arquivo dentro do diretório atual. Como: 'name' ou name1/name2,
 	// sem barra ou ponto.
+	
+
 	
     absolute = absolute_pathname ( (char *) tokenList[0] );
 	
@@ -3674,49 +3721,90 @@ doexec_first_command:
 						   (const char *) 0);           //NULL
 						   
 						   
+	//
+	//====================================================
+    // ## RETURN ##
+    //	
+						   
+						   
 chech_return:
 						 
+	//background_flag
 	
-	
-    //Execve_Ret = (int) shell_gramado_core_init_execve( 
-	//                       (const char*) tokenList[0], //nome
-	//                       (const char*) tokenList[1], 
-	//					   (const char*) tokenList[2]); //env ...deve ser null
 	
 	// Ok, funcionou e o arquivo foi carregado,
 	// mas demora para receber tempo de processamento.
+	
 	if( Execve_Ret == 0 )
 	{
+		
+		// #bugbug 
+		// Se o shell não sair está dando pagefailt.
+		// Ainda estamos implementando as funcionalidades abaixo. 
+		// Essa é a única situação que funciona. Ou seja, se o shell sair.
+		
+		//Isso sai do loop de mensagens e 
+		//sai do shell elegantemente.		
+		
+		running = 0;
+		goto exit_cmp;
+		
 		//
 		// ## WAIT ??
 		//
 		
-		// Aqui temos uma decisão a tomar.
-		// Se o aplicativo executou corretamente e esta em primeiro 
-		// plano então devemos entrar em wait.
-		// Se o aplicativo funcionou corretamente mas está em segundo 
-		// plano então decemos continuar. 
-		// Por enquanto estamos continuando e rodando concomitantemente.
-		//
+		//Temos situações:
+		//+1) O shell fica em primeiro plano e o aplicativo roda em segundo plano.
+		//+2) O shell fica em segundo plano e o aplicativo roda em primeiro plano.
+		//+3) O shell fecha e o aplicativo fica em primeiro plano. (suspensa).
+
 		
-		//
-		// # Stop running #
-		//
+		//+1) O shell fica em primeiro plano e o aplicativo roda em segundo plano.
+		//O app vai rodar em segundo plano.
+		//if ( background_flag == 1 )
+		//{
+			//reativaremos o prompt;
+		//	running = 1;
+		//	goto exit_cmp;
+		//}
 		
-		//Isso sai do loop de mensagens e 
-		//sai do shell elegantemente.
-		running = 0;
 		
-	    goto exit_cmp;	
+		//+2) O shell fica em segundo plano e o aplicativo roda em primeiro plano.
+		//if ( background_flag != 1 )
+		//{
+		    //+3) O shell fecha e o aplicativo fica em primeiro plano. (suspensa).					
+
+		    //Isso sai do loop de mensagens e 
+		    //sai do shell elegantemente.
+		    //running = 0;		
+	        //goto exit_cmp;	
+			
+		//	printf("#todo: shell WAIT! *hang");
+		//	while(1){}
+		//}
+
+        // #fail:
+        // Houve uma falha no tratamento da flag.
+        // Emitimos uma mensagem de erro e ativamos o prompt,
+		// pois não perigo em termos um prompt.
+		//printf("background_flag fail\n");
+		//running = 1;
+		//goto exit_cmp;
+  		
 	}else{
-		// falhou. Significa que o serviço naõ conseguir encontrar 
+		
+		// falhou. 
+		// Significa que o serviço não conseguir encontrar 
 		// o arquivo ou falhou o carregamento.
+		
 		printf("shell: execve fail\n");
+		
 		goto fail;
 	};
 	
 	
 	//
+	//==========================================================
 	// # dobin #
 	//
 	
@@ -3772,6 +3860,10 @@ dobin:
 	};	
 	
 	
+	//
+	//==========================================================
+	// # dotry #
+	//	
 	
 // Tente executar um aplicativo com outra extensão.
 // Checaremos se é uma extensão das suportadas.	
@@ -3815,6 +3907,11 @@ dotry:
 		goto fail;
 	};		
 	
+	
+	//
+	//==========================================================
+	// # dosh #
+	//	
 	
 	//
 	// # Script #
@@ -3866,6 +3963,11 @@ fail:
    //====================
    //    ## EXIT CMP ##
    //====================	
+   
+   
+//==========================================================
+// Saímos da comparação e reabilitamos o prompt de comandos.   
+//
 
 exit_cmp:
 
@@ -3876,18 +3978,12 @@ done:
 	// Limpando a lista de argumentos.
 	// Um array de ponteiros.
 	
-	for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){
+	for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ )
+	{
 		tokenList[i] = NULL;
 	};
 	
 	shellPrompt ();
-	
-	
-	//#bugbug:
-	//queremos dar refresh apenas da janela.
-	//Mostrando as strings da rotina de comparação.	
-	
-	//refresh_screen();
 	
     return (unsigned long) ret_value;
 };
@@ -4858,7 +4954,7 @@ void shellPrompt (){
     prompt_status = 0;
 	prompt_max = PROMPT_MAX_DEFAULT;  
 
-    printf("\n");
+    //printf("\n");
     printf("[%s]", current_workingdiretory_string );	
 	printf("%s", SHELL_PROMPT );
 };
@@ -4876,14 +4972,15 @@ void shellClearBuffer (){
 	//inicializamos com espaços.
 	for ( i=0; i<32; i++ )
 	{
-		for ( j=0; j<80; j++ )
-		{
+		for ( j=0; j<80; j++ ){
+			
 		    LINES[i].CHARS[j] = (char) ' ';
 		    LINES[i].ATTRIBUTES[j] = (char) 7;
 	    }
 		
 		LINES[i].left = 0;
 		LINES[i].right = 0;
+		
 		LINES[i].pos = 0;
 	};
 };
@@ -5093,13 +5190,68 @@ void shellClearScreen (){
 	unsigned long left, top, right, bottom;
 	
     //desabilita o cursor
+	
 	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 	
+	// Limpa o buffer de linhas.
 	
 	shellClearBuffer ();
 	
 	
+	//#window 
+	//Pegamos informações sobre a janela do terminal.
+	
 	w = (void *) shell_info.terminal_window;
+	
+	//Redraw window! 
+	//Essa é uma janela simples.
+	//Ao redesenhar todo conteúdo é apagado.
+	//Isso é melhor que apagra pedaço por pedaço.
+	//A flag indica se deve efetuar refresh ou não.
+	
+	if ( (void *) w != NULL )
+	{
+		APIredraw_window ( w, 1 );
+	};
+
+	//Cursor
+    	
+    left = (terminal_rect.left/8);
+    top = (terminal_rect.top/8);
+	
+    shellSetCursor ( left, top );
+
+	//reabilita o cursor
+	
+	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+};
+
+
+void scroll2 (){
+
+	
+	struct window_d *w;
+	unsigned long left, top, right, bottom;
+	
+    //desabilita o cursor
+	
+	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
+	
+	//#No scroll não apagaremos o buffer.
+	// Limpa o buffer de linhas.
+	//shellClearBuffer ();
+	
+	
+	//#window 
+	//Pegamos informações sobre a janela do terminal.
+	
+	w = (void *) shell_info.terminal_window;
+	
+	//Redraw window! 
+	//Essa é uma janela simples.
+	//Ao redesenhar todo conteúdo é apagado.
+	//Isso é melhor que apagra pedaço por pedaço.
+	//A flag indica se deve efetuar refresh ou não.
 	
 	if ( (void *) w != NULL )
 	{
@@ -5107,20 +5259,67 @@ void shellClearScreen (){
 	};
 
 	
+	//reposiciona o cursor	
     left = (terminal_rect.left/8);
     top = (terminal_rect.top/8);
-	
     shellSetCursor ( left, top );
-
-
-	// Copiamos o conteúdo do screenbuffer para 
-	// a área de cliente do shell.
-	// obs: A outra opção seria repintarmos a janela.
-
-    //shellRefreshScreen ();	
 	
-	//shellRefreshVisibleArea();
 	
+	//#todo
+	//1Mostrar o conteúdo do buffer.
+	//2apagar a última linha.
+	//3reposicionar o cursor no início da última linha.
+	//4reabilitar o cursor.
+
+	//1
+	//=============
+    //mostra o conteúdo do buffer,
+	//mas vamos mudar a área visível antes
+	
+	testChangeVisibleArea ();
+	
+	// efetua o refresh do char atual, que agora é o primeiro 
+	// depois os outros consecutivos.
+	
+	int i=0;
+	int j=0;
+	
+	//textTopRow = 3;
+	//textBottomRow = 3 + 25;
+	
+	if ( textTopRow > textBottomRow )
+	{
+		printf("scroll2: textTopRow fail");
+	}
+	
+	//toda a área visível.
+	//for ( i=0; i<25; i++ )
+		
+	for ( i=textTopRow; i<textBottomRow; i++ )
+	{
+		for ( j=0; j<80; j++ )
+		{	
+	        //refresh
+            printf ("%c", LINES[i].CHARS[j] );						
+		}
+	};	
+	
+	//2
+    left = (terminal_rect.left/8);
+    top =  ( (terminal_rect.top + (8*24) ) /8);
+    shellSetCursor ( left, top );
+    for (i=0; i<78; i++)
+    {
+		printf ("?", LINES[i].CHARS[j] );
+	}		
+	
+	//3
+	//reposiciona o cursor	
+    left = (terminal_rect.left/8);
+    top =  ( (terminal_rect.top + (8*24) ) /8);
+    shellSetCursor ( left, top );
+	
+	//4
 	//reabilita o cursor
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 };
