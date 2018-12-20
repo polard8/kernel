@@ -502,8 +502,8 @@ int heapInit (){
 	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
 	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
-	int thisprocess_id = (int) system_call ( 85, 0, 0, 0); 
-	unsigned char *heaptest = (unsigned char *) system_call ( 184, thisprocess_id, 0, 0 );	
+	int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
+	unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
 	
 	HEAP_START = (unsigned long) &heaptest[0];
 	HEAP_END   = (unsigned long) (HEAP_START + (1024*1024*4) ); //(HEAP_START + (1024*128) );  //128KB 

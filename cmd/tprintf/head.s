@@ -104,6 +104,17 @@ _idle_entry_point:
 	
 	call _testtest_main
 	
+	
+	;;#bugbug
+	;;por esse crt0 não ter exit() então 
+	;;foi possível que shell chamasse outros 
+	;;progamas para usarem essa mesma thread.
+	;;pois parece que o execve do gramado core init 
+	;;não está criando uma thread nova e sim reaproveitando.
+	;;vamos checar :)
+	;;pois queremos que o exit funcione e que o shell possa 
+	;;chamar vários programas.
+	
 	;;
 	;;    * IDLE LOOP
 	;;

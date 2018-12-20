@@ -11,8 +11,8 @@
  
  
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 
@@ -41,13 +41,18 @@ void _main (){
 		}
     };	
 	
-	printf("done.\n");
+	printf("\n");
+	printf("Done!\n");
 	
+	//exit 9 é o código do reaproveitamento.
+	//é excepcional.
+	exit (9);
+	 
 	//while(1){
 	//	asm("pause");
 	//}
     
     //return 0;
-    exit(0);
+   
 };
 

@@ -10,11 +10,11 @@ echo -{ Creating application TASCII.BIN ...
 :Compiling	
 echo -{ ...
 echo -{ Compiling ...
+
 	gcc  -c c:\gramado\cmd\tascii\main.c -I c:\gramado\include\libc -o main.o  
  
-
-    copy c:\gramado\lib\ctype.o c:\sdk\bin\ctype.o	 
-    copy c:\gramado\lib\stdio.o c:\sdk\bin\stdio.o
+    copy c:\gramado\lib\ctype.o  c:\sdk\bin\ctype.o	 
+    copy c:\gramado\lib\stdio.o  c:\sdk\bin\stdio.o
     copy c:\gramado\lib\stdlib.o c:\sdk\bin\stdlib.o
     copy c:\gramado\lib\string.o c:\sdk\bin\string.o
 

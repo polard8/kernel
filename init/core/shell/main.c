@@ -3745,8 +3745,9 @@ chech_return:
 		
 		//Isso sai do loop de mensagens e 
 		//sai do shell elegantemente.		
-		
-		running = 0;
+		printf("shell vai continuar rodando...");
+		running = 1;
+		//running = 0;
 		goto exit_cmp;
 		
 		//
@@ -6204,10 +6205,11 @@ void shell_fntos (char *name){
  *     #@todo: caso seja .bin mas começe com "/"
  *     Devemos suprimir a barra. 
  *     
- */									 
-int shell_gramado_core_init_execve( const char *arg1,  //nome
-                                    const char *arg2,  //arg(endereço da linha de comando)
-                                    const char *arg3 ) //env
+ */		
+ 
+int shell_gramado_core_init_execve ( const char *arg1,  //nome
+                                     const char *arg2,  //arg(endereço da linha de comando)
+                                     const char *arg3 ) //env
 {
 	//erro.
 	int Status = 1;
@@ -6231,8 +6233,6 @@ int shell_gramado_core_init_execve( const char *arg1,  //nome
 	//{ 
 	//    arg1++; 
 	//};
-	
-	
 	
 translate:	
 	
@@ -6261,14 +6261,12 @@ translate:
 
 
 	// #importante:
-	// Isso deve chamar gramado_core_init_execve() na api.
-								
-								
-
+	// Isso deve chamar gramado_core_init_execve() na api.						
 
    	
- //isso chamará uma rotina especial de execve, somente 
+//isso chamará uma rotina especial de execve, somente 
 //usada no ambiente gramado core. 
+
 execve:
 
 //
@@ -6291,11 +6289,10 @@ execve:
 // de onde o aplicativo pegará o caractere.
 //	
 
-    //
+   
     // O retorno significa que o aplicativo foi colocado
 	// para rodar e em breve receberá tempo de processamento.
 	// '0' significa que funcionou e '1' que falhou.
-    //	
 	
 	//
 	// Obs: Se retornar o número do processo então podemos esperar por ele 
@@ -6306,28 +6303,21 @@ execve:
 	                          (unsigned long) arg1,    //Nome
 				              (unsigned long) arg2,    //arg(endereço da linha de comando)
 				              (unsigned long) arg3 );  //env
-							  
-							  
-    if( Status == 0 )
+							  					  
+    if ( Status == 0 )
 	{
 		//Não houve erro. O aplicativo irá executar.
 		
-		//
 		// Nesse momento devemos usar um novo procedimento de janela.
 		// Que vai enviar as mensagens de caractere para um terminal 
 		// específico, para que aplicativos que user aquele terminal 
 		// possam pegar essas mensgens de caractere.
-		//
 		
 #ifdef SHELL_VERBOSE		
 		printf("shell: aplicativo inicializado.\n"); 
 #endif
 		
-		//
-		// ## teste ##
-		//
 		// saindo do shell.
-		//
 		
 		// getpid...
 		// waitforpid(?);
