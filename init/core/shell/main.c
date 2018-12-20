@@ -137,6 +137,10 @@ struct command cmd_table[] = {
 
 int ShellFlag = 0;
 
+
+//se o shell deve fechar mesmo antes de esperar o retorno do app.
+int exit_flag = 0;
+
 //flag que indica se o aplciativo vai rodar em segundo plano ou não.
 //1 = segundo plano
 int background_flag = 0;
@@ -2281,8 +2285,19 @@ this_directory:
 	
 	int b_index = (i-1);
 	
+	
+	//À priori, determinamos o shell não vai fechar e
+	//pretende esperar o retorno do app.
+	exit_flag = 0;
+	
 	//À priori, determinamos que o app vai rodar em primeiro plano.
 	background_flag = 0;
+    
+	
+	if ( strncmp( (char *) tokenList[b_index], "-exit", 5 ) == 0 ){
+	    //o shell vai fechar mesmo antes do retorno do app.
+		exit_flag = 1;
+	}
     
 	if ( strncmp( (char *) tokenList[b_index], "-b", 2 ) == 0 ){
 	    //vai rodar em segundo plano
@@ -2293,6 +2308,11 @@ this_directory:
 	    //vai rodar em segundo plano
 		background_flag = 1;	
 	}
+	
+	
+	//continua 
+	//...
+	
 
 	//#debug
     //printf("shellCompare: %s \n", tokenList[i] );
@@ -3738,16 +3758,22 @@ chech_return:
 	if( Execve_Ret == 0 )
 	{
 		
-		// #bugbug 
-		// Se o shell não sair está dando pagefailt.
-		// Ainda estamos implementando as funcionalidades abaixo. 
-		// Essa é a única situação que funciona. Ou seja, se o shell sair.
 		
-		//Isso sai do loop de mensagens e 
-		//sai do shell elegantemente.		
-		printf("shell vai continuar rodando...");
-		running = 1;
-		//running = 0;
+        //#importante 
+        //Um comando normal. Vai rodar no shell atual. 		
+
+		if( exit_flag == 0)
+		{
+		    printf("shell vai continuar rodando...");
+		    running = 1;
+        };
+		
+		if( exit_flag == 1)
+		{
+		    printf("shell fecha...");
+		    running = 0;
+		};
+		
 		goto exit_cmp;
 		
 		//
