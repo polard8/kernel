@@ -18,6 +18,7 @@
 #include <stdlib.h>  
 #include <string.h>
 
+#include <sys/wait.h>
 
 //shell stuff 
 #include "shell.h"

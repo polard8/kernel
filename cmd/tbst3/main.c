@@ -163,59 +163,78 @@ void insertnum(struct arvore *no, char *k, int n, int i)
 			aux = aux->esq;
 		}
 	}
-}
+};
 
-int main2()
-{
+
+
+/*
+ ***********************************
+ */
+int main2 (){
+	
 	struct arvore *raiz = NULL;
+	
 	int i = 1, j = 1, k, escolha;
+	
 	char a[1], b[1];
+	
 	printf("Ola! Este programa ira converter uma entrada em notacao polonesa para a notacao polonesa reversa (RPN) e infixa.\n");
-	printf("Digite sua equacao em notacao polonesa\n(separe os simbolos e numeros todos por um 'espaco' e depois tecle 'Enter'):\n");
-	raiz = (struct arvore *)malloc(sizeof(struct arvore)); // cria a raiz
+	printf("Digite sua equacao em notacao polonesa\n (separe os simbolos e numeros todos por um 'espaco' e depois tecle 'Enter'):\n");
+	
+	// cria a raiz
+	raiz = (struct arvore *)malloc(sizeof(struct arvore)); 
 	raiz->esq = NULL; //aterra a raiz
 	raiz->dir = NULL;
+	
 	scanf("%s", a);
 	strcpy(raiz->entrada, a);
+	
 	scanf("%s", a);
-	while(a[0] == 42 || a[0] == 43 || a[0] == 45 || a[0] == 47) //enquanto sao entrados sinais, cahama a funcao insertsign
+	
+	//enquanto sao entrados sinais, cahama a funcao insertsign
+	while(a[0] == 42 || a[0] == 43 || a[0] == 45 || a[0] == 47) 
 	{
 		insertsign(raiz, a);
 		scanf("%s", a);
 		i++;	
 	} 
-	insertnum(raiz, a, j, i); //quando sao inseridos numeros, passa a chamar a funcao insertnum
+	
+	//quando sao inseridos numeros, passa a chamar a funcao insertnum
+	insertnum(raiz, a, j, i); 
 	for (j = 2; j < i + 2; j++)
 	{
 		scanf("%s", a);
 		insertnum(raiz, a, j, i);
 	}
-	while (escolha != 3) //repete o menu ate que seja escolhida a opcao "sair"
+	
+	//repete o menu ate que seja escolhida a opcao "sair"
+	while (escolha != 3) 
 	{
 		printf("\n\nO que voce deseja fazer? Digite o numero correspondente!\n");
 		printf("1 - Impressao na notacao polonesa reversa (RPN)\n2 - Impressao na notacao infixa\n3 - Sair\n\n");
 		scanf("%d", &escolha);
-		if (escolha > 3 || escolha <1) //caso seja escolhida uma opcao fora do menu, uma mensagem de erro eh impressa
+		
+		//caso seja escolhida uma opcao fora do menu, uma mensagem de erro eh impressa
+		if (escolha > 3 || escolha <1) 
 		{
 			printf("Favor entrar com uma das opcoes do menu.\n");
-		}
-		else
-		{
+		}else{
+			
 			switch(escolha)
 			{
 				case 1:
-					printf("\nPolonesa reversa:\n");
+					printf("\nPolonesa reversa: ");
 					posordem(raiz);
 					break;
 				case 2:
-					printf("\nNotacao infixa:\n");	
+					printf("\nNotacao infixa: ");	
 					printf("(");
 					emordem(raiz);
 					printf(")");
 			}
 		}
 	}
-}
+};
 
 
 
@@ -1008,13 +1027,13 @@ done:
 
 /*
  ==================================================================================
- * iNICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
+ * INICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
  */
 
 int testtest_main (){
 	
 	printf("\n");
-	printf("Initilizing TBST.BIN ...\n\n");
+	printf("Initilizing TBST3.BIN ...\n\n");
 	
 	
     libcInitRT();
@@ -1022,7 +1041,7 @@ int testtest_main (){
 
 	//bst_main(); 
 	 
-	 main2();
+	main2 ();
 	 
 	/*
 	if ( isxdigit('a') )

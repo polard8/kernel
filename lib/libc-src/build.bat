@@ -22,6 +22,12 @@ rem
 	echo { Compiling extra files ...
 	gcc -c c:\gramado\lib\libc-src\conio.c -I c:\gramado\include\libc -o conio.o
 	
+	gcc -c c:\gramado\lib\libc-src\wait.c   -I c:\gramado\include\libc -o wait.o
+	
+	
+	
+	
+	
 :Moving
     echo { Moving objects ...
 	
@@ -33,7 +39,8 @@ rem
 
     rem extras ...	
 	move conio.o  c:\gramado\lib\conio.o
-    rem ...
+    move wait.o  c:\gramado\lib\wait.o
+	rem ...
 	
 :End
     pause

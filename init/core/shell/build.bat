@@ -31,7 +31,11 @@ echo -{ Creating main.o ...
 	copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
 	copy c:\gramado\lib\stdlib.o  c:\sdk\bin\stdlib.o
 	copy c:\gramado\lib\string.o  c:\sdk\bin\string.o
+	
 	copy c:\gramado\lib\conio.o   c:\sdk\bin\conio.o
+	copy c:\gramado\lib\wait.o   c:\sdk\bin\wait.o
+	
+	
 	
 :SetingObjects		
 set myObjects=head.o ^
@@ -47,7 +51,12 @@ conio.o ^
 builtins.o ^
 desktop.o ^
 parser.o ^
-lexer.o  
+lexer.o ^
+wait.o   
+
+
+
+  
 
 
   

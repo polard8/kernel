@@ -1,4 +1,11 @@
 
+
+#include <sys/types.h>   //for pid_t
+//#include <unistd.h>      //for pid_t
+
+pid_t wait ( int *status );
+pid_t waitpid(pid_t pid, int *status, int options); 
+
 /*
  //BSD System Calls Manual        
  // wait, wait3, wait4, waitpid -- wait for process termination 

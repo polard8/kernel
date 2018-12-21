@@ -3772,9 +3772,11 @@ chech_return:
 			
 			//shell continua rodando, mas espera seu processo filho fechar.
 			//#bugbug: na pratica não temos nada disso.
-			//Child_PID = wait(&Child_Status);
-			//printf("child %d died with code %x\n", Child_PID, Child_Status );
 			
+			enterCriticalSection(); //provisório
+			Child_PID = wait (&Child_Status);
+			printf("child %d died with code %x\n", Child_PID, Child_Status );
+			exitCriticalSection();//provisório
         };
 		
 		if( exit_flag == 1)
