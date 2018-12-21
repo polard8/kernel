@@ -3579,6 +3579,9 @@ do_compare:
 	
 	//fail.
 	int Execve_Ret = 1;
+	int Child_PID = -1;
+	int Child_Status = -1; //retorno de wait
+	//pid_t Child_Status = -1; //retorno de wait	
 	
     //unsigned long a1 = (unsigned long) tokenList[0];
 	
@@ -3766,6 +3769,12 @@ chech_return:
 		{
 		    printf("shell vai continuar rodando...");
 		    running = 1;
+			
+			//shell continua rodando, mas espera seu processo filho fechar.
+			//#bugbug: na pratica não temos nada disso.
+			//Child_PID = wait(&Child_Status);
+			//printf("child %d died with code %x\n", Child_PID, Child_Status );
+			
         };
 		
 		if( exit_flag == 1)
