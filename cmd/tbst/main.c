@@ -193,17 +193,27 @@ int bst_main (){
 	struct node *root = NULL; 
 	
 	
-	//1+2 - 3*4
+	//4+3 - 2*5 = 12
 	
-	root = insert ( root, '-' ); //3 
+	//insert 111
+	root = insert ( root, '?' ); //3 
+
+	insert(root, '+'); //
+	insert(root, '-'); //
+	insert(root, '*'); //
 	
-	insert(root, '+'); //2
-	insert(root, '*'); //1
+	insert(root, 5);   // 
+	insert(root, 2);   //	
+	insert(root, 3);   // 
+	insert(root, 4);   //	
 	
-	insert(root, 4); //d
-	insert(root, 3); //c
-	insert(root, 2); //b 
-	insert(root, 1); //a 	
+	//insert(root, '+'); //2
+	//insert(root, '*'); //1
+	
+	//insert(root, 4); //d
+	//insert(root, 3); //c
+	//insert(root, 2); //b 
+	//insert(root, 1); //a 	
 
 
 	
@@ -495,7 +505,8 @@ int eval ( int *str ){
 
 	int i;
 	
-    for ( i=0; (c = str[i]) != '?'; i++ )
+    //for ( i=0; (c = str[i]) != '?'; i++ )
+    for ( i=0; (c = str[i]) != 111; i++ )		
     {
 
 		if ( c>='0' && c<='9' )
