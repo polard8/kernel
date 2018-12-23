@@ -1,34 +1,7 @@
 /*
  * File: main.c 
  *
- * Descrição: 
- *     Arquivo principal de IDLE.BIN.
- *     IDLE.BIN é um processo com apenas uma thread.
- *     IDLE.BIN é um aplicativo de 32bit em user mode. 
- *
- *     Esse programa deverá ser chamado sempre que o sistema estiver ocioso,
- * ou com falta de opções viáveis. Então esse programa deve ficar responsável 
- * por alguma rotina de manutenção do equilíbrio de sitema, ou por gerência de 
- * energia, com o objetivo de poupar energia nesse momento de ociosidade.
- *
- * O processo idle pode solicitar que processos de gerencia de energia entrem em
- * atuação. Pois a chamada do processo idle em si já é um indicativo de ociosidade
- * do sistema. Pode-se também organizar bancos de dados, registros, memória, buffer,
- * cache etc.
- *
- *     O sistema pode configurar o que esse processo faz quando a máquina 
- * está em idle mode. Quando não há nenhum processo pra rodar ou a cpu se 
- * encontra ociosa, pode-se usar alguma rotina otimizada presente neste 
- * programa. Parece que a intel oferece sujestões pra esse caso, não sei.
- * 
- * Obs: O entry point está em head.s
- *      Agora idle pode fazer systemcalls. 
- *
- * @todo: Criar argumento de entrada.
- *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão.
+ * tbst - calculando expressões. isso deu certo.
  *     ...
  */
  
