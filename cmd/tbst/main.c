@@ -216,24 +216,107 @@ struct node* insert ( struct node* node, int key ){
 	
 int bst_main (){
 	
+	
+	printf("bst_main:\n");
+	
 	buffer_offset = 0;
 		
 	struct node *root = NULL; 
 	
+	int i;
+	int buffer1[32];
+	int buffer2[32];
+	
+	int buffer1_offset = 0;
+	int buffer2_offset = 0;
+	
+    ///int exp[] = { 4, '+', 3, '-', 2, '*', 5, '?'+'0' };
+    //int exp[] = { 4, '+', 3, '-', 2, '*', 5, 111 };	
+    int exp[] = { 4, '+', 3, '-', 2, '*', 5, '?' };	
+	
+	int c;
+	
+	printf("for\n");
+    
+	//colocamos nos buffers em ordem.
+	for ( i=0; (c = exp[i]) != '?'; i++ )		
+    {
+		if ( c>= 0 && c<= 9 )
+		{
+			printf(">");
+			
+			//dígito
+			buffer1[buffer1_offset] = (int) c;
+            buffer1_offset++; 
+			
+		}else{
+            
+			printf("$");
+			//operadores.
+			buffer2[buffer2_offset] = (int) c;
+			buffer2_offset++;
+        }
+    };
+	
+	
+	//
+	//visualizar os buffer,
+	//pra depois nmanipular eles.
+	buffer1[buffer1_offset] = (int) '?';
+	buffer2[buffer2_offset] = (int) '?';
+	
+	//inserindo root.
+	root = insert ( root, '?' ); 
+	
+
+	//operadores +-*
+	for ( i=0; (c = buffer2[i]) != '?'; i++ )
+	{
+		//if ( c>= 0 && c<= 9 )
+		//{
+		//	printf ("%d", c);
+		//	continue;
+		//}
+		printf ("%c", c);
+		insert ( root, buffer2[i] ); 		
+	}
+	
+    buffer1_offset--;//ajustando par ao último válido 
+	
+	//for ( i=0; (c = buffer1[i]) != '?'; i++ )
+	for ( i=buffer1_offset; (c = buffer1[i]); i-- )	
+	{
+		c = buffer1[i];//redundante
+		
+		if ( c>= 0 && c<= 9 )
+		{
+			printf ("%d", c);
+			insert ( root, c );
+            			
+			//continue;
+		}
+		//printf ("%c", c);
+	}	
+
+	
+	//#OK 
+	//nos buffers estão na mesma ordem que na expressão.
+	//agora vamos inserir na ordem inversa dos buffers.
+	
+	// ### root ##
 	//insert 111. 
 	// É um finalizador, representa o igual
 	//depois vamos usar o igual =
 	// x = 4+3 - 2*5
-	root = insert ( root, '?' ); //3 
-
-	insert(root, '+'); //
-	insert(root, '-'); //
-	insert(root, '*'); //
-	
-	insert(root, 5);   // 
-	insert(root, 2);   //	
-	insert(root, 3);   // 
-	insert(root, 4);   //	
+	//root = insert ( root, '?' ); 	
+	//os operadores precisar sem inseridos na ordem da expressão.
+	//insert(root, '+'); //
+	//insert(root, '-'); //
+	//insert(root, '*'); //
+	//insert(root, 5);   // 
+	//insert(root, 2);   //	
+	//insert(root, 3);   // 
+	//insert(root, 4);   //	
 	
  
     // ??
