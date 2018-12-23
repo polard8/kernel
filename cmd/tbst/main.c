@@ -52,6 +52,13 @@
 #include "tprintf.h" 
 
 
+//===============================================================================
+
+///buffer pra fazer conta usando pos order
+int POS_BUFFER[32];
+
+int buffer_offset = 0;
+
 
 //===============================================================================
 
@@ -82,35 +89,69 @@ void inorder(struct node *root)
 } 
 
 
-//Em ordem
-void exibirEmOrdem(struct node *root){
-    if(root != NULL){
-        exibirEmOrdem(root->left);
+//Em ordem  a+b
+//desce até o último pela esquerda, não havendo esquerda vai pra direita.
+void exibirEmOrdem (struct node *root){
+	
+    if (root != NULL)
+	{
+		//visita a esquerda do próximo
+		//só retorna no último então printf funciona 
+		//mostrando o conteúdo do último 
+		//ai visita a direita do último e desce pela esquerda,
+		//não havendo esquerda vai pra direita.
+        exibirEmOrdem (root->left);
         printf("%d ", root->key);
-        exibirEmOrdem(root->right);
+        
+		exibirEmOrdem (root->right);
     }
-}
+};
 
 
 
-//Pré-ordem
-void exibirPreOrdem(struct node *root){
-    if(root != NULL){
-        printf("%d ", root->key);
+//Pré-ordem  +ab
+void exibirPreOrdem (struct node *root){
+    
+	if (root != NULL)
+	{
+        //imprime o conteúdo
+		//desce até o último pela esquerda
+		//visita a direita e desce até o último pela esquerda.
+		printf("%d ", root->key);
         exibirPreOrdem(root->left);
         exibirPreOrdem(root->right);
     }
-}
+};
 
 
-//Pós-ordem
-void exibirPosOrdem(struct node *root){
-    if(root != NULL){
+//Pós-ordem ab+
+void exibirPosOrdem (struct node *root){
+	
+	//#importante
+	//exibe em níveis. de baixo para cima.
+    
+	if (root != NULL)
+	{
+		//desce até o ultimo pela esquerda
+		//visita o da direita e imprime;
         exibirPosOrdem(root->left);
         exibirPosOrdem(root->right);
-        printf("%d ", root->key);
-    }
-}
+		printf("%d ", root->key);
+		
+		if(buffer_offset<0 || buffer_offset >32)
+		{
+			printf("*buffer fail\n");
+			return;
+		}
+		//colocar num buffer pra usar no cálculo 
+		//isso simula uma digitação
+		POS_BUFFER[buffer_offset] = (int) (root->key + '0');
+		buffer_offset++;
+		
+		
+    };
+};
+
 
 /* A utility function to insert a new node with given key in BST */
 struct node* insert(struct node* node, int key) 
@@ -129,34 +170,54 @@ struct node* insert(struct node* node, int key)
 } 
 
 
+
+/*
+ *********************************************************
+ *
+ */
 // Driver Program to test above functions 
 // C program to demonstrate insert operation in binary search tree 
-int bst_main() 
-{ 
+
+int bst_main (){
+	
+	
+	buffer_offset = 0;
+	
 	/* Let us create following BST 
-           50 
+           * 
           /  \ 
-        30    70 
+         +     - 
         / \   / \ 
        20 40 60 80 */
 	
 	struct node *root = NULL; 
 	
-	root = insert ( root, 50 ); 
 	
-	insert(root, 30); 
-	insert(root, 20); 
-	insert(root, 40); 
-	insert(root, 70); 
-	insert(root, 60); 
-	insert(root, 80); 
+	//1+2 - 3*4
+	
+	root = insert ( root, '-' ); //3 
+	
+	insert(root, '+'); //2
+	insert(root, '*'); //1
+	
+	insert(root, 4); //d
+	insert(root, 3); //c
+	insert(root, 2); //b 
+	insert(root, 1); //a 	
+
+
+	
+	
+	//insert(root, '+'); 
+	//insert(root, 2); 
+	//insert(root, 5); 
 
 	// print inoder traversal of the BST 
 	//inorder(root); 
 	
-	printf("\n\n");
-	printf("[50 30 20 40 70 60 80]");
-	printf("\n\n");
+	//printf("\n\n");
+	//printf("[1 + 2 * 3 - 4]");
+	//printf("\n\n");
 	
 	printf("\n\n em ordem: \n");
 	exibirEmOrdem(root);
@@ -348,6 +409,117 @@ done:
     return (unsigned long) 0;	
 };
 
+struct stack
+{
+	int top;
+    int items[32];
+};
+
+
+void push(struct stack *s,int x)
+{
+    if ( s->top > 32 )
+    {
+		printf("Stack Overflow…!\n");
+        return;
+    }else{
+		s->items[ ++s->top ]=x;
+    }
+};
+
+int pop (struct stack *s)
+{
+    //if ( s->top < 0)
+    if ( s->top == -1)
+	{
+		printf("Stack Underflow…!\n");
+        return 0;
+    }else{
+		
+		return ( s->items[ s->top-- ] );
+    }
+};
+
+
+int oper(char c,int opnd1,int opnd2)
+{
+	//printf("oper: %c\n");
+	
+    switch (c)
+    {
+		
+		//case '*': 
+        case 90:  		
+		    return (opnd1*opnd2);
+			
+        //case '+': 
+		case 91:    
+			return(opnd1+opnd2);        		
+			
+		//case '-': 
+		case 93:
+		    return(opnd1-opnd2);
+			
+		//case '/': 
+		case 95:
+		    return(opnd1/opnd2);
+        
+		//#todo
+		case '^': 
+		    return 0; //return(pow(opnd1,opnd2));
+        
+		default: 
+		    printf("oper: Invalid operator…! %d\n", c);
+			return 0;
+    }
+};
+
+int my_isdigit(char ch){
+	
+    return(ch>='0' && ch<='9');
+}
+
+
+int eval ( int *str ){
+	
+    char c;
+    int opnd1, opnd2, val;
+    
+	struct stack stk;
+    
+	stk.top = -1;
+	//stk.top = 0;
+	
+	
+    printf("\n eval:\n");	
+
+	int i;
+	
+    for ( i=0; (c = str[i]) != '?'; i++ )
+    {
+
+		if ( c>='0' && c<='9' )
+		{
+            push ( &stk, (int)( c - '0' ) );
+        
+		}else{
+            
+			//O problema é a ordem em que os operandos aparecem 
+			//o último é a raiz.
+			//e aqui a o operando raiz aparece no meio da expressão.
+			
+			opnd2 = pop (&stk);
+            opnd1 = pop (&stk);
+			
+            val = oper ( c, opnd1, opnd2 );
+            
+			push ( &stk, val );
+        }
+    }
+	
+	//o resultado é o que sobrou na pilha
+    return ( pop(&stk) );
+}
 
 
 /*
@@ -365,6 +537,27 @@ int testtest_main (){
     stdioInitialize();		
 
 	bst_main(); 
+	
+	//finalizador
+	POS_BUFFER[buffer_offset] = '?';
+		
+	int i;
+	
+	int max = buffer_offset;
+	
+	
+	printf("\n the pos order is: "); 
+	if(max >32 || max <=0)
+		printf("max fail");
+	
+	for (i=0; i<max; i++)
+	{
+		printf("%d ",POS_BUFFER[i]);
+	}
+    
+	
+    printf ("\n \n Result after evaluation is: %d \n", eval ( (int*) &POS_BUFFER[0] ) );	
+	 
 	 
 	/*
 	if ( isxdigit('a') )
