@@ -37,8 +37,10 @@
 ; Função importadas.
 ;
 
-
-
+extern _idleServices
+extern _driverInitialize  ;Envia um sinal pro kernel inicializar esse driver.
+extern _driverUninitialize
+extern _testtest_main
 
 
 segment .head_x86
@@ -84,13 +86,20 @@ segment .head_x86
 ;;     + edx comtém uma flag.
 ;;     + EAX={Número do serviço solicitado.}
 ;;
-
-extern _testtest_main
-
 global _idle_entry_point              
 _idle_entry_point:
     nop
 .checkFlag:	
+	
+	;cmp edx, dword 0x00001234
+    ;je InitializeDriver    	     ;; Initialize driver.	
+	
+	
+	;cmp edx, dword 0x00004321
+	;je UninitializeDriver        ;; Uninitialize driver.
+	
+	;cmp edx, dword 0x12345678    ;; Magic.
+	;je services
 	
 	
 	call _testtest_main
@@ -102,9 +111,52 @@ _idle_entry_point:
 IdleLoop:
     NOP
     JMP IdleLoop 
- 
 	
- 
+	
+;;====================================================================	
+;; InitializeDriver:
+;;     Esse processo será inicializado como um driver em user mode.
+;;   
+InitializeDriver:
+    call _driverInitialize	
+    JMP IdleLoop 
+	
+	
+;;====================================================================	
+;; UninitializeDriver:
+;;     O processo deixa de atuar como um driver em user mode.
+;; 	
+UninitializeDriver:
+    call _driverUninitialize
+    JMP IdleLoop 
+	
+	
+;;======================================================================
+;; services:
+;;     Chamaremos algum dos serviços oferecidos, que obviamente só
+;; funcionarão se o driver estiver inicializado.
+;;
+services:
+    
+	;;
+	;; IN: EAX={Número do serviço solicitado.}
+	;;
+
+	push eax
+	
+    call _idleServices 
+	mov dword [.ret_val], eax
+	
+	pop eax
+	
+	;;
+	;; aqui podemos fazer alguma coisa com o valor retornado.
+	;;
+	
+    JMP IdleLoop     	
+	
+.ret_val: dd 0
+
 ;
 ;End.
 ;
