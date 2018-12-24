@@ -1,7 +1,7 @@
 ;;
 ;; File: crt0.asm
 ;;
-;; Entry point.
+;; Entry point of the fasm.bin for gramado 0.4
 ;;
 
 [bits 32]
