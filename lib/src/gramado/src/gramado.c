@@ -89,7 +89,7 @@ dbProcedure( struct window_d *window,
 					 
 /*
  ***********************************************************************
- * system_call:  #ux4 (maior experiência)
+ * gramado_system_call:  #ux4 (maior experiência)
  *    Interrupção de sistema, número 200, chama vários serviços do Kernel com 
  * a mesma interrupção. Essa é a chamada mais simples.
  *
@@ -146,21 +146,21 @@ int gramado_system (const char *command){
 	//     QUE INCLUIREM A API. 
 	
 	//test - Exibe uma string somente para teste.
-	if ( api_strncmp( (char *) command, "test", 4 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "test", 4 ) == 0 )
 	{
 	    printf("apiSystem: Testing commands..\n");
 		goto exit;
 	}; 	
   
 	//ls - List files in a folder.
-	if ( api_strncmp( (char *) command, "ls", 2 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "ls", 2 ) == 0 )
 	{
 	    printf("apiSystem: @todo: ls..\n");
 		goto exit;
 	}; 
 	
 	//makeboot - Cria arquivos e diretórios principais.
-	if ( api_strncmp( (char *) command, "makeboot", 8 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "makeboot", 8 ) == 0 )
 	{
 	    printf("apiSystem: @todo: makeboot..\n");
 		
@@ -173,7 +173,7 @@ int gramado_system (const char *command){
     };
 	
 	//format.
-	if ( api_strncmp( (char *) command, "format", 6 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "format", 6 ) == 0 )
 	{
 	    printf("apiSystem: @todo: format..\n");
 		//fs_format(); 
@@ -181,7 +181,7 @@ int gramado_system (const char *command){
     };	
 	
 	//debug.
-	if ( api_strncmp( (char *) command, "debug", 5 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "debug", 5 ) == 0 )
 	{
 	    printf("apiSystem: @todo: debug..\n");
 		//debug();
@@ -189,7 +189,7 @@ int gramado_system (const char *command){
     };
 	
     //dir.
-	if ( api_strncmp( (char *) command, "dir", 3 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "dir", 3 ) == 0 )
 	{
 	    printf("apiSystem: @todo: dir..\n");
 		//fs_show_dir(0); 
@@ -197,7 +197,7 @@ int gramado_system (const char *command){
     };
 
 	//newfile.
-	if ( api_strncmp( (char *) command, "newfile", 7 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "newfile", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~newfile - Create empty file.\n");
 		//fs_create_file( "novo    txt", 0);
@@ -205,7 +205,7 @@ int gramado_system (const char *command){
     };
 	
 	//newdir.
-	if ( api_strncmp( (char *) command, "newdir", 7 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "newdir", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~newdir - Create empty folder.\n");
 		//fs_create_dir( "novo    dir", 0);
@@ -213,7 +213,7 @@ int gramado_system (const char *command){
     };
 	
     //mbr - Testa mbr.
-    if ( api_strncmp( (char *) command, "mbr", 3 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "mbr", 3 ) == 0 )
 	{
 	    printf("apiSystem: ~mbr\n");
 		//testa_mbr();
@@ -221,7 +221,7 @@ int gramado_system (const char *command){
     }; 
 	
     //root - Testa diretório /root.
-    if ( api_strncmp( (char *) command, "root", 4 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "root", 4 ) == 0 )
 	{
 	    printf("apiSystem: ~/root\n");
 		//testa_root();
@@ -229,7 +229,7 @@ int gramado_system (const char *command){
     }; 
 
 	//start.
-    if ( api_strncmp( (char *) command, "start", 5 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "start", 5 ) == 0 )
 	{
 	    printf("apiSystem: ~start\n");
 		goto exit;
@@ -237,7 +237,7 @@ int gramado_system (const char *command){
 	
 	//help.
 	//?? O que mostrar aqui ??
-    if ( api_strncmp( (char *) command, "help", 4 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "help", 4 ) == 0 )
 	{
 		printf("apiSystem: help stuff\n");
 		//printf(help_string);
@@ -246,7 +246,7 @@ int gramado_system (const char *command){
     };
 	
 	//cls.
-    if ( api_strncmp( (char *) command, "cls", 3 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "cls", 3 ) == 0 )
 	{
 	    printf("apiSystem: cls\n");
 		//black
@@ -255,7 +255,7 @@ int gramado_system (const char *command){
 	};
 	
 	//save.
-	if ( api_strncmp( (char *) command, "save", 4 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "save", 4 ) == 0 )
 	{
 	    printf("apiSystem: ~save\n");
         goto exit;
@@ -264,7 +264,7 @@ int gramado_system (const char *command){
 	//install.
 	//muda um arquivo da area de transferencia para 
 	//o sistema de arquivos...
-	if ( api_strncmp( (char *) command, "install", 7 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "install", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~install\n");
 		//fs_install();
@@ -273,7 +273,7 @@ int gramado_system (const char *command){
 	
 	
 	//boot - Inicia o sistema.
-	if ( api_strncmp( (char *) command, "boot", 4 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "boot", 4 ) == 0 )
 	{
 	    printf("apiSystem: ~boot\n");
 		//boot();
@@ -281,7 +281,7 @@ int gramado_system (const char *command){
     };
 
 	//service
-	if ( api_strncmp( (char *) command, "service", 7 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "service", 7 ) == 0 )
 	{
 	    printf("apiSystem: ~service - rotina de servicos do kernel base\n");
 		//test_services();
@@ -289,7 +289,7 @@ int gramado_system (const char *command){
     };
 
 	//slots - slots de processos ou threads.
-	if ( api_strncmp( (char *) command, "slots", 5 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "slots", 5 ) == 0 )
 	{
 	    printf("apiSystem: ~slots - mostra slots \n");
 		//mostra_slots();
@@ -302,27 +302,27 @@ int gramado_system (const char *command){
     //
 	
 	//exit - Exit the current program
-    if ( api_strncmp( (char *) command, "exit", 4 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "exit", 4 ) == 0 )
 	{
 		printf("apiSystem: exit\n");
 		//exit(exit_code);
-		apiExit(0);
+		gramado_exit(0);
 		goto fail;
     };
 		
     //reboot.
-	if ( api_strncmp( (char *) command, "reboot", 6 ) == 0 )
+	if ( gramado_strncmp( (char *) command, "reboot", 6 ) == 0 )
 	{
 		printf("apiSystem: reboot\n");
-		apiReboot();
+		gramado_reboot();
 		goto fail;
     };
 
 	//shutdown.
-    if ( api_strncmp( (char *) command, "shutdown", 8 ) == 0 )
+    if ( gramado_strncmp( (char *) command, "shutdown", 8 ) == 0 )
 	{
 		printf("apiSystem: shutdown\n");
-		apiShutDown();
+		gramado_shutdown();
         goto fail;
     };
 	
@@ -665,43 +665,43 @@ void gramado_refresh_buffer (unsigned long n){
         //refresh buffer 1,2,3
         
 		case 1: 
-		    system_call( 1, 0, 0, 0); 
+		    gramado_system_call( 1, 0, 0, 0); 
 			break;
         case 2: 
-		    system_call( 2, 0, 0, 0); 
+		    gramado_system_call( 2, 0, 0, 0); 
 			break;
         case 3: 
-		    system_call( 3, 0, 0, 0); 
+		    gramado_system_call( 3, 0, 0, 0); 
 			break;
                  
         //refresh screen     
         case 4: 
-		    system_call( 4, 0, 0, 0); 
+		    gramado_system_call( 4, 0, 0, 0); 
 			break;
              
         //refresh title bar    
         case 5: 
-		    system_call( 5, 0, 0, 0); 
+		    gramado_system_call( 5, 0, 0, 0); 
 			break;
                  
         //refresh menu bar     
         case 6: 
-		    system_call( 6, 0, 0, 0); 
+		    gramado_system_call( 6, 0, 0, 0); 
 			break;
                  
         //refresh tollbar    
         case 7: 
-		    system_call( 7, 0, 0, 0); 
+		    gramado_system_call( 7, 0, 0, 0); 
 			break;
                  
         //refresh status bar   
         case 8: 
-		    system_call( 8, 0, 0, 0); 
+		    gramado_system_call( 8, 0, 0, 0); 
 			break;
 
         //refresh taskbar   
         case 9: 
-		    system_call( 9, 0, 0, 0); 
+		    gramado_system_call( 9, 0, 0, 0); 
 			break;
                  
         default:
@@ -732,7 +732,7 @@ void gramado_print_string ( unsigned long x,
  */
 int gramado_vsync (){
 	
-	system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
+	gramado_system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
     
 	return (int) 0;
 };
@@ -748,7 +748,7 @@ int gramado_edit_box ( unsigned long x,
 			   unsigned long width)
 {
 	//@todo: Altura e largura negligenciados.
-    system_call ( SYSTEMCALL_EDITBOX, x, y, 0 );
+    gramado_system_call ( SYSTEMCALL_EDITBOX, x, y, 0 );
 	
 	return (int) 0;
 };
@@ -762,7 +762,7 @@ int gramado_edit_box ( unsigned long x,
  */
 int gramado_chama_procedimento (unsigned long proximo_procedure){
 	
-    system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
+    gramado_system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
 	
 	return (int) 0;
 };
@@ -776,7 +776,7 @@ int gramado_chama_procedimento (unsigned long proximo_procedure){
  */
 int gramado_set_next_window_procedure (unsigned long next_procedure){
 	
-    system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
+    gramado_system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
     
 	return (int) 0;	
 };
@@ -790,7 +790,7 @@ int gramado_set_next_window_procedure (unsigned long next_procedure){
  */
 int set_cursor (unsigned long x, unsigned long y){
 	
-    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
+    gramado_system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
 	
 	return (int) 0;
 };
@@ -829,7 +829,7 @@ void gramado_carrega_bitmap_16x16 ( unsigned long img_address,
                             unsigned long x, 
 						    unsigned long y )                           
 {
-    system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
+    gramado_system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
 };
 
 
@@ -848,7 +848,7 @@ void gramado_shutdown (){
 	// Um messagebox pode aparece antes de chamar o kernel.
 	
 	//Argumentos podem ser enviados.
-    system_call ( SYSTEMCALL_SHUTDOWN, 0, 0, 0 );
+    gramado_system_call ( SYSTEMCALL_SHUTDOWN, 0, 0, 0 );
 	
     while (1){
 		
@@ -879,7 +879,7 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
     // Antes nós chamávamos o kernel, agora tentaremos 
     // implantar na api.
 	
-	//system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
+	//gramado_system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
 	//	(unsigned long) string1, (unsigned long) string2 );
 	
 
@@ -923,10 +923,10 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 	{	
 	    // Com botão, considera o título.
 	    case 1:
-		    apiBeginPaint();
+		    gramado_begin_paint();
 		    Button = 1;
 			//janela tipo simples.
-	        hWnd = (void*) APICreateWindow (  WT_SIMPLE, 1, 1, string1, 
+	        hWnd = (void*) gramado_create_window (  WT_SIMPLE, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -935,15 +935,15 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 			};
 			apiEndPaint();
             
-			APIRegisterWindow (hWnd);
-            APISetActiveWindow (hWnd);	
-            APISetFocus (hWnd);	 			
+			gramado_register_window (hWnd);
+            gramado_set_active_window (hWnd);	
+            gramado_set_focus (hWnd);	 			
 		    break;
 			
 		// Sem botão, considera o título.	
 	    case 2:
 		    Button = 0;
-	        hWnd = (void*) APICreateWindow( WT_POPUP, 1, 1, string1, 
+	        hWnd = (void*) gramado_create_window( WT_POPUP, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -953,7 +953,7 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 	    case 3:
 		    //janela de aplicativo.
 	        Button = 1;
-			hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Alert", 
+			hWnd = (void*) gramado_create_window( WT_OVERLAPPED, 1, 1, "Alert", 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -962,7 +962,7 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 		//Com botão, título de mensagem do sistema.	
 	    case 4:
 		    Button = 1;
-	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "System Message", 
+	        hWnd = (void*) gramado_create_window( WT_OVERLAPPED, 1, 1, "System Message", 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -971,7 +971,7 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 		//Tipo negligenciado. Usamos o formato padrão.	
 		default:
 		    Button = 1;
-	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Error", 
+	        hWnd = (void*) gramado_create_window( WT_OVERLAPPED, 1, 1, "Error", 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -998,11 +998,11 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 	//
 	
     //.	
-	messagebox_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "OK",     
+	messagebox_button1 = (void *) gramado_create_window ( WT_BUTTON, 1, 1, "OK",     
                                 (cx/3), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (messagebox_button1);
+    gramado_register_window (messagebox_button1);
 
 
 	//
@@ -1010,11 +1010,11 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 	//
 	
     //.	
-	messagebox_button2 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "CANCEL",     
+	messagebox_button2 = (void *) gramado_create_window( WT_BUTTON, 1, 1, "CANCEL",     
                                 ((cx/3)*2), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (messagebox_button2);	
+    gramado_register_window (messagebox_button2);	
 	
 	
 	//
@@ -1028,9 +1028,9 @@ int gramado_message_box ( int type, char *string1, char *string2 ){
 	
 	//#bugbug
 	//#importante devemos fazer o refresh só da janela.
-	//refresh_screen ();
+	//gramado_refresh_screen ();
 
-    apiShowWindow (hWnd);	
+    gramado_show_window (hWnd);	
 	
 	//
 	// loop
@@ -1048,7 +1048,7 @@ Mainloop:
 	while (running)
 	{
 		enterCriticalSection(); 
-		system_call ( 111, (unsigned long)&message_buffer[0],
+		gramado_system_call ( 111, (unsigned long)&message_buffer[0],
 			(unsigned long)&message_buffer[0], 
 			(unsigned long)&message_buffer[0] );
 		exitCriticalSection(); 
@@ -1148,7 +1148,7 @@ done:
 	//Refresh screen. 
 	//?? deletar.
 	//if(VideoBlock.useGui == 1){
-	//    refresh_screen();
+	//    gramado_refresh_screen();
 	//};
     printf ("done\n");	
 	return (unsigned long) 0;
@@ -1170,7 +1170,7 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
     // implantar na api.
 	//
 	
-	//system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
+	//gramado_system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
 	//	(unsigned long) string1, (unsigned long) string2 );
 	
 
@@ -1217,7 +1217,7 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 		    apiBeginPaint();
 		    Button = 1;
 			//janela tipo simples.
-	        hWnd = (void*) APICreateWindow (  WT_SIMPLE, 1, 1, string1, 
+	        hWnd = (void*) gramado_create_window (  WT_SIMPLE, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -1226,15 +1226,15 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 			};
 			apiEndPaint();
             
-			APIRegisterWindow (hWnd);
-            APISetActiveWindow (hWnd);	
-            APISetFocus (hWnd);	 			
+			gramado_register_window (hWnd);
+            gramado_set_active_window (hWnd);	
+            gramado_set_focus (hWnd);	 			
 		    break;
 			
 		// Sem botão, considera o título.	
 	    case 2:
 		    Button = 0;
-	        hWnd = (void*) APICreateWindow( WT_POPUP, 1, 1, string1, 
+	        hWnd = (void*) gramado_create_window ( WT_POPUP, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -1244,7 +1244,7 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 	    case 3:
 		    //janela de aplicativo.
 	        Button = 1;
-			hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Alert", 
+			hWnd = (void*) gramado_create_window( WT_OVERLAPPED, 1, 1, "Alert", 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -1253,7 +1253,7 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 		//Com botão, título de mensagem do sistema.	
 	    case 4:
 		    Button = 1;
-	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "System Message", 
+	        hWnd = (void*) gramado_create_window( WT_OVERLAPPED, 1, 1, "System Message", 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -1262,7 +1262,7 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 		//Tipo negligenciado. Usamos o formato padrão.	
 		default:
 		    Button = 1;
-	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Error", 
+	        hWnd = (void*) gramado_create_window( WT_OVERLAPPED, 1, 1, "Error", 
 			                x, y, cx, cy, 
 							NULL, 0, 
 							WindowClientAreaColor, WindowColor); 
@@ -1289,11 +1289,11 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 	//
 	
     //.	
-	dialogbox_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "OK",     
+	dialogbox_button1 = (void *) gramado_create_window ( WT_BUTTON, 1, 1, "OK",     
                                 (cx/3), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (dialogbox_button1);
+    gramado_register_window (dialogbox_button1);
 
 
 	//
@@ -1301,11 +1301,11 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 	//
 	
     //.	
-	dialogbox_button2 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "CANCEL",     
+	dialogbox_button2 = (void *) gramado_create_window ( WT_BUTTON, 1, 1, "CANCEL",     
                                 ((cx/3)*2), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (dialogbox_button2);	
+    gramado_register_window (dialogbox_button2);	
 	
 	
 	//
@@ -1318,9 +1318,9 @@ int gramado_dialog_box ( int type, char *string1, char *string2 ){
 	
 	//#bugbug
 	//#importante devemos fazer o refresh só da janela.
-	//refresh_screen ();
+	//gramado_refresh_screen ();
 
-    apiShowWindow (hWnd);		 
+    gramado_show_window (hWnd);		 
 	
 	//
 	// loop
@@ -1338,7 +1338,7 @@ Mainloop:
 	while (running)
 	{
 		enterCriticalSection(); 
-		system_call ( 111, (unsigned long)&message_buffer[0],
+		gramado_system_call ( 111, (unsigned long)&message_buffer[0],
 			(unsigned long)&message_buffer[0], 
 			(unsigned long)&message_buffer[0] );
 		exitCriticalSection(); 
@@ -1437,7 +1437,7 @@ done:
 	//Refresh screen. 
 	//?? deletar.
 	//if(VideoBlock.useGui == 1){
-	//    refresh_screen();
+	//    gramado_refresh_screen();
 	//};
     printf ("done\n");	
 	return (unsigned long) 0;
@@ -1702,7 +1702,7 @@ void *gramado_create_window( unsigned long type,        //1, Tipo de janela (pop
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
 	
-    Window = (void *) system_call ( 118 , (unsigned long) &message_buffer[0], 
+    Window = (void *) gramado_system_call ( 118 , (unsigned long) &message_buffer[0], 
 					    (unsigned long) &message_buffer[0], 
 						(unsigned long) &message_buffer[0] );
     
@@ -1729,7 +1729,7 @@ void *gramado_create_window( unsigned long type,        //1, Tipo de janela (pop
 		
 		//if ( type == WT_BUTTON ){
 			
-		//    APIRegisterWindow (Window);
+		//    gramado_register_window (Window);
 		//};
 		
 		//...
@@ -1744,7 +1744,7 @@ done:
 
 
 /*
- * APIRegisterWindow:
+ * gramado_register_window:
  *     Register Window.
  */
 int gramado_register_window (struct window_d *window){
@@ -1756,7 +1756,7 @@ int gramado_register_window (struct window_d *window){
 		return (int) 1;
 	};		
 	
-    system_call ( SYSTEMCALL_REGISTERWINDOW, (unsigned long) window, 
+    gramado_system_call ( SYSTEMCALL_REGISTERWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);
 		
     return (int) 0;	
@@ -1776,7 +1776,7 @@ int gramado_close_window (struct window_d *window){
 		return (int) 1;
 	};		
 	
-    system_call ( SYSTEMCALL_CLOSEWINDOW, (unsigned long) window, 
+    gramado_system_call ( SYSTEMCALL_CLOSEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );	
     
 	return (int) 0;	
@@ -1784,7 +1784,7 @@ int gramado_close_window (struct window_d *window){
 
 
 /*
- * APISetFocus:
+ * gramado_set_focus:
  *     Set Focus.
  */
 int gramado_set_focus (struct window_d *window){
@@ -1796,7 +1796,7 @@ int gramado_set_focus (struct window_d *window){
 		return (int) 1;
 	};		
 	
-    system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
+    gramado_system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
 		
 	//a flag 1 indica que deve-se redesenha e efetuar refresh.
@@ -1812,7 +1812,7 @@ int gramado_set_focus (struct window_d *window){
  */
 int gramado_get_focus (){
 	
-    return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
+    return (int) gramado_system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
 };
 
 
@@ -1829,7 +1829,7 @@ int gramado_kill_focus (struct window_d *window){
 		return (int) 1;
 	};	
 	
-    system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
+    gramado_system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
 		
 	
@@ -1841,7 +1841,7 @@ int gramado_kill_focus (struct window_d *window){
 
 
 /*
- * APISetActiveWindow:
+ * gramado_set_active_window:
  *     Set Active Window.
  * @todo: Esse retorno pode ser void.
  */
@@ -1854,7 +1854,7 @@ int gramado_set_active_window (struct window_d *window){
 		return (int) 1;
 	};
 	
-    system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
+    gramado_system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window );
 		
 	
@@ -1871,7 +1871,7 @@ int gramado_set_active_window (struct window_d *window){
  */
 int gramado_get_active_window (){
 	
-    return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );	
+    return (int) gramado_system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );	
 };
 
 
@@ -1884,7 +1884,7 @@ void gramado_show_current_process_info (){
 	// @todo: Essa rotina devira apenas pegar os valores via system call
 	//        e imprimir os valores obtidos usando rotinas em user mode.
 	
-	system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
+	gramado_system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
 };
 
 
@@ -1895,7 +1895,7 @@ void gramado_resize_window ( struct window_d *window,
                         unsigned long x, 
 						unsigned long y )
 {	
-	system_call ( SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
+	gramado_system_call ( SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
 };
 
 
@@ -1904,7 +1904,7 @@ void gramado_resize_window ( struct window_d *window,
  */
 void gramado_redraw_window( struct window_d *window, unsigned long flags ){
 	
-	system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
+	gramado_system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
 		(unsigned long) flags, (unsigned long) flags );
 };
 
@@ -1913,20 +1913,20 @@ void gramado_replace_window ( struct window_d *window,
                          unsigned long x, 
 						 unsigned long y )
 {
-	system_call ( SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
+	gramado_system_call ( SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
 };
 
 
 void gramado_maximize_window (struct window_d *window){
 	
-	system_call ( SYSTEMCALL_MAXIMIZEWINDOW, (unsigned long) window, 
+	gramado_system_call ( SYSTEMCALL_MAXIMIZEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);
 };
 
 
 void gramado_minimize_window (struct window_d *window){
 	
-	system_call ( SYSTEMCALL_MINIMIZEWINDOW, (unsigned long) window, 
+	gramado_system_call ( SYSTEMCALL_MINIMIZEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);	
 };
 
@@ -1934,20 +1934,20 @@ void gramado_minimize_window (struct window_d *window){
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 void gramado_update_window (struct window_d *window){
 	
-	system_call ( 113, (unsigned long) window, 
+	gramado_system_call ( 113, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);	
 };
 
 
 void *gramado_get_foregroung_window (){
 	
-	system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
+	gramado_system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
 };
 
 
 void gramado_set_foregroung_window (struct window_d *window){
 	
-	system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, 
+	gramado_system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );
 };
 
@@ -1961,7 +1961,7 @@ void gramado_set_foregroung_window (struct window_d *window){
  */
 void gramado_exit (int exit_code){
 	
-    system_call ( SYSTEMCALL_EXIT, (unsigned long) exit_code, 
+    gramado_system_call ( SYSTEMCALL_EXIT, (unsigned long) exit_code, 
 		(unsigned long) exit_code, (unsigned long) exit_code );
     
     while (1){
@@ -1990,9 +1990,9 @@ void gramado_kill (int exit_code){
  * ficando à cargo do kernel apenas fazer a realocação dos recursos de destruição das
  * estruturas. 
  */
-void dead_thread_collector (){
+void gramado_dead_thread_collector (){
 	
-    system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, (unsigned long) 0, 
+    gramado_system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, (unsigned long) 0, 
 		(unsigned long) 0, (unsigned long) 0 );	
 };
 
@@ -2032,13 +2032,13 @@ int gramado_strncmp (char *s1, char *s2, int len){
 
 
 /*
- * refresh_screen:
+ * gramado_refresh_screen:
  *     Refresh Screen.
  *     Passa o conteúdo do backbuffer para o lfb.
  */
 void gramado_refresh_screen (){
 	
-	system_call ( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
+	gramado_system_call ( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
 };
 
 
@@ -2049,7 +2049,7 @@ void gramado_refresh_screen (){
  */
 void gramado_refresh_screen2 (){
 	
-	refresh_screen ();
+	gramado_refresh_screen ();
 };
 
 
@@ -2063,7 +2063,7 @@ void gramado_reboot (){
 	//        as camadas de software de mais alto nível antes
     //        de efetuar o reboot de hardware propriamente dito. 	
 	
-    system_call ( SYSTEMCALL_REBOOT, 0, 0, 0 );	
+    gramado_system_call ( SYSTEMCALL_REBOOT, 0, 0, 0 );	
 };
 
 
@@ -2073,7 +2073,7 @@ void gramado_reboot (){
  */
 void gramado_set_cursor ( unsigned long x, unsigned long y ){
 	
-    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );	
+    gramado_system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );	
 };
 
 
@@ -2083,7 +2083,7 @@ void gramado_set_cursor ( unsigned long x, unsigned long y ){
  */
 unsigned long gramado_get_cursor_x (){
 	
-    return (unsigned long) system_call ( SYSTEMCALL_GETCURSORX, 0, 0, 0 );
+    return (unsigned long) gramado_system_call ( SYSTEMCALL_GETCURSORX, 0, 0, 0 );
 };
 
 
@@ -2093,7 +2093,7 @@ unsigned long gramado_get_cursor_x (){
  */
 unsigned long gramado_get_cursor_y (){
 	
-    return (unsigned long) system_call (SYSTEMCALL_GETCURSORY, 0, 0, 0 );
+    return (unsigned long) gramado_system_call (SYSTEMCALL_GETCURSORY, 0, 0, 0 );
 };
 
 
@@ -2103,7 +2103,7 @@ unsigned long gramado_get_cursor_y (){
  */
 void *gramado_get_clientarea_rect (){
 	
-    return (void *) system_call ( SYSTEMCALL_GETCLIENTAREARECT, 0, 0, 0 );	
+    return (void *) gramado_system_call ( SYSTEMCALL_GETCLIENTAREARECT, 0, 0, 0 );	
 };
 
 
@@ -2113,7 +2113,7 @@ void *gramado_get_clientarea_rect (){
  */
 void gramado_set_clientarea_rect (struct rect_d *r){
 	
-    system_call ( SYSTEMCALL_SETCLIENTAREARECT, (unsigned long) r, 
+    gramado_system_call ( SYSTEMCALL_SETCLIENTAREARECT, (unsigned long) r, 
 		(unsigned long) r, (unsigned long) r );
 };
 
@@ -2126,7 +2126,7 @@ void *gramado_create_process ( unsigned long process_eip,
                         unsigned long process_priority, 
 						char *name )
 {
-    return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, process_eip, 
+    return (void *) gramado_system_call ( SYSTEMCALL_CREATEPROCESS, process_eip, 
 						process_priority, (unsigned long) name );		
 };
 
@@ -2139,7 +2139,7 @@ void *gramado_create_thread( unsigned long thread_eip,
                        unsigned long thread_priority, 
 					   char *name )
 {
-    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, thread_eip, 
+    return (void *) gramado_system_call ( SYSTEMCALL_CREATETHREAD, thread_eip, 
 						thread_priority, (unsigned long) name );		
 };
 
@@ -2152,7 +2152,7 @@ void *gramado_create_thread( unsigned long thread_eip,
  */
 void gramado_start_thread (void *Thread){
 
-    system_call ( SYSTEMCALL_STARTTHREAD, (unsigned long) Thread, 
+    gramado_system_call ( SYSTEMCALL_STARTTHREAD, (unsigned long) Thread, 
 		(unsigned long) Thread, (unsigned long) Thread );	
 };
 
@@ -2172,7 +2172,7 @@ void *gramado_fopen (const char *filename, const char *mode){
 	
 	enterCriticalSection();
 	
-	Ret = (void *) system_call ( SYSTEMCALL_READ_FILE, 
+	Ret = (void *) gramado_system_call ( SYSTEMCALL_READ_FILE, 
 	                (unsigned long) filename, (unsigned long) mode, 0 );
 					
 	exitCriticalSection();
@@ -2225,7 +2225,7 @@ gramado_save_file ( char *file_name,
 	
 	enterCriticalSection();
 		
-	Ret = (int) system_call ( SYSTEMCALL_WRITE_FILE,
+	Ret = (int) gramado_system_call ( SYSTEMCALL_WRITE_FILE,
 	                (unsigned long) &message_buffer[0],     
                     (unsigned long) &message_buffer[0],  
                     (unsigned long) &message_buffer[0] );        
@@ -2258,7 +2258,7 @@ void gramado_down (struct semaphore_d *s){
 		
 tryAgain:	
 
-	Status = (int) system_call( SYSTEMCALL_SEMAPHORE_DOWN, 
+	Status = (int) gramado_system_call( SYSTEMCALL_SEMAPHORE_DOWN, 
 	                            (unsigned long) s, 
 								(unsigned long) s, 
 								(unsigned long) s );
@@ -2317,7 +2317,7 @@ void gramado_up (struct semaphore_d *s){
 	
 tryAgain:	
 
-	Status = (int) system_call ( SYSTEMCALL_SEMAPHORE_UP, (unsigned long) s, 
+	Status = (int) gramado_system_call ( SYSTEMCALL_SEMAPHORE_UP, (unsigned long) s, 
 						(unsigned long) s, (unsigned long) s );	
 
 	//Ok , podemos sair sa sessão crítica.
@@ -2347,13 +2347,13 @@ fail:
 
 
 //P (Proberen) testar.
-void enterCriticalSection (){
+void gramado_enter_critical_section (){
 	
 	int S;
 	
 	while (1)
 	{
-	    S = (int) system_call( SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0);
+	    S = (int) gramado_system_call( SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0);
 	    
 		//Se deixou de ser 0 então posso entrar.
 		//se ainda for 0, continuo no while.
@@ -2365,48 +2365,48 @@ void enterCriticalSection (){
     //Nothing
 done:
     //Muda para zero para que ninguém entre.
-    system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );	
+    gramado_system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );	
 	return;
 };
 
 //V (Verhogen)incrementar.
-void exitCriticalSection (){
+void gramado_exit_critical_section (){
 	
 	//Hora de sair. Mudo para 1 para que outro possa entrar.
-    system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
+    gramado_system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
 
-void initializeCriticalSection (){
+void gramado_initialize_critical_section (){
 	
 	//Inicializa em 1 o semáforo do kernel para que 
 	//o primeiro possa usar.
-	system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
+	gramado_system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
 
 
-void apiBeginPaint (){
+void gramado_begin_paint (){
 	
 	enterCriticalSection ();
 };
 
 
-void apiEndPaint (){
+void gramado_end_paint (){
 	
 	exitCriticalSection ();
 };
 
 
 //imprime um caractere usando o cursor do sistema.
-void apiPutChar (int c){
+void gramado_putchar (int c){
 	
-	system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
+	gramado_system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
 };
 
 
 //Get process ID.
 /*
 int getpid(){
-	return (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
+	return (int) gramado_system_call( SYSTEMCALL_GETPID, 0, 0, 0);
 }
 */
 
@@ -2417,9 +2417,10 @@ int getpid(){
  *     Procedimento de janela adiado. 
  *     Usado pelos aplicativos ao fim dos 
  * seus procedimentos de janela.
+ *defered dialog
  */
 unsigned long 
-apiDefDialog( struct window_d *window, 
+gramado_def_dialog( struct window_d *window, 
               int msg, 
 			  unsigned long long1, 
 			  unsigned long long2 )
@@ -2436,48 +2437,48 @@ apiDefDialog( struct window_d *window,
  *     Obtem informações sobre dimensões e posicionamentos.
  */
  
-unsigned long apiGetSystemMetrics (int index){
+unsigned long gramado_get_system_metrics (int index){
 	
-    return (unsigned long) system_call ( SYSTEMCALL_GETSYSTEMMETRICS, 
+    return (unsigned long) gramado_system_call ( SYSTEMCALL_GETSYSTEMMETRICS, 
 	                                     (unsigned long) index, 
 										 (unsigned long) index, 
 										 (unsigned long) index );
 };
 
 
-void api_set_current_keyboard_responder ( int i ){
+void gramado_set_current_keyboard_responder ( int i ){
 	
-    system_call ( SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER, 
+    gramado_system_call ( SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER, 
 	    (unsigned long) i, (unsigned long) i, (unsigned long) i );
 };
 
 
-int api_get_current_keyboard_responder (){
+int gramado_get_current_keyboard_responder (){
 	
-    return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER, 
+    return (unsigned long) gramado_system_call( SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER, 
 	                                    (unsigned long) 0, 
 										(unsigned long) 0, 
 										(unsigned long) 0 );
 };
 
 
-void api_set_current_mouse_responder (int i){
+void gramado_set_current_mouse_responder (int i){
 	
-    system_call ( SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER, (unsigned long) i, 
+    gramado_system_call ( SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER, (unsigned long) i, 
 	    (unsigned long) i, (unsigned long) i );	
 };
 
 
-int api_get_current_mouse_responder (){
+int gramado_get_current_mouse_responder (){
 	
-    return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER, 
+    return (unsigned long) gramado_system_call( SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER, 
 	                                    (unsigned long) 0, 
 										(unsigned long) 0, 
 										(unsigned long) 0 );	
 };
 
 
-void api_set_window_with_text_input ( struct window_d *window ){
+void gramado_set_window_with_text_input ( struct window_d *window ){
 	
 	if ( (void *) window == NULL ) {
 		return;
@@ -2487,14 +2488,14 @@ void api_set_window_with_text_input ( struct window_d *window ){
 		return;
 	}
 	
-    system_call ( SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT, (unsigned long) window, 
+    gramado_system_call ( SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );
 };
 
 
-int api_get_window_with_text_input (){
+int gramado_get_window_with_text_input (){
 	
-    return (int) system_call ( SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT, 
+    return (int) gramado_system_call ( SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT, 
 	                (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
 };
 
@@ -2507,7 +2508,7 @@ void api_receive_message( struct api_receive_message_d *m )
 	//Enviamos para o kernel o ponteiro da estrutura que desejamos que ele 
 	//coloque os valores.
 	//o kernel deve atualizar a flag dizendo que tem alguma mensagems na estrutura.
-    system_call( SYSTEMCALL_138, (unsigned long) m, (unsigned long) m, (unsigned long) m );
+    gramado_system_call( SYSTEMCALL_138, (unsigned long) m, (unsigned long) m, (unsigned long) m );
 				 
 };
 */
@@ -2524,14 +2525,14 @@ void api_receive_message( struct api_receive_message_d *m )
  */
  
 int 
-gramadocore_init_execve ( const char *filename, 
+gramado_gramadocore_init_execve ( const char *filename, 
                           const char *argv[], 
                           const char *envp[] )
 {
 	
 	//@todo: Ainda não implementada.
 	
-	//system_call( , , ,)
+	//gramado_system_call( , , ,)
 	
 	return (int) -1;
 };
@@ -2545,9 +2546,9 @@ clonando o a estrutura do processo mas ainda há outras coisas pra
 fazer como memória, diretório e a troca correta de diretório de 
 páginas dutante o taskswitch */
 
-int fork (){
+int gramado_fork (){
 	
-    return (int) system_call ( SYSTEMCALL_FORK, (unsigned long) 0, 
+    return (int) gramado_system_call ( SYSTEMCALL_FORK, (unsigned long) 0, 
 					(unsigned long) 0, (unsigned long) 0 ); 
 };
 
@@ -2563,7 +2564,7 @@ int fork (){
  */
  
 int 
-execve ( const char *filename, 
+gramado_execve ( const char *filename, 
          const char *argv[], 
          const char *envp[] )
 {
@@ -2578,7 +2579,7 @@ execve ( const char *filename,
  * apiDialog:
  *     Diálogo de yes ou no.
  */
-int apiDialog ( const char *string ){
+int gramado_dialog ( const char *string ){
 	
     int Status = 1; // Yes!
 	int ch;
@@ -2622,9 +2623,9 @@ done:
 };
 
 
-int api_getchar (){
+int gramado_getchar (){
 	
-	return (int) system_call ( 137, 0, 0, 0 );
+	return (int) gramado_system_call ( 137, 0, 0, 0 );
 };
 
 
@@ -2645,7 +2646,7 @@ int api_getchar (){
 static int nibble_count_16colors = 0;
  
 int 
-apiDisplayBMP ( char *address, 
+gramado_display_bmp ( char *address, 
                 unsigned long x, 
 				unsigned long y )
 {
@@ -2964,7 +2965,7 @@ apiDisplayBMP ( char *address,
 	        };
 			
 			
-			system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
+			gramado_system_call ( SYSTEMCALL_BUFFER_PUTPIXEL, (unsigned long) color, 
 				(unsigned long) left, (unsigned long) bottom );
 			
 			// Próximo pixel.
@@ -3004,7 +3005,7 @@ done:
 //Coloca uma mensagem na estrutura de uma janela.
 //ainda não temos filas de mensagem, então mensagens podem se perder 
 //sendo sobrepostas.
-unsigned long apiSendMessage ( struct window_d *window, 
+unsigned long gramado_send_message ( struct window_d *window, 
                                int message,
                                unsigned long long1,
                                unsigned long long2 )
@@ -3019,7 +3020,7 @@ unsigned long apiSendMessage ( struct window_d *window,
 	message_buffer[3] = (unsigned long) long2;  	
 	
 	
-	return (unsigned long) system_call ( 114 , 
+	return (unsigned long) gramado_system_call ( 114 , 
 	                                     (unsigned long) &message_buffer[0], 
 										 (unsigned long) &message_buffer[0], 
 										 (unsigned long) &message_buffer[0] );	
@@ -3027,7 +3028,7 @@ unsigned long apiSendMessage ( struct window_d *window,
 
 
 
-int apiDrawText ( struct window_d *window, 
+int gramado_draw_text ( struct window_d *window, 
                   unsigned long x, 
 				  unsigned long y, 
 				  unsigned long color, 
@@ -3043,7 +3044,7 @@ int apiDrawText ( struct window_d *window,
 	msg[4] = (unsigned long) string;
 	//...
 	
-	return (int) system_call ( SYSTEMCALL_DRAWTEXT , 
+	return (int) gramado_system_call ( SYSTEMCALL_DRAWTEXT , 
 	                (unsigned long) &msg[0], 
 					(unsigned long) &msg[0], 
 					(unsigned long) &msg[0] );		
@@ -3051,39 +3052,39 @@ int apiDrawText ( struct window_d *window,
 
 
 
-struct window_d *apiGetWSScreenWindow (){
+struct window_d *gramado_get_ws_screen_window (){
 	
-    return (struct window_d *) system_call ( 146 , 0, 0, 0 );
+    return (struct window_d *) gramado_system_call ( 146 , 0, 0, 0 );
 };
 
 
-struct window_d *apiGetWSMainWindow (){
+struct window_d *gramado_get_ws_main_window (){
 	
-    return (struct window_d *) system_call ( 147 , 0, 0, 0 );
+    return (struct window_d *) gramado_system_call ( 147 , 0, 0, 0 );
 };
 
 
 //create timer;
-struct timer_d *apiCreateTimer ( struct window_d *window, 
+struct timer_d *gramado_create_timer ( struct window_d *window, 
                                  unsigned long ms, 
 								 int type )
 {
-	return (struct timer_d *) system_call ( 222, 
+	return (struct timer_d *) gramado_system_call ( 222, 
 	    (unsigned long) window, (unsigned long) ms, (unsigned long) type );
 };
 
 
 // pega informações varidas sobre o sys time.
-unsigned long apiGetSysTimeInfo ( int n ){
+unsigned long gramado_get_systime_info ( int n ){
 	
-	return (unsigned long) system_call ( 223, 
+	return (unsigned long) gramado_system_call ( 223, 
 	    (unsigned long) n, (unsigned long) n, (unsigned long) n );
 };
 
 //mostra uma janela na tela. backbuffer ---> frontbuffer
 void gramado_show_window (struct window_d *window){
 	
-    system_call ( 24, (unsigned long) window, 
+    gramado_system_call ( 24, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );	
 };
 

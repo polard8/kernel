@@ -3335,15 +3335,15 @@ void gramado_up(struct semaphore_d *s);
 
 
 //Critical section support.
-void enterCriticalSection();         //P (Proberen) testar.
-void exitCriticalSection();          //V (Verhogen)incrementar.
-void initializeCriticalSection();    //Inicializa em 1
+void gramado_enter_critical_section();         //P (Proberen) testar.
+void gramado_exit_critical_section();          //V (Verhogen)incrementar.
+void gramado_initialize_critical_section();    //Inicializa em 1
 
 //Paint support.
-void apiBeginPaint();
-void apiEndPaint();
+void gramado_begin_paint();
+void gramado_end_paint();
 
-void apiPutChar( int c );
+void gramado_putchar( int c );
 
 /*
 int getpid();
@@ -3358,22 +3358,22 @@ int getpid();
  * procedimentos de janela.
  */
 unsigned long 
-apiDefDialog( struct window_d *window, 
+gramado_def_dialog( struct window_d *window, 
               int msg, 
 			  unsigned long long1, 
 			  unsigned long long2 );
 			  
 			  
-unsigned long apiGetSystemMetrics( int index );
+unsigned long gramado_get_system_metrics( int index );
 
 
-void api_set_current_keyboard_responder( int i );
-int api_get_current_keyboard_responder();
-void api_set_current_mouse_responder( int i );
-int api_get_current_mouse_responder();
+void gramado_set_current_keyboard_responder( int i );
+int gramado_get_current_keyboard_responder();
+void gramado_set_current_mouse_responder( int i );
+int gramado_get_current_mouse_responder();
 
-void api_set_window_with_text_input( struct window_d *window );
-int api_get_window_with_text_input();
+void gramado_set_window_with_text_input( struct window_d *window );
+int gramado_get_window_with_text_input();
 
 
 /*
@@ -3383,36 +3383,36 @@ int api_get_window_with_text_input();
  *     Roda usando o processo init.
  *
  */
-int gramadocore_init_execve( const char *filename, 
+int gramado_gramadocore_init_execve( const char *filename, 
             const char *argv[], 
             const char *envp[] ); 
 			
 							 
 /* UNIX style */
-int fork();
-int execve ( const char *filename, 
+int gramado_fork();
+int gramado_execve ( const char *filename, 
              const char *argv[], 
              const char *envp[] ); 
 			
 			
 			
 
-int apiDialog( const char *string );
+int gramado_dialog( const char *string );
 
-int api_getchar();
+int gramado_getchar();
 
 
 /*
  * apiDisplayBMP:
  */
-int apiDisplayBMP ( char *address, 
+int gramado_display_bmp ( char *address, 
                     unsigned long x, 
 				    unsigned long y );
 				   
 				   
 			     
 //Coloca uma mensagem na estrutura de uma janela.				   
-unsigned long apiSendMessage ( struct window_d *window, 
+unsigned long gramado_send_message ( struct window_d *window, 
                                int message,
                                unsigned long long1,
                                unsigned long long2 );
@@ -3420,24 +3420,27 @@ unsigned long apiSendMessage ( struct window_d *window,
 
 
 							   
-int apiDrawText ( struct window_d *window, 
+int gramado_draw_text ( struct window_d *window, 
                   unsigned long x, 
 				  unsigned long y, 
 				  unsigned long color, 
 				  char *string );
 				  
-				  
-struct window_d *apiGetWSScreenWindow ();
-struct window_d *apiGetWSMainWindow ();
+				
+//window server				
+struct window_d *gramado_get_ws_screen_window ();
+struct window_d *gramado_get_ws_main_window ();
 
 
 //create timer;
-struct timer_d *apiCreateTimer ( struct window_d *window, 
+struct timer_d *gramado_create_timer ( struct window_d *window, 
                                  unsigned long ms, 
 								 int type );
 
 // pega informações varidas sobre o sys time.
-unsigned long apiGetSysTimeInfo ( int n );
+unsigned long gramado_get_systime_info ( int n );
+
+void gramado_dead_thread_collector ();
 
 //
 //...
