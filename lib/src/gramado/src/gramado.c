@@ -1,5 +1,5 @@
 /*
- * File: api.c 
+ * File: gramado.c   -- gramado framework 
  *
  * Description:
  *     Application Programming Interface - (API).
@@ -61,9 +61,9 @@
 
 //diretório 
 //-I c:\gramado\include
-#include <libc\types.h>   //
-#include <libc\heap.h>    //
-#include <api\api.h>      //
+#include <types.h>   //
+#include <heap.h>    //
+#include <gramado\gramado.h>      //
 
 
 //message box button pointer
@@ -103,10 +103,10 @@ dbProcedure( struct window_d *window,
  * 2016 - Revisão.
  * ...
  */
-void *system_call ( unsigned long ax, 
-                    unsigned long bx, 
-				    unsigned long cx, 
-				    unsigned long dx )
+void *gramado_system_call ( unsigned long ax, 
+                            unsigned long bx, 
+				            unsigned long cx, 
+				            unsigned long dx )
 {
     
 	//##BugBug: Aqui 0 retorno não pode ser inteiro.
@@ -132,7 +132,7 @@ void *system_call ( unsigned long ax,
  *    Obs: Assim como system, isso deve chamar aplicativos. 
  * ?? Talvez deva chamar o próprio shell ??     
  */
-int apiSystem (const char *command){
+int gramado_system (const char *command){
     
     // @todo: Checar se comando é válido, se os primeiros caracteres
 	//        são espaço. Ou talvez somente compare, sem tratar o argumento.
@@ -361,7 +361,7 @@ exit:
  * system1:
  *     int 201, serviço 1, Print pixel. (rever)
  */ 
-int system1 ( unsigned long ax, 
+int gramado_system1 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -381,7 +381,7 @@ int system1 ( unsigned long ax,
  * system2:
  *     int 202, serviço 2, Print horizontal line.  (rever)
  */
-int system2 ( unsigned long ax, 
+int gramado_system2 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -400,7 +400,7 @@ int system2 ( unsigned long ax,
  * system3:
  *     int 203, serviço 3. Retângulo.  (rever)
  */
-int system3 ( unsigned long ax, 
+int gramado_system3 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -419,7 +419,7 @@ int system3 ( unsigned long ax,
  * system4:
  *     int 204, serviço 4. Putch.  (rever)
  */
-int system4 ( unsigned long ax, 
+int gramado_system4 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -438,7 +438,7 @@ int system4 ( unsigned long ax,
  * system5:
  *     int 205, serviço 5. Print string.  (rever)
  */
-int system5 ( unsigned long ax, 
+int gramado_system5 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -457,7 +457,7 @@ int system5 ( unsigned long ax,
  * system6:
  *     int 206, serviço 6. Message box using buffer.  (rever)
  */
-int system6 ( unsigned long ax, 
+int gramado_system6 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -476,7 +476,7 @@ int system6 ( unsigned long ax,
  * system7:
  *     int 207, serviço 7.  (rever)
  */
-int system7 ( unsigned long ax, 
+int gramado_system7 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -495,7 +495,7 @@ int system7 ( unsigned long ax,
  * system8:
  *     int 208, serviço 8.  (rever)
  */
-int system8 ( unsigned long ax, 
+int gramado_system8 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -516,7 +516,7 @@ int system8 ( unsigned long ax,
  *     Chama o procedimento da vez. 
  *     Executa outro procedimento.  (rever)
  */  
-int system9 ( unsigned long ax, 
+int gramado_system9 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx )
@@ -535,7 +535,7 @@ int system9 ( unsigned long ax,
  * system10:
  *     int 210, serviço 10. v
  */
-int system10 ( unsigned long ax, 
+int gramado_system10 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
 			   unsigned long dx )
@@ -554,7 +554,7 @@ int system10 ( unsigned long ax,
  * system11:
  *     int 211, serviço 11.  (rever)
  */
-int system11 ( unsigned long ax, 
+int gramado_system11 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
 			   unsigned long dx )
@@ -573,7 +573,7 @@ int system11 ( unsigned long ax,
  * system12:
  *     int 212, serviço 12.
  */
-int system12 ( unsigned long ax, 
+int gramado_system12 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
 			   unsigned long dx )
@@ -593,7 +593,7 @@ int system12 ( unsigned long ax,
  * system13:
  *     int 213, serviço 13.
  */
-int system13 ( unsigned long ax, 
+int gramado_system13 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
 			   unsigned long dx )
@@ -612,7 +612,7 @@ int system13 ( unsigned long ax,
  * system14:
  *     int 214, serviço 14.  (rever)
  */
-int system14 ( unsigned long ax, 
+int gramado_system14 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
 			   unsigned long dx )
@@ -631,7 +631,7 @@ int system14 ( unsigned long ax,
  * system15:
  *      int 215, serviço 15.  (rever)
  */
-int system15 ( unsigned long ax, 
+int gramado_system15 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
 			   unsigned long dx )
@@ -652,7 +652,7 @@ int system15 ( unsigned long ax,
  *     Refresh buffer.
  *     Atualiza um buffer dado seu número.  (rever)
  */
-void refresh_buffer (unsigned long n){
+void gramado_refresh_buffer (unsigned long n){
 	
 	// Limits.
 	if (n < 1 || n > 9)
@@ -716,7 +716,7 @@ void refresh_buffer (unsigned long n){
  *     int 200, serviço 10.
  *     Print string no buffer.  (rever)
  */
-void print_string ( unsigned long x,  
+void gramado_print_string ( unsigned long x,  
                     unsigned long y,  
 				    unsigned long color, 
 				    unsigned char *string )
@@ -730,7 +730,7 @@ void print_string ( unsigned long x,
  *     Int 200, serviço 15.
  *     Sincroniza o retraço vertical do monitor.  (rever)
  */
-int vsync (){
+int gramado_vsync (){
 	
 	system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
     
@@ -742,7 +742,7 @@ int vsync (){
  * edit_box:
  *     Interrupção 200, serviço SYSTEMCALL_EDITBOX.  (rever)
  */
-int edit_box ( unsigned long x,  
+int gramado_edit_box ( unsigned long x,  
                unsigned long y, 
 			   unsigned long height, 
 			   unsigned long width)
@@ -760,7 +760,7 @@ int edit_box ( unsigned long x,
  *     Chama o proximo procesimento de janela.
  *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
  */
-int chama_procedimento (unsigned long proximo_procedure){
+int gramado_chama_procedimento (unsigned long proximo_procedure){
 	
     system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
 	
@@ -774,7 +774,7 @@ int chama_procedimento (unsigned long proximo_procedure){
  *     Setar o endereço do procedimento que deverá ser chamado. 
  *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
  */
-int SetNextWindowProcedure (unsigned long next_procedure){
+int gramado_set_next_window_procedure (unsigned long next_procedure){
 	
     system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
     
@@ -800,7 +800,7 @@ int set_cursor (unsigned long x, unsigned long y){
  * put_char:
  *     Put char.  (rever)
  */
-void put_char ( unsigned long x,  
+void gramado_put_char ( unsigned long x,  
                 unsigned long y,  
 			    unsigned long color, 
 			    unsigned char *ch )
@@ -825,7 +825,7 @@ void put_char ( unsigned long x,
  * Obs: 
  *     Lembrar que estamos usando endereços lógicos.  (rever)
  */
-void carrega_bitmap_16x16 ( unsigned long img_address, 
+void gramado_carrega_bitmap_16x16 ( unsigned long img_address, 
                             unsigned long x, 
 						    unsigned long y )                           
 {
@@ -839,7 +839,7 @@ void carrega_bitmap_16x16 ( unsigned long img_address,
  *     Interrupção 200, serviço SYSTEMCALL_SHUTDOWN.
  *     Metodo? ACPI, APM ...  (rever)
  */
-void apiShutDown (){
+void gramado_shutdown (){
 	
 	// @todo: 
 	// A API pode chamar algumas rotinas ainda aqui em user mode
@@ -861,7 +861,7 @@ void apiShutDown (){
  * apiInitBackground:
  *     Initialize default background configuration.  (rever)
  */
-void apiInitBackground (){
+void gramado_init_background (){
 	
     //@todo: Implementar.	
     //return;    //Não há uma chamada para isso ainda.            
@@ -874,7 +874,7 @@ void apiInitBackground (){
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
-int MessageBox ( int type, char *string1, char *string2 ){
+int gramado_message_box ( int type, char *string1, char *string2 ){
     
     // Antes nós chamávamos o kernel, agora tentaremos 
     // implantar na api.
@@ -1163,7 +1163,7 @@ done:
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
-int DialogBox ( int type, char *string1, char *string2 ){
+int gramado_dialog_box ( int type, char *string1, char *string2 ){
     
     //
     // Antes nós chamávamos o kernel, agora tentaremos 
@@ -1462,7 +1462,7 @@ done:
  *
  * #todo: esse retorno deve ser unsigned long
  */
-int call_kernel ( unsigned long int_number, 
+int gramado_call_kernel ( unsigned long int_number, 
                   unsigned long service_number, 
                   unsigned long arg1, 
                   unsigned long arg2, 
@@ -1585,7 +1585,7 @@ int call_kernel ( unsigned long int_number,
  *
  *  #todo: esse retorno deve ser unsigned long.
  */
-int call_gui ( unsigned long int_number, 
+int gramado_call_gui ( unsigned long int_number, 
                unsigned long service_number, 
                unsigned long arg1, 
                unsigned long arg2, 
@@ -1665,7 +1665,7 @@ int call_gui ( unsigned long int_number,
  * CONTINUA ...
  *
  */
-void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,normal,...)
+void *gramado_create_window( unsigned long type,        //1, Tipo de janela (popup,normal,...)
                        unsigned long status,      //2, Estado da janela (ativa ou nao)
                        unsigned long view,        //3, (min, max ...)
                        char *windowname,          //4, Título.                          
@@ -1747,7 +1747,7 @@ done:
  * APIRegisterWindow:
  *     Register Window.
  */
-int APIRegisterWindow (struct window_d *window){
+int gramado_register_window (struct window_d *window){
     
     // @todo: Filtrar argumento.	
 	
@@ -1767,7 +1767,7 @@ int APIRegisterWindow (struct window_d *window){
  * APICloseWindow:
  *     Close Window. 
  */
-int APICloseWindow (struct window_d *window){
+int gramado_close_window (struct window_d *window){
 	
     // @todo: Filtrar argumento.	
 	
@@ -1787,7 +1787,7 @@ int APICloseWindow (struct window_d *window){
  * APISetFocus:
  *     Set Focus.
  */
-int APISetFocus (struct window_d *window){
+int gramado_set_focus (struct window_d *window){
 	
     // @todo: Filtrar argumento.
     	
@@ -1810,7 +1810,7 @@ int APISetFocus (struct window_d *window){
  * APIGetFocus:
  *     Get Focus.
  */
-int APIGetFocus (){
+int gramado_get_focus (){
 	
     return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
 };
@@ -1820,7 +1820,7 @@ int APIGetFocus (){
  * APIKillFocus:
  *     Kill Focus.
  */
-int APIKillFocus (struct window_d *window){
+int gramado_kill_focus (struct window_d *window){
 
     // @todo: Filtrar argumento.
 	
@@ -1845,7 +1845,7 @@ int APIKillFocus (struct window_d *window){
  *     Set Active Window.
  * @todo: Esse retorno pode ser void.
  */
-int APISetActiveWindow (struct window_d *window){
+int gramado_set_active_window (struct window_d *window){
 	
     // @todo: Filtrar argumento.	
 	
@@ -1869,7 +1869,7 @@ int APISetActiveWindow (struct window_d *window){
  * APIGetActiveWindow:
  *     Get Active Window Id.
  */
-int APIGetActiveWindow (){
+int gramado_get_active_window (){
 	
     return (int) system_call ( SYSTEMCALL_GETACTIVEWINDOW, 0, 0, 0 );	
 };
@@ -1879,7 +1879,7 @@ int APIGetActiveWindow (){
  * APIShowCurrentProcessInfo:
  *     Mostra informações sobre o processo atual.
  */
-void APIShowCurrentProcessInfo (){
+void gramado_show_current_process_info (){
 	
 	// @todo: Essa rotina devira apenas pegar os valores via system call
 	//        e imprimir os valores obtidos usando rotinas em user mode.
@@ -1891,7 +1891,7 @@ void APIShowCurrentProcessInfo (){
 
 //*********
  
-void APIresize_window ( struct window_d *window, 
+void gramado_resize_window ( struct window_d *window, 
                         unsigned long x, 
 						unsigned long y )
 {	
@@ -1902,14 +1902,14 @@ void APIresize_window ( struct window_d *window,
 /*
  * APIredraw_window:
  */
-void APIredraw_window( struct window_d *window, unsigned long flags ){
+void gramado_redraw_window( struct window_d *window, unsigned long flags ){
 	
 	system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
 		(unsigned long) flags, (unsigned long) flags );
 };
 
 
-void APIreplace_window ( struct window_d *window, 
+void gramado_replace_window ( struct window_d *window, 
                          unsigned long x, 
 						 unsigned long y )
 {
@@ -1917,14 +1917,14 @@ void APIreplace_window ( struct window_d *window,
 };
 
 
-void APImaximize_window (struct window_d *window){
+void gramado_maximize_window (struct window_d *window){
 	
 	system_call ( SYSTEMCALL_MAXIMIZEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);
 };
 
 
-void APIminimize_window (struct window_d *window){
+void gramado_minimize_window (struct window_d *window){
 	
 	system_call ( SYSTEMCALL_MINIMIZEWINDOW, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);	
@@ -1932,20 +1932,20 @@ void APIminimize_window (struct window_d *window){
 
 
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
-void APIupdate_window (struct window_d *window){
+void gramado_update_window (struct window_d *window){
 	
 	system_call ( 113, (unsigned long) window, 
 		(unsigned long) window, (unsigned long) window);	
 };
 
 
-void *APIget_foregroung_window (){
+void *gramado_get_foregroung_window (){
 	
 	system_call ( SYSTEMCALL_GETFOREGROUNDWINDOW, 0, 0, 0 );	
 };
 
 
-void APIset_foregroung_window (struct window_d *window){
+void gramado_set_foregroung_window (struct window_d *window){
 	
 	system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );
@@ -1959,7 +1959,7 @@ void APIset_foregroung_window (struct window_d *window){
  *     programa, terminando o processo e
  *     liberar os recursos que o processo estava usando.
  */
-void apiExit (int exit_code){
+void gramado_exit (int exit_code){
 	
     system_call ( SYSTEMCALL_EXIT, (unsigned long) exit_code, 
 		(unsigned long) exit_code, (unsigned long) exit_code );
@@ -1975,7 +1975,7 @@ void apiExit (int exit_code){
  * kill:
  *     @todo: Poderia ser o envio de um sinal para um processo dado deu PID.  
  */
-void kill (int exit_code){
+void gramado_kill (int exit_code){
 	
 	//#todo
     //return; //Não há uma chamada para isso ainda.
@@ -2002,7 +2002,7 @@ void dead_thread_collector (){
  *     Compara duas strings.
  *     @todo: Isso deve ser oferecido peloa libC e não pela api. 
  */
-int api_strncmp (char *s1, char *s2, int len){
+int gramado_strncmp (char *s1, char *s2, int len){
 	
 	int n = len;
 	
@@ -2036,7 +2036,7 @@ int api_strncmp (char *s1, char *s2, int len){
  *     Refresh Screen.
  *     Passa o conteúdo do backbuffer para o lfb.
  */
-void refresh_screen (){
+void gramado_refresh_screen (){
 	
 	system_call ( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
 };
@@ -2047,7 +2047,7 @@ void refresh_screen (){
  *     Refresh the LFB.
  *     Move the content of BackBuffer to LFB.
  */
-void api_refresh_screen (){
+void gramado_refresh_screen2 (){
 	
 	refresh_screen ();
 };
@@ -2057,7 +2057,7 @@ void api_refresh_screen (){
  * apiReboot:
  *     Reboot.
  */
-void apiReboot (){
+void gramado_reboot (){
 	
 	// @todo: Fazer outras chamadas para
 	//        as camadas de software de mais alto nível antes
@@ -2071,7 +2071,7 @@ void apiReboot (){
  * apiSetCursor: 
  *     Set cursor.
  */
-void apiSetCursor ( unsigned long x, unsigned long y ){
+void gramado_set_cursor ( unsigned long x, unsigned long y ){
 	
     system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );	
 };
@@ -2081,7 +2081,7 @@ void apiSetCursor ( unsigned long x, unsigned long y ){
  * apiGetCursorX:
  *     Get cursor x. 
  */
-unsigned long apiGetCursorX (){
+unsigned long gramado_get_cursor_x (){
 	
     return (unsigned long) system_call ( SYSTEMCALL_GETCURSORX, 0, 0, 0 );
 };
@@ -2091,7 +2091,7 @@ unsigned long apiGetCursorX (){
  * apiGetCursorY:
  *     Get cursor y.
  */
-unsigned long apiGetCursorY (){
+unsigned long gramado_get_cursor_y (){
 	
     return (unsigned long) system_call (SYSTEMCALL_GETCURSORY, 0, 0, 0 );
 };
@@ -2101,7 +2101,7 @@ unsigned long apiGetCursorY (){
  * apiGetClientAreaRect:
  *     Get client area rect.
  */
-void *apiGetClientAreaRect (){
+void *gramado_get_clientarea_rect (){
 	
     return (void *) system_call ( SYSTEMCALL_GETCLIENTAREARECT, 0, 0, 0 );	
 };
@@ -2111,7 +2111,7 @@ void *apiGetClientAreaRect (){
  * apiSetClientAreaRect:
  *     Enviar uma estrutura de retângulo criada em user mode para o kernel.
  */
-void apiSetClientAreaRect (struct rect_d *r){
+void gramado_set_clientarea_rect (struct rect_d *r){
 	
     system_call ( SYSTEMCALL_SETCLIENTAREARECT, (unsigned long) r, 
 		(unsigned long) r, (unsigned long) r );
@@ -2122,7 +2122,7 @@ void apiSetClientAreaRect (struct rect_d *r){
  * apiCreateProcess:
  *     Create a process.
  */
-void *apiCreateProcess( unsigned long process_eip, 
+void *gramado_create_process ( unsigned long process_eip, 
                         unsigned long process_priority, 
 						char *name )
 {
@@ -2135,7 +2135,7 @@ void *apiCreateProcess( unsigned long process_eip,
  * apiCreateThread:
  *     Create a thread.
  */
-void *apiCreateThread( unsigned long thread_eip, 
+void *gramado_create_thread( unsigned long thread_eip, 
                        unsigned long thread_priority, 
 					   char *name )
 {
@@ -2150,7 +2150,7 @@ void *apiCreateThread( unsigned long thread_eip,
  * coloca no estado standby para executar pela primeira vez
  * #BUGBUG: Não retornou. 
  */
-void apiStartThread (void *Thread){
+void gramado_start_thread (void *Thread){
 
     system_call ( SYSTEMCALL_STARTTHREAD, (unsigned long) Thread, 
 		(unsigned long) Thread, (unsigned long) Thread );	
@@ -2166,7 +2166,7 @@ void apiStartThread (void *Thread){
  *     Obs: Devemos passar um endereço válido, previamente 
  * alocado. 
  */
-void *apiFOpen(const char *filename, const char *mode){
+void *gramado_fopen (const char *filename, const char *mode){
 	
     void *Ret;	
 	
@@ -2191,7 +2191,7 @@ void *apiFOpen(const char *filename, const char *mode){
  */
  
 int
-apiSaveFile ( char *file_name, 
+gramado_save_file ( char *file_name, 
               unsigned long file_size,  //size in sectors 
               unsigned long size_in_bytes,			
               char *file_address,
@@ -2237,7 +2237,7 @@ apiSaveFile ( char *file_name,
 
 
 //Operação down em um semáforo indicado no argumento.
-void apiDown (struct semaphore_d *s){
+void gramado_down (struct semaphore_d *s){
 	
 	int Status = 1;    //fail.
 	
@@ -2293,7 +2293,7 @@ fail:
 
 
 //Operação up em um semáforo indicado no argumento.
-void apiUp (struct semaphore_d *s){
+void gramado_up (struct semaphore_d *s){
 	
 	int Status = 1; //fail.
 	
@@ -3081,7 +3081,7 @@ unsigned long apiGetSysTimeInfo ( int n ){
 };
 
 //mostra uma janela na tela. backbuffer ---> frontbuffer
-void apiShowWindow (struct window_d *window){
+void gramado_show_window (struct window_d *window){
 	
     system_call ( 24, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );	
