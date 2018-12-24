@@ -4,7 +4,7 @@
 ; All rights reserved.
 
 	format	ELF
-	public	fasm_main
+	public	asm_fasm_start
 
 macro ccall proc,[arg]
   { common
@@ -42,7 +42,7 @@ section '.text' executable align 16
 ;; a runtime do programa. Então ele passará algumas informações 
 ;; para tudo fique mais fácil para nós.
 
-fasm_main:
+asm_fasm_start:
     
 	;;
 	;; ## Testing functionalities ... ##

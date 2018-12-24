@@ -7,9 +7,12 @@
 [bits 32]
 
 
-extern _gramc_main
+;;está em main.c.
+extern _fasm_main 
 
-extern fasm_main 
+
+;;está em FASM.ASM
+extern asm_fasm_start
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; __crt0Main:
@@ -18,20 +21,28 @@ extern fasm_main
 global __crt0Main
 __crt0Main:
 
-    ;;
+    
 	;; devemos chamar o assembler depois de termos 
 	;; chamado o código em C, que inicializará a 'runtime', pegará a linha de comando,
 	;; providenciará todos os arquivos e buffers necessários e passará tudo 
 	;; para o assembler.
-	;;
 	
-    ;main.c
-	call _gramc_main	
+	
+   ;;
+   ;; ## chamando C ##
+   ;;   
 
-	;;#todo: o retorno da função acima deve ser um ponteiro 
-	;;par aum array com um monte de informações.
 	
-    call fasm_main
+	;;main.c
+    call _fasm_main
+
+
+    ;;
+    ;; ## chamando ASM ##
+    ;;   
+	
+	;;FASM.ASM
+	call asm_fasm_start
 	
 
 	

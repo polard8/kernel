@@ -34,7 +34,7 @@ section '.text' code readable executable
 start:
 
     jmp after_my_awesome_stuff
-	include 'c:\gramado\lib\asm\asm.inc'
+	include 'c:\gramado\include\asm\asm.inc'
 	include 'gramado.inc'
 after_my_awesome_stuff:
 

@@ -20,7 +20,8 @@
 #include "table.h"
 #include "lexer.h"
 #include "parser.h"
-#include "gramc.h"
+
+#include "fasm.h"
 
 
 //fasm support 

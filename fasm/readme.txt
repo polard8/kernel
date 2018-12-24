@@ -1,6 +1,11 @@
  
  /SOURCE/LIBC
 
+
+//=========================
+// main folder: >>>> /SOURCE/LIBC
+
+
  using libc interfce
 
  Testing libc functionalities ...
@@ -10,8 +15,7 @@
 
  gramado/fasm/build.bat creates a objet called FASM.O.
 
- It will be linked against the application gramac.bin in /gramado/gramcc/gramac 
+ It will be linked against the application fasm.bin in /gramado/fasm/SOURCE/LIBC 
 
- gramac.bin invoke FASM.O and FASM.O invoke the libc functionalities in gramac.
 
  :)

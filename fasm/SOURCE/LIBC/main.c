@@ -78,7 +78,8 @@ void debugShowStat();
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
  
-int gramc_main (){
+//int gramc_main (){
+int fasm_main (){
 	
 	//Lexemes suport.
 	char *tokenList[TOKENLIST_MAX_DEFAULT];
@@ -94,7 +95,7 @@ int gramc_main (){
 	
 //#ifdef GRAMCC_VERBOSE
 	//printf("\n");
-	printf("Initializing gramac ...\n");
+	printf("Initializing FASM.BIN for Gramado 0.4 ...\n");
 	printf("Its an inteface for fasm\n");
 	printf ("# cmdline={%s} #\n", shared_memory );
 //#endif
@@ -243,7 +244,7 @@ init:
     
 #ifdef GRAMCC_VERBOSE		
     printf("\n");
-	printf("gramcc_main: Initializing gramcc ...\n");
+	printf("gramcc_main: Initializing fasm for gramado 0.4 ...\n");
 #endif 
 
     libcInitRT();

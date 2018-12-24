@@ -123,11 +123,12 @@ echo -{ ...
 	copy c:\gramado\bin\APPASM.BIN    F:\
 	
 	rem copy c:\gramado\bin\GRAMCC.BIN    F:\
+	
 	copy c:\gramado\bin\GRAMC.BIN    F:\
 	
 	
-	rem test
-	copy c:\gramado\bin\GRAMAC.BIN    F:\
+	rem FASM WITH LIC INTERFACE
+	copy c:\gramado\bin\FASM.BIN    F:\
 	
 	copy c:\gramado\bin\GRAMCODE.BIN   F:\
 	
