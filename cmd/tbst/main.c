@@ -238,6 +238,11 @@ int bst_main (){
 	buffer1[buffer1_offset] = (int) '?';
 	buffer2[buffer2_offset] = (int) '?';
 	
+	//==========================================================================
+	// #todo: NESSA HORA TEM QUE AJUSTAR A PRECEDÊNCIA DOS OPERADORES ## 
+	// 
+	//
+	
 	//inserindo root.
 	root = insert ( root, '?' ); 
 	

@@ -1,5 +1,0 @@
-
-
-    /cpu
-
-    /pc (process control)

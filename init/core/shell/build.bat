@@ -25,6 +25,8 @@ echo -{ Creating main.o ...
 	gcc -c c:\gramado\init\core\shell\parser.c  -I c:\gramado\include\libc  -o parser.o
 	gcc -c c:\gramado\init\core\shell\lexer.c  -I c:\gramado\include\libc  -o lexer.o
 	
+	gcc -c c:\gramado\init\core\shell\net.c  -I c:\gramado\include\libc  -o net.o	
+	
 	copy c:\gramado\lib\api\api.o  c:\sdk\bin\api.o
 	
 	copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
@@ -52,7 +54,10 @@ builtins.o ^
 desktop.o ^
 parser.o ^
 lexer.o ^
-wait.o   
+wait.o ^
+net.o   
+
+   
 
 
 

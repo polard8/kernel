@@ -13,31 +13,89 @@ compilada em outro projeto.
 =========================================
 
 
-    ~Main folders for Gramado Operating System.
+    Main folders for Gramado Operating System.
 
 
 
-//3rdparty - This Fred Nora does not have the copyright.
+//(relations of production)
 
 
-//(super)
-/allegory   - Spiritual quotes and not productive stuff.
+//==============
+/arch     
+    Archtechture stuff.
+    Here you can make th VHD file to run Gramado on a VM.
 
 
+//==============
+/bin      
+    .bin compiled files.
+    All the executable files are here.
 
-//(realtions of production)
-/apps     - The main apps.
-/arch     - Archtechture stuff.
-/bin      - .bin compiled files.
-/docs     - Documentation.
-/drivers  - Ring0 loadable drivers.
-/fs       - File systems support.
-/include  - Headers.
-/kernel   - The kernel base.
-/lib      - Libs.
-/scripts  - Scripts.
-/security - Security support.
-/tests    - Apps.
+//===============
+/cmd 
+    Console applications.
+
+//===============
+/docs    
+    Documentation.
+ 
+
+//================
+/fasm
+/fasm-win
+    Trying to port fasm to Gramado.
+    São duas tentativas diferentes de portar o fasm para o gramado.
+    Uma delas é usando a interface do fasm com o windows.
+    A outra é a interface com a linguagem C unix-like.
+    A alternativa usando a libc parece ser a melhor opção.
+
+
+//================
+/gfe
+    Gramado File Explorer
+
+//================
+/gramcc
+    Gramado Compiler Collection.
+
+//================
+/gramcode
+    Source code editor.
+
+//================
+/gramtext
+     Text editor.
+
+//================
+/gwm
+     Gramado Window Manager
+     GUI in user mode.
+
+//================
+/include  
+    Headers.
+    libc headers.
+    Use these header to create the applications.
+
+//================
+/init
+     Gramado initialization stuff.
+
+//================    
+/lib      
+    Libs.
+    Compiled libs.
+    Source codes for libs.
+
+//================
+/licenses
+    Licenses
+
+//================
+/scripts  
+    Scripts.
+
+
 
 
 

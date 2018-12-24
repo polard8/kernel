@@ -1,0 +1,3 @@
+USERNAME={fred}
+PASSWORD={1234}
+
