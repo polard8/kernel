@@ -1,3 +1,8 @@
+===================================================
+for developers:
+    You're gonna need the folders /include and /lib.
+===================================================
+
 
 Isso será um conjunto de aplicativos em user mode.
 

@@ -24,7 +24,12 @@
 #include "shell.h"
 #include "globals.h"
 #include "builtins.h"
-#include "api.h"
+
+
+//#test
+#include <api/api.h>
+//#include "api.h"
+
 #include "desktop.h"
 
 //# bash 1.05 stuff #

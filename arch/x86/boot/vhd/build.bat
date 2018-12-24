@@ -98,6 +98,7 @@ echo -{ ...
 	
 	rem BMPs
 	copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\*.BMP
+	
 	rem copy c:\gramado\arch\x86\boot\vhd\images\BMP1.BMP      F:\
 	rem copy c:\gramado\arch\x86\boot\vhd\images\MOUSE.BMP     F:\
 	rem copy c:\gramado\arch\x86\boot\vhd\images\DENNIS.BMP    F:\
