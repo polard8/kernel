@@ -12,21 +12,21 @@ mm_prev_pointer     0x10              stdlib.o
 messagebox_button2  0x10              api.o
 g_using_gui         0x10              main.o
 stdin               0x10              main.o
-heap_end            0x10              stdlib.o
+heap_end            0x10              api.o
 rect                0x10              main.o
-g_available_heap    0x10              stdlib.o
-heap_start          0x10              stdlib.o
-heapCount           0x10              stdlib.o
-HEAP_START          0x10              stdlib.o
+g_available_heap    0x10              api.o
+heap_start          0x10              api.o
+heapCount           0x10              api.o
+HEAP_START          0x10              api.o
 prompt_max          0x10              main.o
 CurrentWindow       0x10              main.o
-g_heap_pointer      0x10              stdlib.o
-heapList            0x400             stdlib.o
+g_heap_pointer      0x10              api.o
+heapList            0x400             api.o
 prompt_err          0x400             main.o
 randseed            0x10              stdlib.o
 current_semaphore   0x10              main.o
 g_columns           0x10              main.o
-HEAP_SIZE           0x10              stdlib.o
+HEAP_SIZE           0x10              api.o
 stdout              0x10              main.o
 Streams             0x80              main.o
 last_size           0x10              stdlib.o
@@ -35,10 +35,10 @@ g_rows              0x10              main.o
 prompt_out          0x400             main.o
 mmblockList         0x400             stdlib.o
 dialogbox_button1   0x10              api.o
-libcHeap            0x10              stdlib.o
+libcHeap            0x10              api.o
 g_cursor_y          0x10              main.o
 messagebox_button1  0x10              api.o
-Heap                0x10              stdlib.o
+Heap                0x10              api.o
 dialogbox_button2   0x10              api.o
 CursorInfo          0x10              main.o
 mmblockCount        0x10              stdlib.o
@@ -46,7 +46,7 @@ prompt_status       0x10              main.o
 g_char_attrib       0x10              main.o
 ApplicationInfo     0x10              main.o
 g_cursor_x          0x10              main.o
-HEAP_END            0x10              stdlib.o
+HEAP_END            0x10              api.o
 
 Memory Configuration
 
@@ -287,71 +287,71 @@ Linker script and memory map
                 0x0040a000                . = ALIGN (0x1000)
  *fill*         0x00409580      0xa80 00
 
-.bss            0x0040a000     0xa6f0
+.bss            0x0040a000    0x126f0
                 0x0040a000                bss = .
                 0x0040a000                _bss = .
                 0x0040a000                __bss = .
  *(.bss)
  .bss           0x0040a000        0x0 main.o
- .bss           0x0040a000       0x40 api.o
- .bss           0x0040a040       0x10 stdio.o
- .bss           0x0040a050     0x8010 stdlib.o
-                0x0040a050                environ
- .bss           0x00412060       0x10 string.o
- .bss           0x00412070        0x0 ctype.o
-                0x00413000                . = ALIGN (0x1000)
- *fill*         0x00412070      0xf90 00
- COMMON         0x00413000      0xdb0 main.o
-                0x00413000                prompt
-                0x00413400                ClientAreaInfo
-                0x00413410                BufferInfo
-                0x00413420                stderr
-                0x00413430                prompt_pos
-                0x00413440                g_using_gui
-                0x00413450                stdin
-                0x00413460                rect
-                0x00413470                prompt_max
-                0x00413480                CurrentWindow
-                0x00413490                prompt_err
-                0x00413890                current_semaphore
-                0x004138a0                g_columns
-                0x004138b0                stdout
-                0x004138c0                Streams
-                0x00413940                g_rows
-                0x00413950                prompt_out
-                0x00413d50                g_cursor_y
-                0x00413d60                CursorInfo
-                0x00413d70                prompt_status
-                0x00413d80                g_char_attrib
-                0x00413d90                ApplicationInfo
-                0x00413da0                g_cursor_x
- COMMON         0x00413db0       0x40 api.o
-                0x00413db0                messagebox_button2
-                0x00413dc0                dialogbox_button1
-                0x00413dd0                messagebox_button1
-                0x00413de0                dialogbox_button2
- COMMON         0x00413df0      0x900 stdlib.o
-                0x00413df0                current_mmblock
-                0x00413e00                mm_prev_pointer
-                0x00413e10                heap_end
-                0x00413e20                g_available_heap
-                0x00413e30                heap_start
-                0x00413e40                heapCount
-                0x00413e50                HEAP_START
-                0x00413e60                g_heap_pointer
-                0x00413e70                heapList
-                0x00414270                randseed
-                0x00414280                HEAP_SIZE
-                0x00414290                last_size
-                0x004142a0                last_valid
-                0x004142b0                mmblockList
-                0x004146b0                libcHeap
-                0x004146c0                Heap
-                0x004146d0                mmblockCount
-                0x004146e0                HEAP_END
-                0x004146f0                end = .
-                0x004146f0                _end = .
-                0x004146f0                __end = .
+ .bss           0x0040a000     0x8010 api.o
+ .bss           0x00412010       0x10 stdio.o
+ .bss           0x00412020     0x8010 stdlib.o
+                0x00412020                environ
+ .bss           0x0041a030       0x10 string.o
+ .bss           0x0041a040        0x0 ctype.o
+                0x0041b000                . = ALIGN (0x1000)
+ *fill*         0x0041a040      0xfc0 00
+ COMMON         0x0041b000      0xdb0 main.o
+                0x0041b000                prompt
+                0x0041b400                ClientAreaInfo
+                0x0041b410                BufferInfo
+                0x0041b420                stderr
+                0x0041b430                prompt_pos
+                0x0041b440                g_using_gui
+                0x0041b450                stdin
+                0x0041b460                rect
+                0x0041b470                prompt_max
+                0x0041b480                CurrentWindow
+                0x0041b490                prompt_err
+                0x0041b890                current_semaphore
+                0x0041b8a0                g_columns
+                0x0041b8b0                stdout
+                0x0041b8c0                Streams
+                0x0041b940                g_rows
+                0x0041b950                prompt_out
+                0x0041bd50                g_cursor_y
+                0x0041bd60                CursorInfo
+                0x0041bd70                prompt_status
+                0x0041bd80                g_char_attrib
+                0x0041bd90                ApplicationInfo
+                0x0041bda0                g_cursor_x
+ COMMON         0x0041bdb0      0x4e0 api.o
+                0x0041bdb0                messagebox_button2
+                0x0041bdc0                heap_end
+                0x0041bdd0                g_available_heap
+                0x0041bde0                heap_start
+                0x0041bdf0                heapCount
+                0x0041be00                HEAP_START
+                0x0041be10                g_heap_pointer
+                0x0041be20                heapList
+                0x0041c220                HEAP_SIZE
+                0x0041c230                dialogbox_button1
+                0x0041c240                libcHeap
+                0x0041c250                messagebox_button1
+                0x0041c260                Heap
+                0x0041c270                dialogbox_button2
+                0x0041c280                HEAP_END
+ COMMON         0x0041c290      0x460 stdlib.o
+                0x0041c290                current_mmblock
+                0x0041c2a0                mm_prev_pointer
+                0x0041c2b0                randseed
+                0x0041c2c0                last_size
+                0x0041c2d0                last_valid
+                0x0041c2e0                mmblockList
+                0x0041c6e0                mmblockCount
+                0x0041c6f0                end = .
+                0x0041c6f0                _end = .
+                0x0041c6f0                __end = .
 LOAD main.o
 LOAD api.o
 LOAD stdio.o

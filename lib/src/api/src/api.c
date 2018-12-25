@@ -61,8 +61,8 @@
 
 //diretório 
 //-I c:\gramado\include
-#include <libc\types.h>   //
-#include <libc\heap.h>    //
+#include <types.h>        //
+#include <heap.h>         //
 #include <api\api.h>      //
 
 
@@ -117,7 +117,7 @@ void *system_call ( unsigned long ax,
     //System interrupt. 	
 	asm volatile ("int %1 \n"
 	              : "=a"(RET)	
-		          : "i"(SYSTEM), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+		          : "i"(IA32_SYSCALL_VECTOR), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
     //Nothing.
 	
 	return (void *) RET; 

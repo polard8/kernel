@@ -77,7 +77,7 @@ void *time_system_call ( unsigned long ax,
 	
 	asm volatile (" int %1 \n"
 		           : "=a"(Ret)	
-		           : "i"(200), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+		           : "i"(0x80), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				   
 	return (void *) Ret; 
 };

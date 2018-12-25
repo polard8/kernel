@@ -252,8 +252,13 @@
  * importantes para o desempenho geral do sistema.
  *
  */
+
+ 
+#define IA32_SYSCALL_VECTOR		0x80 
+ 
 //Sistema.
-#define	SYSTEM  200    //*Principal.
+//#define	SYSTEM  200    //*Principal.
+
 //Outras.
 #define	SYSTEM1    201
 #define	SYSTEM2    202

@@ -377,7 +377,7 @@ Linker script and memory map
                 0x0040e000                . = ALIGN (0x1000)
  *fill*         0x0040dff0       0x10 00
 
-.bss            0x0040e000    0x6a0f0
+.bss            0x0040e000    0x720f0
                 0x0040e000                bss = .
                 0x0040e000                _bss = .
                 0x0040e000                __bss = .
@@ -388,89 +388,89 @@ Linker script and memory map
                 0x0040e010                environ
  .bss           0x00416020        0x0 ctype.o
  .bss           0x00416020       0x10 string.o
- .bss           0x00416030       0x40 api.o
-                0x00417000                . = ALIGN (0x1000)
- *fill*         0x00416070      0xf90 00
- COMMON         0x00417000    0x607b0 main.o
-                0x00417000                ini
-                0x00417010                prompt
-                0x00417410                idleStatus
-                0x00417420                st
-                0x00417430                rrconf
-                0x00417440                ClientAreaInfo
-                0x00417450                BufferInfo
-                0x00417460                ntk
-                0x00417470                driverInitialized
-                0x00417480                gdsp
-                0x00417490                nsy
-                0x004174a0                stderr
-                0x004174b0                prompt_pos
-                0x004174c0                srca
-                0x004174d0                g_using_gui
-                0x004174e0                srconf
-                0x004174f0                stdin
-                0x00417500                is
-                0x004491e0                doty
-                0x004491f0                rect
-                0x00449200                nst
-                0x00449210                prompt_max
-                0x00449220                CurrentWindow
-                0x00449230                prompt_err
-                0x00449630                fgrm
-                0x00449640                current_semaphore
-                0x00449650                g_columns
-                0x00449660                as
-                0x00449670                fhdr
-                0x00449680                stdout
-                0x00449690                idnt
-                0x004496d0                Streams
-                0x00449750                adsp
-                0x00449760                act
-                0x00449770                g_rows
-                0x00449780                fin
-                0x00449790                prompt_out
-                0x00449b90                i0
-                0x0045b4e0                nrl
-                0x0045b4f0                rs
-                0x004776f0                fout
-                0x00477700                chk
-                0x00477710                sstart
-                0x00477720                g_cursor_y
-                0x00477730                CursorInfo
-                0x00477740                gs
-                0x00477750                prompt_status
-                0x00477760                actsz
-                0x00477770                g_char_attrib
-                0x00477780                ApplicationInfo
-                0x00477790                idleError
-                0x004777a0                g_cursor_x
- COMMON         0x004777b0      0x900 stdlib.o
-                0x004777b0                current_mmblock
-                0x004777c0                mm_prev_pointer
-                0x004777d0                heap_end
-                0x004777e0                g_available_heap
-                0x004777f0                heap_start
-                0x00477800                heapCount
-                0x00477810                HEAP_START
-                0x00477820                g_heap_pointer
-                0x00477830                heapList
-                0x00477c30                randseed
-                0x00477c40                HEAP_SIZE
-                0x00477c50                last_size
-                0x00477c60                last_valid
-                0x00477c70                mmblockList
-                0x00478070                libcHeap
-                0x00478080                Heap
-                0x00478090                mmblockCount
-                0x004780a0                HEAP_END
- COMMON         0x004780b0       0x40 api.o
-                0x004780b0                messagebox_button2
-                0x004780c0                dialogbox_button1
-                0x004780d0                messagebox_button1
-                0x004780e0                dialogbox_button2
-                0x004780f0                end = .
-                0x004780f0                _end = .
-                0x004780f0                __end = .
+ .bss           0x00416030     0x8010 api.o
+                0x0041f000                . = ALIGN (0x1000)
+ *fill*         0x0041e040      0xfc0 00
+ COMMON         0x0041f000    0x607b0 main.o
+                0x0041f000                ini
+                0x0041f010                prompt
+                0x0041f410                idleStatus
+                0x0041f420                st
+                0x0041f430                rrconf
+                0x0041f440                ClientAreaInfo
+                0x0041f450                BufferInfo
+                0x0041f460                ntk
+                0x0041f470                driverInitialized
+                0x0041f480                gdsp
+                0x0041f490                nsy
+                0x0041f4a0                stderr
+                0x0041f4b0                prompt_pos
+                0x0041f4c0                srca
+                0x0041f4d0                g_using_gui
+                0x0041f4e0                srconf
+                0x0041f4f0                stdin
+                0x0041f500                is
+                0x004511e0                doty
+                0x004511f0                rect
+                0x00451200                nst
+                0x00451210                prompt_max
+                0x00451220                CurrentWindow
+                0x00451230                prompt_err
+                0x00451630                fgrm
+                0x00451640                current_semaphore
+                0x00451650                g_columns
+                0x00451660                as
+                0x00451670                fhdr
+                0x00451680                stdout
+                0x00451690                idnt
+                0x004516d0                Streams
+                0x00451750                adsp
+                0x00451760                act
+                0x00451770                g_rows
+                0x00451780                fin
+                0x00451790                prompt_out
+                0x00451b90                i0
+                0x004634e0                nrl
+                0x004634f0                rs
+                0x0047f6f0                fout
+                0x0047f700                chk
+                0x0047f710                sstart
+                0x0047f720                g_cursor_y
+                0x0047f730                CursorInfo
+                0x0047f740                gs
+                0x0047f750                prompt_status
+                0x0047f760                actsz
+                0x0047f770                g_char_attrib
+                0x0047f780                ApplicationInfo
+                0x0047f790                idleError
+                0x0047f7a0                g_cursor_x
+ COMMON         0x0047f7b0      0x900 stdlib.o
+                0x0047f7b0                current_mmblock
+                0x0047f7c0                mm_prev_pointer
+                0x0047f7d0                heap_end
+                0x0047f7e0                g_available_heap
+                0x0047f7f0                heap_start
+                0x0047f800                heapCount
+                0x0047f810                HEAP_START
+                0x0047f820                g_heap_pointer
+                0x0047f830                heapList
+                0x0047fc30                randseed
+                0x0047fc40                HEAP_SIZE
+                0x0047fc50                last_size
+                0x0047fc60                last_valid
+                0x0047fc70                mmblockList
+                0x00480070                libcHeap
+                0x00480080                Heap
+                0x00480090                mmblockCount
+                0x004800a0                HEAP_END
+ COMMON         0x004800b0       0x40 api.o
+                0x004800b0                messagebox_button2
+                0x004800c0                dialogbox_button1
+                0x004800d0                messagebox_button1
+                0x004800e0                dialogbox_button2
+                0x004800f0                end = .
+                0x004800f0                _end = .
+                0x004800f0                __end = .
 LOAD head.o
 LOAD main.o
 LOAD stdio.o

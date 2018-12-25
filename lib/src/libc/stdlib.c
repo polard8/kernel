@@ -22,7 +22,7 @@
 #include <string.h>
 
 //Interrupção do sistema
-#define	SYSTEM  200  
+//#define	SYSTEM  200  
 
 //Número de serviços.
 #define	SYSTEMCALL_EXIT  70
@@ -99,7 +99,7 @@ void *stdlib_system_call ( unsigned long ax,
     //System interrupt. 	
 	asm volatile ( "int %1 \n"
 	              : "=a"(RET)	
-		          : "i"(SYSTEM), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+		          : "i"(0x80), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
     //Nothing.
 //done:
 

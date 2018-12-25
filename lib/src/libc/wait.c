@@ -21,7 +21,10 @@ pid_t wait ( int *status )
 	
 	
 again:
-	
+
+    
+	//#todo: precisa incluir algum header pra usar essa system_call ou 
+	//criar uma personalizada wait_system_call
 	pid = (pid_t) system_call ( 83, (unsigned long) status , 0, 0 );
 	
 	//#importante
