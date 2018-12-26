@@ -503,7 +503,7 @@ unsigned long tree_eval ()
 
 		if( c == TOKENEOF )
 		{
-            printf("tree_eval: #error EOF \n");
+            printf("tree_eval: #error EOF in line %d\n", lineno);
             exit(1);			
 		}  
 
@@ -520,19 +520,7 @@ unsigned long tree_eval ()
 						State = 2; //depois de um número espera-se um operador ou um separador.
 						break;	
 						
-					//')' provisório para terminar a expressão,
-                    //daí incluimos o finalizador provisório '?'					
-                    case TOKENSEPARATOR:						
-				        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
-						{
-                            exp_buffer[exp_offset] = (int) '?';
-						    exp_offset++;
-                            //
-                            // ## DONE !! ##
-                            //
-                            goto do_bst;							
-						}
-					    break;
+
 						
 				    default:
 					    printf("tree_eval: State1 default");
@@ -560,7 +548,31 @@ unsigned long tree_eval ()
                         exp_buffer[exp_offset] = (int) c;
 						exp_offset++;
 						State = 1; //depois do operador esperamos um número ou um separador ')' ou finalizador provisório ?.
-						break;					
+						break;
+
+					//')' provisório para terminar a expressão,
+                    //daí incluimos o finalizador provisório '?'					
+                    case TOKENSEPARATOR:						
+				        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+						{
+                            exp_buffer[exp_offset] = (int) '?';
+						    exp_offset++;
+                            //
+                            // ## DONE !! ##
+                            //
+                            goto do_bst;							
+						}
+						
+				        if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+						{
+                            exp_buffer[exp_offset] = (int) '?';
+						    exp_offset++;
+                            //
+                            // ## DONE !! ##
+                            //
+                            goto do_bst;							
+						}
+					    break;						
 				} 
 			    break;
 				
@@ -593,16 +605,33 @@ do_bst:
 	
 	//#debug 
 	//hang
-    printf("do_bst: *debug breakpoint");
-	while(1){}    
+    //printf("do_bst: *debug breakpoint");
+	//while(1){}    
 	
 	//==================================================
 	//inicializa árvore binária.
 	//ela pega uma expressão que está em um buffer e 
 	//prepara o buffer POS_BUFFER para eval usar.
+	
 	bst_main(); 
-    printf ("\n tree_eval: result={%d} \n", eval ( (int*) &POS_BUFFER[0] ) );   	
-}
+    
+	//#debug
+	//ok funcionou
+	//printf ("\n tree_eval: result={%d} \n", eval ( (int*) &POS_BUFFER[0] ) );   	
+
+	//#debug 
+	//hang
+    //printf("*debug breakpoint");
+	//while(1){}    
+	
+	
+	unsigned long ret_val;
+	ret_val = (unsigned long) eval ( (int *) &POS_BUFFER[0] ); 
+	
+	printf("result: %d\n",ret_val);
+	
+	return (ret_val); 
+};
 
 //
 // End.

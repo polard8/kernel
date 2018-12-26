@@ -1114,8 +1114,40 @@ int parse_return ( int token ){
 		exit(1);
 	}
 	
-
+	unsigned long eval_ret;
+	//char buffer[20];
 	
+	   
+	eval_ret = (unsigned long) tree_eval ();
+	
+	//char *buffer;
+	char buffer[32];
+	
+	//buffer = (char *) itoa ( (int) eval_ret);
+	
+	itoa ( (int) eval_ret, buffer );
+	
+	strcat( outfile,"  mov eax, ");
+	strcat( outfile, buffer );
+	strcat( outfile,"\n  ret \n\n");
+
+	//o ultimo token em um return statement foi ';'
+	//vamos conferir
+    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+    {
+		//printf("; OK ");
+		c = TOKENSEPARATOR;
+		return c;
+	}	
+
+	//#debug
+	printf("parse_return: debug *hang");
+	while(1){}
+	
+	//#obs 
+	//supendemos todo o resto abaixo por enquanto.
+	
+    /*	
 	while (running)
 	{
 		c = yylex ();
@@ -1335,7 +1367,9 @@ do_separator:
 			printf("parse_return: do_separator Expected ';' on line %d",lineno);
 			exit(1);
 			//while(1){}		
-	};	
+	};
+
+    */	
 	
 done:		
    return c;
@@ -1397,6 +1431,8 @@ int parse_if (int token){
 		printf ("parse_if separator ; missed\n");
 		exit(1);
 	}
+	
+
 	
 	//exit(1);
     return (int) If_Result;	
@@ -1630,9 +1666,9 @@ int parse (){
 						
 							braces_inside++;
 							
-#ifdef PARSER_VERBOSE										
+//#ifdef PARSER_VERBOSE										
 						    printf ("[BRACE] line %d\n", lineno);  //debug par close
-#endif									
+//#endif									
 									
 									//isso vai para o 1 onde procura-se por modificadores e tipos,
 									//mas se estivermos com o corpo da função aberto ele avançará para o próximo state.
@@ -1661,18 +1697,21 @@ int parse (){
                         {
 						    if ( braces_inside > 0 )
 							{
-#ifdef PARSER_VERBOSE											
+//#ifdef PARSER_VERBOSE											
 								printf("[/BRACE] line %d\n", lineno);
-#endif                                
+//#endif                                
 								
 								braces_inside--;
                                 State = 1;
-								break;
-								//State++;
-                                //goto again; 								
+								break;							
 							};							
 						};
 						
+						if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+						{
+							printf("; separator found!\n");
+							State = 1;
+						}
 					    break;
 
 
@@ -1713,8 +1752,9 @@ int parse (){
                             goto debug_output; 							
 						}
 					    //printf("State1: default error\n");
-						printf("State1: default. modifier or type expected on line %d \n", 
+						printf("State1: default. MODIFIER,  TYPE or SEPARATOR expected on line %d \n", 
 						    lineno);
+						printf(">>>token={%d}",c);
 						exit(1);
                         break;
 						

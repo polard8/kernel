@@ -62,7 +62,14 @@ void *stdlib_system_call( unsigned long ax,
 				   
 				   
 				   
-int atoi(const char *str);				   
+int atoi(const char *str);	
+
+
+
+
+//char *itoa (int i);	
+ void itoa(int n, char s[]);
+		   
 
 void exit(int status);
 
