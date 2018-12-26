@@ -6,8 +6,8 @@ void main()
 	
 	//testando parse_expression
 	
-    //if ( 1 + 2 )
-    //{};
+    if ( 1 + 2 )
+    {};
 
     //if ( 3 - 4 )
     //{};
@@ -19,8 +19,8 @@ void main()
     //{};
 
 	//sizeof(int);
-    if ( 1 + sizeof (int) ) 
-    {};		
+    //if ( 1 + sizeof (int) ) 
+    //{};		
 
     //while ( 10 + 11 )
 	//{};

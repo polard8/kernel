@@ -5,8 +5,6 @@
  * env: gramado 0.4
  */
 
- 
- 
 #include  "c.h"
 
 
@@ -95,7 +93,7 @@ int gramc_main (){
 #ifdef GRAMCC_VERBOSE
 	printf("\n");
 	printf(" gramc_main: Initializing gramc ...\n");
-	printf("\n");
+	//printf("\n");
 	printf ("# cmdline={%s} #\n", shared_memory );
 #endif
 	
@@ -166,17 +164,17 @@ int gramc_main (){
 	switch (Ret)
 	{
 		case 0:
-		    printf("mainGetMessage: main returned 0\n");
+		    printf("gramc_main: exit(0)\n");
             exit(0);
 		    break;
 			
 		case 1:
-            printf("mainGetMessage: main returned 1\n");
+            printf("gramc_main: exit(1)\n");
 			exit(1); 
 		    break;
 			
 		default:
-		    printf("mainGetMessage: default exit code %d\n", Ret );
+		    printf("gramc_main: default exit(%d)\n", Ret );
             exit(Ret);
 		    break;
 	};	
@@ -185,7 +183,7 @@ int gramc_main (){
 	// End
 	//
 	
-	printf("mainGetMessage: unexpected exit code %d\n", Ret );
+	printf("gramc_main: unexpected exit code %d\n", Ret );
 	exit(1);
 };
 
@@ -227,11 +225,11 @@ int gramc_main2 ( int argc, char *argv[] ){
 	
 	
 	// Initializing.
-init:
+//init:
     
 #ifdef GRAMCC_VERBOSE		
     printf("\n");
-	printf("gramcc_main: Initializing gramcc ...\n");
+	printf("gramc_main2: Initializing ..\n");
 #endif 
 
     libcInitRT();
@@ -323,47 +321,53 @@ init:
 	//Testando funções do compilador.
 	parse_ret = (int) parse ();
 
+	
+	printf ("parse returned %d\n");
+	/*
+	//#todo parse return
 	switch (parse_ret)
 	{
 		case 0:
-		    return 0;
+		    //return 0;
 			//goto exit_success;
 		    break;
 			
 		case 1:
-		    return 1;
+		    //return 1;
 			//goto exit_error;
 		    break;
 			
 		default:
-		    goto exit_default;
+		    //goto exit_default;
 		    break;
 	};
+	*/
 	
-	
-exit_default:	
+//exit_default:	
 	
 	//#importante
 	//mostra o asm
 	//isso dependerá da flag -s
 	
-	if ( asm_flag == 1 )
-	    printf (" \n OUTPUT: \n%s\n\n", outfile );
+
    
     // More ...   
 	
 out:
-    printf("\n");	
+	if ( asm_flag == 1 )
+	    printf (" \n OUTPUT: \n%s\n\n", outfile );
+	
+    //printf("\n");	
 	//printf("*hang\n");
 	
 	//#debug suspensa por enquanto.
 	//debugShowStat();
 	
-    printf("\n");	
-	printf("*hang\n");	
+    //printf("\n");	
+	printf("gramc_main2: DONE! *hang\n");	
     
 	while (1){
-		asm("pause");
+		asm ("pause");
 	}
 
 exit_success:	

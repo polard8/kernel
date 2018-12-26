@@ -8,8 +8,8 @@
 #include <types.h>
 #include <ctype.h>
 
-#include "heap.h"
-#include "api.h"
+#include <heap.h>
+#include <api/api.h>
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -22,5 +22,6 @@
 #include "parser.h"
 #include "gramc.h"
 
+#include "tree.h" 
 
 

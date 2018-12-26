@@ -304,7 +304,14 @@ unsigned long parse_expression ( int token ){
 	}	
 	
 	
+	//#todo:
+	//estamos suspendendo a parte de baixo e chamado uma rotina 
+	//em tree para calcular a expressão.
+	return (unsigned long) tree_eval ();
 	
+	//===========================================================
+	
+	/*
 	int running = 1;
 	int State = 1;
 	
@@ -825,6 +832,8 @@ unsigned long parse_expression ( int token ){
 	    };
 	};
 	
+	*/
+	
 expression_exit:
     
 	return (unsigned long) Result;
@@ -1334,8 +1343,8 @@ done:
 
 
 //## if ##
-int parse_if ( int token )
-{
+int parse_if (int token){
+	
 	int If_Result = -1;
 	
 	unsigned long Exp_Result = 0;
@@ -1395,8 +1404,8 @@ int parse_if ( int token )
 
 
 
-int parse_while ( int token )
-{
+int parse_while (int token){
+	
 	int While_Result = -1;
 	unsigned long Exp_Result = 0;
 	
@@ -1421,21 +1430,21 @@ int parse_while ( int token )
 	c = yylex();
 	if ( c != TOKENSEPARATOR )
 	{
-		printf ("parse_if separator { missed\n");
+		printf ("parse_while separator { missed\n");
 		exit(1);
 	}
 	
 	c = yylex();
 	if ( c != TOKENSEPARATOR )
 	{
-	printf ("parse_if separator } missed\n");
+	printf ("parse_while separator } missed\n");
 		exit(1);
 	}
 	
 	c = yylex();
 	if ( c != TOKENSEPARATOR )
 	{
-		printf ("parse_if separator ; missed\n");
+		printf ("parse_while separator ; missed\n");
 		exit(1);
 	}
 	

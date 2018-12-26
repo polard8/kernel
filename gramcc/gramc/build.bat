@@ -21,7 +21,11 @@ echo -{ Compiling ...
 	gcc -c c:\gramado\gramcc\gramc\lexer.c  -I c:\gramado\include\libc -o lexer.o
 	gcc -c c:\gramado\gramcc\gramc\parser.c -I c:\gramado\include\libc -o parser.o 	
  
- 
+ 	gcc -c c:\gramado\gramcc\gramc\tree.c   -I c:\gramado\include\libc -o tree.o  
+	
+	rem #todo
+	rem gcc -c c:\gramado\gramcc\gramc\compiler.c   -I c:\gramado\include\libc -o compiler.o  
+	
     copy c:\gramado\lib\ctype.o   c:\sdk\bin\ctype.o
     copy c:\gramado\lib\stdlib.o  c:\sdk\bin\stdlib.o
 	copy c:\gramado\lib\stdio.o   c:\sdk\bin\stdio.o
@@ -38,7 +42,11 @@ stdio.o ^
 string.o ^
 api.o ^
 lexer.o ^
-parser.o   
+parser.o ^
+tree.o  
+
+
+
 
 
   

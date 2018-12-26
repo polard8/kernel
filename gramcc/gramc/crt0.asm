@@ -19,6 +19,9 @@ __crt0Main:
     ;main.c
 	call _gramc_main
 	
+	;;#todo:
+	;;é aqui que precisamos chamr o exit usndo o retorno;
+	
 hang:
     pause
     jmp hang
