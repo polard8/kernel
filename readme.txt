@@ -12,7 +12,7 @@ compilada em outro projeto.
 
 +Não há bootloader pra esse projeto, ele rodará sobre o 
  kernel Norax e poderá ser instalado nele.
- os binários do Gramado podem ser instalados em Norax.
+ os binários do Gramado podem ser instalados em Norax..
  
 
 =========================================
