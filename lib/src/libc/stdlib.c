@@ -871,7 +871,7 @@ done:
  *
  */
  
-/*
+ 
 void *calloc (size_t count, size_t size)
 {
     size_t s = count * size;
@@ -885,7 +885,6 @@ void *calloc (size_t count, size_t size)
   return value;
 };
 
-*/
 
 
 
