@@ -119,6 +119,28 @@ int str_cmp ( unsigned char *str1, unsigned char *str2 ){
 */
 
 
+//#bugbug:
+//Isso ainda não foi testado.
+
+void *memset ( void *ptr, int value, int size ){
+	
+    if( ptr != NULL && size > 0 )
+    {
+        unsigned char *temp = ptr;
+
+        int i = 0;
+
+        for ( i = 0; i < size; i++ )
+        {
+            *temp++ = (unsigned char)value;
+        }
+
+    };
+		
+    return (void *) ptr;
+};
+
+
 //#todo: mover para memory.c ??
 void *memoryZeroMemory ( void* ptr, size_t cnt ){
 	

@@ -1,16 +1,9 @@
 
 
-// gramcc.h
-
-
+// gramc.h
 
 
 // ## ARQUIVOS PARA TESTE ##
-
-//#define STRING_CFILE "int main(){ return 1234; }\t"
-//#define STRING_CFILE "\nint\nmain()\n{\n  return 0x1234;\n}\t\n //comment1  ... \n /* comment2 */ \n "
-//#define STRING_CFILE "\nint\nmain()\n{\n  //This is a comment! \n \n /* This is another comment! */ \n return 0x1234;\n}\t\n  \n "
-//#define STRING_CFILE "\nint\n test_Main()\n{\n  //This is a comment! \n \n /* This is another comment! */ \n return 0x1234;\n}\t\n  \n "
 
 #define STRING_CFILE "int main(){\n"\
 "    return 0x1234;                      \n"\
@@ -20,23 +13,10 @@
 "\t \n \n                                \n"
 
 
-/*
-char STRING_CFILE[] = "\n"
-    "int \n"
-    "main()\n"
-    "{"
-	"//comment1 \n"
-	" comment2  \n"
-    "    return 0x1234;\n"
-    "} /\n"
-    "\n";
-*/
+// ## file support ##
 
 
 FILE *finput; 
-
-
-// ## file support ##
 
 #define INFILE_SIZE 512
 #define OUTFILE_SIZE 512
@@ -48,9 +28,9 @@ unsigned long infile_size;
 unsigned long outfile_size;
 
 
-
 //#importante
-//esses dois buffers serão copiados no final do buffer outfile
+//Esses dois buffers serão copiados no final do buffer outfile.
+
 char DATA[512];
 char BSS[512];
 
@@ -60,6 +40,8 @@ char BSS[512];
 
 //#testando 
 //Isso será a pilha para os argumentos ou expressões matemáticas.
+//#todo: agora o arquivo tree.c lida com pilha.
+//Não precismos mais disso.
 char stack[512];
 
 //#bugbug: Não deveria ser assim???
@@ -69,7 +51,6 @@ char stack[512];
 int stack_count;
 int stack_index;   //current index.
 int stack_flag;    //aciona para sinalizar que devemos colocar o próximo elemento na pilha.
- 
  
  
 //
@@ -94,6 +75,7 @@ int stack_flag;    //aciona para sinalizar que devemos colocar o próximo elemen
 #define ID_CLASS_ENUM      104
 #define ID_CLASS_LABEL     105
 //...
+
 //8 elementos que explicam o identificador.
 int id[8];
 
@@ -136,8 +118,6 @@ char constant_before[2];
 //o que colocar depois dessa constante.
 //isso varia com a base
 char constant_aftes[2];
-
-
 
 
 //#TODO RETURN SUPPORT;
@@ -202,12 +182,11 @@ int temp_filename_length;
 /* Define the list of temporary files to delete.  */
 struct temp_file
 {
-  char *name;
-  struct temp_file *next;
+    char *name;
+    struct temp_file *next;
 };
 
 struct temp_file *temp_file_queue;
-
 
 
 //variável.
@@ -215,9 +194,9 @@ typedef struct variable_d variable_t;
 struct variable_d
 {
     int used;
-    int magic;
-    
+    int magic;    
 };
+
 
 //símbolos tipados.
 //funções e variáveis.
@@ -240,6 +219,7 @@ struct symbol_d
 	struct variable_d *variable;
 };
 
+
 //tipos
 typedef struct type_d type_t;
 struct type_d
@@ -259,5 +239,4 @@ struct type_d
 unsigned long functionList[FUNCTION_COUNT_MAX];
 
 int gramc_main2 ( int argc, char *argv[] );
-
 
