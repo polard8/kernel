@@ -23,6 +23,9 @@ rem
 	gcc -c c:\gramado\lib\src\libc\conio.c  -I c:\gramado\include\libc -o conio.o
 	gcc -c c:\gramado\lib\src\libc\wait.c   -I c:\gramado\include\libc -o wait.o
 	
+	rem posix unix stuff
+	gcc -c c:\gramado\lib\src\libc\unistd.c   -I c:\gramado\include\libc -o unistd.o	
+	
 	
 	
 :Moving
@@ -38,6 +41,8 @@ rem
 	move conio.o  c:\gramado\lib\conio.o
     move wait.o   c:\gramado\lib\wait.o
 	rem ...
+	
+	move unistd.o   c:\gramado\lib\unistd.o
 	
 :End
     pause

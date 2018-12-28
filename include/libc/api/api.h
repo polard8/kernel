@@ -3364,9 +3364,7 @@ void apiEndPaint();
 
 void apiPutChar( int c );
 
-/*
-int getpid();
-*/
+
 
 
 /*
@@ -3407,11 +3405,7 @@ int gramadocore_init_execve( const char *filename,
             const char *envp[] ); 
 			
 							 
-/* UNIX style */
-int fork();
-int execve ( const char *filename, 
-             const char *argv[], 
-             const char *envp[] ); 
+
 			
 			
 			

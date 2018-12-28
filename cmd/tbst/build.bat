@@ -25,6 +25,8 @@ echo -{ app1 (init task)
     copy c:\gramado\lib\time.o	  c:\sdk\bin\time.o
 	
 	copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o	
+	
+	copy c:\gramado\lib\unistd.o	  c:\sdk\bin\unistd.o
  
  
 :Objects	
@@ -34,6 +36,7 @@ stdio.o ^
 stdlib.o ^
 ctype.o ^
 string.o ^
+unistd.o ^
 api.o  
 
 :Linking  

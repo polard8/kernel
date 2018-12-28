@@ -71,7 +71,7 @@ int atoi(const char *str);
  void itoa(int n, char s[]);
 		   
 
-void exit(int status);
+
 
 
 

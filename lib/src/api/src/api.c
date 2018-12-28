@@ -2403,14 +2403,6 @@ void apiPutChar (int c){
 };
 
 
-//Get process ID.
-/*
-int getpid(){
-	return (int) system_call( SYSTEMCALL_GETPID, 0, 0, 0);
-}
-*/
-
-
 
 /*
  * apiDefDialog:
@@ -2539,39 +2531,9 @@ gramadocore_init_execve ( const char *filename,
 
 
 
-/* UNIX style */
-/* Ainda estamos testando isso. A rotina no kernel está 
-clonando o a estrutura do processo mas ainda há outras coisas pra 
-fazer como memória, diretório e a troca correta de diretório de 
-páginas dutante o taskswitch */
-
-int fork (){
-	
-    return (int) system_call ( SYSTEMCALL_FORK, (unsigned long) 0, 
-					(unsigned long) 0, (unsigned long) 0 ); 
-};
-
-
-
-/*
- ********************************************************
- * execve:
- * Executes a new process.
- * PS: Does not return on success, and the text, data, bss, 
- * and stack of the calling process are overwritten by 
- * that of the program loaded. 
- */
  
-int 
-execve ( const char *filename, 
-         const char *argv[], 
-         const char *envp[] )
-{
-	
-	//@todo: Ainda não implementada.
-	
-	return (int) -1;
-};
+
+
 
 
 /*

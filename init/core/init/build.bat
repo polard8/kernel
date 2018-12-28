@@ -24,6 +24,7 @@ echo -{ main
 	
     copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o
 	
+	copy c:\gramado\lib\unistd.o c:\sdk\bin\unistd.o
  
 :Objects	
 set myObjects=head.o ^
@@ -32,6 +33,7 @@ stdio.o ^
 ctype.o ^
 string.o ^
 stdlib.o ^
+unistd.o ^
 api.o  
 
 

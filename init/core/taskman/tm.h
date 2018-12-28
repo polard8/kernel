@@ -4,8 +4,7 @@
 
 
 //api 
-#include "api.h"
-
+#include <api/api.h>
 
 
 //libc 
@@ -14,7 +13,18 @@
 #include <stddef.h>
 #include <stdlib.h>   //.
 
+#include <unistd.h>  
+
 //taskman 
-#include "taskman.h"
+
+// taskman.h 
+
+
+//#define TASKMAN_VERBOSE 1
+
+int appMain( int argc, char *argv[] ); 
+
+int taskmanTest1;
+
 
 

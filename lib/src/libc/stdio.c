@@ -2587,8 +2587,9 @@ void perror (const char *str){
  
 //#test 
 //?? coisa do c++ 
-void rewind ( FILE * stream )
-{
+
+void rewind ( FILE * stream ){
+	
 	if ( (void *) stream == NULL )
 		return;
 	
@@ -2600,6 +2601,10 @@ void rewind ( FILE * stream )
     stdin->_bufsiz = BUFSIZ; 		
 	stdin->_cnt = stdin->_bufsiz;		
 };
+
+
+
+
 
 
 //

@@ -20,6 +20,8 @@
 
 #include <sys/wait.h>
 
+#include <unistd.h>
+
 //shell stuff 
 #include "shell.h"
 #include "globals.h"

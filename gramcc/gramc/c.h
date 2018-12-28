@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <unistd.h>
 
 #include "table.h"
 #include "lexer.h"

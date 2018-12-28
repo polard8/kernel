@@ -138,7 +138,7 @@ Linker script and memory map
                 0x00403fdb                printf
                 0x00402041                printf3
                 0x00404013                vfprintf
- .text          0x0040414c      0xc60 stdlib.o
+ .text          0x0040414c      0xd70 stdlib.o
                 0x00404442                FreeHeap
                 0x00404174                rtGetHeapStart
                 0x0040474f                free
@@ -146,138 +146,144 @@ Linker script and memory map
                 0x00404678                rand
                 0x004045ef                stdlibInitMM
                 0x0040444c                heapInit
-                0x00404be9                __findenv
+                0x00404c01                __findenv
                 0x00404188                rtGetHeapPointer
                 0x00404192                rtGetAvailableHeap
                 0x00404695                srand
-                0x00404ce9                atoi
+                0x00404d01                atoi
                 0x0040464f                libcInitRT
+                0x00404e15                itoa
                 0x0040419c                heapSetLibcHeap
+                0x00404754                calloc
+                0x00404db6                reverse
                 0x004046cd                stdlib_die
-                0x00404cb4                getenv
+                0x00404ccc                getenv
                 0x0040470e                malloc
                 0x0040442f                AllocateHeapEx
                 0x00404243                AllocateHeap
-                0x00404b60                stdlib_strncmp
+                0x00404ba3                stdlib_strncmp
                 0x004046a2                xmalloc
-                0x00404bbe                exit
                 0x0040417e                rtGetHeapEnd
-                0x00404754                system
- .text          0x00404dac        0x0 ctype.o
- .text          0x00404dac      0x430 string.o
-                0x00404f98                strcspn
-                0x00404efb                strcat
-                0x00404dac                strcmp
-                0x00404f52                bzero
-                0x004050d8                strtok_r
-                0x00404e8e                memcpy
-                0x00404e65                memoryZeroMemory
-                0x00404f2b                bcopy
-                0x00404ecb                strcpy
-                0x00405038                strspn
-                0x004051ad                strtok
-                0x00404e07                strncmp
-                0x00404f6d                strlen
- .text          0x004051dc     0x2600 api.o
-                0x00406a4c                APIShowCurrentProcessInfo
-                0x0040727f                api_getchar
-                0x0040577e                system11
-                0x00405823                refresh_buffer
-                0x0040692e                APISetFocus
-                0x004057e1                system14
-                0x00405b0a                apiInitBackground
-                0x0040681e                APICreateWindow
-                0x0040702e                apiBeginPaint
-                0x00405b0f                MessageBox
-                0x00406aca                APIreplace_window
-                0x00407075                apiGetSystemMetrics
-                0x004057c0                system13
-                0x00406ec9                apiDown
-                0x00406580                dbProcedure
-                0x00406bc3                apiExit
-                0x00406f7d                enterCriticalSection
-                0x004071ba                gramadocore_init_execve
-                0x00406e31                apiFOpen
-                0x004077ad                apiShowWindow
-                0x00405634                system1
-                0x004056b8                system5
-                0x00406ca9                api_refresh_screen
-                0x004071fa                apiDialog
-                0x00406d35                apiGetCursorY
-                0x00405ab3                carrega_bitmap_16x16
-                0x00406fd6                exitCriticalSection
-                0x004051dc                system_call
-                0x00406f23                apiUp
-                0x00405204                apiSystem
-                0x0040718e                api_get_window_with_text_input
-                0x00407703                apiGetWSScreenWindow
-                0x00405802                system15
-                0x004069de                APISetActiveWindow
-                0x00406d8d                apiSetClientAreaRect
-                0x004076bc                apiDrawText
-                0x00406aa1                APIredraw_window
-                0x00406ddf                apiCreateThread
-                0x00405a4f                SetNextWindowProcedure
-                0x0040775b                apiCreateTimer
-                0x00406d09                apiGetCursorX
-                0x00405a1f                chama_procedimento
-                0x0040660d                call_kernel
-                0x004068aa                APIRegisterWindow
-                0x0040772f                apiGetWSMainWindow
-                0x00406c1f                api_strncmp
-                0x00406b1c                APIminimize_window
-                0x00405655                system2
-                0x00405676                system3
-                0x0040608e                DialogBox
-                0x004070c7                api_get_current_keyboard_responder
-                0x00406db6                apiCreateProcess
-                0x00406970                APIGetFocus
-                0x004056fa                system7
-                0x004056d9                system6
-                0x0040706b                apiDefDialog
-                0x00406001                mbProcedure
-                0x004068ec                APICloseWindow
-                0x0040767b                apiSendMessage
-                0x00407002                initializeCriticalSection
-                0x0040575d                system10
-                0x00405a7f                set_cursor
-                0x00406af3                APImaximize_window
-                0x004071f0                execve
-                0x00406c7d                refresh_screen
-                0x004072ab                apiDisplayBMP
-                0x0040678d                call_gui
-                0x0040573c                system9
-                0x004071c4                fork
-                0x0040709e                api_set_current_keyboard_responder
-                0x00406a78                APIresize_window
-                0x00407038                apiEndPaint
-                0x00405aae                put_char
-                0x004059ba                print_string
-                0x00407784                apiGetSysTimeInfo
-                0x00406d61                apiGetClientAreaRect
-                0x004059f0                edit_box
-                0x00406bee                kill
-                0x00406cb3                apiReboot
-                0x00405adc                apiShutDown
-                0x004070f3                api_set_current_mouse_responder
-                0x00406b6e                APIget_foregroung_window
-                0x00405697                system4
-                0x00406e6b                apiSaveFile
-                0x00406cdf                apiSetCursor
-                0x0040579f                system12
-                0x004059bf                vsync
-                0x0040571b                system8
-                0x00407148                api_set_window_with_text_input
-                0x00406a20                APIGetActiveWindow
-                0x00406b45                APIupdate_window
-                0x0040711c                api_get_current_mouse_responder
-                0x00406bf3                dead_thread_collector
-                0x00406e08                apiStartThread
-                0x0040699c                APIKillFocus
-                0x00406b9a                APIset_foregroung_window
-                0x00407042                apiPutChar
+                0x00404797                system
+ .text          0x00404ebc        0x0 ctype.o
+ .text          0x00404ebc      0x470 string.o
+                0x004050f1                strcspn
+                0x00405054                strcat
+                0x00404ebc                strcmp
+                0x004050ab                bzero
+                0x00405231                strtok_r
+                0x00404fe7                memcpy
+                0x00404f75                memset
+                0x00404fbe                memoryZeroMemory
+                0x00405084                bcopy
+                0x00405024                strcpy
+                0x00405191                strspn
+                0x00405306                strtok
+                0x00404f17                strncmp
+                0x004050c6                strlen
+ .text          0x0040532c       0x90 unistd.o
+                0x0040532c                unistd_system_call
+                0x00405354                execve
+                0x00405389                fork
+                0x0040535e                exit
+ .text          0x004053bc     0x25d0 api.o
+                0x00406c2c                APIShowCurrentProcessInfo
+                0x00407429                api_getchar
+                0x0040595e                system11
+                0x00405a03                refresh_buffer
+                0x00406b0e                APISetFocus
+                0x004059c1                system14
+                0x00405cea                apiInitBackground
+                0x004069fe                APICreateWindow
+                0x0040720e                apiBeginPaint
+                0x00405cef                MessageBox
+                0x00406caa                APIreplace_window
+                0x00407255                apiGetSystemMetrics
+                0x004059a0                system13
+                0x004070a9                apiDown
+                0x00406760                dbProcedure
+                0x00406da3                apiExit
+                0x0040715d                enterCriticalSection
+                0x0040739a                gramadocore_init_execve
+                0x00407011                apiFOpen
+                0x00407957                apiShowWindow
+                0x00405814                system1
+                0x00405898                system5
+                0x00406e89                api_refresh_screen
+                0x004073a4                apiDialog
+                0x00406f15                apiGetCursorY
+                0x00405c93                carrega_bitmap_16x16
+                0x004071b6                exitCriticalSection
+                0x004053bc                system_call
+                0x00407103                apiUp
+                0x004053e4                apiSystem
+                0x0040736e                api_get_window_with_text_input
+                0x004078ad                apiGetWSScreenWindow
+                0x004059e2                system15
+                0x00406bbe                APISetActiveWindow
+                0x00406f6d                apiSetClientAreaRect
+                0x00407866                apiDrawText
+                0x00406c81                APIredraw_window
+                0x00406fbf                apiCreateThread
+                0x00405c2f                SetNextWindowProcedure
+                0x00407905                apiCreateTimer
+                0x00406ee9                apiGetCursorX
+                0x00405bff                chama_procedimento
+                0x004067ed                call_kernel
+                0x00406a8a                APIRegisterWindow
+                0x004078d9                apiGetWSMainWindow
+                0x00406dff                api_strncmp
+                0x00406cfc                APIminimize_window
+                0x00405835                system2
+                0x00405856                system3
+                0x0040626e                DialogBox
+                0x004072a7                api_get_current_keyboard_responder
+                0x00406f96                apiCreateProcess
+                0x00406b50                APIGetFocus
+                0x004058da                system7
+                0x004058b9                system6
+                0x0040724b                apiDefDialog
+                0x004061e1                mbProcedure
+                0x00406acc                APICloseWindow
+                0x00407825                apiSendMessage
+                0x004071e2                initializeCriticalSection
+                0x0040593d                system10
+                0x00405c5f                set_cursor
+                0x00406cd3                APImaximize_window
+                0x00406e5d                refresh_screen
+                0x00407455                apiDisplayBMP
+                0x0040696d                call_gui
+                0x0040591c                system9
+                0x0040727e                api_set_current_keyboard_responder
+                0x00406c58                APIresize_window
+                0x00407218                apiEndPaint
+                0x00405c8e                put_char
+                0x00405b9a                print_string
+                0x0040792e                apiGetSysTimeInfo
+                0x00406f41                apiGetClientAreaRect
+                0x00405bd0                edit_box
+                0x00406dce                kill
+                0x00406e93                apiReboot
+                0x00405cbc                apiShutDown
+                0x004072d3                api_set_current_mouse_responder
+                0x00406d4e                APIget_foregroung_window
+                0x00405877                system4
+                0x0040704b                apiSaveFile
+                0x00406ebf                apiSetCursor
+                0x0040597f                system12
+                0x00405b9f                vsync
+                0x004058fb                system8
+                0x00407328                api_set_window_with_text_input
+                0x00406c00                APIGetActiveWindow
+                0x00406d25                APIupdate_window
+                0x004072fc                api_get_current_mouse_responder
+                0x00406dd3                dead_thread_collector
+                0x00406fe8                apiStartThread
+                0x00406b7c                APIKillFocus
+                0x00406d7a                APIset_foregroung_window
+                0x00407222                apiPutChar
                 0x00408000                . = ALIGN (0x1000)
- *fill*         0x004077dc      0x824 00
+ *fill*         0x0040798c      0x674 00
 
 .rdata          0x00408000      0xdd0
  .rdata         0x00408000      0x3a0 api.o
@@ -293,14 +299,15 @@ Linker script and memory map
                 0x00408dd0                _data = .
                 0x00408dd0                __data = .
  *(.data)
- .data          0x00408dd0        0x0 main.o
- .data          0x00408dd0        0x0 stdio.o
- .data          0x00408dd0        0x0 stdlib.o
- .data          0x00408dd0        0x0 ctype.o
- .data          0x00408dd0        0x0 string.o
- .data          0x00408dd0      0x440 api.o
+ .data          0x00408dd0      0x440 main.o
+ .data          0x00409210        0x0 stdio.o
+ .data          0x00409210        0x0 stdlib.o
+ .data          0x00409210        0x0 ctype.o
+ .data          0x00409210        0x0 string.o
+ .data          0x00409210        0x0 unistd.o
+ .data          0x00409210      0x440 api.o
                 0x0040a000                . = ALIGN (0x1000)
- *fill*         0x00409210      0xdf0 00
+ *fill*         0x00409650      0x9b0 00
 
 .bss            0x0040a000    0x12770
                 0x0040a000                bss = .
@@ -314,6 +321,7 @@ Linker script and memory map
                 0x0040a020                environ
  .bss           0x00412030        0x0 ctype.o
  .bss           0x00412030       0x10 string.o
+ .bss           0x00412040        0x0 unistd.o
  .bss           0x00412040     0x8010 api.o
                 0x0041b000                . = ALIGN (0x1000)
  *fill*         0x0041a050      0xfb0 00
@@ -375,6 +383,7 @@ LOAD stdio.o
 LOAD stdlib.o
 LOAD ctype.o
 LOAD string.o
+LOAD unistd.o
 LOAD api.o
 OUTPUT(TBST.BIN pe-i386)
 

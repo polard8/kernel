@@ -24,6 +24,7 @@ echo -{ Compiling TASKMAN.BIN.
 	copy c:\gramado\lib\string.o c:\sdk\bin\string.o
 	copy c:\gramado\lib\ctype.o  c:\sdk\bin\ctype.o	
 	
+	copy c:\gramado\lib\unistd.o  c:\sdk\bin\unistd.o	
 	
 :Objects	
 set myObjects=head.o ^
@@ -33,8 +34,8 @@ api.o ^
 ctype.o ^
 stdio.o ^
 stdlib.o ^
-string.o 
-
+unistd.o ^
+string.o  
 
 
 

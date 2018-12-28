@@ -1270,35 +1270,7 @@ done:
 };
 
 
-/*
- * exit:
- *     Torna zombie a thread atual.
- *     Mas o propósito é terminar sair do 
- *     programa, terminando o processo e
- *     liberar os recursos que o processo estava usando.
- *     #importante:
- *     @todo: se o status for (1) devemos imprimir o conteúdo 
- * de stderr na tela.
- */
-void exit (int status){
-	
-	//#importante:
-    //     @todo: se o status for (1) devemos imprimir o conteúdo 
-    // de stderr na tela.
 
- 
-    stdlib_system_call ( SYSTEMCALL_EXIT, (unsigned long) status, 
-	    (unsigned long) status, (unsigned long) status );
-    
-	
-	//Nothing.
-//wait_forever:
-	
-    while (1){
-		
-		asm ("pause");
-	};	
-};
 
 
 //interna de suporte à getenv.

@@ -37,6 +37,7 @@ echo -{ Creating main.o ...
 	copy c:\gramado\lib\conio.o   c:\sdk\bin\conio.o
 	copy c:\gramado\lib\wait.o   c:\sdk\bin\wait.o
 	
+	copy c:\gramado\lib\unistd.o   c:\sdk\bin\unistd.o
 	
 	
 :SetingObjects		
@@ -50,6 +51,7 @@ stdio.o ^
 stdlib.o ^
 string.o ^
 conio.o ^
+unistd.o ^
 builtins.o ^
 desktop.o ^
 parser.o ^

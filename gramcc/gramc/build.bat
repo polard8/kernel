@@ -32,6 +32,10 @@ echo -{ Compiling ...
 	copy c:\gramado\lib\string.o  c:\sdk\bin\string.o
 	
 	copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o
+	
+	copy c:\gramado\lib\unistd.o  c:\sdk\bin\unistd.o
+	
+	
  
 :Objects	
 set myObjects=crt0.o ^
@@ -40,6 +44,7 @@ ctype.o ^
 stdlib.o ^
 stdio.o ^
 string.o ^
+unistd.o ^
 api.o ^
 lexer.o ^
 parser.o ^
