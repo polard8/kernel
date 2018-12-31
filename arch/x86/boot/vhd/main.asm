@@ -61,14 +61,8 @@ boot_main:
 
 	;*Esse é o MBR, a rotina nela carrega o stage 2.
 	;; ** PRIMEIRO SETOR ** ;;
-    
-	;;#test 
-	;;podemos fazer testes aqui.
-	
-	;; original. Funciona.
-	%include "QUASI-OS.ASM"
-    
-
+    ;%include "QUASI-OS.ASM"
+    %include "stage1.asm"
 
 ;;
 ;; Segue um deslocamento para colocar o VBR no lugar certo.
@@ -138,10 +132,10 @@ db 0x01
 ;; ? 
 ;; unsigned short NumberOfReservedSectors;
 ;; O número de setores reservados que ficam entre o vbr e a primeira fat.
-;; #bugbug o certo é 3, mas não consigo mudar sem dar problemas.
 ;; Reserved Sectors. The number of sectors from the Partition Boot Sector 
-;; to the start of the first file allocation table, *(including) the 
-;; Partition Boot Sector. The minimum value is 1. 
+;; to the start of the first file allocation table, 
+;; >>>*(INCLUDING) the Partition Boot Sector. <<<
+;;The minimum value is 1.  (1+3=4)
 ;; If the value is greater than 1, it means that the bootstrap code 
 ;; is too long to fit completely in the Partition Boot Sector.
 db 0x04, 0x00 
@@ -167,9 +161,13 @@ db 0x00, 0x02
 ;; ??
 ;; unsigned short TotalSectorCount16;
 ;; Small Sectors. The number of sectors on the volume if 
-;; the number fits in 16 bits (65535). For volumes larger than 65536 sectors, 
+;; the number fits in 16 bits (65535). 
+;; For volumes larger than 65536 sectors, 
 ;; this field has a value of 0 and the Large Sectors field is used instead.
-db 0x00, 0xF8 ;;63488 (31MB)
+;; 0xF8000 = 63488 setores = 31744 KB
+;; 0x43FE = 17406 setores  = 8703 KB.
+;db 0x00, 0xF8 
+db 0xFE, 0x43 
 
 ;; ??
 ;; unsigned char Media;
@@ -199,14 +197,12 @@ db 0x3F, 0x00
 ;; Number of Heads. The apparent disk geometry in use when 
 ;;the disk was low-level formatted.
 db 0x04, 0x00
-;;db 0x08, 0x00
 
 ;; ??
 ;; unsigned long NumberOfHiddenSectors;
 ;; ?? Hidden Sectors. Same as the Relative Sector field in the Partition Table.
 
 db 0x3F, 0x00, 0x00, 0x00 ;;@todo: talvez sejam os 63 escondidos.
-;;db 0x01, 0x00, 0x00, 0x00 
 
 ;; ??
 ;; unsigned long TotalSectorCount32;
@@ -247,7 +243,7 @@ db 0xE3, 0x50, 0xB1, 0x6E
 ;; unsigned char VolumeLabel[11];
 ;; Volume Label. This field was used to store the volume label, 
 ;; but the volume label is now stored as special file in the root directory.
-db "GRAMADO VBR"
+db  "GRAMADO VBR"
 ;db 0x4E, 0x4F, 0x20, 0x4E, 0x41 
 ;db 0x4D, 0x45, 0x20, 0x20, 0x20 
 ;db 0x20, 0x46, 0x41, 0x54
@@ -472,10 +468,10 @@ vhd_footer:
 .chechsum:
     dd 0xC2E7FFFF
 .uniqueID:
-	db 0x11, 0x80, 0xF2, 0x62
+	db 0x88, 0x80, 0xF2, 0x62
 	db 0xD4, 0x95, 0x65, 0x44
     db 0x88, 0x4E, 0x78, 0x5A
-	db 0x58, 0xBF, 0x82, 0xCE
+	db 0x14, 0x12, 0x12, 0x11
 .savedState:
 	db 0
 .reserved:
