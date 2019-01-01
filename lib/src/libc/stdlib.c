@@ -270,8 +270,12 @@ try_again:
     
 	if( mmblockCount >= MMBLOCK_COUNT_MAX )
 	{
-        printf("stdlib-AllocateHeap Error: mmblockCount limits!");
-		printf("*lib hang (fatal error)\n");
+        printf("stdlib-AllocateHeap Error: mmblockCount limits!\n");
+		printf("stdlib-AllocateHeap Error: g_heap_pointer=%x\n",g_heap_pointer);
+		printf("stdlib-AllocateHeap Error: HEAP_START=%x\n",HEAP_START);
+		printf("stdlib-AllocateHeap Error: HEAP_END=%x\n",HEAP_END);
+		
+		//printf("*lib hang (fatal error)\n");
 		//refresh_screen();
 		//while(1){};
 		return (unsigned long) 0;
@@ -634,11 +638,15 @@ int stdlibInitMM (){
 	//Primeiro Bloco.
     //current_mmblock = (void *) NULL;
 	
+	//#importante:
+	//#inicializando o índice la lista de ponteiros 
+	//par estruturas de alocação.
+	//#bugbug: temos que inicializar isso no kernel também.
+	mmblockCount = 0;
+	
 	//
 	// Continua...
-	//
-	
-//done:	
+	//	
 
     return (int) Status;	
 }; 
@@ -667,8 +675,6 @@ int libcInitRT (){
 	};
 	
 	//...
-	
-//done:	
 
 	return (int) 0;
 };
