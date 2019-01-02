@@ -192,8 +192,6 @@ unsigned long wlMaxWindowHeight;
 //quantidade de linhas e colunas na área de cliente.
 int wlMinColumns;
 int wlMinRows;
-int wlMaxColumns;
-int wlMaxRows;
 
 
 //
@@ -211,79 +209,6 @@ unsigned long wsWindowHeight;
 
 unsigned long wpWindowLeft;
 unsigned long wpWindowTop;
-//..
-
-
-
-//
-// ## Text support #@#
-//
-
-struct shell_line
-{
-    char CHARS[80];
-    char ATTRIBUTES[80];	
-	
-	//início e fim da string dentro da linha.
-	//o resto é espaço.
-	int left;
-	int right;
-	
-	//posição do cursor dentro da linha.
-	int pos;
-};
-
-//PROVISÓRIO
-//O TEXTO TEM 32 LINHAS NO MÁXIMO.
-//ESSA É A PARTE DO TEXTO QUE PODERÁ SER MANIPULADA,
-//O RESTO DO TEXTO DEVERÁ FICAR ESPERANDO NO BUFFER.
-//#IMPORTANTE: 25 DESSAS 32 LINHAS SERÃO VISÍVEIS.
-struct shell_line LINES[32]; 
-
-
-//#importante:
-//Linhas visíveis.
-//número da linha
-//isso será atualizado na hora do scroll.
-int textTopRow;  //Top nem sempre será '0'.
-int textBottomRow;
-
-//linha e coluna atuais
-int textCurrentRow;
-int textCurrentCol;
-
-int textSavedRow;
-int textSavedCol;
-
-
-int textWheelDelta; //delta para rolagem do texto.
-int textMinWheelDelta;  //mínimo que se pode rolar o texto
-int textMaxWheelDelta;  //máximo que se pode rolar o texto
-//...
-
-
-//
-// Buffer support.
-// 
-
-
-//
-//  ** SCREEN BUFFER ***
-//
-
-//#bugbug: ALGUMAS AQUI NÃO SÃO MAIS USDAS. DELETAR !!!
-
-//O buffer
-char screen_buffer[SCREEN_BUFFER_SIZE]; 
-
-//marcador do cursor.
-unsigned long screen_buffer_pos;    //(offset) 
-
-unsigned long screen_buffer_x;      //current col 
-unsigned long screen_buffer_y;      //current row
-
-static unsigned long screen_buffer_saved_x = 0;
-static unsigned long screen_buffer_saved_y = 0;
 
 
 //...

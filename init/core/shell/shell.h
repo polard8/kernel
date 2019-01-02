@@ -872,19 +872,7 @@ struct terminal_screen_info_d
  
 
  
-//#importante. 
-//rect info
-//retângulo da área de cliente onde aparecerão os caracteres.
-typedef struct terminal_rect_info_d terminal_rect_info_t; 
-struct terminal_rect_info_d
-{
-	unsigned long top;
-	unsigned long left;
-	unsigned long width;
-	unsigned long height;
-	//...
-};
-struct terminal_rect_info_d terminal_rect; 
+
 
 
 //cursor info
@@ -1002,15 +990,14 @@ int shmain ( int argc, char **argv );
 //
 
 void shellClearScreen();
-void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
-void shellRefreshLine ( int line_number );
-void shellRefreshChar ( int line_number, int col_number );
-void shellRefreshCurrentChar(); //refresh do char que está na posição usada pelo input.
 
 
 
-//scroll dentro da screen_buffer. (VGA emulada)
-void shellScroll();
+
+
+
+
+
 void scroll2 ();
 //...
 
@@ -1019,8 +1006,8 @@ void scroll2 ();
 // Buffer support.
 //
 
-void shellClearBuffer();
-void shellShowScreenBuffer();
+
+
 //...
 
 
@@ -1028,21 +1015,13 @@ void shellShowScreenBuffer();
 // Typing support.
 //
 
-void shellInsertCR();
-void shellInsertLF();
-void shellInsertNullTerminator();
-void shellInsertNextChar(char c);
 
-void shellInsertCharXY(unsigned long x, unsigned long y, char c);
-char 
-shellGetCharXY ( unsigned long x, 
-                 unsigned long y );
  
-static void lf(void);
-static void ri(void);
-static void cr(void);
-static void del(void);
-void move_to( unsigned long x, unsigned long y);
+
+
+
+
+
 //...
 
 
@@ -1050,9 +1029,9 @@ void move_to( unsigned long x, unsigned long y);
 // Cursor support.
 //
 
-void shellSetCursor(unsigned long x, unsigned long y);
-static void save_cur(void);
-static void restore_cur(void);
+
+
+
 
 
 //
