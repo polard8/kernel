@@ -486,17 +486,6 @@ void shellInitWindowSizes();
 void shellInitWindowPosition();
 
 
-
-//row support
-void textSetTopRow ( int number );
-void textSetBottomRow ( int number );
-int textGetTopRow ();
-int textGetBottomRow ();
-
-
-
-
-
 //
 // Internas.
 //
@@ -7073,35 +7062,6 @@ read_name (str, infile)
   *p = NULL;
 }
 */
-
-//Qual será a linha que estará no topo da janela.
-void textSetTopRow ( int number )
-{
-    textTopRow = (int) number; 	
-};
-
-int textGetTopRow ()
-{
-    return (int) textTopRow; 	
-};
-
-//Qual será a linha que estará na parte de baixo da janela.
-void textSetBottomRow ( int number )
-{
-    textBottomRow = (int) number; 	
-};
-
-int textGetBottomRow ()
-{
-    return (int) textBottomRow; 	
-};
-
-
-
-
-
-
-
 
 
 

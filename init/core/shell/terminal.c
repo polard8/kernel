@@ -528,5 +528,27 @@ void clearLine ( int line_number )
     //shell_buffer_pos = 0;  //?? posição dentro do buffer do shell.	
 };
 
+//Qual será a linha que estará no topo da janela.
+void textSetTopRow ( int number )
+{
+    textTopRow = (int) number; 	
+};
+
+//Qual será a linha que estará na parte de baixo da janela.
+void textSetBottomRow ( int number )
+{
+    textBottomRow = (int) number; 	
+};
+
+int textGetTopRow ()
+{
+    return (int) textTopRow; 	
+};
+
+int textGetBottomRow ()
+{
+    return (int) textBottomRow; 	
+};
+
 
 

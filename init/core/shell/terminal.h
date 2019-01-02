@@ -123,4 +123,10 @@ void testScrollChar();
 
 void clearLine ( int line_number );
 
+//row support
+void textSetTopRow ( int number );
+void textSetBottomRow ( int number );
+int textGetTopRow ();
+int textGetBottomRow ();
+
 
