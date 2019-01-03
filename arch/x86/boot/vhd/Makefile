@@ -1,4 +1,8 @@
 
+#history:
+#2019 - Created by Luciano Gonçalez.
+
+
 all: GRAMADO.VHD vhd-mount docopy vhd-unmount finalize
 #vhd-unmount
 
@@ -36,42 +40,42 @@ docopy: createfolders
 #Copying
 #echo -{ ...
 
-	cp ../../../../../norax/bin/BM.BIN ../../../../bin
-	cp ../../../../../norax/bin/BL.BIN ../../../../bin
-	cp ../../../../../norax/bin/KERNEL.BIN ../../../../bin
-	cp ../../../../../norax/bin/*.FON ../../../../bin
+	cp ../../../../../norax/bin/BM.BIN      ../../../../bin
+	cp ../../../../../norax/bin/BL.BIN      ../../../../bin
+	cp ../../../../../norax/bin/KERNEL.BIN  ../../../../bin
+	cp ../../../../../norax/bin/*.FON       ../../../../bin
 
-	sudo cp ../../../../bin/BM.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/BL.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/BM.BIN  /mnt/gramadovhd
+	sudo cp ../../../../bin/BL.BIN  /mnt/gramadovhd
 
-	sudo cp ../../../../bin/KERNEL.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/INIT.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/SHELL.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TASKMAN.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/KERNEL.BIN   /mnt/gramadovhd
+	sudo cp ../../../../bin/INIT.BIN     /mnt/gramadovhd
+	sudo cp ../../../../bin/SHELL.BIN    /mnt/gramadovhd
+	sudo cp ../../../../bin/TASKMAN.BIN  /mnt/gramadovhd
 
-	sudo cp ../../../../arch/x86/boot/vhd/INIT.TXT /mnt/gramadovhd
-	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT /mnt/gramadovhd
-	sudo cp ../../../../arch/x86/boot/vhd/GRAMADO.TXT /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/INIT.TXT     /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT     /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/GRAMADO.TXT  /mnt/gramadovhd
 
-	sudo cp ../../../../arch/x86/boot/vhd/images/*.BMP /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/images/*.BMP  /mnt/gramadovhd
 
-	sudo cp ../../../../bin/NC2.FON /mnt/gramadovhd
+	sudo cp ../../../../bin/NC2.FON       /mnt/gramadovhd
 #	sudo cp ../../../../bin/FASM.EXE /mnt/gramadovhd
-	sudo cp ../../../../bin/APPASM.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/GRAMC.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/FASM.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/GRAMCODE.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/FCLASS.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/JACKPOT.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TASCII.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/APPASM.BIN    /mnt/gramadovhd
+	sudo cp ../../../../bin/GRAMC.BIN     /mnt/gramadovhd
+	sudo cp ../../../../bin/FASM.BIN      /mnt/gramadovhd
+	sudo cp ../../../../bin/GRAMCODE.BIN  /mnt/gramadovhd
+	sudo cp ../../../../bin/FCLASS.BIN    /mnt/gramadovhd
+	sudo cp ../../../../bin/JACKPOT.BIN   /mnt/gramadovhd
+	sudo cp ../../../../bin/TASCII.BIN    /mnt/gramadovhd
 #	sudo cp ../../../../bin/TGFE.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TPRINTF.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TCTYPE.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TBST.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TBST2.BIN /mnt/gramadovhd
-	sudo cp ../../../../bin/TBST3.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TPRINTF.BIN   /mnt/gramadovhd
+	sudo cp ../../../../bin/TCTYPE.BIN    /mnt/gramadovhd
+	sudo cp ../../../../bin/TBST.BIN      /mnt/gramadovhd
+	sudo cp ../../../../bin/TBST2.BIN     /mnt/gramadovhd
+	sudo cp ../../../../bin/TBST3.BIN     /mnt/gramadovhd
 
-	sudo cp ../../../../arch/x86/boot/vhd/tests/*.C  /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/tests/*.C    /mnt/gramadovhd
 #	sudo cp ../../../../arch/x86/boot/vhd/tests/*.TXT  /mnt/gramadovhd
 	sudo cp ../../../../arch/x86/boot/vhd/tests/*.ASM  /mnt/gramadovhd
 
