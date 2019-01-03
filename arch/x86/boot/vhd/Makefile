@@ -45,20 +45,17 @@ docopy: createfolders
 	cp ../../../../../norax/bin/KERNEL.BIN  ../../../../bin
 	cp ../../../../../norax/bin/*.FON       ../../../../bin
 
-	sudo cp ../../../../bin/BM.BIN  /mnt/gramadovhd
-	sudo cp ../../../../bin/BL.BIN  /mnt/gramadovhd
-
+#root
+	sudo cp ../../../../bin/BM.BIN       /mnt/gramadovhd
+	sudo cp ../../../../bin/BL.BIN       /mnt/gramadovhd
 	sudo cp ../../../../bin/KERNEL.BIN   /mnt/gramadovhd
 	sudo cp ../../../../bin/INIT.BIN     /mnt/gramadovhd
 	sudo cp ../../../../bin/SHELL.BIN    /mnt/gramadovhd
 	sudo cp ../../../../bin/TASKMAN.BIN  /mnt/gramadovhd
-
-	sudo cp ../../../../arch/x86/boot/vhd/INIT.TXT     /mnt/gramadovhd
-	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT     /mnt/gramadovhd
-	sudo cp ../../../../arch/x86/boot/vhd/GRAMADO.TXT  /mnt/gramadovhd
-
+	sudo cp ../../../../arch/x86/boot/vhd/INIT.TXT      /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT      /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/GRAMADO.TXT   /mnt/gramadovhd
 	sudo cp ../../../../arch/x86/boot/vhd/images/*.BMP  /mnt/gramadovhd
-
 	sudo cp ../../../../bin/NC2.FON       /mnt/gramadovhd
 #	sudo cp ../../../../bin/FASM.EXE /mnt/gramadovhd
 	sudo cp ../../../../bin/APPASM.BIN    /mnt/gramadovhd
@@ -74,33 +71,41 @@ docopy: createfolders
 	sudo cp ../../../../bin/TBST.BIN      /mnt/gramadovhd
 	sudo cp ../../../../bin/TBST2.BIN     /mnt/gramadovhd
 	sudo cp ../../../../bin/TBST3.BIN     /mnt/gramadovhd
-
-	sudo cp ../../../../arch/x86/boot/vhd/tests/*.C    /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/tests/*.C        /mnt/gramadovhd
 #	sudo cp ../../../../arch/x86/boot/vhd/tests/*.TXT  /mnt/gramadovhd
-	sudo cp ../../../../arch/x86/boot/vhd/tests/*.ASM  /mnt/gramadovhd
-
+	sudo cp ../../../../arch/x86/boot/vhd/tests/*.ASM      /mnt/gramadovhd
 	sudo cp ../../../../arch/x86/boot/vhd/tests/TEST1.SH1  /mnt/gramadovhd
 
-	sudo cp ../../../../bin/*.BIN /mnt/gramadovhd/BIN/
 
-	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT  /mnt/gramadovhd/USERS/DEFAULT/
-
+#unix-like folders
+	sudo cp ../../../../bin/*.BIN                     /mnt/gramadovhd/bin/
+	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT    /mnt/gramadovhd/users/default/
+	
+	
+#WIN folder
+	sudo cp ../../../../arch/x86/boot/vhd/images/*.BMP  /mnt/gramadovhd/WIN
 
 createfolders:
-	-sudo mkdir /mnt/gramadovhd/BIN
-	-sudo mkdir /mnt/gramadovhd/DEV
-	-sudo mkdir /mnt/gramadovhd/LIB
-	-sudo mkdir /mnt/gramadovhd/USR
+	-sudo mkdir /mnt/gramadovhd/WIN
 
-	-sudo mkdir /mnt/gramadovhd/SBIN
-	-sudo mkdir /mnt/gramadovhd/TMP
-	-sudo mkdir /mnt/gramadovhd/ETC
-
-	-sudo mkdir /mnt/gramadovhd/USR/BIN
-	-sudo mkdir /mnt/gramadovhd/USR/INCLUDE
-	-sudo mkdir /mnt/gramadovhd/USR/LIB
-
-	-sudo mkdir -p /mnt/gramadovhd/USERS/DEFAULT
+#unix-like folders
+	-sudo mkdir /mnt/gramadovhd/boot
+	-sudo mkdir /mnt/gramadovhd/bin
+	-sudo mkdir /mnt/gramadovhd/dev
+	-sudo mkdir /mnt/gramadovhd/lib
+	-sudo mkdir /mnt/gramadovhd/sbin
+	-sudo mkdir /mnt/gramadovhd/tmp
+	-sudo mkdir /mnt/gramadovhd/etc
+	-sudo mkdir /mnt/gramadovhd/proc
+	-sudo mkdir /mnt/gramadovhd/home
+	-sudo mkdir /mnt/gramadovhd/mnt
+	-sudo mkdir /mnt/gramadovhd/media
+	-sudo mkdir /mnt/gramadovhd/usr
+	-sudo mkdir -p /mnt/gramadovhd/usr/bin
+	-sudo mkdir -p /mnt/gramadovhd/usr/include
+	-sudo mkdir -p /mnt/gramadovhd/usr/lib
+	-sudo mkdir -p /mnt/gramadovhd/users
+	-sudo mkdir -p /mnt/gramadovhd/users/default
 
 
 finalize:
