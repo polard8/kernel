@@ -105,3 +105,6 @@ createfolders:
 
 finalize:
 	cp GRAMADO.VHD ../../../../
+	-rm GRAMADO.VHD  
+	
+	

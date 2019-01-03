@@ -95,4 +95,7 @@ finalize:
 	cp SHELL.BIN ../../../bin
 
 clean:
-	-rm *.o shell_map.s
+	-rm *.o
+	-rm SHELL.BIN 
+	
+	
