@@ -53,9 +53,9 @@ wait.o \
 net.o \
 terminal.o
 
+.PHONY: all all-c shell-link finalize clean
 
-
-all: head.o crt0.o main.o all-c shell-link
+all: head.o crt0.o main.o all-c shell-link finalize clean
 	@echo "Ok?"
 
 head.o:
@@ -87,6 +87,9 @@ all-c:
 
 shell-link:
 	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
+
+finalize:
+	cp SHELL.BIN ../../../bin
 
 clean:
 	-rm *.o shell_map.s
