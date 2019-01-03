@@ -21,9 +21,7 @@ echo -{ main
     copy c:\gramado\lib\string.o c:\sdk\bin\string.o
     copy c:\gramado\lib\ctype.o c:\sdk\bin\ctype.o	
     copy c:\gramado\lib\stdlib.o c:\sdk\bin\stdlib.o
-	
     copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o
-	
 	copy c:\gramado\lib\unistd.o c:\sdk\bin\unistd.o
  
 :Objects	
