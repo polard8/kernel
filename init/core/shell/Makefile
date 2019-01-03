@@ -1,4 +1,7 @@
 
+#history:
+#2018 - created by Fred Nora and Luciano Gonçalez
+
 #todo:
 #fazer um makefile pra compilar o shell
 #obs: #bugbug tem que arrumas as coisas aqui.
