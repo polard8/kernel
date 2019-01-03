@@ -19,8 +19,7 @@
  *     2017 - procedure and command stuff.
  *     2018 - Add some bash 1.05 stuff. 
  */
- 
- 
+
  
  
 //
@@ -1216,7 +1215,8 @@ int shellCheckPassword();
 
 //testando botão.
 int shellTestButtons ();
-			
+	
+
 //
 // End.
 //

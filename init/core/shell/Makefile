@@ -68,12 +68,13 @@ main.o:
 	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o main.o
 
 all-c:
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o shellui.o
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o builtins.o
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o desktop.o
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o parser.o
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o net.o
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o terminal.o
+	gcc  -c  shellui.c   -I ../../../include/libc/ $(CFLAGS) -o shellui.o
+	gcc  -c  builtins.c  -I ../../../include/libc/ $(CFLAGS) -o builtins.o
+	gcc  -c  desktop.c   -I ../../../include/libc/ $(CFLAGS) -o desktop.o
+	gcc  -c  parser.c    -I ../../../include/libc/ $(CFLAGS) -o parser.o
+	gcc  -c  lexer.c    -I ../../../include/libc/ $(CFLAGS) -o lexer.o
+	gcc  -c  net.c       -I ../../../include/libc/ $(CFLAGS) -o net.o
+	gcc  -c  terminal.c  -I ../../../include/libc/ $(CFLAGS) -o terminal.o
 
 	cp ../../../lib/api/api.o .
 	cp ../../../lib/ctype.o .
