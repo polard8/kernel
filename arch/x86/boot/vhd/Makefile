@@ -1,142 +1,103 @@
 
+all: GRAMADO.VHD vhd-mount docopy vhd-unmount finalize
+#vhd-unmount
 
-	nasm -I c:/gramado/arch/x86/boot/vhd/stage1/ ^
-	-I c:/gramado/arch/x86/boot/vhd/stage2/ ^
-	-I c:/gramado/arch/x86/boot/vhd/stage2/lib16/ ^
-	-I c:/gramado/arch/x86/boot/vhd/stage2/include/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/lib32/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/include/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/kernel/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/fs/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/shell/ ^
-	-I c:/gramado/arch/x86/boot/vhd/msm/drivers/ ^
-	-I c:/gramado/arch/x86/boot/vhd/bl/ ^
-	-I c:/gramado/arch/x86/boot/vhd/kernel/ ^
-	-I c:/gramado/arch/x86/boot/vhd/browser/  c:/gramado/arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
-	
-	
-vhd-mount:
-	-sudo umount /mnt/noraxvhd
-	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/noraxvhd/
-	
-	
-	
-COPY-STUFF:
-:Copying
-echo -{ ...
+GRAMADO.VHD:
 
- 
-	copy c:\norax\bin\BM.BIN      c:\gramado\bin\BM.BIN
-	copy c:\norax\bin\BL.BIN      c:\gramado\bin\BL.BIN
-	copy c:\norax\bin\KERNEL.BIN  c:\gramado\bin\KERNEL.BIN
-	copy c:\norax\bin\*.FON       c:\gramado\bin\*.FON
- 
+	nasm -I stage1/ \
+	-I stage2/ \
+	-I stage2/lib16/ \
+	-I stage2/include/ \
+	-I msm/ \
+	-I msm/lib32/ \
+	-I msm/include/ \
+	-I msm/kernel/ \
+	-I msm/fs/ \
+	-I msm/shell/ \
+	-I msm/drivers/ \
+	-I bl/ \
+	-I kernel/ \
+	-I browser/  main.asm  -o  GRAMADO.VHD
 
- 
-	copy c:\gramado\bin\BM.BIN    F:\
-    copy c:\gramado\bin\BL.BIN    F:\
-	
- 
-	copy c:\gramado\bin\KERNEL.BIN   F:\
-    copy c:\gramado\bin\INIT.BIN     F:\   
-    copy c:\gramado\bin\SHELL.BIN    F:\  
-    copy c:\gramado\bin\TASKMAN.BIN  F:\   
 
- 
-	
- 
-    copy c:\gramado\arch\x86\boot\vhd\INIT.TXT     F:\
-    copy c:\gramado\arch\x86\boot\vhd\USER.TXT     F:\
-	copy c:\gramado\arch\x86\boot\vhd\GRAMADO.TXT  F:\
-	
- 
-	
- 
-	copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\*.BMP
-	
- 
-	
- 
-	copy c:\gramado\bin\NC2.FON F:\
-	
- 
-	copy c:\gramado\bin\FASM.EXE    F:\
-	
- 
-	copy c:\gramado\bin\APPASM.BIN    F:\
-	
- 
-	
-	copy c:\gramado\bin\GRAMC.BIN    F:\
-	
-	
- 
-	copy c:\gramado\bin\FASM.BIN    F:\
-	
-	copy c:\gramado\bin\GRAMCODE.BIN   F:\
-	
-	copy c:\gramado\bin\FCLASS.BIN    F:\
-    copy c:\gramado\bin\JACKPOT.BIN   F:\	
-	copy c:\gramado\bin\TASCII.BIN    F:\
-		
-	copy c:\gramado\bin\TGFE.BIN      F:\
-    copy c:\gramado\bin\TPRINTF.BIN    F:\
-	
-	copy c:\gramado\bin\TCTYPE.BIN    F:\
-	
-	copy c:\gramado\bin\TBST.BIN    F:\
-	copy c:\gramado\bin\TBST2.BIN    F:\
-    copy c:\gramado\bin\TBST3.BIN    F:\
-	
-	
- 
-	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 
-	copy c:\gramado\arch\x86\boot\vhd\tests\*.TXT  F:\*.TXT
-	copy c:\gramado\arch\x86\boot\vhd\tests\*.ASM  F:\*.ASM
- 
- 
-	
- 
-	copy c:\gramado\arch\x86\boot\vhd\tests\TEST1.SH1   F:\
-	
-	
- 
-	
-:creatingFolders:
+/mnt/gramadovhd:
+	sudo mkdir /mnt/gramadovhd
 
- 
- 
-	
-	mkdir F:\BIN
-	mkdir F:\DEV
-	mkdir F:\LIB
-    mkdir F:\USR
-	mkdir F:\SBIN  
-	mkdir F:\TMP
-	mkdir F:\ETC 
- 
-	
-	
-	mkdir F:\USR\BIN
-	mkdir F:\USR\INCLUDE
-	mkdir F:\USR\LIB 
-	
- 
-	copy c:\gramado\bin\*.BIN    F:\BIN\*.BIN
-	
- 
-	
-    mkdir F:\USERS\DEFAULT
-    copy c:\gramado\arch\x86\boot\vhd\USER.TXT    F:\USERS\DEFAULT\USER.TXT	
-	
-	copy GRAMADO.VHD c:\gramado\GRAMADO.VHD	
-
+vhd-mount: /mnt/gramadovhd
+	-sudo umount /mnt/gramadovhd
+	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd
 
 # umount
 vhd-unmount:
-	sudo umount /mnt/noraxvhd
+	sudo umount /mnt/gramadovhd
+
+#COPY-STUFF
+docopy: createfolders
+#Copying
+#echo -{ ...
+
+	cp ../../../../../norax/bin/BM.BIN ../../../../bin
+	cp ../../../../../norax/bin/BL.BIN ../../../../bin
+	cp ../../../../../norax/bin/KERNEL.BIN ../../../../bin
+	cp ../../../../../norax/bin/*.FON ../../../../bin
+
+	sudo cp ../../../../bin/BM.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/BL.BIN /mnt/gramadovhd
+
+	sudo cp ../../../../bin/KERNEL.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/INIT.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/SHELL.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TASKMAN.BIN /mnt/gramadovhd
+
+	sudo cp ../../../../arch/x86/boot/vhd/INIT.TXT /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/GRAMADO.TXT /mnt/gramadovhd
+
+	sudo cp ../../../../arch/x86/boot/vhd/images/*.BMP /mnt/gramadovhd
+
+	sudo cp ../../../../bin/NC2.FON /mnt/gramadovhd
+#	sudo cp ../../../../bin/FASM.EXE /mnt/gramadovhd
+	sudo cp ../../../../bin/APPASM.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/GRAMC.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/FASM.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/GRAMCODE.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/FCLASS.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/JACKPOT.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TASCII.BIN /mnt/gramadovhd
+#	sudo cp ../../../../bin/TGFE.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TPRINTF.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TCTYPE.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TBST.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TBST2.BIN /mnt/gramadovhd
+	sudo cp ../../../../bin/TBST3.BIN /mnt/gramadovhd
+
+	sudo cp ../../../../arch/x86/boot/vhd/tests/*.C  /mnt/gramadovhd
+#	sudo cp ../../../../arch/x86/boot/vhd/tests/*.TXT  /mnt/gramadovhd
+	sudo cp ../../../../arch/x86/boot/vhd/tests/*.ASM  /mnt/gramadovhd
+
+	sudo cp ../../../../arch/x86/boot/vhd/tests/TEST1.SH1  /mnt/gramadovhd
+
+	sudo cp ../../../../bin/*.BIN /mnt/gramadovhd/BIN/
+
+	sudo cp ../../../../arch/x86/boot/vhd/USER.TXT  /mnt/gramadovhd/USERS/DEFAULT/
 
 
-/mnt/noraxvhd:
-	sudo mkdir /mnt/noraxvhd
+createfolders:
+	-sudo mkdir /mnt/gramadovhd/BIN
+	-sudo mkdir /mnt/gramadovhd/DEV
+	-sudo mkdir /mnt/gramadovhd/LIB
+	-sudo mkdir /mnt/gramadovhd/USR
+
+	-sudo mkdir /mnt/gramadovhd/SBIN
+	-sudo mkdir /mnt/gramadovhd/TMP
+	-sudo mkdir /mnt/gramadovhd/ETC
+
+	-sudo mkdir /mnt/gramadovhd/USR/BIN
+	-sudo mkdir /mnt/gramadovhd/USR/INCLUDE
+	-sudo mkdir /mnt/gramadovhd/USR/LIB
+
+	-sudo mkdir -p /mnt/gramadovhd/USERS/DEFAULT
+
+
+finalize:
+	cp GRAMADO.VHD ../../../../
