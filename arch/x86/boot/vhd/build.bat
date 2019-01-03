@@ -75,19 +75,13 @@ echo -{ ...
 	copy c:\norax\bin\*.FON       c:\gramado\bin\*.FON
 	REM continua ...
 
-    rem Gramado Boot
-	copy c:\gramado\bin\BM.BIN    F:\
-    copy c:\gramado\bin\BL.BIN    F:\
-	
-	rem Gramado Core
+    rem Principais.
+	copy c:\gramado\bin\BM.BIN       F:\
+    copy c:\gramado\bin\BL.BIN       F:\
 	copy c:\gramado\bin\KERNEL.BIN   F:\
     copy c:\gramado\bin\INIT.BIN     F:\   
     copy c:\gramado\bin\SHELL.BIN    F:\  
-    copy c:\gramado\bin\TASKMAN.BIN  F:\   
-
-    rem Gramado Cali
-
-    rem Gramado LA	
+    copy c:\gramado\bin\TASKMAN.BIN  F:\   	
 	
 	rem config stuff
     copy c:\gramado\arch\x86\boot\vhd\INIT.TXT     F:\
@@ -98,15 +92,6 @@ echo -{ ...
 	
 	rem BMPs
 	copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\*.BMP
-	
-	rem copy c:\gramado\arch\x86\boot\vhd\images\BMP1.BMP      F:\
-	rem copy c:\gramado\arch\x86\boot\vhd\images\MOUSE.BMP     F:\
-	rem copy c:\gramado\arch\x86\boot\vhd\images\DENNIS.BMP    F:\
-	rem copy c:\gramado\arch\x86\boot\vhd\images\APP.BMP       F:\
-	rem copy c:\gramado\arch\x86\boot\vhd\images\FILE.BMP      F:\
-	rem copy c:\gramado\arch\x86\boot\vhd\images\FOLDER.BMP    F:\
-	rem copy c:\gramado\arch\x86\boot\vhd\images\TERMINAL.BMP  F:\	
-	rem copy c:\gramado\arch\x86\boot\vhd\images\CURSOR.BMP    F:\
 	
 	
 	rem
@@ -126,28 +111,22 @@ echo -{ ...
 	
 	copy c:\gramado\bin\GRAMC.BIN    F:\
 	
-	
 	rem FASM WITH LIC INTERFACE
-	copy c:\gramado\bin\FASM.BIN    F:\
-	
-	copy c:\gramado\bin\GRAMCODE.BIN   F:\
-	
+	copy c:\gramado\bin\FASM.BIN      F:\
+	copy c:\gramado\bin\GRAMCODE.BIN  F:\
 	copy c:\gramado\bin\FCLASS.BIN    F:\
     copy c:\gramado\bin\JACKPOT.BIN   F:\	
 	copy c:\gramado\bin\TASCII.BIN    F:\
-		
 	copy c:\gramado\bin\TGFE.BIN      F:\
-    copy c:\gramado\bin\TPRINTF.BIN    F:\
-	
+    copy c:\gramado\bin\TPRINTF.BIN   F:\
 	copy c:\gramado\bin\TCTYPE.BIN    F:\
-	
-	copy c:\gramado\bin\TBST.BIN    F:\
-	copy c:\gramado\bin\TBST2.BIN    F:\
-    copy c:\gramado\bin\TBST3.BIN    F:\
+	copy c:\gramado\bin\TBST.BIN      F:\
+	copy c:\gramado\bin\TBST2.BIN     F:\
+    copy c:\gramado\bin\TBST3.BIN     F:\
 	
 	
 	rem arquivos de texto.
-	copy c:\gramado\arch\x86\boot\vhd\tests\*.C  F:\*.C 
+	copy c:\gramado\arch\x86\boot\vhd\tests\*.C    F:\*.C 
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.TXT  F:\*.TXT
 	copy c:\gramado\arch\x86\boot\vhd\tests\*.ASM  F:\*.ASM
 	REM copy c:\gramado\arch\x86\boot\vhd\tests\TEST.C F:\
@@ -176,61 +155,12 @@ echo -{ ...
 	rem 
 	
     rem unix-like
+	rem só o makefile criará essas pastas.
 	
-	mkdir F:\BIN
-	mkdir F:\DEV
-	mkdir F:\LIB
-    mkdir F:\USR
-	mkdir F:\SBIN  
-	mkdir F:\TMP
-	mkdir F:\ETC 
-	REM ...
+	REM Única pasta criada com o bat.
+	mkdir F:\WIN
+	copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\WIN\*.BMP
 	
-	
-	mkdir F:\USR\BIN
-	mkdir F:\USR\INCLUDE
-	mkdir F:\USR\LIB 
-	
-	REM TEST
-	copy c:\gramado\bin\*.BIN    F:\BIN\*.BIN
-	
-	
-    REM mkdir F:\DEV
-    REM mkdir F:\SECURITY
-	REM mkdir F:\TOOLS
-	REM mkdir F:\USERS
-	
-	
-	REM 
-	REM  /DB
-	REM 
-
-	REM #IMPORTANTE:
-	REM BANCO DE DADOS USADOS PELO SISTEMA PARA
-	REM ARMAZENAS ARQUIVOS 'SISTEMICAMENTE IMPORTANTES' E 
-	REM ARQUIVOS DE TESTE DE NOVOS RECURSOS.
-
-	REM mkdir F:\TOOLS\DB	
-	REM copy c:\gramado\arch\x86\boot\vhd\images\*.BMP  F:\TOOLS\DB\*.BMP
- 	REM copy c:\gramado\arch\x86\boot\vhd\*.TXT         F:\TOOLS\DB\*.TXT
-	REM copy c:\gramado\bin\*.BIN                       F:\TOOLS\DB\*.BIN
-	REM copy c:\gramado\bin\*.FON                       F:\TOOLS\DB\*.FON
-	rem  ...
-
-
-	
-	REM 
-	REM  /BOOT
-	REM 
-	
-	REM mkdir F:\TOOLS\BOOT
-	REM copy c:\gramado\bin\BM.BIN    F:\TOOLS\BOOT\BM.BIN
-	REM copy c:\gramado\bin\BL.BIN    F:\TOOLS\BOOT\BL.BIN
-	
-	
-    mkdir F:\USERS\DEFAULT
-    copy c:\gramado\arch\x86\boot\vhd\USER.TXT    F:\USERS\DEFAULT\USER.TXT	
-
 
 :detachingVHD
 echo -{ ...
