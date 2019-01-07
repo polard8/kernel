@@ -1,5 +1,5 @@
 /*
- * File: gws\window.c 
+ * File: gws/window.c 
  *
  * Descrição:
  *     Arquivo principal do Window Manager.
@@ -1702,6 +1702,8 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	unsigned long border_size = 0;
 	unsigned long border_color = COLOR_BORDER;	
 	
+	//printf ("redraw_window: debug \n");
+	
 	if ( (void *) window == NULL )
 	{
 		goto fail;
@@ -1756,26 +1758,20 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	//window->FrontBuffer
 	
 	
-	//
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
 	// obs: Essa checagem está se tornando repetitiva.
-	//
 	
-	if ( (void *) CurrentColorScheme == NULL )
-	{
-		printf("redraw_window: CurrentColorScheme");
-		die();
+	if ( (void *) CurrentColorScheme == NULL ){
+		panic ("redraw_window: CurrentColorScheme");
 		
 	} else {
 		
 		if ( CurrentColorScheme->used != 1 || 
 		     CurrentColorScheme->magic != 1234 )
 		{
-		    printf("redraw_window: CurrentColorScheme validation");
-		    die();			
+		    panic ("redraw_window: CurrentColorScheme validation");		
 		};
-		//Nothing.
 	};	
 	
 	
@@ -1802,11 +1798,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	// na estrutura de janel, bem como o próprio estilo 
 	// de design.
 	
-	//
-	//
-	//
-	
-redrawBegin:
+//redrawBegin:
 
 	if ( window->view == VIEW_NULL )
 	{
@@ -1840,9 +1832,13 @@ redrawBegin:
 			window->width, window->height, window->bg_color );  	
 	};
 	
+    //printf ("redraw_window: breakpoint \n");
+	//refresh_screen();
+	//while(1){}
 	
 	//borda.
 	//para os casos de editbox por exemplo.
+	
 	if ( window->borderUsed == 1 )
 	{
 		//#importante:
@@ -1986,10 +1982,10 @@ redrawBegin:
 			{
 				if ( window->minimize->used == 1 && window->minimize->magic == 1234 )
 				{
-			        draw_button ( window, "V", 
-			            1, 0, 0, 
-			            window->minimize->left, window->minimize->top, window->minimize->width, window->minimize->height, 
-				        window->minimize->bg_color );						
+			        //draw_button ( window, "V", 
+			        //    1, 0, 0, 
+			        //    window->minimize->left, window->minimize->top, window->minimize->width, window->minimize->height, 
+				    //    window->minimize->bg_color );						
 				}
 				
 			}
@@ -2001,10 +1997,10 @@ redrawBegin:
 			{
 				if ( window->maximize->used == 1 && window->maximize->magic == 1234 )
 				{
-			        draw_button ( window, "^", 
-			            1, 0, 0, 
-			            window->maximize->left, window->maximize->top, window->maximize->width, window->maximize->height, 
-				        window->maximize->bg_color );						
+			        //draw_button ( window, "^", 
+			        //    1, 0, 0, 
+			        //    window->maximize->left, window->maximize->top, window->maximize->width, window->maximize->height, 
+				    //    window->maximize->bg_color );						
 				}
 				
 			}					
@@ -2016,10 +2012,10 @@ redrawBegin:
 			{
 				if ( window->close->used == 1 && window->close->magic == 1234 )
 				{
-			        draw_button ( window, "X", 
-			            1, 0, 0, 
-			            window->close->left, window->close->top, window->close->width, window->close->height, 
-				        window->close->bg_color );						
+			        //draw_button ( window, "X", 
+			        //    1, 0, 0, 
+			        //    window->close->left, window->close->top, window->close->width, window->close->height, 
+				    //    window->close->bg_color );						
 				}
 				
 			}		
@@ -2028,7 +2024,9 @@ redrawBegin:
 		//More??...			 		 
 	};		
 	
-	
+    //printf ("redraw_window: breakpoint after title bar \n");
+	//refresh_screen();
+	//while(1){}	
 
     // Client Area. 	
 	if (window->clientAreaUsed == 1)
@@ -2077,6 +2075,9 @@ redrawBegin:
 		//Nothing.
 	};
 
+    //printf ("redraw_window: breakpoint after client area \n");
+	//refresh_screen();
+	//while(1){}	
 	
     //#obs: Talvez isso pode ficar dentro do if de client window.
     if (window->scrollbarUsed == 1)
@@ -2099,13 +2100,13 @@ redrawBegin:
 					     window->scrollbar->scrollbar_button1->magic == 1234 )
 					{
 
-			            draw_button ( window->scrollbar, "^", 
-			                1, 0, 0, 
-			                window->scrollbar->scrollbar_button1->left, 
-							window->scrollbar->scrollbar_button1->top, 
-							window->scrollbar->scrollbar_button1->width, 
-							window->scrollbar->scrollbar_button1->height, 
-				            window->scrollbar->scrollbar_button1->bg_color );											
+			            //draw_button ( window->scrollbar, "^", 
+			            //    1, 0, 0, 
+			            //    window->scrollbar->scrollbar_button1->left, 
+						//	window->scrollbar->scrollbar_button1->top, 
+						//	window->scrollbar->scrollbar_button1->width, 
+						//	window->scrollbar->scrollbar_button1->height, 
+				        //    window->scrollbar->scrollbar_button1->bg_color );											
 							 
 					}						 
 					
@@ -2118,13 +2119,13 @@ redrawBegin:
 					     window->scrollbar->scrollbar_button2->magic == 1234 )
 					{
 
-			            draw_button ( window->scrollbar, "=", 
-			                1, 0, 0, 
-			                window->scrollbar->scrollbar_button2->left, 
-							window->scrollbar->scrollbar_button2->top, 
-							window->scrollbar->scrollbar_button2->width, 
-							window->scrollbar->scrollbar_button2->height, 
-				            window->scrollbar->scrollbar_button2->bg_color );											
+			            //draw_button ( window->scrollbar, "=", 
+			            //    1, 0, 0, 
+			            //    window->scrollbar->scrollbar_button2->left, 
+						//	window->scrollbar->scrollbar_button2->top, 
+						//	window->scrollbar->scrollbar_button2->width, 
+						//	window->scrollbar->scrollbar_button2->height, 
+				        //    window->scrollbar->scrollbar_button2->bg_color );											
 							 
 					}						 
 					
@@ -2137,13 +2138,13 @@ redrawBegin:
 					     window->scrollbar->scrollbar_button3->magic == 1234 )
 					{
 
-			            draw_button ( window->scrollbar, "v", 
-			                1, 0, 0, 
-			                window->scrollbar->scrollbar_button3->left, 
-							window->scrollbar->scrollbar_button3->top, 
-							window->scrollbar->scrollbar_button3->width, 
-							window->scrollbar->scrollbar_button3->height, 
-				            window->scrollbar->scrollbar_button3->bg_color );											
+			            //draw_button ( window->scrollbar, "v", 
+			            //    1, 0, 0, 
+			            //    window->scrollbar->scrollbar_button3->left, 
+						//	window->scrollbar->scrollbar_button3->top, 
+						//	window->scrollbar->scrollbar_button3->width, 
+						//	window->scrollbar->scrollbar_button3->height, 
+				        //   window->scrollbar->scrollbar_button3->bg_color );											
 							 
 					}						 
 					
@@ -2173,6 +2174,10 @@ redrawBegin:
 			}
 		}
 	}
+	
+    //printf ("redraw_window: breakpoint status bar \n");
+	//refresh_screen();
+	//while(1){}	
 	
 	//#bugbug: 
 	//Até agora repintamos a janela relativa ao botão. Provavelmente 

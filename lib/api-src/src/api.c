@@ -1890,9 +1890,10 @@ void APIShowCurrentProcessInfo (){
 
 //*********
  
-void APIresize_window ( struct window_d *window, 
-                        unsigned long x, 
-						unsigned long y )
+void 
+APIresize_window ( struct window_d *window, 
+                   unsigned long x, 
+				   unsigned long y )
 {	
 	system_call ( SYSTEMCALL_RESIZEWINDOW, (unsigned long) window, x, y );
 };
@@ -1901,7 +1902,7 @@ void APIresize_window ( struct window_d *window,
 /*
  * APIredraw_window:
  */
-void APIredraw_window( struct window_d *window, unsigned long flags ){
+void APIredraw_window ( struct window_d *window, unsigned long flags ){
 	
 	system_call ( SYSTEMCALL_REDRAWWINDOW, (unsigned long) window, 
 		(unsigned long) flags, (unsigned long) flags );

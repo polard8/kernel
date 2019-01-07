@@ -5050,23 +5050,35 @@ void shellTestThreads (){
  
 void shellClearScreen (){
 
-	
 	struct window_d *w;
 	unsigned long left, top, right, bottom;
 	
     //desabilita o cursor
 	system_call ( 245, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0);	
 	
-	
 	shellClearBuffer ();
 	
+
 	
 	w = (void *) shell_info.terminal_window;
 	
 	if ( (void *) w != NULL )
 	{
+		//#bugbug
+		//redraw está falhando. 
+		
+		//#BUGBUG
+		//Isso está fazendo redraw da janela main inteira, com frame e tudo.
+		//sendo que deveríamos estar trabalhando somente com a área de cliente.
+		
+		//Para issp precisamos antes criar mais uma janela dentro da janela main
+		//como já fizemos antes.
+		
 		APIredraw_window ( w, 1 );
 	};
+	
+	//printf("#breackpoint");
+	//while(1){}
 
 	
     left = (terminal_rect.left/8);
