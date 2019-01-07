@@ -1120,7 +1120,7 @@ noArgs:
 	system_call ( 244, (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
 	
     //Mensagem ...
-	printf("Starting SHELL.BIN in Holambra Kernel ...\n");	
+	//printf("Starting SHELL.BIN in Holambra Kernel ...\n");	
 	
     //printf("#debug breakpoint");
     //while(1){} 	

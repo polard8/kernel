@@ -559,10 +559,10 @@ struct window_d *shellCreateMainWindow( int status ){
 	//width = wsWindowWidth;
 	//height = wsWindowHeight;
 
-	wpWindowLeft = 0;
-	wpWindowTop = 0;
-	wsWindowWidth = 800;
-	wsWindowHeight = 600;
+	wpWindowLeft = 40;     //0;
+	wpWindowTop =  40;     //0;
+	wsWindowWidth = 600;   //800;
+	wsWindowHeight = 400;  //600;
 
 	
 	left = wpWindowLeft;
@@ -573,9 +573,15 @@ struct window_d *shellCreateMainWindow( int status ){
 	
 	struct window_d *w;
 
-	w = (void *) APICreateWindow ( 1, 1, 1, "shell-main",     
+	//w = (void *) APICreateWindow ( 1, 1, 1, "shell-main",     
+    //                            left, top, width, height,    
+    //                            0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+	
+	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "shell-main",     
                                 left, top, width, height,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+
+	
 								
 	if ( (void *) w == NULL )
 	{	
@@ -607,8 +613,8 @@ void testCreateWindow (){
 	apiBeginPaint ();
 	
 	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "XXX",     
-                                10, 10, 200, 200,
-                                0, 0, COLOR_RED, COLOR_YELLOW ); //xCOLOR_GRAY1, xCOLOR_GRAY1 );
+                                40, 40, 400, 400,
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 	
 	if ( (void *) hWindow == NULL )
 	{
