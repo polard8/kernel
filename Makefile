@@ -15,7 +15,7 @@ VERSION = 0
 PATCHLEVEL = 5
 SUBLEVEL = 0
 EXTRAVERSION =
-NAME = Style
+NAME = Soberano
 
 #todo:
 #We need to simplify these flags, but it's working.
