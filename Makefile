@@ -1,8 +1,6 @@
 
-# I'm working on this script to compile Holambra kernel
-# and put it into the VHD.
+# Compiling Gramado on Manjaro Linux.
 
-#
 # /bin/bash
 # SPDX-License-Identifier: GPL-3.0+
 # BSD License
@@ -14,13 +12,13 @@
 
 
 VERSION = 0
-PATCHLEVEL = 4
+PATCHLEVEL = 5
 SUBLEVEL = 0
 EXTRAVERSION =
 NAME = Style
 
 #todo:
-#We need to simplify these flags
+#We need to simplify these flags, but it's working.
 
 CFLAGS = -m32 \
 	--std=gnu89 \
@@ -372,7 +370,7 @@ vhd-x86:
 	-I arch/x86/boot/vhd/msm/drivers/ \
 	-I arch/x86/boot/vhd/bl/ \
 	-I arch/x86/boot/vhd/kernel/ \
-	-I arch/x86/boot/vhd/browser/  arch/x86/boot/vhd/main.asm  -o  HOLAMBRA.VHD
+	-I arch/x86/boot/vhd/browser/  arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
 
 
 # mount
@@ -382,7 +380,7 @@ vhd-x86:
 
 vhd-mount:
 	-sudo umount /mnt/holambravhd
-	sudo mount -t vfat -o loop,offset=32256 HOLAMBRA.VHD /mnt/holambravhd/
+	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/holambravhd/
 
 ##
 # Copy content to disk
