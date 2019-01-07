@@ -171,6 +171,14 @@ services.o
 	# sudo apt-get install make
 #fi
 
+
+
+#importante
+#Aqui ficarão os alvos principais, como configurações
+#os cripts ficarão em /scripts
+#os alvos aqui chama chama os scripts
+
+
     #ISSO DIZ QUE O ALVO NAO EH ARQUIVO
 	#É para informar ao make não procurar por um arquivo com esse nome
 
