@@ -13,39 +13,16 @@
 #include "sh.h" 
 
 
-	//#arguments	
-	//argv[0] = -cmd comandos; -f use file; -hl headless; -gui use gui; ...  
-	//argv[1] = -interative
-	//argv[2] = -login
-	//argv[3] = Nome do arquivo de script.
-	//argv[4] = Nome do shell.
-	
-//cmd	
 static char *argv[] = { 
-	"-cmd",                  // Shell para digitar comandos.     
-    "-interactive",          // -interactive Shell interativo.
-	"-login",                // -login Login.
-	"nofile",                // Nome do arquivo de script.
-	"Gramado Core Shell",    // Nome do shell.
+    "-interactive",        //shell interativo
+	"-login",              //login
+	"Gramado Core Shell",  //nome do shell
+	"test.sh",             //nome do arquivo de script.
 	NULL 
 };
-
-
-/*
-//file
-static char *argv[] = { 
-	"-f",                  // Shell para digitar comandos.     
-    "",                    // -interactive Shell interativo.
-	"",                    // -login Login.
-	"test1.sh1",           // Nome do arquivo de script.
-	"Gramado Core Shell",  // Nome do shell.
-	NULL 
-};
-*/
 
 
 // Fake environment.
-// #obs: Não estamos passando isso por enquanto.
 static char *envp[] = { 
     "VFSROOT=root:/volume0",           //root dir do vfs
     "BOOTVOLUMEROOT=root:/volume1",    //root dir do volume de boot
@@ -74,11 +51,10 @@ void crt0 (){
     // Call main().	
 	
 	libcInitRT ();
-    
 	stdioInitialize ();	
 
 
-	Response = (int) shmain ( 5, argv ); 
+	Response = (int) shmain ( 3, argv ); 
 								
 									
 	//

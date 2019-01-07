@@ -517,15 +517,31 @@ void shellCreateEditBox (){
  *
  */
  
-int shellCreateTaskBar (int status){
+struct window_d *shellCreateMainWindow( int status ){
 	
 	// #todo:
 	// Precisamos registrar no kernel que essa janela corresponde 
 	// a área de taskbar e que a área de trabalho agora é menor.
-		
-	//
-	// Criando a barra.
-	//
+	
+	// # ??
+	// Pegando a janela principal para usarmos como janela mãe.
+	
+	/*
+	
+	struct window_d *pW;
+
+	pW = (struct window_d *) apiGetWSScreenWindow ();
+	
+	if ( (void *) pW == NULL )
+	{
+	    printf("Screen Window fail\n ");
+	    
+		while (1){
+			asm ("pause");
+			//exit (1);
+		}
+	}
+	*/
 	
 	
 	unsigned long left;
@@ -533,18 +549,35 @@ int shellCreateTaskBar (int status){
 	unsigned long width;
 	unsigned long height;
 	
-	//todo: get system metrics.
+	//left = 0;
+	//top = (600 - (600/16));
+	//width = 800;
+	//height = (600/8); 	
 	
-	left = 0;
-	top = (600 - (600/16));
-	width = 800;
-	height = (600/8);
+	//left = wpWindowLeft;
+	//top = wpWindowTop;
+	//width = wsWindowWidth;
+	//height = wsWindowHeight;
+
+	wpWindowLeft = 0;
+	wpWindowTop = 0;
+	wsWindowWidth = 800;
+	wsWindowHeight = 600;
+
 	
-	taskbarWindow = (void *) APICreateWindow ( 1, 1, 1, "shell-taskbar",     
+	left = wpWindowLeft;
+	top = wpWindowTop;
+	width = wsWindowWidth;
+	height = wsWindowHeight;
+
+	
+	struct window_d *w;
+
+	w = (void *) APICreateWindow ( 1, 1, 1, "shell-main",     
                                 left, top, width, height,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-	if ( (void *) taskbarWindow == NULL )
+	if ( (void *) w == NULL )
 	{	
 		printf("shellCreateTaskBar: taskbar Window fail");
 		refresh_screen();
@@ -554,85 +587,45 @@ int shellCreateTaskBar (int status){
 		}
 		//exit(0);
 	};
+	
 	//Registrar.
-    APIRegisterWindow (taskbarWindow);
+    APIRegisterWindow (w);
 	
-	apiShowWindow (taskbarWindow);
+	apiShowWindow (w);
 	
-	//
-	// menu icon window
-	//
-	
-	//todo: get system metrics.
-	
-	//menu icon
-	unsigned long miLeft = 0;
-	unsigned long miTop = (600 - (600/16));
-	unsigned long miWidth = (800/8); 
-	unsigned long miHeight = (600/16);
+	return w;
+};
 
-	menu_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "*MENU",     
-                            miLeft, miTop, miWidth, miHeight,    
-                            0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
-							
-	if ( (void *) menu_button == NULL )
-	{	
-		printf("shellCreateTopBar: icon1 Window fail");
-		refresh_screen();
-		
-		while (1){
-			asm("pause");
-		}
-		//exit(0);
-	};
+
+
+void testCreateWindow (){
+
 	
-    //Registrar.
-    APIRegisterWindow(menu_button);
-	apiShowWindow (menu_button);
+	struct window_d *hWindow;
 	
- 
 	
-/*	
+	apiBeginPaint ();
 	
-	//
-	// BMP . LABELS
-	//
-    
-	void *b;
+	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "XXX",     
+                                10, 10, 200, 200,
+                                0, 0, COLOR_RED, COLOR_YELLOW ); //xCOLOR_GRAY1, xCOLOR_GRAY1 );
 	
-	// testando malloc.
-	b = (void *) malloc (1024*30); 	
-    
-	if ( (void *) b == NULL )
+	if ( (void *) hWindow == NULL )
 	{
-		printf("shellTestDisplayBMP: allocation fail\n");
-		return -1;
-		//while(1){}
+		printf ("FAIL!");
+		while(1){}
+		
+		die ("shell.bin: hWindow fail");
 	}
 	
-	//Carregando o arquivo.
-loadFile:
-    
-	//@todo: Usar alguma rotina da API específica para carregar arquivo.
-	// na verdade tem que fazer essas rotinas na API.
-	system_call ( SYSTEMCALL_READ_FILE, (unsigned long) bmp1_file_name, 
-		(unsigned long) b, (unsigned long) b );
-		
-		
-	apiDisplayBMP ( (char *) b, 2, 2 ); 
-	apiDisplayBMP ( (char *) b, iconMaxWidth +2, 2 ); 
+	//Registrar.
+    APIRegisterWindow (hWindow);
 	
-	
-	if (status == 2)
-	{
-	    ShellFlag = SHELLFLAG_TOPBAR;
-	}
-	
-*/	
-	
-//done:
+	apiShowWindow (hWindow);	
 
-	return (int) 0;
+    apiEndPaint();
+	
+    printf("ok\n");
 };
 
 

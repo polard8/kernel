@@ -7,24 +7,23 @@
 echo -{ ...
 echo -{ head
 	
-	nasm c:\gramado\init\core\taskman\head.s -felf -o head.o
+	nasm c:\norax\init\core\taskman\head.s -felf -o head.o
 
 :Compiling	
 echo -{ ...
 echo -{ Compiling TASKMAN.BIN.
     
-	gcc -c c:\gramado\init\core\taskman\crt0.c -I c:\gramado\include\libc -o crt0.o  
-	gcc -c c:\gramado\init\core\taskman\main.c -I c:\gramado\include\libc -o main.o  
+	gcc -c c:\norax\init\core\taskman\crt0.c -I c:\norax\include\libc -o crt0.o  
+	gcc -c c:\norax\init\core\taskman\main.c -I c:\norax\include\libc -o main.o  
 	
 	
-	copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o
+	copy c:\norax\lib\api\api.o c:\sdk\bin\api.o
 	
-	copy c:\gramado\lib\stdio.o  c:\sdk\bin\stdio.o
-	copy c:\gramado\lib\stdlib.o c:\sdk\bin\stdlib.o
-	copy c:\gramado\lib\string.o c:\sdk\bin\string.o
-	copy c:\gramado\lib\ctype.o  c:\sdk\bin\ctype.o	
+	copy c:\norax\lib\stdio.o  c:\sdk\bin\stdio.o
+	copy c:\norax\lib\stdlib.o c:\sdk\bin\stdlib.o
+	copy c:\norax\lib\string.o c:\sdk\bin\string.o
+	copy c:\norax\lib\ctype.o  c:\sdk\bin\ctype.o	
 	
-	copy c:\gramado\lib\unistd.o  c:\sdk\bin\unistd.o	
 	
 :Objects	
 set myObjects=head.o ^
@@ -34,15 +33,15 @@ api.o ^
 ctype.o ^
 stdio.o ^
 stdlib.o ^
-unistd.o ^
-string.o  
+string.o 
+
 
 
 
 :Linking
 echo -{ ...
 echo -{ Linking objects ... 
-    ld -T c:\gramado\init\core\taskman\link.ld -o TASKMAN.BIN %myObjects% -Map tm_map.s
+    ld -T c:\norax\init\core\taskman\link.ld -o TASKMAN.BIN %myObjects% -Map tm_map.s
    
     rem
     rem :Cleaning   
@@ -50,7 +49,7 @@ echo -{ Linking objects ...
     rem
    
 :Moving   
-    move TASKMAN.BIN c:\gramado\bin\TASKMAN.BIN
+    move TASKMAN.BIN c:\norax\bin\TASKMAN.BIN
     
 :End	
 echo End.

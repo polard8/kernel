@@ -33,10 +33,17 @@
  */
  
  
+//
+// Includes.
+// 
+ 
+#include "api.h"      //api.
 
-
-#include "init.h"
-
+#include <stdio.h>    //libC em user mode.
+#include <stddef.h>   //libC em user mode. 
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 //
 // Variáveis internas.
@@ -126,14 +133,14 @@ void initMain (void){
 	//nothing for now.
 	
 	
-	//libcInitRT ();
+	libcInitRT ();
     
-	//stdioInitialize ();		
+	stdioInitialize ();		
 	
 	// #debug
 	// Testing output message.
-	//printf("initMain: INIT.BIN is alive \n");
-    //refresh_screen();	
+	printf("initMain: INIT.BIN is alive \n");
+    refresh_screen();	
 };
 
 

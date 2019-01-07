@@ -1,0 +1,701 @@
+/*
+ * File: stdio.h
+ *
+ * Descrição:
+ *     Rotinas padrão de I/O.
+ *   
+ * @todo: Trabalhar nas funções de abrir e fechar arquivos.
+ * 
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
+ */
+
+ 
+/*
+    The stdio.h header defines three variable types, 
+	several macros, and various functions for performing 
+	input and output.
+
+    Library Variables
+    Following are the variable types 
+	defined in the header stdio.h -
+
+    S.N.	Variable & Description
+    1	size_t
+    This is the unsigned integral type and 
+	is the result of the sizeof keyword.
+
+    2 FILE
+    This is an object type suitable for storing 
+	information for a file stream.
+
+    3 fpos_t
+    This is an object type suitable for 
+	storing any position in a file.
+
+    Library Macros
+    Following are the macros 
+	defined in the header stdio.h -
+
+    S.N. Macro & Description
+    1 NULL
+    This macro is the value of a null pointer constant.
+
+    2 _IOFBF, _IOLBF and _IONBF
+    These are the macros which expand to integral constant 
+	expressions with distinct values and 
+	suitable for the use as third argument to the setvbuf function.
+
+    3 BUFSIZ
+    This macro is an integer, 
+	which represents the size of the buffer used by the setbuf function.
+
+    4 EOF
+    This macro is a negative integer, 
+	which indicates that the end-of-file has been reached.
+
+   5 FOPEN_MAX
+   This macro is an integer, 
+   which represents the maximum number of files 
+   that the system can guarantee to be opened simultaneously.
+
+   6 FILENAME_MAX
+   This macro is an integer, 
+   which represents the longest length of a char array 
+   suitable for holding the longest possible filename. 
+   If the implementation imposes no limit, 
+   then this value should be the recommended maximum value.
+
+   7 L_tmpnam
+   This macro is an integer, 
+   which represents the longest length of a char array 
+   suitable for holding the longest possible temporary filename 
+   created by the tmpnam function.
+
+  8 SEEK_CUR, SEEK_END, and SEEK_SET
+  These macros are used in the fseek function to 
+  locate different positions in a file.
+
+  9	TMP_MAX
+  This macro is the maximum number of unique filenames 
+  that the function tmpnam can generate.
+
+  10 stderr, stdin, and stdout
+  These macros are pointers to FILE types 
+  which correspond to the standard error, 
+  standard input, and standard output streams.
+
+  Library Functions
+  Following are the functions defined in the header stdio.h -
+
+  Follow the same sequence of functions for better understanding and 
+  to make use of Try it(Online compiler) option, 
+  because file created in the first function will be 
+  used in subsequent functions.
+  
+  S.N.	Function & Description
+
+  1	
+  int fclose(FILE *stream)
+  Closes the stream. All buffers are flushed.
+
+  2	
+  void clearerr(FILE *stream)
+  Clears the end-of-file and error indicators for the given stream.
+
+  3	
+  int feof(FILE *stream)
+  Tests the end-of-file indicator for the given stream.
+
+  4	
+  int ferror(FILE *stream)
+  Tests the error indicator for the given stream.
+
+  5	
+  int fflush(FILE *stream)
+  Flushes the output buffer of a stream.
+
+  6	
+  int fgetpos(FILE *stream, fpos_t *pos)
+  Gets the current file position of the stream and writes it to pos.
+
+  7	
+  FILE *fopen(const char *filename, const char *mode)
+  Opens the filename pointed to by filename using the given mode.
+
+  8	
+  size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+  Reads data from the given stream into the array pointed to by ptr.
+
+  9	
+  FILE *freopen(const char *filename, const char *mode, FILE *stream)
+  Associates a new filename with the given open 
+  stream and same time closing the old file in stream.
+
+  10	
+  int fseek(FILE *stream, long int offset, int whence)
+  Sets the file position of the stream to the given offset. 
+  The argument offset signifies the number of bytes to seek 
+  from the given whence position.
+
+  11	
+  int fsetpos(FILE *stream, const fpos_t *pos)
+  Sets the file position of the given stream to the given position. 
+  The argument pos is a position given by the function fgetpos.
+
+  12	
+  long int ftell(FILE *stream)
+  Returns the current file position of the given stream.
+
+  13	
+  size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+  Writes data from the array pointed to by ptr to the given stream.
+
+  14	
+  int remove(const char *filename)
+  Deletes the given filename so that it is no longer accessible.
+
+  15	
+  int rename(const char *old_filename, const char *new_filename)
+  Causes the filename referred to, by old_filename to be changed to new_filename.
+
+  16	
+  void rewind(FILE *stream)
+  Sets the file position to the beginning of the file of the given stream.
+
+  17	
+  void setbuf(FILE *stream, char *buffer)
+  Defines how a stream should be buffered.
+
+  18	
+  int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
+  Another function to define how a stream should be buffered.
+
+  19	
+  FILE *tmpfile(void)
+  Creates a temporary file in binary update mode (wb+).
+
+  20	
+  char *tmpnam(char *str)
+  Generates and returns a valid temporary filename which does not exist.
+
+  21	
+  int fprintf(FILE *stream, const char *format, ...)
+  Sends formatted output to a stream.
+
+  22	
+  int printf(const char *format, ...)
+  Sends formatted output to stdout.
+
+  23	
+  int sprintf(char *str, const char *format, ...)
+  Sends formatted output to a string.
+
+  24	
+  int vfprintf(FILE *stream, const char *format, va_list arg)
+  Sends formatted output to a stream using an argument list.
+
+  25	
+  int vprintf(const char *format, va_list arg)
+  Sends formatted output to stdout using an argument list.
+
+  26	
+  int vsprintf(char *str, const char *format, va_list arg)
+  Sends formatted output to a string using an argument list.
+
+  27	
+  int fscanf(FILE *stream, const char *format, ...)
+  Reads formatted input from a stream.
+
+  28	
+  int scanf(const char *format, ...)
+  Reads formatted input from stdin.
+
+  29	
+  int sscanf(const char *str, const char *format, ...)
+  Reads formatted input from a string.
+
+  30	
+  int fgetc(FILE *stream)
+  Gets the next character (an unsigned char) 
+  from the specified stream and 
+  advances the position indicator for the stream.
+
+  31	
+  char *fgets(char *str, int n, FILE *stream)
+  Reads a line from the specified stream and 
+  stores it into the string pointed to by str. 
+  It stops when either (n-1) characters are read, 
+  the newline character is read, 
+  or the end-of-file is reached, 
+  whichever comes first.
+
+  32	
+  int fputc(int char, FILE *stream)
+  Writes a character (an unsigned char) 
+  specified by the argument char to the specified stream and 
+  advances the position indicator for the stream.
+
+  33	
+  int fputs(const char *str, FILE *stream)
+  Writes a string to the specified stream up to 
+  but not including the null character.
+
+  34	
+  int getc(FILE *stream)
+  Gets the next character (an unsigned char) 
+  from the specified stream and 
+  advances the position indicator for the stream.
+
+  35	
+  int getchar(void)
+  Gets a character (an unsigned char) from stdin.
+
+  36	
+  char *gets(char *str)
+  Reads a line from stdin and 
+  stores it into the string pointed to by, str. 
+  It stops when either the newline character is 
+  read or when the end-of-file is reached, 
+  whichever comes first.
+
+  37	
+  int putc(int char, FILE *stream)
+  Writes a character (an unsigned char) 
+  specified by the argument char to the 
+  specified stream and 
+  advances the position indicator for the stream.
+
+  38	
+  int putchar(int char)
+  Writes a character (an unsigned char) 
+  specified by the argument char to stdout.
+
+  39	
+  int puts(const char *str)
+  Writes a string to stdout up to 
+  but not including the null character. 
+  A newline character is appended to the output.
+
+  40	
+  int ungetc(int char, FILE *stream)
+  Pushes the character char (an unsigned char) 
+  onto the specified stream so 
+  that the next character is read.
+
+  41	
+  void perror(const char *str)
+  Prints a descriptive error message to stderr. 
+  First the string str is printed followed by a colon and then a space.
+*/ 
+ 
+ 
+//#ifdef  _POSIX_
+//...
+//#endif
+ 
+//
+// input() support
+// 
+
+#define INPUT_MODE_LINE                0
+#define INPUT_MODE_MULTIPLE_LINES      1
+int g_inputmode;
+ 
+ 
+//
+// Numero de stream no array global de streams.
+//  
+//
+//
+int g_nstream; 
+ 
+// Ponteiro para o array de streams dinâmico,
+// Para o caso de termos um novo array de tamanho maior 
+// que o padrão, então alocaremos memória para ele e 
+// usaremos esse ponteiro aí.
+// Ate mesmo para o caso de usarmos apenas o tamanho 
+// padrão podemos usar esse ponteiro aí,
+// apontando Streams[] para gStreams. 
+unsigned long *gStreams; 
+
+//Tmanho dinâmico.?? 
+//unsigned long gStreams[?];
+ 
+// 
+//printf support 
+//
+
+//#define kprintf printf    //kernel support
+//#define dprintf printf    //debug support
+//...
+ 
+
+#define REVERSE_ATTRIB 0x70
+#define PAD_RIGHT 1
+#define PAD_ZERO 2
+
+/* the following should be enough for 32 bit int */
+#define PRINT_BUF_LEN 12
+
+
+
+/*
+ (BSD style)
+#define	_IOFBF	0		// setvbuf should set fully buffered 
+#define	_IOLBF	1		// setvbuf should set line buffered 
+#define	_IONBF	2		// setvbuf should set unbuffered 
+
+#define	BUFSIZ	1024	// size of buffer used by setbuf
+#define	EOF	(-1)
+*/
+#define EOF (-1)    //Ok.
+
+
+
+
+
+//#define SEEK_SET   0
+//#define SEEK_CUR   1
+//#define SEEK_END   2
+
+
+//enum FileFlags {_F_READ = 0x0001, _F_WRIT = 0x0002, _F_RDWR = 0x0003, _F_ERR = 0x0010, _F_EOF = 0x0020, _F_BIN = 0x0040};
+
+
+#define	STDIN_FILENO	0
+#define	STDOUT_FILENO	1
+#define	STDERR_FILENO	2
+
+//The macro yields the maximum size array of characters that 
+//you must provide to hold a filename.
+//#define FILENAME_MAX (8+3)
+
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
+#endif
+
+//The macro yields the maximum number of files that the target 
+//environment permits to be simultaneously open (including stderr, stdin, and stdout).
+#define FOPEN_MAX	    (32)
+#define NUMBER_OF_FILES (32)
+
+
+/*
+ * Prompt:
+ *    O prompt do shell. 
+ *    Se os caracteres do prompt do shell
+ * serão pintados no terminal, então precisamos de mais espaço.
+ * o terminal pode ser a janela que é a tela toda (gui->screen) ou
+ * outra janela qualquer.
+ *
+ */
+ 
+//BUFFER
+//_IOFBF, _IOLBF and _IONBF
+//_IONBF: The macro yields the value of the mode argument to 
+// setvbuf to indicate no buffering. (Flush the stream buffer at the end of each write operation.)
+
+#define  _IOFBF  4096    //Full buffer (uma página)
+#define  _IOLBF  256     //Uma linha.       
+#define  _IONBF  0   
+
+    
+#define  BUFSIZ  512 
+
+#define PROMPT_SIZE 256 
+#define PROMPT_MAX_DEFAULT 256
+
+ 
+char prompt[PROMPT_SIZE];      //buffer para stdin
+char prompt_out[PROMPT_SIZE];  //buffer para stdout
+char prompt_err[PROMPT_SIZE];  //buffer para strerr
+
+unsigned long prompt_pos; 
+unsigned long prompt_status;
+
+//@todo: Testando strings.
+static char prompt_cursor[] = "$";
+static char prompt_string[] = "Prompt:";
+
+
+//
+// Print char flags. (_outbyte)
+// usada para rotinas de pintura da libC.
+// ou seja, dentro do terminal. 
+//
+
+//
+//#importante: 
+//
+//  +++ Não se escreve fora do terminal com printf. +++
+//
+// Como não se escreve fora no terminal com printf.
+// essa flag só faz sentido dentro de stdio.c
+//
+// Para rotinas de pintura fora do terminal poderemos 
+// usar os dois tipos de draw char.
+//
+// flag usada por _outbyte para decidir
+// se desenha um char transparente ou não.
+int stdio_terminalmode_flag;
+
+
+//verbose mode do kernel.
+//permite que a tela do kernel funcione igual a um 
+//terminal, imprimindo os printfs um abaixo do outro.
+//sempre reiniciando x.
+int stdio_verbosemode_flag;
+
+
+/*
+ **********************************************
+ * FILE:
+ *     Estrutura padrão para arquivos.
+ *     >>> i/o buffer 
+ *
+ *     Ambiente: RING 0.
+ */
+typedef struct _iobuf FILE; 
+struct _iobuf 
+{
+	//Object support.
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+	//object control
+	struct object_d *object;
+	
+	
+	//Current position of file pointer (absolute address).
+	char *_ptr;     
+	
+	int   _cnt;
+	
+	//Pointer to the base of the file.
+	char *_base;    
+	
+	int   _flag;    
+	int   _file;
+	int   _charbuf;
+	int   _bufsiz;
+	char *_tmpfname;
+};
+/*
+    Fluxo padrão. Também conhecidos como descritores padrão.
+
+ +----------------+---------+-----------------------------------+
+ |ID padronizado  |  Nome   |             Descricao             |
+ +----------------+---------+-----------------------------------+
+ |       0        |  stdin  |   associado a leitura do teclado  |
+ +----------------+---------+-----------------------------------+
+ |       1        | stdout  |  associado a saída normal na tela |
+ +----------------+---------+-----------------------------------+
+ |       2        | stderr  | associado a saída de erro         |
+ +----------------+---------+-----------------------------------+
+*/
+
+//
+//  ## ARQUIVOS DO PROCESSO KERNEL  ##
+//
+
+// Gramado Boot
+FILE *stdin;            //0
+FILE *stdout;           //1
+FILE *stderr;           //2
+FILE *vfs;              //3 - Diretório raiz do vfs. 
+FILE *volume1_rootdir;  //4 - Diretório raiz do volume de boot.
+FILE *volume2_rootdir;  //5 - Diretório raiz do volume do sistema. 
+FILE *file_InitTXT;     //6 - Arquivo de configuração de inicialização. INIT.TXT.
+FILE *file_users;       //7 - Pasta para perfis de usuários. /users
+FILE *file_BootManager; //8 - Boot Manager. BM.BIN.
+FILE *file_BootLoader;  //9 - Boot Loader. BL.BIN.
+
+// Gramado Core
+FILE *file_Kernel;      //10 - Kernel base. KERNEL.BIN
+FILE *file_Init;        //11 - Init subsystem. INIT.BIN
+FILE *file_Shell;       //12 - Shell subsystem. SHELL.BIN
+FILE *file_TaskMan;     //13 - Task manager subsystem. TAKSMAN.BIN
+
+// Gramado Cali
+FILE *file_CS;          //14 California Shell. CS.BIN
+FILE *file_CFE;         //15 California File explorer. CFE.BIN
+FILE *file_CWE;         //16 California Web Explorer. CWE.BIN
+
+// Gramado LA
+FILE *file_LA;          //17 - Los Angeles Package Manager. LA.BIN  
+
+// System directories
+FILE *file_dd;          //18 - device drivers folder
+FILE *file_bin;         //19 - applications folder
+FILE *file_tmp;         //20 - tmp files folder
+FILE *file_download;    //21 - download files folder
+FILE *file_libs;        //22 - system libs folder
+
+// User directories
+FILE *file_pwd;         //23 - Diretório de trabalho. Diretório usado no comando 'pwd'. 
+
+//...
+
+//Array de estruturas.
+//FILE *_io_table[NUMBER_OF_FILES];
+
+// Nã usaremos o array de estrutura.
+//#define stdin     (_io_table[0])	
+//#define stdout 	(_io_table[1])
+//#define stderr 	(_io_table[2])
+//#define stdin     (&_io_table[0])	
+//#define stdout 	(&_io_table[1])
+//#define stderr 	(&_io_table[2])
+
+
+/*
+ * ## Aprendendo sobre streams ##
+ * #importante 
+ * Lista de endereços de estruturas de streams.
+ * Essas são as streas que pertencem ao processo kernel.
+ * Array de ponteiros de estrutura.
+ *
+ *
+ * Isso poderia ser um array de acesso global,
+ * contendo streams de todos os processos,
+ * As primeiras sreasm seriam do processo kernel.
+ * Obs: Quando um processo solicitar um descritor 
+ * para a biblioteca C ele estará usando um índice que 
+ * seleciona o descritor real do arquivo, que será usado 
+ * nessa lista.
+ * Vários processos selecionarão o descritor '0',
+ * mas esse descritor deve ser traduzido para 
+ * um verdadeiro descritor usado nessa lista global.
+ *
+ * ## IMPORTANTE ##
+ * O kernel precisa gerenciar os recursos 
+ * usados pelos processos e liberar esses recursos 
+ * quando o processo não estiver mais usando ..
+ * >>> Não é trabalho da libc se preocupar
+ * com o gerenciamento de recursos do processo.
+ *
+ * ## facilita as coisas ##
+ * Pois o kernel pode alocar memória 
+ * para alguns arquivos usando o alocador de páginas, 
+ * mas o processo não tem acesso a essa memória,
+ * então o processo em user mode teria que fazer 
+ * muitas chamadas para acessar o conteúdo do arquivo, 
+ * a não ser que o kernel compartilhe a memória 
+ * com o processo.
+ *
+ *
+ */
+unsigned long Streams[NUMBER_OF_FILES]; 
+
+/*
+ * #importante 
+ * ## suspenso ##
+ */
+//unsigned long GlobalStreams[??]; 
+
+//
+// Pipes support
+//
+
+// 0
+//Pipe para a rotina execve particular 
+//usada no no init do ambiente Gramado Core.
+FILE *pipe_gramadocore_init_execve;
+
+// 1
+//Pipe usado pela rotina execve.
+FILE *pipe_execve;
+
+//Continua ...
+
+#define NUMBER_OF_PIPES 8
+unsigned long Pipes[NUMBER_OF_PIPES];
+
+
+
+/*
+ * Diretórios onde a pesquisa deve ser feita.
+ * Isso é configurável.
+ * 
+ */
+//unsigned long Search[9]; 
+
+
+
+//Lista de arquivos abertos
+//unsigned long openfileList[128];
+//...Outras listas de arquivos.
+
+/*
+ * Protótipos do padão C.
+ */
+
+#define kprintf printf
+ 
+int fclose(FILE *stream);    //@todo:  
+FILE *fopen( const char *filename, const char *mode );    //@todo: 
+int printf(const char *format, ...);
+int sprintf(char *str, const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
+int putchar( int ch );
+void panic( const char *format, ... );
+//...
+
+//BUFFER:
+//void setbuf(FILE *stream, char *buffer)
+//int setvbuf(FILE *stream, char *buffer, int mode, size_t size);
+
+
+//testes...(ainda não  implementadas.)
+//int fgetpos(FILE *stream, fpos_t *pos);
+//int remove(const char *filename);
+//int rename(const char *old_filename, const char *new_filename);
+//  void setbuf(FILE *stream, char *buffer);
+//  FILE *tmpfile(void);
+//  int scanf(const char *format, ...)
+//int fgetc(FILE *stream)
+//  int fputc(int char, FILE *stream)
+//  int getc(FILE *stream)
+//  int getchar(void)
+//  int putc(int char, FILE *stream)
+
+
+int puts ( const char *str );
+
+/*
+ * Funções internas para o padrão C.
+ */
+static void printchar(char **str, int c);
+static int prints(char **out, const char *string, int width, int pad);
+static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase);
+static int print(char **out, int *varg);
+
+//int printf_main(void);    //#suspensa
+
+
+//Suporte às rotinas do padrão C.
+void outbyte(int c);
+void _outbyte(int c);
+
+
+/*
+ * Outros protótipos. 
+ *     Para rotinas do kernel que estão fora do padrão C.
+ */
+void scroll( void );
+int kclear(int color);
+int kclearClientArea(int color);
+int kprint(char *message, unsigned int line, int color);
+
+
+//int getchar();
+
+//inicializa os buffers do fluxo padrão em stdio.c
+int stdioInitialize();
+
+//
+// End.
+//
+

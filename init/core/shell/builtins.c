@@ -135,10 +135,6 @@ void help_builtins (int arg){
 };
 
 
-//isso pode ser feito aqui,
-//temos que pegar a string do kernel 
-//e mostrar ela aqui. 
-//ou talvez o kernel nem deva lidar com essas coisas.
 void pwd_builtins (){
 	
     //printf("~pwd - print working directory\n");

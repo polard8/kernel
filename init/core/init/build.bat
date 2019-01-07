@@ -5,24 +5,25 @@
 
 :Monting
 echo -{ ...
-echo -{ Creating INIT.BIN ...
+echo -{ Creating INIT.BIN for Norax ...
 echo -{ head
     rem head.s
-	nasm c:\gramado\init\core\init\head.s -felf -o head.o
+	nasm c:\norax\init\core\init\head.s -felf -o head.o
 
 	
 :Compiling	
 echo -{ ...
 echo -{ main
-	gcc  -c  c:\gramado\init\core\init\main.c  -I c:\gramado\include\libc -o main.o  
+	gcc  -c  c:\norax\init\core\init\main.c  -I c:\norax\include\libc -o main.o  
  
  
-    copy c:\gramado\lib\stdio.o c:\sdk\bin\stdio.o
-    copy c:\gramado\lib\string.o c:\sdk\bin\string.o
-    copy c:\gramado\lib\ctype.o c:\sdk\bin\ctype.o	
-    copy c:\gramado\lib\stdlib.o c:\sdk\bin\stdlib.o
-    copy c:\gramado\lib\api\api.o c:\sdk\bin\api.o
-	copy c:\gramado\lib\unistd.o c:\sdk\bin\unistd.o
+    copy c:\norax\lib\stdio.o c:\sdk\bin\stdio.o
+    copy c:\norax\lib\string.o c:\sdk\bin\string.o
+    copy c:\norax\lib\ctype.o c:\sdk\bin\ctype.o	
+    copy c:\norax\lib\stdlib.o c:\sdk\bin\stdlib.o
+	
+    copy c:\norax\lib\api\api.o c:\sdk\bin\api.o
+	
  
 :Objects	
 set myObjects=head.o ^
@@ -31,20 +32,19 @@ stdio.o ^
 ctype.o ^
 string.o ^
 stdlib.o ^
-unistd.o ^
 api.o  
 
 
 :Linking  
 echo -{ ...
 echo -{ Linking objects ... 
-   ld -T c:\gramado\init\core\init\link.ld -o INIT.BIN %myObjects%  -Map  init_map.s
+   ld -T c:\norax\init\core\init\link.ld -o INIT.BIN %myObjects%  -Map  init_map.s
    
    rem Não deletar os objetos.
  
  
 :Moving   
-   move INIT.BIN c:\gramado\bin\INIT.BIN
+   move INIT.BIN c:\norax\bin\INIT.BIN
 
    
 :End   

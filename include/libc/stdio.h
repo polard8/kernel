@@ -113,9 +113,6 @@ FILE *stderr;
 //listando os arquivos da biblioteca.
 unsigned long Streams[NUMBER_OF_FILES];
 
-//#define	fileno(stream)		((stream)->_fd)
-//#define L_ctermid 255	/* required by POSIX */
-//#define L_cuserid 255	/* required by POSIX */
 
 
 /*

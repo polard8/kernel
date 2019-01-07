@@ -1,3 +1,0 @@
-MOUSE={MOUSE.BMP}
-
-

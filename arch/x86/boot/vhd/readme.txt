@@ -1,6 +1,5 @@
-﻿
-    #todo:
- 
+﻿#todo:
+     
     +As informações aqui precisam ser revistas.
     +Criar arquivo de configuração da GUI. GUI.TXT.
      

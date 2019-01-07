@@ -18,20 +18,12 @@
 #include <stdlib.h>  
 #include <string.h>
 
-#include <sys/wait.h>
-
-#include <unistd.h>
 
 //shell stuff 
 #include "shell.h"
 #include "globals.h"
 #include "builtins.h"
-
-
-//#test
-#include <api/api.h>
-//#include "api.h"
-
+#include "api.h"
 #include "desktop.h"
 
 //# bash 1.05 stuff #
@@ -43,12 +35,5 @@
 #include "version.h"
 //...
 
-#include "lexer.h"
-#include "parser.h"
-
-#include "net.h"
-
-//#terminal api??
-#include "terminal.h"
 
 

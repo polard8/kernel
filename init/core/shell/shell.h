@@ -19,7 +19,8 @@
  *     2017 - procedure and command stuff.
  *     2018 - Add some bash 1.05 stuff. 
  */
-
+ 
+ 
  
  
 //
@@ -871,7 +872,19 @@ struct terminal_screen_info_d
  
 
  
-
+//#importante. 
+//rect info
+//retângulo da área de cliente onde aparecerão os caracteres.
+typedef struct terminal_rect_info_d terminal_rect_info_t; 
+struct terminal_rect_info_d
+{
+	unsigned long top;
+	unsigned long left;
+	unsigned long width;
+	unsigned long height;
+	//...
+};
+struct terminal_rect_info_d terminal_rect; 
 
 
 //cursor info
@@ -989,15 +1002,15 @@ int shmain ( int argc, char **argv );
 //
 
 void shellClearScreen();
+void shellRefreshScreen(); //copia o conteúdo do buffer para a tela. (dentro da janela)
+void shellRefreshLine ( int line_number );
+void shellRefreshChar ( int line_number, int col_number );
+void shellRefreshCurrentChar(); //refresh do char que está na posição usada pelo input.
 
 
 
-
-
-
-
-
-void scroll2 ();
+//scroll dentro da screen_buffer. (VGA emulada)
+void shellScroll();
 //...
 
 
@@ -1005,8 +1018,8 @@ void scroll2 ();
 // Buffer support.
 //
 
-
-
+void shellClearBuffer();
+void shellShowScreenBuffer();
 //...
 
 
@@ -1014,13 +1027,21 @@ void scroll2 ();
 // Typing support.
 //
 
+void shellInsertCR();
+void shellInsertLF();
+void shellInsertNullTerminator();
+void shellInsertNextChar(char c);
 
+void shellInsertCharXY(unsigned long x, unsigned long y, char c);
+char 
+shellGetCharXY ( unsigned long x, 
+                 unsigned long y );
  
-
-
-
-
-
+static void lf(void);
+static void ri(void);
+static void cr(void);
+static void del(void);
+void move_to( unsigned long x, unsigned long y);
 //...
 
 
@@ -1028,9 +1049,9 @@ void scroll2 ();
 // Cursor support.
 //
 
-
-
-
+void shellSetCursor(unsigned long x, unsigned long y);
+static void save_cur(void);
+static void restore_cur(void);
 
 
 //
@@ -1130,18 +1151,16 @@ void shellShowKernelInfo();
 int shell_gramado_core_init_execve( const char *arg1, 
                                     const char *arg2, 
                                     const char *arg3 );
-									
-int shell_gramado_core_init_execve_exe( const char *arg1, 
-                                        const char *arg2, 
-                                        const char *arg3 );
 
 //
 // shelui.c
 //
 
 void shellCreateEditBox();
-int shellCreateTaskBar( int status );
 
+
+struct window_d *shellCreateMainWindow( int status );
+//struct window_d *shellCreatemainWindow ();
 
 
 
@@ -1205,8 +1224,6 @@ void shell_print_tokenList ( char *token_list[], char *separator );
 /* Check if it's a .bin file */
 int is_bin ( char *cmd );
 
-int is_exe ( char *cmd );
-
 /* Check if it's a .sh1 file */
 int is_sh1 ( char *cmd );
 
@@ -1215,8 +1232,11 @@ int shellCheckPassword();
 
 //testando botão.
 int shellTestButtons ();
-	
 
+
+//tests
+void testCreateWindow ();
+			
 //
 // End.
 //
