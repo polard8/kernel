@@ -1,25 +1,7 @@
 
-# Compiling Gramado on Manjaro Linux.
-# Chamaremos cada alvo que terá seu makefile em sua própria pasta.
+# Makefile for the kernel
 
-# /bin/bash
-# SPDX-License-Identifier: GPL-3.0+
-# BSD License
-#
-# History:
-# 2018 - Created by Matheus Castello.
-# 2019 - Fred Nora.
-# 2019 - Luciano Gonçalez.
-
-
-VERSION = 0
-PATCHLEVEL = 5
-SUBLEVEL = 0
-EXTRAVERSION =
-NAME = Soberano
-
-#todo:
-#We need to simplify these flags, but it's working.
+# todo: temos que mudar o include e acrescentar ../
 
 CFLAGS = -m32 \
 	--std=gnu89 \
@@ -150,42 +132,6 @@ x86fault.o \
 services.o
 
 
-
-# check dependencies this works only in debian based distros
-#if [ $(dpkg-query -W -f='${Status}' nasm 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install nasm
-#fi
-
-#if [ $(dpkg-query -W -f='${Status}' binutils 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install binutils
-#fi
-
-#if [ $(dpkg-query -W -f='${Status}' gcc 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install gcc
-#fi
-
-#if [ $(dpkg-query -W -f='${Status}' make 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install make
-#fi
-
-
-
-#importante
-#Aqui ficarão os alvos principais, como configurações
-#os cripts ficarão em /scripts
-#os alvos aqui chama chama os scripts
-
-
-    #ISSO DIZ QUE O ALVO NAO EH ARQUIVO
-	#É para informar ao make não procurar por um arquivo com esse nome
-
-	#.PHONY x86
-
-xxx_x86: /mnt/holambravhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
 
 compile-kernel:
 	gcc -c kernel/3rdparty/kernel/disk/disk1.c   -I include/ $(CFLAGS) -o disk1.o
@@ -354,7 +300,7 @@ compile-kernel:
 
 	#bugbug:
 	#todo: usar uma lista ordenada de objetos.
-
+	
 link-x86:
 	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map kmap.s
 	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
@@ -364,79 +310,14 @@ link-x86:
 	mv KERNEL.BIN bin/
 # clean the output trash
 	# make clean
-
-vhd-x86:
-	nasm -I arch/x86/boot/vhd/stage1/ \
-	-I arch/x86/boot/vhd/stage2/ \
-	-I arch/x86/boot/vhd/stage2/lib16/ \
-	-I arch/x86/boot/vhd/stage2/include/ \
-	-I arch/x86/boot/vhd/msm/ \
-	-I arch/x86/boot/vhd/msm/lib32/ \
-	-I arch/x86/boot/vhd/msm/include/ \
-	-I arch/x86/boot/vhd/msm/kernel/ \
-	-I arch/x86/boot/vhd/msm/fs/ \
-	-I arch/x86/boot/vhd/msm/shell/ \
-	-I arch/x86/boot/vhd/msm/drivers/ \
-	-I arch/x86/boot/vhd/bl/ \
-	-I arch/x86/boot/vhd/kernel/ \
-	-I arch/x86/boot/vhd/browser/  arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
-
-
-vhd-mount:
-	-sudo umount /mnt/holambravhd
-	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/holambravhd/
-
-##
-# Copy content to disk
-##
-vhd-copy-files:
-	sudo cp bin/BM.BIN       /mnt/holambravhd
-	sudo cp bin/BL.BIN       /mnt/holambravhd
-	sudo cp bin/KERNEL.BIN   /mnt/holambravhd
-	sudo cp bin/INIT.BIN     /mnt/holambravhd
-	sudo cp bin/SHELL.BIN    /mnt/holambravhd
-	sudo cp bin/TASKMAN.BIN  /mnt/holambravhd
 	
-	sudo cp bin/JACKPOT.BIN  /mnt/holambravhd
-	sudo cp bin/TASCII.BIN   /mnt/holambravhd
-	sudo cp bin/CHTEST.BIN   /mnt/holambravhd
 	
-# configs
-	sudo cp arch/x86/boot/vhd/INIT.TXT /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/USER.TXT /mnt/holambravhd
-
-# bitmaps
-	sudo cp arch/x86/boot/vhd/images/BMP1.BMP      /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/MOUSE.BMP     /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/DENNIS.BMP    /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/APP.BMP       /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/FILE.BMP      /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/FOLDER.BMP    /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/TERMINAL.BMP  /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/CURSOR.BMP    /mnt/holambravhd
-
-# fonts
-	sudo cp bin/NC2.FON /mnt/holambravhd
-
-	# sudo cp bin/FCLASS.BIN   /mnt/noraxvhd
-	# sudo cp bin/GRAMCC.BIN   /mnt/noraxvhd
-	# sudo cp bin/JACKPOT.BIN  /mnt/noraxvhd
-	# sudo cp bin/TASCII.BIN   /mnt/noraxvhd
-	# sudo cp bin/TEDITOR.BIN  /mnt/noraxvhd
-	# sudo cp bin/TGFE.BIN     /mnt/noraxvhd
-
-# umount
-vhd-unmount:
-	sudo umount /mnt/holambravhd
-
-
-
-
-/mnt/holambravhd:
-	sudo mkdir /mnt/holambravhd
+	
 
 clean:
 	#find . -type f -name '*.o' -delete
 	-rm *.o
 
 	@echo "Success?"
+
+

@@ -1,1 +1,0 @@
-tmp    - Documentação que sendo produzida no momento e diversos.
