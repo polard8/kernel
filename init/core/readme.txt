@@ -4,6 +4,6 @@
     Special services that run on Gramado Core environment.
 
     +Init
-    +shell
+    +shell (config, installer and test support)
     +Taskman
     
