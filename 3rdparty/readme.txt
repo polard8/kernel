@@ -1,15 +1,8 @@
 
- /3rdparty
+  gramado/3rdparty
+  
+  This folder has public domain codes, bsd licence codes and some contributions. 
+  
+  All the code here can be used in any part of the system. Ring 0 and ring 3.
+  
 
-    3rd party codes.
-
-
-    Por motivos legais e de segurança, aqui ficarão os códigos
-cujos direitos autorais não petencem a Fred Nora.
-
-    Habilitar e desabilitar será a chave do negócio. Iguais ao drivers.
-
-
- Sobre as licensas:
-     Cada arquivo deverá ter seus créditos e licensas continas
-no topo.
