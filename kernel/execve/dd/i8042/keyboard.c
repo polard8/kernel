@@ -1,5 +1,9 @@
 /*
- * File: unb\keyboard.c
+ * File: i8042/keyboard.c
+ *     +handler for keyboard irq.    
+ *
+ * env:
+ *     Ring 0. Kernel base persistent code.
  *
  * Driver de teclado presente dentro do Kernel Base.
  * Esse será o driver de teclado para o modelo abnt2.
@@ -49,14 +53,6 @@
 //
 
 
-
-char _keyboard_queue[32];
-
-
-int _write_offset;
-int _read_offset;
-
-
 /*
  * *******************************************************
  * abnt2_keyboard_handler: 
@@ -79,12 +75,7 @@ int _read_offset;
  * por eventos desse tipo.
  *
  */
- 
-void abnt2_keyboard_handler (){
-	
-	
-    unsigned char scancode = inportb (0x60);	
-	
+
 	//#importante:
 	// Provavelmente uma interrupção irá fazer esse trabalho de 
 	// enviar o scancode para o kernel para que ele coloque na fila.
@@ -93,40 +84,42 @@ void abnt2_keyboard_handler (){
 	
 	
 	//#obs: Esse buffer está em user.h 
+
+
+void abnt2_keyboard_handler (){
 	
+    unsigned char scancode = inportb (0x60);	
+		
 	keybuffer[keybuffer_tail++] = (char) scancode;
 	
-	if ( keybuffer_tail >= 128 )
-	{
+	if ( keybuffer_tail >= 128 ){
 		keybuffer_tail = 0;
 	}
-	
-	
-	// #DEBUG !!!
-	// Isso fica aqui para testes apenas,
-	// pois quem chama isso é o consumidor.
-	
-	
-	outportb ( 0x20, 0x20 );    
 };
 
 
+
+//#importante
+//Isso é usado pelo serviço que pega mensagens de input. (111).
+//pega o scancode.
+//renova a fila do teclado
+
 unsigned long get_scancode (){
 	
-	unsigned long c;
+	unsigned long SC = 0;
 	
-	_read_offset++;
+	SC = (unsigned char) keybuffer[keybuffer_head];
+					
+	keybuffer[keybuffer_head] = 0;
 	
-	if ( _read_offset >= 32 )
-	{
-		_read_offset = 0;
-	}
+	keybuffer_head++;
 	
-	c = 0;
-	c = (unsigned long) _keyboard_queue[_read_offset];
+	if ( keybuffer_head >= 128 ){ 
+	    keybuffer_head = 0; 
+	};	
 	
-	return (unsigned long) c; 
-}
+	return (unsigned long) SC; 	
+};
 
 
 /*

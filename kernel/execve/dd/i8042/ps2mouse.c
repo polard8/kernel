@@ -1,6 +1,8 @@
 /*
- * File: ps2mouse.c
+ * File: i8042/ps2mouse.c
  * 
+ * env:
+ *     Ring 0. Kernel base persistent code.
  * History:
  *     2018 - Created by fred Nora.
  */

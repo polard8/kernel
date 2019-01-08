@@ -1,5 +1,9 @@
 /*
- * File: ps2kbd.c
+ * File: i8042/ps2kbd.c
+ *     keyboard controller support.     
+ *
+ * env:
+ *     Ring 0. Kernel base persistent code.
  *
  * 2018 - Created by Fred Nora.
  */

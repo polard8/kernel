@@ -381,11 +381,6 @@ vhd-x86:
 	-I arch/x86/boot/vhd/browser/  arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
 
 
-# mount
-	#sudo mkdir /mnt/noraxvhd
-	#sudo mkdir /mnt/noraxvhd
-	#sudo mount -o loop,offset=32256 NORAX.VHD /mnt/noraxvhd/
-
 vhd-mount:
 	-sudo umount /mnt/holambravhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/holambravhd/

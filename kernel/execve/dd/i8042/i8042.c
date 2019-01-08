@@ -1,9 +1,10 @@
 /*
- * File: i8042.c
- *
-
- *
-
+ * File: i8042/i8042.c
+ *     i8042 controller initialization.
+ *     initialize ps2 controller.
+ * env:
+ *     Ring 0. Kernel base persistent code.
+ * 2018 - Created by Fred Nora.
  */
 
  

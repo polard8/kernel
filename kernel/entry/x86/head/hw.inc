@@ -118,14 +118,10 @@ _irq0:
 	mov word [_contextDS], ax	
 	
 	
-	;
 	; @todo:
     ; Continuar salvamento de contexto dos registradores x86. 	
 	; Outros registradores. Ex: media, float point, debug.
-	;
 
-
-	;
 	; Preparando os registradores, para funcionarem em kernel mode.
 	;
 	; Obs: 
@@ -255,11 +251,9 @@ dummy_flush:
 	
 ;;.RestoreThreadContext:	
 
-	;
 	; @todo:
     ; Outros registradores precisam ser restaurados agora	
 	; Outros registradores, Ex: media, float point, debug.
-	;
 	
 	;
 	;segments
@@ -427,7 +421,6 @@ timer_interrupt:
 ; _irq1:
 ;     IRQ 1 - #teclado.
 ;
-;	
 global _irq1  
 _irq1:
  
@@ -456,12 +449,7 @@ _irq1:
 	mov fs, ax  ;Usar seletor 0.
 	mov gs, ax  ;Usar seletor 0.
 	
-	
-	;
-	; @todo: Mudar para Inglês o nome da função.
-	;
-	
-	
+		
 	;mov byte [0x800000], byte "t"	
     ;mov byte [0x800001], byte 9	
 	
@@ -483,9 +471,9 @@ _irq1:
 	;OBSERVAÇÃO: O EOI foi chamado na rotina teclado_handler_main().
 	;
 	
-	;MOV AL,020h
-	;OUT 0A0h,AL
-	;OUT 020h,AL
+	MOV AL, 020h
+	OUT 0A0h, AL
+	OUT 020h, AL
 
     sti	
 	iretd

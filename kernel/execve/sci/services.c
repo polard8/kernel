@@ -1,5 +1,5 @@
 /*
- * File: execve\sci\services.c 
+ * File: execve/sci/services.c 
  *
  *       (SCI) = SYSTEM CALL INTERFACE
  *
@@ -883,71 +883,36 @@ void *services( unsigned long number,
 		case 111:
 		    if ( &message_address[0] == 0 )
 			{
-				printf("111: null pointer");
+				printf ("services: 111, null pointer");
 				die();
 				
 			}else{
 				
 			    t = (void *) threadList[current_thread];
 			    
-				//#bugbug:
-				//temos que checar a validade da janela.
-				
 	            if ( (void *) t == NULL )
 	            {
 		           return NULL;
 	            }
-				
-				//se Não há mensagens.
-				if( t->newmessageFlag != 1 )
+								
+				if ( t->newmessageFlag != 1 )
 				{
-                    // Se não há mensagens na estrutura da janela,
-					// então devemos alimentar a estrutura para
-					// que da próxima vez exista alguma mensagem.
-					// Nossas opções são o teclado, pois o próprio mouse 
-					// alimentará por si só a estrutura da janela.
-					
-					//alimentando através de mensagens de teclado
-			        
-					//pega o sccancode.
-					SC = (unsigned char) keybuffer[keybuffer_head];
-					
-					//renova a fila do teclado
-		            keybuffer[keybuffer_head] = 0;
-					keybuffer_head++;
-					if ( keybuffer_head >= 128 ){ 
-				        keybuffer_head = 0; };
-			        
-                    //isso coloca a mensagem na fila da thread atual.
-	
-	                KEYBOARD_LINE_DISCIPLINE ( SC );	
-                    
-					//LINE_DISCIPLINE chama uma função para colocar a mensagem 
-					// na estrutua da janela com foco de entrada. 
-					//#todo, mas agora deverá 
-					//colocar na estrutura da thread atual.
-					
-					//sinalizando, mas acho que o ldisc já faz isso.
-					//#importante: LINE_DISCIPLINE faz isso. 
-					//t->newmessageFlag = 1;  					
-			
-			        return NULL; //sinaliza que não há mensagem 
+					SC = (unsigned char) get_scancode ();
+	                KEYBOARD_LINE_DISCIPLINE ( SC );						
 				}
-				
-				if( t->newmessageFlag == 1 )
-				{
 	
-					//pegando a mensagem.
-			        message_address[0] = (unsigned long) t->window;
-			        message_address[1] = (unsigned long) t->msg;
-			        message_address[2] = (unsigned long) t->long1;
-			        message_address[3] = (unsigned long) t->long2;
+				//pegando a mensagem.
+			    message_address[0] = (unsigned long) t->window;
+			    message_address[1] = (unsigned long) t->msg;
+			    message_address[2] = (unsigned long) t->long1;
+			    message_address[3] = (unsigned long) t->long2;
                     
-					//sinalizamos que a mensagem foi consumida.
-                    t->newmessageFlag = 0; 					
+				//sinalizamos que a mensagem foi consumida.
+                t->newmessageFlag = 0; 					
 				    
-					return (void *) 1; //sinaliza que há mensagem
-				}
+				//sinaliza que há mensagem
+				return (void *) 1; 
+				
 			};
 		    break;
 		

@@ -1,7 +1,8 @@
 /*
- * File: unb\mouse.c
+ * File: i8042/mouse.c
  *
- * Isso aqui está no kernel base.
+ * env:
+ *     Ring 0. Kernel base persistent code.
  * 
  * History:
  * 2017 - Created by Fred Nora. 
