@@ -20,7 +20,6 @@ Groups:
 3 (realtions of production)
 /arch     - Archtechture stuff.
 /bin      - .bin compiled files.
-/build    - Building from differente host platforms.
 /docs     - Documentation.
 /drivers  - Ring0 loadable drivers.
 /fs       - File systems support. Loadable fs.
