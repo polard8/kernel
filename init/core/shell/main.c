@@ -3388,8 +3388,9 @@ do_compare:
 	
 	if ( strncmp( prompt, "t14", 3 ) == 0 )
 	{
+		
+		printf("t14:\n");
 	    testCreateWindow ();
-
 		printf("t14: debug *hang");
 		while(1){}
 		

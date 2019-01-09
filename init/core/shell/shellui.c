@@ -570,7 +570,7 @@ struct window_d *shellCreateMainWindow( int status ){
     //                            left, top, width, height,    
     //                            0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 	
-	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "shell-main",     
+	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "shell-main",     
                                 left, top, width, height,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
@@ -598,20 +598,22 @@ struct window_d *shellCreateMainWindow( int status ){
 
 
 void testCreateWindow (){
-
 	
 	struct window_d *hWindow;
 	
+	//#debug
+	printf("testCreateWindow:\n");
 	
-	apiBeginPaint ();
+	//apiBeginPaint ();
 	
-	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, 1, "XXX",     
+	hWindow = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "XXX",     
                                 40, 40, 400, 400,
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 	
+	
 	if ( (void *) hWindow == NULL )
 	{
-		printf ("FAIL!");
+		printf ("testCreateWindow: FAIL!");
 		while(1){}
 		
 		die ("shell.bin: hWindow fail");
@@ -622,7 +624,7 @@ void testCreateWindow (){
 	
 	apiShowWindow (hWindow);	
 
-    apiEndPaint();
+    //apiEndPaint();
 	
     printf("ok\n");
 };

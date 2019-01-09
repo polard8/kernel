@@ -1,5 +1,5 @@
 /*
- * File: gws\gws\createw.c
+ * File: gws/gws/createw.c
  *
  * Descrição: 
  *     Gerencia os métodos de criação de molduras de janelas e de janelas simples.
@@ -34,9 +34,9 @@
  * se não é flutuante é porque foi pintada no buffer default, que é o Backbuffer.
  *
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - 2018 New features.
  *     ...
  */
 
@@ -69,12 +69,15 @@ que é formada pela barra de títulos, pela borda, pela sombra...
 	 Poderá haver mais de um método de criação de uma frame window.   
  */
  
+
 #include <kernel.h>
+
 
 //Herdadas do Boot Loader.
 // De onde vem isso ?? head.s
 // @todo: Devemos chamar o módulo hal para obtermos esses valores.
 //depois salvamos em variáveis internas usadas pela gui.
+
 extern unsigned long SavedBootBlock;
 extern unsigned long SavedLFB;
 extern unsigned long SavedX;
@@ -176,19 +179,18 @@ void *createwNewWindow()
 //11 - Client Area Color.
 //12 - color (bg) (para janela simples)
  
-void *
-CreateWindow( unsigned long type,         
-              unsigned long status,       
-              unsigned long view,         
-              char *windowname,                                    
-              unsigned long x,                                       
-              unsigned long y,            
-              unsigned long width,        
-              unsigned long height,       
-              struct window_d *pWindow,   
-              int desktopid,              
-              unsigned long clientcolor,  
-              unsigned long color )       
+void *CreateWindow ( unsigned long type, 
+                     unsigned long status, 
+                     unsigned long view, 
+                     char *windowname, 
+                     unsigned long x, 
+                     unsigned long y, 
+                     unsigned long width, 
+                     unsigned long height, 
+                     struct window_d *pWindow, 
+                     int desktopid, 
+                     unsigned long clientcolor, 
+                     unsigned long color ) 
 {	
 	// @todo: O argumento style está faltando.
 	//        cada tipo de tanela poderá ter vários estilos.
@@ -218,12 +220,12 @@ CreateWindow( unsigned long type,
 	int ButtonDown = 0; //??
 	int ButtonUp = 0;   //??
 	int ButtonSysMenu = 0;  //system menu na barra de títulos.	
-    int Border = 0;         //New !!! usado no edit box.
+	int Border = 0;         //New !!! usado no edit box.
 	//int ScrollBar;
 	//...
 	
 	// Desktop support.
-    int ParentWindowDesktopId;    //Id do desktop da parent window.
+	int ParentWindowDesktopId;    //Id do desktop da parent window.
 	int WindowDesktopId;          //Id do desktop da janela a ser criada.
 
 	
@@ -252,7 +254,7 @@ CreateWindow( unsigned long type,
 	
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
-    //unsigned long saveTop;
+	//unsigned long saveTop;
 	
 	
 	// Desktop:
@@ -285,7 +287,7 @@ CreateWindow( unsigned long type,
 	// #bugbug: E quando formos criar a gui->screen, quem será a janela mãe ?
 	
 	if ( (void *) pWindow == NULL )
-    {
+	{
 		Parent = (void *) gui->screen;	
 	
 	} else {
@@ -458,18 +460,14 @@ CreateWindow( unsigned long type,
 		//focus	
 		//window->focus = 0; //determinando que não temos o foco.
 
-		//
 		// @todo:
 		// Se for uma janela filha o posicionamento deve ser somado às margens 
 		// da área de cliente da janela que será a janela mãe.
-		//
 
-		//
 		// #bugbug @todo 
 		// Esses valores de dimensões recebidos via argumento na verdade 
 		// devem ser os valores para a janela, sem contar o frame, que 
 		// inclui as bordas e a barra de títulos.
-		//
 
 		// Dimensões.	
         window->width = width;
@@ -720,10 +718,10 @@ CreateWindow( unsigned long type,
 			
 			//essas flags farão a chamar createwindow 
 			//recursivamente para desenahr os botões.
-			MinimizeButton = 1;   // Botão para minimizar
-		    CloseButton = 1;      // Botão para fechar. 
+			//MinimizeButton = 1;   // Botão para minimizar
+		    //CloseButton = 1;      // Botão para fechar. 
 		    //MenuBar       = 1;  // Barra de menu. 
-	        ButtonSysMenu = 1;    // System menu button. ??
+	        //ButtonSysMenu = 1;    // System menu button. ??
 		    window->shadowUsed = 1;
 		    window->backgroundUsed = 1;
 		    window->titlebarUsed = 1;
@@ -836,6 +834,11 @@ drawBegin:
 	// estiver disponível.
 	// Talvez antes de retornarmos nesse caso seja necessário configurar 
 	// mais elementos da estrutura.
+	
+	//#bugbug
+	//se estamos contruindo a janela, então ela não foi registrada 
+	//não podemos checar as coisas na estrutura ainda,
+	//mas a estrutura ja existe a algumas coisas foram inicializadas.
 	
 	View = 0;
 	View = (int) is_window_minimized(window);

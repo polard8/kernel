@@ -69,7 +69,7 @@ unsigned long cwArg12;     // WindowColor
 
 void servicesPutChar ( int c );
 void servicesChangeProcedure();
-
+unsigned long serviceCreateWindow ( char * message_buffer );
 
 //
 //...
@@ -278,6 +278,12 @@ void *services( unsigned long number,
 	
 	// Serviço especial. Antes dos outros.
 	if ( number == SYS_118 )
+	{
+	    return (void *) serviceCreateWindow ( (char *)  arg2 );
+	}
+	
+	/*
+	if ( number == SYS_118 )
 	{		
 		//Aciona a flag.
 	    //Se a flag tiver acionada, os argumentos usarão os valores 
@@ -309,7 +315,7 @@ void *services( unsigned long number,
 		
 		goto do_create_window;		
 	};
-	
+	*/
 
 	//Number.
 	switch (number)
@@ -430,11 +436,13 @@ void *services( unsigned long number,
 		// O argumento mais importante é o tipo.
 		//Função principal na criação de janelas via systemcall
         case SYS_BUFFER_CREATEWINDOW: 
-			cwArg1 = arg2;               //arg2 Type. 
-            cwArg3 = arg3;               //arg3 view
-			cwArg4 = (char *) a4;        //arg4 Window name.
-			goto do_create_window;
-            break;
+			//printf("SYS_BUFFER_CREATEWINDOW old style\n");
+			//cwArg1 = arg2;               //arg2 Type. 
+            //cwArg3 = arg3;               //arg3 view
+			//cwArg4 = (char *) a4;        //arg4 Window name.
+			//goto do_create_window;
+            return NULL;
+			break;
 			
 			
 		//11, Coloca o conteúdo do backbuffer no LFB.
@@ -1640,6 +1648,7 @@ void *services( unsigned long number,
 // >> do_create_window: é acionada depois de passados todos os argumentos. 
 	
 	
+/*	
 //
 // ## Create window ##
 //
@@ -1661,7 +1670,7 @@ do_create_window:
     //      ...
 
 	//
-	// *Importante: Checando se o esquema de cores está funcionando.
+	// Importante: Checando se o esquema de cores está funcionando.
 	//
 	
 	if ( (void *) CurrentColorScheme == NULL )
@@ -1687,16 +1696,14 @@ do_create_window:
 		//Nothing.
 	};
 	
-	//
+
 	// Nesse momento estamos atribuindo a cor padrão de janelas 
 	// para as janelas que criadas pelos aplicativos através de system calls.
 	// Não há problema nisso por enquanto.
-	//
 	
-	//
 	// *Podemos aceitar as opções de cores passadas por argumento.
 	//  principalmente a cor da área de cliente.
-	//
+
 	
 	//*Importante
 	//definimos as cores psdrão caso a flag esteja desligada.
@@ -1732,13 +1739,11 @@ do_create_window:
 	};	
 	
 
-    //
     // Importante:
 	// Nesse momento é fundamental saber qual é a parent window da janela que vamos criar 
 	// pois a parent window terá as margens que nos guiam.
 	// Essa parent window pode ser uma aba de navegador por exemplo.
 	// >> O aplicativo deve enviar o ponteiro da janela mãe.
-    //	
 	
 	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
 	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
@@ -1788,10 +1793,12 @@ do_create_window:
 		
 		t = (void *) threadList[current_thread];
 		
-		set_thread_priority( t, PRIORITY_HIGH4);
+		set_thread_priority ( t, PRIORITY_HIGH4 );
 		
 	    return (void *) NewWindow; 
 	};
+	
+	*/
 
 //More ...
 //xxx:
@@ -1857,6 +1864,149 @@ void syscall_handler()
 	return;
 };
  */
+
+unsigned long serviceCreateWindow ( char *message_buffer ){
+	
+	unsigned long *message_address = (unsigned long *) message_buffer;
+	
+    struct window_d *NewWindow;  //Ponteiro para a janela criada pelo serviço.
+	
+	
+		cwArg1 = message_address[0];     //Type. 		
+        cwArg2 = message_address[1];     //WindowStatus 
+        cwArg3 = message_address[2];     //view
+		
+		cwArg4 = (char *) message_address[3];    //a4 Window name.
+		
+		cwArg5 = message_address[4]; //x
+		cwArg6 = message_address[5]; //y
+		cwArg7 = message_address[6]; //width
+		cwArg8 = message_address[7]; //height
+		
+		//parent window.
+		//message_address[8];
+		//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
+		cwArg9 = (struct window_d *) message_address[8];  //parent
+		
+		//onde?
+		//message_address[9];
+		//cwArg10 = arg4;  //desktop ID 		
+		
+		cwArg11 = message_address[10];    //cor da area de cliente.
+		cwArg12 = message_address[11];    //cor da janela.	
+	
+	   //==========
+	
+	//Window.
+	unsigned long WindowType;      //Tipo de janela.
+	unsigned long WindowStatus;    //Status, ativa ou não.
+	//unsigned long WindowRect;
+	unsigned long WindowView;      //Min, max.
+	char *WindowName;  
+	
+	unsigned long WindowX = (2*(800/20));  //100;   >          
+	unsigned long WindowWidth  = 320;               
+	
+    unsigned long WindowY = (2*(600/20)); //100;   V                
+    unsigned long WindowHeight = 480;  
+	
+	unsigned long WindowClientAreaColor = COLOR_WINDOW;  
+	unsigned long WindowColor = COLOR_WINDOW;  
+	
+	
+    //#todo: Checar a validade da esturtura,
+	//WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
+	//WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
+	
+        WindowType = cwArg1; 
+		WindowStatus = cwArg2; 
+		WindowView = cwArg3; 
+		WindowName = (char *) cwArg4; 
+	    
+		WindowX = cwArg5; 
+		WindowY = cwArg6; 
+		
+		WindowWidth = cwArg7; 
+        WindowHeight = cwArg8;									  
+		
+		//#todo
+		//gui->screen  = cwArg9; 
+		//desktopID = cwArg10; 
+		
+		WindowClientAreaColor = (unsigned long) cwArg11;  //Obs: A cor da área de cliente será escolhida pelo app.   
+		WindowColor = (unsigned long) cwArg12;     
+	
+	
+	
+	struct thread_d *t;
+	int desktopID;
+	
+	
+	desktopID = (int) get_current_desktop_id();	
+	
+    // Importante:
+	// Nesse momento é fundamental saber qual é a parent window da janela que vamos criar 
+	// pois a parent window terá as margens que nos guiam.
+	// Essa parent window pode ser uma aba de navegador por exemplo.
+	// >> O aplicativo deve enviar o ponteiro da janela mãe.
+	
+	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
+	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
+	//com um endereço da área de memória do app.
+	
+    NewWindow = (void *) CreateWindow ( WindowType, WindowStatus, 
+	                        WindowView, WindowName, 
+	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
+							cwArg9, desktopID, 
+							(unsigned long) WindowClientAreaColor, 
+							(unsigned long) WindowColor );
+	
+	if ( (void *) NewWindow == NULL )
+	{ 
+        //?? Mensagem.
+	    //return NULL; 
+		return 0;
+		
+	}else{	
+        
+		
+		//se a janela foi criada com sucesso, podemos desativar a flag.
+		//*importante, nesse momento precisamos desativar a flag.
+		
+		cwFlag = 0;                  
+		
+        // Obs: 
+		// Quem solicitou a criação da janela pode estar em user mode
+        // porém a estrutura da janela está em kernel mode. #bugbug
+		// Obs:
+		// Para preencher as informações da estrutura, a aplicação
+		// pode enviar diversas chamadas, Se não enviar, serão considerados
+		// os valores padrão referentes ao tipo de janela criada.
+		// Cada tipo tem suas características e mesmo que o solicitante
+		// não seja específico nos detalhes ele terá a janela do tipo que deseja.	
+		
+        //  
+        //@todo: Pode-se refinar os parâmetros da janela na estrutura.
+		//NewWindow->
+		//...
+		
+		//@todo: Não registrar, quem criou que registre a janela.
+		//RegisterWindow(NewWindow);
+		
+		//
+		// Se a tarefa atual está pintando, vamos melhorar a sua prioridade.
+		//
+		
+		t = (void *) threadList[current_thread];
+		
+		set_thread_priority ( t, PRIORITY_HIGH4 );
+		
+		return (unsigned long) NewWindow;
+	    //return (void *) NewWindow; 
+	};
+	
+	
+};
 
 
 // Coloca um char usando o 'terminal mode' de stdio.
