@@ -15,6 +15,7 @@
 // o processo de logon poderá se registrar em um servidor de logon.
 //
 
+
 #include <kernel.h>
 
 
@@ -33,10 +34,10 @@ int gws_wm_status;
 
 
 
-
 //
 // cursor
 //
+
 
 /*
 void gwsEnableTextCursor (){
@@ -51,6 +52,7 @@ void gwsDisableTextCursor (){
 */ 
  
 //abrir o servidor de janelas. 
+
 int gwsOpen (){
 	
 	//Aberto.
@@ -139,24 +141,23 @@ void create_gui (){
 	//        que devem ser deletadas na finalização do logon. @todo.
     // 		
 	
-	gui = (void *) malloc( sizeof(struct gui_d) );
+	gui = (void *) malloc ( sizeof(struct gui_d) );
 	
     if ( (void *) gui == NULL )
 	{	
-	    printf("create_gui:");
-		die();
+	    panic ("gws-create_gui:");
 		
 	} else {
 		
-		// Set user session, window station, desktop, window and menu.
+		// Set user session, room (Window Station), desktop. 
+		// window and menu.
 		
-		current_usersession = 0;        //User Session.
-	    current_room = 0;             //room (Window Station).
-	    current_desktop = 0;        //Desktop.
+		current_usersession = 0;        
+	    current_room = 0;             
+	    current_desktop = 0;        
 		
-		
-	    current_window = 0;         //Window.
-	    current_menu = 0;           //Menu.
+	    current_window = 0;         
+	    current_menu = 0;           
 		
 		
 		// @todo: O logon devveria ter selecionado o perfil do usuário
@@ -247,14 +248,12 @@ void create_gui (){
 						   
 	};
   	
-	//
-	// *** Filtro importante.
-	//
 	
-	if ( (void *) gui == NULL )
-	{
-		printf("create_gui: gui struct");
-		die();
+	//#importante.
+	
+	if ( (void *) gui == NULL ){
+		
+		panic ("gws-create_gui: gui struct");
 	};
 	
 	
@@ -331,25 +330,19 @@ void create_gui (){
 	
 	// Strings.
 	// String no background.
+    // Obs: Informações de ambiemte para o desenvolvedor.
+	//@todo: Informar o desktop atual.
 	
 	if ( (void *) CurrentUser != NULL )
 	{
         if (g_guiMinimal != 1)
-	    {		
-            // Obs: Informações de ambiemte para o desenvolvedor.
-			//@todo: Informar o desktop atual.
-			
-			//#bugbug:
-			//
-			
-		    draw_text ( gui->main, 0, 0, COLOR_WHITE, "User Environment:");
+	    {				
+		    draw_text ( gui->main, 0, 0, COLOR_WHITE, "User Environment");
 		    draw_text ( gui->main, 0, 8, COLOR_WHITE, "================");
 			draw_text ( gui->main, 8*14, 8*4, 
-			    COLOR_WHITE, "Welcome to User Environmet, press F1=HELP.");
+			    COLOR_WHITE, "Welcome to User Environmet, press F1=HELP");
 			draw_text ( gui->main, 8*14, 8*5, COLOR_WHITE, 
 			    "This is the user environment");
-			
-			//draw_text(gui->main, 8*10, 8*12, COLOR_WHITE, "F1=HELP");
 			//...
 			
 			//Outros:
@@ -421,7 +414,8 @@ int grid             //Grid da janela principal.
 	//
 	
 	//Checa validade da estrutura.
-	if( (void*) gui == NULL ){
+	
+	if ( (void*) gui == NULL ){
 		return;
 	}else{	
 	    gui->refresh = refresh; 
@@ -443,8 +437,8 @@ int grid             //Grid da janela principal.
     // @todo: More ?!!
     //	
 	
-done:
-    return;
+//done:
+    //return;
 };
 
 

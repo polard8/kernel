@@ -1,26 +1,14 @@
 /*
- * <3
  * Gramado Operating System - The main file for the kernel.
  * (c) Copyright 2015~2018 - Fred Nora.
  *
- * File: kernel\entry\x86\x86main.c 
+ * File: kernel/entry/x86/x86main.c 
  * 
  * Description:
  *     This is the Kernel Base. 
  *     It's the mains file for a 32 bit x86 Kernel. 
  *     The type is 'hybrid'.
  *     The entry point is in 'head.s'.
- *
- * This is classes for a logic hardware layout.
- *
- * **** Classes: ****
- * ==================
- * 1) kernel.ram               (K5)
- * 2) kernel.io.cpu            (K4)
- * 2) kernel.io.dma            (K3)
- * 3) kernel.devices.unbloqued (K2)
- * 3) kernel.devices.blocked   (K1)
- * 4) kernel.things            (K0)
  *
  * The first three system utilities are: 
  * IDLE.BIN, SHELL.BIN and TASKMAN.BIN.
@@ -43,6 +31,8 @@
  *     2016~2018 - Revision.
  *     //... 
  */ 
+
+
 #include <kernel.h>
 
 
@@ -87,12 +77,12 @@ static inline void mainSetCr3 ( unsigned long value ){
  *      #interna
  *      
  *      Seleciona a primeira thread para rodar e salta para user mode.
- *
  */
-void x86mainStartFirstThread( int n ){
+
+void x86mainStartFirstThread ( int n ){
 	
-	struct thread_d *Thread;
 	int i;
+	struct thread_d *Thread;
 	 
 	if (n < 0)
 	{
@@ -101,13 +91,12 @@ void x86mainStartFirstThread( int n ){
 	}
 	
 	
-	switch (n)
-	{
+	switch (n){
+			
 		case 1:
 		    Thread = IdleThread; 
 		    break;
 			
-		
 		case 2:
 		    Thread = ShellThread;
 			break;
@@ -117,8 +106,7 @@ void x86mainStartFirstThread( int n ){
 		    break;
 			
 		default:
-	        printf("x86mainStartFirstThread.default: thread number fail");
-            die();		
+	        panic ("x86mainStartFirstThread.default: thread number fail");		
 		    break;
 	};
 	
@@ -127,8 +115,7 @@ void x86mainStartFirstThread( int n ){
  
     if ( (void *) Thread == NULL )
     {
-        printf("x86mainStartFirstThread: Thread\n");
-        die();
+        panic ("x86mainStartFirstThread: Thread\n");
 		
     } else {
 
@@ -175,8 +162,8 @@ void x86mainStartFirstThread( int n ){
     refresh_screen(); 
 
 
-    for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ )
-	{
+    for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
+		
         dispatcherReadyList[i] = (unsigned long) Thread;
     }
 
@@ -303,14 +290,12 @@ void startStartIdle (){
     if ( (void *) IdleThread == NULL )
     {
         panic ("x86main-startStartIdle: IdleThread\n");
-        //die();
 		
     }else{
 
         if (IdleThread->saved != 0){
             
 			panic ("x86main-startStartIdle: saved\n");
-            //die();
         };
 
         if (IdleThread->used != 1 || IdleThread->magic != 1234){
@@ -598,16 +583,14 @@ int x86main ( int argc, char *argv[] ){
 											 (unsigned long ) gKernelPageDirectoryAddress ); // Page directory.	
     if( (void *) KernelProcess == NULL )
 	{
-        printf("x86main: KernelProcess\n");
-        die();
+        panic ("x86main: KernelProcess\n");
+
     }else{
  
         processor->CurrentProcess = (void *) KernelProcess;
         processor->NextProcess = (void *) KernelProcess;
 		
-		
 		fs_initialize_process_pwd ( KernelProcess->pid, "no-directory" ); 
-		
 		
         //...
     };
@@ -631,8 +614,8 @@ int x86main ( int argc, char *argv[] ){
 										  (unsigned long ) CreatePageDirectory () ); 	
     if ( (void *) InitProcess == NULL )
 	{
-        printf("x86main: InitProcess\n");
-        die();
+        panic ("x86main: InitProcess\n");
+
     }else{
 		
 		fs_initialize_process_pwd ( InitProcess->pid, "no-directory" );
@@ -645,8 +628,8 @@ int x86main ( int argc, char *argv[] ){
     IdleThread = (void *) KiCreateIdle ();
     if ( (void *) IdleThread == NULL )
 	{
-        printf("x86main: IdleThread\n");
-        die();
+        panic ("x86main: IdleThread\n");
+
     }else{
 
         //IdleThread->ownerPID = (int) InitProcess->pid;
@@ -676,8 +659,8 @@ int x86main ( int argc, char *argv[] ){
 										   RING3, 
 										   (unsigned long )  CreatePageDirectory () );
     if((void *) ShellProcess == NULL){
-        printf("x86main: ShellProcess\n");
-        die();
+        panic ("x86main: ShellProcess\n");
+
     }else{
 		
 		fs_initialize_process_pwd ( ShellProcess->pid, current_workingdiretory_string );
@@ -685,14 +668,13 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 		
-	
     //=============================================
     // Create shell Thread. tid=1. 
     ShellThread = (void *) KiCreateShell();
     if( (void *) ShellThread == NULL )
 	{
-        printf("x86main: ShellThread\n");
-        die();
+        panic ("x86main: ShellThread\n");
+
     }else{
 
         //ShellThread->ownerPID = (int) ShellProcess->pid;
@@ -718,8 +700,9 @@ int x86main ( int argc, char *argv[] ){
 											 RING3, 
 											 (unsigned long )  CreatePageDirectory () ); 	
     if ( (void *) TaskManProcess == NULL ){
-        printf("x86main: TaskManProcess\n");
-        die();
+		
+        panic ("x86main: TaskManProcess\n");
+		
     }else{
 		
 		fs_initialize_process_pwd ( TaskManProcess->pid, "no-directory" );
@@ -728,15 +711,14 @@ int x86main ( int argc, char *argv[] ){
     };
 	
     //===================================
-    //Create taskman Thread. tid=2.
-    
+    //Create taskman Thread. tid=2.   
 	
 	TaskManThread = (void *) KiCreateTaskManager();
     	
 	if( (void *) TaskManThread == NULL )
 	{
-        printf("x86main: TaskManThread\n");
-        die();
+        panic ("x86main: TaskManThread\n");
+
     }else{
 
         //TaskManThread->ownerPID = (int) TaskManProcess->pid;
@@ -761,8 +743,8 @@ int x86main ( int argc, char *argv[] ){
 	RING0IDLEThread = (void *) KiCreateRing0Idle();
     if( (void *) RING0IDLEThread == NULL )
 	{
-        printf("x86main: RING0IDLEThread\n");
-        die();
+        panic ("x86main: RING0IDLEThread\n");
+
     }else{
 
         //RING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
@@ -806,13 +788,9 @@ int x86main ( int argc, char *argv[] ){
 */	
 #endif	
 
-
-
     //
 	//===============================================
 	//
-	
-	
 	
 	//
 	//==============================================
@@ -1089,7 +1067,6 @@ int x86main ( int argc, char *argv[] ){
 	while(1){}
 	*/
 	
-
 	
 #ifdef BREAKPOINT_TARGET_AFTER_ENTRY
     //#debug 

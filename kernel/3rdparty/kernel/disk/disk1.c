@@ -169,28 +169,31 @@ _u8 ata_assert_dever (_i8 nport){
     case 0:
         ata.channel = 0;
         ata.dev_num = 0;
-    break;
+        break;
+			
     case 1:   
         ata.channel = 0;
         ata.dev_num = 1;
-    break;
+        break;
+			
     case 2:
         ata.channel = 1;
         ata.dev_num = 0;
-    break;
+        break;
+			
     case 3:
         ata.channel = 1;
         ata.dev_num = 1;
-    break;
+        break;
     
     default:
         kprintf ("Port %d, volue not used\n", nport );
         return -1;
-     break;
+        break;
     };
 
     set_ata_addr (ata.channel);
-
+	
     return 0;
 };
 
@@ -198,14 +201,13 @@ _u8 ata_assert_dever (_i8 nport){
 /*
  *********************************************
  * ide_identify_device:
- * 
  */
+
 int ide_identify_device ( uint8_t nport ){
 
     _u8 status;
     _u8 lba1, lba2;
-	
-	
+		
 	struct disk_d *disk;
 	
 
@@ -520,8 +522,8 @@ static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Addres
 
 void set_ata_addr (int channel){
 
-    switch (channel)
-	{
+    switch (channel){
+			
         case ATA_PRIMARY:
             ata.cmd_block_base_address  = ATA_BAR0;
             ata.ctrl_block_base_address = ATA_BAR1;
@@ -534,15 +536,14 @@ void set_ata_addr (int channel){
             ata.bus_master_base_address = ATA_BAR4 + 8;
             break;
 			
-        default:
+        //default:
             //PANIC
-            break;
+            //break;
     };
 
-done:
-    return;
+//done:
+    //return;
 };
-
 
 
 
@@ -568,10 +569,9 @@ uint32_t  dev_next_pid = 0;  // O próximo ID de unidade disponível.
 /*
  ********************************************************
  * ide_mass_storage_initialize:
- *     Rotina de inicialização de dispositivo de 
- * armazenamento de dados.
- *
+ *     Rotina de inicialização de dispositivo de armazenamento de dados.
  */
+
 void ide_mass_storage_initialize (){
 	
 	int port;
@@ -581,7 +581,12 @@ void ide_mass_storage_initialize (){
     //	
 	
 	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
+	
+	//#todo
+	//We need to check the pointer validation.
+	//if ( (void *) ready_queue_dev == NULL )
+		//fail
 	
 	current_dev = ( struct st_dev * ) ready_queue_dev;
     current_dev->dev_id      = dev_next_pid++;
@@ -594,7 +599,6 @@ void ide_mass_storage_initialize (){
     // ??
 	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
-
 	//
 	// Sondando dispositivos e imprimindo na tela.
 	//
@@ -604,17 +608,18 @@ void ide_mass_storage_initialize (){
 		
         ide_dev_init(port);
 	}
-    
-done:
-    return;
+	
+//done:
+    //return;
 };
 
 
 /*
- *******************************************************************
+ ********************************************************
  * ide_dev_init:
  *     ?? Alguma rotina de configuração de dispositivos.
  */
+
 int ide_dev_init (char port){
 	
     int data;
@@ -713,19 +718,16 @@ int ide_dev_init (char port){
     //Dados em comum.
 
     new_dev->dev_id = dev_next_pid++;
-	
     new_dev->dev_num = ata.dev_num;
-    
 	new_dev->dev_channel= ata.channel;
-
     new_dev->dev_nport = port;
     
 	//
 	// port
 	//
 	
-	switch ( port )
-	{
+	switch ( port ){
+			
         case 0:
             dev_nport.dev0 = 0x81;
             break;
@@ -778,10 +780,9 @@ int ide_dev_init (char port){
 };
 
 
-/*
- * dev_switch:
- *     ?? Porque esse tipo ??
- */
+/* dev_switch:
+ *     ?? Porque esse tipo ?? */
+
 static inline void dev_switch (void){
 	
 	// ??
@@ -819,9 +820,8 @@ static inline int getpid_dev (){
 
 
 /*
- * getnport_dev:
- *
- */
+ * getnport_dev: */
+
 static inline int getnport_dev (){
 
 	//#todo:
@@ -855,7 +855,8 @@ int nport_ajuste ( char nport ){
 	    return (int) 1; 
 	}
 	
-done:
+//done:
+	
     return (int) 0;
 };
 
@@ -1023,10 +1024,8 @@ static inline _void ata_set_device_and_sector ( _u32 count, _u64 addr,\
 #define dma_bus_read    0
 #define dma_bus_write   1
 
-
 // Status dma
 #define ide_dma_sr_err     0x02
-
 
 // Registros bus master base address
 #define ide_dma_reg_cmd     0x00
@@ -1078,10 +1077,8 @@ ide_dma_data ( void *addr,
 	
     data = inb( ata.bus_master_base_address + ide_dma_reg_cmd ) &~8;
 
-	//
 	// TODO bit 8 Confilito no Oracle VirtualBox
 	// Obs: Isso foi enviado via argumento e agora foi alerado.
-	//
 	
     flg = 1;  
 	
@@ -1177,32 +1174,30 @@ const char *pci_classes[] = {
 };
 					   
 					   
-/*
- * read_pci_config_addr:
- *     READ
- */
-uint32_t diskReadPCIConfigAddr ( int bus, 
-                                 int dev,
-							     int fun, 
-							     int offset )
+/* read_pci_config_addr:
+ *     READ */
+
+uint32_t 
+diskReadPCIConfigAddr ( int bus, 
+                        int dev,
+						int fun, 
+						int offset )
 {
     outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 	
-//done:
-
     return (uint32_t) inportl(PCI_PORT_DATA);
 };
 
 
-/*
- * write_pci_config_addr:
- *     WRITE
- */
-void diskWritePCIConfigAddr ( int bus, 
-                              int dev,
-						 	 int fun, 
-							 int offset, 
-							 int data )
+/* write_pci_config_addr:
+ *     WRITE */
+
+void 
+diskWritePCIConfigAddr ( int bus, 
+                         int dev,
+						 int fun, 
+						 int offset, 
+						 int data )
 {
     outportl ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 	
@@ -1217,6 +1212,7 @@ void diskWritePCIConfigAddr ( int bus,
  * diskATAPCIConfigurationSpace:
  *     Espaço de configuraçao PCI Mass Storage
  */
+
 int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	
     uint32_t data;
@@ -1245,23 +1241,20 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	
     data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
     
-	// Salvando informações.
-	
+	// Saving info.
 	// Classe e sub-classe.
-    ata_pci.classe = data >> 24 &0xff;
-    ata_pci.subclasse = data >> 16 &0xff;
-    
-	// prog if.
-	ata_pci.prog_if = data >> 8 &0xff;
-   
-    // Revision.
-    ata_pci.revision_id = data &0xff;
+    // prog if.
+	// Revision.
+	
+	ata_pci.classe      = data >> 24 & 0xff;
+    ata_pci.subclasse   = data >> 16 & 0xff;
+	ata_pci.prog_if     = data >> 8  & 0xff;
+    ata_pci.revision_id = data       & 0xff;
 
 	
 	// #importante:
 	// Aqui detectamos o tipo de dispositivo com base 
 	// nas informações de classe e subclasse.
-	
 	
 	//
 	//  ## IDE ##
@@ -1473,18 +1466,16 @@ done:
 /*
  ********************************************************************
  * pci_scan_device:
- *
  *     Esta função deve retornar o número de barramento, 
  * o dispositivo e a função do dispositivo conectado ao barramento PCI 
  * de acordo a classe.
- *
  */
+
 uint32_t diskPCIScanDevice ( int class ){
 	
     int bus, dev, fun;
     
 	uint32_t data = -1;
-
 	
 #ifdef KERNEL_VERBOSE		
 	printf("sm-disk-disk-diskPCIScanDevice:\n");
@@ -1507,16 +1498,12 @@ uint32_t diskPCIScanDevice ( int class ){
 				if ( ( data >> 24 &0xff ) == class )
 				{
 					
-					
-                    // Message.
 //#ifdef KERNEL_VERBOSE							
 					kprintf( "[ Detected PCI device: %s ]\n", 
 					         pci_classes[class] );
 //#endif
 							 
-					//
 					// Done !
-					//
                     
 					return (uint32_t) ( fun + (dev*8) + (bus*32) );
                 }
@@ -1525,11 +1512,9 @@ uint32_t diskPCIScanDevice ( int class ){
         };
     };
 
-	//
 	// Fail !
-	//
     
-	kprintf("[ PCI device NOT detected ]\n");		
+	kprintf("PCI device NOT detected\n");		
 	refresh_screen();
 	
     return (uint32_t) (-1);
@@ -1543,6 +1528,7 @@ uint32_t diskPCIScanDevice ( int class ){
  * sobre o disco.
  * Credits: Nelson Cole;
  */
+
 int diskATAInitialize ( int ataflag ){
 	
 	int Status = 1;  //error
@@ -1555,9 +1541,7 @@ int diskATAInitialize ( int ataflag ){
 	_u8 fun;
 	
 	
-	//
 	// Configurando flags do driver.
-	//
 	
 	ATAFlag = (int) ataflag;
 	
@@ -1679,42 +1663,37 @@ int diskATAInitialize ( int ataflag ){
 	
 	
 
-    //
-    // Vamos trabalhar na lista de dispositivos.
-    //	
+        //
+        // Vamos trabalhar na lista de dispositivos.
+        //	
 	
-	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
+	    // Iniciando a lista.
+	    ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
 	
-	//#todo:
-	//Checar a validade da estrutura.
+	    //#todo:
+	    //Checar a validade da estrutura.
 	
-	current_dev = ( struct st_dev * ) ready_queue_dev;
+	    current_dev = ( struct st_dev * ) ready_queue_dev;
     
-	current_dev->dev_id = dev_next_pid++;
-    
-	current_dev->dev_type = -1;
-    current_dev->dev_num = -1;
-    current_dev->dev_channel = -1;
-    current_dev->dev_nport = -1;
-    current_dev->next = NULL;
+	    current_dev->dev_id = dev_next_pid++;
+	    current_dev->dev_type = -1;
+        current_dev->dev_num = -1;
+        current_dev->dev_channel = -1;
+        current_dev->dev_nport = -1;
+        current_dev->next = NULL;
 
-    // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
+        // ??
+	    ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
 
-
-	//
-	// Sondando dispositivos e imprimindo na tela.
-	//
+        // Sondando dispositivos e imprimindo na tela.
 	
-    // As primeiras quatro portas do controlador IDE.    
-	for ( port=0; port < 4; port++ )
-	{
-        ide_dev_init(port);
-	};		
+        // As primeiras quatro portas do controlador IDE.    
+	    for ( port=0; port < 4; port++ )
+	    {
+            ide_dev_init(port);
+	    };		
 		
-		
-		
+			
 		//
 		// Agora se for AHCI.
 		//
@@ -1951,6 +1930,7 @@ int disk_ata_wait_irq (){
 	
     return (int) 0;
 };
+
 
 //
 // End.

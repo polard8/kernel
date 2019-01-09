@@ -754,12 +754,9 @@ done:
 };
 
 
+/* sys_showkernelinfo:
+ *     Show kernel info. */
 
-
-/*
- * sys_showkernelinfo:
- *     Show kernel info.
- */
 void sys_showkernelinfo (){
 	
 	KiInformation ();
@@ -810,12 +807,6 @@ int init_executive (){
 	
 	return (int) Status;
 };
-
-
-/*
-int executiveInit()
-{};
-*/
 
 
 //
