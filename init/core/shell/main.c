@@ -1,5 +1,5 @@
 /*
- * File: main.c Norax Shell
+ * File: main.c 
  *
  * Essa é uma versão do shell apenas par ao kernel norax,
  * deve ser full screens sem frames. Só o suficiente para digitar
@@ -618,7 +618,7 @@ int shmain ( int argc, char **argv ){
 	struct window_d *hWindow;    
 
 	//JANELA CRIADA NA ÁREA DE CLIENTE DA JANELA PRINCIPAL.
-    //struct window_d *hWindow2;       
+    struct window_d *hWindow2;       
 	
 	//struct message_d *m;
 
@@ -905,18 +905,13 @@ noArgs:
     //                            0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
 
-	//printf("HOLAMBRA KERNEL SHELL\n");	
-    //printf("#debug breakpoint");	
-	//while(1){} 
-
-
-	if ( (void *) hWindow == NULL )
-	{
-		printf ("FAIL!");
-		while(1){}
-		
-		die ("shell.bin: hWindow fail");
-	}
+	//if ( (void *) hWindow == NULL )
+	//{
+	//	printf ("FAIL!");
+	//	while(1){}
+	//	
+	//	die ("shell.bin: hWindow fail");
+	//}
 	
 	
 	//printf("HOLAMBRA KERNEL SHELL\n");	
@@ -962,14 +957,14 @@ noArgs:
 	// Precisamos mostrar a janela e não repintar 
 	// a tela toda.
 	
-    APIRegisterWindow (hWindow);
+    //APIRegisterWindow (hWindow);
     //APISetActiveWindow (hWindow);	
     //APISetFocus (hWindow);
 	
 	//#test
 	//vamos mostrar a janela do shell antes de criarmos a janela 
 	//da área de cliente
-	apiShowWindow (hWindow);
+	//apiShowWindow (hWindow);
 	
 	//#test 
 	//Criando um timer.
@@ -989,20 +984,16 @@ noArgs:
 	//refresh_screen ();
 	
 	
-	//
+
 	// #importante:
 	// +pegamos o retângulo referente à area de cliente da janela registrada. 
 	// +atualizamos as variáveis que precisam dessa informação. 
 	// reposicionamos o cursor.
 	// reabilitamos a piscagem de cursor.
-	//
 	
  
-
-	//3bugbug
-	//vamos suspender isso porque estamos usando janela WT_SIMPLE,
-	//e sanela simples não tem área de cliente 
-	
+	//#bugbug
+	//Isso falhou. Vamos deixar pra depois.
 	// +pegamos o retângulo referente à area de cliente da janela registrada. 
 	//unsigned long xbuffer[8];	
 	//system_call ( 134, (unsigned long) hWindow, 
@@ -1012,7 +1003,8 @@ noArgs:
 	//terminal_rect.width = xbuffer[2];
 	//terminal_rect.height = xbuffer[3];	
 	
-	//...
+	
+
 	
 	terminal_rect.left = wpWindowLeft;
 	terminal_rect.top = wpWindowTop;
@@ -1043,7 +1035,11 @@ noArgs:
 	}
 	
 	
-        //#debug
+    //#debug
+	//#todo: 
+	//#debug mostrar as informações obtidas antes de começar a usar
+	//...	
+
 		/*
 	    printf("## debug ## \n");
 	    printf("terminal_rect: 2\n");	
@@ -1054,7 +1050,6 @@ noArgs:
 			terminal_rect.height );	
 	   */
 	
-	//printf("HOLAMBRA KERNEL SHELL\n");	
     //printf("#debug breakpoint");
     //while(1){} 	
 	
@@ -1064,25 +1059,29 @@ noArgs:
 	// ## Janela para texto ##
 	//
 	
-    /*
-    apiBeginPaint();
+  
+    //apiBeginPaint();
 	
 	//mudando as dimensões a janela dentro da área de cliente.
 	
-	terminal_rect.left = terminal_rect.left +2;
-	terminal_rect.top = terminal_rect.top +2;
-	
-	terminal_rect.width = terminal_rect.width -4 -40; //8 * 80;
-	terminal_rect.height = terminal_rect.height -4; //8 * 32;
-	
-	//terminal_rect.width = 8 * 80;
-	//terminal_rect.height = 8 * 32;
+	//terminal_rect.left = terminal_rect.left +2;
+	//terminal_rect.top = terminal_rect.top +2;
+	//terminal_rect.width = terminal_rect.width -4 -40;  //8 * 80;
+	//terminal_rect.height = terminal_rect.height -4;    //8 * 32;
+
+	//área de cliente fake.
+	terminal_rect.left   = terminal_rect.left  +4;
+	terminal_rect.top    = terminal_rect.top   +60;
+	terminal_rect.width  = terminal_rect.width  -60;  //8 * 80;
+	terminal_rect.height = terminal_rect.height -100;  //8 * 32;
+
+
 	
 	
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
 	                        terminal_rect.left, terminal_rect.top, 
 					        terminal_rect.width, terminal_rect.height,    
-                            0, 0, SHELL_TERMINAL_COLOR2, SHELL_TERMINAL_COLOR2 );	   
+                            0, 0, COLOR_TERMINAL2, COLOR_TERMINAL2);	   
 
 						
 	if ( (void *) hWindow2 == NULL )
@@ -1090,7 +1089,7 @@ noArgs:
 		die ("shell.bin: hWindow2 fail");
 	}	
 	
-	apiEndPaint();
+	
 	
     APIRegisterWindow (hWindow2);
     //APISetActiveWindow (hWindow2);	
@@ -1104,8 +1103,8 @@ noArgs:
 	//vamos mostrar a janela da área do cliente, depois de 
 	//termos mostrado a janela mãe.
 	apiShowWindow (hWindow2);
-	*/
-	
+
+	//apiEndPaint();
 	
 	
 	//===========================================================
@@ -1145,23 +1144,17 @@ noArgs:
 	// para essa janela e não apenas ao procedimento de janela do sistema.
 	// # provavelmente isso marca os limites para a impressão de caractere em modo terminal 
 
-	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow, 
-		(unsigned long) hWindow, (unsigned long) hWindow );
+	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow2, 
+		(unsigned long) hWindow2, (unsigned long) hWindow2 );
 		
 				 
 	//salva ponteiro da janela principal e da janela do terminal. 
 	shell_info.main_window = ( struct window_d * ) hWindow;			 
-	shell_info.terminal_window = ( struct window_d * ) hWindow;		
+	shell_info.terminal_window = ( struct window_d * ) hWindow2;		
 	
 	//
 	// @todo: Apenas registrar o procedimento dessa janela na sua estrutura no kernel..
-    // 
-	
-	
-	//printf("HOLAMBRA KERNEL SHELL\n");	
-    //printf("#debug breakpoint");
-    //while(1){} 		
-	
+    // 			
 	
 	//===========================
 	
@@ -1174,7 +1167,7 @@ noArgs:
     //#BUGBUG
     //Estamos passando um ponteiro que é uma variável local.	
 
-	Status = (int) shellInit (hWindow); 
+	Status = (int) shellInit (hWindow2); 
 	
 	if ( Status != 0 ){
 		die ("SHELL.BIN: app_main: shellInit fail");
