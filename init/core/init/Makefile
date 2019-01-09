@@ -48,10 +48,6 @@ conio.o
 
 
 
-
-
-
-
 .PHONY: all all-c shell-link finalize clean
 
 all: head.o main.o all-c shell-link finalize clean

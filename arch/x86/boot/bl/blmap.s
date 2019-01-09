@@ -345,20 +345,20 @@ Linker script and memory map
                 0x0000000000026000                . = ALIGN (0x1000)
  *fill*         0x00000000000250ad      0xf53 
 
-.rodata         0x0000000000026000      0x60c
- .rodata        0x0000000000026000       0x59 main.o
- *fill*         0x0000000000026059        0x3 
- .rodata        0x000000000002605c       0xed loader.o
- .rodata        0x0000000000026149       0x11 init.o
- *fill*         0x000000000002615a        0x2 
- .rodata        0x000000000002615c       0x38 stdio.o
- .rodata        0x0000000000026194       0x44 pci.o
- .rodata        0x00000000000261d8        0xc procedure.o
- .rodata        0x00000000000261e4      0x1c8 fs.o
- .rodata        0x00000000000263ac      0x1b2 shell.o
- .rodata        0x000000000002655e        0xd abort.o
- *fill*         0x000000000002656b        0x1 
- .rodata        0x000000000002656c       0xa0 faults.o
+.rodata         0x0000000000026000      0x610
+ .rodata        0x0000000000026000       0x5f main.o
+ *fill*         0x000000000002605f        0x1 
+ .rodata        0x0000000000026060       0xed loader.o
+ .rodata        0x000000000002614d       0x11 init.o
+ *fill*         0x000000000002615e        0x2 
+ .rodata        0x0000000000026160       0x38 stdio.o
+ .rodata        0x0000000000026198       0x44 pci.o
+ .rodata        0x00000000000261dc        0xc procedure.o
+ .rodata        0x00000000000261e8      0x1c8 fs.o
+ .rodata        0x00000000000263b0      0x1b2 shell.o
+ .rodata        0x0000000000026562        0xd abort.o
+ *fill*         0x000000000002656f        0x1 
+ .rodata        0x0000000000026570       0xa0 faults.o
 
 .eh_frame       0x0000000000027000     0x1620
  .eh_frame      0x0000000000027000       0xf4 main.o

@@ -126,5 +126,6 @@ finalize:
 	
 clean:
 	find . -type f -name '*.o' -delete
+	-rm BL.BIN
 	
 	

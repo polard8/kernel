@@ -13,9 +13,9 @@
 
 
 VERSION = 0
-PATCHLEVEL = 5
+PATCHLEVEL = 6
 SUBLEVEL = 0
-EXTRAVERSION =
+EXTRAVERSION = rc2
 NAME = Soberano
 
 #todo:
@@ -147,30 +147,8 @@ serial.o \
 debug.o \
 abort.o \
 x86fault.o \
-services.o
+services.o    
 
-
-
-# check dependencies this works only in debian based distros
-#if [ $(dpkg-query -W -f='${Status}' nasm 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install nasm
-#fi
-
-#if [ $(dpkg-query -W -f='${Status}' binutils 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install binutils
-#fi
-
-#if [ $(dpkg-query -W -f='${Status}' gcc 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install gcc
-#fi
-
-#if [ $(dpkg-query -W -f='${Status}' make 2>/dev/null | grep -c "ok installed") -eq 0 ];
-#then
-	# sudo apt-get install make
-#fi
 
 
 
@@ -179,11 +157,9 @@ services.o
 #os cripts ficarão em /scripts
 #os alvos aqui chama chama os scripts
 
-
-    #ISSO DIZ QUE O ALVO NAO EH ARQUIVO
-	#É para informar ao make não procurar por um arquivo com esse nome
-
-	#.PHONY x86
+#ISSO DIZ QUE O ALVO NAO EH ARQUIVO
+#É para informar ao make não procurar por um arquivo com esse nome
+#.PHONY x86
 
 xxx_x86: /mnt/holambravhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
 
@@ -265,7 +241,7 @@ compile-kernel:
 	# dd/devmgr
 	gcc -c kernel/execve/dd/devmgr/devmgr.c  -I include/ $(CFLAGS) -o devmgr.o
 
-	#dd/i8042
+	# dd/i8042
 	gcc -c kernel/execve/dd/i8042/i8042.c     -I include/ $(CFLAGS) -o i8042.o
 	gcc -c kernel/execve/dd/i8042/keyboard.c  -I include/ $(CFLAGS) -o keyboard.o
 	gcc -c kernel/execve/dd/i8042/mouse.c     -I include/ $(CFLAGS) -o mouse.o
@@ -273,10 +249,10 @@ compile-kernel:
 	gcc -c kernel/execve/dd/i8042/ps2mouse.c  -I include/ $(CFLAGS) -o ps2mouse.o
 
 
-	#dd/ldisc
+	# dd/ldisc
 	gcc -c kernel/execve/dd/ldisc/ldisc.c  -I include/ $(CFLAGS) -o ldisc.o
 
-	#dd/pci
+	# dd/pci
 	gcc -c kernel/execve/dd/pci/pci.c  -I include/ $(CFLAGS) -o pci.o
 
 	gcc -c kernel/execve/dd/network/intel.c    -I include/ $(CFLAGS) -o nicintel.o
@@ -301,7 +277,7 @@ compile-kernel:
 	# /sci
 	gcc -c kernel/execve/sci/services.c  -I include/ $(CFLAGS) -o services.o
 
-	#/sm
+	# /sm
 	gcc -c kernel/execve/sm/init/init.c    -I include/ $(CFLAGS) -o init.o
 	gcc -c kernel/execve/sm/ob/object.c    -I include/ $(CFLAGS) -o object.o
 	gcc -c kernel/execve/sm/sys/modules.c  -I include/ $(CFLAGS) -o modules.o
@@ -317,9 +293,6 @@ compile-kernel:
 	gcc -c kernel/execve/sm/disk/diskvol.c     -I include/ $(CFLAGS) -o diskvol.o
 	gcc -c kernel/execve/sm/install/install.c  -I include/ $(CFLAGS) -o install.o
 	gcc -c kernel/execve/sm/debug/debug.c      -I include/ $(CFLAGS) -o debug.o
-
-	#rem echo ~{ ...
-	#echo ~{ ux1 /gws \o/
 
 	# k\gws\gws
 	# Gramado Window Server.
@@ -352,8 +325,6 @@ compile-kernel:
 	# *gui (GRAMADO)
 	gcc -c kernel/gws/gws.c   -I include/ $(CFLAGS) -o gws.o
 
-	#bugbug:
-	#todo: usar uma lista ordenada de objetos.
 
 link-x86:
 	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map kmap.s
@@ -362,8 +333,6 @@ link-x86:
     # gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Wl,-Map=kernel/kmap.s -lgcc"
 
 	mv KERNEL.BIN bin/
-# clean the output trash
-	# make clean
 
 vhd-x86:
 	nasm -I arch/x86/boot/vhd/stage1/ \
@@ -386,20 +355,19 @@ vhd-mount:
 	-sudo umount /mnt/holambravhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/holambravhd/
 
-##
 # Copy content to disk
-##
+# 1) BM, BL 
+# 2) KERNEL 
+# 3) INIT, SHELL, TASKMAN
 vhd-copy-files:
 	sudo cp bin/BM.BIN       /mnt/holambravhd
 	sudo cp bin/BL.BIN       /mnt/holambravhd
+	
 	sudo cp bin/KERNEL.BIN   /mnt/holambravhd
+	
 	sudo cp bin/INIT.BIN     /mnt/holambravhd
 	sudo cp bin/SHELL.BIN    /mnt/holambravhd
 	sudo cp bin/TASKMAN.BIN  /mnt/holambravhd
-	
-	sudo cp bin/JACKPOT.BIN  /mnt/holambravhd
-	sudo cp bin/TASCII.BIN   /mnt/holambravhd
-	sudo cp bin/CHTEST.BIN   /mnt/holambravhd
 	
 # configs
 	sudo cp arch/x86/boot/vhd/INIT.TXT /mnt/holambravhd
@@ -418,25 +386,14 @@ vhd-copy-files:
 # fonts
 	sudo cp bin/NC2.FON /mnt/holambravhd
 
-	# sudo cp bin/FCLASS.BIN   /mnt/noraxvhd
-	# sudo cp bin/GRAMCC.BIN   /mnt/noraxvhd
-	# sudo cp bin/JACKPOT.BIN  /mnt/noraxvhd
-	# sudo cp bin/TASCII.BIN   /mnt/noraxvhd
-	# sudo cp bin/TEDITOR.BIN  /mnt/noraxvhd
-	# sudo cp bin/TGFE.BIN     /mnt/noraxvhd
-
 # umount
 vhd-unmount:
 	sudo umount /mnt/holambravhd
-
-
-
 
 /mnt/holambravhd:
 	sudo mkdir /mnt/holambravhd
 
 clean:
-	#find . -type f -name '*.o' -delete
 	-rm *.o
 
 	@echo "Success?"

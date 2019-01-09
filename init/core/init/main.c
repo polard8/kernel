@@ -117,28 +117,23 @@ void idleLoop (){
 
  
 
-
- 
 /*
  ************************
  * initMain:
  *     main().
- *
  */ 
-static char * argv[] = { "-init",NULL };
-static char * envp[] = { "ROOT=root:/volume0", NULL };
+
+static char *argv[] = { "-init",NULL };
+static char *envp[] = { "ROOT=root:/volume0", NULL };
 
 void initMain (void){
-	
-	//nothing for now.
-	
-	
+		
 	libcInitRT ();
-    
 	stdioInitialize ();		
 	
 	// #debug
 	// Testing output message.
+	
 	printf("initMain: INIT.BIN is alive \n");
     refresh_screen();	
 };
@@ -153,8 +148,8 @@ void initMain (void){
  * de driver. Faremos uma chamada ao Kernel dizendo que o driver está 
  * inicializado. Na chamada passaremos alguns parâmetros, como: O número do 
  * serviço, 129 e o código de confirmação, 1234. 4321.
- *
  */
+
 void driverInitialize (){
 	
 	// Inicializando o servidor.
@@ -174,6 +169,7 @@ void driverInitialize (){
  * driver, this is where the driver would clean up any resources held by 
  * this driver. (m$)
  */
+
 void driverUninitialize (){
 	
 	// Finalizando o servidor.
@@ -253,6 +249,7 @@ unsigned long idleServices (unsigned long number){
  * idleInit:
  *     Inicializando a aplicação Idle.
  */
+
 int idleInit (){
 	
 	idleStatus = 0;

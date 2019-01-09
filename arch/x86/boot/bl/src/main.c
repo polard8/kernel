@@ -332,27 +332,26 @@ void BlKernelModuleMain (){
  * estado hlt durante um erro fatal. Para que ele não fique 
  * funcionando a 100% num loop infinito.
  */
- 
+
+// Final message !
+// Bullet, Message.
+// Wait forever. 
+// Halt system.	
+//
+//  No return.
+//	     	
+
+
 void die (){
 	
-    // Final message !
-	// Bullet, Message.
-    
-	printf ("* System Halted");    
+	printf ("[BL]: * System Halted");    
 	refresh_screen ();
 	   
-	// Wait forever. 
-    // Halt system.	
-	
 	while (1){
 		
 	    asm("cli"); 	
 	    asm("hlt");    		
 	};                        
-    
-	//
-    //  No return.
-    //	     	
 };
  
 

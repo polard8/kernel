@@ -4,8 +4,10 @@
  *     2018 - Create by Fred Nora.
  *     Based on original font Nelson Cole. 
  */
-static unsigned char 
-font_nelson_cole2[128*8] = {
+
+
+static unsigned char font_nelson_cole2[128*8] = {
+	
 //0  
 	0x00, //    00000000
 	0x00, //    00000000
