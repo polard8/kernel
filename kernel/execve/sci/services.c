@@ -1603,15 +1603,13 @@ void *services( unsigned long number,
 			
 		//255 - Mostra informações sobre o kernel.	
 		case SYS_SHOWKERNELINFO: 
-			KiInformation();
-			refresh_screen();
+			KiInformation ();
+			//refresh_screen ();
 			break;
 			
-		//
 		// @todo:
-		// Need to check the system call ID to ensure it’s valid…
-		// If it’s invalid, return ENOSYS “Function not implemented” error
-		//
+		// Need to check the system call ID to ensure it's valid 
+		// If it s invalid, return ENOSYS Function not implemented error
 		
 		default:	
 			printf ("services: Default {%d}\n", number );

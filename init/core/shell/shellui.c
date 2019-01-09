@@ -507,13 +507,6 @@ void shellCreateEditBox (){
 
 /*
  ******************** 
- * shellCreateTaskBar:
- *
- *     CRIANDO A TOP BAR.
- *     Obs: Essa é uma janela filha.
- *     @todo: ?? e o procedimento de janela ?? e as mensagens ??
- *     Obs: É uma janela simples e limpa, feita para dispositivos IOT 
- * com resolução 800x600.
  *
  */
  

@@ -5,8 +5,8 @@
 #define FRED_VHD_32MB
 
 #if	defined(FRED_VHD_32MB)
-//#define VHD_32MB_CHS { 0x35E, 0x4, 0x13, 0 }  
 #define VHD_32MB_CHS { 862, 4, 19,  0 }  
+//#define VHD_32MB_CHS { 0x35E, 0x4, 0x13, 0 }  
 #else 
 #error "must define vhd"	
 #endif
@@ -20,8 +20,8 @@
 
 
 // gcc version:
-// gcc (GCC) 3.4.2 (mingw-special)
-// 
+// gcc (GCC) 3.4.2 (mingw-special) windows
+// gcc 8 on manjaro
 
 // #importante:
 // O kernel tem três possíveis processos usados na inicialização.
@@ -34,23 +34,18 @@
 // falhar na inicialização, por enquanto. 
 
 
- 
-
 
 #define ENTRY_INIT_INIT    1
 #define ENTRY_INIT_SHELL   1
 #define ENTRY_INIT_TASKMAN 1
 
-
 //Cria uma thread para o processo kernel, que irá rodar em ring0.
-//#define ENTRY_INIT_KERNELTHREAD_RING0  1  
-
+#define ENTRY_INIT_KERNELTHREAD_RING0  1  
 
 //testando carregar uma segunda thread no mesmo endereço virtual.
 //dessa forma mais de uma thread rodará no mesmo endeereço virtual,
 //mas em processos diferentes.
-//#define ENTRY_INIT_THREAD_400000 1
-
+#define ENTRY_INIT_THREAD_400000 1
 
 
 //Essa flag aciona a rotina que vai checar o máximo de 

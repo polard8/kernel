@@ -2065,19 +2065,20 @@ done:
  *     Quando essa rotina checar os processos verá que não há mais nada pra fechar.
  *     se ainda tiver algum processo pra fechar, então essa rotina fecha, senão termina a rotina. 
  */
+
 void systemReboot (){
 	
-	int i;
-	unsigned long left;
-	unsigned long top;
-	unsigned long width;
-	unsigned long height;		
+	//int i;
+	//unsigned long left;
+	//unsigned long top;
+	//unsigned long width;
+	//unsigned long height;		
 	
-	struct process_d *P;
-	struct thread_d *T;
+	//struct process_d *P;
+	//struct thread_d *T;
 		
-	struct window_d *hWnd;
-	struct window_d *hWindow;	
+	//struct window_d *hWnd;
+	//struct window_d *hWindow;	
 	
 	asm ("cli");
 	
@@ -2085,6 +2086,17 @@ void systemReboot (){
     if ( VideoBlock.useGui != 1 ){
 		hal_reboot();
 	}
+	
+	//#importante:
+	//suspendendo a rotina de reboot,
+	//até que todas funcionalidades gráficas estejam em ordem.
+	//Na verdade deveria existir um aplicativo chamado reboot 
+	//que inicialise essa rotina deixando par ao kernel apenas 
+	//a parte de baixo nível.
+	
+	hal_reboot();
+	
+/*	
 		
 	//Parent window.
 	if ( (void *) gui->main == NULL )
@@ -2300,7 +2312,7 @@ void systemReboot (){
 		//Nothing.
 	};	   
 
- 
+ */
 	
 	//Nothing.
 	

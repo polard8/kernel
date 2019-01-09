@@ -33,9 +33,10 @@ extern unsigned long bss_end;
  *    Chama módulo externo (Server em user mode) para
  *    mostrar informações sobre o kernel ou sobre o sistema.
  *
- *    Obs: As informções podem ser salvas em um arquivo
- *         de saída padrão.
+ *    Obs: 
+ *    As informções podem ser salvas em um arquivo de saída padrão.
  */
+
 void KeInformation (){
 	
 	//return;    //Ainda não implementada.
@@ -59,11 +60,15 @@ void KeInformation (){
  *
  * Obs: As informções podem ser salvas em um arquivo de saída padrão.
  */
+
 //void infoShowKernelInfo() 
+
 void KiInformation (){
 	
-	struct window_d *hWnd;
-	struct window_d *hWindow;
+	//struct window_d *hWnd;
+	//struct window_d *hWindow;
+	
+	/*
 
 	unsigned long left;
 	unsigned long top;    
@@ -80,6 +85,7 @@ void KiInformation (){
 	}	
 	
 	//Parent window.
+	
 	if ( (void *) gui->main == NULL )
 	{
 		printf("KiInformation: parent window fail\n");
@@ -100,16 +106,28 @@ void KiInformation (){
 		//...
 	};
 	
+	*/
+	
+	//printf ("#breakpoint");
+	//refresh_screen();
+	//while(1){}
+	
+	/*
+	
 	// ## Window ##
 		
     //Obs: Podemos usar o esquema de cores padrão.
     //Mas a intenção é que as janelas do kernel tenham
     //sua própria cor.	
-	hWindow = (void *) CreateWindow ( 3, 0, VIEW_MAXIMIZED, "KiInformation", 
+	
+	//hWindow = (void *) CreateWindow ( WT_OVERLAPPED, 1, 1, "KiInformation", 
+	//                    left, top, width, height, 
+	//		     		0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+	
+	hWindow = (void *) CreateWindow ( WT_SIMPLE, 1, 1, "KiInformation", 
 	                    left, top, width, height, 
-			     		gui->main, 0, 
-						KERNEL_WINDOW_DEFAULT_CLIENTCOLOR, 
-						KERNEL_WINDOW_DEFAULT_BGCOLOR ); 
+			     		gui->main, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
+
 
 	if ( (void *) hWindow == NULL)
 	{
@@ -148,7 +166,14 @@ void KiInformation (){
 	
         //...	
 	
-	};										
+	};	
+	
+	
+	//printf ("#breakpoint after window");
+	//refresh_screen();
+	//while(1){}
+	
+	*/
 		
 	// ## Messages ##
 	
@@ -156,6 +181,8 @@ void KiInformation (){
 	//printf("[System Info:]\n");
 	
 	// OS info.
+	// config/gramado.h
+	
 	printf("%s ", OS_NAME );
 	printf("Version: %d.%d.%d \n",
 	    SYSTEM_VERSION_MAJOR,
@@ -340,7 +367,9 @@ void KiInformation (){
 		
 	//More?!
 	
-    SetFocus(hWindow);
+    //SetFocus(hWindow);
+	
+	/*
 	
     //
     // ## Cursor ##
@@ -357,6 +386,8 @@ void KiInformation (){
 	g_cursor_y = g_cursor_top;
     //set_up_cursor(g_cursor_left,g_cursor_top); 		
 
+    */
+	
 	//
 	//  ## Status bar ##
 	//

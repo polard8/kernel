@@ -1,5 +1,5 @@
 /*
- * File: sm\sys\proc.c
+ * File: sm/sys/proc.c
  *
  *     System Procedure.
  *
@@ -28,25 +28,27 @@
  *     procedure.c está em hal, porque recebe intervenções de hardware
  * não importando a arquitetura.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - 2018 New services.
  *     //...
  */ 
  
+
 #include <kernel.h>
 
 
 extern unsigned long key_status;
 extern unsigned long escape_status;
 extern unsigned long tab_status;
-extern unsigned long winkey_status;  // >> Winkey shotcuts. #super
+extern unsigned long winkey_status; 
 extern unsigned long ctrl_status;
 extern unsigned long alt_status;
 extern unsigned long shift_status;
 extern unsigned long capslock_status;
 extern unsigned long numlock_status;
 extern unsigned long scrolllock_status;
+
 
 //
 // Variáveis internas.
@@ -235,6 +237,7 @@ terminal_dialog( struct window_d *window,
  *      POR ENQUANTO ESTÁ PASSANDO UM HANDLE DE JANELA NULO. 
  *
  */
+
 unsigned long 
 system_procedure ( struct window_d *window, 
                    int msg, 
@@ -527,7 +530,6 @@ system_procedure ( struct window_d *window,
 					show_ide_info ();
                     //rotina provisória de teste de read.
 					//procTestF6();
-					
 					break;
 					
 				

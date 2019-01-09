@@ -30,12 +30,12 @@
 //Esse é padrão de versão. 
 //Não mudar, apenas fazer as atualizações. 
 #define SYSTEM_VERSION_MAJOR 0 
-#define SYSTEM_VERSION_MINOR 4
-#define SYSTEM_VERSION_REVISION 0   //++ inc.
+#define SYSTEM_VERSION_MINOR 5
+#define SYSTEM_VERSION_REVISION 0   
 
 //Kernel version strings.
-#define SYSTEM_VERSION_STRING "0.4"
-#define SYSTEM_VERSION_NAME_STRING "Love and Forgiveness"
+#define SYSTEM_VERSION_STRING "0.5"
+#define SYSTEM_VERSION_NAME_STRING "Five"
 
 
 //
