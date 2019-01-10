@@ -51,7 +51,10 @@ extern void refresh_screen();
  */
 int fclose (FILE *stream){
 	
-	if( (void *) stream != NULL ){
+	if( (void *) stream != NULL )
+	{
+		//#bugbug:
+		//Esse NULL não causa efeito algum ??
 		stream = NULL;
 	};		
 

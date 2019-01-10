@@ -43,7 +43,7 @@ executive_gramado_core_init_execve ( int i,
 	
 	//??
 	//Esse é o primeiro argumento.
-	int Plane;
+	int Plane = 0;
 	
 	char *s;
 	struct thread_d *Thread;
@@ -423,7 +423,7 @@ executive_gramado_core_init_execve_exe ( int i,
 	
 	//??
 	//Esse é o primeiro argumento.
-	int Plane;
+	int Plane = 0;
 	
 	char *s;
 	struct thread_d *Thread;

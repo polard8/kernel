@@ -1255,7 +1255,7 @@ noArgs:
 		
 	unsigned long message_buffer[5];	
 		
-Mainloop:
+//Mainloop:
     
 	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
 	   elementos da mensagem e depois zerar o buffer */
@@ -4941,7 +4941,7 @@ fail:
  
 void shellTestThreads (){
 	
-    void *T;	
+    //void *T;	
 	
 	// Obs: 
 	// As threads criadas aqui são atribuídas ao processo PID=0.
@@ -6982,7 +6982,7 @@ int textGetBottomRow ()
 void clearLine ( int line_number )
 {
     int lin = (int) line_number; 
-	int col;  
+	int col = 0;  
 	
 	int Offset = 0; //Deslocamento dentro do screen buffer.
 	

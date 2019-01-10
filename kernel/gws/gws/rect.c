@@ -175,21 +175,30 @@ drawDataRectangle ( unsigned long x,
 				    unsigned long height, 
 				    unsigned long color )
 {
-	struct rect_d *rect;
 	
-    rect->bg_color = color;
+	//#BUGBUG
+	//TEMOS UM PROBLEMÃO AQUI.
+	//Estamos usando um ponteiro sem ao menos
+	//termos alocado memória para sua estrutura.
+	//>> para contornar, vamos tentar usar sem
+	//ponteiro.
+	
+	//struct rect_d *rect;
+	struct rect_d rect;
+	
+    rect.bg_color = color;
    
     //Dimensions.
-	rect->x = 0;        
-    rect->y = 0;         
-    rect->width = width;   
-    rect->height = height;    
+	rect.x = 0;        
+    rect.y = 0;         
+    rect.width = width;   
+    rect.height = height;    
    
     //Margins.
-    rect->left = x;    
-    rect->top = y;
-    rect->right = rect->left + rect->width;
-    rect->bottom = rect->top + rect->height; 
+    rect.left = x;    
+    rect.top = y;
+    rect.right = rect.left + rect.width;
+    rect.bottom = rect.top + rect.height; 
 
     //Limits.
 	//@todo: Repensar os limites para uma janela.
@@ -200,9 +209,9 @@ drawDataRectangle ( unsigned long x,
 	
 	//#todo: Usar variável para largura.
 	
-    if ( rect->right > SavedX )
+    if ( rect.right > SavedX )
 	{
-        rect->right = SavedX;
+        rect.right = SavedX;
 	}	
 
 	/* @todo:
@@ -215,7 +224,7 @@ drawDataRectangle ( unsigned long x,
 	
 	while (height--){
 		
-	    my_buffer_horizontal_line ( rect->left, y, rect->right, rect->bg_color );
+	    my_buffer_horizontal_line ( rect.left, y, rect.right, rect.bg_color );
 		y++;
     };    
 };

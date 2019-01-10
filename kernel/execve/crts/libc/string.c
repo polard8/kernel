@@ -40,8 +40,9 @@ int strcmp(char * s1, char * s2)
  *     Compara duas strings.
  *
  */
-int strncmp(char *s1, char *s2, int len)
-{
+
+int strncmp ( char *s1, char *s2, int len ){
+	
 	int n = len;
 	
 	while( n > 0 )
@@ -52,6 +53,9 @@ int strncmp(char *s1, char *s2, int len)
 		{
             return (int) 1;
         };
+		
+		//#bugbug:
+		//Esse incremento está errado.
 		
 		*s1++;
 		*s2++;

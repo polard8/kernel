@@ -535,14 +535,14 @@ done:
  
 int pciInit (){
 	
-	int i;
-	int j;	
+	//int i;
+	//int j;	
     
 	//Offset 0.
 	//Offset 2.
 	
-	unsigned short Vendor;    
-	unsigned short Device;    
+	//unsigned short Vendor;    
+	//unsigned short Device;    
     //...
 	
    //
