@@ -246,17 +246,30 @@ draw_logon_stuffs:
 			
         if(g_guiMinimal != 1)
 		{
-            //draw_text(gui->screen, 8, 1*8, 
-			//    COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
    			
-			sprintf(str_tmp, "Gramado %s %d.%d.%d-%s", 
-				GRAMAD0_NAME, GRAMADO_VERSION, GRAMADO_PATCHLEVEL,
-				GRAMADO_SUBLEVEL, GRAMADO_EXTRAVERSION);
+			//sprintf(str_tmp, "Gramado %s %d.%d.%d-%s", 
+			//	GRAMAD0_NAME, GRAMADO_VERSION, GRAMADO_PATCHLEVEL,
+			//	GRAMADO_SUBLEVEL, GRAMADO_EXTRAVERSION);
+
+			//sprintf(str_tmp, "Gramado %d.%d.%d%s (%s)",  
+			//	GRAMADO_VERSION, 
+			//	GRAMADO_PATCHLEVEL,
+			//	GRAMADO_SUBLEVEL, 
+			//	GRAMADO_EXTRAVERSION,
+			//	GRAMAD0_NAME );
+			
+			sprintf(str_tmp, "Gramado %d.%d%s (%s)",  
+				GRAMADO_VERSION, 
+				GRAMADO_PATCHLEVEL,
+				GRAMADO_EXTRAVERSION,
+				GRAMAD0_NAME );
+
+			
 			draw_text( gui->main, 400 +8, 8*1, 
 			    COLOR_WHITE, str_tmp );
 				
 			draw_text( gui->main, 400 +8, 8*2, 
-			    COLOR_WHITE, "(c) Copyright 2005-2018, Fred Nora" );
+			    COLOR_WHITE, "(c) Copyright 2005-2019, Fred Nora" );
 			
 			draw_text( gui->main, 400 +8, 8*3, 
 			    COLOR_WHITE, "(under construction) ");

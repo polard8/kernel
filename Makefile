@@ -13,9 +13,9 @@
 
 
 VERSION = 0
-PATCHLEVEL = 6
+PATCHLEVEL = 7
 SUBLEVEL = 0
-EXTRAVERSION = rc2
+EXTRAVERSION = -rc0
 NAME = Soberano
 
 #todo:
@@ -39,15 +39,16 @@ CFLAGS = -m32 \
 ##
 ## Defines
 ##
+
 DEFINES = 	-DGRAMADO_VERSION=$(VERSION) \
 		-DGRAMADO_PATCHLEVEL=$(PATCHLEVEL) \
 		-DGRAMADO_SUBLEVEL=$(SUBLEVEL) \
 		-DGRAMADO_EXTRAVERSION=\"$(EXTRAVERSION)\" \
 		-DGRAMAD0_NAME=\"$(NAME)\"
 
-	##
-	## Objects
-	##
+##
+## Objects
+##
 
 myObjects = head.o \
 x86main.o \
