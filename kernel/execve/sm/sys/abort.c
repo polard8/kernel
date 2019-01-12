@@ -70,6 +70,9 @@ void KiAbort()
 void abort (){
 	
 	asm (" cli ");
+	
+	debug_print("abort:\n");	
+	
 	save_current_context();
 	
 	if (KernelStatus != KERNEL_ABORTED)

@@ -57,6 +57,8 @@ int init_runtime (){
 	
 	SetUpPaging ();		
 	
+
+	
     // Continua ...
 	
  
@@ -101,7 +103,9 @@ int KiInitRuntime (){
 	
 	// #### importante ####
 	// provavelmente aqui é o primeiro lugar onde as mensagens funcional.
-	//
+	
+	//#bugbug
+	//mas temos um problema no Y.
 	
 #ifdef EXECVE_VERBOSE
 	backgroundDraw ( (unsigned long) COLOR_BLUE ); 

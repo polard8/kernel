@@ -408,6 +408,14 @@ int x86main ( int argc, char *argv[] ){
     int Status = 0;
     int zIndex;
 	
+	//
+	// serial debug
+	//
+	
+	init_serial(COM1_PORT);
+
+	debug_print("x86main:\n");
+	
     KernelStatus = KERNEL_NULL;
 
     //Initializing the global spinlock.
@@ -459,15 +467,8 @@ int x86main ( int argc, char *argv[] ){
 	stdio_verbosemode_flag = 1;
 	
 	
-	//
-	// serial debug
-	//
-	
-	init_serial(COM1_PORT);
 
-	debug_print("x86main:\n");
-	
-	//unb\video.c 
+	//video.c 
 	
     videoVideo ();
     videoInit ();
@@ -476,14 +477,18 @@ int x86main ( int argc, char *argv[] ){
 
 #ifdef ENTRY_VERBOSE	
     //If we are using graphics mode.
-    if (VideoBlock.useGui == GUI_ON){
-        printf("x86main: Using GUI\n");
+    if (VideoBlock.useGui == GUI_ON)
+	{
+		debug_print("x86main: Using GUI\n");
+        //printf("x86main: Using GUI\n");
     }
 #endif
 
     //If we are using text mode.
     if (VideoBlock.useGui != GUI_ON)
 	{
+		debug_print("x86main: text mode\n");
+		
         set_up_text_color(0x0F, 0x00);
 
         //g_current_vm = 0x800000;
@@ -511,8 +516,9 @@ int x86main ( int argc, char *argv[] ){
     };
 
 #ifdef ENTRY_VERBOSE
-    printf("x86main: Starting kernel..\n");
-    refresh_screen(); 
+    debug_print("x86main: starting kernel ..\n");
+	//printf("x86main: Starting kernel..\n");
+    //refresh_screen(); 
 #endif
 
 
@@ -531,31 +537,53 @@ int x86main ( int argc, char *argv[] ){
         //mas queremos mensagens antes, antão vamos tentar antecipar a inicialização da runtime.		
 
 #ifdef EXECVE_VERBOSE		
-	    printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
+	    //printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
+	  debug_print("x86main: Initializing runtime\n");
 #endif	
 
-        //sm\rt\runtime.c
+        //sm/rt/runtime.c
 		
 	    Status = (int) KiInitRuntime ();
-	    if ( Status != 0 ){
-	        panic("x86main error: Runtime\n");
+	    if ( Status != 0 )
+		{
+			debug_print("x86main: Runtime fail\n");
+	        //panic("x86main error: Runtime\n");
 	    }
-
+	
+	
+	//#bugbug
+	//depois que a runtime está inicializada, então ja temos mensagem,
+	//pois temos os endereços virtuais dos buffers.
+	//Mas nossa inicialização está apresentando algum problema no Y,
+	//que se corrige apenas no momento do logon.
+	
+    //printf("x86main: RUNTIME OK..\n");
+    //refresh_screen(); 
+    //while(1){}
 //initializeSystem:
 
     //
 	// ## system ##
 	//
-  	
-
-    systemSystem();	
-    Status = (int) systemInit();
 	
-    if ( Status != 0 ){
-        printf("x86main: systemInit\n");
+	//#importante
+	//#obs: É durante essa rotina que começamos a ter mensagens.	
+
+    systemSystem ();	
+    Status = (int) systemInit ();
+	
+    if ( Status != 0 )
+	{
+		debug_print("x86main: systemInit fail\n");
+        printf("x86main: systemInit fail\n");
         KernelStatus = KERNEL_ABORTED;
         goto fail;
     }
+	
+	//Ok
+	//printf("#breakpoint after systemInit");
+    //refresh_screen(); 
+    //while(1){}	
 	
 	debug_print("x86main: processes and threads\n");
 	

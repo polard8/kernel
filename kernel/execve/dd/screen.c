@@ -117,18 +117,20 @@ void screenRefresh()
  * screenInit:
  *     Inicializando o gerenciamento de tela.
  */ 
-int screenInit()
-{
+
+int screenInit (){
+	
     //Configura globais com base nos valores passados pelo Boot Loader.
-	screenSetSize( (unsigned long) SavedX, (unsigned long) SavedY );
+	
+	screenSetSize ( (unsigned long) SavedX, (unsigned long) SavedY );
 	
 	// Setup Screen structure.
+	
     Screen = (void *) malloc( sizeof(struct screen_d) );
     
-	if( (void *) Screen == NULL )
+	if ( (void *) Screen == NULL )
 	{	
-	    printf("screenInit:");
-		die();
+	    panic ("screenInit:");
 		
 	}else{
 		
@@ -147,10 +149,12 @@ int screenInit()
 	
 	// More?!
 	
-done:
-#ifdef KERNEL_VERBOSE
-    printf("done\n");
-#endif
+//done:
+	
+//#ifdef KERNEL_VERBOSE
+//    printf("done\n");
+//#endif
+	
 	return (int) 0;
 };
 

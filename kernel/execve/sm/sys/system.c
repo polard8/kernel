@@ -2874,11 +2874,12 @@ void Removing_from_the_end (struct linkedlist_d *list){
  * 2015 - Created.
  * 2016 - Revisão.
  */
+
 int systemStartUp (){
 	
     int Status = 0;
 	
-	debug_print("systemStartUp\n");
+	debug_print("systemStartUp:\n");
 
 	KeInitPhase = 0;  //Set Kernel phase.    
 
@@ -2886,11 +2887,13 @@ int systemStartUp (){
 	// Antes de tudo: CLI, Video, runtime.
 	//
 	
-	//@todo: As mensagens do abort podem não funcionarem nesse caso.
+	//   ## BUGBUG ##
+	// As mensagens do abort podem não funcionarem nesse caso.
+	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
 	
-	if(KeInitPhase != 0)
+	if ( KeInitPhase != 0 )
 	{		
-		KiAbort();	
+		KiAbort ();	
 		
 	}else{
 		
@@ -2932,25 +2935,6 @@ int systemStartUp (){
 			(unsigned long) SavedY,
 			(unsigned long) SavedBPP );
 #endif
-
-        //
-        // RUNTIME !
-        //	
-
-        //#bugbug:
-        //Somente depois da inicialização da runtime é que temos suporte a mensagens,
-        //mas queremos mensagens antes, antão vamos tentar antecipar a inicialização da runtime.		
-
-//#ifdef EXECVE_VERBOSE		
-	    //printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
-//#endif	
-
-        //sm\rt\runtime.c
- 		
-	   // Status = (int) KiInitRuntime();
-	   // if ( Status != 0 ){
-	   //     panic("sm-sys-system-systemStartUp error: Runtime\n");
-	   // }
 	
         
         //
@@ -2960,11 +2944,16 @@ int systemStartUp (){
 #ifdef EXECVE_VERBOSE
 		//(inicializa as 4 fases.)
 	    // Básico. ( Variáveis globais e estruturas ... ).
-	    printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
-#endif		
+	    //printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
+#endif	
+		
+		
         Status = (int) init (); 
-	    if ( Status != 0 ){
-	        panic("sm-sys-system-systemStartUp error: init\n");
+		
+	    if ( Status != 0 )
+		{
+			debug_print("systemStartUp: init fail\n");
+	        panic ("sm-sys-system-systemStartUp error: init\n");
 	    }	
         //...	 
 		
@@ -3028,7 +3017,7 @@ int systemInit (){
 	
 	int Status;
 	
-	debug_print("systemInit\n");
+	debug_print("systemInit:\n");
 	
 	//Colocando na variável global, a opção selecionada manualmente pelo 
 	//desenvolvedor.

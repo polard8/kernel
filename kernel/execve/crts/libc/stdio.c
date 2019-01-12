@@ -1057,6 +1057,11 @@ input_done:
  *     Inicializando stdio pertencente ao kernel base.
  *     Inicializa as estruturas do fluxo padrão.
  *     Quem chamou essa inicialização ?? Em que hora ??
+ *
+ * #bugbug: Pelo jeito somente depois dessa inicialização é que temos mensagens 
+ * com printf decentes. Então a inicialização do kernel precisa disso.
+ * >> precisamos antecipar essa inicilização. Mas ela precisa ser depois da
+ * inicialização da paginação.
  */
  
 int stdioInitialize (){

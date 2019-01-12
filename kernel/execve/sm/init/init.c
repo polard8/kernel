@@ -104,11 +104,18 @@ int init_architecture_dependent (){
 		panic("sm-init-init_architecture_dependent: KeInitPhase\n");	
 	}
 
-
+	// #### IMPORTANTE ####
+	//
+	// VAMOS ANTECIPAR ESSA INICIALIZAÇÃO NA TENTATIVA DE
+	// ANTECIPARMOS O USO DE MENSAGENS.
+    // >>> mas essa rotina precisa do malloc ,,,
+	//então tem que ser depois da inicialização do stdio.
+	
+	
 	// Os parâmetros de tela dependem das propriedades de hardware
 	// como monitor e placa de vídeo.
 	
-	screenInit();
+	//screenInit();
 
     //printf("init_architecture_dependent: #Debug");
     //refresh_screen();
@@ -339,8 +346,42 @@ done:
 void init_globals (){
 
 #ifdef EXECVE_VERBOSE	
-    printf("sm-init-init_globals:\n");	
+    //printf("sm-init-init_globals:\n");
+	debug_print("init_globals:\n");
 #endif
+	
+	
+	//Outros.
+	errno = 0;
+	
+	//alocando memória para as estruturas do fluxo padrão.
+	stdin = (void *) malloc( sizeof(FILE) );
+	stdout = (void *) malloc( sizeof(FILE) );
+	stderr = (void *) malloc( sizeof(FILE) );
+	
+	//kstdin  = (void*) malloc( sizeof(FILE) );
+	//kstdout = (void*) malloc( sizeof(FILE) );
+	//kstderr = (void*) malloc( sizeof(FILE) );
+	
+    //inicializa as estruturas do fluxo padrão.	
+	stdioInitialize();
+	
+	
+	//#importante
+	//>>> é a partir daqui que temos mensagens!!!
+	
+    screenInit();
+	
+	//
+	// ## FIRST MESSAGE !! ##
+	//
+	
+	debug_print("init_globals: WE HAVE MESSAGES NOW !!!\n");
+	printf("init_globals: first message!\n");
+	
+	
+    //===================	
+	//vamos atrazar configuração de janela em favor de configuração de mensagem
 
 	//Atalho para a próxima mensagem de teclado..(test) debug
 	gNextKeyboardMessage = (int) 0;
@@ -373,8 +414,9 @@ void init_globals (){
 	
 	
 	//Globais no ambiente GUI.
-	if ( g_useGUI == 1 ){
-		
+	if ( g_useGUI == 1 )
+	{
+		//NÃO PRECISAMOS MAIS DISSO, DELETAR;
 		//Próximo procedimento de janela.
 	    g_next_proc = (unsigned long) &system_procedure; 
 		
@@ -404,30 +446,27 @@ void init_globals (){
 	g_file_system_type = FS_TYPE_FAT16;	//tipo 1, fat16.
 	fatbits = (int) 16;
 	
-	//Outros.
-	errno = 0;
-	
-	//alocando memória para as estruturas do fluxo padrão.
-	stdin = (void *) malloc( sizeof(FILE) );
-	stdout = (void *) malloc( sizeof(FILE) );
-	stderr = (void *) malloc( sizeof(FILE) );
-	
-	//kstdin  = (void*) malloc( sizeof(FILE) );
-	//kstdout = (void*) malloc( sizeof(FILE) );
-	//kstderr = (void*) malloc( sizeof(FILE) );
-	
-    //inicializa as estruturas do fluxo padrão.	
-	stdioInitialize();
+	//===================	
 	
 	// #importante:
 	// provavelmente isso altere o comportamento do cursor,
 	// levando o cursor par ao início da tela. Então precisamos
 	// repintar o background para recomeçarmos.
 	
+	//printf("#breakpoint glob");
+    //refresh_screen(); 
+    //while(1){}	
+	
+	
 #ifdef EXECVE_VERBOSE
 	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
 #endif
 
+	
+	//printf("#breakpoint glob");
+    //refresh_screen(); 
+    //while(1){}
+	
 	//
 	// Keyboard support.
 	//
@@ -449,20 +488,29 @@ int init (){
 	
     int Status = 0;
 	
-	debug_print("init\n");
+	debug_print("init:\n");
 	
 	//Check kernel phase.
-	if ( KeInitPhase != 0 ){
-		
-		printf("sm-init-init: KeInitPhase\n");
-        die();		
+	if ( KeInitPhase != 0 )
+	{
+		debug_print("init: KeInitPhase fail\n");
+		panic ("sm-init-init: KeInitPhase\n");
+        //die();		
 	}
- 
+	
+	
+	//
+	// ### IMPORTANTE ###
+	//
+	
+	
     //Globals.
-#ifdef EXECVE_VERBOSE	
-	printf("sm-init-init: init_globals\n");     
-#endif    
 	init_globals();
+	
+//#ifdef EXECVE_VERBOSE	
+	printf("sm-init-init: init_globals ok\n");     
+//#endif  
+	
 	
 	//#bugbug:
 	//Depois de iniciar as globais, provavelmente o cursor mude 
@@ -543,6 +591,7 @@ int init (){
 	initialize_system_message_queue(); 
 	
 	
+
 	//
 	// Network
 	//
@@ -611,6 +660,11 @@ int init (){
 		//printf(" Done!\n");	
 		//...
 	};
+	
+	//fail
+	//printf("#breakpoint before independent");
+	//refresh_screen();
+	//while(1){}		
 
 	
 	//Fase 1: Inicia a parte independente da arquitetura.
@@ -619,6 +673,13 @@ int init (){
 	   //Nothing for now.
 	};
 	KeInitPhase = 1;
+	
+	//fail
+	//printf("#breakpoint before dependent");
+	//refresh_screen();
+	//while(1){}		
+
+	
     
 	//Fase 2: Inicia a parte de arquitetura especifica da máquina atual.
 	//        Ou seja, considera a marca do processador.
@@ -628,6 +689,10 @@ int init (){
 	};
 	KeInitPhase = 2;
 
+	
+	//printf("#breakpoint before logon");
+	//refresh_screen();
+	//while(1){}	
 	
 	//
 	// Logon.
