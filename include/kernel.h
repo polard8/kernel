@@ -44,13 +44,13 @@
 // 
  
 /* configuração do kernel norax*/ 
-#include <config/norax.h> 
+#include <kernel/config/norax.h> 
  
 /* Configuração de produto */ 
-#include <config/gramado.h> 
+#include <kernel/config/gramado.h> 
  
 /* Configuração de compilação */ 
-#include <config/config.h> 
+#include <kernel/config/config.h> 
 
 
 //
@@ -60,13 +60,11 @@
 // Global definitions.
 // This must be on top.
 
-#include <globals/gpa.h>
-#include <globals/gva.h>
-#include <globals/gentry.h>
-
-
-#include <globals/gdef.h>
-#include <globals/gdevice.h>
+#include <kernel/globals/gpa.h>
+#include <kernel/globals/gva.h>
+#include <kernel/globals/gentry.h>
+#include <kernel/globals/gdef.h>
+#include <kernel/globals/gdevice.h>
 //...
 
 
@@ -147,46 +145,48 @@ extern void dispatch_context();
 extern void do_executa_new_task();
 
 
-// libC support.
+
+
+
+
+// kernel libC support.
 //++
-#include <stddef.h>
-#include <types.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <iso646.h>
-#include <signal.h>
-#include <unistd.h>
+#include <kernel/stddef.h>
+#include <kernel/types.h>
+#include <kernel/limits.h>
+#include <kernel/stdio.h>
+#include <kernel/stdlib.h>
+#include <kernel/string.h>
+#include <kernel/ctype.h>
+#include <kernel/iso646.h>
+#include <kernel/signal.h>
+#include <kernel/unistd.h>
 //...
 //--
 
 
-//
+
+
+
 // ## hardware ## 
-//
 
-#include <gramado/intel.h>
-#include <gramado/memory.h>
-#include <gramado/pci.h>
-#include <gramado/cpuid.h>
-#include <gramado/screen.h>
-#include <gramado/video.h>
-#include <gramado/rtc.h>
+#include <kernel/gramado/intel.h>
+#include <kernel/gramado/memory.h>
+#include <kernel/gramado/pci.h>
+#include <kernel/gramado/cpuid.h>
+#include <kernel/gramado/screen.h>
+#include <kernel/gramado/video.h>
+#include <kernel/gramado/rtc.h>
 //...
 
-//
 // ## shared ## 
-//
-
-
-#include <gramado/fonts.h>
-#include <gramado/ascii.h>     //ascii table 
-#include <gramado/fs.h> 
-#include <gramado/prompt.h>
-#include <gramado/bmp.h>
+#include <kernel/gramado/fonts.h>
+#include <kernel/gramado/ascii.h>     //ascii table 
+#include <kernel/gramado/fs.h> 
+#include <kernel/gramado/prompt.h>
+#include <kernel/gramado/bmp.h>
 //...
+
 
 //
 // MICROKERNEL (3)
@@ -194,68 +194,62 @@ extern void do_executa_new_task();
 
 
 // Global first.
-#include <gramado/mk/pc/mm/memmap.h>            //Memory Map - address.
+#include <kernel/gramado/mk/pc/mm/memmap.h>            //Memory Map - address.
 
 
 
 //execve
-#include <gramado/execve/sm/disk/diskmap.h>        //Disk Map - sectors.
+#include <kernel/gramado/execve/sm/disk/diskmap.h>        //Disk Map - sectors.
 
 
 //
 // HAL (4)
 //
 
-#include <gramado/hal/screen.h> 
-#include <gramado/hal/video.h>                        //video.
-#include <gramado/hal/memory.h>                       //ram (hardware).
-#include <gramado/hal/cpu.h>  
-#include <gramado/hal/arch/x86/x86.h> 
-#include <gramado/hal/arch/amd/cpuamd.h>  
+#include <kernel/gramado/hal/screen.h> 
+#include <kernel/gramado/hal/video.h>                        //video.
+#include <kernel/gramado/hal/memory.h>                       //ram (hardware).
+#include <kernel/gramado/hal/cpu.h>  
+#include <kernel/gramado/hal/arch/x86/x86.h> 
+#include <kernel/gramado/hal/arch/amd/cpuamd.h>  
 
-#include <gramado/hal/arch/detect.h>  
+#include <kernel/gramado/hal/arch/detect.h>  
 
 
 //disk1 - nelson
-#include <gramado/3rdparty/kernel/disk/disk1.h>
+#include <kernel/gramado/3rdparty/kernel/disk/disk1.h>
 
 //execve
-#include <gramado/execve/sm/disk/disk.h>           //disk.
+#include <kernel/gramado/execve/sm/disk/disk.h>           //disk.
 
-
-#include <gramado/execve/sm/disk/volume.h>         //volume.
-#include <gramado/hal/serial.h>        
-#include <gramado/hal/mac.h>                             //mac address info. (hw)
+#include <kernel/gramado/execve/sm/disk/volume.h>         //volume.
+#include <kernel/gramado/hal/serial.h>        
+#include <kernel/gramado/hal/mac.h>                             //mac address info. (hw)
 //...
 
 //
 // EXECUTIVE (2)
 //
 
-
 //não mecher na ordem, pode dar problemas;
  //Portas para dispositivos
-#include <gramado/hal/arch/x86/portsx86.h>       
+#include <kernel/gramado/hal/arch/x86/portsx86.h>       
 
-
-#include <gramado/execve/dd/serial.h>  
-
-#include <gramado/execve/dd/ps2.h>          //ps/2 
-#include <gramado/execve/dd/timer.h>        //PIT. irq0.
-#include <gramado/execve/dd/pic.h>          //PIC.
-#include <gramado/execve/dd/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
-#include <gramado/execve/dd/rtc.h>          //clock    ( South bridge).
-#include <gramado/execve/dd/floppy.h>       //floppy   ( South bridge).
-#include <gramado/execve/dd/keyboard.h>     //irq1     ( South bridge).   //keyboard
-#include <gramado/execve/dd/vk.h>         //virtual keys
-#include <gramado/execve/dd/abnt2.h> 
-
-#include <gramado/execve/dd/ldisc/ldisc.h>        //ldisc
-
-#include <gramado/execve/dd/ide.h>          //irq14/15 ( South bridge).
-#include <gramado/execve/dd/pci.h>            //pci.
-#include <gramado/execve/dd/sata.h>           //(PCI BUS).
-#include <gramado/execve/dd/usb.h>            //usb.
+#include <kernel/gramado/execve/dd/serial.h>  
+#include <kernel/gramado/execve/dd/ps2.h>          //ps/2 
+#include <kernel/gramado/execve/dd/timer.h>        //PIT. irq0.
+#include <kernel/gramado/execve/dd/pic.h>          //PIC.
+#include <kernel/gramado/execve/dd/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
+#include <kernel/gramado/execve/dd/rtc.h>          //clock    ( South bridge).
+#include <kernel/gramado/execve/dd/floppy.h>       //floppy   ( South bridge).
+#include <kernel/gramado/execve/dd/keyboard.h>     //irq1     ( South bridge).   //keyboard
+#include <kernel/gramado/execve/dd/vk.h>         //virtual keys
+#include <kernel/gramado/execve/dd/abnt2.h> 
+#include <kernel/gramado/execve/dd/ldisc/ldisc.h>        //ldisc
+#include <kernel/gramado/execve/dd/ide.h>          //irq14/15 ( South bridge).
+#include <kernel/gramado/execve/dd/pci.h>            //pci.
+#include <kernel/gramado/execve/dd/sata.h>           //(PCI BUS).
+#include <kernel/gramado/execve/dd/usb.h>            //usb.
 
 //#include                                       //pcie.
 //...
@@ -265,31 +259,30 @@ extern void do_executa_new_task();
 //
 
 //This must to be on the bottom of HAL part.    
-#include <gramado/hal/device.h>      //device manager.
-#include <gramado/hal/hal.h>         //*****
+#include <kernel/gramado/hal/device.h>      //device manager.
+#include <kernel/gramado/hal/hal.h>         //*****
 //--
-
 
 
 /*
  * MICROKERNEL (3)
  */
  //++
-#include <gramado/mk/arch/x86/x86cont.h>
 
-#include <gramado/mk/pc/ts.h>
-#include <gramado/mk/pc/tasks.h>
-#include <gramado/mk/pc/process.h>
-#include <gramado/mk/pc/thread.h>
-#include <gramado/mk/pc/sched/sched.h>
-#include <gramado/mk/pc/ipc/ipc.h>
-#include <gramado/mk/pc/ipc/sem.h>
-#include <gramado/mk/pc/queue.h>
-#include <gramado/mk/pc/realtime.h>
-#include <gramado/mk/pc/dispatch.h>
-#include <gramado/mk/pc/event.h>
-#include <gramado/mk/pc/pc.h>
-#include <gramado/mk/mk.h>
+#include <kernel/gramado/mk/arch/x86/x86cont.h>
+#include <kernel/gramado/mk/pc/ts.h>
+#include <kernel/gramado/mk/pc/tasks.h>
+#include <kernel/gramado/mk/pc/process.h>
+#include <kernel/gramado/mk/pc/thread.h>
+#include <kernel/gramado/mk/pc/sched/sched.h>
+#include <kernel/gramado/mk/pc/ipc/ipc.h>
+#include <kernel/gramado/mk/pc/ipc/sem.h>
+#include <kernel/gramado/mk/pc/queue.h>
+#include <kernel/gramado/mk/pc/realtime.h>
+#include <kernel/gramado/mk/pc/dispatch.h>
+#include <kernel/gramado/mk/pc/event.h>
+#include <kernel/gramado/mk/pc/pc.h>
+#include <kernel/gramado/mk/mk.h>
 //--
 
 
@@ -298,7 +291,7 @@ extern void do_executa_new_task();
 //
 
 //tty
-#include <gramado/execve/dd/tty/tty.h>
+#include <kernel/gramado/execve/dd/tty/tty.h>
 
 
 //
@@ -308,85 +301,84 @@ extern void do_executa_new_task();
 
 //gramado - GUI. (presentation layer)
 //Gramado Window Server
-#include <gramado/gws/gws/ws.h>
+#include <kernel/gramado/gws/gws/ws.h>
 
 //user
-#include <gramado/gws/user/usession.h>
-#include <gramado/gws/user/room.h>
-#include <gramado/gws/user/desktop.h>
+#include <kernel/gramado/gws/user/usession.h>
+#include <kernel/gramado/gws/user/room.h>
+#include <kernel/gramado/gws/user/desktop.h>
 
-#include <gramado/gws/gws/window.h>
+#include <kernel/gramado/gws/gws/window.h>
 
 //tentar mudar de lugar.
-#include <gramado/execve/dd/i8042/i8042.h>
-#include <gramado/execve/dd/i8042/ps2mouse.h>
-#include <gramado/execve/dd/i8042/ps2kbd.h>
+#include <kernel/gramado/execve/dd/i8042/i8042.h>
+#include <kernel/gramado/execve/dd/i8042/ps2mouse.h>
+#include <kernel/gramado/execve/dd/i8042/ps2kbd.h>
 
-#include <gramado/gws/gws/menu.h>
-#include <gramado/gws/gws/grid.h>
-#include <gramado/gws/gws/bmp.h>
-#include <gramado/gws/gws/guiconf.h>  //*principal.
+#include <kernel/gramado/gws/gws/menu.h>
+#include <kernel/gramado/gws/gws/grid.h>
+#include <kernel/gramado/gws/gws/bmp.h>
+#include <kernel/gramado/gws/gws/guiconf.h>  //*principal.
 
-// gramado/user
-#include <gramado/gws/user/user.h>
-//gramado/logon
-#include <gramado/gws/logon/logon.h>
-//gramado/logoff
-#include <gramado/gws/logoff/logoff.h>
+// user, logon, logoff
+#include <kernel/gramado/gws/user/user.h>
+#include <kernel/gramado/gws/logon/logon.h>
+#include <kernel/gramado/gws/logoff/logoff.h>
+
 //principal
-#include <gramado/gws/gws.h>                     //main file.
+#include <kernel/gramado/gws/gws.h>                     
 
 //uigm - User Interface Graphic Mode.
 //nothing for now.
 
 //gws/terminal 
 //suporte a terminal.
-#include <gramado/gws/terminal/line.h>              //lines support.
-#include <gramado/gws/terminal/terminal.h>          //terminal support. 
-#include <gramado/gws/terminal/console.h>           //Console. Monitor support.
+#include <kernel/gramado/gws/terminal/line.h>              //lines support.
+#include <kernel/gramado/gws/terminal/terminal.h>          //terminal support. 
+#include <kernel/gramado/gws/terminal/console.h>           //Console. Monitor support.
 
 //sm - System Management.  
-#include <gramado/execve/sm/install.h>  
-#include <gramado/execve/sm/init.h>
+#include <kernel/gramado/execve/sm/install.h>  
+#include <kernel/gramado/execve/sm/init.h>
 
-#include <gramado/execve/dd/network/host.h>        //host info.
-#include <gramado/execve/dd/network/intel.h>         //intel nic - network interface controller.
-#include <gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
-#include <gramado/execve/dd/network/socket.h>      //(network) Sockets info. (sw)
-#include <gramado/execve/dd/network/ip.h>          //(network) IP info.      (sw)
-#include <gramado/execve/dd/network/channel.h>     //(network) Channel       (sw)
-#include <gramado/execve/dd/network/client.h>      //(network) Client process support. 
-#include <gramado/execve/dd/network/ns.h>          //(network) Network Server.
-#include <gramado/execve/dd/network/network.h>     //(network) Gerenciamento de rede. 
+#include <kernel/gramado/execve/dd/network/host.h>        //host info.
+#include <kernel/gramado/execve/dd/network/intel.h>       //intel nic - network interface controller.
+#include <kernel/gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
+#include <kernel/gramado/execve/dd/network/socket.h>      //(network) Sockets info. (sw)
+#include <kernel/gramado/execve/dd/network/ip.h>          //(network) IP info.      (sw)
+#include <kernel/gramado/execve/dd/network/channel.h>     //(network) Channel       (sw)
+#include <kernel/gramado/execve/dd/network/client.h>      //(network) Client process support. 
+#include <kernel/gramado/execve/dd/network/ns.h>          //(network) Network Server.
+#include <kernel/gramado/execve/dd/network/network.h>     //(network) Gerenciamento de rede. 
 
-#include <gramado/execve/fs/fs.h>                     //fs.
-#include <gramado/execve/fs/vfs.h>                     //vfs.
-#include <gramado/execve/sm/io.h>                  //io.
-#include <gramado/execve/sci/syscall.h>            //system calls.
-#include <gramado/execve/sm/modules.h>             //module manager.
-#include <gramado/execve/sm/debug.h>
-#include <gramado/execve/sm/sys.h>                 //system calls 2.
-#include <gramado/execve/sm/system.h>              //system manager.
-#include <gramado/execve/dd/dd.h>
+#include <kernel/gramado/execve/fs/fs.h>                     //fs.
+#include <kernel/gramado/execve/fs/vfs.h>                     //vfs.
+#include <kernel/gramado/execve/sm/io.h>                  //io.
+#include <kernel/gramado/execve/sci/syscall.h>            //system calls.
+#include <kernel/gramado/execve/sm/modules.h>             //module manager.
+#include <kernel/gramado/execve/sm/debug.h>
+#include <kernel/gramado/execve/sm/sys.h>                 //system calls 2.
+#include <kernel/gramado/execve/sm/system.h>              //system manager.
+#include <kernel/gramado/execve/dd/dd.h>
 
 //
 // MICROKERNEL (3)
 //
 
 //mm
-#include <gramado/mk/pc/mm/mmglobal.h>
-#include <gramado/mk/pc/mm/heap.h>          //Heap pointer support.
-#include <gramado/mk/pc/mm/aspace.h>        //Address Space, (data base account).
-#include <gramado/mk/pc/mm/dspace.h>        //Disk Space, (data base account).
-#include <gramado/mk/pc/mm/bank.h>          //Bank. database
-#include <gramado/mk/pc/mm/mm.h>            //mm, memory manager support.
+#include <kernel/gramado/mk/pc/mm/mmglobal.h>
+#include <kernel/gramado/mk/pc/mm/heap.h>          //Heap pointer support.
+#include <kernel/gramado/mk/pc/mm/aspace.h>        //Address Space, (data base account).
+#include <kernel/gramado/mk/pc/mm/dspace.h>        //Disk Space, (data base account).
+#include <kernel/gramado/mk/pc/mm/bank.h>          //Bank. database
+#include <kernel/gramado/mk/pc/mm/mm.h>            //mm, memory manager support.
 
 
 //
 // EXECUTIVE (2)
 //
 
-#include <gramado/execve/execve.h>              //main file.
+#include <kernel/gramado/execve/execve.h>              //main file.
 //--
 
 
@@ -395,23 +387,24 @@ extern void do_executa_new_task();
 //
 
 //Cursor support.
-#include <gramado/cursor.h>
+#include <kernel/gramado/cursor.h>
 
 //Kernel request support.
-#include <gramado/request.h>
-
+#include <kernel/gramado/request.h>
 
 //Kernel messages support.
-#include <gramado/messages.h>
+#include <kernel/gramado/messages.h>
 
 //Object Manager support.
-#include <gramado/object.h>
+#include <kernel/gramado/object.h>
 
 //system signals. (SS)
-#include <gramado/ss.h>
+#include <kernel/gramado/ss.h>
 
+#include <kernel/gramado/events.h>
 
-#include <gramado/events.h>
+//=============================================
+
 
 //
 // Globals.
@@ -592,13 +585,9 @@ unsigned long KernelStatus;
 unsigned long kernel_switch;
 
 
-
-
 //error support.
 //isso deve ir para a libc
 unsigned long errno;
-
-
 
 
 //
@@ -628,7 +617,6 @@ char KernelLogBuffer[512];
 //...
 
 
- 
 
 //node od a linked list.
 struct node_d
@@ -762,9 +750,7 @@ struct platform_d *Platform;
 // ## MAIN ##
 //
 
-
-int 
-kMain( int argc, char **argv );
+int kMain ( int argc, char **argv );
 
 
 //
@@ -825,8 +811,8 @@ void die();      //system.c
 //
 
 
-#include <gramado/ke.h>
-#include <gramado/ki.h>
+#include <kernel/gramado/ke.h>
+#include <kernel/gramado/ki.h>
 
 
 //
