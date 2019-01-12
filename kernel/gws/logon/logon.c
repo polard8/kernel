@@ -1,41 +1,41 @@
 /*
  * File: gws\logon\logon.c
  *
- * Descrição:
+ * Descriï¿½ï¿½o:
  *     Kernel Mode Logon Support Routines.
- *     @todo: Esse módulo deve prepara o ambiente para rodar o processo logon.bin.
+ *     @todo: Esse mï¿½dulo deve prepara o ambiente para rodar o processo logon.bin.
  *     Esse logon pode ser usado par um eventual boot loader ou system installer.
  *
- *     Arquivo principal do módulo logon do executive.
- *     *IMPORTANTE: Esse é o ambiente de logon.
- *                  É onde o programa de logon vai rodar.
+ *     Arquivo principal do mï¿½dulo logon do executive.
+ *     *IMPORTANTE: Esse ï¿½ o ambiente de logon.
+ *                  ï¿½ onde o programa de logon vai rodar.
  *                  Cria um desktop para o Logon.
  *
- *     MB - Módulos incluídos no Kernel Base.
- *     No momento aparece a janela do Shell, que é um processo em user mode.
- *     Esse shell que aparece no momento do logon servirá para
- *     configurações. 
- *     No ambiente de logon o comando será passado para o procedimento do
+ *     MB - Mï¿½dulos incluï¿½dos no Kernel Base.
+ *     No momento aparece a janela do Shell, que ï¿½ um processo em user mode.
+ *     Esse shell que aparece no momento do logon servirï¿½ para
+ *     configuraï¿½ï¿½es. 
+ *     No ambiente de logon o comando serï¿½ passado para o procedimento do
  *     Shell.
  *
  *     Mesma coisa se o ambiente for a gui.(user environment).O comando
- *     deve ser passado para o Shell, para configurações.
+ *     deve ser passado para o Shell, para configuraï¿½ï¿½es.
  *
- *     O Logon está na WindowStation0 e no Desktop0. 
+ *     O Logon estï¿½ na WindowStation0 e no Desktop0. 
  *     O desktop do logon tem a main window e a navigation bar, mas pode 
- * ser predefido, assim como na criação da gui.
+ * ser predefido, assim como na criaï¿½ï¿½o da gui.
  *
- * Observação:
- *     É nesse momento, antes de ativar o sistema multitarefas que pode-se
- * instalar as atualizações ou configurações pendentes.
- *     A pendência de configurações ou atualizações serão gravadas em arquivos
- * de configuraçãoou em metafiles, que serão lidos nesse momento.
+ * Observaï¿½ï¿½o:
+ *     ï¿½ nesse momento, antes de ativar o sistema multitarefas que pode-se
+ * instalar as atualizaï¿½ï¿½es ou configuraï¿½ï¿½es pendentes.
+ *     A pendï¿½ncia de configuraï¿½ï¿½es ou atualizaï¿½ï¿½es serï¿½o gravadas em arquivos
+ * de configuraï¿½ï¿½oou em metafiles, que serï¿½o lidos nesse momento.
  * 
  *
- * Obs: A tela de logon poderia, como opção, apresentar as configurações
- *      gravadas em um metafile do sistema. Pois as configurações são
+ * Obs: A tela de logon poderia, como opï¿½ï¿½o, apresentar as configuraï¿½ï¿½es
+ *      gravadas em um metafile do sistema. Pois as configuraï¿½ï¿½es sï¿½o
  *      realizadas nesse momento. 
- *      Poderia mostrar configurações salvas em variáveis globais.
+ *      Poderia mostrar configuraï¿½ï¿½es salvas em variï¿½veis globais.
  *
  *      *IMPORTANTE: O logon deve ser um programa em user mode que chama rotinas aqui contidas.
  *
@@ -43,7 +43,7 @@
  * +Registra o processo de logon
  * +Cria window stations e desktops. 
  *
- *    Versão 1.0, 2015, 2016.
+ *    Versï¿½o 1.0, 2015, 2016.
  */
  
  
@@ -51,7 +51,7 @@
 
 
 
-//Variáveis internas.
+//Variï¿½veis internas.
 //int logonStatus;
 //...
 
@@ -76,13 +76,13 @@ int ExitLogon();
 /* 
  ***************************************************
  * create_logon:
- *     Cria a interface gráfica do Logon.
- *     É o ambiente onde o processo de logon deve rodar. 
+ *     Cria a interface grï¿½fica do Logon.
+ *     ï¿½ o ambiente onde o processo de logon deve rodar. 
  *
  *     Fundo -> Screen, Background.
  *     Logo  -> Sobreposto. 
  *     Navigation bar.
- *     Usuário.
+ *     Usuï¿½rio.
  *
  *    @todo Cria window stations, desktops ...
  *    @todo: logonCreate();
@@ -90,7 +90,8 @@ int ExitLogon();
  */
 void create_logon (){
 	
-	struct window_d *hWindow; 	 
+	struct window_d *hWindow;
+	char str_tmp[120];	 
 	
 	debug_print("create_logon\n");
 	
@@ -176,14 +177,14 @@ void create_logon (){
                            1,  //*screen          
                            1,  //*background       
                            0,  //logo            
-                           0,  //taskbar (autoriza e prepara para a utilização de uma taskbar.)        
-                           1,  //*Main.(Desktop window, Área de trabalho)            
+                           0,  //taskbar (autoriza e prepara para a utilizaï¿½ï¿½o de uma taskbar.)        
+                           1,  //*Main.(Desktop window, ï¿½rea de trabalho)            
                            0,  //menu           
                            0,  //infobox         
                            0,  //messagebox       
                            0,  //debug           
                            0,  //navigationbar    
-                           0); //grid (autoriza e prepara para a utilização de um grid)	
+                           0); //grid (autoriza e prepara para a utilizaï¿½ï¿½o de um grid)	
 	};	
 
     //
@@ -239,8 +240,8 @@ draw_logon_stuffs:
 	{
 
 		// Obs: 
-		// As mensagens aqui são para auxiliar 
-		// o desenvolvedor no processo de inicialização.
+		// As mensagens aqui sï¿½o para auxiliar 
+		// o desenvolvedor no processo de inicializaï¿½ï¿½o.
 		//@todo: Informar o desktop atual.
 			
         if(g_guiMinimal != 1)
@@ -248,8 +249,10 @@ draw_logon_stuffs:
             //draw_text(gui->screen, 8, 1*8, 
 			//    COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
    			
+			sprintf(str_tmp, "Gramado %d.%d.%d-%s", 
+					DEFINE_VERSION, DEFINE_PATCHLEVEL, DEFINE_SUBLEVEL, DEFINE_EXTRAVERSION);
 			draw_text( gui->main, 400 +8, 8*1, 
-			    COLOR_WHITE, "Gramado 0.4" );
+			    COLOR_WHITE, str_tmp );
 				
 			draw_text( gui->main, 400 +8, 8*2, 
 			    COLOR_WHITE, "(c) Copyright 2005-2018, Fred Nora" );
@@ -264,7 +267,7 @@ draw_logon_stuffs:
  	        
 			//draw_text(gui->screen, 640/2, 8, COLOR_WHITE, "Press F1 to Log on");
 	
-			//Opções:
+			//Opï¿½ï¿½es:
 			//StatusBar( gui->screen, "Logon", "Press F1 to start User Environment or F2 to Reboot");
 			//Message Box.
 			//...
@@ -327,22 +330,22 @@ done:
 /*
  ******************************************
  * SetGuiParameters:
- *     Configura a inicialização das janelas 
+ *     Configura a inicializaï¿½ï¿½o das janelas 
  * gerenciadas pelo kernel.
  *     @todo: Limite de janelas (+- 10)
  *
  */
-void SetLogonParameters( int refresh,  // Flag. Colocar ou não o backbuffer na tela.
+void SetLogonParameters( int refresh,  // Flag. Colocar ou nï¿½o o backbuffer na tela.
 int screen,          // Tela do computador.
 int background,      // Background da area de trabalho. 
 int logo,            // Logo, Janela para imagem da area de trabalho.
 int taskbar,         // Barra de tarefas.(icones para programas)
 int main,            // Janela principal.( Desktop, ou Kernel Setup Utility ) 
-int menu,            // Control menu da Área de trabalho.
+int menu,            // Control menu da ï¿½rea de trabalho.
 int infobox,         // Janelinha no canto, para alerta sobre sobre eventos ocorridos no sistema.
 int messagebox,      // O message box do kernel.(cada app cria seu messagebox.) 
 int debug,           // Janela do debug do kernel.(sonda por problemas)
-int navigationbar,   // Janela de navegação(semelhante a navigation bar dos dispositivos mobile) 
+int navigationbar,   // Janela de navegaï¿½ï¿½o(semelhante a navigation bar dos dispositivos mobile) 
 int grid             // Grid da janela principal.
 //limites ...
 )
@@ -378,7 +381,7 @@ int grid             // Grid da janela principal.
  **************************************
  * logon_create_screen:
  *     Cria a tela. 
- *     Atribuindo as dimensões.
+ *     Atribuindo as dimensï¿½es.
  *     ...
  */
 void logon_create_screen()
@@ -391,7 +394,7 @@ void logon_create_screen()
 	unsigned long Height = (unsigned long) screenGetHeight();
 	
 	// Screen
-	// Obs: Não tem 'parent window' !!!
+	// Obs: Nï¿½o tem 'parent window' !!!
 	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Screen", 
 	                                Left, Top, Width, Height, 
 							        NULL, 0, 0, COLOR_BLACK );  
@@ -416,7 +419,7 @@ void logon_create_screen()
 	
 done:
     //#bugbug: 
-	//Não usar set focus nessa que é a primeira janela.	
+	//Nï¿½o usar set focus nessa que ï¿½ a primeira janela.	
 	//windowLock(hWindow);
     return; 
 };
@@ -475,14 +478,14 @@ done:
 /*
  *************************************************
  * logon_create_mainwindow:
- *      A área de trabalho.
- *      *Importante: É a área disponível na tela para o aplicativo. 
+ *      A ï¿½rea de trabalho.
+ *      *Importante: ï¿½ a ï¿½rea disponï¿½vel na tela para o aplicativo. 
  */
 void logon_create_mainwindow()
 {  
     struct window_d *hWindow; 
 	 
-	//Dimensões:
+	//Dimensï¿½es:
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
 	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
 	unsigned long Width = (unsigned long) screenGetWidth();
@@ -498,10 +501,10 @@ void logon_create_mainwindow()
 	//
 	
 	//
-	// Estamos criando uma área de trabalho que
-	// é o tamanho total da tela menos a área destinada
-	// à barra de tarefas.
-	// A barra de tarefas ainda não foi criada, mas
+	// Estamos criando uma ï¿½rea de trabalho que
+	// ï¿½ o tamanho total da tela menos a ï¿½rea destinada
+	// ï¿½ barra de tarefas.
+	// A barra de tarefas ainda nï¿½o foi criada, mas
 	// um tamanho inicial para ela ja foi reservado.
 	//
 	
@@ -532,7 +535,7 @@ void logon_create_mainwindow()
 	//  Desktop Window:
 	//      Criar a janela gui->desktop.
 	//      Na verdade a janela do desktop
-	//      é a janela da área de trabalho.
+	//      ï¿½ a janela da ï¿½rea de trabalho.
 	//
 	
     /*	
@@ -552,7 +555,7 @@ void logon_create_mainwindow()
 		};
 	};
 	
-	//Não registrar pois main menu ja está registrada.
+	//Nï¿½o registrar pois main menu ja estï¿½ registrada.
 	//RegisterWindow(gui->desktop);
 	
 done:
@@ -564,7 +567,7 @@ done:
 /*
  * logon_create_logo:
  *     Cria a janela para o logo da area de trabalho.
- *     o logo da area de trabalho é a magem da area de trabalho.
+ *     o logo da area de trabalho ï¿½ a magem da area de trabalho.
  *
  *     Obs: Sem logo por enquanto.
  */
@@ -575,8 +578,8 @@ void logon_create_logo(){
 
 /*
  * logon_create_taskbar:
- *     Obs: Não há tarefas durante o ambiente de logon.
- *          Não precisa de barra de tarefas.
+ *     Obs: Nï¿½o hï¿½ tarefas durante o ambiente de logon.
+ *          Nï¿½o precisa de barra de tarefas.
  */
 void logon_create_taskbar(){ 
     return; //Cancelada!.
@@ -597,8 +600,8 @@ void logon_create_controlmenu(){
 
 /*
  * logon_create_infobox:
- *     Janelinha de informações do sistema.
- *     Avisa o usuário sobre eventos do sistema na ora do logon,
+ *     Janelinha de informaï¿½ï¿½es do sistema.
+ *     Avisa o usuï¿½rio sobre eventos do sistema na ora do logon,
  * como novos dispositivos encontrados.
  *     Inicalizar uma estrutura light de infobox.
  */
@@ -620,7 +623,7 @@ void logon_create_messagebox(){
 
 /*
  * logon_create_debug:
- *     Pequeno debug de estruturas e parâmetros e logon.
+ *     Pequeno debug de estruturas e parï¿½metros e logon.
  * 
  */
 void logon_create_debug(){ 
@@ -630,14 +633,14 @@ void logon_create_debug(){
 
 /*
  * logon_create_navigationbar:
- *     A barra de navegação na tela de logon.
+ *     A barra de navegaï¿½ï¿½o na tela de logon.
  *
- *     Nessa barra pode ter botões como desligar ou reboot.
- *     Barra de navegação, semelhante as barras encontradas nos 
- * dispositivos móveis.
- *     Usada para navegação simples. 
+ *     Nessa barra pode ter botï¿½es como desligar ou reboot.
+ *     Barra de navegaï¿½ï¿½o, semelhante as barras encontradas nos 
+ * dispositivos mï¿½veis.
+ *     Usada para navegaï¿½ï¿½o simples. 
  *     Fica em baixo.
- *     A barra de navegação da tela de logon pode ser um pouco mais larga.
+ *     A barra de navegaï¿½ï¿½o da tela de logon pode ser um pouco mais larga.
  *
  */
 void logon_create_navigationbar()
@@ -716,7 +719,7 @@ done:
 
 /*
  * logon_create_grid:
- *     O Kernel não cria grid em logon.
+ *     O Kernel nï¿½o cria grid em logon.
  */
 void logon_create_grid(){ 
 	return; //Cancelada!
@@ -725,11 +728,11 @@ void logon_create_grid(){
 
 /*
  * logon_create_developer_screen:
- *     Cria a tela do desenvolvedor, a única tela em primeiro plano e com foco de
- * entrada durante a fase de desenvolvimento da interface gráfica.
- *     É conveniente que essa tela seja de uma cor diferente, para os aplicativos 
+ *     Cria a tela do desenvolvedor, a ï¿½nica tela em primeiro plano e com foco de
+ * entrada durante a fase de desenvolvimento da interface grï¿½fica.
+ *     ï¿½ conveniente que essa tela seja de uma cor diferente, para os aplicativos 
  * testarem cores diferentes de fonte.
- *     Atribuindo as dimensões.
+ *     Atribuindo as dimensï¿½es.
  *     ...
  */
 void logon_create_developer_screen()
@@ -741,16 +744,16 @@ void logon_create_developer_screen()
     struct window_d *hWindow; 
 	
 	//
-	// @todo: Os parâmetros passados com as dimensões foram
-	//        passados pelo boot loader e estão disponíveis.
+	// @todo: Os parï¿½metros passados com as dimensï¿½es foram
+	//        passados pelo boot loader e estï¿½o disponï¿½veis.
 	//
 	
-	//Métrica. 
+	//Mï¿½trica. 
 	//Precisa ter boa altura.
-	//Não pode atrapalhar as outras que serão basicamente pequenas e centralizadas.
-	//Então ela deve ser estreita e do lado esquerdo... 
-	//Deve ter uma cor distinta... naõ pode preto, azul, nem verde, nem rosa...
-	//Será laranjada.
+	//Nï¿½o pode atrapalhar as outras que serï¿½o basicamente pequenas e centralizadas.
+	//Entï¿½o ela deve ser estreita e do lado esquerdo... 
+	//Deve ter uma cor distinta... naï¿½ pode preto, azul, nem verde, nem rosa...
+	//Serï¿½ laranjada.
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
 	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
 	unsigned long Width = (unsigned long) screenGetWidth();
@@ -764,7 +767,7 @@ void logon_create_developer_screen()
 	//
 	//
 	
-	// Screen - Não tem parent window.
+	// Screen - Nï¿½o tem parent window.
 	hWindow = (void*) CreateWindow( 3, 0, VIEW_NORMAL, "{} DEVELOPER SCREEN", 
 	                                Left, Top, Width, Height, 
 							        NULL, 0, COLOR_ORANGE, COLOR_BLUE );  
@@ -783,7 +786,7 @@ void logon_create_developer_screen()
 	    //hWindow->desktop = (void*) desktop0;
 
 		//
-		// Mais métricas.
+		// Mais mï¿½tricas.
 		//
 		hWindow->left    = Left;
 	    hWindow->top     = Top;
@@ -811,24 +814,24 @@ done:
 	// *IMPORTANTE:
 	//
 	//  TRAVAREMOS A JANELA EM PRIMEIRO PLANO E COM O FOCO DE ENTRADA.
-    //  NENHUMA OUTRA JANELA PODERÁ GANHAR O FOCO.
+    //  NENHUMA OUTRA JANELA PODERï¿½ GANHAR O FOCO.
     //  
-    // Até que a interface gráfica fique mais robusta, apenas a janela 
-    // dodesenvolvedor ficará com o foco de entrada.  	
+    // Atï¿½ que a interface grï¿½fica fique mais robusta, apenas a janela 
+    // dodesenvolvedor ficarï¿½ com o foco de entrada.  	
 	//
 	
 	//ganho o foco.
 	SetFocus(hWindow);
 	
 	//trava o foco nela.
-	//não criaremos uma rotina para manipular essa variável...
-	//e ela será usada apenas uma vez. 
-	// essa variável será uma flag na rotina SetFocus(.).
-	//e ficará definida no começo do arquivo window.h.
+	//nï¿½o criaremos uma rotina para manipular essa variï¿½vel...
+	//e ela serï¿½ usada apenas uma vez. 
+	// essa variï¿½vel serï¿½ uma flag na rotina SetFocus(.).
+	//e ficarï¿½ definida no comeï¿½o do arquivo window.h.
 	//_lockfocus = 1;
 	
 
-	//ERRO NA CRIAÇÃO DA ESTRUTURA.
+	//ERRO NA CRIAï¿½ï¿½O DA ESTRUTURA.
 	if( (void*) gui->DEVELOPERSCREEN == NULL ){
 		printf("logon_create_developer_screen: gui->DEVELOPERSCREEN");
 		die();
@@ -853,7 +856,7 @@ unsigned long LogonProcedure( struct window_d *window,
 							  unsigned long long2 ) 
 {
     
-	//Obs: Deve ser simples para o módulo logon do kernel base.
+	//Obs: Deve ser simples para o mï¿½dulo logon do kernel base.
 	
 	switch(msg)
 	{			
@@ -911,7 +914,7 @@ int init_logon (int argc, char *argv[]){
 	debug_print("init_logon\n");
 	
 	//
-	// Se não há argumentos.
+	// Se nï¿½o hï¿½ argumentos.
 	//
 	
 	if(argc < 1){
@@ -960,7 +963,7 @@ int init_logon (int argc, char *argv[]){
     };
 	
 	//
-	// Aqui deve-se habilitar as opções de acordo
+	// Aqui deve-se habilitar as opï¿½ï¿½es de acordo
 	// com a flag.
 	//
 	
