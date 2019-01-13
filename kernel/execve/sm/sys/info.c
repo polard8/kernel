@@ -15,6 +15,8 @@
 
 //Usados para mostrar informações sobre a localização 
 //das partes da imagem do kernel.
+//#todo: deletar;
+/*
 extern unsigned long kernel_begin;
 extern unsigned long kernel_end;
 extern unsigned long code_begin;
@@ -23,7 +25,7 @@ extern unsigned long data_begin;
 extern unsigned long data_end;
 extern unsigned long bss_begin;
 extern unsigned long bss_end;
-
+*/
 
 
 /*
@@ -67,6 +69,7 @@ void KiInformation (){
 	
 	printf("\n");	
 	
+#ifdef IMPORTED_VARIABLES	
 	//=======================================
 	// #Warning                            //
 	// Variables imported from Makefile    //
@@ -78,7 +81,7 @@ void KiInformation (){
         GRAMADO_SUBLEVEL, 
         GRAMADO_EXTRAVERSION,
         GRAMAD0_NAME );	
-	
+#endif
 	
 	//screen 
 	

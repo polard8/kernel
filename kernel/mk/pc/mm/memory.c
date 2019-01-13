@@ -1,5 +1,5 @@
 /*
- * File: pc\mm\memory.c
+ * File: pc/mm/memory.c
  *
  * Descrição:
  *     Arquivo principal do módulo /mm do /pc, Memory Manager. 
@@ -1023,6 +1023,7 @@ void memoryShowMemoryInfo (){
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
 	
+#ifdef IMPORTED_VARIABLES	
 	//=======================================
 	// #Warning                            //
 	// Variables imported from link.ld     //
@@ -1047,6 +1048,9 @@ void memoryShowMemoryInfo (){
 	printf("rodata_begin={%x} rodata_end={%x} \n", &rodata_begin, &rodata_end );
 	printf("data_begin={%x} data_end={%x} \n", &data_begin, &data_end );
 	printf("bss_begin={%x}  bss_end={%x}\n", &bss_begin, &bss_end );
+	
+#endif
+	
 	
 	
 	//  ## heap e stack ##

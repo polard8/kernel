@@ -247,6 +247,7 @@ draw_logon_stuffs:
         if(g_guiMinimal != 1)
 		{
 			
+#ifdef IMPORTED_VARIABLES	
             //=======================================
             // #Warning                            //
             // Variables imported from Makefile    //
@@ -258,9 +259,9 @@ draw_logon_stuffs:
 				GRAMADO_EXTRAVERSION,
 				GRAMAD0_NAME );
 
-			
 			draw_text( gui->main, 400 +8, 8*1, 
 			    COLOR_WHITE, str_tmp );
+#endif
 				
 			draw_text( gui->main, 400 +8, 8*2, 
 			    COLOR_WHITE, "(c) Copyright 2005-2019, Fred Nora" );

@@ -48,6 +48,11 @@
 #define ENTRY_INIT_THREAD_400000 1
 
 
+//Autoriza rotinas que usam varia'veis importadas 
+//de makefiles e arquivos .ld.
+#define IMPORTED_VARIABLES 1
+
+
 //Essa flag aciona a rotina que vai checar o máximo de 
 //configurações e inicializações válidas.
 
