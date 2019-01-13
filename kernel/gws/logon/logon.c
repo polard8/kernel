@@ -90,7 +90,8 @@ int ExitLogon();
  */
 void create_logon (){
 	
-	struct window_d *hWindow; 	 
+	struct window_d *hWindow; 
+	char str_tmp[120];	 
 	
 	debug_print("create_logon\n");
 	
@@ -248,8 +249,11 @@ draw_logon_stuffs:
             //draw_text(gui->screen, 8, 1*8, 
 			//    COLOR_WHITE, (unsigned char *) CurrentUser->name_address);
    			
+			sprintf(str_tmp, "Gramado %s %d.%d.%d-%s", 
+				GRAMAD0_NAME, GRAMADO_VERSION, GRAMADO_PATCHLEVEL,
+				GRAMADO_SUBLEVEL, GRAMADO_EXTRAVERSION);
 			draw_text( gui->main, 400 +8, 8*1, 
-			    COLOR_WHITE, "Gramado 0.4" );
+			    COLOR_WHITE, str_tmp );
 				
 			draw_text( gui->main, 400 +8, 8*2, 
 			    COLOR_WHITE, "(c) Copyright 2005-2018, Fred Nora" );
