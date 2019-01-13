@@ -401,6 +401,9 @@ vhd-copy-files:
 	-sudo mkdir /mnt/gramadovhd/gde/bin	
 	-sudo cp ../gde/bin/* /mnt/gramadovhd/gde/bin 
 	
+#testing chasm
+	-sudo cp ../gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
+	
 
 # umount
 vhd-unmount:

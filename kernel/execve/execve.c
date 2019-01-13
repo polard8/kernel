@@ -177,6 +177,25 @@ executive_gramado_core_init_execve ( int i,
 			// Não deve existir suporte a PE dentro do kernel.
 			// PE é proprietário.
 			
+	
+	Status = (int) fsCheckELFFile ( (unsigned long) 0x00400000 );
+	if ( Status == 0 )
+	{
+	    printf("ok, its a valid ELF file\n");
+		goto format_ok;
+		
+	}		
+	if ( Status == 1 )
+	{
+		//aí ferrou ... não podemos continuar com um arquivo corrompido.	
+        //como carregamos novo arquivo na memória então a antiga thread vai falaher.		
+		printf("executive_gramado_core_init_execve: ERROR. It's not a valid ELF file\n");
+		die();
+        goto fail;
+    }
+	
+	
+	
 	Status = (int) fsCheckPEFile ( (unsigned long) 0x00400000 );
 			
 	if ( Status == 1 )
@@ -184,12 +203,12 @@ executive_gramado_core_init_execve ( int i,
 		//aí ferrou ... não podemos continuar com um arquivo corrompido.	
         //como carregamos novo arquivo na memória então a antiga thread vai falaher.		
 		printf("executive_gramado_core_init_execve: ERROR. It's not a valid PE file\n");
-		die();
-        goto fail;
+		//die();
+        //goto fail;
     }	
+
 	
-	
-	
+format_ok:	
 	
 	//#debug
 	//tentando receber uma linha de ocmando inteira.

@@ -51,6 +51,39 @@
 //...
 
 
+int fsCheckELFFile ( unsigned long address ){
+	
+	unsigned char *buffer = (unsigned char *) address;
+	
+	//.ELF
+	if ( buffer[0] != 0x7F ||
+		 buffer[1] != 0x45 ||
+		 buffer[2] != 0x4C ||
+		 buffer[3] != 0x46 )
+	{
+		printf("fsCheckELFFile: Sig \n");
+		goto fail;
+	}
+	
+	//i486
+	
+	//Continua...
+	
+	//
+	// # OK #
+	//
+	
+//done:	
+	return (int) 0;
+	
+fail:
+    printf("fail\n");
+    return (int) 1;
+};
+
+
+
+
 // Checando a validade de arquivos binários no formato PE.
 // #bugbug: Isso não deve ficar no kernel, pois PE é proprietário.
 // Nem usaremos PE no futuro.

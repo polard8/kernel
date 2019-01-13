@@ -1038,7 +1038,7 @@ findEmptyDirectoryEntry( unsigned long dir_address,
 //Modificador de string.
 void read_fntos(char *name);
 				  
-				  
+int fsCheckELFFile ( unsigned long address );				  
 int fsCheckPEFile( unsigned long address );	
 
 
