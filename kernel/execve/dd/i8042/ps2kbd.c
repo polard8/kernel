@@ -126,6 +126,17 @@ void ps2_keyboard_initialize (){
 	}
 	
 */
+	
+	//buffer
+	int i;
+	
+	for ( i=0; i<128; i++){
+	    keybuffer[i] = 0;
+	}
+	
+	keybuffer_head = 0;
+	keybuffer_tail = 0;
+	
 	//
 	// Set abnt2.
 	//

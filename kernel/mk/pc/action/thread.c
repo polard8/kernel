@@ -679,7 +679,7 @@ int thread_getchar (){
 	
 	//pode ser que esse aplicativo não tenha janela,
 	//mas esteja rodando na janela do shell.
-	struct window_d *wFocus;
+	//struct window_d *wFocus;
 	
 	struct thread_d *t;
 	
@@ -689,40 +689,56 @@ int thread_getchar (){
 	//
 	
 	//window_getch_lock = 1;
-	
-	//
-	// Pegamos um scancode na fila do teclado,
-	// transformamos ela em mensagem e colocamos a 
-	// mensagem na estrutura da janela com o foco de entrada.
-	//
-	
-
-	SC = (unsigned char) keybuffer[keybuffer_head];
-	
-	//Limpa o offset na fila de teclado 
-	//onde pegamos o scancode.
-	
-	keybuffer[keybuffer_head] = 0;
-	
-	//Circulamos a fila de teclado.
-	keybuffer_head++;
-	if( keybuffer_head >= 128 ){
-	    keybuffer_head = 0;	
-	}
-
  
+	SC = (unsigned char) get_scancode ();
+		
     //isso coloca a mensagem na fila da thread atual.
 	
 	KEYBOARD_LINE_DISCIPLINE ( SC );	
-
 	
- 	
-	//
+	
+    t = (void *) threadList[current_thread];
+			    
+	if ( (void *) t == NULL )
+	{
+	     goto fail;
+	}	
+	
+	if ( t->newmessageFlag != 1 )
+	{
+	    goto fail;
+	}
+	
+	if ( t->msg != MSG_KEYDOWN )
+	{
+	    goto fail;	
+	}	
+	
+	//if ( t->long1 == 0 )
+	//{
+	//	goto fail;
+	//}
+	
+	//salva só o char.
+	save = (int) t->long1;
+		
+	//limpa
+	t->window = 0;
+	t->msg = 0;
+	t->long1 = 0;
+	t->long2 = 0;
+					
+	//sinaliza que a mensagem foi consumida, 
+	//e que não temos nova mensagem.
+	t->newmessageFlag = 0;
+	
+	return (int) save;	
+	
+
+	/*
 	// Agora vamos pegar a somente a parte da mensagem 
 	// que nos interessa, que é o caractere armazenado em long1.
-	// Obs: Somente queremos o KEYDOWN. Vamos ignorar as outras 
-	// digitações.
-	//
+	// Obs: Somente queremos o KEYDOWN. Vamos ignorar as outras digitações.
 	
 	//fast way 
 	//@todo: melhorar isso
@@ -787,7 +803,7 @@ int thread_getchar (){
 	    //window_getch_lock = 0;
 		return (int) save;
 	};
-
+    */
 	
 fail:
 done:

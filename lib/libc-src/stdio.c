@@ -1505,6 +1505,9 @@ char *gets (char *s){
             			
 			switch (ch) 
 		    {
+				//case 0:
+				 //   break; 
+					
 				/* termina a string */
 			    case '\n':
 				case VK_RETURN: 
@@ -1525,17 +1528,18 @@ char *gets (char *s){
 					break;
             };
 			
-			printf("%c",ch);
-			s[t] = (char) ch;
-			t++;			
+			//debug
+			//printf("(%c %x) ",ch, ch);
 			
+			printf("%c",ch);
+			
+			s[t] = (char) ch;
+			t++;						
 		};
 		
 		asm ("pause");
     };
-	
-    
-	
+		
 done:	
 
     //s[t] = (char) '\0';

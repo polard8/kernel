@@ -4469,15 +4469,8 @@ int shellInit ( struct window_d *window ){
 done:
     
 	/*
-	   #test 
-	   #bugbug 
-	   
-	   Estamos supendendo a rotina de password porque 
-	   estamos testando o inpot de mensagens.
-	   Sendo que o input do password é diferente do input 
-	   de mensagens.
-       em seguida trablharemos nesse input  também
-       Esse input é o input usado pela libc.
+     #bugbug
+	 Esse input está falahndo e pegando valores extras as vezes.
      */
 	   
 	if ( shellCheckPassword() != 1 ){
@@ -4543,12 +4536,11 @@ done:
 };
 
 
-
 int shellCheckPassword (){
 	
     char buffer[512];	
 	
-	// Se o shell não for interativo não tem login.
+	// Somente um shell interativo tem login.
 	
 	if (interactive == 1)
 	{
@@ -4563,12 +4555,18 @@ int shellCheckPassword (){
 		user_stream = (FILE *) fopen ("user.txt","w+");
 		
 		//#todo check.
+		if ( (void *) user_stream == NULL )
+		{
+		    printf ("Couldn't open the file\n");
+		}
 		
 		// Testing welcome message.
 	    //printf("\n");
-	    printf("\n Welcome to Norax Kernel! \n");
+	    printf("\n Welcome to Gramado shell! \n");
 	    //printf("\n");
 	
+		//#obs
+		//gets is on (stdio.c)
         		
 		//
 		//  ## username  ##
@@ -4587,11 +4585,11 @@ int shellCheckPassword (){
 		
 		printf("\n");
 	
-#ifdef SHELL_VERBOSE	
+//#ifdef SHELL_VERBOSE	
         //@todo colocar o ponteiro na variável no início do arquivo.	
 	    printf("username={%s} password={%s} \n", username, password );
 		//printf("\n");
-#endif
+//#endif
 		
 		char *c = (char *) &user_stream->_base[0];		
 		

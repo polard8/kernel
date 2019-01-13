@@ -1144,14 +1144,11 @@ void *services( unsigned long number,
 		//137
 		// Isso é usado pela biblioteca stdio em user mode
 		// na função 'getchar()'
-		// #bugbug: Não está pegando todos os caracteres digitados.
-		// window.c
-		
+		// #bugbug: Está pegando caracteres extras às vezes.
 		//#test
 		//#bugbug: a partir de agora isso deve pegar mensagem na thread 
-		//atual e não mais na janela com foco de entrada.
+		//atual e não mais na janela com foco de entrada.			
         case SYS_GETCH:  
-		    //return (void *) window_getch();
 			return (void *) thread_getchar();
             break;
 
