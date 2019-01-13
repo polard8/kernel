@@ -65,144 +65,45 @@ void KeInformation (){
 
 void KiInformation (){
 	
-	//struct window_d *hWnd;
-	//struct window_d *hWindow;
+	printf("\n");	
 	
-	/*
-
-	unsigned long left;
-	unsigned long top;    
-	unsigned long width;  
-	unsigned long height; 	
+	//=======================================
+	// #Warning                            //
+	// Variables imported from Makefile    //
+	//=======================================
 	
-	//unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
-	//unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);	
-	
-	if ( VideoBlock.useGui != 1 )
-	{
-		printf("KiInformation: No GUI\n");
-		goto fail;
-	}	
-	
-	//Parent window.
-	
-	if ( (void *) gui->main == NULL )
-	{
-		printf("KiInformation: parent window fail\n");
-		goto fail;
-		
-	} else {
-		
-	    left = gui->main->left;
-	    top = gui->main->top;
-	    
-		width = gui->main->width;
-	    height = gui->main->height;		
-        
-	    // Cursor com base na janela mãe.
-	    g_cursor_x = (left/8);
-	    g_cursor_y = (top/8); 	
-		
-		//...
-	};
-	
-	*/
-	
-	//printf ("#breakpoint");
-	//refresh_screen();
-	//while(1){}
-	
-	/*
-	
-	// ## Window ##
-		
-    //Obs: Podemos usar o esquema de cores padrão.
-    //Mas a intenção é que as janelas do kernel tenham
-    //sua própria cor.	
-	
-	//hWindow = (void *) CreateWindow ( WT_OVERLAPPED, 1, 1, "KiInformation", 
-	//                    left, top, width, height, 
-	//		     		0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
-	
-	hWindow = (void *) CreateWindow ( WT_SIMPLE, 1, 1, "KiInformation", 
-	                    left, top, width, height, 
-			     		gui->main, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
-
-
-	if ( (void *) hWindow == NULL)
-	{
-	    printf("KiInformation: hWindow\n");
-	    goto fail;
-		
-    }else{
-		
-		RegisterWindow(hWindow);
-		set_active_window(hWindow);
-		SetFocus(hWindow);
-		//...
+	printf ("Gramado %d.%d.%d%s (%s)\n",
+        GRAMADO_VERSION, 
+        GRAMADO_PATCHLEVEL,
+        GRAMADO_SUBLEVEL, 
+        GRAMADO_EXTRAVERSION,
+        GRAMAD0_NAME );	
 	
 	
-		// Auterando as margens.
-		// Essas margens são usadas pela função printf.
-		// Obs: As medidas são feitas em números de caracteres.
-		// Obs: @todo: Devemos usar aqui o retângulo da área de cliente,
-		// e não as margens da janela.
-		// A estrutura de janela deve nos oferecer os valores para a métrica do 
-		// retângulo da área de cliente.
-		// Obs: @todo:Acho que essa não é a forma correta de configurar isso. Uma 
-		//rotina deveria perceber as dimensões da janela de do caractere e determinar
-		//as margens.
-		
-		g_cursor_left = (hWindow->left/8);
-		g_cursor_top = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
-		g_cursor_right = g_cursor_left + (width/8);
-		g_cursor_bottom = g_cursor_top  + (height/8);
+	//screen 
 	
-	
-	
-		//cursor (0, mas com margem nova).
-		g_cursor_x = g_cursor_left; 
-		g_cursor_y = g_cursor_top; 
-	
-        //...	
-	
-	};	
-	
-	
-	//printf ("#breakpoint after window");
-	//refresh_screen();
-	//while(1){}
-	
-	*/
-		
-	// ## Messages ##
-	
-	printf("\n");
-	//printf("[System Info:]\n");
-	
-	// OS info.
-	// config/gramado.h
-	
-	printf("%s ", OS_NAME );
-	printf("Version: %d.%d.%d \n",
-	    SYSTEM_VERSION_MAJOR,
-		SYSTEM_VERSION_MINOR,
-		SYSTEM_VERSION_REVISION );
-	
-	// Screen resolution. (first of all)    
-	printf("[Screen Resolution:]\n");
-	printf("Width={%d} Height={%d}\n\n",
+	printf("Screen Resolution: W={%d} H={%d} \n",
 	    g_device_screen_width, g_device_screen_height );
-		
-	// Kernel info.
-	// Version and time running.	
-	//printf("[Kernel Info:]\n");
-	printf("Kernel version: %s %s\n", SYSTEM_VERSION_STRING, SYSTEM_VERSION_NAME_STRING );
+	
+	//timing
+	
 	printf("%d Hz | sys time %d ms | ticks %d \n", 
-	    sys_time_hz, sys_time_ms, sys_time_ticks_total );
-		
-		
-    //ShowUserInfo(int user_id);	
+	    sys_time_hz, sys_time_ms, sys_time_ticks_total );	
+	
+	//
+	// ## User ##
+	//
+	
+	//Group and user.
+	printf("User Info: Group={%d} User={%d}\n", current_group, current_user );
+	
+	//user session, room (window station), desktop.
+	printf("UserSession={%d} Room={%d} Desktop={%d}\n",
+		current_usersession, current_room, current_desktop );
+	
+	//#bugbug Rever isso.
+	ShowUserInfo(0);  
+	
 
     // ## Status ##
 
@@ -230,6 +131,21 @@ void KiInformation (){
 		    break; 
 	};
 
+	//
+	// ## Process and thread ##
+	//
+	
+	printf("[Process Info:]\n");	
+    
+	//Current process and current thread.
+	printf("CurrentProcess={%d} CurrentThread={%d}\n", 
+	    current_process, current_thread );
+
+	printf("# thread info #\n");	
+	printf("{ %d } threads_counter\n\n", ProcessorBlock.threads_counter );	
+    
+	show_thread_information ();		
+
 		
 	// Critério de dispatch.
 	// Mostra o número de vezes que um critério de seleção 
@@ -247,10 +163,6 @@ void KiInformation (){
 		DispatchCountBlock->SelectIdealCount,
 		DispatchCountBlock->SelectDispatcherQueueCount );
 		
-	printf("# thread info #\n");	
-	printf("{ %d } threads_counter\n\n", ProcessorBlock.threads_counter );	
-    
-	show_thread_information ();		
 		
     //
 	// ## Heap and Stack ##
@@ -285,123 +197,13 @@ void KiInformation (){
 	//printf("The video option is %x \n",g_video_mode);
 	//printf("FrontbufferPA={%x} FrontbufferVA={%x} BackbufferVA={%x} \n",
 	//    g_frontbuffer_pa ,g_frontbuffer_va ,g_backbuffer_va);
-	
-	//
-	// ## User ##
-	//
-	
-	printf("[User Info:]\n");
-	
-	//Group and user.
-	printf("Group={%d} User={%d}\n", 
-	    current_group, current_user );
-	
-	//user session, room, desktop.
-	printf("UserSession={%d} Room={%d} Desktop={%d}\n",
-		current_usersession, current_room, current_desktop );
-															
-	
-	//#bugbug
-	//@todo: Rever isso.
-	ShowUserInfo(0);  
-	
-	
-	//
-	// ## Process and thread ##
-	//
-	
-	printf("[Process Info:]\n");	
-    
-	//Current process and current thread.
-	printf("CurrentProcess={%d} CurrentThread={%d}\n", 
-	    current_process, current_thread );
+
 	
     //
     //  ## Memory ##
     //	
 	
 	memoryShowMemoryInfo();
-	
-	
-	//
-	// ## Processor ##
-	//
-	
-	//Específico para intel.
-	//Talves isso não deva ficar aqui.
-	//show_cpu_intel_parameters();
-	
-	
-	//
-	// Disks and directories
-	//
-		
-	//printf("\n[Disks and directories:]\n");
-		
-	//disk
-	//printf("%s (system disk)\n",SYSTEM_DISK);
-	//printf("%s (system volume)\n",SYSTEM_VOLUME);
-		
-	//directories
-	//printf("%s\n",SYSTEM_GBUILD);
-	//printf("%s\n",SYSTEM_GDOCS);
-	//printf("%s\n",SYSTEM_GRAMADO);
-	//printf("%s\n",SYSTEM_GSDK);
-	//printf("%s\n",SYSTEM_GSRC);
-	    
-	//
-	// Test.
-	//
-		
-		
-	//Tentando mostrar informações sobre a imagem do kernel.
-	//o início da área de código e o início da área de dados.
-		
-	/* #bugbug: os valores apresentados não foram os esperados.
-	printf("KernelBegin={%x} Kernelend={%x}\n" ,kernel_begin ,kernel_end );
-	printf("CodeBegin={%x} CodeEnd={%x} \n",code_begin ,code_end);
-	printf("DataBegin={%x} DataEnd={%x} \n",data_begin ,data_end);
-	printf("BSSBegin={%x} BSSEnd={%x} \n",bss_begin ,bss_end);
-	*/
-		
-		
-	//More?!
-	
-    //SetFocus(hWindow);
-	
-	/*
-	
-    //
-    // ## Cursor ##
-    //	
-	
-	// Voltando a margem normal a margem.
-	g_cursor_left = left;       //0;
-	g_cursor_top =  top;        //0;
-	g_cursor_right  = (width/8);   
-	g_cursor_bottom = (height/8);  
-		
-	//cursor (0, mas com margem nova)
-	g_cursor_x = g_cursor_left; 
-	g_cursor_y = g_cursor_top;
-    //set_up_cursor(g_cursor_left,g_cursor_top); 		
-
-    */
-	
-	//
-	//  ## Status bar ##
-	//
-	
-	//#bugbug:
-	//Não devemos criar uma status bar,
-	//apenas atualizar as string s caso a janela 
-	//tenha uma status bar.	
-
-	//@todo criar função.
-	//UpdateStatusBar( hWindow, 
-	//    "Esc=EXIT",
-	//	"Enter=?" );		
-	
 	
 	//Nothing.   	
     goto done;	

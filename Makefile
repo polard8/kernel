@@ -170,7 +170,7 @@ services.o
 #É para informar ao make não procurar por um arquivo com esse nome
 #.PHONY x86
 
-xxx_x86: /mnt/holambravhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
+xxx_x86: /mnt/gramadovhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
 
 compile-kernel:
 	gcc -c kernel/3rdparty/kernel/disk/disk1.c   -I include/ $(CFLAGS) $(DEFINES) -o disk1.o
@@ -361,46 +361,53 @@ vhd-x86:
 
 
 vhd-mount:
-	-sudo umount /mnt/holambravhd
-	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/holambravhd/
+	-sudo umount /mnt/gramadovhd
+	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
 
 # Copy content to disk
 # 1) BM, BL 
 # 2) KERNEL 
 # 3) INIT, SHELL, TASKMAN
 vhd-copy-files:
-	sudo cp bin/BM.BIN       /mnt/holambravhd
-	sudo cp bin/BL.BIN       /mnt/holambravhd
+	sudo cp bin/BM.BIN       /mnt/gramadovhd
+	sudo cp bin/BL.BIN       /mnt/gramadovhd
 	
-	sudo cp bin/KERNEL.BIN   /mnt/holambravhd
+	sudo cp bin/KERNEL.BIN   /mnt/gramadovhd
 	
-	sudo cp bin/INIT.BIN     /mnt/holambravhd
-	sudo cp bin/SHELL.BIN    /mnt/holambravhd
-	sudo cp bin/TASKMAN.BIN  /mnt/holambravhd
+	sudo cp bin/INIT.BIN     /mnt/gramadovhd
+	sudo cp bin/SHELL.BIN    /mnt/gramadovhd
+	sudo cp bin/TASKMAN.BIN  /mnt/gramadovhd
 	
 # configs
-	sudo cp arch/x86/boot/vhd/INIT.TXT /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/USER.TXT /mnt/holambravhd
+	sudo cp arch/x86/boot/vhd/INIT.TXT /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/USER.TXT /mnt/gramadovhd
 
 # bitmaps
-	sudo cp arch/x86/boot/vhd/images/BMP1.BMP      /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/MOUSE.BMP     /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/DENNIS.BMP    /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/APP.BMP       /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/FILE.BMP      /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/FOLDER.BMP    /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/TERMINAL.BMP  /mnt/holambravhd
-	sudo cp arch/x86/boot/vhd/images/CURSOR.BMP    /mnt/holambravhd
-
+	sudo cp arch/x86/boot/vhd/images/BMP1.BMP      /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/images/MOUSE.BMP     /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/images/APP.BMP       /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/images/FILE.BMP      /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/images/FOLDER.BMP    /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/images/TERMINAL.BMP  /mnt/gramadovhd
+	sudo cp arch/x86/boot/vhd/images/CURSOR.BMP    /mnt/gramadovhd
+	
+	-sudo cp arch/x86/boot/vhd/images/DENNIS.BMP    /mnt/gramadovhd
+	
 # fonts
-	sudo cp bin/NC2.FON /mnt/holambravhd
+	sudo cp bin/NC2.FON /mnt/gramadovhd
+	
+#gde suppport
+	-sudo mkdir /mnt/gramadovhd/gde
+	-sudo mkdir /mnt/gramadovhd/gde/bin	
+	-sudo cp ../gde/bin/* /mnt/gramadovhd/gde/bin 
+	
 
 # umount
 vhd-unmount:
-	sudo umount /mnt/holambravhd
+	sudo umount /mnt/gramadovhd
 
-/mnt/holambravhd:
-	sudo mkdir /mnt/holambravhd
+/mnt/gramadovhd:
+	sudo mkdir /mnt/gramadovhd
 
 clean:
 	-rm *.o

@@ -980,14 +980,37 @@ void memoryShowMemoryInfo (){
 	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
 	
-	printf(" [Memory info:]\n");
-	//printf(" ============\n");
+	printf(" Memory info:\n");
 	
 	//sizes
 	printf(" BaseMemory     = (%d KB)\n", memorysizeBaseMemory );
 	printf(" OtherMemory    = (%d KB)\n", memorysizeOtherMemory );
 	printf(" ExtendedMemory = (%d KB)\n", memorysizeExtendedMemory );
 	printf(" TotalMemory    = (%d KB)\n", memorysizeTotal );
+	
+	printf("\n This is a ");
+		
+	// System type
+	
+	switch (g_mm_system_type){
+		
+		case stSmallSystem:
+		    printf("Small System with %d KB\n", memorysizeTotal );
+		    break;
+			
+		case stMediumSystem:
+		    printf("Medium System with %d KB\n", memorysizeTotal );
+			break;
+			
+		case stLargeSystem:
+		    printf("Large System %d KB\n", memorysizeTotal );
+			break;
+			
+		case stNull:
+		default:
+		    printf("(Null) %d KB\n", memorysizeTotal );
+			break;
+	};
 	
 	//system zone
 	//printf("systemzoneStart  = 0x%x\n", systemzoneStart);
@@ -1000,29 +1023,12 @@ void memoryShowMemoryInfo (){
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
 	
-	// System type
+	//=======================================
+	// #Warning                            //
+	// Variables imported from link.ld     //
+	//=======================================
 	
-	switch (g_mm_system_type){
-		
-		case stSmallSystem:
-		    printf(" stSmallSystem={%d KB}\n", memorysizeTotal );
-		    break;
-			
-		case stMediumSystem:
-		    printf(" stMediumSystem={%d KB}\n", memorysizeTotal );
-			break;
-			
-		case stLargeSystem:
-		    printf(" stLargeSystem={%d KB}\n", memorysizeTotal );
-			break;
-			
-		case stNull:
-		default:
-		    printf(" stNull={%d KB}\n", memorysizeTotal );
-			break;
-	};
-	
-	// ## code data bss ##
+	// ## code rodata data bss ##
 	
 	extern unsigned long code_begin;
 	extern unsigned long code_end;

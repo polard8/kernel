@@ -1,5 +1,5 @@
 /*
- * File: gws\logon\logon.c
+ * File: gws/logon/logon.c
  *
  * Descrição:
  *     Kernel Mode Logon Support Routines.
@@ -246,17 +246,11 @@ draw_logon_stuffs:
 			
         if(g_guiMinimal != 1)
 		{
-   			
-			//sprintf(str_tmp, "Gramado %s %d.%d.%d-%s", 
-			//	GRAMAD0_NAME, GRAMADO_VERSION, GRAMADO_PATCHLEVEL,
-			//	GRAMADO_SUBLEVEL, GRAMADO_EXTRAVERSION);
-
-			//sprintf(str_tmp, "Gramado %d.%d.%d%s (%s)",  
-			//	GRAMADO_VERSION, 
-			//	GRAMADO_PATCHLEVEL,
-			//	GRAMADO_SUBLEVEL, 
-			//	GRAMADO_EXTRAVERSION,
-			//	GRAMAD0_NAME );
+			
+            //=======================================
+            // #Warning                            //
+            // Variables imported from Makefile    //
+            //=======================================
 			
 			sprintf(str_tmp, "Gramado %d.%d%s (%s)",  
 				GRAMADO_VERSION, 
