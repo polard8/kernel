@@ -4468,15 +4468,15 @@ int shellInit ( struct window_d *window ){
 	
 done:
     
-	/*
-     #bugbug
-	 Esse input está falahndo e pegando valores extras as vezes.
-     */
-	   
-	if ( shellCheckPassword() != 1 ){
-		
-	    printf("shellCheckPassword FAIL \n");		
-	}
+	
+	// #bugbug
+	// Esse input está falahndo e pegando valores extras as vezes.
+    // SUSPENDIDO ATÉ ESSE TIPO DE INPUT FUNCIONAR.
+	
+	//if ( shellCheckPassword() != 1 ){
+	//	
+	//    printf("shellCheckPassword FAIL \n");		
+	//}
 
 
 	// @todo:
@@ -4489,6 +4489,7 @@ done:
 	
 	
     //heapTest:
+	
     /*	
 	printf("\n...\n");
 	printf("Testing C99 RT ...\n");
