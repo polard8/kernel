@@ -34,7 +34,11 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fleading-underscore \
 	-fno-stack-protector \
-	-s
+	-s	
+	
+#	-fleading-underscore \
+#	-fno-stack-protector \
+#	-s
 
 ##
 ## Defines
@@ -401,9 +405,11 @@ vhd-copy-files:
 	-sudo mkdir /mnt/gramadovhd/gde/bin	
 	-sudo cp ../gde/bin/* /mnt/gramadovhd/gde/bin 
 	
-#testing chasm
-	-sudo cp ../gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
 	
+	
+#Get available apps
+	-sudo cp ../gde/apps/gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GRAMCODE.BIN /mnt/gramadovhd 	
 
 # umount
 vhd-unmount:
