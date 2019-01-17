@@ -410,7 +410,8 @@ vhd-copy-files:
 #Get available apps
 	-sudo cp ../gde/apps/gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GRAMCODE.BIN /mnt/gramadovhd 
-	-sudo cp ../gde/bin/GDESHELL.BIN /mnt/gramadovhd 	
+	-sudo cp ../gde/bin/GDESHELL.BIN /mnt/gramadovhd 
+	-sudo cp ../gde/bin/SPR.BIN /mnt/gramadovhd 
 
 # umount
 vhd-unmount:
