@@ -3,91 +3,50 @@
  *
  * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
  * para suporte à IDE/AHCI.
+ * Suporte a disco, usado no kernel base.
  *
- * 2018 - Created by Nelson Cole. 
+ * History: 
+ *     2018 - Created by Nelson Cole. <nelsoncole72@gmail.com>
+ *     2019 - Revision by Fred Nora.
+ *     ...
  */
 
 
-// nelson cole
-// suporte a disco.
-// usado no kernel base
+#ifndef __ATA_H__
+#define __ATA_H__
 
 
+/*
+ **************************************************************
+ * ata_pci:
+ *     Estrutura para dispositivos PCI.
+ *
+ * #importante
+ + esssa é uma estrutura do gramado, definida em pci.h
+ */
 
-//
-// ==========================================================================
-//     IDE controller support by Nelson Cole
-// ==========================================================================
-//
+struct pci_device_d ata_pci;
 
 
 int ATAFlag;
 #define FORCEPIO 1234
 
 
-/*
- * Khole Operating System
- * ata/ata.h
- * 
- * Copyright (C) 2017,2018 Nelson Cole <nelsoncole72@gmail.com>
- */
- 
- 
-#ifndef __ATA_H__
-#define __ATA_H__
-
-
-
-//
-// Definições de tipos usados pelo Nelson el disk.h e disk.c
-//
-
-typedef char _i8;
-typedef short _i16;
-typedef int _i32;
-typedef long long _i64;
-
-typedef unsigned char _u8;
-typedef unsigned short _u16;
-typedef unsigned long _u32;
-typedef unsigned long long _u64;
-
-//typedef unsigned char uint8_t;
-//typedef unsigned short uint16_t;
-//typedef unsigned long uint32_t;
-typedef unsigned long long uint64_t;
-
-typedef void _void;
-
-
-
 // IO Delay.
 #define io_delay() asm("out %%al,$0x80"::);
 
 
-// Atenção:
-// Esse endereço está na memória baixa.
-//#define DMA_PHYS_ADDR0 (0x40000)
-//#define DMA_PHYS_ADDR1 (DMA_PHYS_ADDR0 + 0x10000)
-//#define DMA_PHYS_ADDR2 (DMA_PHYS_ADDR1 + 0x10000)
-//#define DMA_PHYS_ADDR3 (DMA_PHYS_ADDR2 + 0x10000)
-
-
-
-//
-// ## bug bug precisamos encontrar endereços válidos.
-//
-
-//#bugbug: precisa encontrar endereços válidos.
-//user mode 1:1
+//#bugbug 
+//Precisamos encontrar endereços válidos.
 #define DMA_PHYS_ADDR0 0xa0000
 #define DMA_PHYS_ADDR1 0xb0000
 #define DMA_PHYS_ADDR2 0xb0000
 #define DMA_PHYS_ADDR3 0xb0000 
 
 
-
+//#bubbug usar definição do gramado.
 #define PCI_CLASSE_MASS 1
+
 
 // Controladores de unidades ATA.
 #define ATA_IDE_CONTROLLER  0x1
@@ -253,49 +212,6 @@ struct dev_nport dev_nport;
 //
 
 
-
-
-/*
- * ata_pci:
- *     Suporta a IDE Controller.
- *     Essa é uma estrutura de superte a discos ata.
- */
-struct ata_pci
-{
-    _u16 vendor_id;
-    _u16 device_id;
-    _u16 command;
-    _u16 status;
-    _u8 prog_if;
-    _u8 revision_id;
-    _u8 classe;
-    _u8 subclasse;
-    _u8 primary_master_latency_timer;
-    _u8 header_type;
-    _u8 BIST;
-    _u32 bar0;
-    _u32 bar1; 
-    _u32 bar2;
-    _u32 bar3;
-    _u32 bar4;
-    _u32 bar5;
-    _u16 subsystem_vendor_id;
-    _u16 subsystem_id;  
-    _u32 capabilities_pointer;
-    _u8 interrupt_line;
-    _u8 interrupt_pin;
-
-    // AHCI
-
-    // "Emos" de acrescer com o tempo de acordo nossas necessidades.
-};
-struct ata_pci ata_pci;
-
-
-
-
-
-
 /*
  * ata:
  *     Estrutura para o controle de execução do programa.
@@ -321,23 +237,29 @@ struct ata ata;
 
 
 /*
+ ******************************************************************
  * st_dev:
- *
+ * É uma estrutura para dispositivos de armazenamento.
  */
+
 typedef struct st_dev st_dev_t;
 typedef struct st_dev 
 {
-    _u32 dev_id;
-    _u8  dev_nport;
-    _u8  dev_type;            // ATA or ATAPI
-    _u8  dev_num;
-    _u8  dev_channel;
-    _u8  dev_access;          // LBA28 or LBA48
-    _u8  dev_modo_transfere;
-    _u32 dev_byte_per_sector;
-    _u32 dev_total_num_sector;
-    _u64 dev_total_num_sector_lba48;
-    _u32 dev_size;
+    unsigned long dev_id;
+	
+    unsigned char  dev_nport;
+    unsigned char  dev_type;            // ATA or ATAPI
+    unsigned char  dev_num;
+    unsigned char  dev_channel;
+    unsigned char  dev_access;          // LBA28 or LBA48
+    unsigned char  dev_modo_transfere;
+    
+	unsigned long dev_byte_per_sector;
+    unsigned long dev_total_num_sector;
+    
+	unsigned long long dev_total_num_sector_lba48;
+    
+	unsigned long dev_size;
        
     struct st_dev *next;
 }st_dev;
@@ -346,10 +268,10 @@ typedef struct st_dev
 /*************************** variáves *************************************/
 
 
-_u16 *ata_identify_dev_buf;
-_u8 ata_record_dev;
-_u8 ata_record_channel;
+unsigned short  *ata_identify_dev_buf;
 
+unsigned char ata_record_dev;
+unsigned char ata_record_channel;
 
 
 
@@ -368,26 +290,26 @@ void set_ata_addr(int channel);
 // ata.c
 int ide_identify_device(uint8_t nport);
 void ata_wait(int val);
-_u8 ata_wait_not_busy();
-_u8 ata_wait_busy();
-_u8 ata_wait_no_drq();
-_u8 ata_wait_drq();
-_u8 ata_wait_irq();
-_u8 ata_status_read();
+
+unsigned char ata_wait_not_busy();
+unsigned char ata_wait_busy();
+unsigned char ata_wait_no_drq();
+unsigned char ata_wait_drq();
+unsigned char ata_wait_irq();
+unsigned char ata_status_read();
+
 void ata_cmd_write(int cmd_val);
 
-_u8 ata_assert_dever(char nport);
+unsigned char ata_assert_dever(char nport);
 
 
 // ata_pio.c
-void ata_pio_read(_void *buffer,_i32 bytes);
-void ata_pio_write(_void *buffer,_i32 bytes);
+void ata_pio_read ( void *buffer, int bytes);
+void ata_pio_write ( void *buffer, int bytes);
 
 // ide.c
 
  
- 
-
 
 //ide_dma.c
 void ide_dma_data( void *addr, 
@@ -414,29 +336,32 @@ void ahci_mass_storage_init();
 
 
 // PCI READ.
-uint32_t diskReadPCIConfigAddr( int bus, 
-                               int dev,
-							   int fun, 
-							   int offset );
+uint32_t 
+diskReadPCIConfigAddr ( int bus, 
+                        int dev,
+						int fun, 
+						int offset );
 
 // PCI WRITE.							   
-void diskWritePCIConfigAddr( int bus, 
-                            int dev,
-							int fun, 
-							int offset, 
-							int data );
+void 
+diskWritePCIConfigAddr ( int bus, 
+                         int dev,
+						 int fun, 
+						 int offset, 
+						 int data );
 
-uint32_t diskPCIScanDevice( int class );
+uint32_t diskPCIScanDevice ( int class );
 
-int diskATAPCIConfigurationSpace( char bus, char dev, char fun );
+int diskATAPCIConfigurationSpace ( char bus, char dev, char fun );
+
 
 /*
  ****************************************************************
  * diskATAInitialize:
  *     Inicializa o IDE e mostra informações sobre o disco.
- *
  */
 int diskATAInitialize( int ataflag );
+
 
 /*
  *******************************************
@@ -454,12 +379,91 @@ int disk_ata_wait_irq ();
 
 void show_ide_info();
 
+
+
+///----------------------------
+
+
+//incluindo coisas que estavam em disk1.c
+
+#define DISK1 1
+#define DISK2 2
+#define DISK3 3
+#define DISK4 4
+
+
+
+
+
+// base address 
+static unsigned long ATA_BAR0;    // Primary Command Block Base Address
+static unsigned long ATA_BAR1;    // Primary Control Block Base Address
+static unsigned long ATA_BAR2;    // Secondary Command Block Base Address
+static unsigned long ATA_BAR3;    // Secondary Control Block Base Address
+static unsigned long ATA_BAR4;    // Legacy Bus Master Base Address
+static unsigned long ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Address
+
+
+
+
+
+
+//
+// DMA support
+//
+
+// Commands dma 
+#define dma_bus_start   1
+#define dma_bus_stop    0
+#define dma_bus_read    0
+#define dma_bus_write   1
+
+// Status dma
+#define ide_dma_sr_err     0x02
+
+// Registros bus master base address
+#define ide_dma_reg_cmd     0x00
+#define ide_dma_reg_status  0x02
+#define ide_dma_reg_addr    0x04
+
+// channel
+#define ide_dma_primary     0x00
+#define ide_dma_secundary   0x01
+
+
+/* ide_dma_prdt: */
+
+struct {
+	
+    uint32_t addr;
+    uint32_t len;
+	
+}ide_dma_prdt[4];
+
+
+//
+// pci support
+// #todo: Podemos mudar isso para pic.h, mas precisamos ver 
+// se aceitará a tipagem.
+
+#define CONFIG_ADDR(bus,device,fn,offset)\
+                       (\
+                       (((uint32_t)(bus) &0xff) << 16)|\
+                       (((uint32_t)(device) &0x3f) << 11)|\
+                       (((uint32_t)(fn) &0x07) << 8)|\
+                       ((uint32_t)(offset) &0xfc)|0x80000000)
+
+
+
+
+
+
+
+
+
+
+
+
 #endif
-
-
-
-
-
-
 
 

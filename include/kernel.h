@@ -217,7 +217,8 @@ extern void do_executa_new_task();
 
 
 //disk1 - nelson
-#include <kernel/gramado/3rdparty/kernel/disk/disk1.h>
+//#include <kernel/gramado/3rdparty/sirius.h>
+#include <kernel/gramado/execve/dd/disk1.h>
 
 //execve
 #include <kernel/gramado/execve/sm/disk/disk.h>           //disk.

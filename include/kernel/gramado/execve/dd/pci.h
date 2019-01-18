@@ -11,7 +11,18 @@
  *     Versão 1.0, 2016 - Revisão.
  *     ...
  */
- 
+
+#ifndef __PCI_H__
+#define __PCI_H__
+
+
+
+
+#define PCI_PORT_ADDR 0xCF8
+#define PCI_PORT_DATA 0xCFC
+
+
+					   
 
 //
 // Variáveis internas.
@@ -74,20 +85,25 @@ struct pci_device_d
 	
 	
 	//Primeiros.
+	unsigned short Device;	
 	unsigned short Vendor;
-	unsigned short Device;
+
+	unsigned short Status;	
 	unsigned short Command;
-	unsigned short Status;
-	
-	unsigned char revisionId;
-	unsigned char progif;
-	unsigned char subclass;
+
 	unsigned char classCode;
-	
-	unsigned char cache_line_size;
-	unsigned char latency_timer;
-	unsigned char header_type;
+	unsigned char subclass;
+	unsigned char progif;	
+	unsigned char revisionId;
+
+
 	unsigned char bist;
+	unsigned char header_type;
+	unsigned char latency_timer;	
+	unsigned char cache_line_size;
+
+
+
 	
 	//Address.
 	unsigned long BAR0;
@@ -104,10 +120,11 @@ struct pci_device_d
 	unsigned short subsystem_Device;
 
 	//Últimos.
-    unsigned char irq_line;    //Qual IRQ será usada pelo PIC.	
-	unsigned char irq_pin;     //??
-	unsigned char min_grant;
+
 	unsigned char max_latency;
+	unsigned char min_grant;
+	unsigned char irq_pin;     //??
+    unsigned char irq_line;    //Qual IRQ será usada pelo PIC.	
 	
     //continua ...
 	
@@ -280,7 +297,10 @@ unsigned long KiPciHandler2();
 unsigned long KiPciHandler3();
 unsigned long KiPciHandler4();
 //...								
-								
+	
+
+#endif 
+
 //
 // End.
 //

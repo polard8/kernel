@@ -177,7 +177,8 @@ services.o
 xxx_x86: /mnt/gramadovhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
 
 compile-kernel:
-	gcc -c kernel/3rdparty/kernel/disk/disk1.c   -I include/ $(CFLAGS) $(DEFINES) -o disk1.o
+
+	gcc -c kernel/execve/dd/disk1.c   -I include/ $(CFLAGS) $(DEFINES) -o disk1.o
 
 	# /entry
 	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.s -f elf -o head.o
