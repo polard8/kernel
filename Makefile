@@ -13,10 +13,10 @@
 
 
 VERSION = 0
-PATCHLEVEL = 7
+PATCHLEVEL = 8
 SUBLEVEL = 0
 EXTRAVERSION = -rc0
-NAME = Soberano
+NAME = Profissional
 
 #todo:
 #We need to simplify these flags, but it's working.
