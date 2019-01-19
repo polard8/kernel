@@ -114,6 +114,10 @@ int init_nic (){
 	// 8086:100e
 	// 82540EM Gigabit Ethernet Controller
 	
+	
+	//#importante
+	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.
+	
 	struct pci_device_d *pci_device;
 	
 	pci_device = (void *) malloc ( sizeof( struct pci_device_d  ) );

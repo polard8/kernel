@@ -6,6 +6,156 @@
 // Provavelmente na ultima BAR pegaremos o endereço base dos registradores.
 //
 
+
+
+
+/*
+ **********************************************
+ * AHCIInit
+ *  Procura o dispositivo pela classe configura a estrutura de dispositivo PCI.
+ *
+ */
+
+int AHCIInit (){
+
+	//pci info.
+	unsigned char bus;
+	unsigned char dev;
+	unsigned char fun;			
+    uint32_t data;
+
+    //#debug
+	printf("\n");
+	printf("AHCIInit: Probing PCI ...\n");
+	
+	
+	//Procurar dispositivo pela classe.
+	//#todo  ((class == PCI_CLASSCODE_MASS) && (subclass == PCI_SUBCLASS_SATA))
+	
+	//#bugbug: Isso não resolve nosso problemas, 
+	//precisamos de um dispositivo com subclasse 6. PCI_SUBCLASS_SATA
+	
+	data = (uint32_t) diskPCIScanDevice (PCI_CLASSCODE_MASS); 
+	
+	if ( data == -1 )
+	{
+		printf("AHCIInit: Controller not found\n");
+		//refresh_screen();
+		
+		return (int) 1;
+	
+	} else {
+	    
+		bus = ( data >> 8 & 0xff );
+        dev = ( data >> 3 & 31 );
+        fun = ( data & 7 );
+	};
+
+	
+	
+
+	
+	// # get info
+	// #pci
+	// Pegaremos mais informações e colocaremos na estrutura de 
+	// dispositivo pci.
+	
+	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
+
+	//#debug
+	printf("Vendor=%x \n", (data & 0xffff) );
+	printf("Device=%x \n", (data >> 16 &0xffff) );	
+	
+	
+	//#importante
+	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.	
+	
+	struct pci_device_d *pci_device;
+	
+	pci_device = (void *) malloc ( sizeof( struct pci_device_d  ) );
+	
+	if ( (void *) pci_device ==  NULL )
+    {
+		
+		printf("AHCIInit: pci_device struct\n");
+		return (int) 1;
+	
+	}else{
+		
+		pci_device->deviceUsed = 1;
+		pci_device->deviceMagic = 1234;
+		
+		pci_device->bus = (unsigned char) bus;
+		pci_device->dev = (unsigned char) dev;
+		pci_device->func = (unsigned char) fun;
+		
+		pci_device->Vendor = (unsigned short) (data & 0xffff);
+		pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
+		
+		
+		// #IMPORTANTE
+		// #bugbug:
+		// Esse driver é para placa Intel, vamos cancelar a inicialização 
+		// do driver se a placa não for Intel.
+		
+	    // 8086:100e
+	    // 82540EM Gigabit Ethernet Controller		
+		
+		//if ( pci_device->Vendor != 0x8086 )
+		if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
+		{
+		   printf("AHCIInit: 82540EM not found !\n");
+		   return 1;
+		}
+		
+		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x10 );
+		pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x14 ); 
+		pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x18 );
+		pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x1C );
+		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x20 );
+		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x24 );
+		
+		//#todo:
+		//Temos que pegar o número da interrupção.
+		
+		//...
+	};
+		
+	
+	//
+	// ## IRQ ##
+	//
+
+	pci_device->irq_line = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );   //irq
+	pci_device->irq_pin = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D );    //letras		
+	
+
+	//pegamos o endereç[o físico do início dos registradores.
+	unsigned long phy_address = (pci_device->BAR5 & 0xFFFFFFF0);
+	
+	//#todo
+	//mapeando para obter o endereço virtual que o kernel pode manipular.
+	//Criar esssa rotina lá em pages.c
+	//unsigned long virt_address = mapping_ahci_device_address ( phy_address );
+	
+	//endereço base.
+	unsigned char *base_address = (unsigned char *) virt_address;
+	unsigned long *base_address32 = (unsigned long *) virt_address;
+
+    return 0;
+}
+	
+
+
+
+
+
+
+
+
+
+
+
 //Detect attached SATA devices
 
 /*
@@ -34,6 +184,7 @@ There are four kinds of SATA devices, and their signatures are defined as below.
 #define HBA_PORT_IPM_ACTIVE 1
 #define HBA_PORT_DET_PRESENT 3
  
+/*
 void probe_port(HBA_MEM *abar)
 {
 	// Search disk in impelemented ports
@@ -70,7 +221,9 @@ void probe_port(HBA_MEM *abar)
 		i ++;
 	}
 }
+*/ 
  
+/*
 // Check device type
 static int check_type(HBA_PORT *port)
 {
@@ -96,7 +249,7 @@ static int check_type(HBA_PORT *port)
 		return AHCI_DEV_SATA;
 	}
 }
-
+*/
 
 
 //AHCI port memory space initialization
@@ -121,6 +274,7 @@ The example subroutines stop_cmd() and start_cmd() do the job.
 #define HBA_PxCMD_FR    0x4000
 #define HBA_PxCMD_CR    0x8000
  
+/*
 void port_rebase(HBA_PORT *port, int portno)
 {
 	stop_cmd(port);	// Stop command engine
@@ -154,7 +308,9 @@ void port_rebase(HBA_PORT *port, int portno)
  
 	start_cmd(port);	// Start command engine
 }
+*/ 
  
+/*
 // Start command engine
 void start_cmd(HBA_PORT *port)
 {
@@ -165,7 +321,10 @@ void start_cmd(HBA_PORT *port)
 	port->cmd |= HBA_PxCMD_FRE;
 	port->cmd |= HBA_PxCMD_ST; 
 }
- 
+*/
+
+
+/* 
 // Stop command engine
 void stop_cmd(HBA_PORT *port)
 {
@@ -185,7 +344,7 @@ void stop_cmd(HBA_PORT *port)
 	// Clear FRE (bit4)
 	port->cmd &= ~HBA_PxCMD_FRE;
 }
-
+*/
 
 
 
@@ -214,6 +373,8 @@ Every PRDT entry contains 8K bytes data payload at most.
 #define ATA_DEV_BUSY 0x80
 #define ATA_DEV_DRQ 0x08
  
+
+/*
 bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint16_t *buf)
 {
 	port->is = (uint32_t) -1;		// Clear pending interrupt bits
@@ -301,7 +462,9 @@ bool read(HBA_PORT *port, uint32_t startl, uint32_t starth, uint32_t count, uint
  
 	return true;
 }
+*/
  
+/*
 // Find a free command list slot
 int find_cmdslot(HBA_PORT *port)
 {
@@ -316,4 +479,6 @@ int find_cmdslot(HBA_PORT *port)
 	trace_ahci("Cannot find free command list entry\n");
 	return -1;
 }
+*/
+
 

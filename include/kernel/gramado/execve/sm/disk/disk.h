@@ -74,6 +74,9 @@ struct disk_d
 // Lita de discos
 //
 
+//se tem lista de lisco pode ficar aqui em sm
+//quanto ao resto??!!
+
 unsigned long diskList[DISK_COUNT_MAX];
 
 

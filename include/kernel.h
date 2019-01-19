@@ -218,7 +218,7 @@ extern void do_executa_new_task();
 
 //disk1 - nelson
 //#include <kernel/gramado/3rdparty/sirius.h>
-#include <kernel/gramado/execve/dd/disk1.h>
+#include <kernel/gramado/execve/dd/ide/disk1.h>
 
 //execve
 #include <kernel/gramado/execve/sm/disk/disk.h>           //disk.
@@ -241,15 +241,19 @@ extern void do_executa_new_task();
 #include <kernel/gramado/execve/dd/timer.h>        //PIT. irq0.
 #include <kernel/gramado/execve/dd/pic.h>          //PIC.
 #include <kernel/gramado/execve/dd/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
-#include <kernel/gramado/execve/dd/rtc.h>          //clock    ( South bridge).
-#include <kernel/gramado/execve/dd/floppy.h>       //floppy   ( South bridge).
-#include <kernel/gramado/execve/dd/keyboard.h>     //irq1     ( South bridge).   //keyboard
+#include <kernel/gramado/execve/dd/rtc.h>          //clock.
+#include <kernel/gramado/execve/dd/floppy.h>       //floppy.
+#include <kernel/gramado/execve/dd/keyboard.h>     //irq1     //keyboard
 #include <kernel/gramado/execve/dd/vk.h>         //virtual keys
 #include <kernel/gramado/execve/dd/abnt2.h> 
 #include <kernel/gramado/execve/dd/ldisc/ldisc.h>        //ldisc
-#include <kernel/gramado/execve/dd/ide.h>          //irq14/15 ( South bridge).
+
+#include <kernel/gramado/execve/dd/ide/ide.h>          //irq14/15 
+
 #include <kernel/gramado/execve/dd/pci.h>            //pci.
-#include <kernel/gramado/execve/dd/sata.h>           //(PCI BUS).
+
+#include <kernel/gramado/execve/dd/ahci/sata.h>           //(PCI BUS).
+
 #include <kernel/gramado/execve/dd/usb.h>            //usb.
 
 //#include                                       //pcie.

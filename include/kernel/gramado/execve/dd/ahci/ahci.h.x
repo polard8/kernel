@@ -361,7 +361,7 @@ typedef struct tagHBA_PRDT_ENTRY
 
 
 
-
+int AHCIInit ();
 
 
 

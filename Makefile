@@ -178,8 +178,6 @@ xxx_x86: /mnt/gramadovhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-file
 
 compile-kernel:
 
-	gcc -c kernel/execve/dd/disk1.c   -I include/ $(CFLAGS) $(DEFINES) -o disk1.o
-
 	# /entry
 	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.s -f elf -o head.o
 	gcc -c kernel/entry/x86/x86main.c  -I include/ $(CFLAGS) $(DEFINES) -o x86main.o
@@ -242,7 +240,10 @@ compile-kernel:
 	gcc -c kernel/execve/crts/libc/string.c  -I include/ $(CFLAGS) $(DEFINES) -o string.o
 
 	gcc -c kernel/execve/dd/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
-	gcc -c kernel/execve/dd/hdd.c     -I include/ $(CFLAGS) $(DEFINES) -o hdd.o
+	
+	gcc -c kernel/execve/dd/ide/hdd.c     -I include/ $(CFLAGS) $(DEFINES) -o hdd.o
+	gcc -c kernel/execve/dd/ide/disk1.c   -I include/ $(CFLAGS) $(DEFINES) -o disk1.o
+	
 	gcc -c kernel/execve/dd/pic.c     -I include/ $(CFLAGS) $(DEFINES) -o pic.o
 	gcc -c kernel/execve/dd/rtc.c     -I include/ $(CFLAGS) $(DEFINES) -o rtc.o
 	gcc -c kernel/execve/dd/screen.c  -I include/ $(CFLAGS) $(DEFINES) -o screen.o

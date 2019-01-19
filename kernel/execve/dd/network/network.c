@@ -76,10 +76,10 @@ int networkGetStatus (){
 /*
  **********************************************************
  * networkInit:
- *     Inicializa todos os recursos de rede, inclusive 
- * os drivers dos adaptadores de rede.
- *
+ *     Inicializa todos os recursos de rede, inclusive os drivers dos 
+ * adaptadores de rede.
  */ 
+
 int networkInit (){
 	
 	// Status
@@ -130,9 +130,12 @@ int networkInit (){
 
 	int nic_status;
 	
-	//nic intel.
-	///todo: mudar o nome para sabermos que é intel.
-    nic_status = (int) init_nic ();
+	// nic intel.
+	// todo: mudar o nome para sabermos que é intel.
+	// intel.c
+    
+	nic_status = (int) init_nic ();
+	
 	if (nic_status == 1)
 	{
 		debug_print("networkInit: init_nic fail.\n");
@@ -169,6 +172,7 @@ int networkInit (){
 	
 	return (int) 0;
 };
+
 
 void show_network_info (){
 	
@@ -366,7 +370,7 @@ int handle_ipv6 ( struct nic_info_d *nic, struct ipv6_header_d *header ){
 };
 
 
-//chamad por F6
+//chamada por F6 no procedimento de janela do sistema.
 void testNIC()
 {
 	printf("testNIC: initializing...\n");
