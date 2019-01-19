@@ -985,20 +985,21 @@ const char *pci_classes[] = {
     "Data acquisition and signal processing",
     [255]="Unknown"
 };
-			  				   					   
+
+
 /* read_pci_config_addr:
  *     READ */
 
 uint32_t 
 diskReadPCIConfigAddr ( int bus, 
-                        int dev,
+						int dev,
 						int fun, 
 						int offset )
 {
-    outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
+	outportl ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 	
-    return (uint32_t) inportl(PCI_PORT_DATA);
-};
+	return (uint32_t) inportl(PCI_PORT_DATA);
+}
 
 
 /* write_pci_config_addr:
@@ -1277,15 +1278,23 @@ done:
 /*
  ********************************************************************
  * pci_scan_device:
- *     Esta função deve retornar o número de barramento, 
- * o dispositivo e a função do dispositivo conectado ao barramento PCI 
- * de acordo a classe.
+ *     Busca um dispositivo de acordo com a classe.  
+ *     Esta função deve retornar uma varia'vel contendo: 
+ *     + O número de barramento, 
+ *     + o dispositivo e  
+ *     + a função.
+ *
+ * IN: Class.
+ * OUT: data.
+ *      -1 = error (#bugbug, pois o tipo de retorno eh unsigned int)
  */
 
 uint32_t diskPCIScanDevice ( int class ){
 	
     int bus, dev, fun;
     
+	//#bugbug -1 para unsigned int 
+	
 	uint32_t data = -1;
 	
 #ifdef KERNEL_VERBOSE		
@@ -1306,11 +1315,11 @@ uint32_t diskPCIScanDevice ( int class ){
                 outportl( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
                 data = inportl(PCI_PORT_DATA);
                 
-				if ( ( data >> 24 &0xff ) == class )
+				if ( ( data >> 24 & 0xff ) == class )
 				{
 					
 //#ifdef KERNEL_VERBOSE							
-					kprintf( "[ Detected PCI device: %s ]\n", 
+					kprintf ( "[ Detected PCI device: %s ]\n", 
 					         pci_classes[class] );
 //#endif
 							 
@@ -1325,8 +1334,11 @@ uint32_t diskPCIScanDevice ( int class ){
 
 	// Fail !
     
-	kprintf("PCI device NOT detected\n");		
-	refresh_screen();
+	kprintf ("PCI device NOT detected\n");		
+	
+	//#bugbug
+	//isso e' lento
+	//refresh_screen();
 	
     return (uint32_t) (-1);
 };
@@ -1382,9 +1394,9 @@ int diskATAInitialize ( int ataflag ){
 		goto fail;
 	};
     
-    bus = ( data >> 8 &0xff );
-    dev = ( data >> 3 &31 );
-    fun = ( data &7 );
+    bus = ( data >> 8 & 0xff );
+    dev = ( data >> 3 & 31 );
+    fun = ( data      & 7 );
 
 	//
 	// Vamos saber mais sobre o dispositivo enconrtado. 

@@ -8,33 +8,32 @@
 
 
 
-
-/*
- **********************************************
- * AHCIInit
- *  Procura o dispositivo pela classe configura a estrutura de dispositivo PCI.
- *
- */
-
-int AHCIInit (){
-
-	//pci info.
-	unsigned char bus;
-	unsigned char dev;
-	unsigned char fun;			
-    uint32_t data;
-
-    //#debug
-	printf("\n");
-	printf("AHCIInit: Probing PCI ...\n");
+int 
+handle_ahci_device ( unsigned char bus, 
+					 unsigned char dev, 
+					 unsigned char fun, 
+					 unsigned char class, 
+					 unsigned char subclass )
+{
 	
 	
-	//Procurar dispositivo pela classe.
-	//#todo  ((class == PCI_CLASSCODE_MASS) && (subclass == PCI_SUBCLASS_SATA))
+	//#importante
+	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.	
+	
+	struct pci_device_d *pci_device;
+
+	if ( (class != PCI_CLASSCODE_MASS) && (subclass != PCI_SUBCLASS_SATA ) )
+	{
+		printf ("AHCIInit: Not a SATA device!\n");
+		return 1;
+	}
+	
+//Procurar dispositivo pela classe.
 	
 	//#bugbug: Isso não resolve nosso problemas, 
 	//precisamos de um dispositivo com subclasse 6. PCI_SUBCLASS_SATA
 	
+	/*
 	data = (uint32_t) diskPCIScanDevice (PCI_CLASSCODE_MASS); 
 	
 	if ( data == -1 )
@@ -50,27 +49,39 @@ int AHCIInit (){
         dev = ( data >> 3 & 31 );
         fun = ( data & 7 );
 	};
-
+    */
 	
+	/*
+	 //ja temos isso.
 	
-
+	unsigned char class, subclass;
+	
+	class = (unsigned char) pciConfigReadByte( bus, 
+	                                           dev, 
+											   0,  //fun?? 
+											   PCI_OFFSET_CLASSCODE );
+	
+	subclass = (unsigned char) pciConfigReadByte ( bus, 
+	                                               slot, 
+											       0,  //fun??
+											       PCI_OFFSET_SUBCLASS ); 
+	*/
+	
 	
 	// # get info
 	// #pci
 	// Pegaremos mais informações e colocaremos na estrutura de 
 	// dispositivo pci.
+    uint32_t data;
 	
 	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
+	//data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, 0, 0 );
 
 	//#debug
 	printf("Vendor=%x \n", (data & 0xffff) );
 	printf("Device=%x \n", (data >> 16 &0xffff) );	
 	
-	
-	//#importante
-	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.	
-	
-	struct pci_device_d *pci_device;
+
 	
 	pci_device = (void *) malloc ( sizeof( struct pci_device_d  ) );
 	
@@ -97,16 +108,14 @@ int AHCIInit (){
 		// #bugbug:
 		// Esse driver é para placa Intel, vamos cancelar a inicialização 
 		// do driver se a placa não for Intel.
-		
-	    // 8086:100e
-	    // 82540EM Gigabit Ethernet Controller		
+			
 		
 		//if ( pci_device->Vendor != 0x8086 )
-		if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
-		{
-		   printf("AHCIInit: 82540EM not found !\n");
-		   return 1;
-		}
+		//if ( pci_device->Vendor != 0x???? || pci_device->Device != 0x???? )
+		//{
+		//   printf("AHCIInit: ?? not found !\n");
+		//   return 1;
+		//}
 		
 		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x10 );
 		pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x14 ); 
@@ -140,7 +149,60 @@ int AHCIInit (){
 	
 	//endereço base.
 	unsigned char *base_address = (unsigned char *) virt_address;
-	unsigned long *base_address32 = (unsigned long *) virt_address;
+	unsigned long *base_address32 = (unsigned long *) virt_address;	
+	
+
+	return 0;
+}
+
+/*
+ **********************************************
+ * AHCIInit
+ * inicializar a controladora AHCI, ela foi encontrada na interface pci.
+ * pois a pr'opria controladora 'e um dispositivo pci. 
+ */
+
+int AHCIInit ( unsigned char bus, unsigned char dev, unsigned char fun ){
+
+	//pci info.
+	//unsigned char bus;
+	//unsigned char dev;
+	//unsigned char fun;			
+    uint32_t data;
+
+    //#debug
+	printf("\n");
+	printf("AHCIInit: Probing PCI ...\n");
+	
+	
+	//Aqui temos que checar se o dispositivo eh realmente uma controladora AHCI.
+	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
+
+	//#debug
+	printf("Vendor=%x \n", (data & 0xffff) );
+	printf("Device=%x \n", (data >> 16 &0xffff) );		
+	
+	//pegando o bar5 para encontrarmos 
+	//o endereço que 'e o inicio dos registradores.
+	unsigned long BAR5 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x24 );
+	
+	
+	
+	//pegamos o endereç[o físico do início dos registradores.
+	unsigned long phy_address = ( BAR5 & 0xFFFFFFF0);
+	
+	//#todo
+	//mapeando para obter o endereço virtual que o kernel pode manipular.
+	//Criar esssa rotina lá em pages.c
+	//unsigned long virt_address = mapping_ahci_device_address ( phy_address );
+	
+	//endereço base.
+	unsigned char *base_address = (unsigned char *) virt_address;
+	unsigned long *base_address32 = (unsigned long *) virt_address;	
+	
+	
+	//continua ...
+	
 
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * File: b\pci.c
+ * File: dd/pci/pci.c
  * 
  * Descrição:
  *     Driver de PCI presente no kernel Base.
@@ -607,28 +607,30 @@ static __inline void pci_write_dword(int busno, int devno, int funcno, int addr,
 /*
  * pciConfigReadByte:
  *     Read com retorno do tipo unsigned char.
- */								  
-unsigned char pciConfigReadByte( unsigned char bus, 
-                                 unsigned char slot, 
-								 unsigned char func, 
-								 unsigned char offset )
+ */	
+
+unsigned char 
+pciConfigReadByte ( unsigned char bus, 
+					unsigned char slot, 
+					unsigned char func, 
+					unsigned char offset )
 {
 	//Montando uma unsigned long.
 	unsigned long lbus  = (unsigned long) bus;   //Bus.
-    unsigned long lslot = (unsigned long) slot;  //Device.
-    unsigned long lfunc = (unsigned long) func;  //Function.
+	unsigned long lslot = (unsigned long) slot;  //Device.
+	unsigned long lfunc = (unsigned long) func;  //Function.
 	
 	//O endereço a ser montado e enviado para porta 0xCF8.
-    unsigned long address;   
+	unsigned long address;   
 	
 	//Retorno armazenado na porta de status.
-    unsigned char Ret = 0;             
+	unsigned char Ret = 0;             
  
-    //
+	//
 	// @todo: Filtros de tamanho máximo.
 	//
 	
-    // Create configuration address.
+	// Create configuration address.
 	address = (unsigned long)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | ((unsigned long)0x80000000));
  
     //
@@ -650,14 +652,14 @@ unsigned char pciConfigReadByte( unsigned char bus,
 	//Ret = (unsigned char)( inport8(PCI_DATA_PORT) );
 	//Ret = (unsigned char)(( inportl(PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xff); //??	
 	
-	//
+
     // Obs: 
 	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
-	//
 	
-done:    
+//done:    
+	
 	return (unsigned char) Ret; 
-}; 
+} 
 
 
 /*
@@ -685,35 +687,37 @@ done:
  * para podermos configurar o BAR.
  *
  */
-unsigned short pciConfigReadWord( unsigned char bus, 
-                                  unsigned char slot, 
-								  unsigned char func, 
-								  unsigned char offset )
+
+unsigned short 
+pciConfigReadWord ( unsigned char bus, 
+					unsigned char slot, 
+					unsigned char func, 
+					unsigned char offset )
 {
 	//Montando uma unsigned long.
 	unsigned long lbus  = (unsigned long) bus;   //Bus.
-    unsigned long lslot = (unsigned long) slot;  //Device.
-    unsigned long lfunc = (unsigned long) func;  //Function.
+	unsigned long lslot = (unsigned long) slot;  //Device.
+	unsigned long lfunc = (unsigned long) func;  //Function.
 	
 	//O endereço a ser montado e enviado para porta 0xCF8.
-    unsigned long address;   
+	unsigned long address;   
 	
 	//Retorno armazenado na porta de status.
-    unsigned short Ret = 0;             
+	unsigned short Ret = 0;             
  
-    //
+	//
 	// @todo: Filtros de tamanho máximo.
 	//
 	
-    // Create configuration address.
+	// Create configuration address.
 	address = (unsigned long)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | ((unsigned long)0x80000000));
  
-    //
+
 	// sendComand:
-    // Write out the address. (0x0CF8).
-    //
-    outportl(PCI_ADDRESS_PORT, address);
-    
+	// Write out the address. (0x0CF8).
+
+	outportl(PCI_ADDRESS_PORT, address);
+
 	//
 	// getData:
 	// Read in the data port. (0x0CFC).
@@ -727,14 +731,13 @@ unsigned short pciConfigReadWord( unsigned char bus,
 	//Ret = (unsigned short)(  inport16(PCI_DATA_PORT) );
 
 	
-	//
     // Obs: 
 	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
-	//
 	
-done:    
+//done:    
+	
 	return (unsigned short) Ret; 
-};
+}
  
  
 /* 
@@ -994,11 +997,13 @@ unsigned char pciGetInterruptPin( unsigned char bus,
  * ...
  *
  */
-int pciInfo()
-{
-    int i;
+
+int pciInfo (){
+	
+	int i;
 	int Max = 32;
-    struct pci_device_d *D;
+
+	struct pci_device_d *D;
 	
 	printf("pciInfo:\n");
 	
@@ -1006,10 +1011,10 @@ int pciInfo()
 	// Uma lista com no máximo 32 ponteiros para estrutura de dispositivo pci.
 	//
 	
-	for(i=0; i<Max; i++)
+	for ( i=0; i<Max; i++ )
 	{
 		//Pega um ponteiro de estrutura na lista.
-	    D = (void *) pcideviceList[i];
+		D = (void *) pcideviceList[i];
 		
 		//Checa se o ponteiro é válido.
 		if( (void *) D != NULL )
@@ -1033,10 +1038,11 @@ int pciInfo()
 	//Nothing.
 	
 //Done.	
-done:
-    printf("done!\n");	
+//done:
+	
+	printf("done\n");
 	return (int) 0; 
-};
+}
 
 
 /*
@@ -1074,9 +1080,15 @@ int pciShowDeviceInfo(int number)
  *
  * @todo: 
  *     Completar toda a estrutura, ainda faltam elementos.
- *     Obs: A estrutura está em pci.h.        
+ *     Obs: A estrutura está em pci.h.    
  *
+ * #importante:
+ * #todo
+ * Quando sondamos os dispositivos pci usando for, podemos checar a
+ * classe e a subclasse dos dispositivos e se encontrarmos a combilaçao desejada
+ * entao inicializamos o dispositivo.
  */
+
 int pci_setup_devices (){
 	
     unsigned short Vendor;    //Offset 0.
@@ -1160,27 +1172,51 @@ int pci_setup_devices (){
 					//Pci Header.
 			        D->Vendor    = (unsigned short) Vendor;
 				    D->Device    = (unsigned short) pciCheckDevice(i,j);
+					
 					D->classCode = (unsigned char) pciGetClassCode(i,j);
-					D->subclass  = (unsigned char) pciGetSubClass(i,j); //*importante.
+					D->subclass  = (unsigned char) pciGetSubClass(i,j); 
+					
 					D->irq_line  = (unsigned char) pciGetInterruptLine(i,j);
 					D->irq_pin   = (unsigned char) pciGetInterruptPin(i,j);
 					
 					//Driver.
 					//Inicialização básica.
-					Dr = (void*) malloc( sizeof( struct pci_driver_d  ) );
-					if( (void*) Dr == NULL ){
+					
+					Dr = (void *) malloc ( sizeof( struct pci_driver_d  ) );
+					
+					if ( (void*) Dr == NULL )
+					{
 						D->driver = NULL;
-					}else{ 
-					    D->driver      = (void *) Dr;
-                        Dr->id         = (int) listIndex;
-                        Dr->used       = (int) 1;
-                        Dr->magic      = (int) 1234;
+					}else{
+						
+					    D->driver = (void *) Dr;
+                        
+						Dr->id = (int) listIndex;
+                        
+						Dr->used = (int) 1;
+                        Dr->magic = (int) 1234;
+						
 						Dr->pci_device = (void *) D; 
-						//... 						
+						//...
+						
+						
+					    //#importante
+					    //Chamar as rotinas de inicializaçao do dispositivo encontrado
+					    
+						//SATA
+						//ahci.c
+					    //if ( (D->classCode == PCI_CLASSCODE_MASS) && (D->subclass == PCI_SUBCLASS_SATA ) )						
+						//{
+						// ...
+						//}
+						
+						//Continua ...
+						
 					};  
 					
 					D->next = NULL;   //Next device.
 					//Continua... @todo:
+					
 					
 					//Colocar a estrutura na lista.		
 					

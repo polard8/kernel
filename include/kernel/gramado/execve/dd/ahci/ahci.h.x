@@ -361,7 +361,22 @@ typedef struct tagHBA_PRDT_ENTRY
 
 
 
-int AHCIInit ();
+/*
+ **********************************************
+ * AHCIInit
+ * inicializar a controladora AHCI, ela foi encontrada na interface pci.
+ * 
+ */
+
+int AHCIInit ( unsigned char bus, unsigned char dev, unsigned char fun );
+
+int 
+handle_ahci_device ( unsigned char bus, 
+					 unsigned char dev, 
+					 unsigned char fun, 
+					 unsigned char class, 
+					 unsigned char subclass );
+
 
 
 
