@@ -1,5 +1,5 @@
 /*
- * File: unb\hdd.c 
+ * File: dd/hdd.c 
  * 
  * Descrição:
  *     Interface de acesso a discos do tipo HDD.
@@ -90,10 +90,10 @@ void hdd_ata_pio_write ( int p, void *buffer, int bytes ){
 
 
 uint8_t hdd_ata_status_read (int p){
-	
+
     //#bugbug: 
 	//rever o offset
-   	
+
 	//return inb(ata[p].cmd_block_base_addr + ATA_REG_STATUS);
     return (uint8_t) inportb ( (int) ide_ports[p].base_port + 7);
 };
@@ -152,7 +152,7 @@ int hdd_ata_wait_no_drq (int p){
 //                unsigned long lba, 
 //				int rw, 
 //				int port )
-				
+
 int 
 pio_rw_sector ( unsigned long buffer, 
                 unsigned long lba, 
@@ -187,13 +187,13 @@ pio_rw_sector ( unsigned long buffer,
 	//master. bit 4 = 0
 	if (master == 1)
 	{
-	    tmplba = tmplba | 0x000000E0; //1110 0000b;
+		tmplba = tmplba | 0x000000E0;    //1110 0000b;
 	}
 	
 	//slave. bit 4 = 1
 	if (master == 0)
 	{
-		tmplba = tmplba | 0x000000F0; //1111 0000b;
+		tmplba = tmplba | 0x000000F0;    //1111 0000b;
 	};
 	
 	outportb ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
@@ -205,21 +205,21 @@ pio_rw_sector ( unsigned long buffer,
 	
 	//0x1F3  ; Port to send bit 0 - 7 of LBA
 	tmplba = lba;
-    tmplba = tmplba & 0x000000FF;	
+	tmplba = tmplba & 0x000000FF;	
 	outportb ( (int) ide_ports[port].base_port + 3 , (int) tmplba );
 	
 	
 	//0x1F4  ; Port to send bit 8 - 15 of LBA
 	tmplba = lba;
-	tmplba = tmplba >> 8;	
-    tmplba = tmplba & 0x000000FF;	
+	tmplba = tmplba >> 8;
+	tmplba = tmplba & 0x000000FF;
 	outportb ( (int) ide_ports[port].base_port + 4 , (int) tmplba );
 	
 
 	//0x1F5  ; Port to send bit 16 - 23 of LBA
 	tmplba = lba;
-	tmplba = tmplba >> 16;	
-    tmplba = tmplba & 0x000000FF;	
+	tmplba = tmplba >> 16;
+	tmplba = tmplba & 0x000000FF;
 	outportb ( (int) ide_ports[port].base_port + 5 , (int) tmplba );
 	
 	
@@ -227,7 +227,6 @@ pio_rw_sector ( unsigned long buffer,
 	//rw
 	rw = rw & 0x000000FF;	
 	outportb ( (int) ide_ports[port].base_port + 7 , (int) rw );
-	
 	
 	
 	//PIO or DMA ??
@@ -263,12 +262,12 @@ again:
 	
 	
 	switch (rw)
-    {
+	{
 		//read
-	    case 0x20:
+		case 0x20:
 		    hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
 		    break;
-        
+
 		//write
 		case 0x30:
 		    hdd_ata_pio_write ( (int) port, (void *) buffer, (int) 512 );
@@ -294,7 +293,7 @@ again:
 	
     return (int) 0;	
 } ;
- 
+
 
 /*
  *****************************************
@@ -306,38 +305,39 @@ again:
  * Opção: void hddReadSector(....)
  */
  
-void my_read_hd_sector ( unsigned long ax, 
-                         unsigned long bx, 
-						 unsigned long cx, 
-						 unsigned long dx )
+void 
+my_read_hd_sector ( unsigned long ax, 
+					unsigned long bx, 
+					unsigned long cx, 
+					unsigned long dx )
 {
-	
+
 	// #IMPORTANTE:
-	//
 	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
 	// do IDE num momento específico da inicialização do sistema.
-	
- 
-	// read test (buffer, lba, rw flag, port number )
-    //pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
 
-	// read test (buffer, lba, rw flag, port number, master )
-    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0, (int) 1 );		
-	
+
+	// (buffer, lba, rw flag, port number, master )
+	pio_rw_sector ( (unsigned long) ax, 
+					(unsigned long) bx, 
+					(int) 0x20, 
+					(int) 0, 
+					(int) 1 );
+
 	/*
-	 //antigo.
-	
-    // Passando os argumentos.	
-	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
-	hd_lba = (unsigned long) bx;       //arg2 = lba.
+	 // #antigo.
+	// Suspenso.
+	 // Passando os argumentos.	
+	 hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
+	 hd_lba = (unsigned long) bx;       //arg2 = lba.
 	
 	// Read sector. (ASM)
 	os_read_sector(); 	
-    
+
 	//#todo: deletar esse return.
 	//testar sem ele antes.
-	
 	*/
+
 	return;
 };
 
@@ -351,45 +351,41 @@ void my_read_hd_sector ( unsigned long ax,
  * edx - null
  * Opção: void hddWriteSector(....)
  */
-void my_write_hd_sector ( unsigned long ax, 
-                          unsigned long bx, 
-						  unsigned long cx, 
-						  unsigned long dx )
+
+void 
+my_write_hd_sector ( unsigned long ax,
+					 unsigned long bx,
+					 unsigned long cx,
+					 unsigned long dx )
 {
-	
+
 	// #IMPORTANTE:
-	//
 	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
 	// do IDE num momento específico da inicialização do sistema.
 	
-	
-	//#bugbug:
-	// a rotina de salvar um arquivo invocada pelo shell 
-	//apresentou problemas. Estamos testando ...
- 
-	// read test (buffer, lba, rw flag, port number )
-    // pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );		
-	
-	// read test (buffer, lba, rw flag, port number, master )
-    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0, (int) 1 );			
-	
-	
+	// (buffer, lba, rw flag, port number, master )
+	pio_rw_sector ( (unsigned long) ax, 
+					(unsigned long) bx, 
+					(int) 0x30, 
+					(int) 0, 
+					(int) 1 );
+
 /*
 	//antigo.
-    // Passando os argumentos.	
+	// Passando os argumentos.
 	hd_buffer = (unsigned long) ax;    //arg1 = buffer. 
 	hd_lba = (unsigned long) bx;       //arg2 = lba.
-	
-	// Write sector. (ASM)	
-    // entry/x86/head/hwlib.inc
-	
+
+	// Write sector. (ASM)
+	// entry/x86/head/hwlib.inc
+
 	os_write_sector(); 
 
 */	
 	//#todo: deletar esse return.
 	//testar sem ele antes.	
 	return;
-};   
+};
 
 
 /*
@@ -399,15 +395,15 @@ void my_write_hd_sector ( unsigned long ax,
  *     @todo: Mudar para hddInit().
  */
 int init_hdd (){
-	
-    //
-    // @todo: We need to do something here.
-    //	
+
+	//
+	// @todo: We need to do something here.
+	//	
 
 //done:
 
-    g_driver_hdd_initialized = (int) 1;
-    
+	g_driver_hdd_initialized = (int) 1;
+
 	return (int) 0;
 };
 
