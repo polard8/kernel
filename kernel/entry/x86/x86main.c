@@ -1155,7 +1155,7 @@ fail:
     printf("x86main: EXIT_FAILURE \n");
 	refresh_screen();
     return (int) EXIT_FAILURE;
-};
+}
 
 
 //

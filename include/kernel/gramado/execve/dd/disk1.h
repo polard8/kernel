@@ -104,8 +104,6 @@ int ATAFlag;
 #define ATA_SC_nINE 0x02    // INTRQ.
 
 
-
-
 //ATA bits de status. 
 #define ATA_SR_BSY  0x80    // Busy
 #define ATA_SR_DRDY 0x40    // Device Ready
@@ -161,9 +159,9 @@ int ATAFlag;
 
 /*
  * dev_nport:
- *
+ *     AHCI ports;
  */
-//typedef struct dev_nport dev_nport_t;  
+
 struct dev_nport 
 { 
     unsigned char dev0;
@@ -203,13 +201,10 @@ struct dev_nport dev_nport;
 
 
 
-
-//
 // História:
 //     Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
 //     ICH5 integraçao do SATA e suporte total ACPI 2.0.
 //     ICH6 implementaram os controladores AHCI SATA pela primeira vez.
-//
 
 
 /*

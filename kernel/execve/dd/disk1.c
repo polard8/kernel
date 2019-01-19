@@ -379,100 +379,12 @@ int ide_identify_device ( uint8_t nport ){
         return (int) 0x80;
 
     }
-
-
-   /*
-
-   if ( lba1 == 0x14 && lba2 == 0xEB )
-   {
-        //kputs("Unidade PATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        ata_wait(400);
-        ata_wait_drq(); 
-        ata_pio_read ( ata_identify_dev_buf, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-
-        //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
-        ide_ports[nport].used = (int) 1;
-        ide_ports[nport].magic = (int) 1234;
-        ide_ports[nport].name = "PATAPI";
-        ide_ports[nport].type = (int) idedevicetypesPATAPI;
-
-        return (int) 0x80;
-
-   }
-   else if (lba1 == 0x69  && lba2 == 0x96){
-
-        //kputs("Unidade SATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
-        ata_wait(400);
-        ata_wait_drq(); 
-        ata_pio_read(ata_identify_dev_buf,512);
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-		
-        //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
-		ide_ports[nport].used = (int) 1;
-		ide_ports[nport].magic = (int) 1234;
-		ide_ports[nport].name = "SATAPI";	
-		ide_ports[nport].type = (int) idedevicetypesSATAPI;
-		
-        return (int) 0x80;
-
-   }
-   else if (lba1 == 0x3C && lba2 == 0xC3){
-
-        //kputs("Unidade SATA\n");   
-        // O dispositivo responde imediatamente um erro ao cmd Identify device
-        // entao devemos esperar pelo DRQ ao invez de um BUSY
-        // em seguida enviar 256 word de dados PIO.
-        ata_wait_drq(); 
-        ata_pio_read ( ata_identify_dev_buf, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-		
-        //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
-		ide_ports[nport].used = (int) 1;
-		ide_ports[nport].magic = (int) 1234;
-		ide_ports[nport].name = "SATA";	
-		ide_ports[nport].type = (int) idedevicetypesSATA;
-		
-        return (int) 0;
-		
-   }
-   else if (lba1 == 0 && lba2 == 0){
-	   
-        // kputs("Unidade PATA\n");
-        // aqui esperamos pelo DRQ
-        // e eviamoos 256 word de dados PIO
-        ata_wait_drq();
-        ata_pio_read(ata_identify_dev_buf,512);
-
-        ata_wait_not_busy();
-        ata_wait_no_drq();
-		
-        //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
-		ide_ports[nport].used = (int) 1;
-		ide_ports[nport].magic = (int) 1234;
-		ide_ports[nport].name = "PATA";	
-		ide_ports[nport].type = (int) idedevicetypesPATA;
-		
-        return (int) 0;
-    };
-	
-	*/
-
 	
 	return (int) 0;   
-};
+}
 
 
-//#atanção.
+//#atenção.
 extern st_dev_t *current_dev;
 
 
@@ -505,7 +417,6 @@ void set_ata_addr (int channel){
  * Obs: O que segue são rotinas de suporte ao controlador IDE.
  *
  */
-
 
 
 
@@ -581,7 +492,7 @@ int ide_dev_init (char port){
 		
 		printf("ide_dev_init: struct");
 		die ();
-	}; 
+	}
 	
 	
 	data = (int) ide_identify_device (port);
@@ -691,8 +602,12 @@ int ide_dev_init (char port){
 		case 3:
             dev_nport.dev3 = 0x84;
             break;
-
-        //?? default ?? 			
+			
+		//#atenção
+		//Essa estrutura é para 32 portas.
+		//para listar as portas AHCI.
+		//Mas aqui está apenas listando as 4 portas IDE.	
+		
     };
 
 
@@ -801,7 +716,7 @@ int nport_ajuste ( char nport ){
 	}
 	
     return (int) 0;
-};
+}
 
 
 
@@ -1716,15 +1631,16 @@ void diskATAIRQHandler2 (){
  *     Mostrar as informações obtidas na inicializações 
  * do controlador.
  */
+
 void show_ide_info (){
-	
-	printf("sm-disk-disk-show_ide_info:\n");
 	
 	int i;
 	
+	printf ("\n dd-disk1-show_ide_info:\n");
+	
 	for ( i=0; i<4; i++ )
 	{
-		printf("\n\n");
+		//printf ("\n\n");
 		
 		printf ("id=%d\n", ide_ports[i].id );
 		
@@ -1774,7 +1690,7 @@ void show_ide_info (){
 //done:
     //refresh_screen();
     //return;	
-};
+}
 
 
 //esperando pela interrupção.

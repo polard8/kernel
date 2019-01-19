@@ -428,11 +428,13 @@ struct softlink_d
 /*
  * mbr_d:
  *     Structure for MBR parameters.
- *
+ *     #bugbug: Corrigir esses valores...
+ *     +Olhar no VHD.
+ *     +
  */ 
  
 #define BS_JmpBoot			0		/* x86 jump instruction (3-byte) */
-#define BS_OEMName			3		/* OEM name (8-byte) */
+#define BS_OEMName			2 //3		/* OEM name (8-byte) */
 #define BPB_BytsPerSec		11		/* Sector size [byte] (WORD) */
 #define BPB_SecPerClus		13		/* Cluster size [sector] (BYTE) */
 #define BPB_RsvdSecCnt		14		/* Size of reserved area [sector] (WORD) */
@@ -449,8 +451,8 @@ struct softlink_d
 #define BS_NTres			37		/* WindowsNT error flag (BYTE) */
 #define BS_BootSig			38		/* Extended boot signature (BYTE) */
 #define BS_VolID			39		/* Volume serial number (DWORD) */
-#define BS_VolLab			43		/* Volume label string (8-byte) */
-#define BS_FilSysType		54		/* Filesystem type string (8-byte) */
+#define BS_VolLab			42 //43		/* Volume label string (8-byte) */
+#define BS_FilSysType		50 //54		/* Filesystem type string (8-byte) */
 #define BS_BootCode			62		/* Boot code (448-byte) */
 #define BS_55AA				510		/* Signature word (WORD) */
  

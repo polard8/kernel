@@ -521,62 +521,67 @@ int volume_init (){
 
 
 
-//pegaremos informações sobre um disco ide checando o mbr.
-//o índice determina qual informações pegaremos.
-// -1 = sem assinatura.
-// -2 = nenhuma partição ativa. (80)
-// ...
-//
-//checar o mbr de uma das quatro portas do controlador ide.
-//#obs: o mbr pertence ao disco todo na interface ide, 
-//mas pode dizer alguma coisa sobre as partições,
-// se olharmos na tabela de partições.
 
-int get_ide_disk_info ( int port, unsigned long buffer, int master )
-{
+/*
+ * pegaremos informações sobre um disco ide checando o mbr.
+ * o índice determina qual informações pegaremos.
+ * -1 = sem assinatura.
+ * -2 = nenhuma partição ativa. (80)
+ * ...
+ *
+ * checar o mbr de uma das quatro portas do controlador ide.
+ * #obs: o mbr pertence ao disco todo na interface ide, 
+ * mas pode dizer alguma coisa sobre as partições,
+ * se olharmos na tabela de partições.
+ */
+
+int get_ide_disk_info ( int port, unsigned long buffer, int master ){
+	
+	int i = 0;
     unsigned char *mbr = (unsigned char *) buffer; 
 	
-	// read test (buffer, lba, rw flag, port number )
+	// (buffer, lba, rw flag, port number )
     
-
-	
-	
 	pio_rw_sector ( (unsigned long) &mbr[0], // buffer
-	                 (unsigned long) 0,      // 0 = mbr
-					 (int) 0x20,             // 20 = ler
-					 (int) port,             // port 0-3
-                     (int) master );         // 1 = master  0 = slave
+	                (unsigned long) 0,       // 0 = mbr
+					(int) 0x20,              // 20 = ler
+					(int) port,              // port 0-3
+                    (int) master );          // 1 = master  0 = slave
 	
 	
 	// Check signature.
 	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
-	{
-		
+	{	
 	    //printf("get_ide_disk_info: Sig FAIL \n" );
         return -1;	
-	};	
+	}	
 	
 	
-	//name
-	int i;
-	
+	//print OS name.
+	//#define BS_OEMName 2
+		
 	printf("OS name: [ ");
-	for ( i=0; i<8; i++ )
-	{
+	
+	for ( i=0; i<8; i++ ){
 	    printf("%c", mbr[ BS_OEMName + i ] );
 	};
+	
 	printf(" ]\n");	
 	
     return 0;	
 };
 
 
-void show_ideports_info()
-{
+/*
+ * show_ideports_info:
+ *     #importante: Testando se tem discos nas portas IDE.
+ *     Se está válida então carregamos o primeiro setor do disco,
+ *     checamos pela assinatura no fim do MBR e imprimimos o nome do disco,
+ *     que está presente no BPB.
+ */
+void show_ideports_info (){
 	
- 
-    printf("\nTesting ports. Looking for signature ...\n");  
-  
+    printf("\n show_ideports_info: Testing ports, looking for signature\n");  
 	
 	//primary master 
 	printf("\n Testing primary master \n");
@@ -645,21 +650,15 @@ void show_ideports_info()
 	} else {
 		printf("No disk in secondary slave\n");
 	};
-	
-	
-	
-		
-		refresh_screen();
-	
- 
+	 
 	printf("done\n");
-};
+	refresh_screen();	
+}
 
- 
 
 
 //
-//fim.
+// End.
 //
 
 

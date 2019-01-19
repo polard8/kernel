@@ -883,11 +883,12 @@ void *services( unsigned long number,
 		// Isso funcionou. 
 		// Esse será o padrão até usarmos ponteiro para estrutura.
 		
-		// #test
 		// A intenção agora é pegar a mensagem na estrutura de thread atual.
 		// Desse modo cada aplicativo, quando estiver rodando, pegará as 
         // suas mensagens em sua própria fila.  		
-		
+		// Se não houver mensagem na estrutura da thread, então tentaremos colocar alguma.
+		// Vamos colocar alguma coisa do buffer de teclado.
+			
 		case 111:
 		    if ( &message_address[0] == 0 )
 			{

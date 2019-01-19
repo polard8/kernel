@@ -93,18 +93,22 @@ void procTestF6()
 
 /*
  * ldisc_dialog:
+ *     #bugbug: Acho que isso está suspenso.
  *     Procedimento de dialogo usado para a manipulação de 
  * eventos de teclado.
  *     esse procedimento deve ser chamado quando o sistema 
  * ou algum processo deseja interagir com o driver de teclado 
  *  ?? planejando a funcionalidade desse diálogo ??
  */
+
 unsigned long 
 ldisc_dialog( struct window_d *window, 
               int msg, 
 			  unsigned long long1, 
 			  unsigned long long2 ) 
 {
+	
+/*	
 	//#cuidado
 	//Ponteiro para um buffer em user mode.
 	unsigned long *buffer;
@@ -201,8 +205,10 @@ ldisc_dialog( struct window_d *window,
     };	
 	
 done:	
+
+*/
     return (unsigned long) 0;	
-};
+}
 
 
 /*
@@ -217,7 +223,7 @@ terminal_dialog( struct window_d *window,
     //#suspenso esse diálogo.
 	//repensando ele.
     return 0;	
-};
+}
 
 
 /*
@@ -557,105 +563,22 @@ system_procedure ( struct window_d *window,
 					windowShowWindowList();  
 					break;
 				
-				//Device Info.
-				//Mostra informções sobre todos os dispositivos.
-				//Igual ao gerenciador de dispositivos.
+                //#tests
+				//Vamos usar F5 para testar as funcionalidades dos drivers apenas.	
 				case VK_F5:
+
+					printf("F5:\n"); 
+                    show_ide_info ();		 //execve/dd/disk1.c			
+	                show_ideports_info();    //execve/sm/disk/diskvol.c
 					
-					//if(AltStatus == 1){ window_with_focus = 5; break;};
-					//if(CtrlStatus == 1){ active_window = 5; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F5\n"); break;};
-				    
-					//printf ("%x \n", CreatePageDirectory() );
-					
-					//mostrar informações sobre os processos criados.
-					//show_process_information ();
-					
-					//mostra informações sobre as threads.
-					mostra_slots ();
-					
-					
-					//pci_info();     //PCI information.
-				    
-					
-					
-					//#testando...
-					//isso funciona, não sei se completamente.
-					//save_window ( (struct window_d *) windowList[window_with_focus] );
-					//replace_window ( (struct window_d *) windowList[window_with_focus], 20, 20 );
-					//show_saved_window ( (struct window_d *) windowList[window_with_focus] );
-					//show_window_rect ( (struct window_d *) windowList[window_with_focus] );
-					//refresh_screen();
-					
-					
-					//save_rect ( 100, 100, 200, 200 );
-	                //show_saved_rect ( 2, 2, 200, 200 );
-					//refresh_screen();
-					
-					//testando mbr.					
-					//ok isso funcionou.
-					//fsCheckMbrFile ((unsigned char *) allocPageFrames(1));
-					
-					//Obs: Não usa janelas, isso não mudará o foco.
-					//systemShowDevicesInfo();
-					
-					//isso funciona.
-					//testando a função que converte endereço virtual em físico.
-					//printf("virtual=0xC0000000 physical=%x \n", virtual_to_physical ( 0xC0000000, gKernelPageDirectoryAddress) ); 
-					
-										
-					//Test teclado scancode. (FUNCIONOU BEM)
-					//Quando aciona esse status, o kernel mostra o scancode.
-					//scStatus = 1;
-					
-					break;
+					//#test testando inicialização do IDE, #funcionou.
+					//ata_initialize();
 				
-                //testes				
-				case VK_F6:
-							
-					printf("\n"); 
-					testNIC();
-					//refresh_screen();
-					 
-                    //show_ide_info ();
-					
-                    
-	                //show_ideports_info();
-					
-					/*
-					// funciona 0 - primary master
-					if ( get_ide_disk_info ( (int) 0, (unsigned long) malloc(512) ) == -1 )
-                    {
-		                printf("signature FAIL in port 0\n", 0);	
-		            }else{
-		                printf("signature OK in port 0\n", 0);
-		            };							
-                    refresh_screen();
-					 
-					//funciona 2 - secondary master 
-	                if ( get_ide_disk_info ( (int) 2, (unsigned long) malloc(512) ) == -1 )
-                    {
-		                printf("signature FAIL in port 2\n", 2);	
-		            }else{
-		                printf("signature OK in port 2\n", 2);
-		            };							
-					refresh_screen();
-					
-					
-					// falha 1 - primary slave
-					if ( get_ide_disk_info ( (int) 1, (unsigned long) malloc(512) ) == -1 )
-                    {
-		                printf("signature FAIL in port 1\n", 1);	
-		            }else{
-		                printf("signature OK in port 1\n", 1);
-		            };							
-                    refresh_screen();
-					*/
-					
 					
 					//
 					// NIC test
 					//
+					//testNIC();					
 					
 					//init_nic ();  //intel.c (obs: essa rotina tambem reseta o controlador.)
 					//refresh_screen();
@@ -665,10 +588,24 @@ system_procedure ( struct window_d *window,
 					//refresh_screen(); 
 					//vamos mostrar informações antes obtidas pelo sistema.
 					//show_network_info ();
+					refresh_screen();
+
+
+
+
+					//pci_info();     //PCI information.
+				    					
+					//systemShowDevicesInfo();
+										
+					break;
+				
+                //#testes
+				//Testes diversos.	
+				case VK_F6:
+							
+					printf("\n"); 
+					testNIC();
 					//refresh_screen();
-					
-					
-					
 					
 					//#test
 					//fsList("volume1");
@@ -683,14 +620,6 @@ system_procedure ( struct window_d *window,
 					
 				    //vfsListFiles();
 					//vfsShowVFSInfo();
-					
-					//#test testando inicialização do IDE, #funcionou.
-					//ata_initialize();
-					//show_ide_info(); //(#teste)
-					
-					//if(AltStatus == 1){ window_with_focus = 6; break;};
-					//if(CtrlStatus == 1){ active_window = 6; break;};
-			        //if(ShiftStatus == 1){ printf("shift_F6\n"); break;};
 					
 					//habilitando o cursor.
 					//timer_cursor_used = 1;
@@ -712,23 +641,10 @@ system_procedure ( struct window_d *window,
 					//printf("F6: Testando linkar um driver ...\n");
 					//procedureLinkDriverTest();
 					
-					//Testando repintar o background.
-					//resize_window(gui->background, gui->background->width, gui->background->height);
-					//redraw_window(gui->background);	
-                    //MaximizeWindow(struct window_d *window); //minimizar a janela ativa 					
 					break;
 				
                 //Testing Message Box.				
 				case VK_F7:
-				    zorder++;
-				    if( zorder >= ZORDER_COUNT_MAX ){
-						zorder = 0;
-					}
-					printf("zorder={%d}\n",zorder);
-					SetFocus( (struct window_d*) zorderList[zorder] );
-					refresh_screen();
-					//MessageBox(gui->screen, 1, "F7:","Testing Message Box");
-					goto done;
 					break;
 					
 				// Cls. 

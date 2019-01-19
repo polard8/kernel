@@ -15,41 +15,44 @@
 #include <kernel.h>
 
 
+/*
+ * LINE_DISCIPLINE
+ *     Uma disciplina de linha genérica, para mensagens de 
+ * dispositivos de entrada diferentes.
+ */
+
 int 
 LINE_DISCIPLINE ( struct window_d *window, 
                   int msg, 
 				  unsigned long long1, 
 				  unsigned long long2 )
 {
+
+	struct thread_d *t;		
+	struct window_d *w;  
 	
-	
-	//#todo mensagem de erro.
-	
-	if (window_with_focus < 0)
-		return -1;
-	
+	//
+	// ## window ##
+	//
 	
 	// #importante
     // +Pegamos a janela com o foco de entrada, pois ela 
     // será um elemento da mensagem.	
 	// Mas enviaremos a mensagem para a fila da thread atual.
-	
-	struct window_d *w;  
-	w = (void *) windowList[window_with_focus];
-	
-	struct thread_d *t;	
 
-	//
-	// ## window ##
-	//
+	//#todo mensagem de erro.	
+	
+	if (window_with_focus < 0)
+		return -1;
+	
+	w = (void *) windowList[window_with_focus];
 	
 	if ( (void *) w == NULL )
 	{
-		printf("LINE_DISCIPLINE: w");
+		printf ("LINE_DISCIPLINE: w");
 		die();
 		
 	}else{
-		
 		
 		if ( w->used != 1 || w->magic != 1234 )
 		{
@@ -69,13 +72,13 @@ LINE_DISCIPLINE ( struct window_d *window,
 		
 		if ( (void *) t == NULL )
 		{
-		    printf("LINE_DISCIPLINE: t fail");
+		    printf("LINE_DISCIPLINE: t");
 		    die();			
 		}
 		
 		if ( t->used != 1 || t->magic != 1234 )
 		{
-			printf("LINE_DISCIPLINE: thread t validation");
+			printf("LINE_DISCIPLINE: t validation");
 			die();
 		}        
 			
@@ -83,7 +86,7 @@ LINE_DISCIPLINE ( struct window_d *window,
 		//??
 		
 		//a janela com o foco de entrada deve receber input de teclado.
-		//então a mensagem vai para a thrad associada com a janela com o foco de 
+		//então a mensagem vai para a thread associada com a janela com o foco de 
 		//entrada.
 		//#importante: a rotina que seta o foco deverá fazer essa associação,
 		//o aplicativo chama a rotina de setar o foco em uma janela, 
@@ -101,57 +104,25 @@ LINE_DISCIPLINE ( struct window_d *window,
 		t->newmessageFlag = 1;
 		
 		
-		//#importante:
-		//Chamando o porcedimento de janela para que não fiquemos sem 
-		//mensagem alguma, mas o certo é chamar o procedimento do sistema 
-		//só depois que o aplicativo consumir a mensagem, e o aplicativo decide 
-		//se vai chamar o procedimento do sistema ou não.
-		//inclusive o procedimento do sistema poderá ficar em user mode na API.
-		//aqui poderá ficar um segundo procedimento do sistema, bem reduzido,
-		//apenas para emergência do desenvolvedor.
+        //
+		// system procedure
+		//
 		
-		// sm\sys\proc.c
-		
-		
-		// #importante
-		// Vamos cancelar essa chamada para efeito de desempenho.
-		// Então o procedimentod e janela do sistema só será chamado 
-		// pelo aplicativo, ou pelo kernel 
-		// Para teste e debug a digitação de teclado 
-		// atenderá somente duas mensagens de emergência,
-		// uma para testes de novas funções sendo implementadas e 
-		// outra para refresh e inicialização do caso de problemas.
-		// serão F6 e F8.
-		
-		/*
-	    switch (msg)
-		{
-			case MSG_SYSKEYDOWN:  
-			    switch (long1)
-				{
-					case VK_F6:  //tests
-					case VK_F8:  //refresh screen and reset.
-		               system_procedure (  window, (int) msg, 
-					       (unsigned long) long1, (unsigned long) long2 );					
-					    break;
-				}
-			break;
-		};
-        */ 		
-		
-
-		system_procedure (  window, (int) msg, (unsigned long) long1, 
-	        (unsigned long) long2 );
+		system_procedure ( window, 
+						  (int) msg, 
+						  (unsigned long) long1, 
+	                      (unsigned long) long2 );
 		
 	};	
  	
     return 0;	
-};
+}
 
 
 /*
  ***************
  * KEYBOARD_LINE_DISCIPLINE
+ *     Uma disciplina de linha apenas para as digitações de teclado.
  * Funciona como um filtro.
  * Obs: Essa é a rotina principal desse arquivo, 
  * todo o resto poderá encontrar um lugar melhor.
@@ -159,6 +130,9 @@ LINE_DISCIPLINE ( struct window_d *window,
  */
 	
 int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
+	
+	struct thread_d *t;		
+	struct window_d *w;  	
 	
     //
     // Step 0 - Declarações de variáveis.
@@ -171,22 +145,13 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
     unsigned long ch;          //arg3 - (O caractere convertido para ascii).
     unsigned long status;      //arg4.  
 
-    // Text mode support.
-	// Tela para debug em RING 0.
-    // unsigned char *screen = (unsigned char *) 0x000B8000;   
-    //unsigned char *screen = (unsigned char *) SCREEN_START;    //Virtual.   
-    //...
-	
-	//Window.
-    //struct window_d *wFocus;	
-
-
     //
     // Step1 - Pegar o scancode.
     //
 
     //O driver pegou o scancode e passou para a disciplina de linha 
     //através de parâmetro.	
+	
 	scancode = SC;
 	
 
@@ -558,7 +523,6 @@ done:
 	};
 
 	
-	//
 	// Nesse momento temos duas opções:
 	// Devemos saber se a janela com o foco de entrada é um terminal ou não ...
 	// se ela for um terminal chamaremos o porcedimento de janelas de terminal 
@@ -566,36 +530,26 @@ done:
 	// que é o procedimento de janela do sistema.
 	// *IMPORTANTE: ENQUANTO O PROCEDIMENTO DE JANELA DO SISTEMA TIVER ATIVO,
 	// MUITOS COMANDOS NÃO VÃO FUNCIONAR ATE QUE SAIAMOS DO MODO TERMINAL.
-	//
-	//
 	
-		//
-		// *importante:
-		// Passamos a mensagem de teclado para o procedimento de janela do sistema.
-		// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
-		//
+	// *importante:
+	// Passamos a mensagem de teclado para o procedimento de janela do sistema.
+	// que deverá passar chamar o procedimento de janela da janela com o focod eentrada.
 		
-		//
-		// *importante:
-		// Quem é o 'first responder' para evento de teclado.
-		// A janela com o foco de entrada é o first responder para 
-		// eventos de teclado, mas não para todo tipo de envento.		
-		//
-	
-	
-  
-	// #importante
-    // +Pegamos a janela com o foco de entrada, pois ela 
-    // será um elemento da mensagem.	
-	// Mas enviaremos a mensagem para a fila da thread atual.
-	
-	struct window_d *w;  
-	w = (void *) windowList[window_with_focus];
-	
-	struct thread_d *t;	
+	// *importante:
+	// Quem é o 'first responder' para evento de teclado.
+	// A janela com o foco de entrada é o first responder para 
+	// eventos de teclado, mas não para todo tipo de envento.		
 
 	
 	// ## window ##
+	
+	// #importante
+	// +Pegamos a janela com o foco de entrada, pois ela 
+	// será um elemento da mensagem.	
+	// Mas enviaremos a mensagem para a fila da thread atual.
+	
+
+	w = (void *) windowList[window_with_focus];
 	
 	if ( (void *) w == NULL )
 	{
@@ -603,8 +557,7 @@ done:
 		die();
 		
 	}else{
-		
-		
+			
 		if ( w->used != 1 || w->magic != 1234 )
 		{
 			printf("KEYBOARD_LINE_DISCIPLINE: w validation");
@@ -618,6 +571,7 @@ done:
 		//que tem o foco de entrada.
 		
 		t = (void *) w->InputThread;
+		
 		if ( (void *) t == NULL )
 		{
 		    printf("KEYBOARD_LINE_DISCIPLINE: t");
@@ -651,55 +605,41 @@ done:
 		
 		t->newmessageFlag = 1;
 		
-		
-		//#importante:
-		//Chamando o porcedimento de janela para que não fiquemos sem 
-		//mensagem alguma, mas o certo é chamar o procedimento do sistema 
-		//só depois que o aplicativo consumir a mensagem, e o aplicativo decide 
-		//se vai chamar o procedimento do sistema ou não.
-		//inclusive o procedimento do sistema poderá ficar em user mode na API.
-		//aqui poderá ficar um segundo procedimento do sistema, bem reduzido,
-		//apenas para emergência do desenvolvedor.
-		
-		// sm\sys\proc.c
-		
-		// #importante
-		// Vamos cancelar essa chamada para efeito de desempenho.
-		// Então o procedimentod e janela do sistema só será chamado 
-		// pelo aplicativo, ou pelo kernel 
-		// Para teste e debug a digitação de teclado 
-		// atenderá somente duas mensagens de emergência,
-		// uma para testes de novas funções sendo implementadas e 
-		// outra para refresh e inicialização do caso de problemas.
-		// serão F6 e F8.
-		
+		// Teclas para teste.
+		// F5 F6 F7 F8
+		// Teclas usadas exclusivamente pelo 
+		// procedimento de janelas do sistema.
+		// Os aplicativos não devem usar essas teclas por enquanto.
+		// Então Essas teclas funcionarão mesmo que os aplicativos estejam com problema.
 		
 	    switch (mensagem)
 		{
 			case MSG_SYSKEYDOWN:  
 			    switch (ch)
 				{
-					case VK_F6:  //tests
-					case VK_F8:  //refresh screen and reset.
-		               system_procedure (  w, (int) mensagem, 
-					       (unsigned long) ch, (unsigned long) ch );					
-					    break;
+					case VK_F5:	//tests for drivers.
+					case VK_F6:	//tests
+					case VK_F7:	//tests
+					case VK_F8:	//refresh screen and reset.
+		               
+						system_procedure (  w, 
+										  (int) mensagem, 
+					                      (unsigned long) ch, 
+										  (unsigned long) ch );					
+					    
+						break;
 				}
 			break;
 		};
-        		
 		
-		//#deletar
-		//system_procedure (  w, (int) mensagem, (unsigned long) ch, 
-	    //    (unsigned long) ch );
 	};	
  
     return (int) 0;
-};
+}
 
 
  
-// Mouse 
+// Mouse #todo
 // A entrada é um ponteiro para um buffer que contenha os 
 // 3 chars usados pelo mouse.
 
