@@ -175,8 +175,10 @@ unsigned long get_process_heap_pointer(int pid);
 // Alloc and Free.
 //
 unsigned long AllocateHeap(unsigned long size);
+
 void *AllocateHeapEx(unsigned long size);
-unsigned long FreeHeap(unsigned long size);
+
+void FreeHeap (void *ptr);
 
 //
 // Fim.

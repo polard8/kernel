@@ -1,12 +1,12 @@
 /*
- * File: stdio.c 
+ * File: execve/crts/libc/stdio.c 
  *
  * Descrição:
  *     +Rotinas de input/output padrão.
  *     +Algumas rotinas de console.
  *
- * Ambiente:
- *     Apenas kernel mode.
+ * Environment:
+ *     Ring 0.
  *
  *
  * @todo: Buffering and pipes.
@@ -61,9 +61,6 @@ int fclose (FILE *stream){
 	//
 	// @todo: Implementar.
 	//
-
-
-//done:
 	
 	return (int) 0;
 };
@@ -83,6 +80,7 @@ int fclose (FILE *stream){
  *     usando essa função. É só obtermos o tamanho do arquivo 
  *     e alocarmos um buffer do tamanho necessário
  */
+
 FILE *fopen ( const char *filename, const char *mode ){
 	
     unsigned long fileret;
@@ -154,7 +152,7 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//...
 
 	return (FILE *) stream; 	
-};
+}
 
 
 /*
@@ -179,6 +177,7 @@ FILE *fopen ( const char *filename, const char *mode ){
  * @todo: Fazer o scroll somente no stream stdin e depois mostrar ele pronto.
  *
  */
+
 void scroll (void){
 	
 	// #suspenso
@@ -309,122 +308,70 @@ done:
  *     # isso não faz parte da lib c, mudar para 
  *     o field 3.
  */
-int kclear(int color) {
-	
-    //fis=0x000B8000, virtual=0x800000;
-	char *vm = (char *) g_current_vm;  
-	
-    unsigned int i = 0;
-	
-//Graphic Mode.
-//gui_mode:
-	if ( VideoBlock.useGui == 1 ){
-	    backgroundDraw(COLOR_BLACK);       
-		return (int) 0; 		
-	}
-	
-//Text Mode.
-//text_mode:	
-	while ( i < (SCREEN_WIDTH*SCREEN_HEIGHT*2) ) 
-    { 
-        vm[i] = 219; 
-        i++; 
-        
-        vm[i] = color; 
-        i++; 
-    };
-	
-	//Cursor.
-	g_cursor_x = 0;
-	g_cursor_y = 0;
-	
-//done.
-//done: 
 
-    return (int) 0; 
-}; 
+int kclear (int color) {
+
+	int Status = -1;
+	
+	if ( VideoBlock.useGui == 1 )
+	{
+		backgroundDraw ( COLOR_BLUE );
+
+		g_cursor_x = 0;
+		g_cursor_y = 0;
+
+		Status = 0;
+
+	}else{
+		Status = -1;
+	};
+
+	return Status;
+}
 
 
-/*
- * kclearClientArea:
- *     Limpa a área de cliente em text mode.
- *     Limpa 24 das 25 linhas.
- *     Não limpa a primeira de cima.
- */
+/* kclearClientArea: */
+
 int kclearClientArea (int color){
 	
-	char *vm = (char *) g_current_vm;    //fis=0x000B8000; 	
-    unsigned int i = (SCREEN_WIDTH*2);
-      
-    while(i < (SCREEN_WIDTH*SCREEN_HEIGHT*2)) 
-    { 
-        vm[i] = 219; 
-        i++; 
-        
-        vm[i] = color; 
-        i++; 
-    };
-	
-	//Cursor.
-	g_cursor_x = 0;
-	g_cursor_y = 0;
-    
-//done:
-
-    return (int) 0; 
-}; 
+    return (int) kclear (color);	
+}
 
 
 /*
  **************************************************************
  * kprint:
- *     Rotina simples de escrita em kernel mode.
- *     @todo: isso deve ir para outro lugar. uitm/libk 
+ * #bugbug: N~ao temos mais suporte a modo texto.
+ *
  */
+
 int kprint ( char *message, unsigned int line, int color ){
 	
-    char *vm = (char *) g_current_vm;    //fis=0xb8000, vir=0x800000; 
-    unsigned int i; 
-
-	i = (line*SCREEN_WIDTH*2); 
-
-    while( *message != 0 ) 
-    { 
-        if( *message == '\n' )
-        { 
-            line++; 
-            i = ( line*SCREEN_WIDTH*2 ); 
-            message++; 
-        }else{
-			
-            vm[i] = *message; 
-            message++; 
-            i++; 
-            vm[i]= color; 
-            i++; 
-        }; 
-    };
-	
-//done:	
-    return (int) 0; 
-}; 
+    return (int) -1; 
+}
 
 
 
 /*
- *  ==== Segue aqui a função printf ====
+ *==============================================================================
+ *  ==== Segue aqui o suporte a função 'printf' ====
+ *
+ * #obs:
+ * Em user mode temos uma modelo mais tradiciona de printf,
+ * talvez seja bom implementa-lo aqui tambem.
  */
+
 
 /*
  *****************************
  * prints:
- *     Rotina de suporta a printf.
- */
-static int prints ( char **out, const char *string, int width, int pad )
-{
-    register int pc = 0, padchar = ' ';
+ *     Rotina de suporta a printf. */
 
-    if(width > 0) 
+static int prints ( char **out, const char *string, int width, int pad ){
+	
+	register int pc = 0, padchar = ' ';
+
+    if (width > 0) 
 	{
 	    register int len = 0;
 		register const char *ptr;
@@ -627,22 +574,28 @@ static int print ( char **out, int *varg ){
  *     @field 2
  *     The printf function.
  *     Assuming sizeof(void *) == sizeof(int).
+ *
+ * Em user mode temos uma modelo mais tradiciona de printf,
+ * talvez seja bom implementa-lo aqui tambem.
  */
+
 int printf ( const char *format, ... ){
-    
-    register int *varg = (int *) (&format);
-	return (int) print (0,varg);
-};
+
+	register int *varg = (int *) (&format);
+
+	return (int) print ( 0, varg );
+}
+
 
 /*
- ***********************
- * puts:
- */
+ * puts: */
+
 int puts ( const char *str ){
 	
 	//provisório ...
 	return (int) printf ("%s",str);
-};
+}
+
 
 /*
  *************************************************
@@ -682,6 +635,7 @@ void panic ( const char *format, ... ){
 		    print(0,varg);			
             break; 		
 	};
+	
     die();	
 };
 
@@ -955,6 +909,7 @@ done:
  *     2015 - Created by Fred Nora.
  *     ...
  */
+
 unsigned long input ( unsigned long ch ){
 	
 	int i;
@@ -978,7 +933,7 @@ unsigned long input ( unsigned long ch ){
 		//tem que ter o tamanho de um arquivo.
 		if(prompt_pos >= PROMPT_SIZE)
 		{
-	        printf("input: INPUT_MODE_MULTIPLE_LINES full buffer!\n");	
+	        printf("input: INPUT_MODE_MULTIPLE_LINES full buffer\n");	
 	        refresh_screen();
 			return (unsigned long) 0; 			
 		}
@@ -1080,9 +1035,7 @@ int stdioInitialize (){
 	
 	if ( cWidth == 0 || cHeight == 0 )
 	{
-		//#debug
-		printf("stdioInitialize: fail w h ");
-		die();
+		panic ("stdioInitialize: Char info");
 	}	
 	
 
@@ -1256,13 +1209,11 @@ int stdioInitialize (){
     prompt_pos = 0;	
 	
 	// Done !
-	
-//done:
 
     return (int) 0;	
 	
 fail:
-    panic ("uitm-libc-stdio-stdioInitialize: fail\n");
+    panic ("crts-libc-stdio-stdioInitialize: fail\n");
 };
 
 

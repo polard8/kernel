@@ -1,5 +1,5 @@
 /*
- * File: pc\mm\mm.h  
+ * File: pc/mm/mm.h  
  *
  * Descrição:
  *     Header para o Memory Manager. Gerenciamento de memória.

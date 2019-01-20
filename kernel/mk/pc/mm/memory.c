@@ -385,23 +385,17 @@ void *GetHeap()
 unsigned long AllocateHeap ( unsigned long size ){
 	
     struct mmblock_d *Current;
-    //struct mmblock_d *Prev;
 
-    //
     // @todo: Aplicar filtro.
     // Aqui podemos checar se o quantidade de heap disponível
     // está coerente com o tamanho do heap. Se essa quantidade
-    // for muito grande, maior que o heap total, então temos um
-    // problema.
-    //
-
-    //
+    // for muito grande, maior que o heap total, então temos um problema.
+ 
     // Se não há espaço disponível no heap, não há muito o que fazer.
     // Uma opção seria tentar almentar o heap, se isso for possível.
-    //
 
     // Available heap.
-    if(g_available_heap == 0)
+    if (g_available_heap == 0)
     {
         //
         // @todo: Tentar crescer o heap para atender o size requisitado.
@@ -685,10 +679,8 @@ try_again:
     };
 
 
-    //
     // @todo: 
     // Checar novamente aqui o heap disponível. Se esgotou, tentar crescer.
-    //
 
 
     /*
@@ -697,7 +689,6 @@ try_again:
      * @todo:
      * Colocar o conteúdo da estrutura no lugar destinado para o header.
      * O header conterá informações sobre o heap.
-     *
      */
 
 
@@ -729,21 +720,60 @@ fail:
 
 
 /*
- * FreeHeap: #bugbug
- * @todo: Implementar essa função.
- * Objetivo: Liberar o bloco de memória, configurando a sua estrutura.
- * Libera memória.
- * O argumento é a diferença entra o ponteiro antigo e o novo ponteiro 
- * desejado. 
- * Ponteiros do início da área do cliente.
- * ??
+ ********************
+ * FreeHeap:
+ *
  */
-unsigned long FreeHeap (unsigned long size){
+
+void FreeHeap (void *ptr){
 	
-    // #cancelada !
-	// Usaremos flags e o GC. 
-	return (unsigned long) g_heap_pointer;    
-};
+	struct mmblock_d *Header;		
+	
+	if ( (void *) ptr == NULL )
+	    return;
+	
+	
+    if ( ptr < (void *) KERNEL_HEAP_START || ptr >= (void *) KERNEL_HEAP_END ){
+		return;
+	}
+	
+	
+	// Header
+	// Encontrando o endereço do header.
+	// O ponteiro passado é o endereço da área de cliente.
+	
+	unsigned long UserAreaStart = (unsigned long) ptr; 
+	
+	Header = (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
+	
+	if ( (void *) Header == NULL )
+	{
+		return;
+		
+	}else{
+	
+		if ( Header->Used != 1 || Header->Magic != 1234 )	
+		{
+			return;
+		}
+		
+		//Checa
+		if ( mmblockList[mmblockCount] == (unsigned long) Header && 
+			 Header->Id == mmblockCount )
+		{
+			mmblockList[mmblockCount] = 0;
+			mmblockCount--;
+		}
+		
+		//Isso invalida a estrutura, para evitar mal uso.
+		Header->Used = 0;
+		Header->Magic = 0;
+		
+		g_heap_pointer = (unsigned long) Header;
+	}
+	    	
+	//return;    
+}
 
 
 /*
