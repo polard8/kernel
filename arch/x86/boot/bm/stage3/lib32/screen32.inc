@@ -370,7 +370,7 @@ os_output_chars_newline_skip_LF_nosub:
 	jmp os_output_chars_nextchar	
 
 os_output_chars_tab:
-	push rcx
+	push ecx
 	mov ax, [os_Screen_Cursor_Col]	; Grab the current cursor X value (ex 7)
 	mov cx, ax
 	add ax, 8			; Add 8 (ex 15)

@@ -27,9 +27,9 @@
 //
 
 //Debug flags.
-//#define BL_VERBOSE 1   //Testando desligado.
-//#define BL_??    1
-//#define BL_??    1
+//Testando desligado.
+//#define BL_VERBOSE 1   
+
 
  
 #include <gdef.h>  

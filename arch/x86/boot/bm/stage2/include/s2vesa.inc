@@ -34,7 +34,7 @@ VESA_Info:		                                          ;
     VESAInfo_OEMProductNamePtr	dd	1                     ;
     VESAInfo_OEMProductRevPtr	dd	1                     ;
     VESAInfo_Reserved    		db	222                   ;
-    VESAInfo_OEMData	    	db	256                   ;
+    VESAInfo_OEMData	    	db	0xff ;256             ;
 ;=========================================================;
 ; VESA MODE INFORMATION                                   ;
 ;=========================================================;

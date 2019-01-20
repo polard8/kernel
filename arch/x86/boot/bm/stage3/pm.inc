@@ -1,5 +1,5 @@
 ;
-; File: msm\pm.inc
+; File: bm/stage3/pm.inc
 ;
 ;     +Enable Protected Mode with no Paging.
 ;
@@ -523,13 +523,19 @@ do_rm_startgui:
 	;Set mode.
 	mov al, byte BOOTMODE_GUI
 	call set_boot_mode
-
-	mov word [META$FILE.VIDEO_MODE], 0x115   
+	
+	;; #tests
+	;; 0x118 funcionou à partir no boot loader e no kernel base.
+	;; falta o boot manager aceitar multiplas resoluções
+	
+	;mov word [META$FILE.VIDEO_MODE], 0x118         		
+	mov word [META$FILE.VIDEO_MODE], 0x115     	
+	
 	;mov ax, 0x115
 	;call set_video_mode	
     
 	;Inicializa o modo selecionado.
-	JMP s2modesActivateMode    ;(lib16\s2modes.inc) 
+	JMP s2modesActivateMode    ;(lib16/s2modes.inc) 
 	jmp $
 	
 ;;Mensagens para a rotina de shut down.	

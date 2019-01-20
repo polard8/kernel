@@ -14,6 +14,13 @@
  
 #include <bootloader.h>
 
+
+extern unsigned long SavedBootBlock;
+extern unsigned long SavedLFB;
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP; 
+
  
 extern void my_buffer_load_bitmap_16x16();  
 
@@ -700,12 +707,63 @@ void my_buffer_put_pixel( unsigned long ax,
 						  unsigned long cx, 
 						  unsigned long dx )
 {
-	asm volatile(" \n "
-		          : // no inputs
-		          : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+	//asm volatile(" \n "
+	//	          : // no inputs
+	//	          : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 		
-	gui_buffer_putpixel(); 	
-	return;
+	//#Warning
+	//suspenso, vamos tentar não usar o assembly
+	//gui_buffer_putpixel(); 	
+	//return;
+	
+	//SOFTWARELIB_BACKBUFFER EQU (0x1000000 - 0x800000)
+	unsigned char *where = (unsigned char *) (0x1000000 - 0x800000); //0xC0800000;
+	
+	
+	unsigned long color = (unsigned long) ax;
+	
+	char b, g, r, a;
+	
+	b = (color & 0xFF);	
+	g = (color & 0xFF00) >> 8;
+	r = (color & 0xFF0000) >> 16;
+	a = (color >> 24) + 1;
+	
+	int x = (int) bx;
+	int y = (int) cx;
+	
+	
+	// = 3; 
+	//24bpp
+	int bytes_count;
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+	}
+	
+	// #importante
+	// Pegamos a largura do dispositivo.
+	
+	int width = (int) SavedX; 
+	
+	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
+	
+	where[offset] = b;
+	where[offset +1] = g;
+	where[offset +2] = r;
+	
+	//teste
+	if ( SavedBPP == 32 )
+	{
+	    where[offset +3] = a;	
+	}
 };
 
 
@@ -738,8 +796,8 @@ void my_buffer_char_blt( unsigned long x,
 		work_char++;    //Incrementa 8 bits.	   
 	};
 	
-done:
-    return;  	         	   
+//done:
+    //return;  	         	   
 };
 
 

@@ -1,5 +1,5 @@
 ;
-; File: main.asm 
+; File: bm/main.asm 
 ;
 ; Descrição:
 ;     Esse é o arquivo principal de BM.BIN.
@@ -1233,13 +1233,8 @@ HERE:
 	
 .preSelection:
 	
-	;;
 	;;   ## SET UP BOOT MODE ##
-	;;
-	
-	
 	mov al, byte BOOTMODE_SHELL
-	;mov al, byte BOOTMODE_GUI
 	call set_boot_mode	
 
 
@@ -1248,17 +1243,25 @@ HERE:
 	;; pois temos um comando que inicializa o modo gráfico.
 
 	
-	;;
-	;;   ## SET UP VIDEO MODE ##
-	;;
-	
+    ;; #importante
+    ;; Esse é o momento que configuramos o modo de vídeo ainda antes 
+    ;; de entrarmos na CLI.
+    ;; Isso só faz sentido se o modo de video for o modo gráfico.
+
 	; video:
 	; Faz a primeira seleção de modo de video. Salvando o modo no metafile.
 	; + 0x4115 is 800x600x24bit	(*gui) (3 bytes por pixel) (0xrrggbbrrggbb).
 
-	mov word [META$FILE.VIDEO_MODE], 0x115   
-	;mov ax, 0x115
+
+	;;   ## SET UP BOOT MODE ##
+	;mov al, byte BOOTMODE_GUI
+	;call set_boot_mode	    
+
+	;;   ## SET UP VIDEO MODE ##
+    ;mov word [META$FILE.VIDEO_MODE], 0x115   
+    ;mov ax, 0x115
 	;call set_video_mode
+
 
 	;;
 	;; ## GO!
@@ -1284,10 +1287,12 @@ stage2_msg_pe_sigOK db "BM:stage2Initializations: SIG OK", 13, 10, 0
 ;; stage2Shutdown:
 ;;     Desliga o computador via APM, using BIOS.
 ;;     Obs: Isso é um teste.
-;;     #Funcionou, Criar um comando no shell do boot manager para isso.	
-;;                 isso pode ser chamado quando uma aplicação em user mode
-;;                 chamar uma rotina de retorno para o modo real.
+;;     #Funcionou, 
+;;     Criar um comando no shell do boot manager para isso.	
+;;     isso pode ser chamado quando uma aplicação em user mode
+;;     chamar uma rotina de retorno para o modo real.
 ;;
+
 stage2Shutdown:	
     
 	;Connect to APM API

@@ -1,6 +1,3 @@
-# #todo
-# ISSO AINDA NÃO FOI TESTADO !!
-# REVER TUDO, CONFERIR COMPILAÇÃO.
 
 #
 # Compiling Gramado 0.4 Boot Loader 

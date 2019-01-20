@@ -147,9 +147,12 @@ mShell:
 mGui:
     nop
 .videoMode:	
+
+
 	;Set video mode.
+	;;Usa um modo previamente configurado.	
 	xor eax, eax
-	mov ax, word [META$FILE.VIDEO_MODE]    ;;Usa um modo previamente configurado.
+	mov ax, word [META$FILE.VIDEO_MODE]    
 	call set_video_mode
 	
     ;Salva modo.
