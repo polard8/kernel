@@ -92,7 +92,9 @@ refresh_horizontal_line ( unsigned long x1,
 			break;
 	}
 	
-	//800;
+	// #importante 
+	// Usando a largura salva.
+	
 	int width = (int) SavedX;  	
 	
 	void *s = (void *) (BACKBUFFER_ADDRESS)  + (y * bytes_count * width) + (x1 * bytes_count);
@@ -103,10 +105,14 @@ refresh_horizontal_line ( unsigned long x1,
 	// Tem que ser uma string de tamanho definido.
 	// strcpy(d,s);	
 	
-	unsigned long size = (unsigned long) ( (x2-x1)*3 ); 
+	//#bugbug
+	//Essa '3' precisa ser uma variável
+	
+	unsigned long size = (unsigned long) ( (x2-x1) * bytes_count );
+	//unsigned long size = (unsigned long) ( (x2-x1) * 3 ); 
 	
 	memcpy ( (void *) d, (const void *) s, size );
-};
+}
 
 
 //

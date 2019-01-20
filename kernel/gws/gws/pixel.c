@@ -248,7 +248,9 @@ backbuffer_putpixel( unsigned long ax,
 	int y = (int) cx;
 	
 	
-	int bytes_count;// = 3; //24bpp
+	// = 3; 
+	//24bpp
+	int bytes_count;
 	
 	switch (SavedBPP)
 	{
@@ -261,11 +263,14 @@ backbuffer_putpixel( unsigned long ax,
 			break;
 	}
 	
-	int width = (int) SavedX; //800; 
+	// #importante
+	// Pegamos a largura do dispositivo.
+	
+	int width = (int) SavedX; 
 	
 	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 	
-	where[offset]    = b;
+	where[offset] = b;
 	where[offset +1] = g;
 	where[offset +2] = r;
 	
@@ -274,9 +279,7 @@ backbuffer_putpixel( unsigned long ax,
 	{
 	    where[offset +3] = a;	
 	}
-	
-};
-
+}
 
 
 // IN: cor, x, y, 0
@@ -307,7 +310,9 @@ lfb_putpixel( unsigned long ax,
 	int x = (int) bx;
 	int y = (int) cx;
 
-	int bytes_count;// = 3; //24bpp
+	// = 3; 
+	//24bpp
+	int bytes_count;
 	
 	switch (SavedBPP)
 	{
@@ -320,11 +325,13 @@ lfb_putpixel( unsigned long ax,
 			break;
 	}	
 	
-	int width = (int) SavedX; //800;
+	//#importante
+	//Pegamos a largura salva.
+	int width = (int) SavedX; 
 	
 	int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 	
-	where[offset]    = b;
+	where[offset] = b;
 	where[offset +1] = g;
 	where[offset +2] = r;
 
@@ -333,10 +340,7 @@ lfb_putpixel( unsigned long ax,
 	{
 	    where[offset +3] = a;	
 	}
-	
-};
-
-
+}
 
 
 //#importante:
@@ -344,6 +348,7 @@ lfb_putpixel( unsigned long ax,
 //tem que usar variável pra bytes per pixel e screen width. 
 //A ideia é poder pegar os píxel de um retãngulo e salvá los
 //para depois devolver ao backbuffer.
+
 unsigned long get_pixel ( unsigned long x,  unsigned long y ){
 	
 	//SALVA A COR
@@ -351,11 +356,12 @@ unsigned long get_pixel ( unsigned long x,  unsigned long y ){
 	
 	unsigned char *rgba = (unsigned char *) &COLOR;
 	
-    unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;
+	unsigned char *backbuffer = (unsigned char *) BACKBUFFER_ADDRESS;
 
+	// = 3; 
+	//24bpp
+	int bytes_count;
 
-	int bytes_count;// = 3; //24bpp
-	
 	switch (SavedBPP)
 	{
 		case 32:
@@ -367,21 +373,23 @@ unsigned long get_pixel ( unsigned long x,  unsigned long y ){
 			break;
 	}	
 
-	int width = (int) SavedX; //800;
+	// #importante
+	// Usando largura salva.
+	
+	int width = (int) SavedX; 
 		
-	//unsigned long pos = (unsigned long) (y*3*800)+(x*3);
 	unsigned long pos = (unsigned long) (y* bytes_count * width)+(x * bytes_count);	
 	
-	COLOR  = *( unsigned long * ) &backbuffer[pos];
+	COLOR = *( unsigned long * ) &backbuffer[pos];
 	
-
     return (unsigned long) COLOR;	
-};
+}
 
 
 //copia um pixel do backbuffer para o frontbuffer
 //tem que usar variável pra bytes per pixel e screen width.
 //#todo: TESTAR ESSA FUNÇÃO
+
 void refresh_pixel ( unsigned long x,  unsigned long y ){
 	
 	//SALVA A COR
@@ -392,7 +400,9 @@ void refresh_pixel ( unsigned long x,  unsigned long y ){
     unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_ADDRESS;	
 	
 	
-	int bytes_count;// = 3; //24bpp
+	// = 3; 
+	//24bpp
+	int bytes_count;
 	
 	switch (SavedBPP)
 	{
@@ -405,19 +415,18 @@ void refresh_pixel ( unsigned long x,  unsigned long y ){
 			break;
 	}	
 
-	int width = (int) SavedX; //800;	
+	//#importante
+	//Usando largura salva.
 	
+	int width = (int) SavedX; 	
 
-	//unsigned long pos = (unsigned long) (y*3*800)+(x*3);
 	unsigned long pos = (unsigned long) (y* bytes_count * width)+(x * bytes_count);	
 	
 	//pego o pixel no backbuffer
-	COLOR = get_pixel( x, y );
+	COLOR = get_pixel ( x, y );
 	
 	*( unsigned long * ) &frontbuffer[pos] = COLOR;
-	//*( unsigned long* )&frontbuffer[pos] = get_pixel( x, y );
-
-};
+}
 
 
 //

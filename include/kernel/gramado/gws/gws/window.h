@@ -307,6 +307,9 @@ int window_getch();
 //Definições padronizadas para janelas do kernel usadas para 
 //fornecer informações sobre o sistema.
 // (Retângulo grande no topo da tela.)
+// #bugbug
+// Isso não é uma coisa boa.
+
 #define KERNEL_WINDOW_DEFAULT_LEFT 0
 #define KERNEL_WINDOW_DEFAULT_TOP  0
 #define KERNEL_WINDOW_DEFAULT_WIDTH  800
@@ -348,7 +351,6 @@ struct button_d
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
-	
 	int used;
     int magic;
 
@@ -383,9 +385,9 @@ struct button_d
 	//Group Boxes
 	//Push Buttons
 	//Radio Buttons
+	
 	int type;
 
-   
     int selected;
 	
 	// Border color
@@ -436,6 +438,7 @@ struct button_d *mainButton3;
  * O kernel terá registro disso para salvar as dimensões da
  * área de trabalho, que é o tamanho da tela menos o tamanho da barra.
  */
+
 struct taskbar_d
 {
 	object_type_t objectType;
@@ -468,6 +471,7 @@ struct taskbar_d *TaskBar;    //*Importante: Sem Ponteiro.
  *     um conjunto de menus para manipular
  *     o porcesso com a janela ativa.
  */
+
 struct menubar_d
 {
 	object_type_t objectType;
@@ -491,8 +495,8 @@ struct menubar_d *MenuBar;    //*Importante: Sem Ponteiro.
 /*
  * window_procedure_d:
  *     Estrutura para procedimento de janela.
- *
  */ 
+
 struct window_procedure_d
 {
 
@@ -527,8 +531,8 @@ struct window_procedure_d *WindowProcedure;
  * rect_d:
  *     Estrutura para gerenciamento de retângulos.
  *     Um retângulo pertence à uma janela.
- *
  */
+
 struct rect_d 
 {
 	object_type_t objectType;
@@ -591,7 +595,6 @@ struct tagRGBA *RGBA;
  */ 
  
  
- 
 	//
 	// Window Class support.
 	//
@@ -649,12 +652,9 @@ struct window_class_d
 	
 	//Que tipo de window class.
 	// do sistema, dos processos ...
-    //tipo de classe.	
-	wc_t windowClass; 
+    //tipo de classe.
 	
-	//
-	// 
-	//
+	wc_t windowClass; 
 
 	//1
     client_window_classes_t	clientClass;

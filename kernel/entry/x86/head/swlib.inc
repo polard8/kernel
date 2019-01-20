@@ -98,9 +98,10 @@ _gui_buffer_putpixel:
 	mov es, ax
     pop eax   
 	
-	;;[BytesPerScanLineMOS] ; ebx = y * y multiplier 800*4 ;1024*4 ;640*4      
+	;;[BytesPerScanLineMOS] 
 	
-	imul ebx, 800*3    ;640*3        
+	;largura * bytes por pixel.
+	imul ebx, 800*3        
     
 	;eax*3
 	mov ecx, dword 3
@@ -189,9 +190,10 @@ _gui_buffer_putpixel2:
 	mov es, ax
     pop eax   
 	
-	;;[BytesPerScanLineMOS] ; ebx = y * y multiplier 800*4 ;1024*4 ;640*4      
+	;;[BytesPerScanLineMOS]       
 	
-	imul ebx, 800*3    ;640*3        
+	;;largura * bytes por pixel
+	imul ebx, 800*3            
     
 	;eax*3
 	mov ecx, dword 3
@@ -265,10 +267,10 @@ _background:
 	mov edi, edx
 	
 	;contador de linhas
-	mov   ebx, dword 600    ;480          ;Número de linhas.	    
+	mov   ebx, dword 600     ;Número de linhas.	    
 .bg_newline:     	
 	;contador de pixel por linha.
-    mov   ecx, dword 800*3    ;640*3    ;3 bytes por pixel. (800 pixel por linha).	
+    mov   ecx, dword 800*3    
 .bg_newpixel:      
 	;mov al, byte [.a]
 	;stosb 	
@@ -320,12 +322,11 @@ _asm_refresh_screen:
 	mov edx, dword 0xC0400000    ;Endereço logico do LFB. Configurado no bootloader.
     mov edi, edx
 	
-	;
-	; Uma tela de 800x600:
-	; 800 pixel de 3 bytes por linha é igual a 2400 bytes por linha.   
-	; 2400 byte por linhas é igual a 600 dwords por linha.
+	
+    ;;largura * altura	
+	;; Estamos movendo de 4 em 4 bytes.
     mov ecx, dword (800*600)      
-    rep movsd                ;; Estamos movendo 4bytes
+    rep movsd                
 	
 	pop edx
 	pop ecx

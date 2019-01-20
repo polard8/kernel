@@ -1,5 +1,6 @@
 /*
- * File ws.h
+ * File gws/gws/ws.h
+ *
  *     GWS - Gramado Window Server
  *
  * Esse é o principal header do gws, preferenciamente
@@ -20,7 +21,6 @@
  *
  * History:
  *     2018 - Created by Fred Nora.
- *
  */
  
  
@@ -34,12 +34,6 @@
 #define WINDOW_COUNT_MAX          1024 
 
 #define MAX_WINDOWS WINDOW_COUNT_MAX 
- 
- 
- 
-//Definindo as dimensões padrão. 
-//#define DEFAULT_SCREEN_WIDTH  800
-//#define DEFAULT_SCREEN_HEIGHT 600 
  
 //desktop
 #define DESKTOP_X  0
@@ -58,11 +52,6 @@
 #define DEFAULT_CHAR_HEIGHT  8
 //...
 
-
-
- 
- 
- 
  
  
 //
@@ -713,12 +702,12 @@ int terminal_window;
 
 
 //As fontes usadas pelo servidor gws
-unsigned long gws_currentfont_address;      //fonte atual.
-unsigned long g8x8fontAddress;   //8×8, 80×25,CGA, EGA
-unsigned long g8x14fontAddress;  //8x14,80×25,EGA
-unsigned long g8x16fontAddress;  //??
-unsigned long g9x14fontAddress;  //9x14,80×25,MDA, Hercules
-unsigned long g9x16fontAddress;  //9x16,80×25,VGA
+unsigned long gws_currentfont_address;  // fonte atual.
+unsigned long g8x8fontAddress;          // 8×8, 80×25,CGA, EGA
+unsigned long g8x14fontAddress;         // 8x14,80×25,EGA
+unsigned long g8x16fontAddress;         // ??
+unsigned long g9x14fontAddress;         // 9x14,80×25,MDA, Hercules
+unsigned long g9x16fontAddress;         // 9x16,80×25,VGA
 //...
 
 int gfontSize;
@@ -736,8 +725,8 @@ unsigned long g_char_attrib;
 unsigned long g_kernel_lfb; 
 
 //video mode
-unsigned long g_current_vm; //video memory
-unsigned long g_current_video_mode; //video mode
+unsigned long g_current_vm;          //video memory
+unsigned long g_current_video_mode;  //video mode
 
 
 //#test# todo
@@ -752,8 +741,8 @@ unsigned long g_current_video_mode; //video mode
 //cursor support.
 unsigned long g_cursor_x;
 unsigned long g_cursor_y;
-unsigned long g_cursor_width;   //??
-unsigned long g_cursor_height;  //??
+unsigned long g_cursor_width;    //??
+unsigned long g_cursor_height;   //??
 unsigned long g_cursor_color;
 unsigned long g_cursor_left;     // margem esquerda dada em linhas
 unsigned long g_cursor_top;      // margem superior dada em linhas
@@ -770,20 +759,17 @@ int g_show_text_cursor;
 int textcursorStatus;      
 
 
-
-
 unsigned long g_mousepointer_x;
 unsigned long g_mousepointer_y;
 
 
-void 
-gwsSetCurrentFontAddress( unsigned long address );
+void gwsSetCurrentFontAddress ( unsigned long address );
 
-unsigned long
-gwsGetCurrentFontAddress();
+unsigned long gwsGetCurrentFontAddress ();
 
 /* Carregando e instalando uma fonte dado o nome. */
-int gwsInstallFont( char *file_name );
+int gwsInstallFont ( char *file_name );
+
 
 //
 // End
