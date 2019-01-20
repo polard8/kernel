@@ -419,7 +419,7 @@ int x86main ( int argc, char *argv[] ){
     KernelStatus = KERNEL_NULL;
 
     //Initializing the global spinlock.
-    __ipc_kernel_spinlock = 1;
+    __spinlock_ipc = 1;
 
     // #test.
     // initializing zorder list.

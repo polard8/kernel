@@ -1536,17 +1536,17 @@ void *services( unsigned long number,
 			
 		//226 get
         case SYS_GET_KERNELSEMAPHORE:
-            return (void *) __ipc_kernel_spinlock;
+            return (void *) __spinlock_ipc;
             break;
         
         //227 close critical section	
 		case SYS_CLOSE_KERNELSEMAPHORE:
-		    __ipc_kernel_spinlock = 0;
+			__spinlock_ipc = 0;
 			break;
 			
 		//228 open critical section
 		case SYS_OPEN_KERNELSEMAPHORE:
-		    __ipc_kernel_spinlock = 1;
+		    __spinlock_ipc = 1;
             break;
 			
 		//240

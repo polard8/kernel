@@ -68,19 +68,6 @@ ipc_procedureEx_t *IpcProcedureEx;
  
  
  
- 
-
-//
-// * Kernel spinlock
-//
-
-int __ipc_kernel_spinlock;  //Global.
-//...
-
-
-
-
- 
 int ipcStatus; 
 
 

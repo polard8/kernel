@@ -67,7 +67,8 @@
 #include <kernel/globals/gdevice.h>
 //...
 
-
+//spinlocks
+#include <kernel/gramado/mk/pc/spinlock.h>
 
 //layer.
 
