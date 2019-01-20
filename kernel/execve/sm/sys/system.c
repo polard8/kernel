@@ -2497,48 +2497,67 @@ void die (){
 //o ID da janela que tem o terminal virtual ativo.
 int systemGetTerminalWindow (){
     return (int) terminal_window;	
-}; 
+}
 
 
-//configurar as variáveis de terminal presentes dentro da 
-//janela.
-//pois cada janela pode ter um terminal. 
-void systemSetTerminalWindow( struct window_d *window )
-{
+/*
+ ****************************************************
+ * systemSetTerminalWindow:
+ * 
+ * #importante
+ * Configura qual vai ser a janela do terminal virtual.
+ * Configurar as variáveis de terminal presentes dentro da janela, pois cada 
+ * janela pode ter um terminal. 
+ *
+ * #importante:
+ * >>>> Essa e' a janela que o kernel precisa efetuar o refresh do stdout 
+ * associado a ela. Dessa forma, as rotinas da libc precisa apenas escrever
+ * em stdout, ficando por conta do kernel efetuar o refresh do arquivo 
+ * para dentro da janela. 
+ * >>>> Mas esse arquivo deve conter as caracteri'ticas de cada caractere. 
+ * 
+ */
 
-		// Obs: ?? Como faremos para pintar dentro da janela do terminal.
-        // Obs: a rotina de configuração do terminal deverá ajustar 		
-		// as margens usadas pela rotina de impressão de caracteres.
-        //		
+void systemSetTerminalWindow ( struct window_d *window ){
 
-		
-	//
+	// Obs: ?? Como faremos para pintar dentro da janela do terminal.
+	// Obs: a rotina de configuração do terminal deverá ajustar as margens 
+	// usadas pela rotina de impressão de caracteres.
+       
 	// obs:
     // essa modificação de margens obriga o aplicativo a 
 	// configurar o terminal somente na hora que for usa-lo,
 	// para não correr o risco de imprimir no lugar errado.
-    //	
 		
 //check_window:	
 
 	if ( (void *) window == NULL )
 	{
-		goto fail;
+		return;
+		//goto fail;
 		
 	} else {
 		
 		if ( window->used != 1 || window->magic != 1234 ){
-			goto fail;
+			
+			return;
+			//goto fail;
 		}
 		
-		//Configurando a variável global que diz qual é 
-		//o ID da janela que tem o terminal virtual ativo.
+		
+		// #bugbug
+		// De que janela estamos falando, de qual dos terminais virtuais?
+		// Pode ser da que esta em primeiro plano.
+		// Configurando a variável global que diz qual é 
+		// o ID da janela que tem o terminal virtual ativo.
+		
 		terminal_window = (int) window->id;
 		
 		//configura o status do terminal dentro da janela
-		window->terminal_used = 1;
 		//validade e reusabilidade das variáveis de terminal 
 		//dentro da estrutura de janela.
+		
+		window->terminal_used = 1;
 		window->terminal_magic = 1234; 
 		
 		//tab
@@ -2560,19 +2579,18 @@ void systemSetTerminalWindow( struct window_d *window )
 		
 		//rcClient
 		
-		//
 		// test:
 		// tentando ajustar as margens para as rotinas de impressão.
 		// para que as rotinas de impressão imprimam dentro das 
 		// dimensões do terminal. 
 		// obs: @todo: Essas margens deverão ser reconfiguradas 
 		// quando o terminal é fechado.
-		//
 		
 		// #bugbug:
         // #importante		
 		// Esse ajuste pode significar problemas.
-        if ( (void *) window->rcClient !=  NULL )
+        
+		if ( (void *) window->rcClient !=  NULL )
 		{
 		    //x inicial
 		    if ( window->rcClient->left > 0 )
@@ -2622,22 +2640,22 @@ void systemSetTerminalWindow( struct window_d *window )
 		//limits
 		//@todo: corrigir.
 		// ajustes temporários caso tenha havido um erro anteriormente...
+		
 		if( g_cursor_left > 800 ){
 			g_cursor_left = 795;
-		};
+		}
 
 		if( g_cursor_top > 600 ){
 			g_cursor_top = 595;
-		};
+		}
 		
 		if( g_cursor_right > 800 ){
 			g_cursor_right = 795;
-		};
+		}
 
 		if( g_cursor_bottom > 600 ){
 			g_cursor_bottom = 595;
-		};
-		
+		}
 		
         //Cursor.
 		g_cursor_width = 8;  
@@ -2645,13 +2663,7 @@ void systemSetTerminalWindow( struct window_d *window )
 		g_cursor_color = COLOR_TERMINALTEXT;		
 		
 	};
-		
-done:
-    //...
-fail:	
-    return;
-};
-
+}
 
 
 //@todo: precisamos de argumentos.
@@ -2662,12 +2674,7 @@ void systemSetTerminalRectangle( unsigned long left,
 								 unsigned long height )
 {
 	//terminal_window
-	
-done:
-    //...
-fail:	
-    return;
-};
+}
 
 
 

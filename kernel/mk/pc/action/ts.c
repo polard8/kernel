@@ -1,5 +1,5 @@
 /*
- * File: mk\pc\ts.c
+ * File: mk/pc/ts.c
  *
  *     Task Switching.
  *
@@ -399,7 +399,25 @@ void task_switch (){
 				KiRequest ();
 				
 				extra = 0;
-			}	
+			}
+			
+			// #importante
+			// Se a flag estiver acionada, indica que devemos 
+			// efetuar o refresh do do stdout para a janela do terminal 
+			// virtual que esta' em primeiro plano.
+			// #bugbug: Isso vai acontecer 100 vezes por segundo.
+			// Vai deixar o sistema lento.
+			// #todo: falta o ponteiro para o arquivo.
+			// Esse arquivo alem dos caracteres, tem as caracteristicas 
+			// do caractere.
+			//#todo: criar essa varia'vel.
+			//if ( refresh_terminal_window_flag == 1 )
+			//{
+			//
+			//     refresh_terminal_window_flag = 0;
+			//}
+			
+			
 			
 			// sempre
 			// Isso precisa ser sempre ou então o processo init não 

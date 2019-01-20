@@ -1470,14 +1470,15 @@ void *services( unsigned long number,
         case SYS_SETTERMINALINPUTBUFFER:		
 		    break;
 			
-		//215
-		//retorna o ID.
+		// 215
+		// retorna o ID.
 		case SYS_GETTERMINALWINDOW: 
 		    return (void *) systemGetTerminalWindow(); 
 		    break;
 			
-		//216
-        //configura qual vai ser a janela do terminal. 		
+		// 216
+        // Configura qual vai ser a janela do terminal virtual. 
+		// #obs: O refresh de stdout podera' ocorrer em ts.c	
 		case SYS_SETTERMINALWINDOW:	
 		   systemSetTerminalWindow ( (struct window_d *) arg2 );	
 		   break;
