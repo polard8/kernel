@@ -421,7 +421,8 @@ void mouseHandler (){
 			
 			//??
 			//Colocando os três chars em variáveis globais.
-            //Isso ficará assim caso não aja overflow ...
+            //Isso ficará assim caso não haja overflow ...
+			
 			mouse_packet_data = buffer_mouse[0];
 	 	    mouse_packet_x = buffer_mouse[1];       
 		    mouse_packet_y = buffer_mouse[2];
@@ -431,7 +432,9 @@ void mouseHandler (){
 			// mas queremos que seja feito em C.
 			// #obs: Uma rotina interna aqui nesse arquivo está tentando isso.
 			
+			//#importante.
 		    //salvando antes de atualizar.
+			//paga poder apagar daqui a pouco.
 			saved_mouse_x = mouse_x;
 		    saved_mouse_y = mouse_y;			
 			
