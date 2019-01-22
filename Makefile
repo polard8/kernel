@@ -414,6 +414,9 @@ vhd-copy-files:
 	-sudo cp ../gde/bin/GRAMCODE.BIN /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GDESHELL.BIN /mnt/gramadovhd 
 	-sudo cp ../gde/bin/SPR.BIN /mnt/gramadovhd 
+	-sudo cp ../gde/bin/CHASM32.BIN /mnt/gramadovhd 
+	
+	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM /mnt/gramadovhd
 
 # umount
 vhd-unmount:
