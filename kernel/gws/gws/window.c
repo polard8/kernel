@@ -125,13 +125,21 @@ int show_window_rect (struct window_d *window){
 			// ?? E se a janela tiver uma sombra, 
 			// então precisamos mostrar a sombra também. 
 			
-			if ( window->shadowUsed == 1 )
-			{
-			    refresh_rectangle ( window->left, window->top, 
-				    window->width +2, window->height +2 ); 					
+			//#bugbug
+			//Extranhamente essa checagem atraza a pintura da janela.
+			//Ou talvez o novo tamanho favoreça o refresh rectangle,
+			//ja que tem rotinas diferentes para larguras diferentes
+			
+			//if ( window->shadowUsed == 1 )
+			//{
+				
+			    window->width = window->width +4;
+				window->height = window->height +4;	
 			    
-				return (int) 0;	
-			}
+				//refresh_rectangle ( window->left, window->top, 
+				//    window->width +2, window->height +2 ); 					
+				//return (int) 0;	
+			//}
 			
 	        refresh_rectangle ( window->left, window->top, window->width, 
 		        window->height ); 		
@@ -142,7 +150,7 @@ int show_window_rect (struct window_d *window){
 
 	//fail.
     return (int) 1;	
-};
+}
 
 
 int windowKillTimer ( struct window_d *window, int id ){
@@ -2431,13 +2439,13 @@ resize_window( struct window_d *window,
  *     Muda os valores do posicionamento da janela.
  */	
  
-int replace_window ( struct window_d *window, 
-                     unsigned long x, 
-				     unsigned long y )
+int 
+replace_window ( struct window_d *window, 
+				 unsigned long x, 
+				 unsigned long y )
 {
-    if ( (void *) window == NULL )
-	{
-	    return (int) 1;
+    if ( (void *) window == NULL ){
+		return (int) 1;
 	
 	} else {
 		
@@ -2447,8 +2455,8 @@ int replace_window ( struct window_d *window,
         window->top = (unsigned long) y;
 	};
 
-    return (int) 0;
-};
+    return 0;
+}
 
 
 /*

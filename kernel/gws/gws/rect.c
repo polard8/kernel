@@ -285,6 +285,10 @@ void setClientAreaRect( unsigned long x,
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
  */	
+
+
+//#importante
+//É bem mais rápido com múltiplos de 4.
  
 void 
 refresh_rectangle ( unsigned long x, 
@@ -309,8 +313,9 @@ refresh_rectangle ( unsigned long x,
 	
 	
 	
-	
-	int bytes_count;// = 3; //24bpp
+	// = 3; 
+	//24bpp
+	int bytes_count;
 	
 	switch (SavedBPP)
 	{
@@ -334,58 +339,41 @@ refresh_rectangle ( unsigned long x,
 	 
     vsync ();	
 	
-	
-	/*
-	 //#isso roda mais lento que as rotinas abaixo.
-	for ( i=0; i < lines; i++ ){
 		
-		memcpy ( (void *) p, (const void *) q, (line_size * 3) );
-		
-		q += (Width * 3);
-		p += (Width * 3);
-	};		
-    */
-	
-	
-	//(line_size * 3) é o número de bytes por linha. 
+	//(line_size * bytes_count) é o número de bytes por linha. 
 	
 	int count; 
 	
-	//#bugbug:
-	//NA PRÁTICA, ESSA ROTINA É MAIS LENTA QUE A QUE MOVO DE BYTE EM BYTE.
-	//FAREMOS TENTATIVAS, MAS POR ENQUANTO ESTÁ SUSPENSA ESSA QUE MOVE DE 
-	//4 EM 4 BYTES.
+	
+    //#importante
+    //É bem mais rápido com múltiplos de 4.	
 	
 	//se for divisível por 4.
-	if( ((line_size * 3) % 4) == 0 )
+	if ( ((line_size * bytes_count) % 4) == 0 )
 	{
-        count = ((line_size * 3) / 4);  	
+        count = ((line_size * bytes_count) / 4);  	
 
 	    for ( i=0; i < lines; i++ )
 	    {
 		    //copia uma linha ou um pouco mais caso não seja divisível por 
 		    memcpy32 ( p, q, count );
 		    
-			q += (Width * 3);
-	 	    p += (Width * 3);
+			q += (Width * bytes_count);
+	 	    p += (Width * bytes_count);
 	    };
 	}
 
 	//se não for divisível por 4.
-	if( ((line_size * 3) % 4) != 0 )
+	if ( ((line_size * bytes_count) % 4) != 0 )
 	{
-
-        //count = (line_size * 3);  		
-	
 	    for ( i=0; i < lines; i++ )
 	    {
-		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
-		    q += (Width * 3);
-		    p += (Width * 3);
+		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
+		    q += (Width * bytes_count);
+		    p += (Width * bytes_count);
 	    };	
-	} 
-    
-};
+	}    
+}
 
 
 // A ideia aqui é efetuar o refresh de um retângulo que esteja em um dado buffer.

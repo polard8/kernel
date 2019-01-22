@@ -458,8 +458,9 @@ void *services( unsigned long number,
         //24-28 WINDOW SUPPORT		
         
 		//24
+		// window.c	
 		case 24:
-		    show_window_rect ( (struct window_d *) arg2 );
+		    return (void *) show_window_rect ( (struct window_d *) arg2 );
 		    break;
 	 
 		//34	

@@ -3080,12 +3080,18 @@ unsigned long apiGetSysTimeInfo ( int n ){
 	    (unsigned long) n, (unsigned long) n, (unsigned long) n );
 };
 
-//mostra uma janela na tela. backbuffer ---> frontbuffer
+
+/*
+ * apiShowWindow:
+ * mostra uma janela na tela.
+ * backbuffer ---> frontbuffer
+ */
+
 void apiShowWindow (struct window_d *window){
 	
     system_call ( 24, (unsigned long) window, 
 	    (unsigned long) window, (unsigned long) window );	
-};
+}
 
 
 //

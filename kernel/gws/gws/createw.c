@@ -33,7 +33,6 @@
  * ela é flutuante ou não. Se é flutuante, é porque foi pintada em buffer dedicado,
  * se não é flutuante é porque foi pintada no buffer default, que é o Backbuffer.
  *
- *
  * History:
  *     2015 - Created by Fred Nora.
  *     2016 - 2018 New features.
@@ -122,6 +121,7 @@ fail:
     return (int) 1;	
 };
 
+
 void *createwNewWindow();
 void *createwNewWindow()
 {
@@ -137,7 +137,9 @@ void *createwNewWindow()
 
 */
 
+
 /*
+ ***************************************************************************
  * CreateWindow: 
  *     Cria uma janela com base em uma struct. Retorna o endereço da estrutura 
  * da janela criada, para que possa ser registrada na lista windowList[].
@@ -160,7 +162,8 @@ void *createwNewWindow()
  * WT_SIMPLE        1
  * WT_EDITBOX       2  // igual simples, mais uma bordinha preta.
  * WT_OVERLAPPED    3  // sobreposta(completa)(barra de titulo + borda +client area)
- * WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou message box. (com ou sem barra de titulo ou borda)					   
+ * WT_POPUP         4  // um tipo especial de sobreposta,  //usada em dialog ou 
+ *                        message box. (com ou sem barra de titulo ou borda)					   
  * WT_CHECKBOX      5  // Caixa de seleção. Caixa de verificação. Quadradinho.
  * WT_SCROLLBAR     6  // Cria uma scroll bar. Para ser usada como janela filha.
  * CONTINUA ...
@@ -286,8 +289,8 @@ void *CreateWindow ( unsigned long type,
 	// @todo: devemos checar used e magic da janela mãe.
 	// #bugbug: E quando formos criar a gui->screen, quem será a janela mãe ?
 	
-	if ( (void *) pWindow == NULL )
-	{
+	if ( (void *) pWindow == NULL ){
+		
 		Parent = (void *) gui->screen;	
 	
 	} else {
@@ -295,67 +298,55 @@ void *CreateWindow ( unsigned long type,
 	};
 	
 	
-	//
 	// Devemos checar se a janela está no mesmo desktop 
 	// que a ajnela mãe.
 	// No caso aqui, criarmos uma janela no mesmo desktop que a 
 	// janela mãe.
-	//
 	
-	//
 	// Devemos setar uma flag que indique que essa 
 	// é uma janela filha, caso seja uma. Essa flag 
 	// deve ser passada via argumento @todo.
-	//
-	
-	//
+
 	// @todo: Checar se é uma janela filha, 
-	// se for uma janela filha e não tiver 
-	// uma janela mãe associada a ela, 
+	// se for uma janela filha e não tiver uma janela mãe associada a ela, 
 	// não permita e encerre a função.
-	//
+
 	
 	//if(FlagChild == 1)
 	//{
 		//if(pWindow = NULL) return NULL;
 	//}
 	
-	//
+
 	// @todo: A atualização da contagem de janela deve ficar aqui,
 	// mas me parece que está em outro lugar, ou não tem. ainda.
-	// 
 	
-	//
 	// @todo: Se essa não for uma janela filha, então temos que resetar 
-	// as informações sobre a janela mãe. porque não procedem.
-	//
+	// as informações sobre a janela mãe. porque não procedem.	
 	
-	
-	//
 	//ms. e se essa é uma janela filha de uma janela mãe que pertence à
 	//outra thread e não está no desktop ??
-	//
 	
 	
-	//
-	// *Importante: Checando se o esquema de cores está funcionando.
-	//
+	// *Importante: 
+	// Checando se o esquema de cores está funcionando.
 	
 	if ( (void *) CurrentColorScheme == NULL )
 	{
-		printf("CreateWindow: CurrentColorScheme");
-		die();
+		panic ("CreateWindow: CurrentColorScheme");
+		//die();
 		
 	}else{
 		
 		if ( CurrentColorScheme->used != 1 || 
 		     CurrentColorScheme->magic != 1234 )
 		{
-		    printf("CreateWindow: CurrentColorScheme validation");
-		    die();			
-		};
+		    panic ("CreateWindow: CurrentColorScheme validation");
+		    //die();			
+		}
+		
 		//Nothing.
-	};
+	}
 	
 	
 	//
@@ -365,18 +356,19 @@ void *CreateWindow ( unsigned long type,
 //CreateStruct:
 	
 	//Alocando memória para a estrutura da janela.
-	window = (void *) malloc( sizeof(struct window_d) );	           
+	
+	window = (void *) malloc ( sizeof(struct window_d) );	
+	
 	if ( (void *) window == NULL )
 	{
-        //
         // @todo: 
 		// Onde o Kernel colocará essa mensagem de erro ?
 		// Por enquanto no backbuffer.
-        //
 		
 		// Erro.
 		printf("CreateWindow: window struct \n");
 		refresh_screen();	
+		
 		return NULL; 
 		
     }else{
@@ -709,7 +701,6 @@ void *CreateWindow ( unsigned long type,
 		// 3) Overlapped, (completa, para aplicativos).
 		// Obs: Nessa caso, como se trata de uma janela de aplicativo,
 		// poderíamos configurar a área de cliente.
-		// 
 		case WT_OVERLAPPED:
 	        Shadow = 1;           // Sombra.
 	        Background = 1;       // bg.
@@ -717,9 +708,14 @@ void *CreateWindow ( unsigned long type,
 		    ClientArea = 1;
 			
 			//essas flags farão a chamar createwindow 
-			//recursivamente para desenahr os botões.
-			//MinimizeButton = 1;   // Botão para minimizar
-		    //CloseButton = 1;      // Botão para fechar. 
+			//recursivamente para desenhar os botões.
+			
+			//Controle de janela.
+			//Botões da barra de tírulos.
+			MinimizeButton = 1;   
+		    MaximizeButton = 1;   
+			CloseButton = 1;       
+			
 		    //MenuBar       = 1;  // Barra de menu. 
 	        //ButtonSysMenu = 1;    // System menu button. ??
 		    window->shadowUsed = 1;
@@ -739,8 +735,7 @@ void *CreateWindow ( unsigned long type,
 		    window->backgroundUsed = 1;		
 		    //if(titulo){} TitleBar = 1;    //titulo + borda	
 		    break;
-
-		// 
+ 
 		//5) Check box, (Simples + borda preta).
         //   Caixa de seleção. Caixa de verificação. Quadradinho.
 		case WT_CHECKBOX:
@@ -751,9 +746,8 @@ void *CreateWindow ( unsigned long type,
  			//window->borderUsed = 1;@todo: isso ainda não existe na extrutura ??
 		    break;
 			
-		// 
 		//6) scroll bar.
-        //   // Cria uma scroll bar. Para ser usada como janela filha.
+        // Cria uma scroll bar. Para ser usada como janela filha.
 		case WT_SCROLLBAR:
 			//Background = 1;    //bg.
 		    //window->backgroundUsed = 1;
@@ -799,7 +793,7 @@ void *CreateWindow ( unsigned long type,
 	// Hora de pintar. Os elementos serão incluídos se foram 
 	// selecionados anteriormente.
 	
-drawBegin:	
+//drawBegin:	
 
 	// Obs: Se for uma janela, pintaremos apenas a janela.
 	//      Se for um frame, pintaremos todos os elementos
@@ -820,13 +814,13 @@ drawBegin:
 	
 	
 	// se o view for igual NULL talvez signifique 
-	if( window->view == VIEW_NULL )
+	if ( window->view == VIEW_NULL )
 	{
 		//#bugbug: fail.
 		//window->show = 0;
 		//window->redraw = 0;
 		//return (void*) window;
-	};
+	}
 	
 	// Minimized ? 
 	// Se tiver minimizada, não precisa mostrar a janela, porém
@@ -854,7 +848,7 @@ drawBegin:
 		//como teste estamos retornando.
 		//goto done;
 	    return (void *) window;
-	};
+	}
 	
 	// @todo: Maximized ?
 	// Para maximizar devemos considerar as dimensões da área de cliente
@@ -885,7 +879,7 @@ drawBegin:
 		// Os deslocamentos servem para inserir elementos na janela, como barras, botões e textos.
 		window->x = 0;
         window->y = 0;		
-	};	
+	}	
 
     //  # FULL SCREEN #
 
@@ -913,8 +907,7 @@ drawBegin:
 	//	window->top = 0; 
 	//	window->width = 800;  //@todo: getmetricsDeviceWidth();
 	//	window->height = 600;
-						   
-        
+						           
 	//	window->titlebarUsed = 0;
 	//}
 	
@@ -945,19 +938,18 @@ drawBegin:
 		// sombra deve ser maior. ?? Não ...
 		//if()
 		
+        // @todo: Adicionar a largura das bordas verticais 
+		// e barra de rolagem se tiver.
+		// @todo: Adicionar as larguras das 
+		// bordas horizontais e da barra de títulos.
+		// Cinza escuro.  CurrentColorScheme->elements[??] 
+		// @TODO: criar elemento sombra no esquema. 
 		
 		if ( (unsigned long) type == WT_OVERLAPPED )
-		{
-            // @todo: Adicionar a largura das bordas verticais 
-			// e barra de rolagem se tiver.
-			// @todo: Adicionar as larguras das 
-			// bordas horizontais e da barra de títulos.
-			// Cinza escuro.  CurrentColorScheme->elements[??] 
-			// @TODO: criar elemento sombra no esquema. 
-			
+		{	
 			drawDataRectangle ( window->left +1, window->top +1, 
 				window->width +1 +1, window->height +1 +1, xCOLOR_GRAY1 );             
-        };
+        }
 
         // ??
 		// E os outros tipos, não tem sombra ??
@@ -966,7 +958,7 @@ drawBegin:
 		// foi pressionado ou não.
 		
 		//...
-	};	
+	}
 	
 	// ## Background ##
 	//    Background para todo o espaço ocupado pela janela e pelo seu frame.
@@ -1007,8 +999,7 @@ drawBegin:
 		
 
         //?? More ...	
-	};
-	
+	}
 
 	
 	// ## Title bar ##
@@ -1028,14 +1019,6 @@ drawBegin:
         //A cor sempre deve ser enviada por argumento.
 		window->bg_color = color;  
 		
-		//@todo: Preciso definir a questão o foco.
-		// ?? Quando uma jamela é criada, ela é criada com o foco ou não??
-		//Se a janela estiver com o foco de entrada.
-		//if(window->id == window_with_focus){
-			//esquema de cor. No caso de inativa.
-		//    window->bg_color = CurrentColorScheme->elements[csiActiveWindowTitleBar]; 
-		//}
-		
 		//@todo: String color.
 		
 		//@todo: String size.
@@ -1054,84 +1037,48 @@ drawBegin:
 			window->width +1 +1, window->height +1 +1, window->bg_color );
         
 		// String		
-        // O texto não é tão claro quanto o texto dentro 
-        // da área de cliente, dando foco no conteúdo.
-		
 		draw_string ( window->left +8 +16 +8, window->top +8 +4, 
 			COLOR_TERMINALTEXT2, window->name );  
-			
-		// ??
-		// Active window.		
-		// Ressaltando a barra de títulos da janela com o foco de entrada.
-        // Quem deve ser pintada diferente é a janela com o foco de entrada 
-		// e não a janela ativa.
 		
-	    if ( window->id == active_window )
-		{
-			// ## bugbug ##
-			// Não usaremos mais isso.
-			// As janelas terão apenas cores diferentes 
-			// para diferenciar ativa de não ativa.
-			/*
-            drawDataRectangle( window->left, 
-		                       window->top, 
-				    		   window->width  +1 +1,  // largura do retângulo que marca que a janela está ativa.
-						       4,                     // altura do retângulo que marca que a janela está ativa.
-						       COLOR_SALMON );		  //@todo: Incluir essa cor no esquema padrão.	
-		   */
-		};
-		
-		//if(window->id == window_with_focus)
-		//{} 
-					 
-					 
-	    // #bugbug
-		// Isso é um teste.
-	    // A janela nem foi registrada ainda e já estamos passando o 
-		// ponteiro da estrutura via argumento.
-		
+								 		
 	    // ??
 		// Só criamos o botão na barra de títulos se tivermos uma barra de títulos.
 		// Então esse é o lugar certo para essa rotina.
-		
-		//@todo: Se estivermos em full screen, não teremos botão.	
+		// @todo: Se estivermos em full screen, não teremos botão.	
 		
 		if (MinimizeButton == 1)
 		{
 			window->minimizebuttonUsed = 1;
 			
-			// ??
-			// Quando passamos o handle da janela, a função draw_button
-			// obtêm as margens que precisa. Nos resta passarmos os 
-			// deslocamentos em relação às margens. (x=window->width-?) (y=2).
-			// A função draw_button vai somar a margem obtida pelo handle 'window'
-			// ao deslocamento obtido em (x=window->width-?).
-
-            // ISSO FUNCIONOU BEM,
-			// SERÁ ASSIM DAQUI PRA FRENTE.
-			
+            // Create button.			
 			windowButton1 = CreateWindow ( WT_BUTTON, 1, 1, "V", 
-	                           (window->width -40 -40 -1), 2, 40, 40,									  
+	                           (window->width -40 -40 -1 -40 -1), 2, 40, 40,									  
 			                   window, 0, 
 							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
 			RegisterWindow (windowButton1);
 			window->minimize = windowButton1;
-	    };
+	    }
 		
-		//if (MaximizeButton == 1)
-		//{
+		if (MaximizeButton == 1)
+		{
+			window->maximizebuttonUsed = 1;
 			
-		//}
+            // Create button.			
+			windowButton2 = CreateWindow ( WT_BUTTON, 1, 1, "^", 
+	                           (window->width -40 -40 -1), 2, 40, 40,									  
+			                   window, 0, 
+							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+			
+			RegisterWindow (windowButton2);
+			window->minimize = windowButton2;
+	    }
 	
-		//@todo: Se estivermos em full screen, não teremos botão.
 	    if (CloseButton == 1)
 		{
 			window->closebuttonUsed = 1;
-            
-			// ISSO FUNCIONOU BEM,
-			// SERÁ ASSIM DAQUI PRA FRENTE.
 			
+			// Create button.
 			windowButton3 = CreateWindow ( WT_BUTTON, 1, 1, "X", 
 	                            (window->width -40), 2, 40, 40,									  
 			                    window, 0, 
@@ -1139,7 +1086,7 @@ drawBegin:
             
 			RegisterWindow (windowButton3);
 			window->close = windowButton3;
-	    };					 
+	    }					 
 		
 		//...			 
 	};	

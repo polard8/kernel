@@ -507,7 +507,7 @@ void shellCreateEditBox (){
 
 /*
  ******************** 
- *
+ * Create main window;
  */
  
 struct window_d *shellCreateMainWindow ( int status ){
@@ -578,13 +578,11 @@ struct window_d *shellCreateMainWindow ( int status ){
 	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "shell-main",     
                                 left, top, width, height,    
                                 0, 0, COLOR_TERMINAL2, xCOLOR_GRAY1 );
-
 	
-								
 	if ( (void *) w == NULL )
 	{	
 		printf("shellCreateTaskBar: taskbar Window fail");
-		refresh_screen();
+		//refresh_screen();
 		
 		while (1){
 			asm("pause");
@@ -592,9 +590,9 @@ struct window_d *shellCreateMainWindow ( int status ){
 		//exit(0);
 	};
 	
-	//Registrar.
-    APIRegisterWindow (w);
+	//Registrar e mostrar.
 	
+    APIRegisterWindow (w);
 	apiShowWindow (w);
 	
 	//apiEndPaint();
