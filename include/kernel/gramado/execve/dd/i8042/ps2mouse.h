@@ -47,17 +47,21 @@ unsigned long savedmouseoverwindowY;
 int saved_mouse_x;
 int saved_mouse_y;
 
-//Coordenadas do cursor.
-extern int mouse_x;
-extern int mouse_y;
 
+//#deletar
+//Coisas que antes eram importadas de hwlib.inc e qua não são mais.
+//Coordenadas do cursor.
+//extern int mouse_x;
+//extern int mouse_y;
 //Bytes do controlador.
-extern char mouse_packet_data;
-extern char mouse_packet_x;
-extern char mouse_packet_y;
+//extern char mouse_packet_data;
+//extern char mouse_packet_x;
+//extern char mouse_packet_y;
 //extern char mouse_packet_scroll;
- 
-extern void update_mouse();
+//extern void update_mouse();
+
+
+
 
 
 //Estado dos botões do mouse

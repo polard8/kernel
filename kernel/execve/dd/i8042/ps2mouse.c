@@ -319,6 +319,96 @@ int get_current_mouse_responder (){
 };
 
 
+//==================================================================================
+// Start - testing update_mouse
+//==================================================================================
+
+#define MOUSE_LEFT_BTN	  0x01
+#define MOUSE_RIGHT_BTN	  0x02
+#define MOUSE_MIDDLE_BTN  0x04
+#define MOUSE_X_SIGN	  0x10
+#define MOUSE_Y_SIGN	  0x20
+#define MOUSE_X_OVERFLOW  0x40
+#define MOUSE_Y_OVERFLOW  0x80
+
+long mouse_x = 0;
+long mouse_y = 0;
+
+char mouse_packet_data = 0;
+char mouse_packet_x = 0;
+char mouse_packet_y = 0;
+char mouse_packet_scroll = 0;
+
+/*
+ * ;;=====================================================
+ * ;; _update_mouse:
+ * ;;     Updates the mouse position.
+ * ;;
+ */
+
+void update_mouse ( void ){
+	
+	
+//======== X ==========	
+//Testando o sinal de x.
+//Do the x pos first.	
+do_x:
+    
+	//pega o delta x
+    //testa o sinal para x
+	
+	if( mouse_packet_data & MOUSE_X_SIGN ) 
+	{
+	    goto x_neg;
+	}
+		
+//Caso x seja positivo.
+x_pos:
+	
+	mouse_x += mouse_packet_x;
+	goto do_y;
+	
+//Caso x seja negativo.	
+x_neg:
+    mouse_x -= ( ~mouse_packet_x + 1 );
+
+	if (mouse_x > 0)
+	{
+	    goto do_y;
+	}
+    mouse_x = 0;
+ 
+//======== Y ==========	
+//Testando o sinal de x. 
+//Do the same for y position.	
+do_y:
+    
+	//Pega o delta y.
+    //Testa o sinal para y.
+	if ( mouse_packet_data & MOUSE_Y_SIGN )
+	{
+	    goto y_neg;
+	}
+	
+//Caso y seja positivo.	
+y_pos:
+    mouse_y -= mouse_packet_y;
+	
+    if ( mouse_y > 0 )
+	{
+        goto quit;
+	}
+	mouse_y = 0;
+	goto quit;
+		
+
+//Caso y seja negativo. 	
+y_neg:
+    mouse_y += ( ~mouse_packet_y + 1 );
+	
+quit:	
+    return;
+}
 
 
 /*
