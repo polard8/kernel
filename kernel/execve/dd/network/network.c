@@ -78,6 +78,10 @@ int networkGetStatus (){
  * networkInit:
  *     Inicializa todos os recursos de rede, inclusive os drivers dos 
  * adaptadores de rede.
+ *
+ * #todo:
+ *     Quanto aos adaptadores, poderíamos iniciá-los formorme forem encontrados 
+ * sondando a interface pci.
  */ 
 
 int networkInit (){
@@ -115,44 +119,7 @@ int networkInit (){
 		
 		//...
 		
-	};	
-	
-
-
-	//
-	// NIC
-	//
-	
-	//#todo:
-	//Podemos chamar essa rotina no momento em que estivermos escaneando
-	//os dispositivos PCI e encontrarmos um dispositivo nic Intel.
-	
-	//intel.c
-	
-	//
-	//  ## initializing ... ##
-	//
-
-	int nic_status;
-	
-	// nic intel.
-	// todo: mudar o nome para sabermos que é intel.
-	// intel.c
-    
-	nic_status = (int) init_nic ();
-	
-	if (nic_status == 1)
-	{
-		debug_print("networkInit: init_nic fail\n");
-		printf("networkInit: init_nic fail\n");
-		//refresh_screen();
-		return 1;
-	};
-	
-	
-    e1000_setup_irq();
-	e1000_reset_controller(); 	
-	
+	};		
 	
 	//criando socket para local host porta 80
 	

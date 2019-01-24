@@ -206,7 +206,17 @@ Class Description
 0xFF  Misc
 */
  
- 
+
+
+//Ports.
+#define PCI_ADDRESS_PORT      0x0CF8
+#define PCI_DATA_PORT         0x0CFC
+
+//BDF.
+#define PCI_MAX_BUSES         0xFF  
+#define PCI_MAX_DEVICES       32    
+#define PCI_MAX_FUNCTIONS     8    
+
 
 //
 // PCI Offset.

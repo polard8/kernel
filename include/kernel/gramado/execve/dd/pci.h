@@ -20,9 +20,7 @@
 
 #define PCI_PORT_ADDR 0xCF8
 #define PCI_PORT_DATA 0xCFC
-
-
-					   
+			   
 
 //
 // Variáveis internas.

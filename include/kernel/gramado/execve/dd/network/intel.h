@@ -315,7 +315,9 @@ PCIRegisterIRQHandler ( uint16_t bus,
 						void *priv ); //estrutura
 
  
-int init_nic();
+
+int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun );
+//int e1000_init_nic ();
 
 void e1000_setup_irq();
 int e1000_reset_controller(); 

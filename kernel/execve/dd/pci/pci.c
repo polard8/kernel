@@ -199,14 +199,7 @@ or the ACPI ones to solve the mess. Good luck.
 // Definições internas.
 //
 
-//Ports.
-#define PCI_ADDRESS_PORT      0x0CF8
-#define PCI_DATA_PORT         0x0CFC
-
-//BDF.
-#define PCI_MAX_BUSES         0xFF  
-#define PCI_MAX_DEVICES       32    
-#define PCI_MAX_FUNCTIONS     8     
+ 
 
 //
 // BAR Support.
@@ -654,9 +647,7 @@ pciConfigReadByte ( unsigned char bus,
 	
 
     // Obs: 
-	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
-	
-//done:    
+	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.    
 	
 	return (unsigned char) Ret; 
 } 
@@ -732,9 +723,7 @@ pciConfigReadWord ( unsigned char bus,
 
 	
     // Obs: 
-	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
-	
-//done:    
+	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.   
 	
 	return (unsigned short) Ret; 
 }
@@ -1111,23 +1100,26 @@ int pci_setup_devices (){
 	
 	//Continua ...
 	
-	unsigned char i;
-    unsigned char j;
+	unsigned char i = 0; //Bus.
+    unsigned char j = 0; //Devices. (Slots).
+	unsigned char k = 0; //Functions
+	
+	
 	int listIndex = 0;
 	int Max = 32;    //@todo.
     //...
+	
+	
+	int Status = -1;
 
     struct pci_device_d *D;   //Device. 
 	struct pci_driver_d *Dr;  //Driver.
 	
 	
-#ifdef EXECVE_VERBOSE
-    printf("Detecting PCI Devices ...\n");
-#endif
+//#ifdef EXECVE_VERBOSE
+    printf("Detecting PCI Devices..\n");
+//#endif
 	
-	
-	i=0;    //Bus.
-	j=0;    //Devices. (Slots).
 	
 	//Bus.
 	for( i=0; i < PCI_MAX_BUSES; i++)   
@@ -1135,113 +1127,111 @@ int pci_setup_devices (){
 		//Device.
 	    for( j=0; j < PCI_MAX_DEVICES; j++)
         {
-			//#todo:
-			//Functions
-		    //Devemos fazer mais um for para contemplar as funções,
-			//e chamar uma rotina que tenha as funções no argumento.
 			
-			//for ( k=0; k < PCI_MAX_FUNCTIONS ){}
 			
-			//Checks.
-		    Vendor = (unsigned short) pciCheckVendor(i,j);
-			
-			//if(Vendor == 0xffff) continue;
-		   
-		    if( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
-			{   
-                //Colocar os dispositivos encontrados em estruturas.
-			    D = (void *) malloc( sizeof( struct pci_device_d  ) );
+		    //Checks.
+		    Vendor = (unsigned short) pciCheckVendor (i,j);			
+		    
+			if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
+		    {   
+                 //Colocar em estruturas os dispositivos encontrados.
+			     //Inicializar os conhecidos.
+			         
+			    D = (void *) malloc ( sizeof( struct pci_device_d  ) );
 				
 	            if ( (void *) D != NULL )
 				{
-					//Identificador.
+				    //Identificador.
 					D->deviceId    = (int) listIndex;
 				    D->deviceUsed  = (int) 1;
-					D->deviceMagic = (int) 1234;
+				    D->deviceMagic = (int) 1234;
 					D->name = "No name";
 					
 					//Localização.
 					D->bus = (unsigned char) i;
 					D->dev = (unsigned char) j;
-					//D->func = (unsigned char) ??; //@todo:
+					//D->func = (unsigned char) k; 
 					
 					//Object support.
 					D->objectType = ObjectTypePciDevice;
 					D->objectClass = ObjectClassKernelObjects;
 					
 					//Pci Header.
-			        D->Vendor    = (unsigned short) Vendor;
-				    D->Device    = (unsigned short) pciCheckDevice(i,j);
+			        D->Vendor = (unsigned short) Vendor;
+				    D->Device = (unsigned short) pciCheckDevice(i,j);
 					
 					D->classCode = (unsigned char) pciGetClassCode(i,j);
-					D->subclass  = (unsigned char) pciGetSubClass(i,j); 
+					D->subclass = (unsigned char) pciGetSubClass(i,j); 
 					
-					D->irq_line  = (unsigned char) pciGetInterruptLine(i,j);
-					D->irq_pin   = (unsigned char) pciGetInterruptPin(i,j);
+					D->irq_line = (unsigned char) pciGetInterruptLine(i,j);
+					D->irq_pin = (unsigned char) pciGetInterruptPin(i,j);
 					
-					//Driver.
-					//Inicialização básica.
-					
-					Dr = (void *) malloc ( sizeof( struct pci_driver_d  ) );
-					
-					if ( (void*) Dr == NULL )
-					{
-						D->driver = NULL;
-					}else{
-						
-					    D->driver = (void *) Dr;
-                        
-						Dr->id = (int) listIndex;
-                        
-						Dr->used = (int) 1;
-                        Dr->magic = (int) 1234;
-						
-						Dr->pci_device = (void *) D; 
-						//...
-						
-						
-					    //#importante
-					    //Chamar as rotinas de inicializaçao do dispositivo encontrado
-					    
-						//SATA
-						//ahci.c
-					    //if ( (D->classCode == PCI_CLASSCODE_MASS) && (D->subclass == PCI_SUBCLASS_SATA ) )						
-						//{
-						// ...
-						//}
-						
-						//Continua ...
-						
-					};  
+
 					
 					D->next = NULL;   //Next device.
-					//Continua... @todo:
+					    //Continua... @todo:
 					
 					
-					//Colocar a estrutura na lista.		
+			       //function
+			       for( k=0; k<PCI_MAX_FUNCTIONS; k++)
+			       {
+				        D->func = (unsigned char) k;
+			    
+				        //Nic intel
+				        if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) )	
+				        {
+				            printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
+								
+					        //printf("82540EM Gigabit Ethernet Controller found\n");
+					         Status = (int) e1000_init_nic ( (unsigned char) D->bus, (unsigned char) D->dev, (unsigned char) D->func );
+							 if (Status != 0)
+					         {
+						         printf(".");
+					             //debug_print("e1000_init_nic fail\n");
+		                         //printf("networkInit: e1000_init_nic fail\n");		
+				 	         }else{
+						
+						        printf("8086:100e initialized\n");
+					            e1000_setup_irq();
+						        e1000_reset_controller();
+						        printf("8086:100e done\n");
+								//printf("#debug breakpoint");
+								//refresh_screen();
+								// while(1){} 
+					        }
+				        }
+				
+				     //continua ...	
+			      }; //fuction for.
+					
+					
+
+					
+					
+					    //Colocar a estrutura na lista.		
 					
 					//@todo: Limits
-					if( listIndex < 0 || listIndex >= Max ){ 
+					if ( listIndex < 0 || listIndex >= Max )
+					{ 
 					    goto done; 
-					};
+					}
 					
 					pcideviceList[listIndex] = (unsigned long) D;
 					listIndex++;
 				};				
 			
-			};
-			
-            //@todo: Registrar o que foi encontrado em estrutura.
-            //usar malloc pra alocar memoria pra estrutura. 			
-		};			
-	};
+		    };				
+					
+		};  // Device for.		
+		
+	};  //bus for.
 	
 // Done.
 done:
 
-#ifdef EXECVE_VERBOSE
-    printf("Detecting PCI Devices completes ...\n");
-#endif
+//#ifdef EXECVE_VERBOSE
+    //printf("Detecting PCI Devices completes..\n");
+//#endif
 
     return (int) 0; 
 };

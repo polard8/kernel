@@ -61,28 +61,28 @@ PCIRegisterIRQHandler ( uint16_t bus,
 
 /*
  *****************************************************
- * init_nic:
- *     Inicializa o módulo gerenciador de rede.
- *
+ * e1000_init_nic:
+ *     Inicializando o controlador NIC da Intel.
  */
- 
-//intel_init_nic() 
- 
-int init_nic (){
+
+int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	
-	//pci info.
-	unsigned char bus;
-	unsigned char dev;
-	unsigned char fun;			
-    uint32_t data;
+	//pci info.    
+	uint32_t data;
+	
+	//#bugbug
+	//Primeiro devemos sondar os dispositivos PCI, caso encontrarmos 
+	//o nic da Intel, então chamamos essa rotina para inicializálo,
+	//passando as informações via argumento.
  
     //#debug
-	printf("\n");
-	printf("init_nic: Probing PCI ...\n");
+	//printf("\n");
+	//printf("e1000_init_nic: Probing PCI..\n");
 	
 	// #test 
 	// Encontrar placa de rede.
 	
+	/*
 	data = (uint32_t) diskPCIScanDevice (PCI_CLASSCODE_NETWORK);
 	
 	if ( data == -1 )
@@ -99,21 +99,36 @@ int init_nic (){
         fun = ( data & 7 );
 	};
 
+	*/
 	
 	// # get info
 	// #pci
 	// Pegaremos mais informações e colocaremos na estrutura de 
 	// dispositivo pci.
 	
+	printf("e1000_init_nic:\n");
+	
 	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
-
-	//#debug
-	printf("Vendor=%x \n", (data & 0xffff) );
-	printf("Device=%x \n", (data >> 16 &0xffff) );
+	
+	unsigned short Vendor = (unsigned short) (data & 0xffff);
+	unsigned short Device = (unsigned short) (data >> 16 & 0xffff);	
+	
+	//#importante
+	//devemos falhar antes de alocarmos memória para a estrutura.
 	
 	// 8086:100e
 	// 82540EM Gigabit Ethernet Controller
 	
+    if ( Vendor != 0x8086 || Device != 0x100E )	
+	{
+	    return -1;
+	}
+		
+	//#debug
+	printf("Vendor=%x \n", (data       & 0xffff) );
+	printf("Device=%x \n", (data >> 16 & 0xffff) );
+
+		
 	
 	//#importante
 	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.
@@ -149,11 +164,15 @@ int init_nic (){
 	    // 8086:100e
 	    // 82540EM Gigabit Ethernet Controller		
 		
-		//if ( pci_device->Vendor != 0x8086 )
 		if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
 		{
-		   printf("init_nic: 82540EM not found !\n");
-		   return 1;
+		    
+			printf("#debug breakpoint\n");
+			printf("e1000_init_nic: 82540EM not found!\n");
+		    refresh_screen();
+			while(1){}
+			
+			return -1;
 		}
 		
 		pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x10 );
@@ -356,6 +375,8 @@ int init_nic (){
 		diskWritePCIConfigAddr ( (int) bus, (int) dev, (int) fun, 
 			(int) 0x04, (int) cmd ); 		
 	};
+	
+	printf("done\n");
 		
     return (int) 0;	
 };
@@ -464,6 +485,10 @@ void xxxe1000handler (){
 	// ## type ##
 	//
 	
+	
+	printf("+");
+	refresh_screen();
+	
 	uint16_t type = FromNetByteOrder16(eh->type);
 	
 	switch ( (uint16_t) type)
@@ -478,9 +503,9 @@ void xxxe1000handler (){
 		   
 		//0x0806	Address Resolution Protocol (ARP)
 		case 0x0806:
-		    arp_h = (void *) &buffer[14];
+		    //printf("\nARP ");
+			arp_h = (void *) &buffer[14];
 		    //printf("todo: Address Resolution Protocol (ARP) ");
-			//printf("\nARP ");
 			if ( arp_h->op == ToNetByteOrder16(ARP_OPC_REPLY) )
 			{
 				//#debug
@@ -523,8 +548,9 @@ void xxxe1000handler (){
 			
 		//0x86DD	Internet Protocol Version 6 (IPv6)
 		case 0x86DD:
+			//printf("IPv6 ");
 		    ipv6_h = (void *) &buffer[14];
-		    //printf("IPv6 ");
+		    //
 			handle_ipv6 ( (struct nic_info_d *) currentNIC, 
 			    (struct ipv6_header_d *) ipv6_h );
 			//refresh_screen();
@@ -1034,22 +1060,22 @@ void testSend()
 	char source_ip_address[4];
 	source_ip_address[0] = 192;
 	source_ip_address[1] = 168;
-	source_ip_address[2] = 1;   //56;
-	source_ip_address[3] = 112; //111;
+	source_ip_address[2] = 1;   
+	source_ip_address[3] = 112; 
 
 	char target_ip_address[4];
 	target_ip_address[0] = 192;
 	target_ip_address[1] = 168;
-	target_ip_address[2] = 56;   //56;
-	target_ip_address[3] = 1;   //roteador
+	target_ip_address[2] = 1;     
+	target_ip_address[3] = 103;   
 	
 	//fake source ip address
 	//configurando a estrutura do dispositivo,
 	//usaremos isso pois não temos nenhum outro valor.
 	currentNIC->ip_address[0] = 192;
 	currentNIC->ip_address[1] = 168;
-	currentNIC->ip_address[2] = 1;//56;	
-	currentNIC->ip_address[3] = 112;//111;	
+	currentNIC->ip_address[2] = 1;    	
+	currentNIC->ip_address[3] = 112;  	
 
 	
 	//printf("testSend: testing send stuff ...\n");
