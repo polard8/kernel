@@ -1184,21 +1184,18 @@ int pci_setup_devices (){
 								
 					        //printf("82540EM Gigabit Ethernet Controller found\n");
 					         Status = (int) e1000_init_nic ( (unsigned char) D->bus, (unsigned char) D->dev, (unsigned char) D->func );
-							 if (Status != 0)
+							 if (Status == 0)
 					         {
-						         printf(".");
-					             //debug_print("e1000_init_nic fail\n");
-		                         //printf("networkInit: e1000_init_nic fail\n");		
-				 	         }else{
-						
 						        printf("8086:100e initialized\n");
 					            e1000_setup_irq();
 						        e1000_reset_controller();
 						        printf("8086:100e done\n");
 								//printf("#debug breakpoint");
 								//refresh_screen();
-								// while(1){} 
-					        }
+								//while(1){} 
+				 	         }else{
+						         printf("."); 
+					         }
 				        }
 				
 				     //continua ...	

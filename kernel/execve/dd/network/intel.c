@@ -141,7 +141,7 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
     {
 		
 		printf("init_nic: pci_device struct\n");
-		return (int) 1;
+		return (int) -1;
 	
 	}else{
 		
@@ -257,7 +257,7 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	if ( (void *) currentNIC ==  NULL )
 	{
 		printf("init_nic: currentNIC struct\n");
-	    return (int) 1;	
+	    return (int) -1;	
 		
 	} else {
 		
@@ -400,7 +400,7 @@ void xxxe1000handler (){
 	
 	// #flag !!
 	// Essa flag precisa ser acionada para a rotina funcionar.
-	// F6 tem acionado essa falg.
+	// F6 tem acionado essa flag.
 	
 	if ( e1000_interrupt_flag != 1 )
 		return;	
@@ -1067,7 +1067,7 @@ void testSend()
 	target_ip_address[0] = 192;
 	target_ip_address[1] = 168;
 	target_ip_address[2] = 1;     
-	target_ip_address[3] = 103;   
+	target_ip_address[3] = 111;   
 	
 	//fake source ip address
 	//configurando a estrutura do dispositivo,
