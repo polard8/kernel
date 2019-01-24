@@ -1,12 +1,16 @@
+/*
+ * File: network.h 
+ *     header para o gerenciamento de rede.
+ */
 
-
-//network.h  //header para o gerenciamento de rede.
 
 // >> The register at offset 0x00 is the "IOADDR" window. 
 // >> The register at offset 0x04 is the "IODATA" window. 
 
+
 //packet format
 // Ethernet IPv4 TCP/UDP DATA FCS
+
 
 
 #define ETH_TYPE_IP   0x0800  
@@ -23,8 +27,11 @@
 #define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
 
 
- 
-//estrutura de rede
+/*
+ * network_info_d:
+ *     Estrutura de rede.
+ */ 
+
 typedef struct network_info_d network_info_t;
 struct network_info_d
 {
@@ -32,7 +39,6 @@ struct network_info_d
 	
 	int used;
 	int magic;
-
 	
 	int networkIdentifier;  // Número identificador da rede.
 	char *networkName;      // Nome da rede.
@@ -57,7 +63,6 @@ struct network_info_d
 
 
 
-
 int networkInit();
 
 
@@ -73,6 +78,7 @@ void show_current_nic_info ();
 int handle_ipv6 ( struct nic_info_d *nic, struct ipv6_header_d *header );
 
 void testNIC();
+
 
 //
 // End.

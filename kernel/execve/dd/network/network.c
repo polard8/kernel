@@ -1,11 +1,12 @@
 /*
- * File: network.c
+ * File: dd/network/network.c
+ *     
+ *     Network sopport.
  *
- * Descrição:
- *     Parte principal do módulo sm/network.
- *
- * 2016 - Created by Fred Nora.
+ * History:
+ *     2016 - Created by Fred Nora.
  */
+
 
 /*
  @todo:
@@ -44,7 +45,6 @@
  Network service *
  service protocol
  Network security
-
 */
 
 
@@ -54,23 +54,23 @@
 
 //0 - uninitialized
 //1 - initialized
+
 int network_status;
 
  
 void networkSetstatus (int status){
-    
+
 	if ( status < 0 || status > 1 )
-	    return;
+		return;
 	
 	network_status = (int) status;
-};	
+}
 
 
 int networkGetStatus (){
-    
-	return (int) network_status;	
-};
- 
+
+	return (int) network_status;
+}
  
  
 /*
@@ -89,6 +89,7 @@ int networkInit (){
 	
 	
 	// Host info struct
+	// host.h
 	
 	HostInfo = (struct host_info_d *) malloc ( sizeof( struct host_info_d ) ); 
 
@@ -122,6 +123,10 @@ int networkInit (){
 	// NIC
 	//
 	
+	//#todo:
+	//Podemos chamar essa rotina no momento em que estivermos escaneando
+	//os dispositivos PCI e encontrarmos um dispositivo nic Intel.
+	
 	//intel.c
 	
 	//
@@ -138,8 +143,8 @@ int networkInit (){
 	
 	if (nic_status == 1)
 	{
-		debug_print("networkInit: init_nic fail.\n");
-		printf("networkInit: init_nic fail.\n");
+		debug_print("networkInit: init_nic fail\n");
+		printf("networkInit: init_nic fail\n");
 		//refresh_screen();
 		return 1;
 	};

@@ -90,7 +90,6 @@ struct host_info_d
 	object_type_t objectType;
 	object_class_t objectClass;
 
-	
 	// id da estrutura para lista interna.
     int id;
     
@@ -109,25 +108,22 @@ struct host_info_d
 	//IP
 	char hostIP[3];
 	char *hostIPString;
-	
-	
+		
 	//MAC
 	char hostMAC[6];
 	char *hostMACString;
 	
 	//...
 };
-host_info_t *HostInfo;
+struct host_info_d *HostInfo;
+//host_info_t *HostInfo;
 //...
-
-
 
 
 //char * get_host_name();
 
 
-
 //
-//fim.
+// End.
 //
 

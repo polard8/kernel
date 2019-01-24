@@ -53,6 +53,10 @@ ip_string_t *ipString;
 */ 
 
 
+//
+//  ## IP  ##
+//
+
 typedef struct ip_address_d ip_address_t; 
 struct ip_address_d
 {
@@ -63,14 +67,22 @@ struct ip_address_d
     unsigned long ip_address;
 	//unsigned long ip_mask;
 	
+	//unsigned char ip[4];
+	//unsigned char ipmask[4];
+	
 	int version;    //IPv4, IPv6.
 	
 	//Armazena os valores dos quatro bytes em decimal na forma de string com pontos.
 	//char string[4*4]; 
 };
-ip_address_t *ip_address;
+struct ip_address_d *ip_address;
+//ip_address_t *ip_address;
 //...
 
+
+//
+//  ## UDP  ##
+//
 
 //User Datagram Protocol (UDP)
 typedef struct udp_header_d udp_header_t; 
@@ -83,15 +95,15 @@ struct udp_header_d
 };
 
 
+//
+//  ## IPV4 ##
+//
+
 
 //IPv4 Header Format
 typedef struct ipv4_header_d ipv4_header_t; 
 struct ipv4_header_d 
-{
-	//
-	// * 32bits block **************
-	//
-	
+{	
 	//Version	       //0-3    4bits
 	//IHL	           //4-7    4bits  Internet Header Length
 	/* Header version and length (dwords). */
@@ -126,10 +138,6 @@ struct ipv4_header_d
 	/* Flags; Fragment offset. */
 	unsigned short Flags_FragmentOffset;
 	
-	//
-	// * 32bits block *******************
-	//
-	
 	//ttl. helps prevent datagrams from persisting (e.g. going in circles).
 	//protocol. This field defines the protocol used in the data portion of the IP datagram.
 	//error-checking of the header.
@@ -142,16 +150,9 @@ struct ipv4_header_d
 	/* IP header checksum. */
 	unsigned short HeaderChecksum; //16-31 16bits
 	
-	//
-	// * 32bits block ******************
-	//
 	
 	//This field is the IPv4 address of the sender of the packet.
 	//unsigned long SourceIPAddress; //0-31 32bits
-	
-	//
-	// * 32bits block ************
-	//
 	
 	//This field is the IPv4 address of the receiver of the packet.
 	//unsigned long DestinationIPAddress; //0-31 32bits
@@ -163,9 +164,14 @@ struct ipv4_header_d
 };
 
 
+
+//
+//  ## IPV6 ##
+//
+
+
 //fixed header for ipv6.
 /** IPv6 header */
-
 
 struct ipv6_header_d 
 {
@@ -189,13 +195,14 @@ struct ipv6_header_d
 	
 } __attribute__ (( packed ));
 
+
+
 // We need adapter info: like: name, description
 //so não sei se informações sobre o adaptador deveria ficar nesse arquivos.
 
 
 //send ipv4
-void 
-send_ipv4_packet ( struct nic_info_d *dev, uint32_t len, uint8_t *data );
+void send_ipv4_packet ( struct nic_info_d *dev, uint32_t len, uint8_t *data );
 				   
 				   
 //

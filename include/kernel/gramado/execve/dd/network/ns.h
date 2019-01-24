@@ -1,5 +1,7 @@
 /*
- * File: server.h 
+ * File: ns.h 
+ *
+ *    Network Server.
  *
  * //(network) Server process support. network support
  * Descrição:

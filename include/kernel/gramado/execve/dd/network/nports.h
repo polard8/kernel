@@ -1,5 +1,5 @@
 /*
- * File: networkports.h
+ * File: nports.h
  *
  *  Descrição:
  *      Network ports manager.
@@ -14,4 +14,6 @@
 #define DNS_PORT         53    //(DNS) - Domain Name System. 
 #define HTTP_PORT        80    //HTTP - HyperText Tranfer Protocol.
 #define HTTPS_PORT       443   //HTTPS - HyperText Tranfer Protocol Secure.
+//...
+
 
