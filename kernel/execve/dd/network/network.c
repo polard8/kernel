@@ -179,6 +179,9 @@ void show_network_info (){
 
 
 void show_current_nic_info (){
+	
+	
+	printf("show_current_nic_info:\n");
 
 	if ( (void *) currentNIC ==  NULL )
 	{
@@ -289,8 +292,9 @@ void show_current_nic_info (){
 		//...
 		
 	};	    
-	
-};
+
+	//refresh_screen();
+}
 
 
 
@@ -345,6 +349,8 @@ int handle_ipv6 ( struct nic_info_d *nic, struct ipv6_header_d *header ){
 //chamada por F6 no procedimento de janela do sistema.
 void testNIC()
 {
+	
+	printf("\n\ntestNIC:\n\n"); 
 	printf("testNIC: setup flag and test send arp request \n");
     //init_nic ();
     //e1000_setup_irq();
@@ -360,9 +366,14 @@ void testNIC()
 	//se tivermos informações para mostrar é sinal que a inicialização do kernel 
 	//funcionou. 
 	
-	//show_current_nic_info ();
+	printf("\n\n");
+	show_current_nic_info ();
+	
+	printf("\n\n");
+	pciInfo ();
 	
 	printf("testNIC: Done\n");
+	refresh_screen();
 }
 
 //

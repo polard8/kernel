@@ -1035,18 +1035,20 @@ int pciInfo (){
 
 
 /*
- * Mostra informações sobre um dispositivo PCI.
-int pciShowDeviceInfo(int number);
+ * Mostra informações sobre um dispositivo PCI da lista.
+ */
+
 int pciShowDeviceInfo(int number)
 {
     struct pci_device_d *D;
   
-	if(number < 0){
+	if(number < 0 || number > 32)
+	{
 		return 0;
 	}
 	
 	//Pega um ponteiro de estrutura na lista.
-	D = (void *) pcideviceList[i];
+	D = (void *) pcideviceList[number];
 	
 	//Checa se o ponteiro é válido.
 	if( (void *) D != NULL )
@@ -1058,7 +1060,7 @@ int pciShowDeviceInfo(int number)
 	//Nothing
 	return 0;
 };
-*/
+
 
 
 /*

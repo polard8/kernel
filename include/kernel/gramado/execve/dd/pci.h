@@ -297,6 +297,9 @@ unsigned long KiPciHandler4();
 //...								
 	
 
+//mostra informações sobre um dispositivo pci da lista.
+int pciShowDeviceInfo(int number);
+
 #endif 
 
 //
