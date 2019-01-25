@@ -130,52 +130,52 @@ void KiTaskSwitch (){
  */
  
 void task_switch (){
-		
+
 	int New;
-	int Max;    
+	int Max;
 	
 	struct thread_d *Current;
-	struct process_d *P;        
-	
+	struct process_d *P;
+
 	Max = DISPATCHER_PRIORITY_MAX;
-	
-	
+
+
 	// ## Current thread ##
 	
-    Current = (void *) threadList[current_thread]; 
+	Current = (void *) threadList[current_thread]; 
 	
 	if ( (void *) Current == NULL )
 	{
-	    printf ("ts-task_switch: Struct={%x}", (void *) Current );										   
-        die();
+		printf ("ts-task_switch: Struct={%x}", (void *) Current );
+		die();
 	}
 
 	// ## Current process ##
-    
+
 	P = (void *) Current->process;
-	
+
 	if ( (void *) P == NULL )
 	{
-		
-	    printf("task_switch error: P Struct={%x}", (void *) P );										   
-        die();		
+
+		printf("task_switch error: P Struct={%x}", (void *) P );
+		die();
 	}
 	
 	if ( (void *) P != NULL )
-	{		
+	{
 		if ( P->used == 1 && P->magic == 1234 )
 		{	
-		    current_process = (int) P->pid;
+			current_process = (int) P->pid;
 		}
 		
-		//...		
+		//...
 	};
-	
-	//...	
-	
-	
+
+	//...
+
+
 	// ## Conting ... ##
-		
+
 	
 	//            step: Quantas vezes ela já rodou no total.
 	//    runningCount: Quanto tempo ela está rodando antes de parar.
@@ -199,18 +199,18 @@ void task_switch (){
 		IncrementDispatcherCount (SELECT_CURRENT_COUNT);
 		return;  
 	}
-	
-	
+
+
 	// ## unlocked ##
 	
 	if ( task_switch_status == UNLOCKED )
-	{   
+	{
 		//
-	    // ## SAVE CONTEXT ##
-	    //
+		// ## SAVE CONTEXT ##
+		//
 		
-	    save_current_context ();
-	    Current->saved = 1;	
+		save_current_context ();
+		Current->saved = 1;	
 						
 		if ( Current->runningCount < Current->quantum )
 		{
@@ -219,52 +219,52 @@ void task_switch (){
 		
 		}else{
 			
-		    //
+			//
 			// ## PREEMPT ##
 			//
 		
-		    // * MOVEMENT 3 (Running --> Ready).
-		    if ( Current->state == RUNNING )
-		    {
-                // MOVEMENT 3 (running >> ready)  				
-			    Current->state = READY;    //Preempt.
-		    
-			    if ( Current->preempted == PREEMPTABLE )
+			// * MOVEMENT 3 (Running --> Ready).
+			if ( Current->state == RUNNING )
+			{
+				// MOVEMENT 3 (running >> ready)  
+				Current->state = READY;    //Preempt.
+
+				if ( Current->preempted == PREEMPTABLE )
 				{
 					debug_print(" preempt_q1 ");
-			        queue_insert_head ( queue, (unsigned long) Current, 
-					    QUEUE_READY );	
-			    };
-			
-			    if ( Current->preempted == UNPREEMPTABLE )
+					queue_insert_head ( queue, (unsigned long) Current, 
+						QUEUE_READY );	
+				};
+
+				if ( Current->preempted == UNPREEMPTABLE )
 				{
 					debug_print(" preempt_q2 ");
-			        queue_insert_data( queue, (unsigned long) Current, 
+					queue_insert_data( queue, (unsigned long) Current, 
 						QUEUE_READY );	
-			    };
-		    };
-		    
+				};
+			};
+
 			debug_print(" ok ");
 			
 			//
 			// ## EXTRA ##
 			//
-						
+
 			if (extra == 1)
 			{
 				KiRequest ();
-				
+
 				extra = 0;
 			}
-			
+
 			// schedi.c
-            check_for_standby (); 
-						
-		    goto try_next;
-			
+			check_for_standby (); 
+
+			goto try_next;
+
 		};
 	};
-	    	
+
 //crazyFail:
 	
 	goto dispatch_current;      	
@@ -275,22 +275,22 @@ void task_switch (){
 	
 try_next: 
 	
-    debug_print(" N ");
+	debug_print(" N ");
 	
 	if (ProcessorBlock.threads_counter == 1)
 	{		
 		debug_print(" JUSTONE ");
 		Conductor = IdleThread;
-		
+
 		goto go_ahead;
 	}
 	
 	if ( (void *) Conductor->Next == NULL )
 	{	
 		debug_print(" LAST ");	
-		
-		KiScheduler ();	
-		goto go_ahead;  		
+
+		KiScheduler ();
+		goto go_ahead;
 	}
 	
 	if ( (void *) Conductor->Next != NULL )
@@ -299,18 +299,18 @@ try_next:
 		goto go_ahead;
 		
 	}else{ 
-	    //@todo: Se o próximo for NULL.
+		//@todo: Se o próximo for NULL.
 		//goto go_ahead;
 	}
 	
 go_ahead:
 
-    //##############################################//
-    //                                              //
-    //    #### We have a thread now ####            //
-    //                                              //
-    //##############################################//
-	
+	//##############################################//
+	//                                              //
+	//    #### We have a thread now ####            //
+	//                                              //
+	//##############################################//
+
 	Current = (void *) Conductor;
 		
 	if( (void *) Current == NULL )
@@ -326,26 +326,26 @@ go_ahead:
 		if ( Current->used != 1 || Current->magic != 1234 )
 		{
 			debug_print(" val ");
-		    KiScheduler ();
-		    goto try_next;	
+			KiScheduler ();
+			goto try_next;	
 		}	
 		
-	    if ( Current->state != READY )
+		if ( Current->state != READY )
 		{
 			debug_print(" state ");		
-		    KiScheduler ();
-		    goto try_next;	
+			KiScheduler ();
+			goto try_next;	
 		}
-		
+
 		//
 		//    ####  Dispatcher ####
 		//
-				
+
 		IncrementDispatcherCount (SELECT_DISPATCHER_COUNT);
 		
 		current_thread = (int) Current->tid;
 		
-		goto dispatch_current;    			
+		goto dispatch_current;
 	}
 	
 	//
@@ -364,12 +364,12 @@ go_ahead:
 dispatch_current:
 	
 	debug_print(" DISPATCH_CURRENT \n");
-    
-    //
-    //    ####  Validation ####
-    //	
-		
-    Current = (void *) threadList[current_thread];
+
+	//
+	//    ####  Validation ####
+	//	
+
+	Current = (void *) threadList[current_thread];
 	
 	if ( (void *) Current == NULL )
 	{	
@@ -378,12 +378,12 @@ dispatch_current:
 	}else{
 				
 		if ( Current->used != 1 || 
-		     Current->magic != 1234 || 
+			 Current->magic != 1234 || 
 			 Current->state != READY )
-	    {
-	        panic ("pc-action-ts-task_switch.dispatch_current: validation ERROR");
-	    }
-			    
+		{
+			panic ("pc-action-ts-task_switch.dispatch_current: validation ERROR");
+		}
+
 		Current->runningCount = 0;	
 	}
 	
@@ -396,13 +396,13 @@ dispatch_current:
 	//
 	
 	dispatcher (DISPATCHER_CURRENT);    	
-		
+
 	//
-    //  #### DONE ####
+	//  #### DONE ####
 	//
-	
+
 done:
-	
+
 	if ( Current->ownerPID < 0 || Current->ownerPID >= THREAD_COUNT_MAX )
 	{
 		printf ("action-ts-task_switch: ownerPID ERROR \n", Current->ownerPID );
@@ -414,7 +414,7 @@ done:
 	//
 	
 	
-    P = (void *) processList[Current->ownerPID];
+	P = (void *) processList[Current->ownerPID];
 	
 	if ( (void *) P == NULL )
 	{
@@ -426,20 +426,20 @@ done:
 	{
 		if ( P->used != 1 || P->magic != 1234 )
 		{
-		    printf("action-ts-task_switch: Process %s corrompido \n", 
-			    P->name_address );
-		    die();			
+			printf("action-ts-task_switch: Process %s corrompido \n", 
+				P->name_address );
+			die();
 		}
-			
+
 		if ( P->used == 1 && P->magic == 1234 )
 		{
-		    current_process = (int) P->pid;
-			
+			current_process = (int) P->pid;
+
 			if ( (unsigned long) P->DirectoryPA == 0 )
 			{	
-		        printf ("action-ts-task_switch: Process %s directory fail\n", 
-				    P->name_address );
-		        die();
+				printf ("action-ts-task_switch: Process %s directory fail\n", 
+					P->name_address );
+				die();
 			}
 			
 			current_process_pagedirectory_address = (unsigned long) P->DirectoryPA;
@@ -448,11 +448,11 @@ done:
 		
 		panic ("action-ts-task_switch: * Struct * \n");
 	}
-	
+
 	panic ("action-ts-task_switch: bug sinistro kkk \n");
-			
-doneRET:	
-	return; 		
+
+doneRET:
+	return; 
 }
 
 
