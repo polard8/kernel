@@ -266,6 +266,9 @@ int pciInit();
 int init_pci();
 
 
+int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun );
+
+
 //
 // Read.
 //
@@ -282,6 +285,9 @@ unsigned short pciCheckVendor(unsigned char bus, unsigned char slot);    //Offse
 unsigned short pciCheckDevice(unsigned char bus, unsigned char slot);    //Offset 2.
 unsigned char pciGetSubClass(unsigned char bus, unsigned char slot);     //Offset 0x0A. 
 unsigned char pciGetClassCode(unsigned char bus, unsigned char slot);    //Offset 0x0B.
+
+unsigned char pciGetHeaderType(unsigned char bus, unsigned char slot);
+
 unsigned long pciGetBAR(unsigned char bus, unsigned char slot, int number);    //get BARs (vários offsets.)
 unsigned char pciGetInterruptLine(unsigned char bus, unsigned char slot);    //Offset 0x3C.
 unsigned char pciGetInterruptPin(unsigned char bus, unsigned char slot);     //Interrut pin

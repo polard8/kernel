@@ -212,6 +212,13 @@ Class Description
 #define PCI_ADDRESS_PORT      0x0CF8
 #define PCI_DATA_PORT         0x0CFC
 
+
+// Header Type
+#define PCI_TYPE_MULTIFUNC              0x80
+#define PCI_TYPE_GENERIC                0x00
+#define PCI_TYPE_PCI_BRIDGE             0x01
+#define PCI_TYPE_CARDBUS_BRIDGE         0x02
+
 //BDF.
 #define PCI_MAX_BUSES         0xFF  
 #define PCI_MAX_DEVICES       32    
@@ -288,6 +295,7 @@ Class Description
 #define PCI_OFFSET_MAX_LATENCY              0x3F //char  Maximum Latency MLAT
 
 
+ 
 
 //Intel sata host controller support:
 //40h 2 “Primary Timing (PTIM)—Offset 40h” on page 153 0000h

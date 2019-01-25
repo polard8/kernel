@@ -345,16 +345,16 @@ int handle_ipv6 ( struct nic_info_d *nic, struct ipv6_header_d *header ){
     return 1;	
 };
 
-
+//#IMPORTANTE
 //chamada por F6 no procedimento de janela do sistema.
 void testNIC()
 {
 	
 	printf("\n\ntestNIC:\n\n"); 
-	printf("testNIC: setup flag and test send arp request \n");
-    //init_nic ();
-    //e1000_setup_irq();
-	//e1000_reset_controller(); 
+	//printf("testNIC: setup flag and test send arp request \n");
+    
+	printf("mostra pci info apenas:\n\n");
+	
 	
 	//testando apens o send 
 	
@@ -366,7 +366,7 @@ void testNIC()
 	//se tivermos informações para mostrar é sinal que a inicialização do kernel 
 	//funcionou. 
 	
-	printf("\n\n");
+	//printf("\n\n");
 	show_current_nic_info ();
 	
 	printf("\n\n");

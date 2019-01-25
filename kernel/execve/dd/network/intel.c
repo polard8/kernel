@@ -79,6 +79,8 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	//printf("\n");
 	//printf("e1000_init_nic: Probing PCI..\n");
 	
+	debug_print("e1000_init_nic:\n");
+	
 	// #test 
 	// Encontrar placa de rede.
 	
