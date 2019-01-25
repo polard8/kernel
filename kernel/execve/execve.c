@@ -803,7 +803,10 @@ int init_executive (){
 	// CLOCK - Pega informações de Hora e Data.	
 	
 	init_pci();
-    init_clock();
+	
+	init_clock();
+	get_cmos_info();
+	
 	//...
 	
 	diskATADialog( 1, FORCEPIO, FORCEPIO );

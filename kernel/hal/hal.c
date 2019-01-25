@@ -541,68 +541,19 @@ int init_hal (){
 	init_cpu();
 
 	
-	//
-	// Bug Bug - PCI Initialization.
-	//
-	
-	// PCI - Cria e inicializa estrutura de pci.
-#ifdef HAL_VERBOSE	
-	printf("init_hal: pci\n");
-#endif	
-	init_pci();    //bugbug (a rotina esta incompleta.)	
-
-	//@todo: Isso é um teste de inicialização de pci.
-	//printf("* init_hal: Debug!");
-    //refresh_screen();
-    //while(1){}		
-	
+ 
+ 
 	
 	// TIMER - Cria e inicializa estrutura do timer.
 #ifdef HAL_VERBOSE	
 	printf("init_hal: Timer\n");
 #endif    
 	timerInit();	
-
-	// RTC - Cria e inicializa estrutura de rtc.
-#ifdef HAL_VERBOSE	
-	printf("init_hal: rtc\n");
-#endif	
-	init_clock();
-	get_cmos_info();
-		
-		
-	//
-    //@todo 8042 ... teclado e mouse.
-    //
-    //P8042_install();	
-		
-    //keyboard.
-//#ifdef HAL_VERBOSE	
-	//printf("init_hal: kd\n");
-//#endif	
-	//init_keyboard();
-	
-	//mouse
-	//printf("init_hal: mouse..\n");
-	//init_mouse();  //isso está em keyboard.c
-	
-	//printf("init_hal: init machine (bug)\n");	
-	//hal_init_machine();	
 	
 
-	//Ports components.
-	
-	//
-	// bios date. (detect)
-	//
-	
-	//Collecting Disk Geometry
-	//Floppy Component 
-	
+ 
+ 
 
-	//Video Display Adapter.
-	 //init_screen();
-	
 	//Mouse components
 
 	//

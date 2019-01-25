@@ -351,15 +351,14 @@ void testNIC()
 {
 	
 	printf("\n\ntestNIC:\n\n"); 
-	//printf("testNIC: setup flag and test send arp request \n");
+	printf("testNIC: setup flag and test send arp request \n");
     
-	printf("mostra pci info apenas:\n\n");
+	//printf("mostra pci info apenas:\n\n");
 	
 	
 	//testando apens o send 
 	
-	e1000_interrupt_flag = 1;
-	
+	e1000_interrupt_flag = 1;	
 	testSend();	
 	
 	
