@@ -3,9 +3,7 @@
  * kernel base. 
  * (c) Copyright 2015 Fred Nora.
  *
- * File: k\mk.c 
- * 
- * microkernelMicrokernel(); é o construtor.
+ * File: mk.c 
  *
  * History:
  *     2015 - Created by fred Nora.
@@ -13,14 +11,17 @@
 
  
 #include <kernel.h>
-//#include "mkidata.h"  //MicroKernel Internal Data.
+
+//#todo
+//MicroKernel Internal Data.
+//#include "mkidata.h"  
+
 
 //unsigned char  MicrokernelName[] = "MICROKERNEL LAYER";
 
 
-
-#define LOCALSTUFF1 0
-int localsstuff1;
+//#define LOCALSTUFF1 0
+//int localsstuff1;
 
 
 //coloca um processo ou thread em um dos planos de execução
@@ -278,9 +279,9 @@ void sys_exit_thread (int tid){
 /*
  *****************************************************
  * sys_create_process:
- *     Serviço do sistema.
- *     Interface para criação de um processo.
+ *     Create process system interface.
  */
+
 void *sys_create_process( struct wstation_d *window_station,
                           struct desktop_d  *desktop,
                           struct window_d *window,
@@ -304,8 +305,6 @@ void *sys_create_process( struct wstation_d *window_station,
 	
 	//@todo: Return da função create.
 	
-//done:
-
     return NULL;
 };
 
@@ -313,8 +312,7 @@ void *sys_create_process( struct wstation_d *window_station,
 /*
  *********************************************************
  * sys_create_thread:
- *    Serviço do sistema.
- *    Interface para criação de uma thread.
+ *     Create thread system interface.
  */
 void *sys_create_thread( struct wstation_d *window_station,
                          struct desktop_d  *desktop,
@@ -336,8 +334,6 @@ void *sys_create_thread( struct wstation_d *window_station,
 	    priority, ppid, name); 
 				   
     //@todo: return da função create.
-	
-//done:
 
     return NULL;
 };
@@ -346,7 +342,7 @@ void *sys_create_thread( struct wstation_d *window_station,
 /*
  *********************************************
  * sys_fork:
- * Fork ... Serviço do sistema.
+ *     
  */
  
 int sys_fork (){
@@ -383,30 +379,23 @@ int sys_getppid (){
 	
 	if ( pid >= 0 && pid < PROCESS_COUNT_MAX )
 	{
-        //Ponteiro da estrutura.
 		p = (void *) processList[pid]; 		
 		
-		//erro.
 		if ( (void *) p == NULL )
 		{
 			return (int) -1;
 		}
 		
-		//erro.
 		if ( p->used != 1 || p->magic != 1234 ){
 		    
 			return (int) -1;	
 		}
 		
-		//Retorna o id do processo pai.
 		return (int) p->ppid;
-	};
-	
-//fail.
-//fail:
+	}
 
     return (int) -1;	
-};
+}
 
 
 /*
@@ -520,12 +509,8 @@ int init_microkernel (){
 	//a primeira mensagem só aparece após a inicialização da runtime.
 	//por isso não deu pra limpar a tela antes.
 	printf(">>>debug hang: after init_microkernel");
-	refresh_screen(); 
-	while (1){
-		asm ("hlt");
-	}
+	die();
 #endif	
-
 
     return (int) Status;
 };

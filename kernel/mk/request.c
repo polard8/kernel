@@ -1,5 +1,5 @@
 /*
- * File: mk\request.c
+ * File: mk/request.c
  *
  * Descrição:
  *     Arquivo principal da central de requests do kernel.
@@ -92,24 +92,17 @@ void KiRequest (){
 	
 	//#todo: #bugbug: limite imposto
 	int Max = 11;
-	
-    //
-    // @todo:
-	//     Check some limits.
-    //	
-	
-	// Limits
-    if( kernel_request < 0 || 
-	    kernel_request > Max )
-	{
+		
+    if ( kernel_request < 0 || kernel_request > Max ){
+		
         printf("KiRequest: %d", kernel_request );
 		die();
-	};
+	}
 	
 	//...
     
 	request ();
-};
+}
 
 
 /*
@@ -295,11 +288,12 @@ void request (){
  * Done:
  *   Essas finalizações aplicam para todos os requests.
  */	
-done:
-    //thread->step++;                      //Aumenta o step para todos os tipos.
-    kernel_request = (unsigned long) 0;    //Zera o request.
-	return; 
-};
+	
+//done:
+    kernel_request = (unsigned long) 0;    
+	//return; 
+}
+
 
 //
 // End.

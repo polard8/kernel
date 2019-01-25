@@ -462,18 +462,18 @@ Class Code	Description
 #define PCI_SUBCLASS_MEMORY    0x80  //Memory controller.
 
 //6
-#define PCI_SUBCLASS_HOST    0	    //Host bridge.	
-#define PCI_SUBCLASS_ISA     0x01	//ISA bridge.	
-#define PCI_SUBCLASS_EISA    0x02	//EISA bridge.	
-#define PCI_SUBCLASS_MICROCHANNEL    0x03	//MicroChannel bridge.	
-#define PCI_SUBCLASS_PCI        0x04	//PCI bridge.	
-#define PCI_SUBCLASS_PCMCIA     0x05	//PCMCIA bridge.	
-#define PCI_SUBCLASS_NUBUS      0x06	//NuBus bridge.	
-#define PCI_SUBCLASS_CARDBUS    0x07	//CardBus bridge.	
-#define PCI_SUBCLASS_RACEWAY    0x08	//RACEway bridge.	
-#define PCI_SUBCLASS_PCITOPCI   0x09	//Semi-transparent PCI-to-PCI bridge.	
-#define PCI_SUBCLASS_INFINIBANDTOPCI    0x0A	//InfiniBand to PCI host bridge.	
-#define PCI_SUBCLASS_BRIDGE     0x80	//Bridge.
+#define PCI_SUBCLASS_HOST                0	//Host bridge.	
+#define PCI_SUBCLASS_ISA              0x01	//ISA bridge.	
+#define PCI_SUBCLASS_EISA             0x02	//EISA bridge.	
+#define PCI_SUBCLASS_MICROCHANNEL     0x03	//MicroChannel bridge.	
+#define PCI_SUBCLASS_PCI              0x04	//PCI bridge.	
+#define PCI_SUBCLASS_PCMCIA           0x05	//PCMCIA bridge.	
+#define PCI_SUBCLASS_NUBUS            0x06	//NuBus bridge.	
+#define PCI_SUBCLASS_CARDBUS          0x07	//CardBus bridge.	
+#define PCI_SUBCLASS_RACEWAY          0x08	//RACEway bridge.	
+#define PCI_SUBCLASS_PCITOPCI         0x09	//Semi-transparent PCI-to-PCI bridge.	
+#define PCI_SUBCLASS_INFINIBANDTOPCI  0x0A	//InfiniBand to PCI host bridge.	
+#define PCI_SUBCLASS_BRIDGE           0x80	//Bridge.
 
 //7
 #define PCI_SUBCLASS_SERIAL       0       //Serial controller.	
