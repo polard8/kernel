@@ -15,7 +15,7 @@
 VERSION = 0
 PATCHLEVEL = 8
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
+EXTRAVERSION = 0
 NAME = Profissional
 
 #todo:
