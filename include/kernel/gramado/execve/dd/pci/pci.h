@@ -1,3 +1,29 @@
+/*
+ * File: pci.h
+ *
+ * Descri��o:
+ *     Peripheral Component Interconnect - (PCI).
+ *     Header do driver de PCI do kernel base.
+ *     Refer�ncia site: https://pci-ids.ucw.cz/read/PD
+ *
+ * Hist�rico:
+ *     Vers�o 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
+ *     Vers�o 1.0, 2016 - Revis�o.
+ *     ...
+ */
+
+#ifndef __PCI_H__
+#define __PCI_H__
+
+
+
+
+#define PCI_PORT_ADDR 0xCF8
+#define PCI_PORT_DATA 0xCFC
+
+
+//-----------------
+
 
 //pci.h 
 
@@ -133,13 +159,13 @@ the Pointer is used to access the Configuration Space.
 //An AHCI controller can be found by enumerating the PCI bus. It has a 
 //class id 0x01 (mass storage device) and normally a subclass id 0x06 
 //(serial ATA). The vendor id and device id should also be checked to 
-//ensure it’s really an AHCI controller.
+//ensure it?s really an AHCI controller.
 
 //AHCI Registers and Memory Structures:
 //As mentioned above, host communicates with the AHCI controller through 
 //system memory and memory mapped registers. The last PCI base address 
 //register (BAR[5], header offset 0x24) points to the AHCI base memory, 
-//it’s called ABAR (AHCI Base Memory Register). All AHCI registers and 
+//it?s called ABAR (AHCI Base Memory Register). All AHCI registers and 
 //memories can be located through ABAR. The other PCI base address 
 //registers act same as a traditional IDE controller. Some AHCI 
 //controller can be configured to simulate a legacy IDE one.
@@ -229,7 +255,7 @@ Class Description
 // PCI Offset.
 //
 
-// Deslocamento dentro da tabela de configuração, dado em hexa.
+// Deslocamento dentro da tabela de configura��o, dado em hexa.
 #define PCI_OFFSET_VENDORID       0       //short
 #define PCI_OFFSET_DEVICEID       0x02    //short
 
@@ -298,34 +324,34 @@ Class Description
  
 
 //Intel sata host controller support:
-//40h 2 “Primary Timing (PTIM)—Offset 40h” on page 153 0000h
-//42h 2 “Secondary Timing (STIM)—Offset 42h” on page 154 0000h
-//44h 1 “Device 1 IDE Timing (D1TIM)—Offset 44h” on page 155 00h
-//48h 1 “Synchronous DMA Control (Synchronous_DMA_Control)—Offset 48h” on page 155 00h
-//4Ah 2 “Synchronous_DMA_Timing—Offset 4Ah” on page 156 0000h
-//54h 4 “IDE I/O Configuration (IIOC)—Offset 54h” on page 156 00000000h
-//70h 2 “PCI Power Management Capability ID (PID)—Offset 70h” on page 157 A801h
-//72h 2 “Primary Command Block Base Address (PCMDBA)—Offset 10h” on page 147 4003h
-//74h 2 “PCI Power Management Control and Status (PMCS)—Offset 74h” on page 158 0008h
-//80h 2 “Message Signaled Interrupt Identifier (MID)—Offset 80h” on page 159 7005h
-//82h 2 “Message Signaled Interrupt Message Control (MC)—Offset 82h” on page 159 0000h
-//84h 4 “Message Signaled Interrupt Message Address (MA)—Offset 84h” on page 160 00000000h
-//88h 2 “Message Signaled Interrupt Message Data (MD)—Offset 88h” on page 160 0000h
-//90h 2 “Port Mapping Register (MAP)—Offset 90h” on page 161 0420h
-//92h 2 “Port Control and Status (PCS)—Offset 92h” on page 162 0000h
-//94h 4 “Test Mode Register (TM)—Offset 94h” on page 163 00000000h
-//9Ch 4 “SATA General Configuration (SATAGC)—Offset 9Ch” on page 163 00000000h
-//A0h 1 “SATA Initialization Register Index (SIRI)—Offset A0h” on page 165 00h
-//A4h 4 “SATA Initialization Register Data (SIRD)—Offset A4h” on page 165 00000000h
-//A8h 4 “Serial ATA Capability Register 0 (SATACR0)—Offset A8h” on page 166 00100012h
-//ACh 4 “Serial ATA Capability Register 1 (SATACR1)—Offset ACh” on page 167 00000048h
-//B0h 2 “FLR Capability ID (FLRCID)—Offset B0h” on page 167 0000h
-//B4h 2 “FLR Control (FLRCTL)—Offset B4h” on page 168 0000h
-//D0h 4 “Scratch Pad (SP)—Offset D0h” on page 168 00000000h
-//E0h 4 “BIST FIS Control/Status (BFCS)—Offset E0h” on page 169 00000000h
-//E4h 4 “BIST FIS Transmit Data 1 (BFTD1)—Offset E4h” on page 170 00000000h
-//E8h 4 “BIST FIS Transmit Data 2 (BFTD2)—Offset E8h” on page 170 00000000h
-//F8h 4 “Manufacturing ID (MFID)—Offset F8h” on page 171 08000FB1h
+//40h 2 ?Primary Timing (PTIM)?Offset 40h? on page 153 0000h
+//42h 2 ?Secondary Timing (STIM)?Offset 42h? on page 154 0000h
+//44h 1 ?Device 1 IDE Timing (D1TIM)?Offset 44h? on page 155 00h
+//48h 1 ?Synchronous DMA Control (Synchronous_DMA_Control)?Offset 48h? on page 155 00h
+//4Ah 2 ?Synchronous_DMA_Timing?Offset 4Ah? on page 156 0000h
+//54h 4 ?IDE I/O Configuration (IIOC)?Offset 54h? on page 156 00000000h
+//70h 2 ?PCI Power Management Capability ID (PID)?Offset 70h? on page 157 A801h
+//72h 2 ?Primary Command Block Base Address (PCMDBA)?Offset 10h? on page 147 4003h
+//74h 2 ?PCI Power Management Control and Status (PMCS)?Offset 74h? on page 158 0008h
+//80h 2 ?Message Signaled Interrupt Identifier (MID)?Offset 80h? on page 159 7005h
+//82h 2 ?Message Signaled Interrupt Message Control (MC)?Offset 82h? on page 159 0000h
+//84h 4 ?Message Signaled Interrupt Message Address (MA)?Offset 84h? on page 160 00000000h
+//88h 2 ?Message Signaled Interrupt Message Data (MD)?Offset 88h? on page 160 0000h
+//90h 2 ?Port Mapping Register (MAP)?Offset 90h? on page 161 0420h
+//92h 2 ?Port Control and Status (PCS)?Offset 92h? on page 162 0000h
+//94h 4 ?Test Mode Register (TM)?Offset 94h? on page 163 00000000h
+//9Ch 4 ?SATA General Configuration (SATAGC)?Offset 9Ch? on page 163 00000000h
+//A0h 1 ?SATA Initialization Register Index (SIRI)?Offset A0h? on page 165 00h
+//A4h 4 ?SATA Initialization Register Data (SIRD)?Offset A4h? on page 165 00000000h
+//A8h 4 ?Serial ATA Capability Register 0 (SATACR0)?Offset A8h? on page 166 00100012h
+//ACh 4 ?Serial ATA Capability Register 1 (SATACR1)?Offset ACh? on page 167 00000048h
+//B0h 2 ?FLR Capability ID (FLRCID)?Offset B0h? on page 167 0000h
+//B4h 2 ?FLR Control (FLRCTL)?Offset B4h? on page 168 0000h
+//D0h 4 ?Scratch Pad (SP)?Offset D0h? on page 168 00000000h
+//E0h 4 ?BIST FIS Control/Status (BFCS)?Offset E0h? on page 169 00000000h
+//E4h 4 ?BIST FIS Transmit Data 1 (BFTD1)?Offset E4h? on page 170 00000000h
+//E8h 4 ?BIST FIS Transmit Data 2 (BFTD2)?Offset E8h? on page 170 00000000h
+//F8h 4 ?Manufacturing ID (MFID)?Offset F8h? on page 171 08000FB1h
 //
 
 
@@ -364,12 +390,12 @@ Class Code	Description
 
 
 //BAR for sata, intel host controller
-//10h-“Primary Command Block Base Address (PCMDBA)—Offset 10h” 
-//14h- “Primary Control Block Base Address (PCTLBA)—Offset 14h” 
-//18h -Secondary Command Block Base Address (SCMDBA)—Offset 18h” 
-//1ch-“Secondary Control Block Base Address (SCTLBA)—Offset 1Ch” 
-//20h-“Legacy IDE Base Address / AHCI Index Data Pair Base Address (LBAR)—Offset 20h” 
-//24h-“AHCI Base Address/Serial ATA Index Data Pair Base Address (ABAR)—Offset 24h”
+//10h-?Primary Command Block Base Address (PCMDBA)?Offset 10h? 
+//14h- ?Primary Control Block Base Address (PCTLBA)?Offset 14h? 
+//18h -Secondary Command Block Base Address (SCMDBA)?Offset 18h? 
+//1ch-?Secondary Control Block Base Address (SCTLBA)?Offset 1Ch? 
+//20h-?Legacy IDE Base Address / AHCI Index Data Pair Base Address (LBAR)?Offset 20h? 
+//24h-?AHCI Base Address/Serial ATA Index Data Pair Base Address (ABAR)?Offset 24h?
 //
 
 //vendor 0x8086 device 0x7000 
@@ -580,7 +606,7 @@ Class Code	Description
 //0x101E	American Megatrends Inc.
 //Oracle Corporation - InnoTek Systemberatung GmbH 0x80EE
 
-//Em ordem alfabética.
+//Em ordem alfab�tica.
 #define PCI_VENDOR_ID_AMD					0x1022
 #define PCI_VENDOR_ID_APPLE					0x106B  //0x05ac
 #define PCI_VENDOR_ID_ATI					0x1002
@@ -593,11 +619,296 @@ Class Code	Description
 #define PCI_VENDOR_ID_VIA					0x1106
 //...
 
+//------------------
+			   
 
+//
+// Vari�veis internas.
+//
 
+unsigned long pci_handler_address;
 
+//
+// PCI class struct
+//
+/*
+typedef struct pci_class_d pci_class_t;
+struct pci_class_d
+{
+	unsigned long pci_class;
+	unsigned long pci_subclass;
+    char *name;	
+};
+pci_class_t *PciClass;
+//
+*/
+
+//
+// PCI device structure.
+//
  
+typedef struct pci_device_d pci_device_t;
+struct pci_device_d 
+{
+	object_type_t objectType;
+	object_class_t objectClass;		
 
- 
+	//callback 
+	
+	//Identifica��o.
+	int deviceId;
+    
+	int deviceUsed;   
+	int deviceMagic;   
+    
+	char *name;         
 
+	//unsigned long flag;   
+    //unsigned long error;  
+	
+	// Status do dispositivo.
+	//int device_status;
+	//char *device_status_string;
+	
+	//
+	// @todo: Completar com os elementos que faltam.
+	//        Seguindo a ordem padr�o.
+	
+	
+	//Salvar tamb�m qual bus o device pertence.	
+	//Localiza��o do dispositivo.
+	unsigned char bus;
+	unsigned char dev;   
+    unsigned char func;
+	
+	
+	//Primeiros.
+	unsigned short Device;	
+	unsigned short Vendor;
+
+	unsigned short Status;	
+	unsigned short Command;
+
+	unsigned char classCode;
+	unsigned char subclass;
+	unsigned char progif;	
+	unsigned char revisionId;
+
+
+	unsigned char bist;
+	unsigned char header_type;
+	unsigned char latency_timer;	
+	unsigned char cache_line_size;
+
+
+
+	
+	//Address.
+	unsigned long BAR0;
+	unsigned long BAR1;
+	unsigned long BAR2;
+	unsigned long BAR3;
+	unsigned long BAR4;
+	unsigned long BAR5;
+	
+	
+	//Sub-system vendor id
+	//sub-system device id	
+	unsigned short subsystem_Vendor;
+	unsigned short subsystem_Device;
+
+	//�ltimos.
+
+	unsigned char max_latency;
+	unsigned char min_grant;
+	unsigned char irq_pin;     //??
+    unsigned char irq_line;    //Qual IRQ ser� usada pelo PIC.	
+	
+    //continua ...
+	
+	
+	//estrutura para o driver do dispositivo.
+	struct pci_driver_d *driver;
+    
+	struct pci_device_d* next;	
+};
+pci_device_t *pci_device;
+pci_device_t *current_pci_device;    //Current.
+//...
+
+
+//
+// PCI structure.
+// Estrutura para gerenciar a interface pci.
+// apenas uma inst�ncia dessa estrutura deve existir.
+// 
+//
+// 
+
+typedef struct pci_d pci_t;
+struct pci_d
+{	
+	int devicesFound;    //N�mero de dispositivos encontrados.
+	
+	int	max;
+	pci_device_t* deviceList;	
+};
+pci_t *Pci;
+
+
+
+//
+// Lista as estruturas de dispositivos pci.
+//
+
+unsigned long pcideviceList[32];    //@todo tamanho provisorio. 
+
+//
+// DRIVER.
+//
+
+/*
+ * pci_driver_d:
+ *     Estrutura para drivers de dispositivos pci.     
+ *
+ */
+typedef struct pci_driver_d pci_driver_t;
+struct pci_driver_d
+{
+	object_type_t objectType;
+	object_class_t objectClass;	
+	
+	
+	int id;    //id do driver de dispositivo pci.
+	int used;
+	int magic;
+	
+	//status do driver de dispositivo.
+	//Initialized, ... @todo: Criar enum. pci_device_status_t;
+	//int status;
+	
+	//Nome do driver do dispositivo PCI.
+    const char *name;
+
+	//Pathname para a imagem do driver.
+    const char *pathname;	
+	
+	//unsigned long driver_version;
+	
+	//Endere�o da rotina de tratamento de interrup��o.
+	//unsigned long irq_handler;
+	
+	//
+	// Buffers !!!
+	//
+	
+	//
+	// Os endere�os de mem�ria encontrados na configura��o
+	// de PCI poder�o ser salvos aqui.
+	//
+	
+	//unsigned long io_buffer_address1;
+	//unsigned long io_buffer_address2;
+	//unsigned long io_buffer_address3;
+	//unsigned long io_buffer_address4;
+	
+	//Estrutura do dispositivo pci gerenciado pelo driver.
+	struct pci_device_d *pci_device;
+
+    // ...
+
+    //struct pci_driver_d *next;
+};
+pci_driver_t *PciDrivers;    //@todo: Lista.Igual menuitens.
+//...
+
+
+//Lista de drivers de dispositivos pci.
+//unsigned long pcidriversList[32];
+
+
+
+
+
+/*
+ * The PCI interface treats multi-function devices as independent
+ * devices.  The slot/function address of each device is encoded
+ * in a single byte as follows:
+ *
+ *	7:3 = slot
+ *	2:0 = function
+ *
+ * PCI_DEVFN(), PCI_SLOT(), and PCI_FUNC() are defined in uapi/linux/pci.h.
+ * In the interest of not exposing interfaces to user-space unnecessarily,
+ * the following kernel-only defines are being added here.
+ */
+
+//#define PCI_DEVID(bus, devfn)  ((((u16)(bus)) << 8) | (devfn))
+
+/* return bus from PCI devid = ((u16)bus_number) << 8) | devfn */
+
+//#define PCI_BUS_NUM(x) (((x) >> 8) & 0xff)
+
+
+
+
+
+
+//
+// Prot�tipos de fun��es.
+//
+
+int pciInfo();
+int pciInit();
+
+
+//Inicia o pci.
+int init_pci();
+
+
+int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun );
+
+
+//
+// Read.
+//
+
+unsigned char pciConfigReadByte( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
+unsigned short pciConfigReadWord( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
+unsigned long pciConfigReadDWord( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
+
+//
+// Offsets.
+//
+					  
+unsigned short pciCheckVendor(unsigned char bus, unsigned char slot);    //Offset 0.	
+unsigned short pciCheckDevice(unsigned char bus, unsigned char slot);    //Offset 2.
+unsigned char pciGetSubClass(unsigned char bus, unsigned char slot);     //Offset 0x0A. 
+unsigned char pciGetClassCode(unsigned char bus, unsigned char slot);    //Offset 0x0B.
+
+unsigned char pciGetHeaderType(unsigned char bus, unsigned char slot);
+
+unsigned long pciGetBAR(unsigned char bus, unsigned char slot, int number);    //get BARs (v�rios offsets.)
+unsigned char pciGetInterruptLine(unsigned char bus, unsigned char slot);    //Offset 0x3C.
+unsigned char pciGetInterruptPin(unsigned char bus, unsigned char slot);     //Interrut pin
+//...
+
+
+//Handlers para PCI. Cada handler pode ser compartilhado por at�
+//4 dispositivos.
+unsigned long KiPciHandler1();
+unsigned long KiPciHandler2();
+unsigned long KiPciHandler3();
+unsigned long KiPciHandler4();
+//...								
+	
+
+//mostra informa��es sobre um dispositivo pci da lista.
+int pciShowDeviceInfo(int number);
+
+#endif 
+
+//
+// End.
+//
 

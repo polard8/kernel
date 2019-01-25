@@ -173,7 +173,7 @@ extern void do_executa_new_task();
 
 #include <kernel/gramado/intel.h>
 #include <kernel/gramado/memory.h>
-#include <kernel/gramado/pci.h>
+
 #include <kernel/gramado/cpuid.h>
 #include <kernel/gramado/screen.h>
 #include <kernel/gramado/video.h>
@@ -251,7 +251,8 @@ extern void do_executa_new_task();
 
 #include <kernel/gramado/execve/dd/ide/ide.h>          //irq14/15 
 
-#include <kernel/gramado/execve/dd/pci.h>            //pci.
+
+#include <kernel/gramado/execve/dd/pci/pci.h>            //pci.
 
 #include <kernel/gramado/execve/dd/ahci/sata.h>           //(PCI BUS).
 
