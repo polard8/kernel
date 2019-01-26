@@ -3858,76 +3858,64 @@ int windowLoadGramadoIcons (){
 	//
 	// # Load #
 	//
-//load:
-	
-	//@todo: Checar os retornos.
-    //fRet = (unsigned long) fsLoadFile("APP     BMP", 
-	//    (unsigned long) appIconBuffer );	
-    fRet = (unsigned long) fsLoadFile(VOLUME1_ROOTDIR_ADDRESS, "APP     BMP", 
-	    (unsigned long) appIconBuffer );	
-		
-		
-    if( fRet != 0 )
+
+    fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
+							   VOLUME1_ROOTDIR_ADDRESS, 
+						       "APP     BMP", 
+	                           (unsigned long) appIconBuffer );	
+    if ( fRet != 0 )
 	{
-		printf("init_windows: APP.BMP\n");
+		printf ("init_windows: APP.BMP\n");
 		die();		
 	}		
     
-	
-	//fRet = (unsigned long) fsLoadFile("FILE    BMP", 
-	//    (unsigned long) fileIconBuffer );	
-	fRet = (unsigned long) fsLoadFile( VOLUME1_ROOTDIR_ADDRESS, "FILE    BMP", 
-	    (unsigned long) fileIconBuffer );
-    if( fRet != 0 )
+	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
+						       VOLUME1_ROOTDIR_ADDRESS, 
+							   "FILE    BMP", 
+	                           (unsigned long) fileIconBuffer );
+    if ( fRet != 0 )
 	{
 		printf("init_windows: FILE.BMP\n");
 		die();				
 	}
 	
-	
-	//fRet = (unsigned long) fsLoadFile("FOLDER  BMP", 
-	//    (unsigned long) folderIconBuffer );		
-	fRet = (unsigned long) fsLoadFile(VOLUME1_ROOTDIR_ADDRESS, "FOLDER  BMP", 
-	    (unsigned long) folderIconBuffer );	
-    if( fRet != 0 )
+	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+						       VOLUME1_ROOTDIR_ADDRESS, 
+							   "FOLDER  BMP", 
+	                           (unsigned long) folderIconBuffer );	
+    if ( fRet != 0 )
 	{
 		printf("init_windows: FOLDER.BMP\n");
 		die();				
 	}
 	
-	
-	//fRet = (unsigned long) fsLoadFile("TERMINALBMP", 
-	//    (unsigned long) terminalIconBuffer );		
-	fRet = (unsigned long) fsLoadFile(VOLUME1_ROOTDIR_ADDRESS, "TERMINALBMP", 
-	    (unsigned long) terminalIconBuffer );	
-    if( fRet != 0 )
+	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+						       VOLUME1_ROOTDIR_ADDRESS, 
+							   "TERMINALBMP", 
+	                           (unsigned long) terminalIconBuffer );	
+    if ( fRet != 0 )
 	{
 		printf("init_windows: TERMINAL.BMP\n");
 		die();				
 	}	
 	
-	
-	//fRet = (unsigned long) fsLoadFile("CURSOR  BMP", 
-	//    (unsigned long) cursorIconBuffer );		
-	fRet = (unsigned long) fsLoadFile(VOLUME1_ROOTDIR_ADDRESS, "CURSOR  BMP", 
-	    (unsigned long) cursorIconBuffer );	
-    if( fRet != 0 )
+	fRet = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+						       VOLUME1_ROOTDIR_ADDRESS, 
+							   "CURSOR  BMP", 
+	                           (unsigned long) cursorIconBuffer );	
+    if ( fRet != 0 )
 	{
 		printf("init_windows: CURSOR.BMP\n");
 		die();				
 	}		
 	
+	// #debug
+    // bmpDisplayBMP( appIconBuffer, 1, 1 );
+	// refresh_rectangle( 1, 1, 16, 16 );
+	// die();	
 	
-//done:
-
-	//#debug
-	//isso funcionou.
-    //bmpDisplayBMP( appIconBuffer, 1, 1 );
-	//refresh_rectangle( 1, 1, 16, 16 );
-	//die();	
-	
-    return (int) 0;
-};
+    return 0;
+}
 
 
 /*

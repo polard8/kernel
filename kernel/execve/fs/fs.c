@@ -1,5 +1,5 @@
 /*
- * File: fs\fs.c 
+ * File: fs/fs.c 
  *
  * Descrição:
  *    Arquivo principal do file system manager.
@@ -62,24 +62,17 @@ int fsCheckELFFile ( unsigned long address ){
 		 buffer[3] != 0x46 )
 	{
 		printf("fsCheckELFFile: Sig \n");
-		goto fail;
+		//goto fail;
+	    return 1;
 	}
-	
-	//i486
 	
 	//Continua...
 	
 	//
 	// # OK #
-	//
-	
-//done:	
+
 	return (int) 0;
-	
-fail:
-    printf("fail\n");
-    return (int) 1;
-};
+}
 
 
 
@@ -96,7 +89,8 @@ int fsCheckPEFile ( unsigned long address ){
 	if ( buffer[0] != 0x4C || buffer[1] != 0x01 )
 	{
 		printf("fsCheckPEFile: Sig \n");
-		goto fail;
+		//goto fail;
+		return 1;
 	}
 	
 	//i486
@@ -107,13 +101,8 @@ int fsCheckPEFile ( unsigned long address ){
 	// # OK #
 	//
 	
-//done:	
 	return (int) 0;
-	
-fail:
-    printf("fail\n");
-    return (int) 1;
-};
+}
 
 
 /*
@@ -385,6 +374,9 @@ KeLoadFile( struct channel_d *channel,
             unsigned char *file_name, 
 			unsigned long file_address )
 {
+
+	/*
+	
     int Status;
 	
 	if ( (void *) channel == NULL )
@@ -425,6 +417,8 @@ KeLoadFile( struct channel_d *channel,
 	channel->State = 0;
 
     return (int) 0;	
+	*/
+	return -1;
 };
 
 
@@ -599,14 +593,18 @@ fs_set_entry_status( unsigned long id,
  *
  * #todo: precisa colocar tudo na estrutura que está em fs.h
  */
+
 //void fsCheckMBR(unsigned char* buffer)  //@todo
+
 void fsCheckMbrFile ( unsigned char *buffer ){
 	
 	
 	//#todo
 	//mudar os argumentos para chamarmos as portas ide.
 	
+	int i;
 	unsigned char *mbr = (unsigned char *) buffer; 
+	
 
 	//setor 0.
 	my_read_hd_sector( (unsigned long) &mbr[0] , 0, 0 , 0 );  
@@ -625,8 +623,7 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	
 	// Check signature.
 	if ( mbr[0x1FE] != 0x55 || mbr[0x1FF] != 0xAA )
-	{
-		
+	{	
 	    printf("fsCheckMbrFile: Sig FAIL \n" );
         goto fail;		
 	}
@@ -638,7 +635,7 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	
 	
 	//name
-	int i;
+
 	
 	printf("OS name: [ ");
 	for ( i=0; i<8; i++ )
@@ -713,16 +710,16 @@ done:
  *    Mbr. Vbr.
  * @todo: Mudar para fsCheckDisk().
  */
+
 void fs_check_disk (){
 	
-    printf("fs_check_disk: Initializing..\n");	
+    //printf("fs_check_disk: Initializing..\n");	
 	//fsCheckMbrFile();
 	//fsCheckVbrFile();
-    //...
-	
-    printf("Done\n");
+    //...	
+    //printf("Done\n");
 	//refresh_screen();	
-};
+}
 
 
 /*
@@ -749,8 +746,8 @@ MountShortFileName ( char *buffer,
         }
 
         buffer[i] = entry->FileName[i];
-        ++i;
-    };
+        i++;
+    }
  
     // Get extension.
     if ( (entry->FileName[8] != ' ') )
@@ -759,10 +756,8 @@ MountShortFileName ( char *buffer,
         buffer[i++] = (entry->FileName[ 8] == ' ') ? '\0' : entry->FileName[ 8];
         buffer[i++] = (entry->FileName[ 9] == ' ') ? '\0' : entry->FileName[ 9];
         buffer[i++] = (entry->FileName[10] == ' ') ? '\0' : entry->FileName[10];
-    };
-};
-
-
+    }
+}
 
 
 /*
@@ -817,6 +812,7 @@ void set_filesystem_type (int type){
  *     fsInitFat()
  *     ?? #bugbug: De qual volume ?? 
  */
+
 void fs_init_fat (){
 	
 	// File system structure.
@@ -835,6 +831,7 @@ void fs_init_fat (){
 	{
 	    printf("fs_init_fat error: fat\n");
 	    return;
+		
 	}else{
 		
 	    // Info.
@@ -1023,6 +1020,7 @@ int fsInit (){
 	{
 		printf("fsInit: volume1_rootdir");
 		die ();
+		
 	} else {
 		
 	    volume1_rootdir->_base = (char *) VOLUME1_ROOTDIR_ADDRESS;
@@ -1064,9 +1062,6 @@ int fsInit (){
 	
 	    Streams[5] = (unsigned long) volume2_rootdir;
 	};
-	
-
-	
 	
 	
     //
@@ -1139,7 +1134,8 @@ int fsInit (){
  
 void fsInitializeWorkingDiretoryString (){
 	
-		
+	struct volume_d *v;
+	
 	//'root:'
     //  ## volume list ##
     //primeiro colocamos a string que indica a lista de volumes. 
@@ -1154,9 +1150,6 @@ void fsInitializeWorkingDiretoryString (){
 	//
 	//  ## volume root dir ##	
 	//
-
-
-	struct volume_d *v;
 	
 	v = (struct volume_d *) volumeList[current_volume];
 	
@@ -1209,29 +1202,26 @@ void fsInitializeWorkingDiretoryString (){
 
 	//More ?...
     pwd_initialized = 1;
-};
+}
 
 
 int fs_initialize_process_pwd ( int pid, char *string ){
 	
+	int i;	
 	struct process_d *p;
-	int i;
 	
-	
-	//#todo limits
-	if (pid<0)
-		return 1;
 	
 	if ( pwd_initialized == 0 )
 	{
 		printf("fs_initialize_process_pwd: pwd not initialized\n"); 
 		die();
 	} 
+	
+	if (pid<0)
+		return 1;	
 		
     if ( (void *) string == NULL )
-	{
-	    return (int) 1;    
-	} 
+	    return 1;    
 			
 
     //#importante
@@ -1258,8 +1248,8 @@ int fs_initialize_process_pwd ( int pid, char *string ){
 	    }
 	};
 	
-    return (int) 0;
-};
+    return 0;
+}
 
 
 
@@ -1268,21 +1258,19 @@ int fs_initialize_process_pwd ( int pid, char *string ){
  *     Cada processo tem seu próprio pwd.
  *     Essa rotina mostra o pathname usado pelo processo.
  */
+
 int fs_print_process_pwd ( int pid ){
 	
-	
 	struct process_d *p;
-
-	//#todo limits
-	if (pid<0)
-		return 1;
 	
 	if ( pwd_initialized == 0 )
 	{
 		printf("fs_print_process_pwd: pwd not initialized\n"); 
 		die();
 	} 	
-	
+
+	if (pid<0)
+		return 1;	
 	
 	p = (struct process_d *) processList[pid];
 	
@@ -1329,6 +1317,9 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 		return;
 	}  	
 	
+    if ( (void *) string == NULL )
+	    return;  
+	
 	p = (struct process_d *) processList[current_process];
 	
 	if ( (void *) p == NULL )
@@ -1344,7 +1335,6 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 	        die ();
 	    }
 		
-
         if ( (void *) string == NULL )
 	    {
 			printf ("fsUpdateWorkingDiretoryString: string\n");
@@ -1362,12 +1352,13 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 	        //atualiza a string global.
 			//usando a string do processo atual.
 			
-			for ( i=0; i<32; i++ ){
+			for ( i=0; i<32; i++ )
+			{
 	            current_workingdiretory_string[i] = p->pwd_string[i];	
 	        }
-		};		
-	};	
-};
+		}		
+	}	
+}
 
 
 /* 
@@ -1436,12 +1427,12 @@ void fs_pathname_backup ( int pid, int n ){
         };	
 		
 		//atualizando a string global.
-		for ( i=0; i<32; i++ ){
+		for ( i=0; i<32; i++ )
+		{
 	        current_workingdiretory_string[i] = p->pwd_string[i];	
 	    }
-
-	};		
-};
+	}
+}
 
 
 //interface para carregar arquivo ou diretório.
@@ -1449,8 +1440,7 @@ void fs_pathname_backup ( int pid, int n ){
 int 
 sys_read_file ( unsigned long name, 
                 unsigned long address )
-{
-    
+{ 
 	//fail
     int Ret = -1;	
 	
@@ -1504,28 +1494,19 @@ sys_read_file ( unsigned long name,
 	//
 	
 do_loadfile:	
+	
     taskswitch_lock();
     scheduler_lock();			
-    Ret = (int) fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
-	    (unsigned char *) name, (unsigned long) address );    		
+    
+	Ret = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS,  
+				    VOLUME1_ROOTDIR_ADDRESS, 
+	                (unsigned char *) name, 
+					(unsigned long) address );    		
+	
 	scheduler_unlock();
     taskswitch_unlock();
 	return (int) Ret;
 			
-//#todo:
-//aqui devemos atualizar o pathname depois de carregarmos o diretório.
-//	
-/*		
-do_loaddir:
-    taskswitch_lock();
-    scheduler_lock();			
-    Ret = (unsigned long) fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
-	    (unsigned char *) name, (unsigned long) address );    		
-	scheduler_unlock();
-    taskswitch_unlock();
-	return (unsigned long) Ret;
-*/			
-
 fail:			
     return 1;	
 };
@@ -1551,11 +1532,11 @@ sys_write_file ( char *file_name,
 	taskswitch_lock();
 	scheduler_lock();	
 		    
-	Ret = (int) fsSaveFile ( (char *) file_name,         //name
-	                (unsigned long) file_size,  //3, //@todo: size in sectors 
-				 (unsigned long) size_in_bytes,  //255, //@todo: size in bytes
-				 (char *) file_address,         //arg3,//address
-				 (char) flag );         //,arg4 ); //flag
+	Ret = (int) fsSaveFile ( (char *) file_name,    //name
+	                (unsigned long) file_size,      //3, //@todo: size in sectors 
+				    (unsigned long) size_in_bytes,  //255, //@todo: size in bytes
+				    (char *) file_address,          //arg3,//address
+				    (char) flag );                  //,arg4 ); //flag
 						
 	scheduler_unlock();
 	taskswitch_unlock();

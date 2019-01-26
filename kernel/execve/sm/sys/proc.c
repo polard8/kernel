@@ -1248,12 +1248,9 @@ void procedureMakeTests()
 			printf("erro 1\n");
 			goto done;
 		}
-		
-		//fsLoadFile("INIT    TXT", (unsigned long) stdout->_ptr);
-		
-		fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
-		    "INIT    TXT", 
-			(unsigned long) stdout->_ptr);
+				
+		fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
+		    "INIT    TXT", (unsigned long) stdout->_ptr );
 			
 		printf("%s\n", (const char*) stdout->_ptr);		
 		

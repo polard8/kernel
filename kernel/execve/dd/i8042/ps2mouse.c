@@ -243,15 +243,13 @@ int load_mouse_bmp (){
 	
 	//===================================
 	// MOUSE
-	
-	//fileret = (unsigned long) fsLoadFile( "MOUSE   BMP", 
-	//                            (unsigned long) mouseBMPBuffer );
 								
-	fileret = (unsigned long) fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
+	fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS,
+								VOLUME1_ROOTDIR_ADDRESS, 
 	                            "MOUSE   BMP", 
 	                            (unsigned long) mouseBMPBuffer );
 								  
-	if( fileret != 0 )
+	if ( fileret != 0 )
 	{
 		printf("MOUSE.BMP FAIL\n");		
 		// Escrevendo string na janela.
@@ -263,26 +261,6 @@ int load_mouse_bmp (){
 	//bmpDisplayBMP( mouseBMPBuffer, 20, 20 );
 	//refresh_rectangle( 20, 20, 16, 16 );	
     //===================================							
-	
-	
-	//===================================
-	//DENNIS
-	//fileret = (unsigned long) fsLoadFile( "DENNIS  BMP", 
-	//                              (unsigned long) mouseBMPBuffer );
-								  
-	//if( fileret != 0 )
-	//{
-	//	printf("DENNIS  BMP FAIL\n");		
-		// Escrevendo string na janela.
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "MOUSE.BMP FAIL");
-	//	goto fail;	
-	//};
-	
-	// Render BMP file on backbuffer.
-	//bmpDisplayBMP( mouseBMPBuffer, 0, 0 );
-    //refresh_rectangle( 0, 0, 800, 600 );	
-	//refresh_rectangle( 20, 40, 400, 400 );
-	//===================================
 	
 	
 //refresh_rectangle:

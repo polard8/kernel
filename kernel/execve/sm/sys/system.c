@@ -337,17 +337,16 @@ void *systemRam ( int number,
 			return (void *) CloseChannel( (struct channel_d *) arg1);
 		    break;
 
-		//Load file.
-		//@todo: Isso não pertence a essa categoria, pertence a classe devices.		
-		case 13:
-            //return (void *) fsLoadFile( (unsigned char *) arg1, (unsigned long) arg2);		
-            return (void *) fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
-			                    (unsigned char *) arg1, (unsigned long) arg2);					
+		//Load file.	
+		case 13:	
+            return (void *) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+								VOLUME1_ROOTDIR_ADDRESS, 
+			                    (unsigned char *) arg1, 
+								(unsigned long) arg2);					
             break;
 		
 		//Save file.
         case 14:
-		    //@todo: Isso não pertence a essa categoria, pertence a classe devices.
 		    //return (void *) fsSaveFile( (unsigned char *) arg1, 
 			//                            (unsigned long) arg2, 
 			//							(char *) arg3 

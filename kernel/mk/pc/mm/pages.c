@@ -1,5 +1,5 @@
 /*
- * File: pc\mm\pages.c
+ * File: pc/mm/pages.c
  *
  * Descrição:
  *     Faz a configuração da paginação de memória e oferece rotinas de
@@ -1807,11 +1807,9 @@ fail:
 
 /*
  * testingFrameAlloc:
- *
- * //#importante:
- * //teste de memória é sempre importante.
- * //@todo: Rotina de teste. 
+ *     Rotina de teste. 
  */ 
+
 void testingFrameAlloc (){
 	
 	int Index;
@@ -1853,30 +1851,16 @@ void testingFrameAlloc (){
 	    
 		if ( (void *) pf != NULL )
 		{
-		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", pf->id,
-			    pf->used, pf->magic, pf->free, pf, pf->next ); 	
+		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", 
+				pf->id, pf->used, pf->magic, pf->free, pf, pf->next ); 	
 		}
-		//Nothing.
 	};
 	
 	
     //===================================
-	// @todo: Carregar a estrelinha e usar como ponteiro de mouse.
-	//
-	//janela de test
-    //CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
-	//              (10-5), (10-5), (376+10), (156+10), 
-	//			  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 	
-	
-	
-	
-	//fileret = fsLoadFile( "DENNIS  BMP", (unsigned long) Ret);
-	//fileret = fsLoadFile( "FERRIS  BMP", (unsigned long) Ret);
-	//fileret = fsLoadFile( "GOONIES BMP", (unsigned long) Ret);
-	//fileret = fsLoadFile( "GRAMADO BMP", (unsigned long) Ret);
-	
-	//fileret = fsLoadFile( "BMP1    BMP", (unsigned long) RetAddress);  
-	fileret = fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
+	 
+	fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, 
+			      VOLUME1_ROOTDIR_ADDRESS, 
 	              "BMP1    BMP", 
 				  (unsigned long) RetAddress ); 
 				  
@@ -1889,16 +1873,11 @@ void testingFrameAlloc (){
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
         //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
 		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
-	};
+	}
 	
 	bmpDisplayBMP ( (char *) RetAddress, 20, 20 );
 
     //===================================							
-	
-	//
-	// *importante:
-	//  O REFRESH RECT SÓ FUNCIONA DAS DIMENSÕES NÃO O POSICIONAMENTO.
-	//
 	
 	//Isso funcionou ...
 	refresh_rectangle( 20, 20, 16, 16 );

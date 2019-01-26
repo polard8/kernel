@@ -930,13 +930,10 @@ load_directory ( unsigned long address,
 //O endereço do diretório será passado via argumento.
 
 unsigned long 
-fsLoadFile( unsigned long dir_address,
-            unsigned char *file_name, 
-            unsigned long file_address ); 
-			
-//unsigned long 
-//fsLoadFile( unsigned char *file_name, 
-//            unsigned long file_address ); 
+fsLoadFile ( unsigned long fat_address,
+			 unsigned long dir_address,
+             unsigned char *file_name, 
+             unsigned long file_address );
 
 		
 //get file size.

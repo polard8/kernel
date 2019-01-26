@@ -1,5 +1,5 @@
 /*
- * File: fs\read.c 
+ * File: fs/read.c 
  *
  * Descrição:
  *     Rotinas de leitura
@@ -93,8 +93,7 @@ void read_fntos ( char *name ){
         *name++ = ext[i];
 
     *name = '\0';
- 
-};
+}
 	
 	
 /*
@@ -152,14 +151,10 @@ fatLoadCluster ( unsigned long sector,
  *****************************************************************
  * read_lba:
  *     Carrega um um setor na memória, dado o LBA.
- *     fsReadLBA(..)
  *     Obs: Talvez essa rotina tenha que ter algum retorno no caso de falhas.
  */
-//void read_fat_lba( unsigned long address, unsigned long lba)
  
 void read_lba ( unsigned long address, unsigned long lba ){
-	
-    //Obs: 'fatbits' é uma variável global??
 	
  	//taskswitch_lock();
 	//scheduler_lock();	          	
@@ -192,7 +187,7 @@ void read_lba ( unsigned long address, unsigned long lba ){
 	
 	//scheduler_unlock();
 	//taskswitch_unlock();
-};
+}
 
 
 /*
@@ -218,20 +213,15 @@ void read_lba ( unsigned long address, unsigned long lba ){
  * procurar pelo nome indicado.
  * #bugbug: No momento estamos apenas procurando no diretório raiz, 
  * então devemos substituir o ponteiro *root por *current_dir.
+ * IN:
+ *     Endereço do diretório, 
+ *     Nome do arquivo, 
+ *     Endereço do arquivo.
  */
-//int fsLoadFile( const char *name, unsigned long address ) 
 
-//unsigned long 
-//fsLoadFile ( unsigned char *file_name, 
-//             unsigned long file_address )
-	
-//IN:
-//endereço do diretório, 
-//nome do arquivo, 
-//endereço do arquivo.
-	
 unsigned long 
-fsLoadFile ( unsigned long dir_address,
+fsLoadFile ( unsigned long fat_address,
+			 unsigned long dir_address,
              unsigned char *file_name, 
              unsigned long file_address )			 
 {
@@ -239,43 +229,23 @@ fsLoadFile ( unsigned long dir_address,
 	int i;
     unsigned short next;
 
-	
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
 	char NameX[13];	           //??Nome. 
 
-	// #importante:
-	// Poderíamos usar malloc ou alocador de páginas ??	
-    // A FAT permanece a mesma para a situaçãod e termos apenas uma partição.
-	//mas se tivermos mai de uma partição também precisamos carregar a FAT 
-	//da partição atual.
-	
-	unsigned short *fat = (unsigned short *) VOLUME1_FAT_ADDRESS;
-	//unsigned short *fat = (unsigned short *) CurrentFAT->address;
-	
 	unsigned short cluster;    //Cluster inicial
 
-    //??	
-	unsigned long S;  //Primeiro setor do cluster.
-	int Spc;
-
-	// #importante:
-	// Poderíamos usar malloc ou alocador de páginas ??
-	// #todo: Devemos carregar o diretório atual.
-    
-	//#todo: trocar esse nome por 'dir'
-	unsigned short *root = (unsigned short *) dir_address;
-	//unsigned short *root = (unsigned short *) VOLUME1_ROOTDIR_ADDRESS;
-    //unsigned short *root = (unsigned short *) CurrentDir->address;
+	//?? Primeiro setor do cluster.
+	unsigned long S;  
 	
-	// #todo: Devemos carregar o diretório atual.
-	//unsigned long current_dir_address = (unsigned long) Newpage();
-    //#todo: devemos checar se o endereço é válido.
-	//unsigned short *current_dir = (unsigned short *) current_dir_address;	
-	// #todo: devemos chamar uma função que carregue um diretório no endereço passado 
-	//via argumento.
-    //...
+	int Spc;
+	
+	// Updating fat address and root address.
+	
+	unsigned short *fat = (unsigned short *) fat_address;   
+	unsigned short *root = (unsigned short *) dir_address;
+	
 	
 	// Lock ??.
 	

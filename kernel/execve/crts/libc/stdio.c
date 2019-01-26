@@ -131,23 +131,19 @@ FILE *fopen ( const char *filename, const char *mode ){
 	stream->_tmpfname = (char *) filename;	
 	
 	// Loading file.
-//loadingFile:
-
-	//fileret = fsLoadFile ( (unsigned char *) stream->_tmpfname, 
-	//            (unsigned long) stream->_base );
 				
-    fileret = fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
-	            (unsigned char *) stream->_tmpfname, 
-	            (unsigned long) stream->_base );				
+    fileret = fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+			      VOLUME1_ROOTDIR_ADDRESS, 
+	              (unsigned char *) stream->_tmpfname, 
+	              (unsigned long) stream->_base );				
 	
 	if ( fileret != 0 )
 	{	
 		printf("fopen: fsLoadFile fail\n");
 		
-		stream = NULL;
-		
+		stream = NULL;	
 		return NULL;
-	};
+	}
 	
 	//...
 

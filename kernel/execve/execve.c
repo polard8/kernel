@@ -153,21 +153,18 @@ executive_gramado_core_init_execve ( int i,
 	
 	read_fntos ( (char *) arg1 );
 		
-    Status = (int) fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
+    Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
+					   VOLUME1_ROOTDIR_ADDRESS, 
 	                   (unsigned char *) arg1, 
 	                   (unsigned long) 0x00400000 );
-					
-    //Status = (int) fsLoadFile ( (unsigned char *) arg1, 
-	//                (unsigned long) 0x00400000 );					
+
 
 	// Se não conseguimos carregar o arquivo, devemos abortar.
 	if ( Status == 1 )
-	{
-			
-		//printf("executive_gramado_core_init_execve: Status\n");
+	{		
 		printf("executive_gramado_core_init_execve: ERROR. Can't load file\n");
 		goto fail;
-	};	
+	}
 	
 	//Ok
 	//O comando existe e o arquivo foi carregado.
@@ -684,10 +681,9 @@ executive_gramado_core_init_execve_exe ( int i,
         // Vamos transformar 'file.txt' em "FILE    BIN". 		
 		
 		read_fntos ( (char *) arg1 );
-		
-		//Status = (int) fsLoadFile ( (unsigned char *) arg1,  (unsigned long) 0x00400C00 );  
 		 
-        Status = (int) fsLoadFile ( VOLUME1_ROOTDIR_ADDRESS, 
+        Status = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS,  
+						   VOLUME1_ROOTDIR_ADDRESS, 
 		                   (unsigned char *) arg1,  
 						   (unsigned long) 0x00400C00 );
 		
@@ -696,8 +692,7 @@ executive_gramado_core_init_execve_exe ( int i,
 		{
 			// @todo:
 			// Configurar estrutura.
-			
-			//printf("executive_gramado_core_init_execve: Status\n");
+
 			printf("executive_gramado_core_init_execve: ERROR. Can't load file\n");
 			goto fail;
 		};
