@@ -72,56 +72,28 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	
 	unsigned long phy_address;
 	
-	//#bugbug
-	//Primeiro devemos sondar os dispositivos PCI, caso encontrarmos 
-	//o nic da Intel, então chamamos essa rotina para inicializálo,
-	//passando as informações via argumento.
  
     //#debug
 	//printf("\n");
 	//printf("e1000_init_nic: Probing PCI..\n");
-	
+	printf("e1000_init_nic:\n");	
 	debug_print("e1000_init_nic:\n");
 	
-	// #test 
-	// Encontrar placa de rede.
-	
-	/*
-	data = (uint32_t) diskPCIScanDevice (PCI_CLASSCODE_NETWORK);
-	
-	if ( data == -1 )
-	{
-		printf("init_nic: Controller not found\n");
-		//refresh_screen();
-		
-		return (int) 1;
-	
-	} else {
-	    
-		bus = ( data >> 8 & 0xff );
-        dev = ( data >> 3 & 31 );
-        fun = ( data & 7 );
-	};
-
-	*/
-	
+	// #pci	
 	// # get info
-	// #pci
 	// Pegaremos mais informações e colocaremos na estrutura de 
 	// dispositivo pci.
-	
-	printf("e1000_init_nic:\n");
-	
-	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
-	
-	unsigned short Vendor = (unsigned short) (data & 0xffff);
-	unsigned short Device = (unsigned short) (data >> 16 & 0xffff);	
-	
+
 	//#importante
 	//devemos falhar antes de alocarmos memória para a estrutura.
 	
 	// 8086:100e
 	// 82540EM Gigabit Ethernet Controller
+	
+	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
+	
+	unsigned short Vendor = (unsigned short) (data & 0xffff);
+	unsigned short Device = (unsigned short) (data >> 16 & 0xffff);	
 	
     if ( Vendor != 0x8086 || Device != 0x100E )	
 	{
@@ -132,13 +104,9 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	printf("Vendor=%x \n", (data       & 0xffff) );
 	printf("Device=%x \n", (data >> 16 & 0xffff) );
 
-		
 	
-	//#importante
-	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.
-	
-	//struct pci_device_d *pci_device;
-	//pci_device = (void *) malloc ( sizeof( struct pci_device_d  ) );
+	//pci device struct
+	//passado via argumento. 
 	
 	if ( (void *) pci_device ==  NULL )
     {
@@ -186,10 +154,8 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x20 );
 		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x24 );
 		
-	    //
+		
 	    // ## IRQ ##
-	    //
-
 	    pci_device->irq_line = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );   //irq
 	    pci_device->irq_pin = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D );    //letras	
 		
@@ -216,35 +182,10 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	unsigned char *base_address = (unsigned char *) virt_address;
 	unsigned long *base_address32 = (unsigned long *) virt_address;
 
-	//se for 0 temos que pegar de outro jeito.
-	//if ( base_address[0x5400 + 0] == 0 &&
-	//     base_address[0x5400 + 1] == 0 &&
-	//	 base_address[0x5400 + 2] == 0 &&
-    //     base_address[0x5400 + 3] == 0 &&
-    //     base_address[0x5400 + 4] == 0 &&
-    //     base_address[0x5400 + 5] == 0  )
-	//{
-		//pegar em outro lugar.	 
-	//}  		 
 	
-	//ok, os endereços estão certos.
+	// #debug
 	//printf("phy_address = %x\n", phy_address );
-	//printf("virt_address = %x\n", virt_address );
-	
-	//int z;
-	
-	//for( z=0; z<50; z++ )
-	//{
-	//    printf("%x \n",base_address32[z]);		
-	//}
-	
-	//printf("%x ",base_address32[0]);
-	//printf("%x ",base_address32[0]);
-	//printf("%x ",base_address32[0]);
-	//printf("%x ",base_address32[0]);
-	//printf("%x ",base_address32[0]);
-	//printf("%x ",base_address32[0]);
-		
+	//printf("virt_address = %x\n", virt_address );		
 	//refresh_screen();
 	//while(1){}
 	
@@ -380,8 +321,8 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	
 	printf("done\n");
 		
-    return (int) 0;	
-};
+    return 0;	
+}
 
 
 
@@ -410,6 +351,10 @@ void xxxe1000handler (){
 	
 	//intel.h
 	e1000_irq_count++;
+	
+	
+	printf("xxxe1000handler: #debug e1000\n");
+	refresh_screen();	
 	
 	// Without this, the card may spam interrupts...
 	E1000WriteCommand( currentNIC, 0xD0, 1);		
@@ -594,6 +539,9 @@ uint8_t nic_idt_entry_new_number;
 uint32_t nic_idt_entry_new_address;
 
 void e1000_setup_irq (){
+	
+	
+	debug_print("e1000_setup_irq\n");
 
     //Essa é a rotina em assembly que cria uma entrada na idt para 
     //o nic, com base nas variáveis que são importadas pelo assembly.
@@ -632,6 +580,9 @@ void e1000_setup_irq (){
 int e1000_reset_controller (){
 	
 	int i=0;
+	
+	
+	debug_print("e1000_reset_controller\n");
 	
 	//unsigned long tmp;
 	

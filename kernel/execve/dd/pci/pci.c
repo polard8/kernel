@@ -1380,16 +1380,25 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 			 //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
 								
 		     //printf("82540EM Gigabit Ethernet Controller found\n");
-		     Status = (int) e1000_init_nic ( (unsigned char) D->bus, (unsigned char) D->dev, (unsigned char) D->func , (struct pci_device_d *) D );
+		     Status = (int) e1000_init_nic ( (unsigned char) D->bus, 
+							   (unsigned char) D->dev, 
+							   (unsigned char) D->func, 
+							   (struct pci_device_d *) D );
+			
 			 if (Status == 0)
 			 {
-			      printf("8086:100e initialized\n");
-			      e1000_setup_irq();
-			      e1000_reset_controller();
-			      printf("8086:100e done\n");
+			      //# irq and reset.
+				 
+				  //printf("8086:100e initialized\n");
+			      
+				  e1000_setup_irq();
+				  e1000_reset_controller();
+			      
+				  //printf("8086:100e done\n");
 				  //printf("#debug breakpoint");
 				  //refresh_screen();
 				  //while(1){} 
+				 
 		     }else{
 			      //printf("."); 
 		    }
