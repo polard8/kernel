@@ -1,5 +1,5 @@
 /*
- * File: nic.h
+ * File: intel.h
  *
  * Descrição:
  *     Header para driver de adaptador de rede.
@@ -301,6 +301,8 @@ unsigned long nicList[8];
 
 int e1000_interrupt_flag;
 
+int e1000_irq_count;
+
 //
 // ## prototypes ##
 //
@@ -311,13 +313,12 @@ void
 PCIRegisterIRQHandler ( uint16_t bus, 
                         uint8_t slot, 
 						uint8_t func, 
-						unsigned long handler,   //#bugbug modificamos o tipo. 
-						void *priv ); //estrutura
+						unsigned long handler,   
+						void *priv ); 
 
  
 
-int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun );
-//int e1000_init_nic ();
+int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, struct pci_device_d *pci_device );
 
 void e1000_setup_irq();
 int e1000_reset_controller(); 

@@ -45,16 +45,16 @@ techniques:
 //irq
 void 
 PCIRegisterIRQHandler ( uint16_t bus, 
-                        uint8_t slot, 
+						uint8_t slot, 
 						uint8_t func, 
-						unsigned long handler,   //#bugbug modificamos o tipo. 
-						void *priv ) //estrutura 
+						unsigned long handler,
+						void *priv ) 
 {
 	
 	//#debug 
 	printf("intel-PCIRegisterIRQHandler:");
 	refresh_screen();
-	while(1){}																			
+	while(1){}	
 };
 
 
@@ -65,10 +65,12 @@ PCIRegisterIRQHandler ( uint16_t bus,
  *     Inicializando o controlador NIC da Intel.
  */
 
-int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
+int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, struct pci_device_d *pci_device ){
 	
 	//pci info.    
 	uint32_t data;
+	
+	unsigned long phy_address;
 	
 	//#bugbug
 	//Primeiro devemos sondar os dispositivos PCI, caso encontrarmos 
@@ -135,15 +137,15 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	//#importante
 	//PRECISAMOS SALVAR ESSE PORTEIRO GLOBALMENTE.
 	
-	struct pci_device_d *pci_device;
-	
-	pci_device = (void *) malloc ( sizeof( struct pci_device_d  ) );
+	//struct pci_device_d *pci_device;
+	//pci_device = (void *) malloc ( sizeof( struct pci_device_d  ) );
 	
 	if ( (void *) pci_device ==  NULL )
     {
 		
-		printf("init_nic: pci_device struct\n");
-		return (int) -1;
+		printf("init_nic: #debug pci_device struct\n");
+		die ();
+		//return (int) -1;
 	
 	}else{
 		
@@ -184,30 +186,28 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x20 );
 		pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( bus, dev, fun, 0x24 );
 		
-		//#todo:
-		//Temos que pegar o número da interrupção.
+	    //
+	    // ## IRQ ##
+	    //
+
+	    pci_device->irq_line = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );   //irq
+	    pci_device->irq_pin = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D );    //letras	
+		
+		
+        // ##importante:
+	    // Grab the Base I/O Address of the device
+	    // Aqui nós pegamos o endereço dos registadores na BAR0,
+        // Então mapeamos esse endereço físico para termos um endereço virtual 
+	    // para manipularmos os registradores. 	
+	
+	    phy_address = (pci_device->BAR0 & 0xFFFFFFF0);
 		
 		//...
-	};
+	}
 	
-	
-	//
-	// ## IRQ ##
-	//
-
-	pci_device->irq_line = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );   //irq
-	pci_device->irq_pin = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D );    //letras	
 	//
 	// ## Base address ##
 	//
-	
-    // ##importante:
-	// Grab the Base I/O Address of the device
-	// Aqui nós pegamos o endereço dos registadores na BAR0,
-    // Então mapeamos esse endereço físico para termos um endereço virtual 
-	// para manipularmos os registradores. 	
-	
-	unsigned long phy_address = (pci_device->BAR0 & 0xFFFFFFF0);
 	
 	//mapeando para obter o endereço virtual que o kernel pode manipular.
 	unsigned long virt_address = mapping_nic0_device_address ( phy_address );
@@ -390,6 +390,7 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun ){
  * xxxe1000handler:
  *     e1000 handler :)
  */
+
  
 void xxxe1000handler (){
 		
@@ -404,8 +405,11 @@ void xxxe1000handler (){
 	// Essa flag precisa ser acionada para a rotina funcionar.
 	// F6 tem acionado essa flag.
 	
-	if ( e1000_interrupt_flag != 1 )
-		return;	
+	//if ( e1000_interrupt_flag != 1 )
+	//	return;	
+	
+	//intel.h
+	e1000_irq_count++;
 	
 	// Without this, the card may spam interrupts...
 	E1000WriteCommand( currentNIC, 0xD0, 1);		

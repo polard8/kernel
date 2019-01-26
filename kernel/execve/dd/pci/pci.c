@@ -1276,11 +1276,6 @@ int pciInfo (){
 		};
 	};
 	
-	//Nothing.
-	
-//Done.	
-//done:
-	
 	printf("done\n");
 	return (int) 0; 
 }
@@ -1306,7 +1301,9 @@ int pciShowDeviceInfo(int number)
 	if( (void *) D != NULL )
 	{
 		if(D->deviceMagic == 1234){
-			printf("Vendor={%x} Device={%x} ClassCode={%x} IntLine={%x} \n",D->Vendor, D->Device, D->classCode, D->irq_line);
+			
+			printf ("Vendor={%x} Device={%x} ClassCode={%x} IntLine={%x} \n",
+			    D->Vendor, D->Device, D->classCode, D->irq_line );
 		}
 	}
 	//Nothing
@@ -1316,8 +1313,10 @@ int pciShowDeviceInfo(int number)
 
 
 /*
+ ********************************
  * pciHandleDevice
- *    Registra um dispositivo encontrado na sondagem. mas n~ao inicializa.
+ *    Registra um dispositivo encontrado na sondagem. 
+ *    Inicializa em alguns casos.
  */
 
 int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
@@ -1363,16 +1362,25 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 		printf("$ vendor=%x device=%x \n",D->Vendor, D->Device);
 		
 		
+		D->classCode = (unsigned char) pciGetClassCode(bus, dev);
+		D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
+					
+		D->irq_line = (unsigned char) pciGetInterruptLine(bus, dev);
+		D->irq_pin = (unsigned char) pciGetInterruptPin(bus, dev);
+					
+			
+		D->next = NULL;   //Next device.
+		
 		
 		//Nic intel
-		if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) )	
+		if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) && (D->classCode == PCI_CLASSCODE_NETWORK) )	
 		{
 			debug_print("0x8086:0x100E found \n");
 		     
 			 //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
 								
 		     //printf("82540EM Gigabit Ethernet Controller found\n");
-		     Status = (int) e1000_init_nic ( (unsigned char) D->bus, (unsigned char) D->dev, (unsigned char) D->func );
+		     Status = (int) e1000_init_nic ( (unsigned char) D->bus, (unsigned char) D->dev, (unsigned char) D->func , (struct pci_device_d *) D );
 			 if (Status == 0)
 			 {
 			      printf("8086:100e initialized\n");
@@ -1383,20 +1391,9 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 				  //refresh_screen();
 				  //while(1){} 
 		     }else{
-			      printf("."); 
+			      //printf("."); 
 		    }
-	    }
-		
-		
-		D->classCode = (unsigned char) pciGetClassCode(bus, dev);
-		D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
-					
-		D->irq_line = (unsigned char) pciGetInterruptLine(bus, dev);
-		D->irq_pin = (unsigned char) pciGetInterruptPin(bus, dev);
-					
-			
-		D->next = NULL;   //Next device.
-		
+	    }		
 		
 		//Colocar a estrutura na lista.		
 					
