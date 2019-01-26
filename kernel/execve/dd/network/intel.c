@@ -346,15 +346,15 @@ void xxxe1000handler (){
 	// Essa flag precisa ser acionada para a rotina funcionar.
 	// F6 tem acionado essa flag.
 	
-	//if ( e1000_interrupt_flag != 1 )
-	//	return;	
+	if ( e1000_interrupt_flag != 1 )
+		return;	
 	
 	//intel.h
 	e1000_irq_count++;
 	
 	
-	printf("xxxe1000handler: #debug e1000\n");
-	refresh_screen();	
+	//printf("xxxe1000handler: #debug e1000\n");
+	//refresh_screen();	
 	
 	// Without this, the card may spam interrupts...
 	E1000WriteCommand( currentNIC, 0xD0, 1);		
@@ -437,8 +437,8 @@ void xxxe1000handler (){
 	//
 	
 	
-	printf("+");
-	refresh_screen();
+	//printf("+");
+	//refresh_screen();
 	
 	uint16_t type = FromNetByteOrder16(eh->type);
 	
@@ -545,6 +545,7 @@ void e1000_setup_irq (){
 
     //Essa é a rotina em assembly que cria uma entrada na idt para 
     //o nic, com base nas variáveis que são importadas pelo assembly.
+	//headlib.s
 	
 	extern void asm_nic_create_new_idt_entry();
 	

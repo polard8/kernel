@@ -472,23 +472,22 @@ setup_vectors:
 ;;#bugbug: isso está em intel.c , mas precisa ser global para que todos 
 ;;possam usar.
 ;;talvez em kernel.h
+
 extern _nic_idt_entry_new_number
 extern _nic_idt_entry_new_address
 
+;isso funcionou, tentar configurar outras interupções com isso.
 
 global _asm_nic_create_new_idt_entry
 _asm_nic_create_new_idt_entry:
 	pushad
 	
-	;isso funcionou, tentar configurar outras interupções com isso.
 	
 	mov eax, _nic_handler
-	;mov eax, dword [_nic_idt_entry_new_address] ; 
-	mov ebx, dword [_nic_idt_entry_new_number]	
+	;mov eax, dword [_nic_idt_entry_new_address]
 	
-	;deletar
-	;mov eax, dword _irq9 ;[_idt_entry_new_address] ; 
-	;mov ebx, dword 41; [_idt_entry_new_number] 
+	mov ebx, dword [_nic_idt_entry_new_number]	
+	;mov ebx, dword 41	
 
 	call _setup_idt_vector	
     
@@ -497,6 +496,7 @@ _asm_nic_create_new_idt_entry:
 	
 ;;===============================================	
 extern _xxxe1000handler
+;;extern _PCIRegisterIRQHandler
 
 global _nic_handler	
 _nic_handler:

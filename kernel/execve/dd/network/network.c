@@ -351,28 +351,30 @@ void testNIC()
 {
 	
 	//printf("\n\ntestNIC:\n\n"); 
+	
+	printf("testNIC: Setup flag \n");
 	printf("testNIC: Sending arp request \n");
-    
-	//printf("mostra pci info apenas:\n\n");
+
+	printf ("\n\n #debug: e1000_irq_count=%d \n\n",e1000_irq_count);
 	
-	
+		
 	//testando apens o send 
 	
-	//e1000_interrupt_flag = 1;	
+	e1000_interrupt_flag = 1;	
 	
 	testSend();	
 	
-	printf ("\n\n #debug: e1000_irq_count=%d \n\n",e1000_irq_count);
+
 	
 	
 	//se tivermos informações para mostrar é sinal que a inicialização do kernel 
 	//funcionou. 
 	
 	//printf("\n\n");
-	show_current_nic_info ();
+	//show_current_nic_info ();
 	
-	printf("\n\n");
-	pciInfo ();
+	//printf("\n\n");
+	//pciInfo ();
 	
 	printf("testNIC: Done\n");
 	refresh_screen();

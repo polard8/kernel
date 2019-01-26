@@ -1319,16 +1319,15 @@ int pciShowDeviceInfo(int number)
  *    Inicializa em alguns casos.
  */
 
-int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
-{
+int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
     
 	//ok
 	printf("bus=%d dev=%d fun=%d \n", bus, dev, fun);
 
 	int Status = -1;
 	
-	struct pci_device_d *D;   //Device. 
-	//struct pci_driver_d *Dr;  //Driver.
+	//Device.
+	struct pci_device_d *D;    
 	
     D = (void *) malloc ( sizeof( struct pci_device_d  ) );
     
@@ -1340,6 +1339,10 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 	
 	}else{
 			
+		//Object support.
+		D->objectType = ObjectTypePciDevice;
+		D->objectClass = ObjectClassKernelObjects;
+		
 		//Identificador.
 		D->deviceId = (int) pciListOffset;
 		D->deviceUsed = (int) 1;
@@ -1350,10 +1353,6 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 		D->bus = (unsigned char) bus;
 		D->dev = (unsigned char) dev;
 		D->func = (unsigned char) fun; 
-					
-		//Object support.
-		D->objectType = ObjectTypePciDevice;
-		D->objectClass = ObjectClassKernelObjects;
 					
 		//Pci Header.
 		D->Vendor = (unsigned short) pciCheckVendor (bus, dev);	
@@ -1375,11 +1374,10 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 		//Nic intel
 		if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) && (D->classCode == PCI_CLASSCODE_NETWORK) )	
 		{
-			debug_print("0x8086:0x100E found \n");
-		     
-			 //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
-								
+			 debug_print("0x8086:0x100E found \n"); 
+			 //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );						
 		     //printf("82540EM Gigabit Ethernet Controller found\n");
+			
 		     Status = (int) e1000_init_nic ( (unsigned char) D->bus, 
 							   (unsigned char) D->dev, 
 							   (unsigned char) D->func, 
@@ -1400,7 +1398,8 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun )
 				  //while(1){} 
 				 
 		     }else{
-			      //printf("."); 
+			      printf("pciHandleDevice: #debug NIC");
+				  die();
 		    }
 	    }		
 		
