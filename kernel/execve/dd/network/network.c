@@ -391,7 +391,18 @@ void testNIC()
 	SendARP ( source_ip_address, target_ip_address, target_mac_address );
 	
 
+	//==============================================
+	// ## data ##
+	//		
+                
+	char xxxdata[32];			       	
+    xxxdata[0] = 1;
+	xxxdata[1] = 2;
+	xxxdata[2] = 3;
+	xxxdata[3] = 4;	
 	
+	//#todo: testar isso;
+	SendIPV4 ( source_ip_address, target_ip_address, target_mac_address, xxxdata );
 	
 	//se tivermos informações para mostrar é sinal que a inicialização do kernel 
 	//funcionou. 
@@ -407,6 +418,171 @@ void testNIC()
 }
 
 
+void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6], uint8_t data[32] ){
+	
+	
+	int i=0;
+	struct ether_header *eh;
+	struct  ether_arp *h;
+	
+	if ( currentNIC == NULL )
+	{
+		printf ("SendIPV4: currentNIC\n");
+		return;		
+	}
+	
+	//configurando a estrutura do dispositivo,
+
+	currentNIC->ip_address[0] = source_ip[0];  //192;
+	currentNIC->ip_address[1] = source_ip[1];  //168;
+	currentNIC->ip_address[2] = source_ip[2];  //1;    	
+	currentNIC->ip_address[3] = source_ip[3];  //112;  	
+	
+	
+	//
+	// ====================== ## ETH HEADER ## ====================
+	//
+	
+	eh = (void *) malloc ( sizeof(struct ether_header ) );
+	
+	if ( (void*) eh == NULL)
+	{
+		printf("struct eh fail");
+		die();
+	}
+	
+	for( i=0; i<6; i++)
+	{
+		eh->src[i] = currentNIC->mac_address[i];    //source ok
+		eh->dst[i] = target_mac[i];                 //dest. (broadcast)	
+	}	
+	
+	eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
+	
+	
+	
+    //==============================================
+	// ## ipv4 ##
+	//
+	
+	struct ipv4_header_d *ipv4;
+	
+	ipv4 = (void *) malloc ( sizeof(struct ipv4_header_d) );
+	
+	if( (void *) ipv4 == NULL)
+	{
+		printf(": ipv4 fail");
+		die();
+	}else{
+
+        // IPv4 common header
+	    ipv4->Version_IHL = 0x45;
+	    ipv4->DSCP_ECN = 0x00;
+	    ipv4->Identification = 0x0100; //??
+	    ipv4->Flags_FragmentOffset = 0x0000;
+	    ipv4->TimeToLive = 0x40;
+	    
+		//default protocol: UDP
+ 	    //#define IPV4_PROT_UDP 0x11
+		ipv4->Protocol = 0x11; //IPV4_PROT_UDP;
+ 	    
+		memcpy ( (void*) &ipv4->SourceIPAddress[0],      (const void *) &source_ip[0], 4);
+	    memcpy ( (void*) &ipv4->DestinationIPAddress[0], (const void *) &target_ip[0], 4);    	
+	};
+
+
+	//==============================================
+	// ## udp ##
+	//
+	
+	struct udp_header_d *udp;
+	
+	udp = (void *) malloc ( sizeof(struct udp_header_d) );
+	if( (void *) udp == NULL)
+	{
+		printf(": udp fail");
+		die();
+	}else{
+    
+	    udp->SourcePort = 0;   
+        udp->DestinationPort = 0;
+        udp->Length = 0;
+        udp->Checksum = 0; 		
+    };
+	
+	
+	
+	
+	// ## quem ? ##
+	uint16_t old = currentNIC->tx_cur;
+	
+
+	// ## Copiando o pacote no buffer ##
+	
+	//pegando o endereço virtual do buffer na estrutura do dispositivo.	
+	unsigned char *buffer = (unsigned char *) currentNIC->tx_descs_virt[old];	
+		
+	unsigned char *src_ethernet = (unsigned char *) eh; 
+	unsigned char *src_ipv4 = (unsigned char *) ipv4; 
+	unsigned char *src_udp = (unsigned char *) udp; 
+	
+	
+	int j=0;
+	
+        //copia o header ethernet
+		for ( j=0; j<ETHERNET_HEADER_LENGHT; j++ )
+		{
+			buffer[j] = src_ethernet[j];
+		}
+		
+		//copia o ipv4
+		for ( j=0; j<IPV4_HEADER_LENGHT; j++ )
+		{
+			buffer[j + ETHERNET_HEADER_LENGHT] = src_ipv4[j];
+		}
+
+		//copia o udp
+		for ( j=0; j<UDP_HEADER_LENGHT; j++ )
+		{
+			buffer[j + ETHERNET_HEADER_LENGHT +IPV4_HEADER_LENGHT] = src_udp[j];
+		}
+		
+		//copia o xxxdata
+		for ( j=0; j<32; j++ )
+		{
+			buffer[j + ETHERNET_HEADER_LENGHT +IPV4_HEADER_LENGHT + UDP_HEADER_LENGHT] = data[j];
+		}		
+	
+	
+	
+	//len;
+	currentNIC->legacy_tx_descs[old].length = (ETHERNET_HEADER_LENGHT + IPV4_HEADER_LENGHT + UDP_HEADER_LENGHT + 32);		
+	
+	
+	currentNIC->legacy_tx_descs[old].cmd = 0x1B;
+	currentNIC->legacy_tx_descs[old].status = 0;	
+	
+	currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
+	
+	
+	*( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = currentNIC->tx_cur;	
+	
+	
+	//#debug
+	printf("sending ipv4 (while)\n");
+	refresh_screen();	
+	
+	//checamos o status do old pra ver se ele foi enviado.
+	//fica travado aqui até que seja envidao.
+	//poderia ter um timemout??.
+	while ( !(currentNIC->legacy_tx_descs[old].status & 0xFF) )
+	{
+		//nothing
+	}
+	
+}
+	
+	
 void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] ){
 	
 	int i=0;
