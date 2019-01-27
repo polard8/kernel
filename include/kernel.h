@@ -349,6 +349,10 @@ extern void do_executa_new_task();
 #include <kernel/gramado/execve/sm/init.h>
 
 #include <kernel/gramado/execve/dd/network/host.h>        //host info.
+
+#include <kernel/gramado/execve/dd/network/ethernet.h>
+#include <kernel/gramado/execve/dd/network/arp.h>
+
 #include <kernel/gramado/execve/dd/network/intel.h>       //intel nic - network interface controller.
 #include <kernel/gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
 #include <kernel/gramado/execve/dd/network/socket.h>      //(network) Sockets info. (sw)
