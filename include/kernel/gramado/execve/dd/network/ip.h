@@ -38,6 +38,8 @@ ARP NDP OSPF túneis... L2TP PPP MAC Ethernet DSL RDIS FDDI outros...
 
 
 
+// IPv4 header length
+#define IPV4_HEADER_LENGHT 20      
 
 //#define ETHERTYPE_IPv4 0x0800
 //#define ETHERTYPE_IPv6 0x86DD

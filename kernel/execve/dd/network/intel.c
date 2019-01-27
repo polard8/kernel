@@ -998,64 +998,40 @@ void NetSendEthPacket ( PNetworkDevice dev,
 */
 
 
-//==============================================================
-// ## testSend() ##
-//
+/*
+ ****************************************
+ * SendARP
+ *
+ */
 
-//void testSend()	
-void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] )
-{
+void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] ){
 	
 	int i=0;
-
-	
-	//char source_ip_address[4];
-	//source_ip_address[0] = 192;
-	//source_ip_address[1] = 168;
-	//source_ip_address[2] = 1;   
-	//source_ip_address[3] = 112; 
-
-	//char target_ip_address[4];
-	//target_ip_address[0] = 192;
-	//target_ip_address[1] = 168;
-	//target_ip_address[2] = 1;     
-	//target_ip_address[3] = 111;   
-	
-	//char target_mac_address[6];
-	//target_mac_address[0] = 0xFF;
-	//target_mac_address[1] = 0xFF;
-	//target_mac_address[2] = 0xFF;
-	//target_mac_address[3] = 0xFF;
-	//target_mac_address[4] = 0xFF;
-	//target_mac_address[5] = 0xFF;	
+	struct ether_header *eh;
+	struct  ether_arp *h;
 	
 	
 	if ( currentNIC == NULL )
-		return;
+	{
+		printf ("SendARP: currentNIC\n");
+		return;		
+	}
+
 	
-	
-	//fake source ip address
 	//configurando a estrutura do dispositivo,
-	//usaremos isso pois não temos nenhum outro valor.
-	currentNIC->ip_address[0] = source_ip[0]; //192;
-	currentNIC->ip_address[1] = source_ip[1]; //168;
-	currentNIC->ip_address[2] = source_ip[2]; //1;    	
-	currentNIC->ip_address[3] = source_ip[3]; //112;  			
 
+	currentNIC->ip_address[0] = source_ip[0];  //192;
+	currentNIC->ip_address[1] = source_ip[1];  //168;
+	currentNIC->ip_address[2] = source_ip[2];  //1;    	
+	currentNIC->ip_address[3] = source_ip[3];  //112;  			
 
-	
-	//printf("testSend: testing send stuff ...\n");
-	//refresh_screen();
-	
-	
 	//
-	// ## ETH HEADER ## =============================
+	// ====================== ## ETH HEADER ## ====================
 	//
 	
-	struct ether_header *eh;
+	eh = (void *) malloc ( sizeof(struct ether_header ) );
 	
-	eh =  (void *) malloc ( sizeof(struct ether_header ) );
-	if( (void*) eh == NULL)
+	if ( (void*) eh == NULL)
 	{
 		printf("struct eh fail");
 		die();
@@ -1069,19 +1045,27 @@ void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6]
 	
 	eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
 
-    //show ethernet header
-	//printf("\n\n");
-	//printf("[ethernet header]\n\n");
+    
 	
-	//printf("src: ");
-    //for( i=0; i<6; i++)
-	//	printf("%x ",eh->src[i]);
+	//==================================
+	//#debug
+	//show ethernet header
+	/*
+	printf("\n\n");
+	printf("[ethernet header]\n\n");
 	
-	//printf("dst: ");
-    //for( i=0; i<6; i++)
-	//	printf("%x ",eh->dst[i]);
+	printf("src: ");
+    for( i=0; i<6; i++)
+		printf("%x ",eh->src[i]);
 	
-	//printf("type={%x} ",eh->type);
+	printf("dst: ");
+    for( i=0; i<6; i++)
+		printf("%x ",eh->dst[i]);
+	
+	printf("type={%x} ",eh->type);
+	*/
+	//==================================
+	
 	
 	//#debug
 	//printf("debug *hang");
@@ -1089,11 +1073,16 @@ void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6]
 	//while(1){}
 	
 	//
-	// ## ARP ## ==========================
+	// ==================== ## ARP ## ==========================
 	//
-	
-	struct  ether_arp *h;
+
 	h = (void *) malloc ( sizeof(struct  ether_arp) );
+	
+	if ( (void*) h == NULL)
+	{
+		printf("struct h fail");
+		die();
+	}
 	
     //Hardware type (HTYPE)
 	h->type = 0x0100; // (00 01)
@@ -1126,92 +1115,72 @@ void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6]
 		h->arp_tpa[i] = target_ip[i];    //target ip
 	}		
 	
+	//==================================
+	//#debug
     //show arp
-	//printf("\n\n");
-	//printf("[arp]\n\n");
-	//printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
-	//    h->type ,h->proto ,h->hlen ,h->plen ,h->op);
+	/*
+	printf("\n\n");
+	printf("[arp]\n\n");
+	printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
+	    h->type ,h->proto ,h->hlen ,h->plen ,h->op);
 	
-	//printf("\n sender: mac ");
-	//for( i=0; i<6; i++)
-	//{
-	//    printf("%x ",h->arp_sha[i]);	
-	//}
-	//printf("\n sender: ip ");
-	//for( i=0; i<4; i++)
-	//{
-	//    printf("%d ",h->arp_spa[i]);	
-	//}
-
-	//printf("\n target: mac ");
-	//for( i=0; i<6; i++)
-	//{
-	//    printf("%x ",h->arp_tha[i]);	
-	//}
-	//printf("\n target: ip ");
-	//for( i=0; i<4; i++)
-	//{
-	//    printf("%d ",h->arp_tpa[i]);	
-	//}
+	printf("\n sender: mac ");
+	for( i=0; i<6; i++){
+	    printf("%x ",h->arp_sha[i]);	
+	}
+	printf("\n sender: ip ");
+	for( i=0; i<4; i++){
+	    printf("%d ",h->arp_spa[i]);	
+	}
+	printf("\n target: mac ");
+	for( i=0; i<6; i++){
+	    printf("%x ",h->arp_tha[i]);	
+	}
+	printf("\n target: ip ");
+	for( i=0; i<4; i++){
+	    printf("%d ",h->arp_tpa[i]);	
+	}
+	*/
+	//==================================
+	
 	
 	//#debug
 	//printf("\n debug *hang");
 	//refresh_screen();
 	//while(1){}	
 	
-	//
-	// ?? qual é o endereço virtual onde colocaremos o pacote ??
-	//
-	
-	//copiando o pacote para o endereço virtual do buffer .
-	//lembrando que o endereço físico já foi colocado na estrutura na hora da inicialização.
-	// endereço virtual, endereço virtual do pacote, tamanho do pacote.
-	//memcpy( (void *)(currentNIC->tx_descs_virt[0]), (const void *) data, (unsigned long) (14 + 28));
-	
-	
-	//
+  	
+
 	// ## quem ? ##
-	//
-	
 	uint16_t old = currentNIC->tx_cur;
 	
-	//
+
 	// ## Copiando o pacote no buffer ##
-	//
 	
 	//pegando o endereço virtual do buffer na estrutura do dispositivo.	
-
 	unsigned char *buffer = (unsigned char *) currentNIC->tx_descs_virt[old];
 	
 	unsigned char *src_ethernet = (unsigned char *) eh; 
 	unsigned char *src_arp      = (unsigned char *) h;
 	
 	//copiando o header ethernet
+	//copiando o arp logo após do header ethernet
+	
 	for(i=0; i<14;i++){
 		buffer[i] = src_ethernet[i];
 	}
 
-	//copiando o arp logo após do header ethernet
 	for(i=0; i<28;i++){
 		buffer[i + 14] = src_arp[i];
 	}
 	
-	//ethernet header
-	//memcpy( (void *)(&buffer[i]), (const void *) eh, (unsigned long) (14));
-	//arp header
-	//memcpy( (void *)( &buffer[i + 14]), (const void *) h, (unsigned long) (28));
-	
-	//provavelmente já tem o endereço salvo aqui ...
-	//mas deve ser endereço físico usado pelo controlador.
-	//precisamos de um endereço virtual onde colocaremos o pacote.
-	//currentNIC->legacy_tx_descs[0].addr
-	
-	//#define ETH_HDRLEN 14      // Ethernet header length
-    //#define IP4_HDRLEN 20      // IPv4 header length
-    //#define ARP_HDRLEN 28      // ARP header length
+
     // Ethernet frame length = ethernet header (MAC + MAC + ethernet type) + ethernet data (ARP header)
 	//O comprimento deve ser o tamanho do header etherne + o tamanho do arp.
-	currentNIC->legacy_tx_descs[old].length = 14 + 28;//len;
+	
+	//len;
+	currentNIC->legacy_tx_descs[old].length = (ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT);	
+	//currentNIC->legacy_tx_descs[old].length = 14 + 28;
 	
 	//??
 	//currentNIC->legacy_tx_descs[0].cso

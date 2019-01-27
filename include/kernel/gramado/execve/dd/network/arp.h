@@ -1,4 +1,7 @@
 
+// ARP header length
+#define ARP_HEADER_LENGHT 28      
+
 
 // arp struct
 struct  ether_arp {

@@ -1,4 +1,6 @@
 
+// Ethernet header length
+#define ETHERNET_HEADER_LENGHT 14      
 
 // ethernet header
 struct ether_header {

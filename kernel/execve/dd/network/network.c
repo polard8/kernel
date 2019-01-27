@@ -384,7 +384,8 @@ void testNIC()
 	target_mac_address[4] = 0xFF;
 	target_mac_address[5] = 0xFF;		
 	
-	//testSend();	
+	//tests
+	
 	SendARP ( source_ip_address, target_ip_address, target_mac_address );
 	
 
