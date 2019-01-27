@@ -175,17 +175,32 @@ struct legacy_rx_desc
     uint8_t status;      // Descriptor status 
     uint8_t errors;      // Descriptor Errors 
     uint16_t special;
-	
 };
 
+
+
+
+//
+// arp cache item
+//
+
+struct arp_cache_item_d
+{
+    int used;
+    int magic;
+	uint8_t mac_address[6];
+	uint8_t ipv4_address[4];
+};
 
 
 //
 // ## device info ##
 //
 
-//todo: essa rotina pode ficar em network.h 
-//e qualquer dispositivo nic pode usr, mesmo que não seja intel.
+// #bugbug
+// Me parece que isso deve ser usado apenas para dispositivos  
+// Intel. Pois cada marca terá suas características.
+// nic_intel_info_d
 struct nic_info_d
 {
 	object_type_t objectType;
@@ -198,22 +213,12 @@ struct nic_info_d
 	int used;
 	int magic;
 	
-	//pci device.
-    struct pci_device_d *pci;	
-	
 	//salvando o endereço base.
 	unsigned long registers_base_address;
 	
 	unsigned long DeviceControl;
 	
 	unsigned long DeviceStatus;
-	
-	//unsigned char mac0;
-	//unsigned char mac1;
-	//unsigned char mac2;
-	//unsigned char mac3;
-	//unsigned char mac4;
-	//unsigned char mac5;
 	
 	uint8_t mac_address[6];
 	uint8_t ip_address[4];
@@ -240,17 +245,12 @@ struct nic_info_d
 	uint32_t tx_descs_phys;	 //tx ring physical address
 	
 	
-	//uint8_t  mac_address[6];
-	
-	
-	//unsigned char bus;
-	//unsigned char dev;
-	//unsigned char fun;	
-	
-	
-	//unsigned short vendor;
-	//unsigned short device;
 
+    struct arp_cache_item_d arp_cache[32];
+	
+	//pci device.
+    struct pci_device_d *pci;	
+	
 	// rede.
 	//struct network_info_d *network;
 	
