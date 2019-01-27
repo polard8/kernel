@@ -479,6 +479,23 @@ void xxxe1000handler (){
 				 printf(" | ");
 				for( i=0; i<4; i++){ printf("%d ",arp_h->arp_tpa[i]); }
 				//refresh_screen();
+				//cache
+				for (i=0; i<32; i++)
+				{
+				    //livre
+					if ( currentNIC->arp_cache[i].used == 1 && currentNIC->arp_cache[i].magic == 1234 )
+					{
+						//compara o ip
+					    if ( strncmp( (char *) &currentNIC->arp_cache[i].ipv4_address[0], (char *) &arp_h->arp_spa[0], 4 ) == 0 )
+						{
+							memcpy ( (void*) &currentNIC->arp_cache[i].ipv4_address[0] , (const void *) &eh->src[0], 6);
+							
+							//sinaliza que está em uso.
+							currentNIC->arp_cache[i].magic = 4321;
+						}
+							
+					}
+				}
 				
 				uint16_t arp_tx_old = currentNIC->tx_cur;
 			    uint32_t arp_tx_len = currentNIC->legacy_tx_descs[arp_tx_old].length;
