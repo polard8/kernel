@@ -1002,38 +1002,46 @@ void NetSendEthPacket ( PNetworkDevice dev,
 // ## testSend() ##
 //
 
-void testSend()
+//void testSend()	
+void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] )
 {
 	
 	int i=0;
-	
-	char target_mac_address[6];
-	target_mac_address[0] = 0xFF;
-	target_mac_address[1] = 0xFF;
-	target_mac_address[2] = 0xFF;
-	target_mac_address[3] = 0xFF;
-	target_mac_address[4] = 0xFF;
-	target_mac_address[5] = 0xFF;	
-	
-	char source_ip_address[4];
-	source_ip_address[0] = 192;
-	source_ip_address[1] = 168;
-	source_ip_address[2] = 1;   
-	source_ip_address[3] = 112; 
 
-	char target_ip_address[4];
-	target_ip_address[0] = 192;
-	target_ip_address[1] = 168;
-	target_ip_address[2] = 1;     
-	target_ip_address[3] = 111;   
+	
+	//char source_ip_address[4];
+	//source_ip_address[0] = 192;
+	//source_ip_address[1] = 168;
+	//source_ip_address[2] = 1;   
+	//source_ip_address[3] = 112; 
+
+	//char target_ip_address[4];
+	//target_ip_address[0] = 192;
+	//target_ip_address[1] = 168;
+	//target_ip_address[2] = 1;     
+	//target_ip_address[3] = 111;   
+	
+	//char target_mac_address[6];
+	//target_mac_address[0] = 0xFF;
+	//target_mac_address[1] = 0xFF;
+	//target_mac_address[2] = 0xFF;
+	//target_mac_address[3] = 0xFF;
+	//target_mac_address[4] = 0xFF;
+	//target_mac_address[5] = 0xFF;	
+	
+	
+	if ( currentNIC == NULL )
+		return;
+	
 	
 	//fake source ip address
 	//configurando a estrutura do dispositivo,
 	//usaremos isso pois não temos nenhum outro valor.
-	currentNIC->ip_address[0] = 192;
-	currentNIC->ip_address[1] = 168;
-	currentNIC->ip_address[2] = 1;    	
-	currentNIC->ip_address[3] = 112;  	
+	currentNIC->ip_address[0] = source_ip[0]; //192;
+	currentNIC->ip_address[1] = source_ip[1]; //168;
+	currentNIC->ip_address[2] = source_ip[2]; //1;    	
+	currentNIC->ip_address[3] = source_ip[3]; //112;  			
+
 
 	
 	//printf("testSend: testing send stuff ...\n");
@@ -1055,8 +1063,8 @@ void testSend()
 	
 	for( i=0; i<6; i++)
 	{
-		eh->dst[i] = target_mac_address[i];       //dest. ff ff...
-		eh->src[i] = currentNIC->mac_address[i];  //source ok
+		eh->src[i] = currentNIC->mac_address[i];    //source ok
+		eh->dst[i] = target_mac[i];                 //dest. (broadcast)	
 	}	
 	
 	eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
@@ -1107,15 +1115,15 @@ void testSend()
 	//mac
 	for( i=0; i<6; i++)
 	{
-		h->arp_sha[i] = currentNIC->mac_address[i]; //sender mac
-		h->arp_tha[i] = target_mac_address[i];      //*target mac
+		h->arp_sha[i] = currentNIC->mac_address[i];  //sender mac
+		h->arp_tha[i] = target_mac[i];               //target mac
 	}	
 	
 	//ip
-	for( i=0; i<4; i++)
+	for ( i=0; i<4; i++)
 	{
-		h->arp_spa[i] = source_ip_address[i]; //sender ip
-		h->arp_tpa[i] = target_ip_address[i]; //target ip
+		h->arp_spa[i] = source_ip[i];    //sender ip
+		h->arp_tpa[i] = target_ip[i];    //target ip
 	}		
 	
     //show arp

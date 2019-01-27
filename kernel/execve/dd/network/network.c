@@ -362,7 +362,30 @@ void testNIC()
 	
 	e1000_interrupt_flag = 1;	
 	
-	testSend();	
+	
+	
+	uint8_t source_ip_address[4];
+	source_ip_address[0] = 192;
+	source_ip_address[1] = 168;
+	source_ip_address[2] = 1;   
+	source_ip_address[3] = 112; 
+
+	uint8_t target_ip_address[4];
+	target_ip_address[0] = 192;
+	target_ip_address[1] = 168;
+	target_ip_address[2] = 1;     
+	target_ip_address[3] = 111;   
+	
+	uint8_t target_mac_address[6];
+	target_mac_address[0] = 0xFF;
+	target_mac_address[1] = 0xFF;
+	target_mac_address[2] = 0xFF;
+	target_mac_address[3] = 0xFF;
+	target_mac_address[4] = 0xFF;
+	target_mac_address[5] = 0xFF;		
+	
+	//testSend();	
+	SendARP ( source_ip_address, target_ip_address, target_mac_address );
 	
 
 	
