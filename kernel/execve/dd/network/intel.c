@@ -488,7 +488,7 @@ void xxxe1000handler (){
 						//compara o ip
 					    if ( strncmp( (char *) &currentNIC->arp_cache[i].ipv4_address[0], (char *) &arp_h->arp_spa[0], 4 ) == 0 )
 						{
-							memcpy ( (void*) &currentNIC->arp_cache[i].ipv4_address[0] , (const void *) &eh->src[0], 6);
+							memcpy ( (void*) &currentNIC->arp_cache[i].mac_address[0] , (const void *) &eh->src[0], 6);
 							
 							//sinaliza que está em uso.
 							currentNIC->arp_cache[i].magic = 4321;
