@@ -386,6 +386,8 @@ void testNIC()
 	
 	//tests
 	
+	//mudar network.
+	//tem que ter uma abstração que selecione o nic atual
 	SendARP ( source_ip_address, target_ip_address, target_mac_address );
 	
 
@@ -403,6 +405,247 @@ void testNIC()
 	printf("testNIC: Done\n");
 	refresh_screen();
 }
+
+
+void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] ){
+	
+	int i=0;
+	struct ether_header *eh;
+	struct  ether_arp *h;
+	
+	
+	if ( currentNIC == NULL )
+	{
+		printf ("SendARP: currentNIC\n");
+		return;		
+	}
+
+	
+	//configurando a estrutura do dispositivo,
+
+	currentNIC->ip_address[0] = source_ip[0];  //192;
+	currentNIC->ip_address[1] = source_ip[1];  //168;
+	currentNIC->ip_address[2] = source_ip[2];  //1;    	
+	currentNIC->ip_address[3] = source_ip[3];  //112;  			
+
+	//
+	// ====================== ## ETH HEADER ## ====================
+	//
+	
+	eh = (void *) malloc ( sizeof(struct ether_header ) );
+	
+	if ( (void*) eh == NULL)
+	{
+		printf("struct eh fail");
+		die();
+	}
+	
+	for( i=0; i<6; i++)
+	{
+		eh->src[i] = currentNIC->mac_address[i];    //source ok
+		eh->dst[i] = target_mac[i];                 //dest. (broadcast)	
+	}	
+	
+	eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
+
+    
+	
+	//==================================
+	//#debug
+	//show ethernet header
+	/*
+	printf("\n\n");
+	printf("[ethernet header]\n\n");
+	
+	printf("src: ");
+    for( i=0; i<6; i++)
+		printf("%x ",eh->src[i]);
+	
+	printf("dst: ");
+    for( i=0; i<6; i++)
+		printf("%x ",eh->dst[i]);
+	
+	printf("type={%x} ",eh->type);
+	*/
+	//==================================
+	
+	
+	//#debug
+	//printf("debug *hang");
+	//refresh_screen();
+	//while(1){}
+	
+	//
+	// ==================== ## ARP ## ==========================
+	//
+
+	h = (void *) malloc ( sizeof(struct  ether_arp) );
+	
+	if ( (void*) h == NULL)
+	{
+		printf("struct h fail");
+		die();
+	}
+	
+    //Hardware type (HTYPE)
+	h->type = 0x0100; // (00 01)
+	
+	//Protocol type (PTYPE)
+	h->proto = 0x0008;  //(08 00)    
+	
+	//Hardware address length (MAC)
+	h->hlen = 6;
+	
+	////Protocol address length (IP)
+	h->plen = 4;
+	
+	
+	//Operation (OPER) (dois bytes invertidos)
+	//h->op = ToNetByteOrder16(ARP_OPC_REPLY);  	
+    h->op = ToNetByteOrder16(ARP_OPC_REQUEST);
+	
+	//mac
+	for( i=0; i<6; i++)
+	{
+		h->arp_sha[i] = currentNIC->mac_address[i];  //sender mac
+		h->arp_tha[i] = target_mac[i];               //target mac
+	}	
+	
+	//ip
+	for ( i=0; i<4; i++)
+	{
+		h->arp_spa[i] = source_ip[i];    //sender ip
+		h->arp_tpa[i] = target_ip[i];    //target ip
+	}		
+	
+	//==================================
+	//#debug
+    //show arp
+	/*
+	printf("\n\n");
+	printf("[arp]\n\n");
+	printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
+	    h->type ,h->proto ,h->hlen ,h->plen ,h->op);
+	
+	printf("\n sender: mac ");
+	for( i=0; i<6; i++){
+	    printf("%x ",h->arp_sha[i]);	
+	}
+	printf("\n sender: ip ");
+	for( i=0; i<4; i++){
+	    printf("%d ",h->arp_spa[i]);	
+	}
+	printf("\n target: mac ");
+	for( i=0; i<6; i++){
+	    printf("%x ",h->arp_tha[i]);	
+	}
+	printf("\n target: ip ");
+	for( i=0; i<4; i++){
+	    printf("%d ",h->arp_tpa[i]);	
+	}
+	*/
+	//==================================
+	
+	
+	//#debug
+	//printf("\n debug *hang");
+	//refresh_screen();
+	//while(1){}	
+	
+  	
+
+	// ## quem ? ##
+	uint16_t old = currentNIC->tx_cur;
+	
+
+	// ## Copiando o pacote no buffer ##
+	
+	//pegando o endereço virtual do buffer na estrutura do dispositivo.	
+	unsigned char *buffer = (unsigned char *) currentNIC->tx_descs_virt[old];
+	
+	unsigned char *src_ethernet = (unsigned char *) eh; 
+	unsigned char *src_arp      = (unsigned char *) h;
+	
+	//copiando o header ethernet
+	//copiando o arp logo após do header ethernet
+	
+	for(i=0; i<14;i++){
+		buffer[i] = src_ethernet[i];
+	}
+
+	for(i=0; i<28;i++){
+		buffer[i + 14] = src_arp[i];
+	}
+	
+
+    // Ethernet frame length = ethernet header (MAC + MAC + ethernet type) + ethernet data (ARP header)
+	//O comprimento deve ser o tamanho do header etherne + o tamanho do arp.
+	
+	//len;
+	currentNIC->legacy_tx_descs[old].length = (ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT);	
+	//currentNIC->legacy_tx_descs[old].length = 14 + 28;
+	
+	//??
+	//currentNIC->legacy_tx_descs[0].cso
+	
+	//cmd ok
+	//currentNIC->legacy_tx_descs[0].cmd = TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP;
+	//currentNIC->legacy_tx_descs[0].cmd = TDESC_EOP | TDESC_RS; //intel code
+	
+	currentNIC->legacy_tx_descs[old].cmd = 0x1B;
+	currentNIC->legacy_tx_descs[old].status = 0;	
+	
+	currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
+	
+	//??
+	//currentNIC->legacy_tx_descs[0].css
+	
+	//??
+	//currentNIC->legacy_tx_descs[0].special
+	
+	
+	//
+	// ## SHOW INFO ##
+	//
+	
+	//#importante #todo
+	
+	//device info
+	//isso pode ficar pra depois.
+    	
+	//ethernet header 
+	
+	//arp header
+	
+	//
+	// ## SEND ##
+	//
+
+	
+	//#importante 
+	//diga ao controlador qual é o índice do descritor a ser usado para  
+	//transmitir dados.,
+	
+	//current
+	//TDH	= 0x3810,	/* Tx Descriptor Head */
+	//*( (volatile unsigned int *)(currentNIC->mem_base + 0x3810)) = 0;
+	//TDT	= 0x3818,	/* Tx Descriptor Tail */
+	*( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = currentNIC->tx_cur;	
+
+	//#debug
+	printf("sending broadcast arp(while)\n");
+	refresh_screen();	
+	
+	//checamos o status do old pra ver se ele foi enviado.
+	//fica travado aqui até que seja envidao.
+	//poderia ter um timemout??.
+	while ( !(currentNIC->legacy_tx_descs[old].status & 0xFF) )
+	{
+		//nothing
+	}
+}
+
+
 
 //
 // End

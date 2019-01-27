@@ -307,10 +307,6 @@ void NetSendEthPacket ( PNetworkDevice dev,
 						uint8_t *buf );
 */				
 		
-//void testSend();
-void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] );
-
-
 
 void E1000Send ( void *ndev, uint32_t len, uint8_t *data);		
 
