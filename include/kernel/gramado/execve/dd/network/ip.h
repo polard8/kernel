@@ -206,7 +206,7 @@ struct ipv6_header_d
 
 
 //send ipv4
-void send_ipv4_packet ( struct nic_info_d *dev, uint32_t len, uint8_t *data );
+void send_ipv4_packet ( struct intel_nic_info_d *dev, uint32_t len, uint8_t *data );
 				   
 				   
 //

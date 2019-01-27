@@ -51,7 +51,7 @@ struct network_info_d
 	//struct ip_address_d *networkGatewayIP;
 	
 	//adaptador de rede.
-	//struct nic_info_d *nic;
+	//struct intel_nic_info_d *nic;
 	
 	//user ??
 	//struct user_info_d *networkUserinfo;
@@ -75,7 +75,7 @@ void show_current_nic_info ();
 
 
 //manipular o pacote ipv6 recebido pelo handle do e1000.
-int handle_ipv6 ( struct nic_info_d *nic, struct ipv6_header_d *header );
+int handle_ipv6 ( struct intel_nic_info_d *nic, struct ipv6_header_d *header );
 
 void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6], uint8_t data[32] );
 void SendARP ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6] );

@@ -195,7 +195,7 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	
 	unsigned short tmp16;
 	
-	currentNIC = (void *) malloc ( sizeof( struct nic_info_d ) );
+	currentNIC = (void *) malloc ( sizeof( struct intel_nic_info_d ) );
 	
 	if ( (void *) currentNIC ==  NULL )
 	{
@@ -502,7 +502,7 @@ void xxxe1000handler (){
 			//printf("IPv6 ");
 		    ipv6_h = (void *) &buffer[14];
 		    //
-			handle_ipv6 ( (struct nic_info_d *) currentNIC, 
+			handle_ipv6 ( (struct intel_nic_info_d *) currentNIC, 
 			    (struct ipv6_header_d *) ipv6_h );
 			//refresh_screen();
 			return;	
@@ -905,7 +905,7 @@ int e1000_reset_controller (){
 }
 
 
-void E1000WriteCommand ( struct nic_info_d *d, uint16_t addr, uint32_t val ) {
+void E1000WriteCommand ( struct intel_nic_info_d *d, uint16_t addr, uint32_t val ) {
 	
 	//if (dev->use_io) {																// Use the IO ports?
 	//	PortOutLong(dev->io_base, addr);											// Yes
@@ -917,7 +917,7 @@ void E1000WriteCommand ( struct nic_info_d *d, uint16_t addr, uint32_t val ) {
 
 
 
-uint32_t E1000ReadCommand(struct nic_info_d *d, uint16_t addr) {
+uint32_t E1000ReadCommand(struct intel_nic_info_d *d, uint16_t addr) {
 	//if (dev->use_io) {																// Use the IO ports?
 	//	PortOutLong(dev->io_base, addr);											// Yes
 	//	return PortInLong(dev->io_base + 4);
@@ -1008,7 +1008,7 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data ){
 	// ## dev ##
 	//
 	
-	struct nic_info_d *dev = (struct nic_info_d *) ndev;
+	struct intel_nic_info_d *dev = (struct intel_nic_info_d *) ndev;
 	
 	if ( (void *) dev == NULL )
 		return;
@@ -1076,7 +1076,7 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data ){
 //14+20 bytes
 
 void 
-send_ipv4_packet ( struct nic_info_d *dev, 
+send_ipv4_packet ( struct intel_nic_info_d *dev, 
                    uint32_t len, 
 				   uint8_t *data )
 {
@@ -1212,7 +1212,7 @@ void show_current_nic_info (){
 */
 
 
-uint32_t E1000ReadEEPROM ( struct nic_info_d *d, uint8_t addr )
+uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr )
 {
 	uint32_t data = 0;
 

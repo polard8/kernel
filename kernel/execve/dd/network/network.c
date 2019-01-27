@@ -299,7 +299,7 @@ void show_current_nic_info (){
 
 
 //manipular o pacote ipv6 recebido pelo handle do e1000.
-int handle_ipv6 ( struct nic_info_d *nic, struct ipv6_header_d *header ){
+int handle_ipv6 ( struct intel_nic_info_d *nic, struct ipv6_header_d *header ){
 
     //printf("\n");
     //printf("handle_ipv6: Initializing ...\n");

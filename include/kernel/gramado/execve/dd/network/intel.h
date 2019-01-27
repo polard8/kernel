@@ -200,8 +200,8 @@ struct arp_cache_item_d
 // #bugbug
 // Me parece que isso deve ser usado apenas para dispositivos  
 // Intel. Pois cada marca terá suas características.
-// nic_intel_info_d
-struct nic_info_d
+
+struct intel_nic_info_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
@@ -256,9 +256,9 @@ struct nic_info_d
 	
 	//struct device_d     *device;
 
-    //struct nic_info_d *next;	
+    //struct intel_nic_info_d *next;	
 };
-struct nic_info_d *currentNIC;
+struct intel_nic_info_d *currentNIC;
 //...
 
 
@@ -312,8 +312,8 @@ void E1000Send ( void *ndev, uint32_t len, uint8_t *data);
 
 
 
-void E1000WriteCommand ( struct nic_info_d *d, uint16_t addr, uint32_t val );
-uint32_t E1000ReadCommand(struct nic_info_d *d, uint16_t addr) ;	
+void E1000WriteCommand ( struct intel_nic_info_d *d, uint16_t addr, uint32_t val );
+uint32_t E1000ReadCommand (struct intel_nic_info_d *d, uint16_t addr) ;	
 
 uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt );						
 
@@ -321,7 +321,7 @@ uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt );
 void nic_i8254x_transmit();
 
 //eeprom
-uint32_t E1000ReadEEPROM ( struct nic_info_d *d, uint8_t addr );
+uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr );
 
 
 void xxxe1000handler();
