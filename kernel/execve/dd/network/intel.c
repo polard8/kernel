@@ -922,38 +922,52 @@ int e1000_reset_controller (){
 }
 
 
-void E1000WriteCommand ( struct intel_nic_info_d *d, uint16_t addr, uint32_t val ) {
+void E1000WriteCommand ( struct intel_nic_info_d *d, uint16_t addr, uint32_t val ){
 	
-	//if (dev->use_io) {																// Use the IO ports?
-	//	PortOutLong(dev->io_base, addr);											// Yes
+	
+	// Use the IO ports?
+	//if (dev->use_io) 
+	//{
+	//  Yes
+	//	PortOutLong(dev->io_base, addr);											
 	//	PortOutLong(dev->io_base + 4, val);
 	//} else {
-		*( (volatile unsigned int *)(d->mem_base + addr)) = val;							// No
+	//  No
+	//	*( (volatile unsigned int *)(d->mem_base + addr)) = val;							
 	//}
-};
+	
+	*( (volatile unsigned int *)(d->mem_base + addr)) = val;
+}
 
 
-
-uint32_t E1000ReadCommand(struct intel_nic_info_d *d, uint16_t addr) {
-	//if (dev->use_io) {																// Use the IO ports?
-	//	PortOutLong(dev->io_base, addr);											// Yes
+uint32_t E1000ReadCommand(struct intel_nic_info_d *d, uint16_t addr){
+	
+	// Use the IO ports?
+	//if (dev->use_io) 
+	//{	
+	//  Yes
+	//	PortOutLong(dev->io_base, addr);											
 	//	return PortInLong(dev->io_base + 4);
 	//} else {
-		return *( (volatile unsigned int *) (d->mem_base + addr));							// No
+	//  No
+	//	return *( (volatile unsigned int *) (d->mem_base + addr));							
 	//}
-};
-
-
-//E1000AllocCont retorna o endereço fisico e coloca o virtual em *virt
-//ah ... então eu vou alocar usando endereços virtuais 
-//... e traduzir para físico 
-//... colocar o virtual em *virt e retornar o físico.
-uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt )
-{	
-	//#bugbug
-	//*virt = (uint32_t *) malloc ((uint32_t)amount);
 	
-	uint32_t va = (uint32_t) malloc ((uint32_t)amount);
+	return *( (volatile unsigned int *) (d->mem_base + addr));
+}
+
+
+/*
+ * E1000AllocCont: ??
+ * retorna o endereço fisico e coloca o virtual em *virt
+ * ah ... então eu vou alocar usando endereços virtuais
+ * ... e traduzir para físico 
+ * ... colocar o virtual em *virt e retornar o físico.
+ */
+
+uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt ){
+	
+	uint32_t va = (uint32_t) malloc ( (uint32_t) amount );
 	
 	*virt = va;
 	
@@ -966,7 +980,7 @@ uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt )
 	
 	uint32_t pa = (uint32_t) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
 	
-	if(pa == 0)
+	if (pa == 0)
 	{
 		printf("E1000AllocCont: pa fail");
 		refresh_screen();
@@ -974,8 +988,7 @@ uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt )
 	}
 	
 	return pa;
-};
-
+}
 
 
 /*
@@ -1229,8 +1242,8 @@ void show_current_nic_info (){
 */
 
 
-uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr )
-{
+uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr ){
+	
 	uint32_t data = 0;
 
 	// We have the EEPROM?
@@ -1259,7 +1272,7 @@ uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr )
 	}
 	
 	return (data >> 16) & 0xFFFF; 
-};
+}
 
 
 //

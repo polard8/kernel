@@ -46,43 +46,6 @@ ARP NDP OSPF túneis... L2TP PPP MAC Ethernet DSL RDIS FDDI outros...
 //#define ETHERTYPE_IPv4 0x0800
 //#define ETHERTYPE_IPv6 0x86DD
 
- 
-/* 
-typedef struct ip_string_d ip_string_t; 
-struct ip_string_d
-{
-    char String[4 * 4];
-};	
-ip_string_t *ipString;
-*/ 
-
-
-//
-//  ## IP  ##
-//
-
-typedef struct ip_address_d ip_address_t; 
-struct ip_address_d
-{
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	//netid + hostid.
-    unsigned long ip_address;
-	//unsigned long ip_mask;
-	
-	//unsigned char ip[4];
-	//unsigned char ipmask[4];
-	
-	int version;    //IPv4, IPv6.
-	
-	//Armazena os valores dos quatro bytes em decimal na forma de string com pontos.
-	//char string[4*4]; 
-};
-struct ip_address_d *ip_address;
-//ip_address_t *ip_address;
-//...
-
 
 //
 //  ## UDP  ##

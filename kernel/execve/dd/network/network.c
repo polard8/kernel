@@ -422,8 +422,11 @@ void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6
 	
 	
 	int i=0;
+	
 	struct ether_header *eh;
 	struct  ether_arp *h;
+	struct ipv4_header_d *ipv4;
+	struct udp_header_d *udp;
 	
 	if ( currentNIC == NULL )
 	{
@@ -465,11 +468,9 @@ void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6
 	// ## ipv4 ##
 	//
 	
-	struct ipv4_header_d *ipv4;
-	
 	ipv4 = (void *) malloc ( sizeof(struct ipv4_header_d) );
 	
-	if( (void *) ipv4 == NULL)
+	if ( (void *) ipv4 == NULL)
 	{
 		printf(": ipv4 fail");
 		die();
@@ -478,7 +479,7 @@ void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6
         // IPv4 common header
 	    ipv4->Version_IHL = 0x45;
 	    ipv4->DSCP_ECN = 0x00;
-	    ipv4->Identification = 0x0100; //??
+	    ipv4->Identification = 0x0100; 
 	    ipv4->Flags_FragmentOffset = 0x0000;
 	    ipv4->TimeToLive = 0x40;
 	    
@@ -495,9 +496,8 @@ void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6
 	// ## udp ##
 	//
 	
-	struct udp_header_d *udp;
-	
 	udp = (void *) malloc ( sizeof(struct udp_header_d) );
+	
 	if( (void *) udp == NULL)
 	{
 		printf(": udp fail");
@@ -508,7 +508,7 @@ void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6
         udp->DestinationPort = 0;
         udp->Length = 0;
         udp->Checksum = 0; 		
-    };
+    }
 	
 	
 	

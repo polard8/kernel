@@ -65,7 +65,6 @@ LocalHostHTTPSocket
 ioControl_mouse     0x4               x86main.o
 GRID                0x4               x86main.o
 cursorIconBuffer    0x4               x86main.o
-ip_address          0x4               x86main.o
 preempted_task      0x4               x86main.o
 ActiveWindow        0x4               x86main.o
 mouse_buttom_3      0x4               x86main.o
@@ -2600,16 +2599,15 @@ Linker script and memory map
                 0x00000000c004b85c                ioControl_mouse
                 0x00000000c004b860                GRID
                 0x00000000c004b864                cursorIconBuffer
-                0x00000000c004b868                ip_address
-                0x00000000c004b86c                preempted_task
-                0x00000000c004b870                ActiveWindow
-                0x00000000c004b874                mouse_buttom_3
-                0x00000000c004b878                capslock_status
-                0x00000000c004b87c                KernelArgs
-                0x00000000c004b88c                Irq5
-                0x00000000c004b890                Irq13
-                0x00000000c004b894                terminalWindowWithFocus
-                0x00000000c004b898                Irq2
+                0x00000000c004b868                preempted_task
+                0x00000000c004b86c                ActiveWindow
+                0x00000000c004b870                mouse_buttom_3
+                0x00000000c004b874                capslock_status
+                0x00000000c004b878                KernelArgs
+                0x00000000c004b888                Irq5
+                0x00000000c004b88c                Irq13
+                0x00000000c004b890                terminalWindowWithFocus
+                0x00000000c004b894                Irq2
                 0x00000000c004b8a0                pcideviceList
                 0x00000000c004b920                IpcProcedure
                 0x00000000c004b924                fullscreen_window

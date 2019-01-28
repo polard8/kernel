@@ -47,9 +47,6 @@ struct network_info_d
 	unsigned short networkVersionMinor; 
 	unsigned short networkVersionRevision;	
 	
-	//ip do gateway
-	//struct ip_address_d *networkGatewayIP;
-	
 	//adaptador de rede.
 	//struct intel_nic_info_d *nic;
 	
