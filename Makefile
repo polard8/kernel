@@ -15,8 +15,8 @@
 VERSION = 0
 PATCHLEVEL = 9
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
-NAME = ?
+EXTRAVERSION = 0
+NAME = Elegance
 
 #important
 #We will have a new name just when the release changes.
