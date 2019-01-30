@@ -2079,142 +2079,142 @@ Linker script and memory map
  .rodata        0x00000000c0029c31        0xf tty.o
  .rodata        0x00000000c0029c40      0x31b init.o
  *fill*         0x00000000c0029f5b        0x1 
- .rodata        0x00000000c0029f5c      0x156 logon.o
- .rodata        0x00000000c002a0b2       0x2b logoff.o
- *fill*         0x00000000c002a0dd        0x3 
- .rodata        0x00000000c002a0e0       0x4f detect.o
- .rodata        0x00000000c002a12f        0xf cpuamd.o
- *fill*         0x00000000c002a13e        0x2 
- .rodata        0x00000000c002a140      0x525 memory.o
- *fill*         0x00000000c002a665        0x3 
- .rodata        0x00000000c002a668      0x191 pages.o
- .rodata        0x00000000c002a7f9        0xf apic.o
- .rodata        0x00000000c002a808        0xf pic.o
- *fill*         0x00000000c002a817        0x1 
- .rodata        0x00000000c002a818      0x10c timer.o
- .rodata        0x00000000c002a924       0x4b rtc.o
- *fill*         0x00000000c002a96f        0x1 
- .rodata        0x00000000c002a970       0x31 keyboard.o
- .rodata        0x00000000c002a9a1        0xf mouse.o
- .rodata        0x00000000c002a9b0      0x351 ldisc.o
- .rodata        0x00000000c002ad01       0x42 hdd.o
- *fill*         0x00000000c002ad43        0x1 
- .rodata        0x00000000c002ad44     0x1834 pci.o
- .rodata        0x00000000c002c578        0xf devmgr.o
- *fill*         0x00000000c002c587        0x1 
- .rodata        0x00000000c002c588       0xdc spawn.o
- .rodata        0x00000000c002c664        0xf callout.o
- *fill*         0x00000000c002c673        0x1 
- .rodata        0x00000000c002c674      0x3a7 process.o
- .rodata        0x00000000c002ca1b        0xf pheap.o
- *fill*         0x00000000c002ca2a        0x2 
- .rodata        0x00000000c002ca2c       0xf6 thread.o
- *fill*         0x00000000c002cb22        0x2 
- .rodata        0x00000000c002cb24      0x1ff threadi.o
- .rodata        0x00000000c002cd23        0xf theap.o
- .rodata        0x00000000c002cd32        0xf tstack.o
- *fill*         0x00000000c002cd41        0x3 
- .rodata        0x00000000c002cd44      0x235 create.o
- *fill*         0x00000000c002cf79        0x3 
- .rodata        0x00000000c002cf7c       0xcd x86start.o
- *fill*         0x00000000c002d049        0x3 
- .rodata        0x00000000c002d04c      0x122 x86cont.o
- .rodata        0x00000000c002d16e        0xf tasks.o
- *fill*         0x00000000c002d17d        0x3 
- .rodata        0x00000000c002d180      0x28f ts.o
- *fill*         0x00000000c002d40f        0x1 
- .rodata        0x00000000c002d410      0x181 queue.o
- .rodata        0x00000000c002d591       0x1e sched.o
- *fill*         0x00000000c002d5af        0x1 
- .rodata        0x00000000c002d5b0       0x58 schedi.o
- .rodata        0x00000000c002d608      0x178 dispatch.o
- .rodata        0x00000000c002d780        0xf sem.o
- .rodata        0x00000000c002d78f        0xf modules.o
- *fill*         0x00000000c002d79e        0x2 
- .rodata        0x00000000c002d7a0      0x276 nicintel.o
- *fill*         0x00000000c002da16        0x2 
- .rodata        0x00000000c002da18      0x353 network.o
- *fill*         0x00000000c002dd6b        0x1 
- .rodata        0x00000000c002dd6c       0x31 socket.o
- .rodata        0x00000000c002dd9d        0xf sm.o
- .rodata        0x00000000c002ddac        0xf channel.o
- .rodata        0x00000000c002ddbb        0xf ipc.o
- *fill*         0x00000000c002ddca        0x2 
- .rodata        0x00000000c002ddcc      0x168 read.o
- .rodata        0x00000000c002df34      0x16e write.o
- *fill*         0x00000000c002e0a2        0x2 
- .rodata        0x00000000c002e0a4      0x126 cf.o
- *fill*         0x00000000c002e1ca        0x2 
- .rodata        0x00000000c002e1cc       0x60 search.o
- .rodata        0x00000000c002e22c        0xf format.o
- *fill*         0x00000000c002e23b        0x1 
- .rodata        0x00000000c002e23c      0x4a4 disk1.o
- .rodata        0x00000000c002e6e0      0x426 diskvol.o
- *fill*         0x00000000c002eb06        0x2 
- .rodata        0x00000000c002eb08      0x4ee fs.o
- *fill*         0x00000000c002eff6        0x2 
- .rodata        0x00000000c002eff8       0xf0 vfs.o
- .rodata        0x00000000c002f0e8       0x34 cedge.o
- *fill*         0x00000000c002f11c        0x4 
+ .rodata        0x00000000c0029f5c      0x152 logon.o
+ .rodata        0x00000000c002a0ae       0x2b logoff.o
+ *fill*         0x00000000c002a0d9        0x3 
+ .rodata        0x00000000c002a0dc       0x4f detect.o
+ .rodata        0x00000000c002a12b        0xf cpuamd.o
+ *fill*         0x00000000c002a13a        0x2 
+ .rodata        0x00000000c002a13c      0x525 memory.o
+ *fill*         0x00000000c002a661        0x3 
+ .rodata        0x00000000c002a664      0x191 pages.o
+ .rodata        0x00000000c002a7f5        0xf apic.o
+ .rodata        0x00000000c002a804        0xf pic.o
+ *fill*         0x00000000c002a813        0x1 
+ .rodata        0x00000000c002a814      0x10c timer.o
+ .rodata        0x00000000c002a920       0x4b rtc.o
+ *fill*         0x00000000c002a96b        0x1 
+ .rodata        0x00000000c002a96c       0x31 keyboard.o
+ .rodata        0x00000000c002a99d        0xf mouse.o
+ .rodata        0x00000000c002a9ac      0x351 ldisc.o
+ .rodata        0x00000000c002acfd       0x42 hdd.o
+ *fill*         0x00000000c002ad3f        0x1 
+ .rodata        0x00000000c002ad40     0x1834 pci.o
+ .rodata        0x00000000c002c574        0xf devmgr.o
+ *fill*         0x00000000c002c583        0x1 
+ .rodata        0x00000000c002c584       0xdc spawn.o
+ .rodata        0x00000000c002c660        0xf callout.o
+ *fill*         0x00000000c002c66f        0x1 
+ .rodata        0x00000000c002c670      0x3a7 process.o
+ .rodata        0x00000000c002ca17        0xf pheap.o
+ *fill*         0x00000000c002ca26        0x2 
+ .rodata        0x00000000c002ca28       0xf6 thread.o
+ *fill*         0x00000000c002cb1e        0x2 
+ .rodata        0x00000000c002cb20      0x1ff threadi.o
+ .rodata        0x00000000c002cd1f        0xf theap.o
+ .rodata        0x00000000c002cd2e        0xf tstack.o
+ *fill*         0x00000000c002cd3d        0x3 
+ .rodata        0x00000000c002cd40      0x235 create.o
+ *fill*         0x00000000c002cf75        0x3 
+ .rodata        0x00000000c002cf78       0xcd x86start.o
+ *fill*         0x00000000c002d045        0x3 
+ .rodata        0x00000000c002d048      0x122 x86cont.o
+ .rodata        0x00000000c002d16a        0xf tasks.o
+ *fill*         0x00000000c002d179        0x3 
+ .rodata        0x00000000c002d17c      0x28f ts.o
+ *fill*         0x00000000c002d40b        0x1 
+ .rodata        0x00000000c002d40c      0x181 queue.o
+ .rodata        0x00000000c002d58d       0x1e sched.o
+ *fill*         0x00000000c002d5ab        0x1 
+ .rodata        0x00000000c002d5ac       0x58 schedi.o
+ .rodata        0x00000000c002d604      0x178 dispatch.o
+ .rodata        0x00000000c002d77c        0xf sem.o
+ .rodata        0x00000000c002d78b        0xf modules.o
+ *fill*         0x00000000c002d79a        0x2 
+ .rodata        0x00000000c002d79c      0x276 nicintel.o
+ *fill*         0x00000000c002da12        0x2 
+ .rodata        0x00000000c002da14      0x353 network.o
+ *fill*         0x00000000c002dd67        0x1 
+ .rodata        0x00000000c002dd68       0x31 socket.o
+ .rodata        0x00000000c002dd99        0xf sm.o
+ .rodata        0x00000000c002dda8        0xf channel.o
+ .rodata        0x00000000c002ddb7        0xf ipc.o
+ *fill*         0x00000000c002ddc6        0x2 
+ .rodata        0x00000000c002ddc8      0x168 read.o
+ .rodata        0x00000000c002df30      0x16e write.o
+ *fill*         0x00000000c002e09e        0x2 
+ .rodata        0x00000000c002e0a0      0x126 cf.o
+ *fill*         0x00000000c002e1c6        0x2 
+ .rodata        0x00000000c002e1c8       0x60 search.o
+ .rodata        0x00000000c002e228        0xf format.o
+ *fill*         0x00000000c002e237        0x1 
+ .rodata        0x00000000c002e238      0x4a4 disk1.o
+ .rodata        0x00000000c002e6dc      0x426 diskvol.o
+ *fill*         0x00000000c002eb02        0x2 
+ .rodata        0x00000000c002eb04      0x4ee fs.o
+ *fill*         0x00000000c002eff2        0x2 
+ .rodata        0x00000000c002eff4       0xf0 vfs.o
+ .rodata        0x00000000c002f0e4       0x34 cedge.o
+ *fill*         0x00000000c002f118        0x8 
  .rodata        0x00000000c002f120      0x120 ctype.o
                 0x00000000c002f140                _ctype
  .rodata        0x00000000c002f240       0x98 request.o
- .rodata        0x00000000c002f2d8      0x1f2 info.o
- .rodata        0x00000000c002f4ca        0xf signal.o
- *fill*         0x00000000c002f4d9        0x3 
- .rodata        0x00000000c002f4dc      0x796 system.o
- .rodata        0x00000000c002fc72        0xf bg.o
- .rodata        0x00000000c002fc81       0xba grid.o
- *fill*         0x00000000c002fd3b        0x1 
- .rodata        0x00000000c002fd3c       0xb6 sbar.o
- *fill*         0x00000000c002fdf2        0x2 
- .rodata        0x00000000c002fdf4      0x11d menubar.o
- *fill*         0x00000000c002ff11        0x3 
- .rodata        0x00000000c002ff14      0x234 menu.o
- .rodata        0x00000000c0030148        0xf i8042.o
- *fill*         0x00000000c0030157        0x1 
- .rodata        0x00000000c0030158       0xbd ps2mouse.o
- *fill*         0x00000000c0030215        0x3 
- .rodata        0x00000000c0030218       0x52 ps2kbd.o
- *fill*         0x00000000c003026a        0x2 
- .rodata        0x00000000c003026c       0x2c button.o
- .rodata        0x00000000c0030298       0x4d char.o
- *fill*         0x00000000c00302e5        0x3 
- .rodata        0x00000000c00302e8       0x34 pixel.o
- .rodata        0x00000000c003031c        0xf line.o
- *fill*         0x00000000c003032b        0x1 
- .rodata        0x00000000c003032c       0x70 rect.o
- .rodata        0x00000000c003039c       0x2f dtext.o
- .rodata        0x00000000c00303cb       0x45 font.o
- .rodata        0x00000000c0030410        0xf vsync.o
- .rodata        0x00000000c003041f       0x45 bmp.o
- .rodata        0x00000000c0030464       0xbc createw.o
- .rodata        0x00000000c0030520      0x5e3 window.o
- .rodata        0x00000000c0030b03       0x3b desktop.o
- *fill*         0x00000000c0030b3e        0x2 
- .rodata        0x00000000c0030b40       0x53 room.o
- *fill*         0x00000000c0030b93        0x1 
- .rodata        0x00000000c0030b94       0xaa usession.o
- *fill*         0x00000000c0030c3e        0x2 
- .rodata        0x00000000c0030c40      0x1b3 gws.o
- .rodata        0x00000000c0030df3        0xf object.o
- *fill*         0x00000000c0030e02        0x2 
- .rodata        0x00000000c0030e04       0xa0 userenv.o
- .rodata        0x00000000c0030ea4      0x316 proc.o
- .rodata        0x00000000c00311ba        0xf syscall.o
- .rodata        0x00000000c00311c9        0xf install.o
- .rodata        0x00000000c00311d8        0xf serial.o
- *fill*         0x00000000c00311e7        0x1 
- .rodata        0x00000000c00311e8      0x143 debug.o
- *fill*         0x00000000c003132b        0x1 
- .rodata        0x00000000c003132c       0xa1 abort.o
- *fill*         0x00000000c00313cd        0x3 
- .rodata        0x00000000c00313d0      0x1b2 x86fault.o
- *fill*         0x00000000c0031582        0x2 
- .rodata        0x00000000c0031584      0x4cb services.o
-                0x00000000c0031a4f                _rodata_end = .
+ .rodata        0x00000000c002f2d8      0x1ee info.o
+ .rodata        0x00000000c002f4c6        0xf signal.o
+ *fill*         0x00000000c002f4d5        0x3 
+ .rodata        0x00000000c002f4d8      0x796 system.o
+ .rodata        0x00000000c002fc6e        0xf bg.o
+ .rodata        0x00000000c002fc7d       0xba grid.o
+ *fill*         0x00000000c002fd37        0x1 
+ .rodata        0x00000000c002fd38       0xb6 sbar.o
+ *fill*         0x00000000c002fdee        0x2 
+ .rodata        0x00000000c002fdf0      0x11d menubar.o
+ *fill*         0x00000000c002ff0d        0x3 
+ .rodata        0x00000000c002ff10      0x234 menu.o
+ .rodata        0x00000000c0030144        0xf i8042.o
+ *fill*         0x00000000c0030153        0x1 
+ .rodata        0x00000000c0030154       0xbd ps2mouse.o
+ *fill*         0x00000000c0030211        0x3 
+ .rodata        0x00000000c0030214       0x52 ps2kbd.o
+ *fill*         0x00000000c0030266        0x2 
+ .rodata        0x00000000c0030268       0x2c button.o
+ .rodata        0x00000000c0030294       0x4d char.o
+ *fill*         0x00000000c00302e1        0x3 
+ .rodata        0x00000000c00302e4       0x34 pixel.o
+ .rodata        0x00000000c0030318        0xf line.o
+ *fill*         0x00000000c0030327        0x1 
+ .rodata        0x00000000c0030328       0x70 rect.o
+ .rodata        0x00000000c0030398       0x2f dtext.o
+ .rodata        0x00000000c00303c7       0x45 font.o
+ .rodata        0x00000000c003040c        0xf vsync.o
+ .rodata        0x00000000c003041b       0x45 bmp.o
+ .rodata        0x00000000c0030460       0xbc createw.o
+ .rodata        0x00000000c003051c      0x5e3 window.o
+ .rodata        0x00000000c0030aff       0x3b desktop.o
+ *fill*         0x00000000c0030b3a        0x2 
+ .rodata        0x00000000c0030b3c       0x53 room.o
+ *fill*         0x00000000c0030b8f        0x1 
+ .rodata        0x00000000c0030b90       0xaa usession.o
+ *fill*         0x00000000c0030c3a        0x2 
+ .rodata        0x00000000c0030c3c      0x1b3 gws.o
+ .rodata        0x00000000c0030def        0xf object.o
+ *fill*         0x00000000c0030dfe        0x2 
+ .rodata        0x00000000c0030e00       0xa0 userenv.o
+ .rodata        0x00000000c0030ea0      0x316 proc.o
+ .rodata        0x00000000c00311b6        0xf syscall.o
+ .rodata        0x00000000c00311c5        0xf install.o
+ .rodata        0x00000000c00311d4        0xf serial.o
+ *fill*         0x00000000c00311e3        0x1 
+ .rodata        0x00000000c00311e4      0x143 debug.o
+ *fill*         0x00000000c0031327        0x1 
+ .rodata        0x00000000c0031328       0xa1 abort.o
+ *fill*         0x00000000c00313c9        0x3 
+ .rodata        0x00000000c00313cc      0x1b2 x86fault.o
+ *fill*         0x00000000c003157e        0x2 
+ .rodata        0x00000000c0031580      0x4cb services.o
+                0x00000000c0031a4b                _rodata_end = .
                 0x00000000c0032000                . = ALIGN (0x1000)
- *fill*         0x00000000c0031a4f      0x5b1 
+ *fill*         0x00000000c0031a4b      0x5b5 
 
 .eh_frame       0x00000000c0032000     0x8640
  .eh_frame      0x00000000c0032000       0x9c x86main.o
