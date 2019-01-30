@@ -1,0 +1,828 @@
+.
+├── 3rdparty
+│   ├── fonts
+│   │   ├── nc2
+│   │   │   ├── build.bat
+│   │   │   ├── link.ld
+│   │   │   ├── nc2.c
+│   │   │   └── nc2.h
+│   │   └── readme.txt
+│   ├── lib
+│   │   └── readme.txt
+│   └── readme.txt
+├── arch
+│   ├── arm
+│   │   └── readme.txt
+│   ├── readme.txt
+│   └── x86
+│       └── boot
+│           ├── bl
+│           │   ├── blmap.s
+│           │   ├── compile
+│           │   ├── dn1.txt
+│           │   ├── include
+│           │   │   ├── 3rdparty
+│           │   │   │   └── disk
+│           │   │   │       └── disk1.h.x
+│           │   │   ├── bli386.h
+│           │   │   ├── bli.h
+│           │   │   ├── bootloader.h
+│           │   │   ├── diskmap.h
+│           │   │   ├── en
+│           │   │   │   └── strings.h
+│           │   │   ├── fs.h
+│           │   │   ├── gdef.h
+│           │   │   ├── keyboard.h
+│           │   │   ├── memmap.h
+│           │   │   ├── shell.h
+│           │   │   ├── stddef.h
+│           │   │   ├── stdio.h
+│           │   │   ├── string.h
+│           │   │   └── types.h
+│           │   ├── link.ld
+│           │   ├── Makefile
+│           │   ├── readme.txt
+│           │   ├── src
+│           │   │   ├── 3rdparty
+│           │   │   │   └── disk
+│           │   │   │       └── disk1.c.x
+│           │   │   ├── arch
+│           │   │   │   └── x86
+│           │   │   │       ├── drivers
+│           │   │   │       │   ├── hdd.c
+│           │   │   │       │   ├── keyboard.c
+│           │   │   │       │   ├── pci.c
+│           │   │   │       │   ├── timer.c
+│           │   │   │       │   └── xxx
+│           │   │   │       │       └── hdd.c.x
+│           │   │   │       ├── ports.c
+│           │   │   │       └── x86.c
+│           │   │   ├── core
+│           │   │   │   ├── faults.c
+│           │   │   │   ├── head
+│           │   │   │   │   ├── arm
+│           │   │   │   │   │   └── head.s
+│           │   │   │   │   └── x86
+│           │   │   │   │       ├── hardware.inc
+│           │   │   │   │       ├── hardwarelib.inc
+│           │   │   │   │       ├── headlib.s
+│           │   │   │   │       ├── head.s
+│           │   │   │   │       ├── software.inc
+│           │   │   │   │       └── softwarelib.inc
+│           │   │   │   └── pages.c
+│           │   │   ├── fs
+│           │   │   │   └── fs.c
+│           │   │   ├── init
+│           │   │   │   └── init.c
+│           │   │   ├── libc
+│           │   │   │   ├── dn1.txt
+│           │   │   │   ├── stdio.c
+│           │   │   │   └── string.c
+│           │   │   ├── loader
+│           │   │   │   └── loader.c
+│           │   │   ├── main.c
+│           │   │   ├── shell
+│           │   │   │   └── shell.c
+│           │   │   └── sys
+│           │   │       ├── abort.c
+│           │   │       ├── procedure.c
+│           │   │       └── services.c
+│           │   └── xxx-build.bat
+│           ├── bm
+│           │   ├── main.asm
+│           │   ├── Makefile
+│           │   ├── stage1
+│           │   │   ├── BM-QUASI-OS.ASM
+│           │   │   └── outro-tipo
+│           │   │       ├── quasiosZZZZ.inc
+│           │   │       └── stage1zzzzz.inc
+│           │   ├── stage2
+│           │   │   ├── include
+│           │   │   │   ├── s2bpb.inc
+│           │   │   │   ├── s2config16.inc
+│           │   │   │   ├── s2gdt.inc
+│           │   │   │   ├── s2header.inc
+│           │   │   │   ├── s2metafile.inc
+│           │   │   │   └── s2vesa.inc
+│           │   │   └── lib16
+│           │   │       ├── lib16.inc
+│           │   │       ├── s2a20.inc
+│           │   │       ├── s2detect.inc
+│           │   │       ├── s2fat12.inc
+│           │   │       ├── s2fat16.inc
+│           │   │       ├── s2lib.inc
+│           │   │       ├── s2menu16.inc
+│           │   │       └── s2modes.inc
+│           │   ├── stage3
+│           │   │   ├── blconfig.inc
+│           │   │   ├── bl.inc
+│           │   │   ├── browser.inc
+│           │   │   ├── debug.inc
+│           │   │   ├── drivers
+│           │   │   │   ├── clock.inc
+│           │   │   │   ├── fdc32.inc
+│           │   │   │   ├── hdd32.inc
+│           │   │   │   ├── keyboard.inc
+│           │   │   │   └── timer.inc
+│           │   │   ├── fs
+│           │   │   │   ├── fat12pm.inc
+│           │   │   │   ├── fat16header.inc
+│           │   │   │   ├── fat16.inc
+│           │   │   │   ├── fat16lib.inc
+│           │   │   │   ├── file.inc
+│           │   │   │   ├── format.inc
+│           │   │   │   ├── fs32.inc
+│           │   │   │   └── ramfs.inc
+│           │   │   ├── include
+│           │   │   │   ├── bootloader.inc
+│           │   │   │   ├── cpuinfo.inc
+│           │   │   │   ├── font32.inc
+│           │   │   │   ├── hardware.inc
+│           │   │   │   ├── header32.inc
+│           │   │   │   ├── init.inc
+│           │   │   │   ├── installer.inc
+│           │   │   │   ├── stacks32.inc
+│           │   │   │   ├── system.inc
+│           │   │   │   ├── sysvar32.inc
+│           │   │   │   ├── tasks32.inc
+│           │   │   │   └── tss32.inc
+│           │   │   ├── kernel
+│           │   │   │   ├── gdt32.inc
+│           │   │   │   ├── idt32.inc
+│           │   │   │   ├── ints32.inc
+│           │   │   │   └── ldt32.inc
+│           │   │   ├── kernel.inc
+│           │   │   ├── lib32
+│           │   │   │   ├── input32.inc
+│           │   │   │   ├── lib32.inc
+│           │   │   │   ├── screen32.inc
+│           │   │   │   └── string32.inc
+│           │   │   ├── pm.inc
+│           │   │   ├── readme.txt
+│           │   │   ├── setup.inc
+│           │   │   ├── shell
+│           │   │   │   ├── shellcalls.inc
+│           │   │   │   ├── shell.inc
+│           │   │   │   ├── shelllib.inc
+│           │   │   │   └── shellmsg.inc
+│           │   │   └── start.inc
+│           │   └── xxx-build.bat
+│           ├── mbr
+│           │   └── xxx-stage1.asm
+│           └── vhd
+│               ├── GRAMADO.TXT
+│               ├── GUI.TXT
+│               ├── images
+│               │   ├── APP.BMP
+│               │   ├── BMP1.BMP
+│               │   ├── CURSOR.BMP
+│               │   ├── DENNIS.BMP
+│               │   ├── FILE.BMP
+│               │   ├── FOLDER.BMP
+│               │   ├── GRAMADO.BMP
+│               │   ├── MOUSE.BMP
+│               │   └── TERMINAL.BMP
+│               ├── INIT.TXT
+│               ├── main.asm
+│               ├── Makefile
+│               ├── readme.txt
+│               ├── stage1
+│               │   ├── backup
+│               │   │   ├── QUASI-OS.ASM
+│               │   │   ├── QUASI-OS-backup-funciona.ASM
+│               │   │   ├── QUASI-OS-BACKUP_SEM_PT.ASM
+│               │   │   ├── QUASI-OS-calculando1.ASM
+│               │   │   └── ____XXX-QUASI-OS-backup.ASM
+│               │   └── stage1.asm
+│               ├── tests
+│               │   ├── ERROR1.C
+│               │   ├── ERROR2.C
+│               │   ├── ERROR3.C
+│               │   ├── ERROR4.C
+│               │   ├── ERROR5.C
+│               │   ├── ERROR6.C
+│               │   ├── TEST1.ASM
+│               │   ├── TEST1.C
+│               │   ├── TEST1.SH1
+│               │   ├── TEST2.ASM
+│               │   ├── TEST2.C
+│               │   ├── TEST3.C
+│               │   ├── TEST4.C
+│               │   ├── TEST5.C
+│               │   └── TEST6.C
+│               ├── USER.TXT
+│               ├── xxx-build.bat
+│               └── xxx-install.bat
+├── bin
+│   ├── BL.BIN
+│   ├── BM.BIN
+│   ├── INIT.BIN
+│   ├── KERNEL.BIN
+│   ├── NC2.FON
+│   ├── SHELL.BIN
+│   └── TASKMAN.BIN
+├── compile.txt
+├── CREDITS
+├── docs
+│   ├── en
+│   │   ├── folders.txt
+│   │   └── readme.txt
+│   ├── pt
+│   │   ├── boot
+│   │   │   ├── bl-ordem.txt
+│   │   │   ├── ordem.jpg
+│   │   │   ├── ordem.txt
+│   │   │   └── vhd-32mb.txt
+│   │   ├── kernel
+│   │   │   ├── dn1-pc.txt
+│   │   │   ├── dn2-ts.txt
+│   │   │   └── kernel.txt
+│   │   └── readme.txt
+│   └── readme.txt
+├── drivers
+│   ├── acpi
+│   │   └── readme.txt
+│   ├── ata
+│   │   └── readme.txt
+│   ├── ide
+│   │   └── readme.txt
+│   ├── idle
+│   │   ├── readme.txt
+│   │   └── x86idle.c.x
+│   ├── network
+│   │   └── readme.txt
+│   ├── pci
+│   │   └── readme.txt
+│   ├── platform
+│   │   └── x86
+│   │       └── readme.txt
+│   └── readme.txt
+├── fs
+│   ├── ext2
+│   │   └── readme.txt
+│   ├── fat
+│   │   └── readme.txt
+│   └── readme.txt
+├── include
+│   ├── kernel
+│   │   ├── cdefs.h.x
+│   │   ├── config
+│   │   │   ├── config.h
+│   │   │   ├── gramado.h
+│   │   │   └── norax.h
+│   │   ├── ctype.h
+│   │   ├── globals
+│   │   │   ├── gdef.h
+│   │   │   ├── gdevice.h
+│   │   │   ├── gentry.h
+│   │   │   ├── gpa.h
+│   │   │   └── gva.h
+│   │   ├── gramado
+│   │   │   ├── 3rdparty
+│   │   │   │   └── sirius.h
+│   │   │   ├── ascii.h
+│   │   │   ├── bmp.h
+│   │   │   ├── cpuid.h
+│   │   │   ├── cursor.h
+│   │   │   ├── events.h
+│   │   │   ├── execve
+│   │   │   │   ├── dd
+│   │   │   │   │   ├── abnt2.h
+│   │   │   │   │   ├── ahci
+│   │   │   │   │   │   ├── ahci.h.x
+│   │   │   │   │   │   └── sata.h
+│   │   │   │   │   ├── apic.h
+│   │   │   │   │   ├── dd.h
+│   │   │   │   │   ├── floppy.h
+│   │   │   │   │   ├── i8042
+│   │   │   │   │   │   ├── i8042.h
+│   │   │   │   │   │   ├── ps2kbd.h
+│   │   │   │   │   │   └── ps2mouse.h
+│   │   │   │   │   ├── ide
+│   │   │   │   │   │   ├── disk1.h
+│   │   │   │   │   │   └── ide.h
+│   │   │   │   │   ├── keyboard.h
+│   │   │   │   │   ├── ldisc
+│   │   │   │   │   │   └── ldisc.h
+│   │   │   │   │   ├── network
+│   │   │   │   │   │   ├── arp.h
+│   │   │   │   │   │   ├── channel.h
+│   │   │   │   │   │   ├── client.h
+│   │   │   │   │   │   ├── ethernet.h
+│   │   │   │   │   │   ├── host.h
+│   │   │   │   │   │   ├── intel.h
+│   │   │   │   │   │   ├── ip.h
+│   │   │   │   │   │   ├── network.h
+│   │   │   │   │   │   ├── nports.h
+│   │   │   │   │   │   ├── ns.h
+│   │   │   │   │   │   └── socket.h
+│   │   │   │   │   ├── pci
+│   │   │   │   │   │   └── pci.h
+│   │   │   │   │   ├── pic.h
+│   │   │   │   │   ├── ps2.h
+│   │   │   │   │   ├── rtc.h
+│   │   │   │   │   ├── serial.h
+│   │   │   │   │   ├── timer.h
+│   │   │   │   │   ├── tty
+│   │   │   │   │   │   └── tty.h
+│   │   │   │   │   ├── usb.h
+│   │   │   │   │   └── vk.h
+│   │   │   │   ├── execve.h
+│   │   │   │   ├── fs
+│   │   │   │   │   ├── fs.h
+│   │   │   │   │   └── vfs.h
+│   │   │   │   ├── sci
+│   │   │   │   │   ├── dn1.txt
+│   │   │   │   │   └── syscall.h
+│   │   │   │   └── sm
+│   │   │   │       ├── debug.h
+│   │   │   │       ├── disk
+│   │   │   │       │   ├── disk.h
+│   │   │   │       │   ├── diskmap.h
+│   │   │   │       │   └── volume.h
+│   │   │   │       ├── dn1.txt
+│   │   │   │       ├── init.h
+│   │   │   │       ├── install.h
+│   │   │   │       ├── io.h
+│   │   │   │       ├── modules.h
+│   │   │   │       ├── sys.h
+│   │   │   │       ├── system.h
+│   │   │   │       └── xxxxfs.h
+│   │   │   ├── fonts.h
+│   │   │   ├── fs.h
+│   │   │   ├── gws
+│   │   │   │   ├── gws
+│   │   │   │   │   ├── bmp.h
+│   │   │   │   │   ├── grid.h
+│   │   │   │   │   ├── guiconf.h
+│   │   │   │   │   ├── menu.h
+│   │   │   │   │   ├── window.h
+│   │   │   │   │   └── ws.h
+│   │   │   │   ├── gws.h
+│   │   │   │   ├── logoff
+│   │   │   │   │   └── logoff.h
+│   │   │   │   ├── logon
+│   │   │   │   │   └── logon.h
+│   │   │   │   ├── terminal
+│   │   │   │   │   ├── console.h
+│   │   │   │   │   ├── line.h
+│   │   │   │   │   └── terminal.h
+│   │   │   │   └── user
+│   │   │   │       ├── desktop.h
+│   │   │   │       ├── room.h
+│   │   │   │       ├── user.h
+│   │   │   │       └── usession.h
+│   │   │   ├── hal
+│   │   │   │   ├── arch
+│   │   │   │   │   ├── amd
+│   │   │   │   │   │   └── cpuamd.h
+│   │   │   │   │   ├── detect.h
+│   │   │   │   │   └── x86
+│   │   │   │   │       ├── portsx86.h
+│   │   │   │   │       ├── x86.h
+│   │   │   │   │       └── x86iv.h
+│   │   │   │   ├── cpu.h
+│   │   │   │   ├── device.h
+│   │   │   │   ├── hal.h
+│   │   │   │   ├── mac.h
+│   │   │   │   ├── memory.h
+│   │   │   │   ├── screen.h
+│   │   │   │   ├── serial.h
+│   │   │   │   └── video.h
+│   │   │   ├── intel.h
+│   │   │   ├── ke.h
+│   │   │   ├── ki.h
+│   │   │   ├── memory.h
+│   │   │   ├── messages.h
+│   │   │   ├── mk
+│   │   │   │   ├── arch
+│   │   │   │   │   └── x86
+│   │   │   │   │       └── x86cont.h
+│   │   │   │   ├── mk.h
+│   │   │   │   ├── pc
+│   │   │   │   │   ├── dispatch.h
+│   │   │   │   │   ├── event.h
+│   │   │   │   │   ├── ipc
+│   │   │   │   │   │   ├── ipc.h
+│   │   │   │   │   │   └── sem.h
+│   │   │   │   │   ├── mm
+│   │   │   │   │   │   ├── aspace.h
+│   │   │   │   │   │   ├── bank.h
+│   │   │   │   │   │   ├── dspace.h
+│   │   │   │   │   │   ├── heap.h
+│   │   │   │   │   │   ├── memmap.h
+│   │   │   │   │   │   ├── mmglobal.h
+│   │   │   │   │   │   └── mm.h
+│   │   │   │   │   ├── pc.h
+│   │   │   │   │   ├── process.h
+│   │   │   │   │   ├── queue.h
+│   │   │   │   │   ├── readme.txt
+│   │   │   │   │   ├── realtime.h
+│   │   │   │   │   ├── sched
+│   │   │   │   │   │   └── sched.h
+│   │   │   │   │   ├── spinlock.h
+│   │   │   │   │   ├── tasks.h
+│   │   │   │   │   ├── thread.h
+│   │   │   │   │   └── ts.h
+│   │   │   │   └── readme.txt
+│   │   │   ├── object.h
+│   │   │   ├── prompt.h
+│   │   │   ├── request.h
+│   │   │   ├── rtc.h
+│   │   │   ├── screen.h
+│   │   │   ├── ss.h
+│   │   │   └── video.h
+│   │   ├── iso646.h
+│   │   ├── limits.h
+│   │   ├── signal.h
+│   │   ├── stdarg-h.x
+│   │   ├── stddef.h
+│   │   ├── stdio.h
+│   │   ├── stdlib.h
+│   │   ├── string.h
+│   │   ├── types.h
+│   │   ├── unistd.h
+│   │   └── xxx-ctype-backup.h
+│   ├── kernel.h
+│   ├── libc
+│   │   ├── api
+│   │   │   └── api.h
+│   │   ├── complex.h
+│   │   ├── conio.h
+│   │   ├── ctype.h
+│   │   ├── fenv.h
+│   │   ├── heap.h
+│   │   ├── inttypes.h
+│   │   ├── iso646.h
+│   │   ├── limits.h
+│   │   ├── mm.h
+│   │   ├── stdarg.h
+│   │   ├── stdbool.h
+│   │   ├── stddef.h
+│   │   ├── stdint.h
+│   │   ├── stdio.h
+│   │   ├── stdlib.h
+│   │   ├── string.h
+│   │   ├── tgmath.h
+│   │   ├── time.h
+│   │   ├── types.h
+│   │   └── unistd.h
+│   └── readme.txt
+├── init
+│   ├── core
+│   │   ├── init
+│   │   │   ├── api.h
+│   │   │   ├── APP_map.s
+│   │   │   ├── build.bat
+│   │   │   ├── dn1.txt
+│   │   │   ├── head.s
+│   │   │   ├── init_map.s
+│   │   │   ├── link.ld
+│   │   │   ├── main.c
+│   │   │   ├── Makefile
+│   │   │   └── readme.txt
+│   │   ├── readme.txt
+│   │   ├── shell
+│   │   │   ├── alias.h
+│   │   │   ├── basic
+│   │   │   │   ├── bstub.c
+│   │   │   │   └── bstub.h
+│   │   │   ├── build.bat
+│   │   │   ├── builtins.c
+│   │   │   ├── builtins.h
+│   │   │   ├── compiler.h
+│   │   │   ├── crt0.c
+│   │   │   ├── desktop.c
+│   │   │   ├── desktop.h
+│   │   │   ├── dn1.txt
+│   │   │   ├── flags.h
+│   │   │   ├── general.h
+│   │   │   ├── globals.h
+│   │   │   ├── head.s
+│   │   │   ├── link.ld
+│   │   │   ├── main.c
+│   │   │   ├── Makefile
+│   │   │   ├── ndir.h
+│   │   │   ├── readme.txt
+│   │   │   ├── shell.h
+│   │   │   ├── shell_map.s
+│   │   │   ├── shellui.c
+│   │   │   ├── sh.h
+│   │   │   ├── terminal.c
+│   │   │   ├── terminal.h
+│   │   │   ├── todo-lexer-parser
+│   │   │   │   ├── lexer.c
+│   │   │   │   ├── lexer.h
+│   │   │   │   ├── parser.c
+│   │   │   │   ├── parser.h
+│   │   │   │   └── table.h
+│   │   │   ├── variables.h
+│   │   │   ├── version.h
+│   │   │   └── xx
+│   │   │       └── execcmd.c.x
+│   │   └── taskman
+│   │       ├── api.h
+│   │       ├── app_map.s
+│   │       ├── build.bat
+│   │       ├── crt0.c
+│   │       ├── head.s
+│   │       ├── link.ld
+│   │       ├── main.c
+│   │       ├── Makefile
+│   │       ├── readme.txt
+│   │       ├── taskman.h
+│   │       ├── taskman_map.s
+│   │       └── tm.h
+│   └── readme.txt
+├── kernel
+│   ├── 3rdparty
+│   │   ├── kernel
+│   │   │   └── readme.txt
+│   │   ├── lib
+│   │   │   └── readme.txt
+│   │   └── readme.txt
+│   ├── build-x86-win.bat
+│   ├── dn1.txt
+│   ├── entry
+│   │   ├── arm
+│   │   │   ├── armmain.c
+│   │   │   └── head
+│   │   │       ├── headlib.s
+│   │   │       ├── head.s
+│   │   │       ├── hw.inc
+│   │   │       ├── hwlib.inc
+│   │   │       ├── sw.inc
+│   │   │       └── swlib.inc
+│   │   ├── readme.txt
+│   │   ├── x86
+│   │   │   ├── head
+│   │   │   │   ├── headlib.s
+│   │   │   │   ├── head.s
+│   │   │   │   ├── hw.inc
+│   │   │   │   ├── hwlib.inc
+│   │   │   │   ├── readme.txt
+│   │   │   │   ├── sw.inc
+│   │   │   │   └── swlib.inc
+│   │   │   └── x86main.c
+│   │   └── xxx-main.c.x
+│   ├── execve
+│   │   ├── crts
+│   │   │   └── libc
+│   │   │       ├── cedge.c
+│   │   │       ├── ctype.c
+│   │   │       ├── readme.txt
+│   │   │       ├── stdio.c
+│   │   │       ├── stdlib.c
+│   │   │       └── string.c
+│   │   ├── dd
+│   │   │   ├── ahci
+│   │   │   │   └── ahci.c.x
+│   │   │   ├── apic.c
+│   │   │   ├── devmgr
+│   │   │   │   └── devmgr.c
+│   │   │   ├── i8042
+│   │   │   │   ├── i8042.c
+│   │   │   │   ├── keyboard.c
+│   │   │   │   ├── mouse.c
+│   │   │   │   ├── ps2kbd.c
+│   │   │   │   └── ps2mouse.c
+│   │   │   ├── ide
+│   │   │   │   ├── disk1.c
+│   │   │   │   └── hdd.c
+│   │   │   ├── ldisc
+│   │   │   │   └── ldisc.c
+│   │   │   ├── network
+│   │   │   │   ├── intel.c
+│   │   │   │   ├── network.c
+│   │   │   │   ├── readme.txt
+│   │   │   │   └── socket.c
+│   │   │   ├── pci
+│   │   │   │   └── pci.c
+│   │   │   ├── pic.c
+│   │   │   ├── readme.txt
+│   │   │   ├── rtc.c
+│   │   │   ├── screen.c
+│   │   │   ├── serial.c
+│   │   │   ├── timer.c
+│   │   │   ├── tty
+│   │   │   │   ├── readme.txt
+│   │   │   │   └── tty.c
+│   │   │   ├── usb
+│   │   │   │   └── usb.c
+│   │   │   ├── video.c
+│   │   │   ├── vsync.c
+│   │   │   └── xxx
+│   │   │       ├── b-dn1.txt
+│   │   │       ├── b-dn2.txt
+│   │   │       ├── kbd.x
+│   │   │       ├── keyboard
+│   │   │       │   ├── brlatin1.txt
+│   │   │       │   └── wk600.c
+│   │   │       ├── mount.x
+│   │   │       ├── mo.x
+│   │   │       ├── readme.txt
+│   │   │       ├── serial.c.x
+│   │   │       ├── unb-dn1.txt
+│   │   │       └── unb-dn2.txt
+│   │   ├── eidata.h
+│   │   ├── ei.h
+│   │   ├── execve.c
+│   │   ├── fs
+│   │   │   ├── cf.c
+│   │   │   ├── format.c
+│   │   │   ├── fs.c
+│   │   │   ├── fsmount.x
+│   │   │   ├── fsr.x
+│   │   │   ├── read.c
+│   │   │   ├── readme.txt
+│   │   │   ├── search.c
+│   │   │   ├── vfs.c
+│   │   │   └── write.c
+│   │   ├── readme.txt
+│   │   ├── sci
+│   │   │   ├── readme.txt
+│   │   │   └── services.c
+│   │   └── sm
+│   │       ├── debug
+│   │       │   ├── debug.c
+│   │       │   └── dn1.txt
+│   │       ├── disk
+│   │       │   └── diskvol.c
+│   │       ├── init
+│   │       │   └── init.c
+│   │       ├── install
+│   │       │   ├── install.c
+│   │       │   └── readme.txt
+│   │       ├── ob
+│   │       │   ├── dn1.txt
+│   │       │   ├── dn2.txt
+│   │       │   └── object.c
+│   │       ├── readme.txt
+│   │       ├── rt
+│   │       │   └── runtime.c
+│   │       └── sys
+│   │           ├── abort.c
+│   │           ├── channel.c
+│   │           ├── dn1.txt
+│   │           ├── info.c
+│   │           ├── io.c
+│   │           ├── modules.c
+│   │           ├── proc.c
+│   │           ├── signal.c
+│   │           ├── sm.c
+│   │           └── system.c
+│   ├── gws
+│   │   ├── gws
+│   │   │   ├── bg.c
+│   │   │   ├── bmp.c
+│   │   │   ├── button.c
+│   │   │   ├── char.c
+│   │   │   ├── createw.c
+│   │   │   ├── cursor.x
+│   │   │   ├── dtext.c
+│   │   │   ├── font.c
+│   │   │   ├── grid.c
+│   │   │   ├── line.c
+│   │   │   ├── menubar.c
+│   │   │   ├── menu.c
+│   │   │   ├── pixel.c
+│   │   │   ├── readme.txt
+│   │   │   ├── rect.c
+│   │   │   ├── sbar.c
+│   │   │   └── window.c
+│   │   ├── gws.c
+│   │   ├── logoff
+│   │   │   └── logoff.c
+│   │   ├── logon
+│   │   │   └── logon.c
+│   │   ├── readme.txt
+│   │   ├── terminal
+│   │   │   └── terminal.c
+│   │   └── user
+│   │       ├── desktop.c
+│   │       ├── room.c
+│   │       ├── userenv.c
+│   │       └── usession.c
+│   ├── hal
+│   │   ├── arch
+│   │   │   ├── amd
+│   │   │   │   └── cpuamd.c
+│   │   │   ├── detect.c
+│   │   │   ├── readme.txt
+│   │   │   └── x86
+│   │   │       ├── portsx86.c
+│   │   │       ├── syscall.c
+│   │   │       └── x86.c
+│   │   ├── hal.c
+│   │   ├── hidata.h
+│   │   └── hi.h
+│   ├── kmap.s
+│   ├── link-backup.ld
+│   ├── link.ld
+│   ├── Makefile
+│   ├── mk
+│   │   ├── arch
+│   │   │   └── x86
+│   │   │       ├── x86cont.c
+│   │   │       ├── x86fault.c
+│   │   │       └── x86start.c
+│   │   ├── mk.c
+│   │   ├── mkidata.h
+│   │   ├── mki.h
+│   │   ├── pc
+│   │   │   ├── action
+│   │   │   │   ├── create.c
+│   │   │   │   ├── dispatch.c
+│   │   │   │   ├── fork.x
+│   │   │   │   ├── pheap.c
+│   │   │   │   ├── process.c
+│   │   │   │   ├── queue.c
+│   │   │   │   ├── readme.txt
+│   │   │   │   ├── spawn.c
+│   │   │   │   ├── tasks.c
+│   │   │   │   ├── theap.c
+│   │   │   │   ├── thread.c
+│   │   │   │   ├── threadi.c
+│   │   │   │   ├── ts.c
+│   │   │   │   └── tstack.c
+│   │   │   ├── ipc
+│   │   │   │   ├── callfar.c
+│   │   │   │   ├── callout.c
+│   │   │   │   ├── ipc.c
+│   │   │   │   └── sem.c
+│   │   │   ├── mm
+│   │   │   │   ├── memory.c
+│   │   │   │   └── pages.c
+│   │   │   ├── readme.txt
+│   │   │   └── sched
+│   │   │       ├── sched.c
+│   │   │       └── schedi.c
+│   │   ├── readme.txt
+│   │   └── request.c
+│   └── readme.txt
+├── kmap.s
+├── lib
+│   ├── api
+│   │   └── api.o
+│   ├── api-src
+│   │   ├── build.bat
+│   │   ├── include
+│   │   │   ├── api.h
+│   │   │   ├── heap.h
+│   │   │   └── types.h
+│   │   └── src
+│   │       └── api.c
+│   ├── asm
+│   │   ├── asm.inc
+│   │   └── build.bat
+│   ├── conio.o
+│   ├── ctype.o
+│   ├── fonts
+│   │   └── dn1.txt
+│   ├── libc-src
+│   │   ├── build.bat
+│   │   ├── conio.c
+│   │   ├── ctype.c
+│   │   ├── Makefile
+│   │   ├── stdio.c
+│   │   ├── stdlib.c
+│   │   ├── string.c
+│   │   └── time.c
+│   ├── stdio.o
+│   ├── stdlib.o
+│   ├── string.o
+│   └── time.o
+├── LICENSE
+├── licenses
+│   ├── LICENSE
+│   └── readme.txt
+├── LIST
+├── Makefile
+├── net
+│   └── readme.txt
+├── README.md
+├── readme.txt
+├── scripts
+│   ├── bochsrc.bxrc
+│   ├── Makefile
+│   ├── readme.txt
+│   └── run-qemu.bat
+├── sdebug.txt
+├── security
+│   └── readme.txt
+├── tools
+│   ├── Makefile
+│   └── readme.txt
+├── tree.txt
+└── user
+    ├── faq
+    │   └── readme.txt
+    ├── feedback
+    │   └── readme.txt
+    ├── readme.txt
+    ├── ui
+    │   └── readme.txt
+    └── ux
+        └── readme.txt
+
+183 directories, 642 files

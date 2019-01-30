@@ -406,7 +406,8 @@ void *services( unsigned long number,
 		//
 		//Supondo que os aplicativos escreverão mais em terminal por enquanto 
 		//a cor padrão de fonte será a cor de terminal.
-		//	
+		
+		// #importante	
 		// Aqui está pintando o caractere na janela com o foco de entrada.
 		case SYS_BUFFER_DRAWCHAR:
 			focusWnd = (void *) windowList[window_with_focus];
@@ -414,10 +415,11 @@ void *services( unsigned long number,
 			    break; 
 			};
 			
-			my_buffer_char_blt( (unsigned long) (focusWnd->left + arg2),             //x.
-			                    (unsigned long) (focusWnd->top + arg3),              //y.
-								CurrentColorScheme->elements[csiTerminalFontColor],  //color. 
-								(unsigned long) arg4); 								 //char.
+			//x, y, color, char.
+			my_buffer_char_blt( (unsigned long) (focusWnd->left + arg2),             
+			                    (unsigned long) (focusWnd->top + arg3),              
+								CurrentColorScheme->elements[csiTerminalFontColor],   
+								(unsigned long) arg4 ); 								 
 			break;
 
 		//8 @todo: BugBug, aqui precisamos de 4 parâmetros.
@@ -1098,34 +1100,25 @@ void *services( unsigned long number,
 			//show_saved_rect (  message_address[0],  message_address[1],  message_address[2],  message_address[3] );
 			break; 
 			
-		//134
-		//pegar informações sobre a área de cliente de uma janela;
+		// 134
+		// Pegar informações sobre a área de cliente de uma janela;
+		//#bugbug: temos que checar mais validade de estrutura.
+		//obs: No começo dessa função, colocamos o arg3 como ponteiro para a3.
+		//um buffer de longs.
 		case 134:
-		        //hWnd = (struct window_d *) arg2;
-			    hWnd = (struct window_d *) arg3;
-                if ( (void *) hWnd != NULL )
-                {	
-                    //#bugbug: temos que checar mais validade de estrutura.
-					
-					//obs: No começo dessa função, colocamos o arg3 como ponteiro para a3.
-					//um buffer de longs.
-					
-		    	    a3[0] = (unsigned long) hWnd->rcClient->left;
-			        a3[1] = (unsigned long) hWnd->rcClient->top;     
-			        a3[2] = (unsigned long) hWnd->rcClient->width;
-			        a3[3] = (unsigned long) hWnd->rcClient->height;
-					
+				hWnd = (struct window_d *) arg3;
+
+				if ( (void *) hWnd != NULL )
+				{	
+					a3[0] = (unsigned long) hWnd->rcClient->left;
+					a3[1] = (unsigned long) hWnd->rcClient->top;     
+					a3[2] = (unsigned long) hWnd->rcClient->width;
+					a3[3] = (unsigned long) hWnd->rcClient->height;
 					a3[4] = (unsigned long) hWnd->rcClient->bg_color;
-					
-					//...
-					//#debug
-                    // printf("service: l={%d} t={%d} w={%d} h={%d}\n", 
-	                //     a3[0], a3[1], a3[2], a3[3] ); 	
-					//refresh_screen();
-					//while(1){}
 				}
-		    break;
-		
+			break;
+			
+
 		// 135
 		// Coloca caracteres na estrutura de terminal, para aplciativos pegarem
         case SYS_FEEDTERMINAL:
@@ -1470,25 +1463,29 @@ void *services( unsigned long number,
 		//214
         case SYS_SETTERMINALINPUTBUFFER:		
 		    break;
-			
+
 		// 215
+		// Get terminal window.	
 		// retorna o ID.
+		// O ID fica em terminal_window.
 		case SYS_GETTERMINALWINDOW: 
-		    return (void *) systemGetTerminalWindow(); 
-		    break;
-			
+			return (void *) systemGetTerminalWindow(); 
+			break;
+
 		// 216
-        // Configura qual vai ser a janela do terminal virtual. 
-		// #obs: O refresh de stdout podera' ocorrer em ts.c	
+		// Set terminal window	
+		// Configura qual vai ser a janela do terminal virtual. 
+		// #obs: O refresh de stdout podera' ocorrer em ts.c
+		// O ID fica em terminal_window.	
 		case SYS_SETTERMINALWINDOW:	
 		   systemSetTerminalWindow ( (struct window_d *) arg2 );	
 		   break;
 		   
 		//217
 		case SYS_GETTERMINALRECT:
-            return NULL; 
+			return NULL; 
 			break;
-			
+
 		//218
         //configura na estrutura do terminal corrente,
         //qual vai ser o retãngulo a ser usado. 		
@@ -2013,6 +2010,7 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 // selecionado em _outbyte.
 // stdio_terminalmode_flag = não transparente.
 // Chama função interna.
+
 void servicesPutChar ( int c ){
 	
 	int cWidth = get_char_width ();
@@ -2034,37 +2032,7 @@ void servicesPutChar ( int c ){
 						cHeight );
 	
 	stdio_terminalmode_flag = 0;  
-
-    //
-	// Update cursor
-	//
-	/*
-    //Limites para o número de caracteres numa linha.
-    if ( g_cursor_x >= (g_cursor_right-1) )
-	{
-        g_cursor_x = g_cursor_left;
-        g_cursor_y++;  
-		
-    }else{   
-	
-	    //
-		// ## Incremento ##
-		//
-		
-		// Apenas incrementa a coluna. 
-        g_cursor_x++;                          
-    };
-    
-	
-	//Número máximo de linhas. (8 pixels por linha.)
-    if( g_cursor_y >= g_cursor_bottom )  
-    { 
-	    scroll();
-        g_cursor_y = g_cursor_bottom;
-    };	
-	*/
-
-}; 
+}
  
  
 /*

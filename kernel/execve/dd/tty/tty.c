@@ -13,8 +13,10 @@
  
  
 #include <kernel.h> 
+
  
- 
+
+/*
 void *createTTYLine (){
 	
 	int i;
@@ -72,8 +74,10 @@ void *createTTYLine (){
 //done:
 	
     return (void *) l;	
-}; 
- 
+    //return NULL;	
+}
+*/ 
+
  
 /*
  ***********************************
@@ -82,7 +86,8 @@ void *createTTYLine (){
  *
  */
 int ttyInit (){
-	
+		
+/*	
 	int i;
 	
 	for ( i=0; i < TTYLINES_COUNT_MAX; i++ )
@@ -99,5 +104,7 @@ int ttyInit (){
 //done: 
 
 	return (int) 0; 
-};
+*/
+    return -1;
+}
 

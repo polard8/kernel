@@ -11,24 +11,7 @@
 //#define DEVELOPER_TTYLINES_MAX 25    //25 
 //... 
 
-
-/*
-//??
-//Credits: Linux like.
-#define TTY_BUFFER_SIZE 1024
-typedef struct tty_queue_d tty_queue_t;
-struct tty_queue_d 
-{
-	unsigned long data;
-	unsigned long head;
-	unsigned long tail;
-	struct process_t *process_list;
-	struct thread_t *thread_list;
-	struct window_d *window_list;
-	char buffer[TTY_BUF_SIZE];
-};
-*/
-
+ 
 
 
 //Contador de linhas usados na hora da criação de linhas.
@@ -39,56 +22,36 @@ int ttyCurrentX;
 int ttyCurrentY;
 
 
-typedef struct ttyline_d ttyline_t;
-struct ttyline_d
+ 
+
+ 
+/*
+//estrutura para tty
+//uma estrutura de tty deve estar associado a
+//uma janela de terminal virual.
+struct tty_struct_d
 {
-	//@todo: Object type.
+    //in support
+	unsigned long IN[320];
+    int head; //coloca.
+	int tail; //pega.
 	
-	int used;
-	int magic;
-	int empty;    //Se está vazia.
+	//out support	
+	unsigned long OUT[320];
 	
-	//fazendo uma lista dos caracteres que ficarão dentro da linha.
-	char c[TTYCHARS_COUNT_MAX];
-	//
+	//continua ...
 	
+	//#obs: olhar o do minix
 	
-	//A estrutura de texto que é dona dessa linha.
-	struct ttytext_d *owner_text;
+	//Id da janela do terminal virtual associado
+	//ao tty
+    int windowID;	
 	
-	//Proxima linhas.
-	struct ttyline_d *next;
-};
-ttyline_t *input_line;
-//...
+}TTYLIST[8];
+*/
 
-//ttyline_t *developer_ttylines[TTYLINES_COUNT_MAX];
-//ttyline_t *developer_ttylines[DEVELOPER_TTYLINES_MAX];
-//ttyline_t *developer_ttylines[DEVELOPER_TTYLINES_MAX];
-//ttyline_t *developer_ttylines[DEVELOPER_TTYLINES_MAX];
-//... 
 
-typedef struct ttytext_d ttytext_t;
-struct ttytext_d
-{
-	//@todo: Object type.
-	
-	int used;
-	int magic;
-	int empty;    //Se está vazia.
-	
-	//fazendo uma lista de ponteiros para estruturas de linhas.
-	unsigned long l[TTYLINES_COUNT_MAX];
-	//	
-	
-	//próximo texto.
-	struct ttytext_d *next;
-};
- 
- 
- 
-
-void *createTTYLine(); 
+//void *createTTYLine(); 
 int ttyInit();
 
 

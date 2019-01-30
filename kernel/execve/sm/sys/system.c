@@ -2495,6 +2495,7 @@ void die (){
 
 //o ID da janela que tem o terminal virtual ativo.
 int systemGetTerminalWindow (){
+	
     return (int) terminal_window;	
 }
 

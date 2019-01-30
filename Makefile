@@ -346,7 +346,7 @@ compile-kernel:
 
 
 link-x86:
-	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map kmap.s
+	ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map docs/kmap.s
 	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
 	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects)
     # gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Wl,-Map=kernel/kmap.s -lgcc"
