@@ -1446,14 +1446,16 @@ void *services( unsigned long number,
 		//210
 		case SYS_CREATETERMINAL: 
             break;
+			
 		//211
         case SYS_GETCURRENTTERMINAL:
-            return NULL;
+            return (void *) current_terminal;
 			break;
 			
 	    //212
         case SYS_SETCURRENTTERMINAL:
-            break;
+            current_terminal = (int) arg2;
+			break;
 			
 		//213
         case SYS_GETTERMINALINPUTBUFFER:	

@@ -101,16 +101,22 @@ configurável.
 */
 
 //Struct para terminal.
-typedef struct terminal_d terminal_t;
 struct terminal_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
 
-    int id;    //Slot number.(NÚMERO DO TERMINAL)
+	//Slot number.(NÚMERO DO TERMINAL)
+    int id;    
     
 	int used;
     int magic;
+	
+	//Owner.
+	int PID;
+	
+	int window_id;
+	
 	
 	//@todo: Instance.
 	
@@ -118,9 +124,6 @@ struct terminal_d
 	int	ColMax;
 	int FullScreen;    //flag.
 	
-	// *IMPORTANTE: 
-	// Essa será a janela para uma instância de terminal.
-    struct window_d *window;    
 	
 	// *IMPORTANTE: 
 	// Os caracteres serão pintados nesse retângulo.
@@ -133,39 +136,19 @@ struct terminal_d
 	unsigned long width;
 	unsigned long height;
 	
-	//informações extras sobre o retângulo.
-	struct rect_d *rect;
+    // #importante
+	// Nas estruturas de stream tem elementos
+	// para manipular os bytes.
 	
-	//
-	// Buffers.
-	//
-
-	//?? generic.
-	struct buffer_d *buffer;
-	
-	//Toda instancia de terminal deve ter seu próprio input buffer.
-    void *InputBuffer;
-	//struct buffer_d *InputBuffer;	
+	// #importante
+	// Isso serve para gerenciar estruturas em ring0.
+              
+    FILE *stdin;	
+	FILE *stdout;
+	FILE *stderr;
 	
 	
-	//Toda instancia de terminal deve ter seu próprio Terminal Screen Buffer.
-    //void *TerminalScreenBuffer;
-	//struct buffer_d *TerminalScreenBuffer;	
-	
-	
-	//caractere que os aplicativos pegarão via getch()
-	char inputCH;
-	int inputCHStatus; //status da mensagem de char ;;; empty ??
-	
-    //char prompt[128];
-    //unsigned long prompt_pos;
-	
-	//struct process_d *Owner;
-	//int UserId;                
-};
-terminal_t *CurrentTerminal;
-//...
-
+}TERMINAL[TERMINAL_COUNT_MAX];
 
 //List.
 //(Control+F1) Aciona o primeiro terminal
@@ -176,7 +159,7 @@ terminal_t *CurrentTerminal;
 //(Control+F6)
 //(Control+F7)
 //(Control+F8) 
-unsigned long terminalList[TERMINAL_COUNT_MAX]; //TERMINAL_COUNT_MAX
+//unsigned long terminalList[TERMINAL_COUNT_MAX]; //TERMINAL_COUNT_MAX
 
 
 

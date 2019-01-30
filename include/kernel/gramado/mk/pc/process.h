@@ -305,6 +305,11 @@ struct process_d
 	//que aparece no terminal.
 	int terminal;
 	
+	//#importante
+	//Em qual terminal o processo vai atual.
+	//a estrutura está em terminal.h
+	int terminal_id;
+	
     //Importante:
 	//isso substituirá a flag 'terminal'
     //APPMODE_TERMINAL = O kernel cria uma estrutura de terminal 
