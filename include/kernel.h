@@ -254,7 +254,10 @@ extern void do_executa_new_task();
 
 #include <kernel/gramado/execve/dd/pci/pci.h>            //pci.
 
-#include <kernel/gramado/execve/dd/ahci/sata.h>           //(PCI BUS).
+//#Test
+#include <kernel/gramado/execve/dd/ahci/ahci.h>          
+#include <kernel/gramado/execve/dd/ahci/sata.h>          
+
 
 #include <kernel/gramado/execve/dd/usb.h>            //usb.
 

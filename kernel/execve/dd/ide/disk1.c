@@ -1,5 +1,5 @@
 /*
- * File: disk1.c
+ * File: disk1.c  mudar para ata.
  *
  * IDE/AHCI support.
  *
@@ -1379,20 +1379,18 @@ int diskATAInitialize ( int ataflag ){
     // Sondando a interface PCI para encontrarmos um dispositivo
     // que seja de armazenamento de dados.
 	
-	//PCI_CLASSCODE_MASS
-	
+	//PCI_CLASSCODE_MASS	
     data = (unsigned long) diskPCIScanDevice(PCI_CLASSE_MASS);
-    
-	// Error.	
+	
 	if( data == -1 )
 	{
-		kprintf ("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", 
+		kprintf ("sm-disk-disk-diskATAInitialize: diskPCIScanDevicefail. ret={%d} \n", 
 		    (unsigned long) data );
 		
 	    // Abortar.
 		Status = (int) (PCI_MSG_ERROR);
 		goto fail;
-	};
+	}
     
     bus = ( data >> 8 & 0xff );
     dev = ( data >> 3 & 31 );

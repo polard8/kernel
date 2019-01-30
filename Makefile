@@ -90,6 +90,7 @@ ldisc.o \
 hdd.o \
 pci.o \
 usb.o \
+ahci.o \
 devmgr.o \
 spawn.o \
 callout.o \
@@ -257,6 +258,9 @@ compile-kernel:
 
 	gcc -c kernel/execve/dd/serial.c  -I include/ $(CFLAGS) $(DEFINES) -o serial.o
 
+	# dd/ahci 
+	gcc -c kernel/execve/dd/ahci/ahci.c  -I include/ $(CFLAGS) $(DEFINES) -o ahci.o
+	
 	# dd/devmgr
 	gcc -c kernel/execve/dd/devmgr/devmgr.c  -I include/ $(CFLAGS) $(DEFINES) -o devmgr.o
 
