@@ -713,6 +713,7 @@ static const char experience_banner[] =
 	" cls         - Clear screen\n"
 	" dir         - List\n"
 	" exit        - Exit shell\n"
+	" gramcode    - Text editor\n"
 	" help        - This help\n"
 	" jackpot     - Game\n"	
 	" kernel-info - kernel Info\n"

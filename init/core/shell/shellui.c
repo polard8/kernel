@@ -571,20 +571,19 @@ struct window_d *shellCreateMainWindow ( int status ){
 	//char colors:
 	//fg=COLOR_TERMINALTEXT, bg=COLOR_TERMINAL2 
 	
-	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "Gramado Virtual Machine Experience",     
-                                left, top, width, height,    
-                                0, 0, COLOR_TERMINAL2, xCOLOR_GRAY1 );
+	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "GRAMADO",     
+                     left, top, width, height,    
+                     0, 0, COLOR_TERMINAL2, xCOLOR_GRAY1 );
 	
 	if ( (void *) w == NULL )
 	{	
-		printf("shellCreateTaskBar: taskbar Window fail");
-		//refresh_screen();
+		printf ("shellCreateTaskBar: taskbar Window fail");
 		
 		while (1){
 			asm("pause");
 		}
 		//exit(0);
-	};
+	}
 	
 	//Registrar e mostrar.
 	

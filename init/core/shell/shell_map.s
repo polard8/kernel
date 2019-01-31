@@ -489,16 +489,16 @@ Linker script and memory map
                 0x000000000045d000                . = ALIGN (0x1000)
  *fill*         0x000000000045c2f8      0xd08 
 
-.rodata         0x000000000045d000     0x4320
- .rodata        0x000000000045d000      0x925 crt0.o
- *fill*         0x000000000045d925       0x1b 
- .rodata        0x000000000045d940     0x1cdf main.o
- *fill*         0x000000000045f61f        0x1 
- .rodata        0x000000000045f620      0xb3f shellui.o
- *fill*         0x000000000046015f        0x1 
- .rodata        0x0000000000460160      0x8da builtins.o
- *fill*         0x0000000000460a3a        0x6 
- .rodata        0x0000000000460a40      0x8cf desktop.o
+.rodata         0x000000000045d000     0x43c0
+ .rodata        0x000000000045d000      0x945 crt0.o
+ *fill*         0x000000000045d945       0x1b 
+ .rodata        0x000000000045d960     0x1cff main.o
+ *fill*         0x000000000045f65f        0x1 
+ .rodata        0x000000000045f660      0xb43 shellui.o
+ *fill*         0x00000000004601a3       0x1d 
+ .rodata        0x00000000004601c0      0x8fa builtins.o
+ *fill*         0x0000000000460aba        0x6 
+ .rodata        0x0000000000460ac0      0x8ef desktop.o
 
 .eh_frame       0x0000000000462000     0x1050
  .eh_frame      0x0000000000462000       0x34 crt0.o
