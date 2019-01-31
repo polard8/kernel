@@ -2,8 +2,12 @@
 
     Nessa pasta ficarão componentes relativos ao comportamento do usuário.
     Até mesmo elementos de UI/UX e personas poderão ser discutidos aqui.
-
-
+	
+	
+Projetos:
+    + gramado virtual machine experience 
+    + gramado real machine experience
+	
     user ideas
     human action
 

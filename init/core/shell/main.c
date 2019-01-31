@@ -2590,7 +2590,7 @@ do_compare:
 		}else{
             
 			//humility
-			if( strncmp( (char*) tokenList[i], "-humility", 9 ) == 0 )
+			if( strncmp( (char*) tokenList[i], "--humility", 10 ) == 0 )
 			{ 
 		        printf("Selecting Humility color scheme\n"); 
                 system_call(119, (unsigned long)1, (unsigned long)1, (unsigned long)1);
@@ -2599,7 +2599,7 @@ do_compare:
 			}
 			
 			//pride
-			if( strncmp( (char*) tokenList[i], "-pride", 6 ) == 0 )
+			if( strncmp( (char*) tokenList[i], "--pride", 7 ) == 0 )
 			{
 				printf("Selecting Pride color scheme\n");
                 system_call(119, (unsigned long)2, (unsigned long)2, (unsigned long)2);
@@ -2717,7 +2717,7 @@ do_compare:
 	// editbox
 	// Cria uma edibox.
     // #teste: deletar.
-	if ( strncmp( prompt, "editbox", 7 ) == 0 )
+	if ( strncmp( prompt, "edit-box", 8 ) == 0 )
 	{
 	    enterCriticalSection();    
 	    shellCreateEditBox();
@@ -2799,9 +2799,10 @@ do_compare:
     };
 	
 	
-    //get-windowstation
-	if ( strncmp( prompt, "get-windowstation", 17 ) == 0 )
+    //get-room (windowstation)
+	if ( strncmp( prompt, "get-room", 8 ) == 0 )
 	{
+		//#todo change name.
 	    shellShowWindowStationID();
         goto exit_cmp;
     };
@@ -2860,6 +2861,7 @@ do_compare:
 	// help
 	// ?
 	// Mostra ajuda.
+	// Menu. for gramado virtual machine experience.
     if ( strncmp( prompt, "HELP", 4 ) == 0 ||  
 	     strncmp( prompt, "help", 4 ) == 0 || 
 	     strncmp( prompt, "?", 1 ) == 0 )
@@ -2870,17 +2872,18 @@ do_compare:
 		
 		if( token == NULL )
 		{
-			help_builtins(1);
+			help_builtins (1);
+			
 		}else{
             
-			if( strncmp( (char*) tokenList[i], "-all", 4 ) == 0 )
-			{ 
-                help_builtins(1); 		
-			}
+			//if ( strncmp( (char*) tokenList[i], "--experience", 12 ) == 0 )
+			//{ 
+            //    help_builtins (1); 		
+			//}
 			
-			if( strncmp( (char*) tokenList[i], "-min", 4 ) == 0 )
+			if ( strncmp( (char*) tokenList[i], "--tests", 7 ) == 0 )
 			{
-                help_builtins(2);				
+                help_builtins (2);				
 			}
 			
 			//...
@@ -4778,10 +4781,18 @@ void shellThread (){
 
 
 //help message
-void shellHelp (){
-	
-    printf (help_banner);	
-};
+void shellShowExperienceMenu (){
+
+    printf (experience_banner);			
+    //printf (help_banner);	
+}
+
+//help message
+void shellShowTestsMenu (){
+
+    printf (tests_banner);			
+    //printf (help_banner);	
+}
 
 
 //drawing a tree

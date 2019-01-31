@@ -706,7 +706,53 @@ static const char help_banner[] =
 	" version   - Shell version\n"
 	"\n";
 
+// experience banner
+static const char experience_banner[] =
+    "\n Try these commands: \n \n"
+	" ?           - This help\n"
+	" cls         - Clear screen\n"
+	" dir         - List\n"
+	" exit        - Exit shell\n"
+	" help        - This help\n"
+	" jackpot     - Game\n"	
+	" kernel-info - kernel Info\n"
+	" mm-info     - Memory Info\n"
+	" disk-info   - Disk Info\n"
+	" volume-info - Volume Info\n"
+	" pwd         - Print working directory\n"
+    " reboot      - Reboot system\n"	
+	"\n";
+
 	
+// tests banner 
+// mostra os comandos para testes do sistema 
+// e aplicativos em deseenvolvimento.
+static const char tests_banner[] =
+    "\n Try these commands: \n \n"
+	" about       - Testing message\n"
+	" bmp         - bmp <filename>\n"
+	" cd          - cd <dirname>\n"
+	" color       - color --humility | color --pride\n"
+	" disk-info   - Disk Info\n"
+	" exit        - Exit shell\n"
+	" fork        - fork\n"	
+    " heap        - User mode Heap test\n"	
+	" help        - This help\n"
+	" kernel-info - kernel Info\n"	
+    " mbr         - MBR\n"
+	" pci-info    - PCI iIfo\n"
+    " socket-test - Socket test\n"    
+    " system-info - System info\n"
+	" timer-test  - Timer test\n"
+	" ~>          - getpid getppid getuid getgid\n"	
+	" ~>          - get-usersession get-room get-desktop\n"		
+	" ~>          - dialog-vox edit-box message-box\n"
+	" ~>          - mm-info mm-kernelheap mm-processheap\n"
+	" ~>          - test-taskman-server\n"
+	" ~>          - t1 t2 t3 ... t3 t14\n"	
+	"\n";
+
+
 // tree
 static const char tree_banner[] =
 "\n"
@@ -1063,7 +1109,10 @@ void shellPrompt();
 
 //cmd
 //Funções chamadas pelos comandos.
-void shellHelp();
+
+void shellShowExperienceMenu();
+void shellShowTestsMenu();
+
 void shellTree();
 void shellThread();
 void shellTestLoadFile();

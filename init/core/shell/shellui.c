@@ -570,12 +570,8 @@ struct window_d *shellCreateMainWindow ( int status ){
 	
 	//char colors:
 	//fg=COLOR_TERMINALTEXT, bg=COLOR_TERMINAL2 
-
-	//w = (void *) APICreateWindow ( 1, 1, 1, "shell-main",     
-    //                            left, top, width, height,    
-    //                            0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 	
-	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "shell-main",     
+	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "Gramado Virtual Machine Experience",     
                                 left, top, width, height,    
                                 0, 0, COLOR_TERMINAL2, xCOLOR_GRAY1 );
 	

@@ -113,22 +113,30 @@ int getgid_builtins (){
 };
 
 
+/*
+ * help_builtins:
+ *     Esse comando deve oferecer uma experiência ao usuário. Mostrando
+ * os comandos disponíveis para uso.
+ *     --tests é a flag que mostra os testes das novas implemetações.
+ */
 void help_builtins (int arg){
 	
 	switch (arg)
 	{
-		//all
+		//shell experience menu.
 		case 1:
 		    printf("Show all help topics\n");
-			shellHelp();
+			shellShowExperienceMenu();
 		    break;
-		//min
+			
+		//shell tests menu.
 		case 2:
-		    printf("cls, help, exit..\n");
+			shellShowTestsMenu();
+		    //printf("cls, help, exit..\n");
 			break;
 		
 		default:
-			shellHelp ();
+			shellShowExperienceMenu();
 			break;
 			
 	};

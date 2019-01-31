@@ -16,7 +16,7 @@ VERSION = 0
 PATCHLEVEL = 10
 SUBLEVEL = 0
 EXTRAVERSION = -rc0
-NAME = ?
+NAME = Experience
 
 #important
 #We will have a new name just when the release changes.
@@ -423,6 +423,7 @@ vhd-copy-files:
 	-sudo cp ../gde/bin/GDESHELL.BIN /mnt/gramadovhd 
 	-sudo cp ../gde/bin/SPR.BIN /mnt/gramadovhd 
 	-sudo cp ../gde/bin/CHASM32.BIN /mnt/gramadovhd 
+	-sudo cp ../gde/bin/JACKPOT.BIN /mnt/gramadovhd 
 	
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM /mnt/gramadovhd
 

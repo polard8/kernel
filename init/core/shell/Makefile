@@ -1,21 +1,22 @@
 
+# Gramado Kernel Shell.
+# A mini-shell to setup and test the kernel functionalities.
+
 #history:
 #2019 - Created by Fred Nora and Luciano Gonçalez.
 
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
 
+# todo:
+# Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
+# É desejável que isso mude.
 
 
 VERSION = 0
-PATCHLEVEL = 0
+PATCHLEVEL = 1
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = shell for holambra kernel
+#NAME = gramado Kernel Shell
 
-#todo:
-#We need to simplify these flags
 
 CFLAGS = -m32 \
 	--std=gnu89 \
@@ -31,6 +32,12 @@ CFLAGS = -m32 \
 	-fleading-underscore \
 	-fno-stack-protector \
 	-s
+
+
+# desejamos tirar essa flag.
+#	-fleading-underscore \
+
+
 
 
 	##
