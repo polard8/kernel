@@ -1,4 +1,4 @@
-OUTPUT_FORMAT("pe-i386")   /* let the linker use its 'native' format (ELF/COFF/PE) */
+OUTPUT_FORMAT("elf32-i386")
 ENTRY(_kernel_begin)       /* Kernel entry point. (head.s) */
 SECTIONS
 { 

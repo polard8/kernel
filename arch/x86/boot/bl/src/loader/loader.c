@@ -104,13 +104,20 @@ int load_kernel (){
 	 * 0x184 Digital Equipment Corporation (DEC) Alpha (32-bit).
 	 */ 
 	 
-	//Check for intel i386. 0x014C. 
-	
-	if ( kernel[0] != 0x4C || kernel[1] != 0x01 )
+	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+	if ( kernel[0] != 0x7F || kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
 	{	
 	    printf ("load_kernel fail: %s Validation\n", kernel_name );  
 		goto fail;	
-	};
+	}
+
+
+	// Check for intel i386. 0x014C.
+	//if ( kernel[0] != 0x4C || kernel[1] != 0x01 )
+	//{	
+	//    printf ("load_kernel fail: %s Validation\n", kernel_name );  
+	//	goto fail;	
+	//};
 	
 	
 	//WORD Machine.
