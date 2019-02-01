@@ -440,3 +440,23 @@ clean:
 	-rm *.o
 
 	@echo "Success?"
+	
+makeiso-x86:
+	nasm -I arch/x86/boot/iso/stage1/ \
+	-I arch/x86/boot/iso/stage2/ \
+	-I arch/x86/boot/iso/stage2/lib16/ \
+	-I arch/x86/boot/iso/stage2/include/ \
+	-I arch/x86/boot/iso/msm/ \
+	-I arch/x86/boot/iso/msm/lib32/ \
+	-I arch/x86/boot/iso/msm/include/ \
+	-I arch/x86/boot/iso/msm/kernel/ \
+	-I arch/x86/boot/iso/msm/fs/ \
+	-I arch/x86/boot/iso/msm/shell/ \
+	-I arch/x86/boot/iso/msm/drivers/ \
+	-I arch/x86/boot/iso/bl/ \
+	-I arch/x86/boot/iso/kernel/ \
+	-I arch/x86/boot/iso/browser/  arch/x86/boot/iso/main.asm  -o  GRAMADO.ISO
+	
+	@echo "iso Success?"
+	
+	

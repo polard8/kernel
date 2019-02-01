@@ -1,11 +1,12 @@
 ;;
-;; Gramado MBR - Esse é o MBR que é montado no VHD na hora de sua criação.
+;; Gramado MBR - Esse é o MBR que é montado na ISO na hora de sua criação.
 ;; Será o primeiro setor do disco.
 ;; Essa rotina carrega o BM.BIN na memória e passa o comando para ele. Além de
 ;; passar argumentos.
 ;; (c) Copyright 2017 - Fred Nora.
 ;;
-;; É um VHD de 32MB. A primeira partição é a partição do sistema e está formatada
+;; #bugbug: rever isso.
+;; É uma ISO de 32MB. A primeira partição é a partição do sistema e está formatada
 ;; em fat16 com 512 bytes por cluster.
 ;;
 ;; Obs: Não mudar os endereços de segmento e offset usados para não arrumar problemas.
@@ -27,6 +28,8 @@ ROOTDIRSIZE  EQU (BUFFER_NAME+4)
 
 ;; 16bit. Esse é o MBR do VHD.
 [bits 16]
+
+stage1_start:
 
     jmp START
 
@@ -89,6 +92,8 @@ ImageName   db "BM      BIN", 0x0D, 0x0A, 0x00
 ;msgImg		db "I", 0x0D, 0x0A, 0x00   ;; Loading Image.
 ;msgFail		db "r",0x00                ;; read failure.
 msgFailure  db "R", 0x00               ;; ROOT failure.
+
+msgHello db "Gramado: Stating ISO ...", 0x0D, 0x0A, 0
 ;...
 
 ;Real Start.
@@ -112,10 +117,19 @@ Step2:
     ;cmp dl, byte 0x80
     ;jne FAILURE
 
-    ;;Clear the Screen.
+    ;;Clear the Screen and hello.
 Step3:   
     mov ax, 02h
     int 010h
+	
+    mov  si, msgHello
+    call  DisplayMessage	
+	
+;;#debug	
+xxxhang:	
+    cli
+	hlt
+	jmp xxxhang 
 
 ;Step4:
     ;@todo: Certificar que int 13h é suportada.	
@@ -611,8 +625,11 @@ FAILURE:
 	
 
 
+;;#bugbug
+;;talvez isso n~ao seja mais nessario.
+
 ;Colocando a partition table no lugar certo.(0x1BE).
-    TIMES 446-($-$$) DB 0  ;0x1BE
+    ;TIMES 446-($-$$) DB 0  ;0x1BE
 
 
 	
@@ -648,7 +665,11 @@ P3: dd 0,0,0,0
 ;;
 
 MBR_SIG:    
-	TIMES 510-($-$$) DB 0
+
+    ;;2048 - tamanho de um setor de cd.
+    TIMES 2046 - ($-stage1_start) DB 0
+	;TIMES 2046 - ($-$$) DB 0
+	;;TIMES 510-($-$$) DB 0
     DW 0xAA55
 ;***********************************************************
 
