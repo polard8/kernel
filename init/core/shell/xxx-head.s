@@ -40,8 +40,6 @@ segment .head_x86
 
  
 extern _crt0
-;extern _GramadoMain
-;extern _exit
 
 
 ;;=====================================================

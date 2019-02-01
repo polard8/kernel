@@ -29,9 +29,12 @@ CFLAGS = -m32 \
 	-fno-builtin \
 	-fno-pie \
 	-no-pie \
-	-fleading-underscore \
 	-fno-stack-protector \
 	-s
+	
+#	-fleading-underscore \
+#	-fno-stack-protector \
+#	-s
 
 
 # desejamos tirar essa flag.
@@ -43,9 +46,11 @@ CFLAGS = -m32 \
 	##
 	## Objects
 	##
+#myObjects = head.o \
 
-myObjects = head.o \
-crt0.o \
+
+
+myObjects = crt0.o \
 main.o \
 shellui.o \
 api.o \
@@ -63,11 +68,11 @@ desktop.o
 
 .PHONY: all all-c shell-link finalize clean
 
-all: head.o crt0.o main.o all-c shell-link finalize clean
+all: crt0.o main.o all-c shell-link finalize clean
 	@echo "Ok?"
 
 head.o:
-	nasm  head.s  -felf -o head.o
+#	nasm  head.s  -felf -o head.o
 
 crt0.o:
 	gcc  -c  crt0.c -I ../../../include/libc/ $(CFLAGS) -o crt0.o
@@ -94,7 +99,9 @@ all-c:
 #	cp ../../../lib/unistd.o .
 
 shell-link:
-	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
+	ld -m elf_i386 -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
+#	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
+
 
 finalize:
 	cp SHELL.BIN ../../../bin

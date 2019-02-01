@@ -331,25 +331,47 @@ int load_files (){
 	// Shell.
 	// TaskManager.
 	
-	if ( init[0] != 0x4C || init[1] != 0x01 )
-	{
-	    printf ("load_files: %s Validation", init_name );
-	    goto fail;	
-	};
 	
-	
-	if ( shell[0] != 0x4C || shell[1] != 0x01 )
-	{
-	    printf ("load_files: %s Validation", shell_name );
-	    goto fail;	
-	};
+	//#bugbug
+	//vamos transforma em elf um por vez.
 
-	 
-	if ( taskmanager[0] != 0x4C || taskmanager[1] != 0x01 )
-	{
-	    printf ("load_files: %s Validation", taskmanager_name );
-	    goto fail;	
-	};
+	
+	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+	if ( init[0] != 0x7F || init[1] != 'E' || init[2] != 'L' || init[3] != 'F' )
+	{	
+	    printf ("load_files fail: %s Validation\n", init_name );  
+		goto fail;	
+	}		
+	//if ( init[0] != 0x4C || init[1] != 0x01 )
+	//{
+	//    printf ("load_files: %s Validation", init_name );
+	//    goto fail;	
+	//};
+	
+	
+	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+	if ( shell[0] != 0x7F || shell[1] != 'E' || shell[2] != 'L' || shell[3] != 'F' )
+	{	
+	    printf ("load_files fail: %s Validation\n", shell_name );  
+		goto fail;	
+	}	
+	//if ( shell[0] != 0x4C || shell[1] != 0x01 )
+	//{
+	//    printf ("load_files: %s Validation", shell_name );
+	//    goto fail;	
+	//};
+
+	
+	if ( taskmanager[0] != 0x7F || taskmanager[1] != 'E' || taskmanager[2] != 'L' || taskmanager[3] != 'F' )
+	{	
+	    printf ("load_files fail: %s Validation\n", taskmanager_name );  
+		goto fail;	
+	}			
+	//if ( taskmanager[0] != 0x4C || taskmanager[1] != 0x01 )
+	//{
+	//    printf ("load_files: %s Validation", taskmanager_name );
+	//    goto fail;	
+	//};
 
 	// Continua ...
 	

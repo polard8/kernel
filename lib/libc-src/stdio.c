@@ -2043,7 +2043,7 @@ char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 //vamos usar o que está em ctype.h
 //#define toupper(c)  ((c) - 0x20 * (((c) >= 'a') && ((c) <= 'z')))
 
-static size_t strlen (const char *s){
+static size_t stdio_strlen (const char *s){
 	
 	size_t l = 0;
 	while (*s++)
@@ -2385,7 +2385,7 @@ kvprintf ( char const *fmt,
 			if (p == NULL)
 				p = "(null)";
 			if (!dot)
-				n = strlen (p);
+				n = stdio_strlen (p);
 			else
 				for (n = 0; n < dwidth && p[n]; n++)
 					continue;
@@ -2579,7 +2579,7 @@ int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr )
 		
 	} else {
 		
-		size = (int) strlen (format);
+		size = (int) stdio_strlen (format);
 		
 		//Se a string for maior que o tanto de bytes
 		//disponíveis no arquivo

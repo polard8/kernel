@@ -8,15 +8,6 @@
 #include "tm.h"
 
 
-/* libc */
-/*
-#include <types.h>
-#include <stdio.h> 
-#include <stddef.h>   
-#include <stdlib.h>  
-*/
-
-
 extern int appMain ( int argc, char *argv[] ); 
 
 

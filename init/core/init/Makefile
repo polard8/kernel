@@ -1,21 +1,22 @@
 
+# Gramado Kernel Shell.
+# A mini-shell to setup and test the kernel functionalities.
+
 #history:
 #2019 - Created by Fred Nora and Luciano Gonçalez.
 
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
 
+# todo:
+# Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
+# É desejável que isso mude.
 
 
 VERSION = 0
-PATCHLEVEL = 0
+PATCHLEVEL = 1
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = init for holambra kernel
+#NAME = gramado Kernel Shell
 
-#todo:
-#We need to simplify these flags
 
 CFLAGS = -m32 \
 	--std=gnu89 \
@@ -28,33 +29,49 @@ CFLAGS = -m32 \
 	-fno-builtin \
 	-fno-pie \
 	-no-pie \
-	-fleading-underscore \
 	-fno-stack-protector \
 	-s
+	
+#	-fleading-underscore \
+#	-fno-stack-protector \
+#	-s
+
+
+# desejamos tirar essa flag.
+#	-fleading-underscore \
+
+
 
 
 	##
 	## Objects
 	##
+#myObjects = head.o \
 
-myObjects = head.o \
+
+
+myObjects = crt0.o \
 main.o \
 api.o \
 ctype.o \
 stdio.o \
 stdlib.o \
 string.o \
-conio.o   
+conio.o  
+
 
 
 
 .PHONY: all all-c shell-link finalize clean
 
-all: head.o main.o all-c shell-link finalize clean
+all: crt0.o main.o all-c shell-link finalize clean
 	@echo "Ok?"
 
 head.o:
-	nasm  head.s  -felf -o head.o
+#	nasm  head.s  -felf -o head.o
+
+crt0.o:
+	gcc  -c  crt0.c -I ../../../include/libc/ $(CFLAGS) -o crt0.o
 
 main.o:
 	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o main.o
@@ -78,7 +95,9 @@ all-c:
 #	cp ../../../lib/unistd.o .
 
 shell-link:
-	ld -m i386pe -T link.ld -o INIT.BIN $(myObjects) -Map APP_map.s
+	ld -m elf_i386 -T link.ld -o INIT.BIN $(myObjects) -Map map.s
+#	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
+
 
 finalize:
 	cp INIT.BIN ../../../bin
