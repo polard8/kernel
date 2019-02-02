@@ -1,14 +1,20 @@
-; CDFS Bootable iso9660
+;;
+;; File: iso/stage1/stage1.asm
+;;
+;; Esse e' o stage1 do arquivo .ISO.
+;; O propo'sito e' carregar o stage2 que esta' em boot/gramado/stage2.bin 
+;; CDFS Bootable ISO9660
+;;
+;; History:
+;; 2018 - Created by Nelson Cole. (Sirius OS)
+;; 2019 - Fred Nora. Changing some strings.
+;;
 
-;old
-;LOADSEG equ 0x8000
-;LDSBASE equ 0x2000
 
+;; Offset para o arquivo stage2.bin.
+LOADSEG equ 0x8000   
 
-;;offset para a staga2 BM.BIN.
-LOADSEG equ 0x8000   ;;offset
-
-;;usado para root dir.
+;; Usado para root dir.
 LDSBASE equ 0x2000   
 
         org     0x7c00
