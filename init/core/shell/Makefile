@@ -100,11 +100,10 @@ all-c:
 
 shell-link:
 	ld -m elf_i386 -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
-#	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
 
 
 finalize:
-	cp SHELL.BIN ../../../bin
+	cp SHELL.BIN ../../../bin/init/
 
 clean:
 	-rm *.o

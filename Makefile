@@ -357,7 +357,7 @@ link-x86:
 	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects)
     # gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Wl,-Map=kernel/kmap.s -lgcc"
 
-	mv KERNEL.BIN bin/
+	mv KERNEL.BIN bin/kernel/
 
 vhd-x86:
 	nasm -I arch/x86/boot/vhd/stage1/ \
@@ -385,14 +385,14 @@ vhd-mount:
 # 2) KERNEL 
 # 3) INIT, SHELL, TASKMAN
 vhd-copy-files:
-	sudo cp bin/BM.BIN       /mnt/gramadovhd
-	sudo cp bin/BL.BIN       /mnt/gramadovhd
+	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd
+	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd
 	
-	sudo cp bin/KERNEL.BIN   /mnt/gramadovhd
+	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd
 	
-	sudo cp bin/INIT.BIN     /mnt/gramadovhd
-	sudo cp bin/SHELL.BIN    /mnt/gramadovhd
-	sudo cp bin/TASKMAN.BIN  /mnt/gramadovhd
+	sudo cp bin/init/INIT.BIN     /mnt/gramadovhd
+	sudo cp bin/init/SHELL.BIN    /mnt/gramadovhd
+	sudo cp bin/init/TASKMAN.BIN  /mnt/gramadovhd
 	
 # configs
 	sudo cp arch/x86/boot/vhd/INIT.TXT /mnt/gramadovhd
@@ -458,5 +458,16 @@ makeiso-x86:
 	-I arch/x86/boot/iso/browser/  arch/x86/boot/iso/main.asm  -o  GRAMADO.ISO
 	
 	@echo "iso Success?"
+	
+geniso-x86:
+	nasm arch/x86/boot/iso/stage1/stage1.asm -f bin -o stage1.bin
+	cp stage1.bin bin/boot/
+	#cp bin/boot/BM.BIN bin/boot/gramado/BM.BIN
+	#cp bin/boot/BL.BIN bin/boot/gramado/BL.BIN
+
+	mkisofs -R -J -c boot/boot.catalog -b boot/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
+	
+	@echo "iso Success?"	
+	
 	
 	

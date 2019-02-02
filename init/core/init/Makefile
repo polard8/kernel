@@ -1,6 +1,5 @@
 
-# Gramado Kernel Shell.
-# A mini-shell to setup and test the kernel functionalities.
+#init process
 
 #history:
 #2019 - Created by Fred Nora and Luciano Gonçalez.
@@ -96,11 +95,10 @@ all-c:
 
 shell-link:
 	ld -m elf_i386 -T link.ld -o INIT.BIN $(myObjects) -Map map.s
-#	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
 
 
 finalize:
-	cp INIT.BIN ../../../bin
+	cp INIT.BIN ../../../bin/init/
 
 clean:
 	-rm *.o

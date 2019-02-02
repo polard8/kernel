@@ -1,6 +1,5 @@
 
-# Gramado Kernel Shell.
-# A mini-shell to setup and test the kernel functionalities.
+#taskman
 
 #history:
 #2019 - Created by Fred Nora and Luciano Gonçalez.
@@ -62,12 +61,12 @@ conio.o
 
 
 
-.PHONY: all all-c shell-link finalize clean
+.PHONY: all all-c taskman-link finalize clean
 
-all: crt0.o main.o all-c shell-link finalize clean
+all: crt0.o main.o all-c taskman-link finalize clean
 	@echo "Ok?"
 
-head.o:
+#head.o:
 #	nasm  head.s  -felf -o head.o
 
 crt0.o:
@@ -94,13 +93,12 @@ all-c:
 #	cp ../../../lib/wait.o .
 #	cp ../../../lib/unistd.o .
 
-shell-link:
+taskman-link:
 	ld -m elf_i386 -T link.ld -o TASKMAN.BIN $(myObjects) -Map map.s
-#	ld -m i386pe -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
 
 
 finalize:
-	cp TASKMAN.BIN ../../../bin
+	cp TASKMAN.BIN ../../../bin/init/
 
 clean:
 	-rm *.o

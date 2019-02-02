@@ -19,7 +19,7 @@ asm-stuff:
 
 
 cp-stuff:
-	-cp BM.BIN ../../../../bin/
+	-cp BM.BIN ../../../../bin/boot/
 
 
 clean:

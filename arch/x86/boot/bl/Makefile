@@ -1,6 +1,6 @@
 
 #
-# Compiling Gramado 0.4 Boot Loader 
+# Compiling Gramado 0.11 Boot Loader 
 # BSD License 
 #
 # 2018 - Created by Fred Nora.
@@ -119,7 +119,7 @@ link-x86:
     # gcc -T link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o BL.BIN $(myObjects) -Wl,-Map=blmap.s -lgcc"
 	
 finalize:
-	cp BL.BIN ../../../../bin
+	cp BL.BIN ../../../../bin/boot/
 	
 clean:
 	find . -type f -name '*.o' -delete

@@ -34,7 +34,7 @@ start:
 	mov ax,3
 	int 0x10
 
-	mov si, string1
+	mov si,string1
 	call Prints
 
 	mov cx, 1
@@ -95,12 +95,8 @@ nextsearch:
 
 	
 .SIRIUS:
-
-    ;; #importante
-    ;; Se o o diretório /gramado não for encontrado.
-	
 	cmp byte[bx +0],0
-	jz gramadoNotFound ;jz BootError
+	jz BootError
 
 	mov cx,7
 	lea si,[bx + 33]
@@ -117,12 +113,8 @@ nextsearch:
 
 
 .STAGE2.BIN:
-  
-    ;; #importante
-    ;; Se o arquivo stage2 não for encontrado.
-
 	cmp byte[bx +0], 0
-	jz stage2NotFound ;jz BootError
+	jz BootError
 
 	mov cx,12
 	lea si,[bx + 33]
@@ -131,9 +123,9 @@ nextsearch:
 	rep cmpsb
 	jz ExecStage2
 
-	xor ax, ax
-	mov al, byte[bx + 0]
-	add bx, ax
+	xor ax,ax
+	mov al,byte[bx + 0]
+	add bx,ax
 
 	jmp .STAGE2.BIN
 
@@ -170,32 +162,11 @@ ExecStage2:
 	mov di,LOADSEG / 0x10
 	mov bx,0
 	call ReadSectors
-	
-	mov si, goString
-	call Prints	
-	
-	xor ax,ax
-	int 0x16	
 
 	mov dl,byte[bootdevnum]
 	push dx
 	jmp 0:LOADSEG
 
-
-
-;;==================================
-;;  ## ERROR MESSAGES ##
-;;
-
-gramadoNotFound:
-	mov si, gramadoNotFoundString
-	call Prints	
-	jmp BootError
-	
-stage2NotFound:
-	mov si, stage2NotFoundString
-	call Prints
-	jmp BootError
 	
 BootError:
 
@@ -206,9 +177,6 @@ BootError:
 	int 0x16
 	int 0x19
 
-	
-	
-	
 	
 PHYSICALDAPA: times 0x10 db 0
 ReadSectors:
@@ -307,27 +275,19 @@ crtl			db 0
 
 ;Strings
 string1:
-	;db 'CD Bootable',10,13,0
-	db 'Gramado: Starting ISO ...',10,13,0
-	
+	db 'CD Bootable',10,13,0
+
 string2:   
-	db 'CD Bootable Error!',10,13,0
+	db 'CD Bootable Error',10,13,0
 
 string3:
 	db 'BOOT',0	
 string4:
-    db 'GRAMADO',0
+	db 'SIRIUS',0
 string5:
-	db 'STAGE2.BIN;1',0
-	
-gramadoNotFoundString:
-    db 'gramado folder not found!', 10, 13, 0
-	
-stage2NotFoundString:
-    db 'stage2 not found!', 10, 13, 0
-	
-goString:
-    db 'Presss a key to start stage2', 10, 13, 0   
+        db 'BM.BIN;1',0
+	;db 'STAGE2.BIN;1',0
+
 
 times 2046 - ($-$$) db 0
 dw 0xaa55
