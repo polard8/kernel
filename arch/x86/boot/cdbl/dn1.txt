@@ -1,0 +1,15 @@
+
+
+ O Boot Loader será carregado de algum diretório pelo Boot Manager. Portanto
+Um dos argumentos a ser passados ao Boot Loader pelo Boot Manager é o endereço do
+Diretório na memória, que provavelmente é o diretório raiz do volume.
+
+ Os argumentos mais importante a serem passados ao Boot Loader pele Boot manager
+são:
+
+    * Endereço do diretório na memória.
+    * Bloco de informações e parâmetros de disco.
+    * Número que identifica o disco do qual o Booot Loader foi carregado.
+
+
+ 

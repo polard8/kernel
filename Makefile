@@ -460,12 +460,14 @@ makeiso-x86:
 	@echo "iso Success?"
 	
 geniso-x86:
+	
+	#stage1
 	nasm arch/x86/boot/iso/stage1/stage1.asm -f bin -o stage1.bin
-	cp stage1.bin bin/boot/
-	#cp bin/boot/BM.BIN bin/boot/gramado/BM.BIN
-	#cp bin/boot/BL.BIN bin/boot/gramado/BL.BIN
+	cp stage1.bin bin/boot/gramado/
+	rm stage1.bin
 
-	mkisofs -R -J -c boot/boot.catalog -b boot/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
+	#.ISO
+	mkisofs -R -J -c boot/gramado/boot.catalog -b boot/gramado/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
 	
 	@echo "iso Success?"	
 	
