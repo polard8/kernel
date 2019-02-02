@@ -441,6 +441,9 @@ clean:
 
 	@echo "Success?"
 	
+	
+# Isso e' um teste, anda nao funciona.
+# Cria um arquivo .ISO usando nasm.
 makeiso-x86:
 	nasm -I arch/x86/boot/iso/stage1/ \
 	-I arch/x86/boot/iso/stage2/ \
@@ -457,8 +460,12 @@ makeiso-x86:
 	-I arch/x86/boot/iso/kernel/ \
 	-I arch/x86/boot/iso/browser/  arch/x86/boot/iso/main.asm  -o  GRAMADO.ISO
 	
-	@echo "iso Success?"
+	@echo "#todo Create ISO using nasm"
 	
+# ISO
+# Monta o stage1.bin com nasm.
+# Gera um arquivo .ISO e coloca todo o conteu'do da parata bin
+# dentro do ISO.
 geniso-x86:
 	
 	#stage1
