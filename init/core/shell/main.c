@@ -2933,13 +2933,16 @@ do_compare:
 
 
     // message-box
-	//Testing message box.
+	// Testing message box.
+	// #todo: Testar os quatro tipos. 
 	if ( strncmp( prompt, "message-box", 11 ) == 0 )
-	{
-		//@todo:testar os 4 tipos 
-	    MessageBox( 1, "Shell message box","Testing message box...");
+	{	
+	    //MessageBox ( 1, "Type 1","Testing message box ... Press F1 to exit." );
+		//MessageBox ( 2, "Type 2","Testing message box ... Press F1 to exit." );
+	    MessageBox ( 3, "Type 3","Testing message box ... Press F1 to exit." );
+	    //MessageBox ( 4, "Type 4","Testing message box ... Press F1 to exit." );
         goto exit_cmp;
-    };	
+    }
 	
 
     // mm-info

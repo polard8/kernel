@@ -868,13 +868,15 @@ void apiInitBackground (){
 
 
 /*
+ ***************************************************
  * MessageBox:
  *     Message box on gui->screen.
  *     Types=[1~5]
  *     @todo: Devemos considerar o retorno? E se a chamada falhar?
  */
+
 int MessageBox ( int type, char *string1, char *string2 ){
-    
+
     // Antes nós chamávamos o kernel, agora tentaremos 
     // implantar na api.
 	
@@ -885,25 +887,21 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	//#debug
 	//printf ("Testing new Message Box type=%d \n", type);
 
-    int Response = 0;	
-    int running = 1;
+	int Response = 0;
+	int running = 1;
 
-    //
-    // Draw !
-    //	
-	
 	struct window_d *hWnd;    //Window.
 	struct window_d *pWnd;    //Parent.
 	struct window_d *bWnd;    //Button.	
-	
-	
+		
 	//#todo: usar get system metrics
 	
 	// x and y
 	// @todo centralizado: metade | um terço.
 	// @todo: Pegar a métrica do dispositivo.
+	
 	unsigned long x  = (unsigned long) 10;       //deslocamento x
-	unsigned long y  = (unsigned long) 300;       //deslocamento y
+	unsigned long y  = (unsigned long) 300;      //deslocamento y
     unsigned long cx = (unsigned long) (800/2);  //largura   
     unsigned long cy = (unsigned long) (600/3);  //altura		
 
@@ -911,69 +909,113 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	
 	unsigned long WindowClientAreaColor;
 	unsigned long WindowColor;
-	
-	
-	WindowClientAreaColor = COLOR_YELLOW;
-	WindowColor = COLOR_PINK;	
+		
+	WindowClientAreaColor = xCOLOR_GRAY1; //COLOR_YELLOW;
+	WindowColor = COLOR_TERMINAL2; //COLOR_PINK;	
 	
 	//Obs: Por enquanto para todos os tipos de messagebox 
 	// estamos usando o mesmo tipo de janela.
 	switch (type)
 	{	
-	    // Com botão, considera o título.
+	    // Janela tipo simples.
+		// Com botão, considera o título.
 	    case 1:
-		    apiBeginPaint();
 		    Button = 1;
-			//janela tipo simples.
+			apiBeginPaint ();
 	        hWnd = (void*) APICreateWindow (  WT_SIMPLE, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
+							WindowClientAreaColor, WindowColor ); 
 			if ( (void *) hWnd == NULL ){
 				printf("hWnd fail\n");
-			};
-			apiEndPaint();
-            
-			APIRegisterWindow (hWnd);
-            APISetActiveWindow (hWnd);	
-            APISetFocus (hWnd);	 			
+			}else{
+			    APIRegisterWindow (hWnd);
+                APISetActiveWindow (hWnd);	
+                APISetFocus (hWnd);		
+                apiDrawText ( (struct window_d *) hWnd,
+                    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );				
+			}
+			apiEndPaint ();
 		    break;
 			
 		// Sem botão, considera o título.	
 	    case 2:
 		    Button = 0;
-	        hWnd = (void*) APICreateWindow( WT_POPUP, 1, 1, string1, 
+			apiBeginPaint ();
+	        hWnd = (void *) APICreateWindow( WT_POPUP, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
+							WindowClientAreaColor, WindowColor ); 
+			if ( (void *) hWnd == NULL ){
+				printf("hWnd fail\n");
+			}else{
+			    APIRegisterWindow (hWnd);
+                APISetActiveWindow (hWnd);	
+                APISetFocus (hWnd);	
+                apiDrawText ( (struct window_d *) hWnd,
+                    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );								
+			}
 	        break;
 			
+		 //janela de aplicativo.	
 		// Com botão, Título de alerta.	
 	    case 3:
-		    //janela de aplicativo.
 	        Button = 1;
-			hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Alert", 
+			apiBeginPaint ();
+			hWnd = (void *) APICreateWindow( WT_OVERLAPPED, 1, 1, string1, 
 			                x, y, cx, cy, 
 							NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
+							WindowClientAreaColor, WindowColor ); 
+			if ( (void *) hWnd == NULL ){
+				printf("hWnd fail\n");
+			}else{
+			    APIRegisterWindow (hWnd);
+                APISetActiveWindow (hWnd);	
+                APISetFocus (hWnd);	
+                apiDrawText ( (struct window_d *) hWnd,
+                    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string2 );								
+			}
+			apiEndPaint ();
 	        break;
 			
 		//Com botão, título de mensagem do sistema.	
 	    case 4:
 		    Button = 1;
-	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "System Message", 
+			apiBeginPaint ();
+	        hWnd = (void *) APICreateWindow( WT_OVERLAPPED, 1, 1, "System Message", 
 			                x, y, cx, cy, 
 							NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
+							WindowClientAreaColor, WindowColor ); 
+			if ( (void *) hWnd == NULL ){
+				printf("hWnd fail\n");
+			}else{
+			    APIRegisterWindow (hWnd);
+                APISetActiveWindow (hWnd);	
+                APISetFocus (hWnd);	
+                apiDrawText ( (struct window_d *) hWnd,
+                    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );								
+			}
+			apiEndPaint ();
 	        break;
 			
 		//Tipo negligenciado. Usamos o formato padrão.	
 		default:
 		    Button = 1;
-	        hWnd = (void*) APICreateWindow( WT_OVERLAPPED, 1, 1, "Error", 
+			apiBeginPaint ();
+	        hWnd = (void *) APICreateWindow( WT_OVERLAPPED, 1, 1, "Error", 
 			                x, y, cx, cy, 
 							NULL, 0, 
-							WindowClientAreaColor, WindowColor); 
+							WindowClientAreaColor, WindowColor ); 
+			if ( (void *) hWnd == NULL ){
+				printf("hWnd fail\n");
+			}else{
+			    APIRegisterWindow (hWnd);
+                APISetActiveWindow (hWnd);	
+                APISetFocus (hWnd);	
+                apiDrawText ( (struct window_d *) hWnd,
+                    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );				
+			}
+			apiEndPaint ();
 		    break;
 	};
 	
@@ -1016,18 +1058,11 @@ int MessageBox ( int type, char *string1, char *string2 ){
     APIRegisterWindow (messagebox_button2);	
 	
 	
-	//
 	// string
-	//
 	
-    apiDrawText ( (struct window_d *) hWnd,
-        1*(cx/16), 1*(cy/3),
-        COLOR_WINDOWTEXT, string1 );	
+    //apiDrawText ( (struct window_d *) hWnd,
+    //    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );	
 	
-	
-	//#bugbug
-	//#importante devemos fazer o refresh só da janela.
-	//refresh_screen ();
 
     apiShowWindow (hWnd);	
 	
