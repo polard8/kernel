@@ -15,8 +15,8 @@
 VERSION = 0
 PATCHLEVEL = 11
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
-NAME = ?
+EXTRAVERSION = 0
+NAME = Perfection
 
 #important
 #We will have a new name just when the release changes.
