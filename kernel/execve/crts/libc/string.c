@@ -16,30 +16,26 @@
 //#define toupper(c)  ((int)((c) | 0x20))
 
 
-/*
- * strcmp:
- *     Compara duas strings.
- */
-int strcmp(char * s1, char * s2)
-{
+/* strcmp:
+ *     Compara duas strings. */
+
+int strcmp (char * s1, char * s2){
+	
 	int i;
 
-	for(i = 0; s1[i] == s2[i]; ++i){
+	for ( i=0; s1[i] == s2[i]; i++ )
+	{
 		if( s1[i] == '\0' ){
 			return (0);
-		};
+		}
 	};
-	return((int) (s1[i] - s2[i]));
-};
+	
+	return ((int) (s1[i] - s2[i]));
+}
 
 
-
-
-/*
- * strncmp:
- *     Compara duas strings.
- *
- */
+/* strncmp:
+ *     Compara duas strings. */
 
 int strncmp ( char *s1, char *s2, int len ){
 	
@@ -105,15 +101,11 @@ int str_cmp(unsigned char *str1, unsigned char *str2)
 
  
  
- 
- 
 /*
- * memcpy:
- *
- *
- */
-void *memcpy(void *v_dst, const void *v_src, unsigned long c)
-{
+ * memcpy: */
+
+void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
+	
 	const char *src = v_src;
 	char *dst = v_dst;
 
@@ -122,11 +114,11 @@ void *memcpy(void *v_dst, const void *v_src, unsigned long c)
 		*dst++ = *src++;
 
 	return v_dst;
-};
+}
 
 
-void *memcpy32(void *v_dst, const void *v_src, unsigned long c)
-{
+void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c ){
+	
 	//const char *src = v_src;
 	//char *dst = v_dst;
 
@@ -138,41 +130,38 @@ void *memcpy32(void *v_dst, const void *v_src, unsigned long c)
 		*dst++ = *src++;
 
 	return v_dst;
-};
+}
 
 
 /*
- * strcpy - copia uma string
- *
- *
- */
-char *strcpy(char *to, const char *from)
-{
+ * strcpy - copia uma string */
+
+char *strcpy ( char *to, const char *from ){
+	
 	int i = 0;
 
-	while( to[i] = from[i] ){
+	while ( to[i] = from[i] ){
 		i += 1;
 	};
+	
 	return (to);
-};
+}
 
 
 /*
- * strcat - acrescenta uma string ao fim de outra.
- *
- *
- */
-char *strcat(char *to, const char *from)
-{
+ * strcat - acrescenta uma string ao fim de outra. */
+
+char *strcat (char *to, const char *from){
+	
 	char *ret = to;
 
-	while(*to) {
+	while (*to) {
 		to += 1;
 	};
 	
 	strcpy(to, from);
 	return (ret);
-};
+}
 
 
  /* strcat */
@@ -190,51 +179,49 @@ char *strcat(char *to, const char *from)
  }
 */
 
+
 /*
- *  bcopy:
- *
- */
-void bcopy(char *from, char *to, int len)
-{
+ *  bcopy: */
+
+void bcopy (char *from, char *to, int len){
+	
 	while(len--) 
 	{
 		*to++ = *from++;
 	};
-    return;
-};
+    //return;
+}
 
 
 /*
  *  bzero:
- *      Preenche com zeros.
- */ 
-void  bzero(char *cp, int len)
-{
+ *      Preenche com zeros. */
+
+void bzero (char *cp, int len){
+	
 	while(len--)
 	{
 		*(cp + len) = 0;
 	};
-    return;
-};
+    //return;
+}
+
 
 /*
  * strlen:
- *     Calcula o tamanho de uma string.
- *
- */ 
-size_t strlen(const char *s)
-{	
+ *     Calcula o tamanho de uma string. */
+
+size_t strlen (const char *s){
+	
     size_t i = 0;
 	
-	for(i = 0; s[i] != '\0'; ++i){
-	;
+	for (i = 0; s[i] != '\0'; ++i){
+	    ;
 	};
 	
-done:
+//done:
 	return ( (size_t) i );
-};
-
-
+}
 
 
 /*

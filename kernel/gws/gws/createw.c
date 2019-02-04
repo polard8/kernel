@@ -253,7 +253,7 @@ void *CreateWindow ( unsigned long type,
 	// @todo: isso deve ir para outro lugar.
 	unsigned long border_size = 0;
 	unsigned long border_color = COLOR_BORDER;
-	
+    	
 	
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
@@ -1004,19 +1004,22 @@ void *CreateWindow ( unsigned long type,
 	
 	// ## Title bar ##
     // Título + borda(frame).
-    // #importante: Isso pinta a barra de títulos e as 
-    // bordas para janelas de aplicativos. Ou seja,
-    // as bordas não são pintadas individualmente nesse momento, mas 
-    // logo abaixo, pintaremos as bordas para as janelas onde esse for o caso. 
-    // só falta criar elemento na estrutura para gerenciar as bordas.	
+    
+    // #importante: 
+    // Sobre bordas. 
+    // Isso pinta a barra de títulos e as bordas para janelas de 
+    // aplicativos. Ou seja, as bordas não são pintadas individualmente nesse 
+    // momento, mas logo abaixo, pintaremos as bordas para as janelas onde 
+    // esse for o caso. Só falta criar elemento na estrutura para gerenciar 
+    // as bordas.	
+    
+    //parametros 16=icone 8=paddings
 	
 	if ( TitleBar == 1 )
 	{ 
         //flag.
         window->titlebarUsed = 1;
-		
-        //#importante:  
-        //A cor sempre deve ser enviada por argumento.
+        
 		window->bg_color = color;  
 		
 		//@todo: String color.
@@ -1037,7 +1040,7 @@ void *CreateWindow ( unsigned long type,
 			window->width +1 +1, window->height +1 +1, window->bg_color );
         
 		// String		
-		draw_string ( window->left +8 +16 +8, window->top +8 +4, 
+		draw_string ( window->left +16 +8 +8, window->top +(32/3), 
 			COLOR_TERMINALTEXT2, window->name );  
 		
 								 		
@@ -1052,7 +1055,7 @@ void *CreateWindow ( unsigned long type,
 			
             // Create button.			
 			windowButton1 = CreateWindow ( WT_BUTTON, 1, 1, "V", 
-	                           (window->width -40 -40 -1 -40 -1), 2, 40, 40,									  
+	                           (window->width -32 -32 -1 -32 -1), 2, 32, 32,									  
 			                   window, 0, 
 							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
@@ -1066,7 +1069,7 @@ void *CreateWindow ( unsigned long type,
 			
             // Create button.			
 			windowButton2 = CreateWindow ( WT_BUTTON, 1, 1, "^", 
-	                           (window->width -40 -40 -1), 2, 40, 40,									  
+	                           (window->width -32 -32 -1), 2, 32, 32,									  
 			                   window, 0, 
 							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
@@ -1080,7 +1083,7 @@ void *CreateWindow ( unsigned long type,
 			
 			// Create button.
 			windowButton3 = CreateWindow ( WT_BUTTON, 1, 1, "X", 
-	                            (window->width -40), 2, 40, 40,									  
+	                            (window->width -32), 2, 32, 32,									  
 			                    window, 0, 
 								(unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
             
@@ -1334,13 +1337,13 @@ void *CreateWindow ( unsigned long type,
             {
 			    //left top
                 window->rcClient->left = (unsigned long) (window->left +1);
-                window->rcClient->top = (unsigned long) (window->top  +2 +40 +2);
+                window->rcClient->top = (unsigned long) (window->top  +2 +32 +2);
             
                 // width e height.
                 // width = window widdth - as bordas verticais.
                 // height = windows height - as bordas horizontais - a barra de títulos.
                 window->rcClient->width = (unsigned long) (window->width -1 -1);
-                window->rcClient->height = (unsigned long) (window->height -2 -40 -2 -24 -2);
+                window->rcClient->height = (unsigned long) (window->height -2 -32 -2 -24 -2);
 				
 				//window->rcClient->right = window->rcClient->left + window->rcClient->width;
 				//window->rcClient->bottom = window->rcClient->top + window->rcClient->height;
@@ -1515,18 +1518,13 @@ void *CreateWindow ( unsigned long type,
         //Então uma janela, quando acianoada sua flag que indica que ela é um botão,
         //podemos usar a estrutura de botão para acessar as características do botão.		
 		
-		//draw_button ( Parent, windowname, 1, 
-		//    window->left, window->top, window->width, window->height, 
-		//	window->bg_color );
 
-		//window->button = (struct button_d *) draw_button ( window, windowname, BS_DEFAULT, 0, 0,
-            window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
-		    window->left, window->top, window->width, window->height, 
-			window->bg_color );
+        window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
+                                                 window->left, window->top, window->width, window->height, 
+                                                 window->bg_color );
 		
 		window->isButton = 1;	
-	};	
-
+	}	
 
     if ( (unsigned long) type == WT_EDITBOX )	
 	{
@@ -1608,7 +1606,7 @@ void *CreateWindow ( unsigned long type,
 		// Os ícones já estão carregados, 
 		// vamos apenas decodificá-lo no backbuffer 
 		
-	    bmpDisplayBMP ( appIconBuffer, window->left+1, window->top+1 );
+	    bmpDisplayBMP ( appIconBuffer, window->left +8, window->top +8 );
 	};
 	
 	

@@ -42,13 +42,13 @@ void my_buffer_char_blt ( unsigned long x,
 void set_char_width ( int width ){
 	
 	gcharWidth = (int) width;
-};
+}
 
 
 void set_char_height ( int height ){
 	
 	gcharHeight = (int) height;
-};
+}
 
 
 int get_char_width (){

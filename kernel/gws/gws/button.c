@@ -1,5 +1,5 @@
 /*
- * File: gws\button.c
+ * File: gws/button.c
  *
  * Descrição:
  *     Rotinas de criação e gerenciamento de botões. 
@@ -66,6 +66,7 @@ void updateButton ( struct button_d *button,
 
 };
 
+
 /*
  * draw_button:
  *     Desenha um botão dado um tipo.
@@ -79,6 +80,7 @@ void updateButton ( struct button_d *button,
  * Retorna o ponteiro pra estrutura do botão.
  *
  */
+
 void *draw_button ( struct window_d *window,
                     unsigned char *string,
 					int style,
@@ -178,7 +180,7 @@ void *draw_button ( struct window_d *window,
 			b->border1 = COLOR_BUTTONHIGHLIGHT2;
 			b->border2 = COLOR_BUTTONSHADOW2;
 			//b->color = color; 	
-            goto do_draw_button;			
+            //goto do_draw_button;			
 			break;
 			
 		case BS_FOCUS:
@@ -198,7 +200,7 @@ void *draw_button ( struct window_d *window,
             b->border1 = COLOR_BUTTONHIGHLIGHT2;
 			b->border2 = COLOR_BUTTONSHADOW2;
 			//b->color = color; 	
-			goto do_draw_button;			
+			//goto do_draw_button;			
             break;
 			
 		case BS_HOVER:
@@ -226,7 +228,7 @@ void *draw_button ( struct window_d *window,
 // Do draw the button.
 //
 	
-do_draw_button:
+//do_draw_button:
 
 	// Usaremos retângulos para desenharmos o botão.
    
@@ -255,16 +257,27 @@ do_draw_button:
 // Do draw label.
 //
 					   
-do_draw_label:
+//do_draw_label:
 
 	
 	// Se vamos usar uma imagem ao invés de uma string.
 	//if(useImage == 1{ ... goto done;}
 	
+    //usado para calcular o tamanho de uma string.
+     size_t tmp_size = (size_t) strlen ( (const char *) string );
+	
+	//if ( tmp_size > (width/8) )
+	//{
+	//    printf("fail");
+	//}
+	
+	//(a largura do botão menos a largura da string)/2
+	unsigned long offset = ( ( (unsigned long) width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+	
 	//button label								   
     if (Selected == 1)
 	{
-	    draw_string ( window->left +x +8, window->top +y +8, 
+	    draw_string ( window->left +x +offset, window->top +y +8, 
 			COLOR_WHITE, string );	
 			
     }else{
@@ -275,11 +288,9 @@ do_draw_label:
 		// (window->left +x) left 
 		// (largura do botão, menos a largura da string)/2
 
-	    draw_string ( window->left +x +8, window->top +y +8, 
+	    draw_string ( window->left +x +offset, window->top +y +8, 
 			COLOR_TERMINALTEXT, string );	
 			
-	    //draw_string ( window->left +x +8, window->top +y +8, 
-		//	COLOR_TERMINALTEXT, string );	
 	};
 	
 	//
