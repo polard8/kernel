@@ -108,10 +108,8 @@ LINE_DISCIPLINE ( struct window_d *window,
 		// system procedure
 		//
 		
-		system_procedure ( window, 
-						  (int) msg, 
-						  (unsigned long) long1, 
-	                      (unsigned long) long2 );
+		system_procedure ( window, (int) msg, 
+		    (unsigned long) long1, (unsigned long) long2 );
 		
 	};	
  	
@@ -124,9 +122,8 @@ LINE_DISCIPLINE ( struct window_d *window,
  * KEYBOARD_LINE_DISCIPLINE
  *     Uma disciplina de linha apenas para as digitações de teclado.
  * Funciona como um filtro.
- * Obs: Essa é a rotina principal desse arquivo, 
- * todo o resto poderá encontrar um lugar melhor.
- *
+ * Obs: Essa é a rotina principal desse arquivo, todo o resto poderá 
+ * encontrar um lugar melhor.
  */
 	
 int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
@@ -520,7 +517,7 @@ done:
 		
 		//system_procedure ...
 		// @todo: Chamar o aplicativo REBOOT.BIN.
-	};
+	}
 
 	
 	// Nesse momento temos duas opções:
@@ -617,21 +614,19 @@ done:
 			case MSG_SYSKEYDOWN:  
 			    switch (ch)
 				{
-					case VK_F5:	//tests for drivers.
-					case VK_F6:	//tests
-					case VK_F7:	//tests
-					case VK_F8:	//refresh screen and reset.
+					// Used on system procedure for tests.
+					case VK_F5:	
+					case VK_F6:	
+					case VK_F7:	
+					case VK_F8:	
 		               
-						system_procedure (  w, 
-										  (int) mensagem, 
-					                      (unsigned long) ch, 
-										  (unsigned long) ch );					
+						system_procedure (  w, (int) mensagem, 
+					        (unsigned long) ch, (unsigned long) ch );					
 					    
 						break;
 				}
 			break;
 		};
-		
 	};	
  
     return (int) 0;
@@ -661,7 +656,7 @@ int MOUSE_LINE_DISCIPLINE ( void *buffer ) {
 	//
 	
     return (int) -1;   
-};	
+}
 
 
 //ldisc

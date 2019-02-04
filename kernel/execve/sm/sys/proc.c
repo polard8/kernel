@@ -91,137 +91,26 @@ void procTestF6()
 };
 
 
-/*
- * ldisc_dialog:
- *     #bugbug: Acho que isso está suspenso.
- *     Procedimento de dialogo usado para a manipulação de 
- * eventos de teclado.
- *     esse procedimento deve ser chamado quando o sistema 
- * ou algum processo deseja interagir com o driver de teclado 
- *  ?? planejando a funcionalidade desse diálogo ??
- */
-
+// ??
 unsigned long 
 ldisc_dialog( struct window_d *window, 
               int msg, 
 			  unsigned long long1, 
 			  unsigned long long2 ) 
 {
-	
-/*	
-	//#cuidado
-	//Ponteiro para um buffer em user mode.
-	unsigned long *buffer;
-	
-	if ( (void *) window == NULL ){
-		return (unsigned long) 0;
-	}
-	
-	if( window->used != 1 || window->magic != 1234 ){
-		return (unsigned long) 0;
-	}
-	
-	switch(msg)
-	{
-	    case LDISC_NULL:
-		    window->long1 = 0;
-			window->long2 = 0;
-	        break;
-	
-        case LDISC_GET_ALT_STATUS:
-		    window->long1 = (unsigned long) keyboardGetKeyState(VK_LMENU);		
-	        break;
-		
-	    case LDISC_GET_CTRL_STATUS:	
-		    window->long1 = (unsigned long) keyboardGetKeyState(VK_LCONTROL);		
-            break;
-		
-	    case LDISC_GET_SHIFT_STATUS:	
-		    window->long1 = (unsigned long) keyboardGetKeyState(VK_LSHIFT);		
-		    break;
-		
-	    case LDISC_GET_WINKEY_STATUS:	
-		    window->long1 = (unsigned long) keyboardGetKeyState(VK_LWIN);		
-		    break;
-
-	    case LDISC_GET_CAPITAL_STATUS:	
-		    window->long1 = (unsigned long) keyboardGetKeyState(VK_CAPITAL);		
-		    break;
-
-	    case LDISC_GET_NUMLOCK_STATUS:	
-		    window->long1 = (unsigned long) keyboardGetKeyState(VK_NUMLOCK);		
-		    break;	
-
-	    //case LDISC_GET_SCROLLLOCK_STATUS:	
-		//    window->long1 = (unsigned long) keyboardGetKeyState(VK_SCROLLOCK);		
-		//    break;
-
-        //use long1 como mensagem
-        case LDISC_CHANGE_MESSAGE1:
-		    window->msg = (int) window->long1;
-		    break;
-
-		//use long2 como mensagem	
-        case LDISC_CHANGE_MESSAGE2:
-		    window->msg = (int) window->long2;
-		    break;
-			
-		//pega a próxima mensagem da fila fifo. circular.
-		//case LDISC_GET_NEXT_MESSAGE:
-            //window->msg = (int) ??;
-			//window->long1 = (unsigned long) ??; 
-			//window->long2 = (unsigned long) ??; 
-		    //break;
-
-		//pega o próximo scancode da fila fifo. circular.	
-        //case LDISC_GET_NEXT_SCANCODE:
-        //    window->long1 = (unsigned long) ??;
-        //    break;  			
-			
-		//...
-		
-		//#importante:
-		//#bugbug ?? Cuidado com a pagefault.
-		//Um endereço em usermode espera pelos 4 argumentos da mesagem.
-		//case LDISC_RECEIVE_MESSAGE:
-        //    buffer = (unsigned long*) long1;
-		//	buffer[0] = ??;  //hwnd 
-		//	buffer[1] = ??;  //msg
-		//	buffer[2] = ??;  //long1
-		//	buffer[3] = ??;  //long2
-		//    break;
-			
-			
-		//a estrutura recebe os valores dos argumentos.	
-		case LDISC_LOAD_ARGS:
-		    window->msg = (int) msg;
-            window->long1 = ( unsigned long ) long1;
-            window->long2 = ( unsigned long ) long2;
-            break;
- 			
-	    default:
-            return (unsigned long) 0;
-		    break;
-    };	
-	
-done:	
-
-*/
-    return (unsigned long) 0;	
+    //# cancelada !!!
+    return 0;	
 }
 
 
-/*
- *O procedimento de janela do (terminal.)
- */
+// ??
 unsigned long 
 terminal_dialog( struct window_d *window, 
                  int msg, 
 			     unsigned long long1, 
 				 unsigned long long2 ) 
 {
-    //#suspenso esse diálogo.
-	//repensando ele.
+    //# cancelada !!!
     return 0;	
 }
 

@@ -351,29 +351,13 @@ compile-kernel:
 
 link-x86:
 	ld -m elf_i386 -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map docs/kmap.s
-	
-	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map docs/kmap.s
-	# ld -m i386pe -T kernel/link.ld -o KERNEL.BIN $(wildcard *.o) -Map kernel/kmap.s
-	# gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects)
-    # gcc -T kernel/link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o KERNEL.BIN $(myObjects) -Wl,-Map=kernel/kmap.s -lgcc"
 
 	mv KERNEL.BIN bin/kernel/
 
 vhd-x86:
 	nasm -I arch/x86/boot/vhd/stage1/ \
-	-I arch/x86/boot/vhd/stage2/ \
-	-I arch/x86/boot/vhd/stage2/lib16/ \
-	-I arch/x86/boot/vhd/stage2/include/ \
-	-I arch/x86/boot/vhd/msm/ \
-	-I arch/x86/boot/vhd/msm/lib32/ \
-	-I arch/x86/boot/vhd/msm/include/ \
-	-I arch/x86/boot/vhd/msm/kernel/ \
-	-I arch/x86/boot/vhd/msm/fs/ \
-	-I arch/x86/boot/vhd/msm/shell/ \
-	-I arch/x86/boot/vhd/msm/drivers/ \
-	-I arch/x86/boot/vhd/bl/ \
-	-I arch/x86/boot/vhd/kernel/ \
-	-I arch/x86/boot/vhd/browser/  arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
+	-I arch/x86/boot/vhd/vbr/ \
+	-I arch/x86/boot/vhd/footer/ arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
 
 
 vhd-mount:
@@ -385,19 +369,25 @@ vhd-mount:
 # 2) KERNEL 
 # 3) INIT, SHELL, TASKMAN
 vhd-copy-files:
+	
+# boot	
 	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd
 	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd
 	
+# kernel	
 	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd
 	
+# init	
 	sudo cp bin/init/INIT.BIN     /mnt/gramadovhd
 	sudo cp bin/init/SHELL.BIN    /mnt/gramadovhd
 	sudo cp bin/init/TASKMAN.BIN  /mnt/gramadovhd
 	
-# configs
-	sudo cp arch/x86/boot/vhd/INIT.TXT /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/USER.TXT /mnt/gramadovhd
-
+# user/config
+	sudo cp user/config/USER.TXT /mnt/gramadovhd
+	sudo cp user/config/INIT.TXT /mnt/gramadovhd
+	sudo cp user/config/GUI.TXT  /mnt/gramadovhd
+	sudo cp user/config/GRAMADO.TXT /mnt/gramadovhd
+	
 # bitmaps
 	sudo cp arch/x86/boot/vhd/images/BMP1.BMP      /mnt/gramadovhd
 	sudo cp arch/x86/boot/vhd/images/MOUSE.BMP     /mnt/gramadovhd
@@ -416,8 +406,6 @@ vhd-copy-files:
 	-sudo mkdir /mnt/gramadovhd/gde
 	-sudo mkdir /mnt/gramadovhd/gde/bin	
 	-sudo cp ../gde/bin/* /mnt/gramadovhd/gde/bin 
-	
-	
 	
 #Get available apps
 #	-sudo cp ../gde/apps/gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
@@ -445,20 +433,9 @@ clean:
 # Isso e' um teste, anda nao funciona.
 # Cria um arquivo .ISO usando nasm.
 makeiso-x86:
-	nasm -I arch/x86/boot/iso/stage1/ \
-	-I arch/x86/boot/iso/stage2/ \
-	-I arch/x86/boot/iso/stage2/lib16/ \
-	-I arch/x86/boot/iso/stage2/include/ \
-	-I arch/x86/boot/iso/msm/ \
-	-I arch/x86/boot/iso/msm/lib32/ \
-	-I arch/x86/boot/iso/msm/include/ \
-	-I arch/x86/boot/iso/msm/kernel/ \
-	-I arch/x86/boot/iso/msm/fs/ \
-	-I arch/x86/boot/iso/msm/shell/ \
-	-I arch/x86/boot/iso/msm/drivers/ \
-	-I arch/x86/boot/iso/bl/ \
-	-I arch/x86/boot/iso/kernel/ \
-	-I arch/x86/boot/iso/browser/  arch/x86/boot/iso/main.asm  -o  GRAMADO.ISO
+	#todo:  
+	#nasm -I arch/x86/boot/iso/stage1/ \
+	#-I arch/x86/boot/iso/???/  arch/x86/boot/iso/main.asm  -o  GRAMADO.ISO
 	
 	@echo "#todo Create ISO using nasm"
 	

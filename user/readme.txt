@@ -4,6 +4,16 @@
     Até mesmo elementos de UI/UX e personas poderão ser discutidos aqui.
 	
 	
+/config
+   Arquivos de configuração que o usuário pode mudar.
+   
+/ui
+
+/ux
+
+
+	
+	
 Projetos:
     + gramado virtual machine experience 
     + gramado real machine experience
