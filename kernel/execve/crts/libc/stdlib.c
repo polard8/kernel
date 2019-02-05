@@ -52,7 +52,7 @@ void *malloc (size_t size){
 
 	//Alocar memória no heap do kernel.
 
-	h = (void *) AllocateHeap (s);
+	h = (void *) heapAllocateMemory (s);
 	
 	if ( (void *) h == NULL ){
 		return NULL;

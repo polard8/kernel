@@ -1,5 +1,5 @@
 /*
- * File: \heap.h
+ * File: heap.h
  *
  * Descrição:
  *     Gerenciar o ponteiro global para o heap atual, onde será
@@ -14,7 +14,7 @@
  
 //@todo: diminuir
 //Contagem de heap.
-#define HEAP_COUNT_MAX  8 //256  //32  16  (8)
+#define HEAP_COUNT_MAX  8
 
 
 
@@ -174,13 +174,12 @@ unsigned long get_process_heap_pointer(int pid);
 //
 // Alloc and Free.
 //
-unsigned long AllocateHeap(unsigned long size);
 
-void *AllocateHeapEx(unsigned long size);
+unsigned long heapAllocateMemory (unsigned long size);
 
 void FreeHeap (void *ptr);
 
 //
-// Fim.
+// End.
 //
 

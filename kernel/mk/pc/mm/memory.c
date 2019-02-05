@@ -44,9 +44,8 @@
  * =============
  *     +get_process_heap_pointer
  *     +SetKernelHeap
- *     +AllocateHeap
+ *     +heapAllocateMemory
  *     +FreeHeap
- *     +AllocateHeapEx
  *     +show_memory_structs
  *     +init_heap
  *     +init_stack
@@ -354,7 +353,7 @@ void *GetHeap()
 
 /*
  ****************************************************************
- * AllocateHeap:
+ * AheapAllocateMemory:
  *     Aloca memória no heap do kernel.
  *
  * *IMPORTANTE: 
@@ -368,9 +367,6 @@ void *GetHeap()
  *  A estrutura header do heap, é uma estrutura e deve ficar antes 
  * da área desejada. Partes={ header,client,footer }.
  *
- * @todo: 
- *     Essa rotina poderia se chamar: 
- *     memoryKernelProcessHeapAlloc(unsigned long size).
  * Obs: 
  *     ?? A estrutura usada aqui é salva onde, ou não é salva ??
  *
@@ -382,7 +378,7 @@ void *GetHeap()
  *     2016 - Revision.
  * ...
  */
-unsigned long AllocateHeap ( unsigned long size ){
+unsigned long heapAllocateMemory ( unsigned long size ){
 	
     struct mmblock_d *Current;
 
@@ -407,7 +403,7 @@ unsigned long AllocateHeap ( unsigned long size ){
         // @todo: Aqui poderia parar o sistema e mostrar essa mensagem.
         //
 
-        printf("AllocateHeap fail: g_available_heap={0}\n");
+        printf("heapAllocateMemory fail: g_available_heap={0}\n");
         goto fail;
     };
 
@@ -422,7 +418,7 @@ unsigned long AllocateHeap ( unsigned long size ){
     if( size == 0 )
 	{
         //size = 1;
-        printf("AllocateHeap error: size={0}\n");
+        printf("heapAllocateMemory error: size={0}\n");
         refresh_screen();
         
 		//?? NULL seria o retorno para esse caso ??
@@ -439,7 +435,7 @@ unsigned long AllocateHeap ( unsigned long size ){
 
         //try_grow_heap() ...
 
-        printf("AllocateHeap error: size >= g_available_heap\n");
+        printf("heapAllocateMemory error: size >= g_available_heap\n");
         goto fail;
     };
     
@@ -462,7 +458,7 @@ try_again:
     
 	if( mmblockCount >= MMBLOCK_COUNT_MAX )
 	{
-        printf("pc-mm-memory-AllocateHeap: MMBLOCK_COUNT_MAX");
+        printf("pc-mm-memory-heapAllocateMemory: MMBLOCK_COUNT_MAX");
         die();
     };
 
@@ -500,7 +496,7 @@ try_again:
         if( last_valid < KERNEL_HEAP_START || 
            last_valid >= KERNEL_HEAP_END )
         {
-            printf("pc-mm-memory-AllocateHeap: last_valid");
+            printf("pc-mm-memory-heapAllocateMemory: last_valid");
             die();
         };
 
@@ -674,7 +670,7 @@ try_again:
     }else{
 
         //Se o ponteiro da estrutura de mmblock for inválido.
-        printf("AllocateHeap fail: struct.\n");
+        printf("heapAllocateMemory fail: struct.\n");
         goto fail;
     };
 
@@ -774,18 +770,6 @@ void FreeHeap (void *ptr){
 	    	
 	//return;    
 }
-
-
-/*
- **********************************************
- * AllocateHeapEx:
- *     Aloca heap.
- *     @todo: Deletar: Rotina inútil.
- */
-void *AllocateHeapEx (unsigned long size){
-	
-	return (void *) AllocateHeap(size);  
-};
 
 
 /*
