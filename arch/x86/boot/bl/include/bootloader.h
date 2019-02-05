@@ -4,26 +4,23 @@
  * Descrição:
  *     Header principal do Boot Loader de 32 bits, BL.BIN.
  *     Feito em 32bit C/Assembly.
- *
- * Propósito: 
- *    Declarações e protótipos para as funções principais do Boot Loader.
- *    Oferecer o suporte necessário nessa fase de inicialização.
- *    ...
+ *     Declarações e protótipos para as funções principais do Boot Loader.
+ *     Oferecer o suporte necessário nessa fase de inicialização.
+ *     ...
  * 
  * Histórico:
  * =========
- * Versão 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
- * Versão 1.0, 2014 - Construção de rotinas básicas de suporte.
- * Versão 1.0, 2015 - Construção de mais rotinas básicas de suporte.
- * Versão 1.0, 2016 - Aprimoramento e Debug do que foi feito até aqui.
- * ...
+ *     2013 - Esse arquivo foi criado por Fred Nora.
+ *     2014 - Construção de rotinas básicas de suporte.
+ *     2015 - Construção de mais rotinas básicas de suporte.
+ *     2016 - Aprimoramento e Debug do que foi feito até aqui.
+ *     ...
  *
- * Copyright (c) 2013 - 2016 Frederico Martins Nora (frednora).
+ * Copyright (c) 2013 - 2019 Frederico Martins Nora (frednora).
  */
 
 //
 // Variáveis para habilitações de verbose pra debug.
-// Em ordem alfabética.
 //
 
 //Debug flags.
@@ -54,10 +51,6 @@ extern void refresh_screen();
  
 // Boot Loader version.
 #define BL_VERSION "0.1"
-
-
-
-
 
 
 /*
@@ -167,21 +160,16 @@ extern void refresh_screen();
  * forma de proteção.
  *
  */
-#define DLL_VA 0             //Vínculo dinâmico, .DLL, .SO.  
+//#define DLL_VA 0             //Vínculo dinâmico, .DLL, .SO.  
 #define APP_VA 0x00400000    //Padrão para aplicativos. 4MB. 
 //...
 
 
-//
 // File support: 
 // Usado pelo loader pra carregar arquivos do sistema.
 // Obs: Esses são endereços físicos para carregamento das aplicaçções
 // do sistema. Porém o endereço lógico para o carregamento das
 // aplicações será 0x400000 e das bibliotecas compartilhadas será 0x0.
-//
-
-
-
 
 
 #define INIT_ADDRESS         0x00400000    //Físico.
@@ -366,6 +354,9 @@ extern void refresh_screen();
  */
 #include <fs.h>
 
+
+#include <pci.h>
+
 /*
  * IRQs support.
  */
@@ -454,8 +445,9 @@ unsigned long next_address;  //??
  * Variables for task support.
  * @todo: Não usar o termo task.
  */ 
-unsigned long current_task;
-unsigned long proximo;  //??	
+//unsigned long current_task;
+
+//unsigned long proximo;  //??	
 
 
 /*
@@ -697,12 +689,7 @@ unsigned short pciConfigReadWord( unsigned char bus,
 		
 void system_services();
  
-//
-// Debug support.
-//@todo: usar inglês.
-//
-                        
-void mostra_reg(unsigned long id);  
+ 
 
 
 //
@@ -717,5 +704,5 @@ void abort();  //abort.c  //apresenta o tipo de erro.
 void die();    //main.c   //erro fatal.
 
 //
-//fim.
+// End.
 //

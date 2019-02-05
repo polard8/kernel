@@ -21,12 +21,12 @@ extern unsigned long SavedBootMode;
 /*
  *****************************************
  * set_up_color:
- *     Configura cor padrão para o sistema.
- */
+ *     Configura cor padrão para o sistema. */
+
 void set_up_color (unsigned long color){   
 	
 	g_system_color = (unsigned long) color;	
-};
+}
 
 
 /*
@@ -40,10 +40,11 @@ void set_up_color (unsigned long color){
  *
  *     @todo: Checar o tamanho da variável g_char_attrib. 
  */
+
 void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
 	
     g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);
-};
+}
 
 
 /*
@@ -54,6 +55,7 @@ void set_up_text_color ( unsigned char forecolor, unsigned char backcolor ){
  *     o retorno por ser int.
  */
 //void BlInitGlobals() 
+
 void init_globals (){
 	
 	// Próximo procedimento, status and file system type.
@@ -64,17 +66,13 @@ void init_globals (){
 	g_file_system_type = 1;	
 	//Continua...
 	
-	//
-	// Procedure structure. @todo Check.
-	//
+	// Procedure structure. 
+	// @todo Check.
 	
 	procedure_info.next = (unsigned long) bl_procedure;
 	procedure_info.status = 0;		
     //Continua...
-    
-	//?? @todo: Deletar.
-	proximo = 0;
-};
+}
 
 
 /*
@@ -155,10 +153,8 @@ int init (){
 #endif
 	BltimerInit();	
 	
-	//
 	// Type:
 	//     CD, HD, PXE, FLASH, FAT16 ...
-    //
 	
 /*	
 	switch(BootType)
@@ -179,49 +175,37 @@ int init (){
             //BlAbort();			
             break;			
 	};
-	
 */
-
-
-    //
-	// @todo:
-	//     Check VESA configuration.
-	//     Porque vesa foi configurado pelo Mass Storage Manager.(MSM)(BootManager)
-	//
-	//BlCheckVESA();
-
-
+	
+	//Inicializar os segmentos do sistema.(GDT).(data e code)
 	
 	//@todo:
 	//Pega o valor herdado do Boot Manager.
-	//LegacyCR3 = (unsigned long) GetCR3();
-	
-	
-	//Enable a20? não parece necesário. já foi feito.
-	
-	//Inicializar os segmentos do sistema.(GDT).(data e code)
+	//LegacyCR3 = (unsigned long) GetCR3();	
 	
 	//
 	// Continua ...
 	//
 	
-// Done 
-done:
-    //printf("habilitando as interrupcoes\n");
-	//refresh_screen();
+	// #debug
+    // printf("habilitando as interrupcoes\n");
+	// refresh_screen();
 	
-    //Habilita as interrupções. #CUIDADO!
-	//?? Isso é realmente necessário ??
+	// #CUIDADO!
+    // Habilita as interrupções. 
+	// ?? Isso é realmente necessário ??
+	
 	asm ("sti");
 	
-	//debug
-	//printf("#DEBUG");
-	//refresh_screen();
-	//while(1){}		
+	// #debug
+	// printf("#DEBUG");
+	// refresh_screen();
+	// while(1){}		
 	
     g_initialized = (int) 1;    
-    return (int) 0;  
-};
+    
+	return (int) 0;  
+}
 
 
 //

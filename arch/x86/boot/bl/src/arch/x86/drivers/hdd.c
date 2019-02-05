@@ -22,11 +22,9 @@
  
 #include <bootloader.h>
 
-
+extern void reset_ide0();	
 extern void os_read_sector();
 extern void os_write_sector();
-extern void reset_ide0();	
-
 
 //Usados por read e write.
 extern unsigned long hd_buffer;
@@ -43,7 +41,6 @@ extern unsigned long hd_lba;
  * ebx - lba
  * ecx - null
  * edx - null
- *
  */
  
 void 
@@ -52,10 +49,16 @@ my_read_hd_sector ( unsigned long ax,
 					unsigned long cx, 
 					unsigned long dx )
 {	
-    hd_buffer = (unsigned long) ax;    //arg1 (buffer).
-    hd_lba    = (unsigned long) bx;    //arg2 (lba).		
+    hd_buffer = (unsigned long) ax;   
+    hd_lba = (unsigned long) bx;    		
 
-	//Ler setor do hd. Usando rotina em assembly.
+	// Ler setor do hd. 
+	// Usando rotina em assembly.
+	// #obs: Essa rotina somente lê no canal primário master.
+	
+	// #todo
+	// Precisamos usara a rotina que inicializa o controlador de IDE.
+	
 	os_read_sector();	
     return;
 };
@@ -70,7 +73,6 @@ my_read_hd_sector ( unsigned long ax,
  * ebx - lba
  * ecx - null
  * edx - null
- *
  */
  
 void 
@@ -79,8 +81,8 @@ my_write_hd_sector ( unsigned long ax,
 					 unsigned long cx, 
 					 unsigned long dx )
 {	
-    hd_buffer = (unsigned long) ax;    //arg1 (buffer).
-    hd_lba    = (unsigned long) bx;    //arg2 (lba).
+    hd_buffer = (unsigned long) ax;    
+    hd_lba = (unsigned long) bx;    
 
 	//Gravar setor no hd.	
 	os_write_sector(); 

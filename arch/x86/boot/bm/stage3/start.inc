@@ -1,5 +1,5 @@
 ;-----------------------------------------------------
-; File: stage3\start.inc 
+; File: stage3/start.inc 
 ;
 ; Descrição: 
 ;     Início do modo protegido. 
@@ -212,10 +212,7 @@ start_msg_rebooting        db 'start: Rebooting..',13,10,0
 ;; * IMPORTANTE:
 ;;   O OBJETIVO É CHEGARMOS AQUI COM O ARQUIVO BL.BIN CARREGADO NA MEMÓRIA
 ;;   E PASSARMOS O COMANDO PARA ELE, SEM TERMOS QUE CARREGA LO USANDO RECURSOS DE 32BIT.
-;
-;
-startGUI:
-	
+
 	;; *Importante:
 	;; Fazendo configurações aqui mesmo ao invés de chamarmos 
 	;; 'setup_machine' ou ainda não fazendo essas configurações, 
@@ -224,11 +221,12 @@ startGUI:
 	;; Podemos deixar que o boot loader faça suas inicializações. 
 	;; Obs: Isso está funcionando bem.
 	;; Mas o timer foi configurado várias vezes.
-	
+
 	;;===============
 	;;setup machine
-	
-	
+
+startGUI:
+
 	cli
 	
 	;GDT and IDT. 

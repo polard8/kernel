@@ -6,7 +6,6 @@
  *     Biblioteca C do Boot Loader.
  *     Inclui rotinas gráficas no fim do arquivo.
  *     Inclui vsync.
- *     @todo: Seguir o padrão C99 de headers.
  *
  * 2015 - Created by Fred Nora.
  */
@@ -68,21 +67,18 @@ void scroll (void){
 		*p1++ = 0x07*256 + ' '; 
 		//*p1++ = REVERSE_ATTRIB*256 + ' ';
 	};
-
-//Done.
-//done:	
-	//return;
-};
+}
 
 
-/* bl_clear: Limpa a tela em text mode. */
+/* bl_clear: 
+ * Limpa a tela em text mode. */
  
 int bl_clear (int color){
 	
     unsigned int i = 0;
     char *vidmemz = (char *) 0x000B8000; 
 
-    while(i < (80*25*2)) 
+    while (i < (80*25*2)) 
     { 
         vidmemz[i] = 219; 
         i++; 
@@ -91,20 +87,18 @@ int bl_clear (int color){
         i++; 
     };
 	
-	// Cursor.
 	g_cursor_x = 0;
 	g_cursor_y = 0;
 	
-done:
-    return (int) 0; 
-}; 
+    return 0; 
+}
 
 
 /*
  * kprintf:
  *     Imprime uma string em uma determinada linha. 
- *     @todo: Mudar para bl_print(...)
- */
+ *     @todo: Mudar para bl_print(...) */
+
 int kprintf( char *message, unsigned int line, int color )
 {
 	unsigned int i = 0;	
@@ -112,7 +106,7 @@ int kprintf( char *message, unsigned int line, int color )
 	
     i = (unsigned int) (line*80*2); 
 
-    while(*message != 0) 
+    while (*message != 0) 
     { 
         if(*message == '\n')
         { 
@@ -131,22 +125,21 @@ int kprintf( char *message, unsigned int line, int color )
         };
         //Nothing.		
     }; 
-    //Nothing. 
-done:
-    return (int) 0; 
-}; 
+
+    return 0; 
+} 
 
 
 /*
  * prints:
  *     Print string.
- *     Parte da função printf().
- */
-static int prints( char **out, const char *string, int width, int pad)
-{
+ *     Parte da função printf(). */
+
+static int prints ( char **out, const char *string, int width, int pad ){
+	
     register int pc = 0, padchar = ' ';
 
-    if(width > 0) 
+    if (width > 0) 
 	{
 	    register int len = 0;
 		register const char *ptr;
@@ -609,27 +602,31 @@ int printf_main(void)
     printf("%s", buf);
 
 */	
-done:	
-	return (int) 0;
-};
+//done:	
+	return 0;
+}
 
 
 /*
  * input:
- *     Coloca os caracteres digitados em uma string.
- */
-unsigned long input(unsigned long ch)
-{   
-	char c = (char) ch;    //Converte.
+ *     Coloca os caracteres digitados em uma string. */
+
+unsigned long input (unsigned long ch){
+	
+	//Converte.
+	char c = (char) ch;    
 	
 	//Filtra limite.
-	if(prompt_pos > 250){ 
-	    printf("input: The command is too large.");	
+	
+	if (prompt_pos > 250)
+	{ 
+	    printf ("input: The command is too large");	
 	    return (unsigned long) 0; 
-	};
+	}
  	
 	//Trata caractere digitado.
-	switch(c)
+	
+	switch (c)
 	{
 	    //enter	
 		case KEY_RETURN:
@@ -678,19 +675,21 @@ input_done:
 
 /*
  * my_buffer_horizontal_line:
- *     Pinta uma linha horinzontal no Back Buffer.
- */
-void my_buffer_horizontal_line( unsigned long  x1,
-                                unsigned long  y, 
-								unsigned long  x2,  
-								unsigned long color )
+ *     Pinta uma linha horinzontal no Back Buffer. */
+
+void my_buffer_horizontal_line ( unsigned long x1,
+                                 unsigned long y, 
+								 unsigned long x2,  
+								 unsigned long color )
 {
-	while(x1 < x2){
-        my_buffer_put_pixel( color , x1 , y , 0 );
+	while (x1 < x2)
+	{
+        my_buffer_put_pixel ( color, x1, y, 0 );
         x1++;  
-    };
-	return;
-};
+    }
+	
+	//return;
+}
 
 
 /*
@@ -769,8 +768,8 @@ void my_buffer_put_pixel( unsigned long ax,
 
 /*
  * my_buffer_char_blt:
- *     Draw a char using ROM's font.
- */
+ *     Draw a char using ROM's font. */
+
 void my_buffer_char_blt( unsigned long x, 
                          unsigned long y, 
 						 unsigned long color, 
@@ -781,11 +780,11 @@ void my_buffer_char_blt( unsigned long x,
 	char *work_char = (char*) 0x000FFA6E + (c * 8);    //char height.     
 
 
-    for( y2=0; y2<8; y2++ )
+    for ( y2=0; y2<8; y2++ )
     {
         bit_mask = 0x80;
 
-        for( x2=0; x2<8; x2++ )
+        for ( x2=0; x2<8; x2++ )
         {
             if( (*work_char & bit_mask) )
                 my_buffer_put_pixel( color, x + x2, y, 0); 
@@ -794,62 +793,60 @@ void my_buffer_char_blt( unsigned long x,
                        
 		y++;            //Próxima linha.
 		work_char++;    //Incrementa 8 bits.	   
-	};
-	
-//done:
-    //return;  	         	   
-};
+	};	         	   
+}
 
 
 /*
  * vsync: 
  *     Sincroniza a pintura com o retraço vertical.
- *     OBS: Talvez deva usar cli e sti
- */
-void vsync()
-{
+ *     OBS: Talvez deva usar cli e sti */
+
+void vsync (){
+	
 	//Wait until any previous retrace has ended 
-	do
-	{
+	do {
      //nothing.
 	}while( gui_inb(0x3DA) & 8);
 
 	//Wait until a new retrace has just begun 
-    do 
-	{
+    do {
 	 //nothing.
     } while( !(gui_inb(0x3DA) & 8) );
-};
+}
 
 
 /*
  * gui_inb:
- *     Pega um byte na porta.
- */
-char gui_inb(int port)
-{
+ *     Pega um byte na porta. */
+
+char gui_inb (int port){
+	
     char value = 0;
 	
-    value = inportb(port);
+    value = inportb (port);
 	
 	asm(" nop \n");
 	asm(" nop \n");
 	asm(" nop \n");
 	asm(" nop \n"); 
+	
 	return value;
-};
+}
 
 //@todo: Rever isso.
-unsigned long get_cursor_x(){   
+unsigned long get_cursor_x (){  
+	
     unsigned long *int_args  = (unsigned long *) 0x0090000;
     return   int_args[4];
-};
+}
 
 //@todo: Rever isso.
-unsigned long get_cursor_y(){      
+unsigned long get_cursor_y (){ 
+	
     unsigned long *int_args  = (unsigned long *) 0x0090000;
     return  int_args[8]; 
-};
+}
 
 
 /*
@@ -864,19 +861,21 @@ unsigned long get_cursor_y(){
  * c - y 
  * d - null
  */
-void carrega_bitmap_16x16( unsigned long ax, 
-                           unsigned long bx, 
-                           unsigned long cx, 
-                           unsigned long dx )
+
+void carrega_bitmap_16x16 ( unsigned long ax, 
+                            unsigned long bx, 
+                            unsigned long cx, 
+                            unsigned long dx )
 {
-    asm volatile(" \n "
-		         : // no inputs
-		         : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+    asm volatile (" \n "
+		          : // no inputs
+		          : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 	
-    //Coloca no buffer. Não precisa esperar o retraço vertical.	         	
-	my_buffer_load_bitmap_16x16(); 
-    return;				  
-};
+    // Coloca no buffer. 
+	// Não precisa esperar o retraço vertical.	         	
+	
+	my_buffer_load_bitmap_16x16();    			  
+}
 
 
 //

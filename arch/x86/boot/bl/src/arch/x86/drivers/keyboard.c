@@ -11,9 +11,8 @@
  * Podemos copiar do driver do núcleo.
  *
  * Histórico:
- *     Versão: 1.0, 2015 - Adaptado de versões antigas.
- *     Versão: 1.0, Oct 2016 - Revisão.
- *     ... 
+ *     2015 - Adaptado de versões antigas por Fred Nora.
+ *     2016 - Revisão.
  */
 
  
@@ -345,16 +344,19 @@ void keyboardHandler (){
 		};
 		
 		//Analiza.
-		if(key_status == MSG_SYSKEYDOWN){
+		if (key_status == MSG_SYSKEYDOWN)
+		{
 			ch = shift[scancode];
 			wParam[0] = ch;         //Envia.
 		};
 		
 		//Analisa.
-		if(key_status == MSG_KEYDOWN){
+		if (key_status == MSG_KEYDOWN)
+		{
 			ch = map[scancode];
 			wParam[0] = ch;    //Envia. 
 		};
+		
 		//Nothing.
 	};
 	
@@ -363,8 +365,8 @@ void keyboardHandler (){
 	// Step 3: Debug support.
 	//
  
-	//Debug:
-	//Envia um caractere pra tela.
+	//#debug: Envia um caractere pra tela.
+	
 	screen[76] = (char) ch;
 	screen[77] = (char) 9;     
 
@@ -380,14 +382,9 @@ void keyboardHandler (){
 	//
 	// Step 5: EOI.
 	//
-   
-//done:
 
-    outportb ( 0x20, 0x20 );    //EOI. 
-    
-	//return;   
-};
-
+    outportb ( 0x20, 0x20 );     
+}
 
 
 //

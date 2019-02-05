@@ -161,7 +161,17 @@ void BlMain (){
 	// deve-se carregar.
 	
 	
+	// #importante
+	// Precisamos de uma flag aqui, com a opção de não carregarmos
+	// os outros arquivos e somente carregarmos o kernel.
+	
+	
 	//Loading files.
+	
+	//if ( load_extra_files_flag == 1 )
+	//{
+	//    BlLoadFiles ();
+	//}
 	
 	BlLoadFiles ();
 

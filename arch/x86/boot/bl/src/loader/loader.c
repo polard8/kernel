@@ -23,10 +23,9 @@
 
 
 // PE file header support.
-
-#define IMAGE_FILE_MACHINE_I386   0x014C  // x86
-#define IMAGE_FILE_MACHINE_IA64   0x0200  // Intel Itanium
-#define IMAGE_FILE_MACHINE_AMD64  0x8664  // x64
+//#define IMAGE_FILE_MACHINE_I386   0x014C  // x86
+//#define IMAGE_FILE_MACHINE_IA64   0x0200  // Intel Itanium
+//#define IMAGE_FILE_MACHINE_AMD64  0x8664  // x64
 //Continua...
 
 
@@ -47,7 +46,8 @@ void updateProgressBar();
 */
 
 
-/* load_kernel: Carrega o KERNEL.BIN na memória. */
+/* load_kernel: 
+ * Carrega o KERNEL.BIN na memória. */
  
 int load_kernel (){
 	
@@ -204,10 +204,9 @@ int load_files (){
 	char *taskmanager_name = "TASKMAN.BIN";
 	//...
 	
-	//
+
 	// @todo: Carregar mais arquivos. Especialmente os arquivos 
 	// de configuração e os arquivos de componentes da interface gráfica.
-	//
 	
 	//@todo: Path.
 	//char *root_path = "root:";
@@ -217,7 +216,6 @@ int load_files (){
 	/*
 	 * Address:
 	 *     Endereços físicos para carregar os aplicativos.
-	 *
 	 * @todo: 
 	 *     Os endereços lógicos dos aplicativos deverão ser o mesmo. 
 	 * Todos terão o endereço lógico 0x00400000. Para isso, cada processo 
@@ -226,7 +224,6 @@ int load_files (){
 	 *
 	 * Por enquanto todos processos estão usando o mesmo diretório de páginas
 	 * e cada um é carregado em um endereço lógico diferente, definido à seguir.
-	 * 
 	 */
 	 
 	
@@ -253,7 +250,7 @@ int load_files (){
 	{
 	    printf("load_files fail: Address\n");
 		goto fail;
-	};
+	}
 	
 	
 	// @todo: Limpar a tela.
@@ -267,11 +264,11 @@ int load_files (){
 	
 	Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS );
 	
-	if (Status != 0){
-		
+	if (Status != 0)
+    {	
 	    printf("load_files: Error loading file: %s\n", init_name );
 	    goto fail;
-	};
+	}
 
     // Update progress bar
 	// updateProgressBar();
@@ -318,60 +315,33 @@ int load_files (){
 	// drivers. 
 	
 	
-	//
-	//  ## Validation ##
-	//
-	
-	// Checando os arquivos carregados na memória se são realmente do tipo 
-	// PE, 386. 
-	// #todo: 
-	// Aqui pode haver opções, como ELF.  
-	
+	// #importante
+	// Check for elf signature.
+	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+    
 	// Init. 
 	// Shell.
 	// TaskManager.
 	
-	
-	//#bugbug
-	//vamos transforma em elf um por vez.
-
-	
-	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+    
 	if ( init[0] != 0x7F || init[1] != 'E' || init[2] != 'L' || init[3] != 'F' )
 	{	
 	    printf ("load_files fail: %s Validation\n", init_name );  
 		goto fail;	
-	}		
-	//if ( init[0] != 0x4C || init[1] != 0x01 )
-	//{
-	//    printf ("load_files: %s Validation", init_name );
-	//    goto fail;	
-	//};
-	
-	
-	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
+	}
+    
 	if ( shell[0] != 0x7F || shell[1] != 'E' || shell[2] != 'L' || shell[3] != 'F' )
 	{	
 	    printf ("load_files fail: %s Validation\n", shell_name );  
 		goto fail;	
-	}	
-	//if ( shell[0] != 0x4C || shell[1] != 0x01 )
-	//{
-	//    printf ("load_files: %s Validation", shell_name );
-	//    goto fail;	
-	//};
-
-	
+	}
+    
 	if ( taskmanager[0] != 0x7F || taskmanager[1] != 'E' || taskmanager[2] != 'L' || taskmanager[3] != 'F' )
 	{	
 	    printf ("load_files fail: %s Validation\n", taskmanager_name );  
 		goto fail;	
-	}			
-	//if ( taskmanager[0] != 0x4C || taskmanager[1] != 0x01 )
-	//{
-	//    printf ("load_files: %s Validation", taskmanager_name );
-	//    goto fail;	
-	//};
+	}
+    
 
 	// Continua ...
 	
@@ -388,7 +358,7 @@ int load_files (){
 fail:
 	printf(" Fail\n");    
 	abort ();
-};
+}
 
 
 /*
@@ -406,6 +376,7 @@ size_t blstrlen(const char *s)
 	return ( (size_t) i );
 };
 */
+
 
 /*
 // local
@@ -444,6 +415,7 @@ void DoProgress( char label[], int step, int total )
     return;	
 };
 */
+
 
 /*
 void updateProgressBar(){

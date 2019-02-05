@@ -13,6 +13,9 @@
 #include <bootloader.h>
 
 
+void faultsShowRegisters ();
+
+
 /*
  **************************************************
  * cpu_falts:
@@ -23,6 +26,7 @@
  *
  * 2015 - Created.
  */
+
 void cpu_falts (unsigned long fault_number){
 	
     g_cursor_x = 0;
@@ -30,55 +34,47 @@ void cpu_falts (unsigned long fault_number){
 	
 	printf("faults-cpu_falts: %d\n", fault_number );
 	
-	// Mostra o erro de acordo com o número.	 
+	// Mostra o erro de acordo com o número.
+	
     switch (fault_number)
 	{
 	    //EXCEPTION
 		case 1:
 		case 3:
-		    printf("EXCEPTION \n");
-			mostra_reg(current_task);
+		    printf ("EXCEPTION \n");
 			break;
 		
 		//DOUBLE FAULT
 	    case 8:
-			printf("DOUBLE FAULT \n");
-			mostra_reg(current_task);
+			printf ("DOUBLE FAULT \n");
 		    break;
 
 	    //STACK
 	    case 12:
-			printf("STACK FAULT \n");
-			mostra_reg(current_task);
+			printf ("STACK FAULT \n");
 		    break;
 
 	    //GP
 	    case 13:
-		    printf("GP \n");
-			mostra_reg(current_task);
+		    printf ("GP \n");
 		    break;
 		
 		//PAGE FAULT
 	    case 14:
-		    printf("PAGE FAULT \n");
-			mostra_reg(current_task);
+		    printf ("PAGE FAULT \n");
 		    break;
 	    
 	    default:			
-			printf("Default number\n");
-            mostra_reg(current_task);			
+			printf ("Default number\n");			
 			break;
 	};
 	
-	//
-	// More ?! Tratamento, informações.
-	//
-  
-//
-// Done. 
-//
-
-done:
+	// More ?! 
+	// Tratamento, informações.
+	
+//done:
+    
+	faultsShowRegisters ();	
     die();
 	
 	//
@@ -87,18 +83,9 @@ done:
 };
 
 
-
-/*
- * mostra_reg:
- *     Mostra os valores dos registradores.
- * @todo: Isso deve ir para outro arquivo. ???!!!
- *        Se ficar aqui. mudar o nome para faultShowRegisters();.
- */
-//void faultShowRegisters(int tid) ??
-
-void mostra_reg(unsigned long id){
-	return;    //suspensa. 
-};
+void faultsShowRegisters (){
+    //#todo
+}
 
 //
 // End.
