@@ -334,11 +334,18 @@ extern void refresh_screen();
 #include <diskmap.h>    //Disk Map   - sectors.
 
 
+//#test.
+#include <heap.h> 
+
 /*
  * Lib C support.
  */
 #include <types.h>
 #include <stddef.h>
+
+//#test
+#include <stdlib.h>
+
 #include <stdio.h>
 #include <string.h>
 //...

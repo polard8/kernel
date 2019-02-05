@@ -88,6 +88,32 @@ void BlMain (){
 	init (); 
 	
 	
+	//#test
+	//Inicializando alocação dinâmica de memória.
+	
+	init_heap ();
+	
+	//#test
+	
+	 
+	/*
+	void *tmp;
+	
+	tmp  = (void *) malloc (4096);
+	
+	if ( (void *) tmp == NULL )
+	{
+	    printf("\n\n\n \n\n\n \n\n\n malloc test fail\n");
+
+	}else{
+	    printf("\n\n\n \n\n\n \n\n\n malloc test ok = %x \n",tmp);	
+	}
+	
+	//#debug breakpoint
+	refresh_screen();
+	while(1){}
+ */
+	
 	//
 	//@todo: Limpar a tela.
 	//

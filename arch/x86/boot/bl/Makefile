@@ -44,12 +44,14 @@ init.o \
 ports.o \
 x86.o \
 stdio.o \
+stdlib.o \
 string.o \
 keyboard.o \
 pci.o \
 hdd.o \
 timer.o \
 pages.o \
+heap.o \
 procedure.o \
 fs.o \
 shell.o \
@@ -78,11 +80,15 @@ bl-x86:
 	#rem c. 
 	gcc -c src/core/faults.c  -I include/ $(CFLAGS) -o faults.o
 	gcc -c src/core/pages.c   -I include/ $(CFLAGS) -o pages.o
-
+	
+	gcc -c src/core/heap.c   -I include/ $(CFLAGS) -o heap.o
+	
     #rem echo -{ ...
     #echo -{ Libc
 	gcc -c src/libc/stdio.c  -I include/ $(CFLAGS) -o stdio.o
 	gcc -c src/libc/string.c -I include/ $(CFLAGS) -o string.o
+	
+	gcc -c src/libc/stdlib.c  -I include/ $(CFLAGS) -o stdlib.o
 		
     #rem echo -{ ...
     #echo -{ Init
@@ -114,9 +120,7 @@ bl-x86:
 	
 link-x86:
 	ld -m i386pe -T link.ld -o BL.BIN $(myObjects) -Map blmap.s
-	# ld -m i386pe -T link.ld -o BLL.BIN $(wildcard *.o) -Map blmap.s
-	# gcc -T link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o BL.BIN $(myObjects)
-    # gcc -T link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o BL.BIN $(myObjects) -Wl,-Map=blmap.s -lgcc"
+	
 	
 finalize:
 	cp BL.BIN ../../../../bin/boot/

@@ -353,7 +353,7 @@ void *GetHeap()
 
 /*
  ****************************************************************
- * AheapAllocateMemory:
+ * heapAllocateMemory:
  *     Aloca memória no heap do kernel.
  *
  * *IMPORTANTE: 
@@ -378,6 +378,7 @@ void *GetHeap()
  *     2016 - Revision.
  * ...
  */
+
 unsigned long heapAllocateMemory ( unsigned long size ){
 	
     struct mmblock_d *Current;

@@ -16,32 +16,43 @@ STATUS_X            0x4               main.o
 prompt_pos          0x4               main.o
 g_fat16_root_status
                     0x4               main.o
+current_mmblock     0x4               main.o
 STATUS_Y            0x4               main.o
+mm_prev_pointer     0x4               heap.o
 shell_string_buffer
                     0x400             shell.o
 deslocamento        0x4               shell.o
+bl_heap_start       0x4               main.o
 buffer_dir_entry    0x200             main.o
 BootLoaderCR3       0x4               main.o
 next_address        0x4               main.o
 shift_status        0x4               keyboard.o
+g_available_heap    0x4               main.o
 alt_status          0x4               keyboard.o
+heapCount           0x4               main.o
 EDITBOX_ALTURA      0x4               main.o
 g_lbf_va            0x4               main.o
 LegacyCR3           0x4               main.o
 g_proc_status       0x4               main.o
+g_heap_pointer      0x4               main.o
 gdefTesting         0x4               main.o
+heapList            0x20              main.o
 procedure_info      0x10              main.o
 EDITBOX_TEXT_COLOR  0x4               main.o
 CURSOR_Y            0x4               main.o
 EDITBOX_Y           0x4               main.o
 g_system_color      0x4               main.o
 CURSOR_X            0x4               main.o
+last_size           0x4               heap.o
 useGUI              0x4               main.o
+last_valid          0x4               heap.o
 ret_string          0x4               shell.o
 file_cluster_list   0x800             main.o
 vesa_mode           0x10              main.o
 escape_status       0x4               keyboard.o
+mmblockList         0x400             main.o
 g_next_app          0x4               main.o
+bl_heap_end         0x4               main.o
 tab_status          0x4               keyboard.o
 VideoBlock          0x1c              main.o
 g_cursor_y          0x4               main.o
@@ -49,6 +60,7 @@ g_cmd_status        0x4               main.o
 ShellInitialized    0x4               shell.o
 key_status          0x4               keyboard.o
 g_file_system_type  0x4               main.o
+mmblockCount        0x4               main.o
 g_char_attrib       0x4               main.o
 ctrl_status         0x4               keyboard.o
 g_next_proc         0x4               main.o
@@ -165,185 +177,192 @@ Linker script and memory map
                 0x0000000000022368                softwarelibReboot
                 0x0000000000022376                asm_shut_down
  *(.text)
- .text          0x000000000002237a      0x10b main.o
+ .text          0x000000000002237a      0x110 main.o
                 0x000000000002237a                BlMain
-                0x00000000000223d4                BlLoadKernel
-                0x0000000000022400                BlLoadFiles
-                0x000000000002242c                BlSetupPaging
-                0x000000000002243a                BlAbort
-                0x0000000000022448                BlKernelModuleMain
-                0x0000000000022466                die
- .text          0x0000000000022485      0x2a4 loader.o
-                0x0000000000022485                load_kernel
-                0x0000000000022564                load_files
- .text          0x0000000000022729      0x108 init.o
-                0x0000000000022729                set_up_color
-                0x0000000000022737                set_up_text_color
-                0x0000000000022763                init_globals
-                0x000000000002279b                init
- .text          0x0000000000022831       0xd5 ports.o
-                0x0000000000022831                bloutportb
-                0x000000000002283e                outb
-                0x000000000002284b                inportb
-                0x0000000000022860                outportb
-                0x000000000002286d                inport8
-                0x000000000002287c                outport8
-                0x0000000000022889                inport16
-                0x0000000000022899                outport16
-                0x00000000000228a7                inport32
-                0x00000000000228b6                outport32
-                0x00000000000228c3                inb
-                0x00000000000228e5                inportl
-                0x00000000000228f9                outportl
- .text          0x0000000000022906       0xd6 x86.o
-                0x0000000000022906                enable
-                0x000000000002290d                disable
-                0x0000000000022914                stopCpu
-                0x000000000002291c                intReturn
-                0x0000000000022923                farReturn
-                0x000000000002292a                getFlags
-                0x0000000000022935                setFlags
-                0x0000000000022940                BlProcessorInPort8
-                0x000000000002294f                BlProcessorOutPort8
-                0x000000000002295c                BlProcessorInPort16
-                0x000000000002296c                BlProcessorOutPort16
-                0x000000000002297a                BlProcessorInPort32
-                0x0000000000022989                BlProcessorOutPort32
-                0x0000000000022996                Push
-                0x00000000000229a0                Pop
-                0x00000000000229aa                pushRegs
-                0x00000000000229b1                popRegs
-                0x00000000000229b8                pushFlags
-                0x00000000000229bf                popFlags
-                0x00000000000229c6                getStackPointer
-                0x00000000000229d1                setStackPointer
- .text          0x00000000000229dc      0xb7d stdio.o
-                0x00000000000229dc                panic
-                0x00000000000229fd                scroll
-                0x0000000000022a88                bl_clear
-                0x0000000000022ae2                kprintf
-                0x0000000000022f35                printf
-                0x0000000000022f52                sprintf
-                0x0000000000022fa7                putchar
-                0x0000000000022fc0                outbyte
-                0x0000000000023127                _outbyte
-                0x00000000000231fd                printf_main
-                0x0000000000023207                input
-                0x0000000000023336                my_buffer_horizontal_line
-                0x0000000000023360                my_buffer_put_pixel
-                0x0000000000023432                my_buffer_char_blt
-                0x00000000000234ae                vsync
-                0x00000000000234eb                gui_inb
-                0x0000000000023510                get_cursor_x
-                0x0000000000023525                get_cursor_y
-                0x000000000002353a                carrega_bitmap_16x16
- .text          0x0000000000023559      0x25a string.o
-                0x0000000000023559                strcmp
-                0x00000000000235be                strncmp
-                0x0000000000023621                str_cmp
-                0x000000000002369f                memcpy
-                0x00000000000236dd                strlen
-                0x0000000000023704                strcpy
-                0x0000000000023738                strcat
-                0x0000000000023767                bcopy
-                0x0000000000023793                bzero
- .text          0x00000000000237b3      0x1d6 keyboard.o
-                0x00000000000237b3                keyboardHandler
- .text          0x0000000000023989      0x253 pci.o
-                0x0000000000023989                pciConfigReadWord
-                0x0000000000023a30                pciCheckDevice
-                0x0000000000023a8a                pciCheckVendor
-                0x0000000000023aca                pciGetClassCode
-                0x0000000000023afb                pciInfo
-                0x0000000000023bd2                pciInit
- .text          0x0000000000023bdc       0x48 hdd.o
-                0x0000000000023bdc                my_read_hd_sector
-                0x0000000000023bfa                my_write_hd_sector
-                0x0000000000023c18                limpa_root
-                0x0000000000023c1e                limpa_fat
- .text          0x0000000000023c24       0x48 timer.o
-                0x0000000000023c24                timer
-                0x0000000000023c50                BltimerInit
- .text          0x0000000000023c6c      0x588 pages.o
-                0x0000000000023c6c                SetUpPaging
- .text          0x00000000000241f4       0x92 procedure.o
-                0x00000000000241f4                bl_procedure
- .text          0x0000000000024286      0x7cf fs.o
-                0x0000000000024286                fatClustToSect
-                0x00000000000242ad                fatLoadCluster
-                0x00000000000242e9                fs_format
-                0x0000000000024302                fs_search_empty_entry
-                0x000000000002430c                fs_find_not_empty_entry
-                0x0000000000024316                fs_test_fat_vector
-                0x000000000002431c                fs_get_fat_entry
-                0x0000000000024326                fs_create_entry
-                0x000000000002432c                fsCreateFileName
-                0x0000000000024332                fsSaveFileName
-                0x0000000000024338                fs_save_entry_on_disc
-                0x000000000002433e                fs_set_structures
-                0x0000000000024344                fs_set_entry
-                0x000000000002434a                fs_get_entry
-                0x0000000000024350                fs_show_dir_entry
-                0x0000000000024356                fs_show_dir
-                0x000000000002435c                fs_check_cluster
-                0x0000000000024366                fsSaveRootDir
-                0x000000000002436c                fs_load_dir
-                0x0000000000024372                fs_save_dir
-                0x0000000000024378                fs_save_structure
-                0x000000000002437e                fs_save_entry_on_root
-                0x0000000000024384                fs_show_entry
-                0x000000000002438a                fs_delete_entry
-                0x0000000000024390                fs_init_bootfile_struct
-                0x0000000000024396                fs_get_entry_status
-                0x00000000000243a0                fs_set_entry_status
-                0x00000000000243a6                fs_makeboot
-                0x00000000000243b0                fs_set_fat_entry
-                0x00000000000243b6                fs_find_empty_entry
-                0x00000000000243c0                fs_install
-                0x00000000000243c6                fs_relood_dir
-                0x00000000000243cc                fsLoadFile
-                0x0000000000024588                fsSearchFile
-                0x000000000002465a                fsSearchFileName
-                0x0000000000024670                fs_load_rootdirEx
-                0x00000000000246c1                fs_load_fatEx
-                0x000000000002470f                fs_put_list_on_fat
-                0x00000000000247d2                fs_find_n_empty_entries
-                0x0000000000024853                fs_load_rootdir
-                0x0000000000024861                read_lba
-                0x000000000002487c                write_lba
-                0x0000000000024897                fsSaveFile
-                0x00000000000248a1                fsCreateDir
-                0x00000000000248ba                fsCreateFile
-                0x00000000000249b5                fsClearFat
-                0x00000000000249c3                fsCheckFat
-                0x0000000000024a35                fsInitFat
-                0x0000000000024a3b                fsInitStructures
-                0x0000000000024a41                fsInit
- .text          0x0000000000024a55      0x60b shell.o
-                0x0000000000024a55                shellMain
-                0x0000000000024ac0                shellProcedure
-                0x0000000000024b35                shellInitializePrompt
-                0x0000000000024bc4                shellWaitCmd
-                0x0000000000024bde                shellCompare
-                0x0000000000024f92                shellHelp
-                0x0000000000024fab                boot
-                0x0000000000024fb1                debug
-                0x0000000000024fcc                testa_mbr
-                0x0000000000024ffd                testa_root
-                0x0000000000025031                reboot
-                0x000000000002503f                shellInit
- .text          0x0000000000025060       0x14 services.o
-                0x0000000000025060                blServices
-                0x000000000002506e                system_services
- .text          0x0000000000025074       0x1f abort.o
-                0x0000000000025074                abort
- .text          0x0000000000025093       0xc0 faults.o
-                0x0000000000025093                cpu_falts
-                0x000000000002514d                faultsShowRegisters
+                0x00000000000223d9                BlLoadKernel
+                0x0000000000022405                BlLoadFiles
+                0x0000000000022431                BlSetupPaging
+                0x000000000002243f                BlAbort
+                0x000000000002244d                BlKernelModuleMain
+                0x000000000002246b                die
+ .text          0x000000000002248a      0x2a4 loader.o
+                0x000000000002248a                load_kernel
+                0x0000000000022569                load_files
+ .text          0x000000000002272e      0x108 init.o
+                0x000000000002272e                set_up_color
+                0x000000000002273c                set_up_text_color
+                0x0000000000022768                init_globals
+                0x00000000000227a0                init
+ .text          0x0000000000022836       0xd5 ports.o
+                0x0000000000022836                bloutportb
+                0x0000000000022843                outb
+                0x0000000000022850                inportb
+                0x0000000000022865                outportb
+                0x0000000000022872                inport8
+                0x0000000000022881                outport8
+                0x000000000002288e                inport16
+                0x000000000002289e                outport16
+                0x00000000000228ac                inport32
+                0x00000000000228bb                outport32
+                0x00000000000228c8                inb
+                0x00000000000228ea                inportl
+                0x00000000000228fe                outportl
+ .text          0x000000000002290b       0xd6 x86.o
+                0x000000000002290b                enable
+                0x0000000000022912                disable
+                0x0000000000022919                stopCpu
+                0x0000000000022921                intReturn
+                0x0000000000022928                farReturn
+                0x000000000002292f                getFlags
+                0x000000000002293a                setFlags
+                0x0000000000022945                BlProcessorInPort8
+                0x0000000000022954                BlProcessorOutPort8
+                0x0000000000022961                BlProcessorInPort16
+                0x0000000000022971                BlProcessorOutPort16
+                0x000000000002297f                BlProcessorInPort32
+                0x000000000002298e                BlProcessorOutPort32
+                0x000000000002299b                Push
+                0x00000000000229a5                Pop
+                0x00000000000229af                pushRegs
+                0x00000000000229b6                popRegs
+                0x00000000000229bd                pushFlags
+                0x00000000000229c4                popFlags
+                0x00000000000229cb                getStackPointer
+                0x00000000000229d6                setStackPointer
+ .text          0x00000000000229e1      0xb7d stdio.o
+                0x00000000000229e1                panic
+                0x0000000000022a02                scroll
+                0x0000000000022a8d                bl_clear
+                0x0000000000022ae7                kprintf
+                0x0000000000022f3a                printf
+                0x0000000000022f57                sprintf
+                0x0000000000022fac                putchar
+                0x0000000000022fc5                outbyte
+                0x000000000002312c                _outbyte
+                0x0000000000023202                printf_main
+                0x000000000002320c                input
+                0x000000000002333b                my_buffer_horizontal_line
+                0x0000000000023365                my_buffer_put_pixel
+                0x0000000000023437                my_buffer_char_blt
+                0x00000000000234b3                vsync
+                0x00000000000234f0                gui_inb
+                0x0000000000023515                get_cursor_x
+                0x000000000002352a                get_cursor_y
+                0x000000000002353f                carrega_bitmap_16x16
+ .text          0x000000000002355e       0x5b stdlib.o
+                0x000000000002355e                malloc
+                0x000000000002359a                free
+ .text          0x00000000000235b9      0x25a string.o
+                0x00000000000235b9                strcmp
+                0x000000000002361e                strncmp
+                0x0000000000023681                str_cmp
+                0x00000000000236ff                memcpy
+                0x000000000002373d                strlen
+                0x0000000000023764                strcpy
+                0x0000000000023798                strcat
+                0x00000000000237c7                bcopy
+                0x00000000000237f3                bzero
+ .text          0x0000000000023813      0x1d6 keyboard.o
+                0x0000000000023813                keyboardHandler
+ .text          0x00000000000239e9      0x253 pci.o
+                0x00000000000239e9                pciConfigReadWord
+                0x0000000000023a90                pciCheckDevice
+                0x0000000000023aea                pciCheckVendor
+                0x0000000000023b2a                pciGetClassCode
+                0x0000000000023b5b                pciInfo
+                0x0000000000023c32                pciInit
+ .text          0x0000000000023c3c       0x48 hdd.o
+                0x0000000000023c3c                my_read_hd_sector
+                0x0000000000023c5a                my_write_hd_sector
+                0x0000000000023c78                limpa_root
+                0x0000000000023c7e                limpa_fat
+ .text          0x0000000000023c84       0x48 timer.o
+                0x0000000000023c84                timer
+                0x0000000000023cb0                BltimerInit
+ .text          0x0000000000023ccc      0x588 pages.o
+                0x0000000000023ccc                SetUpPaging
+ .text          0x0000000000024254      0x3b7 heap.o
+                0x0000000000024254                heapAllocateMemory
+                0x000000000002442f                FreeHeap
+                0x00000000000244ef                init_heap
+ .text          0x000000000002460b       0x92 procedure.o
+                0x000000000002460b                bl_procedure
+ .text          0x000000000002469d      0x7cf fs.o
+                0x000000000002469d                fatClustToSect
+                0x00000000000246c4                fatLoadCluster
+                0x0000000000024700                fs_format
+                0x0000000000024719                fs_search_empty_entry
+                0x0000000000024723                fs_find_not_empty_entry
+                0x000000000002472d                fs_test_fat_vector
+                0x0000000000024733                fs_get_fat_entry
+                0x000000000002473d                fs_create_entry
+                0x0000000000024743                fsCreateFileName
+                0x0000000000024749                fsSaveFileName
+                0x000000000002474f                fs_save_entry_on_disc
+                0x0000000000024755                fs_set_structures
+                0x000000000002475b                fs_set_entry
+                0x0000000000024761                fs_get_entry
+                0x0000000000024767                fs_show_dir_entry
+                0x000000000002476d                fs_show_dir
+                0x0000000000024773                fs_check_cluster
+                0x000000000002477d                fsSaveRootDir
+                0x0000000000024783                fs_load_dir
+                0x0000000000024789                fs_save_dir
+                0x000000000002478f                fs_save_structure
+                0x0000000000024795                fs_save_entry_on_root
+                0x000000000002479b                fs_show_entry
+                0x00000000000247a1                fs_delete_entry
+                0x00000000000247a7                fs_init_bootfile_struct
+                0x00000000000247ad                fs_get_entry_status
+                0x00000000000247b7                fs_set_entry_status
+                0x00000000000247bd                fs_makeboot
+                0x00000000000247c7                fs_set_fat_entry
+                0x00000000000247cd                fs_find_empty_entry
+                0x00000000000247d7                fs_install
+                0x00000000000247dd                fs_relood_dir
+                0x00000000000247e3                fsLoadFile
+                0x000000000002499f                fsSearchFile
+                0x0000000000024a71                fsSearchFileName
+                0x0000000000024a87                fs_load_rootdirEx
+                0x0000000000024ad8                fs_load_fatEx
+                0x0000000000024b26                fs_put_list_on_fat
+                0x0000000000024be9                fs_find_n_empty_entries
+                0x0000000000024c6a                fs_load_rootdir
+                0x0000000000024c78                read_lba
+                0x0000000000024c93                write_lba
+                0x0000000000024cae                fsSaveFile
+                0x0000000000024cb8                fsCreateDir
+                0x0000000000024cd1                fsCreateFile
+                0x0000000000024dcc                fsClearFat
+                0x0000000000024dda                fsCheckFat
+                0x0000000000024e4c                fsInitFat
+                0x0000000000024e52                fsInitStructures
+                0x0000000000024e58                fsInit
+ .text          0x0000000000024e6c      0x60b shell.o
+                0x0000000000024e6c                shellMain
+                0x0000000000024ed7                shellProcedure
+                0x0000000000024f4c                shellInitializePrompt
+                0x0000000000024fdb                shellWaitCmd
+                0x0000000000024ff5                shellCompare
+                0x00000000000253a9                shellHelp
+                0x00000000000253c2                boot
+                0x00000000000253c8                debug
+                0x00000000000253e3                testa_mbr
+                0x0000000000025414                testa_root
+                0x0000000000025448                reboot
+                0x0000000000025456                shellInit
+ .text          0x0000000000025477       0x14 services.o
+                0x0000000000025477                blServices
+                0x0000000000025485                system_services
+ .text          0x000000000002548b       0x1f abort.o
+                0x000000000002548b                abort
+ .text          0x00000000000254aa       0xc0 faults.o
+                0x00000000000254aa                cpu_falts
+                0x0000000000025564                faultsShowRegisters
                 0x0000000000026000                . = ALIGN (0x1000)
- *fill*         0x0000000000025153      0xead 
+ *fill*         0x000000000002556a      0xa96 
 
-.rodata         0x0000000000026000      0x614
+.rodata         0x0000000000026000      0x7d8
  .rodata        0x0000000000026000       0x5f main.o
  *fill*         0x000000000002605f        0x1 
  .rodata        0x0000000000026060       0xf3 loader.o
@@ -351,64 +370,70 @@ Linker script and memory map
  .rodata        0x0000000000026164       0x37 stdio.o
  *fill*         0x000000000002619b        0x1 
  .rodata        0x000000000002619c       0x44 pci.o
- .rodata        0x00000000000261e0        0xc procedure.o
- .rodata        0x00000000000261ec      0x1c8 fs.o
- .rodata        0x00000000000263b4      0x1b2 shell.o
- .rodata        0x0000000000026566        0xd abort.o
- *fill*         0x0000000000026573        0x1 
- .rodata        0x0000000000026574       0xa0 faults.o
+ .rodata        0x00000000000261e0      0x1c1 heap.o
+ .rodata        0x00000000000263a1        0xc procedure.o
+ *fill*         0x00000000000263ad        0x3 
+ .rodata        0x00000000000263b0      0x1c8 fs.o
+ .rodata        0x0000000000026578      0x1b2 shell.o
+ .rodata        0x000000000002672a        0xd abort.o
+ *fill*         0x0000000000026737        0x1 
+ .rodata        0x0000000000026738       0xa0 faults.o
 
-.eh_frame       0x0000000000027000     0x1620
+.eh_frame       0x0000000000027000     0x16e0
  .eh_frame      0x0000000000027000       0xf4 main.o
  .eh_frame      0x00000000000270f4       0x58 loader.o
  .eh_frame      0x000000000002714c       0x98 init.o
  .eh_frame      0x00000000000271e4      0x1b8 ports.o
  .eh_frame      0x000000000002739c      0x2b8 x86.o
  .eh_frame      0x0000000000027654      0x32c stdio.o
- .eh_frame      0x0000000000027980      0x138 string.o
- .eh_frame      0x0000000000027ab8       0x38 keyboard.o
- .eh_frame      0x0000000000027af0       0xe0 pci.o
- .eh_frame      0x0000000000027bd0       0x98 hdd.o
- .eh_frame      0x0000000000027c68       0x58 timer.o
- .eh_frame      0x0000000000027cc0       0x38 pages.o
- .eh_frame      0x0000000000027cf8       0x38 procedure.o
- .eh_frame      0x0000000000027d30      0x658 fs.o
- .eh_frame      0x0000000000028388      0x198 shell.o
- .eh_frame      0x0000000000028520       0x58 services.o
- .eh_frame      0x0000000000028578       0x34 abort.o
- .eh_frame      0x00000000000285ac       0x58 faults.o
+ .eh_frame      0x0000000000027980       0x58 stdlib.o
+ .eh_frame      0x00000000000279d8      0x138 string.o
+ .eh_frame      0x0000000000027b10       0x38 keyboard.o
+ .eh_frame      0x0000000000027b48       0xe0 pci.o
+ .eh_frame      0x0000000000027c28       0x98 hdd.o
+ .eh_frame      0x0000000000027cc0       0x58 timer.o
+ .eh_frame      0x0000000000027d18       0x38 pages.o
+ .eh_frame      0x0000000000027d50       0x78 heap.o
+ .eh_frame      0x0000000000027dc8       0x38 procedure.o
+ .eh_frame      0x0000000000027e00      0x658 fs.o
+ .eh_frame      0x0000000000028458      0x198 shell.o
+ .eh_frame      0x00000000000285f0       0x58 services.o
+ .eh_frame      0x0000000000028648       0x34 abort.o
+ .eh_frame      0x000000000002867c       0x58 faults.o
 
-.data           0x0000000000028620      0x9e0
-                0x0000000000028620                data = .
-                0x0000000000028620                _data = .
-                0x0000000000028620                __data = .
+.data           0x00000000000286e0      0x920
+                0x00000000000286e0                data = .
+                0x00000000000286e0                _data = .
+                0x00000000000286e0                __data = .
  *(.data)
- .data          0x0000000000028620        0x2 head.o
-                0x0000000000028620                data_start
- .data          0x0000000000028622        0x0 main.o
- .data          0x0000000000028622        0x0 loader.o
- .data          0x0000000000028622        0x0 init.o
- .data          0x0000000000028622        0x0 ports.o
- .data          0x0000000000028622        0x0 x86.o
- .data          0x0000000000028622        0x0 stdio.o
- .data          0x0000000000028622        0x0 string.o
- *fill*         0x0000000000028622       0x1e 
- .data          0x0000000000028640      0x1a0 keyboard.o
-                0x0000000000028640                destroy_window
-                0x0000000000028644                quit_message
- .data          0x00000000000287e0        0x0 pci.o
- .data          0x00000000000287e0        0x0 hdd.o
- .data          0x00000000000287e0        0x0 timer.o
- .data          0x00000000000287e0        0x0 pages.o
- .data          0x00000000000287e0        0x0 procedure.o
- .data          0x00000000000287e0        0x0 fs.o
- .data          0x00000000000287e0       0x2c shell.o
-                0x00000000000287e0                help_string
- .data          0x000000000002880c        0x0 services.o
- .data          0x000000000002880c        0x0 abort.o
- .data          0x000000000002880c        0x0 faults.o
+ .data          0x00000000000286e0        0x2 head.o
+                0x00000000000286e0                data_start
+ .data          0x00000000000286e2        0x0 main.o
+ .data          0x00000000000286e2        0x0 loader.o
+ .data          0x00000000000286e2        0x0 init.o
+ .data          0x00000000000286e2        0x0 ports.o
+ .data          0x00000000000286e2        0x0 x86.o
+ .data          0x00000000000286e2        0x0 stdio.o
+ .data          0x00000000000286e2        0x0 stdlib.o
+ .data          0x00000000000286e2        0x0 string.o
+ *fill*         0x00000000000286e2       0x1e 
+ .data          0x0000000000028700      0x1a0 keyboard.o
+                0x0000000000028700                destroy_window
+                0x0000000000028704                quit_message
+ .data          0x00000000000288a0        0x0 pci.o
+ .data          0x00000000000288a0        0x0 hdd.o
+ .data          0x00000000000288a0        0x0 timer.o
+ .data          0x00000000000288a0        0x0 pages.o
+ .data          0x00000000000288a0        0x0 heap.o
+ .data          0x00000000000288a0        0x0 procedure.o
+ .data          0x00000000000288a0        0x0 fs.o
+ .data          0x00000000000288a0       0x2c shell.o
+                0x00000000000288a0                help_string
+ .data          0x00000000000288cc        0x0 services.o
+ .data          0x00000000000288cc        0x0 abort.o
+ .data          0x00000000000288cc        0x0 faults.o
                 0x0000000000029000                . = ALIGN (0x1000)
- *fill*         0x000000000002880c      0x7f4 
+ *fill*         0x00000000000288cc      0x734 
 
 .bss            0x0000000000029000     0x2000
                 0x0000000000029000                bss = .
@@ -423,6 +448,7 @@ Linker script and memory map
  .bss           0x0000000000029000        0x0 ports.o
  .bss           0x0000000000029000        0x0 x86.o
  .bss           0x0000000000029000        0x1 stdio.o
+ .bss           0x0000000000029001        0x0 stdlib.o
  .bss           0x0000000000029001        0x0 string.o
  *fill*         0x0000000000029001        0x3 
  .bss           0x0000000000029004        0x4 keyboard.o
@@ -431,6 +457,7 @@ Linker script and memory map
  .bss           0x0000000000029008        0x0 hdd.o
  .bss           0x0000000000029008        0x0 timer.o
  .bss           0x0000000000029008        0x0 pages.o
+ .bss           0x0000000000029008        0x0 heap.o
  .bss           0x0000000000029008        0x0 procedure.o
  .bss           0x0000000000029008        0x0 fs.o
  .bss           0x0000000000029008        0x0 shell.o
@@ -439,7 +466,7 @@ Linker script and memory map
  .bss           0x0000000000029008        0x0 faults.o
  *(COMMON)
  *fill*         0x0000000000029008       0x18 
- COMMON         0x0000000000029020      0xc14 main.o
+ COMMON         0x0000000000029020     0x106c main.o
                 0x0000000000029020                g_fat16_fat_status
                 0x0000000000029040                prompt
                 0x000000000002913c                EDITBOX_LARGURA
@@ -451,62 +478,75 @@ Linker script and memory map
                 0x0000000000029164                STATUS_X
                 0x0000000000029168                prompt_pos
                 0x000000000002916c                g_fat16_root_status
-                0x0000000000029170                STATUS_Y
+                0x0000000000029170                current_mmblock
+                0x0000000000029174                STATUS_Y
+                0x0000000000029178                bl_heap_start
                 0x0000000000029180                buffer_dir_entry
                 0x0000000000029380                BootLoaderCR3
                 0x0000000000029384                next_address
-                0x0000000000029388                EDITBOX_ALTURA
-                0x000000000002938c                g_lbf_va
-                0x0000000000029390                LegacyCR3
-                0x0000000000029394                g_proc_status
-                0x0000000000029398                gdefTesting
-                0x000000000002939c                procedure_info
-                0x00000000000293ac                EDITBOX_TEXT_COLOR
-                0x00000000000293b0                CURSOR_Y
-                0x00000000000293b4                EDITBOX_Y
-                0x00000000000293b8                g_system_color
-                0x00000000000293bc                CURSOR_X
-                0x00000000000293c0                useGUI
-                0x00000000000293e0                file_cluster_list
-                0x0000000000029be0                vesa_mode
-                0x0000000000029bf0                g_next_app
-                0x0000000000029bf4                VideoBlock
-                0x0000000000029c10                g_cursor_y
-                0x0000000000029c14                g_cmd_status
-                0x0000000000029c18                g_file_system_type
-                0x0000000000029c1c                g_char_attrib
-                0x0000000000029c20                g_next_proc
-                0x0000000000029c24                g_lbf_pa
-                0x0000000000029c28                g_nova_mensagem
-                0x0000000000029c2c                EDITBOX_X
-                0x0000000000029c30                g_cursor_x
- COMMON         0x0000000000029c34       0x1c keyboard.o
-                0x0000000000029c34                shift_status
-                0x0000000000029c38                alt_status
-                0x0000000000029c3c                escape_status
-                0x0000000000029c40                tab_status
-                0x0000000000029c44                key_status
-                0x0000000000029c48                ctrl_status
-                0x0000000000029c4c                winkey_status
- COMMON         0x0000000000029c50        0x4 timer.o
-                0x0000000000029c50                timerTicks
- *fill*         0x0000000000029c54        0xc 
- COMMON         0x0000000000029c60      0x42c shell.o
-                0x0000000000029c60                shell_status
-                0x0000000000029c80                shell_string_buffer
-                0x000000000002a080                deslocamento
-                0x000000000002a084                ret_string
-                0x000000000002a088                ShellInitialized
+                0x0000000000029388                g_available_heap
+                0x000000000002938c                heapCount
+                0x0000000000029390                EDITBOX_ALTURA
+                0x0000000000029394                g_lbf_va
+                0x0000000000029398                LegacyCR3
+                0x000000000002939c                g_proc_status
+                0x00000000000293a0                g_heap_pointer
+                0x00000000000293a4                gdefTesting
+                0x00000000000293c0                heapList
+                0x00000000000293e0                procedure_info
+                0x00000000000293f0                EDITBOX_TEXT_COLOR
+                0x00000000000293f4                CURSOR_Y
+                0x00000000000293f8                EDITBOX_Y
+                0x00000000000293fc                g_system_color
+                0x0000000000029400                CURSOR_X
+                0x0000000000029404                useGUI
+                0x0000000000029420                file_cluster_list
+                0x0000000000029c20                vesa_mode
+                0x0000000000029c40                mmblockList
+                0x000000000002a040                g_next_app
+                0x000000000002a044                bl_heap_end
+                0x000000000002a048                VideoBlock
+                0x000000000002a064                g_cursor_y
+                0x000000000002a068                g_cmd_status
+                0x000000000002a06c                g_file_system_type
+                0x000000000002a070                mmblockCount
+                0x000000000002a074                g_char_attrib
+                0x000000000002a078                g_next_proc
+                0x000000000002a07c                g_lbf_pa
+                0x000000000002a080                g_nova_mensagem
+                0x000000000002a084                EDITBOX_X
+                0x000000000002a088                g_cursor_x
+ COMMON         0x000000000002a08c       0x1c keyboard.o
+                0x000000000002a08c                shift_status
+                0x000000000002a090                alt_status
+                0x000000000002a094                escape_status
+                0x000000000002a098                tab_status
+                0x000000000002a09c                key_status
+                0x000000000002a0a0                ctrl_status
+                0x000000000002a0a4                winkey_status
+ COMMON         0x000000000002a0a8        0x4 timer.o
+                0x000000000002a0a8                timerTicks
+ COMMON         0x000000000002a0ac        0xc heap.o
+                0x000000000002a0ac                mm_prev_pointer
+                0x000000000002a0b0                last_size
+                0x000000000002a0b4                last_valid
+ *fill*         0x000000000002a0b8        0x8 
+ COMMON         0x000000000002a0c0      0x42c shell.o
+                0x000000000002a0c0                shell_status
+                0x000000000002a0e0                shell_string_buffer
+                0x000000000002a4e0                deslocamento
+                0x000000000002a4e4                ret_string
+                0x000000000002a4e8                ShellInitialized
  *(.bss_heap)
- .bss_heap      0x000000000002a08c      0x400 head.o
-                0x000000000002a08c                bootloader_heap_start
-                0x000000000002a48c                bootloader_heap_end
+ .bss_heap      0x000000000002a4ec      0x400 head.o
+                0x000000000002a4ec                bootloader_heap_start
+                0x000000000002a8ec                bootloader_heap_end
  *(.bss_stack)
- .bss_stack     0x000000000002a48c      0x400 head.o
-                0x000000000002a48c                bootloader_stack_end
-                0x000000000002a88c                bootloader_stack_start
+ .bss_stack     0x000000000002a8ec      0x400 head.o
+                0x000000000002a8ec                bootloader_stack_end
+                0x000000000002acec                bootloader_stack_start
                 0x000000000002b000                . = ALIGN (0x1000)
- *fill*         0x000000000002a88c      0x774 
+ *fill*         0x000000000002acec      0x314 
                 0x000000000002b000                end = .
                 0x000000000002b000                _end = .
                 0x000000000002b000                __end = .
@@ -518,12 +558,14 @@ LOAD init.o
 LOAD ports.o
 LOAD x86.o
 LOAD stdio.o
+LOAD stdlib.o
 LOAD string.o
 LOAD keyboard.o
 LOAD pci.o
 LOAD hdd.o
 LOAD timer.o
 LOAD pages.o
+LOAD heap.o
 LOAD procedure.o
 LOAD fs.o
 LOAD shell.o
@@ -532,25 +574,27 @@ LOAD abort.o
 LOAD faults.o
 OUTPUT(BL.BIN pe-i386)
 
-.comment        0x0000000000000000      0x1e8
+.comment        0x0000000000000000      0x21c
  .comment       0x0000000000000000       0x1b main.o
  .comment       0x000000000000001b       0x1b loader.o
  .comment       0x0000000000000036       0x1b init.o
  .comment       0x0000000000000051       0x1b ports.o
  .comment       0x000000000000006c       0x1b x86.o
  .comment       0x0000000000000087       0x1b stdio.o
- .comment       0x00000000000000a2       0x1b string.o
- .comment       0x00000000000000bd       0x1b keyboard.o
- .comment       0x00000000000000d8       0x1b pci.o
- .comment       0x00000000000000f3       0x1b hdd.o
- .comment       0x000000000000010e       0x1b timer.o
- .comment       0x0000000000000129       0x1b pages.o
- .comment       0x0000000000000144       0x1b procedure.o
- .comment       0x000000000000015f       0x1b fs.o
- .comment       0x000000000000017a       0x1b shell.o
- .comment       0x0000000000000195       0x1b services.o
- .comment       0x00000000000001b0       0x1b abort.o
- .comment       0x00000000000001cb       0x1b faults.o
+ .comment       0x00000000000000a2       0x1b stdlib.o
+ .comment       0x00000000000000bd       0x1b string.o
+ .comment       0x00000000000000d8       0x1b keyboard.o
+ .comment       0x00000000000000f3       0x1b pci.o
+ .comment       0x000000000000010e       0x1b hdd.o
+ .comment       0x0000000000000129       0x1b timer.o
+ .comment       0x0000000000000144       0x1b pages.o
+ .comment       0x000000000000015f       0x1b heap.o
+ .comment       0x000000000000017a       0x1b procedure.o
+ .comment       0x0000000000000195       0x1b fs.o
+ .comment       0x00000000000001b0       0x1b shell.o
+ .comment       0x00000000000001cb       0x1b services.o
+ .comment       0x00000000000001e6       0x1b abort.o
+ .comment       0x0000000000000201       0x1b faults.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0
@@ -567,6 +611,8 @@ OUTPUT(BL.BIN pe-i386)
  .note.GNU-stack
                 0x0000000000000000        0x0 stdio.o
  .note.GNU-stack
+                0x0000000000000000        0x0 stdlib.o
+ .note.GNU-stack
                 0x0000000000000000        0x0 string.o
  .note.GNU-stack
                 0x0000000000000000        0x0 keyboard.o
@@ -578,6 +624,8 @@ OUTPUT(BL.BIN pe-i386)
                 0x0000000000000000        0x0 timer.o
  .note.GNU-stack
                 0x0000000000000000        0x0 pages.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 heap.o
  .note.GNU-stack
                 0x0000000000000000        0x0 procedure.o
  .note.GNU-stack
