@@ -396,25 +396,36 @@ vhd-copy-files:
 	sudo cp arch/x86/boot/vhd/images/TERMINAL.BMP  /mnt/gramadovhd
 	sudo cp arch/x86/boot/vhd/images/CURSOR.BMP    /mnt/gramadovhd
 	
-	-sudo cp arch/x86/boot/vhd/images/DENNIS.BMP    /mnt/gramadovhd
+	-sudo cp arch/x86/boot/vhd/images/DENNIS.BMP   /mnt/gramadovhd
 	
 # fonts
 	sudo cp bin/NC2.FON /mnt/gramadovhd
 	
-#gde suppport
-	-sudo mkdir /mnt/gramadovhd/gde
-	-sudo mkdir /mnt/gramadovhd/gde/bin	
-	-sudo cp ../gde/bin/* /mnt/gramadovhd/gde/bin 
+# Creating standard folders
+	-sudo mkdir /mnt/gramadovhd/BOOT
+	-sudo mkdir /mnt/gramadovhd/DEV
+	-sudo mkdir /mnt/gramadovhd/HOME
+	-sudo mkdir /mnt/gramadovhd/MNT
+	-sudo mkdir /mnt/gramadovhd/TMP
+	-sudo mkdir /mnt/gramadovhd/BIN
+	-sudo mkdir /mnt/gramadovhd/LIB
+	
+# Creating GDE
+	-sudo mkdir /mnt/gramadovhd/GDE
+	-sudo mkdir /mnt/gramadovhd/GDE/BIN	
+	
+	-sudo cp ../gde/bin/* /mnt/gramadovhd/GDE/BIN 
 	
 #Get available apps
 #	-sudo cp ../gde/apps/gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
-	-sudo cp ../gde/bin/GRAMCODE.BIN /mnt/gramadovhd 
-	-sudo cp ../gde/bin/GDESHELL.BIN /mnt/gramadovhd 
-	-sudo cp ../gde/bin/SPR.BIN /mnt/gramadovhd 
-	-sudo cp ../gde/bin/CHASM32.BIN /mnt/gramadovhd 
-	-sudo cp ../gde/bin/JACKPOT.BIN /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GRAMCODE.BIN  /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GDESHELL.BIN  /mnt/gramadovhd 
+	-sudo cp ../gde/bin/SPR.BIN       /mnt/gramadovhd 
+	-sudo cp ../gde/bin/CHASM32.BIN   /mnt/gramadovhd 
+	-sudo cp ../gde/bin/JACKPOT.BIN   /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GFE.BIN       /mnt/gramadovhd 	
 	
-	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM /mnt/gramadovhd
+	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd
 
 # umount
 vhd-unmount:
