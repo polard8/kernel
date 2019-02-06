@@ -95,7 +95,7 @@ done:
 };
  
 
-
+//#todo: isso deve ir para cima.
 //internas
 void gui_create_screen();
 void gui_create_background();

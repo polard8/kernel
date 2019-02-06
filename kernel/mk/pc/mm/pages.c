@@ -58,7 +58,6 @@
  */
 
 
-//
 // Algumas áreas de memória:
 // =========================
 //
@@ -68,31 +67,24 @@
 // + vga            = 1024 pageframes (4MB).
 //     (Obs: Isso transpassa o real tamanho da vga).
 // + lfb (frontbuffer) = 1024 pageframes (4MB).
-//     (Obs: Isso é muito pouco, pois uma placa de vídeo tem mais memória
-// que isso).
-//      @todo: 
-//      LFB needs to be bigger. (Ex: Four 8GB graphic cards). But the driver 
-// needs to do all the work.
+//     (Obs: Isso é muito pouco, placas de video possuem muita memo'ria)
 // + backbuffer     = 1024 pageframes (4MB). 
 //     (Obs: Isso realmente é pouco, no backbuffer deve caber uma imagem 
 // grande, que será dividida em vários monitores).
-//
-
+// + ?? tem ainda um pool de pageframes usados para alocaçao.
 
 
 #include <kernel.h>
-
-
 
 
 //
 // Variáveis passadas pelo Boot Loader.
 //
 
-//
-// Obs: Teremos que rever os argumentos passados pelo Boot Loader ao Kernel 
-// Pois desejamos tornar o Kernel compatível com GRUB.
-//
+
+// Obs: 
+// Teremos que rever os argumentos passados pelo Boot Loader ao Kernel 
+// Pois podemos tornar o Kernel compatível com GRUB.
 
 extern unsigned long SavedBootBlock;    //Parâmtros passados pelo Boot Loader.
 extern unsigned long SavedLFB;          //LFB address.
@@ -148,9 +140,9 @@ enum PAGE_PTE_FLAGS {
 
 
 /*
-static inline void __native_flush_tlb_single(unsigned long addr)
+static inline void __native_flush_tlb_single (unsigned long addr)
 {
-   asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+   asm volatile ("invlpg (%0)" ::"r" (addr) : "memory");
 }
 */
 
@@ -167,23 +159,20 @@ static inline void __native_flush_tlb_single(unsigned long addr)
  *     +...
  *
  * Obs:
- *
- *   **  Aviso importante!  **
- *
+ *    **  Aviso importante!  **
  *    O endereço precisa ser um endereço físico.
- * 
  *    O endereço passado via argumento pode ser alocado dinamicamente antes 
  * ou então essa rotina pode corromper alguma área importante.
- *
  *    Antes de chamar essa rotina devemos alocar memória do tamanho de 
  * um diretório, que é de 1024 entradas de 4 bytes. (1024*4).
  *
  * #obs: 
- * #bugbug: Quando criamos um novo diretório de páginas ele não tem nada,
- * nem mesmo o kernel base foi mapeado a parte superior da memória virtual.
- * para todo novo diretório criado, precisamos mapear as páginas que o 
- * kernel base vai usar.
- * >> Por isso que clonar o diretório de páginas do kernel parece se uma boa opção.
+ * #bugbug: 
+ * Quando criamos um novo diretório de páginas ele esta' vazio, nem mesmo o
+ * kernel base foi mapeado na parte superior da memória virtual.
+ * Para todo novo diretório criado, precisamos mapear as páginas que o 
+ * kernel base vai usar. Por isso que clonar o diretório de páginas do 
+ * kernel parece se uma boa opção.
  */
  
 //deve retornar o endereço do diretório de páginas criado,
@@ -236,6 +225,7 @@ void *CreatePageDirectory (){
 	
 	// Criamos um diretório vazio com páginas não presentes.
 	// 0010 em binário.	
+	
 	for ( i=0; i < 1024; i++ )
 	{
 		dest[i] = (unsigned long) src[i];    
@@ -246,8 +236,7 @@ void *CreatePageDirectory (){
 	// para colocarmos no cr3.
 	
 	return (void *) destAddressVA;
-};
-
+}
 
 
 /*
@@ -281,30 +270,25 @@ void *CreatePageDirectory (){
  *
  * #importante:
  * O offset é um índice dentro do diretório de páginas.
- *
- */
- 
-//retorna o endereço virtual. 
- 
- 
- 
+ */ 
+
 void *CreatePageTable ( unsigned long directory_address, 
                        int offset, 
 					   unsigned long region_address )
 {
 	
+	int i;
 	
 	//
     // ### pd  ###
     //	
 	
-	//#importante:
-	//Endereço virtual do diretório de páginas.
-	//Precisamos do endereço virtual do diretório para editá-lo
+	// #importante:
+	// Endereço virtual do diretório de páginas.
+	// Precisamos do endereço virtual do diretório para editá-lo.
+	
 	unsigned long *PD = (unsigned long *) directory_address;       
 	
-	
-	//Limits.
 	if ( directory_address == 0 ){
 		
 		return NULL;
@@ -326,7 +310,6 @@ void *CreatePageTable ( unsigned long directory_address,
     unsigned long ptVA = (unsigned long) malloc (4096);
 	//unsigned long ptVA = (unsigned long) newPage(); 
 	
-	//Limits.
 	if ( ptVA == 0 ){
 		
 		return NULL;
@@ -371,7 +354,7 @@ void *CreatePageTable ( unsigned long directory_address,
 	// user mode pages
 	// Será usado pelo processo em user mode. 
 	// Note as flags.(7).
-	int i;
+	
 	for ( i=0; i < 1024; i++ )
     {
 		//7 decimal é igual a 111 binário.
@@ -395,18 +378,16 @@ void *CreatePageTable ( unsigned long directory_address,
 	
 	unsigned long ptPA = (unsigned long) virtual_to_physical ( ptVA, gKernelPageDirectoryAddress ); 	
 	
-	PD[offset] = (unsigned long) ptPA; //&newPT[0]; 
+	PD[offset] = (unsigned long) ptPA;
     PD[offset] = (unsigned long) PD[offset] | 7;      
 
  
-    //
-	// Retornaremos o endereço virtual para que a tabela possa ser manipulada pelo kernel.
-	//
+	// Retornaremos o endereço virtual para que a tabela possa ser manipulada 
+	// pelo kernel.
 
     return (void *) ptVA;
-};
+}
  
-
 
 /*
  * SetCR3:
@@ -415,7 +396,9 @@ void *CreatePageTable ( unsigned long directory_address,
  *     Obs: Chamamos uma rotina em assembly.
  *     @todo: Mudar para pagesSetCR3(.)
  */
+
 //void pagesSetCR3(unsigned long address) 
+
 void SetCR3 (unsigned long address){
 	
 	if (address == 0){
@@ -425,7 +408,7 @@ void SetCR3 (unsigned long address){
 	asm volatile ("\n" :: "a"(address) );
 	
 	set_page_dir();
-};
+}
 
 
 //82540 test
@@ -433,6 +416,7 @@ void SetCR3 (unsigned long address){
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 
 //esse mapeamento só será válido para o primeiro.
+
 unsigned long mapping_nic0_device_address ( unsigned long address ){
 	
     unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
@@ -615,11 +599,6 @@ int SetUpPaging (){
 	//
 	// **** Endereços iniciais áreas de memória 'não paginada'.
 	//
-
-
-	//
-	// *FIM
-	//
 	
 	
 	// *importante:
@@ -709,7 +688,8 @@ int SetUpPaging (){
 	//um endereço físico para a pagetable que mapeará os buffers.
 	unsigned long *heappool_page_table = (unsigned long *) PAGETABLE_HEAPPOOL; 
 	
-	
+	//#importante.
+	//Especiais esclusivo para o ambiente gramado core.
 	unsigned long *gramadocore_init_page_table = (unsigned long *) PAGETABLE_GRAMADOCORE_INIT_HEAP; 
 	unsigned long *gramadocore_shell_page_table = (unsigned long *) PAGETABLE_GRAMADOCORE_SHELL_HEAP; 
 	unsigned long *gramadocore_taskman_page_table = (unsigned long *) PAGETABLE_GRAMADOCORE_TASKMAN_HEAP; 
@@ -746,7 +726,7 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 
-		
+	    // #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		page_directory[i] = (unsigned long) 0 | 2;    
 		
@@ -791,7 +771,7 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
-		
+		// #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		km_page_table[i] = (unsigned long) SMALL_kernel_address | 3;     
 	    SMALL_kernel_address = (unsigned long) SMALL_kernel_address + 4096;  
@@ -829,7 +809,7 @@ int SetUpPaging (){
 	
     for ( i=0; i < 1024; i++ ){
 
-	    
+	    // #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		km2_page_table[i] = (unsigned long) SMALL_kernel_base | 3;     
 	    SMALL_kernel_base = (unsigned long) SMALL_kernel_base + 4096;  
@@ -884,7 +864,7 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
-		
+		// #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		um_page_table[i] = (unsigned long) SMALL_user_address | 7;     
 	    SMALL_user_address = (unsigned long) SMALL_user_address + 4096; 
@@ -932,7 +912,7 @@ int SetUpPaging (){
 	
     for ( i=0; i < 1024; i++ ){
 		
-	    
+	    // #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		vga_page_table[i] = (unsigned long) SMALL_vga_address | 7;     
 	    SMALL_vga_address = (unsigned long) SMALL_vga_address + 4096;  
@@ -983,7 +963,7 @@ int SetUpPaging (){
 	
     for ( i=0; i < 1024; i++ ){
 
-		
+		// #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		frontbuffer_page_table[i] = (unsigned long) SMALL_frontbuffer_address | 7;     
 	    SMALL_frontbuffer_address = (unsigned long) SMALL_frontbuffer_address + 4096;  
@@ -1024,7 +1004,8 @@ int SetUpPaging (){
 	
 	for ( i=0; i < 1024; i++ ){
 		
-	    // O endereço físico e virtual são iguais para essa tabela.
+	    // #importante:	
+		// O endereço físico e virtual são iguais para essa tabela.
 		backbuff_page_table[i] = (unsigned long) SMALL_backbuffer_address | 7;     
 	    SMALL_backbuffer_address = (unsigned long) SMALL_backbuffer_address + 4096;  
     };
@@ -1055,6 +1036,7 @@ int SetUpPaging (){
 	for ( i=0; i < 1024; i++ ){
 		
 	    
+		// #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_address | 7;     
 	    SMALL_pagedpool_address = (unsigned long) SMALL_pagedpool_address + 4096;  
@@ -1078,7 +1060,8 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    // O endereço físico e virtual são iguais para essa tabela.
+	    // #importante:	
+		// O endereço físico e virtual são iguais para essa tabela.
 		heappool_page_table[i] = (unsigned long) SMALL_heappool_address | 7;     
 	    SMALL_heappool_address = (unsigned long) SMALL_heappool_address + 4096;  
     };
@@ -1095,7 +1078,8 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    // O endereço físico e virtual são iguais para essa tabela.
+	    // #importante:	
+		// O endereço físico e virtual são iguais para essa tabela.
 		gramadocore_init_page_table[i] = (unsigned long) SMALL_gramadocore_init_heap_address | 7;     
 	    SMALL_gramadocore_init_heap_address = (unsigned long) SMALL_gramadocore_init_heap_address + 4096;  
     };
@@ -1112,7 +1096,8 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    // O endereço físico e virtual são iguais para essa tabela.
+	    // #importante:	
+		// O endereço físico e virtual são iguais para essa tabela.
 		gramadocore_shell_page_table[i] = (unsigned long) SMALL_gramadocore_shell_heap_address | 7;     
 	    SMALL_gramadocore_shell_heap_address = (unsigned long) SMALL_gramadocore_shell_heap_address + 4096;  
     };
@@ -1129,7 +1114,7 @@ int SetUpPaging (){
 
 	for ( i=0; i < 1024; i++ ){
 		
-	    
+	    // #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
 		gramadocore_taskman_page_table[i] = (unsigned long) SMALL_gramadocore_taskman_heap_address | 7;     
 	    SMALL_gramadocore_taskman_heap_address = (unsigned long) SMALL_gramadocore_taskman_heap_address + 4096;  
@@ -1230,10 +1215,8 @@ int SetUpPaging (){
 	//while(1){};
 #endif
 
-	
-	//
-	// Obs: Podemos reaproveitas pagetables em diferentes processos.
-	//
+	// Obs: 
+	// Podemos reaproveitas pagetables em diferentes processos.
 
 	// CR3:
 	// Salvando o endereço do diretório do processo Kernel no CR3. O diretório 
@@ -1342,7 +1325,8 @@ int SetUpPaging (){
 		kfp->used = 1;
 		kfp->magic = 1234;
 		
-		kfp->address = (unsigned long) (0 * MB);   //?? Começa em 0 MB. ??
+		//?? Começa em 0 MB. ??
+		kfp->address = (unsigned long) (0 * MB);   
 		
 		//pertence ao processo kernel.
 		kfp->process = (void *) KernelProcess;
@@ -1374,7 +1358,8 @@ int SetUpPaging (){
 		small_fp->used = 1;
 		small_fp->magic = 1234;
 		
-		small_fp->address = (unsigned long) (4 * MB);   //Começa em 4 MB.
+		//Começa em 4 MB.
+		small_fp->address = (unsigned long) (4 * MB);   
 
 		//pertence ao processo kernel.
 		small_fp->process = (void*) NULL; //??;
@@ -1411,7 +1396,8 @@ int SetUpPaging (){
 		pageable_fp->used = 1;
 		pageable_fp->magic = 1234;
 		
-		pageable_fp->address = (unsigned long) (20 * MB);   //Começa em 20 MB.
+		//Começa em 20 MB.
+		pageable_fp->address = (unsigned long) (20 * MB);   
 
 		//pertence ao processo kernel.
 		pageable_fp->process = (void*) NULL; //??
@@ -1431,18 +1417,20 @@ int SetUpPaging (){
 	//
 
 // Done.
-done:
+//done:
+	
 #ifdef MK_VERBOSE
 	printf("Done\n");
 #endif	
-    return (int) 0;
-};
+	
+    return 0;
+}
 
 
 /*
  * initializeFramesAlloc:
- *     Inicializa o framepool.
- */
+ *     Inicializa o framepool. */
+
 void initializeFramesAlloc (){
 	
 	int Index;
@@ -1482,7 +1470,7 @@ void initializeFramesAlloc (){
 	
 	    pageframeAllocList[0] = ( unsigned long ) pf; 		
 	};	
-};
+}
 
 
 
@@ -1495,9 +1483,9 @@ void initializeFramesAlloc (){
  * contíguos mas as páginas serão.
  * estamos usando uma page table toda já mapeada. 4MB.
  * @TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
- *
  */
-void *allocPageFrames( int size ){
+
+void *allocPageFrames ( int size ){
 	
 	int Index;
 	
@@ -1655,13 +1643,12 @@ void notfreePageframe (struct page_frame_d *pf){
 /*
  ******************************************************
  * newPageFrame:
- *    Aloca apenas um frame de memória física e retorna 
- * o ponteiro.
+ *    Aloca apenas um frame de memória física e retorna o ponteiro.
  *    ? kernel mode ? user mode ?
  *    obs: isso funciona bem.
- * Obs: Isso é usado pelo alocador de páginas, logo abaixo.
- * 
+ *    Obs: Isso é usado pelo alocador de páginas, logo abaixo.
  */
+
 void *newPageFrame (){
 	
 	//#importante: 
@@ -1672,16 +1659,19 @@ void *newPageFrame (){
 	unsigned long Address = (unsigned long) (g_pagedpool_va);
 
 	//procura slot vazio.
-    for(Index = 0; Index < PAGEFRAME_COUNT_MAX; Index++)
+    for ( Index=0; Index < PAGEFRAME_COUNT_MAX; Index++ )
 	{
-	    New = (void*) pageframeAllocList[Index];		
-		if( New == NULL )
+	    New = (void*) pageframeAllocList[Index];
+		
+		if ( New == NULL )
 		{
-			New = (void*) malloc( sizeof( struct page_frame_d ) );
-			if( New == NULL ){
+			New = (void*) malloc ( sizeof( struct page_frame_d ) );
+			
+			if ( New == NULL ){
 				printf("pc-mm-newPageFrame:\n");
+				//free
 				goto fail;
-			};
+			}
 			
 			//printf("$");
 			New->id = Index;
@@ -1703,21 +1693,22 @@ void *newPageFrame (){
 
 fail:
     return NULL;    
-};
+}
 
 
 /*
  *********************************************************************
  * newPage:
- *     Aloca uma página e retorna seu endereço virtual inicial
- * com base no id do pageframe e no endereço virtual inicial do pool 
- * de pageframes.
+ *     Aloca uma página e retorna seu endereço virtual inicial com base 
+ * no id do pageframe e no endereço virtual inicial do pool de pageframes.
+ * 
  *     ? kernel Mode ? ou user mode ?
  *     Obs: Isso funciona bem.
  * Obs: Alocaremos uma página de memória virtual e retornaremos 
  * o ponteiro para o início da página.
  * Para isso usaremos o alocador de frames de memória física.
  */
+
 void *newPage (){
 	
 	//#importante: 
@@ -1729,12 +1720,9 @@ void *newPage (){
 	
 	unsigned long base = (unsigned long) g_pagedpool_va;	
     
-	
-    //
 	// Pega o id do pageframe e 
 	// multiplica pelo tamanho do frame e 
 	// adiciona à base.	
-	//
 	
     // Novo frame.
 	New	= (void *) newPageFrame ();
@@ -1746,12 +1734,11 @@ void *newPage (){
 		
 	}else{
 	    
-		//check
-        if( New->used == 1 && New->magic == 1234 )
+        if ( New->used == 1 && New->magic == 1234 )
 		{
 			//pega o id 
 			//checa o limite de slots.
-			if( New->id > 0 && New->id < PAGEFRAME_COUNT_MAX )
+			if ( New->id > 0 && New->id < PAGEFRAME_COUNT_MAX )
             {
 				return (void *) ( base + (New->id * 4096) );
 			}				
@@ -1772,8 +1759,8 @@ fail:
  * firstSlotForAList:
  *     Retorna o primeiro índice de uma sequência de 
  * slots livres no pageframeAllocList[].
- *
  */
+
 int firstSlotForAList ( int size ){
 	
 	int Index;
@@ -1783,9 +1770,10 @@ int firstSlotForAList ( int size ){
 	
 tryAgain:
 	
-	for( Index=Base; Index < 1024; Index++ )
+	for ( Index=Base; Index < 1024; Index++ )
 	{
 	    slot = (void*) pageframeAllocList[Index];
+		
 		if( (void*) slot != NULL )
 		{
 			Base = Base+Count;
@@ -1807,13 +1795,13 @@ fail:
 
 /*
  * testingFrameAlloc:
- *     Rotina de teste. 
- */ 
+ *     Rotina de teste. */ 
 
 void testingFrameAlloc (){
 	
 	int Index;
     struct page_frame_d *pf;
+	
 	void *RetAddress;
 	unsigned long fileret;
 	
@@ -1931,7 +1919,8 @@ virtual_to_physical ( unsigned long virtual_address,
 	address = (tmp & 0xFFFFF000);
 	
 	return (unsigned long) (address + o);	
-};
+}
+
 
 //
 // End.

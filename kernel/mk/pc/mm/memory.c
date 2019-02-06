@@ -988,21 +988,18 @@ fail:
 /*
  ************************************
  * memoryShowMemoryInfo:
- *     Show memory info.
- */
+ *     Show memory info. */
+
 void memoryShowMemoryInfo (){
 	
 	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
 	
 	printf(" Memory info:\n");
-	
-	//sizes
 	printf(" BaseMemory     = (%d KB)\n", memorysizeBaseMemory );
 	printf(" OtherMemory    = (%d KB)\n", memorysizeOtherMemory );
 	printf(" ExtendedMemory = (%d KB)\n", memorysizeExtendedMemory );
 	printf(" TotalMemory    = (%d KB)\n", memorysizeTotal );
-	
 	printf("\n This is a ");
 		
 	// System type
@@ -1067,9 +1064,7 @@ void memoryShowMemoryInfo (){
 #endif
 	
 	
-	
 	//  ## heap e stack ##
-	
 	
     printf("\n[Kernel Heap and Stack info:]\n");
 	
@@ -1092,20 +1087,15 @@ void memoryShowMemoryInfo (){
 			
     printf("STACK: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );
 	
-	
-	    // Video info
-	
-	//printf("\nVideo: ");
-	
-	    //Video mode.
-	    //printf("The video option is %x \n",g_video_mode);
+	// Video info
+
 	printf ("\n FrontbufferPA={%x} FrontbufferVA={%x} \n", 
 	    g_frontbuffer_pa, g_frontbuffer_va );  
 	
 	printf ("\n BackbufferVA={%x} \n", g_backbuffer_va );
 	
 	//...
-};
+}
 
 
 /*
@@ -1157,7 +1147,7 @@ int init_mm (){
 	while ( i < MMBLOCK_COUNT_MAX )
 	{
         mmblockList[i] = (unsigned long) 0;
-		++i;
+		i++;
     };
 	
 	//Primeiro Bloco.
@@ -1249,8 +1239,8 @@ int init_mm (){
 int gcGRAMADO (){
 	
 	//Ainda não implementado.
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*
