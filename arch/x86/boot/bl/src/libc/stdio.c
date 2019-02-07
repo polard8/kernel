@@ -32,9 +32,9 @@ extern void my_buffer_load_bitmap_16x16();
  
 void panic (const char *msg){
 	
-    printf ("panic: %s", msg );
+    printf ("panic: (BL.BIN) %s", msg );
     die ();
-};
+}
 
 
 /*

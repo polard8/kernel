@@ -14,7 +14,8 @@
 extern void refresh_screen(); 
 
  
-/* abort: Função principal para abortar o Boot Loader. */ 
+/* abort: 
+   Função principal para abortar o Boot Loader. */ 
 
 void abort (){
 	
@@ -27,7 +28,7 @@ void abort (){
 		asm ("cli");
 		asm ("hlt");
 	};
-};
+}
 
 
 //

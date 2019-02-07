@@ -81,44 +81,13 @@ int load_kernel (){
     // Update progress bar
 	// updateProgressBar();
 	
-	/*
-	 * Checando arquivo na memória. 
-	 * Validação. 
-	 * (Portable Executable - PE)
-	 *
-	 * @todo: 
-	 *     Checar mais elementos do header PE.
-	 */
-	 
-	/* 
-	 * 0x14c Intel I386 (same ID used for 486 and 586).
-	 * 0x14d Intel i860. ( Intel i860 (aka 80860) (32-bit) was a RISC ) 
-	 * 0x1C0 ARM. ARM little endian (32-bit), ARM Holdings, later versions 
-	 * 6+ used in iPhone, Microsoft Nokia N900
-	 * 0x1C4. ARMv7 or IMAGE_FILE_MACHINE_ARMNT (or higher) 
-	 * Thumb mode only (32 bit).
-	 * 0xAA64. ARM8+ (64-bit)
-     * 0x162 MIPS R3000.
-     * 0x166 MIPS R4000.
-	 * 0x183 DEC Alpha AXP.
-	 * 0x184 Digital Equipment Corporation (DEC) Alpha (32-bit).
-	 */ 
-	 
+	
 	// Check for .ELF file. 0x7f 0x45 0x4c 0x46 (.ELF)	
 	if ( kernel[0] != 0x7F || kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
 	{	
 	    printf ("load_kernel fail: %s Validation\n", kernel_name );  
 		goto fail;	
 	}
-
-
-	// Check for intel i386. 0x014C.
-	//if ( kernel[0] != 0x4C || kernel[1] != 0x01 )
-	//{	
-	//    printf ("load_kernel fail: %s Validation\n", kernel_name );  
-	//	goto fail;	
-	//};
-	
 	
 	//WORD Machine.
 	//WORD NumberOfSections.
@@ -147,8 +116,14 @@ int load_kernel (){
          kernel[0x100A] != 0xAD ||  		
 	     kernel[0x100B] != 0x1B )
 	{	    
-        //
-	};	
+        
+		//#debug
+		printf ("0x1BADB002 found!\n");
+		//refresh_screen();
+		//while(1){}
+	}	
+	
+	
 	
 	//Continua ...
 

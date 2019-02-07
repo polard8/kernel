@@ -252,6 +252,7 @@ void BlMain (){
  *     Carrega o Kernel.
  *     Kernel carregado em 0x00100000, entry point em 0x00101000.
  */ 
+
 void BlLoadKernel (){
 	
     int Status;
@@ -263,7 +264,7 @@ void BlLoadKernel (){
 		printf ("BlLoadKernel:\n");
 	    die();		
 	};
-};
+}
  
  
 /*
@@ -274,6 +275,7 @@ void BlLoadKernel (){
  *     + Carrega tarefas do sistema, (idle, shell ...)
  *     + ...
  */ 
+
 void BlLoadFiles (){
 	
 	int Status;
@@ -287,7 +289,7 @@ void BlLoadFiles (){
 		printf ("BlLoadFiles:\n");
 	    die();	
 	};
-};
+}
 
 
 /*
@@ -357,7 +359,7 @@ void BlKernelModuleMain (){
 	
     printf("BlKernelModuleMain: Boot Loader\n");
     refresh_screen();
-};
+}
 
 
 
@@ -367,20 +369,16 @@ void BlKernelModuleMain (){
  *     A intenção dessa rotina deixar o processador no 
  * estado hlt durante um erro fatal. Para que ele não fique 
  * funcionando a 100% num loop infinito.
+ * Final message !
+ * Bullet, Message.
+ * Wait forever. 
+ * Halt system.	
+ * No return. 
  */
-
-// Final message !
-// Bullet, Message.
-// Wait forever. 
-// Halt system.	
-//
-//  No return.
-//	     	
-
 
 void die (){
 	
-	printf ("[BL]: * System Halted");    
+	printf ("die: (BL.BIN) * System Halted");    
 	refresh_screen ();
 	   
 	while (1){
@@ -388,7 +386,7 @@ void die (){
 	    asm("cli"); 	
 	    asm("hlt");    		
 	};                        
-};
+}
  
 
 //
