@@ -24,7 +24,7 @@
 #include "globals.h"
 #include "builtins.h"
 
-#include <api/api.h>
+#include <api.h>
 
 #include "desktop.h"
 

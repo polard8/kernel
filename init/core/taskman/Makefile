@@ -40,7 +40,11 @@ CFLAGS = -m32 \
 #	-fleading-underscore \
 
 
+LIBC    = ../../../lib/gdelibs/libc01/include/
+LIBCOBJ = ../../../lib/gdelibs/libc01/obj
 
+API01   = ../../../lib/gdelibs/api01/include/
+APIOBJ  = ../../../lib/gdelibs/api01/obj
 
 	##
 	## Objects
@@ -56,7 +60,8 @@ ctype.o \
 stdio.o \
 stdlib.o \
 string.o \
-conio.o  
+conio.o \
+unistd.o  
 
 
 
@@ -70,10 +75,10 @@ all: crt0.o main.o all-c taskman-link finalize clean
 #	nasm  head.s  -felf -o head.o
 
 crt0.o:
-	gcc  -c  crt0.c -I ../../../include/libc/ $(CFLAGS) -o crt0.o
+	gcc  -c  crt0.c -I $(LIBC) -I $(API01) $(CFLAGS) -o crt0.o
 
 main.o:
-	gcc  -c  main.c -I ../../../include/libc/ $(CFLAGS) -o main.o
+	gcc  -c  main.c -I $(LIBC) -I $(API01) $(CFLAGS) -o main.o
 
 all-c:
 #	gcc  -c  shellui.c   -I ../../../include/libc/ $(CFLAGS) -o shellui.o
@@ -84,14 +89,16 @@ all-c:
 #	gcc  -c  net.c       -I ../../../include/libc/ $(CFLAGS) -o net.o
 #	gcc  -c  terminal.c  -I ../../../include/libc/ $(CFLAGS) -o terminal.o
 
-	cp ../../../lib/api/api.o .
-	cp ../../../lib/ctype.o .
-	cp ../../../lib/stdio.o .
-	cp ../../../lib/stdlib.o .
-	cp ../../../lib/string.o .
-	cp ../../../lib/conio.o .
+	cp $(APIOBJ)/api.o .
+	
+	cp $(LIBCOBJ)/ctype.o .
+	cp $(LIBCOBJ)/stdio.o .
+	cp $(LIBCOBJ)/stdlib.o .
+	cp $(LIBCOBJ)/string.o .
+	cp $(LIBCOBJ)/conio.o .
 #	cp ../../../lib/wait.o .
-#	cp ../../../lib/unistd.o .
+
+	cp $(LIBCOBJ)/unistd.o .
 
 taskman-link:
 	ld -m elf_i386 -T link.ld -o TASKMAN.BIN $(myObjects) -Map map.s
