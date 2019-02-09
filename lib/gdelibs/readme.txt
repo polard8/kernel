@@ -2,8 +2,9 @@
 
 Libs criadas pelo projeto /gde para odarem no gramado.
 
-vamos tentar construir os aplicativos que estao em init com as libs
-do gdelib ... a
 
+    A libs gde para o sistema gramado ser~ao apenas importadas 
+	do sistemqa gramado, nao construiremos eles aqui.
+	
 
 

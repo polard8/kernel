@@ -2012,7 +2012,6 @@ static unsigned long vga_256colors_palette[256] = {
 #define VIEW_FULL      1000
 #define VIEW_MAXIMIZED 1001
 #define VIEW_MINIMIZED 1002
-#define VIEW_NORMAL 1003
 //...
 
 //botões

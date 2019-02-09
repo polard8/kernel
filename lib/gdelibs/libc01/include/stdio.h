@@ -339,8 +339,10 @@ int fputc(int ch, FILE *stream);
 char *gets(char *s);
 int getchar(void);
 int putchar(int ch);
+
+
 //#define getc(p)     fgetc(p)
-//#define putc(x, p)  fputc(x, p)
+#define putc(x, p)  fputc(x, p)
 //#define getchar()   getc(stdin)
 //#define putchar(x)  putc((x), stdout)
 
