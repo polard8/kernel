@@ -13,10 +13,10 @@
 
 
 VERSION = 0
-PATCHLEVEL = 12
+PATCHLEVEL = 13
 SUBLEVEL = 0
-EXTRAVERSION = .0
-NAME = gdelibs
+EXTRAVERSION = -rc0
+NAME = ?
 
 #important
 #We will have a new name just when the release changes.
