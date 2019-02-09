@@ -612,8 +612,9 @@ int ide_dev_init (char port){
 
 
 #ifdef KERNEL_VERBOSE
-    kprintf("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
-	refresh_screen();
+    //#todo
+	//kprintf("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
+	//refresh_screen();
 #endif
 
     new_dev->next = NULL;

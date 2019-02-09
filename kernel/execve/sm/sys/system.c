@@ -2924,15 +2924,17 @@ int systemStartUp (){
 		set_up_cursor (0,1);
 		
 #ifdef EXECVE_VERBOSE		
-        printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
-		    KERNEL_VERSION);
+        //#todo
+		//printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
+		//    KERNEL_VERSION);
 #endif		
 		
 #ifdef EXECVE_VERBOSE		
+		//#todo
 		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
-		if(gSystemEdition == SYSTEM_DEVELOPER_EDITION){
-		    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
-		};
+		//if (gSystemEdition == SYSTEM_DEVELOPER_EDITION){
+		//    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
+		//};
 #endif
 
 #ifdef EXECVE_VERBOSE

@@ -1,3 +1,9 @@
+/*
+ * File: config.h
+ *     
+ *      Setup compiling stuff.
+ */
+
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
@@ -20,7 +26,6 @@
 
 
 // gcc version:
-// gcc (GCC) 3.4.2 (mingw-special) windows
 // gcc 8 on manjaro
 
 // #importante:
@@ -69,11 +74,8 @@
 //que são mesnagens escritas em maiúculas.
 //fnciona como uma visão panorâmica, usa espinha dorsal, um esqueleto.
 //#define KERNEL_VERBOSE 1
-
 //Esse é usado para trabalhar a rotina de entrypoint da arquitetura alvo.
 //#define ENTRY_VERBOSE 1
-
-
 //Esses quatro são as camadas principais.
 //#define HAL_VERBOSE 1
 //#define MK_VERBOSE 1
@@ -88,7 +90,10 @@
 
 //Seriam inicializações parciais programadas. 
  
-//#define BREAKPOINT_TARGET_AFTER_ENTRY 1
+
+//#todo
+//Criar um breakpoint apo's a sondagem de dispositivos pci.
+
 //#define BREAKPOINT_TARGET_AFTER_VIDEO 1
 //#define BREAKPOINT_TARGET_AFTER_SYSTEM 1
 //#define BREAKPOINT_TARGET_AFTER_RUNTIME 1
@@ -97,6 +102,9 @@
 //#define BREAKPOINT_TARGET_AFTER_LOGOFF 1
 //#define BREAKPOINT_TARGET_AFTER_HAL 1
 //#define BREAKPOINT_TARGET_AFTER_MK 1
+//#define BREAKPOINT_TARGET_AFTER_ENTRY 1
+
+
 
 //
 // ## targets ##

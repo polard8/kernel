@@ -43,7 +43,9 @@
  * +Registra o processo de logon
  * +Cria window stations e desktops. 
  *
- *    Versão 1.0, 2015, 2016.
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2016 - Revision.
  */
  
  
@@ -69,7 +71,6 @@ void logon_create_debug();
 void logon_create_navigationbar();
 void logon_create_grid();
 void logon_create_developer_screen();
-
 int ExitLogon();
 
 
@@ -86,8 +87,8 @@ int ExitLogon();
  *
  *    @todo Cria window stations, desktops ...
  *    @todo: logonCreate();
- *
  */
+
 void create_logon (){
 	
 	struct window_d *hWindow; 
@@ -97,9 +98,9 @@ void create_logon (){
 	
 	//g_guiMinimal = 1;
 	
+	// Disable interrupts, lock task switch and scheduler.
 	
-	//Disable interrupts, lock task switch and scheduler.
-	asm("cli");
+	asm ("cli");
 	set_task_status(LOCKED); 	
 	scheduler_lock();
 
@@ -107,70 +108,65 @@ void create_logon (){
 	// GUI Structure. 
 	// 	
 	
-	gui = (void *) malloc( sizeof(struct gui_d) );
+	gui = (void *) malloc ( sizeof(struct gui_d) );
     
 	if ( (void *) gui == NULL)
 	{
-	    printf ("create_logon:");
-		die();
+	    panic ("gws-create_logon: gui struct");
 		
-	} else {
+	}else{
 	    
-        //Set session ,window station, desktop, window and menu.
+        //Set session, room (Window Station), desktop, window and menu.
 	    
-		current_usersession = 0;    // User Session.
-	    current_room = 0;           // room (Window Station).
-	    current_desktop = 0;        // Desktop.
+		current_usersession = 0;    
+	    current_room = 0;           
+	    current_desktop = 0;        
 		
-		
-	    current_window = 0;        // Window.
-	    current_menu = 0;          // Menu.
+	    current_window = 0;        
+	    current_menu = 0;          
 		
 		// Initialize Session, WindowStation, Desktop, Windows and Menus.
 		  
-		//user section.
-#ifdef KERNEL_VERBOSE		
-		printf("create_logon: User Session..\n");
-#endif		
+		//user section.		
 		init_user_session();
+#ifdef KERNEL_VERBOSE		
+		printf ("gws-create_logon: user ession ok\n");
+#endif		
 		
 		//initialize window station default.	
-#ifdef KERNEL_VERBOSE			    
-		printf("create_logon: Station..\n");   
-#endif	    
 		init_room_manager();	
+#ifdef KERNEL_VERBOSE			    
+		printf ("gws-create_logon: room manage ok\n");   
+#endif	    		
 	
 	    //initialize desktop default.
-#ifdef KERNEL_VERBOSE			    
-		printf("create_logon: Desktop..\n");   
-#endif	    
 		init_desktop(); 	    
+#ifdef KERNEL_VERBOSE			    
+		printf ("gws-create_logon: init desktop ok\n");   
+#endif	    		
 	
 	    //Inicia estrutura.	
-#ifdef KERNEL_VERBOSE			    
-		printf("create_logon: Windows..\n");   
-#endif	    
 		init_windows(); 
+#ifdef KERNEL_VERBOSE			    
+		printf ("gws-create_logon: init windows ok\n");   
+#endif	    		
 
 		//menus.
-#ifdef KERNEL_VERBOSE				
-		printf("create_logon: Menu..\n");
-#endif	    
 		init_menus();        
-	    
+#ifdef KERNEL_VERBOSE				
+		printf("gws-create_logon: init menus ok\n");
+#endif	    	    
 
-        //
-		//
-		//
-
-		
 	    //...
 	};
 	
+	
 	// Configura elementos da tela de login.
-    if( g_guiMinimal == 1 )
+    
+	if ( g_guiMinimal == 1 )
 	{
-        SetLogonParameters(0,1,1,0,0,1,0,0,0,0,0,0); 	
+        SetLogonParameters (0,1,1,0,0,1,0,0,0,0,0,0); 	
+	
 	}else{
 		
         SetLogonParameters(0,  //refresh         
@@ -236,7 +232,7 @@ draw_logon_stuffs:
 	// ## Strings ##
 	//
 	
-	if( (void*) CurrentUser != NULL )
+	if ( (void *) CurrentUser != NULL )
 	{
 
 		// Obs: 
@@ -270,7 +266,7 @@ draw_logon_stuffs:
 			    COLOR_WHITE, "(under construction) ");
 				
 			draw_text( gui->main, 400 +8, 8*4, 
-			    COLOR_WHITE, "(This is the enviroment to run logon.bin)" );
+			    COLOR_WHITE, "(This is the enviroment to run logon process)" );
 				
 			//...
  	        

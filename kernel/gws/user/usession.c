@@ -154,8 +154,8 @@ void open_user_session (){
 
 /*
  * init_user_session:
- *     Inicializa user session.
- */
+ *     Inicializa user session. */
+
 void init_user_session (){
 	
     int i = 0;
@@ -176,11 +176,10 @@ void init_user_session (){
 	
 	CurrentUser = (int) GetCurrentUserId();
 	
-	//Limits.
 	if ( CurrentUser < 0 || CurrentUser >= USER_COUNT_MAX )
 	{
 		return;
-	};
+	}
 	
 	
 	//
@@ -193,12 +192,8 @@ void init_user_session (){
 	
 	if ( (void *) DefaultUserSession == NULL )
 	{
-	    printf("init_user_session: DefaultUserSession");
-		die ();
-		
-	    //refresh_screen();
-	    //while(1){}
-	}; 
+	    panic ("init_user_session: DefaultUserSession");
+	}
 	
 	CurrentUserSession = (void *) DefaultUserSession;
 	
@@ -208,7 +203,7 @@ void init_user_session (){
 	//...
 	
     DefaultUserSession->initialized = 1;
-};
+}
 
 
 /*

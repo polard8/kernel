@@ -2,6 +2,8 @@
 
   File: gramado.h
 
+        Product configuration.
+		
   History:
   2018 - Created by Fred Nora.
 
@@ -28,13 +30,20 @@
 
 //Kernel version
 //Esse é padrão de versão. 
-//Não mudar, apenas fazer as atualizações. 
+//Não mudar, apenas fazer as atualizações.
+
+//#bugbug. 
+//Isso na verdade deve ser feito no makefile.
+//mas o makefiles faz isso de um jeito que
+//utiliza recursos que o gramado ainda nao tem
+//quando formos compilar ele com o pr'oprio compilador.
+
 #define SYSTEM_VERSION_MAJOR 0 
-#define SYSTEM_VERSION_MINOR 5
+#define SYSTEM_VERSION_MINOR 12
 #define SYSTEM_VERSION_REVISION 0   
 
 //Kernel version strings.
-#define SYSTEM_VERSION_STRING "0.5"
+#define SYSTEM_VERSION_STRING "0.12"
 #define SYSTEM_VERSION_NAME_STRING "Five"
 
 

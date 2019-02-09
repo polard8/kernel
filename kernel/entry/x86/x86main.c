@@ -856,11 +856,11 @@ int x86main ( int argc, char *argv[] ){
 	
 #endif		
 
-    //
-    // ## TESTS ##
-    // We can make some tests here.
-    //
+   
+//    ====================== ## TESTS ## =============================
+// begin - We can make some tests here.
 
+	
     //Inicializando as variáveis do cursor piscante do terminal.
     //isso é um teste.
     timer_cursor_used = 0;   //desabilitado.
@@ -957,7 +957,7 @@ int x86main ( int argc, char *argv[] ){
 	// TESTANDO SALVAR UM ARQUIVO ...
     //?? stdin ??
 	
-	char file_1[] = "Isso é um arquivo de teste ..... \n testando salvar um arquivo!!!!:)";
+	char file_1[] = "Isso é um arquivo de teste ..... \n testando salvar um arquivo!:)";
 	
 	char file_name[] = "savetest.txt";
 	write_fntos( (char *) file_name );
@@ -985,8 +985,11 @@ int x86main ( int argc, char *argv[] ){
 	windowLoadGramadoIcons ();
 	
 
-	// ## Testando font nelson Cole 2 ##
-    gwsInstallFont("NC2     FON");
+	// ## Testando font NelsonCole2 ##
+    // #todo: Isso pode ficar no mo'dulo gws?
+	gwsInstallFont("NC2     FON");
+	//gwsInstallFont("NC2     FON");
+	
 	
 	//
 	// ## testando suporte a salvamento de retângulo ##
@@ -1094,6 +1097,10 @@ int x86main ( int argc, char *argv[] ){
 	refresh_screen();
 	while(1){}
 	*/
+	
+	
+//    ====================== ## TESTS ## =============================
+// #end.	
 	
 	
 #ifdef BREAKPOINT_TARGET_AFTER_ENTRY

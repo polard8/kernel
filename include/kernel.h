@@ -43,9 +43,7 @@
 // ## Config section ##
 // 
  
-/* configuração do kernel norax*/ 
-#include <kernel/config/norax.h> 
- 
+
 /* Configuração de produto */ 
 #include <kernel/config/gramado.h> 
  

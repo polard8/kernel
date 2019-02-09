@@ -1,11 +1,15 @@
 /*
  * Gramado GUI - The main file for the GUI layer.
  * (c) Copyright 2015~2018 - Fred Nora.
+ *
+ * ## GWS - Gramado Window Server ##
+ * 
+ * History:
+ *     2017 -  Created by fred Nora.
  */
  
  
-// ## GWS - Gramado Window Server ##
-
+// #obs:
 // Aplicativo poderão se conectar com o servidor de recusros
 // gráficos, principalmente a GUI, que será chamada de 
 // Gramado Window Manager.
@@ -13,7 +17,6 @@
 // ser registrados e abrirem o servidor para usarem seus recursos.
 // do mesmo modo o shell atual poderá se registrar,
 // o processo de logon poderá se registrar em um servidor de logon.
-//
 
 
 #include <kernel.h>
@@ -33,6 +36,23 @@ int gws_wm_PID;
 int gws_wm_status;
 
 
+//
+// # internal
+//
+
+void gui_create_screen();
+void gui_create_background();
+void gui_create_logo();
+void gui_create_taskbar();
+void gui_create_mainwindow();
+void gui_create_controlmenu();
+void gui_create_infobox();
+void gui_create_messagebox();
+void gui_create_debug();
+void gui_create_navigationbar();
+void gui_create_grid();
+
+
 
 //
 // cursor
@@ -50,17 +70,17 @@ void gwsDisableTextCursor (){
     g_show_text_cursor = 0;	
 };
 */ 
+
  
 //abrir o servidor de janelas. 
-
 int gwsOpen (){
 	
 	//Aberto.
 	gws_status = 1;
 	//..
 	
-	return (int) 0;
-};
+	return 0;
+}
 
 
 //fechar o servidor de janelas
@@ -68,8 +88,8 @@ int gwsClose (){
 	
 	gws_status = 0;
 	
-	return (int) 0;
-};
+	return 0;
+}
 
 
 // Registrar um window manager.
@@ -94,24 +114,9 @@ done:
     return (int) 0;		
 };
  
-
-//#todo: isso deve ir para cima.
-//internas
-void gui_create_screen();
-void gui_create_background();
-void gui_create_logo();
-void gui_create_taskbar();
-void gui_create_mainwindow();
-void gui_create_controlmenu();
-void gui_create_infobox();
-void gui_create_messagebox();
-void gui_create_debug();
-void gui_create_navigationbar();
-void gui_create_grid();
-
-	
 	
 /* 
+ **********************************************************
  * create_gui:
  *     Cria as janelas principais: Screen, Background,Logo ...
  *     Cria Window Station, Desktop, Windows, Menu ...
@@ -123,23 +128,15 @@ void gui_create_grid();
  
 void create_gui (){
 	
-	//struct window_d *hWindow; 	 
-
-	//
 	// Set minimal gui set up!.
-	//
-	
 	//g_guiMinimal = 1;
 	
-	
-    //	
 	// Initializing 'gui' structure.
 	// Obs: Essa estrutura foi antes usada pelo Logon.
 	//      Agora a GUI reinicializa.
 	//      Todos os parametros da estrutura precisam ser inicializados.
 	// @todo: Estamos reinicializando tudo, recriando estruturas 
-	//        que devem ser deletadas na finalização do logon. @todo.
-    // 		
+	//        que devem ser deletadas na finalização do logon. @todo.		
 	
 	gui = (void *) malloc ( sizeof(struct gui_d) );
 	
@@ -160,8 +157,9 @@ void create_gui (){
 	    current_menu = 0;           
 		
 		
-		// @todo: O logon devveria ter selecionado o perfil do usuário
-		//        e essa rotina não deveria ser chamada.
+		// #todo: 
+		// ?? O logon deveria ter selecionado o perfil do usuário
+		// e essa rotina não deveria ser chamada. ??
 				
 		init_user_info ();
 		
@@ -169,173 +167,176 @@ void create_gui (){
 		// user section, window station and desktop.
 		// windows and menus.
 		
-		
-#ifdef KERNEL_VERBOSE		
-		printf("create_gui: User Session..\n");
-#endif
 		init_user_session ();
-		
-#ifdef KERNEL_VERBOSE				
-		printf("create_gui: Window Station..\n");
+#ifdef KERNEL_VERBOSE		
+		printf ("gws: user session ok\n");
 #endif
+		
 		init_room_manager();
-	 
-#ifdef KERNEL_VERBOSE			 
-		printf("create_gui: Desk..\n");
+#ifdef KERNEL_VERBOSE				
+		printf ("gws: room ok\n");
 #endif
+		
 	    init_desktop ();	
-	 
 #ifdef KERNEL_VERBOSE			 
-		printf("create_gui: Wind..\n");
-#endif	    
+		printf ("gws: desktop ok\n");
+#endif
+			    
 		init_windows ();	
-	 
 #ifdef KERNEL_VERBOSE			 
-		printf("create_gui: Menu..\n");
-#endif	    
+		printf ("gws: Init windows ok\n");
+#endif
+			    
 		init_menus ();
+#ifdef KERNEL_VERBOSE			 
+		printf ("gws: Init menu ok\n");
+#endif
 		
-		//
-		// System MenuBar: (Barra no topo da tela). 
-		//
+		// #bugbug
+		// System MenuBar: 
+		// (Barra no topo da tela). 
 	
-#ifdef KERNEL_VERBOSE			
-		printf("create_gui: System Menu bar..\n");
-#endif		
 		systemCreateSystemMenuBar();
-		
+#ifdef KERNEL_VERBOSE			
+		printf ("gws: System menubar ok\n");
+#endif				
 		//
 		// Continua ...
         //
 		
     };
 	
-	
-	//
+    // #importante:
 	// Configura quais janelas devem ser pintadas.
-	//
 	
-    if(g_guiMinimal == 1)
+    if (g_guiMinimal == 1)
 	{		
 
-        SetGuiParameters( 0,    //Refresh.         
-                          1,    //*Screen.          
-                          1,    //*Background.       
-                          0,    //Logo.            
-                          1,    //*Taskbar. #test.        
-                          1,    //*Main.(Desktop window, Área de trabalho) com base na taskbar.             
-                          0,    //Menu.           
-                          0,    //Info Box.         
-                          0,    //Message Box.       
-                          0,    //Debug.           
-                          0,    //Navigation Bar.    
-                          0 );  //Grid. #test.	
+        SetGuiParameters( 0,    // Refresh.         
+                          1,    // *Screen.          
+                          1,    // *Background.       
+                          0,    // Logo.            
+                          1,    // *Taskbar. #test.        
+                          1,    // *Main.(Desktop window, Área de trabalho) com base na taskbar.             
+                          0,    // Menu.           
+                          0,    // Info Box.         
+                          0,    // Message Box.       
+                          0,    // Debug.           
+                          0,    // Navigation Bar.    
+                          0 );  // Grid. #test.	
 						  
 	}else{
 		
-        SetGuiParameters( 0,    //Refresh.         
-                          1,    //*Screen.          
-                          1,    //*Background.       
-                          0,    //Logo.            
-                          1,    //*Taskbar. #test.        
-                          1,    //*Main.(Desktop window, Área de trabalho) com base na taskbar.             
-                          0,    //Menu.           
-                          0,    //Info Box.         
-                          0,    //Message Box.       
-                          0,    //Debug.           
-                          0,    //Navigation Bar.    
-                          0 );  //Grid. #test.	
+        SetGuiParameters( 0,    // Refresh.         
+                          1,    // *Screen.          
+                          1,    // *Background.       
+                          0,    // Logo.            
+                          1,    // *Taskbar. #test.        
+                          1,    // *Main.(Desktop window, Área de trabalho) com base na taskbar.             
+                          0,    // Menu.           
+                          0,    // Info Box.         
+                          0,    // Message Box.       
+                          0,    // Debug.           
+                          0,    // Navigation Bar.    
+                          0 );  // Grid. #test.	
 						   
 	};
   	
 	
-	//#importante.
+	// #importante.
+	// Checando se 'gui' 'e uma estrutura va'lida.
+	// precisaremos dela nas rotinas abaixo.
 	
-	if ( (void *) gui == NULL ){
-		
+	if ( (void *) gui == NULL )
+	{	
 		panic ("gws-create_gui: gui struct");
-	};
+	}
 	
 	
-	//Grupo1:
-	//Base windows:
-	//screen,background,taskbar
-	
-	//grupo2
-	//main (com base na screen e na taskbar.)
-	
-	//grupo3
-	//outros.
+	// #grupo1:
+	//     Base windows:
+	//     screen,background,taskbar	
+	// #grupo2:
+	//     main (com base na screen e na taskbar.)
+	// #grupo3:
+	//     outros.
 
-	
 //creatingWindows:
-	
     	
 	//Grupo1:
 	//Base windows:
 	//screen,background,taskbar
 	
-	if (gui->screenStatus == 1){ 
-	    gui_create_screen(); 
-	};
+	if (gui->screenStatus == 1)
+	{ 
+	    gui_create_screen (); 
+	}
 	
-	if (gui->backgroundStatus == 1){	
-	    gui_create_background(); 
-	};
+	if (gui->backgroundStatus == 1)
+	{	
+	    gui_create_background (); 
+	}
 
-	if (gui->taskbarStatus == 1){	
-	    gui_create_taskbar(); 
-	};
+	if (gui->taskbarStatus == 1)
+	{	
+	    gui_create_taskbar (); 
+	}
 
 	//grupo2
 	//main (com base na screen e na taskbar.)
 	
 	
-    if (gui->mainStatus == 1){ 
-	    gui_create_mainwindow(); 
-	};
+	if (gui->mainStatus == 1)
+	{ 
+	    gui_create_mainwindow (); 
+	}
 
 	//grupo3
 	//outros.
 
 	
-	if (gui->logoStatus == 1){ 
-	    gui_create_logo(); 
-	};	
+	if (gui->logoStatus == 1)
+	{ 
+	    gui_create_logo (); 
+	}
 	
 	
-    if (gui->messageboxStatus == 1){ 
-	    gui_create_messagebox(); 
-	};
+	if (gui->messageboxStatus == 1)
+	{ 
+	    gui_create_messagebox (); 
+	}
 	
-    if (gui->menuStatus == 1){ 
-	    gui_create_controlmenu(); 
-	};	
+	if (gui->menuStatus == 1)
+	{ 
+	    gui_create_controlmenu (); 
+	}	
 
-    if (gui->navigationbarStatus == 1){ 
-	    gui_create_navigationbar(); 
-	};
+	if (gui->navigationbarStatus == 1)
+	{ 
+	    gui_create_navigationbar (); 
+	}
 	
 	// Grid: Dentro do grid haverá sempre 3 partes: 
 	//       Header | Content | Footer.
 	//       Obs: @todo: O grid deve levar em consideração a
 	// área que lhe pertence, ou seja a área de trabalho.  
 	
-    if (gui->gridStatus == 1){ 
-	    gui_create_grid(); 
-	};
+	if (gui->gridStatus == 1)
+	{ 
+	    gui_create_grid (); 
+	}
 	
 	
 //drawingStrings:
 	
 	// Strings.
 	// String no background.
-    // Obs: Informações de ambiemte para o desenvolvedor.
+	// Obs: Informações de ambiemte para o desenvolvedor.
 	//@todo: Informar o desktop atual.
 	
 	if ( (void *) CurrentUser != NULL )
 	{
-        if (g_guiMinimal != 1)
+	    if (g_guiMinimal != 1)
 	    {				
 		    draw_text ( gui->main, 0, 0, COLOR_WHITE, "User Environment");
 		    draw_text ( gui->main, 0, 8, COLOR_WHITE, "================");
@@ -415,7 +416,7 @@ int grid             //Grid da janela principal.
 	
 	//Checa validade da estrutura.
 	
-	if ( (void*) gui == NULL ){
+	if ( (void *) gui == NULL ){
 		return;
 	}else{	
 	    gui->refresh = refresh; 
@@ -436,9 +437,6 @@ int grid             //Grid da janela principal.
     //
     // @todo: More ?!!
     //	
-	
-//done:
-    //return;
 };
 
 
@@ -449,8 +447,9 @@ int grid             //Grid da janela principal.
  *     ...
  * @todo: Cria buffer dedicado.
  */
-void gui_create_screen()
-{
+
+void gui_create_screen (){
+	
     struct window_d *hWindow; 
 	
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
@@ -458,37 +457,42 @@ void gui_create_screen()
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();
 
-	//
-	// * IMPORTANTE: Não tem Parent Window!
-	//
+
+	// #IMPORTANTE: 
+	// Não tem Parent Window!
 	
-	if( (void*) gui == NULL ){
+	if ( (void *) gui == NULL )
+	{
         return;
-    };		
+    }
 	
 	//Window:
 	//Pintado uma janela simples, toda preta, do tamanho da tela 
 	//do sispositivo.
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Screen",
-	                               Left, Top, Width, Height,
-						           0, 0, 0, COLOR_BLACK );     
-	if( (void*) hWindow == NULL ){
-	    printf("gui_create_screen:");
-		die();
+	
+	hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "Screen",
+	                       Left, Top, Width, Height,
+						   0, 0, 0, COLOR_BLACK );
+	
+	if ( (void *) hWindow == NULL )
+	{
+	    panic ("gui_create_screen:");
+		
 	}else{
 
 		RegisterWindow(hWindow);
 		set_active_window(hWindow); 
 		
-		//Isso impede que rotinas mudem as caracteríscicas 
-		// da janela principal sem antes destravar ou sem 
-		//ter autorização para isso.
-		windowLock(hWindow); 
+		// Isso impede que rotinas mudem as caracteríscicas da janela principal 
+		// sem antes destravar ou sem ter autorização para isso.
 		
-		//Estrutura gui.
-	    if( (void*) gui != NULL ){
-	        gui->screen = (void*) hWindow;
-		};
+		windowLock (hWindow); 
+		
+		// Estrutura gui.
+	    if ( (void *) gui != NULL )
+		{
+	        gui->screen = (void *) hWindow;
+		}
 		
 	    //Desktop.
 		//a janela pertence ao desktop 0
@@ -497,11 +501,13 @@ void gui_create_screen()
 		//Nothing.
 	};
 	
-	// @todo: More ??!!
-done:
-    //bugbug: Não usar set focus nessa que é a primeira janela.
-    return; 
-};
+	// @todo: 
+	// More ??!!
+
+    // #bugbug: 
+	// #importante:
+	// Não usar set focus nessa que é a primeira janela.
+}
 
 
 /*
