@@ -2,10 +2,10 @@
 
 
 VERSION = 0
-PATCHLEVEL = 0
+PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION =
-#NAME = jackpot
+EXTRAVERSION = -rc0
+NAME = Gramado LibC
 
 #todo:
 #We need to simplify these flags
@@ -41,26 +41,32 @@ main.o:
 
 all-c:
 
+#/ctype
+	gcc  -c  ctype/ctype.c   $(CFLAGS) -I include/ -o ctype.o	
+		
+#/socket
+#	gcc  -c  socket.c    $(CFLAGS) -I include/ -o socket.o
+
+
+#/stdio 
+	gcc  -c  stdio/stdio.c   $(CFLAGS) -I include/ -o stdio.o	
+	
+#/stdlib
+	gcc  -c  stdlib/stdlib.c  $(CFLAGS) -I include/ -o stdlib.o	
+	
+#/unistd
+	gcc  -c  unistd/unistd.c  $(CFLAGS) -I include/ -o unistd.o	
+	
+	
+	
+# outros	
 	gcc  -c  conio.c   $(CFLAGS) -I include/ -o conio.o
-	gcc  -c  ctype.c   $(CFLAGS) -I include/ -o ctype.o	
-	gcc  -c  stdio.c   $(CFLAGS) -I include/ -o stdio.o	
-	gcc  -c  stdlib.c  $(CFLAGS) -I include/ -o stdlib.o	
 	gcc  -c  string.c  $(CFLAGS) -I include/ -o string.o	
 	gcc  -c  time.c    $(CFLAGS) -I include/ -o time.o	
-	gcc  -c  unistd.c  $(CFLAGS) -I include/ -o unistd.o	
-	gcc  -c  wait.c    $(CFLAGS) -I include/ -o wait.o	
+	gcc  -c  wait.c    $(CFLAGS) -I include/ -o wait.o		
 	
-#	cp ../../lib/libc01/obj/ctype.o   .
-#	cp ../../lib/libc01/obj/stdio.o   .
-#	cp ../../lib/libc01/obj/stdlib.o  .	
-#	cp ../../lib/libc01/obj/string.o  .
-#	cp ../../lib/libc01/obj/time.o    .
-	
-	#todo
-#	cp ../../lib/api01/obj/api.o      .
-	
-#	cp ../../lib/libc01/obj/unistd.o  .
-	
+#...	
+		
 
 #create 'ar'
 libc01-link:
@@ -72,8 +78,8 @@ finalize:
 	-cp *.o obj/
 	
 clean:
-#	-rm *.o
-#	-rm JACKPOT.BIN 
+	-rm *.o
+
 	
 	
 

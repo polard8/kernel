@@ -1,10 +1,15 @@
 
 
+
 //math.h 
 
+#ifndef  _MATH_H
+#define  _MATH_H  1
 
-//incluido pra compilar aplicativo portado.
 
+
+
+#endif   /* math.h  */
 
 
 

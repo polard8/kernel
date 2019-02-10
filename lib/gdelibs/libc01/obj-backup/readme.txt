@@ -1,1 +1,0 @@
-objetos da libc
