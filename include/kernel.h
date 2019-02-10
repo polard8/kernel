@@ -1,33 +1,34 @@
 /*
  * Gramado Operating System - The main header for the kernel base. 
- * (c) Coppyright 2018 - Fred Nora.
+ * (c) Coppyright 2019 - Fred Nora.
  *
  * File: kernel.h 
  *
  * This is the header file kernel base.
- * This is a hybrid kernel. 
- * The kernel base has 4 layers: 
+ * This is a hybrid kernel.
+ *
+ * The base kernel has 4 layers: 
  *     HAL, MICROKERNEL, EXECUTIVE and GRAMADO.
  *
  * *****************************************
- * *                                       *  
+ * *                                       *
  * * ;----------------------------------;  *
  * * ;                                  ;  *
- * * ;               GWS                ;  *
- * * ;                                  ;  *  
+ * * ;               gws                ;  *
+ * * ;                                  ;  *
  * * ;----------------------------------;  *
  * * ;----------------------------------;  *
  * * ;                                  ;  *
- * * ;             Execve               ;  *  
+ * * ;             execve               ;  *
  * * ;                                  ;  *
  * * ;----------------------------------;  *
  * *                                       *
  * * ;----------------------------------;  *
- * * ;               MK                 ;  *
+ * * ;              mk                  ;  *
  * * ;----------------------------------;  *
  * *                                       *
  * * ;----------------------------------;  *
- * * ;              Hal                 ;  *
+ * * ;              hal                 ;  *
  * * ;----------------------------------;  *
  * *                                       *
  * *****************************************
@@ -44,10 +45,10 @@
 // 
  
 
-/* Configuração de produto */ 
+/* setup product */ 
 #include <kernel/config/gramado.h> 
  
-/* Configuração de compilação */ 
+/* setup compiling stuff */ 
 #include <kernel/config/config.h> 
 
 
@@ -68,15 +69,13 @@
 //spinlocks
 #include <kernel/gramado/mk/pc/spinlock.h>
 
-//layer.
 
-#define HAL         4   //4
-#define MICROKERNEL 3   //3
-#define EXECUTIVE   2   //2
-#define GRAMADO     1   //1 gws
-
+//layers
 #define KERNEL      0
-
+#define GRAMADO     1   //1 gws
+#define EXECUTIVE   2   //2
+#define MICROKERNEL 3   //3
+#define HAL         4   //4
 
 
 
@@ -89,13 +88,7 @@
 #define RING3 3
 
 
-/*
-// Segments @todo: Include this constants.
-#define GDT_KCODE   0x08
-#define GDT_KDATA   0x10
-#define GDT_UCODE   (0x18 | 3)
-#define GDT_UDATA   (0x20 | 3)
-*/
+
 
 
 //Kernel status constants.
@@ -104,25 +97,11 @@
 #define  KERNEL_ABORTED       2
 #define  KERNEL_INICIALIZADO  KERNEL_INITIALIZED
 #define  KERNEL_ABORTADO      KERNEL_ABORTED
-//#define  KE_ (-1)
-//#define  KE_ (-2)
-//#define  KE_ (-3)
-//#define  KE_ (-4)
+
 
 
 //#define LOBYTE(w) ((char)(((unsigned long )(w)) & 0xff))
 //#define HIBYTE(w) ((char)((((unsigned long)(w)) >> 8) & 0xff))
-
-
-//
-//  ## JOB CONTROL SUPPORT ##
-//
-
-#define PROCESS 10
-#define THREAD  20
-#define BACKGROUND 100 
-#define FOREGROUND 200
-
 
 
 //
@@ -145,9 +124,6 @@ extern void do_executa_new_task();
 
 
 
-
-
-
 // kernel libC support.
 //++
 #include <kernel/stddef.h>
@@ -164,23 +140,19 @@ extern void do_executa_new_task();
 //--
 
 
-
-
-
 // ## hardware ## 
 
 #include <kernel/gramado/intel.h>
 #include <kernel/gramado/memory.h>
-
 #include <kernel/gramado/cpuid.h>
 #include <kernel/gramado/screen.h>
 #include <kernel/gramado/video.h>
 #include <kernel/gramado/rtc.h>
 //...
 
-// ## shared ## 
+
 #include <kernel/gramado/fonts.h>
-#include <kernel/gramado/ascii.h>     //ascii table 
+#include <kernel/gramado/ascii.h>     
 #include <kernel/gramado/fs.h> 
 #include <kernel/gramado/prompt.h>
 #include <kernel/gramado/bmp.h>
@@ -193,12 +165,14 @@ extern void do_executa_new_task();
 
 
 // Global first.
-#include <kernel/gramado/mk/pc/mm/memmap.h>            //Memory Map - address.
+//Memory Map - address.
+#include <kernel/gramado/mk/pc/mm/memmap.h>            
 
 
 
 //execve
-#include <kernel/gramado/execve/sm/disk/diskmap.h>        //Disk Map - sectors.
+//Disk Map - sectors.
+#include <kernel/gramado/execve/sm/disk/diskmap.h>        
 
 
 //
@@ -206,77 +180,60 @@ extern void do_executa_new_task();
 //
 
 #include <kernel/gramado/hal/screen.h> 
-#include <kernel/gramado/hal/video.h>                        //video.
-#include <kernel/gramado/hal/memory.h>                       //ram (hardware).
+#include <kernel/gramado/hal/video.h>
+#include <kernel/gramado/hal/memory.h>
 #include <kernel/gramado/hal/cpu.h>  
 #include <kernel/gramado/hal/arch/x86/x86.h> 
 #include <kernel/gramado/hal/arch/amd/cpuamd.h>  
-
 #include <kernel/gramado/hal/arch/detect.h>  
+#include <kernel/gramado/hal/serial.h>        
+#include <kernel/gramado/hal/mac.h>                             
+#include <kernel/gramado/hal/arch/x86/portsx86.h>
 
 
+//execve
 //disk1 - nelson
 //#include <kernel/gramado/3rdparty/sirius.h>
 #include <kernel/gramado/execve/dd/ide/disk1.h>
-
-//execve
-#include <kernel/gramado/execve/sm/disk/disk.h>           //disk.
-
-#include <kernel/gramado/execve/sm/disk/volume.h>         //volume.
-#include <kernel/gramado/hal/serial.h>        
-#include <kernel/gramado/hal/mac.h>                             //mac address info. (hw)
+#include <kernel/gramado/execve/sm/disk/disk.h>          
+#include <kernel/gramado/execve/sm/disk/volume.h>
+#include <kernel/gramado/execve/dd/serial.h>
+#include <kernel/gramado/execve/dd/ps2.h>
+#include <kernel/gramado/execve/dd/timer.h>
+#include <kernel/gramado/execve/dd/pic.h>
+#include <kernel/gramado/execve/dd/apic.h>
+#include <kernel/gramado/execve/dd/rtc.h>
+#include <kernel/gramado/execve/dd/floppy.h>
+#include <kernel/gramado/execve/dd/keyboard.h>
+#include <kernel/gramado/execve/dd/vk.h>
+#include <kernel/gramado/execve/dd/abnt2.h>
+#include <kernel/gramado/execve/dd/ldisc/ldisc.h>
+#include <kernel/gramado/execve/dd/ide/ide.h>
+#include <kernel/gramado/execve/dd/pci/pci.h>
+#include <kernel/gramado/execve/dd/ahci/ahci.h>
+#include <kernel/gramado/execve/dd/ahci/sata.h>
+#include <kernel/gramado/execve/dd/usb.h>
 //...
 
-//
-// EXECUTIVE (2)
-//
 
-//não mecher na ordem, pode dar problemas;
- //Portas para dispositivos
-#include <kernel/gramado/hal/arch/x86/portsx86.h>       
-
-#include <kernel/gramado/execve/dd/serial.h>  
-#include <kernel/gramado/execve/dd/ps2.h>          //ps/2 
-#include <kernel/gramado/execve/dd/timer.h>        //PIT. irq0.
-#include <kernel/gramado/execve/dd/pic.h>          //PIC.
-#include <kernel/gramado/execve/dd/apic.h>         //APIC - Advanced Programmable Interrupt Controller.
-#include <kernel/gramado/execve/dd/rtc.h>          //clock.
-#include <kernel/gramado/execve/dd/floppy.h>       //floppy.
-#include <kernel/gramado/execve/dd/keyboard.h>     //irq1     //keyboard
-#include <kernel/gramado/execve/dd/vk.h>         //virtual keys
-#include <kernel/gramado/execve/dd/abnt2.h> 
-#include <kernel/gramado/execve/dd/ldisc/ldisc.h>        //ldisc
-
-#include <kernel/gramado/execve/dd/ide/ide.h>          //irq14/15 
-
-
-#include <kernel/gramado/execve/dd/pci/pci.h>            //pci.
-
-//#Test
-#include <kernel/gramado/execve/dd/ahci/ahci.h>          
-#include <kernel/gramado/execve/dd/ahci/sata.h>          
-
-
-#include <kernel/gramado/execve/dd/usb.h>            //usb.
-
-//#include                                       //pcie.
-//...
 
 //
 // HAL (4)
 //
 
-//This must to be on the bottom of HAL part.    
-#include <kernel/gramado/hal/device.h>      //device manager.
-#include <kernel/gramado/hal/hal.h>         //*****
+//device manager.
+#include <kernel/gramado/hal/device.h>
+#include <kernel/gramado/hal/hal.h>
 //--
 
 
 /*
  * MICROKERNEL (3)
  */
- //++
 
+
+//++
+//mk
 #include <kernel/gramado/mk/arch/x86/x86cont.h>
 #include <kernel/gramado/mk/pc/ts.h>
 #include <kernel/gramado/mk/pc/tasks.h>
@@ -295,65 +252,37 @@ extern void do_executa_new_task();
 
 
 //
-// EXECUTIVE (2)
+// GRAMADO (GWS)
 //
 
-//tty
-#include <kernel/gramado/execve/dd/tty/tty.h>
-
-
-//
-// GRAMADO (1)
-// This must to be on the bottom.
-//
-
-//gramado - GUI. (presentation layer)
-//Gramado Window Server
 #include <kernel/gramado/gws/gws/ws.h>
-
-//user
 #include <kernel/gramado/gws/user/usession.h>
 #include <kernel/gramado/gws/user/room.h>
 #include <kernel/gramado/gws/user/desktop.h>
-
 #include <kernel/gramado/gws/gws/window.h>
-
-//tentar mudar de lugar.
-#include <kernel/gramado/execve/dd/i8042/i8042.h>
-#include <kernel/gramado/execve/dd/i8042/ps2mouse.h>
-#include <kernel/gramado/execve/dd/i8042/ps2kbd.h>
-
 #include <kernel/gramado/gws/gws/menu.h>
 #include <kernel/gramado/gws/gws/grid.h>
 #include <kernel/gramado/gws/gws/bmp.h>
-#include <kernel/gramado/gws/gws/guiconf.h>  //*principal.
-
-// user, logon, logoff
+#include <kernel/gramado/gws/terminal/line.h>
+#include <kernel/gramado/gws/terminal/terminal.h>
+#include <kernel/gramado/gws/terminal/console.h>
+#include <kernel/gramado/gws/gws/guiconf.h>
 #include <kernel/gramado/gws/user/user.h>
 #include <kernel/gramado/gws/logon/logon.h>
 #include <kernel/gramado/gws/logoff/logoff.h>
+#include <kernel/gramado/gws/gws.h>
 
-//principal
-#include <kernel/gramado/gws/gws.h>                     
 
-//uigm - User Interface Graphic Mode.
-//nothing for now.
-
-//gws/terminal 
-//suporte a terminal.
-#include <kernel/gramado/gws/terminal/line.h>              //lines support.
-#include <kernel/gramado/gws/terminal/terminal.h>          //terminal support. 
-#include <kernel/gramado/gws/terminal/console.h>           //Console. Monitor support.
-
-//sm - System Management.  
-#include <kernel/gramado/execve/sm/install.h>  
+//execve
+#include <kernel/gramado/execve/sm/install.h>
 #include <kernel/gramado/execve/sm/init.h>
-
+#include <kernel/gramado/execve/dd/tty/tty.h>
+#include <kernel/gramado/execve/dd/i8042/i8042.h>
+#include <kernel/gramado/execve/dd/i8042/ps2mouse.h>
+#include <kernel/gramado/execve/dd/i8042/ps2kbd.h>
 #include <kernel/gramado/execve/dd/network/host.h>        //host info.
-
 #include <kernel/gramado/execve/dd/network/ethernet.h>
 #include <kernel/gramado/execve/dd/network/arp.h>
-
 #include <kernel/gramado/execve/dd/network/intel.h>       //intel nic - network interface controller.
 #include <kernel/gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
 #include <kernel/gramado/execve/dd/network/socket.h>      //(network) Sockets info. (sw)
@@ -362,9 +291,8 @@ extern void do_executa_new_task();
 #include <kernel/gramado/execve/dd/network/client.h>      //(network) Client process support. 
 #include <kernel/gramado/execve/dd/network/ns.h>          //(network) Network Server.
 #include <kernel/gramado/execve/dd/network/network.h>     //(network) Gerenciamento de rede. 
-
-#include <kernel/gramado/execve/fs/fs.h>                     //fs.
-#include <kernel/gramado/execve/fs/vfs.h>                     //vfs.
+#include <kernel/gramado/execve/fs/fs.h>                  //fs.
+#include <kernel/gramado/execve/fs/vfs.h>                 //vfs.
 #include <kernel/gramado/execve/sm/io.h>                  //io.
 #include <kernel/gramado/execve/sci/syscall.h>            //system calls.
 #include <kernel/gramado/execve/sm/modules.h>             //module manager.
@@ -372,6 +300,7 @@ extern void do_executa_new_task();
 #include <kernel/gramado/execve/sm/sys.h>                 //system calls 2.
 #include <kernel/gramado/execve/sm/system.h>              //system manager.
 #include <kernel/gramado/execve/dd/dd.h>
+#include <kernel/gramado/execve/execve.h>        
 
 //
 // MICROKERNEL (3)
@@ -384,14 +313,6 @@ extern void do_executa_new_task();
 #include <kernel/gramado/mk/pc/mm/dspace.h>        //Disk Space, (data base account).
 #include <kernel/gramado/mk/pc/mm/bank.h>          //Bank. database
 #include <kernel/gramado/mk/pc/mm/mm.h>            //mm, memory manager support.
-
-
-//
-// EXECUTIVE (2)
-//
-
-#include <kernel/gramado/execve/execve.h>              //main file.
-//--
 
 
 //
@@ -457,78 +378,44 @@ int g_platform_type;
 int current_user;    //gramado ?
 int current_group;   //gramado ?
 
-//#importante:
-//isso foi movido para gws\ws.h
-//int current_usersession;    //gws
-//int current_windowstation;  //gws
-//int current_desktop;        //gws 
-//int current_window;         //gws
-//int current_menu; //gws
 
-//
-// #importante
-// Essa é a verdadeira idle, que está em ring 0 e trabalha 
-// quando sistema está ocioso.
-// ela deve ficar bloqueada quendo outras estão trabalhando. 
-// Ela não pode ser destruída e nem alterada ... uma vez configurada 
-// ficará sendo ela pra sempre, se ela fechar o sistema deve falhar.
-int idle;   
+//true ring 0 idle tread id.
+//can't be destroied.
+//stay blocked if we have more then one thread.
+int idle;
 
-//Próxima thread das threads em user mode.
-int next_thread;   
-  
+//next user mode thread.
+int next_thread;
+
 int current_process;
 int current_thread;
 int current_disk;
 int current_volume;
-int current_directory;   
-int current_file;        
+int current_directory;
+int current_file;
 int current_terminal;
-int current_dead_process;  //qual processo acabou de morrer.
-int current_dead_thread;   //qual thread acabou de morrer.
+int current_dead_process;
+int current_dead_thread;
 //...
 
 
 //cr3. current page directoory address.
 unsigned long current_process_pagedirectory_address;
 
-//Lista para armazenas os ponteiros das estruturas de todos os processadores.
-//unsigned long processorsList[32];
-
-//Quais processadores estão no estado IDLE.
-//int idleprocessorList[8];
-
-//Quais processadores estão no estado ACTIVE.
-//int activeprocessorList[8];
 
 
-//Tempo absoluto em que o sistema iniciou.
-//unsigned long BootTime;
+//processors count
+int processors_count;
 
-//Conta o número de processadores.
-//int processors_count;
+//all processors's structs.
+unsigned long processorsList[32];
 
-//A arquitetura do processador.(marca)
-//int processor_architecture;
+//processors in idle state.
+int idleprocessorList[32];
 
-//Lista os serviços oferecidos pelo kernel atravéz da systemcall int 200.
-//endereço da função. talvez seja uma chamada à um módulo esterno ou server.
-//unsigned long SystemServices[256];
+//processors in active state.
+int activeprocessorList[32];
 
-
-//Contador de thread switch.
-//unsigned long thread_switch_count;
-
-//Armazena o endereço da rotina de debug do sistema.
-//unsigned long system_debugger_address;
-
-
-//Armazena qual será o número de identificação
-//do próximo processo ou thread criados.
-// se for '0', tem que procurar um novo.
-//se usar o número contido aqui, deve atualizar para 0.
-//int NewPID;
-//int NewTID;
 
 
 //
@@ -597,8 +484,9 @@ unsigned long KernelStatus;
 unsigned long kernel_switch;
 
 
+//#bugbug
+//move this to kernel (ring 0) crt support.
 //error support.
-//isso deve ir para a libc
 unsigned long errno;
 
 
@@ -606,14 +494,12 @@ unsigned long errno;
 // fs support.
 //
 
-
-//??
 //directory entries support.
-char buffer_dir_entry[512];
+//char buffer_dir_entry[512];
 
-//??Isso pode ir para outro lugar ou podemos usar uma stream.
 //log buffer
-char KernelLogBuffer[512];
+//char KernelLogBuffer[512];
+
 
 
 //
@@ -684,6 +570,8 @@ struct kernel_classes_d
 struct kernel_classes_d KernelClasses;
 //...
 
+
+
 /*
 //Kernel Manager.
 struct kernel_d
@@ -728,58 +616,41 @@ struct kernel_d *KernelInfo;
 //...
 
 
+
 /*
  **********************************************************
  * plataform_d:
- *     Os componentes básicos da máquina.
- *     As estruturas de Hardware e Software.
- *     * IMPORTANTE Essa é a estrutura BASE do kernel.
- */
+ *     Basic machine components. Hardware and Software. */
+
 struct platform_d
 {
-    //Name.
     char *name;
-
-    //Type.
-
-
-    //  *Hardware - Componentes do hardware.
-    //  *Firmware - Componentes se software embarcados. BIOS, UEFI ...
-    //  *Software - Componentes do Sistema operacional.
-
-    struct hardware_d *Hardware;    // hal\hal.h
-    struct firmware_d *Firmware;    // hal\hal.h
-    struct system_d   *System;      // executive\system.h
-
+	
+    struct hardware_d *Hardware;    // hal/hal.h
+    struct firmware_d *Firmware;    // hal/hal.h
+    struct system_d   *System;      // execve/sm/system.h
 
     //kernel struct ...
-    struct kernel_d *Kernel;
+    //struct kernel_d *Kernel;
 };
 struct platform_d *Platform; 
 
 
-//
-// ## MAIN ##
-//
+/*
+ *****************************************
+ * kMain:
+ *     Prototype for base kernel 'main' function. */
 
 int kMain ( int argc, char **argv );
 
 
-//
 // Initializations support.  
-//
-
-
 int init_runtime();         //RunTime.
 void boot();                //??
 void save_kernel_args();    //Save args in the structure.
 
 
-//
 // Linked list support.
-// 
-
-
 void* newLinkedlist();
 void* newNode();
 void Removing_from_the_beginning(struct linkedlist_d *list);
@@ -816,12 +687,9 @@ void abort();    //abort.c
 void die();      //system.c
 
 
-//
 // ke - Kernel External.
 // ki - Kernel Internal.
 // PS: This must to be here in the end.
-//
-
 
 #include <kernel/gramado/ke.h>
 #include <kernel/gramado/ki.h>

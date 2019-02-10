@@ -1,25 +1,22 @@
 
 # Compiling Gramado on Manjaro Linux.
-# Chamaremos cada alvo que terá seu makefile em sua própria pasta.
-
 # /bin/bash
 # SPDX-License-Identifier: GPL-3.0+
 # BSD License
-#
 # History:
-# 2018 - Created by Matheus Castello.
-# 2019 - Fred Nora.
-# 2019 - Luciano Gonçalez.
+#     2018 - Created by Matheus Castello.
+#     2019 - Fred Nora.
+#     2019 - Luciano Gonçalez.
 
+
+#important
+#We will have a new name just when the release changes.
 
 VERSION = 0
 PATCHLEVEL = 13
 SUBLEVEL = 0
 EXTRAVERSION = -rc0
 NAME = ?
-
-#important
-#We will have a new name just when the release changes.
 
 #todo:
 #We need to simplify these flags, but it's working.
@@ -37,17 +34,14 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fleading-underscore \
 	-fno-stack-protector \
-	-s	
-	
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
+	-s
+
 
 ##
 ## Defines
 ##
 
-DEFINES = 	-DGRAMADO_VERSION=$(VERSION) \
+DEFINES =  -DGRAMADO_VERSION=$(VERSION) \
 		-DGRAMADO_PATCHLEVEL=$(PATCHLEVEL) \
 		-DGRAMADO_SUBLEVEL=$(SUBLEVEL) \
 		-DGRAMADO_EXTRAVERSION=\"$(EXTRAVERSION)\" \
@@ -168,14 +162,7 @@ services.o
 
 
 
-
-#importante
-#Aqui ficarão os alvos principais, como configurações
-#os cripts ficarão em /scripts
-#os alvos aqui chama chama os scripts
-
-#ISSO DIZ QUE O ALVO NAO EH ARQUIVO
-#É para informar ao make não procurar por um arquivo com esse nome
+#not file.
 #.PHONY x86
 
 xxx_x86: /mnt/gramadovhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
@@ -277,6 +264,7 @@ compile-kernel:
 	# dd/pci
 	gcc -c kernel/execve/dd/pci/pci.c  -I include/ $(CFLAGS) $(DEFINES) -o pci.o
 
+	# dd/network
 	gcc -c kernel/execve/dd/network/intel.c    -I include/ $(CFLAGS) $(DEFINES) -o nicintel.o
 	gcc -c kernel/execve/dd/network/network.c  -I include/ $(CFLAGS) $(DEFINES) -o network.o
 	gcc -c kernel/execve/dd/network/socket.c   -I include/ $(CFLAGS) $(DEFINES) -o socket.o
@@ -440,8 +428,9 @@ clean:
 	@echo "Success?"
 	
 	
-# Isso e' um teste, anda nao funciona.
-# Cria um arquivo .ISO usando nasm.
+# test
+# todo
+# Create a .ISO file using nasm.
 makeiso-x86:
 	#todo:  
 	#nasm -I arch/x86/boot/iso/stage1/ \
@@ -450,9 +439,9 @@ makeiso-x86:
 	@echo "#todo Create ISO using nasm"
 	
 # ISO
-# Monta o stage1.bin com nasm.
-# Gera um arquivo .ISO e coloca todo o conteu'do da parata bin
-# dentro do ISO.
+# Mount stage1.bin file with nasm.
+# Create a .ISO file and move all the content of the /bin folder
+# into the .ISO file.
 geniso-x86:
 	
 	#stage1

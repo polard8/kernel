@@ -1,5 +1,7 @@
 /*
- * File: contx86.h context x86 support 
+ * File: x86cont.h 
+ *
+ * Context support for x86 arch. 
  *
  * Descrição:
  *     Header para rotinas de operações com contexto de threads e processos.

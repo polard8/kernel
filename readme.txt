@@ -1,7 +1,6 @@
 
  ~Main folders for Gramado Operating System.
 
-
 Groups:
 
 4 (super)
