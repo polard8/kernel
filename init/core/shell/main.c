@@ -469,7 +469,8 @@ void fatal( char *msg, char *arg1, char *arg2 );
 char *concat( char *s1, char *s2, char *s3 );
 char *save_string ( char *s, int len );
 
-int shell_save_file();
+int shell_save_file ();
+int save_string2 ( char string[], char file_name[] );
 
 void shellInitSystemMetrics();
 void shellInitWindowLimits();
@@ -550,7 +551,7 @@ shellTopbarProcedure ( struct window_d *window,
 void quit ( int status ){
 	
 	running = 0;
-}; 
+}
  
  
 /*
@@ -3270,7 +3271,8 @@ do_compare:
 	if ( strncmp( prompt, "t5", 2 ) == 0 )
 	{
 		printf("t5: save file\n");
-		shell_save_file ();
+		save_string2 ( "t5: Salvando esse texto em test1234.txt", "TEST1234TXT" );
+		//shell_save_file ();
 		printf("t5: done\n");
         goto exit_cmp;
     };	
@@ -3329,10 +3331,8 @@ do_compare:
 	if ( strncmp( prompt, "t11", 3 ) == 0 )
     {    
         //chama message box com mensagem about.
-        apiSendMessage ( (struct window_d *) 0, 
-		                 (int) MSG_COMMAND, 
-						 (unsigned long) CMD_ABOUT, 
-						 (unsigned long) 0 );
+        apiSendMessage ( (struct window_d *) 0, (int) MSG_COMMAND, 
+		    (unsigned long) CMD_ABOUT, (unsigned long) 0 );
 		
 		goto exit_cmp;
 	};
@@ -3370,7 +3370,7 @@ do_compare:
         goto exit_cmp;					 
 	};	
 	
-	
+	// escrevendo em stdout e mostrando.
 	if ( strncmp( prompt, "t13", 3 ) == 0 )
     {    
         //#obs 
@@ -3399,7 +3399,7 @@ do_compare:
 	//flush stdout
 	if ( strncmp( prompt, "flush-stdout", 12 ) == 0 )
 	{
-		fflush(stdout);
+		fflush (stdout);
 		goto exit_cmp;
 	}
 
@@ -6797,12 +6797,12 @@ int is_sh1 ( char *cmd ){
 
 
 /* 
-Give version information about this shell. 
-*/
+ * Give version information about this shell.  */
+
 void show_shell_version (){
-    printf ("%s, version %s.%s \n", 
-	    shell_name, dist_version, build_version );
-};
+	
+    printf ("%s, version %s.%s \n", shell_name, dist_version, build_version );
+}
 
 
 //testando a rotina de salvar um arquivo.
@@ -6822,7 +6822,9 @@ int shell_save_file (){
 	int Ret;
 	
 	char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
+	
 	char file_1_name[] = "FILE1UM TXT";
+	//char file_1_name[] = "TESTSAVETXT";
 	
 	printf("shell_save_file: Salvando um arquivo ...\n");
 	
@@ -6873,6 +6875,15 @@ int shell_save_file (){
         return (int) 1;				
 	}
 	
+	/*
+	 ## test
+    Ret = (int) apiSaveFile ( file_1_name,        //name 
+                              number_of_sectors,  //number of sectors.
+                              len,                //size in bytes			
+                              stdin->_base,      //address
+                              0x20 );             //flag
+	*/
+	
 	
     Ret = (int) apiSaveFile ( file_1_name,  //name 
                               number_of_sectors,            //number of sectors.
@@ -6886,6 +6897,98 @@ int shell_save_file (){
 	
 	return (int) Ret;
 };
+
+
+//salvando uma string.
+int save_string2 ( char string[], char file_name[] ){
+	
+	// #importante:
+	// Não podemos chamar a API sem que todos os argumentos estejam corretos.
+	
+	// #obs:
+	// Vamos impor o limite de 4 setores por enquanto. 
+	// 512*4 = 2048  (4 setores) 2KB
+	// Se a quantidade de bytes for '0'. ???
+	
+	int Ret;
+	
+	//char file_1[] = "t5: Arquivo \n escrito \n em \n user mode. \n";
+	
+	//char file_1_name[] = "FILE1UM TXT";
+	//char file_1_name[] = "TESTSAVETXT";
+	
+	printf ("save_string2: Salvando um arquivo ...\n");
+	
+	unsigned long number_of_sectors = 0;
+    size_t len = 0;
+	
+	
+	//
+	// Lenght in bytes.
+	//
+	
+	len = (size_t) strlen (string);
+
+	if (len <= 0)
+	{
+	    printf ("save_string2:  Fail. Empty file.\n");
+        return (int) 1;		
+	}
+	
+	if (len > 2048)
+	{
+	    printf ("save_string2:  Limit Fail. The  file is too long.\n");
+        return (int) 1;		
+	}
+	
+    //
+    // Number os sectors.
+    //
+	
+	number_of_sectors = (unsigned long) ( len / 512 );
+	
+	if ( len > 0 && len < 512 ){
+	    number_of_sectors = 1; 
+    }		
+	
+	if ( number_of_sectors == 0 )
+	{
+	    printf ("save_string2:  Limit Fail. (0) sectors so save.\n");
+        return (int) 1;				
+	}
+	
+	//limite de teste.
+	//Se tivermos que salvar mais que 4 setores.
+	if ( number_of_sectors > 4 )
+	{
+	    printf ("save_string2:  Limit Fail. (%d) sectors so save.\n",
+		    number_of_sectors );
+        return (int) 1;				
+	}
+	
+	/*
+	 ## test
+    Ret = (int) apiSaveFile ( file_1_name,        //name 
+                              number_of_sectors,  //number of sectors.
+                              len,                //size in bytes			
+                              stdin->_base,      //address
+                              0x20 );             //flag
+	*/
+	
+	
+    Ret = (int) apiSaveFile ( file_name,  //name 
+                              number_of_sectors,            //number of sectors.
+                              len,            //size in bytes			
+                              string,       //address
+                              0x20 );       //flag		
+				
+	//if (Ret == 0)
+	
+	printf("save_string2: done\n");	
+	
+	return (int) Ret;
+};
+
 
 
 /*
