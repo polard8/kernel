@@ -354,6 +354,7 @@ void tmSetCursor (unsigned long x, unsigned long y){
 // strlen:
 //     Tamanho de uma string.
 // 
+
 size_t tmstrlen (const char *s){
 	
     size_t i = 0;
@@ -362,8 +363,8 @@ size_t tmstrlen (const char *s){
 	    ; 
 	};
 	
-	return ( (size_t) i );
-};
+	return (size_t) i;
+}
 
 
 //
@@ -438,8 +439,8 @@ void progress_bar_test (){
 
 /*
  * tmInit:
- *     Inicializações.
- */
+ *     Inicializações. */
+
 int tmInit (){
 	
 	taskmanagerStatus = 0;
@@ -455,8 +456,8 @@ int tmInit (){
 	
 	//...
 
-    return (int) 0;
-};
+    return 0;
+}
 
 
 
@@ -468,6 +469,7 @@ int tmInit (){
  * @todo:
  *     +... 
  */
+
 int appMain ( int argc, char *argv[] ){
 	
 	//int Status;	
@@ -495,7 +497,7 @@ int appMain ( int argc, char *argv[] ){
     //para dialogar com o kernel.
 	
 #ifdef TASKMAN_VERBOSE
-	printf("appMain: Initializing taskman server..\n");
+	printf("taskman is alive\n");
 #endif	
 	
 	//o kernel deverá associar o PID a um magic.

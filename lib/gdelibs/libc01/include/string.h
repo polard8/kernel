@@ -10,6 +10,7 @@ int memcmp (const void *s1, const void *s2, size_t n);
 long double strtold(const char *nptr, char **endptr);
 
 char *strdup(const char *str);
+char *strndup(const char *s, size_t n);
 
 char *strrchr(const char *p, int ch);
 
@@ -33,7 +34,8 @@ char *strcpy(char *to, const char *from);
 char *strcat(char *to, const char *from);
 void bcopy(char *from, char *to, int len);
 void  bzero(char *cp, int len);
-size_t strlen(const char *s);
+size_t strlen (const char *s);
+size_t strnlen ( const char *s, size_t maxlen );
 
 
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
@@ -43,11 +45,16 @@ size_t strspn(const char* str, const char* accept);
 //char* strtok(char* str, const char* delim);
 
 
-/*apple*/
-char *
-strtok_r(char *s, const char *delim, char **last);
-char *
-strtok(char *s, const char *delim);
+/*apple style*/
+char *strtok_r (char *s, const char *delim, char **last);
+char *strtok (char *s, const char *delim);
+
+
+char *strchr (const char *s, int c);
+
+
+char *strstr (const char *s1, const char *s2);
+
 
 //
 // End.

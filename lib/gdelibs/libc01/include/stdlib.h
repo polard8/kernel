@@ -46,75 +46,68 @@
    
 */   
   
-//A rotina terminou normalmente.                                                                                 
-#define	EXIT_SUCCESS  0    
+//A rotina terminou normalmente.
+#define EXIT_SUCCESS  0    
 
-//A rotina terminou de maneira anormal.                                                                       
-#define	EXIT_FAILURE  1
+//A rotina terminou de maneira anormal.
+#define EXIT_FAILURE  1
 
 #define RAND_MAX  32767 
 
-void *stdlib_system_call( unsigned long ax, 
-                   unsigned long bx, 
-				   unsigned long cx, 
-				   unsigned long dx );
-				   
-				   
-				   
-				   
-int atoi(const char *str);	
+void *stdlib_system_call ( unsigned long ax, 
+                           unsigned long bx, 
+                           unsigned long cx, 
+                           unsigned long dx );
+
+void stdlib_die (char *str);
+
+int atoi (const char *str);	
 
 
-
-
-//char *itoa (int i);	
- void itoa(int n, char s[]);
+void itoa (int n, char s[]);
 		   
 
+char *getenv (const char *name);
 
-
-
-
-char *
-getenv(const char *name);
-
-
-
-
-//exit de mallox não der certo.
-void *xmalloc( int size);
-void stdlib_die (char *str);
 
 /*
  * malloc:
- *    Allocates the requested memory and returns a pointer to it.
- */
-void *malloc(size_t size);
+ *    Allocates the requested memory and returns a pointer to it. */
 
-//void *calloc(size_t nitems, size_t size);  //@todo
+void *malloc (size_t size);
+
 void *calloc (size_t count, size_t size);
 
- //@todo
-void *realloc(void *ptr, size_t size); 
+void *zmalloc ( size_t size);
+
+void *realloc ( void *start, size_t newsize );
+
+
+/*
+ * xmalloc:
+ *     exit se malloc não der certo. */
+
+void *xmalloc ( int size);
+
+
 
 /*
  * free:
- *     Libera a memória alocada por malloc.
- */
-void free(void *ptr);
-//void free2(void *ptr);
+ *     Libera a memória alocada por malloc. */
+
+void free (void *ptr);
 
 //Returns a pseudo-random number in the range of 0 to RAND_MAX.
-int rand(void);
+int rand (void);
 
 //Alimenta a função rand.
-void srand(unsigned int seed);
+void srand (unsigned int seed);
 
 
 //@todo: talvez essa função esteja declara erradamente em systemcall.
 //Obs: Essa rotina existe na API e funciona. Se ela faz parte da lib C
 // então ela deve sair de lá vir pra cá.
-int system(const char *command);
+int system (const char *command);
 
 
 

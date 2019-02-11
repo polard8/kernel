@@ -7,6 +7,11 @@ SUBLEVEL = 0
 EXTRAVERSION = -rc0
 NAME = Gramado LibC
 
+
+#STATIC_LIB = obj/lib/libc01.a
+#SHARED_LIB = obj/lib/libc01.so
+
+
 #todo:
 #We need to simplify these flags
 

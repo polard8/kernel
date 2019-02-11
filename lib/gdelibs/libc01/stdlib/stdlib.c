@@ -5,10 +5,6 @@
  *     stdlib. Parte da lib C da API 32bit.
  * Versão: 1.0, 2016 - Created.
  */
-
-    //?? #bugbug
-	//?? Será que a biblioteca deve chamar a API,
-    //?? A biblioteca não deveria ter suas próprias chamdas. 
 	
 
 #include <types.h> 
@@ -459,10 +455,11 @@ fail:
  *     Aloca heap.
  *     Obs: Onde ??
  */
+
 void *AllocateHeapEx ( unsigned long size ){
 	
-	return (void *) AllocateHeap(size); 
-};
+	return (void *) AllocateHeap (size); 
+}
 
 
 /*
@@ -486,8 +483,8 @@ unsigned long FreeHeap ( unsigned long size ){
 /*
  ****************************************
  * heapInit:
- *     Iniciar a gerência de Heap na libC.
- */
+ *     Iniciar a gerência de Heap na libC. */
+
 int heapInit (){
 	
 	//Internas.
@@ -604,6 +601,7 @@ fail:
  *   Inicializa o memory manager.
  *   Obs: Essa é uma função local.
  */
+
 int stdlibInitMM (){
 	
     int Status = 0;
@@ -658,8 +656,8 @@ int stdlibInitMM (){
  * Obs: *IMPORTANTE: Essa rotina deve ser chamada entes que a biblioteca
  * C seja usada.
  * Obs: Pode haver uma chamada à ela em crt0.s por exemplo.
- *
  */
+
 int libcInitRT (){
 	
 	int Status;
@@ -668,14 +666,13 @@ int libcInitRT (){
 	
 	if ( Status != 0 )
 	{
-		//printf("stdlib-libcInitRT: error\n");
-		return (int) 1; //error
-	};
+		return (int) 1; 
+	}
 	
 	//...
 
-	return (int) 0;
-};
+	return 0;
+}
 
 
 //
@@ -687,12 +684,12 @@ int libcInitRT (){
 /*
  *******
  * rand:
- *     Gera um número randômico.
- */
+ *     Gera um número randômico. */
+
 int rand (void){
 	
 	return (int) ( randseed = randseed * 1234 + 5 );
-};
+}
 
 
 void srand (unsigned int seed){
@@ -701,14 +698,14 @@ void srand (unsigned int seed){
 };
 
 
-void *xmalloc( int size){
+void *xmalloc (int size){
 	
     register int value = (int) malloc(size);
     if(value == 0)
         stdlib_die ("xmalloc fail\n");
 //done:  
     return (void *) value;
-};
+}
 
 
 void stdlib_die (char *str){
@@ -787,17 +784,35 @@ void *malloc ( size_t size ){
 		return NULL;		
 	};
 	*/
-	
-//done:
 
     return (void *) ret; 
 };
 
 
-void *realloc(void *ptr, size_t size)
-{
-    return NULL;  //#todo
+void *realloc ( void *start, size_t newsize ){
+	
+    void *newstart;
+
+    newstart = malloc (newsize);
+    
+	if ( (void *) newstart == NULL )
+	{
+		//free (newstart);
+	    return NULL;
+	}else{
+	
+        bcopy (start, newstart, newsize);
+    
+	    //#bugbug: Not the last allocation.
+	    //free(start);	
+	    
+		return newstart;
+	}
+	
+	//fail.
+	return NULL;
 }
+
 
 /*
  * free:
@@ -815,6 +830,7 @@ void *realloc(void *ptr, size_t size)
  * o GC pode limpar a estrutura ou destrui-la.
  *
  */
+
 void free ( void *ptr ){	
 
 /*
@@ -880,158 +896,70 @@ done:
 
 
 /*
- * calloc: 
- *     Aloca e preenche com zero.
- *
- */
- 
- 
-void *calloc (size_t count, size_t size)
+void *calloc(size_t num, size_t size);
+void *calloc(size_t num, size_t size)
 {
-    size_t s = count * size;
-    
-	void *value = malloc (s);
-    
-	if (value != 0)
-    {    
-	    memset (value, 0, s);
-	};
-  return value;
-};
-
-
+	return zmalloc(num*size);
+}
+*/
 
 
 /*
-  teste
- *
- */
-/* 
-void free2(void *ptr)
-{
-    void *new = (void *) ptr; 
-    void *old  = (void *) g_heap_pointer; //head na sequencia de alocação.
+ * calloc: 
+ *     Aloca e preenche com zero. */
+ 
+void *calloc (size_t count, size_t size){
 	
-	unsigned long size;
-
+    size_t s = count * size;
+    
+	void *value = malloc (s);
 	
-	if( ptr == 0){
-		return;
-	};
-	
-	// bugbug
-	//if( (void*) ptr == NULL ){
-	//	return;
-	//};
-	//
-	
-	if( (void *) g_heap_pointer == (void *) ptr )
+	if ( (void *) value == NULL )
 	{
-	    printf("free: Endereco diferente do alocado por malloc!\n");
-		refresh_screen();
-		while(1){}
-		return;
-	};
+		//free (value);
+	    return NULL;
+	}else{
+	
+	    memset (value, 0, s);
+	    return value;	
+	}
 	
 	//fail
-    if( new == 0 ){
-        return; 
-    };
-	
-	//fail
-	//o novo pointer tem que ser meno que o antigo.
-    if ( new >= old ){ 
-        return; 
-    };
-	
-	
-	
-	//
-	// Base do bloco que se deseja liberar.
-	//
-	
-	unsigned long headerBase;
-	
-	//header base = inicio da area de cliente menos o tamanho do header.
-	headerBase = (unsigned long) (new - 64); //headerSize	= 64
-	
-	//
-	// Checando a validade do header.
-	 // (checando na estrutura do bloco, que fica no header do bloco, no inicio do bloco). 
-	 //
-	 struct d_heap *current;	
+	return NULL;
+}
 
-	current = (void*) headerBase;
+
+/*
+ * zmalloc:
+ *     Alloca memória e zera o conteúdo. */
+
+void *zmalloc ( size_t size){
 	
+	void *mmnew;
 	
-	//
-	// *IMPORTANTE:
-	//     Aqui current é o inicio do header e o inicio do bloco que se deseja
-	//     liberar.
-	//     O que devemos fazer é procurar na lista de blocos. heapList[]
-	//     por uma entrada que tenha esse valor, ele é o ponteiro para a
-	//     estrutura (header) do bloco que se deseja liberar. 
-	//
-	//     Procurando na lista, encontraremos um id, que deve bater  com o id que temos.
-	//
-	
-	
-	if((void*) current == NULL)
+	mmnew = malloc (size);
+
+	if ( (void *) mmnew == NULL )
 	{
-		//printf
-		return;
-	};
+	    //free (mmnew);
+		return NULL;
+	
+	}else{
+		
+		memset(mmnew, 0, size);
+	    return mmnew;
+	}
 
-	int ID;
-	ID = current->Id;
-	
-	
-	int i = 0;
-	while(i <= HEAP_COUNT_MAX) 
-	{
-        if( (void*) current == (void*) heapList[i] )
-		{
-			if( current->Id == ID  && 
-			    current->Used == 1 && 
-				current->Magic == 1234 )
-            {	
-				goto free_block;
-			};				
-		};
-    };
-
-	//fail
-	//...
-fail:	
-    current->Free = 0; //not free yet.
-	return;
-	
-free_block:
-    current->Free = 1; //torna ele livre pra ser usado.
-	//@todo: memset(...) //zerar a memoria da area de cliente do bloco.
-	goto done;
-	return;	
-	
-	//
-	// *IMPORTANTE:
-	// o g_heap_pointer pode continuar no topo do header, 
-	// onde estava antes de chamarem esssa função.
-	//
-	
-done:
-    printf("free: Done.");
-    refresh_screen();	
-	return;
-};
-
-*/
+    //fail
+	return NULL;
+}
 
 
 /*
  **********
  * system:
- *     Interpreta um comando e presta um serviço com base no comando.
- */
+ *     Interpreta um comando e presta um serviço com base no comando. */
+
 int system ( const char *command ){
     
     // @todo: Checar se comando é válido, se os primeiros caracteres
@@ -1254,17 +1182,17 @@ exit:
 /*
  * stdlib_strncmp:
  *     Compara duas strings.
- *     Obs: Função de uso interno.
- */
-int stdlib_strncmp( char *s1, char *s2, int len )
-{
+ *     Obs: Função de uso interno. */
+
+int stdlib_strncmp ( char *s1, char *s2, int len ){
+	
 	int n = len;
 	
-	while( n > 0 )
+	while ( n > 0 )
 	{	
 	    n--;
         
-		if( *s1 != *s2 )
+		if ( *s1 != *s2 )
 		{ 
 	        return (int) 1; 
 		};
@@ -1273,46 +1201,39 @@ int stdlib_strncmp( char *s1, char *s2, int len )
 		*s2++;
 	};		
 			
-	if( *s1 != '\0' || *s2 != '\0' )
+	if ( *s1 != '\0' || *s2 != '\0' )
 	{	
 	    return (int) 2;
 	};		
 	
-	//Nothing.
-	
-done:
-	return (int) 0;
-};
-
-
-
+//done:
+	return 0;
+}
 
 
 //interna de suporte à getenv.
-char *
-__findenv( const char *name, int *offset )
-{
+char *__findenv ( const char *name, int *offset ){
+	
     size_t len;
 	const char *np;
 	char **p, *c;  //??
 
-	if(name == NULL || environ == NULL)
+	if (name == NULL || environ == NULL)
 	{	
         return (char*) 0;
         //return NULL;
 	}
 	
-	for(np = name; *np && *np != '='; ++np)
+	for (np = name; *np && *np != '='; ++np)
 	{	
         continue;
 	};
 	
 	len = (size_t) (np - name);
 	
-	for( p = environ; (c = *p) != NULL; ++p )
+	for ( p = environ; (c = *p) != NULL; ++p )
 	{
-        if( strncmp( c, (char*) name, len ) == 0 && 
-	        c[len] == '=') 
+        if ( strncmp( c, (char*) name, len ) == 0 && c[len] == '=' ) 
 		{
 			*offset = p - environ;
 			
@@ -1322,34 +1243,37 @@ __findenv( const char *name, int *offset )
 	
 	*offset = p - environ;
 	
-done:	
-    return (char*) 0;
+//done:	
+    return (char *) 0;
 	//return NULL;
-};
+}
 
-char *getenv(const char *name)
-{
+
+char *getenv (const char *name){
+	
 	int offset;
 	char *result;
 
 	//_DIAGASSERT(name != NULL);
-    if( (void*) name == NULL )
+    
+	if ( (void*) name == NULL )
 	{
-		return (char*) 0;
-	};
+		return (char *) 0;
+	}
 	
 	//rwlock_rdlock(&__environ_lock);
 	result = __findenv(name, &offset);
 	//rwlock_unlock(&__environ_lock);
 	
-done:	
+//done:	
 	return (char *) result;
-};
+}
 
 
-//atoi. # talvez isso possa ir para o topo do 
-//arquivo para servir mais funções.
-int atoi(const char *str){
+/*
+ * atoi: */
+
+int atoi (const char *str){
 	
     int rv=0; 
     char sign = 0;
@@ -1369,7 +1293,7 @@ int atoi(const char *str){
     if (*str == '-')
 	    sign=1;
 
-    //     sign = (*s == '-');
+    // sign = (*s == '-');
     if (*str == '-' || *str == '+') 
 	    str++;
 
@@ -1383,7 +1307,7 @@ int atoi(const char *str){
         else return (rv);
      
     //     return (sign ? -rv : rv);
-};
+}
 
 
 /*
@@ -1418,9 +1342,13 @@ char *itoa (int i)
 };
 */
 
-/* reverse:  reverse string s in place */
- void reverse(char s[])
- {
+
+/* 
+ reverse:  
+     reverse string s in place */
+
+void reverse (char s[]){
+	
      int i, j;
      char c;
  
@@ -1429,28 +1357,36 @@ char *itoa (int i)
          s[i] = s[j];
          s[j] = c;
      }
- };
- 
-/* itoa:  convert n to characters in s */
- void itoa(int n, char s[])
- {
+}
+
+
+/* 
+ itoa:  
+ convert n to characters in s */
+
+void itoa (int n, char s[]){
+	
      int i, sign;
  
      if ((sign = n) < 0)  /* record sign */
          n = -n;          /* make n positive */
-     i = 0;
-     do {       /* generate digits in reverse order */
+    i = 0;
+    
+	do {       /* generate digits in reverse order */
          s[i++] = n % 10 + '0';   /* get next digit */
      } while ((n /= 10) > 0);     /* delete it */
-     if (sign < 0)
+     
+	if (sign < 0)
          s[i++] = '-';
      s[i] = '\0';
+	
      reverse(s);
  }
 
-int abs( int j)
-{
-	return(j < 0 ? -j : j);
+
+int abs ( int j){
+	
+	return (j < 0 ? -j : j);
 }
 
 

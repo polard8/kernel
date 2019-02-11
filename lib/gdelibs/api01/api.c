@@ -64,34 +64,35 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <heap.h>         
+#include <heap.h>   
+
 #include "include/api.h"     
 
 
-//message box button pointer
+// buttons
 struct window_d *messagebox_button1;
 struct window_d *messagebox_button2;
-
-
 struct window_d *dialogbox_button1;
 struct window_d *dialogbox_button2;
 
 
 unsigned long 
-mbProcedure( struct window_d *window, 
-                     int msg, 
-   				     unsigned long long1, 
-					 unsigned long long2 );
-					 
+mbProcedure ( struct window_d *window, 
+              int msg, 
+              unsigned long long1, 
+              unsigned long long2 );
+
+
 unsigned long 
-dbProcedure( struct window_d *window, 
-                     int msg, 
-   				     unsigned long long1, 
-					 unsigned long long2 );
-					 
+dbProcedure ( struct window_d *window, 
+              int msg, 
+              unsigned long long1, 
+              unsigned long long2 );
+
+
 /*
  ***********************************************************************
- * system_call:  #ux4 (maior experiência)
+ * system_call:  
  *    Interrupção de sistema, número 200, chama vários serviços do Kernel com 
  * a mesma interrupção. Essa é a chamada mais simples.
  *
@@ -105,6 +106,7 @@ dbProcedure( struct window_d *window,
  * 2016 - Revisão.
  * ...
  */
+
 void *system_call ( unsigned long ax, 
                     unsigned long bx, 
 				    unsigned long cx, 
@@ -113,27 +115,24 @@ void *system_call ( unsigned long ax,
     
 	//##BugBug: Aqui 0 retorno não pode ser inteiro.
 	//Temos que pegar unsigned long?? void*. ??
-	int RET = 0;	
 	//unsigned long RET = 0;
 	
-    //System interrupt. 	
+	int RET = 0;
+	
 	asm volatile ("int %1 \n"
 	              : "=a"(RET)	
 		          : "i"(IA32_SYSCALL_VECTOR), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-    //Nothing.
-	
 	return (void *) RET; 
-};
+}
 
 
 /*
  * apiSystem: 
- *
- * Argumento:
  *    Interpreta um comando e envia uma systemcall para o kernel.
  *    Obs: Assim como system, isso deve chamar aplicativos. 
  * ?? Talvez deva chamar o próprio shell ??     
  */
+
 int apiSystem (const char *command){
     
     // @todo: Checar se comando é válido, se os primeiros caracteres
@@ -349,20 +348,23 @@ fail:
 //       uma opção é usar 'done:'. 
 exit:    
     return (int) 0;
-};
+}
 
 
 //
-// *IMPORTANTE: 
-// @TODO: ESSAS ROTINAS ENUMERADAS PODEM CHAMAR AS CLASSES DO KERNEL
-//              (RAM, CPU, DMA, UNBLOCKED, BLOCKED, THINGS)
+// ================ ## int 201 ~ int 215 ## =================
 //
+
+//#obs:
+// Essas interrupções ainda não foram configuradas.
+// cada uma delas servirá para um grupo distinto de serviços.
+// A int 0x80 ainda é a interrupção principal do sistema.
 
 
 /*
  * system1:
- *     int 201, serviço 1, Print pixel. (rever)
- */ 
+ *     int 201 */
+
 int system1 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -375,14 +377,13 @@ int system1 ( unsigned long ax,
 		          : "i"(201), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
-
+}
 
 
 /*
  * system2:
- *     int 202, serviço 2, Print horizontal line.  (rever)
- */
+ *     int 202 */
+
 int system2 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -395,13 +396,13 @@ int system2 ( unsigned long ax,
 		          : "i"(202), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system3:
- *     int 203, serviço 3. Retângulo.  (rever)
- */
+ *     int 203 */
+
 int system3 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -414,13 +415,13 @@ int system3 ( unsigned long ax,
 		          : "i"(203), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system4:
- *     int 204, serviço 4. Putch.  (rever)
- */
+ *     int 204 */
+
 int system4 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -433,13 +434,13 @@ int system4 ( unsigned long ax,
 		          : "i"(204), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system5:
- *     int 205, serviço 5. Print string.  (rever)
- */
+ *     int 205 */
+
 int system5 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -452,13 +453,13 @@ int system5 ( unsigned long ax,
 		          : "i"(205), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system6:
- *     int 206, serviço 6. Message box using buffer.  (rever)
- */
+ *     int 206 */
+
 int system6 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -471,13 +472,13 @@ int system6 ( unsigned long ax,
 		          : "i"(206), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system7:
- *     int 207, serviço 7.  (rever)
- */
+ *     int 207 */
+
 int system7 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -490,13 +491,13 @@ int system7 ( unsigned long ax,
 		          : "i"(207), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system8:
- *     int 208, serviço 8.  (rever)
- */
+ *     int 208 */
+
 int system8 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -509,15 +510,13 @@ int system8 ( unsigned long ax,
 		          : "i"(208), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system9:
- *     int 209, serviço 9.
- *     Chama o procedimento da vez. 
- *     Executa outro procedimento.  (rever)
- */  
+ *     int 209 */
+
 int system9 ( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
@@ -530,13 +529,13 @@ int system9 ( unsigned long ax,
 		          : "i"(209), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system10:
- *     int 210, serviço 10. v
- */
+ *     int 210 */
+
 int system10 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
@@ -549,13 +548,13 @@ int system10 ( unsigned long ax,
 		          : "i"(210), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system11:
- *     int 211, serviço 11.  (rever)
- */
+ *     int 211 */
+
 int system11 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
@@ -568,13 +567,13 @@ int system11 ( unsigned long ax,
 		          : "i"(211), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system12:
- *     int 212, serviço 12.
- */
+ *     int 212 */
+
 int system12 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
@@ -587,14 +586,13 @@ int system12 ( unsigned long ax,
 		          : "i"(212), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
-
+}
 
 
 /*
  * system13:
- *     int 213, serviço 13.
- */
+ *     int 213 */
+
 int system13 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
@@ -607,13 +605,13 @@ int system13 ( unsigned long ax,
 		          : "i"(213), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system14:
- *     int 214, serviço 14.  (rever)
- */
+ *     int 214 */
+
 int system14 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
@@ -626,13 +624,13 @@ int system14 ( unsigned long ax,
 		          : "i"(214), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
 
 
 /*
  * system15:
- *      int 215, serviço 15.  (rever)
- */
+ *      int 215 */
+
 int system15 ( unsigned long ax, 
                unsigned long bx, 
 			   unsigned long cx, 
@@ -645,15 +643,21 @@ int system15 ( unsigned long ax,
 		          : "i"(215), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 				  
 	return (int) ret_val;
-};
+}
+
+
+//=====================================
+// #obs
+// some other functions.
 
 
 /*
+ **********************************************
  * refresh_buffer:
  *     int 200, serviços de 1 à 9.
  *     Refresh buffer.
- *     Atualiza um buffer dado seu número.  (rever)
- */
+ *     Atualiza um buffer dado seu número.  (rever) */
+
 void refresh_buffer (unsigned long n){
 	
 	// Limits.
@@ -706,109 +710,118 @@ void refresh_buffer (unsigned long n){
 		    system_call( 9, 0, 0, 0); 
 			break;
                  
-        default:
+        //default:
             //Nothing
-			break;
-    };
-};
+			//break;
+    }
+}
 
 
 /*
  * print_string:
  *     int 200, serviço 10.
- *     Print string no buffer.  (rever)
- */
+ *     Print string no buffer.  (rever) */
+
 void print_string ( unsigned long x,  
                     unsigned long y,  
 				    unsigned long color, 
 				    unsigned char *string )
 {	
-    //system( 10, x, y, (unsigned long) string);        
-};
+    //#todo
+}
 
 
 /*
  * vsync:
  *     Int 200, serviço 15.
- *     Sincroniza o retraço vertical do monitor.  (rever)
- */
+ *     Sincroniza o retraço vertical do monitor.  (rever) */
+
 int vsync (){
+	
+	//#todo
+	//return (int) system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
 	
 	system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
     
 	return (int) 0;
-};
+}
 
 
 /*
  * edit_box:
- *     Interrupção 200, serviço SYSTEMCALL_EDITBOX.  (rever)
- */
+ *     Interrupção 200, serviço SYSTEMCALL_EDITBOX.  (rever) */
+
 int edit_box ( unsigned long x,  
                unsigned long y, 
 			   unsigned long height, 
 			   unsigned long width)
 {
+	//#todo:
+	//Agora o edit box é um tipo de janelas.
+	
 	//@todo: Altura e largura negligenciados.
     system_call ( SYSTEMCALL_EDITBOX, x, y, 0 );
 	
 	return (int) 0;
-};
+}
 
 
 /*
  * chama_procedimento:
  *     Interrupção 200, serviço SYSTEMCALL_CALL_SYSTEMPROCEDURE. 
  *     Chama o proximo procesimento de janela.
- *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
- */
+ *     Obs: Lembrando que estamos usando endereços lógicos.  (rever) */
+
 int chama_procedimento (unsigned long proximo_procedure){
 	
-    system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
+    //system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
+	//return (int) 0;
 	
-	return (int) 0;
-};
+	//#suspenso 	
+	return -1;
+}
 
 
 /*
  * SetNextWindowProcedure
  *     Interrupção 200, serviço SYSTEMCALL_SETPROCEDURE. 
  *     Setar o endereço do procedimento que deverá ser chamado. 
- *     Obs: Lembrando que estamos usando endereços lógicos.  (rever)
- */
+ *     Obs: Lembrando que estamos usando endereços lógicos.  (rever) */
+
 int SetNextWindowProcedure (unsigned long next_procedure){
 	
-    system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
-    
-	return (int) 0;	
-};
+    //system_call ( SYSTEMCALL_SETPROCEDURE, next_procedure, 0, 0 );
+	//return (int) 0;
+	
+	//#suspenso 	
+	return -1;
+}
 
 
 /*
  * set_cursor:
  *     Configura as posições do cursor.
  *     Interrupção 200, serviço SYSTEMCALL_SETCURSOR.  (rever)
- *     @todo: Criar o protótipo no header.
- */
+ *     @todo: Criar o protótipo no header. */
+
 int set_cursor (unsigned long x, unsigned long y){
 	
-    system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
-	
-	return (int) 0;
-};
+	return (int) system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );
+}
 
 
 /*
  * put_char:
- *     Put char.  (rever)
- */
-void put_char ( unsigned long x,  
-                unsigned long y,  
-			    unsigned long color, 
-			    unsigned char *ch )
+ *     Put char.  (rever) */
+
+void 
+put_char ( unsigned long x, 
+           unsigned long y, 
+           unsigned long color, 
+           unsigned char *ch )
 {
     //return;    //Nothing for now.
-};
+}
 
 
 /*
@@ -827,20 +840,22 @@ void put_char ( unsigned long x,
  * Obs: 
  *     Lembrar que estamos usando endereços lógicos.  (rever)
  */
-void carrega_bitmap_16x16 ( unsigned long img_address, 
-                            unsigned long x, 
-						    unsigned long y )                           
+
+void 
+carrega_bitmap_16x16 ( unsigned long img_address, 
+                       unsigned long x, 
+					   unsigned long y )                           
 {
     system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
-};
+}
 
 
 /*
  * apiShutDown:
  *     Desliga a máquina.
  *     Interrupção 200, serviço SYSTEMCALL_SHUTDOWN.
- *     Metodo? ACPI, APM ...  (rever)
- */
+ *     Metodo? ACPI, APM ...  (rever) */
+
 void apiShutDown (){
 	
 	// @todo: 
@@ -850,24 +865,23 @@ void apiShutDown (){
 	// Um messagebox pode aparece antes de chamar o kernel.
 	
 	//Argumentos podem ser enviados.
+	
     system_call ( SYSTEMCALL_SHUTDOWN, 0, 0, 0 );
 	
-    while (1){
-		
-        asm ("pause");
-	};	
-};
+    // hang forever.
+	while (1){ asm ("pause"); };	
+}
 
 
 /*
  * apiInitBackground:
- *     Initialize default background configuration.  (rever)
- */
+ *     Initialize default background configuration.  (rever) */
+
 void apiInitBackground (){
 	
-    //@todo: Implementar.	
-    //return;    //Não há uma chamada para isso ainda.            
-};
+    //todo: Implementar.	
+    //Não há uma chamada para isso ainda.
+}
 
 
 /*
@@ -904,7 +918,7 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	// @todo centralizado: metade | um terço.
 	// @todo: Pegar a métrica do dispositivo.
 	unsigned long x  = (unsigned long) 10;       //deslocamento x
-	unsigned long y  = (unsigned long) 300;       //deslocamento y
+	unsigned long y  = (unsigned long) 300;      //deslocamento y
     unsigned long cx = (unsigned long) (800/2);  //largura   
     unsigned long cy = (unsigned long) (600/3);  //altura		
 
@@ -918,6 +932,7 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	
 	//Obs: Por enquanto para todos os tipos de messagebox 
 	// estamos usando o mesmo tipo de janela.
+	
 	switch (type)
 	{	
 	    // Janela tipo simples.
@@ -1006,10 +1021,11 @@ int MessageBox ( int type, char *string1, char *string2 ){
 		    Button = 1;
 			apiBeginPaint ();
 	        hWnd = (void *) APICreateWindow( WT_OVERLAPPED, 1, 1, "Error", 
-			                x, y, cx, cy, 
-							NULL, 0, 
+			                x, y, cx, cy, NULL, 0, 
 							WindowClientAreaColor, WindowColor ); 
-			if ( (void *) hWnd == NULL ){
+			
+			if ( (void *) hWnd == NULL )
+			{
 				printf("hWnd fail\n");
 			}else{
 			    APIRegisterWindow (hWnd);
@@ -1023,8 +1039,8 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	};
 	
 	
-	//
-	// button
+	//======================================
+	// button support
 	//
 	
 	//obs: o procedure vai precisar dos botões então tem que declarar global.
@@ -1036,45 +1052,44 @@ int MessageBox ( int type, char *string1, char *string2 ){
 	//unsigned long app2Top = app1Top; 
 
 
-
-	//
-	// botão de reboot
-	//
-	
-    //.	
+	// button 1
 	messagebox_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "OK",     
                                 (cx/3), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
-								
-    APIRegisterWindow (messagebox_button1);
-
-
-	//
-	// botão de close
-	//
 	
-    //.	
+	if ( (void *) messagebox_button1 == NULL )
+	{
+	    printf("button fail \n");
+	}else{
+        APIRegisterWindow (messagebox_button1);   	
+	}
+
+
+	// button 2
 	messagebox_button2 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "CANCEL",     
                                 ((cx/3)*2), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (messagebox_button2);	
+	if ( (void *) messagebox_button2 == NULL )
+	{
+	    printf("button fail \n");
+	}else{
+        APIRegisterWindow (messagebox_button2);   	
+	}
 	
 	
 	// string
-
-    //apiDrawText ( (struct window_d *) hWnd,
+    // apiDrawText ( (struct window_d *) hWnd,
     //    1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );	
 	
 	
-	//#bugbug
-	//#importante devemos fazer o refresh só da janela.
-	//refresh_screen ();
 
+    //Show window.
+	
     apiShowWindow (hWnd);	
 	
-	//
-	// loop
+	//====================================
+	// loop support
 	//
 	
 	unsigned long message_buffer[5];	
@@ -1112,7 +1127,11 @@ Mainloop:
             message_buffer[3] = 0;
             message_buffer[4] = 0;	
         };				
-	};	
+	};
+	
+//
+// Exit.
+//
 
 exit_messagebox:
 
@@ -1120,19 +1139,19 @@ exit_messagebox:
 	printf ("Exiting Message Box \n");
 	
     return (int) Response;	
-};
+}
 
 
 /*
  **************************************************
  * mbProcedure:
- *     O procedimento padrão de message box.
- */																
+ *     O procedimento padrão de message box. */
+
 unsigned long 
-mbProcedure( struct window_d *window, 
-                     int msg, 
-   				     unsigned long long1, 
-					 unsigned long long2 )
+mbProcedure ( struct window_d *window, 
+              int msg, 
+              unsigned long long1, 
+              unsigned long long2 )
 {
     switch (msg)
 	{
@@ -1184,32 +1203,26 @@ mbProcedure( struct window_d *window,
             break;		
 	};
 	
-	
-done:
 	//Refresh screen. 
 	//?? deletar.
 	//if(VideoBlock.useGui == 1){
 	//    refresh_screen();
 	//};
-    printf ("done\n");	
+    
+	printf ("done\n");	
 	return (unsigned long) 0;
-};
-
-
+}
 
 
 /*
  * DialogBox:
  *     
  *     Types=[1~5]
- *     @todo: Devemos considerar o retorno? E se a chamada falhar?
- */
+ *     @todo: Devemos considerar o retorno? E se a chamada falhar? */
+
 int DialogBox ( int type, char *string1, char *string2 ){
     
-    //
-    // Antes nós chamávamos o kernel, agora tentaremos 
-    // implantar na api.
-	//
+    // Antes nós chamávamos o kernel, agora tentaremos implantar na api.
 	
 	//system_call ( SYSTEMCALL_MESSAGE_BOX, (unsigned long) type, 
 	//	(unsigned long) string1, (unsigned long) string2 );
@@ -1236,7 +1249,7 @@ int DialogBox ( int type, char *string1, char *string2 ){
 	// @todo centralizado: metade | um terço.
 	// @todo: Pegar a métrica do dispositivo.
 	unsigned long x  = (unsigned long) 10;       //deslocamento x
-	unsigned long y  = (unsigned long) 300;       //deslocamento y
+	unsigned long y  = (unsigned long) 300;      //deslocamento y
     unsigned long cx = (unsigned long) (800/2);  //largura   
     unsigned long cy = (unsigned long) (600/3);  //altura		
 
@@ -1325,28 +1338,30 @@ int DialogBox ( int type, char *string1, char *string2 ){
 
 
 
-	//
-	// botão de reboot
-	//
-	
-    //.	
+	// button 1 	
 	dialogbox_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "OK",     
                                 (cx/3), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (dialogbox_button1);
+	if ( (void *) dialogbox_button1 == NULL )
+	{
+	    printf("button fail \n");
+	}else{
+        APIRegisterWindow (dialogbox_button1);   	
+	}
 
-
-	//
-	// botão de close
-	//
-	
-    //.	
+     
+	// button 2
 	dialogbox_button2 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "CANCEL",     
                                 ((cx/3)*2), ((cy/4)*3), 80, 24,    
                                 hWnd, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
-    APIRegisterWindow (dialogbox_button2);	
+	if ( (void *) dialogbox_button2 == NULL )
+	{
+	    printf("button fail \n");
+	}else{
+        APIRegisterWindow (dialogbox_button2);   	
+	}
 	
 	
 	//
@@ -1354,17 +1369,15 @@ int DialogBox ( int type, char *string1, char *string2 ){
 	//
 	
     apiDrawText ( (struct window_d *) hWnd,
-        1*(cx/16), 1*(cy/3),
-        COLOR_WINDOWTEXT, string1 );	
+        1*(cx/16), 1*(cy/3), COLOR_WINDOWTEXT, string1 );	
 	
-	//#bugbug
-	//#importante devemos fazer o refresh só da janela.
-	//refresh_screen ();
+
+	//show window.
 
     apiShowWindow (hWnd);		 
 	
-	//
-	// loop
+	//==================================
+	// loop support;
 	//
 	
 	unsigned long message_buffer[5];	
@@ -1403,6 +1416,11 @@ Mainloop:
             message_buffer[4] = 0;	
         };				
 	};	
+	
+	
+//
+// Exit.
+//
 
 exit_dialogbox:
 
@@ -1410,18 +1428,20 @@ exit_dialogbox:
 	printf ("Exiting dialog Box \n");
 	
     return (int) Response;	
-};
+}
+
+
 
 /*
  **************************************************
  * dbProcedure:
- *     O procedimento padrão de message box.
- */																
+ *     O procedimento padrão de dialog box. */
+
 unsigned long 
-dbProcedure( struct window_d *window, 
-                     int msg, 
-   				     unsigned long long1, 
-					 unsigned long long2 )
+dbProcedure ( struct window_d *window, 
+              int msg, 
+              unsigned long long1, 
+              unsigned long long2 )
 {
     switch (msg)
 	{
@@ -1473,20 +1493,19 @@ dbProcedure( struct window_d *window,
             break;		
 	};
 	
-	
-done:
 	//Refresh screen. 
 	//?? deletar.
 	//if(VideoBlock.useGui == 1){
 	//    refresh_screen();
 	//};
-    printf ("done\n");	
+    
+	printf ("done\n");	
 	return (unsigned long) 0;
-};
-
+}
 
 
 /*
+ **************************************************
  * call_kernel:
  *     (FAST CALLS)
  *     @todo: Change name to apiCallKernel(...) 
@@ -1503,6 +1522,7 @@ done:
  *
  * #todo: esse retorno deve ser unsigned long
  */
+
 int call_kernel ( unsigned long int_number, 
                   unsigned long service_number, 
                   unsigned long arg1, 
@@ -1605,11 +1625,12 @@ int call_kernel ( unsigned long int_number,
     };
 	
 	return (int) ret_val;
-};
+}
 
 
 
 /*
+ ********************************************************
  * call_gui:
  *     (FAST CALLS)
  *     Chama os serviçoos de GUI que estão
@@ -1626,6 +1647,7 @@ int call_kernel ( unsigned long int_number,
  *
  *  #todo: esse retorno deve ser unsigned long.
  */
+
 int call_gui ( unsigned long int_number, 
                unsigned long service_number, 
                unsigned long arg1, 
@@ -1682,6 +1704,7 @@ int call_gui ( unsigned long int_number,
  
 
 /*
+ *******************************************************************
  * APICreateWindow: 
  *     Cria uma janela com base em uma struct.
  *     Retorna o endereço da estrutura da janela criada. 
@@ -1729,7 +1752,6 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 	
 	unsigned long message_buffer[12];
 	
-	//enterCriticalSection();
 	message_buffer[0] = (unsigned long) type;
 	message_buffer[1] = (unsigned long) status;
 	message_buffer[2] = (unsigned long) view;
@@ -1743,167 +1765,139 @@ void *APICreateWindow( unsigned long type,        //1, Tipo de janela (popup,nor
 	message_buffer[10] = (unsigned long) clientcolor;
 	message_buffer[11] = (unsigned long) color;
 	
-    Window = (void *) system_call ( 118 , (unsigned long) &message_buffer[0], 
+    
+	//enterCriticalSection();
+	
+	Window = (void *) system_call ( 118 , (unsigned long) &message_buffer[0], 
 					    (unsigned long) &message_buffer[0], 
 						(unsigned long) &message_buffer[0] );
     
 	//exitCriticalSection();								   
 								   
-	//Nothing.
-	
-	//Struct.
 	if ( (void *) Window == NULL )
-	{
-	    return NULL;    //Fail.
+	    return NULL;  
     
-	} else {
-		
-		// Obs: Temos as propriedades da janela criada.
-		//      Talvez o endereço retornado esteja em área
-		//      de memória protegida. Acessar essa estrutura pode 
-		//      gerar um excessão.
-        //      @todo: Cuidado com o retorno #bugbug 		
-		
-		
-		// Se a janela criada for do tipo botão, então precisamos registrar. 
-		// #obs: Podem haver outros tipo que precisam ser registrados.
-		
-		//if ( type == WT_BUTTON ){
-			
-		//    APIRegisterWindow (Window);
-		//};
-		
-		//...
-	    
-		goto done;
-	};
-	
-	//Nothing.
-done:
+
 	return (void *) Window;    
-};
+}
 
 
 /*
+ *****************************
  * APIRegisterWindow:
- *     Register Window.
- */
+ *     Register Window. */
+
 int APIRegisterWindow (struct window_d *window){
-    
-    // @todo: Filtrar argumento.	
 	
 	if ( (void *) window == NULL )
 	{
-		return (int) 1;
-	};		
-	
-    system_call ( SYSTEMCALL_REGISTERWINDOW, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window);
+		return 1;
 		
-    return (int) 0;	
-};
+	}else{
+		
+        return (int) system_call ( SYSTEMCALL_REGISTERWINDOW, (unsigned long) window, 
+                        (unsigned long) window, (unsigned long) window);	
+	}
+
+    return 2;	
+}
 
 
 /*
+ *****************************
  * APICloseWindow:
- *     Close Window. 
- */
+ *     Close Window. */
+
 int APICloseWindow (struct window_d *window){
 	
-    // @todo: Filtrar argumento.	
-	
 	if ( (void *) window == NULL )
 	{
 		return (int) 1;
-	};		
+	}else{
+		
+        return (int) system_call ( SYSTEMCALL_CLOSEWINDOW, (unsigned long) window, 
+		                 (unsigned long) window, (unsigned long) window );		
+	}		
 	
-    system_call ( SYSTEMCALL_CLOSEWINDOW, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window );	
-    
-	return (int) 0;	
-};
+	return 2;	
+}
 
 
 /*
  * APISetFocus:
- *     Set Focus.
- */
+ *     Set Focus. */
+
 int APISetFocus (struct window_d *window){
 	
-    // @todo: Filtrar argumento.
-    	
 	if ( (void *) window == NULL )
 	{
 		return (int) 1;
-	};		
+	}else{
 	
-    system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window );
-		
+        return (int) system_call ( SYSTEMCALL_SETFOCUS, (unsigned long) window, 
+                        (unsigned long) window, (unsigned long) window );	
+	}		
+	
 	//a flag 1 indica que deve-se redesenha e efetuar refresh.
 	//APIredraw_window (window,1);
 		
-    return (int) 0;	
+    return 2;	
 };
 
 
 /*
  * APIGetFocus:
- *     Get Focus.
- */
+ *     Get Focus. */
+
 int APIGetFocus (){
 	
     return (int) system_call ( SYSTEMCALL_GETFOCUS, 0, 0, 0 );	
-};
+}
 
 
 /*
  * APIKillFocus:
- *     Kill Focus.
- */
-int APIKillFocus (struct window_d *window){
+ *     Kill Focus. */
 
-    // @todo: Filtrar argumento.
+int APIKillFocus (struct window_d *window){
 	
 	if ( (void *) window == NULL )
 	{
 		return (int) 1;
-	};	
+	}else{
 	
-    system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window );
-		
+        return (int) system_call ( SYSTEMCALL_KILLFOCUS, (unsigned long) window, 
+                         (unsigned long) window, (unsigned long) window );	
+	}
 	
 	//a flag 1 indica que deve-se redesenha e efetuar refresh.
 	//APIredraw_window ( window, 1 );
 		
-    return (int) 0;	
-};
+    return 2;	
+}
 
 
 /*
  * APISetActiveWindow:
  *     Set Active Window.
- * @todo: Esse retorno pode ser void.
- */
+ * @todo: Esse retorno pode ser void. */
+
 int APISetActiveWindow (struct window_d *window){
-	
-    // @todo: Filtrar argumento.	
 	
 	if ( (void *) window == NULL )
 	{
 		return (int) 1;
-	};
+	}else{
 	
-    system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
-		(unsigned long) window, (unsigned long) window );
-		
+        return (int) system_call ( SYSTEMCALL_SETACTIVEWINDOW, (unsigned long) window, 
+                        (unsigned long) window, (unsigned long) window );	
+	}
 	
 	//a flag 1 indica que deve-se redesenha e efetuar refresh.
 	//APIredraw_window ( window, 1 );
 		
-    return (int) 0;	
-};
+    return 2;	
+}
 
 
 /*
@@ -2016,11 +2010,12 @@ void apiExit (int exit_code){
  * kill:
  *     @todo: Poderia ser o envio de um sinal para um processo dado deu PID.  
  */
+
 void kill (int exit_code){
 	
 	//#todo
-    //return; //Não há uma chamada para isso ainda.
-};
+	//Não há uma chamada para isso ainda.
+}
 
 
 /*
@@ -2031,18 +2026,19 @@ void kill (int exit_code){
  * ficando à cargo do kernel apenas fazer a realocação dos recursos de destruição das
  * estruturas. 
  */
+
 void dead_thread_collector (){
 	
     system_call ( SYSTEMCALL_DEAD_THREAD_COLLECTOR, (unsigned long) 0, 
 		(unsigned long) 0, (unsigned long) 0 );	
-};
+}
 
 
 /*
  * api_strncmp:
  *     Compara duas strings.
- *     @todo: Isso deve ser oferecido peloa libC e não pela api. 
- */
+ *     @todo: Isso deve ser oferecido peloa libC e não pela api. */
+
 int api_strncmp (char *s1, char *s2, int len){
 	
 	int n = len;
@@ -2065,39 +2061,36 @@ int api_strncmp (char *s1, char *s2, int len){
 	    return (int) 2;
 	};
 	
-	//Nothing.		
-//done:
-
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*
  * refresh_screen:
  *     Refresh Screen.
- *     Passa o conteúdo do backbuffer para o lfb.
- */
+ *     Passa o conteúdo do backbuffer para o lfb. */
+
 void refresh_screen (){
 	
 	system_call ( SYSTEMCALL_REFRESHSCREEN, 0, 0, 0 );
-};
+}
 
 
 /*
  * api_refresh_screen:
  *     Refresh the LFB.
- *     Move the content of BackBuffer to LFB.
- */
+ *     Move the content of BackBuffer to LFB. */
+
 void api_refresh_screen (){
 	
 	refresh_screen ();
-};
+}
 
 
 /*
  * apiReboot:
- *     Reboot.
- */
+ *     Reboot. */
+
 void apiReboot (){
 	
 	// @todo: Fazer outras chamadas para
@@ -2105,17 +2098,17 @@ void apiReboot (){
     //        de efetuar o reboot de hardware propriamente dito. 	
 	
     system_call ( SYSTEMCALL_REBOOT, 0, 0, 0 );	
-};
+}
 
 
 /*
  * apiSetCursor: 
- *     Set cursor.
- */
+ *     Set cursor. */
+
 void apiSetCursor ( unsigned long x, unsigned long y ){
 	
     system_call ( SYSTEMCALL_SETCURSOR, x, y, 0 );	
-};
+}
 
 
 /*
@@ -2207,7 +2200,8 @@ void apiStartThread (void *Thread){
  *     Obs: Devemos passar um endereço válido, previamente 
  * alocado. 
  */
-void *apiFOpen(const char *filename, const char *mode){
+
+void *apiFOpen (const char *filename, const char *mode){
 	
     void *Ret;	
 	
@@ -2219,7 +2213,7 @@ void *apiFOpen(const char *filename, const char *mode){
 	exitCriticalSection();
     
 	return (void *) Ret;								
-};
+}
 
 
 /*
@@ -2274,7 +2268,7 @@ apiSaveFile ( char *file_name,
 	exitCriticalSection(); 
 
     return (int) Ret;		
-};
+}
 
 
 //Operação down em um semáforo indicado no argumento.
@@ -2410,6 +2404,7 @@ done:
 	return;
 };
 
+
 //V (Verhogen)incrementar.
 void exitCriticalSection (){
 	
@@ -2417,57 +2412,62 @@ void exitCriticalSection (){
     system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 };
 
+
+//??
+//Inicializa em 1 o semáforo do kernel para que 
+//o primeiro possa usar.
+
 void initializeCriticalSection (){
 	
-	//Inicializa em 1 o semáforo do kernel para que 
-	//o primeiro possa usar.
 	system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
-};
+}
 
 
 void apiBeginPaint (){
 	
 	enterCriticalSection ();
-};
+}
 
 
 void apiEndPaint (){
 	
 	exitCriticalSection ();
-};
+}
 
 
-//imprime um caractere usando o cursor do sistema.
+/*
+ * apiPutChar:
+ *     Imprime um caractere usando o cursor do sistema. */
+
 void apiPutChar (int c){
 	
 	system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
-};
+}
 
 
 
 /*
  * apiDefDialog:
+ *     Defered dialog.
  *     Procedimento de janela adiado. 
- *     Usado pelos aplicativos ao fim dos 
- * seus procedimentos de janela.
+ *     Usado pelos aplicativos ao fim dos seus procedimentos de janela.
  */
+
 unsigned long 
-apiDefDialog( struct window_d *window, 
+apiDefDialog ( struct window_d *window, 
               int msg, 
 			  unsigned long long1, 
 			  unsigned long long2 )
 {
     
-    //#todo
-
-	return (unsigned long) 0;
-};
+    // #todo
+	return (unsigned long) 1;
+}
 
 
 /*
  * apiGetSystemMetrics:
- *     Obtem informações sobre dimensões e posicionamentos.
- */
+ *     Obtem informações sobre dimensões e posicionamentos. */
  
 unsigned long apiGetSystemMetrics (int index){
 	
@@ -2475,61 +2475,63 @@ unsigned long apiGetSystemMetrics (int index){
 	                                     (unsigned long) index, 
 										 (unsigned long) index, 
 										 (unsigned long) index );
-};
+}
 
 
 void api_set_current_keyboard_responder ( int i ){
 	
     system_call ( SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER, 
 	    (unsigned long) i, (unsigned long) i, (unsigned long) i );
-};
+}
 
 
 int api_get_current_keyboard_responder (){
 	
-    return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER, 
-	                                    (unsigned long) 0, 
-										(unsigned long) 0, 
-										(unsigned long) 0 );
-};
+    return (int) system_call ( SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER, 
+	                 (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );
+}
 
 
 void api_set_current_mouse_responder (int i){
 	
     system_call ( SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER, (unsigned long) i, 
 	    (unsigned long) i, (unsigned long) i );	
-};
+}
 
 
 int api_get_current_mouse_responder (){
 	
-    return (unsigned long) system_call( SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER, 
-	                                    (unsigned long) 0, 
-										(unsigned long) 0, 
-										(unsigned long) 0 );	
-};
+    return (int) system_call ( SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER, 
+	                 (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
+}
 
 
+//??
 void api_set_window_with_text_input ( struct window_d *window ){
 	
-	if ( (void *) window == NULL ) {
+	if ( (void *) window == NULL )
+	{
 		return;
-	}
+	}else{
 	
-	if ( window->used != 1 || window->magic != 1234 ){
-		return;
+	    if ( window->used != 1 || window->magic != 1234 )
+		{
+		    return;
+	    }else{
+			
+            system_call ( SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT, (unsigned long) window, 
+                (unsigned long) window, (unsigned long) window );			
+		}
 	}
-	
-    system_call ( SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT, (unsigned long) window, 
-	    (unsigned long) window, (unsigned long) window );
-};
+}
 
 
+//??
 int api_get_window_with_text_input (){
 	
     return (int) system_call ( SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT, 
 	                (unsigned long) 0, (unsigned long) 0, (unsigned long) 0 );	
-};
+}
 
 
 /*
@@ -2562,25 +2564,15 @@ gramadocore_init_execve ( const char *filename,
                           const char *envp[] )
 {
 	
-	//@todo: Ainda não implementada.
-	
-	//system_call( , , ,)
-	
+	//@todo: Ainda não implementada.	
 	return (int) -1;
-};
-
-
-
-
- 
-
-
+}
 
 
 /*
  * apiDialog:
- *     Diálogo de yes ou no.
- */
+ *     Diálogo de yes ou no. */
+
 int apiDialog ( const char *string ){
 	
     int Status = 1; // Yes!
@@ -2628,7 +2620,7 @@ done:
 int api_getchar (){
 	
 	return (int) system_call ( 137, 0, 0, 0 );
-};
+}
 
 
 /*
@@ -2691,11 +2683,8 @@ apiDisplayBMP ( char *address,
 	}
 	
 
-	
-	//
 	// @todo:
 	// Testar validade do endereço.
-	//
 	
 	
 	if ( address == 0 )
@@ -3071,24 +3060,25 @@ struct timer_d *apiCreateTimer ( struct window_d *window,
                                  unsigned long ms, 
 								 int type )
 {
-	return (struct timer_d *) system_call ( 222, 
-	    (unsigned long) window, (unsigned long) ms, (unsigned long) type );
-};
+	return (struct timer_d *) system_call ( 222, (unsigned long) window, 
+							      (unsigned long) ms, (unsigned long) type );
+}
 
 
 // pega informações varidas sobre o sys time.
 unsigned long apiGetSysTimeInfo ( int n ){
 	
-	return (unsigned long) system_call ( 223, 
-	    (unsigned long) n, (unsigned long) n, (unsigned long) n );
-};
+	return (unsigned long) system_call ( 223, (unsigned long) n, 
+								(unsigned long) n, (unsigned long) n );
+}
+
 
 //mostra uma janela na tela. backbuffer ---> frontbuffer
 void apiShowWindow (struct window_d *window){
 	
-    system_call ( 24, (unsigned long) window, 
-	    (unsigned long) window, (unsigned long) window );	
-};
+    system_call ( 24, (unsigned long) window, (unsigned long) window, 
+        (unsigned long) window );	
+}
 
 
 //

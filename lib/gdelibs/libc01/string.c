@@ -51,17 +51,34 @@ long double strtold(const char *nptr, char **endptr)
  * PUBLIC: #endif
  */
 
-char *strdup(const char *str){
+char *strdup (const char *str){
 	
 	size_t len;
 	char *copy;
 
 	len = strlen(str) + 1;
+	
 	if (!(copy = (char *) malloc( ( size_t ) len ) ))
 		return (NULL);
 	memcpy(copy, str, len);
 	return (copy);
 }
+
+
+char *strndup(const char *s, size_t n)
+{
+	size_t l = strnlen (s, n);
+	
+	char *d;
+	d = (char *) malloc (l + 1);
+	
+	if (!d)
+		return NULL;
+	memcpy(d, s, l);
+	d[l] = '\0';
+	return d;
+}
+
 
 /*
  * strrchr --
@@ -70,15 +87,18 @@ char *strdup(const char *str){
  * PUBLIC: char *strrchr __P((const char *, int));
  * PUBLIC: #endif
  */
-char *strrchr(const char *p, int ch)
-{
+
+char *strrchr(const char *p, int ch){
+	
 	char *save;
 	char c;
 
 	c = ch;
-	for (save = NULL;; ++p) {
+	
+	for ( save = NULL;; ++p ) 
+	{
 		if (*p == c)
-			save = (char *)p;
+			save = (char *) p;
 		if (*p == '\0')
 			return (save);
 	}
@@ -97,7 +117,6 @@ uintmax_t strtoumax (const char* str, char** endptr, int base)
 {
    return 0;
 }
-
 
 
 /*
@@ -139,9 +158,9 @@ int strcasecmp (const char *s1, const char*s2){
  *   pointed to by `s1', until `n' characters in all have been written.
  *   The `strncpy' function returns the value of `s1'.  [4.11.2.4]
  */
-char *
-strncpy(char *s1, const char *s2, size_t n)
-{
+
+char *strncpy(char *s1, const char *s2, size_t n){
+	
     char *s = s1;
     while (n > 0 && *s2 != '\0') {
 	*s++ = *s2++;
@@ -157,8 +176,8 @@ strncpy(char *s1, const char *s2, size_t n)
 
 /*
  * strcmp:
- *     Compara duas strings.
- */
+ *     Compara duas strings. */
+
 int strcmp (char * s1, char * s2){
 	
 	int i;
@@ -178,8 +197,8 @@ int strcmp (char * s1, char * s2){
 /*
  * strncmp:
  *     Compara duas strings.
- *     Obs: Essa tem funcionado bem.
- */
+ *     Obs: Essa tem funcionado bem. */
+
 int strncmp ( char *s1, char *s2, int len ){
 	
 	int n = len;
@@ -206,64 +225,25 @@ int strncmp ( char *s1, char *s2, int len ){
 };
 
 
-/*
- * str_cmp:
- *     Compara strings.
- */
- 
-/* 
-//#bugbug deletando porque tá errado. 
-int str_cmp ( unsigned char *str1, unsigned char *str2 ){
-	
-	while ( *str1 == *str2 && 
-	        *str1 != 0 && 
-			*str2 != 0 )
-	{ 
-        str1++; 
-        str2++; 
-    };
-    
+/*linux style
+void *memset(void *s, int c, size_t count)
+{
+	char *xs = s;
 
-	// 
-	// #bugubug: 
-	// Isso não faz sentido.
-	// Deve tá errado.
-	//
-	
-    
-	// #obs:
-	// Só faria sentido se estivesse medindo quantidades 
-	// de chars iguais.
-	
-	
-	if( *str1 == *str2 )
-	{ 
-	    return (int) 0; 
-	};
-	
-	if( *str1 > *str2 )
-	{ 
-	    return (int) 1; 
-	};
-	
-	if( *str1 < *str2 )
-	{ 
-	    return (int) -1; 
-	};
-	
-	//Nothing.
-
-    return (int) -1;
-};
+	while (count--)
+		*xs++ = c;
+	return s;
+}
 */
 
 
-//#bugbug:
-//Isso ainda não foi testado.
+/*
+ * memset:
+ * */
 
 void *memset ( void *ptr, int value, int size ){
 	
-    if( ptr != NULL && size > 0 )
+    if ( ptr != NULL && size > 0 )
     {
         unsigned char *temp = ptr;
 
@@ -271,13 +251,13 @@ void *memset ( void *ptr, int value, int size ){
 
         for ( i = 0; i < size; i++ )
         {
-            *temp++ = (unsigned char)value;
+            *temp++ = (unsigned char) value;
         }
 
     };
 		
     return (void *) ptr;
-};
+}
 
 
 //#todo: mover para memory.c ??
@@ -299,8 +279,9 @@ void *memoryZeroMemory ( void* ptr, size_t cnt ){
 
 /*
  * memcpy:
+ *     ?? #todo: mover para memory.c ?? 
  */
-//#todo: mover para memory.c ?? 
+
 void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
 	
 	const char *src = v_src;
@@ -314,13 +295,13 @@ void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
 	
 	//#todo: Tipar o retorno.
 	return v_dst;
-};
+}
 
 
 /*
  * strcpy: 
- *     Copia uma string.
- */
+ *     Copia uma string. */
+
 char *strcpy ( char *to, const char *from ){
 	
 	int i=0;
@@ -332,13 +313,36 @@ char *strcpy ( char *to, const char *from ){
 
 	//#todo: Tipar o retorno.
 	return (to);
-};
+}
+
+
+/*
+size_t strlcpy(char *dst, const char *src, size_t size)
+size_t strlcpy(char *dst, const char *src, size_t size)
+{
+	size_t bytes = 0;
+	char *q = dst;
+	const char *p = src;
+	char ch;
+	while ((ch = *p++)) {
+		if (bytes + 1 < size)
+			*q++ = ch;
+		bytes++;
+	}
+	// If size == 0 there is no space for a final null... 
+	if (size)
+		*q = '\0';
+	return bytes;
+}
+*/
+
+
 
 
 /*
  * strcat:
- *     Acrescenta uma string ao fim de outra.
- */
+ *     Acrescenta uma string ao fim de outra. */
+
 char *strcat ( char *to, const char *from ){
 	
 	char *ret = to;
@@ -352,10 +356,52 @@ char *strcat ( char *to, const char *from ){
 	
 	//#todo: Tipar o retorno.	
 	return (ret);
-};
+}
+
+/*
+size_t strlcat(char *dst, const char *src, size_t size)
+size_t strlcat(char *dst, const char *src, size_t size)
+{
+	size_t bytes = 0;
+	char *q = dst;
+	const char *p = src;
+	char ch;
+	while (bytes < size && *q) {
+		q++;
+		bytes++;
+	}
+	if (bytes == size)
+		return (bytes + strlen(src));
+	while ((ch = *p++)) {
+		if (bytes + 1 < size)
+			*q++ = ch;
+		bytes++;
+	}
+	*q = '\0';
+	return bytes;
+}
+*/
+
+/*
+char *strncat(char *dst, const char *src, size_t n);
+char *strncat(char *dst, const char *src, size_t n)
+{
+	char *q = strchr(dst, '\0');
+	const char *p = src;
+	char ch;
+	while (n--) {
+		*q++ = ch = *p++;
+		if (!ch)
+			return dst;
+	}
+	*q = '\0';
+	return dst;
+}
+*/
 
 
-/* bcopy: Copia. */
+/* 
+ * bcopy: Copia. */
 
 void bcopy ( char *from, char *to, int len ){
 	
@@ -366,13 +412,13 @@ void bcopy ( char *from, char *to, int len ){
 	{ 
         *to++ = *from++; 
 	};
-};
+}
 
 
 /*
  *  bzero:
- *      Preenche com zeros.
- */
+ *      Preenche com zeros. */
+
 void  bzero ( char *cp, int len ){
 	
 	//if ( len < 0 )
@@ -382,7 +428,7 @@ void  bzero ( char *cp, int len ){
 	{ 
         *(cp + len) = 0; 
 	};
-};
+}
 
 
 /*
@@ -401,6 +447,7 @@ size_t strlen ( const char *s ){
 	return (size_t) i;
 };
 
+
 /*
 static size_t strlen (const char *s){
 	
@@ -411,74 +458,21 @@ static size_t strlen (const char *s){
 };
 */
 
+/* 
+ * strnlen:
+   Find the length of S, but scan at most MAXLEN characters.  
+   If no '\0' terminator is found within the first MAXLEN characters, return MAXLEN. 
+ */
 
-/* Find the length of S, but scan at most MAXLEN characters.  If no '\0'
-   terminator is found within the first MAXLEN characters, return MAXLEN. */
-/*
-size_t
-strnlen (s, maxlen)
-     register const char *s;
-     size_t maxlen;
-{
-  register const char *e;
-  size_t n;
-
-  for (e = s, n = 0; *e && n < maxlen; e++, n++)
-    ;
-  return n;
-}
-*/
-
-/*
-// Compares two strings. 
-//Returns -1 if str1 < str2, 
-//0 if they are equal or 
-//1 otherwise.
-int strcmp(char *str1, char *str2)
-{
-    int i = 0;
-    
-    int failed = 0;
-    
-    while( str1[i] != '\0' && str2[i] != '\0' )
-    {
-        if(str1[i] != str2[i])
-        {
-            failed = 1;
-            break;
-        }
-        i++;
-    }
- 
- 
-   // why did the loop exit?
-    if( (str1[i] == '\0' && str2[i] != '\0') || (str1[i] != '\0' && str2[i] == '\0') )
-    {    
-	    failed = 1;
-    }; 
- 
+size_t strnlen ( const char *s, size_t maxlen ){
 	
-	return failed;
-};
+    const char *e;
+    size_t n;
 
- 
-
-int strcmp(const char *a, const char *b)
-{
-    while(*a && *b) 
-	{
-        if(*a++ != *b++) 
-		    return 1;
-    }
-    
-	if(*a || *b) 
-	    return 1;
-		
-    return 0;
+    for (e = s, n = 0; *e && n < maxlen; e++, n++)
+    ;
+    return n;
 }
-*/
-
-
 
 
 /*
@@ -487,6 +481,7 @@ int strcmp(const char *a, const char *b)
  * Credits: 
  *     Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
  */
+
 size_t strcspn ( const char *str, const char *reject ){
 	
 	int result;
@@ -576,40 +571,6 @@ size_t strspn ( const char* str, const char* accept ){
 };
 
 
-
-/* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
-/*
-char* strtok_r(char* str, const char* delim, char** saveptr)
-{
-	if ( !str && !*saveptr )
-		return NULL;
-	if ( !str )
-		str = *saveptr;
-	str += strspn(str, delim); // Skip leading
-	if ( !*str )
-		return *saveptr = NULL;
-	size_t amount = strcspn(str, delim);
-	if ( str[amount] )
-		*saveptr = str + amount + 1;
-	else
-		*saveptr = NULL;
-	str[amount] = '\0';
-	return str;
-}
-*/
-
-
-
-/* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
-/*
-char* strtok(char* str, const char* delim)
-{
-	static char* lasttokensaveptr = NULL;
-	return strtok_r(str, delim, &lasttokensaveptr);
-}
-*/
-
-
 /*
  **************************************
  * strtok_r:
@@ -693,36 +654,42 @@ cont:
 /*
  *********************************************
  * strtok:
- *     Credits: Apple. (Open Source)
- */
+ *     Credits: Apple. (Open Source) */
+
 char *strtok ( char *s, const char *delim ){
 	
     static char *last;
 	
-    return strtok_r( s, delim, &last );
-};
+    return strtok_r ( s, delim, &last );
+}
 
 
-/*linux style
+/*
+char *strchr(const char *s, int c)
 char *strchr(const char *s, int c)
 {
+	while (*s != (char)c) {
+		if (!*s)
+			return NULL;
+		s++;
+	}
+	return (char *)s;
+}
+*/
+
+/*
+ * strchr:
+ * linux style */
+
+char *strchr (const char *s, int c){
+	
 	for (; *s != (char)c; ++s)
 		if (*s == '\0')
 			return NULL;
 	return (char *)s;
 }
-*/
 
-/*linux style
-void *memset(void *s, int c, size_t count)
-{
-	char *xs = s;
 
-	while (count--)
-		*xs++ = c;
-	return s;
-}
-*/
 
 /*linux style
 void *memmove(void *dest, const void *src, size_t count)
@@ -779,15 +746,17 @@ void *memmove(void *dest, const void *src, size_t count)
  * @s1: The string to be searched
  * @s2: The string to search for
  */
-/* 
-char *strstr(const char *s1, const char *s2)
-{
+
+char *strstr (const char *s1, const char *s2){
+	
 	size_t l1, l2;
 
 	l2 = strlen(s2);
+	
 	if (!l2)
 		return (char *)s1;
 	l1 = strlen(s1);
+	
 	while (l1 >= l2) {
 		l1--;
 		if (!memcmp(s1, s2, l2))
@@ -796,8 +765,6 @@ char *strstr(const char *s1, const char *s2)
 	}
 	return NULL;
 }
-
-*/
 
 
 //

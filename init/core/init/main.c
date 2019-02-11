@@ -130,9 +130,9 @@ int initMain (void){
 	// #debug
 	// Testing output message.
 	
-	printf("initMain: INIT.BIN is alive \n");
-    refresh_screen();	
-	while(1){}
+	//printf("initMain: INIT.BIN is alive \n");
+    //refresh_screen();	
+	//while(1){}
 	
 	return 0;
 }
