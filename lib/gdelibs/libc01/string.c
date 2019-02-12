@@ -37,11 +37,6 @@ int memcmp (const void *s1, const void *s2, size_t n){
 }
 
 
-//todo
-long double strtold(const char *nptr, char **endptr)
-{
-    return 0;
-}
 
 /*
  * strdup --

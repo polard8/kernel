@@ -45,6 +45,10 @@
     ldiv	divisão inteira
    
 */   
+
+
+#ifndef _STDLIB_H
+#define _STDLIB_H 1
   
 //A rotina terminou normalmente.
 #define EXIT_SUCCESS  0    
@@ -112,6 +116,21 @@ int system (const char *command);
 
 
 
+
+//=================================
+
+
+
+
+double strtod (const char *str, char **endptr);
+float strtof(const char *str, char **endptr);
+long double strtold(const char *str, char **endptr);
+double atof(const char *str);
+
+
+//=================================
+
+
 int abs( int j);
 
 
@@ -133,6 +152,10 @@ unsigned long rtGetAvailableHeap();
  * Obs: Pode haver uma chamada à ela em crt0.s por exemplo.
  */
 int libcInitRT();
+
+
+#endif  /*stdlib.h*/
+
 //
 // End.
 //

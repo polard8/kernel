@@ -322,8 +322,15 @@ unsigned long input(unsigned long ch);
 /*
  * Formatted Input
  */
-int scanf( const char *fmt, ... );
+int scanf ( const char *fmt, ... );
 
+
+//(since C99)	
+//int fscanf( FILE *restrict stream, const char *restrict format, ... );
+	
+int fscanf(FILE *stream, const char *format, ... ); 
+
+int sscanf(const char *str, const char *format, ...);
  
 /*
  * Character Input and Output Functions

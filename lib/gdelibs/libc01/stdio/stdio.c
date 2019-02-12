@@ -1937,6 +1937,73 @@ int scanf ( const char *fmt, ... ){
 //======================================================================
 
 
+
+ 
+
+
+
+//(since C99)	
+//int fscanf( FILE *restrict stream, const char *restrict format, ... );
+//(until C99)
+int fscanf (FILE *stream, const char *format, ... ){
+	
+	printf ("fscanf: todo \n");
+    return -1;
+}
+
+ /*
+ * Scan items from a string in accordance with a format.  This is much
+ * simpler than the C standard function: it only recognises %d without a
+ * field width, and does not treat space in the format string or the
+ * input any differently from other characters.  The return value is the
+ * number of characters from the input string that were successfully
+ * scanned, not the number of format items matched as in standard sscanf.
+ * e.mcmanus@opengroup.org, 12 Feb 97
+ * Credits: apple open source.
+ */
+
+int sscanf(const char *str, const char *format, ...){
+	
+	const char *start = str;
+	va_list args;
+	
+	va_start(args, format);
+	for ( ; *format != '\0'; format++) {
+		if (*format == '%' && format[1] == 'd') {
+			int positive;
+			int value;
+			int *valp;
+			
+			if (*str == '-') {
+				positive = 0;
+				str++;
+			} else
+				positive = 1;
+			if (!isdigit(*str))
+				break;
+			value = 0;
+			do {
+				value = (value * 10) - (*str - '0');
+				str++;
+			} while (isdigit(*str));
+			if (positive)
+				value = -value;
+			valp = va_arg(args, int *);
+			*valp = value;
+			format++;
+		} else if (*format == *str) {
+			str++;
+		} else
+			break;
+	}
+	va_end(args);
+	return str - start;
+}
+
+
+
+
+
 //=============================================================
 // printf (start)
 //=============================================================

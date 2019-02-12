@@ -7,7 +7,7 @@
 
 int memcmp (const void *s1, const void *s2, size_t n);
 
-long double strtold(const char *nptr, char **endptr);
+ 
 
 char *strdup(const char *str);
 char *strndup(const char *s, size_t n);
