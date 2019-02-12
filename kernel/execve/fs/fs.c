@@ -1128,10 +1128,28 @@ void fsInitializeWorkingDiretoryString (){
 	
 	struct volume_d *v;
 	
+	//#test
+	//setup volume string
+    char volume_string[8];   // root:/volumeX
+	
+	volume_string[0] = 'v';
+	volume_string[1] = 'o';
+	volume_string[2] = 'l';
+	volume_string[3] = 'u';
+	volume_string[4] = 'm';
+	volume_string[5] = 'e';
+	volume_string[6] = (char)( '1' + (char) current_volume - (char) 1 );
+	volume_string[7] = '\0';
+		
+	
+	
+	
 	//'root:'
     //  ## volume list ##
     //primeiro colocamos a string que indica a lista de volumes. 
-    sprintf ( current_workingdiretory_string, FS_VOLUMELIST_STRING ); 
+	
+    sprintf ( current_workingdiretory_string, FS_ROOT_STRING ); 
+	 //sprintf ( current_workingdiretory_string, FS_VOLUMELIST_STRING );  //#bugbug deletar, errado. 
 	
 	
 	//'/'
@@ -1162,21 +1180,22 @@ void fsInitializeWorkingDiretoryString (){
 
 	    switch (v->id)
 		{
-			case 0:
+			//case 0:
 		        //global usada para string do nome do volume.
-	            current_volume_string = (char *) FS_VOLUME0_STRING;
-		 	    break;
+	        //    current_volume_string = (char *) FS_VOLUME0_STRING;
+		 	//    break;
 				
-			case 1:
+			//case 1:
 		        //global usada para string do nome do volume.
-	            current_volume_string = (char *) FS_VOLUME1_STRING;
-		 	    break;
+	         //   current_volume_string = (char *) FS_VOLUME1_STRING;
+		 	 //   break;
 			
 			default:
 		        //fail.
-		        printf("fsInitializeWorkingDiretoryString: default volume #todo\n");
-		        die();			    
-			    break;
+		        //printf("fsInitializeWorkingDiretoryString: default volume #todo\n");
+		        //die();			    
+			    current_volume_string = (char *) volume_string; 
+				break;
 		}
 		
 		

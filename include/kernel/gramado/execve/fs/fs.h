@@ -47,7 +47,7 @@ struct target_dir_d current_target_dir;
 
 //Volume list
 #define FS_ROOT_STRING        "root:"
-#define FS_VOLUMELIST_STRING  "root:"
+//#define FS_VOLUMELIST_STRING  "root:"  //deletar
 
 //volumes
 #define FS_UNKNOWNVOLUME_STRING "unknown-volume"
