@@ -15,6 +15,7 @@
  *     2015 - Revision.
  */
  
+
 //suporte ao diretório alvo que desejamos acessar.
 //com base em um pathname passado via argumento.
 struct target_dir_d
@@ -23,38 +24,18 @@ struct target_dir_d
     int magic;
 	
 	//ponteiro para a string do caminho
-	char *path;  
+	//char *pwd_string;  
 	
-	//endereço base do diretório a ser acessado.
-	char *dir_base_address;  
-
+	//file name 8.3 (11 bytes;)
+	char name[32];
 	
-	//com base no pathname esses são nossos alvos.
-	struct disk_d    *target_disk;
-	struct volume_d  *target_volume;
-	struct dir_d     *target_dir; 	
-
-    //conjunto de possibilidades para o diretório a ser acessado.
-	//0 - não pode acessar esse diretório.
-	//1 - pode acessar esse diretório.
-	int status;
-	
-	//o diretório foi carregado na memória.
-	int in_memory; 
-	
-	int volume_index;
-	
-	//concatenando nomes dentro do path.
-	int walk_count;
-    int walk_current;
-    
-    int start;
-	
-	int error; 
+	//onde esse direto'rio esta' carregado.
+    unsigned long current_dir_address;
 		
 	//...
 };
-struct target_dir_d *current_target_volume;
+struct target_dir_d current_target_dir;
+ 
  
 #define FS_PATHNAME_SEPARATOR "/"
 #define FS_PATHNAME_TERMINATOR "\0"
@@ -147,9 +128,8 @@ void fs_pathname_backup ( int pid, int n );
 
 
 //essa rotina é chamada por services em services.c
-int 
-sys_read_file ( unsigned long name, 
-                unsigned long address );
+int sys_read_file ( unsigned long name, unsigned long address );
+int sys_read_file2 ( unsigned long name, unsigned long address );
 
 				
 int
@@ -1040,7 +1020,7 @@ void read_fntos(char *name);
 int fsCheckELFFile ( unsigned long address );				  
 int fsCheckPEFile( unsigned long address );	
 
-
+int fsLoadFileFromCurrentTargetDir ( unsigned char *file_name, unsigned long address );
 	  
 				  
 //

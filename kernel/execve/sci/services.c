@@ -322,7 +322,7 @@ void *services( unsigned long number,
 	{
 	    //0 - Null, O processo pode ser malicioso.
 	    case SYS_NULL: 
-	        systemRam(0,0,0,0,0); 
+	        systemRam (0,0,0,0,0); 
 	        break; 	   
 		
 		//Disco: 1,2,3,4
@@ -332,7 +332,7 @@ void *services( unsigned long number,
 		    //@todo: chamar hal
 			//systemDevicesUnblocked(36,arg2,arg3,0,0); 
 		    //read_lba( (unsigned long) arg2, (unsigned long) arg3 );
-			my_read_hd_sector( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
+			my_read_hd_sector ( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
 			break;
 			
 		//2 (i/o) Essa rotina pode ser usada por um driver em user mode.
@@ -340,7 +340,7 @@ void *services( unsigned long number,
 		    //@todo: chamar hal
 			//systemDevicesUnblocked(35,arg2,arg3,0,0); 
 			//write_lba( (unsigned long) arg2, (unsigned long) arg3 );
-			my_write_hd_sector( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
+			my_write_hd_sector ( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
 		    break;
 
 		//3 fopen (i/o)
@@ -349,7 +349,8 @@ void *services( unsigned long number,
         //o atendimento às system calls.			
 		//IN: name. address
 		case SYS_READ_FILE:
-		    return (void *) sys_read_file ( (unsigned long) a2, (unsigned long) arg3 );
+		    //return (void *) sys_read_file ( (unsigned long) a2, (unsigned long) arg3 );
+			return (void *) sys_read_file2 ( (unsigned long) a2, (unsigned long) arg3 );
 			break;
 
 
@@ -1366,6 +1367,7 @@ void *services( unsigned long number,
         //Atualiza o pathname na string global.		
 		case 175:
 		    fsUpdateWorkingDiretoryString ( (char *) arg2 );
+            fsLoadFileFromCurrentTargetDir ( (unsigned char *) arg2, 0 );
 			break;
 			
 		//176	

@@ -112,9 +112,9 @@ int fsCheckPEFile ( unsigned long address ){
  * #test isso funciona.
  */				  
 void 
-fsListFiles( int disk_id, 
-             int volume_id, 
-			 int directory_id )
+fsListFiles ( int disk_id, 
+              int volume_id, 
+              int directory_id )
 {
 	printf("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
 	    disk_id, volume_id, directory_id );
@@ -275,31 +275,24 @@ int fsList ( const char *dir_name ){
 	printf("fsList:\n");
 	
 	
-	//#importante:
-	//temos que consultar a estrutura storage.
-	//Lá saberemos qual é o disco e volume atuais.
-	//Se o nome passado não indicar em qual disco devemos atuar,
-	//isso significa que devemos continuar no mesmo disco.
+	if ( current_target_dir.current_dir_address == 0 )
+	{
+		printf("current_target_dir.current_dir_address fail, reseting\n");
+		refresh_screen();
+		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS; 
+	}
+ 
+	// name, dir address, number of entries
 	
-	//com base no nome temos que encontrar as outras informações sobre 
-	//o diretório.
+	fsFAT16ListFiles ( (const char *) dir_name,         
+		    (unsigned short *) current_target_dir.current_dir_address, 256 );	
 	
-	//se apenas o nome do diretório for indicado 
-	//então devemos procurar no diretório atual.
-	
-	//#bugbug 
-	//POR ENQUANTO SÓ PROCURAMOS NO ROOT DIR.
-	
-	//# improvisando os valores.
-	fsFAT16ListFiles ( (const char *) dir_name,         // name 
-		    (unsigned short *) VOLUME1_ROOTDIR_ADDRESS, // address
-			256 );				                        // number of entries
-			
-	
-	//...
-	
-	return (int) 0;
-};
+	return 0;
+}
+
+
+//#test
+
 
 
 /*
@@ -310,13 +303,12 @@ int fsList ( const char *dir_name ){
  * IN:
  *     dir_address = Ponteiro para um endereço de memória 
  *                   onde foi carregado o diretório.
- *
  */
  
 void 
-fsFAT16ListFiles( const char *dir_name, 
-                  unsigned short *dir_address, 
-				  int number_of_entries )
+fsFAT16ListFiles ( const char *dir_name, 
+                   unsigned short *dir_address, 
+                   int number_of_entries )
 {
 	//@todo: O número de entradas é maior no diretório raiz.(512 ?)
 	
@@ -1287,7 +1279,8 @@ int fs_print_process_pwd ( int pid ){
 	        die ();
 	    }
 		
- 		printf("\n PID=%d %s \n\n", p->pid, p->pwd_string );
+ 		printf("\n PID=%d %s (%s) \n\n", p->pid, p->pwd_string, current_target_dir.name );
+		
 		
 		refresh_screen();
 		return (int) 0;
@@ -1309,6 +1302,10 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 	
 	int i;    
 	struct process_d *p;
+	
+	char *tmp;
+	
+	tmp = string;
 
 	
 	if ( pwd_initialized == 0 )
@@ -1342,6 +1339,8 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 	    
 		} else {
 			
+			//#importante
+			//Colocamos um novo nome no fim do path;
 			//atualiza a string do processo atual.
 			
 		    strcat ( p->pwd_string, string );	
@@ -1356,6 +1355,15 @@ void fsUpdateWorkingDiretoryString ( char *string ){
 			{
 	            current_workingdiretory_string[i] = p->pwd_string[i];	
 	        }
+			
+			//#bugbug: 
+			//test
+			for ( i=0; i< 11; i++ )
+			{
+				current_target_dir.name[i] = *tmp;
+				tmp++;
+			}
+			
 		}		
 	}	
 }
@@ -1431,69 +1439,27 @@ void fs_pathname_backup ( int pid, int n ){
 		{
 	        current_workingdiretory_string[i] = p->pwd_string[i];	
 	    }
+		
+		//#bugbug: 
+		//test
+		for ( i=0; i< 11; i++ )
+		{
+			current_target_dir.name[i] = '\0';
+		}
 	}
 }
 
 
 //interface para carregar arquivo ou diretório.
 //essa rotina é chamada por services em services.c
-int 
-sys_read_file ( unsigned long name, 
-                unsigned long address )
-{ 
+
+int sys_read_file ( unsigned long name, unsigned long address )
+
+{
+	
 	//fail
     int Ret = -1;	
 	
-	//#debug
-	//Essa rotina funciona apenas parcialmente.
-	//Por enquanto só podemos carregar o arquivo.
-	goto do_loadfile;
-
-	/*
-	
-    //#importante 
-	//Aqui devemos ler qual é o tipo de arquivo 
-	//que se deseja carregar, e falharmos caso o 
-	//o tipo deja inválido.
-	//continuamos apenas se o tipo for um dos 
-	//atendidos pelo switch abaixo.
-	
-	//ainda não sabemos.
-	int file_type = -1;
-	
-	//pegando o tipo de arquivo nas informações sobre o aquivo
-	file_type = fs_get_file_type (name);
-	
-	//aqui temos os tipos de arquivo atendidos por essa rotina.
-	switch (file_type)
-	{
-		//load file.
-		case 1000:
-		    goto do_loadfile;
-			break;
-			
-		case 1001:
-            goto do_loaddir;
-			break;
-			
-		//continua	
-		//...	
-			
-		//Isso ficará aqui por compatibilidade,
-		//tem rotinas antigas que não usavam esse argumento.
-		//#todo: podemos colocar um hang aqui e falharmos o sistema 
-		//caso o argumento option seja inválido.
-		default:
-		    goto do_loadfile;
-		    break;
-	};
-	
-	*/
-	//
-	// ## LOAD FILE ##
-	//
-	
-do_loadfile:	
 	
     taskswitch_lock();
     scheduler_lock();			
@@ -1505,12 +1471,79 @@ do_loadfile:
 	
 	scheduler_unlock();
     taskswitch_unlock();
+	
 	return (int) Ret;
 			
 fail:			
     return 1;	
 };
 
+
+int sys_read_file2 ( unsigned long name, unsigned long address )
+{
+	 
+	
+	 //update name.
+	 fsUpdateWorkingDiretoryString ( (char *) name );	
+	 fsLoadFileFromCurrentTargetDir ( (unsigned char *) name, address );
+	
+	 return 0;
+}
+
+ 
+
+int fsLoadFileFromCurrentTargetDir ( unsigned char *file_name, unsigned long address ){
+	
+	int Ret = -1;	
+	int i;
+	unsigned long new_address;
+	
+
+	new_address = address;
+	
+	if ( new_address == 0 )
+	{
+		new_address = (unsigned long) malloc (4096);
+		if ( new_address == 0 )
+		{
+			return -1;
+		}
+	}
+		
+	
+	
+	if ( current_target_dir.current_dir_address == 0 )
+	{
+	    printf("fsLoadCurrentTargetDir current_target_dir.current_dir_address fail \n");
+		
+		//reset.
+		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+		
+		for ( i=0; i< 11; i++ )
+		{
+			current_target_dir.name[i] = '\0';
+		}		
+		
+		return -1;
+	}
+	
+		
+    taskswitch_lock();
+    scheduler_lock();			
+    
+	Ret = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS,  
+				    current_target_dir.current_dir_address,    //src dir address 
+	                (unsigned char *) current_target_dir.name, 
+					(unsigned long) new_address );    		   //dst dir address
+	
+	scheduler_unlock();
+    taskswitch_unlock();
+	
+	
+	current_target_dir.current_dir_address = new_address;
+	
+	return (int) Ret;
+}
 
 //interface para salvar arquivo ou diretório.
 //isso pode ser usado para criar um diretório
