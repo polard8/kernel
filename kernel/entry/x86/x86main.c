@@ -551,6 +551,7 @@ int x86main ( int argc, char *argv[] ){
 	    }
 	
 	
+	
 	//#bugbug
 	//depois que a runtime está inicializada, então ja temos mensagem,
 	//pois temos os endereços virtuais dos buffers.

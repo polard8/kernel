@@ -135,7 +135,7 @@ int hdd_ata_wait_no_drq (int p){
 
 /*
  ******************************************************************
- * rw_sector
+ * pio_rw_sector
  * 
  * IN:
  *   buffer - Buffer address
@@ -146,12 +146,6 @@ int hdd_ata_wait_no_drq (int p){
  *   //outportb ( int port, int data )
  *   (IDE PIO)	
  */
- 
-//int 
-//pio_rw_sector ( unsigned long buffer, 
-//                unsigned long lba, 
-//				int rw, 
-//				int port )
 
 int 
 pio_rw_sector ( unsigned long buffer, 
@@ -289,10 +283,9 @@ again:
 			die();
 			break; 		
 	};
-	
-	
+		
     return (int) 0;	
-} ;
+}
 
 
 /*
@@ -339,7 +332,7 @@ my_read_hd_sector ( unsigned long ax,
 	*/
 
 	return;
-};
+}
 
 
 /*

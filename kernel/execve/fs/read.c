@@ -151,8 +151,7 @@ fatLoadCluster ( unsigned long sector,
  *****************************************************************
  * read_lba:
  *     Carrega um um setor na memória, dado o LBA.
- *     Obs: Talvez essa rotina tenha que ter algum retorno no caso de falhas.
- */
+ *     Obs: Talvez essa rotina tenha que ter algum retorno no caso de falhas. */
  
 void read_lba ( unsigned long address, unsigned long lba ){
 	
@@ -259,15 +258,23 @@ fsLoadFile ( unsigned long fat_address,
 	//Carrega o diretório raiz na memória.
 	
 #ifdef KERNEL_VERBOSE	
-	printf("fsLoadFile: Loading root..\n"); 
+	debug_print("fsLoadFile:\n");
 #endif	
+	
+	//#importante
+	//N~ao carregaremos mais um diret'orio nesse momento,
+	//usaremos o endereço passado por argumento.
+	//esperamos que nesse endereço tenha um diret'orio carregado.
+	//Na inicializaç~ao 'e preciso carregar o diret'orio raiz
+	//antes de chamar essa funç~ao. E para caregar o diret'orio raiz
+	//precisa inicializar o sistema de arquivos e o controlador IDE.
 	
 	//#test
 	//funcionou
 	//carregando o diretório 
 	//address, lba, number of sectors.
 	
-	load_directory ( dir_address, VOLUME1_ROOTDIR_LBA, 32 );
+	//load_directory ( dir_address, VOLUME1_ROOTDIR_LBA, 32 );
     //load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
 	
 	//antigo.  
@@ -514,6 +521,7 @@ done:
  * +se o status da fat para o vulume atual indicar que ela já está carregada,
  *  então não precisamos carregar novamente.
  */
+
 void fs_load_fatEx (){
 	
 	unsigned long i;
@@ -540,7 +548,7 @@ void fs_load_fatEx (){
 		//Incrementa buffer.
 		b = b+512;    
 	};
-};
+}
 
 
 
@@ -568,6 +576,11 @@ load_directory ( unsigned long address,
 };
 
 
+void fs_load_rootdir (){
+	
+    load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
+}
+
 /*
  ********************************************************
  * fs_load_rootdirEx:
@@ -583,54 +596,15 @@ load_directory ( unsigned long address,
  * O tamanho do diretório fica registrado em sua entrada e deve ser 
  * estar realcionado com o tanto de entradas no diretório.
  * Quando um diretório é criado, devemos colocar na sua entrada o tamanho 
- * do diretório.
- */
+ * do diretório. */
+
 void fs_load_rootdirEx (){
 	
-	//#bugbug:
-	//Não sabemos qual é o volume e qual é o disco atual.
-	//precisamo consultar qual é o disco atual e qual 
-	//é o volume atual.
-	//na estrutura de volume deve ter a informação sobre 
-	//qual é a lba do diretório raiz do volume.
-	//Já o endereço pode ser padronizado para todos os volumes.	
-	
-	
-	load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
-	
-	//#obs
-	//deixaremos comentado aqui o jeito antigo, por enquanto.
-	
-	/*
-	unsigned long i;
-	unsigned long b = 0;
-	unsigned long szRoot = 32;
-	
-	//Carregar root dir na memória.
-	for ( i=0; i < szRoot; i++ )
-	{
-	    //read_lba( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i );
-        my_read_hd_sector ( VOLUME1_ROOTDIR_ADDRESS + b, VOLUME1_ROOTDIR_LBA + i, 0, 0 );
-		
-		//Incrementa buffer.
-		b = b+512;    
-	};
-	*/
-};
+	fs_load_rootdir ();
+	//load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
+}
 
 
-void fs_load_rootdir (){
-	
-	//#bugbug:
-	//Não sabemos qual é o volume e qual é o disco atual.
-	//precisamo consultar qual é o disco atual e qual 
-	//é o volume atual.
-	//na estrutura de volume deve ter a informação sobre 
-	//qual é a lba do diretório raiz do volume.
-	//Já o endereço pode ser padronizado para todos os volumes.
-	
-    load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
-}; 
 
 
 /*
@@ -640,32 +614,8 @@ void fs_load_rootdir (){
  */
  
 void fs_load_dir ( unsigned long id ){
-	
-	unsigned long i;
-	unsigned long n = 0;
-	unsigned long lba;
-	
-    FILE *f;
-	
-	
-	//#todo:
-	//+checar qual é o disco atual.
-	//+checar qual é o volume atual.	
-	
-
-	f = (void *) Streams[id];	
-	
-	if ( (void *) f == NULL )
-	{
-	    printf("fs_load_dir fail: Struct\n");
-	    return;
-	}
-	
-	//??
-	//Podemos pegar o nome do arquivo na estrutura 
-	//a arregar ele com fopen.
-	//f->name
-};
+    //#cancelar.
+}
 
 
 

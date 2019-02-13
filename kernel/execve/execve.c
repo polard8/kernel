@@ -793,6 +793,9 @@ int init_executive (){
 #ifdef KERNEL_VERBOSE
 	printf("EXECUTIVE:\n");
 #endif	
+
+	
+    debug_print("init_executive:\n");
 	
 	// PCI - Pega informações da PCI.
 	// CLOCK - Pega informações de Hora e Data.	
@@ -804,7 +807,11 @@ int init_executive (){
 	
 	//...
 	
-	diskATADialog( 1, FORCEPIO, FORCEPIO );
+	//#importante: 
+	//so depois de inicializarmos o ata 'e que podemos carregar alguma coisa.
+	
+	debug_print("init_executive: diskATADialog\n");
+	diskATADialog ( 1, FORCEPIO, FORCEPIO );
 	
 	// ??
 	// configura a tabela do kernel de funções exportadas

@@ -945,9 +945,10 @@ void fs_init_structures (){
  
 int fsInit (){
 	
-#ifdef EXECVE_VERBOSE
+//#ifdef EXECVE_VERBOSE
+	debug_print("fsInit: initializing\n");
     printf("fsInit: Initializing..\n");
-#endif 
+//#endif 
  
 	// Type - Configura o tipo de sistema de arquivos usado. 
 	// No caso, (fat16).

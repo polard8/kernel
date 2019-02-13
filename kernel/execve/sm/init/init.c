@@ -687,6 +687,15 @@ int init (){
     if(Status != 0){
 	    //Nothing for now.
 	};
+	
+	
+	// #importante
+	// So podemos carregar o diret'orio raiz depois que inicializamos o controlador de IDE 
+	// e as estruturas de sistema de arquivos.
+	
+	fs_load_rootdir ();
+	
+	
 	KeInitPhase = 2;
 
 	
