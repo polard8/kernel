@@ -18,14 +18,15 @@
 
 extern void reset_ide0();
 
+
 /*
  ************************************
  * write_fntos
  *     Rotina interna de support.
  *     isso deve ir para bibliotecas depois.
  *     não tem protótipo ainda.
- * Credits: Luiz Felipe
- */
+ *     Credits: Luiz Felipe */
+
 void write_fntos (char *name){
 	
     int  i, ns = 0;
@@ -85,8 +86,7 @@ void write_fntos (char *name){
         *name++ = ext[i];
 
     *name = '\0';
- 
-};
+}
 
 
 /*
@@ -118,19 +118,17 @@ void fatWriteCluster ( unsigned long sector,
 	
 	//...
 	
-//done:
-    //return (int) 0;	
 	return;
-};
+}
 
 
 /*
  *************************************************
  * write_lba:
- *     Grava um setor no disco dado o lba.
- *     
- */
+ *     Grava um setor no disco dado o lba. */
+
 //int write_lba( unsigned long address, unsigned long lba ) 
+
 void write_lba ( unsigned long address, unsigned long lba ){
     
     //@todo: Check limits.
@@ -640,16 +638,15 @@ done:
     printf("fsSaveFile: done hang \n"); 
     refresh_screen();	
     
-	
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*
  * fs_save_rootdir:
  *     Salva o diretório raiz no disco.
- *     @todo: Identificar parâmetros do sistema de arquivos atual.
- */
+ *     @todo: Identificar parâmetros do sistema de arquivos atual. */
+
 void fs_save_rootdir ()
 {
 	//return;
@@ -664,7 +661,6 @@ void fs_save_dir (unsigned long id)
 {
 	//return;
 };
-
 
 
 /*

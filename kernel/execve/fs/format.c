@@ -22,13 +22,13 @@
 void fs_apaga_fat (){
 	
     fs_init_fat ();
-};
+}
 
 
 void fs_delete_entry ( unsigned long id, unsigned long eid )
 {
     //return;
-};
+}
 
 
 

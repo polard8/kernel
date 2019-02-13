@@ -237,8 +237,6 @@ void vfsShowVFSInfo (){
 };
 
 
-
-
 //lista os nomes dos arquivos no diretório raiz do vfs.
 void vfsListFiles (){
 	
@@ -259,8 +257,7 @@ void vfsListFiles (){
 	};
 	
 	refresh_screen();
-	//return;
-};
+}
 
 //
 // End.

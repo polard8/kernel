@@ -31,8 +31,7 @@
  *     rotina interna de support.
  *     isso deve ir para bibliotecas depois.
  *     não tem protótipo ainda.
- * Credits: Luiz Felipe
- */
+ *     Credits: Luiz Felipe */
  
 void read_fntos ( char *name ){
 	
@@ -43,9 +42,7 @@ void read_fntos ( char *name ){
 	ext[1] = 0;
 	ext[2] = 0;
 	ext[3] = 0;
-	
-    //const char ext[4];
-	
+		
     //Transforma em maiúscula enquanto não achar um ponto.
 	
 	while ( *name && *name != '.' )
@@ -118,7 +115,7 @@ fatClustToSect ( unsigned short cluster,
 	//@todo: Check limits.
 	
 	return (unsigned long) (C * spc) + first_data_sector;
-};
+}
 
 
 /*
@@ -144,7 +141,7 @@ fatLoadCluster ( unsigned long sector,
         read_lba ( address, sector + i );
 		address = address +512; 
 	}
-};
+}
 
 
 /*
@@ -320,34 +317,22 @@ fsLoadFile ( unsigned long fat_address,
 	
 	// Continua ... 
 	// Pegar mais informações sobre o sistema de arquivos.
-	
-	
-    /*
-	 * Busca simples pelo arquivo no diretório raiz.
-	 *
-	 * @todo: Essa busca pode ser uma rotina mais sofisticada. Uma função
-	 * auxiliar.
-	 */
-
-    /*
-	 * Primero caractere da entrada:
-	 *   0 = entrada vazia.
-	 *   $ = entrada de arquivo deletado.
-	 *   outros ...
-	 *
-	 *  ATENÇÃO:
-     *      Na verdade a variável 'root' é do tipo short.	 
-	 */
+	// Busca simples pelo arquivo no diretório raiz.
+	// #todo: 
+	// Essa busca pode ser uma rotina mais sofisticada. Uma função auxiliar.
+	// Primero caractere da entrada:
+	// 0 = entrada vazia.
+	// $ = entrada de arquivo deletado.
+	// outros ...
+	// ATENÇÃO:
+	// Na verdade a variável 'root' é do tipo short.	  
 	 
 	i = 0; 
-	
-	// Procura o arquivo no diretório raiz.
-	
-//search_file:
-
+		
     size_t size = (size_t) strlen (file_name); 
 	
-	//Compara.
+	// Procura o arquivo no diretório raiz.	
+	
 	while ( i < max )
 	{
 		//Se a entrada não for vazia.
@@ -377,6 +362,8 @@ fsLoadFile ( unsigned long fat_address,
     // O arquivo não foi encontrado.	
 //notFound:
     printf ("fs-read-fsLoadFile: %s not found\n", file_name );  
+	
+	//#debug
     //printf ("fs-read-fsLoadFile: %s not found\n", NameX );
 	//printf("root: %s ",root);	
     goto fail;
@@ -491,11 +478,12 @@ next_entry:
 	
 //Falha ao carregar o arquivo.
 fail:
-    printf ("fs-read-fsLoadFile fail: file={%s}\n", file_name );	
+    
+	printf ("fs-read-fsLoadFile fail: file={%s}\n", file_name );	
     refresh_screen ();
+	
 	return (unsigned long) 1;
 	
-//Done. 	
 done:
     
 	//#debug support
@@ -503,7 +491,7 @@ done:
 	//refresh_screen(); 
     
 	return (unsigned long) 0;
-};
+}
 
 
 /*
@@ -540,7 +528,8 @@ void fs_load_fatEx (){
 	//caso ja esteja na memória.
 	//obs: padronizaremos alguns endereços, e alocaremos outros.
 	
-	//Carregar root dir na memória.
+	//Carregar fat na memória.
+	
 	for ( i=0; i < szFat; i++ )
 	{
 		my_read_hd_sector( VOLUME1_FAT_ADDRESS + b, VOLUME1_FAT_LBA + i, 0 , 0 );
@@ -581,30 +570,16 @@ void fs_load_rootdir (){
     load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
 }
 
+
 /*
  ********************************************************
  * fs_load_rootdirEx:
- *    Carrega o diretório raiz na memória.
- *    Sistema de arquivos fat16.
- *    ? qual disco ?
- *    ? qual volume ? 
- *
- * #importante:
- * O tamanho do diretório raiz é padronizado.
- * mas é importante calcularmos o tamanho do diretório a ser carregado 
- * para podermos carregar outros diretórios.
- * O tamanho do diretório fica registrado em sua entrada e deve ser 
- * estar realcionado com o tanto de entradas no diretório.
- * Quando um diretório é criado, devemos colocar na sua entrada o tamanho 
- * do diretório. */
+ *    Carrega o diretório raiz na memória. */
 
 void fs_load_rootdirEx (){
 	
 	fs_load_rootdir ();
-	//load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 }
-
-
 
 
 /*
@@ -618,13 +593,8 @@ void fs_load_dir ( unsigned long id ){
 }
 
 
-
-//
-// ==============================
-//
-
-
-
+//pega o tamanho de um arquivo que está no diretório raiz.
+//#todo: podemos alterar para pegar de um arquivo que esteja no diretório alvo.
 unsigned long fsGetFileSize ( unsigned char *file_name ){
 	
     int Status;		
@@ -678,14 +648,16 @@ unsigned long fsGetFileSize ( unsigned char *file_name ){
 	printf("fsGetFileSize: Loading root..\n"); 
 #endif	
 	
+	//#bugbug
+    //pega o tamanho de um arquivo que está no diretório raiz.
+    //#todo: podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
+	
 	//carregando o diretório raiz.
 	load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
 	//fs_load_rootdirEx ();
 	
 	//#todo:
 	//precisamos na verdade carregarmos o diretório corrente.
-		
-
 	
 	// Continua ... 
 	// Pegar mais informações sobre o sistema de arquivos.
@@ -801,7 +773,6 @@ found:
 	//printf ("%d \n" , root[ z+14 ]);
 	//printf ("%d \n" , root[ z+15 ]);
 	//printf ("FileSize=%d \n" , FileSize);
-
 	
 	//#debug
 	//refresh_screen();
@@ -810,15 +781,9 @@ found:
 	//}
 	
 	return (unsigned long) FileSize;
-};
+}
 
 
-//
-// =========
-//
-
- 
- 
 //
 // End.
 //
