@@ -1,5 +1,5 @@
 /*
- * File: disk1.h
+ * File: ata.h
  *
  * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
  * para suporte à IDE/AHCI.

@@ -115,7 +115,11 @@ write.o \
 cf.o \
 search.o \
 format.o \
-disk1.o \
+atainit.o \
+atairq.o \
+atapci.o \
+atadma.o \
+ata.o \
 diskvol.o \
 fs.o \
 vfs.o \
@@ -231,8 +235,15 @@ compile-kernel:
 
 	gcc -c kernel/execve/dd/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
 	
-	gcc -c kernel/execve/dd/ide/hdd.c     -I include/ $(CFLAGS) $(DEFINES) -o hdd.o
-	gcc -c kernel/execve/dd/ide/disk1.c   -I include/ $(CFLAGS) $(DEFINES) -o disk1.o
+	#ide support
+	gcc -c kernel/execve/dd/ide/hdd.c      -I include/ $(CFLAGS) $(DEFINES) -o hdd.o
+	gcc -c kernel/execve/dd/ide/ata.c    -I include/ $(CFLAGS) $(DEFINES) -o ata.o
+	gcc -c kernel/execve/dd/ide/atainit.c  -I include/ $(CFLAGS) $(DEFINES) -o atainit.o
+	gcc -c kernel/execve/dd/ide/atairq.c   -I include/ $(CFLAGS) $(DEFINES) -o atairq.o
+	gcc -c kernel/execve/dd/ide/atapci.c   -I include/ $(CFLAGS) $(DEFINES) -o atapci.o	
+	gcc -c kernel/execve/dd/ide/atadma.c   -I include/ $(CFLAGS) $(DEFINES) -o atadma.o	
+	
+	
 	
 	gcc -c kernel/execve/dd/pic.c     -I include/ $(CFLAGS) $(DEFINES) -o pic.o
 	gcc -c kernel/execve/dd/rtc.c     -I include/ $(CFLAGS) $(DEFINES) -o rtc.o
