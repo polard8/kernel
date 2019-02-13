@@ -1020,7 +1020,8 @@ void read_fntos(char *name);
 int fsCheckELFFile ( unsigned long address );				  
 int fsCheckPEFile( unsigned long address );	
 
-int fsLoadFileFromCurrentTargetDir ( unsigned char *file_name, unsigned long address );
+int fsLoadFileFromCurrentTargetDir ();
+void fsInitTargetDir();
 	  
 				  
 //

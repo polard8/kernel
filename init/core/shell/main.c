@@ -2661,7 +2661,7 @@ do_compare:
 	// dir - Lista os arquivos no estilo DOS.
 	if ( strncmp ( prompt, "dir", 3 ) == 0 )
 	{
-		char dir_name[] = "volume1";
+		//char dir_name[] = "volume1";
 		
 		i++;
 		token = (char *) tokenList[i];
@@ -2672,9 +2672,13 @@ do_compare:
 		    //listar os arquivos em um diretório dado o nome do diretório.
 			enterCriticalSection();
 		    system_call( 177,
-		             (unsigned long) dir_name,   //nome do diretório.
-                     (unsigned long) dir_name,   
-                     (unsigned long) dir_name ); 
+		             (unsigned long) 0,   //nome do diretório.
+                     (unsigned long) 0,   
+                     (unsigned long) 0 ); 			
+		    //system_call( 177,
+		    //         (unsigned long) dir_name,   //nome do diretório.
+            //         (unsigned long) dir_name,   
+            //         (unsigned long) dir_name ); 
 		    exitCriticalSection();		
 			
 			

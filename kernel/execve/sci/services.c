@@ -349,7 +349,10 @@ void *services( unsigned long number,
         //o atendimento às system calls.			
 		//IN: name. address
 		case SYS_READ_FILE:
+			//funciona, nao mexer nesse
 		    //return (void *) sys_read_file ( (unsigned long) a2, (unsigned long) arg3 );
+			
+			//testando novos recursos,
 			return (void *) sys_read_file2 ( (unsigned long) a2, (unsigned long) arg3 );
 			break;
 
@@ -1362,12 +1365,13 @@ void *services( unsigned long number,
                                 (unsigned long) arg3 );
 			break;
 			
-		//175	
+		//175
+		// cd.
         //Atualiza o pathname na estrutura do processo atual.
         //Atualiza o pathname na string global.		
 		case 175:
 		    fsUpdateWorkingDiretoryString ( (char *) arg2 );
-            fsLoadFileFromCurrentTargetDir ( (unsigned char *) arg2, 0 );
+            fsLoadFileFromCurrentTargetDir ();
 			break;
 			
 		//176	

@@ -110,7 +110,8 @@ int fsCheckPEFile ( unsigned long address ){
  *     Lista os arquivos em um diretório, dados os índices de disco, 
  * volume e diretório.
  * #test isso funciona.
- */				  
+ */	
+
 void 
 fsListFiles ( int disk_id, 
               int volume_id, 
@@ -266,11 +267,14 @@ done:
 */
 
 
-//comando 'dir'
-//Listando arquivos em um diretório dado o nome.
+/*
+ **********************
+ * fsList
+ *     comando 'dir'.
+ *     Listando arquivos em um diretório dado o nome.
+ */
 
 int fsList ( const char *dir_name ){
-	
 	
 	printf("fsList:\n");
 	
@@ -280,6 +284,16 @@ int fsList ( const char *dir_name ){
 		printf("current_target_dir.current_dir_address fail, reseting\n");
 		refresh_screen();
 		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS; 
+	}
+	
+	if ( dir_name == 0 )
+	{
+		dir_name = current_target_dir.name;
+		
+		if ( dir_name == 0 )
+		{
+		    printf("current_target_dir.name fail\n");			
+		}
 	}
  
 	// name, dir address, number of entries
@@ -1100,6 +1114,9 @@ int fsInit (){
 	//inicializa p pwd support.
 	fsInitializeWorkingDiretoryString ();
 	
+	//inicializa a estrutura de suporte ao target dir.
+	fsInitTargetDir();
+	
 	//
 	// @todo: Continua ...
 	//
@@ -1215,7 +1232,15 @@ void fsInitializeWorkingDiretoryString (){
     pwd_initialized = 1;
 }
 
+//para inicializarmos o sistema ja' com um alvo, no caso o root dir.
+void fsInitTargetDir()
+{
+	current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+	//current_target_dir.name = ?;
+}
 
+
+//cada processo deve inicialiar seus dados aqui.
 int fs_initialize_process_pwd ( int pid, char *string ){
 	
 	int i;	
@@ -1500,40 +1525,39 @@ fail:
 
 int sys_read_file2 ( unsigned long name, unsigned long address )
 {
+	
+	 //#importante, 
+	 //a atualizaçao do nome foi feita aqui.
 	 
-	
-	 //update name.
+	//update name.
 	 fsUpdateWorkingDiretoryString ( (char *) name );	
-	 fsLoadFileFromCurrentTargetDir ( (unsigned char *) name, address );
-	
-	 return 0;
-}
+	 
 
- 
-
-int fsLoadFileFromCurrentTargetDir ( unsigned char *file_name, unsigned long address ){
-	
 	int Ret = -1;	
 	int i;
+	
 	unsigned long new_address;
 	
-
-	new_address = address;
+    
+	//#importante
+	//temos que respeitar o endereço passaro pelo usu'ario.
 	
+	//new_address = (unsigned long) malloc (4096);
+	
+	new_address =  address;
 	if ( new_address == 0 )
 	{
-		new_address = (unsigned long) malloc (4096);
-		if ( new_address == 0 )
-		{
-			return -1;
-		}
+		printf("address fail\n");
+		return -1;
 	}
-		
 	
+	//#bugbug
+	//tenta carregar o diret'orio que tem o endereço indicado aqui, 
+	//se falhar carregue o root por enquanto.
 	
 	if ( current_target_dir.current_dir_address == 0 )
 	{
-	    printf("fsLoadCurrentTargetDir current_target_dir.current_dir_address fail \n");
+	    printf("sys_read_file2: current_target_dir.current_dir_address fail \n");
 		
 		//reset.
 		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
@@ -1545,6 +1569,10 @@ int fsLoadFileFromCurrentTargetDir ( unsigned char *file_name, unsigned long add
 		
 		return -1;
 	}
+	
+	//#debug
+	printf ("sys_read_file2: dir_name=(%s) dir_addr=(%x) #debug \n",
+	    current_target_dir.name, current_target_dir.current_dir_address );
 	
 		
     taskswitch_lock();
@@ -1561,7 +1589,76 @@ int fsLoadFileFromCurrentTargetDir ( unsigned char *file_name, unsigned long add
 	
 	current_target_dir.current_dir_address = new_address;
 	
+	return (int) Ret;	
+	
+}
+
+ 
+//carregar o diret'orio que est'a configurado como target dir 
+//em algum lugar qualquer da memo'ria.
+int fsLoadFileFromCurrentTargetDir (){
+	
+	int Ret = -1;	
+	int i;
+	
+	unsigned long new_address;
+	
+	//#bugbug
+	//Isso 'e um limite para o tamanho do arquivo (apenas dir).
+	//precisamos expandir isso.
+	//aqui no m'aquimo o arquivo pode ter 4kb.
+	//acho ques estamos falando somente de diret'orio aqui.	
+	
+	new_address = (unsigned long) malloc (4096);
+	if ( new_address == 0 )
+	{
+		return -1;
+	}
+	
+	//#bugbug
+	//tenta carregar o diret'orio que tem o endereço indicado aqui, 
+	//se falhar carregue o root por enquanto.
+	
+	if ( current_target_dir.current_dir_address == 0 )
+	{
+	    printf("fsLoadCurrentTargetDir current_target_dir.current_dir_address fail \n");
+		
+		//reset.
+		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+		
+		for ( i=0; i< 11; i++ )
+		{
+			current_target_dir.name[i] = '\0';
+		}		
+		
+		return -1;
+	}
+	
+	//#debug
+	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
+	//    current_target_dir.name, current_target_dir.current_dir_address );
+	
+		
+    taskswitch_lock();
+    scheduler_lock();			
+    
+	Ret = (int) fsLoadFile ( VOLUME1_FAT_ADDRESS,  
+				    current_target_dir.current_dir_address,    //src dir address 
+	                (unsigned char *) current_target_dir.name, 
+					(unsigned long) new_address );    		   //dst dir address
+	
+	scheduler_unlock();
+    taskswitch_unlock();
+	
+	
+	current_target_dir.current_dir_address = new_address;
+	
+	//#debug
+	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) new_dir_addr=(%x) #debug \n",
+	 //   current_target_dir.name, current_target_dir.current_dir_address );
+	
 	return (int) Ret;
+ 
 }
 
 //interface para salvar arquivo ou diretório.
