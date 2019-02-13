@@ -370,7 +370,12 @@ extern void refresh_screen();
 
 //#include <timer.h>     //irq 0.
 #include <keyboard.h>    //irq 1.
-//#include <ide.h>
+
+
+#include <ata.h>
+#include <ide.h>
+
+
 //...
 
 
@@ -395,6 +400,10 @@ extern void refresh_screen();
 
 //Se o boot loader está inicializado.
 int g_initialized;
+
+int g_driver_hdd_initialized;
+
+
 
 /*
  * Variables for text support.

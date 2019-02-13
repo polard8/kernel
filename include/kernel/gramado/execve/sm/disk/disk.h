@@ -58,7 +58,8 @@ struct disk_d
 	
 	disk_type_t diskType;
 	
-	int id;
+	//int id;
+	uint8_t id;
 	
 	int used;
 	int magic;
@@ -66,6 +67,9 @@ struct disk_d
 	//Ponteiro para o nome do disco,
 	//talvez não precise ser um ponteiro, pode ser um array.
 	char *name;  
+	
+	uint8_t channel;
+	uint8_t dev_num;
     
 	struct disk_d *next;
 };

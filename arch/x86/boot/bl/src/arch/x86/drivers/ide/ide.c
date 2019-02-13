@@ -15,7 +15,8 @@
 //
 
 
-#include <kernel.h>
+#include <bootloader.h>
+
 
 
 #define PCI_PORT_ADDR 0xCF8
@@ -184,7 +185,7 @@ _u8 ata_assert_dever (_i8 nport){
     break;
     
     default:
-        kprintf ("Port %d, volue not used\n", nport );
+        printf ("Port %d, volue not used\n", nport );
         return -1;
      break;
     };
@@ -266,7 +267,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATA";	
@@ -290,7 +291,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATA";	
@@ -311,7 +312,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATAPI";
@@ -332,7 +333,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATAPI";
@@ -356,7 +357,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATAPI";
@@ -376,7 +377,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 		
         //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].id = (uint8_t) nport;
 		ide_ports[nport].used = (int) 1;
 		ide_ports[nport].magic = (int) 1234;
 		ide_ports[nport].name = "SATAPI";	
@@ -397,7 +398,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 		
         //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].id = (uint8_t) nport;
 		ide_ports[nport].used = (int) 1;
 		ide_ports[nport].magic = (int) 1234;
 		ide_ports[nport].name = "SATA";	
@@ -418,7 +419,7 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_no_drq();
 		
         //salvando o tipo em estrutura de porta.
-		ide_ports[nport].id = (int) nport;
+		ide_ports[nport].id = (uint8_t) nport;
 		ide_ports[nport].used = (int) 1;
 		ide_ports[nport].magic = (int) 1234;
 		ide_ports[nport].name = "PATA";	
@@ -531,7 +532,7 @@ void ide_mass_storage_initialize (){
     //	
 	
 	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc( sizeof( struct st_dev) );
+	ready_queue_dev = ( struct st_dev * ) malloc( sizeof( struct st_dev) );
 	
 	current_dev = ( struct st_dev * ) ready_queue_dev;
     current_dev->dev_id      = dev_next_pid++;
@@ -542,7 +543,7 @@ void ide_mass_storage_initialize (){
     current_dev->next        = NULL;
 
     // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
+	ata_identify_dev_buf = ( _u16 * ) malloc (4096);
 
 
 	//
@@ -571,7 +572,7 @@ int ide_dev_init (char port){
 
     st_dev_t *new_dev;	
 	
-    new_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
+    new_dev = ( struct st_dev * ) malloc ( sizeof( struct st_dev) );
     
 	if ( (void *) new_dev ==  NULL )
 	{
@@ -697,7 +698,7 @@ int ide_dev_init (char port){
 
 
 #ifdef KERNEL_VERBOSE
-    kprintf("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
+    printf("[ Detected Disk type: %s ]\n", dev_type[new_dev->dev_type] );
 	refresh_screen();
 #endif
 
@@ -1172,8 +1173,8 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     uint32_t data;
 
 //#ifdef KERNEL_VERBOSE	
-	kprintf("diskATAPCIConfigurationSpace:\n");
-    kprintf("Initializing PCI Mass Storage support..\n");
+	printf ("diskATAPCIConfigurationSpace:\n");
+    printf ("Initializing PCI Mass Storage support..\n");
 //#endif
 
     // Indentification Device
@@ -1184,8 +1185,8 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     ata_pci.device_id = data >> 16 &0xffff;
 	
 //#ifdef KERNEL_VERBOSE	
-	kprintf("\nDisk info:\n");
-    kprintf("[ Vendor ID: %X,Device ID: %X ]\n", ata_pci.vendor_id, 
+	printf("\nDisk info:\n");
+    printf("[ Vendor ID: %X,Device ID: %X ]\n", ata_pci.vendor_id, 
 	    ata_pci.device_id );
 //#endif	
 	
@@ -1258,7 +1259,7 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	    diskWritePCIConfigAddr( bus, dev, fun, 0x48, data | 0xf);
 
 //#ifdef KERNEL_VERBOSE 		
-        kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+        printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
             ata_sub_class_code_register_strings[ata.chip_control_type],
 	        ata_pci.prog_if,
 			ata_pci.revision_id );
@@ -1274,7 +1275,7 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
               ata.chip_control_type = ATA_RAID_CONTROLLER;
 			  
 //#ifdef KERNEL_VERBOSE              
-			  kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+			  printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
                   ata_sub_class_code_register_strings[ata.chip_control_type], 
 				  ata_pci.prog_if,
 				  ata_pci.revision_id );
@@ -1327,7 +1328,7 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
                     diskWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
 
 //#ifdef KERNEL_VERBOSE
-                    kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+                    printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
                         ata_sub_class_code_register_strings[ata.chip_control_type], 
 		                ata_pci.prog_if,
 			            ata_pci.revision_id );
@@ -1340,7 +1341,7 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
                      // PANIC! 
                      //
 					 
-					 kprintf("sm-disk-disk-diskATAPCIConfigurationSpace: PANIC DRIVER BLOCK!");
+					 printf("sm-disk-disk-diskATAPCIConfigurationSpace: PANIC DRIVER BLOCK!");
 		             die();
                  };
 
@@ -1396,17 +1397,17 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	
 	
 #ifdef KERNEL_VERBOSE	
-    kprintf("[ Command %x Status %x ]\n", ata_pci.command, 
+    printf("[ Command %x Status %x ]\n", ata_pci.command, 
 	    ata_pci.status );
 		
-    kprintf("[ Interrupt Line %x Interrupt Pin %x ]\n", ata_pci.interrupt_pin, 
+    printf("[ Interrupt Line %x Interrupt Pin %x ]\n", ata_pci.interrupt_pin, 
 	    ata_pci.interrupt_line );
 #endif		
 	
     data = diskReadPCIConfigAddr(bus,dev,fun,0x48);
 	
 #ifdef KERNEL_VERBOSE		
-    kprintf("[ Synchronous DMA Control Register %X ]\n", data );
+    printf("[ Synchronous DMA Control Register %X ]\n", data );
 #endif
 	
 done:
@@ -1460,7 +1461,7 @@ uint32_t diskPCIScanDevice ( int class ){
 					
                     // Message.
 //#ifdef KERNEL_VERBOSE							
-					kprintf( "[ Detected PCI device: %s ]\n", 
+					printf( "[ Detected PCI device: %s ]\n", 
 					         pci_classes[class] );
 //#endif
 							 
@@ -1479,7 +1480,7 @@ uint32_t diskPCIScanDevice ( int class ){
 	// Fail !
 	//
     
-	kprintf("[ PCI device NOT detected ]\n");		
+	printf("[ PCI device NOT detected ]\n");		
 	refresh_screen();
 	
     return (uint32_t) (-1);
@@ -1516,8 +1517,8 @@ int diskATAInitialize ( int ataflag ){
 	//
 	
 #ifdef KERNEL_VERBOSE
-    kprintf("sm-disk-disk-diskATAInitialize:\n");
-    kprintf("Initializing IDE/AHCI support ...\n");
+    printf ("sm-disk-disk-diskATAInitialize:\n");
+    printf ("Initializing IDE/AHCI support ...\n");
 	//refresh_screen();
 #endif
 
@@ -1531,7 +1532,7 @@ int diskATAInitialize ( int ataflag ){
 	// Error.	
 	if( data == -1 )
 	{
-		kprintf("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", (_u32) data );
+		printf("sm-disk-disk-diskATAInitialize: pci_scan_device fail. ret={%d} \n", (_u32) data );
 		
 	    // Abortar.
 		Status = (int) (PCI_MSG_ERROR);
@@ -1551,13 +1552,13 @@ int diskATAInitialize ( int ataflag ){
 	// Error.	
     if( data == PCI_MSG_ERROR )
 	{
-        kprintf("sm-disk-disk-diskATAInitialize: Error Driver [%X]\n",data);
+        printf("sm-disk-disk-diskATAInitialize: Error Driver [%X]\n",data);
 		Status = (int) 1;
 		goto fail;  
 	
 	}else if( data == PCI_MSG_AVALIABLE )
 	      {
-              kprintf("sm-disk-disk-diskATAInitialize: RAID Controller Not supported.\n");
+              printf("sm-disk-disk-diskATAInitialize: RAID Controller Not supported.\n");
 		      Status = (int) 1;
 		      goto fail;  
           };
@@ -1634,7 +1635,15 @@ int diskATAInitialize ( int ataflag ){
     //	
 	
 	// Iniciando a lista.
-	ready_queue_dev = ( struct st_dev * ) kmalloc ( sizeof( struct st_dev) );
+	ready_queue_dev = ( struct st_dev * ) malloc ( sizeof( struct st_dev) );
+		
+		
+	if ( (void *) ready_queue_dev == NULL )
+	{
+	    printf ("diskATAInitialize: ready_queue_dev struct fail");
+		die();
+	}
+		
 	
 	//#todo:
 	//Checar a validade da estrutura.
@@ -1650,7 +1659,13 @@ int diskATAInitialize ( int ataflag ){
     current_dev->next = NULL;
 
     // ??
-	ata_identify_dev_buf = ( _u16 * ) kmalloc (4096);
+	ata_identify_dev_buf = ( _u16 * ) malloc (4096);
+		
+	if ( (void *) ata_identify_dev_buf == NULL )
+	{
+	    printf ("diskATAInitialize: ata_identify_dev_buf fail");
+		die();
+	}		
 
 
 	//
@@ -1660,7 +1675,7 @@ int diskATAInitialize ( int ataflag ){
     // As primeiras quatro portas do controlador IDE.    
 	for ( port=0; port < 4; port++ )
 	{
-        ide_dev_init(port);
+        ide_dev_init (port);
 	};		
 		
 		
@@ -1695,9 +1710,9 @@ int diskATAInitialize ( int ataflag ){
 			   // Panic !!
 			   //
                
-			   kprintf(" # Panic! # \n");
-			   kprintf("sm-disk-disk-diskATAInitialize:\n");
-		       kprintf("IDE and AHCI not found\n");
+			   printf(" # Panic! # \n");
+			   printf("sm-disk-disk-diskATAInitialize:\n");
+		       printf("IDE and AHCI not found\n");
 			   die();
           };
 	
@@ -1710,7 +1725,7 @@ int diskATAInitialize ( int ataflag ){
 	
 // fail
 fail:
-    kprintf("sm-disk-disk-diskATAInitialize: fail\n");    	
+    printf("sm-disk-disk-diskATAInitialize: fail\n");    	
 done:
 
 //#ifdef KERNEL_VERBOSE 

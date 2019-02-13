@@ -256,9 +256,13 @@ int ide_identify_device ( uint8_t nport ){
 
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+		
+		ide_ports[nport].channel = ata.channel;
+		ide_ports[nport].dev_num = ata.dev_num;		
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATA";	
@@ -268,6 +272,8 @@ int ide_identify_device ( uint8_t nport ){
 		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
 		if ((void *) disk != NULL )
 		{
+			disk->channel = ata.channel;
+			disk->dev_num = ata.dev_num;
 			disk->id = nport;  
 			disk->used = 1;
 			disk->magic = 1234;
@@ -292,9 +298,12 @@ int ide_identify_device ( uint8_t nport ){
         ata_pio_read ( ata_identify_dev_buf, 512 );
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+		ide_ports[nport].channel = ata.channel;
+		ide_ports[nport].dev_num = ata.dev_num;			
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATA";	
@@ -303,6 +312,10 @@ int ide_identify_device ( uint8_t nport ){
 		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
 		if ((void *) disk != NULL )
 		{
+			
+			disk->channel = ata.channel;
+			disk->dev_num = ata.dev_num;
+			
 			disk->id = nport;  
 			disk->used = 1;
 			disk->magic = 1234;
@@ -325,8 +338,11 @@ int ide_identify_device ( uint8_t nport ){
         ata_wait_not_busy();
         ata_wait_no_drq();
 
+		ide_ports[nport].channel = ata.channel;
+		ide_ports[nport].dev_num = ata.dev_num;			
+		
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "PATAPI";
@@ -336,6 +352,9 @@ int ide_identify_device ( uint8_t nport ){
 		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
 		if ((void *) disk != NULL )
 		{
+			disk->channel = ata.channel;
+			disk->dev_num = ata.dev_num;
+			
 			disk->id = nport;  
 			disk->used = 1;
 			disk->magic = 1234;
@@ -357,9 +376,13 @@ int ide_identify_device ( uint8_t nport ){
         ata_pio_read(ata_identify_dev_buf,512);
         ata_wait_not_busy();
         ata_wait_no_drq();
+		
+		
+		ide_ports[nport].channel = ata.channel;
+		ide_ports[nport].dev_num = ata.dev_num;			
 
         //salvando o tipo em estrutura de porta.
-        ide_ports[nport].id = (int) nport;
+        ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].used = (int) 1;
         ide_ports[nport].magic = (int) 1234;
         ide_ports[nport].name = "SATAPI";
@@ -368,6 +391,10 @@ int ide_identify_device ( uint8_t nport ){
 		disk = (struct disk_d *) malloc (  sizeof(struct disk_d) );
 		if ((void *) disk != NULL )
 		{
+			
+			disk->channel = ata.channel;
+			disk->dev_num = ata.dev_num;
+			
 			disk->id = nport;  
 			disk->used = 1;
 			disk->magic = 1234;
@@ -1651,8 +1678,11 @@ void show_ide_info (){
 	
 	for ( i=0; i<4; i++ )
 	{
+				
 		//printf ("\n\n");
 		
+		printf ("channel=%d dev_num=%d \n", ide_ports[i].channel, ide_ports[i].dev_num);
+					
 		printf ("id=%d\n", ide_ports[i].id );
 		
 		printf ("used=%d\n", ide_ports[i].used );
@@ -1664,6 +1694,13 @@ void show_ide_info (){
 		
 		printf ("base_port=%x\n", ide_ports[i].base_port );
 	}	
+	
+	
+	
+	//primary secondary  ... master slave
+	//printf ( " channel=%d dev=%d \n", ata.channel, ata.dev_num );
+	
+     
 	
 	/*
 	// Estrutura 'ata'

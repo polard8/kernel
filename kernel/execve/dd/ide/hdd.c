@@ -305,17 +305,17 @@ my_read_hd_sector ( unsigned long ax,
 					unsigned long dx )
 {
 
+	//=========================================== ATENÇAO ==============================
 	// #IMPORTANTE:
-	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
-	// do IDE num momento específico da inicialização do sistema.
-
+    //#todo
+	//s'o falta conseguirmos as variaveis que indicam o canal e se 'e master ou slave.
 
 	// (buffer, lba, rw flag, port number, master )
 	pio_rw_sector ( (unsigned long) ax, 
 					(unsigned long) bx, 
 					(int) 0x20, 
-					(int) 0, 
-					(int) 1 );
+					(int) 0,    //channel
+					(int) 1 );  //master=1 slave=0
 
 	/*
 	 // #antigo.
@@ -352,16 +352,17 @@ my_write_hd_sector ( unsigned long ax,
 					 unsigned long dx )
 {
 
+	//=========================================== ATENÇAO ==============================
 	// #IMPORTANTE:
-	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
-	// do IDE num momento específico da inicialização do sistema.
+    //#todo
+	//s'o falta conseguirmos as variaveis que indicam o canal e se 'e master ou slave.
 	
 	// (buffer, lba, rw flag, port number, master )
 	pio_rw_sector ( (unsigned long) ax, 
 					(unsigned long) bx, 
 					(int) 0x30, 
-					(int) 0, 
-					(int) 1 );
+					(int) 0,     //channel
+					(int) 1 );   //master=1 slave=0
 
 /*
 	//antigo.

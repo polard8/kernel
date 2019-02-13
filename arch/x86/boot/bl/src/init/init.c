@@ -182,7 +182,9 @@ int init (){
 	//@todo:
 	//Pega o valor herdado do Boot Manager.
 	//LegacyCR3 = (unsigned long) GetCR3();	
+
 	
+
 	//
 	// Continua ...
 	//
@@ -200,7 +202,10 @@ int init (){
 	// #debug
 	// printf("#DEBUG");
 	// refresh_screen();
-	// while(1){}		
+	// while(1){}	
+	
+	
+
 	
     g_initialized = (int) 1;    
     

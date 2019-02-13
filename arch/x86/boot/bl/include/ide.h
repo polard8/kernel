@@ -54,7 +54,8 @@ typedef enum {
 struct ide_ports_d 
 {
     //int id;
-    uint8_t id;
+
+	uint8_t id;
 	
     int used;
     int magic;
@@ -65,10 +66,6 @@ struct ide_ports_d
 	char *name;
 	
     unsigned short base_port;
-	
-	
-	uint8_t channel;
-	uint8_t dev_num;
 
     //...
 
@@ -199,9 +196,17 @@ void write_lba( unsigned long address, unsigned long lba);    //ide.
 void read_lba( unsigned long address, unsigned long lba);     //ide.
 
 
-//int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port ) ; 
 
-int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port, int master ) ; 
+
+int 
+pio_rw_sector ( unsigned long buffer, 
+                unsigned long lba, 
+				int rw, 
+				int port,
+                int master ); 
+
+
+
 
 void my_read_hd_sector( unsigned long ax, 
                         unsigned long bx, 

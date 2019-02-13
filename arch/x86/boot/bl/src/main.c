@@ -95,8 +95,7 @@ void BlMain (){
 	
 	//#test
 	
-	 
-	/*
+	 /*
 	void *tmp;
 	
 	tmp  = (void *) malloc (4096);
@@ -112,7 +111,13 @@ void BlMain (){
 	//#debug breakpoint
 	refresh_screen();
 	while(1){}
- */
+	*/
+	
+	//#importante
+	//Para inicializar o IDE precisa inicializar antes a alocaçao dinamica.
+	
+	init_hdd ();	
+	
 	
 	//
 	//@todo: Limpar a tela.

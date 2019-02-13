@@ -1,6 +1,6 @@
 
 #
-# Compiling Gramado 0.11 Boot Loader 
+# Compiling Gramado 0.13 Boot Loader 
 # BSD License 
 #
 # 2018 - Created by Fred Nora.
@@ -49,6 +49,7 @@ string.o \
 keyboard.o \
 pci.o \
 hdd.o \
+ide.o \
 timer.o \
 pages.o \
 heap.o \
@@ -104,8 +105,7 @@ bl-x86:
     #echo -{ Arch
 	gcc -c src/arch/x86/x86.c               -I include/ $(CFLAGS)  -o x86.o
 	gcc -c src/arch/x86/ports.c             -I include/ $(CFLAGS)  -o ports.o 
-	gcc -c src/arch/x86/drivers/pci.c       -I include/ $(CFLAGS)  -o pci.o	
-	gcc -c src/arch/x86/drivers/hdd.c       -I include/ $(CFLAGS)  -o hdd.o	
+	gcc -c src/arch/x86/drivers/pci.c       -I include/ $(CFLAGS)  -o pci.o		
 	gcc -c src/arch/x86/drivers/keyboard.c  -I include/ $(CFLAGS)  -o keyboard.o
 	gcc -c src/arch/x86/drivers/timer.c     -I include/ $(CFLAGS)  -o timer.o	
 	
@@ -116,6 +116,19 @@ bl-x86:
     #rem echo -{ ...
     #echo -{ Shell
 	gcc -c src/shell/shell.c -I include/ $(CFLAGS) -o shell.o
+	
+	
+	#
+	# #test
+	# tentando dar suporte ai controlador IDE.
+	# 
+
+	gcc -c src/arch/x86/drivers/ide/hdd.c  -I include/ $(CFLAGS)  -o hdd.o				
+	gcc -c src/arch/x86/drivers/ide/ide.c  -I include/ $(CFLAGS)  -o ide.o				
+
+	
+	#backup
+	#gcc -c src/arch/x86/drivers/hdd.c       -I include/ $(CFLAGS)  -o hdd.o		
 	
 	
 link-x86:

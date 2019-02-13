@@ -43,8 +43,7 @@
  */ 
  
  
-#include <kernel.h>
-
+#include <bootloader.h>
 
 /*
  * Externs.
@@ -135,7 +134,7 @@ int hdd_ata_wait_no_drq (int p){
 
 /*
  ******************************************************************
- * rw_sector
+ * pio_rw_sector
  * 
  * IN:
  *   buffer - Buffer address
@@ -146,12 +145,13 @@ int hdd_ata_wait_no_drq (int p){
  *   //outportb ( int port, int data )
  *   (IDE PIO)	
  */
- 
+
 int 
 pio_rw_sector ( unsigned long buffer, 
                 unsigned long lba, 
 				int rw, 
-				int port )
+				int port,
+                int master )
 {
 
     unsigned long tmplba = (unsigned long) lba;
@@ -161,10 +161,36 @@ pio_rw_sector ( unsigned long buffer,
 		return -1;
 	
 	
+	//Selecionar se é master ou slave.
+	//outb (0x1F6, slavebit<<4)
+	//0 - 3		In CHS addressing, bits 0 to 3 of the head. 
+	//          In LBA addressing, bits 24 to 27 of the block number
+	//4	DRV	Selects the drive number.
+	//5	1	Always set.
+	//6	LBA	Uses CHS addressing if clear or LBA addressing if set.
+	//7	1	Always set.
+	
 	//0x01F6 ; Port to send drive and bit 24 - 27 of LBA
 	tmplba = tmplba >> 24;	
-	tmplba = tmplba | 0x000000E0; //1110 0000b;
+	
+	// no bit 4.
+	// 0 = master 
+	// 1 = slave
+	
+	//master. bit 4 = 0
+	if (master == 1)
+	{
+		tmplba = tmplba | 0x000000E0;    //1110 0000b;
+	}
+	
+	//slave. bit 4 = 1
+	if (master == 0)
+	{
+		tmplba = tmplba | 0x000000F0;    //1111 0000b;
+	};
+	
 	outportb ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
+	
 	
 	//0x01F2 ; Port to send number of sectors
 	outportb ( (int) ide_ports[port].base_port + 2 , (int) 1 );
@@ -172,21 +198,21 @@ pio_rw_sector ( unsigned long buffer,
 	
 	//0x1F3  ; Port to send bit 0 - 7 of LBA
 	tmplba = lba;
-    tmplba = tmplba & 0x000000FF;	
+	tmplba = tmplba & 0x000000FF;	
 	outportb ( (int) ide_ports[port].base_port + 3 , (int) tmplba );
 	
 	
 	//0x1F4  ; Port to send bit 8 - 15 of LBA
 	tmplba = lba;
-	tmplba = tmplba >> 8;	
-    tmplba = tmplba & 0x000000FF;	
+	tmplba = tmplba >> 8;
+	tmplba = tmplba & 0x000000FF;
 	outportb ( (int) ide_ports[port].base_port + 4 , (int) tmplba );
 	
 
 	//0x1F5  ; Port to send bit 16 - 23 of LBA
 	tmplba = lba;
-	tmplba = tmplba >> 16;	
-    tmplba = tmplba & 0x000000FF;	
+	tmplba = tmplba >> 16;
+	tmplba = tmplba & 0x000000FF;
 	outportb ( (int) ide_ports[port].base_port + 5 , (int) tmplba );
 	
 	
@@ -196,11 +222,18 @@ pio_rw_sector ( unsigned long buffer,
 	outportb ( (int) ide_ports[port].base_port + 7 , (int) rw );
 	
 	
+	//PIO or DMA ??
+	//If the command is going to use DMA, set the Features Register to 1, otherwise 0 for PIO.
+	//outb (0x1F1, isDMA)
+	
+	
 	//
-	//
+	// #timeout sim, não podemos esperar para sempre.
 	//
 	
 	unsigned char c; 
+	
+	unsigned long timeout = 4444*512;
 	
 again:
 	
@@ -210,18 +243,24 @@ again:
 	
 	if ( c == 0 )
 	{
+		timeout--;
+		if ( timeout == 0 )
+		{
+			printf("rw sector timeout fail;\n");
+			return -3;
+		}
+	   //#bugbug: isso pode enrroscar aqui.	
 	   goto again;	
 	}
-    
 	
 	
 	switch (rw)
-    {
+	{
 		//read
-	    case 0x20:
+		case 0x20:
 		    hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
 		    break;
-        
+
 		//write
 		case 0x30:
 		    hdd_ata_pio_write ( (int) port, (void *) buffer, (int) 512 );
@@ -243,11 +282,10 @@ again:
 			die();
 			break; 		
 	};
-	
-	
+		
     return (int) 0;	
-} ;
- 
+}
+
 
 /*
  *****************************************
@@ -265,15 +303,19 @@ void my_read_hd_sector ( unsigned long ax,
 						 unsigned long dx )
 {
 	
+	
+	//=========================================== ATENÇAO ==============================
 	// #IMPORTANTE:
-	//
-	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
-	// do IDE num momento específico da inicialização do sistema.
+    //#todo
+	//s'o falta conseguirmos as variaveis que indicam o canal e se 'e master ou slave.	
 	
  
-	// read test (buffer, lba, rw flag, port number )
-     pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );		
- 
+    // (buffer, lba, rw flag, port number, master )
+	pio_rw_sector ( (unsigned long) ax, 
+					(unsigned long) bx, 
+					(int) 0x20, 
+					(int) 0,       //port ?
+                    (int) 1 );	   //master=1 slave=0
 	
 	/*
 	 //antigo.
@@ -308,10 +350,10 @@ void my_write_hd_sector ( unsigned long ax,
 						  unsigned long dx )
 {
 	
+	//=========================================== ATENÇAO ==============================
 	// #IMPORTANTE:
-	//
-	// Ok, isso funcionou, mas teve que chamar a rotina de inicialização
-	// do IDE num momento específico da inicialização do sistema.
+    //#todo
+	//s'o falta conseguirmos as variaveis que indicam o canal e se 'e master ou slave.
 	
 	
 	//#bugbug:
@@ -319,7 +361,15 @@ void my_write_hd_sector ( unsigned long ax,
 	//apresentou problemas. Estamos testando ...
  
 	// read test (buffer, lba, rw flag, port number )
-    pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );		
+   // pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );		
+	
+    pio_rw_sector ( (unsigned long) ax, 
+					(unsigned long) bx, 
+					(int) 0x30, 
+					(int) 0, 
+					(int) 1 );
+	
+	
 	
 /*
 	//antigo.
@@ -351,6 +401,8 @@ int init_hdd (){
     // @todo: We need to do something here.
     //	
 
+	diskATADialog ( 1, FORCEPIO, FORCEPIO );
+	
 //done:
 
     g_driver_hdd_initialized = (int) 1;

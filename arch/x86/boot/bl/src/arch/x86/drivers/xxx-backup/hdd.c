@@ -1,3 +1,6 @@
+// #funciona
+// sem o suporte ao controlador ide feito pelo nelson.
+
 /*
  * File: hdd.c 
  *
