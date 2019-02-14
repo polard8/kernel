@@ -110,10 +110,11 @@ unsigned long serviceCreateWindow ( char * message_buffer );
  *
  * 
  */
-void *services( unsigned long number, 
-                unsigned long arg2, 
-				unsigned long arg3, 
-				unsigned long arg4 )
+
+void *services ( unsigned long number, 
+                 unsigned long arg2, 
+                 unsigned long arg3, 
+                 unsigned long arg4 )
 {
 	//
 	// Declarações.
@@ -188,11 +189,10 @@ void *services( unsigned long number,
 	//Window.
 	hWnd = (void*) arg2;
 
-	//
-	// @todo: 
-	//     Antes de utililizar as dimensões da área de trabalho
-	//     vamos atribuir valores negligenciados para as dimensões.
-	//
+
+	// #todo: 
+	// Antes de utililizar as dimensões da área de trabalho
+	// vamos atribuir valores negligenciados para as dimensões.
 	
 	//Inicializando dimensões.
 	//Obs: Emulando telas de celulares.
@@ -222,9 +222,6 @@ void *services( unsigned long number,
 	int desktopID;
 	
 	
-	
-	
-
 	// *Importante: 
 	// Checando se o esquema de cores está funcionando.
 	
@@ -256,7 +253,8 @@ void *services( unsigned long number,
 	
 	if (gui->main == NULL)
 	{
-		printf("services: main");
+		//#debug
+		printf ("services: main");
 		die();
 	};		
 	
@@ -282,41 +280,10 @@ void *services( unsigned long number,
 	    return (void *) serviceCreateWindow ( (char *)  arg2 );
 	}
 	
-	/*
-	if ( number == SYS_118 )
-	{		
-		//Aciona a flag.
-	    //Se a flag tiver acionada, os argumentos usarão os valores 
-	    //que foram configurados aqui.
-		cwFlag  = 1234;
-        
-		cwArg1 = message_address[0];     //Type. 		
-        cwArg2 = message_address[1];     //WindowStatus 
-        cwArg3 = message_address[2];     //view
-		
-		cwArg4 = (char *) message_address[3];    //a4 Window name.
-		
-		cwArg5 = message_address[4]; //x
-		cwArg6 = message_address[5]; //y
-		cwArg7 = message_address[6]; //width
-		cwArg8 = message_address[7]; //height
-		
-		//parent window.
-		//message_address[8];
-		//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
-		cwArg9 = (struct window_d *) message_address[8];  //parent
-		
-		//onde?
-		//message_address[9];
-		//cwArg10 = arg4;  //desktop ID 		
-		
-		cwArg11 = message_address[10];    //cor da area de cliente.
-		cwArg12 = message_address[11];    //cor da janela.
-		
-		goto do_create_window;		
-	};
-	*/
-
+	//
+	// ## Switch ##
+	//
+	
 	//Number.
 	switch (number)
 	{
@@ -438,15 +405,10 @@ void *services( unsigned long number,
 				(unsigned long) a4, COLOR_WHITE );    		
 			break;
 
-		//10 Create window.
-		// O argumento mais importante é o tipo.
-		//Função principal na criação de janelas via systemcall
+		// 10 Create window.
+        // # suspensa.
         case SYS_BUFFER_CREATEWINDOW: 
-			//printf("SYS_BUFFER_CREATEWINDOW old style\n");
-			//cwArg1 = arg2;               //arg2 Type. 
-            //cwArg3 = arg3;               //arg3 view
-			//cwArg4 = (char *) a4;        //arg4 Window name.
-			//goto do_create_window;
+			//return (void *) serviceCreateWindow ( (char *)  arg2 );
             return NULL;
 			break;
 			
@@ -1820,85 +1782,36 @@ done:
     //printf("Done\n",number);
 	//refresh_screen();
     return NULL;	
-};
+}
 
-
-/*
- ** Essa é outra forma de implementar o handler de system call 
- ** Podemos usar em outra interrupção usda pela api.
- ** Credits: Nelson Cole.
-
-#define SYSCALL_NUM 5
-
-unsigned int num;
-
-
-static void *syscall_table[] = {
-	 write_clear,		// eax, 0   Limpar tela
-	&write_char, 		// eax, 1   imprime um caracter na tela
-	&write_string, 		// eax, 2   imprime uma string na tela
-	&write_int,  		// eax, 3   imprime valor inteiro decimal na tela
-	&write_hexa		// eax, 4   imprime volor inteiro hexadecimal na tela
-};
-
-void syscall_handler()
-{
-	__asm__ __volatile__("              \
-	                      push %%eax;   \
-	                      add $4, %%esp;\
-	                      ":"=r"(num): );
-						  
-    if(num <= SYSCALL_NUM)
-	{
-        void *addr = syscall_table[num];
-
-	    __asm__ __volatile__ ("               \
-	                           push %%ebx;    \
-	                           push %%ecx;    \
-	                           push %%edx;    \
-	                           call *%0;      \
-	                           add $12, %%esp \
-	                           "::"r"(addr));
-	}else{
-	    
-		//set_color(4);
-	    //printk("Invalid syscall: eax,%d INT 80\n",num);
-	    //set_color(0xF);
-    };
-
-	return;
-};
- */
 
 unsigned long serviceCreateWindow ( char *message_buffer ){
 	
 	unsigned long *message_address = (unsigned long *) message_buffer;
 	
-    struct window_d *NewWindow;  //Ponteiro para a janela criada pelo serviço.
-	
-	
-		cwArg1 = message_address[0];     //Type. 		
-        cwArg2 = message_address[1];     //WindowStatus 
-        cwArg3 = message_address[2];     //view
+	//Ponteiro para a janela criada pelo serviço.
+    struct window_d *NewWindow;  
 		
-		cwArg4 = (char *) message_address[3];    //a4 Window name.
+	cwArg1 = message_address[0];             // Type. 		
+	cwArg2 = message_address[1];             // WindowStatus 
+	cwArg3 = message_address[2];             // view
+	cwArg4 = (char *) message_address[3];    // a4 Window name.
+	cwArg5 = message_address[4];             // x
+	cwArg6 = message_address[5];             // y
+	cwArg7 = message_address[6];             // width
+	cwArg8 = message_address[7];             // height
 		
-		cwArg5 = message_address[4]; //x
-		cwArg6 = message_address[5]; //y
-		cwArg7 = message_address[6]; //width
-		cwArg8 = message_address[7]; //height
+	//parent window.
+	//message_address[8];
+	//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
+	cwArg9 = (struct window_d *) message_address[8];  //parent
 		
-		//parent window.
-		//message_address[8];
-		//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window. 		
-		cwArg9 = (struct window_d *) message_address[8];  //parent
+	//onde?
+	//message_address[9];
+	//cwArg10 = arg4;  //desktop ID 		
 		
-		//onde?
-		//message_address[9];
-		//cwArg10 = arg4;  //desktop ID 		
-		
-		cwArg11 = message_address[10];    //cor da area de cliente.
-		cwArg12 = message_address[11];    //cor da janela.	
+	cwArg11 = message_address[10];    //cor da area de cliente.
+	cwArg12 = message_address[11];    //cor da janela.	
 	
 	   //==========
 	
@@ -1912,37 +1825,36 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 	unsigned long WindowX = (2*(800/20));  //100;   >          
 	unsigned long WindowWidth  = 320;               
 	
-    unsigned long WindowY = (2*(600/20)); //100;   V                
-    unsigned long WindowHeight = 480;  
+	unsigned long WindowY = (2*(600/20)); //100;   V                
+	unsigned long WindowHeight = 480;  
 	
 	unsigned long WindowClientAreaColor = COLOR_WINDOW;  
 	unsigned long WindowColor = COLOR_WINDOW;  
 	
 	
-    //#todo: Checar a validade da esturtura,
+	//#todo: Checar a validade da esturtura,
 	//WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
 	//WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
 	
-        WindowType = cwArg1; 
-		WindowStatus = cwArg2; 
-		WindowView = cwArg3; 
-		WindowName = (char *) cwArg4; 
-	    
-		WindowX = cwArg5; 
-		WindowY = cwArg6; 
-		
-		WindowWidth = cwArg7; 
-        WindowHeight = cwArg8;									  
-		
-		//#todo
-		//gui->screen  = cwArg9; 
-		//desktopID = cwArg10; 
-		
-		WindowClientAreaColor = (unsigned long) cwArg11;  //Obs: A cor da área de cliente será escolhida pelo app.   
-		WindowColor = (unsigned long) cwArg12;     
-	
-	
-	
+	WindowType = cwArg1; 
+	WindowStatus = cwArg2; 
+	WindowView = cwArg3; 
+	WindowName = (char *) cwArg4; 
+
+	WindowX = cwArg5; 
+	WindowY = cwArg6; 
+
+	WindowWidth = cwArg7; 
+	WindowHeight = cwArg8;
+
+	//#todo
+	//gui->screen  = cwArg9; 
+	//desktopID = cwArg10; 
+
+	WindowClientAreaColor = (unsigned long) cwArg11;  //Obs: A cor da área de cliente será escolhida pelo app.   
+	WindowColor = (unsigned long) cwArg12;     
+
+
 	struct thread_d *t;
 	int desktopID;
 	
@@ -2008,10 +1920,8 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 		
 		return (unsigned long) NewWindow;
 	    //return (void *) NewWindow; 
-	};
-	
-	
-};
+	};	
+}
 
 
 // Coloca um char usando o 'terminal mode' de stdio.
@@ -2027,17 +1937,15 @@ void servicesPutChar ( int c ){
 	if ( cWidth == 0 || cHeight == 0 )
 	{
 		//#debug
-		printf("servicesPutChar: fail w h ");
+		printf ("servicesPutChar: fail w h ");
 		die();
 	}
 	
     stdio_terminalmode_flag = 1;  
 	
 	putchar ( (int) c );
-	refresh_rectangle ( g_cursor_x * cWidth, 
-	                    g_cursor_y * cHeight, 
-						cWidth, 
-						cHeight );
+	refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, 
+		cWidth, cHeight );
 	
 	stdio_terminalmode_flag = 0;  
 }
@@ -2050,10 +1958,10 @@ void servicesPutChar ( int c ){
  *     @todo: Passar argumento via registrador. ??
  *     @todo: Outra função já esta fazendo isso, deletar essa.
  */
-void servicesChangeProcedure (){
-	
+
+void servicesChangeProcedure (){	
 	//return;
-};
+}
 
 
 //

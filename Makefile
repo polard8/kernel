@@ -102,6 +102,8 @@ ts.o \
 queue.o \
 sched.o \
 schedi.o \
+preempt.o \
+priority.o \
 dispatch.o \
 sem.o \
 modules.o \
@@ -213,9 +215,13 @@ compile-kernel:
 	gcc -c  kernel/mk/pc/ipc/sem.c      -I include/  $(CFLAGS) $(DEFINES) -o sem.o
 
 	# mk/pc/sched
-	gcc -c  kernel/mk/pc/sched/sched.c   -I include/ $(CFLAGS) $(DEFINES) -o sched.o
-	gcc -c  kernel/mk/pc/sched/schedi.c  -I include/ $(CFLAGS) $(DEFINES) -o schedi.o
-
+	gcc -c  kernel/mk/pc/sched/sched.c     -I include/ $(CFLAGS) $(DEFINES) -o sched.o
+	gcc -c  kernel/mk/pc/sched/schedi.c    -I include/ $(CFLAGS) $(DEFINES) -o schedi.o
+	gcc -c  kernel/mk/pc/sched/preempt.c   -I include/ $(CFLAGS) $(DEFINES) -o preempt.o	
+	gcc -c  kernel/mk/pc/sched/priority.c  -I include/ $(CFLAGS) $(DEFINES) -o priority.o
+	
+	
+	
 	# /mk/pc/mm (memory manager)
 	gcc -c  kernel/mk/pc/mm/memory.c  -I include/ $(CFLAGS) $(DEFINES) -o memory.o
 	gcc -c  kernel/mk/pc/mm/pages.c   -I include/ $(CFLAGS) $(DEFINES) -o pages.o

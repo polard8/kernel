@@ -25,22 +25,22 @@ extern void turn_task_switch_on();
 
 /*
  * KeStartShell:
- *     Executa o programa SHELL.BIN.
- */
+ *     Executa o programa SHELL.BIN. */
+
 void KeStartShell (){
 	
-    panic("KeStartShell:");    //Cancelada! 	
-};
+    panic ("KeStartShell:");    //Cancelada! 	
+}
 
 
 /*
  * KeStartTaskManager:
- *     Executa o programa TASKMAN.BIN.
- */
+ *     Executa o programa TASKMAN.BIN. */
+
 void KeStartTaskManager (){
 	
-    panic("KeStartTaskManager:");    //Cancelada! 	
-};
+    panic ("KeStartTaskManager:");    //Cancelada! 	
+}
 
 
 /*
@@ -53,19 +53,15 @@ void KeStartTaskManager (){
  *     Poderia ser um kernel request?!
  *     #esse nome precisa ser resolvido ... não usaremos o termo task.
  */
+
 void start_task ( unsigned long id, unsigned long *task_address ){     	
 	
-	//@todo: filtrar argumentos.
-	
-	/*
-	 * start_new_task_status:
-	 *     É uma FLAG. Indica que existe uma thread querendo ser executada 
-	 * pela primeira vez.
-	 *
-	 * @todo: 
-	 *     Isso poderia estar na estrutura 'ProcessorBlock' ?!
-	 *
-	 */
+	// #todo: filtrar argumentos.
+	//  start_new_task_status:
+	//      É uma FLAG. Indica que existe uma thread querendo ser executada 
+	//  pela primeira vez.
+	// #todo: 
+	//  Isso poderia estar na estrutura 'ProcessorBlock' ?!
 	 
 	start_new_task_status = 1; 
     
@@ -73,26 +69,26 @@ void start_task ( unsigned long id, unsigned long *task_address ){
 	start_new_task_id = (int) id; 
     start_new_task_address = (unsigned long) task_address;
 
-    //Só isso ??!!	
-};
+    // mais ??!!	
+}
 
 
 /*
- * reload_current_task:
- */
+ * reload_current_task: */
+
 void reload_current_task (){
 	
-    //return;    //Cancelada!
-};
+    //Cancelada!
+}
 
 
 /*
- * switch_to_user_mode:     
- */
+ * switch_to_user_mode:  */
+
 void switch_to_user_mode (){
 	
-    panic("switch_to_user_mode:");    //Cancelada!	
-}; 
+    panic ("switch_to_user_mode:");    //Cancelada!	
+}
 
 
 /*
@@ -102,18 +98,19 @@ void switch_to_user_mode (){
  *     @todo: Mudar o nome. startExecuteThread(...)
  *          
  */
+
 //unsigned long startExecuteThread(int tid, unsigned long *thread_address)
 
-unsigned long executa_tarefa( int id, 
-                              unsigned long *task_address )
+unsigned long 
+executa_tarefa ( int id, 
+                 unsigned long *task_address )
 {
     struct thread_d *t;
 	
-    //
-	// OBS: A thread a ser executada, precisa ser a current.   
-    //
+	// OBS: 
+	// A thread a ser executada, precisa ser a current.   
 	
-	if( current_thread != id )
+	if ( current_thread != id )
 	{
         printf ("executa_tarefa: current_thread = %d | new task = %d ",
 		    current_thread, id );
@@ -187,23 +184,22 @@ unsigned long executa_tarefa( int id,
 	//Nothing.		
 
     panic ("x86start-executa_tarefa: *");
-};
+}
 
 
 void KiSwitchToUserMode (){
 	
-    //
-	//@todo: Fazer rotina de interface.
-	//
+	// #todo: 
+	// Fazer rotina de interface.
 	
-	switch_to_user_mode();
-};
+	switch_to_user_mode ();
+}
 
 
-unsigned long KiExecutaTarefa(int id, unsigned long *task_address){
+unsigned long KiExecutaTarefa ( int id, unsigned long *task_address ){
 	
     return 0;  //Cancelada.
-};
+}
 
 
 int KiInitTask (int id){
@@ -225,7 +221,7 @@ int KiInitTask (int id){
 void KiInitTasks (){
 	
     init_tasks ();
-};
+}
 
 
 //

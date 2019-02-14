@@ -34,7 +34,7 @@ extern void set_page_dir();
 static inline void ckSetCr3 ( unsigned long value ){
 
     __asm__ ( "mov %0, %%cr3" : : "r" (value) );
-};
+}
 
 
 /*
@@ -96,6 +96,7 @@ unsigned long contextEBP;
 
 
 /*
+ **************************************
  * save_current_context:    
  *    Salvando o contexto da thread interrompida pelo timer IRQ0.
  *    O contexto da tarefa interrompida foi salvo em variáveis pela 
@@ -106,7 +107,6 @@ unsigned long contextEBP;
  *     Estão faltando variáveis nesse contexto, como registradores de 
  * debug e float point por exemplo.
  *     Mudar nome para contextSaveCurrent();.
- *
  */
  
 void save_current_context (){
@@ -190,6 +190,7 @@ void save_current_context (){
 
 
 /*
+ ****************************************************
  * restore_current_context: 
  *     Carregando o contexto da próxima thread a ser executada.
  *     Pegando os valores na estrutura e colocando nas variáveis 
@@ -198,8 +199,8 @@ void save_current_context (){
  *
  * @todo:   
  *     Mudar nome para contextRestoreCurrent();.
- *
  */
+
 void restore_current_context (){
 	
 	int Status;
@@ -270,7 +271,6 @@ void restore_current_context (){
 		// É nessa hora em que colocamos o endereço FÍSICO do 
 		// diretório de páginas usado pela thread no registrador CR3.
 		
-		
 		ckSetCr3 ( (unsigned long) t->DirectoryPA );
 
 		
@@ -289,8 +289,6 @@ void restore_current_context (){
 	    // asm ("nop");
         asm ("movl %eax, %cr3");		
 	};
-	
-	
 
 	//
 	//flag ??...
@@ -298,61 +296,36 @@ void restore_current_context (){
 };
 
 
-
 /*
-int check_thread_ring3_context(int task_id);
-int check_thread_ring3_context(int task_id)
-{
-    return check_task_context(task_id);
-};
-*/
-
-
-/*
- * check_task_context:
- *     Checa e valida o contexto de uma thread em user mode.
- *     Procura por erros nos valores da thread na estrutura de thread.
- *     Obs: Essa rotina é fundamental para previnir falta de página no caso 
- * de colocarmos valores errados nos registradores.
- *
- * * IMPORTANTE:
- * Obs:
- * @todo:
- * Existe um tipo de page fault causada por recarregar os registradores 
- * incorretamente. Acho que rotinas de checagem de conteúdo dos registradores 
- * antes de retornar devem ser mais severas. Os seja, depois de restaurar, 
- * tem que checar. Se não ouver falha, executa iretd. Mas se ouver falha, 
- * devemos bloquear a thread, checar novamente, tentar concertar se for algo 
- * simples e fechar a thread se o erro for grave ou persistir. Logo em seguida 
- * escalonar uma outra thread.
- *
- * @todo: 
- *     Mudar para contextCheckThreadRing3Context();
- *     Criar contextCheckThreadRing0Context();
- *     +Checar registrador eip. se estiver em user mode já é um bom começo.
- *     +Bloquear a thread no caso de falha. 
- *      
- */
+ * check_task_context: */
  
 int contextCheckThreadRing0Context (int tid){
 	
-	return  0;//@todo
-}; 
+	//return -1;  //cancelada
+	return 0;
+};
  
- 
+
 // Checar um contexto válido para threads em ring 3. 
+
 int contextCheckThreadRing3Context (int tid){
 	
-	int Status = 1;    //Error. (condição default).	
+	//Error. (condição default).	
+	int Status = 1;    
+	
     struct thread_d *t; 
     //...
 	
-	//Limits.
-	if( tid < 0 || tid >= THREAD_COUNT_MAX ){
-	    return (int) 1;    //Erro. Status.
-	};
+	// Limits.
+	// Erro. Status.
+	
+	if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+	{
+	    return (int) 1;    
+	}
 	
 	//Structure.
+	
 	t = (void *) threadList[tid]; 
     
 	if ( (void *) t == NULL )
@@ -366,7 +339,7 @@ int contextCheckThreadRing3Context (int tid){
 	    		
 	    if ( t->used != 1 || t->magic != 1234 )
 		{
-	        printf("contextCheckThreadRing3Context: validation\n");
+	        printf ("contextCheckThreadRing3Context: validation\n");
 		    return (int) 1;
 	    };    
 	
@@ -382,22 +355,23 @@ int contextCheckThreadRing3Context (int tid){
 	    //Checa se os segmentos tem os valores válidos para ring 3.
 	    //0x1B para código e 0x23 para dados.
 		
-	    if( t->cs != 0x1B || 
-	        t->ds != 0x23 || 
-		    t->es != 0x23 ||
-	        t->fs != 0x23 ||
-		    t->gs != 0x23 ||
-		    t->ss != 0x23 ) 
+	    if ( t->cs != 0x1B || 
+	         t->ds != 0x23 || 
+	         t->es != 0x23 ||
+	         t->fs != 0x23 ||
+	         t->gs != 0x23 ||
+	         t->ss != 0x23 ) 
 	    {
-	        printf("contextCheckThreadRing3Context: segments fail t={%d}\n", tid );
-		    return (int) 1; 
+	        printf ("contextCheckThreadRing3Context: segments fail t={%d}\n", 
+				tid );
+	        return (int) 1; 
 	    };
 
     	//@todo: Continua checagem ...	
 	};
-   
 
-    // Ok o contexto foi aprovado para ring 3. 
+
+	// Ok o contexto foi aprovado para ring 3. 
 	// Retorna 0.
 
 	return (int) 0;
@@ -406,8 +380,7 @@ int contextCheckThreadRing3Context (int tid){
 
 /*
  * KiCheckTaskContext:
- *     Chama módulo interno pra checar o contexto de uma thread.
- */
+ *     Chama módulo interno pra checar o contexto de uma thread. */
  
 int KiCheckTaskContext (int thread_id){
 	
@@ -430,25 +403,12 @@ void KiRestoreCurrentContext (){
 
  
 /*
- * save_context_of_new_task: 
- */ 
+ * save_context_of_new_task: */
+
 void save_context_of_new_task (int id, unsigned long *task_address){
 	
 	//return;    /* CANCELADA !*/
 };
-
-
-/*
- * Constructor.
-int contextContext()
-{};
-*/
-
-
-/*
-int contextInit()
-{};
-*/
 
 
 //
