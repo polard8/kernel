@@ -192,28 +192,9 @@ void *stdio_system_call ( unsigned long ax,
  *     #todo: chamar o kernel para realizar essa tarefa. */
 
 int fclose (FILE *stream){
-	
-	// @todo: Implementar.
-	
-	//provisório.
-	if ( (void *) stream != NULL ){
-		
-		stream->_ptr = NULL;
-		stream->_cnt = 0;
-		stream->_base = NULL;
-		stream->_flag = 0;
-		stream->_file = 0;
-		stream->_charbuf = 0;
-		stream->_bufsiz = 0;
-		stream->_tmpfname = NULL;
-		
-		stream = NULL;
-	};		
-	
-	//...
-
-	return (int) 0;
-};
+	//#todo: chamar system call.
+	return (int) -1;
+}
 
 
 /*
@@ -1402,44 +1383,9 @@ void stdioInitialize (){
 
 int fflush ( FILE *stream ){
 	
-	register int i = 0;
-	
-	if ( (void *) stream == NULL )
-	{
-		//#todo: 
-		//limpa todas as streams abertas.
-		return (int) (-1);
-	}
-		
-	// Limits.
-    // Se o buffer tiver vazizo ou for maior que o limite.	
-	if ( stream->_bufsiz == 0 || stream->_bufsiz > BUFSIZ )
-	{
-		
-		printf("fflush: buffer size limits\n");
-		return (int) (-1);
-	}
-    
-    //
-	// Clear.
-    //
-	
-    // #bugbug: 
-	// Se essa base aponta para um lugar inválido poderemos 
-	// ter uma page fault.
-	
-    for ( i=0; i < stream->_bufsiz; i++ )
-	{
-	    //limpa
-		stream->_base[i] = (char) '\0';	
-	}
-    
-	stream->_ptr = stream->_base;     //walk	
-    stream->_bufsiz = BUFSIZ; 		  //tamanho
-	stream->_cnt = stream->_bufsiz;   //quanto falta é igual ao tamanho.
-	
-	
-	return (int) 0;
+	//#todo:
+	//chamar system call;
+	return (int) -1;
 };
 
 
@@ -1450,29 +1396,9 @@ int fflush ( FILE *stream ){
 
 int fprintf ( FILE *stream, const char *format, ... ){
 	
-	int size;
 	
-	if ( (void *) stream == NULL )
-	{
-		return (int) (-1);
-		
-	} else {
-		
-		size = (int) stdio_strlen (format);
-		
-		if ( size > stream->_cnt )
-		{
-			return (int) (-1);
-		}
-		
-		stream->_cnt = (int) (stream->_cnt - size);
-		
-		sprintf ( stream->_ptr, format );
-		
-		stream->_ptr = stream->_ptr + size;
-        
-		return (int) 0;		
-	};
+	//#bugbug
+	//precisamos chamr a system call.
 	
 	return (int) (-1);
 };
@@ -1484,29 +1410,8 @@ int fprintf ( FILE *stream, const char *format, ... ){
  */
 int fputs ( const char *str, FILE *stream ){
 	
-	int size;
-	
-	if ( (void *) stream == NULL )
-	{
-		return (int) (-1);
-		
-	} else {
-		
-		size = (int) stdio_strlen (str);
-		
-		if ( size > stream->_cnt )
-		{
-			return (int) (-1);
-		}
-		
-		stream->_cnt = (int) (stream->_cnt - size);
-		
-		sprintf( stream->_ptr, str );
-		
-		stream->_ptr = stream->_ptr + size;
-		
-        return (int) 0;		
-	};
+ 	//#bugbug
+	//precisamos chamr a system call.
 	
 	return (int) (-1);
 }
@@ -1587,43 +1492,28 @@ done:
 
 int ungetc ( int c, FILE *stream ){
 	
-    if (c == EOF) 
-	    return (int) c;	
-	
-	if ( (void *) stream == NULL )
-	{
-		return (int) EOF;
-	}
-
-	//@todo: flag oef.
-	//stream->flags = (stream->flags & ~_IOEOF);
-	
-	stream->_ptr--;
-	
-	stream->_ptr[0] = (char) c;
-	
-    return (int) c;	
+	//#bugbug
+	//precisamos chamr a system call.	
+		
+    return (int) -1;	
 };
 
 
 long ftell (FILE *stream)
 {
-	if ( (void *) stream == NULL )
-	{
-		return (long) 0; //-1
-	}	
-	
-    return (long) (stream->_ptr - stream->_base);	
+	//#bugbug
+	//precisamos chamr a system call.		
+    return (long) -1;	
 };
 
 
 int fileno ( FILE *stream ){
+	
+	//#bugbug
+	//precisamos chamr a system call.		
 
-	if ( (void *) stream == NULL )
-	{
-		return (long) -1; 
-	}	
-	return (int) stream->_file;  //fd
+
+	return (int) -1;  //fd
 };
 
 
@@ -1637,7 +1527,7 @@ int fileno ( FILE *stream ){
 int fgetc ( FILE *stream ){
     
     return (int) stdio_system_call ( 136, (unsigned long) stream,  
-				     (unsigned long) stream,  (unsigned long) stream );
+					 (unsigned long) stream,  (unsigned long) stream );
 }
 
 
@@ -1647,33 +1537,9 @@ int fgetc ( FILE *stream ){
  */
 int feof ( FILE *stream ){
     
-    return (int) stdio_system_call ( 193, (unsigned long) stream,  (unsigned long) stream,  (unsigned long) stream );
-	
-    /*
-    int ch;	
- 
-	if ( (void *) stream == NULL )
-	{
-		return (int) (-1);
-		
-	} else {
-	
-	    ch = fgetc (stream);
-		
-        if ( ch == EOF )
-		{
-			return (int) 1;
-		}else{
-			return (int) 0;
-		};
-	};
-	
-	//checar se o eof foi atingido.
-	// return( (stream->_flag & _IOEOF) );
-	
-	return (int) 0;
-    */
-};
+    return (int) stdio_system_call ( 193, (unsigned long) stream,  
+					(unsigned long) stream,  (unsigned long) stream );
+}
 
 
 /*
@@ -1683,17 +1549,9 @@ int feof ( FILE *stream ){
  */
 int ferror ( FILE *stream ){
     
-    return (int) stdio_system_call ( 194, (unsigned long) stream,  (unsigned long) stream,  (unsigned long) stream );    
-	
-    /*
-	if ( (void *) stream == NULL ){
-		
-		return (int) (-1);
-	}
-	
-    return (int) ( ( stream->_flag & _IOERR ) );
-    */
-};
+    return (int) stdio_system_call ( 194, (unsigned long) stream,  
+					(unsigned long) stream,  (unsigned long) stream );    
+}
 
 
 /*
@@ -1704,44 +1562,9 @@ int ferror ( FILE *stream ){
  */
 int fseek ( FILE *stream, long offset, int whence ){
     
-     return (int) stdio_system_call ( 195, (unsigned long) stream,  (unsigned long) offset,  (unsigned long) whence ); 
-	
-    /*
-	if ( (void *) stream == NULL )
-	{
-	    goto fail;	
-	}
-	
-	//checar limites do offset.
-	
-	switch (whence){
-		
-		case SEEK_SET:    
-		    stream->_ptr = (stream->_base + offset); 
-			goto done;
-			break;
-			
-		case SEEK_CUR:
-		    stream->_ptr = (stream->_ptr + offset);
-		    goto done;
-			break;
-
-		case SEEK_END:
-		    stream->_ptr = ((stream->_base + stream->_bufsiz) + offset); 
-		    goto done;
-			break;
-
-        default:
-		    goto fail;
-			break;
-	};
-	
-fail:	
-    return (int) (-1);	
-done:	
-    return (int) (0);
-    */
-};
+     return (int) stdio_system_call ( 195, (unsigned long) stream, 
+						(unsigned long) offset,  (unsigned long) whence ); 
+}
 
 
 /*
@@ -1751,24 +1574,9 @@ done:
 
 int fputc ( int ch, FILE *stream ){
     
-     return (int) stdio_system_call ( 196, (unsigned long) ch,  (unsigned long) stream,  (unsigned long) stream );    
-	
-    /*
-	if ( (void *) stream == NULL )
-	{
-	    return (int) (-1);	
-		
-	}else{
-		
-        sprintf ( stream->_ptr, "%c", ch);
-	
-	    stream->_ptr++;
-	    stream->_cnt--;		
-	};
-
-    return (int) (0);		
-    */
-};
+     return (int) stdio_system_call ( 196, (unsigned long) ch,  
+					 (unsigned long) stream,  (unsigned long) stream );    
+}
 
 
 /*
