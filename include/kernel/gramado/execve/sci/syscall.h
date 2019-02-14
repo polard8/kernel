@@ -291,7 +291,7 @@
 
 //135 coloca caracteres na estrutura de terminal, para aplciativos pegarem
 #define	SYS_FEEDTERMINAL 135
-#define	SYS_136 136
+#define	SYS_136 136    //fgetc
 #define	SYS_GETCH 137  //SUPORTE a getch()
 #define	SYS_138 138    //get key state.
 #define	SYS_GETSCANCODE 139  
@@ -389,10 +389,12 @@
 //Deve-se alocar memória dentro do heap do processo.
 #define	SYS_ALLOCATEVIRTUALMEMORY 191  //ALOCA MEMÓRIA VIRTUAL PARA UM PROCESSO.
 #define	SYS_192 192
-#define	SYS_193 193
-#define	SYS_194 194
-#define	SYS_195 195
-#define	SYS_196 196
+
+//libc suppport
+#define	SYS_193 193   //feof
+#define	SYS_194 194   //ferror
+#define	SYS_195 195   //fseek
+#define	SYS_196 196   //fputc
 
 //reservados para scroll de janelas.
 #define	SYS_197 197  //scroll de área de cliente de uma janela;

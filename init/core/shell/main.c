@@ -3230,7 +3230,7 @@ do_compare:
 	{
 		printf("\n t4: Open init.txt \n");
         
-		f1 = fopen("init.txt","rb");  
+		f1 = (FILE *) fopen ("init.txt","rb");  
         if( f1 == NULL )
 		{
 			printf("fopen fail\n");
@@ -3253,15 +3253,19 @@ do_compare:
 		printf("Testing fgetc ... \n\n");
 		while(1)
 		{
-			//ch_test = (int) fgetc(f1);
-			ch_test = (int) getc(f1); 
+			//#bugbug: page fault quando chamamos fgetc.
+			//printf("1");
+			ch_test = (int) fgetc (f1);
+			//ch_test = (int) getc (f1); 
+			
 			if( ch_test == EOF )
 			{
 				printf("\n\n");
 				printf("EOF reached :)\n\n");
-				//printf("Show f1->_base: %s\n",f1->_base);
 				goto exit_cmp;
+				
 			}else{
+				//printf("2");
 			    printf("%c", ch_test);	
 			};
 		};
@@ -4549,6 +4553,11 @@ done:
 
 int shellCheckPassword (){
 	
+	//#suspenso por causa do fopen.
+	
+	return 0;
+	/*
+	
     char buffer[512];	
 	
 	// Somente um shell interativo tem login.
@@ -4720,6 +4729,7 @@ int shellCheckPassword (){
 #endif
 	
 	return (int) login_status;
+	*/
 };
 
 

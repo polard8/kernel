@@ -321,6 +321,7 @@ void *services ( unsigned long number,
 			
 			//testando novos recursos,
 			return (void *) sys_read_file2 ( (unsigned long) a2, (unsigned long) arg3 );
+				
 			break;
 
 
@@ -1100,7 +1101,13 @@ void *services ( unsigned long number,
 			//terminal.h
 			//teminalfeedCH = (char) arg3;
 			//teminalfeedCHStatus = (int) 1;
-		    break;		
+		    break;	
+			
+		//136
+		//fgetc
+		case 136:
+			return (void *) fgetc ( (FILE *) arg2 );
+			break;
 			
 		//137
 		// Isso é usado pela biblioteca stdio em user mode
@@ -1378,7 +1385,26 @@ void *services ( unsigned long number,
             return (void *) GetProcessHeapStart ( (int) arg2 );
 			break;	
 
-
+		// feof	
+		case 193:	
+		    return (void *) feof ( (FILE *) arg2 );
+            break;
+			
+		//ferror	
+		case 194:	
+		    return (void *) ferror ( (FILE *) arg2 );
+            break;
+			
+		//fseek	
+		case 195:	
+		    return (void *) fseek ( (FILE *) arg2, (long) arg3, (int) arg4 );
+            break;
+			
+		//fputc	
+		case 196:	
+		    return (void *) fputc ( (int) arg2 , (FILE *) arg3 );
+            break;			
+			
         //197
 		//scroll de área de cliente de uma janela;
         case 197:

@@ -1373,8 +1373,29 @@ fail:
  * sys_read_file2
  *     carrega do diretório alvo. */
 
-int sys_read_file2 ( unsigned long name, unsigned long address ){
+FILE *sys_read_file2 ( unsigned long name, unsigned long address ){
 	
+	 
+	 FILE *stream;
+	
+	 stream = (FILE *) malloc ( sizeof(FILE) );
+	
+	 if ( (void *) stream == NULL )
+	 {
+	     return (FILE *) 0;
+	 }else{
+		 
+		 // #bugbug: 
+		 // temos poucas informaçoes sobre o arquivo
+	 
+     	 stream->_base = (char *) address;
+		 stream->_ptr = stream->_base;
+		 stream->_cnt = 0;
+		 stream->_flag = 0;
+		 //...
+	 };
+	
+
 	 //#importante, 
 	 //A atualizaçao do nome é feita aqui.
 	 
@@ -1391,10 +1412,13 @@ int sys_read_file2 ( unsigned long name, unsigned long address ){
 	//temos que respeitar o endereço passaro pelo usu'ario.
 	
 	new_address =  address;
+
+	
 	if ( new_address == 0 )
 	{
 		printf("address fail\n");
-		return -1;
+		//return -1;
+		return (FILE *) 0;
 	}
 	
 	//#bugbug
@@ -1413,7 +1437,8 @@ int sys_read_file2 ( unsigned long name, unsigned long address ){
 			current_target_dir.name[i] = '\0';
 		}		
 		
-		return -1;
+		//return -1;
+		return (FILE *) 0;
 	}
 	
 	//#debug
@@ -1432,10 +1457,21 @@ int sys_read_file2 ( unsigned long name, unsigned long address ){
 	scheduler_unlock();
     taskswitch_unlock();
 	
+	//se o carregamento funcionou ou n~ao.
 	
-	current_target_dir.current_dir_address = new_address;
+	if ( Ret == 0)
+	{
+        current_target_dir.current_dir_address = new_address;
+		return (FILE *) stream;
+		
+	}else{
 	
-	return (int) Ret;		
+		current_target_dir.current_dir_address = 0;
+		//fclose(stream);
+	    return (FILE *) 0;
+	}
+	
+	return (FILE *) 0;
 }
 
 

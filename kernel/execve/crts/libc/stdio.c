@@ -6,7 +6,7 @@
  *     +Algumas rotinas de console.
  *
  * Environment:
- *     Ring 0.
+ *     >>> Ring 0 <<<
  *
  *
  * @todo: Buffering and pipes.
@@ -47,23 +47,31 @@ extern void refresh_screen();
 /*
  *********************************************
  * fclose:
- *     Close a file.    
- */
+ *     Close a file. */
+
 int fclose (FILE *stream){
 	
-	if( (void *) stream != NULL )
-	{
-		//#bugbug:
-		//Esse NULL não causa efeito algum ??
+	// @todo: Implementar.
+	
+	//provisório.
+	if ( (void *) stream != NULL ){
+		
+		stream->_ptr = NULL;
+		stream->_cnt = 0;
+		stream->_base = NULL;
+		stream->_flag = 0;
+		stream->_file = 0;
+		stream->_charbuf = 0;
+		stream->_bufsiz = 0;
+		stream->_tmpfname = NULL;
+		
 		stream = NULL;
 	};		
-
-	//
-	// @todo: Implementar.
-	//
 	
+	//...
+
 	return (int) 0;
-};
+}
 
 
 /*
@@ -71,9 +79,6 @@ int fclose (FILE *stream){
  * fopen:
  *     @field 2
  *     Open a file.
- *
- *     #bugbug: 
- *     Por enquanto o limite do tamanho do arquivo é 4KB.
  *     
  *     #todo: 
  *     Mas já temos recursos para abrimos arquivos maiores 
@@ -149,6 +154,76 @@ FILE *fopen ( const char *filename, const char *mode ){
 
 	return (FILE *) stream; 	
 }
+
+
+//#todo
+size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
+{
+    return -1;
+}
+
+//#todo
+size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp)
+{
+	return -1;
+}
+
+/* 
+ * fflush: 
+ * Salva o buffer no arquivo associado a ele.
+ * e limpa o buffer. 
+ * Se for NULL então faz isso para todas stream abertas.
+ * retorna 0 se funcionar e retorna EOF se falhar.
+ */
+
+int fflush ( FILE *stream ){
+	
+	register int i = 0;
+	
+	if ( (void *) stream == NULL )
+	{
+		//#todo: 
+		//limpa todas as streams abertas.
+		return (int) (-1);
+	}
+		
+	// Limits.
+    // Se o buffer tiver vazizo ou for maior que o limite.	
+	if ( stream->_bufsiz == 0 || stream->_bufsiz > BUFSIZ )
+	{
+		
+		printf("fflush: buffer size limits\n");
+		return (int) (-1);
+	}
+    
+    //
+	// Clear.
+    //
+	
+    // #bugbug: 
+	// Se essa base aponta para um lugar inválido poderemos 
+	// ter uma page fault.
+	
+    for ( i=0; i < stream->_bufsiz; i++ )
+	{
+	    //limpa
+		stream->_base[i] = (char) '\0';	
+	}
+    
+	stream->_ptr = stream->_base;     //walk	
+    stream->_bufsiz = BUFSIZ; 		  //tamanho
+	stream->_cnt = stream->_bufsiz;   //quanto falta é igual ao tamanho.
+	
+	
+	return 0;
+}
+
+
+
+
+
+
+
 
 
 /*
@@ -335,14 +410,10 @@ int kclearClientArea (int color){
 
 
 /*
- **************************************************************
  * kprint:
- * #bugbug: N~ao temos mais suporte a modo texto.
- *
- */
+ * #bugbug: Nao temos mais suporte a modo texto. */
 
-int kprint ( char *message, unsigned int line, int color ){
-	
+int kprint ( char *message, unsigned int line, int color ){	
     return (int) -1; 
 }
 
@@ -407,16 +478,16 @@ static int prints ( char **out, const char *string, int width, int pad ){
  ****************************************
  * printi:
  *     Rotina de suporta a printf.
- *
  */
+
 static int 
-printi( char **out, 
-        int i, 
-		int b, 
-		int sg, 
-		int width, 
-		int pad, 
-		int letbase )
+printi ( char **out, 
+         int i, 
+		 int b, 
+		 int sg, 
+		 int width, 
+		 int pad, 
+		 int letbase )
 {
 	char print_buf[PRINT_BUF_LEN];
 	register char *s;
@@ -628,12 +699,12 @@ void panic ( const char *format, ... ){
         default:
 	        //backgroundDraw(COLOR_BLACK);
 		    //printf("crts-libc-stdio-panic: KERNEL PANIC\n");
-		    print(0,varg);			
+		    print ( 0, varg );			
             break; 		
 	};
 	
     die();	
-};
+}
 
 
 /*
@@ -645,20 +716,21 @@ void panic ( const char *format, ... ){
  * printed if format was used on printf, 
  * but instead of being printed, the content is stored 
  * as a C string in the buffer pointed by str.
-*/
+ */
+
 int sprintf ( char *str, const char *format, ... ){
 		
     register int *varg = (int *) (&format);
 	return (int) print (&str, varg);
-};
+}
 
 
 /*
  ************************************************
  * fprintf:
  *     @field 2
- *
  */
+
 int fprintf ( FILE *stream, const char *format, ... ){
 	
     register int *varg = (int *) (&format);
@@ -672,9 +744,335 @@ int fprintf ( FILE *stream, const char *format, ... ){
 
 	char *str = (char *) stream->_ptr;
 	
-//done:	
 	return (int) print (&str, varg);	
+}
+
+/*
+ #opçao
+int fprintf ( FILE *stream, const char *format, ... ){
+	
+	int size;
+	
+	if ( (void *) stream == NULL )
+	{
+		return (int) (-1);
+		
+	} else {
+		
+		size = (int) stdio_strlen (format);
+		
+		if ( size > stream->_cnt )
+		{
+			return (int) (-1);
+		}
+		
+		stream->_cnt = (int) (stream->_cnt - size);
+		
+		sprintf ( stream->_ptr, format );
+		
+		stream->_ptr = stream->_ptr + size;
+        
+		return (int) 0;		
+	};
+	
+	return (int) (-1);
+}; 
+
+*/
+
+
+
+/*
+ ********************************
+ * fputs:      
+ */
+
+int fputs ( const char *str, FILE *stream ){
+	
+	int size;
+	
+	if ( (void *) stream == NULL )
+	{
+		return (int) (-1);
+		
+	} else {
+		
+		//size = (int) stdio_strlen (str);
+		size = (int) strlen (str);
+		
+		if ( size > stream->_cnt )
+		{
+			return (int) (-1);
+		}
+		
+		stream->_cnt = (int) (stream->_cnt - size);
+		
+		sprintf( stream->_ptr, str );
+		
+		stream->_ptr = stream->_ptr + size;
+		
+        return (int) 0;		
+	};
+	
+	return (int) (-1);
 };
+
+
+/*
+ *********************************
+ * ungetc:
+ */
+
+int ungetc ( int c, FILE *stream ){
+	
+    if (c == EOF) 
+	    return (int) c;	
+	
+	if ( (void *) stream == NULL )
+	{
+		return (int) EOF;
+	}
+
+	//@todo: flag oef.
+	//stream->flags = (stream->flags & ~_IOEOF);
+	
+	stream->_ptr--;
+	
+	stream->_ptr[0] = (char) c;
+	
+    return (int) c;	
+};
+
+
+
+long ftell (FILE *stream)
+{
+	if ( (void *) stream == NULL )
+	{
+		return (long) 0; //-1
+	}	
+	
+    return (long) (stream->_ptr - stream->_base);	
+};
+
+
+int fileno ( FILE *stream ){
+
+	if ( (void *) stream == NULL )
+	{
+		return (long) -1; 
+	}	
+	return (int) stream->_file;  //fd
+};
+
+
+/*
+ *********************************
+ * fgetc:
+ *     #precisamos exportar isso como serviço. (#136)
+ */
+
+int fgetc ( FILE *stream ){
+	
+    int ch;	
+ 
+	if ( (void *) stream == NULL )
+	{
+		printf ("#debug: fgetc: stream struct fail\n");
+		refresh_screen();
+		
+		return (int) (-1);
+		
+	} else {
+		
+		//Não há mais caracteres disponíveis entre 
+		//stream->_ptr e o tamanho do buffer.
+		if ( stream->_cnt <= 0 )
+		{
+			stream->_flag = (stream->_flag | _IOEOF); 
+			stream->_cnt = 0;
+			
+			return (int) (-1);
+		};
+		
+		//#debug
+		//n~ao podemos acessar um ponteiro nulo... no caso endereço.
+		if ( stream->_ptr == 0 )
+		{
+			printf ("#debug: fgetc: stream struct fail\n");
+		    refresh_screen();
+			return (int) (-1);
+		}else{
+			
+		    //pega o char
+		    ch = (int) *stream->_ptr; 		
+		    
+			stream->_ptr++;
+		    stream->_cnt--;
+		    return (int) ch;				
+		
+		}
+		//fail
+	};
+	
+    return (int) (-1);	
+};
+
+
+
+/*
+ *********************************
+ * feof:
+ */
+
+int feof ( FILE *stream ){
+	
+    int ch;	
+ 
+	if ( (void *) stream == NULL )
+	{
+		return (int) (-1);
+		
+	} else {
+	
+	    ch = fgetc (stream);
+		
+        if ( ch == EOF )
+		{
+			return (int) 1;
+		}else{
+			return (int) 0;
+		};
+	};
+	
+	//checar se o eof foi atingido.
+	// return( (stream->_flag & _IOEOF) );
+	
+	return (int) 0;
+};
+
+
+/*
+ *********************************
+ * ferror:
+ *
+ */
+int ferror ( FILE *stream ){
+	
+	if ( (void *) stream == NULL ){
+		
+		return (int) (-1);
+	}
+	
+    return (int) ( ( stream->_flag & _IOERR ) );
+};
+
+
+
+
+/*
+ **************************************
+ * fseek:
+ *     offset argument is the position that you want to seek to,
+ *     and whence is what that offset is relative to.
+ */
+int fseek ( FILE *stream, long offset, int whence ){
+	
+	if ( (void *) stream == NULL )
+	{
+	    goto fail;	
+	}
+	
+	//checar limites do offset.
+	
+	switch (whence){
+		
+		case SEEK_SET:    
+		    stream->_ptr = (stream->_base + offset); 
+			goto done;
+			break;
+			
+		case SEEK_CUR:
+		    stream->_ptr = (stream->_ptr + offset);
+		    goto done;
+			break;
+
+		case SEEK_END:
+		    stream->_ptr = ((stream->_base + stream->_bufsiz) + offset); 
+		    goto done;
+			break;
+
+        default:
+		    goto fail;
+			break;
+	};
+	
+fail:	
+    return (int) (-1);	
+done:	
+    return (int) (0);	
+};
+
+
+
+/*
+ *****************************************
+ * fputc:
+ */
+
+int fputc ( int ch, FILE *stream ){
+	
+	if ( (void *) stream == NULL )
+	{
+	    return (int) (-1);	
+		
+	}else{
+		
+        sprintf ( stream->_ptr, "%c", ch);
+	
+	    stream->_ptr++;
+	    stream->_cnt--;		
+	};
+
+    return (int) (0);		
+};
+
+
+//(since C99)	
+//int fscanf( FILE *restrict stream, const char *restrict format, ... );
+//(until C99)
+int fscanf (FILE *stream, const char *format, ... ){
+	
+	printf ("fscanf: todo \n");
+    return -1;
+}
+
+
+/*
+int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr );
+int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr ){
+}
+*/
+
+
+void rewind ( FILE * stream ){
+	
+	if ( (void *) stream == NULL )
+		return;
+	
+    //apota par o início do arquivo.
+	//#bugbug: isso vai sobrescrever
+	//as coisas que ainda estão no arquivo;
+	
+	stdin->_ptr = stdin->_base;
+    stdin->_bufsiz = BUFSIZ; 		
+	stdin->_cnt = stdin->_bufsiz;		
+}
+
+
+
+
+
 
 
 
@@ -686,6 +1084,7 @@ int fprintf ( FILE *stream, const char *format, ... ){
  * enviá-lo para a tela.
  * Essa rotina é chamada pelas funções: /print/printi/prints.
  */
+
 static void printchar (char **str, int c)
 {
 	if (str){
@@ -694,7 +1093,7 @@ static void printchar (char **str, int c)
 		++(*str);
 		
 	}else (void) putchar (c);
-};
+}
 
 
 /*
@@ -705,13 +1104,14 @@ static void printchar (char **str, int c)
  * depois é que o caractere será enviado para a tela.
  *     Essa rotina é chamada pelas funções: /printchar/input/.
  */
+
 int putchar (int ch){ 
    
     //Em cedge.c
     outbyte (ch);
     
 	return (int) ch;    
-};
+}
 
 
 /*

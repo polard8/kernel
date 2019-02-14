@@ -94,9 +94,12 @@ typedef char *stdio_va_list;
 
 
 /*
+ **********************************************************************
  * FILE:
  *     Estrutura padrão para arquivos.    
- *     
+ *     #bugbug: os arquivos com esse tipo de estrutura serao
+ *              gerenciados pelo kernel, para ser compativel com unix-like
+ *              e para facilitar a comunicaçao entre processos.
  */
 typedef struct _iobuf FILE; 
 struct _iobuf 
@@ -146,7 +149,7 @@ FILE _iob[NUMBER_OF_FILES] = {
 */
 
 
-
+ 
  
 //
 // Posição virtual da memória de vídeo.

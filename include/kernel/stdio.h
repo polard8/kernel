@@ -353,15 +353,17 @@ unsigned long *gStreams;
 #define EOF (-1)    //Ok.
 
 
-
-
-
 //#define SEEK_SET   0
 //#define SEEK_CUR   1
 //#define SEEK_END   2
 
 
 //enum FileFlags {_F_READ = 0x0001, _F_WRIT = 0x0002, _F_RDWR = 0x0003, _F_ERR = 0x0010, _F_EOF = 0x0020, _F_BIN = 0x0040};
+
+#define _IOMYBUF  0x0008  /* stdio malloc()'d buffer */
+#define _IOEOF    0x0010  /* EOF reached on read */
+#define _IOERR    0x0020  /* I/O error from system */
+#define _IOSTRG   0x0040 /* Strange or no file descriptor */
 
 
 #define	STDIN_FILENO	0
@@ -403,6 +405,22 @@ unsigned long *gStreams;
 
     
 #define  BUFSIZ  512 
+
+/* It moves file pointer position to the beginning of the file. */
+#ifndef SEEK_SET
+#define SEEK_SET        0       
+#endif
+
+/* It moves file pointer position to given location. */
+#ifndef SEEK_CUR
+#define SEEK_CUR        1       
+#endif
+
+/*  It moves file pointer position to the end of file. */
+#ifndef SEEK_END
+#define SEEK_END        2       
+#endif
+
 
 #define PROMPT_SIZE 256 
 #define PROMPT_MAX_DEFAULT 256
@@ -642,6 +660,27 @@ int fprintf(FILE *stream, const char *format, ...);
 int putchar( int ch );
 void panic( const char *format, ... );
 //...
+
+
+
+
+size_t fread (void *ptr, size_t size, size_t n, FILE *fp);
+size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp);
+int fflush ( FILE *stream );
+int fputs ( const char *str, FILE *stream );
+int ungetc ( int c, FILE *stream );
+long ftell (FILE *stream);
+int fileno ( FILE *stream );
+int fgetc ( FILE *stream );
+int feof ( FILE *stream );
+int ferror ( FILE *stream );
+int fseek ( FILE *stream, long offset, int whence );
+int fputc ( int ch, FILE *stream );
+int fscanf (FILE *stream, const char *format, ... );
+void rewind ( FILE * stream );
+
+
+
 
 //BUFFER:
 //void setbuf(FILE *stream, char *buffer)

@@ -129,7 +129,9 @@ void fs_pathname_backup ( int pid, int n );
 
 //essa rotina é chamada por services em services.c
 int sys_read_file ( unsigned long name, unsigned long address );
-int sys_read_file2 ( unsigned long name, unsigned long address );
+
+
+FILE *sys_read_file2 ( unsigned long name, unsigned long address );
 
 				
 int

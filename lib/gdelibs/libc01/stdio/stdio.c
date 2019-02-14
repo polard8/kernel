@@ -5,6 +5,9 @@
  *     Rotinas de input/output para User Mode.
  *     Standard C language. C99.
  *
+ * Environment:
+ *     >>> Ring 3 <<<
+ *
  * Credits:
  *     printf: https://www.menie.org/georges/embedded/small_printf_source_code.html
  *     stdio_fntos: Luiz Felipe
@@ -186,7 +189,8 @@ void *stdio_system_call ( unsigned long ax,
  * fclose:
  *     Close a file.
  *     If work, return 0.
- */
+ *     #todo: chamar o kernel para realizar essa tarefa. */
+
 int fclose (FILE *stream){
 	
 	// @todo: Implementar.
@@ -263,12 +267,13 @@ FILE *fopen ( const char *filename, const char *mode ){
 	FILE *stream;
 
 	//stream = (FILE *) &struct_buffer[0];
-	stream = (FILE *) malloc ( sizeof(FILE) );
-    if ( (void *) stream == NULL )
-    {
-		printf("stdio-fopen: stream fail\n");
-		return NULL;
-	}else{
+	//stream = (FILE *) malloc ( sizeof(FILE) );
+	
+    //if ( (void *) stream == NULL )
+    //{
+	//	printf("stdio-fopen: stream fail\n");
+	//	return NULL;
+	//}else{
 		
 		
 		
@@ -319,29 +324,34 @@ FILE *fopen ( const char *filename, const char *mode ){
 		}
 		
 	   
-	    stream->_base = (char *) malloc ( (size_t) size );		
+	    //stream->_base = (char *) malloc ( (size_t) size );		
         
-		if ( (void *) stream->_base == NULL )
-        {
-		    printf("stdio-fopen: _base fail\n");
-	        return NULL;
-	    }else{
+		//if ( (void *) stream->_base == NULL )
+        //{
+		//    printf("stdio-fopen: _base fail\n");
+	    //    return NULL;
+	    //}else{
 			
-			stream->_ptr = stream->_base;
+		//	stream->_ptr = stream->_base;
 			
 	        //Podemos medir o tamanho do arquivo antes e colocarmos
 	        //o valor aqui ... pode ser checando na entrada de diretório.
-	        stream->_cnt = PROMPT_MAX_DEFAULT;			
-	        stream->_file = 0;
+	     //   stream->_cnt = PROMPT_MAX_DEFAULT;			
+	     //   stream->_file = 0;
   			
-	        stream->_tmpfname = (char *) filename;	
+	     //   stream->_tmpfname = (char *) filename;	
 			
 			//...
-		};		
-	};		
+		//};		
+	//};		
 
 	
 
+	void *buff;
+	
+	buff = (void *) malloc ( (size_t) size );	
+	
+	
 	// @todo: Criar filtros para os argumentos. Retornar NULL
 	// se os argumentos forem inválidos.
 	
@@ -374,11 +384,17 @@ FILE *fopen ( const char *filename, const char *mode ){
 	
 	
     //stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
-	//	(unsigned long) &buffer[0], (unsigned long) &buffer[0] );		
+	//	(unsigned long) &buffer[0], (unsigned long) &buffer[0] );	
+	
+	
+	//#todo
+	//#bugbug
+	//#importante: Essa chamada precisa retornar o ponteiro da 'stream'.
+	
 	
 	//#obs: isso funciona.
     stdio_system_call ( SYSTEMCALL_READ_FILE, (unsigned long) filename, 
-		(unsigned long) stream->_base, (unsigned long) stream->_base );	
+		(unsigned long) buff, (unsigned long) buff );	
 
 	//#test
 	//enviando para o kernel o ponteiro da estrutura, para o kernel 
@@ -492,6 +508,7 @@ size_t fread(void *ptr, size_t size, size_t n, FILE *fp)
 {
     return -1;
 }
+
 
 size_t fwrite(const void *ptr, size_t size, size_t n, FILE *fp)
 {
@@ -745,8 +762,8 @@ int printf3 ( const char *format, ... ){
 //=============================================================
 //
 //usada na printf2
-void printf_atoi(int value, char* valuestring)
-{
+void printf_atoi (int value, char* valuestring){
+    
   int min_flag;
   char swap, *p;
   min_flag = 0;
@@ -1428,9 +1445,9 @@ int fflush ( FILE *stream ){
 
 /*
  ********************************
- * fprintf:
- *      
+ * fprintf:     
  */
+
 int fprintf ( FILE *stream, const char *format, ... ){
 	
 	int size;
@@ -1463,8 +1480,7 @@ int fprintf ( FILE *stream, const char *format, ... ){
 
 /*
  ********************************
- * fputs:
- *      
+ * fputs:      
  */
 int fputs ( const char *str, FILE *stream ){
 	
@@ -1493,7 +1509,7 @@ int fputs ( const char *str, FILE *stream ){
 	};
 	
 	return (int) (-1);
-};
+}
 
 
 /*
@@ -1567,8 +1583,8 @@ done:
 /*
  *********************************
  * ungetc:
- *
  */
+
 int ungetc ( int c, FILE *stream ){
 	
     if (c == EOF) 
@@ -1614,49 +1630,26 @@ int fileno ( FILE *stream ){
 /*
  *********************************
  * fgetc:
- *
+ *     #todo: chamar a rotina do kernel para pegar o char no arquivo,
+ * pois agora o arquivo 'e gerenciado pelo kernel.
  */
+
 int fgetc ( FILE *stream ){
-	
-    int ch;	
- 
-	if ( (void *) stream == NULL )
-	{
-		return (int) (-1);
-		
-	} else {
-		
-		//Não há mais caracteres disponíveis entre 
-		//stream->_ptr e o tamanho do buffer.
-		if ( stream->_cnt <= 0 )
-		{
-			stream->_flag = (stream->_flag | _IOEOF); 
-			stream->_cnt = 0;
-			
-			return (int) (-1);
-		};
-				
-		//pega o char
-		ch = (int) *stream->_ptr; 
-		
-		stream->_ptr++;
-		
-		stream->_cnt--;
-		
-        return (int) ch;		
-	};
-	
-    return (int) (-1);	
-};
+    
+    return (int) stdio_system_call ( 136, (unsigned long) stream,  
+				     (unsigned long) stream,  (unsigned long) stream );
+}
 
 
 /*
  *********************************
  * feof:
- *
  */
 int feof ( FILE *stream ){
+    
+    return (int) stdio_system_call ( 193, (unsigned long) stream,  (unsigned long) stream,  (unsigned long) stream );
 	
+    /*
     int ch;	
  
 	if ( (void *) stream == NULL )
@@ -1679,6 +1672,7 @@ int feof ( FILE *stream ){
 	// return( (stream->_flag & _IOEOF) );
 	
 	return (int) 0;
+    */
 };
 
 
@@ -1688,13 +1682,17 @@ int feof ( FILE *stream ){
  *
  */
 int ferror ( FILE *stream ){
+    
+    return (int) stdio_system_call ( 194, (unsigned long) stream,  (unsigned long) stream,  (unsigned long) stream );    
 	
+    /*
 	if ( (void *) stream == NULL ){
 		
 		return (int) (-1);
 	}
 	
     return (int) ( ( stream->_flag & _IOERR ) );
+    */
 };
 
 
@@ -1705,7 +1703,10 @@ int ferror ( FILE *stream ){
  *     and whence is what that offset is relative to.
  */
 int fseek ( FILE *stream, long offset, int whence ){
+    
+     return (int) stdio_system_call ( 195, (unsigned long) stream,  (unsigned long) offset,  (unsigned long) whence ); 
 	
+    /*
 	if ( (void *) stream == NULL )
 	{
 	    goto fail;	
@@ -1738,17 +1739,21 @@ int fseek ( FILE *stream, long offset, int whence ){
 fail:	
     return (int) (-1);	
 done:	
-    return (int) (0);	
+    return (int) (0);
+    */
 };
 
 
 /*
  *****************************************
  * fputc:
- *
  */
+
 int fputc ( int ch, FILE *stream ){
+    
+     return (int) stdio_system_call ( 196, (unsigned long) ch,  (unsigned long) stream,  (unsigned long) stream );    
 	
+    /*
 	if ( (void *) stream == NULL )
 	{
 	    return (int) (-1);	
@@ -1762,6 +1767,7 @@ int fputc ( int ch, FILE *stream ){
 	};
 
     return (int) (0);		
+    */
 };
 
 
@@ -1935,10 +1941,6 @@ int scanf ( const char *fmt, ... ){
 //======================================================================
 // scanf support (end)
 //======================================================================
-
-
-
- 
 
 
 
@@ -2574,8 +2576,6 @@ int printf ( const char *fmt, ... ){
 	va_list ap;
 	va_start(ap, fmt);
 	
-
-	
 	//int 
 	//kvprintf ( char const *fmt, 
     //       void (*func)( int, void* ), 
@@ -2638,8 +2638,8 @@ int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr )
 
 
 //printf que escreve no stdout. 
-int stdout_printf (const char *format, ...)
-{
+int stdout_printf (const char *format, ...){
+	
     va_list arg;
     int done;
 
@@ -2648,7 +2648,8 @@ int stdout_printf (const char *format, ...)
     va_end (arg);
 
     return done;
-};
+}
+
 
 //printf que escreve no stderr. 
 int stderr_printf (const char *format, ...)
@@ -2685,12 +2686,12 @@ void rewind ( FILE * stream ){
 	stdin->_ptr = stdin->_base;
     stdin->_bufsiz = BUFSIZ; 		
 	stdin->_cnt = stdin->_bufsiz;		
-};
+}
 
 
 //#todo
-int snprintf(char *str,size_t count,const char *fmt,...)
-{
+int snprintf ( char *str, size_t count, const char *fmt, ... ){
+	
 	size_t ret;
 	va_list ap;
     
