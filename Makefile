@@ -72,6 +72,7 @@ detect.o \
 cpuamd.o \
 memory.o \
 pages.o \
+mmpool.o \
 apic.o \
 pic.o \
 timer.o \
@@ -218,6 +219,9 @@ compile-kernel:
 	# /mk/pc/mm (memory manager)
 	gcc -c  kernel/mk/pc/mm/memory.c  -I include/ $(CFLAGS) $(DEFINES) -o memory.o
 	gcc -c  kernel/mk/pc/mm/pages.c   -I include/ $(CFLAGS) $(DEFINES) -o pages.o
+	gcc -c  kernel/mk/pc/mm/mmpool.c  -I include/ $(CFLAGS) $(DEFINES) -o mmpool.o	
+	
+	
 
 	gcc -c  kernel/mk/request.c  -I include/ $(CFLAGS) $(DEFINES) -o request.o
 	gcc -c  kernel/mk/arch/x86/x86fault.c  -I include/ $(CFLAGS) $(DEFINES) -o x86fault.o

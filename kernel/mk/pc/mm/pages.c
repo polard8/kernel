@@ -1283,14 +1283,14 @@ int SetUpPaging (){
 	// Inicializando a lista de pageframes.
 	//
 	
-	for ( Index=0; Index < PAGEFRAME_COUNT_MAX; Index++ ){
-		
-	    pageframeList[Index] = (unsigned long) 0;
+	for ( Index=0; Index < PAGE_COUNT_MAX; Index++ )
+	{	
+	    pageList[Index] = (unsigned long) 0;
 	};
 
 	//Configurando manualmente a lista de pageframes.
-	pageframeList[0] = (unsigned long) 0;
-	pageframeList[1] = (unsigned long) 0;
+	pageList[0] = (unsigned long) 0;
+	pageList[1] = (unsigned long) 0;
 	//...
 
 
@@ -1434,15 +1434,15 @@ int SetUpPaging (){
 void initializeFramesAlloc (){
 	
 	int Index;
-	struct page_frame_d *pf;
+	struct page_d *p;
 	
 	//
 	// Inicializando a lista de pageframes.
 	//
 	
-	for ( Index=0; Index < PAGEFRAME_COUNT_MAX; Index++ ){
-		
-	    pageframeAllocList[Index] = (unsigned long) 0;
+	for ( Index=0; Index < PAGE_COUNT_MAX; Index++ )
+	{	
+	    pageAllocList[Index] = (unsigned long) 0;
 	};
 	
 	
@@ -1450,25 +1450,25 @@ void initializeFramesAlloc (){
 	// Criando o primeiro para testes.
 	//
 	
-	pf = (void *) malloc ( sizeof( struct page_frame_d ) );
+	p = (void *) malloc ( sizeof( struct page_d ) );
 	
-	if ( pf == NULL )
+	if ( p == NULL )
 	{
 		printf("initializeFramesAlloc:\n");
 		return;
 		//goto done;
 	}else{
 		
-	    pf->id = 0;
+	    p->id = 0;
 	
-	    pf->used = 1;
-	    pf->magic = 1234;
+	    p->used = 1;
+	    p->magic = 1234;
 	
-	    pf->free = 0;  //not free
-	    pf->next = NULL; 
+	    p->free = 0;  //not free
+	    p->next = NULL; 
 	    //...	
 	
-	    pageframeAllocList[0] = ( unsigned long ) pf; 		
+	    pageAllocList[0] = ( unsigned long ) p; 		
 	};	
 }
 
@@ -1483,17 +1483,20 @@ void initializeFramesAlloc (){
  * contíguos mas as páginas serão.
  * estamos usando uma page table toda já mapeada. 4MB.
  * @TODO: ESSA ROTINA ESTÁ INCOMPLETA ... REVISAR. #bugbug
+ *
+ * #bugbug: se estamos lidando com o endereço base vitual, então estamos 
+ * lidando com páginas pre alocadas e não pageframes.
  */
 
-void *allocPageFrames ( int size ){
+void *allocPages ( int size ){
 	
 	int Index;
 	
 	//página inicial da lista
-	struct page_frame_d *Ret;   
+	struct page_d *Ret;   
 	
-	struct page_frame_d *Conductor;
-	struct page_frame_d *pf;
+	struct page_d *Conductor;
+	struct page_d *p;
 	
 	//Esse é o endereço virtual do início do pool de pageframes.
 	unsigned long base = (unsigned long) g_pagedpool_va;
@@ -1535,7 +1538,8 @@ void *allocPageFrames ( int size ){
 	}	
 	
 	//se o size for maior que o limite.
-    if( size > PAGEFRAME_COUNT_MAX ){
+    if ( size > PAGE_COUNT_MAX )
+	{
 		//if debug
 		printf("allocPageFrames: size limits\n");
 		goto fail;
@@ -1557,37 +1561,40 @@ void *allocPageFrames ( int size ){
 #endif 
  
 	//começamos a contar do frame logo após o condutor.
-	for(Index = Base; Index < (Base+size+1); Index++)
+	
+	for (Index = Base; Index < (Base+size+1); Index++ )
 	{
-	    pf = (void*) pageframeAllocList[Index];
+	    p = (void *) pageAllocList[Index];
 				
 		//Slot livre
-		if( pf == NULL )
+		if ( p == NULL )
 		{
 			//#bugbug
 			//Isso pode esgotar o heap do kernel
-			pf = (void*) malloc( sizeof( struct page_frame_d ) );
-			if( pf == NULL ){
+			p = (void*) malloc( sizeof( struct page_d ) );
+			
+			if ( p == NULL )
+			{
 				printf("allocPageFrames: 2\n");
 				goto fail;
 			};
 			
 			//printf("#");
-			pf->id = Index;
-			pf->used = 1;
-			pf->magic = 1234;
-			pf->free = 0;  //not free
+			p->id = Index;
+			p->used = 1;
+			p->magic = 1234;
+			p->free = 0;  //not free
 			//...
 			
-			pageframeAllocList[Index] = ( unsigned long ) pf; 
+			pageAllocList[Index] = ( unsigned long ) p; 
 			
-			Conductor->next = (void*) pf;
+			Conductor->next = (void*) p;
 			Conductor = (void*) Conductor->next;
 			
 			Count++;
 			if( Count >= size )
 			{
-				Ret = (void*) pageframeAllocList[Base];
+				Ret = (void*) pageAllocList[Base];
 			    goto done;	
 			}	
 		};
@@ -1601,164 +1608,51 @@ done:
     
 	//*Importante:
 	//retornaremos o endereço virtual inicial do primeiro pageframe da lista.
-	return (void*) ( base + (Ret->id * 4096) );
+	return (void *) ( base + (Ret->id * 4096) );
 };
 
 
 //checar se a estrutura é nula
-int pfEmpty (struct page_frame_d *pf){
+int pEmpty (struct page_d *p){
 	
-    return pf == NULL ? 1 : 0;
+    return p == NULL ? 1 : 0;
 };
 
 
-//selecionar o pageframe como livre.
-void freePageframe (struct page_frame_d *pf){
+//selecionar a página como livre.
+void freePage (struct page_d *p){
 	
-	if (pf == NULL){
+	if (p == NULL){
 		return;  //fail	
 	}
 	    
-	//check
-    if( pf->used == 1 && pf->magic == 1234 ){
-	    pf->free = 1;
-	}		
-};
-
-
-//selecionar o pageframe como não livre.
-void notfreePageframe (struct page_frame_d *pf){
-	
-	if(pf == NULL){
-		return;  //fail	
-	}
-	    
-	//check
-    if( pf->used == 1 && pf->magic == 1234 ){
-	    pf->free = 0;
-	}		
-};
-
-
-/*
- ******************************************************
- * newPageFrame:
- *    Aloca apenas um frame de memória física e retorna o ponteiro.
- *    ? kernel mode ? user mode ?
- *    obs: isso funciona bem.
- *    Obs: Isso é usado pelo alocador de páginas, logo abaixo.
- */
-
-void *newPageFrame (){
-	
-	//#importante: 
-	//Essa estrutura é para frame na memória física.
-	struct page_frame_d *New;
-	
-	int Index;	
-	unsigned long Address = (unsigned long) (g_pagedpool_va);
-
-	//procura slot vazio.
-    for ( Index=0; Index < PAGEFRAME_COUNT_MAX; Index++ )
+    if( p->used == 1 && p->magic == 1234 )
 	{
-	    New = (void*) pageframeAllocList[Index];
-		
-		if ( New == NULL )
-		{
-			New = (void*) malloc ( sizeof( struct page_frame_d ) );
-			
-			if ( New == NULL ){
-				printf("pc-mm-newPageFrame:\n");
-				//free
-				goto fail;
-			}
-			
-			//printf("$");
-			New->id = Index;
-			New->used = 1;
-			New->magic = 1234;
-			New->free = 0;  //not free
-			New->next = NULL;
-			
-			
-			//#bugbug ... isso tá errado.
-			//endereço físico do inicio do frame.
-			//New->address = (unsigned long) Address;
-			//...
-			
-			pageframeAllocList[Index] = ( unsigned long ) New; 
-		    return (void*) New;
-		};
-	};	
-
-fail:
-    return NULL;    
+	    p->free = 1;
+	}		
 }
 
 
-/*
- *********************************************************************
- * newPage:
- *     Aloca uma página e retorna seu endereço virtual inicial com base 
- * no id do pageframe e no endereço virtual inicial do pool de pageframes.
- * 
- *     ? kernel Mode ? ou user mode ?
- *     Obs: Isso funciona bem.
- * Obs: Alocaremos uma página de memória virtual e retornaremos 
- * o ponteiro para o início da página.
- * Para isso usaremos o alocador de frames de memória física.
- */
-
-void *newPage (){
+//selecionar a página como não livre.
+void notfreePage (struct page_d *p){
 	
-	//#importante: 
-	//Essa estrutura é para frame na memória física.	
-	struct page_frame_d *New;
-	
-	// Esse é o endereço virtual do início do pool de pageframes.
-	// Isso significa que num pool temos vários pageframes.
-	
-	unsigned long base = (unsigned long) g_pagedpool_va;	
-    
-	// Pega o id do pageframe e 
-	// multiplica pelo tamanho do frame e 
-	// adiciona à base.	
-	
-    // Novo frame.
-	New	= (void *) newPageFrame ();
-	
-	if( New == NULL )
-	{
-		printf("pc-mm-newPage: New\n");
-		goto fail;
-		
-	}else{
+	if(p == NULL){
+		return;  //fail	
+	}
 	    
-        if ( New->used == 1 && New->magic == 1234 )
-		{
-			//pega o id 
-			//checa o limite de slots.
-			if ( New->id > 0 && New->id < PAGEFRAME_COUNT_MAX )
-            {
-				return (void *) ( base + (New->id * 4096) );
-			}				
-		};		
-	};
-	
- //
- // Fail !
- //
-	
-fail:
-    return NULL;	
-};
+	//check
+    if( p->used == 1 && p->magic == 1234 )
+	{
+	    p->free = 0;
+	}		
+}
 
 
 /*
  ***************************************************************
  * firstSlotForAList:
  *     Retorna o primeiro índice de uma sequência de 
- * slots livres no pageframeAllocList[].
+ * slots livres no pageAllocList[].
  */
 
 int firstSlotForAList ( int size ){
@@ -1772,7 +1666,7 @@ tryAgain:
 	
 	for ( Index=Base; Index < 1024; Index++ )
 	{
-	    slot = (void*) pageframeAllocList[Index];
+	    slot = (void*) pageAllocList[Index];
 		
 		if( (void*) slot != NULL )
 		{
@@ -1794,21 +1688,21 @@ fail:
 
 
 /*
- * testingFrameAlloc:
+ * testingPageAlloc:
  *     Rotina de teste. */ 
 
-void testingFrameAlloc (){
+void testingPageAlloc (){
 	
 	int Index;
-    struct page_frame_d *pf;
+    struct page_d *p;
 	
 	void *RetAddress;
 	unsigned long fileret;
 	
 	//#bugbug .;;;: mais que 100 dá erro ...
 	//@todo: melhorar o código de alocação de páginas.
-	//printf("testingFrameAlloc: #100\n");
-	printf("testingFrameAlloc:\n");
+	//printf("testingPageAlloc: #100\n");
+	printf("testingPageAlloc:\n");
 	
 	//
 	// =============================================
@@ -1816,41 +1710,42 @@ void testingFrameAlloc (){
 	
 	// #test:
 	// Funcionou com 500.
-    //Ret = (void*) allocPageFrames(500);  
+    //Ret = (void*) allocPages(500);  
 	
 	//8KB. Para imagem pequena.
-	RetAddress = (void *) allocPageFrames(2);      
-	if( (void*) RetAddress == NULL )
+	
+	RetAddress = (void *) allocPages (2); 
+	
+	if ( (void *) RetAddress == NULL )
 	{
 	    printf("RetAddress fail\n");
         goto fail;		
 	}
 	
-	printf("\n");
+	//printf("\n");
 	printf("BaseOfList={%x} Showing #32 \n",RetAddress);
     
 	for ( Index=0; Index < 32; Index++ )   	
 	{  
-        pf = (void *) pageframeAllocList[Index]; 
+        p = (void *) pageAllocList[Index]; 
 		
-		if( (void *) pf == NULL ){
+		if ( (void *) p == NULL )
+		{
 		    printf("null\n");	 
 		}
 	    
-		if ( (void *) pf != NULL )
+		if ( (void *) p != NULL )
 		{
 		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", 
-				pf->id, pf->used, pf->magic, pf->free, pf, pf->next ); 	
+				p->id, p->used, p->magic, p->free, p, p->next ); 	
 		}
 	};
 	
 	
     //===================================
 	 
-	fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, 
-			      VOLUME1_ROOTDIR_ADDRESS, 
-	              "BMP1    BMP", 
-				  (unsigned long) RetAddress ); 
+	fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
+	              "BMP1    BMP", (unsigned long) RetAddress ); 
 				  
 	if (fileret != 0)
 	{
@@ -1868,7 +1763,7 @@ void testingFrameAlloc (){
     //===================================							
 	
 	//Isso funcionou ...
-	refresh_rectangle( 20, 20, 16, 16 );
+	refresh_rectangle ( 20, 20, 16, 16 );
 	
 	//struct myrect *rc;
 	
@@ -1882,7 +1777,7 @@ void testingFrameAlloc (){
 	
 	//move_back_to_front(rc);
 	
-	printf("pc-mm-testingFrameAlloc: debug hang\n");
+	printf ("pc-mm-testingPageAlloc: *hang\n");
     die();
 	
 done:

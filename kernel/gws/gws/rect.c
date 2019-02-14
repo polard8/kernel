@@ -485,7 +485,7 @@ int initialize_saved_rect (){
      
         // 800x600x3 (resolução máxima) 351+ páginas.
 		//com isso poderemos salvar uma tela nessa resolução.
-		SavedRect->buffer_address = (void *) allocPageFrames (360);
+		SavedRect->buffer_address = (void *) allocPages (360);
 	
 	    if ( (void *) SavedRect->buffer_address == NULL )
 	    {

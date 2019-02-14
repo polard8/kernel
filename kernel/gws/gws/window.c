@@ -3813,11 +3813,11 @@ int windowLoadGramadoIcons (){
 	// Vamos carregar ícones pequenos.
 	//@todo checar a validade dos ponteiros.
     
-	appIconBuffer = (void *) allocPageFrames(4);
-	fileIconBuffer = (void *) allocPageFrames(4);
-	folderIconBuffer = (void *) allocPageFrames(4);
-	terminalIconBuffer = (void *) allocPageFrames(4);
-	cursorIconBuffer = (void *) allocPageFrames(4);
+	appIconBuffer      = (void *) allocPages (4);
+	fileIconBuffer     = (void *) allocPages (4);
+	folderIconBuffer   = (void *) allocPages (4);
+	terminalIconBuffer = (void *) allocPages (4);
+	cursorIconBuffer   = (void *) allocPages (4);
 	//...
 	
 	if ( (void *) appIconBuffer == NULL )

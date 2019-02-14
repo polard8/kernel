@@ -194,7 +194,7 @@ int load_mouse_bmp (){
 	
 	int Status = 1;
 	int Index;
-    struct page_frame_d *pf;
+ 
 	unsigned long fileret;
 	
 #ifdef KERNEL_VERBOSE
@@ -207,9 +207,9 @@ int load_mouse_bmp (){
 	// Ret = (void*) allocPageFrames(500);  
 	
     // Alocando duas páginas para um BMP pequeno. 8KB.	
-	mouseBMPBuffer = (void *) allocPageFrames(2);
-	//mouseBMPBuffer = (void*) allocPageFrames(10);
-	//mouseBMPBuffer = (void*) allocPageFrames(100);  //400KB
+	mouseBMPBuffer = (void *) allocPages(2);
+	//mouseBMPBuffer = (void*) allocPages(10);
+	//mouseBMPBuffer = (void*) allocPages(100);  //400KB
 	
 	if ( (void *) mouseBMPBuffer == NULL ){
 		
@@ -218,21 +218,7 @@ int load_mouse_bmp (){
 	};
 	
 	
-	// #debug
-	//printf("\n");
-	//printf("BaseOfList={%x} Showing #32 \n",mouseBMPBuffer);
-    //for(Index = 0; Index < 32; Index++)   	
-	//{  
-    //    pf = (void*) pageframeAllocList[Index]; 
-	//	
-	//	if( (void*) pf == NULL ){
-	//	    printf("null\n");	 
-	//	}
-	//   if( (void*) pf != NULL ){
-	//	    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n",
-	//          pf->id ,pf->used ,pf->magic ,pf->free ,pf ,pf->next ); 	
-	//	}
-	//}
+ 
 	
 	//
 	// ## Loading ...  ##

@@ -98,7 +98,7 @@ FILE *fopen ( const char *filename, const char *mode ){
 
 	/*
 	 *usado para alocar mais páginas.
-	Ret = (void*) allocPageFrames(2);      //8KB. para imagem pequena.
+	Ret = (void*) allocPages(2);      //8KB. para imagem pequena.
 	if( (void*) Ret == NULL ){
 	    printf("Ret fail\n");
         goto fail;	

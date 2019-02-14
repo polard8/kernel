@@ -33,7 +33,7 @@ int gwsInstallFont ( char *file_name ){
 	//printf(" #### Loading font ####\n");
 	
 	//14KB	
-	void *font_buffer = (void *) allocPageFrames(8);
+	void *font_buffer = (void *) allocPages(8);
 	
 	if ( (void *) font_buffer == NULL )
 	{

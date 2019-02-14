@@ -515,7 +515,7 @@ system_procedure ( struct window_d *window,
 					//timer_cursor_status = 0;
 					
 					
-				    //testingFrameAlloc();
+				    //testingPageAlloc();
 					
 				    //init_clock(); //clock information
 					//get_cmos_info();

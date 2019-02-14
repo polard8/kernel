@@ -479,7 +479,8 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 // Isso equiva à apenas um pagepool. enão não poderá ser usado
 // em outro lugar enão no contexto de um pagepool.
 //
-#define PAGEFRAME_COUNT_MAX 1024    //??
+
+#define PAGE_COUNT_MAX 1024    //??
 
 
 // Quantidade máxima de framepools.
@@ -823,8 +824,10 @@ struct free_mmblock_d
  *     Guarda informações sobre um 'page frame' na memória física.
  *     @todo: Incluir todas as informações necessárias.
  */
-typedef struct page_frame_d page_frame_t;
-struct page_frame_d
+
+//typedef struct page_d page_t;
+
+struct page_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
@@ -858,22 +861,23 @@ struct page_frame_d
 	
 	
 	//navegação
-    struct page_frame_d *next;	
+    struct page_d *next;	
 };
-page_frame_t *pageframeCurrent;
+struct page_d *pageframeCurrent;
+//page_t *pageframeCurrent;  //deletar
 //...
 
-//Lista de page frames.
-unsigned long pageframeList[PAGEFRAME_COUNT_MAX];
-//page_frames_t *pageframeListHead;
+//Lista de pages.
+unsigned long pageList[PAGE_COUNT_MAX];
+ 
 
 //
 // *importante
 //
 
 //pool de memória paginável usado para alocação.
-//aqui ficam os ponteiros para estrutura do tipo pageframe
-unsigned long pageframeAllocList[PAGEFRAME_COUNT_MAX];
+//aqui ficam os ponteiros para estrutura do tipo page
+unsigned long pageAllocList[PAGE_COUNT_MAX];
 
 
 /*
@@ -1126,15 +1130,21 @@ void *CreatePageTable ( unsigned long directory_address,
 
 
 
-int pfEmpty(struct page_frame_d *pf);
-void freePageframe(struct page_frame_d *pf);
-void notfreePageframe(struct page_frame_d *pf);	
+int pEmpty (struct page_d *p);
+void freePage (struct page_d *p);
+void notfreePage (struct page_d *p);	
+
 int firstSlotForAList(int size);	
 void initializeFramesAlloc();
-void *newPageFrame();  //aloca apenas uma página.	
-void *allocPageFrames(int size);
+
+
+//construtur
+//cria uma estrutura válida de página
+//cujo ponteiro ficará em uma lista.
+void *page();  	
+void *allocPages (int size);
 void *newPage();   //aloca uma página e retorna seu endereço virtual inicial
-void testingFrameAlloc();   //@todo: Rotina de teste. deletar.
+void testingPageAlloc();   //@todo: Rotina de teste. deletar.
 
 
 unsigned long 

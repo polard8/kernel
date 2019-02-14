@@ -2624,9 +2624,9 @@ int api_getchar (){
 
 
 /*
+ ************************************
  * apiDisplayBMP:
- *
- * Mostra na tela uma imagem bmp carregada na memória.
+ *     Mostra na tela uma imagem bmp carregada na memória.
  * 
  * IN:
  *     address = endereço base

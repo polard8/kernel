@@ -792,7 +792,7 @@ get_next:
 		
 		g_heap_count++;
 		
-		//Process->Heap = (unsigned long) allocPageFrames (64); 
+		//Process->Heap = (unsigned long) allocPages (64); 
 
         //Process->Heap = (unsigned long) malloc (1024*32); //32kb		
 		
