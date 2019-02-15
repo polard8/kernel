@@ -3231,7 +3231,6 @@ do_compare:
 		printf("\n t4: Open init.txt \n");
         
 		f1 = (FILE *) fopen ("init.txt","rb");
-		//f1 = (FILE *) fopen ("INIT    TXT","rb");
         if( f1 == NULL )
 		{
 			printf("fopen fail\n");
@@ -4482,16 +4481,9 @@ int shellInit ( struct window_d *window ){
 // Done.
 	
 done:
-    
-	
-	// #bugbug
-	// Esse input está falahndo e pegando valores extras as vezes.
-    // SUSPENDIDO ATÉ ESSE TIPO DE INPUT FUNCIONAR.
-	
-	//if ( shellCheckPassword() != 1 ){
-	//	
-	//    printf("shellCheckPassword FAIL \n");		
-	//}
+		
+	if (interactive == 1)
+	    loginCheckPassword ();
 
 
 	// @todo:
@@ -4552,186 +4544,12 @@ done:
 };
 
 
-int shellCheckPassword (){
-	
-	//#suspenso por causa do fopen.
-	
-	return 0;
-	/*
-	
-    char buffer[512];	
-	
-	// Somente um shell interativo tem login.
-	
-	if (interactive == 1)
-	{
-		//hostname
-        current_host_name = "??host??";		
-		
-		
-		//file 
-		
-		FILE *user_stream;
-		
-		user_stream = (FILE *) fopen ("user.txt","w+");
-		
-		//#todo check.
-		if ( (void *) user_stream == NULL )
-		{
-		    printf ("Couldn't open the file\n");
-		}
-		
-		// Testing welcome message.
-	    //printf("\n");
-	    printf("\n Welcome to Gramado shell! \n");
-	    //printf("\n");
-	
-		//#obs
-		//gets is on (stdio.c)
-        		
-		//
-		//  ## username  ##
-		//
-		
-	    printf("\n username: ");
-	    gets(username);
-		current_user_name = username;
-		
-		//
-		//  ## password ##
-	    //
-		
-		printf("\n password: ");
-	    gets(password);
-		
-		printf("\n");
-	
-//#ifdef SHELL_VERBOSE	
-        //@todo colocar o ponteiro na variável no início do arquivo.	
-	    printf("username={%s} password={%s} \n", username, password );
-		//printf("\n");
-//#endif
-		
-		char *c = (char *) &user_stream->_base[0];		
-		
-		int i;
-		
-		//procura user name.
-		while ( *c && *c != 'U' ){			
-			c++;
-		};
-		
-		if ( c[0] == 'U' &&
-             c[1] == 'S' &&
-             c[2] == 'E' &&
-             c[3] == 'R' &&
-             c[4] == 'N' &&
-             c[5] == 'A' &&
-             c[6] == 'M' && 			
-		     c[7] == 'E' )
-		{
-		    //USERNAME={fred}
-            c = c+10; 
-			
-		    
-			//Move apenas 'fred'
-		    for ( i=0; i<4; i++ ){
-			    buffer[i] = c[i];
-		    }			
-			
-			//printf("\n");
-			//printf("%c", c[0]);
-			//printf("%c", c[1]);
-			//printf("%c", c[2]);
-			//printf("%c", c[3]);
-			//printf("\n");
-			
-			//printf("\n");
-			//printf("%c", buffer[0]);
-			//printf("%c", buffer[1]);
-			//printf("%c", buffer[2]);
-			//printf("%c", buffer[3]);
-			//printf("\n");
-			
-#ifdef SHELL_VERBOSE			
-			printf(">>%s\n", username);
-			printf(">>%s\n", buffer);
-#endif
-			
-            if( strncmp( username, buffer, 4 ) == 0 )
-            {
-#ifdef SHELL_VERBOSE				
-				printf("# USERNAME OK #\n");
-#endif				
-				login_status = 1;
-			}else{
-				printf("# USERNAME FAIL #\n");
-				login_status = 0;
-			};				
-
-        }else{
-			
-			printf("# USERNAME FAIL #\n");
-			login_status = 0;
-		};
-
-
-		while ( *c && *c != 'P' ){			
-			c++;
-		};
-		
-		if ( c[0] == 'P' &&
-             c[1] == 'A' &&
-             c[2] == 'S' &&
-             c[3] == 'S' &&
-             c[4] == 'W' &&
-             c[5] == 'O' &&
-             c[6] == 'R' && 			
-		     c[7] == 'D' )
-		{
-		    //PASSWORD={1234}
-            c = c+10; 
-			
-		    //Move apenas '1234'
-		    for ( i=0; i<4; i++ ){
-			    buffer[i] = c[i];
-		    };
-
-#ifdef SHELL_VERBOSE				
-			printf(">>%s\n", password);
-			printf(">>%s\n", buffer);
-#endif			
-			
-            if ( strncmp( password, buffer, 4 ) == 0 )
-            {
-#ifdef SHELL_VERBOSE								
-				printf("# PASSWORD OK #\n");
-#endif
-				login_status = 1;
-			}else{
-				printf("# PASSWORD FAIL #\n");
-				login_status = 0;
-			};					
-			
-		}else{
-			
-		    printf("# PASSWORD FAIL #\n");
-            login_status = 0; 			
-		};
-		    
-	}else{
-		
-		printf("shell not interactive\n");
-		login_status = 0;
-	};
-	
-#ifdef SHELL_VERBOSE
-		printf("Login done!\n");
-#endif
-	
-	return (int) login_status;
-	*/
-};
+//cancelado;
+//agora esta el login.c
+int shellCheckPassword ()
+{
+    return -1; //deletar
+}
 
 
 /*

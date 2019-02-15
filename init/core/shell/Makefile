@@ -65,8 +65,8 @@ string.o \
 conio.o \
 builtins.o \
 desktop.o \
-unistd.o  
-
+unistd.o \
+login.o   
 
 
 
@@ -89,6 +89,8 @@ all-c:
 	gcc  -c  shellui.c   -I $(LIBC) -I $(API01) $(CFLAGS) -o shellui.o
 	gcc  -c  builtins.c  -I $(LIBC) -I $(API01) $(CFLAGS) -o builtins.o
 	gcc  -c  desktop.c   -I $(LIBC) -I $(API01) $(CFLAGS) -o desktop.o
+	gcc  -c  login.c     -I $(LIBC) -I $(API01) $(CFLAGS) -o login.o	
+	
 #	gcc  -c  parser.c    -I ../../../include/libc/ $(CFLAGS) -o parser.o
 #	gcc  -c  lexer.c     -I ../../../include/libc/ $(CFLAGS) -o lexer.o
 #	gcc  -c  net.c       -I ../../../include/libc/ $(CFLAGS) -o net.o

@@ -1118,7 +1118,11 @@ void *services ( unsigned long number,
 		//#bugbug: a partir de agora isso deve pegar mensagem na thread 
 		//atual e não mais na janela com foco de entrada.			
         case SYS_GETCH:  
+			
 			return (void *) thread_getchar();
+			
+			//#todo: podemos tentar pegar do stdin do processo atual.
+			//return (void *) fgetc ( (FILE *) arg2 );
             break;
 
 		//138 - get key state.	
