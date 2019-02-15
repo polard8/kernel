@@ -1543,6 +1543,30 @@ void *services ( unsigned long number,
 		    __spinlock_ipc = 1;
             break;
 			
+			
+		//232
+		case 232:
+			return (void *) fclose ( (FILE *) arg2);
+			break;
+			
+		//233
+		case 233:
+			return (void *) fflush ( (FILE *) arg2);
+			break;
+			
+		//234
+		case 234:
+			return (void *) fprintf ( (FILE *) arg2, (const char *) arg3 );
+			break;
+			
+		//235
+		case 235:
+			return (void *) fputs ( (const char *) arg2, (FILE *) arg3 );
+			break;
+			
+			
+			
+			
 		//240
 		case SYS_GETCURSORX:
 		    return (void *) get_cursor_x();

@@ -188,12 +188,12 @@ void *stdio_system_call ( unsigned long ax,
  ************************************************
  * fclose:
  *     Close a file.
- *     If work, return 0.
- *     #todo: chamar o kernel para realizar essa tarefa. */
+ *     If work, return 0. */
 
 int fclose (FILE *stream){
-	//#todo: chamar system call.
-	return (int) -1;
+ 
+    return (int) stdio_system_call ( 232, (unsigned long) stream, 
+					 (unsigned long) stream, (unsigned long) stream ); 
 }
 
 
@@ -1284,7 +1284,7 @@ int input_file_buffer_size(void)
 int getchar (void){
 	
 	return (int) stdio_system_call ( 137, 0, 0, 0 ); 
-};
+}
 
 
 /*
@@ -1374,6 +1374,7 @@ void stdioInitialize (){
 
 
 /* 
+ ***********************************
  * fflush: 
  * Salva o buffer no arquivo associado a ele.
  * e limpa o buffer. 
@@ -1383,10 +1384,9 @@ void stdioInitialize (){
 
 int fflush ( FILE *stream ){
 	
-	//#todo:
-	//chamar system call;
-	return (int) -1;
-};
+    return (int) stdio_system_call ( 233, (unsigned long) stream, 
+					 (unsigned long) stream, (unsigned long) stream ); 
+}
 
 
 /*
@@ -1396,12 +1396,9 @@ int fflush ( FILE *stream ){
 
 int fprintf ( FILE *stream, const char *format, ... ){
 	
-	
-	//#bugbug
-	//precisamos chamr a system call.
-	
-	return (int) (-1);
-};
+    return (int) stdio_system_call ( 234, (unsigned long) stream, 
+					 (unsigned long) format, (unsigned long) format ); 
+}
 
 
 /*
@@ -1410,10 +1407,8 @@ int fprintf ( FILE *stream, const char *format, ... ){
  */
 int fputs ( const char *str, FILE *stream ){
 	
- 	//#bugbug
-	//precisamos chamr a system call.
-	
-	return (int) (-1);
+    return (int) stdio_system_call ( 235, (unsigned long) str, 
+					 (unsigned long) stream, (unsigned long) stream ); 
 }
 
 

@@ -68,6 +68,75 @@ void procedureWindowWithFocusTest();
 void procedureGrid();
 
 
+
+
+
+//=========================================
+//f5
+//para testar recursos da libc.
+void
+xxxtestlibc()
+{
+	FILE *f1;
+	int ch_test;
+	
+		printf("\n xxxtestlibc: Open init.txt \n");
+        
+		//f1 = (FILE *) fopen ("init.txt","rb");   	
+	      f1 = (FILE *) fopen ("GRAMADO TXT","rb");  
+        if( f1 == NULL )
+		{
+			printf("fopen fail\n");
+		}else{
+			printf("fopen ok\n");
+			
+			//#bugbug
+			//isso funcionou, entao fopen funciona, entao o problema esta' em fgetc
+			//printf("show: %s @\n", f1->_base );
+			
+		    //Isso mostra que o arquivo foi carregado corretamente 
+		    //na base esperada.
+		    //printf("Show f1->_base: %s\n",f1->_base);
+		
+		    printf("stream info:\n");
+		    printf("f1->_base: %x\n",f1->_base);
+		    printf("f1->_ptr: %x\n",f1->_ptr);
+		    printf("f1->_cnt: %d\n",f1->_cnt);			
+			
+		}
+		
+
+		
+		//
+		// #bugbug ... o fgetc não lê na estrutura esperada.
+		//
+		printf("Testing fgetc ... \n\n");
+		while(1)
+		{
+			//#bugbug: page fault quando chamamos fgetc.
+			//printf("1");
+			ch_test = (int) fgetc (f1);
+			//ch_test = (int) getc (f1); 
+			
+			if( ch_test == EOF )
+			{
+				printf("\n\n");
+				printf("EOF reached :)\n\n");
+				return;
+				//goto exit_cmp;
+				
+			}else{
+				//printf("+");
+			    printf ("%c", ch_test);	
+			};
+		};
+}
+//====================================
+
+
+
+
+
 void procTestF6()
 {	 
 	void *address = (void *) kmalloc (1024);
@@ -457,8 +526,13 @@ system_procedure ( struct window_d *window,
 				case VK_F5:
 
 					printf("F5:\n"); 
-                    show_ide_info ();		 //execve/dd/disk1.c			
-	                show_ideports_info();    //execve/sm/disk/diskvol.c
+                    
+					//interna
+					//no inci'cio do arquivo
+					xxxtestlibc();
+					
+					//show_ide_info ();		 //execve/dd/disk1.c			
+	                //show_ideports_info();    //execve/sm/disk/diskvol.c
 					
 					//#test testando inicialização do IDE, #funcionou.
 					//ata_initialize();
@@ -478,9 +552,6 @@ system_procedure ( struct window_d *window,
 					//vamos mostrar informações antes obtidas pelo sistema.
 					//show_network_info ();
 					refresh_screen();
-
-
-
 
 					//pci_info();     //PCI information.
 				    					

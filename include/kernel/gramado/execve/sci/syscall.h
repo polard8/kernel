@@ -452,10 +452,13 @@
 //logon logoff support.
 #define	SYS_STARTLOGON  230
 #define	SYS_STARTLOGOFF 231
-#define	SYS_232 232
-#define	SYS_233 233
-#define	SYS_234 234
-#define	SYS_235 235
+
+//libc support
+#define	SYS_232 232   //fclose
+#define	SYS_233 233   //fflush
+#define	SYS_234 234   //fprintf
+#define	SYS_235 235   //fputs
+
 #define	SYS_236 236 //reservado para boot support.
 #define	SYS_237 237 //reservado para boot support.
 #define	SYS_238 238 //reservado para boot support.

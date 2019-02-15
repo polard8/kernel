@@ -51,10 +51,10 @@ extern void refresh_screen();
 
 int fclose (FILE *stream){
 	
-	// @todo: Implementar.
-	
-	//provisório.
-	if ( (void *) stream != NULL ){
+	if ( (void *) stream == NULL )
+	{	
+	    return -1;		
+	}else{
 		
 		stream->_ptr = NULL;
 		stream->_cnt = 0;
@@ -95,10 +95,15 @@ FILE *fopen ( const char *filename, const char *mode ){
     unsigned char struct_buffer[1024];
 	
 	//Buffer para armazenar o arquivo que vamos abrir.
-	unsigned char *file_buffer;		
+	char *file_buffer;		
 	
 	//buffer da estrutura.
-	stream = (FILE *) &struct_buffer[0];		
+	stream = (FILE *) &struct_buffer[0];	
+	
+	
+	//#test
+	//temos que fazer isso de um jeito melhor
+	size_t s = (size_t) fsGetFileSize ( (unsigned char *) filename );
 
 
 	/*
@@ -121,25 +126,50 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//já temos recursos para alocar memória para um buffer maior.
 	//obs: Essa alocação vai depender do tamanho do arquivo.
 	
-	file_buffer = (unsigned char *) newPage();
+	//stream->_cnt = PROMPT_MAX_DEFAULT;
+	stream->_cnt = s;	
 	
-	if ( (unsigned char *) file_buffer == NULL )
+	//file_buffer = (char *) newPage();
+	
+	file_buffer = (char *) malloc (s);
+	
+	if ( (char *) file_buffer == NULL )
 	{
 		printf("fopen: file_buffer");
 		die();
 	}	
 	  
-	stream->_base = &file_buffer[0];
-	stream->_ptr = stdin->_base;
-	stream->_cnt = PROMPT_MAX_DEFAULT;
+
+	stream->_base = file_buffer;
+	stream->_ptr = stream->_base;
+	
 	stream->_file = 0;
 	stream->_tmpfname = (char *) filename;	
+	
+	fsUpdateWorkingDiretoryString ( (char *) filename );
+	
+	int i;
+	if ( current_target_dir.current_dir_address == 0 )
+	{
+	    printf("sys_read_file2: current_target_dir.current_dir_address fail \n");
+		
+		//reset.
+		current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+		
+		for ( i=0; i< 11; i++ )
+		{
+			current_target_dir.name[i] = '\0';
+		}		
+		
+		//return -1;
+		return (FILE *) 0;
+	}
 	
 	// Loading file.
 				
     fileret = fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-			      VOLUME1_ROOTDIR_ADDRESS, 
-	              (unsigned char *) stream->_tmpfname, 
+			      current_target_dir.current_dir_address,  
+	              (unsigned char *) current_target_dir.name, 
 	              (unsigned long) stream->_base );				
 	
 	if ( fileret != 0 )
@@ -885,12 +915,21 @@ int fgetc ( FILE *stream ){
 		
 	} else {
 		
+		//#fim.
+		//cnt decrementou e chegou a zero.
 		//Não há mais caracteres disponíveis entre 
 		//stream->_ptr e o tamanho do buffer.
+		
 		if ( stream->_cnt <= 0 )
 		{
 			stream->_flag = (stream->_flag | _IOEOF); 
 			stream->_cnt = 0;
+			
+		    //printf ("#debug: fgetc: $\n");
+			
+			//isso funciona, significa que a estrutura tem ponteiro e base validos.
+			//printf("show fgetc:: %s @\n", stream->_base );
+		    //refresh_screen();			
 			
 			return (int) (-1);
 		};
@@ -902,18 +941,23 @@ int fgetc ( FILE *stream ){
 			printf ("#debug: fgetc: stream struct fail\n");
 		    refresh_screen();
 			return (int) (-1);
+			
 		}else{
 			
 		    //pega o char
-		    ch = (int) *stream->_ptr; 		
-		    
+		    ch = (int) *stream->_ptr; 	
+				
 			stream->_ptr++;
 		    stream->_cnt--;
+			
 		    return (int) ch;				
 		
 		}
 		//fail
 	};
+	
+    printf ("#debug: fgetc: $$\n");
+	refresh_screen();				
 	
     return (int) (-1);	
 };

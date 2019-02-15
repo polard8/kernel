@@ -1374,25 +1374,27 @@ fail:
  *     carrega do diretório alvo. */
 
 FILE *sys_read_file2 ( unsigned long name, unsigned long address ){
-	
 	 
 	 FILE *stream;
 	
+	 //alocando memoria para a estrutura.
 	 stream = (FILE *) malloc ( sizeof(FILE) );
 	
 	 if ( (void *) stream == NULL )
 	 {
 	     return (FILE *) 0;
 	 }else{
-		 
-		 // #bugbug: 
-		 // temos poucas informaçoes sobre o arquivo
-	 
-     	 stream->_base = (char *) address;
-		 stream->_ptr = stream->_base;
-		 stream->_cnt = 0;
-		 stream->_flag = 0;
+		
+     	 //stream->_base = (char *) address;
+		 //stream->_ptr = stream->_base;
+		 //stream->_cnt = 0;
+		 //stream->_flag = 0;
 		 //...
+		 
+	     //printf("sys_read_file2: struct ok \n");
+		 //printf("base=%x \n",stream->_base);
+		 //printf("ptr=%x  \n",stream->_ptr);
+		
 	 };
 	
 
@@ -1445,6 +1447,22 @@ FILE *sys_read_file2 ( unsigned long name, unsigned long address ){
 	//printf ("sys_read_file2: dir_name=(%s) dir_addr=(%x) #debug \n",
 	//    current_target_dir.name, current_target_dir.current_dir_address );
 	
+	
+	size_t s = (size_t) fsGetFileSize ( (unsigned char *) name );
+	
+	
+		stream->_base = (char *) new_address;
+		stream->_ptr  = (char *) new_address;	
+	    stream->_cnt = s;
+	
+	    stream->_file = 0;
+	    stream->_tmpfname = (char *) name;		
+	
+		
+	     printf("sys_read_file2: struct ok \n");
+		 printf("base=%x \n",stream->_base);
+		 printf("ptr=%x  \n",stream->_ptr);
+	
 		
     taskswitch_lock();
     scheduler_lock();			
@@ -1461,6 +1479,8 @@ FILE *sys_read_file2 ( unsigned long name, unsigned long address ){
 	
 	if ( Ret == 0)
 	{
+		printf("sys_read_file2: done\n");
+
         current_target_dir.current_dir_address = new_address;
 		return (FILE *) stream;
 		
