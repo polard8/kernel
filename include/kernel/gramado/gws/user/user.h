@@ -245,7 +245,10 @@ int keyboard_message_tail;
 // Podemos mudar isso toda vez que o 
 // processo com foco de entrada mudar.
 // ?? tty struct ??
+
 FILE *current_stdin;
+FILE *current_stdout;
+FILE *current_stderr;
 
  
 //estrutura para enviar mensagens de teclado do kernel para 

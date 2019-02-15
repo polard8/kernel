@@ -221,7 +221,7 @@ int fflush ( FILE *stream ){
 	}
 		
 	// Limits.
-    // Se o buffer tiver vazizo ou for maior que o limite.	
+    // Se o buffer tiver vazio ou for maior que o limite.	
 	if ( stream->_bufsiz == 0 || stream->_bufsiz > BUFSIZ )
 	{
 		
@@ -1656,9 +1656,16 @@ int stdioInitialize (){
 	// ## keyboard support ##
 	//
 	
+	//fluxo padrao
+	
 	//#importante
 	//usando o buffer keybuffer coko arquivo.
 	//ele esta em gws/user.
+	
+	
+	//
+	// ## stdin
+	//
 	
 	unsigned char *current_stdin_struct_buffer;
 	unsigned char *current_stdin_data_buffer;
@@ -1670,8 +1677,39 @@ int stdioInitialize (){
 	current_stdin->_base = (char *) &current_stdin_data_buffer[0];
 	current_stdin->_ptr  = (char *) &current_stdin_data_buffer[0];
 	current_stdin->_cnt = 128;  //Limitando. na verdade e' 4KB.
+	current_stdin->_bufsiz = 128;
 	
+	//
+	// ## stdout
+	//
 	
+	unsigned char *current_stdout_struct_buffer;
+	unsigned char *current_stdout_data_buffer;
+	
+	current_stdout_struct_buffer = (unsigned char *) newPage();
+	current_stdout_data_buffer = (unsigned char *) newPage();	
+	
+	current_stdout = (FILE *) &current_stdout_struct_buffer[0];
+	current_stdout->_base = (char *) &current_stdout_data_buffer[0];
+	current_stdout->_ptr  = (char *) &current_stdout_data_buffer[0];
+	current_stdout->_cnt = 128;  //Limitando. na verdade e' 4KB.
+	current_stdout->_bufsiz = 128;
+	
+	//
+	// ## stderr
+	//	
+	
+	unsigned char *current_stderr_struct_buffer;
+	unsigned char *current_stderr_data_buffer;
+	
+	current_stderr_struct_buffer = (unsigned char *) newPage();
+	current_stderr_data_buffer = (unsigned char *) newPage();	
+	
+	current_stderr = (FILE *) &current_stderr_struct_buffer[0];
+	current_stderr->_base = (char *) &current_stderr_data_buffer[0];
+	current_stderr->_ptr  = (char *) &current_stderr_data_buffer[0];
+	current_stderr->_cnt = 128;  //Limitando. na verdade e' 4KB.
+	current_stderr->_bufsiz = 128;
 
 	// Done !
 
@@ -1680,6 +1718,51 @@ int stdioInitialize (){
 fail:
     panic ("crts-libc-stdio-stdioInitialize: fail\n");
 };
+
+
+/*
+ *******************************************
+ * REFRESH_STREAM:
+ *     #IMPORTANTE
+ *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
+ */
+
+
+void REFRESH_STREAM ( FILE *stream ){
+
+     char *c;
+     
+	 //#debug
+	 //sprintf ( stream->_base, "TESTING STDOUT ..." );
+	 
+	 int i;
+	 int j;
+	 
+	 j = 80*25;
+	 
+	 c = stream->_base;
+	  
+	int cWidth = get_char_width ();
+	int cHeight = get_char_height ();
+	
+	if ( cWidth == 0 || cHeight == 0 )
+	{
+		//#debug
+		printf ("servicesPutChar: fail w h ");
+		die();
+	}
+	
+     stdio_terminalmode_flag = 1;  
+	 for (i=0; i<j; i++)
+	 {
+	    //putchar ( (int) c );
+		printf("%c",  *c );
+	    refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, 
+		    cWidth, cHeight );
+		 c++;
+	 }
+	stdio_terminalmode_flag = 0;  
+}
 
 
 //

@@ -68,6 +68,44 @@ void procedureWindowWithFocusTest();
 void procedureGrid();
 
 
+// #IMPORTANTE
+// REFRESH STDOUT
+
+void 
+xxxtestlibcSTDOUT(){
+
+     char *c;
+     
+	 sprintf ( current_stdout->_base, "TESTING STDOUT ..." );
+	 
+	 int i;
+	 int j;
+	 
+	 j = 80*25;
+	 
+	 c = current_stdout->_base;
+	  
+	int cWidth = get_char_width ();
+	int cHeight = get_char_height ();
+	
+	if ( cWidth == 0 || cHeight == 0 )
+	{
+		//#debug
+		printf ("servicesPutChar: fail w h ");
+		die();
+	}
+	
+     stdio_terminalmode_flag = 1;  
+	 for (i=0; i<j; i++)
+	 {
+	    //putchar ( (int) c );
+		printf("%c",  *c );
+	    refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, 
+		    cWidth, cHeight );
+		 c++;
+	 }
+	stdio_terminalmode_flag = 0;  
+}
 
 
 
@@ -526,10 +564,15 @@ system_procedure ( struct window_d *window,
 				case VK_F5:
 
 					printf("F5:\n"); 
+					
+					sprintf ( current_stdout->_base, "Testing refresh current_stdout ..." );
+					REFRESH_STREAM (current_stdout);
+					
+				   //xxxtestlibcSTDOUT();
                     
 					//interna
 					//no inci'cio do arquivo
-					xxxtestlibc();
+					//xxxtestlibc();
 					
 					//show_ide_info ();		 //execve/dd/disk1.c			
 	                //show_ideports_info();    //execve/sm/disk/diskvol.c
@@ -551,7 +594,7 @@ system_procedure ( struct window_d *window,
 					//refresh_screen(); 
 					//vamos mostrar informações antes obtidas pelo sistema.
 					//show_network_info ();
-					refresh_screen();
+					//refresh_screen();
 
 					//pci_info();     //PCI information.
 				    					
