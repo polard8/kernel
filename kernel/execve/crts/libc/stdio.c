@@ -1651,6 +1651,28 @@ int stdioInitialize (){
 	
     prompt_pos = 0;	
 	
+	
+	//
+	// ## keyboard support ##
+	//
+	
+	//#importante
+	//usando o buffer keybuffer coko arquivo.
+	//ele esta em gws/user.
+	
+	unsigned char *current_stdin_struct_buffer;
+	unsigned char *current_stdin_data_buffer;
+	
+	current_stdin_struct_buffer = (unsigned char *) newPage();
+	current_stdin_data_buffer = (unsigned char *) newPage();	
+	
+	current_stdin = (FILE *) &current_stdin_struct_buffer[0];
+	current_stdin->_base = (char *) &current_stdin_data_buffer[0];
+	current_stdin->_ptr  = (char *) &current_stdin_data_buffer[0];
+	current_stdin->_cnt = 128;  //Limitando. na verdade e' 4KB.
+	
+	
+
 	// Done !
 
     return (int) 0;	

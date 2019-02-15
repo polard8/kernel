@@ -16,12 +16,11 @@
 // Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
 uint8_t keyboard_read (){
  
-    
-	kbdc_wait(0);
+	kbdc_wait (0);
 	
-	uint8_t val = inportb(0x60);
+	uint8_t val = inportb (0x60);
     
-	wait_ns(200);
+	wait_ns (200);
     
 	return val;
 };

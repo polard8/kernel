@@ -237,10 +237,15 @@ int keybuffer_head;
 int keybuffer_tail;
 char keybuffer[128];
 
- 
 int keyboard_message_head;
 int keyboard_message_tail;
 
+
+// Current stdin.
+// Podemos mudar isso toda vez que o 
+// processo com foco de entrada mudar.
+// ?? tty struct ??
+FILE *current_stdin;
 
  
 //estrutura para enviar mensagens de teclado do kernel para 

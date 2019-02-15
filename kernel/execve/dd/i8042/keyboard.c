@@ -41,8 +41,6 @@
  
 #include <kernel.h>
 
-
-
 //
 // Obs: um driver de teclado precisa ter acesso as portas, 
 // As opções são:
@@ -83,9 +81,23 @@
 	// input e acordar a threa que está esperando por esse tipo de evento. 
 	
 	
-	//#obs: Esse buffer está em user.h 
+	// #obs: 
+    // Esse buffer está em gws/user.h 
 
+// PUT SCANCODE
+void abnt2_keyboard_handler (){
+	
+    unsigned char scancode = inportb (0x60);	
+		
+	current_stdin->_base[keybuffer_tail++] = (char) scancode;
+	
+	if ( keybuffer_tail >= current_stdin->_cnt ){
+		keybuffer_tail = 0;
+	}
+}
 
+/*
+// PUT SCANCODE
 void abnt2_keyboard_handler (){
 	
     unsigned char scancode = inportb (0x60);	
@@ -96,7 +108,7 @@ void abnt2_keyboard_handler (){
 		keybuffer_tail = 0;
 	}
 };
-
+*/
 
 
 //#importante
@@ -104,6 +116,25 @@ void abnt2_keyboard_handler (){
 //pega o scancode.
 //renova a fila do teclado
 
+unsigned long get_scancode (){
+	
+	unsigned long SC = 0;
+	
+	SC = (unsigned char) current_stdin->_base[keybuffer_head];
+					
+	current_stdin->_base[keybuffer_head] = 0;
+	
+	keybuffer_head++;
+	
+	if ( keybuffer_head >= current_stdin->_cnt ){ 
+	    keybuffer_head = 0; 
+	};	
+	
+	return (unsigned long) SC; 	
+}
+
+/*
+// GET SCANCODE
 unsigned long get_scancode (){
 	
 	unsigned long SC = 0;
@@ -119,8 +150,8 @@ unsigned long get_scancode (){
 	};	
 	
 	return (unsigned long) SC; 	
-};
-
+}
+*/
 
 /*
  **************
@@ -131,7 +162,6 @@ unsigned long get_scancode (){
  *     IRQ1.
  *     Essa rotina deve selecionar o handler a ser chamado de acordo
  *     com o driver instalado.
- * 
  */
  
 void KiKeyboard (){
@@ -154,7 +184,7 @@ void KiKeyboard (){
 	{
 	    panic ("unblocked-KiKeyboard: not abnt2\n");
 	};
-};
+}
 
 
 //
