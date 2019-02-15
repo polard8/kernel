@@ -472,11 +472,12 @@
 #define	SYS_244 244   //enable text cursor.
 #define	SYS_245 245   //disable text cursor.
 
-#define	SYS_246 246
-
+//reservado para libc support.
+#define	SYS_246 246   //fopen
 #define	SYS_247 247
 #define	SYS_248 248
 #define	SYS_249 249
+
 //Info support.
 #define	SYS_GETSYSTEMMETRICS  250 
 #define	SYS_SHOWDISKINFO      251 //Informações sobre o disco atual.            

@@ -316,6 +316,7 @@ void *services ( unsigned long number,
         //o atendimento às system calls.			
 		//IN: name. address
 		case SYS_READ_FILE:
+			
 			//funciona, nao mexer nesse
 		    //return (void *) sys_read_file ( (unsigned long) a2, (unsigned long) arg3 );
 			
@@ -1590,6 +1591,23 @@ void *services ( unsigned long number,
 		    //timerShowTextCursor = 0;
 		    //gwsDisableTextCursor ();
             break;		
+			
+			
+		case 246:
+			return (void *) fopen ( (const char *) arg2, (const char *) arg3 );
+			break;
+			
+		case 247:
+			//return (void *) 
+			break;
+			
+		case 248:
+			//return (void *) 
+			break;
+			
+		case 249:
+			//return (void *) 
+			break;
 			
 		//Info. (250 ~ 255).
 		

@@ -3230,7 +3230,8 @@ do_compare:
 	{
 		printf("\n t4: Open init.txt \n");
         
-		f1 = (FILE *) fopen ("init.txt","rb");  
+		f1 = (FILE *) fopen ("init.txt","rb");
+		//f1 = (FILE *) fopen ("INIT    TXT","rb");
         if( f1 == NULL )
 		{
 			printf("fopen fail\n");

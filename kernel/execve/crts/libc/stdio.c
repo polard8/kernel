@@ -101,6 +101,9 @@ FILE *fopen ( const char *filename, const char *mode ){
 	stream = (FILE *) &struct_buffer[0];	
 	
 	
+	read_fntos ( (char *) filename );
+	
+	
 	//#test
 	//temos que fazer isso de um jeito melhor
 	size_t s = (size_t) fsGetFileSize ( (unsigned char *) filename );
