@@ -2271,12 +2271,12 @@ int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr )
 
 /*
  #bsd
-int vprintf(const char *fmt, va_list ap);
+*/
+
 int vprintf(const char *fmt, va_list ap)
 {
 	return vfprintf(stdout, fmt, ap);
 }
-*/
 
 
 //printf que escreve no stdout. 

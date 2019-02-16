@@ -432,6 +432,9 @@ vhd-copy-files:
 	-sudo cp ../gde/bin/CHASM32.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/JACKPOT.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GFE.BIN       /mnt/gramadovhd 	
+	-sudo cp ../gde/bin/LUA.BIN       /mnt/gramadovhd 		
+#...
+
 	
 #test	
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/boot

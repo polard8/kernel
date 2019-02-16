@@ -16,7 +16,7 @@
 #define __STDIO_H__
  
 #include <stddef.h>
-
+#include <stdarg.h> 
 
 #ifdef	_BSD_SIZE_T_
 typedef	_BSD_SIZE_T_	size_t;
@@ -475,6 +475,7 @@ int drawBar(int color);  //??
 //#todo
 int snprintf(char *str,size_t count,const char *fmt,...);
 
+int vprintf (const char *fmt, va_list ap);
 
 
 /*Inicialização da biblioteca*/

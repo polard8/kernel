@@ -70,6 +70,8 @@ all-c:
 	gcc  -c  time.c    $(CFLAGS) -I include/ -o time.o	
 	gcc  -c  wait.c    $(CFLAGS) -I include/ -o wait.o		
 	
+	gcc  -c  math.c    $(CFLAGS) -I include/ -o math.o			
+	
 #...	
 		
 
