@@ -308,21 +308,21 @@ compile-kernel:
 	gcc -c kernel/execve/sci/services.c  -I include/ $(CFLAGS) $(DEFINES) -o services.o
 
 	# /sm
-	gcc -c kernel/execve/sm/init/init.c    -I include/ $(CFLAGS) $(DEFINES) -o init.o
-	gcc -c kernel/execve/sm/ob/object.c    -I include/ $(CFLAGS) $(DEFINES) -o object.o
+	gcc -c kernel/execve/sm/init.c    -I include/ $(CFLAGS) $(DEFINES) -o init.o
+	gcc -c kernel/execve/sm/system.c  -I include/ $(CFLAGS) $(DEFINES) -o system.o
+	gcc -c kernel/execve/sm/debug/debug.c      -I include/ $(CFLAGS) $(DEFINES) -o debug.o
+	gcc -c kernel/execve/sm/disk/diskvol.c     -I include/ $(CFLAGS) $(DEFINES) -o diskvol.o
+	gcc -c kernel/execve/sm/install/install.c  -I include/ $(CFLAGS) $(DEFINES) -o install.o	
+	gcc -c kernel/execve/sm/ob/object.c        -I include/ $(CFLAGS) $(DEFINES) -o object.o
+	gcc -c kernel/execve/sm/rt/runtime.c       -I include/ $(CFLAGS) $(DEFINES) -o runtime.o
+	gcc -c kernel/execve/sm/sys/abort.c    -I include/ $(CFLAGS) $(DEFINES) -o abort.o
+	gcc -c kernel/execve/sm/sys/channel.c  -I include/ $(CFLAGS) $(DEFINES) -o channel.o
+	gcc -c kernel/execve/sm/sys/info.c     -I include/ $(CFLAGS) $(DEFINES) -o info.o
+	gcc -c kernel/execve/sm/sys/io.c       -I  include/ $(CFLAGS) $(DEFINES) -o io.o
 	gcc -c kernel/execve/sm/sys/modules.c  -I include/ $(CFLAGS) $(DEFINES) -o modules.o
 	gcc -c kernel/execve/sm/sys/proc.c     -I include/ $(CFLAGS) $(DEFINES) -o proc.o
-	gcc -c kernel/execve/sm/sys/abort.c    -I include/ $(CFLAGS) $(DEFINES) -o abort.o
-	gcc -c kernel/execve/sm/sys/info.c     -I include/ $(CFLAGS) $(DEFINES) -o info.o
-	gcc -c kernel/execve/sm/sys/sm.c       -I include/ $(CFLAGS) $(DEFINES) -o sm.o
-	gcc -c kernel/execve/sm/sys/channel.c  -I include/ $(CFLAGS) $(DEFINES) -o channel.o
 	gcc -c kernel/execve/sm/sys/signal.c   -I include/ $(CFLAGS) $(DEFINES) -o signal.o
-	gcc -c kernel/execve/sm/sys/system.c   -I include/ $(CFLAGS) $(DEFINES) -o system.o
-	gcc -c kernel/execve/sm/sys/io.c       -I  include/ $(CFLAGS) $(DEFINES) -o io.o
-	gcc -c kernel/execve/sm/rt/runtime.c       -I include/ $(CFLAGS) $(DEFINES) -o runtime.o
-	gcc -c kernel/execve/sm/disk/diskvol.c     -I include/ $(CFLAGS) $(DEFINES) -o diskvol.o
-	gcc -c kernel/execve/sm/install/install.c  -I include/ $(CFLAGS) $(DEFINES) -o install.o
-	gcc -c kernel/execve/sm/debug/debug.c      -I include/ $(CFLAGS) $(DEFINES) -o debug.o
+	gcc -c kernel/execve/sm/sys/sm.c       -I include/ $(CFLAGS) $(DEFINES) -o sm.o
 
 	# k\gws\gws
 	# Gramado Window Server.

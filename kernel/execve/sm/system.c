@@ -3061,12 +3061,12 @@ int systemInit (){
  *     Construtor.
  * Não tem valor de retorno, tem o mesmo nome que a classe.
  * Uma chamada à um construtor criaria uma estrutura com seu nome e 
- * o construtor pode inicializar alguma variável.
- */
+ * o construtor pode inicializar alguma variável. */
+
 void systemSystem (){
 	
     gSystemStatus = 1;
-};
+}
 
 
 //
