@@ -49,14 +49,63 @@
 
 #ifndef _STDLIB_H
 #define _STDLIB_H 1
-  
-//A rotina terminou normalmente.
-#define EXIT_SUCCESS  0    
 
-//A rotina terminou de maneira anormal.
-#define EXIT_FAILURE  1
+
+
+#ifdef	_BSD_SIZE_T_
+typedef	_BSD_SIZE_T_	size_t;
+#undef	_BSD_SIZE_T_
+#endif
+
+#if defined(_BSD_WCHAR_T_) && !defined(__cplusplus)
+typedef	_BSD_WCHAR_T_	wchar_t;
+#undef	_BSD_WCHAR_T_
+#endif
+
+typedef struct {
+	int quot;		/* quotient */
+	int rem;		/* remainder */
+} div_t;
+
+typedef struct {
+	long quot;		/* quotient */
+	long rem;		/* remainder */
+} ldiv_t;
+
+
+#if !defined(_ANSI_SOURCE) && \
+    (defined(_ISOC99_SOURCE) || (__STDC_VERSION__ - 0) >= 199901L || \
+     (__cplusplus - 0) >= 201103L || defined(_NETBSD_SOURCE))
+typedef struct {
+	/* LONGLONG */
+	long long int quot;	/* quotient */
+	/* LONGLONG */
+	long long int rem;	/* remainder */
+} lldiv_t;
+#endif
+
+#if defined(_NETBSD_SOURCE)
+typedef struct {
+	quad_t quot;		/* quotient */
+	quad_t rem;		    /* remainder */
+} qdiv_t;
+#endif
+
+
+#define	EXIT_FAILURE	1
+#define	EXIT_SUCCESS	0
+
+
+//bsd-like
+//#define	RAND_MAX	0x7fffffff
 
 #define RAND_MAX  32767 
+
+
+//bsd stuff
+//extern size_t __mb_cur_max;
+//#define	MB_CUR_MAX	__mb_cur_max
+
 
 void *stdlib_system_call ( unsigned long ax, 
                            unsigned long bx, 

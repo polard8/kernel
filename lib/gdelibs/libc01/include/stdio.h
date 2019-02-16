@@ -17,6 +17,45 @@
  
 #include <stddef.h>
 
+
+#ifdef	_BSD_SIZE_T_
+typedef	_BSD_SIZE_T_	size_t;
+#undef	_BSD_SIZE_T_
+#endif
+#ifdef	_BSD_SSIZE_T_
+typedef	_BSD_SSIZE_T_	ssize_t;
+#undef	_BSD_SSIZE_T_
+#endif
+
+#if defined(_POSIX_C_SOURCE)
+#ifndef __VA_LIST_DECLARED
+typedef __va_list va_list;
+#define __VA_LIST_DECLARED
+#endif
+#endif
+
+
+
+#define	__SLBF	0x0001		/* line buffered */
+#define	__SNBF	0x0002		/* unbuffered */
+#define	__SRD	0x0004		/* OK to read */
+#define	__SWR	0x0008		/* OK to write */
+	/* RD and WR are never simultaneously asserted */
+#define	__SRW	0x0010		/* open for reading & writing */
+#define	__SEOF	0x0020		/* found EOF */
+#define	__SERR	0x0040		/* found error */
+#define	__SMBF	0x0080		/* _buf is from malloc */
+#define	__SAPP	0x0100		/* fdopen()ed in append mode */
+#define	__SSTR	0x0200		/* this is an sprintf/snprintf string */
+#define	__SOPT	0x0400		/* do fseek() optimization */
+#define	__SNPT	0x0800		/* do not do fseek() optimization */
+#define	__SOFF	0x1000		/* set iff _offset is in fact correct */
+#define	__SMOD	0x2000		/* true => fgetln modified _p text */
+#define	__SALC	0x4000		/* allocate string space dynamically */
+
+
+
+
 typedef char *stdio_va_list; 
 
  
@@ -41,9 +80,22 @@ typedef char *stdio_va_list;
 #define	STDERR_FILENO 2
 
 
+/*
+//bsd-like
+//#todo: use this one.
+#define	_IOFBF	0		// setvbuf should set fully buffered 
+#define	_IOLBF	1		// setvbuf should set line buffered 
+#define	_IONBF	2		// setvbuf should set unbuffered 
+*/
 #define _IOFBF    0x0000  /* full buffered */
 #define _IOLBF    0x0040  /* line buffered */
 #define _IONBF    0x0004  /* not buffered */
+
+/*
+ * The buffer size as used by setbuf such that it is equivalent to
+ * (void) setvbuf(fileSetBuffer, caBuffer, _IOFBF, BUFSIZ).
+ */
+#define BUFSIZ  1024
 
 /* Returned by various functions on end of file condition or error. */
 #ifndef EOF
@@ -51,12 +103,37 @@ typedef char *stdio_va_list;
 #endif
 
 
+/*
+ * #bsd-like
+ * FOPEN_MAX is a minimum maximum, and is the number of streams that
+ * stdio can provide without attempting to allocate further resources
+ * (which could fail).  Do not use this for anything.
+ */
+				                 /* must be == _POSIX_STREAM_MAX <limits.h> */
+//#define	FOPEN_MAX	20	        /* must be <= OPEN_MAX <sys/syslimits.h> */
+//#define	FILENAME_MAX	1024	/* must be <= PATH_MAX <sys/syslimits.h> */
+
+
+#define FOPEN_MAX	(32)
+
 #ifndef FILENAME_MAX
 #define	FILENAME_MAX	(260)
 #endif
 
-#define FOPEN_MAX	(32)
 #define NUMBER_OF_FILES (32)
+
+/* System V/ANSI C; this is the wrong way to do this, do *not* use these. */
+#if defined(_XOPEN_SOURCE) || defined(_NETBSD_SOURCE)
+#define	P_tmpdir	"/var/tmp/"
+#endif
+#define	L_tmpnam	1024	/* XXX must be == PATH_MAX */
+
+
+//bsd-like
+/* Always ensure that this is consistent with <limits.h> */
+//#ifndef TMP_MAX
+//#define TMP_MAX			308915776	/* Legacy */
+//#endif
 
 #define TMP_MAX	32767
 
@@ -70,27 +147,25 @@ typedef char *stdio_va_list;
 #define	_IOAPPEND 0x0200
 #endif
 
-/*
- * The buffer size as used by setbuf such that it is equivalent to
- * (void) setvbuf(fileSetBuffer, caBuffer, _IOFBF, BUFSIZ).
- */
-#define BUFSIZ  1024
 
+/* Always ensure that these are consistent with <fcntl.h> and <unistd.h>! */
 
 /* It moves file pointer position to the beginning of the file. */
 #ifndef SEEK_SET
-#define SEEK_SET        0       
+#define	SEEK_SET	0	/* set file offset to offset */
 #endif
 
 /* It moves file pointer position to given location. */
 #ifndef SEEK_CUR
-#define SEEK_CUR        1       
+#define	SEEK_CUR	1	/* set file offset to current plus offset */
 #endif
 
 /*  It moves file pointer position to the end of file. */
 #ifndef SEEK_END
-#define SEEK_END        2       
+#define	SEEK_END	2	/* set file offset to EOF plus offset */
 #endif
+
+
 
 
 /*

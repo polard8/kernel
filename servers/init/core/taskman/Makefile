@@ -40,11 +40,11 @@ CFLAGS = -m32 \
 #	-fleading-underscore \
 
 
-LIBC    = ../../../lib/gdelibs/libc01/include/
-LIBCOBJ = ../../../lib/gdelibs/libc01/obj
+LIBC    = ../../../../lib/gdelibs/libc01/include/
+LIBCOBJ = ../../../../lib/gdelibs/libc01/obj
 
-API01   = ../../../lib/gdelibs/api01/include/
-APIOBJ  = ../../../lib/gdelibs/api01/obj
+API01   = ../../../../lib/gdelibs/api01/include/
+APIOBJ  = ../../../../lib/gdelibs/api01/obj
 
 	##
 	## Objects
@@ -105,7 +105,7 @@ taskman-link:
 
 
 finalize:
-	cp TASKMAN.BIN ../../../bin/init/
+	cp TASKMAN.BIN ../../../../bin/init/
 
 clean:
 	-rm *.o

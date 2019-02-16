@@ -52,12 +52,10 @@
 
 
 /*bsd*/
-/*
 #define F_ULOCK		0
 #define F_LOCK		1
 #define F_TLOCK		2
 #define F_TEST		3
- */
 
  
 /* MINIX 3 */ 
