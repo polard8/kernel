@@ -236,12 +236,12 @@ compile-kernel:
 	gcc -c kernel/execve/execve.c  -I include/ $(CFLAGS) $(DEFINES) -o execve.o
 
 	# crts
-	# /execve/crts/libc
-	gcc -c kernel/execve/crts/libc/cedge.c   -I include/ $(CFLAGS) $(DEFINES) -o cedge.o
-	gcc -c kernel/execve/crts/libc/ctype.c   -I include/ $(CFLAGS) $(DEFINES) -o ctype.o
-	gcc -c kernel/execve/crts/libc/stdlib.c  -I include/ $(CFLAGS) $(DEFINES) -o stdlib.o
-	gcc -c kernel/execve/crts/libc/stdio.c   -I include/ $(CFLAGS) $(DEFINES) -o stdio.o
-	gcc -c kernel/execve/crts/libc/string.c  -I include/ $(CFLAGS) $(DEFINES) -o string.o
+	# /execve/crts/klibc
+	gcc -c kernel/execve/crts/klibc/cedge.c   -I include/ $(CFLAGS) $(DEFINES) -o cedge.o
+	gcc -c kernel/execve/crts/klibc/ctype.c   -I include/ $(CFLAGS) $(DEFINES) -o ctype.o
+	gcc -c kernel/execve/crts/klibc/stdlib.c  -I include/ $(CFLAGS) $(DEFINES) -o stdlib.o
+	gcc -c kernel/execve/crts/klibc/stdio.c   -I include/ $(CFLAGS) $(DEFINES) -o stdio.o
+	gcc -c kernel/execve/crts/klibc/string.c  -I include/ $(CFLAGS) $(DEFINES) -o string.o
 
 	gcc -c kernel/execve/dd/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
 	
