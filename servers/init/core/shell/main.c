@@ -3404,6 +3404,23 @@ do_compare:
 		goto exit_cmp;
 	}
 	
+	//#gws - testando funcionalidades do gws
+	if ( strncmp( prompt, "gws", 3 ) == 0 )
+	{
+		gws_init();
+		
+		gws_backbuffer_putpixel ( COLOR_RED,   100, 250 );
+		gws_backbuffer_putpixel ( COLOR_GREEN, 105, 250 );
+		gws_backbuffer_putpixel ( COLOR_BLUE,  110, 250 );
+		
+		gws_drawchar_transparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
+		gws_drawchar_transparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
+		gws_drawchar_transparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
+		
+		refresh_screen();
+		goto exit_cmp;
+	}
+	
 	//flush stdout
 	if ( strncmp( prompt, "flush-stdout", 12 ) == 0 )
 	{

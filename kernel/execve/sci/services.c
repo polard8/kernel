@@ -348,14 +348,11 @@ void *services ( unsigned long number,
 		    sys_vsync();       		
 			break;
 			
-		//6
-		//Put pixel. 
-        //Coloca um pixel no backbuffer.
-        //Isso pode ser usado por um driver. 
-        //cor,x,y,0		
-        case SYS_BUFFER_PUTPIXEL:
-            //my_buffer_put_pixel ( (unsigned long) a2, 
-			//    (unsigned long) a3, (unsigned long) a4, 0 );   		
+		// 6 - Put pixel. 
+        // Coloca um pixel no backbuffer.
+        // Isso pode ser usado por um servidor. 
+        // cor, x, y, 0.		
+        case SYS_BUFFER_PUTPIXEL:		
             backbuffer_putpixel ( (unsigned long) a2, 
 			    (unsigned long) a3, (unsigned long) a4, 0 );   		
 			break;

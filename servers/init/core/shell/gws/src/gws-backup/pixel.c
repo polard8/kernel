@@ -1,9 +1,11 @@
 /*
- * File: gws\gws\pixel.c
- *
+ * File: shell/gws/gws/pixel.c
+ *     
  * Descrição:
  *     Rotinas de pintura de pixel.
  *     Faz parte do módulo Window Manager do tipo MB.
+ *
+ * Env: ring3
  *
  * *IMPORTANTE
  * Obs: Se uma estrutura de janela for passada como argumento
@@ -31,7 +33,7 @@
  */
 
  
-#include <kernel.h>
+//#include <kernel.h>
 
 
 //

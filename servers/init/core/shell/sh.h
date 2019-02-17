@@ -25,6 +25,8 @@
 #include "builtins.h"
 
 #include <api.h>
+#include <gws.h>
+
 
 #include "desktop.h"
 

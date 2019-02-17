@@ -44,8 +44,15 @@ CFLAGS = -m32 \
 LIBC    = ../../../../lib/gdelibs/libc01/include/
 LIBCOBJ = ../../../../lib/gdelibs/libc01/obj
 
+
 API01   = ../../../../lib/gdelibs/api01/include/
 APIOBJ  = ../../../../lib/gdelibs/api01/obj
+
+
+GWS    = gws/include/   
+#GWSOBJ = gws/obj cancelado
+
+
 
 	##
 	## Objects
@@ -66,7 +73,10 @@ conio.o \
 builtins.o \
 desktop.o \
 unistd.o \
-login.o   
+login.o \
+pixel.o \
+char.o \
+gws.o    
 
 
 
@@ -80,16 +90,24 @@ head.o:
 #	nasm  head.s  -felf -o head.o
 
 crt0.o:
-	gcc  -c  crt0.c -I $(LIBC) -I $(API01) $(CFLAGS) -o crt0.o
+	gcc  -c  crt0.c -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o crt0.o
 
 main.o:
-	gcc  -c  main.c -I $(LIBC) -I $(API01) $(CFLAGS) -o main.o
+	gcc  -c  main.c -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o main.o
 
 all-c:
-	gcc  -c  shellui.c   -I $(LIBC) -I $(API01) $(CFLAGS) -o shellui.o
-	gcc  -c  builtins.c  -I $(LIBC) -I $(API01) $(CFLAGS) -o builtins.o
-	gcc  -c  desktop.c   -I $(LIBC) -I $(API01) $(CFLAGS) -o desktop.o
-	gcc  -c  login.c     -I $(LIBC) -I $(API01) $(CFLAGS) -o login.o	
+	gcc  -c  shellui.c   -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o shellui.o
+	gcc  -c  builtins.c  -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o builtins.o
+	gcc  -c  desktop.c   -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o desktop.o
+	gcc  -c  login.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o login.o
+	
+	
+#gws
+	gcc  -c  gws/src/gws/pixel.c    -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o pixel.o
+	gcc  -c  gws/src/gws/char.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o char.o
+	gcc  -c  gws/src/gws.c          -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o gws.o
+# ...	
+	
 	
 #	gcc  -c  parser.c    -I ../../../include/libc/ $(CFLAGS) -o parser.o
 #	gcc  -c  lexer.c     -I ../../../include/libc/ $(CFLAGS) -o lexer.o
@@ -106,6 +124,10 @@ all-c:
 #	cp ../../../lib/wait.o .
 
 	cp $(LIBCOBJ)/unistd.o .
+
+	#gws cancelado
+#	cp $(GWSOBJ)/pixel.o   .
+	
 
 shell-link:
 	ld -m elf_i386 -T link.ld -o SHELL.BIN $(myObjects) -Map shell_map.s
