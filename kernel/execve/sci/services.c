@@ -362,7 +362,7 @@ void *services ( unsigned long number,
 		//Obs: Esse funciona, não deletar. :)
 		// (x,y,color,char)
 		// (left+x, top+y,color,char)
-		//devemos usar o left e o top da janela com foco d3e entrada.
+		//devemos usar o left e o top da janela com foco de entrada.
         //
 		// Obs: A biblioteca c99 em user mode usa essa chamada para pintar um caractere
 		// quando implementa a função printf(.). Porém esse caractere é pintado
@@ -371,7 +371,7 @@ void *services ( unsigned long number,
 		// Outro caso é a digitação de caractere. Quando um caractere é
 		// digitado desejamos que ele seja pintado na janela com o foco de entrada.
 		//
-		// ?? Quando um carctere é pintado em uma janela que não está com o foco 
+		// ?? Quando um caractere é pintado em uma janela que não está com o foco 
 		//    de entrada ?? ex: shells, logs ...
 		//
 		//Supondo que os aplicativos escreverão mais em terminal por enquanto 

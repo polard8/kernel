@@ -75,6 +75,8 @@ desktop.o \
 unistd.o \
 login.o \
 pixel.o \
+line.o \
+rect.o \
 char.o \
 gws.o    
 
@@ -103,8 +105,10 @@ all-c:
 	
 	
 #gws
-	gcc  -c  gws/src/gws/pixel.c    -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o pixel.o
 	gcc  -c  gws/src/gws/char.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o char.o
+	gcc  -c  gws/src/gws/line.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o line.o
+	gcc  -c  gws/src/gws/pixel.c    -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o pixel.o
+	gcc  -c  gws/src/gws/rect.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o rect.o
 	gcc  -c  gws/src/gws.c          -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o gws.o
 # ...	
 	

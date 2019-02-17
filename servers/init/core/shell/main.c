@@ -3405,7 +3405,7 @@ do_compare:
 	}
 	
 	//#gws - testando funcionalidades do gws
-	if ( strncmp( prompt, "gws", 3 ) == 0 )
+	if ( strncmp ( prompt, "gws", 3 ) == 0 )
 	{
 		gws_init();
 		
@@ -3417,6 +3417,13 @@ do_compare:
 		gws_drawchar_transparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
 		gws_drawchar_transparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
 		
+		
+		gws_draw_char ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
+		
+		my_buffer_horizontal_line( 400, 88, 500, COLOR_PINK );
+		
+		drawDataRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
+
 		refresh_screen();
 		goto exit_cmp;
 	}
