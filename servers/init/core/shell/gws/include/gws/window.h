@@ -18,11 +18,33 @@ struct gws_rect_d
 	//?? ...
 };
 
+
+//#todo
+// A estrtutura deve ficar em user mode.
+// Criaremos janelas gerenciadas por esse servidor.
+
+struct gws_window_d 
+{
+    //#todo
+	//...
+    int dummy;
+	
+	//...
+	
+	
+	struct gws_window_d *next;
+};
+
+
+
 void drawDataRectangle( unsigned long x, 
                         unsigned long y, 
 						unsigned long width, 
 						unsigned long height, 
 						unsigned long color );
+
+
+//int gws_create_window( ... );
 
 
 
