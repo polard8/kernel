@@ -14,8 +14,8 @@
 VERSION = 0
 PATCHLEVEL = 15
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
-NAME = ?
+EXTRAVERSION = .0
+NAME = Shameless
 
 #todo:
 #We need to simplify these flags, but it's working.
