@@ -524,17 +524,17 @@ Linker script and memory map
                 0x000000000045c07e                get_char_height
                 0x000000000045c088                gws_drawchar_transparent
                 0x000000000045c142                gws_draw_char
- .text          0x000000000045c202      0x1c7 gws.o
+ .text          0x000000000045c202      0x1f3 gws.o
                 0x000000000045c202                gws_init
                 0x000000000045c234                serverInit
                 0x000000000045c251                serverDialog
                 0x000000000045d000                . = ALIGN (0x1000)
- *fill*         0x000000000045c3c9      0xc37 
+ *fill*         0x000000000045c3f5      0xc0b 
 
 .iplt           0x000000000045d000        0x0
  .iplt          0x000000000045d000        0x0 gws.o
 
-.rodata         0x000000000045d000     0x598d
+.rodata         0x000000000045d000     0x599d
  .rodata        0x000000000045d000      0x935 crt0.o
  *fill*         0x000000000045d935        0xb 
  .rodata        0x000000000045d940     0x1d7b main.o
@@ -557,94 +557,94 @@ Linker script and memory map
  *fill*         0x000000000046207f        0x1 
  .rodata        0x0000000000462080      0x890 login.o
  .rodata        0x0000000000462910       0x54 char.o
- .rodata        0x0000000000462964       0x29 gws.o
+ .rodata        0x0000000000462964       0x39 gws.o
 
-.eh_frame       0x0000000000462990     0x2dcc
- .eh_frame      0x0000000000462990       0x34 crt0.o
- .eh_frame      0x00000000004629c4      0xcb4 main.o
+.eh_frame       0x00000000004629a0     0x2dcc
+ .eh_frame      0x00000000004629a0       0x34 crt0.o
+ .eh_frame      0x00000000004629d4      0xcb4 main.o
                                         0xccc (size before relaxing)
- .eh_frame      0x0000000000463678      0x140 shellui.o
+ .eh_frame      0x0000000000463688      0x140 shellui.o
                                         0x158 (size before relaxing)
- .eh_frame      0x00000000004637b8      0xc2c api.o
+ .eh_frame      0x00000000004637c8      0xc2c api.o
                                         0xc44 (size before relaxing)
- .eh_frame      0x00000000004643e4      0x734 stdio.o
+ .eh_frame      0x00000000004643f4      0x734 stdio.o
                                         0x74c (size before relaxing)
- .eh_frame      0x0000000000464b18      0x444 stdlib.o
+ .eh_frame      0x0000000000464b28      0x444 stdlib.o
                                         0x45c (size before relaxing)
- .eh_frame      0x0000000000464f5c      0x320 string.o
+ .eh_frame      0x0000000000464f6c      0x320 string.o
                                         0x338 (size before relaxing)
- .eh_frame      0x000000000046527c       0xa0 conio.o
+ .eh_frame      0x000000000046528c       0xa0 conio.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x000000000046531c      0x1e0 builtins.o
+ .eh_frame      0x000000000046532c      0x1e0 builtins.o
                                         0x1f8 (size before relaxing)
- .eh_frame      0x00000000004654fc       0x20 desktop.o
+ .eh_frame      0x000000000046550c       0x20 desktop.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046551c       0x80 unistd.o
+ .eh_frame      0x000000000046552c       0x80 unistd.o
                                          0x98 (size before relaxing)
- .eh_frame      0x000000000046559c       0x20 login.o
+ .eh_frame      0x00000000004655ac       0x20 login.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004655bc       0x20 pixel.o
+ .eh_frame      0x00000000004655cc       0x20 pixel.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004655dc       0x20 line.o
+ .eh_frame      0x00000000004655ec       0x20 line.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004655fc       0x20 rect.o
+ .eh_frame      0x000000000046560c       0x20 rect.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046561c       0xe0 char.o
+ .eh_frame      0x000000000046562c       0xe0 char.o
                                          0xf8 (size before relaxing)
- .eh_frame      0x00000000004656fc       0x60 gws.o
+ .eh_frame      0x000000000046570c       0x60 gws.o
                                          0x78 (size before relaxing)
 
 .note.gnu.property
-                0x000000000046575c       0x1c
+                0x000000000046576c       0x1c
  .note.gnu.property
-                0x000000000046575c       0x1c gws.o
+                0x000000000046576c       0x1c gws.o
 
-.rel.dyn        0x0000000000465778        0x0
- .rel.got       0x0000000000465778        0x0 gws.o
- .rel.iplt      0x0000000000465778        0x0 gws.o
- .rel.text      0x0000000000465778        0x0 gws.o
+.rel.dyn        0x0000000000465788        0x0
+ .rel.got       0x0000000000465788        0x0 gws.o
+ .rel.iplt      0x0000000000465788        0x0 gws.o
+ .rel.text      0x0000000000465788        0x0 gws.o
 
-.data           0x0000000000465780     0x4880
-                0x0000000000465780                data = .
-                0x0000000000465780                _data = .
-                0x0000000000465780                __data = .
+.data           0x00000000004657a0     0x4860
+                0x00000000004657a0                data = .
+                0x00000000004657a0                _data = .
+                0x00000000004657a0                __data = .
  *(.data)
- .data          0x0000000000465780      0x4c4 crt0.o
- *fill*         0x0000000000465c44       0x1c 
- .data          0x0000000000465c60      0x538 main.o
-                0x0000000000466100                running
-                0x0000000000466104                primary_prompt
-                0x0000000000466108                secondary_prompt
-                0x000000000046610c                remember_on_history
-                0x0000000000466110                current_command_number
-                0x0000000000466114                bashrc_file
-                0x0000000000466118                shell_config_file
-                0x000000000046611c                deltaValue
-                0x0000000000466120                long_args
- *fill*         0x0000000000466198        0x8 
- .data          0x00000000004661a0      0x4a0 shellui.o
- .data          0x0000000000466640      0x440 api.o
- .data          0x0000000000466a80        0x0 ctype.o
- .data          0x0000000000466a80        0x0 stdio.o
- .data          0x0000000000466a80        0x8 stdlib.o
-                0x0000000000466a80                _infinity
- .data          0x0000000000466a88        0x0 string.o
- .data          0x0000000000466a88        0x0 conio.o
- *fill*         0x0000000000466a88       0x18 
- .data          0x0000000000466aa0      0x4a0 builtins.o
- .data          0x0000000000466f40      0x4a8 desktop.o
-                0x00000000004673e0                primary_desktop_folder
-                0x00000000004673e4                secondary_desktop_folder
- .data          0x00000000004673e8        0x0 unistd.o
- *fill*         0x00000000004673e8       0x18 
- .data          0x0000000000467400      0x4a0 login.o
- .data          0x00000000004678a0      0x440 pixel.o
- .data          0x0000000000467ce0      0x440 line.o
- .data          0x0000000000468120      0x440 rect.o
- .data          0x0000000000468560      0x440 char.o
- .data          0x00000000004689a0      0x840 gws.o
+ .data          0x00000000004657a0      0x4c4 crt0.o
+ *fill*         0x0000000000465c64       0x1c 
+ .data          0x0000000000465c80      0x538 main.o
+                0x0000000000466120                running
+                0x0000000000466124                primary_prompt
+                0x0000000000466128                secondary_prompt
+                0x000000000046612c                remember_on_history
+                0x0000000000466130                current_command_number
+                0x0000000000466134                bashrc_file
+                0x0000000000466138                shell_config_file
+                0x000000000046613c                deltaValue
+                0x0000000000466140                long_args
+ *fill*         0x00000000004661b8        0x8 
+ .data          0x00000000004661c0      0x4a0 shellui.o
+ .data          0x0000000000466660      0x440 api.o
+ .data          0x0000000000466aa0        0x0 ctype.o
+ .data          0x0000000000466aa0        0x0 stdio.o
+ .data          0x0000000000466aa0        0x8 stdlib.o
+                0x0000000000466aa0                _infinity
+ .data          0x0000000000466aa8        0x0 string.o
+ .data          0x0000000000466aa8        0x0 conio.o
+ *fill*         0x0000000000466aa8       0x18 
+ .data          0x0000000000466ac0      0x4a0 builtins.o
+ .data          0x0000000000466f60      0x4a8 desktop.o
+                0x0000000000467400                primary_desktop_folder
+                0x0000000000467404                secondary_desktop_folder
+ .data          0x0000000000467408        0x0 unistd.o
+ *fill*         0x0000000000467408       0x18 
+ .data          0x0000000000467420      0x4a0 login.o
+ .data          0x00000000004678c0      0x440 pixel.o
+ .data          0x0000000000467d00      0x440 line.o
+ .data          0x0000000000468140      0x440 rect.o
+ .data          0x0000000000468580      0x440 char.o
+ .data          0x00000000004689c0      0x840 gws.o
                 0x000000000046a000                . = ALIGN (0x1000)
- *fill*         0x00000000004691e0      0xe20 
+ *fill*         0x0000000000469200      0xe00 
 
 .got            0x000000000046a000        0x0
  .got           0x000000000046a000        0x0 gws.o

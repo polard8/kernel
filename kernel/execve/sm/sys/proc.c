@@ -68,6 +68,43 @@ void procedureWindowWithFocusTest();
 void procedureGrid();
 
 
+void
+xxxtestSHELLServer(){
+
+   //#atenção:
+   //antes precisa inicializar o servidor.
+   //+por enquanto vamos usar o comando 'gws' para isso.
+
+    //enviaremos uma mensagem para a thread atual,
+	//os programas em user mode consumirão essa mensagem
+	//reenviaremos até que quem consuma saiba lidar com ela,
+	//no caso o server shell/gws.
+
+    struct thread_d *t;
+    
+	t = (void *) threadList[current_thread];
+	
+		
+	//#test 9004
+	//draw horizontal line
+	//x1, y , x2, color
+    
+	t->window = 0;
+	t->msg = 9004;  
+	t->long1 = 100; //x
+	t->long2 = 100; //y
+	
+	t->long3 = 200; //width
+	t->long4 = COLOR_YELLOW;
+	t->long5 = 0;
+	t->long6 = 0;
+	// ... 
+    
+	//sinalizamos que temos uma mensagem.
+	t->newmessageFlag = 1; 
+}
+
+
 // #IMPORTANTE
 // REFRESH STDOUT
 
@@ -565,8 +602,11 @@ system_procedure ( struct window_d *window,
 
 					printf("F5:\n"); 
 					
-					sprintf ( current_stdout->_base, "Testing refresh current_stdout ..." );
-					REFRESH_STREAM (current_stdout);
+					//shell gws
+					xxxtestSHELLServer();
+					
+					//sprintf ( current_stdout->_base, "Testing refresh current_stdout ..." );
+					//REFRESH_STREAM (current_stdout);
 					
 				   //xxxtestlibcSTDOUT();
                     

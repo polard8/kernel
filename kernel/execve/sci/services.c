@@ -879,12 +879,22 @@ void *services ( unsigned long number,
 				}
 	
 				//pegando a mensagem.
-			    message_address[0] = (unsigned long) t->window;
+			    
+				//padrão
+				message_address[0] = (unsigned long) t->window;
 			    message_address[1] = (unsigned long) t->msg;
 			    message_address[2] = (unsigned long) t->long1;
 			    message_address[3] = (unsigned long) t->long2;
+				
+				//extra. Usado pelos servidores e drivers.
+				message_address[4] = (unsigned long) t->long3;
+				message_address[5] = (unsigned long) t->long4;
+				message_address[6] = (unsigned long) t->long5;
+				message_address[7] = (unsigned long) t->long6;
+				//...	
                     
 				//sinalizamos que a mensagem foi consumida.
+				//#todo: nese momento a estrutura da thread também precisa ser limpa.
                 t->newmessageFlag = 0; 					
 				    
 				//sinaliza que há mensagem

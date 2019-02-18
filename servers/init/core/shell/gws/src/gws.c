@@ -77,6 +77,7 @@ unsigned long serverDialog ( unsigned long buffer_address ){
 			
 			//Initialize gws server	
 		case 9000:
+			printf ("9000: \n");
 			return (unsigned long) serverInit ();
 			break;
 			
@@ -100,8 +101,13 @@ unsigned long serverDialog ( unsigned long buffer_address ){
 			break;
 			
 		case 9004:
-			//x1, width , x2, color
+			printf ("9004: \n");
+			// x1, y, x2, color
 			my_buffer_horizontal_line ( long1, long2, long3, long4 );
+			
+			//#debug
+			refresh_screen();  
+			
 			return (unsigned long) 0;
 			break;
 

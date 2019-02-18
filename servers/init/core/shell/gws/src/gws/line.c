@@ -2,6 +2,9 @@
 #include <api.h>
 #include <gws.h>
 
+
+
+
 /* my_buffer_horizontal_line:
  *     Draw a horizontal line on backbuffer. */
 

@@ -480,17 +480,36 @@ struct thread_d
 	unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
 	//unsigned long control_menu_procedure; //procedimento do control menu.
 	
-	//
-	//ORDEM: O que segue é referenciado durante as trocas de mensagens.
-	//       utilização de canais e IPC.
-	//
 	
+	// #ORDEM: 
+	// O que segue é referenciado durante as trocas de mensagens.
+	// utilização de canais e IPC.
+
+	
+	//4 argumentos padrão;
 	struct window_d *window;    //arg1.
 	int msg;                    //arg2.
 	unsigned long long1;        //arg3.
 	unsigned long long2;        //arg4.
 	
+	//argumentos extra usados pelos drivers e servidores.
+	unsigned long long3;
+	unsigned long long4;
+	unsigned long long5;
+	unsigned long long6;
+	unsigned long long7;
+	unsigned long long8;
+	unsigned long long9;
+	unsigned long long10;
+	unsigned long long11;
+	unsigned long long12;
+	//...
+	
 	int newmessageFlag;         //flag avisando que tem nova mensagem.
+	
+	
+	
+	
 	
 	//?? mensagens pendentes.
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem

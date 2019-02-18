@@ -2048,57 +2048,58 @@ Linker script and memory map
                 0x00000000c0027594                _UpdateUserInfo
                 0x00000000c00275ea                _init_user_info
                 0x00000000c0027697                _init_user_environment_manager
- .text          0x00000000c00276ab      0xa11 proc.o
-                0x00000000c00276ab                _xxxtestlibcSTDOUT
-                0x00000000c0027788                _xxxtestlibc
-                0x00000000c0027893                _procTestF6
-                0x00000000c00278cf                _ldisc_dialog
-                0x00000000c00278d9                _terminal_dialog
-                0x00000000c00278e3                _system_procedure
-                0x00000000c0027b31                _registra_procedimento
-                0x00000000c0027b4c                _SetProcedure
-                0x00000000c0027b62                _SendMessage
-                0x00000000c0027b7e                _procedureHelp
-                0x00000000c0027eba                _procedureLinkDriverTest
-                0x00000000c0027efa                _procedureMakeTests
-                0x00000000c0027fd6                _procedureWindowWithFocusTest
-                0x00000000c002807f                _procedureGrid
- .text          0x00000000c00280bc       0x41 syscall.o
-                0x00000000c00280bc                _systemcall
-                0x00000000c00280dd                _jmp_address
- .text          0x00000000c00280fd       0x1e install.o
-                0x00000000c00280fd                _install_os
-                0x00000000c0028103                _install_boot_manager
-                0x00000000c0028109                _install_bootmanager_stage1
-                0x00000000c002810f                _install_bootmanager_stage2
-                0x00000000c0028115                _install_bootmanager_metafile
- .text          0x00000000c002811b       0xe5 serial.o
-                0x00000000c002811b                _serial_write_char
-                0x00000000c002815a                _init_serial
- .text          0x00000000c0028200      0x19e debug.o
-                0x00000000c0028200                _debug_check_inicialization
-                0x00000000c00282ac                _debug_check_drivers
-                0x00000000c00282be                _debug_breakpoint
-                0x00000000c00282dc                _debug_compute_checksum
-                0x00000000c002830c                _debug
-                0x00000000c002835f                _debug_print
- .text          0x00000000c002839e      0x168 abort.o
-                0x00000000c002839e                _KeAbort
-                0x00000000c00283bc                _systemAbort
-                0x00000000c00283ca                _KiAbort
-                0x00000000c00283d8                _abort
- .text          0x00000000c0028506      0x2fd x86fault.o
-                0x00000000c0028506                _faults
-                0x00000000c002871e                _KiCpuFaults
-                0x00000000c0028735                _do_pagefault
- .text          0x00000000c0028803     0x11fe services.o
-                0x00000000c0028803                _services
-                0x00000000c00297f7                _serviceCreateWindow
-                0x00000000c002996e                _servicesPutChar
-                0x00000000c00299fb                _servicesChangeProcedure
-                0x00000000c0029a01                _code_end = .
+ .text          0x00000000c00276ab      0xa79 proc.o
+                0x00000000c00276ab                _xxxtestSHELLServer
+                0x00000000c0027738                _xxxtestlibcSTDOUT
+                0x00000000c0027815                _xxxtestlibc
+                0x00000000c0027920                _procTestF6
+                0x00000000c002795c                _ldisc_dialog
+                0x00000000c0027966                _terminal_dialog
+                0x00000000c0027970                _system_procedure
+                0x00000000c0027b99                _registra_procedimento
+                0x00000000c0027bb4                _SetProcedure
+                0x00000000c0027bca                _SendMessage
+                0x00000000c0027be6                _procedureHelp
+                0x00000000c0027f22                _procedureLinkDriverTest
+                0x00000000c0027f62                _procedureMakeTests
+                0x00000000c002803e                _procedureWindowWithFocusTest
+                0x00000000c00280e7                _procedureGrid
+ .text          0x00000000c0028124       0x41 syscall.o
+                0x00000000c0028124                _systemcall
+                0x00000000c0028145                _jmp_address
+ .text          0x00000000c0028165       0x1e install.o
+                0x00000000c0028165                _install_os
+                0x00000000c002816b                _install_boot_manager
+                0x00000000c0028171                _install_bootmanager_stage1
+                0x00000000c0028177                _install_bootmanager_stage2
+                0x00000000c002817d                _install_bootmanager_metafile
+ .text          0x00000000c0028183       0xe5 serial.o
+                0x00000000c0028183                _serial_write_char
+                0x00000000c00281c2                _init_serial
+ .text          0x00000000c0028268      0x19e debug.o
+                0x00000000c0028268                _debug_check_inicialization
+                0x00000000c0028314                _debug_check_drivers
+                0x00000000c0028326                _debug_breakpoint
+                0x00000000c0028344                _debug_compute_checksum
+                0x00000000c0028374                _debug
+                0x00000000c00283c7                _debug_print
+ .text          0x00000000c0028406      0x168 abort.o
+                0x00000000c0028406                _KeAbort
+                0x00000000c0028424                _systemAbort
+                0x00000000c0028432                _KiAbort
+                0x00000000c0028440                _abort
+ .text          0x00000000c002856e      0x2fd x86fault.o
+                0x00000000c002856e                _faults
+                0x00000000c0028786                _KiCpuFaults
+                0x00000000c002879d                _do_pagefault
+ .text          0x00000000c002886b     0x1242 services.o
+                0x00000000c002886b                _services
+                0x00000000c00298a3                _serviceCreateWindow
+                0x00000000c0029a1a                _servicesPutChar
+                0x00000000c0029aa7                _servicesChangeProcedure
+                0x00000000c0029aad                _code_end = .
                 0x00000000c002a000                . = ALIGN (0x1000)
- *fill*         0x00000000c0029a01      0x5ff 
+ *fill*         0x00000000c0029aad      0x553 
 
 .iplt           0x00000000c002a000        0x0
  .iplt          0x00000000c002a000        0x0 services.o
@@ -2261,23 +2262,23 @@ Linker script and memory map
  .rodata        0x00000000c003212f        0xf object.o
  *fill*         0x00000000c003213e        0x2 
  .rodata        0x00000000c0032140       0xa0 userenv.o
- .rodata        0x00000000c00321e0      0x416 proc.o
- .rodata        0x00000000c00325f6        0xf syscall.o
- .rodata        0x00000000c0032605        0xf install.o
- .rodata        0x00000000c0032614        0xf serial.o
- *fill*         0x00000000c0032623        0x1 
- .rodata        0x00000000c0032624      0x143 debug.o
- *fill*         0x00000000c0032767        0x1 
- .rodata        0x00000000c0032768       0xa1 abort.o
- *fill*         0x00000000c0032809        0x3 
- .rodata        0x00000000c003280c      0x1b2 x86fault.o
- *fill*         0x00000000c00329be        0x2 
- .rodata        0x00000000c00329c0      0x4cb services.o
-                0x00000000c0032e8b                _rodata_end = .
+ .rodata        0x00000000c00321e0      0x3ee proc.o
+ .rodata        0x00000000c00325ce        0xf syscall.o
+ .rodata        0x00000000c00325dd        0xf install.o
+ .rodata        0x00000000c00325ec        0xf serial.o
+ *fill*         0x00000000c00325fb        0x1 
+ .rodata        0x00000000c00325fc      0x143 debug.o
+ *fill*         0x00000000c003273f        0x1 
+ .rodata        0x00000000c0032740       0xa1 abort.o
+ *fill*         0x00000000c00327e1        0x3 
+ .rodata        0x00000000c00327e4      0x1b2 x86fault.o
+ *fill*         0x00000000c0032996        0x2 
+ .rodata        0x00000000c0032998      0x4cb services.o
+                0x00000000c0032e63                _rodata_end = .
                 0x00000000c0033000                . = ALIGN (0x1000)
- *fill*         0x00000000c0032e8b      0x175 
+ *fill*         0x00000000c0032e63      0x19d 
 
-.eh_frame       0x00000000c0033000     0x7f64
+.eh_frame       0x00000000c0033000     0x7f84
  .eh_frame      0x00000000c0033000       0x9c x86main.o
  .eh_frame      0x00000000c003309c       0x40 io.o
                                          0x58 (size before relaxing)
@@ -2481,271 +2482,271 @@ Linker script and memory map
                                          0x38 (size before relaxing)
  .eh_frame      0x00000000c003a8e4      0x160 userenv.o
                                         0x178 (size before relaxing)
- .eh_frame      0x00000000c003aa44      0x1cc proc.o
-                                        0x1e4 (size before relaxing)
- .eh_frame      0x00000000c003ac10       0x44 syscall.o
+ .eh_frame      0x00000000c003aa44      0x1ec proc.o
+                                        0x204 (size before relaxing)
+ .eh_frame      0x00000000c003ac30       0x44 syscall.o
                                          0x5c (size before relaxing)
- .eh_frame      0x00000000c003ac54       0xa0 install.o
+ .eh_frame      0x00000000c003ac74       0xa0 install.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x00000000c003acf4       0x40 serial.o
+ .eh_frame      0x00000000c003ad14       0x40 serial.o
                                          0x58 (size before relaxing)
- .eh_frame      0x00000000c003ad34       0xc0 debug.o
+ .eh_frame      0x00000000c003ad54       0xc0 debug.o
                                          0xd8 (size before relaxing)
- .eh_frame      0x00000000c003adf4       0x7c abort.o
+ .eh_frame      0x00000000c003ae14       0x7c abort.o
                                          0x94 (size before relaxing)
- .eh_frame      0x00000000c003ae70       0x60 x86fault.o
+ .eh_frame      0x00000000c003ae90       0x60 x86fault.o
                                          0x78 (size before relaxing)
- .eh_frame      0x00000000c003aed0       0x94 services.o
+ .eh_frame      0x00000000c003aef0       0x94 services.o
                                          0xac (size before relaxing)
 
 .note.gnu.property
-                0x00000000c003af64       0x1c
+                0x00000000c003af84       0x1c
  .note.gnu.property
-                0x00000000c003af64       0x1c services.o
+                0x00000000c003af84       0x1c services.o
 
-.rel.dyn        0x00000000c003af80        0x0
- .rel.got       0x00000000c003af80        0x0 services.o
- .rel.iplt      0x00000000c003af80        0x0 services.o
- .rel.head_x86  0x00000000c003af80        0x0 services.o
- .rel.text      0x00000000c003af80        0x0 services.o
+.rel.dyn        0x00000000c003afa0        0x0
+ .rel.got       0x00000000c003afa0        0x0 services.o
+ .rel.iplt      0x00000000c003afa0        0x0 services.o
+ .rel.head_x86  0x00000000c003afa0        0x0 services.o
+ .rel.text      0x00000000c003afa0        0x0 services.o
 
-.data           0x00000000c003af80    0x10080
-                0x00000000c003af80                _data_begin = .
+.data           0x00000000c003afa0    0x10060
+                0x00000000c003afa0                _data_begin = .
  *(.data)
- .data          0x00000000c003af80        0x2 head.o
-                0x00000000c003af80                _data_start
- *fill*         0x00000000c003af82       0x1e 
- .data          0x00000000c003afa0      0x23c x86main.o
-                0x00000000c003b1a0                _copyright
- *fill*         0x00000000c003b1dc        0x4 
- .data          0x00000000c003b1e0      0x1f0 io.o
- *fill*         0x00000000c003b3d0       0x10 
- .data          0x00000000c003b3e0      0x1f0 hal.o
- *fill*         0x00000000c003b5d0       0x10 
- .data          0x00000000c003b5e0      0x1f0 mk.o
- *fill*         0x00000000c003b7d0       0x10 
- .data          0x00000000c003b7e0      0x1f0 execve.o
- *fill*         0x00000000c003b9d0       0x10 
- .data          0x00000000c003b9e0      0x1f0 video.o
- *fill*         0x00000000c003bbd0       0x10 
- .data          0x00000000c003bbe0      0x1f0 screen.o
- *fill*         0x00000000c003bdd0       0x10 
- .data          0x00000000c003bde0      0x1f0 runtime.o
- *fill*         0x00000000c003bfd0       0x10 
- .data          0x00000000c003bfe0      0x1f0 portsx86.o
- *fill*         0x00000000c003c1d0       0x10 
- .data          0x00000000c003c1e0      0x1f0 x86.o
- *fill*         0x00000000c003c3d0       0x10 
- .data          0x00000000c003c3e0      0x1f0 stdio.o
- *fill*         0x00000000c003c5d0       0x10 
- .data          0x00000000c003c5e0      0x1f4 stdlib.o
- *fill*         0x00000000c003c7d4        0xc 
- .data          0x00000000c003c7e0      0x1f0 string.o
- *fill*         0x00000000c003c9d0       0x10 
- .data          0x00000000c003c9e0      0x1f0 tty.o
- *fill*         0x00000000c003cbd0       0x10 
- .data          0x00000000c003cbe0      0x1f0 init.o
- *fill*         0x00000000c003cdd0       0x10 
- .data          0x00000000c003cde0      0x1f0 logon.o
- *fill*         0x00000000c003cfd0       0x10 
- .data          0x00000000c003cfe0      0x1f0 logoff.o
- *fill*         0x00000000c003d1d0       0x10 
- .data          0x00000000c003d1e0      0x1f0 detect.o
- *fill*         0x00000000c003d3d0       0x10 
- .data          0x00000000c003d3e0      0x1f0 cpuamd.o
- *fill*         0x00000000c003d5d0       0x10 
- .data          0x00000000c003d5e0      0x1f0 memory.o
- *fill*         0x00000000c003d7d0       0x10 
- .data          0x00000000c003d7e0      0x1f0 pages.o
- *fill*         0x00000000c003d9d0       0x10 
- .data          0x00000000c003d9e0      0x1f0 mmpool.o
- *fill*         0x00000000c003dbd0       0x10 
- .data          0x00000000c003dbe0      0x1f0 apic.o
- *fill*         0x00000000c003ddd0       0x10 
- .data          0x00000000c003dde0      0x1f0 pic.o
- *fill*         0x00000000c003dfd0       0x10 
- .data          0x00000000c003dfe0      0x1f0 timer.o
- *fill*         0x00000000c003e1d0       0x10 
- .data          0x00000000c003e1e0      0x1f0 rtc.o
- *fill*         0x00000000c003e3d0       0x10 
- .data          0x00000000c003e3e0      0x1f0 keyboard.o
- *fill*         0x00000000c003e5d0       0x10 
- .data          0x00000000c003e5e0      0x1f0 mouse.o
- *fill*         0x00000000c003e7d0       0x10 
- .data          0x00000000c003e7e0      0x1f0 ldisc.o
- *fill*         0x00000000c003e9d0       0x10 
- .data          0x00000000c003e9e0      0x1f0 hdd.o
- *fill*         0x00000000c003ebd0       0x10 
- .data          0x00000000c003ebe0      0xec4 pci.o
-                0x00000000c003ede0                _pci_classes2
-                0x00000000c003f1e0                _pci_classnames
- .data          0x00000000c003faa4        0x0 usb.o
- *fill*         0x00000000c003faa4       0x1c 
- .data          0x00000000c003fac0      0x1f0 ahci.o
- *fill*         0x00000000c003fcb0       0x10 
- .data          0x00000000c003fcc0      0x1f0 devmgr.o
- *fill*         0x00000000c003feb0       0x10 
- .data          0x00000000c003fec0      0x1f0 spawn.o
- *fill*         0x00000000c00400b0       0x10 
- .data          0x00000000c00400c0      0x1f0 callout.o
- .data          0x00000000c00402b0        0x0 callfar.o
- *fill*         0x00000000c00402b0       0x10 
- .data          0x00000000c00402c0      0x1f0 process.o
- *fill*         0x00000000c00404b0       0x10 
- .data          0x00000000c00404c0      0x1f0 pheap.o
- *fill*         0x00000000c00406b0       0x10 
- .data          0x00000000c00406c0      0x1f0 thread.o
- *fill*         0x00000000c00408b0       0x10 
- .data          0x00000000c00408c0      0x1f0 threadi.o
- *fill*         0x00000000c0040ab0       0x10 
- .data          0x00000000c0040ac0      0x1f0 theap.o
- *fill*         0x00000000c0040cb0       0x10 
- .data          0x00000000c0040cc0      0x1f0 tstack.o
- *fill*         0x00000000c0040eb0       0x10 
- .data          0x00000000c0040ec0      0x1f0 create.o
- *fill*         0x00000000c00410b0       0x10 
- .data          0x00000000c00410c0      0x1f0 x86start.o
- *fill*         0x00000000c00412b0       0x10 
- .data          0x00000000c00412c0      0x1f0 x86cont.o
- *fill*         0x00000000c00414b0       0x10 
- .data          0x00000000c00414c0      0x1f0 tasks.o
- *fill*         0x00000000c00416b0       0x10 
- .data          0x00000000c00416c0      0x1f0 ts.o
- *fill*         0x00000000c00418b0       0x10 
- .data          0x00000000c00418c0      0x1f0 queue.o
- *fill*         0x00000000c0041ab0       0x10 
- .data          0x00000000c0041ac0      0x1f0 sched.o
- *fill*         0x00000000c0041cb0       0x10 
- .data          0x00000000c0041cc0      0x1f0 schedi.o
- *fill*         0x00000000c0041eb0       0x10 
- .data          0x00000000c0041ec0      0x1f0 preempt.o
- *fill*         0x00000000c00420b0       0x10 
- .data          0x00000000c00420c0      0x1f0 priority.o
- *fill*         0x00000000c00422b0       0x10 
- .data          0x00000000c00422c0      0x1f0 dispatch.o
- *fill*         0x00000000c00424b0       0x10 
- .data          0x00000000c00424c0      0x1f0 sem.o
- *fill*         0x00000000c00426b0       0x10 
- .data          0x00000000c00426c0      0x1f0 modules.o
- *fill*         0x00000000c00428b0       0x10 
- .data          0x00000000c00428c0      0x1f0 nicintel.o
- *fill*         0x00000000c0042ab0       0x10 
- .data          0x00000000c0042ac0      0x1f0 network.o
- *fill*         0x00000000c0042cb0       0x10 
- .data          0x00000000c0042cc0      0x1f0 socket.o
- *fill*         0x00000000c0042eb0       0x10 
- .data          0x00000000c0042ec0      0x1f0 sm.o
- *fill*         0x00000000c00430b0       0x10 
- .data          0x00000000c00430c0      0x1f0 channel.o
- *fill*         0x00000000c00432b0       0x10 
- .data          0x00000000c00432c0      0x1f0 ipc.o
- *fill*         0x00000000c00434b0       0x10 
- .data          0x00000000c00434c0      0x1f0 read.o
- *fill*         0x00000000c00436b0       0x10 
- .data          0x00000000c00436c0      0x1f0 write.o
- *fill*         0x00000000c00438b0       0x10 
- .data          0x00000000c00438c0      0x1f0 cf.o
- *fill*         0x00000000c0043ab0       0x10 
- .data          0x00000000c0043ac0      0x1f0 search.o
- *fill*         0x00000000c0043cb0       0x10 
- .data          0x00000000c0043cc0      0x1f0 format.o
- *fill*         0x00000000c0043eb0       0x10 
- .data          0x00000000c0043ec0      0x1f0 atainit.o
- *fill*         0x00000000c00440b0       0x10 
- .data          0x00000000c00440c0      0x1f0 atairq.o
- *fill*         0x00000000c00442b0       0x10 
- .data          0x00000000c00442c0      0x600 atapci.o
-                0x00000000c00444c0                _pci_classes
- .data          0x00000000c00448c0      0x1f0 atadma.o
- *fill*         0x00000000c0044ab0       0x10 
- .data          0x00000000c0044ac0      0x1f0 ata.o
- *fill*         0x00000000c0044cb0       0x10 
- .data          0x00000000c0044cc0      0x1f0 diskvol.o
- *fill*         0x00000000c0044eb0       0x10 
- .data          0x00000000c0044ec0      0x1f0 fs.o
- *fill*         0x00000000c00450b0       0x10 
- .data          0x00000000c00450c0      0x1f0 vfs.o
- *fill*         0x00000000c00452b0       0x10 
- .data          0x00000000c00452c0      0x1f0 cedge.o
- *fill*         0x00000000c00454b0       0x10 
- .data          0x00000000c00454c0      0x1f0 ctype.o
- *fill*         0x00000000c00456b0       0x10 
- .data          0x00000000c00456c0      0x1f0 request.o
- *fill*         0x00000000c00458b0       0x10 
- .data          0x00000000c00458c0      0x1f0 info.o
- *fill*         0x00000000c0045ab0       0x10 
- .data          0x00000000c0045ac0      0x1f0 signal.o
- *fill*         0x00000000c0045cb0       0x10 
- .data          0x00000000c0045cc0      0x248 system.o
- *fill*         0x00000000c0045f08       0x18 
- .data          0x00000000c0045f20      0x1f0 bg.o
- *fill*         0x00000000c0046110       0x10 
- .data          0x00000000c0046120      0x1f0 grid.o
- *fill*         0x00000000c0046310       0x10 
- .data          0x00000000c0046320      0x1f0 sbar.o
- *fill*         0x00000000c0046510       0x10 
- .data          0x00000000c0046520      0x1f0 menubar.o
- *fill*         0x00000000c0046710       0x10 
- .data          0x00000000c0046720      0x1f0 menu.o
- *fill*         0x00000000c0046910       0x10 
- .data          0x00000000c0046920      0x1f0 i8042.o
- *fill*         0x00000000c0046b10       0x10 
- .data          0x00000000c0046b20      0x1f0 ps2mouse.o
- *fill*         0x00000000c0046d10       0x10 
- .data          0x00000000c0046d20      0x1f0 ps2kbd.o
- *fill*         0x00000000c0046f10       0x10 
- .data          0x00000000c0046f20      0x1f0 button.o
- *fill*         0x00000000c0047110       0x10 
- .data          0x00000000c0047120      0x1f0 char.o
- *fill*         0x00000000c0047310       0x10 
- .data          0x00000000c0047320      0x1f0 pixel.o
- *fill*         0x00000000c0047510       0x10 
- .data          0x00000000c0047520      0x1f0 line.o
- *fill*         0x00000000c0047710       0x10 
- .data          0x00000000c0047720      0x1f0 rect.o
- *fill*         0x00000000c0047910       0x10 
- .data          0x00000000c0047920      0x1f0 dtext.o
- *fill*         0x00000000c0047b10       0x10 
- .data          0x00000000c0047b20      0x1f0 font.o
- *fill*         0x00000000c0047d10       0x10 
- .data          0x00000000c0047d20      0x1f0 vsync.o
- *fill*         0x00000000c0047f10       0x10 
- .data          0x00000000c0047f20      0x1f0 bmp.o
- *fill*         0x00000000c0048110       0x10 
- .data          0x00000000c0048120      0x1f0 createw.o
- *fill*         0x00000000c0048310       0x10 
- .data          0x00000000c0048320      0x1f0 window.o
- *fill*         0x00000000c0048510       0x10 
- .data          0x00000000c0048520      0x1f0 desktop.o
- *fill*         0x00000000c0048710       0x10 
- .data          0x00000000c0048720      0x1f0 room.o
- *fill*         0x00000000c0048910       0x10 
- .data          0x00000000c0048920      0x1f0 usession.o
- *fill*         0x00000000c0048b10       0x10 
- .data          0x00000000c0048b20      0x1f0 gws.o
- *fill*         0x00000000c0048d10       0x10 
- .data          0x00000000c0048d20      0x1f0 object.o
- *fill*         0x00000000c0048f10       0x10 
- .data          0x00000000c0048f20      0x1f0 userenv.o
- *fill*         0x00000000c0049110       0x10 
- .data          0x00000000c0049120      0x1f0 proc.o
- *fill*         0x00000000c0049310       0x10 
- .data          0x00000000c0049320      0x1f0 syscall.o
- *fill*         0x00000000c0049510       0x10 
- .data          0x00000000c0049520      0x1f0 install.o
- *fill*         0x00000000c0049710       0x10 
- .data          0x00000000c0049720      0x1f0 serial.o
- *fill*         0x00000000c0049910       0x10 
- .data          0x00000000c0049920      0x1f0 debug.o
- *fill*         0x00000000c0049b10       0x10 
- .data          0x00000000c0049b20      0x1f0 abort.o
- *fill*         0x00000000c0049d10       0x10 
- .data          0x00000000c0049d20      0x1f0 x86fault.o
- *fill*         0x00000000c0049f10       0x10 
- .data          0x00000000c0049f20      0x1f0 services.o
-                0x00000000c004a110                _data_end = .
+ .data          0x00000000c003afa0        0x2 head.o
+                0x00000000c003afa0                _data_start
+ *fill*         0x00000000c003afa2       0x1e 
+ .data          0x00000000c003afc0      0x23c x86main.o
+                0x00000000c003b1c0                _copyright
+ *fill*         0x00000000c003b1fc        0x4 
+ .data          0x00000000c003b200      0x1f0 io.o
+ *fill*         0x00000000c003b3f0       0x10 
+ .data          0x00000000c003b400      0x1f0 hal.o
+ *fill*         0x00000000c003b5f0       0x10 
+ .data          0x00000000c003b600      0x1f0 mk.o
+ *fill*         0x00000000c003b7f0       0x10 
+ .data          0x00000000c003b800      0x1f0 execve.o
+ *fill*         0x00000000c003b9f0       0x10 
+ .data          0x00000000c003ba00      0x1f0 video.o
+ *fill*         0x00000000c003bbf0       0x10 
+ .data          0x00000000c003bc00      0x1f0 screen.o
+ *fill*         0x00000000c003bdf0       0x10 
+ .data          0x00000000c003be00      0x1f0 runtime.o
+ *fill*         0x00000000c003bff0       0x10 
+ .data          0x00000000c003c000      0x1f0 portsx86.o
+ *fill*         0x00000000c003c1f0       0x10 
+ .data          0x00000000c003c200      0x1f0 x86.o
+ *fill*         0x00000000c003c3f0       0x10 
+ .data          0x00000000c003c400      0x1f0 stdio.o
+ *fill*         0x00000000c003c5f0       0x10 
+ .data          0x00000000c003c600      0x1f4 stdlib.o
+ *fill*         0x00000000c003c7f4        0xc 
+ .data          0x00000000c003c800      0x1f0 string.o
+ *fill*         0x00000000c003c9f0       0x10 
+ .data          0x00000000c003ca00      0x1f0 tty.o
+ *fill*         0x00000000c003cbf0       0x10 
+ .data          0x00000000c003cc00      0x1f0 init.o
+ *fill*         0x00000000c003cdf0       0x10 
+ .data          0x00000000c003ce00      0x1f0 logon.o
+ *fill*         0x00000000c003cff0       0x10 
+ .data          0x00000000c003d000      0x1f0 logoff.o
+ *fill*         0x00000000c003d1f0       0x10 
+ .data          0x00000000c003d200      0x1f0 detect.o
+ *fill*         0x00000000c003d3f0       0x10 
+ .data          0x00000000c003d400      0x1f0 cpuamd.o
+ *fill*         0x00000000c003d5f0       0x10 
+ .data          0x00000000c003d600      0x1f0 memory.o
+ *fill*         0x00000000c003d7f0       0x10 
+ .data          0x00000000c003d800      0x1f0 pages.o
+ *fill*         0x00000000c003d9f0       0x10 
+ .data          0x00000000c003da00      0x1f0 mmpool.o
+ *fill*         0x00000000c003dbf0       0x10 
+ .data          0x00000000c003dc00      0x1f0 apic.o
+ *fill*         0x00000000c003ddf0       0x10 
+ .data          0x00000000c003de00      0x1f0 pic.o
+ *fill*         0x00000000c003dff0       0x10 
+ .data          0x00000000c003e000      0x1f0 timer.o
+ *fill*         0x00000000c003e1f0       0x10 
+ .data          0x00000000c003e200      0x1f0 rtc.o
+ *fill*         0x00000000c003e3f0       0x10 
+ .data          0x00000000c003e400      0x1f0 keyboard.o
+ *fill*         0x00000000c003e5f0       0x10 
+ .data          0x00000000c003e600      0x1f0 mouse.o
+ *fill*         0x00000000c003e7f0       0x10 
+ .data          0x00000000c003e800      0x1f0 ldisc.o
+ *fill*         0x00000000c003e9f0       0x10 
+ .data          0x00000000c003ea00      0x1f0 hdd.o
+ *fill*         0x00000000c003ebf0       0x10 
+ .data          0x00000000c003ec00      0xec4 pci.o
+                0x00000000c003ee00                _pci_classes2
+                0x00000000c003f200                _pci_classnames
+ .data          0x00000000c003fac4        0x0 usb.o
+ *fill*         0x00000000c003fac4       0x1c 
+ .data          0x00000000c003fae0      0x1f0 ahci.o
+ *fill*         0x00000000c003fcd0       0x10 
+ .data          0x00000000c003fce0      0x1f0 devmgr.o
+ *fill*         0x00000000c003fed0       0x10 
+ .data          0x00000000c003fee0      0x1f0 spawn.o
+ *fill*         0x00000000c00400d0       0x10 
+ .data          0x00000000c00400e0      0x1f0 callout.o
+ .data          0x00000000c00402d0        0x0 callfar.o
+ *fill*         0x00000000c00402d0       0x10 
+ .data          0x00000000c00402e0      0x1f0 process.o
+ *fill*         0x00000000c00404d0       0x10 
+ .data          0x00000000c00404e0      0x1f0 pheap.o
+ *fill*         0x00000000c00406d0       0x10 
+ .data          0x00000000c00406e0      0x1f0 thread.o
+ *fill*         0x00000000c00408d0       0x10 
+ .data          0x00000000c00408e0      0x1f0 threadi.o
+ *fill*         0x00000000c0040ad0       0x10 
+ .data          0x00000000c0040ae0      0x1f0 theap.o
+ *fill*         0x00000000c0040cd0       0x10 
+ .data          0x00000000c0040ce0      0x1f0 tstack.o
+ *fill*         0x00000000c0040ed0       0x10 
+ .data          0x00000000c0040ee0      0x1f0 create.o
+ *fill*         0x00000000c00410d0       0x10 
+ .data          0x00000000c00410e0      0x1f0 x86start.o
+ *fill*         0x00000000c00412d0       0x10 
+ .data          0x00000000c00412e0      0x1f0 x86cont.o
+ *fill*         0x00000000c00414d0       0x10 
+ .data          0x00000000c00414e0      0x1f0 tasks.o
+ *fill*         0x00000000c00416d0       0x10 
+ .data          0x00000000c00416e0      0x1f0 ts.o
+ *fill*         0x00000000c00418d0       0x10 
+ .data          0x00000000c00418e0      0x1f0 queue.o
+ *fill*         0x00000000c0041ad0       0x10 
+ .data          0x00000000c0041ae0      0x1f0 sched.o
+ *fill*         0x00000000c0041cd0       0x10 
+ .data          0x00000000c0041ce0      0x1f0 schedi.o
+ *fill*         0x00000000c0041ed0       0x10 
+ .data          0x00000000c0041ee0      0x1f0 preempt.o
+ *fill*         0x00000000c00420d0       0x10 
+ .data          0x00000000c00420e0      0x1f0 priority.o
+ *fill*         0x00000000c00422d0       0x10 
+ .data          0x00000000c00422e0      0x1f0 dispatch.o
+ *fill*         0x00000000c00424d0       0x10 
+ .data          0x00000000c00424e0      0x1f0 sem.o
+ *fill*         0x00000000c00426d0       0x10 
+ .data          0x00000000c00426e0      0x1f0 modules.o
+ *fill*         0x00000000c00428d0       0x10 
+ .data          0x00000000c00428e0      0x1f0 nicintel.o
+ *fill*         0x00000000c0042ad0       0x10 
+ .data          0x00000000c0042ae0      0x1f0 network.o
+ *fill*         0x00000000c0042cd0       0x10 
+ .data          0x00000000c0042ce0      0x1f0 socket.o
+ *fill*         0x00000000c0042ed0       0x10 
+ .data          0x00000000c0042ee0      0x1f0 sm.o
+ *fill*         0x00000000c00430d0       0x10 
+ .data          0x00000000c00430e0      0x1f0 channel.o
+ *fill*         0x00000000c00432d0       0x10 
+ .data          0x00000000c00432e0      0x1f0 ipc.o
+ *fill*         0x00000000c00434d0       0x10 
+ .data          0x00000000c00434e0      0x1f0 read.o
+ *fill*         0x00000000c00436d0       0x10 
+ .data          0x00000000c00436e0      0x1f0 write.o
+ *fill*         0x00000000c00438d0       0x10 
+ .data          0x00000000c00438e0      0x1f0 cf.o
+ *fill*         0x00000000c0043ad0       0x10 
+ .data          0x00000000c0043ae0      0x1f0 search.o
+ *fill*         0x00000000c0043cd0       0x10 
+ .data          0x00000000c0043ce0      0x1f0 format.o
+ *fill*         0x00000000c0043ed0       0x10 
+ .data          0x00000000c0043ee0      0x1f0 atainit.o
+ *fill*         0x00000000c00440d0       0x10 
+ .data          0x00000000c00440e0      0x1f0 atairq.o
+ *fill*         0x00000000c00442d0       0x10 
+ .data          0x00000000c00442e0      0x600 atapci.o
+                0x00000000c00444e0                _pci_classes
+ .data          0x00000000c00448e0      0x1f0 atadma.o
+ *fill*         0x00000000c0044ad0       0x10 
+ .data          0x00000000c0044ae0      0x1f0 ata.o
+ *fill*         0x00000000c0044cd0       0x10 
+ .data          0x00000000c0044ce0      0x1f0 diskvol.o
+ *fill*         0x00000000c0044ed0       0x10 
+ .data          0x00000000c0044ee0      0x1f0 fs.o
+ *fill*         0x00000000c00450d0       0x10 
+ .data          0x00000000c00450e0      0x1f0 vfs.o
+ *fill*         0x00000000c00452d0       0x10 
+ .data          0x00000000c00452e0      0x1f0 cedge.o
+ *fill*         0x00000000c00454d0       0x10 
+ .data          0x00000000c00454e0      0x1f0 ctype.o
+ *fill*         0x00000000c00456d0       0x10 
+ .data          0x00000000c00456e0      0x1f0 request.o
+ *fill*         0x00000000c00458d0       0x10 
+ .data          0x00000000c00458e0      0x1f0 info.o
+ *fill*         0x00000000c0045ad0       0x10 
+ .data          0x00000000c0045ae0      0x1f0 signal.o
+ *fill*         0x00000000c0045cd0       0x10 
+ .data          0x00000000c0045ce0      0x248 system.o
+ *fill*         0x00000000c0045f28       0x18 
+ .data          0x00000000c0045f40      0x1f0 bg.o
+ *fill*         0x00000000c0046130       0x10 
+ .data          0x00000000c0046140      0x1f0 grid.o
+ *fill*         0x00000000c0046330       0x10 
+ .data          0x00000000c0046340      0x1f0 sbar.o
+ *fill*         0x00000000c0046530       0x10 
+ .data          0x00000000c0046540      0x1f0 menubar.o
+ *fill*         0x00000000c0046730       0x10 
+ .data          0x00000000c0046740      0x1f0 menu.o
+ *fill*         0x00000000c0046930       0x10 
+ .data          0x00000000c0046940      0x1f0 i8042.o
+ *fill*         0x00000000c0046b30       0x10 
+ .data          0x00000000c0046b40      0x1f0 ps2mouse.o
+ *fill*         0x00000000c0046d30       0x10 
+ .data          0x00000000c0046d40      0x1f0 ps2kbd.o
+ *fill*         0x00000000c0046f30       0x10 
+ .data          0x00000000c0046f40      0x1f0 button.o
+ *fill*         0x00000000c0047130       0x10 
+ .data          0x00000000c0047140      0x1f0 char.o
+ *fill*         0x00000000c0047330       0x10 
+ .data          0x00000000c0047340      0x1f0 pixel.o
+ *fill*         0x00000000c0047530       0x10 
+ .data          0x00000000c0047540      0x1f0 line.o
+ *fill*         0x00000000c0047730       0x10 
+ .data          0x00000000c0047740      0x1f0 rect.o
+ *fill*         0x00000000c0047930       0x10 
+ .data          0x00000000c0047940      0x1f0 dtext.o
+ *fill*         0x00000000c0047b30       0x10 
+ .data          0x00000000c0047b40      0x1f0 font.o
+ *fill*         0x00000000c0047d30       0x10 
+ .data          0x00000000c0047d40      0x1f0 vsync.o
+ *fill*         0x00000000c0047f30       0x10 
+ .data          0x00000000c0047f40      0x1f0 bmp.o
+ *fill*         0x00000000c0048130       0x10 
+ .data          0x00000000c0048140      0x1f0 createw.o
+ *fill*         0x00000000c0048330       0x10 
+ .data          0x00000000c0048340      0x1f0 window.o
+ *fill*         0x00000000c0048530       0x10 
+ .data          0x00000000c0048540      0x1f0 desktop.o
+ *fill*         0x00000000c0048730       0x10 
+ .data          0x00000000c0048740      0x1f0 room.o
+ *fill*         0x00000000c0048930       0x10 
+ .data          0x00000000c0048940      0x1f0 usession.o
+ *fill*         0x00000000c0048b30       0x10 
+ .data          0x00000000c0048b40      0x1f0 gws.o
+ *fill*         0x00000000c0048d30       0x10 
+ .data          0x00000000c0048d40      0x1f0 object.o
+ *fill*         0x00000000c0048f30       0x10 
+ .data          0x00000000c0048f40      0x1f0 userenv.o
+ *fill*         0x00000000c0049130       0x10 
+ .data          0x00000000c0049140      0x1f0 proc.o
+ *fill*         0x00000000c0049330       0x10 
+ .data          0x00000000c0049340      0x1f0 syscall.o
+ *fill*         0x00000000c0049530       0x10 
+ .data          0x00000000c0049540      0x1f0 install.o
+ *fill*         0x00000000c0049730       0x10 
+ .data          0x00000000c0049740      0x1f0 serial.o
+ *fill*         0x00000000c0049930       0x10 
+ .data          0x00000000c0049940      0x1f0 debug.o
+ *fill*         0x00000000c0049b30       0x10 
+ .data          0x00000000c0049b40      0x1f0 abort.o
+ *fill*         0x00000000c0049d30       0x10 
+ .data          0x00000000c0049d40      0x1f0 x86fault.o
+ *fill*         0x00000000c0049f30       0x10 
+ .data          0x00000000c0049f40      0x1f0 services.o
+                0x00000000c004a130                _data_end = .
                 0x00000000c004b000                . = ALIGN (0x1000)
- *fill*         0x00000000c004a110      0xef0 
+ *fill*         0x00000000c004a130      0xed0 
 
 .got            0x00000000c004b000        0x0
  .got           0x00000000c004b000        0x0 services.o
