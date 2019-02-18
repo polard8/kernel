@@ -1,9 +1,8 @@
-OUTPUT_FORMAT("pe-i386")
+OUTPUT_FORMAT("elf32-i386")
 ENTRY(fmain)
 SECTIONS
 { 
-	
-	.text 0x1000: 
+	.text 0x200: 
     {
         code = .; 
 		_code = .; 
@@ -15,7 +14,9 @@ SECTIONS
        . = ALIGN(4096);
     }
 
-    .data :
+    /* importante - esse eh o entry point para ler os caracteres */
+	
+    .data 0x2000:
     {
         data = .; 
 		_data = .; 

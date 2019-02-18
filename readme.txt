@@ -12,7 +12,7 @@ Groups:
 
 ==============================
 4 (super)
-/3rdparty - This Fred Nora does not have the copyright.
+
 
 =============================
 3 (realtions of production)
