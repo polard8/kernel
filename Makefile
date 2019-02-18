@@ -12,10 +12,10 @@
 #We will have a new name just when the release changes.
 
 VERSION = 0
-PATCHLEVEL = 15
+PATCHLEVEL = 16
 SUBLEVEL = 0
-EXTRAVERSION = .0
-NAME = Shameless
+EXTRAVERSION = -rc0
+NAME = ?
 
 #todo:
 #We need to simplify these flags, but it's working.
