@@ -82,7 +82,7 @@
 #define WINDOW_TOP       0      //10
 
  
-#include "sh.h"
+#include "shell.h" 
 
 
 // Input flags.
@@ -152,6 +152,12 @@ int running = 1;
 int executing = 0;
 
 int login_status = 0;
+
+// #todo: 
+// Nesse modo o servidor shell.bin não abrirá janelas,
+// apanas inicializará os recursos do gws.
+
+int headless;
 
 //Sendo assim, o shell poderia abrir no ambiente de logon.
 
@@ -578,7 +584,7 @@ void quit ( int status ){
  * Obs: Esses argumentos podem ser um padrão.
  */
  
-int shmain ( int argc, char **argv ){
+int main ( int argc, char *argv[] ){
 	
 	//int arg_index = 1;
 	
@@ -710,6 +716,16 @@ int shmain ( int argc, char **argv ){
 			//printf("Initializing login ...\n");
             //printf("arg[1]={%s}\n",argv[1]);    
         };	
+		
+		//#headless
+		//aqui o shell não criará janelas, apenas inicializará o gws.
+		
+		if ( strncmp ( (char *) argv[1], "--headless", 10 ) == 0 ){
+			
+			headless = 1;
+			
+		}
+		
 		
 		//Nome passado viar argumento.
 		//shell_name = (char*) argv[2];

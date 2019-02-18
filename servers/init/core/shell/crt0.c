@@ -10,7 +10,7 @@
  */
 
 
-#include "sh.h" 
+#include "shell.h" 
 
 
 static char *argv[] = { 
@@ -31,13 +31,18 @@ static char *envp[] = {
 };
 
 
-extern int shmain ( int argc, char **argv );	
+extern int main ( int argc, char *argv[] );
 
 
 //
 // Main function in C part.
 // The entry point is in head.s
 //
+
+
+// #todo
+// O crt0 deve pegar a string na memória compartilhada,
+// pois alguns argumentos determinam como o shell deve inicializar.
 
 void crt0 (){
 	
@@ -54,7 +59,7 @@ void crt0 (){
 	stdioInitialize ();	
 
 
-	Response = (int) shmain ( 3, argv ); 
+	Response = (int) main ( 3, argv ); 
 								
 									
 	//
