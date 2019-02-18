@@ -11,6 +11,11 @@
 #include "gws/ws.h"
 
 int gws_init();
+unsigned long serverDialog ( unsigned long buffer_address );
+int serverInit ();
+
+
+
 
 
 

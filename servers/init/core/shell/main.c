@@ -1270,7 +1270,16 @@ noArgs:
 	// Na verdade essa rotina está pegando a mensagem na janela 
 	// com o foco de entrada. Esse argumento foi passado mas não foi usado.
 		
-	unsigned long message_buffer[5];	
+	unsigned long message_buffer[32];	
+	
+	//vamos testar se a mensagem esta no range padrao de servidores
+	//9000 ~  9999
+	int msgtest;
+	
+	
+	//
+	//   ## main loop ##
+	//
 		
 //Mainloop:
     
@@ -1294,15 +1303,26 @@ noArgs:
 		
 		if ( message_buffer[1] != 0 )
 		{
-	        shellProcedure ( (struct window_d *) message_buffer[0], 
-		        (int) message_buffer[1], 
-		        (unsigned long) message_buffer[2], 
-		        (unsigned long) message_buffer[3] );
 			
-			message_buffer[0] = 0;
-            message_buffer[1] = 0;
-            message_buffer[3] = 0;
-            message_buffer[4] = 0;	
+	        //Vamos testar se a mensagem esta no range padrao de servidores
+	        //9000 ~  9999
+			if ( message_buffer[1] >= 9000 && message_buffer[1] <= 9999  )
+			{
+				//Passamos o endereço do buffer contendo os argumentos.
+                serverDialog ((unsigned long) &message_buffer[0] );
+			
+			}else{
+				
+	            shellProcedure ( (struct window_d *) message_buffer[0], 
+		            (int) message_buffer[1], 
+		            (unsigned long) message_buffer[2], 
+		            (unsigned long) message_buffer[3] );
+			};
+			
+			message_buffer[0] = 0;  //window
+            message_buffer[1] = 0;  //msg
+            message_buffer[3] = 0;  //long1
+            message_buffer[4] = 0;	//long2
         };				
 	};
 	
@@ -1372,6 +1392,13 @@ shellProcedure( struct window_d *window,
 	unsigned long input_ret;
     unsigned long compare_return;	
     int q;	
+	
+	
+	//#importante
+	//Temos um ponteiro para o nosso buffer de argumentos
+	//para as mensagens atendidas pelo servidor. 
+	
+
 	
 	//if( msg == COMMAND_INITIALIZE_SHELL ){
 		//...
@@ -1948,8 +1975,14 @@ shellProcedure( struct window_d *window,
         //    };		
 		//    break;
 			
-		
-		
+			
+
+
+
+
+		//...
+			
+			
 		//Mensagem desconhecida.
 		default:
 		    //printf("shell procedure: mensagem desconhecida\n");
@@ -1960,7 +1993,7 @@ shellProcedure( struct window_d *window,
     // Nothing for now !
 done:
 	return (unsigned long) apiDefDialog ( window, msg, long1, long2 );
-};
+}
 
 
 /*
