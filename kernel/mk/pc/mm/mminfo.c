@@ -16,7 +16,7 @@ void memoryShowMemoryInfo (){
 	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
 	
-	printf(" Memory info:\n");
+	printf(" RAM Memory info:\n");
 	
 	printf("\n");
 	printf(" BaseMemory     = (%d KB)\n", memorysizeBaseMemory );

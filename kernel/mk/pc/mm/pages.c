@@ -438,6 +438,13 @@ unsigned long mapping_nic0_device_address ( unsigned long address ){
 	// the CPU that it isn't safe to cache access to this memory. 	
 	//(cache-disable and write-through).
 	
+	
+	// #imporatante
+	// #todo:
+	// Ainda não calculamos o uso de memória física.
+	// Precisamos saber quanta memória física esse dispositivo está usando.
+	
+	
 	int i;
 	for ( i=0; i < 1024; i++ ){
 		
@@ -1153,6 +1160,12 @@ int SetUpPaging (){
 	// Agora vamos calcular a quantidade de memória física usada até agora.
 	// Levando em conta a inicialização que fizemos nessa rotina.
 	
+	// Estamos deixando de fora a memória dos dispositivos, pois a memória
+	// usada pelos dispositivos possuem endereço físico, mas está na parte alta 
+	// do endereçamento físico, muito alem da memória RAM instalada.
+	// Com a exceção da vga, que fica antes de 1MB.
+	// Os dispositivos por enquanto são memória de vídeo e placa de rede.
+	
     memorysizeUsed = (unsigned long) ( mm_used_kernel_area + 
 		mm_used_user_area + 
 		mm_used_backbuffer + 
@@ -1160,8 +1173,7 @@ int SetUpPaging (){
 		mm_used_heappool + 
 		mm_used_gramadocore_init_heap +
 		mm_used_gramadocore_shell_heap +
-		mm_used_gramadocore_taskman_heap +
-		mm_used_lfb );
+		mm_used_gramadocore_taskman_heap );
 			
     memorysizeFree = memorysizeTotal - memorysizeUsed;
 
