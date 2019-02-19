@@ -1067,10 +1067,76 @@ typedef enum {
 //salva o tipo de sistema baseado no tamanho da memória.
 int g_mm_system_type;
 
+
+//
+// ## Physical memory ##
+//
+
+
+//base     = base memory retornada pelo cmos
+//other    = 1MB - base.
+//extended = retornada pelo cmos.
+//total    = base + other + extended.
+
 unsigned long memorysizeBaseMemory;
 unsigned long memorysizeOtherMemory;
 unsigned long memorysizeExtendedMemory;
 unsigned long memorysizeTotal;
+
+
+unsigned long memorysizeInstalledPhysicalMemory;
+
+unsigned long memorysizeTotalPhysicalMemory;
+unsigned long memorysizeAvailablePhysicalMemory;
+
+
+//??
+// Quantidade de memória em uso.
+unsigned long memorysizeUsed;
+
+//??
+//Quantidade de memória livre.
+// ? = total - used.
+unsigned long memorysizeFree;
+
+
+//
+// ## Used Memory support ##
+//
+
+unsigned long mm_used_kernel_area;  // start = 0 size = 4MB
+unsigned long mm_used_user_area;    // start = 0x400000 size = 4MB
+unsigned long mm_used_backbuffer;   // start = 0x800000 size = 4MB
+unsigned long mm_used_pagedpool;    // start = 0xC00000 size = 4MB  
+
+//area de memória onde ficarão heaps para os processos.
+unsigned long mm_used_heappool;     // start = 0x01000000 size = 4MB   
+	
+// #importante
+// os processos init, shell e taskman do gramado core são especiais
+// por isso receberão heaps especiais.
+
+//heap do processo gramado core init
+//heap do processo gramado core shell
+//heap do processo gramado core taskman
+
+unsigned long mm_used_gramadocore_init_heap;     // start = (0x01000000 + 0x400000) size = 4MB
+unsigned long mm_used_gramadocore_shell_heap;    // start = (0x01000000 + 0x800000) size = 4MB
+unsigned long mm_used_gramadocore_taskman_heap;  // start = (0x01000000 + 0xC00000) size = 4MB
+
+unsigned long mm_used_lfb;          // start = ?? size = 4MB
+
+//#todo
+//unsigned long mm_used_
+//more ...
+
+
+//
+//  ## virtual memory ##
+//
+
+unsigned long memorysizeTotalVirtualMemory;
+unsigned long memorysizeAvailableVirtualMemory;
 
 
 // Tamanho dado em MB.

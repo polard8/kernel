@@ -623,7 +623,8 @@ int SetUpPaging (){
 	//
 	
 	//inicializando o endereço.
-	gKernelPageDirectoryAddress = XXXKERNEL_PAGEDIRECTORY;  //0x0009C000;  
+	//0x0009C000;
+	gKernelPageDirectoryAddress = XXXKERNEL_PAGEDIRECTORY;    
 	
 	// 0x0009C000
 	//unsigned long *page_directory = (unsigned long *) KERNEL_PAGEDIRECTORY;         
@@ -769,6 +770,8 @@ int SetUpPaging (){
 	//Salva no diretório o endereço físico da tabela.
 	//Configurando os atributos.	
 	
+	mm_used_kernel_area = (1024 * 4);  // 4096 KB = (4 MB).
+		
 	for ( i=0; i < 1024; i++ ){
 		
 		// #importante:	
@@ -861,6 +864,8 @@ int SetUpPaging (){
 	//o bit 7 da entrada permanece em 0, indicando que temos páginas de 4KB.
 	//Salva no diretório o endereço físico.
 	//Configurando os atributos.
+	
+	mm_used_user_area = (1024 * 4);  // 4096 KB = (4 MB).
 	
 	for ( i=0; i < 1024; i++ ){
 		
@@ -960,6 +965,7 @@ int SetUpPaging (){
 	// Salva no diretório o endereço físico.
 	// Configurando os atributos.
 		
+	 mm_used_lfb = (1024 * 4);  // 4096 KB = (4 MB).
 	
     for ( i=0; i < 1024; i++ ){
 
@@ -980,7 +986,7 @@ int SetUpPaging (){
 	g_backbuffer_va = (unsigned long) BACKBUFFER_ADDRESS; //0xC0800000; 
 	
     //===============================================================
-	// user mode BUFFER1 pages - (0x01000000 - 0x800000 fis) = 0xC0800000virt).
+	// user mode BUFFER1 pages - 0x800000fis = (0x01000000 - 0x800000 fis) = 0xC0800000virt).
 	// ***BackBuffer: 
 	//     É o buffer onde se pinta o que aparecerá na tela. O conteúdo 
 	// desse buffer é copiado no LFB da memória de vídeo, (refresh_screen).
@@ -1002,7 +1008,9 @@ int SetUpPaging (){
 	// Salva no diretório o endereço físico.
 	// Configurando os atributos.
 	
-	for ( i=0; i < 1024; i++ ){
+    mm_used_backbuffer = (1024 * 4);  // 4096 KB = (4 MB).
+	
+    for ( i=0; i < 1024; i++ ){
 		
 	    // #importante:	
 		// O endereço físico e virtual são iguais para essa tabela.
@@ -1033,6 +1041,8 @@ int SetUpPaging (){
 	// Salva no diretório o endereço físico.
 	// Configurando os atributos.
 	
+	mm_used_pagedpool = (1024 * 4);  // 4096 KB = (4 MB).
+	
 	for ( i=0; i < 1024; i++ ){
 		
 	    
@@ -1054,10 +1064,12 @@ int SetUpPaging (){
 	g_heap_size = G_DEFAULT_PROCESSHEAP_SIZE;
 	
 	//heaps suppport
-	//preparando uma área de memória grando o bastante 
+	//preparando uma área de memória grande o bastante 
 	//para conter o heap de todos os processos.
 	//ex: podemos dar 128kb para cada processo inicialmente.
 
+    mm_used_heappool = (1024 * 4);  // 4096 KB = (4 MB).
+	
 	for ( i=0; i < 1024; i++ ){
 		
 	    // #importante:	
@@ -1076,6 +1088,8 @@ int SetUpPaging (){
 	g_gramadocore_init_heap_va = (unsigned long) XXXGRAMADOCORE_INIT_HEAP_VA; //0xC1400000;
 	g_gramadocore_init_heap_size = G_DEFAULT_GRAMADOCORE_INIT_HEAP_SIZE;  //4MB
 
+	mm_used_gramadocore_init_heap = (1024 * 4);  // 4096 KB = (4 MB).
+	
 	for ( i=0; i < 1024; i++ ){
 		
 	    // #importante:	
@@ -1094,6 +1108,8 @@ int SetUpPaging (){
 	g_gramadocore_shell_heap_va = (unsigned long) XXXGRAMADOCORE_SHELL_HEAP_VA; //0xC1800000;
 	g_gramadocore_shell_heap_size = G_DEFAULT_GRAMADOCORE_SHELL_HEAP_SIZE;  //4MB
 
+	mm_used_gramadocore_shell_heap = (1024 * 4);  // 4096 KB = (4 MB).
+	
 	for ( i=0; i < 1024; i++ ){
 		
 	    // #importante:	
@@ -1112,6 +1128,8 @@ int SetUpPaging (){
 	g_gramadocore_taskman_heap_va = (unsigned long) XXXGRAMADOCORE_TASKMAN_HEAP_VA; //0xC1C00000;
 	g_gramadocore_taskman_heap_size = G_DEFAULT_GRAMADOCORE_TASKMAN_HEAP_SIZE;  //4MB
 
+	mm_used_gramadocore_taskman_heap = (1024 * 4);  // 4096 KB = (4 MB).
+	
 	for ( i=0; i < 1024; i++ ){
 		
 	    // #importante:	
@@ -1127,6 +1145,26 @@ int SetUpPaging (){
 	
     //...
 	
+	
+	//
+	//   #### Importante ####
+	//
+	
+	// Agora vamos calcular a quantidade de memória física usada até agora.
+	// Levando em conta a inicialização que fizemos nessa rotina.
+	
+    memorysizeUsed = (unsigned long) ( mm_used_kernel_area + 
+		mm_used_user_area + 
+		mm_used_backbuffer + 
+		mm_used_pagedpool + 
+		mm_used_heappool + 
+		mm_used_gramadocore_init_heap +
+		mm_used_gramadocore_shell_heap +
+		mm_used_gramadocore_taskman_heap +
+		mm_used_lfb );
+			
+    memorysizeFree = memorysizeTotal - memorysizeUsed;
+
 	
 	
 	// @todo:  
@@ -1437,7 +1475,7 @@ void initializeFramesAlloc (){
 	struct page_d *p;
 	
 	//
-	// Inicializando a lista de pageframes.
+	// Inicializando a lista de pages.
 	//
 	
 	for ( Index=0; Index < PAGE_COUNT_MAX; Index++ )
@@ -1476,7 +1514,7 @@ void initializeFramesAlloc (){
 
 /*
  ***********************************************
- * allocPageFrames:
+ * allocPages:
  *
  * @param número de páginas contíguas.
  * Obs: Pode ser que os pageframes não sejam 
@@ -1609,10 +1647,10 @@ done:
 	//*Importante:
 	//retornaremos o endereço virtual inicial do primeiro pageframe da lista.
 	return (void *) ( base + (Ret->id * 4096) );
-};
+}
 
 
-//checar se a estrutura é nula
+//checar se a estrutura de p'agina é nula
 int pEmpty (struct page_d *p){
 	
     return p == NULL ? 1 : 0;
@@ -1651,8 +1689,8 @@ void notfreePage (struct page_d *p){
 /*
  ***************************************************************
  * firstSlotForAList:
- *     Retorna o primeiro índice de uma sequência de 
- * slots livres no pageAllocList[].
+ *     Retorna o primeiro índice de uma sequência de slots livres 
+ * em pageAllocList[].
  */
 
 int firstSlotForAList ( int size ){
@@ -1666,138 +1704,35 @@ tryAgain:
 	
 	for ( Index=Base; Index < 1024; Index++ )
 	{
-	    slot = (void*) pageAllocList[Index];
+	    slot = (void *) pageAllocList[Index];
 		
-		if( (void*) slot != NULL )
-		{
+		if ( (void *) slot != NULL ){
 			Base = Base+Count;
 			Base++;
 			Count = 0;
 			goto tryAgain;			
-		};
+		}
 		
-		Count++;       
-		if(Count >= size){
+		Count++; 
+		
+		if (Count >= size){
 			return (int) Base;
 		}
 	};
-     	
-fail:		
+	
     return (int) -1;		
-};
-
-
-/*
- * testingPageAlloc:
- *     Rotina de teste. */ 
-
-void testingPageAlloc (){
-	
-	int Index;
-    struct page_d *p;
-	
-	void *RetAddress;
-	unsigned long fileret;
-	
-	//#bugbug .;;;: mais que 100 dá erro ...
-	//@todo: melhorar o código de alocação de páginas.
-	//printf("testingPageAlloc: #100\n");
-	printf("testingPageAlloc:\n");
-	
-	//
-	// =============================================
-	//
-	
-	// #test:
-	// Funcionou com 500.
-    //Ret = (void*) allocPages(500);  
-	
-	//8KB. Para imagem pequena.
-	
-	RetAddress = (void *) allocPages (2); 
-	
-	if ( (void *) RetAddress == NULL )
-	{
-	    printf("RetAddress fail\n");
-        goto fail;		
-	}
-	
-	//printf("\n");
-	printf("BaseOfList={%x} Showing #32 \n",RetAddress);
-    
-	for ( Index=0; Index < 32; Index++ )   	
-	{  
-        p = (void *) pageAllocList[Index]; 
-		
-		if ( (void *) p == NULL )
-		{
-		    printf("null\n");	 
-		}
-	    
-		if ( (void *) p != NULL )
-		{
-		    printf("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", 
-				p->id, p->used, p->magic, p->free, p, p->next ); 	
-		}
-	};
-	
-	
-    //===================================
-	 
-	fileret = fsLoadFile (  VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
-	              "BMP1    BMP", (unsigned long) RetAddress ); 
-				  
-	if (fileret != 0)
-	{
-		printf("BMP1    BMP FAIL\n");
-		//escrevendo string na janela
-	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
-        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
-        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
-	}
-	
-	bmpDisplayBMP ( (char *) RetAddress, 20, 20 );
-
-    //===================================							
-	
-	//Isso funcionou ...
-	refresh_rectangle ( 20, 20, 16, 16 );
-	
-	//struct myrect *rc;
-	
-	//rc = (void *) malloc( sizeof( struct myrect ) );
-	//if(
-	
-	//rc->left   = 40 ;
-	//rc->right  = 80;
-	//rc->top    = 40 ;
-	//rc->bottom = 80;
-	
-	//move_back_to_front(rc);
-	
-	printf ("pc-mm-testingPageAlloc: *hang\n");
-    die();
-	
-done:
-  // Nothing for now.	
-fail:
-	refresh_screen();
-    return;	
-};
+}
 
 
 unsigned long 
 virtual_to_physical ( unsigned long virtual_address, 
                       unsigned long dir_address ) 
 {
-	
+	unsigned long tmp;
 	unsigned long address;
 	
 	unsigned long *dir = (unsigned long *) dir_address;
 
-	unsigned long tmp;
 	
 	int d = (int) virtual_address >> 22 & 0x3FF;
     int t = (int) virtual_address >> 12 & 0x3FF;
