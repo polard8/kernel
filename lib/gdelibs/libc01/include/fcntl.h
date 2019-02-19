@@ -55,5 +55,8 @@ struct flock {
 */
 
 
+int fcntl (int fd, int cmd, ... /* arg */ );
+
+
 #endif /* _FCNTL_H */
 

@@ -932,23 +932,23 @@ void outbyte (int c){
  ***********
  * _outbyte:
  *     Just output a byte on the screen.
- * Obs: 
- * A função não se preocupa com o cursor.
- * Essa rotina está preparada somente par ao modo gráfico.
- * Talvez usaremos um selecionador de modo.   
- * #importante: 
- * Não me lebro se o kernel efetua o refresh do char nesse caso.
+ *
+ *     Obs: A função não se preocupa com o cursor.
+ *          Essa rotina está preparada somente par ao modo gráfico.
+ *          Talvez usaremos um selecionador de modo.   
+ *
+ * #obs: 
+ * #importante: Não me lebro se o kernel efetua o refresh do char 
+ * nesse caso.
  */
   
 void _outbyte ( int c ){
 	
-	// #obs: 
-	// #bugbug
-	// Tamanho do char constante = 8. 
-	// O que queremos é usar uma variável.
+	//#obs: Tamanho do char constante = 8. 
+	//o que queremos é usar uma variável.
 	
 	stdio_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
-}
+};
 
 
 /*

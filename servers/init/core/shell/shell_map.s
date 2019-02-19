@@ -503,33 +503,60 @@ Linker script and memory map
                 0x000000000045be93                pwd_builtins
  .text          0x000000000045beaf       0x49 desktop.o
                 0x000000000045beaf                desktopInitialize
- .text          0x000000000045bef8       0x67 unistd.o
+ .text          0x000000000045bef8      0x195 unistd.o
                 0x000000000045bef8                unistd_system_call
                 0x000000000045bf20                execve
                 0x000000000045bf2a                exit
                 0x000000000045bf4a                fork
- .text          0x000000000045bf5f       0x10 login.o
-                0x000000000045bf5f                loginCheckPassword
- .text          0x000000000045bf6f       0x1b pixel.o
-                0x000000000045bf6f                gws_backbuffer_putpixel
- .text          0x000000000045bf8a       0x2b line.o
-                0x000000000045bf8a                my_buffer_horizontal_line
- .text          0x000000000045bfb5       0x86 rect.o
-                0x000000000045bfb5                drawDataRectangle
- .text          0x000000000045c03b      0x1c7 char.o
-                0x000000000045c03b                my_buffer_char_blt
-                0x000000000045c058                set_char_width
-                0x000000000045c066                set_char_height
-                0x000000000045c074                get_char_width
-                0x000000000045c07e                get_char_height
-                0x000000000045c088                gws_drawchar_transparent
-                0x000000000045c142                gws_draw_char
- .text          0x000000000045c202      0x1f3 gws.o
-                0x000000000045c202                gws_init
-                0x000000000045c234                serverInit
-                0x000000000045c251                serverDialog
+                0x000000000045bf5f                setuid
+                0x000000000045bf69                getpid
+                0x000000000045bf7e                getppid
+                0x000000000045bf93                getgid
+                0x000000000045bf9d                dup
+                0x000000000045bfa7                dup2
+                0x000000000045bfb1                dup3
+                0x000000000045bfbb                fcntl
+                0x000000000045bfc5                nice
+                0x000000000045bfcf                shutdown
+                0x000000000045bfd9                send
+                0x000000000045bfe3                pause
+                0x000000000045bfed                mkdir
+                0x000000000045c001                rmdir
+                0x000000000045c00b                link
+                0x000000000045c015                socket
+                0x000000000045c01f                recv
+                0x000000000045c029                mlock
+                0x000000000045c033                munlock
+                0x000000000045c03d                mlockall
+                0x000000000045c047                munlockall
+                0x000000000045c051                sysconf
+                0x000000000045c05b                fsync
+                0x000000000045c065                fdatasync
+                0x000000000045c06f                fpathconf
+                0x000000000045c079                pathconf
+                0x000000000045c083                ioctl
+ .text          0x000000000045c08d       0x10 login.o
+                0x000000000045c08d                loginCheckPassword
+ .text          0x000000000045c09d       0x1b pixel.o
+                0x000000000045c09d                gws_backbuffer_putpixel
+ .text          0x000000000045c0b8       0x2b line.o
+                0x000000000045c0b8                my_buffer_horizontal_line
+ .text          0x000000000045c0e3       0x86 rect.o
+                0x000000000045c0e3                drawDataRectangle
+ .text          0x000000000045c169      0x1c7 char.o
+                0x000000000045c169                my_buffer_char_blt
+                0x000000000045c186                set_char_width
+                0x000000000045c194                set_char_height
+                0x000000000045c1a2                get_char_width
+                0x000000000045c1ac                get_char_height
+                0x000000000045c1b6                gws_drawchar_transparent
+                0x000000000045c270                gws_draw_char
+ .text          0x000000000045c330      0x1f3 gws.o
+                0x000000000045c330                gws_init
+                0x000000000045c362                serverInit
+                0x000000000045c37f                serverDialog
                 0x000000000045d000                . = ALIGN (0x1000)
- *fill*         0x000000000045c3f5      0xc0b 
+ *fill*         0x000000000045c523      0xadd 
 
 .iplt           0x000000000045d000        0x0
  .iplt          0x000000000045d000        0x0 gws.o
@@ -559,7 +586,7 @@ Linker script and memory map
  .rodata        0x0000000000462910       0x54 char.o
  .rodata        0x0000000000462964       0x39 gws.o
 
-.eh_frame       0x00000000004629a0     0x2dcc
+.eh_frame       0x00000000004629a0     0x312c
  .eh_frame      0x00000000004629a0       0x34 crt0.o
  .eh_frame      0x00000000004629d4      0xcb4 main.o
                                         0xccc (size before relaxing)
@@ -579,72 +606,72 @@ Linker script and memory map
                                         0x1f8 (size before relaxing)
  .eh_frame      0x000000000046550c       0x20 desktop.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046552c       0x80 unistd.o
-                                         0x98 (size before relaxing)
- .eh_frame      0x00000000004655ac       0x20 login.o
+ .eh_frame      0x000000000046552c      0x3e0 unistd.o
+                                        0x3f8 (size before relaxing)
+ .eh_frame      0x000000000046590c       0x20 login.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004655cc       0x20 pixel.o
+ .eh_frame      0x000000000046592c       0x20 pixel.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004655ec       0x20 line.o
+ .eh_frame      0x000000000046594c       0x20 line.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046560c       0x20 rect.o
+ .eh_frame      0x000000000046596c       0x20 rect.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046562c       0xe0 char.o
+ .eh_frame      0x000000000046598c       0xe0 char.o
                                          0xf8 (size before relaxing)
- .eh_frame      0x000000000046570c       0x60 gws.o
+ .eh_frame      0x0000000000465a6c       0x60 gws.o
                                          0x78 (size before relaxing)
 
 .note.gnu.property
-                0x000000000046576c       0x1c
+                0x0000000000465acc       0x1c
  .note.gnu.property
-                0x000000000046576c       0x1c gws.o
+                0x0000000000465acc       0x1c gws.o
 
-.rel.dyn        0x0000000000465788        0x0
- .rel.got       0x0000000000465788        0x0 gws.o
- .rel.iplt      0x0000000000465788        0x0 gws.o
- .rel.text      0x0000000000465788        0x0 gws.o
+.rel.dyn        0x0000000000465ae8        0x0
+ .rel.got       0x0000000000465ae8        0x0 gws.o
+ .rel.iplt      0x0000000000465ae8        0x0 gws.o
+ .rel.text      0x0000000000465ae8        0x0 gws.o
 
-.data           0x00000000004657a0     0x4860
-                0x00000000004657a0                data = .
-                0x00000000004657a0                _data = .
-                0x00000000004657a0                __data = .
+.data           0x0000000000465b00     0x4500
+                0x0000000000465b00                data = .
+                0x0000000000465b00                _data = .
+                0x0000000000465b00                __data = .
  *(.data)
- .data          0x00000000004657a0      0x4c4 crt0.o
- *fill*         0x0000000000465c64       0x1c 
- .data          0x0000000000465c80      0x538 main.o
-                0x0000000000466120                running
-                0x0000000000466124                primary_prompt
-                0x0000000000466128                secondary_prompt
-                0x000000000046612c                remember_on_history
-                0x0000000000466130                current_command_number
-                0x0000000000466134                bashrc_file
-                0x0000000000466138                shell_config_file
-                0x000000000046613c                deltaValue
-                0x0000000000466140                long_args
- *fill*         0x00000000004661b8        0x8 
- .data          0x00000000004661c0      0x4a0 shellui.o
- .data          0x0000000000466660      0x440 api.o
- .data          0x0000000000466aa0        0x0 ctype.o
- .data          0x0000000000466aa0        0x0 stdio.o
- .data          0x0000000000466aa0        0x8 stdlib.o
-                0x0000000000466aa0                _infinity
- .data          0x0000000000466aa8        0x0 string.o
- .data          0x0000000000466aa8        0x0 conio.o
- *fill*         0x0000000000466aa8       0x18 
- .data          0x0000000000466ac0      0x4a0 builtins.o
- .data          0x0000000000466f60      0x4a8 desktop.o
-                0x0000000000467400                primary_desktop_folder
-                0x0000000000467404                secondary_desktop_folder
- .data          0x0000000000467408        0x0 unistd.o
- *fill*         0x0000000000467408       0x18 
- .data          0x0000000000467420      0x4a0 login.o
- .data          0x00000000004678c0      0x440 pixel.o
- .data          0x0000000000467d00      0x440 line.o
- .data          0x0000000000468140      0x440 rect.o
- .data          0x0000000000468580      0x440 char.o
- .data          0x00000000004689c0      0x840 gws.o
+ .data          0x0000000000465b00      0x4c4 crt0.o
+ *fill*         0x0000000000465fc4       0x1c 
+ .data          0x0000000000465fe0      0x538 main.o
+                0x0000000000466480                running
+                0x0000000000466484                primary_prompt
+                0x0000000000466488                secondary_prompt
+                0x000000000046648c                remember_on_history
+                0x0000000000466490                current_command_number
+                0x0000000000466494                bashrc_file
+                0x0000000000466498                shell_config_file
+                0x000000000046649c                deltaValue
+                0x00000000004664a0                long_args
+ *fill*         0x0000000000466518        0x8 
+ .data          0x0000000000466520      0x4a0 shellui.o
+ .data          0x00000000004669c0      0x440 api.o
+ .data          0x0000000000466e00        0x0 ctype.o
+ .data          0x0000000000466e00        0x0 stdio.o
+ .data          0x0000000000466e00        0x8 stdlib.o
+                0x0000000000466e00                _infinity
+ .data          0x0000000000466e08        0x0 string.o
+ .data          0x0000000000466e08        0x0 conio.o
+ *fill*         0x0000000000466e08       0x18 
+ .data          0x0000000000466e20      0x4a0 builtins.o
+ .data          0x00000000004672c0      0x4a8 desktop.o
+                0x0000000000467760                primary_desktop_folder
+                0x0000000000467764                secondary_desktop_folder
+ .data          0x0000000000467768        0x0 unistd.o
+ *fill*         0x0000000000467768       0x18 
+ .data          0x0000000000467780      0x4a0 login.o
+ .data          0x0000000000467c20      0x440 pixel.o
+ .data          0x0000000000468060      0x440 line.o
+ .data          0x00000000004684a0      0x440 rect.o
+ .data          0x00000000004688e0      0x440 char.o
+ .data          0x0000000000468d20      0x840 gws.o
                 0x000000000046a000                . = ALIGN (0x1000)
- *fill*         0x0000000000469200      0xe00 
+ *fill*         0x0000000000469560      0xaa0 
 
 .got            0x000000000046a000        0x0
  .got           0x000000000046a000        0x0 gws.o

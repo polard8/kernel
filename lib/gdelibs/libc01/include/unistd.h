@@ -92,9 +92,20 @@
  posix.  
  */
 
+
+#ifndef __UID_T
+#define __UID_T 
+typedef int uid_t;
+#endif 
+
 #ifndef __PID_T
 #define __PID_T 
 typedef int pid_t;
+#endif
+
+#ifndef __GID_T
+#define __GID_T 
+typedef int gid_t;
 #endif
 
 
@@ -108,13 +119,54 @@ int execve ( const char *filename,
 void exit(int status);			 		 
 int fork();
 
-/*
-int getpid();
-*/
 
-/*
-int getppid();
-*/
+int setuid ( uid_t uid );
+
+// POSIX.1-2001, 4.3BSD, SVr4.
+pid_t getpid(void);
+pid_t getppid(void);
+
+gid_t getgid(void);
+
+
+int dup(int oldfd);
+int dup2(int oldfd, int newfd);
+int dup3(int oldfd, int newfd, int flags);
+
+// nice - change process priority
+int nice(int inc);
+
+int pause(void);
+
+
+//SVr4, BSD, POSIX.1-2001.
+int mkdir(const char *pathname, mode_t mode);
+
+//rmdir - delete a	directory
+// SVr4, 4.3BSD, POSIX.1-2001.
+int rmdir(const char *pathname);
+
+//link - make a new name for a file
+// SVr4, 4.3BSD, POSIX.1-2001 (but see NOTES).
+int link(const char *oldpath, const char *newpath);
+
+
+//sysconf - get configuration information at run time
+//  POSIX.1-2001.
+long sysconf(int name);
+
+// fsync,  fdatasync  -  synchronize  a  file's in-core state with storage device
+//4.3BSD, POSIX.1-2001.
+int fsync(int fd);
+int fdatasync(int fd);
+
+//fpathconf, pathconf - get configuration values for files
+//POSIX.1-2001.
+long fpathconf(int fd, int name);
+long pathconf(char *path, int name);
+
+
+
 
 #endif /* _UNISTD_H */
 
