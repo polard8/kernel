@@ -190,6 +190,7 @@ void kernelPS2MouseDriverReadData (void){
  *     Usar isso na inicialização do mouse.
  *     #bugbug isso pode ir para windowLoadGramadoIcons
  */
+
 int load_mouse_bmp (){
 	
 	int Status = 1;

@@ -871,26 +871,20 @@ pciConfigReadByte ( unsigned char bus,
 	// Create configuration address.
 	address = (unsigned long)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | ((unsigned long)0x80000000));
  
-    //
+    
 	// sendComand:
     // Write out the address. (0x0CF8).
-    //
+    
     outportl(PCI_ADDRESS_PORT, address);
     
-	//
 	// getData:
 	// Read in the data port. (0x0CFC).
 	// Talves possamos usar um input do tipo char, que é assim
 	// inline unsigned char inportb(int port)  
     // int inport8(int port) 
-	//
 
-	Ret = (unsigned char)(( inportl(PCI_DATA_PORT) >> ((offset & 3) * 8)) & 0xff); //Parece ser o certo.
-	//Ret = (unsigned char)(( inportl(PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xff);	
-	//Ret = (unsigned char)( inport8(PCI_DATA_PORT) );
-	//Ret = (unsigned char)(( inportl(PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xff); //??	
+	Ret = (unsigned char)(( inportl(PCI_DATA_PORT) >> ((offset & 3) * 8)) & 0xff); 
 	
-
     // Obs: 
 	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.    
 	
@@ -976,12 +970,13 @@ pciConfigReadWord ( unsigned char bus,
  
 /* 
  * pciConfigReadDWord:
- *     Read com retorno do tipo unsigned long.
- */							  
-unsigned long pciConfigReadDWord( unsigned char bus, 
-                                  unsigned char slot, 
-								  unsigned char func, 
-								  unsigned char offset )
+ *     Read com retorno do tipo unsigned long. */
+
+unsigned long 
+pciConfigReadDWord ( unsigned char bus, 
+                     unsigned char slot, 
+                     unsigned char func, 
+                     unsigned char offset )
 {
 	//Montando uma unsigned long.
 	unsigned long lbus  = (unsigned long) bus;   //Bus.
@@ -992,65 +987,57 @@ unsigned long pciConfigReadDWord( unsigned char bus,
     unsigned long address;   
 	
 	//Retorno armazenado na porta de status.
-    unsigned long Ret = 0;             
+    unsigned long Ret = 0;
  
-    //
+	//
 	// @todo: Filtros de tamanho máximo.
 	//
 	
-    // Create configuration address.
+	// Create configuration address.
 	address = (unsigned long)((lbus << 16) | (lslot << 11) | (lfunc << 8) | (offset & 0xfc) | ((unsigned long)0x80000000));
  
-    //
+
 	// sendComand:
-    // Write out the address. (0x0CF8).
-    //
-    outportl(PCI_ADDRESS_PORT, address);
+	// Write out the address. (0x0CF8).
+
+    outportl (PCI_ADDRESS_PORT, address);
     
-	//
+
 	// getData:
 	// Read in the data port. (0x0CFC).
-	//int inport32(int port)
-    //
 
 	Ret = (unsigned long)( inportl(PCI_DATA_PORT) ); //Parece ser o certo.
-	//Ret = (unsigned long)(( inportl(PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xffffffff); 
-	//Ret = (unsigned long)(  inport32(PCI_DATA_PORT) );	
-	//Ret = (unsigned long)(( inportl(PCI_DATA_PORT) >> ((offset & 2) * 8)) & 0xffff);
 
-	
-	//
     // Obs: 
 	// (offset & 2) * 8) = 0 Will choose the first word of the 32 bits register.
-	//
-	
-done:    
+   
 	return (unsigned long) Ret; 
-};
+}
 
  
 /*
  * pciCheckVendor:
- *     Check vendor, offset 0.
- */ 
-unsigned short pciCheckVendor(unsigned char bus, unsigned char slot)
-{
+ *     Check vendor, offset 0. */
+
+unsigned short pciCheckVendor (unsigned char bus, unsigned char slot){
+	
 	//@todo: Nesse momento não há nenhume busca por fuction.
 	// Vendor.
-	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_VENDORID );  
-}; 
+	return (unsigned short) pciConfigReadWord ( bus, slot, 0, PCI_OFFSET_VENDORID );  
+}
 
  
 /*
  * pciCheckDevice:
- *     Check device, offset 2.    
- */ 
-unsigned short pciCheckDevice(unsigned char bus, unsigned char slot)
-{   
+ *     Check device, offset 2. */
+
+unsigned short pciCheckDevice (unsigned char bus, unsigned char slot){
+	
     //@todo: Nesse momento não há nenhume busca por fuction.     
     // Device.
-	return (unsigned short) pciConfigReadWord( bus, slot, 0, PCI_OFFSET_DEVICEID );   
-};
+	return (unsigned short) pciConfigReadWord ( bus, slot, 0, PCI_OFFSET_DEVICEID );   
+}
+
 
 /*
  * pciGetClassCode:
@@ -1115,9 +1102,11 @@ unsigned char pciGetHeaderType(unsigned char bus, unsigned char slot)
  *
  * Obs: Nessa rotina apenas pegamos o valor da bar.
  */
-unsigned long pciGetBAR( unsigned char bus, 
-                         unsigned char slot, 
-						 int number )
+
+unsigned long 
+pciGetBAR ( unsigned char bus, 
+            unsigned char slot, 
+            int number )
 {
 	unsigned long BAR;
 	
@@ -1260,18 +1249,13 @@ int pciInfo (){
 		if( (void *) D != NULL )
 		{
 			//@todo: Mostrar mais informações.
-			if(D->deviceMagic == 1234)
+			if (D->deviceMagic == 1234)
 			{
 				printf("\n [%d/%d/%d] Vendor=%x Device=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
 				       D->bus, D->dev , D->func,
-					   D->Vendor, 
-					   D->Device, 
-					   pci_class_strings[ D->classCode ], 
-					   D->subclass, 
-					   D->irq_line, 
-					   D->irq_pin );
-			
-			
+					   D->Vendor, D->Device, 
+					   pci_class_strings[ D->classCode ], D->subclass, 
+					   D->irq_line, D->irq_pin );
 			};
 		};
 	};
@@ -1285,8 +1269,8 @@ int pciInfo (){
  * Mostra informações sobre um dispositivo PCI da lista.
  */
 
-int pciShowDeviceInfo(int number)
-{
+int pciShowDeviceInfo (int number){
+	
     struct pci_device_d *D;
   
 	if(number < 0 || number > 32)
@@ -1308,8 +1292,7 @@ int pciShowDeviceInfo(int number)
 	}
 	//Nothing
 	return 0;
-};
-
+}
 
 
 /*
@@ -1621,8 +1604,6 @@ int init_pci (){
 
 
 
-
-
 /*
  * pciPci:
  *     Constructor.
@@ -1648,9 +1629,9 @@ int pciInit (){
 	*/
 	
 	return -1;
-	
-}; 
+}
  
+
 //
 // End.
 //

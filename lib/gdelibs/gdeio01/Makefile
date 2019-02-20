@@ -2,17 +2,13 @@
 #history:
 #2019 - Created by Fred Nora.
 
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
-
-
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = jackpot
+#NAME = gdeio
+
 
 #todo:
 #We need to simplify these flags
@@ -48,19 +44,19 @@ CFLAGS = -m32 \
 
 
 
-.PHONY: all all-c gde-link finalize clean
+.PHONY: all all-c gdeio-link finalize clean
 
 
-all: main.o all-c gde-link finalize
+all: main.o all-c gdeio-link finalize
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  gde.c $(CFLAGS) -o gde.o
+	gcc  -c  gdeio.c $(CFLAGS) -o gdeio.o
 
 all-c:
 
-	gcc  -c  gdeapi.c $(CFLAGS) -o gdeapi.o
-	gcc  -c  gdelib.c $(CFLAGS) -o gdelib.o	
+#	gcc  -c  gdeapi.c $(CFLAGS) -o gdeapi.o
+#	gcc  -c  gdelib.c $(CFLAGS) -o gdelib.o	
 
 #	cp ../../lib/libc01/obj/ctype.o   .
 #	cp ../../lib/libc01/obj/stdio.o   .
@@ -75,7 +71,7 @@ all-c:
 	
 
 
-gde-link:
+gdeio-link:
 #	ld -m i386pe -T link.ld -o ???.BIN $(myObjects) -Map app_map.s
 
 finalize:

@@ -29,6 +29,47 @@
 #include <kernel.h>
 
 
+unsigned char inportb (int port){
+	
+    unsigned char ret;
+ 
+    asm ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
+	
+	return (unsigned char) ret;
+};
+
+
+void outportb ( int port, int data ){
+	
+    asm ("outb %%al, %%dx" :: "a" (data), "d" (port) );
+};
+
+
+
+/*
+ * inportl:
+ *     Lê um dword de uma determina porta. */
+
+unsigned long inportl (unsigned long port){
+	
+	unsigned long ret;
+
+	asm volatile ("inl %%dx,%%eax" : "=a" (ret) : "d"(port) );
+	
+	return ret;
+}
+
+
+/*
+ * outportl:
+ *     Escreve um dword em uma determinada porta. */
+
+void outportl ( unsigned long port, unsigned long value ){
+	
+	asm volatile ("outl %%eax,%%dx" :: "d" (port), "a" (value) );
+}
+
+
 
 
 //inport byte
@@ -70,20 +111,7 @@ void outb ( int port, int data ){
 };
 
 
-unsigned char inportb (int port){
-	
-    unsigned char ret;
- 
-    asm ("inb %%dx, %%al" : "=a"(ret): "d"(port) );
-	
-	return (unsigned char) ret;
-};
 
-
-void outportb ( int port, int data ){
-	
-    asm ("outb %%al, %%dx" :: "a" (data), "d" (port) );
-};
 
 
 int inport8 (int port){
@@ -131,30 +159,6 @@ int inport32 (int port){
 void outport32 ( int port, int data ){ 
 
     __asm ("outl %%eax, %%dx" :: "a" (data), "d" (port) );
-};
-
-
-/*
- * inportl:
- *     Lê um dword de uma determina porta.
- */
-unsigned long inportl (unsigned long port){
-	
-	unsigned long ret;
-
-	asm volatile ("inl %%dx,%%eax" : "=a" (ret) : "d"(port) );
-	
-	return ret;
-};
-
-
-/*
- * outportl:
- *     Escreve um dword em uma determinada porta.
- */
-void outportl ( unsigned long port, unsigned long value ){
-	
-	asm volatile ("outl %%eax,%%dx" :: "d" (port), "a" (value) );
 };
 
 
@@ -253,12 +257,62 @@ int kernelProcessorOutPort32 (int port,int data){
 };
 
 
-void wait_ns(int count)
+void wait_ns (int count)
 {
-	count /=100;	 
+	count /= 100;	 
 	while(--count)io_delay();
-
 }
+
+
+
+unsigned long portsx86_IN ( int bits, unsigned long port ){
+
+    switch (bits)
+	{
+		case 8:
+			return (unsigned long) inportb ((int) port);
+			break;
+			
+		case 16:
+			return (unsigned long) inport16 ( (int) port);
+			break;
+			
+		case 32:
+			return (unsigned long) inportl ( (unsigned long) port);
+			break;
+	
+		default:
+			return 0;
+			break;
+	}	
+}
+
+
+void portsx86_OUT ( int bits, unsigned long port, unsigned long value ){
+
+    switch (bits)
+	{
+		case 8:
+			outportb ( (int) port, (int) value );
+			return;
+			break;
+			
+		case 16:
+			outport16 ( (int) port, (int) value );
+			return;
+			break;
+			
+		case 32:
+			outportl ( (unsigned long) port, (unsigned long) value );
+			return;
+			break;
+	
+		default:
+			return;
+			break;
+	}
+}
+
 
 
 

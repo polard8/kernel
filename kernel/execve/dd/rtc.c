@@ -62,15 +62,13 @@ int rtcError;
  *     System CMOS, Realtime clock.
  *     Isso é uma interface para chamar a rotina verdadeira.
  */
-void KiRtcIrq()
-{
+
+void KiRtcIrq (){
+	
 	//...
 	
-done:
-    rtc_irq();
-    return;	
-}; 
- 
+    rtc_irq ();
+}
  
  
 /*
@@ -79,8 +77,9 @@ done:
  *     irq8 interrupt handler.
  *     System CMOS, Realtime clock. 
  */
-void rtc_irq()
-{
+
+void rtc_irq (){
+	
 	unsigned i;
 
 	g_ticks++;
@@ -92,17 +91,14 @@ void rtc_irq()
     
 	// acknowledge IRQ 8 at the RTC by reading register C.
 	outportb(0x70, 0x0C);
-	(void)inportb(0x71); //??
+	(void)inportb(0x71); 
 	outportb(0x70, i);
     
 	// @todo: Checar esse EOI.
 	// acknowledge IRQ 8 at the PICs
 	//outportb(0xA0, 0x20);
 	//outportb(0x20, 0x20);
-	
-done:
-	return;
-};
+}
 
 
 /* 
@@ -110,11 +106,12 @@ done:
  * read_cmos_bcd:
  *     Lê da CMOS um determinado registro. 
  */
-unsigned long read_cmos_bcd( unsigned reg )
-{
+
+unsigned long read_cmos_bcd ( unsigned reg ){
+	
 	unsigned long high_digit, low_digit;
 
-	outportb( 0x70, ( inportb(0x70) & 0x80) | (reg & 0x7F) );
+	outportb ( 0x70, ( inportb(0x70) & 0x80) | (reg & 0x7F) );
 	high_digit = low_digit = inportb(0x71);
 
 	// Converte BCD para binário. 
@@ -124,7 +121,7 @@ unsigned long read_cmos_bcd( unsigned reg )
 	low_digit  &= 0x0F;
 
 	return (unsigned long) (10*high_digit) + low_digit;
-};
+}
 
 
 /*
@@ -138,15 +135,17 @@ unsigned long read_cmos_bcd( unsigned reg )
  * Obs: Na verdade pode estar funcionando e o relógio da máquina virtual
  * está desatualizado.
  */
-unsigned long get_time()
-{
-	unsigned long time;
+
+unsigned long get_time (){
+	
+	unsigned long time = 0;
 
 	time  = read_cmos_bcd(0);
-	time += read_cmos_bcd(2)*60;
-	time += read_cmos_bcd(4)*(60*60);	
+	time += read_cmos_bcd(2) * 60;
+	time += read_cmos_bcd(4) * (60*60);	
+	
 	return (unsigned long) time;
-};
+}
 
 
 /*
@@ -158,15 +157,17 @@ unsigned long get_time()
  * todo: Essa função pode ser trabalhada sem riscos ao sistema.
  * sTATUS: fUNCIONA BEM.
  */
-unsigned long get_date()
-{
-	unsigned long date;
+
+unsigned long get_date (){
+	
+	unsigned long date = 0;
 
 	date  = read_cmos_bcd(9);
-	date += read_cmos_bcd(8)*31;
-	date += read_cmos_bcd(7)*(31*12);
+	date += read_cmos_bcd(8) * 31;
+	date += read_cmos_bcd(7) * (31*12);
+	
 	return (unsigned long) date;
-};
+}
 
 
 /* 
@@ -197,10 +198,12 @@ unsigned long get_date()
  *				
  *	Limite de uma 'word' ??			
  */
-unsigned short rtcGetExtendedMemory()
-{
-    unsigned short total;
-    unsigned char lowmem;
+
+unsigned short rtcGetExtendedMemory (){
+	
+    unsigned short total = 0;
+    
+	unsigned char lowmem;
 	unsigned char highmem;
  
     //Low. (Low extended memory byte)
@@ -214,10 +217,8 @@ unsigned short rtcGetExtendedMemory()
     //Total.
     total = lowmem | highmem << 8;
 	
-done:	
     return (unsigned short) total;
-};
-
+}
 
 
 /* 
@@ -251,7 +252,8 @@ done:
  
 unsigned short rtcGetBaseMemory(){
 	
-    unsigned short total;
+    unsigned short total = 0;
+	
     unsigned char lowmem;
 	unsigned char highmem;
  
@@ -266,9 +268,8 @@ unsigned short rtcGetBaseMemory(){
     //Total.
     total = lowmem | highmem << 8;
 	
-done:	
     return (unsigned short) total;
-};
+}
 
 
 /*
@@ -278,44 +279,45 @@ done:
  * do módulo. @todo: Criar métodos que pegam esses valores salvos na 
  * estrutura.
  */
-void *get_cmos_info()
-{
-	//
-	// #bugbug
-	// Alocando memória toda vez que chama a função.
-	// Issa alocação deveria ser feita apenas uma vez
-	// na inicialização, depois somente atualizados os valores.
-	//
+
+// #bugbug
+// Alocando memória toda vez que chama a função.
+// Issa alocação deveria ser feita apenas uma vez
+// na inicialização, depois somente atualizados os valores.
+
+void *get_cmos_info (){
 	
-	Rtc = (void *) malloc( sizeof(struct rtc_d) );
-    if( (void *) Rtc == NULL)
+	Rtc = (void *) malloc ( sizeof(struct rtc_d) );
+	
+    if ( (void *) Rtc == NULL)
 	{
-	    printf("get_cmos_info fail: Struct\n");
+	    printf ("get_cmos_info fail: Struct\n");
 		refresh_screen();
+		
 		//free(Rtc);
 		return NULL;
+	
 	}else{
 		
 	    //time
 	    Rtc->Seconds = read_cmos_bcd(0);  // Seconds.
 	    Rtc->Minutes = read_cmos_bcd(2);  // Minutes.
-	    Rtc->Hours = read_cmos_bcd(4);  // Hours.
+	    Rtc->Hours   = read_cmos_bcd(4);  // Hours.
 
 	    //date.
 	    Rtc->Year = read_cmos_bcd(9);    
 	    Rtc->Year = (2000 + Rtc->Year);
 		Rtc->Month = read_cmos_bcd(8);    
 	    Rtc->DayOfMonth = read_cmos_bcd(7);    
-			
-		//@todo: put on structure.
     };
 	
 	//struct
-	if( (void *) Hardware == NULL )
+	if ( (void *) Hardware == NULL )
 	{
 		//erro
 	    printf("get_cmos_info: Hardware\n");
 		refresh_screen();
+		
 		//free(Rtc);
 		return NULL;		 
 	}else{
@@ -329,9 +331,8 @@ void *get_cmos_info()
 	printf("Date=%d/%d/%d\n", Rtc->DayOfMonth, Rtc->Month, Rtc->Year );
 #endif	
 	
-done:
 	return (void *) Rtc;
-};
+}
 
 
 /*
@@ -343,10 +344,9 @@ done:
  *     Essa função não deveria mostrar informações na tela.
  * tem que criar função pra isso.
  * essa aqui so deveria pegar as informações e colocar em estrutura.
- *
  */
-int init_clock()
-{
+
+int init_clock (){
 	
 	/*
 	 * @todo: criar uma estrutura para RTC.
@@ -368,11 +368,12 @@ int init_clock()
 	
 	get_cmos_info();
 	
-Done:
     g_driver_rtc_initialized = (int) 1;	
+	
 	printf("Done!\n");	
-	return (int) 0;
-};
+	
+	return 0;
+}
 
 
 /*
@@ -412,6 +413,6 @@ int rtcInit()
 */
 
 //
-//fim.
+// End.
 //
 

@@ -269,9 +269,13 @@
 #define	SYS_125 125   // system procedure call.
 
 //126~129 (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
-#define	SYS_126 126
-#define	SYS_127 127
+
+//io port support
+#define	SYS_USERMODE_PORT_IN  126
+#define	SYS_USERMODE_PORT_OUT 127
+
 #define	SYS_128 128
+
 //Inicializando um driver:
 //Um driver enviou uma systemcall confirmando a inicialização de um driver.
 #define	SYS_DRIVERINITIALIZED 129  

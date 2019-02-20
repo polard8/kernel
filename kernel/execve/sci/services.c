@@ -107,8 +107,6 @@ unsigned long serviceCreateWindow ( char * message_buffer );
  * *IMPORTANTE:
  *  DEPENDEND DO NÚMERO DO SERVIÇO ELE PODERÁ SER TRATADO EM OUTRO ARQUIVO
  *  E NÃO NO KERNEL BASE.
- *
- * 
  */
 
 void *services ( unsigned long number, 
@@ -1025,7 +1023,24 @@ void *services ( unsigned long number,
 		// system procedure call.
         case 125:
             return (void *) system_procedure ( NULL, arg2, arg3, arg4 );
-			break;		
+			break;	
+			
+		//126	
+		case SYS_USERMODE_PORT_IN:
+			//#bugbug
+			//#todo: Tem que resolver as questões de privilégios.
+			//bits, port
+			return (void *) portsx86_IN ( (int) arg2, (unsigned long) arg3 );
+			break;
+			
+		//127	
+		case SYS_USERMODE_PORT_OUT:
+			//#bugbug
+			//#todo: Tem que resolver as questões de privilégios.
+			//bits, port, value
+			portsx86_OUT ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+			return NULL;
+			break;
 		
 		//
 		// 129, Um driver confirmando que foi inicializado.

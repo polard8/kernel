@@ -55,11 +55,12 @@ int videoError;
  *     Configura o endereço inicial da memória de video em modo texto   
  *     fis=b8000  vir=0x800000 
  */
+
 void videoSetupCGAStartAddress (unsigned long address){
 	
     g_current_vm = (unsigned long) address;
 	//g_current_cga_address
-};
+}
 
 
 /*
@@ -336,6 +337,7 @@ int videoInit (){
  *     Confgura algumas variáveis.
  *     @todo: isso poderia ter retorno void.
  */
+
 int videoVideo (){
 	
     videoStatus = 0;
@@ -343,8 +345,7 @@ int videoVideo (){
     //...
 
 	return (int) 0;
-};
-
+}
 
 
 //

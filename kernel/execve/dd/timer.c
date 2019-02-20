@@ -1,5 +1,5 @@
 /*
- * File: dd\timer.c 
+ * File: timer.c 
  *  
  * Descrição:
  *     Arquivo principal do driver do PIT. 
@@ -110,7 +110,7 @@ int timerTextCursorStatus;   //0=apaga 1=acende
 
 
 //Rotina principal.
-void timer();        
+void timer ();        
 //...
 
 
@@ -123,19 +123,19 @@ void timer();
 void KiTimer (){
 	
 	timer ();
-};
+}
 
 
 void timerEnableTextCursor (){
 	
     timerShowTextCursor = 1;	
-};
+}
 
 
 void timerDisableTextCursor (){
 	
     timerShowTextCursor = 0;	
-};	
+}
 	
 
 /*
@@ -146,21 +146,21 @@ void timerDisableTextCursor (){
  * quantum ...).
  *     (tick tick tick)
  */
+
 void timer (){
 	
+	//timers.
+	int i;
 	
-	int i; //timers.
 	struct timer_d *t;
 	
 	//
 	// ## ticks total ##
 	//
-
 	
     //Contador de ticks.
 	//Incrementa o Tempo total de funcionamento do kernel.
 	
-	//timerTicks++; 
     sys_time_ticks_total++;	
 
 	//
@@ -197,7 +197,6 @@ void timer (){
 	}
 
 
-
 	//
 	// ## mouse blink ##
 	//
@@ -227,6 +226,7 @@ void timer (){
 		    }
 		};
 	};
+	
 mouseExit:	
 
     //podemos percorrer a lista de timer e decrementar,
@@ -343,6 +343,7 @@ struct timer_d *create_timer ( struct window_d *window,
 	
 	//limits
 	//limite de 1 tick.
+	
 	if (ms < (1000/sys_time_hz) )
 	{
 		printf("create_timer: ajust ms\n");
@@ -510,79 +511,84 @@ void timerInit8253 ( unsigned long hz ){
 	// Isso será uma variável para fazermos testes de desempenho. 
 	
 	sys_time_hz = (unsigned long) hz;
-};
+}
 
 
 /* set_quantum: */
 void set_quantum ( unsigned long q){
 	
     quantum = (unsigned long) q;
-};
+}
 
 
 /* get_quantum: */
 unsigned long get_quantum (){
 	
     return (unsigned long ) quantum;
-}; 
+}
 
 
 /* set_current_quantum: */
 void set_current_quantum (unsigned long q){
 	
     current_quantum = (unsigned long) q;
-};
+}
 
 
 /* get_current_quantum: */
 unsigned long get_current_quantum (){
 	
     return (unsigned long ) current_quantum;
-}; 
+}
 
 
 /* set_next_quantum: */
 void set_next_quantum (unsigned long q){
 	
     next_quantum = (unsigned long) q;
-};
+}
 
 
 /* get_next_quantum: */
 unsigned long get_next_quantum (){
 	
     return (unsigned long ) next_quantum;
-}; 
+}
 
 
 /* systime in ms */
 unsigned long now (){
 	
     return (unsigned long) get_systime_ms ();
-};
+}
 
 
 /* systime hz */
 unsigned long get_systime_hz (){
 	
     return (unsigned long) sys_time_hz;
-};
+}
 
 
 /* systime in ms */
 unsigned long get_systime_ms (){
 	
     return (unsigned long) sys_time_ms;
-};
+}
 
 
 /* get_systime_totalticks: */
 unsigned long get_systime_totalticks (){
 	
     return (unsigned long) sys_time_ticks_total;
-};
+}
 
 
+/*
+ ***********************
+ * get_systime_info:
+ *     
+ */
 unsigned long get_systime_info (int n){
 	
 	//#todo criar um enum para isso.
@@ -607,7 +613,7 @@ unsigned long get_systime_info (int n){
 		    return (unsigned long) 0;
 		    break;
 	};	
-};
+}
 
 
 /*
@@ -618,6 +624,7 @@ unsigned long get_systime_info (int n){
  * tarefa pra dormir no caso de evento.
  *   #todo: Usar o ms do contador do sys_time
  */
+
 void sleep (unsigned long ms){
 	
     unsigned long t = (unsigned long) ( ms * 512 );
@@ -625,21 +632,21 @@ void sleep (unsigned long ms){
 	while(t > 0){
 		t--;
 	}
-};
+}
 
 
 /* set_timeout: #todo */
 void set_timeout ( unsigned long ticks ){
 
 	time_out = (unsigned long) ticks;
-};
+}
 
 
 /* get_timeout: #todo */
 unsigned long get_timeout (){
 	
 	return (unsigned long) time_out;
-};
+}
 
 
 /*
@@ -648,6 +655,7 @@ unsigned long get_timeout (){
  *     Constructor.
  *     Inciaialização de variáveis do módulo.
  */
+
 int timerTimer (){
 	
 	//Apenas inicializando, isso será atualizado.  
@@ -664,7 +672,7 @@ int timerTimer (){
     //...
 	
 	return (int) 0;
-};
+}
 
 
 /*

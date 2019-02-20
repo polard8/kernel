@@ -1,5 +1,5 @@
 /*
- * File: unblocked\pic.c
+ * File: pic.c
  *
  *    Controlador PIC.
  *    Arquivo principal do módulo interno do kernel de 32bit. 
@@ -48,6 +48,6 @@ int picInit()
 */
  
 //
-// Fim.
+// End.
 //
 

@@ -141,24 +141,20 @@
 // portas
 //
 
+unsigned char inportb(int port);
+void outportb(int port, int data);
+
+unsigned long inportl(unsigned long port);
+void outportl(unsigned long port, unsigned long value);
+
 unsigned char kinportb(int port);
 void koutportb(unsigned int port,unsigned int value);
 
 
-//
-// ...
-//
 
 unsigned char inb(int port);
 void outb(int port, int data);
 
-
-//
-//...
-//
-
-unsigned char inportb(int port);
-void outportb(int port, int data);
 
 //
 // ... Obs: input sem retorno.
@@ -170,14 +166,6 @@ int inport16(int port);
 void outport16(int port,int data);
 int inport32(int port);
 void outport32(int port,int data);
-
-//
-//...
-//
-
-unsigned long inportl(unsigned long port);
-void outportl(unsigned long port, unsigned long value);
-
 
 
 static unsigned char inPort60(void);
@@ -195,6 +183,10 @@ int kernelProcessorOutPort32(int port,int data);
 
 
 void wait_ns(int count);
+
+
+unsigned long portsx86_IN ( int bits, unsigned long port );
+void portsx86_OUT ( int bits, unsigned long port, unsigned long value );
 
 //
 // End.

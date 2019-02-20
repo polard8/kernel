@@ -24,11 +24,6 @@
 
 
 
-
-
-
-
-
 /*
  * get_cpu_intel_parameters:
  *     Pega os parâmetros da cpu x86 através da instrução cpuid.
@@ -41,6 +36,7 @@
  * L2 cache information = 0x80000006.(Extended L2 Cache Features)
  * core per die         = 0x80000008.
  */ 
+
 void get_cpu_intel_parameters (){
 	
 	unsigned long eax, ebx, ecx, edx;
@@ -314,14 +310,12 @@ int cpu_get_parameters (){
  *     Get info.
  *     ??header
  */
+
 int KeTestCPU (){
 	
-	get_cpu_intel_parameters();
-
-	return (int) 0;
-};
-
-
+	get_cpu_intel_parameters ();
+	return 0;
+}
 
 
 /*
@@ -333,6 +327,7 @@ int KeTestCPU (){
  * @todo: Estamos usando cpuid para testar os 2 tipos de arquitetura.
  * nao sei qual ha instruções diferentes para arquiteturas diferentes.
  */
+
 int hal_probe_cpu (){
 	
 	unsigned long eax, ebx, ecx, edx;
@@ -344,8 +339,8 @@ int hal_probe_cpu (){
 	// Check structure.	
 	if ( (void *) processor == NULL )
 	{
-	    panic("hal_probe_cpu: struct\n");
-	};
+	    panic ("hal_probe_cpu: struct\n");
+	}
 	
     //Check vendor.
     cpuid ( 0, eax, ebx, ecx, edx ); 
@@ -377,10 +372,10 @@ int hal_probe_cpu (){
     //Fail:
 	
 	processor->Type = Processor_NULL;	
-    //return (int) 1;
-	
+    
 	panic ("hal_probe_cpu: Processor not supported");
-};
+	//return (int) 1;
+}
 
 
 /*

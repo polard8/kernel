@@ -50,13 +50,12 @@ PCIRegisterIRQHandler ( uint16_t bus,
 						unsigned long handler,
 						void *priv ) 
 {
-	
 	//#debug 
 	printf("intel-PCIRegisterIRQHandler:");
+	
 	refresh_screen();
 	while(1){}	
-};
-
+}
 
 
 /*
@@ -259,18 +258,15 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 			//refresh_screen();
 			//while(1){}
 			 
-		    uint32_t tmp = E1000ReadEEPROM ( currentNIC, 0 );										
-		
+		    uint32_t tmp = E1000ReadEEPROM ( currentNIC, 0 );											
 		    currentNIC->mac_address[0] = (uint8_t)(tmp & 0xFF);
 		    currentNIC->mac_address[1] = (uint8_t)(tmp >> 8);
 		
 		    tmp = E1000ReadEEPROM ( currentNIC, 1);
-		
 		    currentNIC->mac_address[2] = (uint8_t)(tmp & 0xFF);
 		    currentNIC->mac_address[3] = (uint8_t)(tmp >> 8);
 		
 		    tmp = E1000ReadEEPROM ( currentNIC, 2);
-		
 		    currentNIC->mac_address[4] = (uint8_t)(tmp & 0xFF);
 		    currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
 		

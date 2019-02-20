@@ -22,17 +22,16 @@
  * para o kernel.
  *    talvez pertenã ao driver do controlador 8042
  */
+
+//*importante:
+// Estamos no driver de mouse.
+// Chamaremos o mouse handler dentro do kernel base.
+//ps2mouse.c
+
 void mouse_handler (){
 	
-	//*importante:
-	// Estamos no driver de mouse.
-	// Chamaremos o mouse handler dentro do kernel base.
-	
-//callMouseHandler:
-
-    //Obs: Essa função ainda está em ldisc.c
     mouseHandler ();	
-};
+}
 
 
 //
