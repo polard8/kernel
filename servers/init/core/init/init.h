@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#include <stubs/gramado.h>
 
 
 int initMain (void);

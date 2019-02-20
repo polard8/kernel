@@ -61,7 +61,8 @@ stdio.o \
 stdlib.o \
 string.o \
 conio.o \
-unistd.o  
+unistd.o \
+stubs.o   
 
 
 
@@ -99,6 +100,8 @@ all-c:
 #	cp ../../../lib/wait.o .
 
 	cp $(LIBCOBJ)/unistd.o .
+	
+	cp $(LIBCOBJ)/stubs.o .
 
 taskman-link:
 	ld -m elf_i386 -T link.ld -o TASKMAN.BIN $(myObjects) -Map map.s

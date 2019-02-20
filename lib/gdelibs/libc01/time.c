@@ -8,6 +8,8 @@
 #include <time.h>
 #include <types.h> 
 
+//system calls.
+#include <stubs/gramado.h> 
 
 /*
  * time_system_call:
@@ -25,10 +27,13 @@
  *    ecx = arg3.
  *    edx = arg4.
  */
+
+/*
 void *time_system_call ( unsigned long ax, 
                          unsigned long bx, 
 				         unsigned long cx, 
 				         unsigned long dx );
+*/
 
 						 
 						 
@@ -41,7 +46,9 @@ time_t time (time_t *timer){
 	
 	//system call. (224) get time
 	
-	Ret = (time_t) time_system_call ( 224, 0, 0, 0 );
+	//Ret = (time_t) time_system_call ( 224, 0, 0, 0 );
+	
+	Ret = (time_t) gramado_system_call ( 224, 0, 0, 0 );
 	
     *timer = Ret;
 
@@ -66,6 +73,7 @@ time_t time (time_t *timer){
  *    ecx = arg3.
  *    edx = arg4.
  */
+/*
 void *time_system_call ( unsigned long ax, 
                          unsigned long bx, 
 				         unsigned long cx, 
@@ -81,4 +89,8 @@ void *time_system_call ( unsigned long ax,
 				   
 	return (void *) Ret; 
 };
+*/
+
+
+
 

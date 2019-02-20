@@ -60,6 +60,8 @@
 
 #include "login.h"
 
+#include <stubs/gramado.h>
+
 
 //#define SHELL_VERBOSE 1
 

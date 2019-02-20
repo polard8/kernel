@@ -29,6 +29,10 @@
 
 #include <ctype.h>
 
+//system calls.
+#include <stubs/gramado.h> 
+
+
 
 // Testando define.
 
@@ -178,10 +182,12 @@ void stdio_fntos (char *name){
  *    edx = arg4.
  */
  
+/*
 void *stdio_system_call ( unsigned long ax, 
                           unsigned long bx, 
 				          unsigned long cx, 
 				          unsigned long dx );
+*/
 
 						 
 /*
@@ -192,7 +198,10 @@ void *stdio_system_call ( unsigned long ax,
 
 int fclose (FILE *stream){
  
-    return (int) stdio_system_call ( 232, (unsigned long) stream, 
+    //return (int) stdio_system_call ( 232, (unsigned long) stream, 
+	//				 (unsigned long) stream, (unsigned long) stream ); 
+
+    return (int) gramado_system_call ( 232, (unsigned long) stream, 
 					 (unsigned long) stream, (unsigned long) stream ); 
 }
 
@@ -213,7 +222,13 @@ int fclose (FILE *stream){
 
 FILE *fopen ( const char *filename, const char *mode ){
 	
-    return (FILE *) stdio_system_call ( 246, (unsigned long) filename, 
+	//salvando. isso funciona.
+    //return (FILE *) stdio_system_call ( 246, (unsigned long) filename, 
+	//				 (unsigned long) mode, (unsigned long) mode ); 
+	
+	//#teste
+	//tentando esse.
+    return (FILE *) gramado_system_call ( 246, (unsigned long) filename, 
 					 (unsigned long) mode, (unsigned long) mode ); 
 }
 
@@ -780,7 +795,10 @@ int putchar (int ch){
 	//usando seu próprio cursor.
     //put char.
 	
-	stdio_system_call ( 65, (unsigned long) ch, (unsigned long) ch, 
+	//stdio_system_call ( 65, (unsigned long) ch, (unsigned long) ch, 
+	//	(unsigned long) ch );
+	
+	gramado_system_call ( 65, (unsigned long) ch, (unsigned long) ch, 
 		(unsigned long) ch );
 	
 	return (int) ch;    
@@ -947,7 +965,8 @@ void _outbyte ( int c ){
 	//#obs: Tamanho do char constante = 8. 
 	//o que queremos é usar uma variável.
 	
-	stdio_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
+	//stdio_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
+	gramado_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
 };
 
 
@@ -1074,6 +1093,7 @@ input_done:
  *    edx = arg4.
  */
 
+/*
 void *stdio_system_call ( unsigned long ax, 
                           unsigned long bx, 
 				          unsigned long cx, 
@@ -1089,7 +1109,7 @@ void *stdio_system_call ( unsigned long ax,
 
 	return (void *) Ret; 
 };
-
+*/
 
 /*
 // Return BUFFER_SIZE. 
@@ -1117,7 +1137,8 @@ int input_file_buffer_size(void)
 
 int getchar (void){
 	
-	return (int) stdio_system_call ( 137, 0, 0, 0 ); 
+	//return (int) stdio_system_call ( 137, 0, 0, 0 ); 
+	return (int) gramado_system_call ( 137, 0, 0, 0 ); 
 }
 
 
@@ -1218,7 +1239,10 @@ void stdioInitialize (){
 
 int fflush ( FILE *stream ){
 	
-    return (int) stdio_system_call ( 233, (unsigned long) stream, 
+    //return (int) stdio_system_call ( 233, (unsigned long) stream, 
+	//				 (unsigned long) stream, (unsigned long) stream ); 
+	
+    return (int) gramado_system_call ( 233, (unsigned long) stream, 
 					 (unsigned long) stream, (unsigned long) stream ); 
 }
 
@@ -1230,7 +1254,10 @@ int fflush ( FILE *stream ){
 
 int fprintf ( FILE *stream, const char *format, ... ){
 	
-    return (int) stdio_system_call ( 234, (unsigned long) stream, 
+    //return (int) stdio_system_call ( 234, (unsigned long) stream, 
+	//				 (unsigned long) format, (unsigned long) format ); 
+	
+    return (int) gramado_system_call ( 234, (unsigned long) stream, 
 					 (unsigned long) format, (unsigned long) format ); 
 }
 
@@ -1241,7 +1268,9 @@ int fprintf ( FILE *stream, const char *format, ... ){
  */
 int fputs ( const char *str, FILE *stream ){
 	
-    return (int) stdio_system_call ( 235, (unsigned long) str, 
+    //return (int) stdio_system_call ( 235, (unsigned long) str, 
+	//				 (unsigned long) stream, (unsigned long) stream ); 
+    return (int) gramado_system_call ( 235, (unsigned long) str, 
 					 (unsigned long) stream, (unsigned long) stream ); 
 }
 
@@ -1351,7 +1380,9 @@ int fileno ( FILE *stream ){
 
 int fgetc ( FILE *stream ){
     
-    return (int) stdio_system_call ( 136, (unsigned long) stream,  
+    //return (int) stdio_system_call ( 136, (unsigned long) stream,  
+	//				 (unsigned long) stream,  (unsigned long) stream );
+    return (int) gramado_system_call ( 136, (unsigned long) stream,  
 					 (unsigned long) stream,  (unsigned long) stream );
 }
 
@@ -1362,7 +1393,10 @@ int fgetc ( FILE *stream ){
  */
 int feof ( FILE *stream ){
     
-    return (int) stdio_system_call ( 193, (unsigned long) stream,  
+    //return (int) stdio_system_call ( 193, (unsigned long) stream,  
+	//				(unsigned long) stream,  (unsigned long) stream );
+	
+    return (int) gramado_system_call ( 193, (unsigned long) stream,  
 					(unsigned long) stream,  (unsigned long) stream );
 }
 
@@ -1374,7 +1408,10 @@ int feof ( FILE *stream ){
  */
 int ferror ( FILE *stream ){
     
-    return (int) stdio_system_call ( 194, (unsigned long) stream,  
+    //return (int) stdio_system_call ( 194, (unsigned long) stream,  
+	//				(unsigned long) stream,  (unsigned long) stream );    
+	
+    return (int) gramado_system_call ( 194, (unsigned long) stream,  
 					(unsigned long) stream,  (unsigned long) stream );    
 }
 
@@ -1387,7 +1424,10 @@ int ferror ( FILE *stream ){
  */
 int fseek ( FILE *stream, long offset, int whence ){
     
-     return (int) stdio_system_call ( 195, (unsigned long) stream, 
+     //return (int) stdio_system_call ( 195, (unsigned long) stream, 
+	//					(unsigned long) offset,  (unsigned long) whence ); 
+	
+     return (int) gramado_system_call ( 195, (unsigned long) stream, 
 						(unsigned long) offset,  (unsigned long) whence ); 
 }
 
@@ -1399,7 +1439,9 @@ int fseek ( FILE *stream, long offset, int whence ){
 
 int fputc ( int ch, FILE *stream ){
     
-     return (int) stdio_system_call ( 196, (unsigned long) ch,  
+     //return (int) stdio_system_call ( 196, (unsigned long) ch,  
+	 //				 (unsigned long) stream,  (unsigned long) stream );    
+     return (int) gramado_system_call ( 196, (unsigned long) ch,  
 					 (unsigned long) stream,  (unsigned long) stream );    
 }
 
@@ -1413,7 +1455,8 @@ int fputc ( int ch, FILE *stream ){
 void stdioSetCursor ( unsigned long x, unsigned long y ){
 	
 	//34 - set cursor.
-    stdio_system_call ( 34, x, y, 0 );	
+    //stdio_system_call ( 34, x, y, 0 );	
+    gramado_system_call ( 34, x, y, 0 );	
 };
 
 
@@ -1425,7 +1468,8 @@ void stdioSetCursor ( unsigned long x, unsigned long y ){
  */  
 unsigned long stdioGetCursorX (){
 	
-    return (unsigned long) stdio_system_call ( 240, 0, 0, 0 );
+    //return (unsigned long) stdio_system_call ( 240, 0, 0, 0 );
+    return (unsigned long) gramado_system_call ( 240, 0, 0, 0 );
 };
 
 
@@ -1437,7 +1481,8 @@ unsigned long stdioGetCursorX (){
  */
 unsigned long stdioGetCursorY (){
 	
-    return (unsigned long) stdio_system_call ( 241, 0, 0, 0 );
+    //return (unsigned long) stdio_system_call ( 241, 0, 0, 0 );
+    return (unsigned long) gramado_system_call ( 241, 0, 0, 0 );
 };
 
 

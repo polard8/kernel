@@ -59,6 +59,9 @@ all-c:
 #/stdlib
 	gcc  -c  stdlib/stdlib.c  $(CFLAGS) -I include/ -o stdlib.o	
 	
+#/stubs	
+	gcc  -c  stubs/stubs.c   $(CFLAGS) -I include/ -o stubs.o		
+	
 #/unistd
 	gcc  -c  unistd/unistd.c  $(CFLAGS) -I include/ -o unistd.o	
 	

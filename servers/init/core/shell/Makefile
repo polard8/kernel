@@ -78,7 +78,8 @@ pixel.o \
 line.o \
 rect.o \
 char.o \
-gws.o    
+gws.o \
+stubs.o    
 
 
 
@@ -128,6 +129,8 @@ all-c:
 #	cp ../../../lib/wait.o .
 
 	cp $(LIBCOBJ)/unistd.o .
+	
+	cp $(LIBCOBJ)/stubs.o .
 
 	#gws cancelado
 #	cp $(GWSOBJ)/pixel.o   .

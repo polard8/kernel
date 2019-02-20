@@ -16,6 +16,10 @@
 #include <unistd.h>
 
 
+//system calls.
+#include <stubs/gramado.h> 
+
+
 
 #define	UNISTD_SYSTEMCALL_FORK     71  
 #define	UNISTD_SYSTEMCALL_EXIT     70
@@ -25,12 +29,13 @@
 //#todo
 //#define	UNISTD_SYSTEMCALL_GETGID ??
 
-
+/*
 //protótipo de função interna.
 void *unistd_system_call ( unsigned long ax, 
                            unsigned long bx, 
                            unsigned long cx, 
                            unsigned long dx );
+*/
 
 
 /*
@@ -51,6 +56,7 @@ void *unistd_system_call ( unsigned long ax,
  *    edx = arg4.
  */
 
+/*
 void *unistd_system_call ( unsigned long ax, 
                            unsigned long bx, 
                            unsigned long cx, 
@@ -66,6 +72,7 @@ void *unistd_system_call ( unsigned long ax,
 
 	return (void *) Ret; 
 }
+*/
 
 
 /*
@@ -107,7 +114,10 @@ void exit (int status){
     // de stderr na tela.
 
  
-    stdlib_system_call ( UNISTD_SYSTEMCALL_EXIT, (unsigned long) status, 
+    //stdlib_system_call ( UNISTD_SYSTEMCALL_EXIT, (unsigned long) status, 
+	//    (unsigned long) status, (unsigned long) status );
+	
+    gramado_system_call ( UNISTD_SYSTEMCALL_EXIT, (unsigned long) status, 
 	    (unsigned long) status, (unsigned long) status );
     
 	
@@ -129,7 +139,10 @@ páginas dutante o taskswitch */
  
 int fork (){
 	
-    return (int) unistd_system_call ( UNISTD_SYSTEMCALL_FORK, (unsigned long) 0, 
+    //return (int) unistd_system_call ( UNISTD_SYSTEMCALL_FORK, (unsigned long) 0, 
+	//				(unsigned long) 0, (unsigned long) 0 ); 
+	
+    return (int) gramado_system_call ( UNISTD_SYSTEMCALL_FORK, (unsigned long) 0, 
 					(unsigned long) 0, (unsigned long) 0 ); 
 }
 
@@ -145,12 +158,16 @@ int setuid ( uid_t uid )
 
 
 pid_t getpid(void){
-	return (pid_t) unistd_system_call( UNISTD_SYSTEMCALL_GETPID, 0, 0, 0);
+	
+	//return (pid_t) unistd_system_call( UNISTD_SYSTEMCALL_GETPID, 0, 0, 0);
+	return (pid_t) gramado_system_call( UNISTD_SYSTEMCALL_GETPID, 0, 0, 0);
 }
 
 
 pid_t getppid(void){
-	return (pid_t) unistd_system_call( UNISTD_SYSTEMCALL_GETPPID, 0, 0, 0);
+	
+	//return (pid_t) unistd_system_call( UNISTD_SYSTEMCALL_GETPPID, 0, 0, 0);
+	return (pid_t) gramado_system_call( UNISTD_SYSTEMCALL_GETPPID, 0, 0, 0);
 }
 
 

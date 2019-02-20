@@ -18,6 +18,10 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
+
+
+//system calls.
+#include <stubs/gramado.h> 
  
 
 //Número de serviços.
@@ -87,6 +91,7 @@ unsigned long heap_set_new_handler( unsigned long address )
  *     System call.
  */
 
+/*
 void *stdlib_system_call ( unsigned long ax, 
                            unsigned long bx, 
                            unsigned long cx, 
@@ -100,7 +105,7 @@ void *stdlib_system_call ( unsigned long ax,
 	
 	return (void *) RET; 
 }
-
+*/
 
 unsigned long rtGetHeapStart (){
 	
@@ -487,9 +492,14 @@ int heapInit (){
 	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
 	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 	
+	
 	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
-	int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
-	unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
+	
+	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
+	//unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
+	
+	int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
+	unsigned char *heaptest = (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );		
 	
 	HEAP_START = (unsigned long) &heaptest[0];
 	HEAP_END   = (unsigned long) (HEAP_START + (1024*1024*4) ); //(HEAP_START + (1024*128) );  //128KB 
@@ -1127,8 +1137,12 @@ int system ( const char *command ){
     //reboot.
 	if ( stdlib_strncmp ( (char *) command, "reboot", 6 ) == 0 )
 	{
-        stdlib_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
-		    (unsigned long) 0 );		
+        
+		//stdlib_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
+		//    (unsigned long) 0 );		
+		
+		gramado_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
+		    (unsigned long) 0 );				
 		
 		//apiReboot(); 
 		goto fail;
