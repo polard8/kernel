@@ -224,10 +224,15 @@ compile-kernel:
 	
 	
 	# /mk/pc/mm (memory manager)
-	gcc -c  kernel/mk/pc/mm/memory.c  -I include/ $(CFLAGS) $(DEFINES) -o memory.o
-	gcc -c  kernel/mk/pc/mm/pages.c   -I include/ $(CFLAGS) $(DEFINES) -o pages.o
-	gcc -c  kernel/mk/pc/mm/mmpool.c  -I include/ $(CFLAGS) $(DEFINES) -o mmpool.o	
-	gcc -c  kernel/mk/pc/mm/mminfo.c  -I include/ $(CFLAGS) $(DEFINES) -o mminfo.o		
+	
+	#x86
+	gcc -c  kernel/mk/pc/mm/x86/memory.c  -I include/ $(CFLAGS) $(DEFINES) -o memory.o
+	gcc -c  kernel/mk/pc/mm/x86/pages.c   -I include/ $(CFLAGS) $(DEFINES) -o pages.o
+	gcc -c  kernel/mk/pc/mm/x86/mmpool.c  -I include/ $(CFLAGS) $(DEFINES) -o mmpool.o	
+	gcc -c  kernel/mk/pc/mm/x86/mminfo.c  -I include/ $(CFLAGS) $(DEFINES) -o mminfo.o		
+	
+	#arm
+	
 	
 
 	gcc -c  kernel/mk/request.c  -I include/ $(CFLAGS) $(DEFINES) -o request.o

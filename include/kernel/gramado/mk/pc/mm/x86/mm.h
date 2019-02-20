@@ -152,8 +152,32 @@ kernel fica com o 1GB superior."
 	    Criar um layout dos endereços físicos principais usados pelo sistema.
 */ 
  
- 
-  
+
+
+
+
+//#define x86_copy_page(from,to) \
+//__asm__("cld ; rep ; movsl"::"S" (from),"D" (to),"c" (1024):"cx","di","si")
+
+
+//#define PAGE_SIZE 4096
+
+#define clear_page(page)	memset((page), 0, PAGE_SIZE)
+#define copy_page(to,from)	memcpy((to), (from), PAGE_SIZE) 
+
+/*
+static inline void clear_page(void *page)
+{
+	memset(page, 0, PAGE_SIZE);
+}
+*/
+
+/*
+static inline void copy_page(void *to, void *from)
+{
+	memcpy(to, from, PAGE_SIZE);
+}
+*/
  
  //
  // **  ENDEREÇOS DOS PRINCIPAIS PAGE DIRECTORIES **

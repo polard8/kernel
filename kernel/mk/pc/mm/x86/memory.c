@@ -1,5 +1,5 @@
 /*
- * File: pc/mm/memory.c
+ * File: pc/mm/x86/memory.c
  *
  * Descrição:
  *     Arquivo principal do módulo /mm do /pc, Memory Manager. 

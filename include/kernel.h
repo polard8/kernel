@@ -166,7 +166,7 @@ extern void do_executa_new_task();
 
 // Global first.
 //Memory Map - address.
-#include <kernel/gramado/mk/pc/mm/memmap.h>            
+#include <kernel/gramado/mk/pc/mm/x86/memmap.h>            
 
 
 
@@ -307,12 +307,12 @@ extern void do_executa_new_task();
 //
 
 //mm
-#include <kernel/gramado/mk/pc/mm/mmglobal.h>
-#include <kernel/gramado/mk/pc/mm/heap.h>          //Heap pointer support.
-#include <kernel/gramado/mk/pc/mm/aspace.h>        //Address Space, (data base account).
-#include <kernel/gramado/mk/pc/mm/dspace.h>        //Disk Space, (data base account).
-#include <kernel/gramado/mk/pc/mm/bank.h>          //Bank. database
-#include <kernel/gramado/mk/pc/mm/mm.h>            //mm, memory manager support.
+#include <kernel/gramado/mk/pc/mm/x86/mmglobal.h>
+#include <kernel/gramado/mk/pc/mm/x86/heap.h>          //Heap pointer support.
+#include <kernel/gramado/mk/pc/mm/x86/aspace.h>        //Address Space, (data base account).
+#include <kernel/gramado/mk/pc/mm/x86/dspace.h>        //Disk Space, (data base account).
+#include <kernel/gramado/mk/pc/mm/x86/bank.h>          //Bank. database
+#include <kernel/gramado/mk/pc/mm/x86/mm.h>            //mm, memory manager support.
 
 
 //

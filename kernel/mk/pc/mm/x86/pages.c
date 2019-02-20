@@ -1,5 +1,5 @@
 /*
- * File: pc/mm/pages.c
+ * File: pc/mm/x86/pages.c
  *
  * Descrição:
  *     Faz a configuração da paginação de memória e oferece rotinas de
