@@ -56,7 +56,8 @@ static unsigned char HeapBuffer[HEAP_BUFFER_SIZE];
  *     Cada processo tem seu heap.
  *     Cada heap tem uma lista encadeada de blocos.  
  */  
-typedef struct heap_d heap_descriptor_t;
+
+//typedef struct heap_d heap_descriptor_t;
 struct heap_d 
 {
 	int Id;
@@ -71,7 +72,8 @@ struct heap_d
 	
 	//struct mmblock_d *nextblock; //lista linkada de blocos. 
 };
-heap_descriptor_t *libcHeap;
+struct heap_d *libcHeap;
+//heap_descriptor_t *libcHeap;
 //...
 
 
@@ -92,8 +94,8 @@ void heapSetLibcHeap( unsigned long HeapStart, unsigned long HeapSize);
 // Alloc and Free.
 //
 
-unsigned long AllocateHeap( unsigned long size );
-void *AllocateHeapEx(unsigned long size);
+unsigned long heapAllocateMemory ( unsigned long size );
+
 unsigned long FreeHeap( unsigned long size );
 
 //

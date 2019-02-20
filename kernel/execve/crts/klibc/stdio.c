@@ -195,11 +195,13 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
     return -1;
 }
 
+
 //#todo
 size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp)
 {
 	return -1;
 }
+
 
 /* 
  * fflush: 
@@ -250,13 +252,6 @@ int fflush ( FILE *stream ){
 	
 	return 0;
 }
-
-
-
-
-
-
-
 
 
 /*

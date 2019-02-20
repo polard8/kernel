@@ -3,7 +3,9 @@
  *
  * Descrição: 
  *     stdlib. Parte da lib C da API 32bit.
- * Versão: 1.0, 2016 - Created.
+ *
+ * History:
+ *     2016 - Created by Fred Nora.
  */
 	
 
@@ -11,13 +13,9 @@
 #include <stddef.h>
 #include <mm.h>
 #include <heap.h>
-
 #include <ctype.h>
 #include <float.h>
-
-
 #include <stdio.h> 
-
 #include <stdlib.h>
 #include <string.h>
  
@@ -25,10 +23,11 @@
 //Número de serviços.
 #define	SYSTEMCALL_EXIT  70
  
+
 //#define NULL ((void*)0)
 
-//static int randseed = 1234;
 
+//static int randseed = 1234;
 unsigned int randseed;
 
 
@@ -83,26 +82,24 @@ unsigned long heap_set_new_handler( unsigned long address )
 */
 
 
+/*
+ * stdlib_system_call
+ *     System call.
+ */
+
 void *stdlib_system_call ( unsigned long ax, 
                            unsigned long bx, 
-				           unsigned long cx, 
-				           unsigned long dx )
+                           unsigned long cx, 
+                           unsigned long dx )
 {
-    
-	//##BugBug: Aqui 0 retorno não pode ser inteiro.
-	//Temos que pegar unsigned long?? void*. ??
 	int RET = 0;	
-	//unsigned long RET = 0;
 	
-    //System interrupt. 	
 	asm volatile ( "int %1 \n"
 	              : "=a"(RET)	
 		          : "i"(0x80), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-    //Nothing.
-//done:
-
+	
 	return (void *) RET; 
-};
+}
 
 
 unsigned long rtGetHeapStart (){
@@ -183,14 +180,12 @@ void heapSetLibcHeap ( unsigned long HeapStart, unsigned long HeapSize ){
 	//...
 	
 	//Contagem? ainda em zero.?!
-	
-//done:	
-	//return;
-};
+}
 
 
 /*
- * AllocateHeap:
+ ****************************
+ * heapAllocateMemory:
  *     Aloca memória no heap do kernel.
  *
  * *IMPORTANTE: Aloca BLOCOS de memória dentro do heap do processo Kernel.
@@ -209,7 +204,7 @@ void heapSetLibcHeap ( unsigned long HeapStart, unsigned long HeapSize ){
  * ...
  */
  
-unsigned long AllocateHeap (unsigned long size){
+unsigned long heapAllocateMemory (unsigned long size){
 	
 	struct mmblock_d *Current;	
 	//struct mmblock_d *Prev;		
@@ -227,7 +222,7 @@ unsigned long AllocateHeap (unsigned long size){
 		// @todo: Aqui poderia parar o sistema e mostrar essa mensagem.
 		//
 		
-	    printf("AllocateHeap fail: g_available_heap={0}\n");
+	    printf ("heapAllocateMemory fail: g_available_heap={0}\n");
         //refresh_screen();		
         return (unsigned long) 0;
 		//while(1){};
@@ -238,7 +233,7 @@ unsigned long AllocateHeap (unsigned long size){
 	//Se o tamanho desejado é igual a zero.
     if ( size == 0 )
 	{
-	    printf("AllocateHeap error: size={0}\n");
+	    printf ("heapAllocateMemory error: size={0}\n");
 		//refresh_screen();
 		return (unsigned long) g_heap_pointer;
 	};
@@ -252,7 +247,7 @@ unsigned long AllocateHeap (unsigned long size){
 
 		//try_grow_heap() ...
 
-		printf("AllocateHeap error: size >= g_available_heap\n");
+		printf ("heapAllocateMemory error: size >= g_available_heap\n");
 		//refresh_screen();
 		return (unsigned long) 0;
 	};
@@ -268,10 +263,10 @@ try_again:
     
 	if( mmblockCount >= MMBLOCK_COUNT_MAX )
 	{
-        printf("stdlib-AllocateHeap Error: mmblockCount limits!\n");
-		printf("stdlib-AllocateHeap Error: g_heap_pointer=%x\n",g_heap_pointer);
-		printf("stdlib-AllocateHeap Error: HEAP_START=%x\n",HEAP_START);
-		printf("stdlib-AllocateHeap Error: HEAP_END=%x\n",HEAP_END);
+        printf("stdlib-heapAllocateMemory Error: mmblockCount limits!\n");
+		printf("stdlib-heapAllocateMemory Error: g_heap_pointer=%x\n",g_heap_pointer);
+		printf("stdlib-heapAllocateMemory Error: HEAP_START=%x\n",HEAP_START);
+		printf("stdlib-heapAllocateMemory Error: HEAP_END=%x\n",HEAP_END);
 		
 		//printf("*lib hang (fatal error)\n");
 		//refresh_screen();
@@ -300,8 +295,8 @@ try_again:
 	    //Checa os limites do último last heap pointer válido.
 	    if( last_valid < HEAP_START || last_valid >= HEAP_END )
 		{
-            printf("stdlib-AllocateHeap Error: last valid heap pointer limits");
-		    printf("*lib hang, (fatal error)\n");
+            printf ("stdlib-heapAllocateMemory Error: last valid heap pointer limits");
+		    //printf("*lib hang, (fatal error)\n");
 			//refresh_screen();
 		    //while(1){}
             return 0;			
@@ -412,7 +407,7 @@ try_again:
 		
 	    //Se o ponteiro da estrutura de mmblock for inválido.
 		
-		printf("AllocateHeap fail: struct.\n");
+		printf ("heapAllocateMemory fail: struct.\n");
 		//@todo: Deveria retornar.
 		//goto fail;
 		return (unsigned long) 0;
@@ -451,18 +446,6 @@ try_again:
 fail:
     //Se falhamos, retorna 0. Que equivalerá à NULL.
     return (unsigned long) 0;	
-};
-
-
-/*
- * AllocateHeapEx:
- *     Aloca heap.
- *     Obs: Onde ??
- */
-
-void *AllocateHeapEx ( unsigned long size ){
-	
-	return (void *) AllocateHeap (size); 
 }
 
 
@@ -771,7 +754,7 @@ void *malloc ( size_t size ){
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
 	
 	//??? @todo:
-	ret = (void *) AllocateHeap(s);
+	ret = (void *) heapAllocateMemory (s);
 	
 	if ( (void *) ret == NULL )
 	{
