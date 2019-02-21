@@ -34,3 +34,8 @@
 typedef int pid_t;
 
 
+//posix
+int close ( int fd );
+
+
+

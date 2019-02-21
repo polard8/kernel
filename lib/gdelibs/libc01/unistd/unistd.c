@@ -319,17 +319,17 @@ int ioctl ( int d, int request, ... )
 }
 
 
+int open (const char *pathname, int flags, mode_t mode){
+
+    return (int) gramado_system_call ( 16, (unsigned long) pathname, (unsigned long) flags, (unsigned long) mode );
+}
 
 
-	
-	
-	
-	
-
-
-
-
-
+//SVr4, 4.3BSD, POSIX.1-2001.
+int close (int fd)
+{
+    return (int) gramado_system_call ( 17, (unsigned long) fd, (unsigned long) fd, (unsigned long) fd );
+}
 
 
 

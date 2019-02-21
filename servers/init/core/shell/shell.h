@@ -34,6 +34,10 @@
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <string.h>
+
+
+//#tedt: open()
+#include <fcntl.h>
   
 
 #include "globals.h"

@@ -167,8 +167,8 @@ int fdatasync(int fd);
 long fpathconf(int fd, int name);
 long pathconf(char *path, int name);
 
-
-
+//SVr4, 4.3BSD, POSIX.1-2001.
+int close (int fd);
 
 #endif /* _UNISTD_H */
 

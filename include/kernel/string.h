@@ -33,11 +33,9 @@ size_t strspn(const char* str, const char* accept);
 
 
 
-/*apple*/
-char *
-strtok_r(char *s, const char *delim, char **last);
-char *
-strtok(char *s, const char *delim);
+/*apple open source*/
+char *strtok_r (char *s, const char *delim, char **last);
+char *strtok (char *s, const char *delim);
 
 
 

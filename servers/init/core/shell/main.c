@@ -3453,6 +3453,31 @@ do_compare:
 		goto exit_cmp;
 	}
 	
+	//testando open()
+	//precisa incluir fcntl.h
+	int ooofd;
+	if ( strncmp( prompt, "t15", 3 ) == 0 )
+	{
+		printf ("t15: open() Opening file init.txt\n");
+		ooofd = open ( "init.txt", 0, 0 );
+		
+		printf ("descriptor=%d \n", ooofd );
+		goto exit_cmp;
+	}
+	
+	
+	//testando open()
+	//precisa incluir fcntl.h
+	int cccRet;
+	if ( strncmp( prompt, "t16", 3 ) == 0 )
+	{
+		printf ("t16: close() Closing file '0' \n");
+		cccRet = close (0);
+		
+		printf ("ret=%d \n", cccRet );
+		goto exit_cmp;
+	}	
+	
 	//#gws - testando funcionalidades do gws
 	if ( strncmp ( prompt, "gws", 3 ) == 0 )
 	{

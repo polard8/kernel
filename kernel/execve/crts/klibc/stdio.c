@@ -86,6 +86,9 @@ int fclose (FILE *stream){
  *     e alocarmos um buffer do tamanho necessário
  */
 
+//#bugbug
+//ainda nao usamos o argumento mode.
+
 FILE *fopen ( const char *filename, const char *mode ){
 	
     unsigned long fileret;

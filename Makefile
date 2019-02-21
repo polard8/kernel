@@ -64,6 +64,7 @@ x86.o \
 stdio.o \
 stdlib.o \
 string.o \
+unistd.o \
 tty.o \
 init.o \
 logon.o \
@@ -242,13 +243,15 @@ compile-kernel:
 	gcc -c kernel/execve/execve.c  -I include/ $(CFLAGS) $(DEFINES) -o execve.o
 
 	# crts
-	# /execve/crts/klibc
+	# klibc
 	gcc -c kernel/execve/crts/klibc/cedge.c   -I include/ $(CFLAGS) $(DEFINES) -o cedge.o
 	gcc -c kernel/execve/crts/klibc/ctype.c   -I include/ $(CFLAGS) $(DEFINES) -o ctype.o
 	gcc -c kernel/execve/crts/klibc/stdlib.c  -I include/ $(CFLAGS) $(DEFINES) -o stdlib.o
 	gcc -c kernel/execve/crts/klibc/stdio.c   -I include/ $(CFLAGS) $(DEFINES) -o stdio.o
 	gcc -c kernel/execve/crts/klibc/string.c  -I include/ $(CFLAGS) $(DEFINES) -o string.o
+	gcc -c kernel/execve/crts/klibc/unistd.c  -I include/ $(CFLAGS) $(DEFINES) -o unistd.o
 
+	#dd
 	gcc -c kernel/execve/dd/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
 	
 	#ide support

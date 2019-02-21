@@ -136,6 +136,11 @@ extern void do_executa_new_task();
 #include <kernel/iso646.h>
 #include <kernel/signal.h>
 #include <kernel/unistd.h>
+
+
+//test
+#include <kernel/fcntl.h>
+#include <kernel/sys/types.h>
 //...
 //--
 

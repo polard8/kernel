@@ -311,13 +311,15 @@ void *services ( unsigned long number,
 		//3 fopen (i/o)
 		//Carregar um arquivo, dado o nome e o endereço.
 		//#obs: chamar rotinas de interface sys_ simplificam 
-        //o atendimento às system calls.			
+        //o atendimento às system calls.	
+		// A funçao esta' em fs/fs.c	
 		//IN: name. address
 		case SYS_READ_FILE:
 			
 			//funciona, nao mexer nesse
 		    //return (void *) sys_read_file ( (unsigned long) a2, (unsigned long) arg3 );
 			
+			//#importante: estamos usando esse.
 			//testando novos recursos,
 			return (void *) sys_read_file2 ( (unsigned long) a2, (unsigned long) arg3 );
 				
@@ -416,9 +418,24 @@ void *services ( unsigned long number,
 			refresh_screen ();
 			break;			
 			
-        //rede: 12,13,14,15			
+        //rede: 12,13,14,15	
+			
+			
 		//i/o:  16,17,18,19	
-        
+			
+		//open()
+		//retorna um i'ndice na tabela de arquivos abertos do proceso atual.	
+		case 16:
+			//unistd.c
+			//o tipo mode_t precisa de kernel/sys/types.h
+			//pathname, flags, mode
+			return ( void *) open ( (const char *) arg2, (int) arg3, (mode_t)	arg4 );
+			break;
+			
+		case 17:
+			return (void *) close ( (int) arg2 );
+			break;
+			
 
         //24-28 WINDOW SUPPORT		
         
@@ -1619,7 +1636,10 @@ void *services ( unsigned long number,
             break;		
 			
 			
+		//246	
+		//fopen()	
 		case 246:
+			//filename, mode.
 			return (void *) fopen ( (const char *) arg2, (const char *) arg3 );
 			break;
 			

@@ -1,5 +1,5 @@
 /*
- * File: execve\sci\syscall.h
+ * File: execve/sci/syscall.h
  *
  * Descrição:
  *     SCI - System Call Interface header.
@@ -16,7 +16,7 @@
  *
  * @todo: Essas definições podem ficar no módulo service.
  *       pois é ele que atende as chamadas.
- * oBS:
+ * obs:
  * e.g. malloc() is mainly implemented in user space, but uses system calls 
  * to increase the process’ heap size. Ou seja, somente quando acaba a área  
  * que o malloc tem em user mode é que ele chama o kernel e somente para 
@@ -30,7 +30,8 @@
  * +protótipos para as system calls, separadas por grupos:
  *  executive, microkernel, hal.
  *
- * Versão 1.0, 2015, 2016.
+ * History:
+ *     2015 - Created by Fred Nora.
  */
  
 // 
@@ -38,30 +39,33 @@
 //
  
 //NULL.
-#define	SYS_NULL          0
+#define	SYS_NULL  0
 //Disk.
-#define	SYS_READ_LBA      1
-#define	SYS_WRITE_LBA     2
-#define	SYS_READ_FILE     3
-#define	SYS_WRITE_FILE    4
+#define	SYS_READ_LBA    1
+#define	SYS_WRITE_LBA   2
+#define	SYS_READ_FILE   3
+#define	SYS_WRITE_FILE  4
 //Gráfico.
-#define	SYS_VSYNC              5
-#define	SYS_BUFFER_PUTPIXEL    6
-#define	SYS_BUFFER_DRAWCHAR    7
-#define	SYS_BUFFER_DRAWLINE    8
-#define	SYS_BUFFER_DRAWRECT    9
-#define	SYS_BUFFER_CREATEWINDOW    10  // ** função principal **
-#define	SYS_REFRESHSCREEN          11
+#define	SYS_VSYNC                5
+#define	SYS_BUFFER_PUTPIXEL      6
+#define	SYS_BUFFER_DRAWCHAR      7
+#define	SYS_BUFFER_DRAWLINE      8
+#define	SYS_BUFFER_DRAWRECT      9
+#define	SYS_BUFFER_CREATEWINDOW  10 
+#define	SYS_REFRESHSCREEN        11
+
 //rede
 #define	SYS_REDE_R1    12
 #define	SYS_REDE_R2    13
 #define	SYS_REDE_R3    14
 #define SYS_REDE_R4    15
+
 //i/o de disco
-#define	SYS_IO_R1    16
-#define	SYS_IO_R2    17
-#define	SYS_IO_R3    18
-#define	SYS_IO_R4    19
+#define	SYS_IO_R1    16 //open()
+#define	SYS_IO_R2    17 //close
+#define	SYS_IO_R3    18 //#todo
+#define	SYS_IO_R4    19 //#todo
+
 //Outros. 
 #define	SYS_REFRESH_BUFFER1      20
 #define	SYS_REFRESH_BUFFER2      21
@@ -328,8 +332,9 @@
 #define	SYS_GETCURRENTGROUPID  154
 #define	SYS_UPDATEUSERINFO     155
 #define	SYS_SHOWUSERINFO       156
+
 #define	SYS_GETCURRENTUSERSESSION   157 //user session
-#define	SYS_GETCURRENTWINDOWSTATION 158 //window station
+#define	SYS_GETCURRENTWINDOWSTATION 158 //room (window station)
 #define	SYS_GETCURRENTDESKTOP       159 //desktop
 
 
@@ -338,8 +343,8 @@
 #define	SYS_161 161    //get socket IP	
 #define	SYS_162 162    //get socket port	
 #define	SYS_163 163    //update socket  
-#define	SYS_164 164     //netStream
-#define	SYS_165 165     //netSocket
+#define	SYS_164 164    //netStream
+#define	SYS_165 165    //netSocket
 #define	SYS_166 166    //netBuffer
 
 /*gramado core specials execve*/

@@ -1,5 +1,5 @@
 /*
- * File: mk\pc\process.h
+ * File: mk/pc/process.h
  *
  * Descrição:
  *     Header principal para as rotinas de gerenciamento de processos.
@@ -35,7 +35,8 @@
  *     ...
  */
 
-
+//#bugbug
+//talvez aqui nao seja o melhor lugar pra definir isso.
 #define gramado_pid_t pid_t
 
 
@@ -271,6 +272,10 @@ struct process_d
 	//g, Número do grupo do dono do processo.
 	int gid;
 	
+	
+	// #importante
+	// TABELA DE ARQUIVOS ABERTOS PELO PROCESSO.
+	// Tem necessariamente um limite.
 	unsigned long Streams[NUMBER_OF_FILES];
 	
 	//State.
@@ -775,18 +780,14 @@ struct process_d *TaskManProcess;    //PID=103. ?
 
 //Outros.
 struct process_d *Process;           //Current.
-struct process_d *idle_proc;           //Iddle. //@todo: deletar
-struct process_d *cur_process;         //Current.
+struct process_d *idle_proc;         //Iddle. //@todo: deletar
+struct process_d *cur_process;       //Current.
 
 //Lista encadeada de processos.
 struct process_d *process_Conductor2;
 struct process_d *process_Conductor;
 struct process_d *process_rootConductor;
 struct process_d *CurrentProcess;    //Current.
-
-//Genérico.
-//process_descriptor_t *PCB;
-//...
 
 
 /*
@@ -798,7 +799,8 @@ struct process_d *CurrentProcess;    //Current.
  *     Essa é a thread job list, ou job queue.
  *     Armazena todos os processos do sistema.
  *     os que estão residentes na memoria ram e as que não estão.
-*/  
+ */  
+
 unsigned long processList[PROCESS_COUNT_MAX];
 
 
@@ -892,8 +894,8 @@ unsigned long GetPageDirValue();
 unsigned long GetProcessDirectory( struct process_d *process );
 
 void 
-SetProcessDirectory( struct process_d *process, 
-                     unsigned long Address );
+SetProcessDirectory ( struct process_d *process, 
+                      unsigned long Address );
 
 
 //
@@ -915,21 +917,21 @@ void show_process_information ();
 
 //copiar um processo.
 //isso será usado por fork.
-int processCopyProcess( int p1, int p2 );
+int processCopyProcess ( int p1, int p2 );
 
-struct process_d *create_process( struct wstation_d *window_station,
-                                  struct desktop_d  *desktop,
-                                  struct window_d *window,
-                                  unsigned long init_eip, 
-                                  unsigned long priority, 
-								  int ppid, 
-								  char *name,
-								  unsigned long iopl,
-                                  unsigned long directory_address );
-									
+struct process_d *create_process ( struct wstation_d *window_station,
+                                   struct desktop_d  *desktop,
+                                   struct window_d *window,
+                                   unsigned long init_eip, 
+                                   unsigned long priority, 
+                                   int ppid, 
+                                   char *name,
+                                   unsigned long iopl,
+                                   unsigned long directory_address );
+
 //Finalizações.
-void CloseAllProcesses();									
-void dead_task_collector();    
+void CloseAllProcesses();
+void dead_task_collector();
 //@todo: mudar para dead_process_collector().
 //void dead_process_collector();
 
