@@ -1,5 +1,5 @@
 ;
-; File: hardware.inc 
+; File: x86/head/hw.inc 
 ;
 ; Descrição:
 ;     Interrupções de hardware.

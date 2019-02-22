@@ -178,7 +178,7 @@ xxx_x86: /mnt/gramadovhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-file
 compile-kernel:
 
 	# /entry
-	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.s -f elf -o head.o
+	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.asm -f elf -o head.o
 	gcc -c kernel/entry/x86/x86main.c  -I include/ $(CFLAGS) $(DEFINES) -o x86main.o
 
 	# /hal

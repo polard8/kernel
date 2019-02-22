@@ -1,5 +1,5 @@
 ;
-; File: head\x86\hwlib.inc
+; File: x86/head/hwlib.inc
 ;
 ; Descrição:
 ;     Hardware Lib.

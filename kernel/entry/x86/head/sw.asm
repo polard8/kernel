@@ -1,5 +1,5 @@
 ;
-; File: software.inc 
+; File: x86/head/sw.inc 
 ;
 ; Descrição:
 ;     Interrupções de software.

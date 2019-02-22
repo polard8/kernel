@@ -1,5 +1,5 @@
 ;
-; File: softwarelib.inc
+; File: x86/head/swlib.inc
 ;
 ; Descrição:
 ;     Biblioteca para funções de interrupções de software.

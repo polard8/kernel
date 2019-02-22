@@ -2,7 +2,7 @@
 ; Gramado Header - The kernel entry point for x86 processors.
 ; (c) Copyright 2005-2017 Fred Nora.
 ;
-; File: x86\head\head.s 
+; File: x86/head/head.asm 
 ;
 ; Descrição:
 ;      Parte principal do núcleo na arquitetura x86. 
@@ -260,45 +260,53 @@ _kernel_begin:
 ;header_addr -- Contains the address corresponding to the beginning of 
 ;the multiboot_header - the physical memory location at which the 
 ;magic value is supposed to be loaded. This field serves to 
-;"synchronize" the mapping between OS image offsets and physical memory addresses.
+;"synchronize" the mapping between OS image offsets and physical memory 
+;addresses.
 
 ;load_addr -- Contains the physical address of the beginning of 
 ;the text segment. The offset in the OS image file at which to 
 ;start loading is defined by the offset at which the header was found, 
-;minus (header_addr - load_addr). load_addr must be less than or equal to header_addr.
+;minus (header_addr - load_addr). load_addr must be less than or equal 
+;to header_addr.
 
-;load_end_addr -- Contains the physical address of the end of the data segment. 
+;load_end_addr -- Contains the physical address of the end of the data 
+;segment. 
 ;(load_end_addr - load_addr) specifies how much data to load. 
-;This implies that the text and data segments must be consecutive in the OS image; 
+;This implies that the text and data segments must be consecutive in 
+;the OS image; 
 ;this is true for existing a.out executable formats.
 
-;bss_end_addr -- Contains the physical address of the end of the bss segment. 
-;The boot loader initializes this area to zero, and reserves the memory it 
-;occupies to avoid placing boot modules and other data relevant to the OS in that area.
+;bss_end_addr -- Contains the physical address of the end of the bss 
+;segment. 
+;The boot loader initializes this area to zero, and reserves the memory
+;it occupies to avoid placing boot modules and other data relevant to 
+;the OS in that area.
 
-;entry -- The physical address to which the boot loader should jump in order 
-;to start running the OS.
+;entry -- The physical address to which the boot loader should jump in 
+;order to start running the OS.
 
 	;; Multiboot support.
-    MULTIBOOT_PAGE_ALIGN   equ 1<<0
-    MULTIBOOT_MEMORY_INFO  equ 1<<1
-    MULTIBOOT_AOUT_KLUDGE  equ 1<<16
+    MB_PAGE_ALIGN   equ 1<<0
+    MB_MEMORY_INFO  equ 1<<1
+    MB_AOUT_KLUDGE  equ 1<<16
 
-    MULTIBOOT_HEADER_MAGIC equ 0x1BADB002
-    MULTIBOOT_HEADER_FLAGS equ MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO | MULTIBOOT_AOUT_KLUDGE
-    CHECKSUM               equ -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
+    MB_HEADER_MAGIC equ 0x1BADB002
+    MB_HEADER_FLAGS equ MB_PAGE_ALIGN | MB_MEMORY_INFO | MB_AOUT_KLUDGE
+    CHECKSUM        equ -(MB_HEADER_MAGIC + MB_HEADER_FLAGS)
 
     extern _code_begin
 	extern _data_end
 	extern _bss_end
 	
+	
 	; The Multiboot header
 align 4
 mboot_start:
-    dd MULTIBOOT_HEADER_MAGIC
-    dd MULTIBOOT_HEADER_FLAGS
+    dd MB_HEADER_MAGIC
+    dd MB_HEADER_FLAGS
     dd CHECKSUM
-    ; fields used if MULTIBOOT_AOUT_KLUDGE is set in MULTIBOOT_HEADER_FLAGS
+    ; fields used if MULTIBOOT_AOUT_KLUDGE is set in 
+    ; MULTIBOOT_HEADER_FLAGS
     dd mboot_start    ; these are PHYSICAL addresses
     dd _code_begin    ; start of kernel .text (code) section
     dd _data_end      ; end of kernel .data section
@@ -354,17 +362,13 @@ mboot_end:
 	;jmp $
 
     	
-	;;
 	;; Checando se foi carregado de um multiboot compatível
 	;; cmp eax, MULTIBOOT_BOOTLOADER_MAGIC ;0x36d76289
 	;; je mb_ok
     ;;
-	
-	
-	;
-	; @todo: mudar os argumentos passados pelo bootloder
-	; para estar em conformidade com os padrões da multiboot specification.
-	;
+	;; #todo: 
+	;; Mudar os argumentos passados pelo bootloder para estarem  
+	;; em conformidade com os padrões da multiboot specification.
 	
 	;
 	; **** EAX = MAGIC  **** 0x36d76289
@@ -604,9 +608,7 @@ dummyJmpAfterLTR:
     ;;@todo: memory caching control.	
 	
 	;;step 
-	;processor Discovery and initialization
-	;(cpuid threads and cores, start inter-processor interrupt sipi, ap wakeu pstate,
-	;wakeup vector alignment, caching consdarations,ap idle state)	
+	;processor Discovery and initialization	
 	;apenas o básico para o boot manager.
 	
 		
@@ -616,7 +618,8 @@ dummyJmpAfterLTR:
 
 	;step
 	;i/o devices
-	;( embedded controller EC, super io SIO, legacy free systems, miscellaneous io devices)
+	;( embedded controller EC, super io SIO, legacy free systems, 
+	; miscellaneous io devices)
 	
 	
 	;todo: Aqui  é um bom lugar para isso.
@@ -638,7 +641,6 @@ dummyJmpAfterLTR:
 	out  0xa1, al
 	out  0x21, al
 
-	
 	
 	;;
 	;; Configurando alguns registradores.
@@ -674,12 +676,10 @@ dummyJmpAfterLTR:
 	mov dword [_kernel_stack_start],    0x003FFFF0 
 	
 
-    ;
 	; * Muda o status do kernel.
 	;
 	;   @todo: Porque mudou para um se KeMain() muda para 0?
 	;          +deletar isso. 
-	;
 	
 	mov dword [_KernelStatus], dword 1
 	
@@ -876,7 +876,8 @@ USER_DATA_SEL equ $-_gdt
 	db 0xF2   ; 1111b ,2h = ( present|ring3|1 )  , 2 = DATA
 	db 0xCF
 	db 0
-;Tem que ter pelo menos uma tss para mudar para user mode, senão da falta.
+;Tem que ter pelo menos uma tss para mudar para user mode, 
+;senão da falta.
 ;Selector 28h - Tss.
 TSS_DATA_SEL equ $-_gdt	
 gdt6:
@@ -2763,21 +2764,19 @@ _IDT_register:
 ;
 
     ;Funções de apoio à inicialização do Kernel 32bit.
-    %include "headlib.s" 
+    %include "headlib.asm" 
 
 	;Interrupções de hardware (irqs) e faults.
-    %include "hw.inc"
-    %include "hwlib.inc"
+    %include "hw.asm"
+    %include "hwlib.asm"
 
 	;Interrupções de software.
-	%include "sw.inc"
-    %include "swlib.inc"
+	%include "sw.asm"
+    %include "swlib.asm"
 
 
-;
 ; DATA: 
 ;     Início do Segmento de dados.
-;
 
 segment .data
 global _data_start
@@ -2786,10 +2785,8 @@ _data_start:
     db 0xAA    ;data magic.
 
 
-;
 ; BSS:
 ;     Início do segmento BSS.
-;
 
 segment .bss
 global _bss_start

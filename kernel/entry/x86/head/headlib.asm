@@ -1,5 +1,5 @@
 ;
-; File: headlib.s 
+; File: x86/head/headlib.s 
 ;
 ; Descrição:
 ;     Funções auxiliares de supporte a head.s do Kernel Base.
@@ -156,16 +156,18 @@ ldt1:
 	
 ;-----------------------------------------------------------------------------	
 ; _setup_system_interrupt: 
-;    Configura um vetor da IDT para a interrupção do sistema. ?? O endereço do 
-; ISR e o número do vetor são passados ?? via argumento.
+;    Configura um vetor da IDT para a interrupção do sistema. 
+;    O endereço do ISR e o número do vetor são passados via argumento.
 ;
 ; IN:
-;    eax = endereço. 
-;    ebx = número do vetor (200).
+;    eax = endereço. (callback)
+;    ebx = número do vetor (0x80).
 ;
+
 global _setup_system_interrupt
 _setup_system_interrupt:
-    cli
+    
+    ;cli
 	pushad
 
     mov dword [.address], eax    ;endereço.
@@ -195,7 +197,7 @@ _setup_system_interrupt:
 	;lidt [IDT_register]	
 	
 	popad
-	sti      ;; @todo: #bugbug Cuidado !!!
+	;sti  ;; #cuidado.    
 	ret
 .address: dd 0
 .number: dd 0
@@ -205,6 +207,7 @@ _setup_system_interrupt:
 ; setup_faults:
 ;    Configura vetores da idt para faults.
 ;
+
 setup_faults:
 	push eax
 	push ebx
@@ -378,16 +381,16 @@ setup_faults:
 ; setup_vectors:
 ;    Configura alguns vetores da idt.
 ;	
+
 setup_vectors:
 	push eax
 	push ebx 
 	
 
 	;32
-	;Iniciamos um timer provisório, 
-	;depois o kMain() inicia o definitivo.
-	;mov eax,  dword _irq0         ;Será inicializado em C. 
-	mov eax, dword _timer_test     ;Provisório.
+	;Timer.
+	;Iniciamos um timer provisório, depois o main() inicia o definitivo.
+	mov eax, dword _timer_test    
 	mov ebx, dword 32
 	call _setup_idt_vector	
 
@@ -422,25 +425,16 @@ setup_vectors:
 	call _setup_idt_vector	
 	
 
-
     ;128 - 0x80
 	;A interrupção de sistema.
-	;#obs: Utilizamos uma chamada dirferente
-	;para configurar essa interrupção.
+	;#obs: 
+	;Utilizamos uma chamada diferente para configurar essa interrupção.
 	mov eax, dword _int128
 	mov ebx, dword 128
+	;call _setup_idt_vector   	
 	call _setup_system_interrupt  
-	;call _setup_idt_vector   
-	
-    ;200
-	;A interrupção de sistema.
-	;#obs: Utilizamos uma chamada dirferente
-	;para configurar essa interrupção.
-	;mov eax, dword _int200
-	;mov ebx, dword 200
-	;call _setup_system_interrupt  
-	;call _setup_idt_vector       
-   
+
+
     ;213
 	;Executa nova tarefa.
 	mov eax, dword _int213
@@ -454,11 +448,7 @@ setup_vectors:
 	mov ebx, dword 216        
 	call _setup_idt_vector	
 	
-	
-	;;provisório.
-	;mov eax, dword _irq9
-	;mov ebx, dword 41       
-	;call _setup_idt_vector		
+	;; ...	
 	
 	pop ebx
 	pop eax
@@ -480,8 +470,8 @@ extern _nic_idt_entry_new_address
 
 global _asm_nic_create_new_idt_entry
 _asm_nic_create_new_idt_entry:
-	pushad
 	
+	pushad
 	
 	mov eax, _nic_handler
 	;mov eax, dword [_nic_idt_entry_new_address]
@@ -490,13 +480,13 @@ _asm_nic_create_new_idt_entry:
 	;mov ebx, dword 41	
 
 	call _setup_idt_vector	
-    
+	
 	popad
 	ret 
 	
+	
 ;;===============================================	
 extern _xxxe1000handler
-;;extern _PCIRegisterIRQHandler
 
 global _nic_handler	
 _nic_handler:
@@ -525,6 +515,7 @@ _nic_handler:
 ; PS:. Essa rotina é chamada pelo kernel depois de 
 ; salvo o contexto da thread interrompida.
 ;
+
 global _do_executa_new_task
 _do_executa_new_task:	
 
@@ -624,8 +615,8 @@ _test_cpuid_support:
 ; _get_page_dir:
 ;     Pega o valor de cr3.
 ;     page dir. 
-; @todo: Essa rotina poderia se chamar _headlibGetPageDirectory.
-;	
+;	  _headlibGetPageDirectoryAddress
+
 global _get_page_dir	
 _get_page_dir:
 	mov eax, cr3
@@ -636,8 +627,8 @@ _get_page_dir:
 ; _set_page_dir:
 ;     configura o cr3
 ;     page dir. 
-; ; @todo: Essa rotina poderia se chamar _headlibSetPageDirectory.
-;	
+;     _headlibSetPageDirectoryAddress
+
 global _set_page_dir	
 _set_page_dir:
 	mov cr3, eax
@@ -654,6 +645,7 @@ _get_page_fault_adr:
 	mov eax, cr2
 	ret	
 	
+	
 ;---------------------------
 ; _halt:
 ;    Executa a instrução hlt.
@@ -662,6 +654,7 @@ global _halt
 _halt:
 	hlt
 	ret
+	
 	
 ;================================================
 ; setup_gdt:
@@ -678,8 +671,8 @@ setup_gdt:
 ;     Dado o endereço da IDT, 
 ;     preenche todos os vetores, 
 ;     apontando para um só endereço. 'unhandled_int'.
-;
 ;++
+
 setup_idt:
     pushad
 	mov edx, unhandled_int  
@@ -697,6 +690,8 @@ rp_sidt:
 	add  edi, dword 8	
 	dec ecx
 	jne rp_sidt	
+	
+	;#bugbug
 	;lidt [IDT_register]	
 		
 	popad
@@ -777,7 +772,7 @@ _asm_shut_down:
 ;=====================================
 ; _asm_reboot:
 ;     Reboot via teclado.
-; @todo: Essa rotina poderia se chamar _headlibReboot. 
+;     _headlibReboot. 
 ;
 global _asm_reboot	
 _asm_reboot:
@@ -792,5 +787,5 @@ _asm_reboot:
     jmp _asm_reboot	
 	
 ;
-; Fim.
+; End.
 ;
