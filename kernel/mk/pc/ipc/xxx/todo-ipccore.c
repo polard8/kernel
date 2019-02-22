@@ -16,8 +16,6 @@
 
 // 4 = Número máximo de processos que podem fazer parte do Gramado Core.
 
-unsigned long GRAMADOCORE[4];
-
 typedef enum {
 
     gramado_core_init,
@@ -113,12 +111,12 @@ int ipccore_open ( int pid, int server_pid )
 			GRAMADOCORE[server_pid].used = 1;
 			GRAMADOCORE[server_pid].magic = 1234;
 
-	        GRAMADOCORE[server_pid].sender_process = p;
-			//GRAMADOCORE[server_pid].receiver_process = ???;
+	        GRAMADOCORE[server_pid]->sender_process = p;
+			//GRAMADOCORE[server_pid]->receiver_process = ???;
 			
 			//pode ser a thread primária dos processos,
-			//GRAMADOCORE[server_pid].sender_thread = 
-			//GRAMADOCORE[server_pid].receiver_thread = 
+			//GRAMADOCORE[server_pid]->sender_thread = 
+			//GRAMADOCORE[server_pid]->receiver_thread = 
 				
 			//status = conectado.
 			GRAMADOCORE[server_pid].status = 1;
@@ -179,11 +177,11 @@ int ipccore_close ( int pid, int server_pid )
 			GRAMADOCORE[server_pid].used = 0;
 			GRAMADOCORE[server_pid].magic = 0;
 
-	        GRAMADOCORE[server_pid].sender_process = NULL;
-			GRAMADOCORE[server_pid].receiver_process = NULL;
+	        GRAMADOCORE[server_pid]->sender_process = NULL;
+			GRAMADOCORE[server_pid]->receiver_process = NULL;
 			
-			GRAMADOCORE[server_pid].sender_thread = NULL;
-			GRAMADOCORE[server_pid].receiver_thread = NULL; 
+			GRAMADOCORE[server_pid]->sender_thread = NULL;
+			GRAMADOCORE[server_pid]->receiver_thread = NULL; 
 				
 			//Status = desconectado.
 			GRAMADOCORE[server_pid].status = 0;
