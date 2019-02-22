@@ -64,8 +64,12 @@ PCIRegisterIRQHandler ( uint16_t bus,
  *     Inicializando o controlador NIC da Intel.
  */
 
-int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, struct pci_device_d *pci_device ){
-	
+int 
+e1000_init_nic ( unsigned char bus, 
+				 unsigned char dev, 
+				 unsigned char fun, 
+				 struct pci_device_d *pci_device )
+{	
 	//pci info.    
 	uint32_t data;
 	
@@ -91,7 +95,7 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	
 	data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
 	
-	unsigned short Vendor = (unsigned short) (data & 0xffff);
+	unsigned short Vendor = (unsigned short) (data       & 0xffff);
 	unsigned short Device = (unsigned short) (data >> 16 & 0xffff);	
 	
     if ( Vendor != 0x8086 || Device != 0x100E )	
@@ -119,11 +123,11 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 		pci_device->deviceUsed = 1;
 		pci_device->deviceMagic = 1234;
 		
-		pci_device->bus = (unsigned char) bus;
-		pci_device->dev = (unsigned char) dev;
+		pci_device->bus  = (unsigned char) bus;
+		pci_device->dev  = (unsigned char) dev;
 		pci_device->func = (unsigned char) fun;
 		
-		pci_device->Vendor = (unsigned short) (data & 0xffff);
+		pci_device->Vendor = (unsigned short) (data       & 0xffff);
 		pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
 		
 		
@@ -155,8 +159,8 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 		
 		
 	    // ## IRQ ##
-	    pci_device->irq_line = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3C );   //irq
-	    pci_device->irq_pin = (uint8_t) pciConfigReadByte( bus, dev, fun, 0x3D );    //letras	
+	    pci_device->irq_line = (uint8_t) pciConfigReadByte ( bus, dev, fun, 0x3C );   //irq
+	    pci_device->irq_pin  = (uint8_t) pciConfigReadByte ( bus, dev, fun, 0x3D );    //letras	
 		
 		
         // ##importante:
@@ -174,11 +178,13 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	// ## Base address ##
 	//
 	
-	//mapeando para obter o endereço virtual que o kernel pode manipular.
+	// #importante:
+	// Mapeando para obter o endereço virtual que o kernel pode manipular.
+	
 	unsigned long virt_address = mapping_nic0_device_address ( phy_address );
 	
-	//endereço base.
-	unsigned char *base_address = (unsigned char *) virt_address;
+	// Endereço base.
+	unsigned char *base_address   = (unsigned char *) virt_address;
 	unsigned long *base_address32 = (unsigned long *) virt_address;
 
 	
@@ -301,6 +307,7 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
 	// And write back 		
 		
 	//( bus, slot, func, PCI_COMMAND )
+	
 	uint16_t cmd = pciConfigReadWord ( (unsigned char) bus, 
 	                (unsigned char) dev, 
 					(unsigned char) fun, 
@@ -328,7 +335,6 @@ int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, st
  *     e1000 handler :)
  */
 
- 
 void xxxe1000handler (){
 		
 	//structs
@@ -556,11 +562,7 @@ void e1000_setup_irq (){
 	
 	debug_print("e1000_setup_irq\n");
 
-    //Essa é a rotina em assembly que cria uma entrada na idt para 
-    //o nic, com base nas variáveis que são importadas pelo assembly.
-	//headlib.s
-	
-	extern void asm_nic_create_new_idt_entry();
+
 	
 	//pegando o númeo da irq
     uint8_t irq = (uint8_t) currentNIC->pci->irq_line;
@@ -581,6 +583,16 @@ void e1000_setup_irq (){
 	
 	nic_idt_entry_new_number = (uint8_t) idt_num;   
 	nic_idt_entry_new_address = (unsigned long) handler; 
+
+    //
+	// Creating IDT entry.
+	//
+	
+	//Essa é a rotina em assembly que cria uma entrada na idt para 
+    //o nic, com base nas variáveis que são importadas pelo assembly.
+	//headlib.s
+	
+	extern void asm_nic_create_new_idt_entry();
 	
 	asm_nic_create_new_idt_entry();			
 };

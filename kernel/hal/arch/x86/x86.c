@@ -25,7 +25,7 @@ int enable (){
     //talvez deveria ser void o tipo da função.	
     
 	return (int) 0;
-};
+}
 
 
 // desabilita as interrupções
@@ -37,26 +37,26 @@ int disable (){
     //talvez deveria ser void o tipo da função.		
     
 	return (int) 0;
-};
+}
 
 
 int stopCpu (){
 	
     __asm (" cli \n \t " 
 		   " hlt ");
-};
+}
 
 
 int intReturn (){
 	
     __asm ("iret");
-};
+}
 
 
 int farReturn (){
 	
     __asm ("lret");
-};
+}
 
 
 int getFlags (int variable){
@@ -64,7 +64,7 @@ int getFlags (int variable){
     __asm (" pushfl \n \t "     
            " popl %0 "         
            : "=r" (variable) );
-};
+}
 
 
 int setFlags (int variable){
@@ -72,7 +72,7 @@ int setFlags (int variable){
     __asm ("pushl %0 \n\t"   
            "popfl"           
            : : "r" (variable) );
-};
+}
 
 
 
@@ -125,9 +125,9 @@ int setStackPointer (int addr){
 
 
 
-
 //habilita cache.
 //credits: barrelfish
+
 void cpux86_enable_caches (){
 	
     uint32_t cr0;
@@ -138,7 +138,7 @@ void cpux86_enable_caches (){
     cr0 &= ~CPUX86_CR0_NW;
     
 	__asm volatile ("mov %[cr0], %%cr0" :: [cr0] "r" (cr0) );
-}; 
+}
  
 
 /*
@@ -154,8 +154,8 @@ int init_intel (){
 	// Get info.
 	get_cpu_intel_parameters ();
 	
-	return (int) 0;
-};
+	return 0;
+}
  
 
 /*
@@ -167,6 +167,7 @@ int init_intel (){
  *     Criar funções: TerminalShowCPUIntelParameters()
  *                    ShowCPUIntelParameters()
  */
+
 void show_cpu_intel_parameters (){
 	
     //Title.

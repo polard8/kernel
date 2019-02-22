@@ -339,6 +339,25 @@ void hal_reboot();
 void hal_shutdown();
 
 //
+// ====
+//
+
+// 256 interrupções
+// 8 extras para handlers default.
+unsigned long HANDLERS[256+8];
+
+unsigned long getGdt();
+unsigned long getIdt();
+//unsigned long getTss();  //todo
+
+void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, unsigned long callback );
+
+void hal_default_handler();
+void hal_init_handlers_table();
+void hal_setup_new_handler ( int number, unsigned long callback );
+void hal_invalidate_handler (int number);
+
+//
 // End.
 //
 

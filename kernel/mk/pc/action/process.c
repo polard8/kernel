@@ -115,10 +115,11 @@ int do_fork_process (){
 	printf("do_fork_process: Cloning the current process ...\n");
 	
 	
-	//
 	// ## Current ##
 	// Checando a validade do processo atual.
-	//
+	
+	//if ( current_process < 0 )
+	//    return 0;
 	
 	Current = (struct process_d *) processList[current_process];
 	

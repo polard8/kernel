@@ -1,9 +1,10 @@
 /*
- * Gramado Hal - The main file for the Hal module in the kernel base. 
+ * Gramado HAL - The main file for the hal module in the kernel base. 
  * (c) Copyright 2015-2016 Fred Nora.
  *
- *  File: k\hal\hal.c 
- *  Hardware Abstraction Layer
+ *  File: hal/hal.c 
+ *
+ *      HAL - Hardware Abstraction Layer
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -23,24 +24,54 @@
 
 extern unsigned long gdt;
 extern unsigned long idt;
+//extern unsigned long tss;
+
 
 extern void gui_buffer_putpixel();
 
 extern void swlib_backbuffer_putpixel();
 extern void swlib_lfb_putpixel();
 
-
 //
-//@todo: criar rotina hal_get_page_dir();
-//extern unsigned long _get_page_dir();
+// ## IDT SUPPORT ##
 //
 
-//
-// Protótipo de funções internas.
-//
 
-unsigned long getGdt();
-unsigned long getIdt();
+// 256 interrupções
+// 8 extras para handlers default.
+//unsigned long HANDLERS[256+8];
+
+//Esse handler será instalando em todas as entradas
+//da tabela antes da configuração.
+
+void hal_default_handler()
+{
+    return;
+}
+
+
+
+void hal_init_handlers_table()
+{
+    int i=0;
+	int max = (256+8);
+	
+	for (i=0; i< max; i++){
+	    HANDLERS[i] = (unsigned long) &hal_default_handler;
+	}
+}
+
+
+void hal_setup_new_handler ( int number, unsigned long callback )
+{
+    HANDLERS[number] = (unsigned long) callback;    
+}
+
+
+void hal_invalidate_handler (int number)
+{
+    HANDLERS[number] = (unsigned long) 0;    
+}
 
 
 
@@ -152,20 +183,21 @@ void halMain(){
  * hal_backbuffer_putpixel:
  *     Coloca um pixel no backbuffer.
  */
+
+// Chama a rotina em assembly depois de enviar os valores para os 
+// registradores.
+// IN: cor, x, y, 0
+
 void 
 hal_backbuffer_putpixel ( unsigned long ax, 
                           unsigned long bx, 
 						  unsigned long cx, 
 						  unsigned long dx )
-{	
-	// Chama a rotina em assembly depois de enviar os valores para os 
-	// registradores.
-	// IN: cor, x, y, 0
-	
+{
 	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 	
     swlib_backbuffer_putpixel ();	
-};
+}
 
 
 /*
@@ -173,21 +205,21 @@ hal_backbuffer_putpixel ( unsigned long ax,
  * hal_lfb_putpixel:
  *     Coloca um pixel no LFB.
  */
+
+// Chama a rotina em assembly depois de enviar os valores para os 
+// registradores.
+// IN: cor, x, y, 0
+
 void 
 hal_lfb_putpixel ( unsigned long ax, 
                    unsigned long bx, 
 				   unsigned long cx, 
 				   unsigned long dx )
-{	
-	// Chama a rotina em assembly depois de enviar os valores para os 
-	// registradores.
-	// IN: cor, x, y, 0
-	
+{
 	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 	
 	swlib_lfb_putpixel ();
-};
-
+}
 
 
 /*
@@ -195,20 +227,22 @@ hal_lfb_putpixel ( unsigned long ax,
  *     Sincroniza o retraço vertical do monitor.
  *     ? Isso ainda está em uso ?
  */
+
 void sys_vsync (){
 	
     hal_vsync ();	
-};
+}
 
 
 /*
  * sys_showpciinfo:
  *     Mostra informações encontradas na interface PCI.
  */
+
 int sys_showpciinfo (){
 	
     return (int) hal_showpciinfo ();
-};
+}
 
 
 /*
@@ -216,22 +250,24 @@ int sys_showpciinfo (){
  *     Reboot, Serviço do sistema.
  *     Chamando uma rotina interna de reboot do sistema.
  */
+
 void sys_reboot (){
 	
     KiReboot ();
-    panic ("sys_reboot:");
-};
+    panic ("sys_reboot");
+}
 
 
 /*
  * sys_shutdown:
  *     Chama uma rotina interna para desligar a máquina.
  */
+
 void sys_shutdown (){
 	
     KiShutDown ();
-    panic ("sys_shutdown:");
-};
+    panic ("sys_shutdown");
+}
 
 
 /*
@@ -254,8 +290,8 @@ void sys_shutdown (){
  
 int hal_hardware_detect (){
 	
-    return (int) 0;    //#todo	
-};
+    return 0;    //#todo	
+}
 
 
 //#bugbug: tem algo errado aqui nos nomes das funções.
@@ -265,8 +301,8 @@ int hal_hardware_detect (){
 
 int hal_showpciinfo (){
 	
-	return (int) pciInfo();
-};
+	return (int) pciInfo ();
+}
 
 
 /*
@@ -280,6 +316,12 @@ int hal_showpciinfo (){
 void init_cpu (){
 	
     int Status = 0;
+	
+	// #bugbug
+	// Precisamos dar suporte à vários processadores,
+	// e nessa rotina estamos usando uma estrutura para 
+	// um processador específico.
+	// Podemos atribuílo como Current ao fim da rotina.
 	
 	//
 	//  ## Processor struct ##
@@ -299,7 +341,7 @@ void init_cpu (){
 		
 	    processor->Gdt = (unsigned long) getGdt();
 	    processor->Idt = (unsigned long) getIdt();
-	    processor->Tss = 0;  //processor->Id=getTss();
+	    processor->Tss = 0;  //getTss();
         
 		//...
         
@@ -402,30 +444,57 @@ int hal_init_machine (){
 unsigned long getGdt (){
 	
     return (unsigned long) &gdt; 
-};
+}
 
 
 unsigned long getIdt (){
 	
     return (unsigned long) &idt; 
-};
+}
 
+
+/*
+unsigned long getTss (){
+	
+    return (unsigned long) &tss; 
+}
+*/
+	
+	
+//credits: levex		
+void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, unsigned long callback )
+{
+	// Editando uma entrada na idt.
+	
+	//if(!__idt_setup) panic("Invalid IDT!");
+	
+	*(unsigned short*)(idt_location + 8*i + 0) = (unsigned short) (callback & 0x0000ffff);
+	*(unsigned short*)(idt_location + 8*i + 2) = (unsigned short) 0x8;
+	*(unsigned char*) (idt_location + 8*i + 4) = 0x00;
+	*(unsigned char*) (idt_location + 8*i + 5) = 0x8e;    //0 | IDT_32BIT_INTERRUPT_GATE | IDT_PRESENT;
+	*(unsigned short*)(idt_location + 8*i + 6) = (unsigned short)((callback & 0xffff0000) >> 16);
+	
+	//if(test_success) mprint("Registered INT#%d\n", i);
+	//return;
+}	
+	
 
 void hal_vsync (){
 	
     vsync ();
-};
+}
 
 
 /*
  ********************************
  * hal_shutdown:    
  */
+	
 void hal_shutdown (){
 	
     shutdown ();
-    panic ("hal_shutdown:");
-};
+    panic ("hal_shutdown");
+}
 
 
 /*
@@ -458,6 +527,7 @@ void hal_shutdown (){
  which is in the DSDT and therefore AML encoded.
  
  */
+	
 void shutdown (){
 	
 	// @todo: switch APM, ACPI. modo smm	
@@ -466,8 +536,8 @@ void shutdown (){
 	//             manualmente. 
 	//            (Ex: O computador pode ser desligado com segurança).  
 	
-    panic ("hal-shutdown: fail");
-};
+    panic ("hal-shutdown");
+}
 
 
 /*
