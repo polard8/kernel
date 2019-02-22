@@ -74,6 +74,124 @@ void hal_invalidate_handler (int number)
 }
 
 
+//
+//  ## Interrupt vectors support ##
+//
+
+//Esses endereços foram configurados pelo assembler na inicialização.
+//Vamos salvá los na tabela em seus respectivos slots.
+
+extern unsigned long fault_N0;
+extern unsigned long fault_N1;
+extern unsigned long fault_N2;
+extern unsigned long fault_N3;
+extern unsigned long fault_N4;
+extern unsigned long fault_N5;
+extern unsigned long fault_INTRUCAO_INVALIDA;
+extern unsigned long fault_N7;
+extern unsigned long fault_DOUBLE;
+extern unsigned long fault_N9;
+extern unsigned long fault_N10;
+extern unsigned long fault_N11;
+extern unsigned long fault_STACK;
+extern unsigned long fault_GP;
+extern unsigned long fault_N14;
+extern unsigned long fault_N15;
+extern unsigned long fault_N16;
+extern unsigned long fault_N17;
+extern unsigned long fault_N18;
+extern unsigned long fault_N19;
+extern unsigned long fault_N20;
+extern unsigned long fault_N21;
+extern unsigned long fault_N22;
+extern unsigned long fault_N23;
+extern unsigned long fault_N24;
+extern unsigned long fault_N25;
+extern unsigned long fault_N26;
+extern unsigned long fault_N27;
+extern unsigned long fault_N28;
+extern unsigned long fault_N29;
+extern unsigned long fault_N30;
+extern unsigned long fault_N31;
+
+
+extern unsigned long timer_test;  //32
+extern unsigned long irq1;
+extern unsigned long irq8;
+extern unsigned long irq12;
+extern unsigned long irq14;
+extern unsigned long irq15;
+extern unsigned long int128;  // 0x80, system interrupt
+extern unsigned long int213;
+extern unsigned long int216;
+
+
+
+
+void hal_setup_new_vectors_table_entry ( int number, unsigned long address )
+{
+    VECTORS[number] = (unsigned long) address;    
+}
+
+//Esses endereços foram configurados pelo assembler na inicialização.
+//Vamos salvá los na tabela em seus respectivos slots.
+void hal_init_vectors_table()
+{
+	
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N0 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N1 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N2 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N3 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N4 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N5 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_INTRUCAO_INVALIDA );	
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N7 );	
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_DOUBLE );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N9 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N10 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N11 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_STACK );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_GP );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N14 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N15 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N16 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N17 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N18 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N19 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N20 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N21 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N22 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N23 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N24 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N25 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N26 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N27 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N28 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N29 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N30 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N31 );
+	
+	
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &timer_test );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq1 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq8 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq12 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq14 );
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &irq15 );
+	
+	//interrupts
+	
+	//128 - 0x80 system interrupt
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &int128 );
+	
+	//213 - Executa nova tarefa.
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &int213 );
+	
+	//216 - fast create window.
+	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &int216 );
+	
+	//...
+}
 
  /* 
     Exemplo:

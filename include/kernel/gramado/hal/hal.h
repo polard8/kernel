@@ -339,23 +339,54 @@ void hal_reboot();
 void hal_shutdown();
 
 //
-// ====
+// 
 //
-
-// 256 interrupções
-// 8 extras para handlers default.
-unsigned long HANDLERS[256+8];
 
 unsigned long getGdt();
 unsigned long getIdt();
 //unsigned long getTss();  //todo
 
-void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, unsigned long callback );
 
+//
+//  VECTORS (isr and irq address)
+//
+
+
+
+// Endereços das rotinas básicas chamadas pelos vetores de interrupções.
+// Essas rotinas devem chamar seus handlers específicos.
+// 256 interrupções
+unsigned long VECTORS[256];
+
+
+
+void hal_setup_new_vectors_table_entry ( int number, unsigned long address );
+
+// vetores legados.
+//Inicializando a tabela de vetores com os endereços das rotinas usadas pelo assembler
+//na inicialização de alguns vetores de interrupção.
+void hal_init_vectors_table();
+
+
+
+//
+// HANDLERS - (callbacks) 
+//
+
+
+// Endereços para as rotinas em C que tratam as interrupções.
+// Essas rotinas rodam depois da rotina básica em assembly.
+// 256 interrupções
+// 8 extras para handlers default.
+unsigned long HANDLERS[256+8];
+
+void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, unsigned long callback );
 void hal_default_handler();
 void hal_init_handlers_table();
 void hal_setup_new_handler ( int number, unsigned long callback );
 void hal_invalidate_handler (int number);
+
+
 
 //
 // End.
