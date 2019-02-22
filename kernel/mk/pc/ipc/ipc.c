@@ -103,6 +103,7 @@ int ipc_dispatch_message( unsigned long a,
 						  unsigned long d)
 {
 
+/*	
     //
 	// @todo: BugBug rever esse endereço.
 	//
@@ -119,12 +120,12 @@ int ipc_dispatch_message( unsigned long a,
 	int_args[3] = (unsigned long) b;    //arg2 (msg).
 	int_args[4] = (unsigned long) c;    //arg3  (ch).
 	int_args[5] = (unsigned long) d;    //arg4.
-
+*/
 //
 // Done.
 //
 //done:
-    return (int) 0;
+    return (int) -1;
 };
 
 
