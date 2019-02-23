@@ -74,11 +74,15 @@
 // botões
 // 
 
-//janela da taskbar
-struct window_d *taskbarWindow;  //task bar.
 
-//menu iniciar.
-struct window_d *menu_button;
+
+
+//janela da taskbar
+struct window_d *taskbar_window;
+struct window_d *taskbar_button1;
+
+//struct window_d *taskbarWindow;  //task bar.
+//struct window_d *menu_button;
 
  
 //...
@@ -999,6 +1003,9 @@ int shellTestButtons ();
 
 //tests
 void testCreateWindow ();
+
+
+int shellCreateTaskBar();
 
 
 

@@ -577,7 +577,7 @@ struct window_d *shellCreateMainWindow ( int status ){
 	
 	if ( (void *) w == NULL )
 	{	
-		printf ("shellCreateTaskBar: taskbar Window fail");
+		printf ("shellCreateMainWindow: taskbar Window fail");
 		
 		while (1){
 			asm("pause");
@@ -918,6 +918,33 @@ void bmpDisplayBMP ( void *address,
 };
 
 
+
+int shellCreateTaskBar()
+{
+	// Tamanho da tela.	
+	unsigned long ScreenWidth = apiGetSystemMetrics(1);
+    unsigned long ScreenHeight = apiGetSystemMetrics(2); 
+	
+    //em shell.h está o ponteiro.	
+	taskbar_window = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "1",     
+                                0, ScreenHeight-24, ScreenWidth, 24,    
+                                0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	
+	
+	
+	 APIRegisterWindow (taskbar_window);
+	
+    //em shell.h está o ponteiro.	
+	taskbar_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " Menu ",     
+                                4, ScreenHeight-24, 80, 24,    
+                                0, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+								
+    APIRegisterWindow (taskbar_button1);
+	
+	refresh_screen();
+	return 0;
+}
+
+
 //testando botão.
 //quando clicamos no menu da barra de tarefas.
 //todo mudar o nome da função.
@@ -947,7 +974,7 @@ int shellTestButtons (){
 	//
 	
     //em shell.h está o ponteiro.	
-	app1_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "(CIMA)",     
+	app1_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "1",     
                                 app1Left, app1Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
@@ -959,7 +986,7 @@ int shellTestButtons (){
 	//
 	
     //em shell.h está o ponteiro.	
-	app2_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "(BAIXO)",     
+	app2_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "2",     
                                 app2Left, app2Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
@@ -972,7 +999,7 @@ int shellTestButtons (){
 	//
 	
     //em shell.h está o ponteiro.	
-	app3_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP3 ",     
+	app3_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "3",     
                                 app3Left, app3Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								
@@ -987,7 +1014,7 @@ int shellTestButtons (){
 	
 	
     //em shell.h está o ponteiro.	
-	app4_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " APP4 ",     
+	app4_button = (void *) APICreateWindow ( WT_BUTTON, 1, 1, "4",     
                                 app4Left, app4Top, 80, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );
 								

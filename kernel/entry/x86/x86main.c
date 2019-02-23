@@ -190,7 +190,8 @@ void x86mainStartFirstThread ( int n ){
 	//oferecido pelo kernel, para atualização do HZ.
 	//então vamos testá-la.
 	
-    timerInit8253 ( HZ );
+    //timerInit8253 ( HZ );
+	timerInit8253 ( 800 );
 	
 	//parece que isso é realmente preciso, libera o teclado.
 	//outb(0x20,0x20); 

@@ -508,19 +508,20 @@ static const char help_banner[] =
 // experience banner
 static const char experience_banner[] =
     "\n Try these commands: \n \n"
-	" ?           - This help\n"
-	" cls         - Clear screen\n"
-	" dir         - List\n"
-	" exit        - Exit shell\n"
-	" gramcode    - Text editor\n"
-	" help        - This help\n"
-	" jackpot     - Game\n"	
-	" kernel-info - kernel Info\n"
-	" mm-info     - Memory Info\n"
-	" disk-info   - Disk Info\n"
-	" volume-info - Volume Info\n"
-	" pwd         - Print working directory\n"
-    " reboot      - Reboot system\n"	
+	" ?            - This help\n"
+	" cls          - Clear screen\n"
+	" dir          - List\n"
+	" exit         - Exit shell\n"
+	" gramcode     - Text editor\n"
+	" help         - This help\n"
+	" help --tests - Extra commands\n"
+	" jackpot      - Game\n"	
+	" kernel-info  - kernel Info\n"
+	" mm-info      - Memory Info\n"
+	" disk-info    - Disk Info\n"
+	" volume-info  - Volume Info\n"
+	" pwd          - Print working directory\n"
+    " reboot       - Reboot system\n"	
 	"\n";
 
 	
@@ -549,7 +550,7 @@ static const char tests_banner[] =
 	" ~>          - dialog-vox edit-box message-box\n"
 	" ~>          - mm-info mm-kernelheap mm-processheap\n"
 	" ~>          - test-taskman-server\n"
-	" ~>          - t1 t2 t3 ... t3 t14\n"	
+	" ~>          - t1 t2 t3 ... t6 t17\n"	
 	"\n";
 
 

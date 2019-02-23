@@ -2,7 +2,6 @@
 
 // gerenciamento do desktop,
 // manipulação dos ícones no desktop.
-//
 
 
 #include "shell.h" 

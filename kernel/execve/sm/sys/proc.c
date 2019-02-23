@@ -602,8 +602,13 @@ system_procedure ( struct window_d *window,
 
 					printf("F5:\n"); 
 					
+					//Hz
+					//testando ajuste de precisão.
+					timerInit8253 ( (unsigned long) 100 );
+					//timerInit8253 ( (unsigned long) 50 );
+						
 					//shell gws
-					xxxtestSHELLServer();
+					//xxxtestSHELLServer();
 					
 					//sprintf ( current_stdout->_base, "Testing refresh current_stdout ..." );
 					//REFRESH_STREAM (current_stdout);

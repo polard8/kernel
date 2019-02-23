@@ -761,6 +761,13 @@ noArgs:
 	
 	shellShell (); 	
 	
+	
+	//#test
+	//Criando a barra antes de tudo.
+	enterCriticalSection ();    	
+    shellCreateTaskBar();	
+	exitCriticalSection ();	
+	
 	//Apenas inicialize. Continuaremos com o procedimento 
 	//do shell e não o da barra,	
 	
@@ -1628,21 +1635,41 @@ shellProcedure( struct window_d *window,
 				    //#debug
 					//printf("button 1\n");     
 					
-                    //cima
+                    //botão 1
 					if ( window == app1_button )
                     {
-						updateVisibleArea( 0 );
-						shellRefreshVisibleArea(); 
+						//updateVisibleArea( 0 );
+						//shellRefreshVisibleArea(); 
                         //shellScroll();
+						printf (" ** BUTTON 1 ** \n");
 						break;
 					}
 
-					//baixo
+					//botão 2
 					if ( window == app2_button )
                     {
-                        updateVisibleArea( 1 );
-						shellRefreshVisibleArea();
-					    break;
+                        //updateVisibleArea( 1 );
+						//shellRefreshVisibleArea();
+					    printf (" ** BUTTON 2 ** \n");
+						break;
+					}
+					
+					//botão 3
+					if ( window == app3_button )
+                    {
+                        //updateVisibleArea( 1 );
+						//shellRefreshVisibleArea();
+					    printf (" ** BUTTON 3 ** \n");
+						break;
+					}
+					
+					//botão 4
+					if ( window == app4_button )
+                    {
+                        //updateVisibleArea( 1 );
+						//shellRefreshVisibleArea();
+					    printf (" ** BUTTON 4 ** \n");
+						break;
 					}
 					
 					if ( window == editboxWindow )
@@ -1685,10 +1712,11 @@ shellProcedure( struct window_d *window,
 			{		
 				case 1:
 				    //printf("up button 1\n");
-					if (window == menu_button)
+					if (window == taskbar_button1)
 					{
-	                    shellTestButtons ();	
-		                refresh_screen ();						
+	                    //shellTestButtons ();	
+		                //refresh_screen ();
+						printf ("Start menu \n");
 					}
 					
 					
@@ -3447,8 +3475,11 @@ do_compare:
 		
 		printf("t14:\n");
 	    testCreateWindow ();
-		//printf("t14: debug *hang");
-		//while(1){}
+		
+		//#bubug
+		//Vamos abortar por causa de uma page fault.
+		printf("t14: debug *hang");
+		while(1){}
 		
 		goto exit_cmp;
 	}
@@ -3584,9 +3615,6 @@ do_compare:
     };
 	
 
-
-	
-	
 	// taskbar
 	// Cria uma top bar.
     if ( strncmp( prompt, "taskbar", 7 ) == 0 )
@@ -3595,7 +3623,7 @@ do_compare:
 	    
 		//Apenas inicialize. Continuaremos com o procedimento 
 		//do shell e não o da barra,
-		//shellCreateTaskBar (1);
+		//shellCreateTaskBar ();
 	    
 		exitCriticalSection();    
 		
@@ -4732,6 +4760,7 @@ void shellThread (){
 
 
 //help message
+//mostra o menú básico, para comandos que promovam experi?ncia do usuário.
 void shellShowExperienceMenu (){
 
     printf (experience_banner);			
@@ -4739,6 +4768,7 @@ void shellShowExperienceMenu (){
 }
 
 //help message
+//mostra menu extra com recursos ainda não implementados completamente.
 void shellShowTestsMenu (){
 
     printf (tests_banner);			
