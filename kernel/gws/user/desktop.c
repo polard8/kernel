@@ -1,5 +1,5 @@
 /*
- * File: kernel\gws\user\desktop.c
+ * File: kernel/gws/user/desktop.c
  *
  * Descrição:
  *     Gerência a criação de desktops.
@@ -48,6 +48,7 @@
  *     Registrando um desktop numa lista de desktops.
  *     @todo: Mudar para desktopRegisterDesktop(.). 
  */
+
 int RegisterDesktop (struct desktop_d *d){
 	
     int Offset = 0;
@@ -83,8 +84,8 @@ int RegisterDesktop (struct desktop_d *d){
 /*
  * set_current_desktop:
  *     Seta o desktop atual.
- *     @todo: Mudar para desktopSetCurrentDesktop(.).
- */
+ *     @todo: Mudar para desktopSetCurrentDesktop(.). */
+
 void set_current_desktop ( struct desktop_d *desktop ){
 	
 	if ( (void *) desktop == NULL ){ 
@@ -102,6 +103,7 @@ void set_current_desktop ( struct desktop_d *desktop ){
  *     Pega o endereço da estrutura do desktop atual.
  *     @todo: Mudar para desktopGetCurrentDesktop().
  */
+
 void *get_current_desktop (){
 	
     //Check limits.
@@ -125,6 +127,7 @@ int get_current_desktop_id(){
  * init_desktop_list:
  *     Inicializa o array de ponteiros de desktop.
  */
+
 void init_desktop_list (){
 	
     int i=0;		
@@ -133,7 +136,7 @@ void init_desktop_list (){
 	{
         desktopList[i] = 0;
 		
-		++i; 
+		i++; 
 	};
 };
 
@@ -141,9 +144,9 @@ void init_desktop_list (){
 /*
  * CreateDesktop:
  *     Cria um desktop em uma window station.
- *
  */
-void *CreateDesktop ( struct wstation_d *ws ){
+
+void *CreateDesktop ( struct room_d *room ){
 	
 	int i=0;
 	
@@ -153,7 +156,7 @@ void *CreateDesktop ( struct wstation_d *ws ){
 	
 	//Check.
     
-	if ( (void *) ws == NULL ){ 
+	if ( (void *) room == NULL ){ 
 	    
 		return NULL; 
 	};
@@ -174,7 +177,7 @@ void *CreateDesktop ( struct wstation_d *ws ){
 	} else {
 	    
 		//section.
-	    Current->wstation = (void *) ws;
+	    Current->room = (void *) room;
 		
 		//continua...
 	};

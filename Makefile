@@ -115,6 +115,7 @@ socket.o \
 sm.o \
 channel.o \
 ipc.o \
+ipccore.o \
 read.o \
 write.o \
 cf.o \
@@ -214,6 +215,8 @@ compile-kernel:
 	gcc -c  kernel/mk/pc/ipc/callout.c  -I include/  $(CFLAGS) $(DEFINES) -o callout.o
 	gcc -c  kernel/mk/pc/ipc/callfar.c  -I include/  $(CFLAGS) $(DEFINES) -o callfar.o
 	gcc -c  kernel/mk/pc/ipc/ipc.c      -I include/  $(CFLAGS) $(DEFINES) -o ipc.o
+	gcc -c  kernel/mk/pc/ipc/ipccore.c      -I include/  $(CFLAGS) $(DEFINES) -o ipccore.o
+	
 	gcc -c  kernel/mk/pc/ipc/sem.c      -I include/  $(CFLAGS) $(DEFINES) -o sem.o
 
 	# mk/pc/sched

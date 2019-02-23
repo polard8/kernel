@@ -673,6 +673,10 @@ int x86main ( int argc, char *argv[] ){
 	
 	InitProcess->Heap = (unsigned long) g_gramadocore_init_heap_va;
 	
+	//registra um dos servidores do gramado core.
+	//server_index, process, thread
+	ipccore_register ( (int) 0, (struct process_d *) InitProcess, (struct thread_d *) IdleThread );
+	
 #endif
 
 
@@ -711,6 +715,10 @@ int x86main ( int argc, char *argv[] ){
     };	
 	
 	ShellProcess->Heap = (unsigned long) g_gramadocore_shell_heap_va;
+	
+	//registra um dos servidores do gramado core.
+	//server_index, process, thread
+	ipccore_register ( (int) 1, (struct process_d *) ShellProcess, (struct thread_d *) ShellThread );
 	
 #endif	
 
@@ -755,6 +763,11 @@ int x86main ( int argc, char *argv[] ){
     };
 	
 	TaskManProcess->Heap = (unsigned long) g_gramadocore_taskman_heap_va;
+	
+	//registra um dos servidores do gramado core.
+	//server_index, process, thread
+	ipccore_register ( (int) 2, (struct process_d *) TaskManProcess, (struct thread_d *) TaskManThread );
+	
 #endif	
 
 

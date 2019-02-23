@@ -402,7 +402,7 @@ void *systemRam ( int number,
             break;
 
         case 25:		
-		    return (void *) CreateDesktop( (struct wstation_d *) arg1 );
+		    return (void *) CreateDesktop( (struct room_d *) arg1 );
             break;
 		
 		case 26:

@@ -246,6 +246,10 @@ extern void do_executa_new_task();
 #include <kernel/gramado/mk/pc/thread.h>
 #include <kernel/gramado/mk/pc/sched/sched.h>
 #include <kernel/gramado/mk/pc/ipc/ipc.h>
+
+//test
+#include <kernel/gramado/mk/pc/ipc/ipccore.h>
+
 #include <kernel/gramado/mk/pc/ipc/sem.h>
 #include <kernel/gramado/mk/pc/queue.h>
 #include <kernel/gramado/mk/pc/realtime.h>

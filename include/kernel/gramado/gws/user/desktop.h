@@ -26,6 +26,21 @@ struct desktop_d
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
+	
+	// #importante
+	// #quantidades
+	// Isso limita as quantidades que podem ser criadas em um desktop.
+	// permitindo o fácil gerenciamento de drivers em desktops específicos.
+	// Pois alguns desktops podem ter seus próprios gerenciadores de servidores.
+	// Como o caso do gramado core. Que fica a cargo apenas do kernel 
+	// gerenciar esses servidores especiais.
+	
+	
+	int drivers_max;
+	int servers_max;
+	int apps_max;
+	
+	
 	//object control
 	struct object_d *object;
 	
@@ -117,8 +132,9 @@ struct desktop_d
 
 	//Window Station. 
 	//( à qual window station pertence esse desktop ? ).
-	struct wstation_d *wstation;
+	//struct wstation_d *wstation;
 	
+	struct room_d *room;
 	
 	//Lista de processos nessse desktop.
 	//unsigned long processList[32];
@@ -175,7 +191,8 @@ int RegisterDesktop(struct desktop_d *d);
 void set_current_desktop(struct desktop_d *desktop);
 void *get_current_desktop();
 int get_current_desktop_id();
-void *CreateDesktop(struct wstation_d *ws);
+
+void *CreateDesktop(struct room_d *room);
 
 void set_current_menuwindow(struct desktop_d *desktop, struct window_d *window); 
 void set_current_foreground(struct desktop_d *desktop, struct window_d *window); 
@@ -190,7 +207,7 @@ void set_current_menuVScroll(struct desktop_d *desktop, struct menu_d *menu);
 
 
 //
-//fim.
+// End.
 //
 
 

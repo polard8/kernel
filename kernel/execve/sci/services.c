@@ -246,27 +246,16 @@ void *services ( unsigned long number,
 	 
 	desktopID = (int) get_current_desktop_id();		
 	
+	
+	// #bug
 	// Se a área de trabalho for válida, usaremos suas dimensões, 
 	// caso não seja, temos um problema.
 	
 	if (gui->main == NULL)
 	{
-		//#debug
-		printf ("services: main");
-		die();
+		panic ("services: gui->main");
 	};		
 	
-	// ## Limits. ## 
-	// (Limites do número do serviço).
-	
-	// #bugbug
-	// obs: Estamos checando se uma variável unsigned long é menor que zero.
-	//     Isso  não é necessário.
-	
-	if ( number < 0 || number > SERVICE_NUMBER_MAX )
-	{
-	    return NULL;	
-	};
 	
 	//
 	// ## Create Window ##
@@ -277,6 +266,18 @@ void *services ( unsigned long number,
 	{
 	    return (void *) serviceCreateWindow ( (char *)  arg2 );
 	}
+	
+	
+	// 8000 ~ 8999
+	//Chama os serviços oferecidos pelos servidores do gramado core
+	if ( number >= 8000 && number < 9000 )
+	{
+		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
+						    (unsigned long) arg3, (unsigned long) arg4 );
+	};
+	
+	
+	
 	
 	//
 	// ## Switch ##

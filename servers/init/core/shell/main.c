@@ -3437,7 +3437,7 @@ do_compare:
 		stdout_printf("Escrevendo no stdout com stdout_printf \n");
 		
 		//mostra o arquivo desde o começo.
-		printf(stdout->_base);
+		//printf(stdout->_base);
 
 		goto exit_cmp;
 	};	
@@ -3447,8 +3447,8 @@ do_compare:
 		
 		printf("t14:\n");
 	    testCreateWindow ();
-		printf("t14: debug *hang");
-		while(1){}
+		//printf("t14: debug *hang");
+		//while(1){}
 		
 		goto exit_cmp;
 	}
@@ -3476,7 +3476,24 @@ do_compare:
 		
 		printf ("ret=%d \n", cccRet );
 		goto exit_cmp;
-	}	
+	}
+	
+	
+	//chamado rotinas para abrir e fechar um servidor do modulo gramado core.
+	if ( strncmp( prompt, "t17", 3 ) == 0 )
+    {   
+		//abrir
+	    //serviço, sender pid, receiver index
+		system_call ( 8000, 100, 1, 0 );
+		
+		//fechar
+		//serviço, sender pid, receiver index
+        system_call ( 8001, 100, 1, 0 );
+		
+		goto exit_cmp;
+	};	
+	
+	
 	
 	//#gws - testando funcionalidades do gws
 	if ( strncmp ( prompt, "gws", 3 ) == 0 )
