@@ -1,5 +1,5 @@
 /*
- * File: sched\sched.h
+ * File: sched/sched.h
  *
  * Descrição:
  *     Header do scheduler. 
@@ -73,10 +73,11 @@ void KiDoThreadZombie(int id);
 void KiDoThreadDead(int id);
 
 
-//
+
 // Obs: Manipuladores de troca de thread. 
 //      Fazem sentido estarem no scheduler. 
-//
+
+void pick_next_thread();
 
 int scheduler();
 void scheduler_start();

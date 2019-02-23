@@ -53,6 +53,125 @@
 //unsigned long schedulerQueue[4];
 
 
+//0=DRIVERS
+//1=SERVERS
+//2=USER APPS
+unsigned long QUEUES[3];
+
+
+
+
+//selecionamos a next_thread olhando nas filas.
+//se não tiver nada nas filas então usaremos a idle thread.
+
+void pick_next_thread()
+{
+	int q;    //fila selecionada
+	int old;  //salva current thread
+	
+	struct thread_d *t;
+	struct thread_d *next;
+	
+	//se temos um ponteiro para dila de drivers.
+    if ( QUEUES[0] != 0 ){
+	
+		q = 0;
+		
+		//se temos um ponteir para a fila de servidores.
+	} else if ( QUEUES[1] != 1 ){
+	
+		q = 1;
+		
+		//nos resta a fila de apps de usu'ario.	
+	}else{
+	
+	    q = 2;
+	};
+	
+	//salva antiga thread
+	old = next_thread;
+	
+	//checando o conductor.
+	
+	//a fila selecionada 'e v'alida.
+    if (QUEUES[q] != 0)
+	{
+	    //Ok temos uma fila.
+		//vamos pegar a primeira thread da fila.
+		t = (void *) QUEUES[q];
+				
+	}else{
+	
+		// nenhuma thread est'a no estado de READY ... entao nenhuma das
+		// filas foi construida.
+		// nos reata usarmos a thread idle. 
+		
+		//podemos fica nessa condiç~ao at'e que uma thread seja acordada ...
+		//talvez ela esteja esperando alguma recurso,.
+		//quando ela acordar ir'a pra alguma fila.
+		
+		//selecionamos a idle.
+		t = IdleThread;
+	};
+	
+	//
+	// Checando a thread selecionada.
+	//
+	
+	if ( ( void *) t == NULL )
+	{
+	    //fail
+		next_thread = old;
+		
+	}else{
+	
+	    if ( t->used != 1 || t->magic != 1234 )
+		{
+		    //fail
+		    next_thread = old;			
+		}
+	
+		//Ok.
+		next_thread = t->tid;
+	};
+	
+	
+	//
+	// Checando a validade da next thread.
+	//
+	
+	next = (void *) threadList[next_thread];
+	
+	if ( ( void *) next == NULL )	
+	{
+	    //fail
+	    // #debug
+	    //Não conseguimos selecionar nenhuma thread como próxima.
+		//não temos nem mesmo uma thread idle para inicializarmos o round.
+			
+		//#debug
+		printf ("#DEBUG\n");
+		printf ("pick_next_thread: No next_thread, we could't initialize the round\n");
+		die();
+		
+	}else{
+	
+	    
+		if ( next->used != 1 || next->magic != 1234 )
+		{
+	        //fail
+	        // #debug
+	        //Não conseguimos selecionar nenhuma thread como próxima.
+		    //não temos nem mesmo uma thread idle para inicializarmos o round.
+		    //#debug
+		    printf ("#DEBUG\n");
+		    printf ("pick_next_thread: No next_thread, we could't initialize the round\n");
+		    die();	
+		}
+	}
+}
+
+
 
 /*
  ***************************************************************
@@ -87,7 +206,7 @@ int scheduler (){
 	
 	
 	debug_print(" [*SCHEDULER*]");
-
+	
 	// spiritual quote:
 	// "Constrói um caminho de vagões para o condutor andar".
 
@@ -105,7 +224,23 @@ int scheduler (){
 	
 	//Inicia a lista.
 	//marca o início, mas não usa esse ponteiro.
+	
  	Conductor2 = (void *) rootConductor;
+	
+	
+	
+	//
+	// ## preparando 'next_thread' ##
+	//
+	
+	//Não sabemos quem está em next_thread.
+	//Checaremos a possibilidade de não termos filas configuradas.
+	//nesse caso a idle thread será a primeira trhead do round
+	//não havendo outra, pelo menos ela vai rodar.
+	
+	
+	pick_next_thread ();
+	
 	
 	
 	//
@@ -155,44 +290,9 @@ int scheduler (){
 	// onde estão todas as threads.
 
     //@todo pegar primeiro por prioridade.	
-
-	/*	
-    //BLOCKED
-	for(Index=0; Index <= THREAD_COUNT_MAX; Index++)
-	{
-		Thread = (void*) threadList[Index];
-		if( (void*) Thread != NULL)
-		{
-			if(Thread->used == 1 && Thread->magic == 1234 && Thread->state == BLOCKED )
-			{
-				//ACORDA
-				Thread->state = READY;
-			    Conductor2->Next = (void*) Thread;
-                Conductor2 = (void*) Conductor2->Next;
-			};
-			
-		};
-	};
-
-	//WAITING
-	for(Index=0; Index <= THREAD_COUNT_MAX; Index++)
-	{
-		Thread = (void*) threadList[Index];
-		if( (void*) Thread != NULL)
-		{
-			if(Thread->used == 1 && Thread->magic == 1234 && Thread->state == WAITING )
-			{
-				//ACORDA
-				Thread->state = READY;
-			    Conductor2->Next = (void*) Thread;
-                Conductor2 = (void*) Conductor2->Next;
-			};
-			
-		};
-	};
-
-	*/
-
+	
+	
+	
 	//READY.
 	for ( Index=0; Index < THREAD_COUNT_MAX; Index++ )
 	{
@@ -210,46 +310,8 @@ int scheduler (){
 		    //Nothing.
 		};
 		//Nothing.
-	};
-
-	/*
-	//READY. again (de traz pra frente.
-	for(Index=THREAD_COUNT_MAX; Index >= 0; Index--)
-	{
-		Thread = (void*) threadList[Index];
-		if( (void*) Thread != NULL)
-		{
-			if(Thread->used == 1 && Thread->magic == 1234 && Thread->state == READY )
-			{
-			    Conductor2->Next = (void*) Thread;
-                Conductor2 = (void*) Conductor2->Next;
-			};
-			
-		};
 	};	
 
-	*/
-
-	/*
-    //RUNNING
-	for(Index=0; Index <= THREAD_COUNT_MAX; Index++)
-	{
-		Thread = (void*) threadList[Index];
-		if( (void*) Thread != NULL)
-		{
-			if(Thread->used == 1 && Thread->magic == 1234 && Thread->state == RUNNING )
-			{
-				//ACORDA
-				Thread->state = READY;
-			    Conductor->Next = (void*) Thread;
-                Conductor = (void*) Conductor->Next;
-			};
-			
-		};
-	};
-    */
-
-	//Conductor2->Next = NULL;
 
 	//
 	// Continua pegando os tipos diferente.

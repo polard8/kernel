@@ -1,5 +1,5 @@
 /*
- * File: pc\dispatch.c
+ * File: pc/action/dispatch.c
  *
  * Descrição:
  *     Arquivo principal do dispatcher do kernel.
@@ -58,16 +58,15 @@ int dispatch_Default();
 /*
  *********************************************************
  * dispatcher:
- *     Despacha a thread atual que foi escolhida 
- * pelo scheduler. 
- *     Despacha colocando ela no estado RUNNING e 
- * restaurando os valores dos registradores.
- *     Essa função é chamada no final da rotina task_switch, 
- * antes dela retornar.
- *     Obs: Despacha a tarefa de acordo dom o tipo de dispatcher.
- *          Porém os tipos diferentes de dispacher ainda 
- * não estão habilitados, só um funciona.
- *
+ *     Despacha a thread atual que foi escolhida pelo scheduler. 
+ *     Despacha, colocando ela no estado RUNNING e restaurando os valores 
+ * dos registradores.
+ *     Essa função é chamada no final da rotina task_switch, antes dela 
+ * retornar.
+ *     Obs: 
+ *     Despacha a tarefa de acordo dom o tipo de dispatcher.
+ *     Porém os tipos diferentes de dispacher ainda não estão habilitados, 
+ * só um funciona.
  */
  
 void dispatcher ( int type ){
@@ -231,7 +230,7 @@ do_dispatch:
 	
 	dispatch_Pointer = (void *) threadList[current_thread];
 	
-	if ( (void*) dispatch_Pointer == NULL )
+	if ( (void *) dispatch_Pointer == NULL )
 	{
 	    printf("action-dispatch-dispatcher: Struct ERROR\n");
 		die();
@@ -279,15 +278,15 @@ do_dispatch:
 	// nas variáveis usadas pelo assembly para configurar os registradores 
 	// antes do iretd.
 	
-	restore_current_context();
+	restore_current_context ();
 	
     //	
     //  ## Done ##
     //
 	
-done:
-    return; 
-};
+//done:
+    return; //deletar.
+}
 
 
 //
