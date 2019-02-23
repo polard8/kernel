@@ -178,7 +178,7 @@ executive_gramado_core_init_execve ( int i,
 	Status = (int) fsCheckELFFile ( (unsigned long) 0x00400000 );
 	if ( Status == 0 )
 	{
-	    printf("ok, its a valid ELF file\n");
+	    //printf("ok, its a valid ELF file\n");
 		goto format_ok;
 		
 	}		

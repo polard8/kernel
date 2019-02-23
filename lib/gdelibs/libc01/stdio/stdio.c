@@ -965,6 +965,10 @@ void _outbyte ( int c ){
 	//#obs: Tamanho do char constante = 8. 
 	//o que queremos é usar uma variável.
 	
+	//#bugbug
+	//essa funç~ao n~ao 'e usada ... NAO funciona.
+	//printf usa outra coisa (65).
+	
 	//stdio_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
 	gramado_system_call ( 7, 8*g_cursor_x,  8*g_cursor_y, (unsigned long) c ); 
 };

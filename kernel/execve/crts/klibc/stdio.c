@@ -94,6 +94,7 @@ FILE *fopen ( const char *filename, const char *mode ){
     unsigned long fileret;
 	struct _iobuf *stream;
 	
+	//#bugbug: aqui podemos usar o malloc
 	//Buffer usado cara colocar a estrutura.
     unsigned char struct_buffer[1024];
 	
@@ -110,6 +111,17 @@ FILE *fopen ( const char *filename, const char *mode ){
 	//#test
 	//temos que fazer isso de um jeito melhor
 	size_t s = (size_t) fsGetFileSize ( (unsigned char *) filename );
+
+	//#bugbug
+	//Quando pegamos o tamanho do arquivo e for muito grande
+	//o malloc vai falhar.
+	//precisamos exibir o tamanho do arquivo.
+	
+	//vamos impor um limite.
+	// 128 kb
+	
+	//printf ("klibc: fopen limits. size=%d \n", s);
+	//refresh_screen ();
 
 
 	/*
