@@ -1,5 +1,5 @@
 /*
- * File: gramado\request.h 
+ * File: gramado/request.h 
  *
  * Descrição:
  *     ( Deferred Kernel Service )
@@ -64,17 +64,11 @@
 // Então a thread atual no momento da chamada não será 
 // a mesma da thread que chamou.
 #define  KR_DEFERED_SYSTEMPROCEDURE 10
+
 // ...
 
 
-/*
-typedef enum {
-	KernelRequestsNull, //0
-	//...
-}kernel_requests_t;
-*/
-
-#define KERNEL_REQUEST_MAX 32
+#define KERNEL_REQUEST_MAX 1024
 
 
 
@@ -84,33 +78,73 @@ unsigned long kernel_request;
 /*
  *****************************************************
  * request_d:
- *     Estrutura para os requests.
+ *     Estrutura para o request.
+ *     Aqui ficarao os argumentos para atender o request.
+ *     Serao os mesmos das mensagens, para inclusive interagir com elas.
  *
  */
+
 struct request_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
+	// Número do request.
 	
-    int number;
-    unsigned long count;
-    //unsigned long data[4];    
+    unsigned long kernel_request;
+	
+	// 0 = No request.
+	// 1 = Driver request. (high priority)
+	// 2 = Server request. (medium priority)
+	// 3 = User request.   (low priority)
+	
+	int status;
+	
+	// Temporizador.
+	// O request pode ser atendido imediatamente ou
+	// adiado até que esse temporizador seja zerado.
+	// 0 ~ ?
+	
+	int timeout;
+	
+	int target_pid;
+	int target_tid;
+	
+	
+	//
+	// Action support
+	//
+	
+	// basic
+	struct window_d *window;
+	int msg;
+	unsigned long long1;
+	unsigned long long2;
+		
+	// extra	
+	unsigned long long3;
+	unsigned long long4;
+	unsigned long long5;
+	unsigned long long6;
 };
-struct request_d *KernelRequests;
-struct request_d *UserRequests;
-struct request_d *RemoteRequests;
-
-//list.
-unsigned long requestList[KERNEL_REQUEST_MAX];
-
+struct request_d REQUEST;
 
 //
 // Protótipos.
 //
 
-//void user_request();    //@todo:
-void request();
 
+int request ();
+
+int 
+create_request ( unsigned long number, 
+                 int status, 
+                 int timeout,
+				 int target_pid,
+				 int target_tid,
+                 struct window_d *window, 
+                 int msg, 
+                 unsigned long long1, 
+                 unsigned long long2 );
+
+void clear_request();
 
 //
 // End.

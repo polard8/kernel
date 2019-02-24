@@ -20,7 +20,7 @@ int KiInitRuntime();
 void KiInformation(); 
 
 //Requests support.   
-void KiRequest();  
+int KiRequest();  
 
 // Spawn support. spawn a thread.
 void KiSpawnTask(int id);

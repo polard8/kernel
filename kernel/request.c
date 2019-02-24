@@ -1,5 +1,7 @@
 /*
- * File: mk/request.c
+ * File: kernel/request.c
+ *
+ *      Kernel requests.
  *
  * Descrição:
  *     Arquivo principal da central de requests do kernel.
@@ -88,91 +90,91 @@
  * chamam as rotinas de tratamento dos requests.
  */
  
-void KiRequest (){
-	
-	//#todo: #bugbug: limite imposto
-	int Max = 11;
+int KiRequest (){
 		
-    if ( kernel_request < 0 || kernel_request > Max ){
-		
-        printf("KiRequest: %d", kernel_request );
-		die();
+    if ( kernel_request < 0 || kernel_request > KERNEL_REQUEST_MAX )
+	{	
+        printf ("KiRequest: %d", kernel_request );
+		die ();
 	}
 	
-	//...
-    
-	request ();
+	return (int) request ();
 }
 
 
 /*
  *******************************************************
  * request:
- *     Trata os requests do Kernel.
- *    São serviços que terão seu atendimento atrazado até
- * pouco antes de retornar da interrupção do timer.
- * São serviços para o ambiente ring0.  
- *     2015 (Fred Nora) - Created.
- *     2016 (FN) - Revisão.
- *     ...
+ *    Trata os requests do Kernel.
+ *    São serviços que terão seu atendimento atrazado até pouco antes de 
+ * retornar da interrupção do timer.
+ *    Sendo assim, um programa em user mode pode solicitar um request através
+ * de uma system call, sendo a system call transformada em request, adiando
+ * o atendimento.
+ *   O atendimento do request pendende será feito com o auxílio da estrutura
+ * de request.
+ *   Um request será atendido somente quando o timeout zerar. (defered)
  */
  
-void request (){
+int request (){
 	
+	//targets	
     struct process_d *Process; 
     struct thread_d *Thread;	
-
-	int Current;
+	int PID;
+	int TID;
+	
 	unsigned long r;    //Número do request.
 	unsigned long t;    //Tipo de thread. (sistema, periódica...).
-	int Max = 11;	
 	
-   
-	// Current thread.
-	Current = (int) current_thread;
-	
+
 	//
-	// @todo: Filtro.
+	// targets.
 	//
 	
-	//if(Current ...){}
+	PID = (int) REQUEST.target_pid;
+    TID = (int) REQUEST.target_tid;
+
 	
-	Thread = (void *) threadList[Current];
+	//
+	// ## timeout ##
+	//
 	
-	if ( (void *) Thread == NULL )
+	if ( REQUEST.timeout > 0 )
 	{
-		//kernel_request = 0;
-		//...
-		return;    //fail.
+	    REQUEST.timeout--;
+		return 1;
+	}
 	
-	} else {
-		
-	    r = (unsigned long) kernel_request;
-	    
-		t = (unsigned long) Thread->type; 
-		
-		Process = (void *) Thread->process;
-	    
-		//...
-	};
 	
-	//Number limits.
-	
-	//#bugbug
-	//obs: Estamos checando se uma variável unsigned long é menor que zero.
-	//     Isso  não é necessário.	
-	
-	if( r < 0 || r > Max )
+	//
+	// Filtro.
+	//
+
+	if ( PID < 0 || PID > PROCESS_COUNT_MAX )
 	{
-        printf("request: Limits! %d\n",r);
-		die();
-    };
+		Process = NULL;
+	}else{
+	    Process = (void *) processList[PID];		
+	}
+		
+	if ( TID < 0 || TID > THREAD_COUNT_MAX )
+	{
+	    Thread = NULL;
+	}else{
+	
+	    Thread = (void *) threadList[TID];	
+	}
+
 	
     //
 	// # Number #
 	//
 	
-	switch(r) 
+	if (r >= KERNEL_REQUEST_MAX)
+		return -1;
+	
+	switch (r) 
 	{
 	    //0 - request sem motivo, (a variável foi negligenciada).
         case KR_NONE:
@@ -182,56 +184,29 @@ void request (){
 	    //1 - Tratar o tempo das threads de acordo com o tipo.  
 		//#importante: De acordo com o tipo de thread.
 	    case KR_TIME:		    
-			switch (t)
-            {
-                case TYPE_IDLE:   
-                case TYPE_SYSTEM:
-                    //Nothing.				
-                    break;
-
-				//periodic
-	            //Ticks Remaining: Quando o tempo de execução de uma 
-	            //thread se esgota. (Não faz parte do task switch,     
-				//apenas trata o tempo que a tarefa tem para ficar     
-				//executando). O tempo restante vai diminuindo.     					
-                case TYPE_PERIODIC:   
-				    Thread->ticks_remaining--;
-					if( Thread->ticks_remaining == 0 )
-					{
-		                panic("request: Time out TIP={%d}", Thread->tid );					
-	                };
-                    break;
-					
-				//round robin.	
-                case TYPE_RR:   
-				    //Nothing.
-					break;
-					
-				//@todo: Implementar os outros tipos.	
-					
-				default:
-				    //Tipo inválido.
-                    break;						
-            } 			   
+            panic ("request: KR_TIME\n");
+			//return -1;
 	        break;
 		
 	    //2 - faz a current_thread dormir. 
    	    case KR_SLEEP:   
-		    do_thread_sleeping (Current);
+		    do_thread_sleeping ( (int) REQUEST.target_tid );
 	        break;
          
 	    //3 - acorda a current_thread.
 	    case KR_WAKEUP:
-		    //
+		    wakeup_thread ( (int) REQUEST.target_tid );
 		    break;
 
-	    //4 - torna a current_thread zombie.
+        //	
 	    case KR_ZOMBIE:
-	        do_thread_zombie (Current);
+            //panic ("request: KR_ZOMBIE\n");
+			do_thread_zombie ( (int) REQUEST.target_tid );
 		    break;
 			
 		//5 - start new task.
 		//Uma nova thread passa a ser a current, para rodar pela primeira vez.
+		//Não mexer. Pois temos usado isso assim.	
 		case KR_NEW:	
 		    //Start a new thread. 
 	        if(start_new_task_status == 1)
@@ -242,25 +217,27 @@ void request (){
 			
         //6 - torna atual a próxima thread anunciada pela atual.
 		case KR_NEXT:
-            current_thread = (int) Thread->Next->tid; 
+            panic ("request: KR_NEXT\n");
+			//return -1;
 			break;	
 			
 		//7 - tick do timer.
 		case KR_TIMER_TICK:
-		    panic("KR_TIMER_TICK\n");
-			//die();
-		    break;
+		    panic ("request: KR_TIMER_TICK\n");
+		    //return -1;
+			break;
         
 		//8 - limite de funcionamento do kernel.
         case KR_TIMER_LIMIT:
-		    panic("KR_TIMER_LIMIT\n");
-			//die();
-		    break;
+		    panic ("request: KR_TIMER_LIMIT\n");
+		    //return -1;
+			break;
 			
-		//9 - Checa se ha threads para serem inicializadas e 
-		// inicializa pelo método spawn.	
+		// 9 - Checa se ha threads para serem inicializadas e 
+		// inicializa pelo método spawn.
+		// obs: se spawn retornar, continua a rotina de request. sem problemas.	
 		case KR_CHECK_INITIALIZED:
-            check_for_standby();		
+            check_for_standby ();
 		    break;
 			
 		//#todo
@@ -268,31 +245,117 @@ void request (){
         // ?? args ??	
         // o serviço 124 aciona esse request.		
 		case KR_DEFERED_SYSTEMPROCEDURE:
-		    system_procedure ( 0, 0, 0, 0 );
+		    //system_procedure ( REQUEST.window, REQUEST.msg, REQUEST.long1, REQUEST.long2 );
 			break;
 			
+	    //exit process
+		case 11:
+			exit_process ( (int) REQUEST.target_pid, (int) REQUEST.long1 );
+			break;
+			
+		//exit thread.	
+		case 12:
+			exit_thread ( (int) REQUEST.target_tid );
+			break;
+			
+		//make target porcess current
+		//cuidado.	
+		case 13:	
+			current_process = REQUEST.target_pid;
+			break;
+			
+		//make target thread current
+		//cuidado.	
+		case 14:	
+			current_thread = REQUEST.target_tid;
+			break;			
 		
 		//@todo: Tratar mais tipos.	
 		//...
 		
 		default:
-		    //printf("Default Request={%d}\n",r);
+		    printf ("request: Default request {%d} \n", r );
 		    break;
     };
+	
+//Done:
+//   Essas finalizações aplicam para todos os requests.
 
-    //
-    // More ?!
-    //	
+    clear_request ();
+	kernel_request = (unsigned long) 0;  
 	
-/*
- * Done:
- *   Essas finalizações aplicam para todos os requests.
- */	
 	
-//done:
-    kernel_request = (unsigned long) 0;    
-	//return; 
+	// OK.
+	return 0;
 }
+
+
+int 
+create_request ( unsigned long number, 
+                 int status, 
+                 int timeout,
+				 int target_pid,
+				 int target_tid,
+                 struct window_d *window, 
+                 int msg, 
+                 unsigned long long1, 
+                 unsigned long long2 )
+{
+	
+	if (number > KERNEL_REQUEST_MAX)
+		return 1;
+	
+    REQUEST.kernel_request = 0;
+	
+	REQUEST.status = status;
+	
+	if (timeout < 0 )
+	{
+		REQUEST.timeout = 0;
+	}else{
+	    REQUEST.timeout = timeout;
+	}
+	
+	REQUEST.target_pid = target_pid;
+	REQUEST.target_tid = target_tid;	
+	
+	REQUEST.window = (struct window_d *) window;
+	REQUEST.msg = msg;
+	REQUEST.long1 = long1;
+	REQUEST.long2 = long2;
+		
+	//extra.
+	//rever isso depois.
+	REQUEST.long3 = 0;
+	REQUEST.long4 = 0;
+	REQUEST.long5 = 0;
+	REQUEST.long6 = 0;
+	
+	//OK
+	return 0;
+}
+
+void clear_request()
+{
+    REQUEST.kernel_request = 0;
+	REQUEST.status = 0;
+	REQUEST.timeout = 0;
+	
+	REQUEST.target_pid = 0;
+	REQUEST.target_tid = 0;	
+		
+	REQUEST.window = NULL;
+	REQUEST.msg = 0;
+	REQUEST.long1 = 0;
+	REQUEST.long2 = 0;
+		
+	REQUEST.long3 = 0;
+	REQUEST.long4 = 0;
+	REQUEST.long5 = 0;
+	REQUEST.long6 = 0;
+}
+
+
 
 
 //

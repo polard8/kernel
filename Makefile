@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 16
 SUBLEVEL = 0
-EXTRAVERSION = -rc11
+EXTRAVERSION = -rc12
 NAME = ?
 
 #todo:
@@ -238,8 +238,9 @@ compile-kernel:
 	#arm
 	
 	
-
-	gcc -c  kernel/mk/request.c  -I include/ $(CFLAGS) $(DEFINES) -o request.o
+    #kernel/request
+	gcc -c  kernel/request.c  -I include/ $(CFLAGS) $(DEFINES) -o request.o
+	
 	gcc -c  kernel/mk/arch/x86/x86fault.c  -I include/ $(CFLAGS) $(DEFINES) -o x86fault.o
 
 	# /execve
