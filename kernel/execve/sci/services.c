@@ -655,31 +655,19 @@ void *services ( unsigned long number,
         // ## EXIT ##
         //		
 			
-		// 70 - Exit. Torna zombie a thread atual.
-		//isso foi chamado pela libc em user mode.
-		//quando essa interrupção retornar, a libc para num while(1)
+		// 70 - Exit. 
+		// Criaremos um request que será atendido somente quando ouver uma 
+		// interrupção de timer. Enquanto isso a thread deve esperar em um loop.	
 		case SYS_EXIT:
-			
-			//0 = Estamos saindo de aplicativo normalmente, sem erros.
-			//isso não se aplica aos aplicativos que desejamos reaproveitar estrutura.
-			if (arg2 == 0)
-			{							
-				sys_exit_thread (current_thread); 
-				break; 
-			}; 	 		
-			
-			//9= saída anormal,
-			//temos a intenção de reaproveitarmos a estrutura 
-			//da thread, e isso realmente não é normal.
-			//Isso fará a thread ficar presa num while da função exit na libc.
-			if (arg2 == 9)
-			{
-				//do_thread_initialized(current_thread);
-				break;
-			}
-			
-			//...
-			
+			create_request ( (unsigned long) 12, //number 
+                 (int) 1,               //status 
+                 (int) 0,               //timeout. 0=imediatamente.
+				 (int) current_process, //target_pid
+				 (int) current_thread,  //target_tid
+                 NULL,                  //window 
+                 (int) 0,               //msg  
+                 (unsigned long) 0,     //long1  
+                 (unsigned long) 0 );   //long2
 			break;
 		
         //71 		

@@ -14,8 +14,8 @@
 VERSION = 0
 PATCHLEVEL = 16
 SUBLEVEL = 0
-EXTRAVERSION = -rc12
-NAME = ?
+EXTRAVERSION = 0
+NAME = A
 
 #todo:
 #We need to simplify these flags, but it's working.

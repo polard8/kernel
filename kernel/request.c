@@ -171,6 +171,8 @@ int request (){
 	// # Number #
 	//
 	
+	r = kernel_request;
+	
 	if (r >= KERNEL_REQUEST_MAX)
 		return -1;
 	
@@ -305,7 +307,8 @@ create_request ( unsigned long number,
 	if (number > KERNEL_REQUEST_MAX)
 		return 1;
 	
-    REQUEST.kernel_request = 0;
+	kernel_request = number;
+    REQUEST.kernel_request = number;
 	
 	REQUEST.status = status;
 	

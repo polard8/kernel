@@ -181,7 +181,10 @@ void timer (){
 	//Tratará o tempo das tarefas de acordo com o tipo.
 	//#obs: Isso poderia ser usado para atualizar o time dos processos.
 	
-	kernel_request = KR_TIME;  
+	//#suspenso
+	//estou repensando isso.
+	
+	//kernel_request = KR_TIME;  
 	
 	
 	//
@@ -200,10 +203,14 @@ void timer (){
 	//
 	// ## mouse blink ##
 	//
-	
-	
+		
+	//#todo rever isso.
 	//de tempos em tempos atualiza o cursor
-	if ( sys_time_ticks_total % 64 == 0 )	
+	//a cada segundo. sendo ele 100 ou 1000 ... tanto faz.
+	//#todo: mas poderia ser exatamente o hz configurado par ao mouse
+	//if ( sys_time_ticks_total % mouse_cursor_hz == 0 )
+	//if ( sys_time_ticks_total % sys_time_hz == 0 )	
+	if ( sys_time_ticks_total % 70 == 0 )
 	{
 		//Se o cursor piscante está habilitado.
 		//Essa flag é acionada pelo aplicativo.
