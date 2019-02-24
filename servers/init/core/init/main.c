@@ -123,21 +123,11 @@ static char *envp[] = { "ROOT=root:/volume0", NULL };
 
 int initMain (void){
 	
-	//cancelado isso agora é papel do crt0.
-	//libcInitRT ();
-	//stdioInitialize ();		
-	
-	// #debug
-	// Testing output message.
-	
-	//printf("initMain: INIT.BIN is alive \n");
-    //refresh_screen();	
-	//while(1){}
+loop:
+	while (1){}
 	
 	return 0;
 }
-
-
 
 
 /*
