@@ -87,15 +87,28 @@ void screenSetSize( unsigned long width, unsigned long height )
  * refresh_screen:
  *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
  */
-void refresh_screen()
-{
+
+void refresh_screen (){
+	
+	unsigned long *backbuffer = (unsigned long *) BACKBUFFER_VA;
+	unsigned long *frontbuffer = (unsigned long *) FRONTBUFFER_VA;
+	
+	int i=0;
+	
+	 vsync ();	
+	
+	//#test velocidade?
+	for ( i=0; i< SavedX*SavedY; i++ )
+		frontbuffer[i] = backbuffer[i];	
+	
     //antigo.
 	//isso funciona.
 	//screenRefresh();
 
 	//teste
-    refresh_rectangle ( 0, 0, SavedX, SavedY );
-};
+	//isso funciona.
+    //refresh_rectangle ( 0, 0, SavedX, SavedY );
+}
 
 
 /*

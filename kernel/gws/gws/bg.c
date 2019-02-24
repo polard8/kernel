@@ -35,89 +35,31 @@ extern unsigned long SavedBPP;
  *     Clear the screen in text mode.
  *     #todo get device info.
  */
+
 void backgroundDraw (unsigned long color){
 	
     unsigned long i;
+		
+    if (VideoBlock.useGui != 1)
+	    return;
 	
-	//unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
-	//unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-	//unsigned long Width = (unsigned long) screenGetWidth();
-	//unsigned long Height = (unsigned long) screenGetHeight();	
-	
-	
-	//#debug
-	//if( Width != 800 )
-	//{
-	//	printf("Width");
-	//	refresh_screen();
-	//	while(1){}
-	//}
 
-	//#debug
-	//if( Height != 600 )
-	//{
-	//	printf("Height");
-	//	refresh_screen();
-	//	while(1){}
-	//}
+    for ( i=0; i<SavedY; i++ ){			
+        my_buffer_horizontal_line ( 0, i, SavedX, color );
+	}
 	
-	//Modo gráfico.
-//drawGraphicsMode:
+	//#bugbug
+	//estamos determinando as dimensoes do char.
+	//?? ja' podemos usar a varia'vel. ??
 	
-	if (VideoBlock.useGui == 1)
-	{
-		// @todo: Usar variável global. 
-		// Ou variável presente na estrutura 'gui->'
-		
-		//backgroundSetColor( (unsigned long) color);
-		
-		for ( i=0; i<SavedY; i++ ){
-			
-			my_buffer_horizontal_line ( 0, i, SavedX, color );
-		};
-
-		//for(i=0; i<Height; i++){
-		//	my_buffer_horizontal_line( 0, i, Width, color);
-		//};
-		
-        goto done; 		
-	};
-	
-	//Modo texto.
-//drawTextMode:
-	
-	if (VideoBlock.useGui == 0)
-	{
-		kclear(0);
-		goto done; 
-	};
-	
-	//Nothing
-done:	
-	
+	//Cursor.
 	g_cursor_x = 0;
 	g_cursor_y = 0;
-
-    //@todo:
-    //usar uma variável.
-    //Cuidado para não dividir por zero.
-    
-	//if( gcharWidth <= 0 || gcharWidth >= Width ){
-	//	gcharWidth = DEFAULT_CHAR_WIDTH;
-	//} 
-
-	//if( gcharHeight <= 0 || gcharHeight >= Height ){
-	//	gcharHeight = DEFAULT_CHAR_HEIGHT;
-	//} 
-	
-	//g_cursor_right  = (Width/gcharWidth);
-	//g_cursor_bottom = (Height/gcharHeight);
-
-	g_cursor_right  = (SavedX/8);
+	g_cursor_right = (SavedX/8);
 	g_cursor_bottom = (SavedY/8);
 	
-    return;
-};
+	backgroundSetColor (color);
+}
 
 
 /* backgroundSetColor:
@@ -128,19 +70,19 @@ void backgroundSetColor (unsigned long color){
     if ( gui->backgroundStatus == 0 ){
 		
         return;
-    };	
+    }
 
 	if ( (void *) gui->background != NULL ){
 		
 	    gui->background->bg_color = (unsigned long) color;
-	};
-};
+	}
+}
 
 
 /*
  * backgroundRedraw:
- *     Redraw bg.
- */
+ *     Redraw bg. */
+
 void backgroundRedraw (unsigned long color){
 	
     if ( gui->backgroundStatus == 0 ){
@@ -151,8 +93,8 @@ void backgroundRedraw (unsigned long color){
 	if ( (void *) gui->background != NULL ){
 		
 	   backgroundDraw (color);	
-	};
-};
+	}
+}
 
 
 //Constructor.
@@ -160,11 +102,18 @@ void backgroundBackground (){
 	
 	g_cursor_x = 0;
 	g_cursor_y = 0; 
-};
+}
 
 
 //Init.
 int backgroundInit (){
+	
+	unsigned long *lfb = (unsigned long *) BACKBUFFER_VA;
+	int i=0;
+	
+	//#test velocidade?
+	for ( i=0; i< 800*600; i++ )
+		lfb[i] = COLOR_BLACK;
 	
 	// #todo:
 	// Ainda não implementada.
@@ -173,7 +122,7 @@ int backgroundInit (){
 	//...
 	
 	return (int) 0; 
-};	
+}
 
 
 //

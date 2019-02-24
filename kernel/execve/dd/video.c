@@ -178,134 +178,74 @@ int videoInit (){
 	
 	int Status = 0;
 	
-	//uintptr_t addr;
-		
-	// Configuração inicial em modo gráfico.
-	
-	if ( g_useGUI == 1 || VideoBlock.useGui == 1 )
-	{
-	    g_useGUI = 1;
-		VideoBlock.useGui = 1;
-	    
-		
-		//endereço físico do frontbuffer.
-		g_frontbuffer_pa = (unsigned long) SavedLFB;              
 
-		//endereço virtual do backbuffer.
-		g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
+	// Se o modo de video nao esta habilitado
+	if ( VideoBlock.useGui != 1 )
+	{
+	    panic ("videoInit");
+	}
 		
+    g_useGUI = 1;
+	VideoBlock.useGui = 1;
+	    	
+	//endereço físico do frontbuffer.
+	g_frontbuffer_pa = (unsigned long) SavedLFB;              
+
+	//endereço virtual do backbuffer.
+	g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
+			
+	//Device screen sizes. (herdadas do boot loader.)
+	g_device_screen_width = (unsigned long) SavedX;
+	g_device_screen_height = (unsigned long) SavedY;
 		
-		//Device screen sizes. (herdadas do boot loader.)
-		g_device_screen_width = (unsigned long) SavedX;
-		g_device_screen_height = (unsigned long) SavedY;
+	//@todo: #bugbug Para configurar a estrutura HostDeviceInfo tem que 
+	//alocar memória antes, por isso só faremos isso depois de 
+	//inicializarmos o módulo runtime. /rt.
+	
+	//Background.
+	backgroundDraw (COLOR_KERNEL_BACKGROUND);  
 		
-		//
-		//@todo: #bugbug Para configurar a estrutura HostDeviceInfo tem que 
-		//alocar memória antes, por isso só faremos isso depois de 
-		//inicializarmos o módulo runtime. /rt.
-		//
+	//@todo: Isso deve fazer parte do construtor.
 		
-		//Background.
-		backgroundDraw (COLOR_KERNEL_BACKGROUND);  //COLOR_BLUE
+	//Poderíamos copiar a font da ROM para a RAM.
 		
-	    //@todo: Isso deve fazer parte do construtor.
+	//
+	// ## Font support ##
+	//
 		
-		//Poderíamos copiar a font da ROM para a RAM.
-		
-		//
-		// ## Font support ##
-		//
-		
-		//Font. (BIOS font).
-		//#bugbug: 
-		//Na verdade video.c não tem acesso a essa variável,
-		//é preciso chamar o servidor através de um método para 
-        //configurá-la.
+	//Font. (BIOS font).
+	//#bugbug: 
+	//Na verdade video.c não tem acesso a essa variável,
+	//é preciso chamar o servidor através de um método para configurá-la.
         
-		gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
+	gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
  
-	    //#todo: usar a função que configura essas variáveis.
-		gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
-	    gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
-
-		gfontSize = FONT8X8;
-		
-		//Font. (test).
-		//gws_currentfont_address = (unsigned long) ??;  
-	    //gcharWidth = ??;
-	    //gcharHeight = ??;
-
-        //@todo: Onde esta a estrutura para fonte.		
-	    
-		//Cursor. 
-		g_cursor_x = 0;
-	    g_cursor_y = 8;	
-		
-		g_cursor_width = 8;
-		g_cursor_height = 8;
-		
-		g_cursor_color = COLOR_TERMINALTEXT;
+	//#todo: usar a função que configura essas variáveis.
+	gcharWidth = VIDEO_BIOS_FONT8X8_WIDTH;
+	gcharHeight = VIDEO_BIOS_FONT8X8_HEIGHT;		
+	gfontSize = FONT8X8;
+			    
+	//Cursor. 
+	g_cursor_x = 0;
+	g_cursor_y = 8;	
+	g_cursor_width = 8;
+	g_cursor_height = 8;
+	g_cursor_color = COLOR_TERMINALTEXT;
         
-		//@todo; Criar defines para default.
-		g_cursor_left = 0;      // Margem esquerda dada em linhas.
-        g_cursor_top = 0;       // Margem superior dada em linhas.
-		g_cursor_right  = 256;  // Margem direita dada em linhas.
-        g_cursor_bottom = 256;  // Margem inferior dada em linhas.
+	//@todo; Criar defines para default.
+	g_cursor_left = 0;      // Margem esquerda dada em linhas.
+    g_cursor_top = 0;       // Margem superior dada em linhas.
+	g_cursor_right  = 256;  // Margem direita dada em linhas.
+    g_cursor_bottom = 256;  // Margem inferior dada em linhas.
 		
-		//terminal. (cmd)
-		//shell_create_terminal();
-		
-		//Continua ...
-	};
+	set_up_cursor(0,0);    //Cursor.
 	
 	
-	//
-	// Configuração inicial em modo texto.
-	//
-	
-	if (g_useGUI == 0 || VideoBlock.useGui == 0)
-	{
-	    g_useGUI = 0;
-		VideoBlock.useGui = 0;
+	//Continua ...
 		
-	    // Verifica se o monitor é de 16 cores ou monocromico
-	    //if((inportb(0x3CC) & 0x01) != 0){
-		//    addr      = 0xB8000L;
-		//    video_io  = 0x3D4;
-	    //}
-	    //else{
-		//    addr      = 0xB0000L;
-		//    video_io  = 0x3B4;
-	    //}		
-		
-		//video_mem = (uint16_t *)(addr);
-		
-	    //Screen.
-		
-        videoSetupCGAStartAddress(SCREEN_CGA_START);
-	    
-		//Background.
-
-		backgroundDraw ( COLOR_BLUE );
-		
-		//text color. (branco em preto).
-	    set_up_text_color (0x0F, 0x00); 
-		
-		//set video mode
-		//SetVideoMode(3);
-		
-		//Continua ...	
-	};
-	
-
-
 	//
 	// Outras configurações de vídeo independentes do modo de vídeo.
 	//
-	
-//config:
-	
-	set_up_cursor(0,0);    //Cursor.
 	
 	//
     // @todo: Sizes, atribute, atribute color, row, column
@@ -325,9 +265,8 @@ int videoInit (){
 	}
 #endif		
 	
-	
     return (int) Status;    
-};
+}
 
 
 /*
