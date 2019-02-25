@@ -89,19 +89,8 @@
 //0xAB, 0x83	MF2 keyboard
 
 
-void ps2();
+void ps2 ();
 
 
-//deletar
-void 
-MessageBox( struct window_d *parent_window, 
-            int type, 
-		    char *title, 
-			char *string );
-			
-			
-	
-//
-//
-//
+
 

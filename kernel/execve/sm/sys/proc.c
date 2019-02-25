@@ -865,36 +865,22 @@ system_procedure ( struct window_d *window,
 		case MSG_SYSKEYUP: 
             switch (long1)  
             {
-				//0x5B.
-                //Left WinKey system keyup. 
-                //#super.
-				//case VK_LGRAMADO:
-                //    procedureGrid();  //Grid de botões usado pelo kernel.				
-				//break;
-
                 case VK_LWIN:
                 case VK_RWIN:
 				    if ( winkey_status == 0 )
 					{
 						//printf ("winkey\n");
-					    //MessageBox (gui->screen, 1, "Win Key:","MSG_SYSKEYUP VK_LWIN or VK_RWIN");
-                    };
+                    }
 					break;
 					
-				//test.
-				//control menu. (application)
-				//#importante:
-				// ESSA MENSAGEM DEVE SER INTERCEPTADA PELO APLICATIVO.
-				// ex: o shell.bin está intereptando bem essa mensagem.
+                // ??
                 case VK_CONTROL_MENU:
-				    //control menu.
-					//MessageBox(gui->screen, 1, "Control menu:","MSG_SYSKEYUP.VK_CONTROL_MENU");
                     break;
 					
                 default:
                     break;				
             };          
-        break;
+            break;
 		
 
 		// Essa categoria é para receber mensagens
@@ -1124,44 +1110,32 @@ void procedureHelp (){
 	    //Somente se tivermos uma janela válida. 
 	
 	    draw_text( hWindow, 8,  2*(height/20), 
-	        COLOR_WINDOWTEXT, "F1 Help.");
+	        COLOR_WINDOWTEXT, "F1 ?");
         draw_text( hWindow, 8,  3*(height/20), 
-	        COLOR_WINDOWTEXT, "F2 Kernel info.");
+	        COLOR_WINDOWTEXT, "F2 ?");
 	    draw_text( hWindow, 8,  4*(height/20), 
-	        COLOR_WINDOWTEXT, "F3 CPU info.");
+	        COLOR_WINDOWTEXT, "F3 ?");
 	    draw_text( hWindow, 8,  5*(height/20), 
-	        COLOR_WINDOWTEXT, "F4 Window tests.");
+	        COLOR_WINDOWTEXT, "F4 ?");
 	    draw_text( hWindow, 8,  6*(height/20), 
-	        COLOR_WINDOWTEXT, "F5 Device info.");
+	        COLOR_WINDOWTEXT, "F5 Tests");
 	    draw_text( hWindow, 8,  7*(height/20), 
-	        COLOR_WINDOWTEXT, "F6 Clock info.");
+	        COLOR_WINDOWTEXT, "F6 Tests");
 	    draw_text( hWindow, 8,  8*(height/20), 
-	        COLOR_WINDOWTEXT, "F7 MessageBox.");
+	        COLOR_WINDOWTEXT, "F7 ?");
 	    draw_text( hWindow, 8,  9*(height/20), 
-	        COLOR_WINDOWTEXT, "F8 Cls.");
+	        COLOR_WINDOWTEXT, "F8 Cls");
 	    draw_text( hWindow, 8, 10*(height/20), 
-	        COLOR_WINDOWTEXT, "F9 Reboot.");
+	        COLOR_WINDOWTEXT, "F9 Reboot");
 	    draw_text( hWindow, 8, 11*(height/20), 
-	        COLOR_WINDOWTEXT, "F10 Task Manager.");
+	        COLOR_WINDOWTEXT, "F10 ?");
 	    draw_text( hWindow, 8, 12*(height/20), 
-	        COLOR_WINDOWTEXT, "F11 Program manager.");
+	        COLOR_WINDOWTEXT, "F11 ?");
         draw_text( hWindow, 8, 13*(height/20), 
-	        COLOR_WINDOWTEXT, "F12 Tests");	
+	        COLOR_WINDOWTEXT, "F12 ?");	
 	
 	    //...
 	};
-
-		
-    //#bugbug:
-    //O que queremos é apenas atualizar as strings
-    //na status bar existente enão criar uma status bar.    
-	//UpdateStatusBar( hWindow, "Esc=EXIT", "Enter=?" );
-	
-	
-	//
-	// @todo: Habilitar o procedimento de janela.
-	//
-	
 	
 	
 	goto done;
@@ -1170,14 +1144,13 @@ void procedureHelp (){
 fail:		
     printf("fail\n");
 done:
-    SetFocus(hWindow);
+    SetFocus (hWindow);
    
 	//@todo: 
 	//Devemos dar o refresh somente da janela.
 	refresh_screen();
     return;
-};
-
+}
 
 
 /*

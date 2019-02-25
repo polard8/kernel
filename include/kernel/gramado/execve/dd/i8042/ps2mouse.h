@@ -128,15 +128,8 @@ void ps2_mouse_initialize();
 int ps2_mouse_globals_initialize();
 
 
-void mouse_install();   
+void mouse_install ();   
 
-
-//deletar
-void 
-DialogBox( struct window_d *parent_window, 
-           int type, 
-		   char *title, 
-		   char *string );
 		   
 		   
 		   

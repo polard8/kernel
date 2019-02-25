@@ -647,6 +647,7 @@ typedef enum {
 
 
 //estrutura para window class
+
 struct window_class_d
 {
 	
@@ -1553,7 +1554,7 @@ struct gui_d
 	 * Grupo 2: Grid. (grid de ícones flutuantes)
 	 * Grupo 3: Control menu.(Control menu da janel atual).
 	 * Grupo 4: Info Box, ToolTip.
-	 * Grupo 5: MessageBox e DialogBox.
+	 * Grupo 5: ??
 	 * Grupo 6: Outras.
 	 */
 	
@@ -1563,21 +1564,18 @@ struct gui_d
 	// Grupo 0: Screen, Background, Logo, Desktop, Taskbar.
 	//
 	
-	
-    /*
-	 * Screen: 
-	 *     A tela. Tem as dimensões do monitor usado.
-	 */   
+	//Screen: 
+	//      A tela. Tem as dimensões do monitor usado.
+	   
     struct window_d *screen; 
 
 
-	//
 	// A única janela em primeiro plano e com o foco de entrada. 
 	// Será usada pelo desenvolvedor durante a construção dos 
 	// elementos gráficos, até que o sistema gráfico fique mais robusto
 	// e permita ficar trocando a janela com o foco de entrada.
 	// Isso é para evitar confusão de output nesa fase.
-	//
+	
     struct window_d *DEVELOPERSCREEN;    
 	
     
@@ -1681,26 +1679,14 @@ struct gui_d
 	 */
 	struct window_d *tooltip;  
 	
-	//
-	// Grupo 5: MessageBox e DialogBox.
-	//
-
-	/*
-	 * Messagebox:
-	 *     Janela usada para o sistema enviar mensagens de informações.
-	 *     Esse é um ponteiro para um messagebox especial, utilizado 
-	 * apenas pelo sistema, para mensagens sistemicamente importante.
-	 */
+	
+	// Grupo 5: 
+	// MessageBox e DialogBox.
+    // Isso e' um test.
+	
 	struct window_d *messagebox;
-
-	/*
-	 * DialogBox:
-	 *     Janela usada para o sistema se comunicar com o usuário
-	 *     solicitando alguma escolha de opção.
-	 * Essa dialogbox é exclusiva para o sistema se comunicar com o 
-	 * usuário sobre informações sistemicamente importantes. 
-	 */
 	struct window_d *dialogbox;
+	
 	
 	//
 	// Grupo 6: Outras.

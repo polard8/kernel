@@ -1153,7 +1153,7 @@ void *guiGetTooltipWindow()
 };
 
 
-//message box do kernel base. (especial)
+//message box do kernel base. 
 void *guiGetMessageboxWindow()
 {
 	if( (void*) gui == NULL){
@@ -1163,9 +1163,9 @@ void *guiGetMessageboxWindow()
 };
 
 
-//dialogbox do kernel base. (especial)
+//dialogbox do kernel base. 
 void *guiGetDialogboxWindow()
-{
+{	
 	if( (void*) gui == NULL){
 		return NULL;
 	}

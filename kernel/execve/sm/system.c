@@ -644,21 +644,15 @@ void *systemRam ( int number,
 			
 		//Kill window focus.	
         case 73: 
-		    KillFocus( (struct window_d *) arg1 ); 
+		    KillFocus ( (struct window_d *) arg1 ); 
 			break;
 			
+		// message box, cancelado.	
         case 74:
-            MessageBox( (struct window_d *) arg1, 
-			            (int) arg2, 
-						(char *) arg3, 
-						(char *) arg4 );
 			break;
 			
+		// dialog box, cancelado;	
         case 75:  
-            DialogBox( (struct window_d *) arg1, 
-			           (int) arg2, 
-					   (char *) arg3, 
-					   (char *) arg4 );
 			break;
 			
         case 76:
@@ -1637,25 +1631,30 @@ done:
 
 
 //Método interno..
-void *systemNull(){
+
+void *systemNull (){
+	
 	return NULL;
-};
+}
 
 
 /*
  * systemLinkDriver:
  *     Ligando um driver ao sistema operacional.
  */
+
 void *systemLinkDriver( unsigned long arg1, 
                         unsigned long arg2, 
 						unsigned long arg3 )
 {
-	MessageBox(gui->screen, 1, "sm-sys-system-systemLinkDriver:", "Linking a driver.." ); 
-	//
-done:
+	
+	// #todo: 
+	// Ainda não implementada.
+	
+	printf ("systemLinkDriver:\n");
     refresh_screen();	
-    return NULL; //@@todo: Inda não implementada.	
-};
+    return NULL; 	
+}
 
 
 /*
@@ -2316,13 +2315,17 @@ void systemReboot (){
 	//Nothing.
 	
 done:
+	
     refresh_screen();
-	sleep(8*8000);
-	MessageBox(gui->screen, 1, "sm-sys-system-systemReboot:","Rebooting");
-    refresh_screen();
-	KiReboot();
-    die();
-};
+	
+	sleep (8*8000);
+	
+	printf ("systemReboot: Rebooting ...");
+	refresh_screen();
+	
+	KiReboot ();
+    die ();
+}
 
 
 /*
@@ -2330,21 +2333,15 @@ done:
  * systemShutdown:
  *     Interface para shutdown.
  */ 
+
 void systemShutdown (){
 	 
 	//@todo ...
 
-	MessageBox( gui->screen, 1, "sm-sys-system-systemShutdown:","I's safe to turnoff your computer.");
-	
-	//Nothing.
-	
-//done:		
-	//systemShutdownViaAPM(); //@todo: usar essa.
-	//KiShutdown(); //??
-	//hal_shutdown();
-//hang:	
-	die();
-};
+	printf ("systemShutdown: It's safe to turnoff your computer");
+	refresh_screen ();
+	die ();
+}
 
 
 /*
@@ -2352,24 +2349,21 @@ void systemShutdown (){
  *     Desliga a máquina via APM.
  *     (Deve chamar uma rotina herdada do BM).
  */
+
 void systemShutdownViaAPM (){
 
-   //
     // Obs: @todo:
 	//     Existe uma rotina no BM que desliga a máquina via APM usando 
 	// recursos do BIOS. A rotina começa em 32bit, assim podemos tentar herdar 
 	// o ponteiro para a função.
-    //
-	//MessageBox(gui->screen, 1, "systemShutdown:","Turning off via APM ...");	
-
 	
     //Chamar a função de 32 bit herdado do BM.
     //todo: usar iret.
 	
-	//Check limits.
+	// Check limits.
 	// O ponteiro herdado tem que ser um valor dentro do endereço onde 
-	//roda o BM, que começa em 0x8000.
-	//if(shutdown_address > 0x8000 && shutdown_address < 0x20000 ){
+	// roda o BM, que começa em 0x8000.
+	// if(shutdown_address > 0x8000 && shutdown_address < 0x20000 ){
 		
 	//Pilha para iret.
     //asm("pushl %0" :: "r" ((unsigned long) 8)     : "%esp");    //cs.
@@ -2378,9 +2372,10 @@ void systemShutdownViaAPM (){
 		
 	//};
 	
-//hang:	
-    panic("sm-sys-system-systemShutdownViaAPM:\n");
-};
+//hang:
+	
+    panic("sm-system-systemShutdownViaAPM:\n");
+}
 
 
 /*
@@ -2394,6 +2389,7 @@ void systemShutdownViaAPM (){
  * Obs: É muito apropriado essa função ficar no arquivo \sm\sys\system.c
  * Pois é a parte mais importante do módulo System Manegement".
  */
+
 void *systemGetSystemMetric (int number){
 	
 	if ( number <= 0 )

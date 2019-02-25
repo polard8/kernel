@@ -94,7 +94,8 @@ int KiRequest (){
 		
     if ( kernel_request < 0 || kernel_request > KERNEL_REQUEST_MAX )
 	{	
-        printf ("KiRequest: %d", kernel_request );
+        //#debug
+		printf ("KiRequest: %d", kernel_request );
 		die ();
 	}
 	

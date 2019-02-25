@@ -448,7 +448,7 @@ void *services ( unsigned long number,
 	 
 		//34	
         case SYS_VIDEO_SETCURSOR: 
-		    systemRam(86,arg2,arg3,0,0); 
+		    systemRam (86,arg2,arg3,0,0); 
 			//set_up_cursor( (unsigned long) arg2, (unsigned long) arg2);
 			break;              
 
@@ -465,9 +465,11 @@ void *services ( unsigned long number,
             break;    
       
 	
-		//37 - Chama o procedimento procedimento default. @todo return.
+		//37 - Chama o procedimento procedimento default. 
+		//@todo return.
 		case SYS_CALLSYSTEMPROCEDURE: 
-            system_procedure(NULL,arg2,arg3,arg4);	
+            system_procedure (NULL,arg2,arg3,arg4);	
+			//return (void *) system_procedure ( NULL, arg2, arg3, arg4 );	
             break;    
         
 	
@@ -478,37 +480,25 @@ void *services ( unsigned long number,
             break;
 
 
-        //45 Message Box. 
+        // 45 Message Box. 
+		// Cancelado. 
+		// Message box fica na biblioteca em ring 3.	
         case SYS_MESSAGEBOX:		
-            //MessageBox(gui->screen, 1, (char *) a3, (char *) a4 );        
             return NULL;
 			break;
 		
-        //47, Create Window support.		
-        //envia argumentos de controle.
+        //47, cancelada.		
 		case SYS_BUFFER_CREATEWINDOWx:
-		    //cwFlag  = 1234;  //Aciona a flag.
-            //cwArg2  = arg2;  //WindowStatus 
-			//cwArg11 = arg3;  //cor da area de cliente.
-			//cwArg12 = arg4;  //cor da janela.
 			return NULL;
 			break;
 		
-		//48, Create Window support.
-		//envia argumentos de posicionamento.
+		//48, cancelada.
 		case SYS_BUFFER_CREATEWINDOW1:
-		    //cwArg5 = arg2;  //x
-			//cwArg6 = arg3;  //y
-			//cwArg9 = gui->screen;  //@todo: O argumento arg4 está enviando parent window.    
 			return NULL;
 			break;
 		
-		//49, Create Window support.
-		//envia argumentos de dimensões.
+		//49, cancelada.
 		case SYS_BUFFER_CREATEWINDOW2:
-		    //cwArg7 = arg2; //width
-			//cwArg8 = arg3; //height
-			//cwArg10 = arg4;  //desktop ID 
 			return NULL;
 			break;	
 			
