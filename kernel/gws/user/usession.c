@@ -178,6 +178,10 @@ void init_user_session (){
 	
 	if ( CurrentUser < 0 || CurrentUser >= USER_COUNT_MAX )
 	{
+	    DefaultUserSession = NULL;	
+		CurrentUserSession = NULL;
+		
+		//panic ("init_user_session: CurrentUser");
 		return;
 	}
 	

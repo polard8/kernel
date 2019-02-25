@@ -473,14 +473,6 @@ int processCopyProcess ( int p1, int p2 ){
 	
 	Process2->iopl = Process1->iopl;
 	
-	Process2->procedure = Process1->procedure;
-	
-	
-	//message support.
-	Process2->window = Process1->window;  //arg1. 
-	Process2->msg    = Process1->msg;     //arg2.
-	Process2->long1  = Process1->long1;   //arg3.
-	Process2->long2  = Process1->long2;   //arg4.	
 	
 	
 	Process2->base_priority = Process1->base_priority;
@@ -492,8 +484,17 @@ int processCopyProcess ( int p1, int p2 ){
 	Process2->zombieChildListHead = Process1->zombieChildListHead;
 		
 	Process2->exit_code = Process1->exit_code;
-		
-	Process2->Next = Process1->Next; 
+	
+	Process2->dialog_address = Process1->dialog_address;
+	
+	//message support.
+	Process2->window = Process1->window;  //arg1. 
+	Process2->msg    = Process1->msg;     //arg2.
+	Process2->long1  = Process1->long1;   //arg3.
+	Process2->long2  = Process1->long2;   //arg4.		
+	
+	Process2->prev = Process1->prev; 		
+	Process2->next = Process1->next; 
 
 	Status = 0;
 	goto done;	
@@ -563,8 +564,7 @@ struct process_d *create_process ( struct room_d *room,
     // Melhorar esse esquema de numeração e 
 	// contagem de processos criados.
 	
-    if( processNewPID < USER_BASE_PID || 
-	    processNewPID >= PROCESS_COUNT_MAX )
+    if ( processNewPID < USER_BASE_PID || processNewPID >= PROCESS_COUNT_MAX )
 	{
 		processNewPID = (int) USER_BASE_PID;	
 	};
@@ -681,6 +681,7 @@ get_next:
 		// frame pool, o que é equivalente a 4MB. (uma partição)
 		// Obs: Um framepool indica onde é a área de memória fisica
 		// que será usada para mapeamento das páginas usadas pelo processo.
+		
 		Process->framepoolListHead = NULL;
 		
 		//Lista de arquivos.
@@ -734,22 +735,35 @@ get_next:
 		//Process->processMemoryInfo
 		
 		
-		//
-		// @todo: Precisa alocar espaço na memória física.
-        //        Precisa criar page tables para essas areas de cada processo.		
-		//        Os endereços virtuais dessas areas dos processos são sempre os mesmos.
-		//        mas os endereços físicos dessas areas variam de processo pra processo.
-		//
+		// #todo: 
+		// Precisa alocar espaço na memória física.
+        // Precisa criar page tables para essas areas de cada processo.		
+		// Os endereços virtuais dessas areas dos processos são sempre os mesmos.
+		// mas os endereços físicos dessas areas variam de processo pra processo.
 
 		// Imagem do processo.
 		// ?? Provavelmente esse endereço é virtual.
 		// Queremos que esse endereço seja padronizado e que todos 
 		// os processos usem o mesmo endereço.
-		Process->Image = UPROCESS_IMAGE_BASE;  // Base da imagem do processo.
-		//Process->ImageSize = 0;              // Tamanho da imagem do processo.	    
 		
+		// #bugbug
+		// Todos os processos de usuário começam no mesmo endereço virtual.
+		// Porém temos os processos em kernel mode e os processos do gramado core
+		// que usam endereços virtuais diferentes.
+		// #todo: Rever isso.
+		// #todo: estamos suspendendo essa informação.
 		
 		//
+		// ## IMPORTANTE ##
+		//
+		
+		// Base da imagem do processo.
+		// Tamanho da imagem do processo.
+		
+		Process->Image = 0;             //UPROCESS_IMAGE_BASE;  
+		Process->ImageSize = 0;              	    
+		
+		
 		// Heap e Stack:
 		//
 		// @todo: #BugBug 
@@ -760,7 +774,6 @@ get_next:
 		// Obs: O endereço virtual do heap e da stack dos processos serão 
 		// os mesmos para todos os processos, assim como o endereço virtual 
 		// de carregamento da imagem.
- 		//
 		
 		// Heap and Stack. 
 		// #importante: (Endereços virtuais).
@@ -773,7 +786,7 @@ get_next:
 		
 		
 		//Process->Heap = (unsigned long) 0x00400000; //funciona
-		//Process->Heap = (unsigned long) 0xC0C00000;//funciona
+		//Process->Heap = (unsigned long) 0xC0C00000; //funciona
 		
 		// g_heappool_va
         // endereço virtual do pool de heaps.
@@ -829,23 +842,7 @@ get_next:
         //Determina as camadas de software que um processo terá acesso irrestrito.
 	    //Process->ppl = pplK0;
 		
-        //
-        // Procedimento de janela para o processo criado.
-		// Quando criamos um processo, atribuimos à ele o procedimento de 
-		// janela padrão do sistema até que o processo peça para trocá-lo.
-		// Poderia ser 0, mas pode dar page fault.
-	    //
-		
-		Process->procedure = (unsigned long) &system_procedure;
-	    
-		//Msg support.
-		//Argumentos do procedimento de janela.
-		//@todo: Isso pode ser um ponteiro de estrutura,
-		//a fila de mensgens pode ser uma fila de ponteiros.
-		Process->window = NULL;    //arg1. 
-	    Process->msg = 0;          //arg2.
-	    Process->long1 = 0;        //arg3.
-	    Process->long2 = 0;        //arg4.			
+
 		
 	    //Process->callerq	   //head of list of procs wishing to send.
         //Process->sendlink;    //link to next proc wishing to send.
@@ -887,64 +884,57 @@ get_next:
 
         //Process->window_id 		
 		
-		//Process->preempted
-		
-		
-		//Process->saved
-		//Process->PreviousMode
-		
-		//context
-	    //Process->ss
-        //Process->esp
-        //Process->eflags
-        //Process->cs
-        //Process->eip = init_eip;  //isso deve ser o entry point da thread principal.	
-        //Process->ds
-        //Process->es
-        //Process->fs
-        //Process->gs
-        //Process->eax	
-        //Process->ebx
-        //Process->ecx
-        //Process->edx
-        //Process->esi
-        //Process->edi
-        //Process->ebp
-	    //Continua o contexto ...
 		
 		//Process->event
 		
 	
-        //Continua ...
+        // #importante
+		// user session, room and desktop.
 		
-        //Process->processDesktop
-		//Process->processUserSession
-		//Process->room
-		//Process->desktop
+		// #bugbug: 
+		// Não temos informação sobre a user session, 
+		// devemos pegar a estrutura de current user session. 
+		// Para isso ela deve ser configurada na inicialização do gws,
+		// antes da criação dos processo.
+		
+		Process->usession = CurrentUserSession;  // Current.
+		Process->room = room;                    // Passado via argumento.
+		Process->desktop = desktop;              // Passado via argumento.
 		
 		//Process->base_priority
 		
 		
 		//Process->iob[3]
 		
-		//Process->wait4pid
 		
+	    // wait4pid: 
+        // O processo esta esperando um processo filho fechar.
+	    // Esse é o PID do processo que ele está esperando fechar.
+		
+		Process->wait4pid = (pid_t) 0;
 		
 		Process->zombieChildListHead = NULL;
 		
 		Process->exit_code = 0;
 		
-		//More?!
-		//Obs: É bom lembrar que outros elementos podem ser 
-		//configurados posteriormente.
+
+		//procedimento eem ring 0 por enquanto.
+		Process->dialog_address = (unsigned long) &system_procedure;
+
+		Process->signal = 0;
+		Process->signal_mask = 0;
 		
-		//Next.
-		//Process->next_task;  //@todo deletar isso.
-		//Process->next_process
-		//Process->NextInitialized
-		//Process->Parent
-		//Process->Prev
-		Process->Next = NULL; 
+		//Msg support.
+		//Argumentos do procedimento de janela.
+		//@todo: Isso pode ser um ponteiro de estrutura,
+		//a fila de mensgens pode ser uma fila de ponteiros.
+		Process->window = NULL;    //arg1. 
+	    Process->msg = 0;          //arg2.
+	    Process->long1 = 0;        //arg3.
+	    Process->long2 = 0;        //arg4.			
+		
+		Process->prev = NULL; 
+		Process->next = NULL; 
 
 		//Coloca o processo criado na lista de processos.
 		processList[PID] = (unsigned long) Process;		

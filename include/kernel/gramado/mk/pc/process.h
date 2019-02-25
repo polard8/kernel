@@ -256,64 +256,65 @@ struct process_d
 	
 	//callback ,d.
 	
-    /*
-	 * Identificadores.
-	 */
+    //
+	//  Identificadores.
+	//
 	 
 	//PID, (Process Identification), 
-	//c, Número que identifica unicamente um processo.	
-	int pid;
+	//Número que identifica unicamente um processo.	
 	//PPID, (Parent Process Identification),
-    //b, Número de identificação do processo pai.	
-	int ppid;                
+    //Número de identificação do processo pai.	
 	//UID, (User Identification),
-	//a, Número de identificação do usuário que criou o processo.
-	int uid;
+	//Número de identificação do usuário que criou o processo.	
 	//GID, (Group Identification),
-	//g, Número do grupo do dono do processo.
+	//Número do grupo do dono do processo.
+	
+	int pid;	
+	int ppid;                
+	int uid;
 	int gid;
 	
 	
 	// #importante
 	// TABELA DE ARQUIVOS ABERTOS PELO PROCESSO.
 	// Tem necessariamente um limite.
+	
 	unsigned long Streams[NUMBER_OF_FILES];
 	
-	//State.
-	process_state_t state; // flag,
+	// State.
+	// flag ?
+	process_state_t state; 
 	
-
     //plano de execução.
 	int plane;
 
-    //unsigned long error; // error.	
+	// error.
+    //unsigned long error; 	
 
-	unsigned long used;     //@todo: Poderia ser short.
-    unsigned long magic;    //@todo: Poderia ser short.
+	int used;     
+    int magic;    
 	
 	
-	//
 	// @todo:
 	// +name     (Nome=EXEMPLO.BIN)
 	// +pathname (Caminho=/root/boot/EXEMPLO.BIN)
 	// +cmd      (linha de comando ex:EXEM ) 
-	//
-	
-	unsigned long name_address;  //@todo: não usar isso.
-	char *name;             //Nome do processo. 
-	//char *pathname;       //@todo: Incluir.
-	char *cmd;              //Nome curto que serve de comando.
 
-
+	//char *pathname;              //@todo: Incluir.	
+	char *cmd;                     //Nome curto que serve de comando.
+	char *name;                    //Nome do processo. 
+	unsigned long name_address;    //@todo: não usar isso.
 
 	
 	//Se o processo é ou não um processo de terminal.
 	//que aparece no terminal.
+	
 	int terminal;
 	
 	//#importante
 	//Em qual terminal o processo vai atual.
 	//a estrutura está em terminal.h
+	
 	int terminal_id;
 	
     //Importante:
@@ -323,23 +324,24 @@ struct process_d
     //janela de terminal para o aplicativo.
     //APPMODE_WINDOW = O kernel não cria estrutura de terminal para 
     //esse processo e o processo criará janelas.
+	
 	appmode_t appMode;
 	
 	//
 	//    ****  Banco de dados ****
 	//
 	
-	//
-	//Obs: Um processo é um cliente de banco de dados.
-	//     Um processo tem contas conjuntas e pessoais.
-    //     um processo poderá compartilhar esses objetos.	
-    //
+
+	// Obs: 
+	// Um processo é um cliente de banco de dados.
+	// Um processo tem contas conjuntas e pessoais.
+    // Um processo poderá compartilhar esses objetos.	
 
 	//
 	// BANCOS
 	//
 	
-	//Acesso ao banco de dados do kernel. (não é uma lista).
+	//Acesso ao banco de dados do kernel. (não é uma lista).	
 	struct bank_d *kdb;
 	
 	//Lista de acessos à bancos de contas conjuntas.
@@ -406,68 +408,66 @@ struct process_d
 	
 
 	//Qualquer pagefault deve ser registrada na estrutura do processo corrente.
+	//?? não seria na thread ??
 	unsigned long pagefaultCount;
 	//...
 	
+	//ticks running ..
+    //unsigned long Cycles;  // ?? double ??  
 	
-    //double Cycles;                   //ticks running .. 
-    //unsigned long ContextSwitches;   //quantas vezes no total o dispacher atuou sobre ele.
-    //unsigned long ContextSwitchesDelta;  //Quantas trocas de context sofreu durante um determinado tempo de análise.
-	//esse deve ser o mesmo tempo de análise usado para calcular o working set.
+	//quantas vezes no total o dispacher atuou sobre ele.
+	//Essa contagem não deve ser feita na thread.
+	//Ou colocaremos aqui o total de todos os context switches das threads ??
+    //unsigned long ContextSwitches;   
 	
+	//working set support.
+	//Quantas trocas de context sofreu durante um determinado tempo de análise.
+	//Esse deve ser o mesmo tempo de análise usado para calcular o working set.
 	
-	//
-	//files.
-	//
-	//struct FILE Files; lista de arquivos usados por um processo.	
+    //unsigned long ContextSwitchesDelta;  
 
-	//file descriptors.
-	//struct file_t *files; //poteiro para array de estruturas de arquivos.
-	
-	//inicial thread.
-	//struvt thread_d *thread; 
 	
 	//
-	// MEMORY !!!  Image + Heap + Stack 
+	// ## MEMORY SUPPORT ##
 	//
 	
-	//struct image_t *processImageMemory;  // process image.(binario)
-	//struct heap_t  *processHeapMemory;   //process heap
-	//struct stack_t *processStackMemory;  //process stack.
-	
-    	
-	//
-	// ORDEM: O que segue é referenciado durante o processo de task switch.
-	//
+	// image = Imagem do programa principal do processo.
+	// heap  = Heap do processo.
+	// stack = Stack do proceso.
+	    	
+	// #bugbug
+	// Me parece que isso considera que o processo só tem um programa.
+	// Como ficaria no caso do processo ter vários programas.
+	// Podemos fazer aqui só as informações para o programa principal.
+	// Para os outros programas teremos apenas uma lista de ponteiros
+	// para as estruturas que gerenciam eles.
 
-	/*
-	 * Page directory information:
-	 * ==========================
-	 *
-	 *     Todo processo deve ter seu próprio diretório.
-	 *
-	 *     As threads usam o diretório do processo ao qual pertencem.
-	 *     O endereço do diretório é carregado no CR3.
-	 *
-	 */
+	// ORDEM: 
+	// O que segue é referenciado durante o processo de task switch.
+
 	
-	
+	// Page directory information:
+	// ==========================
+	//     Todo processo deve ter seu próprio diretório.
+	//     As threads usam o diretório do processo ao qual pertencem.
+	//     O endereço do diretório é carregado no CR3.
+	 
 	unsigned long DirectoryVA;                  
 	unsigned long DirectoryPA;
 	
-	
-    struct page_directory_d *page_directory;  //ponteiro para a estrutura do diretório do processo.
+	//ponteiro para a estrutura do diretório de páginas do processo.
+    struct page_directory_d *page_directory;  
 
-	//
-	// Teste: Blocos de memoria usados pelo processo.
-	//
 	
-	//struct mmblock_d mmBlocks[32];    //estruturas 
-	//unsigned long mmblockList[32];    //ponteiros para estruturas.
-	
-	//Muitas informações sobre a memória usada pro um processo.
-	//struct process_memory_info_d *processMemoryInfo;
-	
+	// #IMPORTANTE
+	// Com base na origem da imagem e no seu tamanho podemos
+	// determinar a quantidade de páginas que o programa principal do processo
+	// está usando.
+	// Como o programa foi caregado pelo boot loader, ainda não temos a lista
+	// de páginas usadas por esse processo.
+	// #obs: A lista é grande. Então devemos fazer apenas um ponteiro para 
+	// ela, ou colocarmos um ponteiro de estrutura head de uma lista encadeada.
+	// #importante: esssa estrutura tem que ser simples. Com poucos elementos.
 	
 	//Image support.
 	
@@ -497,6 +497,20 @@ struct process_d
 	unsigned long StackOffset;    //Deslocamento da pilha em relação ao início do kernel.	
 	//struct stack_d *processStack;  //@todo: Criar essa estrutura.
 
+	// Teste: 
+	// Blocos de memoria usados pelo processo.
+	
+	//struct mmblock_d mmBlocks[32];    //estruturas 
+	//unsigned long mmblockList[32];    //ponteiros para estruturas.
+	
+	//Muitas informações sobre a memória usada pro um processo.
+	//struct process_memory_info_d *processMemoryInfo;
+	
+	
+	//
+	//  Environment.
+	//
+	
 	
 	//IOPL of the task. (ring).
 	unsigned long iopl;      
@@ -505,87 +519,9 @@ struct process_d
     //Determina as camadas de software que um processo terá acesso irrestrito.	
 	process_permition_level_t ppl;
 
-	//
-	// Os procedimentos são pontos de entrada npos processos via iret.
-	// o kernel utiliza eles para se comunicar com os processos.
-	// Podemos ter vários pontos de entrada em um processo.
-	// Configurados de diversas maneiras. Esses procedimentos ipc
-	// são configurados pelo próprio processo na hora de sua inicialização.
-	// Se o processo não configurá-los, o valor atribuído será NULL e eles
-	// ficarão inválidos. Mas um programa não será fechado se perdermos
-	// a referencia à um de seus procedimentos do tipo ipc. esses procedimentos
-	// poderão ser configurados pelo programa a qualquer hora, em tempo de execução.
-	// Já um procedimento de janela não pode ser fechado. Perdendo o procedimento de
-	//  janela o programa fica comprometido, perdendo completamente o controle
-	// que ele tinha sobre si próprio, ficando por conta do sistema operacional
-	// todo o controle sobre o programa agora sem procedimento de janela.
-	//
-	
-	
-	//
-	// Procedimentos IPC;    
-	//
 
-	//O endereço do procedimento de ipc de um processo.
-	unsigned long ipc_procedure;
-	unsigned long ipc_procedureEx;	
-	//@todo: Criar esses e outros pontos de entrada nos processos.
-	//unsigned long ipc_procedureFast;             //Só um argumento.
-	//unsigned long ipc_procedureInitializeDriver; //Só um argumento.	
-	//...
-	
-	//
-	// Os procedimentos de janelas atual somente sobre a janela
-	// que receber ou pegar a mensagem via chamada de procedimento.
-	// Normalmente a janela ativa do programa tem o procedimento de
-    // janela que comanda tudo dentro do programa; Se fecharmos
-    // a janela ativa, perdemos a estrutura de janela que nos
-    // dá acesso ao procedimento de janela que controla o programa
-    // então o programa deve ser fechado.
-	// Um procedimento de janela não pode ser fechado. Perdendo o procedimento de
-	//  janela o programa fica comprometido, perdendo completamente o controle
-	// que ele tinha sobre si próprio, ficando por conta do sistema operacional
-	// todo o controle sobre o programa agora sem procedimento de janela.	
-	//
-	
-	//
-	// Procedimentos de janela.
-	//
-	
-	//Endereço do procedimento de janela da processo. 
-	unsigned long procedure;  
-	
-	//Argumentos para o procedimento de janela.
-	struct window_d *window;    //arg1.
-	int msg;                    //arg2.
-	unsigned long long1;        //arg3.
-	unsigned long long2;        //arg4.
-
-		
-	//struct process_d *callerq;	   //head of list of procs wishing to send.
-    //struct process_d *sendlink;    //link to next proc wishing to send.
-    //void *message_bufffer;		   //pointer to message buffer.
-    //int getfrom_pid;		       //from whom does process want to receive.
-    //int sendto_pid;	               //pra quem.
-	
-	//
-	// @todo: Criar uma fila de mensagens.
-	//
-	
 
 	
-	//@todo: mailBox, sockets ... (IPC).
-	
-	
-    //
-	// @todo: Criar fila de mensagens do processo.
-	//        Pois cada processo tem sua fila de mensagens.
-	//        O procedimento de janela do processo pega mensagens aqui.
-    //
-	
-	//unsigned char process_message_queue[8];
-	
-
 	/*
 	 * Priority.
      * ========
@@ -739,10 +675,11 @@ struct process_d
 	//generic bytes i/o. contagem de bytes para operações genéricas de i/o, excluindo disco.
 	
 
-	//wait4pid: 
-    //O processo pode estar esperando um processo filho fechar. 
-	//@todo: usar 'int'.
-	unsigned long wait4pid; 
+	// wait4pid: 
+    // O processo esta esperando um processo filho fechar.
+	// Esse é o PID do processo que ele está esperando fechar.
+	
+	pid_t wait4pid;
 	
 	//Motivo do processo fechar.
 	int exit_code;
@@ -755,24 +692,29 @@ struct process_d
 	//struct thread_d *sendersList; //Lista encadeada de processos querendo enviar mensagem
 	//struct thread_d *nextSender;  //próximo processo a enviar mensagem.
 	
-    //
-    //Next.
-    //	
-	
-    //PID do próximo processo. 
-    //(@todo: usar next_process). 	
-	int next_task;  //@todo deletar isso.
-    //int next_process;
-    //struct process_d *NextInitialized;    //Próximo pronto pra rodar.		
-	//struct process_d *Parent;
-	//struct process_d *Prev;
-	
-	
-	//Signal
+	//
+	//   ## IPC ##
+	//
+
+	// Signal	
 	unsigned long signal;
-	unsigned long signalMask;
+	unsigned long signal_mask;
 	
-	struct process_d *Next;
+	//Argumentos para o procedimento de janela.
+	struct window_d *window;    //arg1.
+	int msg;                    //arg2.
+	unsigned long long1;        //arg3.
+	unsigned long long2;        //arg4.		
+	
+	// diálogo com o processo.
+	// importante no caso de servidores e drivers
+	unsigned long dialog_address;
+			
+    // Navigation:
+    // Prev and Next.
+
+	struct process_d *prev;	
+	struct process_d *next;
 };
 
 //Os quatro principais processos.

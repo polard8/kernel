@@ -86,8 +86,10 @@ struct usession_d
 	
     struct usession_d *next;	
 };
-struct usession_d *DefaultUserSession;
 struct usession_d *CurrentUserSession;
+
+//#tests;
+struct usession_d *DefaultUserSession;
 struct usession_d *usession0;
 //struct usession_d *USession;
 //struct usession_d *UserSession;
