@@ -1,8 +1,8 @@
 /*
- * File: socket.h
+ * File: nsocket.h
  *
  * Descrição:
- *     Header para gerenciamento de sockets.
+ *     Header para gerenciamento de sockets. (nao e' libc)
  *
  *    "Um soquete é composto por um endereço de ip,
  *     concatenado com um número de porta, ip_addres:port"

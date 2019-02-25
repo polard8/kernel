@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 17
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
+EXTRAVERSION = -rc1
 NAME = ?
 
 #todo:
@@ -65,6 +65,7 @@ stdio.o \
 stdlib.o \
 string.o \
 unistd.o \
+socket.o \
 tty.o \
 init.o \
 logon.o \
@@ -111,7 +112,7 @@ sem.o \
 modules.o \
 nicintel.o \
 network.o \
-socket.o \
+nsocket.o \
 sm.o \
 channel.o \
 ipc.o \
@@ -254,6 +255,7 @@ compile-kernel:
 	gcc -c kernel/execve/crts/klibc/stdio.c   -I include/ $(CFLAGS) $(DEFINES) -o stdio.o
 	gcc -c kernel/execve/crts/klibc/string.c  -I include/ $(CFLAGS) $(DEFINES) -o string.o
 	gcc -c kernel/execve/crts/klibc/unistd.c  -I include/ $(CFLAGS) $(DEFINES) -o unistd.o
+	gcc -c kernel/execve/crts/klibc/socket.c   -I include/ $(CFLAGS) $(DEFINES) -o socket.o	
 
 	#dd
 	gcc -c kernel/execve/dd/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
@@ -300,7 +302,7 @@ compile-kernel:
 	# dd/network
 	gcc -c kernel/execve/dd/network/intel.c    -I include/ $(CFLAGS) $(DEFINES) -o nicintel.o
 	gcc -c kernel/execve/dd/network/network.c  -I include/ $(CFLAGS) $(DEFINES) -o network.o
-	gcc -c kernel/execve/dd/network/socket.c   -I include/ $(CFLAGS) $(DEFINES) -o socket.o
+	gcc -c kernel/execve/dd/network/nsocket.c   -I include/ $(CFLAGS) $(DEFINES) -o nsocket.o
 
 	# dd/tty
 	gcc -c kernel/execve/dd/tty/tty.c  -I include/ $(CFLAGS) $(DEFINES) -o tty.o

@@ -42,25 +42,24 @@ all: main.o all-c libc01-link finalize clean
 	@echo "Ok?"
 
 main.o:
-#	gcc  -c  gde.c $(CFLAGS) -o gde.o
+#	nothing...
 
 all-c:
 
 #/ctype
-	gcc  -c  ctype/ctype.c   $(CFLAGS) -I include/ -o ctype.o	
+	gcc  -c  ctype/ctype.c    $(CFLAGS) -I include/ -o ctype.o	
 		
 #/socket
-#	gcc  -c  socket.c    $(CFLAGS) -I include/ -o socket.o
-
+	gcc  -c  socket/socket.c  $(CFLAGS) -I include/ -o socket.o
 
 #/stdio 
-	gcc  -c  stdio/stdio.c   $(CFLAGS) -I include/ -o stdio.o	
+	gcc  -c  stdio/stdio.c    $(CFLAGS) -I include/ -o stdio.o	
 	
 #/stdlib
 	gcc  -c  stdlib/stdlib.c  $(CFLAGS) -I include/ -o stdlib.o	
 	
 #/stubs	
-	gcc  -c  stubs/stubs.c   $(CFLAGS) -I include/ -o stubs.o		
+	gcc  -c  stubs/stubs.c    $(CFLAGS) -I include/ -o stubs.o		
 	
 #/unistd
 	gcc  -c  unistd/unistd.c  $(CFLAGS) -I include/ -o unistd.o	
@@ -72,9 +71,7 @@ all-c:
 	gcc  -c  string.c  $(CFLAGS) -I include/ -o string.o	
 	gcc  -c  time.c    $(CFLAGS) -I include/ -o time.o	
 	gcc  -c  wait.c    $(CFLAGS) -I include/ -o wait.o		
-	
 	gcc  -c  math.c    $(CFLAGS) -I include/ -o math.o			
-	
 #...	
 		
 

@@ -124,7 +124,10 @@ extern void do_executa_new_task();
 
 
 
-// kernel libC support.
+// 
+//  ## klibc ##
+//
+
 //++
 #include <kernel/stddef.h>
 #include <kernel/types.h>
@@ -136,11 +139,9 @@ extern void do_executa_new_task();
 #include <kernel/iso646.h>
 #include <kernel/signal.h>
 #include <kernel/unistd.h>
-
-
-//test
 #include <kernel/fcntl.h>
 #include <kernel/sys/types.h>
+#include <kernel/socket.h>
 //...
 //--
 
@@ -294,7 +295,7 @@ extern void do_executa_new_task();
 #include <kernel/gramado/execve/dd/network/arp.h>
 #include <kernel/gramado/execve/dd/network/intel.h>       //intel nic - network interface controller.
 #include <kernel/gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
-#include <kernel/gramado/execve/dd/network/socket.h>      //(network) Sockets info. (sw)
+#include <kernel/gramado/execve/dd/network/nsocket.h>     //(network) Sockets info. (sw) (not libc)
 #include <kernel/gramado/execve/dd/network/ip.h>          //(network) IP info.      (sw)
 #include <kernel/gramado/execve/dd/network/channel.h>     //(network) Channel       (sw)
 #include <kernel/gramado/execve/dd/network/client.h>      //(network) Client process support. 

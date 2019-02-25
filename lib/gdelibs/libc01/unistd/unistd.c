@@ -209,18 +209,6 @@ int nice(int inc)
 };
 
 
-//shutdown	- shut down part of a full-duplex connection
-int shutdown ( int	sockfd,	int how )
-{
-	return -1; //#todo
-};
-
-	 
-ssize_t send ( int sockfd, const void *buf, size_t len, int flags )
-{
-	return -1; //#todo
-};
-
 
 int pause(void)
 {
@@ -245,18 +233,6 @@ int link(const char *oldpath, const char *newpath)
 	return -1; //#todo
 };	
 
-
-//socket -	create an endpoint for communication
-int socket ( int domain, int type, int protocol )
-{
-	return -1; //#todo
-}
-
-
-ssize_t recv ( int sockfd,	void *buf, size_t len, int flags )
-{
-	return -1; //#todo
-}
 
 
 int mlock(const void *addr, size_t len)

@@ -1,9 +1,9 @@
 
-# Gramado Kernel Shell.
-# A mini-shell to setup and test the kernel functionalities.
-
-#history:
-#2019 - Created by Fred Nora and Luciano Gonçalez.
+# Compiling Gramado Core Shell.
+# Shell/GWS
+# 
+# history:
+#     2019 - Created by Fred Nora and Luciano Gonçalez.
 
 
 # todo:
@@ -15,7 +15,7 @@ VERSION = 0
 PATCHLEVEL = 1
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = gramado Kernel Shell
+#NAME = Gramado Core Shell
 
 
 CFLAGS = -m32 \
@@ -31,14 +31,6 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fno-stack-protector \
 	-s
-	
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
-
-
-# desejamos tirar essa flag.
-#	-fleading-underscore \
 
 
 LIBC    = ../../../../lib/gdelibs/libc01/include/
@@ -79,7 +71,9 @@ line.o \
 rect.o \
 char.o \
 gws.o \
-stubs.o    
+stubs.o \
+socket.o    
+
 
 
 
@@ -131,6 +125,8 @@ all-c:
 	cp $(LIBCOBJ)/unistd.o .
 	
 	cp $(LIBCOBJ)/stubs.o .
+	
+	cp $(LIBCOBJ)/socket.o .
 
 	#gws cancelado
 #	cp $(GWSOBJ)/pixel.o   .

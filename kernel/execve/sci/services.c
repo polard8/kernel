@@ -266,15 +266,29 @@ void *services ( unsigned long number,
 	{
 	    return (void *) serviceCreateWindow ( (char *)  arg2 );
 	}
+
+	
+	// 7000 ~ 7999
+	// Suporte as chamadas de socket da libc.
+	// crts/klibc/socket.c
+	if ( number >= 7000 && number < 8000 )
+	{
+		return (void *) socket_services ( (unsigned long) number, (unsigned long) arg2, 
+						    (unsigned long) arg3, (unsigned long) arg4 );
+	};
+
 	
 	
 	// 8000 ~ 8999
-	//Chama os serviços oferecidos pelos servidores do gramado core
+	// Chama os serviços oferecidos pelos servidores do gramado core
+	// pc/ipc/ipccore.c
 	if ( number >= 8000 && number < 9000 )
 	{
 		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
 						    (unsigned long) arg3, (unsigned long) arg4 );
 	};
+	
+	
 	
 	
 	
@@ -1281,28 +1295,32 @@ void *services ( unsigned long number,
 		    return (void *) current_desktop; 
 			break;
 			
-		//160
-		//Criar um socket e retornar o ponteiro para a estrutura.
+		// 160
+		// Criar um socket e retornar o ponteiro para a estrutura.
+		// Gramado API socket support. (not libc)	
 		case 160:
             return (void *) create_socket ( (unsigned long) arg2, (unsigned short) arg3 );
 			break;
 			
-		//161
-        //get socket IP		
+		// 161
+        // get socket IP
+		// Gramado API socket support. (not libc)		
 		case 161:
 		    return (void *) getSocketIP( (struct socket_d *) arg2 );
             break;		
 
-		//162
-        //get socket port		
+		// 162
+        // get socket port		
+		// Gramado API socket support. (not libc)	
 		case 162:
 		    return (void *) getSocketPort( (struct socket_d *) arg2 );
             break;		
 			
-		//163
-        //update socket  
-        //retorno 0=ok 1=fail		
-        case 163:
+		// 163
+        // update socket  
+        // retorno 0=ok 1=fail		
+        // Gramado API socket support. (not libc)	
+		case 163:
             return (void *) update_socket ( (struct socket_d *) arg2, (unsigned long) arg3, (unsigned short) arg4 );
 			break;		
 
@@ -1614,6 +1632,7 @@ void *services ( unsigned long number,
 		    //gwsDisableTextCursor ();
             break;		
 			
+		//246 ~ 249 reservado para libc support.	
 			
 		//246	
 		//fopen()	
@@ -1622,17 +1641,22 @@ void *services ( unsigned long number,
 			return (void *) fopen ( (const char *) arg2, (const char *) arg3 );
 			break;
 			
+		//reservado	
 		case 247:
 			//return (void *) 
 			break;
 			
+		//reservado	
 		case 248:
 			//return (void *) 
 			break;
 			
+		//reservado	
 		case 249:
 			//return (void *) 
 			break;
+			
+			
 			
 		//Info. (250 ~ 255).
 		
