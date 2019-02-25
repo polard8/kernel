@@ -250,51 +250,51 @@ struct process_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
-	
+
 	//object control
 	struct object_d *object;
-	
+
 	//callback ,d.
-	
-    //
+
+	//
 	//  Identificadores.
 	//
-	 
+ 
 	//PID, (Process Identification), 
 	//Número que identifica unicamente um processo.	
 	//PPID, (Parent Process Identification),
-    //Número de identificação do processo pai.	
+	//Número de identificação do processo pai.	
 	//UID, (User Identification),
 	//Número de identificação do usuário que criou o processo.	
 	//GID, (Group Identification),
 	//Número do grupo do dono do processo.
+
+	pid_t pid;
+	pid_t ppid;
 	
-	int pid;	
-	int ppid;                
-	int uid;
-	int gid;
-	
-	
+	uid_t uid;
+	gid_t gid;
+
 	// #importante
 	// TABELA DE ARQUIVOS ABERTOS PELO PROCESSO.
 	// Tem necessariamente um limite.
-	
+
 	unsigned long Streams[NUMBER_OF_FILES];
-	
+
 	// State.
 	// flag ?
 	process_state_t state; 
-	
-    //plano de execução.
+
+	//plano de execução.
 	int plane;
 
 	// error.
-    //unsigned long error; 	
+	//unsigned long error; 	
 
 	int used;     
-    int magic;    
-	
-	
+	int magic;    
+
+
 	// @todo:
 	// +name     (Nome=EXEMPLO.BIN)
 	// +pathname (Caminho=/root/boot/EXEMPLO.BIN)
@@ -305,10 +305,10 @@ struct process_d
 	char *name;                    //Nome do processo. 
 	unsigned long name_address;    //@todo: não usar isso.
 
-	
+
 	//Se o processo é ou não um processo de terminal.
 	//que aparece no terminal.
-	
+
 	int terminal;
 	
 	//#importante
@@ -317,57 +317,56 @@ struct process_d
 	
 	int terminal_id;
 	
-    //Importante:
+	//Importante:
 	//isso substituirá a flag 'terminal'
-    //APPMODE_TERMINAL = O kernel cria uma estrutura de terminal 
-    //com uma janela associada a essa estrutura, essa janela será a 
-    //janela de terminal para o aplicativo.
-    //APPMODE_WINDOW = O kernel não cria estrutura de terminal para 
-    //esse processo e o processo criará janelas.
+	//APPMODE_TERMINAL = O kernel cria uma estrutura de terminal 
+	//com uma janela associada a essa estrutura, essa janela será a 
+	//janela de terminal para o aplicativo.
+	//APPMODE_WINDOW = O kernel não cria estrutura de terminal para 
+	//esse processo e o processo criará janelas.
 	
 	appmode_t appMode;
-	
+
 	//
 	//    ****  Banco de dados ****
 	//
-	
+
 
 	// Obs: 
 	// Um processo é um cliente de banco de dados.
 	// Um processo tem contas conjuntas e pessoais.
-    // Um processo poderá compartilhar esses objetos.	
+	// Um processo poderá compartilhar esses objetos.	
 
 	//
 	// BANCOS
 	//
-	
+
 	//Acesso ao banco de dados do kernel. (não é uma lista).	
 	struct bank_d *kdb;
-	
+
 	//Lista de acessos à bancos de contas conjuntas.
 	struct bank_d *gdbListHead;
-	
+
 	//Lista de acessos à bancos de contas pessoais.
 	struct bank_d *ldbListHead;
-	
-	
+
+
 	//
 	// CONTAS
 	//
-	
+
 	//Lista de contas conjuntas que o processo tem.
 	struct aspace_d *aspaceSharedListHead;
-	
+
 	//Lista de contas pessoais que o processo tem.
 	struct aspace_d *aspacePersonalListHead;
 
-
 	//Lista de contas conjuntas que o processo tem.
 	struct dspace_d *dspaceSharedListHead;
-	
+
 	//Lista de contas pessoais que o processo tem.
 	struct dspace_d *dspacePersonalListHead;
-	
+
 	//Testing...
 	//Process Page Table. (PPT)
 	//Quais são as páginas que o processo está usando e onde elas estão.
@@ -381,60 +380,59 @@ struct process_d
 	// Obs: O kernel deve manter uma lista de frames que podem ser usados.
 	//      na hora de criar uma pagetable pra um page directory de um processo
 	// é necessário pegar na lista de frames 1024 frames livres ou quanto for necessário.
-	//
-	
+
 	// **** IMPORTANTE ****
 	// Uma lista de framepool. (Lista de partições de memória física).
 	// Cada framepool é composto de 1024 frames.
 	// Obs: *IMPORTANTE: Quando um processo é criado, pelo menos um framepool 
 	// deve ser atribuído a ele, mesmo antes de mapear os frames desse 
 	// framepool em alguma pagetable do page directory do processo.
-	//
+
 	struct frame_pool_d *framepoolListHead;
-	
-	
+
+
 	//Quantidade de memória física usada pelo processo que não pode ser compartilhada
 	//com outros processos. (em KB).
 	unsigned long private_memory_size;
-	
+
 	//Quantidade de memória física usada pelo processo que pode ser compartilhada
 	//com outros processos. (em KB).
 	unsigned long shared_memory_size;
-	
+
 	//Quantidade de memória usada por um processo em determinado espaço de tempo.
 	// workset = (private + shared);
 	unsigned long workingset_size;
 	unsigned long workingset_peak_size;	
-	
+
 
 	//Qualquer pagefault deve ser registrada na estrutura do processo corrente.
 	//?? não seria na thread ??
 	unsigned long pagefaultCount;
 	//...
-	
+
 	//ticks running ..
-    //unsigned long Cycles;  // ?? double ??  
+	//unsigned long Cycles;  // ?? double ??  
 	
 	//quantas vezes no total o dispacher atuou sobre ele.
 	//Essa contagem não deve ser feita na thread.
 	//Ou colocaremos aqui o total de todos os context switches das threads ??
-    //unsigned long ContextSwitches;   
-	
+	//unsigned long ContextSwitches;   
+
 	//working set support.
 	//Quantas trocas de context sofreu durante um determinado tempo de análise.
 	//Esse deve ser o mesmo tempo de análise usado para calcular o working set.
-	
-    //unsigned long ContextSwitchesDelta;  
 
-	
+	//unsigned long ContextSwitchesDelta;  
+
+
 	//
 	// ## MEMORY SUPPORT ##
 	//
-	
+
 	// image = Imagem do programa principal do processo.
 	// heap  = Heap do processo.
 	// stack = Stack do proceso.
-	    	
+
 	// #bugbug
 	// Me parece que isso considera que o processo só tem um programa.
 	// Como ficaria no caso do processo ter vários programas.
@@ -451,14 +449,14 @@ struct process_d
 	//     Todo processo deve ter seu próprio diretório.
 	//     As threads usam o diretório do processo ao qual pertencem.
 	//     O endereço do diretório é carregado no CR3.
-	 
+ 
 	unsigned long DirectoryVA;                  
 	unsigned long DirectoryPA;
-	
-	//ponteiro para a estrutura do diretório de páginas do processo.
-    struct page_directory_d *page_directory;  
 
-	
+	//ponteiro para a estrutura do diretório de páginas do processo.
+	struct page_directory_d *page_directory;  
+
+
 	// #IMPORTANTE
 	// Com base na origem da imagem e no seu tamanho podemos
 	// determinar a quantidade de páginas que o programa principal do processo
@@ -468,9 +466,9 @@ struct process_d
 	// #obs: A lista é grande. Então devemos fazer apenas um ponteiro para 
 	// ela, ou colocarmos um ponteiro de estrutura head de uma lista encadeada.
 	// #importante: esssa estrutura tem que ser simples. Com poucos elementos.
-	
+
 	//Image support.
-	
+
 	unsigned long Image;          //Base da imagem do processo.
 	unsigned long ImageSize;      //Tamanho da imagem do processo.
 
@@ -488,9 +486,9 @@ struct process_d
 	unsigned long HeapLastSize;    //Último tamanho alocado..	
 	//struct heap_d *processHeap;  //@todo: Usar essa estrutura.
 
-	
+
 	//  ## Stack ##
-		
+
 	unsigned long Stack;          //Endereço do início da Stack do processo.
 	unsigned long StackEnd;
 	unsigned long StackSize;      //Tamanho da pilha.	
@@ -499,55 +497,53 @@ struct process_d
 
 	// Teste: 
 	// Blocos de memoria usados pelo processo.
-	
+
 	//struct mmblock_d mmBlocks[32];    //estruturas 
 	//unsigned long mmblockList[32];    //ponteiros para estruturas.
-	
+
 	//Muitas informações sobre a memória usada pro um processo.
 	//struct process_memory_info_d *processMemoryInfo;
-	
-	
+
+
 	//
 	//  Environment.
 	//
-	
-	
+
+
 	//IOPL of the task. (ring).
 	unsigned long iopl;      
 
 	//PPL - (Process Permition Level).(gdef.h)
-    //Determina as camadas de software que um processo terá acesso irrestrito.	
+	//Determina as camadas de software que um processo terá acesso irrestrito.	
 	process_permition_level_t ppl;
 
 
-
-	
 	/*
 	 * Priority.
-     * ========
-     * Um processo tem uma prioridade básica estática e também uma prioridade 
+	 * ========
+	 * Um processo tem uma prioridade básica estática e também uma prioridade 
 	 * atual dinâmica, que pode ser incrementada ou decrementada. Se afastando 
 	 * ou se aproximando da prioridade básica. Isso acontece no OpenVMS e no NT.
 	 */
 	unsigned long base_priority; //básica. 
 	unsigned long priority;      //dinâmica.
-	
+
 	//Que tipo de scheduler o processo utiliza. (rr, realtime ...).
 	//int scheduler_type;    
-	
+
 	/* 
 	 * Temporização da tarefa. 
 	 */
-	
+
 	unsigned long step;               //Quantas vezes a tarefa usou o processador. 
 	unsigned long quantum;            //thread quantum
 	unsigned long timeout;            //Tempo em modo de espera. 
 	unsigned long ticks_remaining;    //rt, quanto tempo a tarefa tem disponível para ser concluida.
-	
+
 	//unsigned long alarm;            //Tempo para o próximo alarme, dado em ticks.
-	
+
 	//unsigned long ThreadQuantum;    //As threads do processo iniciam com esse quantum.
-	
+
 	/*
 	 * QUANTUM:
 	 * =======
@@ -570,62 +566,51 @@ struct process_d
 	 * threadList:
 	 *     Lista com ponteiros de estrutura das threads do processo.
 	 *     O indice dessa lista serve para enumerálas.
-     *	 
+	 *	 
 	 *     @todo: Usar array de estruturas dinâmico. (Alocar).
 	 */ 
 	unsigned long tList[32];      //@todo: deletar  
 	//struct thread_d *Threads;   //@todo: usar esse.
 	//struct thread_d CurrentThread;
-	
+
 	//A primeira thead de uma lista linkada.
 	struct thread_d *threadListHead;
 	//struct thread_d *threadReadyListHead;
 	//...	
-	
 
-    //#importante:
+	//#importante:
 	//thread de input
 	//poderia ser primary_thread ??
 	//mas dessa forma podemos mudar a trhead de input dinamicamente.
+
+	struct thread_d *InputThread;	
+
+	// Tipo 
+	// 0 = cpu-bound
+	// 1 = i/o bound.
+
+	int bound_type;
 	
-    struct thread_d *InputThread;	
-	
-	//@todo: estatística de tempo de uso de cpi.
-	
-	//@todo: Tipo cpu-bound, i/o bound.
-	
-	/*
-	 * window:
-	 *    ID da janela mãe da tarefa.
-	 *    Na estrutura de janela terá várias informações importantes. como:
-	 * procedimento de janela, menus, procedimentos de menus ... etc.
-	 *   @todo: criar variável.
-	 *
-	 */
-	//int window_id;
-	
-	/*
-	 * preempted:
-	 *     flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
-     *	   Uma tarefa de menor prioridade pode deixar o estado running 
-	 * para assumir o estado ready em favor de uma tarefa de maior prioridade
-	 * que assumirá o estado running.
-	 *
-	 */
+	// ??
+	// preempted:
+	//     flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
+	//	   Uma tarefa de menor prioridade pode deixar o estado running 
+	// para assumir o estado ready em favor de uma tarefa de maior prioridade
+	// que assumirá o estado running.
+
 	unsigned long preempted;
-	
+
 	//saved ~ Sinaliza que a tarefa teve o seu contexto salvo.
 	unsigned long saved;
-	
+
 	//??
 	unsigned long PreviousMode;	
-	
-	
+
 	/*
 	 * event: 
 	 *    Tipo de evento que fazem a tarefa entrar em modo de espera. 
 	 */	
-    //event_type_t event;
+	//event_type_t event;
 		
 	
 	/*
@@ -647,15 +632,15 @@ struct process_d
 	//lista de arquivos ??
 	//fluxo padrão. stdio, stdout, stderr
 	//unsigned long iob[8];
-    
+
 	//ponteiros para as streams do fluxo padrão.
 	unsigned long standard_streams[3];
 	
 	struct _iobuf *root;	// 4 root directory
 	struct _iobuf *pwd;	    // 5 (print working directory) 
 	//...
-		
-		
+
+
 	//#todo: esse tamanho deve ser igual ao encontrado no módulo /fs.	
 	char pwd_string[32];	
 	
@@ -676,9 +661,9 @@ struct process_d
 	
 
 	// wait4pid: 
-    // O processo esta esperando um processo filho fechar.
+	// O processo esta esperando um processo filho fechar.
 	// Esse é o PID do processo que ele está esperando fechar.
-	
+
 	pid_t wait4pid;
 	
 	//Motivo do processo fechar.
@@ -688,10 +673,10 @@ struct process_d
 	// List of terminated childs
 	struct process_d *zombieChildListHead;           
 	
-    //?? mensagens pendentes.	
+	//?? mensagens pendentes.	
 	//struct thread_d *sendersList; //Lista encadeada de processos querendo enviar mensagem
 	//struct thread_d *nextSender;  //próximo processo a enviar mensagem.
-	
+
 	//
 	//   ## IPC ##
 	//
@@ -699,19 +684,19 @@ struct process_d
 	// Signal	
 	unsigned long signal;
 	unsigned long signal_mask;
-	
+
 	//Argumentos para o procedimento de janela.
 	struct window_d *window;    //arg1.
 	int msg;                    //arg2.
 	unsigned long long1;        //arg3.
 	unsigned long long2;        //arg4.		
-	
+
 	// diálogo com o processo.
 	// importante no caso de servidores e drivers
 	unsigned long dialog_address;
 			
-    // Navigation:
-    // Prev and Next.
+	// Navigation:
+	// Prev and Next.
 
 	struct process_d *prev;	
 	struct process_d *next;
