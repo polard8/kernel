@@ -1,5 +1,5 @@
 /*
- * File: pc\process.c 
+ * File: pc/process.c 
  *
  * Descrição:
  *     Gerenciamento de processos.
@@ -307,28 +307,26 @@ done:
  * system call (serviço 88.)
  * 
  */
-int processTesting(int pid)
-{
+
+int processTesting (int pid){
+	
 	struct process_d *P;
 	
-	P = (void*) processList[pid];
+	P = (void *) processList[pid];
 	
-	if( (void*) P == NULL )
+	if ( (void *) P == NULL )
 	{
 		return (int) 0;
-	}
-	else
-	{		
+	}else{		
 		
-		if( P->used == 1 && P->magic == 1234){
+		if ( P->used == 1 && P->magic == 1234 ){
 	        return (int) 1234;			
 		}
 	};
 	
-fail:
-	return (int) 0;
+//fail:
+	return 0;
 }
-
 
 
 /*
@@ -338,8 +336,9 @@ fail:
  * no PCB do processo.
  *     @todo: Rotinas envolvendo sinais devem ir para outro arquivo.
  */
-int processSendSignal(struct process_d *p, unsigned long signal)
-{
+
+int processSendSignal (struct process_d *p, unsigned long signal){
+	
 	//SIGNAL_COUNT_MAX
 	
 	//Limit
@@ -347,7 +346,8 @@ int processSendSignal(struct process_d *p, unsigned long signal)
 	//	return 1;
 	//}
 	
-	if(signal == 0){
+	if (signal == 0)
+	{
 		return 1;
 	};
 	
@@ -356,18 +356,20 @@ int processSendSignal(struct process_d *p, unsigned long signal)
 	//	return 1;
 	//}		
 	
-ok:	
+//ok:	
 	//Ok
-	if( (void*) p != NULL ){	
+	if ( (void*) p != NULL )
+	{	
 		p->signal = (unsigned long) signal;
 		return 0; //(int) signalSend(p,signal);
 	}
 	
 	//...
 	
-fail:
+//fail:
+	
 	return 1;
-};
+}
 
 
 /*
@@ -539,22 +541,22 @@ done:
  * @todo: 
  * Aumetar o número de argumentos para dar o suporte necessário para 
  * criar um processo do jeito que for necessário
- *
  */
-struct process_d *create_process( struct wstation_d *window_station,
-                                  struct desktop_d *desktop,
-                                  struct window_d *window,
-                                  unsigned long init_eip, 
-                                  unsigned long priority, 
-								  int ppid, 
-								  char *name, 
-								  unsigned long iopl,
-								  unsigned long directory_address )
+
+struct process_d *create_process ( struct room_d *room,
+                                   struct desktop_d *desktop,
+                                   struct window_d *window,
+                                   unsigned long init_eip, 
+                                   unsigned long priority, 
+                                   int ppid, 
+                                   char *name, 
+                                   unsigned long iopl,
+                                   unsigned long directory_address )
 {
-	int PID;
-	struct process_d *Process;
-	
-	// Para a entrada vazia no array de processos.
+    int PID;
+    struct process_d *Process;
+
+    // Para a entrada vazia no array de processos.
     struct process_d *Empty;      	
 
     // @todo:
@@ -636,7 +638,7 @@ get_next:
 		processNewPID = (int) PID;
 		
 		//Identificadores.
-		Process->pid  = (int) PID;                    //PID.
+		Process->pid  = (int) PID;                  //PID.
         Process->ppid = (int) ppid;                 //PPID. 
 		Process->uid  = (int) GetCurrentUserId();   //UID. 
         Process->gid  = (int) GetCurrentGroupId();  //GID. 
@@ -777,7 +779,7 @@ get_next:
         // endereço virtual do pool de heaps.
         // os heaps nessa área serão dados para os processos.
 		// base + (n*size)
-		if(g_heap_count < 0 || g_heap_count >= g_heap_count_max)
+		if (g_heap_count < 0 || g_heap_count >= g_heap_count_max)
 		{
 			//erro 
 			printf("create_process: g_heap_count limits");
@@ -789,7 +791,6 @@ get_next:
 		Process->Heap = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
 		Process->HeapSize = (unsigned long) g_heap_size;
 		Process->HeapEnd = (unsigned long) (Process->Heap + Process->HeapSize); 
-		
 		
 		g_heap_count++;
 		
@@ -813,6 +814,7 @@ get_next:
 		// Tamanho da pilha, dada em KB.
 		// #importante: Deslocamento do endereço do início da pilha em relação 
 		// ao início do processo. 
+		
 		Process->Stack = UPROCESS_DEFAULT_STACK_BASE;   
 	    Process->StackEnd = 0; // @todo: (UPROCESS_DEFAULT_STACK_BASE+UPROCESS_DEFAULT_STACK_SIZE);
 		Process->StackSize = (UPROCESS_DEFAULT_STACK_SIZE/1024);   	
@@ -917,7 +919,7 @@ get_next:
 		
         //Process->processDesktop
 		//Process->processUserSession
-		//Process->window_station
+		//Process->room
 		//Process->desktop
 		
 		//Process->base_priority

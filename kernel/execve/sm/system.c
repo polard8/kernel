@@ -796,7 +796,7 @@ void *systemIoCpu( int number,
 		
         //Process support:
         case 5:
-            return (void*) create_process( (struct wstation_d *) 0,
+            return (void*) create_process( (struct room_d *) 0,
                                            (struct desktop_d  *) 0,
                                            (struct window_d *) 0,
                                            (unsigned long) arg1, 
@@ -917,55 +917,55 @@ void *systemIoCpu( int number,
 	        break;
 	
 	    case 30:
-	        return (void *) GetThreadDirectory( (struct thread_d *) arg1);
+	        return (void *) GetThreadDirectory ( (struct thread_d *) arg1);
 	        break;
 	
 	    //?? Quem tem directory é o processo.
 	    case 31:
-	        SetThreadDirectory( (struct thread_d *) arg1, (unsigned long) arg2);
+	        SetThreadDirectory ( (struct thread_d *) arg1, (unsigned long) arg2 );
 	        break;
 		
 	    case 32:	    
-		    return (void*) create_thread( (struct wstation_d *) 0,
-                                      (struct desktop_d  *) 0,
-                                      (struct window_d *) 0,
-                                      (unsigned long) arg1, 
-                                      (unsigned long) arg2, 
- 									  (int) arg3, 
-									  (char *) arg4);
+		    return (void *) create_thread ( (struct room_d *) 0,
+                                            (struct desktop_d  *) 0,
+                                            (struct window_d *) 0,
+                                            (unsigned long) arg1, 
+                                            (unsigned long) arg2, 
+ 									        (int) arg3, 
+									        (char *) arg4);
             break;
 
 
         case 33:
-            return (void *) GetCurrentThread();
+            return (void *) GetCurrentThread ();
 	        break;
 	
 	    case 34:
-	        return (void *) FindReadyThread();
+	        return (void *) FindReadyThread ();
 	        break;
 	
 	    case 35:
-	        return (void *) GetThreadState( (struct thread_d *) arg1);
+	        return (void *) GetThreadState ( (struct thread_d *) arg1);
 	        break;
 	
 	    case 36:
-	        return (void *) GetThreadType( (struct thread_d *) arg1);
+	        return (void *) GetThreadType ( (struct thread_d *) arg1);
 	        break;
 	
 	    //Dispatch a thread.
 	    case 37: 
-		    dispatch_thread( (struct thread_d *) arg1); 
+		    dispatch_thread ( (struct thread_d *) arg1); 
 			break;
 	
 	    //Set thread priority.
 	    case 38: 
-		    set_thread_priority( (struct thread_d *) arg1, (unsigned long) arg2); 
+		    set_thread_priority ( (struct thread_d *) arg1, (unsigned long) arg2); 
 			break; 
 	
 	    //...
 	
 		default:
-		    return systemNull();
+		    return systemNull ();
 		    break;
 		
 	}; //fim do switch.
@@ -980,6 +980,7 @@ done:
 //    serviços do microkernel referentes à dma.
 // //     Especialmente transferencia RAM <--> Devices.
 //
+
 void *systemIoDma( int number, 
                    unsigned long arg1,  
 		           unsigned long arg2,  

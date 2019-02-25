@@ -57,6 +57,7 @@ done:
 };
 */
 
+
 /*
  ***********************************************************************
  * create_thread:
@@ -82,16 +83,17 @@ done:
  * 2016, Revisão - FN.
  */		
  
-struct thread_d *create_thread( struct wstation_d *window_station,
-                                    struct desktop_d  *desktop,
-                                    struct window_d *window,
-                                    unsigned long init_eip, 
-                                    unsigned long init_stack, 
-									int pid, 
-									char *name)
+struct thread_d *create_thread ( struct room_d *room,
+                                 struct desktop_d  *desktop,
+                                 struct window_d *window,
+                                 unsigned long init_eip, 
+                                 unsigned long init_stack, 
+								 int pid, 
+								 char *name)
 {	
     //Structures.	
 	struct process_d *Process;    //Process.
+	
 	struct thread_d *Thread;      //Thread.
 	struct thread_d *Empty;       //Empty slot.
 
@@ -149,12 +151,14 @@ struct thread_d *create_thread( struct wstation_d *window_station,
 	
 	//Alocando memória para a estrutura da thread.
 	//Obs: Estamos alocando memória dentro do heap do kernel.
-	Thread = (void *) malloc( sizeof(struct thread_d) );	
+	
+	Thread = (void *) malloc ( sizeof(struct thread_d) );	
 	
 	if ( (void *) Thread == NULL )
 	{
 	    printf("pc-action-thread-create_thread: Thread\n");
 		die();
+		
 	}else{  
 	    //Indica à qual proesso a thread pertence.
 	    //Thread->process = (void*) Process;

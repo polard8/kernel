@@ -17,15 +17,16 @@ int sys_getppid();    //Get parent process Identification.
 
 int sys_fork();
 void sys_exit_process(int pid, int code);
-void *sys_create_process( struct wstation_d *window_station,
-                          struct desktop_d  *desktop,
-                          struct window_d *window,
-                          unsigned long init_eip, 
-                          unsigned long priority, 
-					      int ppid, 
-					      char *name, 
-						  unsigned long iopl,
-                          unsigned long directory_address  );
+
+void *sys_create_process ( struct room_d *room,
+                           struct desktop_d  *desktop,
+                           struct window_d *window,
+                           unsigned long init_eip, 
+                           unsigned long priority, 
+					       int ppid, 
+					       char *name, 
+						   unsigned long iopl,
+                           unsigned long directory_address );
 						  
 //
 // THREADS
@@ -33,7 +34,8 @@ void *sys_create_process( struct wstation_d *window_station,
 
 void sys_dead_thread_collector();
 void sys_exit_thread(int tid);
-void *sys_create_thread( struct wstation_d *window_station,
+
+void *sys_create_thread( struct room_d *room,
                          struct desktop_d  *desktop,
                          struct window_d *window,
                          unsigned long init_eip, 

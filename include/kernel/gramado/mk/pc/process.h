@@ -245,6 +245,7 @@ typedef enum {
  *          O kernel precisa alocar memória para Heap e Stack dos processos.
  *          //...
  */
+
 struct process_d 
 {
 	object_type_t objectType;
@@ -648,6 +649,8 @@ struct process_d
 
     //#importante:
 	//thread de input
+	//poderia ser primary_thread ??
+	//mas dessa forma podemos mudar a trhead de input dinamicamente.
 	
     struct thread_d *InputThread;	
 	
@@ -693,12 +696,12 @@ struct process_d
 	 * Windows. (Janelas)
 	 */
 	
-	//user session, window station e desktop. 
-	//Obs: A estrutura de user session contem muitas informações.
-	//@todo: usar processWindowStation processDesktop;
-	//struct usession_d *processUserSession;
-	struct wstation_d *window_station;    //Window Station do processo.  
-	struct desktop_d *desktop;           //Desktop do processo.        
+
+	//User session, room (window station), desktop.
+	
+	struct usession_d *usession;    //user session
+	struct room_d *room;            //room (Window Station) do processo.  
+	struct desktop_d *desktop;      //Desktop do processo.        
 	
 
 	//
@@ -919,7 +922,8 @@ void show_process_information ();
 //isso será usado por fork.
 int processCopyProcess ( int p1, int p2 );
 
-struct process_d *create_process ( struct wstation_d *window_station,
+
+struct process_d *create_process ( struct room_d *room,
                                    struct desktop_d  *desktop,
                                    struct window_d *window,
                                    unsigned long init_eip, 

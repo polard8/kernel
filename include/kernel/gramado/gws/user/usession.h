@@ -35,8 +35,8 @@ unsigned long usersession_start;
  
 /*
  * User section structure (u.session)
- * 
  */ 
+
 struct usession_d
 {
 	object_type_t objectType;

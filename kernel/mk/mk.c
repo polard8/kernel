@@ -282,15 +282,15 @@ void sys_exit_thread (int tid){
  *     Create process system interface.
  */
 
-void *sys_create_process( struct wstation_d *window_station,
-                          struct desktop_d  *desktop,
-                          struct window_d *window,
-                          unsigned long init_eip, 
-                          unsigned long priority, 
-					      int ppid, 
-					      char *name,
-						  unsigned long iopl, 
-						  unsigned long directory_address )
+void *sys_create_process ( struct room_d *room,
+                           struct desktop_d  *desktop,
+                           struct window_d *window,
+                           unsigned long init_eip, 
+                           unsigned long priority, 
+					       int ppid, 
+					       char *name,
+						   unsigned long iopl, 
+						   unsigned long directory_address )
 {
     //
 	// @todo: Create some interface routine.
@@ -299,9 +299,9 @@ void *sys_create_process( struct wstation_d *window_station,
 	//@todo: Filtros para ponteiros NULL.
 	
 	// Create process.
-    create_process( window_station, desktop, window, init_eip, 
-	                priority, ppid, name, iopl, 
-					(unsigned long) directory_address);
+    create_process ( room, desktop, window, init_eip, 
+	                 priority, ppid, name, iopl, 
+					 (unsigned long) directory_address);
 	
 	//@todo: Return da função create.
 	
@@ -314,7 +314,7 @@ void *sys_create_process( struct wstation_d *window_station,
  * sys_create_thread:
  *     Create thread system interface.
  */
-void *sys_create_thread( struct wstation_d *window_station,
+void *sys_create_thread( struct room_d *room,
                          struct desktop_d  *desktop,
                          struct window_d *window,
                          unsigned long init_eip, 
@@ -330,8 +330,7 @@ void *sys_create_thread( struct wstation_d *window_station,
 	
 	
 	// Create thread.
-    create_thread( window_station, desktop, window, init_eip, 
-	    priority, ppid, name); 
+    create_thread ( room, desktop, window, init_eip, priority, ppid, name ); 
 				   
     //@todo: return da função create.
 

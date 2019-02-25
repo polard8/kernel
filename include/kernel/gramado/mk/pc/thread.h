@@ -1,5 +1,5 @@
 /*
- * File: mk\pc\thread.h
+ * File: mk/pc/thread.h
  *
  * Descrição:
  *     Header para threads.
@@ -474,7 +474,7 @@ struct thread_d
 	/*
 	 * Janela e procedimento.
 	 */
-	struct wstation_d *window_station;  //Window Station da thread.
+	struct room_d *room;  //Window Station da thread.
 	struct desktop_d *desktop;         //Desktop da thread.
 	
 	unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
@@ -618,7 +618,7 @@ struct thread_list_d
 
 
 /* create_thread: */ 
-struct thread_d *create_thread ( struct wstation_d *window_station,
+struct thread_d *create_thread ( struct room_d *room,
                                  struct desktop_d  *desktop,
                                  struct window_d *window,
                                  unsigned long init_eip, 
