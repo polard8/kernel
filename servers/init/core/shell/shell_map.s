@@ -558,11 +558,14 @@ Linker script and memory map
                 0x000000000045c6fb                send
                 0x000000000045c705                shutdown
                 0x000000000045c70f                socket
+ .text          0x000000000045c730       0x12 signal.o
+                0x000000000045c730                signal
+                0x000000000045c738                sigaction
                 0x000000000045d000                . = ALIGN (0x1000)
- *fill*         0x000000000045c730      0x8d0 
+ *fill*         0x000000000045c742      0x8be 
 
 .iplt           0x000000000045d000        0x0
- .iplt          0x000000000045d000        0x0 socket.o
+ .iplt          0x000000000045d000        0x0 signal.o
 
 .rodata         0x000000000045d000     0x5b3d
  .rodata        0x000000000045d000      0x955 crt0.o
@@ -589,7 +592,7 @@ Linker script and memory map
  .rodata        0x0000000000462ab0       0x54 char.o
  .rodata        0x0000000000462b04       0x39 gws.o
 
-.eh_frame       0x0000000000462b40     0x3144
+.eh_frame       0x0000000000462b40     0x3184
  .eh_frame      0x0000000000462b40       0x34 crt0.o
  .eh_frame      0x0000000000462b74      0xcb4 main.o
                                         0xccc (size before relaxing)
@@ -627,69 +630,72 @@ Linker script and memory map
                                          0x3c (size before relaxing)
  .eh_frame      0x0000000000465be4       0xa0 socket.o
                                          0xb8 (size before relaxing)
+ .eh_frame      0x0000000000465c84       0x40 signal.o
+                                         0x58 (size before relaxing)
 
 .note.gnu.property
-                0x0000000000465c84       0x1c
+                0x0000000000465cc4       0x1c
  .note.gnu.property
-                0x0000000000465c84       0x1c socket.o
+                0x0000000000465cc4       0x1c signal.o
 
-.rel.dyn        0x0000000000465ca0        0x0
- .rel.got       0x0000000000465ca0        0x0 socket.o
- .rel.iplt      0x0000000000465ca0        0x0 socket.o
- .rel.text      0x0000000000465ca0        0x0 socket.o
+.rel.dyn        0x0000000000465ce0        0x0
+ .rel.got       0x0000000000465ce0        0x0 signal.o
+ .rel.iplt      0x0000000000465ce0        0x0 signal.o
+ .rel.text      0x0000000000465ce0        0x0 signal.o
 
-.data           0x0000000000465ca0     0x4360
-                0x0000000000465ca0                data = .
-                0x0000000000465ca0                _data = .
-                0x0000000000465ca0                __data = .
+.data           0x0000000000465ce0     0x4320
+                0x0000000000465ce0                data = .
+                0x0000000000465ce0                _data = .
+                0x0000000000465ce0                __data = .
  *(.data)
- .data          0x0000000000465ca0      0x4c4 crt0.o
- *fill*         0x0000000000466164       0x1c 
- .data          0x0000000000466180      0x538 main.o
-                0x0000000000466620                running
-                0x0000000000466624                primary_prompt
-                0x0000000000466628                secondary_prompt
-                0x000000000046662c                remember_on_history
-                0x0000000000466630                current_command_number
-                0x0000000000466634                bashrc_file
-                0x0000000000466638                shell_config_file
-                0x000000000046663c                deltaValue
-                0x0000000000466640                long_args
- *fill*         0x00000000004666b8        0x8 
- .data          0x00000000004666c0      0x4a0 shellui.o
- .data          0x0000000000466b60      0x440 api.o
- .data          0x0000000000466fa0        0x0 ctype.o
- .data          0x0000000000466fa0        0x0 stdio.o
- .data          0x0000000000466fa0        0x8 stdlib.o
-                0x0000000000466fa0                _infinity
- .data          0x0000000000466fa8        0x0 string.o
- .data          0x0000000000466fa8        0x0 conio.o
- *fill*         0x0000000000466fa8       0x18 
- .data          0x0000000000466fc0      0x4a0 builtins.o
- .data          0x0000000000467460      0x4a8 desktop.o
-                0x0000000000467900                primary_desktop_folder
-                0x0000000000467904                secondary_desktop_folder
- .data          0x0000000000467908        0x0 unistd.o
- *fill*         0x0000000000467908       0x18 
- .data          0x0000000000467920      0x4a0 login.o
- .data          0x0000000000467dc0      0x440 pixel.o
- .data          0x0000000000468200      0x440 line.o
- .data          0x0000000000468640      0x440 rect.o
- .data          0x0000000000468a80      0x440 char.o
- .data          0x0000000000468ec0      0x840 gws.o
- .data          0x0000000000469700        0x0 stubs.o
- .data          0x0000000000469700        0x0 socket.o
+ .data          0x0000000000465ce0      0x4c4 crt0.o
+ *fill*         0x00000000004661a4       0x1c 
+ .data          0x00000000004661c0      0x538 main.o
+                0x0000000000466660                running
+                0x0000000000466664                primary_prompt
+                0x0000000000466668                secondary_prompt
+                0x000000000046666c                remember_on_history
+                0x0000000000466670                current_command_number
+                0x0000000000466674                bashrc_file
+                0x0000000000466678                shell_config_file
+                0x000000000046667c                deltaValue
+                0x0000000000466680                long_args
+ *fill*         0x00000000004666f8        0x8 
+ .data          0x0000000000466700      0x4a0 shellui.o
+ .data          0x0000000000466ba0      0x440 api.o
+ .data          0x0000000000466fe0        0x0 ctype.o
+ .data          0x0000000000466fe0        0x0 stdio.o
+ .data          0x0000000000466fe0        0x8 stdlib.o
+                0x0000000000466fe0                _infinity
+ .data          0x0000000000466fe8        0x0 string.o
+ .data          0x0000000000466fe8        0x0 conio.o
+ *fill*         0x0000000000466fe8       0x18 
+ .data          0x0000000000467000      0x4a0 builtins.o
+ .data          0x00000000004674a0      0x4a8 desktop.o
+                0x0000000000467940                primary_desktop_folder
+                0x0000000000467944                secondary_desktop_folder
+ .data          0x0000000000467948        0x0 unistd.o
+ *fill*         0x0000000000467948       0x18 
+ .data          0x0000000000467960      0x4a0 login.o
+ .data          0x0000000000467e00      0x440 pixel.o
+ .data          0x0000000000468240      0x440 line.o
+ .data          0x0000000000468680      0x440 rect.o
+ .data          0x0000000000468ac0      0x440 char.o
+ .data          0x0000000000468f00      0x840 gws.o
+ .data          0x0000000000469740        0x0 stubs.o
+ .data          0x0000000000469740        0x0 socket.o
+ .data          0x0000000000469740        0x0 signal.o
                 0x000000000046a000                . = ALIGN (0x1000)
- *fill*         0x0000000000469700      0x900 
+ *fill*         0x0000000000469740      0x8c0 
 
 .got            0x000000000046a000        0x0
- .got           0x000000000046a000        0x0 socket.o
+ .got           0x000000000046a000        0x0 signal.o
 
 .got.plt        0x000000000046a000        0x0
- .got.plt       0x000000000046a000        0x0 socket.o
+ .got.plt       0x000000000046a000        0x0 signal.o
 
 .igot.plt       0x000000000046a000        0x0
- .igot.plt      0x000000000046a000        0x0 socket.o
+ .igot.plt      0x000000000046a000        0x0 signal.o
 
 .bss            0x000000000046a000    0x16d8b
                 0x000000000046a000                bss = .
@@ -741,6 +747,7 @@ Linker script and memory map
  .bss           0x000000000047a0dc        0x0 gws.o
  .bss           0x000000000047a0dc        0x0 stubs.o
  .bss           0x000000000047a0dc        0x0 socket.o
+ .bss           0x000000000047a0dc        0x0 signal.o
                 0x000000000047b000                . = ALIGN (0x1000)
  *fill*         0x000000000047a0dc      0xf24 
  COMMON         0x000000000047b000     0x54a0 crt0.o
@@ -916,6 +923,7 @@ LOAD char.o
 LOAD gws.o
 LOAD stubs.o
 LOAD socket.o
+LOAD signal.o
 OUTPUT(SHELL.BIN elf32-i386)
 
 .comment        0x0000000000000000       0x1a
@@ -940,6 +948,7 @@ OUTPUT(SHELL.BIN elf32-i386)
  .comment       0x000000000000001a       0x1b gws.o
  .comment       0x000000000000001a       0x1b stubs.o
  .comment       0x000000000000001a       0x1b socket.o
+ .comment       0x000000000000001a       0x1b signal.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0
@@ -983,3 +992,5 @@ OUTPUT(SHELL.BIN elf32-i386)
                 0x0000000000000000        0x0 stubs.o
  .note.GNU-stack
                 0x0000000000000000        0x0 socket.o
+ .note.GNU-stack
+                0x0000000000000000        0x0 signal.o

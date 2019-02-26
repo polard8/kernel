@@ -68,7 +68,7 @@ LINE_DISCIPLINE ( struct window_d *window,
 		//Pegamos a thRead de input associada com a janela 
 		//que tem o foco de entrada.
 		
-		t = (void *) w->InputThread;
+		t = (void *) w->control;
 		
 		if ( (void *) t == NULL )
 		{
@@ -567,7 +567,7 @@ done:
 		//Pegamos a thRead de input associada com a janela 
 		//que tem o foco de entrada.
 		
-		t = (void *) w->InputThread;
+		t = (void *) w->control;
 		
 		if ( (void *) t == NULL )
 		{

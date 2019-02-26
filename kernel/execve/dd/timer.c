@@ -440,7 +440,7 @@ struct timer_d *create_timer ( struct window_d *window,
 			//temos uma janela válida 
 			t->window = window;
 			
-			if ( (void *) window->InputThread == NULL )
+			if ( (void *) window->control == NULL )
 			{
 		        printf("create_timer: thread fail \n");
 		        //#debug
@@ -449,7 +449,7 @@ struct timer_d *create_timer ( struct window_d *window,
 				return NULL;
 			}
 			
-			if ( window->InputThread->used != 1 || window->InputThread->magic != 1234 )
+			if ( window->control->used != 1 || window->control->magic != 1234 )
 			{
 				
 		        printf("create_timer: thread validation fail \n");
@@ -463,7 +463,7 @@ struct timer_d *create_timer ( struct window_d *window,
 			//agora o timer tem uma thread para enviar mensagens.
 			//quancdo o tempo se esgotar.
 			
-		    t->thread = (struct thread_d *) window->InputThread;	
+		    t->thread = (struct thread_d *) window->control;	
 		 	
 		};
 		

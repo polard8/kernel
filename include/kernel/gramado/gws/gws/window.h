@@ -1091,10 +1091,11 @@ struct window_d
 	
 	
     //#importante:
-	//thread de input
+	//thread de controle
+	//Usada para input de mensagens e sinais.
 	
-    struct thread_d *InputThread;	
-
+    struct thread_d *control;
+		
     //
     //  Process support.
     //  A que processo a janela pertence??

@@ -48,7 +48,10 @@ all-c:
 
 #/ctype
 	gcc  -c  ctype/ctype.c    $(CFLAGS) -I include/ -o ctype.o	
-		
+
+#/signal
+	gcc  -c  signal/signal.c  $(CFLAGS) -I include/ -o signal.o
+	
 #/socket
 	gcc  -c  socket/socket.c  $(CFLAGS) -I include/ -o socket.o
 

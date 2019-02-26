@@ -72,7 +72,8 @@ rect.o \
 char.o \
 gws.o \
 stubs.o \
-socket.o    
+socket.o \
+signal.o    
 
 
 
@@ -128,6 +129,9 @@ all-c:
 	
 	cp $(LIBCOBJ)/socket.o .
 
+	cp $(LIBCOBJ)/signal.o .
+	
+	
 	#gws cancelado
 #	cp $(GWSOBJ)/pixel.o   .
 	

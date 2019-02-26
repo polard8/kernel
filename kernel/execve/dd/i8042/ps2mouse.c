@@ -679,7 +679,7 @@ void mouseHandler (){
 		//enviaremos a mensagem para a thread do aplicativo ao qual 
 		//a janela pertence.
 		
-		t = (void *) Window->InputThread;
+		t = (void *) Window->control;
 
 		//se a estrutura da thread for inválida.
 		if ( (void *) t == NULL )

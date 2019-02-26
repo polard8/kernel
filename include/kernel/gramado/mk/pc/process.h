@@ -578,12 +578,11 @@ struct process_d
 	//struct thread_d *threadReadyListHead;
 	//...	
 
-	//#importante:
-	//thread de input
-	//poderia ser primary_thread ??
-	//mas dessa forma podemos mudar a trhead de input dinamicamente.
+    //#importante:
+	//thread de controle
+	//Usada para input de mensagens e sinais.
 
-	struct thread_d *InputThread;	
+	struct thread_d *control;		
 
 	// Tipo 
 	// 0 = cpu-bound
