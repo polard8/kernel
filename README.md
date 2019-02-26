@@ -25,11 +25,6 @@
 Gramado (c) is a 32bit multithreaded operating system.
 
 
-## Cloning the repository
-
-git clone https://github.com/frednora/gramado.git
-
-
 ## Compiling Gramado on Linux.
 
 Linux 4.20.7-1-MANJARO x86_64
