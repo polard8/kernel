@@ -319,6 +319,7 @@ void scroll (void){
  ***********************
  * puts:
  */
+
 int puts ( const char *str ){
 	
 	//provisório ...
@@ -2277,8 +2278,7 @@ int printf ( const char *fmt, ... ){
 
 
 
-int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr )
-{
+int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr ){
  	
 	//#suspenso.
 	//return (int) kvprintf ( format, NULL, stream->_ptr, 10, argptr );
