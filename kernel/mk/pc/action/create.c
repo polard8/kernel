@@ -1,5 +1,5 @@
 /*
- * File: microkernel\pc\create.c
+ * File: pc/create.c
  *
  * Descrição:
  *     Rotinas de criação de processos e threads.
@@ -26,9 +26,8 @@
 
 
 // Funções importadas.
-extern unsigned long get_page_dir();
 
-
+extern unsigned long get_page_dir ();
 
 
 
@@ -56,6 +55,7 @@ extern unsigned long get_page_dir();
  * rotina dofork() e outras se necessário.
  *
  */
+
 int fork (){
 	
     //struct process_t *p;
@@ -84,6 +84,7 @@ int fork (){
  *           podem ir para um arquivo que será compilado junto com o kernel.
  *           ex: fork.c
  */
+
 int KiFork (){
 	
 	//@todo Criar interface
@@ -108,6 +109,7 @@ int KiFork (){
  * Obs: Criar idle thread com prioridade alta. TID=0 Idle (RING 3).
  * @todo: Mudar o nome para createCreateIdleThread()
  */
+
 void *KiCreateIdle (){
 	
     void *idleStack;                    // Stack pointer.

@@ -26,9 +26,9 @@
 /*
  * KiShowPreemptedTask
  * @todo: Substituir a palavra task por thread. KiShowPreemptedThread
- *
  */
-void KiShowPreemptedTask()
+
+void KiShowPreemptedTask ()
 {
     //return;
 };
@@ -38,11 +38,12 @@ void KiShowPreemptedTask()
  * KiSetTaskStatus: #deletar
  *     @todo: Substituir a palavra task por thread. KiSetThreadStatus
  */ 
-void KiSetTaskStatus(unsigned long status)
+
+void KiSetTaskStatus (unsigned long status)
 {
     //@todo: criar interface para mudanca de status.
 	
-	set_task_status(status);
+	set_task_status (status);
 };
 
 
@@ -51,11 +52,11 @@ void KiSetTaskStatus(unsigned long status)
  * @todo: Substituir a palavra task por thread. KiGetThreadStatus
  * #bugbgu task não é um termo usado.
  */
-unsigned long KiGetTaskStatus ()
-{ 
-    return (unsigned long) get_task_status(); 
-};
 
+unsigned long KiGetTaskStatus (){
+	
+    return (unsigned long) get_task_status (); 
+}
 
 
 /*
@@ -368,7 +369,12 @@ void mostra_reg (int id){
 };
 
 
-/* set_thread_priority: */
+/* 
+ *********************************
+ * set_thread_priority: 
+ *
+ */
+
 void set_thread_priority ( struct thread_d *t, unsigned long priority ){
 	
     unsigned long ThreadPriority;
@@ -473,7 +479,7 @@ unsigned long GetThreadDirectory ( struct thread_d *thread ){
 	};
 	
 	return (unsigned long) 0;
-};
+}
 
 
 /*
@@ -542,8 +548,7 @@ void release ( int tid ){
 		
 		Thread->state = READY; 
 	};	
-};
-
+}
 
 
 /*
@@ -614,6 +619,7 @@ done:
  *     Destrói uma thread.
  *     Destroi a estrutura e libera o espaço na lista. 
  */
+
 void kill_thread (int tid){
 	
     struct thread_d *Thread;
@@ -757,7 +763,7 @@ void kill_all_threads (){
 		
 	    kill_thread (i);	
 	}
-};
+}
 
 
 //

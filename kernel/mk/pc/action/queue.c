@@ -19,8 +19,8 @@
  * init_queue:
  *     Inicializa a estrutura de fila.
  */
-int init_queue(struct queue_d *q)
-{	
+
+int init_queue (struct queue_d *q){	
  
 	unsigned int i;
 	

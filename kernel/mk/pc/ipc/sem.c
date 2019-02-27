@@ -1,5 +1,5 @@
 /*
- * File: mk\pc\ipc\sem.c  
+ * File: pc/ipc/sem.c  
  *
  * Descrrição:  
  *     Gerenciamento de semáforos.
@@ -27,26 +27,23 @@
  *     Obs: Quem chama essa função deve alocar memória para a 
  * estrutura e passar por argumento uma estrutura válida.
  */
-int 
-init_semaphore( struct semaphore_d *s,  unsigned int count )
-{
 
-    //Checa a validade da estrutura. 
-	if( (void *) s ==  NULL)
+int init_semaphore ( struct semaphore_d *s, unsigned int count ){
+
+	if ( (void *) s == NULL )
 	{
-	    return (int) 1;    //Semáforo inválido.
-	};
+	    return (int) 1;    
+	}
 	
-    //
 	// Atribui algum valor ao semáforo. 
 	// Deve ser 1, para que o primeiro processo à solicitar o semáforo já 
 	// possa usá-lo.
-	//
 	
-	s->count = (unsigned int) count;    //1.
+	//1.
+	s->count = (unsigned int) count;    
     
 	return (int) 0;
-};
+}
 
 
 /*
@@ -64,24 +61,24 @@ init_semaphore( struct semaphore_d *s,  unsigned int count )
  *		  em um loop.
  *       +Bloquamos o processo até que o semáforo esteja liberado.
  */ 
-int Down(struct semaphore_d *s)
-{
+
+int Down (struct semaphore_d *s){
+
+	// Enquanto for 0, eu espero. 
+	// Quando mudar para 1, eu mudo para 0 e avanço.
+	
     int Flag;
 	
-	//
-	// *** Enquanto for 0, eu espero, quando mudar para 1, eu mudo para 0 e
-	// avanço.
-	//
-
-    //Checa a validade da estrutura.    
-	if( (void *) s ==  NULL){
-		return (int) 1;  //Fail.    
+	if ( (void *) s ==  NULL)
+	{
+		return (int) 1;     
 	}else{
+		
 	    Flag = (int) s->count;	
 	};
 	
 	
-	switch(Flag)
+	switch (Flag)
 	{
 		//Já estava liberado, retornamos a indicação de avançar.
 		//Obs: O semáfo fica bloquado.
@@ -97,7 +94,8 @@ int Down(struct semaphore_d *s)
 			break;
 			
 		//Quanquer valor estranho, retornamos a indicação de esperar.
-		default: break;
+		default: 
+			break;
 	};
 	//Nothing
 	return (int) 1;
@@ -110,24 +108,26 @@ int Down(struct semaphore_d *s)
  *     Quando um processo sai da sua região crítica
  *     ele dá um Up no semáforo, mudando seu valor pra 1.
  *     Isso libera o recurso pra outro processo.
- *
  */ 
-int Up(struct semaphore_d *s)
-{
-	int Flag;
-	
+
+int Up (struct semaphore_d *s){
+		
 	//
 	// *** Mudo para 1.
 	//
+
+	int Flag;
 	
-    //Checa a validade da estrutura.    
-	if( (void *) s ==  NULL){
-		return (int) 1;   //retornamos a indicação de erro.    
+	
+	if ( (void *) s == NULL)
+	{
+		return (int) 1;       
 	}else{
+		
 		 Flag = (int) s->count;	
 	};
 
-	switch(Flag)
+	switch (Flag)
 	{
 		//O semáforo já está liberado.
 		case 1: 
@@ -147,20 +147,16 @@ fail:
 };
 
 
-void semaphore_down(struct semaphore_d *s)
-{
-    //@todo: filtrar argumento.
-	Down(s);
-    return;
-};
+void semaphore_down (struct semaphore_d *s){
+	
+	Down (s);
+}
 
 
-void semaphore_up(struct semaphore_d *s)
-{
-    //@todo: filtrar argumento.
-	Up(s);
-    return;
-};
+void semaphore_up (struct semaphore_d *s){
+	
+	Up (s);
+}
 
 
 void *create_semaphore()
@@ -172,7 +168,9 @@ void *create_semaphore()
 
 void delete_semaphore(struct semaphore_d *s)
 {
-	//@todo:	
+	//@todo:
+	
+	//s = NULL;
     return;
 };
 
@@ -192,5 +190,5 @@ void close_semaphore(struct semaphore_d *s)
 
 
 //
-//fim.
+// End.
 //

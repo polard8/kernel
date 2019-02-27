@@ -20,19 +20,17 @@
  *     Obtem o valor início da Pilha.
  *     OUT: 0 = error.
  */
-unsigned long 
-GetThreadStackStart( struct thread_d *thread )
-{
-    if( (void *) thread == NULL )
-	{
+
+unsigned long GetThreadStackStart ( struct thread_d *thread ){
+	
+    if ( (void *) thread == NULL ){
         return (unsigned long) 0;        
-	};
+	}
 	
 	// Nothing for now.
     
-done:
 	return (unsigned long) thread->Stack;
-};
+}
 
 
 //

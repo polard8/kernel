@@ -85,7 +85,8 @@ extern unsigned long get_page_dir();
 //...
 
 int caller_process_id;
-int processNewPID;   //??
+
+int processNewPID;   
 
 
 //
@@ -101,7 +102,7 @@ int processNewPID;   //??
  *     Retorna o PID do clone.
  */
  
-int do_fork_process (){
+pid_t do_fork_process (){
 	
 	int PID;
 	
@@ -207,22 +208,18 @@ do_clone:
 		    goto fail;	
 		}
 		    
-	    //
-		// Ok, funcionou.
-		//
+		// Ok, retornando o número do processo clonado.
 		
-		// ??
-		// Retornando o número do processo clonado.
+		printf ("do_fork_process: done\n");
 		
-		printf("do_fork_process: done\n");
-		return (int) PID;	
+		return (pid_t) PID;	
 	};
 
     // Fail.	
     	
 fail:
-    return (int) -1;	
-};
+    return (pid_t) -1;	
+}
 
 
 /*
@@ -243,7 +240,7 @@ struct process_d *processObject (){
 	};	
 	
 	return (struct process_d *) p;
-};
+}
 
 
 /*
@@ -252,7 +249,7 @@ struct process_d *processObject (){
  *     +Isso pode ser usado para clonar um processo.
  */
  
-int getNewPID (){
+pid_t getNewPID (){
 	
 	struct process_d *p;
 	
@@ -271,7 +268,7 @@ int getNewPID (){
 		
 		if ( (void *) p == NULL )
 		{	
-			return (int) i;
+			return (pid_t) i;
 		}
 		
 		i++;
@@ -279,25 +276,8 @@ int getNewPID (){
 	
 	// Fail.
 	
-    return (int) -1;	
-};
-
-
-/*
-struct process_d *processNew();
-struct process_d *processNew()
-{
-    struct process_d *New;	
-	
-	//@todo: Implementar.
-	//Cria uma processo genérica e retorna o ponteiro.
-	
-	//
-done:	
-	return (struct process_d *) New;
-};
-*/
-
+    return (pid_t) -1;	
+}
 
 
 /*
@@ -305,7 +285,6 @@ done:
  *     Testando se o processo é válido. Se for válido retorna 1234.
  *     @todo: repensar os valores de retorno. 
  * system call (serviço 88.)
- * 
  */
 
 int processTesting (int pid){
@@ -379,7 +358,7 @@ int processSendSignal (struct process_d *p, unsigned long signal){
  *     isso será usado por fork.
  */
  
-int processCopyProcess ( int p1, int p2 ){
+int processCopyProcess ( pid_t p1, pid_t p2 ){
 	
 	int Status = 0;
 	
@@ -554,7 +533,9 @@ struct process_d *create_process ( struct room_d *room,
                                    unsigned long iopl,
                                    unsigned long directory_address )
 {
-    int PID;
+    
+	pid_t PID;
+	
     struct process_d *Process;
 
     // Para a entrada vazia no array de processos.
@@ -881,6 +862,8 @@ get_next:
 		
 		//Lista de threads.
 		Process->threadListHead = NULL;
+		
+		Process->control = NULL;
 
         //Process->window_id 		
 		
@@ -960,13 +943,16 @@ done:
  *     Menos o processo '0'.
  *     processCloseAllProcesses();    
  */
-void CloseAllProcesses()
-{
+
+void CloseAllProcesses (){
+	
 	int Index;
     struct process_d *P;
 
-	//Menos o 0. 
-    for( Index = 1; Index < PROCESS_COUNT_MAX; Index++ )
+	// #importante:
+	// Menos o 0, pois é o kernel. 
+    
+	for ( Index = 1; Index < PROCESS_COUNT_MAX; Index++ )
 	{
 		//Pega, bloqueia e tira da lista.
 		P = (void*) processList[Index];
@@ -976,21 +962,12 @@ void CloseAllProcesses()
 	
 	//Check process 0.
 	P = (void *) processList[0];
-	if( (void *) P == NULL )
+	
+	if ( (void *) P == NULL )
 	{
 		panic("CloseAllProcesses: P\n");
 	};
-	
-	
-	
-	//@todo: checar estado do processo 0.
-	
-	
-done:
-    //CurrentProcess = (void*) P;
-    //current_process = 0;	
-    return;
-};
+}
 
 
 /*
@@ -1024,17 +1001,11 @@ void KeRestoreCurrentContext()
  *     @todo: Talvez essa rotina possa ir para cpu.c
  *  * obs: Não usaremos inicial Ke_
  */ 
-void KeCpuFaults(unsigned long fault_number)
-{ 
-	
-	//
-	// @todo: Limits ???
-	//
-	
-	KiCpuFaults(fault_number);
-	return;
-};
 
+void KeCpuFaults (unsigned long fault_number){ 
+		
+	KiCpuFaults (fault_number);
+}
 
 
 
@@ -1082,67 +1053,6 @@ int KeCheckTaskContext( int task_id )
 	return (int) KiCheckTaskContext(task_id);
 };
 
-
-
-/*
- * KeInitTasks:
- *     Interface para chamar uma rotina de inicialização de variaveis
- * do mecanismo de gerenciamento de tarefas.
- *  * obs: Não usaremos inicial Ke_
- */
-void KeInitTasks()
-{
-    KiInitTasks();
-	
-	//@todo: esse retorno poderia ser int.
-	return;
-};
-
-
-
-
-/*
- * KeCreateTask:
- *     Interface para chamar uma rotina de criação de um processo.
- * nao uma thread.
- * obs: Não usaremos inicial Ke_
- */
-int 
-KeCreateTask( int task_id, 
-              unsigned long *task_eip, 
-			  unsigned long *task_stack, 
-			  unsigned long prior )
-{
-    return 0;
-};
-
-
-
-
-/*
- * KeInitTask:
- *     Interface para chamar uma rotina de inicialização de uma tarefa.
- */
-int KeInitTask(int id)
-{
-    return 0;
-};
-
-
-
-/*
- * KeFork:
- *     Interface para chamar a rotina de criação de uma thread através
- * de duplicação ou clonagem.
- *     @todo: Ke chama rotina de modulo externo.
- *            não é necessario.
- *
- */
-int KeFork()
-{
-    //essa é uma interface... vai chamar rotina de inicialização que chamara rotina fork.
-    return 0; 
-};
 
 
 /*
@@ -1496,6 +1406,7 @@ unsigned long GetPageDirValue()
  *            Quando cria o processo, cria apenas sua estrutura,
  *            ficando a cargo dessa rotina inicializar a estrutura criada. 
  */ 
+
 int init_task(int id)
 { 
     //@todo: inicializar uma estrutura para um processo criado.
@@ -1515,7 +1426,11 @@ int init_task(int id)
  *     Bug bug, problemas na inicialização das estruturas.
  *     Implementar a alocação dinâmica na criação das tarefas.
  */
-void init_tasks()
+
+//#bugbug
+//rever e deletar, se poss'ivel.
+
+void init_tasks ()
 {
     init_processes();	
 };
@@ -1569,26 +1484,6 @@ Done:
 };
 
 
-
-/*  
- ***********************************************************
- * dead_task_collector:
- *     Coletor de processos mortos.    
- * 
- *     Essa rotina deve pegar os processos
- *     que estão no estado TERMINATED  e zerar
- *     as estruturas, liberar memoria, fechar arquivos...
- *     liberar o espaço nos slots...
- *  
- *     @todo: Mudar o nome para processDeadProcessCollector();
- *
- */ 
-void dead_task_collector()
-{	
-	return;  // @todo
-};
-
-
 /*
  **********************************************************************
  * exit_process:
@@ -1603,45 +1498,44 @@ void dead_task_collector()
  *
  * @todo: 
  * Fechar as threads seguindo a lista encadeada.
- *
  */
-void exit_process( int pid, int code )
-{
+
+void exit_process ( pid_t pid, int code ){
+	
 	int i;
     struct process_d *Process;
+	
     struct thread_d *Threads;
 	struct thread_d *Next;	
 	//...
+
+	// Não fechar o processo 0. Ele é o kernel.
+	if ( pid == 0 ){
+		return;
+	}
 	
 	//Limits. 
-	if( pid < 0 || pid >= PROCESS_COUNT_MAX )
-	{
+	if ( pid < 0 || pid >= PROCESS_COUNT_MAX ){
 	    return;	
-	};    
-	
-	// Não fechar o processo 0. ele é o kernel.
-	if( pid == 0 )
-	{
-		return;
-	};
+	}
 	
 	// Mais limites ??
 
 #ifdef MK_VERBOSE	
 	//Debug:
-	printf("exit_process: Terminating process %d.\n",pid);
+	printf ("exit_process: Terminating process %d\n", pid );
 	refresh_screen();
 #endif	
 	
-	//
+
 	// Pega o ponteiro para a estrutura, muda o código de saída 
 	// e o status.
-	//
 	
-	Process = (void*) processList[pid];
+	Process = (void *) processList[pid];
 	
-	if( (void*) Process == NULL )
+	if( (void *) Process == NULL )
 	{
+		//printf ("Invalid PID\n");
 		return;
 	
 	}else{	
@@ -1670,7 +1564,7 @@ void exit_process( int pid, int code )
 	// Se o head da list não foi inicializado corretamente 
 	// dá page fault.
 	
-	Thread = (void*) Process->threadListHead;
+	Thread = (void *) Process->threadListHead;
 		
 	// Se não há nada na head.	
 	if( Thread == NULL )
@@ -1682,12 +1576,11 @@ void exit_process( int pid, int code )
 		//used, magic ??
 	};	
 		
-	//
+	
 	// Se a primeira thread da lista é válida, então tentaremos
 	// fechar toda a lista.
-	//
 	
-	while(1)
+	while (1)
 	{
 		// ?? Qual deve fechar depois. ??
 		
@@ -1708,53 +1601,49 @@ void exit_process( int pid, int code )
     
 #ifdef MK_VERBOSE    
 		    //fecha a thread.
-		    printf("exit_process: Killing thread %d.\n",Thread->tid);
+		    printf ("exit_process: Killing thread %d.\n", Thread->tid );
 #endif			
 			
-			//
 			// Kill !
-			//
 			
-			kill_thread( Thread->tid );  					
+			kill_thread ( Thread->tid );  					
 		    
 			// Prepara qual deve fechar agora.
 		    // Havíamos salvo e agora é vez dela.
 		    // Obs: Estamos reusando o ponteiro.
 			
-			Thread = (void*) Next;
+			Thread = (void *) Next;
 		 };
         //Nothing.
 	};		
 	//nothing
 done:
-    //
+	
+	
 	//@todo:
 	//    Escalonar o processo atual. Se o processo fechado foi o processo 
 	// atual, precisamos de um novo processo atual. Usaremos o processo zero 
 	// por enquanto. Obs: Devemos fazer aqui apenas escalonameto de processo
-	// e não de thread.
-	//
-	
+	// e não de thread.	
 
-	    //Zerando por enquanto.
+	//Zerando por enquanto.
 
 	//?? Analizar essa parte.	
     //@todo: Select next process (idle)
+	
 	current_process = 0;	
     current_thread = 0;    //@todo: Deletar isso.	
 	
-	//More ?!
-	
-	//@Limpar a estrutura toda...
-	//Process->
+
+	//Process->used = 0;
+	//Process->magic = 0;
 	//Process = NULL;
 	
-	//@todo: tirar da lista.
 	
-//Nothing.		
+	//#todo: chamar o scheduler.
+	//scheduler ();
 	return;
-};
-
+}
 
 
 // ??
@@ -1778,18 +1667,17 @@ void set_caller_process_id(int pid)
  *     Initialize process manager.
  *     processInitializeProcessManager();
  */
-int init_process_manager()
-{
+
+int init_process_manager (){
+	
 	caller_process_id = (int) 0;
 	
 	processNewPID = (int) USER_BASE_PID;
 	
 	//...
-	
-	
-done:	
+		
 	return (int) 0;
-};
+}
 
 
 /*
@@ -1810,22 +1698,22 @@ int processmanagerInit(){
 /*
  * GetProcessHeapStart:
  *     Pega o endereço do heap do processo.
- *
  */
-unsigned long GetProcessHeapStart ( int pid ){
+
+unsigned long GetProcessHeapStart ( pid_t pid ){
 	
 	struct process_d *process;
 	
 	//Limits.
-	if( pid < 0 || pid >= PROCESS_COUNT_MAX ){
-		//erro
+	
+	if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
+	{
 		goto fail; 
-	};
+	}
 	
 	process = (struct process_d *) processList[pid];
     
-	//Estrutura inválida.
-	if( (void *) process == NULL )
+	if ( (void *) process == NULL )
 	{
 		goto fail;
 		 
@@ -1839,47 +1727,47 @@ unsigned long GetProcessHeapStart ( int pid ){
 		//Ok.
 		return (unsigned long) process->Heap;
 	};
+	
 fail:	
-    return (int) -1;
-};
-
+    return (unsigned long) 0;
+}
 
 
 /*
  * GetProcessPageDirectoryAddress:
  *
  */
-unsigned long 
-GetProcessPageDirectoryAddress( int pid )
-{
+
+unsigned long GetProcessPageDirectoryAddress ( pid_t pid ){
+	
 	struct process_d *process;
 	
 	//Limits.
+	
 	if( pid < 0 || pid >= PROCESS_COUNT_MAX )
 	{
-		//erro
 		goto fail; 
 	};
 	
 	
 	process = (struct process_d *) processList[pid];
     
-	//Estrutura inválida.
-	if( (void*) process == NULL )
+	if ( (void *) process == NULL )
 	{
 		goto fail;
 		 
 	}else{
 		
-		if( process->used != 1 || process->magic != 1234 ){
+		if ( process->used != 1 || process->magic != 1234 ){
 			goto fail;
 		}
 		
 		return (unsigned long) process->DirectoryPA;
 	};
+	
 fail:	
-    return (int) -1;
-};
+    return (unsigned long) 0;
+}
 
 
 //

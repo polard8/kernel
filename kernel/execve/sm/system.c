@@ -826,14 +826,13 @@ void *systemIoCpu( int number,
 		    CloseAllProcesses(); 
 			break;
 	
-	    //?? Dead process collector. ??
         case 10: 
-		    dead_task_collector(); 
+            //#todo
 			break;
 	
         //Exit process.	
 	    case 11: 
-		    exit_process( (int) arg1, (int) arg2); 
+		    exit_process ( (int) arg1, (int) arg2 ); 
 			break;
 	
 	    //Set caller PID.

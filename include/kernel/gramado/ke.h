@@ -60,7 +60,9 @@ void KeStartProcess(unsigned long pid, unsigned long *task_address);
 void KeWakeupProcess(int pid);
 void KeProcessExit();
 void KeKillProcess(int pid);
-int KeFork();	
+
+
+
 int KeExecProcess(int pid, unsigned long *process_address);
 
 void KeSetQuantum(unsigned long q);
@@ -81,11 +83,14 @@ void KeStartShell();
 void KeStartTaskManager();
 
 
-void KeSpawnTask(int id);   //spawn thread.
+
+// Tasks ??
+// #bugbug: Nao usar esse termo.
+
+
+//spawn thread.
+void KeSpawnTask(int id);
 int KeSelectNextThread(int current);									
-									
-//Tasks??
-int KeInitTask(int id);
 void KeSaveContextOfNewTask(int id, unsigned long *task_address);
 void KeReloadCurrentTask();
 void KeShowTasksParameters();
@@ -94,12 +99,8 @@ void KeMostraSlot(int id);
 void KeMostraReg(int id);
 void KeShowPreemptedTask();	
 int KeCheckTaskContext( int task_id);
-void KeInitTasks();	
-int KeCreateTask( int task_id, 
-                 unsigned long *task_eip, 
-				 unsigned long *task_stack, 
-				 unsigned long prior );
-				 
+
+
 //debug support.
 void KeDebugBreakpoint();
 

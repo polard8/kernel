@@ -773,6 +773,7 @@ struct proc_list_d *waiting_procs;     //Processos que estão esperando.
  *    Informações básicas sobre um processo. 
  *    Quick access.
  */
+
 struct process_info_d 
 {
 	int processId;
@@ -787,25 +788,40 @@ struct process_info_d
 
 
 /* 
- * Linux style.
+ * Linux style. */
+
 #define invalidate() \
- asm("movl %%eax,%%cr3"::"a" (0))
-*/
+    asm ("movl %%eax,%%cr3"::"a" (0))
+
 
 //
 // Protótipos de função.
 //
 
 
-//clona um processo sem thread.
-int do_fork_process();
+/*
+ ***************************************
+ * do_fork_process
+ *     (Função em desenvolvimento)
+ *     Clona um processo sem thread.
+ *     Clona o processo atual.
+ *     Retorna o PID do clone.
+ */
+
+pid_t do_fork_process ();
+
 
 //cria uma estrutura do tipo processo, mas não inicializada.
-struct process_d *processObject();
+struct process_d *processObject ();
 
-//pegar um slot vazio na lista de processos.
-//isso permite clonar um processo,
-int getNewPID();
+
+/*
+ * getNewPID:
+ *     Pegar um slot vazio na lista de processos.
+ *     +Isso pode ser usado para clonar um processo.
+ */
+
+pid_t getNewPID ();
 
 
 // Signal.
@@ -831,22 +847,20 @@ SetProcessDirectory ( struct process_d *process,
 // Process support.
 //
 
-unsigned long GetProcessHeapStart( int pid );
+unsigned long GetProcessHeapStart ( pid_t pid );
 
-unsigned long GetProcessPageDirectoryAddress( int pid );
+unsigned long GetProcessPageDirectoryAddress ( pid_t pid );
 
+int processTesting (int pid);
 
-int processTesting(int pid);
-
-void init_processes();
+void init_processes ();
 
 void show_currentprocess_info ();
 void show_process_information ();
 
 
-//copiar um processo.
-//isso será usado por fork.
-int processCopyProcess ( int p1, int p2 );
+ 
+int processCopyProcess ( pid_t p1, pid_t p2 );
 
 
 struct process_d *create_process ( struct room_d *room,
@@ -860,21 +874,20 @@ struct process_d *create_process ( struct room_d *room,
                                    unsigned long directory_address );
 
 //Finalizações.
-void CloseAllProcesses();
-void dead_task_collector();
-//@todo: mudar para dead_process_collector().
-//void dead_process_collector();
+void CloseAllProcesses ();
+
 
 /*
  * exit_process:
  *     exit process..
- *
  *     Torna o estado PROCESS_TERMINATED.
  *     mas não destrói a estrutura DO PROCESSO.
  *     Outra rotina destruirá as informações.
  *     liberara a memória.     
  */
-void exit_process(int pid, int code);
+
+void exit_process ( pid_t pid, int code );
+
 
 void set_caller_process_id(int pid);
 int get_caller_process_id();

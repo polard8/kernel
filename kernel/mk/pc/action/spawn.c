@@ -33,37 +33,27 @@ static inline void spawnSetCr3 ( unsigned long value ){
 /*
  **********************************************************************
  * KiSpawnTask:
- *     Interface para chamada de módulo interno para rotina de spawn de 
- * thread.
+ *     Interface para chamada de módulo interno para rotina de 
+ * spawn de thread.
  */
  
 void KiSpawnTask (int id){
 	
-    
-	// @todo: 
-	// Some checks.
-
 	if ( id < 0 )
 	{
-		printf("spawn-KiSpawnTask: ERROR TID={%d}", id );
-		die();
-	};
-
-	//
-	// More ?!
-	//
-
-    //Done.	
-
+		printf ("spawn-KiSpawnTask: TID=%d", id );
+		
+		die ();
+	}
+	
 	spawn_thread (id);
 
-	printf("spawn-KiSpawnTask: ERROR");
+	panic ("spawn-KiSpawnTask");
 	
 	//
-	// No return.
+	// No return!
 	//
-};
-
+}
 
 
 /*
@@ -77,13 +67,12 @@ void KiSpawnTask (int id){
 void spawn_thread (int id){
 	
 	int Status;
+	
 	struct thread_d *Current;
     struct thread_d *spawn_Pointer;
 
-
-	//
-	// @todo: Filtrar tid.
-	//
+	// #todo: 
+	// Filtrar tid.
 
 	if ( id < 0 )
 	{
@@ -254,17 +243,12 @@ void spawn_thread (int id){
 	asm ("movb $0x20, %al \n");
 	asm ("outb %al, $0x20 \n");
 	//asm(" movl $0, %eax \n");
-	asm ("sti  \n"); 
 	
+	asm ("sti  \n"); 
 	asm ("iret \n");    //Fly!
     
-	//Nothing.
-	
-//fail:
-
-	panic ("*spawn_task: Return");
-	
-};
+	panic ("spawn_thread");
+}
 
 
 //
