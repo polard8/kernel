@@ -136,67 +136,51 @@ struct command cmd_table[] = {
 */
 
  
- 
-
 //#define MIN(x,y) ((x < y) ? x : y)
+
+
+
+//
+// ======== ## Shell Flag ## ========
+//
 
 int ShellFlag = 0;
 
 
-//O shell está rodadndo.
+//
+// ======== ## Status support ## ========
+//
+
+
+//O shell está rodando.
 int running = 1;
 
 /* Non-zero when we are executing a top-level command. */
-//o shell está executando um comando que 
-//está emprimeiro plando.
+//o shell está executando um comando que está emprimeiro plando.
 int executing = 0;
 
-int login_status = 0;
-
-// #todo: 
-// Nesse modo o servidor shell.bin não abrirá janelas,
-// apanas inicializará os recursos do gws.
-
-int headless;
-
-//Sendo assim, o shell poderia abrir no ambiente de logon.
-
-char username[11];
-char password[11];
-//char sUsername[11];
-//char sPassword[11];
-//char *username;
-//char *password; 
-
-//#define DEFAULT_WINDOW_TITLE "Shell"
-	
-
-#ifndef PPROMPT
-#define PPROMPT "shell\\$ "
-#endif
-char *primary_prompt = PPROMPT;
-
-#ifndef SPROMPT
-#define SPROMPT "shell> "
-#endif
-char *secondary_prompt = SPROMPT;
 
 
 
-COMMAND *global_command = (COMMAND *) NULL;
+//
+// ======== ## Arguments support  ## ========
+//
+
+/* The name of this shell, as taken from argv[0]. */
+char *shell_name;
+
+//Se o shell vai rodar um script e não é interativo.
+//é acionado com a flag em argv[1]  '-f'
+int script_shell = 0;
+
+/* The name of this shell, as taken from argv[2]. */
+char *script_name;
 
 
-/* Non-zero after SIGINT. */
-int interrupt_state = 0;
-
-/* The current user's name. */
-char *current_user_name = (char *) NULL;
-
-/* The current host's name. */
-char *current_host_name = (char *) NULL;
-
-
-
+/* Non-zero means this shell is running interactively. */
+//Se for diferente de zero então esse shell é interativo.
+//Se for zero ele pode apenas estar executando um script.
+int interactive = 0;
 
 /* Non-zero means that this shell is a login shell.
    Specifically:
@@ -210,10 +194,93 @@ char *current_host_name = (char *) NULL;
 //que fez login. 
 int login_shell = 0;
 
-/* Non-zero means this shell is running interactively. */
-//Se for diferente de zero então esse shell é interativo.
-//Se for zero ele pode apenas estar executando um script.
-int interactive = 0;
+
+// #todo: 
+// Nesse modo o servidor shell.bin não abrirá janelas,
+// apanas inicializará os recursos do gws.
+
+int headless;
+
+// Show the task bar.
+int taskbar = 0;
+
+// GWS mode;
+// O shell funcionará apenas como um servidor de recursos gráficos em ring3.
+int gws = 0;
+
+
+//
+// ======== ## Login support ## ========
+//
+
+int login_status = 0;
+
+char username[11];
+char password[11];
+//char *username;
+//char *password; 
+
+
+
+//
+// ======== ## Prompt support ## ========
+//
+
+
+#ifndef PPROMPT
+#define PPROMPT "shell\\$ "
+#endif
+char *primary_prompt = PPROMPT;
+
+#ifndef SPROMPT
+#define SPROMPT "shell> "
+#endif
+char *secondary_prompt = SPROMPT;
+
+
+//
+// ======== ## Version support ## ========
+//
+
+char *dist_version;
+char *build_version; /*revision*/
+
+
+//
+// ======== ## ## ========
+//
+
+
+//
+// ======== ## ## ========
+//
+
+
+//
+// ======== ## Commands support ## ========
+//
+
+COMMAND *global_command = (COMMAND *) NULL;
+
+
+//
+// ======== ## Outros ## ========
+//
+
+// #importante
+// As variáveis aqui pertencem ao bash,
+// estamos tentando aproveitá-las.
+
+
+
+/* Non-zero after SIGINT. */
+int interrupt_state = 0;
+
+/* The current user's name. */
+char *current_user_name = (char *) NULL;
+
+/* The current host's name. */
+char *current_host_name = (char *) NULL;
 
 
 /* Non-zero means to remember lines typed to the shell on the history
@@ -248,14 +315,6 @@ int indirection_level = 0;
 int shell_level = 0;
 
 
-
-/* The name of this shell, as taken from argv[2]. */
-char *shell_name;
-
-char *dist_version;
-char *build_version; /*revision*/
-
-
 /* The name of the .(shell)rc file. */
 char *bashrc_file = "~/.bashrc";
 
@@ -282,64 +341,8 @@ int no_brace_expansion = 0;	/* Non-zero means no foo{a,b} -> fooa fooa. */
 
 
 
-//
-// ## timer ##
-//
 
-int objectX;
-int objectY;
-int deltaX;
-int deltaY;
-//int deltaValue = 4;
-int deltaValue = 1;
 
-//usdo para testar o timer.
-void updateObject ()
-{
-   //RECT rc;
-   //GetClientRect(hwnd, &rc);
-
-   objectX += deltaX;
-   objectY += deltaY;
-
-   if ( objectX < 2 )
-   {
-      objectX = 2;
-      deltaX = deltaValue;
-   }
-   else if ( objectX > 78 ) {
-	   
-      objectX = 78; 
-      deltaX = -deltaValue;  //muda a direção.
-   }
-   
-   
-   if (objectY < 2){
-      objectY = 2;
-      deltaY = deltaValue;
-   }
-   else if ( objectY > 24 ){
-      objectY = 24; 
-      deltaY = -deltaValue;
-   }
-
-    
-	//
-	// ## test ##
-	//
-	
-	//update.
-	//textCurrentRow = objectX;
-    //textCurrentCol = objectY;
-   
-    //putchar.
-	//shellInsertNextChar ( (char) 'T' );  
-	
-	shellSetCursor ( objectX, objectY );	
-	
-	printf("%c",(char) 'X');
-	
-};
 
 /*
 struct {
@@ -673,6 +676,9 @@ int main ( int argc, char *argv[] ){
 	
 	//Não usar verbose nessa fase de tratar os argumentos
 	//pois a janela ainda não foi inicializada.
+	//argv[0] = Tipo de shell: interativo ou não
+	//argv[1] = Tipo de uso: login ... outros ?? 
+	
 	
 	// Se não há argumentos.
 	if (argc < 1)
@@ -680,60 +686,91 @@ int main ( int argc, char *argv[] ){
 		//printf("No args !\n");
 		//#Test.
         //fprintf( stderr,"Starting Shell with no arguments...\n");	 	
-		die("No args");
+		
+		die ("SHELL.BIN: No args");
 		
 		goto noArgs; 
+		
 	}else{
 		
-		//argv[0] = Tipo de shell: interativo ou não
-		//argv[1] = Tipo de uso: login ... outros ?? 
+		// 0
+		// Nome passado viar argumento.
+		shell_name = (char *) argv[0];
+        printf ("Shell Name = { %s }\n", shell_name );		
 		
-		//printf("Testing args ...\n");
+		// 1
+		// -f
+        // Se o shell foi iniciado com um arquivo de script para ser executado.
+		// Então o arg[1] cpontém o nome do arquivo.
+        if ( strncmp ( (char *) argv[1], "-f", 2 ) == 0 )
+        {
+			script_shell = 1;
+			//interactive = 0;
+		    //goto dosh2;
+		};			
 		
-		//#todo: (possibilidades)
-		//As flags poderia começar com f. Ex: fInteractive, fLoginShell,
 		
-	    if ( strncmp ( (char *) argv[0], "-interactive", 12 ) == 0 ){
-			
+		// 2
+		// Script name.
+		//script_name = (char *) argv[2];
+        //printf ("Script Name = { %s }\n", script_name );			
+		
+		
+		// 3
+		// --interactive
+	    if ( strncmp ( (char *) argv[3], "--interactive", 13 ) == 0 )
+		{	
 			interactive = 1;
-            
-            //printf("Initializing an interactive shell ...\n");
-            //printf("arg[0]={%s}\n",argv[0]);			
-        };
-
-        //Se o shell foi iniciado com um arquivo de script para ser 
-        //executado.
-		//a Flag -f indica que o que segue é um arquivo de script.
-        //if( strncmp( (char *) argv[0], "-f", 2 ) == 0 )
-        //{
-		//	goto dosh2;
-		//}			
-		
-	    if ( strncmp ( (char *) argv[1], "-login", 6 ) == 0 ){
 			
+            printf ("Initializing an interactive shell ...\n");
+            //printf ("arg[0]={%s}\n",argv[0]);			
+        };
+		
+		// 4
+		// --login
+	    if ( strncmp ( (char *) argv[4], "--login", 7 ) == 0 )
+		{	
 			login_shell = 1;
 			
 			//printf("Initializing login ...\n");
             //printf("arg[1]={%s}\n",argv[1]);    
-        };	
+        };			
+
 		
-		//#headless
-		//aqui o shell não criará janelas, apenas inicializará o gws.
+        // 5
+		// --headless
+		// Aqui o shell não criará janelas, apenas inicializará o gws.
 		
-		if ( strncmp ( (char *) argv[1], "--headless", 10 ) == 0 ){
-			
-			headless = 1;
-			
-		}
+		if ( strncmp ( (char *) argv[5], "--headless", 10 ) == 0 )
+		{	
+			headless = 1;	
+		};
 		
-		
-		//Nome passado viar argumento.
-		//shell_name = (char*) argv[2];
+        // 6
+		// --taskbar
+		if ( strncmp ( (char *) argv[6], "--taskbar", 9 ) == 0 )
+		{	
+			//taskbar = 1;	
+		};
+
+		// 7
+		// Shell funcionando no modo servidor.
+		if ( strncmp ( (char *) argv[7], "--gws", 5 ) == 0 )
+		{	
+			//gws_shell = 1;	
+		};
+
 
         //...		
 	};
 	
 	//Nothing.
+	
+	
+	// #debug
+	//printf ("#debug: Breakpoint");
+	//while (1){}
+	
 	
 noArgs:		
 	
@@ -1794,11 +1831,15 @@ shellProcedure( struct window_d *window,
 		    printf("SHELL.BIN: MSG_CREATE\n");
 		    break;
 			
-		//MSG_TIMER ;;#TODO INCLUIR ISS0 NA API.	
+		// MSG_TIMER 
+		// #TODO INCLUIR ISS0 NA API.
+		// Em algum momento o shell foi inicializado ... então
+		// ele chamará essa mensagens de acordo com o tempo programado.
 		case 53:
-		    //printf("shell tick\n");
-			updateObject(); //interna
-            break; 		
+			//See tests.c
+			testsTimerUpdateObject ();
+            //printf("shell timer tick\n");
+			break; 		
 		
 		case MSG_SETFOCUS:
 		    APISetFocus(window);
@@ -3588,29 +3629,14 @@ do_compare:
 	// timer-test
 	// Essa rotina cria um objeto timer que gera um interrupção 
 	// de tempos em tempos e é tratado pelo procedimento de janelas.
-	if ( strncmp( prompt, "timer-test", 10 ) == 0 ){
-
-		printf("timer-test: Creating timer\n");
+	if ( strncmp( prompt, "timer-test", 10 ) == 0 )
+	{  
+		printf("timer-test: \n");
 		
-	    printf("%d Hz | sys time %d ms | ticks %d \n", 
-		    apiGetSysTimeInfo(1), 
-			apiGetSysTimeInfo(2), 
-			apiGetSysTimeInfo(3) );		
-					
-		//janela, 100 ms, tipo 2= intermitente.
-		//system_call ( 222, (unsigned long) window, 100, 2);	
-			
-        apiCreateTimer ( (struct window_d *) window, 
-            (unsigned long) 50, (int) 2 );			
+	    testsInitTimer ( (struct window_d *) window );
+        
+		printf("timer-test: done\n");		  
 		
-		//inicializando.
-        objectX = 0;
-        objectY = 0;
-        deltaX = deltaValue;
-        deltaY = deltaValue;
-          
-        printf("timer-test: done\n");		  
-					
         goto exit_cmp;
     };
 	

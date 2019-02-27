@@ -13,23 +13,38 @@
 #include "shell.h" 
 
 
+
+/*
+ * Opções:
+ *     --interactive = Accepts user input.
+ *     --headless = No GUI. 
+ *     --login = Starts with the login. 
+ *     --gws = Starts gws only.
+ *     -f = File flag.
+ */
+
 static char *argv[] = { 
-    "-interactive",        //shell interativo
-	"-login",              //login
-	"Gramado Core Shell",  //nome do shell
-	"test.sh",             //nome do arquivo de script.
+	"Gramado Core Shell - GWS",    // 0 - Nome do shell
+	"-f",	                       // 1 - File flag.
+	"test.sh",                     // 2 - File name for the script.
+    "--interactive",               // 3 - Shell interativo
+	"--login",                     // 4 - Login
+	"--headless",                  // 5 - headless	
+	"--taskbar",                   // 6 - Taskbar
+	"--gws",                       // 7 - Modo servidor, somente gws.
 	NULL 
 };
 
 
 // Fake environment.
+/*
 static char *envp[] = { 
     "VFSROOT=root:/volume0",           //root dir do vfs
     "BOOTVOLUMEROOT=root:/volume1",    //root dir do volume de boot
     "SYSTEMVOLUMEROOT=root:/volume2",  //root dir do volume do sistema
 	NULL 
 };
-
+*/
 
 extern int main ( int argc, char *argv[] );
 
@@ -61,12 +76,10 @@ void crt0 (){
 
 	Response = (int) main ( 3, argv ); 
 								
-									
-	//
+			
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
 	// O erro pode vir no retorno ou implementa-se uma forma de pegar a execessão 
 	// ocorrida durante a execussão de main.
-	//
 	
 	switch (Response)
 	{
@@ -85,15 +98,17 @@ void crt0 (){
 	// ## ERROR ##
 	//
 	
-hang:	
+hang:
+	
     printf("crt0: EXIT ERROR! \n");
     printf("crt0: *Hang!\n");
-	while(1)
-	{
-		asm("pause");
-		asm("pause");
-		asm("pause");
-		asm("pause");
+	
+	while (1){
+		
+		asm ("pause");
+		asm ("pause");
+		asm ("pause");
+		asm ("pause");
 	};
-};
+}
 

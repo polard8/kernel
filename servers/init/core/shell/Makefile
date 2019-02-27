@@ -66,6 +66,7 @@ builtins.o \
 desktop.o \
 unistd.o \
 login.o \
+tests.o\
 pixel.o \
 line.o \
 rect.o \
@@ -98,6 +99,7 @@ all-c:
 	gcc  -c  builtins.c  -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o builtins.o
 	gcc  -c  desktop.c   -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o desktop.o
 	gcc  -c  login.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o login.o
+	gcc  -c  tests.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o tests.o
 	
 	
 #gws

@@ -67,6 +67,9 @@
 #include <stubs/gramado.h>
 
 
+#include "tests.h"
+
+
 //#define SHELL_VERBOSE 1
 
 
