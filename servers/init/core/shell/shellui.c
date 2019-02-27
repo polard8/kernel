@@ -512,51 +512,18 @@ void shellCreateEditBox (){
  
 struct window_d *shellCreateMainWindow ( int status ){
 	
-	// #todo:
-	// Precisamos registrar no kernel que essa janela corresponde 
-	// a área de taskbar e que a área de trabalho agora é menor.
-	
-	// # ??
-	// Pegando a janela principal para usarmos como janela mãe.
-	
-	/*
-	
-	struct window_d *pW;
-
-	pW = (struct window_d *) apiGetWSScreenWindow ();
-	
-	if ( (void *) pW == NULL )
-	{
-	    printf("Screen Window fail\n ");
-	    
-		while (1){
-			asm ("pause");
-			//exit (1);
-		}
-	}
-	*/
-	
-	
 	unsigned long left;
 	unsigned long top;
 	unsigned long width;
 	unsigned long height;
 	
-	//left = 0;
-	//top = (600 - (600/16));
-	//width = 800;
-	//height = (600/8); 	
+    // #imporante
+	// Essas sao as dimensoes da janela principal.
 	
-	//left = wpWindowLeft;
-	//top = wpWindowTop;
-	//width = wsWindowWidth;
-	//height = wsWindowHeight;
-
 	wpWindowLeft = 40;     //0;
 	wpWindowTop =  40;     //0;
 	wsWindowWidth = 600;   //800;
 	wsWindowHeight = 400;  //600;
-
 	
 	left = wpWindowLeft;
 	top = wpWindowTop;

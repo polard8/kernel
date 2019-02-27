@@ -20,7 +20,18 @@
  *     2018 - Add some bash 1.05 stuff. 
  */
  
- 
+
+// main window.
+//# usado para teste 
+//divisível por 4 é mais lento.
+
+#define WINDOW_LEFT      0      
+#define WINDOW_TOP       0      
+
+#define WINDOW_WIDTH     800    
+#define WINDOW_HEIGHT    600-24   
+
+
 
 
 //Setup current compiler 

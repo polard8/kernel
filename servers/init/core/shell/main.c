@@ -73,13 +73,7 @@
  less than console_loglevel. 
 */ 
 
-//# usado para teste 
-//divisível por 4 é mais lento.
 
-#define WINDOW_WIDTH     800    //750 
-#define WINDOW_HEIGHT    600    //400
-#define WINDOW_LEFT      0      //10
-#define WINDOW_TOP       0      //10
 
  
 #include "shell.h" 
@@ -277,7 +271,7 @@ COMMAND *global_command = (COMMAND *) NULL;
 // As variáveis aqui pertencem ao bash,
 // estamos tentando aproveitá-las.
 
-
+int mainwindow_used = 1;
 
 /* Non-zero after SIGINT. */
 int interrupt_state = 0;
@@ -592,6 +586,7 @@ int main ( int argc, char *argv[] ){
 	//char **internal;
 	char *filename;
 	register int i;
+	
 	//
 	// Obs: Esse não é um programa que roda em modo terminal,
 	// ele na verdade cria um terminal dentro de uma janela filha.
@@ -743,10 +738,16 @@ int main ( int argc, char *argv[] ){
 		
         // 6
 		// --taskbar
+		
 		if ( strncmp ( (char *) argv[6], "--taskbar", 9 ) == 0 )
 		{	
 			taskbar = 1;	
 		};
+		
+		if ( strncmp ( (char *) argv[6], "--notaskbar", 11 ) == 0 )
+		{	
+			taskbar = 0;	
+		};		
 
 		// 7
 		// Shell funcionando no modo servidor.
@@ -828,19 +829,29 @@ noArgs:
 	}
 	
 	//
-	// # Taskbar #
+	// # Taskbar or main window #
 	//
 	
+	
+	//  # taskbar #
     if ( taskbar == 1 )
 	{
-	    // #test
-	    // Criando a barra antes de tudo.
-		// See shellui.c
-	    
+		mainwindow_used = 0;
+		
 		enterCriticalSection ();    	
         shellCreateTaskBar ();	
 	    exitCriticalSection ();		
-	}
+		
+	// # Main window #		
+	}else{
+		
+		mainwindow_used = 1;
+		
+	    enterCriticalSection ();    
+        hWindow = shellCreateMainWindow (1);
+	    shell_info.main_window = ( struct window_d * ) hWindow;			
+	    exitCriticalSection ();
+	};
 	
 	
 	//
@@ -855,16 +866,6 @@ noArgs:
 	    //#todo;
 	}
 	
-
-
-	//
-	// # Main window #
-	//
-   
-	enterCriticalSection ();    
-    hWindow = shellCreateMainWindow (1);
-	exitCriticalSection ();
-	//goto again;
 	
 	//#bugbug
 	//falha quando chamamos a rotina de pintura da janela.
@@ -1086,7 +1087,7 @@ noArgs:
 	//system_call ( 222, (unsigned long) hWindow, 100, 2);		
 
 	
-	//printf("HOLAMBRA KERNEL SHELL\n");	
+
     //printf("#debug breakpoint");
     //while(1){} 	
 	
@@ -1103,30 +1104,42 @@ noArgs:
 	// reabilitamos a piscagem de cursor.
 	
  
-	//#bugbug
-	//Isso falhou. Vamos deixar pra depois.
-	// +pegamos o retângulo referente à area de cliente da janela registrada. 
-	//unsigned long xbuffer[8];	
-	//system_call ( 134, (unsigned long) hWindow, 
-	//    (unsigned long) &xbuffer[0], (unsigned long) &xbuffer[0] );	
-	//terminal_rect.left = xbuffer[0];
-	//terminal_rect.top = xbuffer[1];
-	//terminal_rect.width = xbuffer[2];
-	//terminal_rect.height = xbuffer[3];	
 	
+	//===============================
+	
+    //
+	// ## Janela para texto ##
+	//
 	
 
+	// #obs
+	// shellShell() inicializou todas as globais.
 	
-	terminal_rect.left = wpWindowLeft;
-	terminal_rect.top = wpWindowTop;
-	terminal_rect.width = wsWindowWidth;
-	terminal_rect.height = wsWindowHeight;
-
+	
+    if ( mainwindow_used == 1 ){
+	    terminal_rect.left = wpWindowLeft;
+	    terminal_rect.top = wpWindowTop +36;
+	    terminal_rect.width = wsWindowWidth;
+	    terminal_rect.height = wsWindowHeight -36;	
+	}else{	
+	    terminal_rect.left = wpWindowLeft;
+	    terminal_rect.top = wpWindowTop;
+	    terminal_rect.width = wsWindowWidth;
+	    terminal_rect.height = wsWindowHeight;
+	};
+	
+    //#debug
+    //printf ("terminal_rect: l={%d} t={%d} w={%d} h={%d}\n", 
+	//    terminal_rect.left, terminal_rect.top,
+	//	  terminal_rect.width, terminal_rect.height );	
+    //while (1){ asm ("pause"); }	
+	
 
 	//
 	// ## Se der problema no tamanho da área de cliente ##
 	//
 	
+	/*
 	if ( terminal_rect.left < wpWindowLeft ||
          terminal_rect.top < wpWindowTop ||	
 	     terminal_rect.width > wsWindowWidth ||
@@ -1140,83 +1153,30 @@ noArgs:
 			terminal_rect.top,
 		    terminal_rect.width, 
 			terminal_rect.height );
-        while (1){
-			asm ("pause");
-		}			
-	}
-	
-	
-    //#debug
-	//#todo: 
-	//#debug mostrar as informações obtidas antes de começar a usar
-	//...	
-
-		/*
-	    printf("## debug ## \n");
-	    printf("terminal_rect: 2\n");	
-        printf("l={%d} t={%d} w={%d} h={%d}\n", 
-	        terminal_rect.left, 
-			terminal_rect.top,
-		    terminal_rect.width, 
-			terminal_rect.height );	
-	   */
-	
-    //printf("#debug breakpoint");
-    //while(1){} 	
-	
-	//===============================
-	
-    //
-	// ## Janela para texto ##
-	//
-	
-  
-    //apiBeginPaint();
-	
-	//mudando as dimensões a janela dentro da área de cliente.
-	
-	//terminal_rect.left = terminal_rect.left +2;
-	//terminal_rect.top = terminal_rect.top +2;
-	//terminal_rect.width = terminal_rect.width -4 -40;  //8 * 80;
-	//terminal_rect.height = terminal_rect.height -4;    //8 * 32;
-
-	//área de cliente fake.
-	terminal_rect.left   = terminal_rect.left  +4;
-	terminal_rect.top    = terminal_rect.top   +60;
-	terminal_rect.width  = terminal_rect.width  -60;  //8 * 80;
-	terminal_rect.height = terminal_rect.height -100;  //8 * 32;
-
-
-	
-	
+		
+        while (1){ asm ("pause"); }			
+	}	
+     */ 
+ 	
+    //apiBeginPaint();	
 	hWindow2 = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "SHELL-CLIENT",
 	                        terminal_rect.left, terminal_rect.top, 
 					        terminal_rect.width, terminal_rect.height,    
                             0, 0, COLOR_TERMINAL2, COLOR_TERMINAL2);	   
 
-						
+	//apiEndPaint();
+	
 	if ( (void *) hWindow2 == NULL )
 	{	
 		die ("shell.bin: hWindow2 fail");
 	}	
 	
-	
-	
     APIRegisterWindow (hWindow2);
     //APISetActiveWindow (hWindow2);	
     APISetFocus (hWindow2);	 
 	
-	//#importante
-	//refresh_screen ();	
-	
-	//#test 
-	//substituindo refresh screen por show window.
-	//vamos mostrar a janela da área do cliente, depois de 
-	//termos mostrado a janela mãe.
 	apiShowWindow (hWindow2);
 
-	//apiEndPaint();
-	
 	
 	//===========================================================
 
@@ -1258,9 +1218,12 @@ noArgs:
 	system_call ( SYSTEMCALL_SETTERMINALWINDOW, (unsigned long) hWindow2, 
 		(unsigned long) hWindow2, (unsigned long) hWindow2 );
 		
+	
+	//
+	// ## saving ##
+	//
 				 
-	//salva ponteiro da janela principal e da janela do terminal. 
-	shell_info.main_window = ( struct window_d * ) hWindow;			 
+	//salva ponteiro da janela do terminal.  
 	shell_info.terminal_window = ( struct window_d * ) hWindow2;		
 	
 	//

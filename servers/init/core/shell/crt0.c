@@ -1,27 +1,17 @@
 /*
- * \o/
  * Gramado Operating System - The main file for the shell.
- * (c) Copyright 2015~2018 - Fred Nora.
+ * (c) Copyright 2015~2019 - Fred Nora.
  *
- * File: apps\shell\crt0.c
+ * File: crt0.c
  *
  * Environment: Gramado Core.
- * Usado para inicializar a rt na libc99
+ *
  */
 
 
 #include "shell.h" 
 
 
-
-/*
- * Opções:
- *     --interactive = Accepts user input.
- *     --headless = No GUI. 
- *     --login = Starts with the login. 
- *     --gws = Starts gws only.
- *     -f = File flag.
- */
 
 static char *argv[] = { 
 	"Gramado Core Shell - GWS",    // 0 - Nome do shell
@@ -30,8 +20,8 @@ static char *argv[] = {
     "--interactive",               // 3 - Shell interativo
 	"--login",                     // 4 - Login
 	"--headless",                  // 5 - headless	
-	"--taskbar",                   // 6 - Taskbar
-	"--gws",                       // 7 - Modo servidor, somente gws.
+	"--notaskbar",                 // 6 - Taskbar        --taskbar --notaskbar
+	"--gws",                       // 7 - Modo servidor. --gws
 	"--nodesktop",                 // 8 - Modo desktop.  --desktop --nodesktop
 	NULL 
 };
