@@ -97,10 +97,9 @@ main.o:
 all-c:
 	gcc  -c  shellui.c   -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o shellui.o
 	gcc  -c  builtins.c  -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o builtins.o
-	gcc  -c  desktop.c   -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o desktop.o
 	gcc  -c  login.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o login.o
 	gcc  -c  tests.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o tests.o
-	
+	gcc  -c  desktop.c   -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o desktop.o	
 	
 #gws
 	gcc  -c  gws/src/gws/char.c     -I $(LIBC) -I $(API01) -I $(GWS) $(CFLAGS) -o char.o

@@ -918,9 +918,14 @@ void bmpDisplayBMP ( void *address,
 };
 
 
+/*
+ **********************************************
+ * shellCreateTaskBar:
+ *
+ */
 
-int shellCreateTaskBar()
-{
+int shellCreateTaskBar (){
+	
 	// Tamanho da tela.	
 	unsigned long ScreenWidth = apiGetSystemMetrics(1);
     unsigned long ScreenHeight = apiGetSystemMetrics(2); 
@@ -941,6 +946,30 @@ int shellCreateTaskBar()
     APIRegisterWindow (taskbar_button1);
 	
 	refresh_screen();
+	return 0;
+}
+
+
+
+int shellStartDesktopMode (){
+
+	printf ("shellStartDesktopMode: Initializing desktop mode ...\n");
+		
+	//criamos a barra.
+	//lembrando que o ponteiro é global.
+	shellCreateTaskBar ();
+	
+	//...
+		 
+	//chama o loop.
+	//sando do loop podemos retornar 0, o que significa 
+	//que main pode fechar o shell depois de ter usado o modo desktop.
+	
+	
+	//#bugbug
+	// o loop está falhando.
+    //return desktop_loop ();
+	
 	return 0;
 }
 

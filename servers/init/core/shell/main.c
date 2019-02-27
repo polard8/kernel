@@ -152,6 +152,9 @@ int ShellFlag = 0;
 //
 
 
+int shellStatus = 0;
+int shellError = 0;
+
 //O shell está rodando.
 int running = 1;
 
@@ -207,6 +210,9 @@ int taskbar = 0;
 // GWS mode;
 // O shell funcionará apenas como um servidor de recursos gráficos em ring3.
 int gws = 0;
+
+// modo desktop
+int desktop = 0;
 
 
 //
@@ -372,8 +378,11 @@ struct {
 */
 
 //
-// ## Arguments support ##
+// ======== ## bash Arguments support ## ========
 //
+
+// #obs
+// Não sei se estamos usando isso.
 
 // ??
 //é semelhante à estrutura acima.
@@ -452,12 +461,8 @@ struct
 };
 
 
-
-int shellStatus;
-int shellError;
-
-
 //... 
+
 
 /*
 //argument buffer
@@ -467,72 +472,36 @@ int argbuf_index;
 */
 
 
-// Protótipos
-void die (char * str);
-void error( char *msg, char *arg1, char *arg2 );
-void fatal( char *msg, char *arg1, char *arg2 );
-
-//isso foi para stdlib.c
-//void *xmalloc( int size);
-
-char *concat( char *s1, char *s2, char *s3 );
-char *save_string ( char *s, int len );
-
-int shell_save_file ();
-int save_string2 ( char string[], char file_name[] );
+//
+// ======== ## Prototypes ## ======== 
+//
 
 void shellInitSystemMetrics();
 void shellInitWindowLimits();
 void shellInitWindowSizes();
 void shellInitWindowPosition();
+void shellRefreshVisibleArea();
+void shellSocketTest();
 
-//
-// testes de scroll.
-//
+// #todo:
+// Se possível, colocar essas rotinas em tests;c
 void testScrollChar();
-
-//row support
 void textSetTopRow ( int number );
 void textSetBottomRow ( int number );
 int textGetTopRow ();
 int textGetBottomRow ();
-
-
-void clearLine ( int line_number );
-
-
 void testShowLines();
 void testChangeVisibleArea();
-void updateVisibleArea( int direction );
 
-
-void shellRefreshVisibleArea();
-
-void shellSocketTest();
-
-//
-// Internas.
-//
-
-static inline void pause (void){
-	
-    asm volatile ("pause" ::: "memory"); 
-}; 
-
-
-/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
-static inline void rep_nop (void){
-	
-    __asm__ __volatile__ ("rep;nop": : :"memory");
-};
-
-
-#define cpu_relax()  rep_nop()
-
-
-//
-// Protótipos para funções internas.
-//
+void die (char * str);
+void error ( char *msg, char *arg1, char *arg2 );
+void fatal ( char *msg, char *arg1, char *arg2 );
+char *concat ( char *s1, char *s2, char *s3 );
+char *save_string ( char *s, int len );
+int shell_save_file ();
+int save_string2 ( char string[], char file_name[] );
+void updateVisibleArea ( int direction );
+void clearLine ( int line_number );
 
 // Procedimento de janela principal do aplicativo.
 unsigned long 
@@ -555,19 +524,45 @@ shellTopbarProcedure ( struct window_d *window,
                        int msg, 
 			           unsigned long long1, 
 					   unsigned long long2 );
-					  
- 
+
+
+// ...
+
+
+//
+// ======== ## Internal functions ## ========
+//
+
 void quit ( int status ){
 	
 	running = 0;
 }
+
+
+static inline void pause (void){
+	
+    asm volatile ("pause" ::: "memory"); 
+}; 
+
+
+/* 
+ * rep_nop:
+ *     REP NOP (PAUSE) is a good thing to insert into busy-wait loops. 
+ */
+
+static inline void rep_nop (void){
+	
+    __asm__ __volatile__ ("rep;nop": : :"memory");
+};
+#define cpu_relax()  rep_nop()
+
+ 
  
  
 /*
- **************
- * shmain: 
- *     Função principal.
- *     The Application Entry Point.
+ ********************************************************
+ * main: 
+ *     Main function.
  *
  * @todo:
  *    +Checar argumentos.
@@ -750,7 +745,7 @@ int main ( int argc, char *argv[] ){
 		// --taskbar
 		if ( strncmp ( (char *) argv[6], "--taskbar", 9 ) == 0 )
 		{	
-			//taskbar = 1;	
+			taskbar = 1;	
 		};
 
 		// 7
@@ -760,6 +755,20 @@ int main ( int argc, char *argv[] ){
 			//gws_shell = 1;	
 		};
 
+		// 8
+		// Shell funcionando no modo desktop.
+		
+		if ( strncmp ( (char *) argv[8], "--desktop", 9 ) == 0 )
+		{	
+			desktop = 1;	
+		};
+		
+		if ( strncmp ( (char *) argv[8], "--nodesktop", 11 ) == 0 )
+		{	
+			desktop = 0;	
+		};		
+		
+		
 
         //...		
 	};
@@ -799,17 +808,59 @@ noArgs:
 	shellShell (); 	
 	
 	
+	//
+	// # Desktop mode #
+	//		
+	
+	// #test
+	// No modo desktop, criaremos a barra de tarefas e não criaremos a janela do shell.
+	// Esse modo pode ter seu proprio loop de mensagens e procedimento de janela.
+	// O modo desktop criá sua barra de tarefas.
+	
+	int desktopReturn = -1;
+	
+	if ( desktop == 1 )
+	{
+		//#importante
+		//main pode fechar o shell depois de ter usado o modo desktop.
+		
+	    desktopReturn = shellStartDesktopMode ();
+	}
+	
+	//
+	// # Taskbar #
+	//
+	
+    if ( taskbar == 1 )
+	{
+	    // #test
+	    // Criando a barra antes de tudo.
+		// See shellui.c
+	    
+		enterCriticalSection ();    	
+        shellCreateTaskBar ();	
+	    exitCriticalSection ();		
+	}
+	
+	
+	//
+	// # Headless #
+	//	
+	
 	//#test
-	//Criando a barra antes de tudo.
-	enterCriticalSection ();    	
-    shellCreateTaskBar();	
-	exitCriticalSection ();	
+	//nesse modo não teremos janela alguma
 	
-	//Apenas inicialize. Continuaremos com o procedimento 
-	//do shell e não o da barra,	
+	if (headless == 1)
+	{
+	    //#todo;
+	}
 	
-    
-//again:	
+
+
+	//
+	// # Main window #
+	//
+   
 	enterCriticalSection ();    
     hWindow = shellCreateMainWindow (1);
 	exitCriticalSection ();
@@ -975,7 +1026,6 @@ noArgs:
 	//}
 	
 	
-	//printf("HOLAMBRA KERNEL SHELL\n");	
     //printf("#debug breakpoint");	
 	//while(1){} 
 	
@@ -1220,14 +1270,21 @@ noArgs:
 	//===========================
 	
 	
+	//
+	// ======== ## Shell init ## ========
+	//	
+	
+	// #importante
+	// Para inicializarmos o shell precisamos de uma janela válida
+	// onde as mensagens irão aparecer.
+	
+	
 	// Init Shell:
 	//     Inicializa variáveis, buffers e estruturas. Atualiza a tela.
-	
-	enterCriticalSection();
-
     //#BUGBUG
     //Estamos passando um ponteiro que é uma variável local.	
-
+	
+	enterCriticalSection();
 	Status = (int) shellInit (hWindow2); 
 	
 	if ( Status != 0 ){
@@ -1235,17 +1292,16 @@ noArgs:
 	};
 	exitCriticalSection();     		
 	
-	//printf("HOLAMBRA KERNEL SHELL\n");	
+
     //printf("#debug breakpoint");
     //while(1){} 			
 
 	
-	//
+
 	//#importante:
 	//Agora é a hora de pegar mensagens de input de teclado.
 	//Mas se o shell não for interativo, então não pegaremos 
 	//mensagens de input de teclado.
-	//
 	
 	if ( interactive != 1 ){
 		
@@ -1322,10 +1378,10 @@ noArgs:
 	
 	
 	//
-	//   ## main loop ##
+	// ======== ## main loop ## ========
 	//
 		
-//Mainloop:
+Mainloop:
     
 	/* Nesse teste vamos enviar um ponteiro de array, pegarmos os quatro 
 	   elementos da mensagem e depois zerar o buffer */
@@ -1347,6 +1403,9 @@ noArgs:
 		
 		if ( message_buffer[1] != 0 )
 		{
+			// se estamos no modo desktop,
+			//usaremos o procedimento do desktop;
+ 
 			
 	        //Vamos testar se a mensagem esta no range padrao de servidores
 	        //9000 ~  9999
@@ -1355,6 +1414,13 @@ noArgs:
 				//Passamos o endereço do buffer contendo os argumentos.
                 serverDialog ((unsigned long) &message_buffer[0] );
 			
+			}else if ( desktop == 1) {
+				
+	            desktopProcedure ( (struct window_d *) message_buffer[0], 
+		            (int) message_buffer[1], 
+		            (unsigned long) message_buffer[2], 
+		            (unsigned long) message_buffer[3] );				
+				
 			}else{
 				
 	            shellProcedure ( (struct window_d *) message_buffer[0], 
@@ -4289,7 +4355,7 @@ void shellShell (){
 
 
 /*
- *************
+ ******************************************
  * shellInit:
  *     Inicializa o Shell.  
  *

@@ -21,6 +21,15 @@ char *secondary_desktop_folder = SDESKTOPFOLDER;
 
 
 
+int desktop_running = 0;
+
+
+ 
+
+
+
+
+
 int desktopInitialize (){
 	
 	printf("Initializing desktop ...\n");
@@ -29,5 +38,30 @@ int desktopInitialize (){
 	
 	return 0;
 };
+
+
+
+/*
+ * desktop_loop:
+ *     Loop de mensagens no modo desktop.
+ */
+int desktop_loop(){
+
+    return 0;
+}
+
+
+// Procedimento de janela do modo desktop.
+unsigned long 
+desktopProcedure ( struct window_d *window, 
+                 int msg, 
+ 			     unsigned long long1, 
+				 unsigned long long2 )
+{
+	printf ("Desktop procedure \n");
+    return 0;
+}
+
+
 
 

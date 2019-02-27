@@ -32,6 +32,7 @@ static char *argv[] = {
 	"--headless",                  // 5 - headless	
 	"--taskbar",                   // 6 - Taskbar
 	"--gws",                       // 7 - Modo servidor, somente gws.
+	"--nodesktop",                 // 8 - Modo desktop.  --desktop --nodesktop
 	NULL 
 };
 
