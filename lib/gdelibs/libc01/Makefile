@@ -47,7 +47,10 @@ main.o:
 all-c:
 
 #/ctype
-	gcc  -c  ctype/ctype.c    $(CFLAGS) -I include/ -o ctype.o	
+	gcc  -c  ctype/ctype.c    $(CFLAGS) -I include/ -o ctype.o
+	
+#/fscanf
+	gcc  -c  fscanf/fscanf.c  $(CFLAGS) -I include/ -o fscanf.o
 
 #/signal
 	gcc  -c  signal/signal.c  $(CFLAGS) -I include/ -o signal.o

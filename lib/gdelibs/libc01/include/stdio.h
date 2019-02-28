@@ -477,6 +477,10 @@ int snprintf(char *str,size_t count,const char *fmt,...);
 
 int vprintf (const char *fmt, va_list ap);
 
+//#test
+//ainda não foi testada
+int fscanf (FILE *stream, const char *format, ... );
+
 
 /*Inicialização da biblioteca*/
 void stdioInitialize();
