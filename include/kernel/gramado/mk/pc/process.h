@@ -177,9 +177,7 @@
  *     Status de um processo.
  *     @todo: Pode-se usar mais status.
  *            como estado de transição.
- *
  *  Os status de um processo são diferentes do status de uma thread.
- *
  */ 
 typedef enum {
 	PROCESS_CREATED,
@@ -250,11 +248,14 @@ struct process_d
 {
 	object_type_t objectType;
 	object_class_t objectClass;
-
+	
 	//object control
 	struct object_d *object;
 
-	//callback ,d.
+	int used;     
+	int magic;    	
+	
+	//callback 
 
 	//
 	//  Identificadores.
@@ -290,10 +291,6 @@ struct process_d
 
 	// error.
 	//unsigned long error; 	
-
-	int used;     
-	int magic;    
-
 
 	// @todo:
 	// +name     (Nome=EXEMPLO.BIN)
@@ -471,6 +468,17 @@ struct process_d
 
 	unsigned long Image;          //Base da imagem do processo.
 	unsigned long ImageSize;      //Tamanho da imagem do processo.
+	
+	//quantas páginas foram usadas por essa imagem.
+	//ImageSize/PageSize
+	unsigned long PagesPerImage; 
+	
+	//#todo: estrutura com informações sobre a imagem do processo.
+	//see: pc/image.h
+	struct image_info_d *image_info;
+	
+	//#test
+	//struct page_control_t *page_list_head;
 
 
 	// ## Heap ##     
@@ -866,7 +874,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 );
 struct process_d *create_process ( struct room_d *room,
                                    struct desktop_d  *desktop,
                                    struct window_d *window,
-                                   unsigned long init_eip, 
+                                   unsigned long base_address, 
                                    unsigned long priority, 
                                    int ppid, 
                                    char *name,

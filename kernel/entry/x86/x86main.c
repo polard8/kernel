@@ -605,7 +605,7 @@ int x86main ( int argc, char *argv[] ){
     KernelProcess = (void *) create_process( NULL, // Window station.
 	                                         NULL, // Desktop.
 											 NULL, // Window.
-											 (unsigned long) 0xC0001000,  // Entry point. 
+											 (unsigned long) 0xC0000000,  // base address. 
                                              PRIORITY_HIGH,               // Priority.
 											 (int) 0,                     // ppid.
 											 "KERNEL-PROCESS",            // Name.
@@ -635,8 +635,9 @@ int x86main ( int argc, char *argv[] ){
 	
 #ifdef ENTRY_INIT_INIT		
     //Creating init process.
+	//UPROCESS_IMAGE_BASE;
     InitProcess = (void *) create_process ( NULL, NULL, NULL, 
-										  (unsigned long) 0x00401000, 
+										  (unsigned long) 0x00400000, 
                                           PRIORITY_HIGH, 
 										  (int) KernelProcess->pid, 
 										  "INITPROCESS", 
@@ -686,7 +687,7 @@ int x86main ( int argc, char *argv[] ){
 
     //Creating Shell process.
     ShellProcess = (void *) create_process ( NULL, NULL, NULL, 
-										   (unsigned long) 0x00401000, 
+										   (unsigned long) 0x00450000, 
                                            PRIORITY_HIGH, 
 										   (int) KernelProcess->pid, 
 										   "SHELLPROCESS", 
@@ -731,7 +732,7 @@ int x86main ( int argc, char *argv[] ){
     TaskManProcess = (void *) create_process( NULL, 
 	                                         NULL, 
 											 NULL, 
-											 (unsigned long) 0x00401000, 
+											 (unsigned long) 0x004A0000, 
                                              PRIORITY_LOW, 
 											 KernelProcess->pid, 
 											 "TASKMANPROCESS", 

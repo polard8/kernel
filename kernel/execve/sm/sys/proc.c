@@ -602,9 +602,12 @@ system_procedure ( struct window_d *window,
 
 					printf("F5:\n"); 
 					
+					//process info
+					 show_process_information ();
+					
 					//Hz
 					//testando ajuste de precisão.
-					timerInit8253 ( (unsigned long) 100 );
+					//timerInit8253 ( (unsigned long) 100 );
 					//timerInit8253 ( (unsigned long) 50 );
 						
 					//shell gws

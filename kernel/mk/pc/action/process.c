@@ -526,7 +526,7 @@ done:
 struct process_d *create_process ( struct room_d *room,
                                    struct desktop_d *desktop,
                                    struct window_d *window,
-                                   unsigned long init_eip, 
+                                   unsigned long base_address, 
                                    unsigned long priority, 
                                    int ppid, 
                                    char *name, 
@@ -739,11 +739,24 @@ get_next:
 		//
 		
 		// Base da imagem do processo.
-		// Tamanho da imagem do processo.
+
 		
-		Process->Image = 0;             //UPROCESS_IMAGE_BASE;  
+		//Na verdade precisamos aceitar o endereço passado via argumento,
+		//pois nem todos processos começam no endereço default.
+		
+		//UPROCESS_IMAGE_BASE;
+		Process->Image = base_address;   
+		
+		// Tamanho da imagem do processo.
+		// Temos que chamar a função que pega o tamanho de um arquivo,
+		// #bugbug: Porem, no momento o kernel não consegue ler arquivos
+		// que estão em subdiretórios corretamente e os programas estão em subdiretórios.
+		// #obs: O tamanho também poderia ser passado por arguemento.
+		// #ou um argumento com ponteiro pra estrutura de informação sobre uma imagem.
 		Process->ImageSize = 0;              	    
 		
+		//#todo: estrutura com informações sobre a imagem do processo.
+		Process->image_info = NULL;
 		
 		// Heap e Stack:
 		//
@@ -1299,52 +1312,47 @@ void show_currentprocess_info (){
  *     #todo: na verdade um aplicativo em user mode deve fazer esse trabalho
  * solicitando informações sobre cada processo através de chamadas.
  */
+
+// Mostrar informações sobre os processos da lista.
+// obs: as imagens são carregadas em endereços virtuais diferentes
+// e o endereço mostrado é em relação ao diretório de páginas do kernel
+// pois o kernel é que controla o posicionamento das imagens.
+
 void show_process_information (){
 	
-	int i;
+	int i=0;
 	
 	struct process_d *p;	
     
- 
-	
 	printf("show_process_information: \n\n");
-	
- 
-	
-	
-	// #test
-	// Mostrar informações sobre os processos da lista.
-	
-	printf("Process info:\n\n");
 	
 	for ( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
 	    p = (void *) processList[i];
-	    
-		
-		// Mostra as tarefas válidas, 
-		// mesmo que estejam com problemas.
 		
 		if ( (void *) p != NULL && 
 		           p->used == 1 && 
 				   p->magic == 1234 )
-	    {
-			//@todo: Mostrar quem é o processo pai.
-		    
-			printf("PID={%d} Name={%s} Directory={%x} \n", p->pid, 
-			    p->name_address, p->DirectoryPA );
-
+	    {   
+			printf ("PID=%d PPID=%d State=%d BaseAddress=%x ImageSize=%d DirectoryPA=%x DirectoryVA=%x iopl=%d prio=%d wait4pid=%d Name={%s}\n\n", 
+				p->pid, 
+			    p->ppid,
+				p->state,
+				p->Image,
+				p->ImageSize,	
+				p->DirectoryPA,
+				p->DirectoryVA,	
+				p->iopl,
+				p->priority,
+				p->wait4pid,	
+				p->name_address );
 	    }
-		
 		//Nothing.
     };	
-
-	//...
 	
-    printf("show_process_information: done\n");
-	
-	refresh_screen();
-};
+    printf ("done\n");
+	refresh_screen ();
+}
 
 
 /*
@@ -1355,14 +1363,14 @@ void show_process_information (){
  * para um gerenciador de processos em user mode usar.
  * @todo: processSetDirectory(...)
  */
-void 
-SetProcessDirectory( struct process_d *process, unsigned long Address )
-{
+
+void SetProcessDirectory ( struct process_d *process, unsigned long Address ){
+	
     if ( (void *) process != NULL )
 	{
         process->DirectoryPA = (unsigned long) Address;        
 	};
-};
+}
 
 
 /*

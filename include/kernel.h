@@ -243,6 +243,7 @@ extern void do_executa_new_task();
 #include <kernel/gramado/mk/arch/x86/x86cont.h>
 #include <kernel/gramado/mk/pc/ts.h>
 #include <kernel/gramado/mk/pc/tasks.h>
+#include <kernel/gramado/mk/pc/image.h>
 #include <kernel/gramado/mk/pc/process.h>
 #include <kernel/gramado/mk/pc/thread.h>
 #include <kernel/gramado/mk/pc/sched/sched.h>
