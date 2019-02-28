@@ -81,7 +81,7 @@ int load_kernel (){
 	if ( Status != 0 )
 	{
 		//isso funciona.
-	    //Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa, FAT16_ROOTDIR_ADDRESS );
+	    Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa, FAT16_ROOTDIR_ADDRESS );
 	}
 	
 	
@@ -247,10 +247,19 @@ int load_files (){
 	//==================
 	//0, IDLE.BIN. 
 #ifdef BL_VERBOSE
-	printf("load_files: Loading %s..\n", init_name );
+	printf(">>> load_files: Loading %s..\n", init_name );
 #endif
 	
-	Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	//isso funciona
+	//Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	
+	Status = (int) load_path ( "BOOT       /INIT    BIN", (unsigned long) INIT_ADDRESS );	
+	
+	if (Status != 0)
+	{
+		printf ("falhou em carregar boot/init.bin, tentaremos init.bin\n");
+		Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	}
 	
 	if (Status != 0)
     {	
@@ -264,10 +273,20 @@ int load_files (){
     //==================		
 	//1, SHELL.BIN.
 #ifdef BL_VERBOSE
-	printf ("load_files: Loading %s..\n", shell_name );
+	printf (">>> load_files: Loading %s..\n", shell_name );
 #endif
 
-	Status = (int) fsLoadFile ("SHELL   BIN", SHELL_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	//isso funciona
+	//Status = (int) fsLoadFile ("SHELL   BIN", SHELL_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	
+	
+	Status = (int) load_path ( "BOOT       /SHELL   BIN", (unsigned long) SHELL_ADDRESS );	
+	
+	if (Status != 0)
+	{
+		printf ("falhou em carregar boot/shell.bin, tentaremos shell.bin\n");
+	    Status = (int) fsLoadFile ("SHELL   BIN", SHELL_ADDRESS, FAT16_ROOTDIR_ADDRESS );	
+	}
 	
 	if (Status != 0){
 	    
@@ -281,10 +300,19 @@ int load_files (){
     //================== 
 	//2, TASKMAN.BIN.
 #ifdef BL_VERBOSE
-	printf("load_files: Loading %s..\n", taskmanager_name );
+	printf(">>> load_files: Loading %s..\n", taskmanager_name );
 #endif
 
-	Status = (int) fsLoadFile ("TASKMAN BIN", TASKMANAGER_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	//isso funciona
+	//Status = (int) fsLoadFile ("TASKMAN BIN", TASKMANAGER_ADDRESS, FAT16_ROOTDIR_ADDRESS );
+	
+	Status = (int) load_path ( "BOOT       /TASKMAN BIN", (unsigned long) TASKMANAGER_ADDRESS );	
+	
+	if (Status != 0)
+	{
+		printf ("falhou em carregar boot/taskman.bin, tentaremos taskman.bin\n");
+	    Status = (int) fsLoadFile ("TASKMAN BIN", TASKMANAGER_ADDRESS, FAT16_ROOTDIR_ADDRESS );	
+	}
 	
 	if (Status != 0){
 		

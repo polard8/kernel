@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 17
 SUBLEVEL = 0
-EXTRAVERSION = -rc10
+EXTRAVERSION = -rc11
 NAME = ?
 
 #todo:
@@ -395,15 +395,21 @@ vhd-copy-files:
 # boot	
 	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd
 	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd
-	
+
+
+# test
+# Não estão mais no diretório raiz os arquivos kernel, init, shell e taskman
+
 # kernel	
-	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd
-	
+#	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd
+
 # init	
-	sudo cp bin/init/INIT.BIN     /mnt/gramadovhd
-	sudo cp bin/init/SHELL.BIN    /mnt/gramadovhd
-	sudo cp bin/init/TASKMAN.BIN  /mnt/gramadovhd
-	
+#	sudo cp bin/init/INIT.BIN     /mnt/gramadovhd
+#	sudo cp bin/init/SHELL.BIN    /mnt/gramadovhd
+#	sudo cp bin/init/TASKMAN.BIN  /mnt/gramadovhd
+
+
+
 # user/config
 	sudo cp user/config/USER.TXT /mnt/gramadovhd
 	sudo cp user/config/INIT.TXT /mnt/gramadovhd
@@ -440,9 +446,16 @@ vhd-copy-files:
 	
 #copy
 
-#test
-	-sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd/BOOT
+#colocando os arquivos no diretório /boot
+#serão carregados por bl.bin 
+
+	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd/BOOT
 	
+	sudo cp bin/init/INIT.BIN       /mnt/gramadovhd/BOOT
+	sudo cp bin/init/SHELL.BIN      /mnt/gramadovhd/BOOT
+	sudo cp bin/init/TASKMAN.BIN    /mnt/gramadovhd/BOOT
+
+#gde
 	-sudo cp ../gde/bin/* /mnt/gramadovhd/GDE/BIN 
 	
 #Get available apps
