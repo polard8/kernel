@@ -136,7 +136,15 @@ int load_files();
 // File support.
 //
  
-unsigned long fsLoadFile( unsigned char *name, unsigned long address);
+int 
+fsLoadFile ( unsigned char *name, 
+			 unsigned long file_address, 
+			 unsigned long dir_address );
+
+//esse é o endereço do arquivo, que é o último nível do path.
+int load_path ( unsigned char *path, unsigned long address );
+
+
 unsigned long fsSearchFile(unsigned char *name);
 unsigned long fsSaveFile( unsigned char *file_name, 
                                    unsigned long file_size, 

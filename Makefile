@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 17
 SUBLEVEL = 0
-EXTRAVERSION = -rc9
+EXTRAVERSION = -rc10
 NAME = ?
 
 #todo:
@@ -436,6 +436,12 @@ vhd-copy-files:
 # Creating GDE
 	-sudo mkdir /mnt/gramadovhd/GDE
 	-sudo mkdir /mnt/gramadovhd/GDE/BIN	
+	
+	
+#copy
+
+#test
+	-sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd/BOOT
 	
 	-sudo cp ../gde/bin/* /mnt/gramadovhd/GDE/BIN 
 	

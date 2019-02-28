@@ -54,8 +54,10 @@ int load_kernel (){
     int Status;
 
 	//Address.
+	
 	unsigned long kernel_pa = KERNEL_ADDRESS;                    //0x00100000.
 	unsigned long kernel_va = KERNEL_VA;                         //0xC0000000.
+	
 	unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;    //0x00100000.  
 	
 	//Name.
@@ -70,8 +72,19 @@ int load_kernel (){
 														
     //Carregando KERNEL.BIN no endereço físico.
 	
-	Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa );
+	//isso funciona.
+	//Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa, FAT16_ROOTDIR_ADDRESS );
+	
+	//#test
+	Status = (int) load_path ( "BOOT       /KERNEL  BIN", (unsigned long) kernel_pa );
     
+	if ( Status != 0 )
+	{
+		//isso funciona.
+	    //Status = (int) fsLoadFile ("KERNEL  BIN", kernel_pa, FAT16_ROOTDIR_ADDRESS );
+	}
+	
+	
 	if (Status != 0 )
 	{
         printf("load_kernel fail: Load\n");  		
@@ -237,7 +250,7 @@ int load_files (){
 	printf("load_files: Loading %s..\n", init_name );
 #endif
 	
-	Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS );
+	Status = (int) fsLoadFile ("INIT    BIN", INIT_ADDRESS, FAT16_ROOTDIR_ADDRESS );
 	
 	if (Status != 0)
     {	
@@ -254,7 +267,7 @@ int load_files (){
 	printf ("load_files: Loading %s..\n", shell_name );
 #endif
 
-	Status = (int) fsLoadFile ("SHELL   BIN", SHELL_ADDRESS );
+	Status = (int) fsLoadFile ("SHELL   BIN", SHELL_ADDRESS, FAT16_ROOTDIR_ADDRESS );
 	
 	if (Status != 0){
 	    
@@ -271,7 +284,7 @@ int load_files (){
 	printf("load_files: Loading %s..\n", taskmanager_name );
 #endif
 
-	Status = (int) fsLoadFile ("TASKMAN BIN", TASKMANAGER_ADDRESS );
+	Status = (int) fsLoadFile ("TASKMAN BIN", TASKMANAGER_ADDRESS, FAT16_ROOTDIR_ADDRESS );
 	
 	if (Status != 0){
 		

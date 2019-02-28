@@ -446,19 +446,23 @@ void fs_relood_dir (unsigned long id){
  *     +...
  */
  
-unsigned long 
+int 
 fsLoadFile ( unsigned char *name, 
-             unsigned long address )
-{
-	int Status;
+			 unsigned long file_address, 
+			 unsigned long dir_address )
+{	
+	int Status = 0;
 	
 	//Declara variáveis.
 	unsigned long i = 0;
 	unsigned long j = 0;
     unsigned short next;
 
-    //Root support.
-    unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+    //dir support.
+    //unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+    unsigned short *dir = (unsigned short *) dir_address;	
+	
+	
     unsigned long max = 512;    //Número máximo de entradas no root dir.
 	unsigned long z = 0;        //Deslocamento no diretório raiz.
     unsigned long n = 0;        //Deslocamento no nome.
@@ -481,7 +485,7 @@ fsLoadFile ( unsigned char *name,
 	//Essa refresh screen leva muito tempo.
 
 	//Debug
-	//printf("fsLoadFile: Loading %s\n", (const char*) name );
+	printf("fsLoadFile: Loading %s\n", (unsigned char*) name );
 	//refresh_screen();
 	
 //loadRoot:
@@ -508,17 +512,17 @@ fsLoadFile ( unsigned char *name,
 	
 	while (max > 0)
     {     
-        if ( root[z] != 0 )
+        if ( dir[z] != 0 )
         {   
 			//Copia o nome e termina com 0.
-			memcpy( name_x, &root[z], 11);
+			memcpy( name_x, &dir[z], 11);
 			name_x[11] = 0;
 			
             //Compara 11 caracteres.
 			Status = (int) strncmp( name, name_x, 11 );
             
 			if ( Status == 0 ){
-				cluster = (unsigned short) root[z +13];
+				cluster = (unsigned short) dir[z +13];
                 goto found;
 			}; 
         };   
@@ -537,13 +541,13 @@ found:
     //Pega cluster inicial (word).
 	//Limites: 16 entradas por setor, 32 setores de tamanho.
 	//(0x1A/2) = 13.
-	cluster = (unsigned short) root[z +13];   
+	cluster = (unsigned short) dir[z +13];   
 	
 	// Limits.
 	if ( cluster <= 0 || cluster > (0xFFF0) )
 	{
 	    printf ("fsLoadFile fail: Cluster limits File=[%s] Cluster=[%d]\n", 
-		    &root[z], cluster );
+		    &dir[z], cluster );
 		goto fail;
 	}
 	
@@ -616,10 +620,10 @@ while(1)
 	// (data_area_base + next_cluster - 2)
 	// 512 bytes por cluster.
 	
-	read_lba ( address, FAT16_DATAAREA_LBA + cluster -2 ); 
+	read_lba ( file_address, FAT16_DATAAREA_LBA + cluster -2 ); 
 	
 	//Incrementa o buffer. +512;
-	address = (unsigned long) address + SECTOR_SIZE;    
+	file_address = (unsigned long) file_address + SECTOR_SIZE;    
 	
 	//Pega o próximo cluster na FAT.
 	next = (unsigned short) fat[cluster];	
@@ -647,9 +651,11 @@ while(1)
    //		
 
 fail:
+	
 	printf("fsLoadFile: Fail\n");
     refresh_screen();	
-    return (unsigned long) 1;
+    
+	return 1;
 	
     // Done: 
 	// Arquivo carregado com sucesso.
@@ -657,13 +663,164 @@ fail:
 done:
 
 #ifdef BL_VERBOSE
-    printf("fsLoadFile: Done\n");
+    printf ("Done\n");
 	refresh_screen(); 
 #endif
+	
+	//#debug
+	printf ("LOADED\n");
 
-    return (unsigned long) 0;
-};
+    return 0;
+}
 
+
+//esse é o endereço do arquivo, que é o último nível do path.
+int load_path ( unsigned char *path, unsigned long address ){
+
+    int level = 0;
+	
+	char buffer[12];
+	unsigned char *p;
+	
+	//#bugbug
+	//isso pode dar problema, é muito grande.
+	//vamos tentar malloc.
+	//512 entradas de 32 bytes
+	//char dir[512*32];
+	
+	void *dir;                  //diretório do primeiro nível.
+	
+	// #obs:
+    // Alocaremos memória apenas para os diretórios do primeiro nível.
+	// o endereço do arquivo no segundo nível deve ser passado via argumento.
+	
+	//diretório do primeiro nível.
+	dir = (void *) malloc (512*32);
+	if ( (void *) dir == NULL )
+	{
+	    printf ("load_path: dir malloc fail");
+		abort();
+	}
+	
+
+	if (address == 0)
+	{
+	    printf ("load_path: file address");
+		abort();
+	}
+	
+	
+	p = path;
+	
+	int i=0;
+	int Ret = -1; //fail
+	
+	for (;;){
+		
+	switch (level)
+	{
+		//level0:	
+		case 0:
+			printf ("\n[LEVEL 0]\n\n");
+			for ( i=0; i<12; i++ )
+			{
+				//#debug
+				printf ("%c", (char) *p);
+				
+				buffer[i] = (char) *p;
+				
+				if ( *p == '/' )
+				{
+					//#DEBUG
+					//printf (" DELIMITER FOUND ");
+					
+					//finaliza;
+					buffer[i] = 0;
+					
+					// Carregando o diretório do primeiro nível.
+					// nome do diretório, endereço onde carregar o diretório, endereço do diretório onde está o diretório.
+					Ret = fsLoadFile ( (unsigned char *) buffer, (unsigned long) dir, FAT16_ROOTDIR_ADDRESS );
+					
+					//ok
+					if ( Ret == 0 )
+					{
+						printf ("arquivo carregado com sucesso\n");
+						
+						//buffer[0] = 0; //reiniciamos o buffer
+						i = 0;     //reiniciamos o contador do buffer
+						level++;
+						p++;
+						break;
+						
+					}else{
+					    printf ("load_path: fail loading level 0\n");
+						abort();
+					}
+				}
+				
+				p++;
+			};
+			break;
+			
+		
+		//level1:
+		case 1:
+			printf ("\n\n[LEVEL 1]\n\n");
+			for ( i=0; i<12; i++ )
+			{
+				//#debug
+				printf ("%c", (char) *p);
+				
+				buffer[i] = (char) *p;
+				
+				//printf ("BUFFER: {%s} \n", buffer);
+				
+				//fim da string ?
+				if ( *p == 0 )
+				{
+					//printf ("BUFFER: {%s} \n", buffer);
+					//abort ();
+					
+					// Carregando o arquivo alvo que está no segundo nível.
+					// nome do arquivo alvo, endereço onde carregar o diretório, endereço do diretório onde está o diretório.
+					Ret = fsLoadFile ( (unsigned char *) buffer, (unsigned long) address, (unsigned long) dir );					
+				
+					//ok
+				    if ( Ret == 0 )
+					{
+						return 0;
+					
+					}else{
+					    //fail
+					    printf ("load_path: fail loading level 1\n");
+						
+						//#debug: vamos mostrar o conteúdo do diretório de primeiro nível.
+						printf ("DIR: %s", dir );
+						abort();
+					}
+				 
+				};
+				
+				p++;
+			}
+			//se acabou a contage então falhamos.
+			printf ("load_path: level 1: name too long\n");
+			abort();				
+			break;
+			
+		default:
+			//#bugbug
+			printf ("load_path: Default level");
+			abort ();
+			//refresh_screen();
+			//while (1){}
+			break;
+	
+	};  //fim do switch
+	}; //fim do for
+	
+	return -1;
+}
 
 /*
  ***********************************************************
