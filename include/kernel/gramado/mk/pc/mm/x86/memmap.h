@@ -1,5 +1,5 @@
 /*
- *  File: mm\memmap.h 
+ *  File: mm/memmap.h 
  *
  * Descrição: 
  *     Memory map support.
@@ -66,51 +66,57 @@
     ============================================================	
 
 
-		     +------------------------------------+
-	FFFFFFFF |             FIM                    |
-		     +------------------------------------+
-		     +------------------------------------+
-		     +------------------------------------+ 
-		     +------------------------------------+
-	         |         User Mode access           | @todo: Mudar de lugar.  
-		     |                                    |        Seder espaço para lfb.  
-		     |                                    |
-    C0800000 |           Back Buffer              |  			 
-		     +------------------------------------+	
-	         |        User Mode access            |	 Memória da placa de vídeo.
-		     |             (4MB)                  |  @todo Ampliar (PRECISA SER MAIOR)
-			 |             ...                    |  obs: Tamanho do monitor.
-	C0400000 |             LFB                    |
-		     +------------------------------------+
-			 +====================================+
+
+             +------------------------------------+
+    FFFFFFFF |             FIM                    |
+             +------------------------------------+ Tem dispositivos aqui em cima.
+             +------------------------------------+
+             +------------------------------------+ 
+             +------------------------------------+
+             |           Kernel land              | @todo: 
+             |                                    | Mudar de lugar. 
+             |                                    | Seder espaço para LFB, que precisa ser grande.
+    C0800000 |           BackBuffer               | 
+             +------------------------------------+	
+             |           Kernel land              |	 Memória da placa de vídeo.
+             |             (4MB)                  |  SHARED_MEMORY (0xC0800000 -0x100)
+             |             ...                    |  Ampliar (TER O TAMANHO DA MEMÓRIA DA PLACA DE VÍDEO) 
+    C0400000 |          FrontBuffer(LFB)          |  Obs: Tamanho da soma das áreas dos monitores, no mínimo.
+             +------------------------------------+
+             +====================================+
              |           Kernel land              |
-	         |                                    | 
+             |                                    | 
              |  Stack = 0xC02F7FF0 ~ 0xC02FFFF0   | Total 32KB. 
-	         |  Heap  = 0xC0100000 ~ 0xC02F7FF0   |	Total 2015 KB.
-             |                                    | 			 
-			 |  Kernel Entry point = 0xC0001000   | Entry point do kernel.
-	         |  Kernel Base = 0xC0000000          |	Início da imagem do 
-             |                                    |	processo kernel. 		 
-	C0000000 |        ( Kernel Mode access )      |	 	   
-	         +------------------------------------+
-             |           User Land                |	 
-	         |                                    |
+             |  Heap  = 0xC0100000 ~ 0xC02F7FF0   |	Total 2015 KB.
+             |                                    | 
+             |  Kernel Entry point = 0xC0001000   | Entry point do kernel.
+             |  Kernel Base = 0xC0000000          |	Início da imagem do 
+             |                                    |	processo kernel. 
+    C0000000 |        ( Kernel Mode access )      | 
+             +------------------------------------+
+             |           User Land                |
+             +------------------------------------+
+             +------------------------------------+ 
+             +------------------------------------+
+             +------------------------------------+  
+             |                                    |
              |                                    | @todo  Início da pilha em user mode do proesso.
-	         |                                    | @todo: Início do heap em user mode do processo.
+             |                                    | @todo: Início do heap em user mode do processo.
              |                                    | ### Por enquando cada processo tem sua própria
-             |                                    |     pilha e heap no fim da imagem do processo.   			 
-             |                                    | ??
-			 |                                    |
-			 | 00041000 = Process entry point     | Entrypoint da imagem.
-			 | 00040000 = Process image base      | Onde se carrega uma imagem de processo.
-             |                                    |  			 
-             | 00000000 = Dinamic Library Base    |
-			 | 00000000 = Dinamic Library image   |
-			 |                                    |
-             |              ...                   | @todo: ampliar heap.   			 
-	00000000 |       User Mode access             |	 
-			 +====================================+			 
-			    
+             |                                    |     pilha e heap no fim da imagem do processo. 
+             |                                    | 
+             |                                    |
+             | 00401000 = Process entry point     | Entrypoint da imagem.
+             | 00400000 = Process image base      | Onde se carrega uma imagem de processo.
+             |       User Mode access             |  
+             |------------------------------------|
+             |                                    | #importante
+             |                                    | Podemos usar essa área em kernel mode para memória compartilhada.
+             |                                    | Os primeiros 4MB são acessados pelo kernel.
+             |           0 ~ 0x004FFFFF           | Os processos estão herdando esse mapeamento do kernel. 
+    00000000 |         kernel Mode access         | 
+             +====================================+
+ 
   
 
     ***	 
@@ -123,26 +129,8 @@
 */ 
  
 
- 
-
-
 
 //
-// @todo: Com as informações de backbuffer e lfb pode-se
-//        fazer rotinas de pintura rápida de partes da tela, 
-//        e não a tela inteira.
-// 
-
-/*
-unsigned long memmapBaseMemoryStart;
-unsigned long memmapBaseMemoryEnd;
-unsigned long memmapOtherMemoryStart;
-unsigned long memmapOtherMemoryEnd;
-unsigned long memmapExtendedMemoryStart;
-unsigned long memmapExtendedMemoryEnd;
-*/
-
-//
-//fim.
+// End.
 //
 

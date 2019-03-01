@@ -55,9 +55,9 @@ bibliotecas de link dinâmico ".
 	" Todo processo começará em 0x00400000vir e terá o entry point em 
 0x00401000virt ". "Bibliotecas de ligação dinâmica, começarão em 0x0vir
 e não sei se essas bibliotecas tem entry point"
-		
+
 	//...
-	
+
  @todo: 	
      " O ideal é que um processo tenha disponível pra si toda a área baixa de 
 memória virtual, até o início da área do kernel".
@@ -72,59 +72,60 @@ kernel fica com o 1GB superior."
     =======================================================================	
 
 
-		     +------------------------------------+
-	FFFFFFFF |             FIM                    |
-		     +------------------------------------+
-		     +------------------------------------+
-		     +------------------------------------+ 
-		     +------------------------------------+
-	         |           Kernel land              | @todo:   
-		     |                                    | Mudar de lugar.         
-		     |                                    | Seder espaço para LFB, que precisa ser grande.
-    C0800000 |           BackBuffer               |  			 
-		     +------------------------------------+	
-	         |           Kernel land              |	 Memória da placa de vídeo.
-		     |             (4MB)                  |  @todo: 
-			 |             ...                    |  Ampliar (TER O TAMANHO DA MEMÓRIA DA PLACA DE VÍDEO) 
-	C0400000 |          FrontBuffer(LFB)          |  Obs: Tamanho da soma das áreas dos monitores, no mínimo.
-		     +------------------------------------+
-			 +====================================+
+             +------------------------------------+
+    FFFFFFFF |             FIM                    |
+             +------------------------------------+ Tem dispositivos aqui em cima.
+             +------------------------------------+
+             +------------------------------------+ 
+             +------------------------------------+
+             |           Kernel land              | @todo: 
+             |                                    | Mudar de lugar. 
+             |                                    | Seder espaço para LFB, que precisa ser grande.
+    C0800000 |           BackBuffer               | 
+             +------------------------------------+	
+             |           Kernel land              |	 Memória da placa de vídeo.
+             |             (4MB)                  |  SHARED_MEMORY (0xC0800000 -0x100)
+             |             ...                    |  Ampliar (TER O TAMANHO DA MEMÓRIA DA PLACA DE VÍDEO) 
+    C0400000 |          FrontBuffer(LFB)          |  Obs: Tamanho da soma das áreas dos monitores, no mínimo.
+             +------------------------------------+
+             +====================================+
              |           Kernel land              |
-	         |                                    | 
-             |  Stack = 0xC02F7FF0 ~ 0xC02FFFF0   | Total 32KB. 
-	         |  Heap  = 0xC0100000 ~ 0xC02F7FF0   |	Total 2015 KB.
-             |                                    | 			 
-			 |  Kernel Entry point = 0xC0001000   | Entry point do kernel.
-	         |  Kernel Base = 0xC0000000          |	Início da imagem do 
-             |                                    |	processo kernel. 		 
-	C0000000 |        ( Kernel Mode access )      |	 	   
-	         +------------------------------------+
-             |           User Land                |
-		     +------------------------------------+
-		     +------------------------------------+ 
-		     +------------------------------------+
-		     +------------------------------------+ 			 
-	         |                                    |
-             |                                    | @todo  Início da pilha em user mode do proesso.
-	         |                                    | @todo: Início do heap em user mode do processo.
-             |                                    | ### Por enquando cada processo tem sua própria
-             |                                    |     pilha e heap no fim da imagem do processo.   			 
              |                                    | 
-			 |                                    |
-			 | 00401000 = Process entry point     | Entrypoint da imagem.
-			 | 00400000 = Process image base      | Onde se carrega uma imagem de processo.
-             |                                    |  			 
-             | 00000000 = Dinamic Library Base    |
-			 | 00000000 = Dinamic Library image   |
-			 |                                    |
-             |              ...                   | @todo: ampliar heap.   			 
-	00000000 |       User Mode access             |	 
-			 +====================================+			 
-			 
+             |  Stack = 0xC02F7FF0 ~ 0xC02FFFF0   | Total 32KB. 
+             |  Heap  = 0xC0100000 ~ 0xC02F7FF0   |	Total 2015 KB.
+             |                                    | 
+             |  Kernel Entry point = 0xC0001000   | Entry point do kernel.
+             |  Kernel Base = 0xC0000000          |	Início da imagem do 
+             |                                    |	processo kernel. 
+    C0000000 |        ( Kernel Mode access )      | 
+             +------------------------------------+
+             |           User Land                |
+             +------------------------------------+
+             +------------------------------------+ 
+             +------------------------------------+
+             +------------------------------------+  
+             |                                    |
+             |                                    | @todo  Início da pilha em user mode do proesso.
+             |                                    | @todo: Início do heap em user mode do processo.
+             |                                    | ### Por enquando cada processo tem sua própria
+             |                                    |     pilha e heap no fim da imagem do processo. 
+             |                                    | 
+             |                                    |
+             | 00401000 = Process entry point     | Entrypoint da imagem.
+             | 00400000 = Process image base      | Onde se carrega uma imagem de processo.
+             |       User Mode access             |  
+             |------------------------------------|
+             |                                    | #importante
+             |                                    | Podemos usar essa área em kernel mode para memória compartilhada.
+             |                                    | Os primeiros 4MB são acessados pelo kernel.
+             |           0 ~ 0x004FFFFF           | Os processos estão herdando esse mapeamento do kernel. 
+    00000000 |         kernel Mode access         | 
+             +====================================+
+ 
 
     ***
-	
-	
+
+
 
    mm - kernel process
 
@@ -146,7 +147,7 @@ kernel fica com o 1GB superior."
  Kernel Entry point = 0x00101000 
  Heap               =      
  Stack              =  
- 		 
+ 
 	@todo: 
 	    O layout da memória virtual está em fase de desenvolvimento.	   
 	    Criar um layout dos endereços físicos principais usados pelo sistema.
@@ -1098,7 +1099,7 @@ int g_mm_system_type;
 
 
 //base     = base memory retornada pelo cmos
-//other    = 1MB - base.
+//other    = (1MB - base). (Shadow memory = 384 KB)
 //extended = retornada pelo cmos.
 //total    = base + other + extended.
 

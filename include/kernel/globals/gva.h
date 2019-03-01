@@ -100,6 +100,11 @@
 #define BACKBUFFER_VA                      0xC0800000
 
 
+//#IMPORTANTE
+//Essa área de memória compartilhada tem sido usada pelos processos
+//para troca de mensagens. O shell está passando a linha de comandos.
+//#bugbug: Isso tá dentro da memória de vídeo, que são 4MB e começa em 0xC0400000. 
+//#define SHARED_MEMORY (0xC0800000 -0x100)
 
 #define XXXPAGEDPOOL_VA 0xC0C00000
 
