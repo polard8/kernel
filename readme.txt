@@ -36,7 +36,7 @@ Groups:
 /arch     - Archtechture stuff.
 /bin      - .bin compiled files.
 /docs     - Documentation.
-/drivers  - Ring0 loadable drivers.
+/drivers  - Ring3 loadable drivers.
 /fs       - File systems support. Loadable fs.
 /include  - Headers.
 /init     - Initialization processes.
@@ -46,6 +46,7 @@ Groups:
 /net      - newtwork support.
 /scripts  - Scripts.
 /security - Security support.
+/servers  - Ring3 loadable servers.
 
 ================================
 2 (material productive forces)

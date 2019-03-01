@@ -51,35 +51,20 @@ all: main.o all-c gdeio-link finalize
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  gdeio.c $(CFLAGS) -o gdeio.o
+	gcc  -c  gdeio.c $(CFLAGS) -I include/ -o gdeio.o
 
 all-c:
 
-#	gcc  -c  gdeapi.c $(CFLAGS) -o gdeapi.o
-#	gcc  -c  gdelib.c $(CFLAGS) -o gdelib.o	
-
-#	cp ../../lib/libc01/obj/ctype.o   .
-#	cp ../../lib/libc01/obj/stdio.o   .
-#	cp ../../lib/libc01/obj/stdlib.o  .	
-#	cp ../../lib/libc01/obj/string.o  .
-#	cp ../../lib/libc01/obj/time.o    .
-	
-	#todo
-#	cp ../../lib/api01/obj/api.o      .
-	
-#	cp ../../lib/libc01/obj/unistd.o  .
-	
-
 
 gdeio-link:
-#	ld -m i386pe -T link.ld -o ???.BIN $(myObjects) -Map app_map.s
+
 
 finalize:
-#	cp ???.BIN  ../../../bin
+	-mkdir obj
+	-cp gdeio.o obj/
 
 clean:
 	-rm *.o
-#	-rm ???.BIN 
 	
 	
 
