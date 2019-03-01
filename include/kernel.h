@@ -14,7 +14,7 @@
  * *                                       *
  * * ;----------------------------------;  *
  * * ;                                  ;  *
- * * ;               gws                ;  *
+ * * ;               kgws               ;  *
  * * ;                                  ;  *
  * * ;----------------------------------;  *
  * * ;----------------------------------;  *
@@ -72,7 +72,7 @@
 
 //layers
 #define KERNEL      0
-#define GRAMADO     1   //1 gws
+#define GRAMADO     1   //1 kgws
 #define EXECUTIVE   2   //2
 #define MICROKERNEL 3   //3
 #define HAL         4   //4
@@ -148,20 +148,27 @@ extern void do_executa_new_task();
 
 // ## hardware ## 
 
-#include <kernel/gramado/intel.h>
-#include <kernel/gramado/memory.h>
-#include <kernel/gramado/cpuid.h>
-#include <kernel/gramado/screen.h>
-#include <kernel/gramado/video.h>
-#include <kernel/gramado/rtc.h>
+#include <kernel/gramado/kdrivers/intel.h>
+
+#include <kernel/gramado/mk/pc/mm/memory2.h>
+
+#include <kernel/gramado/kdrivers/cpuid.h>
+
+#include <kernel/gramado/kdrivers/screen.h>
+#include <kernel/gramado/kdrivers/video.h>
+
+#include <kernel/gramado/kdrivers/rtc2.h>
 //...
 
 
-#include <kernel/gramado/fonts.h>
-#include <kernel/gramado/ascii.h>     
-#include <kernel/gramado/fs.h> 
-#include <kernel/gramado/prompt.h>
-#include <kernel/gramado/bmp.h>
+#include <kernel/gramado/kservers/kgws/kgws/fonts.h>
+
+#include <kernel/gramado/kservers/ascii.h>   
+
+#include <kernel/gramado/kservers/fs/fs2.h> 
+
+#include <kernel/gramado/kservers/kgws/kgws/prompt.h>
+#include <kernel/gramado/kservers/kgws/kgws/bmp2.h>
 //...
 
 
@@ -199,26 +206,50 @@ extern void do_executa_new_task();
 
 //execve
 //disk1 - nelson
-//#include <kernel/gramado/3rdparty/sirius.h>
-#include <kernel/gramado/execve/dd/ide/ata.h>
+//#include <kernel/3rdparty/sirius.h>
+
+#include <kernel/gramado/kdrivers/ide/ata.h>
+
 #include <kernel/gramado/execve/sm/disk/disk.h>          
 #include <kernel/gramado/execve/sm/disk/volume.h>
-#include <kernel/gramado/execve/dd/serial.h>
-#include <kernel/gramado/execve/dd/ps2.h>
-#include <kernel/gramado/execve/dd/timer.h>
-#include <kernel/gramado/execve/dd/pic.h>
-#include <kernel/gramado/execve/dd/apic.h>
-#include <kernel/gramado/execve/dd/rtc.h>
-#include <kernel/gramado/execve/dd/floppy.h>
-#include <kernel/gramado/execve/dd/keyboard.h>
-#include <kernel/gramado/execve/dd/vk.h>
-#include <kernel/gramado/execve/dd/abnt2.h>
-#include <kernel/gramado/execve/dd/ldisc/ldisc.h>
-#include <kernel/gramado/execve/dd/ide/ide.h>
-#include <kernel/gramado/execve/dd/pci/pci.h>
-#include <kernel/gramado/execve/dd/ahci/ahci.h>
-#include <kernel/gramado/execve/dd/ahci/sata.h>
-#include <kernel/gramado/execve/dd/usb.h>
+
+#include <kernel/gramado/kdrivers/serial/serial.h>
+
+
+#include <kernel/gramado/kdrivers/ps2/ps2.h>
+
+
+#include <kernel/gramado/kdrivers/timer.h>
+
+
+#include <kernel/gramado/kdrivers/pic.h>
+#include <kernel/gramado/kdrivers/apic.h>
+
+#include <kernel/gramado/kdrivers/rtc.h>
+
+
+#include <kernel/gramado/kdrivers/floppy/floppy.h>
+
+
+#include <kernel/gramado/kdrivers/i8042/keyboard.h>
+#include <kernel/gramado/kdrivers/i8042/vk.h>
+#include <kernel/gramado/kdrivers/i8042/kbdabnt2.h>
+
+
+#include <kernel/gramado/execve/ldisc/ldisc.h>
+
+
+#include <kernel/gramado/kdrivers/ide/ide.h>
+
+
+#include <kernel/gramado/kdrivers/pci/pci.h>
+
+
+#include <kernel/gramado/kdrivers/ahci/ahci.h>
+#include <kernel/gramado/kdrivers/ahci/sata.h>
+
+
+#include <kernel/gramado/kdrivers/usb/usb.h>
 //...
 
 
@@ -263,54 +294,68 @@ extern void do_executa_new_task();
 
 
 //
-// GRAMADO (GWS)
+// GRAMADO (KGWS) Kernel gramado window server
 //
 
-#include <kernel/gramado/gws/gws/ws.h>
-#include <kernel/gramado/gws/user/usession.h>
-#include <kernel/gramado/gws/user/room.h>
-#include <kernel/gramado/gws/user/desktop.h>
-#include <kernel/gramado/gws/gws/window.h>
-#include <kernel/gramado/gws/gws/menu.h>
-#include <kernel/gramado/gws/gws/grid.h>
-#include <kernel/gramado/gws/gws/bmp.h>
-#include <kernel/gramado/gws/terminal/line.h>
-#include <kernel/gramado/gws/terminal/terminal.h>
-#include <kernel/gramado/gws/terminal/console.h>
-#include <kernel/gramado/gws/gws/guiconf.h>
-#include <kernel/gramado/gws/user/user.h>
-#include <kernel/gramado/gws/logon/logon.h>
-#include <kernel/gramado/gws/logoff/logoff.h>
-#include <kernel/gramado/gws/gws.h>
+#include <kernel/gramado/kservers/kgws/kgws/ws.h>
+#include <kernel/gramado/kservers/kgws/user/usession.h>
+#include <kernel/gramado/kservers/kgws/user/room.h>
+#include <kernel/gramado/kservers/kgws/user/desktop.h>
+#include <kernel/gramado/kservers/kgws/kgws/window.h>
+#include <kernel/gramado/kservers/kgws/kgws/menu.h>
+#include <kernel/gramado/kservers/kgws/kgws/grid.h>
+#include <kernel/gramado/kservers/kgws/kgws/bmp.h>
+#include <kernel/gramado/kservers/kgws/terminal/line.h>
+#include <kernel/gramado/kservers/kgws/terminal/terminal.h>
+#include <kernel/gramado/kservers/kgws/terminal/console.h>
+#include <kernel/gramado/kservers/kgws/kgws/guiconf.h>
+#include <kernel/gramado/kservers/kgws/user/user.h>
+#include <kernel/gramado/kservers/kgws/logon/logon.h>
+#include <kernel/gramado/kservers/kgws/logoff/logoff.h>
+#include <kernel/gramado/kservers/kgws/kgws.h>
 
 
 //execve
 #include <kernel/gramado/execve/sm/install.h>
 #include <kernel/gramado/execve/sm/init.h>
-#include <kernel/gramado/execve/dd/tty/tty.h>
-#include <kernel/gramado/execve/dd/i8042/i8042.h>
-#include <kernel/gramado/execve/dd/i8042/ps2mouse.h>
-#include <kernel/gramado/execve/dd/i8042/ps2kbd.h>
-#include <kernel/gramado/execve/dd/network/host.h>        //host info.
-#include <kernel/gramado/execve/dd/network/ethernet.h>
-#include <kernel/gramado/execve/dd/network/arp.h>
-#include <kernel/gramado/execve/dd/network/intel.h>       //intel nic - network interface controller.
-#include <kernel/gramado/execve/dd/network/nports.h>      //(network) Network Ports  (sw)
-#include <kernel/gramado/execve/dd/network/nsocket.h>     //(network) Sockets info. (sw) (not libc)
-#include <kernel/gramado/execve/dd/network/ip.h>          //(network) IP info.      (sw)
-#include <kernel/gramado/execve/dd/network/channel.h>     //(network) Channel       (sw)
-#include <kernel/gramado/execve/dd/network/client.h>      //(network) Client process support. 
-#include <kernel/gramado/execve/dd/network/ns.h>          //(network) Network Server.
-#include <kernel/gramado/execve/dd/network/network.h>     //(network) Gerenciamento de rede. 
-#include <kernel/gramado/execve/fs/fs.h>                  //fs.
-#include <kernel/gramado/execve/fs/vfs.h>                 //vfs.
+
+
+#include <kernel/gramado/kdrivers/tty/tty.h>
+
+
+#include <kernel/gramado/kdrivers/i8042/i8042.h>
+#include <kernel/gramado/kdrivers/i8042/ps2mouse.h>
+#include <kernel/gramado/kdrivers/i8042/ps2kbd.h>
+
+#include <kernel/gramado/kdrivers/network/host.h>        //host info.
+#include <kernel/gramado/kdrivers/network/ethernet.h>
+#include <kernel/gramado/kdrivers/network/arp.h>
+#include <kernel/gramado/kdrivers/network/intel.h>       //intel nic - network interface controller.
+#include <kernel/gramado/kdrivers/network/nports.h>      //(network) Network Ports  (sw)
+#include <kernel/gramado/kdrivers/network/nsocket.h>     //(network) Sockets info. (sw) (not libc)
+#include <kernel/gramado/kdrivers/network/ip.h>          //(network) IP info.      (sw)
+#include <kernel/gramado/kdrivers/network/channel.h>     //(network) Channel       (sw)
+#include <kernel/gramado/kdrivers/network/client.h>      //(network) Client process support. 
+#include <kernel/gramado/kdrivers/network/ns.h>          //(network) Network Server.
+#include <kernel/gramado/kdrivers/network/network.h>     //(network) Gerenciamento de rede. 
+
+
+#include <kernel/gramado/kservers/fs/fs.h>                  //fs.
+
+#include <kernel/gramado/kservers/vfs/vfs.h>                //vfs.
+
+
 #include <kernel/gramado/execve/sm/io.h>                  //io.
 #include <kernel/gramado/execve/sci/syscall.h>            //system calls.
 #include <kernel/gramado/execve/sm/modules.h>             //module manager.
 #include <kernel/gramado/execve/sm/debug.h>
 #include <kernel/gramado/execve/sm/sys.h>                 //system calls 2.
 #include <kernel/gramado/execve/sm/system.h>              //system manager.
-#include <kernel/gramado/execve/dd/dd.h>
+
+
+#include <kernel/gramado/kdrivers/dd.h>
+
+
 #include <kernel/gramado/execve/execve.h>        
 
 //
@@ -331,21 +376,21 @@ extern void do_executa_new_task();
 //
 
 //Cursor support.
-#include <kernel/gramado/cursor.h>
+#include <kernel/gramado/kservers/cursor.h>
 
 //Kernel request support.
 #include <kernel/gramado/request.h>
 
 //Kernel messages support.
-#include <kernel/gramado/messages.h>
+#include <kernel/gramado/kservers/messages.h>
 
 //Object Manager support.
-#include <kernel/gramado/object.h>
+#include <kernel/gramado/execve/object.h>
 
 //system signals. (SS)
-#include <kernel/gramado/ss.h>
+#include <kernel/gramado/execve/ss.h>
 
-#include <kernel/gramado/events.h>
+#include <kernel/gramado/kservers/events.h>
 
 //=============================================
 

@@ -12,10 +12,10 @@
 #We will have a new name just when the release changes.
 
 VERSION = 0
-PATCHLEVEL = 17
+PATCHLEVEL = 18
 SUBLEVEL = 0
-EXTRAVERSION = 0
-NAME = G
+EXTRAVERSION = -rc0
+NAME = ?
 
 #todo:
 #We need to simplify these flags, but it's working.
@@ -158,7 +158,7 @@ window.o \
 desktop.o \
 room.o \
 usession.o \
-gws.o \
+kgws.o \
 object.o \
 userenv.o \
 proc.o \
@@ -257,67 +257,78 @@ compile-kernel:
 	gcc -c kernel/execve/crts/klibc/unistd.c  -I include/ $(CFLAGS) $(DEFINES) -o unistd.o
 	gcc -c kernel/execve/crts/klibc/socket.c   -I include/ $(CFLAGS) $(DEFINES) -o socket.o	
 
-	#dd
-	gcc -c kernel/execve/dd/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
+
+	
+	gcc -c kernel/kdrivers/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o
+	gcc -c kernel/kdrivers/pic.c     -I include/ $(CFLAGS) $(DEFINES) -o pic.o
+	gcc -c kernel/kdrivers/rtc.c     -I include/ $(CFLAGS) $(DEFINES) -o rtc.o
+	gcc -c kernel/kdrivers/screen.c  -I include/ $(CFLAGS) $(DEFINES) -o screen.o
+	gcc -c kernel/kdrivers/serial.c  -I include/ $(CFLAGS) $(DEFINES) -o serial.o
+	gcc -c kernel/kdrivers/timer.c   -I include/ $(CFLAGS) $(DEFINES) -o timer.o
+	gcc -c kernel/kdrivers/video.c   -I include/ $(CFLAGS) $(DEFINES) -o video.o
+	gcc -c kernel/kdrivers/vsync.c   -I include/ $(CFLAGS) $(DEFINES) -o vsync.o
+	
+
+	# kdrivers/ahci 
+	gcc -c kernel/kdrivers/ahci/ahci.c  -I include/ $(CFLAGS) $(DEFINES) -o ahci.o
+	
+	# kdrivers/i8042
+	gcc -c kernel/kdrivers/i8042/i8042.c     -I include/ $(CFLAGS) $(DEFINES) -o i8042.o
+	gcc -c kernel/kdrivers/i8042/keyboard.c  -I include/ $(CFLAGS) $(DEFINES) -o keyboard.o
+	gcc -c kernel/kdrivers/i8042/mouse.c     -I include/ $(CFLAGS) $(DEFINES) -o mouse.o
+	gcc -c kernel/kdrivers/i8042/ps2kbd.c    -I include/ $(CFLAGS) $(DEFINES) -o ps2kbd.o
+	gcc -c kernel/kdrivers/i8042/ps2mouse.c  -I include/ $(CFLAGS) $(DEFINES) -o ps2mouse.o
+	
 	
 	#ide support
-	gcc -c kernel/execve/dd/ide/hdd.c      -I include/ $(CFLAGS) $(DEFINES) -o hdd.o
-	gcc -c kernel/execve/dd/ide/ata.c    -I include/ $(CFLAGS) $(DEFINES) -o ata.o
-	gcc -c kernel/execve/dd/ide/atainit.c  -I include/ $(CFLAGS) $(DEFINES) -o atainit.o
-	gcc -c kernel/execve/dd/ide/atairq.c   -I include/ $(CFLAGS) $(DEFINES) -o atairq.o
-	gcc -c kernel/execve/dd/ide/atapci.c   -I include/ $(CFLAGS) $(DEFINES) -o atapci.o	
-	gcc -c kernel/execve/dd/ide/atadma.c   -I include/ $(CFLAGS) $(DEFINES) -o atadma.o	
+	gcc -c kernel/kdrivers/ide/hdd.c      -I include/ $(CFLAGS) $(DEFINES) -o hdd.o
+	gcc -c kernel/kdrivers/ide/ata.c      -I include/ $(CFLAGS) $(DEFINES) -o ata.o
+	gcc -c kernel/kdrivers/ide/atainit.c  -I include/ $(CFLAGS) $(DEFINES) -o atainit.o
+	gcc -c kernel/kdrivers/ide/atairq.c   -I include/ $(CFLAGS) $(DEFINES) -o atairq.o
+	gcc -c kernel/kdrivers/ide/atapci.c   -I include/ $(CFLAGS) $(DEFINES) -o atapci.o	
+	gcc -c kernel/kdrivers/ide/atadma.c   -I include/ $(CFLAGS) $(DEFINES) -o atadma.o	
 	
 	
+	# kdrivers/network
+	gcc -c kernel/kdrivers/network/intel.c    -I include/ $(CFLAGS) $(DEFINES) -o nicintel.o
+	gcc -c kernel/kdrivers/network/network.c  -I include/ $(CFLAGS) $(DEFINES) -o network.o
+	gcc -c kernel/kdrivers/network/nsocket.c  -I include/ $(CFLAGS) $(DEFINES) -o nsocket.o	
 	
-	gcc -c kernel/execve/dd/pic.c     -I include/ $(CFLAGS) $(DEFINES) -o pic.o
-	gcc -c kernel/execve/dd/rtc.c     -I include/ $(CFLAGS) $(DEFINES) -o rtc.o
-	gcc -c kernel/execve/dd/screen.c  -I include/ $(CFLAGS) $(DEFINES) -o screen.o
-	gcc -c kernel/execve/dd/timer.c   -I include/ $(CFLAGS) $(DEFINES) -o timer.o
-	gcc -c kernel/execve/dd/video.c   -I include/ $(CFLAGS) $(DEFINES) -o video.o
-	gcc -c kernel/execve/dd/vsync.c   -I include/ $(CFLAGS) $(DEFINES) -o vsync.o
 
-	gcc -c kernel/execve/dd/serial.c  -I include/ $(CFLAGS) $(DEFINES) -o serial.o
+	# kdrivers/pci
+	gcc -c kernel/kdrivers/pci/pci.c  -I include/ $(CFLAGS) $(DEFINES) -o pci.o
 
-	# dd/ahci 
-	gcc -c kernel/execve/dd/ahci/ahci.c  -I include/ $(CFLAGS) $(DEFINES) -o ahci.o
+
+	# kdrivers/tty
+	gcc -c kernel/kdrivers/tty/tty.c  -I include/ $(CFLAGS) $(DEFINES) -o tty.o
+
+
+	# kdrivers/usb
+	gcc -c kernel/kdrivers/usb/usb.c  -I include/ $(CFLAGS) $(DEFINES) -o usb.o
 	
-	# dd/devmgr
-	gcc -c kernel/execve/dd/devmgr/devmgr.c  -I include/ $(CFLAGS) $(DEFINES) -o devmgr.o
 
-	# dd/i8042
-	gcc -c kernel/execve/dd/i8042/i8042.c     -I include/ $(CFLAGS) $(DEFINES) -o i8042.o
-	gcc -c kernel/execve/dd/i8042/keyboard.c  -I include/ $(CFLAGS) $(DEFINES) -o keyboard.o
-	gcc -c kernel/execve/dd/i8042/mouse.c     -I include/ $(CFLAGS) $(DEFINES) -o mouse.o
-	gcc -c kernel/execve/dd/i8042/ps2kbd.c    -I include/ $(CFLAGS) $(DEFINES) -o ps2kbd.o
-	gcc -c kernel/execve/dd/i8042/ps2mouse.c  -I include/ $(CFLAGS) $(DEFINES) -o ps2mouse.o
+	# devmgr
+	gcc -c kernel/execve/devmgr/devmgr.c  -I include/ $(CFLAGS) $(DEFINES) -o devmgr.o
 
 
-	# dd/ldisc
-	gcc -c kernel/execve/dd/ldisc/ldisc.c  -I include/ $(CFLAGS) $(DEFINES) -o ldisc.o
+	# execve/ldisc
+	gcc -c kernel/execve/ldisc/ldisc.c  -I include/ $(CFLAGS) $(DEFINES) -o ldisc.o
 
-	# dd/pci
-	gcc -c kernel/execve/dd/pci/pci.c  -I include/ $(CFLAGS) $(DEFINES) -o pci.o
 
-	# dd/network
-	gcc -c kernel/execve/dd/network/intel.c    -I include/ $(CFLAGS) $(DEFINES) -o nicintel.o
-	gcc -c kernel/execve/dd/network/network.c  -I include/ $(CFLAGS) $(DEFINES) -o network.o
-	gcc -c kernel/execve/dd/network/nsocket.c   -I include/ $(CFLAGS) $(DEFINES) -o nsocket.o
 
-	# dd/tty
-	gcc -c kernel/execve/dd/tty/tty.c  -I include/ $(CFLAGS) $(DEFINES) -o tty.o
 
-	# dd/usb
-	gcc -c kernel/execve/dd/usb/usb.c  -I include/ $(CFLAGS) $(DEFINES) -o usb.o
+
 
 	# /fs
-	gcc -c kernel/execve/fs/fs.c      -I include/ $(CFLAGS) $(DEFINES) -o fs.o
-	gcc -c kernel/execve/fs/read.c    -I include/ $(CFLAGS) $(DEFINES) -o read.o
-	gcc -c kernel/execve/fs/write.c   -I include/ $(CFLAGS) $(DEFINES) -o write.o
-	gcc -c kernel/execve/fs/cf.c      -I include/ $(CFLAGS) $(DEFINES) -o cf.o
-	gcc -c kernel/execve/fs/search.c  -I include/ $(CFLAGS) $(DEFINES) -o search.o
-	gcc -c kernel/execve/fs/format.c  -I include/ $(CFLAGS) $(DEFINES) -o format.o
-	gcc -c kernel/execve/fs/vfs.c     -I include/ $(CFLAGS) $(DEFINES) -o vfs.o
+	gcc -c kernel/kservers/fs/fs.c      -I include/ $(CFLAGS) $(DEFINES) -o fs.o
+	gcc -c kernel/kservers/fs/read.c    -I include/ $(CFLAGS) $(DEFINES) -o read.o
+	gcc -c kernel/kservers/fs/write.c   -I include/ $(CFLAGS) $(DEFINES) -o write.o
+	gcc -c kernel/kservers/fs/cf.c      -I include/ $(CFLAGS) $(DEFINES) -o cf.o
+	gcc -c kernel/kservers/fs/search.c  -I include/ $(CFLAGS) $(DEFINES) -o search.o
+	gcc -c kernel/kservers/fs/format.c  -I include/ $(CFLAGS) $(DEFINES) -o format.o
+	
+	# /vfs
+	gcc -c kernel/kservers/vfs/vfs.c     -I include/ $(CFLAGS) $(DEFINES) -o vfs.o
 
 	# /sci
 	gcc -c kernel/execve/sci/services.c  -I include/ $(CFLAGS) $(DEFINES) -o services.o
@@ -339,36 +350,29 @@ compile-kernel:
 	gcc -c kernel/execve/sm/sys/signal.c   -I include/ $(CFLAGS) $(DEFINES) -o signal.o
 	gcc -c kernel/execve/sm/sys/sm.c       -I include/ $(CFLAGS) $(DEFINES) -o sm.o
 
-	# k\gws\gws
-	# Gramado Window Server.
-	gcc -c kernel/gws/gws/char.c      -I include/ $(CFLAGS) $(DEFINES) -o char.o
-	gcc -c kernel/gws/gws/pixel.c     -I include/ $(CFLAGS) $(DEFINES) -o pixel.o
-	gcc -c kernel/gws/gws/line.c      -I include/ $(CFLAGS) $(DEFINES) -o line.o
-	gcc -c kernel/gws/gws/rect.c      -I include/ $(CFLAGS) $(DEFINES) -o rect.o
-	gcc -c kernel/gws/gws/dtext.c     -I include/ $(CFLAGS) $(DEFINES) -o dtext.o
-	gcc -c kernel/gws/gws/font.c      -I include/ $(CFLAGS) $(DEFINES) -o font.o
-	gcc -c kernel/gws/gws/createw.c   -I include/ $(CFLAGS) $(DEFINES) -o createw.o
-	gcc -c kernel/gws/gws/grid.c      -I include/ $(CFLAGS) $(DEFINES) -o grid.o
-	gcc -c kernel/gws/gws/sbar.c      -I include/ $(CFLAGS) $(DEFINES) -o sbar.o
-	gcc -c kernel/gws/gws/menubar.c   -I include/ $(CFLAGS) $(DEFINES) -o menubar.o
-	gcc -c kernel/gws/gws/menu.c      -I include/ $(CFLAGS) $(DEFINES) -o menu.o
-	gcc -c kernel/gws/gws/bmp.c       -I include/ $(CFLAGS) $(DEFINES) -o bmp.o
-	gcc -c kernel/gws/gws/button.c    -I include/ $(CFLAGS) $(DEFINES) -o button.o
-	gcc -c kernel/gws/gws/bg.c        -I include/ $(CFLAGS) $(DEFINES) -o bg.o
-	gcc -c kernel/gws/gws/window.c    -I include/ $(CFLAGS) $(DEFINES) -o window.o
-
-	# gramado logon e logoff
-	gcc -c kernel/gws/logon/logon.c    -I include/ $(CFLAGS) $(DEFINES) -o logon.o
-	gcc -c kernel/gws/logoff/logoff.c  -I include/ $(CFLAGS) $(DEFINES) -o logoff.o
-
-	# gramado/user
-	gcc -c kernel/gws/user/userenv.c   -I include/ $(CFLAGS) $(DEFINES) -o userenv.o
-	gcc -c kernel/gws/user/desktop.c   -I include/ $(CFLAGS) $(DEFINES) -o desktop.o
-	gcc -c kernel/gws/user/room.c      -I include/ $(CFLAGS) $(DEFINES) -o room.o
-	gcc -c kernel/gws/user/usession.c  -I include/ $(CFLAGS) $(DEFINES) -o usession.o
-
-	# *gui (GRAMADO)
-	gcc -c kernel/gws/gws.c   -I include/ $(CFLAGS) $(DEFINES) -o gws.o
+	# kservers/kgws - Kernel Gramado Window Server.
+	gcc -c kernel/kservers/kgws/kgws/char.c      -I include/ $(CFLAGS) $(DEFINES) -o char.o
+	gcc -c kernel/kservers/kgws/kgws/pixel.c     -I include/ $(CFLAGS) $(DEFINES) -o pixel.o
+	gcc -c kernel/kservers/kgws/kgws/line.c      -I include/ $(CFLAGS) $(DEFINES) -o line.o
+	gcc -c kernel/kservers/kgws/kgws/rect.c      -I include/ $(CFLAGS) $(DEFINES) -o rect.o
+	gcc -c kernel/kservers/kgws/kgws/dtext.c     -I include/ $(CFLAGS) $(DEFINES) -o dtext.o
+	gcc -c kernel/kservers/kgws/kgws/font.c      -I include/ $(CFLAGS) $(DEFINES) -o font.o
+	gcc -c kernel/kservers/kgws/kgws/createw.c   -I include/ $(CFLAGS) $(DEFINES) -o createw.o
+	gcc -c kernel/kservers/kgws/kgws/grid.c      -I include/ $(CFLAGS) $(DEFINES) -o grid.o
+	gcc -c kernel/kservers/kgws/kgws/sbar.c      -I include/ $(CFLAGS) $(DEFINES) -o sbar.o
+	gcc -c kernel/kservers/kgws/kgws/menubar.c   -I include/ $(CFLAGS) $(DEFINES) -o menubar.o
+	gcc -c kernel/kservers/kgws/kgws/menu.c      -I include/ $(CFLAGS) $(DEFINES) -o menu.o
+	gcc -c kernel/kservers/kgws/kgws/bmp.c       -I include/ $(CFLAGS) $(DEFINES) -o bmp.o
+	gcc -c kernel/kservers/kgws/kgws/button.c    -I include/ $(CFLAGS) $(DEFINES) -o button.o
+	gcc -c kernel/kservers/kgws/kgws/bg.c        -I include/ $(CFLAGS) $(DEFINES) -o bg.o
+	gcc -c kernel/kservers/kgws/kgws/window.c    -I include/ $(CFLAGS) $(DEFINES) -o window.o
+	gcc -c kernel/kservers/kgws/logon/logon.c    -I include/ $(CFLAGS) $(DEFINES) -o logon.o
+	gcc -c kernel/kservers/kgws/logoff/logoff.c  -I include/ $(CFLAGS) $(DEFINES) -o logoff.o
+	gcc -c kernel/kservers/kgws/user/userenv.c   -I include/ $(CFLAGS) $(DEFINES) -o userenv.o
+	gcc -c kernel/kservers/kgws/user/desktop.c   -I include/ $(CFLAGS) $(DEFINES) -o desktop.o
+	gcc -c kernel/kservers/kgws/user/room.c      -I include/ $(CFLAGS) $(DEFINES) -o room.o
+	gcc -c kernel/kservers/kgws/user/usession.c  -I include/ $(CFLAGS) $(DEFINES) -o usession.o
+	gcc -c kernel/kservers/kgws/kgws.c           -I include/ $(CFLAGS) $(DEFINES) -o kgws.o
 
 
 link-x86:

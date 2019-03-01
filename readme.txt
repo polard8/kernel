@@ -2,7 +2,20 @@
  ~Main folders for Gramado Operating System.
  
  
- kernel > drivers > servers > user
+
+ 
+ 
+===================================
+ layer: kernel > drivers > servers > user
+ 
+ 
+ drivers = ring 3 drivers
+ servers = ring 3 servers
+ 
+ kernel/kdrivers = base kernel drivers
+ kernel/kservers = base kernel servers
+
+===================================
  
 
 Groups:
