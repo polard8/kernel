@@ -3316,9 +3316,9 @@ void kill(int exit_code);
 //
 
 //Create thread.
-void *apiCreateThread( unsigned long thread_eip, 
-                       unsigned long thread_priority, 
-					   char *name );
+void *apiCreateThread ( unsigned long init_eip, 
+                        unsigned long init_stack, 
+                        char *name );
 
 //coloca no estado standby para executar pela primeira vez.					   
 void apiStartThread(void *Thread); 

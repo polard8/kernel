@@ -2166,13 +2166,13 @@ void *gde_create_process ( unsigned long process_eip,
  *     Create a thread.
  */
 
-void *gde_create_thread ( unsigned long thread_eip, 
-                          unsigned long thread_priority, 
-					      char *name )
+void *gde_create_thread ( unsigned long init_eip, 
+                          unsigned long init_stack, 
+                          char *name )
 {
-    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, thread_eip, 
-						thread_priority, (unsigned long) name );		
-};
+    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, init_eip, 
+						init_stack, (unsigned long) name );
+}
 
 
 /*

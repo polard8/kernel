@@ -2133,14 +2133,14 @@ Linker script and memory map
                 0x00000000c002936e                _faults
                 0x00000000c0029586                _KiCpuFaults
                 0x00000000c002959d                _do_pagefault
- .text          0x00000000c002966b     0x12ef services.o
+ .text          0x00000000c002966b     0x12fb services.o
                 0x00000000c002966b                _services
                 0x00000000c002a750                _serviceCreateWindow
-                0x00000000c002a8c7                _servicesPutChar
-                0x00000000c002a954                _servicesChangeProcedure
-                0x00000000c002a95a                _code_end = .
+                0x00000000c002a8d3                _servicesPutChar
+                0x00000000c002a960                _servicesChangeProcedure
+                0x00000000c002a966                _code_end = .
                 0x00000000c002b000                . = ALIGN (0x1000)
- *fill*         0x00000000c002a95a      0x6a6 
+ *fill*         0x00000000c002a966      0x69a 
 
 .iplt           0x00000000c002b000        0x0
  .iplt          0x00000000c002b000        0x0 services.o

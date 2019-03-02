@@ -1902,6 +1902,11 @@ done:
 }
 
 
+/*
+ * serviceCreateWindow:
+ *     Cria uma janela com base nos argumentos passados no buffer.
+ */
+
 unsigned long serviceCreateWindow ( char *message_buffer ){
 	
 	unsigned long *message_address = (unsigned long *) message_buffer;
@@ -1976,7 +1981,7 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 	int desktopID;
 	
 	
-	desktopID = (int) get_current_desktop_id();	
+	desktopID = (int) get_current_desktop_id ();	
 	
     // Importante:
 	// Nesse momento é fundamental saber qual é a parent window da janela que vamos criar 
@@ -2027,16 +2032,17 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 		//@todo: Não registrar, quem criou que registre a janela.
 		//RegisterWindow(NewWindow);
 		
-		//
+		// #importante
 		// Se a tarefa atual está pintando, vamos melhorar a sua prioridade.
-		//
+		// Possivelmente a thread de controle da janela é a thread atual.
 		
 		t = (void *) threadList[current_thread];
 		
 		set_thread_priority ( t, PRIORITY_HIGH4 );
 		
+		NewWindow->control = t;
+		
 		return (unsigned long) NewWindow;
-	    //return (void *) NewWindow; 
 	};	
 }
 

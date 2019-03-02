@@ -1,5 +1,5 @@
 /*
- * File: gws/button.c
+ * File: kgws/button.c
  *
  * Descrição:
  *     Rotinas de criação e gerenciamento de botões. 
@@ -35,7 +35,6 @@ void updateButton ( struct button_d *button,
                     unsigned long height, 
                     unsigned long color )
 {
-	
     if ( (void *) button == NULL )
     {
 	    return;	
@@ -60,11 +59,9 @@ void updateButton ( struct button_d *button,
 		button->width = (unsigned long) width; 
 		button->height = (unsigned long) height;
 
-		button->color = (unsigned long) color;
-		
+		button->color = (unsigned long) color;	
 	};
-
-};
+}
 
 
 /*
@@ -78,7 +75,6 @@ void updateButton ( struct button_d *button,
  *
  * #importante: 
  * Retorna o ponteiro pra estrutura do botão.
- *
  */
 
 void *draw_button ( struct window_d *window,
@@ -179,8 +175,6 @@ void *draw_button ( struct window_d *window,
 			border2 = COLOR_BUTTONSHADOW2;
 			b->border1 = COLOR_BUTTONHIGHLIGHT2;
 			b->border2 = COLOR_BUTTONSHADOW2;
-			//b->color = color; 	
-            //goto do_draw_button;			
 			break;
 			
 		case BS_FOCUS:
@@ -188,7 +182,6 @@ void *draw_button ( struct window_d *window,
 			border2 = COLOR_BLUE;
             b->border1 = COLOR_BLUE;
 			b->border2 = COLOR_BLUE;		
-            //b->color = color; 	
 			break;	
                                                        
          // Pressionado.
@@ -199,8 +192,6 @@ void *draw_button ( struct window_d *window,
 			border2 = COLOR_BUTTONSHADOW2;
             b->border1 = COLOR_BUTTONHIGHLIGHT2;
 			b->border2 = COLOR_BUTTONSHADOW2;
-			//b->color = color; 	
-			//goto do_draw_button;			
             break;
 			
 		case BS_HOVER:
@@ -232,27 +223,36 @@ void *draw_button ( struct window_d *window,
 
 	// Usaremos retângulos para desenharmos o botão.
    
-    // Temos a intenção de uar estilos diferentes, como flat design,
+    // Temos a intenção de usar estilos diferentes, como flat design,
 	// por exemplo.
 	
-	//bg
+	//
+	// ## bg ##
+	//
+	
 	drawDataRectangle ( window->left +x, window->top +y, 
 	    width, height, color );
     
+	//
+	// ## 4 bordas ##
+	//
+	
+	// #todo
+	// As cores das bordas deve estar no esquema de cores.
+	
 	//board1, borda de cima e esquerda.
 	drawDataRectangle ( window->left +x, window->top +y, 
 	    width, 1, border1 );
-		
 	drawDataRectangle ( window->left +x, window->top +y, 
 	    1, height, border1 );
 
 	//board2, borda direita e baixo.
 	drawDataRectangle ( window->left +x +width -1, window->top +y, 
 		1, height, border2 );
-					   
 	drawDataRectangle ( window->left +x, window->top +y +height -1, 
 		width, 1, border2 );
 
+	
 //
 // Do draw label.
 //
@@ -293,26 +293,9 @@ void *draw_button ( struct window_d *window,
 			
 	};
 	
-	//
-	// @todo: Algo mais?
-	//
-	
-// Done! 
-//done:
-    
 	//Retornando o ponteiro para a estrutura do botão.
     return (void *) b;          
-};
-
-
-
-
-
-
-/*
-int buttonInit()
-{}
-*/
+}
 
 
 //

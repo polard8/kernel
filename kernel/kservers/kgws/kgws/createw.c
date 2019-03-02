@@ -1,5 +1,5 @@
 /*
- * File: gws/gws/createw.c
+ * File: kgws/kgws/createw.c
  *
  * Descrição: 
  *     Gerencia os métodos de criação de molduras de janelas e de janelas simples.
@@ -1511,14 +1511,17 @@ void *CreateWindow ( unsigned long type,
 	//JANELA DO TIPO BOTÃO.
 	//#BUGBUG: NÃO TEMOS INFORMAÇÕES SOBRE O TIPO DE BOTÃO 
 	//QUE DEVEMOS CRIAR. SÓ SABEMOS QUE A JANELA É DO TIPO BOTÃO.
+	
+	//as posições de left e right são da janela do botão.	
+    //#obs: Essa função retorna uma estrutura de botão.	
+    //Então uma janela, quando acianoada sua flag que indica que ela é um botão,
+    //podemos usar a estrutura de botão para acessar as características do botão.		
+	
+	//#obs
+	//as cores das bordas depende do status.
+	
 	if ( (unsigned long) type == WT_BUTTON )
 	{
-	    //as posições de left e right são da janela do botão.	
-        //#obs: Essa função retorna uma estrutura de botão.	
-        //Então uma janela, quando acianoada sua flag que indica que ela é um botão,
-        //podemos usar a estrutura de botão para acessar as características do botão.		
-		
-
         window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
                                                  window->left, window->top, window->width, window->height, 
                                                  window->bg_color );
@@ -1593,8 +1596,7 @@ void *CreateWindow ( unsigned long type,
 	                              window->left+1, window->bottom-25-1, 
 								  window->width, 25,							  
 					              window, 0, 
-								  COLOR_BLUE, 
-								  COLOR_GRAY );
+								  COLOR_BLUE, COLOR_GRAY );
         
 		// Registrar.
 		RegisterWindow (window->statusbar);

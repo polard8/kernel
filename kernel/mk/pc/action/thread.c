@@ -88,8 +88,8 @@ struct thread_d *create_thread ( struct room_d *room,
                                  struct window_d *window,
                                  unsigned long init_eip, 
                                  unsigned long init_stack, 
-								 int pid, 
-								 char *name)
+                                 int pid, 
+                                 char *name)
 {	
     //Structures.	
 	struct process_d *Process;    //Process.

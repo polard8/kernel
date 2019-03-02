@@ -3317,9 +3317,9 @@ void *gde_create_process ( unsigned long process_eip,
 //
 
 //Create thread.
-void *gde_create_thread ( unsigned long thread_eip, 
-                       unsigned long thread_priority, 
-					   char *name );
+void *gde_create_thread ( unsigned long init_eip, 
+                          unsigned long init_stack, 
+                          char *name );
 
 #define apiCreateThread gde_create_thread 
 

@@ -1,5 +1,5 @@
 /*
- * File: gws/window.c 
+ * File: kgws/window.c 
  *
  * Descrição:
  *     Arquivo principal do Window Manager.
@@ -2404,28 +2404,25 @@ fail:
  */	
  
 int 
-resize_window( struct window_d *window, 
+resize_window ( struct window_d *window, 
                unsigned long cx, 
-			   unsigned long cy )
+               unsigned long cy )
 {
-    
+ 
 	if ( (void *) window == NULL )
 	{
-		//Erro, estrutura inválida.
-	    return (int) 1;    
+	    return 1;    
 	
 	} else {	
 	    
 		//@todo: Checar limites.
 	
-        window->width  = (unsigned long) cx;
+        window->width = (unsigned long) cx;
         window->height = (unsigned long) cy;	
 	};
 
-//done:
-
-    return (int) 0;
-};
+    return 0;
+}
 
 
 /*
@@ -2440,7 +2437,7 @@ replace_window ( struct window_d *window,
 				 unsigned long y )
 {
     if ( (void *) window == NULL ){
-		return (int) 1;
+		return 1;
 	
 	} else {
 		
@@ -2644,7 +2641,7 @@ void DestroyWindow ( struct window_d *window ){
 int get_active_window (){
 	
     return (int) active_window;  
-};
+}
 
 
 /*
@@ -2741,14 +2738,16 @@ exit:
  * change_active_window:
  *     @todo: Trocar a janela ativa
  */
+
 void change_active_window (int id){
 	
-	// @todo: Limits. Max.
-    if(id < 0){
+	//todo: Limits. Max.
+    
+	if (id < 0)
 	    return;
-	};
+
 	active_window = (int) id;
-};
+}
 
 
 /*
@@ -2844,7 +2843,7 @@ void windowUnblockFocus (){
  *     fica dentro dos limites da área de cliente, mesmo que esteja 
  * em full screen.
  *     Se a janela for um editbox, faz mais sentido ainda que 
- * o corsor fique dentro dos limites da área de cliente.
+ * o cursor fique dentro dos limites da área de cliente.
  *
  * #importante:
  *  Isso depende do tipo de janela. Se for um editbox tem que colocar o 
@@ -2883,12 +2882,11 @@ void SetFocus ( struct window_d *window ){
 		}
 		
 		
-		//#importante:
-		//se a estrutura de janel é válida, vamos associar 
-		//a janela com o foco de entrada à thread atual,
-		//pois é ela quem chamou essa rotina. Apesar que 
-		//o proprio kernel pode ter chamado isso na inicialização,
-		//nesse caso a thread será inválida.
+		// #importante:
+		// Se a estrutura de janela é válida, vamos associar a janela com o 
+		// foco de entrada à thread atual, pois é ela quem chamou essa rotina. 
+		// Apesar que o próprio kernel pode ter chamado isso na inicialização,
+		// nesse caso a thread será inválida.
 		
 		window->control = (struct thread_d *) threadList[current_thread];
 		
@@ -2923,10 +2921,10 @@ void SetFocus ( struct window_d *window ){
 			
 			window->focus = 1; 	
 		    
-			//bugbug
-			//Procedure.
-		    //?? Não sei se é o ideal.
-		    SetProcedure((unsigned long) window->procedure);
+			// bugbug
+            // Não estamos mais usando isso.
+			
+		    SetProcedure ((unsigned long) window->procedure);
 			
 			goto setup_wwf;
 		};
@@ -2936,42 +2934,41 @@ void SetFocus ( struct window_d *window ){
             // As janelas filhas nunca são janelas ativas. Se uma janela filha 
 			// tem o foco de entrada, então sua janela mãe é a ativa. 			
 		if( window->id != active_window )
-		{
-				
-			    // Se a janela mãe tem um ponteiro inválido. Então ela não tem uma 
-				// janela mãe, então ativamos a janela filha.
-                // ?? #bugbug talvez não seja essa ideia certa.			
-		    if( (void*) window->parent == NULL ){
+		{	
+			// Se a janela mãe tem um ponteiro inválido. Então ela não tem uma 
+			// janela mãe, então ativamos a janela filha.
+            // ?? #bugbug talvez não seja essa ideia certa.			
+		    
+			if( (void*) window->parent == NULL ){
 		        set_active_window(window);				
 		    }else{
 
-					// Testando a validade da janela mãe
-				    // Ativar a janela mãe se ela tem um ponteiro válido
-					// Pois janela filha nunca é a janela ativa, mesmo tendo o foco.
-			    if( window->parent->used == 1 && 
-				    window->parent->magic == 1234 )
+				// Testando a validade da janela mãe
+				// Ativar a janela mãe se ela tem um ponteiro válido
+				// Pois janela filha nunca é a janela ativa, mesmo tendo o foco.
+			    
+				if ( window->parent->used == 1 && window->parent->magic == 1234 )
 				{
 			        set_active_window(window->parent);	
 			    };				
 			};
 
-                //Obs: Nesse momento a janela ativa está configurada.
-				// a janela ativa é a própria janela ou a sua janela mãe.
-                
-				
-                // Já podemos setar o foco de entrada e configurarmos o 
-				// procedimento de janela.				
+            //Obs: Nesse momento a janela ativa está configurada.
+			// a janela ativa é a própria janela ou a sua janela mãe.
+                	
+            // Já podemos setar o foco de entrada e configurarmos o 
+			// procedimento de janela.				
 
-	            //set wwf id.
+	        //set wwf id.
 			window_with_focus = (int) window->id;
             
             window->focus = 1;   			
 		    
-			    //set wwf pointer.
+			//set wwf pointer.
 			WindowWithFocus = (void *) window;
 
-		        //Procedure.
-		        //?? Não sei se é o ideal.
+		    //Procedure.
+		    //?? Não sei se é o ideal.
 		    SetProcedure((unsigned long) window->procedure);
 			
 			set_top_window( (int) window->id );
@@ -3127,6 +3124,7 @@ void *windowGetForegroundWindow (){
  * que ela se destaque.
  * retorno: 0=OK  , 1=error.
  */
+
 int windowSetForegroundWindow ( struct window_d *window ){
 	
 	if ( (void *) window == NULL )

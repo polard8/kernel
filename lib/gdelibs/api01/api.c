@@ -2169,13 +2169,14 @@ void *apiCreateProcess( unsigned long process_eip,
  * apiCreateThread:
  *     Create a thread.
  */
-void *apiCreateThread( unsigned long thread_eip, 
-                       unsigned long thread_priority, 
-					   char *name )
+
+void *apiCreateThread ( unsigned long init_eip, 
+                        unsigned long init_stack, 
+                        char *name )
 {
-    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, thread_eip, 
-						thread_priority, (unsigned long) name );		
-};
+    return (void *) system_call ( SYSTEMCALL_CREATETHREAD, init_eip, 
+						init_stack, (unsigned long) name );
+}
 
 
 /*
