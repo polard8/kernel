@@ -634,8 +634,8 @@ unsigned long kernel_stack_start_pa;   //pa (endereço indicado na TSS).
  * Obs: 
  * O gerenciamento de memória é tarefa do módulo /sm portanto isso não deve 
  * ir para o /microkernel.
- *
  */
+
 typedef struct process_memory_info_d process_memory_info_t;
 struct process_memory_info_d
 {
@@ -740,16 +740,13 @@ memory_info_t *miMemoryInfo;
  * em especial. (Não incluir nenhuma variável por enquanto!).
  *****************************************************************
  */ 
-//typedef struct mmblock_d mmblock_t;  //@todo: usar esse. 
-typedef struct mmblock_d mmblock_descriptor_t;
+
 struct mmblock_d 
 {
-	//
+	
 	// Essa estrutura é para gerenciar áreas de memória alocadas dinamicamente 
 	// dentro do heap do processo kernel. Alocadas em tempo de eecução.
-	//
 	
-	//
 	// @todo: 
 	// Talvez não seja possível mudar essa estrutura. Éla é diferente.
 	// Portanto não definiremos inada o tipo de objeto que ela é e nem a classe.
@@ -796,52 +793,22 @@ struct mmblock_d
 	// Talvez não pode.
 	//
 	
-	//
-	// *IMPORTANTE: 
+	// IMPORTANTE: 
 	// Talvez temos algum limite para o tamanho dessa estrutura em especial. 
 	// Não inluir nada por enquanto.
-	//
 	
-	//Encadeando.
+	// Navegação
 	struct mmblock_d *Prev;
 	struct mmblock_d *Next;
 };
-mmblock_descriptor_t *current_mmblock;
-//mmblock_descriptor_t *SystemCache_mmblock;
-//mmblock_descriptor_t *ProcessCache_mmblock;
-//...
+struct mmblock_d *current_mmblock;
 
  
 //Lista de blocos. 
 //lista de blocos de memória dentro de um heap.
 //@todo: na verdade temos que usar lista encadeada. 
 unsigned long mmblockList[MMBLOCK_COUNT_MAX];  
-                                 
-								 
-								 							 
-/*
-typedef struct free_mmblock_d free_mmblock_t;
-struct free_mmblock_d 
-{
-   struct mmblock_d *next;
-   char garbage[4092];
-}
-*/
 
-
-
-//
-// ********  GERENCIAMENTO DE MEMÓRIA FÍSICA **************
-//
-
-
-
-//
-// A memória física é dividida em partições.
-// cada partição é composta de 1024 frames.
-// Uma partição será chamada de framepool.
-// Cada pegepool tem 1024 page frames.
-//
 
 /*
  ****************************************************************
@@ -850,58 +817,38 @@ struct free_mmblock_d
  *     @todo: Incluir todas as informações necessárias.
  */
 
-//typedef struct page_d page_t;
-
 struct page_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
 	
+	//identificador da estrutura.
+	//é um índice na lista de páginas do pagedpool.
 	int id;
+	
 	int used;
 	int magic;
-	int locked;             //Não pode ser descarregado para o disco.
 	
-	int free;    //se é um frame de memória física livre para uso.
+	// Identificador de frame.
+	// (pa/4096)
+	int frame_number;
 	
-	//...
+	//Não pode ser descarregado para o disco.
+	//Não pode ser alterado.
+	int locked;             
 	
-    //unsigned long address;  //Endereço físico da page frame.	
+	//A página está livrea para uso pelos processos.
+	int free;    
 	
-	//...
-	
-	//@todo
-	//'owner' A quem pertence a page frame.???user, group, process.
-	//struct process_d *process;
-	//...
-	
-	//à qual pagetable pertence esse page frame.
-	//struct page_table_d *pagetable;
-	
-	//aspace associado à esse pageframe.
-	//struct aspace_d *aspace;
-	
-	//area de disco associada à esse pageframe.
-	//struct dspace_d *dspace;
-	
+	//Contador de referências.
+    int ref_count;
 	
 	//navegação
     struct page_d *next;	
 };
-struct page_d *pageframeCurrent;
-//page_t *pageframeCurrent;  //deletar
-//...
-
-//Lista de pages.
-unsigned long pageList[PAGE_COUNT_MAX];
  
+// #importante
+// Pool de memória paginável usado para alocação.
+// Aqui ficam os ponteiros para estrutura do tipo page.
 
-//
-// *importante
-//
-
-//pool de memória paginável usado para alocação.
-//aqui ficam os ponteiros para estrutura do tipo page
 unsigned long pageAllocList[PAGE_COUNT_MAX];
 
 
@@ -912,18 +859,23 @@ unsigned long pageAllocList[PAGE_COUNT_MAX];
  *     Cada framepool tem 1024 frames.
  *     @todo: Poderia ser framepool_d ??
  */
-typedef struct frame_pool_d frame_pool_t;
+
 struct frame_pool_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
+	//object_type_t objectType;
+	//object_class_t objectClass;
 	
+	//Índice na lista de frame pools;
 	int id;
+	
 	int used;
 	int magic;
+	
+	//Não pode ser modificada.
 	int locked;
 	
 	//Endereço do início do framepool.
+	// va ou pa ??
 	unsigned long address; 
 	
 	//Qual processo é o dono desse framepool.
@@ -938,42 +890,42 @@ struct frame_pool_d
 //
 
 //kernel space.
-frame_pool_t *framepoolKernelSpace;            //0x00000000  Kernel Space. Início do kernel space.
+struct frame_pool_d *framepoolKernelSpace;            //0x00000000  Kernel Space. Início do kernel space.
 
 //user space
-frame_pool_t *framepoolSmallSystemUserSpace;   //0x00400000  Para um sistema pequeno o kernel space tem 4MB.
-frame_pool_t *framepoolMediumSystemUserSpace;  // 
-frame_pool_t *framepoolLargeSystemUserSpace;   //0x40000000  Para um sistema grande o kernel space tem um giga. 
+struct frame_pool_d *framepoolSmallSystemUserSpace;   //0x00400000  Para um sistema pequeno o kernel space tem 4MB.
+struct frame_pool_d *framepoolMediumSystemUserSpace;  // 
+struct frame_pool_d *framepoolLargeSystemUserSpace;   //0x40000000  Para um sistema grande o kernel space tem um giga. 
 //...
 
 //Cada front buffer é uma placa de vídeo.
-frame_pool_t *framepoolFrontBuffer1;   //Início do linear frame buffer 1.
-frame_pool_t *framepoolFrontBuffer2;   //Início do linear frame buffer 2.
-frame_pool_t *framepoolFrontBuffer3;   //Início do linear frame buffer 3.
-frame_pool_t *framepoolFrontBuffer4;   //Início do linear frame buffer 4.
+struct frame_pool_d *framepoolFrontBuffer1;   //Início do linear frame buffer 1.
+struct frame_pool_d *framepoolFrontBuffer2;   //Início do linear frame buffer 2.
+struct frame_pool_d *framepoolFrontBuffer3;   //Início do linear frame buffer 3.
+struct frame_pool_d *framepoolFrontBuffer4;   //Início do linear frame buffer 4.
 //...
 
 //Backbuffer
-frame_pool_t *framepoolBackBuffer1;   //Início do backbuffer.
-frame_pool_t *framepoolBackBuffer2;   //Início do backbuffer.
-frame_pool_t *framepoolBackBuffer3;   //Início do backbuffer.
-frame_pool_t *framepoolBackBuffer4;   //Início do backbuffer.
+struct frame_pool_d *framepoolBackBuffer1;   //Início do backbuffer.
+struct frame_pool_d *framepoolBackBuffer2;   //Início do backbuffer.
+struct frame_pool_d *framepoolBackBuffer3;   //Início do backbuffer.
+struct frame_pool_d *framepoolBackBuffer4;   //Início do backbuffer.
 //...
 
 
 //Área onde poderemos alocar frames para os processos usarem...
 //Esse é o framepool inicial de usa áre grande de memória.
-frame_pool_t *framepoolPageableSpace;   
+struct frame_pool_d *framepoolPageableSpace;   
 
 
 //Current.
-frame_pool_t *framepoolCurrent;
+struct frame_pool_d *framepoolCurrent;
 //...
 
-//frame_pool_t *framepoolKernelPagedPool;
-//frame_pool_t *framepoolKernelNonPagedPool;
-//frame_pool_t *framepoolUserPagedPool;
-//frame_pool_t *framepoolUserNonPagedPool;
+//struct frame_pool_d *framepoolKernelPagedPool;
+//struct frame_pool_d *framepoolKernelNonPagedPool;
+//struct frame_pool_d *framepoolUserPagedPool;
+//struct frame_pool_d *framepoolUserNonPagedPool;
 
 //
 //   **** PAGEABLE AREA ****
@@ -1248,6 +1200,10 @@ virtual_to_physical( unsigned long virtual_address,
 //
 
 void show_memory_structs();
+
+
+//mostra as estruturas de pagina usadas para paginação no pagedpool.
+void showFreepagedMemory ( int max );
 
 
 //

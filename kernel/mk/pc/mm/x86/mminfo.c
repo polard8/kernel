@@ -131,6 +131,7 @@ void memoryShowMemoryInfo (){
  * show_memory_structs:
  *     *IMPORTANTE.
  *     Mostra as informações das estruturas de memória. 
+ *     Essas são as estruturas usadas pelo malloc.
  * @todo: 
  *     Mostrar a memória usada pelos processos.
  *     Mostrar o quanto de memória o processo usa.
@@ -268,7 +269,40 @@ done:
 fail:
 	refresh_screen ();
     return;	
-};
+}
+
+
+//mostra as estruturas de pagina usadas para paginação no pagedpool.
+void showFreepagedMemory ( int max ){
+
+	int Index;
+	struct page_d *p;
+	
+    if (max < 0 || max >= 1024 )
+		return;
+
+	for ( Index=0; Index < max; Index++ )   	
+	{  
+        p = (void *) pageAllocList[Index]; 
+		
+		//if ( (void *) p == NULL )
+		//{
+		//    printf("null\n");	 
+		//}
+	    
+		if ( (void *) p != NULL )
+		{
+		    printf ("id=%d free=%d frameno=%d ref=%d \n", 
+				p->id, 
+				p->free, 
+				p->frame_number,
+				p->ref_count ); 	
+		}
+	};
+	
+	refresh_screen ();	
+}
+
 
 
 

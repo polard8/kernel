@@ -1330,21 +1330,6 @@ int SetUpPaging (){
 
 
 	//
-	// Inicializando a lista de pageframes.
-	//
-	
-	for ( Index=0; Index < PAGE_COUNT_MAX; Index++ )
-	{	
-	    pageList[Index] = (unsigned long) 0;
-	};
-
-	//Configurando manualmente a lista de pageframes.
-	pageList[0] = (unsigned long) 0;
-	pageList[1] = (unsigned long) 0;
-	//...
-
-
-	//
 	// Inicializando a lista de framepools. (partições)
 	//
 	
@@ -1551,6 +1536,9 @@ void *allocPages ( int size ){
 	//Esse é o endereço virtual do início do pool de pageframes.
 	unsigned long base = (unsigned long) g_pagedpool_va;
 	
+	unsigned long va;
+    unsigned long pa;
+	
 	int Count = 0;
 	
 	//
@@ -1562,29 +1550,17 @@ void *allocPages ( int size ){
 #endif
 
 	//problemas com o size.
-	if(size <= 0){
+	if(size <= 0)
+	{
 		//if debug
 		printf("allocPageFrames: size 0\n");
 		return NULL;
 	};
 			
     //Se é pra alocar apenas uma página.
-	if(size == 1)
-	{
-		//
-		//   ## bugbug ##
-		//
-		
-		//printf("allocPageFrames: alguem esta tentando alocar somente uma página ...\n");
-		//refresh_screen();
-		//while(1){ asm ("hlt");}		
-		
-		//#importante
-		//Para corrigir podemos usar essa rotina de alocação de uma página 
-		//ela faz tudo certinho. 
-		
-		return (void *) newPage();
-		
+	if (size == 1)
+	{		
+		return (void *) newPage ();	
 	}	
 	
 	//se o size for maior que o limite.
@@ -1599,9 +1575,13 @@ void *allocPages ( int size ){
 	//
 	// Isso encontra slots o suficiente para alocarmos tudo o que queremos.
 	//
+	
 	int Base;
-	Base = firstSlotForAList(size);
-	if( Base == -1 ){
+	
+	Base = firstSlotForAList (size);
+	
+	if ( Base == -1 )
+	{
 		printf("Base = -1 \n");
 		goto fail;
 	}
@@ -1621,7 +1601,8 @@ void *allocPages ( int size ){
 		{
 			//#bugbug
 			//Isso pode esgotar o heap do kernel
-			p = (void*) malloc( sizeof( struct page_d ) );
+			
+			p = (void *) malloc ( sizeof( struct page_d ) );
 			
 			if ( p == NULL )
 			{
@@ -1631,27 +1612,55 @@ void *allocPages ( int size ){
 			
 			//printf("#");
 			p->id = Index;
+			
 			p->used = 1;
 			p->magic = 1234;
-			p->free = 0;  //not free
-			//...
+			
+			//not free
+			p->free = 0;  
+
+			//----
+			
+			p->locked = 0;
+			
+			//contador de referências
+			p->ref_count = 1;	
+			
+			//pegando o endereço virtual.
+			va = (unsigned long) ( base + (p->id * 4096) );    
+			pa = (unsigned long) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
+			
+	
+			if ( ( pa % PAGE_SIZE) != 0 ) 
+			{		
+			    pa = pa - ( pa % PAGE_SIZE);			
+			}	 	
+			
+			p->frame_number = (pa / PAGE_SIZE);
+			
+			if ( pa == 0 )
+			{
+			    p->frame_number = 0;
+			}
+			
+			//---
 			
 			pageAllocList[Index] = ( unsigned long ) p; 
 			
-			Conductor->next = (void*) p;
-			Conductor = (void*) Conductor->next;
+			Conductor->next = (void *) p;
+			Conductor = (void *) Conductor->next;
 			
 			Count++;
 			if( Count >= size )
 			{
-				Ret = (void*) pageAllocList[Base];
+				Ret = (void *) pageAllocList[Base];
 			    goto done;	
 			}	
 		};
 	};
 	
 fail:
-    printf("allocPageFrames: fail ...\n");		
+    printf("allocPageFrames: fail \n");		
     return NULL;	
 done:
     //printf("allocPageFrames: done ...\n");	
@@ -1718,7 +1727,8 @@ tryAgain:
 	{
 	    slot = (void *) pageAllocList[Index];
 		
-		if ( (void *) slot != NULL ){
+		if ( (void *) slot != NULL )
+		{
 			Base = Base+Count;
 			Base++;
 			Count = 0;

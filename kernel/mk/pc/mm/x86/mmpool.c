@@ -1,22 +1,19 @@
-
 /*
- 'g_pagedpool_va' É o endereço virtual de uma área de memória pré alocada
- de onde tiraremos páginas de memória sob demanda.
- 
- # Estamos alocando páginas, e lidando com endereços virtuais.
- 
+ * File: mmpool.c
+ *     ?
+ *
+ * g_pagedpool_va é o endereço virtual de uma área de memória pré alocada
+ * de onde tiraremos páginas para o alocador.
  */
 
 
 #include <kernel.h>
 
+
 /*
  ******************************************************
  * newPageFrame:
- *    Aloca apenas um frame de memória física e retorna o ponteiro.
- *    ? kernel mode ? user mode ?
- *    obs: isso funciona bem.
- *    Obs: Isso é usado pelo alocador de páginas, logo abaixo.
+ *    Aloca apenas uma página e retorna retorna o ponteiro de estrutura de página.
  */
 
 void *page (){
@@ -43,10 +40,15 @@ void *page (){
 			}
 			
 			//printf("$");
+			
 			New->id = Index;
+			
 			New->used = 1;
 			New->magic = 1234;
-			New->free = 0;  //not free
+			
+			//not free
+			New->free = 0;  
+						
 			New->next = NULL;
 			
 			
@@ -88,16 +90,13 @@ void *newPage (){
 	// Isso significa que num pool temos vários pageframes.
 	
 	unsigned long base = (unsigned long) g_pagedpool_va;	
-    
-	// Pega o id do pageframe e 
-	// multiplica pelo tamanho do frame e 
-	// adiciona à base.	
 	
-    // Novo frame.
-	//New	= (void *) newPageFrame ();
+	unsigned long va;
+    unsigned long pa;
+	   
 	New	= (void *) page ();	
 	
-	if( New == NULL )
+	if ( New == NULL )
 	{
 		printf("pc-mm-newPage: New\n");
 		goto fail;
@@ -106,11 +105,41 @@ void *newPage (){
 	    
         if ( New->used == 1 && New->magic == 1234 )
 		{
-			//pega o id 
-			//checa o limite de slots.
+			// Pega o id 
+			// Checa o limite de slots.
+			
 			if ( New->id > 0 && New->id < PAGE_COUNT_MAX )
             {
+				//trava ou não??
+			    New->locked = 0;
+			    
+				//contador de referências.
+				New->ref_count = 1;	
+
+			    //#importante
+			    //precisamos pegar o endereço físico e dividir pelo tamanho da página.
+				
+				//pegando o endereço virtual.
+				va = (unsigned long) ( base + (New->id * 4096) );
+			    
+				pa = (unsigned long) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
+				
+				
+			    if ( ( pa % PAGE_SIZE) != 0 ) 
+			    {		
+			        pa = pa - ( pa % PAGE_SIZE);			
+		 	    }	 	
+			
+			    New->frame_number = (pa / PAGE_SIZE);
+			
+			    if ( pa == 0 )
+			    {
+			        New->frame_number = 0;
+			    }
+				
+				//retorn o endereço virtual	
 				return (void *) ( base + (New->id * 4096) );
+				//return (void *) va;
 			}				
 		};		
 	};

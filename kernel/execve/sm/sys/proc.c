@@ -602,8 +602,12 @@ system_procedure ( struct window_d *window,
 
 					printf("F5:\n"); 
 					
+					//mostra as estruturas de pagina usadas para paginação no pagedpool.
+					//número de entradas.
+					//showFreepagedMemory (32);
+					showFreepagedMemory (64);
 					//process info
-					 show_process_information ();
+					//show_process_information ();
 					
 					//Hz
 					//testando ajuste de precisão.
