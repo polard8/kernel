@@ -31,13 +31,11 @@ msg_BUGBUG DB 'bm:pmInit: #BUGBUG',0
 ;     Switching to Protected Mode.
 ;     Obs: Talvez essa rotina deva receber argumentos. 
 ;     *Na inicialização essa rotina é chamada em modo texto.
-;
+
 pmInit:
 
-    ;
-	; @todo: Salva o metafile com todos os parametros 
-	; detectados em modo real.
-	;
+	; @todo: 
+	; Salva o metafile com todos os parametros detectados em modo real.
 	
 	;call save_metafile
 
@@ -90,6 +88,8 @@ pmInit:
     or al, 1
     mov cr0, eax
 	
+
+	
 	;;
 	;; Flush pipeline.
 	;;
@@ -104,6 +104,7 @@ pmFlushPipeline:
 	
 	[BITS 32]
 pm32:
+
 
     ;debug em modo texto.
     ;mov byte [0B8000h], byte 'P'
@@ -144,6 +145,7 @@ pm32:
 	mov es, ax
 	;mov fs, stage2_NULL_SEL    
 	;mov gs, stage2_NULL_SEL    
+	
 	mov ss, ax
 	mov esp, dword 0x0009FFFC	
     mov edx, dword 0    
@@ -396,6 +398,7 @@ rm_shutdown_msg1 db 'pm.inc: RM, Press a key to shutdown',13,10,0
 ;; OBS: PODEMOS FAZER UM TESTE ANTES PRA VER SE ELE ESTÁ PRESENTE NA MEMÓRIA.
 ;;; 'L' (PE).          
 ;;
+
 rmStartGUI:
     mov ax, DATA_SEL    
 	mov ds,ax
@@ -405,65 +408,75 @@ rmStartGUI:
 	mov ss,ax
 	mov esp, dword 0x0009FFFC
 	
-
-    ;;
-	;; *Importante:
+	;; #Importante:
 	;; Daqui pra frente não usaremos mais o seletor para 32bit, somente 
 	;; o seletor para modo protegido de 16bit.
-	;;
+    ;; Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
 	
-    ;;Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
 	jmp RM_Code_Sel:pmode_16bit_startgui
 [BITS 16]	
 pmode_16bit_startgui:
-    ; ajusta os seletores de codigo para modo protegido de 16 bits.
+
+    ; Ajusta os seletores de codigo para modo protegido de 16 bits.
+	
 	mov	ax, RM_Data_Sel
 	mov	ss, ax
 	mov	ds, ax
 	mov	es, ax
+	
 	;mov	fs, ax
 	;mov	gs, ax
-	
 	
 	;debug
 	;jmp $
 	
+	;Carrega ivt = 0:0
 
-	lidt [ivtr_rm]  	;Carrega ivt = 0:0
+	lidt [ivtr_rm]  	
 	
 ;5. Clear the PE flag in the CR0 register to switch to real-address mode.
+
    mov eax, cr0
    and al, 0xFE
    mov cr0, eax
    
-;#############################################################################
-;6. Execute a far JMP instruction to jump to a real-address mode program. 
-; This operation flushes the instruction queue and loads the appropriate 
-; base and access rights values in the CS register.
+;;#############################################################################
+;; 6. Execute a far JMP instruction to jump to a real-address mode program. 
+;; This operation flushes the instruction queue and loads the appropriate 
+;; base and access rights values in the CS register.
 
     ;; Usando um jmp de 16 bits modo real.
+	
 	JMP 0:do_rm_startgui 	
-    ;;
+    
+	;; Nothing.
+	
 do_rm_startgui:
     
-	;7. Load the SS, DS, ES, FS, and GS registers as needed by the 
-	; real-address mode code. If any of the registers are not going 
-	; to be used in real-address mode, write 0s to them.
+	;; 7. Load the SS, DS, ES, FS, and GS registers as needed by the 
+	;; real-address mode code. If any of the registers are not going 
+	;; to be used in real-address mode, write 0s to them.
+	
+	;; Segmento 0
 	
 	cli
-    mov ax, 0x0000        ;;segmento 0
+    mov ax, 0x0000        
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-    ; Create stack
+    
+	; Create stack
     mov ax, 0x0000
     mov ss, ax
     mov sp, 0xFFFF
 	
-	;Reprogram PIC: 
-	;change IRQ 0-7 to INT 08h-0Fh, and  
-	;       IRQ 8-15 to INT 70h-77h
+	;; Reprogram PIC: 
+	;; Voltando ao estado legado.
+	
+	;; changes: 
+	;; IRQ 0-7 to INT 08h-0Fh  
+	;; IRQ 8-15 to INT 70h-77h
 
     mov al, 10001b       ; begin PIC 1 initialization
     out 20h, al
@@ -520,6 +533,7 @@ do_rm_startgui:
     ;; int 16h
 
 .doStartGUI:
+
 	;Set mode.
 	mov al, byte BOOTMODE_GUI
 	call set_boot_mode
@@ -527,12 +541,18 @@ do_rm_startgui:
 	;; #tests
 	;; 0x118 funcionou à partir no boot loader e no kernel base.
 	;; falta o boot manager aceitar multiplas resoluções
-	
-	;mov word [META$FILE.VIDEO_MODE], 0x118         		
-	mov word [META$FILE.VIDEO_MODE], 0x115     	
-	
+
 	;mov ax, 0x115
 	;call set_video_mode	
+	
+	;mov word [META$FILE.VIDEO_MODE], 0x118         		
+	;mov word [META$FILE.VIDEO_MODE], 0x115
+	
+	;; #IMPORTANTE
+	;; definição do arquivo main.asm
+	
+	mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
+	
     
 	;Inicializa o modo selecionado.
 	JMP s2modesActivateMode    ;(lib16/s2modes.inc) 

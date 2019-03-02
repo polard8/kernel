@@ -236,13 +236,28 @@ search_vesa:
     mov si, msg_ver_vesa
     call PoeString
     popa
+	
+	;;#bugbug
+	;;Não tá dando pra usar recuperar depois esses valores
+	;;quando estivermos em 32bit.
+	
 	;Salva parâmetros no META$FILE.
 	xor ax, ax
 	mov ax, word [ModeInfo_XResolution]
     mov word [META$FILE.SCREEN_X], ax
+	mov word [g_x_resolution], ax
+	
 	xor ax, ax
 	mov ax, word [ModeInfo_YResolution]
     mov word [META$FILE.SCREEN_Y], ax
+	mov word [g_y_resolution], ax
+	
+	;;#bugbug Isso é 'byte'
+	xor ax, ax
+	mov ax, word [ModeInfo_BitsPerPixel]
+    mov word [META$FILE.BPP], ax
+	mov word [g_bpp], ax
+	
 .done:
 	xor ax, ax
 	clc    ;Limpa a flag.

@@ -133,6 +133,15 @@
 
 
 ;;
+;;   ## VIDEO MODE ##
+;;
+
+ G_VIDEO_MODE EQU 0x115
+;;G_VIDEO_MODE EQU 0x118
+;;...
+
+
+;;
 ;; 16 bit: 
 ;; Estamos no primeiro setor do BM.BIN, ele começa em 16 bit.
 ;;
@@ -947,10 +956,6 @@ msg_stage2_trap_fail db 'BM: stage2 TRAP FAIL',0
 AFTER_DATA:
     nop
 stage2Trap1:  
-
-   ;;
-   ;; *Suspendendo alguns argumentos porque no MBR está faltando espaço.
-   ;;   
    
 	;Confere a autorização. (Magic Number)
 	;cmp bx, word 0xF0ED
@@ -1045,7 +1050,8 @@ stage2Initializations:
 .showMessages:	
 	
 	
-HERE:	
+HERE:
+
 	mov ax, 0 
 	mov ds, ax
 	mov es, ax 
@@ -1060,12 +1066,13 @@ HERE:
 	
 	;Debug.
 	;jmp $
-	
-	
- 
+	 
 	
 ;; Checar se a assinatura PE está na memória, se estiver, pularemos e
-;;a etapa de carregamento do arquivo.	
+;; a etapa de carregamento do arquivo.
+;; #todo
+;; Rever essa assinatudo, pois tudo no sistema agora usa ELF.
+
 .checkSig:
     mov ax, 0x2000
 	mov gs, ax 
@@ -1091,19 +1098,17 @@ HERE:
 	mov si, stage2_msg_pe_sig
 	call DisplayMessage
 	
-;.searchFile: ;;procurar e carregar.
-;;tentaremos pela segunda vez carregar o arquivo.
-
-;
-; * Hang
-;
+;; Hang
 
 .sigHalt:
     hlt	
 	jmp .sigHalt
 	
-;;a assinatura foi encontrada ... prosseguimos com o stage2.
+;; A assinatura foi encontrada ... 
+;; prosseguimos com o stage2.
+
 .sigFound:
+
     ;;message: o arquivo esta presente na memória.
 	mov si, stage2_msg_pe_sigOK
 	call DisplayMessage
@@ -1141,15 +1146,15 @@ HERE:
 	;;com setores desordenados... coisa que não acontece com a rotina de 32bit.
 	;;
 	
-	;DEBUG:   **** USAR BASTANTE ESSE DEBUG PARA TER CERTEZA QUE TEMOS 
-	;TODO O ARQUIVO ONDE QUEREMOS.
-	;;REPETIR ESSE DEBUG EM OUTRAS PARTES DO BM ... 
+	;DEBUG:   
+	;USAR BASTANTE ESSE DEBUG PARA TER CERTEZA QUE TEMOS TODO O ARQUIVO 
+	;ONDE QUEREMOS.
+	;REPETIR ESSE DEBUG EM OUTRAS PARTES DO BM ... 
 	;EM MUITAS PARTES SE PRECISO ... FAZER ALGO SEMELHANTE EM 32BIT
 	;jmp $
 	
-	
-	
     ;Turn off FDC motor.
+	
 .turnoffFDCMotor:	
 	mov dx, 3F2h 
     mov al, 0 

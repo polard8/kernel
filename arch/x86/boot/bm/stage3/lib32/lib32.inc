@@ -31,50 +31,52 @@ TotalMemoryMB: dd 0
 ;------------------------------------------
 ; _bmServices:
 ;     Serviços oferecidos pelo Boot Manager.
-;
-;
+
 global _bmServices
 _bmServices:
-    ;
-	; @todo: Essa rotina conterá os serviços oferecidos pelo Boot Manager.
-	;
+	; @todo: 
+	; Essa rotina conterá os serviços oferecidos pelo Boot Manager.
 	ret
 	
 
-;
-; Obs: As chamadas abaixo visam organização e não desempenho.
-;
 
-;==============================================================
-; lib32PrintChar:
-;     Imprime um caractere na tela em modo gráfico.
-; Obs: O caractere precisa ser desenhado, píxel por pixel.
-;
-; @todo: Argumentos ... variáveis ...
-;
-; a =  cor (rrggbbaa)
-; b =  x ignorado 
-; c =  y ignorado
-; d =  Char.
-;	
-; obs: x e y serão ignorados
-;      e o char será pintado nas cordenadas do 'cursor'.
-;	
+;;==============================================================
+;; lib32PrintChar:
+;;     Imprime um caractere na tela em modo gráfico.
+;;
+;;     Obs: O caractere precisa ser desenhado, píxel por pixel.
+;;     @todo: Argumentos ... variáveis ...
+;;
+;; a =  cor (rrggbbaa)
+;; b =  x ignorado 
+;; c =  y ignorado
+;; d =  Char.
+;;	
+;; obs: x e y serão ignorados
+;;      e o char será pintado nas cordenadas do 'cursor'.
+;;
+
 lib32PrintChar:
+
 	push eax
 	push ebx
 	push ecx 
 	push edx
 
-	mov dword [.color], eax    ;;salva color
-    mov byte [.char], dl       ;;salva char.
+    ;;salva color e char.
+	
+	mov dword [.color], eax    
+    mov byte [.char], dl      
     ;;...	
 	
-	;pega a coordenada x.
+	;; ??
+	;; Pega a coordenada x.
+	;; Me parece que temos variáveis para posição de cursor.
+	
 	mov eax, dword [g_cursor_x]
+		
+	; Se estivermos no fim da linha.
 	
-	
-	;Se estivermos no fim da linha.
 	cmp eax, dword 80
 	jge .nextLine
 	
@@ -99,10 +101,15 @@ lib32PrintChar:
     
 	;; x
     ;;calcula deslocamento na linha
+	;; Me parece que temos variáveis para posição de cursor.
+	
+	;; #bugbug
+	;; Precisamos de uma variável para as dimenções do char.
+	
 	mov eax, dword [g_cursor_x]
-	mov ebx, 8               ;; tamanho da largura do char dada em bits
-	mul ebx  ;; multiplica, o resultado vai para eax.
-	mov dword [.x], eax      ;; deslocamento em pixel na horizontal.
+	mov ebx, 8                    ;; tamanho da largura do char dada em bits
+	mul ebx                       ;; multiplica, o resultado vai para eax.
+	mov dword [.x], eax           ;; deslocamento em pixel na horizontal.
 
 
     mov eax, dword [g_cursor_y]
@@ -111,7 +118,9 @@ lib32PrintChar:
     mov dword [.y], eax      ;; deslocamento em pixel na vertical.
 	
 	;desenha o pixel dadas as coordenadas.
+	
 .PutPixel:
+
     ; a =  cor (rrggbbaa)
     ; b =  x
     ; c =  y
@@ -125,7 +134,9 @@ lib32PrintChar:
 	
 	call _my_buffer_char_blt
 	
+	
 	;;incrementa o cursor depois de imprimir o char.
+	
 	push eax 
     mov eax, dword [g_cursor_x]
     inc eax 
@@ -305,19 +316,19 @@ lib32SetupIDT:
 ;; Continua...	
 	
 	
-;####################################################
-; _gui_buffer_putpixel:
-;     Coloca um pixel no Back Buffer.
-;
-; a =  cor (rrggbbaa)
-; b =  x
-; c =  y
-; d = ?
-;
+;;####################################################
+;; _gui_buffer_putpixel:
+;;     Coloca um pixel no Back Buffer.
+;;
+;; a =  cor (rrggbbaa)
+;; b =  x
+;; c =  y
+;; d = ?
+;;
+
 global _gui_buffer_putpixel
 _gui_buffer_putpixel:
 
-    ;inicio da função.
 	push es
     push ecx
    
@@ -343,30 +354,59 @@ _gui_buffer_putpixel:
 	push eax
 	mov ax, 0x10
 	mov es, ax
-    pop eax   
+    pop eax 
 	
-	;;[BytesPerScanLineMOS] ; ebx = y * y multiplier 800*4 ;1024*4 ;640*4
+	;;#test
 	
-	imul ebx, 800*3 ;640*3        
-    
+	;;ModeInfo_XResolution
+	;;ModeInfo_YResolution
+	;;ModeInfo_BitsPerPixel
+	
+	;TUDO WORD
+	;[META$FILE.SCREEN_X]
+	;[META$FILE.SCREEN_Y]
+    ;[META$FILE.BPP]
+	
+	;[g_x_resolution]
+	;[g_y_resolution]
+	;[g_bpp]
+		
+	;;[BytesPerScanLineMOS] 
+	; ebx = ( y * y multiplier) 
+	
+	;imul ebx, 800*3 
+	
+	imul ebx, 800 ;1024
+	imul ebx, 3	
+	
 	;eax*3
+	
 	mov ecx, dword 3
 	mul ecx
 	add eax, ebx    ;Adiciona ebx.
 	
-	mov  edi, eax ;dword [ebx+eax*3]  ;[ebx+eax*4] ; edi = x*4+(y*y multiplier)
+	
+	;edi = x*3 + (y*y multiplier)
+	
+	mov  edi, eax    
     
-	;mov eax, ecx       ;[MenColor] ; eax = color
-    
-	 
+     
 	;(base) buffer 1 
-    mov ecx, dword LIB32_BACKBUFFER ;0x01000000  ;endereço fisico do backbuffer ;[ModeInfo_PhysBasePtr]
-	add edi, ecx     ;(deslocamento)
+    ;0x01000000 ??
+	;endereço fisico do backbuffer ;[ModeInfo_PhysBasePtr]
+	;(deslocamento)
+	
+	mov ecx, dword LIB32_BACKBUFFER   
+	add edi, ecx     
    	
-	;a
+	
+	;; #bugbug
+	;; Temos que enviar 4 bytes se for 32bpp.
+	;; Precisamos da variável que indique o bpp.
+	
 	;mov al, byte [.a]
-	;stosb 	
-	;envia r, g e b.
+	;stosb 		
+	
 	mov al, byte [.r]
 	stosb 
 	mov al, byte [.g]
@@ -377,6 +417,7 @@ _gui_buffer_putpixel:
 	pop ecx
     pop es
     ret	
+	
 ; v. local.		
 .cor: dd 0
 .x: dd 0
@@ -1103,93 +1144,95 @@ _bit_mask:
 
 	
 
-;-----------------------------------------
-; _my_buffer_char_blt:
-;     Função para desenhar um caractere usando o mapa de 
-; caracteres do BIOS.
-;
-; @todo: Argumentos ... variáveis ...
-;
-; a =  cor (rrggbbaa)
-; b =  x
-; c =  y
-; d =  Char.
-;	
+;;-----------------------------------------
+;; _my_buffer_char_blt:
+;;     Função para desenhar um caractere usando o mapa de caracteres do BIOS.
+;;     @todo: Argumentos ... variáveis ...
+;;
+;; a =  cor (rrggbbaa)
+;; b =  x
+;; c =  y
+;; d =  Char.
+;;
+
 global _my_buffer_char_blt
 _my_buffer_char_blt:
 
 	;salvamentos
+	;color, x, y, char.
 	
-
-    mov dword [.color], eax  ;;color  	 
-	mov dword [.x], ebx      ;;x
-	mov dword [.y], ecx      ;;y
-	mov byte [.char], dl     ;;char  (deslocamento)
+    mov dword [.color], eax    	 
+	mov dword [.x], ebx      
+	mov dword [.y], ecx      
+	mov byte [.char], dl     
 
 	
 	pushad
 	
+	;; Configuração provisoria para testes...
+	;; Mapa de caracteres do BIOS.
+	;; #todo: Precisamos de variável para dimenões do char.
 	
-	;;configuração provisoria para testes...
-	mov dword [_gfontAddress], 0x000FFA6E ;;Mapa de caracteres do BIOS.   
+	mov dword [_gfontAddress], 0x000FFA6E    
 	mov byte [_gcharWidth], 8              
 	mov byte [_gcharHeight], 8
 	
 	;color
 	mov eax, dword [.color]	
-	mov dword [_color], eax    ;; Color
+	mov dword [_color], eax 
 	
 	;x 
 	mov eax, dword [.x]
-	mov dword [_x], eax        ;; x
+	mov dword [_x], eax     
 	
 	;y
 	mov eax, dword [.y]
-	mov dword [_y], eax        ;; y
+	mov dword [_y], eax     
 	
 	;char 
 	mov al, byte [.char]
 	mov byte [CHAR_PART_OFFSET], al        
 	
-    ;;inicializando uma linha do char a ser desenhado. 	
-	mov byte [CHAR_PART], 11111111b  ;; CHARPART  SUJO, TUDO 1.inicializando.
+    ;; Inicializando uma linha do char a ser desenhado.
+	;; CHARPART  SUJO, TUDO 1. Inicializando.
 	
-    ;criando a máscara de bits
+	mov byte [CHAR_PART], 11111111b  
+	
+    ;Criando a máscara de bits
+	
 	mov byte [_bit_mask], 0x80
  
-    ;;
 	;; A variável [_work_char] conterá o sesuldado dessa adição aqui.
-	;;
 	;; work_char = (void *) gfontAddress + (c * gcharHeight);
-    ;;
 	
-	;
 	; Calculamos o deslocamento para pegarmos o caractere certo na fonte.
-	;
 	
 	;; Deslocamento no char map do BIOS.
 	xor eax, eax
 	mov al, byte [CHAR_PART_OFFSET]    	
 	
-	;;O valor do deslocamento deve ser multiplicado pela altura do char
-	;;para encontrarmos o real deslocamento.
-	push ebx ;salva
-	xor ebx, ebx
-	mov ebx, 8; [_gcharHeight]
-	mul ebx    ;; realiza a multiplicação e coloca o resultado em eax.    
-	pop ebx ;recupera 	
+	;; O valor do deslocamento deve ser multiplicado pela altura do char
+	;; para encontrarmos o real deslocamento.
 	
-	;;adicionando a base ao deslocamento..
-	add eax, 0x000FFA6E    ;[_gfontAddress]   
+	push ebx        ;; salva
+	xor ebx, ebx
+	mov ebx, 8      ;; [_gcharHeight]
+	mul ebx         ;; realiza a multiplicação e coloca o resultado em eax.    
+	pop ebx         ;; recupera 	
+	
+	;; Adicionando a base ao deslocamento..
+	;; [_gfontAddress]
+	
+	add eax, 0x000FFA6E       
 	
 	;; Encontramos o endereço do byte que iremos pegar 
 	;; para servir de parte do char que queremos desenhar.
+	
 	mov dword [CHAR_PART_ADDRESS], eax
 	
-	;;
+	
 	;; '********' CHAR PART 
 	;; Pegando o byte encontrado dentro do char map do BIOS.
-	;;
 	
 	push ebx
 	xor ebx, ebx
@@ -1197,16 +1240,16 @@ _my_buffer_char_blt:
 	mov byte [CHAR_PART], bl	
 	pop ebx
 	
-	;;
 	;; Começa um 'for'.
-	;;
-	
-	;;for( y2 = 0; y2 < gcharHeight; y2++ )
+	;; for ( y2 = 0; y2 < gcharHeight; y2++ )
 	
 	;; Zerando o contador [_y2] ...
 	mov dword [_y2], 0
+	
 .L4_comeca_um_for:
-    ;debug
+    
+	
+	;debug
     ;pushad 
  	;mov eax, 200  ;x.
 	;mov ebx, 0   ;y.
@@ -1218,12 +1261,8 @@ _my_buffer_char_blt:
     ;popad 
 	
 	
-
-	
-	;;
 	;; Se o [_gcharHeight] for maior ou igual ao [_y2], que está 
 	;; armazenado em eax.
-	;;
 	
 	XOR EAX, EAX
 	mov eax, [_y2]		
@@ -1234,14 +1273,12 @@ _my_buffer_char_blt:
 	;; Inicializando a variável [_bit_mask]
 	mov byte [_bit_mask], 0x80
 
-	;;
 	;; Começa de outro 'for'.
-	;;
-
-    ;;for( x2 = 0; x2 < gcharWidth; x2++ )
+    ;; for( x2 = 0; x2 < gcharWidth; x2++ )
 	
     ;; Zerando o contador [_x2] ...	
 	mov dword [_x2], 0
+	
 .L7_comeca_outro_for:  ;;for de largura.
 
     ;pushad 
@@ -1252,19 +1289,20 @@ _my_buffer_char_blt:
     ;mov edi, dword  0x00108000    ;blue    	
 	;call CreateWindow
 	;call _asm_refresh_screen
-   ; popad 
+    ;popad 
 	
     ;;coloca o [_x2] em eax.
 	
-    ;;
 	;; Se o [_gcharWidth] for maior ou igual ao [_x2],
 	;; que está armazenado em eax.	
-	;;
+
 
 	XOR EAX, EAX
 	mov eax, [_x2]
 	
-	cmp dword eax, 8 ;[_gcharWidth]
+	;[_gcharWidth]
+	
+	cmp dword eax, 8 
 	jge	.L8_fim_do_Width
 	
 	;;
@@ -1277,10 +1315,13 @@ _my_buffer_char_blt:
 	xor eax, eax
     xor edx, edx
 	
-	mov al, [CHAR_PART]    ;;; *********** PROBLEMAS NA TROCA DO WORKCHAR ************
+	;;; *********** PROBLEMAS NA TROCA DO WORKCHAR ************
+	
+	mov al, [CHAR_PART]    
 	mov dl, [_bit_mask]
     and al, dl	
 	;mov byte [CHAR_PART], al
+
 
 	;; prepara pra sair.
 	;test eax, eax                ;set ZF to 1 if al == 0
@@ -1290,6 +1331,7 @@ _my_buffer_char_blt:
 	;test al, al
 	;pop edx
 	;pop eax
+	
 	
 	;; Se al for igual a '0', então seta zf para 1.
 	;;
@@ -1310,20 +1352,17 @@ _my_buffer_char_blt:
 	; my_buffer_put_pixel(color, x + x2, y, 0);
 	;
 	
-	;
+
 	; Preparando a pilha para a chamada.
 	; Obs: Esses argumentos podem ser passados via registradores, 
 	; depende da rotina chamada.
 	; No nosso caso no Boot Manager, usaremos registradores e não pilha.
 	; @todo: Usar registradores.
-	;
-	
-    ;
+    
     ; a =  cor (rrggbbaa)
     ; b =  x
     ; c =  y
     ; d = ?
-    ;
 	
 	;;
 	;; Observação: Essa rotina pode ser reduzina,
@@ -1347,6 +1386,7 @@ _my_buffer_char_blt:
 	;color (a)
 	mov eax, [_color]    ;; a
 .showPixel:	
+
 	call lib32PutPixel  ;;Put pixel on back buffer.
 	
 	;debug

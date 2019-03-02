@@ -82,17 +82,22 @@ do_mount_volume:
 	popad
 	jmp os_command_line
  
-	
+
+
 ;===============================================================
 ; do_boot:
 ;      Iniciaremos o modo gráfico padrão.
 ;      Chamaremos uma rotina que volta para o modo real, 
 ; muda o modo de vídeo e inicializa a GUI.
-;++		
+;++
+
 do_boot:
+    ;; See pm.inc 
 	jmp rmStartGUI
-	;jmp $
 ;--	
+
+
+
 
 ;===============================================================
 ; do_shutdown:

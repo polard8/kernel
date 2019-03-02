@@ -104,7 +104,7 @@ startSetupMode:
 ;============================
 ; startCLI:	
 ;     Inicia o Shell do Boot Manager. 
-;	
+	
 startCLI:
 	
 	call setup_machine
@@ -129,7 +129,7 @@ startCLI:
 	call set_fs_type
 	
 	;Limpa a tela em modo texto.
-	call clear_screen
+	;call clear_screen
 	
     ;Habilita todas interrupções.
 .enableInterrupts:	
@@ -140,7 +140,7 @@ startCLI:
 	sti 
 	
     ;;
-    ;;  ##  SHELL LOOP  ##
+    ;; ======== ##  SHELL LOOP  ## ========
     ;;    
 
 	;; #importante

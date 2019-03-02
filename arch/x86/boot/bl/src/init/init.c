@@ -104,6 +104,8 @@ int init (){
     //Se estivermos usando modo gráfico (GUI.)	
 	if (VideoBlock.useGui == 1)
 	{
+		// #importante
+		// Essa é a primeira mensagem, ela aparece nos modos 0x115 e 0x118
         printf("init: Using GUI\n");
 	};
 #endif

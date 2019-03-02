@@ -70,10 +70,8 @@ s2modesActivateMode:
 	
 	;jmp $
 	
-	;
 	; Pega o modo de inicialização no metafile.
 	; al = META$FILE.INIT_MODE
-	;
 
 .switch:
 	xor eax, eax
@@ -92,7 +90,7 @@ s2modesActivateMode:
 ;=================================================================
 ;+1 (boot mode shell) -  
 ;    Inicia a prompt de comandos do Boot Manager. #shell.   
-;
+
 mShell:
 
 	pusha
@@ -101,24 +99,28 @@ mShell:
     call PoeString
     popa
 	
-.videoMode:	
+.videoMode:
+
 	;Set video mode.
+	;Modo texto é VGA 3.
+	
 	xor eax, eax
-	mov ax, word 3    ;;Modo texto é VGA 3.
+	mov ax, word 3    
 	call set_video_mode
+	
 	;Screen.
-	call Window.ClearScreen  
+	;call Window.ClearScreen  
 	call Cursor.Hide         
 	
 .bootMode:	
+
 	;Ativar modo de inicialização.
 	mov al, byte BOOTMODE_SHELL
 	call set_boot_mode
 	
-	;
 	; Obs: 
 	; @todo: Talvez os argumentos devam ser preparados antes.
-	;
+
 	 
 	; Inicializão do modo protegido.
 	; Switching to Protected Mode.

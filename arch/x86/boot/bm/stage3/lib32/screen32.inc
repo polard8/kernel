@@ -26,7 +26,9 @@ align 1
 ;
 ;  IN:	Nothing
 ; OUT:	All registers preserved
+
 os_inc_cursor:
+
 	push eax
 
 	;Incrementa coluna.
@@ -124,6 +126,7 @@ os_print_newline_done:
 ;     Displays text.
 ;  IN:	RSI = message location (zero-terminated string)
 ; OUT:	All registers perserved
+
 os_output:
     ;nop
 ;screen32DisplayMessage:
@@ -184,11 +187,18 @@ os_output_char_done:
 ; -----------------------------------------------------------------------------
 
 
-; -----------------------------------------------------------------------------
-; os_pixel -- Put a pixel on the screen
-;  IN:	EBX = Packed X & Y coordinates (YYYYXXXX)
-;	EAX = Pixel Details (AARRGGBB)
-; OUT:	All registers preserved
+
+;; -----------------------------------------------------------------------------
+;; os_pixel 
+;;     Put a pixel on the screen
+;;
+;; IN:	
+;;     EBX = Packed X & Y coordinates (YYYYXXXX)
+;;	   EAX = Pixel Details (AARRGGBB)
+;; OUT:	
+;;     All registers preserved
+;;
+
 os_pixel:
 	push edi
 	push edx
@@ -321,12 +331,17 @@ glyph_done:
 ; -----------------------------------------------------------------------------
 
 
-; -----------------------------------------------------------------------------
-; os_output_chars -- Displays text
-;  IN:	
-; ESI = message location (A string, not zero-terminated)
-; ECX = number of chars to print
-; OUT:	All registers perserved
+;; -----------------------------------------------------------------------------
+;; os_output_chars
+;;     Displays text
+;;
+;; IN:	
+;;     ESI = message location (A string, not zero-terminated)
+;;     ECX = number of chars to print
+;; OUT:	
+;;     All registers perserved
+;;
+
 os_output_chars:
 	push edi
 	push esi

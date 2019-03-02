@@ -181,7 +181,18 @@ g_init_userdir_cluster    dd 0  ;.lba    dd 5
 ;Continua...
 
 
+;;
+;; ## video mode support ##
+;;
 
-;
-;fim
-;
+g_x_resolution dw 0
+g_y_resolution dw 0
+g_bpp          db 0
+
+
+
+;;
+;; End.
+;;
+
+

@@ -37,21 +37,21 @@ align 1
     db 'SHELL'
 align 1
 
-;Flag para configurar a saída da rotina shellInit.
-;shell_exit_flag: dd 0	
 
-;=====================================================
-; os_command_line:
-;     Início do loop para pegar comandos.
-;
-;     #### LOOP ####
-;
-; IN:
-;     Nothing.
-; OUT:
-;     EAX = 0, Sair sem salvar o metafile, depois reiniciar. 
-;     EAX = 1, Sair salvando o metafile, depois reiniciar.
-;++
+
+;;=====================================================
+;; os_command_line:
+;;     Início do loop para pegar comandos.
+;;
+;;     #### LOOP ####
+;;
+;; IN:
+;;     Nothing.
+;; OUT:
+;;     EAX = 0, Sair sem salvar o metafile, depois reiniciar. 
+;;     EAX = 1, Sair salvando o metafile, depois reiniciar.
+;;++
+
 os_command_line:
 
 	; Flag diferente de zero se haverá alguma operação com arquivo.
@@ -67,6 +67,7 @@ os_command_line:
 .do_change_name:
 
     ;Mostra uma string, que é um prompt para mudar o nome do arquivo.	
+	
 	mov esi, prompt_change_file 	
 	call os_output
 	
@@ -95,42 +96,33 @@ os_command_line:
 	mov ecx, 250			    
 	call os_input
 	
-	;
 	; O [ENTER] foi pressionado, então saimos da rotina os_input.
-	;
-	
-	;
 	; The user hit enter so print a new line.
 	; 'os_input_string' stores the number of charaters received in ECX.	
 	; Se não há caracteres no buffer, recomeça.
 	; O contador indica quantos caracteres foram armazenados.
-	;
 	
 .newLine:	
 	call os_print_newline    
 	jecxz os_command_line    ;;Loop
 	
-	;
 	; Remove extra spaces.
 	; 'os_string_parse' stores the number of words in ECX.
-	;
 	
 .extraSpaces:
 	mov esi, edi
 	call os_string_parse	 
 	jecxz os_command_line    ;;Loop    
 	
-	;
 	; Store the number of words in the string.
 	; Salva o número de palavras digitadas.
-	;
+	
 .saveTotalWords:	
 	mov byte [app_argc], cl		
 
-	;
     ; Copy the first word in the string to a new string. 
 	; This is the command/application to run.
-	;
+	
 .copyFirstword:	
 	
 	xor ecx, ecx
@@ -775,21 +767,17 @@ shellInit:
 
 ;--	
 
+;; #version
+;; Print shell version.
 
-;;
 shellPrintShellVersion:
     call print_ver
 	ret
-
-;@todo:	
-;shellPrintOSVersion:
-    ;call xxx
-;	ret
 	
 
-	;
-	; Includes  ............................................
-	;
+	;;
+	;; ======== ## Includes ## ========
+	;;
 	
 	;Calls.
 	%include "shellcalls.inc"    ;Chamadas dos comandos.
@@ -798,11 +786,10 @@ shellPrintShellVersion:
 	;Msg.
 	%include "shellmsg.inc"      ;Mensagens e variáveis do Shell.			
 	
-	;More?!
+	; More ?!
 	
-	
+;;
+;; End.
+;;
 
-	
-;
-;fim.
-;
+
