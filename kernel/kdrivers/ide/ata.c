@@ -974,9 +974,9 @@ int diskATAInitialize ( int ataflag ){
 			   // Panic !!
 			   //
                
-			   kprintf(" # Panic! # \n");
-			   kprintf("sm-disk-disk-diskATAInitialize:\n");
-		       kprintf("IDE and AHCI not found\n");
+			   //kprintf(" # Panic! # \n");
+			   kprintf("sm-disk-disk-diskATAInitialize: IDE and AHCI not found\n");
+		       //kprintf("IDE and AHCI not found\n");
 			   die();
           };
 	

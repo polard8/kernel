@@ -1,5 +1,5 @@
 /*
- * File: dd/pci/pci.c
+ * File: kdrivers/pci.c
  * 
  * Descrição:
  *     Driver de PCI presente no kernel Base.
@@ -257,7 +257,7 @@ or the ACPI ones to solve the mess. Good luck.
 // Defines.
 //
 
-#define PCI_INVALID_VENDORID  0xFFFF
+
 //...
 
 
@@ -322,35 +322,46 @@ const char *pci_classes2[]={
 
 
 /*
-Class Code: A read-only register that specifies the type of function the device performs.
-Subclass: A read-only register that specifies the specific function the device performs.
-Prog IF: A read-only register that specifies a register-level programming interface the device has, if it has any at all.
+Class Code: 
+A read-only register that specifies the type of function the device performs.
 
-The upper byte (at offset 0Bh) is a base class code which broadly classifies the type of function the device performs
-The middle byte (at offset 0Ah) is a sub-class code which identifies more specifically the function of the device
-The lower byte (at offset 09h) identifies a specific register-level programming interface (if any) so that device independent software can interact with the device
+Subclass: 
+A read-only register that specifies the specific function the device performs.
+
+Prog IF: 
+A read-only register that specifies a register-level programming interface 
+the device has, if it has any at all.
+
+The upper byte (at offset 0Bh) is a base class code which broadly classifies 
+the type of function the device performs
+The middle byte (at offset 0Ah) is a sub-class code which identifies more 
+specifically the function of the device
+The lower byte (at offset 09h) identifies a specific register-level programming 
+interface (if any) so that device independent software can interact with the device
 */
 
 
 
 /*
  * pci_classnames_t
- * //0, 'Class code' 'Subclass' 'Prog IF', e string.
+ *     0, 'Class code' 'Subclass' 'Prog IF', e string.
  *
  * Credits: Nelson Cole.
- *
  */
+
 typedef struct {
+	
   uint32_t classcode; //0, 'Class code' 'Subclass' 'Prog IF',
   char *name;
+	
 }pci_classnames_t;
 
 
 //PCI Express, compatibility to PCI local Bus 3.0 
 pci_classnames_t pci_classnames [256] = {
-  	{0x000000, 	"Non-VGA-Compatible devices"								},
-  	{0x000100, 	"VGA-Compatible Device"									},
-  	{0x010000, 	"SCSI bus controller"									},
+  	{0x000000, 	"Non-VGA-Compatible devices" },
+  	{0x000100, 	"VGA-Compatible Device"	},
+  	{0x010000, 	"SCSI bus controller" },
   	{0x010100,	"IDE controller (ISA Compatibility mode-only controller)"				},
 	{0x010105,	"IDE controller (PCI native mode-only controller)"					},
 	{0x01010A,	"IDE controller (ISA Compatibility mode controller, \
@@ -516,37 +527,6 @@ supports both channels switched to ISA compatibility mode, supports bus masterin
 // end - estrutura do Nelson
 //========================================
 
-
-//
-// Class strings.
-//
-
-//Obs: parece que outra forma de lista é mais apropriado.
-static const char* pci_class_strings[] = {
-	"Unknow",                              //0x00 (Pre 2.0 device)
-	"Mass Storage Controller",             //0x01
-	"Network Controller",                  //0x02
-	"Display Controller",                  //0x03
-	"Multimedia Controller",               //0x04 (Multimedia Device)
-	"Memory Controller",                   //0x05
-	"Bridge Device",                       //0x06
-	"Simple Communication Controller",     //0x07
-	"Base System Peripheral",              //0x08
-	"Input Device",                        //0x09
-	"Docking Station",                     //0x0a
-	"Processor",                           //0x0b
-	"Serial Bus Controller",               //0x0c
-	"Wireless Controller",                 //0x0d
-	"Intelligent IO Controllers",          //0x0e
-	"Satellite Communication Controller",  //0x0f
-	"Encryption Decryption Controller",    //0x10
-	"Data Acquisition and Signal Processing Controller",
-	0
-	//"Processing Accelerators",      //0x12
-	//"Non-Essential Instrumentation" //0x13
-	//Daqui pra frente está reservado.
-	//0xff (Device does not fit in any defined classes)
-};
 
 
 //
@@ -719,7 +699,8 @@ static const char* sbc_subclass_strings[] = {
 // Funções internas.
 //
 
-int pci_setup_devices();
+ 
+
 //...
 
 
@@ -740,8 +721,8 @@ int pci_setup_devices();
  * usarão o mesmo isr (handler). Caberá à rotina do handler identificar
  * qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
  * para a rotina de serviço aproriada.
- *
  */
+
 unsigned long KiPciHandler1()
 {
 	//...
@@ -1068,6 +1049,7 @@ unsigned char pciGetHeaderType(unsigned char bus, unsigned char slot)
 	return (unsigned char) pciConfigReadByte( bus, slot, 0, PCI_OFFSET_HEADERTYPE );
 };
 
+
 /*
  *****************************************************************
  * pciGetBAR:
@@ -1216,86 +1198,6 @@ unsigned char pciGetInterruptPin( unsigned char bus,
 
 
 /*
- ****************************************************************************
- * pciInfo:
- *     Mostra as informações salvas nas estruturas da lista de dispositivos. 
- *
- * 0x2668	82801FB (ICH6) High Definition Audio Controller 0x8086	Intel Corporation.
- * 0x2829	Intel(R) ICH8M SATA AHCI Controller	0x8086	Intel Corporation.
- * 0x1237	PCI & Memory	0x8086	Intel Corporation.
- * ...
- *
- */
-
-int pciInfo (){
-	
-	int i;
-	int Max = 32;
-
-	struct pci_device_d *D;
-	
-	printf("pciInfo: \n");
-	
-	//
-	// Uma lista com no máximo 32 ponteiros para estrutura de dispositivo pci.
-	//
-	
-	for ( i=0; i<Max; i++ )
-	{
-		//Pega um ponteiro de estrutura na lista.
-		D = (void *) pcideviceList[i];
-		
-		//Checa se o ponteiro é válido.
-		if( (void *) D != NULL )
-		{
-			//@todo: Mostrar mais informações.
-			if (D->deviceMagic == 1234)
-			{
-				printf("\n [%d/%d/%d] Vendor=%x Device=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
-				       D->bus, D->dev , D->func,
-					   D->Vendor, D->Device, 
-					   pci_class_strings[ D->classCode ], D->subclass, 
-					   D->irq_line, D->irq_pin );
-			};
-		};
-	};
-	
-	printf("done\n");
-	return (int) 0; 
-}
-
-
-/*
- * Mostra informações sobre um dispositivo PCI da lista.
- */
-
-int pciShowDeviceInfo (int number){
-	
-    struct pci_device_d *D;
-  
-	if(number < 0 || number > 32)
-	{
-		return 0;
-	}
-	
-	//Pega um ponteiro de estrutura na lista.
-	D = (void *) pcideviceList[number];
-	
-	//Checa se o ponteiro é válido.
-	if( (void *) D != NULL )
-	{
-		if(D->deviceMagic == 1234){
-			
-			printf ("Vendor={%x} Device={%x} ClassCode={%x} IntLine={%x} \n",
-			    D->Vendor, D->Device, D->classCode, D->irq_line );
-		}
-	}
-	//Nothing
-	return 0;
-}
-
-
-/*
  ********************************
  * pciHandleDevice
  *    Registra um dispositivo encontrado na sondagem. 
@@ -1327,9 +1229,9 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		D->objectClass = ObjectClassKernelObjects;
 		
 		//Identificador.
-		D->deviceId = (int) pciListOffset;
-		D->deviceUsed = (int) 1;
-		D->deviceMagic = (int) 1234;
+		D->id = (int) pciListOffset;
+		D->used = (int) 1;
+		D->magic = (int) 1234;
 		D->name = "No name";
 					
 		//Localização.
@@ -1389,7 +1291,8 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		//Colocar a estrutura na lista.		
 					
 		//#todo: Limits
-		//#bugbug: limite determinado ... precisa de variável.
+		//#bugbug: limite determinado ... 
+		//precisa de variável.
 		
 		if ( pciListOffset < 0 || pciListOffset >= 32 )
 		{ 
@@ -1405,97 +1308,6 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	}
 	
 	return 0;
-}
-
-
-/*
- ***********************************************************************
- * pci_setup_devices:
- *     Encontrar os dispositivos PCI e salvar as informações sobre eles
- * em suas respectivas estruturas.
- *
- * @todo: 
- *     Completar toda a estrutura, ainda faltam elementos.
- *     Obs: A estrutura está em pci.h.    
- *
- * #importante:
- * #todo
- * Quando sondamos os dispositivos pci usando for, podemos checar a
- * classe e a subclasse dos dispositivos e se encontrarmos a combilaçao desejada
- * entao inicializamos o dispositivo.
- */
-
-
-//##bugbug
-//Não precisamos inicialziar os dispositivos nesse momento.
-//somente colocar na estrutura
-
-int pci_setup_devices (){	
-	
-    unsigned short Vendor;    //Offset 0.
-	unsigned short Device;    //Offset 2.
-	
-	//@todo: rever tamanho
-	//unsigned char ClassCode;
-	//unsigned char SubClassCode;
-	//unsigned char ProgIF;	
-	
- 	
-	unsigned char i = 0; //Bus.
-    unsigned char j = 0; //Devices. (Slots).
-	unsigned char k = 0; //Functions
-	
- 
-    printf("Detecting PCI Devices..\n");
-	
-	unsigned char HeaderType;
-	int funcCount;
-	
-	//Bus.
-	for( i=0; i < PCI_MAX_BUSES; i++)   
-	{
-		//Device.
-	    for( j=0; j < PCI_MAX_DEVICES; j++)
-        {
-			
-		    // Valid device ?
-			
-		    Vendor = (unsigned short) pciCheckVendor (i,j);			
-		    
-			if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
-		    { 
-				
-				printf("vendor=%x\n",Vendor);
-				// Multifunction ??
-				//Se o bit 7 estiver acionado, entao e' multifunction.
-				
-				HeaderType = pciGetHeaderType (i,j);
-                
-				funcCount = HeaderType & PCI_TYPE_MULTIFUNC ? PCI_MAX_FUNCTIONS : 1;
-				
-				//function
-			    for( k=0; k<funcCount; k++)
-			    {
-				    //k=0;
-					printf("+");
-				    pciHandleDevice ( i, j, k );			
-			    }; //fuction for.
-				
-		    };				
-					
-		};  // Device for.		
-		
-	};  //bus for.
-	
-
-
-    printf("Detecting PCI Devices completes..\n");
-	
-	debug_print("Detecting PCI Devices completes..\n");
-	//refresh_screen();
-	//while(1){}
-
-    return 0; 
 }
 
 
@@ -1591,46 +1403,14 @@ int init_pci (){
 	};
     
     //...
-	
-//done:	
 
     g_driver_pci_initialized = (int) 1; 
 	
 	//printf("Done\n");
     
 	return (int) Status; 
-};
-
-
-
-
-/*
- * pciPci:
- *     Constructor.
-int pciPci(){
-	;
-};
- */
-
-
-/*
- * pciInit:
- *     Inicialização do módulo.
- */
- 
-int pciInit (){
-	
-	//#bugbug  essa funções nem é chamada.
-	
-	debug_print("pciInit:\n");
-	
-	/*
-	return (int) init_pci();
-	*/
-	
-	return -1;
 }
- 
+
 
 //
 // End.

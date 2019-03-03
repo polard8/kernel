@@ -250,6 +250,7 @@ Class Description
 #define PCI_MAX_DEVICES       32    
 #define PCI_MAX_FUNCTIONS     8    
 
+#define PCI_INVALID_VENDORID  0xFFFF
 
 //
 // PCI Offset.
@@ -656,10 +657,10 @@ struct pci_device_d
 	//callback 
 	
 	//Identificação.
-	int deviceId;
+	int id;
     
-	int deviceUsed;   
-	int deviceMagic;   
+	int used;   
+	int magic;   
     
 	char *name;         
 
@@ -732,8 +733,9 @@ struct pci_device_d
     
 	struct pci_device_d* next;	
 };
-pci_device_t *pci_device;
-pci_device_t *current_pci_device;    //Current.
+
+struct pci_device_d *pci_device;
+struct pci_device_d *current_pci_device;    //Current.
 //...
 
 
@@ -858,15 +860,6 @@ pci_driver_t *PciDrivers;    //@todo: Lista.Igual menuitens.
 // Protótipos de funções.
 //
 
-int pciInfo();
-int pciInit();
-
-
-//Inicia o pci.
-int init_pci();
-
-
-int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun );
 
 
 //
@@ -905,6 +898,29 @@ unsigned long KiPciHandler4();
 
 //mostra informações sobre um dispositivo pci da lista.
 int pciShowDeviceInfo(int number);
+int pciInfo();
+
+
+int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun );
+
+
+//procurar na lista de dispositivos por um dispositivo de 
+//determinados vendor e device.
+
+struct pci_device_d *scan_pci_device_list ( unsigned short vendor, 
+										    unsigned short device );
+
+//procurar na lista de dispositivos por um dispositivo de 
+//determinada classe e subclasse.
+struct pci_device_d *scan_pci_device_list2 ( unsigned char class, 
+										    unsigned char subclass );
+
+//sonda por dispositivos.
+int pci_setup_devices();
+
+
+//Inicia o pci.
+int init_pci();
 
 #endif 
 

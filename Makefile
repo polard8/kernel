@@ -85,6 +85,8 @@ mouse.o \
 ldisc.o \
 hdd.o \
 pci.o \
+pciscan.o \
+pciinfo.o \
 usb.o \
 ahci.o \
 devmgr.o \
@@ -270,6 +272,7 @@ compile-kernel:
 	
 
 	# kdrivers/ahci 
+	# todo
 	gcc -c kernel/kdrivers/ahci/ahci.c  -I include/ $(CFLAGS) $(DEFINES) -o ahci.o
 	
 	# kdrivers/i8042
@@ -297,6 +300,8 @@ compile-kernel:
 
 	# kdrivers/pci
 	gcc -c kernel/kdrivers/pci/pci.c  -I include/ $(CFLAGS) $(DEFINES) -o pci.o
+	gcc -c kernel/kdrivers/pci/pciscan.c  -I include/ $(CFLAGS) $(DEFINES) -o pciscan.o
+	gcc -c kernel/kdrivers/pci/pciinfo.c  -I include/ $(CFLAGS) $(DEFINES) -o pciinfo.o
 
 
 	# kdrivers/tty

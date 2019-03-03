@@ -1,21 +1,16 @@
 
 /*
  * File: ahci.c
- *
+ *      Status: Construindo um driver para ahci.
  */
-
-
 
 
 // O esquema deve ser igual ao driver do ide.
 // primeiro procura o dispositivo na interface PCI.
 // depois inicializa.
-
-
 //#importante:
 //estamos seguindo o esquema do driver de ide
 //para scaneamento do discpositivo. Est'a em ide/disk1.c
-
 
 
 #include <kernel.h>
@@ -27,7 +22,6 @@ int SATAFlag;
 
 int diskSATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 
-	
 	uint32_t data;
 	
 	kprintf("diskSATAPCIConfigurationSpace:\n");
@@ -42,7 +36,6 @@ int diskSATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	kprintf("\nDisk info:\n");
     kprintf("[ Vendor ID: %X,Device ID: %X ]\n", 
 	    sata_pci.Vendor, sata_pci.Device );
-	
 	
 	// Obtendo informações.
 	// Classe code, programming interface, revision id.
@@ -109,7 +102,7 @@ int diskSATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 
 int ahciSATAInitialize ( int ataflag ){
 
-		int Status = 1;  //error
+	int Status = 1;  //error
 	int port;
 	
 	unsigned long data;
@@ -117,6 +110,8 @@ int ahciSATAInitialize ( int ataflag ){
 	unsigned char bus;
 	unsigned char dev;
 	unsigned char fun;
+	
+	struct pci_device_d *D;
 	
 	
 	// Configurando flags do driver.
@@ -129,6 +124,28 @@ int ahciSATAInitialize ( int ataflag ){
 	//Estamos pegando um dispositicvo de armazenamento.
 	//E se for ide?
 	//ja estamos usando um ide.
+	
+	
+	//#importante
+	//#todo
+    //procurar na lista de dispositivos por um dispositivo de 
+    //determinada classe e subclasse.
+    //Vai retornar o ponteiro para a estrutura de dispositivo. 
+	//(struct pci_device_d *)
+	
+	D = (struct pci_device_d *) scan_pci_device_list2 ( (unsigned char) PCI_CLASSCODE_MASS, 
+							          (unsigned char) PCI_SUBCLASS_SATA );	
+	
+	
+	if ( (void *) D == NULL )
+	{
+	    printf ("ahce fail\n");
+	    //...
+		
+	}else{
+	   //...
+	}
+	
 	
 	//PCI_CLASSCODE_MASS	
     data = (unsigned long) diskPCIScanDevice(PCI_CLASSE_MASS);

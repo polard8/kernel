@@ -120,8 +120,8 @@ e1000_init_nic ( unsigned char bus,
 	
 	}else{
 		
-		pci_device->deviceUsed = 1;
-		pci_device->deviceMagic = 1234;
+		pci_device->used = 1;
+		pci_device->magic = 1234;
 		
 		pci_device->bus  = (unsigned char) bus;
 		pci_device->dev  = (unsigned char) dev;
