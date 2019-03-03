@@ -540,7 +540,7 @@ struct window_d *shellCreateMainWindow ( int status ){
 	
 	w = (void *) APICreateWindow ( WT_OVERLAPPED, 1, VIEW_NORMAL, "GRAMADO",     
                      left, top, width, height,    
-                     0, 0, COLOR_TERMINAL2, xCOLOR_GRAY1 );
+                     0, 0, COLOR_TERMINAL2_T, xCOLOR_GRAY1_T );
 	
 	if ( (void *) w == NULL )
 	{	

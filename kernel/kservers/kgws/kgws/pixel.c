@@ -261,6 +261,15 @@ backbuffer_putpixel( unsigned long ax,
 		case 24:
 		    bytes_count = 3;
 			break;
+			
+		//#testando
+		//case 16:
+		//	bytes_count = 2;
+		//	break;
+		
+		//case 8:
+		//	bytes_count = 1;
+		//	break;	
 	}
 	
 	// #importante
