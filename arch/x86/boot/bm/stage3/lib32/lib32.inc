@@ -376,15 +376,41 @@ _gui_buffer_putpixel:
 	
 	;imul ebx, 800*3 
 	
-	imul ebx, 800 ;1024
-	imul ebx, 3	
+	;imul ebx, 800 ;1024
+	;imul ebx, 3	
 	
-	;eax*3
+	cmp byte [BootBlock.bpp], 32
+	je .bpp32	
 	
-	mov ecx, dword 3
+	cmp byte [BootBlock.bpp], 24
+	je .bpp24
+	
+	;;#bugbug
+	;;fail
+	;;precisamos de uma mensagem aqui
+	;;ativaremos o default, que 'e 24.
+	jmp $
+	
+	
+.bpp32:	
+	imul ebx, [BootBlock.x]    ;800 ;1024
+	imul ebx, dword 4;[BootBlock.bpp] ;3
+	;eax*4	
+	mov ecx, dword  4;[BootBlock.bpp] ;3
 	mul ecx
 	add eax, ebx    ;Adiciona ebx.
+	jmp .bppOK	
+
+.bpp24:	
+	imul ebx, [BootBlock.x]    ;800 ;1024
+	imul ebx, dword 3;[BootBlock.bpp] ;3
+	;eax*3	
+	mov ecx, dword  3;[BootBlock.bpp] ;3
+	mul ecx
+	add eax, ebx    ;Adiciona ebx.
+	jmp .bppOK
 	
+.bppOK:	
 	
 	;edi = x*3 + (y*y multiplier)
 	
@@ -403,10 +429,18 @@ _gui_buffer_putpixel:
 	;; #bugbug
 	;; Temos que enviar 4 bytes se for 32bpp.
 	;; Precisamos da variável que indique o bpp.
+
+	cmp byte [BootBlock.bpp], 32
+	je .bpp32RGB	
+
+	cmp byte [BootBlock.bpp], 24
+	je .bpp24RGB	
 	
-	;mov al, byte [.a]
-	;stosb 		
+.bpp32RGB:		
+	mov al, byte [.a]
+	stosb 		
 	
+.bpp24RGB:	
 	mov al, byte [.r]
 	stosb 
 	mov al, byte [.g]

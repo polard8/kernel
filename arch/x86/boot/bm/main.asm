@@ -136,9 +136,59 @@
 ;;   ## VIDEO MODE ##
 ;;
 
- G_VIDEO_MODE EQU 0x115
-;;G_VIDEO_MODE EQU 0x118
+;
+; 0x4112 is 640x480x24bit	 
+; 0x4115 is 800x600x24bit	 
+; 0x4118 is 1024x768x24bit   	
+; 0x411B is 1280x1024x24bit	
+
+; 0x4129 is 640x480x32bit
+; 0x412E is 800x600x32bit
+; 0x4138 is 1024x768x32bit 
+; 0x413D is 1280x1024x32bit 
+
+;  1: 182h, 320x200x8
+;  2: 10Dh, 320x200x15           29: 185h, 640x400x24 
+;  3: 10Eh, 320x200x16           30: 186h, 640x400x32
+;  4: 10Fh, 320x200x24           31: 101h, 640x480x8
+;  5: 120h, 320x200x32           32: 110h, 640x480x15
+;  6: 192h, 320x240x8            33: 111h, 640x480x16
+;  7: 193h, 320x240x15           34: 112h, 640x480x24 *
+;  8: 194h, 320x240x16           35: 121h, 640x480x32
+;  9: 195h, 320x240x24           36: 103h, 800x600x8
+; 10: 196h, 320x240x32           37: 113h, 800x600x15
+; 11: 1A2h, 400x300x8            38: 114h, 800x600x16
+; 12: 1A3h, 400x300x15           39: 115h, 800x600x24 *
+; 13: 1A4h, 400x300x16           40: 122h, 800x600x32
+; 14: 1A5h, 400x300x24           41: 105h, 1024x768x8
+; 15: 1A6h, 400x300x32           42: 116h, 1024x768x15
+; 16: 1B2h, 512x384x8            43: 117h, 1024x768x16
+; 17: 1B3h, 512x384x15           44: 118h, 1024x768x24 *
+; 18: 1B4h, 512x384x16           45: 123h, 1024x768x32
+; 19: 1B5h, 512x384x24           46: 107h, 1280x1024x8
+; 20: 1B6h, 512x384x32           47: 119h, 1280x1024x15
+; 21: 1C2h, 640x350x8            48: 11Ah, 1280x1024x16
+; 22: 1C3h, 640x350x15           49: 11Bh, 1280x1024x24 *
+; 23: 1C4h, 640x350x16           50: 124h, 1280x1024x32
+; 24: 1C5h, 640x350x24           51: 140h, 1400x1050x8
+; 25: 1C6h, 640x350x32           52: 141h, 1400x1050x15
+; 26: 100h, 640x400x8            53: 142h, 1400x1050x16
+; 27: 183h, 640x400x15           54: 143h, 1400x1050x24
+; 28: 184h, 640x400x16           55: 144h, 1400x1050x32
+
+
+;; #importante
+;; use isso para selecionar o modo de video.
+;;
+
+;; 24bpp
+;; funcionaram na oracle virtual box.
+;;G_VIDEO_MODE EQU 0x112
+;;G_VIDEO_MODE EQU 0x115
+G_VIDEO_MODE EQU 0x118
+;;G_VIDEO_MODE EQU 0x11B
 ;;...
+
 
 
 ;;
@@ -1378,7 +1428,7 @@ bootmanager_main:
     %include "tasks32.inc"     ;Rotinas de inicialização do sistema de tarefas.
 
     ;8 - lib32.	
-    %include "lib32.inc"       ;Rotinas em 32 bits.
+    ;%include "lib32.inc"       ;Rotinas em 32 bits.
 
 	;7 - setup  
 	%include "setup.inc"       ;Inicializa arquitetura.
@@ -1404,10 +1454,16 @@ bootmanager_main:
 
 	;2 - Boot Manager Mini-Shell.
 	%include "shell.inc"       ;Prompt de comandos.
+	
     
 	;1 - Start.
 	%include "start.inc"
 
+
+    ;8 - lib32.	
+    %include "lib32.inc"       ;Rotinas em 32 bits.	
+	
+	
 
 ;;===============================================
 ;;    ****    INÍCIO DO BOOT LOADER    ****    ;;

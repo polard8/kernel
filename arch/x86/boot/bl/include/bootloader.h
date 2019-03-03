@@ -25,7 +25,7 @@
 
 //Debug flags.
 //Testando desligado.
-#define BL_VERBOSE 1   
+//#define BL_VERBOSE 1   
 
 
  

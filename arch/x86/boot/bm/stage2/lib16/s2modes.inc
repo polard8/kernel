@@ -251,6 +251,44 @@ s2modespm32:
 	mov ebx, dword 0	
     mov eax, dword 0    
 	    
+	; LFB address.
+	; Width in pixels.
+	; Height in pixel.
+	; BPP.
+	; metafile address
+	; ...
+	
+	xor eax, eax
+	mov eax, dword [ModeInfo_PhysBasePtr]  	
+	mov dword [BootBlock.lfb], eax	
+	
+	xor eax, eax
+	mov ax, word [ModeInfo_XResolution]    
+	mov dword [BootBlock.x], eax 	
+	
+	xor eax, eax
+	mov ax, word [ModeInfo_YResolution]    
+	mov dword [BootBlock.y], eax 	
+	
+	xor eax, eax
+	mov al, byte [ModeInfo_BitsPerPixel]   
+	mov dword [BootBlock.bpp], eax 
+
+	xor eax, eax
+	mov eax, dword META$FILE                 	
+	mov dword [BootBlock.metafile_address], eax	
+    
+	;Continua...
+	
+	;xor eax, eax
+	mov al, byte 'G'                       ;Flag. (useing graphics)	
+	mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endereço físico)
+	
+	mov ebp, dword BootBlock
+	mov ecx, ebp                           ;tabela
+	mov edx, ebp                           ;tabela		
+		
+		
 	;;
 	;; Aqui estamos em modo protegido e no modo gráfico, 
 	;; vamos testar se as mensagens para esse ambiente 
@@ -268,7 +306,10 @@ s2modespm32:
     mov eax, 0x00ffff00 ;color
 	mov esi, s2modes_initmessageinGM
 	call lib32PrintString
-    call _asm_refresh_screen	
+	
+	;#debug
+	;#bugbug isso demora.
+    ;call _asm_refresh_screen	
 
 	;#debug
 	;jmp $

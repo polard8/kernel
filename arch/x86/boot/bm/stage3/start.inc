@@ -531,7 +531,9 @@ startGUI:
 	mov esi, startMsgTest1   
 	call lib32PrintString
     call _asm_refresh_screen
-	;;jmp $	
+	
+	;#debug
+	;jmp $	
 	
 	;
 	; @todo: testando modos no geforce.
@@ -702,6 +704,13 @@ startGUI:
 	
 ;;=======================================================================
 ;;=======================================================================
+
+
+;;=======================================================================
+;;=======================================================================
+
+
+
 	
 ;
 ; Libs --------------------------------------------
@@ -769,7 +778,7 @@ configura_buffer:
 ;
 
 ;usando em start.
-startMsgTest1        db "BM:startGUI: startGUI:", 13, 10, 0
+startMsgTest1        db "BM: start: startGUI:", 13, 10, 0
 msg_start_ok         db "BM:startGUI: OK", 13, 10, 0	
 msg_start_jumping    db "BM:startGUI: Jumping to BL.BIN", 13, 10, 0		
 msg_start_sig        db "BM:startGUI: PE sig fail", 13, 10, 0	
