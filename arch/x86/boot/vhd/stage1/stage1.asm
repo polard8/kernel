@@ -13,7 +13,7 @@
 
 
 END_OF_CLUSTER EQU 0xFFFF
-;;END_OF_CLUSTER EQU 0xFFF8
+;;END_OF_CLUSTER2 EQU 0xFFF8
 
 
 ROOTDIRSTART EQU (BUFFER_NAME)
@@ -49,24 +49,21 @@ DriveNumber           db 0x80
 Flags                 db 0x00    ;; ?? Current Head ??
 Signature             db 0x29    ;; 41
 BUFFER_VOLUME_ID      dd 0x980E63F5
-VolumeLabel           db "NORAX   MBR"
+VolumeLabel           db "GRAMADO MBR"
 SystemID              db "FAT16   "
 
 
 ;;
-;;
-;;
-
-	
-;;
 ;;=================================
 ;;
+
 
 DAPSizeOfPacket db 10h
 DAPReserved     db 00h
 DAPTransfer     dw 0001h
 DAPBuffer       dd 00000000h
 DAPStart        dq 0000000000000000h
+
 
 datasector 	dw 0x0000    ;Início da área de dados.
 cluster     dw 0x0000
@@ -82,24 +79,34 @@ cluster     dw 0x0000
 ;; Mensagens.
 ;;
 
-ImageName   db "BM      BIN", 0x0D, 0x0A, 0x00
-;msgProgress db "*", 0x00               ;; Progresso.
-;msgCRLF     db 0x0D, 0x0A, 0x00        ;; Espaçamento. 
-;msgFAT		db "F", 0x0D, 0x0A, 0x00   ;; Loading FAT.
-;msgImg		db "I", 0x0D, 0x0A, 0x00   ;; Loading Image.
-;msgFail		db "r",0x00                ;; read failure.
-msgFailure  db "R", 0x00               ;; ROOT failure.
+ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+msgFailure    db "R", 0x00               ;; ROOT failure.
+;msgProgress  db "*", 0x00               ;; Progresso.
+;msgCRLF      db 0x0D, 0x0A, 0x00        ;; Espaçamento. 
+;msgFAT		  db "F", 0x0D, 0x0A, 0x00   ;; Loading FAT.
+;msgImg		  db "I", 0x0D, 0x0A, 0x00   ;; Loading Image.
+;msgFail	  db "r",0x00                ;; read failure.
 ;...
 
-;Real Start.
+
+;;
+;; ====================================
+;; START:
+;;     Real Start.
+;;
+
 START:
+
     ;nop
+	
 ;Step1: 
+
     ; Code located at 0x7C00, adjust segment registers to 0x07C0:0.
     cli
     mov  ax, 0x07C0
     mov  ds, ax
     mov  es, ax
+	
     ; Create stack.   0:6000h
     mov  ax, 0x0000
     mov  ss, ax
@@ -107,13 +114,16 @@ START:
     sti
 
 Step2:
+
     mov byte [DriveNumber], byte dl 
 
     ;cmp dl, byte 0x80
     ;jne FAILURE
 
-    ;;Clear the Screen.
+
 Step3:   
+
+    ;;Clear the Screen.
     mov ax, 02h
     int 010h
 
@@ -621,20 +631,33 @@ FAILURE:
 ;;  ## PARTITION TABLE  ##
 ;;======================================================
 ;; http://cars.car.coocan.jp/misc/chs2lba.html
+;; https://en.wikipedia.org/wiki/Partition_type
 
+;; VHD info:
 ;;(CHS=963/4/17)
-;; types:
-;; (4  FAT16 <32M) 
-;; (0xEF EFI fat12/fat16)	
+
+;; Types:
+;; 0x04 - FAT16, less than 32 MB
+;; 0x06 - FAT16, greater than 32 MB
+;; 0xEF - EFI FAT12/FAT16 
+;; ...
+
+
+;; 0xEF:
+;;     EFI, FAT12/FAT16.
+;;     MBR, Service FS,	Intel,	EFI.
+;;     EFI system partition. Can be a FAT12, FAT16, FAT32 (or other) file system.
+
+
 
 
 ; partition 0. 
 P0:
 .flag:                db  0x80     
 .hcs_inicial:         db  1, 1, 0       ; h,c,s      
-.os_type:             db  0x04          ; 0x4, 0xEF       
+.os_type:             db  0xEF          ; EFI FAT12/FAT16.       
 .hcs_final:           db  3, 255, 16    ; h,c,s 
-.lba_inicial:         dd  0x3F          ; Setor inicial da partição. (63, vbr)
+.lba_inicial:         dd  0x3F          ; Setor inicial da partição. (63, vbr).
 .tamanho_da_particao: dd  17406
 
 ; partition 1, 2 and 3.

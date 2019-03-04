@@ -14,8 +14,8 @@
 VERSION = 0
 PATCHLEVEL = 18
 SUBLEVEL = 0
-EXTRAVERSION = -rc9
-NAME = ?
+EXTRAVERSION = 0
+NAME = efi
 
 #todo:
 #We need to simplify these flags, but it's working.
@@ -452,6 +452,9 @@ vhd-copy-files:
 	-sudo mkdir /mnt/gramadovhd/GDE
 	-sudo mkdir /mnt/gramadovhd/GDE/BIN	
 	
+# Creating EFI
+	-sudo mkdir /mnt/gramadovhd/EFI
+	-sudo mkdir /mnt/gramadovhd/EFI/BOOT
 	
 #copy
 
@@ -486,6 +489,10 @@ vhd-copy-files:
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/tmp
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/lib
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/gde
+	
+#test efi
+	-sudo cp arch/x86/boot/efi/BOOTIA32.EFI  /mnt/gramadovhd/EFI/BOOT
+
 
 # umount
 vhd-unmount:
