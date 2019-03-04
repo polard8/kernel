@@ -1,5 +1,5 @@
 ;
-; File: shell\shellcalls.inc
+; File: shell/shcalls.inc
 ;
 ; Descrição:
 ;     Rotinas para atender algumas chamadas do Boot Manager.
@@ -20,13 +20,12 @@
 ; OUT:
 ;     EAX = 0, Sair sem salvar o metafile, depois reiniciar. 
 ;     EAX = 1, Sair salvando o metafile, depois reiniciar. 
-;
 ;++
+
 exit:
     jmp do_boot
 	jmp $
 ;--
-
 
 
 
@@ -36,8 +35,9 @@ exit:
 ;
 ;     Obs: O volume do sistema será um subdiretório 
 ;          do diretório de volumes.
-;
+
 do_mount_volume:
+
     pushad
 	
 	call os_screen_clear 
@@ -91,8 +91,9 @@ do_mount_volume:
 ; muda o modo de vídeo e inicializa a GUI.
 ;++
 
-do_boot:
     ;; See pm.inc 
+	
+do_boot:
 	jmp rmStartGUI
 ;--	
 
@@ -105,18 +106,19 @@ do_boot:
 ;      Chamaremos uma rotina que volta para o modo real, 
 ; e efetua o desligamento com a int 0x15.
 ;++
+
 do_shutdown:
 	jmp rmShutdown
-	;jmp $
 ;--		
+	
 	
 ;-----------------------------------------
 ; debug:
 ;
 ;     Mostra as configurações de inicialização 
 ;     que estão no arquivo INIT.CNF.
-;
 ;++	
+
 debug:
     pushad
     call debug_main
@@ -127,12 +129,12 @@ debug:
 
 ;-------------------------------------------
 ; do_save:
-;
 ;     Torna permanente as alterações de 
 ;     inicialização e partições.		
-;
 ;++
+
 do_save:
+
     ;pushad
 	
 	;Torna permanente as alterações de inicialização.
@@ -142,16 +144,16 @@ do_save:
 	;call fs32_save_current_partition  
 	
 	;popad
+	
 	jmp os_command_line
 ;--
 
 
 ;-------------------------------------------
 ; do_formatdisk:
-;
 ;     Formata um disco.
-;
 ;++	
+
 do_formatdisk:
 	;pushad
 	;call format_disk
@@ -162,10 +164,9 @@ do_formatdisk:
 
 ;----------------------------------------------
 ; do_make_boot:
-;
 ;     Cria diretórios e arquivos para Boot.
-;	
 ;++
+
 do_make_boot:  
 	;pushad
 	;call make_boot
@@ -176,11 +177,11 @@ do_make_boot:
 
 ;----------------------------------------------	
 ; do_install:
-;
 ;     Transfere conteúdo do disco 
 ;     de uma lba para outra.	
 ;     (da area reservada(lba 1024) para o sistema de arquivos.)
 ;++
+
 do_install:
 	
 	;#suspensa !
@@ -194,10 +195,9 @@ do_install:
 
 ;------------------------------------------------
 ; do_set_modo1:
-; 
 ;     Configura modo1.
-;
 ;++	
+
 do_set_modo1:
     push eax
     call blconfig_set_modo1
@@ -210,10 +210,9 @@ do_set_modo1:
 
 ;----------------------------------------
 ; do_set_modo2:
-;
 ;     Configura modo2.
-;
 ;++	
+
 do_set_modo2:
     push eax
 	call blconfig_set_modo2
@@ -226,10 +225,9 @@ do_set_modo2:
 
 ;-------------------------------------
 ; do_set_modo3:
-;
 ;     Configura modo3.
-;
 ;++	
+
 do_set_modo3:
     push eax
 	call blconfig_set_modo3
@@ -242,10 +240,9 @@ do_set_modo3:
 
 ;--------------------------------------
 ; do_set_modo4:
-;
 ;     Configura modo4.
-;
 ;++	
+
 do_set_modo4:
     push eax
     call blconfig_set_modo4
@@ -258,9 +255,8 @@ do_set_modo4:
 
 ;----------------------------------
 ; do_set_v0:
-;
 ; Configura volume 0.
-;	
+
 do_set_v0:
     push eax
     mov eax, VOLUME.p0_name
@@ -272,9 +268,8 @@ do_set_v0:
 	
 ;-----------------------------------
 ; do_set_v1:
-;
 ; Configura volume 1.
-;
+
 do_set_v1:
     push eax
     mov eax, VOLUME.p1_name
@@ -286,9 +281,8 @@ do_set_v1:
 	
 ;---------------------------------
 ; do_set_v2:
-;
 ; Configura volume 2.
-;
+
 do_set_v2:
     push eax
     mov eax, VOLUME.p2_name
@@ -300,9 +294,8 @@ do_set_v2:
 	
 ;-----------------------------------
 ; do_set_v3:
-;
 ; Configura volume 3.
-;
+
 do_set_v3:
     push eax
     mov eax, VOLUME.p3_name
@@ -314,9 +307,8 @@ do_set_v3:
 
 ;-----------------------------------
 ; do_openfile:
-;
 ;     Abre um arquivo.
-;	
+
 do_openfile:
 	mov byte[file_flag], 1
 	jmp os_command_line
@@ -327,6 +319,7 @@ do_openfile:
 ; do_makefile:
 ;     Cria um arquivo.
 ;++	
+
 do_makefile:
 	mov byte[file_flag], 2
 	jmp os_command_line
@@ -335,10 +328,9 @@ do_makefile:
 	
 ;------------------------------------
 ; do_deletefile: 
-;
 ;     Deleta um arquivo.
-;	
 ;++	
+
 do_deletefile:
 	mov byte[file_flag], 3
 	jmp os_command_line
@@ -347,10 +339,9 @@ do_deletefile:
 	
 ;---------------------------------------
 ; do_opendir:
-;
 ;     Abre um diretório.
-;
 ;++	
+
 do_opendir:
 	mov byte[file_flag], 4
 	jmp os_command_line
@@ -359,10 +350,9 @@ do_opendir:
 	
 ;--------------------------------------
 ; do_makedir:
-;
 ;     Cria um diretório.
-;
 ;++	
+
 do_makedir:
 	mov byte[file_flag], 5
 	jmp os_command_line
@@ -371,10 +361,9 @@ do_makedir:
 	
 ;--------------------------------------
 ; do_deletedir:
-;
 ;    Deleta um diretório.
-;	
 ;++
+
 do_deletedir:
 	mov byte[file_flag], 6
 	jmp os_command_line
@@ -384,7 +373,7 @@ do_deletedir:
 ;-----------------------------------------------
 ; do_changedir:
 ;      Muda o diretório atual.
-;	
+	
 do_changedir:
     ;;Nothing for now!
 	jmp os_command_line	
@@ -394,9 +383,10 @@ do_changedir:
 ; ls:
 ;     lista os arquivos.
 ;     (Apresentação no estilo unix.
-;	
+
+;;Nothing for now!
+	
 ls:
-    ;;Nothing for now!
 	jmp os_command_line	
 
 	
@@ -404,16 +394,17 @@ ls:
 ; dir:
 ;    (Mostra o diretório de volumes)
 ;     Mostra as entradas do diretório raiz.	
-;     
 ;++
+
 dir:
+
     pushad
+	
 	call os_screen_clear 
     call reset_cursor
 	
 	;Hd info.bug
 	;call hd_test
-	
 	
     ;mov esi, msg_tamanho_da_particaoP
 	;call os_output		
@@ -434,10 +425,9 @@ dir:
 
 ;----------------------------------
 ; do_seleciona_d0:
-; 
 ;     Seleciona disco 0.
-;
 ;++ 
+
 do_seleciona_d0:
     push eax
 	mov eax, dword 0
@@ -449,10 +439,9 @@ do_seleciona_d0:
 	
 ;-----------------------------------
 ; do_seleciona_d1:
-;
 ;     Seleciona disco 1.
-;
 ;++ 
+
 do_seleciona_d1:
     push eax
 	mov eax, dword 1
@@ -464,10 +453,9 @@ do_seleciona_d1:
 	
 ;------------------------------------
 ; do_seleciona_d2:
-;
 ;     Seleciona disco 2.
-;
 ;++ 
+
 do_seleciona_d2:
     push eax
 	mov eax, dword 2
@@ -479,10 +467,9 @@ do_seleciona_d2:
 	
 ;-------------------------------------
 ; do_seleciona_d3:
-;
 ;     Seleciona disco 3.
-;
 ;++ 
+
 do_seleciona_d3:
     push eax
 	mov eax, dword 3
@@ -494,10 +481,9 @@ do_seleciona_d3:
 	
 ;-------------------------------------
 ; do_seleciona_p0:
-;
 ;     Seleciona partição 0.
-; 	
 ;++
+
 do_seleciona_p0:
     push eax
 	mov eax, dword 0
@@ -509,10 +495,9 @@ do_seleciona_p0:
 	
 ;-------------------------------------
 ; do_seleciona_p1:
-;
 ;     Seleciona partição 1.
-; 
 ;++	
+
 do_seleciona_p1:
     push eax
 	mov eax, dword 1
@@ -524,10 +509,9 @@ do_seleciona_p1:
 	
 ;--------------------------------------
 ; do_seleciona_p2:
-;
 ;     Seleciona partição 2.
-;
 ;++ 	
+
 do_seleciona_p2:
     push eax
 	mov eax, dword 2
@@ -539,10 +523,9 @@ do_seleciona_p2:
 	
 ;--------------------------------------
 ; do_seleciona_p3:
-;
 ;     Seleciona partição 3.
-; 
 ;++	
+
 do_seleciona_p3:
     push eax
 	mov eax, dword 3
@@ -554,10 +537,9 @@ do_seleciona_p3:
 	
 ;----------------------------------------
 ; do_ativar:
-;
 ;     Ativa a partição atual.
-;
 ;++
+
 do_ativar:
     call fs32_ativar_particao_atual
 	jmp os_command_line
@@ -566,10 +548,9 @@ do_ativar:
 	
 ;----------------------------------------
 ; do_desativar:
-;
 ;     Desativa a partição atual.
-;
 ;++	
+
 do_desativar:
     call fs32_desativar_particao_atual
 	jmp os_command_line
@@ -581,8 +562,8 @@ do_desativar:
 ; hd_test:
 ;     Exibir informações sobre um disco
 ;     Testando operações de disco.
-;
 ;++	
+
 hd_test:
 	pushad
 	
@@ -600,13 +581,13 @@ hd_test:
 ;====================================================
 ; shellcallsPartitionTest:
 ;     Exibir informações sobre uma partição.
-;
 ;     Testa qual particão está ativa.
-;
 ;++	
+
 shellcallsPartitionTest:
     nop
 particao_test:
+
     pushad		
 	;call os_screen_clear
     ;call reset_cursor
@@ -623,11 +604,11 @@ particao_test:
 
 ;--------------------------------
 ; print_help:
-;
 ;     Mostra mensagem de ajuda.
-;	
 ;++
+
 print_help:
+
 	;pushad
 	push esi
 	mov esi, help_text
@@ -640,11 +621,10 @@ print_help:
 
 ;----------------------------------
 ; shell_clear_screen:
-;
 ;     Limpa a tela e reapresenta o cursor.
 ;     @todo: Talvez deva reiniciar os registradores.
-;
 ;++	
+
 shell_clear_screen:
 	;call clear_screen
 	call os_screen_clear
@@ -657,6 +637,7 @@ shell_clear_screen:
 ; print_ver:
 ;     Mostra a versão.
 ;++	
+
 print_ver:
 	push esi
 	mov esi, version_msg
@@ -670,6 +651,7 @@ print_ver:
 ; fail:
 ;     We didn't get a valid command or program name.
 ;++	
+
 fail:
     nop
 shellcallsFail:					
@@ -683,39 +665,29 @@ shellcallsFail:
 
 ;-------------------------------------- 
 ; os_bmfs_file_list:
-;
 ;     Generate a list of files on disk.
 ;
 ; IN:	EDI = location to store list.
 ; OUT:	EDI = pointer to end of list.
-;
 ;++
-os_bmfs_file_list:
     ;#Cancelada!
+	
+os_bmfs_file_list:
 	ret 
 ;--
 
 	
 ;--------------------------------------
 ; testzone: ?? 
-;
 ;++
-testzone:
     ;#Cancelada!
+	
+testzone:
 	jmp os_command_line
 ;--	
 
 
-;	
-; Mensagens.
 ;
-
-;pasta0_boot_string  db "boot    dir",0	
-;fail_s              db "do_boot: Load fail",0
-;bl_exec             db "do_boot: Trying BL.BIN",0
-
-
-;
-;fim.
+; End.
 ;
 

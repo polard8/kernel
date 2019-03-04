@@ -1,5 +1,5 @@
 ;
-; File: drivers\keyboard.inc
+; File: drivers/keyboard.inc
 ;
 ; Desrição:
 ;     Driver de teclado em 32bit para o Boot Manager.
@@ -173,13 +173,16 @@ keylayoutupper:
 ; 1c = enter
 
 
+
 ;--------------------------------------------
 ; keyboard:
 ;     Keyboard interrupt. (IRQ 0x01), (INT 0x21)
-;
 ;++
+
 keyboard:
-_irq1:		
+    ;nop
+_irq1:	
+
 	push eax
 	push ebx
 	
@@ -192,6 +195,7 @@ _irq1:
 	;call keyboard_debug		
 
 	;Get the scancode from the keyboard.
+	
 	xor eax, eax
 	in al, 0x60			
 	
@@ -214,6 +218,11 @@ _irq1:
 	jz keydown
 	;Key up.
 	jmp keyup
+	
+	;;
+	;;
+	
+;=======	
 ;Keydown.
 keydown:
 	cmp byte [key_shift], 0x00
@@ -233,6 +242,8 @@ keyboard_processkey:
 	mov [key], bl    ;Pega a tecla.
 	mov al, [key]
 	jmp keyboard_done
+	
+;======	
 ;Keyup.
 keyup:
 	jmp keyboard_done
@@ -246,6 +257,7 @@ keyboard_noshift:
 	jmp keyboard_done
 ;Done.
 keyboard_done:
+
     ;Put the typed character in the bottom right hand corner.
 	mov byte [0xB8F9C], al	
 
@@ -254,12 +266,16 @@ keyboard_done:
 	;call write_char
 	
 	;Avisa que tem nova tecla.
+	
 	mov al, byte 1
 	mov byte [nova_tecla_status], al
+	
 	mov al, 0x20			
 	out 0x20, al
+	
 	pop ebx
 	pop eax
+	
 	iretd
 	
 	
@@ -267,21 +283,26 @@ keyboard_done:
 ;-----------------------------------
 ; get_key:
 ;     Pega mensagem do teclado.
-;	
+	
 get_key:
 	;Pega a nova tecla.
 	mov al, byte [key]
-    ;Muda o status.	
-	mov al, byte 0
-	mov byte [nova_tecla_status], al
-    RET
+    
+	;Muda o status.	
+	push bx
+	mov bl, byte 0
+	mov byte [nova_tecla_status], bl
+	pop bx
+    
+	RET
 
 	
 ;------------------------
 ; pega_status_nova_tecla:
 ;
-;	
+	
 pega_status_nova_tecla:	
+
     ;Vê o status.
     mov al, byte [nova_tecla_status]
 	
@@ -290,6 +311,7 @@ pega_status_nova_tecla:
 	
 	xor ax, ax
 	ret	
+	
 .nova_tecla:
     mov al, byte 1	
 	ret
@@ -298,8 +320,9 @@ pega_status_nova_tecla:
 ;------------------------------
 ; wait_key:
 ;     Espera pressionar uma tecla.
-;	
+	
 wait_key:  
+
 	push edx
 	
 	;ve se tem uma nova tecla na fila.
@@ -312,51 +335,35 @@ wait_key:
 	;nao ha nova tecla
 	cmp dl, byte 0
 	je wait_key
+	
+	;;#bugbug
+	;;tentando um default.
+	
+	jmp wait_key
+	
 .do_exit:
 	;pega a tecla
 	mov al, byte [key]
 	; muda o status
 	mov byte [nova_tecla_status], byte 0	
-	pop edx
+
+    pop edx
 	ret
 	
-
-;----------------------------------
-; key_int:
-;     Keyboard interrupt handler.
-;     Uma das opções de interrupt handler.
-;     Esse deve ser o antigo.
-;     #todo: deletar isso.
-key_int:
-	pusha
-	;cli
-	call clear_screen
-	call init_prompt	
-	;mov al, byte "k"	
-	call write_char	
-	mov al, 0x20			
-	out 0x20, al
-	sti
-	popa
-	IRETD
 	
 	
 ;============================================================
 ; keyboardInit:
 ;     Set keyboard repeat rate to max.
-;     
-;
-keyboardInit:
-	
-	;;
+
 	;; #bugbug
 	;; Cancelado.
 	;; Não precisamos disso, pois vamos configurar o teclado 
 	;; durante a inicialização do i8042 no kernel.
-	;;
-	
+
+keyboardInit:
 	;push ax
-	
+			
 	;Set Typematic Rate/Delay.
 	;mov al, 0xf3
 	;out 0x60, al
@@ -380,9 +387,9 @@ keyboardInit:
 ;===========================================================
 ;; reboot:
 ;;     Reboot the computer via keyboard.
-;;
+
 reboot:
-    nop
+    ;nop
 keyboardReboot:
     ;Wait for an empty Input Buffer.
 	in al, 0x64

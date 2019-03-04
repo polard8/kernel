@@ -23,7 +23,7 @@
 
 
  
-msg_BUGBUG DB 'bm:pmInit: #BUGBUG',0
+;msg_Test DB 'bm:pmInit: ...',0
  
 
 ;====================================================================
@@ -50,11 +50,11 @@ pmInit:
 	mov bl, al    
 	
 	
-	pusha
-    call Window.StatusBar
-    mov si, msg_BUGBUG
-    call PoeString
-    popa	
+	;pusha
+    ;call Window.StatusBar
+    ;mov si, msg_Test
+    ;call PoeString
+    ;popa	
 	
 	;debug
 	;jmp $
@@ -250,27 +250,33 @@ pm32:
 ;; rmShutdown
 ;;     Desliga a máquina fica APM. Não tem argumentos. 
 ;;     Obs: Estamos usando a gdt do módulo de 32 bit        
-;;
+
 rmShutdown:
+
     mov ax, DATA_SEL    
 	mov ds,ax
 	mov es,ax
 	;mov fs,ax
 	;mov gs,ax
+	
 	mov ss,ax
 	mov esp, dword 0x0009FFFC
 
-    ;;
+
 	;; *Importante:
-	;; Daqui pra frente não usaremos mais o seletor para 32bit, somente 
-	;; o seletor para modo protegido de 16bit.
-	;;
+	;; Daqui pra frente não usaremos mais o seletor para 32bit, 
+	;; somente o seletor para modo protegido de 16bit.
+
+	;;Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
 	
-    ;;Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
 	jmp RM_Code_Sel:pmode_16bit
-[BITS 16]	
+	
+[BITS 16]
+
 pmode_16bit:
-    ; ajusta os seletores de codigo para modo protegido de 16 bits.
+
+	; Ajusta os seletores de c'odigo para modo protegido de 16 bits.
+	
 	mov	ax, RM_Data_Sel
 	mov	ss, ax
 	mov	ds, ax
@@ -278,7 +284,9 @@ pmode_16bit:
 	;mov	fs, ax
 	;mov	gs, ax
 
-	lidt [ivtr_rm]  	;Carrega ivt = 0:0
+	;Carrega ivt = 0:0
+	
+	lidt [ivtr_rm]  	
 	
 ;5. Clear the PE flag in the CR0 register to switch to real-address mode.
    mov eax, cr0
@@ -300,11 +308,14 @@ do_rm:
 	; to be used in real-address mode, write 0s to them.
 	
 	cli
-    mov ax, 0x0000        ;;segmento 0
+	
+	;;segmento 0
+    mov ax, 0x0000        
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
+	
     ; Create stack
     mov ax, 0x0000
     mov ss, ax
@@ -336,15 +347,19 @@ do_rm:
 	
 	;Mask off all interrupts for now. 
 	;PERMITE TODAS AS INTS.
+	
 	mov	al, 0		
 	out	0x21, al
 	out	0xA1, al
 	
-    sti    ;enable interrupts
+	;enable interrupts
+    sti    
 
-.enableTextMode:	
-	;set text mode
-    mov   ax,0x0003      ; set text mode for screen
+.enableTextMode:
+
+	; set text mode for screen
+
+    mov   ax,0x0003      
     int   0x10
 
 	 ;*Importante:
@@ -373,15 +388,17 @@ rm_shutdown_msg1 db 'pm.inc: RM, Press a key to shutdown',13,10,0
 ;rm_shutdown_msg4 db '.',13,10,0
 ;...
 
-;; Temos que mdar para 32bit [bits 32]
-;; para não estragar codigos subsequêntes.			
-[bits 32]   
-
-
 
 ;;
 ;; =========================================================================
 ;;	
+
+
+;; Temos que mdar para 32bit [bits 32]
+;; para não estragar codigos subsequêntes.			
+
+[bits 32]   
+
 
 ;;=================================================================================
 ;; rmStartGUI:
@@ -397,14 +414,15 @@ rm_shutdown_msg1 db 'pm.inc: RM, Press a key to shutdown',13,10,0
 ;; E ESSA É A INTENSÃO ... O QUE NOS RESTA É PASSAR O COMANDO PARA ELE.
 ;; OBS: PODEMOS FAZER UM TESTE ANTES PRA VER SE ELE ESTÁ PRESENTE NA MEMÓRIA.
 ;;; 'L' (PE).          
-;;
 
 rmStartGUI:
+
     mov ax, DATA_SEL    
-	mov ds,ax
-	mov es,ax
-	;mov fs,ax
-	;mov gs,ax
+	mov ds, ax
+	mov es, ax
+	;mov fs, ax
+	;mov gs, ax
+	
 	mov ss,ax
 	mov esp, dword 0x0009FFFC
 	
@@ -414,7 +432,9 @@ rmStartGUI:
     ;; Pula para o o modo protegido de 16bit, usando o seletor de 16bit.
 	
 	jmp RM_Code_Sel:pmode_16bit_startgui
-[BITS 16]	
+	
+[BITS 16]
+
 pmode_16bit_startgui:
 
     ; Ajusta os seletores de codigo para modo protegido de 16 bits.
@@ -535,19 +555,10 @@ do_rm_startgui:
 .doStartGUI:
 
 	;Set mode.
+	
 	mov al, byte BOOTMODE_GUI
 	call set_boot_mode
-	
-	;; #tests
-	;; 0x118 funcionou à partir no boot loader e no kernel base.
-	;; falta o boot manager aceitar multiplas resoluções
-
-	;mov ax, 0x115
-	;call set_video_mode	
-	
-	;mov word [META$FILE.VIDEO_MODE], 0x118         		
-	;mov word [META$FILE.VIDEO_MODE], 0x115
-	
+		
 	;; #IMPORTANTE
 	;; definição do arquivo main.asm
 	
@@ -555,8 +566,11 @@ do_rm_startgui:
 	
     
 	;Inicializa o modo selecionado.
-	JMP s2modesActivateMode    ;(lib16/s2modes.inc) 
+	;(lib16/s2modes.inc)
+	
+	JMP s2modesActivateMode     
 	jmp $
+	
 	
 ;;Mensagens para a rotina de shut down.	
 rm_startgui_msg1 db 'pm.inc: RM, Press a key to start GUI',13,10,0		
@@ -565,28 +579,18 @@ rm_startgui_msg1 db 'pm.inc: RM, Press a key to start GUI',13,10,0
 ;rm_startgui_msg4 db '.',13,10,0
 ;...
 
-;; Temos que mdar para 32bit [bits 32]
+;;
+;; =========================================================================
+;;	
+
+
+;; #importante
+;; Temos que mudar para 32bit [bits 32]
 ;; para não estragar codigos subsequêntes.			
+
 [bits 32]   	
 	
 ;
-;End.
+; End.
 ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

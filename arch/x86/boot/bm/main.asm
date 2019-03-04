@@ -1103,10 +1103,8 @@ stage2SavePointers:
 stage2Initializations:	
 	;nop
 	
-    ;
 	; Configuração de vídeo.
 	; Set text output with certain attributes to be bright, and not blinking.
-	;
 	
     ;mov eax, 1003h                       
     ;mov ebx, 0                            
@@ -1224,8 +1222,7 @@ HERE:
 	mov dx, 3F2h 
     mov al, 0 
     out dx, al
-	
-   
+	 
 .setupRegisters:	
    
     ;Setup registers.

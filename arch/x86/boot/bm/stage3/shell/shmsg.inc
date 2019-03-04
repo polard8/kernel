@@ -1,5 +1,5 @@
 ;
-; File: shell\shellmsg.inc 
+; File: shell/shmsg.inc 
 ;
 ; Descrição:
 ;     Mensagens e variáveis do Shell do Boot Manager.
@@ -7,44 +7,35 @@
 ; Histórico:
 ;     2015 - Created.
 ;     2017 - Revision.
-;
 
 
-;
 ; Variáveis:
 ; ==========
-;
 
-;				
+
 ; Struct.
 ;     Estrtura de strings aleatórias para suporte ao shell do boot manager. 
-;
 
 SHELL:
-   .volume:    db 0         ;Em que volume está o Shell.
-   .directory: db 0         ;Em que diretório está o Shell.
-   .separador1: db '>',0    ;Separador1.
-   ;.separador2: db '>>',0    ;Separador2.
-   ;.money: db '$',0
-   ;.slash: db '\\', 0 
-   ;...  
-  
-;;...
+    .volume:      db 0         ;Em que volume está o Shell.
+    .directory:   db 0         ;Em que diretório está o Shell.
+    .separador1:  db '>',0     ;Separador1.
+    ;.separador2: db '>>',0    ;Separador2.
+    ;.money: db '$',0
+    ;.slash: db '\\', 0 
+    ;...  
 
-   
 
 ;Prompt:   
 ;Endereço da string no novo prompt.   
-new_prompt:  dd 0              
+new_prompt:  dd 0 
  
    
 
 ;Flag:
 ;Se vai mudar o nome de um arquivo.
 ;O que fazer com o arquivo? ... Salvar, Abrir.
-file_flag db 0       
-   
-   
+file_flag db 0 
 
 ;
 ; Command strings.
@@ -56,11 +47,9 @@ file_flag db 0
 ;     como as do menu16.
 ;
 
-
-
 ;Inicialização.
-boot_string		  db     'boot', 0    ;Inicia com a configuração atual. 
-reboot_string	  db   'reboot', 0    ;Reinicia o sistema.
+boot_string       db     'boot', 0    ;Inicia com a configuração atual. 
+reboot_string     db   'reboot', 0    ;Reinicia o sistema.
 shutdown_string   db 'shutdown', 0    ;Desliga a máquina via APM.	
 make_boot_string  db 'makeboot', 0    ;Cria inicialização padrão. 
 ;...
@@ -71,13 +60,13 @@ particao_string       db        'part', 0    ;Visualiza as informações sobre uma
 ;;..
 
 ;Operações com arquivos.
-dir_string		    db 'dir', 0    ;Exibe a lista de arquivos do diretório raiz.
-open_file_string    db 'of', 0     ;Open file.
-make_file_string    db 'mf', 0     ;Make file.
-delete_file_string  db 'df', 0     ;Delete file.
-open_dir_string     db 'od', 0     ;Open dir.
-make_dir_string     db 'md', 0     ;Make dir.
-delete_dir_string   db 'dd', 0     ;Delete dir.
+dir_string          db 'dir', 0    ;Exibe a lista de arquivos do diretório raiz.
+open_file_string    db  'of', 0     ;Open file.
+make_file_string    db  'mf', 0     ;Make file.
+delete_file_string  db  'df', 0     ;Delete file.
+open_dir_string     db  'od', 0     ;Open dir.
+make_dir_string     db  'md', 0     ;Make dir.
+delete_dir_string   db  'dd', 0     ;Delete dir.
 
 change_dir_string   db 'cd', 0     ;Change dir. (Change current working dir.)
 print_workingdir_string   db 'pwd', 0     ;pwd (print working directory) 
@@ -85,11 +74,11 @@ ls_string                 db 'ls', 0     ;ls lista os arquivos.
 ;...
 
 ;Outros.
-help_string		      db        'help', 0
-cls_string		      db         'cls', 0
-ver_string		      db         'ver', 0
-exit_string		      db        'exit', 0
-debug_string	      db       'debug', 0
+help_string           db        'help', 0
+cls_string            db         'cls', 0
+ver_string            db         'ver', 0
+exit_string           db        'exit', 0
+debug_string          db       'debug', 0
 testzone_string       db    'testzone', 0    ;; Efetuando o teste atual.
 install_string        db     'install', 0    ;Transfere arq.
 mount_volume_string   db       'mount', 0    ;Monta o volume do sistema se possível.
@@ -112,6 +101,7 @@ d0_string  db '/disk0', 0
 d1_string  db '/disk1', 0
 d2_string  db '/disk2', 0
 d3_string  db '/disk3', 0
+	
 
 ;Volumes. (Variável de ambiente.)
 v0_string  db '/volume0', 0
@@ -119,6 +109,7 @@ v1_string  db '/volume1', 0
 v2_string  db '/volume2', 0
 v3_string  db '/volume3', 0
 
+	
 ;Selecionadores.
 seleciona_d0  db  'd0', 0    ;Seleciona disco 0.
 seleciona_d1  db  'd1', 0    ;Seleciona disco 1.
@@ -131,25 +122,25 @@ seleciona_p3  db  'p3', 0    ;Seleciona particao 3.
 ;...
 
 
-
 ;=====================================================================
 ; * Strings *
 ;
 ; Principais string e mensagens do Shell do Boot Manager.
 ;
-;
+
 
 ;Splash.
 shellmsg_splash: 
-    db 'The Gramado Boot Manager Shell',13,10, 
-    db 'Version ', BOOTMANAGER_VER, ' (C) Copyright Fred Nora 2017',13,10,0
+    db 'Gramado Boot Manager ',13,10, 
+    db 'Version ', BOOTMANAGER_VER, ' (C) Copyright Fred Nora 2019', 13, 10, 0
 
 
 ;Prompt.
-prompt:              db 'BM/>', 0    ;Prompt padrão.
+prompt:              db 'BM/>', 0           ;Prompt padrão.
 msg_shell_prompt:    db 'BM/>', 0
 prompt_change_file:  db 'filename=', 0      ;Para declarar o nome do arquivo.
 ;...
+
 
 ;Volume support.
 system_volume_string db 'VOLUME0 VOL',0
@@ -157,8 +148,8 @@ system_volume_string db 'VOLUME0 VOL',0
 
 
 ;File support.
-appextension:	     db '.app', 0
-dirextension:	     db '.dir', 0
+appextension:  db '.app', 0
+dirextension:  db '.dir', 0
 
 ;Cópia do metafile que será salva no sistema de arquivos.
 metafile1_string:        db 'metafilemf1',0     ;
@@ -192,11 +183,12 @@ msg_file_op7 db "Open app", 13, 10 ,0
 ;...
 
 
-;Strings e messages.   
-version_msg:		db 'Gramado Boot Manager Version ', BOOT_VER, 
-                    db ' (c) Copyright 2013-2018', 13, 10, 0
+;Strings e messages. 
+version_msg:
+    db 'Gramado Boot Manager Version ', BOOT_VER, 
+    db ' (c) Copyright 2019', 13, 10, 0
 
-not_found_msg:	    db 'Command or file not found', 13, 10, 0
+not_found_msg:      db 'Command or file not found', 13, 10, 0
 hd_msg:             db 'Reading sector', 13, 10, 0
 dir_title1_string:  db "Current Directory:", 13, 10, 0
 dir_title2_string:  db "Name                     Cluster", 13, \
@@ -208,20 +200,13 @@ dir_title2_string:  db "Name                     Cluster", 13, \
 
 
 help_text:
-    db '[INITIALIZATION:]', 13, 10
-	db 'boot, reboot, shutdown', 13, 10
-    db '                     ', 13, 10
-    db '[DEVICES:]', 13, 10
+    db 'boot, reboot, shutdown', 13, 10
     db 'disk, part', 13, 10
-    db '                     ', 13, 10
-	db '[FILE:]', 13, 10
-	db 'dir', 13, 10
-    db '                     ', 13, 10
-	db '[MORE:]', 13, 10
+    db 'dir', 13, 10
     db 'help, cls, ver', 13, 10, 0
 
 
 ;
-;fim.
+; End.
 ;
 

@@ -1,5 +1,5 @@
 ;
-; File: shell\shell.inc
+; File: shell/shell.inc
 ;
 ; Descrição:
 ;
@@ -158,7 +158,7 @@ os_command_line:
 	mov al, 0x00
 	stosb				
 
-	;
+
 	; Observações:
 	; At this point 'cli_command_string' holds at least 
 	; "a" and at most "abcdefgh.ijk".
@@ -180,8 +180,9 @@ os_command_line:
     ;;
 	
     ;Trocamos um caractere por outro dentro de uma string.	
+	
 .killSpaces:		
-	;; push esi
+
 	mov esi, cli_temp_string
 	mov al, 0x20                ;Quando for espaço,
 	mov bl, 0x00                ;Coloque zero.
@@ -195,6 +196,7 @@ os_command_line:
 	
 	; 'mount'
     ; Monta o volume do sistema se possível.
+	
 .xMount:	
 	mov edi, mount_volume_string
 	call os_string_compare
@@ -202,6 +204,7 @@ os_command_line:
 
 	;'boot'
 	; Inicia o modo gráfico padrão. GUI 
+	
 .xBoot:	
 	mov edi, boot_string
 	call os_string_compare
@@ -525,10 +528,8 @@ os_command_line:
     nop
 .checkFS:	
 	
-    ;
 	; At this point it is not one of the built-in CLI functions. 
 	; Prepare to check the filesystem.
-	;
 	
 	;Check for a '.' in the string.
 	;If there was a '.' then a suffix is present.
@@ -537,18 +538,14 @@ os_command_line:
 	cmp eax, 0
 	jne full_name			
 
-    ;
 	; No suffix was present, so we add the default application suffix 
 	; of ".app"
-    ;
 	
 	; @todo: Adicionar extensão.
 	
-
-	;
 	; Calculando o tamanho.
 	; If the string is longer than 8 chars we can't add a suffix.
-	;
+
 	call os_string_length
 	cmp ecx, 8
 	jg shellcallsFail    ;; shell\shellcalls.inc.
@@ -737,7 +734,6 @@ open_app_op:
 
 ;--
 
-
 os_command_line_ret:
     ret
 
@@ -752,18 +748,14 @@ os_command_line_ret:
 ; OUT:
 ;     Nothing.
 ;+ 
+
 init_shell:
     nop
 shellInit: 
-	;@todo: Aqui deve ser um jmp e não precisa pushs and pops.
-	;pushad
-	;call os_command_line	
-	;popad
 	jmp os_command_line
 .done:
 	ret
 	
-
 
 ;--	
 
@@ -780,11 +772,11 @@ shellPrintShellVersion:
 	;;
 	
 	;Calls.
-	%include "shellcalls.inc"    ;Chamadas dos comandos.
+	%include "shcalls.inc"    ;Chamadas dos comandos.
 	;Lib.
-	%include "shelllib.inc"      ;Lib de funções do Shell.
+	%include "shlib.inc"      ;Lib de funções do Shell.
 	;Msg.
-	%include "shellmsg.inc"      ;Mensagens e variáveis do Shell.			
+	%include "shmsg.inc"      ;Mensagens e variáveis do Shell.			
 	
 	; More ?!
 	
