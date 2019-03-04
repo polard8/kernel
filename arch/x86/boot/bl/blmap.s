@@ -398,31 +398,31 @@ Linker script and memory map
                 0x00000000000271b2                fsInitFat
                 0x00000000000271b8                fsInitStructures
                 0x00000000000271be                fsInit
- .text          0x00000000000271d2      0x60b shell.o
-                0x00000000000271d2                shellMain
+ .text          0x00000000000271d2      0x604 shell.o
+                0x00000000000271d2                blShellMain
                 0x000000000002723d                shellProcedure
-                0x00000000000272b2                shellInitializePrompt
-                0x0000000000027341                shellWaitCmd
-                0x000000000002735b                shellCompare
-                0x000000000002770f                shellHelp
-                0x0000000000027728                boot
-                0x000000000002772e                debug
-                0x0000000000027749                testa_mbr
-                0x000000000002777a                testa_root
-                0x00000000000277ae                reboot
-                0x00000000000277bc                shellInit
- .text          0x00000000000277dd       0x14 services.o
-                0x00000000000277dd                blServices
-                0x00000000000277eb                system_services
- .text          0x00000000000277f1       0x1f abort.o
-                0x00000000000277f1                abort
- .text          0x0000000000027810       0xc0 faults.o
-                0x0000000000027810                cpu_falts
-                0x00000000000278ca                faultsShowRegisters
+                0x00000000000272ab                shellInitializePrompt
+                0x000000000002733a                shellWaitCmd
+                0x0000000000027354                shellCompare
+                0x0000000000027708                shellHelp
+                0x0000000000027721                boot
+                0x0000000000027727                debug
+                0x0000000000027742                testa_mbr
+                0x0000000000027773                testa_root
+                0x00000000000277a7                reboot
+                0x00000000000277b5                shellInit
+ .text          0x00000000000277d6       0x14 services.o
+                0x00000000000277d6                blServices
+                0x00000000000277e4                system_services
+ .text          0x00000000000277ea       0x1f abort.o
+                0x00000000000277ea                abort
+ .text          0x0000000000027809       0xc0 faults.o
+                0x0000000000027809                cpu_falts
+                0x00000000000278c3                faultsShowRegisters
                 0x0000000000028000                . = ALIGN (0x1000)
- *fill*         0x00000000000278d0      0x730 
+ *fill*         0x00000000000278c9      0x737 
 
-.rodata         0x0000000000028000      0xf30
+.rodata         0x0000000000028000      0xf14
  .rodata        0x0000000000028000       0x67 main.o
  *fill*         0x0000000000028067        0x1 
  .rodata        0x0000000000028068      0x21b loader.o
@@ -438,10 +438,10 @@ Linker script and memory map
  .rodata        0x00000000000289dd        0xc procedure.o
  *fill*         0x00000000000289e9        0x3 
  .rodata        0x00000000000289ec      0x2e4 fs.o
- .rodata        0x0000000000028cd0      0x1b2 shell.o
- .rodata        0x0000000000028e82        0xd abort.o
- *fill*         0x0000000000028e8f        0x1 
- .rodata        0x0000000000028e90       0xa0 faults.o
+ .rodata        0x0000000000028cd0      0x196 shell.o
+ .rodata        0x0000000000028e66        0xd abort.o
+ *fill*         0x0000000000028e73        0x1 
+ .rodata        0x0000000000028e74       0xa0 faults.o
 
 .eh_frame       0x0000000000029000     0x1c60
  .eh_frame      0x0000000000029000       0xf4 main.o

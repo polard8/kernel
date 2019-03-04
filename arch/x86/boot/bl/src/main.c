@@ -388,8 +388,8 @@ void die (){
 	   
 	while (1){
 		
-	    asm("cli"); 	
-	    asm("hlt");    		
+	    asm ("cli"); 	
+	    asm ("hlt");    		
 	};                        
 }
  

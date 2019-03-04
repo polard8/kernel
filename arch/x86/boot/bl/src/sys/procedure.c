@@ -81,12 +81,8 @@ bl_procedure ( unsigned long window,
 			break;
     };
 	
-	
-// Done.
-//done:
-	
     return (unsigned long) 0;	
-};  
+}
 
 
 //

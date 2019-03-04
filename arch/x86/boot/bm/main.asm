@@ -206,6 +206,18 @@ G_VIDEO_MODE EQU 0x144    ;;1024x768x32 (usar essa)
 ;;G_VIDEO_MODE EQU 0x145      ;;#bugbug
 
 
+
+;;
+;; GUI FLAG.
+;;
+
+;; 1 = Starts system GUI.
+;; 0 = Starts the Boot Manager CLI.
+
+G_START_GUI EQU 1  ;; 1= (YES) 0 = (NO)  
+
+
+
 ;;
 ;; 16 bit: 
 ;; Estamos no primeiro setor do BM.BIN, ele começa em 16 bit.
@@ -1300,39 +1312,37 @@ HERE:
 	
 .preSelection:
 	
+	mov al, G_START_GUI 
+	
+	cmp al, 1
+	je .xxxxGUI
+	
+	cmp al, 0
+	je .xxxxCLI
+	
+	jmp .xxxxGUI
+	
+.xxxxCLI:	
+
 	;;   ## SET UP BOOT MODE ##
 	mov al, byte BOOTMODE_SHELL
 	call set_boot_mode	
-
-
-	;; *Importante:
-	;;  A partir de agora sempre inicializaremos no modo shell,
-	;; pois temos um comando que inicializa o modo gráfico.
-
+	jmp .xxxxGO
 	
-    ;; #importante
-    ;; Esse é o momento que configuramos o modo de vídeo ainda antes 
-    ;; de entrarmos na CLI.
-    ;; Isso só faz sentido se o modo de video for o modo gráfico.
+.xxxxGUI:	
 
-	; video:
-	; Faz a primeira seleção de modo de video. Salvando o modo no metafile.
-	; + 0x4115 is 800x600x24bit	(*gui) (3 bytes por pixel) (0xrrggbbrrggbb).
-
-
+	mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
+	
 	;;   ## SET UP BOOT MODE ##
-	;mov al, byte BOOTMODE_GUI
-	;call set_boot_mode	    
-
-	;;   ## SET UP VIDEO MODE ##
-    ;mov word [META$FILE.VIDEO_MODE], 0x115   
-    ;mov ax, 0x115
-	;call set_video_mode
-
+	mov al, byte BOOTMODE_GUI
+	call set_boot_mode	    
+	jmp .xxxxGO
 
 	;;
 	;; ## GO!
 	;;
+
+.xxxxGO:
 	
 	; Ativar o modo escolhido.
 	; (lib16\s2modes.inc)

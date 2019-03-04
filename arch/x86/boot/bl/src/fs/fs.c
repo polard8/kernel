@@ -822,6 +822,7 @@ int load_path ( unsigned char *path, unsigned long address ){
 	return -1;
 }
 
+
 /*
  ***********************************************************
  * fsSearchFile: 
@@ -920,7 +921,6 @@ unsigned long fsSearchFileName ( unsigned char *name ){
  *    Carregando 32 setores do rootdir.
  *    Size = 32 setores. 
  *    512 entradas de 32 bytes cada.
- *
  */
  
 void fs_load_rootdirEx (){
@@ -1321,6 +1321,7 @@ fail:
  * fsClearFat:
  *     Apaga a fat, colocando zero em tudo.
  */
+
 void fsClearFat (){
 	
     fsInitFat();  //Provisório.	 
@@ -1332,14 +1333,15 @@ void fsClearFat (){
  *     Confere os parâmetros da FAT.
  *     @todo: Usar estrutura.
  */
-int fsCheckFat()
-{
+
+int fsCheckFat (){
+	
 	unsigned long i;
 	unsigned long fat_entry;
 	
 	printf("\n");
 	
-    for(i = 0; i < 256; i++)
+    for (i = 0; i < 256; i++)
 	{
         //Pega a FAT entry.
 		fat_entry = fs_get_fat_entry(i);
@@ -1370,6 +1372,7 @@ fail:
  * fsInitFat:
  *    Inicializa as estruturas da FAT.
  */
+
 void fsInitFat(){
 	//return;  //Ainda não implementada.
 };
@@ -1383,6 +1386,7 @@ void fsInitFat(){
  *
  * OBS: Quem vai usar essas estuturas é o bootloader.
  */
+
 void fsInitStructures(){
 	//return;  //Ainda não implementada.
 };

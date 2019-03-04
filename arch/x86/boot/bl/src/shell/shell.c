@@ -1,5 +1,5 @@
 /*
- * File: shell\shell.c 
+ * File: shell/shell.c 
  *
  * Descrição:
  *     Mini-shell do Boot Loader.
@@ -71,24 +71,21 @@ void debug ();
 
 /*
  *************************************************
- * shellMain:
+ * blShellMain:
  *     Função principal do Shell do Boot Loader.
- *
- *     #todo: Usar argumentos padrão argc, argv.
+ *     Auxilia a instalacao do sistema.
  *     #todo: usar delimtador e separador de tokens igual no app shell.
  */
  
-// #todo: int shellMain ( int argc, char **argv )
-// #todo: int shellMain ( int argc, char *argv[] )
- 
-int shellMain ( int argc, char *argv ){
+int blShellMain ( int argc, char *argv[] ){
 	
     unsigned long ret_proc;
 	
 	// Title.	
 	
     bl_clear (0);
-    printf("[BL-SHELL:] Auxilia a instalacao do sistema\n");
+	
+    printf ("blShellMain:\n");
 	
 	//
     // Ativa o procedimento do shell.      
@@ -96,7 +93,9 @@ int shellMain ( int argc, char *argv ){
 	
 	//@todo registrar procedimento.
     //ret_proc = registra_procedimento( (unsigned long) shell_proc, 1, 0, 0);	
-	if(ret_proc != 0){
+	
+	if (ret_proc != 0)
+	{
 	    goto fail_shell;
 	};
 	
@@ -151,17 +150,6 @@ shellProcedure ( unsigned long window,
 				 unsigned long long2 )
 {
     unsigned long input_ret;    
-	
-	//Tela para debug em text mode.
-   	unsigned char *screen = (unsigned char *) 0x000B8000;      
-
-	// @todo: 
-	// Esse debug só deve aparecer se estivermos em Text Mode.
-	
-	//Debug:
-	//if useGUI == 0 (){...}
-	//screen[78] = (char) long1;
-	//screen[79] = (char) 0x09; //blue    
 	
     switch (msg)
     {      
@@ -230,10 +218,8 @@ int shellInitializePrompt (){
 	printf("%c",'_');
 	g_cursor_x--;
  
-//done: 
-
-    return (int) 0;
-};
+    return 0;
+}
 
 
 /*
@@ -253,8 +239,7 @@ wcLoop:
     };	
 	
 	goto wcLoop;
-};
-
+}
 
 
 /*
@@ -422,11 +407,8 @@ void boot (){
     
     /*
 	 * @todo: Chama a re-inicialização do bootloader.
-	 *
 	 */ 
-
-	//return;
-};
+}
 
 			 
 /*
@@ -438,7 +420,6 @@ void boot (){
  *    Efetuar correções possíveis no processo de inicialização.
  *    Por exemplo, se há uma falha no mbr, no bootmanager, ou no sistema
  *    de arquivos, a falha pode ser reportada ou corrigida.
- *
  */
  
 void debug (){
@@ -454,16 +435,12 @@ void debug (){
 	
 	//mostra os arquivos do diretorio raiz.
     //fs_show_dir(0);	
-	
-	
-//done:
 
 #ifdef BL_VERBOSE	
 	printf ("debug: Done \n");
 #endif
 	
-	//return;
-};
+}
 
 
 void testa_mbr (){
@@ -471,9 +448,7 @@ void testa_mbr (){
     my_read_hd_sector ( MBR_ADDRESS, MBR_LBA, 0, 0 );
 	
     printf ("%s", MBR_ADDRESS );
-	
-    //return;   
-};
+}
 
 
 // Mudar nome.
@@ -482,12 +457,11 @@ void testa_root (){
     my_read_hd_sector ( FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA, 0, 0 );
 	
     printf ("%s", FAT16_ROOTDIR_ADDRESS );
-	
-	//return;   
-};
+}
 
 
-/* reboot: Reboot. */
+/* reboot: 
+       Reboot. */
 
 void reboot (){
 	
@@ -495,10 +469,11 @@ void reboot (){
 	// Devemos chamar asm_reboot()
 	
     asm_shut_down();
-};
+}
 
 
-/* init_shell: Inicializa o shell do Boot Loader. */
+/* init_shell: 
+       Inicializa o shell do Boot Loader. */
 
 void shellInit (){
 	
@@ -511,13 +486,9 @@ void shellInit (){
 	//cursor
 	//g_cursor_y = 0;
 	//g_cursor_x = 0;
-	
-//done:
 
     ShellInitialized = 1;
-    
-	//return;
-};
+}
 
 
 //

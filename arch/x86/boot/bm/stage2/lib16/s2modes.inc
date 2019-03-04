@@ -58,6 +58,7 @@ get_video_mode:
 ;+1 - Inicia o Shell do boot manager.  
 ;+2 - Inicia o BL.BIN no modo GUI. 	
 ;++
+
 s2modesActivateMode:
    
 	call Window.ClearScreen	
