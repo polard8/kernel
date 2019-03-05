@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 19
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
+EXTRAVERSION = -rc1
 NAME = ?
 
 #todo:
@@ -383,7 +383,8 @@ compile-kernel:
 link-x86:
 	ld -m elf_i386 -T kernel/link.ld -o KERNEL.BIN $(myObjects) -Map docs/kmap.s
 
-	mv KERNEL.BIN bin/kernel/
+#move
+	mv KERNEL.BIN bin/boot/
 
 vhd-x86:
 	nasm -I arch/x86/boot/vhd/stage1/ \
@@ -401,24 +402,13 @@ vhd-mount:
 # 3) INIT, SHELL, TASKMAN
 vhd-copy-files:
 	
-# boot	
+#
+# ======== Files in the root dir. ========
+#
+
 	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd
 	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd
-
-
-# test
-# Não estão mais no diretório raiz os arquivos kernel, init, shell e taskman
-
-# kernel	
-#	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd
-
-# init	
-#	sudo cp bin/init/INIT.BIN     /mnt/gramadovhd
-#	sudo cp bin/init/SHELL.BIN    /mnt/gramadovhd
-#	sudo cp bin/init/TASKMAN.BIN  /mnt/gramadovhd
-
-
-
+	
 # user/config
 	sudo cp user/config/USER.TXT /mnt/gramadovhd
 	sudo cp user/config/INIT.TXT /mnt/gramadovhd
@@ -433,42 +423,10 @@ vhd-copy-files:
 	sudo cp arch/x86/boot/vhd/images/FOLDER.BMP    /mnt/gramadovhd
 	sudo cp arch/x86/boot/vhd/images/TERMINAL.BMP  /mnt/gramadovhd
 	sudo cp arch/x86/boot/vhd/images/CURSOR.BMP    /mnt/gramadovhd
-	
 	-sudo cp arch/x86/boot/vhd/images/DENNIS.BMP   /mnt/gramadovhd
 	
 # fonts
-	sudo cp bin/NC2.FON /mnt/gramadovhd
-	
-# Creating standard folders
-	-sudo mkdir /mnt/gramadovhd/BOOT
-	-sudo mkdir /mnt/gramadovhd/DEV
-	-sudo mkdir /mnt/gramadovhd/HOME
-	-sudo mkdir /mnt/gramadovhd/MNT
-	-sudo mkdir /mnt/gramadovhd/TMP
-	-sudo mkdir /mnt/gramadovhd/BIN
-	-sudo mkdir /mnt/gramadovhd/LIB
-	
-# Creating GDE
-	-sudo mkdir /mnt/gramadovhd/GDE
-	-sudo mkdir /mnt/gramadovhd/GDE/BIN	
-	
-# Creating EFI
-	-sudo mkdir /mnt/gramadovhd/EFI
-	-sudo mkdir /mnt/gramadovhd/EFI/BOOT
-	
-#copy
-
-#colocando os arquivos no diretório /boot
-#serão carregados por bl.bin 
-
-	sudo cp bin/kernel/KERNEL.BIN   /mnt/gramadovhd/BOOT
-	
-	sudo cp bin/init/INIT.BIN       /mnt/gramadovhd/BOOT
-	sudo cp bin/init/SHELL.BIN      /mnt/gramadovhd/BOOT
-	sudo cp bin/init/TASKMAN.BIN    /mnt/gramadovhd/BOOT
-
-#gde
-	-sudo cp ../gde/bin/* /mnt/gramadovhd/GDE/BIN 
+	sudo cp bin/NC2.FON /mnt/gramadovhd	
 	
 #Get available apps
 #	-sudo cp ../gde/apps/gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
@@ -482,16 +440,80 @@ vhd-copy-files:
 	-sudo cp ../gde/bin/CAT.BIN       /mnt/gramadovhd 	
 	-sudo cp ../gde/bin/GLIBCT1.BIN   /mnt/gramadovhd 	
 #...
-
 	
-#test	
-	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/boot
-	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/tmp
-	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/lib
-	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/gde
+	
+#
+# ======== Creating the all the folders in root dir ========
+#		
+
+# Creating standard folders
+	-sudo mkdir /mnt/gramadovhd/BIN
+	-sudo mkdir /mnt/gramadovhd/BOOT
+	-sudo mkdir /mnt/gramadovhd/DEV
+	-sudo mkdir /mnt/gramadovhd/EFI
+	-sudo mkdir /mnt/gramadovhd/EFI/BOOT	
+	-sudo mkdir /mnt/gramadovhd/GDE
+	-sudo mkdir /mnt/gramadovhd/GDE/BIN		
+	-sudo mkdir /mnt/gramadovhd/HOME
+	-sudo mkdir /mnt/gramadovhd/LIB	
+	-sudo mkdir /mnt/gramadovhd/MNT
+	-sudo mkdir /mnt/gramadovhd/TMP
+
+
+#
+# ======== Files in the BIN/ folder. ========
+#	
+
+	-sudo cp ../gde/bin/*                       /mnt/gramadovhd/BIN 
+	
+#
+# ======== Files in the BOOT/ folder. ========
+#	
+
+# principais.
+# Serão carregados por bl.bin. 
+	sudo cp bin/boot/KERNEL.BIN   /mnt/gramadovhd/BOOT
+	sudo cp bin/boot/INIT.BIN     /mnt/gramadovhd/BOOT
+	sudo cp bin/boot/SHELL.BIN    /mnt/gramadovhd/BOOT
+	sudo cp bin/boot/TASKMAN.BIN  /mnt/gramadovhd/BOOT
+
+#colocaremos drivers e servidores na pasta boot/
+#	sudo cp bin/drivers/??.BIN       /mnt/gramadovhd/BOOT	
+#	sudo cp bin/servers/??.BIN       /mnt/gramadovhd/BOOT
+
+
+#
+# ======== Files in the EFI/ folder. ========
+#	
 	
 #test efi
 #	-sudo cp arch/x86/boot/efi/BOOTIA32.EFI  /mnt/gramadovhd/EFI/BOOT
+
+#
+# ======== Files in the GDE/ folder. ========
+#	
+
+#gde
+	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/GDE
+	-sudo cp ../gde/bin/*                       /mnt/gramadovhd/GDE/BIN 
+	
+
+#
+# ======== Files in the LIB/ folder. ========
+#	
+	
+	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/LIB
+	
+
+#
+# ======== Files in the TMP/ folder. ========
+#	
+
+	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/TMP
+	
+	
+
+	
 
 
 # umount

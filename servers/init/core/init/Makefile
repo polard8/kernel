@@ -108,7 +108,7 @@ shell-link:
 
 
 finalize:
-	cp INIT.BIN ../../../../bin/init/
+	cp INIT.BIN ../../../../bin/boot/
 
 clean:
 	-rm *.o

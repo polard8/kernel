@@ -108,7 +108,7 @@ taskman-link:
 
 
 finalize:
-	cp TASKMAN.BIN ../../../../bin/init/
+	cp TASKMAN.BIN ../../../../bin/boot/
 
 clean:
 	-rm *.o

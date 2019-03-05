@@ -142,7 +142,7 @@ shell-link:
 
 
 finalize:
-	cp SHELL.BIN ../../../../bin/init/
+	cp SHELL.BIN ../../../../bin/boot/
 
 clean:
 	-rm *.o
