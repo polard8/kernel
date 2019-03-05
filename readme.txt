@@ -37,15 +37,11 @@ Groups:
 /bin      - .bin compiled files.
 /docs     - Documentation.
 /drivers  - Ring3 loadable drivers.
-/fs       - File systems support. Loadable fs.
 /include  - Headers.
-/init     - Initialization processes.
 /kernel   - The kernel base.
 /lib      - Libs. Source code and binaries.
 /licenses - licenses.
-/net      - newtwork support.
 /scripts  - Scripts.
-/security - Security support.
 /servers  - Ring3 loadable servers.
 
 ================================
