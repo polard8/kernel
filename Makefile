@@ -12,10 +12,10 @@
 #We will have a new name just when the release changes.
 
 VERSION = 0
-PATCHLEVEL = 18
+PATCHLEVEL = 19
 SUBLEVEL = 0
-EXTRAVERSION = 0
-NAME = efi
+EXTRAVERSION = -rc0
+NAME = ?
 
 #todo:
 #We need to simplify these flags, but it's working.
@@ -491,7 +491,7 @@ vhd-copy-files:
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/gde
 	
 #test efi
-	-sudo cp arch/x86/boot/efi/BOOTIA32.EFI  /mnt/gramadovhd/EFI/BOOT
+#	-sudo cp arch/x86/boot/efi/BOOTIA32.EFI  /mnt/gramadovhd/EFI/BOOT
 
 
 # umount
