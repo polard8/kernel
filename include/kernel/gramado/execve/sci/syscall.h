@@ -522,6 +522,44 @@ systemcall_t *CurrentSystemCall;
 //	...
 //};	
 
+
+
+//#importante
+//wrapper para todos os diálogos de serviços presentes em sci/gde
+//É a int 0x80.
+
+
+void *gde_services ( unsigned long number, 
+                     unsigned long arg2, 
+                     unsigned long arg3, 
+                     unsigned long arg4 );
+
+
+/*
+ * kernel_services:
+ *    Atende as chamadas das interrupções do sistema. 
+ */
+void *kernel_services ( unsigned long number, 
+                 unsigned long arg2, 
+			 	 unsigned long arg3, 
+				 unsigned long arg4 );
+
+
+
+void *shell_services ( unsigned long number, 
+                     unsigned long arg2, 
+                     unsigned long arg3, 
+                     unsigned long arg4 );
+
+
+void *taskman_services ( unsigned long number, 
+                     unsigned long arg2, 
+                     unsigned long arg3, 
+                     unsigned long arg4 );
+
+
+
+
 //
 // End.
 //

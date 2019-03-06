@@ -419,23 +419,7 @@ struct system_d *System;
 // Prototypes.
 //
 
-
-
-/*
- * services:
- *    Atende as chamadas das interrupções do sistema.
- *    É a int 200.
- *    Obs: Essa rotina está em service.c
- */
-void *services ( unsigned long number, 
-                 unsigned long arg2, 
-			 	 unsigned long arg3, 
-				 unsigned long arg4 );
-				
-
-				
-
-				
+		
 /*
  * ldisc_dialog:
  *     Procedimento de dialogo usado para a manipulação de 

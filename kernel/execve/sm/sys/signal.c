@@ -1,5 +1,5 @@
 /*
- * File: sm\sys\signal.c
+ * File: sm\sys\signal.c  #bugbug: esse não é o tratamento de sinal da libc ... o da libc deve ser resolvido em klibc
  *
  * Descrição:
  *     Signal Manager.

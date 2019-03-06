@@ -513,7 +513,9 @@ done:
 	     (alt_status == 1) && 
 		 (ch == KEY_DELETE) )
 	{
-		services ( SYS_REBOOT, 0, 0, 0 );
+		//#bugbug
+		//isso não pode chamar o kernel services diretamente, tem que chamar o gde_services.
+		kernel_services ( SYS_REBOOT, 0, 0, 0 );
 		
 		//system_procedure ...
 		// @todo: Chamar o aplicativo REBOOT.BIN.

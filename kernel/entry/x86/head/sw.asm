@@ -100,7 +100,7 @@ _int100:
 	
  
 ;---------------------------------
-; _int200:
+; _int128:  0x80
 ;    Interrupção de SISTEMA. (padrão).
 ;
 ; eax = ;arg1 (numero)
@@ -114,10 +114,8 @@ _int100:
 ; @todo: Pelo jeito é natural entrar com muito mais argumentos.
 ;        passados pelos registradores ebp, esi, edi.
 ;++
-extern _services
 
-;global _int200
-;_int200: 
+extern _gde_services
 
 global _int128
 _int128:  
@@ -137,7 +135,10 @@ _int128:
     push dword ebx    ;arg2. 
     push dword eax    ;arg1 = {Número do serviço}.
 	
-	call _services  ;;handler em executive\sm\sys\services.c.
+
+	;;O handler padrão é gde_services, que é um wrapper para os outros diálogos.
+	call _gde_services
+	
 	mov dword [.int128Ret], eax    
     
 	;Argumentos.

@@ -71,6 +71,58 @@ void servicesPutChar ( int c );
 void servicesChangeProcedure();
 unsigned long serviceCreateWindow ( char * message_buffer );
 
+
+
+
+void *taskman_services ( unsigned long number, 
+                     unsigned long arg2, 
+                     unsigned long arg3, 
+                     unsigned long arg4 )
+{
+	//#bugbug: estamos revendo isso, veja sci/gde
+	// 8000 ~ 8999
+	// Chama os serviços oferecidos pelos servidores do gramado core
+	// pc/ipc/ipccore.c
+	
+	/* #suspenso
+	if ( number >= 8000 && number < 9000 )
+	{
+		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
+						    (unsigned long) arg3, (unsigned long) arg4 );
+	};
+	*/	
+	//#todo
+   return NULL;
+}
+
+
+
+
+
+void *shell_services ( unsigned long number, 
+                     unsigned long arg2, 
+                     unsigned long arg3, 
+                     unsigned long arg4 )
+{
+	//#bugbug: estamos revendo isso, veja sci/gde
+	// 8000 ~ 8999
+	// Chama os serviços oferecidos pelos servidores do gramado core
+	// pc/ipc/ipccore.c
+	
+	/* #suspenso
+	if ( number >= 8000 && number < 9000 )
+	{
+		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
+						    (unsigned long) arg3, (unsigned long) arg4 );
+	};
+	*/	
+	//#todo
+   return NULL;
+}
+
+
+
+
 //
 //...
 //
@@ -109,7 +161,7 @@ unsigned long serviceCreateWindow ( char * message_buffer );
  *  E NÃO NO KERNEL BASE.
  */
 
-void *services ( unsigned long number, 
+void *kernel_services ( unsigned long number, 
                  unsigned long arg2, 
                  unsigned long arg3, 
                  unsigned long arg4 )
@@ -268,30 +320,20 @@ void *services ( unsigned long number,
 	}
 
 	
+	//#bugbug: estamos revendo isso, veja sci/gde
 	// 7000 ~ 7999
 	// Suporte as chamadas de socket da libc.
 	// crts/klibc/socket.c
+	
+	/* #suspenso vamos mudar esse numeros e atender aqui mesmo
 	if ( number >= 7000 && number < 8000 )
 	{
 		return (void *) socket_services ( (unsigned long) number, (unsigned long) arg2, 
 						    (unsigned long) arg3, (unsigned long) arg4 );
 	};
+    */
+	
 
-	
-	
-	// 8000 ~ 8999
-	// Chama os serviços oferecidos pelos servidores do gramado core
-	// pc/ipc/ipccore.c
-	if ( number >= 8000 && number < 9000 )
-	{
-		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
-						    (unsigned long) arg3, (unsigned long) arg4 );
-	};
-	
-	
-	
-	
-	
 	
 	//
 	// ## Switch ##
@@ -1715,182 +1757,10 @@ void *services ( unsigned long number,
     
 	
 	// * importante:
-	//   Depois de esgotados os 'cases', saltamos para a saída da função.
-	
-	goto done;	
-
-// * Aviso: #Importante.
-//
-// Juntando os argumentos para a função CreateWindow(.).
-// Nesse caso, antes de chamarmos a função CreateWindow, vamos juntar
-// todos os argumentos que ela precisa. Mas o que acontece é que
-// estamos na rotina de serviços que o kernel oferece via API.
-// Qual será a estratégia para conseguirmos os argumentos.
-// >> Quando um aplicativo em user mode chamar CreateWindow, 
-// a rotina da API deve fazer 4 system calls, as 3 primeiras passando 
-// os argumentos e a última criando a janela.
-// >> do_create_window: é acionada depois de passados todos os argumentos. 
-	
-	
-/*	
-//
-// ## Create window ##
-//
-
-do_create_window:	
-	
-	//?? @TODO
-	//if(WindowType >= 0 || WindowType <= 5){
-	//	
-	//}	
-	
-	// @todo: bugbug.
-	// Obs: A parent window é 'gui->screen'. Talvez essa estrutura nem esteja 
-    // inicializada ainda no ambiente de logon.
-	// Obs: O usuário só pode criar janelas na área de trabalho do desktop atual.
-    // @todo: A área de trabalho do desktop atual pode ser representada por
-    // uma estrutura de retângulo na estrutura do desktop e/ou uma estrutura de
-    // retângula na estrututra gui->.
-    //      ...
-
-	//
-	// Importante: Checando se o esquema de cores está funcionando.
-	//
-	
-	if ( (void *) CurrentColorScheme == NULL )
-	{
-		printf("services: CurrentColorScheme");
-		//refresh_screen();
-		die ();
-		
-		//while(1){}
-	
-	}else{
-		
-		if ( CurrentColorScheme->used != 1 || 
-		     CurrentColorScheme->magic != 1234 )
-		{
-		    
-			printf("services: CurrentColorScheme validation");
-		    //refresh_screen();
-		    die();
-			
-			//while(1){}			
-		};
-		//Nothing.
-	};
-	
-
-	// Nesse momento estamos atribuindo a cor padrão de janelas 
-	// para as janelas que criadas pelos aplicativos através de system calls.
-	// Não há problema nisso por enquanto.
-	
-	// *Podemos aceitar as opções de cores passadas por argumento.
-	//  principalmente a cor da área de cliente.
-
-	
-	//*Importante
-	//definimos as cores psdrão caso a flag esteja desligada.
-	WindowColor = CurrentColorScheme->elements[csiWindowBackground];  
-	WindowClientAreaColor = CurrentColorScheme->elements[csiWindow];  
-
-	// * Primeira coisa a fazer é ver se os argumentos estão disponíveis.
-	//   Vamos conferir a flag que indica que argumentos foram enviados 
-	//   previamente.
-	
-	// Se a flag tiver acionada, os argumentos usarão os valores 
-	// que foram previamente passados
-	
-	if (cwFlag == 1234)
-	{		
-        WindowType = cwArg1; 
-		WindowStatus = cwArg2; 
-		WindowView = cwArg3; 
-		WindowName = (char *) cwArg4; 
-	    
-		WindowX = cwArg5; 
-		WindowY = cwArg6; 
-		
-		WindowWidth = cwArg7; 
-        WindowHeight = cwArg8;									  
-		
-		//#todo
-		//gui->screen  = cwArg9; 
-		//desktopID = cwArg10; 
-		
-		WindowClientAreaColor = (unsigned long) cwArg11;  //Obs: A cor da área de cliente será escolhida pelo app.   
-		WindowColor = (unsigned long) cwArg12;            //a cor da janela escolhida pelo app. 
-	};	
-	
-
-    // Importante:
-	// Nesse momento é fundamental saber qual é a parent window da janela que vamos criar 
-	// pois a parent window terá as margens que nos guiam.
-	// Essa parent window pode ser uma aba de navegador por exemplo.
-	// >> O aplicativo deve enviar o ponteiro da janela mãe.
-	
-	//Criando uma janela, mas desconsiderando a estrutura rect_d passada por argumento.
-	//@todo: #bugbug a estrutura rect_d apresenta problema quando passada por argumento
-	//com um endereço da área de memória do app.
-	
-    NewWindow = (void *) CreateWindow ( WindowType, WindowStatus, 
-	                        WindowView, WindowName, 
-	                        WindowX, WindowY, WindowWidth, WindowHeight,									  
-							cwArg9, desktopID, 
-							(unsigned long) WindowClientAreaColor, 
-							(unsigned long) WindowColor );
-	
-	if ( (void *) NewWindow == NULL )
-	{ 
-        //?? Mensagem.
-	    return NULL; 
-		
-	}else{	
-        
-		
-		//se a janela foi criada com sucesso, podemos desativar a flag.
-		//*importante, nesse momento precisamos desativar a flag.
-		
-		cwFlag = 0;                  
-		
-        // Obs: 
-		// Quem solicitou a criação da janela pode estar em user mode
-        // porém a estrutura da janela está em kernel mode. #bugbug
-		// Obs:
-		// Para preencher as informações da estrutura, a aplicação
-		// pode enviar diversas chamadas, Se não enviar, serão considerados
-		// os valores padrão referentes ao tipo de janela criada.
-		// Cada tipo tem suas características e mesmo que o solicitante
-		// não seja específico nos detalhes ele terá a janela do tipo que deseja.	
-		
-        //  
-        //@todo: Pode-se refinar os parâmetros da janela na estrutura.
-		//NewWindow->
-		//...
-		
-		//@todo: Não registrar, quem criou que registre a janela.
-		//RegisterWindow(NewWindow);
-		
-		//
-		// Se a tarefa atual está pintando, vamos melhorar a sua prioridade.
-		//
-		
-		t = (void *) threadList[current_thread];
-		
-		set_thread_priority ( t, PRIORITY_HIGH4 );
-		
-	    return (void *) NewWindow; 
-	};
-	
-	*/
-
-//More ...
-//xxx:
-//yyy:
-//zzz:
+	//   Depois de esgotados os 'cases', vamos para a saída da função.
 
     //    No caso de um aplicativo ter chamado essa rotina, 
-	// o retorno será para o ISR da int 200, feito em assembly.
+	// o retorno será para o ISR da int 0x80, feito em assembly.
     //    No caso do kernel ter chamado essa rotina, apenas retorna.
 	
 //Done.
@@ -1900,6 +1770,44 @@ done:
 	//refresh_screen();
     return NULL;	
 }
+
+
+
+void *gde_services ( unsigned long number, 
+                     unsigned long arg2, 
+                     unsigned long arg3, 
+                     unsigned long arg4 )
+{	
+      if ( number >= 0 && number <= 999 ){
+	  
+	      //chama k_serc.c 
+		  return (void *) kernel_services ( (unsigned long) number, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+	  
+	  } else if ( number >= 1000 &&  number <= 1999 ){
+	   
+		  //envia mensagens para o servidor shell se ele estiver disponível.
+	      
+		  //se shell é um servidor então ele não pode ser fechado
+		  //o ideal é que ele seja escalonado em todos os rounds.
+		  
+	      //chama sh_serc.c 
+		  return (void *) shell_services ( (unsigned long) number, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+		  
+	  }else if  ( number >= 2000 &&  number <= 2999 ){
+		  
+	      //chama tm_serc.c 
+		  return (void *) taskman_services ( (unsigned long) number, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+		  
+	  }else{
+	  
+	      //fail
+		  //vai falhar na última das opção.
+		  return NULL;
+	  };
+	
+	return NULL;
+}
+
 
 
 /*
@@ -2085,6 +1993,12 @@ void servicesPutChar ( int c ){
 void servicesChangeProcedure (){	
 	//return;
 }
+
+
+
+
+
+
 
 
 //

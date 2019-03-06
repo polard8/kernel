@@ -14,13 +14,11 @@
 VERSION = 0
 PATCHLEVEL = 19
 SUBLEVEL = 0
-EXTRAVERSION = 0
-NAME = Makefile Changes
+EXTRAVERSION = .0
+NAME = cortex
 
 
 ARCH ?= x86
-
-
 
 
 
@@ -65,129 +63,44 @@ ifeq ($(ARCH),x86)
 	#deveria ser headx86.o
 	ENTRY_OBJECTS := head.o x86main.o 
 	
-	EXECVE_OBJECTS := cedge.o \
-	ctype.o \
-	socket.o \
-	stdio.o \
-	stdlib.o \
-	string.o \
-	unistd.o \
+	EXECVE_OBJECTS := cedge.o ctype.o socket.o stdio.o stdlib.o string.o unistd.o \
 	devmgr.o \
 	ldisc.o \
-	services.o \
-	debug.o \
-	diskvol.o \
-	install.o \
-	object.o \
-	runtime.o \
-	abort.o \
-	channel.o \
-	info.o \
-	io.o \
-	modules.o \
-	proc.o \
-	signal.o \
-	sm.o \
-	init.o \
-	system.o \
+	gde_serv.o \
+	debug.o diskvol.o install.o object.o runtime.o \
+	abort.o channel.o info.o io.o modules.o proc.o signal.o sm.o \
+	init.o system.o \
 	execve.o 
 	
-	HAL_OBJECTS := cpuamd.o \
-	portsx86.o \
-	syscall.o \
-	x86.o \
-	detect.o \
+	HAL_OBJECTS := cpuamd.o portsx86.o syscall.o x86.o detect.o \
 	hal.o 
 	
 	KDRIVERS_OBJECTS := ahci.o \
-	i8042.o \
-	keyboard.o \
-	mouse.o \
-	ps2kbd.o \
-	ps2mouse.o \
-	ata.o \
-	atadma.o \
-    atainit.o \
-    atairq.o \
-    atapci.o \
-	hdd.o \
-    network.o \
-    nicintel.o \
-    nsocket.o \
-	pci.o \
-	pciinfo.o \
-	pciscan.o \
+	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
+	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
+    network.o nicintel.o nsocket.o \
+	pci.o pciinfo.o pciscan.o \
 	tty.o \
     usb.o \
-	apic.o \
-	pic.o \
-	rtc.o \
-	screen.o \
-    serial.o \
-	timer.o \
-	video.o \
-    vsync.o 
+	apic.o pic.o rtc.o screen.o serial.o timer.o video.o vsync.o 
 
 	
-	KSERVERS_OBJECTS := cf.o \
-	format.o \
-	fs.o \
-    read.o \
-    search.o \
-    write.o \
-    bg.o \
-    bmp.o \
-    button.o \
-    char.o \
-    createw.o \
-    dtext.o \
-    font.o \
-    grid.o \
-    line.o \
-    menu.o \
-    menubar.o \
-    pixel.o \
-    rect.o \
-    sbar.o \
-    window.o \
-	logoff.o \
+	KSERVERS_OBJECTS := cf.o format.o fs.o read.o search.o write.o \
+    bg.o bmp.o button.o char.o createw.o dtext.o font.o grid.o \
+    line.o menu.o menubar.o pixel.o rect.o sbar.o window.o \
+    logoff.o \
 	logon.o \
-    desktop.o \
-    room.o \
-    userenv.o \
-    usession.o \
+    desktop.o room.o userenv.o usession.o \
     kgws.o \
 	vfs.o 
 	
 	
-	MK_OBJECTS := x86cont.o \
-	x86fault.o \
-	x86start.o \
-    create.o \
-    dispatch.o \
-    pheap.o \
-    process.o \
-    queue.o \
-    spawn.o \
-    tasks.o \
-    theap.o \
-    thread.o \
-    threadi.o \
-    ts.o \
-    tstack.o \
-	callout.o \
-	callfar.o \
-    ipc.o \
-    ipccore.o \
-    sem.o \
-	memory.o \
-	mminfo.o \
-	mmpool.o \
-	pages.o \
-    preempt.o \
-    priority.o \
-    sched.o \
-    schedi.o \
+	MK_OBJECTS := x86cont.o x86fault.o x86start.o \
+    create.o dispatch.o pheap.o process.o queue.o spawn.o \
+    tasks.o theap.o thread.o threadi.o ts.o tstack.o \
+	callout.o callfar.o ipc.o ipccore.o sem.o \
+	memory.o mminfo.o mmpool.o pages.o \
+    preempt.o priority.o sched.o schedi.o \
     mk.o 
 
 
@@ -208,134 +121,7 @@ ifeq ($(ARCH),arm)
    # NOTHING FOR NOW
 endif
 
-  	
-
-# backup
-# jeito tradicional.
-
-#myObjects = head.o \
-#x86main.o \
-#io.o \
-#hal.o \
-#mk.o \
-#execve.o \
-#video.o \
-#screen.o \
-#runtime.o \
-#portsx86.o \
-#x86.o \
-#stdio.o \
-#stdlib.o \
-#string.o \
-#unistd.o \
-#socket.o \
-#tty.o \
-#init.o \
-#logon.o \
-#logoff.o \
-#detect.o \
-#cpuamd.o \
-#memory.o \
-#pages.o \
-#mmpool.o \
-#mminfo.o \
-#apic.o \
-#pic.o \
-#timer.o \
-#rtc.o \
-#keyboard.o \
-#mouse.o \
-#ldisc.o \
-#hdd.o \
-#pci.o \
-#pciscan.o \
-#pciinfo.o \
-#usb.o \
-#ahci.o \
-#devmgr.o \
-#spawn.o \
-#callout.o \
-#callfar.o \
-#process.o \
-#pheap.o \
-#thread.o \
-#threadi.o \
-#theap.o \
-#tstack.o \
-#create.o \
-#x86start.o \
-#x86cont.o \
-#tasks.o \
-#ts.o \
-#queue.o \
-#sched.o \
-#schedi.o \
-#preempt.o \
-#priority.o \
-#dispatch.o \
-#sem.o \
-#modules.o \
-#nicintel.o \
-#network.o \
-#nsocket.o \
-#sm.o \
-#channel.o \
-#ipc.o \
-#ipccore.o \
-#read.o \
-#write.o \
-#cf.o \
-#search.o \
-#format.o \
-#atainit.o \
-#atairq.o \
-#atapci.o \
-#atadma.o \
-#ata.o \
-#diskvol.o \
-#fs.o \
-#vfs.o \
-#cedge.o \
-#ctype.o \
-#request.o \
-#info.o \
-#signal.o \
-#system.o \
-#bg.o \
-#grid.o \
-#sbar.o \
-#menubar.o \
-#menu.o \
-#i8042.o \
-#ps2mouse.o \
-#ps2kbd.o \
-#button.o \
-#char.o \
-#pixel.o \
-#line.o \
-#rect.o \
-#dtext.o \
-#font.o \
-#vsync.o \
-#bmp.o \
-#createw.o \
-#window.o \
-#desktop.o \
-#room.o \
-#usession.o \
-#kgws.o \
-#object.o \
-#userenv.o \
-#proc.o \
-#syscall.o \
-#install.o \
-#serial.o \
-#debug.o \
-#abort.o \
-#x86fault.o \
-#services.o    
-
-
+  
 
 #not file.
 #.PHONY x86
@@ -498,8 +284,8 @@ compile-kernel:
 	# /vfs
 	gcc -c kernel/kservers/vfs/vfs.c     -I include/ $(CFLAGS) $(DEFINES) -o vfs.o
 
-	# /sci
-	gcc -c kernel/execve/sci/services.c  -I include/ $(CFLAGS) $(DEFINES) -o services.o
+	# /sci/gde
+	gcc -c kernel/execve/sci/gde/gde_serv.c    -I include/ $(CFLAGS) $(DEFINES) -o gde_serv.o
 
 	# /sm
 	gcc -c kernel/execve/sm/init.c    -I include/ $(CFLAGS) $(DEFINES) -o init.o
