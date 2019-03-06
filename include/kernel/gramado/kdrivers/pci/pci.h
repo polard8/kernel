@@ -648,7 +648,6 @@ pci_class_t *PciClass;
 // PCI device structure.
 //
  
-typedef struct pci_device_d pci_device_t;
 struct pci_device_d 
 {
 	object_type_t objectType;
@@ -747,15 +746,14 @@ struct pci_device_d *current_pci_device;    //Current.
 //
 // 
 
-typedef struct pci_d pci_t;
 struct pci_d
 {	
 	int devicesFound;    //Número de dispositivos encontrados.
 	
 	int	max;
-	pci_device_t* deviceList;	
+	struct pci_device_d * deviceList;	
 };
-pci_t *Pci;
+struct pci_d *Pci;
 
 
 

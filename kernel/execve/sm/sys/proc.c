@@ -587,7 +587,8 @@ system_procedure ( struct window_d *window,
 					
 				//Window tests.	
                 case VK_F4:
-					if(AltStatus == 1){ 
+					if (AltStatus == 1)
+					{ 
 					    closeActiveWindow(); 
 						alt_status = 0;
 						goto done;
@@ -602,10 +603,14 @@ system_procedure ( struct window_d *window,
 
 					printf("F5:\n"); 
 					
+					//testando driver ahci
+					ahciSATAInitialize (1);
+					refresh_screen();
+					
 					//mostra as estruturas de pagina usadas para paginação no pagedpool.
 					//número de entradas.
 					//showFreepagedMemory (32);
-					showFreepagedMemory (64);
+					//showFreepagedMemory (64);
 					//process info
 					//show_process_information ();
 					
