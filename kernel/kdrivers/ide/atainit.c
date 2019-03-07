@@ -20,10 +20,12 @@ diskATADialog ( int msg,
     {
 		//ATAMSG_INITIALIZE
 		//Initialize driver.
+		//ata.c	
+			
 		case 1:
 		    diskATAInitialize ( (int) long1 );
 		    Status = 0;
-			goto done;
+			return (int) Status;	
 			break;
 			
 		//ATAMSG_REGISTER
@@ -32,17 +34,10 @@ diskATADialog ( int msg,
 		//    break;
 			
 		default:
-		    goto fail;
+		    printf ("diskATADialog: fail\n");
 			break;
 	};
 
-//
-// Done:
-//	
-fail:
-    printf("diskATADialog: fail\n");
-done:
     return (int) Status;	
-};
-
+}
 

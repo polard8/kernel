@@ -1209,6 +1209,9 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	//ok
 	printf("bus=%d dev=%d fun=%d \n", bus, dev, fun);
 
+	
+	uint32_t data;
+	
 	int Status = -1;
 	
 	//Device.
@@ -1245,9 +1248,14 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 					
 		printf("$ vendor=%x device=%x \n",D->Vendor, D->Device);
 		
+		//#isso funcionou
+		data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+	    D->classCode  = data >> 24 & 0xff;
+        D->subclass   = data >> 16 & 0xff;	
 		
-		D->classCode = (unsigned char) pciGetClassCode(bus, dev);
-		D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
+		//#bugbug: Isso falhou. Deletar isso e trabalhar essas funções.
+		//D->classCode = (unsigned char) pciGetClassCode(bus, dev);
+		//D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
 					
 		D->irq_line = (unsigned char) pciGetInterruptLine(bus, dev);
 		D->irq_pin = (unsigned char) pciGetInterruptPin(bus, dev);

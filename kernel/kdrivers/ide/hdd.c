@@ -1,5 +1,5 @@
 /*
- * File: dd/hdd.c 
+ * File: ide/hdd.c 
  * 
  * Descrição:
  *     Interface de acesso a discos do tipo HDD.

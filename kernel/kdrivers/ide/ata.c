@@ -792,11 +792,12 @@ int diskATAInitialize ( int ataflag ){
 	int Status = 1;  //error
 	int port;
 	
-	unsigned long data;
 	
 	unsigned char bus;
 	unsigned char dev;
 	unsigned char fun;
+	
+	int Ret = -1;  //fail
 	
 	
 	// Configurando flags do driver.
@@ -808,49 +809,50 @@ int diskATAInitialize ( int ataflag ){
 	//
 	
 #ifdef KERNEL_VERBOSE
-    kprintf("sm-disk-disk-diskATAInitialize:\n");
+    kprintf("diskATAInitialize:\n");
     kprintf("Initializing IDE/AHCI support ...\n");
 	//refresh_screen();
 #endif
-
-    // Sondando a interface PCI para encontrarmos um dispositivo
-    // que seja de armazenamento de dados.
 	
-	//PCI_CLASSCODE_MASS	
-    data = (unsigned long) diskPCIScanDevice(PCI_CLASSE_MASS);
 	
-	if( data == -1 )
+	// #test
+	// Sondando na lista de dispositivos encontrados pra ver se tem algum
+	// controlador de disco IDE.
+	
+	ata_pci = (struct pci_device_d *) scan_pci_device_list2 ( (unsigned char) PCI_CLASSCODE_MASS, 
+							              (unsigned char) PCI_SUBCLASS_IDE );
+	
+	if ( (void *) ata_pci == NULL )
 	{
-		kprintf ("sm-disk-disk-diskATAInitialize: diskPCIScanDevicefail. ret={%d} \n", 
-		    (unsigned long) data );
+	    kprintf ("ata-diskATAInitialize: IDE device not found\n");
+		die ();
 		
-	    // Abortar.
-		Status = (int) (PCI_MSG_ERROR);
-		goto fail;
-	}
-    
-    bus = ( data >> 8 & 0xff );
-    dev = ( data >> 3 & 31 );
-    fun = ( data      & 7 );
-
+	}else{
+		
+        kprintf ("ata-diskATAInitialize: IDE device found\n");
+		kprintf ("[ Vendor=%x Device=%x ]\n", ata_pci->Vendor, ata_pci->Device );		
+		
+	    if ( ata_pci->used != 1 || ata_pci->magic != 1234 )
+	    {
+		    kprintf ("ata-diskATAInitialize: Validation fail\n");
+		    die ();
+	    }	
+	};
+	
 	//
-	// Vamos saber mais sobre o dispositivo enconrtado. 
+	// Vamos saber mais sobre o dispositivo encontrado. 
 	//
 	
-    data = (unsigned long) diskATAPCIConfigurationSpace ( bus, dev, fun );
+	//#bugbug: esse data é só um código de erro.
+	
+    Ret = (unsigned long) diskATAPCIConfigurationSpace ( ata_pci );
 
-    if( data == PCI_MSG_ERROR )
+    if( Ret == PCI_MSG_ERROR )
 	{
-        kprintf("sm-disk-disk-diskATAInitialize: Error Driver [%X]\n",data);
+        kprintf ("ata-diskATAInitialize: Error Driver [%X]\n", Ret );
 		Status = (int) 1;
 		goto fail;  
-	
-	}else if( data == PCI_MSG_AVALIABLE )
-	      {
-              kprintf("sm-disk-disk-diskATAInitialize: RAID Controller Not supported.\n");
-		      Status = (int) 1;
-		      goto fail;  
-          };
+	};
 		  
 	//
     // Salvando informações.
@@ -863,13 +865,13 @@ int diskATAInitialize ( int ataflag ){
     // Initialize base address
     // AHCI/IDE Compativel com portas IO IDE legado
 	
-    ATA_BAR0 = ( ata_pci.BAR0 & ~7 )   + ATA_IDE_BAR0 * ( !ata_pci.BAR0 );
-    ATA_BAR1 = ( ata_pci.BAR1 & ~3 )   + ATA_IDE_BAR1 * ( !ata_pci.BAR1 );       
-    ATA_BAR2 = ( ata_pci.BAR2 & ~7 )   + ATA_IDE_BAR2 * ( !ata_pci.BAR2 );
-    ATA_BAR3 = ( ata_pci.BAR3 & ~3 )   + ATA_IDE_BAR3 * ( !ata_pci.BAR3 );
+    ATA_BAR0 = ( ata_pci->BAR0 & ~7 ) + ATA_IDE_BAR0 * ( !ata_pci->BAR0 );
+    ATA_BAR1 = ( ata_pci->BAR1 & ~3 ) + ATA_IDE_BAR1 * ( !ata_pci->BAR1 );       
+    ATA_BAR2 = ( ata_pci->BAR2 & ~7 ) + ATA_IDE_BAR2 * ( !ata_pci->BAR2 );
+    ATA_BAR3 = ( ata_pci->BAR3 & ~3 ) + ATA_IDE_BAR3 * ( !ata_pci->BAR3 );
     
-	ATA_BAR4 = ( ata_pci.BAR4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci.BAR4 );
-    ATA_BAR5 = ( ata_pci.BAR5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci.BAR5 );
+	ATA_BAR4 = ( ata_pci->BAR4 & ~0x7 ) + ATA_IDE_BAR4 * ( !ata_pci->BAR4 );
+    ATA_BAR5 = ( ata_pci->BAR5 & ~0xf ) + ATA_IDE_BAR5 * ( !ata_pci->BAR5 );
 	
 	//
 	// Colocando nas estruturas.
@@ -975,7 +977,7 @@ int diskATAInitialize ( int ataflag ){
 			   //
                
 			   //kprintf(" # Panic! # \n");
-			   kprintf("sm-disk-disk-diskATAInitialize: IDE and AHCI not found\n");
+			   kprintf ("sm-disk-disk-diskATAInitialize: IDE and AHCI not found\n");
 		       //kprintf("IDE and AHCI not found\n");
 			   die();
           };
@@ -987,7 +989,7 @@ int diskATAInitialize ( int ataflag ){
 	
 // fail
 fail:
-    kprintf("sm-disk-disk-diskATAInitialize: fail\n");    	
+    kprintf ("sm-disk-disk-diskATAInitialize: fail\n");    	
 done:
 
 //#ifdef KERNEL_VERBOSE 

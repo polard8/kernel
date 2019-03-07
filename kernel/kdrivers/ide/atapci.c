@@ -139,43 +139,57 @@ uint32_t diskPCIScanDevice ( int class ){
  *     Espaço de configuraçao PCI Mass Storage
  */
 
-int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
-	
+int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
+{	
     uint32_t data;
 
 //#ifdef KERNEL_VERBOSE	
-	kprintf("diskATAPCIConfigurationSpace:\n");
-    kprintf("Initializing PCI Mass Storage support..\n");
+	kprintf ("diskATAPCIConfigurationSpace:\n");
+    kprintf ("Initializing PCI Mass Storage support..\n");
 //#endif
 
+	if ( (void *) D == NULL )
+	{
+		kprintf ("diskATAPCIConfigurationSpace: struct\n");
+	    return PCI_MSG_ERROR;
+	}else {
+	    
+		if ( D->used != 1 || D->magic != 1234 )
+		{
+			kprintf ("diskATAPCIConfigurationSpace: validation\n");
+		    return PCI_MSG_ERROR;
+		}
+		//ok
+	}
+	
+	
     // Indentification Device
-    data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
+    //data = (uint32_t) diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0 );
 	
 	// Salvando configurações.
-    ata_pci.Vendor = data &0xffff;
-    ata_pci.Device = data >> 16 &0xffff;
+    //D->Vendor = data &0xffff;
+    //D->Device = data >> 16 &0xffff;
 	
 //#ifdef KERNEL_VERBOSE	
-	kprintf("\nDisk info:\n");
-    kprintf("[ Vendor ID: %X,Device ID: %X ]\n", 
-	    ata_pci.Vendor, ata_pci.Device );
+	kprintf ("\nDisk info:\n");
+    kprintf ("[ Vendor ID: %X,Device ID: %X ]\n", D->Vendor, D->Device );
 //#endif	
 	
     
 	// Obtendo informações.
 	// Classe code, programming interface, revision id.
 	
-    data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+    //data  = (uint32_t) diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
     
 	// Saving info.
 	// Classe e sub-classe.
     // prog if.
 	// Revision.
 	
-	ata_pci.classCode  = data >> 24 & 0xff;
-    ata_pci.subclass   = data >> 16 & 0xff;
-	ata_pci.progif     = data >> 8  & 0xff;
-    ata_pci.revisionId = data       & 0xff;
+	//ata_pci->classCode  = data >> 24 & 0xff;
+    //ata_pci->subclass   = data >> 16 & 0xff;
+	//ata_pci->progif     = data >> 8  & 0xff;
+    //ata_pci->revisionId = data       & 0xff;
 
 	
 	// #importante:
@@ -186,45 +200,45 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	//  ## IDE ##
 	//
 	
-    if ( ata_pci.classCode == 1 && ata_pci.subclass == 1 )
+    if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_IDE )
 	{
         // IDE
 		ata.chip_control_type = ATA_IDE_CONTROLLER; 
 		
         // Compatibilidade e nativo, primary.
-        data  = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        data  = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 8 );
         if( data &0x200 )
 		{ 
-	        diskWritePCIConfigAddr( bus, dev, fun, 8, data | 0x100 ); 
+	        diskWritePCIConfigAddr( D->bus, D->dev, D->func, 8, data | 0x100 ); 
 		};        
 
         // Compatibilidade e nativo, secundary.
-        data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 8 );
         if( data &0x800 )
 		{ 
-	        diskWritePCIConfigAddr( bus, dev, fun, 8, data | 0x400 ); 
+	        diskWritePCIConfigAddr( D->bus, D->dev, D->func, 8, data | 0x400 ); 
 		};        
 
-        data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
+        data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 8 );
         if( data &0x8000 )
 		{    
             // Bus Master Enable
-            data = diskReadPCIConfigAddr(bus,dev,fun,4);
-            diskWritePCIConfigAddr(bus,dev,fun,4,data | 0x4);
+            data = diskReadPCIConfigAddr (D->bus, D->dev, D->func, 4);
+            diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data | 0x4);
         }; 
 
 	    // Habilitar interrupcao (INTx#)
-        data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
-        diskWritePCIConfigAddr( bus, dev, fun, 4, data & ~0x400);
+        data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 4 );
+        diskWritePCIConfigAddr( D->bus, D->dev, D->func, 4, data & ~0x400);
 
        	// IDE Decode Enable
-       	data = diskReadPCIConfigAddr( bus, dev, fun, 0x40 );
-       	diskWritePCIConfigAddr( bus, dev, fun, 0x40, data | 0x80008000 );
+       	data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 0x40 );
+       	diskWritePCIConfigAddr( D->bus, D->dev, D->func, 0x40, data | 0x80008000 );
 
         // Synchronous DMA Control Register
 	    // Enable UDMA
-	    data = diskReadPCIConfigAddr( bus, dev, fun, 0x48 );
-	    diskWritePCIConfigAddr( bus, dev, fun, 0x48, data | 0xf);
+	    data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 0x48 );
+	    diskWritePCIConfigAddr( D->bus, D->dev, D->func, 0x48, data | 0xf);
 
 #ifdef KERNEL_VERBOSE 		
         //kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
@@ -235,65 +249,62 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 
         //
         //  ## RAID ##
-        //		
+        //	
+		
+		// #todo
+		// Devemos falhar, pois pois não daremos suporte à IDE RAID por enquanto..
+		
   
-    }else if ( ata_pci.classCode == 1 && ata_pci.subclass == 4 )
+    }else if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_RAID )
 	      {
-              //RAID
               ata.chip_control_type = ATA_RAID_CONTROLLER;
-			  
-#ifdef KERNEL_VERBOSE              
-			  //kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-              //    ata_sub_class_code_register_strings[ata.chip_control_type], 
-				//  ata_pci.progif,
-				 // ata_pci.revisionId );
-#endif
-    
-			  // Em avaliacao
-              return PCI_MSG_AVALIABLE;
-			  
-			  
-			  
+		
+		      kprintf ("atapci-diskATAPCIConfigurationSpace: ATA RAID not supported");
+		      die ();
+			  			  
 	            //
                 //  ## ACHI ##
-                //			  
+                //
+		
+		        // #todo
+		        // Devemos falhar, pois temos outro driver para esse tipo de controlador.
 			  
-          }else if ( ata_pci.classCode == 1 && ata_pci.subclass == 6 )
+          }else if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_SATA )
 		        {
 					// ACHI
 					
 			        ata.chip_control_type = ATA_AHCI_CONTROLLER;
        
                     // Compatibilidade e nativo, primary.
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+                    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
                     if ( data & 0x200 )
 					{ 
-		                diskWritePCIConfigAddr ( bus, dev, fun, 8, data | 0x100 ); 
+		                diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 8, data | 0x100 ); 
 		            }        
 
                     // Compatibilidade e nativo, secundary.
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+                    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
                     if ( data & 0x800 )
 					{ 
-	                    diskWritePCIConfigAddr ( bus, dev, fun, 8, data | 0x400 ); 
+	                    diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 8, data | 0x400 ); 
 		            }        
 
 		            // ??
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+                    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
                     if ( data & 0x8000 ) 
 		            {    
                         // Bus Master Enable.
-                        data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
-                        diskWritePCIConfigAddr ( bus, dev, fun, 4, data | 0x4 );
+                        data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 4 );
+                        diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data | 0x4 );
                     } 
 
                     // IDE Decode Enable
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 0x40 );
-                    diskWritePCIConfigAddr ( bus, dev, fun, 0x40, data | 0x80008000 );
+                    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x40 );
+                    diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 0x40, data | 0x80008000 );
 
                     // Habilitar interrupcao (INTx#)
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
-                    diskWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
+                    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 4 );
+                    diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data & ~0x400);
 
 #ifdef KERNEL_VERBOSE
                     //kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
@@ -302,17 +313,14 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 			           // ata_pci.revisionId );
 #endif			
 
-                    //Ok.
+                    // Fail!!
+		            // O tipo de dispositivo de armazenaento de massa é não suportado.
+		
                 } else {
-					
-					 //
-                     // PANIC! 
-                     //
-					 
-					 kprintf("sm-disk-disk-diskATAPCIConfigurationSpace: PANIC DRIVER BLOCK!");
-		             die();
+								 
+		            kprintf ("atapci-diskATAPCIConfigurationSpace: Mass storage device not supported");
+		            die ();
                  };
-
     
 	// #obs:
 	// Nesse momento já sabemos se é IDE, RAID, AHCI.
@@ -322,83 +330,69 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	
     // PCI cacheline, Latancy, Headr type, end BIST
 	
-    data = diskReadPCIConfigAddr ( bus, dev, fun, 0xC );
+    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0xC );
 	
-	ata_pci.latency_timer = data >>  8 & 0xff;
-	ata_pci.header_type   = data >> 16 & 0xff;
-    ata_pci.bist          = data >> 24 & 0xff;
+	D->latency_timer = data >>  8 & 0xff;
+	D->header_type   = data >> 16 & 0xff;
+    D->bist          = data >> 24 & 0xff;
     
 	
 	//
 	// ## BARs ##
 	//
 	
-    ata_pci.BAR0 = diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
-    ata_pci.BAR1 = diskReadPCIConfigAddr( bus, dev, fun, 0x14 );
-    ata_pci.BAR2 = diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
-    ata_pci.BAR3 = diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
-    ata_pci.BAR4 = diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
-    ata_pci.BAR5 = diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
+    D->BAR0 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x10 );
+    D->BAR1 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x14 );
+    D->BAR2 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x18 );
+    D->BAR3 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x1C );
+    D->BAR4 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x20 );
+    D->BAR5 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x24 );
 	
     //--------------
     
     // Interrupt
-    data = diskReadPCIConfigAddr( bus, dev, fun, 0x3C );
+    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x3C );
     
     //
     // Salvando configurações.
     //		
 	
-	ata_pci.irq_line = data & 0xff;
-    ata_pci.irq_pin  = data >> 8 & 0xff;
+	D->irq_line = data & 0xff;
+    D->irq_pin  = data >> 8 & 0xff;
 
 
     // PCI command and status
-    data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
+    data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 4 );
     
 
     // Salvando configurações.
    
-	ata_pci.Command = data & 0xffff; 
-    ata_pci.Status  = data >> 16 & 0xffff;
+	D->Command = data & 0xffff; 
+    D->Status  = data >> 16 & 0xffff;
 	
 	
 #ifdef KERNEL_VERBOSE	
-    kprintf("[ Command %x Status %x ]\n", 
-		ata_pci.Command, ata_pci.Status );
+    kprintf ("[ Command %x Status %x ]\n", D->Command, D->Status );
 		
-    kprintf("[ Interrupt Line %x Interrupt Pin %x ]\n", 
-		ata_pci.irq_line, ata_pci.irq_pin );
+    kprintf ("[ Interrupt Line %x Interrupt Pin %x ]\n", 
+		D->irq_line, D->irq_pin );
 #endif		
 	
-    data = diskReadPCIConfigAddr(bus,dev,fun,0x48);
+    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x48);
 	
 #ifdef KERNEL_VERBOSE		
-    kprintf("[ Synchronous DMA Control Register %X ]\n", data );
+    kprintf ("[ Synchronous DMA Control Register %X ]\n", data );
 #endif
 	
 done:
+	
+	//#bugbug
+	//Esse refresh atraza as coisas.
 
 #ifdef KERNEL_VERBOSE	
     refresh_screen();
 #endif 
  	
     return (PCI_MSG_SUCCESSFUL);
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 

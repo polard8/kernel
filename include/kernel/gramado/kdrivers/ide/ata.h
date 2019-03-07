@@ -25,7 +25,8 @@
  + esssa é uma estrutura do gramado, definida em pci.h
  */
 
-struct pci_device_d ata_pci;
+//struct pci_device_d ata_pci;
+struct pci_device_d *ata_pci;
 
 
 int ATAFlag;
@@ -347,7 +348,9 @@ diskWritePCIConfigAddr ( int bus,
 
 uint32_t diskPCIScanDevice ( int class );
 
-int diskATAPCIConfigurationSpace ( char bus, char dev, char fun );
+
+
+int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
 
 
 /*
@@ -363,13 +366,13 @@ int diskATAInitialize( int ataflag );
  * diskATADialog:
  *     Rotina de diálogo com o driver ATA.
  */
-int diskATADialog( int msg, 
-                   unsigned long long1, 
-				   unsigned long long2 );
-				   
 
-				   
-				   
+int diskATADialog ( int msg, 
+                    unsigned long long1, 
+                    unsigned long long2 );
+
+
+
 int disk_ata_wait_irq ();
 
 void show_ide_info();
