@@ -411,13 +411,75 @@ void SetCR3 (unsigned long address){
 }
 
 
+/*
+ * mapping_ahci0_device_address:
+ *     Mapeando um endereçi fícico usado pelo driver AHCI.    
+ */
+
+//e, ???h ficará a pagetable para mapear o endereço físico em ????va
+
+
+unsigned long mapping_ahci1_device_address ( unsigned long address ){
+	
+    unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
+
+	
+	//##bugbug: 
+	//Esse endereço é improvisado. Parece que não tem nada nesse endereço.
+	//#todo: temos que alocar memória e converter o endereço lógico em físico.
+	
+	unsigned long *ahci1_page_table = (unsigned long *) PAGETABLE_AHCI1; //0x00083000 
+	
+	
+    // If you do use a pointer to the device register mapping, 
+	// be sure to declare it volatile; otherwise, 
+	// the compiler is allowed to cache values and reorder accesses to this memory.	
+	
+    // Since this is device memory and not regular DRAM, you'll have to tell 
+	// the CPU that it isn't safe to cache access to this memory. 	
+	//(cache-disable and write-through).
+	
+	
+	// #imporatante
+	// #todo:
+	// Ainda não calculamos o uso de memória física.
+	// Precisamos saber quanta memória física esse dispositivo está usando.
+	
+	int i;
+	for ( i=0; i < 1024; i++ ){
+		
+		
+		// 10=cache desable 8= Write-Through 0x002 = Writeable 0x001 = Present
+		// 0001 1011
+		ahci1_page_table[i] = (unsigned long) address | 0x1B; // 0001 1011
+		//nic0_page_table[i] = (unsigned long) address | 3;     
+	    
+		address = (unsigned long) address + 4096;  
+    };
+	
+
+	//f0400000      961
+	
+    page_directory[ENTRY_AHCI1_PAGES] = (unsigned long) &ahci1_page_table[0];
+    page_directory[ENTRY_AHCI1_PAGES] = (unsigned long) page_directory[ENTRY_AHCI1_PAGES] | 0x1B; // 0001 1011   		
+	
+	//(virtual)
+	return (unsigned long) AHCI1_VA;
+}
+
+
+/*
+ * mapping_nic0_device_address:
+ *     Mapeando um endereçi fícico usado pelo NIC1.    
+ */
+
 //82540 test
-//e, 88000h ficará a pagetable para mapear o endereço físico f0000000
+//e, 88000h ficará a pagetable para mapear o endereço físico em f0000000va
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 
 //esse mapeamento só será válido para o primeiro.
 
-unsigned long mapping_nic0_device_address ( unsigned long address ){
+unsigned long mapping_nic1_device_address ( unsigned long address ){
 	
     unsigned long *page_directory = (unsigned long *) gKernelPageDirectoryAddress;      
 

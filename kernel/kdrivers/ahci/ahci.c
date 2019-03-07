@@ -23,6 +23,76 @@ int SATAFlag;
 
 
 
+// Check device type
+
+static int check_type(HBA_PORT *port)
+{
+	uint32_t ssts = port->ssts;
+ 
+	uint8_t ipm = (ssts >> 8) & 0x0F;
+	uint8_t det = ssts & 0x0F;
+ 
+	if (det != HBA_PORT_DET_PRESENT)	// Check drive status
+		return AHCI_DEV_NULL;
+	if (ipm != HBA_PORT_IPM_ACTIVE)
+		return AHCI_DEV_NULL;
+ 
+	switch (port->sig)
+	{
+	case SATA_SIG_ATAPI:
+		return AHCI_DEV_SATAPI;
+	case SATA_SIG_SEMB:
+		return AHCI_DEV_SEMB;
+	case SATA_SIG_PM:
+		return AHCI_DEV_PM;
+	default:
+		return AHCI_DEV_SATA;
+	}
+}
+
+
+
+
+
+void probe_port(HBA_MEM *abar)
+{
+	// Search disk in impelemented ports
+	uint32_t pi = abar->pi;
+	int i = 0;
+	while (i<32)
+	{
+		if (pi & 1)
+		{
+			int dt = check_type(&abar->ports[i]);
+			if (dt == AHCI_DEV_SATA)
+			{
+				kprintf ("SATA drive found at port %d\n", i);
+			}
+			else if (dt == AHCI_DEV_SATAPI)
+			{
+				kprintf ("SATAPI drive found at port %d\n", i);
+			}
+			else if (dt == AHCI_DEV_SEMB)
+			{
+				kprintf("SEMB drive found at port %d\n", i);
+			}
+			else if (dt == AHCI_DEV_PM)
+			{
+				kprintf("PM drive found at port %d\n", i);
+			}
+			else
+			{
+				kprintf("No drive found at port %d\n", i);
+			}
+		}
+ 
+		pi >>= 1;
+		i ++;
+	}
+}
+
+
+
 int ahciSetupDeviceStructure ( struct pci_device_d *D, char bus, char dev, char fun ){
 
 	uint32_t data;
@@ -78,6 +148,15 @@ int ahciSetupDeviceStructure ( struct pci_device_d *D, char bus, char dev, char 
 	kprintf ("BAR0=%x \n", (unsigned long) D->BAR0 );
 	kprintf ("BAR5=%x \n", (unsigned long) D->BAR5 );	
 	
+    // The last PCI base address register (BAR[5], header offset 0x24) points 
+	// to the AHCI base memory, it’s called ABAR (AHCI Base Memory Register). 
+	// The other PCI base address registers act same as a traditional IDE controller. 
+		
+    //HBA memory registers can be divided into two parts: 
+	//Generic Host Control registers and Port Control registers. 
+	//Generic Host Control registers controls the behavior of the whole controller, 
+	//while each port owns its own set of Port Control registers.	
+	
 	//
 	// ## IRQ ##
 	//
@@ -88,6 +167,8 @@ int ahciSetupDeviceStructure ( struct pci_device_d *D, char bus, char dev, char 
 	
 	kprintf ("line=%d pin=%d \n", D->irq_line, D->irq_pin );
 
+	
+	//ABAR (AHCI Base Memory Register). pa
 	//pegamos o endereç[o físico do início dos registradores.
 	unsigned long phy_address = ( D->BAR5 & 0xFFFFFFF0);
 	
@@ -100,12 +181,30 @@ int ahciSetupDeviceStructure ( struct pci_device_d *D, char bus, char dev, char 
 	//#todo
 	//mapeando para obter o endereço virtual que o kernel pode manipular.
 	//Criar esssa rotina lá em pages.c
-	//unsigned long virt_address = mapping_ahci_device_address ( phy_address );
+	//ABAR (AHCI Base Memory Register). va
+	unsigned long virt_address = mapping_ahci1_device_address ( phy_address );
 	
 	//endereço base.
-	//unsigned char *base_address = (unsigned char *) virt_address;
-	//unsigned long *base_address32 = (unsigned long *) virt_address;		
+	unsigned char *base_address = (unsigned char *) virt_address;
+	unsigned long *base_address32 = (unsigned long *) virt_address;		
 
+	
+	kprintf ("VIRTUAL ADDRESS %x\n", virt_address);
+	
+	
+	//#test
+	//vamos sondar as portas usando uma estrutura que contempla os primeiros registradores,
+	//então o ponteiro da estrutura é o início dos registradores.
+	
+	//#bugbug
+	//Isso tá dando page fault ..
+	//vamos fazer verbose de parte por parte,
+	//até encontrarmos o problema.
+	
+	//probe_port ( (HBA_MEM *) virt_address );
+	
+	//#importante
+	//#todo
 	//Continua ... tem mais pra reproduzir do driver de ide, em disk.c
 }
 

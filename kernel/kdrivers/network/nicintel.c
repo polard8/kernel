@@ -182,7 +182,7 @@ e1000_init_nic ( unsigned char bus,
 	// Mapeando para obter o endereço virtual que o kernel pode manipular.
 	// pages.c
 	
-	unsigned long virt_address = mapping_nic0_device_address ( phy_address );
+	unsigned long virt_address = mapping_nic1_device_address ( phy_address );
 	
 	// Endereço base.
 	unsigned char *base_address   = (unsigned char *) virt_address;

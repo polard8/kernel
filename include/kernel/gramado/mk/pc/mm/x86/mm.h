@@ -1149,7 +1149,9 @@ void SetCR3(unsigned long address);
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 
 //esse mapeamento só será válido para o primeiro.
-unsigned long mapping_nic0_device_address( unsigned long address );
+unsigned long mapping_nic1_device_address( unsigned long address );
+unsigned long mapping_ahci1_device_address ( unsigned long address );
+
 
 //
 // Directory and Page Tables.

@@ -62,12 +62,18 @@
 //#define PAGETABLE_RES7         0x00080000
 #define PAGETABLE_RES6         0x00081000
 #define PAGETABLE_RES5         0x00082000
-#define PAGETABLE_RES4         0x00083000
+
+//#test
+//tantando mapear alguma coisa para ahci
+#define PAGETABLE_AHCI1         0x00083000   //AHCI 1
+
 #define PAGETABLE_GRAMADOCORE_TASKMAN_HEAP  0x00084000
 #define PAGETABLE_GRAMADOCORE_SHELL_HEAP    0x00085000
 #define PAGETABLE_GRAMADOCORE_INIT_HEAP     0x00086000
 #define PAGETABLE_HEAPPOOL     0x00087000  //POOL DE HEAPS;
-#define PAGETABLE_NIC1         0x00088000  //NIC
+
+#define PAGETABLE_NIC1         0x00088000  //NIC 1
+
 #define PAGETABLE_PAGEDPOOL    0x00089000
 
 #define PAGETABLE_BACKBUFFER   0x0008A000
@@ -87,7 +93,6 @@
 
 #define PAGETABLE_KERNELAREA   0x0008F000
 #define KM1_PAGETABLE          0x0008F000 // Pagetable para o kernel mode stuff.
-
 
 
 //O endereço físico e virtual são iguais.

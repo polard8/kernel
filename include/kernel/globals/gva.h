@@ -121,6 +121,8 @@
 
 
 #define NIC1_VA 0xF0000000  //
+#define AHCI1_VA 0xF0400000  //
+
 
 
 
