@@ -299,14 +299,11 @@ void *sys_create_process ( struct room_d *room,
 	//@todo: Filtros para ponteiros NULL.
 	
 	// Create process.
-    create_process ( room, desktop, window, init_eip, 
-	                 priority, ppid, name, iopl, 
-					 (unsigned long) directory_address);
 	
-	//@todo: Return da função create.
-	
-    return NULL;
-};
+    return (void *) create_process ( room, desktop, window, init_eip, 
+	                   priority, ppid, name, iopl, 
+					   (unsigned long) directory_address);
+}
 
 
 /*
@@ -314,6 +311,7 @@ void *sys_create_process ( struct room_d *room,
  * sys_create_thread:
  *     Create thread system interface.
  */
+
 void *sys_create_thread( struct room_d *room,
                          struct desktop_d  *desktop,
                          struct window_d *window,
@@ -330,12 +328,8 @@ void *sys_create_thread( struct room_d *room,
 	
 	
 	// Create thread.
-    create_thread ( room, desktop, window, init_eip, priority, ppid, name ); 
-				   
-    //@todo: return da função create.
-
-    return NULL;
-};
+    return (void *) create_thread ( room, desktop, window, init_eip, priority, ppid, name ); 
+}
 
 
 /*

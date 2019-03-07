@@ -20,8 +20,16 @@
  *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
  *     //...
  */
- 
- 
+
+
+
+
+
+void servicesPutChar ( int c );
+void servicesChangeProcedure();
+unsigned long serviceCreateWindow ( char * message_buffer );
+
+
 //
 // ## sys storage support ##
 //
@@ -613,7 +621,120 @@ int systemStartUp();   // Inicialização do sistema.
 int systemInit();      // Inicializador.
 void systemSystem();   // Construtor.
 
-			
+
+// #importante
+// Algumas funções chamadas por gde_services(...)
+// Outras estão em outros arquivos.
+
+
+#define sys_my_read_hd_sector     my_read_hd_sector
+#define sys_my_write_hd_sector    my_write_hd_sector 
+#define sys_fsSaveFile            fsSaveFile
+#define sys_backbuffer_putpixel   backbuffer_putpixel
+#define sys_my_buffer_char_blt    my_buffer_char_blt
+#define sys_my_buffer_horizontal_line    my_buffer_horizontal_line
+#define sys_drawDataRectangle   drawDataRectangle
+#define sys_refresh_screen  refresh_screen
+#define sys_open open
+#define sys_close close
+#define sys_show_window_rect  show_window_rect
+#define sys_set_up_cursor set_up_cursor
+#define sys_system_dispatch_to_procedure system_dispatch_to_procedure
+#define sys_system_procedure system_procedure
+#define sys_resize_window resize_window
+#define sys_redraw_window redraw_window
+#define sys_replace_window replace_window
+#define sys_MaximizeWindow MaximizeWindow
+#define sys_MinimizeWindow MinimizeWindow
+#define sys_windowGetForegroundWindow windowGetForegroundWindow
+#define sys_windowSetForegroundWindow windowSetForegroundWindow
+#define sys_RegisterWindow RegisterWindow
+#define sys_CloseWindow CloseWindow
+#define sys_set_active_window set_active_window
+#define sys_get_active_window get_active_window
+#define sys_SetFocus  SetFocus 
+#define sys_KillFocus KillFocus
+#define sys_servicesPutChar servicesPutChar
+#define sys_windowSendMessage windowSendMessage
+#define sys_create_request create_request
+#define sys_do_fork_process do_fork_process
+#define sys_show_currentprocess_info show_currentprocess_info
+#define sys_do_wait do_wait
+#define sys_Down Down
+#define sys_Up   Up
+#define sys_processTesting processTesting
+#define sys_SelectForExecution SelectForExecution
+#define sys_windowGetMessage windowGetMessage
+#define sys_windowGetLong1   windowGetLong1
+#define sys_windowGetLong2   windowGetLong2
+#define sys_systemReboot systemReboot
+#define sys_windowUpdateWindow windowUpdateWindow
+#define sys_windowSelectColorScheme windowSelectColorScheme
+#define sys_portsx86_IN portsx86_IN
+#define sys_portsx86_OUT portsx86_OUT
+#define sys_systemLinkDriver systemLinkDriver
+#define sys_draw_text draw_text
+#define sys_fgetc fgetc
+#define sys_thread_getchar thread_getchar
+#define sys_keyboardGetKeyState keyboardGetKeyState
+#define sys_get_scancode get_scancode
+#define sys_set_current_keyboard_responder set_current_keyboard_responder
+#define sys_get_current_keyboard_responder get_current_keyboard_responder
+#define sys_set_current_mouse_responder set_current_mouse_responder
+#define sys_get_current_mouse_responder get_current_mouse_responder
+#define sys_getClientAreaRect getClientAreaRect
+#define sys_setClientAreaRect setClientAreaRect
+#define sys_grid grid
+#define sys_MainMenu MainMenu
+#define sys_executive_gramado_core_init_execve executive_gramado_core_init_execve
+#define sys_create_socket create_socket
+#define sys_getSocketIP getSocketIP
+#define sys_getSocketPort getSocketPort
+#define sys_update_socket update_socket
+#define sys_fs_print_process_pwd fs_print_process_pwd
+#define sys_fsListFiles fsListFiles
+#define sys_KiSearchFile KiSearchFile
+#define sys_fsUpdateWorkingDiretoryString fsUpdateWorkingDiretoryString
+#define sys_fsLoadFileFromCurrentTargetDir fsLoadFileFromCurrentTargetDir
+#define sys_fs_pathname_backup fs_pathname_backup
+#define sys_fsList fsList
+#define sys_fsGetFileSize fsGetFileSize
+#define sys_GetProcessHeapStart GetProcessHeapStart
+#define sys_feof feof
+#define sys_ferror ferror
+#define sys_fseek fseek
+#define sys_fputc fputc
+#define sys_gc gc
+#define sys_signalSend signalSend
+#define sys_block_for_a_reason block_for_a_reason
+#define sys_systemGetTerminalWindow systemGetTerminalWindow
+#define sys_systemSetTerminalWindow systemSetTerminalWindow
+#define sys_create_timer create_timer
+#define sys_get_systime_info get_systime_info
+#define sys_get_time get_time
+#define sys_get_date get_date
+#define sys_fclose fclose
+#define sys_fflush fflush
+#define sys_fprintf fprintf
+#define sys_fputs fputs
+#define sys_get_cursor_x get_cursor_x
+#define sys_get_cursor_y get_cursor_y
+#define sys_timerEnableTextCursor timerEnableTextCursor
+#define sys_timerDisableTextCursor timerDisableTextCursor
+#define sys_fopen fopen
+#define sys_systemGetSystemMetrics systemGetSystemMetrics
+#define sys_diskShowCurrentDiskInfo diskShowCurrentDiskInfo
+#define sys_volumeShowCurrentVolumeInfo volumeShowCurrentVolumeInfo
+#define sys_memoryShowMemoryInfo memoryShowMemoryInfo
+#define sys_systemShowDevicesInfo systemShowDevicesInfo
+#define sys_KiInformation KiInformation
+
+
+
+
+
+
+
 //
 // End
 //
