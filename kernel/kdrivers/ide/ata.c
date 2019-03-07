@@ -801,6 +801,7 @@ int diskATAInitialize ( int ataflag ){
 	
 	
 	// Configurando flags do driver.
+	// FORCEPIO = 1234
 	
 	ATAFlag = (int) ataflag;
 	
@@ -829,14 +830,15 @@ int diskATAInitialize ( int ataflag ){
 		
 	}else{
 		
-        kprintf ("ata-diskATAInitialize: IDE device found\n");
-		kprintf ("[ Vendor=%x Device=%x ]\n", ata_pci->Vendor, ata_pci->Device );		
-		
 	    if ( ata_pci->used != 1 || ata_pci->magic != 1234 )
 	    {
 		    kprintf ("ata-diskATAInitialize: Validation fail\n");
 		    die ();
 	    }	
+        
+		//#debug
+		//kprintf ("ata-diskATAInitialize: IDE device found\n");
+		//kprintf ("[ Vendor=%x Device=%x ]\n", ata_pci->Vendor, ata_pci->Device );				
 	};
 	
 	//

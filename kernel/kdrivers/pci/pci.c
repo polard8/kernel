@@ -1205,17 +1205,18 @@ unsigned char pciGetInterruptPin( unsigned char bus,
  */
 
 int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
-    
-	//ok
-	printf("bus=%d dev=%d fun=%d \n", bus, dev, fun);
-
-	
+    	
 	uint32_t data;
 	
 	int Status = -1;
 	
 	//Device.
 	struct pci_device_d *D;    
+	
+	
+	//#debug
+	//printf ("bus=%d dev=%d fun=%d \n", bus, dev, fun);	
+	
 	
     D = (void *) malloc ( sizeof( struct pci_device_d  ) );
     
@@ -1267,6 +1268,7 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		//Nic intel
 		if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) && (D->classCode == PCI_CLASSCODE_NETWORK) )	
 		{
+			 //serial debug
 			 debug_print("0x8086:0x100E found \n"); 
 			 //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );						
 		     //printf("82540EM Gigabit Ethernet Controller found\n");
@@ -1311,9 +1313,10 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		pcideviceList[pciListOffset] = (unsigned long) D;
 		pciListOffset++;
 		
-		printf("$");
+		//#debug
+		//printf("$");
 	
-	}
+	};
 	
 	return 0;
 }
@@ -1331,18 +1334,16 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
  */
 
 int init_pci (){
-	
-	
-	debug_print("init_pci:\n");
-	
-	
+		
 	int Status = 0;
     int Index;
     int Max = 32;   //@todo.	
 	
-	//===========
-	
     unsigned long data;
+	
+	
+	debug_print ("init_pci:\n");	
+	
 	
 	outportl ( 0xCF8, 0x80000000);
 	

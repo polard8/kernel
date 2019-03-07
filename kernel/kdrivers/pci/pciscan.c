@@ -33,28 +33,25 @@ int pci_setup_devices (){
 	
     unsigned short Vendor;    //Offset 0.
 	unsigned short Device;    //Offset 2.
-	
-	//@todo: rever tamanho
-	//unsigned char ClassCode;
-	//unsigned char SubClassCode;
-	//unsigned char ProgIF;	
-	
- 	
+	 	
 	unsigned char i = 0; //Bus.
     unsigned char j = 0; //Devices. (Slots).
 	unsigned char k = 0; //Functions
-	
- 
-    printf("Detecting PCI Devices..\n");
-	
+		
 	unsigned char HeaderType;
 	int funcCount;
 	
+	
+	//#debug
+    kprintf ("pci_setup_devices:\n");	
+    //kprintf ("Detecting PCI Devices..\n");
+
+
 	//Bus.
-	for( i=0; i < PCI_MAX_BUSES; i++)   
+	for ( i=0; i < PCI_MAX_BUSES; i++ )   
 	{
 		//Device.
-	    for( j=0; j < PCI_MAX_DEVICES; j++)
+        for ( j=0; j < PCI_MAX_DEVICES; j++ )
         {
 			
 		    // Valid device ?
@@ -64,7 +61,9 @@ int pci_setup_devices (){
 			if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
 		    { 
 				
-				printf("vendor=%x\n",Vendor);
+				//#debug
+				//printf ("vendor=%x\n",Vendor);
+				
 				// Multifunction ??
 				//Se o bit 7 estiver acionado, entao e' multifunction.
 				
@@ -73,11 +72,12 @@ int pci_setup_devices (){
 				funcCount = HeaderType & PCI_TYPE_MULTIFUNC ? PCI_MAX_FUNCTIONS : 1;
 				
 				//function
-			    for( k=0; k<funcCount; k++)
+			    for ( k=0; k<funcCount; k++)
 			    {
-				    //k=0;
-					printf("+");
-				    pciHandleDevice ( i, j, k );			
+				    //#debug
+					//printf("+");
+				    
+					pciHandleDevice ( i, j, k );			
 			    }; //fuction for.
 				
 		    };				
@@ -87,15 +87,18 @@ int pci_setup_devices (){
 	};  //bus for.
 	
 
-
-    printf("Detecting PCI Devices completes..\n");
+    //#debug
+    //printf("Detecting PCI Devices completes..\n");
 	
-	debug_print("Detecting PCI Devices completes..\n");
+	//serial debug
+	debug_print ("pci_setup_devices: done\n");
+	
 	//refresh_screen();
 	//while(1){}
 
     return 0; 
 }
+
 
 //procurar na lista de dispositivos por um dispositivo de 
 //determinados vendor e device.

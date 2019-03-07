@@ -25,7 +25,6 @@
  + esssa é uma estrutura do gramado, definida em pci.h
  */
 
-//struct pci_device_d ata_pci;
 struct pci_device_d *ata_pci;
 
 
