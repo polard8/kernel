@@ -1,5 +1,5 @@
 /*
- * File: sm\system.h (System Management)
+ * File: sm/system.h (System Management)
  *
  * Descrição:
  *     Header para rotinas de gerenciamento do sistema dentro do módulo 
@@ -525,63 +525,6 @@ void SetProcedure(unsigned long proc);
 // System Server support.
 int init_systemserver ();
 
-
-
-
-/*
- *************************************************************
- * Classes:
- *
- * Isso é uma organização que serve de guia para o desenvolvedor. 
- * O propósito é ajudar na organização do sistema.
- * Não leve a sério.
- * É provisório.
- *
- * 1) systemRam
- * 2) systemIoCpu
- * 2) systemIoDma
- * 3) systemDevicesUnblocked
- * 3) systemDevicesBlocked
- * 4) systemThings
- *
- */
-
-void *systemRam ( int number, 
-                  unsigned long arg1,  
-		          unsigned long arg2,  
-		          unsigned long arg3,  
-		          unsigned long arg4 );
-				  
-void *systemIoCpu ( int number, 
-                    unsigned long arg1,  
-		            unsigned long arg2,  
-		            unsigned long arg3,  
-		            unsigned long arg4 );
-					
-void *systemIoDma ( int number, 
-                    unsigned long arg1,  
-		            unsigned long arg2,  
-		            unsigned long arg3,  
-		            unsigned long arg4 );
-					
-void *systemDevicesUnblocked ( int number, 
-                               unsigned long arg1,  
-		                       unsigned long arg2,  
-		                       unsigned long arg3,  
-		                       unsigned long arg4 );
-							   
-void *systemDevicesBlocked ( int number, 
-                             unsigned long arg1,  
-		                     unsigned long arg2,  
-		                     unsigned long arg3,  
-		                     unsigned long arg4 );
-							 
-void *systemThings ( int number, 
-                     unsigned long arg1,  
-		             unsigned long arg2,  
-		             unsigned long arg3,  
-		             unsigned long arg4 );
-					
 
 //Metodo nulo.
 //Pode ser usado em diálogos.

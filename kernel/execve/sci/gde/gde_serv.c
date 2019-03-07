@@ -1,5 +1,5 @@
 /*
- * File: execve/sci/services.c 
+ * File: execve/sci/gde_serv.c 
  *
  *       (SCI) = SYSTEM CALL INTERFACE
  *
@@ -73,62 +73,8 @@ unsigned long serviceCreateWindow ( char * message_buffer );
 
 
 
-
-void *taskman_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 )
-{
-	//#bugbug: estamos revendo isso, veja sci/gde
-	// 8000 ~ 8999
-	// Chama os serviços oferecidos pelos servidores do gramado core
-	// pc/ipc/ipccore.c
-	
-	/* #suspenso
-	if ( number >= 8000 && number < 9000 )
-	{
-		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
-						    (unsigned long) arg3, (unsigned long) arg4 );
-	};
-	*/	
-	//#todo
-   return NULL;
-}
-
-
-
-
-
-void *shell_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 )
-{
-	//#bugbug: estamos revendo isso, veja sci/gde
-	// 8000 ~ 8999
-	// Chama os serviços oferecidos pelos servidores do gramado core
-	// pc/ipc/ipccore.c
-	
-	/* #suspenso
-	if ( number >= 8000 && number < 9000 )
-	{
-		return (void *) ipcore_services ( (unsigned long) number, (unsigned long) arg2, 
-						    (unsigned long) arg3, (unsigned long) arg4 );
-	};
-	*/	
-	//#todo
-   return NULL;
-}
-
-
-
-
-//
-//...
-//
-
 /*
- * services:
+ * gde_services:
  *     Rotina que atende os pedidos feitos pelos aplicativos em user mode 
  *     via int 200. Ou ainda o kernel pode chamar essa rotina diretamente.
  *     São vários serviços.
@@ -161,8 +107,8 @@ void *shell_services ( unsigned long number,
  *  E NÃO NO KERNEL BASE.
  */
 
-void *kernel_services ( unsigned long number, 
-                 unsigned long arg2, 
+void *gde_services ( unsigned long number, 
+                     unsigned long arg2, 
                  unsigned long arg3, 
                  unsigned long arg4 )
 {
@@ -344,24 +290,18 @@ void *kernel_services ( unsigned long number,
 	{
 	    //0 - Null, O processo pode ser malicioso.
 	    case SYS_NULL: 
-	        systemRam (0,0,0,0,0); 
-	        break; 	   
+	        return NULL;
+			break; 	   
 		
 		//Disco: 1,2,3,4
 		
 		//1 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_READ_LBA: 
-		    //@todo: chamar hal
-			//systemDevicesUnblocked(36,arg2,arg3,0,0); 
-		    //read_lba( (unsigned long) arg2, (unsigned long) arg3 );
 			my_read_hd_sector ( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
 			break;
 			
 		//2 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_WRITE_LBA: 
-		    //@todo: chamar hal
-			//systemDevicesUnblocked(35,arg2,arg3,0,0); 
-			//write_lba( (unsigned long) arg2, (unsigned long) arg3 );
 			my_write_hd_sector ( (unsigned long) arg2 , (unsigned long) arg3, 0 , 0 ); 
 		    break;
 
@@ -468,10 +408,8 @@ void *kernel_services ( unsigned long number,
             return NULL;
 			break;
 			
-			
 		//11, Coloca o conteúdo do backbuffer no LFB.
         case SYS_REFRESHSCREEN: 
-		    //systemRam ( 3, 0, 0, 0, 0 ); 
 			refresh_screen ();
 			break;			
 			
@@ -504,8 +442,7 @@ void *kernel_services ( unsigned long number,
 	 
 		//34	
         case SYS_VIDEO_SETCURSOR: 
-		    systemRam (86,arg2,arg3,0,0); 
-			//set_up_cursor( (unsigned long) arg2, (unsigned long) arg2);
+			set_up_cursor ( (unsigned long) arg2, (unsigned long) arg2);
 			break;              
 
 		//35 - Configura o procedimento da tarefa atual.
@@ -516,8 +453,12 @@ void *kernel_services ( unsigned long number,
 		//36
         //O teclado envia essa mensagem para o procedimento ativo.
         case SYS_KSENDMESSAGE: 
-            systemRam ( 2, (unsigned long) arg2, (unsigned long) arg3, 
-			    (unsigned long) arg4, 0 ); 
+		    g_nova_mensagem = 1; //existe uma nova mensagem.
+            system_dispatch_to_procedure( (struct window_d *) arg2, 
+			                              (int) arg2, 
+										  (unsigned long) arg4, 
+										  (unsigned long) 0);			
+			
             break;    
       
 	
@@ -600,17 +541,17 @@ void *kernel_services ( unsigned long number,
 		
 		//57.	
 		case SYS_REGISTERWINDOW: 
-		    systemRam(41,(unsigned long) hWnd,0,0,0); 
+			return (void *) RegisterWindow ( (struct window_d *) hWnd );
 			break;
 			
 		//58.	
 		case SYS_CLOSEWINDOW: 
-		    systemRam(53,(unsigned long) hWnd,0,0,0); 
+			CloseWindow ( (struct window_d *) hWnd ); 							  
 			break;
 			
         //60
 		case SYS_SETACTIVEWINDOW:			
-			set_active_window(hWnd);
+			set_active_window (hWnd);
 			break;
 
         //61
@@ -620,7 +561,7 @@ void *kernel_services ( unsigned long number,
 
         //62
 		case SYS_SETFOCUS: 
-		    systemRam(71,(unsigned long) hWnd,0,0,0); 
+			SetFocus ( (struct window_d *) hWnd ); 							  
 			break;
 			
         //63 id
@@ -630,8 +571,7 @@ void *kernel_services ( unsigned long number,
 			
         //64
 		case SYS_KILLFOCUS:
-            //KillFocus(window);		
-		    systemRam(73,(unsigned long) hWnd,0,0,0); 
+			KillFocus ( (struct window_d *) hWnd ); 							  
 			break;
 
 		//65	
@@ -669,20 +609,14 @@ void *kernel_services ( unsigned long number,
 
 		//66 - reservado pra input de usuário.
 		//case 66:
-        //    systemDevicesUnblocked( (int)1, (unsigned long) arg1, 
-		//       (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4);  		
 		//	break;
 
 		//67- reservado pra input de usuário.	
 		//case 67:
-        //    systemDevicesUnblocked( (int)1, (unsigned long) arg1, 
-		//        (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4);  		
 		//	break;
 
 		//68- reservado pra input de mouse.	
-		//case 68:
-        //    systemDevicesUnblocked( (int)1, (unsigned long) arg1, 
-		//        (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4);  		
+		//case 68:		
 		//	break;
 
 		//	
@@ -693,8 +627,16 @@ void *kernel_services ( unsigned long number,
         // arg2=msg, arg3=ch, arg4=ch 0		
 		//
 		case 69:
-			systemDevicesUnblocked ( (int) 3, (unsigned long) arg2, (unsigned long) 
-			    arg3, (unsigned long) arg4, 0);  		
+			printf("%c", arg3);
+			system_procedure( NULL, 
+			                  (int) arg2, 
+							  (unsigned long) arg3, 
+							  (unsigned long) arg4 );
+			
+			windowSendMessage( (unsigned long) NULL,
+			                   (unsigned long) arg2,
+							   (unsigned long) arg3,
+							   (unsigned long) arg4 );
 			break;
 			
 		//
@@ -810,7 +752,7 @@ void *kernel_services ( unsigned long number,
 		
 		//90 Coletor de threads Zombie. (a tarefa idle pode chamar isso.)		
 		case SYS_DEADTHREADCOLLECTOR: 
-		    systemIoCpu ( 1, 0, 0, 0, 0 ); 
+			sys_dead_thread_collector ();
 			break;
 			
 		//94	
@@ -833,39 +775,25 @@ void *kernel_services ( unsigned long number,
 			
 		// 99,  Pega 'hwnd' na fila da janela com o foco de entrada.
 		case SYS_GETHWINDOW:
-		    return (void *) systemDevicesUnblocked ( 43, 
-			                    arg2, arg2, arg2, arg2 );
+		    return NULL;
 		    break;
 			
 		//#bugbug
 		//**** 44, Pega 'msg' na fila da janela com o foco de entrada.
 		//Pegando a mensagem na fila da janela com o foco de entrada.
 		case SYS_GETKEYBOARDMESSAGE:
-		    return (void *) systemDevicesUnblocked ( 44, 
-			                    (unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus );
+			return (void *) windowGetMessage ( (struct window_d *) WindowWithFocus );
 			break;
 			
 		//**** 45,  Pega 'long1' na fila da janela com o foco de entrada.	
 		case SYS_GETLONG1:
-		    return (void *) systemDevicesUnblocked ( 45, 
-			                    (unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus );
+			return (void *) windowGetLong1 ( (struct window_d *) WindowWithFocus );
 			break;
 			
 		//**** 46,  Pega 'long2' na fila da janela com o foco de entrada.	
 		case SYS_GETLONG2:
-		    return (void *) systemDevicesUnblocked ( 46, 
-			                    (unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus, 
-								(unsigned long) WindowWithFocus);
+			return (void *) windowGetLong2 ( (struct window_d *) WindowWithFocus );
 			break;
-
 
  
 		//103, SYS_RECEIVEMESSAGE	
@@ -1769,43 +1697,6 @@ done:
     //printf("Done\n",number);
 	//refresh_screen();
     return NULL;	
-}
-
-
-
-void *gde_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 )
-{	
-      if ( number >= 0 && number <= 999 ){
-	  
-	      //chama k_serc.c 
-		  return (void *) kernel_services ( (unsigned long) number, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4 );
-	  
-	  } else if ( number >= 1000 &&  number <= 1999 ){
-	   
-		  //envia mensagens para o servidor shell se ele estiver disponível.
-	      
-		  //se shell é um servidor então ele não pode ser fechado
-		  //o ideal é que ele seja escalonado em todos os rounds.
-		  
-	      //chama sh_serc.c 
-		  return (void *) shell_services ( (unsigned long) number, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4 );
-		  
-	  }else if  ( number >= 2000 &&  number <= 2999 ){
-		  
-	      //chama tm_serc.c 
-		  return (void *) taskman_services ( (unsigned long) number, (unsigned long) arg2, (unsigned long) arg3, (unsigned long) arg4 );
-		  
-	  }else{
-	  
-	      //fail
-		  //vai falhar na última das opção.
-		  return NULL;
-	  };
-	
-	return NULL;
 }
 
 

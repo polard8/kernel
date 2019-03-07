@@ -509,16 +509,15 @@ done:
 		//como o aplicativo não trata esse tipo de mensagem ele apenas reecaminha 
 		//para o procedimentod e janelas do sistema.
 	
+		
+		//system_procedure ...
+		// @todo: Chamar o aplicativo REBOOT.BIN.
+	
 	if ( (ctrl_status == 1) && 
 	     (alt_status == 1) && 
 		 (ch == KEY_DELETE) )
 	{
-		//#bugbug
-		//isso não pode chamar o kernel services diretamente, tem que chamar o gde_services.
-		kernel_services ( SYS_REBOOT, 0, 0, 0 );
-		
-		//system_procedure ...
-		// @todo: Chamar o aplicativo REBOOT.BIN.
+		gde_services ( SYS_REBOOT, 0, 0, 0 );
 	}
 
 	

@@ -529,33 +529,19 @@ systemcall_t *CurrentSystemCall;
 //É a int 0x80.
 
 
-void *gde_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 );
+
 
 
 /*
- * kernel_services:
+ * gde_services:
  *    Atende as chamadas das interrupções do sistema. 
  */
-void *kernel_services ( unsigned long number, 
+void *gde_services ( unsigned long number, 
                  unsigned long arg2, 
 			 	 unsigned long arg3, 
 				 unsigned long arg4 );
 
 
-
-void *shell_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 );
-
-
-void *taskman_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 );
 
 
 
