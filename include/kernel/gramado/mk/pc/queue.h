@@ -10,7 +10,9 @@
  *     2018 - Revision.
  */
 
- 
+
+// Ordenação das listas de filas.
+
 #define QUEUE_NULL     0
 #define QUEUE_STANDBY  1
 #define QUEUE_RUNNING  2
@@ -35,49 +37,36 @@
 #define QUEUE_LEVEL_MAX 17
 
 
-//filas
-/*
-unsigned long queue[256];  //...>fila 
-unsigned long queue_head;  //...>head
-unsigned long queue_tail;  //...>tail
-unsigned long queue_size;  //número totas de espaços na fila (256).
-unsigned long queue_total; //número total de tarefas presentes na fila.		
-unsigned long queue_index;
-unsigned long queue_first;
-unsigned long queue_last;
-*/
- 
- 
+#define MAX_QUEUES 3
+
+
+// Essa é a organização padrão de uma lista de ponteiros de lista encadeada.
+// 0 = DRIVERS
+// 1 = SERVERS
+// 2 = USER APPS
+// 3 = NULL 
+
+unsigned long QUEUES[3];
  
  
 /*
  **********************************************************
  * queue_d:
- *    Estrutura para fila.
- *
- * @todo: usar array de estrutura dinâmico. (alocado)
- * pois essa estrutura esta disperdiçando espaço com 
- * array estáticos.
+ *     Estrutura para organizar várias listas de ponteiros de lista encadeada.
  */
-typedef struct queue_d queue_t;
+
 struct queue_d
 {
-    /*
-	 * @todo: Informações sobre o objeto.
-	 */
-	 // Type         
-	 // Size
-	 //...
-
-    //
-	// Filas de movimento das threads. 1 À 10
+	// #importante
+	// MAX_QUEUES é o número máximo de filas que pode haver na lista.
+	// A lista contém o potneiro head de uma lista encadeada.
 	//
    	
 	//Movimento 1, initialized --> standby. 
     int standbyHead; 
     int standbyTail;
     int standbyMax;
-    unsigned long standbyList[PRIORITY_MAX+1];    
+    unsigned long standbyList[MAX_QUEUES+1];    
 
 
 	//Movimento 2, standby --> running.
@@ -86,7 +75,7 @@ struct queue_d
     int runningHead; 
     int runningTail;
     int runningMax;
-    unsigned long runningList[PRIORITY_MAX+1];    
+    unsigned long runningList[MAX_QUEUES+1];    
 	
 	//Movimento 3, running --> ready.
 	//Movimento 6, waiting --> ready.
@@ -94,7 +83,7 @@ struct queue_d
     int readyHead; 
     int readyTail;
     int readyMax;
-    unsigned long readyList[PRIORITY_MAX+1];     
+    unsigned long readyList[MAX_QUEUES+1];     
 	 
 	 
 	//Movimento 5, ready --> waiting.
@@ -102,41 +91,40 @@ struct queue_d
     int waitingHead;
     int waitingTail;
     int waitingMax;
-    unsigned long waitingList[PRIORITY_MAX+1];
+    unsigned long waitingList[MAX_QUEUES+1];
 	  
 	  
 	//Movimento 7, running --> blocked.	
     int blockedHead;
     int blockedTail;
     int blockedMax;
-    unsigned long blockedList[PRIORITY_MAX+1];
+    unsigned long blockedList[MAX_QUEUES+1];
 	  
 	//Movimento 9, running --> zombie.	
     int zombieHead;
     int zombieTail;
     int zombieMax;
-    unsigned long zombieList[PRIORITY_MAX+1];
+    unsigned long zombieList[MAX_QUEUES+1];
 	  
 	  
 	//Movimento 10, zombie --> dead.
     int deadHead;
     int deadTail;
     int deadMax;
-    unsigned long deadList[PRIORITY_MAX+1];    
+    unsigned long deadList[MAX_QUEUES+1];    
 
 	//Movimento 11, zombie --> initalized.
     //Movimento 0,       x --> initalized. (created)	
     int initializedHead;
     int initializedTail;
     int initializedMax;
-    unsigned long initializedList[PRIORITY_MAX+1];
+    unsigned long initializedList[MAX_QUEUES+1];
 	
 	
 	/*
      * RACE: 
 	 *    Filas do loop do sistema. 
 	 *    Cooperação e Concorrência.
-	 *    
      */ 
 	  
 	  
@@ -144,13 +132,13 @@ struct queue_d
     int syscoopHead; 
     int syscoopTail;
     int syscoopMax;
-    unsigned long syscoopList[PRIORITY_MAX+1];   
+    unsigned long syscoopList[MAX_QUEUES+1];   
 
 	//Concorrência, sistema.
     int sysconcHead; 
     int sysconcTail;
     int sysconcMax;
-    unsigned long sysconcList[PRIORITY_MAX+1];
+    unsigned long sysconcList[MAX_QUEUES+1];
 
 	/*
      * RACE: Filas do loop do usuário. Cooperação e Concorrência.
@@ -161,13 +149,13 @@ struct queue_d
     int usercoopHead; 
     int usercoopTail;
     int usercoopMax;
-    unsigned long usercoopList[PRIORITY_MAX+1];  	
+    unsigned long usercoopList[MAX_QUEUES+1];  	
 
 	//Concorrência, usuário.
     int userconcHead; 
     int userconcTail;
     int userconcMax;
-    unsigned long userconcList[PRIORITY_MAX+1];   
+    unsigned long userconcList[MAX_QUEUES+1];   
 
 	
     /*
@@ -178,56 +166,50 @@ struct queue_d
     int realtimeHead; 
     int realtimeTail;
     int realtimeMax;
-    unsigned long realtimeList[PRIORITY_MAX+1];  //real time rr. 
+    unsigned long realtimeList[MAX_QUEUES+1];  //real time rr. 
 	
 	
     //default queue
     int defaultHead;
     int defaultTail;
     int defaultMax;
-    unsigned long defaultList[PRIORITY_MAX+1]; 
-	
-	//
-	// 3 níveis de prioridade para threads no estado READY.
-	//
+    unsigned long defaultList[MAX_QUEUES+1]; 
 	
 	
-	//Mínimo = 'level <= DISPATCHER_PRIORITY_LOW'
+	// #test
+    // Listas para filas de threads que se encaixam emdeterminadas faixas de prioridade.
+	
+	
+	//Mínimo = 'level <= PRIORITY_LOW'
     int minHead; 
     int minTail;
     int minMax;
-    unsigned long minList[128];
+    unsigned long minList[MAX_QUEUES+1];
 	
-	//Médio == 'DISPATCHER_PRIORITY_LOW > level <= DISPATCHER_PRIORITY_NORMAL'
+	//Médio == 'PRIORITY_LOW > level <= PRIORITY_NORMAL'
     int medHead; 
     int medTail;
     int medMax;
-    unsigned long medList[128];
+    unsigned long medList[MAX_QUEUES+1];
     
-	//Màximo = ' level > DISPATCHER_PRIORITY_NORMAL '
+	//Màximo = ' level > PRIORITY_NORMAL '
 	int maxHead; 
     int maxTail;
     int maxMax;
-    unsigned long maxList[128];
+    unsigned long maxList[MAX_QUEUES+1];
 	
 };
-queue_t *queue;
-//.
 
-// #bugbug
-// Não usar.
-unsigned long queueList[8]; 
-
+struct queue_d *queue;
 
 
 /*
  ****************************************************
  * wait_queue_d:
- *     ## test  ##
- *     Lista encadeada que pode ser usada para threads 
- * que estão esperando por algum evento.
+ *     Lista encadeada que pode ser usada para threads que estão esperando 
+ * por algum evento.
  */
-typedef struct wait_queue_d wait_queue_t;
+
 struct wait_queue_d
 {
 	int size;
@@ -235,9 +217,13 @@ struct wait_queue_d
 	struct thread_d *tail;
 };
 
+struct wait_queue_d *wait_queue;
+
+
+
 
 //
-// Protótipos.
+// ======== Prototypes ========
 //
 
 int init_queue(struct queue_d *q);
@@ -253,8 +239,9 @@ queue_insert_data( struct queue_d *q,
                    unsigned long data, 
 				   int type );
 
-void *queue_get_data( struct queue_d *q, 
-                      int type );
+
+struct thread_d *queue_get_data ( struct queue_d *q, int type );
+
 					  
 void show_queue_information(struct queue_d *q);
 void ScanReadyQueue(struct queue_d *q);

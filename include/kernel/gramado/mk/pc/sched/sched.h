@@ -77,7 +77,9 @@ void KiDoThreadDead(int id);
 // Obs: Manipuladores de troca de thread. 
 //      Fazem sentido estarem no scheduler. 
 
-void pick_next_thread();
+
+struct thread_d *pick_next_thread ();
+
 
 int scheduler();
 void scheduler_start();

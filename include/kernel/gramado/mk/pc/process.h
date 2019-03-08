@@ -113,16 +113,15 @@
 #define PRIORITY_HIGH2     7  //2
 #define PRIORITY_HIGH3     8  //3
 #define PRIORITY_HIGH4     9  //4
+
 //Definições secundárias.
 #define PRIORITY_LOW        PRIORITY_LOW1
-#define PRIORITY_SUPERLOW   PRIORITY_LOW4
-#define PRIORITY_MIN        PRIORITY_SUPERLOW
+#define PRIORITY_MIN        PRIORITY_LOW4
 #define PRIORITY_HIGH       PRIORITY_HIGH1 
-#define PRIORITY_SUPERHIGH  PRIORITY_HIGH4
-#define PRIORITY_MAX        PRIORITY_SUPERHIGH    
+#define PRIORITY_MAX        PRIORITY_HIGH4
+
 //Definição especial.
 #define PRIORITY_REALTIME  10    
-
 
 #define TIMESLICE_MULTIPLIER 2
 //#define TIMESLICE_MULTIPLIER 1

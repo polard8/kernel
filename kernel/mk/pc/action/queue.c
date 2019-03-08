@@ -24,74 +24,78 @@ int init_queue (struct queue_d *q){
  
 	unsigned int i;
 	
+	// #importante
+	// MAX_QUEUES é o número máximo de filas que pode haver na lista.
+	// A lista contém o potneiro head de uma lista encadeada.
+	
     q->standbyHead = 0; 
     q->standbyTail = 0;
-    q->standbyMax  = DISPATCHER_PRIORITY_MAX;
+    q->standbyMax  = MAX_QUEUES; 
 
     q->runningHead = 0; 
     q->runningTail = 0;
-    q->runningMax  = DISPATCHER_PRIORITY_MAX;	
+    q->runningMax  = MAX_QUEUES; 	
 		
 	//ready.
 	q->readyHead = 0; 
     q->readyTail = 0;
-    q->readyMax  = DISPATCHER_PRIORITY_MAX;	
+    q->readyMax  = MAX_QUEUES; 	
 	
 	//waiting.
     q->waitingHead  = 0;
     q->waitingTail  = 0;
-    q->waitingMax   = DISPATCHER_PRIORITY_MAX;
+    q->waitingMax   = MAX_QUEUES; 
 		
     q->blockedHead  = 0;
     q->blockedTail  = 0;
-    q->blockedMax   = DISPATCHER_PRIORITY_MAX;
+    q->blockedMax   = MAX_QUEUES; 
 	
 	
     q->zombieHead  = 0;
     q->zombieTail  = 0;
-    q->zombieMax   = DISPATCHER_PRIORITY_MAX;
+    q->zombieMax   = MAX_QUEUES; 
 
     q->deadHead  = 0;
     q->deadTail  = 0;
-    q->deadMax   = DISPATCHER_PRIORITY_MAX;
+    q->deadMax   = MAX_QUEUES; 
 
     q->initializedHead  = 0;
     q->initializedTail  = 0;
-    q->initializedMax   = DISPATCHER_PRIORITY_MAX;
+    q->initializedMax   = MAX_QUEUES; 
 	
 	
   //Cooperação, sistema.
     q->syscoopHead = 0; 
     q->syscoopTail = 0;
-    q->syscoopMax = DISPATCHER_PRIORITY_MAX;
+    q->syscoopMax = MAX_QUEUES;
 
 
 	//Concorrência, sistema.
     q->sysconcHead = 0; 
     q->sysconcTail = 0;
-    q->sysconcMax = DISPATCHER_PRIORITY_MAX;
+    q->sysconcMax = MAX_QUEUES;
 
 
 	//Concorrência, usuário.
     q->userconcHead = 0; 
     q->userconcTail = 0;
-    q->userconcMax = DISPATCHER_PRIORITY_MAX;
+    q->userconcMax = MAX_QUEUES; 
 	
 	//Cooperação, usuário.
     q->usercoopHead = 0; 
     q->usercoopTail = 0;
-    q->usercoopMax = DISPATCHER_PRIORITY_MAX;
+    q->usercoopMax = MAX_QUEUES;
 	
 	//realtime.
 	q->realtimeHead = 0; 
     q->realtimeTail = 0;
-    q->realtimeMax  = DISPATCHER_PRIORITY_MAX;
+    q->realtimeMax  = MAX_QUEUES; 
 
 	
 	//default.
     q->defaultHead  = 0;
     q->defaultTail  = 0;
-    q->defaultMax   = DISPATCHER_PRIORITY_MAX;
+    q->defaultMax   = MAX_QUEUES; 
 
 
 	i=0;
@@ -389,17 +393,24 @@ done:
 
 /*
  * queue_insert_head:
- *     Coloca um dado no fim da fila. (LIFO)
+ *     ?
  */
-int queue_insert_head(struct queue_d *q, unsigned long data, int type)
+
+int 
+queue_insert_head ( struct queue_d *q, 
+					unsigned long data, 
+					int type )
 {
-    if((void*) q == NULL){
-        printf("queue_insert_head:"); 
-		refresh_screen();
-        while(1){}		
+    if ( (void *) q == NULL )
+	{
+        kprintf ("queue_insert_head:"); 
+		die ();
+		
+		//refresh_screen();
+        //while(1){}		
     };	
 	
-	switch(type)
+	switch (type)
 	{
         case QUEUE_STANDBY:
 		    goto standbyInsertData; 
@@ -524,22 +535,26 @@ done:
 
 
 /*
+ ********************************************
  * queue_get_data:
- *     Pega um dado de uma fila.
- *     Pega da ready. (FIFO)
- *     ?? Pega e remove o primeiro elemento da lista. 
+ *    Pegando o head de uma das listas de ponteiros.
+ *    Isso consome o elemento da lista.
  */
-void *queue_get_data(struct queue_d *q, int type)
-{
-    struct queue_d *New;
+
+struct thread_d *queue_get_data ( struct queue_d *q, int type ){
 	
-    if((void*) q == NULL){
-        printf("queue_get_data:"); 
-		refresh_screen();
-        while(1){}		
+    struct thread_d *Thread;
+	
+    if ( (void *) q == NULL )
+	{
+        kprintf ("queue_get_data:"); 
+		die ();
+		
+		//refresh_screen();
+        //while(1){}		
     };		
 	
-	switch(type)
+	switch (type)
 	{
         case QUEUE_STANDBY:
 		    goto standbyGetData;
@@ -602,53 +617,90 @@ void *queue_get_data(struct queue_d *q, int type)
 		    break;
 	};	
 	
+	
+	//
+	// rotinas.
+	//
+	
+	
 standbyGetData:
-    New = (void*) q->standbyList[q->standbyHead];	
+    Thread = (void *) q->standbyList[q->standbyHead];	
+	q->standbyList[q->standbyHead] = 0;
     goto done;
+	
+//#bugbug: Haha ... esse tipo não faz sentido.	
 runningGetData:
-    New = (void*) q->runningList[q->runningHead];	
+    Thread = (void *) q->runningList[q->runningHead];
+	q->runningList[q->runningHead] = 0;
     goto done;
+	
 readyGetData:
-    New = (void*) q->readyList[q->readyHead];	
+    Thread = (void *) q->readyList[q->readyHead];
+	q->readyList[q->readyHead] = 0;
     goto done;
+	
 waitingGetData:
-    New = (void*) q->waitingList[q->waitingHead];
-    goto done;	
+    Thread = (void *) q->waitingList[q->waitingHead];
+	q->waitingList[q->waitingHead] = 0;
+    goto done;
+	
 blockedGetData:
-    New = (void*) q->blockedList[q->blockedHead];
-    goto done;	
+    Thread = (void *) q->blockedList[q->blockedHead];
+	q->blockedList[q->blockedHead] = 0;
+    goto done;
+	
 zombieGetData:
-    New = (void*) q->zombieList[q->zombieHead];
-    goto done;	
+    Thread = (void *) q->zombieList[q->zombieHead];
+	q->zombieList[q->zombieHead] = 0;
+    goto done;
+	
 deadGetData:
-    New = (void*) q->deadList[q->deadHead];
-    goto done;	
+    Thread = (void *) q->deadList[q->deadHead];
+	q->deadList[q->deadHead] = 0;
+    goto done;
+	
 initializedGetData:
-    New = (void*) q->initializedList[q->initializedHead];
-    goto done;	
+    Thread = (void *) q->initializedList[q->initializedHead];
+	q->initializedList[q->initializedHead] = 0;
+    goto done;
+	
 syscoopGetData: 
-    New = (void*) q->syscoopList[q->syscoopHead];	
+    Thread = (void *) q->syscoopList[q->syscoopHead];	
+	q->syscoopList[q->syscoopHead] = 0;
     goto done;
+	
 usercoopGetData:
-    New = (void*) q->usercoopList[q->usercoopHead];	
+    Thread = (void *) q->usercoopList[q->usercoopHead];
+	q->usercoopList[q->usercoopHead] = 0;
     goto done;
+	
 sysconcGetData:
-    New = (void*) q->sysconcList[q->sysconcHead];	
+    Thread = (void *) q->sysconcList[q->sysconcHead];	
+	q->sysconcList[q->sysconcHead] = 0;
     goto done;
+	
 userconcGetData:
-    New = (void*) q->userconcList[q->userconcHead];	
+    Thread = (void *) q->userconcList[q->userconcHead];	
+	q->userconcList[q->userconcHead] = 0;	
     goto done;
+	
 realtimeGetData:
-    New = (void*) q->realtimeList[q->realtimeHead];	
+    Thread = (void *) q->realtimeList[q->realtimeHead];	
+	q->realtimeList[q->realtimeHead] = 0;
     goto done;
+	
 defaultGetData:
-    New = (void*) q->defaultList[q->defaultHead];
+    Thread = (void *) q->defaultList[q->defaultHead];
+	q->defaultList[q->defaultHead] = 0;
     goto done;
+	
 // Done.
 done:
+	
     //feed_ready_queue(q,1);    //feed head.
-    return (void*) New;    	
-};
+	
+    return (struct thread_d *) Thread;    	
+}
 
 
 /*

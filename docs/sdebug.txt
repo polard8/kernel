@@ -21,8 +21,8 @@ x86main: processes and threads
 x86main: ps2
 x86main: done
 ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  SPAWN 
-ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  SPAWN 
 ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  SPAWN 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  SPAWN 
 ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
 ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
 ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
@@ -40,4 +40,619 @@ ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DI
 ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
 ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
 ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
-ts ts ts 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  SPAWN 
+ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  [*SCHEDULER*] check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  LAST  [*SCHEDULER*] DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q2  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts ts ts ts  preempt_q1  ok  check_for_standby  nothing  N  DISPATCH_CURRENT 
+ts ts ts ts ts ts ts t

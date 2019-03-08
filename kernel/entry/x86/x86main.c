@@ -162,7 +162,7 @@ void x86mainStartFirstThread ( int n ){
     refresh_screen(); 
 
 
-    for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
+    for ( i=0; i <= PRIORITY_MAX; i++ ){
 		
         dispatcherReadyList[i] = (unsigned long) Thread;
     }
@@ -337,7 +337,7 @@ void startStartIdle (){
     refresh_screen(); 
 //#endif
 
-    for ( i=0; i <= DISPATCHER_PRIORITY_MAX; i++ ){
+    for ( i=0; i <= PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) IdleThread;
     }
 

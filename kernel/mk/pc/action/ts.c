@@ -137,7 +137,7 @@ void task_switch (){
 	struct thread_d *Current;
 	struct process_d *P;
 
-	Max = DISPATCHER_PRIORITY_MAX;
+	Max = PRIORITY_MAX;
 
 
 	// ## Current thread ##

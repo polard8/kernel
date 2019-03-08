@@ -27,37 +27,6 @@
 
 
 
-//
-// Prioridades.
-//
-//  ( O dispacher faz o gerenciamento das prioridades, 
-//    mesmo que threads e processos considerem prioridades. )
-//
-//  A fila do dispacher aceita prioridades de 0 à 10.
-//
-//
-
-//Definições principais. 
-#define DISPATCHER_PRIORITY_LOW4   PRIORITY_LOW4      //4
-#define DISPATCHER_PRIORITY_LOW3   PRIORITY_LOW3      //3
-#define DISPATCHER_PRIORITY_LOW2   PRIORITY_LOW2      //2
-#define DISPATCHER_PRIORITY_LOW1   PRIORITY_LOW1      //1 
-#define DISPATCHER_PRIORITY_NORMAL PRIORITY_NORMAL    //*0 (Normal).
-#define DISPATCHER_PRIORITY_HIGH1  PRIORITY_HIGH1     //1
-#define DISPATCHER_PRIORITY_HIGH2  PRIORITY_HIGH2     //2
-#define DISPATCHER_PRIORITY_HIGH3  PRIORITY_HIGH3     //3
-#define DISPATCHER_PRIORITY_HIGH4  PRIORITY_HIGH4     //4
-//Definições secundárias.
-#define DISPATCHER_PRIORITY_LOW        PRIORITY_LOW        
-#define DISPATCHER_PRIORITY_SUPERLOW   PRIORITY_SUPERLOW   
-#define DISPATCHER_PRIORITY_MIN        PRIORITY_MIN        
-#define DISPATCHER_PRIORITY_HIGH       PRIORITY_HIGH        
-#define DISPATCHER_PRIORITY_SUPERHIGH  PRIORITY_SUPERHIGH  
-#define DISPATCHER_PRIORITY_MAX        PRIORITY_MAX            
-//Definição especial.
-#define DISPATCHER_PRIORITY_REALTIME   PRIORITY_REALTIME      
-
-
 //Enumerador de criterio de seleção de thread.
 #define SELECT_IDLE_COUNT         1
 #define SELECT_INITIALIZED_COUNT  2
@@ -142,7 +111,8 @@ dispatch_count_t *DispatchCountBlock;
  *          o kernel esta usando a lista de threads criadas. threadList[]
  *          não considerando a prioridade. ;)
  */ 
-unsigned long dispatcherReadyList[DISPATCHER_PRIORITY_MAX +1];
+
+unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 
 
 

@@ -881,7 +881,7 @@ int init_dispatcher (){
 	dispatcherType = DISPATCHER_SYSTEM; 	
 	
 	//inicializa a fila do dispacher.
-	for ( i=0; i<=DISPATCHER_PRIORITY_MAX; i++ ){
+	for ( i=0; i <= PRIORITY_MAX; i++ ){
 		
 	    dispatcherReadyList[i] = (unsigned long) 0;
 	};

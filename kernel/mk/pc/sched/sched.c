@@ -50,55 +50,61 @@
 //int schedulerType;
 //...
 
-//unsigned long schedulerQueue[4];
 
 
-//0=DRIVERS
-//1=SERVERS
-//2=USER APPS
-unsigned long QUEUES[3];
+/*
+ * pick_next_thread:
+ *     Selecionamos a next_thread olhando nas filas em QUEUE[].
+ *     Se não tiver nada nas filas então usaremos a IdleThread.
+ *     #bugbug: Essa IdleThread está configurada corretamente.
+ *
+ * QUEUE[] contem ponteiros para listas encadeadas.
+ */
 
-
-
-
-//selecionamos a next_thread olhando nas filas.
-//se não tiver nada nas filas então usaremos a idle thread.
-
-void pick_next_thread()
-{
-	int q;    //fila selecionada
-	int old;  //salva current thread
+struct thread_d *pick_next_thread (){
+	
+	int i;    //id da fila selecionada
+	int old;  //salva id da current thread
 	
 	struct thread_d *t;
 	struct thread_d *next;
-	
-	//se temos um ponteiro para dila de drivers.
-    if ( QUEUES[0] != 0 ){
-	
-		q = 0;
-		
-		//se temos um ponteir para a fila de servidores.
-	} else if ( QUEUES[1] != 1 ){
-	
-		q = 1;
-		
-		//nos resta a fila de apps de usu'ario.	
-	}else{
-	
-	    q = 2;
-	};
+
 	
 	//salva antiga thread
-	old = next_thread;
+	old = next_thread;	
 	
-	//checando o conductor.
 	
-	//a fila selecionada 'e v'alida.
-    if (QUEUES[q] != 0)
+	//se temos um ponteiro para fila de drivers.
+	
+    if ( QUEUES[0] != 0 ){
+	
+		i = 0;
+		
+	//se temos um ponteiro para a fila de servidores.
+		
+	} else if ( QUEUES[1] != 0 ){
+	
+		i = 1;
+		
+		//nos resta a fila de apps de usuário.	
+	}else{
+	
+	    i = 2;
+	};
+	
+
+	
+	//
+	// # Checando o conductor. #
+	//
+	
+	//se o elemento tem um valor não nulo..
+    if (QUEUES[i] != 0)
 	{
 	    //Ok temos uma fila.
 		//vamos pegar a primeira thread da fila.
-		t = (void *) QUEUES[q];
+		
+		t = (void *) QUEUES[i];
 				
 	}else{
 	
@@ -111,6 +117,7 @@ void pick_next_thread()
 		//quando ela acordar ir'a pra alguma fila.
 		
 		//selecionamos a idle.
+		
 		t = IdleThread;
 	};
 	
@@ -137,7 +144,7 @@ void pick_next_thread()
 	
 	
 	//
-	// Checando a validade da next thread.
+	// # Checando a validade da next thread. #
 	//
 	
 	next = (void *) threadList[next_thread];
@@ -168,7 +175,14 @@ void pick_next_thread()
 		    printf ("pick_next_thread: No next_thread, we could't initialize the round\n");
 		    die();	
 		}
+		
+		if ( next->state == READY )
+		{
+		    return (struct thread_d *) next;
+		}
 	}
+	
+	return NULL;
 }
 
 
