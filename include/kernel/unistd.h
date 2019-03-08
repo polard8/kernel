@@ -37,5 +37,11 @@ typedef int pid_t;
 //posix
 int close ( int fd );
 
+//POSIX.1-2001, POSIX.1-2008.
+int pipe ( int pipefd[2] );
+
+
+
+
 
 

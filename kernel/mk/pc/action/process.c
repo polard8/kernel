@@ -533,7 +533,9 @@ struct process_d *create_process ( struct room_d *room,
                                    unsigned long iopl,
                                    unsigned long directory_address )
 {
-    
+  
+	int i=0;
+	
 	pid_t PID;
 	
     struct process_d *Process;
@@ -641,6 +643,11 @@ get_next:
 		//Process->cmd = NULL;  //nome curto que serve de comando.
 		Process->name_address = (unsigned long) name;
 		
+		//lista de streams...
+		//#todo temos que zerar essa lista e criarmos 3 streams para o processo.
+		for ( i=0; i< NUMBER_OF_FILES; i++ ){
+		    Process->Streams[i] = 0;
+	    }
 		
 		//Process->terminal =
 		
@@ -665,8 +672,6 @@ get_next:
 		
 		Process->framepoolListHead = NULL;
 		
-		//Lista de arquivos.
-		//Process->Files =
 		
 		//Thread inicial.
 		//Process->thread =
@@ -900,7 +905,6 @@ get_next:
 		//Process->base_priority
 		
 		
-		//Process->iob[3]
 		
 		
 	    // wait4pid: 
@@ -1381,6 +1385,7 @@ void SetProcessDirectory ( struct process_d *process, unsigned long Address ){
  * para um gerenciador de processos em user mode usar.
  * @todo: processGetDirectory(...)
  */
+
 unsigned long GetProcessDirectory( struct process_d *process )
 {
     if( (void*) process != NULL )
@@ -1777,6 +1782,39 @@ fail:
     return (unsigned long) 0;
 }
 
+
+//#todo
+//encontrar um slot vazio em Process->Streams[]
+//retornar o indice.
+/*
+int process_find_empty_stream_slot ( struct process_d *process );
+int process_find_empty_stream_slot ( struct process_d *process ){
+
+ 	int i = 0;
+	
+	if ( (void *) process == NULL )
+	{
+		return -1;
+		 
+	}else{
+		
+		if ( process->used != 1 || process->magic != 1234 ){
+			
+			return -1;
+		}
+		
+	    for ( i=0; i< NUMBER_OF_FILES; i++ )
+	    {
+	        if ( Process->Streams[i] == 0 )
+		    {
+		        return i;
+		    }
+	    }		
+	};  
+	
+	return -1;
+} 
+*/
 
 //
 // End.

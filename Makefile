@@ -14,8 +14,8 @@
 VERSION = 0
 PATCHLEVEL = 21
 SUBLEVEL = 0
-EXTRAVERSION = .0
-NAME = Filas
+EXTRAVERSION = -rc0
+NAME = ?
 
 
 ARCH ?= x86
@@ -63,7 +63,7 @@ ifeq ($(ARCH),x86)
 	#deveria ser headx86.o
 	ENTRY_OBJECTS := head.o x86main.o 
 	
-	EXECVE_OBJECTS := cedge.o ctype.o socket.o stdio.o stdlib.o string.o unistd.o \
+	EXECVE_OBJECTS := pipe.o socket.o cedge.o ctype.o  stdio.o stdlib.o string.o unistd.o \
 	devmgr.o \
 	ldisc.o \
 	gde_serv.o \
@@ -199,6 +199,13 @@ compile-kernel:
 	gcc -c kernel/execve/execve.c  -I include/ $(CFLAGS) $(DEFINES) -o execve.o
 
 	# crts
+	
+	#klibc/pipe
+	gcc -c kernel/execve/crts/klibc/pipe/pipe.c   -I include/ $(CFLAGS) $(DEFINES) -o pipe.o	
+	
+	#klibc/socket
+	gcc -c kernel/execve/crts/klibc/socket/socket.c   -I include/ $(CFLAGS) $(DEFINES) -o socket.o		
+	
 	# klibc
 	gcc -c kernel/execve/crts/klibc/cedge.c   -I include/ $(CFLAGS) $(DEFINES) -o cedge.o
 	gcc -c kernel/execve/crts/klibc/ctype.c   -I include/ $(CFLAGS) $(DEFINES) -o ctype.o
@@ -206,8 +213,6 @@ compile-kernel:
 	gcc -c kernel/execve/crts/klibc/stdio.c   -I include/ $(CFLAGS) $(DEFINES) -o stdio.o
 	gcc -c kernel/execve/crts/klibc/string.c  -I include/ $(CFLAGS) $(DEFINES) -o string.o
 	gcc -c kernel/execve/crts/klibc/unistd.c  -I include/ $(CFLAGS) $(DEFINES) -o unistd.o
-	gcc -c kernel/execve/crts/klibc/socket.c   -I include/ $(CFLAGS) $(DEFINES) -o socket.o	
-
 
 	
 	gcc -c kernel/kdrivers/apic.c    -I include/ $(CFLAGS) $(DEFINES) -o apic.o

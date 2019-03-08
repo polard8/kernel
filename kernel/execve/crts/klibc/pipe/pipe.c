@@ -1,0 +1,122 @@
+/*
+ * File: pipe.c
+ *     Pipe support for klibc.
+ *     ?? Pipes, socketpairs and FIFOs ??
+ *     ?? pipe() and mkfifo(). ??
+ *     pipe() which "returns" two file descriptors. 
+ *     Internally the pipe is (normally) a circular buffer/queue.
+ */
+
+
+#include <kernel.h>
+
+
+// criar duas estruturas de stream que apontam para o mesmo buffer.
+// retorna os descritores de arquivo que estão na estrutura do processo atual.
+int pipe ( int pipefd[2] ){
+	
+	FILE *stream1;
+	FILE *stream2;
+		
+	struct process_d *Process;
+
+	
+	Process = (void *) processList[current_process];
+	
+	if ( (void *) Process == NULL )
+	{
+		return -1;
+	}else{
+	
+	     if ( Process->used != 1 || Process->magic != 1234 )
+		 {
+		     return -1;
+		 }
+		
+		 //ok
+	};
+	
+	//#todo
+	//temos que criar uma rotina que procure slots em Process->Streams[]
+	//e colocarmos em process.c
+	//essa é afunção que estamos criando.
+	// process_find_empty_stream_slot ( struct process_d *process );
+	
+	// procurar 2 slots livres.
+    int i;
+    int slot1 = -1;
+	int slot2 = -1;
+	
+	for ( i=0; i< NUMBER_OF_FILES; i++ )
+	{
+	    if ( Process->Streams[i] == 0 )
+		{
+		    slot1 = i;
+		}
+	}	
+
+	for ( i=0; i< NUMBER_OF_FILES; i++ )
+	{
+	    if ( Process->Streams[i] == 0 )
+		{
+		    slot2 = i;
+		}
+	}	
+
+	if ( slot1 == -1 || slot2 == -1 ) 
+	{
+	    return -1;
+	}
+	
+	
+	// buffer
+	
+	char *buff = (char *) malloc (BUFSIZ);
+	//char *buff = (char *) newPage ();
+	
+    if ( (void *) buff == NULL )
+	{
+	     return -1;
+	}
+	
+	//estruturas 
+	stream1 = (void *) malloc ( sizeof(FILE) );
+	stream2 = (void *) malloc ( sizeof(FILE) );
+	
+	if ( (void *) stream1 == NULL || (void *) stream2 == NULL )
+	{
+	    return -1;
+	}else{
+	
+		// As duas estruturas compartilham o mesmo buffer.
+		
+        stream1->_base = buff;	
+	    stream2->_base = buff;
+		stream1->_ptr = buff;
+		stream2->_ptr = buff;
+		
+		stream1->_tmpfname = NULL;
+		stream2->_tmpfname = NULL;
+		
+		stream1->_bufsiz = BUFSIZ; 
+		stream2->_bufsiz = BUFSIZ; 
+		
+		//quanto falta é igual ao tamanho.
+		stream1->_cnt = stream1->_bufsiz;   
+		stream2->_cnt = stream2->_bufsiz; 
+		
+		// #importante
+		// Esse é o retorno esperado.
+		// Esses índices representam o número do slot
+		// na lista de arquivos abertos na estrutura do processo atual.
+		
+		pipefd[0] = slot1;
+		pipefd[1] = slot2; 	
+		
+		//OK
+		return 0;
+	};
+}
+
+
+
