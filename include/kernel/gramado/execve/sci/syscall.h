@@ -483,10 +483,10 @@
 
 //klibc
 //reservado para libc support.
-#define	SYS_246 246   //fopen
-#define	SYS_247 247   // >pipe
-#define	SYS_248 248   // >read pipe
-#define	SYS_249 249   // >write pipe
+#define	SYS_246 246   // fopen
+#define	SYS_247 247   // pipe
+#define	SYS_248 248   // 
+#define	SYS_249 249   // 
 
 //Info support.
 #define	SYS_GETSYSTEMMETRICS  250 

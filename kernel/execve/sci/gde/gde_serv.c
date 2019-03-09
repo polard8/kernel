@@ -1602,17 +1602,13 @@ void *gde_services ( unsigned long number,
 			break;
 			
 		//reservado	
-		//>>>read pipe	
 		case 248:
-			//#todo: rotina provisória
-			return (void *) sys_read_pipe ( (int) arg2, (int) arg3 );
+			return NULL;
 			break;
 			
 		//reservado	
-		//>>>>write pipe	
 		case 249:
-			//#todo: rotina provisória
-			return (void *) sys_write_pipe ( (int) arg2, (int) arg3 );
+			return NULL;
 			break;
 			
 			
