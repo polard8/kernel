@@ -12,7 +12,7 @@
 #We will have a new name just when the release changes.
 
 VERSION = 0
-PATCHLEVEL = 22
+PATCHLEVEL = 23
 SUBLEVEL = 0
 EXTRAVERSION = -rc2
 NAME = ?
