@@ -38,10 +38,15 @@ typedef int pid_t;
 int close ( int fd );
 
 //POSIX.1-2001, POSIX.1-2008.
-int pipe ( int pipefd[2] );
+int sys_pipe ( int *pipefd );
 
+//#todo: rotina provisória
+//o serviço de ler num pipe deve ser o mesmo de ler num stream dado o fd.
+int sys_read_pipe ( int fd, int count );
 
-
+//#todo: rotina provisória
+//o serviço de escrever num pipe deve ser o mesmo de escrever num stream dado o fd.
+int sys_write_pipe ( int fd, int count );
 
 
 

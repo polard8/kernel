@@ -13,7 +13,8 @@
 
 // criar duas estruturas de stream que apontam para o mesmo buffer.
 // retorna os descritores de arquivo que estão na estrutura do processo atual.
-int pipe ( int pipefd[2] ){
+
+int sys_pipe ( int *pipefd ){
 	
 	FILE *stream1;
 	FILE *stream2;
@@ -117,6 +118,20 @@ int pipe ( int pipefd[2] ){
 		return 0;
 	};
 }
+
+//#todo: rotina provisória
+int sys_read_pipe ( int fd, int count ){
+    return -1;
+}
+
+//#todo: rotina provisória
+int sys_write_pipe ( int fd, int count ){
+    return -1;
+}
+
+
+
+
 
 
 

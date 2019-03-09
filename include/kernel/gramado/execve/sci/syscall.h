@@ -18,7 +18,7 @@
  *       pois é ele que atende as chamadas.
  * obs:
  * e.g. malloc() is mainly implemented in user space, but uses system calls 
- * to increase the process’ heap size. Ou seja, somente quando acaba a área  
+ * to increase the process heap size. Ou seja, somente quando acaba a área  
  * que o malloc tem em user mode é que ele chama o kernel e somente para 
  * almentar seu heap.
  *
@@ -481,11 +481,12 @@
 #define	SYS_244 244   //enable text cursor.
 #define	SYS_245 245   //disable text cursor.
 
+//klibc
 //reservado para libc support.
 #define	SYS_246 246   //fopen
-#define	SYS_247 247
-#define	SYS_248 248
-#define	SYS_249 249
+#define	SYS_247 247   // >pipe
+#define	SYS_248 248   // >read pipe
+#define	SYS_249 249   // >write pipe
 
 //Info support.
 #define	SYS_GETSYSTEMMETRICS  250 

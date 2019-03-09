@@ -502,7 +502,7 @@ Linker script and memory map
                 0x000000000045c059                desktopInitialize
                 0x000000000045c0a2                desktop_loop
                 0x000000000045c0ac                desktopProcedure
- .text          0x000000000045c0c9      0x192 unistd.o
+ .text          0x000000000045c0c9      0x1b3 unistd.o
                 0x000000000045c0c9                execve
                 0x000000000045c0d3                exit
                 0x000000000045c0f3                fork
@@ -531,42 +531,43 @@ Linker script and memory map
                 0x000000000045c20d                ioctl
                 0x000000000045c217                open
                 0x000000000045c23d                close
- .text          0x000000000045c25b       0x10 login.o
-                0x000000000045c25b                loginCheckPassword
- .text          0x000000000045c26b      0x15a tests.o
-                0x000000000045c26b                testsTimerUpdateObject
-                0x000000000045c343                testsInitTimer
- .text          0x000000000045c3c5       0x1b pixel.o
-                0x000000000045c3c5                gws_backbuffer_putpixel
- .text          0x000000000045c3e0       0x2b line.o
-                0x000000000045c3e0                my_buffer_horizontal_line
- .text          0x000000000045c40b       0x86 rect.o
-                0x000000000045c40b                drawDataRectangle
- .text          0x000000000045c491      0x1c7 char.o
-                0x000000000045c491                my_buffer_char_blt
-                0x000000000045c4ae                set_char_width
-                0x000000000045c4bc                set_char_height
-                0x000000000045c4ca                get_char_width
-                0x000000000045c4d4                get_char_height
-                0x000000000045c4de                gws_drawchar_transparent
-                0x000000000045c598                gws_draw_char
- .text          0x000000000045c658      0x1f3 gws.o
-                0x000000000045c658                gws_init
-                0x000000000045c68a                serverInit
-                0x000000000045c6a7                serverDialog
- .text          0x000000000045c84b       0x28 stubs.o
-                0x000000000045c84b                gramado_system_call
- .text          0x000000000045c873       0x49 socket.o
-                0x000000000045c873                listen
-                0x000000000045c87d                recv
-                0x000000000045c887                send
-                0x000000000045c891                shutdown
-                0x000000000045c89b                socket
- .text          0x000000000045c8bc       0x12 signal.o
-                0x000000000045c8bc                signal
-                0x000000000045c8c4                sigaction
+                0x000000000045c25b                pipe
+ .text          0x000000000045c27c       0x10 login.o
+                0x000000000045c27c                loginCheckPassword
+ .text          0x000000000045c28c      0x15a tests.o
+                0x000000000045c28c                testsTimerUpdateObject
+                0x000000000045c364                testsInitTimer
+ .text          0x000000000045c3e6       0x1b pixel.o
+                0x000000000045c3e6                gws_backbuffer_putpixel
+ .text          0x000000000045c401       0x2b line.o
+                0x000000000045c401                my_buffer_horizontal_line
+ .text          0x000000000045c42c       0x86 rect.o
+                0x000000000045c42c                drawDataRectangle
+ .text          0x000000000045c4b2      0x1c7 char.o
+                0x000000000045c4b2                my_buffer_char_blt
+                0x000000000045c4cf                set_char_width
+                0x000000000045c4dd                set_char_height
+                0x000000000045c4eb                get_char_width
+                0x000000000045c4f5                get_char_height
+                0x000000000045c4ff                gws_drawchar_transparent
+                0x000000000045c5b9                gws_draw_char
+ .text          0x000000000045c679      0x1f3 gws.o
+                0x000000000045c679                gws_init
+                0x000000000045c6ab                serverInit
+                0x000000000045c6c8                serverDialog
+ .text          0x000000000045c86c       0x28 stubs.o
+                0x000000000045c86c                gramado_system_call
+ .text          0x000000000045c894       0x49 socket.o
+                0x000000000045c894                listen
+                0x000000000045c89e                recv
+                0x000000000045c8a8                send
+                0x000000000045c8b2                shutdown
+                0x000000000045c8bc                socket
+ .text          0x000000000045c8dd       0x12 signal.o
+                0x000000000045c8dd                signal
+                0x000000000045c8e5                sigaction
                 0x000000000045d000                . = ALIGN (0x1000)
- *fill*         0x000000000045c8ce      0x732 
+ *fill*         0x000000000045c8ef      0x711 
 
 .iplt           0x000000000045d000        0x0
  .iplt          0x000000000045d000        0x0 signal.o
@@ -597,7 +598,7 @@ Linker script and memory map
  .rodata        0x00000000004633f8       0x54 char.o
  .rodata        0x000000000046344c       0x39 gws.o
 
-.eh_frame       0x0000000000463488     0x3200
+.eh_frame       0x0000000000463488     0x3220
  .eh_frame      0x0000000000463488       0x34 crt0.o
  .eh_frame      0x00000000004634bc      0xc88 main.o
                                         0xca0 (size before relaxing)
@@ -617,86 +618,86 @@ Linker script and memory map
                                         0x1f8 (size before relaxing)
  .eh_frame      0x0000000000465fa0       0x60 desktop.o
                                          0x78 (size before relaxing)
- .eh_frame      0x0000000000466000      0x37c unistd.o
-                                        0x394 (size before relaxing)
- .eh_frame      0x000000000046637c       0x20 login.o
+ .eh_frame      0x0000000000466000      0x39c unistd.o
+                                        0x3b4 (size before relaxing)
+ .eh_frame      0x000000000046639c       0x20 login.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000046639c       0x48 tests.o
+ .eh_frame      0x00000000004663bc       0x48 tests.o
                                          0x60 (size before relaxing)
- .eh_frame      0x00000000004663e4       0x20 pixel.o
+ .eh_frame      0x0000000000466404       0x20 pixel.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000466404       0x20 line.o
+ .eh_frame      0x0000000000466424       0x20 line.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000466424       0x20 rect.o
+ .eh_frame      0x0000000000466444       0x20 rect.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000466444       0xe0 char.o
+ .eh_frame      0x0000000000466464       0xe0 char.o
                                          0xf8 (size before relaxing)
- .eh_frame      0x0000000000466524       0x60 gws.o
+ .eh_frame      0x0000000000466544       0x60 gws.o
                                          0x78 (size before relaxing)
- .eh_frame      0x0000000000466584       0x24 stubs.o
+ .eh_frame      0x00000000004665a4       0x24 stubs.o
                                          0x3c (size before relaxing)
- .eh_frame      0x00000000004665a8       0xa0 socket.o
+ .eh_frame      0x00000000004665c8       0xa0 socket.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x0000000000466648       0x40 signal.o
+ .eh_frame      0x0000000000466668       0x40 signal.o
                                          0x58 (size before relaxing)
 
 .note.gnu.property
-                0x0000000000466688       0x1c
+                0x00000000004666a8       0x1c
  .note.gnu.property
-                0x0000000000466688       0x1c signal.o
+                0x00000000004666a8       0x1c signal.o
 
-.rel.dyn        0x00000000004666a4        0x0
- .rel.got       0x00000000004666a4        0x0 signal.o
- .rel.iplt      0x00000000004666a4        0x0 signal.o
- .rel.text      0x00000000004666a4        0x0 signal.o
+.rel.dyn        0x00000000004666c4        0x0
+ .rel.got       0x00000000004666c4        0x0 signal.o
+ .rel.iplt      0x00000000004666c4        0x0 signal.o
+ .rel.text      0x00000000004666c4        0x0 signal.o
 
-.data           0x00000000004666c0     0x4940
-                0x00000000004666c0                data = .
-                0x00000000004666c0                _data = .
-                0x00000000004666c0                __data = .
+.data           0x00000000004666e0     0x4920
+                0x00000000004666e0                data = .
+                0x00000000004666e0                _data = .
+                0x00000000004666e0                __data = .
  *(.data)
- .data          0x00000000004666c0      0x4c8 crt0.o
- *fill*         0x0000000000466b88       0x18 
- .data          0x0000000000466ba0      0x538 main.o
-                0x0000000000467040                running
-                0x0000000000467044                primary_prompt
-                0x0000000000467048                secondary_prompt
-                0x000000000046704c                mainwindow_used
-                0x0000000000467050                remember_on_history
-                0x0000000000467054                current_command_number
-                0x0000000000467058                bashrc_file
-                0x000000000046705c                shell_config_file
-                0x0000000000467060                long_args
- *fill*         0x00000000004670d8        0x8 
- .data          0x00000000004670e0      0x4a0 shellui.o
- .data          0x0000000000467580      0x440 api.o
- .data          0x00000000004679c0        0x0 ctype.o
- .data          0x00000000004679c0        0x0 stdio.o
- .data          0x00000000004679c0        0x8 stdlib.o
-                0x00000000004679c0                _infinity
- .data          0x00000000004679c8        0x0 string.o
- .data          0x00000000004679c8        0x0 conio.o
- *fill*         0x00000000004679c8       0x18 
- .data          0x00000000004679e0      0x4a0 builtins.o
- .data          0x0000000000467e80      0x4a8 desktop.o
-                0x0000000000468320                primary_desktop_folder
-                0x0000000000468324                secondary_desktop_folder
- .data          0x0000000000468328        0x0 unistd.o
- *fill*         0x0000000000468328       0x18 
- .data          0x0000000000468340      0x4a0 login.o
- .data          0x00000000004687e0      0x4a4 tests.o
-                0x0000000000468c80                deltaValue
- *fill*         0x0000000000468c84       0x1c 
- .data          0x0000000000468ca0      0x440 pixel.o
- .data          0x00000000004690e0      0x440 line.o
- .data          0x0000000000469520      0x440 rect.o
- .data          0x0000000000469960      0x440 char.o
- .data          0x0000000000469da0      0x840 gws.o
- .data          0x000000000046a5e0        0x0 stubs.o
- .data          0x000000000046a5e0        0x0 socket.o
- .data          0x000000000046a5e0        0x0 signal.o
+ .data          0x00000000004666e0      0x4c8 crt0.o
+ *fill*         0x0000000000466ba8       0x18 
+ .data          0x0000000000466bc0      0x538 main.o
+                0x0000000000467060                running
+                0x0000000000467064                primary_prompt
+                0x0000000000467068                secondary_prompt
+                0x000000000046706c                mainwindow_used
+                0x0000000000467070                remember_on_history
+                0x0000000000467074                current_command_number
+                0x0000000000467078                bashrc_file
+                0x000000000046707c                shell_config_file
+                0x0000000000467080                long_args
+ *fill*         0x00000000004670f8        0x8 
+ .data          0x0000000000467100      0x4a0 shellui.o
+ .data          0x00000000004675a0      0x440 api.o
+ .data          0x00000000004679e0        0x0 ctype.o
+ .data          0x00000000004679e0        0x0 stdio.o
+ .data          0x00000000004679e0        0x8 stdlib.o
+                0x00000000004679e0                _infinity
+ .data          0x00000000004679e8        0x0 string.o
+ .data          0x00000000004679e8        0x0 conio.o
+ *fill*         0x00000000004679e8       0x18 
+ .data          0x0000000000467a00      0x4a0 builtins.o
+ .data          0x0000000000467ea0      0x4a8 desktop.o
+                0x0000000000468340                primary_desktop_folder
+                0x0000000000468344                secondary_desktop_folder
+ .data          0x0000000000468348        0x0 unistd.o
+ *fill*         0x0000000000468348       0x18 
+ .data          0x0000000000468360      0x4a0 login.o
+ .data          0x0000000000468800      0x4a4 tests.o
+                0x0000000000468ca0                deltaValue
+ *fill*         0x0000000000468ca4       0x1c 
+ .data          0x0000000000468cc0      0x440 pixel.o
+ .data          0x0000000000469100      0x440 line.o
+ .data          0x0000000000469540      0x440 rect.o
+ .data          0x0000000000469980      0x440 char.o
+ .data          0x0000000000469dc0      0x840 gws.o
+ .data          0x000000000046a600        0x0 stubs.o
+ .data          0x000000000046a600        0x0 socket.o
+ .data          0x000000000046a600        0x0 signal.o
                 0x000000000046b000                . = ALIGN (0x1000)
- *fill*         0x000000000046a5e0      0xa20 
+ *fill*         0x000000000046a600      0xa00 
 
 .got            0x000000000046b000        0x0
  .got           0x000000000046b000        0x0 signal.o

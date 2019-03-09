@@ -308,4 +308,14 @@ int close (int fd)
 }
 
 
+int pipe ( int pipefd[2] )
+{
+    return (int) gramado_system_call ( 247, (unsigned long) pipefd, (unsigned long) pipefd, (unsigned long) pipefd );	
+}
+
+
+
+
+
+
 

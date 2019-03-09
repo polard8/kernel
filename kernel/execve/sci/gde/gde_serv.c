@@ -1595,18 +1595,24 @@ void *gde_services ( unsigned long number,
 			break;
 			
 		//reservado	
+		//>>>pipe	
 		case 247:
-			//return (void *) 
+			//#todo: rotina provisória
+			return (void *) sys_pipe ( (int *) arg2 ); 
 			break;
 			
 		//reservado	
+		//>>>read pipe	
 		case 248:
-			//return (void *) 
+			//#todo: rotina provisória
+			return (void *) sys_read_pipe ( (int) arg2, (int) arg3 );
 			break;
 			
 		//reservado	
+		//>>>>write pipe	
 		case 249:
-			//return (void *) 
+			//#todo: rotina provisória
+			return (void *) sys_write_pipe ( (int) arg2, (int) arg3 );
 			break;
 			
 			
