@@ -330,6 +330,7 @@
  *     Set 2016 - Revisão.
  *     ...
  */
+
 //NULL.
 #define	SYSTEMCALL_NULL  0
 

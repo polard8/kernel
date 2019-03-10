@@ -779,10 +779,6 @@
 #define COLOR_BLUE3COBALT 0x0050EF
 #define COLOR_BLUE4INDIGO 0x6A00FF
 
-//#testamdo transparência.
-#define xCOLOR_GRAY1_T    0x50202020  //cinza mais escuro
-#define COLOR_TERMINAL2_T 0x50303030
-
 // ## gray support ## 
 //cinza para pintar janela
 //a janela tem camadas que vai do mais escuro para o mais claro.

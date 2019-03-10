@@ -10,6 +10,11 @@
  
 //system calls.
 #include <stubs/gramado.h>  
+
+
+//#teste de compilação
+//deletar
+//#include <version.h>
  
  
 pid_t wait ( int *status )

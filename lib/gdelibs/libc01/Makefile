@@ -8,6 +8,14 @@ EXTRAVERSION = -rc0
 NAME = Gramado LibC
 
 
+# Target operating system.
+
+TARGETOS ?= gramado
+#TARGETOS ?= linux
+
+
+
+
 #STATIC_LIB = obj/lib/libc01.a
 #SHARED_LIB = obj/lib/libc01.so
 
@@ -47,39 +55,48 @@ main.o:
 all-c:
 
 #/ctype
-	gcc  -c  ctype/ctype.c    $(CFLAGS) -I include/ -o ctype.o
+	gcc  -c  ctype/ctype.c    $(CFLAGS) -I. -I include/ -o ctype.o
 	
 #/fscanf
-	gcc  -c  fscanf/fscanf.c  $(CFLAGS) -I include/ -o fscanf.o
+	gcc  -c  fscanf/fscanf.c  $(CFLAGS) -I. -I include/ -o fscanf.o
 
 #/signal
-	gcc  -c  signal/signal.c  $(CFLAGS) -I include/ -o signal.o
+	gcc  -c  signal/signal.c  $(CFLAGS) -I. -I include/ -o signal.o
 	
 #/socket
-	gcc  -c  socket/socket.c  $(CFLAGS) -I include/ -o socket.o
+	gcc  -c  socket/socket.c  $(CFLAGS) -I. -I include/ -o socket.o
 
 #/stdio 
-	gcc  -c  stdio/stdio.c    $(CFLAGS) -I include/ -o stdio.o	
+	gcc  -c  stdio/stdio.c    $(CFLAGS) -I. -I include/ -o stdio.o	
 	
 #/stdlib
-	gcc  -c  stdlib/stdlib.c  $(CFLAGS) -I include/ -o stdlib.o	
+	gcc  -c  stdlib/stdlib.c  $(CFLAGS) -I. -I include/ -o stdlib.o	
 	
 #/stubs	
-	gcc  -c  stubs/stubs.c    $(CFLAGS) -I include/ -o stubs.o		
+	gcc  -c  stubs/stubs.c    $(CFLAGS) -I. -I include/ -o stubs.o		
 	
 #/unistd
-	gcc  -c  unistd/unistd.c  $(CFLAGS) -I include/ -o unistd.o	
+	gcc  -c  unistd/unistd.c  $(CFLAGS) -I. -I include/ -o unistd.o	
 	
 	
 	
 # outros	
-	gcc  -c  conio.c   $(CFLAGS) -I include/ -o conio.o
-	gcc  -c  string.c  $(CFLAGS) -I include/ -o string.o	
-	gcc  -c  time.c    $(CFLAGS) -I include/ -o time.o	
-	gcc  -c  wait.c    $(CFLAGS) -I include/ -o wait.o		
-	gcc  -c  math.c    $(CFLAGS) -I include/ -o math.o			
+	gcc  -c  conio.c   $(CFLAGS) -I. -I include/ -o conio.o
+	gcc  -c  string.c  $(CFLAGS) -I. -I include/ -o string.o	
+	gcc  -c  time.c    $(CFLAGS) -I. -I include/ -o time.o	
+	gcc  -c  wait.c    $(CFLAGS) -I. -I include/ -o wait.o		
+	gcc  -c  math.c    $(CFLAGS) -I. -I include/ -o math.o			
 #...	
-		
+	
+	
+#ifeq ($(TARGETOS),gramado)
+#	gcc  -c  sysdeps/gramado/gramado.c  $(CFLAGS) -I. -I include/ -o gramado.o			
+#endif
+
+#ifeq ($(TARGETOS),linux)
+#	gcc  -c  sysdeps/gramado/linux.c  $(CFLAGS) -I. -I include/ -o linux.o	
+#endif	
+	
 
 #create 'ar'
 libc01-link:

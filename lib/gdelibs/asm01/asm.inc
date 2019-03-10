@@ -7,7 +7,6 @@ asm_system_call:
 	push ecx
 	push edx
 	
-    ;int 200
 	int 0x80 
 	
 	pop edx
@@ -34,7 +33,6 @@ asm_set_cursor:
 	mov ecx, dword [.y]
 	xor edx, edx 
 	
-	;int 200
 	int 0x80
 	
 	pop edx
@@ -86,7 +84,6 @@ getchar:
 	mov bl, 0       ; byte [.saveChar] 
 	mov al, 137     ;número do serviço
 	
-    ;int 200
 	int 0x80
 
 	pop edx
@@ -126,7 +123,6 @@ putchar:
 	mov bl, byte [.saveChar] 
 	mov al, 65     ;número do serviço
 	
-    ;int 200
     int 0x80
 	
 	;xor edx, edx	
