@@ -1,10 +1,13 @@
-#libc01
+
+# libc01
+# libc version 0.1 for GDE project.
+# 2018 -  Created by Fred Nora.
 
 
 VERSION = 0
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
+EXTRAVERSION = .0
 NAME = Gramado LibC
 
 
@@ -12,8 +15,6 @@ NAME = Gramado LibC
 
 TARGETOS ?= gramado
 #TARGETOS ?= linux
-
-
 
 
 #STATIC_LIB = obj/lib/libc01.a
@@ -109,7 +110,7 @@ finalize:
 	
 clean:
 	-rm *.o
-
 	
 	
-
+	
+	

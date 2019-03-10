@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION =
+EXTRAVERSION = -rc0
 #NAME = Gramado Core Shell
 
 
@@ -33,8 +33,8 @@ CFLAGS = -m32 \
 	-s
 
 
-LIBC    = ../../../../lib/gdelibs/libc01/include/
-LIBCOBJ = ../../../../lib/gdelibs/libc01/obj
+LIBC    = ../../../../lib/gdelibs/libc02/include/
+LIBCOBJ = ../../../../lib/gdelibs/libc02/obj
 
 
 API01   = ../../../../lib/gdelibs/api01/include/
@@ -49,33 +49,14 @@ GWS    = gws/include/
 	##
 	## Objects
 	##
-#myObjects = head.o \
-
-
-
-myObjects = crt0.o \
-main.o \
-shellui.o \
-api.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-conio.o \
-builtins.o \
-desktop.o \
-unistd.o \
-login.o \
-tests.o\
-pixel.o \
-line.o \
-rect.o \
-char.o \
-gws.o \
+	
+	
+myObjects = crt0.o main.o \
 stubs.o \
-socket.o \
-signal.o    
-
+ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
+api.o \
+shellui.o builtins.o desktop.o login.o tests.o \
+pixel.o line.o rect.o char.o gws.o    
 
 
 
