@@ -2993,31 +2993,32 @@ done:
 };
 
 
+/*
+ **********
+ * apiSendMessage:
+ *     Envia uma mensagem para a thread atual.	
+ *     Isso funcionou.
+ */
 
-//Coloca uma mensagem na estrutura de uma janela.
-//ainda não temos filas de mensagem, então mensagens podem se perder 
-//sendo sobrepostas.
-unsigned long apiSendMessage ( struct window_d *window, 
-                               int message,
-                               unsigned long long1,
-                               unsigned long long2 )
+unsigned long 
+apiSendMessage ( struct window_d *window, 
+                 int message,
+                 unsigned long long1,
+                 unsigned long long2 )
 {	
-	
 	unsigned long message_buffer[5];
 	
-	//enterCriticalSection();
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
-	message_buffer[3] = (unsigned long) long2;  	
-	
+	message_buffer[3] = (unsigned long) long2;
+	//...
 	
 	return (unsigned long) system_call ( 114 , 
-	                                     (unsigned long) &message_buffer[0], 
-										 (unsigned long) &message_buffer[0], 
-										 (unsigned long) &message_buffer[0] );	
-};	
-
+	                           (unsigned long) &message_buffer[0], 
+	                           (unsigned long) &message_buffer[0], 
+	                           (unsigned long) &message_buffer[0] );
+}
 
 
 int apiDrawText ( struct window_d *window, 

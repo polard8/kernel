@@ -2923,7 +2923,9 @@ struct timer_d
  * Retorno:
  *     ?? 
  */
-int apiSystem(const char *command);
+
+int apiSystem (const char *command);
+#define gde_system apiSystem
 
 
 /*
@@ -2941,165 +2943,195 @@ int apiSystem(const char *command);
  *    ecx = arg3.
  *    edx = arg4.
  */
-void *system_call( unsigned long ax, 
-                   unsigned long bx, 
-				   unsigned long cx, 
-				   unsigned long dx );
-				   
+
+void *system_call ( unsigned long ax, 
+                    unsigned long bx, 
+                    unsigned long cx, 
+                    unsigned long dx );
+#define gde_system_call system_call
+
+
+
 //
 // As chamadas system1 à system15 poderão ser revistas
 // atribuindo a elas uma destinação mais importante.
 //
 
 //Print pixel.
-int system1( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-			 
+int system1 ( unsigned long ax, 
+              unsigned long bx, 
+			  unsigned long cx, 
+			  unsigned long dx );
+#define gde_system1 system1			 
+
+
 //Print horizontal line.
 int system2( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
-			 
-//Ret�ngulo.
+#define gde_system2 system2
+
+
+//
 int system3( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
-//Putch.
+#define gde_system3 system3
+
+
+//.
 int system4( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
-			 
-//Print string.
+#define gde_system4 system4
+
+
+//
 int system5( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
-			 
-//Message box - Buffer. 
+#define gde_system5 system5
+
+
+//. 
 int system6( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
+#define gde_system6 system6
+
+
 //
 int system7( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
+#define gde_system7 system7
+
+
 //
 int system8( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
-			 
-//  Chama o procedimento da vez. - executa outro procedimento
+#define gde_system8 system8
+
+
 int system9( unsigned long ax, 
              unsigned long bx, 
 			 unsigned long cx, 
 			 unsigned long dx );
-			 
+#define gde_system9 system9
+
+
 //
 int system10( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx );
-			  
+#define gde_system10 system10
+
+
 //
 int system11( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx );
+#define gde_system11 system11
+
+
 //
 int system12( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx );
+#define gde_system12 system12
+
+
 //
 int system13( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx );
+#define gde_system13 system13
+
+
 //
 int system14( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx );
+#define gde_system14 system14
+
+
 //
 int system15( unsigned long ax, 
               unsigned long bx, 
 			  unsigned long cx, 
 			  unsigned long dx );
+#define gde_system15 system15
 
 
-			  
-			  
+
 /*
  * Outras chamadas.
  */
 
  
-//int 200 - serviço 14.
-int edit_box( unsigned long x,  
-              unsigned long y, 
-			  unsigned long height, 
-			  unsigned long width ); 
- 
+//int 0x80 - serviço 14.
+int 
+edit_box ( unsigned long x,  
+           unsigned long y, 
+           unsigned long height, 
+           unsigned long width ); 
+#define gde_edit_box edit_box 
+
+
 //
 // Messages support, (IPC).
 // 
 
-//int 200 - serviço 17.
+//int 0x80 - serviço 17.
 //??rever isso
-int SetNextWindowProcedure(unsigned long next_procedure);
+
+int SetNextWindowProcedure (unsigned long next_procedure);
+#define gde_SetNextWindowProcedure SetNextWindowProcedure
 
 
-//??rever isso
-//@todo: traduzir para inglês.
-int chama_procedimento(unsigned long proximo_procedure);  
+int gde_call_procedure ( unsigned long procedure ); 
  
  
 //Carrega bitmap 16x16.
-void carrega_bitmap_16x16( unsigned long img_address, 
-                           unsigned long x, 
-						   unsigned long y );
+void gde_load_bitmap_16x16 ( unsigned long img_address, 
+                             unsigned long x, 
+                             unsigned long y );
+#define carrega_bitmap_16x16 gde_load_bitmap_16x16 
 
-//int 200 - serviço 241.
-void apiInitBackground();
 
-//Message Box.
+//int 0x80 - serviço 241.
+void apiInitBackground ();
+#define gde_init_background apiInitBackground
+
+
 int MessageBox ( int type, char *string1, char *string2 );
+#define gde_message_box MessageBox
+
+
 int DialogBox ( int type, char *string1, char *string2 );
+#define gde_dialog_box DialogBox
+
 
 /*
  * call_kernel:
  *      Chama os serviços do Kernel.
  */
-int call_kernel( unsigned long int_number, 
-                 unsigned long service_number, 
-                 unsigned long arg1, 
-                 unsigned long arg2, 
-                 unsigned long arg3, 
-                 unsigned long arg4,
-                 unsigned long arg5, 
-                 unsigned long arg6, 
-                 unsigned long arg7, 
-                 unsigned long arg8,
-                 unsigned long arg9, 
-                 unsigned long arg10, 
-                 unsigned long arg11, 
-                 unsigned long arg12 );
 
-				 
-/*
- * call_gui:
- *     Chama os serviços de GUI.
- *     Chama os serviços da GUI que estão em Kernel Mode.
- */
-int call_gui( unsigned long int_number, 
+int 
+call_kernel ( unsigned long int_number, 
               unsigned long service_number, 
               unsigned long arg1, 
               unsigned long arg2, 
@@ -3113,8 +3145,32 @@ int call_gui( unsigned long int_number,
               unsigned long arg10, 
               unsigned long arg11, 
               unsigned long arg12 );
-			  
-	
+#define gde_call_kernel call_kernel
+
+
+/*
+ * call_gui:
+ *     Chama os serviços de GUI.
+ *     Chama os serviços da GUI que estão em Kernel Mode.
+ */
+
+int 
+call_gui ( unsigned long int_number, 
+           unsigned long service_number, 
+           unsigned long arg1, 
+           unsigned long arg2, 
+           unsigned long arg3, 
+           unsigned long arg4,
+           unsigned long arg5, 
+           unsigned long arg6, 
+           unsigned long arg7, 
+           unsigned long arg8,
+           unsigned long arg9, 
+           unsigned long arg10, 
+           unsigned long arg11, 
+           unsigned long arg12 );
+#define gde_call_gui call_gui
+
 
 
 //
@@ -3124,7 +3180,7 @@ int call_gui( unsigned long int_number,
 					   
 /*
  **********************************************************
- * APICreateWindow: 
+ * gde_create_window: 
  *     Cria uma janela com base em uma struct.
  *     Retorna o endereço da estrutura da janela criada. 
  *     Para que possa ser registrada na lista windowList[].
@@ -3182,88 +3238,125 @@ int gde_get_focus ();
 
 
 //Kill Focus.
-int APIKillFocus(struct window_d *window);
+int APIKillFocus (struct window_d *window);
+#define gde_kill_focus APIKillFocus
+
 
 //Set Active Window.
-int APISetActiveWindow(struct window_d *window);
+int APISetActiveWindow (struct window_d *window);
+#define gde_set_active_window APISetActiveWindow
+
 
 //Get Active Window.
-int APIGetActiveWindow();
+int APIGetActiveWindow ();
+#define gde_get_active_window APIGetActiveWindow
+
 
 //Client area.
-void *apiGetClientAreaRect();
-void apiSetClientAreaRect(struct rect_d *r);
+void *apiGetClientAreaRect ();
+#define gde_get_client_area_rect apiGetClientAreaRect
+
+
+void apiSetClientAreaRect (struct rect_d *r);
+#define gde_set_client_area_rect apiSetClientAreaRect
+
 
 //resize
-void APIresize_window( struct window_d *window, 
-                       unsigned long x, 
-					   unsigned long y );
-					   
+void APIresize_window ( struct window_d *window, 
+                        unsigned long x, 
+					    unsigned long y );
+#define gde_resize_window APIresize_window
+
+
 //redraw					   
-void APIredraw_window( struct window_d *window, 
-                       unsigned long flags );
+void APIredraw_window ( struct window_d *window, 
+                        unsigned long flags );
+#define gde_redraw_window APIredraw_window
+
 
 //replace
-void APIreplace_window( struct window_d *window, 
-                        unsigned long x, 
-						unsigned long y );
-
+void APIreplace_window ( struct window_d *window, 
+                         unsigned long x, 
+						 unsigned long y );
+#define gde_replace_window APIreplace_window
 	
+
 //torna visível uma janela.
 //refresh	
 void apiShowWindow (struct window_d *window);
-						
+#define gde_show_window apiShowWindow
+
+
 //max
-void APImaximize_window(struct window_d *window);
+void APImaximize_window (struct window_d *window);
+#define gde_maximize_window APImaximize_window
+
 
 //min
-void APIminimize_window(struct window_d *window);
+void APIminimize_window (struct window_d *window);
+#define gde_minimize_window APIminimize_window
+
 
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
-void APIupdate_window(struct window_d *window);
+void APIupdate_window (struct window_d *window);
+#define gde_update_window APIupdate_window
 
-void *APIget_foregroung_window();
-void APIset_foregroung_window(struct window_d *window);
-	
+
+void *APIget_foregroung_window ();
+#define gde_get_foreground_window APIget_foregroung_window
+
+
+void APIset_foregroung_window (struct window_d *window);
+#define gde_set_foreground_window APIset_foregroung_window	
+
+
 //
 // Char support.
 //	
 	
 //put char.
 //@todo: Mudar argumento para *ch.
-void put_char( unsigned long x,  
-               unsigned long y,  
-			   unsigned long color, 
-			   unsigned char *ch );
-	
+
+void 
+put_char ( unsigned long x,  
+           unsigned long y,  
+           unsigned long color, 
+           unsigned char *ch );
+#define gde_put_char put_char
+
 
 //
 // ## String support ##
 //
 
 //compare
-int api_strncmp(char *s1, char *s2, int len);
+int api_strncmp (char *s1, char *s2, int len);
+#define gde_strncmp api_strncmp
+
 
 
 /*
  ***************************************
  * print_string:
- *     int 200 - serviço 10.
+ *     int 0x80 - serviço 10.
  */
+
 void 
-print_string( unsigned long x,  
-              unsigned long y,  
-		      unsigned long color, 
-			  unsigned char *string );
+print_string ( unsigned long x,  
+               unsigned long y,  
+               unsigned long color, 
+               unsigned char *string );
+#define gde_print_string print_string
+
 
 
 //
 // Buffer support.
 //
 
-//int 200 - serviços - 1,2,3,4,5,6,7,8,9.
-void refresh_buffer(unsigned long n);
-
+//int 0x80 - serviços - 1,2,3,4,5,6,7,8,9.
+void refresh_buffer (unsigned long n);
+#define gde_refresh_buffer refresh_buffer
 
 
 //
@@ -3271,34 +3364,48 @@ void refresh_buffer(unsigned long n);
 //
 
 //Refresh screen.
-void api_refresh_screen();
-void refresh_screen();
+void refresh_screen ();
+void api_refresh_screen ();
+#define gde_refresh_screen api_refresh_screen
 
-//int 200 - serviço 15. 
-int vsync();
+
+
+//int 0x80 - serviço 15. 
+int vsync ();
+#define gde_vsync vsync
 
 
 //
 // Shutdown support.
 //
 
-//int 200 - serviço 220 - (shut down).
+//int 0x80 - serviço 220 - (shut down).
 //@todo: Usar esse serviço pra desligar a máquina e não pra reboot.
-void apiShutDown();
+
+void apiShutDown ();
+#define gde_shutdown apiShutDown
+
 
 //
 // Reboot support.
 //
 
-void apiReboot();
+void apiReboot ();
+#define gde_reboot apiReboot
+
 
 //
 // Cursor support.
 //
 
-unsigned long apiGetCursorX();
-unsigned long apiGetCursorY();
-void apiSetCursor( unsigned long x, unsigned long y);
+unsigned long apiGetCursorX ();
+#define gde_get_cursor_x apiGetCursorX
+
+unsigned long apiGetCursorY ();
+#define gde_get_cursor_y apiGetCursorY
+
+void apiSetCursor ( unsigned long x, unsigned long y);
+#define gde_setcursor apiSetCursor
 
 
 //
@@ -3325,31 +3432,42 @@ void *gde_create_thread ( unsigned long init_eip,
 #define apiCreateThread gde_create_thread 
 
 
+
 //Mostra informações sobre o processo atual.	
-void APIShowCurrentProcessInfo();
+void APIShowCurrentProcessInfo ();
+#define gde_show_current_process_info APIShowCurrentProcessInfo
+
+
 
 //Torna zombie a thread atual.
 //Obs: Um processo fecha quando fecha a thread principal.
 //@todo: Isso não deveria fechar um processo.
 //#bugbug: O lugar dessa função é na stdlib, então mudaremos de nome aqui.
 //void exit(int exit_code);
-void apiExit(int exit_code);	
+
+void apiExit (int exit_code);	
+#define gde_exit apiExit
 
 
 //Destrói a thread atual.
-void kill(int exit_code);	
-	
+void kill (int exit_code);	
+#define gde_kill kill	
 
 
 //coloca no estado standby para executar pela primeira vez.					   
-void apiStartThread(void *Thread); 
+void apiStartThread (void *Thread); 
+#define gde_start_thread apiStartThread
+
+
 
 //
 // File support.
 //
 
 //Open file.
-void *apiFOpen(const char *filename, const char *mode);
+void *apiFOpen (const char *filename, const char *mode);
+#define gde_fopen apiFOpen
+
 
 
 /*
@@ -3369,17 +3487,27 @@ gde_save_file ( char *file_name,
 
 
 //Operação down em um semáforo indicado no argumento.
-void apiDown(struct semaphore_d *s);
+void apiDown (struct semaphore_d *s);
+#define gde_down apiDown
+
 
 //Operação up em um semáforo indicado no argumento.
-void apiUp(struct semaphore_d *s);
-
+void apiUp (struct semaphore_d *s);
+#define gde_up apiUp
 
 
 //Critical section support.
-void enterCriticalSection();         //P (Proberen) testar.
-void exitCriticalSection();          //V (Verhogen)incrementar.
-void initializeCriticalSection();    //Inicializa em 1
+
+void enterCriticalSection ();         //P (Proberen) testar.
+#define gde_enter_critical_section enterCriticalSection
+
+
+void exitCriticalSection ();          //V (Verhogen)incrementar.
+#define gde_exit_critical_section exitCriticalSection
+
+
+void initializeCriticalSection ();    //Inicializa em 1
+#define gde_initialize_critical_section initializeCriticalSection
 
 
 //Paint support.
@@ -3391,8 +3519,8 @@ void gde_end_paint ();
 #define apiEndPaint gde_end_paint
 
 
-void apiPutChar( int c );
-
+void apiPutChar ( int c );
+#define gde_putchar apiPutChar
 
 
 
@@ -3403,23 +3531,37 @@ void apiPutChar( int c );
  *     Usado pelos aplicativos ao fim dos seus 
  * procedimentos de janela.
  */
+
 unsigned long 
-apiDefDialog( struct window_d *window, 
+apiDefDialog ( struct window_d *window, 
               int msg, 
 			  unsigned long long1, 
 			  unsigned long long2 );
+#define gde_def_dialog apiDefDialog
+
 			  
-			  
-unsigned long apiGetSystemMetrics( int index );
+unsigned long apiGetSystemMetrics ( int index );
+#define gde_get_system_metrics apiGetSystemMetrics
+
 
 
 void api_set_current_keyboard_responder( int i );
+#define gde_set_current_keyboard_responder api_set_current_keyboard_responder
+
 int api_get_current_keyboard_responder();
+#define gde_get_current_keyboard_responder api_get_current_keyboard_responder
+
 void api_set_current_mouse_responder( int i );
+#define gde_set_current_mouse_responder api_set_current_mouse_responder
+
 int api_get_current_mouse_responder();
+#define gde_get_current_mouse_responder api_get_current_mouse_responder
 
 void api_set_window_with_text_input( struct window_d *window );
+#define gde_set_window_with_text_input api_set_window_with_text_input
+
 int api_get_window_with_text_input();
+#define gde_get_window_with_text_input api_get_window_with_text_input
 
 
 /*
@@ -3427,63 +3569,88 @@ int api_get_window_with_text_input();
  * gramadocore_init_execve:
  *     Um execve apenas para o ambiente gramado core.
  *     Roda usando o processo init.
- *
  */
-int gramadocore_init_execve( const char *filename, 
-            const char *argv[], 
-            const char *envp[] ); 
-			
-							 
 
-			
-			
-			
+int 
+gramadocore_init_execve ( const char *filename, 
+                          const char *argv[], 
+                          const char *envp[] ); 
 
-int apiDialog( const char *string );
+#define gde_gramadocore_init_execve gramadocore_init_execve
 
-int api_getchar();
+
+
+
+int apiDialog ( const char *string );
+#define gde_dialog apiDialog
+
+
+int api_getchar ();
+#define gde_getchar  api_getchar
 
 
 /*
  * apiDisplayBMP:
  */
-int apiDisplayBMP ( char *address, 
-                    unsigned long x, 
-				    unsigned long y );
-				   
-				   
-			     
-//Coloca uma mensagem na estrutura de uma janela.				   
-unsigned long apiSendMessage ( struct window_d *window, 
-                               int message,
-                               unsigned long long1,
-                               unsigned long long2 );
+
+int 
+apiDisplayBMP ( char *address, 
+                unsigned long x, 
+                unsigned long y );
+#define gde_display_bmp apiDisplayBMP
 
 
 
-							   
-int apiDrawText ( struct window_d *window, 
-                  unsigned long x, 
-				  unsigned long y, 
-				  unsigned long color, 
-				  char *string );
+// Envia uma mensagem para a thread de controle de um dado processo.
+unsigned long 
+apiSendMessageToProcess ( int pid, 
+						  struct window_d *window, 
+                          int message,
+                          unsigned long long1,
+                          unsigned long long2 );
+
+#define gde_send_message_to_process apiSendMessageToProcess
+
+
+//Envia uma mensagem para a thread atual.					   
+unsigned long 
+apiSendMessage ( struct window_d *window, 
+                 int message,
+                 unsigned long long1,
+                 unsigned long long2 );
+#define gde_send_message apiSendMessage
+
+			   
+int 
+apiDrawText ( struct window_d *window, 
+              unsigned long x, 
+			  unsigned long y, 
+			  unsigned long color, 
+			  char *string );
 				  
-				  
+#define gde_draw_text apiDrawText			
+
+// ???
 struct window_d *apiGetWSScreenWindow ();
+#define gde_get_ws_screen_window apiGetWSScreenWindow 
+
+
+// ???
 struct window_d *apiGetWSMainWindow ();
+#define gde_get_ws_main_window apiGetWSMainWindow
 
 
 //create timer;
 struct timer_d *apiCreateTimer ( struct window_d *window, 
                                  unsigned long ms, 
 								 int type );
+#define gde_create_timer apiCreateTimer
+
+
 
 // pega informações varidas sobre o sys time.
 unsigned long apiGetSysTimeInfo ( int n );
-
-//
-//...
-//
+#define gde_get_sys_time_info apiGetSysTimeInfo
 
 //
 // End.

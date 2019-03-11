@@ -3424,14 +3424,12 @@ int apiDisplayBMP ( char *address,
 				    unsigned long y );
 				   
 				   
-			     
-//Coloca uma mensagem na estrutura de uma janela.				   
-unsigned long apiSendMessage ( struct window_d *window, 
-                               int message,
-                               unsigned long long1,
-                               unsigned long long2 );
-
-
+// Envia uma mensagem para a thread atual.	
+unsigned long 
+apiSendMessage ( struct window_d *window, 
+                 int message,
+                 unsigned long long1,
+                 unsigned long long2 );
 
 							   
 int apiDrawText ( struct window_d *window, 

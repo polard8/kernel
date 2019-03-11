@@ -76,6 +76,11 @@ struct window_d *dialogbox_button1;
 struct window_d *dialogbox_button2;
 
 
+//
+// Protótipos de funções internas.
+//
+
+
 unsigned long 
 mbProcedure ( struct window_d *window, 
               int msg, 
@@ -772,7 +777,7 @@ int edit_box ( unsigned long x,
  *     Chama o proximo procesimento de janela.
  *     Obs: Lembrando que estamos usando endereços lógicos.  (rever) */
 
-int chama_procedimento (unsigned long proximo_procedure){
+int gde_call_procedure ( unsigned long procedure ){
 	
     //system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
 	//return (int) 0;
@@ -825,7 +830,7 @@ put_char ( unsigned long x,
 
 
 /*
- * carrega_bitmap_16x16:
+ *  :
  *     Coloca um bitmap no buffer.
  *     interrupção 200, serviço SYSTEMCALL_LOAD_BITMAP_16x16, 
  *     pôe um bitmap no buffer.
@@ -842,11 +847,11 @@ put_char ( unsigned long x,
  */
 
 void 
-carrega_bitmap_16x16 ( unsigned long img_address, 
-                       unsigned long x, 
-					   unsigned long y )                           
+gde_load_bitmap_16x16 ( unsigned long img_address, 
+                        unsigned long x, 
+                        unsigned long y )
 {
-    system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 	
+    system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 
 }
 
 
@@ -2032,7 +2037,8 @@ void dead_thread_collector (){
 /*
  * api_strncmp:
  *     Compara duas strings.
- *     @todo: Isso deve ser oferecido peloa libC e não pela api. */
+ *     @todo: Isso deve ser oferecido peloa libC e não pela api. 
+ */
 
 int api_strncmp (char *s1, char *s2, int len){
 	
@@ -2186,8 +2192,7 @@ void apiStartThread (void *Thread){
 
     system_call ( SYSTEMCALL_STARTTHREAD, (unsigned long) Thread, 
 		(unsigned long) Thread, (unsigned long) Thread );	
-};
-
+}
 
 
 /*
@@ -2587,7 +2592,7 @@ int apiDialog ( const char *string ){
 	        switch (ch)
             {
 				case VK_RETURN:
-				    goto done;
+				    return (int) Status;
                     break;				
 					
 			    case 'Y':
@@ -2609,10 +2614,9 @@ int apiDialog ( const char *string ){
 		
 		asm ("pause");
 	};
-    
-done:		
+	
     return (int) Status;
-};
+}
 
 
 int api_getchar (){
@@ -2990,55 +2994,77 @@ done:
 };
 
 
-
-//Coloca uma mensagem na estrutura de uma janela.
-//ainda não temos filas de mensagem, então mensagens podem se perder 
-//sendo sobrepostas.
-unsigned long apiSendMessage ( struct window_d *window, 
-                               int message,
-                               unsigned long long1,
-                               unsigned long long2 )
-{	
-	
+// Envia uma mensagem para a trhead de controle de um dado processo.
+unsigned long 
+apiSendMessageToProcess ( int pid, 
+                          struct window_d *window, 
+                          int message,
+                          unsigned long long1,
+                          unsigned long long2 )
+{
 	unsigned long message_buffer[5];
-	
-	//enterCriticalSection();
+
+	message_buffer[0] = (unsigned long) window;
+	message_buffer[1] = (unsigned long) message;
+	message_buffer[2] = (unsigned long) long1;
+	message_buffer[3] = (unsigned long) long2;
+	//...
+
+	return (unsigned long) system_call ( 114 , 
+	                           (unsigned long) &message_buffer[0], 
+	                           (unsigned long) pid, 
+	                           (unsigned long) pid );
+}
+
+
+/*
+ **********
+ * apiSendMessage:
+ *     Envia uma mensagem para a thread atual.	
+ *     Isso funcionou.
+ */
+
+unsigned long 
+apiSendMessage ( struct window_d *window, 
+                 int message,
+                 unsigned long long1,
+                 unsigned long long2 )
+{		
+	unsigned long message_buffer[5];
+
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
 	message_buffer[3] = (unsigned long) long2;  	
-	
-	
+
 	return (unsigned long) system_call ( 114 , 
-	                                     (unsigned long) &message_buffer[0], 
-										 (unsigned long) &message_buffer[0], 
-										 (unsigned long) &message_buffer[0] );	
-};	
+	                           (unsigned long) &message_buffer[0], 
+	                           (unsigned long) &message_buffer[0], 
+	                           (unsigned long) &message_buffer[0] );
+}
 
 
-
-int apiDrawText ( struct window_d *window, 
-                  unsigned long x, 
-				  unsigned long y, 
-				  unsigned long color, 
-				  char *string )
+int 
+apiDrawText ( struct window_d *window, 
+              unsigned long x, 
+              unsigned long y, 
+              unsigned long color, 
+              char *string )
 {
-	
 	unsigned long msg[8];
 	
-    msg[0] = (unsigned long) window;
+	msg[0] = (unsigned long) window;
 	msg[1] = (unsigned long) x;
 	msg[2] = (unsigned long) y;
 	msg[3] = (unsigned long) color;
 	msg[4] = (unsigned long) string;
 	//...
 	
-	return (int) system_call ( SYSTEMCALL_DRAWTEXT , 
+	return (int) system_call ( SYSTEMCALL_DRAWTEXT, 
 	                (unsigned long) &msg[0], 
-					(unsigned long) &msg[0], 
-					(unsigned long) &msg[0] );		
-};
-
+	                (unsigned long) &msg[0], 
+	                (unsigned long) &msg[0] );
+}
 
 
 struct window_d *apiGetWSScreenWindow (){
