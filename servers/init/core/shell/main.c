@@ -3476,12 +3476,8 @@ do_compare:
     // Envia uma mensagem para a thread atual.
     // Nesse caso a thread atual é essa mesma, que é a thread de controle
 	// do processo shell.
+	// Isso funcionou bem.
 	// ex: Chama message box com mensagem about.
-	
-	// #todo
-	// Podemos criar uma variação dessa chamada, que envie a mensagem para
-	// a thread de controle de um processo dado o seu PID.
-	// Ou que tenha a identificação de quem envia e de quem recebe.
 	
 	if ( strncmp( prompt, "t11", 3 ) == 0 )
     {    

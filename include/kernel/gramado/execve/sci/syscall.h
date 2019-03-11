@@ -236,14 +236,17 @@
 
 //Outros. @todo: mensagem  
 #define	SYS_111 111   //#mensagem.pega 4 elementos.
-#define	SYS_112 112
+
+//Enviar uma mensagem para a thread de controle de um processo.
+#define	SYS_SENDMESSAGETOPROCESS 112
+
 
 //janela
 // 113 Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 #define	SYS_113 113  
 
-//  ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
-#define	SYS_SENDWINDOWMESSAGE 114  
+// Envia uma mensagem para a thread atual.	 
+#define	SYS_SENDMESSAGETOCURRENTTHREAD 114  
 
 //outros.
 //#importante 

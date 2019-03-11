@@ -871,6 +871,14 @@ void *gde_services ( unsigned long number,
 				
 			};
 		    break;
+			
+		//112	
+		//Enviar uma mensagem para a thread de controle de um processo.	
+		case SYS_SENDMESSAGETOPROCESS:
+			// arg2, arg3
+			// endereço do buffer da mensagem, pid
+			services_send_message_to_process ( (unsigned long) &message_address[0], (int) arg3 );
+			break;
 		
 		//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 		case 113:
@@ -879,8 +887,7 @@ void *gde_services ( unsigned long number,
 			
 		// 114	
         // Envia uma mensagem para a thread atual.	
-			
-		case SYS_SENDWINDOWMESSAGE:
+		case SYS_SENDMESSAGETOCURRENTTHREAD:	
 			// endereço do buffer da mensagem, tid.
 			services_send_message_to_thread ( (unsigned long) &message_address[0], (int) current_thread );
 		    break;
@@ -1877,6 +1884,56 @@ void services_send_message_to_thread ( unsigned long msg_buffer, int tid )
 		};
 	};	
 }
+
+// Envia uma mensagem para a thread de controle de um processo.
+// #todo: Isso deveria ir para o IPC.
+void services_send_message_to_process ( unsigned long msg_buffer, int pid )
+{
+	struct process_d *p;
+	struct thread_d *t;
+	
+	if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
+	{
+	    printf ("?: services_send_message_to_process: Fail, Pid \n");
+		refresh_screen ();
+		return;
+	}
+	
+	//PID OK.
+	p = ( void *) processList[pid];
+	
+	if ( (void *) p == NULL )
+	{
+	    printf ("?: services_send_message_to_process: Fail, struct \n");
+		refresh_screen ();
+		return;	
+	}else{
+	
+		 if ( p->used != 1 || p->magic != 1234 )
+		 {
+			 //fail, validation
+			 return;
+		 }
+		
+		 // Thread de controle.
+	     // #todo: Isso ainda não foi bem trabalhado na estrutura do processo
+		 // na hora da criação do processo.
+		 t = p->control; 
+		
+		 if ( (void *) t == NULL )
+		 {
+		     if ( t->used != 1 || t->magic != 1234 )
+			 {
+				 //fail, validation
+				 return;
+			 }
+		
+			 services_send_message_to_thread ( (unsigned long) msg_buffer, (int) t->tid );   
+		 }
+	};
+}
+
+
 
 
 
