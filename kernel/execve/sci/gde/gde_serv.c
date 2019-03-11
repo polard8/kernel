@@ -12,8 +12,10 @@
  *
  *
  * In this file:
- *   + services: (public)
- *   + servicesChangeProcedure: (private)
+ *   + services (main function)
+ *   + servicesPutChar
+ *   + services_send_message_to_thread
+ *   + serviceCreateWindow
  *
  * History:
  *     2015 - Created by Fred Nora.
@@ -876,40 +878,13 @@ void *gde_services ( unsigned long number,
 			break;
 			
 		// 114	
-        // ## ENVIA UMA MENSAGEM PARA UMA JANELA ##
-		
-		//enviar uma mensagem para a thread atual.
-		//
+        // Envia uma mensagem para a thread atual.	
+			
 		case SYS_SENDWINDOWMESSAGE:
-		    if ( &message_address[0] == 0 )
-			{
-				printf("114: null pointer");
-				die();
-			}else{
-				
-				//hWnd = (struct window_d *) message_address[0];
-				//hWnd = (void *) windowList[window_with_focus];
-				t = (void *) threadList[current_thread];
-				//if ( (void *) == NULL )
-				//{
-				//	return NULL;
-				//}
-				//temos que checar a validade.
-				if ( (void *) t != NULL )
-                {
-                    if ( t->used == 1 && t->magic == 1234 ){					
-				        
-						t->window = (struct window_d *) message_address[0];
-				        t->msg = (int) message_address[1];
-				        t->long1 = (unsigned long) message_address[2];
-				        t->long2 = (unsigned long) message_address[3];
-				
-				        //sinalizando que temos uma mensagem.
-				        t->newmessageFlag = 1; 
-					};
-			    };
-			};
+			// endereço do buffer da mensagem, tid.
+			services_send_message_to_thread ( (unsigned long) &message_address[0], (int) current_thread );
 		    break;
+			
 			
 		// 115 - ## IMPORTANTE ## 
 		// Usado por servidores do sistema para se comunicarem 
@@ -1858,26 +1833,54 @@ void servicesPutChar ( int c ){
 }
  
  
-/*
- * servicesChangeProcedure:
- *     Função interna. 
- *     Atende a interrupção 201, mudando o procedimento de janela atual.
- *     @todo: Passar argumento via registrador. ??
- *     @todo: Outra função já esta fazendo isso, deletar essa.
- */
+// Envia uma mensagem para a thread atual.
+// #todo: Isso deveria ir para o IPC.
+void services_send_message_to_thread ( unsigned long msg_buffer, int tid )
+{	
+    unsigned long *buffer = (unsigned long *) msg_buffer;
 
-void servicesChangeProcedure (){	
-	//return;
+	struct thread_d *t;
+	
+	//#importante
+	//Temos que checar o endereço andes de acessá-lo.
+	
+	
+	if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+	{
+	    printf ("114: services_send_message_to_corrent_thread: Fail, tid \n");
+		refresh_screen ();
+		return;
+	}
+			
+    if ( &buffer[0] == 0 )
+	{
+	    printf ("114: services_send_message_to_corrent_thread: Fail, null pointer\n");
+		refresh_screen ();
+		return;
+		
+	}else{
+				
+		t = (void *) threadList[tid];
+				
+	    if ( (void *) t != NULL )
+        {
+            if ( t->used == 1 && t->magic == 1234 )
+			{					    
+			    t->window = (struct window_d *) buffer[0];
+			    t->msg = (int) buffer[1];
+			    t->long1 = (unsigned long) buffer[2];
+			    t->long2 = (unsigned long) buffer[3];
+				
+				//sinalizando que temos uma mensagem.
+			    t->newmessageFlag = 1; 
+			};
+		};
+	};	
 }
 
 
 
-
-
-
-
-
 //
-// Fim.
+// End.
 //
 

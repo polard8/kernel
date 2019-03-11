@@ -26,7 +26,7 @@
 
 
 void servicesPutChar ( int c );
-void servicesChangeProcedure();
+void services_send_message_to_thread ( unsigned long msg_buffer, int tid );
 unsigned long serviceCreateWindow ( char * message_buffer );
 
 

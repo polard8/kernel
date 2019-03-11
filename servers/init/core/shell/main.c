@@ -2652,7 +2652,6 @@ do_compare:
 	if ( strncmp( prompt, "boot", 4 ) == 0 )
 	{
 	    printf("~boot\n");
-		//boot();
         goto exit_cmp;
     };
 	
@@ -2708,7 +2707,7 @@ do_compare:
 	//close
 	if ( strncmp( prompt, "close", 5 ) == 0 )
 	{
-		shellSendMessage( NULL, MSG_CLOSE, 0, 0);
+		shellSendMessage ( NULL, MSG_CLOSE, 0, 0);
 	    goto exit_cmp;
 	}		
 
@@ -2774,23 +2773,25 @@ do_compare:
 	
 			
 	// date
-	if ( strncmp( prompt, "date", 4 ) == 0 ){
+	if ( strncmp( prompt, "date", 4 ) == 0 )
+	{
 		date_builtins();
         goto exit_cmp;
     };	
 
 	// del
+	// o que segue o comando del é um pathname.
+	//@todo: podemos checar se o pathname é absoluto,
+	//e onde se encontra o arquivo que queremos.		
 	if ( strncmp( prompt, "del", 3 ) == 0 )
 	{
-		// o que segue o comando del é um pathname.
-		//@todo: podemos checar se o pathname é absoluto,
-		//e onde se encontra o arquivo que queremos.		
 		del_builtins();
 	    goto exit_cmp;
 	};	
 
     // desktop.
-	if ( strncmp( prompt, "desktop", 7 ) == 0 ){
+	if ( strncmp( prompt, "desktop", 7 ) == 0 )
+	{
         desktopInitialize();
         goto exit_cmp;
 	};	
@@ -2801,7 +2802,8 @@ do_compare:
 	if ( strncmp( prompt, "dialog-box", 10 ) == 0 )
 	{
 		//@todo:testar os 4 tipos 
-	    MessageBox( 1, "Shell dialog box","Testing dialog box...");
+	    //#bugbug: Estamos chamando MessageBox. Não seria DialogBox?
+		MessageBox ( 1, "Shell dialog box","Testing dialog box...");
         goto exit_cmp;
     };		
 	
@@ -2822,10 +2824,6 @@ do_compare:
 		             (unsigned long) 0,   //nome do diretório.
                      (unsigned long) 0,   
                      (unsigned long) 0 ); 			
-		    //system_call( 177,
-		    //         (unsigned long) dir_name,   //nome do diretório.
-            //         (unsigned long) dir_name,   
-            //         (unsigned long) dir_name ); 
 		    exitCriticalSection();		
 			
 			
@@ -2833,10 +2831,10 @@ do_compare:
 
 		    //listar os arquivos em um diretório dado o nome do diretório.
 			enterCriticalSection();
-		    system_call( 177,
-		             (unsigned long) tokenList[i],   //nome do diretório.
-                     (unsigned long) tokenList[i],   
-                     (unsigned long) tokenList[i] ); 
+		    system_call ( 177,
+		        (unsigned long) tokenList[i],   //nome do diretório.
+                (unsigned long) tokenList[i],   
+                (unsigned long) tokenList[i] ); 
 		    exitCriticalSection();		
 			
 			//...
@@ -2918,27 +2916,31 @@ do_compare:
 	
 	
     // getpid
-	if ( strncmp( prompt, "getpid", 6 ) == 0 ){
+	if ( strncmp( prompt, "getpid", 6 ) == 0 )
+	{
 	    getpid_builtins();
         goto exit_cmp;
     };
 	
     // getppid
-	if ( strncmp( prompt, "getppid", 7 ) == 0 ){
+	if ( strncmp( prompt, "getppid", 7 ) == 0 )
+	{
 	    getppid_builtins();
         goto exit_cmp;
     };
 	
 	
     // getuid - get user id
-	if ( strncmp( prompt, "getuid", 6 ) == 0 ){
+	if ( strncmp( prompt, "getuid", 6 ) == 0 )
+	{
 	    getuid_builtins();
         goto exit_cmp;
     };
 	
 	
     // getgid - get group id
-	if ( strncmp( prompt, "getgid", 6 ) == 0 ){
+	if ( strncmp( prompt, "getgid", 6 ) == 0 )
+	{
 	    getgid_builtins();
         goto exit_cmp;
     };
@@ -2965,6 +2967,30 @@ do_compare:
 	    shellShowDesktopID();
         goto exit_cmp;
     };
+	
+	//#gws - testando funcionalidades do gws
+	if ( strncmp ( prompt, "gws", 3 ) == 0 )
+	{
+		gws_init();
+		
+		gws_backbuffer_putpixel ( COLOR_RED,   100, 250 );
+		gws_backbuffer_putpixel ( COLOR_GREEN, 105, 250 );
+		gws_backbuffer_putpixel ( COLOR_BLUE,  110, 250 );
+		
+		gws_drawchar_transparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
+		gws_drawchar_transparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
+		gws_drawchar_transparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
+		
+		
+		gws_draw_char ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
+		
+		my_buffer_horizontal_line( 400, 88, 500, COLOR_PINK );
+		
+		drawDataRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
+
+		refresh_screen();
+		goto exit_cmp;
+	}
 
 	
 	//unsigned char *hBuffer = (unsigned char *) 0xC1000000;
@@ -3002,7 +3028,6 @@ do_compare:
     };		
 	
 	// hd ??
-	// hd info maybe.
     if ( strncmp( prompt, "hd", 2 ) == 0 )
 	{
 	    printf("~hd\n");
@@ -3045,22 +3070,9 @@ do_compare:
 		
 	
 	// install	
-    // ?? 
 	if ( strncmp( prompt, "install", 7 ) == 0 )
 	{
-		// o que segue o comando install é um pathname.
-		//com o nome do aplicativo instalador
-		//no fim do pathname.
-		//@todo: podemos checar se o pathname é absoluto,
-		//e onde se encontra o arquivo que queremos.
-        //o comando install colocará nos argumentos 
-        //o indicativo que de que desejamos que 
-        //o aplicativo executado seja um instalador.
-        //por exemplo: -install-bin  -install-package -install-lib etc...
-        //install.bin é um aplicativo. 
-        //>install app.bin -install-bin		
 	    printf("~install\n");
-		//fs_install();
         goto exit_cmp;
     };
 	
@@ -3072,17 +3084,6 @@ do_compare:
         goto exit_cmp;
     };	
 	
-	
-    // ls
-	// lista arquivos no estilo unix.
-	//isso será um programa.
-	//if( strncmp( prompt, "ls", 2 ) == 0 )
-	//{
-		//@todo: Isso deve ser um aplicativo.
-	//	printf("~ls\n");
-    //    goto exit_cmp;
-	//};
-
 
     // message-box
 	// Testing message box.
@@ -3120,14 +3121,10 @@ do_compare:
     };
 
 	// mov
-	if ( strncmp( prompt, "mov", 3 ) == 0 )
-	{
-		// o que segue o comando mov são dois pathnames.
-		//@todo: podemos checar se o pathname é absoluto,
-		//e onde se encontra o arquivo que queremos.		
-	    goto exit_cmp;
-	}		
-
+	//if ( strncmp( prompt, "mov", 3 ) == 0 )
+	//{
+	//    goto exit_cmp;
+	//}		
 
     // metrics
 	// Mostra algumas informações de métrica do sistema.
@@ -3207,35 +3204,27 @@ do_compare:
 		goto exit_cmp;
     };
 	
-	// rename - reneme directory or file.
-	if ( strncmp( prompt, "rename", 6 ) == 0 )
-	{
-		// o que segue o comando rename são dois pathnames.
-		//@todo: podemos checar se o pathname é absoluto,
-		//e onde se encontra o arquivo que queremos.		
-        goto exit_cmp;
-    };	
+	// rename - rename directory or file.
+	//if ( strncmp( prompt, "rename", 6 ) == 0 )
+	//{
+    //    goto exit_cmp;
+    //};	
 	
 	
     // root
-	// ??
-    if ( strncmp( prompt, "root", 4 ) == 0 )
-	{
-	    printf("~/root\n");
-		//testa_root();
-		goto exit_cmp;
-    }; 
+    //if ( strncmp( prompt, "root", 4 ) == 0 )
+	//{
+	//    printf("~/root\n");
+	//	goto exit_cmp;
+    //}; 
 
 	
     // save
-	if ( strncmp( prompt, "save", 4 ) == 0 )
-	{
-		// o que segue o comando save é um pathname.
-		//@todo: podemos checar se o pathname é absoluto,
-		//e onde se encontra o arquivo que queremos.		
-	    printf("~save root\n");
-        goto exit_cmp;
-    };
+	//if ( strncmp( prompt, "save", 4 ) == 0 )
+	//{
+	//    printf("~save root\n");
+    //    goto exit_cmp;
+    //};
 	
 	
 	//scroll1
@@ -3274,13 +3263,10 @@ do_compare:
 	}
 
 	
-
-	
     // shellinfo
 	// informações sobre o aplicativo.
 	if ( strncmp( prompt, "shell-info", 10 ) == 0 )
-	{
-		
+	{	
 	    printf("~@todo: shell info.\n");
 		shellShowInfo();
         goto exit_cmp;
@@ -3441,25 +3427,30 @@ do_compare:
         goto exit_cmp;					 
 	};
 	
-	//t7
-	//#test
-	//testando estado das teclas.
+	// t7
+	// Testando estado das teclas.
 	if ( strncmp( prompt, "KEYS", 4 ) == 0 ||
          strncmp( prompt, "keys", 4 ) == 0 || 
          strncmp( prompt, "T7", 2 ) == 0 || 		 
 	     strncmp( prompt, "t7", 2 ) == 0 )	
 	{
-		printf("VK_CAPITAL %d \n", system_call ( 138, VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );				
-	    printf("VK_LSHIFT %d \n", system_call ( 138, VK_LSHIFT, VK_LSHIFT, VK_LSHIFT ) );
-		printf("VK_RSHIFT %d \n", system_call ( 138, VK_RSHIFT, VK_RSHIFT, VK_RSHIFT ) );
-		printf("VK_CONTROL %d \n", system_call ( 138, VK_CONTROL, VK_CONTROL, VK_CONTROL ) );
-		printf("VK_WINKEY %d \n", system_call ( 138, VK_WINKEY, VK_WINKEY, VK_WINKEY ) );
-		printf("VK_LMENU %d \n", system_call ( 138, VK_LMENU, VK_LMENU, VK_LMENU ) );
+		printf ("VK_CAPITAL %d \n", system_call ( 138, 
+		    VK_CAPITAL, VK_CAPITAL, VK_CAPITAL ) );				
+	    printf ("VK_LSHIFT %d \n", system_call ( 138, 
+			VK_LSHIFT, VK_LSHIFT, VK_LSHIFT ) );
+		printf ("VK_RSHIFT %d \n", system_call ( 138, 
+			VK_RSHIFT, VK_RSHIFT, VK_RSHIFT ) );
+		printf ("VK_CONTROL %d \n", system_call ( 138, 
+			VK_CONTROL, VK_CONTROL, VK_CONTROL ) );
+		printf ("VK_WINKEY %d \n", system_call ( 138, 
+			VK_WINKEY, VK_WINKEY, VK_WINKEY ) );
+		printf ("VK_LMENU %d \n", system_call ( 138, 
+			VK_LMENU, VK_LMENU, VK_LMENU ) );
 		//...
 		goto exit_cmp;
 	};
 	
-	//testando a criação de botão e a interação com ele através do mouse.
+	//Testando a criação de botão e a interação com ele através do mouse.
 	if ( strncmp( prompt, "t8", 2 ) == 0 )
     {
 	    shellTestButtons ();	
@@ -3481,16 +3472,27 @@ do_compare:
 		goto exit_cmp;
 	};
 	
-	//t11 - testando o envio de mensagens para o procedimento,
-	//usando o kernel.
+	// t11 - 
+    // Envia uma mensagem para a thread atual.
+    // Nesse caso a thread atual é essa mesma, que é a thread de controle
+	// do processo shell.
+	// ex: Chama message box com mensagem about.
+	
+	// #todo
+	// Podemos criar uma variação dessa chamada, que envie a mensagem para
+	// a thread de controle de um processo dado o seu PID.
+	// Ou que tenha a identificação de quem envia e de quem recebe.
+	
 	if ( strncmp( prompt, "t11", 3 ) == 0 )
     {    
-        //chama message box com mensagem about.
-        apiSendMessage ( (struct window_d *) 0, (int) MSG_COMMAND, 
-		    (unsigned long) CMD_ABOUT, (unsigned long) 0 );
+        apiSendMessage ( (struct window_d *) 0, 
+			(int) MSG_COMMAND, 
+		    (unsigned long) CMD_ABOUT, 
+			(unsigned long) 0 );
 		
 		goto exit_cmp;
 	};
+	
 	
 	//buffer de test;
 	unsigned long message_buffer[11];
@@ -3567,7 +3569,7 @@ do_compare:
 	}
 	
 	
-	//testando open()
+	//testando close()
 	//precisa incluir fcntl.h
 	int cccRet;
 	if ( strncmp( prompt, "t16", 3 ) == 0 )
@@ -3596,29 +3598,7 @@ do_compare:
 	
 	
 	
-	//#gws - testando funcionalidades do gws
-	if ( strncmp ( prompt, "gws", 3 ) == 0 )
-	{
-		gws_init();
-		
-		gws_backbuffer_putpixel ( COLOR_RED,   100, 250 );
-		gws_backbuffer_putpixel ( COLOR_GREEN, 105, 250 );
-		gws_backbuffer_putpixel ( COLOR_BLUE,  110, 250 );
-		
-		gws_drawchar_transparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
-		gws_drawchar_transparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
-		gws_drawchar_transparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
-		
-		
-		gws_draw_char ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
-		
-		my_buffer_horizontal_line( 400, 88, 500, COLOR_PINK );
-		
-		drawDataRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
 
-		refresh_screen();
-		goto exit_cmp;
-	}
 	
 	//flush stdout
 	if ( strncmp( prompt, "flush-stdout", 12 ) == 0 )
@@ -3671,7 +3651,6 @@ do_compare:
 	
 
 	// taskbar
-	// Cria uma top bar.
     if ( strncmp( prompt, "taskbar", 7 ) == 0 )
 	{
 	    enterCriticalSection();    
