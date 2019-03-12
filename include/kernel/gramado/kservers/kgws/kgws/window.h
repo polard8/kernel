@@ -1444,24 +1444,24 @@ struct frontbufferinfo_d *FrontBufferInfo;
  * 2016 - incluíndo novos elementos.
  * ...
  */
+
+
 struct gui_d
 {
-    /*
-	 * Header. ??
-	 */   
 
 	//Se a gui está ou não inicializada.
 	int initialised;		  
+
 	
 	//Procedimento da janela ativa.
 	unsigned long procedure;  
+
 	
 	/*
 	 *    ****    BUFFERS    ****
-	 *
-	 * Ponteiros para os principais buffers usados pelo sistema.
-	 * 
+	 *    Ponteiros para os principais buffers usados pelo sistema.
 	 */
+	
 	
 	/*
 	 * LFB:
@@ -1471,20 +1471,27 @@ struct gui_d
 	 * um lfb para cada placa?
 	 * Esse valor foi configurado pelo BIOS pelo metodo VESA.
 	 */
+	
 	 unsigned long lfb;
 	 
 	/*
 	 * Backbuffers.
 	 *     O Backbuffer pe o buffer para colocar a imagem de pano de fundo.
-	 * Ele será o buffer dedicado da janela principal gui->main.
-	 * 
+	 * Ele será o buffer dedicado da janela principal gui->main. 
 	 */
-	unsigned long backbuffer; //Paranóia.
 	
-    void* backbuffer1; 
-	void* backbuffer2; 
-	void* backbuffer3;
+	// #importante.
+	// Um backbuffer pode cobrir a área de vários monitores.
+	// O conceito de backbuffer pode estar relacionado com o conceito de room,
+	// (window station), com vários desktops e monitores.
+	
+	unsigned long backbuffer;
+	
+    void *backbuffer1; 
+	void *backbuffer2; 
+	void *backbuffer3;
 	//...
+	
 	
 	/*
 	 * Default dedicated buffers.
@@ -1494,12 +1501,13 @@ struct gui_d
 	 * Obs: Toda janela tem que ter um buffer dedicado, onde ela será pintada.
 	 * Depois de pintada ela pertencerá a uma lista de janelas que serão
 	 * enviadas para o LFB seguindo a ordem da lista.
-	 *
 	 */
-	void* defaultWindowDedicatedBuffer1;
-	void* defaultWindowDedicatedBuffer2;
-	void* defaultWindowDedicatedBuffer3;
+	
+	//void* defaultWindowDedicatedBuffer1;
+	//void* defaultWindowDedicatedBuffer2;
+	//void* defaultWindowDedicatedBuffer3;
     //...	
+	
 	
 	/*
 	 * Flag para repintar todas as janelas.
@@ -1550,7 +1558,8 @@ struct gui_d
 	 *
 	 * Os ponteiros aqui serão organizados em grupos:
 	 * ==============================================
-	 * Grupo 0: Screen, Background, Logo, Desktop, Taskbar.
+	 * Screen - root window
+	 * Grupo 0: Background, Logo, Desktop, Taskbar.
 	 * Grupo 1: Main (Full Screen), Status Bar. 
 	 * Grupo 2: Grid. (grid de ícones flutuantes)
 	 * Grupo 3: Control menu.(Control menu da janel atual).
@@ -1559,18 +1568,16 @@ struct gui_d
 	 * Grupo 6: Outras.
 	 */
 	
-	
-	
-	//
-	// Grupo 0: Screen, Background, Logo, Desktop, Taskbar.
-	//
-	
 	//Screen: 
 	//      A tela. Tem as dimensões do monitor usado.
-	   
-    struct window_d *screen; 
-
-
+	// Root window.   
+	
+    struct window_d *screen; 	
+	
+	//
+	// Grupo 0: Background, Logo, Desktop, Taskbar.
+	//
+	
 	// A única janela em primeiro plano e com o foco de entrada. 
 	// Será usada pelo desenvolvedor durante a construção dos 
 	// elementos gráficos, até que o sistema gráfico fique mais robusto
@@ -1763,10 +1770,11 @@ struct gui_d
 	//Informações sobre a tela.
 	struct screen_d *ScreenInfo;
 	
+	// Backbuffer support. (espelho da memória de video)
+	struct backbufferinfo_d  *backbufferInfo;  
 	
-	struct backbufferinfo_d  *backbufferInfo;  // Backbuffer support. (espelho da memória de video)
-	
-	struct frontbufferinfo_d *frontbufferInfo; // Frontbuffer support. (memória de vídeo)
+	// Frontbuffer support. (memória de vídeo)
+	struct frontbufferinfo_d *frontbufferInfo; 
 	
     
 	//
@@ -1783,30 +1791,19 @@ struct gui_d
 	
 	//...
 };
+
+// #importante
 // Estrutura global. 
 // (Usada para passar estutura entre funções)
 // Primeira e única. 
+
 struct gui_d *gui; 
-
-
-  
-
-
-
-/*
- * GUI:
- *     Interface gráfica para o usuário.
- *     Tudo o que compõe a área de trabalho. 
- *     Deve conter as janelas do sistema, como barra de ferramentas,
- * control menu.
- *
- */
 
 
  
 
 /*
- *  Protótipos.
+ *    ########  Protótipos.  ########
  */
  
  
@@ -1830,8 +1827,8 @@ void create_gui();
  * SetGuiParameters:
  *     Configura a inicialização das janelas gerenciadas pelo kernel.
  *     @todo: Limite de janelas (+- 10)
- *
  */
+
 void SetGuiParameters( int refresh,         
                        int screen,          
                        int background,       
@@ -1894,11 +1891,7 @@ void updateButton ( struct button_d *button,
                     unsigned long width, 
                     unsigned long height, 
                     unsigned long color );
-				  
-
 				 
-
-
 
 // Focus support.
 void SetFocus( struct window_d *window );
@@ -2158,9 +2151,11 @@ int save_window (struct window_d *window);
 //para mudar a janela de lugar.
 int show_saved_window (struct window_d *window);
 
+
 //mostra o retãngulo de uma janela que está no backbuffer.
 //tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
 int show_window_rect (struct window_d *window);
+
 
 int 
 resize_window( struct window_d *window, 
@@ -2171,8 +2166,8 @@ int replace_window ( struct window_d *window,
                      unsigned long x, 
 			         unsigned long y );			  
 
-int 
-redraw_window(struct window_d *window, unsigned long flags );
+
+int redraw_window (struct window_d *window, unsigned long flags );
     
 int redraw_screen();                          //redraw all windows.
 int is_window_full(struct window_d *window);
@@ -2256,9 +2251,7 @@ void guiSetUpMainWindow( unsigned long x,
 //  ## timer support  ##
 //
 
-int 
-windowKillTimer( struct window_d *window,
-                 int id );
+int windowKillTimer ( struct window_d *window, int id );
 				 
 int
 windowSetTimer( struct window_d *window, //janela
@@ -2280,26 +2273,31 @@ void windowUpdateWindow( struct window_d *window );
 //faz a janela atual entrar ou sair do modo fullscreen.
 int windowSwitchFullScreen();
 
+
+
 /*
  * CreateWindow:
  *     Cria uma janela com base em um tipo.
  */
-void *CreateWindow( unsigned long type,  //1 - tipo de janela (popup ..normal ...)
-unsigned long status,           //2  - estado da janela (ativa ou nao)
-unsigned long view,             //3  - (min, max ...)
-char* windowname,               //4  - titulo                                
-unsigned long x,                //5  - deslocamento em relação às margens do desktop(sua instancia)        
-unsigned long y,                //6  - idem
-unsigned long width,            //7  - largura da janela  
-unsigned long height,           //8  - altura
-struct window_d *pWindow,       //9  - id da janela mae, se for zero, essa é a janela mae.
-int desktopid,                  //10 - desktop ID.
-unsigned long clientcolor,            //11 - Client Area Color.
-unsigned long color             //12 - cor do bg (para janelas simples, tipo 1)
+
+void *CreateWindow ( unsigned long type,  //1 - tipo de janela (popup ..normal ...)
+          unsigned long status,           //2  - estado da janela (ativa ou nao)
+          unsigned long view,             //3  - (min, max ...)
+          char* windowname,               //4  - titulo                                
+          unsigned long x,                //5  - deslocamento em relação às margens do desktop(sua instancia)        
+          unsigned long y,                //6  - idem
+          unsigned long width,            //7  - largura da janela  
+          unsigned long height,           //8  - altura
+          struct window_d *pWindow,       //9  - id da janela mae, se for zero, essa é a janela mae.
+          int desktopid,                  //10 - desktop ID.
+          unsigned long clientcolor,            //11 - Client Area Color.
+          unsigned long color             //12 - cor do bg (para janelas simples, tipo 1)
 );
 
  
 int scroll_client_window ( struct window_d *window ); 			
+
+
 //
 // End.
 //

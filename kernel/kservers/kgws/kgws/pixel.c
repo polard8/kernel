@@ -97,13 +97,18 @@ pixelPutPixelWindowBuffer( void *buffer,
  * que sempre será o buffer dedicado da janela principal, gui->main.
  * que podemos chamar de 'desktop', mas não é a estrutura de desktop
  * como a conhecemos.
-*/										 
+ */	
+
 void 
 pixelPutPixelDedicatedWindowBuffer( struct window_d *window, 
                                     unsigned long x, 
 									unsigned long y, 
 									unsigned long color )
 {
+	
+	//#suspensa.
+	
+	/*
 	//O buffer será selecionado por essa rotina ficará aqui
 	void *buff;
 	
@@ -173,57 +178,25 @@ useDedicatedBuffer:
 		//while(1){}
 	}
 	//pinta. asm_putpixel()
+	
+	*/
     return;	
 };
 
 
 /*
- ******************************************************
- * my_buffer_put_pixel:
- *     Coloca um pixel no BACKBUFFER. 
- *     Obs: O backbuffer deverá ser o buffer dedicado da janela principal gui->main.     
+ ****
+ * backbuffer_putpixel:
  *
- * a = cor
- * b = x
- * c = y
- * d = null
- *
- * O lugar dessa rotina é no hal.
- *
- * @todo: Aqui podemos fazer algum tipo de filtro, considerar
- * a métrica do buffer e chamar a rotina de /hal apropriada.
- * Usando o módulo /hal como interface entre
- * a /gui e o hardware.
+ * IN: 
+ *     color, x, y, 0
  */
-//void pixelPutPixelBackBuffer( unsigned long ax, unsigned long bx, unsigned long cx, unsigned long dx )
-/*
-void 
-my_buffer_put_pixel( unsigned long ax, 
-                     unsigned long bx, 
-				     unsigned long cx, 
-					 unsigned long dx )
-{
-    
-	//antigo. isso funciona.
-	//hal_backbuffer_putpixel ( ax, bx, cx, dx );
-
-	
-	//estamos testando essa para deletar a função my_buffer_put_pixel
-	backbuffer_putpixel ( ax, bx, cx, dx );
-};
-*/
-
-
-//
-// ## putpixel: backbuffer e lfb ##
-//
-// IN: cor, x, y, 0
 
 void 
-backbuffer_putpixel( unsigned long ax, 
-                     unsigned long bx, 
-				     unsigned long cx, 
-				     unsigned long dx )
+backbuffer_putpixel ( unsigned long ax, 
+                      unsigned long bx, 
+				      unsigned long cx, 
+				      unsigned long dx )
 {
     //#importante
 	//Esse é o origina. Isso funciona.
@@ -291,12 +264,19 @@ backbuffer_putpixel( unsigned long ax,
 }
 
 
-// IN: cor, x, y, 0
+/*
+ ****
+ * lfb_putpixel:
+ *
+ * IN: 
+ *     color, x, y, 0
+ */ 
+
 void 
-lfb_putpixel( unsigned long ax, 
-              unsigned long bx, 
-		      unsigned long cx, 
-		      unsigned long dx )
+lfb_putpixel ( unsigned long ax, 
+               unsigned long bx, 
+		       unsigned long cx, 
+		       unsigned long dx )
 {
     
 	//hal_lfb_putpixel ( ax, bx, cx, dx );

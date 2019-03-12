@@ -1,7 +1,7 @@
 /*
- * File gws/gws/ws.h
+ * File kgws/kgws/ws.h
  *
- *     GWS - Gramado Window Server
+ *     KGWS - kernel Gramado Window Server
  *
  * Esse é o principal header do gws, preferenciamente
  * devem ficar aqui as globais usadas no servidor.
