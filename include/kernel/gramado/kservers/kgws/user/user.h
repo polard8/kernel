@@ -20,6 +20,18 @@
  *
  * Versão 1.0, 2015, 2016.
  */
+
+
+/*
+ Um usuário só pode rodar o servidor de recursos gráficos se ele estiver no modo console.
+ No Gramado o modo console utiliza o servidor de recursos gráficos kgws, que é um servidor
+ dentro do base kernel.
+ No Gramado, o modo console terá o kgws como seu servidor de recursos gráficos para a exibição do 
+ console em full screen.
+ O segundo servidor de recursos gráficos é o gws que está dentro do programa shell.bin.
+ Isso significa que para um usuário inicializar os recursos gráficos do servidor gws ele
+ precisa estar em modo console usando o kgws.
+ */
  
 
 #define USER_COUNT_MAX 16  //User count.
@@ -59,6 +71,25 @@ typedef enum {
     USER_TYPE_NONINTERACTIVE,  //2
 	//...
 }user_type_t;
+
+
+
+/*
+    #importante:
+    
+	User Display Modes:
+    Modos de display para interação com o usuário.
+	>>> NÃO se refere aos modos de display da placa de vídeo.
+	Pois aqui, tanto o modo console, quanto graphical estão usando
+	o modo gráfico da placa de vídeo.
+	O modo texto da placa de vídeo só é usado no boot.
+ */
+
+typedef enum {
+	USER_DISPLAY_MODE_NULL,
+    USER_DISPLAY_MODE_CONSOLE,     // Modo gráfico com um terminal em full screen.
+	USER_DISPLAY_MODE_GRAPHICAL    // Modo gráfico usando um servidor de recursos gráficos.
+}user_display_mode_t;
 
 
 //
@@ -406,6 +437,10 @@ struct user_info_d
 
 	//user type.
     user_type_t userType;	
+	
+	//#importante:
+	//Olhe as explicações logo acima.
+	user_display_mode_t display_mode;
 	
 	//
 	// TOKENs de acesso à recursos do kernel. @todo: Rever.
