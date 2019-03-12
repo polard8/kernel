@@ -23,6 +23,9 @@
 #include <kernel.h>
 
 
+extern unsigned long SavedX;            //Screen width. 
+extern unsigned long SavedY;            //Screen height.
+
 // 4bpp support.
 static int nibble_count_16colors = 0;
 
@@ -74,9 +77,12 @@ bmpDirectDisplayBMP ( char *address,
 	
 	// Limits
 	// @todo: get system metrics.
-	xLimit = 800;
-	yLimit = 600;
 	
+	//xLimit = 800;
+	//yLimit = 600;
+	
+	xLimit = SavedX;
+	yLimit = SavedY;	
 	
 	//
 	// Sincronização do retraço vertical.
@@ -353,9 +359,7 @@ bmpDirectDisplayBMP ( char *address,
 				    if ( color != bmp_selected_color )
 					{
 		                lfb_putpixel ( (unsigned long) color, 
-			                (unsigned long) left, 
-						    (unsigned long) bottom, 
-						    0 );							
+			                (unsigned long) left, (unsigned long) bottom, 0 );							
 					};
 				    break;
 					
@@ -369,17 +373,12 @@ bmpDirectDisplayBMP ( char *address,
 				    if ( color == bmp_selected_color )
 					{	 
 						lfb_putpixel ( (unsigned long) bmp_substitute_color, 
-			                (unsigned long) left, 
-						    (unsigned long) bottom, 
-						     0 );
+			                (unsigned long) left, (unsigned long) bottom, 0 );
 							 
-                    } else {
+                    }else{
 		                							
 						lfb_putpixel ( (unsigned long) color, 
-			                (unsigned long) left, 
-						    (unsigned long) bottom, 
-						    0 );
-	
+			                (unsigned long) left, (unsigned long) bottom, 0 );
 					};							 
 				    break;
 					
@@ -389,12 +388,8 @@ bmpDirectDisplayBMP ( char *address,
 				// Pintamos normalmente a cor atual.
                 case BMP_CHANGE_COLOR_NULL:				
 				default:
-				
 			        lfb_putpixel ( (unsigned long) color, 
-			            (unsigned long) left, 
-						(unsigned long) bottom, 
-						0 );		
-						
+			            (unsigned long) left, (unsigned long) bottom, 0 );		
 					break;
 			};
 
@@ -481,9 +476,12 @@ bmpDisplayBMP ( char *address,
 	
 	// Limits
 	// @todo: get system metrics.
-	xLimit = 800;
-	yLimit = 600;
 	
+	//xLimit = 800;
+	//yLimit = 600;
+
+	xLimit = SavedX;
+	yLimit = SavedY;		
 	
 	// Limits.
 	if ( x > xLimit || y > yLimit )

@@ -11,6 +11,9 @@
 #include <kernel.h>
 
 
+extern unsigned long SavedX;            //Screen width. 
+extern unsigned long SavedY;            //Screen height.
+
 
 /*
  * mouse_write:
@@ -458,10 +461,18 @@ void mouseHandler (){
             // #todo: Os valores foram determinados. 
 			// Precisamos usar variáveis.
 			
-			if( mouse_x < 1 ){ mouse_x = 1; }	
-		    if(	mouse_y < 1 ){ mouse_y = 1; }
-		    if(	mouse_x > (800-16) ){ mouse_x = (800-16); }
-		    if(	mouse_y > (600-16) ){ mouse_y = (600-16); }
+			if ( mouse_x < 1 ){ mouse_x = 1; }	
+		    if ( mouse_y < 1 ){ mouse_y = 1; }
+			
+		    if(	mouse_x > (SavedX-16) )
+			{ 
+				mouse_x = (SavedX-16); 
+		    }
+		    
+			if(	mouse_y > (SavedY-16) )
+			{ 
+				mouse_y = (SavedY-16); 
+			}
 			
 			//
 			// # Draw BMP #
@@ -922,21 +933,19 @@ void mouseHandler (){
 			
 			        //ja que entramos em uma nova janela, vamos mostra isso.
 				    
-					//salvando para apagarmos corretamente.
-					//savedmouseoverwindowX = Window->left;
-					//savedmouseoverwindowY = Window->top;
 					
 				    //botão.
+					//#provisório ...
 			        if ( Window->isButton == 1 )
 				    {    
 			            bmpDisplayCursorBMP ( fileIconBuffer, Window->left, Window->top );	
 			        };
 				
 				    //não botão.
-				    if ( Window->isButton == 0 )
-				    {
-				        bmpDisplayCursorBMP ( folderIconBuffer, Window->left, Window->top );		
-				    };
+				    //if ( Window->isButton == 0 )
+				    //{
+				    //    bmpDisplayCursorBMP ( folderIconBuffer, Window->left, Window->top );		
+				    //};
 				
 				    //nova mouse over
 				    mouseover_window = Window->id;

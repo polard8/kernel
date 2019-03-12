@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 24
 SUBLEVEL = 0
-EXTRAVERSION = -rc2
+EXTRAVERSION = -rc3
 NAME = ?
 
 
@@ -310,27 +310,31 @@ compile-kernel:
 	gcc -c kernel/execve/sm/sys/sm.c       -I include/ $(CFLAGS) $(DEFINES) -o sm.o
 
 	# kservers/kgws - Kernel Gramado Window Server.
-	gcc -c kernel/kservers/kgws/kgws/char.c      -I include/ $(CFLAGS) $(DEFINES) -o char.o
-	gcc -c kernel/kservers/kgws/kgws/pixel.c     -I include/ $(CFLAGS) $(DEFINES) -o pixel.o
-	gcc -c kernel/kservers/kgws/kgws/line.c      -I include/ $(CFLAGS) $(DEFINES) -o line.o
-	gcc -c kernel/kservers/kgws/kgws/rect.c      -I include/ $(CFLAGS) $(DEFINES) -o rect.o
-	gcc -c kernel/kservers/kgws/kgws/dtext.c     -I include/ $(CFLAGS) $(DEFINES) -o dtext.o
-	gcc -c kernel/kservers/kgws/kgws/font.c      -I include/ $(CFLAGS) $(DEFINES) -o font.o
-	gcc -c kernel/kservers/kgws/kgws/createw.c   -I include/ $(CFLAGS) $(DEFINES) -o createw.o
-	gcc -c kernel/kservers/kgws/kgws/grid.c      -I include/ $(CFLAGS) $(DEFINES) -o grid.o
-	gcc -c kernel/kservers/kgws/kgws/sbar.c      -I include/ $(CFLAGS) $(DEFINES) -o sbar.o
-	gcc -c kernel/kservers/kgws/kgws/menubar.c   -I include/ $(CFLAGS) $(DEFINES) -o menubar.o
-	gcc -c kernel/kservers/kgws/kgws/menu.c      -I include/ $(CFLAGS) $(DEFINES) -o menu.o
-	gcc -c kernel/kservers/kgws/kgws/bmp.c       -I include/ $(CFLAGS) $(DEFINES) -o bmp.o
-	gcc -c kernel/kservers/kgws/kgws/button.c    -I include/ $(CFLAGS) $(DEFINES) -o button.o
-	gcc -c kernel/kservers/kgws/kgws/bg.c        -I include/ $(CFLAGS) $(DEFINES) -o bg.o
+
+	gcc -c kernel/kservers/kgws/kgws/comp/bg.c        -I include/ $(CFLAGS) $(DEFINES) -o bg.o
+	gcc -c kernel/kservers/kgws/kgws/comp/bmp.c       -I include/ $(CFLAGS) $(DEFINES) -o bmp.o
+	gcc -c kernel/kservers/kgws/kgws/comp/button.c    -I include/ $(CFLAGS) $(DEFINES) -o button.o	
+	gcc -c kernel/kservers/kgws/kgws/comp/char.c      -I include/ $(CFLAGS) $(DEFINES) -o char.o
+	gcc -c kernel/kservers/kgws/kgws/comp/createw.c   -I include/ $(CFLAGS) $(DEFINES) -o createw.o
+	gcc -c kernel/kservers/kgws/kgws/comp/dtext.c     -I include/ $(CFLAGS) $(DEFINES) -o dtext.o
+	gcc -c kernel/kservers/kgws/kgws/comp/font.c      -I include/ $(CFLAGS) $(DEFINES) -o font.o
+	gcc -c kernel/kservers/kgws/kgws/comp/grid.c      -I include/ $(CFLAGS) $(DEFINES) -o grid.o
+	gcc -c kernel/kservers/kgws/kgws/comp/line.c      -I include/ $(CFLAGS) $(DEFINES) -o line.o
+	gcc -c kernel/kservers/kgws/kgws/comp/menu.c      -I include/ $(CFLAGS) $(DEFINES) -o menu.o
+	gcc -c kernel/kservers/kgws/kgws/comp/menubar.c   -I include/ $(CFLAGS) $(DEFINES) -o menubar.o
+	gcc -c kernel/kservers/kgws/kgws/comp/pixel.c     -I include/ $(CFLAGS) $(DEFINES) -o pixel.o
+	gcc -c kernel/kservers/kgws/kgws/comp/rect.c      -I include/ $(CFLAGS) $(DEFINES) -o rect.o
+	gcc -c kernel/kservers/kgws/kgws/comp/sbar.c      -I include/ $(CFLAGS) $(DEFINES) -o sbar.o
+	
 	gcc -c kernel/kservers/kgws/kgws/window.c    -I include/ $(CFLAGS) $(DEFINES) -o window.o
+	
 	gcc -c kernel/kservers/kgws/logon/logon.c    -I include/ $(CFLAGS) $(DEFINES) -o logon.o
 	gcc -c kernel/kservers/kgws/logoff/logoff.c  -I include/ $(CFLAGS) $(DEFINES) -o logoff.o
 	gcc -c kernel/kservers/kgws/user/userenv.c   -I include/ $(CFLAGS) $(DEFINES) -o userenv.o
 	gcc -c kernel/kservers/kgws/user/desktop.c   -I include/ $(CFLAGS) $(DEFINES) -o desktop.o
 	gcc -c kernel/kservers/kgws/user/room.c      -I include/ $(CFLAGS) $(DEFINES) -o room.o
 	gcc -c kernel/kservers/kgws/user/usession.c  -I include/ $(CFLAGS) $(DEFINES) -o usession.o
+	
 	gcc -c kernel/kservers/kgws/kgws.c           -I include/ $(CFLAGS) $(DEFINES) -o kgws.o
 
 

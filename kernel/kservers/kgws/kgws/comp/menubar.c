@@ -1,5 +1,5 @@
 /*
- * File: gramado\gui\menubar.c
+ * File: menubar.c
  *
  * Descrição:
  *     Rotinas de criação e gerenciamento de menubar.

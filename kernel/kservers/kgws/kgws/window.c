@@ -20,7 +20,6 @@
  * ============
  * +
  * +
- * +
  *
  * Histórico:
  *     Versão: 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
@@ -383,207 +382,12 @@ fail:
 };
 
 
-/*
- * windowInitializeBrowserSupport:
- *      (KSOC - Kernel Standard Output Container)
- *       gerenciador de ambientes de janelas ... como no caso de window station/desktop/window...
- * só que com abas.
- *
- *     Inicialização do sistema de suporte ao navegador shell.
- * *Importante: Essa rotina será bem longa..
- * devemos inicializar todos os recursos que serão usados pelo navagador ...
- * O kernel deve criar uma janela uma janela maximizada que será o navegador ...
- * deve criar 12 abas que serão atendidas através do procedimento de janelas do sistema.
- * 
- * *Importante: essa rotina deve ser chamada antes de rodar qualquer processo em user mode.
- * portanteo um bom lugar pra essa rotina ser chamada é no final de main.c, antes de dar iretd
- * para a thread idle.
- *
- */
 
-//#obs: podemos suspender isso. 
- 
+// ?? 
 int windowInitializeBrowserSupport (){
 	
-/*
-
-    //suspensa	
-	
-	int i;
-	
-	//#debug
-	//printf("Initializing browser support\n");
-	
-	for (i=0; i< TABWINDOW_COUNT_MAX; i++){
-		browsertabList[i] = (unsigned long) 0;
-	}
-	
-	BROWSERWINDOW = NULL;
-	TABWINDOW = NULL;
-	current_tab = 0;
-	
-	
-	//
-	// @todo: Inicializar todos os recursos que o navegador vai precisar.
-	//
-	
-	//Criando a janela do navegador ... isso requer uma ponteiro exclusivo
-	//Esse é a janela com moldura onde as abas serão criadas.
-	//Essas abas serão janelas filhas da janela do navegador KSOC.
-	
-	struct window_d *w;
-	
-    //KSOC - Kernel Standard Output Container
-    w = (void *) CreateWindow( 3, 0, 0,"KSOC", 
-			        0, 0, 800, 600, 
-					gui->screen, 0, COLOR_WINDOW, 0xC0C0C0 );
-
-    if( (void *) w == NULL )
-	{
-	    printf("windowInitializeBrowserSupport:");
-		die();
-	}else{
-		
-		if( w->used != 1 || w->magic != 1234 ){
-	        printf("windowInitializeBrowserSupport: fail");
-		    die();
-		}
-		
-		RegisterWindow(w);
-        set_active_window(w);
-		SetFocus(w);
-
-        //Ponteiro exclusivo.
-        BROWSERWINDOW = (void *) w;		
-	};
-
-
-	// Criando as estruturas para as 12 abas do navegador.
-	// Criaremos apenas 4 abas ... rotinas de erro perceberão a as faltantes
-	// cada aba tem uma estrutura de aba, um ponteiro par a asua janela dentro da estrutura.
-	
-	struct browser_tab_d *bt; //browser tabs.
-	
-	
-	// Importante: 
-	//   Começaremos de 1 pois a aba 0 é a janela gui->screen 
-	
-	for ( i=1; i<4; i++ )
-	{
-		bt = (void *) malloc( sizeof(struct browser_tab_d) );
-	    
-		if ( (void *) bt == NULL )
-		{
-	        printf("erro tab struct");
-		    die();
-	    }		
-		
-		bt->used = 1;
-		bt->magic = 1234;
-		bt->type = 1;  //do mesmo tipo por enquanto.
-		
-		bt->name = "TAB NAME";
-		bt->view = 1;
-		
-		//As abas são janelas do tipo 1, pop up simples.
-		//os tamanhos serão revistos.
-		//brancas á princípio.
-		//
-		// Importante: Pintar todas essas janelas sobrepostas demanda tempo 
-        // podemos criar janelas minimizadas, que não precisam pintar. 		
-		
-        w = (void *) CreateWindow ( 1, 0, 0,"TAB", 
-			            0, 24, 800, 600-24, 
-						gui->screen, 0, COLOR_WINDOW, COLOR_WINDOW );		
-		
-	    if( (void *) w == NULL )
-		{
-	        printf(".");
-		    die();
-	    }else{   
-		    RegisterWindow(w);
-		    //...
-	    };
-	
-	    //Ponteiro da janela da aba.
-	    bt->window = (void*) w;
-		
-		bt->next =  NULL;
-		
-		//salvando o ponteiro para a tab na lista de ponteiros de tab.
-		browsertabList[i] = (unsigned long) bt;
-	
-	};
-	
-
-   //
-   // Testando uma aba.
-   //   
-   
-    //testando a aba 1.
-    bt = (void *) browsertabList[1];
-    
-	if ( (void *) bt == NULL )
-	{
-	    printf("~erro tab struct");
-		die();
-	}	   
-   
-    if ( bt->used != 1 || bt->magic != 1234 )
-	{
-	    printf("windowInitializeBrowserSupport: bt fail");
-		die();		
-	}
-
-	//Determinado que a tab 1 é a tab atual.
-	//Obs; Isso não é a janela com o foco de entrada.
-    current_tab = 1;
-	
-	//janela da aba. (a aba propriamente dita.
-    w = (void *) bt->window;	
-
-    if ( (void *) w == NULL )
-	{
-	    printf("windowInitializeBrowserSupport:~fail");
-		die();
-		
-	}else{
-		
-	    if ( w->used != 1 || w->magic != 1234 )
-		{
-	        printf("windowInitializeBrowserSupport: ~fail");
-	        die();			
-	    }
-		
-		//Aqui temos uma janela válida. Essa janela é uma aba.
-		//vamos escrever nela pra testar.
-		
-		//Ponteiro para a janela da aba atual.
-		//Obs: Rotinas que desejam pintar na aba atual usam esse ponteiro.
-        TABWINDOW = (void *) w;
-
-        
-		//Test: Criando alguns elementos gráficos dentro da aba no navegador.
-		draw_text ( TABWINDOW, 0, 0, COLOR_TEXT, "bt: This is a text on the browser tab number 1");	
-        
-		draw_button ( TABWINDOW, "bt: Button label 11 11", 
-		    1, 0, 0, 
-			11, 11, 56, 24, COLOR_BUTTONFACE); 
-		
-		StatusBar ( TABWINDOW, "bt: Status bar, string 1", "bt: Status bar, string 2");
-	};
-
-	
-   //
-   // Deve haver muito o que fazer ainda  ...
-   //
-   
-    printf("done\n");
-
-	*/
-	
-	return (int) -1;
-};
+	return (int) -1;  //canccelada.
+}
 
 
 /*
@@ -3914,16 +3718,14 @@ int windowLoadGramadoIcons (){
 /*
  ************************* 
  * windowScan:
- *     Escaneia as janelas existentes procurando uma 
- * que contenha o posicionamento do cursor.
- * Ou seja, o posicionamento do cursor deve estar dentro 
- * da área da janela.
+ *     Escaneia as janelas existentes procurando uma que contenha o 
+ * posicionamento do cursor.
+ * Ou seja, o posicionamento do cursor deve estar dentro da área da janela.
  *
  * Obs:
  *    A função retorna na primeira janela encontrada.
- *    Mas deveríamos observar se essa janela possui 
- * janelas filhas, pois o ponteiro pode passar em cima 
- * de uma janela que está dentro de outra janela.  
+ *    Mas deveríamos observar se essa janela possui janelas filhas, pois o 
+ * ponteiro pode passar em cima de uma janela que está dentro de outra janela.  
  */
  
 int windowScan ( unsigned long x, unsigned long y ){
@@ -3933,8 +3735,6 @@ int windowScan ( unsigned long x, unsigned long y ){
 	//register int i;
 	int i = 0;
 	int WID;
-	
-
 	
 	// #bugbug
 	// Nesse for, o número de comparações é insuficiente.
