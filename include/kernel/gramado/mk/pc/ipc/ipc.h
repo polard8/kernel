@@ -36,6 +36,7 @@ struct ipc_procedure_d
 ipc_procedure_t *IpcProcedure;
 //...
 
+
 typedef struct ipc_procedureEx_d ipc_procedureEx_t;
 struct ipc_procedureEx_d
 {
@@ -82,6 +83,7 @@ void *ipcProcedure( unsigned long callback,
 					unsigned long msg4, 
 					unsigned long flag, 
 					unsigned long error);
+
 void *ipcProcedureEx( unsigned long callback, 
                     unsigned long msg1, 
 					unsigned long msg2, 

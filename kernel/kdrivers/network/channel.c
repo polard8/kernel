@@ -8,6 +8,9 @@
  *
  * Obs: Um canal de comunicação é composto por dois sockets.
  *
+ * isso ficara aqui porque estamos lidando com comunicaç~ao cliente servidor.
+ * atrav'es da rede, essa 'e a ideia.
+ *
  * Versão 1.0, 2015, 2016.
  */
 
@@ -21,29 +24,31 @@
  ****************************************************
  * CreateChannel:
  *     Cria um canal.
- *
  */
-void *CreateChannel( struct process_d *OwnerProcess,
-				     struct thread_d *ClientThread,
-				     struct thread_d *ServerThread )
+
+void *CreateChannel ( struct process_d *OwnerProcess,
+				      struct thread_d *SenderThread,
+				      struct thread_d *ReceiverThread )
 {
     struct channel_d *NewChannel;
 
-	NewChannel = (void *) malloc( sizeof(struct channel_d) );
+	NewChannel = (void *) malloc ( sizeof(struct channel_d) );
     
 	if( (void *) NewChannel == NULL )
 	{
 	    return NULL;
 	}else{
+		
 	    NewChannel->OwnerProcess = (void *) OwnerProcess;
-		NewChannel->ClientThread = (void *) ClientThread;
-		NewChannel->ServerThread = (void *) ServerThread;
-	    NewChannel->State = 0;
-	};	
-	//Nothing.
-done:
+		
+		NewChannel->SenderThread = (void *) SenderThread;
+		NewChannel->ReceiverThread = (void *) ReceiverThread;
+	    
+		NewChannel->State = 0;
+	};
+	
     return (void *) NewChannel;
-};
+}
 
 
 /*
@@ -54,8 +59,9 @@ done:
  *     +destrói a estrutura.
  *     ...
  */
-int DestroyChannel(struct channel_d *channel)
-{
+
+int DestroyChannel (struct channel_d *channel){
+	
 	if((void *) channel == NULL )
 	{
 	    return (int) 0;    //Nothing to do.	    	
@@ -64,7 +70,8 @@ int DestroyChannel(struct channel_d *channel)
 	
 	//@todo? ...
 	
-done:
+//done:
+	
     return (int) 0;	
 };
 
@@ -73,31 +80,24 @@ done:
 /*
  * OpenChannel:
  *     Abrir o canal para uso.
- *
  */
-int OpenChannel( struct channel_d *channel, 
-                 struct process_d *OwnerProcess,
-				 struct thread_d *ClientThread,
-				 struct thread_d *ServerThread)
+
+int OpenChannel ( struct channel_d *channel, 
+                  struct process_d *OwnerProcess,
+				  struct thread_d *SenderThread,
+				  struct thread_d *ReceiverThread)
 {
 	if((void*) channel == NULL )
 	{
 	    return (int) 1;    //Fail.
 	}else{
-	   
-	   /*
-	    if( channel->OwnerProcess != OwnerProcess || 
-		    channel->ClientThread != ClientThread || 
-			channel->ServerThread != ServerThread)
-		{
-		    return 1;
-		};
-	    */
+		
 	    channel->State = 1;
 	};
-done:
+	
     return (int) 0;	
-};
+}
+
 
 
 /*
@@ -105,18 +105,19 @@ done:
  *     Libera o canal.
  *     Mas não destroi.
  */
-int CloseChannel(struct channel_d *channel)
-{
-    if((void*) channel == NULL ){
+
+int CloseChannel (struct channel_d *channel){
+	
+    if ( (void*) channel == NULL ){
 	    return (int) 1;
 	}else{
 	    channel->State = 0;
 	};
+	
     return (int) 0;	
-};
-
+}
 
 //
-// Fim.
+// End.
 //
 

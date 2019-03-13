@@ -41,7 +41,7 @@ typedef enum _ECHANNEL_STATE {
  * Obs: Essa estrutura é aceitável, está em conformidade 
  * com os padrões encontrados
  */
-typedef struct channel_d channel_t;
+
 struct channel_d
 {
 	object_type_t objectType;
@@ -57,9 +57,17 @@ struct channel_d
 		
     struct process_d *OwnerProcess;
 	
-    struct thread_d *ClientThread;
-    struct thread_d *ServerThread;
+	// usado para comunição entre threads.
+    struct thread_d *SenderThread;
+    struct thread_d *ReceiverThread;
 	
+	//#importante
+	//Quando a comunicação for entre processos,
+	//temos que usar a thread de controle do processo que está recebendo
+	//a mensagem.
+	
+	struct process_d *SenderProcess;
+	struct process_d *ReceiverProcess;	
 	
 	//Os dois soquetes do canal de comunicação.
 	struct socket_d *clientSocket;
@@ -78,8 +86,8 @@ struct channel_d
 	//me parece que é necessário.
 	//struct channel_d *serverchannel;
 };
-channel_t *defaultChannel;
-channel_t *CurrentChannel;
+
+struct channel_d *CurrentChannel;
 //...
 
 
@@ -89,22 +97,24 @@ unsigned long channelList[32];
 // Prototypes.
 //
 
-void *CreateChannel(struct process_d *OwnerProcess,
-				    struct thread_d *ClientThread,
-				    struct thread_d *ServerThread);
+void *CreateChannel ( struct process_d *OwnerProcess,
+				      struct thread_d *SenderThread,
+				      struct thread_d *ReceiverThread );
+
 					
-int DestroyChannel(struct channel_d *channel);
+int DestroyChannel (struct channel_d *channel);
 
-int OpenChannel(struct channel_d *channel, 
-                struct process_d *OwnerProcess,
-				struct thread_d *ClientThread,
-				struct thread_d *ServerThread);
+
+int OpenChannel ( struct channel_d *channel, 
+                  struct process_d *OwnerProcess,
+				  struct thread_d *SenderThread,
+				  struct thread_d *ReceiverThread );
 				
-int CloseChannel(struct channel_d *channel);
 
+int CloseChannel (struct channel_d *channel);
 
 
 //
-// Fim.
+// End.
 //
 

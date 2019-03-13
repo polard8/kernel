@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 24
 SUBLEVEL = 0
-EXTRAVERSION = -rc4
+EXTRAVERSION = -rc5
 NAME = ?
 
 
@@ -68,7 +68,7 @@ ifeq ($(ARCH),x86)
 	ldisc.o \
 	gde_serv.o \
 	debug.o diskvol.o install.o object.o runtime.o \
-	abort.o channel.o info.o io.o modules.o proc.o signal.o sm.o \
+	abort.o info.o io.o modules.o proc.o signal.o sm.o \
 	init.o system.o \
 	execve.o 
 	
@@ -78,30 +78,30 @@ ifeq ($(ARCH),x86)
 	KDRIVERS_OBJECTS := ahci.o \
 	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
 	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
-    network.o nicintel.o nsocket.o \
+	channel.o network.o nicintel.o nsocket.o \
 	pci.o pciinfo.o pciscan.o \
 	tty.o \
-    usb.o \
+	usb.o \
 	apic.o pic.o rtc.o screen.o serial.o timer.o video.o vsync.o 
 
 	
 	KSERVERS_OBJECTS := cf.o format.o fs.o read.o search.o write.o \
-    bg.o bmp.o button.o char.o createw.o dtext.o font.o grid.o \
-    line.o menu.o menubar.o pixel.o rect.o sbar.o window.o \
-    logoff.o \
+	bg.o bmp.o button.o char.o createw.o dtext.o font.o grid.o \
+	line.o menu.o menubar.o pixel.o rect.o sbar.o window.o \
+	logoff.o \
 	logon.o \
-    desktop.o room.o userenv.o usession.o \
-    kgws.o \
+	desktop.o room.o userenv.o usession.o \
+	kgws.o \
 	vfs.o 
 	
 	
 	MK_OBJECTS := x86cont.o x86fault.o x86start.o \
-    create.o dispatch.o pheap.o process.o queue.o spawn.o \
-    tasks.o theap.o thread.o threadi.o ts.o tstack.o \
+	create.o dispatch.o pheap.o process.o queue.o spawn.o \
+	tasks.o theap.o thread.o threadi.o ts.o tstack.o \
 	callout.o callfar.o ipc.o ipccore.o sem.o \
 	memory.o mminfo.o mmpool.o pages.o \
-    preempt.o priority.o sched.o schedi.o \
-    mk.o 
+	preempt.o priority.o sched.o schedi.o \
+	mk.o 
 
 
 	REQUEST_OBJECTS := request.o 
@@ -247,10 +247,10 @@ compile-kernel:
 	
 	
 	# kdrivers/network
-	gcc -c kernel/kdrivers/network/nicintel.c    -I include/ $(CFLAGS) $(DEFINES) -o nicintel.o
-	gcc -c kernel/kdrivers/network/network.c  -I include/ $(CFLAGS) $(DEFINES) -o network.o
-	gcc -c kernel/kdrivers/network/nsocket.c  -I include/ $(CFLAGS) $(DEFINES) -o nsocket.o	
-	
+	gcc -c kernel/kdrivers/network/channel.c   -I include/ $(CFLAGS) $(DEFINES) -o channel.o
+	gcc -c kernel/kdrivers/network/nicintel.c  -I include/ $(CFLAGS) $(DEFINES) -o nicintel.o
+	gcc -c kernel/kdrivers/network/network.c   -I include/ $(CFLAGS) $(DEFINES) -o network.o
+	gcc -c kernel/kdrivers/network/nsocket.c   -I include/ $(CFLAGS) $(DEFINES) -o nsocket.o	
 
 	# kdrivers/pci
 	gcc -c kernel/kdrivers/pci/pci.c  -I include/ $(CFLAGS) $(DEFINES) -o pci.o
@@ -300,8 +300,7 @@ compile-kernel:
 	gcc -c kernel/execve/sm/install/install.c  -I include/ $(CFLAGS) $(DEFINES) -o install.o	
 	gcc -c kernel/execve/sm/ob/object.c        -I include/ $(CFLAGS) $(DEFINES) -o object.o
 	gcc -c kernel/execve/sm/rt/runtime.c       -I include/ $(CFLAGS) $(DEFINES) -o runtime.o
-	gcc -c kernel/execve/sm/sys/abort.c    -I include/ $(CFLAGS) $(DEFINES) -o abort.o
-	gcc -c kernel/execve/sm/sys/channel.c  -I include/ $(CFLAGS) $(DEFINES) -o channel.o
+	gcc -c kernel/execve/sm/sys/abort.c    -I include/ $(CFLAGS) $(DEFINES) -o abort.o	
 	gcc -c kernel/execve/sm/sys/info.c     -I include/ $(CFLAGS) $(DEFINES) -o info.o
 	gcc -c kernel/execve/sm/sys/io.c       -I  include/ $(CFLAGS) $(DEFINES) -o io.o
 	gcc -c kernel/execve/sm/sys/modules.c  -I include/ $(CFLAGS) $(DEFINES) -o modules.o
