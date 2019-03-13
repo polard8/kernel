@@ -5,8 +5,15 @@
 
 //#define TASKMAN_VERBOSE 1
 
-int appMain( int argc, char *argv[] ); 
 
+
+//deletar
 int taskmanTest1;
+
+
+
+int main ( int argc, char *argv[] ); 
+
+
 
 

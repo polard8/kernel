@@ -617,14 +617,18 @@ struct thread_list_d
 //DispatcherList[2].Threads[4].tid
 
 
-/* create_thread: */ 
+/* 
+ * create_thread: 
+ */ 
+
 struct thread_d *create_thread ( struct room_d *room,
-                                 struct desktop_d  *desktop,
+                                 struct desktop_d *desktop,
                                  struct window_d *window,
                                  unsigned long init_eip, 
                                  unsigned long init_stack, 
 								 int pid, 
 								 char *name );
+
 void *GetCurrentThread();
 void *FindReadyThread();
 int GetThreadState(struct thread_d *Thread);
@@ -668,25 +672,26 @@ void spawn_thread (int id);
 
 // ## Finalizações ##
 
+
 // Liberar uma thread que estava bloqueada ou esperando.
 void release ( int tid );
+
 
 //Torna zumbi uma thread.
 void exit_thread ( int tid );       
 
+
 //Destrói uma thread.
 void kill_thread (int tid);       
 
+
 void dead_thread_collector ();
+
 
 void kill_all_threads ();
 
 
-int thread_getchar (); 
-
-/* Passando o comando para a thread idle no processo init.
-   Isso é usado em x86main.c */
-void startStartIdle ();  
+int thread_getchar ();
 
 
 //

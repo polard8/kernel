@@ -54,11 +54,12 @@
 
 /*
  * pick_next_thread:
- *     Selecionamos a next_thread olhando nas filas em QUEUE[].
+ *     Selecionamos a 'next_thread' olhando nas filas em QUEUE[].
+ *     QUEUE[] contém ponteiros para listas encadeadas.
  *     Se não tiver nada nas filas então usaremos a IdleThread.
- *     #bugbug: Essa IdleThread está configurada corretamente.
  *
- * QUEUE[] contem ponteiros para listas encadeadas.
+ *     #bugbug: Essa IdleThread está configurada corretamente. ?
+ *     #bugbug: E se não existir IfleThread? 
  */
 
 struct thread_d *pick_next_thread (){
@@ -184,6 +185,7 @@ struct thread_d *pick_next_thread (){
 	
 	return NULL;
 }
+
 
 
 

@@ -470,7 +470,7 @@ int tmInit (){
  *     +... 
  */
 
-int appMain ( int argc, char *argv[] ){
+int main ( int argc, char *argv[] ){
 	
 	//int Status;	
 	int Flag;
@@ -500,8 +500,18 @@ int appMain ( int argc, char *argv[] ){
 	printf("taskman is alive\n");
 #endif	
 	
-	//o kernel deverá associar o PID a um magic.
+	//window, x, y, color, string.
+    apiDrawText ( NULL, 0, 16, COLOR_RED, "TASKMAN.BIN is alive!" );
+	refresh_screen ();
 	
+//loop:
+//	while (1){}	
+	
+	// #bugbug
+	// Essa conexão está obscura.
+	// precisamos criar mecanismos mais transparentes.
+	
+	//o kernel deverá associar o PID a um magic.
 	
     PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
 	

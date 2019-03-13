@@ -1004,17 +1004,21 @@ void *gde_services ( unsigned long number,
 		    return (void *) sys_systemLinkDriver(arg2,arg3,arg4); 
 			break;
 			
-		//130
+			
+		// 130
+		// Pinta um texto em uma dada janela.
+		// #todo: Se não for expecificado a janela, então é pra pintar na janela principal. gui->main.
+		// Repensar se qualquer um pode pintar na janela principal.	
+		// args: window, x, y, color, string.
 		case SYS_DRAWTEXT:
-		    
-			//@todo: Poderia pintar na janela atual.
-			argString = (unsigned char *) arg4;
-		    sys_draw_text ( (struct window_d *) message_address[0], //window
-			    (unsigned long) message_address[1],  //x
-				(unsigned long) message_address[2],  //y
-				(unsigned long) message_address[3],   //color
-				(unsigned char *) message_address[4] ); //string
+			//argString = (unsigned char *) arg4; //??
+		    sys_draw_text ( (struct window_d *) message_address[0], 
+			    (unsigned long) message_address[1],  
+				(unsigned long) message_address[2],  
+				(unsigned long) message_address[3],   
+				(unsigned char *) message_address[4] ); 
 			break;
+			
 			
 		//131
 		// Pintar o caractere especificamente na janela com o foco de entrada.          

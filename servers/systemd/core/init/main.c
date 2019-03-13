@@ -118,9 +118,6 @@ void idleLoop (){
  *     main().
  */ 
 
-static char *argv[] = { "-init",NULL };
-static char *envp[] = { "ROOT=root:/volume0", NULL };
-
 int initMain (void){
 	
 loop:
@@ -128,7 +125,6 @@ loop:
 	
 	return 0;
 }
-
 
 /*
  *********************************************************
@@ -249,6 +245,23 @@ int idleInit (){
 	//...
 	return (int) 0;
 };
+
+
+
+int main ( int argc, char *argv[] ){
+
+	//printf ("INIT.BIN is alive!");
+
+	//window, x, y, color, string.
+    apiDrawText ( NULL, 0, 0, COLOR_RED, "INIT.BIN is alive!" );
+	refresh_screen ();
+	
+loop:
+	while (1){}
+	
+    return 0;
+}
+
 
 
 //

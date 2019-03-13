@@ -86,10 +86,9 @@ void x86mainStartFirstThread ( int n ){
 	 
 	if (n < 0)
 	{
-	    printf("x86mainStartFirstThread: thread number fail");
-        die();
+	    printf ("x86mainStartFirstThread: thread number fail");
+        die ();
 	}
-	
 	
 	switch (n){
 			
@@ -111,8 +110,6 @@ void x86mainStartFirstThread ( int n ){
 	};
 	
 	
-   
- 
     if ( (void *) Thread == NULL )
     {
         panic ("x86mainStartFirstThread: Thread\n");
@@ -158,8 +155,8 @@ void x86mainStartFirstThread ( int n ){
     //
 	
     // #debug
-    printf ("x86mainStartFirstThread: Starting idle TID=%d \n", Thread->tid );
-    refresh_screen(); 
+    printf ("x86mainStartFirstThread: Starting idle TID=%d (debug) \n", Thread->tid );
+    refresh_screen (); 
 
 
     for ( i=0; i <= PRIORITY_MAX; i++ ){
@@ -266,131 +263,9 @@ void x86mainStartFirstThread ( int n ){
                   " iret \n" );
 	};
 	
+	// Paranoia
     panic ("x86mainStartFirstThread: FAIL");
-};
-
-
-
-/*
- *********************************************************
- * startStartIdle:
- *     Initializes idle thread.
- *     # fake idle thread 
- *     idle thread em ring3.
- *     Isso fica em thread.h
- *
- *     @todo: 
- *         + Initializes idle thread.
- *           startIdleThread().
- */
- 
-void startStartIdle (){
-	
-    int i;
- 
-    if ( (void *) IdleThread == NULL )
-    {
-        panic ("x86main-startStartIdle: IdleThread\n");
-		
-    }else{
-
-        if (IdleThread->saved != 0){
-            
-			panic ("x86main-startStartIdle: saved\n");
-        };
-
-        if (IdleThread->used != 1 || IdleThread->magic != 1234){
-			
-            printf ("x86main-startStartIdle: tid={%d} magic \n", IdleThread->tid);
-            die();
-        };
-
-        set_current(IdleThread->tid);       
-        //...
-    };
-
-    // State  
-    if ( IdleThread->state != STANDBY ){
-        printf("x86main-startStartIdle: state tid={%d}\n",IdleThread->tid);
-        die();
-    }
-
-    // * MOVEMENT 2 ( Standby --> Running)
-    if ( IdleThread->state == STANDBY )
-	{
-        IdleThread->state = RUNNING;
-        
-		queue_insert_data( queue, (unsigned long) IdleThread, QUEUE_RUNNING );
-    }
-
-
-	//Current process.
-	current_process = IdleThread->process->pid;
-	
-    //
-	// Done!
-    //
-	
-//#ifdef ENTRY_VERBOSE		
-    // #debug
-    printf("x86main-startStartIdle: Starting idle TID=%d \n", IdleThread->tid );
-    refresh_screen(); 
-//#endif
-
-    for ( i=0; i <= PRIORITY_MAX; i++ ){
-        dispatcherReadyList[i] = (unsigned long) IdleThread;
-    }
-
-
-    IncrementDispatcherCount(SELECT_IDLE_COUNT);
-
-
-    //Set cr3 and flush TLB.
-    mainSetCr3 ( (unsigned long) IdleThread->DirectoryPA );
-    asm ("movl %cr3, %eax");
-    asm ("movl %eax, %cr3");
-
-
-    /* turn_task_switch_on:
-     * + Creates a vector for timer irq, IRQ0.
-     * + Enable taskswitch. */
-	 
-    turn_task_switch_on();
-
-	
-	//#bugbug:
-	//Não podemos inicialziar o timer novamente,
-	//temos que aceitar a configuração que o kernel fez.
-	//mas essa rotina será a mesma usada como serviço 
-	//oferecido pelo kernel, para atualização do HZ.
-	//então vamos testá-la.
-	
-    timerInit8253 ( HZ );
-	
-	//parece que isso é realmente preciso, libera o teclado.
-	//outb(0x20,0x20); 
-   
-	// # go!
-	// Nos configuramos a idle thread em user mode e agora vamos saltar 
-	// para ela via iret.
-	
-    asm volatile (" cli \n"
-                  " mov $0x23, %ax  \n"
-                  " mov %ax, %ds  \n"
-                  " mov %ax, %es  \n"
-                  " mov %ax, %fs  \n"
-                  " mov %ax, %gs  \n"
-                  " pushl $0x23  \n"              // ss.
-                  " movl $0x0044FFF0, %eax  \n"
-                  " pushl %eax  \n"               // esp.
-                  " pushl $0x3200  \n"            // eflags.
-                  " pushl $0x1B  \n"              // cs.
-                  " pushl $0x00401000  \n"        // eip.
-                  " iret \n" );
-
-    panic ("x86main-startStartIdle");
-};
-
+}
 
 
 /*
@@ -597,9 +472,7 @@ int x86main ( int argc, char *argv[] ){
     // The processes are: Kernel, Idle, Shell, Taskman.
     // ps: The images are loaded in the memory.
 
-//createProcesses:
-
-//#ifdef ENTRY_INIT_KERNEL		
+//createProcesses:	
 
     // Creating Kernel process. PID=0.
     KernelProcess = (void *) create_process( NULL, // Window station.
@@ -625,15 +498,11 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 	
-//#endif	
-	
 	
 	//Cria um diretório que é clone do diretório do kernel base 
 	//e retorna o endereço físico desse novo diretório.
 	//gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
-	
-	
-#ifdef ENTRY_INIT_INIT		
+		
     //Creating init process.
 	//UPROCESS_IMAGE_BASE;
     InitProcess = (void *) create_process ( NULL, NULL, NULL, 
@@ -679,12 +548,13 @@ int x86main ( int argc, char *argv[] ){
 	//registra um dos servidores do gramado core.
 	//server_index, process, thread
 	ipccore_register ( (int) 0, (struct process_d *) InitProcess, (struct thread_d *) IdleThread );
-	
-#endif
 
 
+	// #importante
+	// Daqui pra baixo temos a opção de criarmos ou não os processos
+	// e as threads. A configuração está em config.h
 
-#ifdef ENTRY_INIT_SHELL
+#ifdef ENTRY_CREATE_SHELL
 
     //Creating Shell process.
     ShellProcess = (void *) create_process ( NULL, NULL, NULL, 
@@ -728,7 +598,7 @@ int x86main ( int argc, char *argv[] ){
 
 
 
-#ifdef ENTRY_INIT_TASKMAN
+#ifdef ENTRY_CREATE_TASKMAN
 	
     //Creating Taskman process. 
     TaskManProcess = (void *) create_process( NULL, 
@@ -777,8 +647,8 @@ int x86main ( int argc, char *argv[] ){
 
 
 
-#ifdef ENTRY_INIT_KERNELTHREAD_RING0
-
+#ifdef ENTRY_CREATE_KERNELTHREAD_RING0
+	
     //===================================
     // Cria uma thread em ring 0.
 	// Ok. isso funcionou bem.
@@ -787,7 +657,8 @@ int x86main ( int argc, char *argv[] ){
 	// um pouco pra cima, onde criamos o processo kernel.
 	// obs: Mesmo não sendo ela o primeiro TID.
 	
-	RING0IDLEThread = (void *) KiCreateRing0Idle();
+	RING0IDLEThread = (void *) KiCreateRing0Idle ();
+	
     if( (void *) RING0IDLEThread == NULL )
 	{
         panic ("x86main: RING0IDLEThread\n");
@@ -796,7 +667,7 @@ int x86main ( int argc, char *argv[] ){
 
         //RING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
         //...
-    };	
+    };
 	
 #endif		
 
@@ -804,7 +675,7 @@ int x86main ( int argc, char *argv[] ){
 //testando carregar uma segunda thread no mesmo endereço virtual.
 //dessa forma mais de uma thread rodará no mesmo endeereço virtual,
 //mas em processos diferentes.
-#ifdef ENTRY_INIT_THREAD_400000
+#ifdef ENTRY_CREATE_THREAD_400000
   //#bugbug:
   //Me parece que esse rotina afeta o funcionamento 
   //do mecanismo improvisado de execve dentro do gramado core 
@@ -1151,25 +1022,25 @@ done:
 #endif
 
 
-// Isso só executa o INIT INIT se ele foi criado.        
-#ifdef ENTRY_INIT_INIT
-		printf("x86main: INIT_INIT\n");
-		x86mainStartFirstThread(1);
+// Isso só executa o INIT se ele foi criado.        
+#ifdef ENTRY_INITIALIZE_INIT
+		printf("x86main: Initializing INIT ..\n");
+		x86mainStartFirstThread (1);
 		//startStartIdle() ;
 		goto fail;
 #endif		
 		
-// Isso só executa o INIT SHELL se ele foi criado.
-#ifdef ENTRY_INIT_SHELL
-        printf("x86main: INIT_SHELL\n");
-		x86mainStartFirstThread(2);
+// Isso só executa o SHELL se ele foi criado.
+#ifdef ENTRY_INITIALIZE_SHELL 
+        printf("x86main: Initializing SHELL ..\n");
+		x86mainStartFirstThread (2);
 	    goto fail;
 #endif
 
-// Isso só executa o INIT TASKMAN se ele foi criado.
-#ifdef ENTRY_INIT_TASKMAN
-    printf("x86main: INIT_TASKMAN\n");
-	x86mainStartFirstThread(3);	
+// Isso só executa o TASKMAN se ele foi criado.
+#ifdef ENTRY_INITIALIZE_TASKMAN
+    printf("x86main: Initializing TASKMAN ..\n");
+	x86mainStartFirstThread (3);	
 	goto fail;
 #endif
 

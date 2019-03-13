@@ -1,9 +1,5 @@
 
-
-
-#include "api.h"      //api.
-
-//#include <api/api.h>      //api.
+#include <api.h>      //api.
 
 #include <stdio.h>    //libC em user mode.
 #include <stddef.h>   //libC em user mode. 
@@ -15,5 +11,7 @@
 
 
 int initMain (void);
+
+int main ( int argc, char *argv[] );
 
 

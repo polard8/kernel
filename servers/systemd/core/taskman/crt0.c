@@ -8,8 +8,10 @@
 #include "tm.h"
 
 
-extern int appMain ( int argc, char *argv[] ); 
+extern int main ( int argc, char *argv[] ); 
 
+static char *argv[] = { "-init",NULL };
+static char *envp[] = { "ROOT=root:/volume0", NULL };
 
 //
 // # Entry point #
@@ -33,7 +35,7 @@ void crt0 (){
 	// printf("crt0: TASKMAN.BIN is alive \n");
     // refresh_screen();
 	
-	ExitCode = (int) appMain ( 0, 0 ); 
+	ExitCode = (int) main ( 1, argv ); 
 	
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
 	// o erro pode vir no retorno ou implementa-se uma forma de pegar a execessão 

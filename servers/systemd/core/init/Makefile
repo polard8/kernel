@@ -1,20 +1,12 @@
 
 #init process
 
-#history:
-#2019 - Created by Fred Nora and Luciano Gonçalez.
-
-
-# todo:
-# Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
-# É desejável que isso mude.
-
 
 VERSION = 0
 PATCHLEVEL = 1
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = gramado Kernel Shell
+#NAME = Init
 
 
 CFLAGS = -m32 \
@@ -31,27 +23,19 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s
 	
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
+	
+
+LIBC    = ../../../../lib/gdelibs/libc02/include/
+LIBCOBJ = ../../../../lib/gdelibs/libc02/obj
+
+API01   = ../../../../lib/gdelibs/api02/include/
+APIOBJ  = ../../../../lib/gdelibs/api02/obj
 
 
-# desejamos tirar essa flag.
-#	-fleading-underscore \
-
-
-LIBC    = ../../../../lib/gdelibs/libc01/include/
-LIBCOBJ = ../../../../lib/gdelibs/libc01/obj
-
-API01   = ../../../../lib/gdelibs/api01/include/
-APIOBJ  = ../../../../lib/gdelibs/api01/obj
 
 	##
 	## Objects
 	##
-#myObjects = head.o \
-
-
 
 myObjects = crt0.o \
 main.o \

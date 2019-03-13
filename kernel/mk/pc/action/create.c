@@ -140,7 +140,7 @@ void *KiCreateIdle (){
 	    //Continua...
 	};
 
-	//
+
 	// @todo: 
 	// #bugbug: #importante
 	// A stack da idle não deve ficar no heap do kernel.
@@ -149,7 +149,6 @@ void *KiCreateIdle (){
 	// Mas ficará aqui por enquanto.
 	// Obs: Mais abaixo a pilha foi configurada manualmente 
 	// no lugar certo.
-	//
 	
 	//IdleThread->Heap = ?;
 	//IdleThread->HeapSize = ?;
@@ -318,23 +317,25 @@ void *KiCreateIdle (){
 	//nesse caso o contador foi configurado manualmente. 
 	//isso acontece com as threads do gramado core.
 
+	// #importante
+	// A criação da thread idle vai inicializar o contador,
+	// para depois só incrementarmos.
+	
     ProcessorBlock.threads_counter = (int) 1;
 	
     
-
-	
-// Done.	
-
-done:
-    //#bugbug
-	//Não há a necessidade de colocar na fila de inicializadas
-	//se logo em seguida estamos selecionando para execução 
-	//colocando no estado standby.
-    queue_insert_data(queue, (unsigned long) IdleThread, QUEUE_INITIALIZED);
-    SelectForExecution(IdleThread);    // * MOVEMENT 1 ( Initialized ---> Standby ).
-   	return (void*) IdleThread;
-};
-
+    // #bugbug
+	// Não há a necessidade de colocar na fila de inicializadas
+	// se logo em seguida estamos selecionando para execução 
+	// colocando no estado standby.
+    
+	queue_insert_data ( queue, (unsigned long) IdleThread, QUEUE_INITIALIZED );
+    
+	// * MOVEMENT 1 ( Initialized ---> Standby ).
+	SelectForExecution (IdleThread);    
+   	
+	return (void *) IdleThread;
+}
 
 
 /*
@@ -343,6 +344,7 @@ done:
  *     Criando Thread Shell manualmente.
  * @todo: Mudar o nome para createCreateShellThread()
  */
+
 void *KiCreateShell (){
 	
     void *shellStack;                    // Stack pointer. 
@@ -351,47 +353,32 @@ void *KiCreateShell (){
 
     int r;
 	
-   /*
-    *@todo: checar o tipo de processador antes de configurar o contexto.
-	*
-	*/
+    // todo: checar o tipo de processador antes de configurar o contexto.
 
-   /*
-	* PID=1 Shell (RING 3).
-	*/  
-
-	 
-    //Process.
-	/*
-	struct process_d *p;
-	p = (void*) malloc( sizeof(struct process_d) );	
-	if( (void*) p == NULL)
+	// PID=1 Shell (RING 3).  
+	
+	if ( (void *) ShellProcess == NULL )
 	{
-	    printf("KiCreateShell: Process fail.\n");
-		refresh_screen();
-		while(1){}
-	};
-	*/
-	if( (void*) ShellProcess == NULL ){
 	    printf("pc-create-KiCreateShell: ShellProcess\n");
 		die();
 	};	
 	
 	//Thread.
-	t = (void*) malloc( sizeof(struct thread_d) );	
-	if( (void*) t == NULL ){
+	t = (void *) malloc ( sizeof(struct thread_d) );
+	
+	if ( (void *) t == NULL ){
 	    printf("pc-create-KiCreateShell: t \n");
 		die();
-	}
-	else
-	{  
+	}else{  
 	    //Indica à qual proesso a thread pertence.
 	    t->process = (void*) ShellProcess; 
 	};
 
 	//Stack.
 	shellStack = (void*) malloc(4*1024);
-	if( (void*) shellStack == NULL ){
+	
+	if ( (void *) shellStack == NULL )
+	{
 	    printf("pc-create-KiCreateShell: shellStack\n");
 		die();
 	};
@@ -435,6 +422,8 @@ void *KiCreateShell (){
 	t->type = TYPE_SYSTEM;   
 	t->saved = 0;
 	t->preempted = PREEMPTABLE; 
+	
+	
 	//t->Heap;
 	//t->HeapSize;
 	//t->Stack;
@@ -475,12 +464,16 @@ void *KiCreateShell (){
 	t->signalMask = 0;
 
 
-	//Context.
-	t->ss  = 0x23;                          //RING 3.
-	t->esp = (unsigned long) GRAMADOCORE_SHELLTHREAD_STACK; //0x0049FFF0;    //shellStack;//  //RING 3 (pilha do app2)(shell?). 
+	// Context.
+	// RING 3.
+	// 0x0049FFF0;    //shellStack;//  //RING 3 (pilha do app2)(shell?). 
+	// 0x00451000; 
+	
+	t->ss  = 0x23;                         
+	t->esp = (unsigned long) GRAMADOCORE_SHELLTHREAD_STACK; 
 	t->eflags = 0x3200;
 	t->cs = 0x1B;                                
-	t->eip = (unsigned long) GRAMADOCORE_SHELLTHREAD_ENTRYPOINT; //0x00451000;     	                                               
+	t->eip = (unsigned long) GRAMADOCORE_SHELLTHREAD_ENTRYPOINT;     	                                               
 	t->ds = 0x23; 
 	t->es = 0x23; 
 	t->fs = 0x23; 
@@ -509,23 +502,21 @@ void *KiCreateShell (){
 	
 	t->Next = NULL;
 
-	
 
-	
 	//
 	// Running tasks.
 	//
 	
-	ProcessorBlock.threads_counter = 2;
-
+	//ProcessorBlock.threads_counter = 2;
+	ProcessorBlock.threads_counter++;
 	
-// Done.
-done:
-    queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
-    SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
-    return (void*) t;
-};
-
+    queue_insert_data ( queue, (unsigned long) t, QUEUE_INITIALIZED );
+	
+	// * MOVEMENT 1 (Initialized --> Standby).
+    SelectForExecution (t);
+	
+    return (void *) t;
+}
 
 
 /*
@@ -534,6 +525,7 @@ done:
  *     Criando thread task manager manualmente.
  * @todo: Mudar o nome para createCreateTaskmanThread()
  */
+
 void *KiCreateTaskManager (){
 	
     void *taskmanStack;                    // Stack pointer. 	
@@ -542,37 +534,24 @@ void *KiCreateTaskManager (){
 	
 	int r;
 	
-   /*
-    * @todo: 
-	*     Checar o tipo de processador antes de configurar o contexto.
-	*
-	*/
-
-
-   /*
-	* PID=2 taskmanager (RING 3).
-	*/  
+	// #todo: Checar o tipo de processador antes de configurar o contexto.
 	
-	//Process.
-	/*
-	struct process_d *p;
-	p = (void*) malloc( sizeof(struct process_d) );	
-	if( (void*) p == NULL)
+	// PID=2 taskmanager (RING 3).
+	
+	
+	if ( (void *) TaskManProcess == NULL )
 	{
-	    printf("KiCreateTaskManager: Process fail.\n");
-		refresh_screen();
-		while(1){}
-	};
-	*/
-	if( (void *) TaskManProcess == NULL ){
 	    printf("pc-create-KiCreatetaskManager: TaskManProcess\n");
 		die();
 	};	
 
     //Thread.
 	//Alocando memória para a estrutura da thread.
-	t = (void *) malloc( sizeof(struct thread_d) );	
-	if( (void *) t == NULL ){
+	
+	t = (void *) malloc ( sizeof(struct thread_d) );	
+	
+	if( (void *) t == NULL )
+	{
 	    printf("pc-create-KiCreateTaskManager: t \n");
 		die();
 	}else{  
@@ -583,8 +562,10 @@ void *KiCreateTaskManager (){
 	//Stack.
 	//#bugbug
 	//estamos alocando uma stack dentro do heap do kernel.
-	taskmanStack = (void *) malloc(4*1024);
-	if( (void*) taskmanStack == NULL ){
+	taskmanStack = (void *) malloc (4*1024);
+	
+	if ( (void *) taskmanStack == NULL )
+	{
 	    printf("pc-create-KiCreateTaskManager: taskmanStack\n");
 		die();
 	};
@@ -612,11 +593,13 @@ void *KiCreateTaskManager (){
 	}	
 	
 	//Procedimento de janela.
-    t->procedure = (unsigned long) &system_procedure;	
-	t->window = NULL;  //window;  //arg1.
-	t->msg = 0;        //arg2.
-	t->long1 = 0;      //arg3.
-	t->long2 = 0;      //arg4.	
+    
+	t->procedure = (unsigned long) &system_procedure;
+	
+	t->window = NULL;    //arg1.
+	t->msg = 0;          //arg2.
+	t->long1 = 0;        //arg3.
+	t->long2 = 0;        //arg4.	
 
     //Características.	
 	t->type = TYPE_SYSTEM;  
@@ -628,6 +611,7 @@ void *KiCreateTaskManager (){
 	t->iopl = RING3;   
 	t->saved = 0;
 	t->preempted = PREEMPTABLE; 
+	
 	//t->Heap;
 	//t->HeapSize;
 	//t->Stack;
@@ -655,7 +639,6 @@ void *KiCreateTaskManager (){
 	t->waiting_limit = WAITING_LIMIT;
 	t->blockedCount = 0;    //Tempo bloqueada.		
 	t->blocked_limit = BLOCKED_LIMIT;
-	
 
 	t->ticks_remaining = 1000;
 	
@@ -664,12 +647,16 @@ void *KiCreateTaskManager (){
 	t->signal = 0;
 	t->signalMask = 0;
 	
-	//Context.
-	t->ss  = 0x23;                          //RING 3.
-	t->esp = (unsigned long) GRAMADOCORE_TASKMANTHREAD_STACK; //0x004FFFF0;     
+	// Context.
+	// RING 3.
+	// 0x004FFFF0; 
+	// 0x004A1000; 
+	
+	t->ss  = 0x23;                          
+	t->esp = (unsigned long) GRAMADOCORE_TASKMANTHREAD_STACK;     
 	t->eflags = 0x3200;
 	t->cs = 0x1B;                                
-	t->eip = (unsigned long) GRAMADOCORE_TASKMANTHREAD_ENTRYPOINT; //0x004A1000;     	                                               
+	t->eip = (unsigned long) GRAMADOCORE_TASKMANTHREAD_ENTRYPOINT;     	                                               
 	t->ds = 0x23; 
 	t->es = 0x23; 
 	t->fs = 0x23; 
@@ -706,26 +693,21 @@ void *KiCreateTaskManager (){
 	// Running tasks.
 	//
 	
-	ProcessorBlock.threads_counter = 3;
+	//ProcessorBlock.threads_counter = 3;
+	ProcessorBlock.threads_counter++;
+		
+    queue_insert_data ( queue, (unsigned long) t, QUEUE_INITIALIZED );
 	
-// Done.
-done:
-    queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
-    SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
+	// * MOVEMENT 1 (Initialized --> Standby).
+    SelectForExecution (t);
+	
     return (void *) t;
-};
-
+}
 
 
 // ==============  idle thread in ring 0  ===============
 
-
-// Isso é uma thread em ring 0 que será usada como idle.
-void xxxRing0Idle (){
-	
-Loop:
-
-    //#test
+   //#test
     //Ok, está funcionando. :)
 	//printf(".");
     
@@ -735,24 +717,40 @@ Loop:
 	// precisa checar se decrementar esse contador causa algum efeito 
 	// negativo.
 	// É necessário de decrementemos o contador.
+
+// Isso é uma thread em ring 0 que será usada como idle.
+void xxxRing0Idle (){
 	
-	asm("cli");
-	dead_thread_collector();
-    asm("sti");
+Loop:
 	
-	asm("hlt");
+	asm ("cli");
+	dead_thread_collector ();
+    asm ("sti");
+	
+	// Importante:
+	// Efetuamos o halt com as interrupções habilitadas.
+	// Então na primeira interrupção o sistema volta a funcionar.
+	// Se as interrupções estivessem desabilitadas, então esse hlt
+	// paralizatia o sistema.
+	
+	// #Ok, essa função é muito boa,
+	// Mas o ideia é chamarmos ela apenas quando o
+	// sistema estiver ocioso, para que não fiquemos um quantum inteiro
+	// inativo.
+	
+	asm ("hlt");
     goto Loop;
 	
-};
+}
 
 
 /*
  ***************************************************************
  * KiCreateRing0Idle:
  *    Criando manualmente uma thread em ring 0.
- *    Para o processador ficar em hlt quando não tiver outra 
- * thread rodando.
+ *    Para o processador ficar em hlt quando não tiver outra thread rodando.
  */
+
 void *KiCreateRing0Idle (){
 	
     void *ring0IdleStack;                    // Stack pointer. 	
@@ -817,11 +815,7 @@ void *KiCreateRing0Idle (){
 	
 	t->plane = BACKGROUND;
 	
-	
-	
 	t->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
-	
-	//t->DirectoryPA = (unsigned long ) gKernelPageDirectoryAddress;
 	
 	
 	for ( r=0; r<8; r++ ){
@@ -830,11 +824,13 @@ void *KiCreateRing0Idle (){
 
 	
 	//Procedimento de janela.
-    t->procedure = (unsigned long) &system_procedure;	
-	t->window = NULL;  //window;  //arg1.
-	t->msg = 0;        //arg2.
-	t->long1 = 0;      //arg3.
-	t->long2 = 0;      //arg4.	
+    
+	t->procedure = (unsigned long) &system_procedure;	
+	
+	t->window = NULL;      // arg1.
+	t->msg = 0;            // arg2.
+	t->long1 = 0;          // arg3.
+	t->long2 = 0;          // arg4.	
 
     //Características.	
 	t->type = TYPE_SYSTEM;  
@@ -846,6 +842,8 @@ void *KiCreateRing0Idle (){
 	t->iopl = RING0;
 	t->saved = 0;
 	t->preempted = PREEMPTABLE;    //PREEMPT_NAOPODE; //nao pode.	
+	
+	// Não precisamos de um heap para  thread idle por enquanto.
 	//t->Heap;
 	//t->HeapSize;
 	//t->Stack;
@@ -853,14 +851,14 @@ void *KiCreateRing0Idle (){
 
 	//Temporizadores.
 	t->step = 0;
-	t->quantum       = QUANTUM_BASE;
+	t->quantum = QUANTUM_BASE;
 	t->quantum_limit = QUANTUM_LIMIT;	
-
-
+   
+    //Contadores.
 	t->standbyCount = 0;
 	t->runningCount = 0;    //Tempo rodando antes de parar.
-	
 	t->readyCount = 0;      //Tempo de espera para retomar a execução.
+	
 	
 	t->initial_time_ms = get_systime_ms();
 	t->total_time_ms = 0;
@@ -884,16 +882,12 @@ void *KiCreateRing0Idle (){
 	
 	//Context.
 	t->ss  = 0x10 | 0;               
-	t->esp = (unsigned long) (ring0IdleStack+(8*1024));  //pilha. 
+	t->esp = (unsigned long) ( ring0IdleStack + (8*1024) );  //pilha. 
 	
-	//#bugbug 
-	//Problemas nos bits 12 e 13.
-	//queremos que esse código rode em ring0.
+	// #bugbug 
+	// Problemas nos bits 12 e 13.
+	// Queremos que esse código rode em ring0.
 	
-	//#obs: mudei para 0x0200 e funcionou. 
-	//
-	
-	//t->eflags = 0x3200;  
 	t->eflags = 0x0200;  
 	
 	t->cs = 8 | 0;                                
@@ -934,16 +928,23 @@ void *KiCreateRing0Idle (){
 	// Running tasks.
 	//
 	
-	ProcessorBlock.threads_counter = 4;
+	// #bugbug
+	// Se deixarmos de criar alguma das threads esse contador falha.
+	// #todo: Deveríamos apenas incrementá-lo.
 	
-// Done.
-done:
-    queue_insert_data(queue, (unsigned long) t, QUEUE_INITIALIZED);
-    SelectForExecution(t);    // * MOVEMENT 1 (Initialized --> Standby).
-    return (void *) t;
-};
+	//ProcessorBlock.threads_counter = 4;
+	ProcessorBlock.threads_counter++;
+	
+    queue_insert_data (queue, (unsigned long) t, QUEUE_INITIALIZED);
+    
+	// * MOVEMENT 1 (Initialized --> Standby).
+	SelectForExecution (t);    
+    
+	return (void *) t;
+}
 
 
 //
-// Fim.
+// End.
 //
+

@@ -12,8 +12,13 @@
 #include <kernel.h>
 
 
-/* draw_text:
- *     Draw text on a window. */
+/* 
+ * draw_text:
+ *     Draw text on a window.
+ *
+ * #test: 
+ *     Como opção, se nenhuma janela for especificada, então pintaremos na janela principal.
+ */
 
 void 
 draw_text ( struct window_d *window,
@@ -24,11 +29,12 @@ draw_text ( struct window_d *window,
 { 
 	if ( (void *) window == NULL )
 	{
+		draw_string ( gui->main->left +x, gui->main->top +y, color, string );
         return;
     }else{
         draw_string ( window->left +x, window->top +y, color, string );
     };
-};
+}
 
 
 /* draw_string:

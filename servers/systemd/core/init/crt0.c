@@ -13,30 +13,15 @@
 #include "init.h" 
 
 
-static char *argv[] = { 
-    "-interactive",        //shell interativo
-	"-login",              //login
-	"Gramado Core Shell",  //nome do shell
-	"test.sh",             //nome do arquivo de script.
-	NULL 
-};
+static char *argv[] = { "-init",NULL };
+static char *envp[] = { "ROOT=root:/volume0", NULL };
 
 
-// Fake environment.
-static char *envp[] = { 
-    "VFSROOT=root:/volume0",           //root dir do vfs
-    "BOOTVOLUMEROOT=root:/volume1",    //root dir do volume de boot
-    "SYSTEMVOLUMEROOT=root:/volume2",  //root dir do volume do sistema
-	NULL 
-};
+extern int main ( int argc, char *argv[] );
 
-
-//extern int shmain ( int argc, char **argv );	
-extern int initMain (void);
 
 //
 // Main function in C part.
-// The entry point is in head.s
 //
 
 void crt0 (){
@@ -54,9 +39,7 @@ void crt0 (){
 	stdioInitialize ();	
 
 
-	//Response = (int) shmain ( 3, argv ); 
-	Response = (int) initMain (); 
-	
+	Response = (int) main ( 1, argv );
 	
 	//while(1){}
 								

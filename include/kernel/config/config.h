@@ -39,18 +39,46 @@
 // falhar na inicialização, por enquanto. 
 
 
+//=====================================================
+//    ######## Creation flags ########
+//
 
-#define ENTRY_INIT_INIT    1
-#define ENTRY_INIT_SHELL   1
-#define ENTRY_INIT_TASKMAN 1
+//Cria o processo shell e sua thread de controle.
+#define ENTRY_CREATE_SHELL   
+
+//Cria o processo taskman e sua thread de controle.
+#define ENTRY_CREATE_TASKMAN 
+
 
 //Cria uma thread para o processo kernel, que irá rodar em ring0.
-#define ENTRY_INIT_KERNELTHREAD_RING0  1  
+#define ENTRY_CREATE_KERNELTHREAD_RING0    
 
+//#bugbug: isso pode afetar a execução de aplicativos usando o processo init.
 //testando carregar uma segunda thread no mesmo endereço virtual.
 //dessa forma mais de uma thread rodará no mesmo endeereço virtual,
 //mas em processos diferentes.
-#define ENTRY_INIT_THREAD_400000 1
+#define ENTRY_CREATE_THREAD_400000 
+
+
+//====================================================
+//    ######## Initialization flags ########
+//
+
+//#bugbug
+//Se as três flags estiverem acionadas, 
+//o kernel criará todos os três processos mas inicializará o init.
+
+#define ENTRY_INITIALIZE_INIT   
+//#define ENTRY_INITIALIZE_SHELL   
+//#define ENTRY_INITIALIZE_TASKMAN 
+
+
+
+//====================================================
+//    ######## more ... ########
+//
+
+
 
 
 //Autoriza rotinas que usam varia'veis importadas 
