@@ -58,10 +58,14 @@ The system creates a new terminal when it starts a terminal process,
 #define TERMINAL_COUNT_MAX 8
 
 //
-// Número do terminal atual.
+// 
 //
 
-//
+
+// Vamos contar os terminais criados.
+int terminal_count;
+
+
 int terminalLine;       //Troca de linha;(up down)
 int terminalOffset;     //Deslocamento dentro da linha; (left right).
 int terminalLineMax;    //Número máximo de linhas suportadas.
@@ -100,7 +104,15 @@ configurável.
 
 */
 
-//Struct para terminal.
+
+
+
+
+/*
+ * terminal_d:
+ *     Terminal struct.
+ */
+
 struct terminal_d
 {
 	object_type_t objectType;
@@ -112,11 +124,20 @@ struct terminal_d
 	int used;
     int magic;
 	
-	//Owner.
-	int PID;
 	
-	int window_id;
+    // Owner.
+    struct process_d *process;
 	
+	// Thread de input.
+	// Não necessariamente precisa ser a thread de controle ?? 
+	
+	struct thread_d *InputThread;
+	
+	
+	// Window
+	// Uma janela associada ao terminal.
+	
+	struct window_d *window;
 	
 	//@todo: Instance.
 	
@@ -150,34 +171,22 @@ struct terminal_d
 	
 }TERMINAL[TERMINAL_COUNT_MAX];
 
-//List.
-//(Control+F1) Aciona o primeiro terminal
-//(Control+F2)
-//(Control+F3)
-//(Control+F4)
-//(Control+F5)
-//(Control+F6)
-//(Control+F7)
-//(Control+F8) 
-//unsigned long terminalList[TERMINAL_COUNT_MAX]; //TERMINAL_COUNT_MAX
+// #bugbug
+// estamos usando um número limitado de terminais.
+// Por que ??
+// Poderemos acioná-los usando teclas de atalho. F1 à F8
+// Terminais são usados por administradores e desenvolvedores.
+// Não precisamos de muitos.
 
+void terminalPutChar ( int c );
 
-
-/*
- * A do terminal que tem a janela ativa e o foco de entrada.
- *
- *
- */
-struct window_d *terminalActiveWindow;
-struct window_d *terminalWindowWithFocus;
-//...
-
-//envia um caractere para a estrutura de terminal 
-//de onde um aplicativo poderá pegar.
-int terminalFeed(int terminal_id, int ch );
-//int init_system_terminal();
+unsigned long 
+terminal_dialog ( struct window_d *window, 
+                  int msg, 
+                  unsigned long long1, 
+                  unsigned long long2 ); 
 
 //
-//fim.
+// End.
 //
 

@@ -696,11 +696,20 @@ void initialize_system_message_queue (){
 
 
 
-
+unsigned long 
+ldisc_dialog ( struct window_d *window, 
+              int msg, 
+              unsigned long long1, 
+              unsigned long long2 ) 
+{
+    //# cancelada !!!
+    return 0;	
+}
 
 
 
 //
 // End.
 //
+
 

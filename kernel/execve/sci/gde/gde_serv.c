@@ -347,12 +347,12 @@ void *gde_services ( unsigned long number,
 			    (unsigned long) a3, (unsigned long) a4, 0 );   		
 			break;
 
-		//7
-		//desenha um char no backbuffer.
-		//Obs: Esse funciona, não deletar. :)
+		// 7
+		// desenha um char no backbuffer.
+		// Obs: Esse funciona, não deletar. :)
 		// (x,y,color,char)
 		// (left+x, top+y,color,char)
-		//devemos usar o left e o top da janela com foco de entrada.
+		// devemos usar o left e o top da janela com foco de entrada.
         //
 		// Obs: A biblioteca c99 em user mode usa essa chamada para pintar um caractere
 		// quando implementa a função printf(.). Porém esse caractere é pintado
@@ -364,11 +364,12 @@ void *gde_services ( unsigned long number,
 		// ?? Quando um caractere é pintado em uma janela que não está com o foco 
 		//    de entrada ?? ex: shells, logs ...
 		//
-		//Supondo que os aplicativos escreverão mais em terminal por enquanto 
-		//a cor padrão de fonte será a cor de terminal.
+		// Supondo que os aplicativos escreverão mais em terminal por enquanto 
+		// a cor padrão de fonte será a cor de terminal.
 		
 		// #importante	
 		// Aqui está pintando o caractere na janela com o foco de entrada.
+			
 		case SYS_BUFFER_DRAWCHAR:
 			focusWnd = (void *) windowList[window_with_focus];
 			if( (void *) focusWnd == NULL ){ 
@@ -446,13 +447,10 @@ void *gde_services ( unsigned long number,
         //O teclado envia essa mensagem para o procedimento ativo.
         case SYS_KSENDMESSAGE: 
 		    g_nova_mensagem = 1; //existe uma nova mensagem.
-            sys_system_dispatch_to_procedure( (struct window_d *) arg2, 
-			                              (int) arg2, 
-										  (unsigned long) arg4, 
-										  (unsigned long) 0);			
+            sys_system_dispatch_to_procedure ( (struct window_d *) arg2, 
+			    (int) arg2, (unsigned long) arg4, (unsigned long) 0);			
             break;    
       
-	
 		//37 - Chama o procedimento procedimento default. 
 		//@todo return.
 		case SYS_CALLSYSTEMPROCEDURE: 
@@ -565,37 +563,36 @@ void *gde_services ( unsigned long number,
 			sys_KillFocus ( (struct window_d *) hWnd ); 							  
 			break;
 
-		//65	
-		//putchar usando o cursor gerenciado pelo kernel.
-		//a biblioteca em user mode, altera o cursor do kernel e 
-		//usa essa rotina para imprimir.
-		//obs: #importante: Como printf é uma função 
-		//usada pelo terminal virtual, deve-se considerar as cores 
-		//usadas no terminal virtual.
-		//@todo: implementar a configuração de cores no terminal virtual 
-		//usado pelo aplicativo.
-		//obs: estamos improvisando as cores por enquanto.
-		//
-		// Obs: ?? Como faremos para pintar dentro da janela do terminal.
-        // Obs: a rotina de configuração do terminal deverá ajustar 		
-		// as margens usadas pela rotina de impressão de caracteres.
-        // então nesse momento devemos considerar que as margens ja estão 
-        // ajustadas.		
-
-        // #importante:
-		// putchar pertence a libc e todo o sistema tem obedecido 
-		// a sua maneira de imprimir chars ... não podemos mudar 
-		// putchar assim tão facilmente.
-		// refresh_rectangle obedece os deslocamentos usados 
-		// por putchar.
- 		
+		// 65	
 		// Coloca um char usando o 'terminal mode' de stdio.
 		// selecionado em _outbyte.
 		// stdio_terminalmode_flag = não transparente.
-		// Chama função interna.
-		
+		// Chama função interna. (servicesPutChar)
+			
+		// #importante:	
+		// >> putchar usando o cursor gerenciado pelo kernel.
+		// A biblioteca em user mode, altera o cursor do kernel e usa essa rotina 
+		// para imprimir. Essa rotina faz o refresh do retãngulo. 
+		// Mas nossa intenção é mesmo escrever na stream de saída no processo. 
+			
+		// #importante: 
+		// Como printf é uma função usada pelo terminal virtual, deve-se 
+		// considerar as cores usadas no terminal virtual.
+		// obs: Como faremos para pintar dentro da janela do terminal ?
+        // obs: A rotina de configuração do terminal deverá ajustar as 
+		// margens usadas pela rotina de impressão de caracteres, então 
+		// nesse momento devemos considerar que as margens ja estão 
+		// ajustadas.		
+
+        // #importante:
+		// putchar pertence a libc e todo o sistema tem obedecido a sua maneira 
+		// de imprimir chars ... não podemos mudar putchar assim tão facilmente.
+		// refresh_rectangle obedece os deslocamentos usados por putchar.
+
+		//queremos usar rotina dentro do servidor de terminal, em kserver/output.c
+			
 		case SYS_PUTCHAR: 
-			sys_servicesPutChar ( (int) arg2 );		
+			sys_terminalPutChar ( (int) arg2 );
 			break;
 
 		//66 - reservado pra input de usuário.
@@ -1817,30 +1814,18 @@ unsigned long serviceCreateWindow ( char *message_buffer ){
 }
 
 
-// Coloca um char usando o 'terminal mode' de stdio.
-// selecionado em _outbyte.
-// stdio_terminalmode_flag = não transparente.
-// Chama função interna.
+/*
+ ********
+ * servicesPutChar:
+ *     Movendo para terminal/output.c 
+ *     Coloca um char usando o 'terminal mode' de stdio selecionado 
+ * em _outbyte.
+ * stdio_terminalmode_flag = não transparente.
+ */
 
 void servicesPutChar ( int c ){
-	
-	int cWidth = get_char_width ();
-	int cHeight = get_char_height ();
-	
-	if ( cWidth == 0 || cHeight == 0 )
-	{
-		//#debug
-		printf ("servicesPutChar: fail w h ");
-		die();
-	}
-	
-    stdio_terminalmode_flag = 1;  
-	
-	putchar ( (int) c );
-	refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, 
-		cWidth, cHeight );
-	
-	stdio_terminalmode_flag = 0;  
+		
+	terminalPutChar ( (int) c );
 }
  
  
@@ -1936,9 +1921,6 @@ void services_send_message_to_process ( unsigned long msg_buffer, int pid )
 		 }
 	};
 }
-
-
-
 
 
 //

@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 24
 SUBLEVEL = 0
-EXTRAVERSION = -rc5
+EXTRAVERSION = -rc6
 NAME = ?
 
 
@@ -90,6 +90,7 @@ ifeq ($(ARCH),x86)
 	line.o menu.o menubar.o pixel.o rect.o sbar.o window.o \
 	logoff.o \
 	logon.o \
+	input.o output.o terminal.o \
 	desktop.o room.o userenv.o usession.o \
 	kgws.o \
 	vfs.o 
@@ -329,6 +330,11 @@ compile-kernel:
 	
 	gcc -c kernel/kservers/kgws/logon/logon.c    -I include/ $(CFLAGS) $(DEFINES) -o logon.o
 	gcc -c kernel/kservers/kgws/logoff/logoff.c  -I include/ $(CFLAGS) $(DEFINES) -o logoff.o
+
+	gcc -c kernel/kservers/kgws/terminal/input.c     -I include/ $(CFLAGS) $(DEFINES) -o input.o
+	gcc -c kernel/kservers/kgws/terminal/output.c    -I include/ $(CFLAGS) $(DEFINES) -o output.o
+	gcc -c kernel/kservers/kgws/terminal/terminal.c  -I include/ $(CFLAGS) $(DEFINES) -o terminal.o
+	
 	gcc -c kernel/kservers/kgws/user/userenv.c   -I include/ $(CFLAGS) $(DEFINES) -o userenv.o
 	gcc -c kernel/kservers/kgws/user/desktop.c   -I include/ $(CFLAGS) $(DEFINES) -o desktop.o
 	gcc -c kernel/kservers/kgws/user/room.c      -I include/ $(CFLAGS) $(DEFINES) -o room.o
@@ -391,11 +397,8 @@ vhd-copy-files:
 	-sudo cp ../gde/bin/GRAMCODE.BIN  /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GDESHELL.BIN  /mnt/gramadovhd 
 	-sudo cp ../gde/bin/SPR.BIN       /mnt/gramadovhd 
-	-sudo cp ../gde/bin/CHASM32.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/JACKPOT.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GFE.BIN       /mnt/gramadovhd 	
-	-sudo cp ../gde/bin/LUA.BIN       /mnt/gramadovhd 
-	-sudo cp ../gde/bin/TEST.LUA      /mnt/gramadovhd 	
 	-sudo cp ../gde/bin/CAT.BIN       /mnt/gramadovhd 	
 	-sudo cp ../gde/bin/GLIBCT1.BIN   /mnt/gramadovhd 	
 #...

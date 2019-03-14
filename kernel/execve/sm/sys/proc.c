@@ -235,28 +235,6 @@ void procTestF6()
 };
 
 
-// ??
-unsigned long 
-ldisc_dialog( struct window_d *window, 
-              int msg, 
-			  unsigned long long1, 
-			  unsigned long long2 ) 
-{
-    //# cancelada !!!
-    return 0;	
-}
-
-
-// ??
-unsigned long 
-terminal_dialog( struct window_d *window, 
-                 int msg, 
-			     unsigned long long1, 
-				 unsigned long long2 ) 
-{
-    //# cancelada !!!
-    return 0;	
-}
 
 
 /*

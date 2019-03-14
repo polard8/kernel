@@ -1,5 +1,5 @@
 /*
- * File: execve/crts/libc/stdio.c 
+ * File: execve/crts/klibc/stdio.c 
  *
  * Descrição:
  *     +Rotinas de input/output padrão.

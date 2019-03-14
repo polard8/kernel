@@ -36,21 +36,19 @@ void *rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count )
 		 (src == dest) ) 
 	{
         // Yes		
-		return dest;																
+		return dest;
 	}
 	
 	// GCC should optimize this for us :)
 	
 	int i;
 	for ( i=0; i < count; i++ ) 
-	{											
+	{
 		dest[i] = src[i];
 	}
 	
 	return dest;
-};
-
-
+}
 
 
 //
@@ -171,11 +169,11 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
 void 
 drawDataRectangle ( unsigned long x, 
                     unsigned long y, 
-				    unsigned long width, 
-				    unsigned long height, 
-				    unsigned long color )
+                    unsigned long width, 
+                    unsigned long height, 
+                    unsigned long color )
 {
-	
+
 	//#BUGBUG
 	//TEMOS UM PROBLEMÃO AQUI.
 	//Estamos usando um ponteiro sem ao menos
@@ -187,20 +185,20 @@ drawDataRectangle ( unsigned long x,
 	struct rect_d rect;
 	
     rect.bg_color = color;
-   
+
     //Dimensions.
 	rect.x = 0;        
     rect.y = 0;         
     rect.width = width;   
     rect.height = height;    
-   
+
     //Margins.
     rect.left = x;    
     rect.top = y;
     rect.right = rect.left + rect.width;
     rect.bottom = rect.top + rect.height; 
 
-    //Limits.
+	//Limits.
 	//@todo: Repensar os limites para uma janela.
 	// Uma janela poderá ser maior que as dimensões de um dispositivo.
 	// mas não poderá ser maior que as dimensões do backbuffer.
@@ -240,7 +238,7 @@ drawDataRectangle ( unsigned long x,
 void *getClientAreaRect (){
 	
     return (void *) rectClientArea;	
-};
+}
 
 
 /*
@@ -248,27 +246,29 @@ void *getClientAreaRect (){
  *     Inicializa a estrutura do retângulo da área de cliente 
  * da janela ativa.
  */
-void setClientAreaRect( unsigned long x, 
-                        unsigned long y, 
-						unsigned long cx, 
-						unsigned long cy )
+
+void 
+setClientAreaRect ( unsigned long x, 
+                    unsigned long y, 
+                    unsigned long cx, 
+                    unsigned long cy )
 {
     struct rect_d *r;
-	
+
     if ( (void *) rectClientArea == NULL )
 	{
 	    return;
-		
+
 	}else{
 
         r->x = x;
         r->y = y;
         r->cx = cx;
         r->cy = cy;
-		
-        rectClientArea = (void *) r;	
+
+        rectClientArea = (void *) r;
 	};
-};
+}
 
 
 /*
@@ -293,26 +293,25 @@ void setClientAreaRect( unsigned long x,
 void 
 refresh_rectangle ( unsigned long x, 
                     unsigned long y, 
-				    unsigned long width, 
-				    unsigned long height )
-{    
-	void *p = (void *) FRONTBUFFER_ADDRESS;		
+                    unsigned long width, 
+                    unsigned long height )
+{
+	void *p = (void *) FRONTBUFFER_ADDRESS;
 	const void *q = (const void*) BACKBUFFER_ADDRESS;
 
 	//#TEST
 	register unsigned int i;
 	//unsigned int i;
-	
+
 	unsigned int line_size, lines;
 	unsigned int offset;
 	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();	
+	unsigned long Height = (unsigned long) screenGetHeight();
 
 	line_size = (unsigned int) width; 
 	lines = (unsigned int) height;
-	
-	
-	
+
+
 	// = 3; 
 	//24bpp
 	int bytes_count;
@@ -329,24 +328,22 @@ refresh_rectangle ( unsigned long x,
 			
 		//...
 	}
-	
-	
+
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
 	
 	p = (void *) (p + offset);    
 	q = (const void *) (q + offset);    
 	 
-    vsync ();	
+	vsync ();	
 	
 		
 	//(line_size * bytes_count) é o número de bytes por linha. 
 	
 	int count; 
-	
-	
-    //#importante
-    //É bem mais rápido com múltiplos de 4.	
+
+	//#importante
+	//É bem mais rápido com múltiplos de 4.	
 	
 	//se for divisível por 4.
 	if ( ((line_size * bytes_count) % 4) == 0 )
@@ -359,7 +356,7 @@ refresh_rectangle ( unsigned long x,
 		    memcpy32 ( p, q, count );
 		    
 			q += (Width * bytes_count);
-	 	    p += (Width * bytes_count);
+	 		p += (Width * bytes_count);
 	    };
 	}
 
@@ -372,7 +369,7 @@ refresh_rectangle ( unsigned long x,
 		    q += (Width * bytes_count);
 		    p += (Width * bytes_count);
 	    };	
-	}    
+	}
 }
 
 
@@ -380,8 +377,8 @@ refresh_rectangle ( unsigned long x,
 void 
 refresh_rectangle2 ( unsigned long x, 
                      unsigned long y, 
-				     unsigned long width, 
-				     unsigned long height,
+                     unsigned long width, 
+                     unsigned long height,
                      unsigned long buffer1,
                      unsigned long buffer2 )
 {    
@@ -518,23 +515,24 @@ int initialize_saved_rect (){
 	//	asm("hlt");
 	//}
 	
-    return (int) 0;	
-};
-
+    return (int) 0;
+}
 
 
 //#testando ...
 //salvar um retângulo no buffer será semelhante ao método de 
 //salvar um bmp em um arquivo.
-int save_rect ( unsigned long x, 
-                unsigned long y, 
-				unsigned long width, 
-				unsigned long height )
-{		
+
+int 
+save_rect ( unsigned long x, 
+            unsigned long y, 
+            unsigned long width, 
+            unsigned long height )
+{
     if ( (void *) SavedRect ==  NULL )
     {
 	    return (int) 1;
-		
+
 	} else {
 
 	    if ( (void *) SavedRect->buffer_address == NULL )
@@ -554,20 +552,19 @@ int save_rect ( unsigned long x,
 
 	//register unsigned int i;
 	unsigned int i;
-	
+
 	unsigned int line_size, lines;
-	
+
 	unsigned int offset1;  
 	unsigned int offset2;  
-	
+
 	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();	
+	unsigned long Height = (unsigned long) screenGetHeight();
 
 	line_size = (unsigned int) width; //passado por argumento
 	lines = (unsigned int) height;    //passado por argumento
-	
-	
-	
+
+
 	int bytes_count;// = 3; //24bpp
 	
 	switch (SavedBPP)
@@ -580,9 +577,9 @@ int save_rect ( unsigned long x,
 		    bytes_count = 3;
 			break;
 	}
-	
 
-	offset1 = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );	
+
+	offset1 = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
 	
 	//atualizando o offset do backbuffer
 	//offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
@@ -590,10 +587,10 @@ int save_rect ( unsigned long x,
 	//configurando o offset do buffer de salvamento.
 	offset2 = 0;
 	
-	p = (void *) (p + offset2);    
-	q = (const void *) (q + offset1);    
-	 
-    
+	p = (void *) (p + offset2);
+	q = (const void *) (q + offset1);
+
+
 	//não precisa de sincronização pois não estamos enviando para o LFB.
 	//vsync ();	
 	
@@ -640,9 +637,8 @@ int save_rect ( unsigned long x,
 	};	 
     */
 
-
-    return (int) 0;		
-};
+    return (int) 0;
+}
 
 
 /*
@@ -657,13 +653,11 @@ int save_rect ( unsigned long x,
 int 
 show_saved_rect ( unsigned long x, 
                   unsigned long y, 
-				  unsigned long width, 
-				  unsigned long height )
-{		
-    
-	
-	
-	
+                  unsigned long width, 
+                  unsigned long height )
+{
+
+
 	// Checando a estrutura que tem informações 
 	// sobre o retângulo salvo.
 	
@@ -685,8 +679,8 @@ show_saved_rect ( unsigned long x,
     // ## Transferindo ... ##
     //
 	
-	void *p = (void *) BACKBUFFER_ADDRESS;   	
-	const void *q = (const void *) SavedRect->buffer_address;         
+	void *p = (void *) BACKBUFFER_ADDRESS;
+	const void *q = (const void *) SavedRect->buffer_address;
 
 	//register unsigned int i;
 	unsigned int i;
@@ -700,7 +694,7 @@ show_saved_rect ( unsigned long x,
 	unsigned int offset2;  //offset dentro do backbuffer
 	
 	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();	
+	unsigned long Height = (unsigned long) screenGetHeight();
 
 	unsigned int line_size, lines;
 	
@@ -720,7 +714,7 @@ show_saved_rect ( unsigned long x,
 	};
 	
 
-	offset1 = (unsigned int) ( ( bytes_count * SavedX * (y) ) + ( bytes_count * (x) ) );		
+	offset1 = (unsigned int) ( ( bytes_count * SavedX * (y) ) + ( bytes_count * (x) ) );
 	
 	offset2 = 0;
 	
@@ -738,7 +732,7 @@ show_saved_rect ( unsigned long x,
 	//se for divisível por 4.
 	if ( ((line_size * 3) % 4) == 0 )
 	{
-        count = ((line_size * 3) / 4);  	
+        count = ((line_size * 3) / 4);
 
 	    for ( i=0; i < lines; i++ )
 	    {
@@ -754,18 +748,18 @@ show_saved_rect ( unsigned long x,
 	if ( ((line_size * 3) % 4) != 0 )
 	{
 
-        //count = (line_size * 3);  		
-	
+        //count = (line_size * 3);
+
 	    for ( i=0; i < lines; i++ )
 	    {
 		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
 		    q += (Width * 3);
 		    p += (Width * 3);
-	    };	
-	}  			
-	
-    return (int) 0;	
-};
+	    };
+	}
+
+    return (int) 0;
+}
 
 
 //

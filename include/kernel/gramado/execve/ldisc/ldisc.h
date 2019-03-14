@@ -206,6 +206,25 @@ int MOUSE_LINE_DISCIPLINE ( void *buffer );
 // #todo
 // Outros esquemas de input podem ser criados aqui.
 
+
+/*
+ * ldisc_dialog:
+ *     Procedimento de dialogo usado para a manipulação de 
+ * eventos de teclado.
+ *     esse procedimento deve ser chamado quando o sistema 
+ * ou algum processo deseja interagir com o driver de teclado 
+ *  ?? planejando a funcionalidade desse diálogo ??
+ */
+ 
+unsigned long 
+ldisc_dialog ( struct window_d *window, 
+               int msg, 
+               unsigned long long1, 
+               unsigned long long2 ); 
+
+
 //
 // End.
 //
+
+
