@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 24
 SUBLEVEL = 0
-EXTRAVERSION = -rc8
+EXTRAVERSION = -rc9
 NAME = ?
 
 
@@ -380,15 +380,17 @@ vhd-copy-files:
 	sudo cp user/config/GRAMADO.TXT /mnt/gramadovhd
 	
 # bitmaps
-	sudo cp arch/x86/boot/vhd/images/BMP1.BMP      /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/images/MOUSE.BMP     /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/images/APP.BMP       /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/images/FILE.BMP      /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/images/FOLDER.BMP    /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/images/TERMINAL.BMP  /mnt/gramadovhd
-	sudo cp arch/x86/boot/vhd/images/CURSOR.BMP    /mnt/gramadovhd
-	-sudo cp arch/x86/boot/vhd/images/DENNIS.BMP   /mnt/gramadovhd
-	
+	sudo cp kernel/kservers/kgws/bmp/APP.BMP       /mnt/gramadovhd
+	sudo cp kernel/kservers/kgws/bmp/BMP1.BMP      /mnt/gramadovhd
+	sudo cp kernel/kservers/kgws/bmp/CURSOR.BMP    /mnt/gramadovhd
+	-sudo cp kernel/kservers/kgws/bmp/DENNIS.BMP   /mnt/gramadovhd
+	sudo cp kernel/kservers/kgws/bmp/FILE.BMP      /mnt/gramadovhd
+	sudo cp kernel/kservers/kgws/bmp/FOLDER.BMP    /mnt/gramadovhd
+	-sudo cp kernel/kservers/kgws/bmp/GRAMADO.BMP  /mnt/gramadovhd
+	sudo cp kernel/kservers/kgws/bmp/MOUSE.BMP     /mnt/gramadovhd
+	sudo cp kernel/kservers/kgws/bmp/TERMINAL.BMP  /mnt/gramadovhd
+
+
 # fonts
 	sudo cp bin/NC2.FON /mnt/gramadovhd	
 	
