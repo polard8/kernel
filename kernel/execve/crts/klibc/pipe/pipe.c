@@ -48,24 +48,42 @@ int sys_pipe ( int *pipefd ){
     int slot1 = -1;
 	int slot2 = -1;
 	
-	for ( i=0; i< NUMBER_OF_FILES; i++ )
+	// #improvisando
+	// 0, 1, 2 são reservados para o fluxo padrão.
+	// Como ainda não temos rotinas par ao fluxo padrão,
+	// pode ser que peguemos os índices reservados.
+	// Para evitar, começaremos depois deles.
+	
+	for ( i=3; i< NUMBER_OF_FILES; i++ )
 	{
 	    if ( Process->Streams[i] == 0 )
 		{
+			//reserva.
+			Process->Streams[i] = 216;
+			
 		    slot1 = i;
+			break;
 		}
 	}	
 
-	for ( i=0; i< NUMBER_OF_FILES; i++ )
+	for ( i=3; i< NUMBER_OF_FILES; i++ )
 	{
 	    if ( Process->Streams[i] == 0 )
 		{
+			//reserva.
+			Process->Streams[i] = 216;
+			
 		    slot2 = i;
+			break;
 		}
 	}	
 
 	if ( slot1 == -1 || slot2 == -1 ) 
 	{
+		
+		Process->Streams[i] = (unsigned long) 0;
+		Process->Streams[i] = (unsigned long) 0;
+		
 	    return -1;
 	}
 	
@@ -77,6 +95,8 @@ int sys_pipe ( int *pipefd ){
 	
     if ( (void *) buff == NULL )
 	{
+		 Process->Streams[i] = (unsigned long) 0;
+		 Process->Streams[i] = (unsigned long) 0;		
 	     return -1;
 	}
 	
@@ -86,6 +106,8 @@ int sys_pipe ( int *pipefd ){
 	
 	if ( (void *) stream1 == NULL || (void *) stream2 == NULL )
 	{
+		Process->Streams[i] = (unsigned long) 0;
+		Process->Streams[i] = (unsigned long) 0;		
 	    return -1;
 	}else{
 	
@@ -106,6 +128,10 @@ int sys_pipe ( int *pipefd ){
 		stream1->_cnt = stream1->_bufsiz;   
 		stream2->_cnt = stream2->_bufsiz; 
 		
+		
+		Process->Streams[i] = (unsigned long) stream1;
+		Process->Streams[i] = (unsigned long) stream2;
+		
 		// #importante
 		// Esse é o retorno esperado.
 		// Esses índices representam o número do slot
@@ -118,6 +144,7 @@ int sys_pipe ( int *pipefd ){
 		return 0;
 	};
 }
+
 
 //#todo: rotina provisória
 int sys_read_pipe ( int fd, int count ){

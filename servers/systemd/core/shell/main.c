@@ -475,7 +475,9 @@ void shellInitWindowLimits();
 void shellInitWindowSizes();
 void shellInitWindowPosition();
 void shellRefreshVisibleArea();
-void shellSocketTest();
+
+void shellSocketTest ();
+void shellPipeTest ();
 
 // #todo:
 // Se possível, colocar essas rotinas em tests;c
@@ -3162,6 +3164,11 @@ do_compare:
         goto exit_cmp;
     };	
 	
+	if ( strncmp( prompt, "pipe-test", 9 ) == 0 )
+	{       
+		shellPipeTest ();
+		goto exit_cmp;
+    }			
 	
     // puts - testing puts, from libc.
 	if ( strncmp( prompt, "puts", 4 ) == 0 )
@@ -3272,15 +3279,18 @@ do_compare:
         goto exit_cmp;
     };	
 	
-	//socket-test
-	//rotina de teste de soquetes.
-	if ( strncmp( prompt, "socket-test", 11 ) == 0 )
-	{
-		//printf("~socket \n");        
-		shellSocketTest();
-		goto exit_cmp;
-    };		
 	
+	// socket-test
+	// Rotina de teste de soquetes.
+	// Esses soquetes não seguem o padrão da libc.
+	// Mas no futuro serão absorvidos pela libc.
+	
+	if ( strncmp( prompt, "socket-test", 11 ) == 0 )
+	{       
+		shellSocketTest ();
+		goto exit_cmp;
+    }		
+
 	
     // shutdown - isso será um programa. shutdown.bin
 	if ( strncmp( prompt, "shutdown", 8 ) == 0 )
@@ -7233,43 +7243,69 @@ void updateVisibleArea( int direction )
 }
 
 
+/*
+ ***
+ * shellSocketTest:
+ *     Rotina de testes de socket.
+ *     Essas funções não petencem à libc, mas farão parte da libc no futuro,
+ * pois socket na libc tem muitas opções.
+ *
+ * #obs: 
+ * Estamos lidando com soquete que usam endereços de IP e número de porta.
+ * Esse tipo de soquete é usado para RPC.
+ * Outros tipos de soquete lidam com outros tipos de endereço.
+ * Podemos usar soquetes para LPC que apenas conecte dois processos
+ * e troquem mensagens via estrutura padrão de mensagem, 
+ * ex: wind, msg, long1, long2. 
+ */
 
-//rotina de testes de socket
-void shellSocketTest()
-{
-	//#todo: isso precisa ser um porteiro de estrutura.
+void shellSocketTest (){
+	
+	// #todo: 
+	// Isso é um ponteiro de estrutura de soquete,
+	// mas não definimos ainda em user mode.
+	
 	void *socketHandle;
 	
+	//ipv4 address.
 	unsigned long iplong;
-	unsigned long port; //short
+	unsigned long port;     // short
 	
+	//ipv4 address.
 	unsigned char ip[4];
 	
-    printf("\n");
-    printf("shellSocketTest: Testing socket stuff ...\n");
+	unsigned long tmp;
+	
+    printf ("\n");
+    printf ("shellSocketTest:\n");
 
 	
 	//
 	// Creating socket
 	//
 	
-	printf("Creating socket ...\n");
-	socketHandle = (void *) system_call ( 160, (unsigned long) 0xC0A80164, (unsigned long) 0, (unsigned long) 0x22C3 );
+	// Testing 160, 161, 162, 163.
 	
-	printf("Updating socket ...\n");
-	system_call ( 163, (unsigned long) socketHandle, (unsigned long) 0xC0A80165, (unsigned long) 0x22C2 );
+	printf ("Creating socket ...\n");
+	socketHandle = (void *) system_call ( 160, (unsigned long) 0xC0A80164, 
+							    (unsigned long) 0, (unsigned long) 0x22C3 );
 	
-	printf("Getting ip from socket ...\n");
-	iplong = (unsigned long) system_call ( 161, (unsigned long) socketHandle, (unsigned long) socketHandle, (unsigned long) socketHandle);
+	printf ("Updating socket info ...\n");
+	system_call ( 163, (unsigned long) socketHandle, 
+	    (unsigned long) 0xC0A80165, (unsigned long) 0x22C2 );
 	
-	printf("Getting port from socket ...\n");
-	port = (unsigned long) system_call ( 162, (unsigned long) socketHandle, (unsigned long) socketHandle, (unsigned long) socketHandle);
+	printf ("Getting IP from socket ...\n");
+	iplong = (unsigned long) system_call ( 161, (unsigned long) socketHandle, 
+							    (unsigned long) socketHandle, (unsigned long) socketHandle);
+	
+	printf ("Getting port from socket ...\n");
+	port = (unsigned long) system_call ( 162, (unsigned long) socketHandle,
+						       (unsigned long) socketHandle, (unsigned long) socketHandle);
 	
 	//
-	// output
+	// Output
 	//
-	unsigned long tmp;
-	
+		
 	tmp = iplong;
 	ip[3] = (char) ( tmp & 0x000000FF ); 
 	
@@ -7285,12 +7321,33 @@ void shellSocketTest()
 	tmp = (tmp >> 24);
 	ip[0] = (char) ( tmp & 0x000000FF );
 	
-	printf("\n");
-	//printf("iplong=%x\n",iplong);
+	
+	printf ("\n");
 	printf ("Socket: ( %d.%d.%d.%d:%d )\n", 
 		ip[0], ip[1], ip[2], ip[3], port );
 	
-	printf("done\n");
-};
+	printf ("Done\n");
+}
+
+void shellPipeTest (){
+
+    int pipefd[2];
+	
+	//pipe()
+	//system_call ( 247, (unsigned long) piprfd, (unsigned long) 0, (unsigned long) 0 );
+
+    if (pipe(pipefd) == -1) {
+        
+		printf ("fail\n");
+		//perror("pipe");
+               //exit (EXIT_FAILURE);
+    }
+	
+	printf ("Pipes: ( %d %d )\n", pipefd[0], pipefd[1] );	
+}
+
+
+
+
 
 
