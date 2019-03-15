@@ -1361,10 +1361,10 @@ Mainloop:
 			(unsigned long) &message_buffer[0] );
 		exitCriticalSection(); 
 			
-		if ( message_buffer[1] != 0 )
-        {
+		//if ( message_buffer[1] != 0 )
+        //{
             //printf(".");			
-		}	
+		//}	
 		
 		if ( message_buffer[1] != 0 )
 		{
@@ -1580,8 +1580,8 @@ shellProcedure( struct window_d *window,
         break;
 		
 		case MSG_KEYUP: 
-		    // printf("%c", (char) 'u');
-            // printf("%c", (char) long1);  			
+		     //printf("%c", (char) 'u');
+             //printf("%c", (char) long1 );  			
 		    break;
 		
 		//Não interceptaremos mensagens do sistema por enquanto.
@@ -1592,9 +1592,7 @@ shellProcedure( struct window_d *window,
 		    switch (long1)
 			{
 		        
-				case VK_F1:
-                    
-
+				case VK_F1:               
 					//shellTestLoadFile ();
 					
 					//inicializa a área visível.
@@ -1618,9 +1616,7 @@ shellProcedure( struct window_d *window,
 		        case VK_F11:
 				    
 					break;
-					
 				//...
-
 			};
 			break;
 		
@@ -1630,10 +1626,8 @@ shellProcedure( struct window_d *window,
 		//como o context menu [Application Key]
 		case MSG_SYSKEYUP:
             switch (long1)
-			{
-				
+			{		
 				//O MENU APPLICATION É O CONTEXT MENU.
-				//
 				case VK_APPS:
 				    MessageBox ( 1, "Gramado Core Shell:", "VK_APPS Context Menu" );
 					break;
@@ -1647,14 +1641,14 @@ shellProcedure( struct window_d *window,
 			{
 				// Null.
 				case 0:
-				    MessageBox( 1, "Shell test", "Testing MSG_COMMAND.NULL." );
+				    MessageBox ( 1, "Shell test", "Testing MSG_COMMAND.NULL." );
 				    break;
 				
 				// About.
 				// Abre uma janela e oferece informações sobre o aplicativo.
 				case CMD_ABOUT:
 				    // Test.
-				    MessageBox( 1, "Shell test", "Testing MSG_COMMAND.CMD_ABOUT." );
+				    MessageBox ( 1, "Shell test", "Testing MSG_COMMAND.CMD_ABOUT." );
 				    break;
 				
 				//clicaram no botão

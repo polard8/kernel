@@ -1,5 +1,6 @@
 /*
  * File: i8042/ps2kbd.c
+ *
  *     keyboard controller support.     
  *
  * env:
@@ -70,7 +71,7 @@ int BAT_TEST (){
  *  @todo: enviar para o driver de teclado o que for de lá.
  *         criar a variável keyboard_type ;;; ABNT2 
  */
-// void keyboardInit()
+
 void ps2_keyboard_initialize (){
 	
 	//user.h
@@ -126,8 +127,15 @@ void ps2_keyboard_initialize (){
 	
 */
 	
-	//buffer
+	// #test
+	// Inicializando o buffer de teclado.
+	// #bugbug: Não sabemos se nesse momento a estrutura de stream já é válida.
+	
 	int i;
+	
+	for ( i=0; i< current_stdin->_cnt ; i++){
+		current_stdin->_base[i] = (char) 0;
+	}
 	
 	for ( i=0; i<128; i++){
 	    keybuffer[i] = 0;
@@ -208,9 +216,9 @@ void ps2_keyboard_initialize (){
 	
 	//Debug support.
 	scStatus = 0;
-
+	
     g_driver_keyboard_initialized = (int) 1;
-};
+}
 
 
 //Pega o status das teclas de modificação.
@@ -312,6 +320,7 @@ void ldisc_init_lock_keys (){
  * keyboardEnable:
  *     Enable keyboard.
  */
+
 void keyboardEnable (){
 	
 	//Wait for bit 1 of status reg to be zero.
@@ -324,13 +333,14 @@ void keyboardEnable (){
 	//Send code for setting Enable command.
     outportb(0x60,0xF4);
     //sleep(100);
-};
+}
 
 
 /*
  * keyboardDisable:
  *     Disable keyboard.
  */
+
 void keyboardDisable (){
 	
 	//Wait for bit 1 of status reg to be zero.
@@ -343,7 +353,7 @@ void keyboardDisable (){
 	//Send code for setting disable command.
     outportb(0x60,0xF5);
     //sleep(100);
-};
+}
 
 
 /*
@@ -386,6 +396,7 @@ void keyboard_set_leds (char flag){
  *     Dado o id de uma thread, retorna o ponteiro de estrutura da janela 
  * à qual a thread pertence.
  */
+
 void *KdGetWindowPointer (int tid){
 	
 	struct thread_d *t;
@@ -421,6 +432,7 @@ void *KdGetWindowPointer (int tid){
  * @todo: bugbug: A mensagem deve estar na fila do processo, na
  *                estrutura do proceso. (Talvez não na thread e nem na janela.)
  */
+
 int KbGetMessage (int tid){
 	
 	int ret_val;
@@ -445,6 +457,7 @@ int KbGetMessage (int tid){
  * KbGetLongParam1:
  *    Pega o parametro "long1" do procedimento de janela de uma thread.
  */
+
 unsigned long KbGetLongParam1 (int tid){
    	
 	struct thread_d *t;

@@ -138,7 +138,8 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
     //Variáveis para tecla digitada.
     unsigned char scancode;
     unsigned char key;         //Tecla (uma parte do scancode).  
-    unsigned long mensagem;    //arg2.	
+	
+	int message;               //arg2.
     unsigned long ch;          //arg3 - (O caractere convertido para ascii).
     unsigned long status;      //arg4.  
 
@@ -158,10 +159,11 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 
 	//Debug stuff.
     //Show the scancode if the flag is enabled.	
-	if (scStatus == 1){
-	    printf("{%d,%x}\n",scancode,scancode);
-	};
 	
+	if (scStatus == 1){
+		
+	    kprintf ("{%d,%x} ", scancode, scancode );
+	}
 	
     //
     // Step 2 - Tratar as mensagens.
@@ -169,10 +171,13 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 
     //Se a tecla for (liberada).
 	//Dá '0' se o bit de paridade for '0'.
+	
     if( (scancode & LDISC_KEY_RELEASED) == 0 )
 	{
+		//Desativando o bit de paridade caso esteja ligado.
+		
 	    key = scancode;
-		key &= LDISC_KEY_MASK;    //Desativando o bit de paridade caso esteja ligado.
+		key &= LDISC_KEY_MASK;    
 
 		//Configurando se é do sistema ou não.
 		//@todo: Aqui podemos chamar uma rotina interna que faça essa checagem.
@@ -185,49 +190,49 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 			//left Shift liberado.
 			case VK_LSHIFT:
 				shift_status = 0;
-				mensagem = MSG_SYSKEYUP;
+				message = MSG_SYSKEYUP;
 			    break;
 
 			//Left Control liberado.			
 			case VK_LCONTROL:
 				ctrl_status = 0;
-				mensagem = MSG_SYSKEYUP;
+				message = MSG_SYSKEYUP;
 				break;
 
 			//left Winkey liberada.
 			case VK_LWIN:
 			    winkey_status = 0;
-                mensagem = MSG_SYSKEYUP;
+                message = MSG_SYSKEYUP;
 				break;
 
 			//Left Alt liberado.
             case VK_LMENU:
 				alt_status = 0;
-				mensagem = MSG_SYSKEYUP;
+				message = MSG_SYSKEYUP;
 			    break;				
 			
 			//right winkey liberada.
 			case VK_RWIN:
 			    winkey_status = 0;
-                mensagem = MSG_SYSKEYUP;
+                message = MSG_SYSKEYUP;
 				break;
 
 			//control menu.
 			case VK_CONTROL_MENU:
 			    //controlmenu_status = 0; //@todo
-			    mensagem = MSG_SYSKEYUP;
+			    message = MSG_SYSKEYUP;
 			    break;
 
             //right control liberada.
 			case VK_RCONTROL:
 				ctrl_status = 0;
-				mensagem = MSG_SYSKEYUP;
+				message = MSG_SYSKEYUP;
 				break;
 				
 			//right Shift liberado.
 			case VK_RSHIFT:
 				shift_status = 0;
-				mensagem = MSG_SYSKEYUP;
+				message = MSG_SYSKEYUP;
 			    break;
 
 			//Funções liberadas.
@@ -243,47 +248,39 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
             case VK_F10:
             case VK_F11:
             case VK_F12:
-			    mensagem = MSG_SYSKEYUP;
+			    message = MSG_SYSKEYUP;
 			    break;
-
 
 			//...
 				
 			//A tecla liberada NÃO é do sistema.
 			default:
-			    mensagem = MSG_KEYUP;
+			    message = MSG_KEYUP;
 				break;
 		};
 
 		//Selecionando o char para os casos de tecla liberada.
 
-        //Analiza: Se for do sistema usa o mapa de caracteres apropriado. 
-   		if(mensagem == MSG_SYSKEYUP)
-		{
-			//Normal.
-			ch = map_abnt2[key];
-		};
-
 		//Analiza: Se for tecla normal, pega o mapa de caracteres apropriado.
-		if(mensagem == MSG_KEYUP)
+		//minúscula
+		//Nenhuma tecla de modificação ligada.
+		if (message == MSG_KEYUP)
 		{
-		    //checar os mudificadores para maiúscula.
-		    //if(shift_status == 1 || capslock_status == 1)
-			//{	
-			//    ch = shift_abnt2[key];	
-			//	goto done;
-			//};
-			
-			//minúscula
-			//Nenhuma tecla de modificação ligada.
 			ch = map_abnt2[key];
 			goto done;
-			
-            //Nothing.
 		};
+		
+        //Analiza: Se for do sistema usa o mapa de caracteres apropriado. 
+		//Normal.
+   		if (message == MSG_SYSKEYUP)
+		{
+			ch = map_abnt2[key];
+		};
+		
         //Nothing.
 		goto done;
 	};
+	
 	
 	// * Tecla (pressionada) ...........	
 	if( (scancode & LDISC_KEY_RELEASED) != 0 )
@@ -308,13 +305,13 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 				if (capslock_status == 0)
 				{ 
 				    capslock_status = 1; 
-					mensagem = MSG_SYSKEYDOWN; 
+					message = MSG_SYSKEYDOWN; 
 					break; 
 				};
 				if (capslock_status == 1)
 				{ 
 				    capslock_status = 0; 
-					mensagem = MSG_SYSKEYDOWN; 
+					message = MSG_SYSKEYDOWN; 
 					break; 
 				};
 				break; 
@@ -323,26 +320,26 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 			case VK_LSHIFT:
 			//case KEY_SHIFT:
 				shift_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 			    break;
 
 			//left control pressionada.
-			case VK_LCONTROL:
 			//case KEY_CTRL:
+			case VK_LCONTROL:
 				ctrl_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 				break;
 
 			//Left Winkey pressionada.
 			case VK_LWIN:
 			    winkey_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 				break;
 
             //left Alt pressionada.
             case VK_LMENU:
 				alt_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 			    break;
 
 			//@todo alt gr.	
@@ -350,7 +347,7 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 			//Right Winkey pressionada.
 			case VK_RWIN:
 			    winkey_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 				break;
 			
             //@todo: Control menu.
@@ -358,13 +355,13 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 			//Right control pressionada.
 			case VK_RCONTROL:
 				ctrl_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 				break;
 
 			//Right shift pressionada.
 			case VK_RSHIFT:
 				shift_status = 1;
-				mensagem = MSG_SYSKEYDOWN;
+				message = MSG_SYSKEYDOWN;
 			    break;
 
 
@@ -380,21 +377,23 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
             case VK_F10:
             case VK_F11:
             case VK_F12:
-			    mensagem = MSG_SYSKEYDOWN;
+			    message = MSG_SYSKEYDOWN;
 			    break;
 
 
 			//Num Lock.	
 		    case VK_NUMLOCK:
 			    //muda o status do numlock não importa o anterior.
-				if(numlock_status == 0){
+				if (numlock_status == 0)
+				{
 		            numlock_status = 1;
-					mensagem = MSG_SYSKEYDOWN;
+					message = MSG_SYSKEYDOWN;
 					break;
 				};
-				if(numlock_status == 1){ 
+				if (numlock_status == 1)
+				{ 
 				    numlock_status = 0;
-                    mensagem = MSG_SYSKEYDOWN; 					
+                    message = MSG_SYSKEYDOWN; 					
 					break; 
 				};
 			    break;
@@ -402,14 +401,15 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 			//Scroll Lock.	
 		    case VK_SCROLL:
 			    //muda o status do numlock não importa o anterior.
-				if(scrolllock_status == 0){
+				if(scrolllock_status == 0)
+				{
 		            scrolllock_status = 1;
-					mensagem = MSG_SYSKEYDOWN;
+					message = MSG_SYSKEYDOWN;
 					break;
 				};
 				if(scrolllock_status == 1){ 
 				    scrolllock_status = 0;
-                    mensagem = MSG_SYSKEYDOWN; 					
+                    message = MSG_SYSKEYDOWN; 					
 					break; 
 				};
 			    break;
@@ -417,25 +417,16 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
             //...
 
 			//A tecla pressionada não é do sistema.
+			
 			default:
-			    //printf("keyboard debug: default: MSG_KEYDOWN\n");
-			    mensagem = MSG_KEYDOWN;
+			    message = MSG_KEYDOWN;
+				//printf("keyboard debug: default: MSG_KEYDOWN\n");
 				break;
 		};
 
-		//uma tecla do sistema foi pressionada.
-		if (mensagem == MSG_SYSKEYDOWN)
-		{
-			ch = map_abnt2[key];
-            goto done;
-		};
-
 		//uma tecla normal foi pressionada.
-		//mensagem de digitação.		
-		//Se o shift ou o capslock estiverem acionados, ela vira maiúscula.
-		//#bugbug: Como o shift  não funciona ainda, então vamos usar 
-		//só o capslock como tecla de modificação da digitação por enquanto.
-		if (mensagem == MSG_KEYDOWN)
+		//mensagem de digitação.				
+		if (message == MSG_KEYDOWN)
 		{
             //maiúsculas.			
 			if (capslock_status == 1)
@@ -451,37 +442,38 @@ int KEYBOARD_LINE_DISCIPLINE ( unsigned char SC ){
 			    goto done;
 			};
 			
+			//#todo
+			// fomos avisados que se trata de uma scape sequence para teclas extras
+			// do teclado estendido. Temos que pegar o scancode de outro mapa.
+			
+			//if ( ESCAPE_E0 == 1 && numlock_status == 1 )
+			//{
+		    //    ch = numlock_abnt2[key];
+			//    ESCAPE_E0 = 0;
+			//	goto done;			
+			//}
+			
             //Nothing.
 		};
+		
+		//uma tecla do sistema foi pressionada.
+		if (message == MSG_SYSKEYDOWN)
+		{
+			ch = map_abnt2[key];
+            goto done;
+		};		
 		
 		//Nothing.
 		goto done;
 	};//fim do else
 
-    //Nothing.
+    //
+	// ## Done ##
+	//
 	
 	// Para finalizar, vamos enviar a mensagem para fila certa.
+	
 done:
-
-	/*
-	 * Debug:
-     *     No caso de modo texto.
-	 *
-	 * Coloca o scancode na tela
-     * set_up_cursor(0,4);
-	 * printf("       "); 	
-     * set_up_cursor(0,4);
-	 * printf("%d ",(unsigned char) (key & 0xff) );
-     * Coloca o caractere na tela
-	 * screen[76] = (char) ch;
-	 * screen[77] = (char) 0x09;  //azul no preto
-	 */
-
-
-	//Debug:
-	//Canto direito da primeira linha.
-	//screen[76] = (char) ch;
-	//screen[77] = (char) 0x09;    //Azul no preto.
 
 	//
 	// Control + Alt + Del.
@@ -513,11 +505,13 @@ done:
 		//system_procedure ...
 		// @todo: Chamar o aplicativo REBOOT.BIN.
 	
-	if ( (ctrl_status == 1) && 
-	     (alt_status == 1) && 
-		 (ch == KEY_DELETE) )
+	if ( (ctrl_status == 1) && (alt_status == 1) && (ch == KEY_DELETE) )
 	{
-		gde_services ( SYS_REBOOT, 0, 0, 0 );
+		// #todo: 
+		// Chamar outra rotina de reboot.
+		// Se o driver estiver em user mode, tem que fazer uma chamada ao sistema.
+		
+		//gde_services ( SYS_REBOOT, 0, 0, 0 );
 	}
 
 	
@@ -551,56 +545,56 @@ done:
 	
 	if ( (void *) w == NULL )
 	{
-		printf("KEYBOARD_LINE_DISCIPLINE: w");
-		die();
+		printf ("KEYBOARD_LINE_DISCIPLINE: w");
+		die ();
 		
 	}else{
 			
 		if ( w->used != 1 || w->magic != 1234 )
 		{
-			printf("KEYBOARD_LINE_DISCIPLINE: w validation");
-			die();
+			printf ("KEYBOARD_LINE_DISCIPLINE: w validation");
+			die ();
 		}		
-
-		// ## thread ##
 		
-		//#importante:
-		//Pegamos a thRead de input associada com a janela 
-		//que tem o foco de entrada.
+		// #importante:
+		// Pegamos a THREAD de input associada com a janela que tem o 
+		// foco de entrada.
 		
 		t = (void *) w->control;
 		
 		if ( (void *) t == NULL )
 		{
-		    printf("KEYBOARD_LINE_DISCIPLINE: t");
-		    die();			
+		    printf ("KEYBOARD_LINE_DISCIPLINE: t");
+		    die ();			
 		}
 		
 		if ( t->used != 1 || t->magic != 1234 )
 		{
-			printf("KEYBOARD_LINE_DISCIPLINE: t validation");
-			die();
+			printf ("KEYBOARD_LINE_DISCIPLINE: t validation");
+			die ();
 		}        
-			
-		//#importante:
-		//??
+
+		//
+		//  ## Message ##
+		//
+
 		
-		//a janela com o foco de entrada deve receber input de teclado.
-		//então a mensagem vai para a thrad associada com a janela com o foco de 
-		//entrada.
-		//#importante: a rotina que seta o foco deverá fazer essa associação,
-		//o aplicativo chama a rotina de setar o foco em uma janela, 
-		//o foco será setado nessa janela e a thread atual será associada 
-		//a essa janela que está recebendo o foco.
+		// #importante:
+		// A janela com o foco de entrada deve receber input de teclado.
+		// Então a mensagem vai para a thread associada com a janela que tem 
+		// o foco de entrada.		
+		// Como o scancode é um char, precisamos converte-lo em unsigned long.
 		
-		//??
-		//ja o input de mouse deve ir para a thread de qualquer janela.
+		unsigned long tmp;
+				
+		tmp = (unsigned long) scancode;
+		tmp = (unsigned long) ( tmp & 0x000000FF );
 		
 		t->window = w;
-		t->msg = (int) mensagem;
-		t->long1 = ch;
-		t->long2 = ch;
-		
+		t->msg = message;
+		t->long1 = ch;     // Key.
+		t->long2 = tmp;    // Scan code.
+			
 		t->newmessageFlag = 1;
 		
 		// Teclas para teste.
@@ -610,7 +604,7 @@ done:
 		// Os aplicativos não devem usar essas teclas por enquanto.
 		// Então Essas teclas funcionarão mesmo que os aplicativos estejam com problema.
 		
-	    switch (mensagem)
+	    switch (message)
 		{
 			case MSG_SYSKEYDOWN:  
 			    switch (ch)
@@ -621,8 +615,8 @@ done:
 					case VK_F7:	
 					case VK_F8:	
 		               
-						system_procedure (  w, (int) mensagem, 
-					        (unsigned long) ch, (unsigned long) ch );					
+						system_procedure (  w, (int) message, 
+					        (unsigned long) ch, (unsigned long) tmp );					
 					    
 						break;
 				}

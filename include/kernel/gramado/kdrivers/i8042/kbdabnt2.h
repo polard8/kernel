@@ -67,7 +67,9 @@
 /*
  * NORMAL ABNT2.
  *     ?? const char* ??
+ * obs: Isso pode ser carregável para várias configurações de teclado.
  */
+
 static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  0,      //Scancode 0.
  033,    //1  (Esc). (\e)

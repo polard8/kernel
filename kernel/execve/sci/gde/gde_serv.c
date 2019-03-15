@@ -827,7 +827,7 @@ void *gde_services ( unsigned long number,
 		    if ( &message_address[0] == 0 )
 			{
 				printf ("services: 111, null pointer");
-				die();
+				die ();
 				
 			}else{
 				
@@ -837,10 +837,39 @@ void *gde_services ( unsigned long number,
 	            {
 		           return NULL;
 	            }
-								
+				
+				// Se não existe uma mensagem na thread, então vamos
+				// pegar uma mensagem de teclado no buffer de teclado (stdin).
+				// Mas e se retornar o valor zero, pois não tem nada no buffer?
+				// Nesse caso vamos retornar essa função dizendo que não temos mensagem
+				// ou tentaremos pegar mensagens em outro arquivo de input.
+				// #teste Do mesmo modo, se o scancode for um prefixo, podemos
+				// pegar o próximo scancode para termos uma mensagem.
+				
 				if ( t->newmessageFlag != 1 )
 				{
+					sc_again:
+					
 					SC = (unsigned char) get_scancode ();
+					
+					if ( SC == 0 )
+					{
+						return NULL;
+					}
+					
+					//#todo
+					// Avisamos que se trata de uma sequência de caracteres.
+					// Uma escape sequence.
+					// Então a disciplina de linhas do teclado vai tratar
+					// o scancode que receber de forma diferente, pegando
+					// char de mapa diferentes.
+					if ( SC == 0xE0 )
+					{
+						//#todo
+						//ESCAPE_E0 = 1;
+						goto sc_again;
+					}
+					
 	                KEYBOARD_LINE_DISCIPLINE ( SC );						
 				}
 	
@@ -865,7 +894,6 @@ void *gde_services ( unsigned long number,
 				    
 				//sinaliza que há mensagem
 				return (void *) 1; 
-				
 			};
 		    break;
 			

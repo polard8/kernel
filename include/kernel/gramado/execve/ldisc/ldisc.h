@@ -140,8 +140,8 @@
 //ldisc
 int scStatus;
 
-
-
+//#todo
+int ESCAPE_E0;
  
  
 //??ldisc

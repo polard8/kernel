@@ -1,5 +1,6 @@
 /*
  * File: i8042/keyboard.c
+ *
  *     +handler for keyboard irq.    
  *
  * env:
@@ -96,25 +97,11 @@ void abnt2_keyboard_handler (){
 	}
 }
 
-/*
-// PUT SCANCODE
-void abnt2_keyboard_handler (){
-	
-    unsigned char scancode = inportb (0x60);	
-		
-	keybuffer[keybuffer_tail++] = (char) scancode;
-	
-	if ( keybuffer_tail >= 128 ){
-		keybuffer_tail = 0;
-	}
-};
-*/
 
-
-//#importante
-//Isso é usado pelo serviço que pega mensagens de input. (111).
-//pega o scancode.
-//renova a fila do teclado
+// #importante
+// Isso é usado pelo serviço que pega mensagens de input. (111).
+// Pega o scancode.
+// Renova a fila do teclado
 
 unsigned long get_scancode (){
 	
@@ -133,25 +120,6 @@ unsigned long get_scancode (){
 	return (unsigned long) SC; 	
 }
 
-/*
-// GET SCANCODE
-unsigned long get_scancode (){
-	
-	unsigned long SC = 0;
-	
-	SC = (unsigned char) keybuffer[keybuffer_head];
-					
-	keybuffer[keybuffer_head] = 0;
-	
-	keybuffer_head++;
-	
-	if ( keybuffer_head >= 128 ){ 
-	    keybuffer_head = 0; 
-	};	
-	
-	return (unsigned long) SC; 	
-}
-*/
 
 /*
  **************
