@@ -14,7 +14,7 @@
 VERSION = 0
 PATCHLEVEL = 24
 SUBLEVEL = 0
-EXTRAVERSION = -rc9
+EXTRAVERSION = -rc10
 NAME = ?
 
 
@@ -395,14 +395,19 @@ vhd-copy-files:
 	sudo cp bin/NC2.FON /mnt/gramadovhd	
 	
 #Get available apps
-#	-sudo cp ../gde/apps/gt/chasm/build/CHTEST.BIN /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GRAMCODE.BIN  /mnt/gramadovhd 
-	-sudo cp ../gde/bin/GDESHELL.BIN  /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GRAMTEXT.BIN  /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GFE.BIN       /mnt/gramadovhd 
 	-sudo cp ../gde/bin/SPR.BIN       /mnt/gramadovhd 
+	
+	-sudo cp ../gde/bin/GDEINIT.BIN   /mnt/gramadovhd 	
+	-sudo cp ../gde/bin/GDESHELL.BIN  /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GDETM.BIN     /mnt/gramadovhd 
+	
 	-sudo cp ../gde/bin/JACKPOT.BIN   /mnt/gramadovhd 
-	-sudo cp ../gde/bin/GFE.BIN       /mnt/gramadovhd 	
-	-sudo cp ../gde/bin/CAT.BIN       /mnt/gramadovhd 	
-	-sudo cp ../gde/bin/GLIBCT1.BIN   /mnt/gramadovhd 	
+	-sudo cp ../gde/bin/CAT.BIN       /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GLIBCT1.BIN   /mnt/gramadovhd 
+
 #...
 	
 	

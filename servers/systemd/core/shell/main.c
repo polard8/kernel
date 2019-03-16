@@ -654,11 +654,12 @@ int main ( int argc, char *argv[] ){
 	//Ok isso funcionou.
 	//Argumentos passados com sucesso do crt0 para o main.
 	
-	//printf("argc={%d}\n",argc);
-	
-	//printf("arg[0]={%s}\n",argv[0]);
-	//printf("arg[1]={%s}\n",argv[1]);
-	//printf("arg[2]={%s}\n",argv[2]);
+	//printf("argc={%d}\n",argc);	
+	//if ( argc >= 2 )
+	//{
+	//    printf("arg[0]={%s}\n",argv[0]);
+	//    printf("arg[1]={%s}\n",argv[1]);
+	//}
 	
 	//
 	// Filtra a quantidade de argumentos.
@@ -684,6 +685,20 @@ int main ( int argc, char *argv[] ){
 		goto noArgs; 
 		
 	}else{
+		
+		
+		// #importante
+		// Precisamos de 9 argumentos.
+		// Ver os argumentos no crt0.c
+		
+		// #importante
+		// Não podemos comparar com um ponteiro nulo, se não é PF.
+		
+		if (argc < 2)
+		{
+		    printf ("main: argc=%d we need 2 or more \n", argc );
+			return 1;
+		}
 		
 		// 0
 		// Nome passado viar argumento.
