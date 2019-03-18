@@ -804,8 +804,8 @@ int diskATAInitialize ( int ataflag ){
 	//#todo: Criar rotina que identifica em qual canal e dispositivo estamos atuando.
 	//Isso foi definido em config.h
 	
-	g_current_ide_channel =  __IDE_CHANNEL;
-	g_current_ide_device = 	__IDE_MASTER;
+	g_current_ide_channel =  __IDE_PORT;
+	g_current_ide_device = 	__IDE_SLAVE;
 	
 	
 	// Configurando flags do driver.

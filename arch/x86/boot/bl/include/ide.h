@@ -59,8 +59,6 @@ typedef enum {
  
 struct ide_ports_d 
 {
-    //int id;
-
 	uint8_t id;
 	
     int used;
@@ -69,10 +67,10 @@ struct ide_ports_d
 	//PATA, SATA, PATAPI, SATAPI
 	int type;
 	
-	char *name;
-	
     unsigned short base_port;
 
+	char *name;
+	
     //...
 
     // Dá pra colocar aqui mais informações sobre 
@@ -80,6 +78,7 @@ struct ide_ports_d
     // podemos usar ponteiros para estruturas.
 	
 };	
+
 struct ide_ports_d ide_ports[4];
  
  
@@ -209,7 +208,7 @@ pio_rw_sector ( unsigned long buffer,
                 unsigned long lba, 
 				int rw, 
 				int port,
-                int master ); 
+                int slave ); 
 
 
 

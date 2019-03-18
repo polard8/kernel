@@ -577,7 +577,12 @@ system_procedure ( struct window_d *window,
 					printf("F5:\n"); 
 					
 					//testando driver ahci
-					ahciSATAInitialize (1);
+					//ahciSATAInitialize (1);
+					//refresh_screen();
+					
+					//mostra informações sobre as portas ide.
+					//vamos ver os valores obtidos nas BARs.
+					show_ide_info ();
 					refresh_screen();
 					
 					//mostra as estruturas de pagina usadas para paginação no pagedpool.

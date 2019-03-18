@@ -152,7 +152,7 @@ pio_rw_sector ( unsigned long buffer,
                 unsigned long lba, 
                 int rw, 
                 int port,
-                int master )
+                int slave )
 {
 
     unsigned long tmplba = (unsigned long) lba;
@@ -179,13 +179,13 @@ pio_rw_sector ( unsigned long buffer,
 	// 1 = slave
 	
 	//master. bit 4 = 0
-	if (master == 1)
+	if (slave == 0)
 	{
 		tmplba = tmplba | 0x000000E0;    //1110 0000b;
 	}
 	
 	//slave. bit 4 = 1
-	if (master == 0)
+	if (slave == 1)
 	{
 		tmplba = tmplba | 0x000000F0;    //1111 0000b;
 	};

@@ -151,11 +151,15 @@ pio_rw_sector ( unsigned long buffer,
                 unsigned long lba, 
 				int rw, 
 				int port,
-                int master )
+                int slave )
 {
 
     unsigned long tmplba = (unsigned long) lba;
 	
+	
+	//#bugbug
+	//só funcionaram as portas 0 e 2.
+	//para primary e secondary.
 	
 	if ( port < 0 || port >= 4 )
 		return -1;
@@ -178,20 +182,24 @@ pio_rw_sector ( unsigned long buffer,
 	// 1 = slave
 	
 	//master. bit 4 = 0
-	if (master == 1)
+	if (slave == 0)
 	{
 		tmplba = tmplba | 0x000000E0;    //1110 0000b;
 	}
 	
 	//slave. bit 4 = 1
-	if (master == 0)
+	if (slave == 1)
 	{
 		tmplba = tmplba | 0x000000F0;    //1111 0000b;
 	};
 	
 	outportb ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
-	
-	
+    
+      
+    //testando
+    //outportb ( (int) ide_ports[port].base_port + 6, (int) 0xE0 | (master << 4) | ((tmplba >> 24) & 0x0F));
+    
+  	
 	//0x01F2 ; Port to send number of sectors
 	outportb ( (int) ide_ports[port].base_port + 2 , (int) 1 );
 	
@@ -315,7 +323,7 @@ void my_read_hd_sector ( unsigned long ax,
 					(unsigned long) bx, 
 					(int) 0x20, 
 					(int) g_current_ide_channel,       // 0
-                    (int) g_current_ide_device );	   //1
+                    (int) g_current_ide_device );	   // 1
 	
 	/*
 	 //antigo.
@@ -395,6 +403,7 @@ void my_write_hd_sector ( unsigned long ax,
  *     Inicializa o driver de hd.
  *     @todo: Mudar para hddInit().
  */
+
 int init_hdd (){
 	
     //

@@ -201,7 +201,7 @@ void read_lba( unsigned long address, unsigned long lba);     //ide.
 
 //int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port ) ; 
 
-int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port, int master ) ; 
+int pio_rw_sector ( unsigned long buffer, unsigned long lba, int rw, int port, int slave ) ; 
 
 void my_read_hd_sector( unsigned long ax, 
                         unsigned long bx, 

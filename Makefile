@@ -14,11 +14,19 @@
 VERSION = 0
 PATCHLEVEL = 24
 SUBLEVEL = 0
-EXTRAVERSION = -rc11
-NAME = ?
+EXTRAVERSION = .0
+NAME = Ikigai
 
 
 ARCH ?= x86
+
+
+
+# Setup disk:
+# For now we're using IDE disk on primary master.
+# You can setup this options in:
+# arch/x86/boot/bl/include/config/config.h for the boot loader and
+# include/kernel/config/config.h for the kernel.
 
 
 
