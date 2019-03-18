@@ -9,10 +9,16 @@
  * Versão 1.0, 2015.
  */
 
-  //
- // IDE ports.
- //
- 
+//
+// IDE ports.
+//
+
+
+int g_current_ide_channel;
+int g_current_ide_device;
+
+
+
 //0 primary master 
 //1 primary slave 
 //2 secondary master 

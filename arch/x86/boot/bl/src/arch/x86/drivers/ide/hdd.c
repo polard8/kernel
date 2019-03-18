@@ -314,8 +314,8 @@ void my_read_hd_sector ( unsigned long ax,
 	pio_rw_sector ( (unsigned long) ax, 
 					(unsigned long) bx, 
 					(int) 0x20, 
-					(int) 0,       //port ?
-                    (int) 1 );	   //master=1 slave=0
+					(int) g_current_ide_channel,       // 0
+                    (int) g_current_ide_device );	   //1
 	
 	/*
 	 //antigo.
@@ -366,8 +366,8 @@ void my_write_hd_sector ( unsigned long ax,
     pio_rw_sector ( (unsigned long) ax, 
 					(unsigned long) bx, 
 					(int) 0x30, 
-					(int) 0, 
-					(int) 1 );
+					(int) g_current_ide_channel,   //0 
+					(int) g_current_ide_device );  //1
 	
 	
 	

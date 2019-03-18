@@ -1494,6 +1494,8 @@ uint32_t diskPCIScanDevice ( int class ){
  * sobre o disco.
  * Credits: Nelson Cole;
  */
+
+
 int diskATAInitialize ( int ataflag ){
 	
 	int Status = 1;  //error
@@ -1504,6 +1506,14 @@ int diskATAInitialize ( int ataflag ){
 	_u8 bus;
 	_u8 dev;
 	_u8 fun;
+
+	
+	//#importante HACK HACK
+	// usando as definições feitas em config.h
+	// até que possamos encontrar o canal e o dispositivo certos.
+	
+	g_current_ide_channel =  __IDE_CHANNEL;
+	g_current_ide_device = 	__IDE_MASTER;	
 	
 	
 	//
