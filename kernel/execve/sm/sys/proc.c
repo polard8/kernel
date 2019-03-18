@@ -212,27 +212,22 @@ xxxtestlibc()
 
 
 
-void procTestF6()
-{	 
+void procTestF6 (){
+	
 	void *address = (void *) kmalloc (1024);
 	
 	unsigned char *buffer = (unsigned char *) address;
 
-    /*
-    //tentando carregar setores específicos pra saber se a função está 
-	//carregando quanquer setor.
-	
-	//read test (buffer, lba, rw flag, port number )
-    pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x20, (int) 0 );	
+    //write
+	pio_rw_sector ( (unsigned long) buffer, 
+	    (unsigned long) 559, 
+		(int) 0x30, 
+		(int) g_current_ide_channel, 
+		(int) g_current_ide_device );	
 	 
-	printf("%s",buffer); 
-	*/
-	
-	
-	pio_rw_sector ( (unsigned long) buffer, (unsigned long) 559, (int) 0x30, (int) 0, (int) 1 );	
-	 
-	//printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
-};
+	// #debug
+	// printf("Signature: [ %x %x ] \n" , buffer[0x1FE], buffer[0x1FF] ); 
+}
 
 
 

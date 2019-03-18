@@ -150,8 +150,8 @@ int hdd_ata_wait_no_drq (int p){
 int 
 pio_rw_sector ( unsigned long buffer, 
                 unsigned long lba, 
-				int rw, 
-				int port,
+                int rw, 
+                int port,
                 int master )
 {
 
@@ -193,24 +193,24 @@ pio_rw_sector ( unsigned long buffer,
 	outportb ( (int) ide_ports[port].base_port + 6 , (int) tmplba );
 	
 	
-	//0x01F2 ; Port to send number of sectors
+	//0x01F2 ; Port to send, number of sectors
 	outportb ( (int) ide_ports[port].base_port + 2 , (int) 1 );
 	
 	
-	//0x1F3  ; Port to send bit 0 - 7 of LBA
+	//0x1F3  ; Port to send, bit 0 - 7 of LBA
 	tmplba = lba;
 	tmplba = tmplba & 0x000000FF;	
 	outportb ( (int) ide_ports[port].base_port + 3 , (int) tmplba );
 	
 	
-	//0x1F4  ; Port to send bit 8 - 15 of LBA
+	//0x1F4  ; Port to send, bit 8 - 15 of LBA
 	tmplba = lba;
 	tmplba = tmplba >> 8;
 	tmplba = tmplba & 0x000000FF;
 	outportb ( (int) ide_ports[port].base_port + 4 , (int) tmplba );
 	
 
-	//0x1F5  ; Port to send bit 16 - 23 of LBA
+	//0x1F5  ; Port to send, bit 16 - 23 of LBA
 	tmplba = lba;
 	tmplba = tmplba >> 16;
 	tmplba = tmplba & 0x000000FF;
@@ -314,8 +314,8 @@ my_read_hd_sector ( unsigned long ax,
 	pio_rw_sector ( (unsigned long) ax, 
 					(unsigned long) bx, 
 					(int) 0x20, 
-					(int) 0,    //channel
-					(int) 1 );  //master=1 slave=0
+					(int) g_current_ide_channel,   //0 ... channel
+					(int) g_current_ide_device );  //1 ... master=1 slave=0
 
 	/*
 	 // #antigo.
@@ -361,8 +361,8 @@ my_write_hd_sector ( unsigned long ax,
 	pio_rw_sector ( (unsigned long) ax, 
 					(unsigned long) bx, 
 					(int) 0x30, 
-					(int) 0,     //channel
-					(int) 1 );   //master=1 slave=0
+					(int) g_current_ide_channel,     //0 ... channel
+					(int) g_current_ide_device );    //1 ... master=1 slave=0
 
 /*
 	//antigo.

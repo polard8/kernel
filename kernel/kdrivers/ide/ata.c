@@ -799,6 +799,14 @@ int diskATAInitialize ( int ataflag ){
 	
 	int Ret = -1;  //fail
 	
+	//#importante
+	//Isso é provisório.
+	//#todo: Criar rotina que identifica em qual canal e dispositivo estamos atuando.
+	//Isso foi definido em config.h
+	
+	g_current_ide_channel =  __IDE_CHANNEL;
+	g_current_ide_device = 	__IDE_MASTER;
+	
 	
 	// Configurando flags do driver.
 	// FORCEPIO = 1234

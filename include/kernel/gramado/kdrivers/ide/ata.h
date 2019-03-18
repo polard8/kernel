@@ -15,6 +15,8 @@
 #ifndef __ATA_H__
 #define __ATA_H__
 
+int g_current_ide_channel;  //primary or secondary.
+int g_current_ide_device;   //master or slave
 
 /*
  **************************************************************

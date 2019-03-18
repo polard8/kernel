@@ -473,9 +473,6 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	//setor 0.
 	my_read_hd_sector ( (unsigned long) &mbr[0] , 0, 0 , 0 );  
 	
-	// read test (buffer, lba, rw flag, port number )
-    //pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x20, (int) 0 );			
-	
 	//message:
 	printf("\n");
 	printf("fsCheckMbrFile: testing MBR ...\n");
@@ -492,9 +489,9 @@ void fsCheckMbrFile ( unsigned char *buffer ){
 	}
 	
 	//jmp
-	printf("JMP: [ %x ", mbr[ BS_JmpBoot + 0 ] );
-	printf("%x ", mbr[ BS_JmpBoot + 1 ] );
-	printf("%x ]\n", mbr[ BS_JmpBoot + 2 ] );
+	printf ("JMP: [ %x ", mbr[ BS_JmpBoot + 0 ] );
+	printf ("%x ", mbr[ BS_JmpBoot + 1 ] );
+	printf ("%x ]\n", mbr[ BS_JmpBoot + 2 ] );
 	
 	
 	//name

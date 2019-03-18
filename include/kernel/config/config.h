@@ -7,6 +7,22 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+//
+// ## IMPORNTANTE ##
+//
+
+// usaremos essa configuraçao provisoriamente
+// ate que tenhamos a condiçao de selecionarmos corretamente
+// o canal e o dispositivo.
+// Inicializaremos essas variaveis ao inicializarmos
+// o controlador de ata. ide. em ata.c diskATAInitialize.
+
+
+// PRIMARY MASTER.
+#define __IDE_CHANNEL 0
+#define __IDE_MASTER  1
+
+
 
 #define FRED_VHD_32MB
 
