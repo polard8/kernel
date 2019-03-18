@@ -24,11 +24,6 @@ char *secondary_desktop_folder = SDESKTOPFOLDER;
 int desktop_running = 0;
 
 
- 
-
-
-
-
 
 int desktopInitialize (){
 	
@@ -41,16 +36,6 @@ int desktopInitialize (){
 
 
 
-/*
- * desktop_loop:
- *     Loop de mensagens no modo desktop.
- */
-int desktop_loop(){
-
-    return 0;
-}
-
-
 // Procedimento de janela do modo desktop.
 unsigned long 
 desktopProcedure ( struct window_d *window, 
@@ -60,6 +45,34 @@ desktopProcedure ( struct window_d *window,
 {
 	printf ("Desktop procedure \n");
     return 0;
+}
+
+
+int shellStartDesktopMode (){
+
+	printf ("shellStartDesktopMode: Initializing desktop mode ...\n");
+		
+	//criamos a barra.
+	//lembrando que o ponteiro é global.
+	
+	shellCreateTaskBar ();
+	
+
+    //#todo	
+	desktopInitialize ();
+	
+ 	
+    //
+	// #IMPORTANTE
+	// NÃO FAZEMOS LOOP AQUI ....
+	// USAREMOS O LOOP DO SHELL.
+	// O SHELL CHAMA O PROCEDIMENTO DO DESKTOP CASO A FLAG
+	// DEMONSTRE QUE O MODO DESKTOP ESTÁ ATIVADO.
+	//
+
+	//Dessa forma, somente inicializaremos e sairemos ...
+	
+	return 0;
 }
 
 

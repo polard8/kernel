@@ -163,8 +163,10 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
 */
 
  
-/* drawDataRectangle:
- *     Draw a rectangle on backbuffer. */
+/* 
+ * drawDataRectangle:
+ *     Draw a rectangle on backbuffer. 
+ */
 
 void 
 drawDataRectangle ( unsigned long x, 
@@ -212,11 +214,12 @@ drawDataRectangle ( unsigned long x,
         rect.right = SavedX;
 	}	
 
-	/* @todo:
-    if( rect->bottom > SavedY ){
-        rect->bottom = SavedY;
-	};
-    */	
+	//teste
+    if ( rect.bottom > SavedY )
+	{
+        rect.bottom = SavedY;
+	}
+    	
   	
     // Draw lines on backbuffer.
 	
@@ -225,16 +228,16 @@ drawDataRectangle ( unsigned long x,
 	    my_buffer_horizontal_line ( rect.left, y, rect.right, rect.bg_color );
 		y++;
     };    
-};
-  
-  
-  
+}
+
+
 /*
  * getClientAreaRect:
  *     Obtém o ponteiro da estrutura do retângulo  
  *     da área de cliente da janela ativa.
  *     @todo: oferecer esse serviço para a api.
  */  
+
 void *getClientAreaRect (){
 	
     return (void *) rectClientArea;	

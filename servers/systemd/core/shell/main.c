@@ -843,49 +843,54 @@ noArgs:
 		//main pode fechar o shell depois de ter usado o modo desktop.
 		
 	    desktopReturn = shellStartDesktopMode ();
-	}
-	
-	//
-	// # Taskbar or main window #
-	//
-	
-	
-	//  # taskbar #
-    if ( taskbar == 1 )
-	{
-		mainwindow_used = 0;
 		
-		enterCriticalSection ();    	
-        shellCreateTaskBar ();	
-	    exitCriticalSection ();		
+		//printf ("Exiting shell ...\n");
+		//exit (0);
 		
-	// # Main window #		
+		printf ("Initializing desktop mode loop ...\n");
+		goto Mainloop;
+		
+		//while(1){}
+	
+	
+	//#importante
+	//se não estamos no modo shell.	
+	
 	}else{
+	
+	    //  # taskbar #
+        if ( taskbar == 1 )
+	    {
+		    mainwindow_used = 0;
 		
-		mainwindow_used = 1;
+            shellCreateTaskBar ();	
 		
-	    enterCriticalSection ();    
-        hWindow = shellCreateMainWindow (1);
-	    shell_info.main_window = ( struct window_d * ) hWindow;			
-	    exitCriticalSection ();
+	        // # Main window #		
+	    }else{
+		
+		    mainwindow_used = 1;
+		
+	        enterCriticalSection ();    
+            hWindow = shellCreateMainWindow (1);
+	        exitCriticalSection ();
+		
+		    shell_info.main_window = ( struct window_d * ) hWindow;			
+	    };	
+		
+		
+	    // # Headless #
+	    //nesse modo não teremos janela alguma
+	
+	    if (headless == 1)
+	    {
+	        //#todo;
+     	}
+		
+		//...
 	};
 	
 	
-	//
-	// # Headless #
-	//	
 	
-	//#test
-	//nesse modo não teremos janela alguma
-	
-	if (headless == 1)
-	{
-	    //#todo;
-	}
-	
-	
-	//#bugbug
-	//falha quando chamamos a rotina de pintura da janela.
 		
 	//
 	// @todo: Usar essa rotina para fazer testes de modo gráfico.
@@ -3668,14 +3673,7 @@ do_compare:
 	// taskbar
     if ( strncmp( prompt, "taskbar", 7 ) == 0 )
 	{
-	    enterCriticalSection();    
-	    
-		//Apenas inicialize. Continuaremos com o procedimento 
-		//do shell e não o da barra,
-		//shellCreateTaskBar ();
-	    
-		exitCriticalSection();    
-		
+		shellCreateTaskBar ();
 		goto exit_cmp;
     };			
 	

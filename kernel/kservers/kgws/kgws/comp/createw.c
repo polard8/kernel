@@ -200,8 +200,11 @@ void *CreateWindow ( unsigned long type,
 	// Obs: Podemos ir usando apenas um estilo padrão por enquanto.
 	
 	// (min, max ...).
-	int View;	
+	//int View;	
 
+	int Maximized; //??
+	int Minimized; //
+	
 	// Bars.
 	int TitleBar = 0;
 	int MenuBar = 0;
@@ -412,11 +415,11 @@ void *CreateWindow ( unsigned long type,
 		window->view = (int) view;
 		
 		// Se não estivermos no modo gráfico, não há o que pintar.
-		if ( g_useGUI == 0 )
-		{ 
-		    window->view = (int) VIEW_MINIMIZED;
+		//if ( g_useGUI == 0 )
+		//{ 
+		 //   window->view = (int) VIEW_MINIMIZED;
             //#bugbug: Abortar.			
-		};
+		//};
 
         //Se não foi oferecido um modo de exibição, então temos um problema.
         //?? Talvez devamos retornar um erro. 
@@ -834,10 +837,15 @@ void *CreateWindow ( unsigned long type,
 	//não podemos checar as coisas na estrutura ainda,
 	//mas a estrutura ja existe a algumas coisas foram inicializadas.
 	
-	View = 0;
-	View = (int) is_window_minimized(window);
+	// #importante
+	// Pois retornaremos no caso de janelas minimizadas.
+	// Provavelmente isso foi usado quando criamos janelas 
+	// de referência na inicialização da GUI.(root)
 	
-    if ( View == 1 )
+	Minimized = 0;
+	Minimized = (int) is_window_minimized (window);
+	
+    if ( Minimized == 1 )
 	{
 		//window->draw = 1; //Devemos pintála no buffer dedicado.
 		window->show = 0;
@@ -846,41 +854,66 @@ void *CreateWindow ( unsigned long type,
 		
 		//@todo: Não retornar. 
 		//como teste estamos retornando.
-		//goto done;
-	    return (void *) window;
+		
+		goto done;
+	    //return (void *) window;
 	}
+	
 	
 	// @todo: Maximized ?
 	// Para maximizar devemos considerar as dimensões da área de cliente
 	// da janela mãe.
-	// Se a jenela estiver maximizada, então deve ter 
-	// o tamanho da área do cliente, caso ela seja uma janela filha.
+	// Se a jenela estiver maximizada, então deve ter o tamanho da área de 
+	// cliente da janela main.
 	// Essa área de cliente poderá ser a área de trabalho, caso a
 	// janela mãe seja a janela principal.
-	// Obs: se estiver mazimizada devemos usar as dimensão e coordenadas 
+	// Obs: se estiver maximizada, devemos usar as dimensão e coordenadas 
 	// da janela gui->main.
 	
-	View = 0;
-	View = (int) is_window_maximized(window);
+	// #bugbug
+	// Temos um problema com essa limitação.
+	// Não conseguimos pintar janelas simples além do height da janela gui->main
+	// para janelas overlapped funciona.
 	
-    if ( View == 1 )
+	
+	Maximized = 0;
+	Maximized = (int) is_window_maximized (window);
+	
+    if ( Maximized == 1 )
 	{
-		//Dimensões.	
-        window->width  = gui->main->width;
-        window->height = gui->main->height;  
 		
-		//Margens.
-		window->left = gui->main->x;    
-        window->top = gui->main->y;
-        window->right = (unsigned long) window->left + window->width;
+		//#debug
+		printf("file: createw.c: #debug\n");
+		printf ("original: l=%d t=%d w=%d h=%d \n", 
+		    window->left, gui->main->top, window->width, window->height );
+		
+		//Margens da janela gui->main
+		window->left = gui->main->left;    
+        window->top  = gui->main->top;		
+		
+		//Dimensões da janela gui->main.
+        window->width  = gui->main->width;
+        window->height = gui->main->height;  		
+        
+		window->right = (unsigned long) window->left + window->width;
         window->bottom = (unsigned long) window->top  + window->height;       
 
-		//Deslocamentos em relação às margens.
-		// Os deslocamentos servem para inserir elementos na janela, como barras, botões e textos.
+		// ??
+		// Deslocamentos em relação às margens.
+		// Os deslocamentos servem para inserir elementos na janela, 
+		// como barras, botões e textos.
 		window->x = 0;
         window->y = 0;		
+		
+		//#debug
+		printf ("corrigido: l=%d t=%d w=%d h=%d \n", 
+		    window->left, gui->main->top, window->width, window->height );
+		
+		//#debug
+		refresh_screen();
+		while(1){}
 	}	
-
+	
     //  # FULL SCREEN #
 
 	//??
@@ -997,7 +1030,6 @@ void *CreateWindow ( unsigned long type,
 		drawDataRectangle ( window->left, window->top, 
 			window->width, window->height, window->bg_color ); 
 		
-
         //?? More ...	
 	}
 
@@ -1508,6 +1540,11 @@ void *CreateWindow ( unsigned long type,
 		//Parent->statusbar = window;
 	//};
 	
+	
+	//
+	//  ## Create button ##
+	//
+	
 	//JANELA DO TIPO BOTÃO.
 	//#BUGBUG: NÃO TEMOS INFORMAÇÕES SOBRE O TIPO DE BOTÃO 
 	//QUE DEVEMOS CRIAR. SÓ SABEMOS QUE A JANELA É DO TIPO BOTÃO.
@@ -1525,7 +1562,6 @@ void *CreateWindow ( unsigned long type,
         window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
                                                  window->left, window->top, window->width, window->height, 
                                                  window->bg_color );
-		
 		window->isButton = 1;	
 	}	
 
@@ -1594,8 +1630,7 @@ void *CreateWindow ( unsigned long type,
 		
 		window->statusbar = CreateWindow ( WT_STATUSBAR, 1, 1, "Status: ...", 
 	                              window->left+1, window->bottom-25-1, 
-								  window->width, 25,							  
-					              window, 0, 
+								  window->width, 25, window, 0, 
 								  COLOR_BLUE, COLOR_GRAY );
         
 		// Registrar.

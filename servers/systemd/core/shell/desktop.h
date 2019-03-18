@@ -2,7 +2,9 @@
 
 
 int desktopInitialize ();
-int desktop_loop();
+
+
+int shellStartDesktopMode ();
 
 
 // Procedimento de janela do modo desktop.

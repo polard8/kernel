@@ -1,5 +1,5 @@
 /*
- * File: gws/logon/logon.c
+ * File: kgws/logon/logon.c
  *
  * Descrição:
  *     Kernel Mode Logon Support Routines.
@@ -486,86 +486,99 @@ done:
  *      A área de trabalho.
  *      *Importante: É a área disponível na tela para o aplicativo. 
  */
-void logon_create_mainwindow()
-{  
+
+void logon_create_mainwindow (){
+	
     struct window_d *hWindow; 
 	 
 	//Dimensões:
+	
 	unsigned long Left = (unsigned long) SCREEN_DEFAULT_LEFT;
 	unsigned long Top  = (unsigned long) SCREEN_DEFAULT_TOP;
-	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();
+	
+	unsigned long Width = (unsigned long) screenGetWidth ();
+	unsigned long Height = (unsigned long) screenGetHeight ();
 
- 
-	if( (void*) gui == NULL ){
+	// #bugbug
+    // Não vedemos prosseguir se essa janela falhar.
+	
+	if ( (void *) gui == NULL )
+	{
         return;
     }; 
 	
-	//
 	// A janela principal pertence ao desktop.
-	//
-	
-	//
 	// Estamos criando uma área de trabalho que
 	// é o tamanho total da tela menos a área destinada
 	// à barra de tarefas.
 	// A barra de tarefas ainda não foi criada, mas
 	// um tamanho inicial para ela ja foi reservado.
-	//
 	
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "logon desktop window", 
+	// #importante
+	// Minimized. Significa que ela não será pintada.
+	// Mas ela precisa ter todos os elementos da estrutura,
+	// pois ela server de referência.
+	
+	hWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, "logon desktop window", 
 	                                Left, Top, Width, Height,           
-							        gui->screen, 0, 0, COLOR_WINDOW  );      
-	if( (void*) hWindow == NULL){
-	    printf("logon-logon-logon_create_mainwindow:\n");
-	    die();
+							        gui->screen, 0, 0, COLOR_WINDOW  );
+	
+	if ( (void *) hWindow == NULL)
+	{
+	    printf ("logon_create_mainwindow\n");
+	    die ();
+		
 	}else{   
 	    		
 	    RegisterWindow(hWindow);
-	    windowLock(hWindow); 
-		set_active_window(hWindow); 
+		
+	    windowLock (hWindow); 
+		set_active_window (hWindow); 
 		
 	    //a janela pertence ao desktop 0
 	    //hWindow->desktop = (void*) desktop0;
 		
-		if( (void*) gui == NULL){
+		if ( (void *) gui == NULL)
+		{
+			//#bugbug
+			// Não poderíamos prosseguir.
+			//#precisamos de uma pensagem aqui.
+			
 		    return;
+			
 		}else{
-	        gui->main = (void*) hWindow;
+			
+	        gui->main = (void *) hWindow;
 		};	
 	};
 	
 	
 	//
-	//  Desktop Window:
-	//      Criar a janela gui->desktop.
-	//      Na verdade a janela do desktop
-	//      é a janela da área de trabalho.
-	//
-	
-    /*	
-	gui->desktop = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Desktop Window", 
-	                                0, 16, 800, 600-16-16, 
-							        gui->screen, 0, 0, COLOR_WINDOW ); 
-	*/
+	// ## Desktop Window ##
+    //
 	
 	gui->desktop = (void*) gui->main;
 	
-	if( (void*) gui->desktop == NULL){
+	if ( (void *) gui->desktop == NULL )
+	{	
+		gui->desktop = (void *) gui->screen;
 		
-		gui->desktop = (void*) gui->screen;
-		
-		if( (void*) gui->desktop == NULL){ 
+		if ( (void *) gui->desktop == NULL)
+		{ 
 		    goto done;
 		};
 	};
 	
-	//Não registrar pois main menu ja está registrada.
-	//RegisterWindow(gui->desktop);
+	
+	// #importante:
+	// Não registrar pois main menu ja está registrada.
+	// RegisterWindow(gui->desktop);
 	
 done:
-    SetFocus(hWindow);
-    return;	
+	
+    SetFocus (hWindow);
+    
+	return;	
 };
 
 

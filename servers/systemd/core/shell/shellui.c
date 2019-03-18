@@ -512,18 +512,26 @@ void shellCreateEditBox (){
  
 struct window_d *shellCreateMainWindow ( int status ){
 	
+	
+	// Tamanho da tela.	
+	//unsigned long ScreenWidth = apiGetSystemMetrics(1);
+    //unsigned long ScreenHeight = apiGetSystemMetrics(2); 
+	
+	
+	//printf ("Creating taskbar ... %d %d\n", ScreenWidth, ScreenHeight);	
+	
 	unsigned long left;
 	unsigned long top;
 	unsigned long width;
 	unsigned long height;
 	
     // #imporante
-	// Essas sao as dimensoes da janela principal.
+	// Essas sao as dimensões da janela principal.
 	
-	wpWindowLeft = 40;     //0;
-	wpWindowTop =  40;     //0;
-	wsWindowWidth = 600;   //800;
-	wsWindowHeight = 400;  //600;
+	wpWindowLeft = 40; //0;
+	wpWindowTop =  40; //0;
+	wsWindowWidth = 600; //1024;
+	wsWindowHeight = 600; //768;
 	
 	left = wpWindowLeft;
 	top = wpWindowTop;
@@ -897,48 +905,46 @@ int shellCreateTaskBar (){
 	unsigned long ScreenWidth = apiGetSystemMetrics(1);
     unsigned long ScreenHeight = apiGetSystemMetrics(2); 
 	
+	
+	printf ("Creating taskbar ... %d %d\n", ScreenWidth, ScreenHeight);
+	
+	enterCriticalSection (); 
+	
     //em shell.h está o ponteiro.	
-	taskbar_window = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "1",     
+	taskbar_window = (void *) APICreateWindow ( WT_SIMPLE, 1, 1, "Taskbar",     
                                 0, ScreenHeight-24, ScreenWidth, 24,    
                                 0, 0, xCOLOR_GRAY1, xCOLOR_GRAY1 );	
 	
+	if ( (void *) taskbar_window == NULL )
+	{
+		printf ("Couldn't create taskbar window\n");
+		return 1;
+	}
 	
 	 APIRegisterWindow (taskbar_window);
+	 apiShowWindow (taskbar_window);
 	
     //em shell.h está o ponteiro.	
 	taskbar_button1 = (void *) APICreateWindow ( WT_BUTTON, 1, 1, " Menu ",     
                                 4, ScreenHeight-24, 80, 24,    
                                 0, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
+	
+	if ( (void *) taskbar_button1 == NULL )
+	{
+		printf ("Couldn't create taskbar button\n");
+		return 1;
+	}
 								
     APIRegisterWindow (taskbar_button1);
+	apiShowWindow (taskbar_button1);
 	
-	refresh_screen();
+	exitCriticalSection ();	
+	
+	//refresh_screen();
 	return 0;
 }
 
 
-
-int shellStartDesktopMode (){
-
-	printf ("shellStartDesktopMode: Initializing desktop mode ...\n");
-		
-	//criamos a barra.
-	//lembrando que o ponteiro é global.
-	shellCreateTaskBar ();
-	
-	//...
-		 
-	//chama o loop.
-	//sando do loop podemos retornar 0, o que significa 
-	//que main pode fechar o shell depois de ter usado o modo desktop.
-	
-	
-	//#bugbug
-	// o loop está falhando.
-    //return desktop_loop ();
-	
-	return 0;
-}
 
 
 //testando botão.

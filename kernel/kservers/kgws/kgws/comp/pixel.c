@@ -185,7 +185,7 @@ useDedicatedBuffer:
 
 
 /*
- ****
+ *********************************
  * backbuffer_putpixel:
  *
  * IN: 
@@ -195,19 +195,22 @@ useDedicatedBuffer:
 void 
 backbuffer_putpixel ( unsigned long ax, 
                       unsigned long bx, 
-				      unsigned long cx, 
-				      unsigned long dx )
+                      unsigned long cx, 
+                      unsigned long dx )
 {
-    //#importante
-	//Esse é o origina. Isso funciona.
-	//hal_backbuffer_putpixel ( ax, bx, cx, dx );
+	// #importante
+	// Esse é o origina. Isso funciona.
+	// Não usar.
+	// hal_backbuffer_putpixel ( ax, bx, cx, dx );
+
+	// #test
+	// tentando um novo método.
+    // usando o endereço virtual do backbuffer.
+	// precisamos de uma variável global para isso.
 	
-	//#test
-	//tentando um novo método.
 	
 	unsigned char *where = (unsigned char *) 0xC0800000;
-	
-	
+		
 	unsigned long color = (unsigned long) ax;
 	
 	char b, g, r, a;
@@ -220,9 +223,9 @@ backbuffer_putpixel ( unsigned long ax,
 	int x = (int) bx;
 	int y = (int) cx;
 	
-	
 	// = 3; 
 	//24bpp
+	
 	int bytes_count;
 	
 	switch (SavedBPP)

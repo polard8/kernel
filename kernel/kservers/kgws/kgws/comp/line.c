@@ -49,24 +49,25 @@ void lineDrawHorizontalLineWindowBuffer(struct window_d *window,
 */
 
 
-
-/* my_buffer_horizontal_line:
- *     Draw a horizontal line on backbuffer. */
+/* 
+ * my_buffer_horizontal_line:
+ *     Draw a horizontal line on backbuffer. 
+ */
 
 void 
-my_buffer_horizontal_line( unsigned long x1,
-                           unsigned long y, 
-						   unsigned long x2,  
-						   unsigned long color )
+my_buffer_horizontal_line ( unsigned long x1,
+                            unsigned long y, 
+                            unsigned long x2,  
+                            unsigned long color )
 {
-	while (x1 < x2){
-		
-		backbuffer_putpixel ( color, x1, y, 0 );
+    while (x1 < x2){
+
+        backbuffer_putpixel ( color, x1, y, 0 );
         x1++;  
     }
-};
+}
 
-					  
+
 void 
 refresh_horizontal_line ( unsigned long x1,
                           unsigned long y, 

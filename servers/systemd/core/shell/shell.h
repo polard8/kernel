@@ -1020,7 +1020,8 @@ void testCreateWindow ();
 
 
 int shellCreateTaskBar();
-int shellStartDesktopMode ();
+
+
 
 
 
