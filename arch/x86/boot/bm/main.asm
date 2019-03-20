@@ -202,10 +202,14 @@
 ;;G_VIDEO_MODE EQU 0x141  ;;640x400x32 
 ;;G_VIDEO_MODE EQU 0x142  ;;640x480x32 
 ;;G_VIDEO_MODE EQU 0x143  ;;800x600x32bpp
-G_VIDEO_MODE EQU 0x144    ;;1024x768x32 (usar essa)
+;; G_VIDEO_MODE EQU 0x144    ;;1024x768x32    >>>>> (usar essa) <<<<
 ;;G_VIDEO_MODE EQU 0x145      ;;#bugbug
 
 
+; Nvidia GeForce:  
+; GeForce 8400 GS: 0x0115   800x600x32BPP
+
+G_VIDEO_MODE EQU 0x0115
 
 ;;
 ;; GUI FLAG.
@@ -214,8 +218,8 @@ G_VIDEO_MODE EQU 0x144    ;;1024x768x32 (usar essa)
 ;; 1 = Starts system GUI.
 ;; 0 = Starts the Boot Manager CLI.
 
-G_START_GUI EQU 1  ;; 1= (YES) 0 = (NO)  
-
+;G_START_GUI EQU 1  ;; 1= (YES) 0 = (NO)  
+G_START_GUI EQU 0  ;; 1= (YES) 0 = (NO)  
 
 
 ;;

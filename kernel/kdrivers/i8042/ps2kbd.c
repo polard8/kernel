@@ -64,6 +64,7 @@ int BAT_TEST (){
 
 
 /*
+ ********************************** #bugbug: essa rotina falhou em gigabyte/intel/chipset=via
  * init_keyboard:
  *     ??
  *     Inicializa o driver de teclado.
@@ -73,6 +74,10 @@ int BAT_TEST (){
  */
 
 void ps2_keyboard_initialize (){
+	
+	
+	printf ("ps2_keyboard_initialize: 1\n");
+	refresh_screen();	
 	
 	//user.h
 	ioControl_keyboard = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
@@ -126,6 +131,12 @@ void ps2_keyboard_initialize (){
 	}
 	
 */
+	
+	
+	printf ("ps2_keyboard_initialize: 2\n");
+	refresh_screen();	
+
+	
 	
 	// #test
 	// Inicializando o buffer de teclado.
@@ -188,6 +199,13 @@ void ps2_keyboard_initialize (){
 	//keyboard_set_leds(LED_NUMLOCK);
 	
  
+	
+	
+	printf ("ps2_keyboard_initialize: 3\n");
+	refresh_screen();	
+
+	
+	
     //#imporante:
 	//não habilitaremos e não resetaremos o dispositivo.
     //habilitar e resetar fica para a inicialização do ps2.
@@ -202,6 +220,9 @@ void ps2_keyboard_initialize (){
 	// Espera os dados descer, ACK
     while(keyboard_read() != 0xFA);
 	
+	printf ("ps2_keyboard_initialize: 4\n");
+	refresh_screen();	
+	
 	
     // Basic Assurance Test (BAT)
     
@@ -211,6 +232,10 @@ void ps2_keyboard_initialize (){
         printf("\nkeyboard error!");
     }  
 
+	printf ("ps2_keyboard_initialize: 5\n");
+	refresh_screen();	
+
+	
     // espera nossa controladora termina
 	kbdc_wait(1);
 	

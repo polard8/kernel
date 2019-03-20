@@ -133,6 +133,10 @@ void *KiCreateIdle (){
 	        printf("pc-action-create-KiCreateIdle: InitProcess\n");
 		    die();
 	    }else{
+			
+			//#todo
+			//checar validade ??
+			
 			//Indica à qual processo a thread pertence.
 	        IdleThread->process = (void *) InitProcess;
 		};		
@@ -168,6 +172,15 @@ void *KiCreateIdle (){
 		die();
 	};
 	
+	
+	
+	//#debug
+	//Ok isso funconou, vamos avançar e econtrar qual e1 o problema com essa rotina.
+	
+	//printf("pc-action-create-KiCreateIdle: struct OK\n");
+	//refresh_screen();
+	//while(1){}
+	
 	// @todo: 
 	//     É possível usar a função create_thread nesse momento.
 	//     Mas é mais veloz fazer o máximo em uma função só.
@@ -178,11 +191,23 @@ void *KiCreateIdle (){
     //Identificadores.
 	IdleThread->tid = 0;
 	IdleThread->ownerPID = (int) InitProcess->pid;  
+	
+	
+	//#debug
+	//testando ... usar as informaç~oes da estrutura de processo.
+	//ok isso funcionou ... vamo prosseguir.
+	
+	//printf("pc-action-create-KiCreateIdle:  OK\n");
+	//refresh_screen();
+	//while(1){}
+
+	
+	
 	IdleThread->used = 1;
 	IdleThread->magic = 1234;
 	IdleThread->name_address = (unsigned long) ThreadName;   //Funciona.
 
-	IdleThread->process = (void*) InitProcess;
+	IdleThread->process = (void *) InitProcess;
 	
 	
 	//
@@ -193,7 +218,7 @@ void *KiCreateIdle (){
 	
 	
 	for ( r=0; r<8; r++ ){
-		Thread->wait_reason[r] = (int) 0;
+		IdleThread->wait_reason[r] = (int) 0;
 	}	
 	
 	
@@ -213,9 +238,17 @@ void *KiCreateIdle (){
 	IdleThread->type = TYPE_IDLE;    //TYPE_SYSTEM.
 	IdleThread->iopl = RING3;        //Idle thread é uma thread de um processo em user mode.
 	IdleThread->state = INITIALIZED;   
+	    
+    IdleThread->base_priority = KernelProcess->base_priority;  //básica.  
+	//IdleThread->base_priority = PRIORITY_NORMAL;
 	
-	//?? E a validade da estrutura KernelProcess ??
-	IdleThread->base_priority = KernelProcess->base_priority;  //básica.   
+	//#debug
+	//testando se d'a problemas usar a estrtutura do processo kernel
+	//printf("pc-action-create-KiCreateIdle:  >>>> OK\n");
+	//refresh_screen();
+	//while(1){}
+	
+	
   	IdleThread->priority = IdleThread->base_priority;          //dinâmica.
 	
 	IdleThread->saved = 0; 
@@ -402,7 +435,7 @@ void *KiCreateShell (){
 	t->DirectoryPA = (unsigned long ) ShellProcess->DirectoryPA;
 	
 	for ( r=0; r<8; r++ ){
-		Thread->wait_reason[r] = (int) 0;
+		t->wait_reason[r] = (int) 0;
 	}	
 	
 	//Procedimento de janela.
@@ -589,7 +622,7 @@ void *KiCreateTaskManager (){
 	t->DirectoryPA = (unsigned long ) TaskManProcess->DirectoryPA; 
 
 	for ( r=0; r<8; r++ ){
-		Thread->wait_reason[r] = (int) 0;
+		t->wait_reason[r] = (int) 0;
 	}	
 	
 	//Procedimento de janela.
@@ -819,7 +852,7 @@ void *KiCreateRing0Idle (){
 	
 	
 	for ( r=0; r<8; r++ ){
-		Thread->wait_reason[r] = (int) 0;
+		t->wait_reason[r] = (int) 0;
 	}	
 
 	

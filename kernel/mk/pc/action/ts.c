@@ -133,32 +133,33 @@ void task_switch (){
 
 	int New;
 	int Max;
-	
+
+	struct process_d *P;	
 	struct thread_d *Current;
-	struct process_d *P;
 
 	Max = PRIORITY_MAX;
 
 
-	// ## Current thread ##
+	// Current thread. 
 	
 	Current = (void *) threadList[current_thread]; 
 	
 	if ( (void *) Current == NULL )
 	{
-		printf ("ts-task_switch: Struct={%x}", (void *) Current );
-		die();
+		panic ("ts-task_switch: struct Current");
+		//printf ("ts-task_switch: struct Current %x", (void *) Current );
+		//die ();
 	}
 
-	// ## Current process ##
+	// Current process. 
 
 	P = (void *) Current->process;
 
 	if ( (void *) P == NULL )
 	{
-
-		printf("task_switch error: P Struct={%x}", (void *) P );
-		die();
+        panic ("ts-task_switch: struct C");
+		//printf ("ts-task_switch: struct C %x", (void *) P );
+		//die ();
 	}
 	
 	if ( (void *) P != NULL )
@@ -166,21 +167,28 @@ void task_switch (){
 		if ( P->used == 1 && P->magic == 1234 )
 		{	
 			current_process = (int) P->pid;
+		}else{
+		
+		    //??
+			//? fail ??
 		}
 		
 		//...
 	};
 
+	
 	//...
 
-
-	// ## Conting ... ##
-
+    //
+	//  ======== ## Conting ## ========
+    //
 	
-	//            step: Quantas vezes ela já rodou no total.
-	//    runningCount: Quanto tempo ela está rodando antes de parar.
+	
+	// step: Quantas vezes ela já rodou no total.
+	// runningCount: Quanto tempo ela está rodando antes de parar.
 
 	Current->step++; 
+	Current->runningCount++;
 	
 	//quanto tempo em ms ele rodou no total.
 	Current->total_time_ms = (unsigned long) Current->total_time_ms + (1000/sys_time_hz);	
@@ -189,19 +197,24 @@ void task_switch (){
 	//isso precisa ser zerado quando ela reiniciar no próximo round.
 	Current->runningCount_ms = (unsigned long) Current->runningCount_ms + (1000/sys_time_hz);	
 
-	Current->runningCount++;
+
+	//
+	// ======== ## locked ## ========
+	//
 	
-	// ## locked ##
-	// Taskswitch locked, Retor without saving.
+	// Taskswitch locked ?, Return without saving.
 	
 	if ( task_switch_status == LOCKED )
 	{    		
 		IncrementDispatcherCount (SELECT_CURRENT_COUNT);
-		return;  
-	}
+		return; 
+		
+	}; //FI LOCKED
 
-
-	// ## unlocked ##
+	
+    //
+	// ======== ## unlocked ## ========
+	//
 	
 	if ( task_switch_status == UNLOCKED )
 	{
@@ -211,71 +224,115 @@ void task_switch (){
 		
 		save_current_context ();
 		Current->saved = 1;	
-						
+		
+		// #importante:
+		// Se a thread ainda não esgotou seu quantum, 
+		// então ela continua usando o processador.
+		
 		if ( Current->runningCount < Current->quantum )
 		{
 			IncrementDispatcherCount (SELECT_CURRENT_COUNT);
 			return; 
 		
+		// #importante
+		// Nesse momento a thread esgotou seu quantum, então sofrerá preempção
+		// e outra thread será colocada para rodar de acordo com a ordem 
+		// estabelecida pelo escalonador.
+			
 		}else{
 			
 			//
-			// ## PREEMPT ##
+			// ======== ## PREEMPT ## ========
 			//
 		
 			// * MOVEMENT 3 (Running --> Ready).
+			
 			if ( Current->state == RUNNING )
 			{
+				// Preempt.
 				// MOVEMENT 3 (running >> ready)  
-				Current->state = READY;    //Preempt.
+				
+				Current->state = READY;    
 
 				if ( Current->preempted == PREEMPTABLE )
 				{
-					debug_print(" preempt_q1 ");
+					debug_print (" preempt_q1 ");
 					queue_insert_head ( queue, (unsigned long) Current, 
 						QUEUE_READY );	
 				};
 
 				if ( Current->preempted == UNPREEMPTABLE )
 				{
-					debug_print(" preempt_q2 ");
-					queue_insert_data( queue, (unsigned long) Current, 
+					debug_print (" preempt_q2 ");
+					queue_insert_data ( queue, (unsigned long) Current, 
 						QUEUE_READY );	
 				};
 			};
 
-			debug_print(" ok ");
+			debug_print (" ok ");
 			
 			//
-			// ## EXTRA ##
+			// ======== ## EXTRA ## ========
 			//
+			
+			// #importante:
+			// Checaremos por atividades extras que foram agendadas pelo 
+			// mecanismo de request. Isso depois do contexto ter sido salvo e 
+			// antes de selecionarmos a próxima thread.
 
 			if (extra == 1)
 			{
 				KiRequest ();
-
+				
+				// #todo: Talvez possamos incluir mais atividades extras.
+				// Continua ...
+				
 				extra = 0;
 			}
-
+			
+			//
+			// ======== ## Spawn ? ## =========
+			//
+			
+			// #importante:
+			// Checar se uma thread está em standby, esperando pra rodar pela 
+			// primeira vez. Nesse caso essa função não retornará.
+			
 			// schedi.c
+			
 			check_for_standby (); 
 
 			goto try_next;
 
 		};
-	};
+		
+	}; //FI UNLOCKED
 
-//crazyFail:
+    //	
+    // ==== Crazy Fail ====
+    //
+	
+	// #bugbug
+	// Não deveríamos estar aqui.
+	// Podemos abortar ou selecionar a próxima provisóriamente.
+	
+	//panic ("ts.c: crazy fail");
 	
 	goto dispatch_current;      	
 	
+	
+	
+	
 	//
-	//    ####  NEXT ####
+	// ======== ####  NEXT #### ========
 	//
 	
 try_next: 
 	
 	debug_print(" N ");
+	
+	// #critério:
+	// Se tivermos apenas uma thread rodando.
 	
 	if (ProcessorBlock.threads_counter == 1)
 	{		
@@ -285,23 +342,63 @@ try_next:
 		goto go_ahead;
 	}
 	
+	
+
+	
+	// #bugbug
+	// Ao fim do round estamos tendo problemas ao reescalonar 
+	// Podemos tentar repedir o round só para teste...
+	// depois melhoramos o reescalonamento.
+		
+	// #importante:
+	// #todo: #test: 
+	// De pempos em tempos uma interrupção pode chamar o escalonador,
+	// ao invés de chamarmos o escalonador ao fim de todo round.
+	
+	// #critério:
+	// Se alcançamos o fim da lista encadeada cujo ponteiro é 'Conductor'.
+	// Então chamamos o scheduler para reescalonar as threads.
+
+	
 	if ( (void *) Conductor->Next == NULL )
 	{	
-		debug_print(" LAST ");	
-
+		debug_print(" LAST ");
+		
+		//printf ("ts: scheduler 1\n");
 		KiScheduler ();
+		
 		goto go_ahead;
+	
+	
 	}
+	
+	// #critério
+	// Se ainda temos threads na lisca encadeada, então selecionaremos
+	// a próxima da lista.
+	// #BUGBUG: ISSO PODE SER UM >>> ELSE <<< DO IF ACIMA.
 	
 	if ( (void *) Conductor->Next != NULL )
 	{		
 		Conductor = (void *) Conductor->Next;	
+		
 		goto go_ahead;
 		
-	}else{ 
-		//@todo: Se o próximo for NULL.
-		//goto go_ahead;
 	}
+	
+	
+	//
+	//    ======== # Go ahead ## ========
+	//
+	
+	// #importante:
+	// Nesse momento já temos uma thread selecionada,
+	// vamos checar a validade e executar ela.
+	
+	// #importante:
+	// Caso a thread selecionada não seja válida, temos duas opções,
+	// ou chamamos o escalonador, ou saltamos para o início dessa rotina
+	// para tentarmos outros critérios.
+	
 	
 go_ahead:
 
@@ -317,6 +414,7 @@ go_ahead:
 	{ 		
 		debug_print(" Struct ");
 		
+		//printf ("ts: scheduler 2\n");
 		KiScheduler ();
 		
 		goto try_next;
@@ -326,13 +424,17 @@ go_ahead:
 		if ( Current->used != 1 || Current->magic != 1234 )
 		{
 			debug_print(" val ");
+			
+			//printf ("ts: scheduler 3\n");
 			KiScheduler ();
 			goto try_next;	
 		}	
 		
 		if ( Current->state != READY )
 		{
-			debug_print(" state ");		
+			debug_print(" state ");	
+			
+			//printf ("ts: scheduler 4\n");
 			KiScheduler ();
 			goto try_next;	
 		}

@@ -143,6 +143,8 @@ extern _x86main
 extern _startStartIdle 
 extern _save_kernel_args
 ;extern _kernelServices ;Services
+
+
 ;...
 
 ;Tasks in ring 0.
@@ -469,11 +471,9 @@ mboot_end:
 	;call _save_kernel_args
 	
 	
-	;;
     ;; *step
 	;; Interrupt enabling: 
 	;; Começaremos configurando suporte a interrupções.
-	;;	
 
 
     ; Desabilita para segurança.
@@ -723,9 +723,8 @@ dummyJmpAfterLTR:
 	
 	;Debug
 	;call _asm_refresh_screen    
-	
-	;debug
 	;jmp $
+	
 	
     ;
 	; Chama o código em C e checa o retorno.
@@ -756,7 +755,7 @@ global __die
 __die:
 	hlt
     jmp __die
-
+	
 	
 ;hlt_loop:
 ;	hlt

@@ -1070,7 +1070,7 @@ void *systemGetSystemStatus (int number){
 void die (){
 	
 	//*Bullet.
-    printf("sm-sys-system-die: * System Halted!\n");      
+    printf("execve-sm-system-die: * System Halted!\n");      
 	
 	if ( VideoBlock.useGui == 1 ){
 	    refresh_screen ();
@@ -1555,11 +1555,26 @@ int systemStartUp (){
 	    if ( Status != 0 )
 		{
 			debug_print("systemStartUp: init fail\n");
-	        panic ("sm-sys-system-systemStartUp error: init\n");
+	        panic ("sm-system-systemStartUp error: init\n");
 	    }	
         //...	 
 		
 	}; //--else
+    
+    
+    
+ 	//#debug :  
+    // esperamos alcaçarmos esse alvo.
+    //isso funcionou gigabyte/intel
+    //vamos avançar
+	
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++ systemStartUp: after init ++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+
+
+    
+    
 	
 	
 	// System Version:
@@ -1641,7 +1656,21 @@ int systemInit (){
 	while (1){
 		asm ("hlt");
 	}
-#endif		
+#endif	
+	
+	
+	//#debug :  
+    // esperamos alcaçarmos esse alvo.
+    //isso funcionou gigabyte/intel
+    //vamos avançar
+	// quem chamou essa funçao foi o começo da inicializaçao do kernel.
+	// retornamos para x86main.c para arch x86.
+	
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++ systemInit ++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+
+	
 	
 	//retornando para a rotina de entrypoint da arquitetura alvo.
 	return (int) Status;

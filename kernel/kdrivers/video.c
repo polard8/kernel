@@ -197,13 +197,45 @@ int videoInit (){
 	//Device screen sizes. (herdadas do boot loader.)
 	g_device_screen_width = (unsigned long) SavedX;
 	g_device_screen_height = (unsigned long) SavedY;
+	
+	
+	// #importante
+	// Nesse momento podemos testar o LFB.
+	// Enviando alguma coisa diretamente pra la' ...
+	
+	
+	// #DEBUG
+	// vamos tentar usar isso como breakpoint.
+	// Ok isso funcionou na gigabyte/intel ... vamos usar isso por enquanto.
+    //lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
+	//while(1){}
 		
 	//@todo: #bugbug Para configurar a estrutura HostDeviceInfo tem que 
 	//alocar memória antes, por isso só faremos isso depois de 
 	//inicializarmos o módulo runtime. /rt.
 	
+	//Isso pode n~ao funcionar pois nao temos
+	//os endereços corretos ainda.
+	
 	//Background.
-	backgroundDraw (COLOR_KERNEL_BACKGROUND);  
+	
+	//#bugbug #hackhack	
+	//vamos suprimir essa mensagem para testar
+	//o kernel na maquina real gigabyte/intel
+	//#importante: nuca mais usaremos essa rotina de bg aqui.
+	//vamos passar ela para um ponto onde ela ja possa ser usada,
+    
+    
+	// #DEBUG
+	// breakpoint
+    //vamos testar se 'e a rotina de bg que est'a falhando...
+    //caso seja ela, ent~ao vamos suprimila se possivel.
+	//ok isso funcionou, vamos avançar.
+	
+    //lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
+	//while(1){}
+
+    
 		
 	//@todo: Isso deve fazer parte do construtor.
 		
@@ -252,6 +284,17 @@ int videoInit (){
 	//
 
     g_driver_video_initialized = 1;
+	
+	
+	
+	
+	// #DEBUG
+	// breakpoint
+    // ok isso funcionou na gigabyte/intel , vamos avançar ...
+   // lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
+   //	while(1){}
+
+
 	
 	
 #ifdef BREAKPOINT_TARGET_AFTER_VIDEO

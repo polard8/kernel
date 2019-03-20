@@ -76,7 +76,8 @@ int pci_setup_devices (){
 			    {
 				    //#debug
 					//printf("+");
-				    
+				    //pci.c
+					
 					pciHandleDevice ( i, j, k );			
 			    }; //fuction for.
 				

@@ -88,6 +88,7 @@ void boot (){
  *
  * Obs: Dependente significa dependente da marca do procesador.
  */
+
 int init_architecture_dependent (){
 	
 	int Status = 0;
@@ -189,34 +190,48 @@ int init_architecture_dependent (){
 
 
 /*
+ ******************************************************************
  * init_architecture_independent:
+ *
  *    Rotina de inicialização da parte do sistema que é independente da 
  * arquitetura presente. Independente da tipo de processador. 
- * Obs: Essa é a fase 1 de inicialização.
+ *    Obs: Essa é a fase 1 de inicialização.
  */
+
 int init_architecture_independent (){
 	
     int Status;
 	
-	debug_print("init_architecture_independent\n");
+	debug_print ("init_architecture_independent\n");
 		
     if (KeInitPhase != 0){
 		panic("sm-init-init_architecture_independent: KeInitPhase\n");
 	}; 
 
 	
-	// Hal:
-#ifdef EXECVE_VERBOSE	
-	// Obs: Nesse momento deve haver alguma sondagem de dispositivos,
-	//      salvando os parâmetros encontrados.
-	//#bugbug @todo: Se é hal ... acho que leva em consideração a arquitetura.
-	printf("Initializing Hal..\n");
-#endif	
-	Status = init_hal();	
-	if(Status != 0){
-	    panic("sm-init-init_architecture_independent: init_hal\n");
-	};
+	//
+	//  ## HAL ##
+	//
+    
+	// #bugbug
+	// Se é HAL é dependente da arquitetura.
+	// Isso deveria ficar na outra rotina.
+	// Não mudaremos por enquanto.
+	
+	
+	Status = init_hal ();	
+	
+	if (Status != 0)
+	{
+	    panic ("init-init_architecture_independent: init_hal\n");
+	}
 
+	
+    //
+	//  ## MICREOKERNEL ##
+	//
+	
+	
 	// Microkernel:
 #ifdef EXECVE_VERBOSE
 	// Obs: O Microkernel lida com informações dependentes da arquitetura,
@@ -225,10 +240,19 @@ int init_architecture_independent (){
 	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
 	printf("Initializing Microkernel..\n");
 #endif	
-	Status = init_microkernel();
-	if(Status != 0){
-	    panic("sm-init-init_architecture_independent: init_microkernel\n");
-	};
+	
+	Status = init_microkernel ();
+	
+	if (Status != 0)
+	{
+	    panic ("init-init_architecture_independent: init_microkernel\n");
+	}
+	
+	
+	//
+	// ## EXECUTIVE ##
+	//
+	
 	
     // Executive:
 #ifdef EXECVE_VERBOSE
@@ -238,85 +262,121 @@ int init_architecture_independent (){
 	//básicos do kernel base nesse momento.
 	printf("Initializing Executive..\n");
 #endif	
-	Status = init_executive();
-	if(Status != 0){
-	    panic("sm-init-init_architecture_independent: init_executive\n"); 
-	};
+	
+	Status = init_executive ();
+	
+	if (Status != 0)
+	{
+	    panic ("init-init_architecture_independent: init_executive\n"); 
+	}
+	
+	//
+	// ## GWS ?? ##
+	//
 	
 	// Gramado:
 #ifdef EXECVE_VERBOSE
     printf("Initializing Gramado..\n");
 #endif
-	Status = init_gramado();
-	if(Status != 0){
-	    panic("sm-init-init_architecture_independent: init_gramado\n"); 
-	};
 	
-	//
+	Status = init_gramado ();
+	
+	if (Status != 0)
+	{
+	    panic ("init-init_architecture_independent: init_gramado\n"); 
+	}
+	
+
 	// User Info:
 	// =========
 	//
 	// @todo: Usuário e sessão devem ser independentes do modo de vídeo. 
 	//        Text ou Graphics.
-	//
-
-	//
 	// @todo: Essas informações são independentes da arquitetura,
 	//      Essa rotina pode ir pra outro lugar.
-	//
+	
 UserInfo:
 #ifdef EXECVE_VERBOSE	  
-    printf("sm-init-init_architecture_independent: init_user_info\n");
+    printf ("init-init_architecture_independent: init_user_info\n");
 #endif
-    init_user_info();       //initialize user info structure.	
-    
 	
-	//
+	//initialize user info structure.
+    init_user_info ();       	
+    
 	// User Session, Window Station and Desktop.
 	// @todo: Essas informações são independentes da arquitetura,
 	//      Essa rotina pode ir pra outro lugar.
-	//
 	
 UserSession:
 #ifdef EXECVE_VERBOSE	
-    printf("sm-init-init_architecture_independent: init_user_session\n");   
-#endif    
-	init_user_session();    //initialize user session.	 
+    printf ("init-init_architecture_independent: init_user_session\n");   
+#endif
+	
+	//initialize user session.
+	init_user_session();   	 
+	
+	
+	// (ROOM)
 	
 WindowStation:
 #ifdef EXECVE_VERBOSE
-    printf("sm-init-init_architecture_independent: init_window_station\n");   
-#endif    
+    printf ("init-init_architecture_independent: init_window_station\n");   
+#endif  
+	
 	init_room_manager();
 
+	// DESKTOP
+	
 Desktop:
 #ifdef EXECVE_VERBOSE
-    printf("sm-init-init_architecture_independent: init_desktop\n");   
+    printf ("init-init_architecture_independent: init_desktop\n");   
 #endif    
+	
 	init_desktop(); 
  
 	
-	// Window manager. - (Inicializa janelas e cria o logon).
-	// @todo: Essas informações são independentes da arquitetura,
-	//      Essa rotina pode ir pra outro lugar.
+	//
+	//  ## WINDOWS ##
+	//
+	
+	// Window manager. 
+	// (Inicializa janelas e cria o logon).
+	// @todo: 
+	// Essas informações são independentes da arquitetura,
+	// Essa rotina pode ir pra outro lugar.
 	
 WindowManager:	
 
 	//Caso não se use gui.
-	if(g_useGUI != 1){
-	    SetProcedure( (unsigned long) &system_procedure);		
+	
+	if (g_useGUI != 1)
+	{
+	    SetProcedure ( (unsigned long) &system_procedure);		
+		
+		// #BUGBUG
+		// Aqui cacelamos a inicialização do window manager
+		// caso não estejamos no modo gráfico.
+		// Como não temos suporte para modo texto, deveríamos abortar.
+		
 	}else{
         
 		// Window manager.
 #ifdef EXECVE_VERBOSE	    
-		printf("sm-init-init_architecture_independent: init_window_manager\n");
-#endif	    
-		init_window_manager();				
+		printf ("init-init_architecture_independent: init_window_manager\n");
+#endif
+		
+		init_window_manager ();	
+		
+		
 	};
+	
+	
 	
 	// tty support.
 	ttyInit();
 
+	
+	
 	//
 	// terminal support.
 	//
@@ -326,15 +386,19 @@ WindowManager:
 
     // Continua ...	 
 	
+	
+	
 done:
+	
 #ifdef EXECVE_VERBOSE
     //debug
     printf("Done\n");	
 	//refresh_screen();
     //while(1){}
 #endif	
+	
     return (int) 0;
-};
+}
 
 
 /*
@@ -490,6 +554,20 @@ int init (){
 	
 	debug_print("init:\n");
 	
+	
+	
+	
+	
+	//#debug : ISSO FUNCIONOU ... 
+	
+	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
+    //refresh_screen(); 
+    //while(1){}	
+	
+	
+	
+	
+	
 	//Check kernel phase.
 	if ( KeInitPhase != 0 )
 	{
@@ -530,8 +608,18 @@ int init (){
 #endif	
 	ioInit();
 	
+	
+	//#debug :  
+	//breakpoint ante de começar as questoes de disco.
+    // ok isso funcionou
+    
+	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+	
+	
     //
-	// ## STORAGE ##
+	// =================== ## STORAGE ## ===========================
 	//
 	
     // #ordem:
@@ -584,6 +672,13 @@ int init (){
 #endif	
 	create_system_folders(); 
     
+    
+    
+    
+    
+    
+    
+    
 
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: initialize_system_message_queue\n");
@@ -591,6 +686,18 @@ int init (){
 	initialize_system_message_queue(); 
 	
 	
+    
+    
+	//#debug :  
+	//breakpoint ante de começar as questoes de network
+    //ok isso funcionou.
+    
+	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+    
+    
+    
 
 	//
 	// Network
@@ -677,7 +784,20 @@ int init (){
 	//fail
 	//printf("#breakpoint before dependent");
 	//refresh_screen();
-	//while(1){}		
+	//while(1){}	
+    
+    
+ 	//#debug :  
+	//breakpoint depois de arch independent. gigabyte/intel
+	//rodou atá aqui ... porém nao sabemos se todos
+	//os dispositivos pci forar listados e se a gerencia de janelas
+	//inicializou corretamente.
+	
+	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+
+   
 
 	
     
@@ -689,15 +809,48 @@ int init (){
 	};
 	
 	
+ 	//#debug :  
+	//breakpoint depois de arch dependent
+	//ok..rodou ate' aqui ... mas nao sabemos se fez um bom trabalho.
+	
+	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+
+	
+	
+	
+	
 	// #importante
-	// So podemos carregar o diret'orio raiz depois que inicializamos o controlador de IDE 
-	// e as estruturas de sistema de arquivos.
+	// So podemos carregar o diretorio raiz depois que inicializamos o 
+    // controlador de IDE e as estruturas de sistema de arquivos.
 	
 	fs_load_rootdir ();
 	
 	
 	KeInitPhase = 2;
 
+	
+	
+	
+	
+ 	//#debug :  
+	//breakpoint antes do logon
+	//rodou ate' aqui.
+	
+	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+
+	
+	
+	
+    //
+	//  ==============  #### LOGON #### ===============
+	//
+	
+	
+	
 	
 	//printf("#breakpoint before logon");
 	//refresh_screen();
@@ -716,18 +869,37 @@ int init (){
     // de acordo com predefinição.
     //
 
-	if ( g_useGUI == 1 ){
+	if ( g_useGUI == 1 )
+	{
 		
 #ifdef EXECVE_VERBOSE		
 		printf("sm-init-init: Logon\n");
 #endif	    
-		create_logon();
-		init_logon(0,0);    //Libera. (Aceita argumentos).
+		
+		create_logon ();
+		
+		//Libera. (Aceita argumentos).
+		init_logon (0,0);    
 
         //Obs: *IMPORTANTE Usa-se o procedimento de janela do Logon.		
 	};	
 	KeInitPhase = 3; 
 			
+	
+	
+	
+ 	//#debug :  
+    // isso funcionou. gigabyte/intel
+	
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++ init: ++++++\n");
+    //refresh_screen(); 
+    //while(1){}		
+
+
+	
+	
+	
+	
 	// Continua ...
 	
 

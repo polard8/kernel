@@ -212,9 +212,11 @@ struct thread_d *pick_next_thread (){
  * Obs:
  *     Pega na fila ReadyQueue.
  *     O scheduler deve sempre pegar da fila do dispatcher.
- *
  */
  
+//#todo
+//podemos contar os rounds;
+
 int scheduler (){
 	
 	int Index;
@@ -222,6 +224,10 @@ int scheduler (){
 	
 	
 	debug_print(" [*SCHEDULER*]");
+	
+	//#debug
+	//printf ("scheduler: Running Threads %d \n", ProcessorBlock.threads_counter );
+	//refresh_screen();
 	
 	// spiritual quote:
 	// "Constrói um caminho de vagões para o condutor andar".
@@ -240,6 +246,9 @@ int scheduler (){
 	
 	//Inicia a lista.
 	//marca o início, mas não usa esse ponteiro.
+  
+  //#debug
+  //printf ("scheduler: 1\n");
 	
  	Conductor2 = (void *) rootConductor;
 	
@@ -254,14 +263,26 @@ int scheduler (){
 	//nesse caso a idle thread será a primeira trhead do round
 	//não havendo outra, pelo menos ela vai rodar.
 	
+  //#debug
+  //printf ("scheduler: 2\n");
 	
-	pick_next_thread ();
+  // #debug
+  // supendendo essa rotina que falhou em gigabyte/intel
+	// Vamos substituir a thread que a função retorna pela current_thread
+  // que esperamos que seja válida. Talvez isso resolva o problema por enquanto.
+  // Mas trabalharemos nessa função depois.
+  
+  //pick_next_thread ();
 	
-	
+  // HACK HACK
+  //next_thread = current_thread;
 	
 	//
 	//  ## PRIMEIRO PONTEIRO VÁLIDO ##
 	//
+  
+   //#debug
+ // printf ("scheduler: 3\n"); 
 	
 	//Next thread.
 	Conductor2->Next = (void *) threadList[next_thread];  
@@ -270,7 +291,9 @@ int scheduler (){
 	//  ## MARCADOR GLOBAL ##
 	//
 	
-	
+  //#debug
+ // printf ("scheduler: 4\n");
+  
 	//TID=0
 	//vamos começar a lista dessa aqui.
 	Conductor = (void *) Conductor2->Next;	
@@ -307,7 +330,8 @@ int scheduler (){
 
     //@todo pegar primeiro por prioridade.	
 	
-	
+  //#debug
+ // printf ("scheduler: 5\n");
 	
 	//READY.
 	for ( Index=0; Index < THREAD_COUNT_MAX; Index++ )
@@ -333,6 +357,8 @@ int scheduler (){
 	// Continua pegando os tipos diferente.
 	//
 
+  //#debug
+ // printf ("scheduler: 6\n");
 
 	//finaliza a lista
 	Conductor2 = (void *) Conductor2->Next; 

@@ -2457,6 +2457,8 @@ int get_active_window (){
  
 void set_active_window (struct window_d *window){
 	
+	/*
+	
 	//devemos desativar a antiga janela ativa.
 	int save = active_window;
 	
@@ -2533,6 +2535,9 @@ exit:
 		}
 		
 	};
+	
+	
+	*/
 
     return;	
 };
@@ -2743,19 +2748,19 @@ void SetFocus ( struct window_d *window ){
 			// janela mãe, então ativamos a janela filha.
             // ?? #bugbug talvez não seja essa ideia certa.			
 		    
-			if( (void*) window->parent == NULL ){
-		        set_active_window(window);				
-		    }else{
+			//if( (void*) window->parent == NULL ){
+		    //    set_active_window(window);				
+		    //}else{
 
 				// Testando a validade da janela mãe
 				// Ativar a janela mãe se ela tem um ponteiro válido
 				// Pois janela filha nunca é a janela ativa, mesmo tendo o foco.
 			    
-				if ( window->parent->used == 1 && window->parent->magic == 1234 )
-				{
-			        set_active_window(window->parent);	
-			    };				
-			};
+			//	if ( window->parent->used == 1 && window->parent->magic == 1234 )
+			//	{
+			//        set_active_window(window->parent);	
+			//    };				
+			//};
 
             //Obs: Nesse momento a janela ativa está configurada.
 			// a janela ativa é a própria janela ou a sua janela mãe.

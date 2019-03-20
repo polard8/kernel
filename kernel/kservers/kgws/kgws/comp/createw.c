@@ -297,6 +297,7 @@ void *CreateWindow ( unsigned long type,
 		Parent = (void *) gui->screen;	
 	
 	} else {
+		
 		Parent = (void *) pWindow;
 	};
 	
@@ -369,12 +370,18 @@ void *CreateWindow ( unsigned long type,
 		// Por enquanto no backbuffer.
 		
 		// Erro.
-		printf("CreateWindow: window struct \n");
-		refresh_screen();	
+		printf ("CreateWindow: window struct \n");
+		refresh_screen ();	
 		
 		return NULL; 
 		
     }else{
+		
+		//#debug
+		//funcionou na gigabyte/intel
+		//printf ("+++++++++++++++++++++++++++++++++++++++++++CreateWindow: window struct OK+++++ \n");
+		//refresh_screen ();	
+		//while (1){}
         
 		// Obs: 
 		// Conseguimos alocar memória para a estrutura da janela. 
@@ -385,6 +392,16 @@ void *CreateWindow ( unsigned long type,
 		window->objectType = ObjectTypeWindow;
 		window->objectClass = ObjectClassGuiObjects;
 
+		//#debug
+		//funcionou na gigabyte/intel
+		//acessando a estrutura.
+        //ok isso funcionou.
+		//printf ("+++++++++++++++++++++++++++++++++++++++++++CreateWindow: window struct OK+++++ \n");
+		//refresh_screen ();	
+		//while (1){}
+
+		
+		
 		// #importante
 		// Id. A janela recebe um id somente na hora de registrar.
 		// window->id = ??.
@@ -560,8 +577,12 @@ void *CreateWindow ( unsigned long type,
 		
 		//Dedicated buffer: 
 		//Cria um buffer dedicado de acordo com as dimensões da janela.		
-		window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
 		
+        //suspensa !!!
+        
+        //window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
+		window->DedicatedBuffer = NULL;
+        
 		//O backbuffer é a janela do desktop ao qual a janela pertence.
 		//window->BackBuffer = (void*) windowGetBackbufferAddress(); //@todo: Criar função.
 		//window->BackBuffer = (void*) g_backbuffer_address;
@@ -575,9 +596,30 @@ void *CreateWindow ( unsigned long type,
 	    //Se não for uma Child, deve-se resetar todas as informações relativas
 	    //à parent window.
 		
+		//#debug
+        //testando acessar elementos da estrutura ... algum est'a falahando;
+		//isso funcionou
+		//printf ("+++++++++++++++++++++++++++++++++++++++++++CreateWindow: window struct OK+++++ \n");
+		//refresh_screen ();	
+		//while (1){}
+
+        //#  =================  BUGBUG =====================
+		
+		//ESTAMOS SUSPENDENDO O USO DE JANELA MAE ... PARA TESTAR NA GIGABYTE/INTEL
+		
 		//Parent support
-		window->parent = (void*) Parent;
-		window->parentid = (unsigned long) Parent->id;
+		//window->parent = (void *) Parent;
+		
+		// Isso impede que acessemos um ponteiro nulo.
+		//if ( (void *) Parent != NULL )
+		//{
+		//	if ( Parent->used == 1 && Parent->magic == 1234 )
+		//	{
+		//	   window->parentid = (unsigned long) Parent->id;
+		//	}
+		//}
+		
+		
 		
 		//Child window linked list.
 		window->childListHead = NULL;
@@ -642,6 +684,15 @@ void *CreateWindow ( unsigned long type,
 		//printf("config1 %s %d %d %d %d \n",
 		//    window->name, window->left, window->top, window->width, window->height );
 	};
+    
+    
+		//#debug
+	    //gigabyte/intel
+	    //funcionou at'e aqui ...mas tivemos que suspender o suporte a janela mae logo acima.
+	
+		//printf ("+++++++++++++++++++++++++++++++++++++++++++CreateWindow: ++++++++++++++++++ OK +++++ \n");
+		//refresh_screen ();	
+		//while (1){}    
 	
     //Exemplos de tipos de janelas, segundo MS.	
     //Overlapped Windows
@@ -913,6 +964,22 @@ void *CreateWindow ( unsigned long type,
 		refresh_screen();
 		while(1){}
 	}	
+	
+	
+		//#debug
+	     //parando logo apos o min max check ...
+		//printf ("+++++++++++++++++++++++++++++++++++++++++++CreateWindow: #debug +++++ \n");
+		//refresh_screen ();	
+		//while (1){}
+
+	
+	
+	
+	//
+	// ======================= #### draw #### ================
+	//
+	
+	
 	
     //  # FULL SCREEN #
 

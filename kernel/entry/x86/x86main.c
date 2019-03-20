@@ -360,6 +360,7 @@ int x86main ( int argc, char *argv[] ){
     }
 #endif
 
+	/*
     //If we are using text mode.
     if (VideoBlock.useGui != GUI_ON)
 	{
@@ -390,13 +391,32 @@ int x86main ( int argc, char *argv[] ){
 			asm ("hlt");
 		}
     };
+	*/
 
 #ifdef ENTRY_VERBOSE
     debug_print("x86main: starting kernel ..\n");
 	//printf("x86main: Starting kernel..\n");
     //refresh_screen(); 
 #endif
+	
+	
+	//#bugbug
+	//parece que chegamos at'e aqui, mas nao mostra as mensagens ...
+	//mas quando avançamos, quando cai num die() e mostra a mensagem.
+	
+    //printf ("x86main: debug breakpoint, real machine, gigabyte/intel ..\n");
+    //refresh_screen (); 
+   // while(1){}
 
+	
+
+	// #DEBUG
+	// breakpoint
+    // ok isso funcionou, vamos avançar
+    //lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
+   	//while(1){}
+
+	
 
      //
 	 // #test
@@ -427,6 +447,16 @@ int x86main ( int argc, char *argv[] ){
 	    }
 	
 	
+	// #DEBUG
+	// breakpoint
+    // essa 'e hard ... vamos tentar ap'os a configuraç~ao de mem'oria
+    
+	lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
+   	//OK nao usaremos mais o pixel porque a partir daqui ja temos mensagens de string.
+	//while(1){}
+
+	
+	
 	
 	//#bugbug
 	//depois que a runtime está inicializada, então ja temos mensagem,
@@ -434,9 +464,19 @@ int x86main ( int argc, char *argv[] ){
 	//Mas nossa inicialização está apresentando algum problema no Y,
 	//que se corrige apenas no momento do logon.
 	
-    //printf("x86main: RUNTIME OK..\n");
+	
+	//vamos testar se ja temos mensagem
+	//Ok isso funcionou na gigabyte/intel
+	
+	//testando essa rotina
+	//#BUGBUG ... FALHOU .... VAMOS PROSSEGUIR SEM ELA. !!!
+	//backgroundDraw (COLOR_KERNEL_BACKGROUND); 
+	//PORQUE PRINTF FUNCIONA.
+	
+    printf ("x86main: RUNTIME OK..\n");
     //refresh_screen(); 
     //while(1){}
+	
 //initializeSystem:
 
     //
@@ -445,6 +485,8 @@ int x86main ( int argc, char *argv[] ){
 	
 	//#importante
 	//#obs: É durante essa rotina que começamos a ter mensagens.	
+	
+	//system.c
 
     systemSystem ();	
     Status = (int) systemInit ();
@@ -456,6 +498,18 @@ int x86main ( int argc, char *argv[] ){
         KernelStatus = KERNEL_ABORTED;
         goto fail;
     }
+	
+    
+	//#DEBUG
+	//BREAKPOINT
+    // #importante: Isso funcionou ... gigabyte/intel.
+    //esse ser'a nosso porto seguro, caso a inicializaçao das threads falhem ...
+    
+	printf ("x86main: systemInit OK ..\n");
+    //printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
+    //refresh_screen(); 
+    //while(1){}	
+	
 	
 	//Ok
 	//printf("#breakpoint after systemInit");
@@ -473,6 +527,8 @@ int x86main ( int argc, char *argv[] ){
     // ps: The images are loaded in the memory.
 
 //createProcesses:	
+    
+    printf ("creating kernel process ...\n");
 
     // Creating Kernel process. PID=0.
     KernelProcess = (void *) create_process( NULL, // Window station.
@@ -498,6 +554,17 @@ int x86main ( int argc, char *argv[] ){
         //...
     };
 	
+    
+    //#debug
+    //ok isso funcionou gigabyte/intel
+    //vamos prosseguir.. agora testando a criaçao de thread.
+   // printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
+   // refresh_screen(); 
+   // while(1){}	
+
+    
+    
+    
 	
 	//Cria um diretório que é clone do diretório do kernel base 
 	//e retorna o endereço físico desse novo diretório.
@@ -522,6 +589,17 @@ int x86main ( int argc, char *argv[] ){
 		
         //processor->IdleProcess = (void*) IdleProcess;	
     };
+	
+	
+	
+	//#DEBUG
+    // isso funcionou ... criamos o processo init
+    //vamos corrigir os bugs na funçao create thread.
+	
+    printf ("++++++++ x86main INIT PROCESS OK +++\n");
+    printf ("++++++++ x86main testing thread creation +++\n");
+    //refresh_screen(); 
+    //while(1){}		
 	
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
@@ -549,6 +627,19 @@ int x86main ( int argc, char *argv[] ){
 	//server_index, process, thread
 	ipccore_register ( (int) 0, (struct process_d *) InitProcess, (struct thread_d *) IdleThread );
 
+    
+    
+    
+    //#debug
+    //ok isso funcionou gigabyte/intel
+    //ok funcionou. vamos prosseguir
+   // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
+   // refresh_screen(); 
+   // while(1){}	
+
+    
+    
+    
 
 	// #importante
 	// Daqui pra baixo temos a opção de criarmos ou não os processos
@@ -710,6 +801,25 @@ int x86main ( int argc, char *argv[] ){
 	//===============================================
 	//
 	
+	
+	
+	
+	
+	
+    
+    //#debug
+    //target: parar depois da criaç~ao de processos e trheads. hard hard.
+	//ok funcionou gigabyte/intel vamos avançar..
+    
+   // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
+   // refresh_screen(); 
+   // while(1){}		
+	
+	
+	
+	
+	
+	
 	//
 	//==============================================
 	// ## importante ## 
@@ -744,7 +854,20 @@ int x86main ( int argc, char *argv[] ){
         KernelStatus = KERNEL_INITIALIZED;
     };
 	
-#endif		
+#endif	
+    
+   
+    //#debug
+    //alvo: parando depois das rotinas de checagem ....
+    // isso funcionou ...vamos prosseguir. gigabyte/intel 
+	
+   // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
+   // refresh_screen(); 
+   // while(1){}		
+
+    
+    
+    
 
    
 //    ====================== ## TESTS ## =============================
@@ -762,13 +885,31 @@ int x86main ( int argc, char *argv[] ){
 //doTests:
    //...
 	
+	//
+	// ========= ## ps2 ## =============
+	//
+	
+	
     // Initializing ps/2 controller.
 	//ldisc.c
 	debug_print("x86main: ps2\n");    
-	ps2();
 	
 	
+	printf ("testing ps2\n");
+    refresh_screen(); 
+	
+	ps2 ();
+	
+    // OK ISSO FUNCIONOU .... MAS FIZEMOS ADAPTAÇ~OES NO DRIVER DE I8042 QUE PRECISAM SER REVISARS...
+    // COLOCAMOS UNS DELAYS ...
+    
+    printf ("+++++++++++++ x86main >>>> BREAKPOINT OK #REVER \n");
+    
+    refresh_screen(); 
+    //while(1){}		
+
  
+	
     //
     // Loading file tests.
     //

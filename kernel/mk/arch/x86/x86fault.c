@@ -46,25 +46,33 @@ void do_pagefault();
  *
  */
  
-// #bugbug 
-// Isso deve-se chamar x86faults 
- 
 void faults ( unsigned long number ){
 	
-//Setup:	
-
     struct thread_d *t;
 	
+	// #isso não é necessário,
+	// pois já foi feito antes.
+	
 	asm ("cli");
+	
+	//
+	//   ## Thread ##
+	//
 
 	t = (void *) threadList[current_thread];
 	
+	
+	// Inválida.
+	
 	if( (void *) t == NULL )
 	{
-		printf("mk-faults-faults: struct\n");
-		printf("No current thread\n");
+		printf ("x86fault: struct, no current thread\n");
+		//printf ("No current thread\n");
 		goto fail;
 	}
+	
+	
+	// Válida.
 	
 	if( (void *) t != NULL )
 	{
@@ -77,18 +85,23 @@ void faults ( unsigned long number ){
 	    }
 	};
 	
+	//
+    //  ## Messages ##
+	//
 	
-//Messages:
+	printf ("\n *FAULTS: \n\n");
 	
-	printf("*FAULTS:\n");
-	printf("Number ## %d  ## \n", number);               
-    printf("Init Phase %d \n", KeInitPhase);
-	printf("logonStatus %d guiStatus %d \n", logonStatus, guiStatus );
-	printf("Running Threads %d \n", ProcessorBlock.threads_counter );
-	printf(" TID %d Step %d \n", current_thread, t->step );			
+	printf ("Number={%d}\n", number);               
+
+	printf ("TID %d Step %d \n", current_thread, t->step );				
+	printf ("Running Threads %d \n", ProcessorBlock.threads_counter );
+
+    printf ("Init Phase %d \n", KeInitPhase);
+	printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
 	
-	//Mostra erro de acordo com o número.
-    switch(number)
+	// Mostra erro de acordo com o número.
+	
+    switch (number)
 	{
 	    //EXCEPTION
 		case 1:

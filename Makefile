@@ -11,11 +11,11 @@
 #important
 #We will have a new name just when the release changes.
 
-VERSION = 0
-PATCHLEVEL = 24
+VERSION = 1
+PATCHLEVEL = 0
 SUBLEVEL = 0
-EXTRAVERSION = .0
-NAME = Ikigai
+EXTRAVERSION = -rc1
+NAME = ?
 
 
 ARCH ?= x86
@@ -282,11 +282,6 @@ compile-kernel:
 	# execve/ldisc
 	gcc -c kernel/execve/ldisc/ldisc.c  -I include/ $(CFLAGS) $(DEFINES) -o ldisc.o
 
-
-
-
-
-
 	# /fs
 	gcc -c kernel/kservers/fs/fs.c      -I include/ $(CFLAGS) $(DEFINES) -o fs.o
 	gcc -c kernel/kservers/fs/read.c    -I include/ $(CFLAGS) $(DEFINES) -o read.o
@@ -367,6 +362,16 @@ vhd-x86:
 vhd-mount:
 	-sudo umount /mnt/gramadovhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
+
+danger-hdd-clone-vhd:
+	sudo dd if=./GRAMADO.VHD of=/dev/sda	
+
+hdd-mount:
+	-sudo umount /mnt/gramadohdd
+	sudo mount -t vfat -o loop,offset=32256 /dev/sda /mnt/gramadohdd/
+	
+hdd-copy-kernel:
+	sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
 
 # Copy content to disk
 # 1) BM, BL 

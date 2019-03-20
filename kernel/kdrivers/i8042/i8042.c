@@ -51,7 +51,10 @@ void ps2 (){
 	
 	// Desativar a primeira porta PS/2.
 	//kbdc_wait(1);
-	//outportb(0x64,0x60);  	
+	//outportb(0x64,0x60);  
+	
+	//printf ("ps2: 1\n");
+	//refresh_screen();
   	
 	kbdc_wait(1);
 	outportb(0x64,0xAD);  
@@ -60,6 +63,9 @@ void ps2 (){
 	// hahaha por default ela já vem desativada, só para constar
 	//kbdc_wait(1);
 	//outportb(0x64,0x60);  	
+	
+	//printf ("ps2: 2\n");
+	//refresh_screen();
 	
 	kbdc_wait(1);
 	outportb(0x64,0xA7); 
@@ -85,6 +91,9 @@ void ps2 (){
 	//printf("ps2: inicializando mouse ...\n");
 	//refresh_screen();	
 	
+	//printf ("ps2: 3\n");
+	////refresh_screen();
+	
 	ps2_mouse_initialize();  
 	
 	
@@ -93,6 +102,9 @@ void ps2 (){
 	//refresh_screen();	
 	//Não afeta o controlador. 
 	//Apenas inicializa variáveis.
+	
+	//printf ("ps2: 4\n");
+	//refresh_screen();
 	
 	ps2_mouse_globals_initialize();	
 
@@ -107,7 +119,10 @@ void ps2 (){
 
     //2
 	//printf("ps2: inicializando teclado ...\n");
-	//refresh_screen();	
+	//refresh_screen();
+	
+	printf ("ps2: 5\n");
+	refresh_screen();
 	
 	ps2_keyboard_initialize();
 	
@@ -115,6 +130,9 @@ void ps2 (){
 	//
 	//mouse install ...
 	//
+	
+	printf ("ps2: 6\n");
+	refresh_screen();
 	
 	mouse_install ();
 	

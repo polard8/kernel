@@ -1,6 +1,11 @@
+//Debug flags.
+//Testando desligado.
 
-
-
+// #BUGBUG
+// Nao usar por enquanto.
+// usar essa flag esta ativando alguma rotina
+// defeituosa.
+// #define BL_VERBOSE 1  
 
 
 // USE PRIMARY MASTER!!

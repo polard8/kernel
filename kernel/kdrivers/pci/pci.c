@@ -1204,16 +1204,18 @@ unsigned char pciGetInterruptPin( unsigned char bus,
  *    Inicializa em alguns casos.
  */
 
-int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
-    	
+int 
+pciHandleDevice ( unsigned char bus, 
+				  unsigned char dev, 
+				  unsigned char fun )
+{    	
 	uint32_t data;
 	
 	int Status = -1;
 	
 	//Device.
 	struct pci_device_d *D;    
-	
-	
+		
 	//#debug
 	//printf ("bus=%d dev=%d fun=%d \n", bus, dev, fun);	
 	
@@ -1223,7 +1225,7 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 	if ( (void *) D == NULL )
 	{
 		printf("pciHandleDevice: struct");
-		die();
+		die ();
 	    //return -1;
 	
 	}else{
@@ -1246,8 +1248,9 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		//Pci Header.
 		D->Vendor = (unsigned short) pciCheckVendor (bus, dev);	
 		D->Device = (unsigned short) pciCheckDevice (bus, dev);
-					
-		printf("$ vendor=%x device=%x \n",D->Vendor, D->Device);
+		
+		// #debug
+		// printf ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
 		
 		//#isso funcionou
 		data  = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
@@ -1306,7 +1309,7 @@ int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun ){
 		
 		if ( pciListOffset < 0 || pciListOffset >= 32 )
 		{ 
-			printf("No more slots!\n");
+			printf ("pciHandleDevice: No more slots!\n");
 			return -1;
 		}
 					

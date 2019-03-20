@@ -903,6 +903,11 @@ int init_mm (){
 	// Clear BSS.
 	// Criar mmClearBSS()
 	
+	//falhou antes disso.
+    //printf ("init_mm: debug breakpoint, real machine, gigabyte/intel ..\n");
+    //refresh_screen (); 
+    //while(1){}		
+	
 
 	//#importante:
 	//Inicializa heap e stack.
@@ -914,12 +919,24 @@ int init_mm (){
 	    return (int) 1;
 	};	
 	
+	//#debug, esta falhando antes disso.
+    //printf ("init_mm: debug breakpoint, real machine, gigabyte/intel ..\n");
+    //refresh_screen (); 
+    //while(1){}	
+
+	
+	
 	Status = (int) init_stack();
 	if (Status != 0)
 	{
 	    printf("init_mm fail: Stack\n");
 	    return (int) 1;
 	};		
+
+    //printf ("init_mm: debug breakpoint, real machine, gigabyte/intel ..\n");
+    //refresh_screen (); 
+    //while(1){}	
+
 	
 	
 	// Zerar a lista.

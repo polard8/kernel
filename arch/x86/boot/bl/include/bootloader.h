@@ -23,9 +23,7 @@
 // Variáveis para habilitações de verbose pra debug.
 //
 
-//Debug flags.
-//Testando desligado.
-//#define BL_VERBOSE 1   
+ 
 
 
 #include <config/config.h>  

@@ -1,5 +1,5 @@
 /*
- * File: rt\runtime.c
+ * File: rt/runtime.c
  *
  * Descrição:
  *     Arquivo principal do módulo '/rt' do kernel base.
@@ -38,8 +38,14 @@ int init_runtime (){
 	
 	// Init Memory Manager:	
 	// Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
+	// ?? onde fica ??
 	
 	init_mm ();
+	
+	
+    //printf ("init_runtime: debug breakpoint, real machine, gigabyte/intel ..\n");
+    //refresh_screen (); 
+    //while(1){}	
 	
 	
 	// Nessa hora a memória já funciona e o malloc tambem. e mensagens.
@@ -54,9 +60,14 @@ int init_runtime (){
 	
 	//Cria o diretório de páginas do processo kernel, page tables e 
 	//area para pageframes de memória paginada.
+	//pages.c
 	
-	SetUpPaging ();		
+	SetUpPaging ();	
 	
+	
+    //printf ("init_runtime: 2 debug breakpoint, real machine, gigabyte/intel ..\n");
+    //refresh_screen (); 
+    //while(1){}		
 
 	
     // Continua ...
@@ -78,8 +89,8 @@ int init_runtime (){
  *     @todo: 
  *         Criar aqui, apenas a interface que chama a rotina 
  *         de inicialização da runtime.
- *
  */
+
 int KiInitRuntime (){
 	
 	int Status = 0;

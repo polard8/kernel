@@ -73,6 +73,10 @@ int MOUSE_BAT_TEST (){
 
 void mouse_install (){
 	
+	
+	printf ("mouse_install: 1\n");
+	refresh_screen();
+	
 	// 0xFF
 	// Espera o dados descer (ACK)	
     // Basic Assurance Test (BAT)
@@ -80,6 +84,11 @@ void mouse_install (){
 	mouse_write (0xFF);
     while ( mouse_read() != 0xFA);	
 
+	printf ("mouse_install: 2\n");
+	refresh_screen();
+
+	
+	
     if ( MOUSE_BAT_TEST() != 0) 
 	{
     	printf("\n Mouse error!");
@@ -91,6 +100,10 @@ void mouse_install (){
 	mouse_write (0xF6);
     while( mouse_read() != 0xFA);
 
+	printf ("mouse_install: 3\n");
+	refresh_screen();
+
+	
     // habilita o mouse. (streaming)
 	//Espera o dados descer (ACK)
 	
@@ -98,6 +111,9 @@ void mouse_install (){
 	while( mouse_read() != 0xFA);
 
     // Espera nossa controladora terminar.
+	printf ("mouse_install: 4\n");
+	refresh_screen();
+
     
 	kbdc_wait (1);	
 }

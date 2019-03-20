@@ -144,18 +144,31 @@ void create_logon (){
 #ifdef KERNEL_VERBOSE			    
 		printf ("gws-create_logon: init desktop ok\n");   
 #endif	    		
-	
-	    //Inicia estrutura.	
-		init_windows(); 
-#ifdef KERNEL_VERBOSE			    
-		printf ("gws-create_logon: init windows ok\n");   
-#endif	    		
 
+				
+	    //Inicia estrutura.	
+		//window.c
+		
+		init_windows(); 
+//#ifdef KERNEL_VERBOSE			    
+		printf ("gws-create_logon: init windows ok\n");   
+//#endif	    		
+
+		
+ 	//#debug :  PARANDO ANTES depois de iniciarmos a gerencia de janelas.
+	//ok funcionou at'e aqui.
+		
+	//printf ("++++++++++++++++++++++++ logon:  ++++++++++++++++++++++++++++++\n");
+   // refresh_screen(); 
+   // while(1){}			
+
+		
+		
 		//menus.
 		init_menus();        
-#ifdef KERNEL_VERBOSE				
+//#ifdef KERNEL_VERBOSE				
 		printf("gws-create_logon: init menus ok\n");
-#endif	    	    
+//#endif	    	    
 
 	    //...
 	};
@@ -187,19 +200,43 @@ void create_logon (){
 	// ## Draw windows ##
 	//
 					   
-draw_logon_stuffs:	
+draw_logon_stuff:	
 	   
 	//Debug.
 	//printf("create_logon: Draw..\n");   
 
 	//Screen, Background and Logo. 
-	if(gui->screenStatus == 1){ 
-	    logon_create_screen(); 
+	if(gui->screenStatus == 1)
+	{ 
+	    //isso falhou.
+		//vamos testar create window,
+		logon_create_screen (); 
+		
 	};
+	
+    //#debug
+	//gigabyte/intel
+	//funcionou at'e aqui com algumas adaptaç~oes...
+	//vamos prosseguir
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
+    //refresh_screen(); 
+    //while(1){}			
+	
+	
 	
 	if(gui->backgroundStatus == 1){	
 	    logon_create_background(); 
-	};	
+	};
+	
+    //#debug
+	//gigabyte/intel
+	//funcionou ate' aqui com algumas adaptaçoes...
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
+   // refresh_screen(); 
+   // while(1){}			
+
+	
+	
 	
 	if(gui->logoStatus == 1){ 
 	    logon_create_logo(); 
@@ -226,6 +263,17 @@ draw_logon_stuffs:
     if(gui->gridStatus == 1){ 
 	    logon_create_grid(); 
 	};
+	
+	
+    //#debug
+	//gigabyte/intel
+	//funcionou ate' aqui com algumas adaptaçoes...
+	//vamos prosseguir
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
+    //refresh_screen(); 
+    //while(1){}			
+
+
 	
 		
 	//
@@ -284,6 +332,17 @@ draw_logon_stuffs:
 	//Debug:
 	//printf("#debug logon.c");				   
 	//die();
+	
+	
+    //#debug
+	//gigabyte/intel
+	//funcionou ate' aqui com algumas adaptaçoes...
+	//vamos prosseguir
+	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
+   // refresh_screen(); 
+   // while(1){}			
+
+
 		
 	//
 	// # Done # 
@@ -389,37 +448,87 @@ int grid             // Grid da janela principal.
  *     Atribuindo as dimensões.
  *     ...
  */
-void logon_create_screen()
-{
+
+void logon_create_screen (){
+	
 	struct window_d *hWindow; 
 	
 	unsigned long Left = 0;
 	unsigned long Top = 0;
+	
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();
 	
 	// Screen
 	// Obs: Não tem 'parent window' !!!
-	hWindow = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Screen", 
+	
+	printf ("             >>>>>>> CREATE WINDOW \n");
+	
+	hWindow = (void*) CreateWindow ( 1, 0, VIEW_MINIMIZED, "Screen", 
 	                                Left, Top, Width, Height, 
 							        NULL, 0, 0, COLOR_BLACK );  
-	if( (void*) hWindow == NULL ){
-	    printf("logon_create_screen:");
-		die();
-	}else{
+	
+	if( (void*) hWindow == NULL )
+	{
 	    
-		RegisterWindow(hWindow);
-	    windowLock(hWindow); 
-		set_active_window(hWindow); 
+		printf ("logon_create_screen:");
+		die ();
+	
+	}else{
+		
+		//#debug breakpoint
+		//ok isso funcionou ... gigabyte/intel
+		printf ("         +++++++++++++++++ >>>>>>> CREATE WINDOW OK OK OK \n");
+	    //refresh_screen();
+		//while(1){}
+
+		if ( hWindow->used != 1 || hWindow->magic != 1234 )
+		{
+			//se essa mensagem n~ao aparecer 'e porque a estrutura est'a certa.
+		    printf ("         +++++++++++++++++ >>>>>>> CREATE WINDOW STRUCT FAIL \n");		
+		}
+		
+		printf ("         ++++++++++++++++++++++++++++++++++++++++ >>>>>>> REGISTER \n");		
+		RegisterWindow (hWindow);
+		
+		printf ("         ++++++++++++++++++++++++++++++++++++++++ >>>>>>> LOCK \n");		
+	    windowLock (hWindow); 
+		
+		printf ("         ++++++++++++++++++++++++++++++++++++++++ >>>>>>> SET ACTIVE \n");	
+		set_active_window (hWindow); 
+
+		//#debug breakpoint
+
+		//printf ("         ++++++++++++++++++++++++++++++++++++++++ >>>>>>> DEBUG BREAKPOINT \n");
+	    //refresh_screen();
+		//while(1){}
+		
 		
 		//a janela pertence ao desktop 0
 	    //hWindow->desktop = (void*) desktop0;
 
-	    if( (void*) gui == NULL){
-		    return;
+	    if( (void *) gui == NULL)
+		{
+			//printf ("++++++++++++++++++++++++++++++++++++++++logon: gui struct NULL");
+		    //refresh_screen();
+			return;
+		
 		}else{
-	        gui->screen = (void*) hWindow;
+			
+			//if ( gui->used != 1 || gui->magic != 1234 )
+			//{
+			//	printf ("++++++++++++++++++++++++++++++++++++++++logon: gui struct fail");
+			    
+			//}
+			
+			printf ("++++++++++++++++++++++++++++++++++++++++logon: gui->screen\n");
+	        gui->screen = (void *) hWindow;
+			printf ("++++++++++++++++++++++++++++++++++++++++logon: gui->screen  ok\n");
+			
+			//refresh_screen();
+			//while(1){}
 		};
+		
 	};
 	
 done:

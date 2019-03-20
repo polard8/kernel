@@ -151,7 +151,7 @@
 //fnciona como uma visão panorâmica, usa espinha dorsal, um esqueleto.
 //#define KERNEL_VERBOSE 1
 //Esse é usado para trabalhar a rotina de entrypoint da arquitetura alvo.
-//#define ENTRY_VERBOSE 1
+#define ENTRY_VERBOSE 1
 //Esses quatro são as camadas principais.
 //#define HAL_VERBOSE 1
 //#define MK_VERBOSE 1

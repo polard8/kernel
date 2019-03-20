@@ -67,6 +67,7 @@ int get_char_height (){
  ******************************************************
  * drawchar_transparent:
  *     Desenha um caractere sem alterar o pano de fundo.
+ *     >> no backbuffer.
  */						   
 void drawchar_transparent ( unsigned long x, 
                             unsigned long y, 
@@ -221,7 +222,9 @@ void drawchar_transparent ( unsigned long x,
  * draw_char:
  *     Constrói um caractere 8x8 no buffer.
  *     Desenha um caractere e pinta o pano de fundo.
+ *     >> no backbuffer.
  */ 
+
 void draw_char ( unsigned long x, 
                  unsigned long y,  
 				 unsigned long c,
