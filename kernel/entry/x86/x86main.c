@@ -252,7 +252,7 @@ void x86mainStartFirstThread ( int n ){
                   " pushl $0x3200  \n"            // eflags.
                   " pushl $0x1B  \n"              // cs.
                   " pushl $0x00451000  \n"        // eip.
-                  " iret \n" );
+				  " iret \n" );
 	};
 	
     //taskman
@@ -271,7 +271,7 @@ void x86mainStartFirstThread ( int n ){
                   " pushl $0x3200  \n"            // eflags.
                   " pushl $0x1B  \n"              // cs.
                   " pushl $0x004A1000  \n"        // eip.
-                  " iret \n" );
+				  " iret \n" );
 	};
 	
 	// Paranoia

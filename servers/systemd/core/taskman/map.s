@@ -329,12 +329,12 @@ Linker script and memory map
  .iplt          0x00000000004a8000        0x0 stubs.o
 
 .rodata         0x00000000004a8000      0xeae
- .rodata        0x00000000004a8000       0x19 crt0.o
- *fill*         0x00000000004a8019        0x3 
- .rodata        0x00000000004a801c      0x1f1 main.o
- *fill*         0x00000000004a820d        0x3 
- .rodata        0x00000000004a8210      0x3ab api.o
- *fill*         0x00000000004a85bb        0x5 
+ .rodata        0x00000000004a8000        0x6 crt0.o
+ *fill*         0x00000000004a8006        0x2 
+ .rodata        0x00000000004a8008      0x1f1 main.o
+ *fill*         0x00000000004a81f9        0x3 
+ .rodata        0x00000000004a81fc      0x3ab api.o
+ *fill*         0x00000000004a85a7       0x19 
  .rodata        0x00000000004a85c0      0x100 ctype.o
                 0x00000000004a85c0                _ctype
  .rodata        0x00000000004a86c0      0x2d4 stdio.o
@@ -377,8 +377,8 @@ Linker script and memory map
                 0x00000000004aafa0                _data = .
                 0x00000000004aafa0                __data = .
  *(.data)
- .data          0x00000000004aafa0      0x450 crt0.o
- *fill*         0x00000000004ab3f0       0x10 
+ .data          0x00000000004aafa0      0x448 crt0.o
+ *fill*         0x00000000004ab3e8       0x18 
  .data          0x00000000004ab400      0x444 main.o
                 0x00000000004ab840                listening
  *fill*         0x00000000004ab844       0x1c 

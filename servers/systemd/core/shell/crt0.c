@@ -52,27 +52,22 @@ extern int main ( int argc, char *argv[] );
 
 void crt0 (){
 	
-	int Response;
+    int ExitCode;	
 	
-	//char **empty_string_pool;
-	
-
     // Inicializando o suporte a alocação dinâmica de memória.
 	// Inicializando o suporte ao fluxo padrão.
     // Call main().	
 	
 	libcInitRT ();
 	stdioInitialize ();	
-
-
-	Response = (int) main ( 3, argv ); 
-								
-			
+	
+	ExitCode = (int) main ( 3, argv ); 
+											
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
 	// O erro pode vir no retorno ou implementa-se uma forma de pegar a execessão 
 	// ocorrida durante a execussão de main.
 	
-	switch (Response)
+	switch (ExitCode)
 	{
 	    case 0:
 		    exit (0);

@@ -14,43 +14,46 @@
 
 
 static char *argv[] = { "-init",NULL };
-static char *envp[] = { "ROOT=root:/volume0", NULL };
+//static char *envp[] = { "ROOT=root:/volume0", NULL };
 
 
 extern int main ( int argc, char *argv[] );
 
 
-//
-// Main function in C part.
-//
+/*
+ ****************************
+ * crt0:
+ *     #importante:
+ *     Esse é o ponto de entrada em user mode, pois é a primeira
+ *     thread se o kernel passar o comando para o init.
+ *     Porém antes de termos alguma mensagem, temos que inicializar
+ *     os recursos da biblioteca.
+ *     ? O que acontece se falhar na hora de inicializar a biblioteca 
+ *     nesse aplicativo.  ?
+ *     Como esse momento é bem importante, então vamos monitor a 
+ *     inicialização da biblioteca, principalmente a inicialização
+ *     feita nessa trhead.
+ */
 
 void crt0 (){
 	
-	int Response;
-	
-	//char **empty_string_pool;
-	
+    int ExitCode;	
 
-    // Inicializando o suporte a alocação dinâmica de memória.
+	// Inicializando o suporte a alocação dinâmica de memória.
 	// Inicializando o suporte ao fluxo padrão.
     // Call main().	
 	
 	libcInitRT ();
 	stdioInitialize ();	
 
-
-	Response = (int) main ( 1, argv );
 	
-	//while(1){}
-								
-									
-	//
+	ExitCode = (int) main ( 1, argv );
+	
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
 	// O erro pode vir no retorno ou implementa-se uma forma de pegar a execessão 
 	// ocorrida durante a execussão de main.
-	//
 	
-	switch (Response)
+	switch (ExitCode)
 	{
 	    case 0:
 		    exit (0);
@@ -77,5 +80,5 @@ hang:
 		asm("pause");
 		asm("pause");
 	};
-};
+}
 

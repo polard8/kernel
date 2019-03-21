@@ -8,10 +8,13 @@
 #include "tm.h"
 
 
-extern int main ( int argc, char *argv[] ); 
+
 
 static char *argv[] = { "-init",NULL };
-static char *envp[] = { "ROOT=root:/volume0", NULL };
+//static char *envp[] = { "ROOT=root:/volume0", NULL };
+
+
+extern int main ( int argc, char *argv[] ); 
 
 //
 // # Entry point #
@@ -21,20 +24,13 @@ static char *envp[] = { "ROOT=root:/volume0", NULL };
 void crt0 (){
 	
     int ExitCode;	
-
-//initRT:	
-
+	
     //Inicializando o suporte a alocação dinâmica de memória.
-	libcInitRT();
-
 	//Inicializando o suporte ao fluxo padrão.
+
+	libcInitRT();
     stdioInitialize();	
-	
-	// #debug
-	// Testing output message.
-	// printf("crt0: TASKMAN.BIN is alive \n");
-    // refresh_screen();
-	
+		
 	ExitCode = (int) main ( 1, argv ); 
 	
 	// Chama kill ou exit de acordo com o problema ocorrido em main.
@@ -46,5 +42,5 @@ void crt0 (){
 	while (1){
 		asm ("pause");
 	};
-};
+}
 
