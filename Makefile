@@ -501,7 +501,8 @@ vhd-unmount:
 	sudo mkdir /mnt/gramadovhd
 
 clean:
-	-rm *.o
+	-rm -f *.o
+	-rm -f *.ISO
 
 	@echo "Success?"
 	
