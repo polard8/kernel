@@ -92,7 +92,11 @@ int ExitLogon();
 void create_logon (){
 	
 	struct window_d *hWindow; 
-	char str_tmp[120];	 
+	
+	// #suspenso.
+	// Suspendemos o uso de variaveis importadas do Makefile,
+	// essa era o buffer delas.
+	// char str_tmp[120];	 
 	
 	debug_print("create_logon\n");
 	
@@ -291,6 +295,8 @@ draw_logon_stuff:
         if(g_guiMinimal != 1)
 		{
 			
+	
+/*			
 #ifdef IMPORTED_VARIABLES	
             //=======================================
             // #Warning                            //
@@ -306,6 +312,8 @@ draw_logon_stuff:
 			draw_text( gui->main, 400 +8, 8*1, 
 			    COLOR_WHITE, str_tmp );
 #endif
+*/
+			
 				
 			draw_text( gui->main, 400 +8, 8*2, 
 			    COLOR_WHITE, "(c) Copyright 2005-2019, Fred Nora" );

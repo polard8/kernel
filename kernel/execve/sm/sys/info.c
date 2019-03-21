@@ -69,6 +69,11 @@ void KiInformation (){
 	
 	printf("\n");	
 	
+
+	// #suspenso
+	// Suspendemos o uso de variáveis importadas do makefile.
+	
+/*	
 #ifdef IMPORTED_VARIABLES	
 	//=======================================
 	// #Warning                            //
@@ -82,6 +87,8 @@ void KiInformation (){
         GRAMADO_EXTRAVERSION,
         GRAMAD0_NAME );	
 #endif
+*/
+	
 	
 	//screen 
 	

@@ -63,6 +63,11 @@ void memoryShowMemoryInfo (){
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
 	
 	
+    
+	// #Suspenso
+	// Suspendemos o uso de variáveis importadas do makefile.
+	
+/*	
 #ifdef IMPORTED_VARIABLES	
 	//=======================================
 	// #Warning                            //
@@ -90,6 +95,8 @@ void memoryShowMemoryInfo (){
 	printf("bss_begin={%x}  bss_end={%x}\n", &bss_begin, &bss_end );
 	
 #endif
+*/
+	
 	
 	
 	//  ## heap e stack ##
