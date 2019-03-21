@@ -154,9 +154,12 @@ void x86mainStartFirstThread ( int n ){
 	// Done!
     //
 	
+	// #bugbug
+	// Na máquina gigabyte/intel o sistema as vezes falha logo após essa mensagem.
+	
     // #debug
-    printf ("x86mainStartFirstThread: Starting idle TID=%d (debug) \n", Thread->tid );
-    refresh_screen (); 
+    //printf ("x86mainStartFirstThread: Starting idle TID=%d (debug) \n", Thread->tid );
+    //refresh_screen (); 
 
 
     for ( i=0; i <= PRIORITY_MAX; i++ ){
@@ -171,14 +174,16 @@ void x86mainStartFirstThread ( int n ){
     //Set cr3 and flush TLB.
     mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
     asm ("movl %cr3, %eax");
+	//#todo: delay.
     asm ("movl %eax, %cr3");
 
-
-    /* turn_task_switch_on:
-     * + Creates a vector for timer irq, IRQ0.
-     * + Enable taskswitch. */
-	 
-    turn_task_switch_on();
+	//
+    // turn_task_switch_on:
+    //  + Creates a vector for timer irq, IRQ0.
+    //  + Enable taskswitch. 
+	//
+	
+    turn_task_switch_on ();
 
 	//#bugbug:
 	//Não podemos inicialziar o timer novamente,
@@ -190,8 +195,14 @@ void x86mainStartFirstThread ( int n ){
     //timerInit8253 ( HZ );
 	timerInit8253 ( 800 );
 	
-	//parece que isso é realmente preciso, libera o teclado.
-	//outb(0x20,0x20); 
+	
+    // #debug
+    printf ("Go to user mode!\n");
+    refresh_screen (); 
+	
+	// ??
+	// parece que isso é realmente preciso, libera o teclado.
+	// outb(0x20,0x20); 
    
 	// # go!
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 
@@ -456,24 +467,13 @@ int x86main ( int argc, char *argv[] ){
 	//while(1){}
 
 	
-	
-	
 	//#bugbug
 	//depois que a runtime está inicializada, então ja temos mensagem,
 	//pois temos os endereços virtuais dos buffers.
 	//Mas nossa inicialização está apresentando algum problema no Y,
 	//que se corrige apenas no momento do logon.
-	
-	
-	//vamos testar se ja temos mensagem
-	//Ok isso funcionou na gigabyte/intel
-	
-	//testando essa rotina
-	//#BUGBUG ... FALHOU .... VAMOS PROSSEGUIR SEM ELA. !!!
-	//backgroundDraw (COLOR_KERNEL_BACKGROUND); 
-	//PORQUE PRINTF FUNCIONA.
-	
-    printf ("x86main: RUNTIME OK..\n");
+			
+    //printf ("x86main: RUNTIME OK..\n");
     //refresh_screen(); 
     //while(1){}
 	
@@ -488,35 +488,31 @@ int x86main ( int argc, char *argv[] ){
 	
 	//system.c
 
-    systemSystem ();	
+    systemSystem ();
+	
     Status = (int) systemInit ();
 	
     if ( Status != 0 )
 	{
-		debug_print("x86main: systemInit fail\n");
-        printf("x86main: systemInit fail\n");
+		debug_print ("x86main: systemInit fail\n");
+        printf ("x86main: systemInit fail\n");
         KernelStatus = KERNEL_ABORTED;
+		
         goto fail;
     }
 	
     
-	//#DEBUG
-	//BREAKPOINT
+	// #DEBUG
+	// BREAKPOINT
     // #importante: Isso funcionou ... gigabyte/intel.
-    //esse ser'a nosso porto seguro, caso a inicializaçao das threads falhem ...
-    
-	printf ("x86main: systemInit OK ..\n");
-    //printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
-    //refresh_screen(); 
-    //while(1){}	
+    // esse ser'a nosso porto seguro, caso a inicializaçao das threads falhem ...
+	// printf ("x86main: systemInit OK ..\n");
+    // printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
+    // refresh_screen(); 
+    // while(1){}	
 	
 	
-	//Ok
-	//printf("#breakpoint after systemInit");
-    //refresh_screen(); 
-    //while(1){}	
-	
-	debug_print("x86main: processes and threads\n");
+	debug_print ("x86main: processes and threads\n");
 	
 	//  ## Processes ##
 
@@ -528,7 +524,8 @@ int x86main ( int argc, char *argv[] ){
 
 //createProcesses:	
     
-    printf ("creating kernel process ...\n");
+	// #debug
+    // printf ("creating kernel process ...\n");
 
     // Creating Kernel process. PID=0.
     KernelProcess = (void *) create_process( NULL, // Window station.
@@ -555,20 +552,16 @@ int x86main ( int argc, char *argv[] ){
     };
 	
     
-    //#debug
-    //ok isso funcionou gigabyte/intel
-    //vamos prosseguir.. agora testando a criaçao de thread.
-   // printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
-   // refresh_screen(); 
-   // while(1){}	
+    // #debug
+    // ok isso funcionou gigabyte/intel
+    // vamos prosseguir.. agora testando a criaçao de thread.
+    // printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
+    // refresh_screen(); 
+    // while(1){}	
 
-    
-    
-    
-	
-	//Cria um diretório que é clone do diretório do kernel base 
-	//e retorna o endereço físico desse novo diretório.
-	//gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
+	// Cria um diretório que é clone do diretório do kernel base 
+	// e retorna o endereço físico desse novo diretório.
+	// gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
 		
     //Creating init process.
 	//UPROCESS_IMAGE_BASE;
@@ -590,16 +583,14 @@ int x86main ( int argc, char *argv[] ){
         //processor->IdleProcess = (void*) IdleProcess;	
     };
 	
-	
-	
-	//#DEBUG
+		
+	// #DEBUG
     // isso funcionou ... criamos o processo init
-    //vamos corrigir os bugs na funçao create thread.
-	
-    printf ("++++++++ x86main INIT PROCESS OK +++\n");
-    printf ("++++++++ x86main testing thread creation +++\n");
-    //refresh_screen(); 
-    //while(1){}		
+    // vamos corrigir os bugs na funçao create thread.
+    // printf ("++++++++ x86main INIT PROCESS OK +++\n");
+    // printf ("++++++++ x86main testing thread creation +++\n");
+    // refresh_screen(); 
+    // while(1){}		
 	
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
@@ -628,18 +619,12 @@ int x86main ( int argc, char *argv[] ){
 	ipccore_register ( (int) 0, (struct process_d *) InitProcess, (struct thread_d *) IdleThread );
 
     
-    
-    
-    //#debug
-    //ok isso funcionou gigabyte/intel
-    //ok funcionou. vamos prosseguir
-   // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
-   // refresh_screen(); 
-   // while(1){}	
-
-    
-    
-    
+    // #debug
+    // ok isso funcionou gigabyte/intel
+    // ok funcionou. vamos prosseguir
+    // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
+    // refresh_screen(); 
+    // while(1){}	
 
 	// #importante
 	// Daqui pra baixo temos a opção de criarmos ou não os processos
@@ -692,9 +677,7 @@ int x86main ( int argc, char *argv[] ){
 #ifdef ENTRY_CREATE_TASKMAN
 	
     //Creating Taskman process. 
-    TaskManProcess = (void *) create_process( NULL, 
-	                                         NULL, 
-											 NULL, 
+    TaskManProcess = (void *) create_process( NULL, NULL, NULL, 
 											 (unsigned long) 0x004A0000, 
                                              PRIORITY_LOW, 
 											 KernelProcess->pid, 
@@ -802,22 +785,12 @@ int x86main ( int argc, char *argv[] ){
 	//
 	
 	
-	
-	
-	
-	
-    
-    //#debug
-    //target: parar depois da criaç~ao de processos e trheads. hard hard.
-	//ok funcionou gigabyte/intel vamos avançar..
-    
-   // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
-   // refresh_screen(); 
-   // while(1){}		
-	
-	
-	
-	
+    // #debug
+    // target: parar depois da criaç~ao de processos e trheads. hard hard.
+	// ok funcionou gigabyte/intel vamos avançar..
+    // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
+    // refresh_screen(); 
+    // while(1){}		
 	
 	
 	//
@@ -857,32 +830,25 @@ int x86main ( int argc, char *argv[] ){
 #endif	
     
    
-    //#debug
-    //alvo: parando depois das rotinas de checagem ....
+    // #debug
+    // alvo: parando depois das rotinas de checagem ....
     // isso funcionou ...vamos prosseguir. gigabyte/intel 
-	
-   // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
-   // refresh_screen(); 
-   // while(1){}		
-
-    
-    
-    
+    // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
+    // refresh_screen(); 
+    // while(1){}		
 
    
-//    ====================== ## TESTS ## =============================
-// begin - We can make some tests here.
-
+    //    ====================== ## TESTS ## =============================
+    // begin - We can make some tests here.
+	
 	
     //Inicializando as variáveis do cursor piscante do terminal.
     //isso é um teste.
     timer_cursor_used = 0;   //desabilitado.
     timer_cursor_status = 0;
 
-
- 
 	
-//doTests:
+   //doTests:
    //...
 	
 	//
@@ -895,20 +861,20 @@ int x86main ( int argc, char *argv[] ){
 	debug_print("x86main: ps2\n");    
 	
 	
-	printf ("testing ps2\n");
-    refresh_screen(); 
+    //#DEBUG
+	//printf ("testing ps2\n");
+    //refresh_screen(); 
 	
 	ps2 ();
 	
-    // OK ISSO FUNCIONOU .... MAS FIZEMOS ADAPTAÇ~OES NO DRIVER DE I8042 QUE PRECISAM SER REVISARS...
-    // COLOCAMOS UNS DELAYS ...
-    
-    printf ("+++++++++++++ x86main >>>> BREAKPOINT OK #REVER \n");
-    
-    refresh_screen(); 
-    //while(1){}		
+    // OK ISSO FUNCIONOU .... 
+	// MAS FIZEMOS ADAPTAÇÕES NO DRIVER DE I8042 QUE PRECISAM SER REVISTAS ...
+    // COLOCAMOS UNS DELAYS ... 
+    // #DEBUG
+    // printf ("+++++++++++++ x86main >>>> BREAKPOINT OK #REVER \n");   
+    // refresh_screen(); 
+    // while(1){}		
 
- 
 	
     //
     // Loading file tests.
@@ -1008,18 +974,19 @@ int x86main ( int argc, char *argv[] ){
 	*/
 	
     
-	//Isso funcionou, não mudar de lugar.
-	//Mas isso faz parte da interface gráfica,
-	//Só que somente nesse momento temos recursos 
-	//suficientes para essa rotina funcionar.
+	// #Aviso:
+	// Isso funcionou, não mudar de lugar.
+	// Mas isso faz parte da interface gráfica,
+	// Só que somente nesse momento temos recursos 
+	// suficientes para essa rotina funcionar.
 	
 	windowLoadGramadoIcons ();
 	
-
-	// ## Testando font NelsonCole2 ##
-    // #todo: Isso pode ficar no mo'dulo gws?
-	gwsInstallFont("NC2     FON");
-	//gwsInstallFont("NC2     FON");
+    // #fonte:
+	// Testando font NelsonCole2
+    // #todo: Isso pode ficar no módulo gws ?
+	
+	gwsInstallFont ("NC2     FON");
 	
 	
 	//
@@ -1074,64 +1041,15 @@ int x86main ( int argc, char *argv[] ){
 		
 	};
 	
-	//#debug
-	//extern unsigned long code_begin;
-	//extern unsigned long code_end;
-	//extern unsigned long data_begin;
-	//extern unsigned long data_end;
-	//extern unsigned long bss_begin;
-	//extern unsigned long bss_end;
-	
-	//printf("\n");
-	//printf("\n");
-	//printf("#debug\n");
-	//printf("======\n");
-	
-	//printf("\n");
-	//printf("code_begin={%x}\n", &code_begin );
-	//printf("  code_end={%x}\n", &code_end );
 
-	//printf("\n");
-	//printf("data_begin={%x}\n", &data_begin );
-	//printf("  data_end={%x}\n", &data_end );
-
-	//printf("\n");
-	//printf(" bss_begin={%x}\n", &bss_begin );
-	//printf("   bss_end={%x}\n", &bss_end );
-	
-	//printf("\n");
-	//refresh_screen();
-	//die();
-	
-	
-	
-	// ## testando ctype ##
-    //ok ... isso funcionou.
-	
-   /*	
-   int var1 = 'h';
-   int var2 = '2';
-    
-   if( isdigit(var1) ) {
-      printf("var1 = |%c| is a digit\n", var1 );
-   } else {
-      printf("var1 = |%c| is not a digit\n", var1 );
-   }
-   
-   if( isdigit(var2) ) {
-      printf("var2 = |%c| is a digit\n", var2 );
-   } else {
-      printf("var2 = |%c| is not a digit\n", var2 );
-   }
-	
-	//#debug
-	refresh_screen();
-	while(1){}
-	*/
-	
-	
+    // #debug	
+	// printf("\n");
+	// refresh_screen();
+	// die();
+			
 //    ====================== ## TESTS ## =============================
 // #end.	
+	
 	
 	
 #ifdef BREAKPOINT_TARGET_AFTER_ENTRY
