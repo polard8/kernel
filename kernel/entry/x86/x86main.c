@@ -609,6 +609,13 @@ int x86main ( int argc, char *argv[] ){
         processor->NextThread    = (void *) IdleThread;
         processor->IdleThread    = (void *) IdleThread;
         //...
+        
+	    // ## importante ## 
+	    // Temos aqui alguma configuração.        
+        
+        current_thread = IdleThread->tid;
+        next_thread = IdleThread->tid;
+        idle = IdleThread->tid; 
     };	
 	
 	InitProcess->Heap = (unsigned long) g_gramadocore_init_heap_va;
@@ -618,6 +625,8 @@ int x86main ( int argc, char *argv[] ){
 	//server_index, process, thread
 	ipccore_register ( (int) 0, (struct process_d *) InitProcess, (struct thread_d *) IdleThread );
 
+    
+	//==============================================    
     
     // #debug
     // ok isso funcionou gigabyte/intel
@@ -793,20 +802,7 @@ int x86main ( int argc, char *argv[] ){
     // while(1){}		
 	
 	
-	//
-	//==============================================
-	// ## importante ## 
-	// Temos aqui alguma configuração.
-	//
-	
-	next_thread = 0;
-	
-	// #importante: 
-	// Essa não pode fechar nunca.
-	// idle thread ... 
-	//idle = 3;
-	idle = 0;
-    
+
 	
 	//...
 
