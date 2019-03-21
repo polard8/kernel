@@ -316,7 +316,7 @@ draw_logon_stuff:
 			
 				
 			draw_text( gui->main, 400 +8, 8*2, 
-			    COLOR_WHITE, "(c) Copyright 2005-2019, Fred Nora" );
+			    COLOR_WHITE, "Gramado Operating System" );
 			
 			draw_text( gui->main, 400 +8, 8*3, 
 			    COLOR_WHITE, "(under construction) ");
