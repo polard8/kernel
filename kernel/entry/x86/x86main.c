@@ -79,6 +79,8 @@ static inline void mainSetCr3 ( unsigned long value ){
  *      Seleciona a primeira thread para rodar e salta para user mode.
  */
 
+extern void clear_nt_flag ();
+
 void x86mainStartFirstThread ( int n ){
 	
 	int i;
@@ -217,30 +219,54 @@ void x86mainStartFirstThread ( int n ){
 	//será que a tss está configurada apenas para a thread idle do INIT ??
 	//temos que conferir isso.
 	
+	//base dos arquivos.
+	unsigned char *buff1 = (unsigned char *) 0x00400000;
+	unsigned char *buff2 = (unsigned char *) 0x00450000;
+	unsigned char *buff3 = (unsigned char *) 0x004A0000;	
+		
+	
+	clear_nt_flag ();
+	
 	//init
     if (n == 1 )
-    {		
-	
-        asm volatile (" cli \n"
-                  " mov $0x23, %ax  \n"
-                  " mov %ax, %ds  \n"
-                  " mov %ax, %es  \n"
-                  " mov %ax, %fs  \n"
-                  " mov %ax, %gs  \n"
-                  " pushl $0x23  \n"              // ss.
-                  " movl $0x0044FFF0, %eax  \n"
-                  " pushl %eax  \n"               // esp.
-                  " pushl $0x3200  \n"            // eflags.
-                  " pushl $0x1B  \n"              // cs.
-                  " pushl $0x00401000  \n"        // eip.
-                  " iret \n" );
+    {
+	    if ( buff1[0] != 0x7F ||
+		     buff1[1] != 'E' ||
+		     buff1[2] != 'L' ||
+		     buff1[3] != 'F' )
+	    {
+	        printf ("x86mainStartFirstThread: init .ELF signature");
+		    die ();
+	    }
+		
+		asm volatile ( " sti  \n"			  
+			           " mov $0x23, %ax  \n"
+                       " mov %ax, %ds    \n"
+                       " mov %ax, %es    \n"
+                       " mov %ax, %fs    \n"
+                       " mov %ax, %gs    \n"
+					   " pushl $0x23  \n"              // ss.
+                       " movl $0x0044FFF0, %eax  \n"   // esp 
+					   " pushl %eax    \n"             // esp.
+                       " pushl $0x3297 \n"             // eflags.
+                       " pushl $0x1B    \n"            // cs.
+                       " pushl $0x00401000 \n"         // eip. 
+					   " iret \n" );
 	};
 	
 	//shell
     if (n == 2 )
     {		
+	    if ( buff2[0] != 0x7F ||
+		     buff2[1] != 'E' ||
+		     buff2[2] != 'L' ||
+		     buff2[3] != 'F' )
+	    {
+	        printf ("x86mainStartFirstThread: shell .ELF signature");
+		    die ();
+	    }		
 	
-        asm volatile (" cli \n"
+        asm volatile (" sti \n"
                   " mov $0x23, %ax  \n"
                   " mov %ax, %ds  \n"
                   " mov %ax, %es  \n"
@@ -258,8 +284,16 @@ void x86mainStartFirstThread ( int n ){
     //taskman
     if (n == 3 )
     {		
-	
-        asm volatile (" cli \n"
+	    if ( buff3[0] != 0x7F ||
+		     buff3[1] != 'E' ||
+		     buff3[2] != 'L' ||
+		     buff3[3] != 'F' )
+	    {
+	        printf ("x86mainStartFirstThread: taskman .ELF signature");
+		    die ();
+	    }
+
+        asm volatile (" sti \n"
                   " mov $0x23, %ax  \n"
                   " mov %ax, %ds  \n"
                   " mov %ax, %es  \n"

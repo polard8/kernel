@@ -61,8 +61,8 @@ dd 0
 dd 0	
 tss0:
 	dd 0x401000             ;back link
-	dd 0x003FFFF0           ;esp0    (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
-	dd 0x10                 ;ss0
+	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço fi'sico.
+	dd 0x10                 ;ss0     (ss da pilha do kernel)
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
 	dd 0                    ;esp2
@@ -96,8 +96,8 @@ dd 0
 dd 0
 tss1:		          
 	dd _task0               ;back link  (todo: esse backlink esta errado,precisa ser logico)
-	dd 0x003FFFF0           ;esp0   (pilha do kernel) @todo: a pilha do kernel esta no fim do kernel
-	dd 0x10                 ;ss0
+	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço fi'sico.
+	dd 0x10                 ;ss0      (ss da pilha do kernel)   
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
 	dd 0                    ;esp2
@@ -786,6 +786,28 @@ _asm_reboot:
 	hlt
     jmp _asm_reboot	
 	
+    
+;;limpar a flag nt em eflags.    
+global _clear_nt_flag
+_clear_nt_flag:
+    push eax
+    push ebx
+    
+    pushfd
+    pop eax
+    
+    mov ebx, 0x00004000
+    not ebx
+    
+    and eax, ebx
+    
+    push eax
+    popfd
+    
+    pop ebx
+    pop eax
+    ret
+    
 ;
 ; End.
 ;
