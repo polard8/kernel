@@ -88,20 +88,20 @@ void KiTaskSwitch (){
 	
 	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
 	{	
-	    printf("KiTaskSwitch error: current_thread TID={%d}", 
-		    current_thread );										   
-        die();
+	    printf ("KiTaskSwitch: current_thread %d", current_thread );										   
+        die ();
 	}
 	
 	if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
 	{
 		
-	    printf("KiTaskSwitch error: current_thread TID={%d}",
-		    current_process );										   
-        die();
+	    printf ("KiTaskSwitch: current_thread %d",current_process );										   
+        die ();
 	}
 	
-	debug_print("ts ");
+#ifdef SERIAL_DEBUG_VERBOSE
+	debug_print ("ts ");
+#endif	
 	
 
 	// ## Task switch ##
@@ -256,20 +256,20 @@ void task_switch (){
 
 				if ( Current->preempted == PREEMPTABLE )
 				{
-					debug_print (" preempt_q1 ");
+					//debug_print (" preempt_q1 ");
 					queue_insert_head ( queue, (unsigned long) Current, 
 						QUEUE_READY );	
 				};
 
 				if ( Current->preempted == UNPREEMPTABLE )
 				{
-					debug_print (" preempt_q2 ");
+					//debug_print (" preempt_q2 ");
 					queue_insert_data ( queue, (unsigned long) Current, 
 						QUEUE_READY );	
 				};
 			};
 
-			debug_print (" ok ");
+			//debug_print (" ok ");
 			
 			//
 			// ======== ## EXTRA ## ========
@@ -329,14 +329,17 @@ void task_switch (){
 	
 try_next: 
 	
+	
+#ifdef SERIAL_DEBUG_VERBOSE	
 	debug_print(" N ");
+#endif	
 	
 	// #critério:
 	// Se tivermos apenas uma thread rodando.
 	
 	if (ProcessorBlock.threads_counter == 1)
 	{		
-		debug_print(" JUSTONE ");
+		//debug_print(" JUSTONE ");
 		Conductor = IdleThread;
 
 		goto go_ahead;
@@ -361,8 +364,11 @@ try_next:
 
 	
 	if ( (void *) Conductor->Next == NULL )
-	{	
+	{
+		
+#ifdef SERIAL_DEBUG_VERBOSE		
 		debug_print(" LAST ");
+#endif		
 		
 		//printf ("ts: scheduler 1\n");
 		KiScheduler ();
@@ -465,8 +471,11 @@ go_ahead:
 
 dispatch_current:
 	
+	
+#ifdef SERIAL_DEBUG_VERBOSE	
 	debug_print(" DISPATCH_CURRENT \n");
-
+#endif
+	
 	//
 	//    ####  Validation ####
 	//	

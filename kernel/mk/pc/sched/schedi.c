@@ -743,11 +743,12 @@ void check_for_standby (){
 	int Max = 32;
 	
 	
+#ifdef SERIAL_DEBUG_VERBOSE	
 	debug_print(" check_for_standby ");
+#endif	
 	
-	
-	do 
-	{
+	do {
+		
 		New = (void *) queue->standbyList[i];
 		
 		if ( (void *) New != NULL )
@@ -763,32 +764,38 @@ void check_for_standby (){
 			};
 		};
 		
-		++i;
+		i++;
 		
 	} while (i < Max);  
 
-    // Done. 
+	//
+    // Done: 
     // Nenhuma tarefa precisa ser inicializada.
     // Podemos apenas retornar para o taskswitch.
+	//
 	
-    //done:
-	
+#ifdef SERIAL_DEBUG_VERBOSE	
 	debug_print(" nothing ");
-    
+#endif    
+	
 	return;
 	
 	
 	//
-	//  ## SPAWN ##
+	//  ======== ## SPAWN ## ========
 	//
 	
-    // Do Spawn.
+
     // spawn.c
 	
 do_spawn:
 	
+	
+#ifdef SERIAL_DEBUG_VERBOSE	
     debug_print(" SPAWN \n");
-    KiSpawnTask ( current_thread );
+#endif    
+	
+	KiSpawnTask ( current_thread );
 	
     //  ## No return ##	
 	

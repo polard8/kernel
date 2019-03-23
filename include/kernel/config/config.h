@@ -202,6 +202,9 @@ sixth..     ide5, usually PCI, probed
 //#define GWS_VERBOSE 1
 
 
+//#define SERIAL_DEBUG_VERBOSE 1
+
+
 //
 // ## breack points ##
 // Set up what what is the breakpoint.

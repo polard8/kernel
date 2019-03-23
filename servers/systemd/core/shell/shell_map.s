@@ -587,8 +587,8 @@ Linker script and memory map
  *fill*         0x00000000004600ee        0x2 
  .rodata        0x00000000004600f0      0x3ab api.o
  *fill*         0x000000000046049b        0x5 
- .rodata        0x00000000004604a0      0xbb0 shellui.o
- *fill*         0x0000000000461050       0x10 
+ .rodata        0x00000000004604a0      0xbac shellui.o
+ *fill*         0x000000000046104c       0x14 
  .rodata        0x0000000000461060      0x90a builtins.o
  *fill*         0x000000000046196a       0x16 
  .rodata        0x0000000000461980      0x94a desktop.o

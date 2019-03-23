@@ -222,8 +222,9 @@ int scheduler (){
 	int Index;
 	struct thread_d *Thread;
 	
-	
-	debug_print(" [*SCHEDULER*]");
+#ifdef SERIAL_DEBUG_VERBOSE		
+	debug_print(" [*SCHEDULER*] ");
+#endif	
 	
 	//#debug
 	//printf ("scheduler: Running Threads %d \n", ProcessorBlock.threads_counter );

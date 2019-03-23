@@ -12,10 +12,10 @@
 #We will have a new name just when the release changes.
 
 VERSION = 1
-PATCHLEVEL = 0
+PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = .0
-NAME = Pula
+EXTRAVERSION = -rc0
+NAME = ?
 
 
 ARCH ?= x86
@@ -140,6 +140,8 @@ endif
 xxx_x86: /mnt/gramadovhd compile-kernel link-x86 vhd-x86 vhd-mount vhd-copy-files vhd-unmount clean
 
 compile-kernel:
+
+	@echo "Compiling kernel ..."
 
 	# /entry
 	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.asm -f elf -o head.o
@@ -348,25 +350,51 @@ link-x86:
 #move
 	mv KERNEL.BIN bin/boot/
 
-vhd-x86:
-	nasm -I arch/x86/boot/vhd/stage1/ \
-	-I arch/x86/boot/vhd/vbr/ \
-	-I arch/x86/boot/vhd/footer/ arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
 
 
-vhd-mount:
-	-sudo umount /mnt/gramadovhd
-	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
+#
+# ======== HDD ========
+#
 
 danger-hdd-clone-vhd:
 	sudo dd if=./GRAMADO.VHD of=/dev/sda	
-
+	
 hdd-mount:
 	-sudo umount /mnt/gramadohdd
 	sudo mount -t vfat -o loop,offset=32256 /dev/sda /mnt/gramadohdd/
 	
+hdd-unmount:
+	-sudo umount /mnt/gramadohdd
+	
 hdd-copy-kernel:
 	sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
+
+	
+	
+#
+# ======== VHD ========
+#
+
+vhd-mount:
+	@echo "Mounting VHD ..."
+	-sudo umount /mnt/gramadovhd
+	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
+	
+# umount
+vhd-unmount:
+	@echo "Unmounting VHD ..."
+	sudo umount /mnt/gramadovhd
+
+/mnt/gramadovhd:
+	sudo mkdir /mnt/gramadovhd
+	
+vhd-x86:
+
+	@echo "Creating VHD ..."
+	
+	nasm -I arch/x86/boot/vhd/stage1/ \
+	-I arch/x86/boot/vhd/vbr/ \
+	-I arch/x86/boot/vhd/footer/ arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
 
 # Copy content to disk
 # 1) BM, BL 
@@ -487,23 +515,12 @@ vhd-copy-files:
 #	
 
 	-sudo cp arch/x86/boot/vhd/tests/TEST1.ASM  /mnt/gramadovhd/TMP
-	
-	
 
 	
+#
+# ======== ISO ======== 
+#
 
-
-# umount
-vhd-unmount:
-	sudo umount /mnt/gramadovhd
-
-/mnt/gramadovhd:
-	sudo mkdir /mnt/gramadovhd
-
-clean:
-	-rm *.o
-
-	@echo "Success?"
 	
 	
 # test
@@ -531,6 +548,32 @@ geniso-x86:
 	mkisofs -R -J -c boot/gramado/boot.catalog -b boot/gramado/stage1.bin -no-emul-boot -boot-load-size 4 -boot-info-table -o GRAMADO.ISO bin
 	
 	@echo "iso Success?"	
+
+
+#
+# ======== Oracle Virtual Box ======== 
+#
+oracle-virtual-box-test:
+	VBoxManage startvm "Gramado"
+
+
+#
+# ======== qemu ======== 
+#
+qemu-test:
+	qemu-system-x86_64 -hda GRAMADO.VHD
+	
+#
+# ======== Clean ======== 
+#
+
+clean:
+	-rm *.o
+	@echo "Success?"
+	
+clean2:
+	-rm *.ISO
+	-rm *.VHD
 	
 	
 	

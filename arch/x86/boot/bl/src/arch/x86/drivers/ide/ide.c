@@ -1084,7 +1084,9 @@ void diskWritePCIConfigAddr ( int bus,
  *************************************************************
  * diskATAPCIConfigurationSpace:
  *     Espaço de configuraçao PCI Mass Storage
+ *     Aqui vamos analisar o tipo de dispositivo.
  */
+
 int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 	
     uint32_t data;
@@ -1138,6 +1140,13 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     if ( ata_pci.classe == 1 && ata_pci.subclasse == 1 )
 	{
         // IDE
+		//#debug
+        //printf (">>> IDE \n");
+        //refresh_screen();		
+        //while(1){}
+		//refresh_screen();
+		//refresh_screen();
+
 		ata.chip_control_type = ATA_IDE_CONTROLLER; 
 		
         // Compatibilidade e nativo, primary.
@@ -1189,6 +1198,13 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
     }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 4 )
 	      {
               //RAID
+		      //printf (">>> RAID \n");
+		      //#debug
+		      //refresh_screen();
+		      //while(1){}
+		      //refresh_screen();
+		      //refresh_screen();
+		
               ata.chip_control_type = ATA_RAID_CONTROLLER;
 			  
 //#ifdef KERNEL_VERBOSE              
@@ -1204,12 +1220,18 @@ int diskATAPCIConfigurationSpace ( char bus, char dev, char fun ){
 			  
 			  
 	            //
-                //  ## ACHI ##
+                //  ## ACHI ##  SATA
                 //			  
 			  
           }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 6 )
 		        {
 					// ACHI
+		            //#debug
+		            //printf (">>> SATA \n");
+		            //while(1){}
+		            //refresh_screen();
+		            //refresh_screen();
+		            //refresh_screen();
 					
 			        ata.chip_control_type = ATA_AHCI_CONTROLLER;
        

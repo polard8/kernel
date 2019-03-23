@@ -63,7 +63,7 @@ void shellui_fntos (char *name){
         *name++ = ext[i];
 
     *name = '\0';
-};
+}
 	
 
 /*
@@ -72,6 +72,7 @@ void shellui_fntos (char *name){
  *     Procedimento de janela.
  *     LOCAL
  */
+
 unsigned long 
 shellTopbarProcedure ( struct window_d *window, 
                        int msg, 
@@ -216,7 +217,7 @@ shellTopbarProcedure ( struct window_d *window,
 					   //@todo: abre o interpretador de comandos.
 					//}
 					//#debug
-					printf("  Topbar ** BN_CLICKED  **  \n");
+					printf ("Topbar ** BN_CLICKED  **\n");
 				break;
 				//...
 				
@@ -482,6 +483,7 @@ done:
 // Criando edit box
 // o tipo dois funciona.
 // testando colocar o ponteiro no edit box. setar foco.
+
 void shellCreateEditBox (){
     
 	editboxWindow = (void *) APICreateWindow ( WT_EDITBOX, 1, 1, "shell-editbox1",     
@@ -491,7 +493,7 @@ void shellCreateEditBox (){
 									   
 	if ( (void *) editboxWindow == NULL)
 	{	
-		printf("shellCreateEditBox: fail");
+		printf ("shellCreateEditBox: fail");
 		
 		refresh_screen();
 		while(1){}
@@ -502,7 +504,8 @@ void shellCreateEditBox (){
     APIRegisterWindow (editboxWindow);
 
 	//shellSetCursor ( 8, 8 );								   
-};
+}
+
 
 
 /*
@@ -511,27 +514,27 @@ void shellCreateEditBox (){
  */
  
 struct window_d *shellCreateMainWindow ( int status ){
-	
+
+	unsigned long left;
+	unsigned long top;
+	unsigned long width;
+	unsigned long height;
+
 	
 	// Tamanho da tela.	
 	//unsigned long ScreenWidth = apiGetSystemMetrics(1);
     //unsigned long ScreenHeight = apiGetSystemMetrics(2); 
 	
-	
 	//printf ("Creating taskbar ... %d %d\n", ScreenWidth, ScreenHeight);	
 	
-	unsigned long left;
-	unsigned long top;
-	unsigned long width;
-	unsigned long height;
 	
     // #imporante
 	// Essas sao as dimensões da janela principal.
 	
-	wpWindowLeft = 40; //0;
-	wpWindowTop =  40; //0;
-	wsWindowWidth = 600; //1024;
-	wsWindowHeight = 600; //768;
+	wpWindowLeft = 40;     //0;
+	wpWindowTop =  40;     //0;
+	wsWindowWidth = 600;   //1024;
+	wsWindowHeight = 400;  //600; //768;
 	
 	left = wpWindowLeft;
 	top = wpWindowTop;
