@@ -533,8 +533,8 @@ struct window_d *shellCreateMainWindow ( int status ){
 	
 	wpWindowLeft = 40;     //0;
 	wpWindowTop =  40;     //0;
-	wsWindowWidth = 600;   //1024;
-	wsWindowHeight = 400;  //600; //768;
+	wsWindowWidth = 640;   //1024;
+	wsWindowHeight = 480;  //600; //768;
 	
 	left = wpWindowLeft;
 	top = wpWindowTop;

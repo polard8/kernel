@@ -23,6 +23,7 @@ libcHeap            0x4               stdlib.o
 smCursorHeight      0x4               crt0.o
 pathname_buffer     0x40              crt0.o
 deltaY              0x4               tests.o
+errno               0x4               unistd.o
 textCurrentRow      0x4               crt0.o
 g_char_attrib       0x4               crt0.o
 g_rows              0x4               crt0.o
@@ -707,7 +708,7 @@ Linker script and memory map
 .igot.plt       0x000000000046b000        0x0
  .igot.plt      0x000000000046b000        0x0 gws.o
 
-.bss            0x000000000046b000    0x16d90
+.bss            0x000000000046b000    0x16d94
                 0x000000000046b000                bss = .
                 0x000000000046b000                _bss = .
                 0x000000000046b000                __bss = .
@@ -904,23 +905,25 @@ Linker script and memory map
                 0x0000000000481d4c                current_mmblock
                 0x0000000000481d50                heapCount
                 0x0000000000481d54                HEAP_START
- COMMON         0x0000000000481d58       0x10 api.o
-                0x0000000000481d58                dialogbox_button2
-                0x0000000000481d5c                messagebox_button1
-                0x0000000000481d60                dialogbox_button1
-                0x0000000000481d64                messagebox_button2
- COMMON         0x0000000000481d68       0x17 login.o
-                0x0000000000481d68                xxxpassword
-                0x0000000000481d74                xxxusername
- *fill*         0x0000000000481d7f        0x1 
- COMMON         0x0000000000481d80       0x10 tests.o
-                0x0000000000481d80                objectY
-                0x0000000000481d84                deltaY
-                0x0000000000481d88                objectX
-                0x0000000000481d8c                deltaX
-                0x0000000000481d90                end = .
-                0x0000000000481d90                _end = .
-                0x0000000000481d90                __end = .
+ COMMON         0x0000000000481d58        0x4 unistd.o
+                0x0000000000481d58                errno
+ COMMON         0x0000000000481d5c       0x10 api.o
+                0x0000000000481d5c                dialogbox_button2
+                0x0000000000481d60                messagebox_button1
+                0x0000000000481d64                dialogbox_button1
+                0x0000000000481d68                messagebox_button2
+ COMMON         0x0000000000481d6c       0x17 login.o
+                0x0000000000481d6c                xxxpassword
+                0x0000000000481d78                xxxusername
+ *fill*         0x0000000000481d83        0x1 
+ COMMON         0x0000000000481d84       0x10 tests.o
+                0x0000000000481d84                objectY
+                0x0000000000481d88                deltaY
+                0x0000000000481d8c                objectX
+                0x0000000000481d90                deltaX
+                0x0000000000481d94                end = .
+                0x0000000000481d94                _end = .
+                0x0000000000481d94                __end = .
 LOAD crt0.o
 LOAD main.o
 LOAD stubs.o
