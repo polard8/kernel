@@ -87,6 +87,9 @@ all-c:
 	gcc  -c  time.c    $(CFLAGS) -I. -I include/ -o time.o	
 	gcc  -c  wait.c    $(CFLAGS) -I. -I include/ -o wait.o		
 	gcc  -c  math.c    $(CFLAGS) -I. -I include/ -o math.o			
+	
+	gcc  -c  strtoul.c    $(CFLAGS) -I. -I include/ -o strtoul.o			
+	gcc  -c  strtol.c    $(CFLAGS) -I. -I include/ -o strtol.o			
 #...	
 
  

@@ -5,6 +5,9 @@
  *     Operações com strings. Padrão C.
  */
 
+
+#include <stddef.h>
+
 #ifdef	_BSD_SIZE_T_
 typedef	_BSD_SIZE_T_	size_t;
 #undef	_BSD_SIZE_T_

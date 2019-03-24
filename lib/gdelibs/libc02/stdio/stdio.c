@@ -2245,7 +2245,10 @@ static void xxxputchar ( int c, void *arg ){
  *     http://www.pagetable.com/?p=298
  */
 
-int printf ( const char *fmt, ... ){	
+int printf ( const char *fmt, ... ){
+	
+	// #todo
+	// Talvez usar semáforo aqui.
 	
 	va_list ap;
 	va_start(ap, fmt);
@@ -2261,8 +2264,11 @@ int printf ( const char *fmt, ... ){
 	
 	//#todo.
 	va_end(ap);
-}; 
-    
+	
+	// #todo
+	//return 0;
+}
+   
 //=============================================================
 // printf end
 //=============================================================

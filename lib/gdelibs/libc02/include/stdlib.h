@@ -51,6 +51,9 @@
 #define _STDLIB_H 1
 
 
+#include <stddef.h>
+
+
 
 #ifdef	_BSD_SIZE_T_
 typedef	_BSD_SIZE_T_	size_t;
@@ -169,7 +172,11 @@ int system (const char *command);
 //=================================
 
 
-
+long
+strtol(const char *nptr, char **endptr, int base);
+	
+unsigned long
+strtoul( const char *nptr, char **endptr, int base);
 
 double strtod (const char *str, char **endptr);
 float strtof(const char *str, char **endptr);

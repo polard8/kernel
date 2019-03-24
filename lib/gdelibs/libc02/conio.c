@@ -10,16 +10,19 @@
 //putch - Writes a character directly to the console.
 int putch (int c){
 	
-    printf( "%c", (char) c );
-    return (int) 1;
-};
+    printf ( "%c", (char) c );
+	
+    return 1;
+}
+
 
 //cputs - Writes a string directly to the console.
 int cputs (const char *str){
 	
-    printf("%s", str);
-    return (int) 1;
-};
+    printf ("%s", str);
+	
+    return 1;
+}
 
 
 // Interna.
@@ -43,29 +46,24 @@ static char getchEcho (int echo){
 			
 		//negligenciado por enquanto.	
 		default:
-		    ch = (char) getchar();
+		    ch = (char) getchar ();
             break;		
-			
-
 	};
-
-//done:  
-
+	
     return (char) ch;
-};
+}
 
 
 /* Read 1 character without echo */
 int getch (void){
 	
-    return (int) getchEcho(0);
-};
+    return (int) getchEcho (0);
+}
 
 
 /* Read 1 character with echo */
 int getche (void){
 	
-    return (int) getchEcho(1);
-};
-
+    return (int) getchEcho (1);
+}
 

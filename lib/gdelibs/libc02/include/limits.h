@@ -44,6 +44,13 @@
 
 
 
+#define	ULONG_MAX	0xffffffff	/* max value for an unsigned long */
+#define	LONG_MAX	2147483647	/* max value for a long */
+#define	LONG_MIN	(-2147483647-1)	/* min value for a long */
+
+
+
+
 /* Minimum sizes required by the POSIX P1003.1 standard (Table 2-3). */
 
 #define _POSIX_ARG_MAX    4096	/* exec() may have 4K worth of args */

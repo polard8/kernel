@@ -26,6 +26,14 @@
 #define	UNISTD_SYSTEMCALL_GETPID   85
 #define	UNISTD_SYSTEMCALL_GETPPID  81
 
+
+//
+//  ## TEST ##
+//
+
+int errno;
+
+
 //#todo
 //#define	UNISTD_SYSTEMCALL_GETGID ??
 

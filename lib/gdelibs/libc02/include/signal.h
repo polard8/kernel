@@ -12,6 +12,11 @@
 
 #include <sys/types.h>
 
+
+//#test
+//coloquei aqui pra compilar o lua.
+typedef int sig_atomic_t;
+
 /* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
 //#ifndef __CYGWIN__
 //typedef unsigned long sigset_t;
