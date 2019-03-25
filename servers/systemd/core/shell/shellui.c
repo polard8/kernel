@@ -555,7 +555,7 @@ struct window_d *shellCreateMainWindow ( int status ){
 	
 	if ( (void *) w == NULL )
 	{	
-		printf ("shellCreateMainWindow: taskbar Window fail");
+		printf ("shellCreateMainWindow: Window fail");
 		
 		while (1){
 			asm("pause");

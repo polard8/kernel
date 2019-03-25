@@ -1703,11 +1703,12 @@ shellProcedure( struct window_d *window,
 		
 		//Essa mensagem pode ser acionada clidando um botão.
 		case MSG_DESTROY:
-		    printf("SHELL.BIN: MSG_DESTROY\n");
+		    printf ("SHELL.BIN: MSG_DESTROY\n");
 		    break;
 			
 		// MSG_MOUSEKEYDOWN	
 		case 30:
+			//qual botão?
 		    switch (long1)
 			{
 				case 1:

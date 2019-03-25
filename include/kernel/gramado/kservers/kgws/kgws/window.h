@@ -1,5 +1,5 @@
 /*
- * File: gws/gws/window.h 
+ * File: kgws/kgws/window.h 
  *
  * Descrição:
  *    Funções e parâmetros para o kernel controlar a interface gráfica 
@@ -926,6 +926,7 @@ struct window_d
     //
 	//
 	
+	struct window_d *toolbar;	
 	
     //
 	//@todo: rever esse cursor, pois ja existe na versão 0.1 acima.
@@ -1132,7 +1133,6 @@ struct window_d
     struct window_d *minimize;
 	struct window_d *maximize;
 	struct window_d *close;
-	
 	
 	
 	//
@@ -1847,16 +1847,19 @@ void SetGuiParameters( int refresh,
 // Bars support. (menubar)
 //
 
-struct window_d*
-StatusBar( struct window_d *window, 
-           unsigned char *string1, 
-		   unsigned char *string2 );
+struct window_d *
+StatusBar ( struct window_d *window, 
+            unsigned char *string1, 
+            unsigned char *string2 );
 
-void *create_menubar(struct window_d *pwindow); 
-int create_menubar_item(struct menu_d *menu, unsigned char *string, int status);
-int draw_menubar_item( struct window_d *window, unsigned char *string);
+struct window_d *ToolBar ( struct window_d *window );
+
+
+void *create_menubar (struct window_d *pwindow); 
+int create_menubar_item (struct menu_d *menu, unsigned char *string, int status);
+int draw_menubar_item ( struct window_d *window, unsigned char *string);
 //int select_menubar_item(struct menuitem_d *menuitem);
-int menubarX();
+int menubarX ();
 
 
 

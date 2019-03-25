@@ -1,14 +1,10 @@
 /*
- * File: kgws/comp/sbar.c
+ * File: kgws/comp/toolbar.c
  *
- * Descrição:
- *     Cria uma status bar em uma janela.
- *     Faz parte do módulo Window Manager do tipo MB.
+ * Toolbar support for kgws.
  *
  * History:
- *     2015 - Created by Fred Nora.
- *     2017 - Small changes.
- *     //...
+ *     2019 - Created by Fred Nora.
  */
 
  
@@ -16,34 +12,15 @@
 
 
 /*
-int UpdateStatusBar( struct window_d *window, 
-                     unsigned char *string1, 
-		             unsigned char *string2 );
-
-int UpdateStatusBar( struct window_d *window, 
-                     unsigned char *string1, 
-		             unsigned char *string2 )
-{
-	//@todo:
-	//atualizar as strings de uma status bar caso
-	//a janela tenha uma status bar.
-};
-*/
-
-
-/*
  ************************************************
- * StatusBar:
+ * ToolBar:
  *
- * Desenha uma statusbar.
- * O tamanho da statusbar deve ser to tamanho da largura da janela. 
- * A scrollbar não deve invadir o espaço da statusbar.
+ * Desenha uma toolbar.
+ * #obs: Só o bg por enquanto.
  */
 
-struct window_d *StatusBar ( struct window_d *window, 
-                             unsigned char *string1, 
-                             unsigned char *string2 )
-{
+struct window_d *ToolBar ( struct window_d *window ){
+	
 	int desktopID;
 	unsigned long StatusBarColor;	
 
@@ -92,7 +69,7 @@ struct window_d *StatusBar ( struct window_d *window,
 	    // Mesma largura da janela.
 	    
 		x = (unsigned long) pWnd->rcClient->left;        
-	    y = (unsigned long) pWnd->rcClient->bottom -32;  
+		y = (unsigned long) pWnd->rcClient->top;  
 	    
 		width = (unsigned long) pWnd->rcClient->width;       
 	    height = (unsigned long) 32;  		
@@ -169,18 +146,18 @@ struct window_d *StatusBar ( struct window_d *window,
 	    RegisterWindow (hWnd);
 		
 		
-	    draw_text ( hWnd, 
-		    0* (width/2), 1* (height/3), 
-		    COLOR_WINDOWTEXT, string1 );
-				   
-	    draw_text ( hWnd, 
-		    1* (width/2), 1* (height/3), 
-			COLOR_WINDOWTEXT, string2 );
+		//#deletar.
+	    //draw_text ( hWnd, 
+		//    0* (width/2), 1* (height/3), 
+		//    COLOR_WINDOWTEXT, string1 );	   
+	    //draw_text ( hWnd, 
+		//    1* (width/2), 1* (height/3), 
+		//	COLOR_WINDOWTEXT, string2 );
 				   
 		
 		// Seleciona a statusbar da parent window.
 		
-		pWnd->statusbar = hWnd;		   
+		pWnd->toolbar = hWnd;
       
 		// ... ?
 		

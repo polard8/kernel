@@ -14,7 +14,7 @@
 VERSION = 1
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
+EXTRAVERSION = -rc1
 NAME = ?
 
 
@@ -97,7 +97,7 @@ ifeq ($(ARCH),x86)
 	
 	KSERVERS_OBJECTS := cf.o format.o fs.o read.o search.o write.o \
 	bg.o bmp.o button.o char.o createw.o dtext.o font.o grid.o \
-	line.o menu.o menubar.o pixel.o rect.o sbar.o window.o \
+	line.o menu.o menubar.o pixel.o rect.o sbar.o toolbar.o window.o \
 	logoff.o \
 	logon.o \
 	input.o output.o terminal.o \
@@ -325,6 +325,7 @@ compile-kernel:
 	gcc -c kernel/kservers/kgws/kgws/comp/pixel.c    -I include/ $(CFLAGS) -o pixel.o
 	gcc -c kernel/kservers/kgws/kgws/comp/rect.c     -I include/ $(CFLAGS) -o rect.o
 	gcc -c kernel/kservers/kgws/kgws/comp/sbar.c     -I include/ $(CFLAGS) -o sbar.o
+	gcc -c kernel/kservers/kgws/kgws/comp/toolbar.c  -I include/ $(CFLAGS) -o toolbar.o	
 	
 	gcc -c kernel/kservers/kgws/kgws/window.c    -I include/ $(CFLAGS) -o window.o
 	
@@ -345,7 +346,6 @@ compile-kernel:
 
 link-x86:
 	ld -m elf_i386 -T kernel/link.ld -o KERNEL.BIN $(OBJECTS) -Map docs/kmap.s
-
 
 #move
 	mv KERNEL.BIN bin/boot/
