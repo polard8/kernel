@@ -14,7 +14,7 @@
 VERSION = 1
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = -rc1
+EXTRAVERSION = -rc2
 NAME = ?
 
 
@@ -46,11 +46,8 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fleading-underscore \
 	-fno-stack-protector \
-	-s
-
-
-# bugbug: Não quero essa flag.
-#	-fleading-underscore \	
+	-s   
+	
 
 ##
 ## Defines

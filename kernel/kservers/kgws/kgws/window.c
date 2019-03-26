@@ -1514,6 +1514,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	if ( (void *) window == NULL )
 	{
 		goto fail;
+		
 	}else{
 		
 	    if ( window->used != 1 || window->magic != 1234 )
@@ -1524,18 +1525,20 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 		//...
 	};
 	
-	
+	// Ok. 
+	// Pelo jeito já temos uma estrutura válida.
+
 	//@todo: Pra que serva a flag redraw ??
 	// É para indicar que repecisamos repintar. ??
 	//if( window->redraw != 1 ){ return (int) 0;}
 	
-	//
-	// Ok, pelo jeito já temos uma estrutura válida.
-	//
 	
-	// Minimized? Se tiver minimizada, não precisa repintar.
+	// Minimized ? 
+	// Se tiver minimizada, não precisa repintar.
+	
 	Status = (int) is_window_minimized (window);
-    if(Status == 1)
+    
+	if (Status == 1)
 	{
 		//?? tem qua mudar alguma flag antes ??
 	    goto done;
@@ -1569,7 +1572,8 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	// Checando se o esquema de cores está funcionando.
 	// obs: Essa checagem está se tornando repetitiva.
 	
-	if ( (void *) CurrentColorScheme == NULL ){
+	if ( (void *) CurrentColorScheme == NULL )
+	{
 		panic ("redraw_window: CurrentColorScheme");
 		
 	} else {
@@ -1578,7 +1582,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 		     CurrentColorScheme->magic != 1234 )
 		{
 		    panic ("redraw_window: CurrentColorScheme validation");		
-		};
+		}
 	};	
 	
 	
@@ -1782,10 +1786,12 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	    //So criamos o botão na barra de títulos se tivermos uma barra de títulos.
 		//então esse é o lugar certo para essa rotina.
 		
-		//@todo: Se estivermos em full screen, não teremos botão.	
-		if(window->minimizebuttonUsed == 1)
+		// #todo: 
+		// Se estivermos em full screen, não teremos botão.	
+		
+		if (window->minimizebuttonUsed == 1)
 		{        
-			if( window->minimize != NULL )
+			if ( window->minimize != NULL )
 			{
 				if ( window->minimize->used == 1 && window->minimize->magic == 1234 )
 				{
@@ -1798,9 +1804,9 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 			}
 	    };
 		
-		if(window->maximizebuttonUsed == 1)
+		if (window->maximizebuttonUsed == 1)
 		{
-			if( window->maximize != NULL )
+			if ( window->maximize != NULL )
 			{
 				if ( window->maximize->used == 1 && window->maximize->magic == 1234 )
 				{
@@ -1812,8 +1818,11 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 				
 			}					
 		}
-		//@todo: Se estivermos em full screen, não teremos botão.
-	    if (window->closebuttonUsed == 1)
+		
+		// #todo: 
+		// Se estivermos em full screen, não teremos botão.
+	    
+		if (window->closebuttonUsed == 1)
 		{			
 			if( window->close != NULL )
 			{
@@ -1838,40 +1847,38 @@ int redraw_window (struct window_d *window, unsigned long flags ){
     // Client Area. 	
 	if (window->clientAreaUsed == 1)
 	{
-		//
-		// Obs: A Client Area é apenas um retângulo.
-		//
+		// Obs: 
+		// A Client Area é apenas um retângulo ??
 
-		//@todo: Passar a estrutura de janela.
+		// #todo: 
+		// Passar a estrutura de janela.
 		
-		
-		// #BUGBUG :: 
+		// #BUGBUG: 
 		// ( NÃO ) PODEMOS REALOCAR NOVAMENTE ... 
 		// TEMOS QUE CHECAR SE A ESTRUTURA É VÁLIDA...
 		// SE TRATA APENAS DE UMA ESTRUTTURA DE RETÃNGULO, 
 		// NÃO ESPERAMOS MUITOS PROBLEMAS.
-		
 		 
 		if ( (void *) window->rcClient == NULL )
 		{
-			printf("redraw_window: rcClient");
-			die();
+			printf ("redraw_window: rcClient");
+			die ();
+			
 		}else{
 			
 			//conferir validade.
-			if( window->rcClient->used != 1 || 
-			    window->rcClient->magic != 1234 )
+			if ( window->rcClient->used != 1 || 
+			     window->rcClient->magic != 1234 )
 			{
-			    printf("redraw_window: rcClient validation");
-			    die();							
+			    printf ("redraw_window: rcClient validation");
+			    die ();							
 			}
 			
 			// Aqui devemos respeitar a forma que a área de cliente 
 			// foi desenhada.
-			// Mas todos os valores que precisamod devar estar 
-			// salvos na estrutura de área de cliente.	
+			// Mas todos os valores que precisamos estão salvos na estrutura 
+			// de área de cliente.	
 			
-			//draw
             drawDataRectangle ( (unsigned long) window->rcClient->left, 
 		                        (unsigned long) window->rcClient->top, 
 						        (unsigned long) window->rcClient->width, 
@@ -1879,6 +1886,7 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 						        (unsigned long) window->rcClient->bg_color );         
 							    
 		};
+		
 		//Nothing.
 	};
 
@@ -1886,8 +1894,10 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	//refresh_screen();
 	//while(1){}	
 	
-    //#obs: Talvez isso pode ficar dentro do if de client window.
-    if (window->scrollbarUsed == 1)
+    // #obs: 
+	// Talvez isso pode ficar dentro do if de client window.
+    
+	if (window->scrollbarUsed == 1)
     {
 	    if ( window->scrollbar != NULL )
 		{
@@ -1906,15 +1916,8 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 					if ( window->scrollbar->scrollbar_button1->used == 1 &&
 					     window->scrollbar->scrollbar_button1->magic == 1234 )
 					{
-
-			            //draw_button ( window->scrollbar, "^", 
-			            //    1, 0, 0, 
-			            //    window->scrollbar->scrollbar_button1->left, 
-						//	window->scrollbar->scrollbar_button1->top, 
-						//	window->scrollbar->scrollbar_button1->width, 
-						//	window->scrollbar->scrollbar_button1->height, 
-				        //    window->scrollbar->scrollbar_button1->bg_color );											
-							 
+						// #todo										
+						// Desenhar o botão	 
 					}						 
 					
 				}
@@ -1925,15 +1928,8 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 					if ( window->scrollbar->scrollbar_button2->used == 1 &&
 					     window->scrollbar->scrollbar_button2->magic == 1234 )
 					{
-
-			            //draw_button ( window->scrollbar, "=", 
-			            //    1, 0, 0, 
-			            //    window->scrollbar->scrollbar_button2->left, 
-						//	window->scrollbar->scrollbar_button2->top, 
-						//	window->scrollbar->scrollbar_button2->width, 
-						//	window->scrollbar->scrollbar_button2->height, 
-				        //    window->scrollbar->scrollbar_button2->bg_color );											
-							 
+						// #todo										
+						// Desenhar o botão	 
 					}						 
 					
 				}
@@ -1944,15 +1940,8 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 					if ( window->scrollbar->scrollbar_button3->used == 1 &&
 					     window->scrollbar->scrollbar_button3->magic == 1234 )
 					{
-
-			            //draw_button ( window->scrollbar, "v", 
-			            //    1, 0, 0, 
-			            //    window->scrollbar->scrollbar_button3->left, 
-						//	window->scrollbar->scrollbar_button3->top, 
-						//	window->scrollbar->scrollbar_button3->width, 
-						//	window->scrollbar->scrollbar_button3->height, 
-				        //   window->scrollbar->scrollbar_button3->bg_color );											
-							 
+						// #todo										
+						// Desenhar o botão	 
 					}						 
 					
 				}
@@ -1986,15 +1975,13 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 	//refresh_screen();
 	//while(1){}	
 	
-	//#bugbug: 
-	//Até agora repintamos a janela relativa ao botão. Provavelmente 
-	//referese à apenas seu background. Porém para redesenharmos o botão
-	//precisamos criar uma função redraw_button, semelhante a função draw_button.
 	
-	//#bugbug
-	//talvez isso não seja necessário. 
-	//poderemos apenas repintar a janela tipo botão do mesmo jeito que repintamos
-	//as outras e apenas atualizar a estrutura se for necessário.
+	//
+	// ## Button ##
+	//
+	
+	// Vamos apenas repintar a janela tipo botão do mesmo jeito que repintamos
+	// as outras e apenas atualizar a estrutura se for necessário.
 	
 	if ( window->type == WT_BUTTON )
 	{
@@ -2004,46 +1991,43 @@ int redraw_window (struct window_d *window, unsigned long flags ){
 			{
 				if ( window->button->used == 1 && window->button->magic == 1234 )
 				{
-				    //redesenhar o botão com base nas informações da estrutura.
+					// #importante
+				    // Redesenhar o botão com base nas informações da estrutura.    
+					// #todo: Checar sytle state type 
+					// #obs: Com focus a borda fica azul. 
+					// O redraw pode ter vindo após uma atualização do botão.
 					
-
-    
-	                
-					//#todo: checar sytle state type 
-					
-					//com focus a borda fica azul.
-					//pois redraw pode ter vindo após uma atualização do botão.
-					if (window->button->state == BS_FOCUS )
+					switch (window->button->state)
 					{
-						window->button->border1 = COLOR_BLUE;
-						window->button->border2 = COLOR_BLUE; 
-					}
-					
-					//se o botão foi pressionado, mudaram o state e precisam repintar.
-					if (window->button->state == BS_PRESS )
-					{
+						case BS_FOCUS:
+						    window->button->border1 = COLOR_BLUE;
+						    window->button->border2 = COLOR_BLUE; 
+							break;
+							
+						case BS_PRESS:
 						window->button->border1 = COLOR_BUTTONHIGHLIGHT2;
 						window->button->border2 = COLOR_BUTTONSHADOW2; 
-					}		
-
-					if (window->button->state == BS_DEFAULT )
-					{
+							break;
+							
+						case BS_DEFAULT:
 						window->button->border1 = COLOR_BUTTONSHADOW2;
 						window->button->border2 = COLOR_BUTTONHIGHLIGHT2; 
-					}	
-
-					if (window->button->state == BS_DISABLED )
-					{
+							break;
+								
+						case BS_DISABLED:
 						window->button->border1 = COLOR_GRAY;
 						window->button->border2 = COLOR_GRAY; 
 						window->button->color = COLOR_GRAY;
-					}	
-
-					if (window->button->state == BS_HOVER )
-					{
-						window->button->color = ( window->button->color - 20);
-					}					
-					
+							break;
+							
+						case BS_HOVER:
+							window->button->color = ( window->button->color - 20);
+							break;
+							
+						//default:
+						//	printf ("redraw button default\n");
+							//break;
+					};
 					
 	                //bg
 	                drawDataRectangle ( window->left + window->button->x, window->top + window->button->y, 
@@ -3742,53 +3726,62 @@ int windowScan ( unsigned long x, unsigned long y ){
 	int WID;
 	
 	// #bugbug
-	// Nesse for, o número de comparações é insuficiente.
-	// Precisamos sondar toda a lista de janelas.
+	// Vamos sondar toda a lista de janelas.
 	// pois pode haver fragmentação na lista de janelas.
 	// Então mesmo com uma contagem baixa de janelas pode haver 
 	// janelas válidas em posições altas.
 	// Então vamos sondar por toda a lista.
 	
-	//for ( i=0; i <= windows_count; i++ )
+	// #BUGBUG
+	// O problema nessa técnica são as sobreposição de janelas.
+	// Quando uma janela está dentro da outr, então duas janelas
+	// estão áptas a serem selecionadas.
+	// Talvez devamos filtrar e só aceitarmos sondar procurando 
+	// por controles.
+	
 	for ( i=0; i < WINDOW_COUNT_MAX; i++ )	
 	{
 		w = (struct window_d *) windowList[i];
 		
-		//Ignorando as janelas principais.
+		// se o ponteiro for válido.
 		if ( (void *) w != NULL )
-		{	
+		{
+			// validation
 			if ( w->used == 1 && w->magic == 1234 )
 			{
-				
-				if ( x > w->left && 
-				     x < w->right && 
-				     y > w->top &&
+				// Dentro da área da janela.
+				if ( x > w->left   && 
+					 x < w->right  && 
+				     y > w->top    &&
 				     y < w->bottom )
 				{
-                    if( w->type == WT_EDITBOX ||
-                        w->type == WT_OVERLAPPED ||	
-                        w->type == WT_CHECKBOX ||	
-                        w->type == WT_SCROLLBAR ||	
-                        w->type == WT_EDITBOX_MULTIPLE_LINES ||	
-						w->type == WT_BUTTON ||	 
-                        w->type == WT_STATUSBAR )						
-					{						
-					   WID = w->id;
-					   window_mouse_over = w->id;
-					   goto done;
+                    if ( w->type == WT_EDITBOX     ||
+                         w->type == WT_OVERLAPPED  ||	
+                         w->type == WT_CHECKBOX    ||	
+                         w->type == WT_SCROLLBAR   ||	
+                         w->type == WT_EDITBOX_MULTIPLE_LINES ||	
+						 w->type == WT_BUTTON      ||	 
+                         w->type == WT_STATUSBAR )						
+					{
+						
+					    // Pega o ID.
+						WID = w->id;
+					    window_mouse_over = w->id;
+					    
+						return (int) WID;
+						//goto done;
 					}
 				}; 
-			};
-				
-		};
-		
+			};		
+		};	
 	};
 	
-fail:
+//fail:
+	
     return (int) -1;	
-done:	
-    return (int) WID;	
-};
+//done:	
+    //return (int) WID;	
+}
 
 
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.

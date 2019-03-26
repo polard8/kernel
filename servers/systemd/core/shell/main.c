@@ -1762,19 +1762,36 @@ shellProcedure( struct window_d *window,
 						break;
 					}					
 					
+					// ??
 					APISetActiveWindow (window);
 					//APIredraw_window ( window, 1 );
 					
-					//botão de close
-					//if ( window == close_button )
-				    //{
-					    //APIresize_window ( window, 200, 200 );
-					    //APIredraw_window ( window, 1 );
-					    //refresh_screen (); //não precisa isso	
-
-					//	running = 0;
-                    //    ShellFlag = SHELLFLAG_EXIT;						
-					//}    
+					//pode ser que recebemos um ponteiro que não nos é acessível.
+					//o 'long2' poderia nos dizer se ele é um dos controles de janela.
+					//isso tornaria tudo mais fácil.
+					//se ele for um controle de janela é só mandar a mensagem de minimizar
+					//maximizar, fechar ...
+					//porém não deveria ser trabalho do aplicativo fazer isso ...
+					//>>> então o servidor deve tomar alguma atitude caso
+					//a janela seja um controle ... ou o procedimento defered receberá 
+					//essa mesma mensagem que contem o argumento long2 indicando qual é o controle de
+					//janela que foi acionado
+					//se o servidor conseguir identificar que esse botão é um controle, então
+					//ele mandara a mensagem de fechar janela ao inves de mandar essa mesagem, por ex.
+					
+                    // #test
+					// se não podemos atender esse evento enão vamos permitir que o kernel
+					// trate ele. 
+					// O procedimento do sistema pode fazer isso, ou o defered ou
+					// mandando uma mensagem para o servidor.
+					// eventSendMessage (...) todo
+					
+					//podemos salvar o ponteiro dos botões da barra de títulos,
+					//solicitando eles para o kernel.
+					
+					//podemos ainda usar algum controle de janelas
+					//windowcontrolSendMessage
+					
 					break;
 					
 				case 2:

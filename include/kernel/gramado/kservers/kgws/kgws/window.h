@@ -1123,9 +1123,12 @@ struct window_d
 	//int isIcon; 
 	//...
 	
-	// Se a flag indicar que a janela é um botão, então 
-	// essa será a estrutura para o botão.
+    // #importante
+	// Se a janela for do tipo botão, então essa será a estrutura para o 
+	// gerenciamento do botão.
+	
 	struct button_d *button;
+	
 	
 	int selected;     //seleção  de item de menu.
     const char *text; //@todo usar unsigned char.
@@ -1883,17 +1886,18 @@ void *draw_button ( struct window_d *window,
                     unsigned long height, 
                     unsigned long color );
 				   
-void updateButton ( struct button_d *button,
-                    struct window_d *window,
-                    unsigned char *string,
-					int style,
-                    int state,
-                    int type,  					
-                    unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height, 
-                    unsigned long color );
+void 
+updateButton ( struct window_d *window,
+               struct button_d *button,
+               unsigned char *string,
+               int style,
+               int state,
+               int type,
+               unsigned long x, 
+               unsigned long y, 
+               unsigned long width, 
+               unsigned long height, 
+               unsigned long color );
 				 
 
 // Focus support.

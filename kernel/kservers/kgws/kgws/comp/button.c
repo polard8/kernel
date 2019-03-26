@@ -23,25 +23,29 @@
 
 
 					
-void updateButton ( struct button_d *button,
-                    struct window_d *window,
-                    unsigned char *string,
-					int style,
-                    int state,
-                    int type,  					
-                    unsigned long x, 
-                    unsigned long y, 
-                    unsigned long width, 
-                    unsigned long height, 
-                    unsigned long color )
+void 
+updateButton ( struct window_d *window,
+               struct button_d *button,
+               unsigned char *string,
+               int style,
+               int state,
+               int type,
+               unsigned long x, 
+               unsigned long y, 
+               unsigned long width, 
+               unsigned long height, 
+               unsigned long color )
 {
     if ( (void *) button == NULL )
     {
+		//printf ("updateButton\n");
 	    return;	
-	} else {
+		
+	}else{
 		
 		if ( button->used != 1 || button->magic != 1234 )
 		{
+			//printf ("updateButton validation\n");
 		    return;	
 		}
 		
@@ -95,7 +99,9 @@ void *draw_button ( struct window_d *window,
 	
 	struct button_d *b;
 	
-	//validade da janela onde o botão está.
+	// Validade da janela onde o botão está.
+	// #todo: cheacr used, magic.
+	
 	if ( (void *) window == NULL )
 	{
 	    return NULL;
@@ -119,12 +125,12 @@ void *draw_button ( struct window_d *window,
 	    b->used = 1;	
 	    b->magic = 1234;
 		
-        //button states:
-        //1. Default
-        //2. Focus
-        //3. Expanded/Toggled/Selected
-        //4. Disabled
-        //5. Hover and Active	
+        // button states:
+        // 1. Default
+        // 2. Focus
+        // 3. Expanded/Toggled/Selected
+        // 4. Disabled
+        // 5. Hover and Active	
 	
 		b->state = (int) state;
 		
@@ -148,11 +154,13 @@ void *draw_button ( struct window_d *window,
 	//	window->buttonList = (void*)b;
 	//}
 	
-	//Todo: Usar esquema padrão de cores.
 		
 	//
 	//  ## State ##
 	//
+
+	// #todo: 
+	// Usar esquema padrão de cores.
 	
     //button states:
     //0. NULL.
@@ -253,12 +261,9 @@ void *draw_button ( struct window_d *window,
 		width, 1, border2 );
 
 	
-//
-// Do draw label.
-//
-					   
-//do_draw_label:
-
+    //
+    // Do draw label.
+    //
 	
 	// Se vamos usar uma imagem ao invés de uma string.
 	//if(useImage == 1{ ... goto done;}

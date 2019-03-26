@@ -638,6 +638,13 @@ void mouseHandler (){
 	// wID = ID da janela.
 	// Escaneamos para achar qual janela bate com os valores indicados.
 	// Ou seja. Sobre qual janela o mouse está passando.
+	
+	// #BUGBUG
+	// O problema nessa técnica são as sobreposição de janelas.
+	// Quando uma janela está dentro da outr, então duas janelas
+	// estão áptas a serem selecionadas.
+	// Talvez devamos filtrar e só aceitarmos sondar procurando 
+	// por controles.
 
 	// #IMPORTANTE
 	// Se for válido e diferente da atual, significa que 
@@ -645,8 +652,7 @@ void mouseHandler (){
 	// -1 significa que ouve algum problema no escaneamento.
 	
 	wID = (int) windowScan ( mouse_x, mouse_y );	
-	
-	
+		
 	//se houve problema no escaneamento de janela
 	if ( wID == -1 )
 	{ 
@@ -677,13 +683,12 @@ void mouseHandler (){
 			//inicializa.
 			mouseover_window = 0;
 		}
+			
+	// Se não houve problema no escaneamento de janela ou seja, se encontramos 
+	// uma janela. Então essa janela deve estar associada à uma thread para qual 
+	// mandaremos a mensagem. Caso a thread for null ... apenas não enviamos.
+	// A janela tem uma thread de controle, igual ao processo.
 		
-		//Nothing.
-		
-	//se não houve problema no escaneamento de janela
-	//ou seja, se encontramos uma janela.
-	//então essa janela deve estar associada à uma thread para qual mandaremos a mensagem.
-	//caso a thread for null ... apenas não enviamos.
     }else{
 		
 		Window = (struct window_d *) windowList[wID];
