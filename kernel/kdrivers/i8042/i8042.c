@@ -27,6 +27,10 @@
  
 void ps2 (){
 	
+	
+	printf ("ps2: initializing ...\n");
+	refresh_screen();
+	
     //printf("");	
 	//printf("ps2: Desabilitando as duas portas...\n");
 	//refresh_screen();
@@ -121,8 +125,8 @@ void ps2 (){
 	//printf("ps2: inicializando teclado ...\n");
 	//refresh_screen();
 	
-	printf ("ps2: 5\n");
-	refresh_screen();
+	//printf ("ps2: 5\n");
+	//refresh_screen();
 	
 	ps2_keyboard_initialize();
 	
@@ -131,8 +135,8 @@ void ps2 (){
 	//mouse install ...
 	//
 	
-	printf ("ps2: 6\n");
-	refresh_screen();
+	//printf ("ps2: 6\n");
+	//refresh_screen();
 	
 	mouse_install ();
 	
@@ -212,9 +216,9 @@ void ps2 (){
 		//
 	//};			
 
-	//printf("ps2: done\n");
-	//refresh_screen();		
-};
+	printf("ps2: done\n");
+	refresh_screen();		
+}
 
 
 //

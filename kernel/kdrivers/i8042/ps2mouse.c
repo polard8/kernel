@@ -46,14 +46,34 @@ unsigned char mouse_read (){
 // Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
 int MOUSE_BAT_TEST (){
     
-    uint8_t val;
+    int val = -1;
+	
+	int i;
 
-    while (1)
+	// #todo:
+	// Cuidado.
+	// Diminuir isso se for possivel.
+	// Nao funciona na maquina reala sem esse delay.
+	
+	for (i=0; i<99000; i++)
+	{
+		wait_ns(200);
+	}		
+	
+	
+    //while (1)
+	for ( i=0; i<999; i++ )
 	{
         val = mouse_read();
 
-        if(val == 0xAA)return (int) 0;
-        else if(val == 0xFC) {
+        if(val == 0xAA)
+		{
+			printf ("ps2mouse.c: MOUSE_BAT_TEST OK\n");
+			return (int) 0;
+        
+		}else if(val == 0xFC){
+			
+			printf ("ps2mouse.c: MOUSE_BAT_TEST fail\n");
        		return (int) -1; 
        	}
     
@@ -61,7 +81,9 @@ int MOUSE_BAT_TEST (){
         	// OBS: este comando não é colocado em buffer
         	mouse_write(0xFE);       
     };
-};
+	
+	printf ("ps2kbd.c: MOUSE_BAT_TEST %d times\n",i);
+}
 
 
 
@@ -74,8 +96,8 @@ int MOUSE_BAT_TEST (){
 void mouse_install (){
 	
 	
-	printf ("mouse_install: 1\n");
-	refresh_screen();
+	//printf ("mouse_install: 1\n");
+	//refresh_screen();
 	
 	// 0xFF
 	// Espera o dados descer (ACK)	
@@ -84,14 +106,13 @@ void mouse_install (){
 	mouse_write (0xFF);
     while ( mouse_read() != 0xFA);	
 
-	printf ("mouse_install: 2\n");
-	refresh_screen();
-
-	
+	//printf ("mouse_install: 2\n");
+	//refresh_screen();
 	
     if ( MOUSE_BAT_TEST() != 0) 
 	{
-    	printf("\n Mouse error!");
+    	//printf("\n Mouse error!");
+		printf ("[WARMING] ps2mouse.c:  MOUSE_BAT_TEST ignored\n");
     }
 
     // Use mouse default
@@ -100,8 +121,9 @@ void mouse_install (){
 	mouse_write (0xF6);
     while( mouse_read() != 0xFA);
 
-	printf ("mouse_install: 3\n");
-	refresh_screen();
+	
+	//printf ("mouse_install: 3\n");
+	//refresh_screen();
 
 	
     // habilita o mouse. (streaming)
@@ -111,9 +133,8 @@ void mouse_install (){
 	while( mouse_read() != 0xFA);
 
     // Espera nossa controladora terminar.
-	printf ("mouse_install: 4\n");
-	refresh_screen();
-
+	//printf ("mouse_install: 4\n");
+	//refresh_screen();
     
 	kbdc_wait (1);	
 }

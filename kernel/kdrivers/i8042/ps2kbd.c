@@ -41,26 +41,52 @@ void keyboard_write (uint8_t write){
 // Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
 int BAT_TEST (){
 	
-    uint8_t val;
+    int val = -1;
+	
+	int i;
 
-    while (1) 
+	// #todo:
+	// Cuidado.
+	// Diminuir isso se for possivel.
+	// Nao funciona na maquina reala sem esse delay.
+	
+	for (i=0; i<99000; i++)
 	{
-        val = keyboard_read();
+		wait_ns(200);
+	}	
+	
 
-        if(val == 0xAA)return (int) 0;
-        else if(val == 0xFC) {
+	for ( i=0; i<999; i++ )
+	{
+        val = (int) keyboard_read ();
+
+		//Ok funcionou o auto teste
+        if(val == 0xAA)
+		{
+			printf ("ps2kbd.c: BAT_TEST OK\n");
+			return (int) 0;
+		
+		//falhou
+		}else if ( val == 0xFC ){
         
+			printf ("ps2kbd.c: BAT_TEST fail\n");
             return (int) -1; 
         }
     
-        // Reenviar o comando. 
-        // OBS: este comando não é colocado em buffer
+		// #bugbug
+		// Tentar novamente, indefinidas vezes.
+        // Esse é o problema. Vamos tentar apenas algumas vezes e falhar se não der certo.
+		// Reenviar o comando. 
+        // obs: este comando não é colocado em buffer
         
+		//printf ("ps2kbd.c: BAT_TEST %d\n", i);
 		keyboard_write (0xFE);       
-       
     };
-};
-
+	
+	//fail
+	printf ("ps2kbd.c: BAT_TEST %d times\n",i);
+    return (int) -1; 	
+}
 
 
 /*
@@ -76,8 +102,8 @@ int BAT_TEST (){
 void ps2_keyboard_initialize (){
 	
 	
-	printf ("ps2_keyboard_initialize: 1\n");
-	refresh_screen();	
+	//printf ("ps2_keyboard_initialize: 1\n");
+	//refresh_screen();	
 	
 	//user.h
 	ioControl_keyboard = (struct ioControl_d *) malloc( sizeof(struct ioControl_d) );
@@ -132,9 +158,10 @@ void ps2_keyboard_initialize (){
 	
 */
 	
-	
-	printf ("ps2_keyboard_initialize: 2\n");
-	refresh_screen();	
+	//#debug
+	//Tentando suprimir esse delay. OK
+	//printf ("ps2_keyboard_initialize: 2\n");
+	//refresh_screen();	
 
 	
 	
@@ -200,9 +227,10 @@ void ps2_keyboard_initialize (){
 	
  
 	
-	
-	printf ("ps2_keyboard_initialize: 3\n");
-	refresh_screen();	
+	//#debug
+	//Tentando suprimir esse delay. OK
+	//printf ("ps2_keyboard_initialize: 3\n");
+	//refresh_screen();	
 
 	
 	
@@ -217,23 +245,44 @@ void ps2_keyboard_initialize (){
 	
 	wait_ns(200);
 	
+	// #bugbug
+	// Isso pode travar ??
 	// Espera os dados descer, ACK
     while(keyboard_read() != 0xFA);
 	
-	printf ("ps2_keyboard_initialize: 4\n");
-	refresh_screen();	
+
+	// #debug
+	// Tentando suprimir esse delay. 
+	//printf ("ps2_keyboard_initialize: 4\n");
+	//refresh_screen();	
 	
+	//#bugbug
+	//esse delay 'e necess'ario par aa rotina de auto teste funcionar na ma'quina real.
+	// Ele foi movido para dentro da rotina de autotest.
+	
+	/*
+	for (i=0; i<99000; i++)
+	{
+		wait_ns(200);
+	}
+	*/
 	
     // Basic Assurance Test (BAT)
     
-	if ( BAT_TEST() != 0) 
+	if ( BAT_TEST () != 0) 
 	{
         // Nelson aqui precisaremos de criar uma rotina de tratamento de erro do teclado
-        printf("\nkeyboard error!");
+        printf ("[WARMING] ps2kbd.c:  BAT_TEST ignored\n");
+		
+		//#debug
+		//refresh_screen();
+		//while(1){}
     }  
 
-	printf ("ps2_keyboard_initialize: 5\n");
-	refresh_screen();	
+	// #debug
+	// Tentando suprimir esse delay. OK
+	//printf ("ps2_keyboard_initialize: 5\n");
+	//refresh_screen();	
 
 	
     // espera nossa controladora termina
