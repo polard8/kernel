@@ -922,6 +922,20 @@ system_procedure ( struct window_d *window,
 		// para o procedimento de janela do aplicativo
 		//
 		
+			
+		// #teste
+		// testando quando o aplicativo chama o procedimento default,.
+		// o teste sera para o click do mouse.
+		// no nosso teste esse click é tratado pelo aplicativo,
+		// mas a mesnagem chegará aqui para tratarmos os botões gerenciados pelo servidor kgws.	
+		case 30:
+			
+			//#debug
+			printf ("system_procedute: mouse keydown\n"); 
+			refresh_screen();
+			break;
+			
+			
 	    //Nothing.
 	    default:    
 		    //return (unsigned long) 0;

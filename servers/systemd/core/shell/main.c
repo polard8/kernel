@@ -499,28 +499,21 @@ int save_string2 ( char string[], char file_name[] );
 void updateVisibleArea ( int direction );
 void clearLine ( int line_number );
 
-// Procedimento de janela principal do aplicativo.
-unsigned long 
-shellProcedure ( struct window_d *window, 
-                 int msg, 
- 			     unsigned long long1, 
-				 unsigned long long2 );
-				
-				
+
+
 //diálogo para alimentar o terminal usado pelos aplicativos.				
 int feedterminalDialog( struct window_d *window, 
                       int msg, 
 				      unsigned long long1, 
 				      unsigned long long2 );
-							  
 
-// Procedimento de janela da topbar.							  
-unsigned long 
-shellTopbarProcedure ( struct window_d *window, 
+
+
+// Procedimento de janela principal do aplicativo.
+void *shellProcedure ( struct window_d *window, 
                        int msg, 
-			           unsigned long long1, 
-					   unsigned long long2 );
-
+				       unsigned long long1, 
+				       unsigned long long2 );
 
 // ...
 
@@ -1478,11 +1471,11 @@ end:
  *     Procedimento de janela.
  *     LOCAL
  */
-unsigned long 
-shellProcedure( struct window_d *window, 
-                int msg, 
-				unsigned long long1, 
-				unsigned long long2 )
+
+void *shellProcedure ( struct window_d *window, 
+                       int msg, 
+				       unsigned long long1, 
+				       unsigned long long2 )
 {
 	unsigned long input_ret;
     unsigned long compare_return;	
@@ -1524,7 +1517,7 @@ shellProcedure( struct window_d *window,
 					//pause();
 					//pause();
 					cpu_relax();
-				    return (unsigned long) 0;
+				    return NULL;
 				    break;
 				
 				// Enter.
@@ -2123,8 +2116,11 @@ shellProcedure( struct window_d *window,
     };
 
     // Nothing for now !
+	
 done:
-	return (unsigned long) apiDefDialog ( window, msg, long1, long2 );
+	
+	return (void *) gde_system_procedure ( window, msg, long1, long2 );
+	//return (unsigned long) apiDefDialog ( window, msg, long1, long2 );
 }
 
 

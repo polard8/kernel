@@ -198,8 +198,9 @@ void *gde_services ( unsigned long number,
 
     struct rect_d *r;	
 	
-	
+	//
 	// ## message support ##
+	//
 	
 	//o endereço do array passado pelo aplicativo
 	//usaremos para enviar uma mensagem com 4 elementos.
@@ -452,10 +453,13 @@ void *gde_services ( unsigned long number,
             break;    
       
 		//37 - Chama o procedimento procedimento default. 
-		//@todo return.
-		case SYS_CALLSYSTEMPROCEDURE: 
-            sys_system_procedure (NULL,arg2,arg3,arg4);	
-			//return (void *) system_procedure ( NULL, arg2, arg3, arg4 );	
+		// #todo
+		// Vamos passar na forma de mesagens para que tenhamos quatro argumentos.	
+		case SYS_CALLSYSTEMPROCEDURE: 	
+			return (void *) sys_system_procedure ( (struct window_d *) message_address[0], 
+							    (int) message_address[1], 
+								(unsigned long) message_address[2], 
+								(unsigned long) message_address[3] );	
             break;    
         
 	

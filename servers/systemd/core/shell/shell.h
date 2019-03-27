@@ -1022,7 +1022,11 @@ void testCreateWindow ();
 int shellCreateTaskBar();
 
 
-
+// Procedimento de janela da topbar.							  
+void *shellTopbarProcedure ( struct window_d *window, 
+                             int msg, 
+			                 unsigned long long1, 
+					         unsigned long long2 );
 
 
 

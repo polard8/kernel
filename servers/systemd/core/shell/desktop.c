@@ -37,14 +37,15 @@ int desktopInitialize (){
 
 
 // Procedimento de janela do modo desktop.
-unsigned long 
-desktopProcedure ( struct window_d *window, 
-                 int msg, 
- 			     unsigned long long1, 
-				 unsigned long long2 )
+void *desktopProcedure ( struct window_d *window, 
+                         int msg, 
+ 			             unsigned long long1, 
+				         unsigned long long2 )
 {
+	
 	printf ("Desktop procedure \n");
-    return 0;
+	
+	return (void *) gde_system_procedure ( window, msg, long1, long2 );
 }
 
 

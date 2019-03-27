@@ -395,7 +395,14 @@
 //Message and procedures.
 #define	SYSTEMCALL_SETPROCEDURE          35
 #define	SYSTEMCALL_KSENDMESSAGE          36  //O teclado envia essa mensagem para o procedimento ativo.
-#define	SYSTEMCALL_CALL_SYSTEMPROCEDURE  37  //chama o procedimento padrao do sistema.
+
+//
+// #importante
+// Chama o procedimento padrao do sistema.
+// Fica no fim da thread.
+//
+
+#define	SYSTEMCALL_CALL_SYSTEMPROCEDURE  37  
 
 //Read sector.
 #define	SYSTEMCALL_READSECTOR  38
@@ -3102,7 +3109,17 @@ int SetNextWindowProcedure (unsigned long next_procedure);
 #define gde_SetNextWindowProcedure SetNextWindowProcedure
 
 
-int gde_call_procedure ( unsigned long procedure ); 
+/*
+ ******************************************************
+ * gde_system_procedure:
+ *     Chama o procedimento de janela padrão do sistema.
+ *     Ele está no kernel.
+ */
+
+void *gde_system_procedure ( struct window_d *window,
+					         int msg,
+					         unsigned long long1,
+					         unsigned long long2 );
  
  
 //Carrega bitmap 16x16.

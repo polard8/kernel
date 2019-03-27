@@ -772,18 +772,30 @@ int edit_box ( unsigned long x,
 
 
 /*
- * chama_procedimento:
- *     Interrupção 200, serviço SYSTEMCALL_CALL_SYSTEMPROCEDURE. 
- *     Chama o proximo procesimento de janela.
- *     Obs: Lembrando que estamos usando endereços lógicos.  (rever) */
+ ******************************************************
+ * gde_system_procedure:
+ *     Chama o procedimento de janela padrão do sistema.
+ *     Ele está no kernel.
+ */
 
-int gde_call_procedure ( unsigned long procedure ){
+void *gde_system_procedure ( struct window_d *window,
+					         int msg,
+					         unsigned long long1,
+					         unsigned long long2 )
+{
 	
-    //system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, proximo_procedure, 0, 0 );    
-	//return (int) 0;
+    unsigned long message_buffer[5];     	
 	
-	//#suspenso 	
-	return -1;
+	
+	message_buffer[0] = (unsigned long) window; 
+	message_buffer[1] = (unsigned long) msg;
+	message_buffer[2] = (unsigned long) long1;
+	message_buffer[3] = (unsigned long) long2;
+	
+    return (void *) system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, 
+					    (unsigned long) &message_buffer[0], 
+						(unsigned long) &message_buffer[0], 
+						(unsigned long) &message_buffer[0] );
 }
 
 

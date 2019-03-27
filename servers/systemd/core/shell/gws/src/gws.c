@@ -1,12 +1,9 @@
 
-
+#include <stddef.h>
 #include <api.h>
 #include <gws.h>
 
-
-
 #include "nc2.h"
-
 
 
 int gws_init(){
@@ -40,13 +37,13 @@ int serverInit (){
  *     Dia'logo padrao para servidores em user mode.
  */
 
-unsigned long serverDialog ( unsigned long buffer_address ){
+void *serverDialog ( unsigned long buffer_address ){
 	
 	unsigned long *message_buffer = (unsigned long *) buffer_address;
 
 	
 	if (buffer_address == 0)
-		return 0;
+		return NULL;
 
 	//0 = window
 	//1 = msg
@@ -72,32 +69,32 @@ unsigned long serverDialog ( unsigned long buffer_address ){
 	switch (msg)
 	{
 	    case 0:
-			return 0;
+			return NULL;
 			break;
 			
 			//Initialize gws server	
 		case 9000:
 			printf ("9000: \n");
-			return (unsigned long) serverInit ();
+			return (void *) serverInit ();
 			break;
 			
 		//
 		case 9001:	
 			//color, x, y
-			return (unsigned long) gws_backbuffer_putpixel ( long1, long2, long3 );
+			return (void *) gws_backbuffer_putpixel ( long1, long2, long3 );
 			break;			
 		
 		//
 		case 9002:	
 			//x, y, color, char
 			gws_drawchar_transparent ( long1, long2, long3, (unsigned long) long4);
-			return (unsigned long) 0;
+			return NULL;
 			break;			
 
 		case 9003:
 			//x, y, char, fg, bg
 			gws_draw_char ( long1, long2, (unsigned long) long3, long4, long5 );
-			return (unsigned long) 0;
+			return NULL;
 			break;
 			
 		case 9004:
@@ -108,14 +105,14 @@ unsigned long serverDialog ( unsigned long buffer_address ){
 			//#debug
 			refresh_screen();  
 			
-			return (unsigned long) 0;
+			return NULL;
 			break;
 
 
 		case 9005:
 			//x, y, width, height, color
 			drawDataRectangle ( long1, long2, long3, long4, long5 );
-			return (unsigned long) 0;
+			return NULL;
 			break;
 	
 	    //...
@@ -125,7 +122,7 @@ unsigned long serverDialog ( unsigned long buffer_address ){
 			break;
 	};
 	
-    return (unsigned long) 0;
+    return NULL;
 }
 
 

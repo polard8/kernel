@@ -73,11 +73,10 @@ void shellui_fntos (char *name){
  *     LOCAL
  */
 
-unsigned long 
-shellTopbarProcedure ( struct window_d *window, 
-                       int msg, 
-				       unsigned long long1, 
-				       unsigned long long2 )
+void *shellTopbarProcedure ( struct window_d *window, 
+                             int msg, 
+				             unsigned long long1, 
+				             unsigned long long2 )
 {
     unsigned long input_ret;
     unsigned long compare_return;	
@@ -102,7 +101,7 @@ shellTopbarProcedure ( struct window_d *window,
             {
 				// Null key.
 				case 0:
-				    return (unsigned long) 0;
+				    return (void *) 0;
 				    break;
 				
 				// Enter.
@@ -463,19 +462,8 @@ shellTopbarProcedure ( struct window_d *window,
 
     // Nothing for now !
 
-//printf("Shell procedure\n");
 done:
-    //@todo: variavel que indica que estamos em modo gráfico.
-	//if(VideoBlock.useGui == 1)
-	//{
-	    //Debug.
-		//refresh_screen(); 
-		//Obs: #bugbug perceba que o procedimento de janela do 
-		//sistema também tem um refresh screen.
-	//};	
-	
-	//return (unsigned long) apiDefDialog(window,msg,long1,long2);
-    return (unsigned long) 0;	
+    return NULL;	
 };
 
 
