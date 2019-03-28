@@ -1661,6 +1661,7 @@ void *shellProcedure ( struct window_d *window,
 				// Abre uma janela e oferece informações sobre o aplicativo.
 				case CMD_ABOUT:
 				    // Test.
+					printf("CMD_ABOUT\n");
 				    MessageBox ( 1, "Shell test", "Testing MSG_COMMAND.CMD_ABOUT." );
 				    break;
 				
@@ -2202,6 +2203,10 @@ unsigned long shellCompare (struct window_d *window){
     //?? é um pathname absoluto ou não. ??
 	//Ok. isso funcionou.
     int absolute; 
+	
+	//buffer de test;
+	unsigned long message_buffer[11];
+	int PID;
 	
 	//#importante:
 	//Transferir toda alinha de comando para a memória 
@@ -3528,9 +3533,6 @@ do_compare:
 	};
 	
 	
-	//buffer de test;
-	unsigned long message_buffer[11];
-	
 	// t12
 	// testando mudar um retângulo de lugar.
 	// + salva o retângulo num buffer 
@@ -3590,6 +3592,7 @@ do_compare:
 		goto exit_cmp;
 	}
 	
+	
 	//testando open()
 	//precisa incluir fcntl.h
 	int ooofd;
@@ -3628,9 +3631,31 @@ do_compare:
         system_call ( 8001, 100, 1, 0 );
 		
 		goto exit_cmp;
-	};	
+	};
+
 	
+
+	// send message to a process.
+	// Envia uma mensagem para a trhead de controle de um processo.
+	// Nesse teste vamos mandar uma mensagem para esse processo mesmo.
 	
+	if ( strncmp( prompt, "t18", 3 ) == 0 )
+	{
+		printf ("t18:\n");
+		enterCriticalSection (); 
+        PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );			
+	    
+		message_buffer[0] = 0;
+		message_buffer[1] = MSG_COMMAND;  //msg
+		message_buffer[2] = CMD_ABOUT;    //long1
+		message_buffer[3] = CMD_ABOUT;		
+		
+		system_call ( 112, (unsigned long) &message_buffer[0], PID, PID );
+		exitCriticalSection ();
+		printf ("t18: done\n");
+		goto exit_cmp;
+	}
+
 	
 
 	

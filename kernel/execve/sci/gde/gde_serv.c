@@ -102,16 +102,16 @@ unsigned long cwArg12;     // WindowColor
 
 void *gde_services ( unsigned long number, 
                      unsigned long arg2, 
-                 unsigned long arg3, 
-                 unsigned long arg4 )
+                     unsigned long arg3, 
+                     unsigned long arg4 )
 {
 	//
 	// Declarações.
 	//
-	
-    //Args. (strings)
+
+	//Args. (strings)
 	unsigned char *stringZ = (unsigned char *) arg2;
-    unsigned char *stringZZ = (unsigned char *) arg3;	
+	unsigned char *stringZZ = (unsigned char *) arg3;
 	
 	unsigned long *a2 = (unsigned long*) arg2;
 	unsigned long *a3 = (unsigned long*) arg3;
@@ -279,15 +279,12 @@ void *gde_services ( unsigned long number,
 	// ## Switch ##
 	//
 	
-	//Number.
 	switch (number)
 	{
 	    //0 - Null, O processo pode ser malicioso.
 	    case SYS_NULL: 
 	        return NULL;
 			break; 	   
-		
-		//Disco: 1,2,3,4
 		
 		//1 (i/o) Essa rotina pode ser usada por um driver em user mode.
 		case SYS_READ_LBA: 
@@ -331,13 +328,13 @@ void *gde_services ( unsigned long number,
 			scheduler_unlock();
 	        taskswitch_unlock();
 		    break;
-			
-		//Gráficos:5,6,7,8,9,10,11.
 		
-		//5 Vertical Sync.(Não sei se é necessário isso via interrupção.); 
+		// 5 Vertical Sync. 
+		// Usada pelos servidores.	
         case SYS_VSYNC:
-		    sys_vsync();       		
+		    sys_vsync ();       		
 			break;
+			
 			
 		// 6 - Put pixel. 
         // Coloca um pixel no backbuffer.
@@ -412,28 +409,25 @@ void *gde_services ( unsigned long number,
 			
 		//i/o:  16,17,18,19	
 			
-		//open()
-		//retorna um i'ndice na tabela de arquivos abertos do proceso atual.	
+		// open()
+		// Retorna um i'ndice na tabela de arquivos abertos do proceso atual.	
+		// unistd.c
+		// O tipo mode_t precisa de kernel/sys/types.h
+		// pathname, flags, mode
 		case 16:
-			//unistd.c
-			//o tipo mode_t precisa de kernel/sys/types.h
-			//pathname, flags, mode
-			return ( void *) sys_open ( (const char *) arg2, (int) arg3, (mode_t)	arg4 );
+			return (void *) sys_open ( (const char *) arg2, (int) arg3, (mode_t) arg4 );
 			break;
 			
 		case 17:
 			return (void *) sys_close ( (int) arg2 );
 			break;
 			
-
-        //24-28 WINDOW SUPPORT		
-        
 		//24
 		// window.c	
 		case 24:
 		    return (void *) sys_show_window_rect ( (struct window_d *) arg2 );
 		    break;
-	 
+			
 		//34	
         case SYS_VIDEO_SETCURSOR: 
 			sys_set_up_cursor ( (unsigned long) arg2, (unsigned long) arg2);
@@ -447,7 +441,7 @@ void *gde_services ( unsigned long number,
 		//36
         //O teclado envia essa mensagem para o procedimento ativo.
         case SYS_KSENDMESSAGE: 
-		    g_nova_mensagem = 1; //existe uma nova mensagem.
+		    g_nova_mensagem = 1;    //flag = Existe uma nova mensagem.
             sys_system_dispatch_to_procedure ( (struct window_d *) arg2, 
 			    (int) arg2, (unsigned long) arg4, (unsigned long) 0);			
             break;    
@@ -462,17 +456,12 @@ void *gde_services ( unsigned long number,
 								(unsigned long) message_address[3] );	
             break;    
         
-	
-	    // ## CANCELADA! ##
-        //42 Load bitmap 16x16.
+        //42 - Load bitmap 16x16. #cancelada.
 		case SYS_LOADBMP16X16 :       
             return NULL;			
             break;
 
-
-        // 45 Message Box. 
-		// Cancelado. 
-		// Message box fica na biblioteca em ring 3.	
+        // 45 - Message Box. #cancelada 
         case SYS_MESSAGEBOX:		
             return NULL;
 			break;
@@ -491,8 +480,6 @@ void *gde_services ( unsigned long number,
 		case SYS_BUFFER_CREATEWINDOW2:
 			return NULL;
 			break;	
-			
-		//50~59 Window suppot, manipulação de janelas	
 
 		//50 resize window (handle,x,y)
 		case SYS_BUFFER_RESIZEWINDOW:		
@@ -510,14 +497,14 @@ void *gde_services ( unsigned long number,
 		    break;
 		
 		//53 maximize window 
+		//(handle)
 		case SYS_BUFFER_MAXIMIZEWINDOW:
-		    //(handle)
 		    sys_MaximizeWindow ((struct window_d*) arg2);
 		    break;
 		
 		//54 minimize window
+		//(handle)
 		case SYS_BUFFER_MINIMIZEWINDOW:
-		    //(handle)
 		    sys_MinimizeWindow ( (struct window_d *) arg2);
 		    break;
 		
@@ -548,8 +535,9 @@ void *gde_services ( unsigned long number,
 			break;
 
         //61
+		//Id. (int).	
 		case SYS_GETACTIVEWINDOW:
-            return (void *) sys_get_active_window();    //Id. (int).		
+            return (void *) sys_get_active_window();    		
 			break;
 
         //62
@@ -611,25 +599,21 @@ void *gde_services ( unsigned long number,
 		//case 68:		
 		//	break;
 
-		//	
-		//69 - Driver de teclado enviando mensagem de digitação.	
-		//     Não somente um driver, mas qualquer processo pode enviar
-		// uma mensagem pra janela com o foco de entrada e chamar o procedimento.
-		// >>>> Enviando para a classe certa.
-        // arg2=msg, arg3=ch, arg4=ch 0		
-		//
+		
+		// 69
+		// ??	
 		case 69:
-			printf("%c", arg3);
-			sys_system_procedure( NULL, 
-			                  (int) arg2, 
-							  (unsigned long) arg3, 
-							  (unsigned long) arg4 );
+			printf ("service 69: #todo\n");
 			
-			sys_windowSendMessage( (unsigned long) NULL,
-			                   (unsigned long) arg2,
-							   (unsigned long) arg3,
-							   (unsigned long) arg4 );
+			//printf("%c", arg3);
+			//sys_system_procedure ( NULL, (int) arg2, 
+			//	(unsigned long) arg3, (unsigned long) arg4 );
+			//sys_windowSendMessage( (unsigned long) NULL,
+			//    (unsigned long) arg2,
+			//	(unsigned long) arg3,
+			//	(unsigned long) arg4 );
 			break;
+			
 			
 		//
         // ## EXIT ##
@@ -655,7 +639,8 @@ void *gde_services ( unsigned long number,
 		    return (void *) sys_do_fork_process ();
 			break;	
 
-		//72 - Create thread.	
+		// 72 - Create thread.
+		// #todo: enviar os argumentos via buffer.	
         case SYS_CREATETHREAD:			
 			return (void *) sys_create_thread ( 
 			                NULL,             // w. station 
@@ -667,13 +652,14 @@ void *gde_services ( unsigned long number,
 							(char *) a4 );    // name
 			break; 
 
-		//73 - Create process.
-        //@todo; Ok, nesse momento, precisamos saber qual é o processo pai do processo 
-        //que iremos criar. Esse deve ser o processo atual ...  		
+		// 73 - Create process.
+		// #todo: enviar os argumentos via buffer.		
+        // #todo: Ok, nesse momento, precisamos saber qual é o processo pai do processo 
+        // que iremos criar. Esse deve ser o processo atual ...  		
 		// PPID = 0. Nesse momento todo processo criado será filho do processo número 0.
 		// mas não é verdade. @tpdp: Precisamos que o aplicativo em user mode 
 		// nos passe o número do processo pai, ou o proprio kernel identifica qual é o 
-		//processo atual e determina que ele será o processo pai.        
+		// processo atual e determina que ele será o processo pai.        
 		case SYS_CREATEPROCESS:
             return (void *) sys_create_process ( NULL, NULL, NULL, 
 			                    arg2, arg3, 0, (char *) a4, 
@@ -696,36 +682,34 @@ void *gde_services ( unsigned long number,
 			break;
 		
 		//82
-		//
 		case SYS_SETPPID: 
 			break;
 			
 			
-		//83
+		// 83
+		// schedi.c
+		// #todo.	
+		// TID, PID 		
+		// TID é a thread atual.
+		// PID veio via argumento.			
         case SYS_WAIT4PID: 
-            //schedi.c
 			return (void *) sys_do_wait ((int *) arg2 );
-			
-			// TID, PID 		
-			// TID é a thread atual.
-			// PID veio via argumento.
 			//block_for_a_reason ( (int) current_thread, (int) arg2 ); //suspenso
-		    break;
+			break;
 			
-		//85
-		//#bugbug Isso está retornando o ID do processo pai do processo atual.
-		//O que queremos é o ID do processo pai do processo que está chamando.
+		// 85
+		// #bugbug: 
+		// Isso está retornando o ID do processo pai do processo atual.
+		// O que queremos é o ID do processo pai do processo que está chamando.
 		case SYS_GETPID: 
 		    return (void *) sys_getpid();
 			break;
 		
 		//86
-		//
 		case SYS_SETPID: 
-		    //
 			break;
 		
-		//Down. 87
+		// 87 Down.
 		case SYS_SEMAPHORE_DOWN:
 		    return (void *) sys_Down ( (struct semaphore_d *) arg2);
 		    break;
@@ -737,7 +721,7 @@ void *gde_services ( unsigned long number,
             return (void *) sys_processTesting (arg2);			
 			break;
 			
-		//Up. 89	
+		// 89 Up. 	
 		case SYS_SEMAPHORE_UP:
 		    return (void *) sys_Up ( (struct semaphore_d *) arg2 );
 		    break;
@@ -751,28 +735,20 @@ void *gde_services ( unsigned long number,
 		//REAL (coloca a thread em standby para executar pela primeira vez.)
 		// * MOVEMENT 1 (Initialized --> Standby).
 		case SYS_STARTTHREAD:
-		    t = (struct thread_d *) arg2;
-            sys_SelectForExecution (t);    	
+		    //t = (struct thread_d *) arg2;
+            //sys_SelectForExecution (t);
+			sys_SelectForExecution ( (struct thread_d *) arg2 );
 			break;		
 			
-	    //
-        // 99,100,101,102 = Pegar nas filas os parâmetros hwnd, msg, long1, long2.
-        //
-
-        // *importante: 
-		// #bugbug SYS_GETKEYBOARDMESSAGE (44) está pegando a mensagem de teclado,
-		// mas na verdade deveria apenas pegar a mensagem, sem se preocupar em 
-		// qual foi o dispositivo gerador do evento. ??!!
-
-			
-		// 99,  Pega 'hwnd' na fila da janela com o foco de entrada.
+		// 99
+		// Pega 'hwnd' na fila da janela com o foco de entrada.
 		case SYS_GETHWINDOW:
 		    return NULL;
 		    break;
 			
-		//#bugbug
-		//****  Pega 'msg' na fila da janela com o foco de entrada.
-		//Pegando a mensagem na fila da janela com o foco de entrada.
+		// #bugbug
+		// Pega 'msg' na fila da janela com o foco de entrada.
+		// Pegando a mensagem na fila da janela com o foco de entrada.
 		case SYS_GETKEYBOARDMESSAGE:
 			return (void *) sys_windowGetMessage ( (struct window_d *) WindowWithFocus );
 			break;
@@ -837,10 +813,7 @@ void *gde_services ( unsigned long number,
 				
 			    t = (void *) threadList[current_thread];
 			    
-	            if ( (void *) t == NULL )
-	            {
-		           return NULL;
-	            }
+	            if ( (void *) t == NULL ){ return NULL; }
 				
 				// Se não existe uma mensagem na thread, então vamos
 				// pegar uma mensagem de teclado no buffer de teclado (stdin).
@@ -856,10 +829,7 @@ void *gde_services ( unsigned long number,
 					
 					SC = (unsigned char) get_scancode ();
 					
-					if ( SC == 0 )
-					{
-						return NULL;
-					}
+					if ( SC == 0 ){ return NULL; }
 					
 					//#todo
 					// Avisamos que se trata de uma sequência de caracteres.
@@ -901,13 +871,17 @@ void *gde_services ( unsigned long number,
 			};
 		    break;
 			
-		//112	
-		//Enviar uma mensagem para a thread de controle de um processo.	
+			
+		// 112	
+		// Enviar uma mensagem para a thread de controle de um processo.	
+		// arg2, arg3
+		// endereço do buffer da mensagem, pid	
 		case SYS_SENDMESSAGETOPROCESS:
-			// arg2, arg3
-			// endereço do buffer da mensagem, pid
+			printf ("112: PID=%d\n", arg3 );
 			services_send_message_to_process ( (unsigned long) &message_address[0], (int) arg3 );
+			printf ("112: done\n");
 			break;
+			
 		
 		//Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
 		case 113:
@@ -1861,28 +1835,47 @@ void servicesPutChar ( int c ){
 }
  
  
-// Envia uma mensagem para a thread atual.
-// #todo: Isso deveria ir para o IPC.
-void services_send_message_to_thread ( unsigned long msg_buffer, int tid )
-{	
-    unsigned long *buffer = (unsigned long *) msg_buffer;
+
+/*
+ ****************
+ * services_send_message_to_thread:
+ *     Envia uma mensagem para uma thread, dados o buffer e o TID.
+ *     #todo: Isso deveria ir para o IPC.
+ */
+
+void services_send_message_to_thread ( unsigned long msg_buffer, int tid ){
 
 	struct thread_d *t;
 	
-	//#importante
-	//Temos que checar o endereço andes de acessá-lo.
+    unsigned long *buffer = (unsigned long *) msg_buffer;
 	
+	
+	printf ("services_send_message_to_corrent_thread: TID=%d \n", tid);
+	refresh_screen ();	
+
+    //
+	// TID
+	//
+
 	
 	if ( tid < 0 || tid >= THREAD_COUNT_MAX )
 	{
-	    printf ("114: services_send_message_to_corrent_thread: Fail, tid \n");
+	    printf ("services_send_message_to_corrent_thread: TID \n");
 		refresh_screen ();
 		return;
 	}
+	
+	//
+	// BUFFER
+	//
+	
+	
+	// #importante
+	// Temos que checar o endereço andes de acessá-lo.
 			
     if ( &buffer[0] == 0 )
 	{
-	    printf ("114: services_send_message_to_corrent_thread: Fail, null pointer\n");
+	    printf ("services_send_message_to_corrent_thread: buffer\n");
 		refresh_screen ();
 		return;
 		
@@ -1892,64 +1885,100 @@ void services_send_message_to_thread ( unsigned long msg_buffer, int tid )
 				
 	    if ( (void *) t != NULL )
         {
-            if ( t->used == 1 && t->magic == 1234 )
-			{					    
-			    t->window = (struct window_d *) buffer[0];
-			    t->msg = (int) buffer[1];
-			    t->long1 = (unsigned long) buffer[2];
-			    t->long2 = (unsigned long) buffer[3];
+            if ( t->used != 1 && t->magic != 1234 )
+			{
+	            printf ("services_send_message_to_corrent_thread: validation\n");
+		        refresh_screen ();
+		        return;				
+			}
+			
+            t->window = (struct window_d *) buffer[0];
+			t->msg = (int) buffer[1];
+			t->long1 = (unsigned long) buffer[2];
+			t->long2 = (unsigned long) buffer[3];
 				
-				//sinalizando que temos uma mensagem.
-			    t->newmessageFlag = 1; 
-			};
+			//sinalizando que temos uma mensagem.
+			t->newmessageFlag = 1; 
+
 		};
 	};	
 }
 
-// Envia uma mensagem para a thread de controle de um processo.
-// #todo: Isso deveria ir para o IPC.
-void services_send_message_to_process ( unsigned long msg_buffer, int pid )
-{
+
+
+/*
+ *********************
+ * services_send_message_to_process:
+ *     Envia uma mensagem para a thread de controle de um processo.
+ *     #todo: Isso deveria ir para o IPC.
+ */
+
+void services_send_message_to_process ( unsigned long msg_buffer, int pid ){
+	
 	struct process_d *p;
 	struct thread_d *t;
 	
+	//#debug
+	printf ("services_send_message_to_process: PID=%d \n", pid);
+	refresh_screen ();	
+	
 	if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
 	{
-	    printf ("?: services_send_message_to_process: Fail, Pid \n");
+		// #debug
+		printf ("services_send_message_to_process: PID \n");
 		refresh_screen ();
 		return;
 	}
 	
-	//PID OK.
 	p = ( void *) processList[pid];
 	
 	if ( (void *) p == NULL )
 	{
-	    printf ("?: services_send_message_to_process: Fail, struct \n");
+	    // #debug
+		printf ("services_send_message_to_process: struct \n");
 		refresh_screen ();
 		return;	
+		
 	}else{
 	
 		 if ( p->used != 1 || p->magic != 1234 )
 		 {
-			 //fail, validation
+		     // #debug
+			 printf ("services_send_message_to_process: p validation \n");
+		     refresh_screen ();
 			 return;
 		 }
 		
+		 //
 		 // Thread de controle.
-	     // #todo: Isso ainda não foi bem trabalhado na estrutura do processo
-		 // na hora da criação do processo.
-		 t = p->control; 
+		 //
 		
+		 t = p->control; 
+
 		 if ( (void *) t == NULL )
 		 {
-		     if ( t->used != 1 || t->magic != 1234 )
+		     // #debug
+			 printf ("services_send_message_to_process: t struct \n");
+		     refresh_screen ();
+			 return;
+
+		 }else{
+		     
+			 if ( t->used != 1 || t->magic != 1234 )
 			 {
-				 //fail, validation
-				 return;
+		         // #debug
+			     printf ("services_send_message_to_process: t validation \n");
+		         refresh_screen ();
+			     return;
 			 }
 		
-			 services_send_message_to_thread ( (unsigned long) msg_buffer, (int) t->tid );   
+			 //
+			 // Send message to the control thread.
+			 //
+			 
+			 services_send_message_to_thread ( (unsigned long) msg_buffer, 
+			     (int) t->tid );   
+
 		 }
 	};
 }
