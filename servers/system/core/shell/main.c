@@ -3641,16 +3641,26 @@ do_compare:
 	
 	if ( strncmp( prompt, "t18", 3 ) == 0 )
 	{
+		//veja essa rotina na api.
+		//apiSendMessageToProcess
+		//apiSendMessageToThread
+		
 		printf ("t18:\n");
 		enterCriticalSection (); 
         PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );			
 	    
-		message_buffer[0] = 0;
-		message_buffer[1] = MSG_COMMAND;  //msg
-		message_buffer[2] = CMD_ABOUT;    //long1
-		message_buffer[3] = CMD_ABOUT;		
+		//isso funciona.
+		//message_buffer[0] = 0;
+		//message_buffer[1] = MSG_COMMAND;  //msg
+		//message_buffer[2] = CMD_ABOUT;    //long1
+		//message_buffer[3] = CMD_ABOUT;		
+		//system_call ( 112, (unsigned long) &message_buffer[0], PID, PID );
 		
-		system_call ( 112, (unsigned long) &message_buffer[0], PID, PID );
+		//testando api.
+		//isso funcionou. Usar esse!
+		apiSendMessageToProcess ( PID, 
+		    NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
+		
 		exitCriticalSection ();
 		printf ("t18: done\n");
 		goto exit_cmp;

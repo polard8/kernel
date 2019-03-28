@@ -256,6 +256,9 @@
 //116 testando servidor
 ////envia uma mensagem de teste para o servidor taskman
 #define	SYS_116 116
+
+
+//envia uma mensagem para uma thread, dado o tid.
 #define	SYS_117 117
 
 //CreateWindow:

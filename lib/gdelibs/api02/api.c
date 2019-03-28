@@ -3006,8 +3006,15 @@ done:
 };
 
 
-// Envia uma mensagem para a trhead de controle de um dado processo.
-unsigned long 
+
+/*
+ *************************************
+ * apiSendMessageToProcess:
+ *     Envia uma mensagem para a thread de controle de um dado processo.
+ *     Dado o PID.
+ */
+
+int
 apiSendMessageToProcess ( int pid, 
                           struct window_d *window, 
                           int message,
@@ -3016,17 +3023,50 @@ apiSendMessageToProcess ( int pid,
 {
 	unsigned long message_buffer[5];
 
+	
+    if (pid<0)
+		return -1;
+	
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
 	message_buffer[3] = (unsigned long) long2;
 	//...
 
-	return (unsigned long) system_call ( 114 , 
-	                           (unsigned long) &message_buffer[0], 
-	                           (unsigned long) pid, 
-	                           (unsigned long) pid );
+	return (int) system_call ( 112 , (unsigned long) &message_buffer[0], 
+	                 (unsigned long) pid, (unsigned long) pid );
 }
+
+
+/*
+ *************************************
+ * apiSendMessageToThread:
+ *     Envia uma mensagem para uma thread.
+ */
+
+int 
+apiSendMessageToThread ( int tid, 
+					     struct window_d *window, 
+                         int message,
+                         unsigned long long1,
+                         unsigned long long2 )
+{
+	unsigned long message_buffer[5];
+
+	
+    if (tid<0)
+		return -1;
+	
+	message_buffer[0] = (unsigned long) window;
+	message_buffer[1] = (unsigned long) message;
+	message_buffer[2] = (unsigned long) long1;
+	message_buffer[3] = (unsigned long) long2;
+	//...
+
+	return (int) system_call ( 117 , (unsigned long) &message_buffer[0], 
+	                 (unsigned long) tid, (unsigned long) tid );
+}
+
 
 
 /*

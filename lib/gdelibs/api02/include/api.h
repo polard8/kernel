@@ -3619,7 +3619,7 @@ apiDisplayBMP ( char *address,
 
 
 // Envia uma mensagem para a thread de controle de um dado processo.
-unsigned long 
+int 
 apiSendMessageToProcess ( int pid, 
 						  struct window_d *window, 
                           int message,
@@ -3627,6 +3627,17 @@ apiSendMessageToProcess ( int pid,
                           unsigned long long2 );
 
 #define gde_send_message_to_process apiSendMessageToProcess
+
+
+// Envia uma mensagem para uma thread.
+int 
+apiSendMessageToThread ( int tid, 
+					     struct window_d *window, 
+                         int message,
+                         unsigned long long1,
+                         unsigned long long2 );
+
+#define gde_send_message_to_thread apiSendMessageToThread
 
 
 //Envia uma mensagem para a thread atual.					   

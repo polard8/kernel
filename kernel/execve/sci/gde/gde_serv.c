@@ -889,9 +889,9 @@ void *gde_services ( unsigned long number,
 			break;
 			
 		// 114	
-        // Envia uma mensagem para a thread atual.	
+        // Envia uma mensagem para a thread atual.
+		// endereço do buffer da mensagem, tid.			
 		case SYS_SENDMESSAGETOCURRENTTHREAD:	
-			// endereço do buffer da mensagem, tid.
 			services_send_message_to_thread ( (unsigned long) &message_address[0], (int) current_thread );
 		    break;
 			
@@ -959,6 +959,15 @@ void *gde_services ( unsigned long number,
 		    gui->taskmanWindow->long2 = (unsigned long) arg4;    //0;
             gui->taskmanWindow->newmessageFlag = 1;				
 		    break;
+			
+		
+		//envia uma mensagem para uma thread, dado o tid.
+		case 117:	
+		    services_send_message_to_thread ( (unsigned long) &message_address[0], (int) arg3 );	
+			break;
+			
+        // #importante
+		// 118 - Essa especialmente foi criada no início da função.
 			
 		//119
 		case SYS_SELECTCOLORSCHEME:
