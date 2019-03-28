@@ -1152,12 +1152,27 @@ void *CreateWindow ( unsigned long type,
 		{
 			window->minimizebuttonUsed = 1;
 			
-            // Create button.			
+            // Create button.
+			// #importante: os argumentos possuem deslocamentos em relação a janela que o botão está.
+			//obs: talvez não precise ser assim. talvez possamos simplesmente criarmos o botão
+			//na posição determinada agora.
+			
 			windowButton1 = CreateWindow ( WT_BUTTON, 1, 1, "V", 
 	                           (window->width -32 -32 -1 -32 -1), 2, 32, 32,									  
 			                   window, 0, 
-							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
+							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);
 			
+			
+			//#test OK ISSO FUNCIONOU
+			//registrar o posicionamento do botão na tela.
+			//deve ser o o posicionamento da janela mais o deslocamento.
+			
+			windowButton1->left   = ( window->left + (window->width -32 -32 -1 -32 -1) );
+			windowButton1->right  = windowButton1->left +32;
+			windowButton1->top    = window->top +2;
+			windowButton1->bottom = windowButton1->top +32; 
+			 
+				
 			RegisterWindow (windowButton1);
 			window->minimize = windowButton1;
 	    }
@@ -1172,6 +1187,12 @@ void *CreateWindow ( unsigned long type,
 			                   window, 0, 
 							   (unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2);	
 			
+			windowButton2->left   = ( window->left + (window->width -32 -32 -1) );
+			windowButton2->right  = windowButton2->left +32;
+			windowButton2->top    = window->top +2;
+			windowButton2->bottom = windowButton2->top +32; 
+
+			
 			RegisterWindow (windowButton2);
 			window->minimize = windowButton2;
 	    }
@@ -1185,6 +1206,11 @@ void *CreateWindow ( unsigned long type,
 	                            (window->width -32), 2, 32, 32,									  
 			                    window, 0, 
 								(unsigned long) COLOR_TERMINAL2, (unsigned long) COLOR_TERMINAL2 );	
+			
+			windowButton3->left   = ( window->left + (window->width -32) );
+			windowButton3->right  = windowButton3->left +32;
+			windowButton3->top    = window->top +2;
+			windowButton3->bottom = windowButton3->top +32; 
             
 			RegisterWindow (windowButton3);
 			window->close = windowButton3;
@@ -1626,6 +1652,7 @@ void *CreateWindow ( unsigned long type,
 	
 	if ( (unsigned long) type == WT_BUTTON )
 	{
+	
         window->button = (struct button_d *) draw_button ( Parent, windowname, BS_DEFAULT, 0, 0,		
                                                  window->left, window->top, window->width, window->height, 
                                                  window->bg_color );
@@ -1633,7 +1660,7 @@ void *CreateWindow ( unsigned long type,
         // E se retornar NULL ?
         //if ( (void *) window->button == NULL ){}
         
-		window->isButton = 1;	
+		window->isButton = 1;
 	}	
 
     if ( (unsigned long) type == WT_EDITBOX )	

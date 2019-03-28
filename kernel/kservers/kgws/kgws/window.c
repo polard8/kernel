@@ -3755,22 +3755,29 @@ int windowScan ( unsigned long x, unsigned long y ){
 				     y > w->top    &&
 				     y < w->bottom )
 				{
-                    if ( w->type == WT_EDITBOX     ||
-                         w->type == WT_OVERLAPPED  ||	
-                         w->type == WT_CHECKBOX    ||	
-                         w->type == WT_SCROLLBAR   ||	
-                         w->type == WT_EDITBOX_MULTIPLE_LINES ||	
-						 w->type == WT_BUTTON      ||	 
-                         w->type == WT_STATUSBAR )						
-					{
-						
-					    // Pega o ID.
+					
+					// #todo
+					// Aqui precisamos de um tratamento diferenciado para cada um dos tipos.
+					// Vamos começar com os botões.
+					// Nesse momento cada um pode ter um compotamento diferente.
+					// Pega o ID.
+					
+					if ( w->type == WT_BUTTON )
+					{    
 						WID = w->id;
-					    window_mouse_over = w->id;
-					    
-						return (int) WID;
-						//goto done;
+					    window_mouse_over = w->id;    
+						return (int) WID;					
 					}
+					
+					if ( w->type == WT_EDITBOX )
+					{    
+						WID = w->id;
+					    window_mouse_over = w->id;    
+						return (int) WID;					
+					}	
+					
+					// ...
+					
 				}; 
 			};		
 		};	

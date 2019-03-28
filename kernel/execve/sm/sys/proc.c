@@ -929,10 +929,44 @@ system_procedure ( struct window_d *window,
 		// no nosso teste esse click é tratado pelo aplicativo,
 		// mas a mesnagem chegará aqui para tratarmos os botões gerenciados pelo servidor kgws.	
 		case 30:
-			
-			//#debug
-			printf ("system_procedute: mouse keydown\n"); 
-			refresh_screen();
+			//qual botão do mouse?
+			switch (long1)
+			{
+				//botão 1	
+				case 1:
+			        //#debug
+			        printf ("system_procedute: mouse keydown, window name %s \n",window->name); 
+			        refresh_screen();	
+					
+					//#test
+					if ( window->isButton == 1 )
+					{
+						//se é o minimize da parent.
+						//if ( window == window->parent->minimize )
+						//{
+			            //     printf (" MINIMIZE \n"); 
+			            //     refresh_screen();								
+						//}
+						//if ( window == window->parent->maximize )
+						//{
+			            //     printf (" MAXIMIZE \n"); 
+			            //     refresh_screen();								
+						//}
+						//if ( window == window->parent->close )
+						//{
+			            //     printf (" CLOSE \n"); 
+			            //     refresh_screen();								
+						//}
+					}
+					
+					break;
+					
+				case 2:
+					break;
+					
+				case 3:
+					break;
+			}
 			break;
 			
 			
