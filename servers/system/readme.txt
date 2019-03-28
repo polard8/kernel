@@ -1,7 +1,7 @@
 https://en.wikipedia.org/wiki/Runlevel
 
     ===================================
-   /systemd
+   /system
 
    Conjunto de programas que são usados durante a inicialização do sistema.
    Um desses programas podem ser o primeiro processo a rodar, normalmente 
@@ -12,7 +12,7 @@ https://en.wikipedia.org/wiki/Runlevel
    Várias servidores de gerenciamento do sistema farão parte
    desse ambiente chamado systemd.
    
-   Em systemd/core/ ficarão os programas principais do systemd.
+   Em system/core/ ficarão os programas principais do system.
    
    +init é um processo que serve para ser clonado para que o
    shell execute um programa no ambiente gramado core. Isso é provisório.
@@ -23,12 +23,12 @@ https://en.wikipedia.org/wiki/Runlevel
    +taskman será o gerenciador principal.
    
    
-   Outros programas farão parte do ambiente systemd, todos voltados
+   Outros programas farão parte do ambiente system, todos voltados
    ao gerenciamento de recursos básicos do sistema.
 
    
    ===============================================
-   /systemd/core
+   /system/core
 
    Gramado Core Environment.
 
@@ -37,9 +37,9 @@ https://en.wikipedia.org/wiki/Runlevel
    no gramado core.
 
    Os programas do gramado core são:
-   /systemd/core/init
-   /systemd/core/shell
-   /systemd/core/taskman   
+   /system/core/init
+   /system/core/shell
+   /system/core/taskman   
    
    ==============================================
 

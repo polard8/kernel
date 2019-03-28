@@ -14,7 +14,7 @@
 VERSION = 1
 PATCHLEVEL = 1
 SUBLEVEL = 0
-EXTRAVERSION = -rc4
+EXTRAVERSION = -rc5
 NAME = ?
 
 
@@ -104,11 +104,12 @@ ifeq ($(ARCH),x86)
 	
 	
 	MK_OBJECTS := x86cont.o x86fault.o x86start.o \
-	create.o dispatch.o pheap.o process.o queue.o spawn.o \
+	dispatch.o pheap.o process.o queue.o spawn.o \
 	tasks.o theap.o thread.o threadi.o ts.o tstack.o \
 	callout.o callfar.o ipc.o ipccore.o sem.o \
 	memory.o mminfo.o mmpool.o pages.o \
 	preempt.o priority.o sched.o schedi.o \
+	create.o \
 	mk.o 
 
 
@@ -169,8 +170,7 @@ compile-kernel:
 	gcc -c  kernel/mk/pc/action/threadi.c   -I include/  $(CFLAGS) -o threadi.o
 	gcc -c  kernel/mk/pc/action/theap.c     -I include/  $(CFLAGS) -o theap.o
 	gcc -c  kernel/mk/pc/action/tstack.c    -I include/  $(CFLAGS) -o tstack.o
-	gcc -c  kernel/mk/pc/action/tasks.c     -I include/  $(CFLAGS) -o tasks.o
-	gcc -c  kernel/mk/pc/action/create.c    -I include/  $(CFLAGS) -o create.o
+	gcc -c  kernel/mk/pc/action/tasks.c     -I include/  $(CFLAGS) -o tasks.o	
 	gcc -c  kernel/mk/pc/action/spawn.c     -I include/  $(CFLAGS) -o spawn.o
 
 	# mk/pc/ipc
@@ -339,6 +339,9 @@ compile-kernel:
 	gcc -c kernel/kservers/kgws/user/usession.c  -I include/ $(CFLAGS) -o usession.o
 	
 	gcc -c kernel/kservers/kgws/kgws.c  -I include/ $(CFLAGS) -o kgws.o
+	
+	#system	
+	gcc -c kernel/system/create.c  -I include/  $(CFLAGS) -o create.o
 
 
 link-x86:

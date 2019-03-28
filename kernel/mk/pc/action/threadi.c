@@ -1,5 +1,5 @@
 /*
- * File: action\threadi.c 
+ * File: action/threadi.c 
  *
  * Descrição:
  *      Thread internal.    
@@ -20,6 +20,302 @@
 
  
 #include <kernel.h>
+
+
+
+// ==============  idle thread in ring 0  ===============
+
+   //#test
+    //Ok, está funcionando. :)
+	//printf(".");
+    
+	// Esse negócio do cli e dead)thread_collector funcionou bem,
+	// mas precisamos atualizar o contador de threads rodando.
+	// Precisa decrementar o contador, e´o problema está aí,
+	// precisa checar se decrementar esse contador causa algum efeito 
+	// negativo.
+	// É necessário de decrementemos o contador.
+
+// Isso é uma thread em ring 0 que será usada como idle.
+void xxxRing0Idle (){
+	
+Loop:
+	
+	asm ("cli");
+	dead_thread_collector ();
+    asm ("sti");
+	
+	// Importante:
+	// Efetuamos o halt com as interrupções habilitadas.
+	// Então na primeira interrupção o sistema volta a funcionar.
+	// Se as interrupções estivessem desabilitadas, então esse hlt
+	// paralizatia o sistema.
+	
+	// #Ok, essa função é muito boa,
+	// Mas o ideia é chamarmos ela apenas quando o
+	// sistema estiver ocioso, para que não fiquemos um quantum inteiro
+	// inativo.
+	
+	asm ("hlt");
+    goto Loop;
+	
+}
+
+
+
+/*
+ ***************************************************************
+ * KiCreateRing0Idle:
+ *    Criando manualmente uma thread em ring 0.
+ *    Para o processador ficar em hlt quando não tiver outra thread rodando.
+ */
+
+void *KiCreateRing0Idle (){
+	
+    void *ring0IdleStack;                    // Stack pointer. 	
+	
+	struct thread_d *t;
+	char *ThreadName = "ring0-idle-thread";    // Name.
+	
+	int r;
+	
+
+	if ( (void *) KernelProcess == NULL )
+	{
+	    printf("pc-create-KiCreateRing0Idle: KernelProcess\n");
+		die();
+	};	
+
+    //Thread.
+	//Alocando memória para a estrutura da thread.
+	t = (void *) malloc( sizeof(struct thread_d) );	
+	
+	if ( (void *) t == NULL )
+	{
+	    printf("pc-create-KiCreateRing0Idle: t \n");
+		die();
+	}else{  
+	    //Indica à qual proesso a thread pertence.
+	    t->process = (void *) KernelProcess;
+	};
+	
+	//Stack.
+	//#bugbug
+	//estamos alocando uma stack dentro do heap do kernel.
+	//nesse caso serve para a thread idle em ring 0.
+	ring0IdleStack = (void *) malloc(8*1024);
+	
+	if( (void *) ring0IdleStack == NULL )
+	{
+	    printf("pc-create-KiCreateRing0Idle: ring0IdleStack\n");
+		die();
+	};
+  	
+	//@todo: object
+	
+    //Identificadores      
+	t->tid = 3;  
+
+    //
+    //  ## Current idle thread  ##
+    //
+	
+	// #importante:
+	// Quando o sistema estiver ocioso, o scheduler 
+	// deve acionar a idle atual.
+	//current_idle_thread = (int) t->tid; 
+	
+	t->ownerPID = (int) KernelProcess->pid;         
+	t->used = 1;
+	t->magic = 1234;	
+	t->name_address = (unsigned long) ThreadName;   //Funciona.
+	
+	t->process = (void *) KernelProcess;
+	
+	t->plane = BACKGROUND;
+	
+	t->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
+	
+	
+	for ( r=0; r<8; r++ ){
+		t->wait_reason[r] = (int) 0;
+	}	
+
+	
+	//Procedimento de janela.
+    
+	t->procedure = (unsigned long) &system_procedure;	
+	
+	t->window = NULL;      // arg1.
+	t->msg = 0;            // arg2.
+	t->long1 = 0;          // arg3.
+	t->long2 = 0;          // arg4.	
+
+    //Características.	
+	t->type = TYPE_SYSTEM;  
+	t->state = INITIALIZED; 
+
+	t->base_priority = KernelProcess->base_priority;  //básica.   
+  	t->priority = t->base_priority;                   //dinâmica.
+	
+	t->iopl = RING0;
+	t->saved = 0;
+	t->preempted = PREEMPTABLE;    //PREEMPT_NAOPODE; //nao pode.	
+	
+	// Não precisamos de um heap para  thread idle por enquanto.
+	//t->Heap;
+	//t->HeapSize;
+	//t->Stack;
+	//t->StackSize;
+
+	//Temporizadores.
+	t->step = 0;
+	t->quantum = QUANTUM_BASE;
+	t->quantum_limit = QUANTUM_LIMIT;	
+   
+    //Contadores.
+	t->standbyCount = 0;
+	t->runningCount = 0;    //Tempo rodando antes de parar.
+	t->readyCount = 0;      //Tempo de espera para retomar a execução.
+	
+	
+	t->initial_time_ms = get_systime_ms();
+	t->total_time_ms = 0;
+	
+	//quantidade de tempo rodadndo dado em ms.
+	t->runningCount_ms = 0;
+	
+	t->ready_limit = READY_LIMIT;
+	t->waitingCount  = 0;
+	t->waiting_limit = WAITING_LIMIT;
+	t->blockedCount = 0;    //Tempo bloqueada.		
+	t->blocked_limit = BLOCKED_LIMIT;
+	
+
+	t->ticks_remaining = 1000;
+	
+	//signal
+	//Sinais para threads.
+	t->signal = 0;
+	t->signalMask = 0;
+	
+	//Context.
+	t->ss  = 0x10 | 0;               
+	t->esp = (unsigned long) ( ring0IdleStack + (8*1024) );  //pilha. 
+	
+	// #bugbug 
+	// Problemas nos bits 12 e 13.
+	// Queremos que esse código rode em ring0.
+	
+	t->eflags = 0x0200;  
+	
+	t->cs = 8 | 0;                                
+	t->eip = (unsigned long) xxxRing0Idle; 	                                               
+	t->ds = 0x10 | 0;
+	t->es = 0x10 | 0;
+	t->fs = 0x10 | 0; 
+	t->gs = 0x10 | 0; 
+	t->eax = 0;
+	t->ebx = 0;
+	t->ecx = 0;
+	t->edx = 0;
+	t->esi = 0;
+	t->edi = 0;
+	t->ebp = 0;	
+	//...
+	
+	//O endereço incial, para controle.
+	t->initial_eip = (unsigned long) t->eip; 		
+	
+	//#bugbug
+	//Obs: As estruturas precisam já estar decidamente inicializadas.
+	//IdleThread->root = (struct _iobuf *) file_root;
+	//IdleThread->pwd  = (struct _iobuf *) file_pwd;	
+
+	//CPU stuffs.
+	//t->cpuID = 0;              //Qual processador.
+	//t->confined = 1;           //Flag, confinado ou não.
+	//t->CurrentProcessor = 0;   //Qual processador.
+	//t->NextProcessor = 0;      //Próximo processador. 
+	
+	//Coloca na lista de estruturas.
+	threadList[3] = (unsigned long) t;
+	
+	t->Next = NULL;
+	
+	//
+	// Running tasks.
+	//
+	
+	// #bugbug
+	// Se deixarmos de criar alguma das threads esse contador falha.
+	// #todo: Deveríamos apenas incrementá-lo.
+	
+	//ProcessorBlock.threads_counter = 4;
+	ProcessorBlock.threads_counter++;
+	
+    queue_insert_data (queue, (unsigned long) t, QUEUE_INITIALIZED);
+    
+	// * MOVEMENT 1 (Initialized --> Standby).
+	SelectForExecution (t);    
+    
+	return (void *) t;
+}
+
+
+
+/*
+ * fork: 
+ *
+ * @todo:
+ *     Semelhante ao unix, isso deve criar um processo filho fazendo uma cópia 
+ * dos parâmetros presentes no PCB do processo pai. Um tipo de clonagem. 
+ * Depois obviamente a imagem do processo filho será carregada em um endereço 
+ * físico diferente da imagem do processo pai.
+ * Essa não precisa ser a rotina, pode ser apenas uma interface, que chama a 
+ * rotina dofork() e outras se necessário.
+ *
+ */
+
+int fork (){
+	
+    //struct process_t *p;
+	
+	//p = (void *) processList[current_process];
+	
+	//...
+	
+	//dofork();
+	
+//done:	
+
+	//return (int) p->pid;
+	return (int) 0;    //Ainda não implementada. 
+};
+
+ 
+
+
+/*
+ * KiFork:
+ *    Inicio do módulo interno que chama a função fork.
+ *    Isso é uma interface para a chamada à rotina fork.
+ *    @todo: As funções relativas às rotinas de fork
+ *           podem ir para um arquivo que será compilado junto com o kernel.
+ *           ex: fork.c
+ */
+
+int KiFork (){
+	
+	//@todo Criar interface
+	
+	return (int) fork();
+};
+
+
+
+
+
 
 
 
