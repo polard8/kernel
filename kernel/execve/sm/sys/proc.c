@@ -941,24 +941,24 @@ system_procedure ( struct window_d *window,
 					//#test
 					if ( window->isButton == 1 )
 					{
-						//se é o minimize da parent.
-						//if ( window == window->parent->minimize )
-						//{
-			            //     printf (" MINIMIZE \n"); 
-			            //     refresh_screen();								
-						//}
-						//if ( window == window->parent->maximize )
-						//{
-			            //     printf (" MAXIMIZE \n"); 
-			            //     refresh_screen();								
-						//}
-						//if ( window == window->parent->close )
-						//{
-			            //     printf (" CLOSE \n"); 
-			            //     refresh_screen();								
-						//}
-					}
+						//lembrando: temos que mandar uma mensagem para a thread 
+						// com uma ação dependendo do botão.
 					
+					    //#test
+                        update_button ( (struct button_d *) window->button,
+                            (unsigned char *) window->button->string,
+                            (int) window->button->style,
+                            (int) BS_PRESS,
+                            (int) window->button->type,
+                            (unsigned long) window->button->x, 
+                            (unsigned long) window->button->y, 
+                            (unsigned long) window->button->width, 
+                            (unsigned long) window->button->height, 
+                            (unsigned long) window->button->color );
+						
+						redraw_button ( (struct button_d *) window->button );
+						show_window_rect (window);					
+					}
 					break;
 					
 				case 2:

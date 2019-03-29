@@ -22,10 +22,9 @@
 #include <kernel.h>
 
 
-					
+//atualizando as características do botão antes de repintá-lo					
 void 
-updateButton ( struct window_d *window,
-               struct button_d *button,
+update_button ( struct button_d *button,
                unsigned char *string,
                int style,
                int state,
@@ -36,21 +35,24 @@ updateButton ( struct window_d *window,
                unsigned long height, 
                unsigned long color )
 {
+	
+	struct window_d *window;
+	
     if ( (void *) button == NULL )
     {
-		//printf ("updateButton\n");
+		//printf ("update_button\n");
 	    return;	
 		
 	}else{
 		
 		if ( button->used != 1 || button->magic != 1234 )
 		{
-			//printf ("updateButton validation\n");
+			//printf ("update_button validation\n");
 		    return;	
 		}
 		
 		//tratar isso no futuro.
-		//button->window = (struct window_d *) window;
+		window = button->window;
 		
 		button->string = (unsigned char *) string;
 		
@@ -300,6 +302,113 @@ void *draw_button ( struct window_d *window,
 	
 	//Retornando o ponteiro para a estrutura do botão.
     return (void *) b;          
+}
+
+
+//repintar o botão com base nas características encontradas na estrutura.
+int redraw_button ( struct button_d *button )
+{
+	//int Focus; //(precisa de borda)
+	//int Selected;
+	//unsigned long border1;
+    //unsigned long border2;
+	
+	struct window_d *w;
+	
+	if ( (void *) button == NULL )
+	{
+		return 1;	
+	}else{
+	
+		//pega a janela.
+	    w = button->window;
+			
+		if ( (void *) w == NULL )
+		{
+			return 1;
+		}else{
+		
+		    if ( w->used != 1 || w->magic != 1234 )
+			{
+				return 1;
+			}
+		}	
+	}
+	
+	
+    //bg
+	drawDataRectangle ( w->left + button->x, 
+					    w->top + button->y, 
+	                    button->width, 
+					    button->height, 
+					    button->color );	
+	
+	
+	//board1, borda de cima e esquerda.
+	drawDataRectangle ( w->left + button->x, 
+					    w->top + button->y, 
+	                    button->width, 
+					    1, 
+					    button->border1 );
+	
+	drawDataRectangle ( w->left + button->x, 
+					    w->top + button->y, 
+	                    1, 
+					    button->height, 
+					    button->border1 );
+
+	//board2, borda direita e baixo.
+	drawDataRectangle ( w->left + button->x + button->width -1, 
+					    w->top + button->y, 
+		                1, 
+					    button->height, 
+					    button->border2 );
+	
+	
+	drawDataRectangle ( w->left + button->x, 
+					    w->top + button->y + button->height -1, 
+		                button->width, 
+					    1, 
+					    button->border2 );	
+	
+	
+	
+    //usado para calcular o tamanho de uma string.
+     size_t tmp_size = (size_t) strlen ( (const char *) button->string );
+	
+	//if ( tmp_size > (width/8) )
+	//{
+	//    printf("fail");
+	//}
+	
+	//(a largura do botão menos a largura da string)/2
+	unsigned long offset = ( ( (unsigned long) button->width - ( (unsigned long) tmp_size * (unsigned long) gcharWidth) ) / 2 );
+	
+	//button label								   
+    if (button->selected == 1)
+	{
+	    draw_string ( w->left + button->x +offset, 
+					  w->top + button->y +8, 
+			          COLOR_WHITE, 
+					  button->string );	
+			
+    }else{
+		
+		//b->width
+		//b->height
+		
+		// (window->left +x) left 
+		// (largura do botão, menos a largura da string)/2
+
+	    draw_string ( w->left + button->x +offset, 
+					  w->top  + button->y +8, 
+			          COLOR_TERMINALTEXT, 
+					  button->string );	
+			
+	};
+	
+	
+	return 0;
 }
 
 

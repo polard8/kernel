@@ -688,7 +688,7 @@ void mouseHandler (){
 			//precisamos checar a validade da estrutura antes de usa-la.
 			
 			//#importante:
-			//isso apaga o que pintamos na janela, o valou foi salvo logo abaixo.
+			//isso apaga o que pintamos na janela, o valor foi salvo logo abaixo.
 			
 			if ( (void *) Window != NULL ){
 				
@@ -978,10 +978,29 @@ void mouseHandler (){
 					
 				    //botão.
 					//#provisório ...
+					//Isso é um sinalizador quando mouse passa por cima.
+					//#test: Vamos tentar modificar as características do botão.
+					
 			        if ( Window->isButton == 1 )
 				    {    
-			            bmpDisplayCursorBMP ( fileIconBuffer, Window->left, Window->top );	
-			        };
+						//isso funciona.
+			            //bmpDisplayCursorBMP ( fileIconBuffer, Window->left, Window->top );	
+			        
+					    //#test
+                        update_button ( (struct button_d *) Window->button,
+                            (unsigned char *) Window->button->string,
+                            (int) Window->button->style,
+                            (int) BS_HOVER,
+                            (int) Window->button->type,
+                            (unsigned long) Window->button->x, 
+                            (unsigned long) Window->button->y, 
+                            (unsigned long) Window->button->width, 
+                            (unsigned long) Window->button->height, 
+                            (unsigned long) Window->button->color );
+						
+						redraw_button ( (struct button_d *) Window->button );
+						show_window_rect (Window);
+					};
 				
 				    //não botão.
 				    //if ( Window->isButton == 0 )

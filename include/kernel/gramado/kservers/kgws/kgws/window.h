@@ -1874,6 +1874,19 @@ set_up_text_color( unsigned char forecolor,
                    unsigned char backcolor );
 							
 
+				   
+void 
+update_button (  struct button_d *button,
+               unsigned char *string,
+               int style,
+               int state,
+               int type,
+               unsigned long x, 
+               unsigned long y, 
+               unsigned long width, 
+               unsigned long height, 
+               unsigned long color );
+				 
 //Button.
 void *draw_button ( struct window_d *window,
                     unsigned char *string,
@@ -1885,20 +1898,8 @@ void *draw_button ( struct window_d *window,
                     unsigned long width, 
                     unsigned long height, 
                     unsigned long color );
-				   
-void 
-updateButton ( struct window_d *window,
-               struct button_d *button,
-               unsigned char *string,
-               int style,
-               int state,
-               int type,
-               unsigned long x, 
-               unsigned long y, 
-               unsigned long width, 
-               unsigned long height, 
-               unsigned long color );
-				 
+
+int redraw_button ( struct button_d *button );
 
 // Focus support.
 void SetFocus( struct window_d *window );

@@ -107,6 +107,7 @@ int show_saved_window (struct window_d *window){
  *     Mostra o retângulo de uma janela que está no backbuffer.
  *     Tem uma janela no backbuffer e desejamos enviar ela para o frontbuffer.
  *     A rotina de refresh rectangle tem que ter o vsync
+ *     #todo: criar um define chamado refresh_window.
  */
 
 int show_window_rect (struct window_d *window){
