@@ -21,6 +21,13 @@ int gwsClose();
 // Registrar um window manager.
 int gwsRegisterWindowManager( int pid );
 
+
+unsigned long
+kgws_mouse_dialog ( struct window_d *window,
+				    int msg,
+				    unsigned long long1,
+				    unsigned long long2 );
+
 int init_gui ();
 
 void gramado();

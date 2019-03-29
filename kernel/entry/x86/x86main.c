@@ -910,98 +910,17 @@ int x86main ( int argc, char *argv[] ){
     // Loading file tests.
     //
 
-
-   // void *b;
-
-
-   /*
-    //===================================
-    // @todo: loads a bmp.
-    //
-    //janela de test
-    CreateWindow( 1, 0, 0, "Fred-BMP-Window", 
-                  (30-5), (450-5), (128+10), (128+10), 
-                  gui->main, 0, COLOR_WINDOW, COLOR_WINDOW); 
-    // testing BMP support 32KB
-    b = (void*) malloc(512*1024);
-    //#bugbug checar a validade do buffer
-
-    unsigned long fileret;
-
-    //taskswitch_lock();
-    //scheduler_lock();
-    fileret = fsLoadFile( "FREDNORABMP", (unsigned long) b);
-    if(fileret != 0)
-    {
-        //escrevendo string na janela
-        draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FREDNORA BMP FAIL");  	
-    }
-    bmpDisplayBMP( b, 30, 450, 128, 128 );
-    //scheduler_unlock();
-    //taskswitch_unlock();
-
-    //===================================
-    */
-
-    /*
-      * esse teste funcionou.
-    //
-    // testando a alocação de páginas.
-    //
-
-    printf("main: testing page allocator\n");
-
-    // isso substitui o malloc.
-    b = (void*) newPage();
-    if( (void *) b == NULL ){
-        printf("main: newPage: buffer:");
-        refresh_screen();
-        while(1){}
-    }
-
-    unsigned long fileret;
-    fileret = fsLoadFile( "INIT    TXT", (unsigned long) b);
-    if(fileret != 0)
-    {
-        //escrevendo string na janela
-        draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "INIT.TXT FAIL");
-    }else{
-
-        printf("%s",b);
-        refresh_screen();
-        while(1){}
-    }
-
-    //#debug
-    printf("main: debug done");
-    refresh_screen();
-    while(1){}
-
-    */
+/*
+    //#obs: me parece que isso vai funcionar sem problemas.
 	
-	/*
-	
-	// TESTANDO SALVAR UM ARQUIVO ...
-    //?? stdin ??
-	
-	char file_1[] = "Isso é um arquivo de teste ..... \n testando salvar um arquivo!:)";
-	
-	char file_name[] = "savetest.txt";
-	write_fntos( (char *) file_name );
-	
+	// 2MB --
+    void *__buffer = (void *) allocPages ( 512 );
 
-    //
-    //  ## Save ##
-    //
+    fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
+	    "GRAMADO BMP", (unsigned long) __buffer );
 	
-	fsSaveFile( file_name,  // Nome. 
-	            3,          // Quantidade de setores.
-				255,        // Tamanho do arquivo dado em bytes.     
-				file_1,     // Buffer onde está o arquivo.
-				0x20 );     // Tipo de entrada. 0x20=arquivo.
-				
-				
-	*/
+	 bmpDisplayBMP ( (char *) __buffer, 0, 0 );  
+*/
 	
     
 	// #Aviso:

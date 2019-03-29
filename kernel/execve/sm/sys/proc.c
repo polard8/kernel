@@ -928,45 +928,13 @@ system_procedure ( struct window_d *window,
 		// o teste sera para o click do mouse.
 		// no nosso teste esse click é tratado pelo aplicativo,
 		// mas a mesnagem chegará aqui para tratarmos os botões gerenciados pelo servidor kgws.	
+			
+		//#importante
+		//vamos tratar aqui vários eventos de mouse.
+			
 		case 30:
-			//qual botão do mouse?
-			switch (long1)
-			{
-				//botão 1	
-				case 1:
-			        //#debug
-			        printf ("system_procedute: mouse keydown, window name %s \n",window->name); 
-			        refresh_screen();	
-					
-					//#test
-					if ( window->isButton == 1 )
-					{
-						//lembrando: temos que mandar uma mensagem para a thread 
-						// com uma ação dependendo do botão.
-					
-					    //#test
-                        update_button ( (struct button_d *) window->button,
-                            (unsigned char *) window->button->string,
-                            (int) window->button->style,
-                            (int) BS_PRESS,
-                            (int) window->button->type,
-                            (unsigned long) window->button->x, 
-                            (unsigned long) window->button->y, 
-                            (unsigned long) window->button->width, 
-                            (unsigned long) window->button->height, 
-                            (unsigned long) window->button->color );
-						
-						redraw_button ( (struct button_d *) window->button );
-						show_window_rect (window);					
-					}
-					break;
-					
-				case 2:
-					break;
-					
-				case 3:
-					break;
-			}
+		case 31:
+			return (unsigned long) kgws_mouse_dialog ( window, msg, long1, long2 );
 			break;
 			
 			
