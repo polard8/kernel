@@ -1,7 +1,7 @@
 /*
  * File: sm/sys/proc.c
  *
- *     System Procedure.
+ *     System Procedure. talvez isso possa pertencer ao servidor kgws.
  *
  *     ****   Central de diálogo.   ****
  *
@@ -928,6 +928,14 @@ system_procedure ( struct window_d *window,
 		// o teste sera para o click do mouse.
 		// no nosso teste esse click é tratado pelo aplicativo,
 		// mas a mesnagem chegará aqui para tratarmos os botões gerenciados pelo servidor kgws.	
+			
+		//#todo
+		//temos que criar alguma coisa que indique o o botão é um controle
+		//e de qual janela ela é um controle.
+		//>>por enquanto vamos olhar na estrutura de sua janela mão
+		//se existe um indicativo de que o botão é um dos 3 controles padrão.
+		//min,max,close
+			
 		case 30:
 			//qual botão do mouse?
 			switch (long1)
@@ -941,23 +949,79 @@ system_procedure ( struct window_d *window,
 					//#test
 					if ( window->isButton == 1 )
 					{
-						//lembrando: temos que mandar uma mensagem para a thread 
-						// com uma ação dependendo do botão.
-					
-					    //#test
-                        update_button ( (struct button_d *) window->button,
-                            (unsigned char *) window->button->string,
-                            (int) window->button->style,
-                            (int) BS_PRESS,
-                            (int) window->button->type,
-                            (unsigned long) window->button->x, 
-                            (unsigned long) window->button->y, 
-                            (unsigned long) window->button->width, 
-                            (unsigned long) window->button->height, 
-                            (unsigned long) window->button->color );
+						// lembrando: 
+						// temos que mandar uma mensagem para a thread 
+						// com uma ação dependendo do botão.				
+						//window->parent janela mãe.
 						
-						redraw_button ( (struct button_d *) window->button );
-						show_window_rect (window);					
+						//se o botão é o controle minimize da janela mãe.
+						if ( window->parent->minimizebuttonUsed == 1 )
+						{	
+							if ( window->parent->minimize == window )
+							{
+							    printf (" >>> MINIMIZE BUTTON \n");
+					            refresh_screen();
+                                update_button ( (struct button_d *) window->button,
+                                    (unsigned char *) window->button->string,
+                                    (int) window->button->style,
+                                    (int) BS_PRESS,
+                                    (int) window->button->type,
+                                    (unsigned long) window->button->x, 
+                                    (unsigned long) window->button->y, 
+                                    (unsigned long) window->button->width, 
+                                    (unsigned long) window->button->height, 
+                                    (unsigned long) window->button->color );
+						
+						        redraw_button ( (struct button_d *) window->button );
+						        show_window_rect (window);
+							}
+						}
+						
+						if ( window->parent->maximizebuttonUsed == 1 )
+						{	
+							if ( window->parent->maximize == window )
+							{
+							    printf (" >>> MAXIMIZE BUTTON \n");
+					            refresh_screen();
+                                update_button ( (struct button_d *) window->button,
+                                    (unsigned char *) window->button->string,
+                                    (int) window->button->style,
+                                    (int) BS_PRESS,
+                                    (int) window->button->type,
+                                    (unsigned long) window->button->x, 
+                                    (unsigned long) window->button->y, 
+                                    (unsigned long) window->button->width, 
+                                    (unsigned long) window->button->height, 
+                                    (unsigned long) window->button->color );
+						
+						        redraw_button ( (struct button_d *) window->button );
+						        show_window_rect (window);
+							}
+						}
+						
+						if ( window->parent->closebuttonUsed == 1 )
+						{	
+							if ( window->parent->close == window )
+							{
+							    printf (" >>> CLOSE BUTTON \n");
+					            refresh_screen();
+                                update_button ( (struct button_d *) window->button,
+                                    (unsigned char *) window->button->string,
+                                    (int) window->button->style,
+                                    (int) BS_PRESS,
+                                    (int) window->button->type,
+                                    (unsigned long) window->button->x, 
+                                    (unsigned long) window->button->y, 
+                                    (unsigned long) window->button->width, 
+                                    (unsigned long) window->button->height, 
+                                    (unsigned long) window->button->color );
+						
+						        redraw_button ( (struct button_d *) window->button );
+						        show_window_rect (window);
+							}
+						}
+						
+						//...
 					}
 					break;
 					

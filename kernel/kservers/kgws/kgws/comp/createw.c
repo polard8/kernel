@@ -608,7 +608,7 @@ void *CreateWindow ( unsigned long type,
 		//ESTAMOS SUSPENDENDO O USO DE JANELA MAE ... PARA TESTAR NA GIGABYTE/INTEL
 		
 		//Parent support
-		//window->parent = (void *) Parent;
+		window->parent = (void *) Parent;
 		
 		// Isso impede que acessemos um ponteiro nulo.
 		//if ( (void *) Parent != NULL )
@@ -1194,7 +1194,7 @@ void *CreateWindow ( unsigned long type,
 
 			
 			RegisterWindow (windowButton2);
-			window->minimize = windowButton2;
+			window->maximize = windowButton2;
 	    }
 	
 	    if (CloseButton == 1)
