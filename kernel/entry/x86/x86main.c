@@ -910,17 +910,13 @@ int x86main ( int argc, char *argv[] ){
     // Loading file tests.
     //
 	
-	//2MB
-    void *dennis_buffer = (void *) allocPages ( 512 );
+	// 2MB --
+    void *__buffer = (void *) allocPages ( 512 );
 
-    fsLoadFile ( VOLUME1_FAT_ADDRESS, 
-				 VOLUME1_ROOTDIR_ADDRESS, 
-	             "DENNIS  BMP", 
-                 (unsigned long) dennis_buffer );
+    fsLoadFile ( VOLUME1_FAT_ADDRESS, VOLUME1_ROOTDIR_ADDRESS, 
+	    "GRAMADO BMP", (unsigned long) __buffer );
 	
-	 bmpDisplayBMP ( (char *) dennis_buffer, 0, 0 ); 
-	
- 
+	 bmpDisplayBMP ( (char *) __buffer, 0, 0 ); 
  
 	
     

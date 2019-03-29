@@ -23,6 +23,14 @@ int gwsRegisterWindowManager( int pid );
 
 int init_gui ();
 
+
+//diálogo para suportar eventos de mouse.
+unsigned long
+kgws_mouse_dialog ( struct window_d *window, 
+				    int msg, 
+				    unsigned long long1, 
+				    unsigned long long2 );
+
 void gramado();
 int init_gramado();
 
