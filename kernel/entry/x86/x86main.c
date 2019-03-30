@@ -199,6 +199,8 @@ void x86mainStartFirstThread ( int n ){
     //timerInit8253 ( HZ );
 	timerInit8253 ( 800 );
 	
+    
+	clear_nt_flag ();    
 	
     // #debug
     printf ("Go to user mode!\n");
@@ -227,8 +229,6 @@ void x86mainStartFirstThread ( int n ){
 	unsigned char *buff3 = (unsigned char *) 0x004A0000;	
 		
 	
-	clear_nt_flag ();
-	
 	//init
     if (n == 1 )
     {
@@ -241,14 +241,19 @@ void x86mainStartFirstThread ( int n ){
 		    die ();
 	    }
         
+
+        
         //Set cr3 and flush TLB.
         mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
         asm ("movl %cr3, %eax");
 	    //#todo: delay.
         asm ("movl %eax, %cr3");        
+
+        printf (">>> IRET\n");
+        refresh_screen ();         		
 		
-		asm volatile ( " sti  \n"			  
-			           " mov $0x23, %ax  \n"
+		//" cli  \n" retiramos isso
+		asm volatile ( " mov $0x23, %ax  \n"
                        " mov %ax, %ds    \n"
                        " mov %ax, %es    \n"
                        " mov %ax, %fs    \n"
@@ -256,7 +261,7 @@ void x86mainStartFirstThread ( int n ){
 					   " pushl $0x23  \n"              // ss.
                        " movl $0x0044FFF0, %eax  \n"   // esp 
 					   " pushl %eax    \n"             // esp.
-                       " pushl $0x3297 \n"             // eflags.
+                       " pushl $0x3200 \n"             // eflags.
                        " pushl $0x1B    \n"            // cs.
                        " pushl $0x00401000 \n"         // eip. 
 	                   " movb $0x20, %al   \n"
@@ -276,6 +281,9 @@ void x86mainStartFirstThread ( int n ){
 		    die ();
 	    }		
 	
+        printf (">>> IRET\n");
+        refresh_screen ();         
+        
         //Set cr3 and flush TLB.
         mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
         asm ("movl %cr3, %eax");
@@ -311,6 +319,9 @@ void x86mainStartFirstThread ( int n ){
 		    die ();
 	    }
 
+        printf (">>> IRET\n");
+        refresh_screen ();         
+        
         //Set cr3 and flush TLB.
         mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
         asm ("movl %cr3, %eax");

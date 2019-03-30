@@ -54,6 +54,9 @@ void faults ( unsigned long number ){
 	// pois já foi feito antes.
 	
 	asm ("cli");
+    
+    printf ("\n *FAULTS: \n\n");
+    
 	
 	//
 	//   ## Thread ##
@@ -66,43 +69,48 @@ void faults ( unsigned long number ){
 	
 	if( (void *) t == NULL )
 	{
-		printf ("x86fault: struct, no current thread\n");
+		printf ("x86fault: FAIL, struct, no current thread\n");
 		//printf ("No current thread\n");
 		goto fail;
-	}
 	
-	
-	// Válida.
-	
-	if( (void *) t != NULL )
-	{
-	    //Salva o contexto se a tarefa já esteve rodando.
-	    if( ProcessorBlock.threads_counter >= 1 && 
-		    t->step > 0 )
+    // Válida.
+    }else{
+        
+	    // Salva o contexto se a tarefa já esteve rodando.
+	    // #bugbug
+        // Devemos salvar também quando ainda não rodou, pois
+        // podemos errar na inicialização da thread.
+        
+        /* 
+        if ( ProcessorBlock.threads_counter >= 1 && 
+		     t->step > 0 )
 		{
-            //printf("faults: Saving context\n");
-			save_current_context();    
+            // #importante
+            // pegamos o contexto de variáveis globais e colocamos na estrutura
+            // para poder exibí-los
+            // Tem que salvar.
+            
+            printf ("faults: Saving context\n");
+			save_current_context ();    
 	    }
+        */
+        
+        printf ("faults: Saving context\n");
+		save_current_context ();            
+        
+	    printf ("Number={%d}\n", number);               
+
+	    printf ("TID %d Step %d \n", current_thread, t->step );				
+	    printf ("Running Threads %d \n", ProcessorBlock.threads_counter );        
+        
+        //printf ("Init Phase %d \n", KeInitPhase);
+	    //printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
+        
 	};
 	
-	//
-    //  ## Messages ##
-	//
+    // OPÇÃO. 
+	// KiInformation ();
 	
-	printf ("\n *FAULTS: \n\n");
-	
-	printf ("Number={%d}\n", number);               
-
-	printf ("TID %d Step %d \n", current_thread, t->step );				
-	printf ("Running Threads %d \n", ProcessorBlock.threads_counter );
-
-    printf ("Init Phase %d \n", KeInitPhase);
-	printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
-	
-	//#test
-	//isso é provisorio ...
-	//é bom para nosso teste na máquina real.
-	KiInformation ();
 	
 	// Mostra erro de acordo com o número.
 	
@@ -136,7 +144,8 @@ void faults ( unsigned long number ){
 		//PAGE FAULT
 		//Obs: é o contrário de page hit.
 	    case 14:
-		    do_pagefault();
+            printf ("PF\n");
+		    do_pagefault ();
 		    break;
 	    
 	    default:			
@@ -150,6 +159,7 @@ void faults ( unsigned long number ){
 	// # Flags #
 	//
 	
+    /*
 	if( fatal_error_flag == 1 ){
         
 		// We can't do anything else.
@@ -163,28 +173,30 @@ void faults ( unsigned long number ){
 		// Uma thread falhou, então fechamos ela e vamos tentar continuar.
 		goto tryagain;
 	};
+    */
 	
     //
 	// * DIE.
 	//
 	
 done:	
-    printf("done");
-    die();
+    //printf("done");
+    //die();
 	
 fail:
-    printf("# FAIL #");
-    die();	
+    //printf("# FAIL #");
+    //die();	
 	
 tryagain:
+    printf ("*HANG\n");
     //refresh_screen();
 	
 	// #debug
 	// Não estamos continuando por enquanto pois 
 	// ainda estamos iplementando isso.
-	die();
+	die ();
     
-	return;	
+	//return;	
 };
 
 
@@ -201,29 +213,25 @@ void KiCpuFaults ( unsigned long number ){
  ******************************
  * do_pagefault:
  *     14 PAGE FAULT.
- *     Obs: Podemos apenas fechar a thread atual e 
- * retomar o sistema.
- * 
+ *     Obs: Podemos apenas fechar a thread atual e retomar o sistema.
  */
  
 void do_pagefault (){
-	
-	
-//Setup:	
-
+    
 	unsigned long page_fault_address;
 	
 	// We can't close idle thread.
 	// Se a thread que apresentou problemas foi a idle.
 	// uma opção é tentar recriá-la.
 	
+    /*
 	if ( current_thread == idle )
 	{
 		printf("do_pagefault: We can't close idle thread \n");
 		fatal_error_flag = 1;
 		goto fail;
 	};
-	
+	*/
 	
 	//
 	// #importante
@@ -247,27 +255,37 @@ void do_pagefault (){
 	
 	//Page Fault Linear Address (PFLA).
 	page_fault_address = (unsigned long) get_page_fault_adr();
+
+	printf(" >>> Address={%x}\n", (unsigned long) page_fault_address);
 	
+    //
+    // Mostra registradores.
+    //
+    
+    mostra_reg (current_thread);
+	mostra_slots ();
+	
+	/*
 	// Se o endereço for igual a 0 é porque o eip está perdido.
 	// Devemos fechar a thread.
 	if( page_fault_address == 0 )
 	{
-		printf("Killing thread %d \n" ,current_thread );
-	    kill_thread( current_thread );
-        current_thread = idle;
+		//tentando apenas terminar a thread, se isso for possível.
+		printf ("Killing thread %d \n" ,current_thread );
+		kill_thread ( current_thread );
+		current_thread = idle;
         thread_failed_flag = 1;
+		
 		goto done;		
 	}
-	
-	printf("Address={%x}\n", (unsigned long) page_fault_address);
-	mostra_reg(current_thread);
-	mostra_slots();
+	*/
 	
 	//@todo alert.
-	printf("do_pagefault: @todo: alloc page.\n");
+	//printf("do_pagefault: #todo: alloc page.\n");
 	
 done:	
 	return;
+	
 fail:
     return;
 }

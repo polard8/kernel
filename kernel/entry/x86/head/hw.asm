@@ -750,7 +750,7 @@ _irq15:
 ;++ 
 unhandled_irq:
     cli
-	push ax
+	push eax
 	
     ;pushad 
 	mov al, 0x20
@@ -758,18 +758,19 @@ unhandled_irq:
     out 0xA0, al  
     ;popad
     
-	pop ax
+	pop eax
 	sti 
     iretd
 ;--
 
 
-;---------------------------------------------
-;
-; #FAULTS 
-; 
+;;
+;; ================ # FAULTS # ================ 
+;;
+
+
 ; Tratamento das faltas.
-;
+
 
 extern _faults
 
@@ -879,7 +880,7 @@ _fault_GP:
     jmp all_faults	
 
 ;
-; int 14
+; int 14 - Page Fault (PF).
 global _fault_N14
 _fault_N14:
 	mov dword [save_fault_number], dword 14
@@ -1007,16 +1008,16 @@ _fault_N31:
 	
 ;===============================================
 ; all_faults:
-;     As faltas são tratadas em kernel mode, 
-;     tem que ajustar os registradores para isso.
+;     As faltas são tratadas em kernel mode, tem que ajustar 
+; os registradores para isso.
+;     
+; #todo: 
+; Enviar o número a falta para uma variável global.
+; Essa rotina poderia se chamar hwAllFaults.
 ;
-;   @todo: Enviar o número a falta para uma 
-; variável global.
-; Essa rotina poderia se chamar headlibAllFaults.
-;
+
 all_faults:
-;headlibAllFaults:
-   
+
 	;d,c,b,a
 	mov dword [_contextEDX], edx	
 	mov dword [_contextECX], ecx	
@@ -1042,7 +1043,15 @@ all_faults:
     mov ax, ds
 	mov word [_contextDS], ax	
 		
-	;(DOUBLE), eip,cs,eflags,esp,ss 
+	;(DOUBLE), eip, cs, eflags, esp, ss 
+    
+    ; #bugbug: 
+    ; No caso de der falha no primeiro salto para ring3:
+    ; Pegamos esses valores da pilha.
+    ; Mas precisamos saber se esses valores refletem
+    ; a parte do código que estava executando na hora da falha,
+    ; ou se é o valor configurado antes do primeiro salto para ring3.
+    
 	pop eax
 	mov dword [_contextEIP], eax	
 	pop eax
@@ -1054,6 +1063,10 @@ all_faults:
 	pop eax
 	mov dword [_contextSS], eax		
     
+    ;;
+    ;; Reajustando os segmentos para rodarmos tranquilos em ring0.
+    ;;
+    
 	; Load the Kernel Data Segment descriptor.
     xor eax, eax
 	mov ax, word 0x10   
@@ -1061,7 +1074,18 @@ all_faults:
     mov es, ax
     mov fs, ax
     mov gs, ax
+    
+    ;; ??
+    ;; e a stack, ainda não tínhamos colocado uma configuração de
+    ;; stack aqui.
+    
+    ;; #todo #todo #todo STACK STACK STACK
 	
+    
+    ;;
+    ;; O número da falta.
+    ;;
+    
 	; Chama a rotina em C.
     ;Passa o argumento via pilha.	
 	push dword [save_fault_number]     

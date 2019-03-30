@@ -123,7 +123,7 @@ tss1:
 	dd 0                    ;esi
 	dd 0                    ;edi
 	dd 0x23                 ;es 
-	dd 0x23                 ;cs 
+	dd 0x1B                 ;cs 
 	dd 0x23                 ;ss
 	dd 0x23                 ;ds
 	dd 0x23                 ;fs
