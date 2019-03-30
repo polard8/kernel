@@ -55,19 +55,26 @@ bl_lfb:        db 0
 ; TSS. 
 ;
 
-;
+
+
+;============================================================
 ;tss0
+
+;; #bugbug
+;; o backlink tem 16bit ?? e os outros 16 são reservados ??
+;; ?? o que é isso. ??
+
 dd 0
 dd 0	
 tss0:
 	dd 0x401000             ;back link
-	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço fi'sico.
+	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço físico.
 	dd 0x10                 ;ss0     (ss da pilha do kernel)
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
 	dd 0                    ;esp2
 	dd 0                    ;ss2	
-	dd 0x9C000              ;cr3 
+	dd 0x9C000              ;cr3  #bugbug: Isso deve ser o cr3 do processo em ring3.
 	dd 0x401000             ;eip   
 	dd 0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)	
 	dd 0                    ;eax
@@ -87,22 +94,24 @@ tss0:
 	dw LDT_TEST_SEL, 0	    ;LDT, reserved
 	dw 0, tss0_iopb - tss0  ;debug, IO permission bitmap (none)	
 tss0_iopb:
-    times 8192 db 0FFh    ;@todo: Isso é realmente necessário.
+    times 8192 db 0FFh    ;#bugbug: Isso é realmente necessário.
 tss0_end:
 	
-;
+    
+    
+;=====================================================
 ;tss1
 dd 0
 dd 0
 tss1:		          
-	dd _task0               ;back link  (todo: esse backlink esta errado,precisa ser logico)
-	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço fi'sico.
+	dd 0x401000 ;;_task0               ;back link  #bugbug tá certo isso ??
+	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço físico.
 	dd 0x10                 ;ss0      (ss da pilha do kernel)   
 	dd 0                    ;esp1
 	dd 0                    ;ss1	
 	dd 0                    ;esp2
 	dd 0                    ;ss2	
-	dd 0x9C000              ;cr3 
+	dd 0x9C000              ;cr3 #bugbug: Isso deve ser o cr3 do processo em ring3.
 	dd 0x401000             ;eip   
 	dd 0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)	
 	dd 0                    ;eax

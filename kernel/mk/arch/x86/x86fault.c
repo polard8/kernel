@@ -99,6 +99,11 @@ void faults ( unsigned long number ){
     printf ("Init Phase %d \n", KeInitPhase);
 	printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
 	
+	//#test
+	//isso é provisorio ...
+	//é bom para nosso teste na máquina real.
+	KiInformation ();
+	
 	// Mostra erro de acordo com o número.
 	
     switch (number)

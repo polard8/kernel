@@ -173,11 +173,13 @@ void x86mainStartFirstThread ( int n ){
     IncrementDispatcherCount (SELECT_IDLE_COUNT);
 
 
+    /*
     //Set cr3 and flush TLB.
     mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
     asm ("movl %cr3, %eax");
 	//#todo: delay.
     asm ("movl %eax, %cr3");
+    */
 
 	//
     // turn_task_switch_on:
@@ -238,6 +240,12 @@ void x86mainStartFirstThread ( int n ){
 	        printf ("x86mainStartFirstThread: init .ELF signature");
 		    die ();
 	    }
+        
+        //Set cr3 and flush TLB.
+        mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+        asm ("movl %cr3, %eax");
+	    //#todo: delay.
+        asm ("movl %eax, %cr3");        
 		
 		asm volatile ( " sti  \n"			  
 			           " mov $0x23, %ax  \n"
@@ -251,6 +259,8 @@ void x86mainStartFirstThread ( int n ){
                        " pushl $0x3297 \n"             // eflags.
                        " pushl $0x1B    \n"            // cs.
                        " pushl $0x00401000 \n"         // eip. 
+	                   " movb $0x20, %al   \n"
+                       " outb %al, $0x20   \n"
 					   " iret \n" );
 	};
 	
@@ -266,19 +276,27 @@ void x86mainStartFirstThread ( int n ){
 		    die ();
 	    }		
 	
+        //Set cr3 and flush TLB.
+        mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+        asm ("movl %cr3, %eax");
+	    //#todo: delay.
+        asm ("movl %eax, %cr3");        
+        
         asm volatile (" sti \n"
-                  " mov $0x23, %ax  \n"
-                  " mov %ax, %ds  \n"
-                  " mov %ax, %es  \n"
-                  " mov %ax, %fs  \n"
-                  " mov %ax, %gs  \n"
-                  " pushl $0x23  \n"              // ss.
-                  " movl $0x0049FFF0, %eax  \n"
-                  " pushl %eax  \n"               // esp.
-                  " pushl $0x3200  \n"            // eflags.
-                  " pushl $0x1B  \n"              // cs.
-                  " pushl $0x00451000  \n"        // eip.
-				  " iret \n" );
+                      " mov $0x23, %ax  \n"
+                      " mov %ax, %ds  \n"
+                      " mov %ax, %es  \n"
+                      " mov %ax, %fs  \n"
+                      " mov %ax, %gs  \n"
+                      " pushl $0x23  \n"              // ss.
+                      " movl $0x0049FFF0, %eax  \n"
+                      " pushl %eax  \n"               // esp.
+                      " pushl $0x3200  \n"            // eflags.
+                      " pushl $0x1B  \n"              // cs.
+                      " pushl $0x00451000  \n"        // eip.
+	                  " movb $0x20, %al   \n"
+                      " outb %al, $0x20   \n"
+				      " iret \n" );
 	};
 	
     //taskman
@@ -293,19 +311,27 @@ void x86mainStartFirstThread ( int n ){
 		    die ();
 	    }
 
+        //Set cr3 and flush TLB.
+        mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+        asm ("movl %cr3, %eax");
+	    //#todo: delay.
+        asm ("movl %eax, %cr3");        
+        
         asm volatile (" sti \n"
-                  " mov $0x23, %ax  \n"
-                  " mov %ax, %ds  \n"
-                  " mov %ax, %es  \n"
-                  " mov %ax, %fs  \n"
-                  " mov %ax, %gs  \n"
-                  " pushl $0x23  \n"              // ss.
-                  " movl $0x004FFFF0, %eax  \n"
-                  " pushl %eax  \n"               // esp.
-                  " pushl $0x3200  \n"            // eflags.
-                  " pushl $0x1B  \n"              // cs.
-                  " pushl $0x004A1000  \n"        // eip.
-				  " iret \n" );
+                      " mov $0x23, %ax  \n"
+                      " mov %ax, %ds  \n"
+                      " mov %ax, %es  \n"
+                      " mov %ax, %fs  \n"
+                      " mov %ax, %gs  \n"
+                      " pushl $0x23  \n"              // ss.
+                      " movl $0x004FFFF0, %eax  \n"
+                      " pushl %eax  \n"               // esp.
+                      " pushl $0x3200  \n"            // eflags.
+                      " pushl $0x1B  \n"              // cs.
+                      " pushl $0x004A1000  \n"        // eip.
+	                  " movb $0x20, %al   \n"
+                      " outb %al, $0x20   \n"
+				      " iret \n" );
 	};
 	
 	// Paranoia

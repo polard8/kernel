@@ -237,14 +237,17 @@ void spawn_thread (int id){
     asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eflags) : "%esp");    //eflags.
     asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->cs)     : "%esp");    //cs.
     asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->eip)    : "%esp");    //eip.
+	
 	// EOI and iret.
-	//Obs: Isso suja o registrador eax.
-	//parece que isso é realmente preciso, libera o teclado.
+	// Obs: 
+	// Parece que isso é realmente preciso, libera o teclado.
+	// Isso suja o registrador eax.
+	
 	asm ("movb $0x20, %al \n");
 	asm ("outb %al, $0x20 \n");
 	//asm(" movl $0, %eax \n");
 	
-	asm ("sti  \n"); 
+	//asm ("sti  \n"); 
 	asm ("iret \n");    //Fly!
     
 	panic ("spawn_thread");

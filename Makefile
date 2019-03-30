@@ -11,11 +11,14 @@
 #important
 #We will have a new name just when the release changes.
 
+# 1.2-...
+# Test on real machine.
+
 VERSION = 1
-PATCHLEVEL = 1
+PATCHLEVEL = 2
 SUBLEVEL = 0
-EXTRAVERSION = 0
-NAME = Gato
+EXTRAVERSION = -rc0
+NAME = ?
 
 
 ARCH ?= x86

@@ -59,6 +59,16 @@
 #define CODE_END    0xC00FFFFF   //0x1FFFFFpys  
 #define CODE_SIZE (CODE_END-CODE_START)
 
+
+//
+// #importante
+// Vamos testar outro tamanho de stack para o kernel.
+// Mudaremos de 8KB para 128KB.
+// 0x8000 0x20000
+//
+
+
+
 //
 // ## KERNEL HEAP ##
 //
@@ -69,7 +79,7 @@
 //considerando o kernel de 1 mega
 
 #define KERNEL_HEAP_START  (0xC0000000 + 0x100000)   //kernel start + kernel size.
-#define KERNEL_HEAP_END    (0xC02FFFF0 - 0x8000)     //stack start - stack size
+#define KERNEL_HEAP_END    (0xC02FFFF0 - 0x20000)    //(0xC02FFFF0 - 0x8000)     //stack start - stack size
 #define KERNEL_HEAP_SIZE   (KERNEL_HEAP_END - KERNEL_HEAP_START)
 
 
@@ -82,7 +92,7 @@
 //Obs: O Heap e a Stack estão dentro dos limites de 4MB de
 //tamanho da imagem do kernel base.
 //32kb
-#define KERNEL_STACK_SIZE   0x8000                                      
+#define KERNEL_STACK_SIZE   0x20000  //0x8000                                      
 #define KERNEL_STACK_START  0xC02FFFF0                                        
 #define KERNEL_STACK_END    (KERNEL_STACK_START - KERNEL_STACK_SIZE)  
 
