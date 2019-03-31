@@ -33,12 +33,10 @@ CFLAGS = -m32 \
 	-s
 
 
-LIBC    = ../../../../lib/gdelibs/libc02/include/
-LIBCOBJ = ../../../../lib/gdelibs/libc02/obj
-
-
-API01   = ../../../../lib/gdelibs/api02/include/
-APIOBJ  = ../../../../lib/gdelibs/api02/obj
+LIBC    = ../../../../lib/gramlibs/libc02/include/
+LIBCOBJ = ../../../../lib/gramlibs/libc02/obj
+API01   = ../../../../lib/gramlibs/api02/include/
+APIOBJ  = ../../../../lib/gramlibs/api02/obj
 
 
 GWS    = gws/include/   

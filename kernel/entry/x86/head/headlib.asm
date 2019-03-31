@@ -796,7 +796,8 @@ _asm_reboot:
     jmp _asm_reboot	
 	
     
-;;limpar a flag nt em eflags.    
+;;limpar a flag nt em eflags. 
+;;e d'a refresh na piline.
 global _clear_nt_flag
 _clear_nt_flag:
     push eax
@@ -804,18 +805,16 @@ _clear_nt_flag:
     
     pushfd
     pop eax
-    
     mov ebx, 0x00004000
     not ebx
-    
     and eax, ebx
-    
     push eax
     popfd
     
     pop ebx
     pop eax
     ret
+    
     
 ;
 ; End.

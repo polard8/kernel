@@ -200,16 +200,23 @@ void x86mainStartFirstThread ( int n ){
 	timerInit8253 ( 800 );
 	
     
+    //nesse momento usaremos o mapeamento do processo alvo ..
+    //no mapeamento do processo alvo tambem tem o kernel
+    //entao nao h'a problemas.
+    
+    //Set cr3 and flush TLB.
+    mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+    asm ("movl %cr3, %eax");
+	    //#todo: delay.
+    asm ("movl %eax, %cr3");  
+    
+    
 	clear_nt_flag ();    
 	
     // #debug
     printf ("Go to user mode!\n");
     refresh_screen (); 
-	
-	// ??
-	// parece que isso é realmente preciso, libera o teclado.
-	// outb(0x20,0x20); 
-   
+	   
 	// # go!
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 
 	// para ela via iret.
@@ -241,16 +248,27 @@ void x86mainStartFirstThread ( int n ){
 		    die ();
 	    }
         
-
-        
-        //Set cr3 and flush TLB.
-        mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
-        asm ("movl %cr3, %eax");
-	    //#todo: delay.
-        asm ("movl %eax, %cr3");        
-
         printf (">>> IRET\n");
-        refresh_screen ();         		
+        refresh_screen ();  
+		
+		//#test
+		//vamos usar o ds do kernel para configurar a pilha.
+		//nova pilha de ring0 em conformidade com a tss0; isso porque esp vai mudando com o tempo.
+		asm volatile ( " movl $0x003FFFF0, %esp \n" 
+					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
+                       " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"  // esp 
+                       " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
+                       " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
+                       " movl $0x00401000, %ds:0x00(%esp)  \n"  // eip. 
+                       " movl $0x23, %eax  \n"
+                       " mov %ax, %ds    \n"
+                       " mov %ax, %es    \n"
+                       " mov %ax, %fs    \n"
+                       " mov %ax, %gs    \n"
+					   " movb $0x20, %al   \n"
+                       " outb %al, $0x20   \n"
+					   " iret \n" );		
+		
 		
 		//" cli  \n" retiramos isso
 		asm volatile ( " mov $0x23, %ax  \n"
@@ -258,6 +276,7 @@ void x86mainStartFirstThread ( int n ){
                        " mov %ax, %es    \n"
                        " mov %ax, %fs    \n"
                        " mov %ax, %gs    \n"
+					  
 					   " pushl $0x23  \n"              // ss.
                        " movl $0x0044FFF0, %eax  \n"   // esp 
 					   " pushl %eax    \n"             // esp.

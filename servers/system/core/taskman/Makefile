@@ -40,11 +40,10 @@ CFLAGS = -m32 \
 #	-fleading-underscore \
 
 
-LIBC    = ../../../../lib/gdelibs/libc01/include/
-LIBCOBJ = ../../../../lib/gdelibs/libc01/obj
-
-API01   = ../../../../lib/gdelibs/api01/include/
-APIOBJ  = ../../../../lib/gdelibs/api01/obj
+LIBC    = ../../../../lib/gramlibs/libc01/include/
+LIBCOBJ = ../../../../lib/gramlibs/libc01/obj
+API01   = ../../../../lib/gramlibs/api01/include/
+APIOBJ  = ../../../../lib/gramlibs/api01/obj
 
 	##
 	## Objects
