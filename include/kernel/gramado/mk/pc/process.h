@@ -520,28 +520,21 @@ struct process_d
 	//IOPL of the task. (ring).
 	unsigned long iopl;      
 
-	//PPL - (Process Permition Level).(gdef.h)
-	//Determina as camadas de software que um processo terá acesso irrestrito.	
-	process_permition_level_t ppl;
-
-
-	/*
-	 * Priority.
-	 * ========
-	 * Um processo tem uma prioridade básica estática e também uma prioridade 
-	 * atual dinâmica, que pode ser incrementada ou decrementada. Se afastando 
-	 * ou se aproximando da prioridade básica. Isso acontece no OpenVMS e no NT.
-	 */
+	// Priority.
+	// Um processo tem uma prioridade básica estática e também uma prioridade 
+	// atual dinâmica, que pode ser incrementada ou decrementada. Se afastando 
+	// ou se aproximando da prioridade básica. Isso acontece no OpenVMS e no NT.
+	
 	unsigned long base_priority; //básica. 
 	unsigned long priority;      //dinâmica.
 
 	//Que tipo de scheduler o processo utiliza. (rr, realtime ...).
 	//int scheduler_type;    
-
-	/* 
-	 * Temporização da tarefa. 
-	 */
-
+ 
+	//
+	// Temporização da tarefa. 
+	//
+	
 	unsigned long step;               //Quantas vezes a tarefa usou o processador. 
 	unsigned long quantum;            //thread quantum
 	unsigned long timeout;            //Tempo em modo de espera. 

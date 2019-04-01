@@ -196,7 +196,11 @@ extern void do_executa_new_task();
 #include <kernel/gramado/hal/video.h>
 #include <kernel/gramado/hal/memory.h>
 #include <kernel/gramado/hal/cpu.h>  
+
 #include <kernel/gramado/hal/arch/x86/x86.h> 
+#include <kernel/gramado/hal/arch/x86/x86iv.h> 
+#include <kernel/gramado/hal/arch/x86/x86gdt.h>
+
 #include <kernel/gramado/hal/arch/amd/cpuamd.h>  
 #include <kernel/gramado/hal/arch/detect.h>  
 #include <kernel/gramado/hal/serial.h>        
@@ -660,8 +664,9 @@ struct kernel_d
     //
 
     //int processorCount;
-    //struct processor_descriptor_t *processorListHead;
-
+    //struct tagProcessor *processor;
+    
+	
     //kernel_args_t
     //kernel_classes_t
 

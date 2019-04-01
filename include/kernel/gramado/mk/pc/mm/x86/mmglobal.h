@@ -1,5 +1,5 @@
 /*
- * File: mm\mmglobal.h
+ * File: mm/mmglobal.h
  *
  * Aqui terão globais para gerenciamento de memória.
  * listas páginas e frames.
@@ -31,6 +31,6 @@ struct lfb_d
 
 
 //
-//fim.
+// End.
 //
 

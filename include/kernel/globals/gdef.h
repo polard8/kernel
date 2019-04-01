@@ -250,42 +250,6 @@ typedef enum {
 }object_class_t;
 
 
-/*
- * PPL - (Process Permition Level).
- *
- * Determina as camadas de software que um processo terá acesso
- * irrestrito.
- *
- * + A permissão natural de um processo de usuário é K5. Podendo ele
- * utiliza somente os serviços oferecidos pela camada K5, que é 
- * a mais alta.
- * 
- * + A permissão natural dos módulos do kernel em user mode podem ser
- *   diferente, variando de K0 à K4. Mas nada impede dos módulos
- *   usarem a permissão K5. Um módulo em kernel mode fabricado por usuários
- *   poderiam receber apenas a permissão K5. As outras permissões
- *   seriam concedidas somente com licensa paga, ou para que fabrica
- * o sistema operacional.
- *
- * + Servidores em user mode poderão ter qualquer um dos níveis.
- *   Mas a permissão natural seria K5. As licensas para servidores
- * em user mode são mais baratas.
- *
- *   Obs: Categorizar os servidores de acordo com o nível de permissão
- * pode melhorar a organização do sistema, tendo em vista que as permissões
- * seguem o padrão de classes do sistema, que uma interconexão lógica
- * de dispositivos.
- */
-typedef enum {
-	pplK0, //executive, (ram),sm,uigm,uitm.
-	pplK1, //microkernel,(io),cpu.
-	pplK2, //microkernel,(io),dma.
-	pplK3, //hal,(device),unblocked.
-	pplK4, //hal,(device),blocked.
-	pplK5, //hal,(things).
-}process_permition_level_t; 
-
-
 
 //
 // buffer support

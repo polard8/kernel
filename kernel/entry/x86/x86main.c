@@ -632,9 +632,6 @@ int x86main ( int argc, char *argv[] ){
         panic ("x86main: KernelProcess\n");
 
     }else{
- 
-        processor->CurrentProcess = (void *) KernelProcess;
-        processor->NextProcess = (void *) KernelProcess;
 		
 		fs_initialize_process_pwd ( KernelProcess->pid, "no-directory" ); 
 		

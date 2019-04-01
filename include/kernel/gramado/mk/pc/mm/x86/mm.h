@@ -1,5 +1,5 @@
 /*
- * File: pc/mm/mm.h  
+ * File: mm/mm.h  
  *
  * Descrição:
  *     Header para o Memory Manager. Gerenciamento de memória.
@@ -316,6 +316,7 @@ unsigned long windowzoneSize;
  *     Obs: Um diretório tem ponteiros para page tables. as page tables 
  * funcionam como pools de frames.
  */
+
 typedef struct page_directory_d page_directory_t;
 struct page_directory_d
 {
@@ -374,6 +375,7 @@ unsigned long pagedirectoryList[PAGEDIRECTORY_COUNT_MAX];
  *     Obs: Uma page table funciona como um pool de frames.
  *          Também pode ser compartilhada entre processo.(cuidado).
  */
+
 typedef struct page_table_d page_table_t;
 struct page_table_d
 {
@@ -616,6 +618,7 @@ typedef enum {
  *     Conta os blocos de memória dentro de um heap.
  *     *dentro do heap usado pelo kernel eu acho ?? 
  */
+
 unsigned long mmblockCount;         
  
 
@@ -623,9 +626,11 @@ unsigned long mmblockCount;
 /*
  * Kernel Stack suppport.
  */ 
+
 unsigned long kernel_stack_end;        //va
 unsigned long kernel_stack_start;      //va
 unsigned long kernel_stack_start_pa;   //pa (endereço indicado na TSS).
+
 
 /*
  * process_memory_info_d:
@@ -668,6 +673,7 @@ process_memory_info_t *pmiCurrent;
  *     Informações sobre a memória física.
  *     O arquivo system.h deve usar isso. 
  */
+
 typedef struct physical_memory_info_d physical_memory_info_t;
 struct physical_memory_info_d
 {
@@ -689,6 +695,7 @@ physical_memory_info_t *pmiMemoryInfo;
  *     Informações sobre a memória.
  *     Isso pode ser usado pela configuração do sistema. 
  */
+
 typedef struct memory_info_d memory_info_t;
 struct memory_info_d
 {
@@ -703,6 +710,7 @@ struct memory_info_d
 	unsigned long TotalV;
     unsigned long AvailableV;
 };
+
 memory_info_t *miMemoryInfo;
 //...
 
@@ -845,6 +853,7 @@ struct page_d
     struct page_d *next;	
 };
  
+
 // #importante
 // Pool de memória paginável usado para alocação.
 // Aqui ficam os ponteiros para estrutura do tipo page.
@@ -1116,20 +1125,30 @@ unsigned long memorysizeTotalVirtualMemory;
 unsigned long memorysizeAvailableVirtualMemory;
 
 
-// Tamanho dado em MB.
-#define SMALLSYSTEM_SIZE  (32*1024*1024)
-#define MEDIUMSYSTEM_SIZE (64*1024*1024)
+// Tamanho dado em bytes.
+#define SMALLSYSTEM_SIZE  ( 32*1024*1024)
+#define MEDIUMSYSTEM_SIZE ( 64*1024*1024)
 #define LARGESYSTEM_SIZE  (128*1024*1024)
 
-// Tamanho dado em quantidade de páginas de 4KB.
-#define SMALLSYSTEM_SIZE_PAGES  ( (32*1024*1024) / 4096 )
-#define MEDIUMSYSTEM_SIZE_PAGES ( (64*1024*1024) / 4096 )
+// Tamanho do sistema, dado em KB.
+#define SMALLSYSTEM_SIZE_KB  ( 32*1024)
+#define MEDIUMSYSTEM_SIZE_KB ( 64*1024)
+#define LARGESYSTEM_SIZE_KB  (128*1024)
+
+// #todo
+// Tamanho do sistema, dado em MB.
+//#define SMALLSYSTEM_SIZE_MB  ( 32)
+//#define MEDIUMSYSTEM_SIZE_MB ( 64)
+//#define LARGESYSTEM_SIZE_MB  (128)
+
+
+// Tamanho so sitema, dado em quantidade de páginas de 4KB.
+#define SMALLSYSTEM_SIZE_PAGES  ( ( 32*1024*1024) / 4096 )
+#define MEDIUMSYSTEM_SIZE_PAGES ( ( 64*1024*1024) / 4096 )
 #define LARGESYSTEM_SIZE_PAGES  ( (128*1024*1024) / 4096 )
 
-// Tamanho dado em KB.
-#define SMALLSYSTEM_SIZE_KB  (32*1024)
-#define MEDIUMSYSTEM_SIZE_KB (64*1024)
-#define LARGESYSTEM_SIZE_KB  (128*1024)
+
+
 
 
 //
@@ -1154,12 +1173,17 @@ unsigned long mapping_ahci1_device_address ( unsigned long address );
 
 
 //
-// Directory and Page Tables.
+// Directory.
 //
 
 //deve retornar o endereço do diretório de páginas criado,
 //que é um clone do diretório de páginas do kernel.
-void *CreatePageDirectory();
+void *CreatePageDirectory ();
+
+
+//
+// Page tables.
+//
 
 
 void *CreatePageTable ( unsigned long directory_address, 
@@ -1170,31 +1194,32 @@ void *CreatePageTable ( unsigned long directory_address,
 				
 					   
 //
-// page frame support.
+// 
 //
-
-
 
 int pEmpty (struct page_d *p);
 void freePage (struct page_d *p);
 void notfreePage (struct page_d *p);	
 
-int firstSlotForAList(int size);	
+int firstSlotForAList(int size);
+
+//?? Talvez tenha que mudar de nome.
+//checar se estamos lidando com páginas ou com frames.
 void initializeFramesAlloc();
 
 
 //construtur
 //cria uma estrutura válida de página
 //cujo ponteiro ficará em uma lista.
-void *page();  	
+void *page ();  	
 void *allocPages (int size);
-void *newPage();   //aloca uma página e retorna seu endereço virtual inicial
-void testingPageAlloc();   //@todo: Rotina de teste. deletar.
+void *newPage ();             //aloca uma página e retorna seu endereço virtual inicial
+void testingPageAlloc ();     //@todo: Rotina de teste. deletar.
 
 
 unsigned long 
-virtual_to_physical( unsigned long virtual_address, 
-                     unsigned long dir_address ) ;
+virtual_to_physical ( unsigned long virtual_address, 
+                      unsigned long dir_address ) ;
 					 
 
 //
@@ -1203,22 +1228,19 @@ virtual_to_physical( unsigned long virtual_address,
 
 void show_memory_structs();
 
-
 //mostra as estruturas de pagina usadas para paginação no pagedpool.
 void showFreepagedMemory ( int max );
 
 
 //
-// garbage collection support
+// GC. #test
 //
 
-int gc();
-
-int gcGRAMADO();
-int gcEXECUTIVE();
-int gcMICROKERNEL();
-int gcHAL();
-
+int gc ();
+int gcGRAMADO ();
+int gcEXECUTIVE ();
+int gcMICROKERNEL ();
+int gcHAL ();
 
 
 

@@ -19,15 +19,14 @@
  *
  * oct 2016 - Created.
  */
-void save_current_context();
-void restore_current_context();
 
-int contextCheckThreadRing0Context(int tid);
-int contextCheckThreadRing3Context(int tid); 
-
+void save_current_context ();
+void restore_current_context ();
+int contextCheckThreadRing0Context (int tid);
+int contextCheckThreadRing3Context (int tid); 
 
 
 //
-//
+// End.
 //
 

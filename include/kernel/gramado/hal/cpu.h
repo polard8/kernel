@@ -5,35 +5,14 @@
  *     Header para gerenciamento de cpus.
  *
  *     CPUs em Desktops:
- *         Intel, AMD.
+ *         Intel, AMD, ARM etc ...
  *
- *     CPUs para dispositivos embarcados:
- *         Intel Quark.
- *
- * @todo: boa parte do que está aqui pode ir 
+ * #todo: boa parte do que está aqui pode ir 
  * para /hardware/intel.h e hardware/amd.h
  *
- * 2015 - Fred Nora.
+ * 2015 - Vreated by Fred Nora.
  */
  
-	
- 
-/* 
- * System Modes support.
- */
- 
-#define SI_RM 0    //Real Mode.
-#define SI_PM 1    //Protected Mode.
-#define SI_LM 2    //Long Mode.
-//#define SI_SM 3    //SMM.
-
-
-//values for cpu mode
-//#define	CPU16	1
-//#define	CPU32	2
-//#define	CPU64	3
-
-
 
 /*
  * Processors support.
@@ -42,36 +21,47 @@
 #define Processor_NULL  0 
 #define Processor_INTEL 1
 #define Processor_AMD   2
-//#define Processor_xxxx   3
+//#define Processor_ARM   3
 //...
 
- 
-/*
- * Globais.
- */ 
-  
+
+
+/* 
+ * System Modes support.
+ */
+
+// #todo
+// Esses modos são específicos da arquitetura Intel.
+// Deve mudar de pasta.
+
+#define SI_RM 0    //Real Mode.
+#define SI_PM 1    //Protected Mode.
+#define SI_LM 2    //Long Mode.
+#define SI_SM 3    //SMM.
+
+
+
   
 /*
  * Structures.
  */  
   
+// #bugbug
+// Os elementos dessa estrutura são específicos da Intel
+// ou pertencem à todos os processadores.
   
 //Informações sobre um processador.  
-typedef struct tagProcessor processor_descriptor_t;
 struct tagProcessor   
 {
 	object_type_t objectType;
 	object_class_t objectClass;	
 	
-	//
-	// @todo: Uma das primeiras coisas deve ser as threads 
-	//        de cada processador.
-	//        
-	//
+	// struct validation.
 	
-    //struct _KTHREAD *CurrentThread;
-    //struct _KTHREAD *NextThread;
-    //struct _KTHREAD *IdleThread;	
+	int used;
+	int magic;
+	
+	
 	
 	//@todo: Processor State ???
 	
@@ -190,44 +180,39 @@ struct tagProcessor
 	
 	//unsigned long MemorySize; 
 	
-	//
-	//
-	//
 	
-	//cada processador tem sua gdt, idt, tss.
+	// cada processador tem sua gdt, idt, tss.
+	// #todo usar ponteiro para estrutura.
+	
 	unsigned long Gdt;
 	unsigned long Idt;
 	unsigned long Tss;	
 	
+	//
+    // Threads.
+	//
 	
 	
-    //Threads presentes no processador.
-	int currentId;    //id.
-    int idleId;       //id.
-    int nextId;       //id.
-	
-	//Threads.
 	struct thread_d *IdleThread;       //ponteiro para estrutura.
-	//struct thread_d *ShellThread;       //ponteiro para estrutura. isso nao interessa para o processador
-	//struct thread_d *TaskManThread;       //ponteiro para estrutura. isso nao interessa para o processador	
 	struct thread_d *CurrentThread;    //ponteiro para estrutura.
 	struct thread_d *NextThread;       //ponteiro para estrutura.
-
-	
-	//processos
-	struct process_d *IdleProcess;       //ponteiro para estrutura.
-	struct process_d *CurrentProcess;    //ponteiro para estrutura.
-	struct process_d *NextProcess;       //ponteiro para estrutura.
-
 	
 	//...
+	
+	//
+	// Next.
+	//
+
+    struct tagProcessor *next;	
 };
-processor_descriptor_t *processor; 
+struct tagProcessor *processor;
  
+
 
 //@todo: liberar essa lista. 
 //unsigned long processorList[32]; 
  
+
 
 /*
  * Prototypes.
@@ -235,15 +220,18 @@ processor_descriptor_t *processor;
  
 
 
+int cpu_get_parameters ();
 
 
-//Rotines.
-void init_cpu();
-int cpu_get_parameters();
-int KeTestCPU();   //@todo: Isso deve isr para include/ke.h.
+//#bugbug
+//Esse nome não é apropriado.
+//@todo: Isso deve isr para include/ke.h.
+int KeTestCPU ();   
 
+
+void init_cpu ();
 
 //
-//fim.
+// End.
 //
 

@@ -51,7 +51,16 @@ typedef unsigned int    uint32_t;
 //typedef	long long		  int64_t;
 //typedef	unsigned long long	u_int64_t;
 
+/* Windows CE virtual address */
+typedef uint32_t		vaddr_t;
+typedef uint32_t		vsize_t;
+/* Physical address */
+typedef uint32_t		paddr_t;
+typedef uint32_t		psize_t;
 
+/* kernel virtual address */
+typedef uint32_t		kaddr_t;
+typedef uint32_t	ksize_t;
 
 
 //

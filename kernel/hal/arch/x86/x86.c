@@ -16,6 +16,18 @@
 #include <kernel.h>
 
 
+/*
+static unsigned short
+get_cs(void)
+{
+	unsigned short _v;
+
+	__asm__ ("movw %%cs,%0": "=r" ((unsigned short) _v));
+	return _v;
+}
+*/
+
+
 // habilita as interrupções
 int enable (){
 	
@@ -140,6 +152,63 @@ void cpux86_enable_caches (){
 	__asm volatile ("mov %[cr0], %%cr0" :: [cr0] "r" (cr0) );
 }
  
+
+
+void
+setgate(struct gate_descriptor_d *gd, void *func, int args, int type, int dpl,
+    int sel)
+{
+
+	gd->gd_looffset = (int)func;
+	gd->gd_selector = sel;
+	gd->gd_stkcpy = args;
+	gd->gd_xx = 0;
+	gd->gd_type = type;
+	gd->gd_dpl = dpl;
+	gd->gd_p = 1;
+	gd->gd_hioffset = (int)func >> 16;
+}
+
+void
+unsetgate(struct gate_descriptor_d *gd)
+{
+	gd->gd_p = 0;
+	gd->gd_hioffset = 0;
+	gd->gd_looffset = 0;
+	gd->gd_selector = 0;
+	gd->gd_xx = 0;
+	gd->gd_stkcpy = 0;
+	gd->gd_type = 0;
+	gd->gd_dpl = 0;
+}
+ 
+ 
+void
+setregion(struct region_descriptor_d *rd, void *base, size_t limit)
+{
+
+	rd->rd_limit = (int)limit;
+	rd->rd_base = (int)base;
+}
+
+void
+setsegment(struct segment_descriptor_d *sd, const void *base, size_t limit,
+    int type, int dpl, int def32, int gran)
+{
+
+	sd->sd_lolimit = (int)limit;
+	sd->sd_lobase = (int)base;
+	sd->sd_type = type;
+	sd->sd_dpl = dpl;
+	sd->sd_p = 1;
+	sd->sd_hilimit = (int)limit >> 16;
+	sd->sd_xx = 0;
+	sd->sd_def32 = def32;
+	sd->sd_gran = gran;
+	sd->sd_hibase = (int)base >> 24;
+}
+
+
 
 /*
  ***********************************************
