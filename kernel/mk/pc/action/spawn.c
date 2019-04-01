@@ -108,7 +108,7 @@ void spawn_thread (int id){
 		if ( spawn_Pointer->state != STANDBY )
 		{
             printf ("spawn_thread: State TID={%d}\n", id );
-		    die();
+		    die ();
         };
 
 		

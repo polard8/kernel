@@ -833,9 +833,21 @@ segment .text
 ; OBS:.  A GDT e a IDT estão conveniente em segmento de código.
 ;
 
-;
-; gdt -----------------------------------------------------
-;
+;;
+;; ============================ GDT =====================================
+;;
+
+;;
+;; TYPES:
+;; The TYPE values for these are 
+;;
+;;  >> 0101 for a task gate,          5
+;;  >> D110 for a interrupt gate,     E
+;;  >> D111 for a trap gate,          F
+;;
+;; where D is 1 for 32 bit gate and 0 for a 16 bit gate. 
+;;
+
 
 global _gdt
 _gdt:
@@ -864,7 +876,7 @@ USER_CODE_SEL equ $-_gdt
 	dw 0xFFFF
 	dw 0
 	db 0 
-	db 0xFA  ; 1111b ,ah = ( present|ring3|1 ) , A = CODE
+	db 0xFE   ;;5,E,F ;;A  ; 1111b ,ah  [ ( present|ring3|1 )  A = CODE ]
 	db 0xCF
 	db 0	
 ;Selector 20h - Data, user mode.
@@ -872,7 +884,7 @@ USER_DATA_SEL equ $-_gdt
 	dw 0xFFFF
 	dw 0
 	db 0 
-	db 0xF2   ; 1111b ,2h = ( present|ring3|1 )  , 2 = DATA
+	db 0xF2   ; 1111b ,2h  [ ( present|ring3|1 )  ,  2 = DATA ]
 	db 0xCF
 	db 0
 ;Tem que ter pelo menos uma tss para mudar para user mode, 

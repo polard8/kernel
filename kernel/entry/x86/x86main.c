@@ -81,6 +81,13 @@ static inline void mainSetCr3 ( unsigned long value ){
 
 extern void clear_nt_flag ();
 
+
+/*
+ Returns program control from an exception or interrupt handler 
+ to a program or procedure that was interrupted by an exception, 
+ an external interrupt, or a software-generated interrupt. 
+*/
+
 void x86mainStartFirstThread ( int n ){
 	
 	int i;
@@ -112,6 +119,7 @@ void x86mainStartFirstThread ( int n ){
 	};
 	
 	
+	/*
     if ( (void *) Thread == NULL )
     {
         panic ("x86mainStartFirstThread: Thread\n");
@@ -147,6 +155,8 @@ void x86mainStartFirstThread ( int n ){
         Thread->state = RUNNING;
         queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
     }
+	
+	*/
 
 
 	//Current process.
@@ -250,6 +260,18 @@ void x86mainStartFirstThread ( int n ){
         
         printf (">>> IRET\n");
         refresh_screen ();  
+		
+		//#debug.
+        //vamos mostrar as informaçoes da primeira thread sempre..
+        //quando falhar,veremos se ha algo de diferente.
+        mostra_slot ( (int) Thread->tid );
+        mostra_reg  ( (int) Thread->tid );
+        refresh_screen ();
+             
+		//#test
+        //isso funcionou ...vamos usar isso sempre.
+		KiSpawnTask ( (int) Thread->tid );
+		die ();
 		
 		//#test
 		//vamos usar o ds do kernel para configurar a pilha.

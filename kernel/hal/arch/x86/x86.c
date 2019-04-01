@@ -17,6 +17,100 @@
 
 
 /*
+#define NSLOTS(sz)	\
+	(((sz) - DYNSEL_START) / sizeof(union descriptor))
+#define NDYNSLOTS	NSLOTS(MAXGDTSIZ)
+*/
+
+#define NDYNSLOTS 8
+
+typedef struct {
+	
+	//bool busy[NDYNSLOTS];
+	int busy[NDYNSLOTS];
+	size_t nslots;
+	
+} gdt_bitmap_t;
+
+/* bitmap of busy slots */
+static gdt_bitmap_t gdt_bitmap;
+
+
+/*
+//pega
+static int
+gdt_get_slot(void);
+static int
+gdt_get_slot(void)
+{
+	size_t i;
+
+	//KASSERT(mutex_owned(&cpu_lock));
+
+	for (i = 0; i < gdt_bitmap.nslots; i++) 
+	{
+		if (!gdt_bitmap.busy[i]) 
+		{
+			gdt_bitmap.busy[i] = true;
+			return (int)i;
+		}
+	}
+	
+	panic ("gdt_get_slot: out of memory");
+
+	// NOT REACHED
+	return 0;
+}
+*/
+
+/*
+//libera
+static void
+gdt_put_slot(int slot);
+static void
+gdt_put_slot(int slot)
+{
+	//KASSERT(mutex_owned(&cpu_lock));
+	//KASSERT(slot < gdt_bitmap.nslots);
+	gdt_bitmap.busy[slot] = false;
+}
+*/
+
+/*
+int
+tss_alloc(const struct i386tss *tss);
+int
+tss_alloc(const struct i386tss *tss)
+{
+	int slot;
+
+	//mutex_enter(&cpu_lock);
+	slot = gdt_get_slot();
+	setgdt(slot, tss, sizeof(struct i386tss) + IOMAPSIZE - 1,
+	    SDT_SYS386TSS, SEL_KPL, 0, 0);
+	//mutex_exit(&cpu_lock);
+
+	return GDYNSEL(slot, SEL_KPL);
+}
+*/
+
+/*	
+void
+tss_free(int sel);	
+void
+tss_free(int sel)
+{
+
+	//mutex_enter(&cpu_lock);
+	gdt_put_slot(IDXDYNSEL(sel));
+	//mutex_exit(&cpu_lock);
+}
+*/
+
+
+
+
+/*
 static unsigned short
 get_cs(void)
 {

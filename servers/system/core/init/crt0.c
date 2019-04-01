@@ -38,6 +38,12 @@ extern int main ( int argc, char *argv[] );
 void crt0 (){
 	
     int ExitCode;	
+	
+	
+	// #debug
+	// Para certificarmos que o primeiro salto ocorreu, vamos
+	// pedir para o kernel imprimir uma mensagem.
+	system_call ( 69,0,0,0);
 
 	// Inicializando o suporte a alocação dinâmica de memória.
 	// Inicializando o suporte ao fluxo padrão.
