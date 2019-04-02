@@ -105,6 +105,8 @@ void faults ( unsigned long number ){
         
         //printf ("Init Phase %d \n", KeInitPhase);
 	    //printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
+		
+		refresh_screen();
         
 	};
 	

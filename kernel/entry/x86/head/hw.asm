@@ -77,11 +77,57 @@ extern _current_process_pagedirectory_address
 ;; IRQ 0. 
 ;; Handler da interrupção do timer.
 ;;
+
+xxx_magic_count:
+    dd 0
+
+xxx_first_thread:
+
+   mov dword [xxx_magic_count], 4321
+
+   xor eax, eax
+
+   ;;ss
+   mov ax, word 0x23
+   mov ds, word ax
+   mov es, word ax
+   mov fs, word ax
+   mov gs, word ax
+   push eax
+   
+   ;;esp
+   mov eax, dword 0x0044FFF0
+   push eax
+   
+   ;;eflags
+   mov eax, dword 0x3200
+   push eax
+
+   xor eax, eax
+   
+   ;;cs
+   mov ax, word 0x1B
+   push eax
+
+   ;;eip
+   mov eax, dword 0x401000
+   push eax
+
+   iret
+   
+ 
+    
 global _irq0
 _irq0:
 
     cli	
-	
+
+
+	;;#test
+	;cmp dword [xxx_magic_count], 0
+	;je xxx_first_thread
+
+
 	;; ?? Exite algum código de erro antes do EIP ??
 	
 	;

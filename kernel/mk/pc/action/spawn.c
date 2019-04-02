@@ -188,14 +188,10 @@ void spawn_thread (int id){
 	IncrementDispatcherCount (SELECT_INITIALIZED_COUNT);
 	
 	
-	// #todo
-	// setup cr3.
-	// flush pipeline
+	//Set cr3 and flush TLB.
 	
-	// setup cr3.
 	spawnSetCr3 ( (unsigned long) spawn_Pointer->DirectoryPA );
 	
-	// flush pipeline
 	asm ("movl %cr3, %eax");
 	asm ("nop");
 	asm ("nop");

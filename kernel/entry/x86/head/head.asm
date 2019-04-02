@@ -513,8 +513,17 @@ mboot_end:
     ; so that it has an RPL of 3, not zero.
     ;     Load 0x2B into the task state register.
  	;
+	
+	;;
+	;; #importante
+	;; Coloca o endereço da TSS na entrada da GDT
+	;;
+	
+	;;isso ja foi configurado.(103)
+	;;mov word [gdt6], tss0_end - tss0 - 1  
+	
 	mov eax, dword tss0
-	mov word [gdt6], tss0_end - tss0 - 1
+	
 	mov [gdt6 + 2], ax
 	shr eax, 16
 	mov [gdt6 + 4], al
@@ -876,7 +885,7 @@ USER_CODE_SEL equ $-_gdt
 	dw 0xFFFF
 	dw 0
 	db 0 
-	db 0xFE   ;;5,E,F ;;A  ; 1111b ,ah  [ ( present|ring3|1 )  A = CODE ]
+	db 0xF8   ;;0xFE   ;;5,E,F ;;A  ; 1111b ,ah  [ ( present|ring3|1 )  A = CODE ]
 	db 0xCF
 	db 0	
 ;Selector 20h - Data, user mode.
@@ -892,11 +901,11 @@ USER_DATA_SEL equ $-_gdt
 ;Selector 28h - Tss.
 TSS_DATA_SEL equ $-_gdt	
 gdt6:
-    dw 103
+    dw 104 ;;103
     dw 0
     db 0
-    db 89h 
-    db 0
+    db 0x89 ;;0x89   ;; presente, ring0(onde esta a tss??), s=0(segmento do sistema) /  ;;89h ((Present|Executable|Accessed)) 1001  bit3=32bitcode
+    db 0x10
     db 0
 ;Selector 30h - Ldt.
 LDT_TEST_SEL equ $-_gdt

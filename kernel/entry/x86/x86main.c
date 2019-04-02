@@ -119,7 +119,7 @@ void x86mainStartFirstThread ( int n ){
 	};
 	
 	
-	/*
+   /*
     if ( (void *) Thread == NULL )
     {
         panic ("x86mainStartFirstThread: Thread\n");
@@ -155,8 +155,8 @@ void x86mainStartFirstThread ( int n ){
         Thread->state = RUNNING;
         queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
     }
-	
 	*/
+	
 
 
 	//Current process.
@@ -215,6 +215,7 @@ void x86mainStartFirstThread ( int n ){
     //entao nao h'a problemas.
     
     //Set cr3 and flush TLB.
+	//isso não é necessário se chamarmos spawn ela faz isso.
     mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
     asm ("movl %cr3, %eax");
 	    //#todo: delay.
@@ -261,17 +262,22 @@ void x86mainStartFirstThread ( int n ){
         printf (">>> IRET\n");
         refresh_screen ();  
 		
-		//#debug.
-        //vamos mostrar as informaçoes da primeira thread sempre..
-        //quando falhar,veremos se ha algo de diferente.
-        mostra_slot ( (int) Thread->tid );
-        mostra_reg  ( (int) Thread->tid );
-        refresh_screen ();
-             
-		//#test
-        //isso funcionou ...vamos usar isso sempre.
-		KiSpawnTask ( (int) Thread->tid );
-		die ();
+		if ( (void *) Thread != NULL )
+		{
+		    //#debug.
+            //vamos mostrar as informaçoes da primeira thread sempre..
+            //quando falhar,veremos se ha algo de diferente.
+            mostra_slot ( (int) Thread->tid );
+            mostra_reg  ( (int) Thread->tid );
+            refresh_screen ();
+		
+            //isso funcionou ...vamos usar isso sempre.
+		    KiSpawnTask ( (int) Thread->tid );
+		    die ();
+		}
+         
+		printf (">>> FAIL\n");
+        die();
 		
 		//#test
 		//vamos usar o ds do kernel para configurar a pilha.
