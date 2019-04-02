@@ -78,57 +78,10 @@ extern _current_process_pagedirectory_address
 ;; Handler da interrupção do timer.
 ;;
 
-xxx_magic_count:
-    dd 0
-
-xxx_first_thread:
-
-   mov dword [xxx_magic_count], 4321
-
-   xor eax, eax
-
-   ;;ss
-   mov ax, word 0x23
-   mov ds, word ax
-   mov es, word ax
-   mov fs, word ax
-   mov gs, word ax
-   push eax
-   
-   ;;esp
-   mov eax, dword 0x0044FFF0
-   push eax
-   
-   ;;eflags
-   mov eax, dword 0x3200
-   push eax
-
-   xor eax, eax
-   
-   ;;cs
-   mov ax, word 0x1B
-   push eax
-
-   ;;eip
-   mov eax, dword 0x401000
-   push eax
-
-   iret
-   
- 
-    
 global _irq0
 _irq0:
 
     cli	
-
-
-	;;#test
-	;cmp dword [xxx_magic_count], 0
-	;je xxx_first_thread
-
-
-	;; ?? Exite algum código de erro antes do EIP ??
 	
 	;
 	;stack
@@ -208,32 +161,6 @@ _irq0:
 	;ts.c
 	call _KiTaskSwitch 	    
 
-
-;;.PageDirectoryStuff:		
-	
-	;;
-	;; O page diretory do processo atual foi salvo em uma variável.
-	;; e agora o registrador CR3 será configurado.
-	;; @todo: #bugbug: Implementar isso com cuidado.
-	;; Obs: 
-	;; Isso é bem perigoso. 
-	;; O diretório para o processo precisa estar devidamente criado. Por isso 
-	;; rotinas de automação na criação e rotinas de checagem são necessárias.
-    ;;
-    ;; HACK HACK
-    ;; Até o momento, o único diretório válido é o do kernel. Então vai ele 
-	;; mesmo.
-	;;
-	
-	;;Endereço do diretório de páginas do processo kernel.
-	;;mov eax, dword 0x0009C000  	
-	
-	;;@todo: #bugbug
-	;;Endereço do diretório de páginas do processo atual.
-	;mov eax, dword [_current_process_pagedirectory_address]  
-	
-	;; CR3.
-	;;mov cr3, eax
 
     ;;
 	;; Flush TLB.
@@ -341,7 +268,7 @@ dummy_flush:
 	mov eax, dword [_contextEAX]    ;eax. (Acumulador).	
 	
 	;( Não precisa 'sti', pois as flags da pilha habilitam as interrupções ).
-	sti
+	;sti
 	
 ;;.Fly:
     ;;
@@ -357,6 +284,7 @@ dummy_flush:
 ;     Despacha o contexto salvo.
 ;     Retorna para a tarefa interrompida através de iret.
 ;	
+
 global _dispatch_context	
 _dispatch_context:
 	
@@ -381,11 +309,6 @@ _dispatch_context:
 	mov ebx, dword [_contextEBX]    ;ebx.
 	mov ecx, dword [_contextECX]    ;ecx.
 	mov edx, dword [_contextEDX]    ;edx.
-
-	;
-    ;EOI - sinal
-    mov al, 20h
-    out 20h, al   
 	
 	;
 	;stack
@@ -394,9 +317,14 @@ _dispatch_context:
 	push dword [_contextEFLAGS]    ;eflags.
 	push dword [_contextCS]        ;cs.
 	push dword [_contextEIP]       ;eip.
-	
+
+	;
+    ;EOI - sinal
+    mov al, 20h
+    out 20h, al   
+
 	;(Não precisa 'sti', pois as flags da pilha habilitam as interrupções ).
-	sti	
+	;sti	
 	iretd	
 
 
@@ -413,27 +341,21 @@ _timer_test:
 	sti
 	iretd
 	
-	
-;-----------------------------------------------------
-; _enter_user_mode - executando a task0 em user mode.
-;	
-global _enter_user_mode	
-_enter_user_mode:	    
-    jmp $	;cancelada @todo deletar.
+		
 
-
-	
-;-------------------------------------------------------
-; _exec_new_task: 
-;     Executa uma nova tarefa com o contexto criado manualmente.
+;--------------------------------------- 
+; timer_interrupt:
+;    Timer interrupt handler.
+;    Provisório.
 ;
-;++ 
-global _exec_new_task 
-_exec_new_task:
-	ret
-;--	
- 
-	
+timer_interrupt:
+    jmp unhandled_irq
+	jmp $
+
+
+
+
+;;; ????????
 		
 _currentTask:
     dd 0
@@ -444,23 +366,7 @@ _stackPointers:
 	
 
 
-;---------------------------------------
-; _ChangeTasks:
-;    ;cancelada ?? @todo: #bugbug
-;	
-_ChangeTasks:
-    jmp $ 
-    ;iretd
 
-
-;--------------------------------------- 
-; timer_interrupt:
-;    Timer interrupt handler.
-;    Provisório.
-;
-timer_interrupt:
-    jmp unhandled_irq
-	jmp $
 
 	
 ;========================================
@@ -513,12 +419,21 @@ _irq1:
 	pop eax
 	;popad
 	
+	
+    ; send EOI to XT keyboard
+    ;in      al, 061h
+    ;mov     ah, al
+    ;or      al, 080h
+    ;out     061h, al
+    ;mov     al, ah
+    ;out     061h, al	
+	
 	;
 	;OBSERVAÇÃO: O EOI foi chamado na rotina teclado_handler_main().
 	;
 	
 	MOV AL, 020h
-	OUT 0A0h, AL
+	;OUT 0A0h, AL
 	OUT 020h, AL
 
     sti	
@@ -541,8 +456,9 @@ _irq3:
 	
 	;call _second_serial_port_Handler
 	mov al, 0x20
+    ;out 0xA0, al  
     out 0x20, al
-    out 0xA0, al  
+
 	
 	popad
 	sti
@@ -560,10 +476,10 @@ _irq4:
 	
 	;call _first_serial_port_Handler
 	mov al, 0x20
-    out 0x20, al
-    out 0xA0, al  
+    ;out 0xA0, al  
+    out 0x20, al	
 	
-	popad
+    popad
 	sti
     iretd	
 
@@ -595,8 +511,9 @@ _irq7:
 	
 	;call _first_parallel_port_Handler
 	mov al, 0x20
+    ;out 0xA0, al  
     out 0x20, al
-    out 0xA0, al  
+
 	
 	popad
 	sti
@@ -616,8 +533,9 @@ _irq8:
 	call _KiRtcIrq
 	
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
+    out 0x20, al
+
 	
 	popad
 	sti
@@ -639,8 +557,9 @@ _irq9:
 	
 	;call _acpiHandler
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
+    out 0x20, al
+
 	
 	popad
 	sti
@@ -657,12 +576,32 @@ _irq10:
 	
 	;call _KiPciHandler1
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
+    out 0x20, al
+
 	
 	popad
 	sti
     iretd
+	
+	
+;;===============================================	
+extern _xxxe1000handler
+
+global _nic_handler	
+_nic_handler:
+    cli
+	pushad
+	
+	call _xxxe1000handler
+	
+	mov al, 0x20
+    out 0xA0, al  
+    out 0x20, al
+	
+	popad
+	sti
+    iretd	
 	
 	
 ;=======================================	
@@ -677,8 +616,9 @@ _irq11:
 	;call _KiPciHandler2
 	
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
+    out 0x20, al
+
 	
 	popad
 	sti
@@ -704,8 +644,9 @@ _irq12:
 	call _mouse_handler
 	
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
+    out 0x20, al
+
 	
 	pop ss
 	pop gs 
@@ -715,6 +656,7 @@ _irq12:
 	
 	popad
 	sti
+
     iretd
 	
 	
@@ -723,6 +665,7 @@ _irq12:
 ; CPU co-processor  or  integrated floating point unit  
 ; or  inter-processor interrupt (use depends on OS)
 ;
+
 global _irq13
 _irq13:
     cli
@@ -730,8 +673,9 @@ _irq13:
 	
 	;call _coprocessorHandler
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
+    out 0x20, al
+
 	
 	pop ax
 	sti
@@ -781,12 +725,13 @@ _irq15:
 	
 	call _diskATAIRQHandler2
 	
-	MOV AL,020h
-	OUT 0A0h,AL
-	OUT 020h,AL
+	MOV AL, 020h
+	OUT 0A0h, AL
+	OUT 020h, AL
 	
 	POP AX
 	sti
+
 	IRETD
 
 
@@ -794,18 +739,19 @@ _irq15:
 ; unhandled_irq:
 ;     Interrupção de hardware genérica. 
 ;++ 
+
 unhandled_irq:
+
     cli
 	push eax
-	
-    ;pushad 
+
 	mov al, 0x20
-    out 0x20, al
     out 0xA0, al  
-    ;popad
-    
+    out 0x20, al
+
 	pop eax
 	sti 
+
     iretd
 ;--
 
@@ -1061,6 +1007,10 @@ _fault_N31:
 ; Enviar o número a falta para uma variável global.
 ; Essa rotina poderia se chamar hwAllFaults.
 ;
+
+;; Pushing an error code (for some exceptions): 
+;; For some specific exceptions such as page faults, 
+;; the CPU pushes an error code, which describes the cause of the exception.
 
 all_faults:
 

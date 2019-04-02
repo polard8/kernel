@@ -887,7 +887,14 @@ USER_CODE_SEL equ $-_gdt
 	db 0 
 	db 0xF8   ;;0xFE   ;;5,E,F ;;A  ; 1111b ,ah  [ ( present|ring3|1 )  A = CODE ]
 	db 0xCF
-	db 0	
+	db 0
+	
+        ;dw     0xffff
+        ;dw     0x0000
+        ;db     0x00
+        ;dw     11011111b *256 +11111010b
+        ;db     0x00	
+	
 ;Selector 20h - Data, user mode.
 USER_DATA_SEL equ $-_gdt
 	dw 0xFFFF
@@ -896,6 +903,13 @@ USER_DATA_SEL equ $-_gdt
 	db 0xF2   ; 1111b ,2h  [ ( present|ring3|1 )  ,  2 = DATA ]
 	db 0xCF
 	db 0
+
+        ;dw     0xffff
+        ;dw     0x0000
+        ;db     0x00
+        ;dw     11011111b *256 +11110010b
+        ;db     0x00
+	
 ;Tem que ter pelo menos uma tss para mudar para user mode, 
 ;senão da falta.
 ;Selector 28h - Tss.

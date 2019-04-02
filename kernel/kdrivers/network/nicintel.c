@@ -591,7 +591,9 @@ void e1000_setup_irq (){
 	
 	//Essa é a rotina em assembly que cria uma entrada na idt para 
     //o nic, com base nas variáveis que são importadas pelo assembly.
-	//headlib.s
+	
+	//headlib.asm
+	//deveria ir para hwlib.asm
 	
 	extern void asm_nic_create_new_idt_entry();
 	

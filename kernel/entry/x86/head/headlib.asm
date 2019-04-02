@@ -81,7 +81,7 @@ tss0:
 	dd 0                    ;ecx
 	dd 0                    ;edx
 	dd 0                    ;ebx	
-	dd 0x43ffff             ;esp   (stack em user mode)
+	dd 0x0044FFF0  ;;0x43ffff             ;esp   (stack em user mode)
 	dd 0                    ;ebp
 	dd 0                    ;esi
 	dd 0                    ;edi
@@ -118,7 +118,7 @@ tss1:
 	dd 0                    ;ecx
 	dd 0                    ;edx
 	dd 0                    ;ebx	
-	dd 0x43ffff             ;esp (stack em user mode)
+	dd 0x0044FFF0  ;;0x43ffff             ;esp (stack em user mode)
 	dd 0                    ;ebp
 	dd 0                    ;esi
 	dd 0                    ;edi
@@ -494,23 +494,7 @@ _asm_nic_create_new_idt_entry:
 	ret 
 	
 	
-;;===============================================	
-extern _xxxe1000handler
-
-global _nic_handler	
-_nic_handler:
-    cli
-	pushad
 	
-	call _xxxe1000handler
-	
-	mov al, 0x20
-    out 0x20, al
-    out 0xA0, al  
-	
-	popad
-	sti
-    iretd		
 
 ;====================================================
 ; _do_executa_new_task:

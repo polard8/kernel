@@ -119,7 +119,10 @@ void x86mainStartFirstThread ( int n ){
 	};
 	
 	
-   /*
+   
+    
+    
+    /*
     if ( (void *) Thread == NULL )
     {
         panic ("x86mainStartFirstThread: Thread\n");
@@ -155,13 +158,15 @@ void x86mainStartFirstThread ( int n ){
         Thread->state = RUNNING;
         queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
     }
-	*/
 	
-
-
 	//Current process.
 	current_process = Thread->process->pid;
-	
+	*/
+    
+    
+    
+    
+    
     //
 	// Done!
     //
@@ -182,14 +187,6 @@ void x86mainStartFirstThread ( int n ){
 
     IncrementDispatcherCount (SELECT_IDLE_COUNT);
 
-
-    /*
-    //Set cr3 and flush TLB.
-    mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
-    asm ("movl %cr3, %eax");
-	//#todo: delay.
-    asm ("movl %eax, %cr3");
-    */
 
 	//
     // turn_task_switch_on:
@@ -212,7 +209,7 @@ void x86mainStartFirstThread ( int n ){
     
     //nesse momento usaremos o mapeamento do processo alvo ..
     //no mapeamento do processo alvo tambem tem o kernel
-    //entao nao h'a problemas.
+    //entao nao há problemas.
     
     //Set cr3 and flush TLB.
 	//isso não é necessário se chamarmos spawn ela faz isso.
@@ -270,7 +267,11 @@ void x86mainStartFirstThread ( int n ){
             mostra_slot ( (int) Thread->tid );
             mostra_reg  ( (int) Thread->tid );
             refresh_screen ();
-		
+		 
+            //printf (">>> WHILE\n");
+            //while(1){
+            //    asm("sti");
+            //}
             //isso funcionou ...vamos usar isso sempre.
 		    KiSpawnTask ( (int) Thread->tid );
 		    die ();

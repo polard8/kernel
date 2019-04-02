@@ -412,8 +412,7 @@ _second:
 ;==================================
 ; CMOS_GET_DATE:
 ;     Pega Hora, Minuto e Segundo.
-;
-;
+
 global _CMOS_GET_DATE	
 _CMOS_GET_DATE:
     
