@@ -197,7 +197,24 @@ void spawn_thread (int id){
 	asm ("nop");
 	asm ("nop");
 	asm ("nop");
-    asm ("movl %eax, %cr3");			
+    asm ("movl %eax, %cr3");
+	
+	
+	
+	//#bugbug
+	//mensagem e refesh screeen dao problema nesse momento.
+	//vamos tentar atualizar a gdt sem emitir mensagem.
+	
+	
+	//#test
+	//printf ("Test ");	
+	//printf ("updating gdt ...");
+	//refresh_screen();
+	
+	init_gdt ();
+	
+	//while(1){}	
+	
 	
 	
     // Spiritual quote:
@@ -212,9 +229,7 @@ void spawn_thread (int id){
                   " mov %ax, %fs \n"
                   " mov %ax, %gs \n");
 				 
-				 
-	
-    //unsigned long argc = 1234;	
+	//unsigned long argc = 1234;	
 	//#test
     //Tentando enviar linha de comando para crt0 ou main() do aplicativo.	
 	//#importante: O aplicativo não pode ler uma string que esteja escrito 

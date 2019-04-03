@@ -54,8 +54,9 @@ bl_lfb:        db 0
 ;
 ; TSS. 
 ;
-
-
+;;como se a task fantasma estivesse em ring0.
+ring0_ghost_task:
+    jmp $
 
 ;============================================================
 ;tss0
@@ -67,7 +68,7 @@ bl_lfb:        db 0
 dd 0
 dd 0	
 tss0:
-	dd 0x401000             ;back link
+	dd 0 ;;0x401000             ;back link
 	dd 0x003FFFF0           ;esp0    (pilha do kernel), endereço físico.
 	dd 0x10                 ;ss0     (ss da pilha do kernel)
 	dd 0                    ;esp1
@@ -75,8 +76,8 @@ tss0:
 	dd 0                    ;esp2
 	dd 0                    ;ss2	
 	dd 0x9C000              ;cr3  #bugbug: Isso deve ser o cr3 do processo em ring3.
-	dd 0x401000             ;eip   
-	dd 0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)	
+	dd ring0_ghost_task         ;0x401000             ;eip   
+	dd 0x00000200 ;0x00003200           ;eflags  (CPL = 3, interrupções habilitadas)	
 	dd 0                    ;eax
 	dd 0                    ;ecx
 	dd 0                    ;edx
@@ -85,12 +86,12 @@ tss0:
 	dd 0                    ;ebp
 	dd 0                    ;esi
 	dd 0                    ;edi
-	dd 0x23                 ;es 
-	dd 0x1B                 ;cs 
-	dd 0x23                 ;ss
-	dd 0x23                 ;ds
-	dd 0x23                 ;fs
-	dd 0x23                 ;gs 
+	dd 0x10 ;0x23                 ;es 
+	dd 0xB  ;0x1B                 ;cs 
+	dd 0x10 ;0x23                 ;ss
+	dd 0x10 ;0x23                 ;ds
+	dd 0x10 ;0x23                 ;fs
+	dd 0x10 ;0x23                 ;gs 
 	dw LDT_TEST_SEL, 0	    ;LDT, reserved
 	dw 0, tss0_iopb - tss0  ;debug, IO permission bitmap (none)	
 tss0_iopb:

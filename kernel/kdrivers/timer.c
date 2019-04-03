@@ -122,6 +122,17 @@ void timer ();
  
 void KiTimer (){
 	
+	//#debug
+	//vamos checar se o primeiro iret está trazendo
+	//o fluxo para cá.
+	//quando não houver falha vai fazer uma bagunça...
+	//mas no caso de falha vai ficar limpo.
+	//também podemos usar o debug via porta serial.
+	//kprintf ("#debug KiTimer ");
+	//refresh_screen();
+	//refresh_screen();
+	//while(1){}
+	
 	timer ();
 }
 

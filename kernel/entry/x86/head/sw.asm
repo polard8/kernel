@@ -99,7 +99,7 @@ _int100:
 
 	
  
-;---------------------------------
+;======================================
 ; _int128:  0x80
 ;    Interrupção de SISTEMA. (padrão).
 ;
@@ -120,15 +120,14 @@ extern _gde_services
 global _int128
 _int128:  
 
+;;_system_call:
 	cli 
-	pushad 
-	
-	;@todo:
-	;New arguments.
-	;push dword ebp    ;arg7.
-	;push dword edi    ;arg6.
-    ;push dword esi    ;arg5.
-	
+	;pushad 
+    
+    push ds
+    push es
+    push fs
+
     ;Argumentos.	
     push dword edx    ;arg4.
     push dword ecx    ;arg3. 
@@ -141,19 +140,20 @@ _int128:
 	
 	mov dword [.int128Ret], eax    
     
+;; ret_from_interrupt:
+;; resume_userspace:
+
 	;Argumentos.
 	pop eax	
     pop ebx
     pop ecx
     pop edx 
 	
-	;@todo:
-	;New arguments.	
-	;pop esi 
-	;pop edi 
-	;pop ebp
-	
-	popad	
+    pop fs
+    pop es
+    pop ds
+
+	;popad	
 	mov eax, dword [.int128Ret] 
 	sti
 	iretd

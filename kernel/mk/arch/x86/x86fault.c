@@ -55,7 +55,7 @@ void faults ( unsigned long number ){
 	
 	asm ("cli");
     
-    printf ("\n *FAULTS: \n\n");
+    printf ("\n *FAULTS: totalticks=%d \n\n",sys_time_ticks_total);
     
 	
 	//

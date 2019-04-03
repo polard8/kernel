@@ -133,7 +133,10 @@ _irq0:
 	mov ds, ax
 	mov es, ax
 	mov fs, ax  ;*   
-	mov gs, ax  ;*              
+	mov gs, ax  ;*   
+	
+	;;#todo
+	;;E a pilha em ring 0?? ss
 	
     ; Chama as rotinas em C.
 	; As rotinas em executarão serviços oferecidos pelo kernel
@@ -144,12 +147,7 @@ _irq0:
 	; em c novamente. Então desabilitaremos a rechamada dessas funções
 	; enquanto elas estivere em execução e habilitaremos novamnete ao sairmos delas.
 	
-;;.TimerStuff:	
-
-	;chamada à modulo externo.
-	;Talvez podemos colocar as rotinas do timer fora do kernel base.
-	;Então essa chamada será uma opção.
-	;call _KeTimer            	
+;;.TimerStuff:	           	
 
 	;Chamada ao módulo interno.
 	;Para essa chamada as rotinas do timer estão dentro do kernel base.

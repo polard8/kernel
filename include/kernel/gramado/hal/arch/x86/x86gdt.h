@@ -9,6 +9,56 @@
 //#define MAXGDTSIZ 65536
 //??
 
+//índices na gdt
+#define GNULL_SEL	0	/* Null descriptor */
+#define GCODE_SEL	1	/* Kernel code descriptor */
+#define GDATA_SEL	2	/* Kernel data descriptor */
+#define GUCODE_SEL	3	/* User code descriptor */
+#define GUDATA_SEL	4	/* User data descriptor */
+#define GTSS_SEL	5   //tss
+#define GLDT_SEL	6   /* Default LDT descriptor */
+
+
+
+
+#define SEL_KPL	0	/* kernel privilege level */
+#define SEL_UPL	3	/* user privilege level */
+
+/* system segments and gate types */
+#define SDT_SYSNULL	 0	/* system null */
+#define SDT_SYS286TSS	 1	/* system 286 TSS available */
+#define SDT_SYSLDT	 2	/* system local descriptor table */
+#define SDT_SYS286BSY	 3	/* system 286 TSS busy */
+#define SDT_SYS286CGT	 4	/* system 286 call gate */
+#define SDT_SYSTASKGT	 5	/* system task gate */
+#define SDT_SYS286IGT	 6	/* system 286 interrupt gate */
+#define SDT_SYS286TGT	 7	/* system 286 trap gate */
+#define SDT_SYSNULL2	 8	/* system null again */
+#define SDT_SYS386TSS	 9	/* system 386 TSS available */
+#define SDT_SYSNULL3	10	/* system null again */
+#define SDT_SYS386BSY	11	/* system 386 TSS busy */
+#define SDT_SYS386CGT	12	/* system 386 call gate */
+#define SDT_SYSNULL4	13	/* system null again */
+#define SDT_SYS386IGT	14	/* system 386 interrupt gate */
+#define SDT_SYS386TGT	15	/* system 386 trap gate */
+
+/* memory segment types */
+#define SDT_MEMRO	16	/* memory read only */
+#define SDT_MEMROA	17	/* memory read only accessed */
+#define SDT_MEMRW	18	/* memory read write */
+#define SDT_MEMRWA	19	/* memory read write accessed */
+#define SDT_MEMROD	20	/* memory read only expand dwn limit */
+#define SDT_MEMRODA	21	/* memory read only expand dwn limit accessed */
+#define SDT_MEMRWD	22	/* memory read write expand dwn limit */
+#define SDT_MEMRWDA	23	/* memory read write expand dwn limit acessed */
+#define SDT_MEME	24	/* memory execute only */
+#define SDT_MEMEA	25	/* memory execute only accessed */
+#define SDT_MEMER	26	/* memory execute read */
+#define SDT_MEMERA	27	/* memory execute read accessed */
+#define SDT_MEMEC	28	/* memory execute only conforming */
+#define SDT_MEMEAC	29	/* memory execute only accessed conforming */
+#define SDT_MEMERC	30	/* memory execute read conforming */
+#define SDT_MEMERAC	31	/* memory execute read accessed conforming */
 
 /*
  * Memory and System segment descriptors
@@ -129,10 +179,30 @@ struct region_descriptor_d {
 // #importante
 // GDT for single processor.
 
-struct segment_descriptor_d xxx_gdt[8];
+struct segment_descriptor_d xxx_gdt[32];
 struct gdt_ptr_d xxx_gdt_ptr;
 
 
+
+
+
+//
+// credits: Linux.
+//
+
+
+#define load_gdt(dtr) native_load_gdt(dtr)
+#define store_gdt(dtr) native_store_gdt(dtr)
+
+static inline void native_load_gdt ( struct gdt_ptr_d *dtr)
+{
+	asm volatile ("lgdt %0"::"m" (*dtr));
+}
+
+static inline void native_store_gdt ( struct gdt_ptr_d *dtr)
+{
+	asm volatile ("sgdt %0":"=m" (*dtr));
+}
 
 
 
@@ -151,6 +221,17 @@ void
 setsegment(struct segment_descriptor_d *sd, const void *base, size_t limit,
     int type, int dpl, int def32, int gran);
 
+void
+setsegmentNR ( int number, 
+			   const void *base, 
+			   size_t limit,
+               int type, 
+			   int dpl, 
+			   int def32, 
+			   int gran);
+
+void  
+init_gdt ();
 
 //
 // End.

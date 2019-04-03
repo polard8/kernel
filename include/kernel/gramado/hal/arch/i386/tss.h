@@ -41,7 +41,8 @@
  * Intel 386 Context Data Type
  */
 
-struct i386tss {
+struct i386tss_d 
+{
 	int	__tss_link;
 	int	tss_esp0; 	/* kernel stack pointer at privilege level 0 */
 	int	tss_ss0;	/* kernel stack segment at privilege level 0 */
@@ -69,6 +70,7 @@ struct i386tss {
 	int	tss_ldt;	/* LDT selector */
 	int	tss_iobase;	/* options and I/O permission map offset */
 };
+
 
 /*
  * I/O bitmap offset beyond TSS's segment limit means no bitmaps.

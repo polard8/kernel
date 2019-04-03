@@ -462,7 +462,7 @@ BCD2bin:
 	RET
 	
 	
-	
+ 
 ; Enable L2 Cache (Not supported on P4 or Atom)
 ;	mov ecx, 0x0000011E		; Control register 3: used to configure the L2 Cache
 ;	rdmsr

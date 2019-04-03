@@ -303,6 +303,48 @@ setsegment(struct segment_descriptor_d *sd, const void *base, size_t limit,
 }
 
 
+void
+setsegmentNR ( int number, 
+			   const void *base, 
+			   size_t limit,
+               int type, 
+			   int dpl, 
+			   int def32, 
+			   int gran)
+{
+	
+	setsegment ((struct segment_descriptor_d *)  &xxx_gdt[number] , 
+	    base, 
+		limit,
+        type, 
+		dpl, 
+		def32, 
+		gran );
+}
+
+
+void  
+init_gdt ()
+{
+    setsegment ( &xxx_gdt[GNULL_SEL], 0, 0, 0, 0, 0, 0);
+	
+	setsegment ( &xxx_gdt[GCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_KPL, 1, 1);
+	setsegment ( &xxx_gdt[GDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_KPL, 1, 1);
+	
+	setsegment ( &xxx_gdt[GUCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_UPL, 1, 1);
+	setsegment ( &xxx_gdt[GUDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_UPL, 1, 1);
+	
+	setsegment ( &xxx_gdt[GTSS_SEL], 0, sizeof ( struct i386tss_d ) - 1, SDT_SYS386TSS,  SEL_KPL, 0, 0);
+	
+	//#bugbug: todo LDT size;
+	setsegment ( &xxx_gdt[GLDT_SEL], 0, 0xff, SDT_SYSLDT,  SEL_KPL, 0, 0);
+	//...
+	
+	xxx_gdt_ptr.limit = (unsigned short) ((32 * sizeof(struct segment_descriptor_d) ) -1);
+	xxx_gdt_ptr.base  = (unsigned int) &xxx_gdt[GNULL_SEL];
+		
+	load_gdt (&xxx_gdt_ptr);
+}
 
 /*
  ***********************************************

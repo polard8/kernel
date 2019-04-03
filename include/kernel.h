@@ -198,6 +198,7 @@ extern void do_executa_new_task();
 #include <kernel/gramado/hal/cpu.h>  
 
 #include <kernel/gramado/hal/arch/i386/pte.h> 
+#include <kernel/gramado/hal/arch/i386/tss.h> 
 
 #include <kernel/gramado/hal/arch/x86/cputypes.h> 
 #include <kernel/gramado/hal/arch/x86/pte.h> 
