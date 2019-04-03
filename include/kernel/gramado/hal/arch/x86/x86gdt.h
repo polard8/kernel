@@ -60,6 +60,13 @@
 #define SDT_MEMERC	30	/* memory execute read conforming */
 #define SDT_MEMERAC	31	/* memory execute read accessed conforming */
 
+
+
+
+#define GSEL(s,r) (((s) << 3) | r)
+
+
+
 /*
  * Memory and System segment descriptors
  * NetBSD style.

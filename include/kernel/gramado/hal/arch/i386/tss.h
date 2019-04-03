@@ -57,7 +57,7 @@ struct i386tss_d
 	int	__tss_ecx; 
 	int	__tss_edx; 
 	int	__tss_ebx; 
-	int	tss_esp;	/* saved stack pointer */
+	int	tss_esp;	/* saved stack pointer */ 
 	int	tss_ebp;	/* saved frame pointer */
 	int	__tss_esi; 
 	int	__tss_edi; 
@@ -81,7 +81,12 @@ struct i386tss_d
 /*
  * If we have an I/O bitmap, there is only one valid offset.
  */
-#define	IOMAP_VALIDOFF	sizeof(struct i386tss)
+#define	IOMAP_VALIDOFF	sizeof(struct i386tss_d)
+
+
+static void
+tss_init ( struct i386tss_d *tss, void *stack, void *func );
+
 
 #endif /* #ifndef _I386_TSS_H_ */
 

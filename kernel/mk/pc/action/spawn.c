@@ -211,8 +211,10 @@ void spawn_thread (int id){
 	//printf ("updating gdt ...");
 	//refresh_screen();
 	
-	init_gdt ();
+	//Ok 
+	//Isso funcionou e irá para outro lugar. Vai para a inicialização.
 	
+	//init_gdt ();
 	//while(1){}	
 	
 	

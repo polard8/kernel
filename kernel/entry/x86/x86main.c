@@ -219,7 +219,11 @@ void x86mainStartFirstThread ( int n ){
     asm ("movl %eax, %cr3");  
     
     
-	clear_nt_flag ();    
+	clear_nt_flag ();   
+	
+	init_gdt ();
+	
+	asm ("clts \n");
 	
     // #debug
     printf ("Go to user mode!\n");
@@ -333,10 +337,18 @@ void x86mainStartFirstThread ( int n ){
         refresh_screen ();         
         
         //Set cr3 and flush TLB.
-        mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
-        asm ("movl %cr3, %eax");
+        //mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+        //asm ("movl %cr3, %eax");
 	    //#todo: delay.
-        asm ("movl %eax, %cr3");        
+        //asm ("movl %eax, %cr3");  
+		
+		if ( (void *) Thread != NULL )
+		{
+		    KiSpawnTask ( (int) Thread->tid );
+		    die ();
+		}
+		printf (">>> FAIL\n");
+        die();
         
         asm volatile (" sti \n"
                       " mov $0x23, %ax  \n"
@@ -371,10 +383,20 @@ void x86mainStartFirstThread ( int n ){
         refresh_screen ();         
         
         //Set cr3 and flush TLB.
-        mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
-        asm ("movl %cr3, %eax");
+        //mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
+        //asm ("movl %cr3, %eax");
 	    //#todo: delay.
-        asm ("movl %eax, %cr3");        
+        //asm ("movl %eax, %cr3"); 
+		
+		if ( (void *) Thread != NULL )
+		{
+		    KiSpawnTask ( (int) Thread->tid );
+		    die ();
+		}
+		printf (">>> FAIL\n");
+        die();
+
+
         
         asm volatile (" sti \n"
                       " mov $0x23, %ax  \n"

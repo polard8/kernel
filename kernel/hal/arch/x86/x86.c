@@ -323,9 +323,36 @@ setsegmentNR ( int number,
 }
 
 
+
+
 void  
 init_gdt ()
 {
+	
+	//criando a tss andtes de colocarmos na gdt
+	
+	//#bugbug
+	//na m'aquina real o sisrtema p'e sens'ivel a essa configuraç~ao.
+	//'e nela que vamos trabalhar.
+	
+	/*
+	struct i386tss_d *tss;
+	
+	tss = (void *) malloc ( sizeof(struct i386tss_d) );
+	
+	if ( (void *) tss == NULL )
+	{
+	    printf ("init_gdt: tss fail\n");
+		die();
+		
+	}else{
+    
+		 tss_init ( (struct i386tss_d *) tss, (void *) 0x003FFFF0, (void *) 0x401000 );
+	}
+	
+    */
+	
+	
     setsegment ( &xxx_gdt[GNULL_SEL], 0, 0, 0, 0, 0, 0);
 	
 	setsegment ( &xxx_gdt[GCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_KPL, 1, 1);
@@ -345,6 +372,44 @@ init_gdt ()
 		
 	load_gdt (&xxx_gdt_ptr);
 }
+
+
+
+static void
+tss_init ( struct i386tss_d *tss, void *stack, void *func )
+{
+	//KASSERT(curcpu()->ci_pmap == pmap_kernel());
+
+	//limpa
+	memset ( tss, 0, sizeof *tss);
+	
+	//ring 0
+	tss->tss_esp0 = 0x003FFFF0;   // (int)((char *)stack + USPACE - 16);   //0x003FFFF0
+	tss->tss_ss0 = GSEL(GDATA_SEL, SEL_KPL);
+	
+
+	/* %cr3 contains the value associated to pmap_kernel */
+	tss->tss_cr3 = 0x9C000;  //rcr3();   // 0x9C000   Thread->Directory ??
+	tss->__tss_eip = (int) 0x401000; //(int) func;
+	/* XXX not needed? */
+	tss->__tss_eflags = PSL_MBO | PSL_NT;	  // PSL_IOPL PSL_I
+
+	tss->tss_esp = 0x0044FFF0; //(int)((char *)stack + USPACE - 16);  //0x0044FFF0
+		
+	tss->__tss_es = GSEL(GDATA_SEL, SEL_KPL);	
+	tss->__tss_cs = GSEL(GCODE_SEL, SEL_KPL);
+	tss->__tss_ss = GSEL(GCODE_SEL, SEL_KPL);
+	tss->__tss_ds = GSEL(GCODE_SEL, SEL_KPL);
+	tss->tss_fs =  GSEL(GDATA_SEL, SEL_KPL);  	//tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);	
+	tss->tss_gs =  GSEL(GDATA_SEL, SEL_KPL);
+		
+	tss->tss_ldt = GSEL ( GLDT_SEL, SEL_KPL );
+
+	tss->tss_iobase = IOMAP_VALIDOFF << 16;
+}
+
+
+
 
 /*
  ***********************************************
