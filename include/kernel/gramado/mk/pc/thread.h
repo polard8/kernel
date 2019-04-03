@@ -318,6 +318,10 @@ struct thread_d
 	//O endereço incial, para controle.
 	unsigned long initial_eip;	
 	
+	//#todo
+	//isso é muito necessário.
+	struct i386tss_d *tss;
+	
 	//
 	// ORDEM: O que segue é referenciado durante o processo de scheduler.
 	//

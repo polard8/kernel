@@ -323,20 +323,26 @@ setsegmentNR ( int number,
 }
 
 
+/*
+ * init_gdt:
+ *     Cria uma TSS e configura algumas entradas na GDT.
+ *     #todo O desafio aqui é configurar a TSS e testar na máquina real.
+ */
 
-
-void  
-init_gdt ()
-{
+void init_gdt (){
 	
-	//criando a tss andtes de colocarmos na gdt
+	// #bugbug
+	// Na máquina real o sistema é sensível a essa configuração.
+	// É nela que vamos trabalhar para que não falhe na hora do salto para ring3.
 	
-	//#bugbug
-	//na m'aquina real o sisrtema p'e sens'ivel a essa configuraç~ao.
-	//'e nela que vamos trabalhar.
-	
-	/*
 	struct i386tss_d *tss;
+	
+	
+	
+	//
+	// Criando a estrutura de TSS e inicializando ela.
+	//
+	
 	
 	tss = (void *) malloc ( sizeof(struct i386tss_d) );
 	
@@ -350,9 +356,6 @@ init_gdt ()
 		 tss_init ( (struct i386tss_d *) tss, (void *) 0x003FFFF0, (void *) 0x401000 );
 	}
 	
-    */
-	
-	
     setsegment ( &xxx_gdt[GNULL_SEL], 0, 0, 0, 0, 0, 0);
 	
 	setsegment ( &xxx_gdt[GCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_KPL, 1, 1);
@@ -361,7 +364,8 @@ init_gdt ()
 	setsegment ( &xxx_gdt[GUCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_UPL, 1, 1);
 	setsegment ( &xxx_gdt[GUDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_UPL, 1, 1);
 	
-	setsegment ( &xxx_gdt[GTSS_SEL], 0, sizeof ( struct i386tss_d ) - 1, SDT_SYS386TSS,  SEL_KPL, 0, 0);
+	//#test
+	setsegment ( &xxx_gdt[GTSS_SEL], &tss, sizeof ( struct i386tss_d ) - 1, SDT_SYS386TSS,  SEL_KPL, 0, 0);
 	
 	//#bugbug: todo LDT size;
 	setsegment ( &xxx_gdt[GLDT_SEL], 0, 0xff, SDT_SYSLDT,  SEL_KPL, 0, 0);
@@ -392,16 +396,16 @@ tss_init ( struct i386tss_d *tss, void *stack, void *func )
 	tss->tss_cr3 = 0x9C000;  //rcr3();   // 0x9C000   Thread->Directory ??
 	tss->__tss_eip = (int) 0x401000; //(int) func;
 	/* XXX not needed? */
-	tss->__tss_eflags = PSL_MBO | PSL_NT;	  // PSL_IOPL PSL_I
+	tss->__tss_eflags = 0x3200;   //PSL_MBO | PSL_NT;	  // PSL_IOPL PSL_I
 
 	tss->tss_esp = 0x0044FFF0; //(int)((char *)stack + USPACE - 16);  //0x0044FFF0
 		
-	tss->__tss_es = GSEL(GDATA_SEL, SEL_KPL);	
-	tss->__tss_cs = GSEL(GCODE_SEL, SEL_KPL);
-	tss->__tss_ss = GSEL(GCODE_SEL, SEL_KPL);
-	tss->__tss_ds = GSEL(GCODE_SEL, SEL_KPL);
-	tss->tss_fs =  GSEL(GDATA_SEL, SEL_KPL);  	//tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);	
-	tss->tss_gs =  GSEL(GDATA_SEL, SEL_KPL);
+	tss->__tss_es = GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);	
+	tss->__tss_cs = GSEL(GUCODE_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
+	tss->__tss_ss = GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
+	tss->__tss_ds = GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
+	tss->tss_fs =  GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);  	//tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);	
+	tss->tss_gs =  GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);
 		
 	tss->tss_ldt = GSEL ( GLDT_SEL, SEL_KPL );
 
