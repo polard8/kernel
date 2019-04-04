@@ -78,6 +78,11 @@ extern _current_process_pagedirectory_address
 ;; Handler da interrupção do timer.
 ;;
 
+;; #importante
+;; Na TSS tem a pilha de ring 0 (SS: ESP), temos que salvar. 
+;; precisamos da pilha antes de chamarmos as rotinas em C.
+;; #test: Vamos fazer um teste usando a pilha na sua posição inicial.
+
 global _irq0
 _irq0:
 
@@ -128,15 +133,30 @@ _irq0:
     ; ou ignorados para economizar instrução.
 
 ;;.setupKernelModeRegisters:		
+  
+	
+	;; #importante
+	;; E a pilha em ring 0?? ss
+	;; temos que pegar na tss a pilha em ring 0.
+	;; Para retornarmos à velha pilha que tinhamos.
+	
+	;;#bugbug
+	;;Temos que pegar a pilha agora, para não termos problemas
+	;;com as rotinas em C.
+	;; #test: Vamos fazer um teste usando a pilha na sua posição inicial.
+	
+	;;VAMOS TESTAR SEM ISSO NA MÁQUINA REAL.
 	xor eax, eax
 	mov ax, word 0x10
 	mov ds, ax
 	mov es, ax
 	mov fs, ax  ;*   
-	mov gs, ax  ;*   
+	mov gs, ax  ;* 
 	
-	;;#todo
-	;;E a pilha em ring 0?? ss
+	mov ss, ax
+	mov eax, 0x003FFFF0 
+	mov esp, eax 
+	
 	
     ; Chama as rotinas em C.
 	; As rotinas em executarão serviços oferecidos pelo kernel
@@ -251,6 +271,13 @@ dummy_flush:
 
 	;
 	;stack
+	;; #obs: estamos colocando isso na pilha do aplicativo..
+	;; assim como todas as operações que fizemos em C.
+	;; #obs: perceba que esse salvo funciona ...
+	;; #o iret da primeira thread não funciona porque 
+	;; não colocamos os valores na pilha do aplicativo como fazemos aqui, e sim
+	;; na pilha do kernel.
+	
 	push dword [_contextSS]        ;ss  - user mode.
 	push dword [_contextESP]       ;esp - user mode.
 	push dword [_contextEFLAGS]    ;eflags.

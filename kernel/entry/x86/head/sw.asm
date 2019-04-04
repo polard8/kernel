@@ -127,6 +127,36 @@ _int128:
     push ds
     push es
     push fs
+	push gs
+	
+	;;#bugbug
+	;;precisamos fazer isso, mas como fica depois ???
+	;;teste: esperamos que os pops restaurem os registradores de segmento.
+	
+	;;#importante
+	;;a questão é que o kernel está usando a pilha do aplicativo,
+	;;se mudamos a pilha como faremos o pop.
+	;;se mudarmos a pilha para pilha do kernel, então temos que fazer isso antes do push
+	;;e recuperarmos a pilha depois do pop .... isso seria um inferno.
+	;;##bugbug pelo jeito o kernel usa a pilha do aplicativo mesmo.
+	
+	;;-------------------
+	;;##bugbug: como pegaremos as mensagens de aplicativo se mudarmos o 
+	;;os registradores de segmento.	
+	;;no caso da interrupção de timer isso talvez não seja problema,
+	;;pois todos os registradores são salvos.
+	;;--------------------
+	
+	;;#bugbug: ISSO FALHA !!!
+	;xor eax, eax
+	;mov ax, word 0x10
+	;mov ds, ax
+	;mov es, ax
+	;mov fs, ax  ;*   
+	;mov gs, ax  ;*  	
+    ;mov ss, ax
+	;mov eax, 0x003FFFF0 
+	;mov esp, eax 
 
     ;Argumentos.	
     push dword edx    ;arg4.
@@ -149,6 +179,7 @@ _int128:
     pop ecx
     pop edx 
 	
+	pop gs
     pop fs
     pop es
     pop ds

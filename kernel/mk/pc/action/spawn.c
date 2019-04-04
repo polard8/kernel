@@ -215,21 +215,38 @@ void spawn_thread (int id){
 	//Isso funcionou e irá para outro lugar. Vai para a inicialização.
 	
 	//init_gdt ();
-	//while(1){}	
+	//while(1){}
 	
 	
+	// #bugbug
+	// Isso está falando na máquina real.
+	// Talvez seja porque estamos colocando os calores da pilha do kernel
+	// e não na pilha do aplicaitvo como faz a irq0.
+	// #test vamos tentar usar a pilha do aplicativo pra ver se o iret funciona na máquina real.
+	
+    // #problema
+	// Como faremos para que o aplicativo pegue esses valores.
+	// pois o ponteiro de pilha aponta para um valor em ring 0,
+	// então o aplicativo estaria proibido de usar essa pilha ??!!
+	// Porvavelmente sim ,,,, mas um aplicativo em ring0 não.
+	// talvez se a memória do kernel para ring3 e fazermos um iret para
+	// dentro do kernel seja possível fazer um segundo iret para fora.
+	
+	//lembrando que o handler do irq0 recebe uma pilha em ring3 por isso consegue voltar.
+	//como não temos uma pilha em ring3 , enão não consegumos voltar.
 	
     // Spiritual quote:
 	// "Body and Things"
 
     //Segmentos.
+	  
 	
-    asm volatile (" cli \n"
+    asm volatile (" cli\n"
                   " mov $0x23, %ax \n"
                   " mov %ax, %ds \n"
                   " mov %ax, %es \n"
                   " mov %ax, %fs \n"
-                  " mov %ax, %gs \n");
+                  " mov %ax, %gs \n");  
 				 
 	//unsigned long argc = 1234;	
 	//#test
@@ -243,6 +260,12 @@ void spawn_thread (int id){
 	//argc 
 	//Ok. isso funcionou ... main no aplicativo recebeu argc do crt0.
 	asm (" mov $0x1234, %ebx \n");
+	
+	//#test
+	//Mudando eflags para iopl 3 antes de usarmos a pilha.
+	
+	asm (" pushl $0x3000 \n");
+	asm (" popfl \n");	
 	  
 	//Pilha para iret.
     asm ("pushl %0" :: "r" ((unsigned long) spawn_Pointer->ss)     : "%esp");    //ss.
@@ -260,16 +283,25 @@ void spawn_thread (int id){
 	asm ("outb %al, $0x20 \n");
 	//asm(" movl $0, %eax \n");
 	
+	//
+	// Fly!
+	//
+	
+	asm ("iret \n");    
+
 	
 	//
 	// # teste sujo
 	//
 	
-	//asm  ("ljmp %0 \n\t" :: "m" (*spawn_Pointer->tr));
-	
+	//tss
+	//isso será um test para taskswitch via hardware,
+	//precisa habilitar flag nt antes,
+	//asm  ("ljmp $0x2B, $0x401000 \n\t");	
 	//asm ("sti  \n"); 
-	asm ("iret \n");    //Fly!
-    
+	
+
+	
 	panic ("spawn_thread");
 }
 
