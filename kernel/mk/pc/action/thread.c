@@ -336,6 +336,8 @@ get_next:
 	    Thread->edi = 0;
 	    Thread->ebp = 0;	
 		
+		//TSS
+		Thread->tss = current_tss;
 		
 		//cpu.
 		//Thread->cpuID = 0;

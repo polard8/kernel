@@ -71,6 +71,11 @@ struct i386tss_d
 	int	tss_iobase;	/* options and I/O permission map offset */
 };
 
+//#obs:
+//Assim todas as threads podem fazer referência à mesma
+//tss depois de inicializada.
+struct i386tss_d *current_tss;
+
 
 /*
  * I/O bitmap offset beyond TSS's segment limit means no bitmaps.

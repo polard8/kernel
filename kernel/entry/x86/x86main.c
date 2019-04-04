@@ -221,7 +221,9 @@ void x86mainStartFirstThread ( int n ){
     
 	clear_nt_flag ();   
 	
-	init_gdt ();
+	//vamos iniciar antes para que
+	//possamos usar a current_tss quando criarmos as threads
+	//init_gdt ();
 	
 	asm ("clts \n");
 	
@@ -653,6 +655,18 @@ int x86main ( int argc, char *argv[] ){
     // while(1){}	
 	
 	
+	//
+	//    #### GDT ####
+	//
+	
+	// #obs
+	// Vamos criar uma TSS e configurarmos a GDT,
+	// assim poderemos usar a current_tss quando criarmos as threads
+	// Essa função faz as duas coisas, cria a tss e configura a gdt.
+	
+	init_gdt ();
+
+	
 	debug_print ("x86main: processes and threads\n");
 	
 	//  ## Processes ##
@@ -746,6 +760,11 @@ int x86main ( int argc, char *argv[] ){
         processor->CurrentThread = (void *) IdleThread;
         processor->NextThread    = (void *) IdleThread;
         processor->IdleThread    = (void *) IdleThread;
+		
+		
+		IdleThread->tss = current_tss;
+			
+			
         //...
         
 	    // ## importante ## 
@@ -807,9 +826,13 @@ int x86main ( int argc, char *argv[] ){
     }else{
 
         //ShellThread->ownerPID = (int) ShellProcess->pid;
-        //...
+        
+		ShellThread->tss = current_tss;
+		
+		//...
     };	
 	
+
 	ShellProcess->Heap = (unsigned long) g_gramadocore_shell_heap_va;
 	ShellProcess->control = ShellThread; 
 		
@@ -854,6 +877,9 @@ int x86main ( int argc, char *argv[] ){
     }else{
 
         //TaskManThread->ownerPID = (int) TaskManProcess->pid;
+		
+		TaskManThread->tss = current_tss;
+		
         //...
     };
 	
@@ -886,8 +912,12 @@ int x86main ( int argc, char *argv[] ){
 
     }else{
 
+		
         //RING0IDLEThread->ownerPID =  (int) KernelProcess->pid; 
-        //...
+		
+		RING0IDLEThread->tss = current_tss;
+        
+		//...
     };
 	
 #endif		

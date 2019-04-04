@@ -263,6 +263,7 @@ setgate(struct gate_descriptor_d *gd, void *func, int args, int type, int dpl,
 	gd->gd_hioffset = (int)func >> 16;
 }
 
+
 void
 unsetgate(struct gate_descriptor_d *gd)
 {
@@ -284,6 +285,7 @@ setregion(struct region_descriptor_d *rd, void *base, size_t limit)
 	rd->rd_limit = (int)limit;
 	rd->rd_base = (int)base;
 }
+
 
 void
 setsegment(struct segment_descriptor_d *sd, const void *base, size_t limit,
@@ -354,6 +356,11 @@ void init_gdt (){
 	}else{
     
 		 tss_init ( (struct i386tss_d *) tss, (void *) 0x003FFFF0, (void *) 0x401000 );
+
+		 // #importante
+		 // Dessa forma as threads poderão usar a mesma tss.
+		
+		 current_tss = tss;
 	}
 	
     setsegment ( &xxx_gdt[GNULL_SEL], 0, 0, 0, 0, 0, 0);

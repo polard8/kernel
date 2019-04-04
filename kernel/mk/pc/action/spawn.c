@@ -260,6 +260,13 @@ void spawn_thread (int id){
 	asm ("outb %al, $0x20 \n");
 	//asm(" movl $0, %eax \n");
 	
+	
+	//
+	// # teste sujo
+	//
+	
+	//asm  ("ljmp %0 \n\t" :: "m" (*spawn_Pointer->tr));
+	
 	//asm ("sti  \n"); 
 	asm ("iret \n");    //Fly!
     
