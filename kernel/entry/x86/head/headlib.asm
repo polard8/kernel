@@ -225,162 +225,162 @@ setup_faults:
 	;#0  
 	mov eax, dword _fault_N0
 	mov ebx, dword 0
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#1  
 	mov eax, dword _fault_N1
 	mov ebx, dword 1
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#2  
 	mov eax, dword _fault_N2
 	mov ebx, dword 2
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#3  
 	mov eax, dword _fault_N3
 	mov ebx, dword 3
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#4  
 	mov eax, dword _fault_N4
 	mov ebx, dword 4
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#5  
 	mov eax, dword _fault_N5
 	mov ebx, dword 5
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#6 - Instrução inválida.
 	mov eax, dword _fault_INTRUCAO_INVALIDA
 	mov ebx, dword 6
-	call _setup_idt_vector
+	call _setup_system_interrupt
 	
 	;#7  
 	mov eax, dword _fault_N7
 	mov ebx, dword 7
-	call _setup_idt_vector
+	call _setup_system_interrupt
 	
 	;#8 - double fault
 	mov eax, dword _fault_DOUBLE
 	mov ebx, dword 8
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#9  
 	mov eax, dword _fault_N9
 	mov ebx, dword 9
-	call _setup_idt_vector
+	call _setup_system_interrupt
 
 	;#10  
 	mov eax, dword _fault_N10
 	mov ebx, dword 10
-	call _setup_idt_vector
+	call _setup_system_interrupt
 
 	;#11  
 	mov eax, dword _fault_N11
 	mov ebx, dword 11
-	call _setup_idt_vector
+	call _setup_system_interrupt
 	
 	;#12 - stack
 	mov eax, dword _fault_STACK
 	mov ebx, dword 12
-	call _setup_idt_vector		
+	call _setup_system_interrupt		
 	
 	;#13 - general protection
 	mov eax, dword _fault_GP
 	mov ebx, dword 13
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;#14  
 	mov eax, dword _fault_N14
 	mov ebx, dword 14
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#15 
 	mov eax, dword _fault_N15
 	mov ebx, dword 15
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#16 
 	mov eax, dword _fault_N16
 	mov ebx, dword 16
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#17  
 	mov eax, dword _fault_N17
 	mov ebx, dword 17
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#18  
 	mov eax, dword _fault_N18
 	mov ebx, dword 18
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#19  
 	mov eax, dword _fault_N19
 	mov ebx, dword 19
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#20  
 	mov eax, dword _fault_N20
 	mov ebx, dword 20
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#21  
 	mov eax, dword _fault_N21
 	mov ebx, dword 21
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#22  
 	mov eax, dword _fault_N22
 	mov ebx, dword 22
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#23 
 	mov eax, dword _fault_N23
 	mov ebx, dword 23
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#24  
 	mov eax, dword _fault_N24
 	mov ebx, dword 24
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#25  
 	mov eax, dword _fault_N25
 	mov ebx, dword 25
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#26 
 	mov eax, dword _fault_N26
 	mov ebx, dword 26
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#27  
 	mov eax, dword _fault_N27
 	mov ebx, dword 27
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#28 
 	mov eax, dword _fault_N28
 	mov ebx, dword 28
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#29  
 	mov eax, dword _fault_N29
 	mov ebx, dword 29
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#30  
 	mov eax, dword _fault_N30
 	mov ebx, dword 30
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;#31 
 	mov eax, dword _fault_N31
 	mov ebx, dword 31
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	pop ebx
 	pop eax
@@ -402,38 +402,42 @@ setup_vectors:
 	;Iniciamos um timer provisório, depois o main() inicia o definitivo.
 	mov eax, dword _timer_test    
 	mov ebx, dword 32
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;33
 	;Keyboard.
 	mov eax, dword  _irq1
 	mov ebx, dword 33
-	call _setup_idt_vector
+	call _setup_system_interrupt
 	
 	;40
 	;Clock, rtc.
 	mov eax, dword  _irq8
 	mov ebx, dword 40
-	call _setup_idt_vector
+	call _setup_system_interrupt
 	
 	;44
 	;Mouse.
 	mov eax, dword  _irq12
 	mov ebx, dword 44
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;46
 	;ide
 	mov eax,  dword _irq14     
 	mov ebx, dword 46
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 
 	;47
 	;ide
 	mov eax,  dword _irq15     
 	mov ebx, dword 47
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
+    
+    ;;
+    ;; system calls.
+    ;;
 
     ;128 - 0x80
 	;A interrupção de sistema.
@@ -441,7 +445,6 @@ setup_vectors:
 	;Utilizamos uma chamada diferente para configurar essa interrupção.
 	mov eax, dword _int128
 	mov ebx, dword 128
-	;call _setup_idt_vector   	
 	call _setup_system_interrupt  
 
 
@@ -449,34 +452,40 @@ setup_vectors:
 	;Executa nova tarefa.
 	mov eax, dword _int213
 	mov ebx, dword 213        
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	
     ;216
 	;Fast Create Window.
 	mov eax, dword _int216
 	mov ebx, dword 216        
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	;; ...	
 	
+    
 	pop ebx
 	pop eax
 	ret
 		
 
-;;=================================================
-;; ## Configurando nova entrada ##
-;;	
 
-;;#bugbug: isso está em intel.c , mas precisa ser global para que todos 
-;;possam usar.
-;;talvez em kernel.h
+;;=================================================
+;;     # NIC #
+;;	
+;; O kernel chma isso provisoriamente para criar uma entrada
+;; na idt para o nic intel.
+;;
+;; #bugbug: isso está em intel.c , mas precisa ser global para que todos 
+;; possam usar.
+;; talvez em kernel.h
+;; isso funcionou, tentar configurar outras interupções com isso.
+;;
 
 extern _nic_idt_entry_new_number
 extern _nic_idt_entry_new_address
 
-;isso funcionou, tentar configurar outras interupções com isso.
+
 
 global _asm_nic_create_new_idt_entry
 _asm_nic_create_new_idt_entry:
@@ -489,7 +498,7 @@ _asm_nic_create_new_idt_entry:
 	mov ebx, dword [_nic_idt_entry_new_number]	
 	;mov ebx, dword 41	
 
-	call _setup_idt_vector	
+	call _setup_system_interrupt	
 	
 	popad
 	ret 
@@ -722,9 +731,10 @@ _setup_idt_vector:
 	
 	mov eax, dword 0x00080000    ;/* selector = 0x0008 = cs */	
 	mov ax, dx		             ;uma parte do endereço
-	mov dx, word 0x8E00	         ;/* interrupt gate - dpl=0, present */
 	
-	;coloca o vetor na idt
+	mov dx, word 0xEE00	 ;;para hardware
+	
+    ;coloca o vetor na idt
 	mov dword [edi+0], eax
 	mov dword [edi+4], edx
 	
@@ -738,6 +748,7 @@ _setup_idt_vector:
 .number: dd 0
 
 
+ 
 ;=====================================
 ; _enable_pse:
 ;     Enable PSE para páginas de 4MB.

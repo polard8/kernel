@@ -363,20 +363,30 @@ void init_gdt (){
 		 current_tss = tss;
 	}
 	
+	
+	// NULL
     setsegment ( &xxx_gdt[GNULL_SEL], 0, 0, 0, 0, 0, 0);
 	
+	// ring 0
 	setsegment ( &xxx_gdt[GCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_KPL, 1, 1);
 	setsegment ( &xxx_gdt[GDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_KPL, 1, 1);
 	
+	// ring 3
 	setsegment ( &xxx_gdt[GUCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_UPL, 1, 1);
 	setsegment ( &xxx_gdt[GUDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_UPL, 1, 1);
 	
-	//#test
-	setsegment ( &xxx_gdt[GTSS_SEL], &tss, sizeof ( struct i386tss_d ) - 1, SDT_SYS386TSS,  SEL_KPL, 0, 0);
 	
+	// TSS selector.
+	// (SDT_SYS386TSS=9=not busy) 
+	// (11 = busy)
+	setsegment ( &xxx_gdt[GTSS_SEL], &tss, sizeof( struct i386tss_d ) - 1, SDT_SYS386TSS,  SEL_KPL, 0, 0);
+	//setsegment ( &xxx_gdt[GTSS_SEL], &tss, sizeof ( struct i386tss_d ) - 1, 11,  SEL_KPL, 0, 0);
+	
+	// LDT selector.
 	//#bugbug: todo LDT size;
 	setsegment ( &xxx_gdt[GLDT_SEL], 0, 0xff, SDT_SYSLDT,  SEL_KPL, 0, 0);
 	//...
+	
 	
 	xxx_gdt_ptr.limit = (unsigned short) ((32 * sizeof(struct segment_descriptor_d) ) -1);
 	xxx_gdt_ptr.base  = (unsigned int) &xxx_gdt[GNULL_SEL];
@@ -386,38 +396,62 @@ void init_gdt (){
 
 
 
+
 static void
 tss_init ( struct i386tss_d *tss, void *stack, void *func )
 {
 	//KASSERT(curcpu()->ci_pmap == pmap_kernel());
+	
+	if ( (void *) tss == NULL )
+	{
+	    printf ("tss_init");
+		die();
+	}
 
 	//limpa
-	memset ( tss, 0, sizeof *tss);
+	memset ( tss, 0, sizeof *tss );
 	
-	//ring 0
-	tss->tss_esp0 = 0x003FFFF0;   // (int)((char *)stack + USPACE - 16);   //0x003FFFF0
-	tss->tss_ss0 = GSEL(GDATA_SEL, SEL_KPL);
+	//ring 0 stack
+	tss->tss_esp0 = 0x003FFFF0;    // (int)((char *)stack + USPACE - 16);   //0x003FFFF0
+	tss->tss_ss0 = GSEL(GDATA_SEL, SEL_KPL);	
+	//tss->tss_ss0 = 0x10; //GSEL(GDATA_SEL, SEL_KPL);
+	
 	
 
 	/* %cr3 contains the value associated to pmap_kernel */
-	tss->tss_cr3 = 0x9C000;  //rcr3();   // 0x9C000   Thread->Directory ??
-	tss->__tss_eip = (int) 0x401000; //(int) func;
+	tss->tss_cr3 = 0x9C000;             //rcr3();   // 0x9C000   Thread->Directory ??
+	tss->__tss_eip = (int) 0x401000;    //(int) func;
 	/* XXX not needed? */
 	tss->__tss_eflags = 0x3200;   //PSL_MBO | PSL_NT;	  // PSL_IOPL PSL_I
 
 	tss->tss_esp = 0x0044FFF0; //(int)((char *)stack + USPACE - 16);  //0x0044FFF0
-		
-	tss->__tss_es = GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);	
-	tss->__tss_cs = GSEL(GUCODE_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
-	tss->__tss_ss = GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
-	tss->__tss_ds = GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
-	tss->tss_fs =  GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);  	//tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);	
-	tss->tss_gs =  GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);
-		
-	tss->tss_ldt = GSEL ( GLDT_SEL, SEL_KPL );
+	
 
+	tss->__tss_es = GSEL(GUDATA_SEL, SEL_UPL); 	
+	tss->__tss_cs = GSEL(GUCODE_SEL, SEL_UPL);  //0x1B 
+	tss->__tss_ss = GSEL(GUDATA_SEL, SEL_UPL); 
+	tss->__tss_ds = GSEL(GUDATA_SEL, SEL_UPL);  //0x23
+	tss->tss_fs = GSEL(GUDATA_SEL, SEL_UPL); 	
+	tss->tss_gs = GSEL(GUDATA_SEL, SEL_UPL); 
+	tss->tss_ldt = GSEL(GLDT_SEL, SEL_KPL);
+    
+	
+ 	/*
+	tss->__tss_es = 0x23; // GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);	
+	tss->__tss_cs = 0x1B; //GSEL(GUCODE_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
+	tss->__tss_ss = 0x23; //GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
+	tss->__tss_ds = 0x23; //GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GCODE_SEL, SEL_KPL);
+	tss->tss_fs =  0x23; //GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);  	//tss->tss_fs = GSEL(GCPU_SEL, SEL_KPL);	
+	tss->tss_gs = 0x23;  // GSEL(GUDATA_SEL, SEL_UPL); //GSEL(GDATA_SEL, SEL_KPL);
+	tss->tss_ldt = 0x30; ////GSEL ( GLDT_SEL, SEL_KPL );
+    */
+	
+	
 	tss->tss_iobase = IOMAP_VALIDOFF << 16;
 }
+
+
+
 
 
 

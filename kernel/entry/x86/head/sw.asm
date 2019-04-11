@@ -20,8 +20,6 @@ extern _new_task_scheduler ;;@todo: deletar.
 global _int48
 _int48:
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 	
@@ -29,8 +27,6 @@ _int48:
 global _int49
 _int49:		
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -38,8 +34,6 @@ _int49:
 global _int50
 _int50:		
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -47,8 +41,6 @@ _int50:
 global _int51
 _int51:		
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -56,8 +48,6 @@ _int51:
 global _int52
 _int52:		
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -65,8 +55,6 @@ _int52:
 global _int53
 _int53:		
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -74,8 +62,6 @@ _int53:
 global _int54
 _int54:		
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -92,8 +78,6 @@ _int54:
 global _int100
 _int100:
     cli		
-    mov al, 0x20
-    out 0x20, al 
 	sti
 	iretd
 
@@ -183,6 +167,9 @@ _int128:
     pop fs
     pop es
     pop ds
+	
+	;; #importante
+	;; Não pode ter eoi.
 
 	;popad	
 	mov eax, dword [.int128Ret] 
@@ -196,8 +183,6 @@ _int128:
 global _int201 
 _int201:
 	cli
-	mov al, 20h
-    out 20h, al   
 	sti	
     iretd
   
@@ -208,8 +193,6 @@ _int201:
 global _int213  
 _int213:
 	cli
-	mov al, 20h
-    out 20h, al   
 	sti	
     iretd
 	
@@ -228,6 +211,7 @@ _int213:
 ;	ebp    ;; (Nothing).  
 ;
 ;++
+
 extern _CreateWindow
 global _int216
 _int216:  
@@ -290,9 +274,6 @@ _int216:
 	;recupera.
 	popad	
 	
-    mov al, 0x20
-    out 0x20, al
-	
 	mov eax, dword [.int216Ret] 
 	sti
 	iretd
@@ -314,13 +295,14 @@ _int216:
 ;-----------------------------------------------
 ; Handler's genéricos para interrupções negligenciadas. 
 ; 
+
+;; #importante
+;; Usamos eoi apenas para as irqs
+
 ignore_int:
 system_interrupt:
 unhandled_int:
     cli
-    mov al, 0x20
-    out 0x20, al
-    out 0xA0, al 
     sti
 	iretd
 	
