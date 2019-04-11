@@ -682,7 +682,23 @@ setup_idt:
 	
 	mov eax, dword 0x00080000    ;/* selector = 0x0008 = cs */	
 	mov ax, dx		             ;uma parte do endereço
-	mov dx, word 0x8E00	         ;/* interrupt gate - dpl=0, present */
+    
+    ;; #test
+    ;; Se a intenção é nos proteger
+    ;; das interrupções de hardware inesperadas, então devemos
+    ;; configurar a idt semelhante ao jeto que configuramos
+    ;; para as irqs ... já que as interrupções de software
+    ;; só ocorrerão depois de inicializadas as entradas para 
+    ;; system call.
+    ;; #importante: Porém não usaremos eoi ... e apontaremos
+    ;; tudo para unhandled_int e não para umhandled_irq.
+    ;; Ou seja, sem eoi.
+    
+    ;;obs: 0xEE00 tem funcionado bem para todos os casos.
+ 
+    
+	;mov dx, word 0x8E00	         ;/* interrupt gate - dpl=0, present */
+    mov dx, word 0xEE00
 	
 	mov edi, dword _idt                
 	
