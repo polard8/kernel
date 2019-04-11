@@ -572,7 +572,8 @@ dummyJmpAfterLTR:
 	mov al, 2
 	out 0xA1, al
 
-	mov al, 00010001b    ;11 sfnm 80x86 support.
+   ;mov al, 00010001b    ;11 sfnm 80x86 support.
+	mov al, 00000001b    ;01 80x86 support.
 	out 0x21, al
 	out 0xA1, al
 
