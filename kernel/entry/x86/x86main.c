@@ -273,18 +273,7 @@ void x86mainStartFirstThread ( int n ){
             mostra_slot ( (int) Thread->tid );
             mostra_reg  ( (int) Thread->tid );
             refresh_screen ();
-		 
-            //printf (">>> WHILE\n");
-            //while(1){
-            //    asm("sti");
-            //}
-            //isso funcionou ...vamos usar isso sempre.
-		    KiSpawnTask ( (int) Thread->tid );
-		    die ();
 		}
-         
-		printf (">>> FAIL\n");
-        die();
 		
 		//#test
 		//vamos usar o ds do kernel para configurar a pilha.
@@ -300,28 +289,19 @@ void x86mainStartFirstThread ( int n ){
                        " mov %ax, %es    \n"
                        " mov %ax, %fs    \n"
                        " mov %ax, %gs    \n"
-					   " movb $0x20, %al   \n"
-                       " outb %al, $0x20   \n"
-					   " iret \n" );		
-		
-		
-		//" cli  \n" retiramos isso
-		asm volatile ( " mov $0x23, %ax  \n"
-                       " mov %ax, %ds    \n"
-                       " mov %ax, %es    \n"
-                       " mov %ax, %fs    \n"
-                       " mov %ax, %gs    \n"
-					  
-					   " pushl $0x23  \n"              // ss.
-                       " movl $0x0044FFF0, %eax  \n"   // esp 
-					   " pushl %eax    \n"             // esp.
-                       " pushl $0x3200 \n"             // eflags.
-                       " pushl $0x1B    \n"            // cs.
-                       " pushl $0x00401000 \n"         // eip. 
-	                   " movb $0x20, %al   \n"
-                       " outb %al, $0x20   \n"
-					   " iret \n" );
+					   " iret \n" );			
 	};
+    
+    
+    
+    printf ("x86main: opcao desabilitada");
+    refresh_screen();
+    while(1){}
+    
+    //
+    // ===== cut here ======
+    //
+    
 	
 	//shell
     if (n == 2 )

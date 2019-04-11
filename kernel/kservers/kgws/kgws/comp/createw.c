@@ -1099,7 +1099,6 @@ void *CreateWindow ( unsigned long type,
 		
         //?? More ...	
 	}
-
 	
 	// ## Title bar ##
     // Título + borda(frame).

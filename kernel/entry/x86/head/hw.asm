@@ -765,6 +765,10 @@ _irq15:
 ;     Interrupção de hardware genérica. 
 ;++ 
 
+;; #bugbug
+;; Não podemos efetuar EOI para todos 
+;; somente para as irqs.
+
 unhandled_irq:
 
     cli
