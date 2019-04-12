@@ -41,22 +41,23 @@ extern void swlib_lfb_putpixel();
 // 8 extras para handlers default.
 //unsigned long HANDLERS[256+8];
 
+
 //Esse handler será instalando em todas as entradas
 //da tabela antes da configuração.
 
-void hal_default_handler()
+void hal_default_handler ()
 {
-    return;
+    //return;
 }
 
 
-
-void hal_init_handlers_table()
+void hal_init_handlers_table ()
 {
     int i=0;
 	int max = (256+8);
 	
-	for (i=0; i< max; i++){
+	for ( i=0; i<max; i++ )
+	{
 	    HANDLERS[i] = (unsigned long) &hal_default_handler;
 	}
 }
@@ -133,9 +134,11 @@ void hal_setup_new_vectors_table_entry ( int number, unsigned long address )
     VECTORS[number] = (unsigned long) address;    
 }
 
+
 //Esses endereços foram configurados pelo assembler na inicialização.
 //Vamos salvá los na tabela em seus respectivos slots.
-void hal_init_vectors_table()
+
+void hal_init_vectors_table ()
 {
 	
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N0 );
@@ -192,6 +195,8 @@ void hal_init_vectors_table()
 	
 	//...
 }
+
+
 
  /* 
     Exemplo:
@@ -284,12 +289,7 @@ void Beep::tone(int freq) {
 */ 
  
  
-/*
-void halMain();
-void halMain(){
-	return;
-};
-*/
+ 
 
 
 //@todo: criar. halGetBootInfo()
@@ -309,11 +309,11 @@ void halMain(){
 void 
 hal_backbuffer_putpixel ( unsigned long ax, 
                           unsigned long bx, 
-						  unsigned long cx, 
-						  unsigned long dx )
+                          unsigned long cx, 
+                          unsigned long dx )
 {
-	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-	
+    asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+
     swlib_backbuffer_putpixel ();	
 }
 
@@ -331,12 +331,12 @@ hal_backbuffer_putpixel ( unsigned long ax,
 void 
 hal_lfb_putpixel ( unsigned long ax, 
                    unsigned long bx, 
-				   unsigned long cx, 
-				   unsigned long dx )
+                   unsigned long cx, 
+                   unsigned long dx )
 {
-	asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-	
-	swlib_lfb_putpixel ();
+    asm volatile ( "\n" : : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
+
+    swlib_lfb_putpixel ();
 }
 
 
@@ -347,8 +347,8 @@ hal_lfb_putpixel ( unsigned long ax,
  */
 
 void sys_vsync (){
-	
-    hal_vsync ();	
+
+    hal_vsync ();
 }
 
 
@@ -358,34 +358,12 @@ void sys_vsync (){
  */
 
 int sys_showpciinfo (){
-	
+
     return (int) hal_showpciinfo ();
 }
 
 
-/*
- * sys_reboot:
- *     Reboot, Serviço do sistema.
- *     Chamando uma rotina interna de reboot do sistema.
- */
 
-void sys_reboot (){
-	
-    KiReboot ();
-    panic ("sys_reboot");
-}
-
-
-/*
- * sys_shutdown:
- *     Chama uma rotina interna para desligar a máquina.
- */
-
-void sys_shutdown (){
-	
-    KiShutDown ();
-    panic ("sys_shutdown");
-}
 
 
 /*
@@ -604,23 +582,30 @@ void hal_vsync (){
 
 
 /*
- ********************************
- * hal_shutdown:    
+ * hal_reboot:
+ *     O hal é a camada mis próxima do hardware, não há tratamento nenhum
+ * para fazer, somente chamar o reboot via teclado. 
+ * em headlib.s 
  */
+
+extern void asm_reboot(); 
+
+void hal_reboot ()
+{	
+    asm_reboot (); 
 	
-void hal_shutdown (){
-	
-    shutdown ();
-    panic ("hal_shutdown");
+	panic ("hal_reboot");
 }
 
 
 /*
- ***********************************************
- * shutdown:
- *     Desligar a máquina.
- *     @todo: APM, ACPI.
- *
+ ********************************
+ * hal_shutdown: 
+ *     Interface usada pelos outros módulos
+ *     #todo: Todos os possiveis métodos ficarão nessa rotina.
+ *     máquina real e máquina virtual.
+ *     #importante: Essa será a única função em hal para chamar shutdown.
+ * quanquer outra interfce deve ficar fora do módulo hal.
  APM:
  ===
  This is the basic sequence of APM commands that must be given in order to shut down a computer.
@@ -629,7 +614,6 @@ void hal_shutdown (){
  +Connect the Real Mode interface.
  +Enable power management for all devices.
  +Set the power state for all devices to "Off" (03h).
- 
  
  ACPI:
  ====
@@ -643,67 +627,18 @@ void hal_shutdown (){
  The problem lies in the gathering of these values 
  especialy since the SLP_TYPa is in the \_S5 object 
  which is in the DSDT and therefore AML encoded.
- 
  */
 	
-void shutdown (){
+void hal_shutdown (){
 	
-	// @todo: switch APM, ACPI. modo smm	
-	//        Obs: Aqui, temporariamente, poderia desabilitar todo o
-	//             sistema e permitir que o usuário desligue a energia
-	//             manualmente. 
-	//            (Ex: O computador pode ser desligado com segurança).  
+	const char *shutdown_str;
 	
-    panic ("hal-shutdown");
+    /* Bochs/QEMU poweroff */
+	shutdown_str = "Shutdown";
+    while (*shutdown_str) outb (0x8900, *(shutdown_str++));
+	
+    panic ("hal_shutdown");
 }
-
-
-/*
- * KiReboot:
- *     Inicialização da parte de hardware do processo de reboot.   
- */
- 
-void KiReboot (){
-	
-	// @todo: fechar as coisas aqui antes de chamar hal_reboot()
-	// pois hal fica responsavel pela parte de hardware.
-    // As rotinas de desligamento do sistema foram para syste.c systemReboot().
-	// ficará aqui somente o que prescede o shamamento de hal.
-	// em hal ficarão as rotinas de reiniamento de hardware.
-    
-    // hal	
-    // Reboot via keyboard.	
-	
-	hal_reboot ();
-	panic ("KiReboot");
-};
-
-
-/*
- * KiShutDown:
- *    @todo: Isso será uma interface para chamar o deligamanto.
- */
- 
-void KiShutDown (){
-	
-    hal_shutdown ();
-    panic ("KiShutDown");
-};
-
-
-/*
- * hal_reboot:
- *     O hal é a camada mis próxima do hardware, não há tratamento nenhum
- * para fazer, somente chamar o reboot via teclado. 
- */
-
-//em headlib.s 
-extern void asm_reboot(); 
-void hal_reboot (){
-	
-    asm_reboot (); 
-	panic("hal_reboot");
-};
 
 
 /*

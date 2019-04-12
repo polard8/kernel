@@ -702,14 +702,6 @@ struct platform_d
 struct platform_d *Platform; 
 
 
-/*
- *****************************************
- * kMain:
- *     Prototype for base kernel 'main' function. */
-
-int kMain ( int argc, char **argv );
-
-
 // Initializations support.  
 int init_runtime();         //RunTime.
 void boot();                //??
@@ -728,29 +720,30 @@ void Removing_from_the_end(struct linkedlist_d *list);
 // Count support.
 //
 
-unsigned long get_tick_count();
+unsigned long get_tick_count ();
 
 
 //
 // Delay support.
 //
 
-void sleep(unsigned long ms);
+void sleep (unsigned long ms);
 
 
 //
 // Finalizations support.
 //
 
-void faults(unsigned long number);
-void shutdown();
+void faults (unsigned long number);
+
+
 
 //
 // Error support
 // 
  
-void abort();    //abort.c
-void die();      //system.c
+void abort ();    //abort.c
+void die ();      //system.c
 
 
 // ke - Kernel External.

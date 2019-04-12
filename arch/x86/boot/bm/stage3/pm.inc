@@ -34,11 +34,6 @@
 
 pmInit:
 
-	; @todo: 
-	; Salva o metafile com todos os parametros detectados em modo real.
-	
-	;call save_metafile
-
 	; Pega o modo no metafile e poe em BL.
 	; retorno em 'AL'.
 	
@@ -58,6 +53,13 @@ pmInit:
 	
 	;debug
 	;jmp $
+
+
+;;
+;; Trampoline
+;;
+
+trampoline:
 	
 	;setup registers 
 	
@@ -128,43 +130,45 @@ pm32:
 	;; Reconfigurando registradores.
 	;;
 
-	;
-	; @todo: 
-	;    Talvez dê para passar outras coisas através dos 
-	; registradores b,c,d.
-	; Obs: 
-	;     A pilha está bem perto do diretório do kernel. ??.
-	;     Stack = 0x0009FFFC
-	;     Directory = 9C000.  
-	;
+	; #todo: 
+	; Talvez dê para passar outras coisas através dos registradores b, c, d.
+	; #obs: 
+	; A pilha está bem perto do diretório do kernel. ??.
+	; Stack = 0x0009FFFC 
+	; Directory = 9C000.  
+
+	; Set up registers.
 	
-    ; Set up registers.
-	
-    mov ax, stage2_DATA_SEL        
+	mov ax, stage2_DATA_SEL 
 	mov ds, ax
 	mov es, ax
-	;mov fs, stage2_NULL_SEL    
-	;mov gs, stage2_NULL_SEL    
+	;mov fs, stage2_NULL_SEL 
+	;mov gs, stage2_NULL_SEL 
 	
 	mov ss, ax
-	mov esp, dword 0x0009FFFC	
-    mov edx, dword 0    
-    mov ecx, dword 0
-	mov ebx, dword 0	
-    mov eax, dword 0    
+	mov esp, dword 0x0009FFFC
+
+	mov edx, dword 0
+	mov ecx, dword 0
+	mov ebx, dword 0
+	mov eax, dword 0
 	
 	
 .GoToStart:
     nop
 
+
 	; debug message.
 .debug_textmode:    
-    mov byte [0B8000h], byte 'P'
-    mov byte [0B8001h], byte 7
-	mov byte [0B8002h], byte 'M'
-	mov byte [0B8003h], byte 7
+    nop
+
+    ;mov byte [0B8000h], byte 'P'
+    ;mov byte [0B8001h], byte 7
+	;mov byte [0B8002h], byte 'M'
+	;mov byte [0B8003h], byte 7
 	;jmp $
 	
+
 .debug_graphicmode:	
     nop    
 	;jmp $
@@ -197,6 +201,11 @@ pm32:
 	; start.inc
     	
 	mov al, byte [BOOT.modo]	
+
+    ;;
+    ;;  Go to start
+    ;;
+
 	JMP start
 	JMP $
 	

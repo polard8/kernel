@@ -920,7 +920,8 @@ done:
 	printf ("systemReboot: Rebooting ...");
 	refresh_screen();
 	
-	KiReboot ();
+	sys_reboot ();
+	
     die ();
 }
 

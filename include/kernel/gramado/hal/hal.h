@@ -184,10 +184,9 @@ struct motherboard_d
  *     #importante:
  *     obs: talvez devamos ter um desses para cada 
  * processador ??
- *     +A contagem de thrads feita aqui refere-se somente 
- * a um processador ?
- *
+ *     +A contagem de thrads feita aqui refere-se somente a um processador ?
  */
+
 struct ProcessorBlock_d
 {
     object_type_t objectType;
@@ -312,21 +311,18 @@ IoWritePartitionTable(
     ); 
 */				
  
-//Initialization support. 
-int init_hal();
+//Initialization support.
 
+int init_hal ();
+int init_amd ();
+// ...
 
-int init_amd();
-
-
-int jmp_address( unsigned long arg1, 
-                 unsigned long arg2, 
-				 unsigned long arg3 , 
-				 unsigned long arg4); 
+int 
+jmp_address ( unsigned long arg1, 
+              unsigned long arg2, 
+              unsigned long arg3 , 
+              unsigned long arg4); 
 				 
-
-
-
 
 
 int hal_init_machine(); 
@@ -335,16 +331,23 @@ unsigned long hal_get_machine_type();
 int hal_hardware_detect();	
 int hal_showpciinfo();		
 void hal_vsync();
-void hal_reboot();
-void hal_shutdown();
+
 
 //
-// 
+// reboot and shutdown
 //
 
-unsigned long getGdt();
-unsigned long getIdt();
-//unsigned long getTss();  //todo
+void hal_reboot ();
+void hal_shutdown ();
+
+
+//
+// gdt and idt
+//
+
+
+unsigned long getGdt ();
+unsigned long getIdt ();
 
 
 //

@@ -344,15 +344,6 @@ int sys_fork (){
 };
 
 
-/*
-void sys_reboot(void)
-{
-    KiReboot();
-	return;
-};
-*/
-
-
 //Pega o id do processo atual.
 int sys_getpid (){
 	
@@ -391,16 +382,7 @@ int sys_getppid (){
 }
 
 
-/*
- **********************************************************************
- * KeReboot:
- *     Uma interface para chamar um servidor em user mode que realize a 
- * rotina de reboot. 
- */
-void KeReboot (){
-	
-    //return;
-};
+ 
 
 
 /*

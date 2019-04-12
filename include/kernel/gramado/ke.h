@@ -106,7 +106,10 @@ void KeDebugBreakpoint();
 
 //Finalization support.
 void KeAbort();         // Global, qualquer módulo pode abortar. 
-void KeReboot();
+
+
+
+ 
 
 
 //

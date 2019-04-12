@@ -379,24 +379,29 @@ done:
  *     Isso pode ser chamado nas rotinas de 
  * reboot e shutdown.
  */
-int ExitLogon()
-{					
-    if( (void*) gui != NULL )
+
+int ExitLogon (){
+	
+    if ( (void *) gui != NULL )
 	{
         //CloseWindow();
 		//...
 		
-		if( (void*) gui->screen != NULL ){
-		    SetFocus(gui->screen);
-	    };
+		if ( (void *) gui->screen != NULL )
+		{
+			// ?
+		    SetFocus (gui->screen);
+	    }
+		
+		//...
 	};
 	
 	//...
 	
-done:	
 	logonStatus = 0;
-	return (int) 0;
-};
+	
+	return 0;
+}
 
 
 /*
@@ -984,16 +989,19 @@ done:
  * LogonProcedure:
  *     O procedimento de janela do Logon.
  *
- */																
-unsigned long LogonProcedure( struct window_d *window, 
-                              int msg, 
-							  unsigned long long1, 
-							  unsigned long long2 ) 
+ */		
+
+unsigned long 
+LogonProcedure ( struct window_d *window, 
+                 int msg, 
+                 unsigned long long1, 
+                 unsigned long long2 ) 
 {
-    
-	//Obs: Deve ser simples para o módulo logon do kernel base.
+   
+	// Obs: 
+	// Deve ser simples para o módulo logon do kernel base.
 	
-	switch(msg)
+	switch (msg)
 	{			
 		case MSG_SYSKEYDOWN:                 
             switch(long1)	       
@@ -1006,8 +1014,8 @@ unsigned long LogonProcedure( struct window_d *window,
 					
 				//Reboot	
                 case VK_F2:
-					ExitLogon();
-				    KiReboot();				
+					ExitLogon ();
+				    sys_reboot ();				
                     break;				
 														
 				default:

@@ -15,10 +15,10 @@
 # Test on real machine.
 
 VERSION = 1
-PATCHLEVEL = 2
+PATCHLEVEL = 3
 SUBLEVEL = 0
-EXTRAVERSION = 0
-NAME = Tempo
+EXTRAVERSION = -rc0
+NAME = 
 
 
 ARCH ?= x86

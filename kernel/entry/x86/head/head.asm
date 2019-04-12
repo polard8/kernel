@@ -741,39 +741,22 @@ dummyJmpAfterLTR:
 	; Se não terminou de forma normal, halt system.
 	;
 	
-	;;
-	;; @todo: Argumentos.
-	;;
+	
+	;; #todo: 
+	;; Argumentos.
 	
 	call _x86main
-
-;;
-;; HANG
-;;	
-
-;global _hang	
-_hang:
-    ;cli 
-    hlt	
-	jmp _hang	
-		
-;;
-;; _DIE
-;;
-		
-global __die
-__die:
-	hlt
-    jmp __die
 	
-	
-;hlt_loop:
-;	hlt
-;	jmp hlt_loop		
+.hang:
+    hlt
+	jmp __die
+	jmp .hang	
+		
 	
 	;
-	; ***
+	; ====================================
 	;
+
 
 ;----------------------------------------
 ; _SavedBootBlock:

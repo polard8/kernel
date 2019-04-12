@@ -774,7 +774,31 @@ done:
 void sys_showkernelinfo (){
 	
 	KiInformation ();
-};
+}
+
+
+ 
+/*
+ * sys_reboot:
+ *     Reboot, Serviço do sistema.
+ *     Chamando uma rotina interna de reboot do sistema.
+ */
+
+void sys_reboot (){
+
+    hal_reboot ();
+}
+
+
+/*
+ * sys_shutdown:
+ *     Chama uma rotina interna para desligar a máquina.
+ */
+
+void sys_shutdown (){
+
+    hal_shutdown ();
+}
 
 
 /*

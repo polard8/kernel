@@ -649,16 +649,65 @@ _get_page_fault_adr:
 	ret	
 	
 	
+	
+;;
+;; _DIE
+;;
+		
+global __die
+__die:
+    cli
+	hlt
+    jmp __die	
+	
 ;---------------------------
 ; _halt:
 ;    Executa a instrução hlt.
-;	
+
 global _halt	
 _halt:
 	hlt
 	ret
+
+
+;;============================
+;; Para ser usada por uma thread idle em ring 0, 
+;; pois habilita as interrupções
+
+global _idle_halt_cpu
+_idle_halt_cpu:
+    sti
+	hlt
+	jmp _idle_halt_cpu
+	
+
+global _refresh_tlb	
+_refresh_tlb:
+    push eax
+	mov eax, cr3
+	mov cr3, eax
+	pop eax
+	ret
 	
 	
+global _arch_pause
+_arch_pause:
+    pause
+    ret
+	
+
+global _interrupts_enable
+_interrupts_enable:
+    sti
+	ret
+
+
+global _interrupts_disable
+_interrupts_disable:
+    cli
+	ret
+
+
 ;================================================
 ; setup_gdt:
 ;     Carrega gdtr.
@@ -794,7 +843,7 @@ _asm_shut_down:
 ; _asm_reboot:
 ;     Reboot via teclado.
 ;     _headlibReboot. 
-;
+
 global _asm_reboot	
 _asm_reboot:
     ; Wait for an empty Input Buffer.

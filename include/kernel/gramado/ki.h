@@ -44,8 +44,7 @@ void *KiCreateRing0Idle();
 void KiCpuFaults(unsigned long number);
 
 // Finalizations support.
-void KiShutDown(); 
-void KiReboot();
+
 void KiAbort(); 
 
 
