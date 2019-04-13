@@ -177,14 +177,13 @@ extern _task2
 
 
 
-;
-; Physical address for Kernel Base and Kernel Entry Point.
-;
 
-KRN_BASE       equ 0x00100000    ;Base.
-KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
-;KRN_ENTRYPOINT equ (0x00101000+(header size))    ;Entry Point. @todo
-;...
+; Physical address for Kernel Base and Kernel Entry Point.
+; #obs: Isso nem precisa, pois não usremos o endereço de entrypoint.
+
+;KRN_BASE       equ 0x00100000    ;Base.
+;KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
+
 
 
 

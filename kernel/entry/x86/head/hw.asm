@@ -6,9 +6,8 @@
 ;     Irqs e interrupções reservadas (faults,etc).
 ;     Ordem: Primeiro as irqs, depois as outras.
 ;
-; Histórico:
-;     Versão: 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
-;     Versão: 1.0, 2016 - Revisão.
+; History:
+;     2015 - Created by Fred Nora.
 ;
 
 
@@ -88,29 +87,30 @@ _irq0:
 
     cli	
 	
-	;
-	;stack
-	pop dword [_contextEIP]         ; eip (DOUBLE).
-	pop dword [_contextCS]          ; cs  (DOUBLE).
-	pop dword [_contextEFLAGS]      ; eflags (DOUBLE).
-	pop dword [_contextESP] 	    ; esp - user mode (DOUBLE).
-	pop dword [_contextSS]          ; ss  - user mode (DOUBLE).
+	; Stack frame
+	
+	pop dword [_contextEIP]         
+	pop dword [_contextCS]          
+	pop dword [_contextEFLAGS]      
+	pop dword [_contextESP] 	    
+	pop dword [_contextSS]          
     
-	;
-	;registers 
-	mov dword [_contextEDX], edx    ; edx.		
-	mov dword [_contextECX], ecx    ; ecx.	 
-	mov dword [_contextEBX], ebx    ; ebx.	 
-	mov dword [_contextEAX], eax    ; eax.
+	; Volatile
 	
-	;
-	;registers 
-	mov dword [_contextEBP], ebp    ; ebp.
-	mov dword [_contextEDI], edi    ; edi.
-	mov dword [_contextESI], esi    ; esi.	
+	mov dword [_contextEDX], edx    
+	mov dword [_contextECX], ecx    	 
+	mov dword [_contextEAX], eax    
 	
-	;
-	;segments
+	; non-volatile
+	
+	mov dword [_contextEBX], ebx    
+	mov dword [_contextEBP], ebp    
+	mov dword [_contextEDI], edi    
+	mov dword [_contextESI], esi    	
+	
+	
+	; Segments
+	
 	xor eax, eax
     mov ax, gs
 	mov word [_contextGS], ax	
@@ -122,132 +122,77 @@ _irq0:
 	mov word [_contextDS], ax	
 	
 	
-	; @todo:
-    ; Continuar salvamento de contexto dos registradores x86. 	
-	; Outros registradores. Ex: media, float point, debug.
-
-	; Preparando os registradores, para funcionarem em kernel mode.
+    ;; #todo
+	;; Outros registradores.
+	;; Se ponto flutuante fou usado pela última trhead então precisa salvar também.
+	
 	;
-	; Obs: 
-	; Os registradores fs e gs podem ser configurados com seletor nulo '0',
-    ; ou ignorados para economizar instrução.
-
-;;.setupKernelModeRegisters:		
-  
+    ; #### Setup ring 0 segments ####
+	;
 	
-	;; #importante
-	;; E a pilha em ring 0?? ss
-	;; temos que pegar na tss a pilha em ring 0.
-	;; Para retornarmos à velha pilha que tinhamos.
-	
-	;;#bugbug
-	;;Temos que pegar a pilha agora, para não termos problemas
-	;;com as rotinas em C.
-	;; #test: Vamos fazer um teste usando a pilha na sua posição inicial.
-	
-	;;VAMOS TESTAR SEM ISSO NA MÁQUINA REAL.
 	xor eax, eax
 	mov ax, word 0x10
 	mov ds, ax
 	mov es, ax
-	mov fs, ax  ;*   
-	mov gs, ax  ;* 
+	
+	; #obs: ?
+	; Isso já poderia vir com segmentos de kernel mode.
+	
+	mov fs, ax  
+	mov gs, ax   
+	
+	; ring 0 stack
 	
 	mov ss, ax
 	mov eax, 0x003FFFF0 
 	mov esp, eax 
 	
-	
-    ; Chama as rotinas em C.
-	; As rotinas em executarão serviços oferecidos pelo kernel
-	; ou pelos seus modulos ou drivers.
-	; Durante a execução dessas rotinas, as interrupções podem
-	; por um instante serem habilitadas novamente, se isso aacontecer
-	; não queremos que a interrupção de timer irq0 chame essas rotinas
-	; em c novamente. Então desabilitaremos a rechamada dessas funções
-	; enquanto elas estivere em execução e habilitaremos novamnete ao sairmos delas.
-	
-;;.TimerStuff:	           	
-
-	;Chamada ao módulo interno.
-	;Para essa chamada as rotinas do timer estão dentro do kernel base.
-	;Rotinas de timer. #NÃO envolvendo task switch.
-	call _KiTimer             	
-    
-;;.TaskSwitchStuff:	
-    ;Task switch. Troca a tarefa a ser executada.
-	;ts.c
-	call _KiTaskSwitch 	    
-
-
-    ;;
-	;; Flush TLB.
+	;;
+	;;  #### C routines ####
 	;;
 	
-    ;Flush TLB.
+	
+    ; Timer
+	; Chamada ao módulo interno.
+	; Para essa chamada as rotinas do timer estão dentro do kernel base.
+	; Rotinas de timer. 
+	; #NÃO envolvendo task switch.
+	
+	call _KiTimer             	
+    
+
+    ; Task switch. 
+	; Troca a tarefa a ser executada.
+	; ts.c
+	
+	call _KiTaskSwitch 	    
+
+    
+	;;
+	;;  #### restore context ####
+	;;
+	
+	
+    ; Flush pipeline and TLB.
+	
+	; #obs: 
+	; A rotina em C de restauração de contexto deve
+	; pegar configurar corretamente o cr3. Isso não deve dar problemas
+	; pois todo processo deve ter o kernel mapeado.
+
     jmp dummy_flush
 dummy_flush:	
-	;TLB.
+
 	mov EAX, CR3  
-    nop
 	nop
 	nop
 	nop
 	nop
 	mov CR3, EAX  
-
-	;----------------------------------------------------------------------
-	; ?? Quando chamar a rotina 'request()' ??
-	; Obs: AGORA NÃO!
-	; Nesse momento uma thread foi selecionada, o contexto está salvo em 
-	; variáveis que já podem passar para os registradores e efetuar iretd.
-	; Isso acontece toda vez que o timer efetua uma interrupção, então não é 
-	; esse o momento ideal para atender aos request, (Signal), pois seria 
-	; muito constante e atrapalharia o desempenho da rotina de troca de 
-	; contexto. Além do mais, o propósito do request, (signal), é sinalizar
-	; a necessidade de uma operação, porém efetua-la somente depois que a
-	; thread atual utilize toda a sua cota.
-	; *** Importante:
-	; O momento ideal será quando a thread que está rodando, usou toda a sua
-	; cota. Esse momento ideal acontece na rotina task_switch em taskswitch.c
-	;-----------------------------------------------------------------------
-	
-	;-----------------------------------------------------------------------
-	; *IMPORTANTE:
-	; Existe um tipo de page fault causada por recarregar os registradores 
-	; incorretamente. Por isso as rotinas de checagem de conteúdo dos 
-	; registradores antes de retornar devem ser mais severas. Ou seja, depois 
-	; de restaurar, tem que checar. Se não ouver falha, executa iretd. Mas se 
-	; ouver falha, devemos bloquear a thread, checar novamente, tentar 
-	; concertar se for algo simples e fechar a thread se o erro for grave ou 
-	; persistir. Logo apos isso devemos escalonar outra tarefa.
-	;------------------------------------------------------------------------
-	
-	;;====================================================================
-	;; ****    IMPORTANTE    ****
-	;; Obs: Muitos comentários devem ir para a documentação. Onde os 
-	;; procedimentos poderão ser explicados detalhadamente.
-	;;====================================================================
 	
 	
+	; Segments
 	
-	;;
-	;; * Importante:
-	;; Esse é o momento em que restauramos o contexto dos registradores 
-	;; de uma thread para podermos efetura um ired e passar o comando para ela.
-	;; Obs: A thread está em user mode.
-	;; Obs: Ao final, um sinal de EOI é necessário, para sinalizarmos o fim da 
-	;; interrupção de TIMER.
-	;;
-	
-;;.RestoreThreadContext:	
-
-	; @todo:
-    ; Outros registradores precisam ser restaurados agora	
-	; Outros registradores, Ex: media, float point, debug.
-	
-	;
-	;segments
 	xor eax, eax
 	mov ax, word [_contextDS]
 	mov ds, ax
@@ -258,49 +203,37 @@ dummy_flush:
 	mov ax, word [_contextGS]
 	mov gs, ax
 	
-	;
-	;registers 
-	mov esi, dword [_contextESI]    ;esi.
-	mov edi, dword [_contextEDI]    ;edi.
-	mov ebp, dword [_contextEBP]    ;ebp.
-	;
-	mov eax, dword [_contextEAX]    ;eax.
-	mov ebx, dword [_contextEBX]    ;ebx.
-	mov ecx, dword [_contextECX]    ;ecx.
-	mov edx, dword [_contextEDX]    ;edx.
-
-	;
-	;stack
-	;; #obs: estamos colocando isso na pilha do aplicativo..
-	;; assim como todas as operações que fizemos em C.
-	;; #obs: perceba que esse salvo funciona ...
-	;; #o iret da primeira thread não funciona porque 
-	;; não colocamos os valores na pilha do aplicativo como fazemos aqui, e sim
-	;; na pilha do kernel.
 	
-	push dword [_contextSS]        ;ss  - user mode.
-	push dword [_contextESP]       ;esp - user mode.
-	push dword [_contextEFLAGS]    ;eflags.
-	push dword [_contextCS]        ;cs.
-	push dword [_contextEIP]       ;eip.
-
-	;
-    ;EOI - sinal.
-	;Sinalizamos apenas o primeiro controlador.
+	; non-volatile
+	
+	mov esi, dword [_contextESI]    
+	mov edi, dword [_contextEDI]    
+	mov ebp, dword [_contextEBP]    
+	mov ebx, dword [_contextEBX]    
+	
+	; eoi
+	
+	xor eax, eax
+	
     mov al, 20h
     out 20h, al  
- 	
-	mov eax, dword [_contextEAX]    ;eax. (Acumulador).	
 	
-	;( Não precisa 'sti', pois as flags da pilha habilitam as interrupções ).
-	;sti
 	
-;;.Fly:
-    ;;
-	;; "Hi, my name is 'iretd', I work so hard for your happiness."
-    ;; "So that's why my page has to be always in the TLB."
-    ;; 	
-    iretd	
+	; Volatile
+	
+	mov eax, dword [_contextEAX]    
+	mov ecx, dword [_contextECX]    
+	mov edx, dword [_contextEDX]    
+	
+	; Stack frame.
+	
+	push dword [_contextSS]        
+	push dword [_contextESP]       
+	push dword [_contextEFLAGS]    
+	push dword [_contextCS]        
+	push dword [_contextEIP]       
+	     	
+    iretd
 	
 	
 	
