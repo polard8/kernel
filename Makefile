@@ -571,12 +571,12 @@ qemu-test:
 #
 
 clean:
-	-rm *.o
+	-rm -f *.o
 	@echo "Success?"
 	
 clean2:
-	-rm *.ISO
-	-rm *.VHD
+	-rm -f *.ISO
+	-rm -f *.VHD
 	
 	
 	
