@@ -17,7 +17,7 @@
 VERSION = 1
 PATCHLEVEL = 3
 SUBLEVEL = 0
-EXTRAVERSION = -rc0
+EXTRAVERSION = -rc1
 NAME = 
 
 
@@ -571,12 +571,12 @@ qemu-test:
 #
 
 clean:
-	-rm -f *.o
+	-rm *.o
 	@echo "Success?"
 	
 clean2:
-	-rm -f *.ISO
-	-rm -f *.VHD
+	-rm *.ISO
+	-rm *.VHD
 	
 	
 	

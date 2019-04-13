@@ -177,13 +177,14 @@ extern _task2
 
 
 
-
+;
 ; Physical address for Kernel Base and Kernel Entry Point.
-; #obs: Isso nem precisa, pois não usremos o endereço de entrypoint.
+;
 
-;KRN_BASE       equ 0x00100000    ;Base.
-;KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
-
+KRN_BASE       equ 0x00100000    ;Base.
+KRN_ENTRYPOINT equ 0x00101000    ;Entry Point.
+;KRN_ENTRYPOINT equ (0x00101000+(header size))    ;Entry Point. @todo
+;...
 
 
 
@@ -212,8 +213,6 @@ extern _task2
 ;; <head>
 global _kernel_begin              
 _kernel_begin:
-;    nop
-;startup_32:
     jmp mboot_end
 
 	;;
@@ -483,7 +482,7 @@ mboot_end:
 	;;
 	;; Ordem das tabelas: gdt, idt, ldt, tss(tr).
 	;;
-
+	
 	;
 	; GDT.
 	lgdt [_GDT_register] 
@@ -658,10 +657,7 @@ dummyJmpAfterLTR:
 	;;
 		
 	
-	; #IMPORTANTE.
-	; desbilita as interrupções. 
-	; #obs: Já fizemos isso antes.
-	
+	;desbilita as interrupções. #IMPORTANTE.
 	cli	
 	
 	;
@@ -669,9 +665,6 @@ dummyJmpAfterLTR:
 	; Debug: Disable break points.
 	xor	eax, eax
 	mov	dr7, eax
-	
-	;mov	dr2, eax
-	
 	
 	;Segmentos.
 	mov ax, word 0x10   
@@ -701,6 +694,10 @@ dummyJmpAfterLTR:
 	mov dword [_KernelStatus], dword 1
 	
 	
+    ;Debug:
+	; Essa mensagem aparece em modot texto.
+    ;mov byte [0x800008], byte "M"    ;flag.	
+    ;mov byte [0x800009], byte 9
 
 	;Debug
 	;#A
@@ -708,31 +705,47 @@ dummyJmpAfterLTR:
 	;mov ebx, 440
 	;mov ecx, 440
 	;call _gui_buffer_putpixel
+
+	;Debug
+	;#B
+	;mov eax, 0xB0B0B0
+	;mov ebx, 494
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
+
+	;Debug
+	;#C
+	;mov eax, 0xC0C0C0
+	;mov ebx, 523
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
+
+	;Debug
+	;#D
+	;mov eax, 0xD0D0D0
+	;mov ebx, 587
+	;mov ecx, 440
+	;call _gui_buffer_putpixel
+	
+	;;
+	;; ## Refresh screen ##
+	;;
+	
+	;Debug
 	;call _asm_refresh_screen    
 	;jmp $
 	
-
-;.Ljump_to_C_code:
-
-    ; #obs
+	
+    ;
 	; Chama o código em C e checa o retorno.
 	; Se não terminou de forma normal, halt system.
-	; #obs
-	; Me parece que chamar não é o jeito certo. 
-	; Talvez tenhamos que retornar, principalmente se a partir daqui
-	; entrarmos em long mode.
-	
-	; xor ebp, ebp	;clear frame pointer
-	; push cs
-	; push eip ;rip
-	; retf
+	;
 	
 	
 	;; #todo: 
 	;; Argumentos.
 	
 	call _x86main
-	
 	
 .hang:
     hlt
