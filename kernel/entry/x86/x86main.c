@@ -413,8 +413,11 @@ void x86mainStartFirstThread ( int n ){
  *     ...
  */
  
-int x86main ( int argc, char *argv[] ){
-	
+//deletar
+//int x86main ( int argc, char *argv[] ){
+
+void x86main (void){
+
     int Status = 0;
     int zIndex;
 	
@@ -1171,9 +1174,20 @@ done:
     };
 
 fail:
-    printf("x86main: EXIT_FAILURE \n");
+    
+    //
+    // #todo
+    // Uma opção aqui é usarmos a tipagem void para essa função
+    // e ao invés de retornarmos, apenas entrarmos na thread idle
+    // em ring 0, isso depois de criadas as threads em user mode.
+    //
+    
+    
+    printf ("x86main: fail\n");
 	refresh_screen();
-    return (int) EXIT_FAILURE;
+    
+    //deletar
+    //return (int) EXIT_FAILURE;
 }
 
 

@@ -741,9 +741,15 @@ dummyJmpAfterLTR:
 	; Se não terminou de forma normal, halt system.
 	;
 	
+	;;
+	;; #todo
+	;; Para simplificar a passagem de C para Assembly, não
+	;; enviaremos argumentos para a função main.
+	;; os argumentos recebidos pelo kernel no entrypoint em head
+	;; deverão ser passador pelo assebly para variáveis em C.
+	;;
 	
-	;; #todo: 
-	;; Argumentos.
+	;; void x86main (void)
 	
 	call _x86main
 	
