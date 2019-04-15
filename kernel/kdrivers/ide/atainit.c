@@ -12,7 +12,7 @@
 int 
 diskATADialog ( int msg, 
                 unsigned long long1, 
-				unsigned long long2 )
+                unsigned long long2 )
 {
     int Status = 1;    //Error.	
 	
@@ -27,12 +27,12 @@ diskATADialog ( int msg,
 		    Status = 0;
 			return (int) Status;	
 			break;
-			
+
 		//ATAMSG_REGISTER
-        //registra o driver. 		
+		//registra o driver. 
 		//case 2:
 		//    break;
-			
+
 		default:
 		    printf ("diskATADialog: fail\n");
 			break;

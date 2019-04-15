@@ -55,7 +55,7 @@ diskWritePCIConfigAddr ( int bus,
     outportl ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
 	
     outportl ( PCI_PORT_DATA, data );
-};
+}
 
 
 
@@ -77,12 +77,13 @@ uint32_t diskPCIScanDevice ( int class ){
 	
     int bus, dev, fun;
     
-	//#bugbug -1 para unsigned int 
+	// #bugbug 
+    // Usando -1 para unsigned int. 
 	
 	uint32_t data = -1;
 	
 #ifdef KERNEL_VERBOSE		
-	printf("sm-disk-disk-diskPCIScanDevice:\n");
+	printf ("diskPCIScanDevice:\n");
     refresh_screen();
 #endif
     
@@ -103,11 +104,10 @@ uint32_t diskPCIScanDevice ( int class ){
 				if ( ( data >> 24 & 0xff ) == class )
 				{
 					
-//#ifdef KERNEL_VERBOSE							
-					printf ( "[ Detected PCI device: %s ]\n", 
+#ifdef KERNEL_VERBOSE							
+					printf ("Detected PCI device: %s \n", 
 					         pci_classes[class] );
-//#endif
-							 
+#endif							 
 					// Done !
                     
 					return (uint32_t) ( fun + (dev*8) + (bus*32) );
@@ -126,8 +126,7 @@ uint32_t diskPCIScanDevice ( int class ){
 	//refresh_screen();
 	
     return (uint32_t) (-1);
-};
-
+}
 
 
 //===================
@@ -139,19 +138,20 @@ uint32_t diskPCIScanDevice ( int class ){
  *     Espaço de configuraçao PCI Mass Storage
  */
 
-int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
-{	
+int diskATAPCIConfigurationSpace ( struct pci_device_d *D ){
+	
     uint32_t data;
 
-//#ifdef KERNEL_VERBOSE	
+#ifdef KERNEL_VERBOSE	
 	kprintf ("diskATAPCIConfigurationSpace:\n");
     kprintf ("Initializing PCI Mass Storage support..\n");
-//#endif
+#endif
 
 	if ( (void *) D == NULL )
 	{
 		kprintf ("diskATAPCIConfigurationSpace: struct\n");
 	    return PCI_MSG_ERROR;
+		
 	}else {
 	    
 		if ( D->used != 1 || D->magic != 1234 )
@@ -160,7 +160,7 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
 		    return PCI_MSG_ERROR;
 		}
 		//ok
-	}
+	};
 	
 	
     // Indentification Device
@@ -170,11 +170,20 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
     //D->Vendor = data &0xffff;
     //D->Device = data >> 16 &0xffff;
 	
-//#ifdef KERNEL_VERBOSE	
+#ifdef KERNEL_VERBOSE	
 	kprintf ("\nDisk info:\n");
     kprintf ("[ Vendor ID: %X,Device ID: %X ]\n", D->Vendor, D->Device );
-//#endif	
+#endif	
 	
+	/*
+	if ( D->Vendor == 0x1106 && D->Device == 0x0591 )
+	{
+		kprintf ("VIA disk found\n");
+	
+	} else if (D->Vendor == 0x1106 && D->Device == 0x0591) {
+        // ...
+	}
+	*/
     
 	// Obtendo informações.
 	// Classe code, programming interface, revision id.
@@ -207,20 +216,20 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
 		
         // Compatibilidade e nativo, primary.
         data  = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 8 );
-        if( data &0x200 )
+        if ( data & 0x200 )
 		{ 
-	        diskWritePCIConfigAddr( D->bus, D->dev, D->func, 8, data | 0x100 ); 
+	        diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 8, data | 0x100 ); 
 		};        
 
         // Compatibilidade e nativo, secundary.
         data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 8 );
-        if( data &0x800 )
+        if ( data & 0x800 )
 		{ 
 	        diskWritePCIConfigAddr( D->bus, D->dev, D->func, 8, data | 0x400 ); 
 		};        
 
         data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 8 );
-        if( data &0x8000 )
+        if ( data & 0x8000 )
 		{    
             // Bus Master Enable
             data = diskReadPCIConfigAddr (D->bus, D->dev, D->func, 4);
@@ -240,12 +249,12 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
 	    data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 0x48 );
 	    diskWritePCIConfigAddr( D->bus, D->dev, D->func, 0x48, data | 0xf);
 
-#ifdef KERNEL_VERBOSE 		
+//#ifdef KERNEL_VERBOSE 		
         //kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
         //    ata_sub_class_code_register_strings[ata.chip_control_type],
 	    //    ata_pci.progif,
 		//	ata_pci.revisionId );
-#endif
+//#endif
 
         //
         //  ## RAID ##
@@ -259,7 +268,7 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
 	      {
               ata.chip_control_type = ATA_RAID_CONTROLLER;
 		
-		      kprintf ("atapci-diskATAPCIConfigurationSpace: ATA RAID not supported");
+		      kprintf ("diskATAPCIConfigurationSpace: ATA RAID not supported");
 		      die ();
 			  			  
 	            //
@@ -306,21 +315,20 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
                     data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 4 );
                     diskWritePCIConfigAddr ( D->bus, D->dev, D->func, 4, data & ~0x400);
 
-#ifdef KERNEL_VERBOSE
+//#ifdef KERNEL_VERBOSE
                     //kprintf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
                        // ata_sub_class_code_register_strings[ata.chip_control_type], 
 		               // ata_pci.progif,
 			           // ata_pci.revisionId );
-#endif			
+//#endif			
 
                     // Fail!!
 		            // O tipo de dispositivo de armazenaento de massa é não suportado.
 		
                 } else {
 								 
-		            kprintf ("atapci-diskATAPCIConfigurationSpace: Mass storage device not supported");
-		            die ();
-                 };
+		            panic ("diskATAPCIConfigurationSpace: Mass Storage Device NOT supported");
+                };
     
 	// #obs:
 	// Nesse momento já sabemos se é IDE, RAID, AHCI.
@@ -348,28 +356,26 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
     D->BAR4 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x20 );
     D->BAR5 = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x24 );
 	
-    //--------------
     
     // Interrupt
-    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x3C );
     
-    //
-    // Salvando configurações.
-    //		
-	
+	data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x3C );
+    	
 	D->irq_line = data & 0xff;
     D->irq_pin  = data >> 8 & 0xff;
 
 
     // PCI command and status
+	
     data = diskReadPCIConfigAddr( D->bus, D->dev, D->func, 4 );
-    
-
-    // Salvando configurações.
    
 	D->Command = data & 0xffff; 
     D->Status  = data >> 16 & 0xffff;
 	
+	
+	//
+	// # debug
+	//
 	
 #ifdef KERNEL_VERBOSE	
     kprintf ("[ Command %x Status %x ]\n", D->Command, D->Status );
@@ -378,16 +384,18 @@ int diskATAPCIConfigurationSpace ( struct pci_device_d *D )
 		D->irq_line, D->irq_pin );
 #endif		
 	
+	// DMA.
+	
     data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x48);
 	
 #ifdef KERNEL_VERBOSE		
-    kprintf ("[ Synchronous DMA Control Register %X ]\n", data );
+    kprintf ("[ Synchronous DMA Control Register %x ]\n", data );
 #endif
 	
 done:
 	
-	//#bugbug
-	//Esse refresh atraza as coisas.
+	// #bugbug
+	// Esse refresh atraza as coisas.
 
 #ifdef KERNEL_VERBOSE	
     refresh_screen();
