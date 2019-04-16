@@ -11,13 +11,10 @@
 #important
 #We will have a new name just when the release changes.
 
-# 1.2-...
-# Test on real machine.
-
 VERSION = 1
 PATCHLEVEL = 3
 SUBLEVEL = 0
-EXTRAVERSION = -rc3
+EXTRAVERSION = -rc4
 NAME = 
 
 

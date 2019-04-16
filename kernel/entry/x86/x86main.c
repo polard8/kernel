@@ -60,9 +60,11 @@ extern unsigned long SavedBootMode;
 // Task switching support.
 extern void turn_task_switch_on();
 
+extern void clear_nt_flag ();
 
-char copyright[] =
-"Copyright (c) 2005-2018\n\tFred Nora.  All rights reserved.\n\n";
+
+//char copyright[] =
+//"Copyright (c) 2005-2019 \n\tFred Nora.  All rights reserved.\n\n";
 
 
 static inline void mainSetCr3 ( unsigned long value ){
@@ -76,17 +78,11 @@ static inline void mainSetCr3 ( unsigned long value ){
  * x86mainStartFirstThread:
  *      #interna
  *      
- *      Seleciona a primeira thread para rodar e salta para user mode.
+ * Seleciona a primeira thread para rodar e salta para user mode.
+ * Returns program control from an exception or interrupt handler 
+ * to a program or procedure that was interrupted by an exception, 
+ * an external interrupt, or a software-generated interrupt.  
  */
-
-extern void clear_nt_flag ();
-
-
-/*
- Returns program control from an exception or interrupt handler 
- to a program or procedure that was interrupted by an exception, 
- an external interrupt, or a software-generated interrupt. 
-*/
 
 void x86mainStartFirstThread ( int n ){
 	
@@ -118,11 +114,10 @@ void x86mainStartFirstThread ( int n ){
 		    break;
 	};
 	
-	
-   
+	// #importante
+    // Sempre checar a validade da estrutura.
     
-    
-    /*
+ 
     if ( (void *) Thread == NULL )
     {
         panic ("x86mainStartFirstThread: Thread\n");
@@ -160,12 +155,7 @@ void x86mainStartFirstThread ( int n ){
     }
 	
 	//Current process.
-	current_process = Thread->process->pid;
-	*/
-    
-    
-    
-    
+	current_process = Thread->process->pid;    
     
     //
 	// Done!
@@ -227,6 +217,20 @@ void x86mainStartFirstThread ( int n ){
 	
 	asm ("clts \n");
 	
+    
+		//#debug.
+        //vamos mostrar as informaçoes da primeira thread sempre..
+        //quando falhar,veremos se ha algo de diferente.
+
+		
+		//if ( (void *) Thread != NULL )
+		//{
+        //    mostra_slot ( (int) Thread->tid );
+        //    mostra_reg  ( (int) Thread->tid );
+        //    refresh_screen ();
+		//}    
+    
+    
     // #debug
     printf ("Go to user mode!\n");
     refresh_screen (); 
@@ -264,21 +268,12 @@ void x86mainStartFirstThread ( int n ){
         
         printf (">>> IRET\n");
         refresh_screen ();  
-		
-		if ( (void *) Thread != NULL )
-		{
-		    //#debug.
-            //vamos mostrar as informaçoes da primeira thread sempre..
-            //quando falhar,veremos se ha algo de diferente.
-            mostra_slot ( (int) Thread->tid );
-            mostra_reg  ( (int) Thread->tid );
-            refresh_screen ();
-		}
-		
+        
 		//#test
 		//vamos usar o ds do kernel para configurar a pilha.
 		//nova pilha de ring0 em conformidade com a tss0; isso porque esp vai mudando com o tempo.
-		asm volatile ( " movl $0x003FFFF0, %esp \n" 
+		
+        asm volatile ( " movl $0x003FFFF0, %esp \n" 
 					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
                        " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"  // esp 
                        " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
@@ -292,17 +287,7 @@ void x86mainStartFirstThread ( int n ){
 					   " iret \n" );			
 	};
     
-    
-    
-    printf ("x86main: opcao desabilitada");
-    refresh_screen();
-    while(1){}
-    
-    //
-    // ===== cut here ======
-    //
-    
-	
+   	
 	//shell
     if (n == 2 )
     {		
@@ -316,37 +301,20 @@ void x86mainStartFirstThread ( int n ){
 	    }		
 	
         printf (">>> IRET\n");
-        refresh_screen ();         
+        refresh_screen ();  
         
-        //Set cr3 and flush TLB.
-        //mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
-        //asm ("movl %cr3, %eax");
-	    //#todo: delay.
-        //asm ("movl %eax, %cr3");  
-		
-		if ( (void *) Thread != NULL )
-		{
-		    KiSpawnTask ( (int) Thread->tid );
-		    die ();
-		}
-		printf (">>> FAIL\n");
-        die();
-        
-        asm volatile (" sti \n"
-                      " mov $0x23, %ax  \n"
-                      " mov %ax, %ds  \n"
-                      " mov %ax, %es  \n"
-                      " mov %ax, %fs  \n"
-                      " mov %ax, %gs  \n"
-                      " pushl $0x23  \n"              // ss.
-                      " movl $0x0049FFF0, %eax  \n"
-                      " pushl %eax  \n"               // esp.
-                      " pushl $0x3200  \n"            // eflags.
-                      " pushl $0x1B  \n"              // cs.
-                      " pushl $0x00451000  \n"        // eip.
-	                  " movb $0x20, %al   \n"
-                      " outb %al, $0x20   \n"
-				      " iret \n" );
+        asm volatile ( " movl $0x003FFFF0, %esp \n" 
+					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
+                       " movl $0x0049FFF0, %ds:0x0C(%esp)  \n"  // esp 
+                       " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
+                       " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
+                       " movl $0x00451000, %ds:0x00(%esp)  \n"  // eip. 
+                       " movl $0x23, %eax  \n"
+                       " mov %ax, %ds    \n"
+                       " mov %ax, %es    \n"
+                       " mov %ax, %fs    \n"
+                       " mov %ax, %gs    \n"
+					   " iret \n" );
 	};
 	
     //taskman
@@ -363,38 +331,19 @@ void x86mainStartFirstThread ( int n ){
 
         printf (">>> IRET\n");
         refresh_screen ();         
-        
-        //Set cr3 and flush TLB.
-        //mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
-        //asm ("movl %cr3, %eax");
-	    //#todo: delay.
-        //asm ("movl %eax, %cr3"); 
-		
-		if ( (void *) Thread != NULL )
-		{
-		    KiSpawnTask ( (int) Thread->tid );
-		    die ();
-		}
-		printf (">>> FAIL\n");
-        die();
-
-
-        
-        asm volatile (" sti \n"
-                      " mov $0x23, %ax  \n"
-                      " mov %ax, %ds  \n"
-                      " mov %ax, %es  \n"
-                      " mov %ax, %fs  \n"
-                      " mov %ax, %gs  \n"
-                      " pushl $0x23  \n"              // ss.
-                      " movl $0x004FFFF0, %eax  \n"
-                      " pushl %eax  \n"               // esp.
-                      " pushl $0x3200  \n"            // eflags.
-                      " pushl $0x1B  \n"              // cs.
-                      " pushl $0x004A1000  \n"        // eip.
-	                  " movb $0x20, %al   \n"
-                      " outb %al, $0x20   \n"
-				      " iret \n" );
+    
+        asm volatile ( " movl $0x003FFFF0, %esp \n" 
+					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
+                       " movl $0x004FFFF0, %ds:0x0C(%esp)  \n"  // esp 
+                       " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
+                       " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
+                       " movl $0x004A1000, %ds:0x00(%esp)  \n"  // eip. 
+                       " movl $0x23, %eax  \n"
+                       " mov %ax, %ds    \n"
+                       " mov %ax, %es    \n"
+                       " mov %ax, %fs    \n"
+                       " mov %ax, %gs    \n"
+					   " iret \n" );
 	};
 	
 	// Paranoia
@@ -409,12 +358,8 @@ void x86mainStartFirstThread ( int n ){
  *
  * Function history:
  *     2015 - Created by Fred Nora.
- *     2016~2018 - Revision.
- *     ...
+ *     2016~2019 - Revision.
  */
- 
-//deletar
-//int x86main ( int argc, char *argv[] ){
 
 void x86main (void){
 
@@ -1175,19 +1120,13 @@ done:
 
 fail:
     
-    //
     // #todo
     // Uma opção aqui é usarmos a tipagem void para essa função
     // e ao invés de retornarmos, apenas entrarmos na thread idle
     // em ring 0, isso depois de criadas as threads em user mode.
-    //
-    
     
     printf ("x86main: fail\n");
 	refresh_screen();
-    
-    //deletar
-    //return (int) EXIT_FAILURE;
 }
 
 
