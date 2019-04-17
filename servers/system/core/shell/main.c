@@ -623,6 +623,14 @@ int main ( int argc, char *argv[] ){
 	
 	
 	
+	// #debug
+	
+	//printf ("SHELL.BIN is alive");
+	//while (1){ asm ("pause"); }
+	
+	
+	
+	
     /* Wait forever if we are debugging a login shell. */
     //while(debugging_login_shell);	
 
@@ -2101,11 +2109,7 @@ void *shellProcedure ( struct window_d *window,
         //    };		
 		//    break;
 			
-			
-
-
-
-
+		
 		//...
 			
 			
