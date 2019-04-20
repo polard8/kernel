@@ -1,5 +1,5 @@
 /*
- * File: unblocked\rtc.c 
+ * File: rtc.c 
  *
  * Descrição:
  *     Real Time Controller ?!!
@@ -63,7 +63,7 @@ int rtcError;
  *     Isso é uma interface para chamar a rotina verdadeira.
  */
 
-void KiRtcIrq (){
+void KiRtcIrq (void){
 	
 	//...
 	
@@ -78,7 +78,7 @@ void KiRtcIrq (){
  *     System CMOS, Realtime clock. 
  */
 
-void rtc_irq (){
+void rtc_irq (void){
 	
 	unsigned i;
 
@@ -136,7 +136,7 @@ unsigned long read_cmos_bcd ( unsigned reg ){
  * está desatualizado.
  */
 
-unsigned long get_time (){
+unsigned long get_time (void){
 	
 	unsigned long time = 0;
 
@@ -158,7 +158,7 @@ unsigned long get_time (){
  * sTATUS: fUNCIONA BEM.
  */
 
-unsigned long get_date (){
+unsigned long get_date (void){
 	
 	unsigned long date = 0;
 
@@ -199,7 +199,7 @@ unsigned long get_date (){
  *	Limite de uma 'word' ??			
  */
 
-unsigned short rtcGetExtendedMemory (){
+unsigned short rtcGetExtendedMemory (void){
 	
     unsigned short total = 0;
     
@@ -250,7 +250,7 @@ unsigned short rtcGetExtendedMemory (){
  *	Limite de uma 'word' ??			
  */
  
-unsigned short rtcGetBaseMemory(){
+unsigned short rtcGetBaseMemory (void){
 	
     unsigned short total = 0;
 	
@@ -285,7 +285,7 @@ unsigned short rtcGetBaseMemory(){
 // Issa alocação deveria ser feita apenas uma vez
 // na inicialização, depois somente atualizados os valores.
 
-void *get_cmos_info (){
+void *get_cmos_info (void){
 	
 	Rtc = (void *) malloc ( sizeof(struct rtc_d) );
 	
@@ -346,7 +346,7 @@ void *get_cmos_info (){
  * essa aqui so deveria pegar as informações e colocar em estrutura.
  */
 
-int init_clock (){
+int init_clock (void){
 	
 	/*
 	 * @todo: criar uma estrutura para RTC.

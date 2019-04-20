@@ -1,5 +1,6 @@
 /*
- * File: sm\sys\signal.c  #bugbug: esse não é o tratamento de sinal da libc ... o da libc deve ser resolvido em klibc
+ * File: sm/sys/signal.c  
+ * #bugbug: esse não é o tratamento de sinal da libc ... o da libc deve ser resolvido em klibc
  *
  * Descrição:
  *     Signal Manager.
@@ -7,6 +8,7 @@
  *
  * Versão: 1.0, 2016 - Created.
  */
+
 
 /*
   Signal Manager: Gerencia os sinais recebidos e enviados pelos processos.
@@ -142,29 +144,25 @@ int signalSend ( struct process_d *process, int signal ){
 	}
 	
 	//...
-	
-//fail:
 
 	return (int) 1;	
-};
+}
 
 
 /*
  * signalInit:
  *     Inicialização do módulo de gerenciamento de sinais.
- *
  */
-int signalInit (){
+
+int signalInit (void){
 	
     Signal = 0;	
-	
-//done:	
 
-	return (int) 0;
-};
+	return 0;
+}
 
 
 //
-// Fim.
+// End.
 //
 

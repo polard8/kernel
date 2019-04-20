@@ -59,19 +59,23 @@
 
 
 // Internas.
-void logon_create_screen();
-void logon_create_background();
-void logon_create_logo();
-void logon_create_taskbar();
-void logon_create_mainwindow();
-void logon_create_controlmenu();
-void logon_create_infobox();
-void logon_create_messagebox();
-void logon_create_debug();
-void logon_create_navigationbar();
-void logon_create_grid();
-void logon_create_developer_screen();
-int ExitLogon();
+void logon_create_screen (void);
+void logon_create_background (void);
+void logon_create_logo (void);
+void logon_create_taskbar (void);
+void logon_create_mainwindow (void);
+void logon_create_controlmenu (void);
+void logon_create_infobox (void);
+void logon_create_messagebox (void);
+void logon_create_debug (void);
+void logon_create_navigationbar (void);
+void logon_create_grid (void);
+void logon_create_developer_screen (void);
+int ExitLogon (void);
+
+
+
+
 
 
 /* 
@@ -89,7 +93,7 @@ int ExitLogon();
  *    @todo: logonCreate();
  */
 
-void create_logon (){
+void create_logon (void){
 	
 	struct window_d *hWindow; 
 	
@@ -158,16 +162,7 @@ void create_logon (){
 		printf ("gws-create_logon: init windows ok\n");   
 //#endif	    		
 
-		
- 	//#debug :  PARANDO ANTES depois de iniciarmos a gerencia de janelas.
-	//ok funcionou at'e aqui.
-		
-	//printf ("++++++++++++++++++++++++ logon:  ++++++++++++++++++++++++++++++\n");
-   // refresh_screen(); 
-   // while(1){}			
-
-		
-		
+				
 		//menus.
 		init_menus();        
 //#ifdef KERNEL_VERBOSE				
@@ -218,28 +213,12 @@ draw_logon_stuff:
 		
 	};
 	
-    //#debug
-	//gigabyte/intel
-	//funcionou at'e aqui com algumas adaptaç~oes...
-	//vamos prosseguir
-	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
-    //refresh_screen(); 
-    //while(1){}			
-	
-	
+
 	
 	if(gui->backgroundStatus == 1){	
 	    logon_create_background(); 
 	};
-	
-    //#debug
-	//gigabyte/intel
-	//funcionou ate' aqui com algumas adaptaçoes...
-	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
-   // refresh_screen(); 
-   // while(1){}			
 
-	
 	
 	
 	if(gui->logoStatus == 1){ 
@@ -269,16 +248,7 @@ draw_logon_stuff:
 	};
 	
 	
-    //#debug
-	//gigabyte/intel
-	//funcionou ate' aqui com algumas adaptaçoes...
-	//vamos prosseguir
-	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
-    //refresh_screen(); 
-    //while(1){}			
-
-
-	
+ 
 		
 	//
 	// ## Strings ##
@@ -337,21 +307,6 @@ draw_logon_stuff:
 		//Nothing.
 	};
 	
-	//Debug:
-	//printf("#debug logon.c");				   
-	//die();
-	
-	
-    //#debug
-	//gigabyte/intel
-	//funcionou ate' aqui com algumas adaptaçoes...
-	//vamos prosseguir
-	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++++ logon: ++\n");
-   // refresh_screen(); 
-   // while(1){}			
-
-
-		
 	//
 	// # Done # 
 	//
@@ -367,8 +322,9 @@ done:
 	};
 	
     gui->initialised = 1;
+	
     return;
-};
+}
 
 
 /*
@@ -380,7 +336,7 @@ done:
  * reboot e shutdown.
  */
 
-int ExitLogon (){
+int ExitLogon (void){
 	
     if ( (void *) gui != NULL )
 	{
@@ -462,7 +418,7 @@ int grid             // Grid da janela principal.
  *     ...
  */
 
-void logon_create_screen (){
+void logon_create_screen (void){
 	
 	struct window_d *hWindow; 
 	
@@ -556,9 +512,9 @@ done:
  ***********************************************
  * logon_create_background:
  *     Cria o background. Pinta ele de uma cor.
- *
  */
-void logon_create_background()
+
+void logon_create_background (void)
 { 
     struct window_d *hWindow;
 
@@ -609,7 +565,7 @@ done:
  *      *Importante: É a área disponível na tela para o aplicativo. 
  */
 
-void logon_create_mainwindow (){
+void logon_create_mainwindow (void){
 	
     struct window_d *hWindow; 
 	 
@@ -711,9 +667,10 @@ done:
  *
  *     Obs: Sem logo por enquanto.
  */
-void logon_create_logo(){ 
-    return; //Cancelada! 
-};
+void logon_create_logo (void)
+{ 
+    //return; //Cancelada! 
+}
 
 
 /*
@@ -721,9 +678,10 @@ void logon_create_logo(){
  *     Obs: Não há tarefas durante o ambiente de logon.
  *          Não precisa de barra de tarefas.
  */
-void logon_create_taskbar(){ 
-    return; //Cancelada!.
-};
+void logon_create_taskbar (void)
+{ 
+    //return; //Cancelada!.
+}
 
 
 /*
@@ -733,9 +691,10 @@ void logon_create_taskbar(){
  *     
  *
  */
-void logon_create_controlmenu(){ 
-    return; 
-};
+void logon_create_controlmenu (void)
+{ 
+    //return; 
+}
 
 
 /*
@@ -745,7 +704,8 @@ void logon_create_controlmenu(){
  * como novos dispositivos encontrados.
  *     Inicalizar uma estrutura light de infobox.
  */
-void logon_create_infobox(){
+void logon_create_infobox (void)
+{
    //@todo: trocar isso por message window, aquela janela amarela de mensagens.
     return; //Nothing for now.
 };
@@ -756,7 +716,8 @@ void logon_create_infobox(){
  *     @todo: Inicializa o message box a ser usado no ambiente de logon.
  *            Light message box. 
  */
-void logon_create_messagebox(){ 
+void logon_create_messagebox (void)
+{ 
     return; 
 };
 
@@ -766,7 +727,8 @@ void logon_create_messagebox(){
  *     Pequeno debug de estruturas e parâmetros e logon.
  * 
  */
-void logon_create_debug(){ 
+void logon_create_debug (void)
+{ 
     return; //Nothing for now.
 };
 
@@ -783,7 +745,7 @@ void logon_create_debug(){
  *     A barra de navegação da tela de logon pode ser um pouco mais larga.
  *
  */
-void logon_create_navigationbar()
+void logon_create_navigationbar (void)
 {
 	
 /*
@@ -861,7 +823,8 @@ done:
  * logon_create_grid:
  *     O Kernel não cria grid em logon.
  */
-void logon_create_grid(){ 
+void logon_create_grid (void)
+{ 
 	return; //Cancelada!
 };
 
@@ -875,7 +838,7 @@ void logon_create_grid(){
  *     Atribuindo as dimensões.
  *     ...
  */
-void logon_create_developer_screen()
+void logon_create_developer_screen (void)
 {
 	
 /*

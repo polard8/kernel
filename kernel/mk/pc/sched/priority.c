@@ -12,7 +12,7 @@
  *            Criar scheduleriBalanceCurrentThreadPriority()
  */
 
-int set_priority (){
+int set_priority (void){
 	
     struct thread_d *Current; 
 	
@@ -26,8 +26,9 @@ int set_priority (){
 	
     set_thread_priority ( Current, PRIORITY_NORMAL);
     
-	return (int) 0; 
+	return 0; 
 }
+
 
 /*
  * KiSetPriority:
@@ -35,7 +36,7 @@ int set_priority (){
  *     Faz alterações na prioridade de acordo com o status.
  */
  
-int KiSetPriority (){
+int KiSetPriority (void){
 	
 	//#todo: Fazer alguma coisa aqui.
 	
@@ -55,17 +56,14 @@ int KiIncreasePriority (int pid){
 
 
 /*
- *********************************************************************
  * find_higher_priority:
  *     Encontra uma thread de maior prioridade entre as threads de 
  * estado READY.
  *     Essa rotina é usado após a preempção, onde uma thread de 
- * baixa prioridade para de executar, para que rode uma de maior 
- * prioridade.
- *
+ * baixa prioridade para de executar, para que rode uma de maior prioridade.
  */
  
-int find_higher_priority (){
+int find_higher_priority (void){
 	
 	int i;              //Contador.
 	unsigned long p;    //Prioridade.	
@@ -154,31 +152,32 @@ int find_higher_priority (){
 	// Encontramos uma tarefa de prioridade maior.
 
     return (int) Current;
-};
+}
+
 
 /*
- *************************************************
+
  * KiFindHigherPriority:
- *     Interface para chamar a rotina de encontrar 
- * tarefa com maior prioridade.
+ *     Interface para chamar a rotina de encontrar tarefa com maior 
+ * prioridade.
  * Encontra uma tarefa de maior prioridade entre as 
- * threads de estado READY para que possa assumir o 
- * estado RUNNING.
+ * threads de estado READY para que possa assumir o estado RUNNING.
  * Essa rotina é usada após a preempçao, onde uma thread 
  * de baixa prioridade para de executar para que rode 
  * uma de maior prioridade.
  */ 
  
-int KiFindHigherPriority (){
-	
+int KiFindHigherPriority (void)
+{	
 	// #todo:
 	// Algo pode ser feito aqui.
 	
     return (int) find_higher_priority (); 
-}; 
- 
+}
 
 
-
+//
+//  End.
+//
 
 

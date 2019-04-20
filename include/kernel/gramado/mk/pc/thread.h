@@ -10,7 +10,7 @@
  *     2018 - Revision.
  */
  
-//
+
 //#define FIRST_THREAD theadList[0]
 //#define LAST_THREAD  threadList[THREAD_COUNT_MAX-1] 
  
@@ -603,6 +603,7 @@ struct thread_d *ready_list_head;
  *   
  *   **** LONG-TERM SCHEDULER FOR THREADS ****
  */
+
 unsigned long threadList[THREAD_COUNT_MAX];
 
 
@@ -633,12 +634,15 @@ struct thread_d *create_thread ( struct room_d *room,
 								 int pid, 
 								 char *name );
 
-void *GetCurrentThread();
-void *FindReadyThread();
-int GetThreadState(struct thread_d *Thread);
-int GetThreadType(struct thread_d *Thread);
-void dispatch_thread(struct thread_d *thread);
-void set_thread_priority(struct thread_d *t, unsigned long priority);
+
+void *GetCurrentThread (void);
+
+void *FindReadyThread (void);
+
+int GetThreadState (struct thread_d *Thread);
+int GetThreadType (struct thread_d *Thread);
+void dispatch_thread (struct thread_d *thread);
+void set_thread_priority (struct thread_d *t, unsigned long priority);
 
 
 // ## Page directory support ## 
@@ -662,11 +666,13 @@ unsigned long GetThreadStackStart(struct thread_d *thread);
 void SelectForExecution (struct thread_d *Thread);
 
 
-void KiShowThreadList();
-void show_thread_information(); 
-int init_threads();
+void KiShowThreadList (void);
 
-int GetCurrentThreadId();
+void show_thread_information (void); 
+
+int init_threads (void);
+
+int GetCurrentThreadId (void);
 
 
 // Usadas durante a inicialização e execução de uma thread.
@@ -689,13 +695,13 @@ void exit_thread ( int tid );
 void kill_thread (int tid);       
 
 
-void dead_thread_collector ();
+void dead_thread_collector (void);
 
 
-void kill_all_threads ();
+void kill_all_threads (void);
 
 
-int thread_getchar ();
+int thread_getchar (void);
 
 
 //

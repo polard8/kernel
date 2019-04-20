@@ -29,7 +29,7 @@
 //Não precisamos inicialziar os dispositivos nesse momento.
 //somente colocar na estrutura
 
-int pci_setup_devices (){	
+int pci_setup_devices (void){	
 	
     unsigned short Vendor;    //Offset 0.
 	unsigned short Device;    //Offset 2.

@@ -119,13 +119,15 @@ unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 /*
  * dispatcher:
  *     Função principal do dispatcher.
- *
  */ 
-void dispatcher(int type);
 
-int init_dispatcher();
-void IncrementDispatcherCount( int type );
+void dispatcher (int type);
+
+int init_dispatcher (void);
+
+void IncrementDispatcherCount ( int type );
 
 //
-// Fim.
+// End.
 //
+

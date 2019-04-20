@@ -17,7 +17,7 @@
  
 
 /*
-void *createTTYLine (){
+void *createTTYLine (void){
 	
 	int i;
 	struct ttyline_d *l;
@@ -83,10 +83,11 @@ void *createTTYLine (){
  ***********************************
  * ttyInit:
  *     Inicialização do módulo.
- *
  */
-int ttyInit (){
+
+int ttyInit (void){
 		
+	
 /*	
 	int i;
 	
@@ -101,10 +102,17 @@ int ttyInit (){
 	input_line = (void *) createTTYLine(); 
 	
 	//...
-//done: 
 
-	return (int) 0; 
+	return 0; 
 */
+	
     return -1;
 }
+
+//
+// End.
+//
+
+
+
 

@@ -67,7 +67,9 @@ struct HeapPointer
  *     Cada processo tem seu heap.
  *     Cada heap tem uma lista encadeada de blocos.  
  */  
+
 typedef struct heap_d heap_descriptor_t;
+
 struct heap_d 
 {
 	object_type_t objectType;
@@ -165,8 +167,9 @@ unsigned long heapList[HEAP_COUNT_MAX];
 // Protótipos.
 //
 
-int init_heap();
-void SetKernelHeap( unsigned long HeapStart, unsigned long HeapSize);
+int init_heap (void);
+
+void SetKernelHeap ( unsigned long HeapStart, unsigned long HeapSize);
 
 //Pega o endereço do início do header da próxima alocação.
 unsigned long get_process_heap_pointer(int pid);

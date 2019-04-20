@@ -1,5 +1,5 @@
 /*
- * Arquivo: wstation.h
+ * File: room.h
  *
  * Descrição:
  *     Window station. 
@@ -72,15 +72,21 @@ unsigned long roomList[ROOM_COUNT_MAX];
  * Contagem de window stations.
  *
  */
+
 //movido para gws.h 
 //int windowstations_count;  
 
-void init_room_manager();
-void init_room_list();
+void init_room_manager (void);
+
+void init_room_list (void);
+
 int RegisterRoom(struct room_d *room);
+
 void set_current_room(struct room_d *room);
-void *get_current_room();
-void *CreateRoom(struct room_d *room);
+
+void *get_current_room (void);
+
+void *CreateRoom (struct room_d *room);
 
 
 //

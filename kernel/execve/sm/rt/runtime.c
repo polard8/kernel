@@ -31,10 +31,8 @@
  *     Kernel heap and stack stuffs.
  *     @todo: Mudar para runtimeInit().
  */
-int init_runtime (){
-	
-	
-	
+
+int init_runtime (void){
 	
 	// Init Memory Manager:	
 	// Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
@@ -72,12 +70,10 @@ int init_runtime (){
 	
     // Continua ...
 	
- 
-
     g_module_runtime_initialized = 1;
 	
     return (int) 0;    
-};
+}
 
 
 /*
@@ -91,7 +87,7 @@ int init_runtime (){
  *         de inicialização da runtime.
  */
 
-int KiInitRuntime (){
+int KiInitRuntime (void){
 	
 	int Status = 0;
 	

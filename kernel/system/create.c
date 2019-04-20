@@ -43,7 +43,7 @@
  * @todo: Mudar o nome para createCreateIdleThread()
  */
 
-void *KiCreateIdle (){
+void *KiCreateIdle (void){
 	
     void *idleStack;                    // Stack pointer.
 	char *ThreadName = "idlethread";    // Name.
@@ -311,7 +311,7 @@ void *KiCreateIdle (){
  * @todo: Mudar o nome para createCreateShellThread()
  */
 
-void *KiCreateShell (){
+void *KiCreateShell (void){
 	
     void *shellStack;                    // Stack pointer. 
 	struct thread_d *t;
@@ -492,7 +492,7 @@ void *KiCreateShell (){
  * @todo: Mudar o nome para createCreateTaskmanThread()
  */
 
-void *KiCreateTaskManager (){
+void *KiCreateTaskManager (void){
 	
     void *taskmanStack;                    // Stack pointer. 	
 	struct thread_d *t;

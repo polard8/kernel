@@ -31,7 +31,7 @@ int lock_taskswitch;
 // Internal.  
 //
 
-void taskswitchRR();
+void taskswitchRR (void);
 //...
 
 
@@ -82,7 +82,7 @@ void taskswitchFlushTLB(){
 	// ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
 */ 
  
-void KiTaskSwitch (){
+void KiTaskSwitch (void){
 	
 	//Limits.
 	
@@ -129,7 +129,7 @@ void KiTaskSwitch (){
  * Called by KiTaskSwitch.
  */
  
-void task_switch (){
+void task_switch (void){
 
 	int New;
 	int Max;
@@ -572,7 +572,8 @@ doneRET:
  *     Task switch usando Round Robin.
  *     Obs: Esse método ainda não foi habilitado.
  */
-void taskswitchRR()
+
+void taskswitchRR (void)
 {
 	int i;
 	int Max = (int) ProcessorBlock.threads_counter;
@@ -696,41 +697,41 @@ void set_task_status( unsigned long status )
 
 
 /*
- **************************************************
  * get_task_status:
  *     Obtem o status do mecanismo de taskswitch.
- *
  * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
  */
-unsigned long get_task_status()
+
+unsigned long get_task_status (void)
 {
     //#bugbug: Mudar para int.		
-    return (unsigned long) task_switch_status;
-};
+    
+	return (unsigned long) task_switch_status;
+}
 
 
 /*
- **********************************************
  * taskswitch_lock:
  *     Trava o mecanismo de taskswitch.
  *     @todo: Mudar para taskswitchLock().
  */ 
-void taskswitch_lock (){
+
+void taskswitch_lock (void){
 	
     task_switch_status = (unsigned long) LOCKED;
-};
+}
 
 
 /*
- *********************************************
  * taskswitch_unlock:
  *     Destrava o mecanismo de taskswitch.
  *     @todo: Mudar para taskswitchUnlock().
  */ 
-void taskswitch_unlock (){
+
+void taskswitch_unlock (void){
 	
     task_switch_status = (unsigned long) UNLOCKED;
-};
+}
 
 
 //

@@ -119,8 +119,8 @@ extern unsigned long stack0_krn_ptr;
 
 
 //functions
-extern void dispatch_context();
-extern void do_executa_new_task();
+extern void dispatch_context (void);
+extern void do_executa_new_task (void);
 
 
 
@@ -154,8 +154,12 @@ extern void do_executa_new_task();
 
 #include <kernel/gramado/kdrivers/cpuid.h>
 
-#include <kernel/gramado/kdrivers/screen.h>
-#include <kernel/gramado/kdrivers/video.h>
+
+//# /x
+#include <kernel/gramado/kdrivers/x/screen.h>
+#include <kernel/gramado/kdrivers/x/video.h>
+
+
 
 #include <kernel/gramado/kdrivers/rtc2.h>
 //...
@@ -240,9 +244,9 @@ extern void do_executa_new_task();
 #include <kernel/gramado/kdrivers/floppy/floppy.h>
 
 
-#include <kernel/gramado/kdrivers/i8042/keyboard.h>
-#include <kernel/gramado/kdrivers/i8042/vk.h>
-#include <kernel/gramado/kdrivers/i8042/kbdabnt2.h>
+#include <kernel/gramado/kdrivers/x/i8042/keyboard.h>
+#include <kernel/gramado/kdrivers/x/i8042/vk.h>
+#include <kernel/gramado/kdrivers/x/i8042/kbdabnt2.h>
 
 
 #include <kernel/gramado/execve/ldisc/ldisc.h>
@@ -332,9 +336,9 @@ extern void do_executa_new_task();
 #include <kernel/gramado/kdrivers/tty/tty.h>
 
 
-#include <kernel/gramado/kdrivers/i8042/i8042.h>
-#include <kernel/gramado/kdrivers/i8042/ps2mouse.h>
-#include <kernel/gramado/kdrivers/i8042/ps2kbd.h>
+#include <kernel/gramado/kdrivers/x/i8042/i8042.h>
+#include <kernel/gramado/kdrivers/x/i8042/ps2mouse.h>
+#include <kernel/gramado/kdrivers/x/i8042/ps2kbd.h>
 
 #include <kernel/gramado/kdrivers/network/host.h>        //host info.
 #include <kernel/gramado/kdrivers/network/ethernet.h>
@@ -702,15 +706,25 @@ struct platform_d
 struct platform_d *Platform; 
 
 
+
+//
 // Initializations support.  
-int init_runtime();         //RunTime.
-void boot();                //??
-void save_kernel_args();    //Save args in the structure.
+//
+
+
+//RunTime.
+int init_runtime (void);         
+
+
+//Save args in the structure.
+void save_kernel_args (void);    
 
 
 // Linked list support.
-void* newLinkedlist();
-void* newNode();
+
+void* newLinkedlist (void);
+void* newNode (void);
+
 void Removing_from_the_beginning(struct linkedlist_d *list);
 void Removing_from_the_middle(struct linkedlist_d *list);
 void Removing_from_the_end(struct linkedlist_d *list);
@@ -720,7 +734,8 @@ void Removing_from_the_end(struct linkedlist_d *list);
 // Count support.
 //
 
-unsigned long get_tick_count ();
+//?? somente o protótipo. deletar.
+//unsigned long get_tick_count ();
 
 
 //
@@ -742,8 +757,8 @@ void faults (unsigned long number);
 // Error support
 // 
  
-void abort ();    //abort.c
-void die ();      //system.c
+void abort (void);    //abort.c
+void die (void);      //system.c
 
 
 // ke - Kernel External.

@@ -21,6 +21,7 @@
  * desktop_d:
  *     Desktop structure.
  */
+
 struct desktop_d
 {
 	object_type_t objectType;
@@ -185,12 +186,16 @@ struct desktop_info_d
 
 
 
-void init_desktop();
-void init_desktop_list();
+void init_desktop (void);
+
+void init_desktop_list (void);
+
 int RegisterDesktop(struct desktop_d *d); 
 void set_current_desktop(struct desktop_d *desktop);
-void *get_current_desktop();
-int get_current_desktop_id();
+
+void *get_current_desktop (void);
+
+int get_current_desktop_id (void);
 
 void *CreateDesktop(struct room_d *room);
 

@@ -85,17 +85,24 @@ unsigned long diskList[DISK_COUNT_MAX];
 
 
 
-void diskShowCurrentDiskInfo();
+void diskShowCurrentDiskInfo (void);
 
 int diskShowDiskInfo ( int descriptor );
 
 void *disk_get_disk_handle( int number );
-void *disk_get_current_disk_info();
-int disk_init();
-void init_test_disk();  //*teste de operação com disco. 
+
+void *disk_get_current_disk_info (void);
+
+int disk_init (void);
+
+//*teste de operação com disco.
+void init_test_disk (void);   
 
 int get_ide_disk_info ( int port, unsigned long buffer, int master );
-void show_ideports_info();
+
+void show_ideports_info (void);
+
+
 //
 // End.
 //

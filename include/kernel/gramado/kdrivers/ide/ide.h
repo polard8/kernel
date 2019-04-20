@@ -80,9 +80,6 @@ struct ide_ports_d
 struct ide_ports_d ide_ports[4];
  
  
- 
- 
- 
 
 #define IDE_ATA 0
 #define IDE_ATAPI 1
@@ -157,8 +154,6 @@ struct ide_disk_d
 };
 
 
- 
- 
 /*
  * ide_d:
  *
@@ -216,8 +211,9 @@ void my_write_hd_sector( unsigned long ax,
 /* 
  * init_hdd:
  *     Inicializa o módulo.
- */				
-int init_hdd();
+ */		
+
+int init_hdd (void);
 
 //
 // End.

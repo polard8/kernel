@@ -401,6 +401,7 @@ mboot_end:
 .useGUI:
 
     ;checar se chegamos aqui com a flag de gui acionada.
+    
 	cmp al, byte 'G'
 	jne .nogui
 
@@ -412,54 +413,56 @@ mboot_end:
    ;mov dword [_g_lbf_pa], ebx         ;Endereço físico do LFB.
 
    
-    ;;
-	;; @todo: 
-	;;     O PONTEIRO PARA BOOTBLOCK DEVERÁ FICAR EM EBX E SEGUIR    
+	;; #todo: 
+	;; O PONTEIRO PARA BOOTBLOCK DEVERÁ FICAR EM EBX E SEGUIR    
 	;; OS PADRÕES DA MULTIBOOT SPECIFICATION, PARA ISSO O BOOT BLOCK
 	;; CRIADO NO BOOT MANAGER E PASSADO PELO BOOT LOADER DEVE SER 
 	;; REORGANIZADO, PARA ADERIR AO PADRÃO.
-	;;
    
     ;BootBlock pointer.
 	;Ponteiro para o bootblock passado pelo Boot Manager.
 
     mov dword [_SavedBootBlock], edx
 
-	;salvando o endereço físico do frontbuffer.
-	;FrontBuffer Address, (LFB)
+	; Salvando o endereço físico do frontbuffer.
+	; FrontBuffer Address, (LFB)
+	
+	;lfb.
 	xor eax, eax
-	mov eax, dword [edx +0]       ;lfb.
+	mov eax, dword [edx +0]       
 	mov dword [_SavedLFB], eax
 	mov dword [_g_frontbuffer_pa], eax
 
+    ;X.
 	xor eax, eax
-    mov ax, word [edx +4]         ;X.
+    mov ax, word [edx +4]         
     mov dword [_SavedX], eax
 
+    ;Y.
 	xor eax, eax
-    mov ax, word [edx +8]         ;Y.
+    mov ax, word [edx +8]         
     mov dword [_SavedY], eax
 
+    ;BPP.
 	xor eax, eax
-    mov al, byte [edx +12]        ;BPP.	
+    mov al, byte [edx +12]        	
     mov dword [_SavedBPP], eax
 	
-	;;
+
 	;; #importante:
 	;; Outras informações poderiam ser passadas 
 	;; através do boot block.
 	;; Informações captadas durante as rotinas de boot.
-	;;
 	
 	
 ;.no_gui:
 
     mov dword [_g_useGUI], dword 0
 
-    ;
     ; Salva os argumentos passados pelo boot loader via registradores.
+    
 	mov dword [_kArg1], eax    ;Video mode.
-	mov dword [_kArg2], ebx    ;LFB. ( VESA - Linear Frame Buffer).
+	mov dword [_kArg2], ebx    ;LFB. (Linear Frame Buffer)
 	mov dword [_kArg3], ecx    ;??.
 	mov dword [_kArg4], edx    ;??.
 
@@ -475,28 +478,26 @@ mboot_end:
 	;; Interrupt enabling: 
 	;; Começaremos configurando suporte a interrupções.
 
-
     ; Desabilita para segurança.
+    
 	cli
 	
-	;;
-	;; Ordem das tabelas: gdt, idt, ldt, tss(tr).
-	;;
+	;; Ordem das tabelas: 
+	;; gdt, idt, ldt, tss(tr).
 	
-	;
 	; GDT.
+	
 	lgdt [_GDT_register] 
 	
-	;
 	; IDT.
-	call setup_idt          ;Aponta tudo para uma isr só. 'unhandled_int'.
-	call setup_faults       ;Configura vetores de faults e exceptions.
-	call setup_vectors      ;Configura outros vetores.
+	
+	call setup_idt        ;Aponta tudo para uma isr só. 'unhandled_int'.
+	call setup_faults     ;Configura vetores de faults e exceptions.
+	call setup_vectors    ;Configura outros vetores.
 	lidt [_IDT_register] 
 
-	
-	;
 	; LDT.
+	
 	xor ax, ax
 	lldt ax
 
@@ -504,7 +505,7 @@ mboot_end:
 	; TR. (tss)
 	;
 
-	;
+
     ; ??
     ; Flush TSS:
     ;     Load the index of our TSS structure.
@@ -512,12 +513,9 @@ mboot_end:
 	; each is 8 bytes long, but we set the bottom two bits (making 0x2B)
     ; so that it has an RPL of 3, not zero.
     ;     Load 0x2B into the task state register.
- 	;
 	
-	;;
 	;; #importante
 	;; Coloca o endereço da TSS na entrada da GDT
-	;;
 	
 	;;isso ja foi configurado.(103)
 	;;mov word [gdt6], tss0_end - tss0 - 1  
@@ -533,31 +531,26 @@ mboot_end:
 	mov ax, word 0x2B     ;28+3. 
 	ltr ax  
 
-	
-    ;
-    ; Me parece que nesse momento precisamos de um jmp far, semelhante ao que usamos
-    ; na comutação do modo real para o modo protegido.
-    ;
-    ;	
+    ; Me parece que nesse momento precisamos de um jmp far, 
+    ; semelhante ao que usamos na comutação do modo real para o 
+    ; modo protegido.	
 	
 	jmp 8:dummyJmpAfterLTR
     nop	
 dummyJmpAfterLTR:
 	
-	;;
 	;; Selecting the 'Processor Interrup Mode'.
 	;; * PIC MODE *
-	;;
 		
-	;;
     ;; Todos os componentes APIC são ignorados e o sistema opera
     ;; no modo single-thread usando LINT0.
-    ;;	
 		
 ;.setupPICMODE:	
 	
 	;PIC.
+	
 	cli
+	
 	;xor eax, eax
 	mov al, 00010001b    ;begin PIC1 initialization.
 	out 0x20, al
@@ -584,38 +577,37 @@ dummyJmpAfterLTR:
 	out  0x21, al
 	
 
-    ;;
-	;; Com todas as interrupções mascaradas, é hora de configurarmos os timers.
-	;;
+	;; Com todas as interrupções mascaradas, é hora de 
+	;; configurarmos os timers.
 	
-	;;
 	;; Configurando os timers do sistema.
 	;; Nossa opção agora é o PIT.
 	;; @todo: Para o RTC podemos fazer uma pequena inicialização agora.
 	;; pois temos um módulo mais completo em C.
-	;;
+
 	
-	;TIMER.
+	; TIMER.
 	; PIT 8253 e 8254 = (1234DD) 1193181.6666 / 100 = 11930. ; 1.19MHz.
 	; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz.
-	;
+	; 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ
+	
 	;xor	eax, eax
 	mov al, byte 0x36
 	mov dx, word 0x43
 	out dx, al
-	mov eax, dword 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ
+	mov eax, dword 11931
 	mov dx, word 0x40
 	out dx, al
 	mov al, ah
 	out dx, al
 	
 	
-	;;@todo:
-	;;Init RTC.
+	;; #todo:
+	;; Init RTC.
 
-
-	;;step 
-    ;;@todo: memory caching control.	
+	;; step 
+    ;; #todo: 
+    ;; memory caching control.	
 	
 	;;step 
 	;processor Discovery and initialization	
@@ -656,17 +648,22 @@ dummyJmpAfterLTR:
 	;; Configurando alguns registradores.
 	;;
 		
+	; #IMPORTANTE.
+	; Desbilita as interrupções. 
 	
-	;desbilita as interrupções. #IMPORTANTE.
 	cli	
 	
-	;
 	; Debug.
 	; Debug: Disable break points.
+	
 	xor	eax, eax
 	mov	dr7, eax
 	
-	;Segmentos.
+	;mov dr2, eax	
+	
+	
+	;Segmentos de dados em ring0.
+	
 	mov ax, word 0x10   
 	mov ds, ax
 	mov es, ax
@@ -677,19 +674,21 @@ dummyJmpAfterLTR:
 
 	;Stack	(atualiza o ponteiro para a variável global).
 	
-	;(o mesmo endereço indicado na TSS ??)
+	; (o mesmo endereço indicado na TSS ??)
+	
 	mov eax, 0x003FFFF0 
 	mov esp, eax 
     
     ;salva.	
+	
 	mov dword [_kernel_stack_start_pa], 0x003FFFF0   
 	mov dword [_kernel_stack_start],    0x003FFFF0 
 	
 
-	; * Muda o status do kernel.
-	;
-	;   @todo: Porque mudou para um se KeMain() muda para 0?
-	;          +deletar isso. 
+	; Muda o status do kernel.
+	; #todo: 
+	; Porque mudou para um se KeMain() muda para 0?
+	; +deletar isso. 
 	
 	mov dword [_KernelStatus], dword 1
 	
@@ -706,48 +705,21 @@ dummyJmpAfterLTR:
 	;mov ecx, 440
 	;call _gui_buffer_putpixel
 
-	;Debug
-	;#B
-	;mov eax, 0xB0B0B0
-	;mov ebx, 494
-	;mov ecx, 440
-	;call _gui_buffer_putpixel
-
-	;Debug
-	;#C
-	;mov eax, 0xC0C0C0
-	;mov ebx, 523
-	;mov ecx, 440
-	;call _gui_buffer_putpixel
-
-	;Debug
-	;#D
-	;mov eax, 0xD0D0D0
-	;mov ebx, 587
-	;mov ecx, 440
-	;call _gui_buffer_putpixel
-	
-	;;
-	;; ## Refresh screen ##
-	;;
-	
-	;Debug
 	;call _asm_refresh_screen    
 	;jmp $
 	
 	
-    ;
+   
 	; Chama o código em C e checa o retorno.
 	; Se não terminou de forma normal, halt system.
-	;
 	
-	;;
+	
 	;; #todo
 	;; Para simplificar a passagem de C para Assembly, não
 	;; enviaremos argumentos para a função main.
 	;; os argumentos recebidos pelo kernel no entrypoint em head
 	;; deverão ser passador pelo assebly para variáveis em C.
-	;;
+	
 	
 	;; void x86main (void)
 	

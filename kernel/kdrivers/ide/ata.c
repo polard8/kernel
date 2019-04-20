@@ -10,6 +10,12 @@
  */
 
 
+void ata_soft_reset (void);
+static inline int getpid_dev (void);
+static inline int getnport_dev (void);
+
+
+    
 /*
 # redundante: isso tem em outro lugar ?
 const char *dev_type[] = {
@@ -60,7 +66,7 @@ void ata_wait (int val){
 // TODO: 
 // Ao configurar os bits BUSY e DRQ devemos verificar retornos de erros.
 
-unsigned char ata_wait_not_busy (){
+unsigned char ata_wait_not_busy (void){
 	
     while ( ata_status_read() & ATA_SR_BSY )
         if ( ata_status_read() & ATA_SR_ERR )
@@ -70,7 +76,7 @@ unsigned char ata_wait_not_busy (){
 }
 
 
-unsigned char ata_wait_busy (){
+unsigned char ata_wait_busy (void){
 	
     while (!(ata_status_read() & ATA_SR_BSY ))
         if ( ata_status_read() & ATA_SR_ERR )
@@ -80,7 +86,7 @@ unsigned char ata_wait_busy (){
 }
 
 
-unsigned char ata_wait_no_drq (){
+unsigned char ata_wait_no_drq (void){
 	
     while ( ata_status_read() & ATA_SR_DRQ )
         if ( ata_status_read() & ATA_SR_ERR )
@@ -90,7 +96,7 @@ unsigned char ata_wait_no_drq (){
 }
 
 
-unsigned char ata_wait_drq (){
+unsigned char ata_wait_drq (void){
 	
     while (!(ata_status_read () & ATA_SR_DRQ))
         if ( ata_status_read () & ATA_SR_ERR )
@@ -100,7 +106,7 @@ unsigned char ata_wait_drq (){
 }
 
  
-void ata_soft_reset (){
+void ata_soft_reset (void){
 	
     unsigned char data = inb ( ata.ctrl_block_base_address + 2 );
     
@@ -113,7 +119,7 @@ void ata_soft_reset (){
 // Lê o status de um disco determinado, se os valores na estrutura 
 // estiverem certos.
 
-unsigned char ata_status_read (){
+unsigned char ata_status_read (void){
 	
    	return inb ( ata.cmd_block_base_address + ATA_REG_STATUS );
 }
@@ -441,7 +447,7 @@ uint32_t  dev_next_pid = 0;  // O próximo ID de unidade disponível.
  *     Rotina de inicialização de dispositivo de armazenamento de dados.
  */
 
-void ide_mass_storage_initialize (){
+void ide_mass_storage_initialize (void){
 	
 	int port;
 
@@ -695,7 +701,7 @@ static inline void dev_switch (void){
  *     ?? Deve ser algum suporte a Processos.
  */
 
-static inline int getpid_dev (){
+static inline int getpid_dev (void){
 	
     if ( (void *) current_dev == NULL )
 		return -1;
@@ -707,7 +713,7 @@ static inline int getpid_dev (){
 /*
  * getnport_dev: */
 
-static inline int getnport_dev (){
+static inline int getnport_dev (void){
 
     if ( (void *) current_dev == NULL )
 		return -1;
@@ -1043,7 +1049,7 @@ done:
  * do controlador.
  */
 
-void show_ide_info (){
+void show_ide_info (void){
 	
 	int i = 0;
 	

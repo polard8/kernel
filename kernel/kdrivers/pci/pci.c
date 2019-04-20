@@ -723,11 +723,11 @@ static const char* sbc_subclass_strings[] = {
  * para a rotina de serviço aproriada.
  */
 
-unsigned long KiPciHandler1()
+unsigned long KiPciHandler1 (void)
 {
 	//...
 	return (unsigned long) 0;
-};
+}
 
 
 /*
@@ -741,11 +741,12 @@ unsigned long KiPciHandler1()
  * para a rotina de serviço aproriada.
  *
  */
-unsigned long KiPciHandler2()
+unsigned long KiPciHandler2 (void)
 {
 	//...
 	return (unsigned long) 0;
-};
+}
+
 
 /*
  * KiPciHandler3: 
@@ -758,11 +759,11 @@ unsigned long KiPciHandler2()
  * para a rotina de serviço aproriada.
  *
  */
-unsigned long KiPciHandler3()
+unsigned long KiPciHandler3 (void)
 {
 	//...
 	return (unsigned long) 0;
-};
+}
 
 
 /*
@@ -774,13 +775,13 @@ unsigned long KiPciHandler3()
  * usarão o mesmo isr (handler). Cabera à rotina do handler identificar
  * qual dispositivo sinalizou que efetuou uma interrupção. Então direcionar 
  * para a rotina de serviço aproriada.
- *
  */
-unsigned long KiPciHandler4()
+
+unsigned long KiPciHandler4 (void)
 {
 	//...
 	return (unsigned long) 0;
-};
+}
 
 
 /**
@@ -1326,6 +1327,7 @@ pciHandleDevice ( unsigned char bus,
 
 
 /*
+ ***************************************
  * init_pci:
  *     Inicializa o módulo PCI em Kernel Mode, dentro do Kernel Base. 
  * 
@@ -1336,7 +1338,7 @@ pciHandleDevice ( unsigned char bus,
  *     Obs: Essa rotina está incompleta.
  */
 
-int init_pci (){
+int init_pci (void){
 		
 	int Status = 0;
     int Index;
@@ -1406,7 +1408,7 @@ int init_pci (){
 	// em suas respectivas estruturas.
 	//
    
-	Status = (int) pci_setup_devices(); 
+	Status = (int) pci_setup_devices (); 
 	
 	if (Status != 0)
 	{

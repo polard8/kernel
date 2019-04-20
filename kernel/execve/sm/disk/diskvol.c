@@ -23,11 +23,12 @@
 
 
 //Mostra informações sobre o disco atual.
-void diskShowCurrentDiskInfo (){
-	
+
+void diskShowCurrentDiskInfo (void)
+{	
 	printf ("The current disk is %d\n", current_disk );
 	diskShowDiskInfo(current_disk);
-};
+}
 
 
 //Mostra informações sobre um disco dado seu descritor.
@@ -98,10 +99,11 @@ void *disk_get_disk_handle ( int number ){
 
 
 /* #deletar */
-void *disk_get_current_disk_info (){
-	return NULL;
-};
 
+void *disk_get_current_disk_info (void)
+{
+	return NULL;
+}
 
 
 /*
@@ -114,7 +116,7 @@ void *disk_get_current_disk_info (){
  
 //int diskInit() 
 
-int disk_init (){
+int disk_init (void){
 
 	int i=0;
 
@@ -190,9 +192,9 @@ int disk_init (){
  * + Carrega o arquivo KCONFIG.TXT se estiver presente e 
  *   sonda informações de configuração contidas nele, exibindo as
  *   informações.
- * 
  */
-void init_test_disk (){
+
+void init_test_disk (void){
 	
 	/*@todo: Teste desse tipo pode ser feito em user mode.*/
 	
@@ -290,11 +292,12 @@ done:
 //
 
 //Mostra informações sobre o volume atual.
-void volumeShowCurrentVolumeInfo (){
+
+void volumeShowCurrentVolumeInfo (void){
 	
 	printf("The current volume is %d\n",current_volume);
     volumeShowVolumeInfo (current_volume);	
-};
+}
 
 
 /*
@@ -379,14 +382,14 @@ void *volume_get_volume_handle( int number )
 };
 
 
-void *volume_get_current_volume_info()
+void *volume_get_current_volume_info (void)
 {
     if( current_volume < 0 || current_volume > VOLUME_COUNT_MAX ){
 	    return NULL;
 	}
 	
-    return (void*) volumeList[VOLUME_COUNT_MAX];	
-};
+    return (void *) volumeList[VOLUME_COUNT_MAX];	
+}
 
 
 
@@ -398,7 +401,7 @@ void *volume_get_current_volume_info()
  
 //int volumeInit()
 
-int volume_init (){
+int volume_init (void){
 	
 	int i;
 	
@@ -569,7 +572,7 @@ int get_ide_disk_info ( int port, unsigned long buffer, int master ){
 	printf(" ]\n");	
 	
     return 0;	
-};
+}
 
 
 /*
@@ -579,7 +582,8 @@ int get_ide_disk_info ( int port, unsigned long buffer, int master ){
  *     checamos pela assinatura no fim do MBR e imprimimos o nome do disco,
  *     que está presente no BPB.
  */
-void show_ideports_info (){
+
+void show_ideports_info (void){
 	
     printf("\n show_ideports_info: Testing ports, looking for signature\n");  
 	

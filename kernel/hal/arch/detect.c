@@ -10,7 +10,6 @@
  *
  * In this file:
  *  + cpu_get_parameters
- *  + KeTestCPU
  *
  */
  
@@ -37,7 +36,7 @@
  * core per die         = 0x80000008.
  */ 
 
-void get_cpu_intel_parameters (){
+void get_cpu_intel_parameters (void){
 	
 	unsigned long eax, ebx, ecx, edx;
       	
@@ -287,15 +286,14 @@ void get_cpu_intel_parameters (){
  *   Sonda a CPU pra saber seus parâmetros. (OEM)
  *   ??header 
  */ 
-int cpu_get_parameters (){
+int cpu_get_parameters (void){
 	
-    // @todo: Copiar a função KeTestCPU aqui.
 	// @todo: Mudar nome para KeProbeCPU(
 	
 	//#bugbug: A inicial Ke está errada nessa situação.
 	
     return (int) KeTestCPU (); 
-};
+}
  
 
 /*
@@ -311,9 +309,10 @@ int cpu_get_parameters (){
  *     ??header
  */
 
-int KeTestCPU (){
+int KeTestCPU (void){
 	
 	get_cpu_intel_parameters ();
+	
 	return 0;
 }
 
@@ -328,7 +327,7 @@ int KeTestCPU (){
  * nao sei qual ha instruções diferentes para arquiteturas diferentes.
  */
 
-int hal_probe_cpu (){
+int hal_probe_cpu (void){
 	
 	unsigned long eax, ebx, ecx, edx;
 	
@@ -383,7 +382,7 @@ int hal_probe_cpu (){
  *     Sonda pra ver apenas qual é a empresa do processador.
  */
  
-int hal_probe_processor_type (){
+int hal_probe_processor_type (void){
 	
     int MASK_LSB_8 = 0xFF;  
 	

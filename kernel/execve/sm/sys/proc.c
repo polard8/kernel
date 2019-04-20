@@ -62,14 +62,21 @@ extern unsigned long scrolllock_status;
 //
 
 //Realiza testes diferentes usando o procedimento do sistema.
-void procedureMakeTests();
-void procedureLinkDriverTest(); // testando linkar um driver ao sistema operacional
-void procedureWindowWithFocusTest();
-void procedureGrid();
+
+void procedureMakeTests (void);
+void procedureLinkDriverTest (void);    // testando linkar um driver ao sistema operacional
+void procedureWindowWithFocusTest (void);
+void procedureGrid (void);
 
 
-void
-xxxtestSHELLServer(){
+void xxxtestSHELLServer (void);
+void xxxtestlibcSTDOUT (void);
+void xxxtestlibc (void);
+void procTestF6 (void);
+
+
+
+void xxxtestSHELLServer (void){
 
    //#atenção:
    //antes precisa inicializar o servidor.
@@ -108,8 +115,7 @@ xxxtestSHELLServer(){
 // #IMPORTANTE
 // REFRESH STDOUT
 
-void 
-xxxtestlibcSTDOUT(){
+void xxxtestlibcSTDOUT (void){
 
      char *c;
      
@@ -149,9 +155,9 @@ xxxtestlibcSTDOUT(){
 //=========================================
 //f5
 //para testar recursos da libc.
-void
-xxxtestlibc()
-{
+
+void xxxtestlibc (void){
+	
 	FILE *f1;
 	int ch_test;
 	
@@ -210,9 +216,7 @@ xxxtestlibc()
 
 
 
-
-
-void procTestF6 (){
+void procTestF6 (void){
 	
 	void *address = (void *) kmalloc (1024);
 	
@@ -1037,15 +1041,14 @@ void SetProcedure (unsigned long proc){
  *            atravéz de uma estrutura que contenha esses quatro 
  *            argumentos na forma de parâmetros. 
  */
-unsigned long SendMessage( struct window_d *window, 
+
+unsigned long SendMessage ( struct window_d *window, 
                   int msg, 
 				  unsigned long long1, 
 				  unsigned long long2 )
 {
 	return (unsigned long) system_procedure(window,msg,long1,long2);
-};
-
-
+}
 
 
 /*
@@ -1053,7 +1056,10 @@ unsigned long SendMessage( struct window_d *window,
  * procedureHelp:
  *     Mensagem de ajuda ao usuário.
  */
-void procedureHelp (){
+
+void procedureHelp (void){
+	
+	/*
 	
 	struct window_d *hWindow; 		
 	
@@ -1156,6 +1162,8 @@ done:
 	//Devemos dar o refresh somente da janela.
 	refresh_screen();
     return;
+	
+	*/
 }
 
 
@@ -1166,7 +1174,8 @@ done:
  * iret, mas poderia bem ser um jmp.
  * Obs: Isse test  funcionou bem, implementar essa rotina definitivamente.
  */
-void procedureLinkDriverTest()
+
+void procedureLinkDriverTest (void)
 {
 	//
 	// Saltando para a thread idle:
@@ -1215,7 +1224,7 @@ void procedureLinkDriverTest()
 
 
 // Função interna para realiza testes usando o procedimento do sistema.
-void procedureMakeTests()
+void procedureMakeTests (void)
 {
 	
      //
@@ -1343,7 +1352,7 @@ void *procedureInvokeUserModeProcedure()
 */
 
 
-void procedureWindowWithFocusTest()
+void procedureWindowWithFocusTest (void)
 {
 	//
 	// ****  TESTANDO A JANELA DO desenvolvedor ****
@@ -1403,20 +1412,18 @@ void procedureWindowWithFocusTest()
 
 /* @todo; Criar um grid parecido com o outro, mas que será gerenciado pelo
  procedimento de janelas do sistema.
-*/ 
-void procedureGrid (){
-	
+*/
+
+void procedureGrid (void)
+{	
 	int Status;
 	
 	Status = grid( (struct window_d*) gui->main ,(int) 4, (int) GRID_HORIZONTAL ); 
 	
 	if(Status == 1){
 		printf("sm-sys-procedureGrid: grid\n");
-	}
-	
-	//return;
-};
-
+	}	
+}
 
 
 //

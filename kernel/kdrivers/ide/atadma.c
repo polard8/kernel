@@ -140,17 +140,18 @@ done:
  * ide_dma_start:
  */
 
-void ide_dma_start (){
+void ide_dma_start (void){
 	
     unsigned char data = inb( ata.bus_master_base_address + ide_dma_reg_cmd );
     outb( ata.bus_master_base_address + ide_dma_reg_cmd, data | 1);
-};
+}
 
 
 /*
  * ide_dma_stop:
  */
-void ide_dma_stop (){
+
+void ide_dma_stop (void){
 	
     unsigned char data = inb( ata.bus_master_base_address + ide_dma_reg_cmd );  
 	outb( ata.bus_master_base_address + ide_dma_reg_cmd, data &~1);
@@ -159,28 +160,20 @@ void ide_dma_stop (){
     outb( ata.bus_master_base_address + ide_dma_reg_status, data &~6);
 	
 done:	
+	
     return;	
-};
+}
 
 
 /*
  * ide_dma_read_status:
  *     DMA read status.
  */
-int ide_dma_read_status (){
+
+int ide_dma_read_status (void){
 	
     return inb ( ata.bus_master_base_address + ide_dma_reg_status );
-};
-
-
-
-
-
-
-
-
-
-
+}
 
 
 

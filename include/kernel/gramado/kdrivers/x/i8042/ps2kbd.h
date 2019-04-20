@@ -169,13 +169,9 @@ struct keyboard_d
 //keyboard_t *Keyboard;
 
 
-
- 
-
-//
 // keyboardMessage
 //     Estrutura interna para mensagens.
-//
+
 struct keyboardMessage 
 {
     unsigned char scancode;
@@ -218,16 +214,19 @@ unsigned long scrolllock_status;
 
 unsigned long keyboard_handler_address;
 
-void  ps2_keyboard_initialize();
 
-void ldisc_init_modifier_keys();
-void ldisc_init_lock_keys();
+void  ps2_keyboard_initialize (void);
+
+void ldisc_init_modifier_keys (void);
+
+void ldisc_init_lock_keys (void);
 
 
 
 //Enable and disable keyboard.
-void keyboardEnable();
-void keyboardDisable();
+
+void keyboardEnable (void);
+void keyboardDisable (void);
 
 //Set flags.
 void keyboard_set_leds(char flag); 
@@ -244,24 +243,25 @@ unsigned long KbGetLongParam2(int tid);
 /*
  * Reboot via Keyboard port.
  */
-void reboot();
+void reboot (void);
 
 
 //get status 
-int get_alt_status();
-int get_ctrl_status();
-int get_shift_status();
+int get_alt_status (void);
+int get_ctrl_status (void);
+int get_shift_status (void);
 //...
 
-void kbdc_wait(unsigned char type);
+void kbdc_wait (unsigned char type);
 
 
 //Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState(unsigned char key);
+unsigned long keyboardGetKeyState (unsigned char key);
 
 
-uint8_t keyboard_read();
-void keyboard_write(uint8_t write);
+uint8_t keyboard_read (void);
+
+void keyboard_write (uint8_t write);
 
 
 

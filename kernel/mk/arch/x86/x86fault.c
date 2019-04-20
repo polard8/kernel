@@ -11,7 +11,7 @@
 #include <kernel.h>
 
 
-extern unsigned long get_page_fault_adr();
+extern unsigned long get_page_fault_adr (void);
 
 //
 // # Flags #
@@ -32,7 +32,7 @@ int fatal_error_flag;
 
 
 //Protótipo de função interna.
-void do_pagefault();
+void do_pagefault (void);
 
 
 /*
@@ -218,7 +218,7 @@ void KiCpuFaults ( unsigned long number ){
  *     Obs: Podemos apenas fechar a thread atual e retomar o sistema.
  */
  
-void do_pagefault (){
+void do_pagefault (void){
     
 	unsigned long page_fault_address;
 	
@@ -256,7 +256,7 @@ void do_pagefault (){
 	// 
 	
 	//Page Fault Linear Address (PFLA).
-	page_fault_address = (unsigned long) get_page_fault_adr();
+	page_fault_address = (unsigned long) get_page_fault_adr ();
 
 	printf(" >>> Address={%x}\n", (unsigned long) page_fault_address);
 	

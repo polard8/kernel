@@ -220,16 +220,16 @@ struct tagProcessor *processor;
  
 
 
-int cpu_get_parameters ();
+int cpu_get_parameters (void);
 
 
 //#bugbug
 //Esse nome não é apropriado.
 //@todo: Isso deve isr para include/ke.h.
-int KeTestCPU ();   
+int KeTestCPU (void);   
 
 
-void init_cpu ();
+void init_cpu (void);
 
 //
 // End.

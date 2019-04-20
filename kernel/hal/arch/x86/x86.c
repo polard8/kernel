@@ -123,46 +123,46 @@ get_cs(void)
 
 
 // habilita as interrupções
-int enable (){
+int enable (void){
 	
     asm ("sti");
 
     //@todo: Porque habilitar as interrupções deveria mudar o valor do registrador eax.
     //talvez deveria ser void o tipo da função.	
     
-	return (int) 0;
+	return 0;
 }
 
 
 // desabilita as interrupções
-int disable (){
+int disable (void){
 	
     asm ("cli"); 
 
     //@todo: Porque desabilitar as interrupções deveria mudar o valor do registrador eax.
     //talvez deveria ser void o tipo da função.		
     
-	return (int) 0;
+	return 0;
 }
 
 
-int stopCpu (){
+int farReturn (void){
+	
+    __asm ("lret");
+}
+
+
+int intReturn (void){
+	
+    __asm ("iret");
+}
+
+int stopCpu (void){
 	
     __asm (" cli \n \t " 
 		   " hlt ");
 }
 
-
-int intReturn (){
-	
-    __asm ("iret");
-}
-
-
-int farReturn (){
-	
-    __asm ("lret");
-}
 
 
 int getFlags (int variable){
@@ -194,25 +194,25 @@ int Pop (int variable){
 };
 
 
-int pushRegs (){
+int pushRegs (void){
 	
     __asm ("pushal" : : : "%esp");
-};
+}
 
 
-int popRegs (){
+int popRegs (void){
 	
     __asm ("popal" : : : "%esp");
-};
+}
 
 
-int pushFlags (){
+int pushFlags (void){
 	
     __asm ("pushfl" : : : "%esp");
 };
 
 
-int popFlags (){
+int popFlags (void){
 	
     __asm ("popfl" : : : "%esp");
 };
@@ -234,7 +234,7 @@ int setStackPointer (int addr){
 //habilita cache.
 //credits: barrelfish
 
-void cpux86_enable_caches (){
+void cpux86_enable_caches (void){
 	
     uint32_t cr0;
 
@@ -331,7 +331,7 @@ setsegmentNR ( int number,
  *     #todo O desafio aqui é configurar a TSS e testar na máquina real.
  */
 
-void init_gdt (){
+void init_gdt (void){
 	
 	// #bugbug
 	// Na máquina real o sistema é sensível a essa configuração.
@@ -462,7 +462,7 @@ tss_init ( struct i386tss_d *tss, void *stack, void *func )
  *     Inicializa processador Intel.
  */
  
-int init_intel (){
+int init_intel (void){
 	
 	cpux86_enable_caches ();
 	
@@ -483,7 +483,7 @@ int init_intel (){
  *                    ShowCPUIntelParameters()
  */
 
-void show_cpu_intel_parameters (){
+void show_cpu_intel_parameters (void){
 	
     //Title.
     printf("\nx86 CPU Info:\n\n");

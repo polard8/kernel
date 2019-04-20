@@ -15,8 +15,8 @@
 #include <kernel.h>
 
 
-
-void KiCalloutTest()
+/*
+void KiCalloutTest(void)
 {
 	//
 	// @todo: reproduzier o spawn para chamar uma rotina de um servidor em user mode.
@@ -26,7 +26,7 @@ void KiCalloutTest()
 	//iret
 	return;
 };
-
+*/
 
 //
 // End.

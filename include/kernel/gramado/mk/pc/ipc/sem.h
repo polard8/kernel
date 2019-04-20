@@ -87,10 +87,9 @@ unsigned long semaforo_color;
  *     o recurso já está bloqueado por outro processo 
  *     então o processo que está tentando utilizar o recurso
  *     deve esperar, mudando o estado para waiting.
- *
- *
  */  
-int Down(struct semaphore_d *s);
+
+int Down (struct semaphore_d *s);
 
 
 /*
@@ -98,20 +97,32 @@ int Down(struct semaphore_d *s);
  *     Quando um processo sai da sua região crítica
  *     ele dá um Up no semáforo, mudando seu valor pra 1.
  *     Isso libera o recurso pra outro processo.
- *
  */ 
-int Up(struct semaphore_d *s);
+
+int Up (struct semaphore_d *s);
+
 
 /*
  * Semaphore support.
  */
 
 int init_semaphore(struct semaphore_d *s, unsigned int count); 
+
 void semaphore_down(struct semaphore_d *s);
+
 void semaphore_up(struct semaphore_d *s); 
-void *create_semaphore(); 
+
+void *create_semaphore (void); 
+
 void delete_semaphore(struct semaphore_d *s);
+
 void open_semaphore(struct semaphore_d *s);
+
 void close_semaphore(struct semaphore_d *s);
+
+//
+// End.
+//
+
 
 

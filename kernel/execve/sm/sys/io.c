@@ -99,8 +99,6 @@ void *ioServices ( unsigned long number,
 	};	
 	
 	//...
-	
-//done:
 
     return NULL;	
 };
@@ -112,17 +110,14 @@ void *ioServices ( unsigned long number,
  *     Initialize i/o manager.
  */	
  
-int ioInit (){
+int ioInit (void){
 	
 	int Status = 0;
 	
 	//...
-
-//done:
 	
 	return (int) Status;
-};
-
+}
 
 
 //

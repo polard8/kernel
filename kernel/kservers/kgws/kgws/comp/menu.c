@@ -448,35 +448,35 @@ fail:
 
 
 /*
- *******************************************
  * set_current_menu:
- *
  */
-void 
-set_current_menu( struct menu_d *menu )
-{
-    //Check.
-	if( (void *) menu == NULL ){
+
+void set_current_menu ( struct menu_d *menu ){
+	
+	if ( (void *) menu == NULL )
+	{
 	    return;
-    };  
-done:
+    }
+	
 	current_menu = (int) menu->Id;
-    return;
-};
+}
 
 
 /*
- ***************************************
  * get_current_menu:
- *
  */
-void *get_current_menu()
-{
-    if(current_menu < 0){
+
+void *get_current_menu (void){
+	
+	//#todo: Limits.
+	
+    if (current_menu < 0)
+	{
 	    return NULL;
-	};	
+	}
+	
     return (void *) menuList[current_menu];
-};
+}
 
 
 /*
@@ -881,7 +881,7 @@ MainMenuProcedure( struct window_d *window,
 done:
     refresh_screen();
 	return (unsigned long) 0;
-};
+}
 
 
 /*
@@ -889,23 +889,24 @@ done:
  * init_menus:
  *     Inicializa a lista de menus.
  */
-int init_menus()
-{
-	int i;
-	for( i=0; i < MENU_COUNT_MAX; ++i ){
+
+int init_menus (void){
+	
+	int i=0;
+	
+	for ( i=0; i < MENU_COUNT_MAX; i++ )
+	{
 	    menuList[i] = (unsigned long) 0;
 	}
 	
-	set_current_menu(NULL);
+	set_current_menu (NULL);
 	
 	menus_count = 0;
 
 	// Continua ...
-
-done:	
-    //printf("Done.\n");
-	return (int) 0;
-};
+	
+	return 0;
+}
 
 
 /*

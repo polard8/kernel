@@ -355,18 +355,18 @@ int redraw_menubar_item (int n){
 				 COLOR_WINDOWTEXT, 
 				 gui->mb->Items[n].string );
 				 
-
-//done:
     
-	return (int) 0;
-};
+	return 0;
+}
 
 
-int get_menubar_selected_item()
+int get_menubar_selected_item (void)
 {
-	//@todo: Checar se a estrutura é válida.
+	// #todo: 
+    // Checar se a estrutura é válida.
+    
     return (int) gui->mb->selectedItem;
-};
+}
 
 
 /*
@@ -374,25 +374,30 @@ int get_menubar_selected_item()
  *     Cria uma menubar na janela screen.
  *     Usanda para teste de criação de menubars.
  */
-int menubarX (){
+
+int menubarX (void){
 	
 	//Usando a janela screen anteriormente criada.
-    if ( (void *) gui->screen == NULL ){
+    
+	if ( (void *) gui->screen == NULL )
+	{
         return (int) 1;
-    };		
+    }		
 	
-	//
     // Cria a janela e o menu. 
 	// (o argumento é a janela mãe)
 	// (retorna a janela da menubar)
-    //	
 	
 	//o handle da menubar window.
     gui->mbhWindow = (void *) create_menubar(gui->screen);
-	if( (void *) gui->mbhWindow == NULL ){
-	    printf("menubarX:");
-		refresh_screen();
-		while(1){}	
+	
+	if ( (void *) gui->mbhWindow == NULL )
+	{
+	    printf ("menubarX:");
+		die ();
+		
+		//refresh_screen();
+		//while(1){}	
 	};
 	
 	
@@ -405,13 +410,12 @@ int menubarX (){
 	create_menubar_item(gui->mbhWindow->barMenu,"Window"       ,0); //control menu da janela.
 	
 	
-	//More?!
-	
-//done:
+	//More ?!
 
     SetProcedure( (unsigned long) &MenuBarProcedure);	 
-    return (int) 0;
-};
+    
+	return 0;
+}
 
 
 /*

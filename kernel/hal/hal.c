@@ -27,10 +27,10 @@ extern unsigned long idt;
 //extern unsigned long tss;
 
 
-extern void gui_buffer_putpixel();
-
-extern void swlib_backbuffer_putpixel();
-extern void swlib_lfb_putpixel();
+extern void gui_buffer_putpixel (void);
+extern void swlib_backbuffer_putpixel (void);
+extern void swlib_lfb_putpixel (void);
+extern void asm_reboot (void);
 
 //
 // ## IDT SUPPORT ##
@@ -45,13 +45,13 @@ extern void swlib_lfb_putpixel();
 //Esse handler será instalando em todas as entradas
 //da tabela antes da configuração.
 
-void hal_default_handler ()
+void hal_default_handler (void)
 {
     //return;
 }
 
 
-void hal_init_handlers_table ()
+void hal_init_handlers_table (void)
 {
     int i=0;
 	int max = (256+8);
@@ -138,7 +138,7 @@ void hal_setup_new_vectors_table_entry ( int number, unsigned long address )
 //Esses endereços foram configurados pelo assembler na inicialização.
 //Vamos salvá los na tabela em seus respectivos slots.
 
-void hal_init_vectors_table ()
+void hal_init_vectors_table (void)
 {
 	
 	hal_setup_new_vectors_table_entry ( (int) 0, (unsigned long) &fault_N0 );
@@ -346,7 +346,7 @@ hal_lfb_putpixel ( unsigned long ax,
  *     ? Isso ainda está em uso ?
  */
 
-void sys_vsync (){
+void sys_vsync (void){
 
     hal_vsync ();
 }
@@ -357,7 +357,7 @@ void sys_vsync (){
  *     Mostra informações encontradas na interface PCI.
  */
 
-int sys_showpciinfo (){
+int sys_showpciinfo (void){
 
     return (int) hal_showpciinfo ();
 }
@@ -384,8 +384,8 @@ int sys_showpciinfo (){
 // Business Chipsets (Q87, Q85, B85) Haswell LGA1150.
  
  
-int hal_hardware_detect (){
-	
+int hal_hardware_detect (void)
+{	
     return 0;    //#todo	
 }
 
@@ -395,8 +395,8 @@ int hal_hardware_detect (){
 //para obter acesso as informações em baixo nível.
 //@todo: rever os nomes das funções.
 
-int hal_showpciinfo (){
-	
+int hal_showpciinfo (void)
+{	
 	return (int) pciInfo ();
 }
 
@@ -409,7 +409,7 @@ int hal_showpciinfo (){
  *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
  */
  
-void init_cpu (){
+void init_cpu (void){
 	
     int Status = 0;
 	
@@ -476,10 +476,10 @@ void hal_set_machine_type ( unsigned long type ){
 };
 
 
-unsigned long hal_get_machine_type (){
-	
+unsigned long hal_get_machine_type (void)
+{	
     return (unsigned long) g_machine_type;
-};
+}
 
 
 /*
@@ -489,7 +489,7 @@ unsigned long hal_get_machine_type (){
  *      @todo: Trocar o nome para hal_init_current_machine. 
  */
  
-int hal_init_machine (){
+int hal_init_machine (void){
 	
 	// Limits for machine type.
 	
@@ -526,25 +526,26 @@ int hal_init_machine (){
 		//Unknow.
 		default:
 		    //processor->Type = (unsigned char) 0;
-	        printf("hal_init_machine error: default type\n");
-            return (int) 0; 			
+	        printf("hal_init_machine: default type\n");
+            return (int) 0; 		
+			
 		    break;
 	};
 
 	//More?!
 
-    return (int) 0;
-};
+    return 0;
+}
 
 
-unsigned long getGdt (){
-	
+unsigned long getGdt (void)
+{	
     return (unsigned long) &gdt; 
 }
 
 
-unsigned long getIdt (){
-	
+unsigned long getIdt (void)
+{	
     return (unsigned long) &idt; 
 }
 
@@ -575,8 +576,9 @@ void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, u
 }	
 	
 
-void hal_vsync (){
-	
+// Monitor vertical sync.
+void hal_vsync (void)
+{	
     vsync ();
 }
 
@@ -588,9 +590,7 @@ void hal_vsync (){
  * em headlib.s 
  */
 
-extern void asm_reboot(); 
-
-void hal_reboot ()
+void hal_reboot (void)
 {	
     asm_reboot (); 
 	
@@ -629,8 +629,8 @@ void hal_reboot ()
  which is in the DSDT and therefore AML encoded.
  */
 	
-void hal_shutdown (){
-	
+void hal_shutdown (void)
+{	
 	const char *shutdown_str;
 	
     /* Bochs/QEMU poweroff */
@@ -646,10 +646,9 @@ void hal_shutdown (){
  * init_hal:
  * Initialize kernel base hal.
  *     Archtecture independent inicialization ...
- *
  */
-//int halInit() 
-int init_hal (){
+
+int init_hal (void){
 	
     int Status = 0;
 	
@@ -663,19 +662,13 @@ int init_hal (){
 #endif	
 	init_cpu();
 
-	
- 
- 
-	
+		
 	// TIMER - Cria e inicializa estrutura do timer.
 #ifdef HAL_VERBOSE	
 	printf("init_hal: Timer\n");
 #endif    
 	timerInit();	
 	
-
- 
- 
 
 	//Mouse components
 
@@ -704,13 +697,11 @@ int init_hal (){
 	//por isso não deu pra limpar a tela antes.
 	printf(">>>debug hang: after init");
 	refresh_screen(); 
-	while (1){
-		asm ("hlt");
-	}
+	while (1){ asm ("hlt"); }
 #endif	
 	
 	return (int) Status;
-};
+}
 
 
 //

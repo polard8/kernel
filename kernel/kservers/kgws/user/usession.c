@@ -22,7 +22,8 @@
  * get_current_user_session:
  *     Get yhe current user session handle.
  */
-void *get_current_user_session (){
+
+void *get_current_user_session (void){
 	
     //return (void*) CurrentUserSession;
 	
@@ -33,7 +34,7 @@ void *get_current_user_session (){
 	};
 	
     return (void *) usessionList[current_usersession];
-};
+}
 
 
 /*
@@ -107,8 +108,26 @@ void *CreateUserSession (int userID){
 };
 
 
+
+//Open User Session.
+void open_user_session (void){
+	
+	if ( (void *) CurrentUserSession == NULL )
+	{
+		printf ("open_user_session: fail \n");
+		return;
+	};
+	
+	//@todo: Criar tempo de início de sessão.
+	//tempo de inicio de sessão
+	
+	CurrentUserSession->BeginTime = (unsigned long) 0;	
+	CurrentUserSession->initialized = 1; 
+}
+
 //Close User Session.
-void close_user_session (){
+
+void close_user_session (void){
 	
 	if ( (void *) CurrentUserSession == NULL )
 	{
@@ -132,31 +151,16 @@ void close_user_session (){
 	CurrentUserSession->initialized = 0; 
 	
 	//...
-};
+}
 
-
-//Open User Session.
-void open_user_session (){
-	
-	if ( (void *) CurrentUserSession == NULL )
-	{
-		printf ("open_user_session: fail \n");
-		return;
-	};
-	
-	//@todo: Criar tempo de início de sessão.
-	//tempo de inicio de sessão
-	
-	CurrentUserSession->BeginTime = (unsigned long) 0;	
-	CurrentUserSession->initialized = 1; 
-};
 
 
 /*
  * init_user_session:
- *     Inicializa user session. */
+ *     Inicializa user session. 
+ */
 
-void init_user_session (){
+void init_user_session (void){
 	
     int i = 0;
 	int CurrentUser = 0;

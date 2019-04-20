@@ -110,7 +110,7 @@ int timerTextCursorStatus;   //0=apaga 1=acende
 
 
 //Rotina principal.
-void timer ();        
+void timer (void);        
 //...
 
 
@@ -120,7 +120,7 @@ void timer ();
  * #todo: Observar alguns procedimentos antes de chamar a rotina.
  */
  
-void KiTimer (){
+void KiTimer (void){
 	
 	//#debug
 	//vamos checar se o primeiro iret está trazendo
@@ -137,13 +137,13 @@ void KiTimer (){
 }
 
 
-void timerEnableTextCursor (){
+void timerEnableTextCursor (void){
 	
     timerShowTextCursor = 1;	
 }
 
 
-void timerDisableTextCursor (){
+void timerDisableTextCursor (void){
 	
     timerShowTextCursor = 0;	
 }
@@ -158,7 +158,7 @@ void timerDisableTextCursor (){
  *     (tick tick tick)
  */
 
-void timer (){
+void timer (void){
 	
 	//timers.
 	int i;
@@ -328,7 +328,7 @@ done:
 
 
 
-int new_timer_id (){
+int new_timer_id (void){
 	
     int i;
     unsigned long new;
@@ -345,7 +345,7 @@ int new_timer_id (){
 	
 	//fail
 	return (int) -1;
-};
+}
 
 
 //#todo 
@@ -540,7 +540,7 @@ void set_quantum ( unsigned long q){
 
 
 /* get_quantum: */
-unsigned long get_quantum (){
+unsigned long get_quantum (void){
 	
     return (unsigned long ) quantum;
 }
@@ -554,7 +554,7 @@ void set_current_quantum (unsigned long q){
 
 
 /* get_current_quantum: */
-unsigned long get_current_quantum (){
+unsigned long get_current_quantum (void){
 	
     return (unsigned long ) current_quantum;
 }
@@ -568,35 +568,35 @@ void set_next_quantum (unsigned long q){
 
 
 /* get_next_quantum: */
-unsigned long get_next_quantum (){
+unsigned long get_next_quantum (void){
 	
     return (unsigned long ) next_quantum;
 }
 
 
 /* systime in ms */
-unsigned long now (){
+unsigned long now (void){
 	
     return (unsigned long) get_systime_ms ();
 }
 
 
 /* systime hz */
-unsigned long get_systime_hz (){
+unsigned long get_systime_hz (void){
 	
     return (unsigned long) sys_time_hz;
 }
 
 
 /* systime in ms */
-unsigned long get_systime_ms (){
+unsigned long get_systime_ms (void){
 	
     return (unsigned long) sys_time_ms;
 }
 
 
 /* get_systime_totalticks: */
-unsigned long get_systime_totalticks (){
+unsigned long get_systime_totalticks (void){
 	
     return (unsigned long) sys_time_ticks_total;
 }
@@ -661,7 +661,7 @@ void set_timeout ( unsigned long ticks ){
 
 
 /* get_timeout: #todo */
-unsigned long get_timeout (){
+unsigned long get_timeout (void){
 	
 	return (unsigned long) time_out;
 }
@@ -674,7 +674,7 @@ unsigned long get_timeout (){
  *     Inciaialização de variáveis do módulo.
  */
 
-int timerTimer (){
+int timerTimer (void){
 	
 	//Apenas inicializando, isso será atualizado.  
 	//ms
@@ -689,7 +689,7 @@ int timerTimer (){
     
     //...
 	
-	return (int) 0;
+	return 0;
 }
 
 
@@ -701,7 +701,8 @@ int timerTimer (){
  *     @todo: KiTimerInit 
  * (unsigned long CallBackExemplo); 
  */
-int timerInit (){
+
+int timerInit (void){
 	
 	int i;
 	

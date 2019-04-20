@@ -1,5 +1,5 @@
 /*
- * File: include\object.h
+ * File: object.h
  *
  * Descrição:
  *    Header do gerenciador de objetos.
@@ -220,6 +220,7 @@
 //typedef struct object_d object_t;
 typedef struct object_d object_descriptor_t;
 typedef struct object_d object_t;
+
 struct object_d 
 {
 	//@todo: 
@@ -249,9 +250,7 @@ struct object_d
    int pidCount;
    int currentPID;
    
-   
-   
-	
+ 
    //endereços
    unsigned long obj_address;
    unsigned long obj_procedure;
@@ -275,6 +274,7 @@ struct object_d
 	
 	//continua...
 };
+
 object_t *object;  //object
 //object_descriptor_t *object;  //object
 
@@ -292,9 +292,6 @@ object_descriptor_t objects_um[256+1];  //objetos em user mode.
 object_descriptor_t objects_gui[256+1]; //objetos gráficos. 
 
 
-
-
-
 /*
  * Se o gerenciador de recursos foi inicializado.
  */
@@ -308,11 +305,10 @@ int g_current_object;
 int g_current_list;
 
 					   
-int init_object_manager();
-
+int init_object_manager (void);
 
 
 //
-//fim.
+// End.
 //
 

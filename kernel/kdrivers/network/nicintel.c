@@ -51,7 +51,7 @@ PCIRegisterIRQHandler ( uint16_t bus,
 						void *priv ) 
 {
 	//#debug 
-	printf("intel-PCIRegisterIRQHandler:");
+	printf("nicintel-PCIRegisterIRQHandler:");
 	
 	refresh_screen();
 	while(1){}	
@@ -336,7 +336,7 @@ e1000_init_nic ( unsigned char bus,
  *     e1000 handler :)
  */
 
-void xxxe1000handler (){
+void xxxe1000handler (void){
 		
 	//structs
 	struct ipv6_header_d *ipv6_h;
@@ -547,7 +547,8 @@ void xxxe1000handler (){
 
 
 //=======================================================
-// Setup nic irq 
+// e1000_setup_irq:
+//     Setup nic irq 
 //
 // #importante
 // Isso é usado por uma hotina em headlib.s para 
@@ -558,13 +559,11 @@ void xxxe1000handler (){
 uint8_t nic_idt_entry_new_number;
 uint32_t nic_idt_entry_new_address;
 
-void e1000_setup_irq (){
-	
-	
+void e1000_setup_irq (void){
+		
 	debug_print("e1000_setup_irq\n");
 
 
-	
 	//pegando o númeo da irq
     uint8_t irq = (uint8_t) currentNIC->pci->irq_line;
 	uint32_t handler = (uint32_t) &xxxe1000handler;//test
@@ -595,7 +594,7 @@ void e1000_setup_irq (){
 	//headlib.asm
 	//deveria ir para hwlib.asm
 	
-	extern void asm_nic_create_new_idt_entry();
+	extern void asm_nic_create_new_idt_entry (void);
 	
 	asm_nic_create_new_idt_entry();			
 };
@@ -606,10 +605,9 @@ void e1000_setup_irq (){
 // ## reset ##
 //
 
-int e1000_reset_controller (){
+int e1000_reset_controller (void){
 	
 	int i=0;
-	
 	
 	debug_print("e1000_reset_controller\n");
 	
@@ -1126,14 +1124,17 @@ send_ipv4_packet ( struct intel_nic_info_d *dev,
 	    return;
 	
 	E1000Send ( (void *) dev, (uint32_t) len , (uint8_t *) &data[0]);	
-};
+}
 
 
-//#deletar isso
+// #deletar isso
 // transmit:
-void nic_i8254x_transmit(){
-	printf("nic_i8254x_transmit:\n");  //cancelada; fizemos outra.
-};
+
+void nic_i8254x_transmit (void)
+{
+	//cancelada; fizemos outra.
+	printf ("nic_i8254x_transmit:\n");  
+}
 
 
 /*

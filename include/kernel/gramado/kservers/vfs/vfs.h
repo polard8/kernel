@@ -301,9 +301,9 @@ struct vfs_d
 }; 
 
 
-void vfsInit();
-void vfs_show_handle_list();
-void vfsShowVFSInfo();
-void vfsListFiles();
+void vfsInit (void);
+void vfs_show_handle_list (void);
+void vfsShowVFSInfo (void);
+void vfsListFiles (void);
 
 

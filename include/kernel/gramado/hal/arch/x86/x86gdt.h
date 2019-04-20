@@ -237,8 +237,9 @@ setsegmentNR ( int number,
 			   int def32, 
 			   int gran);
 
-void  
-init_gdt ();
+
+// Isso poderia ser int.
+void init_gdt (void);
 
 //
 // End.

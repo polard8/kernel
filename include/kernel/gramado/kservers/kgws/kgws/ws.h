@@ -765,9 +765,10 @@ unsigned long g_mousepointer_y;
 
 void gwsSetCurrentFontAddress ( unsigned long address );
 
-unsigned long gwsGetCurrentFontAddress ();
+unsigned long gwsGetCurrentFontAddress (void);
 
 /* Carregando e instalando uma fonte dado o nome. */
+
 int gwsInstallFont ( char *file_name );
 
 

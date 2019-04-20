@@ -15,8 +15,8 @@
  ********************************************
  * InitializeGrid:
  *     Desenha o grid  
- *
  */
+
 int 
 InitializeGrid ( struct window_d *window, 
                  struct grid_d *g, 
@@ -197,7 +197,8 @@ fail:
  * Área de trabalho.
  * @todo: #define gridObject CreateGrid
  */
-void *CreateGrid (){
+
+void *CreateGrid (void){
 	
 	struct grid_d *g;
 	
@@ -223,12 +224,14 @@ void *CreateGrid (){
 		
 		g->next = NULL;
 	};
+	
     return (void *) g;
-};
+}
 
 
 //função para criar o grid do kernel.
 //gerenciado pelo procedimento de janela do sistema.
+
 int grid( struct window_d *window, 
           int n, 
 		  int view )

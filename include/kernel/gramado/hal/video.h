@@ -23,14 +23,15 @@
  *     Constantes para endereços lógicos.
  *     O bootloader configura as páginas e 
  *     atribui esse endereço para o LFB.
- * 
  */ 
+
 #define LFB_BASE        0xC0400000 
 #define BACKBUFFER_BASE 0xC0800000
 
 
 //Memória de video vga em text mode. b8000
-//the address 0xC00B8000 must be used, since the virtual address 0xC0000000 maps to the physical address 0x00000000.
+//the address 0xC00B8000 must be used, since the virtual address 0xC0000000 maps 
+//to the physical address 0x00000000.
 
 
 /*
@@ -38,7 +39,9 @@
  *     Modo de vídeo usado.
  *     //@todo: se estamos encapsulando no módulo, retirar o G de global.
  */
+
 unsigned long g_video_mode;    
+
 
 /*
  * Suporte às dimenções da tela no modo de vídeo escolhido.
@@ -119,15 +122,20 @@ video_t VideoBlock;
  * ficando aqui apenas uma interface.
  *Obs: Isso é coisa de hardware. vídeo. (HAL)
  */
-void vsync();  
+
+void vsync (void);  
  
  
 //video.c 
 void videoSetupCGAStartAddress(unsigned long address);
-unsigned long videoGetMode();
-void videoSetMode(unsigned long mode);
-int videoInit(); 
-int videoVideo();  //Método construtor.
+
+unsigned long videoGetMode (void);
+
+void videoSetMode (unsigned long mode);
+
+int videoInit (void); 
+
+int videoVideo (void);  
 
 
 //

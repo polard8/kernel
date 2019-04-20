@@ -13,6 +13,8 @@
 
 #define GRID_COUNT_MAX 128
 
+
+
 typedef struct grid_d grid_t;
 struct grid_d
 {
@@ -29,7 +31,8 @@ struct grid_d
 
     struct grid_d *next; 	
 };
-grid_t *GRID;
+struct grid_d *GRID;
+//grid_t *GRID;
 //...
 
 
@@ -43,18 +46,20 @@ unsigned long screenGrid[GRID_COUNT_MAX];
 
 
 
-void *CreateGrid();
+void *CreateGrid (void);
+
+
 int 
-InitializeGrid( struct window_d *window, 
-                struct grid_d *g, 
-                int n, 
-				int view );
+InitializeGrid ( struct window_d *window, 
+                 struct grid_d *g, 
+                 int n, 
+				 int view );
 				
-int grid( struct window_d *window, 
-          int n, 
-		  int view );
+
+int grid ( struct window_d *window, int n, int view );
 
 
 //
-//fim.
+//  End.
 //
+

@@ -36,10 +36,12 @@ void *cursorIconBuffer;
 //somente depois que todas as estruturas 
 //necessárias estiverem inicializadas.
 //como filsystem. 
-int windowLoadGramadoIcons(); 
+
+int windowLoadGramadoIcons (void); 
  
 //test: suporte a getch();
-int window_getch(); 
+
+int window_getch (void); 
 
 //
 // #importante:
@@ -1815,15 +1817,17 @@ struct gui_d *gui;
  * StartGui:
  *     Inicializa a gui.
  */						   
-int StartGui();
+
+// Deletar.
+//int StartGui ();
 
 
 /*
  * Create GUI.
  *    Cria a GUI na hora da inicialização.
- *
  */						   
-void create_gui();
+
+void create_gui (void);
 
 
 /*
@@ -1858,11 +1862,19 @@ StatusBar ( struct window_d *window,
 struct window_d *ToolBar ( struct window_d *window );
 
 
+//
+// menubar
+//
+
 void *create_menubar (struct window_d *pwindow); 
+
 int create_menubar_item (struct menu_d *menu, unsigned char *string, int status);
+
 int draw_menubar_item ( struct window_d *window, unsigned char *string);
+
 //int select_menubar_item(struct menuitem_d *menuitem);
-int menubarX ();
+
+int menubarX (void);
 
 
 
@@ -1902,12 +1914,17 @@ void *draw_button ( struct window_d *window,
 int redraw_button ( struct button_d *button );
 
 // Focus support.
-void SetFocus( struct window_d *window );
-void *GetFocus();                             
-void KillFocus( struct window_d *window );
+
+void SetFocus ( struct window_d *window );
+
+void *GetFocus (void);                             
+
+void KillFocus ( struct window_d *window );
 
 //foreground window support
-void *windowGetForegroundWindow();
+
+void *windowGetForegroundWindow (void);
+
 int windowSetForegroundWindow(struct window_d *window);
 
 //parent.
@@ -1918,36 +1935,61 @@ void *GetWindowDesktop(struct window_d * hwnd);
 
 
 // pegando ponteiros para estrutura de janela na estrutura 'gui->'.
-void *guiGetScreenWindow();
-void *guiGetDeveloperScreenWindow();
-void *guiGetBackgroundWindow();
-void *guiGetLogoWindow();
-void *guiGetDesktopWindow();
-void *guiGetTaskbarWindow();
-void *guiGetMainWindow();
-void *guiGetStatusbarWindow();
-void *guiGetGridWindow();
-void *guiGetMenuWindow();
-void *guiGetInfoboxWindow();
-void *guiGetTooltipWindow();
-void *guiGetMessageboxWindow();
-void *guiGetDialogboxWindow();
-void *guiGetDebugWindow();
-void *guiGetMbhWindowWindow();
-void *guiGetTopbarWindow();
-void *guiGetNavigationbarWindow();
-void *guiGetShellWindowWindow();
-void *guiGetShellClientWindowWindow();
+// kgws.c
+
+void *guiGetScreenWindow (void);
+
+void *guiGetDeveloperScreenWindow (void);
+
+void *guiGetBackgroundWindow (void);
+
+void *guiGetLogoWindow (void);
+
+void *guiGetDesktopWindow (void);
+
+void *guiGetTaskbarWindow (void);
+
+void *guiGetMainWindow (void);
+
+void *guiGetStatusbarWindow (void);
+
+void *guiGetGridWindow (void);
+
+void *guiGetMenuWindow (void);
+
+void *guiGetInfoboxWindow (void);
+
+void *guiGetTooltipWindow (void);
+
+void *guiGetMessageboxWindow (void);
+
+void *guiGetDialogboxWindow (void);
+
+void *guiGetDebugWindow (void);
+
+// ?
+void *guiGetMbhWindowWindow (void);
+
+void *guiGetTopbarWindow (void);
+
+void *guiGetNavigationbarWindow (void);
+
+void *guiGetShellWindowWindow (void);
+
+void *guiGetShellClientWindowWindow (void);
 
 
 //
 // Client Area.
 //
-void *getClientAreaRect();
-void setClientAreaRect( unsigned long x, 
-                        unsigned long y, 
-						unsigned long cx, 
-						unsigned long cy );
+
+void *getClientAreaRect (void);
+
+void 
+setClientAreaRect ( unsigned long x, 
+                    unsigned long y, 
+					unsigned long cx, 
+					unsigned long cy );
 
 //
 // Background support.
@@ -1956,8 +1998,12 @@ void setClientAreaRect( unsigned long x,
 void backgroundDraw(unsigned long color);
 void backgroundSetColor(unsigned long color);
 void backgroundRedraw(unsigned long color);
-void backgroundBackground();    //Construtor.
-int backgroundInit();
+
+
+//Construtor.
+void backgroundBackground (void);    
+
+int backgroundInit (void);
 
 //
 // Char and String support.
@@ -1979,9 +2025,11 @@ void my_buffer_char_blt( unsigned long x,
 						 unsigned long c);
 						 
 void set_char_width( int width );	
-void set_char_height( int height );					 
-int get_char_width();
-int get_char_height();	
+void set_char_height( int height );	
+
+
+int get_char_width (void);
+int get_char_height (void);	
 
 //desenha um caractere transparente.
 void drawchar_transparent( unsigned long x, 
@@ -2054,14 +2102,21 @@ struct saved_rect_d
     int bytes;   //quantidade de bytes.
 	int bpp;     //bytes per pixel.
 	
-	int full;    //O buffer está cheio. Um retângulo foi salvo nele.
+	//O buffer está cheio. 
+	//1 retângulo foi salvo nele.
+	
+	int full;    
+	
 };
 struct saved_rect_d *SavedRect;
 
-int initialize_saved_rect ();
 
-//#testando ...
-//salvar um retângulo no buffer será semelhante ao método de salvar um bmp em um arquivo.
+int initialize_saved_rect (void);
+
+// #testando ...
+// Salvar um retângulo no buffer será semelhante ao 
+// método de salvar um bmp em um arquivo.
+
 int save_rect ( unsigned long x, 
                 unsigned long y, 
 				unsigned long width, 
@@ -2071,10 +2126,12 @@ int save_rect ( unsigned long x,
 //de decodificar um bmp, copiando do arquivo para o backbuffer.
 // esses argumentos devem representar o posicionamentod esejado do 
 //retângulo no backbuffer.
-int show_saved_rect ( unsigned long x, 
-                      unsigned long y, 
-				      unsigned long width, 
-				      unsigned long height );	
+
+int 
+show_saved_rect ( unsigned long x, 
+                  unsigned long y, 
+				  unsigned long width, 
+				  unsigned long height );	
 	
 //
 //  ...
@@ -2082,23 +2139,25 @@ int show_saved_rect ( unsigned long x,
 	
 	
 //Pinta um pixel em um buffer de janela.
-void pixelPutPixelWindowBuffer( void* buffer, 
-                          unsigned long x, 
-						  unsigned long y, 
-						  unsigned long color );
+
+void 
+pixelPutPixelWindowBuffer ( void* buffer, 
+                            unsigned long x, 
+						    unsigned long y, 
+						    unsigned long color );
 						  
 /*
  * pixelPutPixelDedicatedWindowBuffer:
  *     Coloca um pixel no buffer da janela.
  *     Serve para pintar janelas que irão direto do seu buffer para o LFB da 
  * memória de vídeo, sem passar pelo back buffer. (OVERLAPPED)
- *
  */
 
-void pixelPutPixelDedicatedWindowBuffer( struct window_d *window, 
-                                         unsigned long x, 
-										 unsigned long y, 
-										 unsigned long color ); 	
+void 
+pixelPutPixelDedicatedWindowBuffer ( struct window_d *window, 
+                                     unsigned long x, 
+									 unsigned long y, 
+									 unsigned long color ); 	
 						 
 /*
 void my_buffer_put_pixel( unsigned long ax, 
@@ -2118,24 +2177,25 @@ backbuffer_putpixel( unsigned long ax,
 				     unsigned long cx, 
 				     unsigned long dx );
 void 
-lfb_putpixel( unsigned long ax, 
-              unsigned long bx, 
-		      unsigned long cx, 
-		      unsigned long dx );
+lfb_putpixel ( unsigned long ax, 
+               unsigned long bx, 
+		       unsigned long cx, 
+		       unsigned long dx );
 	  
 						  
 						  
-void my_buffer_horizontal_line( unsigned long x1,
-                                unsigned long y, 
-								unsigned long x2,  
-								unsigned long color );
+void 
+my_buffer_horizontal_line ( unsigned long x1,
+                            unsigned long y, 
+							unsigned long x2,  
+							unsigned long color );
 								
-void drawDataRectangle( unsigned long x, 
-                        unsigned long y, 
-						unsigned long width, 
-						unsigned long height, 
-						unsigned long color );
-						
+void 
+drawDataRectangle ( unsigned long x, 
+                    unsigned long y, 
+					unsigned long width, 
+					unsigned long height, 
+					unsigned long color );	
 						
 						
 void * rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ); 
@@ -2144,11 +2204,15 @@ void * rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count 
 // Window support.
 // 
  
-int init_window_manager();
-int init_windows();
-int RegisterWindow(struct window_d *window);
-void set_current_window(struct window_d *window);
-void *get_current_window();
+int init_window_manager (void);
+
+int init_windows (void);
+
+int RegisterWindow (struct window_d *window);
+
+
+void set_current_window (struct window_d *window);
+void *get_current_window (void);
 
 //salva o retãngulo de uma janela no buffer de salvamento.
 //isso será usado para mover a janela.
@@ -2177,76 +2241,105 @@ int replace_window ( struct window_d *window,
 
 int redraw_window (struct window_d *window, unsigned long flags );
     
-int redraw_screen();                          //redraw all windows.
+
+//redraw all windows.
+int redraw_screen (void);                          
+
 int is_window_full(struct window_d *window);
 int is_window_maximized(struct window_d *window);
 int is_window_minimized(struct window_d *window);
 
-int get_active_window();
-void set_active_window(struct window_d *window);
-void change_active_window(int id);
+
+
+void set_active_window (struct window_d *window);
+int get_active_window (void);
+
+
+void change_active_window (int id);
+
 void CloseWindow(struct window_d *window);
+
 void DestroyWindow(struct window_d *window);
-void CloseActiveWindow();
-void MinimizeWindow(struct window_d *window);
-void MaximizeWindow(struct window_d *window);
-void windowShowWindowList();
-void show_window_with_focus();
-void show_active_window();
+
+void CloseActiveWindow (void);
+
+void MinimizeWindow (struct window_d *window);
+void MaximizeWindow (struct window_d *window);
+
+//
+// Show
+//
+
+void windowShowWindowList (void);
+
+void show_window_with_focus (void);
+
+void show_active_window (void);
 
 //
 // z-order support.
 //
 
-int z_order_get_free_slot();
-int get_zorder( struct window_d *window );
-struct window_d *getTopWindow(struct window_d *window);
-int get_top_window();
-//configurando a top window.
-void set_top_window( int id );
+int z_order_get_free_slot (void);
 
-void closeActiveWindow();
+int get_zorder ( struct window_d *window );
+struct window_d *getTopWindow (struct window_d *window);
+
+
+
+//configurando a top window.
+
+void set_top_window ( int id );
+int get_top_window (void);
+
+void closeActiveWindow (void);
 
 //bloqueando e desbloqueando o foco.
-void windowBlockFocus();
-void windowUnblockFocus();
+void windowBlockFocus (void);
+void windowUnblockFocus (void);
 
-int windowGetMainWindowDescriptor();
-int windowGetWindowID( struct window_d *window);
+int windowGetMainWindowDescriptor (void);
+
+int windowGetWindowID ( struct window_d *window);
+
 
 //@todo: Criar windowRefreshScreen();
 
-void windowSwitchFocus();
-void windowLock(struct window_d *window);
-void windowUnlock(struct window_d *window);
-int windowCreateDedicatedBuffer(struct window_d *window);
+void windowSwitchFocus (void);
+
+void windowLock (struct window_d *window);
+void windowUnlock (struct window_d *window);
+
+int windowCreateDedicatedBuffer (struct window_d *window);
 
 
 // Envia mensagem para a fila da janela com foco de entrada.
-void windowSendMessage( unsigned long arg1, 
-                        unsigned long arg2, 
-						unsigned long arg3, 
-						unsigned long arg4 );
+
+void 
+windowSendMessage ( unsigned long arg1, 
+                    unsigned long arg2, 
+					unsigned long arg3, 
+					unsigned long arg4 );
 
 
 //
 // pega uma mensagem na estrutura da janela com o foco de entrada.
 //
-void *windowGetHandleWindow(struct window_d *window); 
-void *windowGetMessage(struct window_d *window);
-void *windowGetLong1(struct window_d *window);
-void *windowGetLong2(struct window_d *window);
 
-void windowShowWWFMessageBuffers(); //mostra o buffer de mensagens da janela com foco de entrada.
+void *windowGetHandleWindow (struct window_d *window); 
+void *windowGetMessage (struct window_d *window);
+void *windowGetLong1 (struct window_d *window);
+void *windowGetLong2 (struct window_d *window);
+
+
+// Mostra o buffer de mensagens da janela com foco de entrada.
+
+void windowShowWWFMessageBuffers (void); 
 
 
 //color support.
-void windowSetUpColorScheme(int type);
-int windowSelectColorScheme( int type );
-
-/*Inicialização do sistema de suporte ao navegador shell*/
-int windowInitializeBrowserSupport();
-
+void windowSetUpColorScheme (int type);
+int windowSelectColorScheme ( int type );
 
 
 void guiSetUpMainWindow( unsigned long x, 
@@ -2262,24 +2355,24 @@ void guiSetUpMainWindow( unsigned long x,
 int windowKillTimer ( struct window_d *window, int id );
 				 
 int
-windowSetTimer( struct window_d *window, //janela
-                int id,                  //id do timer
-				int time                //tempo(medida indefinida ainda)
+windowSetTimer ( struct window_d *window, //janela
+                 int id,                  //id do timer
+				 int time                //tempo(medida indefinida ainda)
 				);
 				
 				
 				
 //escaneia as janelas existentes procurando uma 
 //que contenha o posicionamento do cursor.				
-int windowScan( unsigned long x, unsigned long y );
+int windowScan ( unsigned long x, unsigned long y );
 
 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
-void windowUpdateWindow( struct window_d *window );
+void windowUpdateWindow ( struct window_d *window );
 
 
 
 //faz a janela atual entrar ou sair do modo fullscreen.
-int windowSwitchFullScreen();
+int windowSwitchFullScreen (void);
 
 
 

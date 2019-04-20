@@ -4,15 +4,11 @@
  * Descrição:
  *     Header para gerenciamento de menus.
  *
- *
  * Menus:
- * ======
  *     São três os componentes principais: 
  *     (MenuItem < Menu < MenuBar).
  *
- *
  * Control Menu:
- * =============
  *     O control menu aparece apenas na janela ativa.
  *     @todo: Sua estrutura de indica em quan janela ele está aparecento. 
  *            Sua estrutura deve indical qual é o seu procedimento.
@@ -32,8 +28,8 @@
 /*
  * MENUITEM:
  *     Estrutura para menuitem.
- *
  */
+
 struct menuitem_d
 {
 	object_type_t objectType;
@@ -83,10 +79,10 @@ struct menuitem_d *menuitemDefault;
 /*
  * MENU:
  *     Estrutura para menu.
- *
  * (todo menu tem uma janela que recebe as mensagens,
  *   e a janela tem seu procedimento de janela).
  */
+
 struct menu_d
 {
 	object_type_t objectType;
@@ -146,8 +142,8 @@ struct menu_d *menuDefault;
 
 /*
  * Lista de Menus.
- *
  */ 
+
 unsigned long menuList[MENU_COUNT_MAX];
 
 
@@ -155,8 +151,8 @@ unsigned long menuList[MENU_COUNT_MAX];
 
 /*
  * Contagem de menus.
- *
  */
+
 int menus_count;
 
   
@@ -164,8 +160,8 @@ int menus_count;
 /*
  * CURRENT MENU:
  *     Estrutura para o menu atual, (ativo).
- *
  */
+
 struct current_menu_d
 {
     unsigned long menuId;    //Id do menu ativo, (índice na lista de menus).
@@ -188,11 +184,15 @@ struct current_menu_d
 
 //Protótipos.
 
-int init_menus();
-void set_current_menu(struct menu_d *menu);
-void *get_current_menu();
-int RegisterMenu(struct menu_d *menu);
-void initmenuArray(struct menu_d *a, int initialSize);
+int init_menus (void);
+
+void set_current_menu (struct menu_d *menu);
+
+void *get_current_menu (void);
+
+int RegisterMenu (struct menu_d *menu);
+
+void initmenuArray (struct menu_d *a, int initialSize);
 
 
 /*
@@ -200,7 +200,9 @@ void initmenuArray(struct menu_d *a, int initialSize);
  *     Cria o menu principal.
  *     Nada mais na tela, apenas um menu centralizado.
  */
+
 int MainMenu(struct window_d * window);   //o main menu é o control menu.
+
 int ControlMenu(struct window_d * window); //control menu
 
 
@@ -208,40 +210,48 @@ int ControlMenu(struct window_d * window); //control menu
  * MainMenuProcedure:
  *    Main menu. inicialização de ambientes.
  *    //test
- */																
-unsigned long MainMenuProcedure( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2);
+ */
+
+unsigned long 
+MainMenuProcedure ( struct window_d *window, 
+                    int msg, 
+					unsigned long long1, 
+					unsigned long long2 );
+
 
 /*
  * create_menu_item:
  *     Menus são verticais.
- *  
  */
-int create_menu_item(struct menu_d *menu, unsigned char *string, int status);
+
+int create_menu_item (struct menu_d *menu, unsigned char *string, int status);
 
 
 int select_menubar_item(int n);
+
 int unselect_menubar_item(int n);
 
-int get_menubar_selected_item();
+int get_menubar_selected_item (void);
+
 int redraw_menubar_item( int n);
 
 
-void *create_menu( struct window_d *pwindow,    //Parent window. 
-                   unsigned long iCount,        //Contagem de ítems. 
-				   unsigned long sCount,        //Contagem de espaçadores.
-				   int type,                    //Horizontal ou vertical.
-				   int style );                 //Estilo.
+void *create_menu ( struct window_d *pwindow,    //Parent window. 
+                    unsigned long iCount,        //Contagem de ítems. 
+				    unsigned long sCount,        //Contagem de espaçadores.
+				    int type,                    //Horizontal ou vertical.
+				    int style );                 //Estilo.
 
 				   
 				   			   
-unsigned long MenuBarProcedure( struct window_d *window, 
-                                int msg, 
-								unsigned long long1, 
-								unsigned long long2); 
+unsigned long 
+MenuBarProcedure ( struct window_d *window, 
+                   int msg, 
+				   unsigned long long1, 
+				   unsigned long long2 );
+
+
 //
-//fim.
+//  End.
 //
 

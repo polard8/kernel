@@ -65,9 +65,6 @@ Protocol addresses of the source and destination hosts
 //uint8_t broadcast_mac_address[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 
-
-
-
 //
 //  ## TX ##
 //
@@ -123,6 +120,7 @@ struct legacy_tx_desc
 	uint8_t css;    /* checksum start */
 	uint16_t special;
 };
+
 
 //==========
 /* Transmit Descriptor */   
@@ -263,8 +261,6 @@ struct intel_nic_info_d *currentNIC;
 
 
 
-
-
  
 //lista de placas de rede.
 //#todo: o valor máximo precisa ser definido. 
@@ -291,10 +287,16 @@ PCIRegisterIRQHandler ( uint16_t bus,
 
  
 
-int e1000_init_nic ( unsigned char bus, unsigned char dev, unsigned char fun, struct pci_device_d *pci_device );
+int 
+e1000_init_nic ( unsigned char bus, 
+				 unsigned char dev, 
+				 unsigned char fun, 
+				 struct pci_device_d *pci_device );
 
-void e1000_setup_irq();
-int e1000_reset_controller(); 
+
+void e1000_setup_irq (void);
+
+int e1000_reset_controller (void); 
 
 
 //void show_current_nic_info ();
@@ -311,21 +313,21 @@ void NetSendEthPacket ( PNetworkDevice dev,
 void E1000Send ( void *ndev, uint32_t len, uint8_t *data);		
 
 
-
 void E1000WriteCommand ( struct intel_nic_info_d *d, uint16_t addr, uint32_t val );
+
 uint32_t E1000ReadCommand (struct intel_nic_info_d *d, uint16_t addr) ;	
 
 uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt );						
 
 					
-void nic_i8254x_transmit();
+void nic_i8254x_transmit (void);
+
 
 //eeprom
 uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr );
 
 
-void xxxe1000handler();
-
+void xxxe1000handler (void);
 
 
 //

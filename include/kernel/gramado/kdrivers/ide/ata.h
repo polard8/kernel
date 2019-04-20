@@ -275,8 +275,11 @@ unsigned char ata_record_channel;
 /**************************** Libs ***************************************/
 
 // ata_dev.c
+
 int nport_ajuste(char nport);
-void ide_mass_storage_initialize();
+
+void ide_mass_storage_initialize (void);
+
 int ide_dev_init(char port);
 
 
@@ -288,12 +291,19 @@ void set_ata_addr(int channel);
 int ide_identify_device(uint8_t nport);
 void ata_wait(int val);
 
-unsigned char ata_wait_not_busy();
-unsigned char ata_wait_busy();
-unsigned char ata_wait_no_drq();
-unsigned char ata_wait_drq();
-unsigned char ata_wait_irq();
-unsigned char ata_status_read();
+
+unsigned char ata_wait_not_busy (void);
+
+unsigned char ata_wait_busy (void);
+
+unsigned char ata_wait_no_drq (void);
+
+unsigned char ata_wait_drq (void);
+
+unsigned char ata_wait_irq (void);
+
+unsigned char ata_status_read (void);
+
 
 void ata_cmd_write(int cmd_val);
 
@@ -313,16 +323,17 @@ void ide_dma_data( void *addr,
                    uint16_t byte_count, 
 				   uint8_t flg, 
 				   uint8_t nport );
-void ide_dma_start();
-void ide_dma_stop();
-int ide_dma_read_status();
 
+void ide_dma_start (void);
 
- 
+void ide_dma_stop (void);
+
+int ide_dma_read_status (void);
 
 
 //ahci.c
-void ahci_mass_storage_init();
+//deletar.
+//void ahci_mass_storage_init ();
 
 
 
@@ -368,16 +379,16 @@ int diskATAInitialize( int ataflag );
  *     Rotina de diálogo com o driver ATA.
  */
 
-int diskATADialog ( int msg, 
-                    unsigned long long1, 
-                    unsigned long long2 );
+int 
+diskATADialog ( int msg, 
+                unsigned long long1, 
+                unsigned long long2 );
 
 
+int disk_ata_wait_irq (void);
 
-int disk_ata_wait_irq ();
 
-void show_ide_info();
-
+void show_ide_info (void);
 
 
 ///----------------------------
@@ -391,9 +402,6 @@ void show_ide_info();
 #define DISK4 4
 
 
-
-
-
 // base address 
 static unsigned long ATA_BAR0;    // Primary Command Block Base Address
 static unsigned long ATA_BAR1;    // Primary Control Block Base Address
@@ -401,9 +409,6 @@ static unsigned long ATA_BAR2;    // Secondary Command Block Base Address
 static unsigned long ATA_BAR3;    // Secondary Control Block Base Address
 static unsigned long ATA_BAR4;    // Legacy Bus Master Base Address
 static unsigned long ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Address
-
-
-
 
 
 
@@ -451,15 +456,6 @@ struct {
                        (((uint32_t)(device) &0x3f) << 11)|\
                        (((uint32_t)(fn) &0x07) << 8)|\
                        ((uint32_t)(offset) &0xfc)|0x80000000)
-
-
-
-
-
-
-
-
-
 
 
 

@@ -744,7 +744,7 @@ void FreeHeap (void *ptr){
 
 //int memoryInitializeHeapManager() 
 
-int init_heap (){
+int init_heap (void){
 	
 	int i = 0;
 
@@ -840,7 +840,7 @@ fail:
 	*/
     
 	return (int) 1;
-};
+}
 
 
 /*
@@ -850,7 +850,7 @@ fail:
  *     @todo Usar stackInit(). 
  */
  
-int init_stack (){
+int init_stack (void){
 	
     //Globals.
 	//#bugbug
@@ -888,7 +888,7 @@ fail:
  *    @todo: Usar mmInit().
  */
  
-int init_mm (){
+int init_mm (void){
 	
     int Status = 0;
 	int i = 0;	
@@ -1015,7 +1015,7 @@ int init_mm (){
 	
 	//inicializando o framepool (paged pool)
 	
-	initializeFramesAlloc();
+	initializeFramesAlloc ();
 	
 	
 	// Continua...
@@ -1030,8 +1030,8 @@ int init_mm (){
 //
 
 //limpa a camada /gramado
-int gcGRAMADO (){
-	
+int gcGRAMADO (void)
+{	
 	//Ainda não implementado.
 	return 0;
 }
@@ -1099,7 +1099,7 @@ estrutura.
     +O módulo de gerência de threads que limpe suas listas.
  */
 
-int gcEXECUTIVE (){
+int gcEXECUTIVE (void){
 	
 	int i;
 	struct mmblock_d *b;  //memory block.
@@ -1238,17 +1238,17 @@ done:
 
 
 //limpa a camada /microkernel
-int gcMICROKERNEL (){
-	
-	return (int) 0;
+int gcMICROKERNEL (void)
+{	
+	return 0;
 };
 
 
 //limpa a camada /hal
-int gcHAL (){
-	
-	return (int) 0;
-};
+int gcHAL (void)
+{	
+	return 0;
+}
 
 
 /*
@@ -1282,7 +1282,7 @@ int gcHAL (){
  * utilitários usarem.
  */
  
-int gc (){
+int gc (void){
 	
     int Status;
 	

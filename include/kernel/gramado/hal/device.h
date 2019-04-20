@@ -1,5 +1,5 @@
 /*
- * Arquivo: device.h  
+ * File: device.h  
  *
  * Descrição:
  *     Header para o device manager.
@@ -82,9 +82,9 @@ unsigned long deviceList[256];
 
 
 
-void init_device_manager();
+void init_device_manager (void);
 
 //
-// Fim.
+// End.
 //
 

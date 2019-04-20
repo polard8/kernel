@@ -211,10 +211,11 @@ void set_up_cursor ( unsigned long x, unsigned long y ){
  *     Pega o valor de x.
  *     @todo: Isso pode ir para outro lugar.
  */
-unsigned long get_cursor_x (){   
-	
+
+unsigned long get_cursor_x (void)
+{   	
 	return (unsigned long) g_cursor_x;
-};
+}
 
 
 /*
@@ -223,14 +224,15 @@ unsigned long get_cursor_x (){
  *     Pega o valor de y.
  *     @todo: Isso pode ir para outro lugar.
  */
-unsigned long get_cursor_y (){  
-       
+
+unsigned long get_cursor_y (void)
+{         
     return (unsigned long) g_cursor_y; 	
-};
+}
 
 
-void *systemNull (){
-	
+void *systemNull (void)
+{	
 	return NULL;
 }
 
@@ -264,8 +266,8 @@ void *systemLinkDriver( unsigned long arg1,
  *     A Apresentação da sondágem pode ser feita em outra ordem,
  *     melhor que seja a ordem alfabética.
  */
-void systemShowDevicesInfo()
-{
+
+void systemShowDevicesInfo (void){
 	
 #ifdef KERNEL_VERBOSE	
 	printf("sm-sys-system-systemShowDevicesInfo:\n");
@@ -315,7 +317,8 @@ done:
  *      Essas informações devem ser repassadas para "struct system_d".
  *      #bugbug: A parent window deve ser gui->main e não gui->screen.
  */  
-void *systemCreateSystemMenuBar (){
+
+void *systemCreateSystemMenuBar (void){
 	
 	struct window_d * hwBar;                //Barra.
 	//Left: (Software).
@@ -377,12 +380,15 @@ void systemCheck3TierArchitecture(){
 };
 */
 
+
+
 /*
  ***************************************
  * systemSetupVersion:
  *     Setup version info.     
  */
-void systemSetupVersion (){
+
+void systemSetupVersion (void){
 	
 	//Version.
     Version = (void *) malloc( sizeof(struct version_d) );
@@ -440,10 +446,9 @@ void systemSetupVersion (){
 	};
 	
 	//More ?!
-	
-//done:
-    return;
-};
+    
+	//return;
+}
 
 
 /*
@@ -484,21 +489,22 @@ int system_dispatch_to_procedure( struct window_d *window,
 	 * Status: 
 	 *     A mensagem já foi enviada ao procedimento e processada por ele.
 	 *     Então avisamos que não há mais mensagens.
-	 *
      */
+	
 	g_nova_mensagem = 0;
 	
 done:	
 	return (int) 0;
-};   
+}  
 
 
 /*
  * SystemMenu:
  * Cria o system menu para manipular a janela ativa. Control Menu.
  */
-int SystemMenu()
-{
+
+int SystemMenu (void){
+	
     struct window_d *Current;    //Parent window.	
 	struct window_d *hWindow;    //Menu window.
 	
@@ -641,13 +647,17 @@ unsigned long SystemMenuProcedure( struct window_d *window,
 		    //Nothing.
 		    break;
 	};
-//Done.
+	
+
 done:
-	if(VideoBlock.useGui == 1){
+	
+	if (VideoBlock.useGui == 1)
+	{
 	    refresh_screen();
 	};
+	
 	return (unsigned long) 0;
-};
+}
 
 
 /*
@@ -661,7 +671,7 @@ done:
  *     se ainda tiver algum processo pra fechar, então essa rotina fecha, senão termina a rotina. 
  */
 
-void systemReboot (){
+void systemReboot (void){
 	
 	//int i;
 	//unsigned long left;
@@ -932,12 +942,13 @@ done:
  *     Interface para shutdown.
  */ 
 
-void systemShutdown (){
+void systemShutdown (void){
 	 
 	//@todo ...
 
 	printf ("systemShutdown: It's safe to turnoff your computer");
 	refresh_screen ();
+	
 	die ();
 }
 
@@ -948,7 +959,7 @@ void systemShutdown (){
  *     (Deve chamar uma rotina herdada do BM).
  */
 
-void systemShutdownViaAPM (){
+void systemShutdownViaAPM (void){
 
     // Obs: @todo:
 	//     Existe uma rotina no BM que desliga a máquina via APM usando 
@@ -970,9 +981,7 @@ void systemShutdownViaAPM (){
 		
 	//};
 	
-//hang:
-	
-    panic("sm-system-systemShutdownViaAPM:\n");
+    panic ("systemShutdownViaAPM:\n");
 }
 
 
@@ -1068,10 +1077,11 @@ void *systemGetSystemStatus (int number){
  * Refresh.	
  * HALT.
  */
-void die (){
+
+void die (void){
 	
 	//*Bullet.
-    printf("execve-sm-system-die: * System Halted!\n");      
+    printf ("die: * System Halted\n");      
 	
 	if ( VideoBlock.useGui == 1 ){
 	    refresh_screen ();
@@ -1084,11 +1094,12 @@ void die (){
 		asm("cli");
 	    asm("hlt");                        
 	};     	
-};
+}
 
 
 //o ID da janela que tem o terminal virtual ativo.
-int systemGetTerminalWindow (){
+//isso deve ir para kgws
+int systemGetTerminalWindow (void){
 	
     return (int) terminal_window;	
 }
@@ -1356,13 +1367,15 @@ done:
  * newLinkedlist:
  *     Cria uma nova linked list.
  */
-void *newLinkedlist ()
+
+void *newLinkedlist (void)
 {
     struct linkedlist_d *new_list; 
 	
-	new_list = (void *) malloc( sizeof(struct linkedlist_d) );
+	new_list = (void *) malloc ( sizeof(struct linkedlist_d) );
 	
-    if ( (void *) new_list == NULL ){
+    if ( (void *) new_list == NULL )
+	{
 		return NULL;
 	}
 
@@ -1372,9 +1385,8 @@ void *newLinkedlist ()
 	new_list->head =  NULL;
     new_list->tail =  NULL;
 	
-//done:
     return (void *) new_list;
-};
+}
 
 
 
@@ -1382,7 +1394,8 @@ void *newLinkedlist ()
  * newNode:
  *     Cria um novo nodo.
  */
-void *newNode ()
+
+void *newNode (void)
 {
     struct node_d *new_node; 
 	
@@ -1397,9 +1410,8 @@ void *newNode ()
     
 	new_node->flink = NULL;
  
-//done:
     return (void *) new_node;
-};
+}
 
 
 void Removing_from_the_beginning(struct linkedlist_d *list)
@@ -1476,7 +1488,7 @@ void Removing_from_the_end (struct linkedlist_d *list){
  * 2016 - Revisão.
  */
 
-int systemStartUp (){
+int systemStartUp (void){
 	
     int Status = 0;
 	
@@ -1500,7 +1512,7 @@ int systemStartUp (){
 		
 	    //Disable interrupts, lock taskswitch and scheduler.
 	    
-		asm("cli");	
+		asm ("cli");	
 	    taskswitch_lock();
 	    scheduler_lock();
 		
@@ -1532,7 +1544,7 @@ int systemStartUp (){
 #endif
 
 #ifdef EXECVE_VERBOSE
-		printf("sm-sys-system-systemStartUp: LFB={%x} X={%d} Y={%d} BPP={%d}\n",
+		printf ("systemStartUp: LFB=%x X=%d Y=%d BPP=%d\n",
 		    (unsigned long) SavedLFB,
 			(unsigned long) SavedX,
 			(unsigned long) SavedY,
@@ -1631,7 +1643,8 @@ done:
  * systemInit:
  *     Inicializando algumas variáveis.
  */
-int systemInit (){
+
+int systemInit (void){
 	
 	int Status;
 	
@@ -1675,7 +1688,7 @@ int systemInit (){
 	
 	//retornando para a rotina de entrypoint da arquitetura alvo.
 	return (int) Status;
-};
+}
 
 
 /*
@@ -1686,7 +1699,7 @@ int systemInit (){
  * Uma chamada à um construtor criaria uma estrutura com seu nome e 
  * o construtor pode inicializar alguma variável. */
 
-void systemSystem (){
+void systemSystem (void){
 	
     gSystemStatus = 1;
 }

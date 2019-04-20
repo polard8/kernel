@@ -90,11 +90,12 @@
  * chamam as rotinas de tratamento dos requests.
  */
  
-int KiRequest (){
+int KiRequest (void){
 		
     if ( kernel_request < 0 || kernel_request > KERNEL_REQUEST_MAX )
 	{	
         //#debug
+		
 		printf ("KiRequest: %d", kernel_request );
 		die ();
 	}
@@ -117,11 +118,13 @@ int KiRequest (){
  *   Um request será atendido somente quando o timeout zerar. (defered)
  */
  
-int request (){
+int request (void){
 	
 	//targets	
+	
     struct process_d *Process; 
-    struct thread_d *Thread;	
+    struct thread_d *Thread;
+	
 	int PID;
 	int TID;
 	
@@ -339,9 +342,12 @@ create_request ( unsigned long number,
 	return 0;
 }
 
-void clear_request()
-{
+
+
+void clear_request (void){
+	
     REQUEST.kernel_request = 0;
+	
 	REQUEST.status = 0;
 	REQUEST.timeout = 0;
 	
@@ -358,8 +364,6 @@ void clear_request()
 	REQUEST.long5 = 0;
 	REQUEST.long6 = 0;
 }
-
-
 
 
 //

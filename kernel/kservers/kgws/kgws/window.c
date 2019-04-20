@@ -366,28 +366,26 @@ int windowGetWindowID ( struct window_d *window ){
 
 // Pegar o id da janela main.
 // Para os aplicativos lidarem com a área de trabalho. 
-int windowGetMainWindowDescriptor (){
+
+int windowGetMainWindowDescriptor (void){
 	
-	if( (void *) gui == NULL ){
+	if ( (void *) gui == NULL )
+	{
 		goto fail;
+	
 	}else{
 		
-		if( (void *) gui->main == NULL ){
+		if ( (void *) gui->main == NULL )
+		{
 		    goto fail;
 		}
+		
 		return (int) gui->main->id;
 	};
 	
 fail:	
-	return (int) -1;
-};
-
-
-
-// ?? 
-int windowInitializeBrowserSupport (){
 	
-	return (int) -1;  //canccelada.
+	return (int) -1;
 }
 
 
@@ -701,25 +699,31 @@ fail:
 };
 
 
+
 /*
  * windowShowWWFMessageBuffers:
  *     Mostra o buffer de mensagens da janela com foco de entrada.
  *     #Rotinas de teste. @todo: Enviar para a pasta /test.
  *     Esse rotina funcionou e se mostrou bem útil.
  */
-void windowShowWWFMessageBuffers (){
-	
+
+void windowShowWWFMessageBuffers (void){
+
+	int i=0;	
 	struct window_d *wFocus;
+	
     wFocus = (void *) windowList[window_with_focus];
 
-	int i=0;
+	if ( (void *) wFocus == NULL )
+		return;
 	
 	//Obs: Tipo.
+	
 	for ( i=0; i<32; i++ )
 	{
-	    printf("%d ", wFocus->msgList[i]);
+	    printf ("%d ", wFocus->msgList[i]);
     };	
-};
+}
 
 
 /*
@@ -1021,7 +1025,7 @@ fail:
  *
  */
  
-int window_getch (){
+int window_getch (void){
 	
 	//pode ser que esse aplicativo não tenha janela,
 	//mas esteja rodando na janela do shell.
@@ -1209,10 +1213,11 @@ void set_current_window (struct window_d *window){
  * get_current_window: 
  *     Get current window pointer.
  */
-void *get_current_window (){
-	
+
+void *get_current_window (void)
+{	
 	return (void *) CurrentWindow;
-};
+}
 
 
 /*
@@ -1298,9 +1303,10 @@ get_next:
 //#debug
 //usado para debug.
  
-void windowShowWindowList (){
+void windowShowWindowList (void){
 	
 	int i = 0;
+	
 	struct window_d *hWnd;
 	struct window_d *hWindow;
 	
@@ -1441,8 +1447,6 @@ void windowShowWindowList (){
 	};	   
 
     // Continua ...
-	
-//done:
 
     //@todo; 
 	//Aqui podemos dar refresh apenas na janela
@@ -1450,8 +1454,8 @@ void windowShowWindowList (){
 	refresh_screen();
     
 	//SetFocus(hWindow);
-    //return;
-};
+
+}
 
 
 /*
@@ -2099,7 +2103,7 @@ fail:
 
 
 /*
- ****************
+ ******************************
  * redraw_screen:
  *
  *     Repinta todas as janelas com base na zorder.
@@ -2109,7 +2113,7 @@ fail:
  * Do mesmo jeito que o usuário modificou de acordo com suas preferências.
  */
  
-int redraw_screen (){
+int redraw_screen (void){
 	
 	int z;
     int RedrawStatus;	
@@ -2176,14 +2180,16 @@ int redraw_screen (){
 	};
 	
 	
-//Seo for terminar corretamente é porque repintamos tudo o que foi possível.	
-//Nothing.
+//Se for terminar corretamente é porque repintamos tudo o que foi possível.	
+
 done:	
-    return (int) 0;	
+	
+    return 0;	
+	
 fail:
-    printf("redraw_screen: FAIL.\n");
-    die();
-};
+    kprintf ("redraw_screen: \n");
+    die ();
+}
 
 
 /*
@@ -2424,11 +2430,10 @@ void DestroyWindow ( struct window_d *window ){
 /*
  * get_active_window:
  *     Obtem o id da janela ativa.
- *     @todo: Mudar para windowGetActiveWindowId().
  */
  
-int get_active_window (){
-	
+int get_active_window (void)
+{	
     return (int) active_window;  
 }
 
@@ -2549,27 +2554,29 @@ void change_active_window (int id){
  *     Mostra o id da janela ativa.
  *     @todo: Mudar o nome para windowShowActiveWindowId() 
  */
-void show_active_window (){
-	
-	printf ("ActiveWindowId={%d}\n", (int) active_window);
-};
+
+void show_active_window (void)
+{	
+	printf ("ActiveWindow=%d \n", (int) active_window);
+}
 
 /*
  * show_window_with_focus:
  *     Mostra o id da janela com o foco de entrada..
  */
-void show_window_with_focus (){
-	
-	printf ("wwf_Id={%d}\n", (int) window_with_focus );
-};
+
+void show_window_with_focus (void)
+{	
+	printf ("wwf=%d \n", (int) window_with_focus );
+}
 
 
 /*
- *****************************************
  * CloseActiveWindow:
  *     Fecha a janela ativa.
  */
-void CloseActiveWindow (){
+
+void CloseActiveWindow (void){
 	
 	int Offset;
     struct window_d *Window;
@@ -2604,7 +2611,7 @@ void CloseActiveWindow (){
 	};	
 	
     DestroyWindow (Window);
-};
+}
 
 
 //
@@ -2612,16 +2619,16 @@ void CloseActiveWindow (){
 //
 
 
-void windowBlockFocus (){
-	
+void windowBlockFocus (void)
+{		
 	gFocusBlocked = (int) 1;
-};
+}
 
 
-void windowUnblockFocus (){
-	
+void windowUnblockFocus (void)
+{	
 	gFocusBlocked = (int) 0;
-};
+}
 
 
 /*
@@ -2881,16 +2888,17 @@ fail:
 
 
 /*
- *************************************************
  * GetFocus: 
- *     Pega o ponteiro para a estrutura da janela 
- * com o foco de entrada.
+ *     Pega o ponteiro para a estrutura da janela com o foco de entrada.
  */
-void *GetFocus (){
+
+void *GetFocus (void)
+{
+	if ( window_with_focus < 0 )
+		return NULL;
 	
     return (void *) windowList[window_with_focus];	
-};
-
+}
 
 
 /*
@@ -2899,10 +2907,11 @@ void *GetFocus (){
  *     Recupera o handle da janela que o usuário 
  * está trabalhando, ou seja, a janela em primeiro plano.
  */
-void *windowGetForegroundWindow (){
-	
+
+void *windowGetForegroundWindow (void)
+{	
     return (void *) windowList[window_with_focus];		
-};
+}
 
 
 /*
@@ -2975,12 +2984,10 @@ void windowSwitchActiveWindow()
  * e quando trocamos o foco, percorremos a lista atual.
  * mas a lista muda dependendo do ambeinte gráfico que 
  * estamos.
- * Muda quando trocamos a janela ativa, muda quando 
- * trocamos o desktop.
- * 
+ * Muda quando trocamos a janela ativa, muda quando trocamos o desktop.
  */
  
-void windowSwitchFocus (){
+void windowSwitchFocus (void){
 	
 	int Max;
 	int CurrentID;
@@ -2991,14 +2998,15 @@ void windowSwitchFocus (){
 	//...
 	
 	//Max e Current.
-	Max     = (int) windows_count;
+	
+	Max = (int) windows_count;
 	CurrentID = (int) window_with_focus;	//salva
 	
-	//
+
 	// @todo: 
 	// Essa rotina precisa ser refeita. 
 	// Seguindo uma lista linkada de janelas.
-	//
+
 	
 	window = (void *) windowList[window_with_focus];	
 	
@@ -3006,6 +3014,7 @@ void windowSwitchFocus (){
 	{
 		printf("windowSwitchFocus: window\n");
 	    goto fail; 
+		
 	}else{
 		
 	    KillFocus(window);  
@@ -3038,6 +3047,7 @@ void windowSwitchFocus (){
 		//Fail.
 	};
 	//Nothing.
+	
 done:
     redraw_window(window,1);
 	
@@ -3191,7 +3201,7 @@ fail:
  *     @todo windowmanagerInit()
  */
  
-int init_window_manager (){
+int init_window_manager (void){
 	
     // Aloca memória para a estrutura do procedimento 
 	// de janela da thread atual.
@@ -3203,7 +3213,7 @@ int init_window_manager (){
 	
 	if ( (void *) WindowProcedure == NULL )
 	{
-	    printf("init_window_manager: WindowProcedure\n");
+	    printf ("init_window_manager: WindowProcedure\n");
 		die();
 		
 	}else{
@@ -3219,12 +3229,9 @@ int init_window_manager (){
 		//...
 	};
 
-
 	// @todo:  
 	//     Continua fazendo inicializações de 
 	// procedimento de janela.	
-	
-//done:
 
 //#ifdef KERNEL_VERBOSE
 //    printf("done\n");
@@ -3241,7 +3248,7 @@ int init_window_manager (){
  *     Inicializa globais relativas à janelas.
  */
  
-int init_windows (){
+int init_windows (void){
 		
 	// #debug
 	// Inicializa a lista de janelas.
@@ -3515,10 +3522,10 @@ struct window_d *getTopWindow (struct window_d *window){
 }; 
 
 
-int get_top_window (){
-	
+int get_top_window (void)
+{	
 	return (int) top_window;
-};
+}
 
 
 //Setando a top window.
@@ -3528,24 +3535,28 @@ void set_top_window (int id){
 };
 
 
-//fecha a janela ativa.
-void closeActiveWindow (){
+// Fecha a janela ativa.
+
+void closeActiveWindow (void){
 	
     int ID;
 	struct window_d *w;
 	
 	ID = get_active_window();
 	
+	if (ID<0)
+		return;
+	
 	w = (void *) windowList[ID];
 	
 	CloseWindow (w);
-};
+}
 
 
 //encontrando um slot livre na z-order global de 
 //overlapped windows.
 
-int z_order_get_free_slot (){
+int z_order_get_free_slot (void){
 	
 	int response;
 	int z; 
@@ -3576,7 +3587,7 @@ fail:
     return (int) -1;
 done:
     return (int) response;	
-};
+}
 
 
 /*
@@ -3586,7 +3597,7 @@ done:
  *     Obs: Isso funcionou bem.
  */
  
-int windowLoadGramadoIcons (){
+int windowLoadGramadoIcons (void){
 	
 	unsigned long fRet;
 	
@@ -3801,13 +3812,16 @@ void windowUpdateWindow ( struct window_d *window ){
 
 
 
-//
-// ## Full screen support ##
-//
 
+/*
+ ***************************************
+ * windowSwitchFullScreen:
+ *     Switch full screen support.
+ */
 
 //salvando os valores usados para configura o modo 
 //full screen
+
 unsigned long save_client_rect_left;
 unsigned long save_client_rect_top;
 unsigned long save_client_rect_width;
@@ -3816,8 +3830,9 @@ unsigned long save_client_rect_height;
 int fsStatus;
 
 // uma janela entra ou sai do modo full screen.
-// @todo: isso pode ir pra outro lugar, provavelmente gws.
-int windowSwitchFullScreen (){
+// #todo: isso pode ir pra outro lugar, provavelmente gws.
+
+int windowSwitchFullScreen (void){
 	
 	struct window_d *window;
 	
@@ -3953,7 +3968,7 @@ fail:
     return 1;
 };
 
-//
+
 
 int scroll_client_window ( struct window_d *window )
 {

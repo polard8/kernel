@@ -91,31 +91,29 @@ struct hardware_d
 	//struct pit_d *Pit; @todo.
 	struct timer_d *Timer;
 	
-	
-	//
+
 	// RTC CMOS info.
-	//
+
 	struct rtc_d *Rtc;
 	
-	//
+
 	// Discos info.
-	//
+
 	struct diskinfo_d *Disk;
 	
-	//
+
 	// Volumes dos discos.
-	//
-	struct volumeinfo_d *Volumes; //ponteiro para array de estruturas de volumes.
+    //ponteiro para array de estruturas de volumes.
+	
+	struct volumeinfo_d *Volumes; 
 	
 	
-	//
 	// Keyboard info.
-	//
+	
 	struct keyboard_d *Keyboard;
 	
-	//
+	
 	// Mouse info.
-	//
 	
 	
 	//floppy fdd
@@ -313,8 +311,9 @@ IoWritePartitionTable(
  
 //Initialization support.
 
-int init_hal ();
-int init_amd ();
+int init_hal (void);
+
+int init_amd (void);
 // ...
 
 int 
@@ -325,20 +324,26 @@ jmp_address ( unsigned long arg1,
 				 
 
 
-int hal_init_machine(); 
-void hal_set_machine_type(unsigned long type);
-unsigned long hal_get_machine_type();	
-int hal_hardware_detect();	
-int hal_showpciinfo();		
-void hal_vsync();
+int hal_init_machine (void); 
+
+void hal_set_machine_type (unsigned long type);
+
+// ?
+unsigned long hal_get_machine_type (void);	
+
+int hal_hardware_detect (void);	
+
+int hal_showpciinfo (void);		
+
+void hal_vsync (void);
 
 
 //
 // reboot and shutdown
 //
 
-void hal_reboot ();
-void hal_shutdown ();
+void hal_reboot (void);
+void hal_shutdown (void);
 
 
 //
@@ -346,8 +351,8 @@ void hal_shutdown ();
 //
 
 
-unsigned long getGdt ();
-unsigned long getIdt ();
+unsigned long getGdt (void);
+unsigned long getIdt (void);
 
 
 //
@@ -368,7 +373,7 @@ void hal_setup_new_vectors_table_entry ( int number, unsigned long address );
 // vetores legados.
 //Inicializando a tabela de vetores com os endereços das rotinas usadas pelo assembler
 //na inicialização de alguns vetores de interrupção.
-void hal_init_vectors_table();
+void hal_init_vectors_table (void);
 
 
 
@@ -383,9 +388,13 @@ void hal_init_vectors_table();
 // 8 extras para handlers default.
 unsigned long HANDLERS[256+8];
 
+
 void hal_idt_register_interrupt ( unsigned long idt_location, unsigned char i, unsigned long callback );
-void hal_default_handler();
-void hal_init_handlers_table();
+
+void hal_default_handler (void);
+
+void hal_init_handlers_table (void);
+
 void hal_setup_new_handler ( int number, unsigned long callback );
 void hal_invalidate_handler (int number);
 

@@ -51,28 +51,14 @@
  * save_kernel_args:
  *     Salvando em estrutura os argumentos recebidos.
  */
-void save_kernel_args (){
+
+void save_kernel_args (void){
 	
     //KernelArgs.arg1 = ;
     //KernelArgs.arg2 = ;
 	//KernelArgs.arg3 = ;
 	//KernelArgs.arg4 = ;
-	
-    //return;
-};
-
-
-/*
- * boot:
- *     @todo: Propósito ??
- *            Boot de alguma partição.(volume) 
- *            Boot do volume sinalizado.
- *            Identificar volumes.
- */
-void boot (){
-    
-	panic("sm-init-boot:");	
-};	
+}
 
 
 /*
@@ -89,7 +75,7 @@ void boot (){
  * Obs: Dependente significa dependente da marca do procesador.
  */
 
-int init_architecture_dependent (){
+int init_architecture_dependent (void){
 	
 	int Status = 0;
 	unsigned char Type;
@@ -101,8 +87,9 @@ int init_architecture_dependent (){
 	// Fase. (Verificar se essa rotina foi chamada na fase certa de inicialização.)
     //
 	
-	if ( KeInitPhase != 1 ){
-		panic("sm-init-init_architecture_dependent: KeInitPhase\n");	
+	if ( KeInitPhase != 1 )
+	{
+		panic ("init_architecture_dependent: KeInitPhase\n");	
 	}
 
 	// #### IMPORTANTE ####
@@ -178,14 +165,10 @@ int init_architecture_dependent (){
  // Continua ...
  //
 	
-//
-// Done.
-//
-
-//done:
-
-    return (int) Status;
-};
+    // Done.
+    
+	return (int) Status;
+}
 
 
 
@@ -198,14 +181,15 @@ int init_architecture_dependent (){
  *    Obs: Essa é a fase 1 de inicialização.
  */
 
-int init_architecture_independent (){
+int init_architecture_independent (void){
 	
     int Status;
 	
 	debug_print ("init_architecture_independent\n");
 		
-    if (KeInitPhase != 0){
-		panic("sm-init-init_architecture_independent: KeInitPhase\n");
+    if (KeInitPhase != 0)
+	{
+		panic ("init_architecture_independent: KeInitPhase\n");
 	}; 
 
 	
@@ -407,7 +391,8 @@ done:
  *     Inicia variáveis globais do Kernel Base.
  *     Obs: Inicializar por categorias.
  */
-void init_globals (){
+
+void init_globals (void){
 
 #ifdef EXECVE_VERBOSE	
     //printf("sm-init-init_globals:\n");
@@ -546,34 +531,22 @@ void init_globals (){
 /*
  ******************************************
  * init:
- * Base initializations. (Four phases).
+ *     Base initializations.
+ *     (Four phases).
  */ 
-int init (){
+
+int init (void){
 	
     int Status = 0;
 	
 	debug_print("init:\n");
 	
-	
-	
-	
-	
-	//#debug : ISSO FUNCIONOU ... 
-	
-	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
-    //refresh_screen(); 
-    //while(1){}	
-	
-	
-	
-	
-	
 	//Check kernel phase.
+	
 	if ( KeInitPhase != 0 )
 	{
 		debug_print("init: KeInitPhase fail\n");
-		panic ("sm-init-init: KeInitPhase\n");
-        //die();		
+		panic ("sm-init-init: KeInitPhase\n");		
 	}
 	
 	
@@ -583,7 +556,7 @@ int init (){
 	
 	
     //Globals.
-	init_globals();
+	init_globals ();
 	
 //#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: init_globals ok\n");     
@@ -606,16 +579,7 @@ int init (){
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: ioInit\n");	
 #endif	
-	ioInit();
-	
-	
-	//#debug :  
-	//breakpoint ante de começar as questoes de disco.
-    // ok isso funcionou
-    
-	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
-    //refresh_screen(); 
-    //while(1){}		
+	ioInit();	
 	
 	
     //
@@ -662,40 +626,12 @@ int init (){
 	//printf("sm-init-init: fsInit\n");
 #endif    
 	fsInit();
-	
-		
-    //System folders.
-    //#bugbug; Onde estamos criando isso.
-	
-#ifdef EXECVE_VERBOSE	
-	printf("sm-init-init: create_system_folders\n");
-#endif	
-	create_system_folders(); 
-    
-    
-    
-    
-    
-    
-    
-    
+	    
 
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: initialize_system_message_queue\n");
 #endif	
 	initialize_system_message_queue(); 
-	
-	
-    
-    
-	//#debug :  
-	//breakpoint ante de começar as questoes de network
-    //ok isso funcionou.
-    
-	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
-    //refresh_screen(); 
-    //while(1){}		
-    
     
     
 
@@ -767,11 +703,7 @@ int init (){
 		//printf(" Done!\n");	
 		//...
 	};
-	
-	//fail
-	//printf("#breakpoint before independent");
-	//refresh_screen();
-	//while(1){}		
+		
 
 	
 	//Fase 1: Inicia a parte independente da arquitetura.
@@ -780,42 +712,13 @@ int init (){
 	   //Nothing for now.
 	};
 	KeInitPhase = 1;
-	
-	//fail
-	//printf("#breakpoint before dependent");
-	//refresh_screen();
-	//while(1){}	
-    
-    
- 	//#debug :  
-	//breakpoint depois de arch independent. gigabyte/intel
-	//rodou atá aqui ... porém nao sabemos se todos
-	//os dispositivos pci forar listados e se a gerencia de janelas
-	//inicializou corretamente.
-	
-	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
-    //refresh_screen(); 
-    //while(1){}		
-
-   
-
-	
     
 	//Fase 2: Inicia a parte de arquitetura especifica da máquina atual.
 	//        Ou seja, considera a marca do processador.
     Status = (int) init_architecture_dependent();	 
     if(Status != 0){
 	    //Nothing for now.
-	};
-	
-	
- 	//#debug :  
-	//breakpoint depois de arch dependent
-	//ok..rodou ate' aqui ... mas nao sabemos se fez um bom trabalho.
-	
-	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
-    //refresh_screen(); 
-    //while(1){}		
+	};	
 
 	
 	
@@ -829,19 +732,6 @@ int init (){
 	
 	
 	KeInitPhase = 2;
-
-	
-	
-	
-	
- 	//#debug :  
-	//breakpoint antes do logon
-	//rodou ate' aqui.
-	
-	//printf ("++++++++++++++++++++++++ init:  ++++++++++++++++++++++++++++++\n");
-    //refresh_screen(); 
-    //while(1){}		
-
 	
 	
 	
@@ -884,18 +774,6 @@ int init (){
         //Obs: *IMPORTANTE Usa-se o procedimento de janela do Logon.		
 	};	
 	KeInitPhase = 3; 
-			
-	
-	
-	
- 	//#debug :  
-    // isso funcionou. gigabyte/intel
-	
-	//printf ("++++++++++++++++++++++++++++++++++++++++++++++++ init: ++++++\n");
-    //refresh_screen(); 
-    //while(1){}		
-
-
 	
 	
 	
@@ -934,10 +812,8 @@ int init (){
 	
 	
 	
-    return (int) 0;  
-};
-
-
+    return 0;  
+}
  
 
 //

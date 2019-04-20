@@ -771,7 +771,7 @@ done:
 /* sys_showkernelinfo:
  *     Show kernel info. */
 
-void sys_showkernelinfo (){
+void sys_showkernelinfo (void){
 	
 	KiInformation ();
 }
@@ -784,7 +784,7 @@ void sys_showkernelinfo (){
  *     Chamando uma rotina interna de reboot do sistema.
  */
 
-void sys_reboot (){
+void sys_reboot (void){
 
     hal_reboot ();
 }
@@ -795,7 +795,7 @@ void sys_reboot (){
  *     Chama uma rotina interna para desligar a máquina.
  */
 
-void sys_shutdown (){
+void sys_shutdown (void){
 
     hal_shutdown ();
 }
@@ -809,7 +809,7 @@ void sys_shutdown (){
  *     Archtecture (independent) inicialization. 
  */
  
-int init_executive (){
+int init_executive (void){
 	
     int Status = 0;
 	
@@ -834,7 +834,7 @@ int init_executive (){
 	//#importante: 
 	//so depois de inicializarmos o ata 'e que podemos carregar alguma coisa.
 	
-	debug_print("init_executive: diskATADialog\n");
+	debug_print ("init_executive: diskATADialog\n");
 	diskATADialog ( 1, FORCEPIO, FORCEPIO );
 	
 	// ??
@@ -843,8 +843,6 @@ int init_executive (){
     // Status = (int) executive_config_exported_functions();
 
 	//Continua ...
-	
-//Done:
     
 	//@todo: Checar a validade de 'Initialization' ??
 
@@ -854,7 +852,7 @@ int init_executive (){
     Initialization.executive = 1;	
 	
 	return (int) Status;
-};
+}
 
 
 //

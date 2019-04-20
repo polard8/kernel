@@ -62,7 +62,7 @@
  *     #bugbug: E se não existir IfleThread? 
  */
 
-struct thread_d *pick_next_thread (){
+struct thread_d *pick_next_thread (void){
 	
 	int i;    //id da fila selecionada
 	int old;  //salva id da current thread
@@ -217,7 +217,7 @@ struct thread_d *pick_next_thread (){
 //#todo
 //podemos contar os rounds;
 
-int scheduler (){
+int scheduler (void){
 	
 	int Index;
 	struct thread_d *Thread;
@@ -381,7 +381,7 @@ int scheduler (){
  *     @todo: Mudar para schedulerInit,ou schedulerStart. ??
  */
 
-void scheduler_start (){
+void scheduler_start (void){
 	
 	//Lock Scheduler.
 	//Set current.
@@ -393,23 +393,22 @@ void scheduler_start (){
 	// Temos que saber qual é o ID da thread que queremos.
 	
 	set_current (IDLE);     
-	
 	//...
-};
+}
 
 
 /* scheduler_lock: */
-void scheduler_lock (){
+void scheduler_lock (void){
 	
     g_scheduler_status = (unsigned long) LOCKED;
-};
+}
 
 
 /* scheduler_unlock: */  
-void scheduler_unlock (){
+void scheduler_unlock (void){
 	
     g_scheduler_status = (unsigned long) UNLOCKED;
-};
+}
 
 
 /*
@@ -417,17 +416,17 @@ void scheduler_unlock (){
  *     Pega o status do scheduler, se ele está travado ou não.
  */
  
-unsigned long scheduler_get_status()
+unsigned long scheduler_get_status (void)
 {
     return (unsigned long) g_scheduler_status;
-};
+}
 
 
 /*
  * new_task_scheduler: 
  *     ?? #deletar
  */
-void new_task_scheduler()
+void new_task_scheduler (void)
 {   
     return;    /* CANCELADA !*/  		
 };	
@@ -439,14 +438,13 @@ void new_task_scheduler()
  *    @todo: Mudar para schedulerInit()
  *    #burbug: faz o mesmo que scheduler_start.
  */
-//void schedulerInit()
-void init_scheduler (){
-	
+
+
+void init_scheduler (void)
+{
 	// @todo: Implementar inicialização de variaveis do scheduler.
 	//        O nome poderia ser schedulerInit().
 	//        Formato de classes.Init é um método. 
-
-//	return;    //Não implementada.
 };
 
 

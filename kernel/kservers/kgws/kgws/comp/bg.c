@@ -98,7 +98,8 @@ void backgroundRedraw (unsigned long color){
 
 
 //Constructor.
-void backgroundBackground (){
+
+void backgroundBackground (void){
 	
 	g_cursor_x = 0;
 	g_cursor_y = 0; 
@@ -106,10 +107,11 @@ void backgroundBackground (){
 
 
 //Init.
-int backgroundInit (){
+
+int backgroundInit (void){
 	
-	unsigned long *lfb = (unsigned long *) BACKBUFFER_VA;
 	int i=0;
+	unsigned long *lfb = (unsigned long *) BACKBUFFER_VA;
 	
 	//#test velocidade?
 	for ( i=0; i< 800*600; i++ )
@@ -121,7 +123,7 @@ int backgroundInit (){
 	backgroundBackground ();
 	//...
 	
-	return (int) 0; 
+	return 0; 
 }
 
 

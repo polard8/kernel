@@ -119,18 +119,7 @@ void fs_create_name( char *name, unsigned long id,unsigned long eid)
 
 
 
-
-/*
- * create_system_folders:
- *     Cria pastas do sistema.
- * 
- *     @todo: Isso deve ir para aplicativo de instalação.
- *
- */
-void create_system_folders()
-{
-	//return;
-};
+ 
 
 
 //

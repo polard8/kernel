@@ -13,10 +13,12 @@
 
 
 //abrir o servidor de janelas. 
-int gwsOpen();
+int gwsOpen (void);
+
 
 //fechar o servidor de janelas
-int gwsClose();
+int gwsClose (void);
+
 
 // Registrar um window manager.
 int gwsRegisterWindowManager( int pid );
@@ -28,10 +30,12 @@ kgws_mouse_dialog ( struct window_d *window,
 				    unsigned long long1,
 				    unsigned long long2 );
 
-int init_gui ();
 
-void gramado();
-int init_gramado();
+int init_gui (void);
+
+
+int init_gramado (void);
+
 
 //
 // End.

@@ -51,7 +51,7 @@
 
 
 //Internas.
-void config_user();
+void config_user (void);
 
 
 /*
@@ -68,6 +68,7 @@ void config_user();
  * 
  * Mudar o nome para userenvironmentStart(int argc, char* argv[]).
  */
+
 int startUserEnvironment ( int argc, char* argv[] ){
 	
     int Status = 0;
@@ -78,17 +79,17 @@ int startUserEnvironment ( int argc, char* argv[] ){
 
     //Cria as principais janelas que servirão de base para 
     //a interface gráfica.
-    create_gui();
+    create_gui ();
 
     //Inicializa.
-    init_gui(); 
+    init_gui (); 
 	
 	//
 	// Keyboard support.
 	//
 	
-	ldisc_init_modifier_keys();
-	ldisc_init_lock_keys();
+	ldisc_init_modifier_keys ();
+	ldisc_init_lock_keys ();
 	
 	
 	// #importante
@@ -98,8 +99,6 @@ int startUserEnvironment ( int argc, char* argv[] ){
 	//
 	// ...
 	//
-
-//done:
 
     SetProcedure ( (unsigned long) &system_procedure);
     
@@ -111,6 +110,7 @@ int startUserEnvironment ( int argc, char* argv[] ){
  * ShowUserInfo:
  *     Mostra informações sobre o usuário atual.
  */
+
 void ShowUserInfo (int user_id){
 	
 	struct user_info_d *User;
@@ -143,17 +143,12 @@ void ShowUserInfo (int user_id){
  *     Abre o arquivo de configuração de usuário. 
  *     No arquivo ou metafile, terão todas as informações
  * sobre o usuário e serão colocanas nas estruturas.
- *
  */
-void config_user (){
+
+void config_user (void){
 	
-    userconfig_Status = 0;	
-	
-	//...
-	
-//done:
-    //return;    //Ainda não implementada.
-};
+    userconfig_Status = 0;	//#todo
+}
 
 
 /*
@@ -231,13 +226,14 @@ void *CreateUser ( char *name, int type ){
 
 fail:
     return NULL;
-};
+}
 
 
 /*
  * SetCurrentUserId:
  *     Configura o ID do usuário atual.  
  */
+
 void SetCurrentUserId (int user_id){
 	
 	if ( user_id < 0 || user_id >= USER_COUNT_MAX )
@@ -247,19 +243,18 @@ void SetCurrentUserId (int user_id){
 	};
 	
     current_user = (int) user_id;
-	
-	//return;
-};
+}
 
 
 /*
  * GetCurrentUserId: 
  *     Pega o ID do usuário atual.
  */
-int GetCurrentUserId (){
-	
+
+int GetCurrentUserId (void)
+{	
    return (int) current_user;
-};
+}
 
 
 void SetCurrentGroupId (int group_id){
@@ -271,25 +266,25 @@ void SetCurrentGroupId (int group_id){
 	};
 	
     current_group = (int) group_id;
-	
-	//return;
-};
+}
 
 
 /*
  * GetCurrentGroupId: 
  *     Pega o GID do usuário atual.
  */
-int GetCurrentGroupId (){
-	
+
+int GetCurrentGroupId (void)
+{	
     return (int) current_group;
-};
+}
 
 
 /*
  * UpdateUserInfo:
  *    Atualiza todas as informações de usuário.
- */					 
+ */	
+
 void UpdateUserInfo ( struct user_info_d *user, 
                       int id, 
 					  char *name, 
@@ -324,7 +319,7 @@ void UpdateUserInfo ( struct user_info_d *user,
         user->desktopId = desktop_id;                 //Desktop.
 		//...
 	};
-};
+}
 
 
 /*
@@ -364,26 +359,29 @@ void UpdateUserInfo ( struct user_info_d *user,
  * ...
  */
  
-void init_user_info (){
+void init_user_info (void){
 	
 	int Id = 0;
     int Index = 0;	
 	
 	//Initialize list.
-	while (Index < USER_COUNT_MAX){
-		
+    
+	while (Index < USER_COUNT_MAX)
+    {	
 	    userList[Index] = (unsigned long) 0;
         Index++;
 	};	
 	
+    
 	//Configurando a estrutura global.
 	// Create default user. (default,interactive)
-	DefaultUser = (void *) CreateUser(default_user_name, USER_TYPE_INTERACTIVE);
+    
+	DefaultUser = (void *) CreateUser (default_user_name, USER_TYPE_INTERACTIVE);
 	
 	if ( (void *) DefaultUser == NULL )
 	{
-	    printf("init_user_info:");
-	    die();
+	    printf ("init_user_info:");
+	    die ();
 		
 	} else {
 		
@@ -391,7 +389,7 @@ void init_user_info (){
 		//userList[0] = (unsigned long) SystemUser;    //System.
 		userList[1] = (unsigned long) DefaultUser;     //Default.
 		userList[2] = (unsigned long) 0;               //0.
-		//userList[3] = (unsigned long) 0;               //0.
+		//userList[3] = (unsigned long) 0;             //0.
 		//...
 		
 		//Configura o usuário atual.
@@ -408,13 +406,14 @@ void init_user_info (){
 	};
 	
     // Continua...??!!
-};
+}
 
 
 /*
  * init_user_environment_manager:
  *    Inicializa o User Environment Manager. (UEM). 
  */
+
 int init_user_environment_manager ( int argc, char *argv[] ){
 	
 	//...
@@ -422,8 +421,8 @@ int init_user_environment_manager ( int argc, char *argv[] ){
     //g_module_uem_initialized = 1;
     userenvironmentStatus = 1;
 	
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*

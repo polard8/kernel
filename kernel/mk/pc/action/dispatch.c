@@ -38,20 +38,21 @@
 
 
 //
+// #todo:
 // Protótipo de funções internas.
 //
 
-int syscoopDispatcher();
-int usercoopDispatcher();
-int sysconcDispatcher();
-int userconcDispatcher();
-int systemDispatcher();
-int readyDispatcher();
-int idleDispatcher();
-int periodicDispatcher();
-int rrDispatcher();
-int realtimeDispatcher();
-int dispatch_Default();
+int syscoopDispatcher (void);
+int usercoopDispatcher (void);
+int sysconcDispatcher (void);
+int userconcDispatcher (void);
+int systemDispatcher (void);
+int readyDispatcher (void);
+int idleDispatcher (void);
+int periodicDispatcher (void);
+int rrDispatcher (void);
+int realtimeDispatcher (void);
+int dispatch_Default (void);
 
 
 
@@ -302,7 +303,8 @@ do_dispatch:
  *     Pega a head da fila de ready quando vencer o tempo dela de espera.
  *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int readyDispatcher()
+
+int readyDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
 	
@@ -341,12 +343,12 @@ done:
 
 
 
-
 /*
  * syscoopDispatcher:
  *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int syscoopDispatcher()
+
+int syscoopDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
 	
@@ -381,7 +383,8 @@ fail:
  * usercoopDispatcher:
  *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int usercoopDispatcher()
+
+int usercoopDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
 	
@@ -416,7 +419,8 @@ fail:
  * sysconcDispatcher:
  *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int sysconcDispatcher()
+
+int sysconcDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
 	
@@ -451,7 +455,8 @@ fail:
  * userconcDispatcher:
  *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int userconcDispatcher()
+
+int userconcDispatcher (void)
 {
 	struct thread_d *dispatch_Pointer;
 	
@@ -489,11 +494,12 @@ fail:
  *     ?? Penso que isso seja uma interface para 
  * chamar o dispacher. 
  */
-int systemDispatcher()
+
+int systemDispatcher (void)
 { 
     // # suspensa #
-    return (int) 0; 
-};
+    return 0; 
+}
 
 
 /*
@@ -511,16 +517,16 @@ int systemDispatcher()
  * idle atual e despacha-la. 
  *
  */
-int idleDispatcher()
+
+int idleDispatcher (void)
 { 
     //current_idle_thread
 	
 
     // ## suspensa ##
-	
-done:
-	return (int) 0; 
-};
+
+	return 0; 
+}
 
 
 /*
@@ -528,13 +534,13 @@ done:
  *     Periodic dispatcher.
  *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int periodicDispatcher()
+
+int periodicDispatcher (void)
 { 
     // struct thread_d *New;
-    
-done:	
-	return (int) 0; 
-};
+   
+	return 0; 
+}
 
 
 /*
@@ -542,12 +548,11 @@ done:
  *     Round robin dispatcher.
  *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int rrDispatcher()
+
+int rrDispatcher (void)
 { 
-  
-done:  
-	return (int) 0; 
-};
+	return 0; 
+}
 
 
 /*
@@ -563,7 +568,8 @@ done:
  *     Na verdade não é tão real time assim.
  *     Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int realtimeDispatcher()
+
+int realtimeDispatcher (void)
 {
     struct thread_d *New;
 	  
@@ -594,7 +600,7 @@ fail:
  * dispatch_Default:
  *  Obs: Esse tipo de dispacher ainda não foi habilitado.
  */
-int dispatch_Default (){
+int dispatch_Default (void){
 	
 	struct thread_d *New;
 	struct thread_d *Current;
@@ -732,13 +738,12 @@ int dispatch_Default (){
 
 
 /*
- *************************************************
- * dispatch_thread:
+ * dispatch_thread2:
  *     Restaura o contexto e retorna.
  *     #bugbug. Nem sei se essa rotina está em uso.
  */
  
-void dispatch_thread2 (){
+void dispatch_thread2 (void){
 	
     struct thread_d *t;  
 	
@@ -861,10 +866,9 @@ fail:
  * threadList[], não considerando a prioridade. :) sorry.
  *
  * @todo: Mudar o nome para dispachInit();.
- *
  */ 
  
-int init_dispatcher (){
+int init_dispatcher (void){
 	
 	int i;
 	

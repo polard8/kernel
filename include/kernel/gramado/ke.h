@@ -9,6 +9,7 @@
  *     Oct 2016 - Created.
  */
 
+
 /*
  * Servers and Drivers:
  * ====================
@@ -27,14 +28,18 @@
  
  
 //Informações sobre o kernel. módulo externo.
-void KeInformation();   
+void KeInformation (void);   
 
 //Faults support.
-void KeCpuFaults(unsigned long fault_number);
+void KeCpuFaults (unsigned long fault_number);
+
+
 
 //Window support.
-void KeSetFocus(int pid);
-int KeGetFocus();
+// ?? process.c
+void KeSetFocus (int pid);
+int KeGetFocus (void);
+
 
 //File support.
 //carrega um arquivo. 
@@ -43,13 +48,15 @@ KeLoadFile ( struct channel_d *channel,
              unsigned char *file_name, 
 			 unsigned long file_address );
 
+
 //Scheduler support.
-void KeNewProcessScheduler();
-void KeSaveCurrentContext();
-void KeRestoreCurrentContext();	
+void KeNewProcessScheduler (void);
+void KeSaveCurrentContext (void);
+void KeRestoreCurrentContext (void);	
+
 
 //dispatch support.
-void KeDispatchProcess();
+void KeDispatchProcess (void);
 
 void KeDoProcessReady(int pid);
 void KeDoProcessRunning(int pid);
@@ -58,30 +65,29 @@ void KeDoProcessZombie(int pid);
 void KeDoProcessDead(int pid);
 void KeStartProcess(unsigned long pid, unsigned long *task_address);	
 void KeWakeupProcess(int pid);
-void KeProcessExit();
-void KeKillProcess(int pid);
+
+void KeProcessExit (void);
+
+void KeKillProcess (int pid);
 
 
 
-int KeExecProcess(int pid, unsigned long *process_address);
+int KeExecProcess (int pid, unsigned long *process_address);
 
-void KeSetQuantum(unsigned long q);
-unsigned long KeGetQuantum();
-void KeSetCurrentQuantum(unsigned long q);
-unsigned long KeGetCurrentQuantum();
+void KeSetQuantum (unsigned long q);
+unsigned long KeGetQuantum (void);
+
+void KeSetCurrentQuantum (unsigned long q);
+unsigned long KeGetCurrentQuantum (void);
+
 void KeSetNextQuantum(unsigned long q);
-unsigned long KeGetNextQuantum();
-int KeSetPriority();
-int KeIncreasePriority(int pid);
+unsigned long KeGetNextQuantum (void);
 
 
-//
-// passando o comando para os processos.
-//
+int KeSetPriority (void);
 
-void KeStartShell();
-void KeStartTaskManager();
 
+int KeIncreasePriority (int pid);
 
 
 // Tasks ??
@@ -89,23 +95,25 @@ void KeStartTaskManager();
 
 
 //spawn thread.
-void KeSpawnTask(int id);
-int KeSelectNextThread(int current);									
-void KeSaveContextOfNewTask(int id, unsigned long *task_address);
-void KeReloadCurrentTask();
-void KeShowTasksParameters();
-void KeMostraSlots();
-void KeMostraSlot(int id);
-void KeMostraReg(int id);
-void KeShowPreemptedTask();	
-int KeCheckTaskContext( int task_id);
+
+void KeSpawnTask (int id);
+
+int KeSelectNextThread (int current);
+
+void KeSaveContextOfNewTask ( int id, unsigned long *task_address );
+
+void KeShowTasksParameters (void);
 
 
-//debug support.
-void KeDebugBreakpoint();
+void KeShowPreemptedTask (void);	
+
+
+int KeCheckTaskContext (int task_id);
+
 
 //Finalization support.
-void KeAbort();         // Global, qualquer módulo pode abortar. 
+// Global, qualquer módulo pode abortar. 
+//void KeAbort();         
 
 
 

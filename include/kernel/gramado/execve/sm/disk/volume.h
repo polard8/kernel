@@ -96,14 +96,15 @@ struct volume_d *volume_systempartition; // volume 2
 unsigned long volumeList[VOLUME_COUNT_MAX];
 
 
-void volumeShowCurrentVolumeInfo ();
+void volumeShowCurrentVolumeInfo (void);
 
-
-void volumeShowCurrentVolume();
 void *volume_get_volume_handle( int number );
-void *volume_get_current_volume_info();
+
+void *volume_get_current_volume_info (void);
+
 int volumeShowVolumeInfo( int descriptor );
-int volume_init();
+
+int volume_init (void);
 
 
 //

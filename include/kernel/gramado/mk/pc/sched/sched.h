@@ -53,39 +53,47 @@ unsigned long schedulerQueue[4];
 // Protótipos:
 //
  
- 
- 
-void init_scheduler();
+
+void init_scheduler (void);
  
 
 //Interfaces. 
-int KiScheduler();
+int KiScheduler (void);
 
-int KiFindHigherPriority(); 
-int KiSelectNextThread(int current);
-void KiDispatchTask();	
+int KiFindHigherPriority (void); 
+
+int KiSelectNextThread (int current);
+
+void KiDispatchTask (void);	
+
 
 //Interaface para manipulação de estado de thread.
-void KiDoThreadReady(int id);
-void KiDoThreadRunning(int id);
-void KiDoThreadSleeping(int id);
-void KiDoThreadZombie(int id);
-void KiDoThreadDead(int id);
+void KiDoThreadReady (int id);
+void KiDoThreadRunning (int id);
+void KiDoThreadSleeping (int id);
+void KiDoThreadZombie (int id);
+void KiDoThreadDead (int id);
 
 
 
-// Obs: Manipuladores de troca de thread. 
-//      Fazem sentido estarem no scheduler. 
+// Obs: 
+// Manipuladores de troca de thread. 
+// Fazem sentido estarem no scheduler. 
+
+struct thread_d *pick_next_thread (void);
 
 
-struct thread_d *pick_next_thread ();
+int scheduler (void);
+
+void scheduler_start (void);
+
+void scheduler_lock (void);
+
+void scheduler_unlock (void);
+
+void preempt (void);
 
 
-int scheduler();
-void scheduler_start();
-void scheduler_lock();
-void scheduler_unlock();
-void preempt();
 
 //wait
 int do_wait ( int *status );
@@ -102,36 +110,44 @@ int wakeup_thread_reason( int tid, int reason );
 int wakeup_scan_thread_reason( int reason );
 
 //@todo, enviar isso para dispatch.h
-void dispatch_thread2();
+void dispatch_thread2 (void);
 
-unsigned long scheduler_get_status();
-int find_higher_priority();
+unsigned long scheduler_get_status (void);
+
+int find_higher_priority (void);
+
 int SelectNextThread(int current);
+
 void set_current(int id);
-int get_current();
-int get_current_task();
-void new_task_scheduler(); //cancelada
-int set_priority();
+
+int get_current (void);
+
+int get_current_task (void);
+
+void new_task_scheduler (void); //cancelada
+
+int set_priority (void);
 
 
 void wakeup_thread(int tid);
 
-void set_task_status(unsigned long status);
-unsigned long get_task_status();
+void set_task_status (unsigned long status);
+unsigned long get_task_status (void);   //ts.c
 
 
 
 void do_thread_initialized (int id);
-void do_thread_ready(int id);
-void do_thread_running(int id);
-void do_thread_sleeping(int id);
-void do_thread_zombie(int id);
-void do_thread_dead(int id);
+void do_thread_ready (int id);
+void do_thread_running (int id);
+void do_thread_sleeping (int id);
+void do_thread_zombie (int id);
+void do_thread_dead (int id);
 
-void check_for_standby();
-int check_quantum();
+void check_for_standby (void);
+
+int check_quantum (void);
 
 
 //
-// Fim.
+// End.
 //

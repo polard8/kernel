@@ -16,7 +16,7 @@
 #include <kernel.h>
 
 
-extern void reset_ide0();
+//extern void reset_ide0 (void);
 
 
 /*
@@ -647,7 +647,7 @@ done:
  *     Salva o diretório raiz no disco.
  *     @todo: Identificar parâmetros do sistema de arquivos atual. */
 
-void fs_save_rootdir ()
+void fs_save_rootdir (void)
 {
 	//return;
 };
@@ -676,10 +676,7 @@ void fs_save_entry_on_root(unsigned long eid)
 };
 
 
-void fs_save_structure()
-{   
-	//return;
-};
+
 
 
 //

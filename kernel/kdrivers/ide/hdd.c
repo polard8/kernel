@@ -50,10 +50,9 @@
  * Externs.
  */
  
-extern void os_read_sector();
-extern void os_write_sector();
-extern void reset_ide0();	
-
+//extern void os_read_sector();
+//extern void os_write_sector();
+//extern void reset_ide0();	
 
 //Usadas por read e write.
 extern unsigned long hd_buffer;
@@ -388,18 +387,18 @@ my_write_hd_sector ( unsigned long ax,
  *     Inicializa o driver de hd.
  *     @todo: Mudar para hddInit().
  */
-int init_hdd (){
+
+int init_hdd (void){
 
 	//
 	// @todo: We need to do something here.
 	//	
 
-//done:
 
 	g_driver_hdd_initialized = (int) 1;
 
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*

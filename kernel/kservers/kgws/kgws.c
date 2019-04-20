@@ -40,17 +40,17 @@ int gws_wm_status;
 // # internal
 //
 
-void gui_create_screen();
-void gui_create_background();
-void gui_create_logo();
-void gui_create_taskbar();
-void gui_create_mainwindow();
-void gui_create_controlmenu();
-void gui_create_infobox();
-void gui_create_messagebox();
-void gui_create_debug();
-void gui_create_navigationbar();
-void gui_create_grid();
+void gui_create_screen (void);
+void gui_create_background (void);
+void gui_create_logo (void);
+void gui_create_taskbar (void);
+void gui_create_mainwindow (void);
+void gui_create_controlmenu (void);
+void gui_create_infobox (void);
+void gui_create_messagebox (void);
+void gui_create_debug (void);
+void gui_create_navigationbar (void);
+void gui_create_grid (void);
 
 
 
@@ -73,7 +73,7 @@ void gwsDisableTextCursor (){
 
  
 //abrir o servidor de janelas. 
-int gwsOpen (){
+int gwsOpen (void){
 	
 	//Aberto.
 	gws_status = 1;
@@ -84,7 +84,7 @@ int gwsOpen (){
 
 
 //fechar o servidor de janelas
-int gwsClose (){
+int gwsClose (void){
 	
 	gws_status = 0;
 	
@@ -126,7 +126,7 @@ done:
  *(deixe o desenvolvedor saber em qual desktop ele está.)
  */
  
-void create_gui (){
+void create_gui (void){
 	
 	// Set minimal gui set up!.
 	//g_guiMinimal = 1;
@@ -448,7 +448,7 @@ int grid             //Grid da janela principal.
  * @todo: Cria buffer dedicado.
  */
 
-void gui_create_screen (){
+void gui_create_screen (void){
 	
     struct window_d *hWindow; 
 	
@@ -521,7 +521,8 @@ void gui_create_screen (){
  *
  * @todo: Cria buffer dedicado.
  */
-void gui_create_background()
+
+void gui_create_background (void)
 { 
     struct window_d *hWindow; 
 	
@@ -576,9 +577,9 @@ done:
  *      Cria a taskbar da área de trabalho. gui->taskbar.
  *      Cria somente a janela que será uada pelo file manager.
  * e que servirá de referência para a janela gui->main
- *
  */
-void gui_create_taskbar()
+
+void gui_create_taskbar (void)
 { 
 	struct window_d *hWindow; 
 
@@ -587,7 +588,8 @@ void gui_create_taskbar()
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
 	
-	if( (void*) gui == NULL ){
+	if( (void*) gui == NULL )
+	{
         return;
     };
     	
@@ -619,9 +621,10 @@ draw_bar:
 	
 	//...
 	
-done:	
+//done:
+	
 	return; 
-};
+}
 
 
 /*
@@ -635,7 +638,8 @@ done:
  *
  *     Obs: Essa janela é especial e usará o Backbuffer como buffer dedicado.
  */
-void gui_create_mainwindow()
+
+void gui_create_mainwindow (void)
 {
     struct window_d *hWindow; 
 	
@@ -740,7 +744,8 @@ done:
  *
  * @todo: Cria buffer dedicado.
  */
-void gui_create_logo()
+
+void gui_create_logo (void)
 { 
 
 /*
@@ -799,9 +804,9 @@ done:
  *     Esse é o controlmenu da area de trabalho.
  * mesmo que nao esteja rodando o programa gerenciador de
  * deprogramas esse control menu existirá.
- *
  */
-void gui_create_controlmenu()
+
+void gui_create_controlmenu (void)
 { 
 
 /*
@@ -860,7 +865,8 @@ done:
  *como novos dispositivos encontrados.
  * @todo: Cria buffer dedicado.
  */
-void gui_create_infobox()
+
+void gui_create_infobox (void)
 { 
 	if( (void*) gui == NULL ){
         return;
@@ -877,7 +883,7 @@ done:
 /*
  * Cria a janela para message box.
  */
-void gui_create_messagebox()
+void gui_create_messagebox (void)
 { 
 	if( (void*) gui == NULL ){
         return;
@@ -895,7 +901,7 @@ done:
  * cria uma janela para debug do kernel. será um progama em kernel mode.
  * @todo: Cria buffer dedicado.
  */
-void gui_create_debug()
+void gui_create_debug (void)
 { 
 	if( (void*) gui == NULL ){
         return;
@@ -929,7 +935,8 @@ done:
  *  
  * @todo: Cria buffer dedicado.
  */
-void gui_create_navigationbar()
+
+void gui_create_navigationbar (void)
 {
 	
 /*
@@ -1016,7 +1023,8 @@ done:
  *     cada item será um arquivo da pasta "area de trabalho".
  * @todo: Cria buffer dedicado.
  */
-void gui_create_grid()
+
+void gui_create_grid (void)
 { 
 	if( (void*) gui == NULL ){
         return;
@@ -1034,98 +1042,116 @@ done:
 
 //screen
 //métrica do dispositivo.
-void *guiGetScreenWindow()
+
+void *guiGetScreenWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
+	
 	return (void*) gui->screen;
-};
+}
 
 
 //developer screen
-void *guiGetDeveloperScreenWindow()
+
+void *guiGetDeveloperScreenWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->DEVELOPERSCREEN;
-};
+	
+	return (void *) gui->DEVELOPERSCREEN;
+}
 
 
 //background
-void *guiGetBackgroundWindow()
+
+void *guiGetBackgroundWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->background;
-};
+	
+	return (void *) gui->background;
+}
 
 
 //logo
-void *guiGetLogoWindow()
+
+void *guiGetLogoWindow (void)
 {
-	if( (void*) gui == NULL){
+	if ( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->logo;
-};
+	
+	return (void *) gui->logo;
+}
 
 
 //desktop window
-void *guiGetDesktopWindow()
+void *guiGetDesktopWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->desktop;
-};
+	
+	return (void *) gui->desktop;
+}
 
 
 //task bar, top window, mac style
-void *guiGetTaskbarWindow()
+
+void *guiGetTaskbarWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->taskbar;
-};
-
+	
+	return (void *) gui->taskbar;
+}
 
 
 //main window
 //GetDesktopWindow
-void *guiGetMainWindow()
+
+void *guiGetMainWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->main;
-};
+	
+	return (void *) gui->main;
+}
+
 
 //status bar window (do kernel base)
-void *guiGetStatusbarWindow()
+
+void *guiGetStatusbarWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->statusbar;
-};
+	
+	return (void *) gui->statusbar;
+}
 
 
 //grid window (do kernel base)
-void *guiGetGridWindow()
+
+void *guiGetGridWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->grid;
-};
+	
+	return (void *) gui->grid;
+}
 
 
 //janela do 'control menu' atual.
-void *guiGetMenuWindow()
+
+void *guiGetMenuWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
@@ -1135,104 +1161,124 @@ void *guiGetMenuWindow()
 
 
 //infobox (o sistema envia mensagens de informação)
-void *guiGetInfoboxWindow()
+
+void *guiGetInfoboxWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->infobox;
-};
+	
+	return (void *) gui->infobox;
+}
+
 
 //tooltip  Janelinha que aparece quando repousa o mouse sobre elemento gráfico.
-void *guiGetTooltipWindow()
+
+void *guiGetTooltipWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->tooltip;
-};
+	
+	return (void *) gui->tooltip;
+}
 
 
 //message box do kernel base. 
-void *guiGetMessageboxWindow()
+
+void *guiGetMessageboxWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
+	
 	return (void*) gui->messagebox;
-};
+}
 
 
 //dialogbox do kernel base. 
-void *guiGetDialogboxWindow()
+
+void *guiGetDialogboxWindow (void)
 {	
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->dialogbox;
-};
+	
+	return (void *) gui->dialogbox;
+}
 
 
 //janela de debug usada pelo kernel base.
-void *guiGetDebugWindow()
+
+void *guiGetDebugWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->debug;
-};
+	
+	return (void *) gui->debug;
+}
 
 
-//menubar usada pelo kernel base.
-void *guiGetMbhWindowWindow()
+// ?
+// menubar usada pelo kernel base.
+
+void *guiGetMbhWindowWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->mbhWindow;
-};
+	
+	return (void *) gui->mbhWindow;
+}
 
 
-//top bar de verdade, estilo mac ou mobile.
-void *guiGetTopbarWindow()
+//top bar.
+void *guiGetTopbarWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->topbar;
-};
+	
+	return (void *) gui->topbar;
+}
 
 
 //navigation bar, estilo mobile.
 //gerenciada pelo kernel base.
-void *guiGetNavigationbarWindow()
+
+void *guiGetNavigationbarWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->navigationbar;
-};
+	
+	return (void *) gui->navigationbar;
+}
 
 
 //janela do shell do kernel base.
 //naõ é um processo.
-void *guiGetShellWindowWindow()
+
+void *guiGetShellWindowWindow (void)
 {
 	if( (void*) gui == NULL){
 		return NULL;
 	}
-	return (void*) gui->shellWindow;
-};
+	
+	return (void *) gui->shellWindow;
+}
 
 
 //uma janela filha do shell do kernel base.
-void *guiGetShellClientWindowWindow()
+void *guiGetShellClientWindowWindow (void)
 {
 	if( (void*) gui == NULL ){
 		return NULL;
 	}
-	return (void*) gui->shellClientWindow;
-};
+	
+	return (void *) gui->shellClientWindow;
+}
 
 
 // reposiciona e muda o tamanho da gui->main window.
@@ -1270,14 +1316,18 @@ void guiSetUpMainWindow( unsigned long x,
 	//Nothing.
 };
 
+
+
 /*
+ *********************************************
  * init_gui:
  *     Inicializa a GUI.
  *     É preciso criar a GUI antes de inicializar.
  *     @todo: Mudar para guiInit().
  * Obs: Nada alem de recursos gráficos. 
  */
-int init_gui (){
+
+int init_gui (void){
 	
 	// ??
 	// Habilita taskswitch e scheduler.
@@ -1383,25 +1433,19 @@ kgws_mouse_dialog ( struct window_d *window,
 
 
 
-
-
-
 /*
 int guiInit()
 {};
 */
 
-//deletar
-void gramado(){
-	
-    return; 	
-}
+ 
 
-//deletar
-int init_gramado(){
+int init_gramado (void){
 	
 	return 0;
 }
+
+
 
 /*
 int gwsInit();

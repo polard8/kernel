@@ -23,7 +23,9 @@
 #include <kernel.h>
 
 
-//int modulesStatus;
+
+
+int modulesStatus;
 //int modulesError;
 //...
 
@@ -31,6 +33,7 @@
  * modulesModules:
  *     Construtor.
  */
+/*
 void modulesModules();
 void modulesModules()
 {
@@ -39,6 +42,7 @@ void modulesModules()
 	//...
 	return;
 };
+*/
 
 /*
 int modulesInit();

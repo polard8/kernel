@@ -14,6 +14,7 @@
 #define GDT_UDATA   (0x20 | 3)
 */
 
+
 //
 //  ## JOB CONTROL SUPPORT ##
 //
@@ -29,14 +30,14 @@ int microkernelStatus;
  
 
 
-int jobcontrol( int type, int id, int plane );
-int jobcheck( int type, int id );
+int jobcontrol ( int type, int id, int plane );
+int jobcheck ( int type, int id );
 
 
-void microkernelTestLimit();
+void microkernelTestLimit (void);
  
 //inicializa o microkernel do kernel.
-int init_microkernel();
+int init_microkernel (void);
 
 
 	

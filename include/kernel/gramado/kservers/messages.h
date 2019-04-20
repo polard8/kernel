@@ -8,7 +8,7 @@
  *
  */
  
-int zicaaa;
+//int zicaaa;
 
 
 //char kernel_banner[] = "\n";
@@ -39,6 +39,7 @@ struct message_d
 	unsigned long long2;
 };
 
+
 /*
 typedef struct current_message_consumer_d current_message_consumer_t;
 struct current_message_consumer_d
@@ -56,6 +57,8 @@ struct current_message_consumer_d
 current_message_consumer_t *CurrentMessageConsumer;
 */
 
+
+
 #define SYSTEM_MESSAGE_QUEUE_MAX 32
 
 //index
@@ -66,7 +69,7 @@ int system_message_read;
 unsigned long system_message_queue[SYSTEM_MESSAGE_QUEUE_MAX];
 
 
-void initialize_system_message_queue();
+void initialize_system_message_queue (void);
 
 
 

@@ -34,15 +34,14 @@ extern unsigned long bss_end;
  *    Mostra em informações sobre o kernel.
  *    Chama módulo externo (Server em user mode) para
  *    mostrar informações sobre o kernel ou sobre o sistema.
- *
  *    Obs: 
  *    As informções podem ser salvas em um arquivo de saída padrão.
  */
 
-void KeInformation (){
+void KeInformation (void){
 	
 	//return;    //Ainda não implementada.
-};
+}
 
 
 /*
@@ -65,9 +64,9 @@ void KeInformation (){
 
 //void infoShowKernelInfo() 
 
-void KiInformation (){
+void KiInformation (void){
 	
-	printf("\n");	
+	//printf("\n");	
 	
 
 	// #suspenso
@@ -92,7 +91,7 @@ void KiInformation (){
 	
 	//screen 
 	
-	printf("Screen Resolution: W={%d} H={%d} \n",
+	printf ("\n Screen Resolution: W=%d H=%d \n",
 	    g_device_screen_width, g_device_screen_height );
 	
 	//timing

@@ -238,7 +238,12 @@ drawDataRectangle ( unsigned long x,
  *     @todo: oferecer esse serviço para a api.
  */  
 
-void *getClientAreaRect (){
+void *getClientAreaRect (void){
+	
+	
+	// #bugbug
+	// Essa variável global está estranha.
+	// ?? Isso é o que ? um ponteiro de estruttura ?
 	
     return (void *) rectClientArea;	
 }
@@ -470,11 +475,12 @@ refresh_rectangle2 ( unsigned long x,
 
 
 
+// Inicializando a estrutura de gerenciamento de retângulo salvo.
 
-//inicializando a estrutura de gerenciamento de retângulo salvo.
-int initialize_saved_rect (){
+int initialize_saved_rect (void){
 	
-	//alocando memória para a estrutura de gerenciamento do retângulo.
+	// Alocando memória para a estrutura de gerenciamento do retângulo.
+	
     SavedRect = (void *) malloc ( sizeof(struct saved_rect_d) );   
 
     if ( (void *) SavedRect ==  NULL )

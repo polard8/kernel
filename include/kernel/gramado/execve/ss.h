@@ -2,7 +2,8 @@
 
 //ss.h
 
-// System Signals. - Sinais usados pelo sistema, vão além do padrão C.
+// System Signals. 
+// Sinais usados pelo sistema, vão além do padrão C.
 // como as rotinas de tratamento de sinais do sistema usarão
 // definições de sistema, essa arquivo deve ser incluido no fim da
 //lista de inclusões.
@@ -46,11 +47,12 @@
 
 //protótipos.
 
-int signalInit();
-int signalSend(struct process_d *process ,int signal);
+int signalInit (void);
+
+int signalSend ( struct process_d *process, int signal );
 
 
 //
-//fim.
+// End.
 //
 

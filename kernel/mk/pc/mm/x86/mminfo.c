@@ -11,7 +11,7 @@
  * memoryShowMemoryInfo:
  *     Show memory info. */
 
-void memoryShowMemoryInfo (){
+void memoryShowMemoryInfo (void){
 	
 	unsigned long HeapTotal = ((kernel_heap_end - kernel_heap_start)/1024);
 	unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
@@ -152,7 +152,7 @@ void memoryShowMemoryInfo (){
   *refresh screen
  */
 
-void show_memory_structs (){
+void show_memory_structs (void){
 	
 	int i = 0;
     struct mmblock_d *B;	
@@ -195,7 +195,7 @@ void show_memory_structs (){
  * testingPageAlloc:
  *     Rotina de teste. */ 
 
-void testingPageAlloc (){
+void testingPageAlloc (void){
 	
 	int Index;
     struct page_d *p;

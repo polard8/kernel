@@ -1,7 +1,6 @@
 /*
  * File: abnt2.h 
  *     Header de suporte ao teclado abnt2.
- *
  */
 
 

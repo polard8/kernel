@@ -67,7 +67,7 @@ void networkSetstatus (int status){
 }
 
 
-int networkGetStatus (){
+int networkGetStatus (void){
 
 	return (int) network_status;
 }
@@ -84,7 +84,7 @@ int networkGetStatus (){
  * sondando a interface pci.
  */ 
 
-int networkInit (){
+int networkInit (void){
 	
 	// Status
 	
@@ -142,13 +142,13 @@ int networkInit (){
 	
 	//networkSetstatus (1);
 	
-	return (int) 0;
-};
+	return 0;
+}
 
 
-void show_network_info (){
+void show_network_info (void){
 	
-	printf("show_network_info:\n");
+	printf ("show_network_info:\n");
 	
 	if ( network_status == 1 )
 	    printf ("Network initialized\n");
@@ -170,16 +170,12 @@ void show_network_info (){
 	    //...
 	};
 	
-
 	//nic
-	show_current_nic_info ();
-	
-};
+	show_current_nic_info ();	
+}
 
 
-
-void show_current_nic_info (){
-	
+void show_current_nic_info (void){
 	
 	printf("show_current_nic_info:\n");
 
@@ -341,28 +337,26 @@ int handle_ipv6 ( struct intel_nic_info_d *nic, struct ipv6_header_d *header ){
 		return 0;
 	};
 	
-	
     return 1;	
-};
+}
+
+
 
 //#IMPORTANTE
 //chamada por F6 no procedimento de janela do sistema.
-void testNIC()
-{
+
+void testNIC (void){
 	
 	//printf("\n\ntestNIC:\n\n"); 
 	
 	printf("testNIC: Setup flag \n");
 	printf("testNIC: Sending arp request \n");
-
-	printf ("\n\n #debug: e1000_irq_count=%d \n\n",e1000_irq_count);
+	printf ("\n\n #debug: e1000_irq_count=%d \n\n", e1000_irq_count );
 	
 		
 	//testando apens o send 
 	
 	e1000_interrupt_flag = 1;	
-	
-	
 	
 	uint8_t source_ip_address[4];
 	source_ip_address[0] = 192;
@@ -419,8 +413,7 @@ void testNIC()
 
 
 void SendIPV4 ( uint8_t source_ip[4], uint8_t target_ip[4], uint8_t target_mac[6], uint8_t data[32] ){
-	
-	
+		
 	int i=0;
 	
 	struct ether_header *eh;

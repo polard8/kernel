@@ -7,10 +7,11 @@
 
 
 //int usbInit()
-void usbInit (){
-	
+
+void usbInit (void)
+{	
 	//return;
-};
+}
 
 
 //

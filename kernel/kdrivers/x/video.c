@@ -78,10 +78,14 @@ void videoSetupVGAStartAddress( unsigned long address)
  * get_video_mode: 
  *     Obtem o modo de video atual.
  */
-unsigned long videoGetMode (){
+
+//#todo
+//isso pode ser incluido em 'get system parameters' system call.
+
+unsigned long videoGetMode (void){
 	
 	return (unsigned long) g_current_video_mode;
-};
+}
 
 
 /*
@@ -174,7 +178,7 @@ void videoSetMode (unsigned long mode){
  *     Inicia variáveis de video de acordo com o modo gráfico utilizado.
  */ 
  
-int videoInit (){
+int videoInit (void){
 	
 	int Status = 0;
 	
@@ -320,13 +324,13 @@ int videoInit (){
  *     @todo: isso poderia ter retorno void.
  */
 
-int videoVideo (){
+int videoVideo (void){
 	
     videoStatus = 0;
     videoError = 0;
     //...
 
-	return (int) 0;
+	return 0;
 }
 
 

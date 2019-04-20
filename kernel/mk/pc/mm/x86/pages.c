@@ -98,7 +98,7 @@ extern unsigned long SavedBPP;          //Bits per pixel.
 // Funções importadas.
 //
 
-extern void set_page_dir();
+extern void set_page_dir (void);
 //...
 
 
@@ -183,7 +183,7 @@ static inline void __native_flush_tlb_single (unsigned long addr)
 //retornaremos o endereço virtual, para que a função create_process possa usar 
 //tanto o endereço virtual quanto o físico.
 
-void *CreatePageDirectory (){
+void *CreatePageDirectory (void){
 	
 	int i;
 	
@@ -574,7 +574,7 @@ unsigned long mapping_nic1_device_address ( unsigned long address ){
  */
 //int pagesSetUpPaging() 
 
-int SetUpPaging (){
+int SetUpPaging (void){
 	
     unsigned int i;
 	int Index;
@@ -1528,7 +1528,7 @@ int SetUpPaging (){
  * initializeFramesAlloc:
  *     Inicializa o framepool. */
 
-void initializeFramesAlloc (){
+void initializeFramesAlloc (void){
 	
 	int Index;
 	struct page_d *p;

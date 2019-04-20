@@ -81,7 +81,6 @@ unsigned long kernel_request;
  *     Estrutura para o request.
  *     Aqui ficarao os argumentos para atender o request.
  *     Serao os mesmos das mensagens, para inclusive interagir com elas.
- *
  */
 
 struct request_d
@@ -131,7 +130,7 @@ struct request_d REQUEST;
 //
 
 
-int request ();
+int request (void);
 
 int 
 create_request ( unsigned long number, 
@@ -144,7 +143,8 @@ create_request ( unsigned long number,
                  unsigned long long1, 
                  unsigned long long2 );
 
-void clear_request();
+void clear_request (void);
+
 
 //
 // End.

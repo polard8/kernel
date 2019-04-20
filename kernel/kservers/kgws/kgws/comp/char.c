@@ -51,16 +51,16 @@ void set_char_height ( int height ){
 }
 
 
-int get_char_width (){
+int get_char_width (void){
 	
 	return (int) gcharWidth;
-};
+}
 
 
-int get_char_height (){
+int get_char_height (void){
 	
 	return (int) gcharHeight;
-};
+}
 
 
 /*

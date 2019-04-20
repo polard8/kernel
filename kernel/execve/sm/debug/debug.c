@@ -80,7 +80,8 @@ struct Mind_d Mind;
  *     Checa o valor das flags.
  *     checar todos contextos de tarefas válidas.
  */
-int debug_check_inicialization (){
+
+int debug_check_inicialization (void){
 	
     int Status = 0;
 	
@@ -155,7 +156,7 @@ fail:
  * debug_check_drivers:
  *    Checar se os drivers estão inicializados.
  */
-int debug_check_drivers (){
+int debug_check_drivers (void){
 	
 	int Status = 0;
     
@@ -190,11 +191,12 @@ int debug_check_drivers (){
  *     Para a execução do sistema.
  *     @todo: isso pode ir para o arquivo debug.c.
  */
-void debug_breakpoint (){
+
+void debug_breakpoint (void){
 	
-    printf ("sm-debug-debug_breakpoint:\n");
+    printf ("debug_breakpoint:\n");
 	die ();
-};
+}
 
 
 //retorna um checksum dado um buffer e um tamanho.
@@ -221,7 +223,7 @@ debug_compute_checksum ( unsigned char *Buffer,
  *     Checa por falhas depois de cumpridas as três fases de inicialização.
  */
  
-int debug (){
+int debug (void){
 	
 	int Status;
 		

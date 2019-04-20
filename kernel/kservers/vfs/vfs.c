@@ -19,7 +19,7 @@
  
 //int vfsInit (){ 
 
-void vfsInit (){
+void vfsInit (void){
 	
 	int i;
 	
@@ -105,7 +105,8 @@ void vfsInit (){
  * vfs_show_handle_list:
  *     Mostrar os elementos da lista de handles do VFS. 
  */
-void vfs_show_handle_list (){
+
+void vfs_show_handle_list (void){
 	
 	int i;
 	struct vfs_handle_d *h;
@@ -135,7 +136,7 @@ void vfs_show_handle_list (){
  * vfsShowVFSInfo:
  *     Monstrando informações sobre VFS.
  */
-void vfsShowVFSInfo (){
+void vfsShowVFSInfo (void){
 	
 	/*
 	
@@ -238,7 +239,7 @@ void vfsShowVFSInfo (){
 
 
 //lista os nomes dos arquivos no diretório raiz do vfs.
-void vfsListFiles (){
+void vfsListFiles (void){
 	
     int i;
 	struct ext2_dir_entry_d *Entry;

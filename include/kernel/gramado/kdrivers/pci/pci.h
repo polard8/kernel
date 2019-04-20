@@ -887,16 +887,18 @@ unsigned char pciGetInterruptPin(unsigned char bus, unsigned char slot);     //I
 
 //Handlers para PCI. Cada handler pode ser compartilhado por até
 //4 dispositivos.
-unsigned long KiPciHandler1();
-unsigned long KiPciHandler2();
-unsigned long KiPciHandler3();
-unsigned long KiPciHandler4();
+unsigned long KiPciHandler1 (void);
+unsigned long KiPciHandler2 (void);
+unsigned long KiPciHandler3 (void);
+unsigned long KiPciHandler4 (void);
 //...								
 	
 
 //mostra informações sobre um dispositivo pci da lista.
+
 int pciShowDeviceInfo(int number);
-int pciInfo();
+
+int pciInfo (void);
 
 
 int pciHandleDevice ( unsigned char bus, unsigned char dev, unsigned char fun );
@@ -914,11 +916,12 @@ struct pci_device_d *scan_pci_device_list2 ( unsigned char class,
 										    unsigned char subclass );
 
 //sonda por dispositivos.
-int pci_setup_devices();
+int pci_setup_devices (void);
 
 
 //Inicia o pci.
-int init_pci();
+
+int init_pci (void);
 
 #endif 
 

@@ -97,14 +97,23 @@ void *ipcProcedureEx( unsigned long callback,
 					unsigned long ext4,
 					unsigned long ext5 ); //Cowboy.
 
-//inicializa o sistema de transferencia interprocessos.
-void init_ipc();
+
+// inicializa o sistema de transferencia interprocessos.
+
+void init_ipc (void);
+
 
 //envia mensagens entreprocessos.
-int ipc_dispatch_message( unsigned long a, unsigned long b, unsigned long c, unsigned long d);
+
+int 
+ipc_dispatch_message ( unsigned long a, 
+					   unsigned long b, 
+					   unsigned long c, 
+					   unsigned long d );
+
 
 
 //
-// Fim.
+// End.
 //
 

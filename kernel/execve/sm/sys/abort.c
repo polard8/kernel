@@ -19,11 +19,14 @@
  *     do sistema.
  *     Chama módulo externo (Server em user mode).
  */
+/*
 void KeAbort (){
 	
     printf("KeAbort:");
     die();
 };
+*/
+
 
 
 /*
@@ -31,18 +34,15 @@ void KeAbort (){
  *     Chama interface pra abortar todo o sistema
  *     inclusive o kernel.
  */
-void systemAbort (){
+
+void systemAbort (void){
 	
-	//
-	// @todo: Aborta o sistema operacional, nao somente o kernel. ??
-	//
-	
-    KiAbort(); 
+    KiAbort (); 
     
 	//
 	// Sem retorno !
 	//
-};
+}
 
 
 
@@ -51,10 +51,11 @@ void systemAbort (){
  *     Interface para abortar o kernel..
  *     Sem retorno !
  */
-void KiAbort() 
-{
-    abort();	
-};
+
+void KiAbort (void){
+    
+    abort ();	
+}
 
 
 /*
@@ -67,7 +68,8 @@ void KiAbort()
  *     @todo: Pode-se criar um arquivo de log de erro.
  *           //...
  */ 
-void abort (){
+
+void abort (void){
 	
 	asm (" cli ");
 	
@@ -87,7 +89,8 @@ void abort (){
 	/*
 	 * Daqui pra baixo são mensagens.
 	 */    
-	printf("abort: Kernel aborted!\n");
+	
+	printf ("abort: Kernel aborted\n");
 	
 	//Confere a fase de inicialização. Se todas as foses foram cumpridas.
 	if(KeInitPhase < 3){

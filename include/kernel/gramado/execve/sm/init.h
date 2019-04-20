@@ -35,37 +35,41 @@ initialization_t Initialization;    //Obs: Não usando ponteiro.
 //
 // Protótipos.
 // 
- 
- 
-/*
- * init:
- *     Inicialização de partes básicas do sistema.
- */ 
-int init();
-
-
-/*
- * init_globals:
- *     Inicializa globais do sistema.
- */             
-void init_globals();
-
-
-/*
- * init_architecture_independent:
- *     Inicializa módulos que são independentes da arquitetura da máquina.
- */    
-int init_architecture_independent();
 
 
 /*
  * init_architecture_dependent:
  *     Inicializa módulos que dependem da arquitetura da máquina.
  */
-int init_architecture_dependent();
+
+int init_architecture_dependent (void);
+
+
+/*
+ * init_architecture_independent:
+ *     Inicializa módulos que são independentes da arquitetura da máquina.
+ */    
+
+int init_architecture_independent (void);
+
+
+/*
+ * init_globals:
+ *     Inicializa globais do sistema.
+ */     
+
+void init_globals (void);
+
+
+/*
+ * init:
+ *     Inicialização de partes básicas do sistema.
+ */ 
+
+int init (void);
 
 
 //
-// Fim.
+// End.
 //
 

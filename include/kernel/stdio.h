@@ -732,7 +732,7 @@ int kprint(char *message, unsigned int line, int color);
 //int getchar();
 
 //inicializa os buffers do fluxo padrão em stdio.c
-int stdioInitialize();
+int stdioInitialize (void);
 
 void REFRESH_STREAM ( FILE *stream );
 

@@ -510,7 +510,7 @@ done:
  *  então não precisamos carregar novamente.
  */
 
-void fs_load_fatEx (){
+void fs_load_fatEx (void){
 	
 	unsigned long i;
 	unsigned long b = 0;
@@ -565,8 +565,8 @@ load_directory ( unsigned long address,
 };
 
 
-void fs_load_rootdir (){
-	
+void fs_load_rootdir (void)
+{	
     load_directory ( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );	
 }
 
@@ -576,7 +576,7 @@ void fs_load_rootdir (){
  * fs_load_rootdirEx:
  *    Carrega o diretório raiz na memória. */
 
-void fs_load_rootdirEx (){
+void fs_load_rootdirEx (void){
 	
 	fs_load_rootdir ();
 }

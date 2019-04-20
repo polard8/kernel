@@ -146,18 +146,7 @@ done:
 };
 
 
-/*
- * fsCreateVFS:
- * 
- * #bugbug: 
- * Isso está errado, agora temos rotinas de vfs em vfs.c
- * CRIANDO O DIRETÓRIO RAIZ DO VFS BASEADO EM STREAMS **
- * criando o diretório '/vfs'
- */
-
-void fsCreateVFS (){
-	// #suspenso.
-}
+ 
 
 
 /*
@@ -350,7 +339,7 @@ void set_file ( void *file, int Index ){
 }
 
 
-void fs_test_fat_vector (){
+void fs_test_fat_vector (void){
 	//Ainda não implementada.
 }
 
@@ -367,17 +356,6 @@ void fs_set_fat_entry ( unsigned long n, unsigned long value ){
     //Ainda não implementada.	
 }
 
-
-void fs_put_list_on_fat (){
-	
-	//Ainda não implementada.
-}
-
-
-void fs_set_structures (){
-	
-	//Ainda não implementada.
-}
 
 
 void fs_set_entry ( unsigned long id, unsigned long eid ){
@@ -410,7 +388,7 @@ unsigned long fs_check_cluster (unsigned long id){
 /*
  * fs_check_fat:
  *     Check FAT. */
-unsigned long fs_check_fat (){
+unsigned long fs_check_fat (void){
 	
 	//Ainda não implementada.
 	return 1; 
@@ -558,26 +536,6 @@ done:
 }
 
 
-
-/*
- * fs_check_disk:
- *    Checa elementos do disco.
- *    Disco, Volume.
- *    Mbr. Vbr.
- * @todo: Mudar para fsCheckDisk().
- */
-
-void fs_check_disk (){
-	
-    //printf("fs_check_disk: Initializing..\n");	
-	//fsCheckMbrFile();
-	//fsCheckVbrFile();
-    //...	
-    //printf("Done\n");
-	//refresh_screen();	
-}
-
-
 /*
  **************************************************
  * MountShortFileName:
@@ -632,7 +590,7 @@ void set_spc (int spc){
  *     Pega spc, Sector Per Cluster.
  *     ?? #bugbug: De qual disco ?? */
 
-int get_spc (){
+int get_spc (void){
 	
     return (int) g_spc;
 }
@@ -643,7 +601,7 @@ int get_spc (){
  *     Pega o tipo de sistema de arquivos.
  *     ?? #bugbug: De qual volume ??  */
 
-int get_filesystem_type (){
+int get_filesystem_type (void){
 	
     return (int) g_filesystem_type;
 }
@@ -668,7 +626,7 @@ void set_filesystem_type (int type){
  *     ?? #bugbug: De qual volume ?? 
  */
 
-void fs_init_fat (){
+void fs_init_fat (void){
 	
 	// File system structure.
 	
@@ -712,7 +670,7 @@ void fs_init_fat (){
  *     fsInitStructures
  */
  
-void fs_init_structures (){
+void fs_init_structures (void){
 	
     int Type;
 	
@@ -784,7 +742,7 @@ void fs_init_structures (){
  *     Inicializa o file system manager.
  */
  
-int fsInit (){
+int fsInit (void){
 	
 #ifdef EXECVE_VERBOSE
     printf("fsInit: Initializing..\n");
@@ -985,7 +943,7 @@ int fsInit (){
  * ex: root:/volume0>
  */
  
-void fsInitializeWorkingDiretoryString (){
+void fsInitializeWorkingDiretoryString (void){
 	
 	struct volume_d *v;
 	
@@ -1073,7 +1031,7 @@ void fsInitializeWorkingDiretoryString (){
  * fsInitTargetDir:
  *     Para inicializarmos o sistema ja' com um alvo, no caso o root dir. */
 
-void fsInitTargetDir (){
+void fsInitTargetDir (void){
 	
 	current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
 	//current_target_dir.name = ?;
@@ -1498,7 +1456,7 @@ FILE *sys_read_file2 ( unsigned long name, unsigned long address ){
  *     Carrega o diretório que está configurado como target dir 
  * em algum lugar qualquer da memória. */
 
-int fsLoadFileFromCurrentTargetDir (){
+int fsLoadFileFromCurrentTargetDir (void){
 	
 	int Ret = -1;	
 	int i;

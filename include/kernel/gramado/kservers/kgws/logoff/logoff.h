@@ -18,8 +18,8 @@
  */
  
  
-int init_logoff(int argc, char *argv[]);
-int StartLogoff(int argc, char *argv[]);
+int init_logoff (int argc, char *argv[]);
+int StartLogoff (int argc, char *argv[]);
 
 
 //

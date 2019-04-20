@@ -18,29 +18,7 @@
 // Funções importadas.
 //
 
-extern void turn_task_switch_on();
-
-
-
-
-/*
- * KeStartShell:
- *     Executa o programa SHELL.BIN. */
-
-void KeStartShell (){
-	
-    panic ("KeStartShell:");    //Cancelada! 	
-}
-
-
-/*
- * KeStartTaskManager:
- *     Executa o programa TASKMAN.BIN. */
-
-void KeStartTaskManager (){
-	
-    panic ("KeStartTaskManager:");    //Cancelada! 	
-}
+extern void turn_task_switch_on (void);
 
 
 /*
@@ -73,21 +51,15 @@ void start_task ( unsigned long id, unsigned long *task_address ){
 }
 
 
-/*
- * reload_current_task: */
-
-void reload_current_task (){
-	
-    //Cancelada!
-}
+ 
 
 
 /*
  * switch_to_user_mode:  */
 
-void switch_to_user_mode (){
+void switch_to_user_mode (void){
 	
-    panic ("switch_to_user_mode:");    //Cancelada!	
+    panic ("switch_to_user_mode:");    //suspensa.
 }
 
 
@@ -187,7 +159,7 @@ executa_tarefa ( int id,
 }
 
 
-void KiSwitchToUserMode (){
+void KiSwitchToUserMode (void){
 	
 	// #todo: 
 	// Fazer rotina de interface.
@@ -218,7 +190,7 @@ int KiInitTask (int id){
 
 
 
-void KiInitTasks (){
+void KiInitTasks (void){
 	
     init_tasks ();
 }

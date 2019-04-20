@@ -658,7 +658,8 @@ int MOUSE_LINE_DISCIPLINE ( void *buffer ) {
 //inicializando a fila de mensagens do sistema
 //com ponteiros para estruturas de mensagens ...
 //es estruturas serão reutilizáveis.
-void initialize_system_message_queue (){
+
+void initialize_system_message_queue (void){
 	
 	struct message_d *m;
 	

@@ -28,7 +28,7 @@
 #include <kernel.h>
 
 
-extern void set_page_dir();
+extern void set_page_dir (void);
 
 
 static inline void ckSetCr3 ( unsigned long value ){
@@ -109,7 +109,7 @@ unsigned long contextEBP;
  *     Mudar nome para contextSaveCurrent();.
  */
  
-void save_current_context (){
+void save_current_context (void){
 	
     int Status;
 	struct thread_d *t;
@@ -201,7 +201,7 @@ void save_current_context (){
  *     Mudar nome para contextRestoreCurrent();.
  */
 
-void restore_current_context (){
+void restore_current_context (void){
 	
 	int Status;
 	struct thread_d *t;
@@ -390,16 +390,16 @@ int KiCheckTaskContext (int thread_id){
 };
 
 
-void KiSaveCurrentContext (){
+void KiSaveCurrentContext (void){
 	
     save_current_context ();
-};
+}
 
 
-void KiRestoreCurrentContext (){
+void KiRestoreCurrentContext (void){
 	
     restore_current_context ();
-};
+}
 
  
 /*

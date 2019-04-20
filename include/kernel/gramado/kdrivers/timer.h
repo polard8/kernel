@@ -139,35 +139,37 @@ unsigned long timerList[32];
  * Interface chamada pelo handler da irq0 para um rotina num módulo dentro do 
  * kernel base.
  */
-void KiTimer(); 
+
+void KiTimer (void); 
 
 //Global para inicialização do módulo interno.
-int timerInit();
-int timerTimer();
+
+int timerInit (void);
+int timerTimer (void);
 
 void timerInit8253 ( unsigned long hz ); 
 
 //...
 
 //Global para acesso ao tempo imediatamente agora.
-unsigned long now();
+unsigned long now (void);
 
-unsigned long get_timeout();
+unsigned long get_timeout (void);
 void set_timeout(unsigned long ticks);
 
-unsigned long get_systime_hz();
-unsigned long get_systime_ms();
-unsigned long get_systime_totalticks();
+unsigned long get_systime_hz (void);
+unsigned long get_systime_ms (void);
+unsigned long get_systime_totalticks (void);
 
-void timerEnableTextCursor ();
-void timerDisableTextCursor ();
+void timerEnableTextCursor (void);
+void timerDisableTextCursor (void);
 
 unsigned long get_systime_info (int n);
 
 struct timer_d *create_timer ( struct window_d *window, unsigned long ms, int type  );
 //#todo destroy timer.
 
-int new_timer_id ();
+int new_timer_id (void);
 
 //
 // End.

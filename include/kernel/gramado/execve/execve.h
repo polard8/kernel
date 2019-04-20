@@ -8,9 +8,8 @@ int current_taskman_server;
 
 
  
- 
- 
-int init_executive();
+
+int init_executive (void);
 
 
 //void executive_fntos(char *name);

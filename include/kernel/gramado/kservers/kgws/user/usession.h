@@ -115,15 +115,19 @@ unsigned long usessionList[USER_SESSION_COUNT_MAX];
 // Protótipos das funções.
 //
 
-void init_user_session(); 
+void init_user_session (void); 
+
 void *CreateUserSession(int userID); 
-void *get_current_user_session();
-void open_user_session();
-void close_user_session();
+
+void *get_current_user_session (void);
+
+void open_user_session (void);
+
+void close_user_session (void);
 
 
 //
-// Fim.
+// End.
 //
 
 

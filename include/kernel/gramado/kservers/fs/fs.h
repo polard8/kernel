@@ -101,7 +101,9 @@ int fs_print_process_pwd ( int pid );
  * ?? isso deve sser todo o pathname do pwd ?? 
  * ex: root:/volume0>
  */
-void fsInitializeWorkingDiretoryString(); 
+
+void fsInitializeWorkingDiretoryString (void); 
+
 
 /*
  *****************************************
@@ -844,27 +846,30 @@ unsigned short file_cluster_list[1024];
 /*
  * Initialization support.
  */
-int fsInit();
+
+int fsInit (void);
 
 void 
-fsFAT16ListFiles( const char *dir_name, 
-                  unsigned short *dir_address, 
-				  int number_of_entries );
+fsFAT16ListFiles ( const char *dir_name, 
+                   unsigned short *dir_address, 
+				   int number_of_entries );
 
 //MBR support.
-void fsCheckMbrFile( unsigned char *buffer );
+void fsCheckMbrFile ( unsigned char *buffer );
 
 //VBR support.
-void fsCheckVbrFile( unsigned char *buffer );
+void fsCheckVbrFile ( unsigned char *buffer );
 
 
-void fs_init_structures();
-void set_filesystem_type(int type);
-int get_filesystem_type();
+void fs_init_structures (void);
+
+void set_filesystem_type (int type);
+
+int get_filesystem_type (void);
+
 void set_spc(int spc);
-int get_spc();	
-void fs_save_structure();
-void fs_set_structures();
+
+int get_spc (void);	
  
 
 
@@ -872,22 +877,24 @@ void fs_set_structures();
 // FAT support.
 //
  
-void fsClearFat();   
-void fs_init_fat();
-void fs_put_list_on_fat();
-void fs_apaga_fat();
-void fs_load_fatEx();
+void fsClearFat (void);   
+void fs_init_fat (void);
+ 
+
+void fs_load_fatEx (void);
+
 unsigned long fs_get_fat_entry(unsigned long n);
 void fs_set_fat_entry(unsigned long n, unsigned long value);
-unsigned long fs_check_fat();
-void fs_test_fat_vector();
+
+unsigned long fs_check_fat (void);
+void fs_test_fat_vector (void);
 
 
 // root dir support
-void fs_load_rootdir();
-void fs_save_rootdir();
+void fs_load_rootdir (void);
+void fs_save_rootdir (void);
 void fs_save_entry_on_root(unsigned long eid);
-void fs_load_rootdirEx();
+void fs_load_rootdirEx (void);
 
 
 //   Carrega o diretório na memória, dados o endereço, 
@@ -939,7 +946,7 @@ int fsSearchFile( unsigned char *file_name);
 int fsSearchFileName( unsigned char *name);
 
 int KiSearchFile( unsigned char *file_name, unsigned long address);
-void create_system_folders();
+
 void set_file( void *file, int Index);
 void *get_file(int Index);
 
@@ -997,9 +1004,9 @@ void
 MountShortFileName( char *buffer, 
                     struct dir_entry_d *entry );
 
-void fs_check_disk();
+ 
 
-void fsCreateVFS();
+ 
 
 int fsList( const char *dir_name );
 
@@ -1022,8 +1029,8 @@ void read_fntos(char *name);
 int fsCheckELFFile ( unsigned long address );				  
 int fsCheckPEFile( unsigned long address );	
 
-int fsLoadFileFromCurrentTargetDir ();
-void fsInitTargetDir();
+int fsLoadFileFromCurrentTargetDir (void);
+void fsInitTargetDir (void);
 	  
 				  
 //

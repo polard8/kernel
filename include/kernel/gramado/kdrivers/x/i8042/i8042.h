@@ -13,6 +13,7 @@
 //Step 9: Enable Devices
 //Step 10: Reset Devices
 
+
 #define I8042_DATAPORT          0x60	//Read/Write
 #define I8042_STATUSREGISTER    0x64	//Read
 #define I8042_COMMANDREGISTER   0x64	//Write
@@ -89,7 +90,11 @@
 //0xAB, 0x83	MF2 keyboard
 
 
-void ps2 ();
+void ps2 (void);
+
+//
+// End.
+//
 
 
 

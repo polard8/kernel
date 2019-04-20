@@ -28,8 +28,8 @@
 // Chamaremos o mouse handler dentro do kernel base.
 //ps2mouse.c
 
-void mouse_handler (){
-	
+void mouse_handler (void)
+{	
     mouseHandler ();	
 }
 

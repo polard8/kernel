@@ -481,25 +481,37 @@ unsigned long userList[USER_COUNT_MAX];
 int startUserEnvironment(int argc, char* argv[]); 
 
 int init_user_environment_manager(int argc, char *argv[]); 
-void init_user_info();
 
-void *CreateUser(char *name, int type);
+
+void init_user_info (void);
+
+void *CreateUser (char *name, int type);
+
+
 //User
-void SetCurrentUserId(int user_id);
-int GetCurrentUserId();
+void SetCurrentUserId (int user_id);
+
+
+int GetCurrentUserId (void);
+
+
 //Group
-void SetCurrentGroupId(int group_id);
-int GetCurrentGroupId();
-void UpdateUserInfo( struct user_info_d *user, 
-                     int id, 
-					 char *name, 
-					 int type, 
-					 int user_session_id, 
-					 int window_station_id,
-					 int desktop_id );
-void ShowUserInfo(int user_id);
+void SetCurrentGroupId (int group_id);
+
+int GetCurrentGroupId (void);
+
+void 
+UpdateUserInfo ( struct user_info_d *user, 
+                 int id, 
+				 char *name, 
+				 int type, 
+				 int user_session_id, 
+				 int window_station_id,
+				 int desktop_id );
+
+void ShowUserInfo (int user_id);
 					 
 //
-// Fim.
+// End.
 //
 

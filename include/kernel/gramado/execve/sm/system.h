@@ -84,24 +84,6 @@ int gLogonPID;
 int gLogoffPID;
  
  
-int systemGetTerminalWindow(); 
- 
-//configuramos a janela do terminal virtual corrente.. 
-//@todo: isso deve ser uma opção de system call. 
-void systemSetTerminalWindow( struct window_d *window );
-
-
-//configuramos o retângulo do terminal virtual corrente.. 
-void systemSetTerminalRectangle( unsigned long left,
-                                 unsigned long top,
-								 unsigned long width,
-								 unsigned long height );
-
-
-
-
-
-
 
 
 
@@ -428,6 +410,21 @@ struct system_d *System;
 // Prototypes.
 //
 
+
+
+int systemGetTerminalWindow (void); 
+ 
+
+//configuramos a janela do terminal virtual corrente.. 
+//@todo: isso deve ser uma opção de system call. 
+void systemSetTerminalWindow( struct window_d *window );
+
+
+//configuramos o retângulo do terminal virtual corrente.. 
+void systemSetTerminalRectangle( unsigned long left,
+                                 unsigned long top,
+								 unsigned long width,
+								 unsigned long height );
 			   
 												
 /*
@@ -488,14 +485,16 @@ SendMessage ( struct window_d *window,
  *     Help messages.
  *     Obs: Essa rotina está em procedure.c
  */
-void procedureHelp ();
+
+void procedureHelp (void);
 
 
 /*
  * systemAbort:
  *     Abort system.
  */
-void systemAbort ();
+
+void systemAbort (void);
 
 
 /*
@@ -506,12 +505,12 @@ void SetProcedure(unsigned long proc);
 
 
 // System Server support.
-int init_systemserver ();
+int init_systemserver (void);
 
 
 //Metodo nulo.
 //Pode ser usado em diálogos.
-void *systemNull ();  
+void *systemNull (void);  
 
 	
 /*
@@ -534,11 +533,11 @@ void *systemLinkDriver ( unsigned long arg1,
  *     Apresentar em ordem alfabética.
  */
  
-void systemShowDevicesInfo ();
+void systemShowDevicesInfo (void);
  
  
 //Cria a barra de menu do sistema. 
-void *systemCreateSystemMenuBar ();  
+void *systemCreateSystemMenuBar (void);  
 
 
 
@@ -549,7 +548,7 @@ void *systemCreateSystemMenuBar ();
 //void systemCheck3TierArchitecture();
 
 
-void systemSetupVersion(); 
+void systemSetupVersion (void); 
 
 /*
  * system_dispatch_to_procedure:
@@ -564,7 +563,8 @@ int system_dispatch_to_procedure( struct window_d *window,
  * SystemMenu: System Menu para manipular a janela ativa.
  * Interface que chama o control menu da janlea ativa.
  */
-int SystemMenu();
+
+int SystemMenu (void);
 
  
 //isso será um serviço disponível para a api, 
@@ -581,20 +581,30 @@ unsigned long SystemMenuProcedure( struct window_d *window,
 								   unsigned long long1, 
 								   unsigned long long2);
 								   
-void systemReboot();	    //systemReboot: Reboot stuff.						   
-void systemShutdown();      //systemShutdown: Shut down stuff.
+
+void systemReboot (void);	    //systemReboot: Reboot stuff.	
+
+void systemShutdown (void);      //systemShutdown: Shut down stuff.
+
 //Chamar a função de 32 bit herdado do BM.
-void systemShutdownViaAPM(); 
+void systemShutdownViaAPM (void); 
+
+
+
 //Pega informações de medida de elementos do sistema.
 void *systemGetSystemMetric(int number);
+
 //Pega informações de status de elementos do systema.
 void *systemGetSystemStatus(int number);
 
 
 // ## Initializing ##
-int systemStartUp();   // Inicialização do sistema.
-int systemInit();      // Inicializador.
-void systemSystem();   // Construtor.
+
+int systemStartUp (void);   // Inicialização do sistema.
+
+int systemInit (void);      // Inicializador.
+
+void systemSystem (void);   // Construtor.
 
 
 // #importante

@@ -27,7 +27,7 @@ const char * const trap_type[] = {
 };
 */
 
-void get_cpu_amd_parameters();
+void get_cpu_amd_parameters (void);
 
 
 

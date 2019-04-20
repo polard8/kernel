@@ -158,17 +158,23 @@ terminal screen buffer: (um buffer grande onde se coloca o conteudo)
   
 
 //screen.c 
-unsigned long screenGetWidth();
-unsigned long screenGetHeight();
-void refresh_screen();
-void screenRefresh();
-void screenSetSize(unsigned long width, unsigned long height);
-int screenInit(); 
+
+unsigned long screenGetWidth (void);
+
+unsigned long screenGetHeight (void);
+
+void refresh_screen (void);
+
+void screenRefresh (void);
+
+void screenSetSize (unsigned long width, unsigned long height);
+
+int screenInit (void); 
 
 
 //Outros.
-void vsync();  //vsync.c
-
+//#bugbug:?? redefinido ??
+//void vsync ();  //vsync.c
 
 
 //

@@ -25,29 +25,23 @@
  */
  
  
-void task0()
+void task0 (void)
 {
 //    printf("Thread started\n"); 	
     while(1){ asm("hlt"); }
 };
 
-void task1()
+
+void task1 (void)
 {
 //    printf("Thread started\n"); 	 	
     while(1){ asm("hlt"); }
 };
 
-void task2()
-{
-//    printf("Thread started\n"); 	 	
-    while(1){ asm("hlt"); }
-};
 
-void task3()
-{
-//    printf("Thread started\n"); 		
-    while(1){ asm("hlt"); }
-};
+
+
+
 
 //
 // End.

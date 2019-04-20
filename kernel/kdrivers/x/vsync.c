@@ -24,12 +24,12 @@
 
 
 // Funções internas.
-char vsync_inb(int port);
+char vsync_inb (int port);
 
 
  
-void vsync (){
-	
+void vsync (void)
+{	
 	while ( ( vsync_inb (0x3DA) & 8 ) != 8 );
 	
 	while ( ( vsync_inb (0x3DA) & 8 ) == 8 );

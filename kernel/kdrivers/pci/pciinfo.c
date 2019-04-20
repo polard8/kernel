@@ -78,10 +78,9 @@ int pciShowDeviceInfo (int number){
  * 0x2829	Intel(R) ICH8M SATA AHCI Controller	0x8086	Intel Corporation.
  * 0x1237	PCI & Memory	0x8086	Intel Corporation.
  * ...
- *
  */
 
-int pciInfo (){
+int pciInfo (void){
 	
 	int i;
 	int Max = 32;

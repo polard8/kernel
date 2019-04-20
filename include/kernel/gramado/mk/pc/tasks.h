@@ -1,5 +1,5 @@
 /*
- * Arquivo: tasks.h
+ * File: tasks.h
  *
  * Descrição:
  *    Header principal dos recursos do kernel envolvendo PROCESSOS.
@@ -12,6 +12,7 @@
 /*
  *  O que segue são as variáveis usadas com maior frequência.
  */
+
  
 //Status do mecanismo de task switch. 
 unsigned long task_switch_status;
@@ -79,85 +80,124 @@ unsigned long task_count;      //contador de tarefas criadas.
 //void spawn_thread(int id);
 
 
-void init_tasks();
-int init_task(int id);
+//#bugbug
+//os conceitos de tasks ainda estão misturados, hora é thread e hora é processo
+
+void init_tasks (void);
+
+int init_task (int id);
+
 unsigned long executa_tarefa(int id, unsigned long *task_address);
+
 void start_task(unsigned long id, unsigned long *task_address);
 
 //
 // Usadas durante a criação de threads e processos.
 //
-int fork();
+
+int fork (void);
 
  
-				 
+//
+// Outras
+//
 
-//
-//outras
-//
-void switch_to_user_mode(); //??
-void reload_current_task(); //??
-void save_context_of_new_task(int id, unsigned long *task_address); //??	
+void switch_to_user_mode (void); //??
+
+void save_context_of_new_task (int id, unsigned long *task_address); //??	
 	
  
 	
 /*
  * Ki={Kernel Internal}
  *     Protótipos para interfaces de rotinas internas do kernel.
+ * #todo: mover tudo para o arquivo ki.h ??   
  */	
-void KiTaskSwitch();
+
+void KiTaskSwitch (void);
+
 void KiCpuFaults(unsigned long fault_number);
+
 void KiSpawnTask(int id);
+
 int KiCheckTaskContext(int thread_id);
-void KiInitTasks();	
 
+void KiInitTasks (void);	
 
-int KiInitTask(int id);	
-int KiFork();	
-unsigned long KiExecutaTarefa(int id, unsigned long *task_address);
-void KiSwitchToUserMode();
+int KiInitTask (int id);	
 
-  
+int KiFork (void);	
 
- 
+unsigned long KiExecutaTarefa (int id, unsigned long *task_address);
 
-void KiSaveCurrentContext();
-void KiRestoreCurrentContext();	
-void KiNewTaskScheduler();
-int KiSetPriority();
-int KiIncreasePriority(int pid);
-void KiSetCurrent(int id);
-int KiGetCurrent();
-int KiGetCurrentTask();
+void KiSwitchToUserMode (void); 
+
+void KiSaveCurrentContext (void);
+
+void KiRestoreCurrentContext (void);	
+
+void KiNewTaskScheduler (void);
+
+int KiSetPriority (void);
+
+int KiIncreasePriority (int pid);
+
+void KiSetCurrent (int id);
+
+int KiGetCurrent (void);
+
+int KiGetCurrentTask (void);
+
 void KiSetTaskStatus(unsigned long status);
-unsigned long KiGetTaskStatus();
+
+unsigned long KiGetTaskStatus (void);
+
 void KiSaveContextOfNewTask(int id, unsigned long *task_address);
-void KiReloadCurrentTask();
+
 void KiSetQuantum( unsigned long q);
-unsigned long KiGetQuantum();
+
+unsigned long KiGetQuantum (void);
+
 void KiSetCurrentQuantum( unsigned long q);
-unsigned long KiGetCurrentQuantum();
+
+unsigned long KiGetCurrentQuantum (void);
+
 void KiSetNextQuantum( unsigned long q);
-unsigned long KiGetNextQuantum();
+
+unsigned long KiGetNextQuantum (void);
+
 void KiSetFocus(int pid);
-int KiGetFocus();
-void KiDebugBreakpoint();
-void KiShowTasksParameters();
-void KiMostraSlots();
+
+int KiGetFocus (void);
+
+void KiDebugBreakpoint (void);
+
+void KiShowTasksParameters (void);
+
+void KiMostraSlots (void);
+
 void KiMostraSlot(int id);
+
 void KiMostraReg(int id);
-void KiShowPreemptedTask();	
+
+void KiShowPreemptedTask (void);	
 
  
+//
+// Quantum
+//
 
-//quantum
 void set_quantum( unsigned long q);
-unsigned long get_quantum();
-void set_current_quantum( unsigned long q);
-unsigned long get_current_quantum();
-void set_next_quantum( unsigned long q);
-unsigned long get_next_quantum();
 
+unsigned long get_quantum (void);
+
+void set_current_quantum( unsigned long q);
+
+unsigned long get_current_quantum (void);
+
+void set_next_quantum( unsigned long q);
+
+unsigned long get_next_quantum (void);
 
  
  
@@ -166,21 +206,25 @@ unsigned long get_next_quantum();
 // 
 
 //Protótipos de algumas tarefas em RING 0.
-void task0(); 
-void task1();
-void task2();
-void task3();
+
+void task0 (void); 
+void task1 (void);
 
 
 //debug de tarefas.
-void debug_breakpoint();
-void show_tasks_parameters();
-void mostra_slots();
+
+void show_tasks_parameters (void);
+
+void mostra_slots (void);
+
 void mostra_slot(int id);
+
 void mostra_reg(int id);
-void show_preempted_task();
+
+void show_preempted_task (void);
+
 
 //
-//fim.
+// End.
 //
 

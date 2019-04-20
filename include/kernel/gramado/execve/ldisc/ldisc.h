@@ -127,12 +127,6 @@
  
  
 
-
- 
-
-
-
-
 //
 // @todo: Sondando scancode. (provisório.)
 //

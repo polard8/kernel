@@ -35,6 +35,7 @@
  *     ...
  */
 
+
 //#bugbug
 //talvez aqui nao seja o melhor lugar pra definir isso.
 #define gramado_pid_t pid_t
@@ -59,7 +60,7 @@
 // "Todo processo terá seu próprio diretório de páginas
 //  e será carregado no endereço virtual 0x400000, logicamente
 //  cada processo será carregado em um endereço físico diferente."
-// 
+
 #define UPROCESS_IMAGE_BASE 0x400000 
 
 //Process Limit. (User process) 
@@ -135,6 +136,7 @@
  * o tempo de cada interrupção ... e somar o tempo perdido com taskswitch ...
  *  100ms + 5ms(que o timer fica esperando o kernel habilitar as interrupções).
  */
+
 #define QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
 #define QUANTUM_LIMIT  (PRIORITY_REALTIME*TIMESLICE_MULTIPLIER)
 
@@ -178,6 +180,7 @@
  *            como estado de transição.
  *  Os status de um processo são diferentes do status de uma thread.
  */ 
+
 typedef enum {
 	PROCESS_CREATED,
 	PROCESS_INITIALIZED,
@@ -201,11 +204,13 @@ typedef enum {
  APPMODE_WINDOW = O kernel não cria estrutura de terminal para 
  esse processo e o processo criará janelas.
  */
+
 typedef enum {
     APPMODE_NULL,      // Isso se aplica ao processo kernel e ao processo idle por exemplo.	
     APPMODE_TERMINAL,  // O kernel cria uma janela de terminal para o aplicativo.
 	APPMODE_WINDOW,    // O kernel não cria janela de terminal para o aplicativo
 }appmode_t;
+
 
 /*
  * Estruturas para processos.
@@ -560,7 +565,9 @@ struct process_d
 	//  +++++ Thread support +++++
 	//
 	
-	int threadCount;    //Número de threads do processo. 
+	//Número de threads do processo.
+	
+	int threadCount;     
 	
 	/*
 	 * threadList:
@@ -808,11 +815,11 @@ struct process_info_d
  *     Retorna o PID do clone.
  */
 
-pid_t do_fork_process ();
+pid_t do_fork_process (void);
 
 
 //cria uma estrutura do tipo processo, mas não inicializada.
-struct process_d *processObject ();
+struct process_d *processObject (void);
 
 
 /*
@@ -821,7 +828,7 @@ struct process_d *processObject ();
  *     +Isso pode ser usado para clonar um processo.
  */
 
-pid_t getNewPID ();
+pid_t getNewPID (void);
 
 
 // Signal.
@@ -834,9 +841,9 @@ processSendSignal( struct process_d *p,
 // Page directory support.
 //
  
-unsigned long GetPageDirValue();
+unsigned long GetPageDirValue (void);
 
-unsigned long GetProcessDirectory( struct process_d *process );
+unsigned long GetProcessDirectory ( struct process_d *process );
 
 void 
 SetProcessDirectory ( struct process_d *process, 
@@ -853,10 +860,10 @@ unsigned long GetProcessPageDirectoryAddress ( pid_t pid );
 
 int processTesting (int pid);
 
-void init_processes ();
+void init_processes (void);
 
-void show_currentprocess_info ();
-void show_process_information ();
+void show_currentprocess_info (void);
+void show_process_information (void);
 
 
  
@@ -873,8 +880,13 @@ struct process_d *create_process ( struct room_d *room,
                                    unsigned long iopl,
                                    unsigned long directory_address );
 
-//Finalizações.
-void CloseAllProcesses ();
+
+
+//
+// Finalizações.
+//
+
+void CloseAllProcesses (void);
 
 
 /*
@@ -889,13 +901,14 @@ void CloseAllProcesses ();
 void exit_process ( pid_t pid, int code );
 
 
-void set_caller_process_id(int pid);
-int get_caller_process_id();
+void set_caller_process_id (int pid);
 
-int init_process_manager();
+int get_caller_process_id (void);
+
+int init_process_manager (void);
 
 									
 //
-// Fim.
+// End.
 //
 

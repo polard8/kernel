@@ -1,5 +1,5 @@
 /*
- * File: pc\action\thread.c
+ * File: pc/action/thread.c
  *
  * Descrição:
  *     TM - Thread Manager (Parte fundamental do Kernel Base).
@@ -443,23 +443,24 @@ done:
  *     Pega o id da thread atual.
  *     Obs: current_thread já é o id.
  */
-int GetCurrentThreadId (){
+
+int GetCurrentThreadId (void){
 	
 	return (int) current_thread;
-};
+}
 
 
 /*
- ********************************************************
  * GetCurrentThread:
  *     Retorna o endereço da estrutura da thread atual.
- *
  */
-void *GetCurrentThread (){
+
+void *GetCurrentThread (void){
 	
     struct thread_d *Current;
 	
-	if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+	if (current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+	{
 		return NULL;
 	}
 	
@@ -470,7 +471,7 @@ void *GetCurrentThread (){
 	}
 	
 	return (void *) Current;
-};
+}
 
 
 /*
@@ -479,7 +480,8 @@ void *GetCurrentThread (){
  *     Pega a primeira thread READY que encontrar.
  *     E se não encontrar nenhuma, retorna NULL.
  */
-void *FindReadyThread (){
+
+void *FindReadyThread (void){
 	
 	int Index;
     struct thread_d *Thread;  
@@ -502,10 +504,10 @@ void *FindReadyThread (){
         //Nothing.		
 	};
 	
-//Nenhuma foi encontrada.   
-//fail:
+    //Nenhuma foi encontrada.   
+	
     return NULL;
-};
+}
 
 
 /*
@@ -577,15 +579,17 @@ int GetThreadType (struct thread_d *Thread){
  * show_thread_information:
  *     Mostra informações sobre as threads.
  */
-void show_thread_information (){
+
+void show_thread_information (void){
 	
 	struct thread_d *Current;	
 	
-	printf("show_thread_information:\n");		
+	printf ("show_thread_information:\n");		
 	
 	//Limits.
-	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
-		
+	
+	if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+	{	
 		return;
 	}
 	
@@ -593,19 +597,20 @@ void show_thread_information (){
 	
 	if( (void *) Current == NULL )
 	{
-	    printf("pc-thread-show_thread_information:\n");	
+	    printf ("show_thread_information:\n");	
 	    return;
 		
 	} else {
 	    
-		printf("currentTID={%d}\n",current_thread);
+		printf ("currentTID=%d\n", current_thread );
 		//...
 	};
 	
-	printf("idle={%d}\n",idle);
+	printf (" idle=%d\n", idle );
 
 	//Mostra Slots. 
 	//threadi.c
+	
     mostra_slots ();    
 	
 	/*
@@ -621,8 +626,7 @@ void show_thread_information (){
 
     printf("Done\n");
 	refresh_screen ();
-};
-
+}
 
 
 /*
@@ -631,9 +635,11 @@ void show_thread_information (){
  *     Inicializa o thread manager.
  *     Inicializa as estruturas e variáveis 
  *     que lidam com threads.
- *
  */
-int init_threads (){
+
+int init_threads (void){
+	
+	int i;
 	
 	//Globais.	 
 	current_thread = 0;                        //Atual. 
@@ -655,30 +661,30 @@ int init_threads (){
 	
 	
 	//Zerando a lista de threads.
-	int i=0;
-	while ( i < THREAD_COUNT_MAX ){
+	i=0;
+	
+	while ( i < THREAD_COUNT_MAX )
+	{
 	    threadList[i] = (unsigned long) 0;   
-        ++i;
+        i++;
 	}
 	
 	//
 	// @todo: Nada mais?
 	//
 
-	return (int) 0;
-};
-
+	return 0;
+}
 
 
 /*
  **********************************************************
  * thread_getchar:
- *
- * Esse é o serviço 137.
- * Isso é usado pela biblioteca stdio em user mode na função getchar().
+ *     Esse é o serviço 137.
+ *     Isso é usado pela biblioteca stdio em user mode na função getchar().
  */
 
-int thread_getchar (){
+int thread_getchar (void){
 	
 	unsigned char SC;
 	int save;

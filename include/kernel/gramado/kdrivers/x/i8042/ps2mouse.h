@@ -1,3 +1,6 @@
+
+// ps2mouse.h
+
 //Standard PS/2 Mouse Commands
 //Byte	Data byte	Description
 //0xFF	None	Reset
@@ -61,9 +64,6 @@ int saved_mouse_y;
 //extern void update_mouse();
 
 
-
-
-
 //Estado dos botões do mouse
 int mouse_buttom_1; 
 int mouse_buttom_2;
@@ -105,37 +105,32 @@ unsigned long g_mousepointer_width;
 unsigned long g_mousepointer_height;
 
 
-void mouse_write(unsigned char write);
-unsigned char mouse_read();
+void mouse_handler (void);
 
 
+void mouse_write (unsigned char write);
 
-static unsigned char getMouseData(void);
+unsigned char mouse_read (void);
+
+static unsigned char getMouseData (void);
+
+void kernelPS2MouseDriverReadData (void);
 
 
-void kernelPS2MouseDriverReadData(void);
-
-
-//bmp
-//buffer para o bmp
+//bmp - buffer para o bmp
 void *mouseBMPBuffer; 
-int load_mouse_bmp();
+int load_mouse_bmp (void);
 
+void mouseHandler (void); 
 
+void ps2_mouse_initialize (void);
 
-void mouseHandler(); 
-void ps2_mouse_initialize();
-int ps2_mouse_globals_initialize();
+int ps2_mouse_globals_initialize (void);
 
+void mouse_install (void);   
 
-void mouse_install ();   
-
-		   
-		   
-		   
-		  
+		  	  
 //
+// End.
 //
-//
-
 

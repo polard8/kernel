@@ -14,28 +14,32 @@
 
 
 //Runtime support. 
-int KiInitRuntime();        
+int KiInitRuntime (void);        
 
 // Informations support.
-void KiInformation(); 
+void KiInformation (void); 
+
 
 //Requests support.   
-int KiRequest();  
+int KiRequest (void);  
+
 
 // Spawn support. spawn a thread.
-void KiSpawnTask(int id);
+void KiSpawnTask (int id);
 
 //ipc.
-void KiCalloutTest();
-void KiCallfarTest();
+//void KiCalloutTest (void);
+//void KiCallfarTest (void);
 
 
 //## bugbug ##
 // Isso deveria estar no módulo /pc em microkernel.
-void *KiCreateIdle();
-void *KiCreateShell();
-void *KiCreateTaskManager();
-void *KiCreateRing0Idle();	
+
+void *KiCreateIdle (void);
+void *KiCreateShell (void);
+void *KiCreateTaskManager (void);
+
+void *KiCreateRing0Idle (void);	
 
 
 
@@ -45,7 +49,7 @@ void KiCpuFaults(unsigned long number);
 
 // Finalizations support.
 
-void KiAbort(); 
+void KiAbort (void); 
 
 
 //

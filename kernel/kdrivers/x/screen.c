@@ -27,7 +27,7 @@ extern unsigned long SavedY;            //Screen height.
 // Funções importadas.
 //
 
-extern void asm_refresh_screen();
+extern void asm_refresh_screen (void);
 
 
 //
@@ -58,16 +58,17 @@ unsigned long screen_height;
 
 
 //Get width.
-unsigned long screenGetWidth()
+unsigned long screenGetWidth (void)
 {
 	return (unsigned long) screen_width;
-};
+}
  
+
 //Get height. 
-unsigned long screenGetHeight()
+unsigned long screenGetHeight (void)
 {
 	return (unsigned long) screen_height;	
-};
+}
 
 
 /*
@@ -88,7 +89,7 @@ void screenSetSize( unsigned long width, unsigned long height )
  *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
  */
 
-void refresh_screen (){
+void refresh_screen (void){
 	
 	unsigned long *backbuffer = (unsigned long *) BACKBUFFER_VA;
 	unsigned long *frontbuffer = (unsigned long *) FRONTBUFFER_VA;
@@ -117,12 +118,12 @@ void refresh_screen (){
  *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
  *     Se o modo de vídeo permite.
  */
-void screenRefresh()
+void screenRefresh (void)
 {
     //?? SavedBootMode	
     if( g_useGUI == 1 || SavedBootMode == 1 )
 	    asm_refresh_screen();
-};
+}
 
 
 /*
@@ -131,7 +132,7 @@ void screenRefresh()
  *     Inicializando o gerenciamento de tela.
  */ 
 
-int screenInit (){
+int screenInit (void){
 	
     //Configura globais com base nos valores passados pelo Boot Loader.
 	

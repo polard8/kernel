@@ -58,16 +58,17 @@ extern unsigned long SavedBootMode;
 
 
 // Task switching support.
-extern void turn_task_switch_on();
+extern void turn_task_switch_on (void);
 
-extern void clear_nt_flag ();
+
+extern void clear_nt_flag (void);
 
 
 //char copyright[] =
 //"Copyright (c) 2005-2019 \n\tFred Nora.  All rights reserved.\n\n";
 
 
-static inline void mainSetCr3 ( unsigned long value ){
+static inline void mainSetCr3 (unsigned long value){
 	
     __asm__ ( "mov %0, %%cr3" : : "r" (value) );
 };

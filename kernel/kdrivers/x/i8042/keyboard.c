@@ -72,7 +72,6 @@
  * O driver deverá de alguma maneira notificar o kernel sobrea a ocorrência
  * do evento de input. Para que o kernel acorde as trheads que estão esperando 
  * por eventos desse tipo.
- *
  */
 
 	//#importante:
@@ -81,18 +80,19 @@
 	// Nesse momento o kernel de sentir-se alertado sobre o evento de 
 	// input e acordar a threa que está esperando por esse tipo de evento. 
 	
-	
 	// #obs: 
     // Esse buffer está em gws/user.h 
 
 // PUT SCANCODE
-void abnt2_keyboard_handler (){
-	
+
+void abnt2_keyboard_handler (void)
+{	
     unsigned char scancode = inportb (0x60);	
 		
 	current_stdin->_base[keybuffer_tail++] = (char) scancode;
 	
-	if ( keybuffer_tail >= current_stdin->_cnt ){
+	if ( keybuffer_tail >= current_stdin->_cnt )
+	{
 		keybuffer_tail = 0;
 	}
 }
@@ -103,7 +103,7 @@ void abnt2_keyboard_handler (){
 // Pega o scancode.
 // Renova a fila do teclado
 
-unsigned long get_scancode (){
+unsigned long get_scancode (void){
 	
 	unsigned long SC = 0;
 	
@@ -132,7 +132,7 @@ unsigned long get_scancode (){
  *     com o driver instalado.
  */
  
-void KiKeyboard (){
+void KiKeyboard (void){
 	
     //@todo: sondar o driver instalado.	
 	//       um estrutura de dispositivo
@@ -150,7 +150,7 @@ void KiKeyboard (){
 
     if (abnt2 != 1)
 	{
-	    panic ("unblocked-KiKeyboard: not abnt2\n");
+	    panic ("KiKeyboard: not abnt2\n");
 	};
 }
 

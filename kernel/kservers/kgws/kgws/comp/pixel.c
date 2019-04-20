@@ -52,7 +52,8 @@ extern unsigned long SavedBPP;
 //Outras.
 // De onde vem isso ??
 // @todo: Devemos chamar o módulo hal.
-extern void gui_buffer_putpixel();
+
+//extern void gui_buffer_putpixel (void);
 
 
 //

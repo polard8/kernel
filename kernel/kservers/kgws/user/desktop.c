@@ -104,7 +104,7 @@ void set_current_desktop ( struct desktop_d *desktop ){
  *     @todo: Mudar para desktopGetCurrentDesktop().
  */
 
-void *get_current_desktop (){
+void *get_current_desktop (void){
 	
     //Check limits.
     
@@ -115,12 +115,13 @@ void *get_current_desktop (){
 	};
     
 	return (void *) desktopList[current_desktop];
-};
+}
 
 
-int get_current_desktop_id(){
+int get_current_desktop_id (void)
+{
 	return (int) current_desktop;
-};
+}
 
 
 /*
@@ -128,7 +129,7 @@ int get_current_desktop_id(){
  *     Inicializa o array de ponteiros de desktop.
  */
 
-void init_desktop_list (){
+void init_desktop_list (void){
 	
     int i=0;		
     
@@ -138,7 +139,7 @@ void init_desktop_list (){
 		
 		i++; 
 	};
-};
+}
 
 
 /*
@@ -403,11 +404,13 @@ void set_current_menuVScroll ( struct desktop_d *desktop,
 
 
 /*
+ ***********************************************
  * init_desktop:
  *     Inicializa o desktop 0.
  *     @todo: Mudar para: desktopInit().
  */
-void init_desktop (){
+
+void init_desktop (void){
 	
     //printf("init_desktop: Initializing..\n");
 	
@@ -453,16 +456,15 @@ void init_desktop (){
 	
 	
 	//...
-		
-//done:
 
 	//printf("Done.\n");
 	//Set Current.
+    
 	set_current_desktop (desktop0);
 	
 	//#?? Poderíamos ter um retorno de tipo int.
-    //return;
-};
+}
+
 
 
 /*

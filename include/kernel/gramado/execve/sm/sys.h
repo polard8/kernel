@@ -21,11 +21,15 @@ void *sys_create_process ( struct room_d *room,
                            unsigned long iopl,
                            unsigned long directory_address );
 
-int sys_getpid ();
-int sys_getppid ();
-int sys_fork ();
-void sys_exit_process (int pid, int code);
 
+
+int sys_getpid (void);
+
+int sys_getppid (void);
+
+int sys_fork (void);
+
+void sys_exit_process (int pid, int code);
 
 
 //
@@ -41,26 +45,28 @@ void *sys_create_thread ( struct room_d *room,
                           char *name );
 
 void sys_exit_thread (int tid);
-void sys_dead_thread_collector ();
+
+void sys_dead_thread_collector (void);
 
 
 
 //Sincronização do retraço vertical.
-void sys_vsync();
+void sys_vsync (void);
+
 
 //Show kernel info.
-void sys_showkernelinfo();
+void sys_showkernelinfo (void);
 
 //Show pci info.
-int sys_showpciinfo();
+int sys_showpciinfo (void);
 
 
 //
 // reboot and shutdown
 //
 
-void sys_reboot ();
-void sys_shutdown ();
+void sys_reboot (void);
+void sys_shutdown (void);
 
 
 //

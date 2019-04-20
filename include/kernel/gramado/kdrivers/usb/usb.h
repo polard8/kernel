@@ -1,6 +1,4 @@
 
-
-
 //usb.h  usb header.
 
 
@@ -23,7 +21,7 @@
 	Its about time.
 */
 
-void usbInit();
+void usbInit (void);
 
 
 //

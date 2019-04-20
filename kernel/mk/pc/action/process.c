@@ -73,7 +73,7 @@
 // Funções importadas.
 //
 
-extern unsigned long get_page_dir();
+extern unsigned long get_page_dir (void);
 
 
 //
@@ -102,7 +102,7 @@ int processNewPID;
  *     Retorna o PID do clone.
  */
  
-pid_t do_fork_process (){
+pid_t do_fork_process (void){
 	
 	int PID;
 	
@@ -111,9 +111,7 @@ pid_t do_fork_process (){
 	
 	int Ret = -1;
 	
-	
-	//printf("\n");
-	printf("do_fork_process: Cloning the current process ...\n");
+	printf ("do_fork_process: Cloning the current process..\n");
 	
 	
 	// ## Current ##
@@ -225,9 +223,10 @@ fail:
 /*
  * processObject:
  *     Cria uma estrutura do tipo processo, mas não inicializada.
+ *     #todo: Criar a mesma rotina para threads e janelas.
  */
  
-struct process_d *processObject (){
+struct process_d *processObject (void){
 	
 	struct process_d *p;
 	
@@ -235,8 +234,9 @@ struct process_d *processObject (){
 	
 	if ( (void *) p == NULL )
 	{
-	    printf("processObject: fail");
-		die();
+        // #debug
+	    printf ("processObject:");
+		die ();
 	};	
 	
 	return (struct process_d *) p;
@@ -249,7 +249,7 @@ struct process_d *processObject (){
  *     +Isso pode ser usado para clonar um processo.
  */
  
-pid_t getNewPID (){
+pid_t getNewPID (void){
 	
 	struct process_d *p;
 	
@@ -951,7 +951,7 @@ get_next:
 //Done.
 done:
     return (void *) Process;
-};
+}
 
  
 /*
@@ -961,9 +961,9 @@ done:
  *     processCloseAllProcesses();    
  */
 
-void CloseAllProcesses (){
+void CloseAllProcesses (void){
 	
-	int Index;
+	int Index = 0;
     struct process_d *P;
 
 	// #importante:
@@ -990,26 +990,29 @@ void CloseAllProcesses (){
 /*
  * KeSaveCurrentContext:
  *     Interface para chamar rotina de salvamento de contexto de registradores.
-  * obs: Não usaremos inicial Ke_
+ * obs: Não usaremos inicial Ke_
  */
-void KeSaveCurrentContext()
+
+void KeSaveCurrentContext (void)
 {
    //sendo uma interface pode chamar a rotina de acordo com a arquitetura presente.
    //para isso pode-se usar hal.
-    return;
-};
+    //return;
+}
+
 
 /*
  * KeRestoreCurrentContext:
  *     Interface para chamar rotina de restauração de contexto de registradores.
-  * obs: Não usaremos inicial Ke_
+ * obs: Não usaremos inicial Ke_
  */
-void KeRestoreCurrentContext()
+
+void KeRestoreCurrentContext (void)
 {
    //sendo uma interface pode chamar a rotina de acordo com a arquitetura presente.
    //para isso pode-se usar hal.
-    return;
-};
+    //return;
+}
  
  
 /*
@@ -1076,12 +1079,12 @@ int KeCheckTaskContext( int task_id )
  * KeExecProcess:
  *     Interface para chamar a rotina que executa uma tarefa, dado
  * nome e endereço.
- *
  */
-int KeExecProcess(int pid, unsigned long *process_address)
+
+int KeExecProcess (int pid, unsigned long *process_address)
 {
     return 0;
-};
+}
 
 
 /*
@@ -1089,29 +1092,41 @@ int KeExecProcess(int pid, unsigned long *process_address)
  *     Interface para chamr uma rotina para despachar uma thread.
  *     Server em user mode.
  */
-void KeDispatchProcess(){
-    return;
+
+void KeDispatchProcess (void)
+{
+    //return;
 }
 
-void KeDoProcessReady(int pid){
-    return;
-};
 
-void KeDoProcessRunning(int pid){
-    return;
-};
+void KeDoProcessReady (int pid)
+{
+    //return;
+}
 
-void KeDoProcessSleeping(int pid){
-    return;
-};
 
-void KeDoProcessZombie(int pid){
-    return;
-};
+void KeDoProcessRunning (int pid)
+{
+    //return;
+}
 
-void KeDoProcessDead(int pid){
-    return;
-};
+
+void KeDoProcessSleeping (int pid)
+{
+    //return;
+}
+
+
+void KeDoProcessZombie (int pid)
+{
+    //return;
+}
+
+
+void KeDoProcessDead (int pid)
+{
+    //return;
+}
 
 
 /*
@@ -1119,20 +1134,22 @@ void KeDoProcessDead(int pid){
  *     Interface para chamar uma rotina de execução de um processo,
  * dado seu id e seu endereço.
  */
-void KeStartProcess(unsigned long pid, unsigned long *task_address){
-    return;
-};
 
- 
+void KeStartProcess ( unsigned long pid, unsigned long *task_address )
+{
+    //return;
+}
+
  
 /*
  * KeAcordarTarefa:
  *     Interface para chamar uma rotina de acordar um processo..
  */ 
-void KeWakeupProcess(int pid)
+
+void KeWakeupProcess (int pid)
 {
-    return;
-}; 
+    //return;
+}
  
   
 /*
@@ -1142,128 +1159,121 @@ void KeWakeupProcess(int pid)
  *     Chama um módulo externo para sair de uma tarefa.
  *     Chama um Server em user mode.
  */ 
-void KeProcessExit()
+
+void KeProcessExit (void)
 {
-    return;
-};
+    //return;
+}
+
+
 
 /*
  * KeKillProcess:
- *     Chama um server em user mode pra
- *     fechar um processo.
- *       
+ *     Chama um server em user mode pra fechar um processo.
  */ 
-void KeKillProcess(int pid)
-{
-    return;
-};
 
-void KeNewProcessScheduler()
+void KeKillProcess (int pid)
 {
-    return; 
+    //return;
 }
 
 
-int KeSetPriority()
+// ??
+void KeNewProcessScheduler (void)
+{
+    //return; 
+}
+
+
+int KeSetPriority (void)
 {
     return 0;
 }
+
 
 //Aumenta a prioridade de um processo.
-int KeIncreasePriority(int pid)
+int KeIncreasePriority (int pid)
 {
     return 0;
-};
+}
 
-void KeSaveContextOfNewTask(int id, unsigned long *task_address)
+
+void KeSaveContextOfNewTask ( int id, unsigned long *task_address )
 {
-    return;
-};
+    //return;
+}
 
 
-void KeReloadCurrentTask()
+void KeSetQuantum ( unsigned long q)
 {
-    return;
-};
+    //return;
+}
 
 
-void KeSetQuantum( unsigned long q)
+unsigned long KeGetQuantum (void)
+{ 
+    return 0; 
+}
+
+
+void KeSetCurrentQuantum (unsigned long q)
 {
-    return;
-};
+    //return;
+}
 
-unsigned long KeGetQuantum()
+
+unsigned long KeGetCurrentQuantum (void)
 { 
     return 0; 
 };
 
-void KeSetCurrentQuantum( unsigned long q)
-{
-    return;
-};
 
-unsigned long KeGetCurrentQuantum()
+void KeSetNextQuantum (unsigned long q)
+{
+    //return;
+}
+
+
+unsigned long KeGetNextQuantum (void)
 { 
     return 0; 
-};
-
-void KeSetNextQuantum( unsigned long q)
-{
-    return;
-};
-
-unsigned long KeGetNextQuantum()
-{ 
-    return 0; 
-};
+}
 
 
 //@todo: Não faz sentido chamar um módulo externo
 //para setar o foco.
-void KeSetFocus(int pid)
-{
-    return;
-};
+// Isso é para tratamento de janela, deveria ir para kgws
 
-//@todo: Não faz sentido chamar um módulo externo
-//para pegar o foco.
-int KeGetFocus()
+void KeSetFocus (int pid)
+{
+    //return;
+}
+
+
+//@todo: 
+// Não faz sentido chamar um módulo externo
+// para pegar o foco.
+// Isso é para tratamento de janela, deveria ir para kgws
+
+int KeGetFocus (void)
 { 
     return (int) 0; 
-};
+}
 
-void KeDebugBreakpoint()
+
+void KeShowTasksParameters (void)
 {
     //return;
-};
+}
 
-void KeShowTasksParameters()
+
+void KeShowPreemptedTask (void)
 {
     //return;
-};
-
-void KeMostraSlots()
-{
-    //return;
-};
-
-void KeMostraSlot(int id)
-{
-    //return;
-};
-
-void KeMostraReg(int id)
-{
-    //return;
-};
-
-void KeShowPreemptedTask()
-{
-    //return;
-};
+}
 
 
-void show_currentprocess_info (){
+void show_currentprocess_info (void){
 	
     struct process_d *Current;		
 	
@@ -1279,7 +1289,7 @@ void show_currentprocess_info (){
 	
 	if ( (void *) Current == NULL )
 	{
-	    printf("show_process_information: Struct fail\n");
+	    printf ("show_process_information: struct \n");
         return; 		
 	
 	} else {
@@ -1306,11 +1316,11 @@ void show_currentprocess_info (){
 		//...
 	};
 	
-	refresh_screen();
-};
+	refresh_screen ();
+}
+
 
 /*
- ********************************************************
  * show_process_information:
  *     Mostra informações sobre os processos. 
  *     #todo: na verdade um aplicativo em user mode deve fazer esse trabalho
@@ -1322,13 +1332,13 @@ void show_currentprocess_info (){
 // e o endereço mostrado é em relação ao diretório de páginas do kernel
 // pois o kernel é que controla o posicionamento das imagens.
 
-void show_process_information (){
+void show_process_information (void){
 	
 	int i=0;
 	
 	struct process_d *p;	
     
-	printf("show_process_information: \n\n");
+	printf ("show_process_information: \n");
 	
 	for ( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
@@ -1337,8 +1347,12 @@ void show_process_information (){
 		if ( (void *) p != NULL && 
 		           p->used == 1 && 
 				   p->magic == 1234 )
-	    {   
-			printf ("PID=%d PPID=%d State=%d BaseAddress=%x ImageSize=%d DirectoryPA=%x DirectoryVA=%x iopl=%d prio=%d wait4pid=%d Name={%s}\n\n", 
+	    { 
+            
+            // #bugbug
+            // #todo Change that thing.
+            
+			printf ("PID=%d PPID=%d State=%d Base=%x Size=%d DirPA=%x DirVA=%x iopl=%d prio=%d wait4pid=%d Name={%s}\n\n", 
 				p->pid, 
 			    p->ppid,
 				p->state,
@@ -1354,7 +1368,7 @@ void show_process_information (){
 		//Nothing.
     };	
 	
-    printf ("done\n");
+    //printf ("done\n");
 	refresh_screen ();
 }
 
@@ -1403,10 +1417,11 @@ unsigned long GetProcessDirectory( struct process_d *process )
  *     Pega o endereço do diretório de páginas do processo.
  *     processGetPageDirValue()
  */
-unsigned long GetPageDirValue()
+
+unsigned long GetPageDirValue (void)
 {
-    return (unsigned long ) get_page_dir();
-};
+    return (unsigned long ) get_page_dir ();
+}
 
 
 
@@ -1420,13 +1435,13 @@ unsigned long GetPageDirValue()
  *            ficando a cargo dessa rotina inicializar a estrutura criada. 
  */ 
 
-int init_task(int id)
+int init_task (int id)
 { 
     //@todo: inicializar uma estrutura para um processo criado.
 	//obs: ja tem essa rotina feita em aalgum lugar..
 	
-    return (int) 0;   
-};
+    return 0;   
+}
 
 
 
@@ -1443,11 +1458,13 @@ int init_task(int id)
 //#bugbug
 //rever e deletar, se poss'ivel.
 
-void init_tasks ()
-{
-    init_processes();	
-};
+//#bugbug
+//os conceitos de tasks ainda estão misturados, hora é thread e hora é processo
 
+void init_tasks (void)
+{
+    init_processes ();	
+}
 
 
 /*
@@ -1458,7 +1475,7 @@ void init_tasks ()
  * usadas no gerenciamento de processo.
  */
  
-void init_processes (){
+void init_processes (void){
 	
     int i;	
 	
@@ -1482,9 +1499,11 @@ void init_processes (){
 	//
 	
 	i=0;
-	while(i < PROCESS_COUNT_MAX){
+    
+	while (i < PROCESS_COUNT_MAX)
+    {
 	    processList[i] = (unsigned long) 0;
-        ++i;
+        i++;
 	};
 
 
@@ -1492,9 +1511,9 @@ void init_processes (){
 	// @todo: mais algo??
 	//
 	
-Done:	
-	return;
-};
+//Done:	
+	//return;
+}
 
 
 /*
@@ -1660,18 +1679,17 @@ done:
 
 
 // ??
-int get_caller_process_id()
+int get_caller_process_id (void)
 {
 	return (int) caller_process_id;
-};
-
+}
 
 
 // ??
-void set_caller_process_id(int pid)
+void set_caller_process_id (int pid)
 {
 	caller_process_id = (int) pid;
-};
+}
 
 
 /*
@@ -1681,7 +1699,7 @@ void set_caller_process_id(int pid)
  *     processInitializeProcessManager();
  */
 
-int init_process_manager (){
+int init_process_manager (void){
 	
 	caller_process_id = (int) 0;
 	
@@ -1689,7 +1707,7 @@ int init_process_manager (){
 	
 	//...
 		
-	return (int) 0;
+	return 0;
 }
 
 

@@ -16,7 +16,7 @@
  * Find Higher priority thread if we can.
  */
  
-void preempt (){
+void preempt (void){
 
     int Current;
     int Next = 0;

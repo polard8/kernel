@@ -95,8 +95,8 @@ void *ipcProcedureEx( unsigned long callback,
 /*
  * ipc_dispatch_message:
  *    Despacha mensagens entre processos.
- *
  */						  
+
 int ipc_dispatch_message( unsigned long a, 
                           unsigned long b, 
 						  unsigned long c, 
@@ -121,26 +121,23 @@ int ipc_dispatch_message( unsigned long a,
 	int_args[4] = (unsigned long) c;    //arg3  (ch).
 	int_args[5] = (unsigned long) d;    //arg4.
 */
-//
-// Done.
-//
-//done:
-    return (int) -1;
-};
 
+// Done.
+
+    return (int) -1;
+}
 
 
 /*
  * init_ipc:
  *    Inicializa o ipc, 
- *    criando as áreas de tranferência usadas e 
- *    habilitando o ipc. 
- *
+ *    criando as áreas de tranferência usadas e habilitando o ipc. 
  */
-void init_ipc()
+
+void init_ipc (void)
 {  
     //return;    //Não implemantada ainda.
-};
+}
 
 
 /*
@@ -148,6 +145,7 @@ void init_ipc()
 int ipcmIpcm()
 {};
 */
+
 
 /*
 int ipcmInit()

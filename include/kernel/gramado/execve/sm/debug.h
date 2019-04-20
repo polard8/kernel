@@ -6,9 +6,10 @@
  */
 
   
-int debug();
-int debug_check_inicialization();
-int debug_check_drivers();
+int debug (void);
+int debug_check_inicialization (void);
+int debug_check_drivers (void);
+void debug_breakpoint (void);
 
 //retorna um checksum dado um buffer e um tamanho.
 unsigned long debug_compute_checksum( unsigned char *Buffer, unsigned long Lenght);
@@ -17,6 +18,6 @@ unsigned long debug_compute_checksum( unsigned char *Buffer, unsigned long Lengh
 void debug_print ( char *data );
 
 //
-//fim.
+// End.
 //
 

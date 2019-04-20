@@ -85,33 +85,39 @@ struct rtc_d
 	//Monsters ...
 	//...
 };
-rtc_t *Rtc;
-rtc_t *rtc;
 
+struct rtc_d *Rtc;
+struct rtc_d *rtc;	
 
+//rtc_t *Rtc;
+//rtc_t *rtc;
 
 
 //
 // IRQ8.
 //
 
-void KiRtcIrq(); 
-void rtc_irq();
+void KiRtcIrq (void); 
+void rtc_irq (void);
 
 
 //
 // Prototypes.
 //
 
-int init_clock();
+int init_clock (void);
+
 unsigned long read_cmos_bcd(unsigned reg);
-unsigned long get_time();
-unsigned long get_date();
-void *get_cmos_info(); 
+
+unsigned long get_time (void);
+
+unsigned long get_date (void);
+
+void *get_cmos_info (void); 
 
 
-unsigned short rtcGetMaseMemory();
-unsigned short rtcGetExtendedMemory();
+unsigned short rtcGetExtendedMemory (void);
+unsigned short rtcGetMaseMemory (void);
 
 //
 // End.

@@ -4,16 +4,16 @@
  */
 
  
+
 #define TTYCHARS_COUNT_MAX 25    //80 
 #define TTYLINES_COUNT_MAX 25    //25 
+
 
 //#define DEVELOPER_TTYCHARS_MAX 25    //80
 //#define DEVELOPER_TTYLINES_MAX 25    //25 
 //... 
 
  
-
-
 //Contador de linhas usados na hora da criação de linhas.
 int ttyLineCounter;
 
@@ -22,9 +22,6 @@ int ttyCurrentX;
 int ttyCurrentY;
 
 
- 
-
- 
 /*
 //estrutura para tty
 //uma estrutura de tty deve estar associado a
@@ -51,7 +48,14 @@ struct tty_struct_d
 */
 
 
-//void *createTTYLine(); 
-int ttyInit();
+//void *createTTYLine (void); 
+
+int ttyInit (void);
+
+//
+// End.
+//
+
+
 
 

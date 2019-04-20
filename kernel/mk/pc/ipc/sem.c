@@ -159,11 +159,11 @@ void semaphore_up (struct semaphore_d *s){
 }
 
 
-void *create_semaphore()
+void *create_semaphore (void)
 {
 	//@todo:
     return NULL;
-};
+}
 
 
 void delete_semaphore(struct semaphore_d *s)

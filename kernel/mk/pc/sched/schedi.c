@@ -271,7 +271,7 @@ fail:
  *     Essa rotina deve ter retorno do tipo 'int'.
  */
  
-int KiScheduler (){
+int KiScheduler (void){
     
 	// ?? Quem está chamando ? Filtros ?
     // @todo: Talvez haja mais casos onde não se deva trocar a tarefa.
@@ -305,6 +305,7 @@ int KiScheduler (){
  
 /* KiSelectNextThread: */ 
 /* #todo: rever isso */
+
 int KiSelectNextThread (int current ){
 	
 	//
@@ -359,24 +360,23 @@ void KiDoThreadDead (int id){
  *     ??
  *    @todo: Mudar para KiSchedulerNewThread().
  */
-void KiNewTaskScheduler()
+
+void KiNewTaskScheduler (void)
 {
-    //return;    //Cancelada.
-};
+    // Cancelada.
+}
 
 
 /*
  * KiDispatchTask:
  *     Executa uma thread pronta pra rodar.
  *     @todo: Mudar para KiDispatchThread(int tid);
- *
  */
-void KiDispatchTask()
-{
-	//...
-//done:
-    //return;
-};
+
+void KiDispatchTask (void)
+{    
+    //...
+}
 
 
 
@@ -399,10 +399,10 @@ void KiSetCurrent (int id){
  *     Pega o tid da thread atual.
  */
  
-int KiGetCurrent (){
+int KiGetCurrent (void){
 	
     return (int) get_current ();
-};
+}
 
 
 /*
@@ -411,17 +411,20 @@ int KiGetCurrent (){
  *     #bugbug: Esse nome é inapropriado.
  */
  
-int KiGetCurrentTask (){
+int KiGetCurrentTask (void){
 	
     return (int) get_current_task(); 
-};
+}
 
 
-/* Obtendo o TID da thread atual. */
-int get_current (){
-	
+/* 
+ * Obtendo o TID da thread atual. 
+ */
+
+int get_current (void)
+{
 	return (int) current_thread;
-};
+}
 
 
 /* #deletar
@@ -429,10 +432,11 @@ int get_current (){
  *     Pega o id da thread atual.
  *    @todo: Criar scheduleriGetCurrentTID();
  */
-int get_current_task (){
-	
+
+int get_current_task (void)
+{	
     return (int) get_current();
-};
+}
 
 
 /* #todo: mudar para set_current_thread ( int tid ). */
@@ -723,13 +727,11 @@ done:
  *     Procura na lista de threads no 
  * estado StandyBy.
  * Se tiver uma thread nessa lista, ela se torna 
- * a current. Para rodar pela primeira vez, 
- * atravéz de Spawn.
+ * a current. Para rodar pela primeira vez, atravéz de Spawn.
  * Não retorna se encontrar uma threa na lista.
- *
  */
  
-void check_for_standby (){
+void check_for_standby (void){
 	
     int newId;
 	
@@ -804,16 +806,15 @@ do_spawn:
 
 
 /*
- *****************************************************
  * check_quantum:
  *     Checa o quantum atribuido às threads da lista.
  *     Seleciona a primeira thread encontrada com o 
  * quantum no limite. #todo: rever isso.
  *
  * @todo: Mudar para schediCheckThreadQuantum();
- *
  */
-int check_quantum (){
+
+int check_quantum (void){
 	
     //int newId;	
 	

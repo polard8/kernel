@@ -13,10 +13,11 @@
 /*
  ******************************************************
  * newPageFrame:
- *    Aloca apenas uma página e retorna retorna o ponteiro de estrutura de página.
+ *    Aloca apenas uma página e retorna retorna o ponteiro de 
+ * estrutura de página.
  */
 
-void *page (){
+void *page (void){
 	
 	//#importante: 
 	//Essa estrutura é para frame na memória física.
@@ -80,7 +81,7 @@ fail:
  * Para isso usaremos o alocador de frames de memória física.
  */
 
-void *newPage (){
+void *newPage (void){
 	
 	//#importante: 
 	//Essa estrutura é para frame na memória física.	

@@ -73,9 +73,10 @@ struct event_d
 }
 */
 
-void set_current_keyboard_responder( int i );
-int get_current_keyboard_responder();
-void set_current_mouse_responder( int i );
-int get_current_mouse_responder();
+void set_current_keyboard_responder ( int i );
+int get_current_keyboard_responder (void);
+
+void set_current_mouse_responder ( int i );
+int get_current_mouse_responder (void);
 
 

@@ -1154,16 +1154,21 @@ unsigned long memorysizeAvailableVirtualMemory;
 //
 // Protótipos.
 //
-void memoryShowMemoryInfo();
+
+void memoryShowMemoryInfo (void);
 
 //
 // Init support.
 //
 
-int init_mm(); 
-int init_stack();
-int SetUpPaging();    //Configura paginação.
-void SetCR3(unsigned long address);
+int init_mm (void); 
+
+int init_stack (void);
+
+//Configura paginação.
+int SetUpPaging (void);    
+
+void SetCR3 (unsigned long address);
 
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 
@@ -1178,7 +1183,7 @@ unsigned long mapping_ahci1_device_address ( unsigned long address );
 
 //deve retornar o endereço do diretório de páginas criado,
 //que é um clone do diretório de páginas do kernel.
-void *CreatePageDirectory ();
+void *CreatePageDirectory (void);
 
 
 //
@@ -1190,31 +1195,31 @@ void *CreatePageTable ( unsigned long directory_address,
                         int offset, 
 					    unsigned long region_address );
 
-					   
-				
-					   
-//
-// 
-//
 
 int pEmpty (struct page_d *p);
 void freePage (struct page_d *p);
 void notfreePage (struct page_d *p);	
 
-int firstSlotForAList(int size);
+int firstSlotForAList (int size);
 
 //?? Talvez tenha que mudar de nome.
 //checar se estamos lidando com páginas ou com frames.
-void initializeFramesAlloc();
+void initializeFramesAlloc (void);
 
 
 //construtur
 //cria uma estrutura válida de página
 //cujo ponteiro ficará em uma lista.
-void *page ();  	
+
+void *page (void);  	
+
 void *allocPages (int size);
-void *newPage ();             //aloca uma página e retorna seu endereço virtual inicial
-void testingPageAlloc ();     //@todo: Rotina de teste. deletar.
+
+ //aloca uma página e retorna seu endereço virtual inicial
+void *newPage (void);            
+
+
+void testingPageAlloc (void);     //@todo: Rotina de teste. deletar.
 
 
 unsigned long 
@@ -1226,7 +1231,7 @@ virtual_to_physical ( unsigned long virtual_address,
 // Debug support.
 //
 
-void show_memory_structs();
+void show_memory_structs (void);
 
 //mostra as estruturas de pagina usadas para paginação no pagedpool.
 void showFreepagedMemory ( int max );
@@ -1236,11 +1241,11 @@ void showFreepagedMemory ( int max );
 // GC. #test
 //
 
-int gc ();
-int gcGRAMADO ();
-int gcEXECUTIVE ();
-int gcMICROKERNEL ();
-int gcHAL ();
+int gc (void);
+int gcGRAMADO (void);
+int gcEXECUTIVE (void);
+int gcMICROKERNEL (void);
+int gcHAL (void);
 
 
 

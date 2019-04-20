@@ -13,6 +13,7 @@
 
 
 /* cursor */
+
 #define CURSOR_DRAW     (1)
 #define CURSOR_ERASE    (2)
 #define CURSOR_MOVE     (3) 
@@ -78,11 +79,11 @@ typedef enum {
  *********************************************
  * cursor_d:
  *     Estrutura de suporte à cursor.
- *     Essa estrutura deve ser incluída na 
- * estrutura de janela.
- *
+ *     Essa estrutura deve ser incluída na estrutura de janela.
  */
+
 typedef struct cursor_d cursor_t;
+
 struct cursor_d
 {
 	//Object.
@@ -118,9 +119,11 @@ cursor_t *DeveloperWindowCursor; //test?? Cursor da janela do desenvolvedor.
 
 
 //Cursor.
-void set_up_cursor(unsigned long x, unsigned long y);
-unsigned long get_cursor_x();
-unsigned long get_cursor_y();
+
+void set_up_cursor (unsigned long x, unsigned long y);
+
+unsigned long get_cursor_x (void);
+unsigned long get_cursor_y (void);
 
 //
 // End.

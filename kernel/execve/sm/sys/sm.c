@@ -56,10 +56,12 @@ int xx_server();
  * init_systemserver:
  *     System server supprt.
  */
-int init_systemserver()
+
+int init_systemserver (void)
 {
-    return (int) 0;  //Ainda não implementada.
-};
+    return 0;  //Ainda não implementada.
+}
+
 
 /*
 int serverInit();

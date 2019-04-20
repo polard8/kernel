@@ -22,8 +22,12 @@
 #include <kernel.h>
 
 
+//protóripo de função interna.
+void xxxRing0Idle (void);
 
 // ==============  idle thread in ring 0  ===============
+
+
 
    //#test
     //Ok, está funcionando. :)
@@ -37,7 +41,8 @@
 	// É necessário de decrementemos o contador.
 
 // Isso é uma thread em ring 0 que será usada como idle.
-void xxxRing0Idle (){
+
+void xxxRing0Idle (void){
 	
 Loop:
 	
@@ -70,7 +75,7 @@ Loop:
  *    Para o processador ficar em hlt quando não tiver outra thread rodando.
  */
 
-void *KiCreateRing0Idle (){
+void *KiCreateRing0Idle (void){
 	
     void *ring0IdleStack;                    // Stack pointer. 	
 	
@@ -277,7 +282,7 @@ void *KiCreateRing0Idle (){
  *
  */
 
-int fork (){
+int fork (void){
 	
     //struct process_t *p;
 	
@@ -286,14 +291,13 @@ int fork (){
 	//...
 	
 	//dofork();
-	
-//done:	
 
 	//return (int) p->pid;
-	return (int) 0;    //Ainda não implementada. 
-};
-
- 
+	
+	//Ainda não implementada.
+	
+	return 0;     
+}
 
 
 /*
@@ -305,17 +309,12 @@ int fork (){
  *           ex: fork.c
  */
 
-int KiFork (){
+int KiFork (void){
 	
 	//@todo Criar interface
 	
 	return (int) fork();
-};
-
-
-
-
-
+}
 
 
 
@@ -324,10 +323,10 @@ int KiFork (){
  * @todo: Substituir a palavra task por thread. KiShowPreemptedThread
  */
 
-void KiShowPreemptedTask ()
+void KiShowPreemptedTask (void)
 {
     //return;
-};
+}
 
  
 /*
@@ -349,7 +348,7 @@ void KiSetTaskStatus (unsigned long status)
  * #bugbgu task não é um termo usado.
  */
 
-unsigned long KiGetTaskStatus (){
+unsigned long KiGetTaskStatus (void){
 	
     return (unsigned long) get_task_status (); 
 }
@@ -369,15 +368,7 @@ void KiSaveContextOfNewTask ( int id, unsigned long *task_address ){
 };
 
 
-/*
- * KiReloadCurrentTask #deletar
- *  @todo: Substituir a palavra task por thread. KiReloadCurrentThread.
- *
- */
-void KiReloadCurrentTask (){
-	
-    //return;
-};
+ 
 
 
 /* #todo: ?? de quem ?? processo ou thread */
@@ -387,24 +378,25 @@ void KiSetQuantum (unsigned long q){
 };
 
 
-unsigned long KiGetQuantum (){
-	
+unsigned long KiGetQuantum (void)
+{	
     return (unsigned long) 0; 
-};
+}
 
 
 /* #todo: ?? de quem ?? processo ou thread */
 void KiSetCurrentQuantum (unsigned long q){
 	
     //return;
-};
+}
 
 
 /* #todo: ?? de quem ?? processo ou thread */
-unsigned long KiGetCurrentQuantum (){
-	
+
+unsigned long KiGetCurrentQuantum (void)
+{	
     return (unsigned long) 0; 
-};
+}
 
 
 /* #todo: ?? de quem ?? processo ou thread */
@@ -414,11 +406,16 @@ void KiSetNextQuantum ( unsigned long q ){
 };
 
 
-/* #todo: ?? de quem ?? processo ou thread */
-unsigned long KiGetNextQuantum (){
-	
+/* 
+ #todo: 
+  ?? de quem 
+  ?? processo ou thread 
+  */
+
+unsigned long KiGetNextQuantum (void)
+{	
     return (unsigned long) 0; 
-};
+}
 
 
 /* #todo: ?? de quem ?? processo ou thread */
@@ -428,31 +425,45 @@ void KiSetFocus (int pid){
 };
 
 
-/* #todo: ?? de quem ?? processo ou thread */
-int KiGetFocus (){
-	
-    return (int) 0; 
-};
+/* 
+ #todo: 
+ ?? de quem ?? 
+ processo ou thread 
+ janela ???
+ */
+
+int KiGetFocus (void)
+{	
+    return 0;  //#bugbug 
+}
 
 
-/* #todo: chamar função em debug.c */
-void KiDebugBreakpoint (){
-	
-};
+/* 
+ #todo: 
+ chamar função em debug.c 
+ */
+
+void KiDebugBreakpoint (void)
+{
+	//
+}
 
 
 /* #deletar */
-void KiShowTasksParameters (){
-	
+void KiShowTasksParameters (void)
+{	
     //return;
-};
+}
 
 
-/* #todo: mudar nomes */
-void KiMostraSlots (){
-	
+/* 
+ #todo: mudar nomes 
+ */
+
+void KiMostraSlots (void)
+{	
 	mostra_slots();
-};
+}
 
 
 /* #todo: mudar nomes */
@@ -476,10 +487,11 @@ void KiMostraReg (int id){
  * threads existentes em 
  * threadList[i]. (as primeiras da lista).
  */
-void KiShowThreadList (){
+
+void KiShowThreadList (void){
 	
-    mostra_slots();
-};
+    mostra_slots ();
+}
 
 
 /*
@@ -787,19 +799,22 @@ unsigned long GetThreadDirectory ( struct thread_d *thread ){
  *
  *    @todo: Criar uma variavel global que identifique
  *           a tarefa com contexto salvo.
- *
  */
-void show_preempted_task(){
-    
+
+void show_preempted_task (void)
+{
 	//return;
-};
+}
 
 
-/* #deletar */
-void show_tasks_parameters(){  
-	
-	//return; 
-};
+/* 
+ #deletar 
+ */
+
+void show_tasks_parameters (void)
+{  	
+	// 
+}
 
 
 
@@ -982,21 +997,19 @@ done:
 
 
 /*
- **********************************************************
  * dead_thread_collector:
  *     Procura por uma thread no estado zombie mata ela.
- *
- * @todo
- *     Alerta o processo que a thread morreu.
+ *     #todo: Alertar o processo que a thread morreu.
  */
  
-void dead_thread_collector (){
+void dead_thread_collector (void){
 	
-	int i;
-    struct thread_d *Thread;   	  
+	register int i = 0;
+    
     struct process_d *p;         
+	struct thread_d *Thread;   	  
 	
-//Scan:
+    // Scan
 	
 	for ( i=0; i < THREAD_COUNT_MAX; i++ )
 	{
@@ -1048,17 +1061,15 @@ void dead_thread_collector (){
 	//@todo:
 	// * MOVEMENT 10 (zombie --> Dead)
 	// * MOVEMENT 11 (zombie --> Initialized) .. reinicializar.	
-};
+}
 
 
-void kill_all_threads (){
+void kill_all_threads (void){
 	
-	int i;
+	register int i = 0;
     
-	for ( i=0; i < THREAD_COUNT_MAX; i++ ){
-		
-	    kill_thread (i);	
-	}
+	for ( i=0; i < THREAD_COUNT_MAX; i++ )
+		kill_thread (i);	
 }
 
 

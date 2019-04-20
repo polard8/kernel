@@ -14,8 +14,8 @@
 VERSION = 1
 PATCHLEVEL = 3
 SUBLEVEL = 0
-EXTRAVERSION = -rc5
-NAME = 
+EXTRAVERSION = 0
+NAME = NoName
 
 
 ARCH ?= x86
@@ -33,6 +33,25 @@ ARCH ?= x86
 #todo:
 #We need to simplify these flags, but it's working.
 
+
+#funciona
+#CFLAGS = -m32 \
+#	--std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-no-pie \
+#	-fleading-underscore \
+#	-fno-stack-protector \
+#	-s   
+
+
+#tests
 CFLAGS = -m32 \
 	--std=gnu89 \
 	-nodefaultlibs \
@@ -46,8 +65,35 @@ CFLAGS = -m32 \
 	-no-pie \
 	-fleading-underscore \
 	-fno-stack-protector \
-	-s   
+	-s \
+    -Werror=strict-prototypes 
 	
+	
+	#importante:
+	##todo estamos incluindo essa flag, para isso temos que editar 
+	#os argumentos em muitas funções ainda..
+	#-Werror=strict-prototypes  
+	
+	
+	
+#testando esses
+#	-Wno-trigraphs \
+#	-Wno-format-security \
+#	-fno-strict-aliasing \
+#    -Werror=implicit-int \
+#	-Werror=implicit-function-declaration \
+#	-fshort-wchar \
+#	-Wundef 	
+#testing ...
+#-Wall                        fail
+#-fno-common                  fail
+#-Werror=strict-prototypes    fail	 Warn for functions declared or defined without specified argument types.
+#-E                           fail
+#-Wunused-function
+#-Wmissing-prototypes
+
+
+
 
 ##
 ## Defines
@@ -83,14 +129,14 @@ ifeq ($(ARCH),x86)
 	hal.o 
 	
 	KDRIVERS_OBJECTS := ahci.o \
-	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
 	ata.o atadma.o atainit.o atairq.o atapci.o hdd.o \
 	channel.o network.o nicintel.o nsocket.o \
 	pci.o pciinfo.o pciscan.o \
 	tty.o \
 	usb.o \
-	apic.o pic.o rtc.o screen.o serial.o timer.o video.o vsync.o 
-
+	video.o vsync.o screen.o \
+	i8042.o keyboard.o mouse.o ps2kbd.o ps2mouse.o \
+	apic.o pic.o rtc.o serial.o timer.o  
 	
 	KSERVERS_OBJECTS := cf.o format.o fs.o read.o search.o write.o \
 	bg.o bmp.o button.o char.o createw.o dtext.o font.o grid.o \
@@ -225,24 +271,15 @@ compile-kernel:
 	gcc -c kernel/kdrivers/apic.c    -I include/ $(CFLAGS) -o apic.o
 	gcc -c kernel/kdrivers/pic.c     -I include/ $(CFLAGS) -o pic.o
 	gcc -c kernel/kdrivers/rtc.c     -I include/ $(CFLAGS) -o rtc.o
-	gcc -c kernel/kdrivers/screen.c  -I include/ $(CFLAGS) -o screen.o
 	gcc -c kernel/kdrivers/serial.c  -I include/ $(CFLAGS) -o serial.o
 	gcc -c kernel/kdrivers/timer.c   -I include/ $(CFLAGS) -o timer.o
-	gcc -c kernel/kdrivers/video.c   -I include/ $(CFLAGS) -o video.o
-	gcc -c kernel/kdrivers/vsync.c   -I include/ $(CFLAGS) -o vsync.o
+
 
 	# kdrivers/ahci 
 	# todo
 	gcc -c kernel/kdrivers/ahci/ahci.c  -I include/ $(CFLAGS) -o ahci.o
 	
-	# kdrivers/i8042
-	gcc -c kernel/kdrivers/i8042/i8042.c     -I include/ $(CFLAGS) -o i8042.o
-	gcc -c kernel/kdrivers/i8042/keyboard.c  -I include/ $(CFLAGS) -o keyboard.o
-	gcc -c kernel/kdrivers/i8042/mouse.c     -I include/ $(CFLAGS) -o mouse.o
-	gcc -c kernel/kdrivers/i8042/ps2kbd.c    -I include/ $(CFLAGS) -o ps2kbd.o
-	gcc -c kernel/kdrivers/i8042/ps2mouse.c  -I include/ $(CFLAGS) -o ps2mouse.o
-	
-	
+		
 	#ide support
 	gcc -c kernel/kdrivers/ide/hdd.c      -I include/ $(CFLAGS) -o hdd.o
 	gcc -c kernel/kdrivers/ide/ata.c      -I include/ $(CFLAGS) -o ata.o
@@ -267,6 +304,19 @@ compile-kernel:
 
 	# kdrivers/usb
 	gcc -c kernel/kdrivers/usb/usb.c  -I include/ $(CFLAGS) -o usb.o
+	
+	# kdrivers/x
+	gcc -c kernel/kdrivers/x/video.c   -I include/ $(CFLAGS) -o video.o
+	gcc -c kernel/kdrivers/x/vsync.c   -I include/ $(CFLAGS) -o vsync.o
+	gcc -c kernel/kdrivers/x/screen.c  -I include/ $(CFLAGS) -o screen.o
+	# kdrivers/x/i8042
+	gcc -c kernel/kdrivers/x/i8042/i8042.c     -I include/ $(CFLAGS) -o i8042.o
+	gcc -c kernel/kdrivers/x/i8042/keyboard.c  -I include/ $(CFLAGS) -o keyboard.o
+	gcc -c kernel/kdrivers/x/i8042/mouse.c     -I include/ $(CFLAGS) -o mouse.o
+	gcc -c kernel/kdrivers/x/i8042/ps2kbd.c    -I include/ $(CFLAGS) -o ps2kbd.o
+	gcc -c kernel/kdrivers/x/i8042/ps2mouse.c  -I include/ $(CFLAGS) -o ps2mouse.o
+
+
 
 	# devmgr
 	gcc -c kernel/execve/devmgr/devmgr.c  -I include/ $(CFLAGS) -o devmgr.o

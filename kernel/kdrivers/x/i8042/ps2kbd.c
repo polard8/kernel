@@ -12,19 +12,23 @@
 
 #include <kernel.h>
 
+
+int BAT_TEST (void);
  
 
 // Esta função será usada para ler dados do teclado na porta 0x60, fora do IRQ1
-uint8_t keyboard_read (){
+
+uint8_t keyboard_read (void){
  
 	kbdc_wait (0);
 	
 	uint8_t val = inportb (0x60);
     
+	// ??
 	wait_ns (200);
     
-	return val;
-};
+	return (uint8_t) val;
+}
 
 
 // Esta função será usada para escrever dados do teclado na porta 0x60, fora do IRQ1
@@ -34,12 +38,13 @@ void keyboard_write (uint8_t write){
 	
 	outb (0x60,write);
     
-	wait_ns(200);
-};
+	// ??
+	wait_ns (200);
+}
 
 
 // Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
-int BAT_TEST (){
+int BAT_TEST (void){
 	
     int val = -1;
 	
@@ -99,7 +104,7 @@ int BAT_TEST (){
  *         criar a variável keyboard_type ;;; ABNT2 
  */
 
-void ps2_keyboard_initialize (){
+void ps2_keyboard_initialize (void){
 	
 	
 	//printf ("ps2_keyboard_initialize: 1\n");
@@ -348,13 +353,14 @@ unsigned long keyboardGetKeyState ( unsigned char key ){
 	//Nothing.
 
     return (unsigned long) State;		
-};
+}
 
 
 // Inicializa o status das teclas de modificação.
 // são usadas em comjunto com outras teclas para criar atalhos.
 // modificam temporariamente a função de outra tecla.
-void ldisc_init_modifier_keys (){
+
+void ldisc_init_modifier_keys (void){
 	
 	// Modifier keys.
 	
@@ -372,12 +378,13 @@ void ldisc_init_modifier_keys (){
 	//fn_status = 0;  //@todo
 	
 	//...
-};
+}
 
 
 // modificam permanentemente a função de outra tecla.
 //ativa as teclas extendidas.
-void ldisc_init_lock_keys (){
+
+void ldisc_init_lock_keys (void){
 	
     // Capital Lock.	
 	capslock_status = 0;
@@ -387,7 +394,7 @@ void ldisc_init_lock_keys (){
 	
 	// Number Lock.
 	numlock_status = 0;	
-};
+}
 
 
 /*
@@ -395,7 +402,7 @@ void ldisc_init_lock_keys (){
  *     Enable keyboard.
  */
 
-void keyboardEnable (){
+void keyboardEnable (void){
 	
 	//Wait for bit 1 of status reg to be zero.
     
@@ -405,7 +412,7 @@ void keyboardEnable (){
 	};
 	
 	//Send code for setting Enable command.
-    outportb(0x60,0xF4);
+    outportb (0x60,0xF4);
     //sleep(100);
 }
 
@@ -415,7 +422,7 @@ void keyboardEnable (){
  *     Disable keyboard.
  */
 
-void keyboardDisable (){
+void keyboardDisable (void){
 	
 	//Wait for bit 1 of status reg to be zero.
     
@@ -425,7 +432,7 @@ void keyboardDisable (){
 	};
 	
 	//Send code for setting disable command.
-    outportb(0x60,0xF5);
+    outportb (0x60,0xF5);
     //sleep(100);
 }
 
@@ -588,7 +595,7 @@ unsigned long KbGetLongParam2 (int tid){
  *    + Outras ...
  */
  
-void reboot (){
+void reboot (void){
     
     //@todo: 
 	// +criar uma variavel global que especifique o tipo de reboot.
@@ -650,41 +657,38 @@ void reboot (){
 	
 	// @todo: disable();
 	
-//
-// Done.
-//
+    // Done.
 
     hal_reboot ();
 	die ();
-};
-
+}
 
 
 //Get alt Status.
-int get_alt_status (){
-	
+int get_alt_status (void)
+{	
     return (int) alt_status;
-};
-
+}
 
 //Get control status.
-int get_ctrl_status (){
-	
+int get_ctrl_status (void)
+{	
     return (int) ctrl_status;
-};
-
+}
  
-int get_shift_status (){
-	
+//Get shift status.
+int get_shift_status (void)
+{	
     return (int) shift_status;	
-};
- 
+}
+
 
 /*
  * kbdc_wait:
  *     Espera por flag de autorização para ler ou escrever.
  *     (Nelson Cole) 
  */
+
 void kbdc_wait (unsigned char type){
 	
 	if (type==0)
@@ -711,18 +715,18 @@ void kbdc_wait (unsigned char type){
 };
 
 
-//?? isso tá sem protótipo ??
+//events.h
 void set_current_keyboard_responder ( int i ){
 	
 	current_keyboard_responder = i;
-};
+}
 
 
-//?? isso tá sem protótipo ??
-int get_current_keyboard_responder (){
+//events.h
+int get_current_keyboard_responder (void){
 	
 	return (int) current_keyboard_responder;
-};
+}
 
 
 /*
@@ -753,5 +757,12 @@ void keyboard()
 	return;
 }
 */
+
+//
+// End.
+//
+
+
+
 
 

@@ -18,11 +18,7 @@
 #include <kernel.h>
 
 
-//@todo: mudar o nome da função para fs_clear_fat.
-void fs_apaga_fat (){
-	
-    fs_init_fat ();
-}
+ 
 
 
 void fs_delete_entry ( unsigned long id, unsigned long eid )
@@ -36,7 +32,8 @@ void fs_delete_entry ( unsigned long id, unsigned long eid )
  * fsClearFat:
  *      Zera o buffer e grava zeros no hd.
  */
-void fsClearFat (){
+
+void fsClearFat (void){
 	
 	//int i;
     //unsigned char *fat_base = (unsigned char *) FAT16_FAT_ADDRESS;

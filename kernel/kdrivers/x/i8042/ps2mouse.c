@@ -15,6 +15,8 @@ extern unsigned long SavedX;            //Screen width.
 extern unsigned long SavedY;            //Screen height.
 
 
+int MOUSE_BAT_TEST (void);
+
 /*
  * mouse_write:
  *     Envia um byte para a porta 0x60.
@@ -31,20 +33,22 @@ void mouse_write (unsigned char write){
 
 
 /*
+ **************************
  * mouse_read:
  *     Pega um byte na porta 0x60.
- *     (Nelson Cole) */
+ *     (Nelson Cole) 
+ */
 
-unsigned char mouse_read (){
+unsigned char mouse_read (void)
+{	
+	kbdc_wait (0);
 	
-	kbdc_wait(0);
-	
-	return inportb(0x60);
+	return (unsigned char) inportb (0x60);
 }
 
 
 // Esta rotina faz o Auto-teste 0xaa êxito, 0xfc erro
-int MOUSE_BAT_TEST (){
+int MOUSE_BAT_TEST (void){
     
     int val = -1;
 	
@@ -90,10 +94,10 @@ int MOUSE_BAT_TEST (){
 /*
  **********************
  * mouse_install:
- *
+ *     ...
  */
 
-void mouse_install (){
+void mouse_install (void){
 	
 	
 	//printf ("mouse_install: 1\n");
@@ -174,14 +178,13 @@ void kernelPS2MouseDriverReadData (void){
 
 
 /*
- **********************************************************
  * load_mouse_bmp:  ## teste ##
  *     Carregando o arquivo MOUSE.BMP que é o ponteiro de mouse.
  *     Usar isso na inicialização do mouse.
  *     #bugbug isso pode ir para windowLoadGramadoIcons
  */
 
-int load_mouse_bmp (){
+int load_mouse_bmp (void){
 	
 	int Status = 1;
 	int Index;
@@ -259,18 +262,18 @@ done:
 
 
 
-//?? isso tá sem protótipo ??
+// events.h
 void set_current_mouse_responder ( int i ){
 	
     current_mouse_responder = i;	
-};
+}
 
 
-//?? isso tá sem protótipo ??
-int get_current_mouse_responder (){
+// events.h
+int get_current_mouse_responder (void){
 	
     return (int) current_mouse_responder;	
-};
+}
 
 
 //==================================================================================
@@ -367,7 +370,6 @@ quit:
 
 /*
  ********************************************************
- ********************************************************
  * mouseHandler:
  *     Handler de mouse. 
  *
@@ -377,7 +379,6 @@ quit:
  *
  * @todo: Essa rotina não pertence ao line discipline.
  * Obs: Temos externs no início desse arquivo.
- * 
  */
  
 #define MOUSE_DATA_BIT 1
@@ -393,9 +394,10 @@ static char buffer_mouse[3];
 
 
 int flagRefreshMouseOver;
-	
-void mouseHandler (){
-	
+
+
+void mouseHandler (void)
+{	
     // #importante:
 	// Essa será a thread que receberá a mensagem
 	
@@ -1064,14 +1066,12 @@ void mouseHandler (){
  *     Configurando o controlador PS/2, 
  *     e activar a segunda porta PS/2 (mouse).
  *     (Nelson Cole)(Fred Nora)
- *
- * É uma rotina de inicialização do controlador i8042 para 
- * habilitar o segundo dispositivo, o mouse.
- * Essa rotina deve rodar somente uma vez, durante inicialização.
- *
+ *     É uma rotina de inicialização do controlador i8042 para 
+ *     habilitar o segundo dispositivo, o mouse.
+ *     Essa rotina deve rodar somente uma vez, durante inicialização.
  */
  
-void ps2_mouse_initialize (){
+void ps2_mouse_initialize (void){
 	
 	int error_code = 0;
 	
@@ -1223,7 +1223,8 @@ init_mouse_exit:
  *     Inicializando o mouse no controlador 8042.
  *     Carregando o bmp para o curso do mouse.
  */		
-int ps2_mouse_globals_initialize (){
+
+int ps2_mouse_globals_initialize (void){
 	
     unsigned char response = 0;
     unsigned char deviceId = 0;

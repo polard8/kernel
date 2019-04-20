@@ -8,16 +8,16 @@
 #include <kernel.h>
 
 
-void gwsSetCurrentFontAddress ( unsigned long address ){
-	
+void gwsSetCurrentFontAddress ( unsigned long address )
+{	
 	gws_currentfont_address = (unsigned long) address;
-};
+}
 
 
-unsigned long gwsGetCurrentFontAddress (){
-	
+unsigned long gwsGetCurrentFontAddress (void)
+{	
 	return (unsigned long) gws_currentfont_address;
-};
+}
 
 
 /* 

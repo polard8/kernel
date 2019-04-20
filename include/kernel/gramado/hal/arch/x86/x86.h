@@ -61,8 +61,8 @@
 
 // Instructions.
 
-int enable ();
-int disable ();
+int enable (void);
+int disable (void);
 
 int getFlags (int variable);
 int setFlags (int variable);
@@ -70,37 +70,37 @@ int setFlags (int variable);
 int Push (int value);
 int Pop (int variable);
 
-int pushRegs ();
-int popRegs ();
+int pushRegs (void);
+int popRegs (void);
 
-int pushFlags ();
-int popFlags ();
+int pushFlags (void);
+int popFlags (void);
 
 int getStackPointer (int addr);
 int setStackPointer (int addr);
 
-int farReturn ();
+int farReturn (void);
 
-int intReturn ();
+int intReturn (void);
 
-int stopCpu ();  
+int stopCpu (void);  
 
 
 // Cache.
 
-void cpux86_enable_caches();
+void cpux86_enable_caches (void);
 
 //
 // Init.
 //
 
-int init_intel ();
+int init_intel (void);
 
 //
 // Debug support.
 //
 
-void show_cpu_intel_parameters ();
+void show_cpu_intel_parameters (void);
 
 
 //

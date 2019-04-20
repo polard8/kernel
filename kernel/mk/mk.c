@@ -178,13 +178,15 @@ fail:
     return (int) -1;
 done:
     return (int) 0;	
-};
+}
+
 
 /*
  * microkernelTestLimit:
  * #bugbug: isso tem que ir pra for do kernel base.
  */
-void microkernelTestLimit(){
+
+void microkernelTestLimit (void){
 	
 	/*
 	
@@ -248,10 +250,10 @@ done:
 
 
 
-void sys_dead_thread_collector (){
-	
+void sys_dead_thread_collector (void)
+{	
     dead_thread_collector ();
-};
+}
 
 
 //exit process.
@@ -338,21 +340,21 @@ void *sys_create_thread( struct room_d *room,
  *     
  */
  
-int sys_fork (){
+int sys_fork (void){
 	
 	return (int) fork ();
-};
+}
 
 
 //Pega o id do processo atual.
-int sys_getpid (){
+int sys_getpid (void){
 	
 	return (int) current_process;
-};
+}
 
 
 //Pega o ID do processo pai do processo atual.
-int sys_getppid (){
+int sys_getppid (void){
 	
     int pid;
 	int ppid;
@@ -399,11 +401,9 @@ int sys_getppid (){
  *    + Lock the scheduler.
  *
  * @todo: Mudar para microkernelInit().
- *
  */
-//int microkernelInit() 
 
-int init_microkernel (){
+int init_microkernel (void){
 	
     int Status = 0;
 	
@@ -488,7 +488,7 @@ int init_microkernel (){
 #endif	
 
     return (int) Status;
-};
+}
 
 
 //

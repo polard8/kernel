@@ -5,10 +5,12 @@
 
 #include <kernel.h>
 
+int xxxinini;
+
+/*
 void xxxinput();
 void xxxinput(){}
-
-
+*/
 
 
 

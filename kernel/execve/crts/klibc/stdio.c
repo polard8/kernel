@@ -18,7 +18,6 @@
  *     
  * History:
  *     2015 - Create by Fred Nora.
- *
  */
   
  
@@ -39,9 +38,6 @@ extern unsigned long SavedBPP;
 //
 // Funções importadas.
 //
-
-extern void background();  //Assembly.
-extern void refresh_screen();
 
 
 /*
@@ -1472,7 +1468,7 @@ input_done:
  * inicialização da paginação.
  */
  
-int stdioInitialize (){
+int stdioInitialize (void){
 	
 	int Status = 0;
 	

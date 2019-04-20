@@ -20,9 +20,9 @@
 
 /*
  * get_current_windowstation:
- *
  */
-void *get_current_room (){
+
+void *get_current_room (void){
 	
     if ( current_room < 0 )
 	{
@@ -30,7 +30,7 @@ void *get_current_room (){
 	};
 	
     return (void *) roomList[current_room];
-};
+}
 
 
 /*
@@ -144,7 +144,8 @@ int RegisterRoom (struct room_d *room){
 /*
  * init_windowstation_list:
  */
-void init_room_list (){
+
+void init_room_list (void){
 	
     int i=0;
 	
@@ -154,14 +155,15 @@ void init_room_list (){
 		
 		i++; 
 	};
-};
+}
 
 
 /*
  * init_window_station:
  *     Inicializa o gerenciamento de window stations.
  */
-void init_room_manager (){
+
+void init_room_manager (void){
 	
     //printf("init_window_station: Initializing ...\n");
 	
@@ -176,7 +178,7 @@ void init_room_manager (){
 	
 	if ( (void *) room0 == NULL )
 	{
-	    printf("init_window_station fail: room0 Struct");
+	    printf ("init_window_station fail: room0 Struct");
 		die ();
 	};
 	
@@ -194,16 +196,16 @@ void init_room_manager (){
 	//...
 
     RegisterRoom (room0);
-	set_current_room (room0);   
 	
-	//printf("done\n");
-};
+	set_current_room (room0);   
+}
 
 
 /*
 int windowstationInit()
 {}
 */
+
 
 //
 // End.

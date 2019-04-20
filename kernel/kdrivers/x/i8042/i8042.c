@@ -25,11 +25,15 @@
  *     inicialização não for feita desse jeito. 
  */
  
-void ps2 (){
+void ps2 (void){
 	
 	
-	printf ("ps2: initializing ...\n");
+	printf ("ps2: Initializing..\n");
+	
+	// #debug
+	// #todo: Deletar isso.
 	refresh_screen();
+	
 	
     //printf("");	
 	//printf("ps2: Desabilitando as duas portas...\n");
@@ -79,10 +83,8 @@ void ps2 (){
 	//======================================
 	//
 
-    //
 	// ## step 1 ##
     // mouse	 
-    //
 
 	
 //mouse_initialization:	

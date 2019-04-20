@@ -1,5 +1,5 @@
 /*
- * File: sm\ob\object.c
+ * File: sm/ob/object.c
  *
  * Descrição:
  *   #importante: 
@@ -65,9 +65,9 @@
 /*
  * init_object_manager:
  *     Inicializa o gerenciador de objetos.
- *
  */
-int init_object_manager (){
+
+int init_object_manager (void){
 	
     int Status = 0;
 	
@@ -90,21 +90,17 @@ int init_object_manager (){
 	
 	
 	//@todo: initialize object List.
-	
-//Done.	
-//done:
 
     //Inicializado.
 	g_object_manager_status = 1;
 	g_module_objectmanager_initialized = 1;
 	
 #ifdef EXECVE_VERBOSE	
-	printf("Done\n");
+	printf ("Done\n");
 #endif	
     
 	return (int) Status;
-};
-
+}
 
 
 //
@@ -120,7 +116,8 @@ int objectmanagerInit()
 };
 */
 
+
 //
-// Fim.
+// End.
 //
 
