@@ -359,190 +359,20 @@ void x86mainStartFirstThread ( int n ){
 void x86main (void){
 
     int Status = 0;
-    int zIndex;
-	
-	//
-	// serial debug
-	//
-	
-	init_serial(COM1_PORT);
 
-	debug_print("x86main:\n");
-	
-    KernelStatus = KERNEL_NULL;
 
-    //Initializing the global spinlock.
-    __spinlock_ipc = 1;
-
-    // #test.
-    // initializing zorder list.
-	// isso não deve ficar aqui.
-    
-    for ( zIndex = 0; zIndex < ZORDER_COUNT_MAX; zIndex++ ){
-        zorderList[zIndex] = (unsigned long) 0;
-    }
-
-    //initializing zorder counter.
-    zorderCounter = 0;
-
-    // #deletar
-	// set system window procedure.
-    SetProcedure ( (unsigned long) &system_procedure);
-
-    //
-    // ## Video support ##
-    //
-	
-	
-	// First of all.
-    // ps: Boot loader is mapping the LFB.
-
-//setupVideo:
-
-    // @todo: 
-    // Device screen sizes.
-
-    //Set graphics mode or text mode using a flag.
-    if ( SavedBootMode == 1 )
-	{	
-        g_useGUI = GUI_ON;
-        VideoBlock.useGui = GUI_ON;
-        //...
-    }else{
-        g_useGUI = GUI_OFF;
-        VideoBlock.useGui = GUI_OFF;
-        //...
-    };
-	
-	
-	//verbose mode do kernel.
-    //initializes a new line when '\n' is found.
-	stdio_verbosemode_flag = 1;
-	
+	debug_print("[x86] x86main:\n");
 	
 
-	//video.c 
-	
-    videoVideo ();
-    videoInit ();
-	
-    // Init screen
-
-#ifdef ENTRY_VERBOSE	
-    //If we are using graphics mode.
-    if (VideoBlock.useGui == GUI_ON)
-	{
-		debug_print("x86main: Using GUI\n");
-        //printf("x86main: Using GUI\n");
-    }
-#endif
-
-	/*
-    //If we are using text mode.
-    if (VideoBlock.useGui != GUI_ON)
-	{
-		debug_print("x86main: text mode\n");
-		
-        set_up_text_color(0x0F, 0x00);
-
-        //g_current_vm = 0x800000;
-        //Set cga video memory: 0x800000vir = 0xb8000fis.
-        videoSetupCGAStartAddress(SCREEN_CGA_START); 
-
-    //Debug.
-#ifdef ENTRY_VERBOSE
-        kclear(0);
-        kprint("x86main: Debug" ,9 ,9 );
-        printf("x86main: Text Mode\n");
-#endif
-
-        //
-		// ## bug bug ##
-		//
-		
-		// Text mode not supported.
-
-		printf ("x86main: Text mode is the current mode. Its not supported.");
-		//die ();
-		while (1){
-			asm ("hlt");
-		}
-    };
-	*/
 
 #ifdef ENTRY_VERBOSE
-    debug_print("x86main: starting kernel ..\n");
+    debug_print("[x86] x86main: starting x86 kernel ..\n");
 	//printf("x86main: Starting kernel..\n");
     //refresh_screen(); 
 #endif
 	
 	
-	//#bugbug
-	//parece que chegamos at'e aqui, mas nao mostra as mensagens ...
-	//mas quando avançamos, quando cai num die() e mostra a mensagem.
-	
-    //printf ("x86main: debug breakpoint, real machine, gigabyte/intel ..\n");
-    //refresh_screen (); 
-   // while(1){}
-
-	
-
-	// #DEBUG
-	// breakpoint
-    // ok isso funcionou, vamos avançar
-    //lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
-   	//while(1){}
-
-	
-
-     //
-	 // #test
-	 // Tentaremos inicializar a runtime aqui.
-	 // para obtermos suporte ao texto o mais cedo possível.
-	 
-	 
-        //
-        // RUNTIME !
-        //	
-
-        //#bugbug:
-        //Somente depois da inicialização da runtime é que temos suporte a mensagens,
-        //mas queremos mensagens antes, antão vamos tentar antecipar a inicialização da runtime.		
-
-#ifdef EXECVE_VERBOSE		
-	    //printf("sm-sys-system-systemStartUp: Initializing Runtime..\n");
-	  debug_print("x86main: Initializing runtime\n");
-#endif	
-
-        //sm/rt/runtime.c
 		
-	    Status = (int) KiInitRuntime ();
-	    if ( Status != 0 )
-		{
-			debug_print("x86main: Runtime fail\n");
-	        //panic("x86main error: Runtime\n");
-	    }
-	
-	
-	// #DEBUG
-	// breakpoint
-    // essa 'e hard ... vamos tentar ap'os a configuraç~ao de mem'oria
-    
-	lfb_putpixel ( COLOR_YELLOW, 11, 11, 0 );
-   	//OK nao usaremos mais o pixel porque a partir daqui ja temos mensagens de string.
-	//while(1){}
-
-	
-	//#bugbug
-	//depois que a runtime está inicializada, então ja temos mensagem,
-	//pois temos os endereços virtuais dos buffers.
-	//Mas nossa inicialização está apresentando algum problema no Y,
-	//que se corrige apenas no momento do logon.
-			
-    //printf ("x86main: RUNTIME OK..\n");
-    //refresh_screen(); 
-    //while(1){}
-	
 //initializeSystem:
 
     //
@@ -551,6 +381,11 @@ void x86main (void){
 	
 	//#importante
 	//#obs: É durante essa rotina que começamos a ter mensagens.	
+	
+	//#importante
+	//Daqui pra frente tem coisa que é dependente da arquitetura x86 e coisa
+	//que não é ... talvez possamos mandar coisas
+	//que não são dependentes para main.c
 	
 	//system.c
 
@@ -567,17 +402,7 @@ void x86main (void){
         goto fail;
     }
 	
-    
-	// #DEBUG
-	// BREAKPOINT
-    // #importante: Isso funcionou ... gigabyte/intel.
-    // esse ser'a nosso porto seguro, caso a inicializaçao das threads falhem ...
-	// printf ("x86main: systemInit OK ..\n");
-    // printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
-    // refresh_screen(); 
-    // while(1){}	
-	
-	
+
 	//
 	//    #### GDT ####
 	//

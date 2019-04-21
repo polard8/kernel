@@ -1,7 +1,8 @@
-x86main:
-x86main: Using GUI
-x86main: starting kernel ..
+[Kernel] kernel_main:
+[Kernel] kernel_main: Using GUI
 KiInitRuntime
+[x86] x86main:
+[x86] x86main: starting x86 kernel ..
 systemInit:
 systemStartUp:
 init:

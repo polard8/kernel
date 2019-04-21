@@ -706,6 +706,13 @@ struct platform_d
 struct platform_d *Platform; 
 
 
+// inicialização do kernel, independente da arquitetura.
+int kernel_main (void);
+
+//inicialização da arquitetura x86.
+void x86main (void);
+//...
+
 
 //
 // Initializations support.  

@@ -114,7 +114,7 @@ CFLAGS = -m32 \
 ifeq ($(ARCH),x86)
 
 	#deveria ser headx86.o
-	ENTRY_OBJECTS := head.o x86main.o 
+	ENTRY_OBJECTS := head.o main.o x86main.o 
 	
 	EXECVE_OBJECTS := pipe.o socket.o cedge.o ctype.o  stdio.o stdlib.o string.o unistd.o \
 	devmgr.o \
@@ -190,6 +190,9 @@ compile-kernel:
 	# /entry
 	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.asm -f elf -o head.o
 	gcc -c kernel/entry/x86/x86main.c  -I include/ $(CFLAGS) -o x86main.o
+	
+    #main
+	gcc -c kernel/main.c  -I include/ $(CFLAGS) -o main.o
 
 	# /hal
 	gcc -c kernel/hal/hal.c                -I include/ $(CFLAGS) -o hal.o

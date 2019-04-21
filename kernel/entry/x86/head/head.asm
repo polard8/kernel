@@ -137,6 +137,10 @@ extern _dispatch_task
 ; Funções importadas.
 ;
 
+; entrada na rotina de inicialização independente da arquitetura.
+extern _kernel_main
+
+; entrada na rotina de inicialização da arquitetura x86.
 extern _x86main
 
 ;extern _KeStartIdle         ;Start Idle (entra em User Mode). 
@@ -723,7 +727,10 @@ dummyJmpAfterLTR:
 	
 	;; void x86main (void)
 	
-	call _x86main
+	;call _x86main
+	
+	call _kernel_main
+	
 	
 .hang:
     hlt
