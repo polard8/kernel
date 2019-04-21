@@ -187,16 +187,10 @@ void x86mainStartFirstThread ( int n ){
 	
     turn_task_switch_on ();
 
-	//#bugbug:
-	//Não podemos inicialziar o timer novamente,
-	//temos que aceitar a configuração que o kernel fez.
-	//mas essa rotina será a mesma usada como serviço 
-	//oferecido pelo kernel, para atualização do HZ.
-	//então vamos testá-la.
 	
     //timerInit8253 ( HZ );
-	timerInit8253 ( 800 );
-	
+	//timerInit8253 ( 800 );
+	timerInit8253 ( 900 );	    
     
     //nesse momento usaremos o mapeamento do processo alvo ..
     //no mapeamento do processo alvo tambem tem o kernel
@@ -277,7 +271,7 @@ void x86mainStartFirstThread ( int n ){
         asm volatile ( " movl $0x003FFFF0, %esp \n" 
 					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
                        " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"  // esp 
-                       " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
+                       " movl $0x3000,     %ds:0x08(%esp)  \n"  // eflags.
                        " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
                        " movl $0x00401000, %ds:0x00(%esp)  \n"  // eip. 
                        " movl $0x23, %eax  \n"

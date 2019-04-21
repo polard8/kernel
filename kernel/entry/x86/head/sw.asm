@@ -179,6 +179,25 @@ _int128:
 ;--  
   
 
+global _int129
+_int129:
+    pop dword [.frameEIP]
+    pop dword [.frameCS]
+    pop dword [.frameEFLAGS]
+   
+    mov dword [.frameEFLAGS], 0x3200
+
+    push dword [.frameEFLAGS]
+    push dword [.frameCS]
+    push dword [.frameEIP]
+    iretd
+
+.frameEIP: dd 0
+.frameCS: dd 0
+.frameEFLAGS: dd 0
+
+
+
 ;Change procedure.
 global _int201 
 _int201:

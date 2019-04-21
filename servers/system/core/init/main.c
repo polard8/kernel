@@ -253,8 +253,11 @@ int main ( int argc, char *argv[] ){
 	//printf ("INIT.BIN is alive!");
 
 	//window, x, y, color, string.
-    apiDrawText ( NULL, 0, 0, COLOR_RED, "INIT.BIN is alive!" );
+    apiDrawText ( NULL, 0, 0, COLOR_RED, "INIT.BIN is alive! int 129" );
 	refresh_screen ();
+	
+	
+	asm ("int $129 \n");
 	
 loop:
 	while (1){}

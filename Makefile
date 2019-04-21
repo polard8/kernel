@@ -12,10 +12,10 @@
 #We will have a new name just when the release changes.
 
 VERSION = 1
-PATCHLEVEL = 3
+PATCHLEVEL = 4
 SUBLEVEL = 0
-EXTRAVERSION = 0
-NAME = NoName
+EXTRAVERSION = -rc0
+NAME = 
 
 
 ARCH ?= x86

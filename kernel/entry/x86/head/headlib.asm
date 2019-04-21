@@ -448,6 +448,16 @@ setup_vectors:
 	call _setup_system_interrupt  
 
 
+    ;;#test
+    ;;Uma interrupção para habilitar as interrupções mascaráveis.
+    ;; quem usará isso será a thread primária do processo init.
+    ;; apenas uma vez.
+    
+	mov eax, dword _int129
+	mov ebx, dword 129
+	call _setup_system_interrupt  
+
+
     ;213
 	;Executa nova tarefa.
 	mov eax, dword _int213

@@ -288,20 +288,24 @@ setregion(struct region_descriptor_d *rd, void *base, size_t limit)
 
 
 void
-setsegment(struct segment_descriptor_d *sd, const void *base, size_t limit,
-    int type, int dpl, int def32, int gran)
+setsegment ( struct segment_descriptor_d *sd, 
+			 const void *base, 
+			 size_t limit,
+             int type, 
+			 int dpl, 
+			 int def32, 
+			 int gran )
 {
-
-	sd->sd_lolimit = (int)limit;
-	sd->sd_lobase = (int)base;
+	sd->sd_lolimit = (int) limit;
+	sd->sd_lobase = (int) base;
 	sd->sd_type = type;
 	sd->sd_dpl = dpl;
 	sd->sd_p = 1;
-	sd->sd_hilimit = (int)limit >> 16;
+	sd->sd_hilimit = (int) limit >> 16;
 	sd->sd_xx = 0;
 	sd->sd_def32 = def32;
 	sd->sd_gran = gran;
-	sd->sd_hibase = (int)base >> 24;
+	sd->sd_hibase = (int) base >> 24;
 }
 
 
@@ -326,20 +330,19 @@ setsegmentNR ( int number,
 
 
 /*
+ ***********************************
  * init_gdt:
  *     Cria uma TSS e configura algumas entradas na GDT.
  *     #todo O desafio aqui é configurar a TSS e testar na máquina real.
  */
 
-void init_gdt (void){
-	
 	// #bugbug
 	// Na máquina real o sistema é sensível a essa configuração.
 	// É nela que vamos trabalhar para que não falhe na hora do salto para ring3.
+
+void init_gdt (void){
 	
 	struct i386tss_d *tss;
-	
-	
 	
 	//
 	// Criando a estrutura de TSS e inicializando ela.
@@ -350,8 +353,7 @@ void init_gdt (void){
 	
 	if ( (void *) tss == NULL )
 	{
-	    printf ("init_gdt: tss fail\n");
-		die();
+	    panic ("init_gdt:");
 		
 	}else{
     
@@ -361,17 +363,27 @@ void init_gdt (void){
 		 // Dessa forma as threads poderão usar a mesma tss.
 		
 		 current_tss = tss;
-	}
+	};
+	
+	//
+	// Inicializando a GDT.
+	//
 	
 	
 	// NULL
     setsegment ( &xxx_gdt[GNULL_SEL], 0, 0, 0, 0, 0, 0);
 	
 	// ring 0
+	// SDT_MEMERA = 27 = 0x1B
+	// SDT_MEMRWA = 19 = 0x13
+	// SEL_KPL = 0
 	setsegment ( &xxx_gdt[GCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_KPL, 1, 1);
 	setsegment ( &xxx_gdt[GDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_KPL, 1, 1);
 	
 	// ring 3
+	// SDT_MEMERA = 27 = 0x1B
+	// SDT_MEMRWA = 19 = 0x13
+	// SEL_UPL = 3
 	setsegment ( &xxx_gdt[GUCODE_SEL], 0, 0xfffff, SDT_MEMERA, SEL_UPL, 1, 1);
 	setsegment ( &xxx_gdt[GUDATA_SEL], 0, 0xfffff, SDT_MEMRWA, SEL_UPL, 1, 1);
 	
@@ -386,6 +398,11 @@ void init_gdt (void){
 	//#bugbug: todo LDT size;
 	setsegment ( &xxx_gdt[GLDT_SEL], 0, 0xff, SDT_SYSLDT,  SEL_KPL, 0, 0);
 	//...
+	
+	
+	//
+	// Load GDT.
+	//
 	
 	
 	xxx_gdt_ptr.limit = (unsigned short) ((32 * sizeof(struct segment_descriptor_d) ) -1);
@@ -451,8 +468,17 @@ tss_init ( struct i386tss_d *tss, void *stack, void *func )
 }
 
 
-
-
+/*
+// Atualizando a pilha de ring 0 na tss atual.
+void tss_set_kernel_stack (unsigned long stack_address );
+void tss_set_kernel_stack (unsigned long stack_address )
+{
+    if ( (void *) current_tss == NULL )
+	    return;
+		
+	current_tss->tss_esp0 = stack_address;
+}
+*/
 
 
 
@@ -464,7 +490,12 @@ tss_init ( struct i386tss_d *tss, void *stack, void *func )
  
 int init_intel (void){
 	
-	cpux86_enable_caches ();
+	
+	// #bugbug
+	// Suspenso.
+	// Estamos testando os efeitos dessa rotina.
+	
+	//cpux86_enable_caches ();
 	
 	// Get info.
 	get_cpu_intel_parameters ();
