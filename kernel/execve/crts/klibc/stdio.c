@@ -18,6 +18,7 @@
  *     
  * History:
  *     2015 - Create by Fred Nora.
+ *     2019 - Revision.
  */
   
  
@@ -28,6 +29,7 @@
 // De onde vem isso ?? head.s
 // @todo: Devemos chamar o módulo hal para obtermos esses valores.
 //depois salvamos em variáveis internas usadas pela gui.
+
 extern unsigned long SavedBootBlock;
 extern unsigned long SavedLFB;
 extern unsigned long SavedX;
@@ -35,21 +37,23 @@ extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
 
 
-//
-// Funções importadas.
-//
+// Internas.
+
+//void scroll_screen_rect (void);
 
 
 /*
  *********************************************
  * fclose:
- *     Close a file. */
+ *     Close a file. 
+ */
 
 int fclose (FILE *stream){
 	
 	if ( (void *) stream == NULL )
 	{	
-	    return -1;		
+	    return (int) (-1);		
+		
 	}else{
 		
 		stream->_ptr = NULL;
@@ -66,7 +70,7 @@ int fclose (FILE *stream){
 	
 	//...
 
-	return (int) 0;
+	return 0;
 }
 
 
@@ -188,9 +192,10 @@ FILE *fopen ( const char *filename, const char *mode ){
 	
 	if ( fileret != 0 )
 	{	
-		printf("fopen: fsLoadFile fail\n");
+		printf ("fopen: fsLoadFile fail\n");
 		
 		stream = NULL;	
+		
 		return NULL;
 	}
 	
@@ -723,11 +728,13 @@ int printf ( const char *format, ... ){
 
 
 /*
- * puts: */
+ ******************
+ * puts: 
+ *     provisório ...
+ */
 
 int puts ( const char *str ){
 	
-	//provisório ...
 	return (int) printf ("%s",str);
 }
 
@@ -735,48 +742,23 @@ int puts ( const char *str ){
 /*
  *************************************************
  * panic:
- *     # isso não faz parte da lib c, poderia ir para o @field 3.
- *     Kernel panic function.
- *     @todo: Esse função deve retornar void.
- *     Essa função faz parte da libC ??
- *     Essa rotina deveria ir para outro lugar.
- *     provavelmente em /sm
+ *     klibc function to show a formated string and hang the system.
  */
  
 void panic ( const char *format, ... ){
-	
-	register int *varg = (int *)(&format);
-	
-	printf("crts-libc-stdio-panic: KERNEL PANIC\n");
-		
-    switch ( VideoBlock.useGui )
-    {
-		//text mode
-		case 0:
-	        //kclear(0);
-	        print(0,varg);		
-		    break;
-		
-		//graphics mode
-		case 1:
-	        //backgroundDraw(COLOR_BLACK);
-		    //printf("crts-libc-stdio-panic: KERNEL PANIC\n");
-		    print(0,varg);		
-		    break;
 
-        default:
-	        //backgroundDraw(COLOR_BLACK);
-		    //printf("crts-libc-stdio-panic: KERNEL PANIC\n");
-		    print ( 0, varg );			
-            break; 		
-	};
-	
-    die();	
+	register int *varg = (int *)(&format);
+
+	printf ("panic: KERNEL PANIC\n");
+
+	print ( 0, varg );
+
+	die ();
 }
 
 
 /*
- **********************************************************************
+ ***********************************************************
  * sprintf:
  *     @field 2
  *     int sprintf ( char * str, const char * format, ... );
@@ -789,6 +771,7 @@ void panic ( const char *format, ... ){
 int sprintf ( char *str, const char *format, ... ){
 		
     register int *varg = (int *) (&format);
+	
 	return (int) print (&str, varg);
 }
 
@@ -857,7 +840,7 @@ int fprintf ( FILE *stream, const char *format, ... ){
 
 int fputs ( const char *str, FILE *stream ){
 	
-	int size;
+	int size = 0;
 	
 	if ( (void *) stream == NULL )
 	{
@@ -865,7 +848,6 @@ int fputs ( const char *str, FILE *stream ){
 		
 	} else {
 		
-		//size = (int) stdio_strlen (str);
 		size = (int) strlen (str);
 		
 		if ( size > stream->_cnt )
@@ -875,15 +857,15 @@ int fputs ( const char *str, FILE *stream ){
 		
 		stream->_cnt = (int) (stream->_cnt - size);
 		
-		sprintf( stream->_ptr, str );
+		sprintf ( stream->_ptr, str );
 		
 		stream->_ptr = stream->_ptr + size;
 		
-        return (int) 0;		
+        return 0;		
 	};
 	
 	return (int) (-1);
-};
+}
 
 
 /*
@@ -909,8 +891,7 @@ int ungetc ( int c, FILE *stream ){
 	stream->_ptr[0] = (char) c;
 	
     return (int) c;	
-};
-
+}
 
 
 long ftell (FILE *stream)
@@ -921,7 +902,7 @@ long ftell (FILE *stream)
 	}	
 	
     return (long) (stream->_ptr - stream->_base);	
-};
+}
 
 
 int fileno ( FILE *stream ){
@@ -930,8 +911,9 @@ int fileno ( FILE *stream ){
 	{
 		return (long) -1; 
 	}	
+	
 	return (int) stream->_file;  //fd
-};
+}
 
 
 /*
@@ -942,16 +924,17 @@ int fileno ( FILE *stream ){
 
 int fgetc ( FILE *stream ){
 	
-    int ch;	
+    int ch = 0;	
  
 	if ( (void *) stream == NULL )
 	{
-		printf ("#debug: fgetc: stream struct fail\n");
+		// #debug
+		printf ("fgetc: stream struct fail\n");
 		refresh_screen();
 		
 		return (int) (-1);
 		
-	} else {
+	}else{
 		
 		//#fim.
 		//cnt decrementou e chegou a zero.
@@ -994,12 +977,12 @@ int fgetc ( FILE *stream ){
 		//fail
 	};
 	
-    printf ("#debug: fgetc: $$\n");
+	//#debug
+    printf ("fgetc: $$\n");
 	refresh_screen();				
 	
     return (int) (-1);	
-};
-
+}
 
 
 /*
@@ -1009,7 +992,7 @@ int fgetc ( FILE *stream ){
 
 int feof ( FILE *stream ){
 	
-    int ch;	
+    int ch = 0;	
  
 	if ( (void *) stream == NULL )
 	{
@@ -1022,16 +1005,18 @@ int feof ( FILE *stream ){
         if ( ch == EOF )
 		{
 			return (int) 1;
+		
 		}else{
-			return (int) 0;
+			
+			return 0;
 		};
 	};
 	
 	//checar se o eof foi atingido.
 	// return( (stream->_flag & _IOEOF) );
 	
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*
@@ -1039,6 +1024,7 @@ int feof ( FILE *stream ){
  * ferror:
  *
  */
+
 int ferror ( FILE *stream ){
 	
 	if ( (void *) stream == NULL ){
@@ -1047,8 +1033,7 @@ int ferror ( FILE *stream ){
 	}
 	
     return (int) ( ( stream->_flag & _IOERR ) );
-};
-
+}
 
 
 
@@ -1058,6 +1043,7 @@ int ferror ( FILE *stream ){
  *     offset argument is the position that you want to seek to,
  *     and whence is what that offset is relative to.
  */
+
 int fseek ( FILE *stream, long offset, int whence ){
 	
 	if ( (void *) stream == NULL )
@@ -1091,10 +1077,10 @@ int fseek ( FILE *stream, long offset, int whence ){
 	
 fail:	
     return (int) (-1);	
+	
 done:	
-    return (int) (0);	
-};
-
+    return 0;	
+}
 
 
 /*
@@ -1116,13 +1102,14 @@ int fputc ( int ch, FILE *stream ){
 	    stream->_cnt--;		
 	};
 
-    return (int) (0);		
-};
+    return 0;		
+}
 
 
 //(since C99)	
 //int fscanf( FILE *restrict stream, const char *restrict format, ... );
 //(until C99)
+
 int fscanf (FILE *stream, const char *format, ... ){
 	
 	printf ("fscanf: todo \n");
@@ -1152,12 +1139,6 @@ void rewind ( FILE * stream ){
 }
 
 
-
-
-
-
-
-
 /*
  *************************************************************
  * printchar:
@@ -1169,9 +1150,10 @@ void rewind ( FILE * stream ){
 
 static void printchar (char **str, int c)
 {
-	if (str){
-		
+	if (str)
+	{	
 		**str = c;
+		
 		++(*str);
 		
 	}else (void) putchar (c);
@@ -1478,6 +1460,7 @@ unsigned long input ( unsigned long ch ){
 	
 input_more:	
 	return 0;
+	
 input_done:	
     return VK_RETURN;	
 };
@@ -1748,11 +1731,12 @@ int stdioInitialize (void){
 
 	// Done !
 
-    return (int) 0;	
+    return 0;	
 	
 fail:
-    panic ("crts-libc-stdio-stdioInitialize: fail\n");
-};
+	
+    panic ("stdio-stdioInitialize: fail\n");
+}
 
 
 /*
@@ -1761,7 +1745,6 @@ fail:
  *     #IMPORTANTE
  *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
  */
-
 
 void REFRESH_STREAM ( FILE *stream ){
 
@@ -1782,20 +1765,23 @@ void REFRESH_STREAM ( FILE *stream ){
 	
 	if ( cWidth == 0 || cHeight == 0 )
 	{
-		//#debug
-		printf ("servicesPutChar: fail w h ");
-		die();
+		panic ("stdio-REFRESH_STREAM: char w h ");
 	}
 	
-     stdio_terminalmode_flag = 1;  
-	 for (i=0; i<j; i++)
-	 {
-	    //putchar ( (int) c );
-		printf("%c",  *c );
+    // Seleciona o modo terminal.
+	
+	stdio_terminalmode_flag = 1;  
+	
+	for ( i=0; i<j; i++ )
+	{
+		printf ("%c", *c );
+		
 	    refresh_rectangle ( g_cursor_x * cWidth, g_cursor_y * cHeight, 
 		    cWidth, cHeight );
-		 c++;
-	 }
+		
+		c++;
+	};
+	
 	stdio_terminalmode_flag = 0;  
 }
 
@@ -1803,3 +1789,4 @@ void REFRESH_STREAM ( FILE *stream ){
 //
 // End.
 //
+

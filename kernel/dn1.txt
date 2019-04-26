@@ -5,3 +5,7 @@
  @todo: 
      +Shared heap walker.
      A heap of shared memory for dinamic allocation. 
+	 
+	 
+	 Essa pasta deve conter rotinas da camada mais alta do kernel.
+	 na pasta ./arch ficam as rotinas dependentes da arquitetura.

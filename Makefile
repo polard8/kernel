@@ -14,7 +14,7 @@
 VERSION = 1
 PATCHLEVEL = 4
 SUBLEVEL = 0
-EXTRAVERSION = -rc2
+EXTRAVERSION = -rc3
 NAME = 
 
 
@@ -188,8 +188,10 @@ compile-kernel:
 	@echo "Compiling kernel ..."
 
 	# /entry
-	nasm -I kernel/entry/x86/head/ kernel/entry/x86/head/head.asm -f elf -o head.o
-	gcc -c kernel/entry/x86/x86main.c  -I include/ $(CFLAGS) -o x86main.o
+	
+	nasm -I kernel/arch/x86/entry/head/  kernel/arch/x86/entry/head/head.asm -f elf -o head.o	
+	
+	gcc -c kernel/arch/x86/entry/x86main.c  -I include/ $(CFLAGS) -o x86main.o
 	
     #main
 	gcc -c kernel/main.c  -I include/ $(CFLAGS) -o main.o

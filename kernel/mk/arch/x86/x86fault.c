@@ -38,42 +38,46 @@ void do_pagefault (void);
 /*
  *****************************************
  * faults:
+ *
  *    #importante:
  *    +Quem chamou isso, pois temos a intenção de retornar,
  *     inicializando outra a mesma thread, as agora com a inclusão da 
  *     página faltante, ou reinicializar com outra thread, pois fechamos 
- *     a que estava com problemas.  Por fim ainda temos o caso em quan não iremos retornar.
- *
+ *     a que estava com problemas.  
+ *    Por fim ainda temos o caso quando não iremos retornar.
  */
  
 void faults ( unsigned long number ){
 	
     struct thread_d *t;
 	
-	// #isso não é necessário,
-	// pois já foi feito antes.
+	// #bugbug
+	// Isso não é necessário, pois já foi feito antes.
 	
 	asm ("cli");
     
-    printf ("\n *FAULTS: totalticks=%d \n\n",sys_time_ticks_total);
+    kprintf ("\n *FAULTS: totalticks=%d \n\n", sys_time_ticks_total );
     
-	
 	//
 	//   ## Thread ##
 	//
+	
+	// #test
+	// Filtrar current_thread.
+	
+	if ( current_thread < 0 )
+	{
+		printf ("x86fault: current_thread fail\n");		
+		goto fail;
+	}
 
 	t = (void *) threadList[current_thread];
 	
-	
-	// Inválida.
-	
 	if( (void *) t == NULL )
 	{
-		printf ("x86fault: FAIL, struct, no current thread\n");
-		//printf ("No current thread\n");
+		printf ("x86fault: t fail\n");		
 		goto fail;
 	
-    // Válida.
     }else{
         
 	    // Salva o contexto se a tarefa já esteve rodando.
@@ -106,8 +110,7 @@ void faults ( unsigned long number ){
         //printf ("Init Phase %d \n", KeInitPhase);
 	    //printf ("logonStatus %d | guiStatus %d \n", logonStatus, guiStatus );
 		
-		refresh_screen();
-        
+		refresh_screen (); 
 	};
 	
     // OPÇÃO. 
@@ -196,19 +199,20 @@ tryagain:
 	// #debug
 	// Não estamos continuando por enquanto pois 
 	// ainda estamos iplementando isso.
+	
 	die ();
-    
-	//return;	
-};
+}
 
 
 /* Interface */
  
 void KiCpuFaults ( unsigned long number ){
+    
+	// #todo
+	// Checar a validade do argumento.
 	
     faults (number);
-	//die();
-};
+}
 
 
 /*
@@ -231,39 +235,38 @@ void do_pagefault (void){
 	{
 		printf("do_pagefault: We can't close idle thread \n");
 		fatal_error_flag = 1;
-		goto fail;
+		return;
 	};
 	*/
 	
-	//
 	// #importante
     // Devemos ter informações na estrutura da thread que indiquem 
 	// se todas as páginas foram atribuídas à ela ou não na hora 
 	// do carregamento ...
     // Pois assim a rotina de pagefault poderá saber se deve 
 	// realizar a paginação sob demanda ou fechar a thread.
-	//
-	
-//Messages:	
     
-	printf("do_pagefault:\n");
+	printf ("do_pagefault:\n");
 	
 	// #todo:
 	// +Checar se a current é uma thread válida.
 	// +Checar se a current está esperando por paginação sob demanda.
 	// +Pegar o endereço.
 	// +Realizar o mapeamento da página faltante.
-	// 
 	
-	//Page Fault Linear Address (PFLA).
+	//Page Fault Linear Address - PFLA.
+	
 	page_fault_address = (unsigned long) get_page_fault_adr ();
 
-	printf(" >>> Address={%x}\n", (unsigned long) page_fault_address);
+	printf ("Address={%x}\n", (unsigned long) page_fault_address);
 	
     //
     // Mostra registradores.
     //
     
+	// #bugbug
+	// Precisamos mudar os nomes.
+	
     mostra_reg (current_thread);
 	mostra_slots ();
 	
@@ -278,18 +281,10 @@ void do_pagefault (void){
 		current_thread = idle;
         thread_failed_flag = 1;
 		
-		goto done;		
+		return;	
 	}
 	*/
 	
-	//@todo alert.
-	//printf("do_pagefault: #todo: alloc page.\n");
-	
-done:	
-	return;
-	
-fail:
-    return;
 }
 
 
