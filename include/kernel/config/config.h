@@ -192,14 +192,16 @@ sixth..     ide5, usually PCI, probed
 //Esse é usado para exibir somente os marcadores pprincipais,
 //que são mesnagens escritas em maiúculas.
 //fnciona como uma visão panorâmica, usa espinha dorsal, um esqueleto.
-//#define KERNEL_VERBOSE 1
+#define KERNEL_VERBOSE 1
 //Esse é usado para trabalhar a rotina de entrypoint da arquitetura alvo.
 #define ENTRY_VERBOSE 1
 //Esses quatro são as camadas principais.
-//#define HAL_VERBOSE 1
-//#define MK_VERBOSE 1
-//#define EXECVE_VERBOSE 1
-//#define GWS_VERBOSE 1
+#define HAL_VERBOSE 1
+#define MK_VERBOSE 1
+#define EXECVE_VERBOSE 1  
+#define GWS_VERBOSE 1
+
+
 
 
 //#define SERIAL_DEBUG_VERBOSE 1

@@ -18,6 +18,7 @@
 // De onde vem isso ?? head.s
 // @todo: Devemos chamar o módulo hal para obtermos esses valores.
 //depois salvamos em variáveis internas usadas pela gui.
+
 extern unsigned long SavedBootBlock;
 extern unsigned long SavedLFB;
 extern unsigned long SavedX;
@@ -25,6 +26,8 @@ extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
 
 
+// ??
+// Copiando ...
 
 void *rectStrCopyMemory32 ( unsigned long *dest, unsigned long *src, int count ) 
 {
@@ -164,6 +167,7 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
 
  
 /* 
+ *************************************
  * drawDataRectangle:
  *     Draw a rectangle on backbuffer. 
  */
@@ -175,15 +179,6 @@ drawDataRectangle ( unsigned long x,
                     unsigned long height, 
                     unsigned long color )
 {
-
-	//#BUGBUG
-	//TEMOS UM PROBLEMÃO AQUI.
-	//Estamos usando um ponteiro sem ao menos
-	//termos alocado memória para sua estrutura.
-	//>> para contornar, vamos tentar usar sem
-	//ponteiro.
-	
-	//struct rect_d *rect;
 	struct rect_d rect;
 	
     rect.bg_color = color;
@@ -200,14 +195,14 @@ drawDataRectangle ( unsigned long x,
     rect.right = rect.left + rect.width;
     rect.bottom = rect.top + rect.height; 
 
-	//Limits.
-	//@todo: Repensar os limites para uma janela.
+	// Limits.
+	
+	// #todo: 
+	// Repensar os limites para uma janela.
 	// Uma janela poderá ser maior que as dimensões de um dispositivo.
 	// mas não poderá ser maior que as dimensões do backbuffer.
 	// Ou seja: O dedicated buffer de uma janela deve ser menor que
 	// o backbuffer.
-	
-	//#todo: Usar variável para largura.
 	
     if ( rect.right > SavedX )
 	{
@@ -223,9 +218,10 @@ drawDataRectangle ( unsigned long x,
   	
     // Draw lines on backbuffer.
 	
-	while (height--){
-		
+	while (height--)
+	{	
 	    my_buffer_horizontal_line ( rect.left, y, rect.right, rect.bg_color );
+		
 		y++;
     };    
 }
@@ -337,14 +333,20 @@ refresh_rectangle ( unsigned long x,
 		//...
 	}
 
+	// #atenção.
+	
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	
 	offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
 	
 	p = (void *) (p + offset);    
 	q = (const void *) (q + offset);    
 	 
-	vsync ();	
+	// #bugbug
+	// Isso pode nos dar problemas.
+	// ?? Isso ainda é necessário nos dias de hoje ??
 	
+	vsync ();	
 		
 	//(line_size * bytes_count) é o número de bytes por linha. 
 	
@@ -374,14 +376,17 @@ refresh_rectangle ( unsigned long x,
 	    for ( i=0; i < lines; i++ )
 	    {
 		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
-		    q += (Width * bytes_count);
+		    
+			q += (Width * bytes_count);
 		    p += (Width * bytes_count);
 	    };	
 	}
 }
 
 
+// ??
 // A ideia aqui é efetuar o refresh de um retângulo que esteja em um dado buffer.
+
 void 
 refresh_rectangle2 ( unsigned long x, 
                      unsigned long y, 

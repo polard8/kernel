@@ -14,7 +14,7 @@
 VERSION = 1
 PATCHLEVEL = 4
 SUBLEVEL = 0
-EXTRAVERSION = -rc1
+EXTRAVERSION = -rc2
 NAME = 
 
 
@@ -496,6 +496,7 @@ vhd-copy-files:
 	-sudo cp ../gde/bin/JACKPOT.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/CAT.BIN       /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GLIBCT1.BIN   /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GRAMC.BIN     /mnt/gramadovhd 
 
 #...
 	
@@ -522,7 +523,7 @@ vhd-copy-files:
 # ======== Files in the BIN/ folder. ========
 #	
 
-	-sudo cp ../gde/bin/*                       /mnt/gramadovhd/BIN 
+	-sudo cp ../gde/bin/*         /mnt/gramadovhd/BIN 
 	
 #
 # ======== Files in the BOOT/ folder. ========

@@ -97,23 +97,16 @@ int KiInitRuntime (void){
 	//#todo 
 	//preparar a tela para as mesagens;
 	//mas somente se a flag de debug estiver acionada.
-
-
-//#bugbug: Isso aqui não seviu pra coisa alguma,
-//pois é preciso inicializar a memória antes de usar 
-//a rotina que pinta o bg.	
-//#ifdef EXECVE_VERBOSE
-//	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
-//#endif	
 	
     Status = (int) init_runtime ();
 	
 	// #### importante ####
-	// provavelmente aqui é o primeiro lugar onde as mensagens funcional.
+	// provavelmente aqui é o primeiro lugar onde as mensagens funcionam.
 	
 	//#bugbug
 	//mas temos um problema no Y.
-	
+
+	//#bugbug
 #ifdef EXECVE_VERBOSE
 	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
 #endif		
@@ -127,13 +120,11 @@ int KiInitRuntime (void){
 	//por isso não deu pra limpar a tela antes.
 	printf(">>>debug hang: after runtime initialization");
 	refresh_screen(); 
-	while (1){
-		asm ("hlt");
-	}
+	while (1){ asm ("hlt"); };
 #endif	
 	
     return (int) Status;	
-};
+}
 
 
 /*

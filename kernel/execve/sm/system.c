@@ -1529,38 +1529,38 @@ int systemStartUp (void){
         //Welcome message. (Poderia ser um banner.) 
 		set_up_cursor (0,1);
 		
-#ifdef EXECVE_VERBOSE		
+//#ifdef EXECVE_VERBOSE		
         //#todo
 		//printf("sm-sys-system-systemStartUp: Starting 32bit Kernel [%s]..\n",
 		//    KERNEL_VERSION);
-#endif		
+//#endif		
 		
-#ifdef EXECVE_VERBOSE		
+//#ifdef EXECVE_VERBOSE		
 		//#todo
 		//Avisar no caso de estarmos iniciando uma edição de desenvolvedor.
 		//if (gSystemEdition == SYSTEM_DEVELOPER_EDITION){
 		//    printf("sm-sys-system-systemStartUp: %s\n",developer_edition_string);
 		//};
-#endif
+//#endif
 
-#ifdef EXECVE_VERBOSE
-		printf ("systemStartUp: LFB=%x X=%d Y=%d BPP=%d\n",
-		    (unsigned long) SavedLFB,
-			(unsigned long) SavedX,
-			(unsigned long) SavedY,
-			(unsigned long) SavedBPP );
-#endif
+//#ifdef EXECVE_VERBOSE
+//		printf ("systemStartUp: LFB=%x X=%d Y=%d BPP=%d\n",
+//		    (unsigned long) SavedLFB,
+//			(unsigned long) SavedX,
+//			(unsigned long) SavedY,
+//			(unsigned long) SavedBPP );
+//#endif
 	
         
         //
         // INIT ! 
         //  		
 		
-#ifdef EXECVE_VERBOSE
+//#ifdef EXECVE_VERBOSE
 		//(inicializa as 4 fases.)
 	    // Básico. ( Variáveis globais e estruturas ... ).
 	    //printf("sm-sys-system-systemStartUp: Initializing Basics..\n");
-#endif	
+//#endif	
 		
 		
         Status = (int) init (); 

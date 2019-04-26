@@ -38,14 +38,22 @@ extern unsigned long SavedBPP;
 
 void backgroundDraw (unsigned long color){
 	
+	// #bugbug
+	// Isso não está funcionando,
+	// Tá dando page fault.
+	
+	//return;
+	
     unsigned long i;
 		
     if (VideoBlock.useGui != 1)
 	    return;
 	
-
-    for ( i=0; i<SavedY; i++ ){			
+	//for ( i=0; i< 400; i++ )
+    for ( i=0; i<SavedY; i++ )
+	{			
         my_buffer_horizontal_line ( 0, i, SavedX, color );
+        //my_buffer_horizontal_line ( 0, i, 400, color );
 	}
 	
 	//#bugbug
@@ -55,27 +63,21 @@ void backgroundDraw (unsigned long color){
 	//Cursor.
 	g_cursor_x = 0;
 	g_cursor_y = 0;
-	g_cursor_right = (SavedX/8);
-	g_cursor_bottom = (SavedY/8);
 	
-	backgroundSetColor (color);
+	// #bugbug
+	// Será que nesse momento as dimensões do char já estão configuradas ??
+	
+	//g_cursor_right = (SavedX/8);
+	//g_cursor_bottom = (SavedY/8);
 }
 
 
 /* backgroundSetColor:
  *     Set background color in graphics mode. */
 
-void backgroundSetColor (unsigned long color){
-	
-    if ( gui->backgroundStatus == 0 ){
-		
-        return;
-    }
-
-	if ( (void *) gui->background != NULL ){
-		
-	    gui->background->bg_color = (unsigned long) color;
-	}
+void backgroundSetColor (unsigned long color)
+{
+    //#cancelada	
 }
 
 

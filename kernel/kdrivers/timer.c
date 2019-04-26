@@ -783,12 +783,12 @@ int timerInit (void){
 
     g_driver_timer_initialized = (int) 1;
 	
-#ifdef EXECVE_VERBOSE
-    printf("timerInit: Done\n");
-#endif
+//#ifdef EXECVE_VERBOSE
+//    printf("timerInit: Done\n");
+//#endif
 	
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*

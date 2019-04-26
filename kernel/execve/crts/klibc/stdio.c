@@ -265,6 +265,108 @@ int fflush ( FILE *stream ){
 }
 
 
+//scroll test
+//função interna de suporta ao scroll()
+
+void 
+scroll_screen_rect (void)
+{
+    //unsigned long x = 0; 
+    //unsigned long y = 0; 
+    //unsigned long width = 0;  //800
+    //unsigned long height = 0;  //600
+	
+
+	//#TEST
+	register unsigned int i;
+	//unsigned int i;
+
+	unsigned int line_size, lines;
+	unsigned int offset;
+	unsigned long Width = (unsigned long) screenGetWidth();
+	unsigned long Height = (unsigned long) screenGetHeight();
+
+	//line_size = (unsigned int) width; 
+	//lines = (unsigned int) height;
+
+	line_size = (unsigned int) Width; 
+	lines = (unsigned int) Height;
+	
+	// = 3; 
+	//24bpp
+	int bytes_count;
+	
+	switch (SavedBPP)
+	{
+		case 32:
+		    bytes_count = 4;
+		    break;
+		
+		case 24:
+		    bytes_count = 3;
+			break;
+			
+		//...
+	}
+
+	int cHeight = get_char_height ();
+	
+	void *p = (void *) BACKBUFFER_ADDRESS;	//destino	
+	
+	//o y é a linha da origem. o deslocamento de ter a altura de um char.
+	const void *q = (const void *) BACKBUFFER_ADDRESS + ( bytes_count * SavedX * cHeight ) ;	//origem	
+	
+	// #atenção.
+	
+	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+	
+	//offset = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
+	
+	//p = (void *) (p + offset);    
+	//q = (const void *) (q + offset);    
+	 
+	// #bugbug
+	// Isso pode nos dar problemas.
+	// ?? Isso ainda é necessário nos dias de hoje ??
+	
+	//vsync ();	
+		
+	//(line_size * bytes_count) é o número de bytes por linha. 
+	
+	int count; 
+
+	//#importante
+	//É bem mais rápido com múltiplos de 4.	
+	
+	//se for divisível por 4.
+	if ( ((line_size * bytes_count) % 4) == 0 )
+	{
+        count = ((line_size * bytes_count) / 4);  	
+
+	    for ( i=0; i < lines; i++ )
+	    {
+		    //copia uma linha ou um pouco mais caso não seja divisível por 
+		    memcpy32 ( p, q, count );
+		    
+			q += (Width * bytes_count);
+	 		p += (Width * bytes_count);
+	    };
+	}
+
+	//se não for divisível por 4.
+	if ( ((line_size * bytes_count) % 4) != 0 )
+	{
+	    for ( i=0; i < lines; i++ )
+	    {
+		    memcpy ( (void *) p, (const void *) q, (line_size * bytes_count) );
+		    
+			q += (Width * bytes_count);
+		    p += (Width * bytes_count);
+	    };	
+	}
+}
+
+
 /*
  ************************************************************************
  * scroll:
@@ -290,69 +392,24 @@ int fflush ( FILE *stream ){
 
 void scroll (void){
 	
-	// #suspenso
-
-	// Isso funciona para a tela inteira.
-    // mas temos que criar um scroll de janela.	
 	
-/*	
-	
-    unsigned short i;
-    unsigned short j;
-
-
-	//indice para o backbuffer.
-	int Start, End;
-	int Source, Dest;
-	
-	// ponteiros usados no modo gráfico.
-	unsigned char *backbuffer = (unsigned char *) BACKBUFFER_BASE;
-	
-	// ponteiros usados no modo texto.
-	
-	//Início da tela e início da segunda linha.
-	unsigned short *p1 = (unsigned short *) SCREEN_START;
-    unsigned short *p2 = (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
-
+	// #debug
+	// opção de suspender.
+	//return;
+		
 	//salvar cursor.
 	unsigned long OldX, OldY;
 	
+	int i=0;
 	
-	//
 	// Se estamos em Modo gráfico (GUI).
-    //
-
-//graphics_mode:
 	
 	if ( VideoBlock.useGui == 1 )
 	{
 	
-		//Modificar o backbuffer. BACKBUFFER_BASE
-        
-		//mover o backbuffer começando da segunda linha.
-		//exclui a primeira linha e a segunda linha será a nova primeira.
-		
-		//so que na verdade isso deve ser feito apenas para a 
-		//janela onde o texto está e não para o backbuffer inteiro.
-		//por enquanto fica assim.
-		
-		//#bugbug: 
-		//Valores determinados para width e height.
-		//Precisamos pegar valores salvos.
-		
-		Start = 0;
-		Source = Start+(3*800*8);  //Começa da segunda linha.
-		Dest = 0;                  //destino o início do backbuffer.
-		
-		End = (3*800)*600;       //termina ao fim de 600 linhas.
-		
-		//copy. 
-		//Contagem do total a ser transferido.
-		for ( Start=0; Start < End; Start++ ){
-			
-            backbuffer[Start] = backbuffer[Source];
-            Source++;    			
-		};
+		// copia o retângulo.
+		// #todo: olhar as rotinas de copiar retângulo.
+        scroll_screen_rect ();
 		
         //Limpa a última linha.
 		
@@ -361,12 +418,16 @@ void scroll (void){
 		OldY = g_cursor_y;
 		
 		//cursor na ultima linha.
+		
 		//g_cursor_x = 0;
 		g_cursor_x = g_cursor_left;
 		g_cursor_y = (g_cursor_bottom-1);
 		
-		for ( i = g_cursor_x; i < g_cursor_right; i++ ){
-		    _outbyte(' ');    	
+		// limpa a linha.
+		
+		for ( i = g_cursor_x; i < g_cursor_right; i++ )
+		{
+		    _outbyte (' ');    	
 		};
 	
 		// Reposiciona o cursor na última linha.	
@@ -374,42 +435,10 @@ void scroll (void){
 		g_cursor_x = g_cursor_left;
 		g_cursor_y = OldY;
 		
-		refresh_screen();
-		goto done;
-	};
+		refresh_screen ();
 
-	// Se estavermos em modo texto.
-	
-//text_mode:
-	
-	if ( VideoBlock.useGui == 0 )	
-	{
-	    //24 vezes.
-        for ( i=0; i < (SCREEN_HEIGHT -1); i++ )
-	    {
-	        //80 vezes
-            for ( j=0; j < SCREEN_WIDTH; j++ ){
-                *p1++ = *p2++;
-		    };
-			//Nothing.
-		};
-	
-	    //80 vezes.
-        for ( i=0; i < SCREEN_WIDTH; i++ ){
-		    *p1++ = 0x07*256 + ' '; 
-	    };
-		
-		//Nothing.
-		goto done;
-    };
-	
-    //Nothing.	
-	
-*/
-	
-done:
-	return;
-};
+	};
+}
 
 
 /*

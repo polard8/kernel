@@ -86,11 +86,13 @@ int debug_check_inicialization (void){
     int Status = 0;
 	
 	// Check phase.
-	if ( KeInitPhase != 3 ){
+	
+	if ( KeInitPhase != 3 )
+	{
 	   Status = 1;
 	   
-	   printf("sm-debug-debug_check_inicialization: KeInitPhase phase={%d}\n",
-	       KeInitPhase);
+	   printf ("debug_check_inicialization: KeInitPhase phase={%d}\n",
+	       KeInitPhase );
 	   
 	   goto fail;
 	};

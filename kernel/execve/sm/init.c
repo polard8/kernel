@@ -202,6 +202,9 @@ int init_architecture_independent (void){
 	// Isso deveria ficar na outra rotina.
 	// Não mudaremos por enquanto.
 	
+#ifdef EXECVE_VERBOSE	
+    printf ("init_architecture_independent: Initializing HAL..\n");
+#endif		
 	
 	Status = init_hal ();	
 	
@@ -222,7 +225,7 @@ int init_architecture_independent (void){
 	// porém inicializa a gerencia de processos e threads e de comunicação
 	//entre processos.
 	//#bugbug @todo: Se é microkernel é processo é registrador ... acho que leva em consideração a arquitetura.
-	printf("Initializing Microkernel..\n");
+	printf ("init_architecture_independent: Initializing Microkernel..\n");
 #endif	
 	
 	Status = init_microkernel ();
@@ -244,7 +247,7 @@ int init_architecture_independent (void){
 	//uma camada mais alta, porém será inicializado aqui para
 	//efeito de ordem, já que estamos inicializando os tres módulos
 	//básicos do kernel base nesse momento.
-	printf("Initializing Executive..\n");
+	printf ("init_architecture_independent: Initializing Executive..\n");
 #endif	
 	
 	Status = init_executive ();
@@ -260,7 +263,7 @@ int init_architecture_independent (void){
 	
 	// Gramado:
 #ifdef EXECVE_VERBOSE
-    printf("Initializing Gramado..\n");
+    printf ("init_architecture_independent: Initializing Gramado..\n");
 #endif
 	
 	Status = init_gramado ();
@@ -279,7 +282,8 @@ int init_architecture_independent (void){
 	// @todo: Essas informações são independentes da arquitetura,
 	//      Essa rotina pode ir pra outro lugar.
 	
-UserInfo:
+//UserInfo:
+	
 #ifdef EXECVE_VERBOSE	  
     printf ("init-init_architecture_independent: init_user_info\n");
 #endif
@@ -291,7 +295,8 @@ UserInfo:
 	// @todo: Essas informações são independentes da arquitetura,
 	//      Essa rotina pode ir pra outro lugar.
 	
-UserSession:
+//UserSession:
+	
 #ifdef EXECVE_VERBOSE	
     printf ("init-init_architecture_independent: init_user_session\n");   
 #endif
@@ -302,21 +307,23 @@ UserSession:
 	
 	// (ROOM)
 	
-WindowStation:
+//WindowStation:
+	
 #ifdef EXECVE_VERBOSE
-    printf ("init-init_architecture_independent: init_window_station\n");   
+    printf ("init-init_architecture_independent: init_room_manager\n");   
 #endif  
 	
 	init_room_manager();
 
 	// DESKTOP
 	
-Desktop:
+//Desktop:
+	
 #ifdef EXECVE_VERBOSE
     printf ("init-init_architecture_independent: init_desktop\n");   
 #endif    
 	
-	init_desktop(); 
+	init_desktop (); 
  
 	
 	//
@@ -329,7 +336,7 @@ Desktop:
 	// Essas informações são independentes da arquitetura,
 	// Essa rotina pode ir pra outro lugar.
 	
-WindowManager:	
+//WindowManager:	
 
 	//Caso não se use gui.
 	
@@ -377,11 +384,11 @@ done:
 #ifdef EXECVE_VERBOSE
     //debug
     printf("Done\n");	
-	//refresh_screen();
+	refresh_screen();
     //while(1){}
 #endif	
 	
-    return (int) 0;
+    return 0;
 }
 
 
@@ -395,10 +402,9 @@ done:
 void init_globals (void){
 
 #ifdef EXECVE_VERBOSE	
-    //printf("sm-init-init_globals:\n");
+    printf("sm-init-init_globals:\n");
 	debug_print("init_globals:\n");
 #endif
-	
 	
 	//Outros.
 	errno = 0;
@@ -506,7 +512,7 @@ void init_globals (void){
     //refresh_screen(); 
     //while(1){}	
 	
-	
+	//#bugbug isso esta dando problemas.
 #ifdef EXECVE_VERBOSE
 	backgroundDraw ( (unsigned long) COLOR_BLUE ); 
 #endif
@@ -558,9 +564,9 @@ int init (void){
     //Globals.
 	init_globals ();
 	
-//#ifdef EXECVE_VERBOSE	
+#ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: init_globals ok\n");     
-//#endif  
+#endif  
 	
 	
 	//#bugbug:
@@ -573,12 +579,14 @@ int init (void){
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: init_object_manager\n");
 #endif	
+	
 	init_object_manager();
 	
 	//i/o Manager.
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: ioInit\n");	
 #endif	
+	
 	ioInit();	
 	
 	
@@ -597,19 +605,23 @@ int init (void){
 	//É nela que as outras partes devem se basear.
 		
 	storage = (void *) malloc ( sizeof(struct storage_d) );
-	if ( (void *) storage == NULL ){
+	
+	if ( (void *) storage == NULL )
+	{
 	    panic ("sm-init-init: storage");
 	}	
 	
 		
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: disk_init\n");
-#endif    
+#endif  
+	
 	disk_init();
 	
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: volume_init\n");
-#endif    
+#endif
+	
 	volume_init();
 	
 	
@@ -623,18 +635,19 @@ int init (void){
 	
 //deletar	
 #ifdef EXECVE_VERBOSE	
-	//printf("sm-init-init: fsInit\n");
-#endif    
+	printf("sm-init-init: fsInit\n");
+#endif   
+	
 	fsInit();
 	    
 
 #ifdef EXECVE_VERBOSE	
 	printf("sm-init-init: initialize_system_message_queue\n");
 #endif	
-	initialize_system_message_queue(); 
+	
+	initialize_system_message_queue (); 
     
     
-
 	//
 	// Network
 	//
@@ -651,18 +664,20 @@ int init (void){
 	printf("sm-init-init: Platform\n");	
 #endif
 
-	Platform = (void *) malloc( sizeof(struct platform_d) );
+	Platform = (void *) malloc ( sizeof(struct platform_d) );
 	
 	if( (void *) Platform ==  NULL )
 	{
 		// # This is the Root struct #
-		panic("sm-init-init: Platform\n");	
+		panic ("sm-init-init: Platform\n");	
 	
 	}else{
 		
 		//Hardware
-	    Hardware = (void *) malloc( sizeof(struct hardware_d) );
-	    if( (void *) Hardware ==  NULL ){
+	    Hardware = (void *) malloc ( sizeof(struct hardware_d) );
+		
+	    if( (void *) Hardware ==  NULL )
+		{
 		    printf("sm-init-init: Hardware\n");	
 	        die();
 		}else{
@@ -671,8 +686,10 @@ int init (void){
 		};
 		
 		//Firmware
-	    Firmware = (void *) malloc( sizeof(struct firmware_d) );
-	    if( (void *) Firmware ==  NULL ){
+	    Firmware = (void *) malloc ( sizeof(struct firmware_d) );
+	    
+		if( (void *) Firmware ==  NULL )
+		{
 		    printf("sm-init-init: Firmware\n");	
 	        die();
 		}else{
@@ -687,8 +704,10 @@ int init (void){
 		// *IMPORTATE: Aqui estamos inicializando a estrutura do systema.
 		//
 		
-		System = (void *) malloc( sizeof(struct system_d) );
-	    if( (void *) System ==  NULL ){
+		System = (void *) malloc ( sizeof(struct system_d) );
+		
+	    if( (void *) System ==  NULL )
+		{
 		    printf("sm-init-init: System\n");	
 	        die();
 		}else{
@@ -763,7 +782,7 @@ int init (void){
 	{
 		
 #ifdef EXECVE_VERBOSE		
-		printf("sm-init-init: Logon\n");
+	printf ("sm-init-init: Logon\n");
 #endif	    
 		
 		create_logon ();
@@ -805,12 +824,8 @@ int init (void){
 	//por isso não deu pra limpar a tela antes.
 	printf(">>>debug hang: after init");
 	refresh_screen(); 
-	while (1){
-		asm ("hlt");
-	}
+	while (1){ asm ("hlt"); }
 #endif	
-	
-	
 	
     return 0;  
 }

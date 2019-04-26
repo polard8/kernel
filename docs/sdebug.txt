@@ -1,11 +1,13 @@
 [Kernel] kernel_main:
 [Kernel] kernel_main: Using GUI
+[Kernel] kernel_main: Initializing runtime
 KiInitRuntime
 [x86] x86main:
 [x86] x86main: starting x86 kernel ..
 systemInit:
 systemStartUp:
 init:
+init_globals:
 init_globals: WE HAVE MESSAGES NOW !!!
 fsInit:
 init_architecture_independent
@@ -22,4 +24,11 @@ create_logon
 init_logon
 x86main: processes and threads
 x86main: ps2
+fsLoadFile:
+fsLoadFile:
+fsLoadFile:
+fsLoadFile:
+fsLoadFile:
+fsLoadFile:
+fsLoadFile:
 x86main: done

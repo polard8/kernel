@@ -744,9 +744,9 @@ void fs_init_structures (void){
  
 int fsInit (void){
 	
-#ifdef EXECVE_VERBOSE
-    printf("fsInit: Initializing..\n");
-#endif 
+//#ifdef EXECVE_VERBOSE
+   // printf ("fsInit: Initializing..\n");
+//#endif 
 	
 	debug_print("fsInit:\n");	
  
@@ -791,16 +791,16 @@ int fsInit (void){
 
 	// Structures and fat.
 
-#ifdef EXECVE_VERBOSE
-	printf("fsInit: Structures..\n");
-#endif
+//#ifdef EXECVE_VERBOSE
+	//printf("fsInit: Structures..\n");
+//#endif
 	
 	fs_init_structures();
 	
 
-#ifdef EXECVE_VERBOSE
-	printf("fsInit: FAT..\n");
-#endif
+//#ifdef EXECVE_VERBOSE
+	//printf("fsInit: FAT..\n");
+//#endif
 	
 	fs_init_fat();
 	
@@ -925,11 +925,11 @@ int fsInit (void){
 	
 //done:
 
-#ifdef EXECVE_VERBOSE
-    printf("Done\n");
-#endif 
+//#ifdef EXECVE_VERBOSE
+    //printf("Done\n");
+//#endif 
 
-    return (int) 0;    	
+    return 0;    	
 }
 
 

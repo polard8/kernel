@@ -3,7 +3,7 @@
  *
  * edge field for klibc.
  *
- * Etremidades das funções de impressão de caracteres ...
+ * Extremidades das funções de impressão de caracteres ...
  * aqui ficará só o output de byte.
  */
 
@@ -12,6 +12,7 @@
 
 
 /*
+ ***************************************
  * _outbyte:
  *     @field 1
  *     Essa rotina efetivamente envia o caractere para a tela, não 
@@ -35,19 +36,13 @@ void _outbyte (int c){
 	unsigned long y;
 	
     //O caractere.
-	char ch = (char) c;
-	char ch_atributo = (char) g_char_attrib;
-
-	//suporte ao modo texto.
-	//Base atual da memória de vídeo 0x000B8000;
-    //@todo: usar VideoBlock.currentVM.
 	
-	char *vm = (char *) g_current_vm;    
-	
+	char ch = (char) c;	
 	
 	// #test
 	// Tentando pegar as dimensões do char.
-	// #importante: Não pode ser 0, pois poderíamos ter divisão por zero.
+	// #importante: 
+	// Não pode ser 0, pois poderíamos ter divisão por zero.
 	
 	
 	int cWidth = get_char_width ();
@@ -56,9 +51,22 @@ void _outbyte (int c){
 	if ( cWidth == 0 || cHeight == 0 )
 	{
 		//#debug
-		printf("crts-libc-cedge-_outbyte: fail w h ");
-		die();
+		debug_print ("_outbyte: char w h");
+		printf ("_outbyte: fail w h ");
+		die ();
 	}
+	
+	// #bugbug
+	// Caso estejamos em modo texto.
+	// Isso ainda não é suportado.
+	
+	if ( VideoBlock.useGui == 0 )
+	{
+		debug_print ("_outbyte: kernel in text mode");
+	    kprintf ("_outbyte: kernel in text mode");
+		die ();
+	}
+	
 	
 	// #Importante: 
 	// Essa rotina não sabe nada sobre janela, ela escreve na tela como 
@@ -80,7 +88,8 @@ void _outbyte (int c){
 			// ## NÃO TRANPARENTE ##
             // se estamos no modo terminal então usaremos as cores 
             // configuradas na estrutura do terminal atual.
-            // Branco no preto é um padrão para terminal.			
+            // Branco no preto é um padrão para terminal.
+			
             draw_char ( cWidth*g_cursor_x, cHeight*g_cursor_y, c, 
 				COLOR_TERMINALTEXT, COLOR_TERMINAL2 );			
 			
@@ -89,7 +98,8 @@ void _outbyte (int c){
 			// ## TRANSPARENTE ##
 		    // se não estamos no modo terminal então usaremos
 		    // char transparente.
-            // Não sabemos o fundo. Vamos selecionar o foreground.			
+            // Não sabemos o fundo. Vamos selecionar o foreground.		
+			
 			drawchar_transparent ( cWidth*g_cursor_x, cHeight*g_cursor_y, 
 				g_cursor_color, c );
 		};
@@ -98,26 +108,9 @@ void _outbyte (int c){
 		//g_cursor_x++;
      	
 		//goto done;
-        return;		
+        //return;		
 	};
- 
-    // #bugbug
-    // #testando
-	// Caso estivermos em text mode.
-    // #obs: Nunca usamos isso. :)
-	
-	if ( VideoBlock.useGui == 0 )
-	{	
-	    // Calcula o valor do deslocamento para text mode 80x25.
-	    y = (g_cursor_y * 80 *2);
-        x = g_cursor_x*2;    
-        i = y + x;
-        
-		//envia o caractere e o atributo.
-		vm[i+0] = ch;           
-        vm[i+1] = ch_atributo;  
-	};   
-};
+}
 
 
 /*
@@ -129,6 +122,7 @@ void _outbyte (int c){
  * Essa rotina é chamada pelas funções: /putchar/scroll/.
  * @todo: Colocar no buffer de arquivo.
  */
+
 void outbyte (int c){
 	
 	static char prev = 0;
@@ -137,8 +131,7 @@ void outbyte (int c){
 	// Podemos setar a posição do curso usando método,
 	// simulando uma variável protegida.
 	
-//checkChar:
-        
+//checkChar:        
       
     //switch ?? 
 
@@ -147,12 +140,14 @@ void outbyte (int c){
     //	
     
     //Início da próxima linha.    
+	
     if ( c == '\n' && prev == '\r' ) 
     {
 		if ( g_cursor_y >= (g_cursor_bottom-1) )
 		{
 	        
-			scroll();
+			scroll ();
+			
             g_cursor_y = (g_cursor_bottom-1);
 			prev = c; 
 			
@@ -161,7 +156,8 @@ void outbyte (int c){
 			g_cursor_y++;
             g_cursor_x = g_cursor_left; //Por causa do prev.			
 		    prev = c;
-		};	
+		};
+		
         return;
     };
 	
@@ -295,32 +291,30 @@ void outbyte (int c){
 		
     }else{   
 	
-	    //
-		// ## Incremento ##
-		//
+		// Incrementando.
+		// Apenas incrementa a coluna.
 		
-		// Apenas incrementa a coluna. 
         g_cursor_x++;                          
     };
     
 	
-	//Número máximo de linhas. (8 pixels por linha.)
-    if( g_cursor_y >= g_cursor_bottom )  
+	// Número máximo de linhas. (8 pixels por linha.)
+    
+	if ( g_cursor_y >= g_cursor_bottom )  
     { 
-	    scroll();
+	    scroll ();
+		
         g_cursor_y = g_cursor_bottom;
     };
 	
 	
-	//
 	// Nesse momento imprimiremos os caracteres.
-	//
-
     // Imprime os caracteres normais.
+	// Atualisa o prev.	
+	
 	_outbyte (c);
 	
-	// Atualisa o prev.	
 	prev = c;	   
-};
+}
 
 

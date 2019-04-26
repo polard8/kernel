@@ -229,6 +229,13 @@ void x86mainStartFirstThread ( int n ){
     // #debug
     printf ("Go to user mode!\n");
     refresh_screen (); 
+	
+	// #importante
+	// Mudamos para a última fase da inicialização.
+	// Com isso alguns recursos somente para as fases anteriores
+	// deverão ficar indisponíveis.
+	
+	KeInitPhase = 4;
 	   
 	// # go!
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 

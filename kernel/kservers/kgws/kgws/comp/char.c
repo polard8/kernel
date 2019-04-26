@@ -36,29 +36,29 @@ void my_buffer_char_blt ( unsigned long x,
 						  unsigned long c )
 {
     drawchar_transparent ( x, y, color, c );								
-};
+}
 
 
-void set_char_width ( int width ){
-	
+void set_char_width ( int width )
+{	
 	gcharWidth = (int) width;
 }
 
 
-void set_char_height ( int height ){
-	
+void set_char_height (int height)
+{	
 	gcharHeight = (int) height;
 }
 
 
-int get_char_width (void){
-	
+int get_char_width (void)
+{
 	return (int) gcharWidth;
 }
 
 
-int get_char_height (void){
-	
+int get_char_height (void)
+{
 	return (int) gcharHeight;
 }
 
@@ -68,18 +68,20 @@ int get_char_height (void){
  * drawchar_transparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
- */						   
-void drawchar_transparent ( unsigned long x, 
-                            unsigned long y, 
-						    unsigned long color, 
-						    unsigned long c )
+ */
+
+void 
+drawchar_transparent ( unsigned long x, 
+                       unsigned long y, 
+					   unsigned long color, 
+					   unsigned long c )
 {	
 	int x2;
     int y2;
+
+	char *work_char;  
 	
     unsigned char bit_mask = 0x80;	
-    
-	char *work_char;  
     
 	struct window_d *hWindow;			
 	  
@@ -214,7 +216,7 @@ void drawchar_transparent ( unsigned long x,
 	};
 	
 	// Algo mais ?        	   
-};
+}
 
 				
 /*
@@ -225,18 +227,19 @@ void drawchar_transparent ( unsigned long x,
  *     >> no backbuffer.
  */ 
 
-void draw_char ( unsigned long x, 
-                 unsigned long y,  
-				 unsigned long c,
-				 unsigned long fgcolor,
-				 unsigned long bgcolor )
+void 
+draw_char ( unsigned long x, 
+            unsigned long y,  
+			unsigned long c,
+			unsigned long fgcolor,
+			unsigned long bgcolor )
 {	
 	int x2;
     int y2;
 	
-    unsigned char bit_mask = 0x80;	
-    
 	char *work_char;  
+	
+    unsigned char bit_mask = 0x80;	
     
 	struct window_d *hWindow;
 
@@ -365,8 +368,7 @@ void draw_char ( unsigned long x,
 	};
 	
 	// Algo mais ?       	   
-};
-
+}
 
 
 /*
