@@ -69,7 +69,7 @@ extern void clear_nt_flag (void);
 
 
 static inline void mainSetCr3 (unsigned long value){
-	
+
     __asm__ ( "mov %0, %%cr3" : : "r" (value) );
 };
 
@@ -86,53 +86,53 @@ static inline void mainSetCr3 (unsigned long value){
  */
 
 void x86mainStartFirstThread ( int n ){
-	
-	int i;
-	struct thread_d *Thread;
-	 
-	if (n < 0)
-	{
-	    printf ("x86mainStartFirstThread: thread number fail");
+
+    int i;
+    struct thread_d *Thread;
+
+    if (n < 0)
+    {
+        printf ("x86mainStartFirstThread: thread number fail");
         die ();
-	}
-	
-	switch (n){
-			
-		case 1:
-		    Thread = IdleThread; 
-		    break;
-			
-		case 2:
-		    Thread = ShellThread;
-			break;
-		
-		case 3:
-		    Thread = TaskManThread;
-		    break;
-			
-		default:
-	        panic ("x86mainStartFirstThread.default: thread number fail");		
-		    break;
-	};
-	
+    }
+
+    switch (n){
+
+        case 1:
+            Thread = IdleThread; 
+            break;
+
+        case 2:
+            Thread = ShellThread;
+            break;
+
+        case 3:
+            Thread = TaskManThread;
+            break;
+
+        default:
+            panic ("x86mainStartFirstThread.default: thread number fail");
+            break;
+    };
+
 	// #importante
-    // Sempre checar a validade da estrutura.
-    
- 
+	// Sempre checar a validade da estrutura.
+
+
     if ( (void *) Thread == NULL )
     {
         panic ("x86mainStartFirstThread: Thread\n");
-		
+
     } else {
 
         if ( Thread->saved != 0 )
-		{
+        {
             printf("x86mainStartFirstThread: saved\n");
             die();
         };
 
         if ( Thread->used != 1 || Thread->magic != 1234)
-		{
+        {
             printf("x86mainStartFirstThread: tid={%d} magic \n", Thread->tid);
             die();
         };
@@ -143,35 +143,36 @@ void x86mainStartFirstThread ( int n ){
 
     // State  
     if ( Thread->state != STANDBY )
-	{
+    {
         printf ("x86mainStartFirstThread: state tid={%d}\n", Thread->tid);
         die();
     }
 
     // * MOVEMENT 2 ( Standby --> Running)
     if ( Thread->state == STANDBY )
-	{
+    {
         Thread->state = RUNNING;
         queue_insert_data ( queue, (unsigned long) Thread, QUEUE_RUNNING);
     }
-	
+
 	//Current process.
-	current_process = Thread->process->pid;    
-    
-    //
+
+    current_process = Thread->process->pid;    
+
+	//
 	// Done!
-    //
-	
+	//
+
 	// #bugbug
 	// Na máquina gigabyte/intel o sistema as vezes falha logo após essa mensagem.
-	
-    // #debug
-    //printf ("x86mainStartFirstThread: Starting idle TID=%d (debug) \n", Thread->tid );
-    //refresh_screen (); 
+
+	// #debug
+	//printf ("x86mainStartFirstThread: Starting idle TID=%d (debug) \n", Thread->tid );
+	//refresh_screen (); 
 
 
     for ( i=0; i <= PRIORITY_MAX; i++ ){
-		
+
         dispatcherReadyList[i] = (unsigned long) Thread;
     }
 
@@ -180,103 +181,106 @@ void x86mainStartFirstThread ( int n ){
 
 
 	//
-    // turn_task_switch_on:
-    //  + Creates a vector for timer irq, IRQ0.
-    //  + Enable taskswitch. 
+	// turn_task_switch_on:
+	//  + Creates a vector for timer irq, IRQ0.
+	//  + Enable taskswitch. 
 	//
-	
+
     turn_task_switch_on ();
 
-	
-    //timerInit8253 ( HZ );
+
+	//timerInit8253 ( HZ );
 	//timerInit8253 ( 800 );
-	timerInit8253 ( 900 );	    
-    
-    //nesse momento usaremos o mapeamento do processo alvo ..
-    //no mapeamento do processo alvo tambem tem o kernel
-    //entao nao há problemas.
-    
+
+    timerInit8253 ( 900 );
+
+	//nesse momento usaremos o mapeamento do processo alvo ..
+	//no mapeamento do processo alvo tambem tem o kernel
+	//entao nao há problemas.
+
     //Set cr3 and flush TLB.
 	//isso não é necessário se chamarmos spawn ela faz isso.
     mainSetCr3 ( (unsigned long) Thread->DirectoryPA );
     asm ("movl %cr3, %eax");
-	    //#todo: delay.
+		//#todo: delay.
     asm ("movl %eax, %cr3");  
-    
-    
-	clear_nt_flag ();   
-	
+
+
+    clear_nt_flag ();   
+
 	//vamos iniciar antes para que
 	//possamos usar a current_tss quando criarmos as threads
 	//init_gdt ();
-	
-	asm ("clts \n");
-	
-    
-		//#debug.
-        //vamos mostrar as informaçoes da primeira thread sempre..
-        //quando falhar,veremos se ha algo de diferente.
 
-		
+    asm ("clts \n");
+
+
+		//#debug.
+		//vamos mostrar as informaçoes da primeira thread sempre..
+		//quando falhar,veremos se ha algo de diferente.
+
+
 		//if ( (void *) Thread != NULL )
 		//{
-        //    mostra_slot ( (int) Thread->tid );
-        //    mostra_reg  ( (int) Thread->tid );
-        //    refresh_screen ();
+		//    mostra_slot ( (int) Thread->tid );
+		//    mostra_reg  ( (int) Thread->tid );
+		//    refresh_screen ();
 		//}    
-    
-    
-    // #debug
+
+
+	// #debug
     printf ("Go to user mode!\n");
     refresh_screen (); 
-	
+
 	// #importante
 	// Mudamos para a última fase da inicialização.
 	// Com isso alguns recursos somente para as fases anteriores
 	// deverão ficar indisponíveis.
-	
-	KeInitPhase = 4;
-	   
+
+    KeInitPhase = 4;
+
 	// # go!
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 
 	// para ela via iret.
-	
+
 	// #todo:
 	// #importante:
 	// Podemos usr os endereços que estão salvos na estrutura.
-	
+
 	//#bugbug:
 	//temos a questão da tss:
 	//será que a tss está configurada apenas para a thread idle do INIT ??
 	//temos que conferir isso.
-	
+
 	//base dos arquivos.
-	unsigned char *buff1 = (unsigned char *) 0x00400000;
-	unsigned char *buff2 = (unsigned char *) 0x00450000;
-	unsigned char *buff3 = (unsigned char *) 0x004A0000;	
-		
-	
+
+    unsigned char *buff1 = (unsigned char *) 0x00400000;
+    unsigned char *buff2 = (unsigned char *) 0x00450000;
+    unsigned char *buff3 = (unsigned char *) 0x004A0000;	
+
+
 	//init
+
     if (n == 1 )
     {
-	    if ( buff1[0] != 0x7F ||
-		     buff1[1] != 'E' ||
-		     buff1[2] != 'L' ||
-		     buff1[3] != 'F' )
-	    {
-	        printf ("x86mainStartFirstThread: init .ELF signature");
-		    die ();
-	    }
-        
+        if ( buff1[0] != 0x7F ||
+             buff1[1] != 'E' ||
+             buff1[2] != 'L' ||
+             buff1[3] != 'F' )
+        {
+            printf ("x86mainStartFirstThread: init .ELF signature");
+            die ();
+        }
+
         printf (">>> IRET\n");
-        refresh_screen ();  
-        
+        refresh_screen ();
+
 		//#test
 		//vamos usar o ds do kernel para configurar a pilha.
 		//nova pilha de ring0 em conformidade com a tss0; isso porque esp vai mudando com o tempo.
-		
+
         asm volatile ( " movl $0x003FFFF0, %esp \n" 
-					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
+                       " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
                        " movl $0x0044FFF0, %ds:0x0C(%esp)  \n"  // esp 
                        " movl $0x3000,     %ds:0x08(%esp)  \n"  // eflags.
                        " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
@@ -286,10 +290,10 @@ void x86mainStartFirstThread ( int n ){
                        " mov %ax, %es    \n"
                        " mov %ax, %fs    \n"
                        " mov %ax, %gs    \n"
-					   " iret \n" );			
-	};
-    
-   	
+                       " iret \n" );
+    };
+
+
 	//shell
     if (n == 2 )
     {		
@@ -306,7 +310,7 @@ void x86mainStartFirstThread ( int n ){
         refresh_screen ();  
         
         asm volatile ( " movl $0x003FFFF0, %esp \n" 
-					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
+                       " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
                        " movl $0x0049FFF0, %ds:0x0C(%esp)  \n"  // esp 
                        " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
                        " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
@@ -316,7 +320,7 @@ void x86mainStartFirstThread ( int n ){
                        " mov %ax, %es    \n"
                        " mov %ax, %fs    \n"
                        " mov %ax, %gs    \n"
-					   " iret \n" );
+                       " iret \n" );
 	};
 	
     //taskman
@@ -335,7 +339,7 @@ void x86mainStartFirstThread ( int n ){
         refresh_screen ();         
     
         asm volatile ( " movl $0x003FFFF0, %esp \n" 
-					   " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
+                       " movl $0x23,       %ds:0x10(%esp)  \n"  // ss.
                        " movl $0x004FFFF0, %ds:0x0C(%esp)  \n"  // esp 
                        " movl $0x3200,     %ds:0x08(%esp)  \n"  // eflags.
                        " movl $0x1B,       %ds:0x04(%esp)  \n"  // cs.
@@ -345,9 +349,9 @@ void x86mainStartFirstThread ( int n ){
                        " mov %ax, %es    \n"
                        " mov %ax, %fs    \n"
                        " mov %ax, %gs    \n"
-					   " iret \n" );
+                       " iret \n" );
 	};
-	
+
 	// Paranoia
     panic ("x86mainStartFirstThread: FAIL");
 }
@@ -368,24 +372,22 @@ void x86main (void){
     int Status = 0;
 
 
-	debug_print("[x86] x86main:\n");
-	
+    debug_print("[x86] x86main:\n");
 
 
 #ifdef ENTRY_VERBOSE
     debug_print("[x86] x86main: starting x86 kernel ..\n");
 	//printf("x86main: Starting kernel..\n");
-    //refresh_screen(); 
+	//refresh_screen(); 
 #endif
-	
-	
-		
+
+
 //initializeSystem:
 
-    //
+	//
 	// ## system ##
 	//
-	
+
 	//#importante
 	//#obs: É durante essa rotina que começamos a ter mensagens.	
 	
@@ -397,15 +399,15 @@ void x86main (void){
 	//system.c
 
     systemSystem ();
-	
+
     Status = (int) systemInit ();
-	
+
     if ( Status != 0 )
-	{
-		debug_print ("x86main: systemInit fail\n");
+    {
+        debug_print ("x86main: systemInit fail\n");
         printf ("x86main: systemInit fail\n");
         KernelStatus = KERNEL_ABORTED;
-		
+
         goto fail;
     }
 	
@@ -421,9 +423,9 @@ void x86main (void){
 	
 	init_gdt ();
 
-	
+
 	debug_print ("x86main: processes and threads\n");
-	
+
 	//  ## Processes ##
 
     //=================================================
@@ -439,14 +441,14 @@ void x86main (void){
 
     // Creating Kernel process. PID=0.
     KernelProcess = (void *) create_process( NULL, // Window station.
-	                                         NULL, // Desktop.
-											 NULL, // Window.
-											 (unsigned long) 0xC0000000,  // base address. 
+                                             NULL, // Desktop.
+                                             NULL, // Window.
+                                             (unsigned long) 0xC0000000,  // base address. 
                                              PRIORITY_HIGH,               // Priority.
-											 (int) 0,                     // ppid.
-											 "KERNEL-PROCESS",            // Name.
-											 RING0,                       // iopl. 
-											 (unsigned long ) gKernelPageDirectoryAddress ); // Page directory.	
+                                             (int) 0,                     // ppid.
+                                             "KERNEL-PROCESS",            // Name.
+                                              RING0,                       // iopl. 
+                                              (unsigned long ) gKernelPageDirectoryAddress ); // Page directory.	
     if( (void *) KernelProcess == NULL )
 	{
         panic ("x86main: KernelProcess\n");
@@ -458,20 +460,14 @@ void x86main (void){
         //...
     };
 	
-    
-    // #debug
-    // ok isso funcionou gigabyte/intel
-    // vamos prosseguir.. agora testando a criaçao de thread.
-    // printf ("++++++++++++++++++++++++++++++++++++++++++++++++++++++ x86main +++\n");
-    // refresh_screen(); 
-    // while(1){}	
-
+   
 	// Cria um diretório que é clone do diretório do kernel base 
 	// e retorna o endereço físico desse novo diretório.
 	// gInitPageDirectoryAddress = (unsigned long) CreatePageDirectory();
 		
     //Creating init process.
 	//UPROCESS_IMAGE_BASE;
+	
     InitProcess = (void *) create_process ( NULL, NULL, NULL, 
 										  (unsigned long) 0x00400000, 
                                           PRIORITY_HIGH, 
@@ -491,14 +487,6 @@ void x86main (void){
     };
 	
 		
-	// #DEBUG
-    // isso funcionou ... criamos o processo init
-    // vamos corrigir os bugs na funçao create thread.
-    // printf ("++++++++ x86main INIT PROCESS OK +++\n");
-    // printf ("++++++++ x86main testing thread creation +++\n");
-    // refresh_screen(); 
-    // while(1){}		
-	
     //====================================================
     //Create Idle Thread. tid=0. ppid=0.
     IdleThread = (void *) KiCreateIdle ();
@@ -540,12 +528,6 @@ void x86main (void){
     
 	//==============================================    
     
-    // #debug
-    // ok isso funcionou gigabyte/intel
-    // ok funcionou. vamos prosseguir
-    // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
-    // refresh_screen(); 
-    // while(1){}	
 
 	// #importante
 	// Daqui pra baixo temos a opção de criarmos ou não os processos
@@ -716,17 +698,7 @@ void x86main (void){
 	//===============================================
 	//
 	
-	
-    // #debug
-    // target: parar depois da criaç~ao de processos e trheads. hard hard.
-	// ok funcionou gigabyte/intel vamos avançar..
-    // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
-    // refresh_screen(); 
-    // while(1){}		
-	
-	
-
-	
+		
 	//...
 
 
@@ -736,68 +708,53 @@ void x86main (void){
 #ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
 
     Status = (int) debug ();
-    
-	if ( Status != 0 )
-	{    
+
+    if ( Status != 0 )
+    {
         printf("x86main: debug\n");
-		KernelStatus = KERNEL_ABORTED;
+        KernelStatus = KERNEL_ABORTED;
         goto fail;
     }else{
         KernelStatus = KERNEL_INITIALIZED;
     };
-	
-#endif	
-    
-   
-    // #debug
-    // alvo: parando depois das rotinas de checagem ....
-    // isso funcionou ...vamos prosseguir. gigabyte/intel 
-    // printf ("+++++++++++++ x86main >>>> BREAKPOINT +++\n");
-    // refresh_screen(); 
-    // while(1){}		
 
-   
-    //    ====================== ## TESTS ## =============================
-    // begin - We can make some tests here.
-	
-	
+#endif	
+
+
+
+	//    ====================== ## TESTS ## =============================
+	// begin - We can make some tests here.
+
+
     //Inicializando as variáveis do cursor piscante do terminal.
     //isso é um teste.
     timer_cursor_used = 0;   //desabilitado.
     timer_cursor_status = 0;
 
-	
-   //doTests:
+//doTests:
    //...
-	
+
 	//
 	// ========= ## ps2 ## =============
 	//
-	
-	
-    // Initializing ps/2 controller.
-	//ldisc.c
-	debug_print("x86main: ps2\n");    
-	
-	
-    //#DEBUG
-	//printf ("testing ps2\n");
-    //refresh_screen(); 
-	
-	ps2 ();
-	
-    // OK ISSO FUNCIONOU .... 
-	// MAS FIZEMOS ADAPTAÇÕES NO DRIVER DE I8042 QUE PRECISAM SER REVISTAS ...
-    // COLOCAMOS UNS DELAYS ... 
-    // #DEBUG
-    // printf ("+++++++++++++ x86main >>>> BREAKPOINT OK #REVER \n");   
-    // refresh_screen(); 
-    // while(1){}		
 
-	
-    //
-    // Loading file tests.
-    //
+
+	// Initializing ps/2 controller.
+	// ldisc.c
+	debug_print("x86main: ps2\n");    
+
+
+	//#DEBUG
+	//printf ("testing ps2\n");
+	//refresh_screen(); 
+
+    ps2 ();
+
+
+	//
+	// Loading file tests.
+	//
+
 
 /*
     //#obs: me parece que isso vai funcionar sem problemas.
@@ -811,22 +768,22 @@ void x86main (void){
 	 bmpDisplayBMP ( (char *) __buffer, 0, 0 );  
 */
 	
-    
+
 	// #Aviso:
 	// Isso funcionou, não mudar de lugar.
 	// Mas isso faz parte da interface gráfica,
 	// Só que somente nesse momento temos recursos 
 	// suficientes para essa rotina funcionar.
-	
-	windowLoadGramadoIcons ();
-	
-    // #fonte:
+
+    windowLoadGramadoIcons ();
+
+	// #fonte:
 	// Testando font NelsonCole2
-    // #todo: Isso pode ficar no módulo gws ?
-	
-	gwsInstallFont ("NC2     FON");
-	
-	
+	// #todo: Isso pode ficar no módulo gws ?
+
+    gwsInstallFont ("NC2     FON");
+
+
 	//
 	// ## testando suporte a salvamento de retângulo ##
 	//
@@ -850,61 +807,64 @@ void x86main (void){
 	
 	// ## Criando a janela do servidor taskman ## 
 	// usada para comunicação.
-	
-	gui->taskmanWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, 
-	                                "taskman-server-window", 
-	                                1, 1, 1, 1,           
-							        gui->main, 0, 0, COLOR_WINDOW  ); 
-								 
-	if ( (void *) gui->taskmanWindow == NULL )
-	{
-		printf("x86main: falaha ao criar a janela do servidor taskman\n");
-		die();
-	
-	} else {
-		
+
+    gui->taskmanWindow = (void *) CreateWindow ( 1, 0, VIEW_MINIMIZED, 
+                                    "taskman-server-window", 
+                                    1, 1, 1, 1, 
+                                    gui->main, 0, 0, COLOR_WINDOW  ); 
+
+    if ( (void *) gui->taskmanWindow == NULL )
+    {
+        printf("x86main: falaha ao criar a janela do servidor taskman\n");
+        die ();
+
+    } else {
+
 		//inicializando a primeira mensagem
 		////envia uma mensagem de teste para o servidor taskman
-	    gui->taskmanWindow->msg_window = NULL;
-		gui->taskmanWindow->msg = 0; //temos uma mensagem.
-		gui->taskmanWindow->long1 = 0;
-		gui->taskmanWindow->long2 = 0;
-        gui->taskmanWindow->newmessageFlag = 0;		
-		
-	    //gui->taskmanWindow->msg_window = NULL;
+
+        gui->taskmanWindow->msg_window = NULL;
+        gui->taskmanWindow->msg = 0; //temos uma mensagem.
+        gui->taskmanWindow->long1 = 0;
+        gui->taskmanWindow->long2 = 0;
+        gui->taskmanWindow->newmessageFlag = 0;
+
+		//gui->taskmanWindow->msg_window = NULL;
 		//gui->taskmanWindow->msg = 123; //temos uma mensagem.
 		//gui->taskmanWindow->long1 = 0;
 		//gui->taskmanWindow->long2 = 0;
-        //gui->taskmanWindow->newmessageFlag = 1;		
-		
-	};
-	
+		//gui->taskmanWindow->newmessageFlag = 1;		
 
-    // #debug	
+    };
+
+
+	// #debug	
 	// printf("\n");
 	// refresh_screen();
 	// die();
-			
+
+
 //    ====================== ## TESTS ## =============================
 // #end.	
-	
-	
-	
+
+
+
 #ifdef BREAKPOINT_TARGET_AFTER_ENTRY
-    //#debug 
+	//#debug 
 	//a primeira mensagem só aparece após a inicialização da runtime.
 	//por isso não deu pra limpar a tela antes.
-	printf(">>>debug hang: after entry");
-	refresh_screen(); 
-	while (1){
-		asm ("hlt");
-	}
+
+    printf(">>>debug hang: after entry");
+    refresh_screen(); 
+    while (1){ asm ("hlt"); }
+
 #endif	
-	
-	
+
+
 	//
-    // done !
-    //
+	// done !
+	//
+
 
 done:
 
@@ -912,7 +872,7 @@ done:
 
     // Return to assembly file, (head.s).
     if ( KernelStatus == KERNEL_INITIALIZED )
-	{
+    {
 
 #ifdef KERNEL_VERBOSE
     refresh_screen();
@@ -942,18 +902,18 @@ done:
 #endif
 
         printf("x86main: No idle thread selected.\n");
-	    goto fail;	
+        goto fail;
     };
 
 fail:
-    
-    // #todo
-    // Uma opção aqui é usarmos a tipagem void para essa função
-    // e ao invés de retornarmos, apenas entrarmos na thread idle
-    // em ring 0, isso depois de criadas as threads em user mode.
-    
+
+	// #todo
+	// Uma opção aqui é usarmos a tipagem void para essa função
+	// e ao invés de retornarmos, apenas entrarmos na thread idle
+	// em ring 0, isso depois de criadas as threads em user mode.
+
     printf ("x86main: fail\n");
-	refresh_screen();
+    refresh_screen();
 }
 
 

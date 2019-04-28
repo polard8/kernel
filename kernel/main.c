@@ -189,11 +189,11 @@ int kernel_main (void){
 	
 	//#todo
 	//Talvez um switch.
-	
+
 	// switch (){
-    // ...
-    //}
-    
+	// ...
+	//}
+
 	// #provisório.
 	
 	x86main ();
