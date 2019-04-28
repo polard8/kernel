@@ -31,7 +31,7 @@
  *     + BlMain        - Entrada da parte em C do boot loader. 
  *     + BlLoadKernel  - Carrega o kernel.
  *     + BlLoadFiles   - Carrega os módulos do Kernel, aplicativos e 
-                         metafiles de inicilização.
+ *                       metafiles de inicilização.
  *     + BlSetupPaging - Configura a paginação.
  *     ...
  *
@@ -46,6 +46,7 @@
 
 
 // Protótipos de funções internas.
+
 void BlLoadKernel();
 void BlLoadFiles();
 void BlSetupPaging();
@@ -78,23 +79,24 @@ void BlSetupPaging();
 //void BlMain( int argc, char *argv[], char *envp[] ) 
 
 void BlMain (){
-	
-    //Set GUI.
+
+	//Set GUI.
 	//Isso foi meio imperativo.
-	//VideoBlock.useGui = 1;			
-	//VideoBlock.useGui = 0;				
-	
+	//VideoBlock.useGui = 1;
+	//VideoBlock.useGui = 0;
+
 	//INIT ~ Faz inicializações básicas.
-	init (); 
-	
-	
+
+    init ();
+
+
 	//#test
 	//Inicializando alocação dinâmica de memória.
-	
-	init_heap ();
-	
+
+    init_heap ();
+
 	//#test
-	
+
 	 /*
 	void *tmp;
 	
@@ -105,47 +107,47 @@ void BlMain (){
 	    printf("\n\n\n \n\n\n \n\n\n malloc test fail\n");
 
 	}else{
-	    printf("\n\n\n \n\n\n \n\n\n malloc test ok = %x \n",tmp);	
+	    printf("\n\n\n\n\n malloc test ok = %x \n",tmp);
 	}
 	
 	//#debug breakpoint
 	refresh_screen();
 	while(1){}
 	*/
-	
+
 	//#importante
 	//Para inicializar o IDE precisa inicializar antes a alocaçao dinamica.
-	
-	init_hdd ();	
-	
-	
+
+    init_hdd ();
+
+
 	//
 	//@todo: Limpar a tela.
 	//
-	
+
 	//Welcome Message.
 	//banner
-#ifdef BL_VERBOSE		
-	printf("BlMain: Starting Boot Loader..\n");	
-#endif    
-	
+
+#ifdef BL_VERBOSE
+    printf ("BlMain: Starting Boot Loader..\n");
+#endif
+
 	//Debug:
 	//kprintf( "BlMain: Boot Loader 32 bits em C (TEXT Mode) #test. #hang", 9, 9 );
 	//while(1){}
 
     if (g_initialized != 1)
-	{
-		printf ("BlMain:");
-		die();
-	}
-
+    {
+        printf ("BlMain:");
+        die ();
+    }
 
 	//Debug...
-	//printf("#################################################\n");
-	//printf("#DEBUG: *HANG\n");		
+	//printf("####################\n");
+	//printf("#DEBUG: *HANG\n");
 	//refresh_screen();
 	//while(1){}
-	
+
 
 	//*Importante:
     // ===========
@@ -155,62 +157,63 @@ void BlMain (){
     //
 	// Inicia os carregamentos.
 	//
-	
-	//Carrega arquivos.	
+
+	//Carrega arquivos.
 #ifdef BL_VERBOSE	
     printf("BlMain: Loading files..\n");
     refresh_screen();
 #endif
 
-    
+
 	// #importante:
 	// Carregando o diretório raiz e a fat na memória.
 	// Evitando repetição de carregamento.
-	
-	
+
+
 	// Ok isso deu certo.
-	fs_load_rootdirEx();
-	fs_load_fatEx();
-	
+
+    fs_load_rootdirEx();
+    fs_load_fatEx();
+
     g_fat16_root_status = 1;
     g_fat16_fat_status = 1;	
 
-	
+
 	//
 	//  ## Loading files ... ##
 	//
-	
+
 	//loading kernel base.
-	
+
     BlLoadKernel ();
-	
-	
+
+
 	// @Todo: (Pensando na possibilidade)
 	// Aqui podemos ter acondição de carregarmos apenas o krnel base.
 	// Essa opção deverá ser habilitada através de um arquivo de configuração.
 	// Ou no header do kernel base poderá ter a indicação de quais módulos 
 	// deve-se carregar.
-	
-	
+
+
 	// #importante
 	// Precisamos de uma flag aqui, com a opção de não carregarmos
 	// os outros arquivos e somente carregarmos o kernel.
-	
-	
+
+
 	//Loading files.
-	
+
 	//if ( load_extra_files_flag == 1 )
 	//{
 	//    BlLoadFiles ();
 	//}
-	
-	BlLoadFiles ();
 
-    
-    // Paging:
-    //     Depois carregar o kernel e os módulos 
+    BlLoadFiles ();
+
+
+	// Paging:
+	//     Depois carregar o kernel e os módulos 
 	//     nos seus endereços físicos, 
-    //     configura a paginação e 
+	//     configura a paginação e 
 	//     volta para o assembly para 
 	//     configurar os registradores e 
 	//     passar o comando para o kernel.
@@ -218,37 +221,36 @@ void BlMain (){
 	// Obs:
 	//     Essa configuração básica não impede
 	//     que o kernel faça uma reconfiguração completa.
-    
+
 #ifdef BL_VERBOSE	
 	printf("BlMain: Initializing pages..\n");
 	//refresh_screen();
 #endif	
-	BlSetupPaging();
-    
-    
-	//@todo: Atualizar status.
- 	
 	
-  // Done:
-  //     Ao retornar, head.s configura CR0 e CR3.	
+    BlSetupPaging();
+
+
+	//@todo: Atualizar status.
+
+// Done:
+//     Ao retornar, head.s configura CR0 e CR3.
 
 //done:
-	
-    //Debug message.
-	
-//#ifdef BL_VERBOSE	
-//	printf("BlMain: LFB={%x} \n",g_lbf_pa);	
+
+	//Debug message.
+
+//#ifdef BL_VERBOSE
+//	printf("BlMain: LFB={%x} \n",g_lbf_pa);
 //#endif
 
 #ifdef BL_VERBOSE	
     printf("BlMain: Done\n");
-    //printf("#DEBUG: *HANG\n");		
-	refresh_screen();
-    //while(1){};	
-#endif	
+    //printf("#DEBUG: *HANG\n");
+    refresh_screen();
+    //while(1){};
+#endif
 
-	//return;
-};
+}
 
 
 /*
@@ -259,19 +261,19 @@ void BlMain (){
  */ 
 
 void BlLoadKernel (){
-	
+
     int Status;
-	
-	Status = (int) load_kernel ();	
-	
-	if ( Status != 0 )
-	{
-		printf ("BlLoadKernel:\n");
-	    die();		
-	};
+
+    Status = (int) load_kernel ();
+
+    if ( Status != 0 )
+    {
+        printf ("BlLoadKernel:\n");
+        die ();
+    };
 }
- 
- 
+
+
 /*
  ****************************************************
  * BlLoadFiles:
@@ -282,18 +284,18 @@ void BlLoadKernel (){
  */ 
 
 void BlLoadFiles (){
-	
-	int Status;
-	
+
+    int Status;
+
 	// Está em loader.c
-	Status = (int) load_files ();
-	
-	if ( Status != 0 )
-	{
-	    //Erro fatal.
-		printf ("BlLoadFiles:\n");
-	    die();	
-	};
+    Status = (int) load_files ();
+
+    if ( Status != 0 )
+    {
+		//Erro fatal.
+        printf ("BlLoadFiles:\n");
+        die ();
+    };
 }
 
 
@@ -325,12 +327,12 @@ void BlLoadFiles (){
 * 
  *      Essa deve ser uma interface que chama as rotinas de configuração
  * da paginação. 
- * 
- */ 
+ */
+
 void BlSetupPaging (){
-	
+
     SetUpPaging ();
-};
+}
 
 
 /*
@@ -338,18 +340,18 @@ void BlSetupPaging (){
  * BlAbort:
  *     Rotina para abortar o bootloader em caso de erro grave.
  */
+
 void BlAbort (){
-	
-	
+
+
 	//@todo: 
 	//    Talvez poderia ter uma interface antes de chamar a rotina abort().
 	//
 	//ex:
 	//checks()
-	
+
     abort (); 
-    //die ();	
-};
+}
 
 
 /*
@@ -361,11 +363,10 @@ void BlAbort (){
  */
  
 void BlKernelModuleMain (){
-	
-    printf("BlKernelModuleMain: Boot Loader\n");
-    refresh_screen();
-}
 
+    printf ("BlKernelModuleMain: Boot Loader\n");
+    refresh_screen ();
+}
 
 
 /*
@@ -382,18 +383,20 @@ void BlKernelModuleMain (){
  */
 
 void die (){
-	
-	printf ("die: (BL.BIN) * System Halted");    
-	refresh_screen ();
-	   
-	while (1){
-		
-	    asm ("cli"); 	
-	    asm ("hlt");    		
-	};                        
+
+    printf ("die: (BL.BIN) * System Halted");
+    refresh_screen ();
+
+    while (1){
+
+        asm ("cli");
+        asm ("hlt");
+    };
 }
- 
+
 
 //
 // End.
-//  
+//
+
+

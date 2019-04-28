@@ -1,7 +1,7 @@
 ;
 ; Gramado Boot Loader - a Boot Loader entry point for x86 processors.
 ; It's a 32bit, kernel mode, system aplication used to load the kernel and 
-;some other files.
+; some other files.
 ; (c) Copyright 2015-2016 Fred Nora.
 ;
 ; File: head.s 
@@ -44,7 +44,7 @@ segment .head_x86
 ;Endereço físico do Linear Frame Buffer, LFB.
 extern _g_lbf_pa      
 ;...
- 
+
 
 ; Funções importadas.
 
@@ -81,78 +81,80 @@ _bootloader_entry_point:
 
     ; #debug.
     ; text mode.
-	
-	mov byte [0xb8000], byte "B"	
-    mov byte [0xb8001], byte 9	
-    mov byte [0xb8002], byte "L"	
-    mov byte [0xb8003], byte 9	
-   
+
+    mov byte [0xb8000], byte "B"
+    mov byte [0xb8001], byte 9
+    mov byte [0xb8002], byte "L"
+    mov byte [0xb8003], byte 9
+
     ;Debug.
-    ;JMP $    
-    
+    ;JMP $
+
 	;Salva o modo de vídeo.
     mov byte [bl_video_mode], al
-	
+
 	;Verifica se usa gui ou não.
 	cmp al, byte 'G'
 	je .useGUI
 .dontuseGUI:
-	mov dword [_SavedBootMode], 0    ;Text Mode flag.
-    jmp .go    	
-.useGUI:	
-    mov dword [_SavedBootMode], 1    ;GUI flag.	
+    mov dword [_SavedBootMode], 0    ;Text Mode flag.
+    jmp .go 
+
+.useGUI:
+    mov dword [_SavedBootMode], 1    ;GUI flag.
+
 .go:		
 	;Salva o LFB.
 	;Global para endereço físico do LFB.
 	mov dword [_g_lbf_pa], ebx    
-	
+
    ; @todo: 
    ;     Passar o bootblock em ebx e a flag em al.
-   
+
     mov byte [bl_video_mode], al
     mov dword [_g_lbf_pa], ebx         ;Endereço físico do LFB.
-   
-    ;;
+
+	;;
 	;; ## Boot Block ##
 	;;
-	
+
 	;BootBlock pointer.
 	;Ponteiro para o bootblock passado pelo boot manager.
 	
-    mov dword [_SavedBootBlock], edx        
-	
+    mov dword [_SavedBootBlock], edx 
+
     ;LFB, X, Y, BPP
-	
-	xor eax, eax
-	mov eax, dword [edx +0]    	
-	mov dword [_SavedLFB], eax
-	
-	xor eax, eax
-    mov ax, word [edx +4]      	
+
+    xor eax, eax
+    mov eax, dword [edx +0] 
+    mov dword [_SavedLFB], eax
+
+    xor eax, eax
+    mov ax, word [edx +4] 
     mov dword [_SavedX], eax
-	
-	xor eax, eax
-    mov ax, word [edx +8]      	
+
+    xor eax, eax
+    mov ax, word [edx +8] 
     mov dword [_SavedY], eax
-	
-	xor eax, eax
+
+    xor eax, eax
     mov al, byte [edx +12]     	
     mov dword [_SavedBPP], eax
-	
-	
+
+
 	; #todo: 
 	; Pode-se zerar os registradores nesse momento ?
-	
-	
+
+
 	;Configura IDT. 
 	;Aponta tudo para 'unhandled_int'.
 	;Configura vetores de faults e exception.
 	;Outros vetores.
-	
-    cli    
-	call setup_idt 	      
-	call setup_faults     
-	call setup_vectors    
+
+    cli 
+    call setup_idt 
+    call setup_faults 
+    call setup_vectors 
 
 	;Carrega GDT e IDT.
 	
@@ -194,72 +196,77 @@ _bootloader_entry_point:
 	out 0xA1, al
 	cli
 	
-	;unmask all interrupts	
-	mov al, 0					                  
-	out 0xa1, al                                   
-	out 0x21, al    
+	;unmask all interrupts
+
+    mov al, 0
+    out 0xa1, al 
+    out 0x21, al 
 
     ;; Calling C part of the kernel base.
-	
+
 ;.callBlMain:
 
-    ;;
+	;;
 	;;  ## Call ##
 	;;
 
-	call _BlMain
-	
+    call _BlMain
+
 ;.getResponse:
 
 	;; Response in EAX.
-	
-	
+
+
 	; Debug.
 	; jmp $
-	
-	
+
+
 	; Obs:
 	; A rotina _BlMain configurou os diretórios e as pagetables.
 	; Configurou 4 diretórios e algumas pagetables.
-    ; Agora registramos o diretório do processo kernel em cr3.
+	; Agora registramos o diretório do processo kernel em cr3.
 	; Colocando no CR3 o endereço do diretório de páginas que o Kernel usará.
 
-	
-setupCR3:	
+
+setupCR3:
 
 	; @todo: 
 	; Usar variável global.
 	; Obs:  
-	; Para sistemas pequenos.             	
-	
-	mov eax, dword (0x01000000 - 0x900000)           
-	mov cr3, eax                  	
-  
-    ;Flush TLB.
+	; Para sistemas pequenos. 
+
+    mov eax, dword (0x01000000 - 0x900000) 
+    mov cr3, eax 
+
+	;Flush TLB.
+
 flushTLB:
+
     jmp dummy_flush
+
 	;TLB.
-dummy_flush:	
-	mov EAX, CR3  
+dummy_flush:
+
+    mov EAX, CR3  
     nop
-	nop
-	nop
-	nop
     nop
-	nop
-	nop
-	nop	
-	mov CR3, EAX  
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+    mov CR3, EAX
 
 setupCR0:
-	
+
 	; Configura CR0  #(PG).
-	
-	mov eax, cr0                    
-	or eax, dword 0x80000000        
-	mov cr0, eax   
-	
-	
+
+    mov eax, cr0 
+    or eax, dword 0x80000000 
+    mov cr0, eax 
+
+
 	; Meta-Object: @todo:
 	; ============
 	;     O Boot Loader passar para o kernel um Meta-Objeto na forma de vetor,
@@ -269,7 +276,7 @@ setupCR0:
 	; pode atuar como um módulo do kernel em kernel mode. Outro método
 	; que o Boot Loader deve passar para o kernel base é o método _bmServices
 	; herdado do Boot Manager.
-	
+
 	; Preparando para passa o comando para o Kernel.
 	;
 	; @todo: 
@@ -279,15 +286,15 @@ setupCR0:
     ; ebx = LFB address.
     ; ecx = BootBlock pointer.
     ; edx = LoaderBlock pointer.
-    
+
 
 StartKernelEntry:
-	
+
 	;LFB address.
 	;Width in pixels.
 	;Height in pixel.
 	;bpp.
-	
+
 	xor eax, eax
 	mov eax, dword [_SavedLFB]    
 	mov dword [BootBlock.lfb], eax
@@ -303,9 +310,9 @@ StartKernelEntry:
 	xor eax, eax
 	mov al, byte [_SavedBPP]     
 	mov dword [BootBlock.bpp], eax 
-    
+
 	;Continua...
-	
+
 	; Argumentos passandos através dos registradores:
 	; al = Flag.
 	; ebx = LFB address.
@@ -329,51 +336,52 @@ StartKernelEntry:
 	jne .nogui 
 	mov al, byte 'G'    ;Use GUI.
 	jmp .gui
+
 .nogui:
+
 	mov al, byte 'T'    ;Use text mode.
-	
-    ; Debug.
-    ; Text mode.
-	
-	mov byte [0xb8000], byte "g"	
-    mov byte [0xb8001], byte 9	
-    mov byte [0xb8002], byte "o"	
-    mov byte [0xb8003], byte 9		
-.gui:		
-    
+
+	; Debug.
+	; Text mode.
+
+    mov byte [0xb8000], byte "g"
+    mov byte [0xb8001], byte 9
+    mov byte [0xb8002], byte "o"
+    mov byte [0xb8003], byte 9
+
+.gui:
+
 	;;
 	;; Go ! 
 	;; (Passa o comando para o Kernel.)
 	;;
-	
+
 	; #obs:
 	; Sem o header do multiboot. 
 	
-	jmp CODE_SEL:0xC0001000        
+	jmp CODE_SEL:0xC0001000 
 	jmp $
-	
-	
-	
-;;===============================================================	
+
+
+
+;;===============================================================
 ;;
 ;;  # Boot loader Shell loop #
 ;;
 
-blShellLoop:	
+blShellLoop:
 
-    ;Aqui está aberta a opção de chamar o shell do boot loader.
-    ;call _shell_main	
-	
-	jmp blShellLoop
+	;Aqui está aberta a opção de chamar o shell do boot loader.
+	;call _shell_main	
 
-	
+    jmp blShellLoop
+
+
 ;========================================================
 ; BootBlock:
 ;     Bloco de configuração de inicialização.
-;     * 
-;     * LFB address.
-;     *
-;
+;     LFB address.
+
 BootBlock:
 .lfb: dd 0    ;LFB address.
 .x:   dd 0    ;Width in pixels.
@@ -415,50 +423,64 @@ _SavedBootMode:
 ; gdt ----------------------------
 ;
 
-gdt:	
+
+gdt:
+
 ; Nulo.
 NULL_SEL equ $-gdt
     dd 0
     dd 0
+
 ; Segmento de código.
 CODE_SEL equ $-gdt
-	dw 0xFFFF
-	dw 0
-	db 0 
-	db 0x9A    ; present, ring0, code, non-confirming, readble.
-	db 0xCF
-	db 0
+    dw 0xFFFF
+    dw 0
+    db 0 
+    db 0x9A    ; present, ring0, code, non-confirming, readble.
+    db 0xCF
+    db 0
+
 ; Segmento de dados.
 DATA_SEL equ $-gdt
-	dw 0xFFFF
-	dw 0
-	db 0 
-	db 0x92   ; present, ring0, data, expanded up, writeble. (BITS)
-	db 0xCF
-	db 0	
-; Outros. #suspensos.
+    dw 0xFFFF
+    dw 0
+    db 0 
+    db 0x92   ; present, ring0, data, expanded up, writeble. (BITS)
+    db 0xCF
+    db 0
+
+;video
 VIDEO_SEL equ $-gdt	
     dq 0x00c0920b80000002     ;/* screen 0x18 - for display */
+
+;tss0
 TSS0_SEL equ $-gdt	
-	dq 0x0000e90100000068     ;# TSS0 descr 0x20
+    dq 0x0000e90100000068     ;# TSS0 descr 0x20
+
+;ldt
 LDT0_SEL equ $-gdt
-	dq 0x0000e20100000040     ;# LDT0 descr 0x28
+    dq 0x0000e20100000040     ;# LDT0 descr 0x28
+
+;tss1
 TSS1_SEL equ $-gdt	
-	dq 0x0000e90100000068     ;# TSS1 descr 0x30
+    dq 0x0000e90100000068     ;# TSS1 descr 0x30
+
+;ldt1
 LDT1_SEL equ $-gdt
     dq 0x0000e20100000040     ;# LDT1 descr 0x38	
+
 end_gdt:
     dd 0
+
 
 ;
 ; GDT_register - registro.
 ;  
 GDT_register:
-	dw (end_gdt-gdt)-1
-    dd gdt 	
-	
+    dw (end_gdt-gdt)-1
+    dd gdt 
 
- 
+
 ;
 ; idt ---------------------------
 ;
@@ -475,7 +497,7 @@ sys_code       equ  8        ;Seletor de código.
 idt:
 
 ;0 interrupt 0h, Div error.
-	dw 0			                   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt

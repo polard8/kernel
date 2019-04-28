@@ -1,3 +1,8 @@
+/*
+ * File: heap.c
+ *     2015 - Created by Fred Nora.
+ */
+
 
 
 #include <bootloader.h>
@@ -203,13 +208,14 @@ try_again:
 		// Obs: Perceba que 'Current' e 'Current->Header' 
 		// devem ser iguais. 
 
-        // Identificadores básicos:
+		// Identificadores básicos:
 		// Endereço onde começa o header.
 		// Tamanho do header. (*TAMANHO DA STRUCT).
 		// Id do mmblock. (Índice na lista)
 		// used and magic flags.
 		// 0=not free 1=FREE (*SUPER IMPORTANTE)
-		Current->Header = (unsigned long) g_heap_pointer;  
+
+        Current->Header = (unsigned long) g_heap_pointer;  
         Current->headerSize = MMBLOCK_HEADER_SIZE;         
         Current->Id = mmblockCount;                        
         Current->Used = 1;                
@@ -249,10 +255,10 @@ try_again:
 		// 'userareaSize' como tamanho da área de cliente, 
 		// esse tamanho equivale ao tamanho solicitado mais o 
 		// tanto de bytes não usados.
-        // Obs: Por enquanto o tamanho da área de cliente tem 
+		// Obs: Por enquanto o tamanho da área de cliente tem 
 		// apenas o tamanho do espaço solicitado.
-        
-		Current->Footer = (unsigned long) Current->userArea + size;
+
+        Current->Footer = (unsigned long) Current->userArea + size;
 
         //
         // Heap pointer. 
@@ -274,7 +280,7 @@ try_again:
         // Coloca o ponteiro na lista de blocos.
         //
 
-		
+
         mmblockList[mmblockCount] = (unsigned long) Current;
 
         //
@@ -301,44 +307,42 @@ try_again:
         g_heap_pointer = (unsigned long) Current->Footer;
 
 
-        //
         // Available heap:
         // Calcula o valor de heap disponível para as próximas alocações.
         // O heap disponível será o que tínhamos disponível menos o que 
         // gastamos agora.
         // O que gastamos agora foi o tamanho do header mais o tamanho da área
         // de cliente.
-        //
 
         g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);
 
-        //
 		// ## Finalmente ##
-		//
-        // Retorna o ponteiro para o início da área alocada.
+		// Retorna o ponteiro para o início da área alocada.
 		// Essa área alocada chamado de user area.
-        // Obs: Esse é o valor que será usado pela função malloc.
-        //
-        // *Importante:
-        // O que acontece se um aplicativo utilizar além da área alocada ??
-        // O aplicativo invadirá a área do footer, onde está a estrutura do 
-        // próximo bloco. Inutilizando as informações sobre aquele bloco.
-        // *Aviso: Cuidado com isso. @todo: Como corrigir.?? O que fazer??
-        //
+		// Obs: Esse é o valor que será usado pela função malloc.
+		//
+		// *Importante:
+		// O que acontece se um aplicativo utilizar além da área alocada ??
+		// O aplicativo invadirá a área do footer, onde está a estrutura do 
+		// próximo bloco. Inutilizando as informações sobre aquele bloco.
+		// *Aviso: Cuidado com isso. @todo: Como corrigir.?? O que fazer??
 
         return (unsigned long) Current->userArea;
-        //Nothing.
+
+		//Nothing.
 
     }else{
 
-        //Se o ponteiro da estrutura de mmblock for inválido.
+		//Se o ponteiro da estrutura de mmblock for inválido.
+
         printf("heapAllocateMemory fail: struct.\n");
         goto fail;
+
     };
 
 
-    // @todo: 
-    // Checar novamente aqui o heap disponível. Se esgotou, tentar crescer.
+	// @todo: 
+	// Checar novamente aqui o heap disponível. Se esgotou, tentar crescer.
 
 
     /*
@@ -371,13 +375,12 @@ try_again:
 //
 
 fail:
+
     refresh_screen();
     //Se falhamos, retorna 0. Que equivalerá à NULL.
     return (unsigned long) 0;
-};
 
-
-
+}
 
 
 /*
@@ -387,62 +390,62 @@ fail:
  */
 
 void FreeHeap (void *ptr){
-	
-	struct mmblock_d *Header;		
-	
-	if ( (void *) ptr == NULL )
-	    return;
-	
-	
-    if ( ptr < (void *) BL_HEAP_START || ptr >= (void *) BL_HEAP_END ){
-		return;
-	}
-	
-	
+
+    struct mmblock_d *Header;
+
+    if ( (void *) ptr == NULL )
+        return;
+
+
+    if ( ptr < (void *) BL_HEAP_START || ptr >= (void *) BL_HEAP_END )
+    {
+        return;
+    }
+
+
 	// Header
 	// Encontrando o endereço do header.
 	// O ponteiro passado é o endereço da área de cliente.
-	
-	unsigned long UserAreaStart = (unsigned long) ptr; 
-	
-	Header = (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
-	
-	if ( (void *) Header == NULL )
-	{
+
+    unsigned long UserAreaStart = (unsigned long) ptr;
+
+    Header = (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
+
+    if ( (void *) Header == NULL )
+    {
 		return;
 		
-	}else{
-	
-		if ( Header->Used != 1 || Header->Magic != 1234 )	
-		{
-			return;
-		}
-		
+    }else{
+
+        if ( Header->Used != 1 || Header->Magic != 1234 )
+        {
+            return;
+        }
+
 		//Checa
+
 		if ( mmblockList[mmblockCount] == (unsigned long) Header && 
 			 Header->Id == mmblockCount )
 		{
 			mmblockList[mmblockCount] = 0;
 			mmblockCount--;
 		}
-		
+
 		//Isso invalida a estrutura, para evitar mal uso.
-		Header->Used = 0;
-		Header->Magic = 0;
-		
-		g_heap_pointer = (unsigned long) Header;
-	}
-	    	
-	//return;    
+
+        Header->Used = 0;
+        Header->Magic = 0;
+
+        g_heap_pointer = (unsigned long) Header;
+
+    };
+
 }
 
 
 
-
-
-
 /*
- ***********************************************************************
+ ********************************************
  * init_heap:
  *     Iniciar a gerência de Heap do bl. 
  *     @todo: Usar heapInit() ou heapHeap(). memoryInitializeHeapManager().
@@ -531,26 +534,30 @@ int init_heap (){
 // Done.
 //done:
 
+
 #ifdef MK_VERBOSE
     printf("Done\n");
-#endif	
-	
-	return (int) 0;
-	
-    
+#endif
+
+    return 0;
+
+
 	// Fail. 
 	// Falha ao iniciar o heap do bl.
 
 fail:
-    printf("init_heap: Fail\n");
-	refresh_screen();
-	
+
+    printf ("init_heap: Fail\n");
+    refresh_screen ();
+
 	/*
 	// #debug
 	printf("* Debug: %x %x  \n", bl_heap_start, bl_heap_end );	
 	refresh_screen();	 
     while(1){}		
 	*/
-    
-	return (int) 1;
-};
+
+    return 1;
+}
+
+
