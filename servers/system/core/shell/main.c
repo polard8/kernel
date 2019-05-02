@@ -3637,41 +3637,59 @@ do_compare:
 		goto exit_cmp;
 	};
 
+
+
+
+	
 	
 
-	// send message to a process.
-	// Envia uma mensagem para a trhead de controle de um processo.
+	// t18
+	// Send message to a process.
+	// Envia uma mensagem para a thread de controle de um processo.
 	// Nesse teste vamos mandar uma mensagem para esse processo mesmo.
-	
+
 	if ( strncmp( prompt, "t18", 3 ) == 0 )
 	{
+        enterCriticalSection ();
+        printf ("t18:\n");
+
+		//get pid
+        PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
+
+		//Enviando uma mensagem para um processo.
+		apiSendMessageToProcess ( PID, NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
+
+       	printf ("t18: done\n");
+        exitCriticalSection ();
+
+        goto exit_cmp;
+	}
+
+
+
+
+
+
+
+	
+	
+	
+
+/*
 		//veja essa rotina na api.
 		//apiSendMessageToProcess
 		//apiSendMessageToThread
 		
-		printf ("t18:\n");
-		enterCriticalSection (); 
-        PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );			
-	    
 		//isso funciona.
 		//message_buffer[0] = 0;
 		//message_buffer[1] = MSG_COMMAND;  //msg
 		//message_buffer[2] = CMD_ABOUT;    //long1
 		//message_buffer[3] = CMD_ABOUT;		
 		//system_call ( 112, (unsigned long) &message_buffer[0], PID, PID );
-		
-		//testando api.
-		//isso funcionou. Usar esse!
-		apiSendMessageToProcess ( PID, 
-		    NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
-		
-		exitCriticalSection ();
-		printf ("t18: done\n");
-		goto exit_cmp;
-	}
-
+*/	
 	
 
+	
 	
 	//flush stdout
 	if ( strncmp( prompt, "flush-stdout", 12 ) == 0 )

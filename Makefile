@@ -66,16 +66,16 @@ CFLAGS = -m32 \
 	-fleading-underscore \
 	-fno-stack-protector \
 	-s \
-    -Werror=strict-prototypes 
-	
-	
+	-Werror=strict-prototypes 
+
+
 	#importante:
 	##todo estamos incluindo essa flag, para isso temos que editar 
 	#os argumentos em muitas funções ainda..
 	#-Werror=strict-prototypes  
-	
-	
-	
+
+
+
 #testando esses
 #	-Wno-trigraphs \
 #	-Wno-format-security \
@@ -412,20 +412,19 @@ link-x86:
 #
 
 danger-hdd-clone-vhd:
-	sudo dd if=./GRAMADO.VHD of=/dev/sda	
-	
+	sudo dd if=./GRAMADO.VHD of=/dev/sda
+
 hdd-mount:
 	-sudo umount /mnt/gramadohdd
 	sudo mount -t vfat -o loop,offset=32256 /dev/sda /mnt/gramadohdd/
-	
+
 hdd-unmount:
 	-sudo umount /mnt/gramadohdd
 	
 hdd-copy-kernel:
 	sudo cp bin/boot/KERNEL.BIN /mnt/gramadohdd/BOOT 
 
-	
-	
+
 #
 # ======== VHD ========
 #
@@ -434,7 +433,7 @@ vhd-mount:
 	@echo "Mounting VHD ..."
 	-sudo umount /mnt/gramadovhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadovhd/
-	
+
 # umount
 vhd-unmount:
 	@echo "Unmounting VHD ..."
@@ -442,11 +441,11 @@ vhd-unmount:
 
 /mnt/gramadovhd:
 	sudo mkdir /mnt/gramadovhd
-	
+
 vhd-x86:
 
 	@echo "Creating VHD ..."
-	
+
 	nasm -I arch/x86/boot/vhd/stage1/ \
 	-I arch/x86/boot/vhd/vbr/ \
 	-I arch/x86/boot/vhd/footer/ arch/x86/boot/vhd/main.asm  -o  GRAMADO.VHD
@@ -463,13 +462,13 @@ vhd-copy-files:
 
 	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd
 	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd
-	
+
 # user/config
-	sudo cp user/config/USER.TXT /mnt/gramadovhd
-	sudo cp user/config/INIT.TXT /mnt/gramadovhd
-	sudo cp user/config/GUI.TXT  /mnt/gramadovhd
-	sudo cp user/config/GRAMADO.TXT /mnt/gramadovhd
-	
+	sudo cp user/config/USER.TXT     /mnt/gramadovhd
+	sudo cp user/config/INIT.TXT     /mnt/gramadovhd
+	sudo cp user/config/GUI.TXT      /mnt/gramadovhd
+	sudo cp user/config/GRAMADO.TXT  /mnt/gramadovhd
+
 # bitmaps
 	sudo cp kernel/kservers/kgws/bmp/APP.BMP       /mnt/gramadovhd
 	sudo cp kernel/kservers/kgws/bmp/BMP1.BMP      /mnt/gramadovhd
@@ -484,21 +483,23 @@ vhd-copy-files:
 
 # fonts
 	sudo cp bin/NC2.FON /mnt/gramadovhd	
-	
+
 #Get available apps
 	-sudo cp ../gde/bin/GRAMCODE.BIN  /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GRAMTEXT.BIN  /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GFE.BIN       /mnt/gramadovhd 
 	-sudo cp ../gde/bin/SPR.BIN       /mnt/gramadovhd 
-	
-	-sudo cp ../gde/bin/GDEINIT.BIN   /mnt/gramadovhd 	
+
+	-sudo cp ../gde/bin/GDEINIT.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GDESHELL.BIN  /mnt/gramadovhd 
+	-sudo cp ../gde/bin/GDETERM.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GDETM.BIN     /mnt/gramadovhd 
-	
+
 	-sudo cp ../gde/bin/JACKPOT.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/CAT.BIN       /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GLIBCT1.BIN   /mnt/gramadovhd 
 	-sudo cp ../gde/bin/GRAMC.BIN     /mnt/gramadovhd 
+
 
 #...
 	
