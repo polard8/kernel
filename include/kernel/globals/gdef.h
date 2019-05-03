@@ -250,6 +250,28 @@ typedef enum {
 }object_class_t;
 
 
+// #importante
+// Essas configurações de x server e window manager
+// ficarão aqui e não em kgws porque o próprio kgws é
+// um x server e um window manager.
+// Quando o valor for '0' é o kgws o servidor atual.
+
+//
+// X Server support
+//
+
+
+// PID do processo que é o servidor de recursos gráficos
+int g_xserver_pid;
+
+
+//
+// Window manager support.
+//
+
+
+// PID do processo que é o window manager atual.
+int g_wm_pid;
 
 //
 // buffer support

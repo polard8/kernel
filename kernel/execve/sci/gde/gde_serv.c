@@ -217,16 +217,16 @@ void *gde_services ( unsigned long number,
 	
 	if ( (void *) CurrentColorScheme == NULL )
 	{
-		printf("StatusBar: CurrentColorScheme");
-		die();
+		printf ("gde_services: CurrentColorScheme");
+		die ();
 	
 	}else{
 		
 		if ( CurrentColorScheme->used != 1 || 
 		     CurrentColorScheme->magic != 1234 )
 		{
-		    printf("StatusBar: CurrentColorScheme validation");
-		    die();		
+		    printf ("gde_services: CurrentColorScheme validation");
+		    die ();		
 		};
 		//Nothing.
 	};	
@@ -258,7 +258,65 @@ void *gde_services ( unsigned long number,
 	{
 	    return (void *) serviceCreateWindow ( (char *)  arg2 );
 	}
+	
+	
+	//
+	// x server and wm support
+	//
+	
+	
 
+	// get x server PID
+	if ( number == 512 )
+	{
+	    return (void *) g_xserver_pid;
+	}
+	
+	// set x server PID
+	if ( number == 513 )
+	{		
+		g_xserver_pid = (int) arg2;
+		return NULL;
+	}
+	
+	// get wm PID
+	if ( number == 514 )
+	{
+	    return (void *) g_wm_pid;
+	}
+	
+	// set wm PID
+	if ( number == 515 )
+	{
+	    g_wm_pid = (int) arg2;
+		return NULL;
+	}	
+	
+    // show x server info	
+	if ( number == 516 )
+	{
+		kprintf ("x server info: PID=%d \n", g_xserver_pid);
+	    refresh_screen ();	
+		return NULL;
+	}
+
+    // show wm info		
+	if ( number == 517 )
+	{
+		kprintf ("window manager info: PID=%d \n", g_wm_pid);
+	    refresh_screen ();	
+		return NULL;		
+	}
+
+
+
+	
+	
+	
+	//
+	// test
+	//
+	
 	
 	//#bugbug: estamos revendo isso, veja sci/gde
 	// 7000 ~ 7999

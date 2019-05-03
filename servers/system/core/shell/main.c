@@ -1669,8 +1669,8 @@ void *shellProcedure ( struct window_d *window,
 				// Abre uma janela e oferece informações sobre o aplicativo.
 				case CMD_ABOUT:
 				    // Test.
-					printf("CMD_ABOUT\n");
-				    MessageBox ( 1, "Shell test", "Testing MSG_COMMAND.CMD_ABOUT." );
+					printf("X SERVER\n");
+				    MessageBox ( 1, "X SERVER TEST", "Testing MSG_COMMAND.CMD_ABOUT." );
 				    break;
 				
 				//clicaram no botão
@@ -3657,7 +3657,7 @@ do_compare:
         PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
 
 		//Enviando uma mensagem para um processo.
-		apiSendMessageToProcess ( PID, NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
+        apiSendMessageToProcess ( PID, NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
 
        	printf ("t18: done\n");
         exitCriticalSection ();
@@ -3666,10 +3666,59 @@ do_compare:
 	}
 
 
+	// setup-x
+	// setup x server PID
+	if ( strncmp( prompt, "setup-x", 7 ) == 0 )
+	{
+	    enterCriticalSection ();
+		
+		//get current pid
+        PID = (int) system_call ( SYSTEMCALL_GETPID, 0, 0, 0 );
+		
+		// set x server PID
+		system_call ( 513, PID, PID, PID );
+		
+		exitCriticalSection ();
+		goto exit_cmp;
+	}
 
+    // test-x
+	if ( strncmp( prompt, "test-x", 6 ) == 0 )
+	{
+	    enterCriticalSection ();
+		
+		//get x server pid
+        PID = (int) system_call ( 512, 0, 0, 0 );
+		
+		//Enviando uma mensagem para a thread de controle do processo x server.
+        apiSendMessageToProcess ( PID, NULL, MSG_COMMAND, CMD_ABOUT, CMD_ABOUT );
+		
+		exitCriticalSection ();		
+		goto exit_cmp;
+	}
+	
 
+    // show x server info
+	if ( strncmp( prompt, "xserver-info", 12 ) == 0 )
+	{
+	    enterCriticalSection ();
+		
+        system_call ( 516, 0, 0, 0 );
+				
+		exitCriticalSection ();	
+		goto exit_cmp;
+	}
 
-
+    // show wm info
+	if ( strncmp( prompt, "wm-info", 7 ) == 0 )
+	{
+	    enterCriticalSection ();
+		
+        system_call ( 517, 0, 0, 0 );
+				
+		exitCriticalSection ();	
+		goto exit_cmp;
+	}
 
 	
 	
