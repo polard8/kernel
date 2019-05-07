@@ -3638,11 +3638,6 @@ do_compare:
 	};
 
 
-
-
-	
-	
-
 	// t18
 	// Send message to a process.
 	// Envia uma mensagem para a thread de controle de um processo.
@@ -3831,16 +3826,26 @@ do_compare:
         goto exit_cmp;
     };
 
-
-    // Se apertamos o enter e não encontramos um comando válido
+	
+	
+	// ==============================
+	//     Fim das comparações     //
+	// ==============================
+	
+	
+	
+    // #obs
+	// Se apertamos o enter e não encontramos um comando válido
     // então damos um aviso de comando inválido e reiniciamos o prompt 
     // na próxima linha.
 	
-	//fail.
+	// Inicializando o retorno.
+	// fail.
+	
 	int Execve_Ret = 1;
 	
+	// ??
     //unsigned long a1 = (unsigned long) tokenList[0];
-	
 	//char *a1 = tokenList[1];
 	//char *a1 = tokenList[2];
 	
@@ -3851,20 +3856,11 @@ doexec_first_command:
 	// ## TEST ##
 	//
 
-	// #importante:
-	// Se estamos aqui é porque o comando não corresponde a nenhuma das 
-	// palavras reservadas acima, então executaremos, presumindo ser um nome 
-	// de aplicativo no formato 'test.bin'. 
-	
-	// #importante:
-	// Vamos checar se o pathname é absoluto ou relativo.
-	// +Se tiver barra, significa que o pathname é absoluto e 
-	// começa no diretório raiz do volume do sistema.
-	// root:/volume1/
-	// +Se começar por root:/ também é absoluto.
-	// +Pathname relativo é somente aquele que é apenas um nome 
-	// de arquivo dentro do diretório atual. Como: 'name' ou name1/name2,
-	// sem barra ou ponto.
+	// #bugbug
+	// #todo:
+	// Rever essa rotina.
+	// Um pathname absoluto começa no início do diretório raiz,
+	// declarandoem que volume está. ex: root:/volume1/... ou /volume1/...
 	
     absolute = absolute_pathname ( (char *) tokenList[0] );
 	
@@ -3877,8 +3873,7 @@ doexec_first_command:
 			
 		//é absoluto	
 		case 1:
-		    printf("doexec_first_command: absolute pathname\n");
-			
+		    printf("doexec_first_command: absolute pathname\n");		
 			break;
 			
 		//falha	
@@ -3888,8 +3883,9 @@ doexec_first_command:
 			break;
 	};   
 
-    // Trata no caso de ser absoluto.
+    // ./
 	// + Eliminar ./ pois se trata de arquivo no diretório atual.
+	
 	if (absolute == 1)
 	{
 		//#bugbug: Essa definição não deve ficar aqui.
@@ -3908,69 +3904,32 @@ doexec_first_command:
 	};
 		
 	
-	
-	//
-	// ## Executando um programa no formato ">test.bin"
-	//
-	
-	//char *tmp[] = { tokenList[1], tokenList[2], tokenList[3], NULL };
-	//char *tmp2[] = { tokenList[1], tokenList[2], tokenList[3], NULL };
-	
-    //Presumindo ser um nome de aplicativo no formato 'test.bin'.
-    //o token 0 é o nome do programa e o os próximos são argumenteos ..
-	//dessa forma podemos enviar um comando e dois argumentos ...
-	//?? Talvez devessemos enviar um ponteiro para um array de strings 
-	// no último argumento. (argv) ou ainda um env
-						 
+	// #todo: 
+	// Colocar isso no início dessa função.
 
-    //Execve_Ret = (int) shell_gramado_core_init_execve( 
-	//                       (const char*) tokenList[0], //nome
-	//                       (const char*) tokenList[1], 
-	//					   (const char*) tokenList[2] ); //env ...deve ser null
-	
-	//#bugbug: e sem argumento.
-	/*
-	char *p = ( char * ) &prompt[0];
-	
-	while( *p && *p != ' ' && *p != '\0' )
-	{
-		p++;
-	}
-	
-	while( *p && *p == ' ' && *p != '\0' )
-	{
-		p++;
-	}
-	*/
-	
-	
-	//#todo: Colocar isso no início dessa função.
-	unsigned long buffer[5];
-	int z;
-	
+    unsigned long buffer[5];
+    int z;
+
 	// Colocamos todos os ponteiros no array.
-	for ( z=0; z<token_count; z++ ){
-	    buffer[z] = (unsigned long) tokenList[z];	
-	}						 
+
+    for ( z=0; z<token_count; z++ )
+    {
+        buffer[z] = (unsigned long) tokenList[z];
+    }
 
 	// ## ISSO DEU CERTO ## 	
-    // Passamos anteriormente a linha de comandos via memória compartilhada,
-    // agora então precisamos passar somente o nome do arquivo.	
+	// Passamos anteriormente a linha de comandos via memória compartilhada,
+	// agora então precisamos passar somente o nome do arquivo.	
+
     Execve_Ret = (int) shell_gramado_core_init_execve ( 
-	                       (const char *) tokenList[0], //nome
-	                       (const char *) 0,            //NULL
-						   (const char *) 0);           //NULL
-						 
-	
-	
-    //Execve_Ret = (int) shell_gramado_core_init_execve( 
-	//                       (const char*) tokenList[0], //nome
-	//                       (const char*) tokenList[1], 
-	//					   (const char*) tokenList[2]); //env ...deve ser null
-	
+                           (const char *) tokenList[0], 
+                           (const char *) 0,
+                           (const char *) 0);
+
 	// Ok, funcionou e o arquivo foi carregado,
 	// mas demora para receber tempo de processamento.
-	if( Execve_Ret == 0 )
+
+	if ( Execve_Ret == 0 )
 	{
 		//
 		// ## WAIT ??
@@ -3982,21 +3941,25 @@ doexec_first_command:
 		// Se o aplicativo funcionou corretamente mas está em segundo 
 		// plano então decemos continuar. 
 		// Por enquanto estamos continuando e rodando concomitantemente.
-		//
 		
 		//
 		// # Stop running #
 		//
 		
-		//Isso sai do loop de mensagens e 
-		//sai do shell elegantemente.
+		// Isso sai do loop de mensagens e sai do shell elegantemente.
+		
 		running = 0;
 		
 	    goto exit_cmp;	
+		
 	}else{
-		// falhou. Significa que o serviço naõ conseguir encontrar 
-		// o arquivo ou falhou o carregamento.
-		printf("shell: execve fail\n");
+		
+		// falhou. 
+		// Significa que o serviço não conseguir encontrar o arquivo ou 
+		// falhou o carregamento.
+		
+		printf ("shell: execve: fail\n");
+		
 		goto fail;
 	};
 	
@@ -4005,30 +3968,33 @@ doexec_first_command:
 	// # dobin #
 	//
 	
-	//Vamos executar um programa .bin.
-	//.bin é a extensão padrão.
-	//Executaremos o segundo comando, pois o primeiro é ~$dobin.
-	//
+	// Vamos executar um programa .bin.
+	// .bin é a extensão padrão.
+	// Executaremos o segundo comando, pois o primeiro é ~$dobin.
+	
 dobin:
 
     if( is_bin( (char *) tokenList[1] ) != 1 )
-	{
-		printf("dobin: it's not a .bin filename.\n");
-		printf("dobin: fail\n");
+    {
+        printf ("dobin: it's not a .bin filename.\n");
+        printf ("dobin: fail\n");
+
 		//@todo: back ...
-	};
+    };
 
 	//Precisamos passar somente o nome pois a linah de comando 
 	//já foi enviada através de memória compartilhada.
+
     Execve_Ret = (int) shell_gramado_core_init_execve( 
-	                       (const char*) tokenList[1],   // Nome
-	                       (const char*) 0,              // Null
-						   (const char*) 0 );            // Null
-						 
+                           (const char*) tokenList[1],
+                           (const char*) 0, 
+                           (const char*) 0 ); 
+
 	// Ok, funcionou e o arquivo foi carregado,
 	// mas demora para receber tempo de processamento.
-	if( Execve_Ret == 0 )
-	{
+
+    if ( Execve_Ret == 0 )
+    {
 		//
 		// ## WAIT ??
 		//
@@ -4060,6 +4026,7 @@ dobin:
 	
 // Tente executar um aplicativo com outra extensão.
 // Checaremos se é uma extensão das suportadas.	
+	
 dotry:
     	
     //Precisamos passar somente o nome pois já passamos 
@@ -4105,12 +4072,11 @@ dotry:
 	// # Script #
 	//
 	
-	//Um comando no shell invoca a execussão de um script 
-	//dado o nome via tokenList.
+	// Um comando no shell invoca a execussão de um script 
+	// dado o nome via tokenList.
 	
 dosh:
 
-    //
 	// Vamos tentar colocar o arquivo de script no stdin 
 	// que é onde fica o prompt. Então retornaremos no 
 	// início dessa rotina mas agora com uma nova linha de comando.
@@ -4120,8 +4086,8 @@ dosh:
 
     if ( is_sh1( (char *) tokenList[1] ) != 1 )
 	{
-		printf("dosh: it's not a .sh1 filename.\n");
-		printf("dosh: fail\n");
+		printf ("dosh: it's not a .sh1 filename.\n");
+		printf ("dosh: fail\n");
 	};
 
     // #ok
@@ -4143,8 +4109,11 @@ dosh:
 //	
 	
 fail:	
-    printf(" Unknown command!\n");
-    ret_value=1;
+	
+    printf (" Unknown command!\n");
+    
+	ret_value = 1;
+	
 	goto done;
 	
 	
@@ -4152,6 +4121,7 @@ fail:
    //    ## EXIT CMP ##
    //====================	
 
+	
 exit_cmp:
 
     ret_value = 0;	
@@ -4160,26 +4130,25 @@ done:
 
 	// Limpando a lista de argumentos.
 	// Um array de ponteiros.
-	
-	for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ ){
+
+	for ( i=0; i<TOKENLIST_MAX_DEFAULT; i++ )
+	{
 		tokenList[i] = NULL;
 	};
-	
+
 	shellPrompt ();
 	
+	// #bugbug:
+	// Queremos dar refresh apenas da janela.
+	// Mostrando as strings da rotina de comparação.	
 	
-	//#bugbug:
-	//queremos dar refresh apenas da janela.
-	//Mostrando as strings da rotina de comparação.	
-	
-	//refresh_screen();
+	// refresh_screen ();
 	
     return (unsigned long) ret_value;
-};
+}
 
 
-
-void shellInitSystemMetrics()
+void shellInitSystemMetrics ()
 {
 	//pegaremos todas as metricas de uma vez só,
 	//se uma falhar, então pegaremos tudo novamente.
@@ -6121,48 +6090,56 @@ void shell_fntos (char *name){
 /*
  *******************************************************
  * shell_gramado_core_init_execve:
- *     gramado core specials execve SUPPORT
- *     ## executa arquivos do tipo ">test.bin"
  *
- *     #importante; E caso o arquivo não tenha extensão?
- *     # Devemos presumir que ele seja .bin ?? 
- *       Ou não tenha ponto nem extensão. ?? Certamente o 
- * carregamento irá falhar.
- *     #@todo: caso seja .bin mas começe com "/"
- *     Devemos suprimir a barra. 
- *     
- */									 
-int shell_gramado_core_init_execve( const char *arg1,  //nome
-                                    const char *arg2,  //arg(endereço da linha de comando)
-                                    const char *arg3 ) //env
+ *     #importante:
+ *         Essa é uma maneira alternativa de executar um processo. Pois ainda
+ *     não implementamos as formas tradicionais.
+ *
+ *     >> Executa arquivos do tipo "$test.bin"
+ *
+ *     #obs: 
+ *     E caso o arquivo não tenha extensão ?
+ *     Devemos presumir que ele seja .bin ? 
+ *     Ou não tenha ponto nem extensão. ? 
+ *     Certamente o carregamento irá falhar.
+ * 
+ *     #todo: 
+ *     Caso seja .bin, mas começe com "/", devemos suprimir a barra. 
+ *
+ */	
+
+int 
+shell_gramado_core_init_execve ( const char *arg1,     // nome
+                                 const char *arg2,     // arg (endereço da linha de comando)
+                                 const char *arg3 )    // env
 {
 	//erro.
+
 	int Status = 1;
-	
+
 	//unsigned long arg_address = (unsigned long) &argv[0];
 
-	// suprimindo dot-slash
+// suprimindo dot-slash
 	// The dot is the current directory and the 
 	// slash is a path delimiter.
 	//if( filename[0] == '.' && filename[1] == '/' )
 	//{ 
 	//    filename++;
-    //    filename++; 
-    //    goto translate;	
+	//    filename++; 
+	//    goto translate;	
 	//};
-	
-	
+
+
 	//suprimindo a barra.
 	//if( *arg1 == '/' || 
 	//    *arg1 == '\\' )
 	//{ 
 	//    arg1++; 
 	//};
-	
-	
-	
-translate:	
-	
+
+
+translate:
+
 	//
 	// ## BUG BUG
 	//
@@ -6189,20 +6166,19 @@ translate:
 
 	// #importante:
 	// Isso deve chamar gramado_core_init_execve() na api.
-								
-								
 
 
-   	
- //isso chamará uma rotina especial de execve, somente 
+//isso chamará uma rotina especial de execve, somente 
 //usada no ambiente gramado core. 
+
 execve:
 
-//
+
 // #importante
+// #todo: esse comentário será revisto.
 // Nesse momento o shell pode atuar com outro procedimento de janela 
-// que ficaria responsável por conduzir essas mensgens ató o processo 
-// filho, que ate mesmo ser um aplicativo que não use  recursos gráficos.
+// que ficaria responsável por conduzir essas mensagens até o processo 
+// filho, que até mesmo ser um aplicativo que não use  recursos gráficos.
 // Esse processo filho a janela do shell como output e o shell como input.
 // Ex: um aplicativo chamado pelo shell pode chamar a função getch() para 
 // obter input ... como o shell tem a janela com o foco de entrada, então 
@@ -6216,102 +6192,108 @@ execve:
 // descritores de terminal.
 // teminalFeed(teminal_id,ch) poderia enviar o caratere para um terminal específico,
 // de onde o aplicativo pegará o caractere.
-//	
 
-    //
+
     // O retorno significa que o aplicativo foi colocado
 	// para rodar e em breve receberá tempo de processamento.
-	// '0' significa que funcionou e '1' que falhou.
-    //	
+	// '0' significa que funcionou e '1' que falhou.	
 	
-	//
-	// Obs: Se retornar o número do processo então podemos esperar por ele 
-	// chamadno wait(ret);
-	//
+	// Obs: 
+	// Se retornar o número do processo então podemos esperar por ele 
+	// chamando wait (ret);
 	
-	Status = (int) system_call( 167, 
-	                          (unsigned long) arg1,    //Nome
-				              (unsigned long) arg2,    //arg(endereço da linha de comando)
-				              (unsigned long) arg3 );  //env
-							  
-							  
-    if( Status == 0 )
+	// #importante
+	// Chama a rotina de execve alternativa, que executa um processo
+	// com os recursos do processo init.
+
+    Status = (int) system_call ( 167, 
+                       (unsigned long) arg1,      // Nome
+                       (unsigned long) arg2,      // arg (endereço da linha de comando)
+                       (unsigned long) arg3 );    // env
+
+    if ( Status == 0 )
 	{
-		//Não houve erro. O aplicativo irá executar.
-		
-		//
+		// Não houve erro. O aplicativo irá executar.
 		// Nesse momento devemos usar um novo procedimento de janela.
 		// Que vai enviar as mensagens de caractere para um terminal 
 		// específico, para que aplicativos que user aquele terminal 
 		// possam pegar essas mensgens de caractere.
-		//
-		
-#ifdef SHELL_VERBOSE		
-		printf("shell: aplicativo inicializado.\n"); 
+
+
+#ifdef SHELL_VERBOSE
+        printf ("shell: Process initialized.\n");
 #endif
-		
+
 		//
 		// ## teste ##
 		//
 		// saindo do shell.
 		//
-		
+
 		// getpid...
 		// waitforpid(?);
-		
+
 		//die("Exiting shell.bin\n");
 		
 		//Saindo sem erro.
 		//exit(0);
+
+		// Saída elegante, retornando para o crt0.
 		
-		//Saída elegante, retornando para o crt0.
-		ShellFlag = SHELLFLAG_EXIT;
-		
+        ShellFlag = SHELLFLAG_EXIT;
+
 		//ShellFlag = SHELLFLAG_FEEDTERMINAL;		
-		goto done;
-	}else{
-		
+
+        goto done;
+
+    }else{
+
 		// Se estamos aqui é porque ouve erro 
 		// ainda não sabemos o tipo de erro. 
 		// Status indica o tipo de erro.
 		// Se falhou significa que o aplicativo não vai executar,
 		// então não mais o que fazer.
-		
+
 		//#importante: Error message.
-		printf("shell: aplicativo nao foi inicializado.\n");
 		
+        printf ("shell: Process was NOT initialized.\n");
+
 		ShellFlag = SHELLFLAG_COMMANDLINE;
-		goto fail;
-	};
-	
-	
+		
+        goto fail;
+
+    };
+
+
 	//fail.
-	
-	//
-    // Retornaremos. 
+	// Retornaremos. 
 	// Quem chamou essa rotina que tome a decisão 
 	// se entra em wait ou não.
-    //
 
 	
 fail:
+
     //#importante: Error message.
     //status = 1.
-    printf("shell_gramado_core_init_execve: \n fail retornando ao interpretador\n");
+	
+    printf ("shell_gramado_core_init_execve: \n fail retornando ao interpretador\n");
+	
 done:
-    return (int) Status;						  
-};
 
+    return (int) Status;						  
+}
 
 
 /*
  * feedterminalDialog:
  *     Para alimentar um terminal com caracteres.
- */					  
-int feedterminalDialog( struct window_d *window, 
-                      int msg, 
-				      unsigned long long1, 
-				      unsigned long long2 )
+ */		
+
+int 
+feedterminalDialog ( struct window_d *window, 
+                     int msg, 
+				     unsigned long long1, 
+				     unsigned long long2 )
 {
 	//int q;
 	

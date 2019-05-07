@@ -572,87 +572,82 @@ Linker script and memory map
  *fill*         0x000000000045cbb3      0x44d 
 
 .iplt           0x000000000045d000        0x0
- .iplt          0x000000000045d000        0x0 gws.o
+ .iplt          0x000000000045d000        0x0 crt0.o
 
-.rodata         0x000000000045d000     0x6545
+.rodata         0x000000000045d000     0x6565
  .rodata        0x000000000045d000      0x935 crt0.o
  *fill*         0x000000000045d935        0xb 
- .rodata        0x000000000045d940     0x1ef4 main.o
- *fill*         0x000000000045f834        0xc 
- .rodata        0x000000000045f840      0x100 ctype.o
-                0x000000000045f840                _ctype
- .rodata        0x000000000045f940      0x2d4 stdio.o
-                0x000000000045fa80                hex2ascii_data
- *fill*         0x000000000045fc14        0x4 
- .rodata        0x000000000045fc18      0x510 stdlib.o
- .rodata        0x0000000000460128        0x6 conio.o
- *fill*         0x000000000046012e        0x2 
- .rodata        0x0000000000460130      0x3ab api.o
- *fill*         0x00000000004604db        0x5 
- .rodata        0x00000000004604e0      0xba4 shellui.o
- *fill*         0x0000000000461084       0x1c 
- .rodata        0x00000000004610a0      0x90a builtins.o
- *fill*         0x00000000004619aa       0x16 
- .rodata        0x00000000004619c0      0x94a desktop.o
- *fill*         0x000000000046230a       0x16 
- .rodata        0x0000000000462320      0x8b0 login.o
- *fill*         0x0000000000462bd0       0x10 
- .rodata        0x0000000000462be0      0x8d8 tests.o
- .rodata        0x00000000004634b8       0x54 char.o
- .rodata        0x000000000046350c       0x39 gws.o
+ .rodata        0x000000000045d940     0x1f04 main.o
+ *fill*         0x000000000045f844       0x1c 
+ .rodata        0x000000000045f860      0x100 ctype.o
+                0x000000000045f860                _ctype
+ .rodata        0x000000000045f960      0x2d4 stdio.o
+                0x000000000045faa0                hex2ascii_data
+ *fill*         0x000000000045fc34        0x4 
+ .rodata        0x000000000045fc38      0x510 stdlib.o
+ .rodata        0x0000000000460148        0x6 conio.o
+ *fill*         0x000000000046014e        0x2 
+ .rodata        0x0000000000460150      0x3ab api.o
+ *fill*         0x00000000004604fb        0x5 
+ .rodata        0x0000000000460500      0xba4 shellui.o
+ *fill*         0x00000000004610a4       0x1c 
+ .rodata        0x00000000004610c0      0x90a builtins.o
+ *fill*         0x00000000004619ca       0x16 
+ .rodata        0x00000000004619e0      0x94a desktop.o
+ *fill*         0x000000000046232a       0x16 
+ .rodata        0x0000000000462340      0x8b0 login.o
+ *fill*         0x0000000000462bf0       0x10 
+ .rodata        0x0000000000462c00      0x8d8 tests.o
+ .rodata        0x00000000004634d8       0x54 char.o
+ .rodata        0x000000000046352c       0x39 gws.o
 
-.eh_frame       0x0000000000463548     0x3240
- .eh_frame      0x0000000000463548       0x34 crt0.o
- .eh_frame      0x000000000046357c      0xca8 main.o
+.eh_frame       0x0000000000463568     0x3240
+ .eh_frame      0x0000000000463568       0x34 crt0.o
+ .eh_frame      0x000000000046359c      0xca8 main.o
                                         0xcc0 (size before relaxing)
- .eh_frame      0x0000000000464224       0x24 stubs.o
+ .eh_frame      0x0000000000464244       0x24 stubs.o
                                          0x3c (size before relaxing)
- .eh_frame      0x0000000000464248      0x6f0 stdio.o
+ .eh_frame      0x0000000000464268      0x6f0 stdio.o
                                         0x708 (size before relaxing)
- .eh_frame      0x0000000000464938      0x400 stdlib.o
+ .eh_frame      0x0000000000464958      0x400 stdlib.o
                                         0x418 (size before relaxing)
- .eh_frame      0x0000000000464d38      0x320 string.o
+ .eh_frame      0x0000000000464d58      0x320 string.o
                                         0x338 (size before relaxing)
- .eh_frame      0x0000000000465058       0xa0 conio.o
+ .eh_frame      0x0000000000465078       0xa0 conio.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x00000000004650f8       0xa0 socket.o
+ .eh_frame      0x0000000000465118       0xa0 socket.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x0000000000465198       0x40 signal.o
+ .eh_frame      0x00000000004651b8       0x40 signal.o
                                          0x58 (size before relaxing)
- .eh_frame      0x00000000004651d8      0x39c unistd.o
+ .eh_frame      0x00000000004651f8      0x39c unistd.o
                                         0x3b4 (size before relaxing)
- .eh_frame      0x0000000000465574      0xc6c api.o
+ .eh_frame      0x0000000000465594      0xc6c api.o
                                         0xc84 (size before relaxing)
- .eh_frame      0x00000000004661e0      0x160 shellui.o
+ .eh_frame      0x0000000000466200      0x160 shellui.o
                                         0x178 (size before relaxing)
- .eh_frame      0x0000000000466340      0x1e0 builtins.o
+ .eh_frame      0x0000000000466360      0x1e0 builtins.o
                                         0x1f8 (size before relaxing)
- .eh_frame      0x0000000000466520       0x60 desktop.o
+ .eh_frame      0x0000000000466540       0x60 desktop.o
                                          0x78 (size before relaxing)
- .eh_frame      0x0000000000466580       0x20 login.o
+ .eh_frame      0x00000000004665a0       0x20 login.o
                                          0x38 (size before relaxing)
- .eh_frame      0x00000000004665a0       0x48 tests.o
+ .eh_frame      0x00000000004665c0       0x48 tests.o
                                          0x60 (size before relaxing)
- .eh_frame      0x00000000004665e8       0x20 pixel.o
+ .eh_frame      0x0000000000466608       0x20 pixel.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000466608       0x20 line.o
+ .eh_frame      0x0000000000466628       0x20 line.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000466628       0x20 rect.o
+ .eh_frame      0x0000000000466648       0x20 rect.o
                                          0x38 (size before relaxing)
- .eh_frame      0x0000000000466648       0xe0 char.o
+ .eh_frame      0x0000000000466668       0xe0 char.o
                                          0xf8 (size before relaxing)
- .eh_frame      0x0000000000466728       0x60 gws.o
+ .eh_frame      0x0000000000466748       0x60 gws.o
                                          0x78 (size before relaxing)
 
-.note.gnu.property
-                0x0000000000466788       0x1c
- .note.gnu.property
-                0x0000000000466788       0x1c gws.o
-
-.rel.dyn        0x00000000004667a4        0x0
- .rel.got       0x00000000004667a4        0x0 gws.o
- .rel.iplt      0x00000000004667a4        0x0 gws.o
- .rel.text      0x00000000004667a4        0x0 gws.o
+.rel.dyn        0x00000000004667a8        0x0
+ .rel.got       0x00000000004667a8        0x0 crt0.o
+ .rel.iplt      0x00000000004667a8        0x0 crt0.o
+ .rel.text      0x00000000004667a8        0x0 crt0.o
 
 .data           0x00000000004667c0     0x4840
                 0x00000000004667c0                data = .
@@ -701,13 +696,13 @@ Linker script and memory map
  *fill*         0x000000000046a6c0      0x940 
 
 .got            0x000000000046b000        0x0
- .got           0x000000000046b000        0x0 gws.o
+ .got           0x000000000046b000        0x0 crt0.o
 
 .got.plt        0x000000000046b000        0x0
- .got.plt       0x000000000046b000        0x0 gws.o
+ .got.plt       0x000000000046b000        0x0 crt0.o
 
 .igot.plt       0x000000000046b000        0x0
- .igot.plt      0x000000000046b000        0x0 gws.o
+ .igot.plt      0x000000000046b000        0x0 crt0.o
 
 .bss            0x000000000046b000    0x16d94
                 0x000000000046b000                bss = .
@@ -949,30 +944,31 @@ LOAD char.o
 LOAD gws.o
 OUTPUT(SHELL.BIN elf32-i386)
 
-.comment        0x0000000000000000       0x1a
- .comment       0x0000000000000000       0x1a crt0.o
+.comment        0x0000000000000000       0x2b
+ .comment       0x0000000000000000       0x11 crt0.o
+                                         0x12 (size before relaxing)
+ .comment       0x0000000000000011       0x12 main.o
+ .comment       0x0000000000000011       0x1a stubs.o
                                          0x1b (size before relaxing)
- .comment       0x000000000000001a       0x1b main.o
- .comment       0x000000000000001a       0x1b stubs.o
- .comment       0x000000000000001a       0x1b ctype.o
- .comment       0x000000000000001a       0x1b stdio.o
- .comment       0x000000000000001a       0x1b stdlib.o
- .comment       0x000000000000001a       0x1b string.o
- .comment       0x000000000000001a       0x1b conio.o
- .comment       0x000000000000001a       0x1b socket.o
- .comment       0x000000000000001a       0x1b signal.o
- .comment       0x000000000000001a       0x1b unistd.o
- .comment       0x000000000000001a       0x1b api.o
- .comment       0x000000000000001a       0x1b shellui.o
- .comment       0x000000000000001a       0x1b builtins.o
- .comment       0x000000000000001a       0x1b desktop.o
- .comment       0x000000000000001a       0x1b login.o
- .comment       0x000000000000001a       0x1b tests.o
- .comment       0x000000000000001a       0x1b pixel.o
- .comment       0x000000000000001a       0x1b line.o
- .comment       0x000000000000001a       0x1b rect.o
- .comment       0x000000000000001a       0x1b char.o
- .comment       0x000000000000001a       0x1b gws.o
+ .comment       0x000000000000002b       0x1b ctype.o
+ .comment       0x000000000000002b       0x1b stdio.o
+ .comment       0x000000000000002b       0x1b stdlib.o
+ .comment       0x000000000000002b       0x1b string.o
+ .comment       0x000000000000002b       0x1b conio.o
+ .comment       0x000000000000002b       0x1b socket.o
+ .comment       0x000000000000002b       0x1b signal.o
+ .comment       0x000000000000002b       0x1b unistd.o
+ .comment       0x000000000000002b       0x1b api.o
+ .comment       0x000000000000002b       0x12 shellui.o
+ .comment       0x000000000000002b       0x12 builtins.o
+ .comment       0x000000000000002b       0x12 desktop.o
+ .comment       0x000000000000002b       0x12 login.o
+ .comment       0x000000000000002b       0x12 tests.o
+ .comment       0x000000000000002b       0x12 pixel.o
+ .comment       0x000000000000002b       0x12 line.o
+ .comment       0x000000000000002b       0x12 rect.o
+ .comment       0x000000000000002b       0x12 char.o
+ .comment       0x000000000000002b       0x12 gws.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0

@@ -2141,7 +2141,7 @@ Linker script and memory map
  *fill*         0x00000000c002b26c      0xd94 
 
 .iplt           0x00000000c002c000        0x0
- .iplt          0x00000000c002c000        0x0 request.o
+ .iplt          0x00000000c002c000        0x0 head.o
 
 .rodata         0x00000000c002c000     0xa000
                 0x00000000c002c000                _rodata_begin = .
@@ -2557,16 +2557,11 @@ Linker script and memory map
  .eh_frame      0x00000000c003de84       0x80 request.o
                                          0x98 (size before relaxing)
 
-.note.gnu.property
-                0x00000000c003df04       0x1c
- .note.gnu.property
-                0x00000000c003df04       0x1c request.o
-
-.rel.dyn        0x00000000c003df20        0x0
- .rel.got       0x00000000c003df20        0x0 request.o
- .rel.iplt      0x00000000c003df20        0x0 request.o
- .rel.head_x86  0x00000000c003df20        0x0 request.o
- .rel.text      0x00000000c003df20        0x0 request.o
+.rel.dyn        0x00000000c003df04        0x0
+ .rel.got       0x00000000c003df04        0x0 head.o
+ .rel.iplt      0x00000000c003df04        0x0 head.o
+ .rel.head_x86  0x00000000c003df04        0x0 head.o
+ .rel.text      0x00000000c003df04        0x0 head.o
 
 .data           0x00000000c003df20    0x110e0
                 0x00000000c003df20                _data_begin = .
@@ -2829,13 +2824,13 @@ Linker script and memory map
  *fill*         0x00000000c004e670      0x990 
 
 .got            0x00000000c004f000        0x0
- .got           0x00000000c004f000        0x0 request.o
+ .got           0x00000000c004f000        0x0 head.o
 
 .got.plt        0x00000000c004f000        0x0
- .got.plt       0x00000000c004f000        0x0 request.o
+ .got.plt       0x00000000c004f000        0x0 head.o
 
 .igot.plt       0x00000000c004f000        0x0
- .igot.plt      0x00000000c004f000        0x0 request.o
+ .igot.plt      0x00000000c004f000        0x0 head.o
 
 .bss            0x00000000c004f000    0x4e000
                 0x00000000c004f000                _bss_begin = .
@@ -3861,134 +3856,134 @@ LOAD mk.o
 LOAD request.o
 OUTPUT(KERNEL.BIN elf32-i386)
 
-.comment        0x0000000000000000       0x1a
- .comment       0x0000000000000000       0x1a main.o
-                                         0x1b (size before relaxing)
- .comment       0x000000000000001a       0x1b x86main.o
- .comment       0x000000000000001a       0x1b pipe.o
- .comment       0x000000000000001a       0x1b socket.o
- .comment       0x000000000000001a       0x1b cedge.o
- .comment       0x000000000000001a       0x1b ctype.o
- .comment       0x000000000000001a       0x1b stdio.o
- .comment       0x000000000000001a       0x1b stdlib.o
- .comment       0x000000000000001a       0x1b string.o
- .comment       0x000000000000001a       0x1b unistd.o
- .comment       0x000000000000001a       0x1b devmgr.o
- .comment       0x000000000000001a       0x1b ldisc.o
- .comment       0x000000000000001a       0x1b gde_serv.o
- .comment       0x000000000000001a       0x1b debug.o
- .comment       0x000000000000001a       0x1b diskvol.o
- .comment       0x000000000000001a       0x1b install.o
- .comment       0x000000000000001a       0x1b object.o
- .comment       0x000000000000001a       0x1b runtime.o
- .comment       0x000000000000001a       0x1b abort.o
- .comment       0x000000000000001a       0x1b info.o
- .comment       0x000000000000001a       0x1b io.o
- .comment       0x000000000000001a       0x1b modules.o
- .comment       0x000000000000001a       0x1b proc.o
- .comment       0x000000000000001a       0x1b signal.o
- .comment       0x000000000000001a       0x1b sm.o
- .comment       0x000000000000001a       0x1b init.o
- .comment       0x000000000000001a       0x1b system.o
- .comment       0x000000000000001a       0x1b execve.o
- .comment       0x000000000000001a       0x1b cpuamd.o
- .comment       0x000000000000001a       0x1b portsx86.o
- .comment       0x000000000000001a       0x1b syscall.o
- .comment       0x000000000000001a       0x1b x86.o
- .comment       0x000000000000001a       0x1b detect.o
- .comment       0x000000000000001a       0x1b hal.o
- .comment       0x000000000000001a       0x1b ahci.o
- .comment       0x000000000000001a       0x1b ata.o
- .comment       0x000000000000001a       0x1b atadma.o
- .comment       0x000000000000001a       0x1b atainit.o
- .comment       0x000000000000001a       0x1b atairq.o
- .comment       0x000000000000001a       0x1b atapci.o
- .comment       0x000000000000001a       0x1b hdd.o
- .comment       0x000000000000001a       0x1b channel.o
- .comment       0x000000000000001a       0x1b network.o
- .comment       0x000000000000001a       0x1b nicintel.o
- .comment       0x000000000000001a       0x1b nsocket.o
- .comment       0x000000000000001a       0x1b pci.o
- .comment       0x000000000000001a       0x1b pciinfo.o
- .comment       0x000000000000001a       0x1b pciscan.o
- .comment       0x000000000000001a       0x1b tty.o
- .comment       0x000000000000001a       0x1b usb.o
- .comment       0x000000000000001a       0x1b video.o
- .comment       0x000000000000001a       0x1b vsync.o
- .comment       0x000000000000001a       0x1b screen.o
- .comment       0x000000000000001a       0x1b i8042.o
- .comment       0x000000000000001a       0x1b keyboard.o
- .comment       0x000000000000001a       0x1b mouse.o
- .comment       0x000000000000001a       0x1b ps2kbd.o
- .comment       0x000000000000001a       0x1b ps2mouse.o
- .comment       0x000000000000001a       0x1b apic.o
- .comment       0x000000000000001a       0x1b pic.o
- .comment       0x000000000000001a       0x1b rtc.o
- .comment       0x000000000000001a       0x1b serial.o
- .comment       0x000000000000001a       0x1b timer.o
- .comment       0x000000000000001a       0x1b cf.o
- .comment       0x000000000000001a       0x1b format.o
- .comment       0x000000000000001a       0x1b fs.o
- .comment       0x000000000000001a       0x1b read.o
- .comment       0x000000000000001a       0x1b search.o
- .comment       0x000000000000001a       0x1b write.o
- .comment       0x000000000000001a       0x1b bg.o
- .comment       0x000000000000001a       0x1b bmp.o
- .comment       0x000000000000001a       0x1b button.o
- .comment       0x000000000000001a       0x1b char.o
- .comment       0x000000000000001a       0x1b createw.o
- .comment       0x000000000000001a       0x1b dtext.o
- .comment       0x000000000000001a       0x1b font.o
- .comment       0x000000000000001a       0x1b grid.o
- .comment       0x000000000000001a       0x1b line.o
- .comment       0x000000000000001a       0x1b menu.o
- .comment       0x000000000000001a       0x1b menubar.o
- .comment       0x000000000000001a       0x1b pixel.o
- .comment       0x000000000000001a       0x1b rect.o
- .comment       0x000000000000001a       0x1b sbar.o
- .comment       0x000000000000001a       0x1b toolbar.o
- .comment       0x000000000000001a       0x1b window.o
- .comment       0x000000000000001a       0x1b logoff.o
- .comment       0x000000000000001a       0x1b logon.o
- .comment       0x000000000000001a       0x1b input.o
- .comment       0x000000000000001a       0x1b output.o
- .comment       0x000000000000001a       0x1b terminal.o
- .comment       0x000000000000001a       0x1b desktop.o
- .comment       0x000000000000001a       0x1b room.o
- .comment       0x000000000000001a       0x1b userenv.o
- .comment       0x000000000000001a       0x1b usession.o
- .comment       0x000000000000001a       0x1b kgws.o
- .comment       0x000000000000001a       0x1b vfs.o
- .comment       0x000000000000001a       0x1b x86cont.o
- .comment       0x000000000000001a       0x1b x86fault.o
- .comment       0x000000000000001a       0x1b x86start.o
- .comment       0x000000000000001a       0x1b dispatch.o
- .comment       0x000000000000001a       0x1b pheap.o
- .comment       0x000000000000001a       0x1b process.o
- .comment       0x000000000000001a       0x1b queue.o
- .comment       0x000000000000001a       0x1b spawn.o
- .comment       0x000000000000001a       0x1b tasks.o
- .comment       0x000000000000001a       0x1b theap.o
- .comment       0x000000000000001a       0x1b thread.o
- .comment       0x000000000000001a       0x1b threadi.o
- .comment       0x000000000000001a       0x1b ts.o
- .comment       0x000000000000001a       0x1b tstack.o
- .comment       0x000000000000001a       0x1b callout.o
- .comment       0x000000000000001a       0x1b callfar.o
- .comment       0x000000000000001a       0x1b ipc.o
- .comment       0x000000000000001a       0x1b ipccore.o
- .comment       0x000000000000001a       0x1b sem.o
- .comment       0x000000000000001a       0x1b memory.o
- .comment       0x000000000000001a       0x1b mminfo.o
- .comment       0x000000000000001a       0x1b mmpool.o
- .comment       0x000000000000001a       0x1b pages.o
- .comment       0x000000000000001a       0x1b preempt.o
- .comment       0x000000000000001a       0x1b priority.o
- .comment       0x000000000000001a       0x1b sched.o
- .comment       0x000000000000001a       0x1b schedi.o
- .comment       0x000000000000001a       0x1b create.o
- .comment       0x000000000000001a       0x1b mk.o
- .comment       0x000000000000001a       0x1b request.o
+.comment        0x0000000000000000       0x11
+ .comment       0x0000000000000000       0x11 main.o
+                                         0x12 (size before relaxing)
+ .comment       0x0000000000000011       0x12 x86main.o
+ .comment       0x0000000000000011       0x12 pipe.o
+ .comment       0x0000000000000011       0x12 socket.o
+ .comment       0x0000000000000011       0x12 cedge.o
+ .comment       0x0000000000000011       0x12 ctype.o
+ .comment       0x0000000000000011       0x12 stdio.o
+ .comment       0x0000000000000011       0x12 stdlib.o
+ .comment       0x0000000000000011       0x12 string.o
+ .comment       0x0000000000000011       0x12 unistd.o
+ .comment       0x0000000000000011       0x12 devmgr.o
+ .comment       0x0000000000000011       0x12 ldisc.o
+ .comment       0x0000000000000011       0x12 gde_serv.o
+ .comment       0x0000000000000011       0x12 debug.o
+ .comment       0x0000000000000011       0x12 diskvol.o
+ .comment       0x0000000000000011       0x12 install.o
+ .comment       0x0000000000000011       0x12 object.o
+ .comment       0x0000000000000011       0x12 runtime.o
+ .comment       0x0000000000000011       0x12 abort.o
+ .comment       0x0000000000000011       0x12 info.o
+ .comment       0x0000000000000011       0x12 io.o
+ .comment       0x0000000000000011       0x12 modules.o
+ .comment       0x0000000000000011       0x12 proc.o
+ .comment       0x0000000000000011       0x12 signal.o
+ .comment       0x0000000000000011       0x12 sm.o
+ .comment       0x0000000000000011       0x12 init.o
+ .comment       0x0000000000000011       0x12 system.o
+ .comment       0x0000000000000011       0x12 execve.o
+ .comment       0x0000000000000011       0x12 cpuamd.o
+ .comment       0x0000000000000011       0x12 portsx86.o
+ .comment       0x0000000000000011       0x12 syscall.o
+ .comment       0x0000000000000011       0x12 x86.o
+ .comment       0x0000000000000011       0x12 detect.o
+ .comment       0x0000000000000011       0x12 hal.o
+ .comment       0x0000000000000011       0x12 ahci.o
+ .comment       0x0000000000000011       0x12 ata.o
+ .comment       0x0000000000000011       0x12 atadma.o
+ .comment       0x0000000000000011       0x12 atainit.o
+ .comment       0x0000000000000011       0x12 atairq.o
+ .comment       0x0000000000000011       0x12 atapci.o
+ .comment       0x0000000000000011       0x12 hdd.o
+ .comment       0x0000000000000011       0x12 channel.o
+ .comment       0x0000000000000011       0x12 network.o
+ .comment       0x0000000000000011       0x12 nicintel.o
+ .comment       0x0000000000000011       0x12 nsocket.o
+ .comment       0x0000000000000011       0x12 pci.o
+ .comment       0x0000000000000011       0x12 pciinfo.o
+ .comment       0x0000000000000011       0x12 pciscan.o
+ .comment       0x0000000000000011       0x12 tty.o
+ .comment       0x0000000000000011       0x12 usb.o
+ .comment       0x0000000000000011       0x12 video.o
+ .comment       0x0000000000000011       0x12 vsync.o
+ .comment       0x0000000000000011       0x12 screen.o
+ .comment       0x0000000000000011       0x12 i8042.o
+ .comment       0x0000000000000011       0x12 keyboard.o
+ .comment       0x0000000000000011       0x12 mouse.o
+ .comment       0x0000000000000011       0x12 ps2kbd.o
+ .comment       0x0000000000000011       0x12 ps2mouse.o
+ .comment       0x0000000000000011       0x12 apic.o
+ .comment       0x0000000000000011       0x12 pic.o
+ .comment       0x0000000000000011       0x12 rtc.o
+ .comment       0x0000000000000011       0x12 serial.o
+ .comment       0x0000000000000011       0x12 timer.o
+ .comment       0x0000000000000011       0x12 cf.o
+ .comment       0x0000000000000011       0x12 format.o
+ .comment       0x0000000000000011       0x12 fs.o
+ .comment       0x0000000000000011       0x12 read.o
+ .comment       0x0000000000000011       0x12 search.o
+ .comment       0x0000000000000011       0x12 write.o
+ .comment       0x0000000000000011       0x12 bg.o
+ .comment       0x0000000000000011       0x12 bmp.o
+ .comment       0x0000000000000011       0x12 button.o
+ .comment       0x0000000000000011       0x12 char.o
+ .comment       0x0000000000000011       0x12 createw.o
+ .comment       0x0000000000000011       0x12 dtext.o
+ .comment       0x0000000000000011       0x12 font.o
+ .comment       0x0000000000000011       0x12 grid.o
+ .comment       0x0000000000000011       0x12 line.o
+ .comment       0x0000000000000011       0x12 menu.o
+ .comment       0x0000000000000011       0x12 menubar.o
+ .comment       0x0000000000000011       0x12 pixel.o
+ .comment       0x0000000000000011       0x12 rect.o
+ .comment       0x0000000000000011       0x12 sbar.o
+ .comment       0x0000000000000011       0x12 toolbar.o
+ .comment       0x0000000000000011       0x12 window.o
+ .comment       0x0000000000000011       0x12 logoff.o
+ .comment       0x0000000000000011       0x12 logon.o
+ .comment       0x0000000000000011       0x12 input.o
+ .comment       0x0000000000000011       0x12 output.o
+ .comment       0x0000000000000011       0x12 terminal.o
+ .comment       0x0000000000000011       0x12 desktop.o
+ .comment       0x0000000000000011       0x12 room.o
+ .comment       0x0000000000000011       0x12 userenv.o
+ .comment       0x0000000000000011       0x12 usession.o
+ .comment       0x0000000000000011       0x12 kgws.o
+ .comment       0x0000000000000011       0x12 vfs.o
+ .comment       0x0000000000000011       0x12 x86cont.o
+ .comment       0x0000000000000011       0x12 x86fault.o
+ .comment       0x0000000000000011       0x12 x86start.o
+ .comment       0x0000000000000011       0x12 dispatch.o
+ .comment       0x0000000000000011       0x12 pheap.o
+ .comment       0x0000000000000011       0x12 process.o
+ .comment       0x0000000000000011       0x12 queue.o
+ .comment       0x0000000000000011       0x12 spawn.o
+ .comment       0x0000000000000011       0x12 tasks.o
+ .comment       0x0000000000000011       0x12 theap.o
+ .comment       0x0000000000000011       0x12 thread.o
+ .comment       0x0000000000000011       0x12 threadi.o
+ .comment       0x0000000000000011       0x12 ts.o
+ .comment       0x0000000000000011       0x12 tstack.o
+ .comment       0x0000000000000011       0x12 callout.o
+ .comment       0x0000000000000011       0x12 callfar.o
+ .comment       0x0000000000000011       0x12 ipc.o
+ .comment       0x0000000000000011       0x12 ipccore.o
+ .comment       0x0000000000000011       0x12 sem.o
+ .comment       0x0000000000000011       0x12 memory.o
+ .comment       0x0000000000000011       0x12 mminfo.o
+ .comment       0x0000000000000011       0x12 mmpool.o
+ .comment       0x0000000000000011       0x12 pages.o
+ .comment       0x0000000000000011       0x12 preempt.o
+ .comment       0x0000000000000011       0x12 priority.o
+ .comment       0x0000000000000011       0x12 sched.o
+ .comment       0x0000000000000011       0x12 schedi.o
+ .comment       0x0000000000000011       0x12 create.o
+ .comment       0x0000000000000011       0x12 mk.o
+ .comment       0x0000000000000011       0x12 request.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0
