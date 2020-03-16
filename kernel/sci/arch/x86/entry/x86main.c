@@ -289,7 +289,7 @@ void __x86StartInit (void){
     
     fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
-                                  "INIT    BIN", 
+                                  "INIT2   BIN", 
                                   (unsigned long) 0x00400000 );
 
 
@@ -298,7 +298,7 @@ void __x86StartInit (void){
     {
         fileret = (unsigned long) fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                                       VOLUME1_ROOTDIR_ADDRESS, 
-                                      "INIT2   BIN", 
+                                      "INIT    BIN", 
                                       (unsigned long) 0x00400000 );
 
         

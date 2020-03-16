@@ -548,6 +548,23 @@ vhd-copy-files:
 	@echo "(Step 6) Copying files into the mounted VHD ..."
 
 
+	# Create folders in the new mounted disk.
+	sudo mkdir /mnt/gramadovhd/BIN
+	sudo mkdir /mnt/gramadovhd/BOOT
+	sudo mkdir /mnt/gramadovhd/DEV
+	sudo mkdir /mnt/gramadovhd/DEV/PTS
+	sudo mkdir /mnt/gramadovhd/EFI
+	sudo mkdir /mnt/gramadovhd/EFI/BOOT
+	sudo mkdir /mnt/gramadovhd/ETC
+	sudo mkdir /mnt/gramadovhd/GARDEN
+	sudo mkdir /mnt/gramadovhd/GARDEN/BIN
+	sudo mkdir /mnt/gramadovhd/HOME
+	sudo mkdir /mnt/gramadovhd/LIB
+	sudo mkdir /mnt/gramadovhd/MNT
+	sudo mkdir /mnt/gramadovhd/SBIN
+	sudo mkdir /mnt/gramadovhd/TMP
+
+
 #
 # ======== Files in the root dir. ========
 #
@@ -556,11 +573,9 @@ vhd-copy-files:
 	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd
 	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd
 
-
-#userland
 	sudo cp init/base/bin/INIT2.BIN      /mnt/gramadovhd
-#	sudo cp init/base/bin/GRAMMGR.BIN    /mnt/gramadovhd
-
+	sudo cp init/base/bin/INIT2.BIN      /mnt/gramadovhd/BOOT
+	
 
 #base
 	sudo cp base/GRAMADO.TXT        /mnt/gramadovhd
@@ -585,7 +600,6 @@ vhd-copy-files:
 #...
 
 
-	
 #base Cursors
 	sudo cp  base/res/cursors/CURSOR.BMP    /mnt/gramadovhd
 	sudo cp  base/res/cursors/MOUSE.BMP     /mnt/gramadovhd
@@ -642,7 +656,7 @@ vhd-copy-files:
 #	-sudo cp userland/ul1/garden/bin/GDETERM.BIN   /mnt/gramadovhd 
 
 #apps
-	-sudo cp apps/bin/GDESHELL.BIN  /mnt/gramadovhd 
+	sudo cp apps/bin/GDESHELL.BIN  /mnt/gramadovhd 
 
 
 	-sudo cp apps/bin/GRAMCODE.BIN  /mnt/gramadovhd 
@@ -699,29 +713,6 @@ vhd-copy-files:
 #...
 
 
-
-
-#
-# ======== Creating the all the folders in root dir ========
-#		
-
-# Creating standard folders
-	-sudo mkdir /mnt/gramadovhd/BIN
-	-sudo mkdir /mnt/gramadovhd/BOOT
-	-sudo mkdir /mnt/gramadovhd/DEV
-	-sudo mkdir /mnt/gramadovhd/DEV/PTS
-	-sudo mkdir /mnt/gramadovhd/EFI
-	-sudo mkdir /mnt/gramadovhd/EFI/BOOT
-	-sudo mkdir /mnt/gramadovhd/ETC
-	-sudo mkdir /mnt/gramadovhd/GARDEN
-	-sudo mkdir /mnt/gramadovhd/GARDEN/BIN
-	-sudo mkdir /mnt/gramadovhd/HOME
-	-sudo mkdir /mnt/gramadovhd/LIB
-	-sudo mkdir /mnt/gramadovhd/MNT
-	-sudo mkdir /mnt/gramadovhd/SBIN
-	-sudo mkdir /mnt/gramadovhd/TMP
-
-
 #
 # ======== Files in the BIN/ folder. ========
 #
@@ -738,6 +729,7 @@ vhd-copy-files:
 # ======== Files in the /BOOT/ folder. ========
 #
 
+	sudo cp bin/boot/KERNEL.BIN   /mnt/gramadovhd
 	sudo cp bin/boot/KERNEL.BIN   /mnt/gramadovhd/BOOT
 	sudo cp bin/boot/BM.BIN       /mnt/gramadovhd/BOOT
 	sudo cp bin/boot/BL.BIN       /mnt/gramadovhd/BOOT

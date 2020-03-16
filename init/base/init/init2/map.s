@@ -31,7 +31,7 @@ environ             0x4               stdio.o
 g_available_heap    0x4               api.o
 g_heap_pointer      0x4               api.o
 g_columns           0x4               crt0.o
-my__p               0x4               unistd.o
+my( *)              0x4               unistd.o
 HEAP_SIZE           0x4               api.o
 optind              0x4               unistd.o
 mmblockCount        0x4               stdlib.o
@@ -625,7 +625,7 @@ Linker script and memory map
                 0x0000000000420640                errno
                 0x0000000000420644                optarg
                 0x0000000000420648                opterr
-                0x000000000042064c                my__p
+                0x000000000042064c                my( *)
                 0x0000000000420650                optind
                 0x0000000000420660                __Hostname_buffer
                 0x00000000004206a0                __Login_buffer
@@ -647,20 +647,21 @@ LOAD ioctl.o
 LOAD stubs.o
 OUTPUT(INIT2.BIN elf32-i386)
 
-.comment        0x0000000000000000       0x11
+.comment        0x0000000000000000       0x3a
  .comment       0x0000000000000000       0x11 crt0.o
                                          0x12 (size before relaxing)
- .comment       0x0000000000000011       0x12 main.o
- .comment       0x0000000000000011       0x12 api.o
- .comment       0x0000000000000011       0x12 ctype.o
- .comment       0x0000000000000011       0x12 stdio.o
- .comment       0x0000000000000011       0x12 stdlib.o
- .comment       0x0000000000000011       0x12 string.o
- .comment       0x0000000000000011       0x12 conio.o
- .comment       0x0000000000000011       0x12 unistd.o
- .comment       0x0000000000000011       0x12 termios.o
- .comment       0x0000000000000011       0x12 ioctl.o
- .comment       0x0000000000000011       0x12 stubs.o
+ .comment       0x0000000000000011       0x29 main.o
+                                         0x2a (size before relaxing)
+ .comment       0x000000000000003a       0x12 api.o
+ .comment       0x000000000000003a       0x12 ctype.o
+ .comment       0x000000000000003a       0x12 stdio.o
+ .comment       0x000000000000003a       0x12 stdlib.o
+ .comment       0x000000000000003a       0x12 string.o
+ .comment       0x000000000000003a       0x12 conio.o
+ .comment       0x000000000000003a       0x12 unistd.o
+ .comment       0x000000000000003a       0x12 termios.o
+ .comment       0x000000000000003a       0x12 ioctl.o
+ .comment       0x000000000000003a       0x12 stubs.o
 
 .note.GNU-stack
                 0x0000000000000000        0x0
