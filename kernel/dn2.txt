@@ -1,0 +1,50 @@
+    sci/ 
+        pasta raiz de todas as chamadas.
+
+        [I/0]
+        >> a1 sysio    fs,dd,net
+
+        [NOT I/O]
+        >> b1 susmk  (process realated)  mm,ipc,sched
+        >> b2 syslib o kernel é só mais uma biblioteca.
+        >> b3 syssm  gerenciar o sistema.
+
+===========================================================   
+   sysio/   (IO)
+        Pasta para o tratamento de systemcalls relativas à i/o.
+        fs, net, dd
+        ws e wm são Output.
+        hal/ ports 
+
+
+    sysmk/  (NOT IO)
+        Pasta para o tratamento de systemcalls relativas à processos.
+        scheduling, mm, ipc
+        ipc: lpc, rpc ...
+        execve é processo.
+-----------------------------------------
+
+    syssm/ 
+        system management
+        Relativos à grencia do sistema.
+        não é io, não é processo.
+        ob pertence à sm
+        arch entry
+        debug é sm.
+        config é sm
+        ...
+
+---------------------------------------
+    syslib/
+        biblioteca comum à todos os módulos.
+        os processos poderão chamar as rotinas que estão aqui dentro também
+        como as rotinas de io, em syslib/libio  ...
+ 
+
+----------------------------------
+
+
+
+
+        
+      

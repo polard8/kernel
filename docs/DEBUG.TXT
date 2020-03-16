@@ -1,0 +1,14 @@
+
+[1]
+A função fopen em ring 3 está falhando na máquina real.
+Bem na parte de pegar o tamanho do arquivo.
+Lembrando que o carregamento de arquivos durante a inicialização
+do kernel está funcionando, pois ele carregou os ícones.
+Isso compromete todos os aplicativos que chamam essa rotina.
+
+[2]
+...
+
+
+[3]
+...

@@ -1,0 +1,11 @@
+
+    Where the kernel starts?
+
+
+    x86:
+        1) kernel/arch/x86/entry/head/boot.asm
+        2) kernel/main.c
+        3) kernel/arch/x86/entry/x86main.c
+
+
+

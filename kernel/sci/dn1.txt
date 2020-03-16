@@ -1,0 +1,15 @@
+
+    Só existirão quatro alvos para as chamadas às rotinas de tratamento
+    essas chamadas estão nas 4 pastas de apoio começadas com sysxxx
+
+    O ponto de entrada das pastas alvo será sempre o arquivo xxxfs.c
+
+    >> iofs.c
+    >> mkfs.c
+    >> libfs.c
+    >> smfs.c
+
+
+    não são sistemas de arquivo proprimente ditos.
+    mas podem se tornar no futuro sistemas de arquivos virtuais
+   que gerenciam os arquivos relativos ao seu módulo.

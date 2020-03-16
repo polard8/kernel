@@ -1,0 +1,15 @@
+
+ ~ Main folders for Gramado Operating System.
+
+/arch     - Archtechture stuff.
+/bin      - .bin compiled files.
+/docs     - Documentation.
+/drivers  - Ring0 loadable drivers.
+/include  - Headers.
+/init     - Initialization processes.
+/kernel   - The kernel base.
+/lib      - Libs. Source code and binaries.
+/licenses - Licenses.
+/scripts  - Scripts.
+/user     - User ideas. (User ideas, human action and spiritual quotes)
+          

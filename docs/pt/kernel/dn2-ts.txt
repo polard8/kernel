@@ -1,0 +1,45 @@
+
+    Design Note 2 - task switch
+
+
+    Descrição resumida do processo de seleção de thread e despacho de thread
+no momento da interrupção gerada pelo Timer, Irq0.
+
+    O timer é configurado para gerar várias interrupções po segundo,
+no caso são 100 interrupções por segundo. Mas não se troca de thread a 
+cada interupção. No caso, em média trocamos de thread a cada 10 interrupções, 
+o que dá, à cada 100 milisegundos.
+
+
+#define QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
+#define QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
+
+
+ As quatro fases da rotina de interrupção com timer:
+ ==================================================
+ 
+1 - A interrupção do timer, irq0, ativa a ISR0 '_int0' no arquivo hardware.inc.
+    Essa rotina salva o contexto dos registradores em variáveis globais.
+    Chama as rotinas '_KiTimer' em timer.c e '_KiTaskSwitch' em ts.c.
+    Logo após essas duas rotinas, _int0 retoma e reconfigura os registradores
+    com as informações de contexto do novo processo à rodar caso houve troca de processo 
+	ou com os valores do mesmo processo caso não houve troca de contexto.
+
+2 - _KiTimer, em timer.c realiza algum tipo de gerenciamento de tempo, independente se 
+     haverá ou não troca de contexto de processo ou thread.
+
+3 - _KiTaskSwitch em taskswitch.c gerencia a rotina de troca de thread, realizando
+operações de salvamento e restauração de contexto utilizado variáveis globais e extrutura de dados, 
+seleciona a próxima thread através do scheduler, despacha a thread selecionada através do dispatcher e 
+retorna para a função _irq0 em hardware.inc, que configurará os registradores e executará a thread
+através do método iret.
+
+4 - A última fase já foi descrita no fim do ítem 1. É quando a rotina _irq0 em 
+hw.inc configura os registradores da cpu com o contexto do próximo processo
+e retoma a execução através do método iret.
+
+;
+; Fim.
+;
+ 
+    

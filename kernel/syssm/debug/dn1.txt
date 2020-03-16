@@ -1,0 +1,12 @@
+
+
+ debug:
+ =====
+
+
+   na verdade são rotinas de análises e estatísticas.
+   Obs deve gerar arquivo de log.
+
+
+   kd, kernel debug é um termo apropriado nessa pasta.
+   

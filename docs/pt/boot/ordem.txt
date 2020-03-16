@@ -1,0 +1,22 @@
+
+Descrição resumida da ordem de inicialização.
+
+
++ O MBR chama o programa BM.BIN e passa o comando para ele.
+
++ BM.BIN chama o programa BL.BIN e passa o comando para ele.
+
++ BL.BIN carrega o programa KERNEL.BIN.
+  logo em seguida passa o comando para o programa KERNEL.BIN.
+  
++ KERNEL.BIN cria algumas threads, inicializa elas e passa o comando para
+  a thread primária do processo INIT.BIN.
+  Nesse momento algumas threads estão rodando e o usuário pode digitar comandos
+  no aplicativo SHELL.BIN.
+  
+  /kernel/entry é a pasta onde ficam os arquivos que inicializam o kernel base.
+    
+  Para a arquitetura x86, o primeiro arquivo é entry/x86/head/head.s que passará o comando 
+  para a parte em C que começa em entry/x86/x86main.c
+  
+  Fred Nora, 28 de janeiro de 2019.

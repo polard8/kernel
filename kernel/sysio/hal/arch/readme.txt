@@ -1,0 +1,1 @@
+todo: essas coisas deve ir para o hal

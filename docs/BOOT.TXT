@@ -1,0 +1,11 @@
+    Where the boot starts?
+
+    x86:
+        1) arch/x86/boot/vhd/main.asm
+        2) arch/x86/boot/bm/main.asm
+        3) arch/x86/boot/bl/src/core/head/x86/head.s
+
+
+
+
+

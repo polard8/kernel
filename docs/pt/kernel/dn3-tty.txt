@@ -1,0 +1,19 @@
+tty.
+
+Eu tenho uma lista de ttys que servem para console virtual. Console virtual é aquele que praticamente faz parte da máquina, e precisa funcionar mesmo que os terminais virtuais estejam falhando. Essa lista é limitada à 4. Esse é o número de consoles virtuais do gramado.
+
+Também tenho uma lista de ttys para outros fins. Os terminais virtuais usarão essas ttys para se conectarem aos processos filhos. Essa lista é grande e existirão vários tipos de conexões usando as ttys dessa lista.
+
+-----------
+
+Bom, fiz o seguinte:
+
+Cada processo tem uma tty.
+
+E os processos podem usar as funções getpid() e getppid().
+
+Então eu criei uma chamada que conecta a tty do filho à tty do pai, dados os pids como entrada.
+
+Os pais seriam sempre o slave, como acontece com os terminais virtuais.
+
+A estrutura de tty tem um elemento assim: tty->link.

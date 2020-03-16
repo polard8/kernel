@@ -1,0 +1,7 @@
+    /sm   - System management.
+
+    Headers para os módulos de gerenciamento do sistema.
+
+
+   network manager
+   >> O suporte a network foi incluido aqui para dar mais importância a comunicação e gerenciamento via rede, o que faz sentido nos dias de hoje.
