@@ -200,7 +200,8 @@ vhd-copy-files:
 	-sudo cp gramado/base/dev/SDA        /mnt/gramadovhd
 	-sudo cp gramado/base/tests/*.CPP    /mnt/gramadovhd
 	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
-	-sudo cp gramado/servers/bin/GWS.BIN    /mnt/gramadovhd
+	-sudo cp gramado/gws/bin/GWS.BIN       /mnt/gramadovhd
+	-sudo cp gramado/gws/bin/GWST.BIN      /mnt/gramadovhd
 	-sudo cp animal/apps/bin/*.BIN         /mnt/gramadovhd
 	-sudo cp animal/cmd/bin/*.BIN          /mnt/gramadovhd
 #	-sudo cp animal/cmd/bin/S2.BIN         /mnt/gramadovhd
@@ -272,7 +273,7 @@ clean-system-files:
 	-rm -rf gramado/kernel/KERNEL.BIN
 	-rm -rf gramado/init/*.BIN
 	-rm -rf gramado/gdeshell/*.BIN
-	-rm -rf gramado/servers/bin/*.BIN	
+	-rm -rf gramado/gws/bin/*.BIN	
 
 	-rm -rf animal/apps/bin/*.BIN
 	-rm -rf animal/cmd/bin/*.BIN
@@ -478,7 +479,7 @@ build-gdeshell:
 build-gws:
 	@echo "==================="
 	@echo " Compiling the gws"
-	make -C gramado/servers/gws   
+	make -C gramado/gws   
 
 build-apps:
 	@echo "==================="
