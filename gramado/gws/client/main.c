@@ -1,6 +1,7 @@
 /*
  * File: s2.c
  *
+ *    Client side application for Gramado Window Server.
  *    Using socket to connect with gws.
  *    AF_GRAMADO family.
  *
