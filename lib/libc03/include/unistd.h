@@ -140,16 +140,10 @@ typedef int gid_t;
 
 
 
-// #isso é um teste
+
 int execv (const char *path, char *const argv[] );
-
-
-// #todo:
-// Tem um monte de função pra fazer aqui.
-
-//padrao.
-//int execve ( const char *path, char *const argv[], char *const envp[] );  
-int execve ( const char *filename, char *argv[], char *envp[] );  
+int execve ( const char *path, char *const argv[], char *const envp[] );  
+// ...
 
 
 

@@ -1,8 +1,8 @@
 
 
-	echo "~~~>"
+	echo "~~~~>"
 	
-	qemu-system-x86_64 -hda GRAMADO.VHD \
+	qemu-system-x86_64 -hda ANIMAL.VHD \
 	-m 512 \
 	-serial stdio \
 	-netdev user,id=breh,hostfwd=tcp:127.0.0.1:8888-10.0.2.15:8888,hostfwd=tcp:127.0.0.1:8823-10.0.2.15:23 \

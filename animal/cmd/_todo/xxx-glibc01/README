@@ -1,0 +1,11 @@
+				* glibc *
+The GNU C Library, commonly known as glibc, 
+is the C standard library released by the GNU Project. 
+
+Originally written by the Free Software Foundation (FSF) for the GNU operating system, 
+the library's development has been overseen by a committee since 2001, with Ulrich Drepper as the lead contributor and maintainer.
+
+[This version]
+
+This version of glibc is completly written by Tomas 'ZeXx86' Jedrzejek for 
+light compatibility with GNU programs written in C programming languague on ZeX/OS.

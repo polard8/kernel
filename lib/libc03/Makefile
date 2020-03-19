@@ -114,6 +114,9 @@ all-c:
 	
 	gcc  -c  pty.c    $(CFLAGS) -I. -I include/ -o pty.o
 	gcc  -c  tty.c    $(CFLAGS) -I. -I include/ -o tty.o
+
+
+	gcc  -c  _split.c    $(CFLAGS) -I. -I include/ -o _split.o
 #...	
 
  

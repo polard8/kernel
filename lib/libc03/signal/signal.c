@@ -55,13 +55,14 @@ const char* sys_siglist[NSIG] = {
  *     POSIX.1-2001, POSIX.1-2008, C89, C99.
  */
 
+    //#todo
+    
 sighandler_t signal (int signum, sighandler_t handler)
 {
+    sighandler_t __ret;
 
-    //#todo
+
     /*
-    sighandler_t ret;
-    
     ret = (sighandler_t) gramado_system_call ( ?, ?, ?, ? );
 
     if (ret == SIG_ERR)
@@ -91,7 +92,8 @@ sigaction ( int signum,
 }
 
 
-
+// #todo
+// Sends a signal to a process or a process group.
 int kill (pid_t pid, int sig)
 {
 	// #todo

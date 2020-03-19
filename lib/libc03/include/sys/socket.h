@@ -12,6 +12,7 @@
 //=========
 /* Supported address families. */
 
+
 #define AF_UNSPEC     0
 #define AF_UNIX       1     /* Unix domain sockets 		*/
 #define AF_LOCAL      1     /* POSIX name for AF_UNIX	*/
@@ -46,6 +47,9 @@
 #define AF_RXRPC      33            /* RxRPC sockets 		*/
 #define AF_MAX        34            /* For now.. ??? */
 #define AF_RS232      35            /* Serial socket (NEW!) */
+
+
+#define AF_GRAMADO 8000
 
 
 /* Protocol families, same as address families. */

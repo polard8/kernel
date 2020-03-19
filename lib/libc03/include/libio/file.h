@@ -36,17 +36,20 @@
 
 
 
+// mode:
+// The mode of I/O, as given in the MODE argument to fopen, etc.
 // glibc-style
-/* The mode of I/O, as given in the MODE argument to fopen, etc.  */
+// #todo: We need it for bsd-like.
+
 typedef struct
 {
-  unsigned int __read:1;	/* Open for reading.  */
-  unsigned int __write:1;	/* Open for writing.  */
-  unsigned int __append:1;	/* Open for appending.  */
-  unsigned int __binary:1;	/* Opened binary.  */
-  unsigned int __create:1;	/* Create the file.  */
-  unsigned int __exclusive:1;	/* Error if it already exists.  */
-  unsigned int __truncate:1;	/* Truncate the file on opening.  */
+    unsigned int  __read:1;       /* Open for reading.  */
+    unsigned int  __write:1;      /* Open for writing.  */
+    unsigned int  __append:1;     /* Open for appending.  */
+    unsigned int  __binary:1;     /* Opened binary.  */
+    unsigned int  __create:1;     /* Create the file.  */
+    unsigned int  __exclusive:1;  /* Error if it already exists.  */
+    unsigned int  __truncate:1;   /* Truncate the file on opening.  */
 } __io_mode;
 
 
@@ -68,73 +71,18 @@ struct __sbuf {
 
 
 
-
-
-/*
- **********************************************************************
- * FILE:
- *     Estrutura padrão para arquivos.    
- *     #bugbug: os arquivos com esse tipo de estrutura serao
- *              gerenciados pelo kernel, para ser compativel com unix-like
- *              e para facilitar a comunicaçao entre processos.
- */
-
-
-/*
- 
- bsd structure
-  
-typedef	struct __sFILE {
-	unsigned char *_p;	          // current position in (some) buffer 
-	int	_r;		                  // read space left for getc() 
-	int	_w;		                  // write space left for putc() 
-	short	_flags;		          // flags, below; this FILE is free if 0 
-	short	_file;		          // fileno, if Unix descriptor, else -1 
-	struct	__sbuf _bf;	          // the buffer (at least 1 byte, if !NULL) 
-	int	_lbfsize;	              // 0 or -_bf._size, for inline putc 
-
-	//operations 
-	void	*_cookie;	                 // cookie passed to io functions 
-	int	(*_close) __P((void *));
-	int	(*_read)  __P((void *, char *, int));
-	fpos_t	(*_seek)  __P((void *, fpos_t, int));
-	int	(*_write) __P((void *, const char *, int));
-
-	//file extension 
-	struct	__sbuf _ext;
-
-	// separate buffer for long sequences of ungetc() 
-	unsigned char *_up;   	// saved _p when _p is doing ungetc data 
-	int	_ur;		        // saved _r when _r is counting ungetc data 
-
-	// tricks to meet minimum requirements even when malloc() fails 
-	unsigned char _ubuf[3];	// guarantee an ungetc() buffer 
-	unsigned char _nbuf[1];	// guarantee a getc() buffer 
-
-	//separate buffer for fgetln() when line crosses buffer boundary 
-	struct	__sbuf _lb;	// buffer for fgetln() 
-
-	//Unix stdio files get aligned to block boundaries on fseek() 
-	int	_blksize;	// stat.st_blksize (may be != _bf._size) 
-	fpos_t	_offset;	// current lseek offset 
-} FILE;
-*/
-
-
-
-
+// FILE structure.
 // bsd-like
-
-// #importante
-// Isso deve ficar igual ao que está em ring 0.
+// 2019 - Created by Fred Nora.
 
 struct _iobuf 
 {
     int used;
     int magic;
 
-
-    unsigned char *_base;    // Pointer to the base of the file. the buffer 
+    // Pointer to the base of the file. 
+    // Sometimes used as a buffer pointer.
+    unsigned char *_base;    
     
     
 	// current position in (some) buffer
@@ -175,12 +123,8 @@ struct _iobuf
     fpos_t (*_seek)  __P((void *, fpos_t, int));
     int    (*_write) __P((void *, const char *, int));
 
-
 	//file extension 
     struct __sbuf _ext;
-
-
-
 
 	// separate buffer for long sequences of ungetc() 
 	// saved _p when _p is doing ungetc data 
@@ -198,18 +142,14 @@ struct _iobuf
     struct __sbuf _lb;    // buffer for fgetln() 
 
 
-
 	//Unix stdio files get aligned to block boundaries on fseek() 
     int _blksize;      // stat.st_blksize (may be != _bf._size) 
     fpos_t _offset;    // current lseek offset 
 
-
-
     int   _charbuf;   
     char *_tmpfname;
-    
-    
-    
+
+
     int eof;
     int error;
     int have_ungotten;
@@ -228,73 +168,37 @@ struct _iobuf
     int iopl;
 };
 
+// glibc-like
+#define  __stdio_file  _iobuf  
+
+// bsd-like
+#define  __sFILE _iobuf  
 
 
-/* The opaque type of streams.  */
+//++
+#ifndef  __FILE_defined
+// The opaque type of streams.
 typedef struct _iobuf FILE; 
-
-// This way it looks like glibc.
-//typedef struct _iobuf __stdio_file;
-
-
-// This way it looks like bsd.
-//typedef struct _iobuf __sFILE;
-
-
-/*
-#ifndef	__FILE_defined
-
-//The opaque type of streams. 
-typedef struct __stdio_file FILE;
-
-#define	__FILE_defined	1
+#define  __FILE_defined  1
 #endif  //FILE not defined.  
-*/
+//--
 
 
-
-
+// Standard stream.
 FILE *stdin;
 FILE *stdout;
 FILE *stderr;
 
 
+// Ajust.
+#define  __validfp (stream)    \
+             ( (void *) stream !=  NULL )
 
 
+//
+// A list of stream in the library.
+//
 
-/*
- // outra lista.
- // lista tradicional
-
-  // _ptr, _cnt, _base,  _flag, _file, _charbuf, _bufsiz  
-  // stdin (_iob[0]) 
-  // stdout (_iob[1])  
-  // stderr (_iob[3]) 
- 
-char buf_stdin[BUFSIZ];
-* 
-FILE _iob[NUMBER_OF_FILES] = {
-	{ buf_stdin, 0, buf_stdin, _IOREAD | _IOYOURBUF, 0, 0, _INTERNAL_BUFSIZ },
-	{ NULL, 0, NULL, _IOWRT, 1, 0, 0 },
-	{ NULL, 0, NULL, _IOWRT, 2, 0, 0 },
-};
-
-#define stdin  (&_iob[0])
-#define stdout (&_iob[1])
-#define stderr (&_iob[2])
-
-*/
-
-
-//#define	fileno(stream)		((stream)->_fd)
-
-
-//#define  __validfp(stream)  ( (void *) stream !=  NULL )
-#define  __validfp(stream)                 \
-    ( (void *) stream !=  NULL )
-
-
-//listando os arquivos da biblioteca.
 unsigned long Streams[NUMBER_OF_FILES];
 
 #endif    //__FILE_H__

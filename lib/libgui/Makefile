@@ -37,38 +37,19 @@ all: main.o all-c api01-link finalize clean
 	@echo "Ok?"
 
 main.o:
-#	gcc  -c  gde.c $(CFLAGS) -o gde.o
+# nothing
 
 all-c:
 
-	gcc  -c  api.c   $(CFLAGS) -I ../libcore/include/ -o api.o
-	
-#	gcc  -c  ctype.c   $(CFLAGS) -I include/ -o ctype.o	
-#	gcc  -c  stdio.c   $(CFLAGS) -I include/ -o stdio.o	
-#	gcc  -c  stdlib.c  $(CFLAGS) -I include/ -o stdlib.o	
-#	gcc  -c  string.c  $(CFLAGS) -I include/ -o string.o	
-#	gcc  -c  time.c    $(CFLAGS) -I include/ -o time.o	
-#	gcc  -c  unistd.c  $(CFLAGS) -I include/ -o unistd.o	
-#	gcc  -c  wait.c    $(CFLAGS) -I include/ -o wait.o	
-	
-#	cp ../../lib/libc01/obj/ctype.o   .
-#	cp ../../lib/libc01/obj/stdio.o   .
-#	cp ../../lib/libc01/obj/stdlib.o  .	
-#	cp ../../lib/libc01/obj/string.o  .
-#	cp ../../lib/libc01/obj/time.o    .
-	
-	#todo
-#	cp ../../lib/api01/obj/api.o      .
-	
-#	cp ../../lib/libc01/obj/unistd.o  .
-	
+	gcc  -c  api.c   $(CFLAGS) -I include/ -I ../libc03/include/ -o api.o
+
 
 #create 'ar'
 api01-link:
-#	ld -m i386pe -T link.ld -o JACKPOT.BIN $(myObjects) -Map app_map.s
+# nothing
+
 
 finalize:
-#	cp JACKPOT.BIN  ../../../bin
 	-mkdir obj/
 	-cp *.o obj/
 	

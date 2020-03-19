@@ -1,11 +1,9 @@
 /*
  * API - This is the header for 32bit applications.
- * Copyright (c) 2017 Fred Nora.
+ * Copyright (c) Fred Nora.
  *
  * File: api.h 
  *
- * @todo: Esse arquivo poderia se chamar gramado.h.
- *        Ou gramado.h incluir esse arquivo.
  *   
  * Description:
  *    Header da API do sistema.
@@ -38,15 +36,13 @@
  * Obs: No futuro pode haver alguma reorganização desses números. 
  *      a mesma ordem deverá se obedecida no kernel base. 
  *
- * Histórico: 
- *     2013 - Esse arquivo foi criado por Fred Nora.
- *     2014 - Implimentação de novas chamadas. 
- *     2015 - Implimentação de novas chamadas.
- *     2016 - Implementação de novas chamadas.
- *     2017 - Revisão.
+ * History:
+ *     2013 - Created by Fred Nora.
+ *     2014 ~ 2020 New functions.
  */
 
-// #teste
+
+// ??
 #include <types.h>      
 #include <stddef.h>
  
@@ -79,187 +75,6 @@ typedef enum {
 //
 
 
-/*
- * KERNEL:
- *     Serviços relativos ao gerenciamento do kernel.
- *     Manipula status e estatísticas do kernel. Também faz configurações 
- * em tempo real, tais como: Selecionar tipo de scheduler, gerenciar 
- * quantidade de recursos etc ...
- *     Isso são interrupções.
- *     De 48 até 199.
- */
-
-//Kernel.
-#define	KERNEL      48
-#define	KERNEL48    48
-#define	KERNEL49    49
-
-#define	KERNEL50    50
-#define	KERNEL51    51
-#define	KERNEL52    52
-#define	KERNEL53    53
-#define	KERNEL54    54
-#define	KERNEL55    55
-#define	KERNEL56    56
-#define	KERNEL57    57
-#define	KERNEL58    58
-#define	KERNEL59    59
-
-#define	KERNEL60    60
-#define	KERNEL61    61
-#define	KERNEL62    62
-#define	KERNEL63    63
-#define	KERNEL64    64
-#define	KERNEL65    65
-#define	KERNEL66    66
-#define	KERNEL67    67
-#define	KERNEL68    68
-#define	KERNEL69    69
-
-#define	KERNEL70    70
-#define	KERNEL71    71
-#define	KERNEL72    72
-#define	KERNEL73    73
-#define	KERNEL74    74
-#define	KERNEL75    75
-#define	KERNEL76    76
-#define	KERNEL77    77
-#define	KERNEL78    78
-#define	KERNEL79    79
-
-#define	KERNEL80    80
-#define	KERNEL81    81
-#define	KERNEL82    82
-#define	KERNEL83    83
-#define	KERNEL84    84
-#define	KERNEL85    85
-#define	KERNEL86    86
-#define	KERNEL87    87
-#define	KERNEL88    88
-#define	KERNEL89    89
-
-#define	KERNEL90    90
-#define	KERNEL91    91
-#define	KERNEL92    92
-#define	KERNEL93    93
-#define	KERNEL94    94
-#define	KERNEL95    95
-#define	KERNEL96    96
-#define	KERNEL97    97
-#define	KERNEL98    98
-#define	KERNEL99    99
-
-#define	KERNEL100   100
-#define	KERNEL101   101
-#define	KERNEL102   102
-#define	KERNEL103   103
-#define	KERNEL104   104
-#define	KERNEL105   105
-#define	KERNEL106   106
-#define	KERNEL107   107
-#define	KERNEL108   108
-#define	KERNEL109   109
-
-#define	KERNEL110    110
-#define	KERNEL111    111
-#define	KERNEL112    112
-#define	KERNEL113    113
-#define	KERNEL114    114
-#define	KERNEL115    115
-#define	KERNEL116    116
-#define	KERNEL117    117
-#define	KERNEL118    118
-#define	KERNEL119    119
-
-#define	KERNEL120    120
-#define	KERNEL121    121
-#define	KERNEL122    122
-#define	KERNEL123    123
-#define	KERNEL124    124
-#define	KERNEL125    125
-#define	KERNEL126    126
-#define	KERNEL127    127
-#define	KERNEL128    128
-#define	KERNEL129    129
-
-#define	KERNEL130    130
-#define	KERNEL131    131
-#define	KERNEL132    132
-#define	KERNEL133    133
-#define	KERNEL134    134
-#define	KERNEL135    135
-#define	KERNEL136    136
-#define	KERNEL137    137
-#define	KERNEL138    138
-#define	KERNEL139    139
-
-#define	KERNEL140    140
-#define	KERNEL141    141
-#define	KERNEL142    142
-#define	KERNEL143    143
-#define	KERNEL144    144
-#define	KERNEL145    145
-#define	KERNEL146    146
-#define	KERNEL147    147
-#define	KERNEL148    148
-#define	KERNEL149    149
-
-#define	KERNEL150    150
-#define	KERNEL151    151
-#define	KERNEL152    152
-#define	KERNEL153    153
-#define	KERNEL154    154
-#define	KERNEL155    155
-#define	KERNEL156    156
-#define	KERNEL157    157
-#define	KERNEL158    158
-#define	KERNEL159    159
-
-#define	KERNEL160    160
-#define	KERNEL161    161
-#define	KERNEL162    162
-#define	KERNEL163    163
-#define	KERNEL164    164
-#define	KERNEL165    165
-#define	KERNEL166    166
-#define	KERNEL167    167
-#define	KERNEL168    168
-#define	KERNEL169    169
-
-#define	KERNEL170    170
-#define	KERNEL171    171
-#define	KERNEL172    172
-#define	KERNEL173    173
-#define	KERNEL174    174
-#define	KERNEL175    175
-#define	KERNEL176    176
-#define	KERNEL177    177
-#define	KERNEL178    178
-#define	KERNEL179    179
-
-#define	KERNEL180    180
-#define	KERNEL181    181
-#define	KERNEL182    182
-#define	KERNEL183    183
-#define	KERNEL184    184
-#define	KERNEL185    185
-#define	KERNEL186    186
-#define	KERNEL187    187
-#define	KERNEL188    188
-#define	KERNEL189    189
-
-
-#define	KERNEL190    190
-#define	KERNEL191    191
-#define	KERNEL192    192
-#define	KERNEL193    193
-#define	KERNEL194    194
-#define	KERNEL195    195
-#define	KERNEL196    196
-#define	KERNEL197    197
-#define	KERNEL198    198
-#define	KERNEL199    199
-
 
 /*
  * SYSTEM:
@@ -276,140 +91,74 @@ typedef enum {
  * importantes para o desempenho geral do sistema.
  *
  */
-
  
-#define IA32_SYSCALL_VECTOR		0x80 
- 
-//Sistema.
-//#define	SYSTEM  200    //*Principal.
-
-//Outras.
-#define	SYSTEM1    201
-#define	SYSTEM2    202
-#define	SYSTEM3    203
-#define	SYSTEM4    204
-#define	SYSTEM5    205
-#define	SYSTEM6    206
-#define	SYSTEM7    207
-#define	SYSTEM8    208
-#define	SYSTEM9    209
-#define	SYSTEM10   210
-#define	SYSTEM11   211
-#define	SYSTEM12   212
-#define	SYSTEM13   213
-#define	SYSTEM14   214
-#define	SYSTEM15   215
-//..
+#define  IA32_SYSCALL_VECTOR    0x80 
 
 
-/*
- * GUI:
- *     Serviços gráficos rápidos.
- *     Com essas chamadas será possível utilizar os recursos
- * gráficos oferecidos pelo kernel base. O kernel base, por sua vez,
- * atende as chamadas com rotinas próprias e com rotinas disponíveis
- * na biblioteca em user mode.
- *     O objetivo maior dessa chamadas é oferecer serviços gráficos
- * que sejam atendidos mais rapidamente que os outros serviços do 
- * do kernel.
- * Obs: Serão apenas as interrupções 216, 217, 218 e 219.
- *
- */
- 
-#define	FAST_CREATE_WINDOW     216 //Obs: Essa substitui a chamada GUI. 
-#define	GUI     216  //Fast Create window.
-#define	GUI217  217
-#define	GUI218  218
-#define	GUI219  219
+// List of services for the system interrupt (0x80).
+// arch x86.
+
+// NULL.
+#define  SYSTEMCALL_NULL  0
+
+// Disk.
+#define  SYSTEMCALL_READ_LBA    1
+#define  SYSTEMCALL_WRITE_LBA   2
+#define  SYSTEMCALL_READ_FILE   3
+#define  SYSTEMCALL_WRITE_FILE  4
 
 
-//
-// Obs: As outras estão indefinidas. De 220 até 255.
-//
+// Graphics.
+#define  SYSTEMCALL_VSYNC                5
+#define  SYSTEMCALL_BUFFER_PUTPIXEL      6
+#define  SYSTEMCALL_BUFFER_DRAWCHAR      7
+#define  SYSTEMCALL_BUFFER_DRAWLINE      8
+#define  SYSTEMCALL_BUFFER_DRAWRECT      9
+#define  SYSTEMCALL_BUFFER_CREATEWINDOW  10
+#define  SYSTEMCALL_REFRESHSCREEN        11
 
 
-//
-// * Agora segue a lista de serviços usados pela interupção principal. 200.
-//
-
-/*
- * interrupção 200:
- * ===============
- *     Lista de serviços oferecidos pela interrupção 200.
- *     Essa é a interrupção de sistema, a principal interrupção.
- * Ofereçe diversos recurso básicos.
- *     O propósito é oferecer um grande número de recursos básicos
- * não dando prioridade ao desempenho.
- *
- * Obs: A ordem dos 19 primeiros implica prioridade e velocidade.
- *      Os serviços estão organizados por categoria.
- *
- * Lembrete: 
- * *Importante: Lembre-se que a ordem que está aqui deve necessariamente
- * ser a mesma ordem encontrada no kernel base. Portanto, alterações
- * aqui apresentam um grande custo, pois acarretam mudanças no kernel base.
- * 
- * Histórico da lista:
- *     2015 - Created.
- *     Set 2016 - Revisão.
- *     ...
- */
-
-//NULL.
-#define	SYSTEMCALL_NULL  0
-
-//Disk.
-#define	SYSTEMCALL_READ_LBA    1
-#define	SYSTEMCALL_WRITE_LBA   2
-#define	SYSTEMCALL_READ_FILE   3
-#define	SYSTEMCALL_WRITE_FILE  4
-
-//Gráfico.
-#define	SYSTEMCALL_VSYNC                5
-#define	SYSTEMCALL_BUFFER_PUTPIXEL      6
-#define	SYSTEMCALL_BUFFER_DRAWCHAR      7
-#define	SYSTEMCALL_BUFFER_DRAWLINE      8
-#define	SYSTEMCALL_BUFFER_DRAWRECT      9
-#define	SYSTEMCALL_BUFFER_CREATEWINDOW  10
-#define	SYSTEMCALL_REFRESHSCREEN        11
-
-//Rede.
-#define	SYSTEMCALL_REDE_RES1  12
-#define	SYSTEMCALL_REDE_RES2  13
-#define	SYSTEMCALL_REDE_RES3  14
-#define	SYSTEMCALL_REDE_RES4  15
+// Network.
+#define  SYSTEMCALL_REDE_RES1  12
+#define  SYSTEMCALL_REDE_RES2  13
+#define  SYSTEMCALL_REDE_RES3  14
+#define  SYSTEMCALL_REDE_RES4  15
 
 
-// unix
-#define  SYS_OPEN     16  // open ()
-#define  SYS_CLOSE    17  // close ()
-#define  SYS_READ     18  // read ()
-#define  SYS_WRITE    19  // write ()
+// libc
+#define  SYS_OPEN     16    // open()
+#define  SYS_CLOSE    17    // close()
+#define  SYS_READ     18    // read()
+#define  SYS_WRITE    19    // write()
 
-//Outros. 
 
-//Buffer.
-#define	SYSTEMCALL_REFRESH_BUFFER1  20
-#define	SYSTEMCALL_REFRESH_BUFFER2  21
-#define	SYSTEMCALL_REFRESH_BUFFER3  22
 
-//Screen.
-#define	SYSTEMCALL_REFRESH_SCREEN2  23
+// Buffer.
+#define  SYSTEMCALL_REFRESH_BUFFER1  20
+#define  SYSTEMCALL_REFRESH_BUFFER2  21
+#define  SYSTEMCALL_REFRESH_BUFFER3  22
 
-//24-28 WINDOW SUPPORT	
-#define	SYSTEMCALL_SHOWWINDOW   24
-#define	SYSTEMCALL_25   25
-#define	SYSTEMCALL_26    26
-#define	SYSTEMCALL_27    27
-#define	SYSTEMCALL_28    28
 
-//Buffer: Print string.
-#define	SYSTEMCALL_BUFFER_PRINTSTRING  29
+// Screen.
+#define  SYSTEMCALL_REFRESH_SCREEN2  23
+
+
+// 24-28 WINDOW SUPPORT
+#define  SYSTEMCALL_SHOWWINDOW   24
+#define  SYSTEMCALL_25           25
+#define  SYSTEMCALL_26           26
+#define  SYSTEMCALL_27           27
+#define  SYSTEMCALL_28           28
+
+
+// Buffer: Print string.
+#define  SYSTEMCALL_BUFFER_PRINTSTRING  29
+
 
 //Buffer: Put pixel on buffer.
-#define	SYSTEMCALL_BUFFER1_PUTPIXEL  30
-#define	SYSTEMCALL_BUFFER2_PUTPIXEL  31
-#define SYSTEMCALL_BUFFER3_PUTPIXEL  32
+#define  SYSTEMCALL_BUFFER1_PUTPIXEL  30
+#define  SYSTEMCALL_BUFFER2_PUTPIXEL  31
+#define  SYSTEMCALL_BUFFER3_PUTPIXEL  32
 
 
 // Livre: Usar para outra coisa.
@@ -417,209 +166,309 @@ typedef enum {
 
 
 //Cursor.
-#define	SYSTEMCALL_SETCURSOR  34
+#define  SYSTEMCALL_SETCURSOR  34
 
 
 // Livre: Usar para outra coisa.
 #define  SYSTEMCALL_35  35
 
 
-//?? rever
-//O teclado envia essa mensagem para o procedimento ativo.
-#define	SYSTEMCALL_KSENDMESSAGE          36 
+// ?? rever
+// O teclado envia essa mensagem para o procedimento ativo.
+#define  SYSTEMCALL_KSENDMESSAGE  36 
 
-//
+
 // #importante
 // Chama o procedimento padrao do sistema.
 // Fica no fim da thread.
+#define  SYSTEMCALL_CALL_SYSTEMPROCEDURE  37  
+
+
+// Hostname 
+#define  SYS_GETHOSTNAME    38
+#define  SYS_SETHOSTNAME    39
+
+// Username.
+#define  SYS_GETUSERNAME    40
+#define  SYS_SETUSERNAME    41
+
+
+// Bitmap img: 
+// Load bitmap image, size=16x16.
+#define  SYSTEMCALL_LOAD_BITMAP_16x16  42  
+
+// Livre. ?
+#define  SYSTEMCALL_43  43
+
+
+// ?? 
+// Next app.
+#define  SYSTEMCALL_G_NEXT_APP  44
+
+
+// Message box.
+#define  SYSTEMCALL_MESSAGE_BOX  45
+
+
+// Client area.
+#define  SYSTEMCALL_SET_CLIENT_AREA    46
+
+
+// Create Window support.
+// Rever o uso dessas chamadas.
+#define  SYSTEMCALL_CREATEWINDOW0  47  
+#define  SYSTEMCALL_CREATEWINDOW1  48 
+#define  SYSTEMCALL_CREATEWINDOW2  49 
+
+
+//
+// (50~64) 
+// Window suppot: 
+// manipulação de janelas.
 //
 
-#define	SYSTEMCALL_CALL_SYSTEMPROCEDURE  37  
+#define  SYSTEMCALL_RESIZEWINDOW    50 //resize. 
+#define  SYSTEMCALL_REDRAWWINDOW    51 //redraw.
+#define  SYSTEMCALL_REPLACEWINDOW   52 //replace.
+#define  SYSTEMCALL_MAXIMIZEWINDOW  53 //MAXIMIZE
+#define  SYSTEMCALL_MINIMIZEWINDOW  54 //MINMIZE
+#define  SYSTEMCALL_GETFOREGROUNDWINDOW  55   //GET FOREGROUND
+#define  SYSTEMCALL_SETFOREGROUNDWINDOW  56   // SET FOREGROUND
+#define  SYSTEMCALL_REGISTERWINDOW  57  
+#define  SYSTEMCALL_CLOSEWINDOW     58
+#define  SYSTEMCALL_DESTROYWINDOW   59
+#define  SYSTEMCALL_SETACTIVEWINDOW  60
+#define  SYSTEMCALL_GETACTIVEWINDOW  61
+#define  SYSTEMCALL_SETFOCUS   62
+#define  SYSTEMCALL_GETFOCUS   63
+#define  SYSTEMCALL_KILLFOCUS  64
 
 
-
-#define SYS_GETHOSTNAME    38
-#define SYS_SETHOSTNAME    39
-#define SYS_GETUSERNAME    40
-#define SYS_SETUSERNAME    41
+// Putchar.
+// Muito usada.
+#define  SYSTEMCALL_SYS_PUTCHAR  65
 
 
+// ??
+#define  SYSTEMCALL_66  66
+#define  SYSTEMCALL_67  67
+#define  SYSTEMCALL_68  68
+#define  SYSTEMCALL_69  69
 
-//Bitmap img: 
-#define	SYSTEMCALL_LOAD_BITMAP_16x16  42  //Load bitmap image, size=16x16.
-#define	SYSTEMCALL_43                 43
-
-// ?? Next app.
-#define	SYSTEMCALL_G_NEXT_APP         44
-
-//Message box.
-#define	SYSTEMCALL_MESSAGE_BOX        45
-
-//Client area.
-#define	SYSTEMCALL_SET_CLIENT_AREA    46
-
-//Create Window support.
-#define	SYSTEMCALL_CREATEWINDOW0  47 // envia argumentos de controle. 
-#define	SYSTEMCALL_CREATEWINDOW1  48 // envia argumentos de posicionamento.
-#define	SYSTEMCALL_CREATEWINDOW2  49 // envia argumentos de dimensões.
 
 //
-//(50~59) Window suppot, manipulação de janelas.
+// Process and Thread.
 //
 
-#define	SYSTEMCALL_RESIZEWINDOW    50 //resize. 
-#define	SYSTEMCALL_REDRAWWINDOW    51 //redraw.
-#define	SYSTEMCALL_REPLACEWINDOW   52 //replace.
-#define	SYSTEMCALL_MAXIMIZEWINDOW    53 //MAXIMIZE
-#define	SYSTEMCALL_MINIMIZEWINDOW    54 //MINMIZE
-#define	SYSTEMCALL_GETFOREGROUNDWINDOW    55   //GET FOREGROUND
-#define	SYSTEMCALL_SETFOREGROUNDWINDOW    56   // SET FOREGROUND
-//Register window.
-#define	SYSTEMCALL_REGISTERWINDOW  57  
-//Close window.
-#define	SYSTEMCALL_CLOSEWINDOW     58
-//Destroy window. (Destrói a estrutura e a classe).
-#define	SYSTEMCALL_DESTROYWINDOW   59
+
+//++
+#define  SYSTEMCALL_EXIT             70
+#define  SYSTEMCALL_FORK             71  
+#define  SYSTEMCALL_CREATETHREAD     72
+#define  SYSTEMCALL_CREATEPROCESS    73
+#define  SYSTEMCALL_CLOSEALLPROCESS  74
+#define  SYSTEMCALL_75               75   //?? livre.
+#define  SYSTEMCALL_GETNEXTPROCESS   76
+#define  SYSTEMCALL_SETNEXTPROCESS   77
+#define  SYSTEMCALL_GETNEXTTHREAD    78
+#define  SYSTEMCALL_SETNEXTTHREAD    79
+#define  SYSTEMCALL_CURRENTPROCESSINFO  80 
+#define  SYSTEMCALL_GETPPID  81
+#define  SYSTEMCALL_SETPPID  82
+#define  SYSTEMCALL_WAIT4    83 
+#define  SYSTEMCALL_84       84    // ?? Livre.
+#define  SYSTEMCALL_GETPID   85
+#define  SYSTEMCALL_SETPID   86
+#define  SYSTEMCALL_SEMAPHORE_DOWN  87
+#define  SYSTEMCALL_88              88  //Em uso. não mudar.
+#define  SYSTEMCALL_SEMAPHORE_UP    89
+#define  SYSTEMCALL_DEAD_THREAD_COLLECTOR  90
+#define  SYSTEMCALL_ALERTTHREAD  91
+#define  SYSTEMCALL_92  92    // ??
+#define  SYSTEMCALL_93  93    // ??
+#define  SYSTEMCALL_STARTTHREAD  94
+#define  SYSTEMCALL_95  95  // ??livre
+#define  SYSTEMCALL_96  96  // ??livre
+#define  SYSTEMCALL_97  97  // ??livre
+#define  SYSTEMCALL_RESUMETHREAD  98
+#define  SYSTEMCALL_99            99  // ??livre
+//--
+
+//
+// ipc
+//
+
+// (100~109) ipc
+// Rotinas de mensagens. Channels, Sockets.
+#define  SYSTEMCALL_100                100  // ??livre
+#define  SYSTEMCALL_101                101  // ??livre
+#define  SYSTEMCALL_102                102  // ??livre
+#define  SYSTEMCALL_RECEIVEMESSAGE     103  //Pega uma mensagem no PCB de um processo.
+#define  SYSTEMCALL_SENDMESSAGE        104  //Envia uma mensagem para o PCB de um processo.
+#define  SYSTEMCALL_REGISTERPROCEDURE  105
+#define  SYSTEMCALL_CREATECHANNEL      106
+#define  SYSTEMCALL_DESTROYCHANNEL     107
+#define  SYSTEMCALL_OPENCHANNEL        108
+#define  SYSTEMCALL_CLOSECHANNEL       109
 
 
 
-//Active window support.
-#define	SYSTEMCALL_SETACTIVEWINDOW  60
-#define	SYSTEMCALL_GETACTIVEWINDOW  61
+// Reboot.
+#define  SYSTEMCALL_REBOOT  110
 
-//Focus support.
-#define	SYSTEMCALL_SETFOCUS   62
-#define	SYSTEMCALL_GETFOCUS   63
-#define	SYSTEMCALL_KILLFOCUS  64
 
-//Outros. 
-//@todo: Reservar próximos para seleção de janela. 
-#define	SYSTEMCALL_SYS_PUTCHAR  65
-#define	SYSTEMCALL_66  66
-#define	SYSTEMCALL_67  67
+// 111- get single message.
+// Ótima. Muito usada.
+#define  SYSTEMCALL_111  111
 
-#define	SYSTEMCALL_68  68
-#define	SYSTEMCALL_69  69
+// 112 - Send message to process.
+#define  SYSTEMCALL_112  112
 
-//Exit process support.
-#define	SYSTEMCALL_EXIT             70
 
-//fork support.
-#define	SYSTEMCALL_FORK             71  
+// 113 - Update window.
+// Envia uma mensagem PAINT para o aplicativo atualizar a 
+// área de cliente.
+#define  SYSTEMCALL_113  113
 
-//Create thread.
-#define	SYSTEMCALL_CREATETHREAD     72
+// 114 - Send message to thread.
+#define  SYSTEMCALL_114  114
 
-//Create process.
-#define	SYSTEMCALL_CREATEPROCESS    73
+// 115 - free slot.
+#define  SYSTEMCALL_115  115
 
-//Outros. 
-//@todo: Reservar próximos para manipulação de threads e processos. 
-#define	SYSTEMCALL_CLOSEALLPROCESS  74
-#define	SYSTEMCALL_75               75 //poderia ser close current process.??
-#define	SYSTEMCALL_GETNEXTPROCESS   76
-#define	SYSTEMCALL_SETNEXTPROCESS   77
-#define	SYSTEMCALL_GETNEXTTHREAD    78
-#define	SYSTEMCALL_SETNEXTTHREAD    79
 
-//@todo: Resevar próximos para manipulação de processos.
-#define	SYSTEMCALL_CURRENTPROCESSINFO  80  //Informações sobre o processo atual.
-#define	SYSTEMCALL_GETPPID  81
-#define	SYSTEMCALL_SETPPID  82
-#define	SYSTEMCALL_WAIT4    83 //wait for process termination
-#define	SYSTEMCALL_84       84
-#define	SYSTEMCALL_GETPID   85
-#define	SYSTEMCALL_SETPID   86
-#define	SYSTEMCALL_SEMAPHORE_DOWN  87
-#define	SYSTEMCALL_88              88  //Em uso. não mudar.
-#define	SYSTEMCALL_SEMAPHORE_UP    89
+// 116 - free slot.
+#define  SYSTEMCALL_116  116
 
-//reserva próximos para manipulação de threads.
-//Dead thread collector.
-#define	SYSTEMCALL_DEAD_THREAD_COLLECTOR  90
-#define	SYSTEMCALL_ALERTTHREAD  91
-#define	SYSTEMCALL_92  92
-#define	SYSTEMCALL_93  93
-#define	SYSTEMCALL_STARTTHREAD  94 //REAL (coloca a thread em standby para executar pela primeira vez.)
-#define	SYSTEMCALL_95  95
-#define	SYSTEMCALL_96  96
-#define	SYSTEMCALL_97  97
-#define	SYSTEMCALL_RESUMETHREAD  98
 
-//Procedure arguments. (window,msg,long1,long2)
-#define	SYSTEMCALL_GET_HWINDOW           99
-#define	SYSTEMCALL_GET_KEYBOARD_MESSAGE  100
-#define	SYSTEMCALL_GET_LONG1             101 
-#define	SYSTEMCALL_GET_LONG2             102
+// 117 - Send message to thread.
+#define  SYSTEMCALL_117  117
 
-//(103~109) Rotinas de mensagens. Channels, Sockets.
-#define	SYSTEMCALL_RECEIVEMESSAGE     103  //Pega uma mensagem no PCB de um processo.
-#define	SYSTEMCALL_SENDMESSAGE        104  //Envia uma mensagem para o PCB de um processo.
-#define	SYSTEMCALL_REGISTERPROCEDURE  105
-#define	SYSTEMCALL_CREATECHANNEL      106
-#define	SYSTEMCALL_DESTROYCHANNEL     107
-#define	SYSTEMCALL_OPENCHANNEL        108
-#define	SYSTEMCALL_CLOSECHANNEL       109
 
-//Reboot.
-#define	SYSTEMCALL_REBOOT  110
+// 118 - Create window.
+// Cria uma janela usando o kgws.
+// Muito usada.
+#define  SYSTEMCALL_118  118
 
-//Outros. 
-//@todo: Reservar para gerenciamento de energia. 111- 119
-#define	SYSTEMCALL_111  111
-#define	SYSTEMCALL_112  112
-#define	SYSTEMCALL_113  113 //Envia uma mensagem PAINT para o aplicativo atualizar a área de trabalho.
-#define	SYSTEMCALL_114  114
-#define	SYSTEMCALL_115  115
-#define	SYSTEMCALL_116  116
-#define	SYSTEMCALL_117  117
-#define	SYSTEMCALL_118  118
-#define	SYSTEMCALL_119  119
 
-//??
-//120-125 gerenciamento de barras
-#define	SYSTEMCALL_CREATEMENUBAR    120
-#define	SYSTEMCALL_CREATETASKBAR    121
-#define	SYSTEMCALL_CREATESTATUSBAR  122
-#define	SYSTEMCALL_123              123
-#define	SYSTEMCALL_124              124
-#define	SYSTEMCALL_125              125
+// Select color scheme.
+#define  SYSTEMCALL_119  119
 
-//126~129 (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
-#define	SYSTEMCALL_126 126
-#define	SYSTEMCALL_127 127
-#define	SYSTEMCALL_128 128
-//129: Inicializando um driver. Um driver enviou uma systemcall 
-//confirmando a inicialização de um driver.
-#define	SYSTEMCALL_DRIVERINITIALIZED 129
 
-//130-139 Manipulação de texto.
-#define	SYSTEMCALL_DRAWTEXT  130
-#define	SYSTEMCALL_131       131
-#define	SYSTEMCALL_132       132
-#define	SYSTEMCALL_SET_WINDOW_WITH_TEXT_INPUT 133
-#define	SYSTEMCALL_GET_WINDOW_WITH_TEXT_INPUT 134
-#define	SYSTEMCALL_135       135
-#define	SYSTEMCALL_136       136
-#define	SYSTEMCALL_137       137
-#define	SYSTEMCALL_138       138    //api_receive_message
-#define	SYSTEMCALL_139       139   //get scancode.@todo
+
+
+// livres.
+#define  SYSTEMCALL_120    120
+#define  SYSTEMCALL_121    121
+#define  SYSTEMCALL_122    122
+#define  SYSTEMCALL_123    123
+
+
+// test:
+// kernel request para defered system window procedure.
+#define  SYSTEMCALL_124    124
+
+
+// Calling system procedure.
+// Muito usada.
+#define  SYSTEMCALL_125    125
+
+
+//
+// 126 ~ 129 
+// (RESERVADO PARA COMUNICAÇÃO COM DRIVER.)
+//
+
+
+// User mode port IN.
+#define  SYSTEMCALL_126 126
+
+// User mode port OUT.
+#define  SYSTEMCALL_127 127
+
+// Livre (usar para comunicação com drivers)
+#define  SYSTEMCALL_128 128
+
+// 129: 
+// Inicializando um driver. 
+// Um driver enviou uma systemcall confirmando a 
+// inicialização de um driver.
+// #bugbug: Talvez isso será feito via socket.
+// Ou essa rotina pode ser usado para registrar
+// no kernel.
+#define  SYSTEMCALL_DRIVERINITIALIZED 129
+
+
+//
+// 130-139 
+// Text support.
+//
+
+
+// draw text
+#define  SYSTEMCALL_DRAWTEXT  130
+
+// draw text wwf
+#define  SYSTEMCALL_131       131
+
+// livre
+#define  SYSTEMCALL_132       132
+
+// ??
+#define  SYSTEMCALL_133       133
+
+// ??
+#define  SYSTEMCALL_134       134
+
+// livres
+#define  SYSTEMCALL_135       135  
+#define  SYSTEMCALL_136       136
+
+
+// Thread get char.
+#define  SYSTEMCALL_137       137
+
+
+//
+// Keyboard.
+//
+
+// 138 - Keyboard. Get key state.
+#define  SYSTEMCALL_138       138    
+
+// 139 - Keyboard. Get scancode.
+#define  SYSTEMCALL_139       139   
 
 //keyboard responder
 #define	SYSTEMCALL_SET_CURRENT_KEYBOARD_RESPONDER 140
 #define	SYSTEMCALL_GET_CURRENT_KEYBOARD_RESPONDER 141
 
+//
+// Mouse
+//
+
 //mouse responder
 #define	SYSTEMCALL_SET_CURRENT_MOUSE_RESPONDER 142
 #define	SYSTEMCALL_GET_CURRENT_MOUSE_RESPONDER 143
 
-//144-149 Recursos da area do Cliente.
-#define	SYSTEMCALL_GETCLIENTAREARECT 144    // Get client Area rect.
-#define	SYSTEMCALL_SETCLIENTAREARECT 145    // Set Client Area rect.
-#define	SYSTEMCALL_146 146
-#define	SYSTEMCALL_147 147
-#define	SYSTEMCALL_148 148
-#define	SYSTEMCALL_149 149
+
+
+//
+// 144-147
+// Recursos da area do Cliente.
+//
+
+#define  SYSTEMCALL_GETCLIENTAREARECT 144    // Get client Area rect.
+#define  SYSTEMCALL_SETCLIENTAREARECT 145    // Set Client Area rect.
+#define  SYSTEMCALL_146 146                  // kgws screen window
+#define  SYSTEMCALL_147 147                  // kgws main window
+
+
+// grid
+#define  SYSTEMCALL_148 148
+
+// menu
+#define  SYSTEMCALL_149 149
 
 
 //150-159 user and group support.
@@ -762,6 +611,99 @@ typedef enum {
 #define	SYSTEMCALL_MEMORYINFO        253
 #define	SYSTEMCALL_SHOWPCIINFO       254
 #define	SYSTEMCALL_SHOWKERNELINFO    255
+
+
+//
+// Ok.
+// A interrupção 0x80 tem muitos outros serviços.
+// 
+
+/*
+ 
+  260    Deprecated. 
+  261    Deprecated.
+  
+  262     console_read
+  263     console_write
+  264     ??
+  265     yield
+  266     process_get_tty
+  267     pty_link_by_pid
+  268     tty_read_ttyList              kdrivers/tty/tty.c
+  269     tty_write_ttyList             kdrivers/tty/tty.c
+  270     vt_create
+  271     vt_set_child
+  272     tty_read                      kdrivers/tty/tty.c
+  273     tty_write                     kdrivers/tty/tty.c
+  
+  
+  277     console_get_current_virtual_console
+  278     console_set_current_virtual_console 
+  279     windowUpdateWindow
+  
+  289     sys_serial_debug_printk       sci/sys/sys.c
+  
+  300     UpdateStatusBar
+  
+  518     redraw_screen
+  
+  600     sys_dup
+  601     sys_dup2
+  602     sys_dup3
+  
+  
+  770     systemShowDevicesInfo
+  
+  801     __gethostname
+  801     __sethostname
+  803     __getusername
+  804     __setusername
+  
+  808     __ptsname ?
+  809     __ptsname ?
+  880     __GetProcessStats
+  881     __GetThreadStats
+  882     getprocessname
+  883     getthreadname
+  
+  
+  900     do_clone_execute_process
+  901     fork again ?
+  
+  
+  967     network_procedure
+  
+  4002    sys_fopen
+  4003    sys_fopen
+  
+  7000    sys_socket                    syslib/libcore/socket.c
+  7001    sys_connect                   syslib/libcore/socket.c
+  7002    sys_accept                    syslib/libcore/socket.c
+  7003    sys_bind                      syslib/libcore/socket.c
+  7004    sys_listen                    syslib/libcore/socket.c
+  //...
+  
+  
+  8000    sys_ioctl                     sci/sys/sys.c
+  8001    sys_fcntl                     sci/sys/sys.c
+  
+  9700    raise_window
+  
+  9800    ps2_mouse_dialog
+  
+  
+  9900    button_down
+  9901    button_up
+  
+  9999    system_get_pid
+
+*/
+
+
+//
+// #todo
+// Temos a interrupção 133.
+// 
 
 
 //
@@ -3060,74 +3002,61 @@ struct bmp_infoheader_d
 
 struct timer_d 
 {
-	//Object.
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	
-	int id;
-	
-	int used;
-	int magic;
-	
-	//1 = one shot 
-	//2 = intermitent
-	
-	int type;
-	
-	//owner.
+    // Object.
+    object_type_t objectType;
+    object_class_t objectClass;
+
+
+    int id;
+
+    int used;
+    int magic;
+
+    // 1 = one shot 
+    // 2 = intermitent
+    int type;
+
+
+    // Owner.
     struct process_d *process;
-	struct thread_d *thread;
-	struct window_d *window;
+    struct thread_d *thread;
+    struct window_d *window;
 
-	
-	int count_down;     //--
-	int initial_count_down; //base fixa
-	
-	//quantas vezes o timer se esgotou.
-	unsigned long times;
-	
-	int status;  //??
-	
 
-	unsigned long flag; //f
-	unsigned long error; //e
-	
-	//Navegação.
-	struct timer_d *next;
+    int count_down;     //--
+    int initial_count_down; //base fixa
+
+    //quantas vezes o timer se esgotou.
+    unsigned long times;
+
+    int status;
+
+    unsigned long flag; 
+    unsigned long error; 
+
+
+    struct timer_d *next;
 };
 
 
-//
-// ## Principais chamadas ao sistema ##
-//
 
+    //
+    // Prototypes.
+    //
  
 /*
- ******************************************************
- * apiSystem: 
- *     Interpreta um comando e envia uma systemcall 
- * para o Kernel.
- *
- * Obs: Há comandos predefinidos, porém um comando 
- * pode ser o nome abreviado de um programa ou uma 
- * variável de ambiante representando um diretório.
- *
- * Argumento:
- *     String de comando.
- *
- * Retorno:
- *     ?? 
+ **************************************************
+ * gde_system:
+ *     #todo: 
  */
 
 int gde_system (const char *command);
 
 
-
 /*
  ******************************************************
  * system_call: 
- *     Interrupção de sistema, número 200, 
+ *     Interrupção de sistema, número 0x80, 
  * pode chamar vários serviços do kernel com a 
  * mesma interrupção. O número do serviço é passado via 
  * argumento.
@@ -3140,130 +3069,12 @@ int gde_system (const char *command);
  *    edx = arg4.
  */
 
-void *system_call ( unsigned long ax, 
-                    unsigned long bx, 
-                    unsigned long cx, 
-                    unsigned long dx );
-
-
-//
-// As chamadas system1 à system15 poderão ser revistas
-// atribuindo a elas uma destinação mais importante.
-//
-
-//Print pixel.
-int system1 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
-
-
-
-//Print horizontal line.
-int system2( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-
-//
-int system3( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-
-//.
-int system4( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-//
-int system5( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-//. 
-int system6( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-//
-int system7( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-
-//
-int system8( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-
-int system9( unsigned long ax, 
-             unsigned long bx, 
-			 unsigned long cx, 
-			 unsigned long dx );
-
-
-
-//
-int system10( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
-
-
-
-//
-int system11( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
-
-
-
-//
-int system12( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
-
-
-
-//
-int system13( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
-
-
-
-//
-int system14( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
-
-
-
-//
-int system15( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx );
+void *
+system_call ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
 
 
 /*
@@ -3286,75 +3097,29 @@ int system15( unsigned long ax,
  *     Ele está no kernel.
  */
 
-void *gde_system_procedure ( struct window_d *window,
-                             int msg,
-                             unsigned long long1,
-                             unsigned long long2 );
+void *
+gde_system_procedure ( 
+    struct window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 );
  
  
 //Carrega bitmap 16x16.
 void 
-gde_load_bitmap_16x16 ( unsigned long img_address, 
-                        unsigned long x, 
-                        unsigned long y );
+gde_load_bitmap_16x16 ( 
+    unsigned long img_address, 
+    unsigned long x, 
+    unsigned long y );
 
 
 //int 0x80 - serviço 241.
 void gde_init_background ();
 
-
-
 int gde_message_box ( int type, char *string1, char *string2 );
-
 
 int gde_dialog_box ( int type, char *string1, char *string2 );
 
-
-/*
- * call_kernel:
- *      Chama os serviços do Kernel.
- */
-
-int 
-call_kernel ( unsigned long int_number, 
-              unsigned long service_number, 
-              unsigned long arg1, 
-              unsigned long arg2, 
-              unsigned long arg3, 
-              unsigned long arg4,
-              unsigned long arg5, 
-              unsigned long arg6, 
-              unsigned long arg7, 
-              unsigned long arg8,
-              unsigned long arg9, 
-              unsigned long arg10, 
-              unsigned long arg11, 
-              unsigned long arg12 );
-
-
-
-/*
- * call_gui:
- *     Chama os serviços de GUI.
- *     Chama os serviços da GUI que estão em Kernel Mode.
- */
-
-int 
-call_gui ( unsigned long int_number, 
-           unsigned long service_number, 
-           unsigned long arg1, 
-           unsigned long arg2, 
-           unsigned long arg3, 
-           unsigned long arg4,
-           unsigned long arg5, 
-           unsigned long arg6, 
-           unsigned long arg7, 
-           unsigned long arg8,
-           unsigned long arg9, 
-           unsigned long arg10, 
-           unsigned long arg11, 
-           unsigned long arg12 );
-           
 
 
 //
@@ -3383,91 +3148,77 @@ call_gui ( unsigned long int_number,
  * CONTINUA ...
  */
 
-void *gde_create_window ( unsigned long type,        //1-Tipo de janela, (popup,normal,...).
-                          unsigned long status,      //2-Estado da janela, (ativa ou não).
-                          unsigned long view,        //3-(min, max ...).
-                          char *windowname,          //4-Título.  
-                          unsigned long x,           //5-Deslocamento em relação às margens do Desktop. 
-                          unsigned long y,           //6-Deslocamento em relação às margens do Desktop.
-                          unsigned long width,       //7-Largura da janela.
-                          unsigned long height,      //8-Altura da janela.
-                          struct window_d *pWindow,  //9-Endereço da estrutura da janela mãe.
-                          unsigned long onde,        //10-Ambiente.( Estão no desktop, barra, cliente ...)
-                          unsigned long clientcolor, //11- Cor da área de cliente.
-                          unsigned long color );     //12-Color (bg) (para janela simples).
+// Create a window using kgws.
+
+void *
+gde_create_window ( 
+    unsigned long type,        //1-Tipo de janela, (popup,normal,...).
+    unsigned long status,      //2-Estado da janela, (ativa ou não).
+    unsigned long view,        //3-(min, max ...).
+    char *windowname,          //4-Título.  
+    unsigned long x,           //5-Deslocamento em relação às margens do Desktop. 
+    unsigned long y,           //6-Deslocamento em relação às margens do Desktop.
+    unsigned long width,       //7-Largura da janela.
+    unsigned long height,      //8-Altura da janela.
+    struct window_d *pWindow,  //9-Endereço da estrutura da janela mãe.
+    unsigned long onde,        //10-Ambiente.( Estão no desktop, barra, cliente ...)
+    unsigned long clientcolor, //11- Cor da área de cliente.
+    unsigned long color );     //12-Color (bg) (para janela simples).
 
 
 //Register Window.
 int gde_register_window (struct window_d *window);
 
-
-
-
 //Close Window.
 int gde_close_window (struct window_d *window);
-
-
 
 //Set Focus.
 int gde_set_focus (struct window_d *window);
 
-
 //Get Focus.
 int gde_get_focus ();
-
-
 
 //Kill Focus.
 int gde_kill_focus (struct window_d *window);
 
-
-
 //Set Active Window.
 int gde_set_active_window (struct window_d *window);
-
-
 
 //Get Active Window.
 int gde_get_active_window ();
 
-
-
 //Client area.
-
 void *gde_get_client_area_rect ();
 void gde_set_client_area_rect (struct rect_d *r);
 
 
-
-
-
 //resize
 void 
-gde_resize_window ( struct window_d *window, 
-                   unsigned long x, 
-                   unsigned long y );
-
+gde_resize_window ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y );
 
 
 //redraw
 //flag= show??
 void 
-gde_redraw_window ( struct window_d *window, 
-                   unsigned long flags );
+gde_redraw_window ( 
+    struct window_d *window, 
+    unsigned long flags );
 
 
 
 //replace
 void 
-gde_replace_window ( struct window_d *window, 
-                    unsigned long x, 
-                    unsigned long y );
+gde_replace_window ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y );
 
 
-//torna visível uma janela.
-//refresh
+// torna visível uma janela.
 void gde_show_window (struct window_d *window);
-
 
 
 // max and min
@@ -3492,10 +3243,11 @@ void gde_set_foregroung_window (struct window_d *window);
 //
 
 void 
-__gde_put_char ( unsigned long x,  
-               unsigned long y,  
-               unsigned long color, 
-               unsigned char *ch );
+__gde_put_char ( 
+    unsigned long x,  
+    unsigned long y,  
+    unsigned long color, 
+    unsigned char *ch );
 
 
 //
@@ -3511,8 +3263,6 @@ __gde_put_char ( unsigned long x,
 int gde_strncmp (char *s1, char *s2, int len);
 
 
-
-
 /*
  ***************************************
  * gde_print_string:
@@ -3520,12 +3270,11 @@ int gde_strncmp (char *s1, char *s2, int len);
  */
 
 void 
-gde_print_string ( unsigned long x,  
-               unsigned long y,  
-               unsigned long color, 
-               unsigned char *string );
-
-
+gde_print_string ( 
+    unsigned long x,  
+    unsigned long y,  
+    unsigned long color, 
+    unsigned char *string );
 
 
 //
@@ -3546,30 +3295,14 @@ void gde_refresh_buffer (unsigned long n);
 // Copy the backbuffer in the lfb.
 void gde_show_backbuffer ();
 
-
-
-
 //int 0x80 - serviço 15. 
 int gde_vsync ();
-int gws_vsync ();
 
-
-
-
-//
 // Shutdown support.
-//
-
 void gde_shutdown ();
 
-
-
-//
 // Reboot support.
-//
-
 void gde_reboot ();
-
 
 
 //
@@ -3578,59 +3311,50 @@ void gde_reboot ();
 
 void gde_set_cursor ( unsigned long x, unsigned long y );
 void gde_get_cursor ( unsigned long *x, unsigned long *y );
-
 unsigned long gde_get_cursor_x ();
 unsigned long gde_get_cursor_y ();
 
 
+//
+// Process support
+//
 
+
+// Create process.
+// #todo: This function needs more parameters.
+void *
+gde_create_process ( 
+    unsigned long process_eip, 
+    unsigned long process_priority, 
+    char *name );
 
 
 //
-// ## Process support ##
+// Thread support
 //
 
-//Create process.
-void *gde_create_process ( unsigned long process_eip, 
-                           unsigned long process_priority, 
-                           char *name );
-
-
-
-
-//
-// ## Thread support ##
-//
-
-//Create thread.
-void *gde_create_thread ( unsigned long init_eip, 
-                          unsigned long init_stack, 
-                          char *name );
-
+// Create thread.
+// #todo: This function needs more parameters.
+void *
+gde_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name );
 
 
 //Mostra informações sobre o processo atual.
 void gde_show_current_process_info ();
 
-
-
-
 // Torna zombie a thread atual.
 void gde_exit (int exit_code);
-
 
 //Destrói a thread atual.
 void gde_kill (int exit_code);
 
-
 void gde_dead_thread_collector ();
-
-
 
 //coloca no estado standby para executar pela primeira vez.
 void gde_start_thread (void *thread); 
-
-
 
 
 //
@@ -3652,44 +3376,36 @@ void *gde_fopen (const char *filename, const char *mode);
 //size in sectors 
 
 int
-gde_save_file ( char *file_name, 
-                unsigned long file_size, 
-                unsigned long size_in_bytes, 
-                char *file_address, 
-                char flag ); 
+gde_save_file ( 
+    char *file_name, 
+    unsigned long file_size, 
+    unsigned long size_in_bytes, 
+    char *file_address, 
+    char flag ); 
 
+int gde_create_empty_file (char *file_name);
 
-int gde_create_empty_file ( char *file_name );
-int gde_create_empty_directory ( char *dir_name );
+int gde_create_empty_directory (char *dir_name);
 
-
-
-// semáforo.
-
+// semaphore
 void gde_down (struct semaphore_d *s);
 void gde_up (struct semaphore_d *s);
 
 
-
 // Critical section support.
-
-void gde_enter_critical_section ();         // P (Proberen) testar.
-void gde_exit_critical_section ();          // V (Verhogen) incrementar.
-void gde_p ();    // P (Proberen) 
-void gde_v ();    // V (Verhogen) 
+void gde_enter_critical_section ();  // P (Proberen) testar.
+void gde_exit_critical_section ();   // V (Verhogen) incrementar.
+void gde_p ();                       // P (Proberen) 
+void gde_v ();                       // V (Verhogen) 
 
 
 //Inicializa em 1
 void gde_initialize_critical_section ();    
 
 
-
 //Paint support.
-
 void gde_begin_paint ();
 void gde_end_paint ();
-
-
 
 void gde_put_char (int c);
 
@@ -3704,70 +3420,64 @@ void gde_put_char (int c);
  */
 
 unsigned long 
-gde_def_dialog ( struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 );
-
-
+gde_def_dialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 
 unsigned long gde_get_system_metrics ( int index );
 
-
-
 int gde_dialog ( const char *string );
-
 
 int gde_getchar ();
 
 
-/*
- * gde_display_bmp:
- */
-
 int 
-gde_display_bmp ( char *address, 
-                  unsigned long x, 
-                  unsigned long y );
-
+gde_display_bmp ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y );
 
 
 // Envia uma mensagem para a thread de controle de um dado processo.
 int 
-gde_send_message_to_process ( int pid, 
-                          struct window_d *window, 
-                          int message,
-                          unsigned long long1,
-                          unsigned long long2 );
-
+gde_send_message_to_process ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
 
 
 // Envia uma mensagem para uma thread.
 int 
-gde_send_message_to_thread ( int tid, 
-                         struct window_d *window, 
-                         int message,
-                         unsigned long long1,
-                         unsigned long long2 );
+gde_send_message_to_thread ( 
+    int tid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
 
 
-
-//Envia uma mensagem para a thread atual.  
+// Send message to the current thread.
 unsigned long 
-gde_send_message ( struct window_d *window, 
-                  int message,
-                  unsigned long long1,
-                  unsigned long long2 );
+gde_send_message ( 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 );
 
   
 int 
-gde_draw_text ( struct window_d *window, 
-                unsigned long x, 
-                unsigned long y, 
-                unsigned long color, 
-                char *string );
+gde_draw_text ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    char *string );
 
 
 // ?
@@ -3775,11 +3485,13 @@ struct window_d *gde_get_ws_screen_window ();
 struct window_d *gde_get_ws_main_window ();
 
 
-//create timer;
-struct timer_d *gde_create_timer ( struct window_d *window, 
-                                   unsigned long ms, 
-                                   int type );
+// Create timer;
 
+struct timer_d *
+gde_create_timer ( 
+    struct window_d *window, 
+    unsigned long ms, 
+    int type );
 
 
 // pega informações varidas sobre o sys time.
@@ -3795,10 +3507,10 @@ int gde_start_terminal (void);
 
 
 int 
-gde_update_statusbar ( struct window_d *window, 
-                       unsigned char *string1, 
-                       unsigned char *string2 );
-
+gde_update_statusbar ( 
+    struct window_d *window, 
+    unsigned char *string1, 
+    unsigned char *string2 );
 
 
 // Usada para obter o pid de alguns drivers e servidores
@@ -3806,27 +3518,20 @@ gde_update_statusbar ( struct window_d *window,
 // rodando ao mesmo tempo.
 int gde_get_pid (int index);
 
-
-
 struct window_d *gde_get_screen_window (void);
 struct window_d *gde_get_background_window (void);
 struct window_d *gde_get_main_window (void);
 
-
-
 int gde_getprocessname (int pid, char *name, size_t len);
 int gde_getthreadname (int tid, char *name, size_t len);
 
-
 unsigned long gde_get_process_stats (int pid, int index);
 unsigned long gde_get_thread_stats (int tid, int index);
-
 
 // Envia uma string para a porta serial COM1
 void gde_debug_print (char *string);
 
 int gde_clone_and_execute ( char *name );
-
 
 int __gde_set_cursor (unsigned long x, unsigned long y);
 
@@ -3850,23 +3555,14 @@ int gde_setup_net_buffer (int pid, char *buffer, size_t len);
 
 
 
-// cria um novo process, uma thread e carrega a imagem.
+// cria um novo processo, 
+// uma thread e carrega a imagem.
 int 
-execute_new_process ( const char *filename, 
-                      char *argv[], 
-                      char *envp[] );
+execute_new_process ( 
+    const char *filename, 
+    char *argv[], 
+    char *envp[] );
 
-
-
-
-
-//
-// Aliases
-//
-
-// #todo
-// #define garden_xxx gde_xxx 
-// ...
 
 //
 // End.

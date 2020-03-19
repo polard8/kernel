@@ -36,27 +36,34 @@
 
 int ioctl (int fd, unsigned long request, ...){
 
+    int __ret = -1;
     va_list ap;
     va_start(ap, request);
 
     unsigned arg = va_arg(ap, unsigned long);
     
 
-    gramado_system_call ( 8000,
-        (unsigned long) fd,
-        (unsigned long) request,
-        (unsigned long) arg );
+    __ret = (int) gramado_system_call ( 8000,
+                      (unsigned long) fd,
+                      (unsigned long) request,
+                       (unsigned long) arg );
 
-    //kvprintf ( fmt, xxxputchar, NULL, 10, ap );
     
+    // ?? util
+    // kvprintf ( fmt, xxxputchar, NULL, 10, ap );
+
     va_end (ap);
     
-    // #todo: 
-    // Pegar o retorno da systemcall
-    
-    //errno = 0;
-    
-    return 0;
+
+    // Error.
+    if (__ret < 0)
+    {
+        //errno = -__ret;
+        return (-1);
+    }
+
+
+    return (__ret);
 }
 
 

@@ -27,6 +27,8 @@ Variables:
 */
 
 
+
+
 // ??
 //typedef __PTRDIFF_TYPE__ ptrdiff_t;
 //typedef __SIZE_TYPE__ size_t;
@@ -72,6 +74,9 @@ typedef int size_t;
  * offset_of - "Deslocamento dentro de uma estrutura"
  */
 #define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
+
+//linux like. 
+// #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
 
 //

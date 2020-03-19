@@ -487,12 +487,12 @@ FILE *open_wmemstream(wchar_t **ptr, size_t *sizeloc);
 
 FILE *open_memstream(char **ptr, size_t *sizeloc);
 
+FILE *stdio_make_file( int fd, const char *mode );
+FILE *fdopen (int fd, const char *mode);
 FILE *freopen(const char *pathname, const char *mode, FILE *stream);
 
-FILE *fdopen(int fd, const char *mode);
 
 FILE *tmpfile(void);
-
 char *tempnam(const char *dir, const char *pfx);
 char *tmpnam_r(char *s);
 char *tmpnam(char *s);
@@ -738,9 +738,18 @@ int ungetc ( int c, FILE *stream );
 //#define __sputc(x, p) fputc(x, p)
 
 
-
+//++
+//===================
+// Isso vai ler no buffer da stream que está em ring3.
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp);
+// Isso vai escrever no buffer da stream que está em ring3.
 size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp);
+// Isso vai ler no arquivo que está em ring0.
+int __linux_fgetc (FILE *f);
+// Isso vai escrever no arquivo que está em ring0.
+int __linux_fputc(int c, FILE *f);
+//===================
+//--
 
 
 

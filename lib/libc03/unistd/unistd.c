@@ -35,96 +35,29 @@
 
 
 
-#define	UNISTD_SYSTEMCALL_FORK     71  
-#define	UNISTD_SYSTEMCALL_EXIT     70
-#define	UNISTD_SYSTEMCALL_GETPID   85
-#define	UNISTD_SYSTEMCALL_GETPPID  81
-//...
-
-
-//
-//  ## TEST ##
-//
-
-int errno;
-
-
-//The <unistd.h> header shall declare the following external variables:
-char  *optarg;
-int    opterr, optind, optopt;
-
-
-//#todo
+#define  UNISTD_SYSTEMCALL_FORK     71  
+#define  UNISTD_SYSTEMCALL_EXIT     70
+#define  UNISTD_SYSTEMCALL_GETPID   85
+#define  UNISTD_SYSTEMCALL_GETPPID  81
 //#define	UNISTD_SYSTEMCALL_GETGID ??
-
-/*
-//protótipo de função interna.
-void *unistd_system_call ( unsigned long ax, 
-                           unsigned long bx, 
-                           unsigned long cx, 
-                           unsigned long dx );
-*/
+// ...
 
 
-/*
- ********************
- * unistd_system_call:
- *     System call usada pelo módulo stdio.  
- *     Função interna. 
- *     As funções padrão de stdio chamarão recursos do kernel atravéz dessa 
- * rotina.
- *     Interrupção de sistema, número 200, personalizada para stdio.
- *     Chama vários serviços do Kernel com a mesma interrupção.
- *     Essa é a chamada mais simples.
- *
- * Argumentos:
- *    eax = arg1, o Número do serviço.
- *    ebx = arg2. 
- *    ecx = arg3.
- *    edx = arg4.
- */
+    //
+    // Error.
+    //
 
-/*
-void *unistd_system_call ( unsigned long ax, 
-                           unsigned long bx, 
-                           unsigned long cx, 
-                           unsigned long dx )
-{
-    int Ret = 0;	
-
-	//System interrupt.
-
-	asm volatile ( " int %1 \n"
-		           : "=a"(Ret)	
-		           : "i"(0x80), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-
-	return (void *) Ret; 
-}
-*/
+// Number of last error.
+// Maybe errno.c is a better place for this. 
+int errno = 0;
 
 
-
- 
-
-
-/*
- * execv:
- * 
- */
-
-// #todo
-// Testar essa rotina usando a variável **environ. 
-
-char *__execv_environ[] = { NULL, NULL, NULL };
-
-int execv (const char *path, char *const argv[] )
-{
-    return execve ( path, (char **) argv, __execv_environ );
-    //return execve ( path, (char **) argv, environ ); //#todo: use this one.
-}
+// The <unistd.h> header shall declare 
+// the following external variables:
+char *optarg;
+int opterr, optind, optopt;
 
 
- 
 
 // unistd ?
 /* 
@@ -141,166 +74,68 @@ int tcsetpgrp(int fd, pid_t pgid)
     return ioctl(fd, TIOCSPGRP, pgid);
 } 
 */ 
- 
-//padrão libc.
-//int execve ( const char *path, char *const argv[], char *const envp[] );  
 
-int 
-execve ( const char *filename, 
-         char *argv[], 
-         char *envp[] )	
+
+
+
+/*
+ ************************************************
+ * execv:
+ * 
+ */
+
+// #todo
+// Testar essa rotina usando a variável **environ. 
+
+char *__execv_environ[] = { NULL, NULL, NULL };
+
+int execv (const char *path, char *const argv[] )
 {
-	//erro.
-
-    int Status = 1;
-
-	//unsigned long arg_address = (unsigned long) &argv[0];
-
-	// suprimindo dot-slash
-	// The dot is the current directory and the 
-	// slash is a path delimiter.
-	//if( filename[0] == '.' && filename[1] == '/' )
-	//{ 
-	//    filename++;
-	//    filename++; 
-	//    goto translate;	
-	//};
-
-
-	//suprimindo a barra.
-	//if( *arg1 == '/' || 
-	//    *arg1 == '\\' )
-	//{ 
-	//    arg1++; 
-	//};
-
-
-translate:
-
-	//
-	// ## BUG BUG
-	//
-	// Talvez nesse momento, ao transformar a string ele 
-	// corrompa o espaço reservado para o argumento seguinte.
-	// vamos fazer um teste no quan a rotina não precise 
-	// acrescentar zeros.
-	//
-	
-	//
-	// correto é isso mesmo,
-	// para não corromper o espaço dos argumentos no vetor,
-	// teremos que transformar somente lá no kernel, pouco antes 
-	// de carregarmos o arquivo.
-	//
-	
-	//Isso faz uma conversão de 'test.bin' em 'TEST    BIN'.
-	//Ok funcionou.
-	//shell_fntos( (char *) arg1);
-	
-	//const char* isso não foi testado.
-	//shell_fntos(filename);
-
-
-	// #importante:
-	// Isso deve chamar gramado_core_init_execve() na api.
-								
-	
-	// #obs:
-	// isso chamará uma rotina especial de execve, somente  
-	// usada no ambiente gramado core. 
-	// Essa é uma rotina alternativa que roda um processo usando os recursos 
-	// do processo init.
-	
-execve:
-
-	// Obs: 
-	// Se retornar o número do processo então podemos esperar por ele 
-	// chamando wait (ret);
-
-	//#todo:
-	// mudaremos esse número de chamada pra uma
-	// que use o processo atual e não o init.
-
-    Status = (int) gramado_system_call ( 248, 
-                       (unsigned long) filename,    // Nome
-                       (unsigned long) argv,        // arg (endereço da linha de comando)
-                       (unsigned long) envp );      // env
-
-    if ( Status == 0 )
-    {
-		//Não houve erro. O aplicativo irá executar.
-
-		// Nesse momento devemos usar um novo procedimento de janela.
-		// Que vai enviar as mensagens de caractere para um terminal 
-		// específico, para que aplicativos que user aquele terminal 
-		// possam pegar essas mensgens de caractere.
-
-
-//#ifdef SHELL_VERBOSE
-        //printf ("execve: Aplicativo inicializado\n");
-//#endif
-
-		//
-		// ## teste ##
-		//
-		// saindo do shell.
-		//
-		
-		// getpid...
-		// waitforpid(?);
-		
-		//die("Exiting shell.bin\n");
-		
-		//Saindo sem erro.
-		//exit(0);
-		
-		//Saída elegante, retornando para o crt0.
-		//ShellFlag = SHELLFLAG_EXIT;
-		//ShellFlag = SHELLFLAG_FEEDTERMINAL;
-		
-		goto done;
-	}else{
-		
-		// Se estamos aqui é porque ouve erro 
-		// ainda não sabemos o tipo de erro. 
-		// Status indica o tipo de erro.
-		// Se falhou significa que o aplicativo não vai executar,
-		// então não mais o que fazer.
-		
-		//#importante: Error message.
-		printf ("execve: O aplicativo nao foi inicializado\n");
-		
-		//ShellFlag = SHELLFLAG_COMMANDLINE;
-		goto fail;
-	};
-
-	//fail.
-	
-	// Retornaremos. 
-	// Quem chamou essa rotina que tome a decisão 
-	// se entra em wait ou não.
-
-fail:
-
-    Status = -1;
-    
-	//#importante: Error message.
-	
-    printf ("execve: fail \n");
-	
-done:
-
-    return (int) Status;
+    // #bugbug: Falta a tipagem do último argumento??
+    return execve ( path, (char **) argv, __execv_environ );
+    //return execve ( path, (char **) argv, (char **) __execv_environ );
+    //return execve ( path, (char **) argv, environ ); //#todo: use this one.
 }
 
 
 
+/*
+ ******************************* 
+ * execve:
+ * 
+ */
+
+int 
+execve ( const char *path, 
+         char *const argv[], 
+         char *const envp[] )
+{
+    int __ret = -1;
+
+
+    __ret = (int) gramado_system_call ( 248, 
+                      (unsigned long) path, 
+                      (unsigned long) argv,   
+                      (unsigned long) envp );  
+
+    //Error.
+    if (__ret < 0)
+    {
+        // errno = -__ret;  //#todo: Enable this thing.
+        return (-1);
+    } 
+
+    return (__ret);
+}
 
 
 
-
-
-
+/*
+ * read_ttyList:
+ *    Special case of read(), where it reads from a
+ *  fd present in a list calle ttyList[fd].
+ */
+ 
 ssize_t read_ttyList (int fd, const void *buf, size_t count)
 {
     if (fd<0)
@@ -313,6 +148,12 @@ ssize_t read_ttyList (int fd, const void *buf, size_t count)
 }
 
 
+/*
+ * write_ttyList:
+ *    Special case of write(), where it writes into a
+ *  fd present in a list calle ttyList[fd].
+ */
+
 // o descritor seleciona uma tty em ttyList[]
 ssize_t write_ttyList (int fd, const void *buf, size_t count)
 {
@@ -324,6 +165,7 @@ ssize_t write_ttyList (int fd, const void *buf, size_t count)
                          (unsigned long) buf, 
                          (unsigned long) count ); 
 }
+
 
 ssize_t read_tty (int fd, const void *buf, size_t count)
 {
@@ -380,27 +222,35 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
 }
 
 
-
-//usam a lista de arquivos abertos do processo. p->Streams[i]
+/*
+ * read:
+ *     Standard read() function.
+ */
+//usam a lista de arquivos abertos do processo.
 ssize_t read (int fd, const void *buf, size_t count)
 {
     if (fd<0)
         return -1;
 
     return (ssize_t) gramado_system_call ( 18, 
-                         (unsigned long) fd,      // dispositivo.
+                         (unsigned long) fd,
                          (unsigned long) buf, 
                          (unsigned long) count ); 
 }
 
-//usam a lista de arquivos abertos do processo. p->Streams[i]
+
+/*
+ * write: 
+ *     Standard write() function. 
+ */
+// usam a lista de arquivos abertos do processo. 
 ssize_t write (int fd, const void *buf, size_t count)
 {
     if (fd<0)
         return -1;
 
     return (ssize_t) gramado_system_call ( 19, 
-                         (unsigned long) fd,      // dispositivo.
+                         (unsigned long) fd,
                          (unsigned long) buf, 
                          (unsigned long) count ); 
 }
@@ -421,12 +271,30 @@ ssize_t write (int fd, const void *buf, size_t count)
  * ?? Essa função também pertence à unistd
  */
 
+// cause normal process termination
+
+
+// Remember: The parent process called wait().
+// The exit() function causes normal process termination and the value
+// of status & 0xFF is returned to the parent.
+
 void exit (int status){
-	
+
+
+    // #todo
+    // Chamar rotina para finalizar a biblioteca.
+    // Liberando os recursos usados.
+
     // #importante:
     // #todo: 
+    
+    // ??
     // Se o status for (1) devemos imprimir o conteúdo 
     // de stderr na tela.
+
+    //if(status==1)
+        //printf(stderr);
+
 
     // 70
     gramado_system_call ( UNISTD_SYSTEMCALL_EXIT, 
@@ -451,8 +319,21 @@ void exit (int status){
 
 pid_t fork (void)
 {
-    return (pid_t) gramado_system_call( UNISTD_SYSTEMCALL_FORK, 0, 0, 0 );
+    pid_t __ret = -1;
+    
+    __ret = (pid_t) gramado_system_call( UNISTD_SYSTEMCALL_FORK, 
+                        0, 0, 0 );
+    
+    if(__ret<0)
+    {
+         //errno = -__ret;
+         return (-1);
+    }
+    
+    return (__ret);
 }
+
+
 
 
 

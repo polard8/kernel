@@ -83,24 +83,27 @@ struct window_d *dialogbox_button2;
 
 
 unsigned long 
-mbProcedure ( struct window_d *window, 
-              int msg, 
-              unsigned long long1, 
-              unsigned long long2 );
+mbProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 unsigned long 
-dbProcedure ( struct window_d *window, 
-              int msg, 
-              unsigned long long1, 
-              unsigned long long2 );
+dbProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 
 /*
- ***********************************************************************
+ *****************************************************************
  * system_call:  
- *    Interrupção de sistema, número 0x80, chama vários serviços do Kernel com 
- * a mesma interrupção. Essa é a chamada mais simples.
+ *    Interrupção de sistema, número 0x80, chama vários serviços 
+ * do Kernel com a mesma interrupção. 
+ *    Essa é a chamada mais simples.
  *
  * Argumentos:
  *    eax = arg1, O número do serviço.
@@ -109,14 +112,15 @@ dbProcedure ( struct window_d *window,
  *    edx = arg4.
  *
  * 2015 - Created by Fred Nora.
- * 2016 ~ 2019 - New functions.
  * ...
  */
 
-void *system_call ( unsigned long ax, 
-                    unsigned long bx, 
-                    unsigned long cx, 
-                    unsigned long dx )
+void *
+system_call ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx )
 {
 
 	//##BugBug: Aqui 0 retorno não pode ser inteiro.
@@ -135,19 +139,6 @@ void *system_call ( unsigned long ax,
 
 
 /*
-//not tested
-int gde_system2 (const char *command);
-int gde_system2 (const char *command)
-{
-    // clone and execute.
-    gramado_system_call (900, (unsigned long) command, 0, 0);    
-    return 0;
-}
-*/
-
-
-
-/*
  ***********************************
  * gde_system: 
  *    Interpreta um comando e envia uma systemcall para o kernel.
@@ -156,518 +147,17 @@ int gde_system2 (const char *command)
  */
 
 int gde_system (const char *command){
-    
-    // @todo: Checar se comando é válido, se os primeiros caracteres
-	//        são espaço. Ou talvez somente compare, sem tratar o argumento.
 
-	//@todo:
-	// Criar rotina para pular os caracteres em branco no início do comando.
-	
-	//@todo: version, ...
-	
-	//OBS: ESSES SÃO OS COMANDOS DO SISTEMA, USADOS POR TODOS OS PROGRAMAS
-	//     QUE INCLUIREM A API. 
-	
-	//test - Exibe uma string somente para teste.
-	if ( gde_strncmp( (char *) command, "test", 4 ) == 0 )
-	{
-	    printf("gde_system: Testing commands..\n");
-		goto exit;
-	}
-  
-	//ls - List files in a folder.
-	if ( gde_strncmp( (char *) command, "ls", 2 ) == 0 )
-	{
-	    printf("gde_system: @todo: ls..\n");
-		goto exit;
-	} 
-	
-	//makeboot - Cria arquivos e diretórios principais.
-	if ( gde_strncmp( (char *) command, "makeboot", 8 ) == 0 )
-	{
-	    printf("gde_system: @todo: makeboot..\n");
-		
-		//ret_value = fs_makeboot();
-		//if(ret_value != 0){
-		//    printf("shell: makeboot fail!");
-		//};
-		
-        goto exit;
-    }
-	
-	//format.
-	if ( gde_strncmp( (char *) command, "format", 6 ) == 0 )
-	{
-	    printf("gde_system: @todo: format..\n");
-		//fs_format(); 
-        goto exit;
-    }
-	
-	//debug.
-	if ( gde_strncmp( (char *) command, "debug", 5 ) == 0 )
-	{
-	    printf("gde_system: @todo: debug..\n");
-		//debug();
-        goto exit;
-    }
-	
-    //dir.
-	if ( gde_strncmp( (char *) command, "dir", 3 ) == 0 )
-	{
-	    printf("gde_system: @todo: dir..\n");
-		//fs_show_dir(0); 
-        goto exit;
-    }
+    // #todo
+    // 
 
-	//newfile.
-	if ( gde_strncmp( (char *) command, "newfile", 7 ) == 0 )
-	{
-	    printf("gde_system: ~newfile - Create empty file.\n");
-		//fs_create_file( "novo    txt", 0);
-        goto exit;
-    }
-	
-	//newdir.
-	if ( gde_strncmp( (char *) command, "newdir", 7 ) == 0 )
-	{
-	    printf("gde_system: ~newdir - Create empty folder.\n");
-		//fs_create_dir( "novo    dir", 0);
-        goto exit;
-    }
-	
-    //mbr - Testa mbr.
-    if ( gde_strncmp( (char *) command, "mbr", 3 ) == 0 )
-	{
-	    printf("gde_system: ~mbr\n");
-		//testa_mbr();
-		goto exit;
-    }; 
-	
-    //root - Testa diretório /root.
-    if ( gde_strncmp( (char *) command, "root", 4 ) == 0 )
-	{
-	    printf("gde_system: ~/root\n");
-		//testa_root();
-		goto exit;
-    }; 
-
-	//start.
-    if ( gde_strncmp( (char *) command, "start", 5 ) == 0 )
-	{
-	    printf("gde_system: ~start\n");
-		goto exit;
-    }; 
-	
-	//help.
-	//?? O que mostrar aqui ??
-    if ( gde_strncmp( (char *) command, "help", 4 ) == 0 )
-	{
-		printf("gde_system: help stuff\n");
-		//printf(help_string);
-		//print_help();
-		goto exit;
-    };
-	
-	//cls.
-    if ( gde_strncmp( (char *) command, "cls", 3 ) == 0 )
-	{
-	    printf("gde_system: cls\n");
-		//black
-	    //api_clear_screen(0);
-        goto exit;
-	};
-	
-	//save.
-	if ( gde_strncmp( (char *) command, "save", 4 ) == 0 )
-	{
-	    printf("gde_system: ~save\n");
-        goto exit;
-    };
-	
-	//install.
-	//muda um arquivo da area de transferencia para 
-	//o sistema de arquivos...
-	if ( gde_strncmp( (char *) command, "install", 7 ) == 0 )
-	{
-	    printf("gde_system: ~install\n");
-		//fs_install();
-        goto exit;
-    };
-	
-	
-	//boot - Inicia o sistema.
-	if ( gde_strncmp( (char *) command, "boot", 4 ) == 0 )
-	{
-	    printf("gde_system: ~boot\n");
-		//boot();
-        goto exit;
-    };
-
-	//service
-	if ( gde_strncmp( (char *) command, "service", 7 ) == 0 )
-	{
-	    printf("gde_system: ~service - rotina de servicos do kernel base\n");
-		//test_services();
-        goto exit;
-    };
-
-	//slots - slots de processos ou threads.
-	if ( gde_strncmp( (char *) command, "slots", 5 ) == 0 )
-	{
-	    printf("gde_system: ~slots - mostra slots \n");
-		//mostra_slots();
-        goto exit;
-    };
-	
-	
-    //
-    // Continua ...
-    //
-	
-	//exit - Exit the current program
-    if ( gde_strncmp( (char *) command, "exit", 4 ) == 0 )
-	{
-		printf("gde_system: exit\n");
-		gde_exit (0);
-		goto fail;
-    };
-		
-    //reboot.
-	if ( gde_strncmp( (char *) command, "reboot", 6 ) == 0 )
-	{
-		printf ("gde_system: reboot\n");
-		gde_reboot ();
-		goto fail;
-    };
-
-	//shutdown.
-    if ( gde_strncmp( (char *) command, "shutdown", 8 ) == 0 )
-	{
-		printf("gde_system: shutdown\n");
-		gde_shutdown();
-        goto fail;
-    };
-	
-	//@todo: exec
-	
-    //:default
-	printf ("gde_system: Unknown command!\n");
-	
-	//
-	// o que devemos fazer aqui é pegar o nome digitado e comparar
-	// com o nome dos arquivos do diretório do sistema. se encontrado,
-	// devemos carregar e executar.
-	//
-	
-// Fail. Palavra não reservada.	
-fail:
-    printf ("gde_system: FAIL\n");
-    return (int) 1;
-
-// #todo: 
-// Esse exit como vari'avel local precisa mudar de nome	
-// para não confundir com a função exit de sair do processo.
-// uma opção é usar 'done:'. 
-	
-exit:
-	
     return 0;
 }
 
 
-//
-// ================ ## int 201 ~ int 215 ## =================
-//
-
-//#obs:
-// Essas interrupções ainda não foram configuradas.
-// cada uma delas servirá para um grupo distinto de serviços.
-// A int 0x80 ainda é a interrupção principal do sistema.
 
 
-/*
- * system1:
- *     int 201 */
 
-int system1 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile (" int %1 \n"
-		          : "=a"(ret_val)	
-		          : "i"(201), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system2:
- *     int 202 */
-
-int system2 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile (" int %1 \n"
-		          : "=a"(ret_val)		
-		          : "i"(202), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system3:
- *     int 203 */
-
-int system3 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ( "int %1\n"
-		          : "=a"(ret_val)	
-		          : "i"(203), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system4:
- *     int 204 */
-
-int system4 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(204), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system5:
- *     int 205 */
-
-int system5 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(205), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system6:
- *     int 206 */
-
-int system6 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(206), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system7:
- *     int 207 */
-
-int system7 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(207), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system8:
- *     int 208 */
-
-int system8 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(208), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system9:
- *     int 209 */
-
-int system9 ( unsigned long ax, 
-              unsigned long bx, 
-			  unsigned long cx, 
-			  unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(209), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system10:
- *     int 210 */
-
-int system10 ( unsigned long ax, 
-               unsigned long bx, 
-			   unsigned long cx, 
-			   unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(210), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system11:
- *     int 211 */
-
-int system11 ( unsigned long ax, 
-               unsigned long bx, 
-			   unsigned long cx, 
-			   unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(211), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system12:
- *     int 212 */
-
-int system12 ( unsigned long ax, 
-               unsigned long bx, 
-			   unsigned long cx, 
-			   unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(212), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system13:
- *     int 213 */
-
-int system13 ( unsigned long ax, 
-               unsigned long bx, 
-			   unsigned long cx, 
-			   unsigned long dx )
-{
-    int ret_val;
-	
-	asm volatile (" int %1 \n"
-		          : "=a"(ret_val)		
-		          : "i"(213), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system14:
- *     int 214 */
-
-int system14 ( unsigned long ax, 
-               unsigned long bx, 
-			   unsigned long cx, 
-			   unsigned long dx )
-{
-    int ret_val;
-	
-    asm volatile (" int %1 \n "
-		          : "=a"(ret_val)		
-		          : "i"(214), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
-
-
-/*
- * system15:
- *      int 215 */
-
-int system15 ( unsigned long ax, 
-               unsigned long bx, 
-			   unsigned long cx, 
-			   unsigned long dx )
-{
-	int ret_val;
-	
-	asm volatile ("int %1\n"
-		          : "=a"(ret_val)		
-		          : "i"(215), "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
-				  
-	return (int) ret_val;
-}
 
 
 //=====================================
@@ -685,10 +175,9 @@ int system15 ( unsigned long ax,
  */
 
 void gde_refresh_buffer (unsigned long n){
-	
-	// Limits.
-    if (n < 1 || n > 9)
-    {
+
+    // Limits.
+    if (n < 1 || n > 9){
         return;
     }
 
@@ -751,10 +240,11 @@ void gde_refresh_buffer (unsigned long n){
  */
 
 void 
-gde_print_string ( unsigned long x,  
-               unsigned long y,  
-               unsigned long color, 
-               unsigned char *string )
+gde_print_string ( 
+    unsigned long x,  
+    unsigned long y,  
+    unsigned long color, 
+    unsigned char *string )
 {
     //#todo
 }
@@ -767,16 +257,11 @@ gde_print_string ( unsigned long x,
  *     Sincroniza o retraço vertical do monitor.  (rever) 
  */
 
-int gde_vsync (){
-
+int gde_vsync ()
+{
     return (int) gramado_system_call ( SYSTEMCALL_VSYNC, 0, 0, 0 );
 }
 
-
-int gws_vsync () {
-
-    return (int) gde_vsync ();
-}
 
 /*
  ******************************************************
@@ -785,10 +270,13 @@ int gws_vsync () {
  *     Ele está no kernel.
  */
 
-void *gde_system_procedure ( struct window_d *window,
-                             int msg,
-                             unsigned long long1,
-                             unsigned long long2 )
+
+void *
+gde_system_procedure ( 
+    struct window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
     unsigned long message_buffer[5]; 
@@ -801,10 +289,10 @@ void *gde_system_procedure ( struct window_d *window,
     
     
     // Isso evita muitos problemas.
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         return NULL;
     }
+
 
     return (void *) system_call ( SYSTEMCALL_CALL_SYSTEMPROCEDURE, 
                         (unsigned long) &message_buffer[0], 
@@ -833,10 +321,11 @@ int __gde_set_cursor (unsigned long x, unsigned long y){
  */
 
 void 
-__gde_put_char ( unsigned long x, 
-               unsigned long y, 
-               unsigned long color, 
-               unsigned char *ch )
+__gde_put_char ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    unsigned char *ch )
 {
     //return;    //Nothing for now.
 }
@@ -860,9 +349,10 @@ __gde_put_char ( unsigned long x,
  */
 
 void 
-gde_load_bitmap_16x16 ( unsigned long img_address, 
-                        unsigned long x, 
-                        unsigned long y )
+gde_load_bitmap_16x16 ( 
+    unsigned long img_address, 
+    unsigned long x, 
+    unsigned long y )
 {
     system_call ( SYSTEMCALL_LOAD_BITMAP_16x16, img_address, x, y ); 
 }
@@ -1163,10 +653,11 @@ exit_messagebox:
  */
 
 unsigned long 
-mbProcedure ( struct window_d *window, 
-              int msg, 
-              unsigned long long1, 
-              unsigned long long2 )
+mbProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
     switch (msg)
@@ -1398,14 +889,12 @@ int gde_dialog_box ( int type, char *string1, char *string2 ){
     int Response = 0;
     int running = 1;
 
-    //
     // Draw !
-    //
-	
-	struct window_d *hWnd;    //Window.
-	struct window_d *pWnd;    //Parent.
-	struct window_d *bWnd;    //Button.
-	
+
+    struct window_d *hWnd;    //Window.
+    struct window_d *pWnd;    //Parent.
+    struct window_d *bWnd;    //Button.
+
 	
 	//#todo: usar get system metrics
 	
@@ -1599,18 +1088,20 @@ exit_dialogbox:
  *     O procedimento padrão de dialog box. */
 
 unsigned long 
-dbProcedure ( struct window_d *window, 
-              int msg, 
-              unsigned long long1, 
-              unsigned long long2 )
+dbProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
+
     switch (msg)
 	{
         case MSG_KEYDOWN:
             switch(long1)
             {
-                case VK_ESCAPE:	
-				    printf ("scape\n");
+                case VK_ESCAPE:
+                    //printf ("scape\n");
                     return (unsigned long) 101;  
 				    break;
 				   
@@ -1665,207 +1156,6 @@ dbProcedure ( struct window_d *window,
 }
 
 
-/*
- **************************************************
- * call_kernel:
- *     (FAST CALLS)
- *     @todo: Change name to apiCallKernel(...) 
- *
- *     Chama os serviços de Kernel. São usadas várias interrupções, 
- * uma para cada número de serviço. O Kernel pode oferecer vários 
- * serviços relativos à ele mesmo e à gerencia do sistema, como requests
- * por exemplo.
- *
- * Obs: Deve haver alguma restrição para o uso dessa chamada.
- * Quem deve usar ela são os drivers e servers. 
- * Os recursos acessados por essa chamada são mais críticos e 
- * sistemicamente importantes.  (rever)
- *
- * #todo: esse retorno deve ser unsigned long
- */
-
-int call_kernel ( unsigned long int_number, 
-                  unsigned long service_number, 
-                  unsigned long arg1, 
-                  unsigned long arg2, 
-                  unsigned long arg3, 
-                  unsigned long arg4,
-                  unsigned long arg5, 
-                  unsigned long arg6, 
-                  unsigned long arg7, 
-                  unsigned long arg8,
-                  unsigned long arg9, 
-                  unsigned long arg10, 
-                  unsigned long arg11, 
-                  unsigned long arg12 )
-{
-	int ret_val;
-
-
-    switch (int_number){ 
-                      
-        //48 - Vários serviços de Kernel Requests.
-        case KERNEL:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-    
-        //49
-        case KERNEL49:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL49), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        //50
-        case KERNEL50:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL50), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-        
-        //51     
-        case KERNEL51:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL51), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        //52
-        case KERNEL52:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL52), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-
-        //53
-        case KERNEL53:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL53), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-        
-        //54     
-        case KERNEL54:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL54), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-
-        
-        case KERNEL55:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL55), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        case KERNEL56:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL56), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        case KERNEL57:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL57), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        //
-		// ...
-		//
-		
-		case KERNEL199:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(KERNEL199), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-        default:
-            //Nothing.
-            break;
-    };
-
-
-    return (int) ret_val;
-}
-
-
-
-/*
- ********************************************************
- * call_gui:
- *     (FAST CALLS)
- *     Chama os serviçoos de GUI que estão
- *     em Kernel mode.
- *
- *     Uma interrupçãoo para cada serviço.
- *
- *     Quando o Kernel híbrido ofereçe
- *     rotinas gráficas há um ganho de desempenho.
- *
- *     Um subsistema de recursos gráficos em user mode
- *     pode usar essa chamada para utilizar recursos 
- *     gráficos do kernel.  (rever)
- *
- *  #todo: esse retorno deve ser unsigned long.
- */
-
-int call_gui ( unsigned long int_number, 
-               unsigned long service_number, 
-               unsigned long arg1, 
-               unsigned long arg2, 
-               unsigned long arg3, 
-               unsigned long arg4,
-               unsigned long arg5, 
-               unsigned long arg6, 
-               unsigned long arg7, 
-               unsigned long arg8,
-               unsigned long arg9, 
-               unsigned long arg10, 
-               unsigned long arg11, 
-               unsigned long arg12 )
-{
-	int ret_val;  
-	
-	//Vários serviços. 
-			
-    switch (int_number){      
-
-        //Fast Create Window.		
-        case FAST_CREATE_WINDOW:
-		//case GUI:
-            asm volatile ( " int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(FAST_CREATE_WINDOW), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-    
-        case GUI217:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(GUI217), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        case GUI218:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(GUI218), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-             
-        case GUI219:
-            asm volatile ( "int %1 \n"
-		                  : "=a"(ret_val)		
-		                  : "i"(GUI219), "a"(arg1), "b"(arg2), "c"(arg3), "d"(arg4) );
-	                       break;
-		default:
-		    //Nothing.
-		    break; 
-    };
-
-
-    return (int) ret_val;
-}
-
 
 /*
  *******************************************************************
@@ -1894,20 +1184,24 @@ int call_gui ( unsigned long int_number,
  *
  */
 
-void *gde_create_window ( unsigned long type,        //1, Tipo de janela (popup,normal,...)
-                          unsigned long status,      //2, Estado da janela (ativa ou nao)
-                          unsigned long view,        //3, (min, max ...)
-                          char *windowname,          //4, Título.                          
-                          unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
-                          unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
-                          unsigned long width,       //7, Largura da janela.
-                          unsigned long height,      //8, Altura da janela.
-                          struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
-                          unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
-                          unsigned long clientcolor, //11, Cor da área de cliente
-                          unsigned long color )      //12, Color (bg) (para janela simples).
+
+void *
+gde_create_window ( 
+    unsigned long type,        //1, Tipo de janela (popup,normal,...)
+    unsigned long status,      //2, Estado da janela (ativa ou nao)
+    unsigned long view,        //3, (min, max ...)
+    char *windowname,          //4, Título.                          
+    unsigned long x,           //5, Deslocamento em relação às margens do Desktop.                           
+    unsigned long y,           //6, Deslocamento em relação às margens do Desktop.
+    unsigned long width,       //7, Largura da janela.
+    unsigned long height,      //8, Altura da janela.
+    struct window_d *pWindow,  //9, Endereço da estrutura da janela mãe.
+    unsigned long onde,        //10, Ambiente.( Est� no desktop, barra, cliente ...)
+    unsigned long clientcolor, //11, Cor da área de cliente
+    unsigned long color )      //12, Color (bg) (para janela simples).
 { 
-	struct window_d *Window;
+
+    struct window_d *Window;
 
 	// Enviando tudo via argumento.
 	// Esse método dá a possibilidade de enviarmos ainda 
@@ -1959,18 +1253,18 @@ void *gde_create_window ( unsigned long type,        //1, Tipo de janela (popup,
  */
 
 int gde_register_window (struct window_d *window){
-	
-	if ( (void *) window == NULL )
-	{
-		return 1;
-		
-	}else{
-		
+
+
+    if ( (void *) window == NULL ){
+        return 1;
+
+    }else{
+
         return (int) system_call ( SYSTEMCALL_REGISTERWINDOW, 
                         (unsigned long) window, 
                         (unsigned long) window, 
                         (unsigned long) window);
-    }
+    };
 
 
     return 2;
@@ -1984,20 +1278,20 @@ int gde_register_window (struct window_d *window){
  */
 
 int gde_close_window (struct window_d *window){
-	
-	if ( (void *) window == NULL )
-	{
-		return (int) 1;
-	}else{
-		
+
+
+    if ( (void *) window == NULL ){
+        return (int) 1;
+
+    }else{
+
         return (int) system_call ( SYSTEMCALL_CLOSEWINDOW, 
                          (unsigned long) window, 
-		                 (unsigned long) window, 
-		                 (unsigned long) window );
-	}
+                         (unsigned long) window, 
+                         (unsigned long) window );
+    };
 
-
-	return 2;
+    return 2;
 }
 
 
@@ -2044,9 +1338,9 @@ int gde_get_focus (){
 int gde_kill_focus (struct window_d *window){
 
 
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         return (int) 1;
+ 
     }else{
 
         return (int) system_call ( SYSTEMCALL_KILLFOCUS, 
@@ -2054,6 +1348,7 @@ int gde_kill_focus (struct window_d *window){
                          (unsigned long) window, 
                          (unsigned long) window );
     };
+
 
     return (int) 2;
 }
@@ -2112,14 +1407,14 @@ void gde_show_current_process_info (){
 
  
 void 
-gde_resize_window ( struct window_d *window, 
-                   unsigned long x, 
-                   unsigned long y )
+gde_resize_window ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y )
 {
-	gramado_system_call ( SYSTEMCALL_RESIZEWINDOW, 
-	    (unsigned long) window, 
-	    x, 
-	    y );
+
+    gramado_system_call ( SYSTEMCALL_RESIZEWINDOW, 
+        (unsigned long) window, x, y );
 }
 
 
@@ -2128,8 +1423,9 @@ gde_resize_window ( struct window_d *window,
  */
 
 void 
-gde_redraw_window ( struct window_d *window, 
-                    unsigned long flags )
+gde_redraw_window ( 
+    struct window_d *window, 
+    unsigned long flags )
 {
     gramado_system_call ( SYSTEMCALL_REDRAWWINDOW, 
         (unsigned long) window, 
@@ -2139,11 +1435,13 @@ gde_redraw_window ( struct window_d *window,
 
 
 void 
-gde_replace_window ( struct window_d *window, 
-                    unsigned long x, 
-                    unsigned long y )
+gde_replace_window ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y )
 {
-	system_call ( SYSTEMCALL_REPLACEWINDOW, (unsigned long) window, x, y );
+    system_call ( SYSTEMCALL_REPLACEWINDOW, 
+        (unsigned long) window, x, y );
 }
 
 
@@ -2185,9 +1483,11 @@ void *gde_get_foregroung_window (){
 
 
 void gde_set_foregroung_window (struct window_d *window){
-	
-	system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, (unsigned long) window, 
-	    (unsigned long) window, (unsigned long) window );
+
+    system_call ( SYSTEMCALL_SETFOREGROUNDWINDOW, 
+        (unsigned long) window, 
+        (unsigned long) window, 
+        (unsigned long) window );
 }
 
 
@@ -2398,9 +1698,11 @@ void gde_set_client_area_rect (struct rect_d *r){
  *     Create a process.
  */
 
-void *gde_create_process ( unsigned long process_eip, 
-                           unsigned long process_priority, 
-                           char *name )
+void *
+gde_create_process ( 
+    unsigned long process_eip, 
+    unsigned long process_priority, 
+    char *name )
 {
     return (void *) system_call ( SYSTEMCALL_CREATEPROCESS, 
                         process_eip, 
@@ -2418,9 +1720,11 @@ void *gde_create_process ( unsigned long process_eip,
  *     Essa será uma rotina de baixo nível para pthreads.
  */
 
-void *gde_create_thread ( unsigned long init_eip, 
-                          unsigned long init_stack, 
-                          char *name )
+void *
+gde_create_thread ( 
+    unsigned long init_eip, 
+    unsigned long init_stack, 
+    char *name )
 {
     return (void *) system_call ( SYSTEMCALL_CREATETHREAD, 
                         init_eip, 
@@ -2490,13 +1794,15 @@ void *gde_fopen (const char *filename, const char *mode){
 //file_size = size in sectors
 
 int
-gde_save_file ( char *file_name, 
-                unsigned long file_size,
-                unsigned long size_in_bytes,
-                char *file_address,
-                char flag )
+gde_save_file ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag )
 {
-    int Ret;
+
+    int Ret = 0;
 
 
 	// Enviando tudo via argumento.
@@ -2535,9 +1841,9 @@ gde_save_file ( char *file_name,
 }
 
 
-int gde_create_empty_file ( char *file_name )
-{
-    int __ret;
+int gde_create_empty_file ( char *file_name ){
+
+    int __ret = 0;
     
     gde_enter_critical_section ();
     
@@ -2545,20 +1851,25 @@ int gde_create_empty_file ( char *file_name )
                       (unsigned long) file_name, 0, 0);
 
     gde_exit_critical_section ();    
+    
     return __ret;
 }
 
-int gde_create_empty_directory ( char *dir_name )
-{
-    int __ret;
-    
+
+int gde_create_empty_directory ( char *dir_name ){
+
+    int __ret=0;
+
+
     gde_enter_critical_section ();
     
     __ret = (int) gramado_system_call ( 44, 
                       (unsigned long) dir_name, 0, 0);
 
     gde_exit_critical_section ();    
-    return __ret;
+
+
+    return (int) __ret;
 }
 
 
@@ -2567,21 +1878,19 @@ int gde_create_empty_directory ( char *dir_name )
 // Operação down em um semáforo indicado no argumento.
 
 void gde_down (struct semaphore_d *s){
-	
-	int Status = 1;    //fail.
-	
-	if( (void*) s == NULL  )
-	{
-	    //Semáforo inválido, 
-        //Bloquear a thread, não adianta fazer a system call.
-        //@todo: Chamar rotina que bloqueia a thread.
-		
-		printf ("gde_down: *fail");
-		
-		while (1){ asm ("pause"); };
-        
-		//return;
-	};
+
+    int Status = 1;    //fail.
+
+
+    // Semáforo inválido, 
+    // Bloquear a thread, não adianta fazer a system call.
+    // todo: Chamar rotina que bloqueia a thread.
+    if ( (void *) s == NULL  ){
+
+        printf ("gde_down: *fail");
+        while (1){ asm ("pause"); };
+        //return;
+    }
 
 tryAgain:
     
@@ -2589,15 +1898,17 @@ tryAgain:
     //1 = algo deu errado espere tentando novamente.
 	
 	Status = (int) system_call ( SYSTEMCALL_SEMAPHORE_DOWN, 
-                    (unsigned long) s, (unsigned long) s, (unsigned long) s );
+                       (unsigned long) s, 
+                       (unsigned long) s, 
+                       (unsigned long) s );
 
 	// Podemos entrar na região crítica.
-	
-	if (Status == 0)
-	{
-		return;
-	}
-	
+
+    if (Status == 0){
+        return;
+    }
+
+
 	// Devemos esperar, monitorando a flag ou bloquando a thread.
 	
 	if (Status == 1)
@@ -2623,23 +1934,22 @@ fail:
 // Operação up em um semáforo indicado no argumento.
 
 void gde_up (struct semaphore_d *s){
-	
-	int Status = 1; 
-	
-	if ( (void *) s == NULL  )
-	{
-	    //Semáforo inválido, 
+
+    int Status = 1; 
+
+       //Semáforo inválido, 
         //Bloquear a thread, não adianta fazer a system call.
         //@todo: Chamar rotina que bloqueia a thread.
-		
-		printf ("gde_up: *fail");
-		
-		while (1){ asm ("pause"); }
-	};
+
+    if ( (void *) s == NULL  ){
+        printf ("gde_up: *fail");
+        while (1){ asm ("pause"); }
+    }
+
 
     //0 = deu certo, podemos asir da sessão crítica.
     //1 = algo deu errado, não conseguimos sair da sessão crítica.	
-	
+
 tryAgain:
 
 
@@ -2679,11 +1989,12 @@ fail:
 
 //P (Proberen) testar.
 void gde_enter_critical_section (){
-	
-	int S;
-	
-	while (1)
-	{
+
+    int S;
+
+
+    while (1)
+    {
 	    S = (int) system_call ( SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
 	    
 		//Se deixou de ser 0 então posso entrar.
@@ -2732,21 +2043,21 @@ void gde_v ()
 //Inicializa em 1 o semáforo do kernel para que 
 //o primeiro possa usar.
 
-void gde_initialize_critical_section (){
-	
-	system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
+void gde_initialize_critical_section ()
+{
+    system_call ( SYSTEMCALL_OPEN_KERNELSEMAPHORE, 0, 0, 0 );
 }
 
 
-void gde_begin_paint (){
-	
-	gde_enter_critical_section ();
+void gde_begin_paint ()
+{
+    gde_enter_critical_section ();
 }
 
 
-void gde_end_paint (){
-	
-	gde_exit_critical_section ();
+void gde_end_paint ()
+{
+    gde_exit_critical_section ();
 }
 
 
@@ -2757,9 +2068,9 @@ void gde_end_paint (){
  *     #todo; falar mais sobre isso.
  */
 
-void gde_put_char (int c){
-	
-	system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
+void gde_put_char (int c)
+{
+    system_call ( SYSTEMCALL_SYS_PUTCHAR, c, c, c );
 }
 
 
@@ -2772,11 +2083,13 @@ void gde_put_char (int c){
  */
 
 unsigned long 
-gde_def_dialog ( struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 )
+gde_def_dialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
+    // ??
     return (unsigned long) 1;
 }
 
@@ -2824,16 +2137,17 @@ void api_receive_message( struct api_receive_message_d *m )
 int gde_dialog ( const char *string ){
 
     int Status = 1; // Yes!
-    int ch;
+    int ch = 0;
+
 
     printf (string);
 
     while (1)
     {
-	    ch = (int) gde_getchar ();
-		
-		if ( ch != -1 )
-	    {
+        ch = (int) gde_getchar ();
+
+        if ( ch != -1 )
+        {
 	        switch (ch)
             {
 				case VK_RETURN:
@@ -2858,17 +2172,18 @@ int gde_dialog ( const char *string ){
 		};
 		
 		// ?? rever isso.
-		asm ("pause");
+        asm ("pause");
 	};
-	
+
+
     return (int) Status;
 }
 
 
 // #todo
 // Descrever o método usdo por essa rotina.
-int gde_getchar (){
-
+int gde_getchar ()
+{
     return (int) gramado_system_call ( 137, 0, 0, 0 );
 }
 
@@ -3258,11 +2573,12 @@ done:
 // de buffer.
 
 int
-gde_send_message_to_process ( int pid, 
-                              struct window_d *window, 
-                              int message,
-                              unsigned long long1,
-                              unsigned long long2 )
+gde_send_message_to_process ( 
+    int pid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
     unsigned long message_buffer[5];
@@ -3292,11 +2608,12 @@ gde_send_message_to_process ( int pid,
  */
 
 int 
-gde_send_message_to_thread ( int tid, 
-                             struct window_d *window, 
-                             int message,
-                             unsigned long long1,
-                             unsigned long long2 )
+gde_send_message_to_thread ( 
+    int tid, 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
 
     unsigned long message_buffer[5];
@@ -3328,42 +2645,48 @@ gde_send_message_to_thread ( int tid,
  */
 
 unsigned long 
-gde_send_message ( struct window_d *window, 
-                 int message,
-                 unsigned long long1,
-                 unsigned long long2 )
+gde_send_message ( 
+    struct window_d *window, 
+    int message,
+    unsigned long long1,
+    unsigned long long2 )
 {
-	unsigned long message_buffer[5];
+
+    unsigned long message_buffer[5];
 
 	message_buffer[0] = (unsigned long) window;
 	message_buffer[1] = (unsigned long) message;
 	message_buffer[2] = (unsigned long) long1;
 	message_buffer[3] = (unsigned long) long2; 
 
-	return (unsigned long) system_call ( 114 , 
-	                           (unsigned long) &message_buffer[0], 
-	                           (unsigned long) &message_buffer[0], 
-	                           (unsigned long) &message_buffer[0] );
+    return (unsigned long) system_call ( 114 , 
+                               (unsigned long) &message_buffer[0], 
+                               (unsigned long) &message_buffer[0], 
+                               (unsigned long) &message_buffer[0] );
 }
 
 
 int 
-gde_draw_text ( struct window_d *window, 
-                unsigned long x, 
-                unsigned long y, 
-                unsigned long color, 
-                char *string )
+gde_draw_text ( 
+    struct window_d *window, 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long color, 
+    char *string )
 {
-	unsigned long msg[8];
-	
+
+    unsigned long msg[8];
+
+
 	msg[0] = (unsigned long) window;
 	msg[1] = (unsigned long) x;
 	msg[2] = (unsigned long) y;
 	msg[3] = (unsigned long) color;
 	msg[4] = (unsigned long) string;
 	//...
-	
-	return (int) system_call ( SYSTEMCALL_DRAWTEXT, 
+
+
+    return (int) system_call ( SYSTEMCALL_DRAWTEXT, 
 	                (unsigned long) &msg[0], 
 	                (unsigned long) &msg[0], 
 	                (unsigned long) &msg[0] );
@@ -3371,14 +2694,14 @@ gde_draw_text ( struct window_d *window,
 
 
 // ?
-struct window_d *gde_get_ws_screen_window (){
-	
+struct window_d *gde_get_ws_screen_window ()
+{
     return (struct window_d *) system_call ( 146 , 0, 0, 0 );
 }
 
 // ?
-struct window_d *gde_get_ws_main_window (){
-	
+struct window_d *gde_get_ws_main_window ()
+{
     return (struct window_d *) system_call ( 147 , 0, 0, 0 );
 }
 
@@ -3390,10 +2713,12 @@ struct window_d *gde_get_ws_main_window (){
  *     
  *     Create timer.
  */
- 
-struct timer_d *gde_create_timer ( struct window_d *window, 
-                                   unsigned long ms, 
-                                   int type )
+
+struct timer_d *
+gde_create_timer ( 
+    struct window_d *window, 
+    unsigned long ms, 
+    int type )
 {
     return (struct timer_d *) gramado_system_call ( 222, 
                                   (unsigned long) window, 
@@ -3402,9 +2727,8 @@ struct timer_d *gde_create_timer ( struct window_d *window,
 }
 
 
-
 // pega informações varidas sobre o sys time.
-unsigned long gde_get_systime_info ( int n ){
+unsigned long gde_get_systime_info (int n){
 
     return (unsigned long) gramado_system_call ( 223, 
                                (unsigned long) n, 
@@ -3477,9 +2801,10 @@ int gde_start_terminal (void){
 
 
 int 
-gde_update_statusbar ( struct window_d *window, 
-                       unsigned char *string1, 
-                       unsigned char *string2 )
+gde_update_statusbar ( 
+    struct window_d *window, 
+    unsigned char *string1, 
+    unsigned char *string2 )
 {
     return (int) system_call ( 300, 
                      (unsigned long) window, 
@@ -3523,16 +2848,16 @@ struct window_d *gde_get_main_window (void)
 
 
 //pega o nome do processo dado o pid.
-int gde_getprocessname (int pid, char *name, size_t len)
-{
-	int __len_ret;
-	
-	if ( len < 0 || len > 64 ) //HOST_NAME_MAX
-	{
-	    printf ("gde_getprocessname: len\n");
-	    return -1;
-	}
+int gde_getprocessname (int pid, char *name, size_t len){
 
+    int __len_ret = 0;
+
+
+    //HOST_NAME_MAX
+    if ( len < 0 || len > 64 ){
+        printf ("gde_getprocessname: len\n");
+        return -1;
+    }
 
 
     //coloca no buffer interno
@@ -3558,16 +2883,16 @@ int gde_getprocessname (int pid, char *name, size_t len)
 
 
 //pega o nome do thread dado o tid.
-int gde_getthreadname (int tid, char *name, size_t len)
-{
-	int __len_ret;
-	
-	if ( len < 0 || len > 64 ) //HOST_NAME_MAX
-	{
-	    printf ("gde_getthreadname: len\n");
-	    return -1;
-	}
+int gde_getthreadname (int tid, char *name, size_t len){
 
+    int __len_ret = 0;
+
+
+    //HOST_NAME_MAX
+    if ( len < 0 || len > 64 ){
+        printf ("gde_getthreadname: len\n");
+        return -1;
+    }
 
 
     //coloca no buffer interno
@@ -3612,8 +2937,8 @@ unsigned long gde_get_thread_stats (int tid, int index){
 
 
 // Envia uma string para a porta serial COM1
-void gde_debug_print (char *string)
-{
+void gde_debug_print (char *string){
+
     gramado_system_call ( 289, 
         (unsigned long) string,
         (unsigned long) string,
@@ -3646,7 +2971,7 @@ int gde_clone_and_execute ( char *name )
 // OUT: 0=Ok -1=fail
 int gde_setup_net_buffer (int pid, char *buffer, size_t len){
 
-    int len_ret;
+    int len_ret = 0;
     
     len_ret = (int) gramado_system_call ( 550, 
                         (unsigned long) pid,
@@ -3657,12 +2982,12 @@ int gde_setup_net_buffer (int pid, char *buffer, size_t len){
 }
 
 
-
 // cria um novo process, uma thread e carrega a imagem.
 int 
-execute_new_process ( const char *filename, 
-                      char *argv[], 
-                      char *envp[] )
+execute_new_process ( 
+    const char *filename, 
+    char *argv[], 
+    char *envp[] )
 {
     return (int) gramado_system_call ( 168, 
                      (unsigned long) filename,    // Nome

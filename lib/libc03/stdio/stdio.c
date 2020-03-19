@@ -268,6 +268,41 @@ void stdio_fntos (char *name){
 }
 
 
+/*
+ # para estudar.
+static int _fillbuf(FILE *stream);
+static int _fillbuf(FILE *stream)
+{
+    if (stream->buf == NULL) {
+        if ((stream->buf = (char *)malloc(stream->bufsize)) == NULL)
+            return EOF;
+    }
+    stream->ptr = stream->buf;
+    stream->nr = read(stream->fd, stream->ptr, stream->bufsize);
+    if (--stream->nr < 0) {
+        if (stream->nr == -1)
+            stream->flags |= FILE_FLAG_EOF;
+        else
+            stream->flags |= FILE_FLAG_ERROR;
+        stream->nr = 0;
+        stream->nw = 0;
+        return EOF;
+    }
+    return (unsigned char) *stream->ptr++;
+}
+*/
+
+// # para estudar.
+/*
+int fgetc(FILE *stream)
+{
+    if (stream->nw > 0)
+        fflush(stream);
+    return (--(stream)->nr >= 0) ?
+        (unsigned char)*stream->ptr++ : _fillbuf(stream);
+}
+*/
+
 
 
 /*
@@ -403,20 +438,53 @@ int fclose (FILE *stream){
 }
 
 
+// Carrega um arquivo e retorna o ponteiro para a estrutura de stream.
+// #bugbug
+// We just have the pointer for a structure.
+// The file was loaded in ring0 by fopen(), using open()
+// So, for now, we simply can't access the data of the file.
+// The only way is using read() and the fd given by open().
 
-FILE *fopen ( const char *filename, const char *mode )
-{
+FILE *fopen ( const char *filename, const char *mode ){
 
+    FILE *__stream;   // Return this pointer.
+    
     int fd;       /* File descriptor.  */
     int flags;    /* Stream flags.     */
     int oflags;   /* Flags for open(). */
+    
+    // #todo:
+    // The 'mode' passed via argment will give us the 'flags'
+    // used in open().
+    
+    /*
+    int flags = 0;
+    // NOTE: rt is a non-standard mode which opens a file for read, explicitly
+    // specifying that it's a text file
+    if (!strcmp(mode, "r") || !strcmp(mode, "rb") || !strcmp(mode, "rt"))
+        flags = O_RDONLY;
+    else if (!strcmp(mode, "r+") || !strcmp(mode, "rb+"))
+        flags = O_RDWR;
+    else if (!strcmp(mode, "w") || !strcmp(mode, "wb"))
+        flags = O_WRONLY | O_CREAT | O_TRUNC;
+    else if (!strcmp(mode, "w+") || !strcmp(mode, "wb+"))
+        flags = O_RDWR | O_CREAT | O_TRUNC;
+    else if (!strcmp(mode, "a") || !strcmp(mode, "ab"))
+        flags = O_WRONLY | O_APPEND | O_CREAT;
+    else if (!strcmp(mode, "a+") || !strcmp(mode, "ab+"))
+        flags = O_RDWR | O_APPEND | O_CREAT;
+    else {
+        fprintf(stderr, "FIXME(LibC): fopen('%s', '%s')\n", pathname, mode);
+        ASSERT_NOT_REACHED();
+    }
+    */
 
-    FILE *__stream;   
- 
 
-    //Failed to open file. 
-    //fd = open (filename, oflags, MAY_READ | MAY_WRITE) )
-    fd = open (filename, 0, 0);  //no flags for now!
+    // Open the file. 
+    // No flags for now!
+
+    // fd = open (filename, oflags, MAY_READ | MAY_WRITE) )
+    fd = open (filename, 0, 0);  
     
     if (fd < 0){
         printf (" fopen: open() fail\n");
@@ -424,35 +492,47 @@ FILE *fopen ( const char *filename, const char *mode )
     }
 
     //
-	// Stream
-	//
-	
-	__stream = (FILE *) malloc( sizeof(FILE) );
+    // Stream
+    //
+
+    __stream = (FILE *) malloc ( sizeof(FILE) );
     
     if ( (void *) __stream == NULL )
         return NULL;
 
-	
-	__stream->used = 1;
-	__stream->magic = 1234;
 
-	__stream->_file = fd;
-	__stream->_flags = flags;
+    __stream->used = 1;
+    __stream->magic = 1234;
 
-	__stream->_tmpfname = (char *) strdup(filename);
+    __stream->_file = fd;
+    __stream->_flags = flags;
 
-	
+    __stream->_tmpfname = (char *) strdup(filename);
+
+
 	// #importante:
 	// Dessa forma fopen não permite que os aplicativos
 	// leiam o conteúdo do arquivo no buffer.
 	// Então o aplicativo terá que usar read pra ler 
 	// o conteúdo no buffer em ring0.
+	
 
-	__stream->_base = NULL;    // ??
-	__stream->_cnt = 0;         // ??
+    __stream->_base = (char *) malloc (BUFSIZ); 
     
-	__stream->_r = 0;
-	__stream->_w = 0;
+     if ( (void *) __stream->_base == NULL ){
+          debug_print("fopen: stream buffer fail\n");
+          printf("fopen: stream buffer fail\n");
+          return NULL;
+          //exit (-1)
+     }
+    
+    __stream->_p = __stream->_base; 
+    __stream->_lbfsize = BUFSIZ;
+    
+    __stream->_cnt = 0;        // ??
+    
+    __stream->_r = 0;
+    __stream->_w = 0;
 
     return (__stream);
 }
@@ -794,86 +874,15 @@ int puts(const char* s)
 */
 
 
-void clearerr(FILE* stream)
-{
-    //assert(stream);
+void clearerr (FILE* stream){
+
     if ( (void *) stream == NULL )
         return;
     
-    
+    //stream->_flags &= ~(_IOERR|_IOEOF);
     stream->eof = FALSE;
     stream->error = 0;
 }
-
-
-/*
-void __clearerr( FILE *iop );
-void __clearerr( FILE *iop )
-{
-    iop->_flags &= ~(_IOERR|_IOEOF);
-}
-*/
-
-
-
-
-/*
-int ferror(FILE* stream)
-{
-    return stream->error;
-}
-*/
-
-
-
-
-
-/*linux klibc style*/
-/*
-size_t _fread (void *buf, size_t count, FILE *f)
-{
-  size_t bytes = 0;
-  ssize_t rv;
-  char *p = buf;
-
-
-    if ( (void *) f == NULL )
-       return -1;
-
-
-  while ( count ) 
-  {
-    rv = read(fileno(f), p, count);
-	  
-    if ( rv == -1 ) {
-		
-      if ( errno == EINTR )
-	continue;
-      else
-	break;
-		
-    } else if ( rv == 0 ) {
-      break;
-    }
-
-    p += rv;
-    bytes += rv;
-    count -= rv;
-  }
-
-  return bytes;
-}
-*/
-
-
-/*linux klibc style*/
-/*
-size_t fread (void *ptr, size_t size, size_t nmemb, FILE *f)
-{
-    return _fread (ptr, size*nmemb, f)/size;
-}
-*/
-
 
 
 /*
@@ -886,91 +895,46 @@ size_t fread (void *ptr, size_t size, size_t nmemb, FILE *f)
 // Ler uma certa quantidade de chars de uma stream e coloca-los no buffer.
 // Isso vai ser usado pelo terminal por exemplo.
 // Assim o terminal pode pegar uma string que esteja no arquivo.
+
+// See:
+// http://man7.org/linux/man-pages/man3/fread.3.html
 // https://www.tutorialspoint.com/c_standard_library/c_function_fread.htm 
+
+// #todo:
+// Check the sizes.
 
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp){
 
-/*
-    if ( (void *) fp == NULL )
-       return -1;
-
+    int nreads = 0;
+    
+    // Se não temos o ponteiro, então não teremos o fd
+    // para usarmos em read().
+    if ( (void *) fp == NULL ){
+        printf ("fread: fp \n");
+        return (size_t) -1;
+    }
  
-    //#bugbug: Não passaremos ponteiro de stream par ao kernel. 
-    return (size_t) gramado_system_call ( 607, 
-                        (unsigned long) ptr, 
-                        (unsigned long) n, 
-                        (unsigned long) fp ); 
-*/
-
-
+    // Quantidade inválida.
     if ( n <= 0 ){
         printf ("fread: n \n");
         return (size_t) -1;
     }
 
-
-    //if ( (void *) fp == NULL )
-       //return -1;
-
-
-    if ( (void *) fp == NULL )
-    {
-        printf ("fread: fp\n");
+    if ( (void *) ptr == NULL ){
+        printf ("fread: ptr \n");
         return (size_t) -1;
+    }
+    
+    // Read.
+     
+    nreads = read ( fileno(fp), ptr, sizeof(ptr) );
 
-    }else{
+    if (nreads <= 0){
+        printf ("fread: read() fail \n");
+        return (size_t) -1;   
+    }
 
-       // if (s->flags & IOSTREAM_READ)
-       //switch (s->node->type) arquivo, dispositivo, etc ... 
-
-
-		//if (stream->offset <= file->size)
-
-		//ai tem algo errado
-        if ( fp->_p < fp->_base ){
-            printf ("fread: position fail\n");
-            return (size_t) -1;
-        }
-
-
-        // dst = buffer no app.
-        // src = base do buffer da stream + offset de leitura.
-
-        //#todo: 
-        // ainda não temos uma base do buffer devidamente inicializada. 
-		
-		// #hack hack: 
-		// provisório, deletar depois.
-		// precisamos inicializar quando usamos fopen
-		// suspendendo esse hack pois fiz as modificações no fopen
-		// pra inicialziar a estrutura.
-		// Então isso deve funcionar sem esse ajuste 
-		// pelo menos para arquivos abertos com fopen.
-		
-		//fp->_bf._base = fp->_base; 
-		//fp->_r = 0; 
-
-        //...
-
-		//#debug
-        //printf ("fread: copiando para o buffer\n");
-        //printf ("_r=%d \n", fp->_r );
-        //printf ("_bf._base=%x \n", fp->_bf._base );
-        //refresh_screen ();
-
-        // #todo: 
-        // _r limits
-
-        memcpy ( (void *) ptr, 
-            (const void *) (fp->_base + fp->_r ), 
-            (unsigned long) n );
-
-         // Update.        
-         fp->_r = (fp->_r + n);  
-    };
-
-
-    return 0;
+    return (size_t) nreads;
 }
 
 
@@ -982,19 +946,34 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp){
 
 size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp)
 {
-	return -1;
-	/*
-    assert(stream);
-    auto* bytes = (const u8*)ptr;
-    ssize_t nwritten = 0;
-    for (size_t i = 0; i < (size * nmemb); ++i) {
-        int rc = fputc(bytes[i], stream);
-        if (rc == EOF)
-            break;
-        ++nwritten;
+    int nwrite = 0;
+    
+    // Se não temos o ponteiro, então não teremos o fd
+    // para usarmos em read().
+    if ( (void *) fp == NULL ){
+        printf ("fwrite: fp \n");
+        return (size_t) -1;
     }
-    return nwritten / size;
-    */
+ 
+    // Quantidade inválida.
+    if ( n <= 0 ){
+        printf ("fwrite: n \n");
+        return (size_t) -1;
+    }
+
+    if ( (void *) ptr == NULL ){
+        printf ("fwrite: ptr \n");
+        return (size_t) -1;
+    }
+
+    nwrite = write( fileno(fp), ptr, sizeof(ptr) );
+    
+    if (nwrite <= 0){
+        printf ("fwrite: write() fail \n");
+        return (size_t) -1;   
+    }
+
+    return (size_t) nwrite;    
 }
 
 
@@ -1878,7 +1857,7 @@ unsigned long input ( unsigned long ch ){
 			//{ printf("%c", (char) ' '); }
 		    goto input_done;
 			break;
-			
+
 		case VK_BACKSPACE:
             
 			//Se estamos no início da linha.
@@ -1945,34 +1924,6 @@ int input_file_buffer_size(void)
 */
 
 
-/*glibc style;*/
-/* Read a character from stdin.  */
-/*
-//int DEFUN_VOID(getchar)
-int getchar (void)
-{
-
-    if ( (void *) stdin == NULL )
-       return EOF;
-
-  return __getc(stdin);
-}
-*/
-
-
-/*
-int getchar(void)
-{
-    if ( (void *) stdin == NULL )
-       return EOF;
-
-	return getc(stdin);
-}
-*/
-
-
-
-
 /*
 int __fflush_stdin(void) 
 {
@@ -2033,122 +1984,36 @@ int fprintf(FILE *fp, const char *fmt, ...)
  * fprintf:     
  */
 
+// #bugbug
+// We just have the pointer for a structure.
+// The file was loaded in ring0 by fopen(), using open()
+// So, for now, we simply can't access the data of the file.
+// The only way is using read() and the fd given by open().
+
 int fprintf ( FILE *stream, const char *format, ... ){
 
-	//
-	// Stream.
-	//
-	
+
     if ( (void *) stream == NULL )
        return EOF;
 
-    // Usando o kernel para colocar o conteúdo na stream.
     
-    gramado_system_call ( 234, 
-        (unsigned long) stream, 
-        (unsigned long) format, 
-        (unsigned long) format );
-   
+   debug_print ("fprintf: TODO. Not implemented yet\n");
+  
    // Suspendendo a notificação do terminal.
    return 0;
-
-   /*
-
-    //
-    // Terminal.
-    //
-
-    // #bugbug
-    // Rever isso e pegar a pid certo.
-
-	// Pegamos o pid do terminal e enviamos uma 
-	// notificação de evento para ele.
-	int terminal___PID = -1;
-	unsigned long message_buffer[5];
-	
-	//SÓ NOTIFICAREMOS O TERMINAL SE TIVERMOS NO MODO NORMAL
-	if ( __libc_output_mode == LIBC_NORMAL_MODE )
-	{
-        //terminal___PID = (int) system_call ( 1004, 0, 0, 0 ); 
-        terminal___PID = (int) gramado_system_call ( 1004, 0, 0, 0 ); 
-	
-	    if ( terminal___PID < 0 )
-	    {
-			//libc_set_output_mode (LIBC_DRAW_MODE);
-		    //printf_draw ("fprintf:fail\n");
-		    return -1;
-	    }
-		
-        //if (pid<0)
-		    //return -1;
-	
-	    message_buffer[0] = (unsigned long) 0;    //window
-	    message_buffer[1] = (unsigned long) 100;  //message;  //MSG_TERMINALCOMMAND
-	    message_buffer[2] = (unsigned long) 2008; //long1;    //2008  
-	    message_buffer[3] = (unsigned long) 2008; //long2;    //2008
-	    //...
-
-	    //notifica o terminal de que ele tem mensagens.
-        //return (int) system_call ( 112 , (unsigned long) &message_buffer[0], 
-        //                (unsigned long) terminal___PID, (unsigned long) terminal___PID );
-
-        return (int) gramado_system_call ( 112 , 
-                         (unsigned long) &message_buffer[0], 
-                         (unsigned long) terminal___PID, 
-                         (unsigned long) terminal___PID );
-
-        //#todo temos que usar essa chamada ao invés dessa rotina acima.
-        //ok
-	    // __SendMessageToProcess ( terminal___PID, NULL, MSG_TERMINALCOMMAND, 2008, 2008 );
-    }
-    
-    */
-
-    return 0;
 }
 
-
-/*
-int fputs (const char *s, FILE *stream) 
-{
-    if ( (void *) stream == NULL )
-       return EOF;
-
-  return fwrite ( s, strlen(s), 1, stream );
-}
-*/
-
-
-/*uClib style*/
-/*
-int fputs(const char *str, FILE *fp)
-{
-	int n;
-
-	n = strlen(str);
-
-    if ( (void *) fp == NULL )
-       return EOF;
-
-	_uClibc_fwrite((const unsigned char *)str, n, fp);
-	if (fp->mode & __MODE_ERR) {
-		n = EOF;
-	}
-	return n;
-}
-*/
-	
 
 
 
 //#todo: testar.
 //Credits: Sombra OS.
-void nputs (char *cp, int len)
-{
-	int i = len;
-	char *str;
+void nputs (char *cp, int len){
+	
+    int i = len;
+    char *str;
 
-	for (str = cp; i; str++, i--)
+    for (str = cp; i; str++, i--)
         putchar ( (int) *str);
 }
 
@@ -2169,6 +2034,7 @@ char *__gets(char *str)
 
 	return fgets(str, INT_MAX, stdin);
 }
+
 
 
 
@@ -2253,21 +2119,6 @@ char *glibc_gets (char *s)
 
 
 
-/*dietlibc style*/
-//isso deve ir para ring0
-/*
-int ungetc(int c, FILE *stream) 
-{
-  if (stream->ungotten || c<0 || c>255)
-    return EOF;
-	
-  stream->ungotten=1;
-  stream->ungetbuf=(unsigned char)c;
-  stream->flags&=~(ERRORINDICATOR|EOFINDICATOR);
-	
-  return c;
-}
-*/
 
 
 /*
@@ -2275,8 +2126,8 @@ int ungetc(int c, FILE *stream)
  * ungetc:
  */
 
-int ungetc ( int c, FILE *stream )
-{
+int ungetc ( int c, FILE *stream ){
+
     //ASSERT(stream);
     if ( (void *) stream == NULL )
         return EOF;
@@ -2301,46 +2152,6 @@ int ungetc ( int c, FILE *stream )
 }
 
 
-/*
-// unix v7 cool way
-int __ungetc( int c, FILE *iop );
-int __ungetc( int c, FILE *iop ){
-	
-    if (c == EOF)
-		return(-1);
-
-
-	if ((iop->_flags & _IOREAD )==0 || iop->_p <= iop->_base )
-		if (iop->_p == iop->_base && iop->_w==0)
-			*iop->_p++;
-		else
-			return(-1);
-
-	iop->_w++;
-	
-	*--iop->_p = c;
-	
-	return(0);
-}
-*/
-
-
-
-
-/*
-int putc(int ch, FILE* stream)
-{
-    return fputc(ch, stream);
-}
-*/
-
-/*
-int putchar(int ch)
-{
-    return putc(ch, stdout);
-}
-*/
-
 
 
 /*linux - klibc style*/
@@ -2352,6 +2163,8 @@ static __inline__ off_t ftell(FILE *__f)
 }
 */
 
+
+
 // Dixaremos o kernel manipular a estrutura.
 //This function returns the current file position of the stream stream. 
 long ftell (FILE *stream)
@@ -2361,7 +2174,7 @@ long ftell (FILE *stream)
         
     fflush (stream);
     
-    return lseek( fileno(stream) , 0, SEEK_CUR);
+    return lseek ( fileno(stream) , 0, SEEK_CUR);
 }
 
 
@@ -2370,8 +2183,8 @@ long ftell (FILE *stream)
  *     Gets the file id.
  *     The kernel gets this value from the stream struct.
  */
-int fileno ( FILE *stream )
-{
+int fileno ( FILE *stream ){
+
     //assert(stream);
  
     if ( (void *) stream == NULL )
@@ -2383,31 +2196,17 @@ int fileno ( FILE *stream )
 
 
 /*linux klibc style.*/
-//isso deve ir para ring0
-/*
-int fgetc(FILE *f)
+// Isso vai ler no arquivo que está em ring0.
+int __linux_fgetc (FILE *f)
 {
-  unsigned char ch;
+    unsigned char ch;
   
     if ( (void *) f == NULL )
        return EOF;
   
-  return ( _fread (&ch, 1, f) == 1) ? (int) ch : EOF;
+    
+    return ( fread (&ch, 1, 1, f) == 1) ? (int) ch : EOF;
 }
-*/
-
-
-/*uClibb style*/
-//isso deve ir para ring0
-/*
-int getc(FILE *stream)
-{
-    if ( (void *) stream == NULL )
-       return EOF;
-
-    return (((stream)->bufpos >= (stream)->bufread)?  fgetc(stream) : (*(stream)->bufpos++));
-}
-*/
 
 
 //
@@ -2483,72 +2282,162 @@ int __fflush (FILE *stream)
 
 
 
+// Buffer fill.
+// Precisamos pegar o conteúdo do arquivo que está em ring0 e
+// colocar no buffer em ring3 para o __getc pegar um byte.
+// OUT: nreads. (quantos bytes foram lidos.)
+
+int ____bfill(FILE *stream);
+int ____bfill(FILE *stream)
+{
+    int nbyte = 0;
+
+    // struct
+    if ( (void *) stream == NULL ){
+        debug_print("____bfill: struct\n");
+        printf ("____bfill: struct\n");
+        return -1;
+    }
+
+    // buffer
+    if ( stream->_lbfsize != BUFSIZ )
+    {
+        debug_print("____bfill: _lbfsize fail\n");
+        printf ("____bfill: _lbfsize fail\n");
+        return -1;
+    }
+
+    //
+    // # Read!
+    //
+    
+    nbyte = (int) read ( fileno(stream), 
+                     stream->_p, 
+                     stream->_lbfsize );
+
+    
+    if (nbyte<0)
+    {
+        debug_print("____bfill: [DANGER] read fail\n");
+        printf ("____bfill: [DANGER] read fail\n");
+        return -1;
+    }
+
+    if (nbyte == 0){
+        debug_print ("____bfill: [DEBUG] eof? empty file ?\n");
+        printf ("____bfill: [DEBUG] eof? empty file ?\n");
+        return EOF;
+    }
+
+    //
+    // OK. 
+    // Read funcionou. 
+    // :^)
+    //
+    
+    // Estamos cheios.
+    stream->_cnt = BUFSIZ;
+    
+    return (int) nbyte;
+}
+
+
+// #todo:
+// #importante
+// Se tem alguma coisa no buffer em ring3 a gente pega,
+// se não tem, então precisamos usar o read() e copiar do arquivo
+// em ring0 para o buffer em ring3.
+// >>>> _fillbuf()
+
+
+// Cada processo pode ter uma 'vista' do arquivo em ring3.
+// Então:
+// + Se acabou nosso buffer em ring3, enchemos o buffer novamente.
+// + Se não acabou então pegamos um byte no buffer.
+// Isso vale para arquivos craidos com fopen cujo buffer
+// ja começa vazio.
 
 int __getc ( FILE *stream ){
 
     int ch = 0;
+    int nreads = 0;
 
 
+    // struct
     if ( (void *) stream == NULL ){
+        debug_print ("__getc: stream struct fail\n");
+        printf ("__getc: stream struct fail\n");
+        return EOF;   
+    }
+
+
+	// Se acabou o buffer!!
+	// cnt decrementou e chegou a zero.
+	// Não há mais caracteres disponíveis entre 
+	// stream->_ptr e o tamanho do buffer.
+
+    if ( stream->_cnt <= 0 )
+    {
+        debug_print("__getc: [EMPTY BUFFER?] _cnt\n");
+        
+        // #todo:
+        // We need this routine to call getc() after fopen().
+  
+        // coloque bytes no buffer dessa stream.
+        nreads = (int) ____bfill (stream);
+                  
+            //nreads = read (fileno(stream), stream->_p, 1 );
+            
+        // fail.
+        if (nreads <= 0){
+            debug_print ("__getc: [BUFFER?] ____bfill fail\n");
+            stream->_flags = (stream->_flags | _IOEOF); 
+            stream->_cnt = 0;
+            return EOF;
+        }
+        
+        // Ok
+        // Temos bytes no buffer.
+        // Então vamos pegar um.
+        
+        ch = (int) *stream->_p;
+        stream->_p++;
+        stream->_cnt--;
+    
+        return (int) ch;
+    }
+
+
+    //
+    // Ok. 
+    // Vamos ler o buffer, porque ele está cheio.
+    //
+
+    // Se o ponteiro de leitura for inválido.
+    // Não podemos acessar um ponteiro nulo ... 
+    // no caso endereço.
+    
+    if ( stream->_p == 0 ){
+        debug_print ("__getc: [BUFFER POINTER] stream struct fail\n");
         printf ("__getc: stream struct fail\n");
         return EOF;
-    }else{
+    }
 
-		 //(--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
-		
-		//#fim.
-		//cnt decrementou e chegou a zero.
-		//Não há mais caracteres disponíveis entre 
-		//stream->_ptr e o tamanho do buffer.
-		
-		if ( stream->_cnt <= 0 )
-		{
-			stream->_flags = (stream->_flags | _IOEOF); 
-			stream->_cnt = 0;
-			
-		    //printf ("#debug: fgetc: $\n");
-			
-			//isso funciona, significa que a estrutura tem ponteiro e base validos.
-			//printf("show fgetc:: %s @\n", stream->_base );
-		    //refresh_screen();
-			
-			return EOF;
-		};
+    //
+    // # Read!
+    //
+    
+    // Pega o char no posicionamento absoluto do arquivo.
+    // Ajust file.
+        
+    ch = (int) *stream->_p;
+    stream->_p++;
+    stream->_cnt--;
 
-		//#debug
-		//nao podemos acessar um ponteiro nulo... no caso endereço.
-		
-		if ( stream->_p == 0 )
-		{
-			printf ("__getc: stream struct fail\n");
-		    //refresh_screen();
-			return EOF;
-			
-		}else{
-			
-			// #obs: 
-			// Tem que ter a opção de pegarmos usando o posicionamento
-			// no buffer. O terminal gosta dessas coisas.
-			
-		    //Pega o char no posicionamento absoluto do arquivo
-		    ch = (int) *stream->_p;
-				
-            stream->_p++;
-            stream->_cnt--;
-
-		    return (int) ch;
-		
-		}
-		//fail
-    };
-
-
-	//#debug
-    //printf ("fgetc: $$\n");
-	//refresh_screen();
-
-     return EOF;
+    return (int) ch;
 }
+
+
 
 int __putc (int ch, FILE *stream)
 {   
@@ -2613,12 +2502,16 @@ int putc (int ch, FILE *stream)
 }
 
 
+// don't change it
+// See: unix v7
 int fgetc ( FILE *stream )
 {
     return (int) getc (stream);
 }
 
 
+// don't change it
+// See: unix v7
 int fputc ( int ch, FILE *stream )
 {
     return (int) putc (ch, stream);
@@ -2675,21 +2568,25 @@ int puts (const char *s)
 //
 
 //s n iop
-char *fgets (char *s, int size, FILE *stream)
-{
-	register c;
-	register char *cs;
+char *fgets (char *s, int size, FILE *stream){
 
-	cs = s;
-	while (--size>0 && (c = getc(stream))>=0) {
-		*cs++ = c;
-		if (c=='\n')
-			break;
-	}
-	if (c<0 && cs==s)
-		return(NULL);
-	*cs++ = '\0';
-	return(s);
+    register c;
+    register char *cs;
+
+    cs = s;
+    while (--size>0 && (c = getc(stream))>=0) 
+    {
+        *cs++ = c;
+        if (c=='\n')
+            break;
+    }
+
+    if (c<0 && cs==s)
+        return (NULL);
+    
+    *cs++ = '\0';
+
+    return (s);
 }
 
 
@@ -2737,47 +2634,41 @@ int putw (int w, FILE *stream)
 
 
 
-
-
-
-
-
-
 /*uClib style*/
-char *fgets2 (char *s, int count, FILE *fp)
-{
-	int ch;
-	char *p;
-	
-	p = s;
-	
+char *fgets2 (char *s, int count, FILE *fp){
+
+    int ch;
+    char *p;
+
+
+    p = s;
+
     if ( (void *) fp == NULL )
        return (char *) 0;
 
-	
-	//Guard against count arg == INT_MIN. 
-	while (count-- > 1) 
-	{		
+
+    // Guard against count arg == INT_MIN. 
+    while (count-- > 1) 
+    {		
 		ch = getc (fp);
-		
-		if (ch == EOF) 
-		{
-			break;
-		}
-		
+
+        if (ch == EOF){
+            break;
+        }
+
 		*p++ = ch;
 		
 		if (ch == '\n') { break; }
-	}
-	
+    }
+
 	if ( ferror(fp) || (s == p) ) 
 	{
 		return 0;
 	}
-	
-	*p = 0;
-	
-	return s;
+
+    *p = 0;
+
+    return s;
 }
 
 
@@ -3008,9 +2899,11 @@ static __inline__ int fseek(FILE *__f, off_t __o, int __w)
  */
 
 // The fseek function is used to change the file position of the stream stream. 
-int fseek ( FILE *stream, long offset, int whence )
-{
-	return -1;
+int fseek ( FILE *stream, long offset, int whence ){
+
+    debug_print ("fseek: TODO. Not implemented yet\n");
+
+    return -1;
 	/*
     assert(stream);
     fflush(stream);
@@ -3027,34 +2920,18 @@ int fseek ( FILE *stream, long offset, int whence )
 
 
 
-
-
-/*uClib style*/
-/*
-int putc(int c, FILE *stream)
-{
-    if ( (void *) stream == NULL )
-       return EOF;
-
-    return(((stream)->bufpos >= (stream)->bufwrite)?  fputc((c), (stream)) : (unsigned char) (*(stream)->bufpos++ = (c)) );
-}
-*/
-
-
-
 /*linux klibc style*/
-/*
-int fputc(int c, FILE *f)
-{
-  unsigned char ch = c;
+// Isso vai escrever no arquivo que está em ring0.
+int __linux_fputc(int c, FILE *f){
+
+    unsigned char ch = c;
 
     if ( (void *) f == NULL )
        return EOF;
   
   
-  return _fwrite(&ch, 1, f) == 1 ? ch : EOF;
+    return fwrite(&ch, 1, 1, f) == 1 ? ch : EOF;
 }
-*/
 
 
 /*
@@ -4272,21 +4149,31 @@ int stderr_printf (const char *format, ... ){
     return done;
 }
 
-//#bugbug: não devemos usar stream em ring3.
+
+
+// The perror() function produces a message on standard error describing
+// the last error encountered during a call to a system or library
+// function.
+// See: http://man7.org/linux/man-pages/man3/perror.3.html
 void perror (const char *str){
 
-    // #todo
-    // Aqui podemos chamar o kernel
-    // e ele coloca essa stream em stderr.
-    // Mas deve ser o stderr da lista de arquivos do processo.
-
-    stderr_printf (str);
+    //#todo: check errno, and the string for the current error.
+    printf ("FIXME: perror() \n");
+    printf (str);
 }
 
 
 // O ponto de leitura e escrita volta a ser a base.
+// Isso é válido apenas para a stream aqui em ring3.
 void rewind (FILE *stream)
 {
+
+    if( (void*) stream == NULL )
+        return;
+        
+    //:^)
+    stream->_p = stream->_base;
+
 	//unix 32V
 	//fflush(stream);
 	//lseek( fileno(stream), 0, 0);
@@ -4378,6 +4265,29 @@ stdio_initialize_standard_streams (void)
 }
 
 
+// wtf ... it looks so cool!
+/*
+file *file_purpose (file *f); 
+file *file_purpose (file *f) 
+{
+	if (f->purpose == purpose_recv) {
+		return stdin;
+	}
+	else if (f->purpose == purpose_send) {
+		return stdout;
+	}
+	else if (f->purpose == (purpose_send | purpose_dbg)) {
+		return dbgout;
+	}
+	else if (f->purpose == (purpose_send | purpose_err)) {
+		return stderr;
+	}
+	else {
+		// TODO: Warn about unknown file for pipe. Default to stderr
+		return stderr;
+	}
+}
+*/
 
 
 
@@ -4578,25 +4488,36 @@ void setlinebuf (FILE *stream)
 
 
 
-// #test
-int setvbuf (FILE *stream, char *buf, int mode, size_t size)
-{
+// See: https://linux.die.net/man/3/setvbuf
+int setvbuf (FILE *stream, char *buf, int mode, size_t size){
 
-    if (mode != _IONBF && mode != _IOLBF && mode != _IOFBF) {
+    // #bugbug
+    // Esse tratamanto de bits pode estar errado.
+    // unbuffered, line buffered, fully buffered 
+    if ( mode != _IONBF && 
+         mode != _IOLBF && 
+         mode != _IOFBF )
+    {
+        debug_print ("setvbuf: mode \n");
         //errno = EINVAL;
         return -1;
     }
     stream->_flags = mode;
-    
-    // Se foi passado um byffer válido.
+
+
+    // Se foi passado um buffer válido.
     if (buf) {
-        stream->_base = buf;
+
+        debug_print ("setvbuf: using new buffer \n");
+        stream->_base = (char *) buf;
         stream->_lbfsize = size;
     
     // Não passaram um buffer válido.
     // Vmaos usar o default.
     } else {
-        stream->_base = stream->default_buffer;
+
+        debug_print ("setvbuf: using default buffer \n");
+        stream->_base = (char *) stream->default_buffer;
         stream->_lbfsize = BUFSIZ;
     };
     
@@ -4967,6 +4888,17 @@ int vfscanf(FILE *stream, const char *format, va_list ap)
 
 
 
+FILE *tmpfile(void)
+{
+    // steps:
+    // + Salva um arquivo vazio com nome randômico.
+    // + Abre esse arquivo com open.
+    // + Cria uma stream para esse fd.
+
+	return (FILE *) 0;
+}
+
+
 //tmpnam(): 
 //SVr4, 4.3BSD, C89, C99, POSIX.1-2001.  
 //POSIX.1-2008 marks tmpnam() as obsolete.
@@ -5021,26 +4953,84 @@ char *tempnam(const char *dir, const char *pfx)
 
 
 
-FILE *tmpfile(void)
+
+FILE *stdio_make_file( int fd, const char *mode )
 {
-	return (FILE *) 0;
+    FILE *__file;
+    
+    __file = (FILE *) malloc( sizeof(FILE) );
+    if ( (void *) __file == NULL )
+        return NULL;
+        
+ 
+    __file->used = 1;
+    __file->magic = 1234;
+    __file->_cnt = 0;  
+    __file->_file = fd;
+    
+    // flags
+    __file->_flags = 0;
+    
+    /*
+    switch (*mode) {
+
+    case 'r':
+        __file->_flags |= _IOREAD;
+        break;
+
+    case 'a':
+        lseek(fd, 0L, 2);
+        //No break
+    case 'w':
+        __file->_flags |= _IOWRT;
+        break;
+
+    default:
+        return(NULL);
+    }
+    */
+
+
+    /*
+	if (mode[1] == '+') {
+		__file->_flags &= ~(_IOREAD|_IOWRT);
+		__file->_flags |= _IORW;
+	}
+    */
+
+    //__file->_tmpfname = (char *) strdup(filename);
+
+    __file->_base = NULL;    // ??
+
+    
+    __file->_r = 0;
+    __file->_w = 0;
+
+   
+    //#todo: Initializa structure.
+    //...
+
+    return (FILE *) __file;
 }
-
-
-
 
 // #test
-// Tem que abrir um novo arquivo e associar com o fd?
+// Cria uma nova stream para o fd.
+// O fd foi obtido anteriormente,
 FILE *fdopen (int fd, const char *mode)
 {
-    return (FILE *) 0;
+    if(fd<0)
+        return NULL;
+        
+    return (FILE *) stdio_make_file (fd, (const char *) mode);
 }
 
 
-FILE *freopen(const char *pathname, const char *mode, FILE *stream)
+FILE *freopen (const char *pathname, const char *mode, FILE *stream)
 {
     if ( (void *) stream == NULL )
        return (FILE *) 0;
+
+    debug_print ("freopen: TODO: \n");
 
 	return (FILE *) 0;
 }
@@ -5100,8 +5090,7 @@ int fgetpos(FILE* stream, fpos_t* pos)
 } 
 */
 
-int fgetpos (FILE *stream, fpos_t *pos )
-{ 
+int fgetpos (FILE *stream, fpos_t *pos ){ 
 
     if ( (void *) stream == NULL )
        return EOF;
@@ -5115,21 +5104,22 @@ int fgetpos (FILE *stream, fpos_t *pos )
     }
     */
     
-    *pos = ftell(stream);
+    *pos = ftell (stream);
+
     if (*pos < 0L)
         return(-1);
+ 
     return(0);
 }
 
 
-int fsetpos (FILE *stream, const fpos_t *pos)       
-{ 
+int fsetpos (FILE *stream, const fpos_t *pos){
+ 
     if ( (void *) stream == NULL )
        return EOF;
 
-    return fseek(stream, (long) *pos, SEEK_SET);
+    return fseek (stream, (long) *pos, SEEK_SET);
 }
-
 
 
 

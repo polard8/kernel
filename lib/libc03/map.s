@@ -86,9 +86,9 @@ LOAD somain.o
  *(.note.gnu.build-id)
                 0x0000000000002000                . = ALIGN (0x1000)
 
-.dynamic        0x0000000000002000       0x68
+.dynamic        0x0000000000002000       0x70
  *(.dynamic)
- .dynamic       0x0000000000002000       0x68 socrt0.o
+ .dynamic       0x0000000000002000       0x70 socrt0.o
                 0x0000000000002000                _DYNAMIC
                 0x0000000000003000                . = ALIGN (0x1000)
 
@@ -142,10 +142,10 @@ LOAD somain.o
  *(.eh_frame)
  *(.note.GNU-stack)
 
-.comment        0x0000000000000000       0x11
+.comment        0x0000000000000000       0x29
  *(.comment)
- .comment       0x0000000000000000       0x11 socrt0.o
-                                         0x12 (size before relaxing)
- .comment       0x0000000000000011       0x12 somain.o
+ .comment       0x0000000000000000       0x29 socrt0.o
+                                         0x2a (size before relaxing)
+ .comment       0x0000000000000029       0x2a somain.o
 LOAD ./LIBC03.A
 OUTPUT(LIBC03.SO elf32-i386)

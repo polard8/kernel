@@ -34,13 +34,19 @@
 
 
 // Connecting with the ws.
-#include "connect.h"
+//#include "connect.h"
 
 
 // Read and write from socket.
 #include "rw.h"
 
 // ...
+
+
+
+
+
+
 
 
 
@@ -62,6 +68,7 @@ void *gws_system_call ( unsigned long a,
                         unsigned long d );
 
 
+void gws_debug_print (char *string);
 
 // Initialize the library.
 int gws_initialize_library (void);
@@ -121,6 +128,8 @@ void *gws_create_window ( unsigned long type,        //1, Tipo de janela (popup,
 void gws_reboot (void);
 
 
+
+void gws_yield(void);
 
 
 

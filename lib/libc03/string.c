@@ -516,6 +516,19 @@ char *strcpy ( char *to, const char *from ){
 }
 
 
+/*
+ //#test
+char* strcpy(char* to, const char* from);
+char* strcpy(char* to, const char* from)
+{
+    char *dest_ptr = to;
+    const char *src_ptr = from;
+    while ((*dest_ptr++ = *src_ptr++) != '\0')
+        ;
+    return to;
+}
+*/
+
 
 size_t strlcpy (char *dst, const char *src, size_t size){
 

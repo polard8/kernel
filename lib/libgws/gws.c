@@ -25,11 +25,8 @@
 
 
 //libgws
+#include "include/connect.h"  
 #include "include/gws.h"  
-
-
-int __gws__desktop__id;
-int __ws__pid;
 
 
 
@@ -50,47 +47,27 @@ void *gws_system_call ( unsigned long a,
     return (void *) __Ret; 
 }
 
+// Envia uma string para a porta serial COM1
+void gws_debug_print (char *string)
+{
+    gws_system_call ( 289, 
+        (unsigned long) string,
+        (unsigned long) string,
+        (unsigned long) string );
+}
 
 // Initialize the library.
 int gws_initialize_library(void)
 {
 
-    // Pega o id do desktop atual.
-    // ?? Ou o qual o processo pertence ??
-    __gws__desktop__id = (int) gws_system_call (519,0,0,0);
-   
-    
-    // Get ws PID for a given desktop
-    __ws__pid = (int) gws_system_call ( 512,
-                         (unsigned long) __gws__desktop__id,
-                         (unsigned long) __gws__desktop__id,
-                         (unsigned long) __gws__desktop__id );    
-        
-        
-    
-    if (__ws__pid<0)
+    int status = -1;
+    status = gws_initialize_connection();    
+
+    if(status<0){
+        gws_debug_print("gws_initialize_library: fail\n");
         return -1;
-        
-        
-        // Send message.
-        // Envia uma mensagem pedindo para o ws emitir um hello!
-        // msg = 1000;
-
-        //vamos criar uma chamada semelhante a essa.
-
-        // IN: PID, window, msg, long1, long2
-        gws_send_message_to_process ( __ws__pid, 
-            NULL, 1000, 0, 0 );  
+    }
     
-
-        // put some pixel in this position.
-        gws_send_message_to_process ( __ws__pid, 
-            NULL, 2000, 40, 40 );  
-
-        // refresh screen
-        gws_send_message_to_process ( __ws__pid, 
-            NULL, 2020, 0, 0 );     
-        
     return 0;
 }
 
@@ -216,10 +193,102 @@ void *gws_create_window ( unsigned long type,        //1, Tipo de janela (popup,
                           unsigned long color )      //12, Color (bg) (para janela simples).
  
 {
-    return NULL;
+
+
+    int n_writes = 0;   // For sending requests.
+    int n_reads = 0;    // For receiving responses.
+
+
+    unsigned long buffer;
+
+
+    buffer = (unsigned long) gws_get_message_buffer();
+
+    // Isso permite ler a mensagem na forma de longs.
+    unsigned long *message_buffer = (unsigned long *) buffer;   
+
+    int client_fd = -1;
+    
+    int s=-1;
+    
+    s = gws_get_connect_status();
+
+    if (s != 1){
+        gws_debug_print("gws_create_window: Not connected\n");
+        return NULL;
+    }
+    
+    
+    client_fd = gws_get_client_fd();
+    
+    if (client_fd < 0){
+        gws_debug_print("gws_create_window: client fd fail\n");
+        return NULL;
+    }
+
+    
+    while(1){
+
+
+        //create window        
+        
+        // msg header.
+        message_buffer[0] = 0;       // window. 
+        message_buffer[1] = 1001;    // msg
+        message_buffer[2] = 0;       // long1 (Response)
+        message_buffer[3] = 0;       // long2
+        
+        // Extra
+        message_buffer[4] = x;       // x
+        message_buffer[5] = y;       // y
+        message_buffer[6] = width;   // w
+        message_buffer[7] = height;  // h
+        message_buffer[8] = color;   // color
+
+        // ...
+
+        n_writes = write ( client_fd, 
+                       message_buffer, 
+                       sizeof(message_buffer) );
+                       
+        //send(client_fd , hello , strlen(hello) , 0 ); 
+       
+        // Se foi possível enviar, então não tentaos novamente.
+        if(n_writes>0)
+           break;
+    };
+    
+    // #todo
+    // Read the response.
+    
+    
+    __again:
+    n_reads = read ( client_fd, message_buffer, sizeof(message_buffer) );
+    // Não vamos insistir num arquivo vazio.
+    if (n_reads<=0){
+        gws_yield();
+        goto __again;
+    }
+    
+    // O que lemos não era uma resposta.
+    // Isso não deveria acontecer.
+    // Se a mensagem não é uma resposta, lemos novamente.
+    if (message_buffer[1] != 4000){
+        gws_yield();
+        goto __again;
+    }
+    
+
+    // The response is the long1in the header of the 
+    // buffer.
+
+    return (void *) message_buffer[2];   // The response.
 }
 
 
-
+void gws_yield(void){
+	
+    gws_system_call(265,0,0,0); //yield thread.
+}
 	
 

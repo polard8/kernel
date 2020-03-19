@@ -1,0 +1,18 @@
+    bin/
+         binários . talvez deletar essa pasta
+
+    docs/
+    licenses/
+
+    gramado/
+        ntos. 
+        a camada baixa do opearacional básico, 
+        sem aplicativos frescos.
+
+    scripts/
+
+    animal/
+        windows. 
+        a camada superior do sistema operacional. 
+        aplicativos frescos.
+

@@ -1,1 +1,2 @@
-#define	sysname	"where I am"
+#define  sysname  "where I am"  
+
