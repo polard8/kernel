@@ -2,7 +2,11 @@
  * File: parser.h
  */
  
-//#test 
+
+// #test
+//#define gramc_skip_blanks(p)     {while (*(p) == ' ') { (p)++; }}
+//#define gramc_skip_nonblanks(p)  {while (*(p) && *(p) != ' ') { (p)++; }}
+
 
 //Espiada, olhadinha.
 int peekSymbol;

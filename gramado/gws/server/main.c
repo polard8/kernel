@@ -601,12 +601,14 @@ int main (int argc, char **argv){
     // #test
     // Nesse test, s2 usará socket para se conectar
     // AF_GRAMADO.
-    
-    gde_clone_and_execute ("gwst.bin");
-    //gde_clone_and_execute ("s2.bin"); 
-    //gde_clone_and_execute ("iliinit.bin");        
+
+
+    gde_clone_and_execute ("gwst.bin");  
+    //gde_clone_and_execute ("s2.bin");  
+    //gde_clone_and_execute ("iliinit.bin");  
     // ...
-    
+
+ 
     printf ("gws: * yield \n");
 
     for (i=0; i<11; i++)
