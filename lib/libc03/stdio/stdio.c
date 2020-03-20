@@ -4091,9 +4091,16 @@ void setlinebuf (FILE *stream)
 }
 
 
-
+//The setvbuf() function may be used on any open stream to change its buffer.
+//If the argument buf is NULL, only the mode is affected; 
+//a new buffer will be allocated on the next read or write operation. 
 // See: https://linux.die.net/man/3/setvbuf
+
 int setvbuf (FILE *stream, char *buf, int mode, size_t size){
+
+    if (size <= 0)
+        return (-1);
+
 
     // #bugbug
     // Esse tratamanto de bits pode estar errado.
@@ -4106,29 +4113,57 @@ int setvbuf (FILE *stream, char *buf, int mode, size_t size){
         //errno = EINVAL;
         return -1;
     }
-    stream->_flags = mode;
 
 
+    /*
+    if (mode == _IONBF)
+    {
+        // Nesse caso. 
+        // Limpa a estrutura e buffer nulo.
+    }
+    */
+
+    // #todo size limits.
+
+
+    //if (mode == _IOFBF || mode == _IOLBF){
+
+
+    // Valid buffer.
     // Se foi passado um buffer válido.
-    if (buf) {
-
+    if ( (void *) buf != NULL ){
         debug_print ("setvbuf: using new buffer \n");
         stream->_base = (char *) buf;
         stream->_lbfsize = size;
-    
-    // Não passaram um buffer válido.
-    // Vmaos usar o default.
-    } else {
+    } 
 
+    // Invalid buffer.    
+    // Nenhum buffer foi passado.
+    // Devemos criar um. Vamos usar o default.
+    if ( (void *) buf == NULL ){
         debug_print ("setvbuf: using default buffer \n");
         stream->_base = (char *) stream->default_buffer;
         stream->_lbfsize = BUFSIZ;
-    };
-    
+    }
+
+    //}
+
+
+
+    // #bugbug
+    // E se nesse momento ainda temos um ponteiro nulo para buffer?
+
+    // r/w pointers and offsets.
     stream->_p = stream->_base;
     stream->_w = 0;
     stream->_r = 0;
     
+    // Unset any buffering flag
+    //stream->_flags &= ~(_IOFBF | _IOLBF | _IONBF);
+
+    // And set what the user requested
+    stream->_flags |= mode;
+
     return 0;
 }
 
