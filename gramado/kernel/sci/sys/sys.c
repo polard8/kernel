@@ -251,6 +251,80 @@ int permission (file *f)
 }
 */
 
+// File read.
+// It's called by sys_read.
+// COpia à partir do início do arquivo.
+int file_read_buffer ( file *f, char *buffer, int len ){
+
+    char *p;
+
+  
+    p = buffer;
+
+    // Check file
+    if ( (void *) f == NULL ){
+        printf ("file_read_buffer: file\n");
+        goto fail;
+    }
+
+    // Check buffer
+    if ( (void *) p == NULL ){
+        printf ("file_read_buffer: p\n");
+        goto fail;
+    }
+
+    //
+    // Copy!
+    //
+    
+    memcpy ( (void *) buffer, (const void *) f->_base, len ); 
+    return (int) len;
+
+fail:
+    refresh_screen ();
+    return EOF;
+}
+
+
+/*
+ * file_write: 
+ *     Escreve no arquivo uma certa quantidade de caracteres de uma 
+ *     dada string.
+ */
+// Escreve no arquivo uma certa quantidade de caracteres de uma dada string 
+
+// It's called by sys_write.
+int file_write_buffer ( file *f, char *string, int len ){
+
+    char *p;
+
+    p = string;
+
+  
+    if ( (void *) f == NULL ){
+        printf ("file_write_buffer: file\n");
+        goto fail;
+    }
+
+    if ( (void *) p == NULL ){
+        printf ("file_write_buffer: p\n");
+        goto fail;
+    }
+
+    //
+    // Copy!
+    //
+
+    memcpy ( (void *) f->_base, (const void *) string, len ); 
+    return len;
+    
+fail:
+    refresh_screen ();
+    return EOF;
+}
+
+
+
 
 /*
  ************************************
@@ -446,7 +520,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         {
             // OUT:
             // > 0 or EOF.
-            nbytes = (int) file_read ( (file *) __file, 
+            nbytes = (int) file_read_buffer ( (file *) __file, 
                               (char *) ubuf, (int) count );
         
             // Se lemos alguma coisa:
@@ -526,7 +600,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
     if ( __file->_flags & __SRD )
     {     
-        nbytes = (int) file_read ( (file *) __file, 
+        nbytes = (int) file_read_buffer ( (file *) __file, 
                            (char *) ubuf, (int) count );
 
         // ok to write.
@@ -701,7 +775,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
             //current_process, __file->_file );
         //refresh_screen();
                  
-        nbytes = (int) file_write ( (file *) __file, 
+        nbytes = (int) file_write_buffer ( (file *) __file, 
                            (char *) ubuf, (int) count );
                             
         // #debug
@@ -753,7 +827,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
               
             //memcpy( (void *) fa->_base, (const void *) __file->_base, (size_t) ncopy );
          
-            nbytes = (int) file_write ( (file *) __file2, 
+            nbytes = (int) file_write_buffer ( (file *) __file2, 
                                (char *) ubuf, (int) ncopy );
                                
             
@@ -812,7 +886,7 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     //if (fp->_flags & __SWR)
         
     // Normal file.
-    nbytes = (int) file_write ( (file *) __file, 
+    nbytes = (int) file_write_buffer ( (file *) __file, 
                        (char *) ubuf, (int) count );
     
     // Avisa que o arquivo não está mais no modo escrita,

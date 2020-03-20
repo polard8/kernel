@@ -34,15 +34,6 @@
 typedef int pid_t;
 
 
-
-
-// Escreve no arquivo uma certa quantidade de caracteres de uma dada string 
-int file_write ( file *f, char *string, int len );
-int file_read ( file *f, char *buffer, int len );
-
-
-
-
 //#todo
 //https://www.mkssoftware.com/docs/man3/pathconf.3.asp
 long fpathconf (int fildes, int name);

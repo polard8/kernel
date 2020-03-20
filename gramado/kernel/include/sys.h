@@ -18,21 +18,25 @@ int sys_open ( const char *pathname, int flags, mode_t mode );
 int sys_close ( int fd );
 
 
+//
+// read and write
+//
 
+// helper functions for 18 and 19.
+int file_read_buffer ( file *f, char *buffer, int len );
+int file_write_buffer ( file *f, char *string, int len );
 
-
-// 289
-int sys_serial_debug_printk ( char *s );
-
-
-// 18
+// 18 and 19
 int sys_read (unsigned int fd,char *ubuf,int count);
-
-
-// 19
 int sys_write (unsigned int fd,char *ubuf,int count);
 
 
+//
+// debug.
+//
+
+// 289
+int sys_serial_debug_printk ( char *s );
 
 
 
