@@ -529,12 +529,11 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             // #todo: Acordar quem espera para escrever.
 
             if (nbytes > 0){
-                __file->socket_buffer_full = 0;
-                __file->_flags |= __SWR;
-                
                 // #debug
                 // printf ("read ok. %d bytes \n",nbytes);
-                
+
+                __file->socket_buffer_full = 0;
+                __file->_flags |= __SWR;
                 return (int) nbytes;
             }
 
@@ -552,10 +551,8 @@ int sys_read (unsigned int fd, char *ubuf, int count){
                 
                 do_thread_waiting (current_thread);
                 __file->tid_waiting = current_thread;
-             
+                __file->_flags |= __SWR;  //pode escrever      
                 scheduler();
-                 
-                __file->_flags |= __SWR;  //pode escrever
                 return 0;
             }
         } // if it's full.
@@ -572,11 +569,12 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         {    
             //#debug
             //printf ("thread %d is waiting now \n", current_thread);
-            
+            //refresh_screen();
+
             do_thread_waiting (current_thread);
-            __file->tid_waiting = current_thread; 
+            __file->tid_waiting = current_thread;
+            __file->_flags |= __SWR;  //pode escrever.
             scheduler();
-            __file->_flags |= __SWR;  //pode escrever.  
             return 0;
         }  // if it's not full.
 
@@ -605,7 +603,6 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
         // ok to write.
         __file->_flags = __SWR;
-
         return nbytes;
     }
 
@@ -704,7 +701,6 @@ int sys_write (unsigned int fd,char *ubuf,int count){
 
     if ( (void *) __P == NULL ){
         debug_print ("sys_write: __P\n");
-        
         //printf ("sys_write: __P\n");
         goto fail;
     }
@@ -718,7 +714,6 @@ int sys_write (unsigned int fd,char *ubuf,int count){
     
     if ( (void *) __file == NULL ){
         debug_print ("sys_write: __file not open\n");
-        
         //printf ("sys_write: __file not open\n");
         goto fail;
     }
@@ -793,7 +788,6 @@ int sys_write (unsigned int fd,char *ubuf,int count){
         // na criação da estrutura de socket.
         if ( (void *) s1->conn == NULL){ 
             debug_print("sys_write: s1->conn fail. No connection\n");
-            
             //printf("sys_write: s1->conn fail. No connection\n");  //for real machine;
             goto fail;
         }    
@@ -802,7 +796,6 @@ int sys_write (unsigned int fd,char *ubuf,int count){
          
         if ( (void *) s2 == NULL){    
             debug_print("sys_write: s2 fail. No connection\n");
-            
             //printf("sys_write: s2 fail. No connection\n");  //for real machine;
             goto fail;
         }    
@@ -812,7 +805,6 @@ int sys_write (unsigned int fd,char *ubuf,int count){
         
         if ( (void *) __file2 == NULL){
             debug_print ("sys_write: target file fail. __file2\n");
-            
             //printf ("sys_write: target file fail. __file2\n");
             goto fail;
         }  
@@ -912,18 +904,6 @@ fail:
     debug_print("sys_write: fail\n");
     return 0;
 }
-
-
-
-// lseek is just for block devices.
-/*
-//off_t lseek(int fd, off_t offset, int whence);
-int sys_lseek(unsigned int fd,off_t offset, int origin);
-int sys_lseek(unsigned int fd,off_t offset, int origin)
-{
-    return -1;
-}
-*/
 
 
 /*
