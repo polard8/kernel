@@ -277,12 +277,14 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     // fd.
     if (fd<0 || fd>31){
         debug_print ("sys_read: fd\n");
+        printf ("sys_read: fd\n");
         goto fail;
     }
 
     // count.
     if (count<=0){
         debug_print ("sys_read: count\n");
+        printf ("sys_read: count\n");
         goto fail;
     }
 
@@ -303,7 +305,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         debug_print ("sys_read: invalid ubuf address\n");
         
         // #debug
-        // printf ("sys_read: invalid ubuf address\n"); 
+        printf ("sys_read: invalid ubuf address\n"); 
         goto fail; 
     }
     
@@ -315,7 +317,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         debug_print ("sys_read: __P\n");
         
         // #debug
-        // printf ("sys_read: __P\n");
+        printf ("sys_read: __P\n");
         goto fail; 
     }
 
@@ -326,7 +328,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
     if ( (void *) __file == NULL ){
         debug_print ("sys_read: __file not open\n");
         
-        //printf ("sys_read: __file not open\n");
+        printf ("sys_read: __file not open\n");
         goto fail; 
     }
 
@@ -395,16 +397,15 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         if ( (void *) __P->priv == NULL ){
             debug_print ("sys_read: __P->priv fail\n");
             
-            //printf ("sys_read: __P->priv fail\n");
+            printf ("sys_read: __P->priv fail\n");
             goto fail;
         }
          
         // Pega a estrutura de soquete.
         s = __P->priv;
         if ( (void *) s == NULL){
-            //printf ("sys_read: s fail\n");
-            
             debug_print ("sys_read: s fail\n");
+            printf ("sys_read: s fail\n");
             goto fail;
         }
 
@@ -416,7 +417,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         if ( (void *) s->private_file == NULL ){
             debug_print ("sys_read: s->private_file fail\n");
             
-            //printf ("sys_read: s->private_file fail\n");
+            printf ("sys_read: s->private_file fail\n");
             goto fail;
         }
 
@@ -424,7 +425,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
         if (__file != s->private_file){
             debug_print ("sys_read: __file fail\n");
             
-            //printf ("sys_read: __file fail\n");
+            printf ("sys_read: __file fail\n");
             goto fail;
         }
 
@@ -443,6 +444,8 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
         if (__file->socket_buffer_full == 1)
         {
+            // OUT:
+            // > 0 or EOF.
             nbytes = (int) file_read ( (file *) __file, 
                               (char *) ubuf, (int) count );
         
@@ -466,7 +469,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             // + reescalonamos as threads e
             // + sinalizamos que podem escrever no arquivo.
 
-            if (nbytes == 0){
+            if (nbytes <= 0){
              
                 // #debug
                 //printf ("sys_read: The thread %d is waiting now \n", 
@@ -481,9 +484,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
                 __file->_flags |= __SWR;  //pode escrever
                 return 0;
             }
-
-            panic ("sys_read: read socket full fail");
-        }
+        } // if it's full.
          
          
         // Se, no caso de socket, o buffer está vazio:
@@ -503,10 +504,9 @@ int sys_read (unsigned int fd, char *ubuf, int count){
             scheduler();
             __file->_flags |= __SWR;  //pode escrever.  
             return 0;
-        }
+        }  // if it's not full.
 
-        panic ("sys_read: read socket fail");
-        //return 0;
+        panic ("sys_read: unexpected socket_buffer_full value \n");
     }  
 
 
@@ -541,7 +541,7 @@ int sys_read (unsigned int fd, char *ubuf, int count){
 
 fail:
 
-    debug_print("sys_read: fail\n");
+    debug_print ("sys_read: fail\n");
     refresh_screen();
     return 0;
 }
