@@ -9,6 +9,11 @@ all:
 	make -C ./gramc
 	make -C ./reboot
 	make -C ./true
+	make -C ./sum
+	make -C ./showfun
+
+
+
 # ...
 	
 	

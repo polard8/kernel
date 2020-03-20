@@ -28,7 +28,8 @@ int main (int argc, char *argv[] ){
     unsigned char count;
 	unsigned char standard_ascii_max = STANDARD_ASCII_MAX;
 	
-	libc_set_output_mode (LIBC_DRAW_MODE);
+	//libc_set_output_mode (LIBC_DRAW_MODE);
+	
 	printf ("\n");
 	printf ("ASCII.BIN:\n");
 	printf ("Show ascii table ...\n");

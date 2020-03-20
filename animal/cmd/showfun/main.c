@@ -1,52 +1,36 @@
-    /*
+/*
+* C program to Display the Function Names 
+* defined in C Source File
+*/
 
-     * C program to Display the Function Names defined in C Source File
 
-     */
+#include <stdio.h>
+#include <string.h>
 
-    #include <stdio.h>
 
-    #include <string.h>
-
-     
-
-    void check(char *c,int p1, int p2);
-
-    void display(char *c, int p1);
+void check (char *c,int p1, int p2);
+void display (char *c, int p1);
 
      
+void main (int argc, char **argv)
+{
 
-    void main(int argc, char **argv)
+    FILE *fp;
+    char ch[100];
+    char *pos1, *pos2, *pos3;
 
+     
+    fp = fopen(argv[1], "r");
+
+    if (fp == NULL)
     {
+       printf("\nFile unable to open");
+       return;
+    }else
+       printf("\nFile Opened to display function names :\n");
 
-        FILE *fp;
-
-        char ch[100];
-
-        char *pos1, *pos2, *pos3;
-
-     
-
-        fp=fopen(argv[1], "r");
-
-        if (fp == NULL)
-
-        {
-
-            printf("\nFile unable to open");
-
-            return;
-
-        }
-
-        else
-
-            printf("\nFile Opened to display function names :\n");
-
-        while (1)
-
-        {
+    while (1)
+    {
 
             if ((fgets(ch, 100, fp)) != NULL)
 
@@ -77,38 +61,31 @@
                                 check(ch, pos1 - ch, pos2 - ch);
 
                             }
-
                             else    continue;
 
                         }
-
                         else    continue;
 
                     }
-
                     else    continue;
 
                 }
-
                 else    continue;
 
             }
-
             else    break;
 
         }
 
         fclose(fp);
-
-    }
+}
 
      
 
     /* To check if it is a function */
 
-    void check(char *c, int p1, int p2)
-
-    {
+void check(char *c, int p1, int p2)
+{
 
         int i, flag = 0, temp = p1;
 
@@ -147,9 +124,7 @@
                 return;
 
             }
-
             else
-
             {
 
                 flag = 0;
@@ -175,30 +150,21 @@
                         return;
 
                      }
-
                      else
-
                          return;
 
               }
 
         }
+}
 
-    }
+/* To display function name */
+void display(char *c,int p1)
+{
 
-     
+   int temp = p1, i;
 
-    /* To display function name */
-
-    void display(char *c,int p1)
-
-    {
-
-        int temp = p1, i;
-
-     
-
-        while (c[--temp] != ' ');
+    while (c[--temp] != ' ');
 
         for (i = temp + 1; i < p1; i++)            /* Print name of function character by character */
 
@@ -207,7 +173,8 @@
         printf("\n");
 
         return;
+}
 
-     
 
-    }
+
+

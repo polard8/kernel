@@ -1,27 +1,48 @@
+// echo for Animal.
 
 
 #include <stdio.h>
 
 
 
-int main ( int argc, char *argv[] )
-{
-	register int i, nflg;
+int main ( int argc, char *argv[] ){
 
-	nflg = 0;
-	if(argc > 1 && argv[1][0] == '-' && argv[1][1] == 'n') {
-		nflg++;
-		argc--;
-		argv++;
-	}
-	for(i=1; i<argc; i++) {
-		fputs(argv[i], stdout);
-		if (i < argc-1)
-			putchar(' ');
-	}
-	if(nflg == 0)
-		putchar('\n');
-	exit(0);
+    register int i, start, nflg;
+
+    start = 1;
+    nflg = 0;
+
+    // echo -n 
+    // NO new line.
+    if ( argc > 1 && 
+         argv[1][0] == '-' && 
+         argv[1][1] == 'n')
+    {
+        start++;
+        nflg++;
+        argc--;
+        //argv++;
+    }
+
+
+    for (i=start; i<argc; i++)
+    {
+        fputs (argv[i], stdout);
+
+        if (i < argc-1)
+            putchar(' ');
+    }
+
+    // new line and flush
+    if (nflg == 0){
+        putchar('\n');
+    
+    // just flush.
+    }else{
+        fflush(stdout);
+    };
+
+    exit(0);
 }
 
 
