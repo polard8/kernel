@@ -78,18 +78,27 @@ int network_status;
 int notification_status; 
 
 
-// ??
-file *network__stream;
+// Usado por esse módulo.
+file *____network_file;
 
 
 
+/*
+ * network_procedure:
+ *     Dialog.
+ * 
+ */
+ 
 // Dialog with this module.
+
 unsigned long 
-network_procedure ( struct window_d *window,
-                    int msg,
-                    unsigned long long1,
-                    unsigned long long2 )
+network_procedure ( 
+    struct window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 )
 {
+
     struct process_d *__process;
 
 	//printf ("network_procedure:\n");
@@ -101,44 +110,65 @@ network_procedure ( struct window_d *window,
 	//Testar a validade dos ponteiros.
 
     __process = (struct process_d *) processList[current_process];
+
+    if ( (void *) __process == NULL )
+        return 0;
+
     
     switch (msg)
     {
-		//o processo em ring3 envia a stream para mensagens de texto
-		//nesse momento vamos habilitar a notifica��o de processos.
-		//>long1 tem o descritor na lista de arquivos abertos do processo.
-		case 1000:
-	        network__stream = (file *) __process->Objects[long1];
-		    notification_status = 1;
-		    if ( notification_status != 1 ){ break; }		     
-		    if ( (void *) network__stream == NULL )
-		    { printf("network_procedure: stream fail"); break; }
+
+        // 1000 - Notification ?
+        // O processo em ring3 envia a stream para mensagens de texto.
+        // Nesse momento vamos habilitar a notificação de processos.
+        // IN: long1 tem o descritor na lista de arquivos 
+        // abertos do processo.
+        case 1000:
+            notification_status = 1;
+            if ( notification_status != 1 ){ break; }
+ 
+            // #todo:
+            // Pra que esse arquivo vai ser usado mesmo ?
+            ____network_file = (file *) __process->Objects[long1];
+              
+            if ( (void *) ____network_file == NULL ){ 
+                printf ("network_procedure: ____network_file fail\n"); 
+                refresh_screen();
+                break; 
+            }
+            // Mensagem.
            __process->control->window = NULL;
-           __process->control->msg = (int) MSG_AF_INET;          //temos uma mensagem. 
+           __process->control->msg = (int) MSG_AF_INET;      //temos uma mensagem. 
            __process->control->long1 = (unsigned long) 0;    //0;
            __process->control->long2 = (unsigned long) 0;    //0;
            __process->control->newmessageFlag = 1;
+            
             // pty_send_message_to_thread ( (unsigned long) msg_buffer, (int) t->tid );  
             //network_status = ; //apto a
-		   break;
-		
-		//>long1 tem o descritor na lista de arquivos abertos do processo.
-		case 2000:
-		    network__stream = (file *) __process->Objects[long1]; 
-		    notification_status = 1;
-		    if ( notification_status != 1 ){ break; }		    
-		    if ( (void *) network__stream == NULL )
-		    { printf("network_procedure: stream fail"); break;   }
-		    
-		    ftell (network__stream);
-		    sprintf( (char *) network__stream->_base, "Hello friend!\n");
-		    //memcpy ( (void *), (const void *), (size_t) );
+            break;
+
+        //>long1 tem o descritor na lista de arquivos abertos do processo.
+        case 2000:
+            notification_status = 1;
+            if ( notification_status != 1 ){ break; }
+            
+            ____network_file = (file *) __process->Objects[long1]; 
+            if ( (void *) ____network_file == NULL ){ 
+                printf ("network_procedure: ____network_file fail\n"); 
+                refresh_screen();
+                break;   
+            }
+
+            ftell (____network_file);
+            sprintf( (char *) ____network_file->_base, "Hello friend!\n");
+            //memcpy ( (void *), (const void *), (size_t) );
+
            __process->control->window = NULL;
-           __process->control->msg = (int) MSG_NET_DATA_IN ;  //temos uma mensagem. 
-           __process->control->long1 = (unsigned long) network__stream;    //stream;
-           __process->control->long2 = (unsigned long) network__stream;    //stream;
+           __process->control->msg = (int) MSG_NET_DATA_IN;  //temos uma mensagem. 
+           __process->control->long1 = (unsigned long) long1;  
+           __process->control->long2 = (unsigned long) long2;  
            __process->control->newmessageFlag = 1;
-		    break;
+           break;
 
 		//send ARP packet
 		//O processo controi um pacote e envia o buffer em long1.
@@ -161,34 +191,41 @@ network_procedure ( struct window_d *window,
 		//notificando o processo atual de que recebemos um ipv4
 		////notificando ...(ok funcionou.)
 		//reaproveitando um soquete se a conec��o est� estabelecida.
-		case 3000:
-		    if ( notification_status != 1 ){ break; }
-		    //network__stream = (FILE *) __process->Streams[long1]; 
-		    if ( (void *) network__stream == NULL )
-		    { printf("network_procedure: stream fail"); break;   }
+        case 3000:
+            if ( notification_status != 1 ){ break; }
 
-		    ftell (network__stream); //network__stream->_p = network__stream->_base;
-		    //rewind(network__stream); //network__stream->_p = network__stream->_base;
-		    
-		    sprintf( (char *) network__stream->_base, "Hello process. We've got your ipv4 packet!\n");
-		    //memcpy ( (void *), (const void *), (size_t) );
-           __process->control->window = NULL;
-           __process->control->msg = (int) MSG_NETWORK_NOTIFY_PROCESS;  // 
-           __process->control->long1 = (unsigned long) network__stream;    //stream;
-           __process->control->long2 = (unsigned long) network__stream;    //stream;
-           __process->control->newmessageFlag = 1;
-		    break;
-		    
-		    
+            ____network_file = (file *) __process->Objects[long1]; 
+            if ( (void *) ____network_file == NULL ){ 
+                printf ("network_procedure: ____network_file fail\n"); 
+                refresh_screen();
+                break;   
+            }
+
+            ftell (____network_file); 
+            //rewind(____network_file); 
+
+            sprintf( (char *) ____network_file->_base, 
+                "Hello process. We've got your ipv4 packet!\n");
+            //memcpy ( (void *), (const void *), (size_t) );
+            __process->control->window = NULL;
+            __process->control->msg = (int) MSG_NETWORK_NOTIFY_PROCESS;   
+            __process->control->long1 = (unsigned long) long1; 
+            __process->control->long2 = (unsigned long) long2; 
+            __process->control->newmessageFlag = 1;
+            break;
+
+   
 		//#todo    
 		// notificando o app em ring3 que ele tem dados em 
 		// seu buffer previamente configurado por ele.
 		// MSG_ = 1444
-		case 4000:
-		    break;
-		//...
+        case 4000:
+            break;
+
+        //...
     } 
-    
+
+
 	//printf ("network_procedure: done\n");
 	//refresh_screen();
     return (unsigned long ) 0;
@@ -1304,9 +1341,9 @@ network_driver_dialog (
 
     switch (msg)
     {
-        case 0:
-            return 1;
-            break;
+        //case 0:
+            //return 1;
+            //break;
 
         // >>>> buffer full.
         case 8000:
@@ -1386,7 +1423,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
     eh = (void *) buffer_address;
 
     if ( (void *) eh == NULL ){
-        printf ("network_decode_buffer: eh");
+        printf ("network_decode_buffer: eh\n");
+        refresh_screen();
         return 1;
 
     }else{
@@ -1403,6 +1441,11 @@ int network_decode_buffer ( unsigned long buffer_address ){
     };
 
 
+    // #importante
+    // Provavelmente o buffer seja enviado para um
+    // servidor de protocolos.
+    // Um servidor só para todos os protocolos.
+
     uint16_t type = FromNetByteOrder16(eh->type);
     
     switch ( (uint16_t) type)
@@ -1416,8 +1459,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
         case 0x0800:
            
            // #debug
-            printf ("IPV4 received\n");
-            refresh_screen ();
+            //printf ("IPV4 received\n");
+            //refresh_screen ();
            
            //#test
            //notificando ...(ok funcionou.)
@@ -1438,8 +1481,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
         case 0x0806:
         
             // #debug
-            printf ("ARP received\n");
-            refresh_screen ();
+            //printf ("ARP received\n");
+            //refresh_screen ();
                    
             //printf("\nARP ");
             do_arp ((unsigned long) buffer_address );
@@ -1452,8 +1495,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
         case 0x86DD:
 
             // #debug
-            printf ("IPV6 received\n");
-            refresh_screen ();
+            //printf ("IPV6 received\n");
+            //refresh_screen ();
         
             //printf ("IPv6 ");
             do_ipv6 ( (unsigned long) buffer_address );
@@ -1466,8 +1509,8 @@ int network_decode_buffer ( unsigned long buffer_address ){
         default:
 
             // #debug
-            printf ("UNKNOWN received\n");
-            refresh_screen ();
+            //printf ("UNKNOWN received\n");
+            //refresh_screen ();
 
             // #debug
             //printf("default ethernet type\n");
@@ -1508,12 +1551,12 @@ int do_arp ( unsigned long buffer ){
 
     struct ether_header *eh;
     struct ether_arp *arp_h;
-    int i;
+    
+    int i=0;
+
 
    //debug
    // printf ("do_arp: \n");
-
-
 
     eh = (struct ether_header *) (buffer + 0);
     arp_h = (struct ether_arp *) (buffer + 14);
@@ -1523,7 +1566,11 @@ int do_arp ( unsigned long buffer ){
     //printf("todo: Address Resolution Protocol (ARP) ");
   
     if ((void *) arp_h == NULL)
+    {
+        
         return 1;
+    }
+
 
     // Recebemos um reply.
     // N�o faremos nada por enquanto.
@@ -1605,6 +1652,7 @@ int do_arp ( unsigned long buffer ){
 		//reenvia os mesmos dados, mas modificados para replay.
 		//essa rotina vai copiar de um buffer para outro.
         //printf ("\n Sending ARP reply ...\n");
+        //refresh_screen();
 
         E1000Send ( (void *) currentNIC, 
             (uint32_t) arp_tx_len, 
