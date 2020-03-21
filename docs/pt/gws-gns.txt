@@ -1,0 +1,15 @@
+gws e gns
+
+---
+
+O win32 é o ambiente principal do nt. A atribuição principal dele é agir como o x window server, oferencendo input de teclado, input de mouse e output na tela. Somado a isso ele inicializa os outros ambientes e distribui os aplicativos,cada um em seu respectivo ambiente. Alem de outras coisas, mas basicamente é um X.
+
+---
+
+O ambiente principal do gramado será o gws, (gramado window server). Ele vai se inspirar no x e no win32.
+
+---
+
+Para combinar com o nome gws eu vou criar o servidor gns, (gramado network server), que servirá arquivos e aplicações para a rede.
+
+Provavelmente ele chamará um servidor de protocolos como helper.
