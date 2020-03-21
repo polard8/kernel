@@ -1265,19 +1265,27 @@ SendARP ( uint8_t source_ip[4],
  *     Dialog for the network driver.
  */
 
-// #bugbug
-// Estamos chamando isso de server, ent�o essas rotinas precisam ir para
-// par a pasta kservers?
+// Essa rotina é chamada depois que o handler obtem 
+// o endereço do buffer.
+
+// IN:
+// window = NULL.
+// msg    = msg.
+// long1  = buffer address.
+// long1  = buffer address.
 
 unsigned long 
-network_driver_dialog ( struct window_d *window, 
-                        int msg, 
-                        unsigned long long1, 
-                        unsigned long long2 ) 
+network_driver_dialog ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 ) 
 {
-	
+
 	// #debug
+    debug_print ("network_driver_dialog:\n");
     //printf ("network_driver_dialog:\n");
+
 
 	// Vamos tratar as mensagens recebidas. Entre elas:
 	// MSG_BUFFERFULL  - (O buffer est� cheio)
@@ -1294,17 +1302,17 @@ network_driver_dialog ( struct window_d *window,
     //int i;
 
 
-
-
     switch (msg)
     {
         case 0:
             return 1;
             break;
 
-        // buffer full.
+        // >>>> buffer full.
         case 8000:
+            debug_print ("network_driver_dialog: 8000. buffer full\n");
             //printf ("buffer=%x\n", long1);
+            // IN: buffer address.
             return (unsigned long) network_decode_buffer ( (unsigned long) long1 );
             break;
 
@@ -1333,17 +1341,36 @@ network_driver_dialog ( struct window_d *window,
 }
 
 
+
+/*
+ * network_decode_buffer:
+ *     Decode the buffer and call routines for each protocol.
+ */
+
+// Essa rotina é chamada por network_driver_dialog
+// para decodificar o que tem dentro do buffer.
+// Ela deve chamar as rotinas de protocolo apropriadas.
+
+ 
 // O que tem no buffer?
-//decodificando o protocolo encontrado no buffer.
-//vamos sondar o ethernet header para percebermos o tipo
-//e redirecionarmos para a rotina apropriada.
+// Decodificando o protocolo encontrado no buffer.
+
+// #importante:
+// Vamos sondar o ethernet header para percebermos o tipo
+// e redirecionarmos para a rotina apropriada.
+
+
 int network_decode_buffer ( unsigned long buffer_address ){
 
     //#debug
+    debug_print ("network_decode_buffer:\n");
     //printf ("network_decode_buffer:\n");
 
-    struct ether_header *eh;
+    //
+    // Only the ethernet header.
+    //
 
+    struct ether_header *eh;
 
     if ( buffer_address == 0 ){
         printf ("network_decode_buffer: buffer\n");
@@ -1388,6 +1415,10 @@ int network_decode_buffer ( unsigned long buffer_address ){
 		//de que recebemos um pacote ipv4
         case 0x0800:
            
+           // #debug
+            printf ("IPV4 received\n");
+            refresh_screen ();
+           
            //#test
            //notificando ...(ok funcionou.)
            network_procedure ( NULL, 3000, 0,0 ); 
@@ -1405,6 +1436,11 @@ int network_decode_buffer ( unsigned long buffer_address ){
 		//#todo: devemos chamar uma rotina para tratamento de ARP e n�o
 		//fazermos tudo aqui. kkk.
         case 0x0806:
+        
+            // #debug
+            printf ("ARP received\n");
+            refresh_screen ();
+                   
             //printf("\nARP ");
             do_arp ((unsigned long) buffer_address );
             //refresh_screen ();
@@ -1414,6 +1450,11 @@ int network_decode_buffer ( unsigned long buffer_address ){
 		//::: IPV6
 		//0x86DD	Internet Protocol Version 6 (IPv6)
         case 0x86DD:
+
+            // #debug
+            printf ("IPV6 received\n");
+            refresh_screen ();
+        
             //printf ("IPv6 ");
             do_ipv6 ( (unsigned long) buffer_address );
             //refresh_screen ();
@@ -1423,6 +1464,11 @@ int network_decode_buffer ( unsigned long buffer_address ){
 		//::: DEFAULT
         // Error: Default package type.
         default:
+
+            // #debug
+            printf ("UNKNOWN received\n");
+            refresh_screen ();
+
             // #debug
             //printf("default ethernet type\n");
             //refresh_screen();

@@ -77,14 +77,15 @@ PCIRegisterIRQHandler ( uint16_t bus,
 // 8086:100e
 // 82540EM Gigabit Ethernet Controller
 
-
 int 
-e1000_init_nic ( unsigned char bus, 
-                 unsigned char dev, 
-                 unsigned char fun, 
-                 struct pci_device_d *pci_device )
+e1000_init_nic ( 
+    unsigned char bus, 
+    unsigned char dev, 
+    unsigned char fun, 
+    struct pci_device_d *pci_device )
 {
-	//pci info.
+
+    // pci info.
     uint32_t data;
 
     unsigned long phy_address;
@@ -99,7 +100,6 @@ e1000_init_nic ( unsigned char bus,
 
 	//#importante
 	//devemos falhar antes de alocarmos memória para a estrutura.
-
 
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
 
@@ -131,13 +131,12 @@ e1000_init_nic ( unsigned char bus,
 	//
 
 
-	//pci device struct
-	//passado via argumento. 
+	// pci device struct
+	// passado via argumento. 
 
-    if ( (void *) pci_device ==  NULL )
-    {
-
+    if ( (void *) pci_device ==  NULL ){
         panic ("e1000_init_nic: pci_device\n");
+
     }else{
 
         pci_device->used = 1;
@@ -164,11 +163,11 @@ e1000_init_nic ( unsigned char bus,
 		// +usar if else.
 		// já fizemos essa checagem antes.
 
-		if ( pci_device->Vendor != 0x8086 || 
-		     pci_device->Device != 0x100E )
-		{
-			panic ("e1000_init_nic: 82540EM not found\n");
-		}
+        if ( pci_device->Vendor != 0x8086 || 
+             pci_device->Device != 0x100E )
+        {
+            panic ("e1000_init_nic: 82540EM not found\n");
+        }
 
 
 		//
@@ -237,12 +236,12 @@ e1000_init_nic ( unsigned char bus,
 	// #todo: 
 	// Checar essa estrutura.
 
-	currentNIC = (void *) kmalloc ( sizeof( struct intel_nic_info_d ) );
-	
-	if ( (void *) currentNIC ==  NULL )
-	{
-		panic ("e1000_init_nic: currentNIC struct\n");
-	} else {
+    currentNIC = (void *) kmalloc ( sizeof( struct intel_nic_info_d ) );
+
+    if ( (void *) currentNIC ==  NULL ){
+        panic ("e1000_init_nic: currentNIC struct\n");
+
+    } else {
 
 
 		currentNIC->used = 1;
@@ -355,15 +354,16 @@ e1000_init_nic ( unsigned char bus,
                        (unsigned char) fun, 
                        (unsigned char) 0x04 );
 
-	if ( (cmd & 0x04) != 0x04 ) 
-	{
-		cmd |= 0x04;
+
+    if ( (cmd & 0x04) != 0x04 ) 
+    {
+        cmd |= 0x04;
 
         // ??
 		//(bus, slot, func, PCI_COMMAND, cmd);
 		diskWritePCIConfigAddr ( (int) bus, (int) dev, (int) fun, 
 			(int) 0x04, (int) cmd ); 
-	};
+    }
 
 
     printf ("Done\n");
@@ -392,22 +392,20 @@ e1000_init_nic ( unsigned char bus,
 
 void xxxe1000handler (void){
 
-	//Structs.
-
     struct ipv6_header_d *ipv6_h;
     struct ether_header *eh;
     struct ether_arp *arp_h;
 
-    int i;
-
+    int i=0;
 
 
     //
-    // profiler
+    // Profiler
     //
     
 	// Contando as interrupções desse tipo.
-	g_profiler_ints_irq9++;	
+    g_profiler_ints_irq9++;
+
 
 	// #importante:
 	// #flag 
@@ -417,14 +415,12 @@ void xxxe1000handler (void){
     //printf ("xxxe1000handler: ");
     //refresh_screen();
 
-	if ( e1000_interrupt_flag != 1 )
-	{
-		//#debug
+    if ( e1000_interrupt_flag != 1 ){
         printf ("xxxe1000handler: locked\n");
         refresh_screen();
         return;
 
-	}else{
+    }else{
 
 		//#debug
         //printf ("xxxe1000handler: unlocked\n");
@@ -433,15 +429,13 @@ void xxxe1000handler (void){
 
 
 
-	//intel.h
-	e1000_irq_count++;
+	// See: intel.h
+    e1000_irq_count++;
 
     //#test
-    if ( (void *) currentNIC != NULL )
-    {
+    if ( (void *) currentNIC != NULL ){
         currentNIC->interrupt_count++;
     }
-
 
 
 	// #debug
@@ -450,51 +444,54 @@ void xxxe1000handler (void){
 
 
 	// Without this, the card may spam interrupts...
-	E1000WriteCommand ( currentNIC, 0xD0, 1);
+    E1000WriteCommand ( currentNIC, 0xD0, 1);
 
 
-	//status
-	uint32_t status = E1000ReadCommand ( currentNIC, 0xC0 ); 
+    // status
+    uint32_t status = E1000ReadCommand ( currentNIC, 0xC0 ); 
 
-	// Linkup
-	if (status & 0x04) 
-	{
+    // 0x04 - Linkup
+    if (status & 0x04) 
+    {
 		uint32_t val = E1000ReadCommand ( currentNIC, 0 );
-		
 		E1000WriteCommand ( currentNIC, 0, val | 0x40 );
-		
 		return;
-	
-	} else if (status & 0x80){
-		
-	    //printf("xxxe1000handler: handler for NIC e1000");
-		//printf("e1000 handler ");
-	    //refresh_screen();
-		
-		
-		while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
-		{
-			uint16_t old = currentNIC->rx_cur;
-			uint32_t len = currentNIC->legacy_rx_descs[old].length;
-			
+
+    // 0x80 - ?
+    } else if (status & 0x80){
+        //printf("xxxe1000handler: handler for NIC e1000");
+        //printf("e1000 handler ");
+        //refresh_screen();
+
+
+        // Todos os buffers de recebimento.
+        // Olhamos um bit do status de todos os buffers.
+        while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
+        {
+             uint16_t old = currentNIC->rx_cur;
+             uint32_t len = currentNIC->legacy_rx_descs[old].length;
+
 			// Our Net layer should handle it
 			//NetHandlePacket(dev->ndev, len, (PUInt8)dev->rx_descs_virt[old]);
 
 			//printf(">"); 
 
-			currentNIC->legacy_rx_descs[old].status = 0;
-			currentNIC->rx_cur = (currentNIC->rx_cur + 1) % 32;
+            // zera.
+            currentNIC->legacy_rx_descs[old].status = 0;
+            
+            // circula.
+            currentNIC->rx_cur = (currentNIC->rx_cur + 1) % 32;
 
-			//??
-			E1000WriteCommand ( currentNIC, 0x2818, old );
-		}
+            // ??
+            E1000WriteCommand ( currentNIC, 0x2818, old );
+        };
     };
 
 
 
 
 	//
-	// =================== ## Reagir ## ================================
+	// =============== ## Reagir ## ===========================
 	//
 
 	// #importante
@@ -509,14 +506,12 @@ void xxxe1000handler (void){
     unsigned char *buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
     
 
-
-
     // #importante
     // Agora que temos o buffer podemos enviar para o servidor de rede.
     // Pois o driver do controlador não lida com protocolos.
+    // See: network.c
 
-    //network_server_dialog ( NULL,
-    network_driver_dialog ( NULL, 
+     network_driver_dialog ( NULL, 
         (int) 8000, 
         (unsigned long) &buffer[0],  
         (unsigned long) &buffer[0] ); 
