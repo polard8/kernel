@@ -683,9 +683,24 @@ int close (int fd){
  * pipe:
  *
  */
+ 
 
-// good!
+int pipe2 ( int pipefd[2], int flags )
+{
+    return (int) gramado_system_call ( 247, 
+                     (unsigned long) pipefd, 
+                     (unsigned long) flags, 
+                     (unsigned long) 0 );
+}
 
+
+int pipe (int pipefd[2])
+{
+    return (int) pipe2(pipefd,0);
+}
+
+
+/*
 int pipe ( int pipefd[2] )
 {
     return (int) gramado_system_call ( 247, 
@@ -693,15 +708,7 @@ int pipe ( int pipefd[2] )
                      (unsigned long) pipefd, 
                      (unsigned long) pipefd );
 }
-
-
-/*
-int pipe(int pipefd[2])
-{
-    return pipe2(pipefd, 0);
-}
 */
-
 
 
 long fpathconf (int fildes, int name)

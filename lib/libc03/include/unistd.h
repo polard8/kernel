@@ -213,6 +213,7 @@ long pathconf (const char *pathname, int name);
 int close (int fd);
 
 //POSIX.1-2001, POSIX.1-2008.
+int pipe2 ( int pipefd[2], int flags );
 int pipe ( int pipefd[2] );
 
 
