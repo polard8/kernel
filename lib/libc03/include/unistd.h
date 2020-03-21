@@ -62,18 +62,23 @@ extern int    opterr, optind, optopt;
 
 /* MINIX 3 */
 /* Values used by access().  POSIX Table 2-8. */
-#define F_OK               0	// test if file exists 
-#define X_OK               1	// test if file is executable 
-#define W_OK               2	// test if file is writable 
-#define R_OK               4	// test if file is readable 
+
+#define  F_OK  0  // test if file exists 
+#define  X_OK  1  // test if file is executable 
+#define  W_OK  2  // test if file is writable 
+#define  R_OK  4  // test if file is readable 
 
 
+/* 
+ MINIX 3
+ Values used for whence 
+ in lseek(fd, offset, whence).  POSIX Table 2-9. 
+ */
+ 
+#define  SEEK_SET  0  /* offset is absolute  */
+#define  SEEK_CUR  1  /* offset is relative to current position */
+#define  SEEK_END  2  /* offset is relative to end of file */
 
-/* MINIX 3 */
-/* Values used for whence in lseek(fd, offset, whence).  POSIX Table 2-9. */
-#define SEEK_SET           0	/* offset is absolute  */
-#define SEEK_CUR           1	/* offset is relative to current position */
-#define SEEK_END           2	/* offset is relative to end of file */
 
 //#todo kkk
 /* This value is required by POSIX Table 2-10. */
@@ -81,10 +86,10 @@ extern int    opterr, optind, optopt;
 
 
 /*bsd*/
-#define F_ULOCK		0
-#define F_LOCK		1
-#define F_TLOCK		2
-#define F_TEST		3
+#define  F_ULOCK  0
+#define  F_LOCK   1
+#define  F_TLOCK  2
+#define  F_TEST   3
 
  
 /* MINIX 3 */ 
@@ -212,6 +217,11 @@ long pathconf (const char *pathname, int name);
 //SVr4, 4.3BSD, POSIX.1-2001.
 int close (int fd);
 
+
+//
+// pipe
+//
+
 //POSIX.1-2001, POSIX.1-2008.
 int pipe2 ( int pipefd[2], int flags );
 int pipe ( int pipefd[2] );
@@ -225,6 +235,10 @@ int pipe ( int pipefd[2] );
 
 ssize_t write_ttyList (int fd, const void *buf, size_t count);
 ssize_t read_ttyList (int fd, const void *buf, size_t count);
+
+//
+// tty
+//
 
 
 // tty from open file list.

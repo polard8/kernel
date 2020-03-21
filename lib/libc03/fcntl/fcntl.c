@@ -1,12 +1,16 @@
+/*
+ * File: fcntl.c
+ * 
+ * 2020 - Created by Fred Nora.
+ */
 
 
-
-       #include <stddef.h>
-       #include <types.h>
-       #include <sys/types.h>
-       #include <sys/stat.h>
-       #include <fcntl.h>
-//#include <unistd.h>
+#include <stddef.h>
+#include <types.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+// ...
 
 
 
@@ -20,6 +24,7 @@
 
 int fcntl ( int fd, int cmd, ... )
 {
+    debug_print("fcntl: [TODO]\n");
 
     if (fd<0) {
         return -1;
@@ -172,6 +177,27 @@ int creat (const char *pathname, mode_t mode)
 // lock operation using fcntl()
 int flock (int fd, int operation)
 {
+    debug_print("flock: [TODO]\n");
     return -1;
 }
+
+/*
+// MINIX 3
+int flock(int fd, int mode);
+int flock(int fd, int mode)
+{
+  struct flock lck;
+
+  memset((void *) &lck, 0, sizeof(struct flock));
+  switch (mode & ~LOCK_NB) {
+  case LOCK_SH: lck.l_type = F_RDLCK; break;
+  case LOCK_EX: lck.l_type = F_WRLCK; break;
+  case LOCK_UN: lck.l_type = F_UNLCK; break;
+  default: errno = EINVAL; return -1;
+  }
+  return fcntl(fd, mode & LOCK_NB ? F_SETLK : F_SETLKW, &lck);
+}
+*/
+
+
 

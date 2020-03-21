@@ -37,6 +37,8 @@
 
 
 
+
+
 #define  UNISTD_SYSTEMCALL_FORK     71  
 #define  UNISTD_SYSTEMCALL_EXIT     70
 #define  UNISTD_SYSTEMCALL_GETPID   85
@@ -356,15 +358,16 @@ int setuid ( uid_t uid ){
 }
 
 
-uid_t getuid (void){
-	
-	return (uid_t) gramado_system_call ( 152, 0, 0, 0 );
+uid_t getuid (void)
+{
+    return (uid_t) gramado_system_call ( 152, 0, 0, 0 );
 }
 
 
-uid_t geteuid (void){
-	
-	return -1;
+uid_t geteuid (void)
+{
+    debug_print ("geteuid: [TODO]\n");
+    return -1;
 	//return (uid_t) gramado_system_call ( ?, 0, 0, 0 );
 } 
 
@@ -439,8 +442,9 @@ void sysbeep()
  */
 
 int dup (int oldfd){
-	
-    return (int) gramado_system_call ( (unsigned long) oldfd, 0, 0, 0 );
+
+    return (int) gramado_system_call ( (unsigned long) oldfd, 
+                     0, 0, 0 );
 }
 
 
@@ -452,9 +456,7 @@ int dup (int oldfd){
 int dup2 (int oldfd, int newfd){
 
     return (int) gramado_system_call ( (unsigned long) oldfd, 
-                     (unsigned long) newfd, 
-                     0, 
-                     0 );
+                     (unsigned long) newfd, 0, 0 );
 }
 
 
@@ -472,17 +474,18 @@ int dup3 (int oldfd, int newfd, int flags){
 }
 
 
-
 //see: sys/resource.h
-int getpriority(int which, id_t who)
+int getpriority (int which, id_t who)
 {
-	return -1;
+    debug_print ("getpriority: [TODO]\n");
+    return -1;
 }
 
 //see: sys/resource.h
-int setpriority(int which, id_t who, int prio)
+int setpriority (int which, id_t who, int prio)
 {
-	return -1;
+    debug_print ("setpriority: [TODO]\n");
+    return -1;
 }
 
 
@@ -492,8 +495,12 @@ int setpriority(int which, id_t who, int prio)
  *     Change process priority.
  */
 
+// #todo:
+// It looks very wasy to implement.
+
 int nice (int inc)
 {
+    debug_print ("nice: [TODO]\n");
     return -1;    //#todo
 
     //#todo
@@ -518,9 +525,10 @@ int nice (int inc)
  *
  */
 
-int pause (void){
-	
-	return -1; //#todo
+int pause (void)
+{
+    debug_print ("pause: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -529,9 +537,10 @@ int pause (void){
  *
  */
 
-int mkdir (const char *pathname, mode_t mode){
-	
-	return -1; //#todo
+int mkdir (const char *pathname, mode_t mode)
+{
+    debug_print ("mkdir: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -540,10 +549,11 @@ int mkdir (const char *pathname, mode_t mode){
  *
  */
 
-int rmdir (const char *pathname){
-	
-	return -1; //#todo
-}	
+int rmdir (const char *pathname)
+{
+    debug_print ("rmdir: [TODO]\n");
+    return -1; //#todo
+}
 
 
 /*
@@ -553,15 +563,17 @@ int rmdir (const char *pathname){
 
 //Links a name to a file.
 
-int link (const char *oldpath, const char *newpath){
-	
+int link (const char *oldpath, const char *newpath)
+{
+    debug_print ("link: [TODO]\n");
 	return -1; //#todo
 }
 
 
 //#todo.
-int unlink(const char *pathname)
+int unlink (const char *pathname)
 {
+    debug_print ("unlink: [TODO]\n");
     return (int) (-1);
 }
 
@@ -571,8 +583,9 @@ int unlink(const char *pathname)
  *
  */
 
-int mlock (const void *addr, size_t len){
-	
+int mlock (const void *addr, size_t len)
+{
+    debug_print ("mlock: [TODO]\n");
 	return -1; //#todo
 }
 
@@ -582,9 +595,10 @@ int mlock (const void *addr, size_t len){
  *
  */
 
-int munlock (const void *addr, size_t len){
-	
-	return -1; //#todo
+int munlock (const void *addr, size_t len)
+{
+    debug_print ("munlock: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -593,9 +607,10 @@ int munlock (const void *addr, size_t len){
  *
  */
 
-int mlockall (int flags){
-	
-	return -1; //#todo
+int mlockall (int flags)
+{
+    debug_print ("mlockall: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -604,9 +619,10 @@ int mlockall (int flags){
  *
  */
 
-int munlockall (void){
-	
-	return -1; //#todo
+int munlockall (void)
+{
+    debug_print ("munlockall: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -615,9 +631,10 @@ int munlockall (void){
  *
  */
 
-long sysconf (int name){
-	
-	return -1; //#todo
+long sysconf (int name)
+{
+    debug_print ("sysconf: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -626,9 +643,10 @@ long sysconf (int name){
  *
  */
 
-int fsync (int fd){
-	
-	return -1;    //#todo
+int fsync (int fd)
+{
+    debug_print ("fsync: [TODO]\n");
+    return -1;    //#todo
 }
 
 
@@ -637,9 +655,10 @@ int fsync (int fd){
  *
  */
 
-int fdatasync (int fd){
-	
-	return -1; //#todo
+int fdatasync (int fd)
+{
+    debug_print ("fdatasync: [TODO]\n");
+    return -1; //#todo
 }
 
 
@@ -647,12 +666,14 @@ int fdatasync (int fd){
 // commit buffer cache to disk 
 void sync(void)
 {
+    debug_print ("sync: [TODO]\n");
 	//todo: use syscall!!
 }
 
 // commit buffer cache to disk 
 int syncfs(int fd)
 {
+    debug_print ("syncfs: [TODO]\n");
     return -1;
 }
 
@@ -683,7 +704,6 @@ int close (int fd){
  * pipe:
  *
  */
- 
 
 int pipe2 ( int pipefd[2], int flags )
 {
@@ -700,33 +720,18 @@ int pipe (int pipefd[2])
 }
 
 
-/*
-int pipe ( int pipefd[2] )
-{
-    return (int) gramado_system_call ( 247, 
-                     (unsigned long) pipefd, 
-                     (unsigned long) pipefd, 
-                     (unsigned long) pipefd );
-}
-*/
-
-
 long fpathconf (int fildes, int name)
 {
+    debug_print ("fpathconf: [TODO]\n");
     return -1;
 }
 
 
 long pathconf (const char *pathname, int name)
 {
+    debug_print ("pathconf: [TODO]\n");
     return -1;
 } 
-
-
-//deletar.
-//static char   __libc_hostname[HOST_NAME_MAX];
-//static char   __libc_username[HOST_NAME_MAX];
-
 
 
 
@@ -785,6 +790,26 @@ int sethostname (const char *name, size_t len){
 
 
 /*
+// minix 3
+int __getlogin(char *logname, size_t sz);
+int __getlogin(char *logname, size_t sz)
+{
+  struct passwd *pw_entry;
+
+  pw_entry = getpwuid(getuid());
+
+  if (pw_entry == (struct passwd *)NULL)
+    return 0; 
+    
+  strncpy(logname, pw_entry->pw_name, sz);
+  return sz;
+}
+*/
+
+
+
+
+/*
  * getlogin: 
  * 
  */
@@ -808,12 +833,14 @@ int setlogin (const char *name){
 
     //#todo: pegar retorno da função
     //return (int) 
-	gramado_system_call ( 804, 
-	    (unsigned long) name,
-	    (unsigned long) name,
-	    (unsigned long) name );
-	    
-	return 0; //poderia retornar o size.
+
+    gramado_system_call ( 804, 
+        (unsigned long) name,
+        (unsigned long) name,
+        (unsigned long) name );
+       
+    
+    return 0; //poderia retornar o size.
 }
 
 
@@ -826,16 +853,16 @@ int setlogin (const char *name){
 // #todo
 // usar  setlogin 
  
-int getusername (char *name, size_t len)
-{
-	int __len_ret;
-	
-	if ( len < 0 || len > HOST_NAME_MAX )
-	{
+int getusername (char *name, size_t len){
+
+    int __len_ret;
+
+
+    if ( len < 0 || len > HOST_NAME_MAX )
+    {
 	    printf ("getusername: len\n");
 	    return -1;
-	}
-
+    }
 
 
     //coloca no buffer interno
@@ -850,10 +877,9 @@ int getusername (char *name, size_t len)
 	    return -1;
 	}
 
-	if ( __len_ret > len )
-	{
-		__len_ret = len;
-	}
+    if ( __len_ret > len ){
+        __len_ret = len;
+    }
 
 
     return 0;
@@ -887,8 +913,7 @@ int setusername (const char *name, size_t len){
 
 
     // Tamanho indicado pelo aplicativo.
-    if ( __name_len > len )
-    {
+    if ( __name_len > len ){
         printf ("setusername: len\n");
         return 1;     
     }
@@ -923,28 +948,29 @@ int setusername (const char *name, size_t len){
 // Chamremos o kernel e diremos, coloque o nome aqui nesse buffer.
 //char __ttyname_buffer[64];
 
-char *ttyname(int fd)
-{
-	static char buf[PATH_MAX];
-	int rv;
-	
-	rv = ttyname_r (fd, buf, sizeof(buf));
-	
-	if (rv != 0)
-	{
-		errno = rv;
-		return NULL;
-	}
+char *ttyname (int fd){
 
-	return buf;
+    static char buf[PATH_MAX];
+    int rv=0;
+
+    rv = (int) ttyname_r (fd, buf, sizeof(buf));
+
+    if (rv != 0){
+        errno = rv;
+        return NULL;
+    }
+
+
+    return buf;
 }
 
 
-//POSIX.1-2001, POSIX.1-2008, 4.2BSD.
-//ttyname, ttyname_r - return name of a terminal
+// POSIX.1-2001, POSIX.1-2008, 4.2BSD.
+// ttyname, ttyname_r - return name of a terminal
 int ttyname_r(int fd, char *buf, size_t buflen)
 { 
-	return -1; 
+    debug_print ("ttyname_r: [TODO]\n");
+    return -1; 
 }
 
 
@@ -969,6 +995,7 @@ int isatty (int fd)
     return ( tcgetattr(fd, &t) != -1 ); 
 }
 
+
 /*
 int isatty(int fd)
 {
@@ -980,7 +1007,8 @@ int isatty(int fd)
 
 int getopt (int argc, char * const argv[], const char *optstring)
 {
-	return -1;
+    debug_print ("getopt: [TODO]\n");
+    return -1;
 }
 
 
@@ -1017,18 +1045,19 @@ int stat(const char *path, struct stat *buf)
 */
 
 
-//POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
-unsigned int alarm(unsigned int seconds)
+// POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
+unsigned int alarm (unsigned int seconds)
 {
-	return 0;
+    debug_print ("alarm: [TODO]\n");
+    return -1;
 }
 
 
 
-
-int brk(void *addr)
+int brk (void *addr)
 {
-	return -1;
+    debug_print ("brk: [TODO]\n");
+    return -1;
 }
 
 
@@ -1042,28 +1071,30 @@ void *sbrk(intptr_t increment)
 */
 
 
-
-
 int execvp (const char *file, char *const argv[])
 {
-	return -1;
+    debug_print ("execvep: [TODO]\n");
+    return -1;
     //return = execvpe ( file, argv, environ );
 }
 
 
 int 
-execvpe ( const char *file, 
-          char *const argv[],
-          char *const envp[] )
+execvpe ( 
+    const char *file, 
+    char *const argv[],
+    char *const envp[] )
 {
-	return -1;
+    debug_print ("execvpe: [TODO]\n");
+    return -1;
 }
 
 
 
 int chown(const char *pathname, uid_t owner, gid_t group)
 {
-	return -1; 
+    debug_print ("chown: [TODO]\n");
+    return -1; 
 }
 
 
@@ -1071,15 +1102,17 @@ int chown(const char *pathname, uid_t owner, gid_t group)
 
 int fchown(int fd, uid_t owner, gid_t group)
 {
-	return -1; 
+    debug_print ("fchown: [TODO]\n");
+    return -1; 
 }
 
 
 
 
-int lchown(const char *pathname, uid_t owner, gid_t group)
+int lchown (const char *pathname, uid_t owner, gid_t group)
 {
-	return -1; 
+    debug_print ("lchown: [TODO]\n");
+    return -1; 
 }
 
 
@@ -1087,25 +1120,30 @@ int lchown(const char *pathname, uid_t owner, gid_t group)
 
 int chdir(const char *path)
 {
-	return -1; 
+    debug_print ("chdir: [TODO]\n");
+    return -1; 
 }
 
 
 
 int fchdir(int fd)
 {
-	return -1; 
+    debug_print ("fchdir: [TODO]\n");
+    return -1; 
 }
        
 
-//sleep - sleep for a specified number of seconds
+// sleep - sleep for a specified number of seconds
 unsigned int sleep(unsigned int seconds)
 {
-	return 0;
+    debug_print ("sleep: [TODO]\n");
+    return -1;
 }
 
 
-//todo
+// ??
+// todo
+// exit deveria ser o wrapper para _exit ?
 void _exit (int status)
 {
     //improvisando
@@ -1116,13 +1154,15 @@ void _exit (int status)
 
 void swab_w (const short *from, short *to, ssize_t n)
 {
-	
-	n /= 2;
-	while (--n >= 0) {
-		*to++ = (*from << 8) + ((*from >> 8) & 0377);
-		from++;
-	}
+    n /= 2;
+
+    while (--n >= 0)
+    {
+        *to++ = (*from << 8) + ((*from >> 8) & 0377);
+        from++;
+    };
 }
+
 
 void swab (const void *from, void *to, ssize_t n)
 {
@@ -1134,7 +1174,8 @@ void swab (const void *from, void *to, ssize_t n)
 // #todo
 off_t lseek(int fd, off_t offset, int whence)
 { 
-	return 0;
+    debug_print ("lseek: [TODO]\n");
+    return 0;
 }
 
 
@@ -1146,8 +1187,10 @@ off_t tell(int fildes)
 
 
 
-int access(const char *pathname, int mode)
+int access (const char *pathname, int mode)
 {
+    debug_print ("access: [TODO]\n");
+    
 	// #todo
 	//struct stat foo;
 	//return ( stat(pathname, &foo) );
@@ -1289,7 +1332,7 @@ l:
 
 // pega uma label em uma linha do arquivo
 // para comparar strings;
-int getlin(char s[]){
+int getlin (char s[]){
 
     int ch, i;
 
@@ -1485,7 +1528,7 @@ int umatch(char *s, char *p){
 
 // Compare
 // Not tested yet.
-int compar(char *s1, char *s2){
+int compar (char *s1, char *s2){
 
     int c1, c2;
 
