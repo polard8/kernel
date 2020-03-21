@@ -74,137 +74,6 @@ int TEST_PRINTF(void);
 int TEST_PRINTF2(void);
 int TEST_PRINTF3(void);
 
-void idleLoop();
-void driverInitialize();      // processo sendo considerado um driver servidor.
-void driverUninitialize();    // desinicializa.
-int idleInit();               // processo sendo consideredo cliente.
-unsigned long idleServices(unsigned long number);  //Principal.
-//...
-
-
-
-
-//Another loop.
-void idleLoop(){
-    while(1){}	
-};
-
- 
-
-
-
-
-/*
- * driverInitialize:
- *     O Kernel solicitou a rotina de inicialização do processo Idle na forma 
- * de driver. Faremos uma chamada ao Kernel dizendo que o driver está 
- * inicializado. Na chamada passaremos alguns parâmetros, como: O número do 
- * serviço, 129 e o código de confirmação, 1234. 4321.
- *
- */
-void driverInitialize()
-{
-	//printf("Idle: Initializing driver ...\n");
-
-
-	driverInitialized = 1;	
-	//system_call( 129, 4321, 4321, 4321 );	
-	
-
-	printf("IDLE.BIN: Initialized.\n");
-}
-
-/*
- * driverUninitialize:
- *     This method is called to uninitialize the driver object. In a real 
- * driver, this is where the driver would clean up any resources held by 
- * this driver. (m$)
- */
-void driverUninitialize()
-{
-	//
-	// Dúvidas??
-	// Devemos nos preparar para desinicializar o driver.
-	// Desalocaremos os recursos usadados pelo driver, como memória, 
-	// arquivos abertos ...
-	// Obs: Não sei se atribuição do próprio driver liberar os recursos.
-	// Mas de toda forma, no mínimo devemos avisar o Kernel que os recursos 
-	// não são mais necessários.
-	// @todo: Podemos enviar um comando para o kernel pedindo pra que ele não 
-	// link esse driver ao sistema, ou que deixe ele não inicializado.
-	//
-
-	//printf("Idle: Unitializing driver ...\n");
-
-
-	driverInitialized = 0;	
-	
-	//Faremos uma chamada para o Kernel 'deslinkar' o driver.
-	//talvez 128. 127 126..???
-	//system_call( ?? , 4321, 4321, 4321 ); 		
-
-	printf("IDLE.BIN: Uninitialized.\n");
-}
-
-
-/*
- * idleInit:
- *     Inicializando a aplicação Idle.
- */
-int idleInit()
-{
-	idleStatus = 0;
-	idleError = 0;
-	
-	//printf("Idle: Initializing idle application ..\n");
-
-	//...
-	return 0;
-}
-
-
-/*
- *****************************************************************************
- * idleServices:
- *     Essa função oferece serviços de acordo com o número passado via 
- * argumento.
- * Essa deve ficar por último e ter acesso à qualquer rotina acima ou em
- * bibliotecas incluídas.
- */
-unsigned long idleServices(unsigned long number)
-{
-    // Checar se o driver está inicializado.
-	if(driverInitialized != 1){
-		return (unsigned long) 1;    //erro
-	}
-	
-	
-	//
-	// Selecionar o serviço.
-	//
-	
-    switch(number)
-    {
-		case 0:
-		    printf("Idle Driver: NULL service.\n");
-		    idleLoop();
-			break;
-			
-		case 1:
-		    printf("Idle Driver: service 1.\n");
-		    //idleLoop();
-			break;
-
-        //...			
-		
-		default:
-		    printf("Idle Driver: default service.\n");        
-			//idleLoop();
-			break;
-	};	
-
-    return (unsigned long) 0;	
-}
 
 
 
@@ -280,27 +149,23 @@ int main (int argc, char *argv[]){
 //testando 
 //não tradicional, mas funciona.
 
-int TEST_PRINTF(void)
-{
+int TEST_PRINTF (void){
+
+    int mi;
+    int i=5;
+    unsigned int bs = sizeof(int)*8;
+
+    char *np = 0;
+    char *ptr = "Hello world!";
+    char buf[128];
 
 
-	
-	int mi;
-	int i = 5;
-	unsigned int bs = sizeof(int)*8;
+    mi = (1 << (bs-1)) + 1;
 
-	char *np = 0;	
-	char *ptr = "Hello world!";
-	char buf[80];
-	
-	
 
-	mi = (1 << (bs-1)) + 1;
-	
-//	vsync();
-	
-	printf("%s\n", ptr);
-	printf("printf test\n");
+
+	printf ("%s\n", ptr);
+	printf ("printf test\n");
 	printf("%s is null pointer\n", np);
 	printf("%d = 5\n", i);
 	printf("%d = - max int\n", mi);
@@ -311,25 +176,25 @@ int TEST_PRINTF(void)
 	printf("%d %s(s)%", 0, "message");
 	printf("\n");
 	printf("%d %s(s) with %%\n", 0, "message");
-	
+
     sprintf(buf, "justif: \"%-10s\"\n", "left"); 
     printf("%s", buf);
-	
+
     sprintf(buf, "justif: \"%10s\"\n", "right"); 
     printf("%s", buf);
-	
+
     sprintf(buf, " 3: %04d zero padded\n", 3); 
     printf("%s", buf);
-	
+
     sprintf(buf, " 3: %-4d left justif.\n", 3); 
     printf("%s", buf);
-	
+
     sprintf(buf, " 3: %4d right justif.\n", 3); 
     printf("%s", buf);
-	
+
     sprintf(buf, "-3: %04d zero padded\n", -3); 
     printf("%s", buf);
-	
+
     sprintf(buf, "-3: %-4d left justif.\n", -3); 
     printf("%s", buf);
 	
@@ -337,10 +202,8 @@ int TEST_PRINTF(void)
     printf("%s", buf);
 
 
-done:
-	return (int) 0;
+    return 0;
 }
-
 
 
 /*
@@ -447,29 +310,24 @@ done:
 
 
 
-int TEST_PRINTF3(void)
-{
+int TEST_PRINTF3 (void){
+
+    int mi;
+    int i = 5;
+    unsigned int bs = sizeof(int)*8;
+
+    char *np = 0;	
+    char *ptr = "Hello world!";
+    char buf[128];
 
 
-	
-	int mi;
-	int i = 5;
-	unsigned int bs = sizeof(int)*8;
+    mi = (1 << (bs-1)) + 1;
 
-	char *np = 0;	
-	char *ptr = "Hello world!";
-	char buf[80];
-	
-	
 
-	mi = (1 << (bs-1)) + 1;
-	
-//	vsync();
-	
-	printf3("%s\n", ptr);
-	printf3(" _(string 1 2 3 4)_ \n");
-	printf3("%s is null pointer\n", np);
-	
+
+	printf3 ("%s\n", ptr);
+	printf3 (" _(string 1 2 3 4)_ \n");
+	printf3 ("%s is null pointer\n", np);
 	
 	printf3("%d = 5\n", i);
 	printf3("%d = - max int\n", mi);
@@ -505,10 +363,10 @@ int TEST_PRINTF3(void)
     sprintf(buf, "-3: %4d right justif.\n", -3); 
     printf3("%s", buf);
 
-done:
-	return (int) 0;
-}
 
+
+    return 0;
+}
 
 //
 // End.

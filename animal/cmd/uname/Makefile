@@ -28,10 +28,10 @@ CFLAGS = -m32 \
 	-s
 	
 	
-LIBC    = ../../lib/libc03/include/
-LIBCOBJ = ../../lib/libc03/obj
-API     = ../../lib/api02/include/
-APIOBJ  = ../../lib/api02/obj
+LIBC    = ../../../lib/libc03/include/
+LIBCOBJ = ../../../lib/libc03/obj
+API     = ../../../lib/api02/include/
+APIOBJ  = ../../../lib/api02/obj
 
 
 	##
@@ -47,6 +47,7 @@ time.o \
 unistd.o \
 termios.o \
 ioctl.o \
+fcntl.o \
 stubs.o
 
 
@@ -74,15 +75,15 @@ all-c:
 
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
-
+	cp $(LIBCOBJ)/fcntl.o  .
+	
 	
 cat-link:
 	ld -m elf_i386 -T ../link.ld -o UNAME.BIN $(myObjects)    
 
 
-
 finalize:
-	cp UNAME.BIN  ../../bin
+	cp UNAME.BIN  ../bin
 
 clean:
 	-rm *.o

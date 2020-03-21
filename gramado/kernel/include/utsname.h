@@ -2,6 +2,8 @@
 
 // File: utsname.h
 
+#ifndef __UTSNAME_H
+#define __UTSNAME_H
 
 
 #define  _UTSNAME_LENGTH  65
@@ -47,11 +49,10 @@ struct utsname
 //uname() returns system information in the structure pointed to by
 //buf.  The utsname struct is defined in <sys/utsname.h>:
 
-// Imp-lemented in unistd.c (Why not?)
-int uname (struct utsname *buf);
+
+int sys_uname (struct utsname *ubuf);
 
 
-
-
+#endif    
 
 

@@ -66,7 +66,8 @@ extern void do_executa_new_task (void);
 // =========================================================
 
 // config
-#include "gramado.h"    // product. 
+//#include "gramado.h"    // product. 
+#include "animal.h"    // product. 
 #include "config.h"     // compiling.
 
 // globals
@@ -399,6 +400,8 @@ extern void do_executa_new_task (void);
 #include "sysmk.h"
 #include "syssm.h" 
 
+
+#include "utsname.h"
 
 
 //

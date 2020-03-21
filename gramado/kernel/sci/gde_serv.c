@@ -327,6 +327,14 @@ void *gde_extra_services ( unsigned long number,
     }
     
     
+    // 377 - todo: implement uname() libc support.
+    if ( number == 377 ){
+
+        printf ("service 377: uname. [todo] \n");
+        sys_uname ( (struct utsname *) arg2 );        
+        refresh_screen();
+    }
+    
     
     struct window_d *__window;
     

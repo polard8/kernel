@@ -10,6 +10,38 @@
 #include <kernel.h>
 
 
+// service 377.
+int sys_uname (struct utsname *ubuf)
+{
+
+    if ( (void *) ubuf == NULL )
+        return -1;
+    
+    memcpy ( (void *)  ubuf->sysname, 
+        (const void *) OS_NAME, 
+        sizeof(OS_NAME) );    
+
+    memcpy ( (void *)  ubuf->nodename, 
+        (const void *) NODE_NAME, 
+        sizeof(NODE_NAME) );    
+        
+    memcpy ( (void *)  ubuf->release, 
+        (const void *) RELEASE_NAME, 
+        sizeof(RELEASE_NAME) );    
+        
+    memcpy ( (void *)  ubuf->version, 
+        (const void *) VERSION_NAME, 
+        sizeof(VERSION_NAME) );    
+
+    memcpy ( (void *)  ubuf->machine, 
+        (const void *) MACHINE_NAME, 
+        sizeof(MACHINE_NAME) );    
+
+    
+    return 0;
+}
+
+
 
 // 289
 // See: sm/debug/debug.c

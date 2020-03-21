@@ -30,6 +30,8 @@
 #include <utmp.h>
 #include <termios.h>
 
+#include <sys/utsname.h>
+
 //system calls.
 #include <stubs/gramado.h> 
 
@@ -1147,6 +1149,14 @@ int access(const char *pathname, int mode)
 }
 
 
+// #see: sys/utsname.h
+int uname (struct utsname *buf)
+{
+    debug_print("uname: TODO\n");
+    return (int) gramado_system_call ( 377, 
+                     (unsigned long) buf, 0, 0);
+}
+
 
 /*
 int getsuf (char s[]);
@@ -1312,8 +1322,6 @@ l:
 
     return(0);
 }
-
-
 
 
 /*
@@ -1568,6 +1576,9 @@ xxx_todo_int133 ( unsigned long ax,
 
     return (pid_t) Ret;
 }
+
+
+
 
 
 //

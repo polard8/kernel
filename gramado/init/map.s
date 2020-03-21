@@ -380,7 +380,7 @@ Linker script and memory map
                 0x0000000000408a0d                cputs
                 0x0000000000408a42                getch
                 0x0000000000408a5a                getche
- .text          0x0000000000408a72      0x879 unistd.o
+ .text          0x0000000000408a72      0x8a6 unistd.o
                 0x0000000000408a72                execv
                 0x0000000000408a90                execve
                 0x0000000000408acb                read_ttyList
@@ -450,42 +450,43 @@ Linker script and memory map
                 0x0000000000409162                lseek
                 0x000000000040916c                tell
                 0x0000000000409180                access
-                0x000000000040918a                eq
-                0x00000000004091d6                getlin
-                0x0000000000409267                compar
-                0x00000000004092c3                xxx_todo_int133
- .text          0x00000000004092eb      0x20b termios.o
-                0x00000000004092eb                tcgetpgrp
-                0x0000000000409318                tcsetpgrp
-                0x000000000040933d                tcgetattr
-                0x000000000040935b                tcsetattr
-                0x00000000004093cc                tcsendbreak
-                0x00000000004093d6                tcdrain
-                0x00000000004093f3                tcflush
-                0x00000000004093fd                tcflow
-                0x0000000000409407                cfmakeraw
-                0x0000000000409481                cfgetispeed
-                0x0000000000409499                cfgetospeed
-                0x00000000004094b1                cfsetispeed
-                0x00000000004094c8                cfsetospeed
-                0x00000000004094df                cfsetspeed
- .text          0x00000000004094f6       0x52 ioctl.o
-                0x00000000004094f6                ioctl
- .text          0x0000000000409548      0x11f fcntl.o
-                0x0000000000409548                fcntl
-                0x000000000040955f                openat
-                0x000000000040959a                open
-                0x0000000000409636                creat
-                0x000000000040965d                flock
- .text          0x0000000000409667       0x28 stubs.o
-                0x0000000000409667                gramado_system_call
+                0x000000000040918a                uname
+                0x00000000004091b7                eq
+                0x0000000000409203                getlin
+                0x0000000000409294                compar
+                0x00000000004092f0                xxx_todo_int133
+ .text          0x0000000000409318      0x20b termios.o
+                0x0000000000409318                tcgetpgrp
+                0x0000000000409345                tcsetpgrp
+                0x000000000040936a                tcgetattr
+                0x0000000000409388                tcsetattr
+                0x00000000004093f9                tcsendbreak
+                0x0000000000409403                tcdrain
+                0x0000000000409420                tcflush
+                0x000000000040942a                tcflow
+                0x0000000000409434                cfmakeraw
+                0x00000000004094ae                cfgetispeed
+                0x00000000004094c6                cfgetospeed
+                0x00000000004094de                cfsetispeed
+                0x00000000004094f5                cfsetospeed
+                0x000000000040950c                cfsetspeed
+ .text          0x0000000000409523       0x52 ioctl.o
+                0x0000000000409523                ioctl
+ .text          0x0000000000409575      0x11f fcntl.o
+                0x0000000000409575                fcntl
+                0x000000000040958c                openat
+                0x00000000004095c7                open
+                0x0000000000409663                creat
+                0x000000000040968a                flock
+ .text          0x0000000000409694       0x28 stubs.o
+                0x0000000000409694                gramado_system_call
                 0x000000000040a000                . = ALIGN (0x1000)
- *fill*         0x000000000040968f      0x971 
+ *fill*         0x00000000004096bc      0x944 
 
 .iplt           0x000000000040a000        0x0
  .iplt          0x000000000040a000        0x0 crt0.o
 
-.rodata         0x000000000040a000     0x1284
+.rodata         0x000000000040a000     0x1290
  .rodata        0x000000000040a000       0x8a crt0.o
  *fill*         0x000000000040a08a        0x2 
  .rodata        0x000000000040a08c       0x8f main.o
@@ -498,62 +499,62 @@ Linker script and memory map
                 0x000000000040a800                hex2ascii_data
  .rodata        0x000000000040ac98      0x560 stdlib.o
  .rodata        0x000000000040b1f8        0x6 conio.o
- .rodata        0x000000000040b1fe       0x4f unistd.o
- *fill*         0x000000000040b24d        0x3 
- .rodata        0x000000000040b250       0x34 fcntl.o
+ .rodata        0x000000000040b1fe       0x5c unistd.o
+ *fill*         0x000000000040b25a        0x2 
+ .rodata        0x000000000040b25c       0x34 fcntl.o
 
-.eh_frame       0x000000000040b284     0x335c
- .eh_frame      0x000000000040b284       0x34 crt0.o
- .eh_frame      0x000000000040b2b8       0x44 main.o
+.eh_frame       0x000000000040b290     0x337c
+ .eh_frame      0x000000000040b290       0x34 crt0.o
+ .eh_frame      0x000000000040b2c4       0x44 main.o
                                          0x5c (size before relaxing)
- .eh_frame      0x000000000040b2fc      0xb24 api.o
+ .eh_frame      0x000000000040b308      0xb24 api.o
                                         0xb3c (size before relaxing)
- .eh_frame      0x000000000040be20      0xf54 stdio.o
+ .eh_frame      0x000000000040be2c      0xf54 stdio.o
                                         0xf6c (size before relaxing)
- .eh_frame      0x000000000040cd74      0x648 stdlib.o
+ .eh_frame      0x000000000040cd80      0x648 stdlib.o
                                         0x660 (size before relaxing)
- .eh_frame      0x000000000040d3bc      0x5c0 string.o
+ .eh_frame      0x000000000040d3c8      0x5c0 string.o
                                         0x5d8 (size before relaxing)
- .eh_frame      0x000000000040d97c       0xa0 conio.o
+ .eh_frame      0x000000000040d988       0xa0 conio.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x000000000040da1c      0x920 unistd.o
-                                        0x938 (size before relaxing)
- .eh_frame      0x000000000040e33c      0x1c0 termios.o
+ .eh_frame      0x000000000040da28      0x940 unistd.o
+                                        0x958 (size before relaxing)
+ .eh_frame      0x000000000040e368      0x1c0 termios.o
                                         0x1d8 (size before relaxing)
- .eh_frame      0x000000000040e4fc       0x20 ioctl.o
+ .eh_frame      0x000000000040e528       0x20 ioctl.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000040e51c       0xa0 fcntl.o
+ .eh_frame      0x000000000040e548       0xa0 fcntl.o
                                          0xb8 (size before relaxing)
- .eh_frame      0x000000000040e5bc       0x24 stubs.o
+ .eh_frame      0x000000000040e5e8       0x24 stubs.o
                                          0x3c (size before relaxing)
 
-.rel.dyn        0x000000000040e5e0        0x0
- .rel.got       0x000000000040e5e0        0x0 crt0.o
- .rel.iplt      0x000000000040e5e0        0x0 crt0.o
- .rel.text      0x000000000040e5e0        0x0 crt0.o
+.rel.dyn        0x000000000040e60c        0x0
+ .rel.got       0x000000000040e60c        0x0 crt0.o
+ .rel.iplt      0x000000000040e60c        0x0 crt0.o
+ .rel.text      0x000000000040e60c        0x0 crt0.o
 
-.data           0x000000000040e5e0      0xa20
-                0x000000000040e5e0                data = .
-                0x000000000040e5e0                _data = .
-                0x000000000040e5e0                __data = .
+.data           0x000000000040e620      0x9e0
+                0x000000000040e620                data = .
+                0x000000000040e620                _data = .
+                0x000000000040e620                __data = .
  *(.data)
- .data          0x000000000040e5e0       0x50 crt0.o
- *fill*         0x000000000040e630       0x10 
- .data          0x000000000040e640      0x440 main.o
- .data          0x000000000040ea80      0x440 api.o
- .data          0x000000000040eec0        0x0 ctype.o
- .data          0x000000000040eec0        0x0 stdio.o
- .data          0x000000000040eec0        0x8 stdlib.o
-                0x000000000040eec0                _infinity
- .data          0x000000000040eec8        0x0 string.o
- .data          0x000000000040eec8        0x0 conio.o
- .data          0x000000000040eec8        0x0 unistd.o
- .data          0x000000000040eec8        0x0 termios.o
- .data          0x000000000040eec8        0x0 ioctl.o
- .data          0x000000000040eec8        0x0 fcntl.o
- .data          0x000000000040eec8        0x0 stubs.o
+ .data          0x000000000040e620       0x50 crt0.o
+ *fill*         0x000000000040e670       0x10 
+ .data          0x000000000040e680      0x440 main.o
+ .data          0x000000000040eac0      0x440 api.o
+ .data          0x000000000040ef00        0x0 ctype.o
+ .data          0x000000000040ef00        0x0 stdio.o
+ .data          0x000000000040ef00        0x8 stdlib.o
+                0x000000000040ef00                _infinity
+ .data          0x000000000040ef08        0x0 string.o
+ .data          0x000000000040ef08        0x0 conio.o
+ .data          0x000000000040ef08        0x0 unistd.o
+ .data          0x000000000040ef08        0x0 termios.o
+ .data          0x000000000040ef08        0x0 ioctl.o
+ .data          0x000000000040ef08        0x0 fcntl.o
+ .data          0x000000000040ef08        0x0 stubs.o
                 0x000000000040f000                . = ALIGN (0x1000)
- *fill*         0x000000000040eec8      0x138 
+ *fill*         0x000000000040ef08       0xf8 
 
 .got            0x000000000040f000        0x0
  .got           0x000000000040f000        0x0 crt0.o
