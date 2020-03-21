@@ -36,18 +36,14 @@
 //
 // Includes.
 // 
- 
+
+#include <ctype.h> 
 #include <types.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-#include <stdio.h>   //libC em user mode.
 
-#include <ctype.h>
-
-#include "api.h"      //api.
-
-#include "tprintf.h" 
 
 //
 // Variáveis internas.
@@ -109,17 +105,14 @@ void idleLoop(){
 void driverInitialize()
 {
 	//printf("Idle: Initializing driver ...\n");
-	//refresh_screen();
+
 
 	driverInitialized = 1;	
 	//system_call( 129, 4321, 4321, 4321 );	
 	
-done:	
-	printf("IDLE.BIN: Initialized.\n");
-	refresh_screen();
-	return;
-};
 
+	printf("IDLE.BIN: Initialized.\n");
+}
 
 /*
  * driverUninitialize:
@@ -142,19 +135,16 @@ void driverUninitialize()
 	//
 
 	//printf("Idle: Unitializing driver ...\n");
-	//refresh_screen();
+
 
 	driverInitialized = 0;	
 	
 	//Faremos uma chamada para o Kernel 'deslinkar' o driver.
 	//talvez 128. 127 126..???
 	//system_call( ?? , 4321, 4321, 4321 ); 		
-	
-done:	
+
 	printf("IDLE.BIN: Uninitialized.\n");
-	refresh_screen();
-	return;
-};
+}
 
 
 /*
@@ -167,10 +157,10 @@ int idleInit()
 	idleError = 0;
 	
 	//printf("Idle: Initializing idle application ..\n");
-	//refresh_screen();
+
 	//...
-	return (int) 0;
-};
+	return 0;
+}
 
 
 /*
@@ -212,12 +202,9 @@ unsigned long idleServices(unsigned long number)
 			//idleLoop();
 			break;
 	};	
-	
-	
-done:
-    refresh_screen(); 
+
     return (unsigned long) 0;	
-};
+}
 
 
 
@@ -225,7 +212,7 @@ done:
  * iNICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
  */
 
-int testtest_main (){
+int main (int argc, char *argv[]){
 	
 	printf("\n");
 	printf("Initilizing ...\n\n");
@@ -246,9 +233,9 @@ int testtest_main (){
 	TEST_PRINTF3();	 	
 	
 	printf("DONE.");	
-	refresh_screen();
+
 	return 0;
-};
+}
 
 
 
@@ -352,7 +339,7 @@ int TEST_PRINTF(void)
 
 done:
 	return (int) 0;
-};
+}
 
 
 
@@ -520,7 +507,7 @@ int TEST_PRINTF3(void)
 
 done:
 	return (int) 0;
-};
+}
 
 
 //

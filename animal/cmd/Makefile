@@ -11,7 +11,7 @@ all:
 	make -C ./true
 	make -C ./sum
 	make -C ./showfun
-
+	make -C ./tprintf  
 
 
 # ...

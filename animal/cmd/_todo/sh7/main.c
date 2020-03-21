@@ -128,6 +128,8 @@ read_more:
         // #
         // Reading from stdin.
         
+        // #todo
+        // Isso é o input de teclado.
         ret = read (0, cmdbuf, 128);
         
         //printf("ret is %d\n", ret);

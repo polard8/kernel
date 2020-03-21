@@ -28,10 +28,10 @@ CFLAGS = -m32 \
 	-s
 	
 	
-LIBC    = ../../lib/libc03/include/
-LIBCOBJ = ../../lib/libc03/obj
-API     = ../../lib/api02/include/
-APIOBJ  = ../../lib/api02/obj
+LIBC    = ../../../lib/libc03/include/
+LIBCOBJ = ../../../lib/libc03/obj
+API     = ../../../lib/api02/include/
+APIOBJ  = ../../../lib/api02/obj
 
 
 	##
@@ -77,7 +77,7 @@ all-c:
 
 	
 cat-link:
-	ld -m elf_i386 -T link.ld -o SH7.BIN $(myObjects) -Map map.s
+	ld -m elf_i386 -T ../link.ld -o SH7.BIN $(myObjects) -Map map.s
 
 finalize:
 	cp SH7.BIN  ../../bin
