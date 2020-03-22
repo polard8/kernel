@@ -1546,11 +1546,18 @@ int do_ipv6 ( unsigned long buffer )
 }
 
 
+
+/*
+ ********************
+ * do_arp:
+ * 
+ */
+ 
 // decodifica um pacote arp.
 int do_arp ( unsigned long buffer ){
 
-    struct ether_header *eh;
-    struct ether_arp *arp_h;
+    struct ether_header  *eh;
+    struct ether_arp     *ah;
     
     int i=0;
 
@@ -1559,112 +1566,143 @@ int do_arp ( unsigned long buffer ){
    // printf ("do_arp: \n");
 
     eh = (struct ether_header *) (buffer + 0);
-    arp_h = (struct ether_arp *) (buffer + 14);
-    //arp_h = (struct ether_arp *) &buffer[14];
-
+    ah = (struct ether_arp *)    (buffer + 14);
+    
    
-    //printf("todo: Address Resolution Protocol (ARP) ");
+    // printf ("todo: Address Resolution Protocol (ARP) ");
   
-    if ((void *) arp_h == NULL)
-    {
-        
+    if ((void *) ah == NULL){
+        debug_print ("do_arp: arp header struct\n");
+        //printf()
         return 1;
     }
+    
+    
+    //
+    // Operation:
+    // ARP_OPC_REPLY or ARP_OPC_REQUEST
+    //
 
+    if ( ah->op == ToNetByteOrder16(ARP_OPC_REPLY) ){
+        goto __do_reply;
+    }
+    
+    if ( ah->op == ToNetByteOrder16(ARP_OPC_REQUEST) ){
+        goto __do_request;
+    }
+
+    // Fail:
+    debug_print ("do_arp: Not valid operation\n");
+    printf ("do_arp: Not valid operation\n");
+    return -1;
+
+//
+// Reply!
+//
+
+__do_reply:
 
     // Recebemos um reply.
-    // N�o faremos nada por enquanto.
+    // Não faremos nada por enquanto.
     // Mas provavelmente nesse momento recebemos
-    // alguma informa��o que solicitamos, como o MAC de um dispositivo.
-    if ( arp_h->op == ToNetByteOrder16(ARP_OPC_REPLY) )
-    {
-        //#debug
-        //printf ("\n ARP REPLY received \n");
-        //refresh_screen();
+    // alguma informação que solicitamos, como o MAC de um dispositivo.
+    
+    //#debug
+    //printf ("\n ARP REPLY received \n");
+    //refresh_screen();
         
-        //#debug
-        //printf("REPLY received\n");
-        //printf("src: ");
-        //for( i=0; i<4; i++)
-        //    printf("%x ",arp_h->arp_spa[i]);
-        //refresh_screen();
-        return 1;
-    }
+    //#debug
+    //printf("REPLY received\n");
+    //printf("src: ");
+    //for( i=0; i<4; i++)
+    //    printf("%x ",arp_h->arp_spa[i]);
+    //refresh_screen();
+
+    return -1;
+    
+
+//
+// Request!
+//
+
+__do_request:
 
     // Recebemos um request.
     // Vamos responter.
-    if ( arp_h->op == ToNetByteOrder16(ARP_OPC_REQUEST) )
+
+
+    // #debug
+    //printf ("\n ARP REQUEST received \n");
+    //refresh_screen();
+
+    // printf ("\n ARP REQUEST received | ");
+    // for ( i=0; i<6; i++){ printf("%x ",eh->src[i]); };
+
+    // printf (" | ");
+    // for ( i=0; i<6; i++){ printf("%x ",eh->dst[i]); };
+
+    // printf (" | ");
+    // for ( i=0; i<4; i++){ printf("%d ",arp_h->arp_spa[i]); };
+
+    // printf (" | ");
+    // for ( i=0; i<4; i++){ printf("%d ",arp_h->arp_tpa[i]); };
+
+
+	//cache
+	//cada controlador tem seu cache.
+
+
+    for ( i=0; i<32; i++ )
     {
-        //#debug
-        //printf ("\n ARP REQUEST received \n");
-        //refresh_screen();
-
-        //printf ("\n ARP REQUEST received | ");
-        //for ( i=0; i<6; i++){ printf("%x ",eh->src[i]); };
-
-        //printf (" | ");
-        //for ( i=0; i<6; i++){ printf("%x ",eh->dst[i]); };
-
-        //printf (" | ");
-        //for ( i=0; i<4; i++){ printf("%d ",arp_h->arp_spa[i]); };
-
-        //printf (" | ");
-        //for ( i=0; i<4; i++){ printf("%d ",arp_h->arp_tpa[i]); };
-
-
-		//cache
-		//cada controlador tem seu cache.
-
-        for ( i=0; i<32; i++ )
+        // livre.
+        if ( currentNIC->arp_cache[i].used == 1 && 
+             currentNIC->arp_cache[i].magic == 1234 )
         {
-             // livre.
-             if ( currentNIC->arp_cache[i].used == 1 && 
-                  currentNIC->arp_cache[i].magic == 1234 )
-             {
 
-				//compara o ip
-                if ( strncmp ( (char *) &currentNIC->arp_cache[i].ipv4_address[0], 
-                               (char *) &arp_h->arp_spa[0], 
+            // compara o ip
+            if ( strncmp ( (char *) &currentNIC->arp_cache[i].ipv4_address[0], 
+                               (char *) &ah->arp_spa[0], 
                                  4 ) == 0 )
-                {
-                     memcpy ( (void *) &currentNIC->arp_cache[i].mac_address[0], 
-                        (const void *) &eh->src[0], 
-                         6 );
+            {
+                memcpy ( (void *) &currentNIC->arp_cache[i].mac_address[0], 
+                    (const void *) &eh->src[0], 
+                     6 );
 
-					// Sinaliza que est� em uso.
-                    currentNIC->arp_cache[i].magic = 4321;
-                 }
-              }
-         };
-
-         // ??
-         // vamos responder.
-         // Pra isso precisamos saber o tamanho do buffer.
-         // vamos rever isso pois n�o podemos mais consultar o controlador 
-         // por enquanto.
-         
-         uint16_t arp_tx_old = currentNIC->tx_cur;
-         uint32_t arp_tx_len = currentNIC->legacy_tx_descs[arp_tx_old].length;
-
-		//Muda para REPLAY.
-        arp_h->op = ToNetByteOrder16(ARP_OPC_REPLY);
-
-		//reenvia os mesmos dados, mas modificados para replay.
-		//essa rotina vai copiar de um buffer para outro.
-        //printf ("\n Sending ARP reply ...\n");
-        //refresh_screen();
-
-        E1000Send ( (void *) currentNIC, 
-            (uint32_t) arp_tx_len, 
-            (uint8_t *) buffer );
-
-
-        //printf ("\n");
-        //refresh_screen ();
-        return 0;
+                // Sinaliza que está em uso.
+                currentNIC->arp_cache[i].magic = 4321;
+            }
+        }
     };
 
 
+    // ??
+    // vamos responder.
+    // Pra isso precisamos saber o tamanho do buffer.
+    // vamos rever isso pois n�o podemos mais consultar o controlador 
+    // por enquanto.
+         
+    uint16_t arp_tx_old = currentNIC->tx_cur;
+    uint32_t arp_tx_len = currentNIC->legacy_tx_descs[arp_tx_old].length;
+
+    // Muda para REPLAY.
+    ah->op = ToNetByteOrder16(ARP_OPC_REPLY);
+
+    // Reenvia os mesmos dados, mas modificados para replay.
+    // essa rotina vai copiar de um buffer para outro.
+    
+    //printf ("\n Sending ARP reply ...\n");
+    //refresh_screen();
+
+
+    // Send.
+    
+    E1000Send ( (void *) currentNIC, 
+        (uint32_t) arp_tx_len, 
+        (uint8_t *) buffer );
+
+
+    //printf ("\n");
+    //refresh_screen ();
     return 0;
 }
 
