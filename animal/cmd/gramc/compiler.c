@@ -34,7 +34,7 @@ FILE *compiler (){
 
     printf ("compiler: calling parser ...\n");
     // The parser will call the yylex() a lot of times.
-	parser_return = (int) parser ();
+    parser_return = (int) parser ();
 	//analizar retorno	
 
 
@@ -47,8 +47,8 @@ FILE *compiler (){
 //done:	
 	printf ("compiler: $$$$$$$$$$ Done \n\n");
 	
-	// Returning the output.
-	return (FILE *) stdout;
+    // Returning the output.
+    return (FILE *) stdout;
 }
 
 

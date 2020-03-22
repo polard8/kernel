@@ -399,60 +399,52 @@ int is_letter(char c)
  */
 
 int gramcInitialize (){
-	
-    int Status = 0;		
-	int i=0;
-	
-	
+
+    int Status = 0;
+    int i=0;
+
+
     printf ("gramcInitialize: Initializing ...\n");
-	
-	
+
+
 	// Clear buffers
-	
-	for ( i=0; i<INFILE_SIZE; i++ )
-	{
-		infile[i] = '\0';
-	}
 
-	for ( i=0; i<OUTFILE_SIZE; i++ )
-	{
-		outfile[i] = '\0';
-	}
-	
-	
-	// Inicializamos o buffer do arquivo sujando ele.
-    // Mas depois carregaremos um arquivo.	
-	
-	// input output
-	
-    //sprintf ( infile, STRING_CFILE );
-	sprintf (infile, "initializing infile " );
-    strcat (infile,"buffer");	
-	
-    sprintf (outfile, "\n;; initializing outfile buffer \n" );
-    strcat (outfile,";; its an assembly file \n\n");	
-    strcat (outfile,"\n segment .text \n");
-	
-	
-	// text, data, bss
+    for ( i=0; i<INFILE_SIZE; i++ ){
+        infile[i] = '\0';
+    }
+    sprintf (infile, "; ======================== \n");
+    strcat (infile,  "; Initializing infile ...\n\n");
 
-    sprintf (TEXT, "\n;; initializing TEXT buffer \n" );
-    strcat (TEXT,";; its an assembly TEXT \n\n");	
-    strcat (TEXT,"\n segment .text \n");	
-	
-    sprintf (DATA, "\n;; initializing DATA buffer \n" );
-    strcat (DATA,";; its an assembly DATA \n\n");	
-    strcat (DATA,"\n segment .data \n");
-	
-    sprintf (BSS, "\n;; initializing BSS buffer \n" );
-    strcat (BSS,";; its an assembly BSS \n\n");	
-	strcat (BSS,"\n segment .bss \n");
-	
-	
+
+    for ( i=0; i<OUTFILE_SIZE; i++ ){
+        outfile[i] = '\0';
+    }
+    sprintf (outfile, "; ======================== \n" );
+    strcat (outfile,  ";Initializing outfile ...\n\n");
+
+
+
+    // text, data, bss
+
+
+    sprintf (TEXT, "; ======================== \n" );
+    strcat (TEXT,  "; Initializing TEXT buffer \n");
+    strcat (TEXT,  "segment .text \n");
+    
+    sprintf (DATA, "; ======================== \n" );
+    strcat (DATA,  "; Initializing DATA buffer \n");
+    strcat (DATA,  "segment .data \n");
+    
+    sprintf (BSS, "; ======================== \n" );
+    strcat (BSS,  "; Initializing BSS buffer \n");
+    strcat (BSS,  "segment .bss \n");
+
+
 	//table.
+
 //contador para não estourar a lista. 
     keyword_count = 0;  
-	identifier_count = 0; 
+    identifier_count = 0; 
     keyword_count = 0; 
     constant_count = 0; 
     string_count = 0; 
@@ -469,8 +461,8 @@ int gramcInitialize (){
     current_constant = 0; 
     current_string = 0; 
     current_separator = 0; 
-    current_special = 0;	
-	
+    current_special = 0;
+
 	
 	//
 	// ## program ##
@@ -479,13 +471,13 @@ int gramcInitialize (){
 	program.name = program_name;
 	program.function_count;
 	program.function_list = NULL;
-	
-	
+
+
 	//...
-	
+
     printf ("gramcInitialize: done\n");
 
-    return (int) Status;	
+    return (int) Status;
 }
 
 
