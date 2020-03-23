@@ -33,11 +33,12 @@
 ;
 ;
 
-
 ;Definições usadas apenas em 16bit.
-;%DEFINE SYSTEM4NORA_VER '1.0' ;Deletar.
-%DEFINE BOOTMANAGER_VER '1.0'
+%DEFINE BOOTMANAGER_VER '1.1'
 ;;...
+
+
+
 
 ;Definições.
 
@@ -156,10 +157,10 @@ g_Fat16BPB  dd 0    ;Para rotinas de 32 bits.
 ;;
 
 msg_bm_splash:
-    db 13,10, 
-    db 'The Gramado Boot Manager',13,10, 
+    db 'Gramado Boot Manager ',13,10, 
     db 'Version ', BOOTMANAGER_VER, 
-	db ' (C) Copyright Fred Nora 2017',13,10,0
+    db ' (C) Copyright Fred Nora 2020',13,10,0
+
 
 msg_s2_init                  db 13, 10, "s2: Initializing stage 2", 13, 10, 0
 msg_s2_activating_mode       db "s2: Activating mode", 13, 10, 0

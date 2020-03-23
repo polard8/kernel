@@ -20,10 +20,6 @@ SHELL:
     .volume:      db 0         ;Em que volume está o Shell.
     .directory:   db 0         ;Em que diretório está o Shell.
     .separador1:  db '>',0     ;Separador1.
-    ;.separador2: db '>>',0    ;Separador2.
-    ;.money: db '$',0
-    ;.slash: db '\\', 0 
-    ;...  
 
 
 ;Prompt:   
@@ -122,24 +118,29 @@ seleciona_p3  db  'p3', 0    ;Seleciona particao 3.
 ;...
 
 
-;=====================================================================
-; * Strings *
-;
-; Principais string e mensagens do Shell do Boot Manager.
+; ===============================================================
+; Messages
 ;
 
-
-;Splash.
+version_msg:
 shellmsg_splash: 
+
     db 'Gramado Boot Manager ',13,10, 
-    db 'Version ', BOOTMANAGER_VER, ' (C) Copyright Fred Nora 2019', 13, 10, 0
+    db 'Version ', BOOTMANAGER_VER, 
+    db ' (C) Copyright Fred Nora 2020',13,10,0
 
 
-;Prompt.
+
+;;
+;; Prompt
+;;
+
 prompt:              db 'BM/>', 0           ;Prompt padrão.
 msg_shell_prompt:    db 'BM/>', 0
+
+
 prompt_change_file:  db 'filename=', 0      ;Para declarar o nome do arquivo.
-;...
+
 
 
 ;Volume support.
@@ -182,11 +183,6 @@ msg_file_op6 db "Delete dir", 13, 10 ,0
 msg_file_op7 db "Open app", 13, 10 ,0
 ;...
 
-
-;Strings e messages. 
-version_msg:
-    db 'Gramado Boot Manager Version ', BOOT_VER, 
-    db ' (c) Copyright 2019', 13, 10, 0
 
 not_found_msg:      db 'Command or file not found', 13, 10, 0
 hd_msg:             db 'Reading sector', 13, 10, 0

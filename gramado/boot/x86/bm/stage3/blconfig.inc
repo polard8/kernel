@@ -1,5 +1,5 @@
 ;
-; File: msm\blconfig.inc 
+; File: stage3/blconfig.inc 
 ;
 ; Descrição:
 ; Rotinas para configurar os arquivos de inicialização system.cnf e init.cnf.

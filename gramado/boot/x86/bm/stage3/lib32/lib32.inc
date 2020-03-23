@@ -26,22 +26,10 @@ LIB32_BACKBUFFER EQU (0x1000000 - 0x800000)
 ;
 
 TotalMemoryMB: dd 0
-;...
+; ...
 
 
-;------------------------------------------
-; _bmServices:
-;     Serviços oferecidos pelo Boot Manager.
-
-global _bmServices
-_bmServices:
-	; @todo: 
-	; Essa rotina conterá os serviços oferecidos pelo Boot Manager.
-	ret
-	
-
-
-;;==============================================================
+;; ==============================
 ;; lib32PrintChar:
 ;;     Imprime um caractere na tela em modo gráfico.
 ;;
@@ -65,22 +53,21 @@ lib32PrintChar:
 	push edx
 
     ;;salva color e char.
-	
-	mov dword [.color], eax    
-    mov byte [.char], dl      
-    ;;...	
-	
+    mov dword [.color], eax  
+    mov byte [.char], dl  
+    ;; ...	
+
 	;; ??
 	;; Pega a coordenada x.
 	;; Me parece que temos variáveis para posição de cursor.
 	
-	mov eax, dword [g_cursor_x]
-		
+    mov eax, dword [g_cursor_x]
+
 	; Se estivermos no fim da linha.
-	
-	cmp eax, dword 80
-	jge .nextLine
-	
+
+    cmp eax, dword 80
+    jge .nextLine
+
 	;;@todo:
 	;; Última linha ??
 	;mov eax, dword [g_cursor_y]
@@ -88,38 +75,37 @@ lib32PrintChar:
 	;jge .??
 	
 	;; CARRIAGE RETURN.
-	cmp dl, byte 13    
-	je .CR
+    cmp dl, byte 13    
+    je .CR
 	
 	;; LINE FEED.
-	cmp dl, byte 10    
-	je .LF
-		
+    cmp dl, byte 10    
+    je .LF
+
 	;;...
 	
 	;; não muda de linha
-.thisLine:	
-    
+.thisLine:
+
 	;; x
 	;;calcula deslocamento na linha
 	;; Me parece que temos variáveis para posição de cursor.
 	
 	;; #bugbug
 	;; Precisamos de uma variável para as dimenções do char.
-	
-	mov eax, dword [g_cursor_x]
-	mov ebx, 8                    ;; tamanho da largura do char dada em bits
-	mul ebx                       ;; multiplica, o resultado vai para eax.
-	mov dword [.x], eax           ;; deslocamento em pixel na horizontal.
+
+    mov eax, dword [g_cursor_x]
+    mov ebx, 8                   ;; tamanho da largura do char dada em bits
+    mul ebx                        ;; multiplica, o resultado vai para eax.
+    mov dword [.x], eax    ;; deslocamento em pixel na horizontal.
 
 
     mov eax, dword [g_cursor_y]
     mov ebx, 8 
     mul ebx 
     mov dword [.y], eax      ;; deslocamento em pixel na vertical.
-	
+
 	;desenha o pixel dadas as coordenadas.
-	
 .PutPixel:
 
     ; a =  cor (rrggbbaa)
@@ -127,17 +113,17 @@ lib32PrintChar:
     ; c =  y
     ; d =  Char.
 
-	mov eax, dword [.color]
-	mov ebx, dword [.x]
-	mov ecx, dword [.y]
-	xor edx, edx
-	mov dl, byte [.char]
-	
-	call _my_buffer_char_blt
-	
+    mov eax, dword [.color]
+    mov ebx, dword [.x]
+    mov ecx, dword [.y]
+    xor edx, edx
+    mov dl, byte [.char]
 
-	;; Incrementa o cursor depois de imprimir o char.
-	
+    call _my_buffer_char_blt
+
+
+    ;; Incrementa o cursor depois de imprimir o char.
+
     push eax 
     mov eax, dword [g_cursor_x]
     inc eax 
@@ -157,32 +143,32 @@ lib32PrintChar:
     mov eax, dword [g_cursor_y]
     inc eax 
     mov dword [g_cursor_y], eax
-	
+
 	;Agora que estamos na linha certa, devemos calcular
 	;legando em conta o tamanho do caractere.
 
     jmp .thisLine
-	
+
 .CR:	
     ;Volta ao começo da linha.
     mov dword [g_cursor_x], 0
-	jmp .done 
-	
+    jmp .done 
+
   ;;muda de linha..
 .LF:
-	
-	;Próxima linha.
+
+    ;Próxima linha.
     mov eax, dword [g_cursor_y]
     inc eax 
     mov dword [g_cursor_y], eax 
     jmp .done
 
 .done:
-	pop edx 
-	pop ecx 
-	pop ebx 
-	pop eax 
-	ret
+    pop edx 
+    pop ecx 
+    pop ebx 
+    pop eax 
+    ret
 
 .color: dd 0
 .x: dd 0
@@ -191,8 +177,7 @@ lib32PrintChar:
 ;;--
 
 
-
-;===========================================================
+; =================================
 ; lib32PrintString:
 ;     Imprime uma string na tela em modo gráfico.
 ; Um ponteiro para string deve estar em alguma registrador.
@@ -212,7 +197,6 @@ lib32PrintString:
 ; Outra cor, não preto.
 
 .colorBlack:
-
     mov eax, 0x00FF0000 
 
 ;; Salva color.
@@ -334,7 +318,7 @@ lib32SetupIDT:
 
 
 
-;;####################################################
+;; ##########################
 ;; _gui_buffer_putpixel:
 ;;     Coloca um pixel no Back Buffer.
 ;;
@@ -469,14 +453,13 @@ _gui_buffer_putpixel:
 
 
 .bpp24RGB:
-
     mov al, byte [.r]
     stosb 
     mov al, byte [.g]
     stosb 
     mov al, byte [.b]
     stosb 
-
+    
     pop ecx
     pop es
     ret
@@ -492,7 +475,7 @@ _gui_buffer_putpixel:
 
 
 
-;#################################################
+; ########################
 ; _gui_direct_putpixel:
 ;     Coloca um pixel direto no LFB.
 ;
@@ -670,7 +653,7 @@ draw_rect:
 .color: dd 0 
 
 
-;;=========================================================
+;; =========================
 ; CreateWindow:
 ;     Desenha uma janela.
 ; a = x
@@ -683,11 +666,11 @@ draw_rect:
 CreateWindow:
 
     pushad
-    mov dword [.x],    eax       ;x
-    mov dword [.y],    ebx       ;y
-    mov dword [.width],   ecx    ;largura
+    mov dword [.x],    eax          ;x
+    mov dword [.y],    ebx          ;y
+    mov dword [.width],   ecx     ;largura
     mov dword [.height],  edx    ;altura
-    mov dword [.color],   edi    ;color
+    mov dword [.color],   edi      ;color
 
 
 	;bg
@@ -721,7 +704,7 @@ CreateWindow:
 .color: dd 0
 
 
-;;=======================================================
+;; ====================================
 ; _fade_screen:
 ;     Fade background screen.
 ;     Pinta uma parte do background em degradê.
@@ -845,32 +828,29 @@ _background:
 global _background_teste
 _background_teste:
 .fade_screen: 
-    
-	;
+
 	; Direto
-	;
-	
 	;call _vsync 
-	
-	pushad
-	  
-	;COR 
-	mov al, byte 0x00
-	mov byte [.a], al    ;a
-	mov al, byte 0xfe     
-	mov byte [.r], al    ;r
-	mov al, byte 0x00
-	mov byte [.g], al    ;g
-	mov al, byte 0x00
-	mov byte [.b], al    ;b
-	
-	;LFB
-	mov edx, DWORD [ModeInfo_PhysBasePtr]
-	;mov edx, DWORD [VIDEO.lfb]  
+
+    pushad
+
+    ;COR 
+    mov al, byte 0x00
+    mov byte [.a], al    ;a
+    mov al, byte 0xfe     
+    mov byte [.r], al    ;r
+    mov al, byte 0x00
+    mov byte [.g], al    ;g
+    mov al, byte 0x00
+    mov byte [.b], al    ;b
+
+    ;LFB
+    mov edx, DWORD [ModeInfo_PhysBasePtr]
+    ;mov edx, DWORD [VIDEO.lfb]  
     mov edi, edx
-	
+
 	;contador de linhas
-	mov   ebx, dword 600   ; numero de linhas
+    mov   ebx, dword 600   ; numero de linhas
 .bg_newline:     
 	;contador de pixel por linha.
     mov   ecx, dword 800*3 ; 3 bytes por pixel.  
@@ -878,18 +858,19 @@ _background_teste:
     
 	;mov al, byte [.a]
 	;stosb 
-	mov al, byte [.r]
-	stosb 
-	mov al, byte [.g]
-	stosb 
-	mov al, byte [.b]
-	stosb 
-    
-	loop   .bg_newpixel ; proximo pixel. 
+    mov al, byte [.r]
+    stosb 
+    mov al, byte [.g]
+    stosb 
+    mov al, byte [.b]
+    stosb 
+
+    loop   .bg_newpixel ; proximo pixel. 
 
     dec ebx
-	cmp ebx, dword 0
-	jne .bg_newline ; proxima linha	
+    cmp ebx, dword 0
+    jne .bg_newline ; proxima linha	
+
 .exit_bg:
     popad
     RET
@@ -897,22 +878,6 @@ _background_teste:
 .r: db 0
 .g: db 0
 .b: db 0
-
-
-;---------------------------------------------------------
-; _my_direct_load_bitmap_16x16:
-;     Copia um bitmap .BMP da memória direto no LFB.
-;
-; Argumentos:
-;     eax = Endreço do arquivo .BMP. 
-;     ebx = x. (x no LFB).
-;     ecx = y. (y no LFB).
-;     edx = null.
-;
-global _my_direct_load_bitmap_16x16     
-_my_direct_load_bitmap_16x16:
-	;; Suspensa para economizar espaço.
-    ret
 
 
 
@@ -956,17 +921,17 @@ _asm_refresh_screen:
     RET
 
 
-;=======================================================  ;
+;==============================;
 ; Get RAM size.                                           ;
-;=======================================================  ;
+;==============================;
 get_ram_size:                         ;
     mov eax, dword [TotalMemoryMB]    ;
     ret
 
 
-;=======================================================  ;
+;==============================;
 ; Get Boot Drive.                                         ;
-;=======================================================  ;
+;==============================;
 Get_Boot_Drive:                             ;
     mov al, byte [META$FILE.DISK_NUMBER]    ;
     ret
@@ -1000,7 +965,7 @@ setup_gdt:
 ;--
 
 
-;;==================================================
+;;==================================
 ; setup_idt:
 ;     Configura a IDT.
 
@@ -1106,7 +1071,7 @@ get_cursor_y:
     ret
 
 
-;; ==========================================================
+;; ================================
 ; write_char:
 ;     Write a char in text mode.
 
@@ -1142,10 +1107,9 @@ write_char:
     RET
 
 
-;;====================================================
+;; ================================
 ; DisplayMessage32:
 ;     Mostra uma string. de ESI. Em text mode.
-;
 
 DisplayMessage32:
     nop
@@ -1160,10 +1124,9 @@ DisplayMessage32:
     ret
 
 
-;;======================================================
+;; ====================
 ; clear_screen:
 ;     Clear screen in text mode.
-;
 
 clear_screen: 
 
@@ -1201,9 +1164,7 @@ textmode_WriteChar:
     RET
 
 
-
-
-;; ====================================================================
+;; =====================================
 ;; DRAW CHAR:
 ;; Teste para tentar desenhar um caractere em modo gráfico 32bit.
 ;;
@@ -1264,13 +1225,13 @@ _bit_mask:    db 0
 global _my_buffer_char_blt
 _my_buffer_char_blt:
 
-	;salvamentos
-	;color, x, y, char.
+    ; Salvamentos
+    ; color, x, y, char.
 
-    mov dword [.color], eax    
-    mov dword [.x], ebx      
-    mov dword [.y], ecx      
-    mov byte [.char], dl     
+    mov dword [.color], eax  
+    mov dword [.x], ebx  
+    mov dword [.y], ecx   
+    mov byte [.char], dl  
 
     pushad
 
@@ -1278,155 +1239,132 @@ _my_buffer_char_blt:
 	;; Configuração provisoria para testes...
 	;; Mapa de caracteres do BIOS.
 	;; #todo: Precisamos de variável para dimenões do char.
-	
-	mov dword [_gfontAddress], 0x000FFA6E    
-	mov byte [_gcharWidth], 8    
-	mov byte [_gcharHeight], 8
-	
+
+    mov dword [_gfontAddress], 0x000FFA6E  
+    mov byte [_gcharWidth], 8  
+    mov byte [_gcharHeight], 8
+
 	;color
-	mov eax, dword [.color]	
-	mov dword [_color], eax 
-	
-	;x 
-	mov eax, dword [.x]
-	mov dword [_x], eax     
-	
-	;y
-	mov eax, dword [.y]
-	mov dword [_y], eax     
-	
+    mov eax, dword [.color]
+    mov dword [_color], eax 
+
+    ;x 
+    mov eax, dword [.x]
+    mov dword [_x], eax   
+
+    ;y
+    mov eax, dword [.y]
+    mov dword [_y], eax  
+
 	;char 
-	mov al, byte [.char]
-	mov byte [CHAR_PART_OFFSET], al        
-	
+    mov al, byte [.char]
+    mov byte [CHAR_PART_OFFSET], al  
+
     ;; Inicializando uma linha do char a ser desenhado.
-	;; CHARPART  SUJO, TUDO 1. Inicializando.
-	
-	mov byte [CHAR_PART], 11111111b  
-	
+    ;; CHARPART  SUJO, TUDO 1. Inicializando.
+
+    mov byte [CHAR_PART], 11111111b  
+
     ;Criando a máscara de bits
-	
-	mov byte [_bit_mask], 0x80
- 
+
+    mov byte [_bit_mask], 0x80
+
 	;; A variável [_work_char] conterá o sesuldado dessa adição aqui.
 	;; work_char = (void *) gfontAddress + (c * gcharHeight);
 	
 	; Calculamos o deslocamento para pegarmos o caractere certo na fonte.
 	
-	;; Deslocamento no char map do BIOS.
-	xor eax, eax
-	mov al, byte [CHAR_PART_OFFSET]   
-	
+    ; Deslocamento no char map do BIOS.
+    xor eax, eax
+    mov al, byte [CHAR_PART_OFFSET]   
+
 	;; O valor do deslocamento deve ser multiplicado pela altura do char
 	;; para encontrarmos o real deslocamento.
-	
-	push ebx        ;; salva
-	xor ebx, ebx
-	mov ebx, 8      ;; [_gcharHeight]
-	mul ebx         ;; realiza a multiplicação e coloca o resultado em eax.    
-	pop ebx         ;; recupera 
-	
+
+    push ebx        ;; salva
+    xor ebx, ebx
+    mov ebx, 8      ;; [_gcharHeight]
+    mul ebx           ;; realiza a multiplicação e coloca o resultado em eax.    
+    pop ebx           ;; recupera 
+
 	;; Adicionando a base ao deslocamento..
 	;; [_gfontAddress]
-	
-	add eax, 0x000FFA6E       
-	
+
+    add eax, 0x000FFA6E   
+
 	;; Encontramos o endereço do byte que iremos pegar 
 	;; para servir de parte do char que queremos desenhar.
-	
-	mov dword [CHAR_PART_ADDRESS], eax
-	
-	
+
+    mov dword [CHAR_PART_ADDRESS], eax
+
+
 	;; '********' CHAR PART 
 	;; Pegando o byte encontrado dentro do char map do BIOS.
-	
-	push ebx
-	xor ebx, ebx
-	mov bl, [eax]
-	mov byte [CHAR_PART], bl
-	pop ebx
-	
-	;; Começa um 'for'.
-	;; for ( y2 = 0; y2 < gcharHeight; y2++ )
-	
-	;; Zerando o contador [_y2] ...
-	mov dword [_y2], 0
-	
-.L4_comeca_um_for:
-    
-	
-	;debug
-    ;pushad 
- 	;mov eax, 200  ;x.
-	;mov ebx, 0   ;y.
-	;mov ecx, 30  ;largura.
-	;mov edx, 30  ;altura.	
-    ;mov edi, dword  0x00108000    ;blue   
-	;call CreateWindow
-	;call _asm_refresh_screen
-    ;popad 
-	
-	
-	;; Se o [_gcharHeight] for maior ou igual ao [_y2], que está 
-	;; armazenado em eax.
-	
-	XOR EAX, EAX
-	mov eax, [_y2]
-	
-    cmp dword eax, 8    ;[_gcharHeight] ;8
-	jge	.L1_done_fim_do_Height
-	
-	;; Inicializando a variável [_bit_mask]
-	mov byte [_bit_mask], 0x80
 
-	;; Começa de outro 'for'.
+    push ebx
+    xor ebx, ebx
+    mov bl, [eax]
+    mov byte [CHAR_PART], bl
+    pop ebx
+
+    ;; Começa um 'for'.
+    ;; for ( y2 = 0; y2 < gcharHeight; y2++ )
+
+    ;; Zerando o contador [_y2] ...
+    mov dword [_y2], 0
+
+.L4_comeca_um_for:
+
+    ;; Se o [_gcharHeight] for maior ou igual ao [_y2], que está 
+    ;; armazenado em eax.
+
+    XOR EAX, EAX
+    mov eax, [_y2]
+
+    cmp dword eax, 8    ;[_gcharHeight] ;8
+    jge  .L1_done_fim_do_Height
+
+    ;; Inicializando a variável [_bit_mask]
+    mov byte [_bit_mask], 0x80
+
+    ;; Começa de outro 'for'.
     ;; for( x2 = 0; x2 < gcharWidth; x2++ )
-	
+
     ;; Zerando o contador [_x2] ...
-	mov dword [_x2], 0
-	
+    mov dword [_x2], 0
+
 .L7_comeca_outro_for:  ;;for de largura.
 
-    ;pushad 
- 	;mov eax, 400  ;x.
-	;mov ebx, 0   ;y.
-	;mov ecx, 30  ;largura.
-	;mov edx, 30  ;altura.	
-    ;mov edi, dword  0x00108000    ;blue   
-	;call CreateWindow
-	;call _asm_refresh_screen
-    ;popad 
-	
+
     ;;coloca o [_x2] em eax.
 	
-	;; Se o [_gcharWidth] for maior ou igual ao [_x2],
-	;; que está armazenado em eax.
+    ;; Se o [_gcharWidth] for maior ou igual ao [_x2],
+    ;; que está armazenado em eax.
 
+    XOR EAX, EAX
+    mov eax, [_x2]
 
-	XOR EAX, EAX
-	mov eax, [_x2]
-	
-	;[_gcharWidth]
-	
-	cmp dword eax, 8 
-	jge	.L8_fim_do_Width
-	
+    ;[_gcharWidth]
+
+    cmp dword eax, 8 
+    jge  .L8_fim_do_Width
+
 	;;
 	;; if( (*work_char & bit_mask) )
 	;;
-	
+
     ;push eax 
-	;push edx
-	
-	xor eax, eax
+    ;push edx
+
+    xor eax, eax
     xor edx, edx
-	
+
 	;;; *********** PROBLEMAS NA TROCA DO WORKCHAR ************
-	
-	mov al, [CHAR_PART]    
-	mov dl, [_bit_mask]
-    and al, dl	
-	;mov byte [CHAR_PART], al
+
+    mov al, [CHAR_PART]  
+    mov dl, [_bit_mask]
+    and al, dl
+    ;mov byte [CHAR_PART], al
 
 
 	;; prepara pra sair.
@@ -1443,16 +1381,16 @@ _my_buffer_char_blt:
 	;;
 	;test ax, ax
     ;js .L10_nao_mostra_pixel
-	;je .L10_nao_mostra_pixel
-	;je .L10_nao_mostra_pixel    ;jump if ZF == 1
-	
-	cmp al, 0
-	je .L10_nao_mostra_pixel
-	
+    ;je .L10_nao_mostra_pixel
+    ;je .L10_nao_mostra_pixel    ;jump if ZF == 1
+
+    cmp al, 0
+    je .L10_nao_mostra_pixel
+
 	;;
 	;; se não saltou no jmp acima é porque decidiu mostrar o pixel.
 	;;
-	
+
 ;;++	
 	;
 	; my_buffer_put_pixel(color, x + x2, y, 0);
@@ -1475,21 +1413,21 @@ _my_buffer_char_blt:
 	;; excluindo algumas instruções desnecessárias.
 	;;
 	
-	
-	push eax 
-	push ebx 
-	push ecx 
-	push edx 
-	
-	;0 (d)
+
+    push eax 
+    push ebx 
+    push ecx 
+    push edx 
+
+    ;0 (d)
     mov edx, 0            ;; d
-	;y (c)
+    ;y (c)
     mov ecx, [_y]         ;; c
-	;x+x2 (x) ??
+    ;x+x2 (x) ??
     mov eax, [_x2]
     add eax, [_x]
     mov ebx, eax           ;; x (b)
-	;color (a)
+    ;color (a)
     mov eax, [_color]      ;; a
 
 ;;Put pixel on back buffer.
@@ -1511,119 +1449,75 @@ _my_buffer_char_blt:
 
 .L10_nao_mostra_pixel:
 
-    ;debug
-    ;pushad 
- 	;mov eax, 100  ;x.
-	;mov ebx, 0   ;y.
-	;mov ecx, 30  ;largura.
-	;mov edx, 30  ;altura.
-	;mov edi, dword  0x00804000    ;blue  
-	;call CreateWindow
-	;call _asm_refresh_screen
-	; popad 
-
-
 	;;o bit mask precisa mudar sem estragar eax...
     ;;bit_mask = (bit_mask >> 1);
 
 	;; shr
-	push eax
-	mov al, byte [_bit_mask] 
-	shr al, 1         
-	mov byte [_bit_mask], al
-	pop eax
-	
+    push eax
+    mov al, byte [_bit_mask] 
+    shr al, 1         
+    mov byte [_bit_mask], al
+    pop eax
+
 	; Incrementando o contador...
-	
-	push eax
-	mov eax, [_x2]   
-	inc eax
-	mov [_x2], eax
-	pop eax
-	
-	jmp	.L7_comeca_outro_for
-	;
-	
-;
+
+    push eax
+    mov eax, [_x2]   
+    inc eax
+    mov [_x2], eax
+    pop eax
+
+    jmp  .L7_comeca_outro_for
+
 ; Quando finalmente pintarmos 8 pixel na horizontal, é o fim da largura.
-;
 
 .L8_fim_do_Width:
 
-    ;debug
-    ;pushad 
- 	;mov eax, 300  ;x.
-	;mov ebx, 0   ;y.
-	;mov ecx, 30  ;largura.
-	;mov edx, 30  ;altura.
-    ;mov edi, dword  0x30808000    ;blue  
-	;call CreateWindow
-	;call _asm_refresh_screen
-    ;popad 
-
-
 
     ;; Aqui existem três incrementos,
-    
-	;; y++;
-	;; Um endereço de memória. Posicionamento de pixel.
+
+    ;; y++;
+    ;; Um endereço de memória. Posicionamento de pixel.
 
     mov eax, [_y] 
     inc dword eax
     mov [_y], eax
 
 
-	;;
 	;; Incrementando para irmos para a p´roxima linha do char
 	;; representada por um byte. ??
-	;;
 
 	;; work_char++;
 	;mov eax, [_work_char]
 	;inc dword [eax]
-	
-	
+
     mov eax, dword [CHAR_PART_ADDRESS]	
     inc eax        ;; pegaremos o byte do endEreço seguinte, que conterá a próxima linha do char.
     mov dword [CHAR_PART_ADDRESS], eax  ;;novo endereço.atualiza o endereço que estamos usando.
 
-	mov ebx,  dword [CHAR_PART_ADDRESS] ;;atualiza O CHAR PART.
-	mov al, [ebx]
-	mov byte [CHAR_PART], al            ;;atualiza O CHAR PART.
-	
+    mov ebx,  dword [CHAR_PART_ADDRESS] ;;atualiza O CHAR PART.
+    mov al, [ebx]
+    mov byte [CHAR_PART], al            ;;atualiza O CHAR PART.
+
 	;; Contador...
-	mov eax, [_y2]
-	inc dword eax
-	mov [_y2], eax
-	
-	jmp	.L4_comeca_um_for
-	;
+    mov eax, [_y2]
+    inc dword eax
+    mov [_y2], eax
+
+    jmp  .L4_comeca_um_for
+
 .L11:
 .L1_done_fim_do_Height:
-    ;debug
-    ;pushad 
- 	;mov eax, 700  ;x.
-	;mov ebx, 0   ;y.
-	;mov ecx, 90  ;largura.
-	;mov edx, 90  ;altura.
-    ;mov edi, dword  0x00808000    ;blue   
-	;call CreateWindow
-	;call _asm_refresh_screen
-    ;popad 
-
-
 	;leave
-	popad
-	ret
+    popad
+    ret
+
 
 .tmp:    dd 0
 .char:   db 0
 .color:  dd 0
 .x:      dd 0
 .y:      dd 0
-
-
-
 
 ;
 ; End.

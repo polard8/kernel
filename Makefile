@@ -274,6 +274,8 @@ clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 
+	-rm -rf gramado/boot/x86/bin/*.BIN
+	
 	-rm -rf gramado/kernel/KERNEL.BIN
 	-rm -rf gramado/init/*.BIN
 	-rm -rf gramado/gdeshell/*.BIN
