@@ -1,142 +1,164 @@
+;;
+;; File: libasm.inc
+;;     It's a library to build applications in ring3.
+;;
+;; Credits:
+;;     #todo
+;;     return infinity, mike os ... 
+;;
+;; History:
+;;     2020 - Document created by Fred Nora.
+;;
+
 
 ;; IN: a, b, c ,d 
-;;OUT a = return value.
+;; OUT a = return value.
+
+;libasm_system_call:
 asm_system_call:
 
     push ebx
-	push ecx
-	push edx
-	
-	int 0x80 
-	
-	pop edx
-	pop ecx 
-	pop ebx
-	
-	ret
-	
-	
-;;#todo: Não tá funcionando bem.	
-;;IN: eax = x ebx = y	
+    push ecx
+    push edx
+
+    int 0x80 
+
+    pop edx
+    pop ecx 
+    pop ebx
+
+    ret
+
+
+;; #todo: 
+;; Não tá funcionando bem.
+;; IN: eax = x ebx = y
 asm_set_cursor:
  
     push eax 
-	push ebx 
+    push ebx 
     push ecx 
     push edx 
-	
+
     mov dword [.x], eax 
-	mov dword [.y], ebx
-	
-	mov eax, 34 
-	mov ebx, dword [.x]
-	mov ecx, dword [.y]
-	xor edx, edx 
-	
-	int 0x80
-	
-	pop edx
-	pop ecx 
-	pop ebx 
-	pop ebx 
-	
-	ret
-	
-.x: dd 0	
-.y: dd 0	
-	
+    mov dword [.y], ebx
+
+    mov eax, 34 
+    mov ebx, dword [.x]
+    mov ecx, dword [.y]
+    xor edx, edx 
+
+    int 0x80
+
+    pop edx
+    pop ecx 
+    pop ebx 
+    pop ebx 
+
+    ret
+
+.x: dd 0
+.y: dd 0
+
 
 ;;=====================
-;;reset cursor.	
+;; reset cursor.
+
 reset_cursor:
+
     push eax 
-	push ebx
-	
-	xor eax, eax 
-    xor ebx, ebx 	
+    push ebx
+
+    xor eax, eax 
+    xor ebx, ebx 
     call asm_set_cursor
 
     pop ebx  
-    pop eax 	
-    ret	
-	
-	
-	
+    pop eax 
+    ret
+
+
+
 ;;===================================
-;; getchar	
-;; OUT: eax = char  'al'	
+;; getchar
+;; 
+;; OUT: eax = char  'al'
 ;;
+
 getchar:
+
     ;;push eax
-	push ebx
-    push ecx	
-	push edx
-    
-	;;mov byte [.saveChar], al
+    push ebx
+    push ecx
+    push edx
 
-	xor edx, edx	
-	xor ecx, ecx 
-	xor ebx, ebx	
-	xor eax, eax   
+    ;;mov byte [.saveChar], al
 
-	mov dl, 0       ; byte [.saveChar]
-	mov cl, 0       ; byte [.saveChar]
-	mov bl, 0       ; byte [.saveChar] 
-	mov al, 137     ;número do serviço
-	
-	int 0x80
+    xor edx, edx
+    xor ecx, ecx 
+    xor ebx, ebx
+    xor eax, eax   
 
-	pop edx
-	pop ecx
-    pop ebx
-    ;;pop eax	
-	
-	;;#importante 
-	;;o retorno é um char em 'AL'.
-	
-    ret	
-	
-;;.saveChar:
-    ;;db 0	
-	
-	
-	
-;;===================================
-;; putchar	
-;; IN: eax = char e, 'al'	
-;;
-putchar:
-    push eax
-	push ebx
-    push ecx	
-	push edx
-    
-	mov byte [.saveChar], al
+    mov dl, 0       ; byte [.saveChar]
+    mov cl, 0       ; byte [.saveChar]
+    mov bl, 0       ; byte [.saveChar] 
+    mov al, 137     ;número do serviço
 
-	xor edx, edx	
-	xor ecx, ecx 
-	xor ebx, ebx	
-	xor eax, eax   
-
-	mov dl, byte [.saveChar]
-	mov cl, byte [.saveChar]
-	mov bl, byte [.saveChar] 
-	mov al, 65     ;número do serviço
-	
     int 0x80
-	
-	;xor edx, edx	
-	;xor ecx, ecx 
-	;xor ebx, ebx	
-	;xor eax, eax   
 
-	pop edx
-	pop ecx
+    pop edx
+    pop ecx
     pop ebx
-    pop eax	
-	
-    ret	
-	
+    ;;pop eax
+
+	;; #importante 
+	;; o retorno é um char em 'AL'.
+    ret
+
+;;.saveChar:
+    ;;db 0
+
+
+
+
+;;===================================
+;; putchar
+;; IN: eax = char e, 'al'
+;;
+
+putchar:
+
+    push eax
+    push ebx
+    push ecx
+    push edx
+    
+    mov byte [.saveChar], al
+
+    xor edx, edx
+    xor ecx, ecx 
+    xor ebx, ebx
+    xor eax, eax   
+
+    mov dl, byte [.saveChar]
+    mov cl, byte [.saveChar]
+    mov bl, byte [.saveChar] 
+    mov al, 65     ;número do serviço
+
+    int 0x80
+
+	;xor edx, edx
+	;xor ecx, ecx 
+	;xor ebx, ebx
+	;xor eax, eax
+
+    pop edx
+    pop ecx
+    pop ebx
+    pop eax
+    
+    ret
+
 .saveChar:
     db 0
 	
@@ -146,8 +168,8 @@ os_output_char:
    nop		
 print_char:
     call putchar 
-    ret		
-	
+    ret
+
 
 
 ;;=====================================
@@ -156,24 +178,24 @@ print_char:
 ;;
 
 DisplayMessage:
-    lodsb                                    ; Load next character.
-    or  al, al                               ; Test for NUL character.
+    lodsb           ; Load next character.
+    or  al, al      ; Test for NUL character.
     jz  .DONE
     
-	;al = char que queremos exibir.
-	mov ah, 0
-	xor ebx, ebx 
-	call putchar 
-	
-	;mov  ah, 0x0E                            ; BIOS teletype.                           
-    ;mov  bx, 0x0007                          ; Página e atributo.  
-	;int  0x10                                ; Invoke BIOS.
+    ;al = char que queremos exibir.
+    mov ah, 0
+    xor ebx, ebx 
+    call putchar 
+
+    ;mov  ah, 0x0E            ; BIOS teletype.                           
+    ;mov  bx, 0x0007          ; Página e atributo.  
+    ;int  0x10                ; Invoke BIOS.
     
-	jmp  DisplayMessage
+    jmp  DisplayMessage
 .DONE:
     ret
-	
-	
+
+
 ;testDisplayMessage:
 ;    mov esi,  _fred_string3
 ;	call DisplayMessage
@@ -197,20 +219,20 @@ print_spaces:
     mov  al, ' '             ; character to print
 .loop:
     jecxz .exit
-	
+
     ;push ecx
-	call    putchar
+    call    putchar
     ;pop ecx
-	
-	loop    .loop
+
+    loop  .loop
 .exit:
     popad
-    ret	
-	
+    ret
+
 	
 	
 
-;--------------------------------------------------------------------------
+;---------------------------------------------------------------------
 ; Write the byte value to the console in hex.
 ;
 ; Arguments:
@@ -227,11 +249,11 @@ print_hex:
     push    ax
     ror     al, 4
     
-	call    print_nibble            ; display upper nibble
-	pop     ax
+    call    print_nibble            ; display upper nibble
+    pop     ax
     
-	call    print_nibble            ; display lower nibble
-	ror     eax, 8
+    call    print_nibble            ; display lower nibble
+    ror     eax, 8
     loop    .looph
 
     ;mov     al, 10                  ; carriage return
@@ -251,8 +273,8 @@ print_nibble:
     ;push ecx
     call    putchar
     ;pop ecx
-	ret		
-	
+    ret
+
 
 ;--------------------------------------------------
 ; os_int_to_string:
@@ -270,16 +292,20 @@ print_nibble:
 ;   (20 for the digits and 1 for the string terminator).
 ;   Adapted from http://www.cs.usfca.edu/~cruse/cs210s09/rax2uint.s
 ;
-os_int_to_string:
-	push edx
-	push ecx
-	push ebx
-	push eax
 
-	mov ebx, 10					; base of the decimal system
-	xor ecx, ecx					; number of digits generated
+os_int_to_string:
+
+    push edx
+    push ecx
+    push ebx
+    push eax
+
+    mov ebx, 10               ; base of the decimal system
+    xor ecx, ecx              ; number of digits generated
+
 os_int_to_string_next_divide:
-	xor edx, edx					; RAX extended to (RDX,RAX)
+
+    xor edx, edx				; RAX extended to (RDX,RAX)
 	div ebx						; divide by the number-base
 	push edx					; save remainder on the stack
 	inc ecx						; and count this remainder
@@ -294,12 +320,12 @@ os_int_to_string_next_digit:
 	xor al, al
 	stosb						; Store the null terminator at the end of the string
 
-	pop eax
-	pop ebx
-	pop ecx
-	pop edx
-	ret
-;-----------------------------------------------------------------------
+    pop eax
+    pop ebx
+    pop ecx
+    pop edx
+    ret
+;----------------------------------------------------------------------
    
 
 ;--------------------------------------------------------------------
@@ -309,14 +335,17 @@ os_int_to_string_next_digit:
 ; OUT:	RAX = integer value
 ;	All other registers preserved
 ; Adapted from http://www.cs.usfca.edu/~cruse/cs210s09/uint2rax.s
-os_string_to_int:
-	push esi
-	push edx
-	push ecx
-	push ebx
 
-	xor eax, eax			; initialize accumulator
-	mov ebx, 10			; decimal-system's radix
+os_string_to_int:
+
+    push esi
+    push edx
+    push ecx
+    push ebx
+
+    xor eax, eax              ; initialize accumulator
+    mov ebx, 10               ; decimal-system's radix
+
 os_string_to_int_next_digit:
 	mov cl, [esi]			; fetch next character
 	cmp cl, '0'			; char preceeds '0'?
@@ -329,11 +358,11 @@ os_string_to_int_next_digit:
 	inc esi				; advance source index
 	jmp os_string_to_int_next_digit	; and check another char
 os_string_to_int_invalid:
-	pop ebx
-	pop ecx
-	pop edx
-	pop esi
-	ret
+    pop ebx
+    pop ecx
+    pop edx
+    pop esi
+    ret
 ;------------------------------------------------------------
 
 
@@ -343,35 +372,42 @@ os_string_to_int_invalid:
 ;     Return length of a string.
 ;  IN:	RSI = string location
 ; OUT:	RCX = length (not including the NULL terminator)
-;	All other registers preserved
-os_string_length:
-	push edi
-	push eax
-	
-	xor ecx, ecx
-	xor eax, eax
-	mov edi, esi
-	not ecx
-	cld
-	repne scasb	; compare byte at RDI to value in AL
-	not ecx
-	dec ecx
+;    All other registers preserved
 
-	pop eax
-	pop edi
-	ret
+os_string_length:
+
+    push edi
+    push eax
+
+    xor ecx, ecx
+    xor eax, eax
+    mov edi, esi
+    not ecx
+    cld
+    repne scasb    ; compare byte at RDI to value in AL
+    not ecx
+    dec ecx
+
+    pop eax
+    pop edi
+    ret
 ;--------------------------------------------------
 
-; -----------------------------------------------------------------------------
+
+
+; ----------------------------------------------------------------
 ; os_string_copy -- Copy the contents of one string into another
 ;  IN:	RSI = source
 ;	RDI = destination
 ; OUT:	All registers preserved
-; Note:	It is up to the programmer to ensure that there is sufficient space in the destination
+; Note: It is up to the programmer to ensure that there is 
+; sufficient space in the destination
+
 os_string_copy:
-	push esi
-	push edi
-	push eax
+
+    push esi
+    push edi
+    push eax
 
 os_string_copy_more:
 	lodsb				; Load a character from the source string
@@ -379,29 +415,31 @@ os_string_copy_more:
 	cmp al, 0			; If source string is empty, quit out
 	jne os_string_copy_more
 
-	pop eax
-	pop edi
-	pop esi
-	ret
-; -----------------------------------------------------------------------------
+    pop eax
+    pop edi
+    pop esi
+    ret
+; ------------------------------------------------------------------
 
 
 
 
-; -----------------------------------------------------------------------------
+; --------------------------------------------------------------------
 ; os_string_compare -- See if two strings match
-;  IN:	RSI = string one
-;	RDI = string two
-; OUT:	Carry flag set if same
+;  IN:  RSI = string one
+;       RDI = string two
+; OUT:  Carry flag set if same
+
 os_string_compare:
-	push esi
-	push edi
-	push ebx
-	push eax
+    push esi
+    push edi
+    push ebx
+    push eax
 
 os_string_compare_more:
-	mov al, [esi]			; Store string contents
-	mov bl, [edi]
+
+    mov al, [esi]			; Store string contents
+    mov bl, [edi]
 	cmp al, 0			; End of first string?
 	je os_string_compare_terminated
 	cmp al, bl
@@ -428,11 +466,11 @@ os_string_compare_terminated:
 	pop esi
 	stc
 	ret
-; -----------------------------------------------------------------------------
+; --------------------------------------------------------------------
 
 
 
-; -----------------------------------------------------------------------------
+; ---------------------------------------------------------------------
 ; os_string_find_char -- Find first location of character in a string
 ;  IN:	RSI = string location
 ;	AL  = character to find
@@ -468,32 +506,34 @@ os_string_find_char_not_found:
 	pop esi
 	xor eax, eax	; not found, set RAX to 0
 	ret
-; -----------------------------------------------------------------------------
+; -------------------------------------------------------------------
 
 
 
-;=============================================================================
+; ==================================================================
 ; os_string_change_char:
 ;     Change all instances of a character in a string.
 ;     Trocamos um caractere por outro dentro de uma string. 
 ;
-; IN:	
+; IN:
 ;     ESI = Sstring location.
-;	  AL  = Character to replace.
-;	  BL  = Replacement character.
+;     AL  = Character to replace.
+;     BL  = Replacement character.
 ;
-; OUT:	
+; OUT:
 ;     All registers preserved
 ;
+
 os_string_change_char:
 
-	push esi  ;;Colocamos na pilha.
-	
-	push ecx
-	push ebx
-	push eax
+    push esi    ; Colocamos na pilha.
 
-	mov cl, al
+    push ecx
+    push ebx
+    push eax
+
+    mov cl, al
+
 os_string_change_char_loop:
 	mov byte al, [esi]
 	
@@ -510,27 +550,28 @@ os_string_change_char_no_change:
 	jmp os_string_change_char_loop
 
 os_string_change_char_done:
-	pop eax
-	pop ebx
-	pop ecx
-	
-	pop esi    ;;tiramos da pilha.
-	ret
-; -----------------------------------------------------------------------------
+    pop eax
+    pop ebx
+    pop ecx
+
+    pop esi    ; Tiramos da pilha.
+    ret
+; --------------------------------------------------------------------
 
 
 
 
-
-; -----------------------------------------------------------------------------
+; --------------------------------------------------------------------
 ; os_string_chomp -- Strip leading and trailing spaces from a string
-;  IN:	RSI = string location
-; OUT:	All registers preserved
+;  IN:  RSI = string location
+; OUT:  All registers preserved
+
 os_string_chomp:
-	push esi
-	push edi
-	push ecx
-	push eax
+
+    push esi
+    push edi
+    push ecx
+    push eax
 
 	call os_string_length		; Quick check to see if there are any characters in the string
 	jecxz os_string_chomp_done	; No need to work on it if there is no data
@@ -575,28 +616,30 @@ os_string_chomp_copy:		; Copy a byte from RSI to RDI one byte at a time until we
 	jne os_string_chomp_copy
 
 os_string_chomp_done:
-	pop eax
-	pop ecx
-	pop edi
-	pop esi
-	ret
-; -----------------------------------------------------------------------------
+    pop eax
+    pop ecx
+    pop edi
+    pop esi
+    ret
+; ---------------------------------------------------------------------
 
 
 
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 ; os_string_parse -- Parse a string into individual words
 ;  IN:	RSI = Address of string
 ; OUT:	RCX = word count
 ; Note:	This function will remove "extra" whitespace in the source string
 ;	"This is  a test. " will update to "This is a test."
-os_string_parse:
-	push esi
-	push edi
-	push eax
 
-	xor ecx, ecx			; RCX is our word counter
-	mov edi, esi
+os_string_parse:
+
+    push esi
+    push edi
+    push eax
+
+    xor ecx, ecx              ; RCX is our word counter
+    mov edi, esi
 
 	call os_string_chomp		; Remove leading and trailing spaces
 	
@@ -624,40 +667,40 @@ os_string_parse_no_more_spaces:
 	inc ecx
 	jmp os_string_parse_next_char
 os_string_parse_done:
-	pop eax
-	pop edi
-	pop esi
+    pop eax
+    pop edi
+    pop esi
     ret
-; -----------------------------------------------------------------------------
+; ---------------------------------------------------------------------
 
 
 
 
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 ; os_string_append -- Append a string to an existing string
 ;  IN:	RSI = String to be appended
 ;	RDI = Destination string
 ; OUT:	All registers preserved
 ; Note:	It is up to the programmer to ensure that there is sufficient space in the destination
 os_string_append:
-	push esi
-	push edi
-	push ecx
+    push esi
+    push edi
+    push ecx
 
-	xchg esi, edi
-	call os_string_length
-	xchg esi, edi
-	add edi, ecx
-	call os_string_copy
+    xchg esi, edi
+    call os_string_length
+    xchg esi, edi
+    add edi, ecx
+    call os_string_copy
 
-	pop ecx
-	pop edi
-	pop esi
-	ret
-; -----------------------------------------------------------------------------
+    pop ecx
+    pop edi
+    pop esi
+    ret
+; ---------------------------------------------------------------------
 
 
-; -----------------------------------------------------------------------------
+; ---------------------------------------------------------------------
 ; os_hex_string_to_int -- Convert up to 8 hexascii to bin
 ;  IN:	RSI = Location of hex asciiz string
 ; OUT:	RAX = binary value of hex string
@@ -688,11 +731,11 @@ os_hex_string_to_int_got:
 	or bl, al
 	jmp os_hex_string_to_int_loop
 os_hex_string_to_int_exit:
-	mov eax, ebx				; int value stored in RBX, move to RAX
-	pop ebx
-	pop ecx
-	pop esi
-	ret
+    mov eax, ebx				; int value stored in RBX, move to RAX
+    pop ebx
+    pop ecx
+    pop esi
+    ret
 ;-----------------------------------------------------------------
 
 
@@ -716,14 +759,15 @@ align 2
 ;
 os_input:
 
-	push edi
-	push edx    ;Counter to keep track of max accepted characters.
-	push eax
+    push edi
+    push edx    ;Counter to keep track of max accepted characters.
+    push eax
 
-	mov edx, ecx    ;Max chars to accept.
-	xor ecx, ecx	;Offset from start.
+    mov edx, ecx    ; Max chars to accept.
+    xor ecx, ecx    ; Offset from start.
 
-;++	
+
+;++
 os_input_more:
 	
 	;Prompt.
@@ -797,17 +841,19 @@ os_halt_and_more:
 	;;hlt
     pause	
 	jmp os_input_more
+
 os_input_done:	
-	mov al, 0x00
-	stosb				    ;We NULL terminate the string.
-	
-	mov al, ' '
-	call os_output_char
-	
-	pop eax
-	pop edx
-	pop edi
-	RET
+
+    mov al, 0x00
+    stosb                    ; We NULL terminate the string.
+
+    mov al, ' '
+    call os_output_char
+
+    pop eax
+    pop edx
+    pop edi
+    RET
 ;---------------------------------------------------------------
 
 
@@ -827,8 +873,8 @@ os_input_key:
 	; pega um char na fila do teclado e coloca em al.
 	; isso é a mesma usada pela libc.
 	
-	call getchar
-	
+    call getchar
+
 	mov byte [.key], al
 	;mov al, [key]    ;Pega.
 	
@@ -842,10 +888,13 @@ os_input_key:
 .key db 0		
 
 os_input_key_no_key:
-	clc			            ;Clear the carry flag.
-	ret
+    clc                   ; Clear the carry flag.
+    ret
 ;--------------------
 
+;;
+;; End.
+;;
 
-	
-	
+
+

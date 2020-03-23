@@ -29,20 +29,6 @@ CFLAGS = -m32 \
 	-s
 
 
-	##
-	## Objects
-	##
-
-#myObjects = main.o \
-#ctype.o \
-#stdio.o \
-#stdlib.o \
-#string.o \
-#time.o \
-#api.o \
-#unistd.o  
-
-
 
 .PHONY: all all-c gdeio-link finalize clean
 
