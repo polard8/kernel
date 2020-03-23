@@ -49,9 +49,12 @@ struct desktop_d
     int name_lenght;
 
     // The window server and the window manager for this desktop.
-    int ws;
-    int wm;
     
+    int ws;   // window server
+    int wm;   // window manager
+    int ns;   // network server
+    // ...
+      
   
     // #todo
     // A estrutura de eventos também desve estar associado

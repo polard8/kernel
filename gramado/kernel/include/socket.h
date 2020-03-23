@@ -32,6 +32,7 @@
 #define GRAMADO_SH_PORT 8
 #define GRAMADO_WS_PORT 11
 #define GRAMADO_WM_PORT 12
+#define GRAMADO_NS_PORT 14   // network server.
 // ...
 int gramado_ports[32];
 //--

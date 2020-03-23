@@ -481,6 +481,51 @@ void *gde_extra_services ( unsigned long number,
         return (void *) CurrentDesktop;
     }
 
+    // network server
+	// 520 - get ns PID for a given desktop
+    if ( number == 520 )
+    {
+        // pega o wm de um dado desktop.
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed == 1 && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                return (void *) __desktop->ns; 
+            }
+        }
+        return NULL; //#bugbug: Isso pode significar pid 0.
+    }
+
+    // network server
+	// 521 - set ns PID for a given desktop
+	// Register a window server.
+	// gramado_ports[11] = ws_pid
+
+    if ( number == 521 )
+    {
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed == 1 && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                __desktop->ns = (int) arg3;
+                
+                
+                // What is the process listen to the port 11.
+                gramado_ports[GRAMADO_NS_PORT] = (int) current_process;
+                
+                // returning ok.
+                // But, we could return the port number.
+                return (void *) 1;  //ok 
+            }
+        }
+        return NULL; //fail
+    }    
+
+
     // ??
     // setup net buffer for a process.
     struct process_d *__net_process;

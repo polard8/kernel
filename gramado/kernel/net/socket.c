@@ -680,28 +680,28 @@ socket_ioctl ( unsigned long number,
 }
 
 
-
-//em nosso exemplo o cliente quer se conectar com o servidor.
+// connect.
+// Em nosso exemplo o cliente quer se conectar com o servidor.
+// IN: client fd, address, address len
 // OUT: 0=ok <0=fail
 int 
-sys_connect ( int sockfd, 
-              const struct sockaddr *addr,
-              socklen_t addrlen )
+sys_connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen )
 {
 
-    struct socket_d *my_socket;
-    struct socket_d *server_socket;    
-    
-    
-    struct process_d *p;
-    struct process_d *tp;  //target process.
-    
+    struct process_d *p;   // Current process.
+    struct process_d *tp;  // Target process.
+
     struct file_d *f;
-
-
+    
+    struct socket_d *my_socket;
+    struct socket_d *server_socket; 
 
     int target_pid = -1;
     
+
     
     printf ("sys_connect: PID %d | fd %d | \n",
         current_process, sockfd );
@@ -744,7 +744,12 @@ sys_connect ( int sockfd,
             if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 'm' ){   
                 target_pid = (int) gramado_ports[GRAMADO_WM_PORT]; 
             }
-            
+
+            // network server
+            if ( addr->sa_data[0] == 'n' && addr->sa_data[1] == 's' ){   
+                target_pid = (int) gramado_ports[GRAMADO_NS_PORT]; 
+            }
+
             // ...
 
             printf (">>>> target pid %d \n", target_pid);

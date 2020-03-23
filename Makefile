@@ -200,10 +200,12 @@ vhd-copy-files:
 	-sudo cp gramado/base/dev/SDA        /mnt/gramadovhd
 	-sudo cp gramado/base/tests/*.CPP    /mnt/gramadovhd
 	-sudo cp gramado/base/res/wall/ANIMAL.BMP   /mnt/gramadovhd
+	
 	-sudo cp gramado/gns/bin/GNS.BIN       /mnt/gramadovhd
-	# todo -sudo cp gramado/gns/bin/GNST.BIN      /mnt/gramadovhd	
+	-sudo cp gramado/gns/bin/GNST.BIN      /mnt/gramadovhd
 	-sudo cp gramado/gws/bin/GWS.BIN       /mnt/gramadovhd
 	-sudo cp gramado/gws/bin/GWST.BIN      /mnt/gramadovhd
+	
 	-sudo cp animal/apps/bin/*.BIN         /mnt/gramadovhd
 	-sudo cp animal/cmd/bin/*.BIN          /mnt/gramadovhd
 #	-sudo cp animal/cmd/bin/S2.BIN         /mnt/gramadovhd

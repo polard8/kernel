@@ -175,29 +175,10 @@ new_message:
     {
         // Create window        
         message_buffer[0] = 0;       // window. 
-        message_buffer[1] = 1001;    // msg. Create window.
+        message_buffer[1] = 1000;    // msg=hello.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
-        
-        message_buffer[4] = 450;   //x
-        message_buffer[5] = 100;   //y
-        message_buffer[6] = 200;   //w
-        message_buffer[7] = 200;   //h
-        
-        message_buffer[8] = ____color + ( rand() ); 
-
-
-        /*
-        //line
-        message_buffer[0] = 0; //window. 
-        message_buffer[1] = 1003; //1000;  //msg = hello friend.
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        message_buffer[4] = 100;   //x1
-        message_buffer[5] = 100;   //y
-        message_buffer[6] = 200;       //x2
-        message_buffer[7] = 0x00FF00;   //color
-        */
+       
 
         //...
 
@@ -247,9 +228,9 @@ new_message:
 
 
        //#caution
-       //we cam stay here for ever.
+       //we can stay here for ever.
        //it's a test yet.
-    __again:
+__again:
     n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
     // Não vamos insistir num arquivo vazio.
     if (n_reads<=0){
@@ -295,15 +276,8 @@ process_reply:
     //
 
     //printf("%d bytes readed\n",n_reads);
-    //printf("RESPONSE: {%s} \n",__buffer+16);
+    printf("RESPONSE: {%s} \n",__buffer+16);
     
-    // A resposta tras o window id no inpicio do buffer.
-    // printf ("s2: Window ID %d \n", message_buffer[0] );
-
-    ____color = rand();
-    
-    debug_print ("gnst: new message\n");
-    goto new_message;
     
     
     debug_print ("gnst: bye\n"); 

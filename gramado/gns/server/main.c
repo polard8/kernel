@@ -95,8 +95,8 @@ struct desktop_d *__desktop;
 
 
 // Our PID.
-int __ws_pid;
-
+//int __ws_pid;
+int __ns_pid;   // network server pid.
 
 //window.
 struct window_d *__mywindow; 
@@ -340,6 +340,8 @@ gwsProcedure ( struct window_d *window,
             break;
 
         case 1000:
+            printf (">> Hello from Gramado Network Server !\n");
+            //refresh_screen();
         
             //draw text inside a window.
             //dtextDrawText ( (struct window_d *) __mywindow,
@@ -539,13 +541,13 @@ int main (int argc, char **argv){
     // Register.
     //
 
-
-    __ws_pid = (int) getpid();
-
     // Set ws PID
     // Setar esse processo como o ws do sistema.
-    gramado_system_call ( 513, __desktop, __ws_pid, __ws_pid );
-
+    //__ws_pid = (int) getpid();
+    //gramado_system_call ( 513, __desktop, __ws_pid, __ws_pid );
+    
+    __ns_pid = (int) getpid();
+    gramado_system_call ( 521, __desktop, __ns_pid, __ns_pid );
 
 
     //
@@ -642,7 +644,7 @@ int main (int argc, char **argv){
         // Messages sended via sockets.
         //debug_print("$s");
         // It works.
-        //__socket_messages (____saved_server_fd);
+        __socket_messages (____saved_server_fd);
 
         //...
     };
