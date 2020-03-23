@@ -796,7 +796,7 @@ typedef enum {
 
 //w2k - system colors
 //#bugbug delete;
-#define COLOR_TEST_0  0x8080FF  // COLOR_BACKGROUND(verde claro) ??
+#define COLOR_TEST_0  0x8080FF  // COLOR_BACKGROUND
 #define COLOR_TEST_1  0x80FFFF  // COLOR_APPWORKSPACE, MDIWINDOW 
 #define COLOR_TEST_2  0x80FF80  // COLOR_WINDOW, CLIENT
 #define COLOR_TEST_3  0x80FF00  // COLOR_WINDOWTEXT, CLIENTTEXT 

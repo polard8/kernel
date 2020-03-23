@@ -503,14 +503,26 @@ int main (int argc, char **argv){
     
     //if(w==0 && h==0)
         //fail!
-   
         
+        
+    // #todo:
+    // Let's create the traditional green background.
+
+    struct gws_window_d *__bg_window;
+    __bg_window = (struct window_d *) createwCreateWindow ( WT_SIMPLE, 
+                                         1, 1, "gws-bg",  
+                                         0, 0, w, h,   
+                                         gui->screen, 0, 
+                                         COLOR_BACKGROUND, COLOR_BACKGROUND );    
+   
+
+
     // #log: isso funcionou na máquina real.    
     __mywindow = (struct window_d *) createwCreateWindow ( WT_SIMPLE, 
                                          1, 1, "gws-taskbar",  
                                          0, 0, w, 36,   
                                          gui->screen, 0, 
-                                         COLOR_GRAY, COLOR_GRAY );
+                                         xCOLOR_GRAY1, xCOLOR_GRAY1 );
 
  
  
