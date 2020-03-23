@@ -26,17 +26,20 @@
 #include <bootloader.h>
 
 
-// Prototypes.
-
-unsigned long init_testing_memory_size (int mb);
-void BlLoadKernel();
-void BlSetupPaging();
-
-
 //static char *codename = "Gramado Boot";
 //char kernel_file_name[] = "kernel.bin";
 //static char **argv = { NULL, NULL, NULL };
 //static char **envp = { NULL, NULL, NULL };
+
+
+
+// Prototypes.
+
+unsigned long init_testing_memory_size (int mb);
+void BlLoadKernel ();
+void BlSetupPaging ();
+
+
 
 
 /*
@@ -242,8 +245,8 @@ void BlMain (){
 /*
  ***************************************************************
  * BlLoadKernel: 
- *     Carrega o Kernel.
- *     Kernel carregado em 0x00100000, entry point em 0x00101000.
+ *     It loads the kernel image at 0x00100000.
+ *     The entry point is at 0x00101000.
  */ 
 
 void BlLoadKernel (){
@@ -341,12 +344,10 @@ unsigned long init_testing_memory_size (int mb)
 {
     unsigned char *BASE = (unsigned char *) 0;  
     
-    int offset; 
+    int offset=0; 
+    int i=0;
 
-    int i;
-
-
-    // salvando os valores durante o test
+    // Salvando os valores durante o test.
     unsigned char ____value1 = 0;             
     unsigned char ____value2 = 0;                 
     
@@ -355,9 +356,8 @@ unsigned long init_testing_memory_size (int mb)
     // Flag.
     //
 
-    //acionando
+    // Acionando flag.
     ____testing_memory_size_flag = 1;
-
 
 
 
@@ -434,8 +434,6 @@ unsigned long init_testing_memory_size (int mb)
     return __last_valid_address;
 }
  
-
-
 //
 //================================================================
 // end - Testing memory size
@@ -445,16 +443,10 @@ unsigned long init_testing_memory_size (int mb)
 
 
 /*
- **************************************************
+ *******************************************
  * die:
- *     A inten��o dessa rotina deixar o processador no 
- * estado hlt durante um erro fatal. Para que ele n�o fique 
- * funcionando a 100% num loop infinito.
- * Final message !
- * Bullet, Message.
- * Wait forever. 
- * Halt system.	
- * No return. 
+ *     CLI HLT routine.
+ *     No return!
  */
 
 void die (){
