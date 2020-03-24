@@ -77,12 +77,25 @@ int strncasecmp(const char *s1, const char *s2, size_t len)
 */
 
 
+// musl
+/*
+int strncasecmp(const char *_l, const char *_r, size_t n);
+int strncasecmp(const char *_l, const char *_r, size_t n)
+{
+	const unsigned char *l=_l, *r=_r;
+	if (!n--) return 0;
+	for (; *l && *r && n && (*l == *r || tolower(*l) == tolower(*r)); l++, r++, n--);
+	return tolower(*l) - tolower(*r);
+}
+*/
+
 void *memsetw (void *dst, int val, size_t count){
 
-	unsigned short *temp = (unsigned short *) dst;
+    unsigned short *temp = (unsigned short *) dst;
 
-	for ( ; count != 0; count--)
-		*temp++ = val;
+    for ( ; count != 0; count--)
+        *temp++ = val;
+
     return (void *) dst;
 }
 
@@ -96,14 +109,14 @@ int memcmp (const void *s1, const void *s2, size_t n){
 
     if (n != 0) 
     {
-		const unsigned char *p1 = s1, *p2 = s2;
+        const unsigned char *p1 = s1, *p2 = s2;
 
-		do {
+        do {
 
-			if (*p1++ != *p2++)
-				return (*--p1 - *--p2);
+            if (*p1++ != *p2++)
+                return (*--p1 - *--p2);
 
-		} while (--n != 0);
+        } while (--n != 0);
     }
 
     return 0;
@@ -123,12 +136,14 @@ char *strdup (const char *str){
     char *copy;
     size_t len;
 
-	len = strlen(str) + 1;
-	
-	if (!(copy = (char *) malloc( ( size_t ) len ) ))
-		return (NULL);
-	memcpy (copy, str, len);
-	return (copy);
+    len = strlen(str) + 1;
+
+    if (!(copy = (char *) malloc( ( size_t ) len ) ))
+        return (NULL);
+
+    memcpy (copy, str, len);
+    
+    return (copy);
 }
 
 
@@ -138,13 +153,14 @@ char *strndup (const char *s, size_t n){
 
     size_t l = strnlen (s, n);
 
-	d = (char *) malloc (l + 1);
-	
-	if (!d)
-		return NULL;
-	
-	memcpy (d, s, l);
-	d[l] = '\0';
+    d = (char *) malloc (l + 1);
+
+    if (!d)
+        return NULL;
+
+    memcpy (d, s, l);
+
+    d[l] = '\0';
 
     return (char *) d;
 }
@@ -212,12 +228,13 @@ char *strim(char *s)
  */
 
 
-char *strnchr(const char *s, size_t count, int c)
-{
-	for (; count-- && *s != '\0'; ++s)
-		if (*s == (char)c)
-			return (char *)s;
-	return NULL;
+char *strnchr (const char *s, size_t count, int c){
+
+    for (; count-- && *s != '\0'; ++s)
+        if (*s == (char)c)
+            return (char *) s;
+
+    return NULL;
 }
 
 
@@ -238,11 +255,11 @@ char *strrchr (const char *p, int ch){
 
     for ( save = NULL;; ++p ) 
     {
-		if (*p == c)
-			save = (char *) p;
-		
-		if (*p == '\0')
-			return (char *) save;
+        if (*p == c)
+            save = (char *) p;
+
+        if (*p == '\0')
+            return (char *) save;
     }
 	/* NOTREACHED */
 }
@@ -252,7 +269,8 @@ char *strrchr (const char *p, int ch){
 //definido em inttypes.h
 intmax_t strtoimax (const char *str, char **endptr, int base)
 {
-   return 0;
+    debug_print ("strtoimax: [TODO]\n");
+    return 0;
 }
 
 
@@ -260,7 +278,8 @@ intmax_t strtoimax (const char *str, char **endptr, int base)
 //definido em inttypes.h
 uintmax_t strtoumax (const char *str, char **endptr, int base)
 {
-   return 0;
+    debug_print ("strtoumax: [TODO]\n");
+    return 0;
 }
 
 
@@ -326,10 +345,10 @@ int strcasecmp (const char *s1, const char *s2){
     unsigned char s1ch, s2ch;
 
     for (;;){
-		
-		s1ch = *s1++;
-		s2ch = *s2++;
-		
+
+        s1ch = *s1++;
+        s2ch = *s2++;
+
 		//tolower
 		
 		if (s1ch >= 'A' && s1ch <= 'Z')
@@ -393,11 +412,11 @@ int strcmp(const char *s1, const char *s2){
 
     for ( i=0; s1[i] == s2[i]; i++ )
     {
-        if ( s1[i] == '\0' )
-        { 
+        if ( s1[i] == '\0' ){ 
             return 0; 
         }
     };
+
 
     return (int) ( s1[i] - s2[i] );
 }
@@ -417,8 +436,7 @@ int strncmp (const char *s1, const char *s2, size_t n){
     {
         n--;
 
-        if ( *s1 != *s2 )
-        { 
+        if ( *s1 != *s2 ){ 
             return (int) 1; 
         }
 
@@ -429,7 +447,8 @@ int strncmp (const char *s1, const char *s2, size_t n){
     if ( *s1 != '\0' || *s2 != '\0' )
     {
         return (int) 2;
-    };
+    }
+
 
     return 0;
 }
@@ -448,12 +467,12 @@ void *memset ( void *ptr, int value, int size ){
 
         int i = 0;
 
-        for ( i = 0; i < size; i++ )
-        {
+        for ( i=0; i < size; i++ ){
             *temp++ = (unsigned char) value;
         }
 
-    };
+    }
+
 
     return (void *) ptr;
 }
@@ -545,9 +564,10 @@ size_t strlcpy (char *dst, const char *src, size_t size){
     }
 
 	// If size == 0 there is no space for a final null... 
-	if (size)
-		*q = '\0';
-	return bytes;
+    if (size)
+        *q = '\0';
+
+    return bytes;
 }
 
 
@@ -601,19 +621,21 @@ size_t strlcat (char *dst, const char *src, size_t size){
     //#bugbug
     //E se size for menor que zero.?
 
-	while (bytes < size && *q)
-	{
+    while (bytes < size && *q)
+    {
 		q++;
 		bytes++;
-	}
+    };
 
-	if (bytes == size)
-		return (bytes + strlen(src));
-	while ((ch = *p++)) {
+    if (bytes == size)
+        return (bytes + strlen(src));
+
+    while ((ch = *p++)){
+
 		if (bytes + 1 < size)
 			*q++ = ch;
 		bytes++;
-	}
+    };
 
 	*q = '\0';
 	return bytes;
@@ -636,7 +658,7 @@ char *strncat (char *dst, const char *src, size_t n){
 		*q++ = ch = *p++;
 		if (!ch)
 			return dst;
-    }
+    };
 
     *q = '\0';
 
@@ -684,11 +706,10 @@ void  bzero ( char *cp, int len ){
 
 size_t strlen (const char *s){
 
-    size_t i = 0;
+    size_t i=0;
 
-    for ( i=0; s[i] != '\0'; i++ ){ 
-    ; 
-    };
+    for ( i=0; s[i] != '\0'; i++ )
+    { ; };
 
     return (size_t) i;
 }
@@ -713,7 +734,9 @@ size_t strnlen ( const char *s, size_t maxlen ){
         //return -1;
 
     for (e = s, n = 0; *e && n < maxlen; e++, n++)
-    ;
+    { ; };
+
+
     return (size_t) n;
 }
 
@@ -724,14 +747,15 @@ char *strpbrk (const char *cs, const char *ct){
 
     for ( sc1 = cs; *sc1 != '\0'; ++sc1 )
     {
-		for ( sc2 = ct; *sc2 != '\0'; ++sc2 )
-		{
-			if (*sc1 == *sc2)
-				return (char *) sc1;
-		}
+        for ( sc2 = ct; *sc2 != '\0'; ++sc2 )
+        {
+            if (*sc1 == *sc2)
+                return (char *) sc1;
+        };
     };
 
-	return NULL;
+
+    return NULL;
 }
 
 
@@ -761,7 +785,8 @@ char *strsep(char **s, const char *ct){
 	if (end)
 		*end++ = '\0';
 	*s = end;
-	return (char *) sbegin;
+
+    return (char *) sbegin;
 }
 
 
@@ -882,18 +907,22 @@ void *memset32 (uint32_t *s, uint32_t v, size_t count)
 
 // ??
 // Não é padrão. Mas deixe aqui.
-static void *check_bytes8 ( const char *start, 
-                             char value, 
-                             unsigned int bytes )
+static void *
+check_bytes8 ( 
+    const char *start, 
+    char value, 
+    unsigned int bytes )
 {
-	while (bytes)
-	{
+
+    while (bytes)
+    {
 		if (*start != value)
 			return (void *)start;
 		start++;
 		bytes--;
-	}
-	return NULL;
+    };
+
+    return NULL;
 }
 
 
@@ -912,7 +941,8 @@ char *strreplace (char *s, char old, char new){
 	for (; *s; ++s)
 		if (*s == old)
 			*s = new;
-	return (char *) s;
+
+    return (char *) s;
 }
 
 
@@ -928,10 +958,10 @@ char *strreplace (char *s, char old, char new){
 
 size_t strcspn ( const char *str, const char *reject ){
 	
-	int result;
+    int result;
 	
 	//size_t reject_length = 0;
-	int reject_length = 0;
+    int reject_length = 0;
 	
 	while ( reject[reject_length] )
 		reject_length++;
@@ -940,7 +970,7 @@ size_t strcspn ( const char *str, const char *reject ){
 	// ?? Não seria "result==1" ??
 	//for ( size_t result = 0; 1; result++ )
     for ( result=0; result=1; result++ )
-	{
+    {
 		char c = str[result];
 		
 		if ( !c )
@@ -976,8 +1006,8 @@ size_t strspn ( const char *str, const char *accept ){
     int result;
 
 	//size_t accept_length = 0;
-	int accept_length = 0; 
-	
+    int accept_length = 0; 
+
 	while ( accept[accept_length] )
 		accept_length++;
 	
@@ -986,9 +1016,9 @@ size_t strspn ( const char *str, const char *accept ){
 	//for ( size_t result = 0; true; result++ )
     
     for ( result = 0; result = 1; result++ )
-	{
-		char c = str[result];
-		
+    {
+        char c = str[result];
+
 		if ( !c )
 			return (size_t) result;
 		
@@ -1036,15 +1066,15 @@ char *strtok_r ( char *s, const char *delim, char **last ){
 	
 cont:
     
-	c = *s++;
+    c = *s++;
     
-	for ( spanp = (char *) delim; (sc = *spanp++) != 0; )
+    for ( spanp = (char *) delim; (sc = *spanp++) != 0; )
     {
-	    if (c == sc)
-	    {
-	        goto cont;
-	    }
+        if (c == sc){
+            goto cont;
+        }
     };
+
 
 	// No non-delimiter characters. 
     if ( c == 0 )
@@ -1068,27 +1098,26 @@ cont:
 	    {
 	        if ( (sc = *spanp++) == c )
 	        {
-		        if ( c == 0 )
-				{
-		            s = NULL;
-					
-		        }else{
-					
-		            char *w = s -1;
-		            
-					*w = '\0';
-		        };
-				
+                if ( c == 0 ){
+                    s = NULL;
+
+                }else{
+
+                    char *w = s -1;
+
+                    *w = '\0';
+                };
+
 		        *last = s;
 				
 		        return tok;
 	        };
 			
-	    }while( sc != 0 );
+        } while( sc != 0 );
         
 		//Nothing.
 
-	};
+    };
     // NOTREACHED 
 }
 
@@ -1096,7 +1125,7 @@ cont:
 /*
  *********************************************
  * strtok:
- *     Credits: Apple. (Open Source) 
+ *     strtok 
  */
 
 char *strtok ( char *s, const char *delim ){
@@ -1114,36 +1143,36 @@ char *strtok ( char *s, const char *delim ){
  */
 
 char *strchr (const char *s, int c){
-	
+
 	for (; *s != (char) c; ++s)
 		if (*s == '\0')
 			return NULL;
-	return (char *) s;
+
+    return (char *) s;
 }
 
 
 /*linux style*/
-
 void *memmove (void *dest, const void *src, size_t count){
-	
-	char *tmp;
-	const char *s;
 
-	if (dest <= src) {
+    char *tmp;
+    const char *s;
+
+    if (dest <= src) {
 		tmp = dest;
 		s = src;
 		while (count--)
 			*tmp++ = *s++;
-	} else {
+    } else {
 		tmp = dest;
 		tmp += count;
 		s = src;
 		s += count;
 		while (count--)
 			*--tmp = *--s;
-	}
+    };
 
-	return dest;
+    return dest;
 }
 
 
@@ -1160,18 +1189,19 @@ void *memmove (void *dest, const void *src, size_t count){
  */
  
 void *memscan (void *addr, int c, size_t size){
-	
-	unsigned char *p = addr;
 
-	while (size){
-		
+    unsigned char *p = addr;
+
+    while (size){
+
 		if (*p == c)
 			return (void *)p;
 		p++;
 		size--;
-	}
+    };
 
-  	return (void *) p;
+
+    return (void *) p;
 }
 
 
@@ -1183,23 +1213,25 @@ void *memscan (void *addr, int c, size_t size){
  */
 
 char *strstr (const char *s1, const char *s2){
-	
-	size_t l1, l2;
 
-	l2 = strlen(s2);
+    size_t l1, l2;
+
+    l2 = strlen(s2);
 	
 	if (!l2)
 		return (char *)s1;
 	l1 = strlen(s1);
 	
-	while (l1 >= l2){
+    while (l1 >= l2)
+    {
 		l1--;
 		if (!memcmp(s1, s2, l2))
 			return (char *)s1;
 		s1++;
-	}
-	
-	return NULL;
+    };
+
+
+    return NULL;
 }
 
 
@@ -1256,14 +1288,16 @@ char *__strdup (char *l){
 
 
 
-char *index (const char *s, int c)
-{
-	do {
+char *index (const char *s, int c){
+
+    do {
 		if (*s == c)
 			return (char *) (s);
-	} while (*s++);
-	return(NULL);
+    } while (*s++);
+
+    return(NULL);
 }
+
 
 char *rindex (const char *s, int c)
 {
@@ -1296,9 +1330,9 @@ size_t strxfrm (char *dst, const char *src, size_t n){
 		memcpy (dst, src, copysize);
 		
 		dst[copysize] = 0;
-	}
+    }
 
-	return (srclen);
+    return (srclen);
 }
 
 
@@ -1354,19 +1388,38 @@ void swab (const void *from, void *to, size_t len){
 
 
 
-char *strerror(int errnum)
-{ 
-	return 0; 
+char *strerror (int errnum)
+{
+    debug_print ("strerror: [TODO]\n");
+    return 0; 
 }
 
 
+/* XSI-compliant */
+int strerror_r (int errnum, char *buf, size_t buflen)
+{
+    char *msg = strerror (errnum);
 
-//GNU-specific 
+    if (strlen(msg) >= buflen)
+        return -1;  //return ERANGE;
+
+
+    strcpy(buf, msg);
+
+    return 0;
+}
+
+
+/* GNU-specific */
+/*
 char *strerror_r(int errnum, char *buf, size_t buflen)
 { 
-	return 0; 
-
+    debug_print ("strerror_r: GNU-specific \n");
+    return 0; 
 }
+*/
+
+
 
 
 /*
@@ -1378,8 +1431,9 @@ char *strerror_l(int errnum, locale_t locale)
 
 
 char *strsignal (int sig)
-{ 
-	return 0; 
+{
+    debug_print ("strsignal: [TODO]\n");
+    return 0; 
 }
 
 
@@ -1388,18 +1442,23 @@ char *strsignal (int sig)
 //#define toupper(c)	(islower(c) ? c + 'A' - 'a' : c)
 
 // Converte a string para tudo maiusculo.
-void strtoupper(char *src){
-  char *c;
+void strtoupper (char *src){
 
-  if (!src){
-    return;
-  }
-  c = src;
-  while((*c)!='\0'){
-    (*c) = toupper (*c);
-    c++;
-  }
+    char *c;
+
+    if (!src){
+        return;
+    }
+
+    c = src;
+  
+    while ((*c)!='\0')
+    {
+        (*c) = toupper (*c);
+        c++;
+    };
 }
+
 
 //
 // End.

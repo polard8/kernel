@@ -109,7 +109,16 @@ char *strstr (const char *s1, const char *s2);
 
 size_t strxfrm (char *dst, const char *src, size_t n);
 char *strerror(int errnum);
-char *strerror_r(int errnum, char *buf, size_t buflen);
+
+
+
+/* XSI-compliant */
+int strerror_r (int errnum, char *buf, size_t buflen);
+
+/* GNU-specific */
+//char *strerror_r(int errnum, char *buf, size_t buflen);
+
+
 char *strsignal(int sig);
 
 

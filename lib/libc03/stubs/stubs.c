@@ -2,9 +2,11 @@
 /*
  * File: stubs.c 
  * 
- * 
+ *    stubs and system calls.
  */
 
+// Stubs are nop functions.
+// It's used in dinlink.
 
 #include <stdio.h>
 #include <types.h> 
