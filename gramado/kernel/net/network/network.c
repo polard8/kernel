@@ -272,50 +272,46 @@ int networkInit (void){
 
     }else{
 
-		//#todo object header
-		
-		HostInfo->used = 1;
-		HostInfo->magic = 1234;
+        // #todo object header
 
-        //host name.
-		HostInfo->hostName = (char *) kmalloc ( HOSTNAME_BUFFER_SIZE );
-		HostInfo->hostName_len = (size_t) HOSTNAME_BUFFER_SIZE;
-		
-		
-		//#bugbug
-		//falha na m�quina real... acho que est� falhando.
-		//see: klibc
-		//__sethostname ( (char *) HOST_DEFAULTNAME);
+        HostInfo->used = 1;
+        HostInfo->magic = 1234;
 
-		HostInfo->hostVersion = NULL;
-		
-	    HostInfo->hostVersionMajor = 0;
-	    HostInfo->hostVersionMinor = 0; 
-	    HostInfo->hostVersionRevision = 0;
+        //HostInfo->__hostname =
+        HostInfo->hostName_len = (size_t) HOSTNAME_BUFFER_SIZE;
+
+
+        HostInfo->hostVersion = NULL;
+
+        HostInfo->hostVersionMajor = 0;
+        HostInfo->hostVersionMinor = 0; 
+        HostInfo->hostVersionRevision = 0;
         HostInfo->hostArchitecture = 0; 
-		
+
 		//...
 		
-	};		
-	
+    };
+
 	// Criando socket para local host porta 80;
 	// Localhost (127.0.0.1):80 
 	// COnfigurando soquete atual.
-	
-	LocalHostHTTPSocket = (struct socket_d *) create_socket ( 0, 0 );  
-	
-	CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
-	
+
+    LocalHostHTTPSocket = (struct socket_d *) create_socket (0,0);  
+
+
+    CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
+
 	//...
-	
+
 
     socket_init();
 
 
 	// Status ?? No, not now!	
 	// networkSetstatus (1);
-	
-	return 0;
+
+
+    return 0;
 }
 
 
@@ -342,18 +338,16 @@ void show_network_info (void){
 
     }else{
 
-	    //#todo: 
-	    printf ("Host name %s\n ", HostInfo->hostName );
-	    printf ("IP %s \n ", HostInfo->hostIP );
-	    printf ("MAC %s \n ", HostInfo->hostMAC );	
-	    //...
+        // #todo: 
+        printf ("IP %s \n ", HostInfo->hostIP );
+        printf ("MAC %s \n ", HostInfo->hostMAC );
+        //...
     };
 
 
-    //nic
+    // nic
     show_current_nic_info ();
 }
-
 
 
 
@@ -364,8 +358,8 @@ void show_network_info (void){
  */
 
 void show_current_nic_info (void){
-	
-	printf ("show_current_nic_info:\n");
+
+    printf ("show_current_nic_info:\n");
 
     // #bugbug
     // Essa estrutura est� falhando.
@@ -375,31 +369,31 @@ void show_current_nic_info (void){
         return;
 
     }else{
-		
+
         if ( currentNIC->used != 1 || currentNIC->magic != 1234 ){
             printf ("show_current_nic_info: validation fail\n");
             return;
         }
-		
+
         if ( (void *) currentNIC->pci == NULL ){
             printf ("show_current_nic_info: pci struct fail\n");
             return;
         }
 
-        //messages 
-		printf ("NIC device info:\n");
-		printf ("Vendor %x Device %x \n", 
-		    currentNIC->pci->Vendor, currentNIC->pci->Device );
-			
-			
-		//bars	
+        // messages 
+        printf ("NIC device info:\n");
+        printf ("Vendor %x Device %x \n", 
+            currentNIC->pci->Vendor, currentNIC->pci->Device );
+
+
+		// bars
 		printf ("BAR0 %x\n", currentNIC->pci->BAR0 );
 		printf ("BAR1 %x\n", currentNIC->pci->BAR1 );
 		printf ("BAR2 %x\n", currentNIC->pci->BAR2 );
 		printf ("BAR3 %x\n", currentNIC->pci->BAR3 );
 		printf ("BAR4 %x\n", currentNIC->pci->BAR4 );
 		printf ("BAR5 %x\n \n", currentNIC->pci->BAR5 );
-		
+
 		//
 		// ## Device status ##
 		//
@@ -411,72 +405,66 @@ void show_current_nic_info (void){
 		// a full duplex link is up at 1000 MB/s, among other things.
 
 
-		printf ("Device status %x \n", currentNIC->DeviceStatus );
-		
-		// Full duplex.0=half,1=full 
-		if (currentNIC->DeviceStatus & 1)
-		{
-			printf ("Full duplex \n");
-		}
+        printf ("Device status %x \n", currentNIC->DeviceStatus );
+
+        // Full duplex.0=half,1=full 
+        if (currentNIC->DeviceStatus & 1){
+            printf ("Full duplex \n");
+        }
 
         // Link up.0=no,1=link 
-		if (currentNIC->DeviceStatus & 2)
-		{
-			printf ("link up \n");
-		}
-		
-		// transmission paused
-		if (currentNIC->DeviceStatus & 0x10)
-		{
-			printf ("transmission paused\n");
-		}
-		
-		// TBI mode 
-		if (currentNIC->DeviceStatus & 0x20)
-		{
-			printf ("TBI mode\n");
-		}
-		
-		
-		// Speed 1000Mb/s 
-		if (currentNIC->DeviceStatus & 0x80)
-		{
-			//currentNIC->speed #todo
-			printf ("1000Mbs\n");
-		}	
+        if (currentNIC->DeviceStatus & 2){
+            printf ("link up \n");
+        }
+
+        // transmission paused
+        if (currentNIC->DeviceStatus & 0x10){
+            printf ("transmission paused\n");
+        }
+
+        // TBI mode 
+        if (currentNIC->DeviceStatus & 0x20){
+            printf ("TBI mode\n");
+        }
+
+        // Speed 1000Mb/s 
+        if (currentNIC->DeviceStatus & 0x80){
+            //currentNIC->speed #todo
+            printf ("1000Mbs\n");
+        }
 
 		//
 		// ## MAC ##
 		//
-		
-		printf ("MAC %x %x %x %x %x %x \n", 
-		    currentNIC->mac_address[0], 
-			currentNIC->mac_address[1], 
-			currentNIC->mac_address[2],
+
+        printf ("MAC %x %x %x %x %x %x \n", 
+            currentNIC->mac_address[0], 
+            currentNIC->mac_address[1], 
+            currentNIC->mac_address[2],
             currentNIC->mac_address[3], 
-			currentNIC->mac_address[4], 
-			currentNIC->mac_address[5] );
+            currentNIC->mac_address[4], 
+            currentNIC->mac_address[5] );
 
 		//
 		// ## IP ##
 		//
-			
-		printf ("IP %d %d %d %d \n", 
-		    currentNIC->ip_address[0], 
-			currentNIC->ip_address[1], 
-			currentNIC->ip_address[2],
+
+        printf ("IP %d %d %d %d \n", 
+            currentNIC->ip_address[0], 
+            currentNIC->ip_address[1], 
+            currentNIC->ip_address[2],
             currentNIC->ip_address[3] );
-			
-			
+
         printf ("int_line={%d} int_pin={%d}\n",
-		    currentNIC->pci->irq_line,     //irq
-			currentNIC->pci->irq_pin );    //shared INTA#
-			
-		printf ("interrupt_count={%d}\n", currentNIC->interrupt_count );
-			
+            currentNIC->pci->irq_line,     //irq
+            currentNIC->pci->irq_pin );    //shared INTA#
+
+        printf ("interrupt_count={%d}\n", currentNIC->interrupt_count );
+
 		//...
-		
-	};	    
+
+    };
+
 
 	//refresh_screen ();
 }
@@ -493,27 +481,28 @@ void show_current_nic_info (void){
 //ipv6 needs to have its own document.
 
 int 
-handle_ipv6 ( struct intel_nic_info_d *nic, 
-              struct ipv6_header_d *header )
+handle_ipv6 ( 
+    struct intel_nic_info_d *nic, 
+    struct ipv6_header_d *header )
 {
     //printf("\n");
     //printf("handle_ipv6: Initializing ...\n");
 
 
     if ( (void *) nic == NULL ){
-		printf ("handle_ipv6: nic fail\n");
-		return -1;
-	}
+        printf ("handle_ipv6: nic fail\n");
+        return -1;
+    }
 
 
     if ( (void *) header == NULL ){
-		printf ("handle_ipv6: header fail\n");
-		return -2;
+        printf ("handle_ipv6: header fail\n");
+        return -2;
 
-	}else{
-		
-		//printf("ver_tc_label=%x len=%d next_header=%x hop_limit=%d \n",
-		//    header->ver_tc_label,
+    }else{
+
+        //printf("ver_tc_label=%x len=%d next_header=%x hop_limit=%d \n",
+        //    header->ver_tc_label,
         //    header->len,
         //    header->next_header,
         //    header->hop_limit );
@@ -533,10 +522,9 @@ handle_ipv6 ( struct intel_nic_info_d *nic,
 		//printf("hop_limit=%d \n", header->hop_limit & 0xFF );
 		
 		//...
-		
-		return 0;
-	};
 
+        return 0;
+    };
 
     return 1;
 }
@@ -590,8 +578,8 @@ void testNIC (void){
     //
 
     printf ("testNIC: Unlock interrupt handler \n");
-	e1000_interrupt_flag = 1;
-	
+    e1000_interrupt_flag = 1;
+
 	uint8_t source_ip_address[4];
 	source_ip_address[0] = 192;
 	source_ip_address[1] = 168;
@@ -618,8 +606,8 @@ void testNIC (void){
 	//tem que ter uma abstra��o que selecione o nic atual
 
     printf ("testNIC: Sending arp request \n");
-	SendARP ( source_ip_address, target_ip_address, target_mac_address );
-	
+    SendARP ( source_ip_address, target_ip_address, target_mac_address );
+
 
 	//==============================================
 	// ## data ##
@@ -634,7 +622,7 @@ void testNIC (void){
 
 	// #todo: 
 	// testar isso;
-	printf ("testNIC: Sending IPV4 \n");
+    printf ("testNIC: Sending IPV4 \n");
     network_SendIPV4_UDP ( source_ip_address, target_ip_address, 
         target_mac_address, xxxdata, 20 );
 
@@ -647,7 +635,7 @@ void testNIC (void){
 	//pciInfo ();
 
 	//printf("\n\n");
-	show_current_nic_info ();
+    show_current_nic_info ();
 
     printf ("\n\n ====TEST DONE ==== \n\n"); 
 
@@ -673,7 +661,6 @@ void testNIC (void){
 // #todo
 // udp needs to have its own document.
 
-
 // #todo
 // Change the return type to 'int'. 
 
@@ -682,11 +669,12 @@ void testNIC (void){
 // UDP = 0x11 (ip protocol)
 
 int
-network_SendIPV4_UDP ( uint8_t source_ip[4], 
-           uint8_t target_ip[4], 
-           uint8_t target_mac[6], 
-           uint8_t data[32],
-           unsigned short port )
+network_SendIPV4_UDP ( 
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6], 
+    uint8_t data[32],
+    unsigned short port )
 {
     int i=0;
     int j=0;
@@ -846,8 +834,7 @@ network_SendIPV4_UDP ( uint8_t source_ip[4],
 	// Usaremos esse offset logo abaixo.
 	// Pegamos esse offset na estrutura do controlador nic intel.
 
-	uint16_t old = currentNIC->tx_cur;
-
+    uint16_t old = currentNIC->tx_cur;
 
 
 	//
@@ -1007,9 +994,10 @@ network_SendIPV4_UDP ( uint8_t source_ip[4],
 // Change the return type to 'int'. 
 
 void 
-SendARP ( uint8_t source_ip[4], 
-          uint8_t target_ip[4], 
-          uint8_t target_mac[6] )
+SendARP ( 
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6] )
 {
 
     struct ether_header *eh;
@@ -1129,8 +1117,6 @@ SendARP ( uint8_t source_ip[4],
 
         //...
     };
-
-
 
 
 	//==================================
@@ -1529,13 +1515,16 @@ int network_decode_buffer ( unsigned long buffer_address ){
 // para assim reenviarmos o pacote ao processo conectado a essa porta.
 int do_ipv4 ( unsigned long buffer )
 {
-    //printf ("do_ipv4\n");
+    debug_print ("do_ipv4: [TODO]\n");
     return 0;
 }
 
+
 int do_ipv6 ( unsigned long buffer )
 {
-	//printf ("do_ipv6\n");
+    debug_print ("do_ipv6: [TODO]\n");
+    
+    //printf ("do_ipv6\n");
     //printf("IPv6 ");
     //ipv6_h = (void *) &buffer[14];
 

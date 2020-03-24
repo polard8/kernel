@@ -95,22 +95,23 @@ struct sockaddr_in {
 //static char hostname_buffer[HOSTNAME_BUFFER_SIZE];
 
 
-typedef struct host_info_d host_info_t;
+
+//typedef struct host_info_d host_info_t;
 struct host_info_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;
+    object_type_t objectType;
+    object_class_t objectClass;
 
-	// id da estrutura para lista interna.
+    // id da estrutura para lista interna.
     int id;
     
     int used;
     int magic;
 
-    int hostIdentifier;  // Número identificador dentro da rede interna.
+    // Número identificador dentro da rede interna.
+    int hostIdentifier;  
 
 
-    char *hostName;         // Nome. deletar
     char __hostname[64];    // HOSTNAME_BUFFER_SIZE
     size_t hostName_len;    // len
 
@@ -119,22 +120,20 @@ struct host_info_d
     unsigned short hostVersionMinor; 
     unsigned short hostVersionRevision;
     int hostArchitecture; //identificador de tipo de arquitetura. ex: (x86)
-	
-	
-	//IP
+
+
+    //IP
     char hostIP[3];
     char *hostIPString;
-		
-	//MAC
+
+    //MAC
     char hostMAC[6];
     char *hostMACString;
 	
 	//...
 };
 struct host_info_d *HostInfo;
-//host_info_t *HostInfo;
 //...
-
 
 #endif    
 

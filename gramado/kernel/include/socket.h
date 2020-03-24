@@ -50,12 +50,12 @@ struct socket_d *create_socket ( unsigned long ip, unsigned short port );
 unsigned long getSocketIP ( struct socket_d *socket );
 unsigned long getSocketPort ( struct socket_d *socket );
 
+
 int 
-update_socket ( struct socket_d *socket, 
-                unsigned long ip, 
-                unsigned short port );
-
-
+update_socket ( 
+    struct socket_d *socket, 
+    unsigned long ip, 
+    unsigned short port );
 
 
 
@@ -408,12 +408,14 @@ struct sockaddr_big {
 
 /* Device structure */
 typedef struct socket_context {
+
     struct socket_context *next, *prev;
-	unsigned fd;
-	int family;
-	int type;
-	int protocol;
-} socket_t;
+    unsigned fd;
+    int family;
+    int type;
+    int protocol;
+
+}socket_t;
 
 
 
@@ -430,16 +432,20 @@ struct sockaddr
 //isso deve ficar em in.h
 typedef struct
 {
-	int sin_family;
-	int sin_port;
-	char *sin_addr;
-} sockaddr_in;
+    int sin_family;
+    int sin_port;
+    char *sin_addr;
+
+}sockaddr_in;
+
 
 typedef struct
 {
-	char *h_addr;
-	unsigned h_length;
-} hostent;
+    char *h_addr;
+    unsigned h_length;
+
+}hostent;
+
 
 //=========
 
@@ -499,6 +505,8 @@ struct socket_d
     int used;
     int magic;
 
+    unsigned long ip;
+    unsigned short port;
 
     //
     // Connection
@@ -524,15 +532,6 @@ struct socket_d
 
 
     pid_t owner;
-
-
-    // long representation, not string.
-    // Semelhante à estrutura acima.
-    // Talvez podemos delear isso e 
-    // usarmos somente a estrutura acima.
-    unsigned long ip_long;
-    unsigned short port;
-
 };
 struct socket_d *CurrentSocket;
 struct socket_d *LocalHostHTTPSocket;
