@@ -121,7 +121,7 @@ void gws_yield(void);
  
 int 
 gwsProcedure ( 
-    struct window_d *window, 
+    struct gws_window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
@@ -188,7 +188,7 @@ void __socket_messages (int fd){
  
                 
     // realiza o serviço.
-    gwsProcedure ( (struct window_d *) message_buffer[0], 
+    gwsProcedure ( (struct gws_window_d *) message_buffer[0], 
        (int) message_buffer[1], 
        (unsigned long) message_buffer[2], 
        (unsigned long) message_buffer[3] );
@@ -285,10 +285,11 @@ void __ipc_message (void){
  */
  
 int 
-gwsProcedure ( struct window_d *window, 
-               int msg, 
-               unsigned long long1, 
-               unsigned long long2 )
+gwsProcedure ( 
+    struct gws_window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
     int my_pid = -1;
@@ -338,9 +339,8 @@ gwsProcedure ( struct window_d *window,
         case 1000:
         
             //draw text inside a window.
-            dtextDrawText ( (struct window_d *) __mywindow,
-                60, 70,
-                COLOR_GREEN,
+            dtextDrawText ( (struct gws_window_d *) __mywindow,
+                60, 70, COLOR_GREEN,
                 "Hello friend. This is the Window Server!" );
                 
             //printf ("Hello friend! %d %d \r \n", long1, long2 );
@@ -351,18 +351,19 @@ gwsProcedure ( struct window_d *window,
              break;
 
 
-        //case MSG_CREATE_WINDOW:
+        // Create Window.
+        // Usará o buffer global
+        // case MSG_CREATE_WINDOW:
         case 1001:
-            // Usará o buffer global
             serviceCreateWindow (); 
             break; 
-            
-            
+
+
         case 1002:
             servicepixelBackBufferPutpixel(); //pixel
             break;
 
-               
+
         case 1003:
             servicelineBackbufferDrawHorizontalLine();
             break;
@@ -691,32 +692,22 @@ int serviceCreateWindow (void){
     w=message_address[6];  //w
     h=message_address[7];  //h
     color = message_address[8];
-    
-   
+ 
+ 
     // #todo
     // type passed by message.
-    
-    /*
-     __mywindow = (struct window_d *) createwCreateWindow ( WT_SIMPLE, //WT_OVERLAPPED, 
-                                         1, 1, "test-window",  
-                                         x, y, 
-                                         w, h,   
-                                         gui->screen, 0, 
-                                         COLOR_PINK, color );
-    */
-   
-     __mywindow = (struct window_d *) createwCreateWindow ( WT_OVERLAPPED, 
-                                         1, 1, "test-window",  
-                                         x, y, 
-                                         w, h,   
-                                         gui->screen, 0, 
-                                         COLOR_PINK, color );   
+
+     __mywindow = (struct gws_window_d *) createwCreateWindow ( WT_OVERLAPPED, 
+                                              1, 1, "No-Name",  
+                                              x, y, 
+                                              w, h,   
+                                              gui->screen, 0, 
+                                              COLOR_PINK, color );   
 
 
-    
 
     int id = -1;
-    id = gwsRegisterWindow( __mywindow );
+    id = gwsRegisterWindow ( __mywindow );
 
     if (id<0)
         gde_debug_print("serviceCreateWindow: Couldn't register window\n");

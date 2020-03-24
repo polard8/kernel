@@ -86,7 +86,7 @@ int main ( int argc, char *argv[] ){
     debug_print ("---------------------------\n");    
     debug_print ("gwst.bin: Initializing ...\n");
 
-
+    char *name = "Window name 1";
 
     //
     // socket
@@ -134,18 +134,11 @@ int main ( int argc, char *argv[] ){
     } 
 
 
-     //
-     // Loop for new message.
-     //
-
-    unsigned long ____color = 0x00FF00;
-
-// loop:
-new_message:
 
     //
-    // Write
+    // Send request.
     //
+
 
     // #debug
     debug_print ("gwst: Writing ...\n");      
@@ -155,32 +148,22 @@ new_message:
 
     while (1)
     {
-        // Create window        
+        // Create window    
+            
         message_buffer[0] = 0;       // window. 
         message_buffer[1] = 1001;    // msg. Create window.
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         
-        message_buffer[4] = 450;   //x
-        message_buffer[5] = 100;   //y
-        message_buffer[6] = 200;   //w
-        message_buffer[7] = 200;   //h
+        message_buffer[4] = 120;   //x
+        message_buffer[5] = 120;   //y
+        message_buffer[6] = 480;   //w
+        message_buffer[7] = 320;   //h
         
-        message_buffer[8] = ____color + ( rand() ); 
+        message_buffer[8] = xCOLOR_GRAY2; 
 
-
-        /*
-        //line
-        message_buffer[0] = 0; //window. 
-        message_buffer[1] = 1003; //1000;  //msg = hello friend.
-        message_buffer[2] = 0;
-        message_buffer[3] = 0;
-        message_buffer[4] = 100;   //x1
-        message_buffer[5] = 100;   //y
-        message_buffer[6] = 200;       //x2
-        message_buffer[7] = 0x00FF00;   //color
-        */
-
+         
+        
         //...
 
         // Write!
@@ -195,7 +178,7 @@ new_message:
 
 
     //
-    // waiting
+    // Waiting for response.
     //
 
     // Espera para ler a resposta. 
@@ -231,66 +214,71 @@ new_message:
        //#caution
        //we cam stay here for ever.
        //it's a test yet.
-    __again:
+    
+response_loop:
     n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
     // Não vamos insistir num arquivo vazio.
     if (n_reads<=0){
          gws_yield();        
-        goto __again;
+        goto response_loop;
     }
     
     // Get the message sended by the server.
     int msg = (int) message_buffer[1];
     
-    switch (msg)
-    {
+    switch (msg){
+
         case SERVER_PACKET_TYPE_REQUEST:
             gws_yield ();
-            goto __again;
+            goto response_loop;
             break;
             
+        // Reply!
         case SERVER_PACKET_TYPE_REPLY:
             goto process_reply;
             break;
             
         case SERVER_PACKET_TYPE_EVENT:
             //todo: call procedure.
-            goto __again;
+            goto response_loop;
             break;
             
         case SERVER_PACKET_TYPE_ERROR:
             debug_print ("gwst: SERVER_PACKET_TYPE_ERROR\n");
-            goto __again;
+            goto response_loop;
             //exit (-1);
             break;
         
         default:
-            goto __again;
+            goto response_loop;
             break; 
     };
 
+//
+// Process reply.
+//
 
 process_reply:
+    
+    // A resposta tras o window id no início do buffer.
+    printf ("gwst: Window ID %d \n", message_buffer[0] );
 
-    //
-    // done:
-    //
 
-    //printf("%d bytes readed\n",n_reads);
-    //printf("RESPONSE: {%s} \n",__buffer+16);
-    
-    // A resposta tras o window id no inpicio do buffer.
-    // printf ("s2: Window ID %d \n", message_buffer[0] );
+//
+// Done!
+//
 
-    ____color = rand();
-    
-    debug_print ("gwst: new message\n");
-    goto new_message;
-    
-    
     debug_print ("gwst: bye\n"); 
     printf ("gwst: bye\n");
 
     return 0;
 }
+
+
+//
+// End.
+//
+
+
+
 

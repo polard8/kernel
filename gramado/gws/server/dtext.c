@@ -19,10 +19,11 @@
  */
 
 void 
-dtextDrawString ( unsigned long x,
-                  unsigned long y,
-                  unsigned long color,
-                  unsigned char *string )
+dtextDrawString ( 
+    unsigned long x,
+    unsigned long y,
+    unsigned long color,
+    unsigned char *string )
 {
 
     int Index=0;
@@ -71,18 +72,18 @@ dtextDrawString ( unsigned long x,
  */
 
 void 
-dtextDrawText ( struct window_d *window,
-                unsigned long x,
-                unsigned long y,
-                unsigned long color,
-                unsigned char *string )
+dtextDrawText ( 
+    struct gws_window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned long color,
+    unsigned char *string )
 { 
 
-    struct window_d * __w;
+    struct gws_window_d * __w;
 
+    __w = (struct gws_window_d *) gui->screen;
 
-    __w = (struct window_d *) gui->screen;
-	
     if ( (void *) window == NULL )
     {
         dtextDrawString ( __w->left +x, __w->top +y, color, string );

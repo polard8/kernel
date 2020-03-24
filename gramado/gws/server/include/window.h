@@ -939,7 +939,7 @@ dtextDrawString (
               
 void 
 dtextDrawText ( 
-    struct window_d *window,
+    struct gws_window_d *window,
     unsigned long x,
     unsigned long y,
     unsigned long color,
