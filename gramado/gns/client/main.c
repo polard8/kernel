@@ -81,11 +81,13 @@ void gnst_yield(void){
 }
 
 
+/*
 // gerar número aleatório dentro de uma faixa.
 int gerar_numero(int lim_inf, int lim_sup)
 {
     return (lim_inf + (rand() % lim_sup));
 }
+*/
 
 
 int main ( int argc, char *argv[] ){

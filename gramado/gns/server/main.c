@@ -124,19 +124,12 @@ void gns_yield(void);
  */
  
 int 
-gwsProcedure ( 
-    struct window_d *window, 
+gnsProcedure ( 
+    void *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-               
-               
-               
-// Protótipo de função interna,
-int serviceCreateWindow ( void );
-int servicepixelBackBufferPutpixel (void);
-int servicelineBackbufferDrawHorizontalLine (void);
-//...
+
 
 
 // internal.
@@ -192,7 +185,7 @@ void __socket_messages (int fd){
  
                 
     // realiza o serviço.
-    gwsProcedure ( (struct window_d *) message_buffer[0], 
+    gnsProcedure ( (void *) message_buffer[0], 
        (int) message_buffer[1], 
        (unsigned long) message_buffer[2], 
        (unsigned long) message_buffer[3] );
@@ -269,7 +262,7 @@ void __ipc_message (void){
 
         
     // Send message to the window procedure.
-    gwsProcedure ( (struct window_d *) message_buffer[0], 
+    gnsProcedure ( (void *) message_buffer[0], 
         (int) message_buffer[1], 
         (unsigned long) message_buffer[2], 
         (unsigned long) message_buffer[3] );
@@ -283,16 +276,18 @@ void __ipc_message (void){
 
 /*
  **********************************
- * gwsProcedure:
+ * gnsProcedure:
  *     Main dialog.
  * 
  */
  
+
 int 
-gwsProcedure ( struct window_d *window, 
-               int msg, 
-               unsigned long long1, 
-               unsigned long long2 )
+gnsProcedure ( 
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
 
     int my_pid = -1;
@@ -341,49 +336,21 @@ gwsProcedure ( struct window_d *window,
 
         case 1000:
             printf (">> Hello from Gramado Network Server !\n");
-            //refresh_screen();
-        
-            //draw text inside a window.
-            //dtextDrawText ( (struct window_d *) __mywindow,
-               // 60, 70,
-                //COLOR_GREEN,
-                //"Hello friend. This is the Window Server!" );
-                
-            //printf ("Hello friend! %d %d \r \n", long1, long2 );
-            
-             //#todo: send response.
-            
-             //gws_show_backbuffer ();
-             break;
+            break;
 
-
-        //case MSG_CREATE_WINDOW:
         case 1001:
-            // Usará o buffer global
-            //serviceCreateWindow (); 
             break; 
             
             
         case 1002:
-            //servicepixelBackBufferPutpixel(); //pixel
             break;
 
                
         case 1003:
-            //servicelineBackbufferDrawHorizontalLine();
             break;
                
-    
-        //
-        // Testing some drawing routines.
-        //
-         
-         
-        // put pixel
-        // IN: Color, x, y
+             
         case 2000:
-            //pixelBackBufferPutpixel ( (unsigned long) COLOR_PINK,   
-               // (unsigned long) long1, (unsigned long) long2 );
             break;
  
         case 2001:
@@ -661,131 +628,6 @@ int main (int argc, char **argv){
     return 0; 
 }
 
-
-
-// wrapper
-// chamaremos a função que cria a janela
-// com base nos argumentos que estão no buffer
-// que é uma variável global nesse documento.
-
-int serviceCreateWindow (void){
-	
-/*
-
-	//o buffer é uma global nesse documento.
-    unsigned long *message_address = (unsigned long *) &__buffer[0];
-    
-    
-    struct gws_window_d *__mywindow;
-
-    unsigned long x,y,w,h, color;
-        
-    
-    gde_debug_print("gws: serviceCreateWindow:\n");
-    //printf ("serviceCreateWindow:\n");
-
-
-    x=message_address[4];  //x
-    y=message_address[5];  //y
-    w=message_address[6];  //w
-    h=message_address[7];  //h
-    color = message_address[8];
-    
-   
-    // #todo
-    // type passed by message.
-    
-
-   
-     __mywindow = (struct window_d *) createwCreateWindow ( WT_OVERLAPPED, 
-                                         1, 1, "test-window",  
-                                         x, y, 
-                                         w, h,   
-                                         gui->screen, 0, 
-                                         COLOR_PINK, color );   
-
-
-    
-
-    int id = -1;
-    id = gwsRegisterWindow( __mywindow );
-
-    if (id<0)
-        gde_debug_print("serviceCreateWindow: Couldn't register window\n");
-
-    
-    // preparando a resposta.
-    // Ela será enviada depois pelo loop de socket.
-    next_response[0] = (unsigned long) id; //window
-    next_response[1] = SERVER_PACKET_TYPE_REPLY; //msg 
-    next_response[2] = 0;
-    next_response[3] = 0;
-
-*/
-
-    //gws_show_backbuffer (); //for debug    
-    return 0; //todo
-}
-
-
-
-    // #tests
-    // Isso funciona.
-    //pixelBackBufferPutpixel ( COLOR_RED,   100, 250 );
-    //pixelBackBufferPutpixel ( COLOR_GREEN, 105, 250 );
-    //pixelBackBufferPutpixel ( COLOR_BLUE,  110, 250 );
-    //charBackbufferDrawcharTransparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
-    //charBackbufferDrawcharTransparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
-    //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
-    //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
-    //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
-    //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
-
-
-int servicepixelBackBufferPutpixel(void)
-{
-/*
-	//o buffer é uma global nesse documento.
-    unsigned long *message_address = (unsigned long *) &__buffer[0];
-
-    unsigned long x,y,color;
-      
-    x=message_address[4];  // x
-    y=message_address[5];  // y
-    color=message_address[6];  // color
-
-    pixelBackBufferPutpixel ( color, x, y );
-
-*/
-    //gws_show_backbuffer (); // for debug
-    return 0;
-}
-
-
-
-
-
-int servicelineBackbufferDrawHorizontalLine (void)
-{
-	/*
-
-	//o buffer é uma global nesse documento.
-    unsigned long *message_address = (unsigned long *) &__buffer[0];
-
-    //x1,y,x2, color
-    unsigned long x1,y,x2,color;
-      
-    x1 = message_address[4];  // 
-    y  = message_address[5];   // 
-    x2 = message_address[6];  // 
-    color = message_address[7];
-   
-   lineBackbufferDrawHorizontalLine ( x1, y, x2, color );
-
-*/
-   //gws_show_backbuffer (); // for debug   
-   return 0;
-}
 
 void gns_yield(void){
 	
