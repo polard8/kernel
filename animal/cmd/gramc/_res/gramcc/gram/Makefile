@@ -92,10 +92,11 @@ all-c:
 	cp $(APIOBJ)/api.o      .
 
 gramcc-link:
-	ld -m elf_i386 -T link.ld -o GRAM.BIN $(myObjects) -Map app_map.s
+	ld -m elf_i386 -T link.ld -o GRAM.BIN $(myObjects)   
+	
 
 finalize:
-	cp GRAM.BIN  ../../../bin
+#	cp GRAM.BIN  ../../../bin
 
 clean:
 	-rm *.o

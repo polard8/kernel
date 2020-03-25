@@ -1,6 +1,5 @@
 
-# init2
-
+# init process.
 
 VERSION = 0
 PATCHLEVEL = 1
@@ -88,9 +87,8 @@ all-c:
 	cp $(APIOBJ)/api.o .
 
 
-
 shell-link:
-	ld -m elf_i386 -T link.ld -o INIT.BIN $(myObjects) -Map map.s
+	ld -m elf_i386 -T link.ld -o INIT.BIN $(myObjects)    
 
 
 finalize:

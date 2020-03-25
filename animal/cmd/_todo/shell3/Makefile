@@ -79,10 +79,11 @@ all-c:
 
 	
 cat-link:
-	ld -m elf_i386 -T link.ld -o SHELL3.BIN $(myObjects) -Map map.s
+	ld -m elf_i386 -T ../link.ld -o SHELL3.BIN $(myObjects)    
+
 
 finalize:
-	cp SHELL3.BIN  ../../bin
+#	cp SHELL3.BIN  ../../bin
 
 clean:
 	-rm *.o

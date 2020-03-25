@@ -98,14 +98,15 @@ bl-x86:
     #echo -{ Arch
 	gcc -c src/arch/x86/x86.c               -I include/ $(CFLAGS)  -o x86.o
 	gcc -c src/arch/x86/ports.c             -I include/ $(CFLAGS)  -o ports.o 
-	gcc -c src/arch/x86/drivers/pci.c       -I include/ $(CFLAGS)  -o pci.o	
-	gcc -c src/arch/x86/drivers/hdd.c       -I include/ $(CFLAGS)  -o hdd.o	
+	gcc -c src/arch/x86/drivers/pci.c       -I include/ $(CFLAGS)  -o pci.o
+	gcc -c src/arch/x86/drivers/hdd.c       -I include/ $(CFLAGS)  -o hdd.o
 	gcc -c src/arch/x86/drivers/keyboard.c  -I include/ $(CFLAGS)  -o keyboard.o
-	gcc -c src/arch/x86/drivers/timer.c     -I include/ $(CFLAGS)  -o timer.o	
-	
+	gcc -c src/arch/x86/drivers/timer.c     -I include/ $(CFLAGS)  -o timer.o
+
+
     #rem echo -{ ...
     #echo -{ Fs
-	gcc -c src/fs/fs.c -I include/ $(CFLAGS) -o fs.o						
+	gcc -c src/fs/fs.c -I include/ $(CFLAGS) -o fs.o
 
     #rem echo -{ ...
     #echo -{ Shell
@@ -113,14 +114,14 @@ bl-x86:
 	
 	
 link-x86:
-	ld -m i386pe -T link.ld -o cdbl.bin $(myObjects) -Map blmap.s
-	
+	ld -m i386pe -T link.ld -o cdbl.bin $(myObjects)    
+
 	# ld -m i386pe -T link.ld -o BLL.BIN $(wildcard *.o) -Map blmap.s
 	# gcc -T link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o BL.BIN $(myObjects)
     # gcc -T link.ld -fno-pie -no-pie -ffreestanding -nostdlib -o BL.BIN $(myObjects) -Wl,-Map=blmap.s -lgcc"
 	
 finalize:
-	cp cdbl.bin ../../../../../bin/boot/gramado/
+#	cp cdbl.bin ../../../../../bin/boot/gramado/
 	
 clean:
 	find . -type f -name '*.o' -delete

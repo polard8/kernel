@@ -81,7 +81,7 @@ all-c:
 
 
 jackpot-link:
-	ld -m elf_i386 -T link.ld -o LISP.BIN $(myObjects) -Map map.s
+	ld -m elf_i386 -T ../link.ld -o LISP.BIN $(myObjects) 
 
 finalize:
 	cp LISP.BIN  ../bin

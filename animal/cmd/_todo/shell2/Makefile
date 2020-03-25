@@ -104,10 +104,11 @@ all-c:
 	
 	
 shell-link:
-	ld -m elf_i386 -T link.ld -o SHELL2.BIN $(myObjects) -Map shell_map.s
+	ld -m elf_i386 -T ../link.ld -o SHELL2.BIN $(myObjects)  
+
 
 finalize:
-	cp SHELL2.BIN ../../bin
+#	cp SHELL2.BIN ../../bin
 
 clean:
 	-rm *.o

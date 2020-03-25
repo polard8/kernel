@@ -107,13 +107,14 @@ all-c:
 
 
 shell-link:
-	ld -m elf_i386 -T link.ld -o ZSHELL.BIN $(myObjects) -Map shell_map.s
+	ld -m elf_i386 -T ../link.ld -o ZSHELL.BIN $(myObjects)  
+
 
 finalize:
-	cp ZSHELL.BIN ../../bin
+#	cp ZSHELL.BIN ../../bin
 
 clean:
 	-rm *.o
-	-rm ZSHELL.BIN 
+#	-rm ZSHELL.BIN 
 	
 	

@@ -92,13 +92,14 @@ all-c:
 	cp $(APIOBJ)/api.o .
 
 taskman-link:
-	ld -m elf_i386 -T link.ld -o ZTASKMAN.BIN $(myObjects) -Map map.s
+	ld -m elf_i386 -T ../link.ld -o ZTASKMAN.BIN $(myObjects)   
+
 
 finalize:
-	cp ZTASKMAN.BIN ../../bin
+#	cp ZTASKMAN.BIN ../../bin
 
 clean:
 	-rm *.o
-	-rm ZTASKMAN.BIN 
+#	-rm ZTASKMAN.BIN 
 	
 	

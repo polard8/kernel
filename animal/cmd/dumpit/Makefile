@@ -80,10 +80,11 @@ all-c:
 	cp $(LIBCOBJ)/crt0.o  .	
 
 tascii-link:
-	ld -m elf_i386 -T ../link.ld -o DUMPIT.BIN $(myObjects) -Map app_map.s
+	ld -m elf_i386 -T ../link.ld -o DUMPIT.BIN $(myObjects)    
+
 
 finalize:
-	cp DUMPIT.BIN ../../bin
+#	cp DUMPIT.BIN ../../bin
 
 clean:
 	-rm *.o

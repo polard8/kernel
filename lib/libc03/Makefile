@@ -140,10 +140,11 @@ all-c:
 
 	
 
-#create 'ar'
+# create 'ar'
+# #todo: We need a new ld file.
 libc-link:
-	ar rc LIBC03.A $(OBJECTS)
-	ld -m elf_i386 socrt0.o somain.o -nostdlib -T elf_ia32_efi.lds -shared -znocombreloc -Bsymbolic -L . -l:LIBC03.A -o LIBC03.SO -Map map.s
+#	ar rc LIBC03.A $(OBJECTS)
+#	ld -m elf_i386 socrt0.o somain.o -nostdlib -T elf_ia32_efi.lds -shared -znocombreloc -Bsymbolic -L . -l:LIBC03.A -o LIBC03.SO -Map map.s
 
 finalize:
 	-mkdir obj/
