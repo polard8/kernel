@@ -1,4 +1,4 @@
-
+// See: https://netbsd.gw.com/cgi-bin/man-cgi?intro+2+NetBSD-current
 
 #include <stdio.h>
 #include <stdarg.h>

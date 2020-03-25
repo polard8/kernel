@@ -13,7 +13,9 @@ all:
 	make -C ./showfun
 	make -C ./tprintf
 	make -C ./uname    
-
+	make -C ./c4  
+	
+	    
 
 # ...
 	
