@@ -1,18 +1,21 @@
-# Compiling Animal on Ubuntu.
-# BSD License
-# SPDX-License-Identifier: GPL-3.0+
-# History:
-#     2018 - Created by Matheus Castello.
-#     2019 - Fred Nora.
-#     2019 - Luciano Gonçalez.
-
-
+# License: BSD License
 VERSION = 1
 PATCHLEVEL = 35
 SUBLEVEL =
-EXTRAVERSION = -rc3
+EXTRAVERSION = -rc4
 NAME = Gramado 1.xx
 
+# Documentation.
+# See: docs/
+# To see the targets execute "make help"
+
+
+# That's our default target when none is given on the command line
+PHONY := _all
+_all: all
+
+	@echo "That's all!"
+	
 
 
 KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
@@ -27,73 +30,43 @@ obj := $(objtree)
  
  
 # Make variables (CC, etc...)
-#AS		= as
-#LD		= ld
-#CC		= gcc
-#AR		= ar
-#MAKE := make
-#NASM := nasm
-#OBJCOPY		= objcopy
-#OBJDUMP		= objdump
-#LEX		= flex
-#YACC	= bison
-#PERL		= perl
-#PYTHON		= python
-#PYTHON2		= python2
-#PYTHON3		= python3
-#RUBY		= ruby
+AS	= as
+LD	= ld
+CC	= gcc
+AR	= ar
+MAKE	= make
+NASM	= nasm
+OBJCOPY	= objcopy
+OBJDUMP	= objdump
+LEX	= flex
+YACC	= bison
+PERL	= perl
+PYTHON	= python
+PYTHON2	= python2
+PYTHON3	= python3
+RUBY	= ruby
 
 
 
+# Verbose.
 
-##
-## Defines
-##
+ifndef KBUILD_VERBOSE
+  KBUILD_VERBOSE = 1
+endif
 
-#
-# DEFINES =  -DGRAMADO_VERSION=$(VERSION) \
-#		-DGRAMADO_PATCHLEVEL=$(PATCHLEVEL) \
-#		-DGRAMADO_SUBLEVEL=$(SUBLEVEL) \
-#		-DGRAMADO_EXTRAVERSION=\"$(EXTRAVERSION)\" \
-#		-DGRAMAD0_NAME=\"$(NAME)\"
+ifeq ($(KBUILD_VERBOSE),1)
+  Q =
+else
+  Q = @
+endif
 
-
- 
-
-# First of all, lemme discribe this documment!
-# We just have two parts. The kernel and the extra stuff.
-
-## The kernel stuff.
-## Step1 KERNEL.BIN         - Creating the kernel image.
-## Step2 kernel-image-link  - Linking the kernel image.
-## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
-## Step4 vhd-create         - Creating a VHD in Assembly language.
-## Step5 vhd-mount          - Mounting the VHD.
-## Step6 vhd-copy-files     - Copying files into the mounted VHD.
-## Step7 vhd-unmount        - Unmounting the VHD.
-## Step8 clean              - Deleting the object files.           
-
-## The extra stuff.
-## 1) ISO support.
-## 2) HDD support.
-## 3) VM support.
-## 4) Serial debug support.
-## 5) Clean files support.
-## 6) Usage support.
-
-
-# That's our default target when none is given on the command line
-PHONY := _all
-_all: all
-
-	@echo "That's all!"
 
 #
 # Begin.
 #
 
-## =============================================================================
-## The kernel stuff.
+## ====================================================================
+## Step0 build-system-files - Libraries and apps.
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 ## Step2 kernel-image-link  - Linking the kernel image.
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -126,12 +99,92 @@ clean-system-files
 
 
 
+# Building system files.
+# boot, libs, apps and commands.
+# #todo: fonts.
+
+
+
+PHONY := build-system-files
+
+#Step 0
+build-system-files: /usr/local/gramado-build \
+build-boot \
+build-lib \
+build-init \
+build-gdeshell \
+build-gns \
+build-gws \
+build-apps \
+build-cmd
+
+
+/usr/local/gramado-build:
+	-sudo mkdir /usr/local/gramado-build
+	
+build-boot:
+
+	@echo "==================="
+	@echo "Compiling BM ... "
+	$(Q) $(MAKE) -C gramado/boot/x86/bm/ 
+
+	@echo "==================="
+	@echo "Compiling BL ... "
+	$(Q) $(MAKE) -C gramado/boot/x86/bl/ 
+	
+build-lib:
+#	@echo "==================="
+#	@echo "Compiling gramado libs ..."
+#	make -C gramado/lib
+
+#	@echo "==================="
+#	@echo "Compiling animal libs ..."
+#	make -C animal/lib
+
+	@echo "==================="
+	@echo "Compiling libs ..."
+	$(Q) $(MAKE) -C lib
+
+build-init:
+	@echo "==================="
+	@echo "Compiling init process ... [TODO]"
+	$(Q) $(MAKE) -C gramado/init
+
+build-gdeshell:
+	@echo "==================="
+	@echo " Compiling the gdeshell"
+	$(Q) $(MAKE) -C gramado/gdeshell   
+	
+build-gns:
+	@echo "==================="
+	@echo " Compiling the gns"
+	$(Q) $(MAKE) -C gramado/gns   
+
+build-gws:
+	@echo "==================="
+	@echo " Compiling the gws"
+	$(Q) $(MAKE) -C gramado/gws   
+
+
+build-apps:
+	@echo "==================="
+	@echo "Compiling apps ..."
+	$(Q) $(MAKE) -C animal/apps
+
+build-cmd:
+	@echo "==================="
+	@echo "Compiling cmd ..."
+	$(Q) $(MAKE) -C animal/cmd
+	
+
+
+
 ## Step1 KERNEL.BIN         - Creating the kernel image.
 KERNEL.BIN: 
 	@echo "================================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	make -C gramado/kernel   
+	$(Q) $(MAKE) -C gramado/kernel   
 
 
 ## Step3 /mnt/gramadovhd    - Creating the directory to mount the VHD.
@@ -147,7 +200,7 @@ vhd-create:
 	@echo "================================="
 	@echo "(Step 4) Creating a VHD in Assembly language ..."
 
-	nasm gramado/boot/x86/vhd/main.asm -I gramado/boot/x86/vhd/ -o ANIMAL.VHD   
+	$(NASM) gramado/boot/x86/vhd/main.asm -I gramado/boot/x86/vhd/ -o ANIMAL.VHD   
 	
 
 
@@ -322,7 +375,7 @@ makeiso-x86:
 geniso-x86:
 	
 	#stage1
-	nasm kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
+	$(NASM) kernel/boot/x86/iso/stage1/stage1.asm -f bin -o stage1.bin
 	cp stage1.bin bin/boot/gramado/
 	rm stage1.bin
 
@@ -429,83 +482,6 @@ gcc-test:
 	chmod 755 ./scripts/gcccheck
 	./scripts/gcccheck
 
-
-#
-# Building system files.
-# boot, libs, apps and commands.
-# #todo: fonts.
-#
-
-PHONY := build-system-files
-build-system-files: /usr/local/gramado-build \
-build-boot \
-build-lib \
-build-init \
-build-gdeshell \
-build-gns \
-build-gws \
-build-apps \
-build-cmd
-
-
-/usr/local/gramado-build:
-	-sudo mkdir /usr/local/gramado-build
-	
-build-boot:
-
-	@echo "==================="
-	@echo "Compiling BM ... "
-	make -C gramado/boot/x86/bm/ 
-
-	@echo "==================="
-	@echo "Compiling BL ... "
-	make -C gramado/boot/x86/bl/ 
-	
-build-lib:
-#	@echo "==================="
-#	@echo "Compiling gramado libs ..."
-#	make -C gramado/lib
-
-#	@echo "==================="
-#	@echo "Compiling animal libs ..."
-#	make -C animal/lib
-
-	@echo "==================="
-	@echo "Compiling libs ..."
-	make -C lib
-
-build-init:
-	@echo "==================="
-	@echo "Compiling init process ... [TODO]"
-	make -C gramado/init
-
-build-gdeshell:
-	@echo "==================="
-	@echo " Compiling the gdeshell"
-	make -C gramado/gdeshell   
-	
-build-gns:
-	@echo "==================="
-	@echo " Compiling the gns"
-	make -C gramado/gns   
-
-build-gws:
-	@echo "==================="
-	@echo " Compiling the gws"
-	make -C gramado/gws   
-
-
-build-apps:
-	@echo "==================="
-	@echo "Compiling apps ..."
-	make -C animal/apps
-
-build-cmd:
-	@echo "==================="
-	@echo "Compiling cmd ..."
-	make -C animal/cmd
-	
-	
 
 #
 # ======== USAGE ========
