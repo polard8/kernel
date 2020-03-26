@@ -512,7 +512,10 @@ int main (int argc, char **argv){
 
     printf ("gramc4: Initializing ...\n");
 
-    --argc; ++argv;
+    --argc; 
+    ++argv;
+    
+    // -s
     if (argc > 0 && **argv == '-' && (*argv)[1] == 's') 
     { 
         src = 1; 
@@ -520,6 +523,7 @@ int main (int argc, char **argv){
         ++argv; 
     }
 
+    // -d
     if (argc > 0 && **argv == '-' && (*argv)[1] == 'd') 
     { 
         debug = 1; 
@@ -528,8 +532,7 @@ int main (int argc, char **argv){
     }
 
 
-    if (argc < 1) 
-    { 
+    if (argc < 1) { 
         printf("usage: c4 [-s] [-d] file ...\n"); 
         return -1; 
     }
@@ -540,8 +543,7 @@ int main (int argc, char **argv){
     //
 
 
-    if ((fd = open(*argv, 0, 0)) < 0) 
-    { 
+    if ((fd = open(*argv, 0, 0)) < 0){ 
         printf("could not open(%s)\n", *argv); 
         return -1; 
     }
@@ -549,6 +551,11 @@ int main (int argc, char **argv){
 
     poolsz = 256*1024;    // arbitrary size
 
+    //
+    // Buffer.
+    // sym, le, data, sp
+    //
+    
     if (!(sym = malloc(poolsz))) 
     { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
     
@@ -572,15 +579,26 @@ int main (int argc, char **argv){
     p = "char else enum if int return sizeof while "
         "open read close printf malloc free memset memcmp exit void main";
 
-    i = Char; while (i <= While) { next(); id[Tk] = i++; } // add keywords to symbol table
-    i = OPEN; while (i <= EXIT) { next(); id[Class] = Sys; id[Type] = INT; id[Val] = i++; } // add library to symbol table
+    
+    // add keywords to symbol table
+    i = Char; 
+    while (i <= While) { next(); id[Tk] = i++; } 
+    
+    // add library to symbol table
+    i = OPEN; 
+    while (i <= EXIT) { next(); id[Class] = Sys; id[Type] = INT; id[Val] = i++; } 
+    
+    
+    //
+    // void main ...
+    //
   
-    // handle void type
+    // handle 'void' type
     next(); 
     id[Tk] = Char; 
 
 
-    // keep track of main
+    // keep track of 'main'
     next(); 
     idmain = id; 
 
@@ -593,14 +611,13 @@ int main (int argc, char **argv){
     // Read!
     //    
 
-    if ( (i = read(fd, p, poolsz-1)) <= 0 )
-    { 
+    if ( (i = read(fd, p, poolsz-1)) <= 0 ){ 
         printf ("read() returned %d\n", i); 
         return -1; 
     }
 
+    // Finalize.
     p[i] = 0;
-
     close (fd);
 
     //
@@ -614,28 +631,45 @@ int main (int argc, char **argv){
     while (tk) 
     {
 
+       // Step 0 = type or enum
+
         bt = INT;    // basetype
-
         
-        // INT | CHAR | ENUM 
-        if (tk == Int) next();
-        else if (tk == Char) { next(); bt = CHAR; }
+        // INT
+        if (tk == Int) { 
+            next(); 
+        
+        // CHAR
+        }
+        else if (tk == Char) { 
+            next(); 
+            bt = CHAR; 
+        
+        // ENUM
+        // Abre e fecha o corpo.
+        }
         else if (tk == Enum) {
-
+            
             next();
 
             if (tk != '{') 
                 next();
 
 
+            // Depois que abre, tem que fazer um while até fechar.
+            // Falha se não for um symbol. 
+            // (Porque tem symbol no corpo da funções e no corpo do enum)
+            // Depos tem que ter uma atribuição ou separador.
+                
             // '{'
             if (tk == '{') 
-            {
+            {   
                 next();
                 i = 0;
                 while (tk != '}') 
                 {
-                    if (tk != Id) { 
+                    if (tk != Id)
+                    { 
                         printf("%d: bad enum identifier %d\n", line, tk); 
                         return -1; 
                     }
@@ -646,7 +680,8 @@ int main (int argc, char **argv){
                     if (tk == Assign) 
                     {
                         next();
-                        if (tk != Num) { printf("%d: bad enum initializer\n", line); return -1; }
+                        if (tk != Num) 
+                        { printf("%d: bad enum initializer\n", line); return -1; }
                         i = ival;
                         next();
                     }
@@ -662,13 +697,20 @@ int main (int argc, char **argv){
             }
         }
 
+        // Step 1:
+        // Logo acima encontramos tipos ou enum.
+        // Para o enum, abrimos e fechamos o corpo.
+        // Para os tipos, vamos tratar agora.
+        // Obs: Estamos fazendo declarações globais.
+
         // While inside the body ?
         while (tk != ';' && tk != '}')
         {
-        
+
             ty = bt;
 
-
+            // ?? Se a declaração global é um ponteiro ??
+            
             // MUL
             while (tk == Mul)
             { 
@@ -676,17 +718,24 @@ int main (int argc, char **argv){
                 ty = ty + PTR; 
             }
 
-            // NOT ID.
+            // Se não é um symbol.
+            // Deveríamos ter um symbol logo após o tipo.
             if (tk != Id) { 
                 printf ("%d: bad global declaration\n", line); 
                 return -1; 
             }
 
+            // O if acima nos faz ter certeza que 
+            // nesse momento temos um symbol.
+            
             if (id[Class]) { 
                 printf ("%d: duplicate global definition\n", line); 
                 return -1; 
             }
 
+            // Depois do symbol, abre-se a função.
+            // Começando com a pilha de parâmetros. '()'.
+            
             next();
       
             id[Type] = ty;
@@ -701,6 +750,8 @@ int main (int argc, char **argv){
                 next (); 
                 i = 0;
                 
+                // Vamos contruir a pilha de parâmetros
+                // Até encontrarmos o fim da pilha ')'
                 while (tk != ')') 
                 {
                     ty = INT;
@@ -729,14 +780,21 @@ int main (int argc, char **argv){
                     if (tk == ',') next();
                 }
 
+                // Depois de contruída a pilha de parâmetros
+                // devemos abrir o corpo da função.
+                
                 next();
                 
-                if (tk != '{') { printf("%d: bad function definition\n", line); return -1; }
+                if (tk != '{') { 
+                    printf ("%d: bad function definition\n", line); 
+                    return -1; 
+                }
         
                 loc = ++i;
                 
                 next();
 
+                // Declarações de variáveis dentro do corpo da função.
                 while (tk == Int || tk == Char)
                 {
                     bt = (tk == Int) ? INT : CHAR;
@@ -761,11 +819,20 @@ int main (int argc, char **argv){
                         if (tk == ',') next();
                     }
                     next();
-                }
+                
+                }; // Fim do while de declarações de variáveis dentro do corpo da função.
 
-                *++e = ENT; *++e = i - loc;
 
-                while (tk != '}') stmt();
+                *++e = ENT; 
+                *++e = i - loc;
+
+                // Encontramos Statements dentro do corpo da função.
+                // Ou seja, todas as declarações foram feitas no início do corpo
+                // e se não for }, então é statement.
+               
+                while (tk != '}') 
+                    stmt();
+                
                 *++e = LEV;
                 id = sym;    // unwind symbol table locals
                 
@@ -778,107 +845,281 @@ int main (int argc, char **argv){
                         id[Val]   = id[HVal];
                     }
                     id = id + Idsz;
-                }
+                };
 
 
-            // NOT FUNCTION ?
+            // Não era abertura de pilha de parâmetros.
             } else {
                 id[Class] = Glo;
                 id[Val] = (int)data;
                 data = data + sizeof(int);
-            }
+            };
 
 
             // ','
+            // Não era abretura de pilha de parâmetros,
+            // provavelmente uma sequência de declarações de variáveis.
             if (tk == ',')
                 next ();
-        }
+       
+        }; //while. Finalização de declaração ou corpo.
 
+        
+        // Quando finalizarmos a declaração ou o corpo
+        // então pegamos mais um token e tentamos pegar mais
+        // uma declaração ou função.
+        
         next();
-    
-    }
+ 
+    }; // while principal.
 
 
-    if (!(pc = (int *)idmain[Val])) { 
+    // Step 2
+    // Depois que acabaram-se as declarações ou funções
+    // vamos checar se 'main' foi definida.
+
+    if ( !(pc = (int *)idmain[Val]) ) 
+    { 
         printf ("main() not defined\n"); 
         return -1; 
     }
-    
+
+    // ??
     if (src) 
         return 0;
 
-  // setup stack
-  bp = sp = (int *)((int)sp + poolsz);
-  *--sp = EXIT; // call exit if main returns
-  *--sp = PSH; t = sp;
-  *--sp = argc;
-  *--sp = (int)argv;
-  *--sp = (int)t;
 
+
+    // Step 3
+    // Setup stack
+
+    bp = sp = (int *)((int)sp + poolsz);
+ 
+    // call exit if main returns
+    *--sp = EXIT; 
+    *--sp = PSH; t = sp;
+    *--sp = argc;
+    *--sp = (int) argv;
+    *--sp = (int) t;
+
+
+
+    // Step 4.
 
     //
     // Run...
     //
 
-  cycle = 0;
+    // ??
+    // Vamos rodar o interpretador ?
+    // Realizando algumas instruções.
 
-    while (1) {
+    cycle = 0;
+
+    while (1)
+    {
 
         i = *pc++; 
         ++cycle;
     
-        if (debug)
-        {
+        if (debug){
+
             printf ("%d> %.4s", cycle,
                 &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                 "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
                 "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[i * 5]);
-            if (i <= ADJ) printf(" %d\n", *pc); else printf("\n");
+            
+            if (i <= ADJ) printf (" %d\n", *pc); else printf("\n");
         }
+        
+        // O interpretador realiza algumas instruções.
 
+        // load local address
+        if      (i == LEA) { 
+            a = (int)(bp + *pc++); 
+        
+        // load global address or immediate
+        } 
+        else if (i == IMM) { 
+            a = *pc++; 
+        
+        // jump
+        } 
+        else if (i == JMP) { 
+            pc = (int *)*pc; 
+        
+        // jump to subroutine
+        }  
+        else if (i == JSR) { 
+            *--sp = (int)(pc + 1); 
+            pc = (int *)*pc; 
+        
+        
+        // branch if zero
+        }        
+        else if (i == BZ)  { 
+            pc = a ? pc + 1 : (int *)*pc; 
+        
+        
+        // branch if not zero
+        } 
+        else if (i == BNZ) { 
+            pc = a ? (int *)*pc : pc + 1; 
+        
+        // enter subroutine
+        } 
+        else if (i == ENT) { 
+            *--sp = (int) bp; 
+            bp = sp; 
+            sp = sp - *pc++; 
+        
+        // stack adjust
+        }     
+        else if (i == ADJ) { 
+            sp = sp + *pc++; 
+        
+        // leave subroutine
+        }    
+        else if (i == LEV) { 
+            sp = bp; 
+            bp = (int *)*sp++; 
+            pc = (int *)*sp++; 
+        
+        // load int
+        } 
+        else if (i == LI) { 
+            a = *(int *)a; 
+        
+        
+        // load char
+        } 
+        else if (i == LC) { 
+            a = *(char *)a; 
+        
+        
+        // store int
+        } 
+        else if (i == SI) { 
+            *(int *)*sp++ = a; 
+        
+        // store char
+        }   
+        else if (i == SC) { 
+            a = *(char *)*sp++ = a; 
+        
+        
+        // push
+        } 
+        else if (i == PSH) { 
+            *--sp = a; 
+        
+        } 
+        else if (i == OR) { 
+            a = *sp++ |  a; 
+        
+        }
+        else if (i == XOR) { 
+            a = *sp++ ^  a; 
+        
+        }
+        else if (i == AND) { 
+            a = *sp++ &  a; 
+        
+        }
+        else if (i == EQ)  { 
+            a = *sp++ == a; 
+        
+        }
+        else if (i == NE) { 
+            a = *sp++ != a; 
+        
+        }
+        else if (i == LT) { 
+            a = *sp++ <  a; 
+        
+        }
+        else if (i == GT) { 
+            a = *sp++ >  a; 
+        
+        }
+        else if (i == LE) { 
+            a = *sp++ <= a; 
+        
+        }
+        else if (i == GE) { 
+            a = *sp++ >= a; 
+        
+        }
+        else if (i == SHL) { 
+            a = *sp++ << a; 
+        
+        }
+        else if (i == SHR) { 
+            a = *sp++ >> a; 
+        
+        }
+        else if (i == ADD) { 
+            a = *sp++ +  a; 
+        
+        }
+        else if (i == SUB) { 
+            a = *sp++ -  a; 
+        
+        }
+        else if (i == MUL) { 
+            a = *sp++ *  a; 
 
-    if      (i == LEA) a = (int)(bp + *pc++);                             // load local address
-    else if (i == IMM) a = *pc++;                                         // load global address or immediate
-    else if (i == JMP) pc = (int *)*pc;                                   // jump
-    else if (i == JSR) { *--sp = (int)(pc + 1); pc = (int *)*pc; }        // jump to subroutine
-    else if (i == BZ)  pc = a ? pc + 1 : (int *)*pc;                      // branch if zero
-    else if (i == BNZ) pc = a ? (int *)*pc : pc + 1;                      // branch if not zero
-    else if (i == ENT) { *--sp = (int)bp; bp = sp; sp = sp - *pc++; }     // enter subroutine
-    else if (i == ADJ) sp = sp + *pc++;                                   // stack adjust
-    else if (i == LEV) { sp = bp; bp = (int *)*sp++; pc = (int *)*sp++; } // leave subroutine
-    else if (i == LI)  a = *(int *)a;                                     // load int
-    else if (i == LC)  a = *(char *)a;                                    // load char
-    else if (i == SI)  *(int *)*sp++ = a;                                 // store int
-    else if (i == SC)  a = *(char *)*sp++ = a;                            // store char
-    else if (i == PSH) *--sp = a;                                         // push
+        }
+        else if (i == DIV) { 
+            a = *sp++ /  a; 
+        
+        }
+        else if (i == MOD) { 
+            a = *sp++ %  a; 
 
-    else if (i == OR)  a = *sp++ |  a;
-    else if (i == XOR) a = *sp++ ^  a;
-    else if (i == AND) a = *sp++ &  a;
-    else if (i == EQ)  a = *sp++ == a;
-    else if (i == NE)  a = *sp++ != a;
-    else if (i == LT)  a = *sp++ <  a;
-    else if (i == GT)  a = *sp++ >  a;
-    else if (i == LE)  a = *sp++ <= a;
-    else if (i == GE)  a = *sp++ >= a;
-    else if (i == SHL) a = *sp++ << a;
-    else if (i == SHR) a = *sp++ >> a;
-    else if (i == ADD) a = *sp++ +  a;
-    else if (i == SUB) a = *sp++ -  a;
-    else if (i == MUL) a = *sp++ *  a;
-    else if (i == DIV) a = *sp++ /  a;
-    else if (i == MOD) a = *sp++ %  a;
-
-    else if (i == OPEN) a = open ((char *)sp[1], *sp,0);
-    else if (i == READ) a = read (sp[2], (char *)sp[1], *sp);
-    else if (i == CLOS) a = close (*sp);
-    else if (i == PRTF) { t = sp + pc[1]; a = printf((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); }
-    else if (i == MALC) a = (int) malloc (*sp);
-    else if (i == FREE) free ((void *)*sp);
-    else if (i == MSET) a = (int) memset ((char *)sp[2], sp[1], *sp);
-    else if (i == MCMP) a = memcmp ((char *)sp[2], (char *)sp[1], *sp);
-        else if (i == EXIT) { printf("exit(%d) cycle = %d\n", *sp, cycle); return *sp; }
-        else { printf("unknown instruction = %d! cycle = %d\n", i, cycle); return -1; }
+        }
+        else if (i == OPEN) { 
+            a = open ((char *)sp[1], *sp,0); 
+        
+        }
+        else if (i == READ) { 
+            a = read (sp[2], (char *)sp[1], *sp); 
+        
+        }
+        else if (i == CLOS) { 
+            a = close (*sp); 
+        
+        }
+        else if (i == PRTF) { 
+            t = sp + pc[1]; 
+            a = printf ((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); 
+        
+        }
+        else if (i == MALC) { 
+            a = (int) malloc (*sp); 
+        
+        }
+        else if (i == FREE) { 
+            free ((void *)*sp); 
+        
+        }
+        else if (i == MSET) { 
+            a = (int) memset ((char *)sp[2], sp[1], *sp); 
+        
+        }
+        else if (i == MCMP) { 
+            a = memcmp ((char *)sp[2], (char *)sp[1], *sp); 
+        
+        }
+        else if (i == EXIT) { 
+            printf("exit(%d) cycle = %d\n", *sp, cycle); 
+            return *sp; 
+        
+        }
+        else { 
+            printf ("unknown instruction = %d! cycle = %d\n", i, cycle); 
+            return -1; 
+        };
     
     }; // while
 
