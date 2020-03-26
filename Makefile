@@ -2,7 +2,7 @@
 VERSION = 1
 PATCHLEVEL = 35
 SUBLEVEL =
-EXTRAVERSION = -rc4
+EXTRAVERSION = -rc5
 NAME = Gramado 1.xx
 
 # Documentation.

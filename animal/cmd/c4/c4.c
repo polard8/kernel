@@ -1,3 +1,4 @@
+// License: GPL-2.0
 // c4.c - C in four functions
 
 // char, int, and pointer types
