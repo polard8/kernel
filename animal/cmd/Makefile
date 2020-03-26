@@ -6,16 +6,20 @@ all:
 	make -C ./cmp
 	make -C ./echo
 	make -C ./false
-	make -C ./gramc
 	make -C ./reboot
 	make -C ./true
 	make -C ./sum
 	make -C ./showfun
 	make -C ./tprintf
-	make -C ./uname    
+	make -C ./uname
+	
+	# gramc thing.    
+	make -C ./gramc
+	make -C ./gramreg
+	
+	# c4 thing.
 	make -C ./c4  
 	make -C ./gramc4
-	
 	
 	
 
