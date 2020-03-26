@@ -14,8 +14,10 @@ all:
 	make -C ./tprintf
 	make -C ./uname    
 	make -C ./c4  
+	make -C ./gramc4
 	
-	    
+	
+	
 
 # ...
 	

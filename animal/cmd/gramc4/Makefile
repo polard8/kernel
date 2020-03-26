@@ -47,7 +47,7 @@ APIOBJ  = ../../../lib/libgui/obj
 	## Objects
 	##
 
-myObjects = crt0.o c4.o \
+myObjects = crt0.o gramc4.o \
 ctype.o \
 stdio.o \
 stdlib.o \
@@ -72,7 +72,7 @@ all: c4.o all-c jackpot-link finalize clean
 	@echo "Ok?"
 
 c4.o:
-	gcc  -c  c4.c  -Wall     $(CFLAGS) -I $(LIBC) -I $(API02) -o c4.o
+	gcc  -c  gramc4.c  -Wall  $(CFLAGS) -I $(LIBC) -I $(API02) -o gramc4.o
 
 
 all-c:
@@ -103,16 +103,15 @@ all-c:
 
 
 jackpot-link:
-	ld -m elf_i386 -T ../link.ld -o C4.BIN $(myObjects)    
+	ld -m elf_i386 -T ../link.ld -o GRAMC4.BIN $(myObjects)    
 	
 	
 
 finalize:
-	cp C4.BIN ../bin 
+	cp GRAMC4.BIN ../bin 
 
 clean:
 	-rm *.o
-	-rm C4.BIN 
-	
+	-rm GRAMC4.BIN 
 	
 	
