@@ -27,5 +27,10 @@ int main() {
     printf("-16000 >= -17000 : %d\n", -16000 >= -17000);
     printf("\n");
 
+
+    printf("Calling new process ...\n");
+    run("reboot.bin",0);
+    printf("done\n");
+    
     return 0;
 }

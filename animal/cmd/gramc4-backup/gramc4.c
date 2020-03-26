@@ -59,7 +59,7 @@ enum {
 // opcodes
 enum { LEA, IMM, JMP, JSR, BZ, BNZ, ENT, ADJ, LEV, LI, LC, SI, SC, PSH,
        OR, XOR, AND, EQ, NE, LT, GT, LE, GE, SHL, SHR, ADD, SUB, MUL, DIV, MOD,
-       OPEN, RUN, READ, CLOS, PRTF, MALC, FREE, MSET, MCMP, EXIT };
+       OPEN, READ, CLOS, PRTF, MALC, FREE, MSET, MCMP, EXIT };
 
 
 // types
@@ -93,7 +93,7 @@ void next (void){
         while (le < e) {
           printf("%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                            "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-                           "OPEN,RUN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5]);
+                           "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5]);
           if (*le <= ADJ) printf(" %d\n", *++le); else printf("\n");
         }
       }
@@ -577,7 +577,7 @@ int main (int argc, char **argv){
     memset(data, 0, poolsz);
 
     p = "char else enum if int return sizeof while "
-        "open run read close printf malloc free memset memcmp exit void main";
+        "open read close printf malloc free memset memcmp exit void main";
 
     
     // add keywords to symbol table
@@ -941,7 +941,7 @@ int main (int argc, char **argv){
             printf ("%d> %.4s", cycle,
                 &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                 "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-                "OPEN,RUN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[i * 5]);
+                "OPEN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[i * 5]);
             
             if (i <= ADJ) printf (" %d\n", *pc); else printf("\n");
         }
@@ -1094,11 +1094,7 @@ int main (int argc, char **argv){
         }
         else if (i == OPEN) { 
             a = open ((char *)sp[1], *sp,0); 
-
-        }
-        else if (i == RUN) { 
-            //a = open ((char *)sp[1], *sp,0);
-            a = gramado_system_call (900,(unsigned long)sp[1],0,0);   
+        
         }
         else if (i == READ) { 
             a = read (sp[2], (char *)sp[1], *sp); 
