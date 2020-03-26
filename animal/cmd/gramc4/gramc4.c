@@ -22,6 +22,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+//test
+#include <sys/wait.h> 
+
 
 // target: i386.
 // #define int long long
@@ -923,7 +926,9 @@ int main (int argc, char **argv){
     //
     // Run...
     //
-
+    
+    int Wait_status;
+    
     // ??
     // Vamos rodar o interpretador ?
     // Realizando algumas instruções.
@@ -1098,7 +1103,9 @@ int main (int argc, char **argv){
         }
         else if (i == RUN) { 
             //a = open ((char *)sp[1], *sp,0);
-            a = gramado_system_call (900,(unsigned long)sp[1],0,0);   
+            a = gramado_system_call (900,(unsigned long)sp[1],0,0); 
+            
+             waitpid (-1,&Wait_status,0);  
         }
         else if (i == READ) { 
             a = read (sp[2], (char *)sp[1], *sp); 

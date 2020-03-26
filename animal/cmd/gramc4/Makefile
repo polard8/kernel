@@ -62,6 +62,7 @@ fscanf.o \
 fcntl.o \
 termios.o \
 ioctl.o \
+wait.o \
 stubs.o    
 
 
@@ -98,6 +99,8 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	
+	cp $(LIBCOBJ)/wait.o .
+
 	cp $(APIOBJ)/api.o      .
 
 

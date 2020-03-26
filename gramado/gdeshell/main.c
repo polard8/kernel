@@ -89,6 +89,8 @@
 
 #include "shell.h"
 
+//test
+#include <sys/wait.h> 
 
 // porque deletamos libcore
 #define gramado_strncmp strncmp 
@@ -3534,7 +3536,7 @@ do_compare:
     if ( gramado_strncmp( prompt, "wait-test", 9 ) == 0 )
     {
         //wait (&___wait_status);
-        wait (-1,&___wait_status,0);
+        waitpid (-1,&___wait_status,0);
         goto exit_cmp;
     }
 
@@ -3729,7 +3731,7 @@ doexec_first_command:
 		printf ("Running in bg \n");
 
         // Bella!  
-        wait (-1,&Wait_status,0);
+        waitpid (-1,&Wait_status,0);
         
         //#debug
         printf ("wait() ends\n");
