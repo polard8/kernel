@@ -2,6 +2,8 @@
   This is the folder for the kernelbase's source code.
   Everything here is gonna run in ring 0, 32bit protected mode.
 
+     It will generate the image KERNEL.BIN.
+
 
 	2020 - Fred Nora
  

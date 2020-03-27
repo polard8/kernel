@@ -1104,8 +1104,8 @@ int main (int argc, char **argv){
         else if (i == RUN) { 
             //a = open ((char *)sp[1], *sp,0);
             a = gramado_system_call (900,(unsigned long)sp[1],0,0); 
-            
-             waitpid (-1,&Wait_status,0);  
+            waitpid (-1,&Wait_status,0); 
+        
         }
         else if (i == READ) { 
             a = read (sp[2], (char *)sp[1], *sp); 
@@ -1130,7 +1130,7 @@ int main (int argc, char **argv){
         }
         else if (i == MSET) { 
             a = (int) memset ((char *)sp[2], sp[1], *sp); 
-        
+
         }
         else if (i == MCMP) { 
             a = memcmp ((char *)sp[2], (char *)sp[1], *sp); 

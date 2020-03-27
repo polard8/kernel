@@ -655,9 +655,9 @@ char *strncat (char *dst, const char *src, size_t n){
 
     while (n--)
     {
-		*q++ = ch = *p++;
-		if (!ch)
-			return dst;
+        *q++ = ch = *p++;
+        if (!ch)
+            return dst;
     };
 
     *q = '\0';
