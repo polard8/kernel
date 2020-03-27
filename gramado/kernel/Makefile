@@ -305,57 +305,66 @@ all-c:
 	##
 
 
-	$(CC) -c bottom/sysio/io.c     $(KINCLUDE) $(CFLAGS) -o io.o
-	$(CC) -c bottom/sysio/sysio.c  $(KINCLUDE) $(CFLAGS) -o sysio.o
+	$(CC) -c bottom/io.c      $(KINCLUDE) $(CFLAGS) -o io.o
+	$(CC) -c bottom/sysio.c   $(KINCLUDE) $(CFLAGS) -o sysio.o
+	$(CC) -c bottom/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
 	# sysio/hal
-	$(CC) -c bottom/sysio/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c bottom/sysio/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
-	$(CC) -c bottom/sysio/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
-	$(CC) -c bottom/sysio/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
-	$(CC) -c bottom/sysio/hal/arch/x86/syscall.c   $(KINCLUDE) $(CFLAGS) -o syscall.o
-	$(CC) -c bottom/sysio/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
+	$(CC) -c bottom/hal/hal.c                $(KINCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c bottom/hal/arch/detect.c        $(KINCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c bottom/hal/arch/amd/cpuamd.c    $(KINCLUDE) $(CFLAGS) -o cpuamd.o
+	$(CC) -c bottom/hal/arch/x86/portsx86.c  $(KINCLUDE) $(CFLAGS) -o portsx86.o
+	$(CC) -c bottom/hal/arch/x86/syscall.c   $(KINCLUDE) $(CFLAGS) -o syscall.o
+	$(CC) -c bottom/hal/arch/x86/x86.c       $(KINCLUDE) $(CFLAGS) -o x86.o
 
 	# rtc
-	$(CC) -c bottom/sysio/kdrivers/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c bottom/dd/rtc/rtc.c     $(KINCLUDE) $(CFLAGS) -o rtc.o
 
 	# serial
-	$(CC) -c bottom/sysio/kdrivers/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
+	$(CC) -c bottom/dd/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
 
 	# x86
-	$(CC) -c bottom/sysio/kdrivers/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
-	$(CC) -c bottom/sysio/kdrivers/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
-	$(CC) -c bottom/sysio/kdrivers/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c bottom/dd/arch/x86/apic.c  $(KINCLUDE) $(CFLAGS) -o apic.o
+	$(CC) -c bottom/dd/arch/x86/pic.c   $(KINCLUDE) $(CFLAGS) -o pic.o
+	$(CC) -c bottom/dd/arch/x86/pit.c   $(KINCLUDE) $(CFLAGS) -o pit.o
 
 	# ahci 
-	$(CC) -c bottom/sysio/kdrivers/ahci/ahci.c  $(KINCLUDE) $(CFLAGS) -o ahci.o
+	$(CC) -c bottom/dd/ahci/ahci.c  $(KINCLUDE) $(CFLAGS) -o ahci.o
 
 	# ide
-	$(CC) -c bottom/sysio/kdrivers/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
-	$(CC) -c bottom/sysio/kdrivers/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
-	$(CC) -c bottom/sysio/kdrivers/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
-	$(CC) -c bottom/sysio/kdrivers/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
-	$(CC) -c bottom/sysio/kdrivers/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
-	$(CC) -c bottom/sysio/kdrivers/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
+	$(CC) -c bottom/dd/ide/hdd.c      $(KINCLUDE) $(CFLAGS) -o hdd.o
+	$(CC) -c bottom/dd/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o
+	$(CC) -c bottom/dd/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o
+	$(CC) -c bottom/dd/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o
+	$(CC) -c bottom/dd/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o
+	$(CC) -c bottom/dd/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o
 
 	# pci
-	$(CC) -c bottom/sysio/kdrivers/pci/pci.c      $(KINCLUDE) $(CFLAGS) -o pci.o
-	$(CC) -c bottom/sysio/kdrivers/pci/pciscan.c  $(KINCLUDE) $(CFLAGS) -o pciscan.o
-	$(CC) -c bottom/sysio/kdrivers/pci/pciinfo.c  $(KINCLUDE) $(CFLAGS) -o pciinfo.o
+	$(CC) -c bottom/dd/pci/pci.c      $(KINCLUDE) $(CFLAGS) -o pci.o
+	$(CC) -c bottom/dd/pci/pciscan.c  $(KINCLUDE) $(CFLAGS) -o pciscan.o
+	$(CC) -c bottom/dd/pci/pciinfo.c  $(KINCLUDE) $(CFLAGS) -o pciinfo.o
 
 	# tty
-	$(CC) -c bottom/sysio/kdrivers/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
-	$(CC) -c bottom/sysio/kdrivers/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c bottom/sysio/kdrivers/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
-	$(CC) -c bottom/sysio/kdrivers/tty/vt.c  $(KINCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c bottom/dd/tty/console.c $(KINCLUDE) $(CFLAGS) -o cedge.o
+	$(CC) -c bottom/dd/tty/tty.c     $(KINCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c bottom/dd/tty/pty.c     $(KINCLUDE) $(CFLAGS) -o pty.o
+	$(CC) -c bottom/dd/tty/vt.c  $(KINCLUDE) $(CFLAGS) -o vt.o
 
 	# usb
-	$(CC) -c bottom/sysio/kdrivers/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
+	$(CC) -c bottom/dd/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
 
 	# net
-	$(CC) -c bottom/sysio/kdrivers/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
-	# devices
-	$(CC) -c bottom/sysio/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
+	$(CC) -c bottom/dd/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
+	
+	
+	# ws
+	$(CC) -c bottom/dd/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c bottom/dd/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c bottom/dd/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c bottom/dd/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c bottom/dd/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	$(CC) -c bottom/dd/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
+	
 
 
 
@@ -363,22 +372,14 @@ all-c:
 	# falling angels.
 	#
 	
-	# ws
-	$(CC) -c bottom/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c bottom/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c bottom/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c bottom/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c bottom/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-	#video
-	$(CC) -c bottom/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
 	#ps
-	$(CC) -c bottom/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
-	$(CC) -c bottom/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c bottom/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
-	$(CC) -c bottom/memory.c  $(KINCLUDE) $(CFLAGS) -o memory.o
-	$(CC) -c bottom/mminfo.c  $(KINCLUDE) $(CFLAGS) -o mminfo.o
-	$(CC) -c bottom/mmpool.c  $(KINCLUDE) $(CFLAGS) -o mmpool.o
-	$(CC) -c bottom/pages.c   $(KINCLUDE) $(CFLAGS) -o pages.o
+	$(CC) -c bottom/ps/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c bottom/ps/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
+	$(CC) -c bottom/ps/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+	$(CC) -c bottom/ps/memory.c  $(KINCLUDE) $(CFLAGS) -o memory.o
+	$(CC) -c bottom/ps/mminfo.c  $(KINCLUDE) $(CFLAGS) -o mminfo.o
+	$(CC) -c bottom/ps/mmpool.c  $(KINCLUDE) $(CFLAGS) -o mmpool.o
+	$(CC) -c bottom/ps/pages.c   $(KINCLUDE) $(CFLAGS) -o pages.o
 
 
 	# x86 initialization
