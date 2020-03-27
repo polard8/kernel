@@ -160,6 +160,9 @@ all-c:
 	## ==== TOP ==== 
 	##
 
+	# main (Architechture independent)
+	# It's the higher level of the init sybsystem.
+	$(CC) -c top/main.c $(KINCLUDE) $(CFLAGS) -o main.o
 
 	#  /sci - System Call Interface.
 	$(CC) -c top/sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
@@ -241,12 +244,6 @@ all-c:
 	$(CC) -c top/ws/xproc.c     $(KINCLUDE) $(CFLAGS) -o xproc.o
 	$(CC) -c top/ws/screen.c    $(KINCLUDE) $(CFLAGS) -o screen.o
 	$(CC) -c top/ws/video.c     $(KINCLUDE) $(CFLAGS) -o video.o
-	$(CC) -c top/ws/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
-	$(CC) -c top/ws/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	$(CC) -c top/ws/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c top/ws/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c top/ws/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	$(CC) -c top/ws/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
 	$(CC) -c top/ws/ldisc.c     $(KINCLUDE) $(CFLAGS) -o ldisc.o
 
 
@@ -267,11 +264,6 @@ all-c:
 	$(CC) -c middle/syslib/libcore/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
 	$(CC) -c middle/syslib/libcore/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
 	$(CC) -c middle/syslib/syslib.c $(KINCLUDE) $(CFLAGS) -o syslib.o
-
-	# x86
-	$(CC) -c  middle/sysmk/ps/arch/x86/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
-	$(CC) -c  middle/sysmk/ps/arch/x86/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
-	$(CC) -c  middle/sysmk/ps/arch/x86/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
 
 	# ps/action
 	$(CC) -c  middle/sysmk/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o
@@ -294,12 +286,6 @@ all-c:
 	$(CC) -c  middle/sysmk/ps/ipc/ipc.c      $(KINCLUDE)  $(CFLAGS) -o ipc.o
 	$(CC) -c  middle/sysmk/ps/ipc/ipccore.c  $(KINCLUDE)  $(CFLAGS) -o ipccore.o
 	$(CC) -c  middle/sysmk/ps/ipc/sem.c      $(KINCLUDE)  $(CFLAGS) -o sem.o
-
-	# ps/mm
-	$(CC) -c  middle/sysmk/ps/mm/x86/memory.c  $(KINCLUDE) $(CFLAGS) -o memory.o
-	$(CC) -c  middle/sysmk/ps/mm/x86/mminfo.c  $(KINCLUDE) $(CFLAGS) -o mminfo.o
-	$(CC) -c  middle/sysmk/ps/mm/x86/mmpool.c  $(KINCLUDE) $(CFLAGS) -o mmpool.o
-	$(CC) -c  middle/sysmk/ps/mm/x86/pages.c   $(KINCLUDE) $(CFLAGS) -o pages.o
 
 	# ps/sched
 	$(CC) -c  middle/sysmk/ps/sched/preempt.c   $(KINCLUDE) $(CFLAGS) -o preempt.o
@@ -372,9 +358,28 @@ all-c:
 	$(CC) -c bottom/sysio/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
 
-	# main (Architechture independent)
-	# It's the higher level of the init sybsystem.
-	$(CC) -c bottom/init/main.c $(KINCLUDE) $(CFLAGS) -o main.o
+
+	#
+	# falling angels.
+	#
+	
+	# ws
+	$(CC) -c bottom/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c bottom/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c bottom/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c bottom/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c bottom/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	#video
+	$(CC) -c bottom/vsync.c     $(KINCLUDE) $(CFLAGS) -o vsync.o
+	#ps
+	$(CC) -c bottom/x86cont.c   $(KINCLUDE)  $(CFLAGS) -o x86cont.o
+	$(CC) -c bottom/x86fault.c  $(KINCLUDE)  $(CFLAGS) -o x86fault.o
+	$(CC) -c bottom/x86start.c  $(KINCLUDE)  $(CFLAGS) -o x86start.o
+	$(CC) -c bottom/memory.c  $(KINCLUDE) $(CFLAGS) -o memory.o
+	$(CC) -c bottom/mminfo.c  $(KINCLUDE) $(CFLAGS) -o mminfo.o
+	$(CC) -c bottom/mmpool.c  $(KINCLUDE) $(CFLAGS) -o mmpool.o
+	$(CC) -c bottom/pages.c   $(KINCLUDE) $(CFLAGS) -o pages.o
+
 
 	# x86 initialization
 	$(CC) -c bottom/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
