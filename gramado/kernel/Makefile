@@ -160,14 +160,6 @@ all-c:
 	## ==== TOP ==== 
 	##
 
-	# x86 boot
-	$(NASM) top/init/x86/boot.asm -I top/init/x86/ -f elf -o boot.o
-	# x86 initialization
-	$(CC) -c top/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
-
-	# main (Architechture independent)
-	# It's the higher level of the init sybsystem.
-	$(CC) -c top/init/main.c $(KINCLUDE) $(CFLAGS) -o main.o
 
 	#  /sci - System Call Interface.
 	$(CC) -c top/sci/gde_serv.c $(KINCLUDE) $(CFLAGS) -o gde_serv.o
@@ -192,7 +184,6 @@ all-c:
 	$(CC) -c top/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
 
 	# net
-	$(CC) -c top/net/network/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
 	$(CC) -c top/net/network/channel.c   $(KINCLUDE) $(CFLAGS) -o channel.o
 	$(CC) -c top/net/network/network.c   $(KINCLUDE) $(CFLAGS) -o network.o
 	$(CC) -c top/net/socket.c            $(KINCLUDE) $(CFLAGS) -o socket.o	
@@ -374,10 +365,22 @@ all-c:
 
 	# usb
 	$(CC) -c bottom/sysio/kdrivers/usb/usb.c   $(KINCLUDE) $(CFLAGS) -o usb.o
-	
+
+	# net
+	$(CC) -c bottom/sysio/kdrivers/net/nicintel.c  $(KINCLUDE) $(CFLAGS) -o nicintel.o
 	# devices
 	$(CC) -c bottom/sysio/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o
 
+
+	# main (Architechture independent)
+	# It's the higher level of the init sybsystem.
+	$(CC) -c bottom/init/main.c $(KINCLUDE) $(CFLAGS) -o main.o
+
+	# x86 initialization
+	$(CC) -c bottom/init/x86/x86init.c  $(KINCLUDE) $(CFLAGS) -o x86init.o
+
+	# x86 boot
+	$(NASM) bottom/init/x86/boot.asm -I bottom/init/x86/ -f elf -o boot.o
 
 
 ## Step2 link-kernel-image  - Linking the kernel image.
