@@ -358,9 +358,10 @@ socket_gramado (
         _file->_r = 0;
         _file->_w = 0;
         _file->_lbfsize = BUFSIZ; 
-
         //quanto falta é igual ao tamanho.
-        _file->_cnt = _file->_lbfsize;  
+        _file->_cnt = _file->_lbfsize;
+        
+        _file->socket_buffer_full = 0;  
 
         _file->socket = sock;
         

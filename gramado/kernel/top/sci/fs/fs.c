@@ -1,42 +1,11 @@
 /*
  * File: fs/fs.c 
  *
- * Descri��o:
- *    Arquivo principal do file system manager.
- *    M�dulo em kernel mode, incluido no kernel base. 
+ *     Top level file system support.
  *    
- * IMPORTANTE: 
- * A id�ia principal � que esse m�dulo de o suporte ao acesso a qualquer 
- * sistema de arquivo suportado, esteja ele em user mode ou em kernel mode.
- *
- * Arquivo principal do m�dulo fs do executive do kernel..
- * Gerenciador de arquivos do kernel.
- * Na verdade o Kernel n�o tem atribui��es de carregar arquivos. Mas ele 
- * ofere�e servi�os b�sicos que podem ser chamados pelos aplicativos.
- *
- * Objetivo:
- * Ofere�er opera��es nos sistemas de arquivos suportados pelo kernel.
- * Esse gerenciador chama as fun��es em kernel mode do sistema de arquivos
- * interno e chama as servi�os oferecidos pelos drivers em user mode.
- *
- * Os drivers em user mode podem oferecer acesso � sistemas de arquivos
- * variados.
- *
- * Ao kernel, compete as fun��es b�sicas de opera��es com hardware.
- * O sistema de arquivos suportado pelo kernel � fat16.
- * Continua ...
- *
- * Observa��o: 
- *    Os valores das estruturas do sistema de arquivos podem ser salvos 
- * em um registro.
- *    No registro pode ter um registro das opera��es efetuadas 
- * no sistema de arquivo.
- *   Continua ...
  *   
  * History: 
  *    2015 - Created by Fred Nora.
- *    2016 - Revision.
- *    2019 - fred, pwd and cd support.
  *    ...
  */
 
@@ -53,143 +22,23 @@
 
 
 // Get free slot.
-int fs_get_mounted_free_slot (void){
-
-    int i;
-    for (i=0; i<128; i++){
-        if ( mountedList[i] == 0 )
-            goto __ok;
-    }
-
-   //fail
-    return (int) (-1);
-
-__ok:
-    return (int) i;
-}
-
-
-
-
-//IN: Índice na lista de volumes. volumeList[i].
-int 
-fs_mount_volume ( struct disk_d *d, 
-                  struct volume_d *v,
-                  char *name,
-                  size_t len )
+int fs_get_mounted_free_slot (void)
 {
-
-    struct mounted_d *m;
-    int __slot = -1;
-    int i;
-    
-    
-    if ( (void *) name == NULL ){
-        debug_print ("fs_mount_volume: name");
-        return -1;
-    }
-    
-    
-    if (len<0 || len>63){
-        debug_print ("fs_mount_volume: len");
-        len = 8;
-        //return -1;    
-    }
-    
-    
-    __slot = fs_get_mounted_free_slot();
-    
-    if (__slot < 0){
-        debug_print ("fs_mount_volume: no more slots");
-        panic ("fs_mount_volume: no more slots");
-    }
-
-
-    m = (struct mounted_d *) kmalloc ( sizeof(struct mounted_d) );
-
-    if ( (void *) m == NULL ){
-        panic ("fs_mount_volume: m");
-    }else{
-
-        m->id = __slot;
-    
-        m->used = 1;
-        m->magic = 1234;
-
-        m->disk = (struct disk_d *) d;
-        m->volume = (struct volume_d *) v;
-        
-        
-        m->mountedName_len = len;
-    
-        for (i=0; i<len; i++)
-            m->__mountedname[i] = name[i];
-            
-        m->__mountedname[i+1] = 0;  
-    
-        if (__slot >= 128)
-            panic("fs_mount_volume: __slot limits");
-
-        mountedList[__slot] = (unsigned long) m;
-    
-        return 0;
-    };
-
-
     return -1;
 }
 
 
+
 void fs_initialize_mounted_list(void)
 {
-   int i;
-   for (i=0; i<128; i++)
-       mountedList[i] = (unsigned long) 0;
-   
-   
-   //Vamos montar os volumes criados em storage.c
-   
-
-   fs_mount_volume (____boot____disk, volume_bootpartition, "/", 1 );  //root
-   fs_mount_volume (____boot____disk, volume_systempartition, "/data", 5 ); //system
-   fs_mount_volume (NULL, volume_vfs, "/vfs", 4 );
+	//
 }
+
 
 
 void fs_show_mounted(int i)
 {
-    struct mounted_d *m;
-
-
-    if(i<0)
-        return;
-
-
-    m = (struct mounted_d *) mountedList[i];
-
-    if ( (void *) m == NULL ){
-        return;
-
-    }else{
-
-
-        printf ("\n====================================\n");
-        printf ("%d) %s\n",m->id,m->__mountedname);
-        //printf ("fs_show_mounted: \n");
-        //printf ("id %d\n",m->id);
-        //printf ("used %d\n",m->used);
-        //printf ("magic %d\n",m->magic);
-
-
-        if ( (void *) m->disk != NULL )
-            diskShowDiskInfo(m->disk->id);
-
-        if ( (void *) m->volume != NULL )
-            volumeShowVolumeInfo(m->volume->id);
-        
-
-        refresh_screen ();        
-    };
+    //
 }
 
 
@@ -197,12 +46,7 @@ void fs_show_mounted(int i)
 //mostra a lista de volumes montados.
 void fs_show_mounted_list(void)
 {
-   int i;
-   for (i=0; i<128; i++)
-   {
-       if( mountedList[i] != 0)
-           fs_show_mounted(i);
-   }
+    //
 }
 
 

@@ -75,10 +75,42 @@ int devmgr_init_device_list(void)
 }
 
 
+/*
+// Mount a device into the deviceList[].
+// IN: Device id.
+struct device_d *do_mount (int dev);
+struct device_d *do_mount (int dev)
+{
+    struct device_d *d;
+    
+    d = (struct device_d *) devmgr_device_object();
+    
+    if ( (void*) == NULL )
+       return (struct device_d *) 0;
 
+
+    //d->? = dev;
+    
+    return (struct device_d *) d;
+}
+*/
+
+
+/*
+// Mount root device.
+int mount_root (void);
+int mount_root (void)
+{
+   return -1;
+}
+*/
+
+
+// OUT: A pointer to a void mounted device.
 struct device_d *devmgr_device_object (void)
 {
     struct device_d *d;
+    
     unsigned long __tmp;
     int i;
     

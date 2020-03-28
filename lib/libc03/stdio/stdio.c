@@ -50,19 +50,18 @@ static int terminal___PID;
 
 // Testando define.
 
-#define	SYSTEMCALL_READ_LBA    1
-#define	SYSTEMCALL_WRITE_LBA   2
-#define	SYSTEMCALL_READ_FILE   3
-#define	SYSTEMCALL_WRITE_FILE  4
+#define  SYSTEMCALL_READ_LBA    1
+#define  SYSTEMCALL_WRITE_LBA   2
+#define  SYSTEMCALL_READ_FILE   3
+#define  SYSTEMCALL_WRITE_FILE  4
 // ...
 
 
 // Why ?
-#define VK_RETURN      0x1C 
-#define VK_BACKSPACE   0x0E 
-#define VK_BACK	       0x0E  
-#define VK_TAB         0x0F 
-
+#define  VK_RETURN      0x1C 
+#define  VK_BACKSPACE   0x0E 
+#define  VK_BACK        0x0E  
+#define  VK_TAB         0x0F 
 
 
 
@@ -126,7 +125,7 @@ int stdio_atoi (char *s){
         return (rv);
     };
 
-    //     return (sign ? -rv : rv);
+    // return (sign ? -rv : rv);
 }
 
 
@@ -275,24 +274,25 @@ _strout (
     int fillch )
 {
 
-	while (adjust < 0) {
-		
-		if (*string=='-' && fillch=='0') {
-			putc (*string++, file);
-			count--;
-		}
+    while (adjust < 0)
+    {
+        if (*string=='-' && fillch=='0')
+        {
+            putc (*string++, file);
+            count--;
+        }
 
-		putc(fillch, file);
-		adjust++;
-	};
-	
-	while (--count>=0)
-		putc(*string++, file);
-	
-	while (adjust) {
-		putc(fillch, file);
-		adjust--;
-	}
+        putc (fillch, file);
+        adjust++;
+    };
+
+    while (--count>=0)
+        putc (*string++, file);
+
+    while (adjust) {
+        putc (fillch, file);
+        adjust--;
+    };
 }
 
 
@@ -328,28 +328,28 @@ int __fflush (FILE *stream){
     if ( (void *) stream->_base == NULL ){
         debug_print( "__fflush: _base\n");
         return -1;
-    }   
+    } 
 
 
-    if ( stream->_w <= 0 ){   
+    if ( stream->_w <= 0 ){ 
         stream->_w = 0; 
         debug_print( "__fflush: _w\n");
         return -1;
     } 
-               
-    
+
+
     // #todo: 
     // This is the desired way.
     // Nesse teste escreveremos em stdout. Seu descritor indicará
     // que é um dispositivo do tipo console. O kernel escreverá no 
-    // console 0.           
+    // console 0.  
+
     int rc = write ( fileno(stream), stream->_base, stream->_w );
 
 
     // ISSO FUNCIONA.
     // vamos testar no console virtual.
     //int rc = write_VC ( 0, stream->_base, stream->_w ); 
- 
  
     stream->_w = 0;
     //stream->error = 0;
@@ -358,10 +358,10 @@ int __fflush (FILE *stream){
     //stream->ungotten = 0;
     
     if (rc < 0){
-		
         //stream->error = errno;
         return EOF;
     }
+
 
     return 0;
 }
@@ -618,18 +618,19 @@ int putchar (int ch){
 
 char *gets (char *s){
 
-	register c;
-	register char *cs;
+    register c;
+    register char *cs;
 
-	cs = s;
-	while ((c = getchar()) != '\n' && c >= 0)
-		*cs++ = c;
-	if (c<0 && cs==s)
-		return(NULL);
+    cs = s;
+    while ((c = getchar()) != '\n' && c >= 0)
+        *cs++ = c;
+    if (c<0 && cs==s)
+        return (NULL);
 
-	*cs++ = '\0';
+    *cs++ = '\0';
 
-	return(s);
+
+    return (s);
 }
 
 
@@ -659,7 +660,7 @@ char *fgets (char *s, int size, FILE *stream){
         *cs++ = c;
         if (c=='\n')
             break;
-    }
+    };
 
     if (c<0 && cs==s)
         return (NULL);
@@ -689,27 +690,27 @@ int fputs ( const char *s, FILE *stream ){
 
 int getw (FILE *stream){
 
-	register i;
+    register i;
 
-	i = getc (stream);
-	
+    i = getc (stream);
+
 	//#todo
 	//if (stream->_flags&_IOEOF)
 		//return(-1);
 		
-	if (stream->eof == 1 )
-		return EOF;
-		
-		
-	return (i | (getc(stream)<<8));
+    if (stream->eof == 1 )
+        return EOF;
+
+
+    return (i | (getc(stream)<<8));
 }
 
 
 //#test
 int putw (int w, FILE *stream)
 {
-	putc (w, stream);
-	putc (w>>8, stream);
+    putc (w, stream);
+    putc (w>>8, stream);
     
     // ?? rever retorno.
     return 0;
@@ -1178,26 +1179,26 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
 // quando ele sobre flush.
 int prompt_putchar ( int c, int con_id )
 {
-	
-	if ( con_id < 0 )
-	    return -1;
-	    
-	if ( con_id >= 4 )
-	    return -1;
-	
-	
+
+    if ( con_id < 0 )
+        return -1;
+    
+    if ( con_id >= 4 )
+        return -1;
+
+
    //#todo: overflow do prompt[]
 
     // ??
     //eol
-	if ( c != '\n' ){
+    if ( c != '\n' ){
         input ( (unsigned long) c );
         return c;
     }
     
 
     // se \n
-	if ( c == '\n' ){
+    if ( c == '\n' ){
        prompt_flush (con_id);
     }
 
@@ -1210,8 +1211,8 @@ int prompt_putchar ( int c, int con_id )
 
 int prompt_put_string ( char *string )
 {
-	if ( (void *) string == NULL )
-	    return -1;
+    if ( (void *) string == NULL )
+        return -1;
 
     sprintf(prompt,(const char *) string);
     return 0;
