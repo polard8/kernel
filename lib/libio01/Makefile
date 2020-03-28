@@ -7,11 +7,8 @@ VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = gdeio
+#NAME = libio
 
-
-#todo:
-#We need to simplify these flags
 
 CFLAGS = -m32 \
 	--std=gnu89 \
@@ -37,20 +34,19 @@ all: main.o all-c gdeio-link finalize
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  gdeio.c $(CFLAGS) -I include/ -o gdeio.o
+	gcc  -c  libio.c $(CFLAGS) -I include/ -o libio.o 
+
 
 all-c:
 
-
 gdeio-link:
-
 
 finalize:
 	-mkdir obj
-	-cp gdeio.o obj/
+	-cp libio.o obj/
 
 clean:
 	-rm *.o
-	
-	
+
+
 

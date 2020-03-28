@@ -1,5 +1,5 @@
 /*
- * File: gdeio.c
+ * File: libio.c
  * 
  * 2019 - Created by Fred Nora.
  */
@@ -23,13 +23,13 @@
 // Precisamos checar essas chamadas ao kernel.
 
 
-#include <gdeio.h>
+#include <libio.h>
 
 
 // Protótipo da system call.
 
 void *
-__gdeio_system_call ( 
+__libio_system_call ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
@@ -37,12 +37,12 @@ __gdeio_system_call (
 
 /*
  ********************************
- * __gdeio_system_call:
+ * __libio_system_call:
  *     system call usada pelo gdeio para acessar as portas.
  */
 
 void *
-__gdeio_system_call ( 
+__libio_system_call ( 
     unsigned long ax, 
     unsigned long bx, 
     unsigned long cx, 
@@ -66,7 +66,7 @@ __gdeio_system_call (
 //retorna o valor.
 unsigned char gde_inport8 (unsigned short port)
 {
-    return (unsigned char) __gdeio_system_call ( 126, 
+    return (unsigned char) __libio_system_call ( 126, 
                                (unsigned long) 8, 
                                (unsigned long) port, 
                                (unsigned long) port );
@@ -77,7 +77,7 @@ unsigned char gde_inport8 (unsigned short port)
 //retorna o valor.
 unsigned short gde_inport16 (unsigned short port)
 {
-    return (unsigned short) __gdeio_system_call ( 126, 
+    return (unsigned short) __libio_system_call ( 126, 
                                 (unsigned long) 16, 
                                 (unsigned long) port, 
                                 (unsigned long) port );
@@ -87,7 +87,7 @@ unsigned short gde_inport16 (unsigned short port)
 //retorna o valor.
 unsigned long gde_inport32 (unsigned short port)
 {
-    return (unsigned long) __gdeio_system_call ( 126, 
+    return (unsigned long) __libio_system_call ( 126, 
                                (unsigned long) 32, 
                                (unsigned long) port, 
                                (unsigned long) port );
@@ -96,7 +96,7 @@ unsigned long gde_inport32 (unsigned short port)
 
 void gde_outport8 ( unsigned short port, unsigned char value)
 {
-    __gdeio_system_call ( 127, 
+    __libio_system_call ( 127, 
          (unsigned long) 8, 
          (unsigned long) port, 
          (unsigned long) value );
@@ -105,7 +105,7 @@ void gde_outport8 ( unsigned short port, unsigned char value)
 
 void gde_outport16 ( unsigned short port, unsigned short value)
 {
-    __gdeio_system_call ( 127, 
+    __libio_system_call ( 127, 
         (unsigned long) 16, 
         (unsigned long) port, 
         (unsigned long) value );
@@ -114,7 +114,7 @@ void gde_outport16 ( unsigned short port, unsigned short value)
 
 void gde_outport32 ( unsigned short port, unsigned long value)
 {
-    __gdeio_system_call ( 127, 
+    __libio_system_call ( 127, 
         (unsigned long) 32, 
         (unsigned long) port, 
         (unsigned long) value );
