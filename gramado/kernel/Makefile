@@ -258,12 +258,13 @@ all-c:
 	##
 
 	# libcore
-	$(CC) -c middle/syslib/libcore/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c middle/syslib/libcore/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c middle/syslib/libcore/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c middle/syslib/libcore/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c middle/syslib/libcore/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
+	$(CC) -c middle/syslib/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c middle/syslib/kstdio.c  $(KINCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c middle/syslib/stdlib.c  $(KINCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c middle/syslib/string.c  $(KINCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c middle/syslib/unistd.c  $(KINCLUDE) $(CFLAGS) -o unistd.o
 	$(CC) -c middle/syslib/syslib.c $(KINCLUDE) $(CFLAGS) -o syslib.o
+
 
 	# ps/action
 	$(CC) -c  middle/sysmk/ps/action/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o

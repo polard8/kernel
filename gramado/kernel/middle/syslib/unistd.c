@@ -1,6 +1,6 @@
 /*
  * File: unistd.c  
- * 
+ *       kernel base. ring 0. 
  */
 
 
@@ -8,13 +8,26 @@
 
 
 
-long fpathconf (int fildes, int name){
+long fpathconf (int fildes, int name)
+{
+    debug_print("fpathconf: [TODO]\n");
     return -1;
 }
 
-long pathconf (const char *pathname, int name){
+
+long pathconf (const char *pathname, int name)
+{
+    debug_print("pathconf: [TODO]\n");    
     return -1;
 } 
+
+
+off_t sys_lseek (int fd, off_t offset, int whence)
+{
+    debug_print("sys_lseek: [TODO]\n");
+    return (off_t) -1;
+}
+
 
 
 //pegando host name
@@ -22,9 +35,7 @@ long pathconf (const char *pathname, int name){
 //suporte a rotina da libc.
 int __gethostname (char *buffer){
 
-
     char *hostname_buffer = (char *) buffer;
- 
 
 	//Estrutura default para informações sobre o host.
 	//host.h

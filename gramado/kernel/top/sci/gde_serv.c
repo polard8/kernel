@@ -69,24 +69,26 @@ unsigned long cwArg11;     // WindowClientAreaColor
 unsigned long cwArg12;     // WindowColor
 
 
+
 //
 // ====
 //
 
-void *gde_extra_services ( unsigned long number, 
-                     unsigned long arg2, 
-                     unsigned long arg3, 
-                     unsigned long arg4 );
-                     
-                     
+void *
+gde_extra_services ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 
-
-
-void *gde_extra_services ( unsigned long number, 
-                           unsigned long arg2, 
-                           unsigned long arg3, 
-                           unsigned long arg4 )
+// Services abouve 256.
+void *
+gde_extra_services ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 )
 {
 
     // #todo
@@ -200,41 +202,40 @@ void *gde_extra_services ( unsigned long number,
     // Set child pid given in a vt structure.
     // Only the father will configurate this thing.
     // IN: window, child's pid
-    if ( number == 271 )
-    {
-         return (void *) vt_set_child ( (struct window_d *) arg2, (int) arg3 );
+    if ( number == 271 ){
+         return (void *) vt_set_child ( (struct window_d *) arg2, 
+                             (int) arg3 );
     }
 
 
-    // channel is a file descriptor in the file list of the current process.
-    if (number == 272)
-    {
-           // IN: fd, buf, count.         
+    // Channel is a file descriptor in the file list 
+    // of the current process.
+    // IN: fd, buf, count.         
+    if (number == 272){
            return (void *) tty_read ( (unsigned int) arg2,   //channel 
                                (char *) arg3,                //buf
                                (int) arg4 );                 //nr
     }
 
-    // channel is a file descriptor in the file list of the current process.
-    if (number == 273)
-    {
-        // IN: fd, buf, count.         
+
+    // Channel is a file descriptor in the file list 
+    // of the current process.
+    // IN: fd, buf, count.         
+    if (number == 273){
         return (void *) tty_write ( (unsigned int) arg2,  //channel 
                             (char *) arg3,                //buf
                             (int) arg4 );                 //nr
     }
 
 
-
-
-    if (number == 277 )
-    {
+    // Get current virtual console.
+    if (number == 277 ){
         return (void *) console_get_current_virtual_console ();
     }
 
-    if (number == 278 )
-    {
-        //#todo: precisa de privil�gio.
+    // Set current cirtual console.
+    // #todo: precisa de privilégio. 
+    if (number == 278 ){
         console_set_current_virtual_console ( (int) arg2 );
         return NULL;
     }
@@ -243,16 +244,14 @@ void *gde_extra_services ( unsigned long number,
     // Update window.
     // Atualiza a �rea de cliente enviando uma mensage MSG_PAINT.
     // Isso funcionou.
-    if ( number == 279 )
-    {
+    if ( number == 279 ){
         windowUpdateWindow ( (struct window_d *) arg2 );
         return NULL;
     }
 
 
     // Returns the current runlevel.
-    if ( number == 288 )
-    {
+    if ( number == 288 ){
         return (void *) current_runlevel;
     }
     
@@ -279,12 +278,10 @@ void *gde_extra_services ( unsigned long number,
     */
 
     unsigned long __mm_size_mb = 0;
-    if ( number == 292 )
-    {
+    if ( number == 292 ){
         __mm_size_mb = ( memorysizeTotal/0x400);
         return (void *) __mm_size_mb;
     }
-    
     
     
     // #bugbug: cuidado.
@@ -295,11 +292,10 @@ void *gde_extra_services ( unsigned long number,
     if ( number == 293 ){
         return (void *) info_get_boot_info ( (int) arg2 );
     }
-    
-    
 
 
     // Updates a status bar of a given window.
+    // #deprecated. Delete!
     if ( number == 300 )
     {
         return (void *) UpdateStatusBar ( (struct window_d *) arg2, 
@@ -329,7 +325,6 @@ void *gde_extra_services ( unsigned long number,
     
     // 377 - todo: implement uname() libc support.
     if ( number == 377 ){
-
         printf ("service 377: uname. [todo] \n");
         sys_uname ( (struct utsname *) arg2 );        
         refresh_screen();
@@ -456,28 +451,23 @@ void *gde_extra_services ( unsigned long number,
 
     // 517 - show wm info
     // wm para o desktop atual
-    if ( number == SYS_SHOW_WM_INFO )
-    {
+    if ( number == SYS_SHOW_WM_INFO ){
         kprintf ("window manager info: PID=%d \n", CurrentDesktop->wm);
         refresh_screen ();
         return NULL;
     }
 
 
-
-
     // Repinta todas as janelas que foram invalidadas.
     // Isso ser� usado pelo compositor do window server. 
     // Ou pelo window manager.
-    if ( number == 518 )
-    {
+    if ( number == 518 ){
         redraw_screen();
         return NULL;
     }
 
     // get current desktop
-    if (number == 519)
-    {
+    if (number == 519){
         return (void *) CurrentDesktop;
     }
 
@@ -546,26 +536,34 @@ void *gde_extra_services ( unsigned long number,
     }
 
 
-	// 600 - dup
-    if ( number == 600 )
-    {
+
+
+
+    // 600 - dup
+    if ( number == 600 ){
         return (void *) sys_dup ( (int) arg2 );
     }
 
-	// 601 - dup2
-    if ( number == 601 )
-    {
+    // 601 - dup2
+    if ( number == 601 ){
         return (void *) sys_dup2 ( (int) arg2, (int) arg3 );
     }
 
-	// 602 - dup3
-    if ( number == 602 )
-    {
+    // 602 - dup3
+    if ( number == 602 ){
         return (void *) sys_dup3 ( (int) arg2, (int) arg3, (int) arg4 );
     }
-
- 
     
+    
+    // 603 - lseek support.
+    // See: unistd.c
+    // IN: fd, offset, whence.
+    if ( number == 603 ){
+        return (void *) sys_lseek ( (int) arg2, 
+                            (off_t) arg3, (int) arg4 );
+    }
+ 
+
     // 620
     // process_execve.
     // Uma implementação de execve que roda um novo programa

@@ -1171,20 +1171,23 @@ void swab (const void *from, void *to, ssize_t n)
 
 
 
-// #todo
-off_t lseek(int fd, off_t offset, int whence)
+// whence = "De onde ?".
+off_t lseek (int fd, off_t offset, int whence)
 { 
-    debug_print ("lseek: [TODO]\n");
-    return 0;
+    //debug_print ("lseek: [TODO]\n");
+    
+    return (off_t) gramado_system_call ( 603, 
+               (unsigned long) fd,
+               (unsigned long) offset,
+               (unsigned long) whence );
 }
 
 
-off_t tell(int fildes)
+off_t tell (int fildes)
 {
-	return lseek(fildes, 0, SEEK_CUR);
-	//return(lseek(fildes, 0, 1));
+    return lseek (fildes, 0, SEEK_CUR);
+    //maybe: return(lseek(fildes, 0, 1));
 }
-
 
 
 int access (const char *pathname, int mode)
