@@ -6,7 +6,7 @@
  */
  
 
-#include "gramc.h"
+#include "gramcnf.h"
 
 
 //#### supensa ###

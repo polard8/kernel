@@ -15,7 +15,7 @@ all:
 	
 	# gramc thing.    
 	make -C ./gramc
-	make -C ./gramreg
+	make -C ./gramcnf
 	
 	# c4 thing.
 	make -C ./c4  

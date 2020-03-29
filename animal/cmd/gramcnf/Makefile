@@ -88,15 +88,16 @@ all-c:
 
 
 gramcc-link:
-	ld -m elf_i386 -T ../link.ld -o GRAMREG.BIN $(myObjects)  
+	ld -m elf_i386 -T ../link.ld -o GRAMCNF.BIN $(myObjects)  
 	
 
 
 finalize:
-	cp GRAMREG.BIN  ../bin
+	cp GRAMCNF.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm GRAMREG.BIN 
-	
+	-rm GRAMCNF.BIN 
+
+
 	

@@ -10,7 +10,7 @@
 // lexer >> parser >> compiler
 
 
-#include "gramc.h"
+#include "gramcnf.h"
 
 
 

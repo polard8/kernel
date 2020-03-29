@@ -10,8 +10,7 @@
 // Includes.
 // 
  
-
-#include "gramc.h"
+#include "gramcnf.h"
 
 //#importante
 //#expressão em ordem!!!

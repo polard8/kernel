@@ -6,7 +6,8 @@
 
 
 
-#include "gramc.h"
+#include "gramcnf.h"
+
 
 #define __VERSION__ "0.1"
 
