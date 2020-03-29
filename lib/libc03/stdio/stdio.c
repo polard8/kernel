@@ -1286,7 +1286,7 @@ void prompt_clean (){
 // Esses argumentos podem estar fora dos padrões.
 // Mas a implementação feita pelo altor é assim mesmo. 
 
-static int 
+int 
 prints ( 
     char **out, 
     const char *string, 
@@ -1348,7 +1348,7 @@ prints (
  *     used by printf.
  */
 
-static int 
+int 
 printi ( 
     char **out, 
     int i, 
@@ -1418,7 +1418,7 @@ printi (
  *     Used by printf.
  */
 
-static int print ( char **out, int *varg ){
+int print ( char **out, int *varg ){
 
     register int width, pad;
     register int pc = 0;
@@ -1779,7 +1779,7 @@ int sprintf ( char *out, const char *format, ... ){
 }
 
 
-static void printchar ( char **str, int c ){
+void printchar ( char **str, int c ){
 
     if (str) 
     {

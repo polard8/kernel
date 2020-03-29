@@ -66,17 +66,18 @@ typedef	u_short	gid_t;			/* group id */
 typedef	short	pid_t;			/* process id */
 #endif
 
-typedef	u_short	mode_t;			/* permissions */
-typedef u_long	fixpt_t;		/* fixed point number */
+typedef  u_short  mode_t;   /* permissions */
+typedef  u_long   fixpt_t;  /* fixed point number */
+
 
 #ifndef _POSIX_SOURCE
-typedef	struct	_uquad	{ u_long val[2]; } u_quad;
-typedef	struct	_quad	{   long val[2]; } quad;
-typedef	long *	qaddr_t;	/* should be typedef quad * qaddr_t; */
+typedef  struct  _uquad  { u_long val[2]; } u_quad;
+typedef  struct  _quad  {   long val[2]; } quad;
+typedef  long * qaddr_t;  /* should be typedef quad * qaddr_t; */
 
-#define	major(x)	((int)(((u_int)(x) >> 8)&0xff))	/* major number */
-#define	minor(x)	((int)((x)&0xff))		/* minor number */
-#define	makedev(x,y)	((dev_t)(((x)<<8) | (y)))	/* create dev_t */
+#define  major(x)      ((int)(((u_int)(x) >> 8)&0xff))	/* major number */
+#define  minor(x)      ((int)((x)&0xff))		/* minor number */
+#define  makedev(x,y)  ((dev_t)(((x)<<8) | (y)))	/* create dev_t */
 #endif
 
 
@@ -85,15 +86,16 @@ typedef	long *	qaddr_t;	/* should be typedef quad * qaddr_t; */
 #if !defined(_ANSI_SOURCE) && !defined(_POSIX_SOURCE)
 #include <machine/types.h>
 #endif
+*/
 
+// file offset or size.
 
- /* file offset or size */
-
-typedef int __off_t;
-typedef int __darwin_off_t;
-typedef int __gramado_off_t;
+typedef  int  __off_t;
+typedef  int  __darwin_off_t;
+typedef  int  __gramado_off_t;
 //typedef	__int64_t	__off_t;
 //...
+
 
 
 //typedef __WINT_TYPE__ wint_t;

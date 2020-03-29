@@ -1267,15 +1267,15 @@ int stdlib_strncmp ( char *s1, char *s2, int len ){
 
 //unix v7 
 //used by getenv
-static char *nvmatch ( char *s1, char *s2 )
+char *nvmatch ( char *s1, char *s2 )
 {
-
-	while (*s1 == *s2++)
+    while (*s1 == *s2++)
 		if (*s1++ == '=')
 			return(s2);
-	if (*s1 == '\0' && *(s2-1) == '=')
-		return(s2);
-	return(NULL);
+    if (*s1 == '\0' && *(s2-1) == '=')
+        return (s2);
+    
+    return (NULL);
 }
 
 //unix v7

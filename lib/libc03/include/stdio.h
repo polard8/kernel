@@ -520,12 +520,29 @@ int fclose (FILE *stream);
 
 
 void nputs (char *cp, int len);
-static int prints (char **out, const char *string, int width, int pad);
-static int printi (char **out, int i, int b, int sg, int width, int pad, int letbase);
-static int print (char **out, int *varg);
-static void printchar (char **str, int c);
+
+int 
+prints (
+    char **out, 
+    const char *string, 
+    int width, 
+    int pad );
+
+int 
+printi (
+    char **out, 
+    int i, 
+    int b, 
+    int sg, 
+    int width, 
+    int pad, 
+    int letbase );
+
+int print (char **out, int *varg);
+void printchar (char **str, int c);
 void outbyte (int c);
 void _outbyte (int c);
+
  
 // 
 // Formatted Output

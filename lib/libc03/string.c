@@ -905,9 +905,8 @@ void *memset32 (uint32_t *s, uint32_t v, size_t count)
 */
 
 
-// ??
-// Não é padrão. Mas deixe aqui.
-static void *
+// ?? - Não é padrão. Mas deixe aqui.
+void *
 check_bytes8 ( 
     const char *start, 
     char value, 

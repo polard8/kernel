@@ -22,9 +22,12 @@ typedef	_BSD_SIZE_T_	size_t;
 
 
 // ??
-static void *check_bytes8 ( const char *start, 
-                             char value, 
-                             unsigned int bytes );
+void *
+check_bytes8 ( 
+    const char *start, 
+    char value, 
+    unsigned int bytes );
+
 
 int strcoll (const char *s1, const char *s2);
 

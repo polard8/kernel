@@ -123,18 +123,21 @@ function in which va_start was invoked with the same ap argument.
 
 #define va_arg( ap, t )  \
     ( ( (ap) = (ap) + __va_argsiz(t) ),  \
-	           *( (t *) (void *) ( (ap) - __va_argsiz(t) ) ) )
-	  
-//#define va_arg( AP, TYPE )  \
-//    ( AP += __va_rounded_size(TYPE), \
-//    *((TYPE *) (AP - __va_rounded_size (TYPE))) )
+    *( (t *) (void *) ( (ap) - __va_argsiz(t) ) ) )
 
-//void __va_end(va_list* ap);
-//#define va_end(ap) \
-//	(__va_end(&(ap)))	  
-	  
-  
-  
+
+/*
+#define va_arg( AP, TYPE )  \
+    ( AP += __va_rounded_size(TYPE), \
+    *((TYPE *) (AP - __va_rounded_size (TYPE))) )
+*/
+
+/*
+void __va_end(va_list* ap);
+#define va_end(ap) \
+    (__va_end(&(ap)))
+*/
+
   
 /*
 typedef char *va_list;

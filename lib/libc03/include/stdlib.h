@@ -164,7 +164,7 @@ void itoa (int n, char s[]);
 
 
 // unix v7 - like.
-static char *nvmatch ( char *s1, char *s2 );
+char *nvmatch ( char *s1, char *s2 );
 char *v7_getenv ( char *name );
 
 

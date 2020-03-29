@@ -16,6 +16,7 @@
 // just enough features to allow self-compilation and a bit more
 // Written by Robert Swierczek
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -24,6 +25,8 @@
 
 //test
 #include <sys/wait.h> 
+
+#include <stubs/gramado.h>
 
 
 // target: i386.
@@ -210,7 +213,8 @@ void expr (int lev){
 
     *++e = IMM; *++e = ival; next();
     while (tk == '"') next();
-    data = (char *)((int)data + sizeof(int) & -sizeof(int)); ty = PTR;
+    data = (char *) ( (int) data + sizeof(int) & -sizeof(int) ); 
+    ty = PTR;
 
 
   // SIZEOF
@@ -513,9 +517,21 @@ void stmt (void){
 
 int main (int argc, char **argv){
 
+
     int fd, bt, ty, poolsz, *idmain;
-    int *pc, *sp, *bp, a, cycle;    // vm registers
     int i, *t;    // temps
+
+    //
+    // vm registers.
+    //
+
+    //int *pc, *sp, *bp, a, cycle;    // vm registers
+    int *register_pc;
+    int *register_sp;
+    int *register_bp;
+    int register_a;
+    int register_cycle;
+
 
 
     printf ("gramc4: Initializing ...\n");
@@ -576,7 +592,7 @@ int main (int argc, char **argv){
     { printf("could not malloc(%d) data area\n", poolsz); return -1; }
     
 
-    if (!(sp = malloc(poolsz))) 
+    if (!(register_sp = malloc(poolsz))) 
     { printf("could not malloc(%d) stack area\n", poolsz); return -1; }
 
 
@@ -888,7 +904,7 @@ int main (int argc, char **argv){
             // Não era abertura de pilha de parâmetros.
             } else {
                 id[Class] = Glo;
-                id[Val] = (int)data;
+                id[Val] = (int) data;
                 data = data + sizeof(int);
             };
 
@@ -915,7 +931,7 @@ int main (int argc, char **argv){
     // Depois que acabaram-se as declarações ou funções
     // vamos checar se 'main' foi definida.
 
-    if ( !(pc = (int *)idmain[Val]) ) 
+    if ( !( register_pc = (int *) idmain[Val] ) )
     { 
         printf ("main() not defined\n"); 
         return -1; 
@@ -930,14 +946,15 @@ int main (int argc, char **argv){
     // Step 3
     // Setup stack
 
-    bp = sp = (int *)((int)sp + poolsz);
+    register_bp = register_sp = (int *)((int) register_sp + poolsz);
  
     // call exit if main returns
-    *--sp = EXIT; 
-    *--sp = PSH; t = sp;
-    *--sp = argc;
-    *--sp = (int) argv;
-    *--sp = (int) t;
+    *--register_sp = EXIT; 
+    *--register_sp = PSH; 
+    t = register_sp;
+    *--register_sp = argc;
+    *--register_sp = (int) argv;
+    *--register_sp = (int) t;
 
 
 
@@ -953,216 +970,217 @@ int main (int argc, char **argv){
     // Vamos rodar o interpretador ?
     // Realizando algumas instruções.
 
-    cycle = 0;
+    register_cycle = 0;
 
     while (1)
     {
 
-        i = *pc++; 
-        ++cycle;
+        i = *register_pc++;
+
+        ++register_cycle;
     
         if (debug){
 
-            printf ("%d> %.4s", cycle,
+            printf ("%d> %.4s", register_cycle,
                 &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                 "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
                 "OPEN,RUN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[i * 5]);
             
-            if (i <= ADJ) printf (" %d\n", *pc); else printf("\n");
+            if (i <= ADJ) printf (" %d\n", *register_pc); else printf("\n");
         }
         
         // O interpretador realiza algumas instruções.
 
         // load local address
         if      (i == LEA) { 
-            a = (int)(bp + *pc++); 
+            register_a = (int)(register_bp + *register_pc++); 
         
         // load global address or immediate
         } 
         else if (i == IMM) { 
-            a = *pc++; 
+            register_a = *register_pc++; 
         
         // jump
         } 
         else if (i == JMP) { 
-            pc = (int *)*pc; 
+            register_pc = (int *) *register_pc; 
         
         // jump to subroutine
         }  
         else if (i == JSR) { 
-            *--sp = (int)(pc + 1); 
-            pc = (int *)*pc; 
+            *--register_sp = (int)(register_pc + 1); 
+            register_pc = (int *) *register_pc; 
         
         
         // branch if zero
         }        
         else if (i == BZ)  { 
-            pc = a ? pc + 1 : (int *)*pc; 
+            register_pc = register_a ? register_pc + 1 : (int *) *register_pc; 
         
         
         // branch if not zero
         } 
         else if (i == BNZ) { 
-            pc = a ? (int *)*pc : pc + 1; 
+            register_pc = register_a ? (int *) *register_pc : register_pc + 1; 
         
         // enter subroutine
         } 
         else if (i == ENT) { 
-            *--sp = (int) bp; 
-            bp = sp; 
-            sp = sp - *pc++; 
+            *--register_sp = (int) register_bp; 
+            register_bp = register_sp; 
+            register_sp = register_sp - *register_pc++; 
         
         // stack adjust
         }     
         else if (i == ADJ) { 
-            sp = sp + *pc++; 
+            register_sp = register_sp + *register_pc++; 
         
         // leave subroutine
         }    
         else if (i == LEV) { 
-            sp = bp; 
-            bp = (int *)*sp++; 
-            pc = (int *)*sp++; 
+            register_sp = register_bp; 
+            register_bp = (int *) *register_sp++; 
+            register_pc = (int *) *register_sp++; 
         
         // load int
         } 
         else if (i == LI) { 
-            a = *(int *)a; 
+            register_a = *(int *) register_a; 
         
         
         // load char
         } 
         else if (i == LC) { 
-            a = *(char *)a; 
+            register_a = *(char *) register_a; 
         
         
         // store int
         } 
         else if (i == SI) { 
-            *(int *)*sp++ = a; 
+            *(int *)*register_sp++ = register_a; 
         
         // store char
         }   
         else if (i == SC) { 
-            a = *(char *)*sp++ = a; 
+            register_a = *(char *)*register_sp++ = register_a; 
         
         
         // push
         } 
         else if (i == PSH) { 
-            *--sp = a; 
+            *--register_sp = register_a; 
         
         } 
         else if (i == OR) { 
-            a = *sp++ |  a; 
+            register_a = *register_sp++ |  register_a; 
         
         }
         else if (i == XOR) { 
-            a = *sp++ ^  a; 
+            register_a = *register_sp++ ^  register_a; 
         
         }
         else if (i == AND) { 
-            a = *sp++ &  a; 
+            register_a = *register_sp++ &  register_a; 
         
         }
         else if (i == EQ)  { 
-            a = *sp++ == a; 
+            register_a = *register_sp++ == register_a; 
         
         }
         else if (i == NE) { 
-            a = *sp++ != a; 
+            register_a = *register_sp++ != register_a; 
         
         }
         else if (i == LT) { 
-            a = *sp++ <  a; 
+            register_a = *register_sp++ <  register_a; 
         
         }
         else if (i == GT) { 
-            a = *sp++ >  a; 
+            register_a = *register_sp++ >  register_a; 
         
         }
         else if (i == LE) { 
-            a = *sp++ <= a; 
+            register_a = *register_sp++ <= register_a; 
         
         }
         else if (i == GE) { 
-            a = *sp++ >= a; 
+            register_a = *register_sp++ >= register_a; 
         
         }
         else if (i == SHL) { 
-            a = *sp++ << a; 
+            register_a = *register_sp++ << register_a; 
         
         }
         else if (i == SHR) { 
-            a = *sp++ >> a; 
+            register_a = *register_sp++ >> register_a; 
         
         }
         else if (i == ADD) { 
-            a = *sp++ +  a; 
+            register_a = *register_sp++ +  register_a; 
         
         }
         else if (i == SUB) { 
-            a = *sp++ -  a; 
+            register_a = *register_sp++ -  register_a; 
         
         }
         else if (i == MUL) { 
-            a = *sp++ *  a; 
+            register_a = *register_sp++ *  register_a; 
 
         }
         else if (i == DIV) { 
-            a = *sp++ /  a; 
+            register_a = *register_sp++ /  register_a; 
         
         }
         else if (i == MOD) { 
-            a = *sp++ %  a; 
+            register_a = *register_sp++ %  register_a; 
 
         }
         else if (i == OPEN) { 
-            a = open ((char *)sp[1], *sp,0); 
+            register_a = open ((char *)register_sp[1], *register_sp,0); 
 
         }
         else if (i == RUN) { 
             //a = open ((char *)sp[1], *sp,0);
-            a = gramado_system_call (900,(unsigned long)sp[1],0,0); 
+            register_a = (int) gramado_system_call (900,(unsigned long)register_sp[1],0,0); 
             waitpid (-1,&Wait_status,0); 
         
         }
         else if (i == READ) { 
-            a = read (sp[2], (char *)sp[1], *sp); 
+            register_a = read (register_sp[2], (char *)register_sp[1], *register_sp); 
         
         }
         else if (i == CLOS) { 
-            a = close (*sp); 
+            register_a = close (*register_sp); 
         
         }
         else if (i == PRTF) { 
-            t = sp + pc[1]; 
-            a = printf ((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); 
+            t = register_sp + register_pc[1]; 
+            register_a = printf ((char *)t[-1], t[-2], t[-3], t[-4], t[-5], t[-6]); 
         
         }
         else if (i == MALC) { 
-            a = (int) malloc (*sp); 
+            register_a = (int) malloc (*register_sp); 
         
         }
         else if (i == FREE) { 
-            free ((void *)*sp); 
+            free ((void *)*register_sp); 
         
         }
         else if (i == MSET) { 
-            a = (int) memset ((char *)sp[2], sp[1], *sp); 
+            register_a = (int) memset ((char *)register_sp[2], register_sp[1], *register_sp); 
 
         }
         else if (i == MCMP) { 
-            a = memcmp ((char *)sp[2], (char *)sp[1], *sp); 
+            register_a = memcmp ((char *)register_sp[2], (char *)register_sp[1], *register_sp); 
         
         }
         else if (i == EXIT) { 
-            printf("exit(%d) cycle = %d\n", *sp, cycle); 
-            return *sp; 
+            printf("exit(%d) cycle = %d\n", *register_sp, register_cycle); 
+            return *register_sp; 
         
         }
         else { 
-            printf ("unknown instruction = %d! cycle = %d\n", i, cycle); 
+            printf ("unknown instruction = %d! cycle = %d\n", i, register_cycle); 
             return -1; 
         };
     
