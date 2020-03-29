@@ -1,86 +1,90 @@
 
 
-
-//Enumeração dos tipos de tokens.
+// Enumeração dos tipos de tokens.
 typedef enum {
-	TOKENNULL,
-	TOKENEOF,
-    TOKENKEYWORD,      // int while void. (reserveds)
-	TOKENIDENTIFIER,   // var1, total ...
-	TOKENCONSTANT,     // 10 20 0x1234 ...
-	TOKENSTRING,       // "this is a string"
-	TOKENOPERATOR,     // math. + - * / % | & ^ =
-	TOKENSEPARATOR,    // separadores (){}[],.;:? ...
-	TOKENSPECIAL,       // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
-	TOKENQUALIFIER,  // static volatile ...
-	TOKENMODIFIER,   // signed unsigned ...
+
+    TOKENNULL,
+    TOKENEOF,
+    TOKENKEYWORD,     // int while void. (reserveds)
+    TOKENIDENTIFIER,  // var1, total ...
+    TOKENCONSTANT,    // 10 20 0x1234 ...
+    TOKENSTRING,      // "this is a string"
+    TOKENOPERATOR,    // math. + - * / % | & ^ =
+    TOKENSEPARATOR,   // separadores (){}[],.;:? ...
+    TOKENSPECIAL,     // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
+    TOKENQUALIFIER,   // static volatile ...
+    TOKENMODIFIER,    // signed unsigned ...
     TOKENTYPE,
     ARITHCOMPARE,
-	EQCOMPARE,
-	ASSIGN,    // =
-	PLUSPLUS,
-	MINUSMINUS,
-	ANDAND,
-	OROR,
-	LSHIFT,
-	RSHIFT,
-	POINTSAT
-	
+    EQCOMPARE,
+    ASSIGN,           // =
+    PLUSPLUS,
+    MINUSMINUS,
+    ANDAND,
+    OROR,
+    LSHIFT,
+    RSHIFT,
+    POINTSAT
+
 }token_t;
 
 
 
-//Enumeração dos tipos de tokens.
+// Enumeração dos tipos de tokens.
 typedef enum {
-	TNULL,
+
+    TNULL,
     TINT,
-	TVOID,
-	TCHAR,
-	TSHORT,
-	TLONG
-	//...
+    TVOID,
+    TCHAR,
+    TSHORT,
+    TLONG
+    //...
+
 }types_t;
 
-//Enumeração dos modificadores.
+// Enumeração dos modificadores.
 typedef enum {
-	MNULL,
+    
+    MNULL,
     MSIGNED,
-	MUNSIGNED
+    MUNSIGNED
 	//...
 }modifiers_t;
 
+
 //Enumeração dos qualificadores.
 typedef enum {
-	QNULL,
+    QNULL,
     QVOLATILE,
-	QSTATIC
+    QSTATIC
 	//...
 }qualifiers_t;
  
 
 typedef enum {
-	KWNULL,
+    KWNULL,
     KWASM,
-	KWGOTO,
-	KWRETURN,
-	KWCONTINUE,
-	KWDEFAULT,
-	KWCASE,
-	KWSWITCH,
-	KWFOR,
-	KWDO,
-	KWWHILE,
-	KWELSE,
-	KWIF,
-	KWUNION,
-	KWSTRUCT,
-	KWENUM,
-	KWSIZEOF,
-	KWVOLATILE,
-	KWINLINE,
-	KWSTATIC,
-	KWDEF,          //não faz parte da linguagem c
-	KWVAR           //não faz parte da linguagem c 
+    KWGOTO,
+    KWRETURN,
+    KWCONTINUE,
+    KWDEFAULT,
+    KWCASE,
+    KWSWITCH,
+    KWFOR,
+    KWDO,
+    KWWHILE,
+    KWELSE,
+    KWIF,
+    KWUNION,
+    KWSTRUCT,
+    KWENUM,
+    KWSIZEOF,
+    KWVOLATILE,
+    KWINLINE,
+    KWSTATIC,
+    KWDEF,          //não faz parte da linguagem c
+    KWVAR           //não faz parte da linguagem c 
 	
 	//...
 }keywords_t;
@@ -206,52 +210,50 @@ int current_special;
  
  
 //keywords. (palavras reservadas.)
-#define TOKEN_SIZEOF "sizeof"
-#define TOKEN_ENUM "enum"
-#define TOKEN_SCTRUCT "struct"
-#define TOKEN_UNION "union"
-#define TOKEN_IF "if"
-#define TOKEN_ELSE "else"
-#define TOKEN_WHILE "while"
-#define TOKEN_DO "do"
-#define TOKEN_FOR "for"
-#define TOKEN_SWITCH "switch"
-#define TOKEN_CASE "case"
-#define TOKEN_DEFAULT "default"
+#define TOKEN_SIZEOF   "sizeof"
+#define TOKEN_ENUM     "enum"
+#define TOKEN_SCTRUCT  "struct"
+#define TOKEN_UNION    "union"
+#define TOKEN_IF       "if"
+#define TOKEN_ELSE     "else"
+#define TOKEN_WHILE    "while"
+#define TOKEN_DO       "do"
+#define TOKEN_FOR      "for"
+#define TOKEN_SWITCH   "switch"
+#define TOKEN_CASE     "case"
+#define TOKEN_DEFAULT  "default"
 
 //keywords. (palavras reservadas.)
-#define TOKEN_BREAK "break"
-#define TOKEN_CONTINUE "continue"
-#define TOKEN_RETURN "return"
-#define TOKEN_GOTO "goto"
-#define TOKEN_ASM "asm"
-#define TOKEN_VOLATILE "volatile"
-#define TOKEN_INLINE "inline"
+#define TOKEN_BREAK     "break"
+#define TOKEN_CONTINUE  "continue"
+#define TOKEN_RETURN    "return"
+#define TOKEN_GOTO      "goto"
+#define TOKEN_ASM       "asm"
+#define TOKEN_VOLATILE  "volatile"
+#define TOKEN_INLINE    "inline"
 
 //types
-#define TOKEN_CHAR "char"
-#define TOKEN_SHORT "short"
-#define TOKEN_LONG "long"
-#define TOKEN_SIGNED "signed"
-#define TOKEN_UNSIGNED "unsigned"
-#define TOKEN_BOOL "bool"
-#define TOKEN_DOUBLE "double"
-#define TOKEN_FLOAT "float"
-#define TOKEN_INT "int"
-#define TOKEN_VOID "void"
-#define TOKEN_STATIC "static"
-#define TOKEN_CONST "const"
-#define TOKEN_DEFINE "define"
-#define TOKEN_TYPEDEF "typedef"
-
-
-
+#define TOKEN_CHAR      "char"
+#define TOKEN_SHORT     "short"
+#define TOKEN_LONG      "long"
+#define TOKEN_SIGNED    "signed"
+#define TOKEN_UNSIGNED  "unsigned"
+#define TOKEN_BOOL      "bool"
+#define TOKEN_DOUBLE    "double"
+#define TOKEN_FLOAT     "float"
+#define TOKEN_INT       "int"
+#define TOKEN_VOID      "void"
+#define TOKEN_STATIC    "static"
+#define TOKEN_CONST     "const"
+#define TOKEN_DEFINE    "define"
+#define TOKEN_TYPEDEF   "typedef"
 
 
 
 #define TOKEN_GOTO "goto"
 
 //...
+
 
 //identifiers
 #define TOKEN_MAIN "main"
@@ -381,8 +383,6 @@ static	 while
 #define ID_INDEX 6   
 
 
-
-
 //...
 #define ID_CLASS_VAR       100
 #define ID_CLASS_STRING    101
@@ -396,7 +396,6 @@ static	 while
 int id[8];
 
 //#obs lembrando que o identificador fica em outro buffer.
-
 
 
 
@@ -478,10 +477,10 @@ struct variable_d
 typedef struct symbol_d sysmbol_t;
 struct symbol_d
 {
+    int id;
+    
     int used;
     int magic;
-
-    int id;
 
     int type;      // função ou variável ou protótipo ou extern.
     char *string;  // void, int, xxx, y ...
@@ -499,10 +498,10 @@ struct symbol_d
 typedef struct type_d type_t;
 struct type_d
 {
+    int id;
+    
     int used;
     int magic;
-
-    int id;
 
     int type;
     char *string;    // String que representa o tipo.
@@ -512,27 +511,6 @@ struct type_d
 #define FUNCTION_COUNT_MAX 32
 
 unsigned long functionList[FUNCTION_COUNT_MAX];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

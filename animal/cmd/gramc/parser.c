@@ -7,6 +7,24 @@
 #include "gramc.h"
 
 
+char *x_p;        // current position in source code
+char *x_lp;       // current position in source code
+char *x_data;     // data/bss pointer
+
+
+int *x_e;       // current position in emitted code
+int *x_le;      // current position in emitted code
+int *x_id;      // currently parsed identifier
+int *x_sym;     // symbol table (simple list of identifiers)
+int x_tk;       // current token
+int x_ival;     // current token value
+int x_ty;       // current expression type
+int x_loc;      // local variable offset
+int x_line;     // current line number
+int x_src;      // print source and assembly flag
+int x_debug;    // print executed instructions
+
+
 
 char save_symbol[32];
 
@@ -1629,7 +1647,7 @@ expression_exit:
 
 
 /*
- ************************************************************************
+ *********************************************************
  * parse:
  *     Função principal.
  *     Pegando tokens com o lexer e fazendo coisas ...
@@ -1712,6 +1730,181 @@ int parse (){
 
     // This llop needs to look like gramc4.
     // It will use if else instead of switch.
+    
+   token = yylex();  //next
+    
+    while (running == 1)
+    {
+        //token = yylex();
+
+        // EOF: 
+        // O lexer nos disse que acabou.
+        if ( token == TOKENEOF )
+        {
+            printf ("parse: ~EOF\n");
+            running = 0;
+            break;
+        }
+        
+        // INT CHAR 
+        if ( token == TOKENTYPE )
+        {
+            id[ID_TYPE] = type_found; 
+            token = yylex();  //next
+        }
+        
+        // symbol depois do tipo.
+        
+        //while (tk != ';' && tk != '}')
+        while (1)
+        {
+            // fim do loop.
+            if ( token == TOKENSEPARATOR )
+            {
+                if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+                {
+                    break;
+                }
+
+                if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
+                {
+                    break;
+                }                
+            }
+            
+            
+            // Se não é um symbol.
+            // Deveríamos ter um symbol logo após o tipo.
+            if (token != TOKENIDENTIFIER) { 
+                //printf ("%d: bad global declaration\n", line); 
+                printf ("%d: symbol not found!\n", lineno);
+                return -1; 
+            }
+            
+            // Se o if acima falhou, então temos um identifier.
+            // #debug
+            printf ("%d: symbol found!\n", lineno);
+            id[ID_TOKEN] = TOKENIDENTIFIER;
+            id[ID_STACK_OFFSET] = stack_index;
+
+            // Salva o símbolo. #isso funciona.
+            sprintf ( save_symbol, real_token_buffer );
+                              
+            token = yylex();  //next
+            
+            // Depois do symbol
+            
+            // FUNCTION
+            if ( token == TOKENSEPARATOR )
+            {
+                // '(': abertura de pilha de parâmetros. 
+                if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+                {
+                    //break;
+                    // dentro da ílha de parâmetros.
+                    while(1)
+                    {
+                        token = yylex();  //next
+                        
+                        if ( token == TOKENSEPARATOR )
+                        {
+                            // terminal a pilha de parãmetros.
+                            if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+                            {
+                                break;
+                            }
+                        }        
+                    
+                    };
+                    
+                    token = yylex();  //next
+                    
+                    //obs: sem espaço entre ')' e '{';
+                    
+                    // acabou a pilha de parâmetros.
+                    // vamos entrar no corpo.
+                    // '{'
+                    if ( token != TOKENSEPARATOR )
+                    {
+                       printf ("%d: Expected { separator!\n", lineno);
+                       exit(-1);
+                    }
+                    
+                    // temos um separator
+                    // precisa ser '{'
+                    if ( strncmp( (char *) real_token_buffer, "{", 1 ) != 0  )
+                    {
+                       printf ("%d: Expected { separator!\n", lineno);
+                       exit(-1);
+                    }
+                    
+                    // ...
+                    
+                    while (1)
+                    {
+                        // Depois de '{'
+                        token = yylex();  //next
+
+                        if ( token == TOKENSEPARATOR )
+                        {
+                            // Se chegamos ao fim do corpo.
+                            if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
+                            {
+                                //#debug
+                                printf ("%d: Separator } found!\n", lineno);
+                                break;
+                            }
+                        }
+
+                        // EOF: 
+                        // O lexer nos disse que acabou.
+                        if ( token == TOKENEOF )
+                        {
+                            printf ("%d: [ERROR] Missing } separator!\n", lineno);
+                            running = 0;
+                            break;
+                        }
+                        
+                        printf ("%d: Nothing\n", lineno); 
+                        // ...
+                    };
+                }
+                
+                // Era um separador, mas não era abertura de pilha de parâmetros.
+                
+                // Separador de symbols.
+                if ( strncmp( (char *) real_token_buffer, ",", 1 ) == 0  )
+                {
+                    printf ("%d: #debug: , found\n", lineno);
+                    break;
+                }
+                
+                // ??
+                // O que temos aqui ???
+                // Cuidado.
+                
+            // Não era um separador depois do synbol.
+            }else{
+                printf ("%d: Separator expected!\n", lineno);
+                exit(-1);
+            };
+            
+            //#debug
+            //printf ("%d: Unexpected error!\n", lineno);
+            break;
+            
+        }; //while. Finalização de declaração ou corpo.
+        
+        //#debug
+        break;
+    }; //while principal.
+   
+   
+   
+   
+   
+   
+   
     
     /*
     //++

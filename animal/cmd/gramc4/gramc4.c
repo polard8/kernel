@@ -117,8 +117,13 @@ void next (void){
         tk = tk * 147 + *p++;
       tk = (tk << 6) + (p - pp);
       id = sym;
-      while (id[Tk]) {
-        if (tk == id[Hash] && !memcmp((char *)id[Name], pp, p - pp)) { tk = id[Tk]; return; }
+      while (id[Tk])
+      {
+        if ( tk == id[Hash] && !memcmp((char *)id[Name], pp, p - pp) )
+        { 
+            tk = id[Tk]; 
+            return; 
+        }
         id = id + Idsz;
       }
       id[Name] = (int)pp;
@@ -714,6 +719,9 @@ int main (int argc, char **argv){
             }
         }
 
+
+        // symbol agora;
+        
         // Step 1:
         // Logo acima encontramos tipos ou enum.
         // Para o enum, abrimos e fechamos o corpo.
