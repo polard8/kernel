@@ -26,9 +26,54 @@ int x_debug;    // print executed instructions
 
 
 
-// opcodes #TODO
-enum { OPCODE_NOTHING, OPCODE_MAIN, OPCODE_EXIT };
-
+// opcodes #todo
+enum { 
+       
+       OPCODE_NOTHING, 
+       OPCODE_MAIN, 
+       
+       OPCODE_LEA, 
+       OPCODE_IMM, 
+       OPCODE_JMP, 
+       OPCODE_JSR, 
+       OPCODE_BZ, 
+       OPCODE_BNZ, 
+       OPCODE_ENT, 
+       OPCODE_ADJ, 
+       OPCODE_LEV, 
+       OPCODE_LI, 
+       OPCODE_LC, 
+       OPCODE_SI, 
+       OPCODE_SC, 
+       OPCODE_PSH,
+       OPCODE_OR, 
+       OPCODE_XOR, 
+       OPCODE_AND, 
+       OPCODE_EQ, 
+       OPCODE_NE, 
+       OPCODE_LT, 
+       OPCODE_GT, 
+       OPCODE_LE, 
+       OPCODE_GE, 
+       OPCODE_SHL, 
+       OPCODE_SHR, 
+       OPCODE_ADD, 
+       OPCODE_SUB, 
+       OPCODE_MUL, 
+       OPCODE_DIV, 
+       OPCODE_MOD,
+       
+       OPCODE_OPEN, 
+       OPCODE_RUN, 
+       OPCODE_READ, 
+       OPCODE_CLOS, 
+       OPCODE_PRTF, 
+       OPCODE_MALC, 
+       OPCODE_FREE, 
+       OPCODE_MSET, 
+       OPCODE_MCMP, 
+       OPCODE_EXIT 
+};
 
 
 char save_symbol[32];
@@ -1663,7 +1708,21 @@ int parse (){
     int running = 1;
 
     register int token;
-
+    
+    
+    //++
+    int fd, bt, ty, poolsz, *idmain;
+    // vm registers
+    int *reg_pc; 
+    int *reg_sp; 
+    int *reg_bp; 
+    int reg_a;
+    int reg_cycle; 
+    // ...   
+    //--
+    
+    
+    
     int i;
 
 
@@ -1684,6 +1743,54 @@ int parse (){
 	// size ??
 	//
     size_t size;
+    
+    
+    // arbitrary size
+    poolsz = 256*1024;
+    
+    
+    //
+    // Buffer.
+    // sym, le, data, sp
+    //
+    
+    // symbol table (simple list of identifiers)
+    if (!(x_sym = malloc(poolsz))) 
+    { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
+    
+    // #importante:
+    // id é um ponteiro. Temos que inicializar para usar.
+    id = x_sym;
+ 
+    // limpa o primeiro id[]
+	for ( i=0; i<8; i++ )
+		id[i] = 0;
+		    
+    // x_le current position in emitted code
+    // x_e current position in emitted code
+    if (!(x_le = x_e = malloc(poolsz))) 
+    { printf("could not malloc(%d) text area\n", poolsz); return -1; }
+    
+    // data/bss pointer
+    if (!(x_data = malloc(poolsz))) 
+    { printf("could not malloc(%d) data area\n", poolsz); return -1; }
+    
+    // register.
+    if (!(reg_sp = malloc(poolsz))) 
+    { printf("could not malloc(%d) stack area\n", poolsz); return -1; }
+
+
+    memset(x_sym,  0, poolsz);
+    memset(x_e,    0, poolsz);
+    memset(x_data, 0, poolsz);
+    
+    
+    
+        
+    
+            
+    
+    
      
     // #bugbug
     // Tentando encontrar o tamanho do arquivo via fseek/ftell.
@@ -1812,6 +1919,9 @@ int parse (){
                 // '(': abertura de pilha de parâmetros. 
                 if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                 {
+                    // Mudando a classe. Agora temos uma função.
+                    id[ID_CLASS] = ID_CLASS_FUNCTION;
+                                
                     //break;
                     // dentro da ílha de parâmetros.
                     while(1)
@@ -1823,12 +1933,11 @@ int parse (){
                             // terminal a pilha de parãmetros.
                             if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
                             {
-                                // Mudando a classe. Agora temos uma função.
-                                id[ID_CLASS] = ID_CLASS_FUNCTION;
                                 break;
                             }
                         }        
                     
+                        // #bugbug: loop infinito se não encontrar ).
                     };
                     
                     token = yylex();  //next
@@ -1953,8 +2062,8 @@ int parse (){
     // Realizando algumas instruções.
 
     int inst =0; // instruction.
-    int cycle = 0;
-    //cycle = 0;
+
+    reg_cycle = 0;
     
     printf ("\n");
     printf ("Running ...\n");
@@ -1963,7 +2072,7 @@ int parse (){
     
     while (1)
     {
-        ++cycle;
+        ++reg_cycle;
     
         // Pega o program counter e 
         // incrementa para pegar o próximo.
@@ -1975,14 +2084,14 @@ int parse (){
          
          // NOTHING
          if ( inst == OPCODE_NOTHING ){
-             printf ("OPCODE_NOTHING on cycle %d \n", cycle);
+             printf ("OPCODE_NOTHING on cycle %d \n", reg_cycle);
              break;
          
          
          // MAIN
          }
          else if ( inst == OPCODE_MAIN ){
-             printf ("main(?): on cycle %d \n", cycle);
+             printf ("main(?): on cycle %d \n", reg_cycle);
              break;
          
          //...
@@ -1992,7 +2101,7 @@ int parse (){
          }
          else {
             
-            printf ("unknown instruction = %d! cycle = %d\n", inst, cycle); 
+            printf ("unknown instruction = %d! cycle = %d\n", inst, reg_cycle); 
             exit(-1);
             //return -1; 
          };
@@ -2247,10 +2356,8 @@ int parserInit (){
 	stack_flag = 0;
 	stack_count = 0;
 	stack_index = 0;
-	
- 
-	for ( i=0; i<8; i++ )
-		id[i] = 0;
+
+
 	
 	for ( i=0; i<8; i++ )
 		constant[i] = 0;

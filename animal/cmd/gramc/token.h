@@ -398,7 +398,15 @@ static	 while
 //...
 
 //8 elementos que explicam o identificador.
-int id[8];
+//int id[8];
+
+// deve apontar para áreas alocadas ... pois teremos vários id[].
+// Isso funcionou.
+int *id;     
+
+
+
+
 
 //#obs lembrando que o identificador fica em outro buffer.
 

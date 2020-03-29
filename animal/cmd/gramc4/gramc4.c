@@ -793,12 +793,20 @@ int main (int argc, char **argv){
                         ty = ty + PTR; 
                     }
 
-                    if (tk != Id) { printf("%d: bad parameter declaration\n", line); return -1; }
-                    if (id[Class] == Loc) { printf("%d: duplicate parameter definition\n", line); return -1; }
+                    //tem que ser um symbol.
+                    if (tk != Id) 
+                    { printf("%d: bad parameter declaration\n", line); return -1; }
                     
-                    id[HClass] = id[Class]; id[Class] = Loc;
-                    id[HType]  = id[Type];  id[Type] = ty;
-                    id[HVal]   = id[Val];   id[Val] = i++;
+                    // tem que ser local.
+                    if (id[Class] == Loc) 
+                    { printf("%d: duplicate parameter definition\n", line); return -1; }
+                    
+                    id[HClass] = id[Class]; 
+                    id[Class] = Loc;
+                    id[HType] = id[Type];  
+                    id[Type] = ty;
+                    id[HVal] = id[Val];   
+                    id[Val] = i++;
                     
                     next();
                     
@@ -835,8 +843,12 @@ int main (int argc, char **argv){
                             ty = ty + PTR; 
                         }
 
-                        if (tk != Id) { printf("%d: bad local declaration\n", line); return -1; }
-                        if (id[Class] == Loc) { printf("%d: duplicate local definition\n", line); return -1; }
+                        if (tk != Id) 
+                        { printf("%d: bad local declaration\n", line); return -1; }
+                        
+                        if (id[Class] == Loc) 
+                        { printf("%d: duplicate local definition\n", line); return -1; }
+                        
                         id[HClass] = id[Class]; id[Class] = Loc;
                         id[HType]  = id[Type];  id[Type] = ty;
                         id[HVal]   = id[Val];   id[Val] = ++i;
