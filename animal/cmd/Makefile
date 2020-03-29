@@ -21,7 +21,9 @@ all:
 	make -C ./c4  
 	make -C ./gramc4
 	
+	make -C ./bazic   
 	
+
 
 # ...
 	

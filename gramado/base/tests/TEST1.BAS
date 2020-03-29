@@ -1,0 +1,3 @@
+10 PRINT "HELLO WORLD! \n"
+
+

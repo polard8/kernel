@@ -34,10 +34,9 @@
 
 
 
-char *p;        // current position in source code
-char *lp;       // current position in source code
-char *data;     // data/bss pointer
-
+char *p;      // current position in source code
+char *lp;     // current position in source code
+char *data;   // data/bss pointer
 
 int *e;       // current position in emitted code
 int *le;      // current position in emitted code
@@ -47,9 +46,14 @@ int tk;       // current token
 int ival;     // current token value
 int ty;       // current expression type
 int loc;      // local variable offset
-int line;     // current line number
+
 int src;      // print source and assembly flag
 int debug;    // print executed instructions
+
+int line;     // current line number
+
+
+
 
 
 
@@ -1175,15 +1179,17 @@ int main (int argc, char **argv){
         
         }
         else if (i == EXIT) { 
-            printf("exit(%d) cycle = %d\n", *register_sp, register_cycle); 
+            printf ("exit(%d) cycle = %d\n", *register_sp, register_cycle ); 
+
             return *register_sp; 
-        
+
         }
         else { 
-            printf ("unknown instruction = %d! cycle = %d\n", i, register_cycle); 
+            printf ("unknown instruction = %d! cycle = %d\n", 
+                i, register_cycle ); 
             return -1; 
         };
-    
+
     }; // while
 
 
