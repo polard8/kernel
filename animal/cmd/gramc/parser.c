@@ -26,6 +26,11 @@ int x_debug;    // print executed instructions
 
 
 
+// opcodes #TODO
+enum { OPCODE_NOTHING, OPCODE_MAIN, OPCODE_EXIT };
+
+
+
 char save_symbol[32];
 
 
@@ -1731,12 +1736,10 @@ int parse (){
     // This llop needs to look like gramc4.
     // It will use if else instead of switch.
     
-   token = yylex();  //next
+    token = yylex();  //next
     
     while (running == 1)
     {
-        //token = yylex();
-
         // EOF: 
         // O lexer nos disse que acabou.
         if ( token == TOKENEOF )
@@ -1782,10 +1785,19 @@ int parse (){
             }
             
             // Se o if acima falhou, então temos um identifier.
+            // mais ainda não sabemos se ele é uma variável ou uma função
+            // então não vamos determinar a classe ainda.
+
             // #debug
             printf ("%d: symbol found!\n", lineno);
             id[ID_TOKEN] = TOKENIDENTIFIER;
             id[ID_STACK_OFFSET] = stack_index;
+            id[ID_CLASS] = ID_CLASS_VAR;  // determinando.
+            
+            if ( strncmp( (char *) real_token_buffer, "main", 4 ) == 0  )
+            {
+                id[ID_OPCODE] = OPCODE_MAIN;
+            }
 
             // Salva o símbolo. #isso funciona.
             sprintf ( save_symbol, real_token_buffer );
@@ -1811,6 +1823,8 @@ int parse (){
                             // terminal a pilha de parãmetros.
                             if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
                             {
+                                // Mudando a classe. Agora temos uma função.
+                                id[ID_CLASS] = ID_CLASS_FUNCTION;
                                 break;
                             }
                         }        
@@ -1840,11 +1854,16 @@ int parse (){
                     
                     // ...
                     
+                    // encontramos o { ...
+                    // estamos dentro do corpo da função.
+                    
                     while (1)
                     {
                         // Depois de '{'
                         token = yylex();  //next
 
+                        
+                        // Encontramos o separador que finaliza o corpo ?
                         if ( token == TOKENSEPARATOR )
                         {
                             // Se chegamos ao fim do corpo.
@@ -1855,7 +1874,11 @@ int parse (){
                                 break;
                             }
                         }
-
+                        
+                        // Encontramos uma cariável ou função dentro do corpo ?
+                        //if ( token == TOKENIDENTIFIER)
+                        //{}
+                        
                         // EOF: 
                         // O lexer nos disse que acabou.
                         if ( token == TOKENEOF )
@@ -1895,95 +1918,24 @@ int parse (){
             
         }; //while. Finalização de declaração ou corpo.
         
+        
+        // poderia pegar o pŕoximo e recomeçar o while.
+        // a última função precis ser um main() ?
+        
+        token = yylex();  //next
+         
+        
+        // #importante:
+        // Só sai do while principal no fim do arquivo.
+        
         //#debug
-        break;
+        //break;
+        
     }; //while principal.
-   
-   
-   
-   
-   
-   
-   
-    
-    /*
-    //++
-    while (running == 1)
-    {
-        token = yylex();
-
-        // EOF: 
-        // O lexer nos disse que acabou.
-        if ( token == TOKENEOF )
-        {
-            printf ("parse: ~EOF\n");
-            running = 0;
-            break;
-        }
-        
-        
-        
-        
-        // INT
-        if (token == Int) {
 
 
-        // CHAR
-        }
-        else if (token == Char) { 
-			
-			
-        // ENUM
-        // Abre e fecha o corpo.
-        }
-        else if (token == Enum) {
-            
-            // ...
-        }
 
 
-        // While inside the body ?
-        while (token != ';' && token != '}')
-        {
-                    // MUL
-            while (token == Mul)
-            {
-            }
-            
-            // ...
-            // FUNCTION
-            if (token == '(')
-            {
-
-            }else{
-
-            }
-            
-            // ','
-            // Não era abretura de pilha de parâmetros,
-            // provavelmente uma sequência de declarações de variáveis.
-            if (token == ',')
-                
-            
-        }; //while. Finalização de declaração ou corpo.
-
-        
-        // Quando finalizarmos a declaração ou o corpo
-        // então pegamos mais um token e tentamos pegar mais
-        // uma declaração ou função.
-        
-        next();
-        
-        
-    };// while principal.
-    //--
-    */
-
- 
- 
- 
- 
- 
     //#todo
     //Para rodar as funções precisamos da pilha.
 
@@ -2000,9 +1952,52 @@ int parse (){
     // Vamos rodar o interpretador ?
     // Realizando algumas instruções.
 
+    int inst =0; // instruction.
+    int cycle = 0;
     //cycle = 0;
+    
+    printf ("\n");
+    printf ("Running ...\n");
+    printf ("\n");
+    
+    
+    while (1)
+    {
+        ++cycle;
+    
+        // Pega o program counter e 
+        // incrementa para pegar o próximo.
+         
+        //i = *pc++;
+         
+        inst = id[ID_OPCODE];
+         
+         
+         // NOTHING
+         if ( inst == OPCODE_NOTHING ){
+             printf ("OPCODE_NOTHING on cycle %d \n", cycle);
+             break;
+         
+         
+         // MAIN
+         }
+         else if ( inst == OPCODE_MAIN ){
+             printf ("main(?): on cycle %d \n", cycle);
+             break;
+         
+         //...
+         
+         
+         // ERROR
+         }
+         else {
+            
+            printf ("unknown instruction = %d! cycle = %d\n", inst, cycle); 
+            exit(-1);
+            //return -1; 
+         };
+     };
 
- 
     /*
     //--
     while (1)

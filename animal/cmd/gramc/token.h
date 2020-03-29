@@ -382,6 +382,11 @@ static	 while
 // expressões matemáticas.
 #define ID_INDEX 6   
 
+// Como é uma linguagem interpretada
+// o opcode pode ser uma operação ou uma função.
+// Ex: JMP, ADD ou PRINTF ...
+#define ID_OPCODE 7
+
 
 //...
 #define ID_CLASS_VAR       100
