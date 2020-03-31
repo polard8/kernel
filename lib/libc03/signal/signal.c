@@ -2,7 +2,8 @@
  * File: signal.c
  *
  */
- 
+
+
 #include <sys/types.h>
 #include <errno.h>
 
@@ -11,7 +12,8 @@
 #include <stubs/gramado.h> 
 
 
-const char* sys_siglist[NSIG] = {
+
+const char *sys_siglist[NSIG] = {
     "Invalid signal number",
     "Hangup",
     "Interrupt",
@@ -57,10 +59,12 @@ const char* sys_siglist[NSIG] = {
 
     //#todo
     
-sighandler_t signal (int signum, sighandler_t handler)
-{
+sighandler_t signal (int signum, sighandler_t handler){
+
     sighandler_t __ret;
 
+
+    debug_print ("signal: [TODO] \n");
 
     /*
     ret = (sighandler_t) gramado_system_call ( ?, ?, ?, ? );
@@ -84,18 +88,23 @@ sighandler_t signal (int signum, sighandler_t handler)
  */
 
 int 
-sigaction ( int signum, 
-            const struct sigaction *act,
-            struct sigaction *oldact )
+sigaction ( 
+    int signum, 
+    const struct sigaction *act,
+    struct sigaction *oldact )
 {
+    debug_print ("sigaction: [TODO] \n");
     return -1; //#todo
 }
 
 
 // #todo
 // Sends a signal to a process or a process group.
-int kill (pid_t pid, int sig)
-{
+int kill (pid_t pid, int sig){
+
+
+    debug_print ("kill: [TODO] \n");
+
 	// #todo
 	/*
 	int ret;
@@ -123,49 +132,60 @@ int raise (int sig)
 
 
 
-int sigismember(const sigset_t* set, int signum)
-{
+int sigismember (const sigset_t* set, int signum){
+
     if (signum < 1 || signum > 32) {
         errno = EINVAL;
         return -1;
     }
+
     if (*set & (1 << (signum - 1)))
         return 1;
+
     return 0;
 }
 
 
-int killpg(int pgrp, int sig)
+int killpg (int pgrp, int sig)
 {
+    debug_print ("killpg: [TODO] \n");
 	return -1;
 }
 
-int sigemptyset(sigset_t *set)
+
+// ?? 
+int sigemptyset (sigset_t *set)
 {
     *set = 0;
     return 0;
 }
 
-int sigfillset(sigset_t *set)
+
+// ??
+int sigfillset (sigset_t *set)
 {
     *set = 0xffffffff;
     return 0;
 }
 
-int sigaddset(sigset_t *set, int signum)
-{
+
+
+int sigaddset (sigset_t *set, int signum){
+
     if (signum < 1 || signum > 32) {
         errno = EINVAL;
         return -1;
     }
+
     *set |= 1 << (signum - 1);
+
     return 0;
 } 
 
 
 
-int sigdelset(sigset_t *set, int signum)
-{
+int sigdelset (sigset_t *set, int signum){
+
     if (signum < 1 || signum > 32) {
         errno = EINVAL;
         return -1;
@@ -182,6 +202,8 @@ void psignal(int sig, const char *s)
 {}
 */
 
+
+
 /*
 void psiginfo (const siginfo_t *si, const char *s);
 void psiginfo (const siginfo_t *si, const char *s)
@@ -195,7 +217,5 @@ void psiginfo (const siginfo_t *si, const char *s)
 //
 // End.
 //
-
-
 
 

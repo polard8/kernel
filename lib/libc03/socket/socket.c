@@ -8,7 +8,6 @@
 
 
 
-
 #include <sys/types.h>  
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -44,8 +43,9 @@
 // See: http://man7.org/linux/man-pages/man2/socket.2.html
 
 //int socket ( int family, int type, int protocol ){
-int socket ( int domain, int type, int protocol )
-{
+
+int socket ( int domain, int type, int protocol ){
+
     int __fd = -1;
     
     __fd = (int) gramado_system_call ( 7000, 
@@ -123,12 +123,14 @@ int socketpair (int domain, int type, int protocol, int sv[2]){
 
 
 int 
-connect ( int sockfd, 
-          const struct sockaddr *addr,
-          socklen_t addrlen )
+connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen )
 {
     int __status = -1;
-    
+
+
     __status = (int) gramado_system_call ( 7001, 
                      (unsigned long) sockfd, 
                      (unsigned long) addr, 
@@ -162,8 +164,8 @@ connect ( int sockfd,
 // and addrlen is left unchanged.
 
 
-int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
-{
+int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen){
+
     int __fd = -1;
     
     __fd = (int) gramado_system_call ( 7002, 
@@ -241,12 +243,13 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds,
 // On error, -1 is returned, and errno is set appropriately.
 
 int 
-bind ( int sockfd, 
-       const struct sockaddr *addr,
-       socklen_t addrlen )
+bind ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen )
 {
     int __status = -1;
-    
+
     __status = (int) gramado_system_call ( 7003, 
                      (unsigned long) sockfd, 
                      (unsigned long) addr, 
@@ -269,10 +272,10 @@ bind ( int sockfd,
 // On success, zero is returned.  
 // On error, -1 is returned, and errno is set appropriately.     
 
-int listen (int sockfd, int backlog)
-{
+int listen (int sockfd, int backlog){
+
     int __status = -1;
-    
+
     __status = (int) gramado_system_call ( 7004, 
                      (unsigned long) sockfd, 
                      (unsigned long) backlog, 
@@ -291,9 +294,7 @@ int listen (int sockfd, int backlog)
  * send:
  */
 
-ssize_t send ( int sockfd, const void *buf, size_t len, int flags )
-{
-
+ssize_t send ( int sockfd, const void *buf, size_t len, int flags ){
 
     //#todo: Usar esse.
     //return (ssize_t) sendto ( (int) sockfd, 
@@ -309,27 +310,25 @@ ssize_t send ( int sockfd, const void *buf, size_t len, int flags )
 //These interfaces first appeared in 4.2BSD.
        
 ssize_t 
-sendto ( int sockfd, 
-         const void *buf, 
-         size_t len, 
-         int flags,
-         const struct sockaddr *dest_addr, 
-         socklen_t addrlen )
+sendto ( 
+    int sockfd, 
+    const void *buf, 
+    size_t len, 
+    int flags,
+    const struct sockaddr *dest_addr, 
+    socklen_t addrlen )
 {
 
     return (ssize_t) write ( sockfd, (const void *) buf, len );
-    //return -1;
 }
 
 
 
 ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
 {
+    debug_print ("sendmsg: [TODO]\n");
     return -1;
 }
-
-
-
 
 
 
@@ -337,8 +336,7 @@ ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
  * recv:
  */
 
-ssize_t recv ( int sockfd, void *buf, size_t len, int flags )
-{
+ssize_t recv ( int sockfd, void *buf, size_t len, int flags ){
 
     // #todo: Usar esse.
     //return (ssize_t) recvfrom ( (int) sockfd, 
@@ -352,31 +350,34 @@ ssize_t recv ( int sockfd, void *buf, size_t len, int flags )
 
 
 ssize_t 
-recvfrom ( int sockfd, 
-           void *buf, 
-           size_t len, 
-           int flags,
-           struct sockaddr *src_addr, 
-           socklen_t *addrlen )
+recvfrom ( 
+    int sockfd, 
+    void *buf, 
+    size_t len, 
+    int flags,
+    struct sockaddr *src_addr, 
+    socklen_t *addrlen )
 {
 
      return (ssize_t) read ( sockfd, (const void *) buf, len );
-     //return -1;
 }
 
 
 ssize_t recvmsg (int sockfd, struct msghdr *msg, int flags)
 {
+    debug_print ("recvmsg: [TODO]\n");
     return -1;
 }
 
 
 
 int 
-getpeername ( int sockfd, 
-              struct sockaddr *addr, 
-              socklen_t *addrlen )
+getpeername ( 
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen )
 {
+    debug_print ("getpeername: [TODO]\n");
     return -1;
 }
 
@@ -386,16 +387,18 @@ getpeername ( int sockfd,
 //appeared in 4.2BSD).
 
 int 
-getsockname ( int sockfd, 
-              struct sockaddr *addr, 
-              socklen_t *addrlen )
+getsockname ( 
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen )
 {
     int __status = -1;
-    
+
+
     __status = (int) gramado_system_call ( 7007, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) addr, 
-                     (unsigned long) addrlen );
+                         (unsigned long) sockfd, 
+                         (unsigned long) addr, 
+                         (unsigned long) addrlen );
 
     if(__status<0)
         printf ("getsockname: fail\n");
@@ -405,11 +408,6 @@ getsockname ( int sockfd,
 }
 
 
-
-
-
-
-       
 /*
  * shutdown:
  *     shut down part of a full-duplex connection    
@@ -422,13 +420,14 @@ getsockname ( int sockfd,
 // Muda as flags do arquivo. 
 // Alterando permissões de leitura ou escrita.
 
-int shutdown ( int sockfd, int how ){
-
+int shutdown ( int sockfd, int how )
+{
     // #todo
     // Deve existir uma rotina na libc que mude
     // as permissões de um arquivo. Então é ela que devemos
     // chamar agora e não uma system call.
 
+    debug_print ("shutdown: [TODO]\n");
     return -1; 
 }
 

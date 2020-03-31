@@ -1064,39 +1064,42 @@ void reader_loop ()
  *     LOCAL
  */
 
+
 unsigned long 
-shellProcedure ( struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 )
+shellProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
 {
+
     unsigned long input_ret;
-    unsigned long compare_return;	
-    int q;	
-	
-	//if( msg == COMMAND_INITIALIZE_SHELL ){
-		//...
-	//}
-	
-	int c;
-	
+    unsigned long compare_return;
+    int q;
+
+    int c;
+
+
+
     switch (msg)
     {
+         // Receberemos uma mensagem vida do servidor de rede.
          case MSG_AF_INET:
-             //receberemos uma mensagem vida do servidor de rede.
              printf ("gdeshell: MSG_AF_INET\n");
              break;
-             
+
+
+         // Receberemos uma mensagem vida do servidor de rede.
          case MSG_NET_DATA_IN:
-             //receberemos uma mensagem vida do servidor de rede.
              printf ("gdeshell: MSG_NET_DATA_IN\n");
-              while ( (c = fgetc( (FILE *) long1)) >= 0 )
-                  printf ("%c", c); 
+             while ( (c = fgetc( (FILE *) long1)) >= 0 )
+                 printf ("%c", c); 
              break;
-             
-         //esse processo � notificado sobre o recebimento de um pacote ipv4    
+
+
+         // esse processo � notificado sobre o recebimento de um pacote ipv4    
+         //receberemos uma mensagem vida do servidor de rede.
          case MSG_NETWORK_NOTIFY_PROCESS:
-             //receberemos uma mensagem vida do servidor de rede.
              printf ("gdeshell: MSG_NETWORK_NOTIFY_PROCESS\n");
               while ( (c = fgetc( (FILE *) long1)) >= 0 )
                   printf ("%c", c); 
@@ -1127,33 +1130,29 @@ shellProcedure ( struct window_d *window,
 					cpu_relax();
 				    return (unsigned long) 0;
 				    break;
-				
-				// Enter.
-				// Finaliza a string e compara.
-				case VK_RETURN:
-				    
-					//#test
-					//printf("\r");
-					//printf("\n");
-				
-				    input ('\0'); 
-					
-					//#obs: 
-					//#importante 
-					//Se essa janela for a janela do shell, 
-					//ent�o a rotina de compara��o poder� fazer um refresh dessa janela. 
-					//#obs: talvez esse refresh nem seja necess�rio.
-					//cada rotina chamada que fa�a seu pr�prio refresh se conseguir.
-					shellCompare (window);
-					goto done;
+
+                // [Enter].
+                // Finaliza a string e compara.
+                // #obs: 
+                // #importante 
+                // Se essa janela for a janela do gdeshell, então 
+                // a rotina de comparação poderá fazer um refresh 
+                // dessa janela. 
+                // #obs: talvez esse refresh nem seja necessário.
+                // cada rotina chamada que fará seu próprio refresh 
+                // se conseguir.
+                case VK_RETURN:
+                    input('\0'); 
+                    shellCompare (window);
+                    goto done;
                     break; 
 
-				//#test	
-                case VK_TAB:
-					printf ("\t");
-					goto done;
-				    break;	
 
+                // #test
+                case VK_TAB:
+                    printf ("\t");
+                    goto done;
+                    break;
 
                 // #todo
                 // falta configurar prompt[] usado por input();
@@ -1174,153 +1173,78 @@ shellProcedure ( struct window_d *window,
 
 
 
-                // Mensagens de digita��o.
-                // Texto. Envia o caractere.
-                // Imprime os caracteres normais na janela com o foco de 
-                // entrada.
-                // Enfilera os caracteres na string 'prompt[]' para depois 
-                // ser comparada com outras strings.
-                // prompt[] � o stdin.
-
+                // Mensagens de digitação.
+                // Enfilera os caracteres na string 'prompt[]' 
+                // para depois ser comparada com outras strings.
+                // Coloca na memória de video virtual,
+                // Que é semelhante a vga, contendo char e atributo.
+                // Isso mostra o caractere na tela.
                 default:
-                    // Coloca no stdin, prompt[].
-                    input ( (unsigned long) long1 );      
-                    // Coloca na mem�ria de video virtual,
-                    // Que � semelhante a vga, contendo char e atributo.
+                    input ( (unsigned long) long1 );  
                     shellInsertNextChar ( (char) long1 );  
                     goto done;
-                    break;   
-      
-            
+                    break; 
             };
         break;
-		
-		case MSG_KEYUP: 
-		    // printf("%c", (char) 'u');
-            // printf("%c", (char) long1);  			
-		    break;
-		
-		//N�o interceptaremos mensagens do sistema por enquanto.
-		//As mensagens do sistema s�o interceptadas primeiro pelo procedimento 
-		//do sistema.
-		
-		case MSG_SYSKEYDOWN:
-		    switch (long1)
-			{
-		        
-				case VK_F1:
-                    
 
-					//shellTestLoadFile ();
-					
-					//inicializa a �rea vis�vel.
-					//textTopRow = 0;
-	                //textBottomRow = 0 + 24;
-						
-					break;
-					
-				case VK_F2:
-				    //testChangeVisibleArea();
-					break;
-					
-				case VK_F3:
-				    //shellRefreshVisibleArea();
-					break;
-					
-				//...
-				
-                //full screen
-                //colocar em full screen somente a �rea de cliente. 				
-		        case VK_F11:
-				    
-					break;
-					
-				//...
 
-			};
-			break;
-		
+
+        // Não interceptaremos mensagens do sistema por enquanto.
+        // As mensagens do sistema são interceptadas primeiro pelo 
+        // procedimento do sistema.
+        case MSG_SYSKEYDOWN:
+            // Nothing for now!
+            break;
+
+
+        case MSG_KEYUP: 
+            break;
+
 		//Obs:
-		//essas teclas s�o tratadas pelo procedimento do sistema.
+		//essas teclas são tratadas pelo procedimento do sistema.
 		//mas alguma tecla personalizada pode ser  tratada pelo aplicativo,
 		//como o context menu [Application Key]
-		case MSG_SYSKEYUP:
+        case MSG_SYSKEYUP:
             switch (long1)
-			{
-				
-				//O MENU APPLICATION � O CONTEXT MENU.
-				//
-				case VK_APPS:
-				    gde_message_box ( 3, 
-				        "Gramado Core Shell:", 
-				        "VK_APPS Context Menu" );
-					break;
-			}
-		    break;
-		
+            {
+                // Menu.
+                case VK_APPS:
+                    gde_message_box ( 3, "gdeshell:", "VK_APPS" );
+                    break;
+            };
+            break;
 
-        // Commands.		
-		case MSG_COMMAND:
+
+        // Commands.
+        case MSG_COMMAND:
             switch (long1)
-			{
-				// Null.
-				case 0:
-				    gde_message_box ( 3, 
-				        "Shell test", 
-				        "Testing MSG_COMMAND.NULL." );
-				    break;
-				
-				// About.
-				// Abre uma janela e oferece informa��es 
-				// sobre o aplicativo.
-				case CMD_ABOUT:
-				    printf ("CMD_ABOUT\n");
-				    // Test. ok.
-				    //gde_message_box ( 3, 
-				        //"Shell test", 
-				        //"Testing MSG_COMMAND.CMD_ABOUT." );
-				    break;
+            {
+                case CMD_ABOUT:
+                    printf ("MSG_COMMAND-CMD_ABOUT\n");
+                    break;
 
-				//clicaram no bot�o
-				case BN_CLICKED:
-				    //if(window == i1Window){
-					     //@todo: abre o menu de aplicativos
-					//}
-				    //if(window == i2Window){
-					   //@todo: abre o interpretador de comandos.
-					//}
-					//#debug
-					printf(" * BN_CLICKED * \n");
-				break;
-				//...
-				
-				//default:
-				//break;
-			}
-		    break; 		
-		
-		//Essa mensagem pode ser acionada clidando um bot�o.
-		case MSG_CLOSE:
-		    //??
-		    //isso deve fechar qualquer janela que esteja usando esse procedimento.
-			//pode ser uma janela filha ou ainda uma janela de dialogo criada pelo sistema.
-			//??
-		    printf("SHELL.BIN: MSG_CLOSE\n");
-			
-			//@todo: Criar essa fun��o na api.
-			//apiExitProcess(0);
-			break;
-		
-		//Essa mensagem pode ser acionada clidando um bot�o.
-		case MSG_DESTROY:
-		    printf("SHELL.BIN: MSG_DESTROY\n");
-		    break;
-			
-		// MSG_MOUSEKEYDOWN	
-		case 30:
-		    switch (long1)
-			{
-				case 1:
+                // Nothing for now!
+                default:
+                    break;
+            };
+            break;
+
+
+        case MSG_CLOSE:
+            printf ("MSG_CLOSE\n");
+            break;
+
+
+       case MSG_DESTROY:
+            printf ("MSG_DESTROY\n");
+            break;
+
+
+        // MSG_MOUSEKEYDOWN
+        case 30:
+            switch (long1)
+            {
+                case 1:
 				
 				    //#obs: No keydown a gente s� abaixa o bot�o.
 					
@@ -1362,27 +1286,25 @@ shellProcedure ( struct window_d *window,
 					    //refresh_screen (); //n�o precisa isso	
 
 					//	_running = 0;
-                    //    ShellFlag = SHELLFLAG_EXIT;						
+                    //    ShellFlag = SHELLFLAG_EXIT;
 					//}    
 					break;
-					
-				case 2:
-				    //#debug
-				    printf("button 2\n");
-				    break;
-					
-				case 3:
-				    //#debug
-				    printf("button 3\n");
-				    break;
-			};			
+
+                case 2:
+                    printf ("button 2\n");
+                    break;
+
+                case 3:
+                    printf ("button 3\n");
+                    break;
+            };
             break;
 
-		// MSG_MOUSEKEYUP	
-		case 31:
-		    switch (long1)
-			{		
-				case 1:
+        // MSG_MOUSEKEYUP
+        case 31:
+            switch (long1)
+            {
+                case 1:
 				    //printf("up button 1\n");
 					if (window == menu_button)
 					{
@@ -1411,71 +1333,35 @@ shellProcedure ( struct window_d *window,
 					}  
 					
 					break;
-					
-				case 2:
-				    printf("up button 2\n");
-				    break;
-					
-				case 3:
-				    printf("up button 3\n");
-				    break;
-			};		
-            break;	
 
-		// MSG_MOUSEMOVE	
-		case 32:
-            //APISetFocus(window);
-			//printf("m");
-            break;	
+                case 2:
+                    printf ("up button 2\n");
+                    break;
 
-		// MSG_MOUSEOVER	
-		case 33:
-		    
-			//se tiver passando em cima do bot�o de close.
-			if ( window == close_button )
-			{
-				//printf(".");
-			    //APIresize_window ( window, 200, 200 );
-				//APIredraw_window ( window, 1 );	
-			}
-            
-		    break;
-
-		//entered	
-        case 38:
-		    if ( window == close_button )
-			{
-			    //printf("entered\n");	
-			}
-            break;		
-
-		//exited	
-        case 39:
-		    if ( window == close_button )
-		    {
-			    //printf("exited\n");
-		    }
+                case 3:
+                    printf ("up button 3\n");
+                    break;
+            };
             break;
-			
-		//Quando a aplicativo em user mode chama o kernel para 
-		//que o kernel crie uma janela, depois que o kernel criar a janela,
-		//ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
+
+
+
+        //Quando a aplicativo em user mode chama o kernel para 
+        //que o kernel crie uma janela, depois que o kernel criar a janela,
+        //ele faz uma chamada ao procedimento de janela do aplicativo com a mensagem 
         //MSG_CREATE, se o aplicativo retornar -1, ent�o a rotina em kernel mode que 
         //esta criando a janela, cancela a janela que est� criando e retorn NULL.		
-		case MSG_CREATE:
-		    printf("gdeshell: MSG_CREATE\n");
-		    break;
-		
-		
+        case MSG_CREATE:
+            printf ("MSG_CREATE\n");
+            break;
+
+
 		//#IMPORTANTE
 		// a API CHAMA ISSO DE TEMPOS EM TEMPOS DE ACORDO
 		//COM A CONFIGURA��O FEITA ANTES POR ESSE APP.
 		//MSG_TIMER ;;#TODO INCLUIR ISS0 NA API.	
-		case 53:
-		    //printf("shell tick\n");
-			//updateObject(); //interna
-            update_cpu_usage ();
-            //xmas_tree();
+        case 53:
+            // update_cpu_usage ();
             break; 
 
 
@@ -1497,206 +1383,16 @@ shellProcedure ( struct window_d *window,
         // o driver de rede notifica o aplicativo de que
         // tem conte�do no buffer previamente configurado pelo aplicativo.
         // veja gde_setup_net_buffer;
+        //__net_buffer[] 
+        // #todo: ler o __net_buffer        
         case 1444:
-           //__net_buffer[] 
-           // #todo: ler o __net_buffer
-           printf ("gdeshell: 1444 net driver notification ! we got data in our buffer :)\n");
+           printf ("gdeshell: 1444 net driver notification! \n"); 
+           printf (" We got data in our buffer :)\n");
            break;
-           
-        //#todo: 
-        // Isso ainda n�o existe na biblioteca. criar.	
-        //case MSG_CLS:
-            //limparemos o ret�ngulo da �rea de cliente,
-            //mesmo que estejamos em full screen. 
-        // break;
 
 
-		//mudaremos o curso usando long1 e long2.
-		//case MSG_SETCURSOR:
-		//    break;
-		
-		//case MSG_HSCROLL:
-		//    break;
-		//case MSG_VSCROLL:
-		//    break;
-		
-		
-		//case MSG_FULLSCREEN:
-		//    break;
-		
-		
-		//case COMMAND_SET_WINDOW_SIZE:
-		//    break;
-		
-		//case COMMAND_HIDE_WINDOW:
-        //    break; 
-
-		
-		//#importante
-		// os caracteres de controle encontrados na tabela ascii.
-		//@todo: Essa mensagem precis ser criada, tanto no kernel 
-		//quanto na API.
-		//case MSG_ASCII_CONTROL_KEYS:
-		//   switch(long1)
-		//	{
-	
-		        //^A STX
-                //case 1:
-		        //    printf("^A");
-                //    break;  		
-	
-		        //^B SOT
-                //case 2:
-		        //    printf("^B");
-                //   break;  		
-			
-		        //^C ETX
-                //case 3:
-		        //    printf("^C");
-		        //	shellPrompt();
-                //    break;
-
-		        //^D EOT
-                //case 4:
-		        //   printf("^D");
-                //   break;
-
-		        //^E ENQ
-                //case 5:
-		        //    printf("^E");
-                //    break;  								
-			
-		        //^F ACK
-                //case 6:
-		        //    printf("^F");
-                //    break;  					
-
-
-		        //^G BEL
-                //case 7:
-		        //   printf("^G");
-                //    break;  					
-			
-			
-		        //^H BS
-                //case 8:
-                //    break;  								
-			
-		        //^I HT horizontal tab
-                //case 9:
-                //    break;  	
-
-		        //^J LF
-                //case 10:
-                //    break;  			
-			
-						
-		        //^K VT vertical tab
-                //case 11:
-                //    break;  	
-
-		        //^L FF form feed
-                //case 12:
-                //    break;  	
-			
-			
-		        //^M CR
-                //case 13:
-                //    break;  	
-			
-
-		        //^N SO
-                //case 14:
-                //    break;  				
-		
-
-		        //^O SI
-                //case 15:
-                //    break;
-
-
-		        //^P DLE DATA LINK ESCAPE
-                //case 16:
-                //    break;  			
-		
-		
-		        //^Q DC1 DEVICE CONTROL 1
-                //case 17:
-                //    break;  	
-  			
-			
-		        //^R DC2 DEVICE CONTROL 2
-                //case 18:
-                //    break;
-
-		        //^S DC3 DEVICE CONTROL 3
-                //case 19:
-                //    break;  			
-
-		        //^T DC3 DEVICE CONTROL 4
-                //case 20:
-                //    break;  			
-		
-		
-		        //^U NAK NEGATIVE ACKNOLEDGE
-                //case 21:
-                //    break;  			
-
-		        //^V SYN SYNCHRONOUS IDLE
-                //case 22:
-                //    break;  			
-		
-		        //^W ETB END OF TRANSMISSION BLOCK
-                //case 23:
-                //    break;  			
-		
-		        //^X CAN CANCEL
-                //case 24:
-                //    break;  			
-
-		
-		        //^Y EM END OF MEDIUM
-                //case 25:
-                //    break;  			
-		
-		        //^Z SUB SUBSTITUTE
-                //case 26:
-                //    break;  			
-		
-		
-		        //^[ ESC ESCAPE
-                //case 27:
-                //    break;  			
-		
-		        //^\ FS FILE SEPARATOR
-                //case 28:
-                //    break;  			
-		
-		        //^] GS GROUP SEPARATOR
-                //case 29:
-                //    break;  			
-		
-		        //^ RS RECORD SEPARATOR
-                //case 30:
-                //    break;  			
-		
-		
-		        //_ US UNIT SEPARATOR
-                //case 31:
-                //    break;  			
-		
-		
-		        //DELETE
-                //case 127:
-                //    break; 
-
-        //    };		
-		//    break;
-			
-		
-
+        // NOthing for now!
         default:
-            //printf (".");
             break;
     };
 
@@ -1705,54 +1401,17 @@ shellProcedure ( struct window_d *window,
 
 done:
 
-    return (unsigned long) gde_def_dialog ( window, 
-                               msg, long1, long2 );
+    // Calling system procedure.
+    return (unsigned long) gde_def_dialog (window,msg,long1,long2);
 }
 
 
-/*
- ******************************
- * shellWaitCmd:
- *     Espera completar o comando com um [ENTER]. ##suspensa
- */
-
-void shellWaitCmd (){
-		
-	// @todo: Cuidado com loop infinito.
-
-	
-	// Obs: Quem muda o status � o procedimento,
-	//      quando recebe o retorno da fun��o input:
-	
-
-	// Uma interrup��o de teclado aciona o procedimento
-	// do shell que atualiza o status.
-	
-	
-	// BUG BUG :
-    //
-    //    Pra esse shell funcionar teria que habilita
-    //    agora a interrup��o de teclado e somente ela
-    //    para que a interrup��o de timer n�o bagun�e as
-    //    coisas fazendo troca de contexto.
-
-	
-	//asm("sti");    //@todo; N�o habilitar!
-	
-    //Loop.  
-
-    do{
-		if ( prompt_status == 1 )
-		{
-			prompt_status = 0;     
-			return;
-	    };
-	
-	} while (1);
-
-
-    prompt_status = 0;	
+// #todo: Delete
+void shellWaitCmd ()
+{
+	// Nothing.
 }
+
 
 
 /*
@@ -1864,8 +1523,7 @@ fixing_command_line:
             // printf("#debug \n");
 
             j++;
-            if ( j > wlMaxColumns )
-            {
+            if ( j > wlMaxColumns ){
                printf ("shellCompare: The command line is too long or there is no terminator! \n");
                exit (1);
             }
@@ -2138,23 +1796,23 @@ do_compare:
 	//
 
     if ( strncmp ( (char *) tokenList[0], "dobin", 5 ) == 0 ){
-	    goto dobin;	
-	}
+        goto dobin;
+    }
 
     if ( strncmp ( (char *) tokenList[0], "dotry", 5 ) == 0 ){
-		goto dotry;
-	} 
-	
-	//um comando no shell pede para executar um script
+        goto dotry;
+    } 
+
+    //um comando no shell pede para executar um script
     if ( strncmp ( (char *) tokenList[0], "dosh", 4 ) == 0 ){
-		goto dosh;
-	} 	
+        goto dosh;
+    }
 
 
 	// token
 	// testando tokenList
 	// comando usado para testes de comando.
-	int __z;
+    int __z;
 
     if ( strncmp ( prompt, "token", 5 ) == 0 )
     {
@@ -2227,36 +1885,6 @@ do_compare:
         __shellTestARP ();
         goto exit_cmp;
     }
-
-
-	// bmp
-	// $ bmp exemplo.bmp
-    if ( strncmp ( prompt, "bmp", 3 ) == 0 )
-    {
-        i++;
-        token = (char *) tokenList[i];
-
-        if ( token == NULL ){
-             printf ("Error: No name!\n");
-        }else{
-   
-		   // test. aloca 200 KB
-		   printf ("test 200 KB\n");
-		   shellDisplayBMPEx ( (char *) tokenList[i], (int) (200) );
-			
-			//@todo: podemos checar se o pathname � absoluto,
-			//e onde se encontra o arquivo que queremos.
-			//shellDisplayBMP ( (char *) tokenList[i] );
-		
-		   //test 2MB
-		   //o argumento tamanho � dado  em kb.
-		   //printf("test 2mb\n");
-		   //shellDisplayBMPEx ( (char *) tokenList[i], (int) (1024*2) );
-		   
-            gde_show_backbuffer ();
-        };
-        goto exit_cmp;
-    };
 
 
     // #bugbug
@@ -2342,22 +1970,19 @@ do_compare:
         goto exit_cmp;
     }
 
-    // devices.
-    // Mostra a lista de dispositivos deviceList[]
+    // devices - Mostra a lista de dispositivos deviceList[]
     if ( gramado_strncmp( prompt, "devices", 7 ) == 0 ){
         gramado_system_call ( 770, 0, 0, 0 );
         goto exit_cmp;
     }
 
 
-	
-	// dir - Lista os arquivos no estilo DOS.
-	// ls  - Lista no estilu *NIX. Isso ser� um aplicativo.
-	if ( gramado_strncmp ( prompt, "dir", 3 ) == 0 || 
-	     gramado_strncmp ( prompt, "ls", 2 ) == 0 )
-	{
-		char dir_name[] = "volume1";
-		
+    // List files and folders.
+    if ( gramado_strncmp ( prompt, "dir", 3 ) == 0 || 
+         gramado_strncmp ( prompt, "ls", 2 ) == 0 )
+    {
+        char dir_name[] = "volumeX";
+
 		i++;
 		token = (char *) tokenList[i];
 		
@@ -2392,55 +2017,35 @@ do_compare:
 		//dir_builtins();
         goto exit_cmp;
     };
-	
+
+
     // disk-info
-	if ( gramado_strncmp( prompt, "disk-info", 9 ) == 0 ){
-	    shellShowDiskInfo ();
-        goto exit_cmp;
-    }
-	
-	
-	// echo - Echo de terminal.
-    if ( gramado_strncmp( prompt, "echo", 4 ) == 0 ){
-		echo_builtins (tokenList);
-		goto exit_cmp;
-    }
-
-	
-	// editbox
-	// Cria uma edibox.
-    if ( gramado_strncmp( prompt, "editbox", 7 ) == 0 )
-    {
-        gde_enter_critical_section ();
-        shellCreateEditBox ();
-        gde_exit_critical_section();
+    if ( gramado_strncmp( prompt, "disk-info", 9 ) == 0 ){
+        shellShowDiskInfo ();
         goto exit_cmp;
     }
 
 
-	
-	// exec - Executa um programa fechando o shell.
-    if ( gramado_strncmp ( prompt, "exec", 4 ) == 0 )
-	{
-		// o que segue o comando exec � um pathname.
-		//@todo: podemos checar se o pathname � absoluto,
-		//e onde se encontra o arquivo que queremos.		
-		exec_builtins();
-		ShellFlag = SHELLFLAG_EXIT;
-		goto exit_cmp;
+
+    // exec - Executa um programa fechando o shell.
+    // o que segue o comando exec � um pathname.
+    //@todo: podemos checar se o pathname � absoluto,
+    //e onde se encontra o arquivo que queremos.
+    if ( gramado_strncmp ( prompt, "exec", 4 ) == 0 ){
+        exec_builtins();
+        ShellFlag = SHELLFLAG_EXIT;
+        goto exit_cmp;
     }
-	
 
 
-	// exit - Exit the application.
+    // exit - Exit the application.
     if ( gramado_strncmp( prompt, "exit", 4 ) == 0 ){
-		exit_builtins();
-		ShellFlag = SHELLFLAG_EXIT;
-		goto exit_cmp;
+        exit_builtins();
+        ShellFlag = SHELLFLAG_EXIT;
+        goto exit_cmp;
     }
     
-    
-   
+
     // gethostname 
     char *my_hostname;
     char hostbuffer[256]; 
@@ -2477,12 +2082,10 @@ do_compare:
 
 
     char *env_string;
-    if ( gramado_strncmp( prompt, "ws", 2 ) == 0 )
-    {
+    if ( gramado_strncmp( prompt, "ws", 2 ) == 0 ){
         env_string = (char *) getenv ("WS");
         printf (" The window server is %s .\n", env_string);
-        
-		goto exit_cmp;
+        goto exit_cmp;
     }
     
 
@@ -2499,7 +2102,7 @@ do_compare:
 		my_ptsname = (char *) ptsname (1);
 		printf (my_ptsname);
         goto exit_cmp;
-    }; 
+    }
 
 
     //ptsname_r
@@ -2514,64 +2117,58 @@ do_compare:
 	}        
 
     // getpids
-    if ( gramado_strncmp ( prompt, "getpids", 7 ) == 0 )
-    {
-        printf ( "Window Server PID %d\n", gde_get_pid (GETPID_WS) );
-        printf ( "Window Manager PID %d\n", gde_get_pid (GETPID_WM) );
+    if ( gramado_strncmp ( prompt, "getpids", 7 ) == 0 ){
+        printf ( "Window Server PID %d\n", gde_get_pid(GETPID_WS) );
+        printf ( "Window Manager PID %d\n", gde_get_pid(GETPID_WM) );
         goto exit_cmp;
     }
 
     // getpid
-	if ( gramado_strncmp( prompt, "getpid", 6 ) == 0 )
-	{
-	    getpid_builtins ();
+    if ( gramado_strncmp( prompt, "getpid", 6 ) == 0 ){
+        getpid_builtins ();
         goto exit_cmp;
-    };
-	
+    }
+
+
     // getppid
-	if ( gramado_strncmp( prompt, "getppid", 7 ) == 0 )
-	{
-	    getppid_builtins();
+    if ( gramado_strncmp( prompt, "getppid", 7 ) == 0 ){
+        getppid_builtins();
         goto exit_cmp;
-    };
-	
-	
+    }
+
+
     // getuid - get user id
-	if ( gramado_strncmp( prompt, "getuid", 6 ) == 0 )
-	{
-	    getuid_builtins();
+    if ( gramado_strncmp( prompt, "getuid", 6 ) == 0 ){
+        getuid_builtins();
         goto exit_cmp;
-    };
-	
-	
+    }
+
+
     // getgid - get group id
-	if ( gramado_strncmp( prompt, "getgid", 6 ) == 0 )
-	{
-	    getgid_builtins();
+    if ( gramado_strncmp( prompt, "getgid", 6 ) == 0 ){
+        getgid_builtins();
         goto exit_cmp;
-    };
-	
+    }
+
     //get-usersession
-	if ( gramado_strncmp( prompt, "get-usersession", 15 ) == 0 )
-	{
-	    shellShowUserSessionID();
+    if ( gramado_strncmp( prompt, "get-usersession", 15 ) == 0 ){
+        shellShowUserSessionID();
         goto exit_cmp;
-    };
-	
-	
+    }
+
+
     //get-windowstation
-	if ( gramado_strncmp( prompt, "get-room", 8 ) == 0 )
-	{
-	    shellShowWindowStationID(); //mudar o nome;
+    if ( gramado_strncmp( prompt, "get-room", 8 ) == 0 ){
+        shellShowWindowStationID(); //mudar o nome;
         goto exit_cmp;
-    };
-	
+    }
+
+
     //get-desktop
-	if ( gramado_strncmp( prompt, "get-desktop", 11 ) == 0 )
-	{
-	    shellShowDesktopID();
+    if ( gramado_strncmp( prompt, "get-desktop", 11 ) == 0 ){
+        shellShowDesktopID();
         goto exit_cmp;
-    };
+    }
 
 	
 	//unsigned char *hBuffer = (unsigned char *) 0xC1000000;
@@ -2638,8 +2235,8 @@ do_compare:
     // See: http://man7.org/linux/man-pages/man2/ioctl.2.html
 
     //int32_t ____value;
-    if ( gramado_strncmp( prompt, "ioctl", 5 ) == 0 ){
-
+    if ( gramado_strncmp( prompt, "ioctl", 5 ) == 0 )
+    {
         printf ("~ioctl:\n");
 
         //fd request
@@ -2654,17 +2251,6 @@ do_compare:
         goto exit_cmp;
     }
 
-
-
-    /*
-    // install
-    // Isso pode ser um aplicativo. 
-    if ( gramado_strncmp( prompt, "install", 7 ) == 0 )
-    {
-        printf ("~install\n");
-        goto exit_cmp;
-    }
-    */
 
 
     // ints
@@ -2738,33 +2324,22 @@ do_compare:
     }
 
 
-
-
-
     // message-box
-	// Testing message box.
-	// #todo: testar os 4 tipos 
-    if ( gramado_strncmp( prompt, "message-box", 11 ) == 0 )
-    {
-        //gde_message_box ( 1, "MessageBox", "type 1" );
-        //gde_message_box ( 2, "MessageBox", "type 2" );
+    if ( gramado_strncmp( prompt, "message-box", 11 ) == 0 ){
         gde_message_box ( 3, "MessageBox", "type 3" );
-        //gde_message_box ( 4, "MessageBox", "type 4" );
         goto exit_cmp;
     }
 
 
-    // mkdir - Criar um diret�rio dado o nome.
-    if ( gramado_strncmp( prompt, "mkdir", 5 ) == 0 )
-    {
+    // mkdir - Create a new directory, given it's name.
+    if ( gramado_strncmp( prompt, "mkdir", 5 ) == 0 ){
         gde_create_empty_directory ( (char *) tokenList[1] );
         goto exit_cmp;
     }
 
 
-    // mkfile - Criar um arquivo dado o nome.
-    if ( gramado_strncmp( prompt, "mkfile", 6 ) == 0 )
-    {
+    // mkfile - Create a new file, given it's name.
+    if ( gramado_strncmp( prompt, "mkfile", 6 ) == 0 ){
         gde_create_empty_file ( (char *) tokenList[1] );
         goto exit_cmp;
     }
@@ -2776,8 +2351,7 @@ do_compare:
     }
 
 
-    // mm-size
-    // mb
+    // mm-size (MB)
     unsigned long __mm_size_mb = 0;    
     if ( gramado_strncmp( prompt, "mm-size", 7 ) == 0 )
     {
@@ -2857,7 +2431,6 @@ do_compare:
     // process-stats
     // Testando informa��es estat�sticas sobre os processos.
     // #bugbug: N�o mostra as informa��es dos processos clones.
-
     if ( gramado_strncmp( prompt, "process-stats", 13 ) == 0 ){
         process_stats();
         goto exit_cmp;
@@ -2893,17 +2466,14 @@ do_compare:
     }
 
 
-
-    // ram.
-    // Show RAM memory info.
+    // ram - Show RAM memory info.
     if (gramado_strncmp ( prompt, "ram", 3 ) == 0){
         ram_test();
         goto exit_cmp;
     }
  
 
-    // root
-    // Show root file system info.
+    // root - Show root file system info.
     if ( gramado_strncmp( prompt, "root", 4 ) == 0 ){
         gramado_system_call (4444, 0, 0, 0);
         goto exit_cmp;
@@ -2914,7 +2484,7 @@ do_compare:
     // sethostname
     // Pega a segunda palavra digitada.
     if ( gramado_strncmp( prompt, "sethostname", 11 ) == 0 ){
-        i++;
+        i++; //#bugbug: Indefined value.
         token = (char *) tokenList[i];
         sethostname( (const char*) tokenList[i], (size_t) 64-1 );
         goto exit_cmp;
@@ -2925,7 +2495,7 @@ do_compare:
     // Pega a segunda palavra digitada.
     if ( gramado_strncmp( prompt, "setusername", 11 ) == 0 )
     {
-        i++;
+        i++; //#bugbug: Indefined value.
         token = (char *) tokenList[i];
         setlogin( (const char*) tokenList[i] );
 
@@ -3030,13 +2600,15 @@ do_compare:
     if ( gramado_strncmp( prompt, "test-net-2", 10 ) == 0 )
     {
 		//#obs: esse buffer � global para que o procedimento de janela possa acessalo
-         __net_ret = (int) gde_setup_net_buffer ( getpid(), __net_buffer, sizeof(__net_buffer) );
-         
+         __net_ret = (int) gde_setup_net_buffer ( getpid(), 
+                               __net_buffer, 
+                               sizeof(__net_buffer) );
+
          if (__net_ret == 0){
-			 printf ("Ok buffer configurado\n");
+             printf ("Ok buffer configurado\n");
          }else{
-	         printf ("fail. buffer nao configurado\n");
-	     };
+             printf ("fail. buffer nao configurado\n");
+         };
          goto exit_cmp;
     }
 
@@ -3081,8 +2653,7 @@ do_compare:
     }
 
 
-	// t2 - 
-	// Test bmp
+	// t2 - Test bmp
     if ( gramado_strncmp( prompt, "t2", 2 ) == 0 )
     {
         shellTestDisplayBMP ();
@@ -3091,8 +2662,7 @@ do_compare:
     }
 
 
-    // t3
-    // Test thread
+    // t3 - Test thread
     if ( gramado_strncmp( prompt, "t3", 2 ) == 0 ||
         gramado_strncmp( prompt, "test-thread", 11 ) == 0)
     {
@@ -3101,39 +2671,27 @@ do_compare:
     }
 
 
-	// t4 - 
-	// Testing fopen function.
-	// file: init.txt
+	// t4 - Testing fopen function.
 	FILE *f1;
 	int ch_test;
 
     if ( gramado_strncmp( prompt, "t4", 2 ) == 0 )
     {
-		printf ("\n t4: Open init.txt \n");
+        printf ("\n t4: Open init.txt \n");
         
-		f1 = fopen ("init.ini","rb");  
-        if( f1 == NULL )
-		{
+        f1 = fopen ("init.ini","rb");  
+        if( f1 == NULL ){
 			printf ("fopen fail\n");
 			//goto exit_cmp;
 		}else{
 			printf ("fopen ok\n");
 			//goto exit_cmp;
-		}
-		
-		//Isso mostra que o arquivo foi carregado corretamente 
-		//na base esperada.
-		//printf("Show f1->_base: %s\n",f1->_base);
-		
-		//printf("stream info:\n");
-		//printf("f1->_base: %x\n",f1->_base);
-		//printf("f1->_ptr: %x\n",f1->_ptr);
-		//printf("f1->_cnt: %d\n",f1->_cnt);
-		
+		};
+
 		// #bugbug ... o fgetc n�o l� na estrutura esperada.
-		printf("Testing fgetc ... \n\n");
-		while(1)
-		{
+        printf ("Testing fgetc ... \n\n");
+        while (1){
+
 			//ch_test = (int) fgetc(f1);
 			ch_test = (int) getc (f1); 
 			if( ch_test == EOF )
@@ -3155,25 +2713,18 @@ do_compare:
     // Saving a file.
     // It's running on qemu.
     // It's not running on real machine.
-    if ( gramado_strncmp ( prompt, "t5", 2 ) == 0 )
-    {
+    if ( gramado_strncmp ( prompt, "t5", 2 ) == 0 ){
         printf ("t5: Saving a file\n");
-		shell_save_file ();
-		printf ("t5: Done :)\n");
+        shell_save_file ();
+        printf ("t5: Done :)\n");
         goto exit_cmp;
     }
 
 
-    // cancelada
-    if ( gramado_strncmp( prompt, "t6", 2 ) == 0 )
-    {
-        printf("~Nothing\n");
-        goto exit_cmp;
-    }
+    // t6 - cancelada
 
 
-    // t7
-    // Testando estado das teclas.
+    // t7 - Testando estado das teclas.
     if ( gramado_strncmp( prompt, "KEYS", 4 ) == 0 ||
          gramado_strncmp( prompt, "keys", 4 ) == 0 || 
          gramado_strncmp( prompt, "T7", 2 ) == 0 || 
@@ -3227,21 +2778,7 @@ do_compare:
     }
 
 
-
-	// t16
-	// Testando execve da libc
-	// Isso funcionou usando o processo init.
-	// #todo: N�o usar exece no garden ... apenas no atacama.
-	if ( gramado_strncmp( prompt, "t16", 3 ) == 0 )
-	{
-		//printf ("Testando execve da gde libc02. *hang\n" );
-		//execve ("gramcode.bin", NULL, NULL );
-		//execve ("jackpot.bin", NULL, NULL );
-		//while (1){}
-		//exit (1);
-		goto exit_cmp;
-	}
-
+	// t16 - cancelado.
 
 
 	// t17 - create process
@@ -3261,15 +2798,15 @@ do_compare:
     }
 
 
-	// t18
-	// OpenTTY.
+	// t18 - OpenTTY.
 	FILE *opentty_fp;
 	FILE *terminal_opentty_fp;
 	int x_ch;
 	int terminal_PID;
 	#define MSG_TERMINALCOMMAND 100 //provis�rio
-	if ( gramado_strncmp ( prompt, "t18", 3 ) == 0 )
-	{
+
+    if ( gramado_strncmp ( prompt, "t18", 3 ) == 0 )
+    {
 		//get tty stream
 		//o shell pega um stream para escrever.
 		//pega o stdout do kernel
@@ -3334,17 +2871,17 @@ do_compare:
 
 
 
-	//t20 - Isso executa o terminal e manda uma mensagem pra ele.
-	int terminal___PID;
-	FILE *_fp;
-	if ( gramado_strncmp ( prompt, "t20", 3 ) == 0 )
-	{
-		terminal___PID = (int) gde_start_terminal ();
-	    if ( terminal___PID <= 0 )
-	    {
-		    printf ("PID fail. We can't send the message\n");
-	        goto exit_cmp;
-	    }else{
+    // t20 - Isso executa o terminal e manda uma mensagem pra ele.
+    int terminal___PID;
+    FILE *_fp;
+
+    if ( gramado_strncmp ( prompt, "t20", 3 ) == 0 )
+    {
+        terminal___PID = (int) gde_start_terminal ();
+        if ( terminal___PID <= 0 ){
+            printf ("PID fail. We can't send the message\n");
+            goto exit_cmp;
+        }else{
 
 			printf ("t20: The terminal PID is %d \n", terminal___PID );
 			printf ("t20: writing in the stdout\n"); //ring3 ??
@@ -3373,14 +2910,14 @@ do_compare:
 			//#importante: N�o t� dando pra enviar mensagens seguidas.
 			//acho que tem que esperar.
 			
-			//__SendMessageToProcess ( terminal___PID, NULL, MSG_TERMINALCOMMAND, 2001, 2001 );
-			__SendMessageToProcess ( terminal___PID, NULL, MSG_TERMINALCOMMAND, 2008, 2008 );
-			//__SendMessageToProcess ( terminal___PID, NULL, MSG_TERMINALCOMMAND, 2009, 2009 );
+			__SendMessageToProcess ( terminal___PID, 
+			    NULL, MSG_TERMINALCOMMAND, 2008, 2008 );
+
 			//...
-		}		
+		}
 		goto exit_cmp;
-	}
-	
+    }
+
 
     // t900 - Clona e executa o filho dado o nome do filho.
     // Isso funciona muito bem.
@@ -3403,40 +2940,17 @@ do_compare:
         shellTaskList();
         goto exit_cmp;
     }
-    
-
-   //teste da �rvore de natal
-   //tem que configurar MSG_TIMER
-    if ( gramado_strncmp( prompt, "timer-xmas", 10 ) == 0 )
-    {
-        /*
-		//#teste de natal.
-		//criando a janela e carregando a imagem
-        xmas_tree_create("dennis.bmp");  
-        apiCreateTimer ( (struct window_d *) window, 
-            (unsigned long) 3, (int) 2 );
-            //(unsigned long) 50, (int) 2 );
-
-		//inicializando.
-        objectX = 50;
-        objectY = 10;
-        deltaX = deltaValue;
-        deltaY = deltaValue;
-        */
-        
-        goto exit_cmp;
-    }
 
 
 	// timer-test
 	// Essa rotina cria um objeto timer que gera um interrup��o 
 	// de tempos em tempos e � tratado pelo procedimento de janelas.
-	if ( gramado_strncmp( prompt, "timer-test", 10 ) == 0 )
-	{
-		__count = 0; //tem que uinicializar;
-		
-		printf("timer-test: Creating timer\n");
-	    printf("%d Hz | sys time %d ms | ticks %d \n", 
+    if ( gramado_strncmp( prompt, "timer-test", 10 ) == 0 )
+    {
+        __count = 0; //tem que uinicializar;
+
+        printf("timer-test: Creating timer\n");
+        printf("%d Hz | sys time %d ms | ticks %d \n", 
             gde_get_systime_info (1), 
             gde_get_systime_info (2), 
             gde_get_systime_info (3) );
@@ -3474,14 +2988,6 @@ do_compare:
     // IN: service, user id.
     if ( gramado_strncmp( prompt, "user-info", 9 ) == 0 ){
         gramado_system_call (156, 0,0,0);
-        goto exit_cmp;
-    }
-
-
-    // version
-    if ( gramado_strncmp( prompt, "version", 7 ) == 0 ){
-        printf ("~version: TODO\n");
-        // show_shell_version ();  //#bugbug
         goto exit_cmp;
     }
 
