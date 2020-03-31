@@ -95,7 +95,13 @@ int __ws_pid;
 
 
 //window.
-struct window_d *__mywindow; 
+struct gws_window_d *__bg_window;
+struct gws_window_d *__taskbar_window; 
+struct gws_window_d *__mywindow;  //generic, for tests.
+// ...
+
+
+
 
 
 int ____saved_server_fd = -1;
@@ -109,30 +115,26 @@ int ____saved_server_fd = -1;
 unsigned long next_response[32];
 
 
+// Prototypes.
+void create_background (void);
+void create_taskbar (void);
 void gws_yield(void);
-  
-  
 
-/*
- * gwsProcedure:
- *     Dialog to handle the event loop.
- * 
- */
- 
 int 
 gwsProcedure ( 
     struct gws_window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-               
-               
-               
-// Protótipo de função interna,
+ 
 int serviceCreateWindow ( void );
 int servicepixelBackBufferPutpixel (void);
 int servicelineBackbufferDrawHorizontalLine (void);
 //...
+
+
+
+
 
 
 // internal.
@@ -265,7 +267,7 @@ void __ipc_message (void){
 
         
     // Send message to the window procedure.
-    gwsProcedure ( (struct window_d *) message_buffer[0], 
+    gwsProcedure ( (struct gws_window_d *) message_buffer[0], 
         (int) message_buffer[1], 
         (unsigned long) message_buffer[2], 
         (unsigned long) message_buffer[3] );
@@ -422,6 +424,48 @@ gwsProcedure (
 
 
 
+void create_background (void)
+{
+    unsigned long w=0;
+    unsigned long h=0;
+    
+    w = gws_get_device_width();
+    h = gws_get_device_height();
+
+
+    __bg_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+                                         1, 1, "gws-bg",  
+                                         0, 0, w, h,   
+                                         gui->screen, 0, 
+                                         COLOR_BACKGROUND, COLOR_BACKGROUND );    
+
+
+    if ( (void *) __bg_window == NULL ){
+        gde_debug_print ("gws: __bg_window fail\n");  
+    }
+}
+
+
+void create_taskbar (void)
+{
+    unsigned long w=0;
+    unsigned long h=0;
+    
+    w = gws_get_device_width();
+    h = gws_get_device_height();
+
+    __taskbar_window = (struct gws_window_d *) createwCreateWindow ( WT_SIMPLE, 
+                                               1, 1, "gws-taskbar",  
+                                               0, 0, w, 36,   
+                                               gui->screen, 0, 
+                                               xCOLOR_GRAY1, xCOLOR_GRAY1 );
+    
+    if ( (void *) __taskbar_window == NULL ){
+        gde_debug_print ("gws: __taskbar_window fail\n");  
+    }
+}
+
+
 /*
  ******************************
  * main: 
@@ -429,9 +473,6 @@ gwsProcedure (
  */
 
 int main (int argc, char **argv){
-
-    unsigned long w=0;
-    unsigned long h=0;
 
 
     // Isso registra uma gramado port.
@@ -445,7 +486,7 @@ int main (int argc, char **argv){
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';   
     
-    
+
     int server_fd = -1; 
     int bind_status = -1;
     
@@ -456,11 +497,9 @@ int main (int argc, char **argv){
     running = 1;
     
 
-    // Serial debug.
-    gde_debug_print ("--------------------------\n");
-    gde_debug_print ("gws: Initializing ...\n");
-
     // #debug
+    gde_debug_print ("---------------------\n");
+    gde_debug_print ("gws: Initializing ...\n");
     printf ("gws: gws is alive !  \n");
 
     
@@ -468,62 +507,11 @@ int main (int argc, char **argv){
     
     gwsInit ();
 
-    
-    // #tests
-    // Isso funciona.
-    //pixelBackBufferPutpixel ( COLOR_RED,   100, 250 );
-    //pixelBackBufferPutpixel ( COLOR_GREEN, 105, 250 );
-    //pixelBackBufferPutpixel ( COLOR_BLUE,  110, 250 );
-    //charBackbufferDrawcharTransparent ( 250,       250, COLOR_RED,   (unsigned long) 'R');
-    //charBackbufferDrawcharTransparent ( 250 +8,    250, COLOR_GREEN, (unsigned long) 'G');
-    //charBackbufferDrawcharTransparent ( 250 +8 +8, 250, COLOR_BLUE,  (unsigned long) 'B');
-    //charBackbufferDrawchar ( 300, 300, (unsigned long) 'X', COLOR_YELLOW, COLOR_RED );
-    //lineBackbufferDrawHorizontalLine ( 400, 88, 500, COLOR_PINK );
-    //rectBackbufferDrawRectangle ( 200, 400, 100, 60, COLOR_YELLOW );
 
-
-    //createwCreateWindow ( WT_SIMPLE, 1, 1, "FIRST-WINDOW",  
-        //10, 60, 
-        //(800/3), (600/3),   
-        //gui->screen, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-    
-
-    //createwCreateWindow ( WT_EDITBOX, 1, 1, "FIRST-WINDOW",  
-      //  80, 80, 
-      //  300, 40,   
-      // gui->screen, 0, xCOLOR_GRAY3, xCOLOR_GRAY3 );
-
-
-    //
-    // Task bar
-    //
-
-    w = gws_get_device_width();
-    h = gws_get_device_height();
-
-    
-    //if(w==0 && h==0)
-        //fail!
-        
-        
-    // #todo:
     // Let's create the traditional green background.
 
-    struct gws_window_d *__bg_window;
-    __bg_window = (struct window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                         1, 1, "gws-bg",  
-                                         0, 0, w, h,   
-                                         gui->screen, 0, 
-                                         COLOR_BACKGROUND, COLOR_BACKGROUND );    
-   
-
-
-    // #log: isso funcionou na máquina real.    
-    __mywindow = (struct window_d *) createwCreateWindow ( WT_SIMPLE, 
-                                         1, 1, "gws-taskbar",  
-                                         0, 0, w, 36,   
-                                         gui->screen, 0, 
-                                         xCOLOR_GRAY1, xCOLOR_GRAY1 );
+    create_background();
+    create_taskbar();
 
  
  
@@ -598,7 +586,7 @@ int main (int argc, char **argv){
     // Calling child.
     //
 
-    dtextDrawText ( (struct window_d *) gui->screen,
+    dtextDrawText ( (struct gws_window_d *) gui->screen,
         8, 80, COLOR_RED, "gws: Calling child" );
         
     

@@ -83,7 +83,7 @@ int main ( int argc, char *argv[] ){
     int client_fd;
 
 
-    debug_print ("---------------------------\n");    
+    debug_print ("--------------------------\n"); 
     debug_print ("gwst.bin: Initializing ...\n");
 
     char *name = "Window name 1";
@@ -128,7 +128,8 @@ int main ( int argc, char *argv[] ){
     // #debug
     printf ("gwst: connecting ...\n");      
 
-    if (connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0){ 
+    if ( connect (client_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0 )
+    { 
         printf("gwst: Connection Failed \n"); 
         return -1; 
     } 
@@ -163,14 +164,13 @@ int main ( int argc, char *argv[] ){
         message_buffer[8] = xCOLOR_GRAY2; 
 
          
-        
         //...
 
         // Write!
-        // Se foi possível enviar, então saimos do loop.        
-        // obs: podemos usar send();
+        // Se foi possível enviar, então saimos do loop.  
 
-        n_writes = write (client_fd, __buffer, sizeof(__buffer));
+        // n_writes = write (client_fd, __buffer, sizeof(__buffer));
+        n_writes = send (client_fd, __buffer, sizeof(__buffer), 0);
        
         if(n_writes>0)
            break;
@@ -211,19 +211,26 @@ int main ( int argc, char *argv[] ){
     debug_print ("gwst: reading ...\n");      
 
 
-       //#caution
-       //we cam stay here for ever.
-       //it's a test yet.
-    
+    //#caution
+    // we can stay here for ever.
+
 response_loop:
-    n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
+
+    //n_reads = read ( client_fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( client_fd, __buffer, sizeof(__buffer), 0 );
+    
     // Não vamos insistir num arquivo vazio.
     if (n_reads<=0){
-         gws_yield();        
+         gws_yield(); 
         goto response_loop;
     }
     
+    //
+    // The msg index.
+    //
+    
     // Get the message sended by the server.
+
     int msg = (int) message_buffer[1];
     
     switch (msg){
@@ -258,18 +265,14 @@ response_loop:
 // Process reply.
 //
 
-process_reply:
+// A resposta tras o window id no início do buffer.
     
-    // A resposta tras o window id no início do buffer.
-    printf ("gwst: Window ID %d \n", message_buffer[0] );
-
-
-//
-// Done!
-//
+process_reply:
 
     debug_print ("gwst: bye\n"); 
-    printf ("gwst: bye\n");
+
+    printf ("gwst: Window ID %d \n", message_buffer[0] );
+    printf ("gwst: Bye\n");
 
     return 0;
 }
