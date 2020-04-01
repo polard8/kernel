@@ -80,18 +80,21 @@ See: https://wiki.osdev.org/Graphics_stack
 // O buffer para  as mensagens recebidas via socket.
 //
 
-char __buffer[512];   
-
+// Our PID.
+int __ws_pid;
 
 int running = 0;
+
+int ____saved_server_fd = -1;
+
+char __buffer[512];   
 
 
 // Our desktop;
 struct desktop_d *__desktop;
 
 
-// Our PID.
-int __ws_pid;
+int dirty_status = 0;
 
 
 //window.
@@ -102,9 +105,6 @@ struct gws_window_d *__mywindow;  //generic, for tests.
 
 
 
-
-
-int ____saved_server_fd = -1;
 
 
 // Esses valores serão enviados como 
@@ -133,8 +133,23 @@ int servicelineBackbufferDrawHorizontalLine (void);
 //...
 
 
+/*
+// internal
+void client_shutdown (int fd);
+void client_shutdown (int fd)
+{
+	//remove client
+	//deallocate resources.
+}
+*/
 
-
+/*
+void client_die(int fd);
+void client_die(int fd)
+{
+    client_shutdown(fd);
+}
+*/
 
 
 // internal.
@@ -142,7 +157,8 @@ int servicelineBackbufferDrawHorizontalLine (void);
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
 
-void __socket_messages (int fd){
+//void handle_request (int fd);
+void handle_request (int fd){
 
     // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
@@ -152,7 +168,7 @@ void __socket_messages (int fd){
 
 
     if (fd<0){
-        gde_debug_print ("__socket_messages: fd\n");
+        gde_debug_print ("handle_request: fd\n");
         return;
     }
 
@@ -165,7 +181,12 @@ void __socket_messages (int fd){
     // o kernel copia para aquele arquivo ao qual esse estivere conectado.
     // olhando em accept[0]
 
-    n_reads = read ( fd, __buffer, sizeof(__buffer));
+    //
+    // Recv.
+    //
+    
+    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = recv ( fd, __buffer, sizeof(__buffer), 0 );
 
     // 
     // Se nao tem o que ler. saimos. 
@@ -183,10 +204,31 @@ void __socket_messages (int fd){
 
     debug_print ("gws: Got a request!\n");
     debug_print ("gws: Calling window procedure \n");
+    
+    
+    // #todo.
+    // Dependendo do tipo de request, então construiremos
+    // a resposta ou prestatemos os serviço.
+    // Para cada tipo de request o servidor precisa construir 
+    // uma resposta diferente.
+    // O request afeta os campos da mensagem.
+    // Esses campos estão em um buffer, mas poderiam estar
+    // em um arquivo json.
+    
+    // Types:
+    // + Null: fail.
+    // + Identify: The server needs to identify itself.
+    // + Get all objects:
+    // + Set inspected object:
+    // + Set property: Probably setting a property of an object.
+    // + Disconnect:
+    // ...
+    
+    
                 
     //#debug: para a máquina real.
     //printf ("gws: got a message!\n");
-    //printf ("gws: __socket_messages: calling window procedure \n");
+    //printf ("gws: handle_request: calling window procedure \n");
  
                 
     // realiza o serviço.
@@ -221,12 +263,18 @@ __again:
     //sprintf (__buffer," ................. This is a response");
                 
     // Primeiros longs do buffer.
-    message_buffer[0] = next_response[0];         //  Window ID.
-    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; //next_response[1] 
+    message_buffer[0] = next_response[0];         // Window ID.
+    message_buffer[1] = SERVER_PACKET_TYPE_REPLY; // next_response[1] 
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
-    n_writes = write ( fd, __buffer, sizeof(__buffer) );
+    //
+    // Send
+    //
+ 
+    //n_writes = write ( fd, __buffer, sizeof(__buffer) );
+    n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
+    
     if (n_writes<=0)
         goto __again;
 
@@ -250,8 +298,9 @@ __again:
 
 // internal
 // System ipc messages. (It's like a signal)
-void __ipc_message (void){
-
+//void handle_ipc_message (void);
+void handle_ipc_message (void){
+    
     unsigned long message_buffer[5];   
 
     gde_enter_critical_section ();
@@ -513,35 +562,24 @@ int main (int argc, char **argv){
     create_background();
     create_taskbar();
 
- 
+    // Activate the compositor.
+    dirty_status = 1;
  
 
-    //
     // Desktop
-    //
-
     // Getting current desktop;
 
-    __desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
-
-
-     //draw text inside a window.
-     //draw_text ( (struct window_d *) __mywindow,
-       // 40, 40,
-        //COLOR_RED,
-         //"Drawing some text inside a window!" );
-
-
-    //
     // Register.
-    //
-
+    // Register window server as the current server for this
+    // desktop.
+    
+    
+    __desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
 
     __ws_pid = (int) getpid();
 
-    // Set ws PID
-    // Setar esse processo como o ws do sistema.
     gramado_system_call ( 513, __desktop, __ws_pid, __ws_pid );
+
 
 
 
@@ -596,8 +634,6 @@ int main (int argc, char **argv){
     gws_show_backbuffer ();
 
 
-
-
     printf ("gws: * Calling child \n");
     // #test
     // Nesse test, s2 usará socket para se conectar
@@ -621,25 +657,21 @@ int main (int argc, char **argv){
 
 // loop:
 
+      // + Normal messages. (It's like signals.)
+      // + Compositor. (Redraw dirty rectangles)
+      // + Socket requests.
+ 
+     //while (running == 1){
      while (1){
-       
-        // Normal messages. (It's like signals.)
-        //debug_print("$m");
-         __ipc_message ();
-        
 
-        // Repaint dirty rectangles.
-        //debug_print("$c");
-        //if( dirty_status == 1 )
-            compositor();
-        
-        // Messages sended via sockets.
-        //debug_print("$s");
-        // It works.
-        __socket_messages (____saved_server_fd);
+         handle_ipc_message();
 
-        //...
+         if( dirty_status == 1 )
+             compositor();
+        
+         handle_request (____saved_server_fd);
     };
+
 
     //
     // =======================================
@@ -694,13 +726,21 @@ int serviceCreateWindow (void){
 
 
 
+    if ( (void *) __mywindow == NULL ){
+       gde_debug_print ("createwCreateWindow: fail\n");
+       //return -1;
+    }
+
+
     int id = -1;
     id = gwsRegisterWindow ( __mywindow );
 
-    if (id<0)
-        gde_debug_print("serviceCreateWindow: Couldn't register window\n");
-
+    if (id<0){
+        gde_debug_print ("serviceCreateWindow: Couldn't register window\n");
+        //return -1;
+    }
     
+  
     // preparando a resposta.
     // Ela será enviada depois pelo loop de socket.
     next_response[0] = (unsigned long) id; //window
