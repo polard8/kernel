@@ -1,8 +1,7 @@
 
 
-int main (){
 
-
+int main ()    {
 
 
 

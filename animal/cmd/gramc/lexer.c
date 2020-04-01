@@ -106,22 +106,23 @@ begin:
 
     c = getc (finput);
     
-    printf("%c ",c); //#debug
+    // #debug
+    //printf ("%c ",c); 
 
     for (;;)
     {
         switch (c)
         {
 			// ## spaces ##	
-			//se encontramos um espaço, pegamos o próximo e saímos do switch 
-			//para reentrarmos no switch
+			// Se encontramos um espaço, pegamos o próximo e saímos do switch 
+			// para reentrarmos no switch.
                 
             case ' ':
             case '\t':
             case '\f':
             case '\r':
             case '\b':
-                c = getc(finput);
+                c = getc (finput);
                 break;
 
 			// ## new lines ##	
@@ -276,6 +277,7 @@ begin:
             */
 				
 
+            // Se não é espaço, nem comentário, nem preprocessador.
             default:
                 return (int) c;
 
@@ -303,7 +305,8 @@ int yylex (){
 
 again:
 
-    //Pega um char da stream de entrada.
+    // Pega um char da stream de entrada.
+    // Mas pula os espaços e os comentários.
 
     c = skip_white_space ();
     
@@ -311,15 +314,17 @@ again:
     {
         case 0:
         case EOF:
-            printf ("yylex: EOF\n");
+            
+            // #debug
+            //printf ("yylex: EOF\n");
             
             eofno++;  
             value = TOKENEOF;
-
-		    //#test
 		    return (value);
 		    break;
 
+        
+        // identifier ou keyword.
         case 'A':
         case 'B':
         case 'C':
@@ -376,14 +381,20 @@ again:
 
             p = token_buffer;
 
+            // Se for um dos chars acima, 
+            // então vamos contruir uma paçavra num buffer.
+            
             while (1)
             {
+			    *p = c;  // Coloca o char no buffer.
+			    p++;     // Incrementa o buffer.
 
-				//@todo: limite tamanho do buffer
-
-			    //coloca no buffer.
-			    *p = c;
-			    p++;
+                
+                // Pega o próximo char da palavra.
+                // #bugbug:
+                // Se esse ungetc() funcionar com o char depois da palavra,
+                // então temos que ter certeza que ele funcionou corretamente,
+                // e que poderemos recuperar o char recolocado com o ungetc().
 
                 c = getc (finput);
 
@@ -581,8 +592,10 @@ again:
 
             //...
 
+            //return (value);
             break;
 
+        // number ?
         case '0':
         case '1':
         case '2':
@@ -675,7 +688,8 @@ again:
 			constant_done:
             break;
 	
-        //String
+        // String
+        // Começando com aspas.
         case '\"':
         {
             c = getc (finput);
@@ -710,29 +724,23 @@ again:
 	        //yylval.ttype = build_string (p - token_buffer, token_buffer);
 	        //TREE_TYPE (yylval.ttype) = char_array_type_node;
 
-			//avisa que é uma string ... ela vai estar no token_buffer.
-	        //value = STRING; 
+			// Avisa que é uma string ... ela vai estar no token_buffer.
 			value = TOKENSTRING;
-			
 			break;
         };	
 		
-        //separators (){}[],.;:?
-        case '(':
-        case ')':
-        case '{':
-        case '}':
-        case '[':
-        case ']':
-        case ',':
-        case '.':
-        case ';':
-        case ':':
-        case '?':
+        // Separators (){}[],.;:?
+        // 
+        case '(': case ')':
+        case '{': case '}':
+        case '[': case ']':
+        case ',': case '.': case ';': case ':': case '?':
             p = token_buffer;
             *p++ = c;
             *p++ = 0;
+            
             value = TOKENSEPARATOR;
+            //return (value); //#test
             break;
 
 
@@ -756,53 +764,18 @@ again:
 
 	        switch (c)
 	        {
-                case '+':
-	                lexer_code = PLUS_EXPR; 
-					break;
-					
-                case '-':
-	                lexer_code = MINUS_EXPR; 
-					break;
-					
-                case '&':
-	                lexer_code = BIT_AND_EXPR; 
-					break;
-					
-                case '|':
-	                lexer_code = BIT_IOR_EXPR; 
-					break;
-
-                case '*':
-	                lexer_code = MULT_EXPR; 
-					break;
-
-                case '/':
-	                lexer_code = TRUNC_DIV_EXPR; 
-					break;
-
-                case '%':
-                    lexer_code = TRUNC_MOD_EXPR; 
-					break;
-
-                case '^':
-	                lexer_code = BIT_XOR_EXPR; 
-					break;
-
-                case LSHIFT:
-	                lexer_code = LSHIFT_EXPR; 
-					break;
-
-	            case RSHIFT:
-	               lexer_code = RSHIFT_EXPR; 
-					break;
-					
-                case '<':
-	                lexer_code = LT_EXPR; 
-					break;
-					
-                case '>':
-	                lexer_code = GT_EXPR; 
-					break;
+                case '+':    lexer_code = PLUS_EXPR;       break;
+                case '-':    lexer_code = MINUS_EXPR;      break;
+                case '&':    lexer_code = BIT_AND_EXPR;    break;
+                case '|':    lexer_code = BIT_IOR_EXPR;    break;
+                case '*':    lexer_code = MULT_EXPR;       break;
+                case '/':    lexer_code = TRUNC_DIV_EXPR;  break;
+                case '%':    lexer_code = TRUNC_MOD_EXPR;  break;
+                case '^':    lexer_code = BIT_XOR_EXPR;    break;
+                case LSHIFT: lexer_code = LSHIFT_EXPR;     break;
+                case RSHIFT: lexer_code = RSHIFT_EXPR;     break;
+                case '<':    lexer_code = LT_EXPR;         break;
+                case '>':    lexer_code = GT_EXPR;         break;
 	        }	
 
 	        c1 = getc (finput);
@@ -836,30 +809,19 @@ again:
 				
 	                switch (c)
 	                {
-	                    case '+':
-	                        value = PLUSPLUS; 
-						    goto done;
-                        case '-':
-	                        value = MINUSMINUS; 
-							goto done;
-                        case '&':
-	                        value = ANDAND; 
-							goto done;
-                        case '|':
-	                        value = OROR; 
-							goto done;
-                        case '<':
-	                        c = LSHIFT;
-	                        goto combine;
-                        case '>':
-	                        c = RSHIFT;
-	                        goto combine;
+	                    case '+': value = PLUSPLUS;    goto done;
+                        case '-': value = MINUSMINUS;  goto done;
+                        case '&': value = ANDAND;      goto done;
+                        case '|': value = OROR;        goto done;
+                        
+                        case '<': c = LSHIFT;          goto combine;
+                        case '>': c = RSHIFT;          goto combine;
 	                }
 					
             }else if ((c == '-') && (c1 == '>')) {
 				
-		         value = POINTSAT; 
-				 goto done; 
+		        value = POINTSAT; 
+				goto done; 
 		    }
 	        
 			ungetc (c1, finput);
@@ -870,6 +832,7 @@ again:
                 goto done;
         };
 
+        //
         default:
             value = c;
     

@@ -518,6 +518,23 @@ int __getc ( FILE *stream ){
     // # Read!
     //
     
+    
+    // #test
+    // have ungotten ??
+    if ( stream->have_ungotten == TRUE )
+    {
+        // Pegamos o ungotten.
+        ch = (int) stream->ungotten;
+        
+        // não mexemos nos contadores.
+        //stream->_p++;
+        //stream->_cnt--;
+        
+        stream->have_ungotten = FALSE;
+        
+        return (int) ch;
+    }
+    
     // Pega o char no posicionamento absoluto do arquivo.
     // Ajust file.
         
@@ -2283,6 +2300,13 @@ ssize_t getline(char** lineptr, size_t* n, FILE* stream)
  *********************************
  * ungetc:
  */
+
+
+// #todo:
+// #importante:
+// Se recolocarmos alguma coisa com o ungetc(),
+// então e getc() deve checar se antes temos um unget
+// se tiver deve pega-lo, so depois fazer seu trabalho.
 
 int ungetc ( int c, FILE *stream ){
 

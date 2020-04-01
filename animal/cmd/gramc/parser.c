@@ -1847,23 +1847,23 @@ int parse (){
     
     while (running == 1)
     {
-        // EOF: 
-        // O lexer nos disse que acabou.
+        // EOF: O lexer nos disse que acabou.
         if ( token == TOKENEOF )
-        {
-            printf ("parse: ~EOF\n");
-            running = 0;
-            break;
+        { 
+            printf ("parse: ~EOF\n"); 
+            running = 0; 
+            break; 
         }
-        
+ 
         // INT CHAR 
         if ( token == TOKENTYPE )
         {
             id[ID_TYPE] = type_found; 
-            token = yylex();  //next
+            token = yylex();  // pega o identificador.
         }
         
         // symbol depois do tipo.
+        // #bugbug: E se o anterior não foi um tipo ??
         
         //while (tk != ';' && tk != '}')
         while (1)
@@ -1885,9 +1885,11 @@ int parse (){
             
             // Se não é um symbol.
             // Deveríamos ter um symbol logo após o tipo.
+
             if (token != TOKENIDENTIFIER) { 
-                //printf ("%d: bad global declaration\n", line); 
-                printf ("%d: symbol not found!\n", lineno);
+                printf ("%d: bad global declaration\n", lineno); 
+                //printf ("%d: Symbol not found! \n", lineno);
+                printf("%s\n",real_token_buffer );
                 return -1; 
             }
             
@@ -1896,11 +1898,8 @@ int parse (){
             // então não vamos determinar a classe ainda.
 
             // #debug
-            printf ("%d: symbol found!\n", lineno);
-            id[ID_TOKEN] = TOKENIDENTIFIER;
-            id[ID_STACK_OFFSET] = stack_index;
-            id[ID_CLASS] = ID_CLASS_VAR;  // determinando.
-            
+            printf ("%d: $$$ symbol found! {%s} \n", lineno, real_token_buffer);
+
             if ( strncmp( (char *) real_token_buffer, "main", 4 ) == 0  )
             {
                 id[ID_OPCODE] = OPCODE_MAIN;
@@ -1908,17 +1907,28 @@ int parse (){
 
             // Salva o símbolo. #isso funciona.
             sprintf ( save_symbol, real_token_buffer );
+
+            id[ID_TOKEN] = TOKENIDENTIFIER;
+            id[ID_STACK_OFFSET] = stack_index;
+            id[ID_CLASS] = ID_CLASS_VAR;  // determinando.
+            
+            // Avança para depois de um identifier.
                               
             token = yylex();  //next
             
             // Depois do symbol
+            //printf("%s\n",real_token_buffer );
             
-            // FUNCTION
+            // FUNCTION: Pilha de parâmetros.
+            // () 
             if ( token == TOKENSEPARATOR )
             {
+            	//printf("::::%s\n",real_token_buffer );
+
                 // '(': abertura de pilha de parâmetros. 
                 if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                 {
+                	//printf ("::(\n");
                     // Mudando a classe. Agora temos uma função.
                     id[ID_CLASS] = ID_CLASS_FUNCTION;
                                 
@@ -1930,9 +1940,10 @@ int parse (){
                         
                         if ( token == TOKENSEPARATOR )
                         {
-                            // terminal a pilha de parãmetros.
+                            // Termina a pilha de parâmetros.
                             if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
                             {
+                            	//printf ("::)\n");
                                 break;
                             }
                         }        
@@ -1941,7 +1952,7 @@ int parse (){
                     };
                     
                     token = yylex();  //next
-                    
+
                     //obs: sem espaço entre ')' e '{';
                     
                     // acabou a pilha de parâmetros.
@@ -1979,7 +1990,7 @@ int parse (){
                             if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
                             {
                                 //#debug
-                                printf ("%d: Separator } found!\n", lineno);
+                                //printf ("%d: Separator } found!\n", lineno);
                                 break;
                             }
                         }
@@ -2007,7 +2018,7 @@ int parse (){
                 // Separador de symbols.
                 if ( strncmp( (char *) real_token_buffer, ",", 1 ) == 0  )
                 {
-                    printf ("%d: #debug: , found\n", lineno);
+                    printf ("%d: #debug: , found\n", lineno); 
                     break;
                 }
                 
@@ -2015,12 +2026,14 @@ int parse (){
                 // O que temos aqui ???
                 // Cuidado.
                 
-            // Não era um separador depois do synbol.
-            }else{
-                printf ("%d: Separator expected!\n", lineno);
+              // Não era um separador depois do symbol.
+            } else {
+
+                printf ("%d: Separator expected!\n", lineno); 
                 exit(-1);
             };
             
+
             //#debug
             //printf ("%d: Unexpected error!\n", lineno);
             break;
