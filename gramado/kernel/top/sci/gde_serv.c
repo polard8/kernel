@@ -935,7 +935,7 @@ gde_extra_services (
      //poderia ser um indice na tabela de arquivos abertos pelo processo.
      // #todo: rever.
     if ( number == 4002 ){
-        return (void *) kernel_fopen ( (const char *) arg2, "r+" );
+        return (void *) k_fopen ( (const char *) arg2, "r+" );
     }
 
 
@@ -2518,16 +2518,16 @@ gde_services (
 	
 	
 		//246 ~ 249 reservado para libc support.	
-			
-			
-			
-		// 246	
-		// #todo
-		// Essa rotina est� servido � chamada openat() da libc03.
-		// IN: dirfd, pathname, flags.
-		case 246:
-			return (void *) __openat ( (int) arg2, (const char *) arg3, (int) arg4 ); 
-			break;
+
+
+
+        // 246
+        // IN: dirfd, pathname, flags.
+        case 246:
+            return (void *) k_openat ( (int) arg2, 
+                                (const char *) arg3, (int) arg4 ); 
+            break;
+
 
 
         // 247 - pipe() support.

@@ -877,18 +877,10 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 #define kprintf printf
 
 
-
-//Isso pertence � fcntl
-int __openat (int dirfd, const char *pathname, int flags);
-file *kernel_fopen ( const char *filename, const char *mode );    //@todo: 
-int fclose (file *f); 
-
-
 int printf (const char *format, ...);
 int sprintf (char *str, const char *format, ...);
-int fprintf (file *stream, const char *format, ...);
+int fprintf (file *f, const char *format, ...);
 int putchar ( int ch );
-
 
 
 int kputs ( const char *str );
@@ -912,10 +904,16 @@ printi ( char **out,
          int pad, 
          int letbase );
 
-
 int print (char **out, int *varg);
 
 
+
+
+
+
+int k_openat (int dirfd, const char *pathname, int flags);
+file *k_fopen ( const char *filename, const char *mode ); 
+int k_fclose (file *f); 
 int k_ungetc ( int c, file *f );
 int k_fgetc ( file *f );
 int k_fputc ( int ch, file *f );

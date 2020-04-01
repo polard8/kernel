@@ -41,7 +41,7 @@ extern unsigned long SavedBPP;
  *     Close a file. 
  */
 
-int fclose (file *f){
+int k_fclose (file *f){
 
     if ( (void *) f == NULL ){
         return EOF;
@@ -99,32 +99,26 @@ int fclose (file *f){
 // Precisamos inicializar corretamente a estrutura antes de 
 // retornarmos o ponteiro.
 
-file *kernel_fopen ( const char *filename, const char *mode ){
+file *k_fopen ( const char *filename, const char *mode ){
 
-    unsigned long fileret;
-
-    int i;
-    
-	//struct _iobuf *stream;
-    file *stream;
+    file *f;
 
 	// Buffer para armazenar o arquivo que vamos abrir.
     char *file_buffer;
 
-	// #bugbug: 
-	// aqui podemos usar o kmalloc ?
-	// Buffer usado para colocar a estrutura, 
-	// mas o problema é o free que ainda não funciona.
+    int i=0;    
+    unsigned long fileret;
 
-    // 1024 é desperdício.
-    unsigned char struct_buffer[1024];
 
-    //
-    // stream;
-    //
 
-	//buffer da estrutura.
-    stream = (file *) &struct_buffer[0];
+    f = (file *) kmalloc( sizeof(file) );
+
+    if ( (void*) f == NULL ){
+        kprintf ("k_fopen: f\n");
+        refresh_screen();
+        return NULL;
+    }
+
 
 
 	// #bugbug
@@ -154,7 +148,7 @@ file *kernel_fopen ( const char *filename, const char *mode ){
     size_t s = (size_t) fsGetFileSize ( (unsigned char *) filename );
 
     if ( s <= 0 ){
-        printf ("fopen: file size \n");
+        printf ("k_fopen: file size \n");
         goto fail;
     }
 
@@ -192,50 +186,40 @@ file *kernel_fopen ( const char *filename, const char *mode ){
 	//file_buffer = (char *) newPage();
     file_buffer = (char *) kmalloc (s);
 
-    if ( (char *) file_buffer == NULL )
-    {
-        printf ("fopen: file_buffer \n");
+    if ( (char *) file_buffer == NULL ){
+        printf ("k_fopen: file_buffer \n");
         goto fail;
-
-		//refresh_screen ();
-		//return (FILE *) 0;
     }
 
 
-	//
-	// Configurando a stream;
-	//
+	// Configurando a estrutura.
 
-    if ( (void *) stream == NULL )
-    {
-        printf ("fopen: stream \n");
+    if ( (void *) f == NULL ){
+        printf ("k_fopen: stream \n");
         goto fail;
-    
-		//refresh_screen();
-		//return (FILE *) 0;
 
-	}else{
+    }else{
 
-        stream->used = 1;
-        stream->magic = 1234;
+        f->used = 1;
+        f->magic = 1234;
 
-        stream->_base = file_buffer;
-        stream->_bf._base = file_buffer;
-        stream->_lbfsize = s;    // File size.
-        stream->_r = 0;
-        stream->_w = 0;
-        stream->_p = stream->_base;
+        f->_base = file_buffer;
+        f->_bf._base = file_buffer;
+        f->_lbfsize = s;    // File size.
+        f->_r = 0;
+        f->_w = 0;
+        f->_p = f->_base;
 
 		//?? #todo: 
 		// precisamos de um id
 		// Esse ID é um indice da estrutura de processo.
 
-        stream->_file = 0; 
+        f->_file = 0; 
 
-        stream->_tmpfname = (char *) filename;
+        f->_tmpfname = (char *) filename;
 
         // Quanto falta para acabar o arquivo.
-        stream->_cnt = s;
+        f->_cnt = s;
 
 
         // #todo
@@ -255,13 +239,12 @@ file *kernel_fopen ( const char *filename, const char *mode ){
 
     if ( current_target_dir.current_dir_address == 0 )
     {
-        printf ("fopen: current_target_dir.current_dir_address fail \n");
+        printf ("k_fopen: current_target_dir.current_dir_address fail \n");
 
 		//reset.
         current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
 
-        for ( i=0; i< 11; i++ )
-        {
+        for ( i=0; i<11; i++ ){
             current_target_dir.name[i] = '\0';
         }
 
@@ -280,23 +263,19 @@ file *kernel_fopen ( const char *filename, const char *mode ){
     fileret = fsLoadFile ( VOLUME1_FAT_ADDRESS, 
                   current_target_dir.current_dir_address, 
                   (unsigned char *) filename, 
-                  (unsigned long) stream->_base );
+                  (unsigned long) f->_base );
 
 	//printf ("after_fsLoadFile: %s\n", filename );  
 
-    if ( fileret != 0 )
-    {
-        stream = NULL;
-
-        printf ("fopen: fsLoadFile fail\n");
+    if ( fileret != 0 ){
+        printf ("k_fopen: fsLoadFile fail\n");
+        f = NULL;
         goto fail;
-
-		//refresh_screen ();
-		//return (FILE *) 0;
     }
 
+
 done:
-    return (file *) stream;
+    return (file *) f;
 
 fail:
 
@@ -305,8 +284,8 @@ fail:
 }
 
 
-//Isso pertence à fcntl
-int __openat (int dirfd, const char *pathname, int flags){
+
+int k_openat (int dirfd, const char *pathname, int flags){
 
     file *f;
     
@@ -316,10 +295,14 @@ int __openat (int dirfd, const char *pathname, int flags){
     // #bugbug
     // Improvisando com essa que funciona o carregamento.
     
-    f = (file *) kernel_fopen ( (const char *) pathname, "r" );
+    f = (file *) k_fopen ( (const char *) pathname, "r" );
 
-    if (!f)
+    if (!f){
+    	kprintf ("k_openat: f\n");
+    	refresh_screen();
         return -1;
+    }
+
 
     // #bugbug
     // Esse número esta errado ??
@@ -346,12 +329,15 @@ int __openat (int dirfd, const char *pathname, int flags){
  */
 
 int 
-prints ( char **out, 
-         const char *string, 
-         int width, 
-         int pad )
+prints ( 
+    char **out, 
+    const char *string, 
+    int width, 
+    int pad )
 {
+
     register int pc = 0, padchar = ' ';
+
 
     if (width > 0) 
     {
@@ -362,7 +348,7 @@ prints ( char **out,
 		if (len >= width) width = 0;
 		else width -= len;
 		if (pad & PAD_ZERO) padchar = '0';
-    };
+    }
 
 
     if( !(pad & PAD_RIGHT) ) 
@@ -372,7 +358,7 @@ prints ( char **out,
 		    printchar (out,padchar);
 			++pc;
 		};
-    };
+    }
 
 
     for ( ; *string; ++string )
@@ -400,22 +386,25 @@ prints ( char **out,
  */
 
 int 
-printi ( char **out, 
-         int i, 
-         int b, 
-         int sg, 
-         int width, 
-         int pad, 
-         int letbase )
+printi (
+    char **out, 
+    int i, 
+    int b, 
+    int sg, 
+    int width, 
+    int pad, 
+    int letbase )
 {
+
     char print_buf[PRINT_BUF_LEN];
+    
     register char *s;
     register int t, neg = 0, pc = 0;
     register unsigned int u = i;
 
 
-    if ( i == 0 ) 
-    {
+    if ( i == 0 ) {
+
 		print_buf[0] = '0';
 		print_buf[1] = '\0';
 		
@@ -483,6 +472,7 @@ int print ( char **out, int *varg ){
     register int width, pad;
     register int pc = 0;
     register char *format = (char *) (*varg++);
+    
     char scr[2];
 
     for ( ; *format != 0; ++format ) 
@@ -587,6 +577,10 @@ int print ( char **out, int *varg ){
 // Devemos tentar usar o mesmo printf implementado na libc
 // Essa aqui não está no padrão.
 
+// #todo:
+// Vamos substtuir essa função por uma de licensa bsd.
+// Olhar na biblioteca.
+
 int printf ( const char *format, ... ){
 
     register int *varg = (int *) (&format);
@@ -609,8 +603,6 @@ int vsprintf(char *string, const char *format, va_list ap)
 {
 }
 */
-
-
 
 
 /*
@@ -660,77 +652,21 @@ int sprintf ( char *str, const char *format, ... ){
 // Isso significa que fprintf não pode ativar a rotina de pintura
 // enquanto não encontrar um '\n'
 
-int fprintf ( file *stream, const char *format, ... ){
+int fprintf ( file *f, const char *format, ... ){
 
     register int *varg = (int *) (&format);
 
-	//
-	// Validation.
-	//
 
-	//#debug
-	//kprintf ("klibc-stdio-fprintf: stream=%x \n",stream);
-	//kprintf ("klibc-stdio-fprintf: stdout=%x \n",stdout);
-
-
-    if ( (void *) stream == NULL ){
-        panic ("kstdio-fprintf: stream\n");
+    if ( (void *) f == NULL ){
+        panic ("syslib-fprintf: f\n");
 
     }else{
 
-        if ( stream->used != 1 || stream->magic != 1234 ){
-            panic ("kstdio-fprintf: stream validation\n");
+        if ( f->used != 1 || f->magic != 1234 ){
+            panic ("syslib-fprintf: f validation\n");
         }
 		//...
     };
-
-
-	//
-	// print 
-	//
-
-	// #obs:
-	// Isso deve ser feito antes e alterarmos o ponteiro _ptr de stdout.
-	
-//print:
-	
-	
-	// Se a stream for a stdout então vamos ter alertar para pintar.
-	//#obs: esquema antigo, não usaremos mais isso por enquanto.
-	
-	/*
-	if (stream == stdout)
-	{
-		//Indicamos que deve pintar.
-		//isso será ativado pelo fflush
-		CurrentTTY->stdout_status = 1;
-		
-		//se temos um print pendente não precisamos mudar o last.
-		//se não temos um print pendente então precisamos mudar o last.
-		if ( CurrentTTY->print_pending == 0 )
-		{
-			//#bugbug: Na verdade só podemos ativar essa
-			//pendência quando encontrarmos um '\n' '\r'
-			//então então o terminal pode mostrar na tela o conteúdo
-			//de uma linha, normalmente a última do terminal,
-			//mudando de linha efetua-se o scroll.
-			//>> Se ainda não temos um '\n' só um fflush mostraria
-			//o conteúdo na tela.
-			
-			
-			//#importante
-			//Mudamos isso para printchar
-			//então somente depois de encontrar o \n ativaremos essa flag.
-			//Isso na teoria.Porque na prática tá imprimindo pra todos os casos. haha
-			//CurrentTTY->print_pending = 1;
-			
-	        // Indicamos de onde a rotina de pintura deve começar.
-		    CurrentTTY->stdout_last_ptr = stdout->_p;
-		}
-	}	
-	*/
-
-
 
 
 	//
@@ -738,7 +674,7 @@ int fprintf ( file *stream, const char *format, ... ){
 	//
 
 	// Colocamos no ponteiro e nao na base.
-    char *str = (char *) stream->_p;
+    char *str = (char *) f->_p;
 
 	// #todo
 	// Tem que atualizar o ponteiro com uma strlen.
@@ -753,7 +689,7 @@ int fprintf ( file *stream, const char *format, ... ){
 	// Depois de ter imprimido então atualizamos o ponteiro de entrada 
 	// no arquivo.
 
-    stream->_p = stream->_p + len;
+    f->_p = f->_p + len;
 
 
     return (int) status;
@@ -858,7 +794,7 @@ int k_fgetc ( file *f ){
 
 
     if ( (void *) f == NULL ){
-        printf ("k_fgetc: stream struct fail\n");
+        printf ("k_fgetc: f\n");
         refresh_screen();
         return EOF;
  
@@ -891,7 +827,7 @@ int k_fgetc ( file *f ){
 		//nao podemos acessar um ponteiro nulo... no caso endereço.
 
         if ( f->_p == 0 ){
-            printf ("#debug: fgetc: stream struct fail\n");
+            printf ("k_fgetc: f->_p \n");
             refresh_screen();
             return EOF;
             
@@ -914,7 +850,7 @@ int k_fgetc ( file *f ){
 
 
 	//#debug
-    printf ("fgetc: fail\n");
+    printf ("k_fgetc: fail\n");
     refresh_screen();
  
     return EOF;
@@ -1154,7 +1090,7 @@ int k_fscanf (file *f, const char *format, ... )
     // Existe um scanf completo em ring3.
     // Talvez não precisamos de outro aqui.
 
-    printf ("k_fscanf: todo \n");
+    printf ("k_fscanf: [TODO] \n");
     return (int) -1;
 }
 
@@ -1204,14 +1140,7 @@ void k_rewind ( file *f ){
     if ( (void *) f == NULL )
         return;
 
-
-    // ?? #bugbug
-    // stdin pertence ao kernel.
-    
-    f->_p = stdin->_base;
-    
-    // todo: use this one.
-    //f->_p = f->_base;
+    f->_p = f->_base;
 }
 
 
@@ -1375,7 +1304,7 @@ void stdio_ClearToStartOfLine()
 
 unsigned long input ( unsigned long ch ){
 
-    int i;
+    int i=0;
 
 	// Converte 'unsigned long' em 'char'.
     char c = (char) ch;
@@ -1499,12 +1428,14 @@ input_done:
 int stdioInitialize (void){
 
     int Status = 0;
-    int i;
+    int i=0;
 
     // Buffers para as estruturas.
     unsigned char *buffer0;
     unsigned char *buffer1;
     unsigned char *buffer2;
+
+
 
     int cWidth = get_char_width ();
     int cHeight = get_char_height ();
@@ -1772,7 +1703,7 @@ int stdioInitialize (void){
     return 0;
 
 fail:
-    panic ("stdio-stdioInitialize: fail\n");
+    panic ("kstdio-stdioInitialize: fail\n");
 }
 
 
@@ -1881,21 +1812,21 @@ int k_setvbuf (file *f, char *buf, int mode, size_t size){
 
 		//#todo
 		//se o buffer é válido.
-        //if (stream->_bf._base != NULL) 
+        //if (f->_bf._base != NULL) 
         //{
-            //if (stream->cnt > 0)
-                //fflush (stream);
+            //if (f->cnt > 0)
+                //fflush (f);
                 
-            //free (stream->buf);
+            //free (f->buf);
         //}
         
         // Udate stream.
         f->_bf._base = buf;
         f->_lbfsize = size;        
-        // ?? stream->bufmode = mode;
+        // ?? f->bufmode = mode;
 
         f->_p = buf;
-        // ??stream->cnt = 0;
+        // ??f->cnt = 0;
         //...
     };
 
