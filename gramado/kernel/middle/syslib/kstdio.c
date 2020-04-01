@@ -619,7 +619,7 @@ int vsprintf(char *string, const char *format, va_list ap)
  *     provisório ...
  */
 
-int puts ( const char *str )
+int kputs ( const char *str )
 {
     return (int) printf ("%s",str);
 }
@@ -765,7 +765,7 @@ int fprintf ( file *stream, const char *format, ... ){
  * fputs:      
  */
 
-int fputs ( const char *str, file *f ){
+int k_fputs ( const char *str, file *f ){
 
     int size = 0;
 
@@ -800,7 +800,7 @@ int fputs ( const char *str, file *f ){
  * ungetc:
  */
 
-int ungetc ( int c, file *f ){
+int k_ungetc ( int c, file *f ){
 
     if (c == EOF) 
         return (int) c;
@@ -825,7 +825,7 @@ int ungetc ( int c, file *f ){
  * 
  */
 
-long ftell (file *f){
+long k_ftell (file *f){
 
     if ( (void *) f == NULL )
        return EOF;
@@ -837,7 +837,7 @@ long ftell (file *f){
 
 
 // fileno: Return the fd.
-int fileno ( file *f ){
+int k_fileno ( file *f ){
 
     if ( (void *) f == NULL )
        return EOF;
@@ -852,13 +852,13 @@ int fileno ( file *f ){
  *     #precisamos exportar isso como serviço. (#136)
  */
 
-int fgetc ( file *f ){
+int k_fgetc ( file *f ){
 
     int ch = 0;
 
 
     if ( (void *) f == NULL ){
-        printf ("fgetc: stream struct fail\n");
+        printf ("k_fgetc: stream struct fail\n");
         refresh_screen();
         return EOF;
  
@@ -929,7 +929,7 @@ int fgetc ( file *f ){
 // ??
 // REVER.
 
-int feof ( file *f ){
+int k_feof ( file *f ){
 
     int ch = 0;
 
@@ -939,7 +939,7 @@ int feof ( file *f ){
 
     } else {
 
-        ch = fgetc (f);
+        ch = k_fgetc (f);
 
         if ( ch == EOF )
         {
@@ -965,7 +965,7 @@ int feof ( file *f ){
  *
  */
 
-int ferror ( file *f ){
+int k_ferror ( file *f ){
 
     if ( (void *) f == NULL )
        return EOF;
@@ -983,10 +983,11 @@ int ferror ( file *f ){
  *     and whence is what that offset is relative to.
  */
 
-int fseek ( file *stream, long offset, int whence ){
+int k_fseek ( file *f, long offset, int whence ){
 
-    if ( (void *) stream == NULL )
-    {
+
+    if ( (void *) f == NULL ){
+        debug_print ("k_fseek: f\n");
         goto fail;
     }
 
@@ -997,19 +998,19 @@ int fseek ( file *stream, long offset, int whence ){
 
         case SEEK_SET:
 		    //printf ("SEEK_SET\n");   
-		    stream->_p = (stream->_base + offset); 
+            f->_p = (f->_base + offset); 
 			goto done;
 			break;
 			
         case SEEK_CUR:
 		    //printf ("SEEK_CUR\n");
-		    stream->_p = (stream->_p + offset);
+		    f->_p = (f->_p + offset);
 		    goto done;
 			break;
 
         case SEEK_END:
 		    //printf ("SEEK_END stream->_lbfsize=%d \n",stream->_lbfsize);
-		    stream->_p = ((stream->_base + stream->_lbfsize) + offset); 
+		    f->_p = ((f->_base + f->_lbfsize) + offset); 
 		    goto done;
 			break;
 
@@ -1021,7 +1022,7 @@ int fseek ( file *stream, long offset, int whence ){
 
 
 fail:
-	printf ("fseek fail\n");
+	printf ("k_fseek fail\n");
 	refresh_screen();
     return (int) (-1);
 
@@ -1071,7 +1072,7 @@ int __swbuf (int c, file *fp)
  * fputc:
  */
 
-int fputc ( int ch, file *f ){
+int k_fputc ( int ch, file *f ){
 
     if ( (void *) f == NULL ){
         return EOF;
@@ -1136,26 +1137,24 @@ int fputc ( int ch, file *f ){
 /*
  ********************************** 
  * fscanf:
- * 
- * 
- * 
+ *
  */
  
 // (since C99)
 // int fscanf( file *restrict stream, const char *restrict format, ... );
 // (until C99)
 
-int fscanf (file *stream, const char *format, ... )
+int k_fscanf (file *f, const char *format, ... )
 {
 	
-    if ( (void *) stream == NULL )
+    if ( (void *) f == NULL )
        return EOF;
 
     // #obs:
     // Existe um scanf completo em ring3.
     // Talvez não precisamos de outro aqui.
 
-    printf ("fscanf: todo \n");
+    printf ("k_fscanf: todo \n");
     return (int) -1;
 }
 
@@ -1198,7 +1197,7 @@ int vfprintf(file *stream, const char *format, va_list ap)
  *
  */
 
-void rewind ( file *f ){
+void k_rewind ( file *f ){
 
     //fseek (f, 0L, SEEK_SET);
 
@@ -1787,13 +1786,13 @@ fail:
 // see: 
 // https://linux.die.net/man/3/setvbuf
 
-void setbuf (file *stream, char *buf){
+void k_setbuf (file *f, char *buf){
 
-    if ( (void *) stream == NULL )
-    {
-		return;
+    if ( (void *) f == NULL ){
+        return;
+
     }else{
-	
+
 		//#todo
 		//se o buffer é válido.
         //if (stream->_bf._base != NULL) 
@@ -1805,11 +1804,11 @@ void setbuf (file *stream, char *buf){
         //}
         
         // Udate stream.
-        stream->_bf._base = buf;
+        f->_bf._base = buf;
         //stream->_lbfsize = size;        
         // ?? stream->bufmode = mode;
 
-        stream->_p = buf;
+        f->_p = buf;
         // ??stream->cnt = 0;
         //...
     };
@@ -1821,11 +1820,11 @@ void setbuf (file *stream, char *buf){
  * 
  */
  
-void setbuffer (file *stream, char *buf, size_t size){
+void k_setbuffer (file *f, char *buf, size_t size){
 
-    if ( (void *) stream == NULL )
-    {
-		return;
+    if ( (void *) f == NULL ){
+        return;
+
     }else{
 
 		//#todo
@@ -1839,15 +1838,16 @@ void setbuffer (file *stream, char *buf, size_t size){
         //}
         
         // Udate stream.
-        stream->_bf._base = buf;
-        stream->_lbfsize = size;        
+        f->_bf._base = buf;
+        f->_lbfsize = size;        
         // ?? stream->bufmode = mode;
 
-        stream->_p = buf;
+        f->_p = buf;
         // ??stream->cnt = 0;
         //...
     };
 }
+
 
 
 /*
@@ -1855,9 +1855,11 @@ void setbuffer (file *stream, char *buf, size_t size){
  * 
  */
  
-void setlinebuf (file *stream)
+void k_setlinebuf (file *f)
 {
-    if ( (void *) stream == NULL )
+    debug_print ("k_setlinebuf: \n");
+    
+    if ( (void *) f == NULL )
        return;
 }
 
@@ -1869,11 +1871,12 @@ void setlinebuf (file *stream)
  * 
  */
 
-int setvbuf (file *stream, char *buf, int mode, size_t size){
+int k_setvbuf (file *f, char *buf, int mode, size_t size){
 
-    if ( (void *) stream == NULL )
-    {
-		return -1;
+
+    if ( (void *) f == NULL ){
+        return -1;
+
     }else{
 
 		//#todo
@@ -1887,14 +1890,15 @@ int setvbuf (file *stream, char *buf, int mode, size_t size){
         //}
         
         // Udate stream.
-        stream->_bf._base = buf;
-        stream->_lbfsize = size;        
+        f->_bf._base = buf;
+        f->_lbfsize = size;        
         // ?? stream->bufmode = mode;
 
-        stream->_p = buf;
+        f->_p = buf;
         // ??stream->cnt = 0;
         //...
     };
+
 
     return 0;
 }

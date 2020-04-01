@@ -159,7 +159,7 @@ network_procedure (
                 break;   
             }
 
-            ftell (____network_file);
+            k_ftell (____network_file);
             sprintf( (char *) ____network_file->_base, "Hello friend!\n");
             //memcpy ( (void *), (const void *), (size_t) );
 
@@ -201,7 +201,7 @@ network_procedure (
                 break;   
             }
 
-            ftell (____network_file); 
+            k_ftell (____network_file); 
             //rewind(____network_file); 
 
             sprintf( (char *) ____network_file->_base, 

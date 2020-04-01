@@ -888,59 +888,20 @@ int printf (const char *format, ...);
 int sprintf (char *str, const char *format, ...);
 int fprintf (file *stream, const char *format, ...);
 int putchar ( int ch );
-//...
 
 
 
-int fputs ( const char *str, file *f );
-int ungetc ( int c, file *f );
-long ftell (file *f);
-int fileno ( file *f );
-int fgetc ( file *f );
-int feof ( file *f );
-int ferror ( file *f );
-int fseek ( file *stream, long offset, int whence );
-int fputc ( int ch, file *f );
-int fscanf (file *stream, const char *format, ... );
-void rewind ( file *f );
-
-
-
-//BUFFER:
-//void setbuf(file *stream, char *buffer)
-//int setvbuf(file *stream, char *buffer, int mode, size_t size);
-
-
-//testes...(ainda n�o  implementadas.)
-//int fgetpos(file *stream, fpos_t *pos);
-//int remove(const char *filename);
-//int rename(const char *old_filename, const char *new_filename);
-//  void setbuf(file *stream, char *buffer);
-//  FILE *tmpfile(void);
-//  int scanf(const char *format, ...)
-//int fgetc(file *stream)
-//  int fputc(int char, file *stream)
-//  int getc(file *stream)
-//  int getchar(void)
-//  int putc(int char, file *stream)
-
-
-int puts ( const char *str );
-
-
-
-
-/*
- * Fun��es internas para o padr�o C.
- */
+int kputs ( const char *str );
 
 void printchar (char **str, int c);
+
 
 int 
 prints ( char **out, 
          const char *string, 
          int width, 
          int pad );
+
 
 int 
 printi ( char **out, 
@@ -951,32 +912,29 @@ printi ( char **out,
          int pad, 
          int letbase );
 
+
 int print (char **out, int *varg);
 
 
+int k_ungetc ( int c, file *f );
+int k_fgetc ( file *f );
+int k_fputc ( int ch, file *f );
+int k_fputs ( const char *str, file *f );
+int k_fileno ( file *f );
+int k_feof ( file *f );
+int k_ferror ( file *f );
+int k_fseek ( file *f, long offset, int whence );
+long k_ftell (file *f);
+int k_fscanf (file *f, const char *format, ... );
+void k_rewind ( file *f );
 
-
-/*
- * Outros prot�tipos. 
- *     Para rotinas do kernel que est�o fora do padr�o C.
- */
-
-
-
-
-
-//int getchar();
-
-
-//
-// stream buffer support
-//
 
 // see: https://linux.die.net/man/3/setvbuf
-void setbuf(file *stream, char *buf);
-void setbuffer(file *stream, char *buf, size_t size);
-void setlinebuf(file *stream);
-int setvbuf(file *stream, char *buf, int mode, size_t size);
+void k_setbuf (file *f, char *buf);
+void k_setbuffer (file *f, char *buf, size_t size);
+void k_setlinebuf (file *f);
+int k_setvbuf (file *f, char *buf, int mode, size_t size);
+
 
 //inicializa os buffers do fluxo padr�o em stdio.c
 int stdioInitialize (void);
@@ -985,4 +943,6 @@ int stdioInitialize (void);
 //
 // End.
 //
+
+
 

@@ -24,8 +24,28 @@ long pathconf (const char *pathname, int name)
 
 off_t sys_lseek (int fd, off_t offset, int whence)
 {
-    debug_print("sys_lseek: [TODO]\n");
-    return (off_t) -1;
+    debug_print("sys_lseek: [WORK IN PROGRESS]\n");
+    
+    struct process_d *p;
+    file *f;
+
+    
+    if (fd<0 || fd >= 32)
+        return -1; //#todo message
+    
+    
+    p = (struct process_d *) processList[current_process];
+    
+    if ( (void *) p == NULL )
+        return -1; //#todo message
+    
+    
+    f = (file *) p->Objects[fd];
+    
+    if ( (void *) f == NULL )
+        return -1; //#todo message
+    
+    return (off_t) k_fseek ( (file *) f, (long) offset, (int) whence );
 }
 
 
