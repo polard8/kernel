@@ -2018,7 +2018,7 @@ int parse (){
                 // Separador de symbols.
                 if ( strncmp( (char *) real_token_buffer, ",", 1 ) == 0  )
                 {
-                    printf ("%d: #debug: , found\n", lineno); 
+                    //printf ("%d: #debug: , found\n", lineno); 
                     break;
                 }
                 
