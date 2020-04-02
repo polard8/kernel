@@ -2357,7 +2357,7 @@ static __inline__ off_t ftell(FILE *__f)
 
 
 
-// Dixaremos o kernel manipular a estrutura.
+// Deixaremos o kernel manipular a estrutura.
 //This function returns the current file position of the stream stream. 
 long ftell (FILE *stream){
 
@@ -2366,7 +2366,7 @@ long ftell (FILE *stream){
         
     fflush (stream);
     
-    return lseek ( fileno(stream) , 0, SEEK_CUR);
+    return (long) lseek ( fileno(stream) , 0, SEEK_CUR);
 }
 
 
@@ -2670,9 +2670,9 @@ static __inline__ int fseek(FILE *__f, off_t __o, int __w)
 // The fseek function is used to change the file position of the stream stream. 
 int fseek ( FILE *stream, long offset, int whence ){
 
-    debug_print ("fseek: TODO. Not implemented yet\n");
-
-    return -1;
+    //debug_print ("fseek: TODO. Not implemented yet\n");
+    //return -1;
+    
 	/*
     assert(stream);
     fflush(stream);
@@ -2685,7 +2685,27 @@ int fseek ( FILE *stream, long offset, int whence ){
     stream->ungotten = 0;
     return 0;
     */
+    
+    if ( (void*) stream == NULL )
+    {
+        debug_print ("fseek: stream \n");
+        return -1;
+    }
+    
+    //fflush(stream);    
+    off_t off = lseek( fileno(stream), offset, whence);
+    if (off < 0){
+        debug_print ("fseek: lseek fail \n");
+        return off;
+    }
+   
+    //stream->eof = false;
+    //stream->error = 0;
+    stream->have_ungotten = FALSE;
+    stream->ungotten = 0;
+    return -1;
 }
+
 
 
 

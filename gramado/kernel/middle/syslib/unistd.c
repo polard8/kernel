@@ -45,7 +45,9 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     if ( (void *) f == NULL )
         return -1; //#todo message
     
-    return (off_t) k_fseek ( (file *) f, (long) offset, (int) whence );
+    k_fseek ( (file *) f, (long) offset, (int) whence );
+
+    return (off_t) ( f->_p - f->_base ); 
 }
 
 

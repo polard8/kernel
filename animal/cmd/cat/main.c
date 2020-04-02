@@ -25,7 +25,10 @@
 //Talvez precisemos configurar o stdout.
  
 
-// Funcionou.
+
+// #test
+// usar ftell e fseek pra calcular o tamanho do arquivo.
+// provavlemente fasm esta usando isso e essas funções ainda não funcionam.
  
 int main ( int argc, char *argv[] ){
 
@@ -54,6 +57,16 @@ int main ( int argc, char *argv[] ){
         printf ("read fail\n");
         exit(-1);
     }
+    
+    //
+    // Testing size.
+    //
+    
+    fseek(fp, 0, SEEK_END);  // seek to end of file
+    size_t size = ftell(fp); // get current file pointer
+    fseek(fp, 0, SEEK_SET);  // seek back to beginning of file
+    printf (">>>> size %d \n",size);  
+
 
     //printf (">>>> %s \n",buffer);        
     
