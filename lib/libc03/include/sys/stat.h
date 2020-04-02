@@ -49,7 +49,8 @@
 
 
 
-//#todo
+// #todo
+// We need to define some types here.
 
 /*
 struct stat {
@@ -69,6 +70,8 @@ struct stat {
     time_t    st_ctime;   // time of last status change 
 };
 */
+
+
 
 
 

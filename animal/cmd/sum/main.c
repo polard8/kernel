@@ -22,7 +22,7 @@ int main ( int argc, char *argv[] ){
 
     do {
     
-    if(i < argc) {
+        if(i < argc) {
 			if ((f = fopen(argv[i], "r")) == NULL) {
 				fprintf(stderr, "sum: Can't open %s\n", argv[i]);
 				errflg += 10;
@@ -32,7 +32,9 @@ int main ( int argc, char *argv[] ){
 			f = stdin;
 		sum = 0;
 		nbytes = 0;
-		while ((c = getc(f)) != EOF) {
+		
+		while ((c = getc(f)) != EOF)
+		{
 			nbytes++;
 			if (sum&01)
 				sum = (sum>>1) + 0x8000;
@@ -56,8 +58,8 @@ int main ( int argc, char *argv[] ){
 		printf("\n");
 		fclose(f);
 		
-	} while(++i < argc);
-	
+	} while (++i < argc);
+
 
     printf("done\n");
     exit (errflg);

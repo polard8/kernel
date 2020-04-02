@@ -68,15 +68,17 @@ int show_quick;			/* quick, names only */
 int hostwidth = HOST_WIDTH;
 char *mytty;
 
-int
-main(int argc, char *argv[])
-{
-	struct utmp usr;
-	FILE *ufp;
-	char *t;
-	int c;
+int main (int argc, char *argv[]){
 
-	setlocale(LC_ALL, "");
+    struct utmp usr;
+    
+    FILE *ufp;
+    char *t;
+    int c;
+
+
+    setlocale (LC_ALL, "");
+
 
 	if (pledge("stdio unveil rpath getpw", NULL) == -1)
 		err(1, "pledge");
@@ -224,10 +226,10 @@ who_am_i(FILE *ufp)
 	output(&usr);
 }
 
-void
-output(struct utmp *up)
-{
-	struct stat sb;
+void output (struct utmp *up){
+
+    struct stat sb;
+
 	char line[sizeof(_PATH_DEV) + sizeof (up->ut_line)];
 	char state = '?';
 	static time_t now = 0;

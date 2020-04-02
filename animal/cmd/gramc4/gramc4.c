@@ -98,15 +98,16 @@ void next (void){
     if (tk == '\n') {
 
       if (src) {
-        printf("%d: %.*s", line, p - lp, lp);
+        printf("%d: %.*s", line, p - lp, lp); 
         lp = p;
         while (le < e) {
           printf("%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
                            "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
                            "OPEN,RUN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5]);
           if (*le <= ADJ) printf(" %d\n", *++le); else printf("\n");
-        }
+        };
       }
+      
       ++line;
     
     // #
@@ -121,17 +122,15 @@ void next (void){
 
       pp = p - 1;
       while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9') || *p == '_')
-        tk = tk * 147 + *p++;
+          tk = tk * 147 + *p++;
       tk = (tk << 6) + (p - pp);
       id = sym;
       while (id[Tk])
       {
-        if ( tk == id[Hash] && !memcmp((char *)id[Name], pp, p - pp) )
-        { 
-            tk = id[Tk]; 
-            return; 
-        }
-        id = id + Idsz;
+          if ( tk == id[Hash] && !memcmp((char *)id[Name], pp, p - pp) )
+          {  tk = id[Tk]; return; }
+          
+          id = id + Idsz;
       }
       id[Name] = (int)pp;
       id[Hash] = tk;
@@ -155,14 +154,11 @@ void next (void){
     }
     else if (tk == '/') {
 
-      if (*p == '/') {
-        ++p;
-        while (*p != 0 && *p != '\n') ++p;
-      }
-      else {
-        tk = Div;
-        return;
-      }
+        if (*p == '/') {
+            ++p; while (*p != 0 && *p != '\n') ++p;
+        } else {
+            tk = Div; return;
+        }
 
 
     // (')single  (")double 
@@ -184,16 +180,16 @@ void next (void){
     // = + - ! < > | & ^% * [ ? ~; { } ( ) ] , : 
     }
     else if (tk == '=') { if (*p == '=') { ++p; tk = Eq; } else tk = Assign; return; }
-    else if (tk == '+') { if (*p == '+') { ++p; tk = Inc; } else tk = Add; return; }
-    else if (tk == '-') { if (*p == '-') { ++p; tk = Dec; } else tk = Sub; return; }
+    else if (tk == '+') { if (*p == '+') { ++p; tk = Inc; } else tk = Add;   return; }
+    else if (tk == '-') { if (*p == '-') { ++p; tk = Dec; } else tk = Sub;   return; }
     else if (tk == '!') { if (*p == '=') { ++p; tk = Ne; } return; }
     else if (tk == '<') { if (*p == '=') { ++p; tk = Le; } else if (*p == '<') { ++p; tk = Shl; } else tk = Lt; return; }
     else if (tk == '>') { if (*p == '=') { ++p; tk = Ge; } else if (*p == '>') { ++p; tk = Shr; } else tk = Gt; return; }
-    else if (tk == '|') { if (*p == '|') { ++p; tk = Lor; } else tk = Or; return; }
+    else if (tk == '|') { if (*p == '|') { ++p; tk = Lor; } else tk = Or;  return; }
     else if (tk == '&') { if (*p == '&') { ++p; tk = Lan; } else tk = And; return; }
-    else if (tk == '^') { tk = Xor; return; }
-    else if (tk == '%') { tk = Mod; return; }
-    else if (tk == '*') { tk = Mul; return; }
+    else if (tk == '^') { tk = Xor;  return; }
+    else if (tk == '%') { tk = Mod;  return; }
+    else if (tk == '*') { tk = Mul;  return; }
     else if (tk == '[') { tk = Brak; return; }
     else if (tk == '?') { tk = Cond; return; }
     else if (tk == '~' || tk == ';' || tk == '{' || tk == '}' || tk == '(' || tk == ')' || tk == ']' || tk == ',' || tk == ':') return;
@@ -208,7 +204,6 @@ void expr (int lev){
 
   int t, *d;
 
-  
 
   // Nothing| NUM | '"'  
   if (!tk) { printf("%d: unexpected eof in expression\n", line); exit(-1); }
@@ -296,7 +291,7 @@ void expr (int lev){
 
   //  ! | ~ | ADD | SUB 
   }
-  else if (tk == '!') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = 0; *++e = EQ; ty = INT; }
+  else if (tk == '!') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = 0; *++e = EQ;   ty = INT; }
   else if (tk == '~') { next(); expr(Inc); *++e = PSH; *++e = IMM; *++e = -1; *++e = XOR; ty = INT; }
   else if (tk == Add) { next(); expr(Inc); ty = INT; }
   else if (tk == Sub) {
@@ -310,8 +305,9 @@ void expr (int lev){
   }
   else if (tk == Inc || tk == Dec) {
 
-    t = tk; next(); expr(Inc);
-    if (*e == LC) { *e = PSH; *++e = LC; }
+    t = tk; 
+    next(); expr(Inc);
+    if (*e == LC)      { *e = PSH; *++e = LC; }
     else if (*e == LI) { *e = PSH; *++e = LI; }
     else { printf("%d: bad lvalue in pre-increment\n", line); exit(-1); }
     *++e = PSH;
@@ -406,7 +402,8 @@ void expr (int lev){
     }
     else if (tk == Brak) {
       
-      next(); *++e = PSH; expr(Assign);
+      next(); 
+      *++e = PSH; expr(Assign);
       if (tk == ']') next(); else { printf("%d: close bracket expected\n", line); exit(-1); }
       if (t > PTR) { *++e = PSH; *++e = IMM; *++e = sizeof(int); *++e = MUL;  }
       else if (t < PTR) { printf("%d: pointer type expected\n", line); exit(-1); }
@@ -416,8 +413,7 @@ void expr (int lev){
     // 
     }
     else { 
-        printf("%d: compiler error tk=%d\n", line, tk); 
-        exit(-1); 
+        printf("%d: compiler error tk=%d\n", line, tk); exit(-1); 
     }
   }
 }
@@ -428,7 +424,6 @@ void stmt (void){
     int *a, *b;
 
     
-
     // IF
     if (tk == If){
 
@@ -451,8 +446,8 @@ void stmt (void){
             *b = (int)(e + 3); 
             *++e = JMP; 
             b = ++e;
-            next();
-            stmt();
+            
+            next(); stmt();
         }
         
         *b = (int)(e + 1);
@@ -483,25 +478,18 @@ void stmt (void){
     } else if (tk == Return){
 
         next ();
-
-    if (tk != ';') expr(Assign);
-    *++e = LEV;
-    if (tk == ';') next(); else { printf("%d: semicolon expected\n", line); exit(-1); }
+        if (tk != ';') expr(Assign); *++e = LEV;
+        if (tk == ';') next(); else { printf("%d: semicolon expected\n", line); exit(-1); }
   
 
     // '{'
     } else if (tk == '{') {
-
+        next (); while (tk != '}') stmt();
         next ();
-        while (tk != '}') stmt();
-        next ();
-
 
     // ';'
     } else if (tk == ';') {
-    
         next ();
-
     
     // 
     } else {
@@ -545,25 +533,15 @@ int main (int argc, char **argv){
     
     // -s
     if (argc > 0 && **argv == '-' && (*argv)[1] == 's') 
-    { 
-        src = 1; 
-        --argc; 
-        ++argv; 
-    }
+    { src = 1;  --argc;  ++argv; }
 
     // -d
     if (argc > 0 && **argv == '-' && (*argv)[1] == 'd') 
-    { 
-        debug = 1; 
-        --argc; 
-        ++argv; 
-    }
+    { debug = 1;  --argc;  ++argv; }
 
 
-    if (argc < 1) { 
-        printf("usage: c4 [-s] [-d] file ...\n"); 
-        return -1; 
-    }
+    if (argc < 1) 
+    {  printf("usage: c4 [-s] [-d] file ...\n"); return -1;  }
 
 
     //
@@ -572,17 +550,15 @@ int main (int argc, char **argv){
 
 
     if ((fd = open(*argv, 0, 0)) < 0){ 
-        printf("could not open(%s)\n", *argv); 
-        return -1; 
+        printf("could not open(%s)\n", *argv); return -1; 
     }
 
 
-    poolsz = 256*1024;    // arbitrary size
+    poolsz = (256*1024);    // arbitrary size
 
-    //
+
     // Buffer.
     // sym, le, data, sp
-    //
     
     if (!(sym = malloc(poolsz))) 
     { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
@@ -623,6 +599,7 @@ int main (int argc, char **argv){
     while (i <= EXIT) 
     { 
         next(); 
+        
         id[Class] = Sys; 
         id[Type] = INT; 
         id[Val] = i++; 
@@ -654,8 +631,7 @@ int main (int argc, char **argv){
     //    
 
     if ( (i = read(fd, p, poolsz-1)) <= 0 ){ 
-        printf ("read() returned %d\n", i); 
-        return -1; 
+        printf ("read() returned %d\n", i); return -1; 
     }
 
     // Finalize.
@@ -684,8 +660,7 @@ int main (int argc, char **argv){
         // CHAR
         }
         else if (tk == Char) { 
-            next(); 
-            bt = CHAR; 
+            next();  bt = CHAR; 
         
         // ENUM
         // Abre e fecha o corpo.
@@ -693,9 +668,7 @@ int main (int argc, char **argv){
         else if (tk == Enum) {
             
             next();
-
-            if (tk != '{') 
-                next();
+            if (tk != '{') next();
 
 
             // Depois que abre, tem que fazer um while até fechar.
@@ -737,10 +710,10 @@ int main (int argc, char **argv){
 
                 next();
             }
-        }
+        } // terminal o enum.
 
-
-        // symbol agora;
+        // acima foi visto tipo e enum.
+        // agora é symbol.
         
         // Step 1:
         // Logo acima encontramos tipos ou enum.
@@ -749,6 +722,7 @@ int main (int argc, char **argv){
         // Obs: Estamos fazendo declarações globais.
 
         // While inside the body ?
+        
         while (tk != ';' && tk != '}')
         {
 
@@ -757,8 +731,7 @@ int main (int argc, char **argv){
             // ?? Se a declaração global é um ponteiro ??
             
             // MUL
-            while (tk == Mul)
-            { 
+            while (tk == Mul){ 
                 next(); 
                 ty = ty + PTR; 
             }
@@ -766,7 +739,7 @@ int main (int argc, char **argv){
             // Se não é um symbol.
             // Deveríamos ter um symbol logo após o tipo.
             if (tk != Id) { 
-                printf ("%d: bad global declaration\n", line); 
+                printf ("%d: bad global declaration\n", line);  
                 return -1; 
             }
 
@@ -780,20 +753,18 @@ int main (int argc, char **argv){
 
             // Depois do symbol, abre-se a função.
             // Começando com a pilha de parâmetros. '()'.
+            // Salvamos a tipagem obtida acima.            
             
             next();
-      
             id[Type] = ty;
-
             
             // FUNCTION
             if (tk == '(')
             {
-                
                 id[Class] = Fun;
                 id[Val] = (int)(e + 1);
-                next (); 
-                i = 0;
+                
+                next(); i=0;
                 
                 // Vamos contruir a pilha de parâmetros
                 // Até encontrarmos o fim da pilha ')'
@@ -801,23 +772,17 @@ int main (int argc, char **argv){
                 {
                     ty = INT;
                     
-                    if (tk == Int) next();
-                    else if (tk == Char) { 
-                             next (); 
-                             ty = CHAR; 
-                         }
+                    if (tk == Int)        next();
+                    else if (tk == Char){ next (); ty = CHAR; }
 
-                    while (tk == Mul) 
-                    { 
-                        next(); 
-                        ty = ty + PTR; 
-                    }
+                    // Is it a pointer ?
+                    while (tk == Mul){    next();  ty = ty + PTR; }
 
-                    //tem que ser um symbol.
+                    // Tem que ser um symbol.
                     if (tk != Id) 
                     { printf("%d: bad parameter declaration\n", line); return -1; }
                     
-                    // tem que ser local.
+                    // Tem que ser local.
                     if (id[Class] == Loc) 
                     { printf("%d: duplicate parameter definition\n", line); return -1; }
                     
@@ -828,20 +793,19 @@ int main (int argc, char **argv){
                     id[HVal] = id[Val];   
                     id[Val] = i++;
                     
-                    next();
+                    next(); 
                     
+                    // Concatenação de parâmetros.
                     if (tk == ',') next();
                 }
 
+                next();
+
                 // Depois de contruída a pilha de parâmetros
                 // devemos abrir o corpo da função.
-                
-                next();
-                
-                if (tk != '{') { 
-                    printf ("%d: bad function definition\n", line); 
-                    return -1; 
-                }
+
+                if (tk != '{')
+                { printf ("%d: bad function definition\n", line); return -1; }
         
                 loc = ++i;
                 
@@ -851,33 +815,39 @@ int main (int argc, char **argv){
                 while (tk == Int || tk == Char)
                 {
                     bt = (tk == Int) ? INT : CHAR;
+                    
                     next();
 
                     while (tk != ';') 
                     {
                         ty = bt;
 
+                        // pointer ??
                         while (tk == Mul) 
-                        { 
-                            next(); 
-                            ty = ty + PTR; 
-                        }
+                        { next(); ty = ty + PTR; }
 
+                        // symbol
                         if (tk != Id) 
                         { printf("%d: bad local declaration\n", line); return -1; }
                         
+                        // variavel local.
                         if (id[Class] == Loc) 
                         { printf("%d: duplicate local definition\n", line); return -1; }
                         
                         id[HClass] = id[Class]; id[Class] = Loc;
                         id[HType]  = id[Type];  id[Type] = ty;
                         id[HVal]   = id[Val];   id[Val] = ++i;
+                        
                         next();
+                        
+                        // Concatenando declarações de variáveis locais.
                         if (tk == ',') next();
                     }
                     next();
                 
-                }; // Fim do while de declarações de variáveis dentro do corpo da função.
+                // Fim do while de declarações de variáveis 
+                // dentro do corpo da função?
+                }; 
 
 
                 *++e = ENT; 
@@ -887,8 +857,8 @@ int main (int argc, char **argv){
                 // Ou seja, todas as declarações foram feitas no início do corpo
                 // e se não for }, então é statement.
                
-                while (tk != '}') 
-                    stmt();
+                while (tk != '}') stmt();
+                
                 
                 *++e = LEV;
                 id = sym;    // unwind symbol table locals
@@ -912,12 +882,9 @@ int main (int argc, char **argv){
                 data = data + sizeof(int);
             };
 
-
-            // ','
             // Não era abretura de pilha de parâmetros,
             // provavelmente uma sequência de declarações de variáveis.
-            if (tk == ',')
-                next ();
+            if (tk == ',') next ();
        
         }; //while. Finalização de declaração ou corpo.
 
@@ -937,13 +904,13 @@ int main (int argc, char **argv){
 
     if ( !( register_pc = (int *) idmain[Val] ) )
     { 
-        printf ("main() not defined\n"); 
-        return -1; 
+        printf ("main() not defined\n"); return -1; 
     }
 
-    // ??
-    if (src) 
-        return 0;
+
+    if (src){ 
+        debug_print ("gramc4: src\n"); return 0; 
+    }
 
 
 
@@ -996,7 +963,7 @@ int main (int argc, char **argv){
         // O interpretador realiza algumas instruções.
 
         // load local address
-        if      (i == LEA) { 
+        if (i == LEA) { 
             register_a = (int)(register_bp + *register_pc++); 
         
         // load global address or immediate

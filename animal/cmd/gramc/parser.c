@@ -1720,9 +1720,7 @@ int parse (){
     int reg_cycle; 
     // ...   
     //--
-    
-    
-    
+
     int i;
 
 
@@ -1739,20 +1737,14 @@ int parse (){
     int State = 1;
 
 
-	//
-	// size ??
-	//
     size_t size;
-    
-    
+ 
     // arbitrary size
     poolsz = 256*1024;
-    
-    
-    //
+
+
     // Buffer.
     // sym, le, data, sp
-    //
     
     // symbol table (simple list of identifiers)
     if (!(x_sym = malloc(poolsz))) 
@@ -1763,9 +1755,9 @@ int parse (){
     id = x_sym;
  
     // limpa o primeiro id[]
-	for ( i=0; i<8; i++ )
-		id[i] = 0;
-		    
+    for ( i=0; i<8; i++ )
+        id[i] = 0;
+   
     // x_le current position in emitted code
     // x_e current position in emitted code
     if (!(x_le = x_e = malloc(poolsz))) 
@@ -1783,13 +1775,7 @@ int parse (){
     memset(x_sym,  0, poolsz);
     memset(x_e,    0, poolsz);
     memset(x_data, 0, poolsz);
-    
-    
-    
-        
-    
-            
-    
+   
     
      
     // #bugbug
@@ -1848,11 +1834,8 @@ int parse (){
     while (running == 1)
     {
         // EOF: O lexer nos disse que acabou.
-        if ( token == TOKENEOF )
-        { 
-            printf ("parse: ~EOF\n"); 
-            running = 0; 
-            break; 
+        if ( token == TOKENEOF ){ 
+            printf ("parse: ~EOF\n"); running = 0; break; 
         }
  
         // INT CHAR 
@@ -1873,12 +1856,12 @@ int parse (){
             {
                 if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
                 {
-                    break;
+                    break; //todo
                 }
 
                 if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
                 {
-                    break;
+                    break; //todo
                 }                
             }
             
@@ -1958,8 +1941,7 @@ int parse (){
                     // acabou a pilha de parâmetros.
                     // vamos entrar no corpo.
                     // '{'
-                    if ( token != TOKENSEPARATOR )
-                    {
+                    if ( token != TOKENSEPARATOR ){
                        printf ("%d: Expected { separator!\n", lineno);
                        exit(-1);
                     }
@@ -2001,9 +1983,9 @@ int parse (){
                         
                         // EOF: 
                         // O lexer nos disse que acabou.
-                        if ( token == TOKENEOF )
-                        {
-                            printf ("%d: [ERROR] Missing } separator!\n", lineno);
+                        if ( token == TOKENEOF ){
+                            printf ("%d: [ERROR] Missing } separator!\n", 
+                            lineno);
                             running = 0;
                             break;
                         }
@@ -2027,10 +2009,8 @@ int parse (){
                 // Cuidado.
                 
               // Não era um separador depois do symbol.
-            } else {
-
-                printf ("%d: Separator expected!\n", lineno); 
-                exit(-1);
+            } else { 
+                printf ("%d: Separator expected!\n", lineno);  exit(-1);
             };
             
 
@@ -2097,29 +2077,27 @@ int parse (){
          
          // NOTHING
          if ( inst == OPCODE_NOTHING ){
-             printf ("OPCODE_NOTHING on cycle %d \n", reg_cycle);
-             break;
+             printf ("OPCODE_NOTHING on cycle %d \n", reg_cycle); break;
          
          
          // MAIN
          }
          else if ( inst == OPCODE_MAIN ){
-             printf ("main(?): on cycle %d \n", reg_cycle);
-             break;
+             printf ("main(?): on cycle %d \n", reg_cycle); break;
          
          //...
-         
          
          // ERROR
          }
          else {
-            
             printf ("unknown instruction = %d! cycle = %d\n", inst, reg_cycle); 
-            exit(-1);
-            //return -1; 
+            exit(-1); 
          };
      };
 
+
+
+    // reaproveitas as intruções abaixo.
     /*
     //--
     while (1)
