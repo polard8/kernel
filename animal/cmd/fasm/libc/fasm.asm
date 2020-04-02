@@ -32,13 +32,21 @@ extrn gettimeofday
 section '.text' executable align 16
 
 
+;; #todo
+;; main() needs to give us the arguments.
+
 fasm_main:
 	
 	
+	; argc
 	mov	ecx,[esp+4]
 	mov	[argc],ecx
+	
+	;argv
 	mov	ebx,[esp+8]
 	mov	[argv],ebx
+
+
 	push	ebp
 	mov	[stack_frame],esp
 
@@ -176,7 +184,7 @@ get_params:
       bad_params:
 	stc
 	ret
-      memory_option:
+    memory_option:
 	cmp	byte [esi],0
 	jne	get_memory_setting
 	dec	ecx
@@ -309,11 +317,14 @@ get_params:
 	clc
 	ret
 
-include 'system.inc'
 
-include '..\version.inc'
+
+include  'system.inc'
+include  '..\version.inc'
+
 
 _copyright db 'Copyright (c) 1999-2020, Tomasz Grysztar',0xA,0
+
 
 _logo db 'flat assembler  version ',VERSION_STRING,0
 _usage db 0xA
@@ -324,11 +335,12 @@ _usage db 0xA
        db ' -d <name>=<value>  define symbolic variable',0xA
        db ' -s <file>          dump symbolic information for debugging',0xA
        db 0
-_memory_prefix db '  (',0
-_memory_suffix db ' kilobytes memory)',0xA,0
-_passes_suffix db ' passes, ',0
-_seconds_suffix db ' seconds, ',0
-_bytes_suffix db ' bytes.',0xA,0
+_memory_prefix  db '  (',0
+_memory_suffix  db ' kilobytes memory)',0xA,0
+_passes_suffix    db ' passes, ',0
+_seconds_suffix  db ' seconds, ',0
+_bytes_suffix     db ' bytes.',0xA,0
+
 
 include '..\errors.inc'
 include '..\symbdump.inc'
@@ -341,8 +353,10 @@ include '..\formats.inc'
 include '..\x86_64.inc'
 include '..\avx.inc'
 
+
 include '..\tables.inc'
 include '..\messages.inc'
+
 
 section '.bss' writeable align 4
 
@@ -363,3 +377,6 @@ preprocessing_done db ?
 
 predefinitions rb 1000h
 buffer rb 1000h
+
+
+

@@ -25,15 +25,17 @@
 //Talvez precisemos configurar o stdout.
  
 
-extern void fasm_main(void);
+extern void fasm_main(int argc, char *argv[]);
 
-// Funcionou.
+
+
  
 int main ( int argc, char *argv[] ){
 
 
     printf ("fasm: Initializing ...\n");
-    fasm_main();
+    // IN: It needs to be in: [esp+4] and [esp+8]
+    fasm_main(argc,argv);
     printf ("fasm: Done\n");
 
 
