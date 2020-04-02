@@ -23,6 +23,9 @@ all:
 	
 	make -C ./bazic   
 	
+	make -C ./fasm  
+	
+	 
 
 
 # ...

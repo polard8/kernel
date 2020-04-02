@@ -1169,19 +1169,29 @@ size_t fwrite (const void *ptr, size_t size, size_t n, FILE *fp){
         return (size_t) -1;
     }
  
+ 
+    // #todo:
+    // n limits.
+ 
     // Quantidade inválida.
     if ( n <= 0 ){
         printf ("fwrite: n \n");
         return (size_t) -1;
     }
+   
+   
+    // #todo:    
+    //if ( size ?? )
+
 
     if ( (void *) ptr == NULL ){
         printf ("fwrite: ptr \n");
         return (size_t) -1;
     }
 
-    nwrite = write( fileno(fp), ptr, sizeof(ptr) );
-    
+    //nwrite = write( fileno(fp), ptr, sizeof(ptr) );
+    nwrite = write ( fileno(fp), ptr, n );
+
     if (nwrite <= 0){
         printf ("fwrite: write() fail \n");
         return (size_t) -1;   

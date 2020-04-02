@@ -19,23 +19,37 @@
 // Isso funciona.
 
 time_t time (time_t *timer){
-	
-	time_t Ret;
-	
+
+    time_t Ret;
+
 	//system call. (224) get time
-		
-	Ret = (time_t) gramado_system_call ( 224, 0, 0, 0 );
-	
+
+    Ret = (time_t) gramado_system_call ( 224, 0, 0, 0 );
+
     *timer = Ret;
 
-    return (time_t) Ret;	
+    return (time_t) Ret;
 }
 
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
+int gettimeofday (struct timeval *tv, struct timezone *tz)
 {
-	return -1;
+    debug_print ("gettimeofday: [TODO]\n");
+    return -1;
 }
+
+
+int settimeofday (const struct timeval *tv, const struct timezone *tz)
+{
+    debug_print ("settimeofday: [TODO]\n");
+    return -1;
+}
+
+
+
+
+
+
 
 
 
